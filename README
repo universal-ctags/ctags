@@ -31,9 +31,9 @@ Exuberant Ctags offers the following features:
 
 5.  User-defined languages, using Posix regular expressions.
 
-6.  Supports UNIX, MSDOS, Windows 95/98/NT, OS/2, QNX, Amiga, QDOS, VMS,
-    Macintosh, and Cray. Some pre-compiled binaries are available on the web
-    site.
+6.  Supports UNIX, MSDOS, Windows 95/98/NT, OS/2, QNX, Amiga, QDOS, RISC OS,
+    VMS, Macintosh, and Cray. Some pre-compiled binaries are available on
+    the web site.
 
 
 Visit the Exuberant Ctags web site:

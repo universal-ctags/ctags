@@ -98,11 +98,18 @@ extern void vStringPut (vString *const string, const int c)
 
 extern void vStringCatS (vString *const string, const char *const s)
 {
+#if 1
+    const size_t len = strlen (s);
+    while (string->length + len >= string->size)/*  check for buffer overflow */
+	vStringAutoResize (string);
+    strcpy (string->buffer + string->length, s);
+    string->length += len;
+#else
     const char *p = s;
-
     do
 	vStringPut (string, *p);
     while (*p++ != '\0');
+#endif
 }
 
 extern vString *vStringNewCopy (vString *const string)

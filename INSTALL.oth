@@ -16,6 +16,7 @@ For non-Unix platforms, simple makefiles are provided:
     mk_mvc.mak    For Win32 using Microsoft Visual C++
     mk_os2.mak    For OS/2 using GCC (EMX)
     mk_qdos.mak   For QDOS using C68
+    mk_riscos.mak For RISC OS using the GCC SDK <http://hard-mofo.dsvr.net>
     mk_sas.mak    For Amiga using SAS/C
 
 
@@ -37,7 +38,7 @@ Win32:
 Macintosh with MPW:
 -------------------
 
-  To build CTags on MPW you will have to have the Metrowerks compilers
+  To build Ctags on MPW you will have to have the Metrowerks compilers
   or you will have to edit the makefiles yourself.
   
   Since the makefile for MPW is called mk_mpw.mak you will have to give
@@ -48,9 +49,9 @@ Macintosh with MPW:
   If the build process goes wrong make sure the line endings for the
   makefile are set to MacOS (CR instead of LF).
 
-  This version of CTags only accepts and emits unix style paths. This was
+  This version of Ctags only accepts and emits unix style paths. This was
   done since it was easier to implement (few changes in main source files)
-  and since I ported CTags to MPW to use with Pepper which also works with
+  and since I ported Ctags to MPW to use with Pepper which also works with
   unix style paths internally. Besides, since we're now moving to MacOS X
   anyway, Mac programmers are getting used to unix style paths anyway.
   
@@ -65,3 +66,13 @@ Macintosh with MPW:
   put quotes around the full unix style path since / has a special meaning
   in MPW.
   
+RISC OS:
+--------
+
+  Regex support on RISC OS is available when compiled to use the RISC OS port
+  of the GNU regex library, which can be obtained from:
+ 
+    <http://www.sbellon.de/software.html>
+ 
+  Using 'Set RexEx$Path <Obey$Dir>.' in the regex-0/12 directory will ensure
+  it can be found.
