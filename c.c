@@ -939,8 +939,7 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 	case TAG_TYPEDEF:
 	case TAG_UNION:
 	    if (vStringLength (scope) > 0  &&
-		(isMember (st) || st->parent->declaration == DECL_NAMESPACE) &&
-		(type != TAG_ENUMERATOR || isLanguage (Lang_csharp)))
+		(isMember (st) || st->parent->declaration == DECL_NAMESPACE))
 	    {
 		if (isType (st->context, TOKEN_NAME))
 		    tag->extensionFields.scope [0] = tagName (TAG_CLASS);
