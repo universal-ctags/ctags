@@ -21,6 +21,7 @@
 #endif
 #include <stdio.h>
 #include "readtags.h"
+#include "routines.h"
 
 /*
 *   MACROS

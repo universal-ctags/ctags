@@ -258,8 +258,7 @@ extern void eFree (void *const ptr)
  *  String manipulation functions
  */
 
-#if !defined (HAVE_STRCASECMP) && !defined (HAVE_STRICMP)
-extern int strcasecmp (const char *s1, const char *s2)
+extern int struppercmp (const char *s1, const char *s2)
 {
     int result;
     do
@@ -268,10 +267,8 @@ extern int strcasecmp (const char *s1, const char *s2)
     } while (result == 0  &&  *s1++ != '\0'  &&  *s2++ != '\0');
     return result;
 }
-#endif
 
-#if !defined (HAVE_STRNCASECMP) && !defined (HAVE_STRNICMP)
-extern int strncasecmp (const char *s1, const char *s2, size_t n)
+extern int strnuppercmp (const char *s1, const char *s2, size_t n)
 {
     int result;
     do
@@ -280,7 +277,6 @@ extern int strncasecmp (const char *s1, const char *s2, size_t n)
     } while (result == 0  &&  --n > 0  &&  *s1++ != '\0'  &&  *s2++ != '\0');
     return result;
 }
-#endif
 
 #ifndef HAVE_STRSTR
 extern char* strstr (const char *str, const char *substr)
