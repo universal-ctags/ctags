@@ -1330,10 +1330,10 @@ static void parseInterfaceBlock (tokenInfo *const token)
 	     isKeyword (token, KEYWORD_operator))
     {
 	parseParenName (token);
-
 	if (isType (token, TOKEN_OPERATOR))
 	    makeFortranTag (token, TAG_INTERFACE);
     }
+    ancestorPush (token);
     while (! isKeyword (token, KEYWORD_end))
     {
 	switch (token->keyword)
@@ -1346,6 +1346,7 @@ static void parseInterfaceBlock (tokenInfo *const token)
     readToken (token);
     Assert (isKeyword (token, KEYWORD_interface));
     skipToNextStatement (token);
+    ancestorPop ();
 }
 
 /*  entry-stmt is
