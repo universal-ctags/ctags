@@ -96,7 +96,7 @@ static void findVimTags (void)
 		while (isspace ((int) *cp))
 		    ++cp;
                 cp = skipPrefix (cp, &scope);
-		if (isupper ((int) *cp))
+		if (isupper ((int) *cp)  ||  scope == 's'  ||  scope == '<')
 		{
 		    do
 		    {
