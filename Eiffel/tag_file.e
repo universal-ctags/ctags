@@ -107,8 +107,8 @@ feature -- Status report
 feature -- Status setting
 
 	set_sort_type (type: INTEGER) is
-			-- Force valud for sort type of file if automatic detection does
-			-- not work.
+			-- Force sort type of file (in case automatic detection does not
+			-- work).
 		require
 			open: open
 			valid_sort_type: valid_sort_type (type)
@@ -164,8 +164,12 @@ feature -- Status setting
 
 	start is
 			-- Move to first tag in file
+		require
+			exists: open
 		do
 			read_tag (c_tags_first (handle, string_to_c (tag_entry_struct)))
+		ensure
+			item_found: not off implies item /= Void
 		end
 
 	forth is
