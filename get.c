@@ -118,6 +118,11 @@ extern void cppInit (const boolean state)
     Cpp.directive.accept    = TRUE;
     Cpp.directive.nestLevel = 0;
 
+    Cpp.directive.ifdef [0].ignoreAllBranches = FALSE;
+    Cpp.directive.ifdef [0].singleBranch = FALSE;
+    Cpp.directive.ifdef [0].branchChosen = FALSE;
+    Cpp.directive.ifdef [0].ignoring     = FALSE;
+
     if (Cpp.directive.name == NULL)
 	Cpp.directive.name = vStringNew ();
     else

@@ -5,6 +5,7 @@ ctags-5.5.3 (Sun Dec 14 2003)
 * Fixed problem destroying tag file with certain info options [Bug #845502].
 * Fixed portability problem [DJGPP].
 * Fixed problem of double characters in signature field [Bug #852368].
+* Fixed problem manifested by errant preprocessor conditionals [Bug #839162].
 
 ctags-5.5.2 (Wed Sep 17 2003)
 * Added tags for local variables for C-based languages [C/C++/C#/Java/Vera,
