@@ -1154,7 +1154,7 @@ static void processListKindsOption (
 	else
 	    printLanguageKinds (language);
     }
-    FilesRequired = FALSE;
+    exit (0);
 }
 
 static void processListMapsOption (
@@ -1171,7 +1171,7 @@ static void processListMapsOption (
 	else
 	    printLanguageMaps (language);
     }
-    FilesRequired = FALSE;
+    exit (0);
 }
 
 static void processListLanguagesOption (
@@ -1179,7 +1179,7 @@ static void processListLanguagesOption (
 	const char *const parameter __unused__)
 {
     printLanguageList ();
-    FilesRequired = FALSE;
+    exit (0);
 }
 
 static void processOptionFile (
@@ -1510,7 +1510,7 @@ static void processShortOption (
     {
 	case '?':
 	    processHelpOption ("?", NULL);
-	    FilesRequired = FALSE;
+	    exit (0);
 	    break;
 	case 'a':
 	    checkOptionOrder (option);

@@ -180,6 +180,12 @@ extern int lstat (const char *, struct stat *);
 *   FUNCTION DEFINITIONS
 */
 
+extern void freeRoutineResources (void)
+{
+    if (CurrentDirectory != NULL)
+	eFree (CurrentDirectory);
+}
+
 extern void setExecutableName (const char *const path)
 {
     ExecutableProgram = path;

@@ -81,6 +81,7 @@ typedef struct {
 /*
 *   FUNCTION PROTOTYPES
 */
+extern void freeRoutineResources (void);
 extern void setExecutableName (const char *const path);
 extern const char *getExecutableName (void);
 extern void error (const errorSelection selection, const char *const format, ...) __printf__ (2, 3);

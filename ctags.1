@@ -507,7 +507,7 @@ before the first file name. [Ignored in etags mode]
 
 .TP 5
 .B \--help
-Prints to standard output a detailed usage description and then exits.
+Prints to standard output a detailed usage description, and then exits.
 
 .TP 5
 \fB--if0\fP[=\fIyes\fP|\fIno\fP]
@@ -618,7 +618,7 @@ built-in language names.
 
 .TP 5
 \fB--license\fP
-Prints a summary of the software license to standard output and then exits.
+Prints a summary of the software license to standard output, and then exits.
 
 .TP 5
 \fB--line-directives\fP[=\fIyes\fP|\fIno\fP]
@@ -646,25 +646,26 @@ disabled, symbolic links are ignored. This option is on by default.
 .TP 5
 \fB--list-kinds\fP[=\fIlanguage\fP|\fIall\fP]
 Lists the tag kinds recognized for either the specified language or all
-languages. Each kind of tag recorded in the tag file is represented by a
-one-letter flag, which is also used to filter the tags placed into the output
-through use of the \fB--<LANG>-kinds\fP option. Note that some languages and/or
-tag kinds may be implemented using regular expressions and may not be
-available if regex support is not compiled into \fBctags\fP (see the
-\fB--regex-<LANG>\fP option). Each kind listed is enabled unless followed by
-"[off]".
+languages, and then exits. Each kind of tag recorded in the tag file is
+represented by a one-letter flag, which is also used to filter the tags placed
+into the output through use of the \fB--<LANG>-kinds\fP option. Note that some
+languages and/or tag kinds may be implemented using regular expressions and
+may not be available if regex support is not compiled into \fBctags\fP (see
+the \fB--regex-<LANG>\fP option). Each kind listed is enabled unless followed
+by "[off]".
 
 .TP 5
 \fB--list-maps\fP[=\fIlanguage\fP|\fIall\fP]
 Lists the file extensions and file name patterns which associate a file name
-with a language for either the specified language or all languages. See
-the \fB--langmap\fP option, and \fBSOURCE FILES\fP, above.
+with a language for either the specified language or all languages, and then
+exits. See the \fB--langmap\fP option, and \fBSOURCE FILES\fP, above.
 
 .TP 5
 \fB--list-languages\fP
-Lists the names of the languages understood by \fBctags\fP. These language
-names are case insensitive and may be used in the \fB--language-force\fP,
-\fB--languages\fP, \fB--<LANG>-kinds\fP, and \fB--regex-<LANG>\fP options.
+Lists the names of the languages understood by \fBctags\fP, and then exits.
+These language names are case insensitive and may be used in the
+\fB--language-force\fP, \fB--languages\fP, \fB--<LANG>-kinds\fP, and
+\fB--regex-<LANG>\fP options.
 
 .TP 5
 \fB--options\fP=\fIfile\fP
@@ -780,8 +781,8 @@ are read from these sources. The default is \fIno\fP.
 
 .TP 5
 \fB--version\fP
-Prints a version identifier for \fBctags\fP to standard output and then exits.
-This is guaranteed to always contain the string "Exuberant Ctags".
+Prints a version identifier for \fBctags\fP to standard output, and then
+exits. This is guaranteed to always contain the string "Exuberant Ctags".
 
 
 .SH "OPERATIONAL DETAILS"

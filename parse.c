@@ -343,7 +343,8 @@ extern void freeParserResources (void)
 	LanguageTable [i]->name = NULL;
 	eFree (LanguageTable [i]);
     }
-    eFree (LanguageTable);
+    if (LanguageTable != NULL)
+	eFree (LanguageTable);
     LanguageTable = NULL;
     LanguageCount = 0;
 }

@@ -467,10 +467,14 @@ static void makeTags (cookedArgs* args)
     boolean files = (boolean)(! cArgOff (args) || Option.fileList != NULL
 			      || Option.filter);
 
-    if (filesRequired ()  && ! files)
-	error (FATAL, "No files specified. Try \"%s --help\".",
-	       getExecutableName ());
-
+    if (!files)
+    {
+	if (filesRequired ())
+	    error (FATAL, "No files specified. Try \"%s --help\".",
+		getExecutableName ());
+	else
+	    return;
+    }
 #define timeStamp(n) timeStamps[(n)]=(Option.printTotals ? clock():(clock_t)0)
     if (! Option.filter)
 	openTagFile ();
@@ -552,9 +556,9 @@ extern int main (int __unused__ argc, char **argv)
 
     /*  Clean up.
      */
-    eFree (CurrentDirectory);
     cArgDelete (args);
     freeKeywordTable ();
+    freeRoutineResources ();
     freeSourceFileResources ();
     freeTagFileResources ();
     freeOptionResources ();

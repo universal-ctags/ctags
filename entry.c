@@ -104,7 +104,8 @@ extern int ftruncate (int fd, off_t length);
 
 extern void freeTagFileResources (void)
 {
-    eFree (TagFile.directory);
+    if (TagFile.directory != NULL)
+	eFree (TagFile.directory);
     vStringDelete (TagFile.vLine);
 }
 
