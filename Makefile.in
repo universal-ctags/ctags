@@ -103,13 +103,13 @@ dctags$(EXEEXT): debug.c $(SOURCES) $(HEADERS)
 	$(CC) -I. -I$(srcdir) $(DEFS) -DDEBUG -g $(LDFLAGS) -o $@ debug.c $(SOURCES)
 
 readtags$(EXEEXT): readtags.c readtags.h
-	$(CC) -DREADTAGS_MAIN -I. -I$(srcdir) $(DEFS) $(CFLAGS) $(LDFLAGS) -o $@ $<
+	$(CC) -DREADTAGS_MAIN -I. -I$(srcdir) $(DEFS) $(CFLAGS) $(LDFLAGS) -o $@ readtags.c
 
 etyperef$(EXEEXT): etyperef.o keyword.o routines.o strlist.o vstring.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
 etyperef.o: eiffel.c
-	$(CC) -DTYPE_REFERENCE_TOOL -I. -I$(srcdir) $(DEFS) $(CFLAGS) -o $@ -c $<
+	$(CC) -DTYPE_REFERENCE_TOOL -I. -I$(srcdir) $(DEFS) $(CFLAGS) -o $@ -c eiffel.c
 
 $(OBJECTS): $(HEADERS) config.h
 
