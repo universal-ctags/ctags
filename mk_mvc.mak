@@ -37,6 +37,9 @@ ctags: ctags.exe
 ctags.exe: $(SOURCES) respmvc $(EXTRA_LIBS)
 	cl /O2 /G5 /Fe$@ @respmvc /link setargv.obj
 
+readtags.exe: readtags.c
+	cl /clr /O2 /G5 /Fe$@ $(DEFINES) -DREADTAGS_MAIN readtags.c /link setargv.obj
+
 # Debug version
 dctags.exe: $(SOURCES) respmvc $(EXTRA_LIBS)
 	cl /Zi -DDEBUG /Fe$@ @respmvc debug.c /link setargv.obj

@@ -49,6 +49,9 @@ ctags: ctags.exe
 ctags.exe: $(SOURCES) respbc5 $(EXTRA_LIBS)
 	$(BCC) $(CFLAGS) $(OPT) $(MT_OPT) -O2 -e$@ $(LDFLAGS) @respbc5
 
+readtags.exe: readtags.c
+	$(BCC) $(CFLAGS) $(OPT) $(MT_OPT) -O2 -e$@ $(DEFINES) -DREADTAGS_MAIN readtags.c $(LDFLAGS)
+
 # Debug version
 dctags.exe: $(SOURCES) respbc5 $(EXTRA_LIBS)
 	$(BCC) $(CFLAGS) -DDEBUG -e$@ $(LDFLAGS) @respbc5 debug.c
