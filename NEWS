@@ -1,5 +1,8 @@
 Current Version: @@VERSION@@
 
+ctags-5.5.5 (Wed Apr 28 2004)
+* Fixed creation of TAGS file with etags-include but no files [Bug #941233].
+
 ctags-5.5.4 (Thu Mar 25 2004)
 * Fixed broken -R option.
 

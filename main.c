@@ -331,7 +331,7 @@ static boolean createTagsForWildcardArg (const char *const arg)
 
 #endif
 
-static boolean createTagsForArgs (cookedArgs* const args)
+static boolean createTagsForArgs (cookedArgs *const args)
 {
     boolean resize = FALSE;
 
@@ -354,12 +354,12 @@ static boolean createTagsForArgs (cookedArgs* const args)
 
 /*  Read from an opened file a list of file names for which to generate tags.
  */
-static boolean createTagsFromFileInput (FILE* const fp, const boolean filter)
+static boolean createTagsFromFileInput (FILE *const fp, const boolean filter)
 {
     boolean resize = FALSE;
     if (fp != NULL)
     {
-	cookedArgs* args = cArgNewFromLineFile (fp);
+	cookedArgs *args = cArgNewFromLineFile (fp);
 	parseOptions (args);
 	while (! cArgOff (args))
 	{
@@ -380,7 +380,7 @@ static boolean createTagsFromFileInput (FILE* const fp, const boolean filter)
 
 /*  Read from a named file a list of file names for which to generate tags.
  */
-static boolean createTagsFromListFile (const char* const fileName)
+static boolean createTagsFromListFile (const char *const fileName)
 {
     boolean resize;
     Assert (fileName != NULL);
@@ -388,7 +388,7 @@ static boolean createTagsFromListFile (const char* const fileName)
 	resize = createTagsFromFileInput (stdin, FALSE);
     else
     {
-	FILE* const fp = fopen (fileName, "r");
+	FILE *const fp = fopen (fileName, "r");
 	if (fp == NULL)
 	    error (FATAL | PERROR, "cannot open list file \"%s\"", fileName);
 	resize = createTagsFromFileInput (fp, FALSE);
@@ -460,21 +460,27 @@ static void printTotals (const clock_t *const timeStamps)
 #endif
 }
 
-static void makeTags (cookedArgs* args)
+static boolean etagsInclude (void)
+{
+    return (boolean)(Option.etags && Option.etagsInclude != NULL);
+}
+
+static void makeTags (cookedArgs *args)
 {
     clock_t timeStamps [3];
     boolean resize = FALSE;
     boolean files = (boolean)(! cArgOff (args) || Option.fileList != NULL
 			      || Option.filter);
 
-    if (! files  &&  ! Option.recurse)
+    if (! files)
     {
 	if (filesRequired ())
 	    error (FATAL, "No files specified. Try \"%s --help\".",
 		getExecutableName ());
-	else
+	else if (! Option.recurse && ! etagsInclude ())
 	    return;
     }
+
 #define timeStamp(n) timeStamps[(n)]=(Option.printTotals ? clock():(clock_t)0)
     if (! Option.filter)
 	openTagFile ();
