@@ -792,7 +792,7 @@ static const char *TagFileName = "tags";
 static const char *ProgramName;
 static int extensionFields;
 static int SortOverride;
-static int SortMethod;
+static sortType SortMethod;
 
 static void printTag (const tagEntry *entry)
 {
@@ -928,9 +928,9 @@ extern int main (int argc, char **argv)
 			SortOverride = 1;
 			++j;
 			if (arg [j] == '\0')
-			    SortMethod = 1;
+			    SortMethod = TAG_SORTED;
 			else if (strchr ("012", arg[j]) != NULL)
-			    SortMethod = arg[j] - '0';
+			    SortMethod = (sortType) (arg[j] - '0');
 			else
 			{
 			    fprintf (errout, Usage, ProgramName);
