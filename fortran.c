@@ -82,8 +82,6 @@ typedef enum eKeywordId {
     KEYWORD_double,
     KEYWORD_elemental,
     KEYWORD_end,
-    KEYWORD_enddo,
-    KEYWORD_endif,
     KEYWORD_entry,
     KEYWORD_equivalence,
     KEYWORD_external,
@@ -244,8 +242,6 @@ static const keywordDesc FortranKeywordTable [] = {
     { "do",		KEYWORD_do		},
     { "double",		KEYWORD_double		},
     { "elemental",	KEYWORD_elemental	},
-    { "enddo",		KEYWORD_enddo		},
-    { "endif",		KEYWORD_endif		},
     { "end",		KEYWORD_end		},
     { "entry",		KEYWORD_entry		},
     { "equivalence",	KEYWORD_equivalence	},
@@ -892,6 +888,31 @@ static void checkForLabel (void)
     ungetChar (c);
 }
 
+static void readIdentifier (tokenInfo *const token, const int c)
+{
+    parseIdentifier (token->string, c);
+    token->keyword = analyzeToken (token->string);
+    if (! isKeyword (token, KEYWORD_NONE))
+	token->type = TOKEN_KEYWORD;
+    else
+    {
+	token->type = TOKEN_IDENTIFIER;
+	if (strncmp (vStringValue (token->string), "end", 3) == 0)
+	{
+	    vString *const sub = vStringNewInit (vStringValue (token->string) + 3);
+	    const keywordId kw = analyzeToken (sub);
+	    vStringDelete (sub);
+	    if (kw != KEYWORD_NONE)
+	    {
+		token->secondary = newToken ();
+		token->secondary->type = TOKEN_KEYWORD;
+		token->secondary->keyword = kw;
+		token->keyword = KEYWORD_end;
+	    }
+	}
+    }
+}
+
 static void readToken (tokenInfo *const token)
 {
     int c;
@@ -991,14 +1012,7 @@ getNextChar:
 
 	default:
 	    if (isalpha (c))
-	    {
-		parseIdentifier (token->string, c);
-		token->keyword = analyzeToken (token->string);
-		if (isKeyword (token, KEYWORD_NONE))
-		    token->type = TOKEN_IDENTIFIER;
-		else
-		    token->type = TOKEN_KEYWORD;
-	    }
+		readIdentifier (token, c);
 	    else if (isdigit (c))
 	    {
 		vStringCat (token->string, parseNumeric (c));
