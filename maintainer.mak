@@ -189,7 +189,7 @@ DIFF = if diff $(DIFF_OPTIONS) tags.ref tags.test > $(DIFF_FILE); then \
 
 .PHONY: test test.include test.fields test.eiffel test.linux
 
-test: test.include test.fields test.eiffel #test.linedir test.linux
+test: test.include test.fields test.linedir test.eiffel #test.linux
 
 test.%: DIFF_FILE = $@.diff
 
@@ -209,8 +209,8 @@ test.fields: $(CTAGS_TEST) $(CTAGS_REF)
 	@ $(CTAGS_TEST) -R $(TEST_FIELD_OPTIONS) -o tags.test Test
 	@- $(DIFF)
 
-REF_LINEDIR_OPTIONS = $(TEST_OPTIONS) --line-directives
-TEST_LINEDIR_OPTIONS = $(TEST_OPTIONS) --line-directives
+REF_LINEDIR_OPTIONS = $(TEST_OPTIONS) --line-directives -n
+TEST_LINEDIR_OPTIONS = $(TEST_OPTIONS) --line-directives -n
 test.linedir: $(CTAGS_TEST) $(CTAGS_REF)
 	@ echo -n "Testing line directives..."
 	@ $(CTAGS_REF) $(REF_LINEDIR_OPTIONS) -o tags.ref Test/line_directives.c
