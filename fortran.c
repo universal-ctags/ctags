@@ -1118,6 +1118,9 @@ static void parseTypeDeclarationStmt (tokenInfo *const token)
     {
 	if (isType (token, TOKEN_IDENTIFIER))
 	    makeFortranTag (token, tag);
+	readToken (token);
+	if (isType (token, TOKEN_PAREN_OPEN))
+	    skipPast (token, TOKEN_PAREN_CLOSE);
 	skipPast (token, TOKEN_COMMA);
     } while (! isType (token, TOKEN_STATEMENT_END));
     skipToNextStatement (token);

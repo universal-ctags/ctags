@@ -11,6 +11,7 @@ ctags-5.5 (Wed Jan 20 2003)
 * Fixed problem with infinite loop in certain comments [PL/SQL, Bug #629115].
 * Fixed problem of incorrect extension field [C. Bug #639639].
 * Fixed problem of empty scoping extension field [C. Bug #639644].
+* Fixed spurious tag when an array-spec occurs within an entity-decl [Fortran].
 * Fixed man page errors and omissions.
 * Fixed bug in readFieldValue() in readtags library.
 * Fixed bug in option parsing in readtags command-line program.
