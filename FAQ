@@ -145,7 +145,7 @@ There are several packages already available which provide this capability.
 Namely, these are: GLOBAL source code tag system, GNU id-utils, cscope,
 and cflow. As of this writing, they can be found in the following locations:
 
-GLOBAL:    http://www.tamacom.com/global
+GLOBAL:    http://www.gnu.org/software/global
 id-utils:  http://www.gnu.org/software/idutils/idutils.html
 cscope:    http://cscope.sourceforge.net
 cflow:     ftp://www.ibiblio.org/pub/Linux/devel/lang/c
