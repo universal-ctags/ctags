@@ -467,7 +467,7 @@ static void makeTags (cookedArgs* args)
     boolean files = (boolean)(! cArgOff (args) || Option.fileList != NULL
 			      || Option.filter);
 
-    if (!files)
+    if (! files  &&  ! Option.recurse)
     {
 	if (filesRequired ())
 	    error (FATAL, "No files specified. Try \"%s --help\".",
