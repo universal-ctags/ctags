@@ -27,6 +27,13 @@
 */
 #define TAB '\t'
 
+#if !defined(HAVE_STRCASECMP) && defined(HAVE_STRICMP) && !defined(strcasecmp)
+# define strcasecmp stricmp
+#endif
+#if !defined(HAVE_STRNCASECMP) && defined(HAVE_STRNICMP) && !defined(strncasecmp)
+# define strncasecmp strnicmp
+#endif
+
 
 /*
 *   DATA DECLARATIONS
@@ -491,8 +498,8 @@ static int readTagLineSeek (tagFile *const file, const off_t pos)
     return result;
 }
 
-#ifndef HAVE_STRICMP
-static int stricmp (const char *s1, const char *s2)
+#if !defined (HAVE_STRCASECMP) && !defined (HAVE_STRICMP)
+static int strcasecmp (const char *s1, const char *s2)
 {
     int result;
     do
@@ -503,8 +510,8 @@ static int stricmp (const char *s1, const char *s2)
 }
 #endif
 
-#ifndef HAVE_STRNICMP
-static int strnicmp (const char *s1, const char *s2, size_t n)
+#if !defined (HAVE_STRNCASECMP) && !defined (HAVE_STRNICMP)
+static int strncasecmp (const char *s1, const char *s2, size_t n)
 {
     int result;
     do
@@ -521,10 +528,10 @@ static int nameComparison (tagFile *const file)
     if (file->search.ignorecase)
     {
 	if (file->search.partial)
-	    result = strnicmp (file->search.name, file->name.buffer,
+	    result = strncasecmp (file->search.name, file->name.buffer,
 			       file->search.nameLength);
 	else
-	    result = stricmp (file->search.name, file->name.buffer);
+	    result = strcasecmp (file->search.name, file->name.buffer);
     }
     else
     {

@@ -239,9 +239,8 @@ dnl ----------------------------
 
 AC_CHECK_FUNCS(fnmatch)
 AC_CHECK_FUNCS(strstr)
-AC_CHECK_FUNCS(stricmp)
-AC_CHECK_FUNCS(strnicmp)
-
+AC_CHECK_FUNCS(strcasecmp stricmp, break)
+AC_CHECK_FUNCS(strncasecmp strnicmp, break)
 AC_CHECK_FUNCS(fgetpos, have_fgetpos=yes)
 
 dnl SEEK_SET should be in stdio.h, but may be in unistd.h on SunOS 4.1.x
