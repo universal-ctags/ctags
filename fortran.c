@@ -103,6 +103,7 @@ typedef enum eKeywordId {
     KEYWORD_save,
     KEYWORD_select,
     KEYWORD_sequence,
+    KEYWORD_stdcall,
     KEYWORD_subroutine,
     KEYWORD_target,
     KEYWORD_then,
@@ -236,6 +237,7 @@ static const keywordDesc FortranKeywordTable [] = {
     { "save",		KEYWORD_save		},
     { "select",		KEYWORD_select		},
     { "sequence",	KEYWORD_sequence	},
+    { "stdcall",	KEYWORD_stdcall		},
     { "subroutine",	KEYWORD_subroutine	},
     { "target",		KEYWORD_target		},
     { "then",		KEYWORD_then		},
@@ -1402,6 +1404,7 @@ static boolean parseDeclarationConstruct (tokenInfo *const token)
 	case KEYWORD_format:    skipToNextStatement (token); break;
 	case KEYWORD_parameter: skipToNextStatement (token); break;
 	case KEYWORD_include:   skipToNextStatement (token); break;
+	case KEYWORD_stdcall:   readToken (token);           break;
 	/* derived type handled by parseTypeDeclarationStmt(); */
 
 	default:
@@ -1704,14 +1707,11 @@ static void parseProgramUnit (tokenInfo *const token)
 	    case KEYWORD_program:    parseMainProgram (token);          break;
 	    case KEYWORD_subroutine: parseSubroutineSubprogram (token); break;
 	    case KEYWORD_recursive:  skipToNextStatement (token);       break;
+	    case KEYWORD_stdcall:    readToken (token);                 break;
+
 	    default:
-		if (isTypeSpec (token))
-		    parseTypeDeclarationStmt (token);
-		else
-		{
-		    parseSpecificationPart (token);
-		    parseExecutionPart (token);
-		}
+		parseSpecificationPart (token);
+		parseExecutionPart (token);
 		break;
 	}
     } while (TRUE);
