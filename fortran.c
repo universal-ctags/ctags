@@ -890,10 +890,14 @@ getNextChar:
 	    break;
 
 	case ':':
-	    if (getChar () == ':')
+	    c = getChar ();
+	    if (c == ':')
 		token->type = TOKEN_DOUBLE_COLON;
 	    else
+	    {
+		ungetChar (c);
 		token->type = TOKEN_UNDEFINED;
+	    }
 	    break;
 
 	default:
@@ -1019,17 +1023,15 @@ static void parseTypeSpec (tokenInfo *const token)
     switch (token->keyword)
     {
 	case KEYWORD_character:
+	    /* skip char-selector */
 	    readToken (token);
 	    if (isType (token, TOKEN_OPERATOR) &&
 		     strcmp (vStringValue (token->string), "*") == 0)
-	    {
-		/* skip char-selector */
 		readToken (token);
-		if (isType (token, TOKEN_PAREN_OPEN))
-		    skipOverParens (token);
-		else
-		    readToken (token);
-	    }
+	    if (isType (token, TOKEN_PAREN_OPEN))
+		skipOverParens (token);
+	    else
+		readToken (token);
 	    break;
 
 

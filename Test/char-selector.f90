@@ -12,5 +12,8 @@
       CHARACTER*12 units(MXDDI)
       PRIVATE :: units
       INTEGER(4), PRIVATE, DIMENSION (MXDDI+1) :: list
+      CHARACTER(1024) :: fpshape
       INTEGER(4), PRIVATE :: nout
+      CHARACTER*(1024) :: fpshape2
+      INTEGER(4), PRIVATE :: last
       END MODULE OUT_RD5
