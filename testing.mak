@@ -24,7 +24,7 @@ test: test.include test.fields test.linedir test.eiffel test.linux
 test.%: DIFF_FILE = $@.diff
 
 REF_INCLUDE_OPTIONS = $(TEST_OPTIONS) --format=1
-TEST_INCLUDE_OPTIONS = $(REF_INCLUDE_OPTIONS) --format=1
+TEST_INCLUDE_OPTIONS = $(TEST_OPTIONS) --format=1
 test.include: $(CTAGS_TEST) $(CTAGS_REF)
 	@ echo -n "Testing tag inclusion..."
 	@ $(CTAGS_REF) -R $(REF_INCLUDE_OPTIONS) -o tags.ref Test
