@@ -194,7 +194,7 @@ TAGS: $(CTAGS_EXEC)
 	./$(CTAGS_EXEC) -e $(srcdir)/*
 
 clean:
-	rm -f $(OBJECTS) $(READ_LIB) $(CTAGS_EXEC) tags TAGS
+	rm -f $(OBJECTS) $(READ_LIB) readtags $(CTAGS_EXEC) tags TAGS
 
 mostlyclean: clean
 

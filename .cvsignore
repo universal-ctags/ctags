@@ -8,6 +8,7 @@ config.h
 *.od
 ctags
 dctags
+readtags
 .deps
 errors
 tags
