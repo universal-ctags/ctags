@@ -1621,6 +1621,7 @@ extern void parseOption (cookedArgs* const args)
 
 extern void parseOptions (cookedArgs* const args)
 {
+    NonOptionEncountered = FALSE;
     while (! cArgOff (args)  &&  cArgIsOption (args))
 	parseOption (args);
     if (! cArgOff (args)  &&  ! cArgIsOption (args))
