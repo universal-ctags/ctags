@@ -172,6 +172,7 @@
 #  define HAVE_STAT_H 1
 #  define HAVE_TYPES_H 1
 # else
+#  define HAVE_FCNTL_H 1
 #  define HAVE_SYS_STAT_H 1
 #  define HAVE_SYS_TYPES_H 1
 # endif

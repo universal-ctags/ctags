@@ -76,4 +76,4 @@ OBJECTS = \
 	tcl.$(OBJEXT) \
 	vim.$(OBJEXT) \
 	yacc.$(OBJEXT) \
-	vstring.$(OBJEXT) \
+	vstring.$(OBJEXT)
