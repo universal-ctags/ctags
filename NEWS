@@ -14,6 +14,7 @@ ctags-5.5.3 (Tue Feb 17 2004)
 * Fixed spurious tags for for C++ member templtates [C++, Bug #849591].
 * Fixed spurious local tags for statements following labels [C].
 * Fixed missing tags for certain scoped functions [Vim].
+* Fixed missing tags for certain initializers [Fortran, Bug #877956].
 
 ctags-5.5.2 (Wed Sep 17 2003)
 * Added tags for local variables for C-based languages [C/C++/C#/Java/Vera,

@@ -957,8 +957,7 @@ getNextChar:
 	case '<':
 	case '>':
 	{
-	    const char *const operatorChars = "*/+-=<>";
-
+	    const char *const operatorChars = "*/+=<>";
 	    do {
 		vStringPut (token->string, c);
 		c = getChar ();
