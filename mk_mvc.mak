@@ -51,9 +51,11 @@ regex.obj:
 respmvc: $(SOURCES) $(HEADERS) mk_mvc.mak
 	echo $(DEFINES) $(INCLUDES) $(SOURCES) $(EXTRA_LIBS) > $@
 
-clean:
+mostlyclean:
 	- del *.obj
-	- del ctags.exe
 	- del dctags.exe
 	- del respmvc
 	- del tags
+
+clean: mostlyclean
+	- del ctags.exe

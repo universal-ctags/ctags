@@ -65,10 +65,12 @@ respbc5: $(SOURCES) $(HEADERS) mk_bc5.mak
 	echo $(CFLAGS) >> $@
 	echo $(SOURCES) $(EXTRA_LIBS) >> $@
 
-clean:
+mostlyclean:
 	- del *.obj
 	- del *.tds
-	- del ctags.exe
 	- del dctags.exe
 	- del respbc5
 	- del tags
+
+clean: mostlyclean
+	- del ctags.exe
