@@ -87,8 +87,9 @@ extern langType getNamedLanguage (const char *const name)
     Assert (name != NULL);
     for (i = 0  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
     {
-	if (LanguageTable [i]->name != NULL)
-	    if (strcasecmp (name, LanguageTable [i]->name) == 0)
+	const parserDefinition* const lang = LanguageTable [i];
+	if (lang->name != NULL)
+	    if (strcasecmp (name, lang->name) == 0)
 		result = i;
     }
     return result;
@@ -209,25 +210,27 @@ extern void printLanguageMap (const langType language)
 
 extern void installLanguageMapDefault (const langType language)
 {
-    Assert (language >= 0);
-    if (LanguageTable [language]->currentPatterns != NULL)
-	stringListDelete (LanguageTable [language]->currentPatterns);
-    if (LanguageTable [language]->currentExtensions != NULL)
-	stringListDelete (LanguageTable [language]->currentExtensions);
+    parserDefinition* lang;
+    Assert (0 <= language  &&  language < (int) LanguageCount);
+    lang = LanguageTable [language];
+    if (lang->currentPatterns != NULL)
+	stringListDelete (lang->currentPatterns);
+    if (lang->currentExtensions != NULL)
+	stringListDelete (lang->currentExtensions);
 
-    if (LanguageTable [language]->patterns == NULL)
-	LanguageTable [language]->currentPatterns = stringListNew ();
+    if (lang->patterns == NULL)
+	lang->currentPatterns = stringListNew ();
     else
     {
-	LanguageTable [language]->currentPatterns =
-	    stringListNewFromArgv (LanguageTable [language]->patterns);
+	lang->currentPatterns =
+	    stringListNewFromArgv (lang->patterns);
     }
-    if (LanguageTable [language]->extensions == NULL)
-	LanguageTable [language]->currentExtensions = stringListNew ();
+    if (lang->extensions == NULL)
+	lang->currentExtensions = stringListNew ();
     else
     {
-	LanguageTable [language]->currentExtensions =
-	    stringListNewFromArgv (LanguageTable [language]->extensions);
+	lang->currentExtensions =
+	    stringListNewFromArgv (lang->extensions);
     }
     if (Option.verbose)
 	printLanguageMap (language);
@@ -254,10 +257,12 @@ extern void clearLanguageMap (const langType language)
 extern void addLanguagePatternMap (const langType language, const char* ptrn)
 {
     vString* const str = vStringNewInit (ptrn);
+    parserDefinition* lang;
     Assert (0 <= language  &&  language < (int) LanguageCount);
-    if (LanguageTable [language]->currentPatterns == NULL)
-	LanguageTable [language]->currentPatterns = stringListNew ();
-    stringListAdd (LanguageTable [language]->currentPatterns, str);
+    lang = LanguageTable [language];
+    if (lang->currentPatterns == NULL)
+	lang->currentPatterns = stringListNew ();
+    stringListAdd (lang->currentPatterns, str);
 }
 
 extern boolean removeLanguageExtensionMap (const char *const extension)
@@ -354,11 +359,12 @@ extern void freeParserResources (void)
     unsigned int i;
     for (i = 0  ;  i < LanguageCount  ;  ++i)
     {
-	freeList (&LanguageTable [i]->currentPatterns);
-	freeList (&LanguageTable [i]->currentExtensions);
-	eFree (LanguageTable [i]->name);
-	LanguageTable [i]->name = NULL;
-	eFree (LanguageTable [i]);
+	parserDefinition* const lang = LanguageTable [i];
+	freeList (&lang->currentPatterns);
+	freeList (&lang->currentExtensions);
+	eFree (lang->name);
+	lang->name = NULL;
+	eFree (lang);
     }
     if (LanguageTable != NULL)
 	eFree (LanguageTable);
@@ -412,13 +418,16 @@ static kindOption *langKindOption (const langType language, const int flag)
 
 static void disableLanguageKinds (const langType language)
 {
-    if (LanguageTable [language]->regex)
+    const parserDefinition* lang;
+    Assert (0 <= language  &&  language < (int) LanguageCount);
+    lang = LanguageTable [language];
+    if (lang->regex)
 	disableRegexKinds (language);
     else
     {
 	unsigned int i;
-	for (i = 0  ;  i < LanguageTable [language]->kindCount  ;  ++i)
-	    LanguageTable [language]->kinds [i].enabled = FALSE;
+	for (i = 0  ;  i < lang->kindCount  ;  ++i)
+	    lang->kinds [i].enabled = FALSE;
     }
 }
 
@@ -510,12 +519,14 @@ static void printKinds (langType language, boolean indent)
 
 extern void printLanguageKinds (const langType language)
 {
+    Assert (0 <= language  &&  language < (int) LanguageCount);
     if (language == LANG_AUTO)
     {
+	const parserDefinition* lang = LanguageTable [language];
 	unsigned int i;
 	for (i = 0  ;  i < LanguageCount  ;  ++i)
 	{
-	    printf ("%s\n", LanguageTable [i]->name);
+	    printf ("%s%s\n", lang->name, lang->enabled ? "" : " [disabled]");
 	    printKinds (i, TRUE);
 	}
     }
@@ -559,7 +570,7 @@ static void printLanguage (const langType language)
     Assert (0 <= language  &&  language < (int) LanguageCount);
     lang = LanguageTable [language];
     if (lang->kinds != NULL  ||  lang->regex)
-	printf ("%s\n", lang->name);
+	printf ("%s%s\n", lang->name, lang->enabled ? "" : " [disabled]");
 }
         
 extern void printLanguageList (void)
@@ -595,18 +606,19 @@ static boolean createTagsForFile (
 	const unsigned int passCount)
 {
     boolean retried = FALSE;
-
+    Assert (0 <= language  &&  language < (int) LanguageCount);
     if (fileOpen (fileName, language))
     {
+	const parserDefinition* const lang = LanguageTable [language];
 	if (Option.etags)
 	    beginEtagsFile ();
 
 	makeFileTag (fileName);
 
-	if (LanguageTable [language]->parser != NULL)
-	    LanguageTable [language]->parser ();
-	else if (LanguageTable [language]->parser2 != NULL)
-	    retried = LanguageTable [language]->parser2 (passCount);
+	if (lang->parser != NULL)
+	    lang->parser ();
+	else if (lang->parser2 != NULL)
+	    retried = lang->parser2 (passCount);
 
 	if (Option.etags)
 	    endEtagsFile (getSourceFileTagPath ());
