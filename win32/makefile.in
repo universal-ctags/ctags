@@ -1,0 +1,39 @@
+# $Id$
+# Makefile for building Win32 releases
+
+VERSION = 521
+
+# Borland C library directory
+ZIP = "c:\Program Files\WinZip\wzzip"
+#ZIP = pkzip -xctags$(VERSION)\gnu_regex_dist\*.*
+
+# Add this file for wildcard expansion (does NOT work with 4.0!)
+
+#ctagsw32.exe: ctags$(VERSION)\mk_mvc.mak
+#	cd ctags$(VERSION)
+#	nmake -f mk_mvc.mak clean
+#	nmake -f mk_mvc.mak
+#	copy ctags.exe ..\$@
+#	nmake -f mk_mvc.mak clean
+#	cd ..
+
+zip: ctagsw32.exe
+	- del ec$(VERSION)w32.zip
+	- del ctags$(VERSION)\ctags.tds
+	copy ctagsw32.exe ctags$(VERSION)\ctags.exe
+	$(ZIP) -Pr ec$(VERSION)w32 ctags$(VERSION)\*.*
+	- del ctags$(VERSION)\ctags.exe
+#	copy ctags16.exe ctags$(VERSION)\ctags.exe
+#	$(ZIP) -Pr ec$(VERSION)-16 ctags$(VERSION)\*.*
+#	copy ctags32.exe ctags$(VERSION)\ctags.exe
+#	$(ZIP) -Pr ec$(VERSION)-32 ctags$(VERSION)\*.*
+
+zip-os2: ctagsos2.exe
+	- del ec$(VERSION)os2.zip
+	copy ctagsos2.exe ctags$(VERSION)\ctags.exe
+	$(ZIP) -Pr ec$(VERSION)os2 ctags$(VERSION)\*.*
+	del ctags$(VERSION)\ctags.exe
+
+clean:
+	- del ctagsw32.exe
+	- del ctagsos2.exe

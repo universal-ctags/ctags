@@ -43,11 +43,11 @@ REDIR	= 2>&1 | tee $(ERRFILE)
 
 RPM_ROOT= $(HOME)/Rpm
 CTAGS_DOSDIR = win32
-WEB_ARCHIVE_DIR = $(HOME)/public_html/archives
-WEB_CTAGS_DIR = $(HOME)/public_html/ctags
+WEB_ARCHIVE_DIR = releases
+CTAGS_WEBSITE = website
 DEP_DIR	= .deps
 
-CC		= gcc
+CC		= gcc3
 INCLUDE	= -I.
 DEFS	= -DHAVE_CONFIG_H
 COMP_FLAGS = $(INCLUDE) $(DEFS) $(CFLAGS)
@@ -199,6 +199,38 @@ cvs-files:
 	@ls -1 $(CVS_FILES)
 
 #
+# Web site files
+#
+website-%: website-man-% website-index-% $(CTAGS_WEBSITE)/news.html \
+		$(CTAGS_WEBSITE)/EXTENDING.html
+	:
+
+website-man-%: ctags.1 Makefile
+	@ echo "---------- Generating $(CTAGS_WEBSITE)/ctags.html"
+	man2html $< | sed -e "s/@@VERSION@@/$*/g" \
+		-e 's%<A HREF="mailto:[^"]*">\([^@]*\)@\([^<]*\)</A>%\1\&#64;\2%' \
+		> $(CTAGS_WEBSITE)/ctags.html
+
+website-index-%: index.html Makefile
+	@ echo "---------- Generating $(CTAGS_WEBSITE)/index.html"
+	sed -e "s/@@VERSION@@/$*/g" \
+		-e "s/@@DOS_VERSION@@/`echo $* | sed 's/\.//g'`/g" \
+		-e "s/@@DATE@@/`date +'%d %B %Y'`/" \
+		$< > $(CTAGS_WEBSITE)/index.html
+
+$(CTAGS_WEBSITE)/EXTENDING.html: EXTENDING.html
+	@ echo "---------- Generating $(CTAGS_WEBSITE)/EXTENDING.html"
+	ln -s ../$< $@
+
+$(CTAGS_WEBSITE)/news.html: NEWS Makefile
+	@ echo "---------- Generating $(CTAGS_WEBSITE)/news.html"
+	sed -e 's/</\&lt;/g' -e 's/>/\&gt;/g' \
+		-e 's@^Current Version:.*$$@<html><head><title>Exuberant Ctags: Change Notes</title></head><body><h1>Change Notes</h1><pre>@' \
+		-e 's@\(^ctags-.* (.*)\)$$@<b>\1</b>@' \
+		-e 's@^vim:.*$$@</pre><hr><a href="http:index.html">Back to <strong>Exuberant Ctags</strong></a></body></html>@' \
+		$< > $@
+
+#
 # Release management
 #
 ctags-%.lsm: ctags.lsm
@@ -237,7 +269,8 @@ dos1-%: $(DOS_FILES)
 	done
 	cd $(CTAGS_DOSDIR); mv makefile makefile.bak; \
 		sed -e 's/^\(VERSION = \).*$$/\1$*
-/' makefile.bak > makefile
+/' makefile.bak > makefile ;\
+		rm makefile.bak
 
 dos2-%: $(DOS_VER_FILES)
 	for file in $^ ;do \
@@ -260,7 +293,7 @@ rpm-%: ctags-%.tar.gz ctags.spec $(RPM_ROOT)/SOURCES $(RPM_ROOT)/SPECS
 	@ echo "---------- Building RPM"
 	cp -p ctags-$*.tar.gz $(RPM_ROOT)/SOURCES/
 	sed -e "s/@@VERSION@@/$*/" ctags.spec > $(RPM_ROOT)/SPECS/ctags-$*.spec
-	(cd $(RPM_ROOT)/SPECS; rpm -ba ctags-$*.spec)
+	(cd $(RPM_ROOT)/SPECS; CC=gcc3 rpm -ba ctags-$*.spec)
 	rm -fr $(RPM_ROOT)/BUILD/ctags-$*
 
 ctags32-%: ctags-%.tar.gz
@@ -283,11 +316,9 @@ cleanrelease-%:
 	rm -f $(RPM_ROOT)/SRPMS/ctags-$*-1.src.rpm
 	rm -f $(RPM_ROOT)/SPECS/ctags-$*.spec
 
-internal-release-%: ctags-%.tar.gz ctags-%.tar.Z dos-% rpm-%
+internal-release-%: ctags-%.tar.gz ctags-%.tar.Z dos-% rpm-% website-%
 	@ echo "---------- Copying files to web archive"
 	cp -p ctags-$*.tar.* $(WEB_ARCHIVE_DIR)
-	cp -p EXTENDING.html $(WEB_CTAGS_DIR)
-	cp -p ctags-$*/ctags.html $(WEB_CTAGS_DIR)/ctags.html
 	cp -p $(RPM_ROOT)/RPMS/i386/ctags-$*-1.i386.rpm $(WEB_ARCHIVE_DIR)
 	cp -p $(RPM_ROOT)/SRPMS/ctags-$*-1.src.rpm $(WEB_ARCHIVE_DIR)
 	cp -p ctags-$*/ctags.lsm $(WEB_ARCHIVE_DIR)/ctags-$*.lsm
