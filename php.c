@@ -67,10 +67,7 @@ static void findPhpTags (void)
 		++cp;
 	    }
 	    vStringTerminate (name);
-	    while (isspace ((int) *cp))
-		++cp;
-	    if (*cp++ == '(')
-		makeSimpleTag (name, PhpKinds, K_FUNCTION);
+	    makeSimpleTag (name, PhpKinds, K_FUNCTION);
 	    vStringClear (name);
 	} 
 	else if (strncmp ((const char*) cp, "class", (size_t) 5) == 0 &&

@@ -13,6 +13,7 @@ ctags-5.5 (Fri Jan 31 2003)
 * Fixed problem with infinite loop in certain comments [PL/SQL, Bug #629115].
 * Fixed problem of incorrect extension field [C, Bug #639639].
 * Fixed problem of empty scoping extension field [C, Bug #639644].
+* Fixed missing tags for functions split across lines [PHP, Bug #681824].
 * Fixed missing tags for nested subprograms using 'contains' [Fortran, Bug #670433].
 * Fixed spurious tag when an array-spec occurs within an entity-decl [Fortran].
 * Fixed missing scope extension field on namespaces [C++, C#, Bug #665086].
