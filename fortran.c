@@ -1018,10 +1018,24 @@ static void parseTypeSpec (tokenInfo *const token)
     Assert (isTypeSpec (token));
     switch (token->keyword)
     {
+	case KEYWORD_character:
+	    readToken (token);
+	    if (isType (token, TOKEN_OPERATOR) &&
+		     strcmp (vStringValue (token->string), "*") == 0)
+	    {
+		/* skip char-selector */
+		readToken (token);
+		if (isType (token, TOKEN_PAREN_OPEN))
+		    skipOverParens (token);
+		else
+		    readToken (token);
+	    }
+	    break;
+
+
 	case KEYWORD_integer:
 	case KEYWORD_real:
 	case KEYWORD_complex:
-	case KEYWORD_character:
 	case KEYWORD_logical:
 	    readToken (token);
 	    if (isType (token, TOKEN_PAREN_OPEN))
@@ -1161,7 +1175,11 @@ static void parseEntityDecl (tokenInfo *const token)
     {
 	while (! isType (token, TOKEN_COMMA) &&
 		! isType (token, TOKEN_STATEMENT_END))
+	{
 	    readToken (token);
+	    if (isType (token, TOKEN_PAREN_OPEN))
+		skipOverParens (token);
+	}
     }
     /* token left at either comma or statement end */
 }
@@ -1174,11 +1192,9 @@ static void parseEntityDeclList (tokenInfo *const token)
 	if (isType (token, TOKEN_COMMA))
 	    readToken (token);
 	else if (isType (token, TOKEN_STATEMENT_END))
-	{
-	    skipToNextStatement (token);
 	    break;
-	}
     }
+    skipToNextStatement (token);
 }
 
 /*  type-declaration-stmt is
