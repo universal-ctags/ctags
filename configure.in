@@ -142,15 +142,28 @@ dnl -------------------
 
 AC_PROG_CC
 
-if uname | grep "HP-UX" > /dev/null 2>&1; then
-	AC_MSG_CHECKING("HP-UX native compiler")
-	if test "$CC" = "cc"; then
-		AC_MSG_RESULT(yes; adding compiler options for ANSI support)
-		CFLAGS="$CFLAGS -Aa -D_HPUX_SOURCE"
-	else
-		AC_MSG_RESULT(no)
-	fi
-fi
+case `uname` in
+	HP-UX)
+		AC_MSG_CHECKING("HP-UX native compiler")
+		if test "$CC" = "cc"; then
+			AC_MSG_RESULT(yes; adding compiler options for ANSI support)
+			CFLAGS="$CFLAGS -Aa -D_HPUX_SOURCE"
+		else
+			AC_MSG_RESULT(no)
+		fi
+		;;
+	SunOS)
+		if uname -r | grep '5\.' >/dev/null 2>&1; then
+			AC_MSG_CHECKING("Solaris native compiler")
+			if test "$CC" = "cc" -a `which cc` = "/usr/ucb/cc"; then
+				AC_MSG_RESULT(yes; adding compiler option for ANSI support)
+				CFLAGS="$CFLAGS -Xa"
+			else
+				AC_MSG_RESULT(no)
+			fi
+		fi
+		;;
+esac
 
 AC_PROG_LN_S
 AC_CHECK_PROG(STRIP, strip, strip, :)
