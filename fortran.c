@@ -370,8 +370,11 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 	if (ancestorCount () > 0)
 	{
 	    const tokenInfo* const parent = ancestorTop ();
-	    e.extensionFields.scope [0] = FortranKinds [parent->tag].name;
-	    e.extensionFields.scope [1] = vStringValue (parent->string);
+	    if (parent->tag != TAG_UNDEFINED)
+	    {
+		e.extensionFields.scope [0] = FortranKinds [parent->tag].name;
+		e.extensionFields.scope [1] = vStringValue (parent->string);
+	    }
 	}
 	makeTagEntry (&e);
     }
