@@ -154,6 +154,7 @@ typedef enum eTokenType {
     TOKEN_OPERATOR,
     TOKEN_PAREN_CLOSE,
     TOKEN_PAREN_OPEN,
+    TOKEN_PERCENT,
     TOKEN_STATEMENT_END,
     TOKEN_STRING
 } tokenType;
@@ -872,9 +873,10 @@ getNextChar:
 	case EOF:  longjmp (Exception, (int) ExceptionEOF);	break;
 	case ' ':  goto getNextChar;
 	case '\t': goto getNextChar;
-	case ',':  token->type = TOKEN_COMMA;			break;
-	case '(':  token->type = TOKEN_PAREN_OPEN;		break;
-	case ')':  token->type = TOKEN_PAREN_CLOSE;		break;
+	case ',':  token->type = TOKEN_COMMA;		break;
+	case '(':  token->type = TOKEN_PAREN_OPEN;	break;
+	case ')':  token->type = TOKEN_PAREN_CLOSE;	break;
+	case '%':  token->type = TOKEN_PERCENT;		break;
 
 	case '*':
 	case '/':
@@ -1267,13 +1269,19 @@ static void parseEntityDecl (tokenInfo *const token)
 
 static void parseEntityDeclList (tokenInfo *const token)
 {
-    while (isType (token, TOKEN_IDENTIFIER))
+    if (isType (token, TOKEN_PERCENT))
+	skipToNextStatement (token);
+    else while (isType (token, TOKEN_IDENTIFIER))
     {
 	parseEntityDecl (token);
 	if (isType (token, TOKEN_COMMA))
 	    readToken (token);
+	else if (isType (token, TOKEN_STATEMENT_END))
+	{
+	    skipToNextStatement (token);
+	    break;
+	}
     }
-    skipToNextStatement (token);
 }
 
 /*  type-declaration-stmt is
