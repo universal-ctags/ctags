@@ -1,13 +1,12 @@
-Distribution: Exuberant Ctags
-Summary: A multi-language source code indexing tool
+Summary: Exuberant Ctags - a multi-language source code indexing tool
 Name: ctags
 Version: @@VERSION@@
 Release: 1
-Copyright: GPL
+License: GPL
 Group: Development/Tools
 Source: http://prdownloads.sourceforge.net/ctags/ctags-%{version}.tar.gz
 URL: http://ctags.sourceforge.net
-Buildroot: /var/tmp/ctags-root
+Buildroot: %{_tmppath}/%{name}-%{version}-root
 
 %description
 Exuberant Ctags generates an index (or tag) file of language objects
@@ -24,19 +23,18 @@ Install ctags if you are going to use your system for programming.
 %setup -q
 
 %build
-autoconf
-CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=$RPM_BUILD_ROOT/usr --disable-etags
-make CFLAGS="$RPM_OPT_FLAGS"
+%configure
+make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make prefix=$RPM_BUILD_ROOT/usr install-strip
+%makeinstall
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%defattr(0644,root,root,0755)
+%defattr(-,root,root)
 %doc COPYING EXTENDING.html FAQ NEWS README ctags.html
-%attr(0755,root,root) /usr/bin/ctags
-/usr/share/man/man1/ctags.1.gz
+%{_bindir}/ctags
+%{_mandir}/man1/ctags*
