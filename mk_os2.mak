@@ -42,14 +42,14 @@ release:
 	$(MAKE) -f mk_os2.mak ctags \
 	CC="gcc" \
 	CFLAGS="-g -O4 -mpentium -Wall -Zomf" \
-	LFLAGS="-g -Zomf -Zsys -Zlinker /PM:VIO" \
+	LFLAGS="-s -Zomf -Zsys -Zlinker /PM:VIO" \
 	LIBS="-lregex"
 
 # Use the line below if you have created config.h
 # (manually or by running configure)
 # Otherwise use built-in defaults (#ifdef OS2)!
 # DEFINES=-DHAVE_CONFIG_H
-DEFINES=-DOS2 -DUNIX_PATH_SEPARATOR
+DEFINES=-DOS2
 
 
 # General rules and definitions

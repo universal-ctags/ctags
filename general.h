@@ -100,14 +100,15 @@
 #endif
 
 #ifdef OS2
+# define UNIX_PATH_SEPARATOR 1
 # define CASE_INSENSITIVE_FILENAMES
-# define MSDOS_STYLE_PATH
 # define HAVE_DIRENT_H 1
+# define HAVE_FCNTL_H 1
 # define HAVE_IO_H 1
-# define HAVE_TIME_H 1
 # define HAVE_STDLIB_H 1
 # define HAVE_SYS_STAT_H 1
 # define HAVE_SYS_TYPES_H 1
+# define HAVE_TIME_H 1
 # define HAVE_UNISTD_H 1
 # define HAVE_CLOCK 1
 # define HAVE_CHSIZE 1
