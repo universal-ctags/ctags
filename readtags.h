@@ -21,6 +21,10 @@
 #ifndef READTAGS_H
 #define READTAGS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
 *  MACROS
 */
@@ -238,6 +242,10 @@ extern tagResult tagsFindNext (tagFile *const file, tagEntry *const entry);
 *  return TagFailure is no file is currently open, TagSuccess otherwise.
 */
 extern tagResult tagsClose (tagFile *const file);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif
 
