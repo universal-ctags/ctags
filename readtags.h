@@ -151,7 +151,7 @@ typedef struct {
 *  be set to the errno value representing the system error preventing the tag
 *  file from being successfully opened.
 */
-extern tagFile *tagsOpen (const char *filePath, tagFileInfo *info);
+extern tagFile *tagsOpen (const char *const filePath, tagFileInfo *const info);
 
 /*
 *  This function allows the client to override the normal automatic detection
