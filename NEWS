@@ -1,8 +1,11 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.2 (Wed Aug 27 2003)
+ctags-5.5.2 (Tue Sep 02 2003)
+* Added tags for local variables for C-based languages [C/C++/C#/Java/Vera,
+  Feature Request #449503].
 * Fixed compilation problem due to type change made to accomodate change of
   return type of _findfirst() in VisualStudio.Net [Win32, Bug #775789].
+* Fixed problems with certain bit fields.
 
 ctags-5.5.1 (Wed Jul 30 2003)
 * Changed supported tag kinds for Verilog parser during overhaul.
