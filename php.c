@@ -72,6 +72,7 @@ static void findPhpTags (void)
 	if (*(const char*)cp == '$'  &&  isVarChar1 (*(const char*)(cp+1)))
 	{
 	    cp += 1;
+	    vStringClear (name);
 	    while (isVarChar ((int) *cp))
 	    {
 		vStringPut (name, (int) *cp);
@@ -97,6 +98,7 @@ static void findPhpTags (void)
 	    if (*cp == '&')	/* skip reference character */
 		cp++;
 
+	    vStringClear (name);
 	    while (isalnum ((int) *cp)  ||  *cp == '_')
 	    {
 		vStringPut (name, (int) *cp);
@@ -113,6 +115,7 @@ static void findPhpTags (void)
 
 	    while (isspace ((int) *cp))
 		++cp;
+	    vStringClear (name);
 	    while (isalnum ((int) *cp)  ||  *cp == '_')
 	    {
 		vStringPut (name, (int) *cp);
@@ -140,6 +143,7 @@ static void findPhpTags (void)
 	    else if (! ((*cp == '_')  || isalnum ((int) *cp)))
 		continue;
           
+	    vStringClear (name);
 	    while (isalnum ((int) *cp)  ||  *cp == '_')
 	    {
 		vStringPut (name, (int) *cp);
