@@ -16,16 +16,6 @@ dnl ------------------
 echo 'Exuberant Ctags, version @@VERSION@@'
 uname -mrsv 2>/dev/null
 
-dnl Check host-specific requirements
-dnl --------------------------------
-AC_MSG_CHECKING("HP-UX")
-if uname | grep "HP-UX" > /dev/null 2>&1; then
-	AC_MSG_RESULT(yes; adding compiler options for ANSI support)
-	CFLAGS="$CFLAGS -Aa -D_HPUX_SOURCE"
-else
-	AC_MSG_RESULT(no)
-fi
-
 dnl Define convenience macros
 dnl -------------------------
 dnl CHECK_HEADER_DEFINE(LABEL, HEADER [,ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ] ])
@@ -151,6 +141,17 @@ dnl Checks for programs
 dnl -------------------
 
 AC_PROG_CC
+
+if uname | grep "HP-UX" > /dev/null 2>&1; then
+	AC_MSG_CHECKING("HP-UX native compiler")
+	if test "$CC" = "cc"; then
+		AC_MSG_RESULT(yes; adding compiler options for ANSI support)
+		CFLAGS="$CFLAGS -Aa -D_HPUX_SOURCE"
+	else
+		AC_MSG_RESULT(no)
+	fi
+fi
+
 AC_PROG_LN_S
 AC_CHECK_PROG(STRIP, strip, strip, :)
 

@@ -1,7 +1,7 @@
 Current Version: @@VERSION@@
 
-ctags-5.1.1 (Sat Nov 10 2001)
-* Portabilitiy fixes [VMS, OS/2]
+ctags-5.1.1 (Mon Nov 12 2001)
+* Portabilitiy fixes [HP-UX, VMS, OS/2].
 
 ctags-5.1 (Tue Nov 06 2001)
 * Changed name of option configuration files for MSDOS, MSWindows, and OS/2.
