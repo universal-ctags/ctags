@@ -17,3 +17,5 @@ ctags.ref
 ctags.html
 syntax.vim
 ctags-[0-9].[0-9]*
+showtags
+win32
