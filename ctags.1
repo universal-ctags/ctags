@@ -730,7 +730,10 @@ disabled, symbolic links are ignored. This option is on by default.
 
 .TP 5
 \fB--options\fP=\fIfile\fP
-Read additional options from \fIfile\fP.
+Read additional options from \fIfile\fP. As a special case, if
+\fB--options\fP=\fINONE\fP is specified as the first option on the command
+line, it will disable the automatic reading of any configuration options from
+either a file or the environment (see \fBFILES\fP).
 
 .TP 5
 \fB--recurse\fP[=\fIyes\fP|\fIno\fP]

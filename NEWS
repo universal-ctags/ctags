@@ -1,10 +1,12 @@
 Current Version: @@VERSION@@
 
-ctags-5.5 (Mon Dec 02 2002)
+ctags-5.5 (Fri Dec 20 2002)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
 * Added support for dimensioned variables, contributed by Simon Bohlin [ASP].
 * Added support for C# language.
 * Added support for SML (Standard ML) language, contributed by Venkatesh Prasad.
+* Added special handling of --options=NONE to disable automatic reading of
+  options from configuration files or environment.
 * Fixed problem with infinite loop in certain comments [PL/SQL, Bug #629115].
 * Fixed problem of incorrect extension field [C. Bug #639639].
 * Fixed problem of empty scoping extension field [C. Bug #639644].

@@ -91,9 +91,9 @@ typedef const struct {
 *   DATA DEFINITIONS
 */
 
-static boolean NonOptionEncountered = FALSE;
-
-static stringList *OptionFiles = NULL;
+static boolean NonOptionEncountered;
+static stringList *OptionFiles;
+static boolean SkipConfiguration;
 
 static const char *const HeaderExtensions [] = {
     "h", "H", "hh", "hpp", "hxx", "h++", "inc", "def", NULL
@@ -1568,12 +1568,22 @@ static boolean parseFileOptions (const char* const fileName)
     return fileFound;
 }
 
+/* Actions to be taken before reading any other options */
 extern void previewFirstOption (cookedArgs* const args)
 {
-    if (cArgIsOption (args) &&
-	(strcmp (args->item, "V") == 0 || strcmp (args->item, "verbose") == 0))
+    while (cArgIsOption (args))
     {
-	parseOption (args);
+	if (strcmp (args->item, "V") == 0 || strcmp (args->item, "verbose") == 0)
+	    parseOption (args);
+	else if (strcmp (args->item, "options") == 0  &&
+		strcmp (args->parameter, "NONE") == 0)
+	{
+	    fprintf (stderr, "No options will be read from files or environment\n");
+	    SkipConfiguration = TRUE;
+	    cArgForth (args);
+	}
+	else
+	    break;
     }
 }
 
@@ -1629,8 +1639,11 @@ static void parseEnvironmentOptions (void)
 
 extern void readOptionConfiguration (void)
 {
-    parseConfigurationFileOptions ();
-    parseEnvironmentOptions ();
+    if (! SkipConfiguration)
+    {
+	parseConfigurationFileOptions ();
+	parseEnvironmentOptions ();
+    }
 }
 
 /*
