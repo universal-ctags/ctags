@@ -53,6 +53,12 @@ typedef enum eLocate {
     EX_PATTERN		/* -N  only patterns in tag file */
 } exCmd;
 
+typedef enum sortType {
+    SO_UNSORTED,
+    SO_SORTED,
+    SO_FOLDSORTED
+} sortType;
+
 struct sInclude {
     boolean fileNames;		/* include tags for source file names */
     boolean qualifiedTags;	/* include tags for qualified class members */
@@ -83,7 +89,7 @@ typedef struct sOptionValues {
     boolean etags;	    /* -e  output Emacs style tags file */
     exCmd locate;	    /* --excmd  EX command used to locate tag */
     boolean recurse;	    /* -R  recurse into directories */
-    boolean sorted;	    /* -u,--sort  sort tags */
+    sortType sorted;	    /* -u,--sort  sort tags */
     boolean verbose;	    /* -V  verbose */
     boolean xref;	    /* -x  generate xref output instead */
     char *fileList;	    /* -L  name of file containing names of files */

@@ -122,7 +122,7 @@ else
 	if test "$sort_found" = yes ; then
 		AC_MSG_CHECKING(if sort accepts our command line)
 		touch /tmp/sort.test
-		sort -u -o /tmp/sort.test /tmp/sort.test 1>/dev/null 2>&1
+		sort -u -f -o /tmp/sort.test /tmp/sort.test 1>/dev/null 2>&1
 		if test $? -ne 0 ; then
 			AC_MSG_RESULT(no)
 		else

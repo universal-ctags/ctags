@@ -152,8 +152,10 @@ static void addPseudoTags (void)
 		    "extended format; --format=1 will not append ;\" to lines";
 
 	writePseudoTag ("TAG_FILE_FORMAT", format, formatComment);
-	writePseudoTag ("TAG_FILE_SORTED", Option.sorted ? "1":"0",
-		       "0=unsorted, 1=sorted");
+	writePseudoTag ("TAG_FILE_SORTED",
+			Option.sorted == SO_FOLDSORTED ? "2" :
+			    (Option.sorted == SO_SORTED ? "1" : "0"),
+		       "0=unsorted, 1=sorted, 2=foldcase");
 	writePseudoTag ("TAG_PROGRAM_AUTHOR",	AUTHOR_NAME,  AUTHOR_EMAIL);
 	writePseudoTag ("TAG_PROGRAM_NAME",	PROGRAM_NAME, "");
 	writePseudoTag ("TAG_PROGRAM_URL",	PROGRAM_URL,  "official site");
@@ -190,7 +192,8 @@ static void updateSortedFlag (const char *const line,
 		    d != (int) Option.sorted)
 		{
 		    fsetpos (fp, &flagLocation);
-		    fputc (Option.sorted ? '1' : '0', fp);
+		    fputc (Option.sorted == SO_FOLDSORTED ? '2' :
+				(Option.sorted == SO_SORTED ? '1' : '0'), fp);
 		}
 		fsetpos (fp, &nextLine);
 	    }
@@ -452,7 +455,7 @@ static void sortTagFile (void)
 {
     if (TagFile.numTags.added > 0L)
     {
-	if (Option.sorted)
+	if (Option.sorted != SO_UNSORTED)
 	{
 	    verbose ("sorting tag file\n");
 #ifdef EXTERNAL_SORT

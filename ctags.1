@@ -781,11 +781,14 @@ either the \fBregex(5,7)\fP man page, or the GNU info documentation for regex
 .RE
 
 .TP 5
-\fB--sort\fP[=\fIyes\fP|\fIno\fP]
+\fB--sort\fP[=\fIyes\fP|\fIno\fP|\fIfoldcase\fP]
 Indicates whether the tag file should be sorted on the tag name (default is
-\fIyes\fP). Note that the original \fBvi\fP(1) requires sorted tags. This
-option is on by default. This option must appear before the first file name.
-[Ignored in etags mode]
+\fIyes\fP). Note that the original \fBvi\fP(1) required sorted tags. 
+The \fIfoldcase\fP value specifies case insensitive (or case-folded) sorting.
+Fast binary searches of tag files sorted with case-folding will require
+special support from tools using tag files, such as that found in the ctags
+readtags library, or Vim version 6.2 or higher (using "set ignorecase"). This
+option must appear before the first file name. [Ignored in etags mode]
 
 .TP 5
 \fB--tag-relative\fP[=\fIyes\fP|\fIno\fP]

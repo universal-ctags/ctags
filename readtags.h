@@ -26,6 +26,7 @@
 /* Options for tagSetSorted() */
 #define TAG_UNSORTED 0
 #define TAG_SORTED   1
+#define TAG_FOLDSORT 2
 
 /* Options for tagsFind() */
 #define TAG_FULLMATCH     0x0

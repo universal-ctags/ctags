@@ -127,7 +127,7 @@ optionValues Option = {
     EX_MIX,		/* -n, --excmd */
 #endif
     FALSE,		/* -R */
-    TRUE,		/* -u, --sort */
+    SO_SORTED,		/* -u, --sort */
     FALSE,		/* -V */
     FALSE,		/* -x */
     NULL,		/* -L */
@@ -252,8 +252,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --regex-<LANG>=/line_pattern/name_pattern/[flags]"},
  {1,"       Define regular expression for locating tags in specific language."},
 #endif
- {0,"  --sort=[yes|no]"},
- {0,"       Should tags be sorted [yes]?"},
+ {0,"  --sort=[yes|no|foldcase]"},
+ {0,"       Should tags be sorted (optionally ignoring case) [yes]?."},
  {0,"  --tag-relative=[yes|no]"},
  {0,"       Should paths be relative to location of tag file [no; yes when -e]?"},
  {1,"  --totals=[yes|no]"},
@@ -428,7 +428,7 @@ extern void checkOptions (void)
 static void setEtagsMode (void)
 {
     Option.etags = TRUE;
-    Option.sorted = FALSE;
+    Option.sorted = SO_UNSORTED;
     Option.lineDirectives = FALSE;
     Option.tagRelative = TRUE;
 }
@@ -684,6 +684,24 @@ extern const char *fileExtension (const char *const fileName)
     return extension;
 }
 
+static boolean isFalse (const char *parameter)
+{
+    return (boolean) (
+	strcasecmp (parameter, "0"  ) == 0  ||
+	strcasecmp (parameter, "n"  ) == 0  ||
+	strcasecmp (parameter, "no" ) == 0  ||
+	strcasecmp (parameter, "off") == 0);
+}
+
+static boolean isTrue (const char *parameter)
+{
+    return (boolean) (
+	strcasecmp (parameter, "1"  ) == 0  ||
+	strcasecmp (parameter, "y"  ) == 0  ||
+	strcasecmp (parameter, "yes") == 0  ||
+	strcasecmp (parameter, "on" ) == 0);
+}
+
 /*  Determines whether the specified file name is considered to be a header
  *  file for the purposes of determining whether enclosed tags are global or
  *  static.
@@ -900,6 +918,21 @@ static void processOptionFile (const char *const option,
 	error (WARNING, "no option file supplied for \"%s\"", option);
     else if (! parseFileOptions (parameter))
 	error (FATAL | PERROR, "cannot open option file \"%s\"", parameter);
+}
+
+static void processSortType (const char *const option,
+			     const char *const parameter)
+{
+    if (isFalse (parameter))
+	Option.sorted = SO_UNSORTED;
+    else if (isTrue (parameter))
+	Option.sorted = SO_SORTED;
+    else if (strcasecmp (parameter, "f") == 0 ||
+	    strcasecmp (parameter, "fold") == 0 ||
+	    strcasecmp (parameter, "foldcase") == 0)
+	Option.sorted = SO_FOLDSORTED;
+    else
+	error (FATAL, "Invalid value for \"%s\" option", option);
 }
 
 static void installHeaderListDefaults (void)
@@ -1243,6 +1276,7 @@ static parametricOption ParametricOptions [] = {
     { "langdef",		processLanguageDefineOption,	FALSE	},
     { "langmap",		processLanguageMapOption,	FALSE	},
     { "options",		processOptionFile,		FALSE	},
+    { "sort",			processSortType,		TRUE	},
 };
 
 static booleanOption BooleanOptions [] = {
@@ -1257,7 +1291,6 @@ static booleanOption BooleanOptions [] = {
 #ifdef RECURSE_SUPPORTED
     { "recurse",	&Option.recurse,		FALSE	},
 #endif
-    { "sort",		&Option.sorted,			TRUE	},
     { "tag-relative",	&Option.tagRelative,		TRUE	},
     { "totals",		&Option.printTotals,		TRUE	},
     { "verbose",	&Option.verbose,		FALSE	},
@@ -1301,13 +1334,9 @@ static boolean getBooleanOption (const char *const option,
 
     if (parameter [0] == '\0')
 	selection = TRUE;
-    else if (strcmp (parameter, "0"  ) == 0  ||
-	     strcmp (parameter, "no" ) == 0  ||
-	     strcmp (parameter, "off") == 0)
+    else if (isFalse (parameter))
 	selection = FALSE;
-    else if (strcmp (parameter, "1"  ) == 0  ||
-	     strcmp (parameter, "yes") == 0  ||
-	     strcmp (parameter, "on" ) == 0)
+    else if (isTrue (parameter))
 	selection = TRUE;
     else
 	error (FATAL, "Invalid value for \"%s\" option", option);
@@ -1471,7 +1500,7 @@ static void processShortOption (const char *const option,
 	    break;
 	case 'u':
 	    checkOptionOrder (option);
-	    Option.sorted = FALSE;
+	    Option.sorted = SO_UNSORTED;
 	    break;
 	case 'V':
 	    Option.verbose = TRUE;

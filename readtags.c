@@ -21,7 +21,6 @@
 #endif
 #include <stdio.h>
 #include "readtags.h"
-#include "routines.h"
 
 /*
 *   MACROS
@@ -43,7 +42,7 @@ struct sTagFile {
     short initialized;
 	/* format of tag file */
     short format;
-	/* is the tag file sorted? */
+	/* how is the tag file sorted? */
     short sorted;
 	/* pointer to file structure */
     FILE* fp;
@@ -97,6 +96,33 @@ const char *const PseudoTagPrefix = "!_";
 /*
 *   FUNCTION DEFINITIONS
 */
+
+/*
+ * Compare two strings, ignoring case.
+ * Return 0 for match, < 0 for smaller, > 0 for bigger
+ * Make sure case is folded to uppercase in comparison (like for 'sort -f')
+ * This makes a difference when one of the chars lies between upper and lower
+ * ie. one of the chars [ \ ] ^ _ ` for ascii. (The '_' in particular !)
+ */
+static int struppercmp (const char *s1, const char *s2)
+{
+    int result;
+    do
+    {
+	result = toupper ((int) *s1) - toupper ((int) *s2);
+    } while (result == 0  &&  *s1++ != '\0'  &&  *s2++ != '\0');
+    return result;
+}
+
+static int strnuppercmp (const char *s1, const char *s2, size_t n)
+{
+    int result;
+    do
+    {
+	result = toupper ((int) *s1) - toupper ((int) *s2);
+    } while (result == 0  &&  --n > 0  &&  *s1++ != '\0'  &&  *s2++ != '\0');
+    return result;
+}
 
 static int growString (vstring *s)
 {
@@ -353,7 +379,7 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
     if (info != NULL)
     {
 	info->file.format = 1;
-	info->file.sorted = 0;
+	info->file.sorted = TAG_UNSORTED;
 	info->program.author  = NULL;
 	info->program.name    = NULL;
 	info->program.url     = NULL;
@@ -492,46 +518,22 @@ static int readTagLineSeek (tagFile *const file, const off_t pos)
     return result;
 }
 
-#if !defined (HAVE_STRCASECMP) && !defined (HAVE_STRICMP)
-static int strcasecmp (const char *s1, const char *s2)
-{
-    int result;
-    do
-    {
-	result = toupper ((int) *s1) - toupper ((int) *s2);
-    } while (result == 0  &&  *s1++ != '\0'  &&  *s2++ != '\0');
-    return result;
-}
-#endif
-
-#if !defined (HAVE_STRNCASECMP) && !defined (HAVE_STRNICMP)
-static int strncasecmp (const char *s1, const char *s2, size_t n)
-{
-    int result;
-    do
-    {
-	result = toupper ((int) *s1) - toupper ((int) *s2);
-    } while (result == 0  &&  --n > 0  &&  *s1++ != '\0'  &&  *s2++ != '\0');
-    return result;
-}
-#endif
-
 static int nameComparison (tagFile *const file)
 {
     int result;
     if (file->search.ignorecase)
     {
 	if (file->search.partial)
-	    result = strncasecmp (file->search.name, file->name.buffer,
-			       file->search.nameLength);
+	    result = strnuppercmp (file->search.name, file->name.buffer,
+		    file->search.nameLength);
 	else
-	    result = strcasecmp (file->search.name, file->name.buffer);
+	    result = struppercmp (file->search.name, file->name.buffer);
     }
     else
     {
 	if (file->search.partial)
 	    result = strncmp (file->search.name, file->name.buffer,
-			      file->search.nameLength);
+		    file->search.nameLength);
 	else
 	    result = strcmp (file->search.name, file->name.buffer);
     }
@@ -639,10 +641,21 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
     fseek (file->fp, 0, SEEK_END);
     file->size = ftell (file->fp);
     rewind (file->fp);
-    if (file->sorted && ! file->search.ignorecase)
+    if ((file->sorted == TAG_SORTED    && !file->search.ignorecase) ||
+	(file->sorted == TAG_FOLDSORT  &&  file->search.ignorecase))
+    {
+#ifdef DEBUG
+	printf ("<performing binary search>\n");
+#endif
 	result = findBinary (file);
+    }
     else
+    {
+#ifdef DEBUG
+	printf ("<performing sequential search>\n");
+#endif
 	result = findSequential (file);
+    }
 
     if (result != TagSuccess)
 	file->search.pos = file->size;
@@ -658,7 +671,8 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 static tagResult findNext (tagFile *const file, tagEntry *const entry)
 {
     tagResult result = TagFailure;
-    if (file->sorted && ! file->search.ignorecase)
+    if ((file->sorted == TAG_SORTED    && !file->search.ignorecase) ||
+	(file->sorted == TAG_FOLDSORT  &&  file->search.ignorecase))
     {
 	result = tagsNext (file, entry);
 	if (result == TagSuccess  && nameComparison (file) != 0)
@@ -821,7 +835,7 @@ const char *const Usage =
     "    -i           Perform case-insensitive matching.\n"
     "    -l           List all tags.\n"
     "    -p           Perform partial matching.\n"
-    "    -s[0|1]      Override sort detection of tag file.\n"
+    "    -s[0|1|2]    Override sort detection of tag file.\n"
     "    -t file      Use specified tag file (default: \"tags\").\n"
     "Note that options are acted upon as encountered, so order is significant.\n";
 
@@ -842,7 +856,7 @@ extern int main (int argc, char **argv)
 	    int j;
 	    for (j = 1  ;  arg [j] != '\0'  ;  ++j)
 	    {
-		switch (arg[j])
+		switch (arg [j])
 		{
 		    case 'e': extensionFields = 1;         break;
 		    case 'i': options |= TAG_IGNORECASE;   break;
@@ -851,10 +865,13 @@ extern int main (int argc, char **argv)
 		    case 't': TagFileName = argv [++i];    break;
 		    case 's':
 			SortOverride = 1;
+			++j;
 			if (arg [j] == '\0')
 			    Sorted = 1;
-			else
-			    Sorted = (arg [++j] != '0');
+			else if (strchr ("012", arg[j]) != NULL)
+			    Sorted = arg[j] - '0';
+			else 
+			    SortOverride = 0;
 			break;
 		    default:
 			fprintf (errout, "%s: unknown option: %c\n",

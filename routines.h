@@ -143,7 +143,6 @@ extern boolean isAbsolutePath (const char *const path);
 extern char* absoluteFilename (const char *file);
 extern char* absoluteDirname (char *file);
 extern char* relativeFilename (const char *file, const char *dir);
-extern vString *combinePathAndFile (const char *const path, const char *const file);
 extern FILE *tempFile (const char *const mode, char **const pName);
 
 #endif	/* _ROUTINES_H */

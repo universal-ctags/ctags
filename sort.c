@@ -60,7 +60,10 @@ extern void catFile (const char *const name)
 
 extern void externalSortTags (const boolean toStdout)
 {
-    const char *const sortCommand = "sort -u -o";
+    const char *const sortNormalCommand = "sort -u -o";
+    const char *const sortFoldedCommand = "sort -u -f -o";
+    const char *sortCommand =
+	Option.sorted == SO_FOLDSORTED ? sortFoldedCommand : sortNormalCommand;
     PE_CONST char *const sortOrder1 = "LC_COLLATE=C";
     PE_CONST char *const sortOrder2 = "LC_ALL=C";
     const size_t length	= 4 + strlen (sortOrder1) + strlen (sortOrder2) +
@@ -116,6 +119,14 @@ static void failedSort (FILE *const fp, const char* msg)
 	error (FATAL, "%s: %s", msg, cannotSort);
 }
 
+static int compareTagsFolded(const void *const one, const void *const two)
+{
+    const char *const line1 = *(const char* const*) one;
+    const char *const line2 = *(const char* const*) two;
+
+    return struppercmp (line1, line2);
+}
+
 static int compareTags (const void *const one, const void *const two)
 {
     const char *const line1 = *(const char* const*) one;
@@ -161,6 +172,7 @@ extern void internalSortTags (const boolean toStdout)
     FILE *fp = NULL;
     const char *line;
     size_t i;
+    int (*cmpFunc)(const void *, const void *);
 
     /*	Allocate a table of line pointers to be sorted.
      */
@@ -169,6 +181,8 @@ extern void internalSortTags (const boolean toStdout)
     char **const table = (char **) malloc (tableSize);	/* line pointers */
     DebugStatement ( size_t mallocSize = tableSize; )	/* cumulative total */
 
+
+    cmpFunc = Option.sorted == SO_FOLDSORTED ? compareTagsFolded : compareTags;
     if (table == NULL)
 	failedSort (fp, "out of memory");
 
@@ -206,7 +220,7 @@ extern void internalSortTags (const boolean toStdout)
 
     /*	Sort the lines.
      */
-    qsort (table, numTags, sizeof (*table), compareTags);
+    qsort (table, numTags, sizeof (*table), cmpFunc);
 
     writeSortedTags (table, numTags, toStdout);
 
