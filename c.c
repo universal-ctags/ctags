@@ -1442,12 +1442,14 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 	case KEYWORD_EXTERN:
 	    reinitStatement (st, FALSE);
 	    st->scope = SCOPE_EXTERN;
+	    st->declaration = DECL_BASE;
 	    break;
 
 	case KEYWORD_STATIC:
 	    reinitStatement (st, FALSE);
 	    if (! isLanguage (Lang_java))
 		st->scope = SCOPE_STATIC;
+	    st->declaration = DECL_BASE;
 	    break;
     }
 }
