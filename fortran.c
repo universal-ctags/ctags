@@ -973,7 +973,7 @@ static void parseTypeSpec (tokenInfo *const token)
 	    readToken (token);
 	    if (isType (token, TOKEN_PAREN_OPEN))
 		skipPast (token, TOKEN_PAREN_CLOSE); /* skip kind-selector */
-	    else if (isType (token, TOKEN_OPERATOR) &&
+	    if (isType (token, TOKEN_OPERATOR) &&
 		     strcmp (vStringValue (token->string), "*") == 0)
 	    {
 		readToken (token);
@@ -1032,6 +1032,8 @@ static boolean isMatchingEnd (tokenInfo *const token, keywordId keyword)
 	readToken (token);
 	result = (boolean) (isKeyword (token, KEYWORD_NONE) ||
 			    isKeyword (token, keyword));
+	if (result)
+	    skipToNextStatement (token);
     }
     return result;
 }
@@ -1091,15 +1093,39 @@ static void parseQualifierSpecList (tokenInfo *const token)
 	skipToToken (token, TOKEN_STATEMENT_END);
 }
 
-static boolean localVariableScope (void)
+static tagType variableTagType (void)
 {
-    boolean result = TRUE;
+    tagType result = TAG_VARIABLE;
     if (ancestorCount () > 0)
     {
 	const tokenInfo* const parent = ancestorTop ();
-	result = (boolean) (parent->tag != TAG_MODULE);
+	switch (parent->tag)
+	{
+	    case TAG_MODULE:       result = TAG_VARIABLE;  break;
+	    case TAG_DERIVED_TYPE: result = TAG_COMPONENT; break;
+	    case TAG_FUNCTION:     result = TAG_LOCAL;     break;
+	    case TAG_SUBROUTINE:   result = TAG_LOCAL;     break;
+	}
     }
     return result;
+}
+
+static void parseEntityDeclList (tokenInfo *const token)
+{
+    while (isType (token, TOKEN_IDENTIFIER))
+    {
+	makeFortranTag (token, variableTagType ());
+	readToken (token);
+	if (isType (token, TOKEN_PAREN_OPEN))
+	    skipPast (token, TOKEN_PAREN_CLOSE);
+	if (isType (token, TOKEN_OPERATOR) &&
+		strcmp (vStringValue (token->string), "*") == 0)
+	    readToken (token);
+	while (! isType (token, TOKEN_COMMA) &&
+		! isType (token, TOKEN_STATEMENT_END))
+	    readToken (token);
+	readToken (token);
+    }
 }
 
 /*  type-declaration-stmt is
@@ -1107,23 +1133,18 @@ static boolean localVariableScope (void)
  */
 static void parseTypeDeclarationStmt (tokenInfo *const token)
 {
-    const tagType tag = localVariableScope () ? TAG_LOCAL : TAG_VARIABLE;
     Assert (isTypeSpec (token));
     parseTypeSpec (token);
-    if (isType (token, TOKEN_COMMA))
-	parseQualifierSpecList (token);
-    if (isType (token, TOKEN_DOUBLE_COLON))
-	readToken (token);
-    do
+    if (!isType (token, TOKEN_STATEMENT_END))	/* if not end of derived type... */
     {
-	if (isType (token, TOKEN_IDENTIFIER))
-	    makeFortranTag (token, tag);
-	readToken (token);
-	if (isType (token, TOKEN_PAREN_OPEN))
-	    skipPast (token, TOKEN_PAREN_CLOSE);
-	skipPast (token, TOKEN_COMMA);
-    } while (! isType (token, TOKEN_STATEMENT_END));
-    skipToNextStatement (token);
+	if (isType (token, TOKEN_COMMA))
+	    parseQualifierSpecList (token);
+	if (isType (token, TOKEN_DOUBLE_COLON))
+	    readToken (token);
+	parseEntityDeclList (token);
+    }
+    if (isType (token, TOKEN_STATEMENT_END))
+	skipToNextStatement (token);
 }
 
 static void parseParenName (tokenInfo *const token)
@@ -1237,13 +1258,7 @@ static void parseComponentDefStmt (tokenInfo *const token)
 	parseQualifierSpecList (token);
     if (isType (token, TOKEN_DOUBLE_COLON))
 	readToken (token);
-    do
-    {
-	if (isType (token, TOKEN_IDENTIFIER))
-	    makeFortranTag (token, TAG_COMPONENT);
-	skipPast (token, TOKEN_COMMA);
-    } while (! isType (token, TOKEN_STATEMENT_END));
-    readToken (token);
+    parseEntityDeclList (token);
 }
 
 /*  derived-type-def is
@@ -1478,11 +1493,13 @@ static void parseInternalSubprogramPart (tokenInfo *const token)
 		parseSubroutineSubprogram (token);
 		break;
 
+	    case KEYWORD_end:
+		done = TRUE;
+		break;
+
 	    default:
 		if (isTypeSpec (token))
 		    parseTypeSpec (token);
-		else if (isKeyword (token, KEYWORD_end))
-		    done = TRUE;
 		else
 		    readToken (token);
 		break;
@@ -1534,23 +1551,21 @@ static void parseModule (tokenInfo *const token)
  *      or data-stmt
  *      or entry-stmt
  */
-static void parseExecutionPart (tokenInfo *const token, const keywordId keyword)
+static void parseExecutionPart (tokenInfo *const token)
 {
-    while (! isMatchingEnd (token, keyword))
+    while (! isKeyword (token, KEYWORD_end) && ! isKeyword (token, KEYWORD_contains))
     {
 	readToken (token);
-	if (isKeyword (token, KEYWORD_contains))
-	    parseInternalSubprogramPart (token);
-	else if (isKeyword (token, KEYWORD_entry))
+	if (isKeyword (token, KEYWORD_entry))
 	    parseEntryStmt (token);
 	skipOverParens (token);
     }
-    skipToNextStatement (token);
 }
 
 static void parseSubprogram (tokenInfo *const token,
 			     const keywordId keyword, const tagType tag)
 {
+    boolean ended;
     Assert (isKeyword (token, keyword));
     readToken (token);
     if (isType (token, TOKEN_IDENTIFIER))
@@ -1558,7 +1573,15 @@ static void parseSubprogram (tokenInfo *const token,
     ancestorPush (token);
     skipToNextStatement (token);
     parseSpecificationPart (token);
-    parseExecutionPart (token, keyword);
+    if (! isKeyword (token, KEYWORD_end))
+    {
+	if (! isKeyword (token, KEYWORD_contains))
+	    parseExecutionPart (token);
+	if (isKeyword (token, KEYWORD_contains))
+	    parseInternalSubprogramPart (token);
+	Assert (isKeyword (token, KEYWORD_end));
+    }
+    ended = isMatchingEnd (token, keyword);
     ancestorPop ();
 }
 
@@ -1626,11 +1649,11 @@ static void parseProgramUnit (tokenInfo *const token)
 	    case KEYWORD_recursive:  readToken (token);                 break;
 	    default:
 		if (isTypeSpec (token))
-		    parseTypeSpec (token);
+		    parseTypeDeclarationStmt (token);
 		else
 		{
 		    parseSpecificationPart (token);
-		    parseExecutionPart (token, KEYWORD_NONE);
+		    parseExecutionPart (token);
 		}
 		break;
 	}
