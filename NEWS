@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.3.1 (Tue Sep 03 2002)
+ctags-5.3.1 (Wed Sep 04 2002)
 * Renamed tagsSetSorted() to tagsSetSortType() and "sorted" member of
   tagFileInfo structure of readtags library to "sort".
 * Added new function, tagsFirst() to readtags library.
@@ -8,6 +8,7 @@ ctags-5.3.1 (Tue Sep 03 2002)
 * Fixed null tags for unnamed BLOCK DATA statements [Fortran].
 * Fixed missing tags for function preceded by "<SID>" [Vim].
 * Fixed missing tags for equate statements not in column 1 [Asm, Bug #538629].
+* Fixed Ruby parser (why didn't the compiler report my screw-up?) [Ruby].
 
 ctags-5.3 (Wed Jul 17 2002)
 * Allowed --etags-include option without input files.

@@ -125,7 +125,8 @@ static void findRubyTags (void)
 			* characters.
 			*/
 		    while (isalnum ((int) *cp)  ||
-			(cp != '\0' && strchr ("_!?.", (int) cp) != NULL))
+			((int) *cp != '\0' &&
+			 strchr ("_!?.", (int) *cp) != NULL))
 		    {
 			/* classmethods are accesible only via class instance
 			    * instead of object instance. This difference has to
