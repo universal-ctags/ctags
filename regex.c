@@ -441,7 +441,7 @@ static void matchCallbackPattern (const vString* const line,
     regexMatch matches [BACK_REFERENCE_COUNT];
     unsigned int count = 0;
     int i;
-    for (i = 0; i < BACK_REFERENCE_COUNT  &&  pmatch [i].rm_so != -1; ++i)
+    for (i = 0  ;  i < BACK_REFERENCE_COUNT  &&  pmatch [i].rm_so != -1  ;  ++i)
     {
 	matches [i].start  = pmatch [i].rm_so;
 	matches [i].length = pmatch [i].rm_eo - pmatch [i].rm_so;

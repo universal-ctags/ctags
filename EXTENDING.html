@@ -117,39 +117,40 @@ these types:
 <p>
 The callback function is passed the line matching the regular expression and
 an array of <code>count</code> structures defining the subexpression matches
-of the regular expression.
+of the regular expression, starting from \0 (the entire line).
 
 <p>
 This is all there is to it. All other details are specific to the parser and
 how it wants to do its job. There are some support functions which can take
 care of some commonly needed parsing tasks, such as keyword table lookups (see
 keyword.c), which you can make use of if desired (examples of its use can be
-found in c.c, eiffel.c, and fortran.c). Almost everyting is already taken care
+found in c.c, eiffel.c, and fortran.c). Almost everything is already taken care
 of automatically for you by the infrastructure.  Writing the actual parsing
 algorithm is the hardest part, but is not constrained by any need to conform
 to anything in ctags other than that mentioned above.
 
 <p>
 There are several different approaches used in the parsers inside <b>Exuberant
-Ctags</b> and you can browse through these as examples of how to go about it.
+Ctags</b> and you can browse through these as examples of how to go about
+creating your own.
 
 <h2>Examples</h2>
 
-  Below you will find two example parsers. The first is for our mythical Swine
-  parser, which provides tags for lines beginning with "<CODE>def</CODE>"
-  followed by some name. The second is a simple regex parser for makefile
-  macros.
+  Below you will find several example parsers demonstrating most of the
+  facilities available. These include three alternative implementations
+  of a Swine parser, which generate tags for lines beginning with
+  "<CODE>def</CODE>" followed by some name.
 
 <pre>
 /***************************************************************************
  * swine.c
- * Parser for Swine definitions
+ * Character-based parser for Swine definitions
  **************************************************************************/
 /* INCLUDE FILES */
 #include "general.h"    /* always include first */
 
 #include &lt;string.h&gt;     /* to declare strxxx() functions */
-#include &lt;string.h&gt;     /* to define isxxx() macros */
+#include &lt;ctype.h&gt;      /* to define isxxx() macros */
 
 #include "parse.h"      /* always include */
 #include "read.h"       /* to define file fileReadLine() */
@@ -205,7 +206,97 @@ extern parserDefinition* SwineParser (void)
 }
 </pre>
 
+<p>
+<pre>
+/***************************************************************************
+ * swine.c
+ * Regex-based parser for Swine
+ **************************************************************************/
+/* INCLUDE FILES */
+#include "general.h"    /* always include first */
+#include "parse.h"      /* always include */
 
+/* FUNCTION DEFINITIONS */
+
+static void installSwineRegex (const langType language)
+{
+    addTagRegex (language, "^def[ \t]*([A-Z0-9_]+)", "\\1", "d,definition", NULL);
+}
+
+/* Create parser definition stucture */
+extern parserDefinition* SwineParser (void)
+{
+    static const char *const extensions [] = { "swn", NULL };
+    parserDefinition* def = parserNew ("Swine");
+    parserDefinition* const def = parserNew ("Makefile");
+    def-&gt;patterns   = patterns;
+    def-&gt;extensions = extensions;
+    def-&gt;initialize = installMakefileRegex;
+    def-&gt;regex      = TRUE;
+    return def;
+}
+</pre>
+
+<p>
+<pre>
+/***************************************************************************
+ * swine.c
+ * Regex callback-based parser for Swine definitions
+ **************************************************************************/
+/* INCLUDE FILES */
+#include "general.h"    /* always include first */
+
+#include "parse.h"      /* always include */
+#include "read.h"       /* to define file fileReadLine() */
+
+/* DATA DEFINITIONS */
+typedef enum eSwineKinds {
+    K_DEFINE
+} swineKind;
+
+static kindOption SwineKinds [] = {
+    { TRUE, 'd', "definition", "pig definition" }
+};
+
+/* FUNCTION DEFINITIONS */
+
+static void definition (const char *const line, const regexMatch *const matches,
+                       const unsigned int count)
+{
+    if (count &gt; 1)    /* should always be true per regex */
+    {
+        vString *const name = vStringNew ();
+        vStringNCopyS (name, matches [1].start, matches [1].length);
+        makeSimpleTag (name, SwineKinds, K_DEFINE);
+    }
+}
+
+static void findSwineTags (void)
+{
+    while (fileReadLine () != NULL)
+        ;  /* don't need to do anything here since callback is sufficient */
+}
+
+static void installSwine (const langType language)
+{
+    addCallbackRegex (language, "^def +([a-zA-Z0-9_]+)", NULL, definition);
+}
+
+/* Create parser definition stucture */
+extern parserDefinition* SwineParser (void)
+{
+    static const char *const extensions [] = { "swn", NULL };
+    parserDefinition* def = parserNew ("Swine");
+    def-&gt;kinds      = SwineKinds;
+    def-&gt;kindCount  = KIND_COUNT (SwineKinds);
+    def-&gt;extensions = extensions;
+    def-&gt;parser     = findSwineTags;
+    def-&gt;initialize = installSwine;
+    return def;
+}
+</pre>
+
+<p>
 <pre>
 /***************************************************************************
  * make.c
@@ -219,7 +310,7 @@ extern parserDefinition* SwineParser (void)
 
 static void installMakefileRegex (const langType language)
 {
-    addLanguageRegex (language, "/(^|[ \t])([A-Z0-9_]+)[ \t]*:?=/\\2/m,macro/i");
+    addTagRegex (language, "(^|[ \t])([A-Z0-9_]+)[ \t]*:?=", "\\2", "m,macro", "i");
 }
 
 /* Create parser definition stucture */
