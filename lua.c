@@ -73,9 +73,9 @@ static void extract_name (const char *begin, const char *end, vString *name)
     {
 	const char *cp;
 
-	while (isspace (*begin))
+	while (isspace ((int) *begin))
 	    begin++;
-	while (isspace (*end))
+	while (isspace ((int) *end))
 	    end--;
 	if (begin < end)
 	{
