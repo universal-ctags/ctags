@@ -19,7 +19,7 @@ DIFF = if diff $(DIFF_OPTIONS) tags.ref tags.test > $(DIFF_FILE); then \
 
 .PHONY: test test.include test.fields test.eiffel test.linux
 
-test: test.include test.fields test.linedir # test.eiffel test.linux
+test: test.include test.fields test.linedir test.eiffel test.linux
 
 test.%: DIFF_FILE = $@.diff
 
@@ -47,9 +47,9 @@ test.linedir: $(CTAGS_TEST) $(CTAGS_REF)
 	@ $(CTAGS_TEST) $(TEST_LINEDIR_OPTIONS) -o tags.test Test/line_directives.c
 	@- $(DIFF)
 
-REF_EIFFEL_OPTIONS = $(TEST_OPTIONS) --format=1
-TEST_EIFFEL_OPTIONS = $(TEST_OPTIONS) --format=1
-EIFFEL_DIRECTORY = /usr/local/Eiffel4
+REF_EIFFEL_OPTIONS = $(TEST_OPTIONS) --format=1 --languages=eiffel
+TEST_EIFFEL_OPTIONS = $(TEST_OPTIONS) --format=1 --languages=eiffel
+EIFFEL_DIRECTORY = $(ISE_EIFFEL)/library
 test.eiffel: $(CTAGS_TEST) $(CTAGS_REF)
 	@ echo -n "Testing Eiffel tag inclusion..."
 	@ $(CTAGS_REF) -R $(REF_EIFFEL_OPTIONS) -o tags.ref $(EIFFEL_DIRECTORY)
