@@ -10,6 +10,7 @@ ctags-5.1.1 (Wed Dec 12 2001)
 * Fixed problem with invalid filenames in preprocessor line directives.
 * Fixed makefile problem preventing successful make [Solaris].
 * Fixed bug parsing scoped variables (e.g. "b:variable") [Vim, Bug #487608].
+* Fixed problem compiling readtags.c on some hosts.
 
 ctags-5.1 (Tue Nov 06 2001)
 * Changed name of option configuration files for MSDOS, MSWindows, and OS/2.

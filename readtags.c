@@ -12,9 +12,13 @@
 *   INCLUDE FILES
 */
 #include "general.h"	/* must always come first */
+
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>	/* declare off_t */
+#endif
 #include <stdio.h>
 #include "readtags.h"
 
