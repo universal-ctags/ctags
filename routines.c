@@ -356,32 +356,58 @@ extern void setCurrentDirectory (void)
     free (cwd);
 }
 
+#define USE_LSTAT 1
+
+/* For caching of stat() calls */
+static struct stat *estat (const char *fileName)
+{
+    static struct stat FileStatus;
+    static char *FileStatusName;
+    static struct stat *result = NULL;
+    if (FileStatusName == NULL  ||  strcmp (fileName, FileStatusName) != 0)
+    {
+	if (FileStatusName != NULL)
+	    eFree (FileStatusName);
+	FileStatusName = eStrdup (fileName);
+#ifndef USE_LSTAT
+	if (stat (fileName, &FileStatus) != 0)
+	    result = NULL;
+#else
+	if (lstat (fileName, &FileStatus) != 0)
+	    result = NULL;
+	else if (! S_ISLNK (FileStatus.st_mode))
+	    result = &FileStatus;
+	else if (stat (fileName, &FileStatus) != 0)
+	    result = NULL;
+#endif
+	else
+	    result = &FileStatus;
+    }
+    return result;
+}
+
 extern boolean doesFileExist (const char *const fileName)
 {
-    struct stat fileStatus;
-
-    return (boolean) (stat (fileName, &fileStatus) == 0);
+    return (boolean) (estat (fileName) != NULL);
 }
 
 extern long unsigned int getFileSize (const char *const name)
 {
-    struct stat fileStatus;
-    unsigned long size = 0;
-
-    if (stat (name, &fileStatus) == 0)
-	size = fileStatus.st_size;
-
-    return size;
+    unsigned long result = 0;
+    struct stat *fileStatus;
+    fileStatus = estat (name);
+    if (fileStatus != NULL)
+	result = fileStatus->st_size;
+    return result;
 }
 
 extern boolean isExecutable (const char *const name)
 {
-    struct stat fileStatus;
     boolean result = FALSE;
-
-    if (stat (name, &fileStatus) == 0)
-	result = (boolean) ((fileStatus.st_mode & (S_IXUSR|S_IXGRP|S_IXOTH)) != 0);
-
+    struct stat *fileStatus;
+    fileStatus = estat (name);
+    if (fileStatus != NULL)
+	result = (boolean) ((fileStatus->st_mode & (S_IXUSR|S_IXGRP|S_IXOTH)) != 0);
     return result;
 }
 
@@ -390,24 +416,22 @@ static boolean isSetUID (const char *const name)
 #if defined (VMS) || defined (MSDOS) || defined (WIN32) || defined (__EMX__) || defined (AMIGA)
     return FALSE;
 #else
-    struct stat fileStatus;
     boolean result = FALSE;
-
-    if (stat (name, &fileStatus) == 0)
-	result = (boolean) ((fileStatus.st_mode & S_ISUID) != 0);
-
+    struct stat *fileStatus;
+    fileStatus = estat (name);
+    if (fileStatus != NULL)
+	result = (boolean) ((fileStatus->st_mode & S_ISUID) != 0);
     return result;
 #endif
 }
 
 extern boolean isNormalFile (const char *const name)
 {
-    struct stat fileStatus;
     boolean result = FALSE;
-
-    if (stat (name, &fileStatus) == 0)
-	result = (boolean) (S_ISREG (fileStatus.st_mode));
-
+    struct stat *fileStatus;
+    fileStatus = estat (name);
+    if (fileStatus != NULL)
+	result = (boolean) (S_ISREG (fileStatus->st_mode));
     return result;
 }
 
@@ -415,9 +439,10 @@ extern boolean isDirectory (const char *const name)
 {
     boolean result = FALSE;
 #ifndef AMIGA
-    struct stat fileStatus;
-    if (stat (name, &fileStatus) == 0)
-	result = (boolean) S_ISDIR (fileStatus.st_mode);
+    struct stat *fileStatus;
+    fileStatus = estat (name);
+    if (fileStatus != NULL)
+	result = (boolean) S_ISDIR (fileStatus->st_mode);
 #else
     struct FileInfoBlock *const fib = xMalloc (1, struct FileInfoBlock);
     if (fib != NULL)
@@ -441,12 +466,17 @@ extern boolean isSymbolicLink (const char *const name)
 #if defined (MSDOS) || defined (WIN32) || defined (VMS) || defined (__EMX__) || defined (AMIGA)
     return FALSE;
 #else
-    struct stat fileStatus;
     boolean result = FALSE;
-
+#if USE_LSTAT
+    struct stat *fileStatus;
+    fileStatus = estat (name);
+    if (fileStatus != NULL)
+	result = (boolean) S_ISDIR (fileStatus->st_mode);
+#else
+    struct stat fileStatus;
     if (lstat (name, &fileStatus) == 0)
 	result = (boolean) (S_ISLNK (fileStatus.st_mode));
-
+#endif
     return result;
 #endif
 }
@@ -454,21 +484,24 @@ extern boolean isSymbolicLink (const char *const name)
 extern boolean isRecursiveLink (const char* const dirName)
 {
     boolean result = FALSE;
-    char* const path = absoluteFilename (dirName);
-    while (path [strlen (path) - 1] == PATH_SEPARATOR)
-	path [strlen (path) - 1] = '\0';
-    while (! result  &&  strlen (path) > (size_t) 1)
+    if (isSymbolicLink (dirName))
     {
-	char *const separator = strrchr (path, PATH_SEPARATOR);
-	if (separator == NULL)
-	    break;
-	else if (separator == path)	/* backed up to root directory */
-	    *(separator + 1) = '\0';
-	else
-	    *separator = '\0';
-	result = isSameFile (path, dirName);
+	char* const path = absoluteFilename (dirName);
+	while (path [strlen (path) - 1] == PATH_SEPARATOR)
+	    path [strlen (path) - 1] = '\0';
+	while (! result  &&  strlen (path) > (size_t) 1)
+	{
+	    char *const separator = strrchr (path, PATH_SEPARATOR);
+	    if (separator == NULL)
+		break;
+	    else if (separator == path)	/* backed up to root directory */
+		*(separator + 1) = '\0';
+	    else
+		*separator = '\0';
+	    result = isSameFile (path, dirName);
+	}
+	eFree (path);
     }
-    eFree (path);
     return result;
 }
 
