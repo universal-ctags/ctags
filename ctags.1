@@ -367,19 +367,21 @@ tag file which "includes" other tag files. [Used only in etags mode]
 
 .TP 5
 \fB--exclude\fP=[\fIpattern\fP]
-Add \fIpattern\fP to a list of excluded files and directories. For each file
-name considered by \fBctags\fP, \fIpattern\fP will be compared against both
-the complete path (e.g. some/path/base.ext) and the base name (e.g. base.ext)
-of the file, thus allowing patterns which match a given file name irrespective
-of its path, or match only a specific path. If appropriate support is
-available from the runtime library of your C compiler, then \fIpattern\fP may
-contain the usual shell wildcards common on Unix (be sure to quote the option
-parameter to protect the wildcards from being expanded by the shell before
-being passed to \fBctags\fP; also be aware that wildcards can match the slash
-character, '/'). You can determine if shell wildcards are available on your
-platfom by examining the output of the \fB--version\fP option, which will
-include "+wildcards" in the compiled feature list; otherwise, \fIpattern\fP
-is matched against file names using a simple textual comparison.
+Add \fIpattern\fP to a list of excluded files and directories. This option
+may be specified as many times as desired. For each file name considered by
+\fBctags\fP, each \fIpattern\fP specified using this option will be compared
+against both the complete path (e.g. some/path/base.ext) and the base name
+(e.g. base.ext) of the file, thus allowing patterns which match a given file
+name irrespective of its path, or match only a specific path. If appropriate
+support is available from the runtime library of your C compiler, then
+\fIpattern\fP may contain the usual shell wildcards (not regular expressions)
+common on Unix (be sure to quote the option parameter to protect the wildcards
+from being expanded by the shell before being passed to \fBctags\fP; also be
+aware that wildcards can match the slash character, '/'). You can determine if
+shell wildcards are available on your platfom by examining the output of the
+\fB--version\fP option, which will include "+wildcards" in the compiled
+feature list; otherwise, \fIpattern\fP is matched against file names using a
+simple textual comparison.
 
 If \fIpattern\fP begins with the character '@', then the rest of the string
 is interpreted as a file name from which to read exclusion patterns, one per
@@ -1409,6 +1411,14 @@ Find the next definition for the last tag.
 
 .PP
 For more commands, see the \fITags\fP topic in the Emacs info document.
+
+
+.SH "HOW TO USE WITH NEDIT"
+NEdit version 5.1 and later can handle the new extended tag file format (see
+\fB--format\fP). To make NEdit use the tag file, select "File->Load Tags
+File". NEdit 5.1 can can read multiple tag files from different directories.
+Setting the X resource nedit.tagFile to the name of a tag file instructs NEdit
+to automatically load that tag file at startup time.
 
 
 .SH "CAVEATS"
