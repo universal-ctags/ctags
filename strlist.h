@@ -32,12 +32,14 @@ typedef struct sStringList {
 */
 extern stringList *stringListNew (void);
 extern void stringListAdd (stringList *const current, vString *string);
+extern void stringListRemoveLast (stringList *const current);
 extern void stringListCombine (stringList *const current, stringList *const from);
 extern stringList* stringListNewFromArgv (const char* const* const list);
 extern stringList* stringListNewFromFile (const char* const fileName);
 extern void stringListClear (stringList *const current);
 extern unsigned int stringListCount (const stringList *const current);
 extern vString* stringListItem (const stringList *const current, const unsigned int indx);
+extern vString* stringListLast (const stringList *const current);
 extern void stringListDelete (stringList *const current);
 extern boolean stringListHasInsensitive (const stringList *const current, const char *const string);
 extern boolean stringListHas (const stringList *const current, const char *const string);

@@ -56,6 +56,14 @@ extern void stringListAdd (stringList *const current, vString *string)
     current->list [current->count++] = string;
 }
 
+extern void stringListRemoveLast (stringList *const current)
+{
+    Assert (current != NULL);
+    Assert (current->count > 0);
+    --current->count;
+    current->list [current->count] = NULL;
+}
+
 /* Combine list `from' into `current', deleting `from' */
 extern void stringListCombine (
 	stringList *const current, stringList *const from)
@@ -113,6 +121,13 @@ extern vString* stringListItem (
 {
     Assert (current != NULL);
     return current->list [indx];
+}
+
+extern vString* stringListLast (const stringList *const current)
+{
+    Assert (current != NULL);
+    Assert (current->count > 0);
+    return current->list [current->count - 1];
 }
 
 extern void stringListClear (stringList *const current)
