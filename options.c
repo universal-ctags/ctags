@@ -44,7 +44,7 @@
 
 /*  The following separators are permitted for list options.
  */
-#define EXTENSION_SEPARATOR '.'
+#define EXTENSION_SEPARATOR ','
 #define PATTERN_START '('
 #define PATTERN_STOP  ')'
 #define IGNORE_SEPARATORS   ", \t\n"
@@ -699,9 +699,8 @@ static boolean isTrue (const char *parameter)
 extern boolean isIncludeFile (const char *const fileName)
 {
     boolean result = FALSE;
-    const char *const extension = fileExtension (fileName);
     if (Option.headerExt != NULL)
-	result = stringListExtensionMatched (Option.headerExt, extension);
+	result = stringListExtensionMatched (Option.headerExt, fileName);
     return result;
 }
 
@@ -914,7 +913,7 @@ static void printFeatureList (void)
 
 static void printProgramIdentification (void)
 {
-    printf ("%s %s, Copyright (C) 1996-2003 %s\n",
+    printf ("%s %s, Copyright (C) 1996-2004 %s\n",
 	    PROGRAM_NAME, PROGRAM_VERSION, AUTHOR_NAME);
     printf ("  Compiled: %s, %s\n", __DATE__, __TIME__);
     printf ("  Addresses: <%s>, %s\n", AUTHOR_EMAIL, PROGRAM_URL);
