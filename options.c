@@ -93,6 +93,7 @@ typedef const struct {
 
 static boolean NonOptionEncountered;
 static stringList *OptionFiles;
+static boolean FilesRequired = TRUE;
 static boolean SkipConfiguration;
 
 static const char *const HeaderExtensions [] = {
@@ -225,12 +226,14 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Print this option summary."},
  {1,"  --if0=[yes|no]"},
  {1,"       Should C code within #if 0 conditional branches be parsed [no]?"},
+ {1,"  --<LANG>-kinds=[+|-]kinds"},
+ {1,"       Enable/disable tag kinds for language <LANG>."},
  {1,"  --langdef=name"},
  {1,"       Define a new language to be parsed with regular expressions."},
  {1,"  --langmap=map(s)"},
  {1,"       Override default mapping of language to source file extension."},
  {1,"  --language-force=language"},
- {1,"       Force all files to be interpreated with specified language."},
+ {1,"       Force all files to be interpreted using specified language."},
  {1,"  --languages=[+|-]list"},
  {1,"       Restrict files scanned for tags to those mapped to langauges"},
  {1,"       specified in the comma-separated 'list'. The list can contain any"},
@@ -241,6 +244,10 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Should #line directives be processed [no]?"},
  {1,"  --links=[yes|no]"},
  {1,"       Indicate whether symbolic links should be followed [yes]."},
+ {1,"  --list-kinds=language|all"},
+ {1,"       Output a list of all tag kinds for specified language or all."},
+ {1,"  --list-languages"},
+ {1,"       Output list of supported languages."},
  {1,"  --options=file"},
  {1,"       Specify file from which command line options should be read."},
  {1,"  --recurse=[yes|no]"},
@@ -382,6 +389,14 @@ extern void setDefaultTagFileName (void)
 	Option.tagFileName = stringCopy (CTAGS_FILE);
 }
 
+extern boolean filesRequired (void)
+{
+    boolean result = FilesRequired;
+    if (Option.recurse)
+	result = FALSE;
+    return result;
+}
+
 extern void checkOptions (void)
 {
     const char* notice;
@@ -479,6 +494,8 @@ static void parseLongOption (cookedArgs *const args, const char *item)
 	args->item [length] = '\0';
 	args->parameter = equal + 1;
     }
+    Assert (args->item != NULL);
+    Assert (args->parameter != NULL);
 }
 
 static void cArgRead (cookedArgs *const current)
@@ -496,6 +513,8 @@ static void cArgRead (cookedArgs *const current)
 	    current->isOption = TRUE;
 	    current->longOption = TRUE;
 	    parseLongOption (current, item + 2);
+	    Assert (current->item != NULL);
+	    Assert (current->parameter != NULL);
 	}
 	else if (*item == '-')
 	{
@@ -509,7 +528,7 @@ static void cArgRead (cookedArgs *const current)
 	    current->isOption = FALSE;
 	    current->longOption = FALSE;
 	    current->item = item;
-	    current->parameter = "";
+	    current->parameter = NULL;
 	}
     }
 }
@@ -703,8 +722,190 @@ extern boolean isIncludeFile (const char *const fileName)
     return result;
 }
 
-static void processLanguageForceOption (const char *const option,
-					const char *const parameter)
+/*
+ *  Specific option processing
+ */
+
+static void processEtagsInclude (
+	const char *const __unused__ option, const char *const parameter)
+{
+    if (! Option.etags)
+	error (FATAL, "Etags must be enabled to use \"%s\" option", option);
+    else
+    {
+	vString *const file = vStringNewInit (parameter);
+	if (Option.etagsInclude == NULL)
+	    Option.etagsInclude = stringListNew ();
+	stringListAdd (Option.etagsInclude, file);
+	FilesRequired = FALSE;
+    }
+}
+
+static void processExcmdOption (
+	const char *const option, const char *const parameter)
+{
+    switch (*parameter)
+    {
+	case 'm': Option.locate = EX_MIX;	break;
+	case 'n': Option.locate = EX_LINENUM;	break;
+	case 'p': Option.locate = EX_PATTERN;	break;
+	default:
+	    error (FATAL, "Invalid value for \"%s\" option", option);
+	    break;
+    }
+}
+
+static void processExtraTagsOption (
+	const char *const option, const char *const parameter)
+{
+    struct sInclude *const inc = &Option.include;
+    const char *p = parameter;
+    boolean mode = TRUE;
+    int c;
+
+    if (*p != '+'  &&  *p != '-')
+    {
+	inc->fileNames		= FALSE;
+	inc->qualifiedTags	= FALSE;
+#if 0
+	inc->fileScope		= FALSE;
+#endif
+    }
+    while ((c = *p++) != '\0') switch (c)
+    {
+	case '+': mode = TRUE;			break;
+	case '-': mode = FALSE;			break;
+
+	case 'f': inc->fileNames	= mode;	break;
+	case 'q': inc->qualifiedTags	= mode;	break;
+#if 0
+	case 'F': inc->fileScope	= mode;	break;
+#endif
+
+	default: error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
+		       c, option);
+	    break;
+    }
+}
+
+static void processFieldsOption (
+	const char *const option, const char *const parameter)
+{
+    struct sExtFields *field = &Option.extensionFields;
+    const char *p = parameter;
+    boolean mode = TRUE;
+    int c;
+
+    if (*p != '+'  &&  *p != '-')
+    {
+	field->access		= FALSE;
+	field->fileScope	= FALSE;
+	field->implementation	= FALSE;
+	field->inheritance	= FALSE;
+	field->kind		= FALSE;
+	field->kindKey		= FALSE;
+	field->kindLong		= FALSE;
+	field->language		= FALSE;
+	field->scope		= FALSE;
+    }
+    while ((c = *p++) != '\0') switch (c)
+    {
+	case '+': mode = TRUE;			break;
+	case '-': mode = FALSE;			break;
+
+	case 'a': field->access		= mode;	break;
+	case 'f': field->fileScope	= mode;	break;
+	case 'm': field->implementation	= mode;	break;
+	case 'i': field->inheritance	= mode;	break;
+	case 'k': field->kind		= mode;	break;
+	case 'K': field->kindLong	= mode;	break;
+	case 'l': field->language	= mode;	break;
+	case 'n': field->lineNumber	= mode;	break;
+	case 's': field->scope		= mode;	break;
+	case 'S': field->signature	= mode;	break;
+	case 'z': field->kindKey	= mode;	break;
+
+	default: error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
+		       c, option);
+	    break;
+    }
+}
+
+static void processFilterTerminatorOption (
+	const char *const __unused__ option, const char *const parameter)
+{
+    freeString (&Option.filterTerminator);
+    Option.filterTerminator = stringCopy (parameter);
+}
+
+static void processFormatOption (
+	const char *const option, const char *const parameter)
+{
+    unsigned int format;
+
+    if (sscanf (parameter, "%u", &format) < 1)
+	error (FATAL, "Invalid value for \"%s\" option",option);
+    else if (format <= (unsigned int) MaxSupportedTagFormat)
+	Option.tagFileFormat = format;
+    else
+	error (FATAL, "Unsupported value for \"%s\" option", option);
+}
+
+static void printInvocationDescription (void)
+{
+    printf (INVOCATION, getExecutableName ());
+}
+
+static void printOptionDescriptions (const optionDescription *const optDesc)
+{
+    int i;
+    for (i = 0 ; optDesc [i].description != NULL ; ++i)
+    {
+	if (! Option.etags || optDesc [i].usedByEtags)
+	    puts (optDesc [i].description);
+    }
+}
+
+static void printFeatureList (void)
+{
+    int i;
+
+    for (i = 0 ; Features [i] != NULL ; ++i)
+    {
+	if (i == 0)
+	    printf ("  Optional compiled features: ");
+	printf ("%s+%s", (i>0 ? ", " : ""), Features [i]);
+#ifdef CUSTOM_CONFIGURATION_FILE
+	if (strcmp (Features [i], "custom-conf") == 0)
+	    printf ("=%s", CUSTOM_CONFIGURATION_FILE);
+#endif
+    }
+    if (i > 0)
+	putchar ('\n');
+}
+
+static void printProgramIdentification (void)
+{
+    printf ("%s %s, Copyright (C) 1996-2002 %s\n",
+	    PROGRAM_NAME, PROGRAM_VERSION, AUTHOR_NAME);
+    printf ("  Compiled: %s, %s\n", __DATE__, __TIME__);
+    printf ("  Addresses: <%s>, %s\n", AUTHOR_EMAIL, PROGRAM_URL);
+    printFeatureList ();
+}
+
+static void processHelpOption (
+	const char *const __unused__ option, const char *const __unused__ parameter)
+{
+    printProgramIdentification ();
+    putchar ('\n');
+    printInvocationDescription ();
+    putchar ('\n');
+    printOptionDescriptions (LongOptionDescription);
+    FilesRequired = FALSE;
+}
+
+static void processLanguageForceOption (
+	const char *const option, const char *const parameter)
 {
     langType language;
     if (strcasecmp (parameter, "auto") == 0)
@@ -721,7 +922,6 @@ static void processLanguageForceOption (const char *const option,
     else
 	Option.language = language;
 }
-
 static char* skipPastMap (char* p)
 {
     while (*p != EXTENSION_SEPARATOR  &&
@@ -828,8 +1028,8 @@ static char* processLanguageMap (char* map)
     return result;
 }
 
-static void processLanguageMapOption (const char *const option,
-				      const char *const parameter)
+static void processLanguageMapOption (
+	const char *const option, const char *const parameter)
 {
     char *const maps = eStrdup (parameter);
     char *map = maps;
@@ -849,8 +1049,8 @@ static void processLanguageMapOption (const char *const option,
     eFree (maps);
 }
 
-static void processLanguageListOption (const char *const option,
-				       const char *const parameter)
+static void processLanguagesOption (
+	const char *const option, const char *const parameter)
 {
     char *const langs = eStrdup (parameter);
     enum { Add, Remove, Replace } mode = Replace;
@@ -901,17 +1101,66 @@ static void processLanguageListOption (const char *const option,
     eFree (langs);
 }
 
-static void processOptionFile (const char *const option,
-			       const char *const parameter)
+static void processLicenseOption (
+	const char *const __unused__ option, const char *const __unused__ parameter)
 {
-    if (parameter == NULL  ||  parameter [0] == '\0')
+    printProgramIdentification ();
+    puts ("");
+    puts (License1);
+    puts (License2);
+    FilesRequired = FALSE;
+}
+
+static void processListKindsOption (
+	const char *const option, const char *const parameter)
+{
+    if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+        printLanguageKinds (LANG_AUTO);
+    else
+    {
+	langType language = getNamedLanguage (parameter);
+	if (language == LANG_IGNORE)
+	    error (FATAL, "Uknown language specified in \"%s\" option", option);
+	else
+	    printLanguageKinds (language);
+    }
+    FilesRequired = FALSE;
+}
+
+static void processListMapsOption (
+	const char *const __unused__ option, const char *const __unused__ parameter)
+{
+    if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+        printLanguageMaps (LANG_AUTO);
+    else
+    {
+	langType language = getNamedLanguage (parameter);
+	if (language == LANG_IGNORE)
+	    error (FATAL, "Uknown language specified in \"%s\" option", option);
+	else
+	    printLanguageMaps (language);
+    }
+    FilesRequired = FALSE;
+}
+
+static void processListLanguagesOption (
+	const char *const __unused__ option, const char *const __unused__ parameter)
+{
+    printLanguageList();
+    FilesRequired = FALSE;
+}
+
+static void processOptionFile (
+	const char *const option, const char *const parameter)
+{
+    if (parameter [0] == '\0')
 	error (WARNING, "no option file supplied for \"%s\"", option);
     else if (! parseFileOptions (parameter))
 	error (FATAL | PERROR, "cannot open option file \"%s\"", parameter);
 }
 
-static void processSortType (const char *const option,
-			     const char *const parameter)
+static void processSortOption (
+	const char *const option, const char *const parameter)
 {
     if (isFalse (parameter))
 	Option.sorted = SO_UNSORTED;
@@ -967,9 +1216,9 @@ static void processHeaderListOption (const int option, const char *parameter)
 
 /*  Determines whether or not "name" should be ignored, per the ignore list.
  */
-extern boolean isIgnoreToken (const char *const name,
-			      boolean *const pIgnoreParens,
-			      const char **const replacement)
+extern boolean isIgnoreToken (
+	const char *const name, boolean *const pIgnoreParens,
+	const char **const replacement)
 {
     boolean result = FALSE;
 
@@ -1068,184 +1317,11 @@ static void processIgnoreOption (const char *const list)
 	readIgnoreList (list);
 }
 
-/*
- *  Specific option processing
- */
-
-static void printfFeatureList (void)
+static void processVersionOption (
+	const char *const __unused__ option, const char *const __unused__ parameter)
 {
-    int i;
-
-    for (i = 0 ; Features [i] != NULL ; ++i)
-    {
-	if (i == 0)
-	    printf ("  Optional compiled features: ");
-	printf ("%s+%s", (i>0 ? ", " : ""), Features [i]);
-#ifdef CUSTOM_CONFIGURATION_FILE
-	if (strcmp (Features [i], "custom-conf") == 0)
-	    printf ("=%s", CUSTOM_CONFIGURATION_FILE);
-#endif
-    }
-    if (i > 0)
-	putchar ('\n');
-}
-
-static void printProgramIdentification (void)
-{
-    printf ("%s %s, Copyright (C) 1996-2002 %s\n",
-	    PROGRAM_NAME, PROGRAM_VERSION, AUTHOR_NAME);
-    printf ("  Compiled: %s, %s\n", __DATE__, __TIME__);
-    printf ("  Addresses: <%s>, %s\n", AUTHOR_EMAIL, PROGRAM_URL);
-    printfFeatureList ();
-}
-
-static void printInvocationDescription (void)
-{
-    printf (INVOCATION, getExecutableName ());
-}
-
-static void printOptionDescriptions (const optionDescription *const optDesc)
-{
-    int i;
-    for (i = 0 ; optDesc [i].description != NULL ; ++i)
-    {
-	if (! Option.etags || optDesc [i].usedByEtags)
-	    puts (optDesc [i].description);
-    }
-}
-
-static void printHelp (const optionDescription *const optDesc)
-{
-
     printProgramIdentification ();
-    putchar ('\n');
-    printInvocationDescription ();
-    putchar ('\n');
-    printOptionDescriptions (optDesc);
-}
-
-static void processExcmdOption (const char *const option,
-				const char *const parameter)
-{
-    switch (*parameter)
-    {
-	case 'm': Option.locate = EX_MIX;	break;
-	case 'n': Option.locate = EX_LINENUM;	break;
-	case 'p': Option.locate = EX_PATTERN;	break;
-	default:
-	    error (FATAL, "Invalid value for \"%s\" option", option);
-	    break;
-    }
-}
-
-static void processFormatOption (const char *const option,
-				 const char *const parameter)
-{
-    unsigned int format;
-
-    if (sscanf (parameter, "%u", &format) < 1)
-	error (FATAL, "Invalid value for \"%s\" option",option);
-    else if (format <= (unsigned int) MaxSupportedTagFormat)
-	Option.tagFileFormat = format;
-    else
-	error (FATAL, "Unsupported value for \"%s\" option", option);
-}
-
-static void processEtagsInclude (const char *const __unused__ option,
-				 const char *const parameter)
-{
-    if (! Option.etags)
-	error (FATAL, "Etags must be enabled to use \"%s\" option", option);
-    else
-    {
-	vString *const file = vStringNewInit (parameter);
-	if (Option.etagsInclude == NULL)
-	    Option.etagsInclude = stringListNew ();
-	stringListAdd (Option.etagsInclude, file);
-    }
-}
-
-static void processFilterTerminatorOption (const char *const __unused__ option,
-					   const char *const parameter)
-{
-    freeString (&Option.filterTerminator);
-    Option.filterTerminator = stringCopy (parameter);
-}
-
-static void processExtensionFieldsOption (const char *const option,
-					  const char *const parameter)
-{
-    struct sExtFields *field = &Option.extensionFields;
-    const char *p = parameter;
-    boolean mode = TRUE;
-    int c;
-
-    if (*p != '+'  &&  *p != '-')
-    {
-	field->access		= FALSE;
-	field->fileScope	= FALSE;
-	field->implementation	= FALSE;
-	field->inheritance	= FALSE;
-	field->kind		= FALSE;
-	field->kindKey		= FALSE;
-	field->kindLong		= FALSE;
-	field->language		= FALSE;
-	field->scope		= FALSE;
-    }
-    while ((c = *p++) != '\0') switch (c)
-    {
-	case '+': mode = TRUE;			break;
-	case '-': mode = FALSE;			break;
-
-	case 'a': field->access		= mode;	break;
-	case 'f': field->fileScope	= mode;	break;
-	case 'm': field->implementation	= mode;	break;
-	case 'i': field->inheritance	= mode;	break;
-	case 'k': field->kind		= mode;	break;
-	case 'K': field->kindLong	= mode;	break;
-	case 'l': field->language	= mode;	break;
-	case 'n': field->lineNumber	= mode;	break;
-	case 's': field->scope		= mode;	break;
-	case 'S': field->signature	= mode;	break;
-	case 'z': field->kindKey	= mode;	break;
-
-	default: error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
-		       c, option);
-	    break;
-    }
-}
-
-static void processExtraTagsOption (const char *const option,
-				    const char *const parameter)
-{
-    struct sInclude *const inc = &Option.include;
-    const char *p = parameter;
-    boolean mode = TRUE;
-    int c;
-
-    if (*p != '+'  &&  *p != '-')
-    {
-	inc->fileNames		= FALSE;
-	inc->qualifiedTags	= FALSE;
-#if 0
-	inc->fileScope		= FALSE;
-#endif
-    }
-    while ((c = *p++) != '\0') switch (c)
-    {
-	case '+': mode = TRUE;			break;
-	case '-': mode = FALSE;			break;
-
-	case 'f': inc->fileNames	= mode;	break;
-	case 'q': inc->qualifiedTags	= mode;	break;
-#if 0
-	case 'F': inc->fileScope	= mode;	break;
-#endif
-
-	default: error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
-		       c, option);
-	    break;
-    }
+    FilesRequired = FALSE;
 }
 
 /*
@@ -1257,17 +1333,23 @@ static parametricOption ParametricOptions [] = {
     { "exclude",		processExcludeOption,		FALSE	},
     { "excmd",			processExcmdOption,		FALSE	},
     { "extra",			processExtraTagsOption,		FALSE	},
-    { "fields",			processExtensionFieldsOption,	FALSE	},
+    { "fields",			processFieldsOption,		FALSE	},
     { "filter-terminator",	processFilterTerminatorOption,	TRUE	},
     { "format",			processFormatOption,		TRUE	},
+    { "help",			processHelpOption,		TRUE	},
     { "lang",			processLanguageForceOption,	FALSE	},
     { "language",		processLanguageForceOption,	FALSE	},
     { "language-force",		processLanguageForceOption,	FALSE	},
-    { "languages",		processLanguageListOption,	FALSE	},
+    { "languages",		processLanguagesOption,		FALSE	},
     { "langdef",		processLanguageDefineOption,	FALSE	},
     { "langmap",		processLanguageMapOption,	FALSE	},
+    { "license",		processLicenseOption,		TRUE	},
+    { "list-kinds",		processListKindsOption,		TRUE	},
+    { "list-maps",		processListMapsOption,		TRUE	},
+    { "list-languages",		processListLanguagesOption,	TRUE	},
     { "options",		processOptionFile,		FALSE	},
-    { "sort",			processSortType,		TRUE	},
+    { "sort",			processSortOption,		TRUE	},
+    { "version",		processVersionOption,		TRUE	},
 };
 
 static booleanOption BooleanOptions [] = {
@@ -1297,8 +1379,8 @@ static void checkOptionOrder (const char* const option)
 	error (FATAL, "-%s option may not follow a file name", option);
 }
 
-static boolean processParametricOption (const char *const option,
-					const char *const parameter)
+static boolean processParametricOption (
+	const char *const option, const char *const parameter)
 {
     const int count = sizeof (ParametricOptions) / sizeof (parametricOption);
     boolean found = FALSE;
@@ -1318,8 +1400,8 @@ static boolean processParametricOption (const char *const option,
     return found;
 }
 
-static boolean getBooleanOption (const char *const option,
-				 const char *const parameter)
+static boolean getBooleanOption (
+	const char *const option, const char *const parameter)
 {
     boolean selection = TRUE;
 
@@ -1335,8 +1417,8 @@ static boolean getBooleanOption (const char *const option,
     return selection;
 }
 
-static boolean processBooleanOption (const char *const option,
-				     const char *const parameter)
+static boolean processBooleanOption (
+	const char *const option, const char *const parameter)
 {
     const int count = sizeof (BooleanOptions) / sizeof (booleanOption);
     boolean found = FALSE;
@@ -1356,10 +1438,11 @@ static boolean processBooleanOption (const char *const option,
     return found;
 }
 
-static void processLongOption (const char *const option,
-			       const char *const parameter)
+static void processLongOption (
+	const char *const option, const char *const parameter)
 {
-    if (parameter == NULL  ||  *parameter == '\0')
+    Assert (parameter != NULL);
+    if (parameter == NULL  &&  parameter [0] == '\0')
 	verbose ("  Option: --%s\n", option);
     else
 	verbose ("  Option: --%s=%s\n", option, parameter);
@@ -1372,28 +1455,8 @@ static void processLongOption (const char *const option,
 	;
     else if (processRegexOption (option, parameter))
 	;
-#define isOption(item)	(boolean) (strcmp (item,option) == 0)
-    else if (isOption ("help"))
-    {
-	printHelp (LongOptionDescription);
-	printKindOptions ();
-	exit (0);
-    }
-    else if (isOption ("license"))
-    {
-	printProgramIdentification ();
-	puts ("");
-	puts (License1);
-	puts (License2);
-	exit (0);
-    }
-    else if (isOption ("version"))
-    {
-	printProgramIdentification ();
-	exit (0);
-    }
 #ifndef RECURSE_SUPPORTED
-    else if (isOption ("recurse"))
+    else if (strcmp (item, "recurse") == 0)
 	error (WARNING, "%s option not supported on this host", option);
 #endif
     else
@@ -1401,21 +1464,21 @@ static void processLongOption (const char *const option,
 #undef isOption
 }
 
-static void processShortOption (const char *const option,
-				const char *const parameter)
+static void processShortOption (
+	const char *const option, const char *const parameter)
 {
-    if (parameter == NULL  ||  *parameter == '\0')
+    if (parameter == NULL  ||  parameter [0] == '\0')
 	verbose ("  Option: -%s\n", option);
     else
 	verbose ("  Option: -%s %s\n", option, parameter);
 
-    if (isCompoundOption (*option) && *parameter == '\0')
+    if (isCompoundOption (*option) && (parameter == NULL  ||  parameter [0] == '\0'))
 	error (FATAL, "Missing parameter for \"%s\" option", option);
     else switch (*option)
     {
 	case '?':
-	    printHelp (LongOptionDescription);
-	    exit (0);
+	    processHelpOption ("?", NULL);
+	    FilesRequired = FALSE;
 	    break;
 	case 'a':
 	    checkOptionOrder (option);
@@ -1459,9 +1522,6 @@ static void processShortOption (const char *const option,
 	    break;
 	case 'h':
 	    processHeaderListOption (*option, parameter);
-	    break;
-	case 'i':
-	    processLegacyKindOption (parameter);
 	    break;
 	case 'I':
 	    processIgnoreOption (parameter);

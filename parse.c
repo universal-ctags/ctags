@@ -41,8 +41,8 @@ static unsigned int LanguageCount = 0;
 *   FUNCTION DEFINITIONS
 */
 
-extern void makeSimpleTag (const vString* const name,
-			   kindOption* const kinds, const int kind)
+extern void makeSimpleTag (
+	const vString* const name, kindOption* const kinds, const int kind)
 {
     if (kinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
     {
@@ -260,8 +260,8 @@ extern void addLanguagePatternMap (const langType language, const char* ptrn)
     stringListAdd (LanguageTable [language]->currentPatterns, str);
 }
 
-extern void addLanguageExtensionMap (const langType language,
-				     const char* extension)
+extern void addLanguageExtensionMap (
+	const langType language, const char* extension)
 {
     vString* const str = vStringNewInit (extension);
     Assert (0 <= language  &&  language < (int) LanguageCount);
@@ -352,8 +352,8 @@ extern void freeParserResources (void)
 *   Option parsing
 */
 
-extern void processLanguageDefineOption (const char *const option,
-					 const char *const __unused__ parameter)
+extern void processLanguageDefineOption (
+	const char *const option, const char *const __unused__ parameter)
 {
 #ifdef HAVE_REGEX
     if (parameter [0] == '\0')
@@ -392,47 +392,6 @@ static kindOption *langKindOption (const langType language, const int flag)
     return result;
 }
 
-extern void processLegacyKindOption (const char *const parameter)
-{
-    const langType lang = getNamedLanguage ("c");
-    boolean clear = FALSE;
-    const char* p = parameter;
-    boolean mode = TRUE;
-    int c;
-
-    error (WARNING, "-i option is deprecated; use --c-types option instead");
-    if (*p == '=')
-    {
-	clear = TRUE;
-	++p;
-    }
-    if (clear  &&  *p != '+'  &&  *p != '-')
-    {
-	unsigned int i;
-	for (i = 0  ;  i < LanguageTable [lang]->kindCount  ;  ++i)
-	    LanguageTable [lang]->kinds [i].enabled = FALSE;
-	Option.include.fileNames= FALSE;
-	Option.include.fileScope= FALSE;
-    }
-    while ((c = *p++) != '\0') switch (c)
-    {
-	case '+': mode = TRUE;  break;
-	case '-': mode = FALSE; break;
-
-	case 'F': Option.include.fileNames = mode; break;
-	case 'S': Option.include.fileScope = mode; break;
-
-	default:
-	{
-	    kindOption* const opt = langKindOption (lang, c);
-	    if (opt != NULL)
-		opt->enabled = mode;
-	    else
-		error (WARNING, "Unsupported parameter '%c' for -i option", c);
-	} break;
-    }
-}
-
 static void disableLanguageKinds (const langType language)
 {
     if (LanguageTable [language]->regex)
@@ -445,8 +404,8 @@ static void disableLanguageKinds (const langType language)
     }
 }
 
-static boolean enableLanguageKind (const langType language,
-				   const int kind, const boolean mode)
+static boolean enableLanguageKind (
+	const langType language, const int kind, const boolean mode)
 {
     boolean result = FALSE;
     if (LanguageTable [language]->regex)
@@ -463,9 +422,9 @@ static boolean enableLanguageKind (const langType language,
     return result;
 }
 
-static void processLangKindOption (const langType language,
-				   const char *const option,
-				   const char *const parameter)
+static void processLangKindOption (
+	const langType language, const char *const option,
+	const char *const parameter)
 {
     const char *p = parameter;
     boolean mode = TRUE;
@@ -478,23 +437,21 @@ static void processLangKindOption (const langType language,
     {
 	case '+': mode = TRUE;  break;
 	case '-': mode = FALSE; break;
-
 	default:
-	{
 	    if (! enableLanguageKind (language, c, mode))
 		error (WARNING, "Unsupported parameter '%c' for --%s option",
 		    c, option);
-	} break;
+	    break;
     }
 }
 
-extern boolean processKindOption (const char *const option,
-				  const char *const parameter)
+extern boolean processKindOption (
+	const char *const option, const char *const parameter)
 {
     boolean handled = FALSE;
     const char* const dash = strchr (option, '-');
     if (dash != NULL  &&
-	(strcmp (dash + 1, "types") == 0  ||  strcmp (dash + 1, "kinds") == 0))
+	(strcmp (dash + 1, "kinds") == 0  ||  strcmp (dash + 1, "types") == 0))
     {
 	langType language;
 	vString* langName = vStringNew ();
@@ -510,15 +467,15 @@ extern boolean processKindOption (const char *const option,
     return handled;
 }
 
-static void printLangugageKindOption (const kindOption* const kind)
+static void printLanguageKind (const kindOption* const kind)
 {
-    printf ("          %c  %s%s\n", kind->letter,
+    printf ("    %c  %s%s\n", kind->letter,
 	kind->description != NULL ? kind->description :
 	    (kind->name != NULL ? kind->name : ""),
 	kind->enabled ? "" : " [off]");
 }
 
-static void printLangugageKindOptions (const langType language)
+static void printKinds (langType language)
 {
     const parserDefinition* lang;
     Assert (0 <= language  &&  language < (int) LanguageCount);
@@ -526,33 +483,68 @@ static void printLangugageKindOptions (const langType language)
     if (lang->kinds != NULL  ||  lang->regex)
     {
 	unsigned int i;
-	char* const name = newLowerString (lang->name);
-	printf ("  --%s-types=[+|-]kinds\n", name);
-	eFree (name);
+	printf ("%s\n", lang->name);
 	if (lang->kinds != NULL)
 	    for (i = 0  ;  i < lang->kindCount  ;  ++i)
-		printLangugageKindOption (lang->kinds + i);
-	printRegexKindOptions (language);
+		printLanguageKind (lang->kinds + i);
+	printRegexKinds (language);
     }
 }
 
-extern void printKindOptions (void)
+extern void printLanguageKinds (const langType language)
+{
+    if (language == LANG_AUTO)
+    {
+	unsigned int i;
+	for (i = 0  ;  i < LanguageCount  ;  ++i)
+	    printKinds (i);
+    }
+    else
+	printKinds (language);
+}
+
+static void printMaps (const langType language)
+{
+    const parserDefinition* lang;
+    unsigned int i;
+    Assert (0 <= language  &&  language < (int) LanguageCount);
+    lang = LanguageTable [language];
+    printf ("%-8s", lang->name);
+    if (lang->extensions != NULL)
+	for (i = 0  ;  lang->extensions [i] != NULL  ;  ++i)
+	    printf (" *.%s", lang->extensions [i]);
+    if (lang->patterns != NULL)
+	for (i = 0  ;  lang->patterns [i] != NULL  ;  ++i)
+	    printf (" %s", lang->patterns [i]);
+    putchar ('\n');
+}
+
+extern void printLanguageMaps (const langType language)
+{
+    if (language == LANG_AUTO)
+    {
+	unsigned int i;
+	for (i = 0  ;  i < LanguageCount  ;  ++i)
+	    printMaps (i);
+    }
+    else
+	printMaps (language);
+}
+
+static void printLanguage (const langType language)
+{
+    const parserDefinition* lang;
+    Assert (0 <= language  &&  language < (int) LanguageCount);
+    lang = LanguageTable [language];
+    if (lang->kinds != NULL  ||  lang->regex)
+	printf ("%s\n", lang->name);
+}
+        
+extern void printLanguageList (void)
 {
     unsigned int i;
-
-    printf (
- "\n  The following options are used to specify which language-specific tag\n\
-  types (or kinds) should be included in the tag file. \"Kinds\" is a group of\n\
-  one-letter flags designating kinds of tags to either include or exclude from\n\
-  the output. Each letter or group of letters may be preceded by either '+' to\n");
-    printf (
- "  add it to those already included, or '-' to exclude it from the output. In\n\
-  the absence of any preceding '+' or '-' sign, only those kinds listed in\n\
-  \"kinds\" will be included in the output. Below each option is a list of the\n\
-  flags accepted. All kinds are enabled by default unless otherwise noted.\n\n");
-
     for (i = 0  ;  i < LanguageCount  ;  ++i)
-	printLangugageKindOptions (i);
+	printLanguage (i);
 }
 
 /*
@@ -576,9 +568,9 @@ static void makeFileTag (const char *const fileName)
     }
 }
 
-static boolean createTagsForFile (const char *const fileName,
-				  const langType language,
-				  const unsigned int passCount)
+static boolean createTagsForFile (
+	const char *const fileName, const langType language,
+	const unsigned int passCount)
 {
     boolean retried = FALSE;
 
@@ -603,8 +595,8 @@ static boolean createTagsForFile (const char *const fileName,
     return retried;
 }
 
-static boolean createTagsWithFallback (const char *const fileName,
-				       const langType language)
+static boolean createTagsWithFallback (
+	const char *const fileName, const langType language)
 {
     const unsigned long numTags	= TagFile.numTags.added;
     fpos_t tagFilePosition;

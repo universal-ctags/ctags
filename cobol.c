@@ -23,17 +23,17 @@
 static void installCobolRegex (const langType language)
 {
    addTagRegex (language, "^[ \t]*[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)[ \t]+(BLANK|OCCURS|IS|JUST|PIC|REDEFINES|RENAMES|SIGN|SYNC|USAGE|VALUE)",
-	"\\1", "d,data", "i");
+	"\\1", "d,data,data items", "i");
    addTagRegex (language, "^[ \t]*[FSR]D[ \t]+([A-Z0-9][A-Z0-9-]*)\\.",
-	"\\1", "f,file", "i");
+	"\\1", "f,file,file descriptions (FD, SD, RD)", "i");
    addTagRegex (language, "^[ \t]*[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)\\.",
-	"\\1", "g,group", "i");
+	"\\1", "g,group,group items", "i");
    addTagRegex (language, "^[ \t]*([A-Z0-9][A-Z0-9-]*)\\.",
-	"\\1", "p,paragraph", "i");
+	"\\1", "p,paragraph,paragraphs", "i");
    addTagRegex (language, "^[ \t]*PROGRAM-ID\\.[ \t]+([A-Z0-9][A-Z0-9-]*)\\.",
-	"\\1", "P,program", "i");
+	"\\1", "P,program,program ids", "i");
    addTagRegex (language, "^[ \t]*([A-Z0-9][A-Z0-9-]*)[ \t]+SECTION\\.",
-	"\\1", "s,section", "i");
+	"\\1", "s,section,sections", "i");
 }
 
 extern parserDefinition* CobolParser ()

@@ -83,7 +83,6 @@ extern parserDefinitionFunc PARSER_LIST;
 
 /* Legacy interface */
 extern boolean includingDefineTags (void);
-extern void processLegacyKindOption (const char *const parameter);
 
 /* Language processing and parsing */
 extern void makeSimpleTag (const vString* const name, kindOption* const kinds, const int kind);
@@ -97,6 +96,7 @@ extern void clearLanguageMap (const langType language);
 extern void addLanguageExtensionMap (const langType language, const char* extension);
 extern void addLanguagePatternMap (const langType language, const char* ptrn);
 extern void printLanguageMap (const langType language);
+extern void printLanguageMaps (const langType language);
 extern void enableLanguages (const boolean state);
 extern void enableLanguage (const langType language, const boolean state);
 extern void initializeParsing (void);
@@ -104,6 +104,8 @@ extern void freeParserResources (void);
 extern void processLanguageDefineOption (const char *const option, const char *const parameter);
 extern boolean processKindOption (const char *const option, const char *const parameter);
 extern void printKindOptions (void);
+extern void printLanguageKinds (const langType language);
+extern void printLanguageList (void);
 extern boolean parseFile (const char *const fileName);
 
 /* Regex interface */
@@ -117,7 +119,7 @@ extern void addTagRegex (const langType language, const char* const regex, const
 extern void addCallbackRegex (const langType language, const char *const regex, const char *const flags, const regexCallback callback);
 extern void disableRegexKinds (const langType __unused__ language);
 extern boolean enableRegexKind (const langType language, const int kind, const boolean mode);
-extern void printRegexKindOptions (const langType language);
+extern void printRegexKinds (const langType language);
 extern void freeRegexResources (void);
 extern void checkRegex (void);
 

@@ -1,7 +1,16 @@
 Current Version: @@VERSION@@
 
-ctags-5.5 (Fri Feb 21 2003)
+ctags-5.5 (Sun Feb 23 2003)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
+* Removed explicit descriptions of individual --<LANG>-types options from
+  --help output. See new --list-languages and --list-kinds options.
+* Removed explicit list of supported languages and supported tag kinds and
+  mapping patterns from man page. See new --list-languages, --list-kinds, and
+  --list-maps options.
+* Renamed --<LANG>-types option to --<LANG>-kinds; still accept old name, though.
+* Added --list-kinds option.
+* Added --list-maps option.
+* Added --list-languages option.
 * Added support for dimensioned variables, contributed by Simon Bohlin [ASP].
 * Added support for C# language.
 * Added support for Erlang language, contributed by Brent Fulgham.

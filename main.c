@@ -166,9 +166,9 @@ extern vString *combinePathAndFile (
     return filePath;
 }
 
-extern void addTotals (const unsigned int files,
-		       const long unsigned int lines,
-		       const long unsigned int bytes)
+extern void addTotals (
+	const unsigned int files, const long unsigned int lines,
+	const long unsigned int bytes)
 {
     Totals.files += files;
     Totals.lines += lines;
@@ -191,12 +191,8 @@ extern boolean isDestinationStdout (void)
     return toStdout;
 }
 
-/*
- *	Create tags
- */
-
-extern void processExcludeOption (const char *const __unused__ option,
-				  const char *const parameter)
+extern void processExcludeOption (
+	const char *const __unused__ option, const char *const parameter)
 {
     const char *const fileName = parameter + 1;
     if (parameter [0] == '\0')
@@ -557,7 +553,7 @@ static void makeTags (cookedArgs* args)
     boolean files = (boolean)(! cArgOff (args) || Option.fileList != NULL
 			      || Option.filter);
 
-    if (! files  &&  ! Option.recurse  &&  ! Option.etagsInclude)
+    if (filesRequired ()  && ! files)
 	error (FATAL, "No files specified. Try \"%s --help\".",
 	       getExecutableName ());
 

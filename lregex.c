@@ -59,6 +59,7 @@ struct sKind {
     boolean enabled;
     char letter;
     char* name;
+    char* description;
 };
 
 enum pType { PTRN_TAG, PTRN_CALLBACK };
@@ -242,7 +243,8 @@ static boolean parseTagRegex (
 
 static void addCompiledTagPattern (
 	const langType language, regex_t* const pattern,
-	char* const name, const char kind, char* const kindName)
+	char* const name, const char kind, char* const kindName,
+	char *const description)
 {
     patternSet* set;
     regexPattern *ptrn;
@@ -268,6 +270,7 @@ static void addCompiledTagPattern (
     ptrn->u.tag.kind.enabled = TRUE;
     ptrn->u.tag.kind.letter  = kind;
     ptrn->u.tag.kind.name    = kindName;
+    ptrn->u.tag.kind.description = description;
 }
 
 static void addCompiledCallbackPattern (
@@ -332,11 +335,13 @@ static regex_t* compileRegex (const char* const regexp, const char* const flags)
 #endif
 
 static void parseKinds (
-	const char* const kinds, char* const kind, char** const kindName)
+	const char* const kinds, char* const kind, char** const kindName,
+	char **description)
 {
     *kind = '\0';
     *kindName = NULL;
-    if (kinds == NULL)
+    *description = NULL;
+    if (kinds == NULL  ||  kinds [0] == '\0')
     {
 	*kind = 'r';
 	*kindName = eStrdup ("regex");
@@ -344,23 +349,40 @@ static void parseKinds (
     else if (kinds [0] != '\0')
     {
 	const char* k = kinds;
-	if (k [1] == ','  ||  k [1] == '\0')
+	if (k [0] != ','  &&  (k [1] == ','  ||  k [1] == '\0'))
 	    *kind = *k++;
+	else
+	    *kind = 'r';
 	if (*k == ',')
 	    ++k;
-	if (*k != '\0')
-	    *kindName = eStrdup (k);
+	if (k [0] == '\0')
+	    *kindName = eStrdup ("regex");
+	else
+	{
+	    const char *const comma = strchr (k, ',');
+	    if (comma == NULL)
+		*kindName = eStrdup (k);
+	    else
+	    {
+		*kindName = (char*) eMalloc (comma - k + 1);
+		strncpy (*kindName, k, comma - k);
+		(*kindName) [comma - k] = '\0';
+		k = comma + 1;
+		if (k [0] != '\0')
+		    *description = eStrdup (k);
+	    }
+	}
     }
 }
 
-static void printRegexKindOption (const regexPattern *pat, unsigned int i)
+static void printRegexKind (const regexPattern *pat, unsigned int i)
 {
     const struct sKind *const kind = &pat [i].u.tag.kind;
     Assert (pat [i].type == PTRN_TAG);
-    printf ("          %c  %s (regex %d)%s\n",
+    printf ("    %c  %s %s\n",
 	    kind->letter != '\0' ? kind->letter : '?',
-	    kind->name != NULL ? kind->name : "Regex pattern",
-	    i + 1, kind->enabled ? "" : " [off]");
+	    kind->description != NULL ? kind->description : kind->name,
+	    kind->enabled ? "" : " [off]");
 }
 
 static void processLanguageRegex (const langType language,
@@ -523,9 +545,10 @@ extern void addTagRegex (
 	{
 	    char kind;
 	    char* kindName;
-	    parseKinds (kinds, &kind, &kindName);
+	    char* description;
+	    parseKinds (kinds, &kind, &kindName, &description);
 	    addCompiledTagPattern (language, cp, eStrdup (name),
-				    kind, kindName);
+		    kind, kindName, description);
 	}
     }
 #endif
@@ -628,7 +651,7 @@ extern boolean enableRegexKind (
     return result;
 }
 
-extern void printRegexKindOptions (const langType __unused__ language)
+extern void printRegexKinds (const langType __unused__ language)
 {
 #ifdef HAVE_REGEX
     if (language <= SetUpper  &&  Sets [language].count > 0)
@@ -637,7 +660,7 @@ extern void printRegexKindOptions (const langType __unused__ language)
 	unsigned int i;
 	for (i = 0  ;  i < set->count  ;  ++i)
 	    if (set->patterns [i].type == PTRN_TAG)
-		printRegexKindOption (set->patterns, i);
+		printRegexKind (set->patterns, i);
     }
 #endif
 }

@@ -125,6 +125,7 @@ extern void verbose (const char *const format, ...) __printf__ (1, 2);
 extern void freeList (stringList** const pString);
 extern void setDefaultTagFileName (void);
 extern void checkOptions (void);
+extern boolean filesRequired (void);
 extern void testEtagsInvocation (void);
 
 extern cookedArgs* cArgNewFromString (const char* string);
