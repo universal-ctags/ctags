@@ -97,8 +97,6 @@ typedef enum eTokenType {
 typedef struct sTokenInfo {
     tokenType	type;
     keywordId	keyword;
-    unsigned long lineNumber;	/* line number of token */
-    fpos_t	filePosition;	/* file position of line containing token */
     vString *	string;
 } tokenInfo;
 
@@ -205,9 +203,6 @@ static tokenInfo *newToken (void)
 
     token->type         = TOKEN_UNDEFINED;
     token->keyword      = KEYWORD_NONE;
-    token->lineNumber   = KEYWORD_NONE;
-    token->lineNumber   = getSourceLineNumber ();
-    token->filePosition = getInputFilePosition ();
     token->string       = vStringNew ();
 
     return token;
@@ -233,8 +228,6 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 
 	e.kindName     = SqlKinds [kind].name;
 	e.kind         = SqlKinds [kind].letter;
-	e.lineNumber   = token->lineNumber;
-	e.filePosition = token->filePosition;
 
 	makeTagEntry (&e);
     }
@@ -302,8 +295,6 @@ static void readToken (tokenInfo *const token)
 
     token->type         = TOKEN_UNDEFINED;
     token->keyword      = KEYWORD_NONE;
-    token->lineNumber   = getSourceLineNumber ();
-    token->filePosition = getInputFilePosition ();
     vStringClear (token->string);
 
 getNextChar:
