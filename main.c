@@ -55,7 +55,10 @@
 # ifdef __BORLANDC__
 #  define boolean BORLAND_boolean
 # endif
-# include <dirent.h>
+# ifdef HAVE_SYS_TYPES_H
+#  include <sys/types.h>    /* required by dirent.h */
+# endif
+# include <dirent.h>	/* to declare opendir() */
 # undef boolean
 #endif
 #ifdef HAVE_DIRECT_H
