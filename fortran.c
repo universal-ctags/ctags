@@ -217,7 +217,7 @@ static const keywordDesc FortranKeywordTable [] = {
     { "if",		KEYWORD_if		},
     { "implicit",	KEYWORD_implicit	},
     { "include",	KEYWORD_include		},
-    { "instrinsic",	KEYWORD_intrinsic	},
+    { "intrinsic",	KEYWORD_intrinsic	},
     { "integer",	KEYWORD_integer		},
     { "intent",		KEYWORD_intent		},
     { "interface",	KEYWORD_interface	},
