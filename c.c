@@ -675,9 +675,7 @@ static boolean isMember (const statementInfo *const st)
     if (isType (st->context, TOKEN_NAME))
 	result = TRUE;
     else
-	result = (boolean) (st->parent != NULL && (
-		isContextualStatement (st->parent) ||
-		st->parent->declaration == DECL_NAMESPACE));
+	result = (boolean)(st->parent != NULL && isContextualStatement (st->parent));
     return result;
 }
 
@@ -822,7 +820,6 @@ static veraKind veraTagKind (const tagType type) {
 	case TAG_CLASS:      result = VK_CLASS;           break;
 	case TAG_ENUM:       result = VK_ENUMERATION;     break;
 	case TAG_ENUMERATOR: result = VK_ENUMERATOR;      break;
-	case TAG_EVENT:      result = VK_VARIABLE;        break;
 	case TAG_FUNCTION:   result = VK_FUNCTION;        break;
 	case TAG_MEMBER:     result = VK_MEMBER;          break;
 	case TAG_PROGRAM:    result = VK_PROGRAM;         break;
@@ -940,8 +937,9 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 	case TAG_TASK:
 	case TAG_TYPEDEF:
 	case TAG_UNION:
-	    if (isMember (st) &&
-		! (type == TAG_ENUMERATOR  &&  vStringLength (scope) == 0))
+	    if (vStringLength (scope) > 0  &&
+		(isMember (st) || st->parent->declaration == DECL_NAMESPACE) &&
+		(type != TAG_ENUMERATOR || isLanguage (Lang_csharp)))
 	    {
 		if (isType (st->context, TOKEN_NAME))
 		    tag->extensionFields.scope [0] = tagName (TAG_CLASS);
@@ -1616,7 +1614,6 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 	case KEYWORD_CONST:	st->declaration = DECL_BASE;		break;
 	case KEYWORD_DOUBLE:	st->declaration = DECL_BASE;		break;
 	case KEYWORD_ENUM:	st->declaration = DECL_ENUM;		break;
-	case KEYWORD_EVENT:	st->declaration = DECL_EVENT;		break;
 	case KEYWORD_EXTENDS:	readParents (st, '.');
 				setToken (st, TOKEN_NONE);		break;
 	case KEYWORD_FLOAT:	st->declaration = DECL_BASE;		break;
@@ -1649,6 +1646,11 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 	case KEYWORD_VOID:	st->declaration = DECL_BASE;		break;
 	case KEYWORD_VOLATILE:	st->declaration = DECL_BASE;		break;
 	case KEYWORD_VIRTUAL:	st->implementation = IMP_VIRTUAL;	break;
+
+	case KEYWORD_EVENT:
+	    if (isLanguage (Lang_csharp))
+		st->declaration = DECL_EVENT;
+	    break;
 
 	case KEYWORD_TYPEDEF:
 	    reinitStatement (st, FALSE);
