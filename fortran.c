@@ -1030,7 +1030,7 @@ static void parseTypeSpec (tokenInfo *const token)
 		readToken (token);
 	    if (isType (token, TOKEN_PAREN_OPEN))
 		skipOverParens (token);
-	    else
+	    else if (isType (token, TOKEN_NUMERIC))
 		readToken (token);
 	    break;
 
@@ -1194,9 +1194,11 @@ static void parseEntityDeclList (tokenInfo *const token)
 	if (isType (token, TOKEN_COMMA))
 	    readToken (token);
 	else if (isType (token, TOKEN_STATEMENT_END))
+	{
+	    skipToNextStatement (token);
 	    break;
+	}
     }
-    skipToNextStatement (token);
 }
 
 /*  type-declaration-stmt is
