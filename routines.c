@@ -135,6 +135,8 @@
 # elif defined (__BORLANDC__)
 #  define PATH_MAX  MAXPATH
 #  define currentdrive() (getdisk() + 'A')
+# elif defined (DJGPP)
+#  define currentdrive() (getdisk() + 'A')
 # else
 #  define currentdrive() 'C'
 # endif

@@ -1,8 +1,9 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.3 (Thu Oct 12 2003)
+ctags-5.5.3 (Thu Oct 30 2003)
 * Removed forgotten debug statement.
 * Fixed problem destroying tag file for certain information options.
+* Fixed portability problem [DJGPP].
 
 ctags-5.5.2 (Wed Sep 17 2003)
 * Added tags for local variables for C-based languages [C/C++/C#/Java/Vera,

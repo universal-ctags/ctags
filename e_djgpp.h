@@ -14,6 +14,7 @@
 #define CASE_INSENSITIVE_FILENAMES 1
 #define MSDOS_STYLE_PATH 1
 
+#define HAVE_DIR_H 1
 #define HAVE_DIRENT_H 1
 #define HAVE_FCNTL_H 1
 #define HAVE_FNMATCH_H 1
