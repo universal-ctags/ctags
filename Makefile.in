@@ -201,7 +201,8 @@ TAGS: $(CTAGS_EXEC)
 
 clean:
 	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB) 
-	rm -f dctags$(EXEEXT) readtags$(EXEEXT) etyperef$(EXEEXT)
+	rm -f dctags$(EXEEXT) readtags$(EXEEXT)
+	rm -f etyperef$(EXEEXT) etyperef.$(OBJEXT)
 
 mostlyclean: clean
 
