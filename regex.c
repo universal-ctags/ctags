@@ -58,7 +58,7 @@ struct sKind {
     boolean enabled;
     char letter;
     char* name;
-} kind;
+};
 
 typedef struct {
     regex_t *pattern;
