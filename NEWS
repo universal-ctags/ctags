@@ -1,5 +1,8 @@
 Current Version: @@VERSION@@
 
+ctags-5.5.3 (Thu Sep 18 2003)
+* Removed forgotten debug statement.
+
 ctags-5.5.2 (Wed Sep 17 2003)
 * Added tags for local variables for C-based languages [C/C++/C#/Java/Vera,
   Feature Request #449503].

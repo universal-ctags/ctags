@@ -710,7 +710,6 @@ extern char* absoluteFilename (const char *file)
 	    sprintf (drive, "%c:", currentdrive ());
 	    res = concat (drive, file, "");
 	}
-printf ("absolute of %s = %s\n", file, res);
 #else
 	res = eStrdup (file);
 #endif
