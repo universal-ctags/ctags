@@ -157,7 +157,7 @@ case `uname` in
 			AC_MSG_CHECKING("Solaris native compiler")
 			if test "$CC" = "cc" -a `which cc` = "/usr/ucb/cc"; then
 				AC_MSG_RESULT(yes; adding compiler option for ANSI support)
-				CFLAGS="$CFLAGS -Xa"
+				CC="$CC -Xa"
 			else
 				AC_MSG_RESULT(no)
 			fi
