@@ -2,7 +2,8 @@ Current Version: @@VERSION@@
 
 ctags-5.5.1 (Tue Jun 10 2003)
 * Fixed compilation error for uncommon hosts.
-* Restored exit of program after --help, --license, and --version options.
+* Restored exit of program after --help, --license, and --version options [Bug
+  #717311, #751240].
 * Allowed semicolon as statement separator [Fortran, Bug #734933].
 
 ctags-5.5 (Tue Apr 1 2003)
