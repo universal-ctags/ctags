@@ -197,7 +197,7 @@ static void findPythonTags (void)
 		}
 	    }
 	}
-	if ((cp = strstr ((const char*) cp, "\"\"\"")) != NULL)
+	if ((cp = (const unsigned char*) strstr ((const char*)cp, "\"\"\"")) != NULL)
 	{
 	    cp += 3;
 	    cp = (const unsigned char*) strstr ((const char*) cp, "\"\"\"");
