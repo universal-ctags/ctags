@@ -192,10 +192,11 @@ typedef struct sTokenInfo {
 
 static langType Lang_fortran;
 static jmp_buf Exception;
-static int Ungetc = '\0';
-static unsigned int Column = 0;
-static boolean FreeSourceForm = FALSE;
-static tokenInfo *Parent = NULL;
+static int Ungetc;
+static unsigned int Column;
+static boolean FreeSourceForm;
+static boolean ParsingString;
+static tokenInfo *Parent;
 
 /* indexed by tagType */
 static kindOption FortranKinds [] = {
@@ -617,6 +618,12 @@ static int getFixedFormChar (void)
 	    newline = TRUE;	/* need to check for continuation line */
 	    Column = 0;
 	}
+	else if (c == '!'  &&  ! ParsingString)
+	{
+	    c = skipLine ();
+	    newline = TRUE;	/* need to check for continuation line */
+	    Column = 0;
+	}
 	else if (c == '&')	/* check for free source form */
 	{
 	    const int c2 = fileGetc ();
@@ -806,8 +813,9 @@ static vString *parseNumeric (int c)
 static void parseString (vString *const string, const int delimeter)
 {
     const unsigned long inputLineNumber = getInputLineNumber ();
-    int c = getChar ();
-
+    int c;
+    ParsingString = TRUE;
+    c = getChar ();
     while (c != delimeter  &&  c != '\n'  &&  c != EOF)
     {
 	vStringPut (string, c);
@@ -823,6 +831,7 @@ static void parseString (vString *const string, const int delimeter)
 	    longjmp (Exception, (int) ExceptionFixedFormat);
     }
     vStringTerminate (string);
+    ParsingString = FALSE;
 }
 
 /*  Read a C identifier beginning with "firstChar" and places it into "name".
@@ -995,6 +1004,12 @@ getNextChar:
 	    }
 	    break;
 
+	case '"':
+	case '\'':
+	    parseString (token->string, c);
+	    token->type = TOKEN_STRING;
+	    break;
+
 	case ';':
 	    token->type = TOKEN_STATEMENT_END;
 	    break;
@@ -1017,11 +1032,6 @@ getNextChar:
 	    {
 		vStringCat (token->string, parseNumeric (c));
 		token->type = TOKEN_NUMERIC;
-	    }
-	    else if (c == '"'  ||  c == '\'')
-	    {
-		parseString (token->string, c);
-		token->type = TOKEN_STRING;
 	    }
 	    else if (c == ';'  &&  FreeSourceForm)
 		token->type = TOKEN_STATEMENT_END;
@@ -1407,7 +1417,7 @@ static void parseCommonNamelistStmt (tokenInfo *const token, tagType type)
 	    makeFortranTag (token, TAG_LOCAL);
 	readToken (token);
 	if (isType (token, TOKEN_PAREN_OPEN))
-	    skipOverParens (token);
+	    skipOverParens (token);        /* skip explicit-shape-spec-list */
 	if (isType (token, TOKEN_COMMA))
 	    readToken (token);
     } while (! isType (token, TOKEN_STATEMENT_END));
