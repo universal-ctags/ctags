@@ -2,8 +2,8 @@
 #
 #	Copyright (c) 1996-2001, Darren Hiebert
 #
-#   Development makefile for Exuberant Ctags, used to build releases.
-#   Requires GNU make.
+#	Development makefile for Exuberant Ctags, used to build releases.
+#	Requires GNU make.
 
 CTAGS_TEST = ctags
 CTAGS_REF = ctags.ref
@@ -67,3 +67,4 @@ test.linux: $(CTAGS_TEST) $(CTAGS_REF)
 
 TEST_ARTIFACTS = test.*.diff tags.ref tags.test
 
+# vi:ts=4 sw=4

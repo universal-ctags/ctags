@@ -2,8 +2,8 @@
 #
 #	Copyright (c) 1996-2001, Darren Hiebert
 #
-#   Development makefile for Exuberant Ctags, used to build releases.
-#   Requires GNU make.
+#	Development makefile for Exuberant Ctags, used to build releases.
+#	Requires GNU make.
 
 OBJEXT = o
 
