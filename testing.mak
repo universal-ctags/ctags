@@ -17,9 +17,9 @@ DIFF = if diff $(DIFF_OPTIONS) tags.ref tags.test > $(DIFF_FILE); then \
 		echo "FAILED: differences left in $(DIFF_FILE)" ; \
 	  fi
 
-.PHONY: test test.include test.fields test.etags test.eiffel test.linux
+.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux
 
-test: test.include test.fields test.linedir test.etags test.eiffel test.linux
+test: test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux
 
 test.%: DIFF_FILE = $@.diff
 
@@ -37,6 +37,14 @@ test.fields: $(CTAGS_TEST) $(CTAGS_REF)
 	@ echo -n "Testing extension fields..."
 	@ $(CTAGS_REF) -R $(REF_FIELD_OPTIONS) -o tags.ref Test
 	@ $(CTAGS_TEST) -R $(TEST_FIELD_OPTIONS) -o tags.test Test
+	@- $(DIFF)
+
+REF_EXTRA_OPTIONS = $(TEST_OPTIONS) --extra=+fq --format=1
+TEST_EXTRA_OPTIONS = $(TEST_OPTIONS) --extra=+fq --format=1
+test.extra: $(CTAGS_TEST) $(CTAGS_REF)
+	@ echo -n "Testing extra tags..."
+	@ $(CTAGS_REF) -R $(REF_EXTRA_OPTIONS) -o tags.ref Test
+	@ $(CTAGS_TEST) -R $(TEST_EXTRA_OPTIONS) -o tags.test Test
 	@- $(DIFF)
 
 REF_LINEDIR_OPTIONS = $(TEST_OPTIONS) --line-directives -n
