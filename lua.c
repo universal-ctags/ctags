@@ -56,9 +56,12 @@ static void __unused__ print_string (char *p, char *q)
 static boolean is_a_code_line (const unsigned char *line)
 {
     boolean result;
-    if (line [0] == '\0')
+    const unsigned char *p = line;
+    while (isspace ((int) *p))
+	p++;
+    if (p [0] == '\0')
 	result = FALSE;
-    else if (line [0] == '-' && line [1] == '-')
+    else if (p [0] == '-' && p [1] == '-')
 	result = FALSE;
     else
 	result = TRUE;
