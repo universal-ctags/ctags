@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.2 (Tue Sep 02 2003)
+ctags-5.5.2 (Wed Sep 17 2003)
 * Added tags for local variables for C-based languages [C/C++/C#/Java/Vera,
   Feature Request #449503].
 * Fixed compilation problem due to type change made to accomodate change of
