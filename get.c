@@ -28,7 +28,7 @@
 *   MACROS
 */
 #define stringMatch(s1,s2)	(strcmp (s1,s2) == 0)
-#define isspacetab(c)		((c) == ' ' || (c) == '\t')
+#define isspacetab(c)		((c) == SPACE || (c) == TAB)
 
 /*
 *   DATA DECLARATIONS
@@ -54,6 +54,7 @@ enum eState {
     DRCTV_DEFINE,		/* "#define" encountered */
     DRCTV_HASH,			/* initial '#' read; determine directive */
     DRCTV_IF,			/* "#if" or "#ifdef" encountered */
+    DRCTV_PRAGMA,		/* #pragma encountered */
     DRCTV_UNDEF			/* "#undef" encountered */
 };
 
@@ -186,8 +187,7 @@ static boolean readDirective (int c, char *const name, unsigned int maxLength)
 /*  Reads an identifier, whose first character is given by "c", into "tag",
  *  together with the file location and corresponding line number.
  */
-static boolean readDefineTag (int c, vString *const name,
-			      boolean *const parameterized)
+static void readIdentifier (int c, vString *const name)
 {
     vStringClear (name);
     do
@@ -195,10 +195,7 @@ static boolean readDefineTag (int c, vString *const name,
 	vStringPut (name, c);
     } while (c = fileGetc (), (c != EOF  &&  isident (c)));
     fileUngetc (c);
-    vStringPut (name, '\0');
-
-    *parameterized = (boolean) (c == '(');
-    return (boolean) (isspace (c)  ||  c == '(');
+    vStringTerminate (name);
 }
 
 static conditionalInfo *currentConditional (void)
@@ -314,12 +311,32 @@ static void makeDefineTag (const char *const name)
 
 static void directiveDefine (const int c)
 {
-    boolean parameterized;
-
     if (isident1 (c))
     {
-	readDefineTag (c, Cpp.directive.name, &parameterized);
+	readIdentifier (c, Cpp.directive.name);
 	makeDefineTag (vStringValue (Cpp.directive.name));
+    }
+    Cpp.directive.state = DRCTV_NONE;
+}
+
+static void directivePragma (int c)
+{
+    if (isident1 (c))
+    {
+	readIdentifier (c, Cpp.directive.name);
+	if (stringMatch (vStringValue (Cpp.directive.name), "weak"))
+	{
+	    /* generate macro tag for weak name */
+	    do
+	    {
+		c = fileGetc ();
+	    } while (c == SPACE);
+	    if (isident1 (c))
+	    {
+		readIdentifier (c, Cpp.directive.name);
+		makeDefineTag (vStringValue (Cpp.directive.name));
+	    }
+	}
     }
     Cpp.directive.state = DRCTV_NONE;
 }
@@ -365,7 +382,9 @@ static boolean directiveHash (const int c)
 	Cpp.directive.state = DRCTV_NONE;
 	DebugStatement ( if (ignore != ignore0) debugCppIgnore (ignore); )
     }
-    else	/* "pragma", etc. */
+    else if (stringMatch (directive, "pragma"))
+	Cpp.directive.state = DRCTV_PRAGMA;
+    else
 	Cpp.directive.state = DRCTV_NONE;
 
     return ignore;
@@ -383,6 +402,7 @@ static boolean handleDirective (const int c)
 	case DRCTV_DEFINE:	directiveDefine (c);		break;
 	case DRCTV_HASH:	ignore = directiveHash (c);	break;
 	case DRCTV_IF:		ignore = directiveIf (c);	break;
+	case DRCTV_PRAGMA:	directivePragma (c);		break;
 	case DRCTV_UNDEF:	directiveDefine (c);		break;
     }
     return ignore;
@@ -427,7 +447,7 @@ static int skipOverCComment (void)
 		c = next;
 	    else
 	    {
-		c = ' ';			/* replace comment with space */
+		c = SPACE;			/* replace comment with space */
 		break;
 	    }
 	}

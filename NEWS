@@ -1,6 +1,7 @@
 Current Version: @@VERSION@@
 
-ctags-5.2.4 (Tue Feb 26 2002)
+ctags-5.2.4 (Wed Feb 27 2002)
+* Added support for "#pragma weak", generating macro tags for weak symbols [C].
 * Fixed spurious tag for clients portion of feature clause when following
   an empty feature clause [Eiffel].
 
