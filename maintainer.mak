@@ -141,10 +141,10 @@ profclean:
 gcovclean:
 	rm -f $(COV_GEN)
 
-clean: depclean profclean gcovclean
+clean: depclean profclean gcovclean clean-test
 	rm -f *.[ois] *.o[dm] ctags dctags mctags ctags*.exe readtags \
 		ctags.html ctags.prof ctags.cov *.bb *.bbg tags TAGS syntax.vim \
-		$(ERRFILE) $(TEST_ARTIFACTS)
+		$(ERRFILE)
 
 distclean: clean
 	rm -f $(CONFIG_GEN)

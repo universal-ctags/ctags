@@ -67,4 +67,7 @@ test.linux: $(CTAGS_TEST) $(CTAGS_REF)
 
 TEST_ARTIFACTS = test.*.diff tags.ref tags.test
 
+clean-test:
+	rm -f $(TEST_ARTIFACTS)
+
 # vi:ts=4 sw=4
