@@ -168,7 +168,7 @@ static const keywordDesc SqlKeywordTable [] = {
 *   FUNCTION DECLARATIONS
 */
 
-static void parseBlock (tokenInfo *token, boolean local);
+static void parseBlock (tokenInfo *const token, const boolean local);
 
 /*
 *   FUNCTION DEFINITIONS

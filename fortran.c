@@ -1094,7 +1094,7 @@ static boolean isTypeSpec (tokenInfo *const token)
 
 static boolean isSubprogramPrefix (tokenInfo *const token)
 {
-    boolean result = FALSE;
+    boolean result;
     switch (token->keyword)
     {
 	case KEYWORD_elemental:
@@ -1102,6 +1102,9 @@ static boolean isSubprogramPrefix (tokenInfo *const token)
 	case KEYWORD_recursive:
 	case KEYWORD_stdcall:
 	    result = TRUE;
+	    break;
+	default:
+	    result = FALSE;
 	    break;
     }
     return result;
@@ -1265,6 +1268,7 @@ static tagType variableTagType (void)
 	    case TAG_DERIVED_TYPE: result = TAG_COMPONENT; break;
 	    case TAG_FUNCTION:     result = TAG_LOCAL;     break;
 	    case TAG_SUBROUTINE:   result = TAG_LOCAL;     break;
+	    default:               result = TAG_VARIABLE;  break;
 	}
     }
     return result;
