@@ -66,8 +66,8 @@ typedef struct {
 typedef parserDefinition* (parserDefinitionFunc) (void);
 
 typedef struct {
-	off_t start;	/* character index where match starts */
-	size_t length;	/* length of match */
+    off_t start;	/* character index in line where match starts */
+    size_t length;	/* length of match */
 } regexMatch;
 
 typedef void (*regexCallback) (const char *line, const regexMatch *matches, unsigned int count);

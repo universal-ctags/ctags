@@ -39,8 +39,8 @@ the parser on the currently open file.
 The structure <code>parserDefinition</code> allows assignment of the following
 fields:
 
-<p>
 <pre>
+<code>
   const char *name;               /* name of language */
   kindOption *kinds;              /* tag kinds handled by parser */
   unsigned int kindCount;         /* size of `kinds' list */
@@ -50,6 +50,7 @@ fields:
   simpleParser parser;            /* simple parser (common case) */
   rescanParser parser2;           /* rescanning parser (unusual case) */
   boolean regex;                  /* is this a regex parser? */
+</code>
 </pre>
 
 <p>
@@ -78,12 +79,45 @@ defining the current entry (and possibly overriding the file position or other
 defaults), the parser passes this structure to <code>makeTagEntry()</code>.
 
 <p>
-Instead of writing a parser, it may be possible to specify regular expressions
-which define the tags. In this case, instead of defining a parsing function,
-<code>SwineParser()</code>, sets <code>regex</code> to true, and points
-<code>initialize</code> to a function which calls
-<code>addLanguageRegex()</code> to install the regular expressions which
-define its tags.
+Instead of writing a character-oriented parser, it may be possible to specify
+regular expressions which define the tags. In this case, instead of defining a
+parsing function, <code>SwineParser()</code>, sets <code>regex</code> to true,
+and points <code>initialize</code> to a function which calls
+<code>addTagRegex()</code> to install the regular expressions which define its
+tags. The regular expressions thus installed are compared against each line 
+of the input file and generate a specified tag when matched.
+
+<p>
+A regex-based parser is inherently line-oriented (i.e. the entire tag must be
+recognizable from looking at a single line) and context-insensitive (i.e the
+generation of the tag is entirely based upon when the regular expression
+matches a single line). However, a regex-based callback mechanism is also
+available, installed via the function <code>addCallbackRegex()</code>. This
+allows a specified function to be invoked whenever a specific regular
+expression is matched. This allows a character-oriented parser to operate
+based upon context of what happened on a previous line (e.g. the start or end
+of a multi-line comment). Note that regex callbacks are called just before the
+first character of that line can is read via either <code>fileGetc()</code> or
+using <code>fileGetc()</code>. The effect of this is that before either of
+these routines return, a callback routine may be invoked because the line
+matched a regex callback. A callback function to be installed is defined by
+these types:
+
+<pre>
+<code>
+  typedef void (*regexCallback) (const char *line, const regexMatch *matches, unsigned int count);
+
+  typedef struct {
+      off_t start;    /* character index in line where match starts */
+      size_t length;  /* length of match */
+  } regexMatch;
+</code>
+</pre>
+
+<p>
+The callback function is passed the line matching the regular expression and
+an array of <code>count</code> structures defining the subexpression matches
+of the regular expression.
 
 <p>
 This is all there is to it. All other details are specific to the parser and
