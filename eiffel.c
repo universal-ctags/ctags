@@ -989,7 +989,7 @@ static void parseArguments (tokenInfo *const token)
 #endif
 }
 
-static void parseFeature (tokenInfo *const token)
+static boolean parseFeature (tokenInfo *const token)
 {
     boolean found = FALSE;
     while (readFeatureName (token))
@@ -1017,6 +1017,7 @@ static void parseFeature (tokenInfo *const token)
 	if (isKeyword (token, KEYWORD_is))
 	    findFeatureEnd (token);
     }
+    return found;
 }
 
 static void parseExport (tokenInfo *const token)
@@ -1043,7 +1044,12 @@ static void parseFeatureClauses (tokenInfo *const token)
     {
 	if (isKeyword (token, KEYWORD_feature))
 	    parseExport (token);
-	parseFeature (token);
+	if (! isKeyword (token, KEYWORD_invariant) &&
+	    ! isKeyword (token, KEYWORD_indexing))
+	{
+	    if (! parseFeature (token))
+		readToken (token);
+	}
     } while (! isKeyword (token, KEYWORD_end) &&
 	     ! isKeyword (token, KEYWORD_invariant) &&
 	     ! isKeyword (token, KEYWORD_indexing));

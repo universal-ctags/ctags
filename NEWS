@@ -1,7 +1,8 @@
 Current Version: @@VERSION@@
 
-ctags-5.2.3 (Sun Feb 17 2002)
+ctags-5.2.3 (Mon Feb 18 2002)
 * Fixed portability problem in makefile [Solaris, FreeBSD].
+* Fixed infinite loop for certain cases of invalid syntax [Eiffel].
 
 ctags-5.2.2 (Sat Feb 16 2002)
 * Fixed spurious tags following empty feature clause [Eiffel].
