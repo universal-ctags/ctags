@@ -27,6 +27,7 @@
     FortranParser, \
     JavaParser, \
     LispParser, \
+    LuaParser, \
     MakefileParser, \
     PascalParser, \
     PerlParser, \

@@ -5,8 +5,8 @@ Entered-date:	@@LSMDATE@@
 Description:	An improved ctags with multilanguage support.
 Keywords:	tag tags ctags etags ftags ptags Exuberant Assembler ASP AWK
 		Bourne sh BETA C C++ COBOL Eiffel Fortran Java Korn ksh Lisp
-                Makefile Pascal Perl PHP Python REXX Ruby Scheme SLang S-Lang
-		Tcl Vim tool utility source index zsh
+		Lua Makefile Pascal Perl PHP Python REXX Ruby Scheme SLang
+		S-Lang Tcl Vim tool utility source index zsh
 Author:		darren@hiebert.com (Darren Hiebert)
 Primary-site:	http://ctags.sourceforge.net
 		215kB ctags-@@VERSION@@.tar.gz

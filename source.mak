@@ -20,6 +20,7 @@ SOURCES = \
 	get.c \
 	keyword.c \
 	lisp.c \
+	lua.c \
 	main.c \
 	make.c \
 	options.c \
@@ -56,6 +57,7 @@ OBJECTS = \
 	get.$(OBJEXT) \
 	keyword.$(OBJEXT) \
 	lisp.$(OBJEXT) \
+	lua.$(OBJEXT) \
 	main.$(OBJEXT) \
 	make.$(OBJEXT) \
 	options.$(OBJEXT) \

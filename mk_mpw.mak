@@ -23,6 +23,7 @@ SOURCES = ¶
 	get.c ¶
 	keyword.c ¶
 	lisp.c ¶
+	lua.c ¶
 	main.c ¶
 	make.c ¶
 	options.c ¶
@@ -60,6 +61,7 @@ OBJ = ¶
 	get.o ¶
 	keyword.o ¶
 	lisp.o ¶
+	lua.o ¶
 	main.o ¶
 	make.o ¶
 	options.o ¶
