@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.3 (Wed Jul 10 2002)
+ctags-5.3 (Mon Jul 15 2002)
 * Allowed --etags-include option without input files.
 * Changed Asm parser to back to C-based parser to remove redundant tags,
   and extending its support for more variants [Asm].
@@ -20,6 +20,8 @@ ctags-5.3 (Wed Jul 10 2002)
 * Fixed portability problems [Bugs #541997, #571240].
 * Fixed bug in configure script [Solaris, Bug #542966].
 * Fixed invalid package name tags [Perl, Bug #535068].
+* Fixed failure to output relative paths into etags TAGS files on Win32
+  [Bug #568365].
 * Fixed incorrect line address in cases of line continuation [Fortran].
 * Fixed missing tags for certain cases of invalid syntax [C].
 * Fixed missing tags in Fortran with HPF extensions [Fortran, Bug #565813].

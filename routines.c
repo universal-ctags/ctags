@@ -372,7 +372,7 @@ extern void setCurrentDirectory (void)
     if (CurrentDirectory [strlen (CurrentDirectory) - (size_t) 1] !=
 	    PATH_SEPARATOR)
     {
-	printf (CurrentDirectory + strlen (CurrentDirectory), "%c",
+	sprintf (CurrentDirectory + strlen (CurrentDirectory), "%c",
 		OUTPUT_PATH_SEPARATOR);
     }
 }
@@ -597,12 +597,13 @@ extern char* absoluteFilename (const char *file)
 	res = concat (CurrentDirectory, file, "");
 
     /* Delete the "/dirname/.." and "/." substrings. */
-    slashp = strchr (res, '/');
+    slashp = strchr (res, PATH_SEPARATOR);
     while (slashp != NULL  &&  slashp [0] != '\0')
     {
 	if (slashp[1] == '.')
 	{
-	    if (slashp [2] == '.' && (slashp [3] == '/' || slashp [3] == '\0'))
+	    if (slashp [2] == '.' &&
+		(slashp [3] == PATH_SEPARATOR || slashp [3] == '\0'))
 	    {
 		cp = slashp;
 		do
@@ -615,20 +616,20 @@ extern char* absoluteFilename (const char *file)
 		 * so the luser could say `d:/../NAME'. We silently treat this
 		 * as `d:/NAME'.
 		 */
-		else if (cp [0] != '/')
+		else if (cp [0] != PATH_SEPARATOR)
 		    cp = slashp;
 #endif
 		strcpy (cp, slashp + 3);
 		slashp = cp;
 		continue;
 	    }
-	    else if (slashp [2] == '/'  ||  slashp [2] == '\0')
+	    else if (slashp [2] == PATH_SEPARATOR  ||  slashp [2] == '\0')
 	    {
 		strcpy (slashp, slashp + 2);
 		continue;
 	    }
 	}
-	slashp = strchr (slashp + 1, '/');
+	slashp = strchr (slashp + 1, PATH_SEPARATOR);
     }
 
     if (res [0] == '\0')
@@ -636,7 +637,7 @@ extern char* absoluteFilename (const char *file)
     else
     {
 #ifdef MSDOS_STYLE_PATH
-	/* Canonicalize drive letter case.  */
+	/* Canonicalize drive letter case. */
 	if (res [1] == ':'  &&  islower (res [0]))
 	    res [0] = toupper (res [0]);
 #endif
@@ -653,13 +654,7 @@ extern char* absoluteDirname (char *file)
 {
     char *slashp, *res;
     char save;
-#ifdef MSDOS_STYLE_PATH
-    char *p;
-    for (p = file  ;  *p != '\0'  ;  p++)
-	if (*p == '\\')
-	    *p = '/';
-#endif
-    slashp = strrchr (file, '/');
+    slashp = strrchr (file, PATH_SEPARATOR);
     if (slashp == NULL)
 	res = eStrdup (CurrentDirectory);
     else
@@ -691,17 +686,17 @@ extern char* relativeFilename (const char *file, const char *dir)
     fp--;
     dp--;			/* back to the first differing char */
     do
-    {				/* look at the equal chars until '/' */
+    {				/* look at the equal chars until path sep */
 	if (fp == absdir)
 	    return absdir;	/* first char differs, give up */
 	fp--;
 	dp--;
-    } while (*fp != '/');
+    } while (*fp != PATH_SEPARATOR);
 
     /* Build a sequence of "../" strings for the resulting relative file name.
      */
     i = 0;
-    while ((dp = strchr (dp + 1, '/')) != NULL)
+    while ((dp = strchr (dp + 1, PATH_SEPARATOR)) != NULL)
 	i += 1;
     res = xMalloc (3 * i + strlen (fp + 1) + 1, char);
     res [0] = '\0';
