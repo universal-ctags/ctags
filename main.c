@@ -896,6 +896,7 @@ extern void processExcludeOption (const char *const __unused__ option,
 	    Excluded = sl;
 	else
 	    stringListCombine (Excluded, sl);
+	verbose ("    adding exclude patterns from %s\n", parameter + 1);
     }
     else
     {
@@ -903,6 +904,7 @@ extern void processExcludeOption (const char *const __unused__ option,
 	if (Excluded == NULL)
 	    Excluded = stringListNew ();
 	stringListAdd (Excluded, item);
+	verbose ("    adding exclude pattern: %s\n", parameter);
     }
 }
 
@@ -1346,10 +1348,6 @@ extern int main (int __unused__ argc, char **argv)
     setCurrentDirectory ();
     setExecutableName (*argv++);
     checkRegex ();
-
-    /* always excluded by default */
-    processExcludeOption (NULL, "EIFGEN");
-    processExcludeOption (NULL, "SCCS");
 
     args = cArgNewFromArgv (argv);
     previewFirstOption (args);

@@ -389,9 +389,10 @@ simple textual comparison.
 If \fIpattern\fP begins with the character '@', then the rest of the string
 is interpreted as a file name from which to read exclusion patterns, one per
 line. If \fIpattern\fP is empty, the list of excluded patterns is cleared.
-Note that at program startup, the exclude list contains "EIFGEN" and "SCCS"
-by default, which are directories for which it is generally not desirable to
-descend.
+Note that at program startup, the default exclude list contains "EIFGEN",
+"SCCS", "RCS", and "CVS", which are names of directories for which it is
+generally not desirable to descend while processing the \fB--recurse\fP
+option.
 
 .TP 5
 \fB--excmd\fP=\fItype\fP
