@@ -1,0 +1,40 @@
+-- $Id$
+
+system
+	readtags
+
+root
+	TAG_FILE_READER (root_cluster): "make"
+
+default
+	assertion (all)
+	multithreaded (no)
+	console_application (yes)
+	dynamic_runtime (yes)
+	dead_code_removal (yes)
+	profile (yes)
+	line_generation (yes)
+	debug  (yes)
+	array_optimization (yes)
+	inlining (yes)
+	inlining_size ("4")
+
+	precompiled ("$ISE_EIFFEL/precomp/spec/$ISE_PLATFORM/base")
+
+cluster
+	
+	root_cluster: "."
+
+		-- EiffelBase
+    all base: "$ISE_EIFFEL/library/base"
+		exclude
+			"desc";"table_eiffel3"
+		end
+
+external
+
+	include_path: "../../../.."
+
+	object: "../../../readtags.o"
+
+end
