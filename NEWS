@@ -6,6 +6,7 @@ ctags-5.3.1 (Tue Sep 03 2002)
 * Added new function, tagsFirst() to readtags library.
 * Fixed incorrect tag kinds [Verilog].
 * Fixed null tags for unnamed BLOCK DATA statements [Fortran].
+* Fixed missing tags for function preceded by "<SID>" [Vim].
 * Fixed missing tags for equate statements not in column 1 [Asm, Bug #538629].
 
 ctags-5.3 (Wed Jul 17 2002)

@@ -45,7 +45,7 @@ static kindOption VimKinds [] = {
  * and the character defining the scope.
  * If a colon is not found, it returns the original pointer.
  */
-static const unsigned char* skipColon (const unsigned char* name, int *scope)
+static const unsigned char* skipPrefix (const unsigned char* name, int *scope)
 {
     const unsigned char* result = name;
     if (scope != NULL)
@@ -55,6 +55,12 @@ static const unsigned char* skipColon (const unsigned char* name, int *scope)
 	if (scope != NULL)
 	    *scope = *name;
 	result = name + 2;
+    }
+    else if (strncmp(name, "<SID>", (size_t) 5) == 0)
+    {
+	if (scope != NULL)
+	    *scope = *name;
+	result = name + 5;
     }
     return result;
 }
@@ -83,7 +89,7 @@ static void findVimTags (void)
 	    {
 		while (isspace ((int) *cp))
 		    ++cp;
-                cp = skipColon (cp, &scope);
+                cp = skipPrefix (cp, &scope);
 		if (isupper ((int) *cp))
 		{
 		    do
@@ -112,7 +118,7 @@ static void findVimTags (void)
                 /* deal with spaces, $, @ and & */
                 while (!isalnum ((int) *cp))
                     ++cp;
-                cp = skipColon (cp, &scope);
+                cp = skipPrefix (cp, &scope);
                 do
 		{
                     vStringPut (name, (int) *cp);
