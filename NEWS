@@ -6,6 +6,9 @@ ctags-5.2.4 (Tue Jun 11 2002)
   and extending its support for more variants [Asm].
 * Changed to using _tempnam() to create temporary files on Windows, allowing
   "TMP" environment variable to set temporary directory.
+* Changed the -x output to match that of traditional ctags when the --format=1
+  option is supplied. The new format was also changed slightly to conform more
+  closely to the original format, with the addition of the extra tag type field.
 * Added support for RISC OS platform, contributed by Andrew Wingate.
 * Added support for "#pragma weak", generating macro tags for weak symbols [C].
 * Added support for mixins and class methods to Ruby parser, submitted by

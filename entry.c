@@ -635,9 +635,15 @@ static size_t writeCompactSourceLine (FILE *const fp, const char *const line)
 static int writeXrefEntry (const tagEntryInfo *const tag)
 {
     const char *const line =
-			readSourceLine (TagFile.vLine, tag->filePosition, NULL);
-    int length = fprintf (TagFile.fp, "%-20s %-10s %4lu  %-14s ", tag->name,
-			 tag->kindName, tag->lineNumber, tag->sourceFileName);
+	    readSourceLine (TagFile.vLine, tag->filePosition, NULL);
+    int length;
+
+    if (Option.tagFileFormat == 1)
+	length = fprintf (TagFile.fp, "%-16s %4lu %-16s ", tag->name,
+		tag->lineNumber, tag->sourceFileName);
+    else
+	length = fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s ", tag->name,
+		tag->kindName, tag->lineNumber, tag->sourceFileName);
 
     length += writeCompactSourceLine (TagFile.fp, line);
     putc (NEWLINE, TagFile.fp);
