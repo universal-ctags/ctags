@@ -141,7 +141,7 @@ these types:
   typedef void (*regexCallback) (const char *line, const regexMatch *matches, unsigned int count);
 
   typedef struct {
-      off_t start;    /* character index in line where match starts */
+      size_t start;   /* character index in line where match starts */
       size_t length;  /* length of match */
   } regexMatch;
 </pre>
@@ -309,7 +309,7 @@ static void definition (const char *const line, const regexMatch *const matches,
     if (count &gt; 1)    /* should always be true per regex */
     {
         vString *const name = vStringNew ();
-        vStringNCopyS (name, matches [1].start, matches [1].length);
+        vStringNCopyS (name, line + matches [1].start, matches [1].length);
         makeSimpleTag (name, SwineKinds, K_DEFINE);
     }
 }
