@@ -427,9 +427,10 @@ static lineType getLineType (void)
 	 */
 	/*  EXCEPTION! Some compilers permit '!' as a commment character here.
 	 *
-	 *  Treat '#' in column 1 as comment to permit preprocessor directives.
+	 *  Treat # and $ in column 1 as comment to permit preprocessor directives.
+	 *  Treat D and d in column 1 as comment for HP debug statements.
 	 */
-	if (column == 0  &&  strchr ("*Cc!#", c) != NULL)
+	if (column == 0  &&  strchr ("*Cc!#$Dd", c) != NULL)
 	    type = LTYPE_COMMENT;
 	else if (c == '\t')  /* EXCEPTION! Some compilers permit a tab here */
 	{
