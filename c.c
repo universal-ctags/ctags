@@ -2253,7 +2253,8 @@ static void processColon (statementInfo *const st)
 	    const tokenInfo *const prev  = prevToken (st, 1);
 	    const tokenInfo *const prev2 = prevToken (st, 2);
 	    if (prev->keyword == KEYWORD_DEFAULT ||
-		prev2->keyword == KEYWORD_CASE)
+		prev2->keyword == KEYWORD_CASE ||
+		st->parent != NULL)
 	    {
 		reinitStatement (st, FALSE);
 	    }
@@ -2445,7 +2446,7 @@ static void deleteStatement (void)
 
     for (i = 0  ;  i < (unsigned int) NumTokens  ;  ++i)
     {
-	deleteToken (st->token [i]);        st->token [i] = NULL;
+	deleteToken (st->token [i]);       st->token [i] = NULL;
     }
     deleteToken (st->blockName);           st->blockName = NULL;
     deleteToken (st->context);             st->context = NULL;
