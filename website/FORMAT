@@ -5,8 +5,8 @@ Proposal for extended Vi tags file format
 
 Version: 0.06 DRAFT
    Date: 1998 Feb 8
- Author: Bram Moolenaar <Bram@vim.org>
-    and: Darren Hiebert <darren@hiebert.com>
+ Author: Bram Moolenaar <Bram at vim.org>
+    and: Darren Hiebert <darren at hiebert.com>
 
 
 1. Introduction
@@ -38,19 +38,19 @@ To make this proposal into a standard for tags files, it needs to be supported
 by most people working on versions of Vi, ctags, etc..  Currently this
 standard is supported by:
 
-Darren Hiebert <darren@hiebert.com>		Exuberant ctags
-Bram Moolenaar <Bram@vim.org>			Vim (Vi IMproved)
+Darren Hiebert <darren at hiebert.com>		Exuberant ctags
+Bram Moolenaar <Bram at vim.org>		Vim (Vi IMproved)
 
 These have been or will be asked to support this standard:
 
-Nvi		Keith Bostic <bostic@bsdi.com>
-Vile		Tom E. Dickey <dickey@clark.net>
-NEdit		Mark Edel <edel@fnal.gov>
-CRiSP		Paul Fox <fox@crisp.demon.co.uk>
-Lemmy           James Iuliano <jai@accessone.com>
-Zeus            Jussi Jumppanen <jussij@ca.com.au>
-Elvis		Steve Kirkendall <kirkenda@cs.pdx.edu>
-FTE             Marko Macek <Marko.Macek@snet.fri.uni-lj.si>
+Nvi		Keith Bostic <bostic at bsdi.com>
+Vile		Tom E. Dickey <dickey at clark.net>
+NEdit		Mark Edel <edel at ltx.com>
+CRiSP		Paul Fox <fox at crisp.demon.co.uk>
+Lemmy           James Iuliano <jai at accessone.com>
+Zeus            Jussi Jumppanen <jussij at ca.com.au>
+Elvis		Steve Kirkendall <kirkenda at cs.pdx.edu>
+FTE             Marko Macek <Marko.Macek at snet.fri.uni-lj.si>
 
 
 3. Backwards compatibility
