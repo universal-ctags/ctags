@@ -4,6 +4,7 @@ ctags-5.4.1 (Sat Oct 26 2002)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
 * Fixed problem with infinite loop in certain comments [PL/SQL, Bug #629115].
 * Fixed man page errors and omissions.
+* Fixed bug in readFieldValue() in readtags library.
 
 ctags-5.4 (Thu Oct 17 2002)
 * Improved ability for tagsOpen() in readtags library to report failure to
