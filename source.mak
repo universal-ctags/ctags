@@ -77,3 +77,4 @@ OBJECTS = \
 	vim.$(OBJEXT) \
 	yacc.$(OBJEXT) \
 	vstring.$(OBJEXT)
+
