@@ -45,8 +45,8 @@
 
 #elif defined (_MSC_VER)
 
-#  define HAVE__FINDFIRST 1
-#  define HAVE_DIRECT_H 1
+# define HAVE__FINDFIRST 1
+# define HAVE_DIRECT_H 1
 
 #elif defined (__MINGW32__)
 

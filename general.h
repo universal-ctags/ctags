@@ -14,49 +14,29 @@
 /*
 *   INCLUDE FILES
 */
-#ifdef HAVE_CONFIG_H
+#if defined (HAVE_CONFIG_H)
 # include <config.h>
-#endif
-
-/* Include correct file for compilation environment */
-
-#ifdef AMIGA
+#elif defined (AMIGA)
 # include "e_amiga.h"
-#endif
-
-#ifdef __CYGWIN__
+#elif defined (__CYGWIN__)
 # include "e_cygwin.h"
-#endif
-
-#ifdef DJGPP
+#elif defined (DJGPP)
 # include "e_djgpp.h"
-#endif
-
-#ifdef macintosh
+#elif defined (macintosh)
 # include "e_mac.h"
-#endif
-
-#if defined (MSDOS) || defined (WIN32)
+#elif defined (MSDOS) || defined (WIN32)
 # include "e_msoft.h"
-#endif
-
-#ifdef OS2
+#elif defined (OS2)
 # include "e_os2.h"
-#endif
-
-#ifdef QDOS
+#elif defined (QDOS)
 # include "e_qdos.h"
-#endif
-
-#ifdef RISCOS
+#elif defined (RISCOS)
 # include "e_riscos.h"
-#endif
-
-#if defined (__vms) && ! defined (VMS)
-# define VMS 1
-#endif
-#ifdef VMS
+#elif defined (__vms) || defined (VMS)
 # include "e_vms.h"
+# ifndef VMS
+#  define VMS 1
+# endif
 #endif
 
 
