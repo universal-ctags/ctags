@@ -91,7 +91,7 @@ static void findPerlTags (void)
 	    while (isspace (*cp))
 		cp++;
 	    while (! isspace ((int) *cp) && *cp != '\0' &&
-		   strchr ("{(;", (int) cp) == NULL)
+		   strchr ("{(;", (int) *cp) == NULL)
 	    {
 		vStringPut (name, (int) *cp);
 		cp++;
