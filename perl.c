@@ -54,7 +54,7 @@ static void findPerlTags (void)
 
 	if (skipPodDoc)
 	{
-	    if (strcmp ((const char*) line, "=cut") == 0)
+	    if (strncmp ((const char*) line, "=cut", (size_t) 4) == 0)
 		skipPodDoc = FALSE;
 	    continue;
 	}
