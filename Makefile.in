@@ -99,11 +99,17 @@ all: $(CTAGS_EXEC) $(READ_LIB)
 $(CTAGS_EXEC): $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
-dctags: debug.c $(SOURCES) $(HEADERS)
+dctags$(EXEEXT): debug.c $(SOURCES) $(HEADERS)
 	$(CC) -I. -I$(srcdir) $(DEFS) -DDEBUG -g $(LDFLAGS) -o $@ debug.c $(SOURCES)
 
-readtags: readtags.c readtags.h
-	$(CC) -I. -I$(srcdir) -DREADTAGS_MAIN $(DEFS) $(CFLAGS) $(LDFLAGS) -o $@ $<
+readtags$(EXEEXT): readtags.c readtags.h
+	$(CC) -DREADTAGS_MAIN -I. -I$(srcdir) $(DEFS) $(CFLAGS) $(LDFLAGS) -o $@ $<
+
+etyperef$(EXEEXT): etyperef.o keyword.o routines.o strlist.o vstring.o
+	$(CC) $(LDFLAGS) -o $@ $^
+
+etyperef.o: eiffel.c
+	$(CC) -DTYPE_REFERENCE_TOOL -I. -I$(srcdir) $(DEFS) $(CFLAGS) -o $@ -c $<
 
 $(OBJECTS): $(HEADERS) config.h
 
@@ -194,7 +200,8 @@ TAGS: $(CTAGS_EXEC)
 	./$(CTAGS_EXEC) -e $(srcdir)/*
 
 clean:
-	rm -f $(OBJECTS) $(READ_LIB) readtags $(CTAGS_EXEC) tags TAGS
+	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB) 
+	rm -f dctags$(EXEEXT) readtags$(EXEEXT) etyperef$(EXEEXT)
 
 mostlyclean: clean
 

@@ -102,11 +102,6 @@ extern CONST_FILE inputFile File;
 /*
 *   FUNCTION PROTOTYPES
 */
-#if defined(NEED_PROTO_FGETPOS)
-extern int fgetpos  (FILE *stream, fpos_t *pos);
-extern int fsetpos  (FILE *stream, fpos_t *pos);
-#endif
-
 extern void freeSourceFileResources (void);
 extern boolean fileOpen (const char *const fileName, const langType language);
 extern boolean fileEOF (void);

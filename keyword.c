@@ -18,8 +18,8 @@
 
 #include "debug.h"
 #include "keyword.h"
-#include "main.h"
 #include "options.h"
+#include "routines.h"
 
 /*
 *   MACROS

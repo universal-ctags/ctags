@@ -44,6 +44,7 @@
 #include "main.h"
 #include "options.h"
 #include "read.h"
+#include "routines.h"
 #include "sort.h"
 #include "strlist.h"
 

@@ -16,6 +16,8 @@
 */
 #include "general.h"	/* must always come first */
 
+#include <stdio.h>
+
 /*
 *   DATA DECLARATIONS
 */

@@ -19,7 +19,7 @@
 #include <ctype.h>
 
 #include "debug.h"
-#include "main.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*

@@ -24,17 +24,15 @@
 #include <setjmp.h>
 
 #include "debug.h"
+#include "keyword.h"
+#include "routines.h"
+#include "vstring.h"
 #ifndef TYPE_REFERENCE_TOOL
 #include "entry.h"
-#endif
-#include "keyword.h"
-#include "main.h"
-#ifndef TYPE_REFERENCE_TOOL
 #include "options.h"
 #include "parse.h"
 #include "read.h"
 #endif
-#include "vstring.h"
 
 /*
 *   MACROS

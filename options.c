@@ -25,6 +25,7 @@
 #define OPTION_WRITE
 #include "options.h"
 #include "parse.h"
+#include "routines.h"
 
 /*
 *   MACROS

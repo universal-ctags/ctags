@@ -20,8 +20,8 @@
 #endif
 
 #include "debug.h"
-#include "main.h"
 #include "read.h"
+#include "routines.h"
 #include "strlist.h"
 
 /*

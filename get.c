@@ -20,7 +20,6 @@
 #include "debug.h"
 #include "entry.h"
 #include "get.h"
-#include "main.h"
 #include "options.h"
 #include "read.h"
 #include "vstring.h"

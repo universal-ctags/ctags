@@ -4,7 +4,8 @@
 
 HEADERS = \
 	args.h ctags.h debug.h entry.h general.h get.h keyword.h \
-	main.h options.h parse.h parsers.h read.h sort.h strlist.h vstring.h
+	main.h options.h parse.h parsers.h read.h routines.h sort.h \
+	strlist.h vstring.h
 
 SOURCES = \
 	args.c \
@@ -32,6 +33,7 @@ SOURCES = \
 	read.c \
 	regex.c \
 	rexx.c \
+	routines.c \
 	ruby.c \
 	scheme.c \
 	sh.c \
@@ -69,6 +71,7 @@ OBJECTS = \
 	read.$(OBJEXT) \
 	regex.$(OBJEXT) \
 	rexx.$(OBJEXT) \
+	routines.$(OBJEXT) \
 	ruby.$(OBJEXT) \
 	scheme.$(OBJEXT) \
 	sh.$(OBJEXT) \

@@ -75,7 +75,7 @@ ctags dctags ctags.prof ctags.cov:
 else
 all: dctags tags syntax.vim
 
--include $(DSOURCES:%.c=$(DEP_DIR)/%.d)
+-include $(DSOURCES:%.c=$(DEP_DIR)/%.d) $(DEP_DIR)/readtags.d
 
 #
 # Executable targets
@@ -103,11 +103,11 @@ gcov: $(SOURCES:.c=.c.gcov)
 readtags: readtags.[ch]
 	$(CC) -g $(COMP_FLAGS) -DREADTAGS_MAIN -o $@ readtags.c
 
-readtags.o: readtags.[ch]
+readtags.o: readtags.c readtags.h
 	$(CC) $(COMP_FLAGS) -c readtags.c
 
-etyperef: routines.c etyperef.o keyword.o strlist.o vstring.o
-	$(CC) $(OPT) $(COMP_FLAGS) -o $@ $^
+etyperef: etyperef.o keyword.o routines.o strlist.o vstring.o
+	$(CC) -o $@ $^
 
 etyperef.o: eiffel.c
 	$(CC) -DTYPE_REFERENCE_TOOL $(OPT) $(COMP_FLAGS) -o $@ -c $<
@@ -148,7 +148,7 @@ gcovclean:
 	rm -f $(COV_GEN)
 
 clean: depclean profclean gcovclean clean-test
-	rm -f *.[ois] *.o[dm] ctags dctags mctags ctags*.exe readtags \
+	rm -f *.[ois] *.o[dm] ctags dctags mctags ctags*.exe readtags etyperef \
 		ctags.html ctags.prof ctags.cov *.bb *.bbg tags TAGS syntax.vim \
 		$(ERRFILE)
 

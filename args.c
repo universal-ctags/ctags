@@ -20,7 +20,7 @@
 
 #include "args.h"
 #include "debug.h"
-#include "main.h"
+#include "routines.h"
 
 /*
 *   FUNCTION DEFINITIONS

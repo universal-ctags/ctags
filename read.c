@@ -23,6 +23,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "main.h"
+#include "routines.h"
 #include "options.h"
 
 /*

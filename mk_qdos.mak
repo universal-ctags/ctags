@@ -64,6 +64,7 @@ OBJECTS = \
 	read.$(OBJEXT) \
 	regex.$(OBJEXT) \
 	rexx.$(OBJEXT) \
+	routines.$(OBJEXT) \
 	ruby.$(OBJEXT) \
 	scheme.$(OBJEXT) \
 	sh.$(OBJEXT) \

@@ -16,7 +16,6 @@
 
 #include <string.h>
 
-#include "main.h"
 #include "options.h"
 #include "parse.h"
 #include "read.h"

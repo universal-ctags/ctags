@@ -22,10 +22,10 @@
 #include "entry.h"
 #include "get.h"
 #include "keyword.h"
-#include "main.h"
 #include "options.h"
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 
 /*
 *   MACROS

@@ -31,9 +31,9 @@
 
 #include "debug.h"
 #include "entry.h"
-#include "main.h"
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 
 #ifdef HAVE_REGEX
 

@@ -22,9 +22,9 @@
 
 #include "debug.h"
 #include "entry.h"
-#include "main.h"
 #include "options.h"
 #include "read.h"
+#include "routines.h"
 #include "sort.h"
 
 #ifdef TRAP_MEMORY_CALLS
