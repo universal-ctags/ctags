@@ -7,7 +7,7 @@ Copyright: GPL
 Group: Development/Tools
 Source: http://ctags.sourceforge.net/archives/ctags-%{version}.tar.gz
 URL: http://ctags.sourceforge.net
-Buildroot: /home/darren/Develop
+Buildroot: /var/tmp/ctags-root
 
 %description
 Exuberant Ctags generates an index (or tag) file of language objects
@@ -37,6 +37,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(0644,root,root,0755)
-%doc COPYING EXTENDING.html FAQ NEWS QUOTES README
+%doc COPYING EXTENDING.html FAQ NEWS QUOTES README ctags.html
 %attr(0755,root,root) /usr/bin/ctags
 /usr/man/man1/ctags.1.gz

@@ -43,7 +43,7 @@ WARNINGS	=	-Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
 ERRFILE	= errors
 REDIR	= 2>&1 | tee $(ERRFILE)
 
-RPM_ROOT= $(HOME)/Develop
+RPM_ROOT= $(HOME)/Rpm
 CTAGS_DOSDIR = win32
 WEB_ARCHIVE_DIR = $(HOME)/public_html/archives
 WEB_CTAGS_DIR = $(HOME)/public_html/ctags
@@ -302,7 +302,10 @@ dos-%:
 	$(MAKE) $(CTAGS_DOSDIR)/ctags`echo $*|sed 's/\.//g'` \
 			dos1-`echo $*|sed 's/\.//g'` dos2-$*
 
-rpm-%: ctags-%.tar.gz ctags.spec
+$(RPM_ROOT)/SOURCES $(RPM_ROOT)/SPECS:
+	mkdir -p $@
+
+rpm-%: ctags-%.tar.gz ctags.spec $(RPM_ROOT)/SOURCES $(RPM_ROOT)/SPECS 
 	@ echo "---------- Building RPM"
 	cp -p ctags-$*.tar.gz $(RPM_ROOT)/SOURCES/
 	sed -e "s/@@VERSION@@/$*/" ctags.spec > $(RPM_ROOT)/SPECS/ctags-$*.spec
