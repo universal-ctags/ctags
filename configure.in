@@ -260,8 +260,8 @@ AC_EGREP_HEADER(clock_t, time.h, AC_MSG_RESULT(yes),
 dnl Checks for compiler characteristics
 dnl -----------------------------------
 
-AC_CYGWIN
-AC_MINGW32
+dnl AC_CYGWIN
+dnl AC_MINGW32
 AC_C_CONST
 AC_OBJEXT
 AC_EXEEXT
