@@ -227,27 +227,26 @@ static void buildEiffelKeywordHash (void)
 
 static void addGenericName (tokenInfo *const token)
 {
-    if (vStringLength (token->featureName) > 0)
-	stringListAdd (GenericNames, vStringNewCopy (token->featureName));
+    if (vStringLength (token->string) > 0)
+	stringListAdd (GenericNames, vStringNewCopy (token->string));
 }
 
 static boolean isGeneric (tokenInfo *const token)
 {
     return (boolean) stringListHasInsensitive (
-	GenericNames, vStringValue (token->featureName));
+	GenericNames, vStringValue (token->string));
 }
 
 static void reportType (tokenInfo *const token)
 {
-    if (vStringLength (token->featureName) > 0  && ! isGeneric (token)  &&
+    if (vStringLength (token->string) > 0  && ! isGeneric (token)  &&
 	(SelfReferences || strcasecmp (vStringValue (
-	    token->featureName), vStringValue (token->className)) != 0) &&
-	! stringListHasInsensitive (ReferencedTypes,
-				    vStringValue (token->featureName)))
+	    token->string), vStringValue (token->className)) != 0) &&
+	! stringListHasInsensitive (
+	    ReferencedTypes, vStringValue (token->string)))
     {
-	printf ("%s\n", vStringValue (token->featureName));
-	stringListAdd (ReferencedTypes, vStringNewCopy (token->featureName));
-	vStringClear (token->featureName);
+	printf ("%s\n", vStringValue (token->string));
+	stringListAdd (ReferencedTypes, vStringNewCopy (token->string));
     }
 }
 
@@ -792,7 +791,6 @@ static void parseGeneric (tokenInfo *const token, boolean __unused__ declaration
 		    findKeyword (token, KEYWORD_end);
 		else if (isType (token, TOKEN_IDENTIFIER))
 		{
-		    vStringCopy (token->featureName, token->string);
 		    if (constraint)
 			reportType (token);
 		    else
@@ -803,20 +801,14 @@ static void parseGeneric (tokenInfo *const token, boolean __unused__ declaration
 	    else if (isKeyword (token, KEYWORD_like))
 		readToken (token);
 	    else if (isType (token, TOKEN_IDENTIFIER))
-	    {
-		vStringCopy (token->featureName, token->string);
 		reportType (token);
-	    }
 	}
 	else
 	{
 	    if (isType (token, TOKEN_OPEN_BRACKET))
 		++depth;
 	    else if (isType (token, TOKEN_IDENTIFIER))
-	    {
-		vStringCopy (token->featureName, token->string);
 		reportType (token);
-	    }
 	    else if (isKeyword (token, KEYWORD_like))
 		readToken (token);
 	}
@@ -830,7 +822,6 @@ static void parseType (tokenInfo *const token)
     boolean bitType;
     Assert (isType (token, TOKEN_IDENTIFIER));
 #ifdef TYPE_REFERENCE_TOOL
-    vStringCopy (token->featureName, token->string);
     reportType (token);
 #endif
     bitType = (boolean)(strcmp ("BIT", vStringValue (token->string)) == 0);
