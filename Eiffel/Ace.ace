@@ -19,7 +19,7 @@ default
 	inlining (yes)
 	inlining_size ("4")
 
---	precompiled ("$ISE_EIFFEL/precomp/spec/$ISE_PLATFORM/base")
+	precompiled ("$ISE_EIFFEL/precomp/spec/$ISE_PLATFORM/base")
 
 cluster
 	
