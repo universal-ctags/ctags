@@ -155,7 +155,7 @@ case `uname` in
 	SunOS)
 		if uname -r | grep '5\.' >/dev/null 2>&1; then
 			AC_MSG_CHECKING("Solaris native compiler")
-			if test "$CC" = "cc" -a `which cc` = "/usr/ucb/cc"; then
+			if test "$CC" = "cc" -a "`which cc`" = "/usr/ucb/cc"; then
 				AC_MSG_RESULT(yes; adding compiler option for ANSI support)
 				CC="$CC -Xa"
 			else

@@ -1,8 +1,9 @@
 Current Version: @@VERSION@@
 
-ctags-5.2.4 (Thu Mar 06 2002)
+ctags-5.2.4 (Sun Apr 14 2002)
 * Added support for RISC OS platform, contributed by Andrew Wingate.
 * Added support for "#pragma weak", generating macro tags for weak symbols [C].
+* Fixed bug in configure script [Solaris, Bug #542966].
 * Fixed invalid package name tags [Perl].
 * Fixed spurious tag for clients portion of feature clause when following
   an empty feature clause [Eiffel].
