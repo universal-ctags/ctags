@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.3.1 (Wed Sep 04 2002)
+ctags-5.3.1 (Thu Sep 12 2002)
 * Renamed tagsSetSorted() to tagsSetSortType() and "sorted" member of
   tagFileInfo structure of readtags library to "sort".
 * Added new function, tagsFirst() to readtags library.
