@@ -25,13 +25,16 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
+    K_NONE = -1,
     K_SUBROUTINE,
-    K_PACKAGE
+    K_PACKAGE,
+    K_CONSTANT
 } perlKind;
 
 static kindOption PerlKinds [] = {
     { TRUE, 's', "subroutine", "subroutines" },
-    { TRUE, 'p', "package",    "packages" }
+    { TRUE, 'p', "package",    "packages" },
+    { TRUE, 'c', "constant",   "constants" }
 };
 
 /*
@@ -78,11 +81,11 @@ static void findPerlTags (void)
     vString *name = vStringNew ();
     boolean skipPodDoc = FALSE;
     const unsigned char *line;
-    perlKind kind;
 
     while ((line = fileReadLine ()) != NULL)
     {
 	const unsigned char *cp = line;
+	perlKind kind = K_NONE;
 
 	if (skipPodDoc)
 	{
@@ -105,24 +108,40 @@ static void findPerlTags (void)
 	while (isspace (*cp))
 	    cp++;
 
-	if (strncmp((const char*) cp, "sub", (size_t) 3) == 0 ||
-	    strncmp((const char*) cp, "package", (size_t) 7) == 0)
+	if (strncmp((const char*) cp, "sub", (size_t) 3) == 0)
 	{
-	    if (strncmp((const char*) cp, "sub", (size_t) 3) == 0)
+	    cp += 3;
+	    kind = K_SUBROUTINE;
+	}
+	else if (strncmp((const char*) cp, "use", (size_t) 3) == 0)
+	{
+	    cp += 3;
+	    if (!isspace(*cp))
+		continue;
+	    while (*cp && isspace(*cp))
+		++cp;
+	    if (strncmp((const char*) cp, "constant", (size_t) 8) != 0)
 	    {
-	    	cp += 3;
-		kind = K_SUBROUTINE;
-	    } else {
-	    	cp += 7;
-		kind = K_PACKAGE;
+		cp += 8;
+		continue;
 	    }
+	    cp += 8;
+	    kind = K_CONSTANT;
+	}
+	else if (strncmp((const char*) cp, "package", (size_t) 7) == 0)
+	{
+	    cp += 7;
+	    kind = K_PACKAGE;
+	}
+	if (kind != K_NONE)
+	{
 	    if (!isspace(*cp))		/* woops, not followed by a space */
 	        continue;
 
 	    while (isspace (*cp))
 		cp++;
 	    while (! isspace ((int) *cp) && *cp != '\0' &&
-		   strchr ("{(;", (int) *cp) == NULL)
+		   strchr ("{(;=", (int) *cp) == NULL)
 	    {
 		vStringPut (name, (int) *cp);
 		cp++;

@@ -2,6 +2,7 @@ Current Version: @@VERSION@@
 
 ctags-5.5.3 (Mon Feb 16 2004)
 * Removed forgotten debug statement [Bug #811704].
+* Added support for Perl "use constant" [Perl, Patch #853704].
 * Fixed problem destroying tag file with certain info options [Bug #845502].
 * Fixed portability problem [DJGPP].
 * Fixed problem of double characters in signature field [C, Bug #852368].
