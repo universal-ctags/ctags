@@ -23,61 +23,14 @@ feature -- Initialization
 
 	make (args: ARRAY [STRING]) is
 			-- Root creation
-		local
-			i, j: INTEGER
-			arg: STRING
 		do
-			from
-				set_program_name (args.item (0))
-				if args.upper = 0 then
-					io.error.put_string (usage)
-					exceptions.die (1)
-				end
-				set_default_options
-				i := 1
-			until
-				i > args.upper
-			loop
-				arg := args.item (i)
-				if arg.item (1) /= '-' then
-					find_tag (arg)
-				else
-					from j := 2 until j > arg.count loop
-						inspect arg.item (j)
-						when 'e' then showing_extension_fields := True
-						when 'i' then ignoring_case := True
-						when 'p' then partial_matching := True
-						when 'l' then list_tags
-						when 't' then
-							if j < arg.count then
-								tag_file_name := arg.substring (j+1, arg.count)
-								j := arg.count
-							elseif i < args.upper then
-								i := i + 1
-								tag_file_name := args.item (i)
-							else
-								io.error.put_string (usage)
-								exceptions.die (1)
-							end
-						when 's' then
-							sort_override := True
-							j := j + 1
-							if j > arg.count then
-								sort_type := Sort_case_sensitive
-							elseif arg.item (j).is_digit then
-								sort_type := arg.item (j).code - ('0').code
-							else
-								io.error.put_string (usage)
-								exceptions.die (1)
-							end
-						else
-							report_unknown_option (arg.item (j))
-						end
-						j := j + 1
-					end
-				end
-				i := i + 1
+			set_program_name (args.item (0))
+			if args.upper = 0 then
+				io.error.put_string (usage)
+				exceptions.die (1)
 			end
+			set_default_options
+			parse_command_line (args)
 		end
 
 feature {NONE} -- Implmentation
@@ -148,6 +101,57 @@ feature {NONE} -- Implmentation
 			tag_file_name := "tags"
 		end
 
+	parse_command_line (args: ARRAY [STRING]) is
+		local
+			i, j: INTEGER
+			arg: STRING
+			action_supplied: BOOLEAN
+		do
+			from i := 1 until i > args.upper loop
+				arg := args.item (i)
+				if arg.item (1) /= '-' then
+					find_tag (arg)
+					action_supplied := True
+				else
+					from j := 2 until j > arg.count loop
+						inspect arg.item (j)
+						when 'e' then showing_extension_fields := True
+						when 'i' then ignoring_case := True
+						when 'p' then partial_matching := True
+						when 'l' then list_tags; action_supplied := True
+						when 't' then
+							if j < arg.count then
+								tag_file_name := arg.substring (j+1, arg.count)
+								j := arg.count
+							elseif i < args.upper then
+								i := i + 1
+								tag_file_name := args.item (i)
+							else
+								io.error.put_string (usage)
+								exceptions.die (1)
+							end
+						when 's' then
+							sort_override := True
+							j := j + 1
+							if j > arg.count then
+								sort_type := Sort_case_sensitive
+							elseif arg.item (j).is_digit then
+								sort_type := arg.item (j).code - ('0').code
+							else
+								io.error.put_string (usage)
+								exceptions.die (1)
+							end
+						else
+							report_unknown_option (arg.item (j))
+						end
+						j := j + 1
+					end
+				end
+				i := i + 1
+			end
+			if not action_supplied then report_no_action end
+		end
+
 	report_unknown_option (switch: CHARACTER) is
 			-- Report `switch' as unknown option
 		do
@@ -155,6 +159,15 @@ feature {NONE} -- Implmentation
 			io.error.put_string (": unknown option: ")
 			io.error.put_character (switch)
 			io.error.put_character ('%N')
+			exceptions.die (1)
+		end
+
+	report_no_action is
+			-- Report `switch' as unknown option
+		do
+			io.error.put_string (program_name)
+			io.error.put_string (
+				": no action specified: specify tag name(s) or -l option%N")
 			exceptions.die (1)
 		end
 
@@ -193,6 +206,8 @@ feature {NONE} -- Implmentation
 			if not file.open then
 				io.error.put_string (program_name)
 				io.error.put_string (": cannot open tag file: ")
+				io.error.put_string (file.error_description)
+				io.error.put_string (": ")
 				io.error.put_string (tag_file_name)
 				io.error.put_character ('%N')
 				exceptions.die (1)

@@ -28,6 +28,8 @@ feature -- Initialization
 		require
 			name_not_empty: nm /= Void and then not nm.is_empty
 		do
+			format := Format_extended
+			sort_type := Sort_case_sensitive
 			create tag_file_info_struct.make_filled ('%U', tag_file_info_size)
 			create tag_entry_struct.make_filled ('%U', tag_entry_size)
 			handle := c_tags_open (
@@ -45,7 +47,13 @@ feature -- Initialization
 					c_program_url (string_to_c (tag_file_info_struct)))
 				program_version := string_from_c (
 					c_program_version (string_to_c (tag_file_info_struct)))
+			else
+				error_number := c_file_error_number (
+					string_to_c (tag_file_info_struct))
+				error_description := string_from_c (c_strerror (error_number))
 			end
+		ensure
+			opened: open or else (error_number > 0 and error_description /= Void)
 		end
 
 feature -- Access
@@ -73,6 +81,12 @@ feature -- Status report
 	open: BOOLEAN
 			-- Is the tag file open? If this is false, then the system "errno"
 			-- variable may be examined to determine the cause.
+
+	error_number: INTEGER
+			-- Value of errno of O/S when creation of `Current' fails
+
+	error_description: STRING
+			-- Value of errno of O/S when creation of `Current' fails
 
 	off: BOOLEAN
 			-- Is there another tag after this one?
@@ -273,6 +287,13 @@ feature {NONE} -- Implementation
 
 feature {NONE} -- Externals
 
+	c_strerror (errnum: INTEGER): POINTER is
+		external
+			"C (int): char* | <errno.h>"
+		alias
+			"strerror"
+		end
+
 	tag_file_info_size: INTEGER is
 		external
 			"C [macro %"readtags.h%"] (): long"
@@ -390,6 +411,20 @@ feature {NONE} -- Externals
 			"C (tagFile*): tagResult | %"readtags.h%""
 		alias
 			"tagsClose"
+		end
+
+	c_file_opened (p: POINTER): BOOLEAN is
+		external
+			"C [struct %"readtags.h%"] (tagFileInfo): int"
+		alias
+			"status.opened"
+		end
+
+	c_file_error_number (p: POINTER): INTEGER is
+		external
+			"C [struct %"readtags.h%"] (tagFileInfo): int"
+		alias
+			"status.error_number"
 		end
 
 	c_file_format (p: POINTER): INTEGER is
