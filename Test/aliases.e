@@ -1,4 +1,4 @@
-class ALIAS
+class ALIASES
 
 feature -- One
 
