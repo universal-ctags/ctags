@@ -1,4 +1,4 @@
-Begin3
+Begin4
 Title:		Exuberant Ctags
 Version:	@@VERSION@@
 Entered-date:	@@LSMDATE@@
@@ -7,12 +7,12 @@ Keywords:	tag tags ctags etags ftags ptags Exuberant Assembler ASP AWK
 		Bourne sh BETA C C++ COBOL Eiffel Fortran Java Korn ksh Lisp
 		Lua Makefile Pascal Perl PHP Python REXX Ruby Scheme SLang
 		S-Lang Tcl Vim tool utility source index zsh
-Author:		dhiebert at users.sourceforge.net (Darren Hiebert)
-Primary-site:	http://ctags.sourceforge.net
-		220kB ctags-@@VERSION@@.tar.gz
+Author:		dhiebert@users.sourceforge.net (Darren Hiebert)
+Maintained-by:  dhiebert@users.sourceforge.net (Darren Hiebert)
+Primary-site:	http://prdownloads.sourceforge.net/ctags
+		216K ctags-@@VERSION@@.tar.gz
 Original-site:	http://ctags.sourceforge.net
-		220kB archives/ctags-@@VERSION@@.tar.gz
 Platforms:	UNIX, MSDOS, Windows 95/98/NT, OS/2, QNX, Amiga, QDOS, VMS,
 		Macintosh, Cray
-Copying-policy: GNU General Public License
+Copying-policy: Gnu General Public License (GPL)
 End

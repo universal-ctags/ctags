@@ -201,6 +201,9 @@ cvs-files:
 #
 # Release management
 #
+ctags-%.lsm: ctags.lsm
+	sed -e "s/@@VERSION@@/$*/" -e "s/@@LSMDATE@@/`date +'%Y-%m-%d'`/" $< > $@
+
 ctags-%.tar.gz: $(UNIX_FILES) $(VERSION_FILES)
 	@ echo "---------- Building tar ball"
 	if [ -d ctags-$* ] ;then rm -fr ctags-$** ;fi
@@ -209,7 +212,7 @@ ctags-%.tar.gz: $(UNIX_FILES) $(VERSION_FILES)
 	for file in $(VERSION_FILES) ;do \
 		rm -f ctags-$*/$${file} ;\
 		sed -e "s/@@VERSION@@/$*/" \
-		    -e "s/@@LSMDATE@@/`date +'%d%b%y' | tr 'a-z' 'A-Z'`/" \
+		    -e "s/@@LSMDATE@@/`date +'%Y-%m-%d'`/" \
 			$${file} > ctags-$*/$${file} ;\
 	done
 	chmod 644 ctags-$*/*
