@@ -243,9 +243,19 @@ TEST_ARTIFACTS = test.*.diff tags.ref tags.test
 status:
 	@ cvs -n -q update
 
-cvs-tag-%:
+cvs-retag-%: CVS_TAG_OPTIONS := -F
+
+cvs-tag-% cvs-retag-%: cvs-tagcheck-%
 	@ echo "---------- Tagging release `echo $* | sed 's/\./_/g'`"
 	@ cvs tag -c $(CVS_TAG_OPTIONS) Ctags-`echo $* | sed 's/\./_/g'`
+
+cvs-tagcheck-%:
+	@ if test -z "$(CVS_TAG_OPTIONS)"; then \
+		if cvs update -p -r Ctags-`echo $* | sed 's/\./_/g'` maintainer.mak >/dev/null 2>&1 ;then \
+			echo "release-$* already exists; use rerelease-$*" >&2 ;\
+			exit 1 ;\
+		fi ;\
+	fi
 
 cvs-files:
 	@ls -1 $(CVS_FILES)
@@ -332,7 +342,7 @@ cleanrelease-%:
 	rm -f $(RPM_ROOT)/SRPMS/ctags-$*-1.src.rpm
 	rm -f $(RPM_ROOT)/SPECS/ctags-$*.spec
 
-release-%: cvs-tag-% ctags-%.tar.gz ctags-%.tar.Z dos-% rpm-%
+internal-release-%: ctags-%.tar.gz ctags-%.tar.Z dos-% rpm-%
 	@ echo "---------- Copying files to web archive"
 	cp -p ctags-$*.tar.* $(WEB_ARCHIVE_DIR)
 	cp -p EXTENDING.html $(WEB_CTAGS_DIR)
@@ -344,9 +354,9 @@ release-%: cvs-tag-% ctags-%.tar.gz ctags-%.tar.Z dos-% rpm-%
 	chmod o+r $(WEB_ARCHIVE_DIR)/*
 	@ echo "---------- Release $* completed"
 
-rerelease-%: CVS_TAG_OPTIONS := -F
+release-%: cvs-tag-% internal-release-%
 
-rerelease-%: release-%
+rerelease-%: cvs-retag-% internal-release-%
 
 #
 # Dependency file generation
