@@ -253,15 +253,24 @@ static void reportType (tokenInfo *const token)
 
 static int fileGetc (void)
 {
-    const int result = getc (File);
-    if (Debug > 0  &&  result != EOF)
-	putc (result, stderr);
-    return result;
+    int c = getc (File);
+    if (c == '\r')
+    {
+	c = getc (File);
+	if (c != '\n')
+	{
+	    ungetc (c, File);
+	    c = '\n';
+	}
+    }
+    if (Debug > 0  &&  c != EOF)
+	putc (c, stderr);
+    return c;
 }
 
 static int fileUngetc (c)
 {
-    return ungetc(c, File);
+    return ungetc (c, File);
 }
 
 extern char *readLine (vString *const vLine, FILE *const fp)
