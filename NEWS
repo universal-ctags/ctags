@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.4 (Tue Oct 15 2002)
+ctags-5.4 (Wed Oct 16 2002)
 * Improved ability for tagsOpen() in readtags library to report failure to
   open tag file, adding new fields to tagFileInfo structure.
 * Added '$' a valid character for C identifier [VMS].
@@ -12,6 +12,7 @@ ctags-5.4 (Tue Oct 15 2002)
 * Added support for Vera language, inspired by Dave Eggum [Vera].
 * Fixed inverted test causing TMPDIR to be used for temporary files when
   ctags is setuid instead of when not setuid [Bug #623713].
+* Fixed problem with double precision functions [Fortran, Bug #620288].
 * Fixed problem terminating Perl POD block [Perl, Bug #612019].
 * Fixed problem with leading spaces before instruction [TCL, Bug #615928].
 

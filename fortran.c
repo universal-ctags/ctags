@@ -983,7 +983,9 @@ static void parseTypeSpec (tokenInfo *const token)
 
 	case KEYWORD_double:
 	    readToken (token);
-	    if (! isKeyword (token, KEYWORD_precision))
+	    if (isKeyword (token, KEYWORD_precision))
+		readToken (token);
+	    else
 		skipToToken (token, TOKEN_STATEMENT_END);
 	    break;
 
