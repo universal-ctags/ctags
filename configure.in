@@ -168,10 +168,26 @@ esac
 AC_PROG_LN_S
 AC_CHECK_PROG(STRIP, strip, strip, :)
 
+
+dnl Checks for operating environment
+dnl --------------------------------
+
+dnl Check whether system supports #! scripts
 AC_SYS_INTERPRETER
 if test yes = "$interpval"; then
 	AC_DEFINE(SYS_INTERPRETER)
 fi
+
+dnl Test for case-insensitive filenames
+AC_MSG_CHECKING("for case-insensitive filenames")
+touch conftest.cif
+if test -f CONFTEST.CIF; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(CASE_INSENSITIVE_FILENAMES)
+else
+	AC_MSG_RESULT(no)
+fi
+rm -f conftest.cif
 
 
 dnl Checks for header files
@@ -233,6 +249,7 @@ AC_MSG_RESULT($have_st_ino)
 if test yes = "$have_st_ino"; then
 	AC_DEFINE(HAVE_STAT_ST_INO)
 fi
+
 
 dnl Checks for library functions
 dnl ----------------------------

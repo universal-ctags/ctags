@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.5 (Sun Feb 23 2003)
+ctags-5.5 (Tue Feb 25 2003)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
 * Removed explicit descriptions of individual --<LANG>-types options from
   --help output. See new --list-languages and --list-kinds options.
@@ -20,6 +20,7 @@ ctags-5.5 (Sun Feb 23 2003)
 * Added '$', 'D', and 'd' in column 1 as comment characters [Fortran].
 * Added special handling of --options=NONE to disable automatic reading of
   options from configuration files or environment.
+* Added check for case-insensitive filenames to configure.
 * Fixed problem with lower case <SID> tag [Vim, Bug #657327].
 * Fixed problem recognizing indented code [Vim, Patch #664685].
 * Fixed problem with infinite loop in certain comments [PL/SQL, Bug #629115].

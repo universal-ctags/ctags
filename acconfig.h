@@ -72,6 +72,10 @@
  */
 #undef SYS_INTERPRETER
 
+/*  Define this label if your system uses case-insensitive file names
+ */
+#undef CASE_INSENSITIVE_FILENAMES
+
 /*  Define this label to use the system sort utility (which is probably more
  *  efficient) over the internal sorting algorithm.
  */
