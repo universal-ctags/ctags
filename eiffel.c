@@ -239,7 +239,7 @@ static void makeEiffelFeatureTag (tokenInfo *const token)
 
 	makeTagEntry (&e);
 
-	if (Option.qualifiedTags)
+	if (Option.include.qualifiedTags)
 	{
 	    vString* qualified = vStringNewInit (vStringValue (token->className));
 	    vStringPut (qualified, '.');

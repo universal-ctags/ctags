@@ -140,7 +140,6 @@ optionValues Option = {
     TRUE,		/* --links */
     FALSE,		/* --filter */
     NULL,		/* --filter-terminator */
-    FALSE,		/* --qualified-tags */
     FALSE,		/* --tag-relative */
     FALSE,		/* --totals */
     FALSE,		/* --line-directives */

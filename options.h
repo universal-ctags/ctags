@@ -91,7 +91,6 @@ typedef struct sOptionValues {
     boolean followLinks;    /* --link  follow symbolic links? */
     boolean filter;	    /* --filter  behave as filter: files in, tags out */
     char* filterTerminator; /* --filter-terminator  string to output */
-    boolean qualifiedTags;  /* --qualified-tags include class-qualified tag */
     boolean tagRelative;    /* --tag-relative file paths relative to tag file */
     boolean printTotals;    /* --totals  print cumulative statistics */
     boolean lineDirectives; /* --linedirectives  process #line directives */
