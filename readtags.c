@@ -41,7 +41,7 @@ typedef struct {
 *   DATA DEFINITIONS
 */
 const char* const EmptyString = "";
-const char* const PsuedoTagPrefix = "!_";
+const char* const PseudoTagPrefix = "!_";
 const char* TagFileName = "tags";
 
 /* Information about current tag file */
@@ -318,10 +318,10 @@ static void parseTagLine (tagEntry *const entry)
     }
 }
 
-static void readPsuedoTags (tagFileInfo *const info)
+static void readPseudoTags (tagFileInfo *const info)
 {
     fpos_t startOfLine;
-    size_t prefixLength = strlen (PsuedoTagPrefix);
+    size_t prefixLength = strlen (PseudoTagPrefix);
     while (1)
     {
 	const char *key, *value;
@@ -329,7 +329,7 @@ static void readPsuedoTags (tagFileInfo *const info)
 	fgetpos (File.fp, &startOfLine);
 	if (! readTagLine ())
 	    break;
-	if (strncmp (File.line.buffer, PsuedoTagPrefix, prefixLength) != 0)
+	if (strncmp (File.line.buffer, PseudoTagPrefix, prefixLength) != 0)
 	    break;
 	else
 	{
@@ -385,7 +385,7 @@ static tagResult initialize (const char *filePath, tagFileInfo *info)
 	rewind (File.fp);
 	if (info != NULL)
 	{
-	    /* read psuedo tags into 'info' */
+	    /* read pseudo tags into 'info' */
 	    info->file.format     = 1;
 	    info->file.sorted     = 0;
 	    info->program.author  = EmptyString;
@@ -393,7 +393,7 @@ static tagResult initialize (const char *filePath, tagFileInfo *info)
 	    info->program.url     = EmptyString;
 	    info->program.version = EmptyString;
 	}
-	readPsuedoTags (info);
+	readPseudoTags (info);
 	File.initialized = 1;
 	result = TagSuccess;
     }
