@@ -121,7 +121,7 @@ static void findVimTags (void)
 	    {
 		while (isspace ((int) *cp))
 		    ++cp; 
-		if (strncmp ((const char*) cp, "end", (size_t) 3) != 0)
+		if (strncasecmp ((const char*) cp, "end", (size_t) 3) != 0)
 		{    
 		    do
 		    {
