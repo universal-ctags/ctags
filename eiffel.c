@@ -306,6 +306,8 @@ static vString *parseInteger (int c)
 	string = vStringNew ();
     vStringClear (string);
 
+    if (c == '\0')
+	c = fileGetc ();
     if (c == '-')
     {
 	vStringPut (string, c);
@@ -566,7 +568,10 @@ getNextChar:
 	case '-':
 	    c = fileGetc ();
 	    if (c != '-')		/* is this the start of a comment? */
+	    {
 		fileUngetc (c);
+		token->type = TOKEN_OPERATOR;
+	    }
 	    else
 	    {
 		skipToCharacter ('\n');
@@ -687,7 +692,7 @@ static void skipPastMatchingBracket (tokenInfo *const token)
     } while (depth > 0);
 }
 
-static void skipEntityType (tokenInfo *const token)
+static void parseEntityType (tokenInfo *const token)
 {
     /*  When called, we are at the ':'. Move to the type.
      */
@@ -722,7 +727,7 @@ static void parseLocal (tokenInfo *const token)
 
 	readToken (token);
 	if (isType (token, TOKEN_COLON))
-	    skipEntityType (token);
+	    parseEntityType (token);
     }
 }
 
@@ -733,6 +738,9 @@ static void findFeatureEnd (tokenInfo *const token)
     switch (token->keyword)
     {
 	default:
+	    if (isType (token, TOKEN_OPERATOR)) /* sign of manifest constant */
+		readToken (token);
+	    readToken (token);
 	    break;
 
 	case KEYWORD_deferred:
@@ -779,6 +787,8 @@ static boolean readFeatureName (tokenInfo *const token)
 {
     boolean isFeatureName = FALSE;
 
+    if (isKeyword (token, KEYWORD_frozen))
+	readToken (token);
     if (isType (token, TOKEN_IDENTIFIER))
 	isFeatureName = TRUE;
     else if (isKeyword (token, KEYWORD_infix)  ||
@@ -793,53 +803,54 @@ static boolean readFeatureName (tokenInfo *const token)
 
 static void parseFeature (tokenInfo *const token)
 {
-    do
+    boolean found = FALSE;
+    while (readFeatureName (token))
     {
-	if (readFeatureName (token))
-	    makeEiffelFeatureTag (token);
+	found = TRUE;
+	makeEiffelFeatureTag (token);
 	readToken (token);
-    } while (isType (token, TOKEN_COMMA));
-
-
-    /*  Skip signature.
-     */
-    if (isType (token, TOKEN_OPEN_PAREN))	/* arguments? */
-	locateToken (token, TOKEN_CLOSE_PAREN);
-    if (isType (token, TOKEN_COLON))		/* a query? */
-	skipEntityType (token);
-
-    if (isKeyword (token, KEYWORD_is))
-	findFeatureEnd (token);
+	if (isType (token, TOKEN_COMMA))
+	    readToken (token);
+    }
+    if (found)
+    {
+	if (isType (token, TOKEN_OPEN_PAREN))		/* arguments? */
+	    locateToken (token, TOKEN_CLOSE_PAREN);
+	if (isType (token, TOKEN_COLON))		/* a query? */
+	    parseEntityType (token);
+	if (isKeyword (token, KEYWORD_obsolete))
+	{
+	    readToken (token);
+	    if (isType (token, TOKEN_STRING))
+		readToken (token);
+	}
+	if (isKeyword (token, KEYWORD_is))
+	    findFeatureEnd (token);
+    }
 }
 
 static void parseExport (tokenInfo *const token)
 {
     token->isExported = TRUE;
-
     readToken (token);
-    if (isType (token, TOKEN_OPEN_BRACE)) do
+    if (isType (token, TOKEN_OPEN_BRACE))
     {
-	readToken (token);
-	if (isType (token, TOKEN_CLOSE_BRACE))
+	token->isExported = FALSE;
+	while (! isType (token, TOKEN_CLOSE_BRACE))
 	{
-	    token->isExported = FALSE;
+	    if (isType (token, TOKEN_IDENTIFIER))
+		token->isExported |= !isIdentifierMatch (token, "NONE");
 	    readToken (token);
 	}
-	else
-	{
-	    if (isIdentifierMatch (token, "NONE"))
-		token->isExported = FALSE;
-	    locateToken (token, TOKEN_CLOSE_BRACE);
-	}
-    } while (isType (token, TOKEN_COMMA));
+	readToken (token);
+    }
 }
 
-static void locateKeyword (tokenInfo *const token, const keywordId keyword)
+static void skipKeyword (tokenInfo *const token, const keywordId keyword)
 {
     do
 	readToken (token);
     while (! isKeyword (token, keyword));
-
     readToken (token);
 }
 
@@ -847,7 +858,7 @@ static void parseFeatureClauses (tokenInfo *const token)
 {
     do
     {
-	while (isKeyword (token, KEYWORD_feature))
+	if (isKeyword (token, KEYWORD_feature))
 	    parseExport (token);
 	parseFeature (token);
     } while (! isKeyword (token, KEYWORD_end) &&
@@ -875,7 +886,7 @@ static void parseRename (tokenInfo *const token)
     } while (isType (token, TOKEN_COMMA));
 
     if (! isKeyword (token, KEYWORD_end))
-	locateKeyword (token, KEYWORD_end);
+	skipKeyword (token, KEYWORD_end);
 }
 
 static void parseInherit (tokenInfo *const token)
@@ -895,7 +906,7 @@ static void parseInherit (tokenInfo *const token)
 	    case KEYWORD_undefine:
 	    case KEYWORD_redefine:
 	    case KEYWORD_select:
-		locateKeyword (token, KEYWORD_end);
+		skipKeyword (token, KEYWORD_end);
 		break;
 
 	    case KEYWORD_end:
@@ -964,7 +975,7 @@ static void findEiffelTags (void)
     exception = (exception_t) (setjmp (Exception));
     while (exception == ExceptionNone)
     {
-	locateKeyword (token, KEYWORD_class);
+	skipKeyword (token, KEYWORD_class);
 	parseClass (token);
     }
     deleteToken (token);
