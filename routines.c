@@ -130,9 +130,13 @@
 # if defined (_MSC_VER)
 #  define stat    _stat
 #  define getcwd  _getcwd
+#  define currentdrive() (_getdrive() + 'A' - 1)
 #  define PATH_MAX  _MAX_PATH
 # elif defined (__BORLANDC__)
 #  define PATH_MAX  MAXPATH
+#  define currentdrive() (getdisk() + 'A')
+# else
+#  define currentdrive() 'C'
 # endif
 #endif
 
@@ -468,22 +472,6 @@ extern boolean isRecursiveLink (const char* const dirName)
     return result;
 }
 
-extern boolean isSameFile (const char *const name1, const char *const name2)
-{
-    boolean result = FALSE;
-#if defined (HAVE_STAT_ST_INO)
-    struct stat stat1, stat2;
-
-    if (stat (name1, &stat1) == 0  &&  stat (name2, &stat2) == 0)
-	result = (boolean) (stat1.st_ino == stat2.st_ino);
-#elif defined (CASE_INSENSITIVE_FILENAMES)
-    result = (boolean) (strcasecmp (name1, name2) == 0);
-#else
-    result = (boolean) (strcmp (name1, name2) == 0);
-#endif
-    return result;
-}
-
 #ifndef HAVE_FGETPOS
 
 extern int fgetpos (FILE *stream, fpos_t *pos)
@@ -507,6 +495,57 @@ extern int fsetpos (FILE *stream, fpos_t const *pos)
 /*
  *  Pathname manipulation (O/S dependent!!!)
  */
+
+static boolean isPathSeparator (const int c)
+{
+    boolean result;
+#if defined (MSDOS_STYLE_PATH) || defined (VMS)
+    result = (boolean) (strchr (PathDelimiters, c) != NULL);
+#else
+    result = (boolean) (c == PATH_SEPARATOR);
+#endif
+    return result;
+}
+
+#if ! defined (HAVE_STAT_ST_INO)
+
+static void canonicalizePath (char *const path __unused__)
+{
+#if defined (MSDOS_STYLE_PATH)
+    char *p;
+    for (p = path  ;  *p != '\0'  ;  ++p)
+	if (isPathSeparator (*p)  &&  *p != ':')
+	    *p = PATH_SEPARATOR;
+#endif
+}
+
+#endif
+
+extern boolean isSameFile (const char *const name1, const char *const name2)
+{
+    boolean result = FALSE;
+#if defined (HAVE_STAT_ST_INO)
+    struct stat stat1, stat2;
+
+    if (stat (name1, &stat1) == 0  &&  stat (name2, &stat2) == 0)
+	result = (boolean) (stat1.st_ino == stat2.st_ino);
+#else
+    {
+	char *const n1 = absoluteFilename (name1);
+	char *const n2 = absoluteFilename (name2);
+	canonicalizePath (n1);
+	canonicalizePath (n2);
+# if defined (CASE_INSENSITIVE_FILENAMES)
+	result = (boolean) (strcasecmp (n1, n2) == 0);
+#else
+	result = (boolean) (strcmp (n1, n2) == 0);
+#endif
+	free (n1);
+	free (n2);
+    }
+#endif
+    return result;
+}
 
 extern const char *baseFilename (const char *const filePath)
 {
@@ -565,11 +604,11 @@ extern boolean isAbsolutePath (const char *const path)
 {
     boolean result = FALSE;
 #if defined (MSDOS_STYLE_PATH)
-    if (strchr (PathDelimiters, path [0]) != NULL)
+    if (isPathSeparator (path [0]))
 	result = TRUE;
     else if (isalpha (path [0])  &&  path [1] == ':')
     {
-	if (strchr (PathDelimiters, path [2]) != NULL)
+	if (isPathSeparator (path [2]))
 	    result = TRUE;
 	else
 	    /*  We don't support non-absolute file names with a drive
@@ -582,9 +621,57 @@ extern boolean isAbsolutePath (const char *const path)
 #elif defined (VMS)
     result = (boolean) (strchr (path, ':') != NULL);
 #else
-    result = (boolean) (path [0] == PATH_SEPARATOR);
+    result = isPathSeparator (path [0]);
 #endif
     return result;
+}
+
+extern vString *combinePathAndFile (
+    const char *const path, const char *const file)
+{
+    vString *const filePath = vStringNew ();
+#ifdef VMS
+    const char *const directoryId = strstr (file, ".DIR;1");
+
+    if (directoryId == NULL)
+    {
+	const char *const versionId = strchr (file, ';');
+
+	vStringCopyS (filePath, path);
+	if (versionId == NULL)
+	    vStringCatS (filePath, file);
+	else
+	    vStringNCatS (filePath, file, versionId - file);
+	vStringCopyToLower (filePath, filePath);
+    }
+    else
+    {
+	/*  File really is a directory; append it to the path.
+	 *  Gotcha: doesn't work with logical names.
+	 */
+	vStringNCopyS (filePath, path, strlen (path) - 1);
+	vStringPut (filePath, '.');
+	vStringNCatS (filePath, file, directoryId - file);
+	if (strchr (path, '[') != NULL)
+	    vStringPut (filePath, ']');
+	else
+	    vStringPut (filePath, '>');
+	vStringTerminate (filePath);
+    }
+#else
+    const int lastChar = path [strlen (path) - 1];
+    boolean terminated = isPathSeparator (lastChar);
+
+    vStringCopyS (filePath, path);
+    if (! terminated)
+    {
+	vStringPut (filePath, OUTPUT_PATH_SEPARATOR);
+	vStringTerminate (filePath);
+    }
+    vStringCatS (filePath, file);
+#endif
+
+    return filePath;
 }
 
 /* Return a newly-allocated string whose contents concatenate those of
@@ -612,9 +699,22 @@ extern char* absoluteFilename (const char *file)
 {
     char *slashp, *cp;
     char *res = NULL;
-
     if (isAbsolutePath (file))
+    {
+#ifdef MSDOS_STYLE_PATH
+	if (file [1] == ':')
+	    res = eStrdup (file);
+	else
+	{
+	    char drive [3];
+	    sprintf (drive, "%c:", currentdrive ());
+	    res = concat (drive, file, "");
+	}
+printf ("absolute of %s = %s\n", file, res);
+#else
 	res = eStrdup (file);
+#endif
+    }
     else
 	res = concat (CurrentDirectory, file, "");
 
@@ -669,7 +769,7 @@ extern char* absoluteFilename (const char *file)
 }
 
 /* Return a newly allocated string containing the absolute file name of dir
- * where FILE resides given CWD (which should end with a slash).
+ * where `file' resides given `CurrentDirectory'.
  * Routine adapted from Gnu etags.
  */
 extern char* absoluteDirname (char *file)

@@ -23,7 +23,6 @@
 /*
 *   FUNCTION PROTOTYPES
 */
-extern vString *combinePathAndFile (const char *const path, const char *const file);
 extern void addTotals (const unsigned int files, const long unsigned int lines, const long unsigned int bytes);
 extern boolean isDestinationStdout (void);
 extern void processExcludeOption (const char *const option, const char *const parameter);

@@ -114,58 +114,6 @@ static boolean createTagsForEntry (const char *const entryName);
 *   FUNCTION DEFINITIONS
 */
 
-extern vString *combinePathAndFile (
-    const char *const path, const char *const file)
-{
-    vString *const filePath = vStringNew ();
-#ifdef VMS
-    const char *const directoryId = strstr (file, ".DIR;1");
-
-    if (directoryId == NULL)
-    {
-	const char *const versionId = strchr (file, ';');
-
-	vStringCopyS (filePath, path);
-	if (versionId == NULL)
-	    vStringCatS (filePath, file);
-	else
-	    vStringNCatS (filePath, file, versionId - file);
-	vStringCopyToLower (filePath, filePath);
-    }
-    else
-    {
-	/*  File really is a directory; append it to the path.
-	 *  Gotcha: doesn't work with logical names.
-	 */
-	vStringNCopyS (filePath, path, strlen (path) - 1);
-	vStringPut (filePath, '.');
-	vStringNCatS (filePath, file, directoryId - file);
-	if (strchr (path, '[') != NULL)
-	    vStringPut (filePath, ']');
-	else
-	    vStringPut (filePath, '>');
-	vStringTerminate (filePath);
-    }
-#else
-    const int lastChar = path [strlen (path) - 1];
-# ifdef MSDOS_STYLE_PATH
-    boolean terminated = (boolean) (strchr (PathDelimiters, lastChar) != NULL);
-# else
-    boolean terminated = (boolean) (lastChar == PATH_SEPARATOR);
-# endif
-
-    vStringCopyS (filePath, path);
-    if (! terminated)
-    {
-	vStringPut (filePath, OUTPUT_PATH_SEPARATOR);
-	vStringTerminate (filePath);
-    }
-    vStringCatS (filePath, file);
-#endif
-
-    return filePath;
-}
-
 extern void addTotals (
 	const unsigned int files, const long unsigned int lines,
 	const long unsigned int bytes)

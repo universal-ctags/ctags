@@ -120,6 +120,7 @@ extern int fsetpos  (FILE *stream, fpos_t *pos);
 extern const char *baseFilename (const char *const filePath);
 extern const char *fileExtension (const char *const fileName);
 extern boolean isAbsolutePath (const char *const path);
+extern vString *combinePathAndFile (const char *const path, const char *const file);
 extern char* absoluteFilename (const char *file);
 extern char* absoluteDirname (char *file);
 extern char* relativeFilename (const char *file, const char *dir);
