@@ -1,13 +1,16 @@
 Current Version: @@VERSION@@
 
-ctags-5.5 (Wed Jan 20 2003)
+ctags-5.5 (Thu Jan 30 2003)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
 * Added support for dimensioned variables, contributed by Simon Bohlin [ASP].
 * Added support for C# language.
+* Added support for Erlang language, contributed by Emil.
 * Added support for SML (Standard ML) language, contributed by Venkatesh Prasad.
+* Added tags for autocommand groups [Vim, Patch #664685].
 * Added special handling of --options=NONE to disable automatic reading of
   options from configuration files or environment.
 * Fixed problem with lower case <SID> tag [Vim, Bug #657327].
+* Fixed problem recognizing indented code [Vim, Patch #664685].
 * Fixed problem with infinite loop in certain comments [PL/SQL, Bug #629115].
 * Fixed problem of incorrect extension field [C. Bug #639639].
 * Fixed problem of empty scoping extension field [C. Bug #639644].

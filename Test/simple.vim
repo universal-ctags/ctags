@@ -6,3 +6,11 @@ endf
 
 function! Foo(arg)
 endfunction
+
+    fu IndentedFunction(arg)
+    endf
+
+augroup uncompress
+  au!
+  au BufEnter *.gz	%!gunzip
+augroup END

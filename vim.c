@@ -27,13 +27,15 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
+    K_AUGROUP,
     K_FUNCTION,
     K_VARIABLE
 } vimKind;
 
 static kindOption VimKinds [] = {
-    { TRUE,  'f', "function", "function definitions"},
-    { TRUE,  'v', "variable", "variable definitions"},
+    { TRUE,  'a', "augroup",  "autocommand group" },
+    { TRUE,  'f', "function", "function definitions" },
+    { TRUE,  'v', "variable", "variable definitions" },
 };
 
 /*
@@ -74,6 +76,10 @@ static void findVimTags (void)
 
     while ((line = fileReadLine ()) != NULL)
     {
+	while (isspace ((int) *line))
+	    ++line;
+	if ((int) *line == '"')
+	    continue;        /* skip comment */
 	if (strncmp ((const char*) line, "fu", (size_t) 2) == 0)
 	{
 	    const unsigned char *cp = line + 1;
@@ -99,6 +105,31 @@ static void findVimTags (void)
 		    } while (isalnum ((int) *cp)  ||  *cp == '_');
 		    vStringTerminate (name);
 		    makeSimpleTag (name, VimKinds, K_FUNCTION);
+		    vStringClear (name);
+		}
+	    }
+	}
+
+        if  (strncmp ((const char*) line, "aug", (size_t) 3) == 0)
+	{
+	    /* Found Autocommand Group (augroup) */
+	    const unsigned char *cp = line + 2;
+	    if ((int) *++cp == 'r' && (int) *++cp == 'o' &&
+		(int) *++cp == 'u' && (int) *++cp == 'p')
+		    ++cp;
+	    if (isspace ((int) *cp))
+	    {
+		while (isspace ((int) *cp))
+		    ++cp; 
+		if (strncmp ((const char*) cp, "end", (size_t) 3) != 0)
+		{    
+		    do
+		    {
+			vStringPut (name, (int) *cp);
+			++cp;
+		    } while (isalnum ((int) *cp)  ||  *cp == '_');
+		    vStringTerminate (name);
+		    makeSimpleTag (name, VimKinds, K_AUGROUP);
 		    vStringClear (name);
 		}
 	    }
