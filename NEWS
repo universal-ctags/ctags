@@ -1,7 +1,8 @@
 Current Version: @@VERSION@@
 
-ctags-5.1.1 (Mon Nov 12 2001)
+ctags-5.1.1 (Wed Nov 28 2001)
 * Portabilitiy fixes [HP-UX, VMS, OS/2].
+* Added instructions on using tags with NEdit to man page.
 
 ctags-5.1 (Tue Nov 06 2001)
 * Changed name of option configuration files for MSDOS, MSWindows, and OS/2.
@@ -33,6 +34,7 @@ ctags-5.1 (Tue Nov 06 2001)
 * Fixed problem reading option configuration files using CR-LF newlines.
 * Fixed problem preventing output control over tag kinds of regex patterns
   [Bug #429869]
+* Fixed incorrect parsing of Vim functions with ':' modifiers [Bug #466517].
 
 ctags-5.0.1 (Sun Apr 15 2001)
 * Fixed problem checking recursive links [SunOS 4.x].
