@@ -726,19 +726,19 @@ See, also, the \fB--exclude\fP to limit recursion.
 The \fI/regexp/replacement/\fP pair define a regular expression replacement
 pattern, similar in style to \fBsed\fP substitution commands, with which to
 generate tags from source files mapped to the named language, \fB<LANG>\fP,
-(either a built-in or user-defined language). The regular expression
-\fIregexp\fP defines a regular expression which is used to locate a single
-source line containing a tag and may specify tab characters using \\t. When
-a matching line is found, a tag will be generated for the name defined by
-\fIreplacement\fP, which generally will contain the special back-references
-\\1 through \\9 to refer to matching sub-expression groups within
-\fIregexp\fP. The '/' separator characters shown in the parameter to the
-option can actually be replaced by any character. Note that whichever
-separator character is used will have to be escaped with a backslash ('\\')
-character wherever it is used in the parameter as something other than a
-separator. The regular expression defined by this option is added to the
-current list of regular expressions for the specified language unless the
-parameter is omitted, in which case the current list is cleared.
+(either a built-in or user-defined language). The regular expression,
+\fIregexp\fP, defines an extended regular expression (roughly that used by
+\fBegrep\fP(1)), which is used to locate a single source line containing a tag
+and may specify tab characters using \\t. When a matching line is found, a tag
+will be generated for the name defined by \fIreplacement\fP, which generally
+will contain the special back-references \\1 through \\9 to refer to matching
+sub-expression groups within \fIregexp\fP. The '/' separator characters shown
+in the parameter to the option can actually be replaced by any character. Note
+that whichever separator character is used will have to be escaped with a
+backslash ('\\') character wherever it is used in the parameter as something
+other than a separator. The regular expression defined by this option is added
+to the current list of regular expressions for the specified language unless
+the parameter is omitted, in which case the current list is cleared.
 
 Unless modified by \fIflags\fP, \fIregexp\fP is interpreted as a Posix
 extended regular expression. The \fIreplacement\fP should expand for all
@@ -771,6 +771,10 @@ support for regular expressions, which depends upon your platform. You can
 determine if support for regular expressions is compiled in by examining the
 output of the \fB--version\fP option, which will include "+regex" in the
 compiled feature list.
+
+For more information on the regular expressionss used by \fBctags\fP, see
+either the \fBregex(5,7)\fP man page, or the GNU info documentation for regex
+(e.g. "info regex").
 .RE
 
 .TP 5
