@@ -1316,7 +1316,9 @@ static void parseEntityDeclList (tokenInfo *const token)
     if (isType (token, TOKEN_PERCENT))
 	skipToNextStatement (token);
     else while (isType (token, TOKEN_IDENTIFIER) ||
-		isType (token, TOKEN_KEYWORD))
+		(isType (token, TOKEN_KEYWORD) &&
+		 !isKeyword (token, KEYWORD_function) &&
+		 !isKeyword (token, KEYWORD_subroutine)))
     {
 	/* compilers accept keywoeds as identifiers */
 	if (isType (token, TOKEN_KEYWORD))
