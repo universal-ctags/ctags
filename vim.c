@@ -41,16 +41,21 @@ static kindOption VimKinds [] = {
 */
 
 /* This function takes a char pointer, tries to find a scope separator in the
- * string, and if it does, returns a pointer to the character after the colon.
+ * string, and if it does, returns a pointer to the character after the colon,
+ * and the character defining the scope.
  * If a colon is not found, it returns the original pointer.
  */
-static const unsigned char* skipColon (const unsigned char* string)
+static const unsigned char* skipColon (const unsigned char* name, int *scope)
 {
-    const unsigned char* result = string;
-    const unsigned char *const colon =
-		(const unsigned char*) strchr ((const char*) string, ':');
-    if (colon != NULL)
-	result = colon + 1;
+    const unsigned char* result = name;
+    if (scope != NULL)
+	*scope = '\0';
+    if (name[1] == ':')
+    {
+	if (scope != NULL)
+	    *scope = *name;
+	result = name + 2;
+    }
     return result;
 }
 
@@ -59,6 +64,7 @@ static void findVimTags (void)
     vString *name = vStringNew ();
     const unsigned char *line;
     boolean inFunction = FALSE;
+    int scope;
 
     while ((line = fileReadLine ()) != NULL)
     {
@@ -77,7 +83,7 @@ static void findVimTags (void)
 	    {
 		while (isspace ((int) *cp))
 		    ++cp;
-                cp = skipColon (cp);
+                cp = skipColon (cp, &scope);
 		if (isupper ((int) *cp))
 		{
 		    do
@@ -106,7 +112,7 @@ static void findVimTags (void)
                 /* deal with spaces, $, @ and & */
                 while (!isalnum ((int) *cp))
                     ++cp;
-                cp = skipColon (cp);
+                cp = skipColon (cp, &scope);
                 do
 		{
                     vStringPut (name, (int) *cp);
