@@ -19,8 +19,8 @@ Exuberant Ctags offers the following features:
 
 1.  It supports the following languages: Assembler, AWK, ASP, BETA,
     Bourne/Korn/Z Shell, C, C++, C#, COBOL, Eiffel, Erlang, Fortran, Java, Lisp,
-    Lua, Makefile, Pascal, Perl, PHP, PL/SQL, Python, REXX, Ruby, S-Lang,
-    Scheme, Tcl, Verilog, Vim, and YACC.
+    Lua, Makefile, Pascal, Perl, PHP, PL/SQL, Python, REXX, Ruby, Scheme,
+    S-Lang, SML (Standard ML), Tcl, Vera, Verilog, Vim, and YACC.
 
 2.  It is capable of generating tags for virtually all C language constructs.
 
@@ -33,9 +33,9 @@ Exuberant Ctags offers the following features:
 
 5.  User-defined languages, using Posix regular expressions.
 
-6.  Supports UNIX, MSDOS, Windows 95/98/NT, OS/2, QNX, Amiga, QDOS, RISC OS,
-    VMS, Macintosh, and Cray. Some pre-compiled binaries are available on
-    the web site.
+6.  Supports UNIX, MSDOS, Windows 95/98/NT/2000/XP, OS/2, QNX, Amiga, QDOS,
+    RISC OS, VMS, Macintosh, and Cray. Some pre-compiled binaries are
+    available on the web site.
 
 
 Visit the Exuberant Ctags web site:
