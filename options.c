@@ -1131,10 +1131,15 @@ static void processFormatOption (const char *const option,
 static void processEtagsInclude (const char *const __unused__ option,
 				 const char *const parameter)
 {
-    vString *const file = vStringNewInit (parameter);
-    if (Option.etagsInclude == NULL)
-	Option.etagsInclude = stringListNew ();
-    stringListAdd (Option.etagsInclude, file);
+    if (! Option.etags)
+	error (FATAL, "Etags must be enabled to use \"%s\" option", option);
+    else
+    {
+	vString *const file = vStringNewInit (parameter);
+	if (Option.etagsInclude == NULL)
+	    Option.etagsInclude = stringListNew ();
+	stringListAdd (Option.etagsInclude, file);
+    }
 }
 
 static void processFilterTerminatorOption (const char *const __unused__ option,

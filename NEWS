@@ -1,6 +1,7 @@
 Current Version: @@VERSION@@
 
 ctags-5.2.4 (Wed May 29 2002)
+* Allowed --etags-include option without input files.
 * Changed Asm parser to back to C-based parser to remove redundant tags,
   and extending its support for more variants [Asm].
 * Changed to using _tempnam() to create temporary files on Windows, allowing

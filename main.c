@@ -505,7 +505,7 @@ static void makeTags (cookedArgs* args)
     boolean files = (boolean)(! cArgOff (args) || Option.fileList != NULL
 			      || Option.filter);
 
-    if (! files  &&  ! Option.recurse)
+    if (! files  &&  ! Option.recurse  &&  ! Option.etagsInclude)
 	error (FATAL, "No files specified. Try \"%s --help\".",
 	       getExecutableName ());
 
