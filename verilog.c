@@ -1,29 +1,20 @@
 /*
- *  $Id$
- *
- *  Copyright (c) 2002, Nam SungHyun <namsh@kldp.org>
- *
- *  This source code is released for free distribution under the terms of the
- *  GNU General Public License.
- *
- *  This module contains functions for generating tags for the Verilog HDL
- *  (Hardware Description Language).
- *
- *  o	Should I support next cases (@ == *)?
- *
- *	    reg net_1; wire net_2; // net_2 should be tagged
- *
- *	    /@ comment @/ reg net_3; // net_3 should be tagged
- *	    wire /@ comment @/ net_3; // net_3 should be tagged
- *
- *	    /@ multi-line comment start
- *		reg net_4; // net_4 should NOT be tagged
- *	     @/
- *
- *	    // multiline declarations
- *	    inout [(`ABUSWIDTH-1):0]
- *			    addrbus;
- */
+*   $Id$
+* 
+*   Copyright (c) 2003, Darren Hiebert
+* 
+*   This source code is released for free distribution under the terms of the
+*   GNU General Public License.
+* 
+*   This module contains functions for generating tags for the Verilog HDL
+*   (Hardware Description Language).
+* 
+*   Language definition documents:
+*	http://www.eg.bucknell.edu/~cs320/1995-fall/verilog-manual.html
+*	http://www.sutherland-hdl.com/on-line_ref_guide/vlog_ref_top.html
+*	http://home.europa.com/~celiac/VerilogBNF.html
+*	http://eesun.free.fr/DOC/VERILOG/verilog_manual1.html
+*/
 
 /*
  *   INCLUDE FILES
@@ -31,7 +22,10 @@
 #include "general.h"	/* must always come first */
 
 #include <string.h>
+#include <setjmp.h>
 
+#include "debug.h"
+#include "keyword.h"
 #include "parse.h"
 #include "read.h"
 #include "vstring.h"
@@ -39,10 +33,18 @@
 /*
  *   DATA DECLARATIONS
  */
+typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
+
 typedef enum {
     K_UNDEFINED = -1,
-    K_FUNCTION, K_MODULE, K_PARAMETER, K_PORT, K_REG, K_TASK,
-    K_VARIABLE, K_WIRE
+    K_CONSTANT,
+    K_EVENT,
+    K_FUNCTION,
+    K_MODULE,
+    K_NET,
+    K_PORT,
+    K_REGISTER,
+    K_TASK
 } verilogKind;
 
 typedef struct {
@@ -53,104 +55,266 @@ typedef struct {
 /*
  *   DATA DEFINITIONS
  */
+static int Ungetc;
+static int Lang_verilog;
+static jmp_buf Exception;
+
 static kindOption VerilogKinds [] = {
-    { TRUE, 'f', "function",  "functions" },
-    { TRUE, 'm', "module",    "modules" },
-    { TRUE, 'P', "parameter", "parameters, defines" },
-    { TRUE, 'p', "port",      "ports (input, output, inout)" },
-    { TRUE, 'r', "reg",       "registers" },
-    { TRUE, 't', "task",      "tasks" },
-    { TRUE, 'v', "variable",  "variables (integer, real, time)" },
-    { TRUE, 'w', "wire",      "wires (supply, tri, wire, wand, ...)" }
+ { TRUE, 'c', "constant",  "constants (define, parameter, specparam)" },
+ { TRUE, 'e', "event",     "events" },
+ { TRUE, 'f', "function",  "functions" },
+ { TRUE, 'm', "module",    "modules" },
+ { TRUE, 'n', "net",       "net data types" },
+ { TRUE, 'p', "port",      "ports" },
+ { TRUE, 'r', "register",  "register data types" },
+ { TRUE, 't', "task",      "tasks" }
 };
 
-static keywordAssoc keywordTable [] = {
-    { "`define",   K_PARAMETER },
+static keywordAssoc VerilogKeywordTable [] = {
+    { "`define",   K_CONSTANT },
+    { "event",     K_EVENT },
     { "function",  K_FUNCTION },
     { "inout",     K_PORT },
     { "input",     K_PORT },
-    { "integer",   K_VARIABLE },
+    { "integer",   K_REGISTER },
     { "module",    K_MODULE },
     { "output",    K_PORT },
-    { "parameter", K_PARAMETER },
-    { "real",      K_VARIABLE },
-    { "reg",       K_REG },
-    { "supply0",   K_WIRE },
-    { "supply1",   K_WIRE },
+    { "parameter", K_CONSTANT },
+    { "real",      K_REGISTER },
+    { "realtime",  K_REGISTER },
+    { "reg",       K_REGISTER },
+    { "specparam", K_CONSTANT },
+    { "supply0",   K_NET },
+    { "supply1",   K_NET },
     { "task",      K_TASK },
-    { "time",      K_VARIABLE },
-    { "tri0",      K_WIRE },
-    { "tri1",      K_WIRE },
-    { "triand",    K_WIRE },
-    { "tri",       K_WIRE },
-    { "trior",     K_WIRE },
-    { "trireg",    K_WIRE },
-    { "wand",      K_WIRE },
-    { "wire",      K_WIRE },
-    { "wor",       K_WIRE }
+    { "time",      K_REGISTER },
+    { "tri0",      K_NET },
+    { "tri1",      K_NET },
+    { "triand",    K_NET },
+    { "tri",       K_NET },
+    { "trior",     K_NET },
+    { "trireg",    K_NET },
+    { "wand",      K_NET },
+    { "wire",      K_NET },
+    { "wor",       K_NET }
 };
-
-#define K_NUM (sizeof(keywordTable) / sizeof(keywordTable[0]))
 
 /*
  *   FUNCTION DEFINITIONS
  */
 
-static void findVerilogTags (void)
+static void initialize (const langType language)
+{
+    size_t i;
+    const size_t count = sizeof (VerilogKeywordTable) /
+			 sizeof (VerilogKeywordTable [0]);
+    Lang_verilog = language;
+    for (i = 0  ;  i < count  ;  ++i)
+    {
+	const keywordAssoc* const p = &VerilogKeywordTable [i];
+	addKeyword (p->keyword, language, (int) p->kind);
+    }
+}
+
+static void vUngetc (int c)
+{
+    Assert (Ungetc == '\0');
+    Ungetc = c;
+}
+
+static int vGetc (void)
+{
+    int c;
+    if (Ungetc == '\0')
+	c = fileGetc ();
+    else
+    {
+	c = Ungetc;
+	Ungetc = '\0';
+    }
+    if (c == '/')
+    {
+	int c2 = fileGetc ();
+	if (c2 == EOF)
+	    longjmp (Exception, (int) ExceptionEOF);
+	else if (c2 == '/')   /* strip comment until end-of-line */
+	{
+	    do
+		c = fileGetc ();
+	    while (c != '\n'  &&  c != EOF);
+	}
+	else if (c2 == '*')    /* strip block comment */
+	{
+	    do
+	    {
+		do
+		    c = fileGetc ();
+		while (c != '*'  &&  c != EOF);
+		if (c != EOF)
+		    c = fileGetc ();
+	    } while (c != '/'  &&  c != EOF);
+	    if (c != EOF)
+		c = ' ';      /* comment equivalent to white space */
+	}
+	else
+	    Ungetc = c2;
+    }
+    else if (c == '"')        /* strip string contents */
+    {
+	int c2;
+	do
+	    c2 = fileGetc ();
+	while (c2 != '"'  &&  c2 != EOF);
+	c = '@';
+    }
+    if (c == EOF)
+	longjmp (Exception, (int) ExceptionEOF);
+    return c;
+}
+
+static boolean isIdentifierCharacter (const int c)
+{
+    return (boolean)(isalnum (c)  ||  c == '_'  ||  c == '`');
+}
+
+static int skipWhite (int c)
+{
+    while (isspace (c))
+	c = vGetc ();
+    return c;
+}
+
+static int skipPastMatch (const char *const pair)
+{
+    const int begin = pair [0], end = pair [1];
+    int matchLevel = 1;
+    int c;
+    do
+    {
+	c = vGetc ();
+	if (c == begin)
+	    ++matchLevel;
+	else if (c == end)
+	    --matchLevel;
+    }
+    while (matchLevel > 0);
+    return vGetc ();
+}
+
+static boolean readIdentifier (vString *const name, int c)
+{
+    vStringClear (name);
+    if (isIdentifierCharacter (c))
+    {
+	while (isIdentifierCharacter (c))
+	{
+	    vStringPut (name, c);
+	    c = vGetc ();
+	}
+	vUngetc (c);
+	vStringTerminate (name);
+    }
+    return (boolean)(name->length > 0);
+}
+
+static void tagNameList (const verilogKind kind, int c)
 {
     vString *name = vStringNew ();
-    const unsigned char *line;
-
-    while ((line = fileReadLine ()) != NULL)
-    {
-	const unsigned char *cp = line;
-	verilogKind vkind = K_UNDEFINED;
-	unsigned int i;
-
-	while (isspace ((int) *cp))
-	    ++cp;
-
-	if (cp [0] == '/' && cp [1] == '/')
-	    continue;
-
-	for (i = 0  ;  i < K_NUM  ;  ++i)
+    boolean repeat;
+    Assert (isIdentifierCharacter (c));
+    do
+    { 
+	repeat = FALSE;
+	if (isIdentifierCharacter (c))
 	{
-	    const keywordAssoc *p = keywordTable + i;
-	    size_t klen = strlen (p->keyword);
-	    if (strncmp ((const char*) cp, p->keyword, klen) == 0
-		&& isspace ((int) cp [klen]))
+	    readIdentifier (name, c);
+	    makeSimpleTag (name, VerilogKinds, kind);
+	}
+	else
+	    break;
+	c = skipWhite (vGetc ());
+	if (c == '[')
+	    c = skipPastMatch ("[]");
+	c = skipWhite (c);
+	if (c == '=')
+	{
+	    if (c == '{')
+		skipPastMatch ("{}");
+	    else
 	    {
-		cp += klen + 1;
-		vkind = p->kind;
-		break;
+		do
+		    c = vGetc ();
+		while (c != ','  &&  c != ';');
 	    }
 	}
-
-	if (vkind != K_UNDEFINED)
+	if (c == ',')
 	{
-	    /* Many keywords can have bit width.
-	     *	    reg [3:0] net_name;
-	     *	    inout [(`DBUSWIDTH-1):0] databus;
-	     */
-	    for ( ;  *cp  ;  ++cp)
-	    {
-		if (*cp == '[')
-		{
-		    while (*cp != ']')
-			++cp;
-		}
-		else if (isspace ((int) *cp) == 0)
-		    break;
-	    }
+	    c = skipWhite (vGetc ());
+	    repeat = TRUE;
+	}
+	else
+	    repeat = FALSE;
+    } while (repeat);
+    vStringDelete (name);
+    vUngetc (c);
+}
 
-	    if (*cp != '\0')
-	    {
-		for ( ;  isalnum ((int) *cp) || *cp == '_'  ;  ++cp)
-		    vStringPut (name, (int) *cp);
-		vStringTerminate (name);
-		makeSimpleTag (name, VerilogKinds, vkind);
-		vStringClear (name);
-	    }
+static void findTag (vString *const name)
+{
+    const verilogKind kind = (verilogKind)
+	    lookupKeyword (vStringValue (name), Lang_verilog);
+    if (kind != K_UNDEFINED)
+    {
+	int c = skipWhite (vGetc ());
+
+	/* Many keywords can have bit width.
+	*   reg [3:0] net_name;
+	*   inout [(`DBUSWIDTH-1):0] databus;
+	*/
+	if (c == '(')
+	    c = skipPastMatch ("()");
+	c = skipWhite (c);
+	if (c == '[')
+	    c = skipPastMatch ("[]");
+	c = skipWhite (c);
+	if (c == '#')
+	{
+	    c = vGetc ();
+	    if (c == '(')
+		c = skipPastMatch ("()");
+	}
+	c = skipWhite (c);
+	if (isIdentifierCharacter (c))
+	    tagNameList (kind, c);
+    }
+}
+
+static void findVerilogTags (void)
+{
+    vString *const name = vStringNew ();
+    volatile boolean newStatement = TRUE;
+    volatile int c = '\0';
+    exception_t exception = (exception_t) setjmp (Exception);
+
+    if (exception == ExceptionNone) while (c != EOF)
+    {
+	c = vGetc ();
+	switch (c)
+	{
+	    case ';':
+	    case '\n':
+		newStatement = TRUE;
+		break;
+
+	    case ' ':
+	    case '\t':
+		break;
+
+	    default:
+		if (newStatement && readIdentifier (name, c))
+		    findTag (name);
+		newStatement = FALSE;
+		break;
 	}
     }
     vStringDelete (name);
@@ -164,6 +328,7 @@ extern parserDefinition* VerilogParser (void)
     def->kindCount  = KIND_COUNT (VerilogKinds);
     def->extensions = extensions;
     def->parser     = findVerilogTags;
+    def->initialize = initialize;
     return def;
 }
 

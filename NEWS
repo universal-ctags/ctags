@@ -1,16 +1,19 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.1 (Wed Jun 25 2003)
-* Fixed compilation error for uncommon hosts.
+ctags-5.5.1 (Wed Jul 16 2003)
 * Restored exit of program after --help, --license, and --version options [Bug
   #717311, #751240].
 * Added support for tags for labels [PL/SQL].
-* Fixed missing tags for Korn shell specific function definitions. [Sh]
+* Changed supported tag kinds for Verilog parser during overhaul.
+* Fixed missing tags for definitions spanning lines [Verilog, Bug #726875].
+* Fixed compilation error for uncommon hosts.
+* Fixed missing tags for Korn shell specific function definitions. [Sh,
+  Bug #769184]
 * Fixed missing tags when semicolon separator appears [Fortran, Bug #734933].
 * Fixed missing tags when endsubroutine keyword appears [Fortran, Bug #726712].
 * Fixed missing tags for nested blocks [PL/SQL, Bug #722501].
 * Fixed missing tags for function typedefs [C].
-* Fixed inability to map empty extension when path contained period [Bug #742689].
+* Fixed inability to map empty extension when path contained dot [Bug #742689].
 
 ctags-5.5 (Tue Apr 1 2003)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
@@ -44,7 +47,8 @@ ctags-5.5 (Tue Apr 1 2003)
 * Fixed problem of incorrect extension field [C, Bug #639639].
 * Fixed problem of empty scoping extension field [C, Bug #639644].
 * Fixed missing tags for functions split across lines [PHP, Bug #681824].
-* Fixed missing tags for nested subprograms using 'contains' [Fortran, Bug #670433].
+* Fixed missing tags for nested subprograms using 'contains' [Fortran,
+  Bug #670433].
 * Fixed missing tags when variable has same name as keyword [Fortran].
 * Fixed spurious tag when an array-spec occurs within an entity-decl [Fortran].
 * Fixed mishandling of multiline raw strings [Python, Bug #699171].
