@@ -344,9 +344,9 @@ extern char* newUpperString (const char* str)
 extern void setCurrentDirectory (void)
 {
 #ifdef AMIGA
-    const char* const cwd = eStrdup (".");
+    char* const cwd = eStrdup (".");
 #else
-    const char* const cwd = getcwd (NULL, PATH_MAX);
+    char* const cwd = getcwd (NULL, PATH_MAX);
 #endif
     CurrentDirectory = xMalloc (strlen (cwd) + 2, char);
     if (cwd [strlen (cwd) - (size_t) 1] == PATH_SEPARATOR)
