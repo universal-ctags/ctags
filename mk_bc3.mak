@@ -31,7 +31,7 @@ debug: dctags.exe
 dctags.exe: $(SOURCES) respbc3 debug.c
 	$(CC) -DDEBUG -v -e$@ @respbc3 debug.c
 
-respbc3: makefile.bc3
+respbc3: mk_bc3.mak
 	copy &&|
 $(CFLAGS)
 $(LFLAGS)
