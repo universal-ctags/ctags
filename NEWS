@@ -10,11 +10,12 @@ ctags-5.4 (Wed Oct 16 2002)
 * Added class and method support to TCL parser [TCL].
 * Added support for PL/SQL language.
 * Added support for Vera language, inspired by Dave Eggum [Vera].
+* Fixed problem terminating Perl POD block [Perl, Bug #612621].
+* Fixed problem re whitespace preceding subprogram name [Pascal, Bug #612019].
+* Fixed problem with leading spaces before instruction [TCL, Bug #615928].
+* Fixed problem with double precision functions [Fortran, Bug #620288].
 * Fixed inverted test causing TMPDIR to be used for temporary files when
   ctags is setuid instead of when not setuid [Bug #623713].
-* Fixed problem with double precision functions [Fortran, Bug #620288].
-* Fixed problem terminating Perl POD block [Perl, Bug #612019].
-* Fixed problem with leading spaces before instruction [TCL, Bug #615928].
 
 ctags-5.3.1 (Thu Sep 12 2002)
 * Renamed tagsSetSorted() to tagsSetSortType() and "sorted" member of

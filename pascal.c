@@ -26,7 +26,7 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-    K_PROCEDURE, K_FUNCTION
+    K_FUNCTION, K_PROCEDURE
 } pascalKind;
 
 static kindOption PascalKinds [] = {
@@ -89,8 +89,10 @@ static void findPascalTags (void)
 {
     vString *name = vStringNew ();
     tagEntryInfo tag;
+    pascalKind kind;
 				/* each of these flags is TRUE iff: */
     boolean incomment = FALSE;	/* point is inside a comment */
+    int comment_char;
     boolean inquote = FALSE;	/* point is inside '..' string */
     boolean get_tagname = FALSE;/* point is after PROCEDURE/FUNCTION
 				    keyword, so next item = potential tag */
@@ -104,7 +106,6 @@ static void findPascalTags (void)
     dbp = fileReadLine ();
     while (dbp != NULL)
     {
-	pascalKind kind = K_FUNCTION;
 	int c = *dbp++;
 
 	if (c == '\0')		/* if end of line */
@@ -119,9 +120,9 @@ static void findPascalTags (void)
 	}
 	if (incomment)
 	{
-	    if (c == '}')		/* within { } comments */
+	    if (comment_char == '{' && c == '}')
 		incomment = FALSE;
-	    else if (c == '*' && *dbp == ')') /* within (* *) comments */
+	    else if (comment_char == '(' && c == '*' && *dbp == ')')
 	    {
 		dbp++;
 		incomment = FALSE;
@@ -141,11 +142,13 @@ static void findPascalTags (void)
 		continue;
 	    case '{':		/* found open { comment */
 		incomment = TRUE;
+		comment_char = c;
 		continue;
 	    case '(':
 		if (*dbp == '*')	/* found open (* comment */
 		{
 		    incomment = TRUE;
+		    comment_char = c;
 		    dbp++;
 		}
 		else if (found_tag)  /* found '(' after tag, i.e., parm-list */
@@ -200,7 +203,9 @@ static void findPascalTags (void)
 		continue;
 
 	    /* grab block name */
-	    for (cp = dbp + 1  ;  *cp != '\0' && !endtoken (*cp)  ;  cp++)
+	    while (isspace ((int) *dbp))
+		++dbp;
+	    for (cp = dbp  ;  *cp != '\0' && !endtoken (*cp)  ;  cp++)
 		continue;
 	    vStringNCopyS (name, (const char*) dbp,  cp - dbp);
 	    createPascalTag (&tag, name, kind);
@@ -219,24 +224,28 @@ static void findPascalTags (void)
 			get_tagname = TRUE;
 			kind = K_PROCEDURE;
 		    }
+		    break;
 		case 'd':
 		    if (tail ("estructor"))
 		    {
 			get_tagname = TRUE;
 			kind = K_PROCEDURE;
 		    }
+		    break;
 		case 'p':
 		    if (tail ("rocedure"))
 		    {
 			get_tagname = TRUE;
 			kind = K_PROCEDURE;
 		    }
+		    break;
 		case 'f':
 		    if (tail ("unction"))
 		    {
 			get_tagname = TRUE;
 			kind = K_FUNCTION;
 		    }
+		    break;
 	    }
 	}				/* while not eof */
     }
