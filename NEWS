@@ -1,10 +1,11 @@
 Current Version: @@VERSION@@
 
-ctags-5.4.1 (Tue Nov 12 2002)
+ctags-5.4.1 (Sun Nov 24 2002)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
 * Added support for dimensioned variables to ASP parser, contributed by Simon
   Bohlin [ASP].
 * Fixed problem with infinite loop in certain comments [PL/SQL, Bug #629115].
+* Fixed problem of incorrect extension field [C. Bug #639639].
 * Fixed man page errors and omissions.
 * Fixed bug in readFieldValue() in readtags library.
 

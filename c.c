@@ -531,7 +531,7 @@ static const char *declString (const declType declaration)
 {
     static const char *const names [] = {
 	"?", "base", "class", "enum", "function", "ignore", "interface",
-	"namespace", "no mangle", "package", "struct", "union",
+	"namespace", "no mangle", "package", "program", "struct", "task", "union",
     };
     Assert (sizeof (names) / sizeof (names [0]) == DECL_COUNT);
     Assert ((int) declaration < DECL_COUNT);
@@ -2263,8 +2263,11 @@ static boolean isStatementEnd (const statementInfo *const st)
     if (isType (token, TOKEN_SEMICOLON))
 	isEnd = TRUE;
     else if (isType (token, TOKEN_BRACE_CLOSE))
+	/* Java does not require semicolons to end a block. Neither do C++
+	 * namespaces. All other blocks require a semicolon to terminate them.
+	 */
 	isEnd = (boolean) (isLanguage (Lang_java) ||
-			  ! isContextualStatement (st));
+	    st->declaration == DECL_NAMESPACE || ! isContextualStatement (st));
     else
 	isEnd = FALSE;
 
