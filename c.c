@@ -37,8 +37,8 @@
 #define parentDecl(st)		((st)->parent == NULL ? \
 				DECL_NONE : (st)->parent->declaration)
 #define isType(token,t)		(boolean) ((token)->type == (t))
-#define insideEnumBody(st)	(boolean) ((st)->parent == NULL ? FALSE : \
-				    ((st)->parent->declaration == DECL_ENUM))
+#define insideEnumBody(st)	((st)->parent == NULL ? FALSE : \
+			    (boolean) ((st)->parent->declaration == DECL_ENUM))
 #define isExternCDecl(st,c)	(boolean) ((c) == STRING_SYMBOL  && \
 		    ! (st)->haveQualifyingName  && (st)->scope == SCOPE_EXTERN)
 

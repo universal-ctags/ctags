@@ -50,19 +50,21 @@ typedef struct sConditionalInfo {
     boolean ignoring;		/* current ignore state */
 } conditionalInfo;
 
+enum eState {
+    DRCTV_NONE,			/* no known directive - ignore to end of line */
+    DRCTV_DEFINE,		/* "#define" encountered */
+    DRCTV_HASH,			/* initial '#' read; determine directive */
+    DRCTV_IF,			/* "#if" or "#ifdef" encountered */
+    DRCTV_UNDEF			/* "#undef" encountered */
+};
+
 /*  Defines the current state of the pre-processor.
  */
 typedef struct sCppState {
     int	    ungetch, ungetch2;	/* ungotten characters, if any */
     boolean resolveRequired;	/* must resolve if/else/elif/endif branch */
     struct sDirective {
-	enum eState {
-	    DRCTV_NONE,		/* no known directive - ignore to end of line */
-	    DRCTV_DEFINE,	/* "#define" encountered */
-	    DRCTV_HASH,		/* initial '#' read; determine directive */
-	    DRCTV_IF,		/* "#if" or "#ifdef" encountered */
-	    DRCTV_UNDEF		/* "#undef" encountered */
-	} state;
+	enum eState state;	/* current directive being processed */
 	boolean	accept;		/* is a directive syntatically permitted? */
 	vString * name;		/* macro name */
 	unsigned int nestLevel;	/* level 0 is not used */

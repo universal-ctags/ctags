@@ -129,9 +129,7 @@ extern void addKeyword (const char *const string, langType language, int value)
     if (entry == NULL)
     {
 	hashEntry **const table = getHashTable ();
-	hashEntry *new = newEntry (string, language, value);
-
-	table [hashedValue] = new;
+	table [hashedValue] = newEntry (string, language, value);
     }
     else
     {
@@ -149,10 +147,8 @@ extern void addKeyword (const char *const string, langType language, int value)
 	}
 	if (entry == NULL)
 	{
-	    hashEntry *new = newEntry (string, language, value);
-
 	    Assert (prev != NULL);
-	    prev->next = new;
+	    prev->next = newEntry (string, language, value);
 	}
     }
 }

@@ -39,9 +39,9 @@ typedef void (*parserInitialize) (langType language);
 
 typedef struct sKindOption {
     boolean enabled;			/* are tags for kind enabled? */
-    const int letter;			/* kind letter */
+    int letter;				/* kind letter */
     const char* name;			/* kind name */
-    const char* const description;	/* displayed in --help output */
+    const char* description;		/* displayed in --help output */
 } kindOption;
 
 typedef struct {

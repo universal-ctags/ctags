@@ -54,14 +54,16 @@
 */
 #if defined (POSIX_REGEX) || defined (GNU_REGEX)
 
+struct sKind {
+    boolean enabled;
+    char letter;
+    char* name;
+} kind;
+
 typedef struct {
     regex_t *pattern;
     char *name_pattern;
-    struct sKind {
-	boolean enabled;
-	char letter;
-	char* name;
-    } kind;
+    struct sKind kind;
 #if defined (GNU_REGEX)
     struct re_registers regs;
     boolean error_signaled;

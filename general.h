@@ -28,7 +28,7 @@
 /*  This is a helpful internal feature of later versions (> 2.7) of GCC
  *  to prevent warnings about unused variables.
  */
-#if (__GNUC__ > 2  ||  (__GNUC__ == 2  &&  __GNUC_MINOR__ >= 7)) && ! defined (__APPLE_CC__)
+#if (__GNUC__ > 2  ||  (__GNUC__ == 2  &&  __GNUC_MINOR__ >= 7)) && !(defined (__APPLE_CC__) || defined (__GNUG__))
 # define __unused__	__attribute__((unused))
 # define __printf__(s,f)  __attribute__((format (printf, s, f)))
 #else
@@ -201,7 +201,13 @@
 typedef enum { FALSE, TRUE } booleanType;
 typedef int boolean;
 #else
+# ifdef __cplusplus
+typedef bool boolean;
+#define FALSE false
+#define TRUE true
+# else
 typedef enum { FALSE, TRUE } boolean;
+# endif
 #endif
 
 #if ! defined (HAVE_FGETPOS) && ! defined (fpos_t)

@@ -69,7 +69,7 @@ enum eOptionLimits {
 
 typedef struct sOptionDescription {
     int usedByEtags;
-    const char *const description;
+    const char *description;
 } optionDescription;
 
 typedef void (*parametricOptionHandler) (const char *const option, const char *const parameter);
@@ -1144,7 +1144,7 @@ static void processFilterTerminatorOption (const char *const __unused__ option,
 static void processExtensionFieldsOption (const char *const option,
 					  const char *const parameter)
 {
-    struct sExtFields *const field = &Option.extensionFields;
+    struct sExtFields *field = &Option.extensionFields;
     const char *p = parameter;
     boolean mode = TRUE;
     int c;

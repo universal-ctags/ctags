@@ -107,16 +107,16 @@ extern void vStringCatS (vString *const string, const char *const s)
 
 extern vString *vStringNewCopy (vString *const string)
 {
-    vString *new = vStringNew ();
-    vStringCatS (new, string->buffer);
-    return new;
+    vString *vs = vStringNew ();
+    vStringCatS (vs, string->buffer);
+    return vs;
 }
 
 extern vString *vStringNewInit (const char *const s)
 {
-    vString *new = vStringNew ();
-    vStringCatS (new, s);
-    return new;
+    vString *vs = vStringNew ();
+    vStringCatS (vs, s);
+    return vs;
 }
 
 extern void vStringNCatS (vString *const string, const char *const s,

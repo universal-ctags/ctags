@@ -202,27 +202,27 @@ static void updateSortedFlag (const char *const line,
  */
 static long unsigned int updatePseudoTags (FILE *const fp)
 {
-    enum { maxClassLength = 20 };
-    char class [maxClassLength + 1];
+    enum { maxEntryLength = 20 };
+    char entry [maxEntryLength + 1];
     unsigned long linesRead = 0;
     fpos_t startOfLine;
-    size_t classLength;
+    size_t entryLength;
     const char *line;
 
-    sprintf (class, "%sTAG_FILE", PSEUDO_TAG_PREFIX);
-    classLength = strlen (class);
-    Assert (classLength < maxClassLength);
+    sprintf (entry, "%sTAG_FILE", PSEUDO_TAG_PREFIX);
+    entryLength = strlen (entry);
+    Assert (entryLength < maxEntryLength);
 
     fgetpos (fp, &startOfLine);
     line = readLine (TagFile.vLine, fp);
-    while (line != NULL  &&  line [0] == class [0])
+    while (line != NULL  &&  line [0] == entry [0])
     {
 	++linesRead;
-	if (strncmp (line, class, classLength) == 0)
+	if (strncmp (line, entry, entryLength) == 0)
 	{
 	    char tab, classType [16];
 
-	    if (sscanf (line + classLength, "%15s%c", classType, &tab) == 2  &&
+	    if (sscanf (line + entryLength, "%15s%c", classType, &tab) == 2  &&
 		tab == '\t')
 	    {
 		if (strcmp (classType, "_SORTED") == 0)
@@ -337,7 +337,7 @@ extern void copyBytes (FILE* const fromFp, FILE* const toFp, const long size)
     do
     {
 	toRead = (0 < remaining && remaining < BufferSize) ?
-		    remaining : BufferSize;
+		    remaining : (long) BufferSize;
 	numRead = fread (buffer, (size_t) 1, (size_t) toRead, fromFp);
 	if (fwrite (buffer, (size_t)1, (size_t)numRead, toFp) < (size_t)numRead)
 	    error (FATAL | PERROR, "cannot complete write");

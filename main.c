@@ -591,14 +591,14 @@ extern FILE *tempFile (const char *const mode, char **const pName)
     FILE *fp;
     int fd;
 #ifdef HAVE_MKSTEMP
-    const char *const template = "tags.XXXXXX";
+    const char *const pattern = "tags.XXXXXX";
     const char *tmpdir = NULL;
     if (! isSetUID (ExecutableProgram))
 	tmpdir = getenv ("TMPDIR");
     if (tmpdir == NULL)
 	tmpdir = TMPDIR;
-    name = xMalloc (strlen (tmpdir) + 1 + strlen (template) + 1, char);
-    sprintf (name, "%s%c%s", tmpdir, OUTPUT_PATH_SEPARATOR, template);
+    name = xMalloc (strlen (tmpdir) + 1 + strlen (pattern) + 1, char);
+    sprintf (name, "%s%c%s", tmpdir, OUTPUT_PATH_SEPARATOR, pattern);
     fd = mkstemp (name);
 #else
     name = xMalloc (L_tmpnam, char);
@@ -895,11 +895,11 @@ extern void processExcludeOption (const char *const __unused__ option,
 	freeList (&Excluded);
     else if (parameter [0] == '@')
     {
-	stringList* const new = stringListNewFromFile (parameter + 1);
+	stringList* const sl = stringListNewFromFile (parameter + 1);
 	if (Excluded == NULL)
-	    Excluded = new;
+	    Excluded = sl;
 	else
-	    stringListCombine (Excluded, new);
+	    stringListCombine (Excluded, sl);
     }
     else
     {

@@ -47,35 +47,41 @@ typedef struct sCookedArgs {
     char* item;
 } cookedArgs;
 
+typedef enum eLocate {
+    EX_MIX,		/* line numbers for defines, patterns otherwise */
+    EX_LINENUM,		/* -n  only line numbers in tag file */
+    EX_PATTERN		/* -N  only patterns in tag file */
+} exCmd;
+
+struct sInclude {
+    boolean fileNames;		/* include tags for source file names */
+    boolean qualifiedTags;	/* include tags for qualified class members */
+    boolean fileScope;		/* include tags of file scope only */
+};
+
+struct sExtFields {		/* extension field content control */
+    boolean access;
+    boolean fileScope;
+    boolean implementation;
+    boolean inheritance;
+    boolean kind;
+    boolean kindKey;
+    boolean kindLong;
+    boolean language;
+    boolean lineNumber;
+    boolean scope;
+};
+
 /*  This stores the command line options.
  */
 typedef struct sOptionValues {
-    struct sInclude {
-	boolean fileNames;	/* include tags for source file names */
-	boolean qualifiedTags;	/* include tags for qualified class members */
-	boolean	fileScope;	/* include tags of file scope only */
-    } include;
-    struct sExtFields {		/* extension field content control */
-	boolean access;
-	boolean fileScope;
-	boolean implementation;
-	boolean inheritance;
-	boolean kind;
-	boolean kindKey;
-	boolean kindLong;
-	boolean language;
-	boolean lineNumber;
-	boolean scope;
-    } extensionFields;
+    struct sInclude include;/* --extra  extra tag inclusion */
+    struct sExtFields extensionFields;/* --fields  extension field control */
     stringList* ignore;	    /* -I  name of file containing tokens to ignore */
     boolean append;	    /* -a  append to "tags" file */
     boolean backward;	    /* -B  regexp patterns search backwards */
     boolean etags;	    /* -e  output Emacs style tags file */
-    enum eLocate {
-	EX_MIX,		    /* line numbers for defines, patterns otherwise */
-	EX_LINENUM,	    /* -n  only line numbers in tag file */
-	EX_PATTERN	    /* -N  only patterns in tag file */
-    } locate;		    /* --excmd  EX command used to locate tag */
+    exCmd locate;	    /* --excmd  EX command used to locate tag */
     boolean recurse;	    /* -R  recurse into directories */
     boolean sorted;	    /* -u,--sort  sort tags */
     boolean verbose;	    /* -V  verbose */
