@@ -31,21 +31,22 @@ EXTRA_LIBS = regex.obj
 
 DEFINES = -DWIN32 $(REGEX_DEFINE)
 INCLUDES = $(EXTRA_INC)
+OPT = /O2 /G5
 
 ctags: ctags.exe
 
 ctags.exe: $(SOURCES) respmvc $(EXTRA_LIBS)
-	cl /O2 /G5 /Fe$@ @respmvc /link setargv.obj
+	cl $(OPT) /Fe$@ @respmvc /link setargv.obj
 
 readtags.exe: readtags.c
-	cl /clr /O2 /G5 /Fe$@ $(DEFINES) -DREADTAGS_MAIN readtags.c /link setargv.obj
+	cl /clr $(OPT) /Fe$@ $(DEFINES) -DREADTAGS_MAIN readtags.c /link setargv.obj
 
 # Debug version
 dctags.exe: $(SOURCES) respmvc $(EXTRA_LIBS)
 	cl /Zi -DDEBUG /Fe$@ @respmvc debug.c /link setargv.obj
 
 regex.obj:
-	cl /c /O2 /G5 /Fo$@ $(DEFINES) -Dconst= $(INCLUDES) $(REGEX_DIR)\regex.c
+	cl /c $(OPT) /Fo$@ $(DEFINES) -Dconst= $(INCLUDES) $(REGEX_DIR)\regex.c
 
 respmvc: $(SOURCES) $(HEADERS) mk_mvc.mak
 	echo $(DEFINES) $(INCLUDES) $(SOURCES) $(EXTRA_LIBS) > $@
