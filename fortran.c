@@ -1895,14 +1895,16 @@ static boolean parseImplicitPartStmt (tokenInfo *const token)
  *      [implicit-part] (is [implicit-part-stmt] ... [implicit-stmt])
  *      [declaration-construct] ...
  */
-static void parseSpecificationPart (tokenInfo *const token)
+static boolean parseSpecificationPart (tokenInfo *const token)
 {
+    boolean result = FALSE;
     while (skipStatementIfKeyword (token, KEYWORD_use))
-	;
+	result = TRUE;
     while (parseImplicitPartStmt (token))
-	;
+	result = TRUE;
     while (parseDeclarationConstruct (token))
-	;
+	result = TRUE;
+    return result;
 }
 
 /*  block-data is
@@ -1944,8 +1946,8 @@ static void parseBlockData (tokenInfo *const token)
 static void parseInternalSubprogramPart (tokenInfo *const token)
 {
     boolean done = FALSE;
-    Assert (isKeyword (token, KEYWORD_contains));
-    skipToNextStatement (token);
+    if (isKeyword (token, KEYWORD_contains))
+	skipToNextStatement (token);
     do
     {
 	switch (token->keyword)
@@ -2013,8 +2015,9 @@ static void parseModule (tokenInfo *const token)
  *      or data-stmt
  *      or entry-stmt
  */
-static void parseExecutionPart (tokenInfo *const token)
+static boolean parseExecutionPart (tokenInfo *const token)
 {
+    boolean result = FALSE;
     boolean done = FALSE;
     while (! done)
     {
@@ -2025,10 +2028,12 @@ static void parseExecutionPart (tokenInfo *const token)
 		    readToken (token);
 		else
 		    skipToNextStatement (token);
+		result = TRUE;
 		break;
 
 	    case KEYWORD_entry:
 		parseEntryStmt (token);
+		result = TRUE;
 		break;
 
 	    case KEYWORD_contains:
@@ -2045,12 +2050,14 @@ static void parseExecutionPart (tokenInfo *const token)
 		    isSecondaryKeyword (token, KEYWORD_where))
 		{
 		    skipToNextStatement (token);
+		    result = TRUE;
 		}
 		else
 		    done = TRUE;
 		break;
 	}
     }
+    return result;
 }
 
 static void parseSubprogram (tokenInfo *const token, const tagType tag)
@@ -2126,11 +2133,9 @@ static void parseMainProgram (tokenInfo *const token)
  */
 static void parseProgramUnit (tokenInfo *const token)
 {
-    unsigned long startingLine;
     readToken (token);
     do
     {
-	startingLine = File.lineNumber;
 	if (isType (token, TOKEN_STATEMENT_END))
 	    readToken (token);
 	else switch (token->keyword)
@@ -2147,13 +2152,13 @@ static void parseProgramUnit (tokenInfo *const token)
 		    readToken (token);
 		else
 		{
-		    parseSpecificationPart (token);
-		    parseExecutionPart (token);
+		    boolean one = parseSpecificationPart (token);
+		    boolean two = parseExecutionPart (token);
+		    if (! (one || two))
+			readToken (token);
 		}
 		break;
 	}
-	if (File.lineNumber == startingLine)
-	    longjmp (Exception, (int) ExceptionLoop);
     } while (TRUE);
 }
 
