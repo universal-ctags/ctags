@@ -44,7 +44,7 @@
 */
 
 typedef enum eException {
-    ExceptionNone, ExceptionEOF, ExceptionFixedFormat
+    ExceptionNone, ExceptionEOF, ExceptionFixedFormat, ExceptionLoop
 } exception_t;
 
 /*  Used to designate type of line read in fixed source form.
@@ -2126,9 +2126,11 @@ static void parseMainProgram (tokenInfo *const token)
  */
 static void parseProgramUnit (tokenInfo *const token)
 {
+    unsigned long startingLine;
     readToken (token);
     do
     {
+	startingLine = File.lineNumber;
 	if (isType (token, TOKEN_STATEMENT_END))
 	    readToken (token);
 	else switch (token->keyword)
@@ -2150,6 +2152,8 @@ static void parseProgramUnit (tokenInfo *const token)
 		}
 		break;
 	}
+	if (File.lineNumber == startingLine)
+	    longjmp (Exception, (int) ExceptionLoop);
     } while (TRUE);
 }
 

@@ -19,6 +19,7 @@ ctags-5.5.3 (Sat Mar 13 2004)
 * Fixed missing tags related to template specializations [C++, Bug #872494].
 * Fixed spurious local tags for statements following labels [C].
 * Fixed missing tags for certain scoped functions [Vim].
+* Fixed infinite loop in Fortran parser.
 * Fixed missing tags for certain initializers [Fortran, Bug #877956].
 * Fixed problem with comment line after continuation character [Fortran,
   Bug #858165].
