@@ -2265,7 +2265,9 @@ static void processColon (statementInfo *const st)
 static void processAngleBracket (void)
 {
     int c = cppGetc ();
-    if (isLanguage (Lang_cpp) &&  c != '<' && c != '=')
+    if (c == '>')
+	;   /* already found match for template */
+    else if (isLanguage (Lang_cpp) &&  c != '<' && c != '=')
 	skipToMatch ("<>");        /* this is a template */
     else
 	cppUngetc (c);

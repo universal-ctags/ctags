@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.3 (Tue Feb 17 2004)
+ctags-5.5.3 (Sat Feb 28 2004)
 * Removed forgotten debug statement [Bug #811704].
 * Added support for Perl "use constant" [Perl, Patch #853704].
 * Added support for "and" keyword [SML, Bug #816636].
@@ -12,6 +12,7 @@ ctags-5.5.3 (Tue Feb 17 2004)
 * Fixed incorrect line address in tag file for SQL tags [SQL, Bug #823000].
 * Fixed incorrect recognition of POD paragraph [Perl, Bug #842077].
 * Fixed spurious tags for for C++ member templtates [C++, Bug #849591].
+* Fixed missing tags related to template specializations [C++, Bug #872494].
 * Fixed spurious local tags for statements following labels [C].
 * Fixed missing tags for certain scoped functions [Vim].
 * Fixed missing tags for certain initializers [Fortran, Bug #877956].
