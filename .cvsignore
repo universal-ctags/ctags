@@ -1,0 +1,7 @@
+configure
+config.h.in
+ctags.html
+.o
+.od
+ctags
+dctags
