@@ -194,7 +194,7 @@ static kindOption FortranKinds [] = {
     { TRUE,  'p', "program",    "programs"},
     { TRUE,  's', "subroutine", "subroutines"},
     { TRUE,  't', "type",       "derived types"},
-    { TRUE,  'v', "variable",   "module variables"}
+    { TRUE,  'v', "variable",   "program (global) and module variables"}
 };
 
 static const keywordDesc FortranKeywordTable [] = {
@@ -221,10 +221,10 @@ static const keywordDesc FortranKeywordTable [] = {
     { "if",		KEYWORD_if		},
     { "implicit",	KEYWORD_implicit	},
     { "include",	KEYWORD_include		},
-    { "intrinsic",	KEYWORD_intrinsic	},
     { "integer",	KEYWORD_integer		},
     { "intent",		KEYWORD_intent		},
     { "interface",	KEYWORD_interface	},
+    { "intrinsic",	KEYWORD_intrinsic	},
     { "logical",	KEYWORD_logical		},
     { "module",		KEYWORD_module		},
     { "namelist",	KEYWORD_namelist	},
