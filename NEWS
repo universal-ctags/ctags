@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.1 (Mon Jun 23 2003)
+ctags-5.5.1 (Wed Jun 25 2003)
 * Fixed compilation error for uncommon hosts.
 * Restored exit of program after --help, --license, and --version options [Bug
   #717311, #751240].
@@ -9,6 +9,7 @@ ctags-5.5.1 (Mon Jun 23 2003)
 * Fixed missing tags when semicolon separator appears [Fortran, Bug #734933].
 * Fixed missing tags when endsubroutine keyword appears [Fortran, Bug #726712].
 * Fixed missing tags for nested blocks [PL/SQL, Bug #722501].
+* Fixed missing tags for function typedefs [C].
 * Fixed inability to map empty extension when path contained period [Bug #742689].
 
 ctags-5.5 (Tue Apr 1 2003)

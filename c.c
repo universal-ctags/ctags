@@ -2122,7 +2122,8 @@ static void analyzeParens (statementInfo *const st)
 	    st->gotArgs = TRUE;
 	    setToken (st, TOKEN_ARGS);
 	    advanceToken (st);
-	    analyzePostParens (st, &info);
+	    if (st->scope != SCOPE_TYPEDEF)
+		analyzePostParens (st, &info);
 	}
 	else
 	    setToken (st, TOKEN_NONE);
