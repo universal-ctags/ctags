@@ -29,7 +29,7 @@ Win32:
   Regex support on Win32 is available when compiled to use the Win32 port of
   the Gnu regex library, which can be obtained here:
 
-    http://people.delphi.com/gjc/gnu_regex.html
+    http://people.delphiforums.com/gjc/gnu_regex.html
 
   See the makefiles, mk_mvc.mak or mk_bc5.mak, to learn how to build with
   this library.
