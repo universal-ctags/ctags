@@ -51,7 +51,7 @@ WEB_ARCHIVE_DIR = releases
 CTAGS_WEBSITE = website
 DEP_DIR	= .deps
 
-CC		= gcc3
+CC		= gcc
 INCLUDE	= -I.
 DEFS	= -DHAVE_CONFIG_H
 COMP_FLAGS = $(INCLUDE) $(DEFS) $(CFLAGS)

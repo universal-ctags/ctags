@@ -192,7 +192,7 @@ extern boolean isDestinationStdout (void)
 }
 
 extern void processExcludeOption (
-	const char *const __unused__ option, const char *const parameter)
+	const char *const option __unused__, const char *const parameter)
 {
     const char *const fileName = parameter + 1;
     if (parameter [0] == '\0')

@@ -767,7 +767,7 @@ static void findKeyword (tokenInfo *const token, const keywordId keyword)
 	readToken (token);
 }
 
-static void parseGeneric (tokenInfo *const token, boolean __unused__ declaration)
+static void parseGeneric (tokenInfo *const token, boolean declaration __unused__)
 {
     unsigned int depth = 0;
 #ifdef TYPE_REFERENCE_TOOL
