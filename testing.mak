@@ -17,9 +17,9 @@ DIFF = if diff $(DIFF_OPTIONS) tags.ref tags.test > $(DIFF_FILE); then \
 		echo "FAILED: differences left in $(DIFF_FILE)" ; \
 	  fi
 
-.PHONY: test test.include test.fields test.eiffel test.linux
+.PHONY: test test.include test.fields test.etags test.eiffel test.linux
 
-test: test.include test.fields test.linedir test.eiffel test.linux
+test: test.include test.fields test.linedir test.etags test.eiffel test.linux
 
 test.%: DIFF_FILE = $@.diff
 
@@ -45,6 +45,14 @@ test.linedir: $(CTAGS_TEST) $(CTAGS_REF)
 	@ echo -n "Testing line directives..."
 	@ $(CTAGS_REF) $(REF_LINEDIR_OPTIONS) -o tags.ref Test/line_directives.c
 	@ $(CTAGS_TEST) $(TEST_LINEDIR_OPTIONS) -o tags.test Test/line_directives.c
+	@- $(DIFF)
+
+REF_ETAGS_OPTIONS = -e
+TEST_ETAGS_OPTIONS = -e
+test.etags: $(CTAGS_TEST) $(CTAGS_REF)
+	@ echo -n "Testing TAGS output..."
+	@ $(CTAGS_REF) -R $(REF_ETAGS_OPTIONS) -o tags.ref Test
+	@ $(CTAGS_TEST) -R $(TEST_ETAGS_OPTIONS) -o tags.test Test
 	@- $(DIFF)
 
 REF_EIFFEL_OPTIONS = $(TEST_OPTIONS) --format=1 --languages=eiffel
