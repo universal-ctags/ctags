@@ -100,6 +100,8 @@ typedef struct sTokenInfo {
     tokenType	type;
     keywordId	keyword;
     vString *	string;
+    unsigned long lineNumber;
+    fpos_t filePosition;
 } tokenInfo;
 
 /*
@@ -230,6 +232,8 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 	tagEntryInfo e;
 	initTagEntry (&e, name);
 
+	e.lineNumber   = token->lineNumber;
+	e.filePosition = token->filePosition;
 	e.kindName     = SqlKinds [kind].name;
 	e.kind         = SqlKinds [kind].letter;
 
@@ -299,6 +303,8 @@ static void readToken (tokenInfo *const token)
 
     token->type         = TOKEN_UNDEFINED;
     token->keyword      = KEYWORD_NONE;
+    token->lineNumber   = getSourceLineNumber ();
+    token->filePosition = getInputFilePosition ();
     vStringClear (token->string);
 
 getNextChar:
