@@ -38,6 +38,7 @@
     SchemeParser, \
     ShParser, \
     SlangParser, \
+    SqlParser, \
     TclParser, \
     VerilogParser, \
     VimParser, \

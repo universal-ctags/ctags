@@ -41,6 +41,7 @@ SOURCES = ¶
 	sh.c ¶
 	slang.c ¶
 	sort.c ¶
+	sql.c ¶
 	strlist.c ¶
 	tcl.c ¶
 	verilog.c ¶
@@ -81,6 +82,7 @@ OBJ = ¶
 	sh.o ¶
 	slang.o ¶
 	sort.o ¶
+	sql.o ¶
 	strlist.o ¶
 	tcl.o ¶
 	verilog.o ¶
