@@ -25,13 +25,14 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-  K_FUNCTION, K_SUB, K_DIM
+    K_CONST, K_FUNCTION, K_SUB, K_DIM
 } aspKind;
 
 static kindOption AspKinds [] = {
-    { TRUE, 'f', "function", "functions"},
-    { TRUE, 's', "sub",      "subroutines"},
-    { TRUE, 'v', "variable", "variables"}
+    { TRUE, 'c', "constant",   "constants"},
+    { TRUE, 'f', "function",   "functions"},
+    { TRUE, 's', "subroutine", "subroutines"},
+    { TRUE, 'v', "variable",   "variables"}
 };
 
 /*
@@ -165,6 +166,25 @@ static void findAspTags (void)
 		    }
 		    vStringTerminate (name);
 		    makeSimpleTag (name, AspKinds, K_DIM);
+		    vStringClear (name);
+		}
+	    }
+
+	    /* const declaration? */
+	    else if (strncasecmp ((const char*) cp, "const", (size_t) 5) == 0)
+	    {
+		cp += 5;
+		if (isspace ((int) *cp))
+		{
+		    while (isspace ((int) *cp))
+			++cp;
+		    while (isalnum ((int) *cp)  ||  *cp == '_')
+		    {
+			vStringPut (name, (int) *cp);
+			++cp;
+		    }
+		    vStringTerminate (name);
+		    makeSimpleTag (name, AspKinds, K_CONST);
 		    vStringClear (name);
 		}
 	    }

@@ -1,6 +1,8 @@
 ' "_descriptions.asp"
 ' Documentation for my variables
 
+Const constDecl = 512
+
 Dim lang_start      '(htmlct.inc) char-index, use for multilanguage-strings
 DIM lang_length     '(htmlct.inc) num.chars to get, i.e. mid(str, lang_start, lang_length)
 function HtmlCutout(lang, str)   'dig-out a piece of text from a multilang. string str
