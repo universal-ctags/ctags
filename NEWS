@@ -1,8 +1,12 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.3 (Sun Feb 29 2004)
+ctags-5.5.3 (Sat Mar 13 2004)
 * Removed forgotten debug statement [Bug #811704].
-* Added support for Perl "use constant" [Perl, Patch #853704].
+* Added support for Perl labels.
+* Added support for Perl "use constant" [Perl, Patch #853704, Feature Request
+  #710017].
+* Added support for package qualification of tags, removing useless "package"
+  tag kind [Perl, Feature Request #448887].
 * Added support for "and" keyword [SML, Bug #816636].
 * Added support for variables [PHP].
 * Fixed problem destroying tag file with certain info options [Bug #845502].

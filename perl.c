@@ -17,6 +17,7 @@
 
 #include <string.h>
 
+#include "options.h"
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
@@ -28,14 +29,12 @@ typedef enum {
     K_NONE = -1,
     K_CONSTANT,
     K_LABEL,
-    K_PACKAGE,
     K_SUBROUTINE
 } perlKind;
 
 static kindOption PerlKinds [] = {
     { TRUE, 'c', "constant",   "constants" },
     { TRUE, 'l', "label",      "labels" },
-    { TRUE, 'p', "package",    "packages" },
     { TRUE, 's', "subroutine", "subroutines" }
 };
 
@@ -91,12 +90,14 @@ static boolean isPodWord (const char *word)
 static void findPerlTags (void)
 {
     vString *name = vStringNew ();
+    vString *package = NULL;
     boolean skipPodDoc = FALSE;
     const unsigned char *line;
 
     while ((line = fileReadLine ()) != NULL)
     {
 	boolean spaceRequired = FALSE;
+	boolean qualified = FALSE;
 	const unsigned char *cp = line;
 	perlKind kind = K_NONE;
 
@@ -126,6 +127,7 @@ static void findPerlTags (void)
 	    cp += 3;
 	    kind = K_SUBROUTINE;
 	    spaceRequired = TRUE;
+	    qualified = TRUE;
 	}
 	else if (strncmp((const char*) cp, "use", (size_t) 3) == 0)
 	{
@@ -139,12 +141,23 @@ static void findPerlTags (void)
 	    cp += 8;
 	    kind = K_CONSTANT;
 	    spaceRequired = TRUE;
+	    qualified = TRUE;
 	}
 	else if (strncmp((const char*) cp, "package", (size_t) 7) == 0)
 	{
 	    cp += 7;
-	    kind = K_PACKAGE;
-	    spaceRequired = TRUE;
+	    if (package == NULL)
+		package = vStringNew ();
+	    else
+		vStringClear (package);
+	    while (isspace (*cp))
+		cp++;
+	    while ((int) *cp != ';'  &&  !isspace ((int) *cp))
+	    {
+		vStringPut (package, (int) *cp);
+		cp++;
+	    }
+	    vStringCatS (package, "::");
 	}
 	else
 	{
@@ -171,11 +184,24 @@ static void findPerlTags (void)
 	    }
 	    vStringTerminate (name);
 	    if (vStringLength (name) > 0)
+	    {
 		makeSimpleTag (name, PerlKinds, kind);
+		if (Option.include.qualifiedTags && qualified &&
+		    package != NULL  && vStringLength (package) > 0)
+		{
+		    vString *const qualifiedName = vStringNew ();
+		    vStringCopy (qualifiedName, package);
+		    vStringCat (qualifiedName, name);
+		    makeSimpleTag (qualifiedName, PerlKinds, kind);
+		    vStringDelete (qualifiedName);
+		}
+	    }
 	    vStringClear (name);
 	}
     }
     vStringDelete (name);
+    if (package != NULL)
+	vStringDelete (package);
 }
 
 extern parserDefinition* PerlParser (void)
