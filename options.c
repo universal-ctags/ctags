@@ -901,7 +901,7 @@ static void processHelpOption (
     printInvocationDescription ();
     putchar ('\n');
     printOptionDescriptions (LongOptionDescription);
-    FilesRequired = FALSE;
+    exit (0);
 }
 
 static void processLanguageForceOption (
@@ -1108,7 +1108,7 @@ static void processLicenseOption (
     puts ("");
     puts (License1);
     puts (License2);
-    FilesRequired = FALSE;
+    exit (0);
 }
 
 static void processListKindsOption (
@@ -1321,7 +1321,7 @@ static void processVersionOption (
 	const char *const __unused__ option, const char *const __unused__ parameter)
 {
     printProgramIdentification ();
-    FilesRequired = FALSE;
+    exit (0);
 }
 
 /*
