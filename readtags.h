@@ -50,6 +50,14 @@ typedef struct sTagFile tagFile;
 /* This structure contains information about the tag file. */
 typedef struct {
 
+	struct {
+		    /* was the tag file successfully opened? */
+		int opened;
+
+		    /* errno value when 'opened' is false */
+		int error_number;
+	} status;
+
 	    /* information about the structure of the tag file */
 	struct {
 		    /* format of tag file (1 = original, 2 = extended) */
@@ -138,7 +146,10 @@ typedef struct {
 *  null) pointer to a structure which, if not null, will be populated with
 *  information about the tag file. If successful, the function will return a
 *  handle which must be supplied to other calls to read information from the
-*  tag file.
+*  tag file, and info.status.opened will be set to true. If unsuccessful,
+*  info.status.opened will be set to false and info.status.error_number will
+*  be set to the errno value representing the system error preventing the tag
+*  file from being successfully opened.
 */
 extern tagFile *tagsOpen (const char *filePath, tagFileInfo *info);
 

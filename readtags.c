@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
 #ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>	/* declare off_t */
 #endif
@@ -443,10 +444,8 @@ static void gotoFirstLogicalTag (tagFile *const file)
 
 static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 {
-    tagFile *const result = (tagFile*) malloc (sizeof (tagFile));
-    if (result == NULL)
-	perror ("cannot open tag file");
-    else
+    tagFile *result = (tagFile*) malloc (sizeof (tagFile));
+    if (result != NULL)
     {
 	memset (result, 0, sizeof (tagFile));
 	growString (&result->line);
@@ -456,13 +455,18 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 	    result->fields.max * sizeof (tagExtensionField));
 	result->fp = fopen (filePath, "r");
 	if (result->fp == NULL)
-	    perror ("cannot open tag file");
+	{
+	    free (result);
+	    result = NULL;
+	    info->status.error_number = errno;
+	}
 	else
 	{
 	    fseek (result->fp, 0, SEEK_END);
 	    result->size = ftell (result->fp);
 	    rewind (result->fp);
 	    readPseudoTags (result, info);
+	    info->status.opened = 1;
 	    result->initialized = 1;
 	}
     }
@@ -785,6 +789,7 @@ extern tagResult tagsClose (tagFile *file)
 #ifdef READTAGS_MAIN
 
 static const char *TagFileName = "tags";
+static const char *ProgramName;
 static int extensionFields;
 static int SortOverride;
 static int SortMethod;
@@ -823,7 +828,11 @@ static void findTag (const char *const name, const int options)
     tagEntry entry;
     tagFile *const file = tagsOpen (TagFileName, &info);
     if (file == NULL)
-	perror ("Cannot open tag file");
+    {
+	fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
+		ProgramName, strerror (info.status.error_number), name);
+	exit (1);
+    }
     else
     {
 	if (SortOverride)
@@ -845,7 +854,11 @@ static void listTags (void)
     tagEntry entry;
     tagFile *const file = tagsOpen (TagFileName, &info);
     if (file == NULL)
-	perror ("Cannot open tag file");
+    {
+	fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
+		ProgramName, strerror (info.status.error_number), TagFileName);
+	exit (1);
+    }
     else
     {
 	while (tagsNext (file, &entry) == TagSuccess)
@@ -868,18 +881,23 @@ const char *const Usage =
 
 extern int main (int argc, char **argv)
 {
-    int i;
     int options = 0;
+    int actionSupplied = 0;
+    int i;
+    ProgramName = argv [0];
     if (argc == 1)
     {
-	fprintf (errout, Usage, argv [0]);
+	fprintf (errout, Usage, ProgramName);
 	exit (1);
     }
     for (i = 1  ;  i < argc  ;  ++i)
     {
 	const char *const arg = argv [i];
 	if (arg [0] != '-')
+	{
 	    findTag (arg, options);
+	    actionSupplied = 1;
+	}
 	else
 	{
 	    int j;
@@ -890,7 +908,8 @@ extern int main (int argc, char **argv)
 		    case 'e': extensionFields = 1;         break;
 		    case 'i': options |= TAG_IGNORECASE;   break;
 		    case 'p': options |= TAG_PARTIALMATCH; break;
-		    case 'l': listTags ();                 break;
+		    case 'l': listTags (); actionSupplied = 1; break;
+	    
 		    case 't':
 			if (arg [j+1] != '\0')
 			{
@@ -901,7 +920,7 @@ extern int main (int argc, char **argv)
 			    TagFileName = argv [++i];
 			else
 			{
-			    fprintf (errout, Usage, argv [0]);
+			    fprintf (errout, Usage, ProgramName);
 			    exit (1);
 			}
 			break;
@@ -914,17 +933,24 @@ extern int main (int argc, char **argv)
 			    SortMethod = arg[j] - '0';
 			else
 			{
-			    fprintf (errout, Usage, argv [0]);
+			    fprintf (errout, Usage, ProgramName);
 			    exit (1);
 			}
 			break;
 		    default:
 			fprintf (errout, "%s: unknown option: %c\n",
-				    argv[0], arg[j]);
+				    ProgramName, arg[j]);
 			exit (1);
 			break;
 		}
 	    }
+	}
+	if (! actionSupplied)
+	{
+	    fprintf (errout,
+		"%s: no action specified: specify tag name(s) or -l option\n",
+		ProgramName);
+	    exit (1);
 	}
     }
     return 0;
