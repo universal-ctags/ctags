@@ -74,7 +74,7 @@ test.eiffel: $(CTAGS_TEST) $(CTAGS_REF)
 
 REF_LINUX_OPTIONS = $(TEST_OPTIONS) --fields=k
 TEST_LINUX_OPTIONS = $(TEST_OPTIONS) --fields=k
-LINUX_DIRECTORY = /usr/src/linux-2.4
+LINUX_DIRECTORY := $(shell ls -dtr /usr/src/linux-* | tail -1)
 test.linux: $(CTAGS_TEST) $(CTAGS_REF)
 	@ echo -n "Testing Linux tag inclusion..."
 	@ $(CTAGS_REF) -R $(REF_LINUX_OPTIONS) -o tags.ref $(LINUX_DIRECTORY)
