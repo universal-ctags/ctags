@@ -1,12 +1,14 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.1 (Wed Jun 11 2003)
+ctags-5.5.1 (Sun Jun 22 2003)
 * Fixed compilation error for uncommon hosts.
 * Restored exit of program after --help, --license, and --version options [Bug
   #717311, #751240].
+* Added support for tags for labels [PL/SQL].
 * Fixed missing tags for Korn shell specific function definitions. [Sh]
 * Fixed missing tags when semicolon separator appears [Fortran, Bug #734933].
 * Fixed missing tags when endsubroutine keyword appears [Fortran, Bug #726712].
+* Fixed missing tags for nested blocks [PL/SQL, Bug #722501].
 
 ctags-5.5 (Tue Apr 1 2003)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].

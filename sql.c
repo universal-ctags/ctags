@@ -82,6 +82,8 @@ typedef struct sKeywordDesc {
 
 typedef enum eTokenType {
     TOKEN_UNDEFINED,
+    TOKEN_BLOCK_LABEL_BEGIN,
+    TOKEN_BLOCK_LABEL_END,
     TOKEN_CHARACTER,
     TOKEN_CLOSE_PAREN,
     TOKEN_SEMICOLON,
@@ -114,6 +116,7 @@ typedef enum {
     SQLTAG_FUNCTION,
     SQLTAG_FIELD,
     SQLTAG_LOCAL_VARIABLE,
+    SQLTAG_BLOCK_LABEL,
     SQLTAG_PACKAGE,
     SQLTAG_PROCEDURE,
     SQLTAG_RECORD,
@@ -130,6 +133,7 @@ static kindOption SqlKinds [] = {
     { TRUE,  'f', "function",  "functions"	},
     { TRUE,  'F', "field",     "record fields"	},
     { FALSE, 'l', "local",     "local variables"},
+    { TRUE,  'L', "label",     "block label"    },
     { TRUE,  'P', "package",   "packages"	},
     { TRUE,  'p', "procedure", "procedures"	},
     { TRUE,  'r', "record",    "records"	},
@@ -331,6 +335,26 @@ getNextChar:
 	    }
 	    break;
 
+	case '<':
+	case '>':
+	{
+	    const int initial = c;
+	    int d = fileGetc ();
+	    if (d == initial)
+	    {
+		if (initial == '<')
+		    token->type = TOKEN_BLOCK_LABEL_BEGIN;
+		else
+		    token->type = TOKEN_BLOCK_LABEL_END;
+	    }
+	    else
+	    {
+		fileUngetc (d);
+		token->type = TOKEN_UNDEFINED;
+	    }
+	    break;
+	}
+
 	case '/':
 	{
 	    int d = fileGetc ();
@@ -414,6 +438,7 @@ static void parseSubProgram (tokenInfo *const token)
     {
 	if (isType (name, TOKEN_IDENTIFIER))
 	    makeSqlTag (name, kind);
+	readToken (token);
 	parseBlock (token, TRUE);
     }
     else if (isType (token, TOKEN_SEMICOLON))
@@ -478,14 +503,21 @@ static void parseSimple (tokenInfo *const token, const sqlKind kind)
 	makeSqlTag (token, kind);
 }
 
-static void parseBlock (tokenInfo *const token, const boolean local)
+static void parseDeclare (tokenInfo *const token, const boolean local)
 {
-    int depth = 1;
-    while (depth > 0)
-    {
+    if (isKeyword (token, KEYWORD_declare))
 	readToken (token);
+    while (! isKeyword (token, KEYWORD_begin) && ! isKeyword (token, KEYWORD_end))
+    {
 	switch (token->keyword)
 	{
+	    case KEYWORD_cursor:    parseSimple (token, SQLTAG_CURSOR); break;
+	    case KEYWORD_function:  parseSubProgram (token); break;
+	    case KEYWORD_procedure: parseSubProgram (token); break;
+	    case KEYWORD_subtype:   parseSimple (token, SQLTAG_SUBTYPE); break;
+	    case KEYWORD_trigger:   parseSimple (token, SQLTAG_TRIGGER); break;
+	    case KEYWORD_type:      parseType (token); break;
+
 	    default:
 		if (isType (token, TOKEN_IDENTIFIER))
 		{
@@ -495,40 +527,68 @@ static void parseBlock (tokenInfo *const token, const boolean local)
 			makeSqlTag (token, SQLTAG_VARIABLE);
 		}
 		break;
-
-	    case KEYWORD_cursor:    parseSimple (token, SQLTAG_CURSOR); break;
-	    case KEYWORD_function:  parseSubProgram (token); break;
-	    case KEYWORD_procedure: parseSubProgram (token); break;
-	    case KEYWORD_subtype:   parseSimple (token, SQLTAG_SUBTYPE); break;
-	    case KEYWORD_trigger:   parseSimple (token, SQLTAG_TRIGGER); break;
-	    case KEYWORD_type:      parseType (token); break;
-	    case KEYWORD_end:       --depth; break;
-
-	    case KEYWORD_begin:
-	    {
-		while (depth > 0)
-		{
-		    switch (token->keyword)
-		    {
-			case KEYWORD_if:
-			case KEYWORD_loop:
-			    ++depth;
-			    readToken (token);
-			    break;
-
-			case KEYWORD_end:
-			    --depth;
-			    findToken (token, TOKEN_SEMICOLON);
-			    break;
-
-			default:
-			    readToken (token);
-			    break;
-		    }
-		}
-		break;
-	    }
 	}
+	findToken (token, TOKEN_SEMICOLON);
+	readToken (token);
+    }
+}
+
+static void parseLabel (tokenInfo *const token)
+{
+    Assert (isType (token, TOKEN_BLOCK_LABEL_BEGIN));
+    readToken (token);
+    if (isType (token, TOKEN_IDENTIFIER))
+    {
+	makeSqlTag (token, SQLTAG_BLOCK_LABEL);
+	readToken (token);        /* read end of label */
+    }
+}
+
+static void parseStatements (tokenInfo *const token)
+{
+    do
+    {
+	if (isType (token, TOKEN_BLOCK_LABEL_BEGIN))
+	    parseLabel (token);
+	else
+	{
+	    switch (token->keyword)
+	    {
+		case KEYWORD_if:
+		case KEYWORD_loop:
+		    readToken (token);
+		    parseStatements (token);
+		    break;
+
+		case KEYWORD_declare:
+		case KEYWORD_begin:
+		    parseBlock (token, TRUE);
+		    break;
+
+		default:
+		    readToken (token);
+		    break;
+	    }
+	    findToken (token, TOKEN_SEMICOLON);
+	}
+	readToken (token);
+    } while (! isKeyword (token, KEYWORD_end));
+}
+
+static void parseBlock (tokenInfo *const token, const boolean local)
+{
+    if (isType (token, TOKEN_BLOCK_LABEL_BEGIN))
+    {
+	parseLabel (token);
+	readToken (token);
+    }
+    if (! isKeyword (token, KEYWORD_begin))
+	parseDeclare (token, local);
+    if (isKeyword (token, KEYWORD_begin))
+    {
+	readToken (token);
+	while (! isKeyword (token, KEYWORD_end))
+	    parseStatements (token);
 	findToken (token, TOKEN_SEMICOLON);
     }
 }
@@ -544,6 +604,7 @@ static void parsePackage (tokenInfo *const token)
     {
 	if (isType (name, TOKEN_IDENTIFIER))
 	    makeSqlTag (name, SQLTAG_PACKAGE);
+	readToken (token);
 	parseBlock (token, FALSE);
     }
     findToken (token, TOKEN_SEMICOLON);
@@ -572,8 +633,11 @@ static void parseSqlFile (tokenInfo *const token)
     do
     {
 	readToken (token);
-	switch (token->keyword)
+	if (isType (token, TOKEN_BLOCK_LABEL_BEGIN))
+	    parseLabel (token);
+	else switch (token->keyword)
 	{
+	    case KEYWORD_begin:     parseBlock (token, FALSE); break;
 	    case KEYWORD_cursor:    parseSimple (token, SQLTAG_CURSOR); break;
 	    case KEYWORD_declare:   parseBlock (token, FALSE); break;
 	    case KEYWORD_function:  parseSubProgram (token); break;
