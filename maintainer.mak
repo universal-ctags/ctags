@@ -355,8 +355,10 @@ internal-release-%: ctags-%.tar.gz ctags-%.tar.Z dos-% rpm-%
 	@ echo "---------- Release $* completed"
 
 release-%: cvs-tag-% internal-release-%
+	:
 
 rerelease-%: cvs-retag-% internal-release-%
+	:
 
 #
 # Dependency file generation
