@@ -25,7 +25,6 @@
  *   DATA DECLARATIONS
  */
 typedef enum {
-    K_AND = -2,
     K_NONE = -1,
     K_EXCEPTION,
     K_FUNCTION,
@@ -54,7 +53,6 @@ static struct {
     smlKind kind;
 } SmlKeywordTypes [] = {
     { "abstype",   K_TYPE      },
-    { "and",       K_AND       },
     { "datatype",  K_TYPE      },
     { "exception", K_EXCEPTION },
     { "functor",   K_FUNCTOR   },
@@ -153,7 +151,6 @@ static void findSmlTags (void)
 {
     vString *const identifier = vStringNew ();
     const unsigned char *line;
-    smlKind lastTag = K_NONE;
 
     while ((line = fileReadLine ()) != NULL)
     {
@@ -177,13 +174,7 @@ static void findSmlTags (void)
 	    {
 		cp = skipSpace (cp);
 		cp = parseIdentifier (cp, identifier);
-		if (foundTag == K_AND)
-		    makeSmlTag (lastTag, identifier);
-		else
-		{
-		    makeSmlTag (foundTag, identifier);
-		    lastTag = foundTag;
-		}
+		makeSmlTag (foundTag, identifier);
 	    }
 	    if (strstr ((const char *) cp, "(*") != NULL)
 	    {
