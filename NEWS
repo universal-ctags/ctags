@@ -1,8 +1,9 @@
 Current Version: @@VERSION@@
 
-ctags-5.4 (Wed Oct 16 2002)
+ctags-5.4 (Thu Oct 17 2002)
 * Improved ability for tagsOpen() in readtags library to report failure to
   open tag file, adding new fields to tagFileInfo structure.
+* Improved Cobol support to include data, files, groups, and sections [Cobol].
 * Added '$' a valid character for C identifier [VMS].
 * Added support for recording routine argument declarations for C-like
   languages. See the --fields option and man page section TAG FILE FORMAT for
