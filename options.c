@@ -947,7 +947,7 @@ static void processLanguageForceOption (
 	       "\"--%s\" option is obsolete; use \"--language-force\" instead",
 	       option);
     if (language == LANG_IGNORE)
-	error (FATAL, "Uknown language specified in \"%s\" option", option);
+	error (FATAL, "Unknown language specified in \"%s\" option", option);
     else
 	Option.language = language;
 }
@@ -1150,7 +1150,7 @@ static void processListKindsOption (
     {
 	langType language = getNamedLanguage (parameter);
 	if (language == LANG_IGNORE)
-	    error (FATAL, "Uknown language specified in \"%s\" option", option);
+	    error (FATAL, "Unknown language specified in \"%s\" option",option);
 	else
 	    printLanguageKinds (language);
     }
@@ -1167,7 +1167,7 @@ static void processListMapsOption (
     {
 	langType language = getNamedLanguage (parameter);
 	if (language == LANG_IGNORE)
-	    error (FATAL, "Uknown language specified in \"%s\" option", option);
+	    error (FATAL, "Unknown language specified in \"%s\" option",option);
 	else
 	    printLanguageMaps (language);
     }
