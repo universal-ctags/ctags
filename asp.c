@@ -1,7 +1,7 @@
 /*
 *   $Id$
 *
-*   Copyright (c) 2000, Patrick Dehne
+*   Copyright (c) 2000, Patrick Dehne <patrick@steidle.net>
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License.

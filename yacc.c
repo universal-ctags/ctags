@@ -1,7 +1,7 @@
 /*
 *   $Id$
 *
-*   Copyright (c) 2001, Nick Hibma
+*   Copyright (c) 2001, Nick Hibma <n_hibma@qubesoft.com>
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License.

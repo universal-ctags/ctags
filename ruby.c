@@ -1,7 +1,7 @@
 /*
 *   $Id$
 *
-*   Copyright (c) 2000-2001, Thaddeus Covert
+*   Copyright (c) 2000-2001, Thaddeus Covert <sahuagin@mediaone.net>
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License.
