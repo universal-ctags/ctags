@@ -160,6 +160,13 @@ of the regular expression, starting from \0 (the entire line).
 </p>
 
 <p>
+Lastly, be sure to add your the name of the file containing your parser (e.g.
+swine.c) to the macro <code>SOURCES</code> in the file <code>source.mak</code>
+and an entry for the object file to the macro <code>OBJECTS</code> in the same
+file, so that your new module will be compiled into the program.
+</p>
+
+<p>
 This is all there is to it. All other details are specific to the parser and
 how it wants to do its job. There are some support functions which can take
 care of some commonly needed parsing tasks, such as keyword table lookups (see
