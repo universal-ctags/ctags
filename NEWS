@@ -1,13 +1,15 @@
 Current Version: @@VERSION@@
 
-ctags-5.5 (Sun Mar 09 2003)
+ctags-5.5 (Mon Mar 10 2003)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
+* Changed interface tag kinds to be disabled by default (like prototypes in
+  C/C++) [Fortran].
 * Removed explicit descriptions of individual --<LANG>-types options from
   --help output. See new --list-languages and --list-kinds options.
 * Removed explicit list of supported languages and supported tag kinds and
   mapping patterns from man page. See new --list-languages, --list-kinds, and
   --list-maps options.
-* Renamed --<LANG>-types option to --<LANG>-kinds; still accept old name, though.
+* Renamed --<LANG>-types option to --<LANG>-kinds (still accepts old name).
 * Added --list-kinds option.
 * Added --list-maps option.
 * Added --list-languages option.
@@ -19,11 +21,11 @@ ctags-5.5 (Sun Mar 09 2003)
 * Added support for SML (Standard ML) language, contributed by Venkatesh Prasad.
 * Added mapping for .plx to Perl.
 * Added tags for autocommand groups [Vim, Patch #664685].
+* Added support for numerous language extensions [Fortran].
 * Added '$', 'D', and 'd' in column 1 as comment characters [Fortran].
 * Added special handling of --options=NONE to disable automatic reading of
   options from configuration files or environment.
 * Added check for case-insensitive filenames to configure.
-* Added support for numerous language extensions [Fortran].
 * Fixed problem with lower case <SID> tag [Vim, Bug #657327].
 * Fixed problem recognizing indented code [Vim, Patch #664685].
 * Fixed problem with infinite loop in certain comments [PL/SQL, Bug #629115].

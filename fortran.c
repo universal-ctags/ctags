@@ -172,7 +172,6 @@ typedef enum eTagType {
     TAG_MODULE,
     TAG_NAMELIST,
     TAG_PROGRAM,
-    TAG_STRUCTURE,
     TAG_SUBROUTINE,
     TAG_DERIVED_TYPE,
     TAG_VARIABLE,
@@ -206,18 +205,24 @@ static kindOption FortranKinds [] = {
     { TRUE,  'c', "common",     "common blocks"},
     { TRUE,  'e', "entry",      "entry points"},
     { TRUE,  'f', "function",   "functions"},
-    { TRUE,  'i', "interface",  "interfaces"},
+    { FALSE, 'i', "interface",  "interfaces"},
     { TRUE,  'k', "component",  "type and structure components"},
     { TRUE,  'l', "label",      "labels"},
     { FALSE, 'L', "local",      "local, common block, and namelist variables"},
     { TRUE,  'm', "module",     "modules"},
     { TRUE,  'n', "namelist",   "namelists"},
     { TRUE,  'p', "program",    "programs"},
-    { TRUE,  'S', "structure",  "structures"},
     { TRUE,  's', "subroutine", "subroutines"},
-    { TRUE,  't', "type",       "derived types"},
+    { TRUE,  't', "type",       "derived types and structures"},
     { TRUE,  'v', "variable",   "program (global) and module variables"}
 };
+
+/* For a definition of Fortran 77 with extensions:
+ * http://scienide.uwaterloo.ca/MIPSpro7/007-2362-004/sgi_html/index.html
+ *
+ * For the Compaq Fortran Reference Manual:
+ * http://h18009.www1.hp.com/fortran/docs/lrm/dflrm.htm
+ */
 
 static const keywordDesc FortranKeywordTable [] = {
     /* keyword		keyword ID */
@@ -394,6 +399,15 @@ static tokenInfo *newToken (void)
     token->filePosition	= getInputFilePosition ();
 
     return token;
+}
+
+static tokenInfo *newTokenFrom (tokenInfo *const token)
+{
+    tokenInfo *result = newToken ();
+    *result = *token;
+    result->string = vStringNewCopy (token->string);
+    token->secondary = NULL;
+    return result;
 }
 
 static void deleteToken (tokenInfo *const token)
@@ -1223,7 +1237,6 @@ static tagType variableTagType (void)
 	    case TAG_MODULE:       result = TAG_VARIABLE;  break;
 	    case TAG_DERIVED_TYPE: result = TAG_COMPONENT; break;
 	    case TAG_FUNCTION:     result = TAG_LOCAL;     break;
-	    case TAG_STRUCTURE:    result = TAG_COMPONENT; break;
 	    case TAG_SUBROUTINE:   result = TAG_LOCAL;     break;
 	}
     }
@@ -1301,13 +1314,6 @@ static void parseTypeDeclarationStmt (tokenInfo *const token)
     }
     if (isType (token, TOKEN_STATEMENT_END))
 	skipToNextStatement (token);
-}
-
-static void parseParenName (tokenInfo *const token)
-{
-    readToken (token);
-    if (isType (token, TOKEN_PAREN_OPEN))
-	readToken (token);
 }
 
 /*  namelist-stmt is
@@ -1447,23 +1453,41 @@ static void parseUnionStmt (tokenInfo *const token)
  */
 static void parseStructureStmt (tokenInfo *const token)
 {
+    tokenInfo *name;
     Assert (isKeyword (token, KEYWORD_structure));
     readToken (token);
     if (isType (token, TOKEN_OPERATOR) &&
 	strcmp (vStringValue (token->string), "/") == 0)
-    {
+    {	/* read structure name */
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
-	    makeFortranTag (token, TAG_STRUCTURE);
-	ancestorPush (token);
-	skipToNextStatement (token);
-	while (! isKeyword (token, KEYWORD_end))
-	    parseFieldDefinition (token);
-	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_structure));
-	skipToNextStatement (token);
-	ancestorPop ();
+	    makeFortranTag (token, TAG_DERIVED_TYPE);
+	name = newTokenFrom (token);
+	skipPast (token, TOKEN_OPERATOR);
     }
+    else
+    {	/* fake out anonymous structure */
+	name = newToken ();
+	name->type = TOKEN_IDENTIFIER;
+	name->tag = TAG_DERIVED_TYPE;
+	vStringCopyS (name->string, "anonymous");
+    }
+    while (isType (token, TOKEN_IDENTIFIER))
+    {	/* read field names */
+	makeFortranTag (token, TAG_COMPONENT);
+	readToken (token);
+	if (isType (token, TOKEN_COMMA))
+	    readToken (token);
+    }
+    skipToNextStatement (token);
+    ancestorPush (name);
+    while (! isKeyword (token, KEYWORD_end))
+	parseFieldDefinition (token);
+    readSubToken (token);
+    Assert (isSecondaryKeyword (token, KEYWORD_structure));
+    skipToNextStatement (token);
+    ancestorPop ();
+    deleteToken (name);
 }
 
 /*  specification-stmt
@@ -1600,13 +1624,17 @@ static void parseDerivedTypeDef (tokenInfo *const token)
  */
 static void parseInterfaceBlock (tokenInfo *const token)
 {
+    Assert (isKeyword (token, KEYWORD_interface));
+#if 1
     readToken (token);
     if (isType (token, TOKEN_IDENTIFIER))
 	makeFortranTag (token, TAG_INTERFACE);
     else if (isKeyword (token, KEYWORD_assignment) ||
 	     isKeyword (token, KEYWORD_operator))
     {
-	parseParenName (token);
+	readToken (token);
+	if (isType (token, TOKEN_PAREN_OPEN))
+	    readToken (token);
 	if (isType (token, TOKEN_OPERATOR))
 	    makeFortranTag (token, TAG_INTERFACE);
     }
@@ -1632,6 +1660,17 @@ static void parseInterfaceBlock (tokenInfo *const token)
     Assert (isSecondaryKeyword (token, KEYWORD_interface));
     skipToNextStatement (token);
     ancestorPop ();
+#else
+    do
+    {
+	do
+	    skipToNextStatement (token);
+	while (! isKeyword (token, KEYWORD_end));
+	readSubToken (token);
+    } while (! isSecondaryKeyword (token, KEYWORD_interface));
+    Assert (isSecondaryKeyword (token, KEYWORD_interface));
+    skipToNextStatement (token);
+#endif
 }
 
 /*  entry-stmt is
@@ -1934,6 +1973,9 @@ static void parseExecutionPart (tokenInfo *const token)
 
 static void parseSubprogram (tokenInfo *const token, const tagType tag)
 {
+    Assert (isKeyword (token, KEYWORD_program) ||
+	    isKeyword (token, KEYWORD_function) ||
+	    isKeyword (token, KEYWORD_subroutine));
     readToken (token);
     if (isType (token, TOKEN_IDENTIFIER))
 	makeFortranTag (token, tag);
@@ -1946,6 +1988,7 @@ static void parseSubprogram (tokenInfo *const token, const tagType tag)
     Assert (isKeyword (token, KEYWORD_end));
     readSubToken (token);
     Assert (isSecondaryKeyword (token, KEYWORD_NONE) ||
+	    isSecondaryKeyword (token, KEYWORD_program) ||
 	    isSecondaryKeyword (token, KEYWORD_function) ||
 	    isSecondaryKeyword (token, KEYWORD_subroutine));
     skipToNextStatement (token);

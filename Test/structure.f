@@ -16,3 +16,14 @@
         record /weather/ latest
         print *, latest.month, latest.day, latest.year, 
       + latest.clouds, latest.rainfall
+        end program
+
+        program nested_structure
+        structure /top/
+            structure /nested/ level2
+                structure level3a, level3b
+                    integer a
+                end structure
+            end structure
+        end structure
+        end program
