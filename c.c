@@ -565,7 +565,7 @@ static const char *implementationString (const impType imp)
 static const char *tokenString (const tokenType type)
 {
     static const char *const names [] = {
-	"none", "args", "}", "{", "comma", "colon", "double colon", "keyword",
+	"none", "args", "}", "{", "colon", "comma", "double colon", "keyword",
 	"name", "package", "paren-name", "semicolon", "specifier"
     };
     Assert (sizeof (names) / sizeof (names [0]) == TOKEN_COUNT);
@@ -1228,8 +1228,6 @@ static void qualifyVariableTag (const statementInfo *const st,
      */
     if (! isType (nameToken, TOKEN_NAME))
 	;
-    else if (st->declaration == DECL_IGNORE)
-	;
     else if (st->scope == SCOPE_TYPEDEF)
 	makeTag (nameToken, st, TRUE, TAG_TYPEDEF);
     else if (st->declaration == DECL_EVENT)
@@ -1646,6 +1644,12 @@ static void readParents (statementInfo *const st, const int qualifier)
     deleteToken (token);
 }
 
+static void skipStatement (statementInfo *const st)
+{
+    st->declaration = DECL_IGNORE;
+    skipToOneOf (";");
+}
+
 static void processToken (tokenInfo *const token, statementInfo *const st)
 {
     switch (token->keyword)		/* is it a reserved word? */
@@ -1668,10 +1672,10 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 	case KEYWORD_FLOAT:	st->declaration = DECL_BASE;		break;
 	case KEYWORD_FUNCTION:	st->declaration = DECL_BASE;		break;
 	case KEYWORD_FRIEND:	st->scope	= SCOPE_FRIEND;		break;
-	case KEYWORD_GOTO:	st->declaration = DECL_IGNORE;		break;
+	case KEYWORD_GOTO:	skipStatement (st);			break;
 	case KEYWORD_IMPLEMENTS:readParents (st, '.');
 				setToken (st, TOKEN_NONE);		break;
-	case KEYWORD_IMPORT:	st->declaration = DECL_IGNORE;		break;
+	case KEYWORD_IMPORT:	skipStatement (st);			break;
 	case KEYWORD_INT:	st->declaration = DECL_BASE;		break;
 	case KEYWORD_INTEGER:	st->declaration = DECL_BASE;		break;
 	case KEYWORD_INTERFACE: st->declaration = DECL_INTERFACE;	break;
@@ -1684,7 +1688,7 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 	case KEYWORD_PROGRAM:	st->declaration = DECL_PROGRAM;		break;
 	case KEYWORD_PROTECTED:	setAccess (st, ACCESS_PROTECTED);	break;
 	case KEYWORD_PUBLIC:	setAccess (st, ACCESS_PUBLIC);		break;
-	case KEYWORD_RETURN:	st->declaration = DECL_IGNORE;		break;
+	case KEYWORD_RETURN:	skipStatement (st);			break;
 	case KEYWORD_SHORT:	st->declaration = DECL_BASE;		break;
 	case KEYWORD_SIGNED:	st->declaration = DECL_BASE;		break;
 	case KEYWORD_STRING:	st->declaration = DECL_BASE;		break;
@@ -1693,7 +1697,7 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 	case KEYWORD_THROWS:	discardTypeList (token);		break;
 	case KEYWORD_UNION:	st->declaration = DECL_UNION;		break;
 	case KEYWORD_UNSIGNED:	st->declaration = DECL_BASE;		break;
-	case KEYWORD_USING:	st->declaration = DECL_IGNORE;		break;
+	case KEYWORD_USING:	skipStatement (st);			break;
 	case KEYWORD_VOID:	st->declaration = DECL_BASE;		break;
 	case KEYWORD_VOLATILE:	st->declaration = DECL_BASE;		break;
 	case KEYWORD_VIRTUAL:	st->implementation = IMP_VIRTUAL;	break;
@@ -2257,6 +2261,15 @@ static void processColon (statementInfo *const st)
     }
 }
 
+static void processAngleBracket (void)
+{
+    int c = cppGetc ();
+    if (isLanguage (Lang_cpp) &&  c != '<' && c != '=')
+	skipToMatch ("<>");        /* this is a template */
+    else
+	cppUngetc (c);
+}
+
 /*  Skips over any initializing value which may follow an '=' character in a
  *  variable definition.
  */
@@ -2359,12 +2372,6 @@ static void parseGeneralToken (statementInfo *const st, const int c)
 		cppUngetc (c2);
 	}
     }
-    else if (c == '<')
-    {
-	int c2 = cppGetc ();
-	if (st->declaration == DECL_CLASS && !(c2 == '=' || isspace (c2)))
-	    skipToMatch ("<>");        /* this is a template */
-    }
     else if (c == '!' || c == '>')
     {
 	int c2 = cppGetc ();
@@ -2391,6 +2398,7 @@ static void nextToken (statementInfo *const st)
 	{
 	    case EOF: longjmp (Exception, (int) ExceptionEOF);	break;
 	    case '(': analyzeParens (st);			break;
+	    case '<': processAngleBracket ();			break;
 	    case '*': st->haveQualifyingName = FALSE;		break;
 	    case ',': setToken (st, TOKEN_COMMA);		break;
 	    case ':': processColon (st);			break;

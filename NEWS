@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.3 (Fri Dec 19 2003)
+ctags-5.5.3 (Sun Dec 21 2003)
 * Removed forgotten debug statement [Bug #811704].
 * Fixed problem destroying tag file with certain info options [Bug #845502].
 * Fixed portability problem [DJGPP].
@@ -8,6 +8,7 @@ ctags-5.5.3 (Fri Dec 19 2003)
 * Fixed problem manifested by errant preprocessor conditionals [Bug #839162].
 * Fixed incorrect line address in tag file for SQL tags [SQL, Bug #823000].
 * Fixed incorrect recognition of POD paragraph [Perl, Bug #842077].
+* Fixed spurious tags for for C++ member templtates [C++, Bug #849591].
 
 ctags-5.5.2 (Wed Sep 17 2003)
 * Added tags for local variables for C-based languages [C/C++/C#/Java/Vera,
