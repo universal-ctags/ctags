@@ -71,15 +71,15 @@ feature -- Output
 	out: STRING is
 			-- Printable representation of tag entry
 		do
-			create Result.make (name.count + 1 + file.count + 1 + pattern.count)
-			io.put_string (name)
-			io.put_character ('%T')
-			io.put_string (file)
-			io.put_character ('%T')
+			create Result.make (name.count + 1 + file.count + 1 + pattern.count + 40)
+			Result.append (name)
+			Result.extend (Tab)
+			Result.append (file)
+			Result.extend (Tab)
 			if pattern /= Void then
-				io.put_string (pattern)
+				Result.append (pattern)
 			else
-				io.put_string (line_number.out)
+				Result.append_integer (line_number)
 			end
 		end
 
@@ -87,10 +87,11 @@ feature -- Output
 			-- Printable representation of tag entry with extension fields
 		local
 			sep: STRING
+			o: STRING
 		do
-			create Result.make (30)
 			sep := ";%""
 			Result := out
+			Result.copy (out)
 			if kind /= Void then
 				Result.append (sep); sep := Empty_string
 				Result.extend (Tab)
