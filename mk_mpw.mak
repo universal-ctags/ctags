@@ -23,6 +23,7 @@ SOURCES = ¶
 	get.c ¶
 	keyword.c ¶
 	lisp.c ¶
+	lregex.c ¶
 	lua.c ¶
 	main.c ¶
 	make.c ¶
@@ -33,7 +34,6 @@ SOURCES = ¶
 	php.c ¶
 	python.c ¶
 	read.c ¶
-	lregex.c ¶
 	rexx.c ¶ ¶
 	routines.c ¶
 	ruby.c ¶
@@ -62,6 +62,7 @@ OBJ = ¶
 	get.o ¶
 	keyword.o ¶
 	lisp.o ¶
+	lregex.o ¶
 	lua.o ¶
 	main.o ¶
 	make.o ¶
@@ -72,7 +73,6 @@ OBJ = ¶
 	php.o ¶
 	python.o ¶
 	read.o ¶
-	lregex.o ¶
 	rexx.o ¶
 	routines.o ¶
 	ruby.o ¶

@@ -21,6 +21,7 @@ SOURCES = \
 	get.c \
 	keyword.c \
 	lisp.c \
+	lregex.c \
 	lua.c \
 	main.c \
 	make.c \
@@ -31,7 +32,6 @@ SOURCES = \
 	php.c \
 	python.c \
 	read.c \
-	lregex.c \
 	rexx.c \
 	routines.c \
 	ruby.c \
@@ -66,6 +66,7 @@ OBJECTS = \
 	get.$(OBJEXT) \
 	keyword.$(OBJEXT) \
 	lisp.$(OBJEXT) \
+	lregex.$(OBJEXT) \
 	lua.$(OBJEXT) \
 	main.$(OBJEXT) \
 	make.$(OBJEXT) \
@@ -76,7 +77,6 @@ OBJECTS = \
 	php.$(OBJEXT) \
 	python.$(OBJEXT) \
 	read.$(OBJEXT) \
-	lregex.$(OBJEXT) \
 	rexx.$(OBJEXT) \
 	routines.$(OBJEXT) \
 	ruby.$(OBJEXT) \

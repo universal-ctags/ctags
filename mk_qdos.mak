@@ -53,6 +53,7 @@ OBJECTS = qdos.$(OBJEXT) \
 	get.$(OBJEXT) \
 	keyword.$(OBJEXT) \
 	lisp.$(OBJEXT) \
+	lregex.$(OBJEXT) \
 	lua.$(OBJEXT) \
 	main.$(OBJEXT) \
 	make.$(OBJEXT) \
@@ -63,7 +64,6 @@ OBJECTS = qdos.$(OBJEXT) \
 	php.$(OBJEXT) \
 	python.$(OBJEXT) \
 	read.$(OBJEXT) \
-	lregex.$(OBJEXT) \
 	rexx.$(OBJEXT) \
 	routines.$(OBJEXT) \
 	ruby.$(OBJEXT) \
