@@ -319,7 +319,7 @@ rpm-%: ctags-%.tar.gz ctags.spec $(RPM_ROOT)/SOURCES $(RPM_ROOT)/SPECS
 	@ echo "---------- Building RPM"
 	cp -p ctags-$*.tar.gz $(RPM_ROOT)/SOURCES/
 	sed -e "s/@@VERSION@@/$*/" ctags.spec > $(RPM_ROOT)/SPECS/ctags-$*.spec
-	(cd $(RPM_ROOT)/SPECS; rpm --sign -ba ctags-$*.spec)
+	(cd $(RPM_ROOT)/SPECS; rpm -ba ctags-$*.spec)
 	rm -fr $(RPM_ROOT)/BUILD/ctags-$*
 
 ctags32-%: ctags-%.tar.gz
