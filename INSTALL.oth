@@ -9,7 +9,7 @@ For non-Unix platforms, simple makefiles are provided:
     descrip.mms   For VMS using either DEC C or VAX C
     mk_bc3.mak    For MSDOS using Borland C/C++ 3.x
     mk_bc5.mak    For Win32 using Borland C++ 5.5
-    mk_djg.mak    For MSDOS using Gnu GCC (DJGPP)
+    mk_djg.mak    For MSDOS using DJGPP Gnu GCC (better to follow Unix install)
     mk_manx.mak   For Amiga using Aztec/Manx C 5.0
     mk_ming.mak   For Win32 using Mingw32
     mk_mpw.mak    For Macintosh using MPW
@@ -34,6 +34,12 @@ Win32:
   See the makefiles, mk_mvc.mak or mk_bc5.mak, to learn how to build with
   this library.
 
+DJGPP:
+------
+
+  It is better to follow the standard Unix install on DJGPP, but this requires
+  that you use BASH and requires a fairly complete installation of GJGPP
+  packages. You can use mk_djg.mak if you can't run configure.
 
 Macintosh with MPW:
 -------------------

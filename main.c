@@ -236,93 +236,110 @@ static boolean excludedFile (const char* const name)
     return result;
 }
 
-# if defined (MSDOS) || defined (WIN32)
-
-static boolean createTagsForMatchingEntries (char *const pattern)
+#if defined (HAVE_OPENDIR)
+static boolean recurseUsingOpendir (const char *const dirName)
 {
     boolean resize = FALSE;
-    const size_t dirLength = baseFilename (pattern) - (char *) pattern;
-    vString *const filePath = vStringNew ();
+    DIR *const dir = opendir (dirName);
+    if (dir == NULL)
+	error (WARNING | PERROR, "cannot recurse into directory \"%s\"", dirName);
+    else
+    {
+	struct dirent *entry;
+	while ((entry = readdir (dir)) != NULL)
+	{
+	    if (strcmp (entry->d_name, ".") != 0  &&
+		strcmp (entry->d_name, "..") != 0)
+	    {
+		vString *filePath;
+		if (strcmp (dirName, ".") == 0)
+		    filePath = vStringNewInit (entry->d_name);
+		else
+		    filePath = combinePathAndFile (dirName, entry->d_name);
+		resize |= createTagsForEntry (vStringValue (filePath));
+		vStringDelete (filePath);
+	    }
+	}
+	closedir (dir);
+    }
+    return resize;
+}
+
+#elif defined (HAVE_FINDFIRST) || defined (HAVE__FINDFIRST)
+
+static boolean createTagsForWildcardEntry (
+	const char *const pattern, const size_t dirLength,
+	const char *const entryName)
+{
+    boolean resize = FALSE;
+    /* we must not recurse into the directories "." or ".." */
+    if (strcmp (entryName, ".") != 0  &&  strcmp (entryName, "..") != 0)
+    {
+	vString *const filePath = vStringNew ();
+	vStringNCopyS (filePath, pattern, dirLength);
+	vStringCatS (filePath, entryName);
+	resize = createTagsForEntry (vStringValue (filePath));
+	vStringDelete (filePath);
+    }
+    return resize;
+}
+
+static boolean createTagsForWildcardUsingFindfirst (const char *const pattern)
+{
+    boolean resize = FALSE;
+    const size_t dirLength = baseFilename (pattern) - pattern;
 #if defined (HAVE_FINDFIRST)
     struct ffblk fileInfo;
     int result = findfirst (pattern, &fileInfo, FA_DIREC);
-
     while (result == 0)
     {
-	const char *const entryName = fileInfo.ff_name;
-
-	/*  We must not recurse into the directories "." or "..".
-	 */
-	if (strcmp (entryName, ".") != 0  &&  strcmp (entryName, "..") != 0)
-	{
-	    vStringNCopyS (filePath, pattern, dirLength);
-	    vStringCatS (filePath, entryName);
-	    resize |= createTagsForEntry (vStringValue (filePath));
-	}
+	const char *const entry = (const char *) fileInfo.ff_name;
+	resize |= createTagsForWildcardEntry (pattern, dirLength, entry);
 	result = findnext (&fileInfo);
     }
 #elif defined (HAVE__FINDFIRST)
     struct _finddata_t fileInfo;
-    long hFile = _findfirst (pattern, &fileInfo);
-
+    intptr_t hFile = _findfirst (pattern, &fileInfo);
     if (hFile != -1L)
     {
 	do
 	{
-	    const char *const entryName = fileInfo.name;
-
-	    /*  We must not recurse into the directories "." or "..".
-	     */
-	    if (strcmp (entryName, ".") != 0  &&  strcmp (entryName, "..") != 0)
-	    {
-		vStringNCopyS (filePath, pattern, dirLength);
-		vStringCatS (filePath, entryName);
-		resize |= createTagsForEntry (vStringValue (filePath));
-	    }
+	    const char *const entry = (const char *) fileInfo.name;
+	    resize |= createTagsForWildcardEntry (pattern, dirLength, entry);
 	} while (_findnext (hFile, &fileInfo) == 0);
 	_findclose (hFile);
     }
 #endif
-
-    vStringDelete (filePath);
     return resize;
 }
 
 #elif defined (AMIGA)
 
-static boolean createTagsForMatchingEntries (char *const pattern)
+static boolean createTagsForAmigaWildcard (const char *const pattern)
 {
     boolean resize = FALSE;
     struct AnchorPath *const anchor =
-			(struct AnchorPath *) eMalloc ((size_t) ANCHOR_SIZE);
+	    (struct AnchorPath *) eMalloc ((size_t) ANCHOR_SIZE);
+    LONG result;
 
-    if (anchor != NULL)
-    {
-	LONG result;
-
-	memset (anchor, 0, (size_t) ANCHOR_SIZE);
-	anchor->ap_Strlen = ANCHOR_BUF_SIZE; /* ap_Length no longer supported */
-
-	/*  Allow '.' for current directory.
-	 */
+    memset (anchor, 0, (size_t) ANCHOR_SIZE);
+    anchor->ap_Strlen = ANCHOR_BUF_SIZE;
+    /* Allow '.' for current directory */
 #ifdef APF_DODOT
-	anchor->ap_Flags = APF_DODOT | APF_DOWILD;
+    anchor->ap_Flags = APF_DODOT | APF_DOWILD;
 #else
-	anchor->ap_Flags = APF_DoDot | APF_DoWild;
+    anchor->ap_Flags = APF_DoDot | APF_DoWild;
 #endif
-
-	result = MatchFirst ((UBYTE *) pattern, anchor);
-	while (result == 0)
-	{
-	    resize |= createTagsForEntry ((char *) anchor->ap_Buf);
-	    result = MatchNext (anchor);
-	}
-	MatchEnd (anchor);
-	eFree (anchor);
+    result = MatchFirst ((UBYTE *) pattern, anchor);
+    while (result == 0)
+    {
+	resize |= createTagsForEntry ((char *) anchor->ap_Buf);
+	result = MatchNext (anchor);
     }
+    MatchEnd (anchor);
+    eFree (anchor);
     return resize;
 }
-
 #endif
 
 static boolean recurseIntoDirectory (const char *const dirName)
@@ -334,50 +351,32 @@ static boolean recurseIntoDirectory (const char *const dirName)
 	verbose ("ignoring \"%s\" (directory)\n", dirName);
     else
     {
-#if defined (HAVE_OPENDIR)
-	DIR *const dir = opendir (dirName);
-	if (dir == NULL)
-	    error (WARNING | PERROR, "cannot recurse into directory \"%s\"",
-		   dirName);
-	else
-	{
-	    struct dirent *entry;
-	    verbose ("RECURSING into directory \"%s\"\n", dirName);
-	    while ((entry = readdir (dir)) != NULL)
-	    {
-		if (strcmp (entry->d_name, ".") != 0  &&
-		    strcmp (entry->d_name, "..") != 0)
-		{
-		    vString *filePath;
-		    if (strcmp (dirName, ".") == 0)
-			filePath = vStringNewInit (entry->d_name);
-		    else
-			filePath = combinePathAndFile (dirName, entry->d_name);
-		    resize |= createTagsForEntry (vStringValue (filePath));
-		    vStringDelete (filePath);
-		}
-	    }
-	    closedir (dir);
-	}
-#elif defined (AMIGA) || defined (MSDOS) || defined (WIN32)
-	vString *const pattern = vStringNew ();
 	verbose ("RECURSING into directory \"%s\"\n", dirName);
-# ifdef AMIGA
-	if (*dirName != '\0'  &&  strcmp (dirName, ".") != 0)
+#if defined (HAVE_OPENDIR)
+	resize = recurseUsingOpendir (dirName);
+#elif defined (HAVE_FINDFIRST) || defined (HAVE__FINDFIRST)
 	{
+	    vString *const pattern = vStringNew ();
 	    vStringCopyS (pattern, dirName);
-	    if (dirName [strlen (dirName) - 1] != '/')
-		vStringPut (pattern, '/');
+	    vStringPut (pattern, OUTPUT_PATH_SEPARATOR);
+	    vStringCatS (pattern, "*.*");
+	    resize = createTagsForWildcardUsingFindfirst (vStringValue (pattern));
+	    vStringDelete (pattern);
 	}
-	vStringCatS (pattern, "#?");
-# else
-	vStringCopyS (pattern, dirName);
-	vStringPut (pattern, OUTPUT_PATH_SEPARATOR);
-	vStringCatS (pattern, "*.*");
-# endif
-	resize = createTagsForMatchingEntries (vStringValue (pattern));
-	vStringDelete (pattern);
-#endif	/* HAVE_OPENDIR */
+#elif defined (AMIGA)
+	{
+	    vString *const pattern = vStringNew ();
+	    if (*dirName != '\0'  &&  strcmp (dirName, ".") != 0)
+	    {
+		vStringCopyS (pattern, dirName);
+		if (dirName [strlen (dirName) - 1] != '/')
+		    vStringPut (pattern, '/');
+	    }
+	    vStringCatS (pattern, "#?");
+	    resize = createTagsForAmigaWildcard (vStringValue (pattern));
+	    vStringDelete (pattern);
+	}
+#endif
     }
     return resize;
 }
@@ -404,6 +403,32 @@ static boolean createTagsForEntry (const char *const entryName)
     return resize;
 }
 
+#ifdef MANUAL_GLOBBING
+
+static boolean createTagsForWildcardArg (const char *const arg)
+{
+    boolean resize = FALSE;
+    vString *const pattern = vStringNewInit (arg);
+    char *patternS = vStringValue (pattern);
+
+#if defined (HAVE_FINDFIRST) || defined (HAVE__FINDFIRST)
+    /*  We must transform the "." and ".." forms into something that can
+     *  be expanded by the findfirst/_findfirst functions.
+     */
+    if (Option.recurse  &&
+	(strcmp (patternS, ".") == 0  ||  strcmp (patternS, "..") == 0))
+    {
+	vStringPut (pattern, OUTPUT_PATH_SEPARATOR);
+	vStringCatS (pattern, "*.*");
+    }
+    resize |= createTagsForWildcardUsingFindfirst (patternS);
+#endif
+    vStringDelete (pattern);
+    return resize;
+}
+
+#endif
+
 static boolean createTagsForArgs (cookedArgs* const args)
 {
     boolean resize = FALSE;
@@ -412,23 +437,10 @@ static boolean createTagsForArgs (cookedArgs* const args)
      */
     while (! cArgOff (args))
     {
-	const char *arg = cArgItem (args);
+	const char *const arg = cArgItem (args);
 
-#if defined (MSDOS) || defined (WIN32)
-	vString *const pattern = vStringNewInit (arg);
-	char *patternS = vStringValue (pattern);
-
-	/*  We must transform the "." and ".." forms into something that can
-	 *  be expanded by the MSDOS/Windows functions.
-	 */
-	if (Option.recurse  &&
-	    (strcmp (patternS, ".") == 0  ||  strcmp (patternS, "..") == 0))
-	{
-	    vStringPut (pattern, OUTPUT_PATH_SEPARATOR);
-	    vStringCatS (pattern, "*.*");
-	}
-	resize |= createTagsForMatchingEntries (patternS);
-	vStringDelete (pattern);
+#ifdef MANUAL_GLOBBING
+	resize |= createTagsForWildcardArg (arg);
 #else
 	resize |= createTagsForEntry (arg);
 #endif

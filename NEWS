@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.5 (Sat Mar 29 2003)
+ctags-5.5 (Sun Mar 30 2003)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
 * Changed tags within interfaces to be disabled by default (like prototypes in
   C/C++) [Fortran].
@@ -42,6 +42,7 @@ ctags-5.5 (Sat Mar 29 2003)
 * Fixed man page errors and omissions.
 * Fixed bug in readFieldValue() in readtags library.
 * Fixed bug in option parsing in readtags command-line program.
+* Fixed portability problems with Cygwin and DJGPP.
 
 ctags-5.4 (Thu Oct 17 2002)
 * Improved ability for tagsOpen() in readtags library to report failure to

@@ -85,14 +85,6 @@
 # endif
 #endif
 
-#ifndef HAVE_STRICMP
-# define stricmp(s1,s2) struppercmp(s1,s2)
-#endif
-
-#ifndef HAVE_STRICMP
-# define strnicmp(s1,s2,n) strnuppercmp(s1,s2,n)
-#endif
-
 /*
 *   DATA DECLARATIONS
 */

@@ -71,6 +71,10 @@ AC_ARG_ENABLE(maintainer-mode,
 [  --enable-maintainer-mode
                           use maintainer makefile])
 
+AC_ARG_ENABLE(shell-globbing,
+[  --enable-shell-globbing=DIR
+                          does shell expand wildcards (yes|no)? [yes]])
+
 AC_ARG_ENABLE(tmpdir,
 [  --enable-tmpdir=DIR     default directory for temporary files [ARG=/tmp]],
 	tmpdir_specified=yes)
@@ -112,31 +116,6 @@ if test "$enable_macro_patterns" = yes ; then
 	AC_MSG_RESULT(tag file will use patterns for macros by default)
 fi
 
-AC_MSG_CHECKING(selected sort method)
-if test no = "$enable_external_sort"; then
-	AC_MSG_RESULT(simple internal algorithm)
-else
-	AC_MSG_RESULT(external sort utility)
-	enable_external_sort=no
-    AC_CHECK_PROG(sort_found, sort, yes, no)
-	if test "$sort_found" = yes ; then
-		AC_MSG_CHECKING(if sort accepts our command line)
-		touch /tmp/sort.test
-		sort -u -f -o /tmp/sort.test /tmp/sort.test 1>/dev/null 2>&1
-		if test $? -ne 0 ; then
-			AC_MSG_RESULT(no)
-		else
-			AC_MSG_RESULT(yes)
-			AC_DEFINE(EXTERNAL_SORT)
-			enable_external_sort=yes
-		fi
-		rm -f /tmp/sort.test
-    fi
-fi
-if test "$enable_external_sort" != yes ; then
-	AC_MSG_RESULT(using internal sort algorithm as fallback)
-fi
-
 dnl Checks for programs
 dnl -------------------
 
@@ -172,6 +151,30 @@ AC_CHECK_PROG(STRIP, strip, strip, :)
 dnl Checks for operating environment
 dnl --------------------------------
 
+dnl Check for temporary directory
+AC_MSG_CHECKING(directory to use for temporary files)
+if test -n "$enable_tmpdir"; then
+	tmpdir="$enable_tmpdir"
+elif test -n "$TMPDIR"; then
+	tmpdir="$TMPDIR"
+elif test -n "$TMPDIR"; then
+	tmpdir="$TMPDIR"
+elif test -n "$TMP"; then
+	tmpdir="$TMP"
+elif test -n "$TEMP"; then
+	tmpdir="$TEMP"
+elif test -d "c:/"; then
+	tmpdir="c:/"
+else
+	tmpdir="/tmp"
+fi
+if test -d $tmpdir ; then
+	AC_MSG_RESULT($tmpdir)
+	AC_DEFINE_UNQUOTED(TMPDIR, "$tmpdir")
+else
+	AC_MSG_ERROR($tmpdir does not exist)
+fi
+
 dnl Check whether system supports #! scripts
 AC_SYS_INTERPRETER
 if test yes = "$interpval"; then
@@ -188,6 +191,31 @@ else
 	AC_MSG_RESULT(no)
 fi
 rm -f conftest.cif
+
+AC_MSG_CHECKING(selected sort method)
+if test no = "$enable_external_sort"; then
+	AC_MSG_RESULT(simple internal algorithm)
+else
+	AC_MSG_RESULT(external sort utility)
+	enable_external_sort=no
+    AC_CHECK_PROG(sort_found, sort, yes, no)
+	if test "$sort_found" = yes ; then
+		AC_MSG_CHECKING(if sort accepts our command line)
+		touch ${tmpdir}/sort.test
+		sort -u -f -o ${tmpdir}/sort.test ${tmpdir}/sort.test 1>/dev/null 2>&1
+		if test $? -ne 0 ; then
+			AC_MSG_RESULT(no)
+		else
+			AC_MSG_RESULT(yes)
+			AC_DEFINE(EXTERNAL_SORT)
+			enable_external_sort=yes
+		fi
+		rm -f ${tmpdir}/sort.test
+    fi
+fi
+if test "$enable_external_sort" != yes ; then
+	AC_MSG_RESULT(using internal sort algorithm as fallback)
+fi
 
 
 dnl Checks for header files
@@ -276,21 +304,10 @@ if test "$have_mkstemp" != yes -a "$have_tempnam" != yes; then
 	if test "$tmpdir_specified" = yes ; then
 		AC_MSG_RESULT(use of tmpnam overrides temporary directory selection)
 	fi
-else
-	AC_MSG_CHECKING(directory to use for temporary files)
-	if test -z "$enable_tmpdir" -o "$enable_tmpdir" = no -o "$enable_tmpdir" = yes ;
-		then tmpdir=/tmp
-		else tmpdir="$enable_tmpdir"
-	fi
-	if test -d $tmpdir ; then
-		AC_MSG_RESULT($tmpdir)
-		AC_DEFINE_UNQUOTED(TMPDIR, "$tmpdir")
-	else
-		AC_MSG_WARN($tmpdir does not exist)
-	fi
 fi
 
-AC_CHECK_FUNCS(strerror opendir)
+AC_CHECK_FUNCS(opendir findfirst _findfirst, break)
+AC_CHECK_FUNCS(strerror)
 AC_CHECK_FUNCS(clock times, break)
 AC_CHECK_FUNCS(remove, have_remove=yes,
 	CHECK_HEADER_DEFINE(remove, unistd.h,, AC_DEFINE(remove, unlink)))
