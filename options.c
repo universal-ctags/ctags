@@ -93,6 +93,7 @@ typedef const struct {
 
 static boolean NonOptionEncountered;
 static stringList *OptionFiles;
+static stringList* Excluded;
 static boolean FilesRequired = TRUE;
 static boolean SkipConfiguration;
 
@@ -721,6 +722,51 @@ static void processEtagsInclude (
 	stringListAdd (Option.etagsInclude, file);
 	FilesRequired = FALSE;
     }
+}
+
+static void processExcludeOption (
+	const char *const option __unused__, const char *const parameter)
+{
+    const char *const fileName = parameter + 1;
+    if (parameter [0] == '\0')
+	freeList (&Excluded);
+    else if (parameter [0] == '@')
+    {
+	stringList* const sl = stringListNewFromFile (fileName);
+	if (sl == NULL)
+	    error (FATAL | PERROR, "cannot open \"%s\"", fileName);
+	if (Excluded == NULL)
+	    Excluded = sl;
+	else
+	    stringListCombine (Excluded, sl);
+	verbose ("    adding exclude patterns from %s\n", fileName);
+    }
+    else
+    {
+	vString *const item = vStringNewInit (parameter);
+	if (Excluded == NULL)
+	    Excluded = stringListNew ();
+	stringListAdd (Excluded, item);
+	verbose ("    adding exclude pattern: %s\n", parameter);
+    }
+}
+
+extern boolean isExcludedFile (const char* const name)
+{
+    const char* base = baseFilename (name);
+    boolean result = FALSE;
+    if (Excluded != NULL)
+    {
+	result = stringListFileMatched (Excluded, base);
+	if (! result  &&  name != base)
+	    result = stringListFileMatched (Excluded, name);
+    }
+#ifdef AMIGA
+    /* not a good solution, but the only one which works often */
+    if (! result)
+	result = (boolean) (strcmp (name, TagFile.name) == 0);
+#endif
+    return result;
 }
 
 static void processExcmdOption (
@@ -1721,6 +1767,7 @@ extern void freeOptionResources (void)
     freeString (&Option.fileList);
     freeString (&Option.filterTerminator);
 
+    freeList (&Excluded);
     freeList (&Option.ignore);
     freeList (&Option.headerExt);
     freeList (&Option.etagsInclude);

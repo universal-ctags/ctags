@@ -91,7 +91,6 @@
 /*
 *   DATA DEFINITIONS
 */
-static stringList* Excluded = NULL;
 static struct { long files, lines, bytes; } Totals = { 0, 0, 0 };
 
 #ifdef AMIGA
@@ -137,51 +136,6 @@ extern boolean isDestinationStdout (void)
 	)))
 	toStdout = TRUE;
     return toStdout;
-}
-
-extern void processExcludeOption (
-	const char *const option __unused__, const char *const parameter)
-{
-    const char *const fileName = parameter + 1;
-    if (parameter [0] == '\0')
-	freeList (&Excluded);
-    else if (parameter [0] == '@')
-    {
-	stringList* const sl = stringListNewFromFile (fileName);
-	if (sl == NULL)
-	    error (FATAL | PERROR, "cannot open \"%s\"", fileName);
-	if (Excluded == NULL)
-	    Excluded = sl;
-	else
-	    stringListCombine (Excluded, sl);
-	verbose ("    adding exclude patterns from %s\n", fileName);
-    }
-    else
-    {
-	vString *const item = vStringNewInit (parameter);
-	if (Excluded == NULL)
-	    Excluded = stringListNew ();
-	stringListAdd (Excluded, item);
-	verbose ("    adding exclude pattern: %s\n", parameter);
-    }
-}
-
-static boolean excludedFile (const char* const name)
-{
-    const char* base = baseFilename (name);
-    boolean result = FALSE;
-    if (Excluded != NULL)
-    {
-	result = stringListFileMatched (Excluded, base);
-	if (! result  &&  name != base)
-	    result = stringListFileMatched (Excluded, name);
-    }
-#ifdef AMIGA
-    /* not a good solution, but the only one which works often */
-    if (! result)
-	result = (boolean) (strcmp (name, TagFile.name) == 0);
-#endif
-    return result;
 }
 
 #if defined (HAVE_OPENDIR)
@@ -335,7 +289,7 @@ static boolean createTagsForEntry (const char *const entryName)
     fileStatus *status = eStat (entryName);
 
     Assert (entryName != NULL);
-    if (excludedFile (entryName))
+    if (isExcludedFile (entryName))
 	verbose ("excluding \"%s\"\n", entryName);
     else if (status->isSymbolicLink  &&  ! Option.followLinks)
 	verbose ("ignoring \"%s\" (symbolic link)\n", entryName);
@@ -599,7 +553,6 @@ extern int main (int __unused__ argc, char **argv)
     /*  Clean up.
      */
     eFree (CurrentDirectory);
-    freeList (&Excluded);
     cArgDelete (args);
     freeKeywordTable ();
     freeSourceFileResources ();

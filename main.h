@@ -25,7 +25,6 @@
 */
 extern void addTotals (const unsigned int files, const long unsigned int lines, const long unsigned int bytes);
 extern boolean isDestinationStdout (void);
-extern void processExcludeOption (const char *const option, const char *const parameter);
 extern int main (int argc, char **argv);
 
 #endif	/* _MAIN_H */
