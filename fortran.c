@@ -1033,8 +1033,6 @@ getNextChar:
 		vStringCat (token->string, parseNumeric (c));
 		token->type = TOKEN_NUMERIC;
 	    }
-	    else if (c == ';'  &&  FreeSourceForm)
-		token->type = TOKEN_STATEMENT_END;
 	    else
 		token->type = TOKEN_UNDEFINED;
 	    break;
