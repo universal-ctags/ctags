@@ -209,12 +209,14 @@ website-%: website-man-% website-index-% $(CTAGS_WEBSITE)/news.html \
 
 website-man-%: ctags.1 Makefile
 	@ echo "---------- Generating $(CTAGS_WEBSITE)/ctags.html"
+	umask 022 ; \
 	man2html $< | sed -e "s/@@VERSION@@/$*/g" \
 		-e 's%<A HREF="mailto:[^"]*">\([^@]*\)@\([^<]*\)</A>%\1\&#64;\2%' \
 		> $(CTAGS_WEBSITE)/ctags.html
 
 website-index-%: index.html Makefile
 	@ echo "---------- Generating $(CTAGS_WEBSITE)/index.html"
+	umask 022 ; \
 	sed -e "s/@@VERSION@@/$*/g" \
 		-e "s/@@DOS_VERSION@@/`echo $* | sed 's/\.//g'`/g" \
 		-e "s/@@DATE@@/`date +'%d %B %Y'`/" \
@@ -222,10 +224,11 @@ website-index-%: index.html Makefile
 
 $(CTAGS_WEBSITE)/EXTENDING.html: EXTENDING.html
 	@ echo "---------- Generating $(CTAGS_WEBSITE)/EXTENDING.html"
-	ln -s ../$< $@
+	cp $< $@ && chmod 644 $@
 
 $(CTAGS_WEBSITE)/news.html: NEWS Makefile
 	@ echo "---------- Generating $(CTAGS_WEBSITE)/news.html"
+	umask 022 ; \
 	sed -e 's/</\&lt;/g' -e 's/>/\&gt;/g' \
 		-e 's@^Current Version:.*$$@<html><head><title>Exuberant Ctags: Change Notes</title></head><body><h1>Change Notes</h1><pre>@' \
 		-e 's@\(^ctags-.* (.*)\)$$@<b>\1</b>@' \
