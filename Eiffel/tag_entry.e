@@ -87,7 +87,6 @@ feature -- Output
 			-- Printable representation of tag entry with extension fields
 		local
 			sep: STRING
-			o: STRING
 		do
 			sep := ";%""
 			Result := out
