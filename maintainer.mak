@@ -55,7 +55,8 @@ CC		= gcc3
 INCLUDE	= -I.
 DEFS	= -DHAVE_CONFIG_H
 COMP_FLAGS = $(INCLUDE) $(DEFS) $(CFLAGS)
-OPT		= -O2 -march=i686 -mcpu=i686 
+PROF_OPT= -O3 -march=i686 -mcpu=i686 
+OPT		= $(PROF_OPT) -fomit-frame-pointer
 DCFLAGS	= $(COMP_FLAGS) -DDEBUG -DINTERNAL_SORT
 LD		= gcc
 LDFLAGS	= 
@@ -97,7 +98,7 @@ mctags: $(SOURCES:.c=.om) debug.om safe_malloc.om
 	$(LD) -o $@ $(LDFLAGS) $^
 
 ctags.prof: $(SOURCES) $(HEADERS) Makefile
-	$(CC) -pg $(COMP_FLAGS) $(WARNINGS) $(SOURCES) -o $@
+	$(CC) -pg $(PROF_OPT) $(COMP_FLAGS) $(WARNINGS) $(SOURCES) -o $@
 
 ctags.cov: $(SOURCES) $(HEADERS) Makefile
 	$(CC) -fprofile-arcs -ftest-coverage $(COMP_FLAGS) $(WARNINGS) $(SOURCES) -o $@
