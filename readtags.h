@@ -14,6 +14,10 @@
 
 typedef enum { TagFailure = 0, TagSuccess = 1 } tagResult;
 
+struct sTagFile;
+
+typedef struct sTagFile tagFile;
+
 /* This structure contains information about the tag file. */
 typedef struct {
 
@@ -26,18 +30,19 @@ typedef struct {
 		short sorted;
 	} file;
 
+
 	    /* information about the program which created this tag file */
 	struct {
-		    /* name of author */
+		    /* name of author of generating program (may be null) */
 		const char *author;
 
-		    /* name of program */
+		    /* name of program (may be null) */
 		const char *name;
 
-		    /* URL of distribution */
+		    /* URL of distribution (may be null) */
 		const char *url;
 
-		    /* program version */
+		    /* program version (may be null) */
 		const char *version;
 	} program;
 
@@ -101,18 +106,19 @@ typedef struct {
 *  This function must be called before calling other functions in this
 *  library. It is passed the path to the tag file to read and, optionally, a
 *  pointer to a structure to populate with information about the tag file,
-*  which may be null. The function will return TagSuccess if the file was
-*  successfully opened, TagFailure if not.
+*  which may be null. If successful, the function will return a handle which
+*  must be supplied to other calls to read information from the tag file.
 */
-extern tagResult tagsOpen (const char *filePath, tagFileInfo *info);
+extern tagFile *tagsOpen (const char *filePath, tagFileInfo *info);
 
 /*
-*  Step sequentially through each line of the tag file. It is passed a pointer
-*  to a structure which will be populated with information about the next tag
-*  file entry, which may be null. The function will return TagSuccess another
-*  tag entry is found, or TagFailure if not (i.e. it reached end of file).
+*  Step sequentially through each line of the tag file. It is passed the
+*  handle to an opened tag file and a pointer to a structure which will be
+*  populated with information about the next tag file entry, which may be
+*  null. The function will return TagSuccess another tag entry is found, or
+*  TagFailure if not (i.e. it reached end of file).
 */
-extern tagResult tagsNext (tagEntry *entry);
+extern tagResult tagsNext (tagFile *file, tagEntry *entry);
 
 /*
 *  Retrieve the value associated with the extension field for a specified key.
@@ -129,7 +135,7 @@ extern const char *tagsField (const tagEntry *entry, const char *key);
 *  function will return TagSuccess if a tag matching the name is found, or
 *  TagFailure if not.
 */
-extern tagResult tagsFind (tagEntry *entry, const char *name);
+extern tagResult tagsFind (tagFile *file, tagEntry *entry, const char *name);
 
 /*
 *  Find the next tag matching the name last found by tagsFind(). The structure
@@ -137,13 +143,13 @@ extern tagResult tagsFind (tagEntry *entry, const char *name);
 *  entry. The function will return TagSuccess if another tag matching the name
 *  is found, or TagFailure if not.
 */
-extern tagResult tagsFindNext (tagEntry *entry);
+extern tagResult tagsFindNext (tagFile *file, tagEntry *entry);
 
 /*
 *  Call tagsTerminate() at completion of reading the tag file, which will
 *  close the file and free any internal memory allocated. The function will
 *  return TagFailure is no file is currently open, TagSuccess otherwise.
 */
-extern tagResult tagsClose (void);
+extern tagResult tagsClose (tagFile *file);
 
 /* vi:set tabstop=8 shiftwidth=4: */
