@@ -1665,10 +1665,12 @@ by use of the \fB--excmd\fP=\fIn\fP option.
 When parsing a C++ member function definition (e.g. "className::function"),
 \fBctags\fP cannot determine whether the scope specifier is a class name or a
 namespace specifier and always lists it as a class name in the scope portion
-of the extension fields. Also, if the function defintion is located in a
-separate file from than where the class is defined (the usual case), the
-access specification (i.e. public, protected, or private) that the function
-had when declared in the class is not known.
+of the extension fields. Also, if a C++ function is defined outside of the
+class declaration (the usual case), the access specification (i.e. public,
+protected, or private) and implementation information (e.g. virtual, pure
+virtual) contained in the function declaration are not known when the tag is
+generated for the function definition. It will, however be available for
+prototypes (e.g \fB--c++-types\fP=\fI+p\fP).
 
 No qualified tags are generated for language objects inherited into a class.
 
