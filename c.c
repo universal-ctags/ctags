@@ -2042,13 +2042,11 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 
 	    case '[':
 		info->isKnrParamList = FALSE;
-		vStringPut (Signature, c);
 		skipToMatch ("[]");
 		break;
 
 	    case '<':
 		info->isKnrParamList = FALSE;
-		vStringPut (Signature, c);
 		skipToMatch ("<>");
 		break;
 
