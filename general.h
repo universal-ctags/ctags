@@ -1,7 +1,7 @@
 /*
 *   $Id$
 *
-*   Copyright (c) 1998-2002, Darren Hiebert
+*   Copyright (c) 1998-2003, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License.
@@ -18,8 +18,6 @@
 # include <config.h>
 #elif defined (AMIGA)
 # include "e_amiga.h"
-#elif defined (__CYGWIN__)
-# include "e_cygwin.h"
 #elif defined (DJGPP)
 # include "e_djgpp.h"
 #elif defined (macintosh)
