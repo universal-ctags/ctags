@@ -33,16 +33,23 @@
 #define HAVE_STRSTR 1
 #define HAVE_STRERROR 1
 #define HAVE_FINDNEXT 1
+
 #ifdef __BORLANDC__
+
 # define HAVE_DIR_H 1
 # define HAVE_DIRENT_H 1
 # define HAVE_FINDFIRST 1
+
 #elif defined (_MSC_VER)
+
 #  define HAVE__FINDFIRST 1
 #  define HAVE_DIRECT_H 1
+
 #elif defined (__MINGW32__)
-# if defined (__MSVCRT__)
-   /* Work-around for broken implementation of fgetpos()/fsetpos() on Mingw32 */
+
+# include <_mingw.h>
+# if defined (__MSVCRT__) && __MINGW32_MAJOR_VERSION == 1 && __MINGW32_MINOR_VERSION < 2
+/* Work-around for broken implementation of fgetpos()/fsetpos() on Mingw32 */
 #  undef HAVE_FGETPOS
 #  define NEED_PROTO_FGETPOS 1
 # endif
@@ -52,6 +59,7 @@
 # define ffblk _finddata_t
 # define FA_DIREC _A_SUBDIR
 # define ff_name name
+
 #endif
 
 #endif
