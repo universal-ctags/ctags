@@ -1069,7 +1069,7 @@ static void printfFeatureList (void)
 
 static void printProgramIdentification (void)
 {
-    printf ("%s %s, Copyright (C) 1996-2001 %s\n",
+    printf ("%s %s, Copyright (C) 1996-2002 %s\n",
 	    PROGRAM_NAME, PROGRAM_VERSION, AUTHOR_NAME);
     printf ("  Compiled: %s, %s\n", __DATE__, __TIME__);
     printf ("  Addresses: <%s>, %s\n", AUTHOR_EMAIL, PROGRAM_URL);
