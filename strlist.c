@@ -57,7 +57,8 @@ extern void stringListAdd (stringList *const current, vString *string)
 }
 
 /* Combine list `from' into `current', deleting `from' */
-extern void stringListCombine (stringList *const current, stringList *const from)
+extern void stringListCombine (
+	stringList *const current, stringList *const from)
 {
     unsigned int i;
     Assert (current != NULL);
@@ -107,8 +108,8 @@ extern unsigned int stringListCount (const stringList *const current)
     return current->count;
 }
 
-extern vString* stringListItem (const stringList *const current,
-				const unsigned int indx)
+extern vString* stringListItem (
+	const stringList *const current, const unsigned int indx)
 {
     Assert (current != NULL);
     return current->list [indx];
@@ -142,30 +143,55 @@ extern void stringListDelete (stringList *const current)
     }
 }
 
-extern boolean stringListHas (const stringList *const current,
-			      const char *const str)
+static boolean compareString (
+	const char *const string, vString *const itm)
 {
-    boolean result = FALSE;
+    return (boolean) (strcmp (string, vStringValue (itm)) == 0);
+}
+
+static boolean compareStringInsensitive (
+	const char *const string, vString *const itm)
+{
+    return (boolean) (strcasecmp (string, vStringValue (itm)) == 0);
+}
+
+static int stringListIndex (
+	const stringList *const current,
+	const char *const string,
+	boolean (*test)(const char *s, vString *const vs))
+{
+    int result = -1;
     unsigned int i;
     Assert (current != NULL);
-    for (i = 0  ;  ! result  &&  i < current->count  ;  ++i)
-	result = (boolean) (strcmp (str, vStringValue (current->list [i]))==0);
+    Assert (string != NULL);
+    Assert (test != NULL);
+    for (i = 0  ;  result == -1  &&  i < current->count  ;  ++i)
+	if ((*test)(string, current->list [i]))
+	    result = i;
     return result;
 }
 
-extern boolean stringListHasInsensitive (const stringList *const current,
-					 const char *const str)
+extern boolean stringListHas (
+	const stringList *const current, const char *const string)
 {
     boolean result = FALSE;
-    unsigned int i;
     Assert (current != NULL);
-    for (i = 0  ;  ! result  &&  i < current->count  ;  ++i)
-	result = (boolean) (strcasecmp (str, vStringValue (current->list [i]))==0);
+    result = stringListIndex (current, string, compareString) != -1;
     return result;
 }
 
-extern boolean stringListHasTest (const stringList *const current,
-				  boolean (*test)(const char *s))
+extern boolean stringListHasInsensitive (
+	const stringList *const current, const char *const string)
+{
+    boolean result = FALSE;
+    Assert (current != NULL);
+    Assert (string != NULL);
+    result = stringListIndex (current, string, compareStringInsensitive) != -1;
+    return result;
+}
+
+extern boolean stringListHasTest (
+	const stringList *const current, boolean (*test)(const char *s))
 {
     boolean result = FALSE;
     unsigned int i;
@@ -175,18 +201,38 @@ extern boolean stringListHasTest (const stringList *const current,
     return result;
 }
 
-extern boolean stringListExtensionMatched (const stringList* const list,
-					   const char* const extension)
+extern boolean stringListRemoveExtension (
+	const stringList* const current, const char* const extension)
+{
+    boolean result = FALSE;
+    int where;
+#ifdef CASE_INSENSITIVE_FILENAMES
+    where = stringListIndex (current, extension, compareStringInsensitive);
+#else
+    where = stringListIndex (current, extension, compareString);
+#endif
+    if (where != -1)
+    {
+	memmove (current->list + where, current->list + where + 1,
+		current->count - where);
+	current->list [current->count - 1] = NULL;
+	result = TRUE;
+    }
+    return result;
+}
+
+extern boolean stringListExtensionMatched (
+	const stringList* const current, const char* const extension)
 {
 #ifdef CASE_INSENSITIVE_FILENAMES
-    return stringListHasInsensitive (list, extension);
+    return stringListHasInsensitive (current, extension);
 #else
-    return stringListHas (list, extension);
+    return stringListHas (current, extension);
 #endif
 }
 
-static boolean fileNameMatched (const vString* const vpattern,
-				const char* const fileName)
+static boolean fileNameMatched (
+	const vString* const vpattern, const char* const fileName)
 {
     const char* const pattern = vStringValue (vpattern);
 #if defined (HAVE_FNMATCH)
@@ -198,13 +244,13 @@ static boolean fileNameMatched (const vString* const vpattern,
 #endif
 }
 
-extern boolean stringListFileMatched (const stringList* const list,
-				      const char* const fileName)
+extern boolean stringListFileMatched (
+	const stringList* const current, const char* const fileName)
 {
     boolean result = FALSE;
     unsigned int i;
-    for (i = 0  ;  ! result  &&  i < stringListCount (list)  ;  ++i)
-	result = fileNameMatched (stringListItem (list, i), fileName);
+    for (i = 0  ;  ! result  &&  i < stringListCount (current)  ;  ++i)
+	result = fileNameMatched (stringListItem (current, i), fileName);
     return result;
 }
 
@@ -214,6 +260,7 @@ extern void stringListPrint (const stringList *const current)
     Assert (current != NULL);
     for (i = 0  ;  i < current->count  ;  ++i)
 	printf ("%s%s", (i > 0) ? ", " : "", vStringValue (current->list [i]));
+    putchar ('\n');
 }
 
 /* vi:set tabstop=8 shiftwidth=4: */

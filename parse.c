@@ -260,6 +260,19 @@ extern void addLanguagePatternMap (const langType language, const char* ptrn)
     stringListAdd (LanguageTable [language]->currentPatterns, str);
 }
 
+extern boolean removeLanaguageExtensionMap (const char *const extension)
+{
+    boolean result = FALSE;
+    unsigned int i;
+    for (i = 0  ;  i < LanguageCount  &&  ! result ;  ++i)
+    {
+	stringList* const exts = LanguageTable [i]->currentExtensions;
+	if (exts != NULL  &&  stringListRemoveExtension (exts, extension))
+	    result = TRUE;
+    }
+    return result;
+}
+
 extern void addLanguageExtensionMap (
 	const langType language, const char* extension)
 {

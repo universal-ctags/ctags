@@ -42,6 +42,7 @@ extern void stringListDelete (stringList *const current);
 extern boolean stringListHasInsensitive (const stringList *const current, const char *const string);
 extern boolean stringListHas (const stringList *const current, const char *const string);
 extern boolean stringListHasTest (const stringList *const current, boolean (*test)(const char *s));
+extern boolean stringListRemoveExtension (const stringList* const current, const char* const extension);
 extern boolean stringListExtensionMatched (const stringList* const list, const char* const extension);
 extern boolean stringListFileMatched (const stringList* const list, const char* const str);
 extern void stringListPrint (const stringList *const current);
