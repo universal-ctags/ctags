@@ -32,6 +32,7 @@
 */
 /* '?' character is allowed in AMD 29K family */
 #define SYMBOL "[[:alpha:]_$][[:alnum:]_$?]*"
+#define EQU "(:?=|(:[[:blank:]]+)?\\.?(equ|set|d[bcdfpqstw][.[:space:]]))"
 
 /*
 *   DATA DEFINITIONS
@@ -58,9 +59,8 @@ static void checkLabel (const char *line, const regexMatch *matches,
     if (! compiled)
     {
 	/* rejects patterns matching other constructs */
-	compiled = (boolean) (regcomp (&LabelReject,
-	    "([=:]|(\\.?(equ|set)|d[cbdfpqtw][.[:space:]]))",
-	    REG_EXTENDED|REG_ICASE) == 0);
+	compiled = (boolean) (regcomp (&LabelReject, EQU,
+		REG_EXTENDED|REG_ICASE) == 0);
     }
     if (compiled && count > 2)
     {
@@ -77,23 +77,37 @@ static void checkLabel (const char *line, const regexMatch *matches,
 #endif
 }
 
+/*
+ * Based upon code samples from http://www.programmersheaven.com/zone5/
+ */
 static void installAsmRegex (const langType language)
 {
+    /*
+     * abc =
+     * abc :=
+     * abc \.?EQU
+     * abc \.?SET
+     * abc \.?D[BCDFPQSTW][. ]
+     */
     addTagRegex (language,
-	"^(" SYMBOL
-	")([[:blank:]]*=|([[:blank:]]+\\.?(equ|set)|d[cbdfpqtw][.[:space:]]))",
+	"^(" SYMBOL ")[[:blank:]]*(" EQU ")",
 	"\\1", "d,define", "i");
     /* gas .equ */
     addTagRegex (language,
 	"^[[:blank:]]*\\.(equ|set)[[:blank:]]+(" SYMBOL ")",
-	"\\1", "d,define", "i");
+	"\\2", "d,define", "i");
 
-    addTagRegex (language,
-	"^(" SYMBOL ")[[:blank:]]*(:|[[:blank:]]\\.?label[[:space:]])",
-	"\\1", "l,label", "i");
+    /*
+     * abc:
+     * abc LABEL
+     */
+    addCallbackRegex (language,
+	"^(" SYMBOL ")[[:blank:]]*(:|[[:blank:]]label[[:space:]])",
+	"i", checkLabel);
 
     addCallbackRegex (language,
-	"^(" SYMBOL ")[[:blank:]]+([[:alpha:]].*)$", "i", checkLabel);
+	"^(" SYMBOL ")[[:blank:]]+([[:alpha:]].*)$",
+	"i", checkLabel);
 
     /* MASM proc */
     addTagRegex (language,
@@ -129,11 +143,21 @@ static void installAsmRegex (const langType language)
 
 extern parserDefinition* AsmParser (void)
 {
-    static const char *const extensions [] = { "asm", "ASM", "s", "S", NULL };
+    static const char *const extensions [] = {
+	"asm", "ASM", "s", "S", NULL
+    };
+    static const char *const patterns [] = {
+	"*.29[kK]",
+	"*.[68][68][kKsSxX]",
+	"*.[xX][68][68]",
+	"*.A5[01]",
+	NULL
+    };
     parserDefinition* def = parserNew ("Asm");
     def->kinds      = AsmKinds;
     def->kindCount  = KIND_COUNT (AsmKinds);
     def->extensions = extensions;
+    def->patterns   = patterns;
     def->initialize = installAsmRegex;
     def->regex      = TRUE;
     return def;
