@@ -43,7 +43,8 @@ ctags-5.5 (Tue Apr 1 2003)
 * Fixed man page errors and omissions.
 * Fixed bug in readFieldValue() in readtags library.
 * Fixed bug in option parsing in readtags command-line program.
-* Fixed portability problems with Cygwin and DJGPP.
+* Fixed portability problems with DJGPP [Bug #692569].
+* Fixed portability problems with Cygwin.
 
 ctags-5.4 (Thu Oct 17 2002)
 * Improved ability for tagsOpen() in readtags library to report failure to
