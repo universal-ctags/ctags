@@ -719,7 +719,7 @@ extern FILE *tempFile (const char *const mode, char **const pName)
     const char *const pattern = "tags.XXXXXX";
     const char *tmpdir = NULL;
     fileStatus *file = eStat (ExecutableProgram);
-    if (file->isSetuid)
+    if (! file->isSetuid)
 	tmpdir = getenv ("TMPDIR");
     if (tmpdir == NULL)
 	tmpdir = TMPDIR;

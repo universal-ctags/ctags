@@ -10,6 +10,8 @@ ctags-5.4 (Tue Oct 15 2002)
 * Added class and method support to TCL parser [TCL].
 * Added support for PL/SQL language.
 * Added support for Vera language, inspired by Dave Eggum [Vera].
+* Fixed inverted test causing TMPDIR to be used for temporary files when
+  ctags is setuid instead of when not setuid [Bug #623713].
 * Fixed problem terminating Perl POD block [Perl, Bug #612019].
 * Fixed problem with leading spaces before instruction [TCL, Bug #615928].
 
