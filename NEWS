@@ -11,6 +11,7 @@ ctags-5.2.4 (Wed May 29 2002)
 * Fixed portability problem [MingW32, Bug #541997].
 * Fixed bug in configure script [Solaris, Bug #542966].
 * Fixed invalid package name tags [Perl, Bug #535068].
+* Fixed missing tags for certain cases of invalid syntax [C].
 * Fixed spurious tag for clients portion of feature clause when following
   an empty feature clause [Eiffel].
 
