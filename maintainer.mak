@@ -265,9 +265,14 @@ ctags-%.tar.gz: $(UNIX_FILES) $(VERSION_FILES)
 	done
 	chmod 644 ctags-$*/*
 	chmod 755 ctags-$*/mkinstalldirs
-	(cd ctags-$*; autoheader; chmod 644 config.h.in)
-	(cd ctags-$*; autoconf; chmod 755 configure)
-	(cd ctags-$*; man2html ctags.1 > ctags.html)
+	(cd ctags-$* ;\
+		autoheader ;\
+		chmod 644 config.h.in ;\
+		autoconf ;\
+		chmod 755 configure ;\
+		rm -fr autom4te.cache ;\
+		man2html ctags.1 > ctags.html ;\
+	)
 	tar -zcf $@ ctags-$*
 
 ctags-%.tar.Z: ctags-%.tar.gz
