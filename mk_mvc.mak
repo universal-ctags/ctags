@@ -35,14 +35,14 @@ INCLUDES = $(EXTRA_INC)
 ctags: ctags.exe
 
 ctags.exe: $(SOURCES) respmvc $(EXTRA_LIBS)
-	cl /Fe$@ @respmvc /link setargv.obj
+	cl /O2 /G5 /Fe$@ @respmvc /link setargv.obj
 
 # Debug version
 dctags.exe: $(SOURCES) respmvc $(EXTRA_LIBS)
-	cl -DDEBUG /Fe$@ @respmvc debug.c /link setargv.obj
+	cl /Zi -DDEBUG /Fe$@ @respmvc debug.c /link setargv.obj
 
 regex.obj:
-	cl /c /Fo$@ $(DEFINES) -Dconst= $(INCLUDES) $(REGEX_DIR)\regex.c
+	cl /c /O2 /G5 /Fo$@ $(DEFINES) -Dconst= $(INCLUDES) $(REGEX_DIR)\regex.c
 
 respmvc: $(SOURCES) $(HEADERS) mk_mvc.mak
 	echo $(DEFINES) $(INCLUDES) $(SOURCES) $(EXTRA_LIBS) > $@
