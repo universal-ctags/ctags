@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.1 (Fri Nov 02 2001)
+ctags-5.1 (Tue Nov 06 2001)
 * Changed name of option configuration files for MSDOS, MSWindows, and OS/2.
 * Changed regex support to enforce REG_NEWLINE. This fixes problem where the
   newline character was explicity being matched by user patterns [Bug #431477].
