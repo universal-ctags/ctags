@@ -337,17 +337,18 @@ static boolean recurseIntoDirectory (const char *const dirName)
 static boolean createTagsForEntry (const char *const entryName)
 {
     boolean resize = FALSE;
+    fileStatus *status = eStat (entryName);
 
     Assert (entryName != NULL);
     if (excludedFile (entryName))
 	verbose ("excluding \"%s\"\n", entryName);
-    else if (isSymbolicLink (entryName)  &&  ! Option.followLinks)
+    else if (status->isSymbolicLink  &&  ! Option.followLinks)
 	verbose ("ignoring \"%s\" (symbolic link)\n", entryName);
-    else if (! doesFileExist (entryName))
+    else if (! status->exists)
 	error (WARNING | PERROR, "cannot open source file \"%s\"", entryName);
-    else if (isDirectory (entryName))
+    else if (status->isDirectory)
 	resize = recurseIntoDirectory (entryName);
-    else if (! isNormalFile (entryName))
+    else if (! status->isNormalFile)
 	verbose ("ignoring \"%s\" (special file)\n", entryName);
     else
 	resize = parseFile (entryName);

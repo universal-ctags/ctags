@@ -96,6 +96,10 @@
 # endif
 #endif
 
+#ifndef S_IFMT
+# define S_IFMT 0
+#endif
+
 #ifndef S_IXUSR
 # define S_IXUSR 0
 #endif
@@ -111,6 +115,10 @@
 #endif
 #ifndef S_IWUSR
 # define S_IWUSR 0200
+#endif
+
+#ifndef S_ISUID
+# define S_ISUID 0
 #endif
 
 /*  Hack for rediculous practice of Microsoft Visual C++.
@@ -356,94 +364,10 @@ extern void setCurrentDirectory (void)
     free (cwd);
 }
 
-#define USE_LSTAT 1
-
-/* For caching of stat() calls */
-static struct stat *estat (const char *fileName)
-{
-    static struct stat FileStatus;
-    static char *FileStatusName;
-    static struct stat *result = NULL;
-    if (FileStatusName == NULL  ||  strcmp (fileName, FileStatusName) != 0)
-    {
-	if (FileStatusName != NULL)
-	    eFree (FileStatusName);
-	FileStatusName = eStrdup (fileName);
-#ifndef USE_LSTAT
-	if (stat (fileName, &FileStatus) != 0)
-	    result = NULL;
-#else
-	if (lstat (fileName, &FileStatus) != 0)
-	    result = NULL;
-	else if (! S_ISLNK (FileStatus.st_mode))
-	    result = &FileStatus;
-	else if (stat (fileName, &FileStatus) != 0)
-	    result = NULL;
-#endif
-	else
-	    result = &FileStatus;
-    }
-    return result;
-}
-
-extern boolean doesFileExist (const char *const fileName)
-{
-    return (boolean) (estat (fileName) != NULL);
-}
-
-extern long unsigned int getFileSize (const char *const name)
-{
-    unsigned long result = 0;
-    struct stat *fileStatus;
-    fileStatus = estat (name);
-    if (fileStatus != NULL)
-	result = fileStatus->st_size;
-    return result;
-}
-
-extern boolean isExecutable (const char *const name)
+#ifdef AMIGA
+static boolean isAmigaDirectory (const char *const name)
 {
     boolean result = FALSE;
-    struct stat *fileStatus;
-    fileStatus = estat (name);
-    if (fileStatus != NULL)
-	result = (boolean) ((fileStatus->st_mode & (S_IXUSR|S_IXGRP|S_IXOTH)) != 0);
-    return result;
-}
-
-static boolean isSetUID (const char *const name)
-{
-#if defined (VMS) || defined (MSDOS) || defined (WIN32) || defined (__EMX__) || defined (AMIGA)
-    return FALSE;
-#else
-    boolean result = FALSE;
-    struct stat *fileStatus;
-    fileStatus = estat (name);
-    if (fileStatus != NULL)
-	result = (boolean) ((fileStatus->st_mode & S_ISUID) != 0);
-    return result;
-#endif
-}
-
-extern boolean isNormalFile (const char *const name)
-{
-    boolean result = FALSE;
-    struct stat *fileStatus;
-    fileStatus = estat (name);
-    if (fileStatus != NULL)
-	result = (boolean) (S_ISREG (fileStatus->st_mode));
-    return result;
-}
-
-extern boolean isDirectory (const char *const name)
-{
-    boolean result = FALSE;
-#ifndef AMIGA
-    struct stat *fileStatus;
-    fileStatus = estat (name);
-    if (fileStatus != NULL)
-	result = (boolean) S_ISDIR (fileStatus->st_mode);
-#else
     struct FileInfoBlock *const fib = xMalloc (1, struct FileInfoBlock);
     if (fib != NULL)
     {
@@ -457,34 +381,57 @@ extern boolean isDirectory (const char *const name)
 	}
 	eFree (fib);
     }
-#endif
     return result;
 }
+#endif
 
-extern boolean isSymbolicLink (const char *const name)
+/* For caching of stat() calls */
+extern fileStatus *eStat (const char *const fileName)
 {
-#if defined (MSDOS) || defined (WIN32) || defined (VMS) || defined (__EMX__) || defined (AMIGA)
-    return FALSE;
+    struct stat status;
+    static fileStatus file;
+    if (file.name == NULL  ||  strcmp (fileName, file.name) != 0)
+    {
+	if (file.name != NULL)
+	    eFree (file.name);
+	file.name = eStrdup (fileName);
+	if (lstat (file.name, &status) != 0)
+	    file.exists = FALSE;
+	else
+	{
+	    file.isSymbolicLink = (boolean) S_ISLNK (status.st_mode);
+	    if (file.isSymbolicLink  &&  stat (file.name, &status) != 0)
+		file.exists = FALSE;
+	    else
+	    {
+		file.exists = TRUE;
+#ifdef AMIGA
+		file.isDirectory = isAmigaDirectory (file.name);
 #else
-    boolean result = FALSE;
-#if USE_LSTAT
-    struct stat *fileStatus;
-    fileStatus = estat (name);
-    if (fileStatus != NULL)
-	result = (boolean) S_ISDIR (fileStatus->st_mode);
-#else
-    struct stat fileStatus;
-    if (lstat (name, &fileStatus) == 0)
-	result = (boolean) (S_ISLNK (fileStatus.st_mode));
+		file.isDirectory = (boolean) S_ISDIR (status.st_mode);
 #endif
-    return result;
-#endif
+		file.isNormalFile = (boolean) (S_ISREG (status.st_mode));
+		file.isExecutable = (boolean) ((status.st_mode &
+		    (S_IXUSR | S_IXGRP | S_IXOTH)) != 0);
+		file.isSetuid = (boolean) ((status.st_mode & S_ISUID) != 0);
+		file.size = status.st_size;
+	    }
+	}
+    }
+    return &file;
+}
+
+extern boolean doesFileExist (const char *const fileName)
+{
+    fileStatus *status = eStat (fileName);
+    return status->exists;
 }
 
 extern boolean isRecursiveLink (const char* const dirName)
 {
     boolean result = FALSE;
-    if (isSymbolicLink (dirName))
+    fileStatus *status = eStat (dirName);
+    if (status->isSymbolicLink)
     {
 	char* const path = absoluteFilename (dirName);
 	while (path [strlen (path) - 1] == PATH_SEPARATOR)
@@ -815,7 +762,8 @@ extern FILE *tempFile (const char *const mode, char **const pName)
 #ifdef HAVE_MKSTEMP
     const char *const pattern = "tags.XXXXXX";
     const char *tmpdir = NULL;
-    if (! isSetUID (ExecutableProgram))
+    fileStatus *file = eStat (ExecutableProgram);
+    if (file->isSetuid)
 	tmpdir = getenv ("TMPDIR");
     if (tmpdir == NULL)
 	tmpdir = TMPDIR;

@@ -290,9 +290,10 @@ extern void fileClose (void)
 	 *  and is incremented upon each newline.
 	 */
 	if (Option.printTotals)
-	    addTotals (0, File.lineNumber - 1L,
-		      getFileSize (vStringValue (File.name)));
-
+	{
+	    fileStatus *status = eStat (vStringValue (File.name));
+	    addTotals (0, File.lineNumber - 1L, status->size);
+	}
 	fclose (File.fp);
 	File.fp = NULL;
     }
