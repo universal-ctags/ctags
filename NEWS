@@ -1,5 +1,9 @@
 Current Version: @@VERSION@@
 
+ctags-5.2.4 (Tue Feb 26 2002)
+* Fixed spurious tag for clients portion of feature clause when following
+  an empty feature clause [Eiffel].
+
 ctags-5.2.3 (Sun Feb 24 2002)
 * Fixed portability problem in makefile [Solaris, FreeBSD].
 * Fixed infinite loop for certain cases of invalid syntax [Eiffel].

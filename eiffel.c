@@ -1046,7 +1046,8 @@ static void parseFeatureClauses (tokenInfo *const token)
     {
 	if (isKeyword (token, KEYWORD_feature))
 	    parseExport (token);
-	if (! isKeyword (token, KEYWORD_invariant) &&
+	if (! isKeyword (token, KEYWORD_feature) &&
+	    ! isKeyword (token, KEYWORD_invariant) &&
 	    ! isKeyword (token, KEYWORD_indexing))
 	{
 	    if (! parseFeature (token))
