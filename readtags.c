@@ -36,13 +36,6 @@ typedef struct {
     char *buffer;
 } vstring;
 
-/*
-*   DATA DEFINITIONS
-*/
-const char* const EmptyString = "";
-const char* const PseudoTagPrefix = "!_";
-const char* TagFileName = "tags";
-
 /* Information about current tag file */
 struct sTagFile {
 	/* has the file been opened and this structure initialized? */
@@ -94,6 +87,11 @@ struct sTagFile {
     } program;
 };
 
+/*
+*   DATA DEFINITIONS
+*/
+const char *const EmptyString = "";
+const char *const PseudoTagPrefix = "!_";
 
 /*
 *   FUNCTION DEFINITIONS
@@ -744,6 +742,7 @@ extern tagResult tagsClose (tagFile *file)
 
 #ifdef READTAGS_MAIN
 
+const char *TagFileName = "tags";
 static int extensionFields = 0;
 
 static void printTag (const tagEntry *entry)
