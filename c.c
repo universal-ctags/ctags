@@ -60,7 +60,7 @@ typedef enum eException {
 /*  Used to specify type of keyword.
  */
 typedef enum eKeywordId {
-    KEYWORD_NONE,
+    KEYWORD_NONE = -1,
     KEYWORD_ATTRIBUTE, KEYWORD_ABSTRACT,
     KEYWORD_BOOLEAN, KEYWORD_BYTE, KEYWORD_BAD_STATE, KEYWORD_BAD_TRANS,
     KEYWORD_BIND, KEYWORD_BIND_VAR, KEYWORD_BIT,

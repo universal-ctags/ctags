@@ -157,18 +157,18 @@ extern int lookupKeyword (const char *const string, langType language)
 {
     const unsigned long hashedValue = hashValue (string);
     hashEntry *entry = getHashTableEntry (hashedValue);
-    int value = 0;
+    int result = -1;
 
     while (entry != NULL)
     {
 	if (language == entry->language  &&  strcmp (string, entry->string) == 0)
 	{
-	    value = entry->value;
+	    result = entry->value;
 	    break;
 	}
 	entry = entry->next;
     }
-    return value;
+    return result;
 }
 
 extern void freeKeywordTable (void)

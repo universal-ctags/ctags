@@ -32,7 +32,7 @@ typedef enum {
 } AsmKind;
 
 typedef enum {
-    OP_UNDEFINED = 0,
+    OP_UNDEFINED = -1,
     OP_ALIGN,
     OP_COLON_EQUAL,
     OP_END,
@@ -95,7 +95,6 @@ static const asmKeyword AsmKeywords [] = {
 
 static const opKind OpKinds [] = {
     /* must be ordered same as opKeyword enumeration */
-    { OP_UNDEFINED,   K_NONE   },
     { OP_ALIGN,       K_NONE   },
     { OP_COLON_EQUAL, K_DEFINE },
     { OP_END,         K_NONE   },
