@@ -138,19 +138,16 @@ static char* nextFileLine (FILE* const fp)
 		break;
 	    c = fgetc (fp);
 	}
-	if (c != EOF)
+	if (c == '\r')
 	{
-	    if (c == '\r')
-	    {
-		c = fgetc (fp);
-		if (c != '\n')
-		    c = ungetc (c, fp);
-	    }
-	    vStringTerminate (vs);
-	    result = xMalloc (vStringLength (vs) + 1, char);
-	    strcpy (result, vStringValue (vs));
-	    vStringDelete (vs);
+	    c = fgetc (fp);
+	    if (c != '\n')
+		c = ungetc (c, fp);
 	}
+	vStringTerminate (vs);
+	result = xMalloc (vStringLength (vs) + 1, char);
+	strcpy (result, vStringValue (vs));
+	vStringDelete (vs);
     }
     return result;
 }
