@@ -37,6 +37,10 @@ typedef struct {
 /*
 *   DATA DEFINITIONS
 */
+#if 0
+static langType Lang_asm;
+#endif
+
 static kindOption AsmKinds [] = {
     { TRUE, 'd', "define", "defines" },
     { TRUE, 'l', "label",  "labels"  },
@@ -45,6 +49,8 @@ static kindOption AsmKinds [] = {
 };
 
 static const OpType OpTypes [] = {
+    { "align",    K_NONE   },
+    { "end",      K_NONE   },
     { "endm",     K_NONE   },
     { "endmacro", K_NONE   },
     { "endp",     K_NONE   },
@@ -54,6 +60,7 @@ static const OpType OpTypes [] = {
     { "macro",    K_MACRO  },
     { "proc",     K_LABEL  },
     { "record",   K_TYPE   },
+    { "sections", K_NONE   },
     { "set",      K_DEFINE },
     { "struct",   K_TYPE   },
     { "=",        K_DEFINE },
@@ -65,6 +72,31 @@ static unsigned int OpTypeCount = sizeof (OpTypes) / sizeof (OpType);
 /*
 *   FUNCTION DEFINITIONS
 */
+#if 0
+static void buildAsmKeywordHash (void)
+{
+    const size_t count = sizeof (OpTypes) / sizeof (OpTypes [0]);
+    size_t i;
+    for (i = 0  ;  i < count  ;  ++i)
+    {
+	const OpType* const p = OpTypes + i;
+	addKeyword (p->operator, Lang_asm, (int) p->kind);
+    }
+}
+
+static AsmKind analyzeOperator (vString *const name)
+{
+    static vString *keyword = NULL;
+    AsmKind result;
+
+    if (keyword == NULL)
+	keyword = vStringNew ();
+    vStringCopyToLower (keyword, name);
+    result = (AsmKind) lookupKeyword (vStringValue (keyword), Lang_asm);
+    return result;
+}
+#endif
+
 static boolean isInitialSymbolCharacter (int c)
 {
     return (boolean) (c != '\0' && (isalpha (c) || strchr ("_$", c) != NULL));
@@ -127,22 +159,26 @@ static AsmKind operatorKind (
     return result;
 }
 
+/*  We must check for "DB", "DB.L", "DCB.W" (68000)
+ */
 static boolean isDefineOperator (const vString *const operator)
 {
     const unsigned char *const op =
 	(unsigned char*) vStringValue (operator); 
     const size_t length = vStringLength (operator);
-    const boolean result = (boolean) (toupper ((int) *op) == 'D'  &&
+    const boolean result = (boolean) (length > 0  &&
+	toupper ((int) *op) == 'D'  &&
 	(length == 2 ||
-	 (length > 2 && strchr (". \t", (int) op [2]) != NULL)));
+	 (length == 4  &&  (int) op [2] == '.') ||
+	 (length == 5  &&  (int) op [3] == '.')));
     return result;
 }
 
 static void makeAsmTag (
 	const vString *const name,
 	const vString *const operator,
-	const boolean initialSymbol,
-	const boolean hasColon)
+	const boolean labelCandidate,
+	const boolean nameFollows)
 {
     if (vStringLength (name) > 0)
     {
@@ -153,13 +189,15 @@ static void makeAsmTag (
 	    if (kind != K_NONE)
 		makeSimpleTag (name, AsmKinds, kind);
 	}
-	else if (initialSymbol)
+	else if (isDefineOperator (operator))
 	{
-	    if (isDefineOperator (operator))
+	    if (! nameFollows)
 		makeSimpleTag (name, AsmKinds, K_DEFINE);
-	    else if (hasColon)
-		makeSimpleTag (name, AsmKinds, K_LABEL);
-	    else if (vStringLength (operator) > 0)
+	}
+	else if (labelCandidate)
+	{
+	    operatorKind (name, &found);
+	    if (! found)
 		makeSimpleTag (name, AsmKinds, K_LABEL);
 	}
     }
@@ -193,8 +231,8 @@ static void findAsmTags (void)
     while ((line = fileReadLine ()) != NULL)
     {
 	const unsigned char *cp = line;
-	boolean hasColon = FALSE;
-	boolean initialSymbol = isInitialSymbolCharacter ((int) *cp);
+	boolean labelCandidate = (boolean) (! isspace ((int) *cp));
+	boolean nameFollows = FALSE;
 	const boolean isComment = (boolean)
 		(*cp != '\0' && strchr (";*@", *cp) != NULL);
 
@@ -228,22 +266,19 @@ static void findAsmTags (void)
 	    continue;
 	}
 
+	/* skip white space */
+	while (isspace ((int) *cp))
+	    ++cp;
+
 	/* read symbol */
-	if (initialSymbol)
+	cp = readSymbol (cp, name);
+	if (vStringLength (name) > 0  &&  *cp == ':')
 	{
-	    cp = readSymbol (cp, name);
-	    if (*cp == ':')
-	    {
-		hasColon = TRUE;
-		++cp;
-	    }
-	    else if (! isspace ((int) *cp))
-	    {
-		vStringClear (name);
-		initialSymbol = FALSE;
-	    }
+	    labelCandidate = TRUE;
+	    ++cp;
 	}
-	else if (! isspace ((int) *cp))
+
+	if (! isspace ((int) *cp)  &&  *cp != '\0')
 	    continue;
 
 	/* skip white space */
@@ -264,17 +299,26 @@ static void findAsmTags (void)
 	vStringTerminate (operator);
 
 	/* attempt second read of symbol */
-	if (!initialSymbol)
+	if (vStringLength (name) == 0)
 	{
 	    while (isspace ((int) *cp))
 		++cp;
 	    cp = readSymbol (cp, name);
+	    nameFollows = TRUE;
 	}
-	makeAsmTag (name, operator, initialSymbol, hasColon);
+	makeAsmTag (name, operator, labelCandidate, nameFollows);
     }
     vStringDelete (name);
     vStringDelete (operator);
 }
+
+#if 0
+static void initialize (const langType language)
+{
+    Lang_asm = language;
+    buildAsmKeywordHash ();
+}
+#endif
 
 extern parserDefinition* AsmParser (void)
 {
@@ -294,6 +338,9 @@ extern parserDefinition* AsmParser (void)
     def->extensions = extensions;
     def->patterns   = patterns;
     def->parser     = findAsmTags;
+#if 0
+    def->initialize = initialize;
+#endif
     return def;
 }
 
