@@ -12,14 +12,14 @@ default
 	console_application (yes)
 	dynamic_runtime (yes)
 	dead_code_removal (yes)
-	profile (yes)
+	profile (no)
 	line_generation (yes)
 	debug  (yes)
 	array_optimization (yes)
 	inlining (yes)
 	inlining_size ("4")
 
-	precompiled ("$ISE_EIFFEL/precomp/spec/$ISE_PLATFORM/base")
+--	precompiled ("$ISE_EIFFEL/precomp/spec/$ISE_PLATFORM/base")
 
 cluster
 	
