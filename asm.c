@@ -21,6 +21,9 @@
 #include "read.h"
 #include "vstring.h"
 #ifdef HAVE_REGCOMP
+# ifdef HAVE_SYS_TYPES_H
+#  include <sys/types.h> /* declare off_t (not known to regex.h on FreeBSD) */
+# endif
 # include "regex.h"
 #endif
 
