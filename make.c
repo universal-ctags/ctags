@@ -14,6 +14,7 @@
 */
 #include "general.h"	/* must always come first */
 
+#include <string.h>
 #include <ctype.h>
 
 #include "parse.h"
@@ -40,21 +41,40 @@ static boolean isIdentifier (int c)
     return (boolean)(isalnum (c)  ||  c == '_');
 }
 
+static const unsigned char *readIdentifier (
+	const unsigned char *p, vString *const id)
+{
+    vStringClear (id);
+    while (isIdentifier ((int) *p))
+    {
+	vStringPut (id, (int) *p);
+	++p;
+    }
+    vStringTerminate (id);
+    return p;
+}
+
 static void findMakeTags (void)
 {
     vString *name = vStringNew ();
     const unsigned char *line;
+    boolean line_continuation = FALSE;
+    boolean in_define = FALSE;
 
     while ((line = fileReadLine ()) != NULL)
     {
 	const unsigned char* cp = line;
 	boolean possible = TRUE;
 
+	if (! line_continuation)
+	{
+	    if (! isIdentifier ((int) *cp))
+		continue;
+	}
 	while (isspace ((int) *cp))
 	    ++cp;
 	if (*cp == '#')
 	    continue;
-
 	while (*cp != '\0')
 	{
 	    /*  We look for any sequence of identifier characters following
@@ -62,19 +82,27 @@ static void findMakeTags (void)
 	     */
 	    if (possible && isIdentifier ((int) *cp))
 	    {
-		while (isIdentifier ((int) *cp))
-		{
-		    vStringPut (name, (int) *cp);
-		    ++cp;
-		}
-		vStringTerminate (name);
+		cp = readIdentifier (cp, name);
 		while (isspace ((int) *cp))
 		    ++cp;
-		if ( *cp == ':')
-		    ++cp;
-		if ( *cp == '=')
+		if (strcmp (vStringValue (name), "endef") == 0)
+		    in_define = FALSE;
+		else if (in_define)
+		    break;
+		else if (strcmp (vStringValue (name), "define") == 0  &&
+		    isIdentifier ((int) *cp))
+		{
+		    in_define = TRUE;
+		    cp = readIdentifier (cp, name);
 		    makeSimpleTag (name, MakeKinds, K_MACRO);
-		vStringClear (name);
+		}
+		else
+		{
+		    if (strchr (":?", *cp) != NULL)
+			++cp;
+		    if (*cp == '=')
+			makeSimpleTag (name, MakeKinds, K_MACRO);
+		}
 	    }
 	    else if (isspace ((int) *cp) ||  *cp == ':')
 		possible = TRUE;
@@ -83,6 +111,8 @@ static void findMakeTags (void)
 	    if (*cp != '\0')
 		++cp;
 	}
+	line_continuation = (boolean)
+	    (cp > line + 2  &&  strcmp ((const char *) cp - 2, "\\\n") == 0);
     }
     vStringDelete (name);
 }
