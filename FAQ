@@ -136,7 +136,7 @@ features, which you can learn gradually. I would be willing to say that it
 is the best vi-clone available within 4 light-years of Alpha Centauri. It
 works (nearly) exactly like standard vi, but provides some incredibly useful
 extensions (some of which I have participated in designing with the author).
-The RedHat Linux distribution has adopted Vim as its standard vi.
+Most Linux distributions have adopted Vim as its standard vi.
 
   ----------------------------------------------------------------------
 12.  How can I locate all references to a specific function or variable?
@@ -177,7 +177,7 @@ final tag file, or let the final invocation of ctags sort the file.
 You need to download the GNU regex package for Win32 from the following
 location:
 
-    http://people.delphi.com/gjc/gnu_regex.html
+    http://people.delphiforums.com/gjc/gnu_regex.html
 
 Then point the makefile macro, REGEX_DIR, found in mk_mvc.mak and mk_bc5.mak,
 to the directory created by extracting this archive.
