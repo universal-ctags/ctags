@@ -119,6 +119,9 @@ o.slang:	c.slang
 o.sort:		c.sort
 	$(CC) -c c.sort -o o.sort
 
+o.sml:		c.sml
+	$(CC) -c c.sml -o o.sml
+
 o.sql:		c.sql
 	$(CC) -c c.sql -o o.sql
 

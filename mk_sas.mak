@@ -39,6 +39,7 @@ OBJECTS = \
 	sh.$(OBJEXT) \
 	slang.$(OBJEXT) \
 	sort.$(OBJEXT) \
+	sml.$(OBJEXT) \
 	sql.$(OBJEXT) \
 	strlist.$(OBJEXT) \
 	tcl.$(OBJEXT) \

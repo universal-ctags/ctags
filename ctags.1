@@ -130,6 +130,9 @@ names are mapped to languages according to the following default mappings
 .B S-Lang
 *.sl
 .TP 9
+.B SML (Standard ML)
+*.sml *.sig
+.TP 9
 .B Tcl
 *.tcl *.wish
 .TP 9
@@ -837,11 +840,11 @@ guaranteed to always contain the string "Exuberant Ctags".
 Each type (or kind) of tag recorded in the tag file is indicated by a
 one-letter flag, which is also used to filter the tags placed into the output
 through use of the \fB--<LANG>-type\fP option. The flags corresponding to each
-tag kind for each langauge are described below. Note that some languages
-and/or tag kinds may be implemented using regular expressions and may not be
-available if regex support is not compiled into \fBctags\fP (see the
-\fB--regex-<LANG>\fP option). Kinds are enabled by default
-except where noted (with "[off]").
+tag kind for each named langauge are described below under the name of the
+language to which it applies. Note that some languages and/or tag kinds may be
+implemented using regular expressions and may not be available if regex
+support is not compiled into \fBctags\fP (see the \fB--regex-<LANG>\fP
+option). Kinds are enabled by default except where noted (with "[off]").
 
 .TP 5
 Asm
@@ -909,7 +912,7 @@ patterns (only virtual or rebound patterns are recorded)
 .RE
 
 .TP 5
-C and C++
+C (or C++)
 .RS 5
 .PD 0
 .TP 4
@@ -1208,7 +1211,7 @@ sets
 .RE
 
 .TP 5
-Sh (Bourne, Korn, Z)
+Sh
 .RS 5
 .PD 0
 .TP 4
@@ -1228,6 +1231,35 @@ functions
 .TP 4
 .I n
 namespaces
+.RE
+.PD 1
+.RE
+
+.TP 5
+SML
+.RS 5
+.PD 0
+.TP 4
+.I e
+exception
+.TP 4
+.I f
+function
+.TP 4
+.I c
+functor
+.TP 4
+.I s
+signature
+.TP 4
+.I r
+structure
+.TP 4
+.I t
+type
+.TP 4
+.I v
+value
 .RE
 .PD 1
 .RE

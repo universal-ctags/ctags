@@ -1,9 +1,9 @@
 Current Version: @@VERSION@@
 
-ctags-5.4.1 (Sun Nov 24 2002)
+ctags-5.4.1 (Tue Nov 26 2002)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
-* Added support for dimensioned variables to ASP parser, contributed by Simon
-  Bohlin [ASP].
+* Added support for dimensioned variables, contributed by Simon Bohlin [ASP].
+* Added support for SML (Standard ML) language, contributed by Venkatesh Prasad.
 * Fixed problem with infinite loop in certain comments [PL/SQL, Bug #629115].
 * Fixed problem of incorrect extension field [C. Bug #639639].
 * Fixed problem of empty scoping extension field [C. Bug #639644].
