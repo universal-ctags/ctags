@@ -24,16 +24,39 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-    K_PROCEDURE
+    K_PROCEDURE, K_CLASS, K_METHOD
 } tclKind;
 
 static kindOption TclKinds [] = {
-    { TRUE, 'p', "procedure", "procedures" }
+    { TRUE, 'p', "procedure", "procedures" },
+    { TRUE, 'c', "class",  "classes" },
+    { TRUE, 'f', "method", "methods" }
 };
 
 /*
 *   FUNCTION DEFINITIONS
 */
+
+static const unsigned char *makeTclTag (
+	const unsigned char *cp,
+	vString *const name,
+	const tclKind kind)
+{
+    vStringClear (name);
+    while ((int) *cp != '\0'  &&  ! isspace ((int) *cp))
+    {
+	vStringPut (name, (int) *cp);
+	++cp;
+    }
+    vStringTerminate (name);
+    makeSimpleTag (name, TclKinds, kind);
+    return cp;
+}
+
+static boolean match (const unsigned char *line, const char *word)
+{
+    return (boolean) (strncmp ((const char*) line, word, strlen (word)) == 0);
+}
 
 static void findTclTags (void)
 {
@@ -42,24 +65,38 @@ static void findTclTags (void)
 
     while ((line = fileReadLine ()) != NULL)
     {
-	int i;
+	const unsigned char *cp;
 
+	while (isspace (line [0])) 
+	    ++line;
+	
 	if (line [0] == '\0'  ||  line [0] == '#')
 	    continue;
 
-	if (strncmp ((const char*) line, "proc", (size_t) 4) == 0)
+	/* read first word */
+	for (cp = line ; *cp != '\0'  &&  ! isspace ((int) *cp) ; ++cp)
+	    ;
+	if (! isspace ((int) *cp))
+	    continue;
+	while (isspace ((int) *cp))
+	    ++cp;
+	/* Now `line' points at first word and `cp' points at next word */
+
+	if (match (line, "proc"))
+	    cp = makeTclTag (cp, name, K_PROCEDURE);
+	else if (match (line, "class") || match (line, "itcl::class"))
+	    cp = makeTclTag (cp, name, K_CLASS);
+	else if (match (line, "public") ||
+		match (line, "protected") ||
+		match (line, "private"))
 	{
-	    const unsigned char *cp = line + 4;
-	    while (isspace ((int) *cp))
-		++cp;
-	    while ((int) *cp != '\0'  &&  ! isspace ((int) *cp))
+	    if (match (cp, "method"))
 	    {
-		vStringPut (name, (int) *cp);
-		++cp;
+		cp += 6;
+		while (isspace ((int) *cp))
+		    ++cp;
+		cp = makeTclTag (cp, name, K_METHOD);
 	    }
-	    vStringTerminate (name);
-	    makeSimpleTag (name, TclKinds, K_PROCEDURE);
-	    vStringClear (name);
 	}
     }
     vStringDelete (name);
@@ -67,7 +104,7 @@ static void findTclTags (void)
 
 extern parserDefinition* TclParser (void)
 {
-    static const char *const extensions [] = { "tcl", "tk", "wish", NULL };
+    static const char *const extensions [] = { "tcl", "tk", "wish", "itcl", NULL };
     parserDefinition* def = parserNew ("Tcl");
     def->kinds      = TclKinds;
     def->kindCount  = KIND_COUNT (TclKinds);
