@@ -36,6 +36,8 @@
 #define isBlank(c)		(boolean) (c == ' ' || c == '\t')
 #define isType(token,t)		(boolean) ((token)->type == (t))
 #define isKeyword(token,k)	(boolean) ((token)->keyword == (k))
+#define isSecondaryKeyword(token,k)  (boolean) ((token)->secondary == NULL ? \
+    FALSE : (token)->secondary->keyword == (k))
 
 /*
 *   DATA DECLARATIONS
@@ -98,6 +100,7 @@ typedef enum eKeywordId {
     KEYWORD_private,
     KEYWORD_program,
     KEYWORD_public,
+    KEYWORD_pure,
     KEYWORD_real,
     KEYWORD_recursive,
     KEYWORD_save,
@@ -160,6 +163,7 @@ typedef struct sTokenInfo {
     keywordId keyword;
     tagType tag;
     vString* string;
+    struct sTokenInfo *secondary;
     unsigned long lineNumber;
     fpos_t filePosition;
 } tokenInfo;
@@ -232,6 +236,7 @@ static const keywordDesc FortranKeywordTable [] = {
     { "private",	KEYWORD_private		},
     { "program",	KEYWORD_program		},
     { "public",		KEYWORD_public		},
+    { "pure",		KEYWORD_pure		},
     { "real",		KEYWORD_real		},
     { "recursive",	KEYWORD_recursive	},
     { "save",		KEYWORD_save		},
@@ -292,6 +297,7 @@ static void ancestorPop (void)
 
     Ancestors.list [Ancestors.count].type       = TOKEN_UNDEFINED;
     Ancestors.list [Ancestors.count].keyword    = KEYWORD_NONE;
+    Ancestors.list [Ancestors.count].secondary  = NULL;
     Ancestors.list [Ancestors.count].tag        = TAG_UNDEFINED;
     Ancestors.list [Ancestors.count].string     = NULL;
     Ancestors.list [Ancestors.count].lineNumber = 0L;
@@ -331,6 +337,32 @@ static void buildFortranKeywordHash (void)
 /*
 *   Tag generation functions
 */
+
+static tokenInfo *newToken (void)
+{
+    tokenInfo *const token = xMalloc (1, tokenInfo);
+
+    token->type	        = TOKEN_UNDEFINED;
+    token->keyword      = KEYWORD_NONE;
+    token->tag	        = TAG_UNDEFINED;
+    token->string       = vStringNew ();
+    token->secondary    = NULL;
+    token->lineNumber   = getSourceLineNumber ();
+    token->filePosition	= getInputFilePosition ();
+
+    return token;
+}
+
+static void deleteToken (tokenInfo *const token)
+{
+    if (token != NULL)
+    {
+	vStringDelete (token->string);
+	deleteToken (token->secondary);
+	token->secondary = NULL;
+	eFree (token);
+    }
+}
 
 static boolean isFileScope (const tagType type)
 {
@@ -397,16 +429,11 @@ static int skipLine (void)
 
 static void makeLabelTag (vString *const label)
 {
-    tokenInfo token;
-
-    token.type		= TOKEN_LABEL;
-    token.keyword	= KEYWORD_NONE;
-    token.tag		= TAG_LABEL;
-    token.string	= label;
-    token.lineNumber	= getSourceLineNumber ();
-    token.filePosition	= getInputFilePosition ();
-
-    makeFortranTag (&token, TAG_LABEL);
+    tokenInfo *token = newToken ();
+    token->type  = TOKEN_LABEL;
+    vStringCopy (token->string, label);
+    makeFortranTag (token, TAG_LABEL);
+    deleteToken (token);
 }
 
 static lineType getLineType (void)
@@ -734,26 +761,6 @@ static void parseIdentifier (vString *const string, const int firstChar)
     ungetChar (c);		/* unget non-identifier character */
 }
 
-static tokenInfo *newToken (void)
-{
-    tokenInfo *const token = xMalloc (1, tokenInfo);
-
-    token->type	   = TOKEN_UNDEFINED;
-    token->keyword = KEYWORD_NONE;
-    token->tag	   = TAG_UNDEFINED;
-    token->string  = vStringNew ();
-    token->lineNumber   = getSourceLineNumber ();
-    token->filePosition	= getInputFilePosition ();
-
-    return token;
-}
-
-static void deleteToken (tokenInfo *const token)
-{
-    vStringDelete (token->string);
-    eFree (token);
-}
-
 /*  Analyzes the identifier contained in a statement described by the
  *  statement structure and adjusts the structure according the significance
  *  of the identifier.
@@ -805,9 +812,11 @@ static void readToken (tokenInfo *const token)
 {
     int c;
 
-    token->type    = TOKEN_UNDEFINED;
-    token->tag     = TAG_UNDEFINED;
-    token->keyword = KEYWORD_NONE;
+    deleteToken (token->secondary);
+    token->type        = TOKEN_UNDEFINED;
+    token->tag         = TAG_UNDEFINED;
+    token->keyword     = KEYWORD_NONE;
+    token->secondary   = NULL;
     vStringClear (token->string);
 
 getNextChar:
@@ -915,13 +924,24 @@ getNextChar:
     }
 }
 
+static void readSubToken (tokenInfo *const token)
+{
+    if (token->secondary == NULL)
+    {
+	token->secondary = newToken ();
+	readToken (token->secondary);
+    }
+    Assert (token->secondary != NULL);
+}
+
 /*
 *   Scanning functions
 */
 
 static void skipToToken (tokenInfo *const token, tokenType type)
 {
-    while (! isType (token, type) && ! isType (token, TOKEN_STATEMENT_END))
+    while (! isType (token, type) && ! isType (token, TOKEN_STATEMENT_END) &&
+	    !(token->secondary != NULL && isType (token->secondary, TOKEN_STATEMENT_END)))
 	readToken (token);
 }
 
@@ -1323,8 +1343,8 @@ static void parseDerivedTypeDef (tokenInfo *const token)
 	else
 	    skipToNextStatement (token);
     }
-    readToken (token);
-    Assert (isKeyword (token, KEYWORD_type));
+    readSubToken (token);
+    Assert (isSecondaryKeyword (token, KEYWORD_type));
     skipToToken (token, TOKEN_STATEMENT_END);
     ancestorPop ();
 }
@@ -1373,8 +1393,8 @@ static void parseInterfaceBlock (tokenInfo *const token)
 	    default:                 skipToNextStatement (token);       break;
 	}
     }
-    readToken (token);
-    Assert (isKeyword (token, KEYWORD_interface));
+    readSubToken (token);
+    Assert (isSecondaryKeyword (token, KEYWORD_interface));
     skipToNextStatement (token);
     ancestorPop ();
 }
@@ -1510,8 +1530,9 @@ static void parseBlockData (tokenInfo *const token)
     parseSpecificationPart (token);
     while (! isKeyword (token, KEYWORD_end))
 	skipToNextStatement (token);
-    readToken (token);
-    Assert (isKeyword (token, KEYWORD_block));
+    readSubToken (token);
+    Assert (isSecondaryKeyword (token, KEYWORD_NONE) ||
+	    isSecondaryKeyword (token, KEYWORD_block));
     skipToNextStatement (token);
     ancestorPop ();
 }
@@ -1534,16 +1555,14 @@ static void parseInternalSubprogramPart (tokenInfo *const token)
     {
 	switch (token->keyword)
 	{
-	    case KEYWORD_function:
-		parseFunctionSubprogram (token);
-		break;
+	    case KEYWORD_function:   parseFunctionSubprogram (token);   break;
+	    case KEYWORD_subroutine: parseSubroutineSubprogram (token); break;
+	    case KEYWORD_end:        done = TRUE;                       break;
 
-	    case KEYWORD_subroutine:
-		parseSubroutineSubprogram (token);
-		break;
-
-	    case KEYWORD_end:
-		done = TRUE;
+	    case KEYWORD_recursive:
+	    case KEYWORD_pure:
+	    case KEYWORD_stdcall:
+		readToken (token);
 		break;
 
 	    default:
@@ -1584,8 +1603,9 @@ static void parseModule (tokenInfo *const token)
 	parseInternalSubprogramPart (token);
     while (! isKeyword (token, KEYWORD_end))
 	skipToNextStatement (token);
-    readToken (token);
-    Assert (isKeyword (token, KEYWORD_module));
+    readSubToken (token);
+    Assert (isSecondaryKeyword (token, KEYWORD_NONE) ||
+	    isSecondaryKeyword (token, KEYWORD_module));
     skipToNextStatement (token);
     ancestorPop ();
 }
@@ -1605,7 +1625,6 @@ static void parseModule (tokenInfo *const token)
 static void parseExecutionPart (tokenInfo *const token)
 {
     boolean done = FALSE;
-    int end = 0;
     while (! done)
     {
 	switch (token->keyword)
@@ -1624,37 +1643,20 @@ static void parseExecutionPart (tokenInfo *const token)
 		done = TRUE;
 		break;
 
-	    case KEYWORD_if:
-		readToken (token);
-		if (isType (token, TOKEN_PAREN_OPEN))
-		    skipOverParens (token);
-		if (isKeyword (token, KEYWORD_then))
-		    ++end;
-		skipToNextStatement (token);
-		break;
-
-	    case KEYWORD_do:
-	    case KEYWORD_select:
-	    case KEYWORD_where:
-	    case KEYWORD_while:
-		++end;
-		skipToNextStatement (token);
-		break;
-
 	    case KEYWORD_end:
-	    case KEYWORD_enddo:
-	    case KEYWORD_endif:
-		if (end == 0)
-		    done = TRUE;
-		else
+		readSubToken (token);
+		if (isSecondaryKeyword (token, KEYWORD_do) ||
+		    isSecondaryKeyword (token, KEYWORD_if) ||
+		    isSecondaryKeyword (token, KEYWORD_select) ||
+		    isSecondaryKeyword (token, KEYWORD_where))
 		{
-		    --end;
 		    skipToNextStatement (token);
 		}
+		else
+		    done = TRUE;
 		break;
 	}
     }
-    Assert (end == 0);
 }
 
 static void parseSubprogram (tokenInfo *const token, const tagType tag)
@@ -1669,6 +1671,10 @@ static void parseSubprogram (tokenInfo *const token, const tagType tag)
     if (isKeyword (token, KEYWORD_contains))
 	parseInternalSubprogramPart (token);
     Assert (isKeyword (token, KEYWORD_end));
+    readSubToken (token);
+    Assert (isSecondaryKeyword (token, KEYWORD_NONE) ||
+	    isSecondaryKeyword (token, KEYWORD_function) ||
+	    isSecondaryKeyword (token, KEYWORD_subroutine));
     skipToNextStatement (token);
     ancestorPop ();
 }
@@ -1735,8 +1741,12 @@ static void parseProgramUnit (tokenInfo *const token)
 	    case KEYWORD_module:     parseModule (token);               break;
 	    case KEYWORD_program:    parseMainProgram (token);          break;
 	    case KEYWORD_subroutine: parseSubroutineSubprogram (token); break;
-	    case KEYWORD_recursive:  skipToNextStatement (token);       break;
-	    case KEYWORD_stdcall:    readToken (token);                 break;
+
+	    case KEYWORD_recursive:
+	    case KEYWORD_pure:
+	    case KEYWORD_stdcall:
+		readToken (token);
+		break;
 
 	    default:
 		parseSpecificationPart (token);
