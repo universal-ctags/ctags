@@ -1,8 +1,3 @@
-C Date: Tue, 08 Oct 2002 08:15:33 -0700
-C From: noreply@sourceforge.net
-C To: noreply@sourceforge.net
-C Subject: [ ctags-Bugs-620288 ] fortran function definition
-C 
 C Bugs item #620288, was opened at 2002-10-08 08:15
 C You can respond by visiting: 
 C https://sourceforge.net/tracker/?func=detail&atid=106556&aid=620288&group_id=6556
