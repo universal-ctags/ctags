@@ -52,9 +52,11 @@ INCLUDE	= -I.
 DEFS	= -DHAVE_CONFIG_H
 COMP_FLAGS = $(INCLUDE) $(DEFS) $(CFLAGS)
 OPT		= -O2 -march=i686 -mcpu=i686 
-DCFLAGS	= $(COMP_FLAGS) -DDEBUG -DINTERNAL_SORT -DREADTAGS_MAIN
+DCFLAGS	= $(COMP_FLAGS) -DDEBUG -DINTERNAL_SORT
 LD		= gcc
 LDFLAGS	= 
+
+readtags.err: DCFLAGS += -DREADTAGS_MAIN
 
 AUTO_GEN	= configure config.h.in
 CONFIG_GEN	= config.cache config.log config.status config.run config.h Makefile
@@ -347,24 +349,24 @@ $(DEP_DIR)/%.d: %.c maintainer.mak
 #
 %.o: %.c
 	@ echo "-- Compiling $<"
-	@ $(CC) $(COMP_FLAGS) -DEXTERNAL_SORT $(OPT) $(WARNINGS) -Wuninitialized -c $<  $(REDIR)
+	@ $(CC) $(COMP_FLAGS) -DEXTERNAL_SORT $(OPT) $(WARNINGS) -Wuninitialized -c $<
 
 %.od: %.c
 	@ echo "-- Compiling (debug) $<"
-	@ $(CC) -g $(DCFLAGS) $(WARNINGS) -o $*.od -c $<  $(REDIR)
+	@ $(CC) -g $(DCFLAGS) $(WARNINGS) -o $*.od -c $<
 
 %.om: %.c
 	@ echo "-- Compiling (safe alloc) $<"
-	@ $(CC) -g -DTRAP_MEMORY_CALLS $(DCFLAGS) $(WARNINGS) -o $*.om -c $<  $(REDIR)
+	@ $(CC) -g -DTRAP_MEMORY_CALLS $(DCFLAGS) $(WARNINGS) -o $*.om -c $<
 
 %.i: %.c FORCE
-	$(CC) $(DCFLAGS) $(WARNINGS) -Wuninitialized -O -E $< > $@ $(REDIR)
+	$(CC) $(DCFLAGS) $(WARNINGS) -Wuninitialized -O -E $< > $@
 
 %.ic: %.c FORCE
-	$(CC) $(DCFLAGS) $(WARNINGS) -Wuninitialized -O -E $< | noblanks > $@ $(REDIR)
+	$(CC) $(DCFLAGS) $(WARNINGS) -Wuninitialized -O -E $< | noblanks > $@
 
 %.s: %.c FORCE
-	$(CC) $(DCFLAGS) $(WARNINGS) -S $< > $@ $(REDIR)
+	$(CC) $(DCFLAGS) $(WARNINGS) -S $< > $@
 
 %.err: %.c
 	@ $(CC) $(DCFLAGS) $(WARNINGS) -Wuninitialized -O -c $<
