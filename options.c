@@ -700,7 +700,7 @@ static void processLanguageForceOption (const char *const option,
 					const char *const parameter)
 {
     langType language;
-    if (stricmp (parameter, "auto") == 0)
+    if (strcasecmp (parameter, "auto") == 0)
 	language = LANG_AUTO;
     else
 	language = getNamedLanguage (parameter);
@@ -792,7 +792,7 @@ static char* processLanguageMap (char* map)
 	    else
 		clear = TRUE;
 	    for (p = list  ;  *p != ','  &&  *p != '\0'  ;  ++p) /*no-op*/ ;
-	    if (strnicmp (list, "default", p - list) == 0)
+	    if (strncasecmp (list, "default", p - list) == 0)
 	    {
 		verbose ("    Restoring default %s language map: ", getLanguageName (language));
 		installLanguageMapDefault (language);
@@ -1016,6 +1016,8 @@ static void readIgnoreList (const char *const list)
 static void addIgnoreListFromFile (const char *const fileName)
 {
     stringList* tokens = stringListNewFromFile (fileName);
+    if (tokens == NULL)
+	error (FATAL | PERROR, "cannot open \"%s\"", fileName);
     if (Option.ignore == NULL)
 	Option.ignore = tokens;
     else
@@ -1507,11 +1509,18 @@ extern void parseOptions (cookedArgs* const args)
 	NonOptionEncountered = TRUE;
 }
 
+static const char *CheckFile;
+static boolean checkSameFile (const char *const fileName)
+{
+    return isSameFile (CheckFile, fileName);
+}
+
 static boolean parseFileOptions (const char* const fileName)
 {
     boolean fileFound = FALSE;
     const char* const format = "Considering option file %s: %s\n";
-    if (stringListHasFile (OptionFiles, fileName))
+    CheckFile = fileName;
+    if (stringListHasTest (OptionFiles, checkSameFile))
 	verbose (format, fileName, "already read");
     else
     {

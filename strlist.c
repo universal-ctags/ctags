@@ -84,9 +84,7 @@ extern stringList* stringListNewFromFile (const char* const fileName)
 {
     stringList* result = NULL;
     FILE* const fp = fopen (fileName, "r");
-    if (fp == NULL)
-	error (FATAL | PERROR, "cannot open \"%s\"", fileName);
-    else
+    if (fp != NULL)
     {
 	result = stringListNew ();
 	while (! feof (fp))
@@ -162,18 +160,18 @@ extern boolean stringListHasInsensitive (const stringList *const current,
     unsigned int i;
     Assert (current != NULL);
     for (i = 0  ;  ! result  &&  i < current->count  ;  ++i)
-	result = (boolean) (stricmp (str, vStringValue (current->list [i]))==0);
+	result = (boolean) (strcasecmp (str, vStringValue (current->list [i]))==0);
     return result;
 }
 
-extern boolean stringListHasFile (const stringList *const current,
-				  const char *const file)
+extern boolean stringListHasTest (const stringList *const current,
+				  boolean (*test)(const char *s))
 {
     boolean result = FALSE;
     unsigned int i;
     Assert (current != NULL);
     for (i = 0  ;  ! result  &&  i < current->count  ;  ++i)
-	result = (boolean) (isSameFile (file, vStringValue (current->list [i])));
+	result = (*test)(vStringValue (current->list [i]));
     return result;
 }
 
@@ -194,7 +192,7 @@ static boolean fileNameMatched (const vString* const vpattern,
 #if defined (HAVE_FNMATCH)
     return (boolean) (fnmatch (pattern, fileName, 0) == 0);
 #elif defined (CASE_INSENSITIVE_FILENAMES)
-    return (boolean) (stricmp (pattern, fileName) == 0);
+    return (boolean) (strcasecmp (pattern, fileName) == 0);
 #else
     return (boolean) (strcmp (pattern, fileName) == 0);
 #endif

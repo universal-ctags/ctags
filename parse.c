@@ -87,7 +87,7 @@ extern langType getNamedLanguage (const char *const name)
     for (i = 0  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
     {
 	if (LanguageTable [i]->name != NULL)
-	    if (stricmp (name, LanguageTable [i]->name) == 0)
+	    if (strcasecmp (name, LanguageTable [i]->name) == 0)
 		result = i;
     }
     return result;

@@ -66,7 +66,7 @@ static void findAspTags (void)
 		break;
 	    
 	    /* jump over end function/sub lines */
-	    else if (strnicmp ((const char*) cp, "end", (size_t) 3)== 0)
+	    else if (strncasecmp ((const char*) cp, "end", (size_t) 3)== 0)
 	    {
 		cp += 3;
 		if (isspace ((int)*cp))
@@ -74,13 +74,13 @@ static void findAspTags (void)
 		    while (isspace ((int)*cp))
 			++cp;
 
-		    if (strnicmp ((const char*) cp, "function", (size_t) 8) == 0)
+		    if (strncasecmp ((const char*) cp, "function", (size_t) 8) == 0)
 		    {
 			cp+=8;
 			break;
 		    }
 
-		    else if (strnicmp ((const char*) cp, "sub", (size_t) 3) == 0)
+		    else if (strncasecmp ((const char*) cp, "sub", (size_t) 3) == 0)
 		    {
 			cp+=3;
 			break;
@@ -89,7 +89,7 @@ static void findAspTags (void)
 	    }
 
 	    /* jump over exit function/sub lines */
-	    else if (strnicmp ((const char*) cp, "exit", (size_t) 4)==0)
+	    else if (strncasecmp ((const char*) cp, "exit", (size_t) 4)==0)
 	    {
 		cp += 4;
 		if (isspace ((int) *cp))
@@ -97,13 +97,13 @@ static void findAspTags (void)
 		    while (isspace ((int) *cp))
 			++cp;
 
-		    if (strnicmp ((const char*) cp, "function", (size_t) 8) == 0)
+		    if (strncasecmp ((const char*) cp, "function", (size_t) 8) == 0)
 		    {
 			cp+=8;
 			break;
 		    }
 
-		    else if (strnicmp ((const char*) cp, "sub", (size_t) 3) == 0)
+		    else if (strncasecmp ((const char*) cp, "sub", (size_t) 3) == 0)
 		    {
 			cp+=3;
 			break;
@@ -112,7 +112,7 @@ static void findAspTags (void)
 	    }
 
 	    /* function? */
-	    else if (strnicmp ((const char*) cp, "function", (size_t) 8) == 0)
+	    else if (strncasecmp ((const char*) cp, "function", (size_t) 8) == 0)
 	    {
 		cp += 8;
 
@@ -132,7 +132,7 @@ static void findAspTags (void)
 	    }
 
 	    /* sub? */
-	    else if (strnicmp ((const char*) cp, "sub", (size_t) 3) == 0)
+	    else if (strncasecmp ((const char*) cp, "sub", (size_t) 3) == 0)
 	    {
 		cp += 3;
 		if (isspace ((int) *cp))

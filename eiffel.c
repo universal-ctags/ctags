@@ -240,7 +240,7 @@ static boolean isGeneric (tokenInfo *const token)
 static void reportType (tokenInfo *const token)
 {
     if (vStringLength (token->featureName) > 0  && ! isGeneric (token)  &&
-	stricmp (vStringValue (token->featureName),
+	strcasecmp (vStringValue (token->featureName),
 		 vStringValue (token->className)) != 0 &&
 	! stringListHasInsensitive (ReferencedTypes,
 				    vStringValue (token->featureName)))
@@ -262,6 +262,11 @@ static int fileGetc (void)
 static int fileUngetc (c)
 {
     return ungetc(c, File);
+}
+
+extern char *readLine (vString *const vLine, FILE *const fp)
+{
+    return NULL;
 }
 
 #else
@@ -739,7 +744,7 @@ static boolean isIdentifierMatch (const tokenInfo *const token,
 				  const char *const name)
 {
     return (boolean) (isType (token, TOKEN_IDENTIFIER)  &&
-		     stricmp (vStringValue (token->string), name) == 0);
+		     strcasecmp (vStringValue (token->string), name) == 0);
 }
 
 static void findToken (tokenInfo *const token, const tokenType type)

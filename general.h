@@ -190,6 +190,13 @@
 # define HAVE_REGEX 1
 #endif
 
+/* Variant names */
+#if !defined(HAVE_STRCASECMP) && defined(HAVE_STRICMP) && !defined(strcasecmp)
+# define strcasecmp stricmp
+#endif
+#if !defined(HAVE_STRNCASECMP) && defined(HAVE_STRNICMP) && !defined(strncasecmp)
+# define strncasecmp strnicmp
+#endif
 
 /*
 *   DATA DECLARATIONS

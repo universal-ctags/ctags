@@ -135,8 +135,8 @@ static void findBetaTags (void)
 		if (first < last - 1)
 		{
 		    vStringChar (line, last) = 0;
-		    if (stricmp ("LIB", vStringValue (line) + first) &&
-		        stricmp ("PROGRAM", vStringValue (line) + first))
+		    if (strcasecmp ("LIB", vStringValue (line) + first) &&
+		        strcasecmp ("PROGRAM", vStringValue (line) + first))
 		    {
 			makeBetaTag (vStringValue (line) + first, K_FRAGMENT);
 		    }
@@ -191,7 +191,7 @@ static void findBetaTags (void)
 		        pos++;
 		    /* skip past SLOT */
 		    if (pos+4 <= len &&
-		        !strnicmp (vStringValue(line) + pos, "SLOT", (size_t)4))
+		        !strncasecmp (vStringValue(line) + pos, "SLOT", (size_t)4))
 		        pos += 4;
 		    /* skip past space after SLOT */
 		    while (pos < len &&
@@ -207,9 +207,9 @@ static void findBetaTags (void)
 		    if (eoname < len)
 		    {
 		        vStringChar (line, eoname) = 0;
-			if (stricmp ("LIB", vStringValue (line) + pos) &&
-			    stricmp ("PROGRAM", vStringValue (line) + pos) &&
-			    stricmp ("SLOT", vStringValue (line) + pos))
+			if (strcasecmp ("LIB", vStringValue (line) + pos) &&
+			    strcasecmp ("PROGRAM", vStringValue (line) + pos) &&
+			    strcasecmp ("SLOT", vStringValue (line) + pos))
 			{
 			    makeBetaTag (vStringValue (line) + pos, K_SLOT);
 			}

@@ -292,8 +292,8 @@ extern void error (const errorSelection selection,
 	exit (1);
 }
 
-#ifndef HAVE_STRICMP
-extern int stricmp (const char *s1, const char *s2)
+#if !defined (HAVE_STRCASECMP) && !defined (HAVE_STRICMP)
+extern int strcasecmp (const char *s1, const char *s2)
 {
     int result;
     do
@@ -304,8 +304,8 @@ extern int stricmp (const char *s1, const char *s2)
 }
 #endif
 
-#ifndef HAVE_STRNICMP
-extern int strnicmp (const char *s1, const char *s2, size_t n)
+#if !defined (HAVE_STRNCASECMP) && !defined (HAVE_STRNICMP)
+extern int strncasecmp (const char *s1, const char *s2, size_t n)
 {
     int result;
     do
@@ -476,7 +476,7 @@ extern boolean isSameFile (const char *const name1, const char *const name2)
     if (stat (name1, &stat1) == 0  &&  stat (name2, &stat2) == 0)
 	result = (boolean) (stat1.st_ino == stat2.st_ino);
 #elif defined (CASE_INSENSITIVE_FILENAMES)
-    result = (boolean) (stricmp (name1, name2) == 0);
+    result = (boolean) (strcasecmp (name1, name2) == 0);
 #else
     result = (boolean) (strcmp (name1, name2) == 0);
 #endif
@@ -887,16 +887,19 @@ extern vString *combinePathAndFile (const char *const path,
 extern void processExcludeOption (const char *const __unused__ option,
 				  const char *const parameter)
 {
+    const char *const fileName = parameter + 1;
     if (parameter [0] == '\0')
 	freeList (&Excluded);
     else if (parameter [0] == '@')
     {
-	stringList* const sl = stringListNewFromFile (parameter + 1);
+	stringList* const sl = stringListNewFromFile (fileName);
+	if (sl == NULL)
+	    error (FATAL | PERROR, "cannot open \"%s\"", fileName);
 	if (Excluded == NULL)
 	    Excluded = sl;
 	else
 	    stringListCombine (Excluded, sl);
-	verbose ("    adding exclude patterns from %s\n", parameter + 1);
+	verbose ("    adding exclude patterns from %s\n", fileName);
     }
     else
     {

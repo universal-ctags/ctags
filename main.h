@@ -68,11 +68,11 @@ extern const char *getExecutableName (void);
 extern void processExcludeOption (const char *const option, const char *const parameter);
 extern int main (int argc, char **argv);
 
-#ifndef HAVE_STRICMP
-extern int stricmp (const char *s1, const char *s2);
+#if !defined (HAVE_STRCASECMP) && !defined (HAVE_STRICMP)
+extern int strcasecmp (const char *s1, const char *s2);
 #endif
-#ifndef HAVE_STRNICMP
-extern int strnicmp (const char *s1, const char *s2, size_t n);
+#if !defined (HAVE_STRNCASECMP) && !defined (HAVE_STRNICMP)
+extern int strncasecmp (const char *s1, const char *s2, size_t n);
 #endif
 #ifndef HAVE_STRSTR
 extern char* strstr (const char *str, const char *substr);

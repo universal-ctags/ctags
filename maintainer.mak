@@ -106,6 +106,12 @@ readtags: readtags.[ch]
 readtags.o: readtags.[ch]
 	$(CC) $(COMP_FLAGS) -c readtags.c
 
+etyperef: routines.c etyperef.o keyword.o strlist.o vstring.o
+	$(CC) $(OPT) $(COMP_FLAGS) -o $@ $^
+
+etyperef.o: eiffel.c
+	$(CC) -DTYPE_REFERENCE_TOOL $(OPT) $(COMP_FLAGS) -o $@ -c $<
+
 endif
 endif
 endif
