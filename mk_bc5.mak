@@ -7,7 +7,7 @@
 BCC = bcc32
 
 # You can obtain an Win32 version of the Gnu regex support library from
-#   http://people.delphi.com/gjc/gnu_regex.html
+#   http://people.delphiforums.com/gjc/gnu_regex.html
 # Point REGEX_DIR to the directory created when you extract the archive.
 # If you just run gnu_regex.exe in this directory, then you can just
 # uncomment the REGEX_DIR macro below and everything should work.
@@ -29,7 +29,7 @@ EXTRA_LIBS = $(REGEX_DIR)\gnu_regex.lib
 LDFLAGS = -tWCR
 !else
 REGEX_DEFINE = -DHAVE_REGCOMP -DREGEX_MALLOC -DSTDC_HEADERS=1
-EXTRA_LIBS = gnu_regex.obj
+EXTRA_LIBS = regex.obj
 !endif
 !endif
 
@@ -53,7 +53,7 @@ ctags.exe: $(SOURCES) respbc5 $(EXTRA_LIBS)
 dctags.exe: $(SOURCES) respbc5 $(EXTRA_LIBS)
 	$(BCC) $(CFLAGS) -DDEBUG -e$@ $(LDFLAGS) @respbc5 debug.c
 
-gnu_regex.obj:
+regex.obj:
 	$(BCC) -c -o$@ -w- $(DEFINES) -Dconst= $(INCLUDES) $(REGEX_DIR)\regex.c
 
 respbc5: $(SOURCES) $(HEADERS) mk_bc5.mak
