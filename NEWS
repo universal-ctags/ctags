@@ -8,6 +8,7 @@ ctags-5.2 (Fri Dec 21 2001)
 * Added support for Lua language, submitted by Max Ischenko.
 * Added instructions to man page on using tags with NEdit.
 * Added setargv.obj to link for wildcard expansion [MSVC].
+* Added capability to have regex invoke a callback in a regex parser.
 * Fixed regex tag problem which left newlines in back-references.
 * Fixed missing class-qualified tags [Eiffel].
 * Fixed spurious tags for entries in final indexing clause [Eiffel].

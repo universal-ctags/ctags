@@ -65,6 +65,13 @@ typedef struct {
 
 typedef parserDefinition* (parserDefinitionFunc) (void);
 
+typedef struct {
+	off_t start;	/* character index where match starts */
+	size_t length;	/* length of match */
+} regexMatch;
+
+typedef void (*regexCallback) (const char *line, const regexMatch *matches, unsigned int count);
+
 /*
 *   FUNCTION PROTOTYPES
 */
@@ -107,6 +114,8 @@ extern void matchRegex (const vString* const line, const langType language);
 #endif
 extern boolean processRegexOption (const char *const option, const char *const parameter);
 extern void addLanguageRegex (const langType language, const char* const regex);
+extern void addTagRegex (const langType language, const char* const regex, const char* const name, const char* const kinds, const char* const flags);
+extern void addCallbackRegex (const langType language, const char* const regex, const char* flags, const regexCallback callback);
 extern void disableRegexKinds (const langType __unused__ language);
 extern boolean enableRegexKind (const langType language, const int kind, const boolean mode);
 extern void printRegexKindOptions (const langType language);
