@@ -39,6 +39,7 @@
     ShParser, \
     SlangParser, \
     TclParser, \
+    VerilogParser, \
     VimParser, \
     YaccParser
 

@@ -41,6 +41,7 @@ SOURCES = \
 	sort.c \
 	strlist.c \
 	tcl.c \
+	verilog.c \
 	vim.c \
 	yacc.c \
 	vstring.c
@@ -86,6 +87,7 @@ OBJECTS = \
 	sort.$(OBJEXT) \
 	strlist.$(OBJEXT) \
 	tcl.$(OBJEXT) \
+	verilog.$(OBJEXT) \
 	vim.$(OBJEXT) \
 	yacc.$(OBJEXT) \
 	vstring.$(OBJEXT)

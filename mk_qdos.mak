@@ -44,10 +44,10 @@ OBJECTS = qdos.$(OBJEXT) \
 	asm.$(OBJEXT) \
 	asp.$(OBJEXT) \
 	awk.$(OBJEXT) \
-	eiffel.$(OBJEXT) \
 	beta.$(OBJEXT) \
 	c.$(OBJEXT) \
 	cobol.$(OBJEXT) \
+	eiffel.$(OBJEXT) \
 	entry.$(OBJEXT) \
 	fortran.$(OBJEXT) \
 	get.$(OBJEXT) \
@@ -73,9 +73,10 @@ OBJECTS = qdos.$(OBJEXT) \
 	sort.$(OBJEXT) \
 	strlist.$(OBJEXT) \
 	tcl.$(OBJEXT) \
+	verilog.$(OBJEXT) \
 	vim.$(OBJEXT) \
-	yacc.$(OBJEXT) \
-	vstring.$(OBJEXT)
+	vstring.$(OBJEXT) \
+	yacc.$(OBJEXT)
 
 $(EXEC) : $(OBJECTS)
     $(LD) -o$(EXEC) $(LDFLAGS) $(OBJECTS) $(LIBS)

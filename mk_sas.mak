@@ -12,10 +12,10 @@ OBJECTS = \
 	asm.$(OBJEXT) \
 	asp.$(OBJEXT) \
 	awk.$(OBJEXT) \
-	eiffel.$(OBJEXT) \
 	beta.$(OBJEXT) \
 	c.$(OBJEXT) \
 	cobol.$(OBJEXT) \
+	eiffel.$(OBJEXT) \
 	entry.$(OBJEXT) \
 	fortran.$(OBJEXT) \
 	get.$(OBJEXT) \
@@ -41,9 +41,10 @@ OBJECTS = \
 	sort.$(OBJEXT) \
 	strlist.$(OBJEXT) \
 	tcl.$(OBJEXT) \
+	verilog.$(OBJEXT) \
 	vim.$(OBJEXT) \
-	yacc.$(OBJEXT) \
 	vstring.$(OBJEXT) \
+	yacc.$(OBJEXT)
 
 ctags: $(OBJECTS)
 	sc link to $@ $(OBJECTS) math s sint

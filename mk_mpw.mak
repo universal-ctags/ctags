@@ -14,10 +14,10 @@ SOURCES = ¶
 	asm.c ¶
 	asp.c ¶
 	awk.c ¶
-	eiffel.c ¶
 	beta.c ¶
 	c.c ¶
 	cobol.c ¶
+	eiffel.c ¶
 	entry.c ¶
 	fortran.c ¶
 	get.c ¶
@@ -43,9 +43,10 @@ SOURCES = ¶
 	sort.c ¶
 	strlist.c ¶
 	tcl.c ¶
+	verilog.c ¶
 	vim.c ¶
-	yacc.c ¶
 	vstring.c ¶
+	yacc.c ¶
 	mac.c
 
 OBJ = ¶
@@ -53,10 +54,10 @@ OBJ = ¶
 	asm.o ¶
 	asp.o ¶
 	awk.o ¶
-	eiffel.o ¶
 	beta.o ¶
 	c.o ¶
 	cobol.o ¶
+	eiffel.o ¶
 	entry.o ¶
 	fortran.o ¶
 	get.o ¶
@@ -82,9 +83,10 @@ OBJ = ¶
 	sort.o ¶
 	strlist.o ¶
 	tcl.o ¶
+	verilog.o ¶
 	vim.o ¶
-	yacc.o ¶
 	vstring.o ¶
+	yacc.o ¶
 	mac.o
 
 LIBS = ¶
