@@ -18,6 +18,7 @@
 #include <string.h>
 
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -36,6 +37,37 @@ static kindOption PerlKinds [] = {
 /*
 *   FUNCTION DEFINITIONS
 */
+
+static boolean isPodWord (const char *word)
+{
+    boolean result = FALSE;
+    if (isalpha (*word))
+    {
+	const char *white = strchr (word, ' ');
+	if (white == NULL)
+	    white = strchr (word, '\t');
+	if (white != NULL)
+	{
+	    const char *const pods [] = {
+		"head1", "head2", "head3", "head4", "over", "item", "back",
+		"pod", "begin", "end", "for"
+	    };
+	    const size_t count = sizeof (pods) / sizeof (pods [0]);
+	    const size_t len = white - word;
+	    char *id = (char*) eMalloc (len + 1);
+	    size_t i;
+	    strncpy (id, word, len);
+	    id [len] = '\0';
+	    for (i = 0  ;  i < count  &&  ! result  ;  ++i)
+	    {
+		if (strcmp (id, pods [i]) == 0)
+		    result = TRUE;
+	    }
+	    eFree (id);
+	}
+    }
+    return result;
+}
 
 /* Algorithm adapted from from GNU etags.
  * Perl support by Bart Robinson <lomew@cs.utah.edu>
@@ -60,8 +92,7 @@ static void findPerlTags (void)
 	}
 	else if (line [0] == '=')
 	{
-	    skipPodDoc = (boolean) (strncmp (
-			(const char*) line + 1, "cut", (size_t) 3) != 0);
+	    skipPodDoc = isPodWord ((const char*)line + 1);
 	    continue;
 	}
 	else if (strcmp ((const char*) line, "__DATA__") == 0)
