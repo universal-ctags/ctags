@@ -26,30 +26,6 @@
 /*
  *  Portability macros
  */
-#if !defined(HAVE_STRCASECMP) && !defined(strcasecmp)
-# ifdef HAVE_STRICMP
-#  define strcasecmp(s1,s2) stricmp(s1,s2)
-# else
-#  define strcasecmp(s1,s2) struppercmp(s1,s2)
-# endif
-#endif
-
-#if !defined(HAVE_STRNCASECMP) && !defined(strncasecmp)
-# ifdef HAVE_STRNICMP
-#  define strncasecmp(s1,s2) strnicmp(s1,s2)
-# else
-#  define strncasecmp(s1,s2) strnuppercmp(s1,s2)
-# endif
-#endif
-
-#ifndef HAVE_STRICMP
-# define stricmp(s1,s2) struppercmp(s1,s2)
-#endif
-
-#ifndef HAVE_STRICMP
-# define strnicmp(s1,s2) strnuppercmp(s1,s2)
-#endif
-
 #ifndef PATH_SEPARATOR
 # if defined (MSDOS_STYLE_PATH)
 #  define PATH_SEPARATOR '\\'
@@ -69,6 +45,9 @@
 /*
 *   DATA DECLARATIONS
 */
+#if defined (MSDOS_STYLE_PATH) || defined (VMS)
+extern const char *const PathDelimiters;
+#endif
 extern char *CurrentDirectory;
 typedef int errorSelection;
 enum eErrorTypes { FATAL = 1, WARNING = 2, PERROR = 4 };

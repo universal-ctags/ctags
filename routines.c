@@ -145,16 +145,16 @@
 /*
 *   DATA DEFINITIONS
 */
+#if defined (MSDOS_STYLE_PATH)
+const char *const PathDelimiters = ":/\\";
+#elif defined (VMS)
+const char *const PathDelimiters = ":]>";
+#endif
+
 char *CurrentDirectory;
 
 static const char *ExecutableProgram;
 static const char *ExecutableName;
-
-#if defined (MSDOS_STYLE_PATH)
-static const char PathDelimiters [] = ":/\\";
-#elif defined (VMS)
-static const char PathDelimiters [] = ":]>";
-#endif
 
 /*
 *   FUNCTION PROTOTYPES
@@ -164,6 +164,9 @@ extern int stat (const char *, struct stat *);
 #endif
 #ifdef NEED_PROTO_LSTAT
 extern int lstat (const char *, struct stat *);
+#endif
+#if defined (MSDOS) || defined (WIN32) || defined (VMS) || defined (__EMX__) || defined (AMIGA)
+# define lstat(fn,buf) stat(fn,buf)
 #endif
 
 /*

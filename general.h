@@ -87,6 +87,33 @@
 #endif
 
 /*
+ *  Portability macros
+ */
+#if !defined(HAVE_STRCASECMP) && !defined(strcasecmp)
+# ifdef HAVE_STRICMP
+#  define strcasecmp(s1,s2) stricmp(s1,s2)
+# else
+#  define strcasecmp(s1,s2) struppercmp(s1,s2)
+# endif
+#endif
+
+#if !defined(HAVE_STRNCASECMP) && !defined(strncasecmp)
+# ifdef HAVE_STRNICMP
+#  define strncasecmp(s1,s2,n) strnicmp(s1,s2,n)
+# else
+#  define strncasecmp(s1,s2,n) strnuppercmp(s1,s2,n)
+# endif
+#endif
+
+#ifndef HAVE_STRICMP
+# define stricmp(s1,s2) struppercmp(s1,s2)
+#endif
+
+#ifndef HAVE_STRICMP
+# define strnicmp(s1,s2,n) strnuppercmp(s1,s2,n)
+#endif
+
+/*
 *   DATA DECLARATIONS
 */
 
