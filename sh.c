@@ -56,40 +56,44 @@ static void findShTags (void)
 
     while ((line = fileReadLine ()) != NULL)
     {
+	const unsigned char* cp = line;
+	boolean functionFound = FALSE;
+
 	if (line [0] == '#')
 	    continue;
 
-	if (strchr ((const char*) line, '(') != NULL)
+	while (isspace (*cp))
+	    cp++;
+	if (strncmp ((const char*) cp, "function", (size_t) 8) == 0  &&
+	    isspace ((int) cp [8]))
 	{
-	    const unsigned char* cp = line;
-
-	    while (isspace (*cp))
-		cp++;
-
-	    if (strncmp ((const char*) cp, "function", (size_t) 8) == 0  &&
-		isspace ((int) cp [8]))
-	    {
-		cp += 8;
-	    }
+	    functionFound = TRUE;
+	    cp += 8;
+	    if (! isspace ((int) *cp))
+		continue;
 	    while (isspace ((int) *cp))
 		++cp;
-	    while (isalnum ((int) *cp)  ||  *cp == '_')
-	    {
-		vStringPut (name, (int) *cp);
-		++cp;
-	    }
-	    vStringTerminate (name);
-	    while (isspace ((int) *cp))
-		++cp;
-	    if (*cp++ == '(')
-	    {
-		while (isspace ((int) *cp))
-		    ++cp;
-		if (*cp == ')'  && ! hackReject (name))
-		    makeSimpleTag (name, ShKinds, K_FUNCTION);
-	    }
-	    vStringClear (name);
 	}
+	if (! isalnum ((int) *cp))
+	    continue;
+	while (isalnum ((int) *cp)  ||  *cp == '_')
+	{
+	    vStringPut (name, (int) *cp);
+	    ++cp;
+	}
+	vStringTerminate (name);
+	while (isspace ((int) *cp))
+	    ++cp;
+	if (*cp++ == '(')
+	{
+	    while (isspace ((int) *cp))
+		++cp;
+	    if (*cp == ')'  && ! hackReject (name))
+		functionFound = TRUE;
+	}
+	if (functionFound)
+	    makeSimpleTag (name, ShKinds, K_FUNCTION);
+	vStringClear (name);
     }
     vStringDelete (name);
 }
