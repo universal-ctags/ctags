@@ -7,6 +7,7 @@ ctags-5.5 (Fri Dec 20 2002)
 * Added support for SML (Standard ML) language, contributed by Venkatesh Prasad.
 * Added special handling of --options=NONE to disable automatic reading of
   options from configuration files or environment.
+* Fixed problem with lower case <SID> tag [Vim, Bug #657327].
 * Fixed problem with infinite loop in certain comments [PL/SQL, Bug #629115].
 * Fixed problem of incorrect extension field [C. Bug #639639].
 * Fixed problem of empty scoping extension field [C. Bug #639644].

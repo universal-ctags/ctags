@@ -56,7 +56,7 @@ static const unsigned char* skipPrefix (const unsigned char* name, int *scope)
 	    *scope = *name;
 	result = name + 2;
     }
-    else if (strncmp ((const char*) name, "<SID>", (size_t) 5) == 0)
+    else if (strncasecmp ((const char*) name, "<SID>", (size_t) 5) == 0)
     {
 	if (scope != NULL)
 	    *scope = *name;
