@@ -974,6 +974,10 @@ getNextChar:
 	    }
 	    break;
 
+	case ';':
+	    token->type = TOKEN_STATEMENT_END;
+	    break;
+
 	case ':':
 	    c = getChar ();
 	    if (c == ':')

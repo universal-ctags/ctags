@@ -1,8 +1,9 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.1 (Tue Apr 11 2003)
+ctags-5.5.1 (Tue Jun 10 2003)
 * Fixed compilation error for uncommon hosts.
 * Restored exit of program after --help, --license, and --version options.
+* Allowed semicolon as statement separator [Fortran, Bug #734933].
 
 ctags-5.5 (Tue Apr 1 2003)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
