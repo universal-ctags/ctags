@@ -272,10 +272,7 @@ dos1-%: $(DOS_FILES)
 	for file in $^ ;do \
 		unix2dos < $${file} > $(CTAGS_DOSDIR)/ctags$*/$${file} ;\
 	done
-	cd $(CTAGS_DOSDIR); mv makefile makefile.bak; \
-		sed -e 's/^\(VERSION = \).*$$/\1$*
-/' makefile.bak > makefile ;\
-		rm makefile.bak
+	cd $(CTAGS_DOSDIR); sed -e "s/@@DOS_VERSION@@/$*/" makefile.in > makefile
 
 dos2-%: $(DOS_VER_FILES)
 	for file in $^ ;do \

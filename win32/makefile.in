@@ -1,7 +1,7 @@
 # $Id$
 # Makefile for building Win32 releases
 
-VERSION = 521
+VERSION = @@DOS_VERSION@@
 
 # Borland C library directory
 ZIP = "c:\Program Files\WinZip\wzzip"
