@@ -158,25 +158,27 @@ will also need to use either the \fB--langmap\fP or \fB--language-force\fP
 option.
 
 .TP 5
-.BI \-I " tokenlist"
-Specifies a list of tokens which are to be specially handled while parsing C
-and C++ source files. This option is specifically provided to handle special
-cases arising through the use of preprocessor macros. When the tokens listed
-are simple tokens, these tokens will be ignored during parsing of the source
-files. If a token is suffixed with a '+' character, \fBctags\fP will also
-ignore any parenthesis-enclosed argument list which may immediately follow the
-token in the source files. If two tokens are separated with the '=' character,
-the first token is replaced by the second token for parsing purposes. The list
-of tokens may be supplied directly on the command line or read in from a
-separate file. If the first character of \fItokenlist\fP is '@', '.' or a
-pathname separator ('/' or '\\'), or the first two characters specify a drive
-letter (e.g. "C:"), the parameter \fItokenlist\fP will be interpreted as a
-filename from which to read a list of tokens, one per input line.
-Otherwise, \fItokenlist\fP is a list of tokens (or token pairs) to be
-specially handled, each delimited by a either a comma or by white space (in
-which case the list should be quoted to keep the entire list as one command
-line argument). Multiple \fB-I\fP options may be supplied. To clear the list
-of ignore tokens, supply a single dash ("-") for \fItokenlist\fP.
+.BI \-I " idenifier-list"
+Specifies a list of identifiers which are to be specially handled while
+parsing C and C++ source files. This option is specifically provided to handle
+special cases arising through the use of preprocessor macros. When the
+identifiers listed are simple identifiers, these identifiers will be ignored
+during parsing of the source files. If an identifier is suffixed with a '+'
+character, \fBctags\fP will also ignore any parenthesis-enclosed argument list
+which may immediately follow the identifier in the source files. If two
+identifiers are separated with the '=' character, the first identifiers is
+replaced by the second identifiers for parsing purposes. The list of
+identifiers may be supplied directly on the command line or read in from a
+separate file. If the first character of \fIidentifier-list\fP is '@', '.' or
+a pathname separator ('/' or '\\'), or the first two characters specify a
+drive letter (e.g. "C:"), the parameter \fIidentifier-list\fP will be
+interpreted as a filename from which to read a list of identifiers, one per
+input line. Otherwise, \fIidentifier-list\fP is a list of identifiers (or
+identifier pairs) to be specially handled, each delimited by a either a comma
+or by white space (in which case the list should be quoted to keep the entire
+list as one command line argument). Multiple \fB-I\fP options may be supplied.
+To clear the list of ignore identifiers, supply a single dash ("-") for
+\fIidentifier-list\fP.
 
 This feature is useful when preprocessor macros are used in such a way that
 they cause syntactic confusion due to their presence. Indeed, this is the best
