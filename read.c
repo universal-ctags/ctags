@@ -68,6 +68,7 @@ static void setInputFileName (const char *const fileName)
 	vStringNCopyS (File.path, fileName, length);
     }
 }
+
 static void setSourceFileParameters (vString *const fileName)
 {
     if (File.source.name != NULL)
