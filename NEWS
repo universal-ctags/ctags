@@ -1,7 +1,8 @@
 Current Version: @@VERSION@@
 
-ctags-5.1.1 (Wed Nov 28 2001)
+ctags-5.1.1 (Wed Dec 12 2001)
 * Portabilitiy fixes [HP-UX, VMS, OS/2].
+* Changed reading of option files to ignore blank lines.
 * Added instructions on using tags with NEdit to man page.
 * Fixed regex tag problem which left newlines in back-references.
 

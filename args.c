@@ -130,9 +130,12 @@ static char* nextFileLine (FILE* const fp)
 
 	Assert (fp != NULL);
 	c = fgetc (fp);
-	while (c != EOF  &&  c != '\n'  &&  c != '\r')
+	while (c != EOF)
 	{
-	    vStringPut (vs, c);
+	    if (c != '\n'  &&  c != '\r')
+		vStringPut (vs, c);
+	    else if (vStringLength (vs) > 0)
+		break;
 	    c = fgetc (fp);
 	}
 	if (c != EOF)
