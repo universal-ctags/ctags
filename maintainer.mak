@@ -211,7 +211,7 @@ website-man-%: ctags.1 Makefile
 	@ echo "---------- Generating $(CTAGS_WEBSITE)/ctags.html"
 	umask 022 ; \
 	man2html $< | sed -e "s/@@VERSION@@/$*/g" \
-		-e 's%<A HREF="mailto:[^"]*">\([^@]*\)@\([^<]*\)</A>%\1\&#64;\2%' \
+		-e 's%<A HREF="mailto:[^"]*">\([^@]*\)@\([^<]*\)</A>%\1\ at \2%' \
 		> $(CTAGS_WEBSITE)/ctags.html
 
 website-index-%: index.html Makefile
