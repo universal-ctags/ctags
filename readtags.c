@@ -236,7 +236,7 @@ static int readTagLine (tagFile *const file)
 static tagResult growFields (tagFile *const file)
 {
     tagResult result = TagFailure;
-    size_t newCount = 2 * file->fields.max;
+    unsigned short newCount = 2 * file->fields.max;
     tagExtensionField *newFields = (tagExtensionField*)
 	    realloc (file->fields.list, newCount * sizeof (tagExtensionField));
     if (newFields == NULL)
@@ -900,7 +900,7 @@ extern int main (int argc, char **argv)
 	}
 	else
 	{
-	    int j;
+	    size_t j;
 	    for (j = 1  ;  arg [j] != '\0'  ;  ++j)
 	    {
 		switch (arg [j])
