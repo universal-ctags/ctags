@@ -624,7 +624,6 @@ static boolean isContextualStatement (const statementInfo *const st)
 	case DECL_CLASS:
 	case DECL_ENUM:
 	case DECL_INTERFACE:
-	case DECL_NAMESPACE:
 	case DECL_PROGRAM:
 	case DECL_STRUCT:
 	case DECL_UNION:
@@ -931,7 +930,7 @@ static void findScopeHierarchy (vString *const string,
 
 	for (s = st->parent  ;  s != NULL  ;  s = s->parent)
 	{
-	    if (isContextualStatement (s))
+	    if (isContextualStatement (s) || s->declaration == DECL_NAMESPACE)
 	    {
 		vStringCopy (temp, string);
 		vStringClear (string);
@@ -2266,8 +2265,7 @@ static boolean isStatementEnd (const statementInfo *const st)
 	/* Java does not require semicolons to end a block. Neither do C++
 	 * namespaces. All other blocks require a semicolon to terminate them.
 	 */
-	isEnd = (boolean) (isLanguage (Lang_java) ||
-	    st->declaration == DECL_NAMESPACE || ! isContextualStatement (st));
+	isEnd = (boolean) (isLanguage (Lang_java) || ! isContextualStatement (st));
     else
 	isEnd = FALSE;
 
@@ -2345,7 +2343,7 @@ static void tagCheck (statementInfo *const st)
 		    qualifyFunctionTag (st, prev2);
 		}
 	    }
-	    else if (isContextualStatement (st))
+	    else if (isContextualStatement (st) || st->declaration == DECL_NAMESPACE)
 	    {
 		if (isType (prev, TOKEN_NAME))
 		    copyToken (st->blockName, prev);
