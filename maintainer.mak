@@ -27,7 +27,7 @@ COMMON_FILES =	COPYING EXTENDING.html FAQ INSTALL.oth NEWS README \
 				$(ENVIRONMENT_SOURCES) $(ENVIRONMENT_HEADERS)
 
 UNIX_FILES	=	$(COMMON_FILES) \
-				INSTALL acconfig.h configure.in \
+				.indent.pro INSTALL acconfig.h configure.in \
 				Makefile.in maintainer.mak testing.mak \
 				descrip.mms mkinstalldirs magic.diff \
 				ctags.1 ctags.lsm
