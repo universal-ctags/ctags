@@ -1,16 +1,24 @@
 <!-- $Id$ -->
 <html>
 <head>
-<title>Exuberant Ctags: Adding a new parser</title>
+<title>Exuberant Ctags: Adding support for a new language</title>
 </head>
 <body>
 
-<h1>How to Add a New Parser to Exuberant Ctags</h1>
+<h1>How to Add Support for a New Language to Exuberant Ctags</h1>
 
+<p>
 <b>Exuberant Ctags</b> has been designed to make it very easy to add your own
-custom language parser.
+custom language parser. As an exercise, let us assume that I want to add
+support for my new language, <em>Swine</em>, the successor to Perl (i.e. Perl
+before Swine &lt;wince&gt;). This language consists of simple definitions of
+labels in the form "<code>def my_label</code>". Let us now examine the various
+ways to do this.
+</p>
 
 <h2>Operational background</h2>
+
+<p>
 As ctags considers each file name, it tries to determine the language of the
 file by applying the following three tests in order: if the file extension has
 been mapped to a language, if the file name matches a shell pattern mapped to
@@ -20,28 +28,48 @@ platform). If a language was identified, the file is opened and then the
 appropriate language parser is called to operate on the currently open file.
 The parser parses through the file and whenever it finds some interesting
 token, calls a function to define a tag entry.
+</p>
 
-<h2>Integrating a new parser</h2>
-
-Let's assume that I want to add support for my new language, <em>Swine</em>,
-the successor to Perl (i.e. Perl before Swine &lt;wince&gt;).
+<h2>Creating a user-defined language</h2>
 
 <p>
-First, I create a new module, <code>swine.c</code>, and add one externally
-visible function to it, <code>extern parserDefinition *SwineParser(void)</code>,
-and add its name to the table in <code>parsers.h</code>. The job of this
-parser definition function is to create an instance of the
-<code>parserDefinition</code> structure (using <code>parserNew()</code>) and
-populate it with information defining how files of this language are
-recognized, what kinds of tags it can locate, and the function used to invoke
-the parser on the currently open file.
+The quickest and easiest way to do this is by defining a new language using
+the program options. In order to have Swine support available every time I
+start ctags, I will place the following lines into the file
+<code>$HOME/.ctags</code>, which is read in every time ctags starts:
+
+<code>
+<pre>
+  --langdef=swine
+  --langmap=swine:.swn
+  --regex-swine=/^def[ \t]*([a-zA-Z0-9_]+)/\1/d,definition/
+</pre>
+</code>
+The first line defines the new language, the second maps a file extension to
+it, and the third defines a regular expression to identify a language
+definition and generate a tag file entry for it.
+</p>
+
+<h2>Integrating a new language parser</h2>
+
+<p>
+Now suppose that I want to truly integrate compiled-in support for Swine into
+ctags. First, I create a new module, <code>swine.c</code>, and add one
+externally visible function to it, <code>extern parserDefinition
+*SwineParser(void)</code>, and add its name to the table in
+<code>parsers.h</code>. The job of this parser definition function is to
+create an instance of the <code>parserDefinition</code> structure (using
+<code>parserNew()</code>) and populate it with information defining how files
+of this language are recognized, what kinds of tags it can locate, and the
+function used to invoke the parser on the currently open file.
+</p>
 
 <p>
 The structure <code>parserDefinition</code> allows assignment of the following
 fields:
 
-<pre>
 <code>
+<pre>
   const char *name;               /* name of language */
   kindOption *kinds;              /* tag kinds handled by parser */
   unsigned int kindCount;         /* size of `kinds' list */
@@ -51,8 +79,9 @@ fields:
   simpleParser parser;            /* simple parser (common case) */
   rescanParser parser2;           /* rescanning parser (unusual case) */
   boolean regex;                  /* is this a regex parser? */
-</code>
 </pre>
+</code>
+</p>
 
 <p>
 The <code>name</code> field must be set to a non-empty string. Also, unless
@@ -69,6 +98,7 @@ can put back a character using <code>fileUngetc()</code>. How our Swine parser
 actually parses the contents of the file is entirely up to the writer of the
 parser--it can be as crude or elegant as desired. You will note a variety of
 examples from the most complex (c.c) to the simplest (make.c).
+</p>
 
 <p>
 When the Swine parser identifies an interesting token for which it wants to
@@ -78,6 +108,7 @@ initializes defaults and fills information about the current line number and
 the file position of the beginning of the line. After filling in information
 defining the current entry (and possibly overriding the file position or other
 defaults), the parser passes this structure to <code>makeTagEntry()</code>.
+</p>
 
 <p>
 Instead of writing a character-oriented parser, it may be possible to specify
@@ -87,6 +118,7 @@ and points <code>initialize</code> to a function which calls
 <code>addTagRegex()</code> to install the regular expressions which define its
 tags. The regular expressions thus installed are compared against each line 
 of the input file and generate a specified tag when matched.
+</p>
 
 <p>
 A regex-based parser is inherently line-oriented (i.e. the entire tag must be
@@ -104,21 +136,23 @@ these routines return, a callback routine may be invoked because the line
 matched a regex callback. A callback function to be installed is defined by
 these types:
 
-<pre>
 <code>
+<pre>
   typedef void (*regexCallback) (const char *line, const regexMatch *matches, unsigned int count);
 
   typedef struct {
       off_t start;    /* character index in line where match starts */
       size_t length;  /* length of match */
   } regexMatch;
-</code>
 </pre>
+</code>
+</p>
 
 <p>
 The callback function is passed the line matching the regular expression and
 an array of <code>count</code> structures defining the subexpression matches
 of the regular expression, starting from \0 (the entire line).
+</p>
 
 <p>
 This is all there is to it. All other details are specific to the parser and
@@ -129,19 +163,24 @@ found in c.c, eiffel.c, and fortran.c). Almost everything is already taken care
 of automatically for you by the infrastructure.  Writing the actual parsing
 algorithm is the hardest part, but is not constrained by any need to conform
 to anything in ctags other than that mentioned above.
+</p>
 
 <p>
 There are several different approaches used in the parsers inside <b>Exuberant
 Ctags</b> and you can browse through these as examples of how to go about
 creating your own.
+</p>
 
 <h2>Examples</h2>
 
-  Below you will find several example parsers demonstrating most of the
-  facilities available. These include three alternative implementations
-  of a Swine parser, which generate tags for lines beginning with
-  "<CODE>def</CODE>" followed by some name.
+<p>
+Below you will find several example parsers demonstrating most of the
+facilities available. These include three alternative implementations
+of a Swine parser, which generate tags for lines beginning with
+"<CODE>def</CODE>" followed by some name.
+</p>
 
+<code>
 <pre>
 /***************************************************************************
  * swine.c
@@ -206,9 +245,11 @@ extern parserDefinition* SwineParser (void)
     return def;
 }
 </pre>
+</code>
 
 <p>
 <pre>
+<code>
 /***************************************************************************
  * swine.c
  * Regex-based parser for Swine
@@ -221,7 +262,7 @@ extern parserDefinition* SwineParser (void)
 
 static void installSwineRegex (const langType language)
 {
-    addTagRegex (language, "^def[ \t]*([A-Z0-9_]+)", "\\1", "d,definition", NULL);
+    addTagRegex (language, "^def[ \t]*([a-zA-Z0-9_]+)", "\\1", "d,definition", NULL);
 }
 
 /* Create parser definition stucture */
@@ -236,6 +277,7 @@ extern parserDefinition* SwineParser (void)
     def-&gt;regex      = TRUE;
     return def;
 }
+</code>
 </pre>
 
 <p>
@@ -280,7 +322,7 @@ static void findSwineTags (void)
 
 static void installSwine (const langType language)
 {
-    addCallbackRegex (language, "^def +([a-zA-Z0-9_]+)", NULL, definition);
+    addCallbackRegex (language, "^def[ \t]+([a-zA-Z0-9_]+)", NULL, definition);
 }
 
 /* Create parser definition stucture */
@@ -327,12 +369,6 @@ extern parserDefinition* MakefileParser (void)
     return def;
 }
 </pre>
-
-<hr>
-<a href="http:index.html">
- <img align=left border=0 src="http:../images/return.gif" alt="Return">
- Back to <strong>Exuberant Ctags</strong>
-</a>
 
 </body>
 </html>
