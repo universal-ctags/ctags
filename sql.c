@@ -455,16 +455,14 @@ static void parseSubProgram (tokenInfo *const token)
 static void parseRecord (tokenInfo *const token)
 {
     Assert (isType (token, TOKEN_OPEN_PAREN));
-    readToken (token);
     do
     {
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
 	    makeSqlTag (token, SQLTAG_FIELD);
-	do
-	    readToken (token);
 	while (!(isType (token, TOKEN_COMMA) ||
-		 isType (token, TOKEN_CLOSE_PAREN)));
+		 isType (token, TOKEN_CLOSE_PAREN)))
+	    readToken (token);
     } while (! isType (token, TOKEN_CLOSE_PAREN));
 }
 
