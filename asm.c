@@ -131,7 +131,7 @@ static void makeAsmTag (
 	{
 	    const unsigned char *const op =
 		(unsigned char*) vStringValue (operator); 
-	    if (toupper ((int) *op) == 'D'  &&
+	    if (toupper ((int) *op) == 'D'  && vStringLength (operator) > 2 &&
 		strchr (". \t", (int) op [2]) != NULL)
 	    {
 		makeSimpleTag (name, AsmKinds, K_DEFINE);
@@ -142,6 +142,24 @@ static void makeAsmTag (
 		makeSimpleTag (name, AsmKinds, K_LABEL);
 	}
     }
+}
+
+static const unsigned char* readSymbol (
+	const unsigned char *const start,
+	vString *const sym)
+{
+    const unsigned char *cp = start;
+    vStringClear (sym);
+    if (isInitialSymbolCharacter ((int) *cp))
+    {
+	while (isSymbolCharacter ((int) *cp))
+	{
+	    vStringPut (sym, *cp);
+	    ++cp;
+	}
+	vStringTerminate (sym);
+    }
+    return cp;
 }
 
 static void findAsmTags (void)
@@ -156,7 +174,8 @@ static void findAsmTags (void)
 	const unsigned char *cp = line;
 	boolean hasColon = FALSE;
 	boolean initialSymbol = isInitialSymbolCharacter ((int) *cp);
-	const boolean isComment = (boolean) (strchr (";*@", *cp) != NULL);
+	const boolean isComment = (boolean)
+		(*cp != '\0' && strchr (";*@", *cp) != NULL);
 
 	/* skip comments */
 	if (strncmp ((const char*) cp, "/*", (size_t) 2) == 0)
@@ -191,13 +210,7 @@ static void findAsmTags (void)
 	/* read symbol */
 	if (initialSymbol)
 	{
-	    vStringClear (name);
-	    while (isSymbolCharacter ((int) *cp))
-	    {
-		vStringPut (name, *cp);
-		++cp;
-	    }
-	    vStringTerminate (name);
+	    cp = readSymbol (cp, name);
 	    if (*cp == ':')
 	    {
 		hasColon = TRUE;
@@ -234,16 +247,7 @@ static void findAsmTags (void)
 	{
 	    while (isspace ((int) *cp))
 		++cp;
-	    if (isInitialSymbolCharacter ((int) *cp))
-	    {
-		vStringClear (name);
-		while (isSymbolCharacter ((int) *cp))
-		{
-		    vStringPut (name, *cp);
-		    ++cp;
-		}
-		vStringTerminate (name);
-	    }
+	    cp = readSymbol (cp, name);
 	}
 	makeAsmTag (name, operator, initialSymbol, hasColon);
     }
