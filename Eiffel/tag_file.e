@@ -86,7 +86,7 @@ feature -- Status report
 			-- Value of errno of O/S when creation of `Current' fails
 
 	error_description: STRING
-			-- Value of errno of O/S when creation of `Current' fails
+			-- Value of strerror(errno) of O/S when creation of `Current' fails
 
 	off: BOOLEAN
 			-- Is there another tag after this one?
