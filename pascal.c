@@ -89,10 +89,10 @@ static void findPascalTags (void)
 {
     vString *name = vStringNew ();
     tagEntryInfo tag;
-    pascalKind kind;
+    pascalKind kind = K_FUNCTION;
 				/* each of these flags is TRUE iff: */
     boolean incomment = FALSE;	/* point is inside a comment */
-    int comment_char;
+    int comment_char = '\0';    /* type of current comment */
     boolean inquote = FALSE;	/* point is inside '..' string */
     boolean get_tagname = FALSE;/* point is after PROCEDURE/FUNCTION
 				    keyword, so next item = potential tag */
