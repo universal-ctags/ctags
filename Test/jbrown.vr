@@ -1,0 +1,47 @@
+// Sample taken from:
+// http://groups.google.com/groups?q=vera+group:comp.*&hl=en&lr=&ie=UTF-8&oe=UTF-8&selm=39BD28D2.40737022%40us.ibm.com.remove.this.spam.filter&rnum=6
+#include <vera_defines.vrh>
+
+typedef class Transaction;
+
+program myProgram {
+
+   Transaction t;                    // t is of type Transaction
+
+   repeat(100) {                     // write 100 times to the bus
+      t = new();                     // random values to bus
+      t.writeBus();
+   }
+
+   t = new(32'h0000_0000, 32'h1111_afaf);  // write direct value to bus
+   t.writeBus();
+}
+
+class Transaction {
+
+   rand bit[31:0] address;           // allow for address to be random
+   rand bit[31:0] data;              // allow for data to be random
+
+   constraint c1 {                   // rules for generating address
+      address >= 32'h0000_1000;
+      address <= 32'h0000_1fff;
+   }
+
+   // no rules for data: any value is valid
+
+   task new( (bit[31:0] address = -1), (bit[31:0] data = -1)) {
+      void = this.randomize();       // randomize address, data
+      if (address != -1) this.address = address;
+      if (data != -1) this.data = data;
+   }
+
+   task writeBus() {
+      printf("Writing Bus w/ Addr=%h_%h Data=%h_%h\n",
+          address[31:16], address[15:0], data[31:16], data[15:0]);
+
+      @1 bus.address = address;
+      bus.data = data;
+      @1 bus.addrress = 32'hzzzz_zzzz;
+      bus.data = 32'hzzzz_zzzz;
+   }
+} // end class Transaction

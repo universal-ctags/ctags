@@ -447,7 +447,7 @@ static int skipOverCComment (void)
 		c = next;
 	    else
 	    {
-		c = SPACE;			/* replace comment with space */
+		c = SPACE;		/* replace comment with space */
 		break;
 	    }
 	}
@@ -464,7 +464,7 @@ static int skipOverCplusComment (void)
     while ((c = fileGetc ()) != EOF)
     {
 	if (c == BACKSLASH)
-	    fileGetc ();			/* throw away next character, too */
+	    fileGetc ();		/* throw away next character, too */
 	else if (c == NEWLINE)
 	    break;
     }
@@ -481,7 +481,7 @@ static int skipToEndOfString (void)
     while ((c = fileGetc ()) != EOF)
     {
 	if (c == BACKSLASH)
-	    fileGetc ();			/* throw away next character, too */
+	    fileGetc ();		/* throw away next character, too */
 	else if (c == DOUBLE_QUOTE)
 	    break;
     }
@@ -490,18 +490,28 @@ static int skipToEndOfString (void)
 
 /*  Skips to the end of the three (possibly four) 'c' sequence, returning a
  *  special character to symbolically represent a generic character.
+ *  Also detects Vera numbers that include a base specifier (ie. 'b1010).
  */
 static int skipToEndOfChar (void)
 {
     int c;
+    int count = 0, veraBase = '\0';
 
     while ((c = fileGetc ()) != EOF)
     {
+        ++count;
 	if (c == BACKSLASH)
-	    fileGetc ();			/* throw away next character, too */
+	    fileGetc ();		/* throw away next character, too */
 	else if (c == SINGLE_QUOTE)
 	    break;
 	else if (c == NEWLINE)
+	{
+	    fileUngetc (c);
+	    break;
+	}
+	else if (count == 1  &&  strchr ("DHOB", toupper (c)) != NULL)
+	    veraBase = c;
+	else if (veraBase != '\0'  &&  ! isalnum (c))
 	{
 	    fileUngetc (c);
 	    break;

@@ -1,0 +1,103 @@
+// Sample provide by Dave Eggum <deggum@synopsys.com> on 05 Sep 2002.
+#define DEFAULT_INT 0
+#define DEFAULT_BIT 1'bz
+
+typedef class ExampleClass;
+
+program main {
+    ExampleClass oModel1, oModel2, oModel3;
+    integer i;
+    string s;
+
+    oModel1 = new("first");
+    oModel2 = new("second", 2);
+    oModel3 = new("third", 3);
+
+    oModel1.setInt(5);
+    i = oModel1.getInt();
+
+    oModel2.m_bit; // BUG: this jump should fail... but doesn't
+
+    oModel2.setData(8'o272);
+    oModel2.setData(8'hbA);
+    oModel2.setData(8'b1011_1010);
+
+    s = oModel3.getName();
+
+    fork {
+        oModel3.wait();
+    } {
+        oModel3.trigger();
+    }
+    join all
+
+    wait_child();
+
+    oModel3.setTrigger(void);
+}
+
+class ExampleClass {
+    local integer   m_int = DEFAULT_INT;
+    local bit       m_bit = DEFAULT_BIT;
+    local bit [7:0] m_data = 8'hzz;
+    local string    m_sName;
+    local event     m_eTrigger;
+
+    public task new(string sInstName, integer index = DEFAULT_INT) {
+        m_sName = sInstName;
+        m_int = index;
+    }
+
+    public task setInt(integer i) {
+        m_int = i;
+    }
+
+    public function integer getInt() {
+        getInt = m_int;
+    }
+
+    public task setBit(bit b) {
+        m_bit = b;
+    }
+
+    public function bit getBit() {
+        getBit = m_bit;
+    }
+
+    public task setData(bit[7:0] data) {
+        m_data = data;
+    }
+
+    public function bit[7:0] getData() {
+        getData = m_data;
+    }
+
+    public task setName(string name) {
+        m_sName = name;
+    }
+
+    public function string getName() {
+        getName = m_sName;
+    }
+
+    public task wait() {
+        sync(ALL,m_eTrigger);
+    }
+
+    public task trigger() {
+        trigger(m_eTrigger);
+    }
+
+    public task setTrigger(event e); // prototype
+    public function event getTrigger(); // prototype
+}
+
+task ExampleClass::setTrigger(event e) {
+    m_eTrigger = e;
+}
+
+function event ExampleClass::getTrigger() {
+    getTrigger = m_eTrigger;
+}
+
+// vim: sw=4:ts=4:expandtab

@@ -40,6 +40,7 @@
     SlangParser, \
     SqlParser, \
     TclParser, \
+    VeraParser, \
     VerilogParser, \
     VimParser, \
     YaccParser

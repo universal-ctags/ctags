@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.3.2 (Wed Oct 02 2002)
+ctags-5.4 (Tue Oct 15 2002)
 * Improved ability for tagsOpen() in readtags library to report failure to
   open tag file, adding new fields to tagFileInfo structure.
 * Added '$' a valid character for C identifier [VMS].
@@ -9,6 +9,7 @@ ctags-5.3.2 (Wed Oct 02 2002)
   more information [C, C++, Java].
 * Added class and method support to TCL parser [TCL].
 * Added support for PL/SQL language.
+* Added support for Vera language, inspired by Dave Eggum [Vera].
 * Fixed problem terminating Perl POD block [Perl, Bug #612019].
 * Fixed problem with leading spaces before instruction [TCL, Bug #615928].
 
