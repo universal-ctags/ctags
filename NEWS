@@ -1,12 +1,13 @@
 Current Version: @@VERSION@@
 
-ctags-5.2 (Sun Dec 16 2001)
+ctags-5.2 (Fri Dec 21 2001)
 * Portabilitiy fixes [HP-UX, Solaris, VMS, OS/2].
 * Made code compilable by a C++ compiler.
 * Changed reading of option files to ignore blank lines.
 * Changed and enhanced interface to readtags library (see readtags.h).
 * Added support for Lua language, submitted by Max Ischenko.
 * Added instructions to man page on using tags with NEdit.
+* Added setargv.obj to link for wildcard expansion [MSVC].
 * Fixed regex tag problem which left newlines in back-references.
 * Fixed missing class-qualified tags [Eiffel].
 * Fixed spurious tags for entries in final indexing clause [Eiffel].
