@@ -4,6 +4,7 @@ ctags-5.5 (Fri Jan 31 2003)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
 * Added support for dimensioned variables, contributed by Simon Bohlin [ASP].
 * Added support for C# language.
+* Added support for Erlang language, contributed by Brent Fulgham.
 * Added support for SML (Standard ML) language, contributed by Venkatesh Prasad.
 * Added tags for autocommand groups [Vim, Patch #664685].
 * Added special handling of --options=NONE to disable automatic reading of

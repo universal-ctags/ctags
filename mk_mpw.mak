@@ -19,6 +19,7 @@ SOURCES = ¶
 	cobol.c ¶
 	eiffel.c ¶
 	entry.c ¶
+	erlang.c ¶
 	fortran.c ¶
 	get.c ¶
 	keyword.c ¶
@@ -61,6 +62,7 @@ OBJ = ¶
 	cobol.o ¶
 	eiffel.o ¶
 	entry.o ¶
+	erlang.o ¶
 	fortran.o ¶
 	get.o ¶
 	keyword.o ¶

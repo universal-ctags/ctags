@@ -18,7 +18,7 @@ because most were easily fooled by a number of preprocessor contructs.
 Exuberant Ctags offers the following features:
 
 1.  It supports the following languages: Assembler, AWK, ASP, BETA,
-    Bourne/Korn/Z Shell, C, C++, C#, COBOL, Eiffel, Fortran, Java, Lisp,
+    Bourne/Korn/Z Shell, C, C++, C#, COBOL, Eiffel, Erlang, Fortran, Java, Lisp,
     Lua, Makefile, Pascal, Perl, PHP, PL/SQL, Python, REXX, Ruby, S-Lang,
     Scheme, Tcl, Verilog, Vim, and YACC.
 

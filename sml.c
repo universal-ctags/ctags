@@ -1,7 +1,7 @@
 /*
 *   $Id$
 *
-*   Copyright (c) 2002, Venkatesh Prasad Ranganath
+*   Copyright (c) 2002, Venkatesh Prasad Ranganath and Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License.
@@ -198,3 +198,5 @@ extern parserDefinition *SmlParser (void)
     def->parser = findSmlTags;
     return def;
 }
+
+/* vi:set tabstop=8 shiftwidth=4: */

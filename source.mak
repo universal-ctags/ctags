@@ -12,11 +12,12 @@ SOURCES = \
 	asm.c \
 	asp.c \
 	awk.c \
-	eiffel.c \
 	beta.c \
 	c.c \
 	cobol.c \
+	eiffel.c \
 	entry.c \
+	erlang.c \
 	fortran.c \
 	get.c \
 	keyword.c \
@@ -61,11 +62,12 @@ OBJECTS = \
 	asm.$(OBJEXT) \
 	asp.$(OBJEXT) \
 	awk.$(OBJEXT) \
-	eiffel.$(OBJEXT) \
 	beta.$(OBJEXT) \
 	c.$(OBJEXT) \
 	cobol.$(OBJEXT) \
+	eiffel.$(OBJEXT) \
 	entry.$(OBJEXT) \
+	erlang.$(OBJEXT) \
 	fortran.$(OBJEXT) \
 	get.$(OBJEXT) \
 	keyword.$(OBJEXT) \

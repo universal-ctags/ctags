@@ -49,6 +49,7 @@ OBJECTS = qdos.$(OBJEXT) \
 	cobol.$(OBJEXT) \
 	eiffel.$(OBJEXT) \
 	entry.$(OBJEXT) \
+	erlang.$(OBJEXT) \
 	fortran.$(OBJEXT) \
 	get.$(OBJEXT) \
 	keyword.$(OBJEXT) \

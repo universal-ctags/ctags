@@ -25,6 +25,7 @@
     CsharpParser, \
     CobolParser, \
     EiffelParser, \
+    ErlangParser, \
     FortranParser, \
     JavaParser, \
     LispParser, \

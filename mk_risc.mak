@@ -8,11 +8,11 @@ CC    = $(GCC) $(OPT)
 
 # Object list
 OBJECTS = \
-	o.args o.asm o.asp o.awk o.eiffel o.beta o.clang o.cobol o.entry \
-	o.fortran o.get o.keyword o.lisp o.lregex o.lua o.main o.make \
-	o.options o.parse o.pascal o.perl o.php o.python o.read o.rexx \
-	o.routines o.ruby o.scheme o.sh o.slang o.sort o.strlist o.tcl \
-	o.verilog o.vim o.vstring o.yacc
+	o.args o.asm o.asp o.awk o.beta o.clang o.cobol o.eiffel o.entry
+	o.erlang o.fortran o.get o.keyword o.lisp o.lregex o.lua o.main \
+	o.make o.options o.parse o.pascal o.perl o.php o.python o.read \
+	o.rexx o.routines o.ruby o.scheme o.sh o.slang o.sort o.strlist \
+	o.tcl o.verilog o.vim o.vstring o.yacc
 
 all: $(OBJECTS)
 	gcc -o ctags $(OBJECTS) RegEx:libregex
@@ -38,9 +38,6 @@ o.asp:		c.asp
 o.awk:		c.awk
 	$(CC) -c c.awk -o o.awk
 
-o.eiffel:	c.eiffel
-	$(CC) -c c.eiffel -o o.eiffel
-
 o.beta:		c.beta
 	$(CC) -c c.beta -o o.beta
 
@@ -50,8 +47,14 @@ o.clang:	c.c
 o.cobol:	c.cobol
 	$(CC) -c c.cobol -o o.cobol
 
+o.eiffel:	c.eiffel
+	$(CC) -c c.eiffel -o o.eiffel
+
 o.entry:	c.entry
 	$(CC) -c c.entry -o o.entry
+
+o.erlang:	c.erlang
+	$(CC) -c c.erlang -o o.erlang
 
 o.fortran:	c.fortran
 	$(CC) -c c.fortran -o o.fortran
