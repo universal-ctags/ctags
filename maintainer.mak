@@ -284,7 +284,6 @@ internal-release-%: ctags-%.tar.gz ctags-%.tar.Z dos-% rpm-%
 	@ echo "---------- Copying files to web archive"
 	cp -p ctags-$*.tar.* $(WEB_ARCHIVE_DIR)
 	cp -p EXTENDING.html $(WEB_CTAGS_DIR)
-	mv -f ctags.html $(WEB_CTAGS_DIR)
 	cp -p ctags-$*/ctags.html $(WEB_CTAGS_DIR)/ctags.html
 	cp -p $(RPM_ROOT)/RPMS/i386/ctags-$*-1.i386.rpm $(WEB_ARCHIVE_DIR)
 	cp -p $(RPM_ROOT)/SRPMS/ctags-$*-1.src.rpm $(WEB_ARCHIVE_DIR)
