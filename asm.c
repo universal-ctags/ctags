@@ -22,84 +22,67 @@
 #include "vstring.h"
 
 /*
-*   DATA DEFINITIONS
-*/
-typedef enum {
-    K_DEFINE, K_LABEL, K_MACRO
-} asmKind;
-
-/* indexed by asmKind */
-static kindOption AsmKinds [] = {
-    { TRUE, 'd', "define", "defines (names assigned a specified value)"},
-    { TRUE, 'l', "label", "labels (names assigned an address)"},
-    { TRUE, 'm', "macro", "macros"}
-};
-
-/*
 *   FUNCTION DEFINITIONS
 */
 
-/* Algorithm adapted from from GNU etags.
- * By Bob Weiner, Motorola Inc., 4/3/94
- * Unix and microcontroller assembly tag handling
- * look for '^ [a-zA-Z_.$] [a-zA_Z0-9_.$]*[: ^I^J]'
- */
-static void findAsmTags (void)
+static void installAsmRegex (const langType language)
 {
-    vString *name = vStringNew ();
-    const unsigned char *line;
+    addTagRegex (language,
+	"^([[:alpha:]_.$][[:alnum:]_$]*)[[:space:]]+(=|\\.?(equ|set)|d[cbdfpqtw])[[:space:].]",
+	"\\1", "d,define", "i");
+    /* gas .equ */
+    addTagRegex (language,
+	"^[[:blank:]]*\\.(equ|set)[[:blank:]]+([[:alpha:]_.$][[:alnum:]_$]*)",
+	"\\1", "d,define", "i");
 
-    while ((line = fileReadLine ()) != NULL)
-    {
-	const unsigned char *cp = line;
-	int c = *cp;
+    addTagRegex (language,
+	"^([[:alpha:]_.$][[:alnum:]_$]*)[[:space:]]*(:|[[:blank:]]\\.?label[[:space:]])",
+	"\\1", "l,label", "i");
 
-	/*  If first char is alphabetic or one of [_.$], test for colon
-	 *  following identifier.
-	 */
-	if (isalpha (c) || c == '_' || c == '.' || c == '$')
-	{
-	    vStringPut (name, c);
-	    c = *++cp;
-	    while (isalnum (c) || c == '_' || c == '.' || c == '$')
-	    {
-		vStringPut (name, c);
-		c = *++cp;
-	    }
-	    vStringTerminate (name);
-	    while (isspace (c))
-		c = *++cp;
-	    if (c == ':')
-		makeSimpleTag (name, AsmKinds, K_LABEL);
-	    else if (c == '=' ||
-		     strncmp ((const char*) cp, "equ", (size_t) 3) == 0)
-		makeSimpleTag (name, AsmKinds, K_DEFINE);
-	    else if (strcmp (vStringValue (name), ".macro") == 0)
-	    {
-		vStringClear (name);
-		while (isalnum (c) || c == '_')
-		{
-		    vStringPut (name, c);
-		    c = *++cp;
-		}
-		vStringTerminate (name);
-		if (vStringLength (name) > 0)
-		    makeSimpleTag (name, AsmKinds, K_MACRO);
-	    }
-	    vStringClear (name);
-	}
-    }
-    vStringDelete (name);
+    /* MASM proc */
+    addTagRegex (language,
+	"^([[:alpha:]_.$][[:alnum:]_$]*)[[:blank:]]+proc[[:space:]]",
+	"\\1", "l,label", "i");
+    /* TASM proc */
+    addTagRegex (language,
+	"^proc[[:blank:]]+([[:alpha:]_.$][[:alnum:]_$]*)",
+	"\\1", "l,label", "i");
+
+    /* gas macro */
+    addTagRegex (language,
+	"^[[:blank:]]*\\.macro[[:blank:]]*([[:alpha:]_.$][[:alnum:]_$]*)",
+	"\\1", "m,macro", "i");
+    /* MASM macro */
+    addTagRegex (language,
+	"^([[:alpha:]_.$][[:alnum:]_$]*)[[:blank:]]+macro[[:space:]]",
+	"\\1", "m,macro", "i");
+    /* TASM macro */
+    addTagRegex (language,
+	"^macro[[:space:]]+([[:alpha:]_.$][[:alnum:]_$]*)",
+	"\\1", "m,macro", "i");
+
+    /* MASM structures */
+    addTagRegex (language,
+	"^([[:alpha:]_.$][[:alnum:]_$]*)[[:blank:]]+(struct|record)[[:space:]]",
+	"\\1", "t,type", "i");
+    /* TASM structures */
+    addTagRegex (language,
+	"^struct[[:space:]]+([[:alpha:]_.$][[:alnum:]_$]*)",
+	"\\1", "t,type", "i");
+
+    /* make sure this regex is last, or it will catch lines matched above */
+    addTagRegex (language,
+	"^([[:alpha:]_][[:alnum:]_.$]*)[[:blank:]]",
+	"\\1", "l,label", "i");
 }
 
 extern parserDefinition* AsmParser (void)
 {
-    static const char *const extensions [] = { "asm", "s", "S", NULL };
+    static const char *const extensions [] = { "asm", "ASM", "s", "S", NULL };
     parserDefinition* def = parserNew ("Asm");
-    def->kinds      = AsmKinds;
-    def->kindCount  = KIND_COUNT (AsmKinds);
     def->extensions = extensions;
-    def->parser     = findAsmTags;
+    def->initialize = installAsmRegex;
+    def->regex      = TRUE;
     return def;
 }
 

@@ -118,11 +118,11 @@ and points <code>initialize</code> to a function which calls
 <code>addTagRegex()</code> to install the regular expressions which define its
 tags. The regular expressions thus installed are compared against each line 
 of the input file and generate a specified tag when matched. It is usually
-much easier to write a regex-based parser; however, they are generally about
-50 times slower that an equivalent character-based parser. Whether this
-matters to you depends upon how much code you have to parse. It is probably
-a good strategy to implement a regex-based parser first, and if it is too slow
-for you, then invest the time and effort to write a character-based parser.
+much easier to write a regex-based parser, although they can be slower (one
+parser example was 4 times slower). Whether the speed difference matters to
+you depends upon how much code you have to parse. It is probably a good
+strategy to implement a regex-based parser first, and if it is too slow for
+you, then invest the time and effort to write a character-based parser.
 </p>
 
 <p>
