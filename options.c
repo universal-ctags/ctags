@@ -410,19 +410,6 @@ extern void checkOptions (void)
 	if (Option.tagFileName != NULL)
 	    error (WARNING, "%s ignores output tag file name", notice);
     }
-#ifdef UPDATE_ENABLED
-    if (Option.update)
-    {
-	notice = "update option is not compatible with";
-	if (Option.etags)
-	    error (FATAL, "%s emacs-style tags", notice);
-	if (Option.filter)
-	    error (FATAL, "%s filter option", notice);
-	if (isDestinationStdout ())
-	    error (FATAL, "%s tags to stdout", notice);
-	Option.append = TRUE;
-    }
-#endif
 }
 
 static void setEtagsMode (void)
