@@ -303,8 +303,6 @@ static void readToken (tokenInfo *const token)
 
     token->type         = TOKEN_UNDEFINED;
     token->keyword      = KEYWORD_NONE;
-    token->lineNumber   = getSourceLineNumber ();
-    token->filePosition = getInputFilePosition ();
     vStringClear (token->string);
 
 getNextChar:
@@ -388,6 +386,8 @@ getNextChar:
 	    else
 	    {
 		parseIdentifier (token->string, c);
+		token->lineNumber = getSourceLineNumber ();
+		token->filePosition = getInputFilePosition ();
 		token->keyword = analyzeToken (token->string);
 		if (isKeyword (token, KEYWORD_rem))
 		{
