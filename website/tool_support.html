@@ -1,0 +1,38 @@
+<!-- $Id$ -->
+<html>
+<head>
+<title>Exuberant Ctags: Addiing Tag File Support to Software Tools</title>
+</head>
+<body>
+
+<h1>How to Add Tag File Support to Software Tools</h1>
+
+<p>
+<strong>Exuberant Ctags</strong> now includes a library to easily add tag file
+support to software tools, such as editors. The distributed makefile contains
+a target for library object file, <code>readtags.o</code>, and a demonstration
+program for the library, <code>readtags</code>.
+</p>
+
+<p>
+The functions provided by this library are intended to provide tag file
+support to a software tool. The tag lookups provided are sufficiently fast
+enough to permit opening a sorted tag file, searching for a matching tag, then
+closing the tag file each time a tag is looked up (search times are on the
+order of hundreths of a second, even for huge tag files). This is the
+recommended use of this library for most tool applications. Adhering to this
+approach permits a user to regenerate a tag file at will without the tool
+needing to detect and resynchronize with changes to the tag file. Even for an
+unsorted 24MB tag file, tag searches take about one second on my 650 MHz
+Athalon Linux machine.
+</p>
+
+<p>
+The interface to the library is documented in the include file
+<code>readtags.h</code>. For an example implementation, see the function
+<code>findTag()</code> in the conditionally compiled portion of the source
+file <code>readtags.c</code>.
+</p>
+
+</body>
+</html>
