@@ -194,7 +194,7 @@ extern void vStringNCopyS (vString *const string, const char *const s,
     vStringNCatS (string, s, length);
 }
 
-extern void vStringCopyToLower (vString *const dest, vString *const src)
+extern void vStringCopyToLower (vString *const dest, const vString *const src)
 {
     const size_t length = src->length;
     const char *s = src->buffer;

@@ -17,6 +17,8 @@
 
 #include <string.h>
 
+#include "debug.h"
+#include "keyword.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
@@ -29,17 +31,41 @@ typedef enum {
     K_NONE = -1, K_DEFINE, K_LABEL, K_MACRO, K_TYPE
 } AsmKind;
 
+typedef enum {
+    OP_UNDEFINED = 0,
+    OP_ALIGN,
+    OP_COLON_EQUAL,
+    OP_END,
+    OP_ENDM,
+    OP_ENDMACRO,
+    OP_ENDP,
+    OP_ENDS,
+    OP_EQU,
+    OP_EQUAL,
+    OP_LABEL,
+    OP_MACRO,
+    OP_PROC,
+    OP_RECORD,
+    OP_SECTIONS,
+    OP_SET,
+    OP_STRUCT,
+    OP_LAST
+} opKeyword;
+
 typedef struct {
     const char *operator;
+    opKeyword keyword;
+} asmKeyword;
+
+typedef struct {
+    opKeyword keyword;
     AsmKind kind;
-} OpType;
+} opKind;
 
 /*
 *   DATA DEFINITIONS
 */
-#if 0
 static langType Lang_asm;
-#endif
 
 static kindOption AsmKinds [] = {
     { TRUE, 'd', "define", "defines" },
@@ -48,54 +74,71 @@ static kindOption AsmKinds [] = {
     { TRUE, 't', "type",   "types"   }
 };
 
-static const OpType OpTypes [] = {
-    { "align",    K_NONE   },
-    { "end",      K_NONE   },
-    { "endm",     K_NONE   },
-    { "endmacro", K_NONE   },
-    { "endp",     K_NONE   },
-    { "ends",     K_NONE   },
-    { "equ",      K_DEFINE },
-    { "label",    K_LABEL  },
-    { "macro",    K_MACRO  },
-    { "proc",     K_LABEL  },
-    { "record",   K_TYPE   },
-    { "sections", K_NONE   },
-    { "set",      K_DEFINE },
-    { "struct",   K_TYPE   },
-    { "=",        K_DEFINE },
-    { ":=",       K_DEFINE }
+static const asmKeyword AsmKeywords [] = {
+    { "align",    OP_ALIGN       },
+    { "endmacro", OP_ENDMACRO    },
+    { "endm",     OP_ENDM        },
+    { "end",      OP_END         },
+    { "endp",     OP_ENDP        },
+    { "ends",     OP_ENDS        },
+    { "equ",      OP_EQU         },
+    { "label",    OP_LABEL       },
+    { "macro",    OP_MACRO       },
+    { ":=",       OP_COLON_EQUAL },
+    { "=",        OP_EQUAL       },
+    { "proc",     OP_PROC        },
+    { "record",   OP_RECORD      },
+    { "sections", OP_SECTIONS    },
+    { "set",      OP_SET         },
+    { "struct",   OP_STRUCT      }
 };
 
-static unsigned int OpTypeCount = sizeof (OpTypes) / sizeof (OpType);
+static const opKind OpKinds [] = {
+    /* must be ordered same as opKeword enumeration */
+    { OP_UNDEFINED,   K_NONE   },
+    { OP_ALIGN,       K_NONE   },
+    { OP_COLON_EQUAL, K_DEFINE },
+    { OP_END,         K_NONE   },
+    { OP_ENDMACRO,    K_NONE   },
+    { OP_ENDM,        K_NONE   },
+    { OP_ENDP,        K_NONE   },
+    { OP_ENDS,        K_NONE   },
+    { OP_EQUAL,       K_DEFINE },
+    { OP_EQU,         K_DEFINE },
+    { OP_LABEL,       K_LABEL  },
+    { OP_MACRO,       K_MACRO  },
+    { OP_PROC,        K_LABEL  },
+    { OP_RECORD,      K_TYPE   },
+    { OP_SECTIONS,    K_NONE   },
+    { OP_SET,         K_DEFINE },
+    { OP_STRUCT,      K_TYPE   }
+};
 
 /*
 *   FUNCTION DEFINITIONS
 */
-#if 0
 static void buildAsmKeywordHash (void)
 {
-    const size_t count = sizeof (OpTypes) / sizeof (OpTypes [0]);
+    const size_t count = sizeof (AsmKeywords) / sizeof (AsmKeywords [0]);
     size_t i;
     for (i = 0  ;  i < count  ;  ++i)
     {
-	const OpType* const p = OpTypes + i;
-	addKeyword (p->operator, Lang_asm, (int) p->kind);
+	const asmKeyword* const p = AsmKeywords + i;
+	addKeyword (p->operator, Lang_asm, (int) p->keyword);
     }
 }
 
-static AsmKind analyzeOperator (vString *const name)
+static opKeyword analyzeOperator (const vString *const op)
 {
     static vString *keyword = NULL;
-    AsmKind result;
+    opKeyword result = OP_UNDEFINED;
 
     if (keyword == NULL)
 	keyword = vStringNew ();
-    vStringCopyToLower (keyword, name);
-    result = (AsmKind) lookupKeyword (vStringValue (keyword), Lang_asm);
+    vStringCopyToLower (keyword, op);
+    result = (opKeyword) lookupKeyword (vStringValue (keyword), Lang_asm);
     return result;
 }
-#endif
 
 static boolean isInitialSymbolCharacter (int c)
 {
@@ -142,19 +185,12 @@ static AsmKind operatorKind (
 	boolean *const found)
 {
     AsmKind result = K_NONE;
-    *found = FALSE;
-    if (vStringLength (operator) > 0)
+    const opKeyword kw = analyzeOperator (operator);
+    *found = (boolean) (kw != OP_UNDEFINED);
+    if (*found)
     {
-	unsigned int i;
-	for (i = 0  ;  i < OpTypeCount && !*found  ;  ++i)
-	{
-	    if (strcasecmp (vStringValue (operator), OpTypes [i].operator) == 0)
-	    {
-		if (OpTypes [i].kind != K_NONE)
-		    result = OpTypes [i].kind;
-		*found = TRUE;
-	    }
-	}
+	result = OpKinds [kw].kind;
+	Assert (OpKinds [kw].keyword == kw);
     }
     return result;
 }
@@ -203,7 +239,7 @@ static void makeAsmTag (
     }
 }
 
-static const unsigned char* readSymbol (
+static const unsigned char *readSymbol (
 	const unsigned char *const start,
 	vString *const sym)
 {
@@ -218,6 +254,21 @@ static const unsigned char* readSymbol (
 	}
 	vStringTerminate (sym);
     }
+    return cp;
+}
+
+static const unsigned char *readOperator (
+	const unsigned char *const start,
+	vString *const operator)
+{
+    const unsigned char *cp = start;
+    vStringClear (operator);
+    while (*cp != '\0'  &&  ! isspace ((int) *cp))
+    {
+	vStringPut (operator, *cp);
+	++cp;
+    }
+    vStringTerminate (operator);
     return cp;
 }
 
@@ -286,17 +337,12 @@ static void findAsmTags (void)
 	    ++cp;
 
 	/* skip leading dot */
+#if 0
 	if (*cp == '.')
 	    ++cp;
+#endif
 
-	/* read operator */
-	vStringClear (operator);
-	while (*cp != '\0'  &&  ! isspace ((int) *cp))
-	{
-	    vStringPut (operator, *cp);
-	    ++cp;
-	}
-	vStringTerminate (operator);
+	cp = readOperator (cp, operator);
 
 	/* attempt second read of symbol */
 	if (vStringLength (name) == 0)
@@ -312,13 +358,11 @@ static void findAsmTags (void)
     vStringDelete (operator);
 }
 
-#if 0
 static void initialize (const langType language)
 {
     Lang_asm = language;
     buildAsmKeywordHash ();
 }
-#endif
 
 extern parserDefinition* AsmParser (void)
 {
@@ -338,9 +382,7 @@ extern parserDefinition* AsmParser (void)
     def->extensions = extensions;
     def->patterns   = patterns;
     def->parser     = findAsmTags;
-#if 0
     def->initialize = initialize;
-#endif
     return def;
 }
 
