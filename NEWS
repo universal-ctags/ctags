@@ -1,16 +1,15 @@
 Current Version: @@VERSION@@
 
 ctags-5.1.1 (Sun Dec 16 2001)
-* Portabilitiy fixes [HP-UX, VMS, OS/2].
+* Portabilitiy fixes [HP-UX, Solaris, VMS, OS/2].
 * Made code compilable by a C++ compiler.
 * Changed reading of option files to ignore blank lines.
 * Changed and enhanced interface to readtags library (see readtags.h).
-* Added instructions on using tags with NEdit to man page.
+* Added instructions to man page on using tags with NEdit.
 * Fixed regex tag problem which left newlines in back-references.
 * Fixed missing class-qualified tags [Eiffel].
 * Fixed spurious tags for entries in final indexing clause [Eiffel].
 * Fixed problem with invalid filenames in preprocessor line directives.
-* Fixed makefile problem preventing successful make [Solaris].
 * Fixed bug parsing scoped variables (e.g. "b:variable") [Vim, Bug #487608].
 * Fixed problem compiling readtags.c on some hosts.
 * Fixed memory overwrite problem in readtags library.
