@@ -4,16 +4,17 @@ ctags-5.2.2 (Sat Feb 16 2002)
 * Fixed spurious tags following empty feature clause [Eiffel].
 * Fixed missing tags for classes specifying generic creation routine [Eiffel].
 * Fixed missing tags when label not followed by white space [YACC].
+* Fixed for portability [Solaris, MacOS X].
 * Added support for type reference tool [Eiffel].
 
 ctags-5.2.1 (Sun Jan 20 2002)
-* Portabilitiy fixes [Mingw32].
+* Portability fixes [Mingw32].
 * Added "RCS" and "CVS" to list of directories excluded by default.
 * Fixed missing tags for function pointers declared const or volatile
   [C, Bug #503764].
 
 ctags-5.2 (Sun Dec 23 2001)
-* Portabilitiy fixes [HP-UX, Solaris, VMS, OS/2].
+* Portability fixes [HP-UX, Solaris, VMS, OS/2].
 * Made code compilable by a C++ compiler.
 * Changed reading of option files to ignore blank lines.
 * Changed and enhanced interface to readtags library (see readtags.h).
