@@ -20,125 +20,235 @@
 #include "parse.h"
 #include "read.h"
 #include "vstring.h"
-#ifdef HAVE_REGCOMP
-# ifdef HAVE_SYS_TYPES_H
-#  include <sys/types.h> /* declare off_t (not known to regex.h on FreeBSD) */
-# endif
-# include "regex.h"
-#endif
 
 /*
-*   MACROS
+*   DATA DECLARATIONS
 */
-/* '?' character is allowed in AMD 29K family */
-#define SYMBOL "[[:alpha:]_$][[:alnum:]_$?]*"
-#define EQU "(:?=|(:[[:blank:]]+)?\\.?(equ|set|d[bcdfpqstw][.[:space:]]))"
+typedef enum {
+    K_NONE = -1, K_DEFINE, K_LABEL, K_MACRO, K_TYPE
+} AsmKind;
+
+typedef struct {
+    const char *operator;
+    AsmKind kind;
+} OpType;
 
 /*
 *   DATA DEFINITIONS
 */
-typedef enum {
-    K_LABEL
-} AsmKind;
-
 static kindOption AsmKinds [] = {
-    { TRUE, 'l', "label", "labels"}
+    { TRUE, 'd', "define", "defines" },
+    { TRUE, 'l', "label",  "labels"  },
+    { TRUE, 'm', "macro",  "macros"  },
+    { TRUE, 't', "type",   "types"   }
 };
 
+static const OpType OpTypes [] = {
+    { "endm",     K_NONE   },
+    { "endmacro", K_NONE   },
+    { "endp",     K_NONE   },
+    { "ends",     K_NONE   },
+    { "equ",      K_DEFINE },
+    { "label",    K_LABEL  },
+    { "macro",    K_MACRO  },
+    { "proc",     K_LABEL  },
+    { "record",   K_TYPE   },
+    { "set",      K_DEFINE },
+    { "struct",   K_TYPE   },
+    { "=",        K_DEFINE },
+    { ":=",       K_DEFINE }
+};
+
+static unsigned int OpTypeCount = sizeof (OpTypes) / sizeof (OpType);
 
 /*
 *   FUNCTION DEFINITIONS
 */
-
-static void checkLabel (const char *line, const regexMatch *matches,
-			unsigned int count)
+static boolean isInitialSymbolCharacter (int c)
 {
-#ifdef HAVE_REGCOMP
-    static regex_t LabelReject;
-    static boolean compiled = FALSE;
-    if (! compiled)
-    {
-	/* rejects patterns matching other constructs */
-	compiled = (boolean) (regcomp (&LabelReject, EQU,
-		REG_EXTENDED|REG_ICASE) == 0);
-    }
-    if (compiled && count > 2)
-    {
-	const char *match1 = line + matches [1].start;
-	const char *match2 = line + matches [2].start;
-	if (regexec (&LabelReject, match2, (size_t) 0, NULL, 0) != 0)
-	{
-	    vString *name = vStringNew ();
-	    vStringNCopyS (name, match1, matches [1].length);
-	    makeSimpleTag (name, AsmKinds, K_LABEL);
-	    vStringDelete (name);
-	}
-    }
-#endif
+    return (boolean) (c != '\0' && (isalpha (c) || strchr ("_$", c) != NULL));
 }
 
-/*
- * Based upon code samples from http://www.programmersheaven.com/zone5/
- */
-static void installAsmRegex (const langType language)
+static boolean isSymbolCharacter (int c)
 {
-    /*
-     * abc =
-     * abc :=
-     * abc \.?EQU
-     * abc \.?SET
-     * abc \.?D[BCDFPQSTW][. ]
-     */
-    addTagRegex (language,
-	"^(" SYMBOL ")[[:blank:]]*(" EQU ")",
-	"\\1", "d,define", "i");
-    /* gas .equ */
-    addTagRegex (language,
-	"^[[:blank:]]*\\.(equ|set)[[:blank:]]+(" SYMBOL ")",
-	"\\2", "d,define", "i");
+    /* '?' character is allowed in AMD 29K family */
+    return (boolean) (c != '\0' && (isalnum (c) || strchr ("_$?", c) != NULL));
+}
 
-    /*
-     * abc:
-     * abc LABEL
-     */
-    addCallbackRegex (language,
-	"^(" SYMBOL ")[[:blank:]]*(:|[[:blank:]]label[[:space:]])",
-	"i", checkLabel);
+static boolean readPreProc (const unsigned char *const line)
+{
+    boolean result;
+    const unsigned char *cp = line;
+    vString *name = vStringNew ();
+    while (isSymbolCharacter ((int) *cp))
+    {
+	vStringPut (name, *cp);
+	++cp;
+    }
+    vStringTerminate (name);
+    result = (boolean) (strcmp (vStringValue (name), "define") == 0);
+    if (result)
+    {
+	while (isspace ((int) *cp))
+	    ++cp;
+	vStringClear (name);
+	while (isSymbolCharacter ((int) *cp))
+	{
+	    vStringPut (name, *cp);
+	    ++cp;
+	}
+	vStringTerminate (name);
+	makeSimpleTag (name, AsmKinds, K_DEFINE);
+    }
+    vStringDelete (name);
+    return result;
+}
 
-    addCallbackRegex (language,
-	"^(" SYMBOL ")[[:blank:]]+([[:alpha:]].*)$",
-	"i", checkLabel);
+static void makeAsmTag (
+	const vString *const name,
+	const vString *const operator,
+	const boolean initialSymbol,
+	const boolean hasColon)
+{
+    unsigned int i;
+    if (vStringLength (name) > 0)
+    {
+	boolean found = FALSE;
+	if (vStringLength (operator) > 0)
+	{
+	    for (i = 0  ;  i < OpTypeCount && !found  ;  ++i)
+	    {
+		if (strcasecmp (
+		    vStringValue (operator), OpTypes [i].operator) == 0)
+		{
+		    if (OpTypes [i].kind != K_NONE)
+			makeSimpleTag (name, AsmKinds, OpTypes [i].kind);
+		    found = TRUE;
+		}
+	    }
+	}
+	if (!found && initialSymbol)
+	{
+	    const unsigned char *const op =
+		(unsigned char*) vStringValue (operator); 
+	    if (toupper ((int) *op) == 'D'  &&
+		strchr (". \t", (int) op [2]) != NULL)
+	    {
+		makeSimpleTag (name, AsmKinds, K_DEFINE);
+	    }
+	    else if (hasColon)
+		makeSimpleTag (name, AsmKinds, K_LABEL);
+	    else if (vStringLength (operator) > 0)
+		makeSimpleTag (name, AsmKinds, K_LABEL);
+	}
+    }
+}
 
-    /* MASM proc */
-    addTagRegex (language,
-	"^(" SYMBOL ")[[:blank:]]+proc[[:space:]]",
-	"\\1", "l,label", "i");
-    /* TASM proc */
-    addTagRegex (language,
-	"^proc[[:blank:]]+(" SYMBOL ")",
-	"\\1", "l,label", "i");
+static void findAsmTags (void)
+{
+    vString *name = vStringNew ();
+    vString *operator = vStringNew ();
+    const unsigned char *line;
+    boolean inCComment = FALSE;
 
-    /* gas macro */
-    addTagRegex (language,
-	"^[[:blank:]]*\\.macro[[:blank:]]*(" SYMBOL ")",
-	"\\1", "m,macro", "i");
-    /* MASM macro */
-    addTagRegex (language,
-	"^(" SYMBOL ")[[:blank:]]+macro[[:space:]]",
-	"\\1", "m,macro", "i");
-    /* TASM macro */
-    addTagRegex (language,
-	"^macro[[:blank:]]+(" SYMBOL ")",
-	"\\1", "m,macro", "i");
+    while ((line = fileReadLine ()) != NULL)
+    {
+	const unsigned char *cp = line;
+	boolean hasColon = FALSE;
+	boolean initialSymbol = isInitialSymbolCharacter ((int) *cp);
+	const boolean isComment = (boolean) (strchr (";*@", *cp) != NULL);
 
-    /* MASM structures */
-    addTagRegex (language,
-	"^(" SYMBOL ")[[:blank:]]+(struct|record)[[:space:]]",
-	"\\1", "t,type", "i");
-    /* TASM structures */
-    addTagRegex (language,
-	"^struct[[:blank:]]+(" SYMBOL ")",
-	"\\1", "t,type", "i");
+	/* skip comments */
+	if (strncmp ((const char*) cp, "/*", (size_t) 2) == 0)
+	{
+	    inCComment = TRUE;
+	    cp += 2;
+	}
+	if (inCComment)
+	{
+	    do
+	    {
+		if (strncmp ((const char*) cp, "*/", (size_t) 2) == 0)
+		{
+		    inCComment = FALSE;
+		    cp += 2;
+		    break;
+		}
+		++cp;
+	    } while (*cp != '\0');
+	}
+	if (isComment || inCComment)
+	    continue;
+
+	/* read preprocessor defines */
+	if (*cp == '#')
+	{
+	    ++cp;
+	    readPreProc (cp);
+	    continue;
+	}
+
+	/* read symbol */
+	if (initialSymbol)
+	{
+	    vStringClear (name);
+	    while (isSymbolCharacter ((int) *cp))
+	    {
+		vStringPut (name, *cp);
+		++cp;
+	    }
+	    vStringTerminate (name);
+	    if (*cp == ':')
+	    {
+		hasColon = TRUE;
+		++cp;
+	    }
+	    else if (! isspace ((int) *cp))
+	    {
+		vStringClear (name);
+		initialSymbol = FALSE;
+	    }
+	}
+	else if (! isspace ((int) *cp))
+	    continue;
+
+	/* skip white space */
+	while (isspace ((int) *cp))
+	    ++cp;
+
+	/* skip leading dot */
+	if (*cp == '.')
+	    ++cp;
+
+	/* read operator */
+	vStringClear (operator);
+	while (*cp != '\0'  &&  ! isspace ((int) *cp))
+	{
+	    vStringPut (operator, *cp);
+	    ++cp;
+	}
+	vStringTerminate (operator);
+
+	/* attempt second read of symbol */
+	if (!initialSymbol)
+	{
+	    while (isspace ((int) *cp))
+		++cp;
+	    if (isInitialSymbolCharacter ((int) *cp))
+	    {
+		vStringClear (name);
+		while (isSymbolCharacter ((int) *cp))
+		{
+		    vStringPut (name, *cp);
+		    ++cp;
+		}
+		vStringTerminate (name);
+	    }
+	}
+	makeAsmTag (name, operator, initialSymbol, hasColon);
+    }
+    vStringDelete (name);
+    vStringDelete (operator);
 }
 
 extern parserDefinition* AsmParser (void)
@@ -147,10 +257,10 @@ extern parserDefinition* AsmParser (void)
 	"asm", "ASM", "s", "S", NULL
     };
     static const char *const patterns [] = {
+	"*.A51",
 	"*.29[kK]",
 	"*.[68][68][kKsSxX]",
 	"*.[xX][68][68]",
-	"*.A5[01]",
 	NULL
     };
     parserDefinition* def = parserNew ("Asm");
@@ -158,8 +268,7 @@ extern parserDefinition* AsmParser (void)
     def->kindCount  = KIND_COUNT (AsmKinds);
     def->extensions = extensions;
     def->patterns   = patterns;
-    def->initialize = installAsmRegex;
-    def->regex      = TRUE;
+    def->parser     = findAsmTags;
     return def;
 }
 

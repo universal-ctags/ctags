@@ -1,6 +1,8 @@
 Current Version: @@VERSION@@
 
-ctags-5.2.4 (Tue May 14 2002)
+ctags-5.2.4 (Wed May 29 2002)
+* Changed Asm parser to back to C-based parser to remove redundant tags,
+  and extending its support for more variants [Asm].
 * Changed to using _tempnam() to create temporary files on Windows, allowing
   "TMP" environment variable to set temporary directory.
 * Added support for RISC OS platform, contributed by Andrew Wingate.

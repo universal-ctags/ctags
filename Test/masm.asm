@@ -15,6 +15,9 @@ END
 myequ	EQU    3
 myequal = 4
 
+; http://www.xploiter.com/mirrors/asm/asm_3.htm
+hllequal := 4
+
 BYTE_BUFFER    LABEL     BYTE
 WORD_BUFFER    DW        512 dup (?)
 
