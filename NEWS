@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.1 (Sat Jul 26 2003)
+ctags-5.5.1 (Wed Jul 30 2003)
 * Changed supported tag kinds for Verilog parser during overhaul.
 * Restored exit of program after --help, --license, and --version options [Bug
   #717311, #751240].
