@@ -822,6 +822,7 @@ static veraKind veraTagKind (const tagType type) {
 	case TAG_CLASS:      result = VK_CLASS;           break;
 	case TAG_ENUM:       result = VK_ENUMERATION;     break;
 	case TAG_ENUMERATOR: result = VK_ENUMERATOR;      break;
+	case TAG_EVENT:      result = VK_VARIABLE;        break;
 	case TAG_FUNCTION:   result = VK_FUNCTION;        break;
 	case TAG_MEMBER:     result = VK_MEMBER;          break;
 	case TAG_PROGRAM:    result = VK_PROGRAM;         break;
