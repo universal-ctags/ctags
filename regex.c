@@ -437,7 +437,7 @@ static vString* substitute (const char* const in, const char* out,
 		vStringNCatS (result, in + pmatch [dig].rm_so, diglen);
 	    }
 	}
-	else
+	else if (*p != '\n'  &&  *p != '\r')
 	    vStringPut (result, *p);
     }
     vStringTerminate (result);
