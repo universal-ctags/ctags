@@ -119,7 +119,7 @@ extern void addTagRegex (const langType language, const char* const regex, const
 extern void addCallbackRegex (const langType language, const char *const regex, const char *const flags, const regexCallback callback);
 extern void disableRegexKinds (const langType __unused__ language);
 extern boolean enableRegexKind (const langType language, const int kind, const boolean mode);
-extern void printRegexKinds (const langType language);
+extern void printRegexKinds (const langType language, boolean indent);
 extern void freeRegexResources (void);
 extern void checkRegex (void);
 

@@ -375,11 +375,12 @@ static void parseKinds (
     }
 }
 
-static void printRegexKind (const regexPattern *pat, unsigned int i)
+static void printRegexKind (const regexPattern *pat, unsigned int i, boolean indent)
 {
     const struct sKind *const kind = &pat [i].u.tag.kind;
+    const char *const indentation = indent ? "    " : "";
     Assert (pat [i].type == PTRN_TAG);
-    printf ("    %c  %s %s\n",
+    printf ("%s%c  %s %s\n", indentation,
 	    kind->letter != '\0' ? kind->letter : '?',
 	    kind->description != NULL ? kind->description : kind->name,
 	    kind->enabled ? "" : " [off]");
@@ -651,7 +652,7 @@ extern boolean enableRegexKind (
     return result;
 }
 
-extern void printRegexKinds (const langType __unused__ language)
+extern void printRegexKinds (const langType __unused__ language, boolean indent)
 {
 #ifdef HAVE_REGEX
     if (language <= SetUpper  &&  Sets [language].count > 0)
@@ -660,7 +661,7 @@ extern void printRegexKinds (const langType __unused__ language)
 	unsigned int i;
 	for (i = 0  ;  i < set->count  ;  ++i)
 	    if (set->patterns [i].type == PTRN_TAG)
-		printRegexKind (set->patterns, i);
+		printRegexKind (set->patterns, i, indent);
     }
 #endif
 }

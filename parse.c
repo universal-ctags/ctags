@@ -467,15 +467,16 @@ extern boolean processKindOption (
     return handled;
 }
 
-static void printLanguageKind (const kindOption* const kind)
+static void printLanguageKind (const kindOption* const kind, boolean indent)
 {
-    printf ("    %c  %s%s\n", kind->letter,
+    const char *const indentation = indent ? "    " : "";
+    printf ("%s%c  %s%s\n", indentation, kind->letter,
 	kind->description != NULL ? kind->description :
 	    (kind->name != NULL ? kind->name : ""),
 	kind->enabled ? "" : " [off]");
 }
 
-static void printKinds (langType language)
+static void printKinds (langType language, boolean indent)
 {
     const parserDefinition* lang;
     Assert (0 <= language  &&  language < (int) LanguageCount);
@@ -483,11 +484,9 @@ static void printKinds (langType language)
     if (lang->kinds != NULL  ||  lang->regex)
     {
 	unsigned int i;
-	printf ("%s\n", lang->name);
-	if (lang->kinds != NULL)
-	    for (i = 0  ;  i < lang->kindCount  ;  ++i)
-		printLanguageKind (lang->kinds + i);
-	printRegexKinds (language);
+	for (i = 0  ;  i < lang->kindCount  ;  ++i)
+	    printLanguageKind (lang->kinds + i, indent);
+	printRegexKinds (language, indent);
     }
 }
 
@@ -497,10 +496,13 @@ extern void printLanguageKinds (const langType language)
     {
 	unsigned int i;
 	for (i = 0  ;  i < LanguageCount  ;  ++i)
-	    printKinds (i);
+	{
+	    printf ("%s\n", LanguageTable [i]->name);
+	    printKinds (i, TRUE);
+	}
     }
     else
-	printKinds (language);
+	printKinds (language, FALSE);
 }
 
 static void printMaps (const langType language)
