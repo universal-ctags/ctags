@@ -84,8 +84,7 @@ extern void debugEntry (const tagEntryInfo *const tag)
     {
 	printf ("<#%s%s:%s", scope, tag->kindName, tag->name);
 
-	if (Option.extensionFields.access  &&
-		tag->extensionFields.scope [0] != NULL  &&
+	if (tag->extensionFields.scope [0] != NULL  &&
 		tag->extensionFields.scope [1] != NULL)
 	    printf (" [%s:%s]", tag->extensionFields.scope [0],
 		    tag->extensionFields.scope [1]);
