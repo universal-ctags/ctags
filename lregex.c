@@ -129,8 +129,8 @@ static void clearPatternSet (const langType language)
 *   Regex psuedo-parser
 */
 
-static void makeRegexTag (const vString* const name,
-			  const struct sKind* const kind)
+static void makeRegexTag (
+	const vString* const name, const struct sKind* const kind)
 {
     if (kind->enabled)
     {
@@ -199,8 +199,9 @@ static char* scanSeparators (char* name)
  * to the trailing flags is written to `flags'. If the pattern is not in the
  * correct format, a false value is returned.
  */
-static boolean parseTagRegex (char* const regexp, char** const name,
-			      char** const kinds, char** const flags)
+static boolean parseTagRegex (
+	char* const regexp, char** const name,
+	char** const kinds, char** const flags)
 {
     boolean result = FALSE;
     const int separator = (unsigned char) regexp [0];
@@ -239,9 +240,9 @@ static boolean parseTagRegex (char* const regexp, char** const name,
     return result;
 }
 
-static void addCompiledTagPattern (const langType language,
-				   regex_t* const pattern, char* const name,
-				   const char kind, char* const kindName)
+static void addCompiledTagPattern (
+	const langType language, regex_t* const pattern,
+	char* const name, const char kind, char* const kindName)
 {
     patternSet* set;
     regexPattern *ptrn;
@@ -269,9 +270,9 @@ static void addCompiledTagPattern (const langType language,
     ptrn->u.tag.kind.name    = kindName;
 }
 
-static void addCompiledCallbackPattern (const langType language,
-					regex_t* const pattern,
-					const regexCallback callback)
+static void addCompiledCallbackPattern (
+	const langType language, regex_t* const pattern,
+	const regexCallback callback)
 {
     patternSet* set;
     regexPattern *ptrn;
@@ -330,8 +331,8 @@ static regex_t* compileRegex (const char* const regexp, const char* const flags)
 
 #endif
 
-static void parseKinds (const char* const kinds,
-			char* const kind, char** const kindName)
+static void parseKinds (
+	const char* const kinds, char* const kind, char** const kindName)
 {
     *kind = '\0';
     *kindName = NULL;
@@ -363,7 +364,7 @@ static void printRegexKindOption (const regexPattern *pat, unsigned int i)
 }
 
 static void processLanguageRegex (const langType language,
-				  const char* const parameter)
+	const char* const parameter)
 {
     if (parameter == NULL  ||  parameter [0] == '\0')
 	clearPatternSet (language);
@@ -394,8 +395,9 @@ static void processLanguageRegex (const langType language,
 
 #if defined (POSIX_REGEX)
 
-static vString* substitute (const char* const in, const char* out,
-			    const int nmatch, const regmatch_t* const pmatch)
+static vString* substitute (
+	const char* const in, const char* out,
+	const int nmatch, const regmatch_t* const pmatch)
 {
     vString* result = vStringNew ();
     const char* p;
@@ -418,8 +420,8 @@ static vString* substitute (const char* const in, const char* out,
 }
 
 static void matchTagPattern (const vString* const line,
-			     const regexPattern* const patbuf,
-			     const regmatch_t* const pmatch)
+	const regexPattern* const patbuf,
+	const regmatch_t* const pmatch)
 {
     vString *const name = substitute (vStringValue (line),
 	    patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch);
@@ -434,9 +436,9 @@ static void matchTagPattern (const vString* const line,
     vStringDelete (name);
 }
 
-static void matchCallbackPattern (const vString* const line,
-				  const regexPattern* const patbuf,
-				  const regmatch_t* const pmatch)
+static void matchCallbackPattern (
+	const vString* const line, const regexPattern* const patbuf,
+	const regmatch_t* const pmatch)
 {
     regexMatch matches [BACK_REFERENCE_COUNT];
     unsigned int count = 0;
@@ -450,36 +452,49 @@ static void matchCallbackPattern (const vString* const line,
     patbuf->u.callback.function (vStringValue (line), matches, count);
 }
 
-static void matchRegexPattern (const vString* const line,
-			       const regexPattern* const patbuf)
+static boolean matchRegexPattern (const vString* const line,
+	const regexPattern* const patbuf)
 {
+    boolean result = FALSE;
     regmatch_t pmatch [BACK_REFERENCE_COUNT];
     const int match = regexec (patbuf->pattern, vStringValue (line),
 			       BACK_REFERENCE_COUNT, pmatch, 0);
     if (match == 0)
     {
+	result = TRUE;
 	if (patbuf->type == PTRN_TAG)
 	    matchTagPattern (line, patbuf, pmatch);
 	else if (patbuf->type == PTRN_CALLBACK)
 	    matchCallbackPattern (line, patbuf, pmatch);
+	else
+	{
+	    Assert ("invalid pattern type" == NULL);
+	    result = FALSE;
+	}
     }
+    return result;
 }
 
 #endif
 
 /* PUBLIC INTERFACE */
 
-/* Match against all patterns for specified language. */
-extern void matchRegex (const vString* const line, const langType language)
+/* Match against all patterns for specified language. Returns true if at least
+ * on pattern matched.
+ */
+extern boolean matchRegex (const vString* const line, const langType language)
 {
+    boolean result = FALSE;
     if (language != LANG_IGNORE  &&  language <= SetUpper  &&
 	Sets [language].count > 0)
     {
 	const patternSet* const set = Sets + language;
 	unsigned int i;
 	for (i = 0  ;  i < set->count  ;  ++i)
-	    matchRegexPattern (line, set->patterns + i);
+	    if (matchRegexPattern (line, set->patterns + i))
+		result = TRUE;
     }
+    return result;
 }
 
 extern void findRegexTags (void)
@@ -491,11 +506,12 @@ extern void findRegexTags (void)
 
 #endif /* HAVE_REGEX */
 
-extern void addTagRegex (const langType __unused__ language,
-			 const char* const __unused__ regex,
-			 const char* const __unused__ name,
-			 const char* const __unused__ kinds,
-			 const char* const __unused__ flags)
+extern void addTagRegex (
+	const langType __unused__ language,
+	const char* const __unused__ regex,
+	const char* const __unused__ name,
+	const char* const __unused__ kinds,
+	const char* const __unused__ flags)
 {
 #ifdef HAVE_REGEX
     Assert (regex != NULL);
@@ -515,10 +531,11 @@ extern void addTagRegex (const langType __unused__ language,
 #endif
 }
 
-extern void addCallbackRegex (const langType __unused__ language,
-			      const char* const __unused__ regex,
-			      const char* const __unused__ flags,
-			      const regexCallback __unused__ callback)
+extern void addCallbackRegex (
+	const langType __unused__ language,
+	const char* const __unused__ regex,
+	const char* const __unused__ flags,
+	const regexCallback __unused__ callback)
 {
 #ifdef HAVE_REGEX
     Assert (regex != NULL);
@@ -531,8 +548,8 @@ extern void addCallbackRegex (const langType __unused__ language,
 #endif
 }
 
-extern void addLanguageRegex (const langType __unused__ language,
-			      const char* const __unused__ regex)
+extern void addLanguageRegex (
+	const langType __unused__ language, const char* const __unused__ regex)
 {
 #ifdef HAVE_REGEX
     if (! regexBroken)
@@ -589,9 +606,9 @@ extern void disableRegexKinds (const langType __unused__ language)
 #endif
 }
 
-extern boolean enableRegexKind (const langType __unused__ language,
-				const int __unused__ kind,
-				const boolean __unused__ mode)
+extern boolean enableRegexKind (
+	const langType __unused__ language,
+	const int __unused__ kind, const boolean __unused__ mode)
 {
     boolean result = FALSE;
 #ifdef HAVE_REGEX

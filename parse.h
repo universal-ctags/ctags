@@ -109,7 +109,7 @@ extern boolean parseFile (const char *const fileName);
 /* Regex interface */
 #ifdef HAVE_REGEX
 extern void findRegexTags (void);
-extern void matchRegex (const vString* const line, const langType language);
+extern boolean matchRegex (const vString* const line, const langType language);
 #endif
 extern boolean processRegexOption (const char *const option, const char *const parameter);
 extern void addLanguageRegex (const langType language, const char* const regex);
