@@ -17,6 +17,7 @@ ctags-5.2.4 (Tue Jun 11 2002)
 * Fixed bug in configure script [Solaris, Bug #542966].
 * Fixed invalid package name tags [Perl, Bug #535068].
 * Fixed missing tags for certain cases of invalid syntax [C].
+* Fixed missing tags in Fortran with HPF extensions [Fortran, Bug #565813].
 * Fixed spurious tag for clients portion of feature clause when following
   an empty feature clause [Eiffel].
 

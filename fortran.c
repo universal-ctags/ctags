@@ -1464,15 +1464,21 @@ static void parseInternalSubprogramPart (tokenInfo *const token)
     {
 	switch (token->keyword)
 	{
-	    case KEYWORD_function:   parseFunctionSubprogram (token);   break;
-	    case KEYWORD_subroutine: parseSubroutineSubprogram (token); break;
-	    case KEYWORD_recursive:  readToken (token); break;
+	    case KEYWORD_function:
+		parseFunctionSubprogram (token);
+		break;
+
+	    case KEYWORD_subroutine:
+		parseSubroutineSubprogram (token);
+		break;
 
 	    default:
 		if (isTypeSpec (token))
 		    parseTypeSpec (token);
-		else
+		else if (isKeyword (token, KEYWORD_end))
 		    done = TRUE;
+		else
+		    readToken (token);
 		break;
 	}
     } while (! done);
