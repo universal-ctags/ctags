@@ -31,7 +31,7 @@ SOURCES = \
 	php.c \
 	python.c \
 	read.c \
-	regex.c \
+	lregex.c \
 	rexx.c \
 	routines.c \
 	ruby.c \
@@ -76,7 +76,7 @@ OBJECTS = \
 	php.$(OBJEXT) \
 	python.$(OBJEXT) \
 	read.$(OBJEXT) \
-	regex.$(OBJEXT) \
+	lregex.$(OBJEXT) \
 	rexx.$(OBJEXT) \
 	routines.$(OBJEXT) \
 	ruby.$(OBJEXT) \

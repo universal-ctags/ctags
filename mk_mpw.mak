@@ -33,7 +33,7 @@ SOURCES = ¶
 	php.c ¶
 	python.c ¶
 	read.c ¶
-	regex.c ¶
+	lregex.c ¶
 	rexx.c ¶ ¶
 	routines.c ¶
 	ruby.c ¶
@@ -72,7 +72,7 @@ OBJ = ¶
 	php.o ¶
 	python.o ¶
 	read.o ¶
-	regex.o ¶
+	lregex.o ¶
 	rexx.o ¶
 	routines.o ¶
 	ruby.o ¶
