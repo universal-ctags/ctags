@@ -44,6 +44,8 @@
 
 #define isOneOf(c,s)		(boolean) (strchr ((s), (c)) != NULL)
 
+#define isHighChar(c)		((unsigned char)(c) >= 0xc0)
+
 /*
 *   DATA DECLARATIONS
 */
@@ -1397,7 +1399,7 @@ static void readIdentifier (tokenInfo *const token, const int firstChar)
 	    first = FALSE;
 	}
 	c = cppGetc ();
-    } while (isident (c));
+    } while (isident (c) || (isLanguage (Lang_java) && isHighChar (c)));
     vStringTerminate (name);
     cppUngetc (c);		/* unget non-identifier character */
 
@@ -2252,7 +2254,7 @@ static void parseGeneralToken (statementInfo *const st, const int c)
 {
     const tokenInfo *const prev = prevToken (st, 1);
 
-    if (isident1 (c))
+    if (isident1 (c) || (isLanguage (Lang_java) && isHighChar (c)))
     {
 	parseIdentifier (st, c);
 	if (isType (st->context, TOKEN_NAME) &&

@@ -35,6 +35,7 @@ ctags-5.5 (Sun Mar 09 2003)
 * Fixed missing scope extension field on namespaces [C++, C#, Bug #665086].
 * Fixed several bugs causing missed tags [Fortran].
 * Fixed problem with --langmap option preventing clearing of map [Bug #688442].
+* Fixed recognition of Unicode-8 characters [Java].
 * Fixed man page errors and omissions.
 * Fixed bug in readFieldValue() in readtags library.
 * Fixed bug in option parsing in readtags command-line program.
