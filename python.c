@@ -165,7 +165,7 @@ static void findPythonTags (void)
 	cp = skipSpace (cp);
 	indent = cp - line;
 
-	if (*cp == '#')	/* skip initial comment */
+	if (*cp == '#' || *cp == '\0')	/* skip comment or blank line */
 	    continue;
 	
 	if (longStringLiteral)
@@ -185,18 +185,19 @@ static void findPythonTags (void)
 		vStringClear (class);
 
 	    cp = parseIdentifier (cp, identifier);
-	    if (!isspace ((int) *cp))
-		continue;
-	    cp = skipSpace (cp);
-	    if (strcmp (vStringValue (identifier), "def") == 0)
-		parseFunction (cp, class);
-	    else if (strcmp (vStringValue (identifier), "class") == 0)
+	    if (isspace ((int) *cp))
 	    {
-		parseClass (cp, class);
-		class_indent = indent;
+		cp = skipSpace (cp);
+		if (strcmp (vStringValue (identifier), "def") == 0)
+		    parseFunction (cp, class);
+		else if (strcmp (vStringValue (identifier), "class") == 0)
+		{
+		    parseClass (cp, class);
+		    class_indent = indent;
+		}
 	    }
 	}
-	if (strstr ((const char*) cp, "\"\"\"") != NULL)
+	if ((cp = strstr ((const char*) cp, "\"\"\"")) != NULL)
 	{
 	    cp += 3;
 	    cp = (const unsigned char*) strstr ((const char*) cp, "\"\"\"");
