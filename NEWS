@@ -1,5 +1,8 @@
 Current Version: @@VERSION@@
 
+ctags-5.2.1 (Tue Jan 01 2002)
+* Portabilitiy fixes [Mingw32].
+
 ctags-5.2 (Sun Dec 23 2001)
 * Portabilitiy fixes [HP-UX, Solaris, VMS, OS/2].
 * Made code compilable by a C++ compiler.

@@ -102,9 +102,9 @@ extern CONST_FILE inputFile File;
 /*
 *   FUNCTION PROTOTYPES
 */
-#ifdef NEED_PROTO_FGETPOS
+#if defined(NEED_PROTO_FGETPOS)
 extern int fgetpos  (FILE *stream, fpos_t *pos);
-extern int fsetpos  (FILE *stream, const fpos_t *pos);
+extern int fsetpos  (FILE *stream, fpos_t *pos);
 #endif
 
 extern void freeSourceFileResources (void);

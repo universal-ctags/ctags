@@ -217,6 +217,7 @@ typedef enum { FALSE, TRUE } boolean;
 /* Work-around for broken implementation of fgetpos()/fsetpos() on Mingw32 */
 #if defined (__MINGW32__) && defined (__MSVCRT__)
 # undef HAVE_FGETPOS
+# define NEED_PROTO_FGETPOS 1
 #endif
 
 /*

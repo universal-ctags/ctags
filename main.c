@@ -538,9 +538,7 @@ extern boolean doesFileExist (const char *const fileName)
 
 #ifndef HAVE_FGETPOS
 
-extern int fgetpos ( stream, pos )
-    FILE *const stream;
-    fpos_t *const pos;
+extern int fgetpos (FILE *stream, fpos_t *pos)
 {
     int result = 0;
 
@@ -551,9 +549,7 @@ extern int fgetpos ( stream, pos )
     return result;
 }
 
-extern int fsetpos ( stream, pos )
-    FILE *const stream;
-    fpos_t *const pos;
+extern int fsetpos (FILE *stream, fpos_t const *pos)
 {
     return fseek (stream, *pos, SEEK_SET);
 }
