@@ -201,7 +201,7 @@ static boolean createTagsForWildcardUsingFindfirst (const char *const pattern)
     }
 #elif defined (HAVE__FINDFIRST)
     struct _finddata_t fileInfo;
-    intptr_t hFile = _findfirst (pattern, &fileInfo);
+    findfirst_t hFile = _findfirst (pattern, &fileInfo);
     if (hFile != -1L)
     {
 	do
