@@ -9,6 +9,8 @@
 *   This module contains functions for generating tags for the PHP web page
 *   scripting language. Only recognizes functions and classes, not methods or
 *   variables.
+*
+*   Parsing PHP defines by Pavel Hlousek <pavel.hlousek@seznam.cz>, Apr 2003.
 */
 
 /*
@@ -26,11 +28,12 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-    K_CLASS, K_FUNCTION
+    K_CLASS, K_DEFINE, K_FUNCTION
 } phpKind;
 
 static kindOption PhpKinds [] = {
     { TRUE, 'c', "class",    "classes" },
+    { TRUE, 'd', "define",   "constant definitions" },
     { TRUE, 'f', "function", "functions" }
 };
 
@@ -84,6 +87,33 @@ static void findPhpTags (void)
 	    }
 	    vStringTerminate (name);
 	    makeSimpleTag (name, PhpKinds, K_CLASS);
+	    vStringClear (name);
+	}
+	else if (strncmp ((const char*) cp, "define", (size_t) 6) == 0 &&
+	         ! isalnum ((int) cp [6]))
+	{
+	    cp += 6;
+
+	    while (isspace ((int) *cp))
+		++cp;
+	    if (*cp != '(')
+		continue;
+	    ++cp;
+
+	    while (isspace ((int) *cp))
+		++cp;
+	    if ((*cp == '\'') || (*cp == '"'))
+		++cp;
+	    else if (! ((*cp == '_')  || isalnum ((int) *cp)))
+		continue;
+          
+	    while (isalnum ((int) *cp)  ||  *cp == '_')
+	    {
+		vStringPut (name, (int) *cp);
+		++cp;
+	    }
+	    vStringTerminate (name);
+	    makeSimpleTag (name, PhpKinds, K_DEFINE);
 	    vStringClear (name);
 	}
 
