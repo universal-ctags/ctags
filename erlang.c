@@ -27,14 +27,14 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-    K_FUNCTION, K_MODULE, K_RECORD, K_MACRO
+    K_MACRO, K_FUNCTION, K_MODULE, K_RECORD
 } erlangKind;
 
 static kindOption ErlangKinds[] = {
+    {TRUE, 'd', "macro",    "macro definitions"},
     {TRUE, 'f', "function", "functions"},
     {TRUE, 'm', "module",   "modules"},
     {TRUE, 'r', "record",   "record definitions"},
-    {TRUE, 's', "macro",    "macro definitions"},
 };
 
 /*
@@ -74,82 +74,49 @@ static const unsigned char *parseIdentifier (
     return cp;
 }
 
-static void makeGenericTag (
-	erlangKind kind, vString *const identifier, vString *const module)
+static void makeMemberTag (
+	vString *const identifier, erlangKind kind, vString *const module)
 {
-    tagEntryInfo tag;
-    
-    initTagEntry (&tag, vStringValue (identifier));
-    tag.kindName = ErlangKinds[kind].name;
-    tag.kind = ErlangKinds[kind].letter;
-
-    if (module && (vStringLength (module) > 0) )
+    if (ErlangKinds [kind].enabled  &&  vStringLength (identifier) > 0)
     {
-        tag.extensionFields.scope [0] = "module";
-        tag.extensionFields.scope [1] = vStringValue (module);
+	tagEntryInfo tag;
+	initTagEntry (&tag, vStringValue (identifier));
+	tag.kindName = ErlangKinds[kind].name;
+	tag.kind = ErlangKinds[kind].letter;
+
+	if (module != NULL  &&  vStringLength (module) > 0)
+	{
+	    tag.extensionFields.scope [0] = "module";
+	    tag.extensionFields.scope [1] = vStringValue (module);
+	}
+	makeTagEntry (&tag);
     }
-    makeTagEntry (&tag);
 }
 
-static void makeErlangTag (const unsigned char *cp, erlangKind kind,
-                vString *const module)
+static void parseModuleTag (const unsigned char *cp, vString *const module)
 {
     vString *const identifier = vStringNew ();
-    cp = parseIdentifier (cp, identifier);
-    makeGenericTag (kind, identifier, module);
-    vStringDelete (identifier);
-}
-
-static void makeModuleTag (const unsigned char *cp, erlangKind kind,
-                vString *const module)
-{
-    vString *const identifier = vStringNew ();
-    cp = parseIdentifier (cp, identifier);
-    makeGenericTag (kind, identifier, NULL);
+    parseIdentifier (cp, identifier);
+    makeSimpleTag (identifier, ErlangKinds, K_MODULE);
 
     /* All further entries go in the new module */
     vStringCopy (module, identifier);
     vStringDelete (identifier);
 }
 
-static void makeFunctionTag (vString *const name, vString *const module)
+static void parseSimpleTag (const unsigned char *cp, erlangKind kind)
 {
-    tagEntryInfo tag;
-
-    initTagEntry (&tag, vStringValue (name));
-    tag.kindName = ErlangKinds[K_FUNCTION].name;
-    tag.kind = ErlangKinds[K_FUNCTION].letter;
-
-    if (module && (vStringLength (module) > 0) )
-    {
-        tag.extensionFields.scope [0] = "module";
-        tag.extensionFields.scope [1] = vStringValue (module);
-    }
-    makeTagEntry (&tag);
+    vString *const identifier = vStringNew ();
+    parseIdentifier (cp, identifier);
+    makeSimpleTag (identifier, ErlangKinds, kind);
+    vStringDelete (identifier);
 }
 
-/*
- * Add a function definition tag if:
- * 1) There is no white-space at the start of the line
- * 2) It doesn't match the previous identifier
- */
-static void parseFunction (const unsigned char *cp, vString *const previous,
-                vString *const module)
+static void parseFunctionTag (const unsigned char *cp, vString *const module)
 {
-    /*
-     * Rule 1 is met if we are in this routine, so just find the identifier,
-     * determine if it is different from the previous, and add it.
-     */
     vString *const identifier = vStringNew ();
-    cp = parseIdentifier (cp, identifier);
-    
-    if ( (vStringLength (identifier) != vStringLength (previous) )
-         || (strncmp (vStringValue (identifier), vStringValue (previous),
-		 vStringLength (identifier)) != 0))
-    {
-	makeFunctionTag (identifier, module);
-	vStringCopy (previous, identifier);
-    }
+    parseIdentifier (cp, identifier);
+    makeMemberTag (identifier, K_FUNCTION, module);
     vStringDelete (identifier);
 }
 
@@ -159,25 +126,25 @@ static void parseFunction (const unsigned char *cp, vString *const previous,
  * -define(foo, bar)
  * -record(graph, {vtab = notable, cyclic = true}).
  */
-static void parseDirective (const unsigned char *cp,
-                vString *const module)
+static void parseDirective (const unsigned char *cp, vString *const module)
 {
     /*
      * A directive will be either a record definition or a directive.
      * Record definitions are handled separately
      */
     vString *const directive = vStringNew ();
+    const char *const drtv = vStringValue (directive);
     cp = parseIdentifier (cp, directive);
     cp = skipSpace (cp);
     if (*cp == '(')
 	++cp;
 
-    if (strncmp (vStringValue (directive), "record", 6) == 0)
-	makeErlangTag (cp, K_RECORD, module);
-    else if (strncmp (vStringValue (directive), "define", 6) == 0)
-    	makeErlangTag (cp, K_MACRO, module);
-    else if (strncmp (vStringValue (directive), "module", 6) == 0)
-    	makeModuleTag (cp, K_MODULE, module);
+    if (strcmp (drtv, "record") == 0)
+	parseSimpleTag (cp, K_RECORD);
+    else if (strcmp (drtv, "define") == 0)
+    	parseSimpleTag (cp, K_MACRO);
+    else if (strcmp (drtv, "module") == 0)
+    	parseModuleTag (cp, module);
     /* Otherwise, it was an import, export, etc. */
     
     vStringDelete (directive);
@@ -185,7 +152,6 @@ static void parseDirective (const unsigned char *cp,
 
 static void findErlangTags (void)
 {
-    vString *const previous = vStringNew ();
     vString *const module = vStringNew ();
     const unsigned char *line;
 
@@ -204,9 +170,8 @@ static void findErlangTags (void)
 	    parseDirective(cp, module);
 	}
 	else if (isIdentifierFirstCharacter ((int) *cp))
-	    parseFunction (cp, previous, module);
+	    parseFunctionTag (cp, module);
     }
-    vStringDelete (previous);
     vStringDelete (module);
 }
 
