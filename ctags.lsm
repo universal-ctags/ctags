@@ -10,7 +10,7 @@ Keywords:	tag tags ctags etags ftags ptags Exuberant Assembler ASP AWK
 Author:		dhiebert@users.sourceforge.net (Darren Hiebert)
 Maintained-by:  dhiebert@users.sourceforge.net (Darren Hiebert)
 Primary-site:	http://prdownloads.sourceforge.net/ctags
-		224K ctags-@@VERSION@@.tar.gz
+		218K ctags-@@VERSION@@.tar.gz
 Original-site:	http://ctags.sourceforge.net
 Platforms:	UNIX, MSDOS, Windows 95/98/NT, OS/2, QNX, Amiga, QDOS, VMS,
 		Macintosh, MacOS X, Cray
