@@ -18,7 +18,7 @@ Exuberant Ctags offers the following features:
 1.  It supports the following languages: Assembler, AWK, ASP, BETA,
     Bourne/Korn/Z Shell, C, C++, COBOL, Eiffel, Fortran, Java, Lisp, Lua,
     Makefile, Pascal, Perl, PHP, Python, REXX, Ruby, S-Lang, Scheme, Tcl,
-    and Vim.
+    Verilog, Vim, and YACC.
 
 2.  It is capable of generating tags for virtually all C language constructs.
 
