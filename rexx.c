@@ -22,8 +22,8 @@
 
 static void installRexxRegex (const langType language)
 {
-    addLanguageRegex (language,
-	"/^([A-Za-z0-9@#$\\.!?_]+)[ \t]*:/\\1/s,subroutine/");
+    addTagRegex (language, "^([A-Za-z0-9@#$\\.!?_]+)[ \t]*:",
+	"\\1", "s,subroutine", NULL);
 }
 
 extern parserDefinition* RexxParser (void)

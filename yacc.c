@@ -23,8 +23,8 @@
 
 static void installYaccRegex (const langType language)
 {
-    addLanguageRegex (language,
-        "/^([A-Za-z][A-Za-z_0-9]+)[ \t]+:/\\1/l,label/");
+    addTagRegex (language,
+        "^([A-Za-z][A-Za-z_0-9]+)[ \t]+:", "\\1", "l,label", NULL);
 }
 
 extern parserDefinition* YaccParser ()

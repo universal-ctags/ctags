@@ -22,8 +22,12 @@
  */
 static void installSlangRegex (const langType language)
 {
-   addLanguageRegex (language, "/^.*define[ \t]+([A-Z_][A-Z0-9_]*)[^;]*$/\\1/f,function/i");
-   addLanguageRegex (language, "/^[ \t]*implements[ \t]+\\([ \t]*\"([^\"]*)\"[ \t]*\\)[ \t]*;/\\1/n,namespace/");
+   addTagRegex (language,
+	"^.*define[ \t]+([A-Z_][A-Z0-9_]*)[^;]*$",
+	"\\1", "f,function", "i");
+   addTagRegex (language,
+	"^[ \t]*implements[ \t]+\\([ \t]*\"([^\"]*)\"[ \t]*\\)[ \t]*;",
+	"\\1", "n,namespace", NULL);
 }
 
 extern parserDefinition* SlangParser (void)
