@@ -290,17 +290,17 @@ extern void addLanguageExtensionMap (
     stringListAdd (LanguageTable [language]->currentExtensions, str);
 }
 
-extern void enableLanguages (const boolean state)
-{
-    unsigned int i;
-    for (i = 0  ;  i < LanguageCount  ;  ++i)
-	LanguageTable [i]->enabled = state;
-}
-
 extern void enableLanguage (const langType language, const boolean state)
 {
     Assert (0 <= language  &&  language < (int) LanguageCount);
     LanguageTable [language]->enabled = state;
+}
+
+extern void enableLanguages (const boolean state)
+{
+    unsigned int i;
+    for (i = 0  ;  i < LanguageCount  ;  ++i)
+	enableLanguage (i, state);
 }
 
 static void initializeParsers (void)
@@ -519,13 +519,12 @@ static void printKinds (langType language, boolean indent)
 
 extern void printLanguageKinds (const langType language)
 {
-    Assert (0 <= language  &&  language < (int) LanguageCount);
     if (language == LANG_AUTO)
     {
-	const parserDefinition* lang = LanguageTable [language];
 	unsigned int i;
 	for (i = 0  ;  i < LanguageCount  ;  ++i)
 	{
+	    const parserDefinition* const lang = LanguageTable [i];
 	    printf ("%s%s\n", lang->name, lang->enabled ? "" : " [disabled]");
 	    printKinds (i, TRUE);
 	}
