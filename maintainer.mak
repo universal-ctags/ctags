@@ -17,7 +17,7 @@ VERSION_FILES=	$(DOS_VER_FILES) configure.in ctags.spec
 
 LIB_FILES	=	readtags.c readtags.h
 
-COMMON_FILES =	COPYING EXTENDING.html FAQ INSTALL.oth NEWS QUOTES README \
+COMMON_FILES =	COPYING EXTENDING.html FAQ INSTALL.oth NEWS README \
 				mk_bc3.mak mk_bc5.mak mk_djg.mak mk_manx.mak mk_ming.mak \
 				mk_mpw.mak mk_mvc.mak mk_os2.mak mk_qdos.mak mk_sas.mak \
 				source.mak $(DSOURCES) $(HEADERS) $(LIB_FILES)
