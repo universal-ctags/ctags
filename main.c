@@ -1,7 +1,7 @@
 /*
 *   $Id$
 *
-*   Copyright (c) 1996-2002, Darren Hiebert
+*   Copyright (c) 1996-2003, Darren Hiebert
 *
 *   Author: Darren Hiebert <dhiebert@users.sourceforge.net>
 *           http://ctags.sourceforge.net

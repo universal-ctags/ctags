@@ -1,7 +1,7 @@
 /*
 *   $Id$
 *
-*   Copyright (c) 1996-2002, Darren Hiebert
+*   Copyright (c) 1996-2003, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License.
@@ -886,7 +886,7 @@ static void printFeatureList (void)
 
 static void printProgramIdentification (void)
 {
-    printf ("%s %s, Copyright (C) 1996-2002 %s\n",
+    printf ("%s %s, Copyright (C) 1996-2003 %s\n",
 	    PROGRAM_NAME, PROGRAM_VERSION, AUTHOR_NAME);
     printf ("  Compiled: %s, %s\n", __DATE__, __TIME__);
     printf ("  Addresses: <%s>, %s\n", AUTHOR_EMAIL, PROGRAM_URL);
