@@ -698,11 +698,11 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 /* "sep" returns a value only the first time it is evaluated */
 #define sep (first ? (first = FALSE, separator) : empty)
 
-    if (tag->kindName != NULL && (
-	 Option.extensionFields.kindLong  ||  tag->kind == '\0'))
+    if (tag->kindName != NULL && (Option.extensionFields.kindLong  ||
+	 (Option.extensionFields.kind  && tag->kind == '\0')))
 	length += fprintf (TagFile.fp,"%s\t%s%s", sep, kindKey, tag->kindName);
-    else if (tag->kind != '\0'  &&
-	    (! Option.extensionFields.kindLong  ||  tag->kindName == NULL))
+    else if (tag->kind != '\0'  && (Option.extensionFields.kind  ||
+	    (Option.extensionFields.kindLong  &&  tag->kindName == NULL)))
 	length += fprintf (TagFile.fp, "%s\t%s%c", sep, kindKey, tag->kind);
 
     if (Option.extensionFields.lineNumber)
