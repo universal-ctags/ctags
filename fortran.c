@@ -939,8 +939,9 @@ static void skipToNextStatement (tokenInfo *const token)
 }
 
 /* skip over parenthesis enclosed contents starting at next token.
- * Token refers to first token following closing parenthesis. If an opening
- * parenthesis is not found, `token' is moved to the end of the statement.
+ * Token is left at the first token following closing parenthesis. If an
+ * opening parenthesis is not found, `token' is moved to the end of the
+ * statement.
  */
 static void skipOverParens (tokenInfo *const token)
 {
@@ -1116,21 +1117,44 @@ static tagType variableTagType (void)
     return result;
 }
 
+static void parseEntityDecl (tokenInfo *const token)
+{
+    Assert (isType (token, TOKEN_IDENTIFIER));
+    makeFortranTag (token, variableTagType ());
+    readToken (token);
+    if (isType (token, TOKEN_PAREN_OPEN))
+	skipOverParens (token);
+    if (isType (token, TOKEN_OPERATOR) &&
+	    strcmp (vStringValue (token->string), "*") == 0)
+    {
+	readToken (token);        /* read char-length */
+	if (isType (token, TOKEN_PAREN_OPEN))
+	    skipOverParens (token);
+	else
+	    readToken (token);
+    }
+    if (isType (token, TOKEN_OPERATOR) &&
+	    strcmp (vStringValue (token->string), "=") == 0)
+    {
+	while (! isType (token, TOKEN_COMMA) &&
+		! isType (token, TOKEN_STATEMENT_END))
+	    readToken (token);
+    }
+    /* token left at either comma or statement end */
+}
+
 static void parseEntityDeclList (tokenInfo *const token)
 {
     while (isType (token, TOKEN_IDENTIFIER))
     {
-	makeFortranTag (token, variableTagType ());
-	readToken (token);
-	if (isType (token, TOKEN_PAREN_OPEN))
-	    skipOverParens (token);
-	if (isType (token, TOKEN_OPERATOR) &&
-		strcmp (vStringValue (token->string), "*") == 0)
+	parseEntityDecl (token);
+	if (isType (token, TOKEN_COMMA))
 	    readToken (token);
-	while (! isType (token, TOKEN_COMMA) &&
-		! isType (token, TOKEN_STATEMENT_END))
-	    readToken (token);
-	readToken (token);
+	else if (isType (token, TOKEN_STATEMENT_END))
+	{
+	    skipToNextStatement (token);
+	    break;
+	}
     }
 }
 
@@ -1703,6 +1727,7 @@ static void parseProgramUnit (tokenInfo *const token)
 	else switch (token->keyword)
 	{
 	    case KEYWORD_block:      parseBlockData (token);            break;
+	    case KEYWORD_end:        skipToNextStatement (token);       break;
 	    case KEYWORD_function:   parseFunctionSubprogram (token);   break;
 	    case KEYWORD_module:     parseModule (token);               break;
 	    case KEYWORD_program:    parseMainProgram (token);          break;
