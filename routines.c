@@ -15,19 +15,19 @@
 #include "general.h"	/* must always come first */
 
 #ifdef HAVE_STDLIB_H
-# include <stdlib.h>		/* to declare malloc (), realloc () */
+# include <stdlib.h>	/* to declare malloc (), realloc () */
 #endif
 #include <ctype.h>
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>
 
-#include <stdio.h>		/* to declare SEEK_SET (hopefully) */
+#include <stdio.h>	/* to declare SEEK_SET (hopefully) */
 #ifdef HAVE_FCNTL_H
-# include <fcntl.h>		/* to declar O_RDWR, O_CREAT, O_EXCL */
+# include <fcntl.h>	/* to declar O_RDWR, O_CREAT, O_EXCL */
 #endif
 #ifdef HAVE_UNISTD_H
-# include <unistd.h>		/* to declare mkstemp () */
+# include <unistd.h>	/* to declare mkstemp () */
 #endif
 
 /*  To declare "struct stat" and stat ().
@@ -47,7 +47,15 @@
 # endif
 #endif
 
-
+#ifdef HAVE_DOS_H
+# include <dos.h>	/* to declare MAXPATH */
+#endif
+#ifdef HAVE_DIRECT_H
+# include <direct.h>	/* to _getcwd */
+#endif
+#ifdef HAVE_DIR_H
+# include <dir.h>	/* to declare findfirst () and findnext () */
+#endif
 #include "debug.h"
 #include "routines.h"
 
@@ -60,25 +68,6 @@
 */
 #ifndef TMPDIR
 # define TMPDIR "/tmp"
-#endif
-
-/*
- *  Portability macros
- */
-#ifndef PATH_SEPARATOR
-# if defined (MSDOS_STYLE_PATH)
-#  define PATH_SEPARATOR '\\'
-# elif defined (QDOS)
-#  define PATH_SEPARATOR '_'
-# else
-#  define PATH_SEPARATOR '/'
-# endif
-#endif
-
-#if defined (MSDOS_STYLE_PATH) && defined (UNIX_PATH_SEPARATOR)
-# define OUTPUT_PATH_SEPARATOR	'/'
-#else
-# define OUTPUT_PATH_SEPARATOR	PATH_SEPARATOR
 #endif
 
 /*  File type tests.
@@ -355,9 +344,9 @@ extern char* newUpperString (const char* str)
 extern void setCurrentDirectory (void)
 {
 #ifdef AMIGA
-    char* const cwd = eStrdup (".");
+    const char* const cwd = eStrdup (".");
 #else
-    char* const cwd = getcwd (NULL, PATH_MAX);
+    const char* const cwd = getcwd (NULL, PATH_MAX);
 #endif
     CurrentDirectory = xMalloc (strlen (cwd) + 2, char);
     if (cwd [strlen (cwd) - (size_t) 1] == PATH_SEPARATOR)

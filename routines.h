@@ -24,6 +24,25 @@
 #define xRealloc(p,n,Type) (Type *)eRealloc((p), (n) * sizeof (Type))
 
 /*
+ *  Portability macros
+ */
+#ifndef PATH_SEPARATOR
+# if defined (MSDOS_STYLE_PATH)
+#  define PATH_SEPARATOR '\\'
+# elif defined (QDOS)
+#  define PATH_SEPARATOR '_'
+# else
+#  define PATH_SEPARATOR '/'
+# endif
+#endif
+
+#if defined (MSDOS_STYLE_PATH) && defined (UNIX_PATH_SEPARATOR)
+# define OUTPUT_PATH_SEPARATOR	'/'
+#else
+# define OUTPUT_PATH_SEPARATOR	PATH_SEPARATOR
+#endif
+
+/*
 *   DATA DECLARATIONS
 */
 extern char *CurrentDirectory;

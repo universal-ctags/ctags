@@ -15,11 +15,6 @@
 *   INCLUDE FILES
 */
 #include "general.h"	/* must always come first */
-
-#ifdef HAVE_SYS_TYPES_H
-# include <sys/types.h>	/* to declare off_t */
-#endif
-
 #include "parsers.h"	/* contains list of parsers */
 #include "strlist.h"
 
@@ -70,7 +65,7 @@ typedef struct {
 typedef parserDefinition* (parserDefinitionFunc) (void);
 
 typedef struct {
-    off_t start;	/* character index in line where match starts */
+    size_t start;	/* character index in line where match starts */
     size_t length;	/* length of match */
 } regexMatch;
 
