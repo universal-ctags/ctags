@@ -118,6 +118,7 @@ extern int fgetpos  (FILE *stream, fpos_t *pos);
 extern int fsetpos  (FILE *stream, fpos_t *pos);
 #endif
 extern const char *baseFilename (const char *const filePath);
+extern const char *fileExtension (const char *const fileName);
 extern boolean isAbsolutePath (const char *const path);
 extern char* absoluteFilename (const char *file);
 extern char* absoluteDirname (char *file);

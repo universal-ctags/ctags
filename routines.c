@@ -542,6 +542,25 @@ extern const char *baseFilename (const char *const filePath)
     return tail;
 }
 
+extern const char *fileExtension (const char *const fileName)
+{
+    const char *extension;
+    const char *pDelimiter = NULL;
+    const char *const base = baseFilename (fileName);
+#ifdef QDOS
+    pDelimiter = strrchr (base, '_');
+#endif
+    if (pDelimiter == NULL)
+        pDelimiter = strrchr (base, '.');
+
+    if (pDelimiter == NULL)
+	extension = "";
+    else
+	extension = pDelimiter + 1;	/* skip to first char of extension */
+
+    return extension;
+}
+
 extern boolean isAbsolutePath (const char *const path)
 {
     boolean result = FALSE;

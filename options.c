@@ -673,24 +673,6 @@ static void addExtensionList (stringList *const slist,
     eFree (extensionList);
 }
 
-extern const char *fileExtension (const char *const fileName)
-{
-    const char *extension;
-    const char *pDelimiter = NULL;
-#ifdef QDOS
-    pDelimiter = strrchr (fileName, '_');
-#endif
-    if (pDelimiter == NULL)
-        pDelimiter = strrchr (fileName, '.');
-
-    if (pDelimiter == NULL)
-	extension = "";
-    else
-	extension = pDelimiter + 1;	/* skip to first char of extension */
-
-    return extension;
-}
-
 static boolean isFalse (const char *parameter)
 {
     return (boolean) (
