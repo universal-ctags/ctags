@@ -711,12 +711,12 @@ static tagResult findNext (tagFile *const file, tagEntry *const entry)
 *  EXTERNAL INTERFACE
 */
 
-extern tagFile *tagsOpen (const char *filePath, tagFileInfo *info)
+extern tagFile *tagsOpen (const char *const filePath, tagFileInfo *const info)
 {
     return initialize (filePath, info);
 }
 
-extern tagResult tagsSetSortType (tagFile *file, sortType type)
+extern tagResult tagsSetSortType (tagFile *const file, const sortType type)
 {
     tagResult result = TagFailure;
     if (file != NULL  &&  file->initialized)
@@ -771,7 +771,7 @@ extern tagResult tagsFindNext (tagFile *const file, tagEntry *const entry)
     return result;
 }
 
-extern tagResult tagsClose (tagFile *file)
+extern tagResult tagsClose (tagFile *const file)
 {
     tagResult result = TagFailure;
     if (file != NULL  &&  file->initialized)

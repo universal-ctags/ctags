@@ -166,7 +166,7 @@ extern tagFile *tagsOpen (const char *filePath, tagFileInfo *info);
 *  it actually is not. The function will return TagSuccess if called on an
 *  open tag file or TagFailure if not.
 */
-extern tagResult tagsSetSortType (tagFile *file, sortType type);
+extern tagResult tagsSetSortType (tagFile *const file, const sortType type);
 
 /*
 *  Reads the first tag in the file, if any. It is passed the handle to an
@@ -175,7 +175,7 @@ extern tagResult tagsSetSortType (tagFile *file, sortType type);
 *  The function will return TagSuccess another tag entry is found, or
 *  TagFailure if not (i.e. it reached end of file).
 */
-extern tagResult tagsFirst (tagFile *file, tagEntry *entry);
+extern tagResult tagsFirst (tagFile *const file, tagEntry *const entry);
 
 /*
 *  Step to the next tag in the file, if any. It is passed the handle to an
@@ -185,7 +185,7 @@ extern tagResult tagsFirst (tagFile *file, tagEntry *entry);
 *  if not (i.e. it reached end of file). It will always read the first tag in
 *  the file immediately after calling tagsOpen().
 */
-extern tagResult tagsNext (tagFile *file, tagEntry *entry);
+extern tagResult tagsNext (tagFile *const file, tagEntry *const entry);
 
 /*
 *  Retrieve the value associated with the extension field for a specified key.
@@ -194,7 +194,7 @@ extern tagResult tagsNext (tagFile *file, tagEntry *entry);
 *  containing the key of the desired extension field. If no such field of the
 *  specified key exists, the function will return null.
 */
-extern const char *tagsField (const tagEntry *entry, const char *key);
+extern const char *tagsField (const tagEntry *const entry, const char *const key);
 
 /*
 *  Find the first tag matching `name'. The structure pointed to by `entry'
@@ -221,7 +221,7 @@ extern const char *tagsField (const tagEntry *entry, const char *key);
 *  The function will return TagSuccess if a tag matching the name is found, or
 *  TagFailure if not.
 */
-extern tagResult tagsFind (tagFile *file, tagEntry *entry, const char *name, int options);
+extern tagResult tagsFind (tagFile *const file, tagEntry *const entry, const char *const name, const int options);
 
 /*
 *  Find the next tag matching the name and options supplied to the most recent
@@ -230,14 +230,14 @@ extern tagResult tagsFind (tagFile *file, tagEntry *entry, const char *name, int
 *  function will return TagSuccess if another tag matching the name is found,
 *  or TagFailure if not.
 */
-extern tagResult tagsFindNext (tagFile *file, tagEntry *entry);
+extern tagResult tagsFindNext (tagFile *const file, tagEntry *const entry);
 
 /*
 *  Call tagsTerminate() at completion of reading the tag file, which will
 *  close the file and free any internal memory allocated. The function will
 *  return TagFailure is no file is currently open, TagSuccess otherwise.
 */
-extern tagResult tagsClose (tagFile *file);
+extern tagResult tagsClose (tagFile *const file);
 
 #endif
 
