@@ -260,7 +260,7 @@ extern void addLanguagePatternMap (const langType language, const char* ptrn)
     stringListAdd (LanguageTable [language]->currentPatterns, str);
 }
 
-extern boolean removeLanaguageExtensionMap (const char *const extension)
+extern boolean removeLanguageExtensionMap (const char *const extension)
 {
     boolean result = FALSE;
     unsigned int i;
@@ -268,7 +268,10 @@ extern boolean removeLanaguageExtensionMap (const char *const extension)
     {
 	stringList* const exts = LanguageTable [i]->currentExtensions;
 	if (exts != NULL  &&  stringListRemoveExtension (exts, extension))
+	{
+	    verbose (" (removed from %s)", getLanguageName (i));
 	    result = TRUE;
+	}
     }
     return result;
 }
@@ -278,6 +281,7 @@ extern void addLanguageExtensionMap (
 {
     vString* const str = vStringNewInit (extension);
     Assert (0 <= language  &&  language < (int) LanguageCount);
+    removeLanguageExtensionMap (extension);
     stringListAdd (LanguageTable [language]->currentExtensions, str);
 }
 
@@ -526,12 +530,14 @@ static void printMaps (const langType language)
     Assert (0 <= language  &&  language < (int) LanguageCount);
     lang = LanguageTable [language];
     printf ("%-8s", lang->name);
-    if (lang->extensions != NULL)
-	for (i = 0  ;  lang->extensions [i] != NULL  ;  ++i)
-	    printf (" *.%s", lang->extensions [i]);
-    if (lang->patterns != NULL)
-	for (i = 0  ;  lang->patterns [i] != NULL  ;  ++i)
-	    printf (" %s", lang->patterns [i]);
+    if (lang->currentExtensions != NULL)
+	for (i = 0  ;  i < stringListCount (lang->currentExtensions)  ;  ++i)
+	    printf (" *.%s", vStringValue (
+			stringListItem (lang->currentExtensions, i)));
+    if (lang->currentPatterns != NULL)
+	for (i = 0  ;  i < stringListCount (lang->currentPatterns)  ;  ++i)
+	    printf (" %s", vStringValue (
+			stringListItem (lang->currentPatterns, i)));
     putchar ('\n');
 }
 

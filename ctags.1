@@ -564,7 +564,8 @@ expanded by the shell before being passed to \fBctags\fP). You can determine
 if shell wildcards are available on your platform by examining the output of
 the \fB--version\fP option, which will include "+wildcards" in the compiled
 feature list; otherwise, the file name patterns are matched against file names
-using a simple textual comparison.
+using a simple textual comparison. When mapping a file extension, it will
+first be unmapped from any other languages.
 
 If the first character in a map is a plus sign, then the extensions and file
 name patterns in that map will be appended to the current map for that

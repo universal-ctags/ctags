@@ -1,6 +1,7 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.5 (Mon July 12 2004)
+ctags-5.5.5 (Sun Aug 15 2004)
+* Changed --langmap to first unmap each supplied extension from other languages.
 * Added support for ASP constants [ASP, Patch #961842].
 * Fixed creation of TAGS file with etags-include but no files [Bug #941233].
 * Fixed problem reading last line of list file (-L) without final newline.

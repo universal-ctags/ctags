@@ -48,8 +48,8 @@ typedef struct {
     char* name;				/* name of language */
     kindOption* kinds;			/* tag kinds handled by parser */
     unsigned int kindCount;		/* size of `kinds' list */
-    const char* const* extensions;	/* list of default extensions */
-    const char* const* patterns;	/* list of default file name patterns */
+    const char *const *extensions;	/* list of default extensions */
+    const char *const *patterns;	/* list of default file name patterns */
     parserInitialize initialize;	/* initialization routine, if needed */
     simpleParser parser;		/* simple parser (common case) */
     rescanParser parser2;		/* rescanning parser (unusual case) */
@@ -93,7 +93,7 @@ extern langType getFileLanguage (const char *const fileName);
 extern void installLanguageMapDefault (const langType language);
 extern void installLanguageMapDefaults (void);
 extern void clearLanguageMap (const langType language);
-extern boolean removeLanaguageExtensionMap (const char *const extension);
+extern boolean removeLanguageExtensionMap (const char *const extension);
 extern void addLanguageExtensionMap (const langType language, const char* extension);
 extern void addLanguagePatternMap (const langType language, const char* ptrn);
 extern void printLanguageMap (const langType language);

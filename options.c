@@ -669,6 +669,7 @@ static void addExtensionList (stringList *const slist,
     {
 	printf ("\n      now: ");
 	stringListPrint (slist);
+	putchar ('\n');
     }
     eFree (extensionList);
 }
@@ -1212,6 +1213,7 @@ static void installHeaderListDefaults (void)
     {
 	printf ("    Setting default header extensions: ");
 	stringListPrint (Option.headerExt);
+	putchar ('\n');
     }
 }
 

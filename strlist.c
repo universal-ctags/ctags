@@ -202,7 +202,7 @@ extern boolean stringListHasTest (
 }
 
 extern boolean stringListRemoveExtension (
-	const stringList* const current, const char* const extension)
+	stringList* const current, const char* const extension)
 {
     boolean result = FALSE;
     int where;
@@ -214,8 +214,9 @@ extern boolean stringListRemoveExtension (
     if (where != -1)
     {
 	memmove (current->list + where, current->list + where + 1,
-		current->count - where);
+		(current->count - where) * sizeof (*current->list));
 	current->list [current->count - 1] = NULL;
+	--current->count;
 	result = TRUE;
     }
     return result;
@@ -260,7 +261,6 @@ extern void stringListPrint (const stringList *const current)
     Assert (current != NULL);
     for (i = 0  ;  i < current->count  ;  ++i)
 	printf ("%s%s", (i > 0) ? ", " : "", vStringValue (current->list [i]));
-    putchar ('\n');
 }
 
 /* vi:set tabstop=8 shiftwidth=4: */
