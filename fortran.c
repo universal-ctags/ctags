@@ -1435,7 +1435,8 @@ static void parseBlockData (tokenInfo *const token)
     if (isKeyword (token, KEYWORD_data))
     {
 	readToken (token);
-	makeFortranTag (token, TAG_BLOCK_DATA);
+	if (isType (token, TOKEN_IDENTIFIER))
+	    makeFortranTag (token, TAG_BLOCK_DATA);
     }
     ancestorPush (token);
     skipToNextStatement (token);

@@ -1,7 +1,8 @@
 Current Version: @@VERSION@@
 
-ctags-5.3.1 (Sun Jul 21 2002)
+ctags-5.3.1 (Thu Aug 22 2002)
 * Fixed incorrect tag kinds [Verilog].
+* Fixed null tags for unnamed BLOCK DATA statements [Fortran].
 
 ctags-5.3 (Wed Jul 17 2002)
 * Allowed --etags-include option without input files.
