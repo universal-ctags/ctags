@@ -44,7 +44,7 @@
 
 /*  The following separators are permitted for list options.
  */
-#define EXTENSION_SEPARATOR ','
+#define EXTENSION_SEPARATOR '.'
 #define PATTERN_START '('
 #define PATTERN_STOP  ')'
 #define IGNORE_SEPARATORS   ", \t\n"
@@ -699,8 +699,9 @@ static boolean isTrue (const char *parameter)
 extern boolean isIncludeFile (const char *const fileName)
 {
     boolean result = FALSE;
+    const char *const extension = fileExtension (fileName);
     if (Option.headerExt != NULL)
-	result = stringListExtensionMatched (Option.headerExt, fileName);
+	result = stringListExtensionMatched (Option.headerExt, extension);
     return result;
 }
 
