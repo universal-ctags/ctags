@@ -27,7 +27,6 @@
 */
 #define TAB '\t'
 
-#define nameComparison(nm)  (strcmp ((nm), file->name.buffer))
 
 /*
 *   DATA DECLARATIONS
@@ -62,12 +61,19 @@ struct sTagFile {
     vstring line;
 	/* name of tag in last line read */
     vstring name;
+	/* defines tag search state */
     struct {
 		/* file position of last match for tag */
 	    off_t pos; 
 		/* name of tag last searched for */
 	    const char *name;
-    } find;
+		/* length of name for partial matches */
+	    size_t nameLength;
+		/* peforming partial match */
+	    short partial;
+		/* ignoring case */
+	    short ignorecase;
+    } search;
 	/* miscellaneous extension fields */
     struct {
 		/* number of entries in `list' */
@@ -120,6 +126,7 @@ static int growString (vstring *s)
     return result;
 }
 
+/* Copy name of tag out of tag line */
 static void copyName (tagFile *const file)
 {
     size_t length;
@@ -486,7 +493,53 @@ static int readTagLineSeek (tagFile *const file, const off_t pos)
     return result;
 }
 
-static void findFirstNonMatchBefore (tagFile *const file, const char *const name)
+#ifndef HAVE_STRICMP
+static int stricmp (const char *s1, const char *s2)
+{
+    int result;
+    do
+    {
+	result = toupper ((int) *s1) - toupper ((int) *s2);
+    } while (result == 0  &&  *s1++ != '\0'  &&  *s2++ != '\0');
+    return result;
+}
+#endif
+
+#ifndef HAVE_STRNICMP
+static int strnicmp (const char *s1, const char *s2, size_t n)
+{
+    int result;
+    do
+    {
+	result = toupper ((int) *s1) - toupper ((int) *s2);
+    } while (result == 0  &&  --n > 0  &&  *s1++ != '\0'  &&  *s2++ != '\0');
+    return result;
+}
+#endif
+
+static int nameComparison (tagFile *const file)
+{
+    int result;
+    if (file->search.ignorecase)
+    {
+	if (file->search.partial)
+	    result = strnicmp (file->search.name, file->name.buffer,
+			       file->search.nameLength);
+	else
+	    result = stricmp (file->search.name, file->name.buffer);
+    }
+    else
+    {
+	if (file->search.partial)
+	    result = strncmp (file->search.name, file->name.buffer,
+			      file->search.nameLength);
+	else
+	    result = strcmp (file->search.name, file->name.buffer);
+    }
+    return result;
+}
+
+static void findFirstNonMatchBefore (tagFile *const file)
 {
 #define JUMP_BACK 512
     int more_lines;
@@ -500,26 +553,26 @@ static void findFirstNonMatchBefore (tagFile *const file, const char *const name
 	else
 	    pos = pos - JUMP_BACK;
 	more_lines = readTagLineSeek (file, pos);
-	comp = nameComparison (name);
+	comp = nameComparison (file);
     } while (more_lines  &&  comp == 0  &&  pos > 0  &&  pos < start);
 }
 
-static tagResult findFirstMatchBefore (tagFile *const file, const char *const name)
+static tagResult findFirstMatchBefore (tagFile *const file)
 {
     tagResult result = TagFailure;
     int more_lines;
     off_t start = file->pos;
-    findFirstNonMatchBefore (file, name);
+    findFirstNonMatchBefore (file);
     do
     {
 	more_lines = readTagLine (file);
-	if (nameComparison (name) == 0)
+	if (nameComparison (file) == 0)
 	    result = TagSuccess;
     } while (more_lines  &&  result != TagSuccess  &&  file->pos < start);
     return result;
 }
 
-static tagResult findBinary (tagFile *const file, const char *const name)
+static tagResult findBinary (tagFile *const file)
 {
     tagResult result = TagFailure;
     off_t lower_limit = 0;
@@ -531,7 +584,7 @@ static tagResult findBinary (tagFile *const file, const char *const name)
 	if (! readTagLineSeek (file, pos))
 	{
 	    /* in case we fell off end of file */
-	    result = findFirstMatchBefore (file, name);
+	    result = findFirstMatchBefore (file);
 	    break;
 	}
 	else if (pos == last_pos)
@@ -541,7 +594,7 @@ static tagResult findBinary (tagFile *const file, const char *const name)
 	}
 	else
 	{
-	    const int comp = nameComparison (name);
+	    const int comp = nameComparison (file);
 	    last_pos = pos;
 	    if (comp < 0)
 	    {
@@ -556,20 +609,20 @@ static tagResult findBinary (tagFile *const file, const char *const name)
 	    else if (pos == 0)
 		result = TagSuccess;
 	    else
-		result = findFirstMatchBefore (file, name);
+		result = findFirstMatchBefore (file);
 	}
     }
     return result;
 }
 
-static tagResult findSequential (tagFile *const file, const char *const name)
+static tagResult findSequential (tagFile *const file)
 {
     tagResult result = TagFailure;
     if (file->initialized)
     {
 	while (result == TagFailure  &&  readTagLine (file))
 	{
-	    if (nameComparison (name) == 0)
+	    if (nameComparison (file) == 0)
 		result = TagSuccess;
 	}
     }
@@ -577,23 +630,26 @@ static tagResult findSequential (tagFile *const file, const char *const name)
 }
 
 static tagResult find (tagFile *const file, tagEntry *const entry,
-		       const char *const name)
+		       const char *const name, const int options)
 {
     tagResult result = TagFailure;
-    file->find.name = name;
+    file->search.name = name;
+    file->search.nameLength = strlen (name);
+    file->search.partial = (options & TAG_PARTIALMATCH) != 0;
+    file->search.ignorecase = (options & TAG_IGNORECASE) != 0;
     fseek (file->fp, 0, SEEK_END);
     file->size = ftell (file->fp);
     rewind (file->fp);
-    if (file->sorted)
-	result = findBinary (file, name);
+    if (file->sorted && ! file->search.ignorecase)
+	result = findBinary (file);
     else
-	result = findSequential (file, name);
+	result = findSequential (file);
 
     if (result != TagSuccess)
-	file->find.pos = file->size;
+	file->search.pos = file->size;
     else
     {
-	file->find.pos = file->pos;
+	file->search.pos = file->pos;
 	if (entry != NULL)
 	    parseTagLine (file, entry);
     }
@@ -603,15 +659,15 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 static tagResult findNext (tagFile *const file, tagEntry *const entry)
 {
     tagResult result = TagFailure;
-    if (file->sorted)
+    if (file->sorted && ! file->search.ignorecase)
     {
 	result = tagsNext (file, entry);
-	if (result == TagSuccess  && nameComparison (file->find.name) != 0)
+	if (result == TagSuccess  && nameComparison (file) != 0)
 	    result = TagFailure;
     }
     else
     {
-	result = findSequential (file, file->find.name);
+	result = findSequential (file);
 	if (result == TagSuccess  &&  entry != NULL)
 	    parseTagLine (file, entry);
     }
@@ -625,6 +681,17 @@ static tagResult findNext (tagFile *const file, tagEntry *const entry)
 extern tagFile *tagsOpen (const char *filePath, tagFileInfo *info)
 {
     return initialize (filePath, info);
+}
+
+extern tagResult tagsSetSorted (tagFile *file, int sorted)
+{
+    tagResult result = TagFailure;
+    if (file != NULL  &&  file->initialized)
+    {
+	file->sorted = sorted;
+	result = TagSuccess;
+    }
+    return result;
 }
 
 extern tagResult tagsNext (tagFile *const file, tagEntry *const entry)
@@ -644,11 +711,11 @@ extern const char *tagsField (const tagEntry *const entry, const char *const key
 }
 
 extern tagResult tagsFind (tagFile *const file, tagEntry *const entry,
-			   const char *const name)
+			   const char *const name, const int options)
 {
     tagResult result = TagFailure;
     if (file != NULL  &&  file->initialized)
-	result = find (file, entry, name);
+	result = find (file, entry, name, options);
     return result;
 }
 
@@ -677,24 +744,37 @@ extern tagResult tagsClose (tagFile *file)
 
 #ifdef READTAGS_MAIN
 
+static int extensionFields = 0;
+
 static void printTag (const tagEntry *entry)
 {
     int i;
+    boolean first = TRUE;
+    const char* separator = ";\"";
+    const char* const empty = "";
+/* "sep" returns a value only the first time it is evaluated */
+#define sep (first ? (first = FALSE, separator) : empty)
     printf ("%s\t%s\t%s",
 	entry->name, entry->file, entry->address.pattern);
-    if (entry->kind != NULL  &&  entry->kind [0] != '\0')
-	printf ("\tkind:%s", entry->kind);
-    if (entry->fileScope)
-	printf ("\tfile:");
-    if (entry->address.lineNumber > 0)
-	printf ("\tline:%lu", entry->address.lineNumber);
-    for (i = 0  ;  i < entry->fields.count  ;  ++i)
-	printf ("\t%s:%s", entry->fields.list [i].key,
-	    entry->fields.list [i].value);
+    if (extensionFields)
+    {
+	if (entry->kind != NULL  &&  entry->kind [0] != '\0')
+	    printf ("%s\tkind:%s", sep, entry->kind);
+	if (entry->fileScope)
+	    printf ("%s\tfile:", sep);
+#if 0
+	if (entry->address.lineNumber > 0)
+	    printf ("%s\tline:%lu", sep, entry->address.lineNumber);
+#endif
+	for (i = 0  ;  i < entry->fields.count  ;  ++i)
+	    printf ("%s\t%s:%s", sep, entry->fields.list [i].key,
+		entry->fields.list [i].value);
+    }
     putchar ('\n');
+#undef sep
 }
 
-static void findTag (const char *const name)
+static void findTag (const char *const name, const int options)
 {
     tagFileInfo info;
     tagEntry entry;
@@ -703,7 +783,7 @@ static void findTag (const char *const name)
 	perror ("Cannot open tag file");
     else
     {
-	if (tagsFind (file, &entry, name) == TagSuccess)
+	if (tagsFind (file, &entry, name, options) == TagSuccess)
 	{
 	    do
 	    {
@@ -730,15 +810,19 @@ static void listTags (void)
 }
 
 const char *const Usage =
-    "Usage: %s [-f name(s)] [-l] [-t file]\n"
-    "    -f name(s)   Find tags matching specified names.\n"
+    "Usage: %s [-ilp] [-t file] [name(s)]\n"
+    "    -e           Include extension fields in output.\n"
+    "    -i           Perform case-insenstive matching.\n"
     "    -l           List all tags.\n"
+    "    -p           Perform partial matching.\n"
     "    -t file      Use specified tag file (default: \"tags\").\n"
+    "  Find tags matching specified names.\n"
     "  Note that options are acted upon as encountered, so order is significant.\n";
 
 extern int main (int argc, char **argv)
 {
     int i;
+    int options = 0;
     if (argc == 1)
     {
 	fprintf (stderr, Usage, argv [0]);
@@ -746,32 +830,29 @@ extern int main (int argc, char **argv)
     }
     for (i = 1  ;  i < argc  ;  ++i)
     {
-	if (*argv [i] == '-')
+	const char *const arg = argv [i];
+	if (arg [0] == '-')
 	{
-	    const int arg = argv [i][1];
-	    switch (arg)
+	    int j;
+	    for (j = 1  ;  arg[j] != '\0'  ;  ++j)
 	    {
-		case 'f':
+		switch (arg[j])
 		{
-		    int j;
-		    for (j = i + 1  ;  j < argc  ;  ++j)
-			findTag (argv [j]);
-		    break;
+		    case 'e': extensionFields = 1;         break;
+		    case 'i': options |= TAG_IGNORECASE;   break;
+		    case 'p': options |= TAG_PARTIALMATCH; break;
+		    case 'l': listTags ();                 break;
+		    case 't': TagFileName = argv [++i];    break;
+		    default:
+			fprintf (stderr, "%s: unknown option: %c\n",
+				    argv[0], arg[j]);
+			exit (1);
+			break;
 		}
-		case 'l':
-		    listTags ();
-		    break;
-		case 't':
-		    ++i;
-		    TagFileName = argv [i];
-		    break;
-		default:
-		    fprintf (stderr, "%s: unknown option: %s\n",
-				argv[0], argv[i]);
-		    exit (1);
-		    break;
 	    }
 	}
+	else
+	    findTag (arg, options);
     }
     return 0;
 }

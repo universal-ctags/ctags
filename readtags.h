@@ -5,8 +5,28 @@
 *
 *   This source code is released for the public domain.
 *
-*   This module defines the public interface for reading tag files.
+*   This file defines the public interface for looking up tag entries in tag
+*   files.
+*
+*   The functions defined in this interface are intended to provide tag file
+*   support to a software tool. The tag lookups provided are sufficiently fast
+*   enough to permit opening a sorted tag file, searching for a matching tag,
+*   then closing the tag file each time a tag is looked up (search times are
+*   on the order of milliseconds, even for huge tag files). This is the
+*   recommended use of this library for most tool applications. Adhering to
+*   this approach permits a user to regenerate a tag file at will without the
+*   tool needing to detect and resynchronize with changes to the tag file.
 */
+
+/*
+*  MACROS
+*/
+
+/* Options for tagFind() */
+#define TAG_FULLMATCH     0x0
+#define TAG_PARTIALMATCH  0x1
+#define TAG_OBSERVECASE   0x0
+#define TAG_IGNORECASE    0x2
 
 /*
 *  DATA DECLARATIONS
@@ -48,8 +68,9 @@ typedef struct {
 
 } tagFileInfo;
 
-/* This structure contains information about an extension field for a tag. */
-/* These exist at the end of the tag in the form "key:value"). */
+/* This structure contains information about an extension field for a tag.
+ * These exist at the end of the tag in the form "key:value").
+ */
 typedef struct {
 
 	    /* the key of the extension field */
@@ -112,6 +133,20 @@ typedef struct {
 extern tagFile *tagsOpen (const char *filePath, tagFileInfo *info);
 
 /*
+*  This function allows the client to override the normal automatic detection
+*  of whether a tag file is sorted or not. Tag files in the new extended
+*  format contain a key indicating whether or not they are sorted. However,
+*  tag files in the original format do not contain such a key even when
+*  sorted, preventing this library from taking advantage of fast binary
+*  lookups. If the client knows that such an unmarked tag file is indeed
+*  sorted (or not), it can override the automatic detection. Note that
+*  incorrect lookup results will result if a tag file is marked as sorted
+*  when it actually is not. The function will return TagSuccess if called on
+*  an open tag file or TagFailure if not.
+*/
+extern tagResult tagsSetSorted (tagFile *file, int sorted);
+
+/*
 *  Step sequentially through each line of the tag file. It is passed the
 *  handle to an opened tag file and a pointer to a structure which will be
 *  populated with information about the next tag file entry, which may be
@@ -130,18 +165,31 @@ extern tagResult tagsNext (tagFile *file, tagEntry *entry);
 extern const char *tagsField (const tagEntry *entry, const char *key);
 
 /*
-*  Find the first tag associated with `name'. The structure pointed to by
-*  `entry' will be populated with information about the tag file entry. The
-*  function will return TagSuccess if a tag matching the name is found, or
+*  Find the first tag matching `name'. The structure pointed to by `entry'
+*  will be populated with information about the tag file entry. If a tag file
+*  is sorted using the C locale, a binary search algorithm is used to search
+*  the tag file, resulting in very fast tag lookups, even in huge tag files.
+*  Various options controlling the matches can be combined by bit-wise or-ing
+*  certain values together. The available values are:
+*
+*    TAG_PARTIALMATCH
+*        Tags whose leading characters match `name' will qualify.
+*
+*    TAG_IGNORECASE
+*        Matching will be performed in a case-insenstive manner. Note that
+*        this disables binary searches of the tag file.
+*
+*  The function will return TagSuccess if a tag matching the name is found, or
 *  TagFailure if not.
 */
-extern tagResult tagsFind (tagFile *file, tagEntry *entry, const char *name);
+extern tagResult tagsFind (tagFile *file, tagEntry *entry, const char *name, int options);
 
 /*
-*  Find the next tag matching the name last found by tagsFind(). The structure
-*  pointed to by `entry' will be populated with information about the tag file
-*  entry. The function will return TagSuccess if another tag matching the name
-*  is found, or TagFailure if not.
+*  Find the next tag matching the name and options supplied to the most recent
+*  call to tagsFind() for the same tag file. The structure pointed to by
+*  `entry' will be populated with information about the tag file entry. The
+*  function will return TagSuccess if another tag matching the name is found,
+*  or TagFailure if not.
 */
 extern tagResult tagsFindNext (tagFile *file, tagEntry *entry);
 

@@ -4,7 +4,7 @@ ctags-5.1.1 (Sun Dec 16 2001)
 * Portabilitiy fixes [HP-UX, VMS, OS/2].
 * Made code compilable by a C++ compiler.
 * Changed reading of option files to ignore blank lines.
-* Changed interface to readtags library (readtags.h).
+* Changed and enhanced interface to readtags library (see readtags.h).
 * Added instructions on using tags with NEdit to man page.
 * Fixed regex tag problem which left newlines in back-references.
 * Fixed missing class-qualified tags [Eiffel].
