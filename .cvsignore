@@ -4,6 +4,7 @@ config.status
 config.cache
 config.log
 config.h
+autom4te.cache
 *.o
 *.od
 ctags
