@@ -797,10 +797,10 @@ static void readToken (tokenInfo *const token)
     vStringClear (token->string);
 
 getNextChar:
+    c = getChar ();
+
     token->lineNumber	= getSourceLineNumber ();
     token->filePosition	= getInputFilePosition ();
-
-    c = getChar ();
 
     switch (c)
     {
