@@ -105,38 +105,58 @@ static boolean readPreProc (const unsigned char *const line)
     return result;
 }
 
+static AsmKind operatorKind (
+	const vString *const operator,
+	boolean *const found)
+{
+    AsmKind result = K_NONE;
+    *found = FALSE;
+    if (vStringLength (operator) > 0)
+    {
+	unsigned int i;
+	for (i = 0  ;  i < OpTypeCount && !*found  ;  ++i)
+	{
+	    if (strcasecmp (vStringValue (operator), OpTypes [i].operator) == 0)
+	    {
+		if (OpTypes [i].kind != K_NONE)
+		    result = OpTypes [i].kind;
+		*found = TRUE;
+	    }
+	}
+    }
+    return result;
+}
+
+static boolean isDefineOperator (const vString *const operator)
+{
+    const unsigned char *const op =
+	(unsigned char*) vStringValue (operator); 
+    const size_t length = vStringLength (operator);
+    const boolean result = (boolean) (toupper ((int) *op) == 'D'  &&
+	(length == 2 ||
+	 (length > 2 && strchr (". \t", (int) op [2]) != NULL)));
+    return result;
+}
+
 static void makeAsmTag (
 	const vString *const name,
 	const vString *const operator,
 	const boolean initialSymbol,
 	const boolean hasColon)
 {
-    unsigned int i;
     if (vStringLength (name) > 0)
     {
-	boolean found = FALSE;
-	if (vStringLength (operator) > 0)
+	boolean found;
+	const AsmKind kind = operatorKind (operator, &found);
+	if (found)
 	{
-	    for (i = 0  ;  i < OpTypeCount && !found  ;  ++i)
-	    {
-		if (strcasecmp (
-		    vStringValue (operator), OpTypes [i].operator) == 0)
-		{
-		    if (OpTypes [i].kind != K_NONE)
-			makeSimpleTag (name, AsmKinds, OpTypes [i].kind);
-		    found = TRUE;
-		}
-	    }
+	    if (kind != K_NONE)
+		makeSimpleTag (name, AsmKinds, kind);
 	}
-	if (!found && initialSymbol)
+	else if (initialSymbol)
 	{
-	    const unsigned char *const op =
-		(unsigned char*) vStringValue (operator); 
-	    if (toupper ((int) *op) == 'D'  && vStringLength (operator) > 2 &&
-		strchr (". \t", (int) op [2]) != NULL)
-	    {
+	    if (isDefineOperator (operator))
 		makeSimpleTag (name, AsmKinds, K_DEFINE);
-	    }
 	    else if (hasColon)
 		makeSimpleTag (name, AsmKinds, K_LABEL);
 	    else if (vStringLength (operator) > 0)
