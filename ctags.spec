@@ -39,4 +39,4 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(0644,root,root,0755)
 %doc COPYING EXTENDING.html FAQ NEWS README ctags.html
 %attr(0755,root,root) /usr/bin/ctags
-/usr/man/man1/ctags.1.gz
+/usr/share/man/man1/ctags.1.gz
