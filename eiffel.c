@@ -227,23 +227,23 @@ static void buildEiffelKeywordHash (void)
 
 static void addGenericName (tokenInfo *const token)
 {
+    vStringUpper (token->string);
     if (vStringLength (token->string) > 0)
 	stringListAdd (GenericNames, vStringNewCopy (token->string));
 }
 
 static boolean isGeneric (tokenInfo *const token)
 {
-    return (boolean) stringListHasInsensitive (
-	GenericNames, vStringValue (token->string));
+    return (boolean) stringListHas (GenericNames, vStringValue (token->string));
 }
 
 static void reportType (tokenInfo *const token)
 {
+    vStringUpper (token->string);
     if (vStringLength (token->string) > 0  && ! isGeneric (token)  &&
-	(SelfReferences || strcasecmp (vStringValue (
+	(SelfReferences || strcmp (vStringValue (
 	    token->string), vStringValue (token->className)) != 0) &&
-	! stringListHasInsensitive (
-	    ReferencedTypes, vStringValue (token->string)))
+	! stringListHas (ReferencedTypes, vStringValue (token->string)))
     {
 	printf ("%s\n", vStringValue (token->string));
 	stringListAdd (ReferencedTypes, vStringNewCopy (token->string));
@@ -867,7 +867,6 @@ static void parseLocal (tokenInfo *const token)
 #ifndef TYPE_REFERENCE_TOOL
 	if (isType (token, TOKEN_IDENTIFIER))
 	    makeEiffelLocalTag (token);
-
 #endif
 	readToken (token);
 	if (isType (token, TOKEN_COLON))
@@ -909,8 +908,6 @@ static void findFeatureEnd (tokenInfo *const token)
 		    readToken (token);
 		    if (isType (token, TOKEN_IDENTIFIER))
 			parseType (token);
-		    if (isType (token, TOKEN_CLOSE_BRACE))
-			readToken (token);
 		}
 		else if (isType (token, TOKEN_BANG))
 		{
@@ -1149,6 +1146,7 @@ static void parseClass (tokenInfo *const token)
 	readToken (token);
 #else
 	vStringCopy (token->className, token->string);
+	vStringUpper (token->className);
 	if (PrintClass)
 	    puts (vStringValue (token->className));
 	if (! PrintReferences)
@@ -1258,7 +1256,7 @@ static const char *const Usage =
     "    -s    Include self-references.\n"
     "\n";
 
-extern main (int argc, char** argv)
+extern int main (int argc, char** argv)
 {
     int i;
     for (i = 1  ;  argv [i] != NULL  ;  ++i)
@@ -1308,8 +1306,12 @@ extern main (int argc, char** argv)
 	fprintf (errout, Usage, argv [0]);
 	exit (1);
     }
-
-    findReferences ();
+    else
+    {
+	findReferences ();
+	fclose (File);
+    }
+    return 0;
 }
 
 #endif
