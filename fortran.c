@@ -205,7 +205,7 @@ static kindOption FortranKinds [] = {
     { TRUE,  'c', "common",     "common blocks"},
     { TRUE,  'e', "entry",      "entry points"},
     { TRUE,  'f', "function",   "functions"},
-    { FALSE, 'i', "interface",  "interfaces"},
+    { FALSE, 'i', "interface",  "interface contents, generic names, and operators"},
     { TRUE,  'k', "component",  "type and structure components"},
     { TRUE,  'l', "label",      "labels"},
     { FALSE, 'L', "local",      "local, common block, and namelist variables"},
@@ -351,6 +351,20 @@ static void ancestorPop (void)
     Ancestors.list [Ancestors.count].lineNumber = 0L;
 }
 
+static const tokenInfo* ancestorScope (void)
+{
+    tokenInfo *result = NULL;
+    unsigned int i;
+    for (i = Ancestors.count  ;  i > 0  &&  result == NULL ;  --i)
+    {
+	tokenInfo *const token = Ancestors.list + i - 1;
+	if (token->type == TOKEN_IDENTIFIER &&
+	    token->tag != TAG_UNDEFINED  && token->tag != TAG_INTERFACE)
+	    result = token;
+    }
+    return result;
+}
+
 static const tokenInfo* ancestorTop (void)
 {
     Assert (Ancestors.count > 0);
@@ -368,6 +382,18 @@ static void ancestorClear (void)
     Ancestors.list = NULL;
     Ancestors.count = 0;
     Ancestors.max = 0;
+}
+
+static boolean insideInterface (void)
+{
+    boolean result = FALSE;
+    unsigned int i;
+    for (i = 0  ;  i < Ancestors.count && !result ;  ++i)
+    {
+	if (Ancestors.list [i].tag == TAG_INTERFACE)
+	    result = TRUE;
+    }
+    return result;
 }
 
 static void buildFortranKeywordHash (void)
@@ -458,14 +484,15 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 
 	if (ancestorCount () > 0)
 	{
-	    const tokenInfo* const parent = ancestorTop ();
-	    if (parent->tag != TAG_UNDEFINED)
+	    const tokenInfo* const scope = ancestorScope ();
+	    if (scope != NULL)
 	    {
-		e.extensionFields.scope [0] = FortranKinds [parent->tag].name;
-		e.extensionFields.scope [1] = vStringValue (parent->string);
+		e.extensionFields.scope [0] = FortranKinds [scope->tag].name;
+		e.extensionFields.scope [1] = vStringValue (scope->string);
 	    }
 	}
-	makeTagEntry (&e);
+	if (! insideInterface () || includeTag (TAG_INTERFACE))
+	    makeTagEntry (&e);
     }
 }
 
@@ -1624,11 +1651,14 @@ static void parseDerivedTypeDef (tokenInfo *const token)
  */
 static void parseInterfaceBlock (tokenInfo *const token)
 {
+    tokenInfo *name = NULL;
     Assert (isKeyword (token, KEYWORD_interface));
-#if 1
     readToken (token);
     if (isType (token, TOKEN_IDENTIFIER))
+    {
 	makeFortranTag (token, TAG_INTERFACE);
+	name = newTokenFrom (token);
+    }
     else if (isKeyword (token, KEYWORD_assignment) ||
 	     isKeyword (token, KEYWORD_operator))
     {
@@ -1636,9 +1666,18 @@ static void parseInterfaceBlock (tokenInfo *const token)
 	if (isType (token, TOKEN_PAREN_OPEN))
 	    readToken (token);
 	if (isType (token, TOKEN_OPERATOR))
+	{
 	    makeFortranTag (token, TAG_INTERFACE);
+	    name = newTokenFrom (token);
+	}
     }
-    ancestorPush (token);
+    if (name == NULL)
+    {
+	name = newToken ();
+	name->type = TOKEN_IDENTIFIER;
+	name->tag = TAG_INTERFACE;
+    }
+    ancestorPush (name);
     while (! isKeyword (token, KEYWORD_end))
     {
 	switch (token->keyword)
@@ -1660,17 +1699,7 @@ static void parseInterfaceBlock (tokenInfo *const token)
     Assert (isSecondaryKeyword (token, KEYWORD_interface));
     skipToNextStatement (token);
     ancestorPop ();
-#else
-    do
-    {
-	do
-	    skipToNextStatement (token);
-	while (! isKeyword (token, KEYWORD_end));
-	readSubToken (token);
-    } while (! isSecondaryKeyword (token, KEYWORD_interface));
-    Assert (isSecondaryKeyword (token, KEYWORD_interface));
-    skipToNextStatement (token);
-#endif
+    deleteToken (name);
 }
 
 /*  entry-stmt is

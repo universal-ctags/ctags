@@ -2,7 +2,7 @@ Current Version: @@VERSION@@
 
 ctags-5.5 (Mon Mar 10 2003)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
-* Changed interface tag kinds to be disabled by default (like prototypes in
+* Changed tags within interfaces to be disabled by default (like prototypes in
   C/C++) [Fortran].
 * Removed explicit descriptions of individual --<LANG>-types options from
   --help output. See new --list-languages and --list-kinds options.
