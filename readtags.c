@@ -742,8 +742,10 @@ extern tagResult tagsClose (tagFile *file)
 
 #ifdef READTAGS_MAIN
 
-const char *TagFileName = "tags";
-static int extensionFields = 0;
+static const char *TagFileName = "tags";
+static int extensionFields;
+static int SortOverride;
+static int Sorted;
 
 static void printTag (const tagEntry *entry)
 {
@@ -782,6 +784,8 @@ static void findTag (const char *const name, const int options)
 	perror ("Cannot open tag file");
     else
     {
+	if (SortOverride)
+	    tagsSetSorted (file, Sorted);
 	if (tagsFind (file, &entry, name, options) == TagSuccess)
 	{
 	    do
@@ -809,14 +813,16 @@ static void listTags (void)
 }
 
 const char *const Usage =
-    "Usage: %s [-ilp] [-t file] [name(s)]\n"
+    "Find tag file entries matching specified names.\n\n"
+    "Usage: %s [-ilp] [-s[0|1]] [-t file] [name(s)]\n\n"
+    "Options:\n"
     "    -e           Include extension fields in output.\n"
     "    -i           Perform case-insensitive matching.\n"
     "    -l           List all tags.\n"
     "    -p           Perform partial matching.\n"
+    "    -s[0|1]      Override sort detection of tag file.\n"
     "    -t file      Use specified tag file (default: \"tags\").\n"
-    "  Find tags matching specified names.\n"
-    "  Note that options are acted upon as encountered, so order is significant.\n";
+    "Note that options are acted upon as encountered, so order is significant.\n";
 
 extern int main (int argc, char **argv)
 {
@@ -833,7 +839,7 @@ extern int main (int argc, char **argv)
 	if (arg [0] == '-')
 	{
 	    int j;
-	    for (j = 1  ;  arg[j] != '\0'  ;  ++j)
+	    for (j = 1  ;  arg [j] != '\0'  ;  ++j)
 	    {
 		switch (arg[j])
 		{
@@ -842,6 +848,13 @@ extern int main (int argc, char **argv)
 		    case 'p': options |= TAG_PARTIALMATCH; break;
 		    case 'l': listTags ();                 break;
 		    case 't': TagFileName = argv [++i];    break;
+		    case 's':
+			SortOverride = 1;
+			if (arg [j] == '\0')
+			    Sorted = 1;
+			else
+			    Sorted = (arg [++j] != '0');
+			break;
 		    default:
 			fprintf (stderr, "%s: unknown option: %c\n",
 				    argv[0], arg[j]);

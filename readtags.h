@@ -12,17 +12,22 @@
 *   support to a software tool. The tag lookups provided are sufficiently fast
 *   enough to permit opening a sorted tag file, searching for a matching tag,
 *   then closing the tag file each time a tag is looked up (search times are
-*   on the order of milliseconds, even for huge tag files). This is the
-*   recommended use of this library for most tool applications. Adhering to
-*   this approach permits a user to regenerate a tag file at will without the
-*   tool needing to detect and resynchronize with changes to the tag file.
+*   on the order of hundreths of a second, even for huge tag files). This is
+*   the recommended use of this library for most tool applications. Adhering
+*   to this approach permits a user to regenerate a tag file at will without
+*   the tool needing to detect and resynchronize with changes to the tag file.
+*   Even for an unsorted 24MB tag file, tag searches take about one second.
 */
 
 /*
 *  MACROS
 */
 
-/* Options for tagFind() */
+/* Options for tagSetSorted() */
+#define TAG_UNSORTED 0
+#define TAG_SORTED   1
+
+/* Options for tagsFind() */
 #define TAG_FULLMATCH     0x0
 #define TAG_PARTIALMATCH  0x1
 #define TAG_OBSERVECASE   0x0
@@ -134,15 +139,15 @@ extern tagFile *tagsOpen (const char *filePath, tagFileInfo *info);
 
 /*
 *  This function allows the client to override the normal automatic detection
-*  of whether a tag file is sorted or not. Tag files in the new extended
-*  format contain a key indicating whether or not they are sorted. However,
-*  tag files in the original format do not contain such a key even when
-*  sorted, preventing this library from taking advantage of fast binary
-*  lookups. If the client knows that such an unmarked tag file is indeed
-*  sorted (or not), it can override the automatic detection. Note that
-*  incorrect lookup results will result if a tag file is marked as sorted
-*  when it actually is not. The function will return TagSuccess if called on
-*  an open tag file or TagFailure if not.
+*  of whether a tag file is sorted or not. Permissible values for `sorted' are
+*  TAG_UNSORTED and TAG_SORTED. Tag files in the new extended format contain a
+*  key indicating whether or not they are sorted. However, tag files in the
+*  original format do not contain such a key even when sorted, preventing this
+*  library from taking advantage of fast binary lookups. If the client knows
+*  that such an unmarked tag file is indeed sorted (or not), it can override
+*  the automatic detection. Note that incorrect lookup results will result if
+*  a tag file is marked as sorted when it actually is not. The function will
+*  return TagSuccess if called on an open tag file or TagFailure if not.
 */
 extern tagResult tagsSetSorted (tagFile *file, int sorted);
 
@@ -175,9 +180,16 @@ extern const char *tagsField (const tagEntry *entry, const char *key);
 *    TAG_PARTIALMATCH
 *        Tags whose leading characters match `name' will qualify.
 *
+*    TAG_FULLMATCH
+*        Only tags whose full lengths match `name' will qualify.
+*
 *    TAG_IGNORECASE
 *        Matching will be performed in a case-insenstive manner. Note that
 *        this disables binary searches of the tag file.
+*
+*    TAG_OBSERVECASE
+*        Matching will be performed in a case-senstive manner. Note that
+*        this enables binary searches of the tag file.
 *
 *  The function will return TagSuccess if a tag matching the name is found, or
 *  TagFailure if not.
