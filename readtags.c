@@ -945,13 +945,13 @@ extern int main (int argc, char **argv)
 		}
 	    }
 	}
-	if (! actionSupplied)
-	{
-	    fprintf (errout,
-		"%s: no action specified: specify tag name(s) or -l option\n",
-		ProgramName);
-	    exit (1);
-	}
+    }
+    if (! actionSupplied)
+    {
+	fprintf (errout,
+	    "%s: no action specified: specify tag name(s) or -l option\n",
+	    ProgramName);
+	exit (1);
     }
     return 0;
 }

@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.5 (Fri Dec 20 2002)
+ctags-5.5 (Wed Jan 20 2003)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
 * Added support for dimensioned variables, contributed by Simon Bohlin [ASP].
 * Added support for C# language.
@@ -13,6 +13,7 @@ ctags-5.5 (Fri Dec 20 2002)
 * Fixed problem of empty scoping extension field [C. Bug #639644].
 * Fixed man page errors and omissions.
 * Fixed bug in readFieldValue() in readtags library.
+* Fixed bug in option parsing in readtags command-line program.
 
 ctags-5.4 (Thu Oct 17 2002)
 * Improved ability for tagsOpen() in readtags library to report failure to
