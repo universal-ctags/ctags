@@ -57,28 +57,23 @@ static boolean isPodWord (const char *word)
     boolean result = FALSE;
     if (isalpha (*word))
     {
-	const char *white = strchr (word, ' ');
-	if (white == NULL)
-	    white = strchr (word, '\t');
-	if (white != NULL)
+	const char *const pods [] = {
+	    "head1", "head2", "head3", "head4", "over", "item", "back",
+	    "pod", "begin", "end", "for"
+	};
+	const size_t count = sizeof (pods) / sizeof (pods [0]);
+	const char *white = strpbrk (word, " \t");
+	const size_t len = (white!=NULL) ? (size_t)(white-word) : strlen (word);
+	char *const id = (char*) eMalloc (len + 1);
+	size_t i;
+	strncpy (id, word, len);
+	id [len] = '\0';
+	for (i = 0  ;  i < count  &&  ! result  ;  ++i)
 	{
-	    const char *const pods [] = {
-		"head1", "head2", "head3", "head4", "over", "item", "back",
-		"pod", "begin", "end", "for"
-	    };
-	    const size_t count = sizeof (pods) / sizeof (pods [0]);
-	    const size_t len = white - word;
-	    char *id = (char*) eMalloc (len + 1);
-	    size_t i;
-	    strncpy (id, word, len);
-	    id [len] = '\0';
-	    for (i = 0  ;  i < count  &&  ! result  ;  ++i)
-	    {
-		if (strcmp (id, pods [i]) == 0)
-		    result = TRUE;
-	    }
-	    eFree (id);
+	    if (strcmp (id, pods [i]) == 0)
+		result = TRUE;
 	}
+	eFree (id);
     }
     return result;
 }
