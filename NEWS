@@ -15,6 +15,7 @@ ctags-5.5 (Sun Feb 23 2003)
 * Added support for C# language.
 * Added support for Erlang language, contributed by Brent Fulgham.
 * Added support for SML (Standard ML) language, contributed by Venkatesh Prasad.
+* Added mapping for .plx to Perl.
 * Added tags for autocommand groups [Vim, Patch #664685].
 * Added special handling of --options=NONE to disable automatic reading of
   options from configuration files or environment.
