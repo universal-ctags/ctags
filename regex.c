@@ -20,7 +20,7 @@
 
 #include <string.h>
 
-#if defined (HAVE_REGCOMP) || defined (HAVE_RE_COMPILE_PATTERN)
+#ifdef HAVE_REGCOMP
 # include <ctype.h>
 # include <stddef.h>
 # ifdef HAVE_SYS_TYPES_H

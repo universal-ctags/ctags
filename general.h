@@ -186,7 +186,7 @@
 
 
 /* Define regex if supported */
-#if (defined (HAVE_REGCOMP) && !defined (REGCOMP_BROKEN)) || defined (HAVE_RE_COMPILE_PATTERN)
+#if (defined (HAVE_REGCOMP) && !defined (REGCOMP_BROKEN))
 # define HAVE_REGEX 1
 #endif
 
