@@ -18,19 +18,22 @@
 *   the tool needing to detect and resynchronize with changes to the tag file.
 *   Even for an unsorted 24MB tag file, tag searches take about one second.
 */
+#ifndef READTAGS_H
+#define READTAGS_H
 
 /*
 *  MACROS
 */
 
-/* Options for tagSetSorted() */
-#define TAG_UNSORTED 0
-#define TAG_SORTED   1
-#define TAG_FOLDSORT 2
+/* Options for tagsSetSortType() */
+typedef enum {
+    TAG_UNSORTED, TAG_SORTED, TAG_FOLDSORTED
+} sortType ;
 
 /* Options for tagsFind() */
 #define TAG_FULLMATCH     0x0
 #define TAG_PARTIALMATCH  0x1
+
 #define TAG_OBSERVECASE   0x0
 #define TAG_IGNORECASE    0x2
 
@@ -52,8 +55,8 @@ typedef struct {
 		    /* format of tag file (1 = original, 2 = extended) */
 		short format;
 
-		    /* is the tag file sorted? (0 = unsorted, 1 = sorted) */
-		short sorted;
+		    /* how is the tag file sorted? */
+		sortType sort;
 	} file;
 
 
@@ -131,33 +134,45 @@ typedef struct {
 
 /*
 *  This function must be called before calling other functions in this
-*  library. It is passed the path to the tag file to read and, optionally, a
-*  pointer to a structure to populate with information about the tag file,
-*  which may be null. If successful, the function will return a handle which
-*  must be supplied to other calls to read information from the tag file.
+*  library. It is passed the path to the tag file to read and a (possibly
+*  null) pointer to a structure which, if not null, will be populated with
+*  information about the tag file. If successful, the function will return a
+*  handle which must be supplied to other calls to read information from the
+*  tag file.
 */
 extern tagFile *tagsOpen (const char *filePath, tagFileInfo *info);
 
 /*
 *  This function allows the client to override the normal automatic detection
-*  of whether a tag file is sorted or not. Permissible values for `sorted' are
-*  TAG_UNSORTED and TAG_SORTED. Tag files in the new extended format contain a
-*  key indicating whether or not they are sorted. However, tag files in the
-*  original format do not contain such a key even when sorted, preventing this
-*  library from taking advantage of fast binary lookups. If the client knows
-*  that such an unmarked tag file is indeed sorted (or not), it can override
-*  the automatic detection. Note that incorrect lookup results will result if
-*  a tag file is marked as sorted when it actually is not. The function will
-*  return TagSuccess if called on an open tag file or TagFailure if not.
+*  of how a tag file is sorted. Permissible values for `type' are
+*  TAG_UNSORTED, TAG_SORTED, TAG_FOLDSORTED. Tag files in the new extended
+*  format contain a key indicating whether or not they are sorted. However,
+*  tag files in the original format do not contain such a key even when
+*  sorted, preventing this library from taking advantage of fast binary
+*  lookups. If the client knows that such an unmarked tag file is indeed
+*  sorted (or not), it can override the automatic detection. Note that
+*  incorrect lookup results will result if a tag file is marked as sorted when
+*  it actually is not. The function will return TagSuccess if called on an
+*  open tag file or TagFailure if not.
 */
-extern tagResult tagsSetSorted (tagFile *file, int sorted);
+extern tagResult tagsSetSortType (tagFile *file, sortType type);
 
 /*
-*  Step sequentially through each line of the tag file. It is passed the
-*  handle to an opened tag file and a pointer to a structure which will be
-*  populated with information about the next tag file entry, which may be
-*  null. The function will return TagSuccess another tag entry is found, or
+*  Reads the first tag in the file, if any. It is passed the handle to an
+*  opened tag file and a (possibly null) pointer to a structure which, if not
+*  null, will be populated with information about the first tag file entry.
+*  The function will return TagSuccess another tag entry is found, or
 *  TagFailure if not (i.e. it reached end of file).
+*/
+extern tagResult tagsFirst (tagFile *file, tagEntry *entry);
+
+/*
+*  Step to the next tag in the file, if any. It is passed the handle to an
+*  opened tag file and a (possibly null) pointer to a structure which, if not
+*  null, will be populated with information about the next tag file entry. The
+*  function will return TagSuccess another tag entry is found, or TagFailure
+*  if not (i.e. it reached end of file). It will always read the first tag in
+*  the file immediately after calling tagsOpen().
 */
 extern tagResult tagsNext (tagFile *file, tagEntry *entry);
 
@@ -212,5 +227,7 @@ extern tagResult tagsFindNext (tagFile *file, tagEntry *entry);
 *  return TagFailure is no file is currently open, TagSuccess otherwise.
 */
 extern tagResult tagsClose (tagFile *file);
+
+#endif
 
 /* vi:set tabstop=8 shiftwidth=4: */

@@ -43,7 +43,7 @@ struct sTagFile {
 	/* format of tag file */
     short format;
 	/* how is the tag file sorted? */
-    short sorted;
+    short sortMethod;
 	/* pointer to file structure */
     FILE* fp;
 	/* file position of first character of `line' */
@@ -375,11 +375,11 @@ static char *duplicate (const char *str)
 static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 {
     fpos_t startOfLine;
-    size_t prefixLength = strlen (PseudoTagPrefix);
+    const size_t prefixLength = strlen (PseudoTagPrefix);
     if (info != NULL)
     {
-	info->file.format = 1;
-	info->file.sorted = TAG_UNSORTED;
+	info->file.format     = 1;
+	info->file.sort       = TAG_UNSORTED;
 	info->program.author  = NULL;
 	info->program.name    = NULL;
 	info->program.url     = NULL;
@@ -400,7 +400,7 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 	    key = entry.name + prefixLength;
 	    value = entry.file;
 	    if (strcmp (key, "TAG_FILE_SORTED") == 0)
-		file->sorted = atoi (value);
+		file->sortMethod = atoi (value);
 	    else if (strcmp (key, "TAG_FILE_FORMAT") == 0)
 		file->format = atoi (value);
 	    else if (strcmp (key, "TAG_PROGRAM_AUTHOR") == 0)
@@ -414,7 +414,7 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 	    if (info != NULL)
 	    {
 		info->file.format     = file->format;
-		info->file.sorted     = file->sorted;
+		info->file.sort       = file->sortMethod;
 		info->program.author  = file->program.author;
 		info->program.name    = file->program.name;
 		info->program.url     = file->program.url;
@@ -425,11 +425,27 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
     fsetpos (file->fp, &startOfLine);
 }
 
+static void gotoFirstLogicalTag (tagFile *const file)
+{
+    fpos_t startOfLine;
+    const size_t prefixLength = strlen (PseudoTagPrefix);
+    rewind (file->fp);
+    while (1)
+    {
+	fgetpos (file->fp, &startOfLine);
+	if (! readTagLine (file))
+	    break;
+	if (strncmp (file->line.buffer, PseudoTagPrefix, prefixLength) != 0)
+	    break;
+    }
+    fsetpos (file->fp, &startOfLine);
+}
+
 static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 {
     tagFile *const result = (tagFile*) malloc (sizeof (tagFile));
     if (result == NULL)
-	perror ("Cannot open tag file");
+	perror ("cannot open tag file");
     else
     {
 	memset (result, 0, sizeof (tagFile));
@@ -641,8 +657,8 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
     fseek (file->fp, 0, SEEK_END);
     file->size = ftell (file->fp);
     rewind (file->fp);
-    if ((file->sorted == TAG_SORTED    && !file->search.ignorecase) ||
-	(file->sorted == TAG_FOLDSORT  &&  file->search.ignorecase))
+    if ((file->sortMethod == TAG_SORTED      && !file->search.ignorecase) ||
+	(file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase))
     {
 #ifdef DEBUG
 	printf ("<performing binary search>\n");
@@ -671,8 +687,8 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 static tagResult findNext (tagFile *const file, tagEntry *const entry)
 {
     tagResult result = TagFailure;
-    if ((file->sorted == TAG_SORTED    && !file->search.ignorecase) ||
-	(file->sorted == TAG_FOLDSORT  &&  file->search.ignorecase))
+    if ((file->sortMethod == TAG_SORTED      && !file->search.ignorecase) ||
+	(file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase))
     {
 	result = tagsNext (file, entry);
 	if (result == TagSuccess  && nameComparison (file) != 0)
@@ -696,13 +712,24 @@ extern tagFile *tagsOpen (const char *filePath, tagFileInfo *info)
     return initialize (filePath, info);
 }
 
-extern tagResult tagsSetSorted (tagFile *file, int sorted)
+extern tagResult tagsSetSortType (tagFile *file, sortType type)
 {
     tagResult result = TagFailure;
     if (file != NULL  &&  file->initialized)
     {
-	file->sorted = sorted;
+	file->sortMethod = type;
 	result = TagSuccess;
+    }
+    return result;
+}
+
+extern tagResult tagsFirst (tagFile *const file, tagEntry *const entry)
+{
+    tagResult result = TagFailure;
+    if (file != NULL  &&  file->initialized)
+    {
+	gotoFirstLogicalTag (file);
+	result = readNext (file, entry);
     }
     return result;
 }
@@ -760,7 +787,7 @@ extern tagResult tagsClose (tagFile *file)
 static const char *TagFileName = "tags";
 static int extensionFields;
 static int SortOverride;
-static int Sorted;
+static int SortMethod;
 
 static void printTag (const tagEntry *entry)
 {
@@ -800,7 +827,7 @@ static void findTag (const char *const name, const int options)
     else
     {
 	if (SortOverride)
-	    tagsSetSorted (file, Sorted);
+	    tagsSetSortType (file, SortMethod);
 	if (tagsFind (file, &entry, name, options) == TagSuccess)
 	{
 	    do
@@ -851,7 +878,9 @@ extern int main (int argc, char **argv)
     for (i = 1  ;  i < argc  ;  ++i)
     {
 	const char *const arg = argv [i];
-	if (arg [0] == '-')
+	if (arg [0] != '-')
+	    findTag (arg, options);
+	else
 	{
 	    int j;
 	    for (j = 1  ;  arg [j] != '\0'  ;  ++j)
@@ -862,16 +891,32 @@ extern int main (int argc, char **argv)
 		    case 'i': options |= TAG_IGNORECASE;   break;
 		    case 'p': options |= TAG_PARTIALMATCH; break;
 		    case 'l': listTags ();                 break;
-		    case 't': TagFileName = argv [++i];    break;
+		    case 't':
+			if (arg [j+1] != '\0')
+			{
+			    TagFileName = arg + j + 1;
+			    j += strlen (TagFileName);
+			}
+			else if (i + 1 < argc)
+			    TagFileName = argv [++i];
+			else
+			{
+			    fprintf (errout, Usage, argv [0]);
+			    exit (1);
+			}
+			break;
 		    case 's':
 			SortOverride = 1;
 			++j;
 			if (arg [j] == '\0')
-			    Sorted = 1;
+			    SortMethod = 1;
 			else if (strchr ("012", arg[j]) != NULL)
-			    Sorted = arg[j] - '0';
-			else 
-			    SortOverride = 0;
+			    SortMethod = arg[j] - '0';
+			else
+			{
+			    fprintf (errout, Usage, argv [0]);
+			    exit (1);
+			}
 			break;
 		    default:
 			fprintf (errout, "%s: unknown option: %c\n",
@@ -881,8 +926,6 @@ extern int main (int argc, char **argv)
 		}
 	    }
 	}
-	else
-	    findTag (arg, options);
     }
     return 0;
 }
