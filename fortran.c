@@ -188,7 +188,7 @@ static kindOption FortranKinds [] = {
     { TRUE,  'i', "interface",  "interfaces"},
     { TRUE,  'k', "component",  "type components"},
     { TRUE,  'l', "label",      "labels"},
-    { FALSE, 'L', "local",      "local and common block variables"},
+    { FALSE, 'L', "local",      "local, common block, and namelist variables"},
     { TRUE,  'm', "module",     "modules"},
     { TRUE,  'n', "namelist",   "namelists"},
     { TRUE,  'p', "program",    "programs"},
@@ -1227,41 +1227,47 @@ static void parseParenName (tokenInfo *const token)
 	readToken (token);
 }
 
-/*  common-stmt is
- *      COMMON [/[common-block-name]/] common-block-object-list [[,]/[common-block-name]/ common-block-object-list] ...
+/*  namelist-stmt is
+ *      NAMELIST /namelist-group-name/ namelist-group-object-list
+ *	    [[,]/[namelist-group-name]/ namelist-block-object-list] ...
+ *
+ *  namelist-group-object is
+ *      variable-name
+ *
+ *  common-stmt is
+ *      COMMON [/[common-block-name]/] common-block-object-list
+ *	    [[,]/[common-block-name]/ common-block-object-list] ...
  *
  *  common-block-object is
  *      variable-name [ ( explicit-shape-spec-list ) ]
  */
-static void parseCommonStmt (tokenInfo *const token)
+static void parseCommonNamelistStmt (tokenInfo *const token, tagType type)
 {
-    Assert (isKeyword (token, KEYWORD_common));
+    Assert (isKeyword (token, KEYWORD_common) ||
+	    isKeyword (token, KEYWORD_namelist));
     readToken (token);
     do
     {
-	if (isType (token, TOKEN_OPERATOR))
+	if (isType (token, TOKEN_OPERATOR) &&
+	    strcmp (vStringValue (token->string), "/") == 0)
 	{
 	    readToken (token);
 	    if (isType (token, TOKEN_IDENTIFIER))
-		makeFortranTag (token, TAG_COMMON_BLOCK);
+	    {
+		makeFortranTag (token, type);
+		readToken (token);
+	    }
 	    skipPast (token, TOKEN_OPERATOR);
 	}
 	if (isType (token, TOKEN_IDENTIFIER))
 	    makeFortranTag (token, TAG_LOCAL);
-	skipPast (token, TOKEN_COMMA);
+	readToken (token);
+	if (isType (token, TOKEN_PAREN_OPEN))
+	    skipOverParens (token);
+	if (isType (token, TOKEN_COMMA))
+	    readToken (token);
     } while (! isType (token, TOKEN_STATEMENT_END));
     skipToNextStatement (token);
-}
-
-static void tagSlashName (tokenInfo *const token, const tagType type)
-{
-    readToken (token);
-    if (isType (token, TOKEN_OPERATOR))
-    {
-	readToken (token);
-	if (isType (token, TOKEN_IDENTIFIER))
-	    makeFortranTag (token, type);
-    }
 }
 
 /*  specification-stmt
@@ -1287,11 +1293,12 @@ static boolean parseSpecificationStmt (tokenInfo *const token)
     boolean result = TRUE;
     switch (token->keyword)
     {
-	case KEYWORD_common: parseCommonStmt (token); break;
+	case KEYWORD_common:
+	    parseCommonNamelistStmt (token, TAG_COMMON_BLOCK);
+	    break;
 
 	case KEYWORD_namelist:
-	    tagSlashName (token, TAG_NAMELIST);
-	    skipToNextStatement (token);
+	    parseCommonNamelistStmt (token, TAG_NAMELIST);
 	    break;
 
 	case KEYWORD_allocatable:
