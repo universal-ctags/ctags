@@ -21,8 +21,8 @@
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <stdio.h>	/* to declare tempnam(), and SEEK_SET (hopefully) */
 
-#include <stdio.h>	/* to declare SEEK_SET (hopefully) */
 #ifdef HAVE_FCNTL_H
 # include <fcntl.h>	/* to declar O_RDWR, O_CREAT, O_EXCL */
 #endif
@@ -759,7 +759,7 @@ extern FILE *tempFile (const char *const mode, char **const pName)
     char *name;
     FILE *fp;
     int fd;
-#ifdef HAVE_MKSTEMP
+#if defined(HAVE_MKSTEMP)
     const char *const pattern = "tags.XXXXXX";
     const char *tmpdir = NULL;
     fileStatus *file = eStat (ExecutableProgram);
@@ -770,6 +770,11 @@ extern FILE *tempFile (const char *const mode, char **const pName)
     name = xMalloc (strlen (tmpdir) + 1 + strlen (pattern) + 1, char);
     sprintf (name, "%s%c%s", tmpdir, OUTPUT_PATH_SEPARATOR, pattern);
     fd = mkstemp (name);
+#elif defined(HAVE_TEMPNAM)
+    name = tempnam (TMPDIR, "tags");
+    if (name == NULL)
+	error (FATAL | PERROR, "cannot allocate temporary file name");
+    fd = open (name, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
 #else
     name = xMalloc (L_tmpnam, char);
     if (tmpnam (name) != name)

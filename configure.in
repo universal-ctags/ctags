@@ -252,6 +252,9 @@ fi
 
 AC_CHECK_FUNCS(mkstemp, have_mkstemp=yes)
 if test "$have_mkstemp" != yes ; then
+	AC_CHECK_FUNCS(tempnam, have_tempnam=yes)
+fi
+if test "$have_mkstemp" != yes -a "$have_tempnam" != yes; then
 	AC_CHECK_FUNCS(chmod)
 	if test "$tmpdir_specified" = yes ; then
 		AC_MSG_RESULT(use of tmpnam overrides temporary directory selection)

@@ -33,6 +33,9 @@
 #define HAVE_STRSTR 1
 #define HAVE_STRERROR 1
 #define HAVE_FINDNEXT 1
+#define HAVE_TEMPNAM 1
+#define tempnam(dir,pfx) _tempnam(dir,pfx)
+#define TMPDIR "\\"
 
 #ifdef __BORLANDC__
 
