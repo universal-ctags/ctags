@@ -47,16 +47,12 @@ static void findTclTags (void)
 	if (line [0] == '\0'  ||  line [0] == '#')
 	    continue;
 
-	/* read first word */
-	for (i = 0  ;  line [i] != '\0'  &&  ! isspace (line [i])  ;  ++i)
-	    ;
-
 	if (strncmp ((const char*) line, "proc", (size_t) 4) == 0)
 	{
-	    const unsigned char *cp = line + i;
+	    const unsigned char *cp = line + 4;
 	    while (isspace ((int) *cp))
 		++cp;
-	    while (line [i] != '\0'  &&  ! isspace ((int) *cp))
+	    while ((int) *cp != '\0'  &&  ! isspace ((int) *cp))
 	    {
 		vStringPut (name, (int) *cp);
 		++cp;
