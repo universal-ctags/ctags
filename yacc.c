@@ -1,7 +1,7 @@
 /*
 *   $Id$
 *
-*   Copyright (c) 2001, Nick Hibma <n_hibma@qubesoft.com>
+*   Copyright (c) 2001, Nick Hibma <n_hibma@van-laarhoven.org>
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License.
@@ -24,7 +24,7 @@
 static void installYaccRegex (const langType language)
 {
     addTagRegex (language,
-        "^([A-Za-z][A-Za-z_0-9]+)[ \t]+:", "\\1", "l,label", NULL);
+        "^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1", "l,label", NULL);
 }
 
 extern parserDefinition* YaccParser ()
