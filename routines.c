@@ -145,10 +145,10 @@
 /*
 *   DATA DEFINITIONS
 */
-char *CurrentDirectory = NULL;
+char *CurrentDirectory;
 
-static const char *ExecutableProgram = NULL;
-static const char *ExecutableName = NULL;
+static const char *ExecutableProgram;
+static const char *ExecutableName;
 
 #if defined (MSDOS_STYLE_PATH)
 static const char PathDelimiters [] = ":/\\";
@@ -354,18 +354,24 @@ extern char* newUpperString (const char* str)
 
 extern void setCurrentDirectory (void)
 {
-    char buf [PATH_MAX];
-#ifdef AMIGA
-    char* const cwd = eStrdup (".");
-#else
-    char* const cwd = getcwd (buf, PATH_MAX);
+#ifndef AMIGA
+    char* buf;
 #endif
-    CurrentDirectory = xMalloc (strlen (cwd) + 2, char);
-    if (cwd [strlen (cwd) - (size_t) 1] == PATH_SEPARATOR)
-	strcpy (CurrentDirectory, cwd);
-    else
-	sprintf (CurrentDirectory, "%s%c", cwd, OUTPUT_PATH_SEPARATOR);
-    free (cwd);
+    if (CurrentDirectory == NULL)
+	CurrentDirectory = xMalloc ((size_t) (PATH_MAX + 1), char);
+#ifdef AMIGA
+    strcpy (CurrentDirectory, ".");
+#else
+    buf = getcwd (CurrentDirectory, PATH_MAX);
+    if (buf == NULL)
+	perror ("");
+#endif
+    if (CurrentDirectory [strlen (CurrentDirectory) - (size_t) 1] !=
+	    PATH_SEPARATOR)
+    {
+	printf (CurrentDirectory + strlen (CurrentDirectory), "%c",
+		OUTPUT_PATH_SEPARATOR);
+    }
 }
 
 #ifdef AMIGA
