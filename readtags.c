@@ -811,7 +811,7 @@ static void listTags (void)
 const char *const Usage =
     "Usage: %s [-ilp] [-t file] [name(s)]\n"
     "    -e           Include extension fields in output.\n"
-    "    -i           Perform case-insenstive matching.\n"
+    "    -i           Perform case-insensitive matching.\n"
     "    -l           List all tags.\n"
     "    -p           Perform partial matching.\n"
     "    -t file      Use specified tag file (default: \"tags\").\n"
