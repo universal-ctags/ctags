@@ -28,8 +28,8 @@ typedef enum {
 } tclKind;
 
 static kindOption TclKinds [] = {
-    { TRUE, 'c', "class",  "classes" },
-    { TRUE, 'm', "method", "methods" },
+    { TRUE, 'c', "class",     "classes" },
+    { TRUE, 'm', "method",    "methods" },
     { TRUE, 'p', "procedure", "procedures" }
 };
 

@@ -30,7 +30,7 @@ typedef enum {
 
 static kindOption AspKinds [] = {
     { TRUE, 'f', "function", "functions"},
-    { TRUE, 's', "sub", "subroutines"},
+    { TRUE, 's', "sub",      "subroutines"},
     { TRUE, 'v', "variable", "variables"}
 };
 

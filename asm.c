@@ -71,7 +71,7 @@ static kindOption AsmKinds [] = {
     { TRUE, 'd', "define", "defines" },
     { TRUE, 'l', "label",  "labels"  },
     { TRUE, 'm', "macro",  "macros"  },
-    { TRUE, 't', "type",   "types"   }
+    { TRUE, 't', "type",   "types (structs and records)"   }
 };
 
 static const asmKeyword AsmKeywords [] = {

@@ -39,13 +39,13 @@ typedef enum {
  *   DATA DEFINITIONS
  */
 static kindOption SmlKinds[] = {
-    {TRUE, 'e', "exception", "exception declaration"},
-    {TRUE, 'f', "function", "function definition"},
-    {TRUE, 'c', "functor", "functor definition"},
-    {TRUE, 's', "signature", "signature declaration"},
-    {TRUE, 'r', "structure", "structure declaration"},
-    {TRUE, 't', "type", "type definition"},
-    {TRUE, 'v', "value", "value bindings"}
+    { TRUE, 'e', "exception", "exception declarations" },
+    { TRUE, 'f', "function",  "function definitions" },
+    { TRUE, 'c', "functor",   "functor definitions" },
+    { TRUE, 's', "signature", "signature declarations" },
+    { TRUE, 'r', "structure", "structure declarations" },
+    { TRUE, 't', "type",      "type definitions" },
+    { TRUE, 'v', "value",     "value bindings" }
 };
 
 static struct {

@@ -33,7 +33,7 @@ typedef enum {
 } vimKind;
 
 static kindOption VimKinds [] = {
-    { TRUE,  'a', "augroup",  "autocommand group" },
+    { TRUE,  'a', "augroup",  "autocommand groups" },
     { TRUE,  'f', "function", "function definitions" },
     { TRUE,  'v', "variable", "variable definitions" },
 };

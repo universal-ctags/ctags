@@ -307,11 +307,11 @@ typedef enum {
 } javaKind;
 
 static kindOption JavaKinds [] = {
-    { TRUE,  'c', "class", "classes"},
-    { TRUE,  'f', "field", "fields"},
+    { TRUE,  'c', "class",     "classes"},
+    { TRUE,  'f', "field",     "fields"},
     { TRUE,  'i', "interface", "interfaces"},
-    { TRUE,  'm', "method", "methods"},
-    { TRUE,  'p', "package", "packages"},
+    { TRUE,  'm', "method",    "methods"},
+    { TRUE,  'p', "package",   "packages"},
 };
 
 /* Used to index into the VeraKinds table. */

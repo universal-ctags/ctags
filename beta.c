@@ -41,7 +41,7 @@ static kindOption BetaKinds [] = {
     { TRUE,  'f', "fragment", "fragment definitions"},
     { FALSE, 'p', "pattern",  "all patterns"},
     { TRUE,  's', "slot",     "slots (fragment uses)"},
-    { TRUE,  'v', "virtual",  "patterns (only virtual or rebound patterns are recorded)"}
+    { TRUE,  'v', "virtual",  "patterns (virtual or rebound)"}
 };
 
 /* [A-Z_a-z0-9] */
