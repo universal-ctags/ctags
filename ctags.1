@@ -70,14 +70,17 @@ names are mapped to languages according to the following default mappings
 .B Awk
 *.awk
 .TP 9
+.B BETA
+*.bet
+.TP 9
 .B C
 *.c
 .TP 9
 .B C++
 *.C *.c++ *.cc *.cpp *.cxx *.h *.H *.hh *.hpp *.hxx *.h++
 .TP 9
-.B BETA
-*.bet
+.B C#
+*.cs
 .TP 9
 .B Cobol
 *.cbl *.cob *.CBL *.COB
@@ -145,7 +148,7 @@ names are mapped to languages according to the following default mappings
 .B Vim
 *.vim
 .TP 9
-.B YACC/Bison
+.B YACC
 *.y
 .PD 1
 .RE
@@ -546,7 +549,8 @@ Each letter or group of letters may be preceded by either '+' to add it to the
 default set, or '-' to exclude it. In the absence of any preceding '+' or '-'
 sign, only those kinds explicitly listed in \fIflags\fP will be included in
 the output (i.e. overriding the default set). This option is ignored if the
-option \fB--format\fP=\fI1\fP has been specified.
+option \fB--format\fP=\fI1\fP has been specified. The default value 
+of this options is \fIfks\fP.
 .RE
 
 .TP 5
@@ -954,6 +958,49 @@ variable definitions
 .TP 4
 .I x
 extern and forward variable declarations [off]
+.RE
+.PD 1
+
+.TP 5
+C#
+.RS 5
+.PD 0
+.TP 4
+.I c
+classes
+.TP 4
+.I d
+macro definitions
+.TP 4
+.I e
+enumerators (values inside an enumeration)
+.TP 4
+.I E
+events
+.TP 4
+.I f
+fields
+.TP 4
+.I g
+enumeration names
+.TP 4
+.I i
+interfaces
+.TP 4
+.I m
+methods
+.TP 4
+.I n
+namespaces
+.TP 4
+.I p
+properties
+.TP 4
+.I s
+structure names
+.TP 4
+.I t
+typedefs
 .RE
 .PD 1
 

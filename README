@@ -1,8 +1,10 @@
 Exuberant Ctags
 ===============
-Author: Darren Hiebert
-        <dhiebert at users.sourceforge.net>
+Author: Darren Hiebert <dhiebert at users.sourceforge.net>
         http://ctags.sourceforge.net
+        Instant Messaging:
+          Yahoo! ID     : dbhiebert
+          AIM ScreenName: darrenhiebert
 
 Exuberant Ctags is a multilanguage reimplementation of the much-underused
 ctags(1) program and is intended to be the mother of all ctags programs. It
@@ -16,9 +18,9 @@ because most were easily fooled by a number of preprocessor contructs.
 Exuberant Ctags offers the following features:
 
 1.  It supports the following languages: Assembler, AWK, ASP, BETA,
-    Bourne/Korn/Z Shell, C, C++, COBOL, Eiffel, Fortran, Java, Lisp, Lua,
-    Makefile, Pascal, Perl, PHP, Python, REXX, Ruby, S-Lang, Scheme, Tcl,
-    Verilog, Vim, and YACC.
+    Bourne/Korn/Z Shell, C, C++, C#, COBOL, Eiffel, Fortran, Java, Lisp,
+    Lua, Makefile, Pascal, Perl, PHP, PL/SQL, Python, REXX, Ruby, S-Lang,
+    Scheme, Tcl, Verilog, Vim, and YACC.
 
 2.  It is capable of generating tags for virtually all C language constructs.
 

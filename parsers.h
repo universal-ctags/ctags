@@ -22,6 +22,7 @@
     BetaParser, \
     CParser, \
     CppParser, \
+    CsharpParser, \
     CobolParser, \
     EiffelParser, \
     FortranParser, \
