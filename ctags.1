@@ -530,7 +530,7 @@ Line number of tag definintion
 .I s
 Scope of tag definition [enabled]
 .TP 4
-.I s
+.I S
 Signature of routine (e.g. prototype or parameter list)
 .TP 4
 .I z
@@ -1155,6 +1155,9 @@ classes
 .TP 4
 .I f
 functions
+.TP 4
+.I m
+members
 .RE
 .PD 1
 .RE
@@ -1179,7 +1182,10 @@ Ruby
 classes
 .TP 4
 .I f
-functions
+methods
+.TP 4
+.I F
+singleton methods
 .TP 4
 .I m
 mixins
@@ -1275,6 +1281,12 @@ Tcl
 .RS 5
 .PD 0
 .TP 4
+.I c
+classes
+.TP 4
+.I m
+methods
+.TP 4
 .I p
 procedures
 .RE
@@ -1364,6 +1376,9 @@ Vim
 .TP 4
 .I f
 functions
+.TP 4
+.I v
+variables
 .RE
 .PD 1
 .RE

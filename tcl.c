@@ -24,13 +24,13 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-    K_PROCEDURE, K_CLASS, K_METHOD
+    K_CLASS, K_METHOD, K_PROCEDURE
 } tclKind;
 
 static kindOption TclKinds [] = {
-    { TRUE, 'p', "procedure", "procedures" },
     { TRUE, 'c', "class",  "classes" },
-    { TRUE, 'f', "method", "methods" }
+    { TRUE, 'm', "method", "methods" },
+    { TRUE, 'p', "procedure", "procedures" }
 };
 
 /*

@@ -32,7 +32,7 @@ typedef enum {
 static kindOption PythonKinds[] = {
     {TRUE, 'c', "class", "classes"},
     {TRUE, 'f', "function", "functions"},
-    {TRUE, 'm', "member", "class member"}
+    {TRUE, 'm', "member", "class members"}
 };
 
 /*
