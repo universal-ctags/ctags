@@ -537,7 +537,8 @@ static void matchRegexPattern (const vString* const line,
 /* Match against all patterns for specified language. */
 extern void matchRegex (const vString* const line, const langType language)
 {
-    if (language <= SetUpper  &&  Sets [language].count > 0)
+    if (language != LANG_IGNORE  &&  language <= SetUpper  &&
+	Sets [language].count > 0)
     {
 	patternSet* const set = Sets + language;
 	unsigned int i;

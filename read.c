@@ -88,15 +88,21 @@ static void setSourceFileParameters (vString *const fileName)
     File.source.language = getFileLanguage (vStringValue (fileName));
 }
 
-static void setSourceFileName (vString *const fileName)
+static boolean setSourceFileName (vString *const fileName)
 {
-    vString *pathName;
-    if (isAbsolutePath (vStringValue (fileName)) || File.path == NULL)
-	pathName = fileName;
-    else
-	pathName = combinePathAndFile (vStringValue (File.path),
-				      vStringValue (fileName));
-    setSourceFileParameters (pathName);
+    boolean result = FALSE;
+    if (getFileLanguage (vStringValue (fileName)) != LANG_IGNORE)
+    {
+	vString *pathName;
+	if (isAbsolutePath (vStringValue (fileName)) || File.path == NULL)
+	    pathName = vStringNewCopy (fileName);
+	else
+	    pathName = combinePathAndFile (vStringValue (File.path),
+					vStringValue (fileName));
+	setSourceFileParameters (pathName);
+	result = TRUE;
+    }
+    return result;
 }
 
 /*
@@ -128,6 +134,14 @@ static unsigned long readLineNumber (void)
     return lNum;
 }
 
+/* While ANSI only permits lines of the form:
+ *   # line n "filename"
+ * Earlier compilers generated lines of the form
+ *   # n filename
+ * GNU C will output lines of the form:
+ *   # n "filename"
+ * So we need to be fairly flexible in what we accept.
+ */
 static vString *readFileName (void)
 {
     vString *const fileName = vStringNew ();
@@ -145,6 +159,8 @@ static vString *readFileName (void)
 	vStringPut (fileName, c);
 	c = getc (File.fp);
     }
+    if (c == '\n')
+	ungetc (c, File.fp);
     vStringPut (fileName, '\0');
 
     return fileName;
@@ -179,19 +195,20 @@ static boolean parseLineDirective (void)
 	else
 	{
 	    vString *const fileName = readFileName ();
-	    File.source.lineNumber = lNum - 1;	/* applies to NEXT line */
-	    DebugStatement ( debugPrintf (DEBUG_RAW, "#%s %ld", lineStr, lNum); )
-
 	    if (vStringLength (fileName) == 0)
-		vStringDelete (fileName);
-	    else
 	    {
-		setSourceFileName (fileName);
-		DebugStatement ( debugPrintf (DEBUG_RAW, " \"%s\"",
-					      vStringValue (fileName)); )
+		File.source.lineNumber = lNum - 1;  /* applies to NEXT line */
+		DebugStatement ( debugPrintf (DEBUG_RAW, "#%s %ld", lineStr, lNum); )
+	    }
+	    else if (setSourceFileName (fileName))
+	    {
+		File.source.lineNumber = lNum - 1;  /* applies to NEXT line */
+		DebugStatement ( debugPrintf (DEBUG_RAW, "#%s %ld \"%s\"",
+				lineStr, lNum, vStringValue (fileName)); )
 	    }
 
-	    if (Option.include.fileNames && lNum == 1)
+	    if (Option.include.fileNames && vStringLength (fileName) > 0 &&
+		lNum == 1)
 	    {
 		tagEntryInfo tag;
 		initTagEntry (&tag, baseFilename (vStringValue (fileName)));
@@ -204,6 +221,7 @@ static boolean parseLineDirective (void)
 
 		makeTagEntry (&tag);
 	    }
+	    vStringDelete (fileName);
 	    result = TRUE;
 	}
     }
