@@ -63,16 +63,16 @@
 # undef boolean
 #endif
 #ifdef HAVE_DIRECT_H
-# include <direct.h>	/* to _getcwd */
+# include <direct.h>	/* to _getcwd() */
 #endif
 #ifdef HAVE_DOS_H
 # include <dos.h>	/* to declare FA_DIREC */
 #endif
 #ifdef HAVE_DIR_H
-# include <dir.h>	/* to declare findfirst () and findnext () */
+# include <dir.h>	/* to declare findfirst() and findnext */
 #endif
 #ifdef HAVE_IO_H
-# include <io.h>	/* to declare _finddata_t in MSVC++ 4.x */
+# include <io.h>	/* to declare _findfirst() */
 #endif
 
 
