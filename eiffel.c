@@ -121,7 +121,9 @@ static langType Lang_eiffel;
 
 static const char *FileName;
 static FILE *File;
-static int IdentifyClass;
+static int PrintClass;
+static int PrintReferences;
+static int SelfReferences;
 static int Debug;
 static stringList *GenericNames;
 static stringList *ReferencedTypes;
@@ -238,8 +240,8 @@ static boolean isGeneric (tokenInfo *const token)
 static void reportType (tokenInfo *const token)
 {
     if (vStringLength (token->featureName) > 0  && ! isGeneric (token)  &&
-	strcasecmp (vStringValue (token->featureName),
-		 vStringValue (token->className)) != 0 &&
+	(SelfReferences || strcasecmp (vStringValue (
+	    token->featureName), vStringValue (token->className)) != 0) &&
 	! stringListHasInsensitive (ReferencedTypes,
 				    vStringValue (token->featureName)))
     {
@@ -1146,13 +1148,11 @@ static void parseClass (tokenInfo *const token)
 	readToken (token);
 #else
 	vStringCopy (token->className, token->string);
-	if (IdentifyClass)
-	{
+	if (PrintClass)
 	    puts (vStringValue (token->className));
+	if (! PrintReferences)
 	    exit (0);
-	}
-	else
-	    readToken (token);
+	readToken (token);
 #endif
     }
 
@@ -1248,11 +1248,13 @@ static void findReferences (void)
 static const char *const Usage =
     "Prints names of types referenced by an Eiffel language file.\n"
     "\n"
-    "Usage: %s [-c] [-d] [file_name | -]\n"
+    "Usage: %s [-cdrs] [file_name | -]\n"
     "\n"
     "Options:\n"
-    "    -c    Print only class name of current file.\n"
+    "    -c    Print class name of current file (on first line of output).\n"
     "    -d    Enable debug output.\n"
+    "    -r    Print types referenced by current file (default unless -c).\n"
+    "    -s    Include self-references.\n"
     "\n";
 
 extern main (int argc, char** argv)
@@ -1261,19 +1263,26 @@ extern main (int argc, char** argv)
     for (i = 1  ;  argv [i] != NULL  ;  ++i)
     {
 	const char *const arg = argv [i];
-	if (arg [0] == '-') switch (arg [1])
+	if (arg [0] == '-')
 	{
-	    case 'c':  IdentifyClass = 1; break;
-	    case 'd':  Debug = 1;         break;
-	    case '\0':
-		File = stdin;
-		FileName = "stdin";
-		break;
-	    default:
-		fprintf (stderr, "%s: unknown option: %c\n", argv [0], arg [1]);
-		fprintf (stderr, Usage, argv [0]);
-		exit (1);
-		break;
+	    int j;
+	    if (arg [1] == '\0')
+	    {
+		    File = stdin;
+		    FileName = "stdin";
+	    }
+	    else for (j = 1  ;  arg [j] != '\0'  ;  ++j) switch (arg [j])
+	    {
+		case 'c':  PrintClass      = 1; break;
+		case 'r':  PrintReferences = 1; break;
+		case 's':  SelfReferences  = 1; break;
+		case 'd':  Debug           = 1; break;
+		default:
+		    fprintf (stderr, "%s: unknown option: %c\n", argv [0], arg [1]);
+		    fprintf (stderr, Usage, argv [0]);
+		    exit (1);
+		    break;
+	    }
 	}
 	else if (File != NULL)
 	{
@@ -1291,6 +1300,8 @@ extern main (int argc, char** argv)
 	    }
 	}
     }
+    if (! PrintClass)
+	PrintReferences = 1;
     if (File == NULL)
     {
 	fprintf (stderr, Usage, argv [0]);
