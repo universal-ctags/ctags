@@ -1,5 +1,8 @@
 Current Version: @@VERSION@@
 
+ctags-5.5.1 (Tue Apr 1 2003)
+* Fixed compilation error for uncommon hosts.
+
 ctags-5.5 (Tue Apr 1 2003)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
 * Changed tags within interfaces to be disabled by default (like prototypes in

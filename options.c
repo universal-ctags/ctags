@@ -53,7 +53,7 @@
 # define DEFAULT_FILE_FORMAT	2
 #endif
 
-#if defined (MSDOS) || defined (WIN32) || defined (OS2) || defined (AMIGA) || defined (HAVE_OPENDIR)
+#if defined (HAVE_OPENDIR) || defined (HAVE_FINDFIRST) || defined (HAVE__FINDFIRST) || defined (AMIGA)
 # define RECURSE_SUPPORTED
 #endif
 
@@ -1456,12 +1456,11 @@ static void processLongOption (
     else if (processRegexOption (option, parameter))
 	;
 #ifndef RECURSE_SUPPORTED
-    else if (strcmp (item, "recurse") == 0)
+    else if (strcmp (option, "recurse") == 0)
 	error (WARNING, "%s option not supported on this host", option);
 #endif
     else
 	error (FATAL, "Unknown option: --%s", option);
-#undef isOption
 }
 
 static void processShortOption (
