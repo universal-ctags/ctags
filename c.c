@@ -932,6 +932,7 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 	case TAG_FIELD:
 	case TAG_INTERFACE:
 	case TAG_MEMBER:
+	case TAG_NAMESPACE:
 	case TAG_PROPERTY:
 	case TAG_STRUCT:
 	case TAG_TASK:
