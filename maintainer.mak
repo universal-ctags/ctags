@@ -17,16 +17,20 @@ VERSION_FILES=	$(DOS_VER_FILES) configure.in ctags.spec
 
 LIB_FILES	=	readtags.c readtags.h
 
-COMMON_FILES =	COPYING EXTENDING.html FAQ INSTALL.oth NEWS README \
+ENVIRONMENT_MAKEFILES = \
 				mk_bc3.mak mk_bc5.mak mk_djg.mak mk_manx.mak mk_ming.mak \
 				mk_mpw.mak mk_mvc.mak mk_os2.mak mk_qdos.mak mk_sas.mak \
-				source.mak $(DSOURCES) $(HEADERS) $(LIB_FILES)
+
+COMMON_FILES =	COPYING EXTENDING.html FAQ INSTALL.oth NEWS README \
+				$(ENVIRONMENT_MAKEFILES) source.mak \
+				$(DSOURCES) $(HEADERS) $(LIB_FILES) \
+				$(ENVIRONMENT_SOURCES) $(ENVIRONMENT_HEADERS)
 
 UNIX_FILES	=	$(COMMON_FILES) \
 				INSTALL acconfig.h configure.in \
 				Makefile.in maintainer.mak testing.mak \
 				descrip.mms mkinstalldirs magic.diff \
-				argproc.c mac.c mac.h qdos.c ctags.1 ctags.lsm
+				ctags.1 ctags.lsm
 
 DOS_FILES	=	$(COMMON_FILES)
 

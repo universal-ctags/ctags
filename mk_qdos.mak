@@ -34,11 +34,12 @@ LIBS =
 
 OBJEXT = o
 
-HEADERS = \
+HEADERS = e_qdos.h \
 	args.h ctags.h debug.h entry.h general.h get.h keyword.h \
-	main.h options.h parse.h parsers.h read.h sort.h strlist.h vstring.h
+	main.h options.h parse.h parsers.h read.h routines.h sort.h \
+	strlist.h vstring.h
 
-OBJECTS = \
+OBJECTS = qdos.$(OBJEXT) \
 	args.$(OBJEXT) \
 	asm.$(OBJEXT) \
 	asp.$(OBJEXT) \
@@ -74,7 +75,7 @@ OBJECTS = \
 	tcl.$(OBJEXT) \
 	vim.$(OBJEXT) \
 	yacc.$(OBJEXT) \
-	vstring.$(OBJEXT) \
+	vstring.$(OBJEXT)
 
 $(EXEC) : $(OBJECTS)
     $(LD) -o$(EXEC) $(LDFLAGS) $(OBJECTS) $(LIBS)
