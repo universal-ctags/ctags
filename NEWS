@@ -6,6 +6,7 @@ ctags-5.1.1 (Wed Dec 12 2001)
 * Added instructions on using tags with NEdit to man page.
 * Fixed regex tag problem which left newlines in back-references.
 * Fixed missing class-qualified tags [Eiffel].
+* Fixed spurious tags for entries in final indexing clause [Eiffel].
 
 ctags-5.1 (Tue Nov 06 2001)
 * Changed name of option configuration files for MSDOS, MSWindows, and OS/2.

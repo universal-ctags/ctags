@@ -851,7 +851,8 @@ static void parseFeatureClauses (tokenInfo *const token)
 	    parseExport (token);
 	parseFeature (token);
     } while (! isKeyword (token, KEYWORD_end) &&
-	     ! isKeyword (token, KEYWORD_invariant));
+	     ! isKeyword (token, KEYWORD_invariant) &&
+	     ! isKeyword (token, KEYWORD_indexing));
 }
 
 static void parseRename (tokenInfo *const token)
