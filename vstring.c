@@ -181,6 +181,17 @@ extern void vStringStripTrailing (vString *const string)
     }
 }
 
+/*  Chop last character from string.
+ */
+extern void vStringChop (vString *const string)
+{
+    if (string->length > 0)
+    {
+	--string->length;
+	string->buffer [string->length] = '\0';
+    }
+}
+
 extern void vStringCopyS (vString *const string, const char *const s)
 {
     vStringClear (string);

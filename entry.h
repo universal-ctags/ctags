@@ -71,6 +71,7 @@ typedef struct sTagEntryInfo {
 	const char* implementation;
 	const char* inheritance;
 	const char* scope [2];	/* value and key */
+	const char* signature;
     } extensionFields;		/* list of extension fields*/
 } tagEntryInfo;
 

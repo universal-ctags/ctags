@@ -524,6 +524,9 @@ Line number of tag definintion
 .I s
 Scope of tag definition [enabled]
 .TP 4
+.I s
+Signature of routine (e.g. prototype or parameter list)
+.TP 4
 .I z
 Include the "kind:" key in kind field
 .PD 1
@@ -1423,6 +1426,14 @@ of a routine or class, where \fIvalue\fP is specific to the language
 .I inherits
 When present, \fIvalue\fP. is a comma-separated list of classes from which
 this class is derived (i.e. inherits from).
+
+.TP 12
+.I signature
+When present, \fIvalue\fP. is a language-dependent representation of the
+signature of a routine. A routine signature in its complete form specifies the
+return type of a routine and its formal argument list. This extension field is
+presently supported only for C-based languages and does not include the return
+type.
 
 .PP
 In addition, information on the scope of the tag definition may be available,

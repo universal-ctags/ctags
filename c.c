@@ -230,6 +230,8 @@ static jmp_buf Exception;
 static langType Lang_c;
 static langType Lang_cpp;
 static langType Lang_java;
+static vString *Signature;
+static boolean CollectingSignature;
 
 /* Used to index into the CKinds table. */
 typedef enum {
@@ -758,15 +760,17 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
     {
 	default: break;
 
+	case TAG_FUNCTION:
+	case TAG_METHOD:
+	case TAG_PROTOTYPE:
+	    if (vStringLength (Signature) > 0)
+		tag->extensionFields.signature = vStringValue (Signature);
 	case TAG_CLASS:
 	case TAG_ENUM:
 	case TAG_ENUMERATOR:
 	case TAG_FIELD:
-	case TAG_FUNCTION:
 	case TAG_INTERFACE:
 	case TAG_MEMBER:
-	case TAG_METHOD:
-	case TAG_PROTOTYPE:
 	case TAG_STRUCT:
 	case TAG_TYPEDEF:
 	case TAG_UNION:
@@ -1049,11 +1053,25 @@ static void qualifyVariableTag (const statementInfo *const st,
  */
 static int skipToNonWhite (void)
 {
+    boolean found = FALSE;
     int c;
 
+#if 0
     do
 	c = cppGetc ();
     while (isspace (c));
+#else
+    while (1)
+    {
+	c = cppGetc ();
+	if (isspace (c))
+	    found = TRUE;
+	else
+	    break;
+    }
+    if (CollectingSignature && found)
+	vStringPut (Signature, ' ');
+#endif
 
     return c;
 }
@@ -1091,8 +1109,10 @@ static void skipToMatch (const char *const pair)
     int matchLevel = 1;
     int c = '\0';
 
-    while (matchLevel > 0  &&  (c = cppGetc ()) != EOF)
+    while (matchLevel > 0  &&  (c = skipToNonWhite ()) != EOF)
     {
+	if (CollectingSignature)
+	    vStringPut (Signature, c);
 	if (c == begin)
 	{
 	    ++matchLevel;
@@ -1185,12 +1205,19 @@ static void readIdentifier (tokenInfo *const token, const int firstChar)
 {
     vString *const name = token->name;
     int c = firstChar;
+    boolean first = TRUE;
 
     initToken (token);
 
     do
     {
 	vStringPut (name, c);
+	if (CollectingSignature)
+	{
+	    if (!first)
+		vStringPut (Signature, c);
+	    first = FALSE;
+	}
 	c = cppGetc ();
     } while (isident (c));
     vStringTerminate (name);
@@ -1577,9 +1604,16 @@ static boolean skipPostArgumentStuff (statementInfo *const st,
 		{
 		case KEYWORD_ATTRIBUTE:	skipParens ();	break;
 		case KEYWORD_THROW:	skipParens ();	break;
-		case KEYWORD_CONST:			break;
 		case KEYWORD_TRY:			break;
-		case KEYWORD_VOLATILE:			break;
+
+		case KEYWORD_CONST:
+		case KEYWORD_VOLATILE:
+		    if (vStringLength (Signature) > 0)
+		    {
+			vStringPut (Signature, ' ');
+			vStringCat (Signature, token->name);
+		    }
+		    break;
 
 		case KEYWORD_CATCH:	case KEYWORD_CLASS:
 		case KEYWORD_EXPLICIT:	case KEYWORD_EXTERN:
@@ -1688,10 +1722,14 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
     boolean firstChar = TRUE;
     int nextChar = '\0';
 
+    CollectingSignature = TRUE;
+    vStringClear (Signature);
+    vStringPut (Signature, '(');
     info->parameterCount = 1;
     do
     {
 	int c = skipToNonWhite ();
+	vStringPut (Signature, c);
 
 	switch (c)
 	{
@@ -1735,11 +1773,13 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 
 	    case '[':
 		info->isKnrParamList = FALSE;
+		vStringPut (Signature, c);
 		skipToMatch ("[]");
 		break;
 
 	    case '<':
 		info->isKnrParamList = FALSE;
+		vStringPut (Signature, c);
 		skipToMatch ("<>");
 		break;
 
@@ -1755,8 +1795,10 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 		{
 		    info->isNameCandidate = FALSE;
 		    cppUngetc (c);
+		    vStringClear (Signature);
 		    skipMacro (st);
 		    depth = 0;
+		    vStringChop (Signature);
 		}
 		else if (isType (token, TOKEN_PAREN_NAME))
 		{
@@ -1819,6 +1861,10 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
     if (! info->isNameCandidate)
 	initToken (token);
 
+    vStringTerminate (Signature);
+    if (info->isKnrParamList)
+	vStringClear (Signature);
+    CollectingSignature = FALSE;
     return nextChar;
 }
 
@@ -2250,6 +2296,7 @@ static boolean findCTags (const unsigned int passCount)
 
     Assert (passCount < 3);
     cppInit ((boolean) (passCount > 1));
+    Signature = vStringNew ();
 
     exception = (exception_t) setjmp (Exception);
     retry = FALSE;
@@ -2265,6 +2312,7 @@ static boolean findCTags (const unsigned int passCount)
 		    getInputFileName ());
 	}
     }
+    vStringDelete (Signature);
     cppTerminate ();
     return retry;
 }

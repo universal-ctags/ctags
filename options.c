@@ -115,7 +115,8 @@ optionValues Option = {
 	FALSE,		/* -fields=K */
 	FALSE,		/* -fields=l */
 	FALSE,		/* -fields=n */
-	TRUE		/* -fields=s */
+	TRUE,		/* -fields=s */
+	FALSE		/* -fields=S */
     },
     NULL,		/* -I */
     FALSE,		/* -a */
@@ -204,7 +205,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --extra=[+|-]flags"},
  {1,"      Include extra tag entries for selected information (flags: \"fq\")."},
  {1,"  --fields=[+|-]flags"},
- {1,"      Include selected extension fields (flags: \"afmikKlnsz\") [fks]."},
+ {1,"      Include selected extension fields (flags: \"afmikKlnsSz\") [fks]."},
  {1,"  --file-scope=[yes|no]"},
  {1,"       Should tags scoped only for a single file (e.g. \"static\" tags"},
  {1,"       be included in the output [yes]?"},
@@ -1203,6 +1204,7 @@ static void processExtensionFieldsOption (const char *const option,
 	case 'l': field->language	= mode;	break;
 	case 'n': field->lineNumber	= mode;	break;
 	case 's': field->scope		= mode;	break;
+	case 'S': field->signature	= mode;	break;
 	case 'z': field->kindKey	= mode;	break;
 
 	default: error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
