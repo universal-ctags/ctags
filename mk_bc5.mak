@@ -47,14 +47,14 @@ OPT = -O2 -OS -lGt
 ctags: ctags.exe
 
 ctags.exe: $(SOURCES) respbc5 $(EXTRA_LIBS)
-	$(BCC) $(CFLAGS) $(OPT) $(MT_OPT) -O2 -e$@ $(LDFLAGS) @respbc5
+	$(BCC) $(OPT) $(MT_OPT) -e$@ $(LDFLAGS) @respbc5
 
 readtags.exe: readtags.c
-	$(BCC) $(CFLAGS) $(OPT) $(MT_OPT) -O2 -e$@ $(DEFINES) -DREADTAGS_MAIN readtags.c $(LDFLAGS)
+	$(BCC) $(CFLAGS) $(OPT) $(MT_OPT) -e$@ $(DEFINES) -DREADTAGS_MAIN readtags.c $(LDFLAGS)
 
 # Debug version
 dctags.exe: $(SOURCES) respbc5 $(EXTRA_LIBS)
-	$(BCC) $(CFLAGS) -DDEBUG -e$@ $(LDFLAGS) @respbc5 debug.c
+	$(BCC) -DDEBUG -e$@ $(LDFLAGS) @respbc5 debug.c
 
 regex.obj:
 	$(BCC) -c -o$@ -w- $(DEFINES) -Dconst= $(INCLUDES) $(REGEX_DIR)\regex.c
@@ -62,6 +62,7 @@ regex.obj:
 respbc5: $(SOURCES) $(HEADERS) mk_bc5.mak
 	echo $(DEFINES) $(INCLUDES) > $@
 	echo $(WARNINGS) >> $@
+	echo $(CFLAGS) >> $@
 	echo $(SOURCES) $(EXTRA_LIBS) >> $@
 
 clean:
