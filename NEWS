@@ -4,6 +4,7 @@ ctags-5.5.5 (Wed Jan 05 2005)
 * Changed --langmap to first unmap each supplied extension from other languages.
 * Added support for ASP constants [ASP, Patch #961842].
 * Added support for multi-line define of GNU make.
+* Added .mk as extension recognized as a make language file [Make].
 * Extended functionality of Ruby parser with patch from Elliot Hughes [Ruby].
 * Fixed creation of TAGS file with etags-include but no files [Bug #941233].
 * Fixed problem reading last line of list file (-L) without final newline.
