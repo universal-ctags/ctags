@@ -351,7 +351,11 @@ getNextChar:
 		{
 		    skipToCharacter ('*');
 		    c = fileGetc ();
-		} while (c != '/');
+		    if (c == '/')
+			break;
+		    else
+			fileUngetc (c);
+		} while (c != '\0');
 		goto getNextChar;
 	    }
 	    break;
