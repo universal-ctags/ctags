@@ -793,13 +793,15 @@ static char* processLanguageMap (char* map)
 	language = getNamedLanguage (map);
 	if (language != LANG_IGNORE)
 	{
+	    const char *const deflt = "default";
 	    char* p;
 	    if (*list == '+')
 		++list;
 	    else
 		clear = TRUE;
 	    for (p = list  ;  *p != ','  &&  *p != '\0'  ;  ++p) /*no-op*/ ;
-	    if (strncasecmp (list, "default", p - list) == 0)
+	    if ((size_t) (p - list) == strlen (deflt) &&
+		strncasecmp (list, deflt, p - list) == 0)
 	    {
 		verbose ("    Restoring default %s language map: ", getLanguageName (language));
 		installLanguageMapDefault (language);
