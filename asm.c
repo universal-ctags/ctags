@@ -41,7 +41,6 @@ static kindOption AsmKinds [] = {
     { TRUE, 'l', "label", "labels"}
 };
 
-static regex_t LabelReject;
 
 /*
 *   FUNCTION DEFINITIONS
@@ -51,6 +50,7 @@ static void checkLabel (const char *line, const regexMatch *matches,
 			unsigned int count)
 {
 #ifdef HAVE_REGCOMP
+    static regex_t LabelReject;
     static boolean compiled = FALSE;
     if (! compiled)
     {
@@ -98,7 +98,7 @@ static void installAsmRegex (const langType language)
 	"\\1", "l,label", "i");
     /* TASM proc */
     addTagRegex (language,
-	"^proc[[:blank:]]+([[:alpha:]_.$][[:alnum:]_$?]*)",
+	"^proc[[:blank:]]+(" SYMBOL ")",
 	"\\1", "l,label", "i");
 
     /* gas macro */
