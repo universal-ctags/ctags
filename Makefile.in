@@ -139,7 +139,6 @@ install-lib: $(DEST_READ_LIB) $(DEST_READ_INC)
 
 $(DEST_CTAGS): $(CTAGS_EXEC) $(bindir) FORCE
 	$(INSTALL_PROG) $(CTAGS_EXEC) $@  &&  chmod 755 $@
-	$(STRIP) $(DEST_CTAGS)
 
 $(DEST_ETAGS):
 	- if [ -x $(DEST_CTAGS) ]; then \
