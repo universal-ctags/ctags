@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.3 (Sat Mar 13 2004)
+ctags-5.5.3 (Sun Mar 14 2004)
 * Removed forgotten debug statement [Bug #811704].
 * Added support for Perl labels.
 * Added support for Perl "use constant" [Perl, Patch #853704, Feature Request
