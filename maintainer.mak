@@ -101,7 +101,7 @@ ctags.cov: $(SOURCES) $(HEADERS) Makefile
 gcov: $(SOURCES:.c=.c.gcov)
 
 readtags: readtags.[ch]
-	$(CC) -g $(COMP_FLAGS) -DREADTAGS_MAIN -o $@ readtags.c
+	$(CC) $(OPT) $(COMP_FLAGS) -DREADTAGS_MAIN -o $@ readtags.c
 
 readtags.o: readtags.c readtags.h
 	$(CC) $(COMP_FLAGS) -c readtags.c
