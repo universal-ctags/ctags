@@ -94,17 +94,17 @@ static const asmKeyword AsmKeywords [] = {
 };
 
 static const opKind OpKinds [] = {
-    /* must be ordered same as opKeword enumeration */
+    /* must be ordered same as opKeyword enumeration */
     { OP_UNDEFINED,   K_NONE   },
     { OP_ALIGN,       K_NONE   },
     { OP_COLON_EQUAL, K_DEFINE },
     { OP_END,         K_NONE   },
-    { OP_ENDMACRO,    K_NONE   },
     { OP_ENDM,        K_NONE   },
+    { OP_ENDMACRO,    K_NONE   },
     { OP_ENDP,        K_NONE   },
     { OP_ENDS,        K_NONE   },
-    { OP_EQUAL,       K_DEFINE },
     { OP_EQU,         K_DEFINE },
+    { OP_EQUAL,       K_DEFINE },
     { OP_LABEL,       K_LABEL  },
     { OP_MACRO,       K_MACRO  },
     { OP_PROC,        K_LABEL  },
