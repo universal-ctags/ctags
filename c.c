@@ -2081,7 +2081,7 @@ static void initParenInfo (parenInfo *const info)
 {
     info->isPointer		= FALSE;
     info->isParamList		= TRUE;
-    info->isKnrParamList	= TRUE;
+    info->isKnrParamList	= isLanguage (Lang_c);
     info->isNameCandidate	= TRUE;
     info->invalidContents	= FALSE;
     info->nestedArgs		= FALSE;
