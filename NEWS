@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.3 (Sat Feb 28 2004)
+ctags-5.5.3 (Sun Feb 29 2004)
 * Removed forgotten debug statement [Bug #811704].
 * Added support for Perl "use constant" [Perl, Patch #853704].
 * Added support for "and" keyword [SML, Bug #816636].
@@ -16,6 +16,8 @@ ctags-5.5.3 (Sat Feb 28 2004)
 * Fixed spurious local tags for statements following labels [C].
 * Fixed missing tags for certain scoped functions [Vim].
 * Fixed missing tags for certain initializers [Fortran, Bug #877956].
+* Fixed problem with comment line after continuation character [Fortran,
+  Bug #858165].
 
 ctags-5.5.2 (Wed Sep 17 2003)
 * Added tags for local variables for C-based languages [C/C++/C#/Java/Vera,

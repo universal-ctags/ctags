@@ -696,29 +696,47 @@ static int skipToNextLine (void)
 static int getFreeFormChar (void)
 {
     static boolean newline = TRUE;
-    boolean recurse = FALSE;
+    boolean advanceLine = FALSE;
     int c = fileGetc ();
 
-    if (c == '&')		/* handle line continuation */
+    /* If the last nonblank, non-comment character of a FORTRAN 90
+     * free-format text line is an ampersand then the next non-comment
+     * line is a continuation line.
+     */
+    if (c == '&')
     {
-	recurse = TRUE;
-	c = fileGetc ();
+	do
+	    c = fileGetc ();
+	while (isspace (c)  &&  c != '\n');
+	if (c == '\n')
+	{
+	    newline = TRUE;
+	    advanceLine = TRUE;
+	}
+	else if (c == '!')
+	    advanceLine = TRUE;
+	else
+	{
+	    fileUngetc (c);
+	    c = '&';
+	}
     }
     else if (newline && (c == '!' || c == '#'))
-	recurse = TRUE;
-    while (recurse)
+	advanceLine = TRUE;
+    while (advanceLine)
     {
 	while (isspace (c))
 	    c = fileGetc ();
-	while (c == '!' || (newline && c == '#'))
+	if (c == '!' || (newline && c == '#'))
 	{
 	    c = skipToNextLine ();
 	    newline = TRUE;
+	    continue;
 	}
 	if (c == '&')
 	    c = fileGetc ();
 	else
-	    recurse = FALSE;
+	    advanceLine = FALSE;
     }
     newline = (boolean) (c == '\n');
     return c;
