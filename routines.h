@@ -1,7 +1,7 @@
 /*
 *   $Id$
 *
-*   Copyright (c) 1998-2002, Darren Hiebert
+*   Copyright (c) 2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License.

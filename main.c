@@ -1,7 +1,7 @@
 /*
 *   $Id$
 *
-*   Copyright (c) 1996-2001, Darren Hiebert
+*   Copyright (c) 1996-2002, Darren Hiebert
 *
 *   Author: Darren Hiebert <dhiebert@users.sourceforge.net>
 *           http://ctags.sourceforge.net
@@ -14,7 +14,8 @@
 *   provide a fully featured ctags program which is free of the limitations
 *   which most (all?) others are subject to.
 *
-*   This module contains top level start-up and portability functions.
+*   This module contains the start-up code and routines to determine the list
+*   of files to parsed for tags.
 */
 
 /*
@@ -23,17 +24,6 @@
 #include "general.h"	/* must always come first */
 
 #include <string.h>
-
-#ifdef AMIGA
-# include <dos/dosasl.h>	/* for struct AnchorPath */
-# include <clib/dos_protos.h>	/* function prototypes */
-# define ANCHOR_BUF_SIZE 512
-# define ANCHOR_SIZE (sizeof (struct AnchorPath) + ANCHOR_BUF_SIZE)
-# ifdef __SASC
-   extern struct DosLibrary *DOSBase;
-#  include <pragmas/dos_pragmas.h>
-# endif
-#endif
 
 /*  To provide timings features if available.
  */
@@ -51,6 +41,17 @@
 
 /*  To provide directory searching for recursion feature.
  */
+#ifdef AMIGA
+# include <dos/dosasl.h>	/* for struct AnchorPath */
+# include <clib/dos_protos.h>	/* function prototypes */
+# define ANCHOR_BUF_SIZE 512
+# define ANCHOR_SIZE (sizeof (struct AnchorPath) + ANCHOR_BUF_SIZE)
+# ifdef __SASC
+   extern struct DosLibrary *DOSBase;
+#  include <pragmas/dos_pragmas.h>
+# endif
+#endif
+
 #ifdef HAVE_DIRENT_H
 # ifdef __BORLANDC__
 #  define boolean BORLAND_boolean
@@ -73,6 +74,7 @@
 #ifdef HAVE_IO_H
 # include <io.h>	/* to declare _finddata_t in MSVC++ 4.x */
 #endif
+
 
 #include "debug.h"
 #include "keyword.h"

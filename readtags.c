@@ -1,7 +1,7 @@
 /*
 *   $Id$
 *
-*   Copyright (c) 1996-2001, Darren Hiebert
+*   Copyright (c) 1996-2002, Darren Hiebert
 *
 *   This source code is released into the public domain.
 *
