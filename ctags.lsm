@@ -7,7 +7,7 @@ Keywords:	tag tags ctags etags ftags ptags Exuberant Assembler ASP AWK
 		Bourne sh BETA C C++ COBOL Eiffel Fortran Java Korn ksh Lisp
 		Lua Makefile Pascal Perl PHP Python REXX Ruby Scheme SLang
 		S-Lang Tcl Vim tool utility source index zsh
-Author:		darren@hiebert.com (Darren Hiebert)
+Author:		dhiebert at users.sourceforge.net (Darren Hiebert)
 Primary-site:	http://ctags.sourceforge.net
 		215kB ctags-@@VERSION@@.tar.gz
 Original-site:	http://ctags.sourceforge.net

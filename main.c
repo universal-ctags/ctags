@@ -3,8 +3,8 @@
 *
 *   Copyright (c) 1996-2001, Darren Hiebert
 *
-*   Author: Darren Hiebert <darren@hiebert.com>, <darren@hiwaay.net>
-*           http://darren.hiebert.com
+*   Author: Darren Hiebert <dhiebert@users.sourceforge.net>
+*           http://ctags.sourceforge.net
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License. It is provided on an as-is basis and no

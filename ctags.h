@@ -20,7 +20,7 @@
 #define PROGRAM_NAME	"Exuberant Ctags"
 #define PROGRAM_URL	"http://ctags.sourceforge.net"
 #define AUTHOR_NAME	"Darren Hiebert"
-#define AUTHOR_EMAIL	"darren@hiebert.com"
+#define AUTHOR_EMAIL	"dhiebert@users.sourceforge.net"
 
 #endif	/* _CTAGS_H */
 
