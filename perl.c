@@ -26,20 +26,32 @@
 */
 typedef enum {
     K_NONE = -1,
-    K_SUBROUTINE,
+    K_CONSTANT,
+    K_LABEL,
     K_PACKAGE,
-    K_CONSTANT
+    K_SUBROUTINE
 } perlKind;
 
 static kindOption PerlKinds [] = {
-    { TRUE, 's', "subroutine", "subroutines" },
+    { TRUE, 'c', "constant",   "constants" },
+    { TRUE, 'l', "label",      "labels" },
     { TRUE, 'p', "package",    "packages" },
-    { TRUE, 'c', "constant",   "constants" }
+    { TRUE, 's', "subroutine", "subroutines" }
 };
 
 /*
 *   FUNCTION DEFINITIONS
 */
+
+static boolean isIdentifier1 (int c)
+{
+    return (boolean) (isalpha (c) || c == '_');
+}
+
+static boolean isIdentifier (int c)
+{
+    return (boolean) (isalnum (c) || c == '_');
+}
 
 static boolean isPodWord (const char *word)
 {
@@ -84,6 +96,7 @@ static void findPerlTags (void)
 
     while ((line = fileReadLine ()) != NULL)
     {
+	boolean spaceRequired = FALSE;
 	const unsigned char *cp = line;
 	perlKind kind = K_NONE;
 
@@ -112,36 +125,46 @@ static void findPerlTags (void)
 	{
 	    cp += 3;
 	    kind = K_SUBROUTINE;
+	    spaceRequired = TRUE;
 	}
 	else if (strncmp((const char*) cp, "use", (size_t) 3) == 0)
 	{
 	    cp += 3;
 	    if (!isspace(*cp))
 		continue;
-	    while (*cp && isspace(*cp))
+	    while (*cp && isspace (*cp))
 		++cp;
 	    if (strncmp((const char*) cp, "constant", (size_t) 8) != 0)
-	    {
-		cp += 8;
 		continue;
-	    }
 	    cp += 8;
 	    kind = K_CONSTANT;
+	    spaceRequired = TRUE;
 	}
 	else if (strncmp((const char*) cp, "package", (size_t) 7) == 0)
 	{
 	    cp += 7;
 	    kind = K_PACKAGE;
+	    spaceRequired = TRUE;
+	}
+	else
+	{
+	    if (isIdentifier1 (*cp))
+	    {
+		const unsigned char *p = cp;
+		while (isIdentifier (*p))
+		    ++p;
+		if ((int) *p == ':')
+		    kind = K_LABEL;
+	    }
 	}
 	if (kind != K_NONE)
 	{
-	    if (!isspace(*cp))		/* woops, not followed by a space */
+	    if (spaceRequired && !isspace (*cp))
 	        continue;
 
 	    while (isspace (*cp))
 		cp++;
-	    while (! isspace ((int) *cp) && *cp != '\0' &&
-		   strchr ("{(;=", (int) *cp) == NULL)
+	    while (isIdentifier (*cp))
 	    {
 		vStringPut (name, (int) *cp);
 		cp++;
