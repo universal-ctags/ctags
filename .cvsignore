@@ -9,6 +9,7 @@ config.h
 ctags
 dctags
 readtags
+debug
 etyperef
 .deps
 errors
