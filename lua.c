@@ -40,8 +40,8 @@ static kindOption LuaKinds [] = {
 static void __unused__ print_string (char *p, char *q)
 {
     for ( ; p != q; p++)
-	fprintf(stderr, "%c", *p);
-    fprintf(stderr, "\n");
+	fprintf (errout, "%c", *p);
+    fprintf (errout, "\n");
 }
 
 /*

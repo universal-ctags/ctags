@@ -830,7 +830,7 @@ extern int main (int argc, char **argv)
     int options = 0;
     if (argc == 1)
     {
-	fprintf (stderr, Usage, argv [0]);
+	fprintf (errout, Usage, argv [0]);
 	exit (1);
     }
     for (i = 1  ;  i < argc  ;  ++i)
@@ -856,7 +856,7 @@ extern int main (int argc, char **argv)
 			    Sorted = (arg [++j] != '0');
 			break;
 		    default:
-			fprintf (stderr, "%s: unknown option: %c\n",
+			fprintf (errout, "%s: unknown option: %c\n",
 				    argv[0], arg[j]);
 			exit (1);
 			break;

@@ -263,7 +263,7 @@ static int fileGetc (void)
 	}
     }
     if (Debug > 0  &&  c != EOF)
-	putc (c, stderr);
+	putc (c, errout);
     return c;
 }
 
@@ -1279,15 +1279,15 @@ extern main (int argc, char** argv)
 		case 's':  SelfReferences  = 1; break;
 		case 'd':  Debug           = 1; break;
 		default:
-		    fprintf (stderr, "%s: unknown option: %c\n", argv [0], arg [1]);
-		    fprintf (stderr, Usage, argv [0]);
+		    fprintf (errout, "%s: unknown option: %c\n", argv [0], arg [1]);
+		    fprintf (errout, Usage, argv [0]);
 		    exit (1);
 		    break;
 	    }
 	}
 	else if (File != NULL)
 	{
-	    fprintf (stderr, Usage, argv [0]);
+	    fprintf (errout, Usage, argv [0]);
 	    exit (1);
 	}
 	else
@@ -1305,7 +1305,7 @@ extern main (int argc, char** argv)
 	PrintReferences = 1;
     if (File == NULL)
     {
-	fprintf (stderr, Usage, argv [0]);
+	fprintf (errout, Usage, argv [0]);
 	exit (1);
     }
 
