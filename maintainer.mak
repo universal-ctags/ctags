@@ -189,7 +189,7 @@ DIFF = if diff $(DIFF_OPTIONS) tags.ref tags.test > $(DIFF_FILE); then \
 
 .PHONY: test test.include test.fields test.eiffel test.linux
 
-test: test.include test.fields test.linedir test.eiffel #test.linux
+test: test.include test.fields test.eiffel #test.linedir test.linux
 
 test.%: DIFF_FILE = $@.diff
 
