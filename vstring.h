@@ -36,7 +36,9 @@
 #define vStringLower(vs)	toLowerString((vs)->buffer)
 #define vStringUpper(vs)	toUpperString((vs)->buffer)
 
-#define VSTRING_PUTC_MACRO 1
+#ifndef DEBUG
+# define VSTRING_PUTC_MACRO 1
+#endif
 #ifdef VSTRING_PUTC_MACRO
 #define vStringPut(s,c) \
     (void)(((s)->length == (s)->size ? vStringAutoResize (s) : 0), \
