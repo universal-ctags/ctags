@@ -268,6 +268,7 @@ ctags-%.tar.gz: $(UNIX_FILES) $(VERSION_FILES)
 	chmod 755 ctags-$*/mkinstalldirs
 	(cd ctags-$*; autoheader; chmod 644 config.h.in)
 	(cd ctags-$*; autoconf; chmod 755 configure)
+	(cd ctags-$*; man2html ctags.1 > ctags.html)
 	tar -zcf $@ ctags-$*
 
 ctags-%.tar.Z: ctags-%.tar.gz
@@ -287,13 +288,14 @@ dos1-%: $(DOS_FILES)
 		sed -e 's/^\(VERSION = \).*$$/\1$*
 /' makefile.bak > makefile
 
-dos2-%: $(DOS_VER_FILES) ctags.html
+dos2-%: $(DOS_VER_FILES)
 	for file in $^ ;do \
 		rm -f $(CTAGS_DOSDIR)/ctags`echo $*|sed 's/\.//g'`/$${file} ;\
 		sed -e "s/@@VERSION@@/$*/" \
 		    -e "s/@@LSMDATE@@/`date +'%d%b%y' | tr 'a-z' 'A-Z'`/" $${file} |\
 			unix2dos > $(CTAGS_DOSDIR)/ctags`echo $*|sed 's/\.//g'`/$${file} ;\
-	done
+	done ;\
+	cd $(CTAGS_DOSDIR)/ctags`echo $*|sed 's/\.//g'` ; man2html ctags.1 > ctags.html
 
 dos-%:
 	@ echo "---------- Building MSDOS release directory"
@@ -327,11 +329,12 @@ cleanrelease-%:
 	rm -f $(RPM_ROOT)/SRPMS/ctags-$*-1.src.rpm
 	rm -f $(RPM_ROOT)/SPECS/ctags-$*.spec
 
-release-%: cvs-tag-% ctags-%.tar.gz ctags-%.tar.Z dos-% rpm-% ctags.html
+release-%: cvs-tag-% ctags-%.tar.gz ctags-%.tar.Z dos-% rpm-%
 	@ echo "---------- Copying files to web archive"
 	cp -p ctags-$*.tar.* $(WEB_ARCHIVE_DIR)
 	cp -p EXTENDING.html $(WEB_CTAGS_DIR)
 	mv -f ctags.html $(WEB_CTAGS_DIR)
+	cp -p ctags-$*/ctags.html $(WEB_CTAGS_DIR)/ctags.html
 	cp -p $(RPM_ROOT)/RPMS/i386/ctags-$*-1.i386.rpm $(WEB_ARCHIVE_DIR)
 	cp -p $(RPM_ROOT)/SRPMS/ctags-$*-1.src.rpm $(WEB_ARCHIVE_DIR)
 	cp -p ctags-$*/ctags.lsm $(WEB_ARCHIVE_DIR)/ctags-$*.lsm

@@ -194,15 +194,15 @@ TAGS: $(CTAGS_EXEC)
 	./$(CTAGS_EXEC) -e $(srcdir)/*
 
 clean:
-	@ rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS
+	rm -f $(OBJECTS) $(READ_LIB) $(CTAGS_EXEC) tags TAGS
 
 mostlyclean: clean
 
 distclean: clean
-	@ rm -f $(CONFIG_GEN)
+	rm -f $(CONFIG_GEN)
 
 maintainerclean: distclean
-	@ rm -f $(AUTO_GEN)
+	rm -f $(AUTO_GEN)
 
 #
 # implicit rules
