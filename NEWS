@@ -1,8 +1,10 @@
 Current Version: @@VERSION@@
 
-ctags-5.2.1 (Thu Jan 03 2002)
+ctags-5.2.1 (Sun Jan 20 2002)
 * Portabilitiy fixes [Mingw32].
 * Added "RCS" and "CVS" to list of directories excluded by default.
+* Fixed missing tags for function pointers declared const or volatile
+  [C, Bug #503764].
 
 ctags-5.2 (Sun Dec 23 2001)
 * Portabilitiy fixes [HP-UX, Solaris, VMS, OS/2].

@@ -1783,8 +1783,12 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 			token->type = TOKEN_PAREN_NAME;
 		    else if (isType (token, TOKEN_KEYWORD))
 		    {
-			info->isKnrParamList = FALSE;
-			info->isNameCandidate = FALSE;
+			if (token->keyword != KEYWORD_CONST &&
+			    token->keyword != KEYWORD_VOLATILE)
+			{
+			    info->isKnrParamList = FALSE;
+			    info->isNameCandidate = FALSE;
+			}
 		    }
 		}
 		else
