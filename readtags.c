@@ -11,16 +11,13 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"	/* must always come first */
-
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <errno.h>
-#ifdef HAVE_SYS_TYPES_H
-# include <sys/types.h>	/* declare off_t */
-#endif
 #include <stdio.h>
+#include <errno.h>
+#include <sys/types.h>	/* to declare off_t */
+
 #include "readtags.h"
 
 /*
@@ -797,11 +794,11 @@ static sortType SortMethod;
 static void printTag (const tagEntry *entry)
 {
     int i;
-    boolean first = TRUE;
+    int first = 1;
     const char* separator = ";\"";
     const char* const empty = "";
 /* "sep" returns a value only the first time it is evaluated */
-#define sep (first ? (first = FALSE, separator) : empty)
+#define sep (first ? (first = 0, separator) : empty)
     printf ("%s\t%s\t%s",
 	entry->name, entry->file, entry->address.pattern);
     if (extensionFields)
@@ -887,7 +884,7 @@ extern int main (int argc, char **argv)
     ProgramName = argv [0];
     if (argc == 1)
     {
-	fprintf (errout, Usage, ProgramName);
+	fprintf (stderr, Usage, ProgramName);
 	exit (1);
     }
     for (i = 1  ;  i < argc  ;  ++i)
@@ -920,7 +917,7 @@ extern int main (int argc, char **argv)
 			    TagFileName = argv [++i];
 			else
 			{
-			    fprintf (errout, Usage, ProgramName);
+			    fprintf (stderr, Usage, ProgramName);
 			    exit (1);
 			}
 			break;
@@ -933,12 +930,12 @@ extern int main (int argc, char **argv)
 			    SortMethod = (sortType) (arg[j] - '0');
 			else
 			{
-			    fprintf (errout, Usage, ProgramName);
+			    fprintf (stderr, Usage, ProgramName);
 			    exit (1);
 			}
 			break;
 		    default:
-			fprintf (errout, "%s: unknown option: %c\n",
+			fprintf (stderr, "%s: unknown option: %c\n",
 				    ProgramName, arg[j]);
 			exit (1);
 			break;
@@ -948,7 +945,7 @@ extern int main (int argc, char **argv)
     }
     if (! actionSupplied)
     {
-	fprintf (errout,
+	fprintf (stderr,
 	    "%s: no action specified: specify tag name(s) or -l option\n",
 	    ProgramName);
 	exit (1);

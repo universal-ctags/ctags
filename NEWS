@@ -1,11 +1,12 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.1 (Thu Jul 17 2003)
+ctags-5.5.1 (Sun Jul 20 2003)
+* Changed supported tag kinds for Verilog parser during overhaul.
 * Restored exit of program after --help, --license, and --version options [Bug
   #717311, #751240].
 * Added support for tags for labels [PL/SQL].
 * Added support for tags for constant definitions [PHP].
-* Changed supported tag kinds for Verilog parser during overhaul.
+* Removed inclusion of general.h (GPL) from readtags.c (public domain).
 * Fixed missing tags for definitions spanning lines [Verilog, Bug #726875].
 * Fixed compilation error for uncommon hosts.
 * Fixed missing tags for Korn shell specific function definitions. [Sh,
