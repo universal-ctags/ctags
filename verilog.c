@@ -40,7 +40,7 @@
  *   DATA DECLARATIONS
  */
 typedef enum {
-    K_UNDEFINED,
+    K_UNDEFINED = -1,
     K_FUNCTION, K_MODULE, K_PARAMETER, K_PORT, K_REG, K_TASK,
     K_VARIABLE, K_WIRE
 } verilogKind;

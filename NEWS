@@ -1,5 +1,8 @@
 Current Version: @@VERSION@@
 
+ctags-5.3.1 (Sun Jul 21 2002)
+* Fixed incorrect tag kinds [Verilog].
+
 ctags-5.3 (Wed Jul 17 2002)
 * Allowed --etags-include option without input files.
 * Changed Asm parser to back to C-based parser to remove redundant tags,
