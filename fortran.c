@@ -74,6 +74,7 @@ typedef enum eKeywordId {
     KEYWORD_dimension,
     KEYWORD_do,
     KEYWORD_double,
+    KEYWORD_elemental,
     KEYWORD_end,
     KEYWORD_enddo,
     KEYWORD_endif,
@@ -210,6 +211,7 @@ static const keywordDesc FortranKeywordTable [] = {
     { "dimension",	KEYWORD_dimension	},
     { "do",		KEYWORD_do		},
     { "double",		KEYWORD_double		},
+    { "elemental",	KEYWORD_elemental	},
     { "end",		KEYWORD_end		},
     { "enddo",		KEYWORD_enddo		},
     { "endif",		KEYWORD_endif		},
@@ -1005,6 +1007,21 @@ static boolean isTypeSpec (tokenInfo *const token)
     return result;
 }
 
+static boolean isSubprogramPrefix (tokenInfo *const token)
+{
+    boolean result = FALSE;
+    switch (token->keyword)
+    {
+	case KEYWORD_elemental:
+	case KEYWORD_pure:
+	case KEYWORD_recursive:
+	case KEYWORD_stdcall:
+	    result = TRUE;
+	    break;
+    }
+    return result;
+}
+
 /*  type-spec
  *      is INTEGER [kind-selector]
  *      or REAL [kind-selector] is ( etc. )
@@ -1417,7 +1434,15 @@ static void parseInterfaceBlock (tokenInfo *const token)
 	{
 	    case KEYWORD_function:   parseFunctionSubprogram (token);   break;
 	    case KEYWORD_subroutine: parseSubroutineSubprogram (token); break;
-	    default:                 skipToNextStatement (token);       break;
+
+	    default:
+		if (isSubprogramPrefix (token))
+		    readToken (token);
+		else if (isTypeSpec (token))
+		    parseTypeSpec (token);
+		else
+		    skipToNextStatement (token);
+		break;
 	}
     }
     readSubToken (token);
@@ -1586,14 +1611,10 @@ static void parseInternalSubprogramPart (tokenInfo *const token)
 	    case KEYWORD_subroutine: parseSubroutineSubprogram (token); break;
 	    case KEYWORD_end:        done = TRUE;                       break;
 
-	    case KEYWORD_recursive:
-	    case KEYWORD_pure:
-	    case KEYWORD_stdcall:
-		readToken (token);
-		break;
-
 	    default:
-		if (isTypeSpec (token))
+		if (isSubprogramPrefix (token))
+		    readToken (token);
+		else if (isTypeSpec (token))
 		    parseTypeSpec (token);
 		else
 		    readToken (token);
@@ -1657,7 +1678,10 @@ static void parseExecutionPart (tokenInfo *const token)
 	switch (token->keyword)
 	{
 	    default:
-		skipToNextStatement (token);
+		if (isSubprogramPrefix (token))
+		    readToken (token);
+		else
+		    skipToNextStatement (token);
 		break;
 
 	    case KEYWORD_entry:
@@ -1769,15 +1793,14 @@ static void parseProgramUnit (tokenInfo *const token)
 	    case KEYWORD_program:    parseMainProgram (token);          break;
 	    case KEYWORD_subroutine: parseSubroutineSubprogram (token); break;
 
-	    case KEYWORD_recursive:
-	    case KEYWORD_pure:
-	    case KEYWORD_stdcall:
-		readToken (token);
-		break;
-
 	    default:
-		parseSpecificationPart (token);
-		parseExecutionPart (token);
+		if (isSubprogramPrefix (token))
+		    readToken (token);
+		else
+		{
+		    parseSpecificationPart (token);
+		    parseExecutionPart (token);
+		}
 		break;
 	}
     } while (TRUE);
