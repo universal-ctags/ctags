@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.5 (Tue Feb 25 2003)
+ctags-5.5 (Sun Mar 02 2003)
 * Changed kind indicator for methods from 'f' to 'm' [Tcl].
 * Removed explicit descriptions of individual --<LANG>-types options from
   --help output. See new --list-languages and --list-kinds options.
@@ -14,6 +14,8 @@ ctags-5.5 (Tue Feb 25 2003)
 * Added support for dimensioned variables, contributed by Simon Bohlin [ASP].
 * Added support for C# language.
 * Added support for Erlang language, contributed by Brent Fulgham.
+* Added support for HTML language files.
+* Added support for JavaScript language files.
 * Added support for SML (Standard ML) language, contributed by Venkatesh Prasad.
 * Added mapping for .plx to Perl.
 * Added tags for autocommand groups [Vim, Patch #664685].

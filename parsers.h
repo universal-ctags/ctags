@@ -27,7 +27,9 @@
     EiffelParser, \
     ErlangParser, \
     FortranParser, \
+    HtmlParser, \
     JavaParser, \
+    JavaScriptParser, \
     LispParser, \
     LuaParser, \
     MakefileParser, \

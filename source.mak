@@ -20,6 +20,8 @@ SOURCES = \
 	erlang.c \
 	fortran.c \
 	get.c \
+	html.c \
+	jscript.c \
 	keyword.c \
 	lisp.c \
 	lregex.c \
@@ -70,6 +72,8 @@ OBJECTS = \
 	erlang.$(OBJEXT) \
 	fortran.$(OBJEXT) \
 	get.$(OBJEXT) \
+	html.$(OBJEXT) \
+	jscript.$(OBJEXT) \
 	keyword.$(OBJEXT) \
 	lisp.$(OBJEXT) \
 	lregex.$(OBJEXT) \
