@@ -178,7 +178,7 @@ static void parseBlock (tokenInfo *token, boolean local);
 
 static boolean isIdentChar1 (const int c)
 {
-    return isalpha (c);
+    return (boolean) isalpha (c);
 }
 
 static boolean isIdentChar (const int c)

@@ -44,7 +44,7 @@ struct sTagFile {
 	/* format of tag file */
     short format;
 	/* how is the tag file sorted? */
-    short sortMethod;
+    sortType sortMethod;
 	/* pointer to file structure */
     FILE* fp;
 	/* file position of first character of `line' */
@@ -401,7 +401,7 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 	    key = entry.name + prefixLength;
 	    value = entry.file;
 	    if (strcmp (key, "TAG_FILE_SORTED") == 0)
-		file->sortMethod = atoi (value);
+		file->sortMethod = (sortType) atoi (value);
 	    else if (strcmp (key, "TAG_FILE_FORMAT") == 0)
 		file->format = atoi (value);
 	    else if (strcmp (key, "TAG_PROGRAM_AUTHOR") == 0)

@@ -775,9 +775,9 @@ static cKind cTagKind (const tagType type)
     return result;
 }
 
-static cKind csharpTagKind (const tagType type)
+static csharpKind csharpTagKind (const tagType type)
 {
-    cKind result = CK_UNDEFINED;
+    csharpKind result = CSK_UNDEFINED;
     switch (type)
     {
 	case TAG_CLASS:      result = CSK_CLASS;           break;
