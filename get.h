@@ -22,16 +22,15 @@
 *   MACROS
 */
 /*  Is the character valid as a character of a C identifier?
+ *  VMS allows '$' in identifiers.
  */
-#ifdef VMS
-# define isident(c)	(isalnum(c) || (c) == '_' || (c) == '$')
-#else
-# define isident(c)	(isalnum(c) || (c) == '_')
-#endif
+#define isident(c)	(isalnum(c) || (c) == '_' || (c) == '$')
 
 /*  Is the character valid as the first character of a C identifier?
+ *  C++ allows '~' in destructors.
+ *  VMS allows '$' in identifiers.
  */
-#define isident1(c)	(isalpha(c) || (c) == '_' || (c) == '~')
+#define isident1(c)	(isalpha(c) || (c) == '_' || (c) == '~' || (c) == '$')
 
 /*
 *   FUNCTION PROTOTYPES
