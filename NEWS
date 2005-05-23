@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.5 (Wed Jan 05 2005)
+ctags-5.5.5 (Mon May 23 2005)
 * Changed --langmap to first unmap each supplied extension from other languages.
 * Added support for ASP constants [ASP, Patch #961842].
 * Added support for multi-line define of GNU make.
@@ -10,6 +10,7 @@ ctags-5.5.5 (Wed Jan 05 2005)
 * Fixed problem reading last line of list file (-L) without final newline.
 * Fixed infinite loop that could occur on files without final newline [C, Java].
 * Fixed incorrect tag for first field of table [SQL].
+* Fixed missing tags for functions beginning with underscore [Sh].
 
 ctags-5.5.4 (Thu Mar 25 2004)
 * Fixed broken -R option.

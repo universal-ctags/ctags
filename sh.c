@@ -74,7 +74,7 @@ static void findShTags (void)
 	    while (isspace ((int) *cp))
 		++cp;
 	}
-	if (! isalnum ((int) *cp))
+	if (! (isalnum ((int) *cp) || *cp == '_'))
 	    continue;
 	while (isalnum ((int) *cp)  ||  *cp == '_')
 	{
