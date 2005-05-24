@@ -2021,7 +2021,23 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 
 	    case '.':
 		info->isNameCandidate = FALSE;
-		info->isKnrParamList = FALSE;
+		c = cppGetc ();
+		if (c != '.')
+		{
+		    cppUngetc (c);
+		    info->isKnrParamList = FALSE;
+		}
+		else
+		{
+		    c = cppGetc ();
+		    if (c != '.')
+		    {
+			cppUngetc (c);
+			info->isKnrParamList = FALSE;
+		    }
+		    else
+			vStringCatS (Signature, "..."); /* variable arg list */
+		}
 		break;
 
 	    case ',':
