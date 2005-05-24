@@ -1,7 +1,7 @@
 /*
 *   $Id$
 *
-*   Copyright (c) 2000-2002, Darren Hiebert
+*   Copyright (c) 2000-2005, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License.
@@ -17,6 +17,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "options.h"
 #include "parse.h"
 #include "read.h"
 #include "vstring.h"
@@ -36,83 +37,160 @@ static kindOption MakeKinds [] = {
 *   FUNCTION DEFINITIONS
 */
 
-static boolean isIdentifier (int c)
+static int nextChar (void)
 {
-    return (boolean)(isalnum (c)  ||  c == '_');
+    int c = fileGetc ();
+    if (c == '\\')
+    {
+	c = fileGetc ();
+	if (c == '\n')
+	    c = fileGetc ();
+    }
+    return c;
 }
 
-static const unsigned char *readIdentifier (
-	const unsigned char *p, vString *const id)
+static void skipLine (void)
 {
+    int c;
+    do
+	c = nextChar ();
+    while (c != EOF  &&  c != '\n');
+    if (c == '\n')
+	fileUngetc (c);
+}
+
+static int skipToNonWhite (void)
+{
+    int c;
+    do
+	c = nextChar ();
+    while (c != '\n' && isspace (c));
+    return c;
+}
+
+static boolean isIdentifier (int c)
+{
+    return (boolean)(c != '\0' && (isalnum (c)  ||  strchr (".-_", c) != NULL));
+}
+
+static void readIdentifier (const int first, vString *const id)
+{
+    int c = first;
     vStringClear (id);
-    while (isIdentifier ((int) *p))
+    while (isIdentifier (c))
     {
-	vStringPut (id, (int) *p);
-	++p;
+	vStringPut (id, c);
+	c = nextChar ();
     }
+    fileUngetc (c);
     vStringTerminate (id);
-    return p;
+}
+
+static void skipToMatch (const char *const pair)
+{
+    const int begin = pair [0], end = pair [1];
+    const unsigned long inputLineNumber = getInputLineNumber ();
+    int matchLevel = 1;
+    int c = '\0';
+
+    while (matchLevel > 0)
+    {
+	c = nextChar ();
+	if (c == begin)
+	    ++matchLevel;
+	else if (c == end)
+	    --matchLevel;
+	else if (c == '\n')
+	    break;
+    }
+    if (c == EOF)
+	verbose ("%s: failed to find match for '%c' at line %lu\n",
+		getInputFileName (), begin, inputLineNumber);
 }
 
 static void findMakeTags (void)
 {
     vString *name = vStringNew ();
-    const unsigned char *line;
-    boolean line_continuation = FALSE;
+    boolean newline = TRUE;
     boolean in_define = FALSE;
+    boolean in_rule = FALSE;
+    boolean variable_possible = TRUE;
+    int c;
 
-    while ((line = fileReadLine ()) != NULL)
+    while ((c = nextChar ()) != EOF)
     {
-	const unsigned char* cp = line;
-	boolean possible = TRUE;
-
-	if (! line_continuation)
+	if (newline)
 	{
-	    if (! isIdentifier ((int) *cp))
-		continue;
-	}
-	while (isspace ((int) *cp))
-	    ++cp;
-	if (*cp == '#')
-	    continue;
-	while (*cp != '\0')
-	{
-	    /*  We look for any sequence of identifier characters following
-	     *  either a white space or a colon and followed by either = or :=
-	     */
-	    if (possible && isIdentifier ((int) *cp))
+	    if (in_rule)
 	    {
-		cp = readIdentifier (cp, name);
-		while (isspace ((int) *cp))
-		    ++cp;
-		if (strcmp (vStringValue (name), "endef") == 0)
-		    in_define = FALSE;
-		else if (in_define)
-		    break;
-		else if (strcmp (vStringValue (name), "define") == 0  &&
-		    isIdentifier ((int) *cp))
+		if (c == '\t')
 		{
-		    in_define = TRUE;
-		    cp = readIdentifier (cp, name);
-		    makeSimpleTag (name, MakeKinds, K_MACRO);
+		    skipLine ();        /* skip rule */
+		    continue;
 		}
 		else
+		    in_rule = FALSE;
+	    }
+	    variable_possible = (boolean)(!in_rule);
+	    newline = FALSE;
+	}
+	if (c == '\n')
+	    newline = TRUE;
+	else if (isspace (c))
+	    continue;
+	else if (c == '#')
+	    skipLine ();
+	else if (c == '(')
+	    skipToMatch ("()");
+	else if (c == '{')
+	    skipToMatch ("{}");
+	else if (c == ':')
+	{
+	    variable_possible = TRUE;
+	    in_rule = TRUE;
+	}
+	else if (variable_possible && isIdentifier (c))
+	{
+	    readIdentifier (c, name);
+	    if (strcmp (vStringValue (name), "endef") == 0)
+		in_define = FALSE;
+	    else if (in_define)
+		skipLine ();
+	    else if (strcmp (vStringValue (name), "define") == 0  &&
+		isIdentifier (c))
+	    {
+		in_define = TRUE;
+		c = skipToNonWhite ();
+		readIdentifier (c, name);
+		makeSimpleTag (name, MakeKinds, K_MACRO);
+		skipLine ();
+	    }
+	    else {
+		c = skipToNonWhite ();
+		if (strchr (":?+", c) != NULL)
 		{
-		    if (strchr (":?", *cp) != NULL)
-			++cp;
-		    if (*cp == '=')
-			makeSimpleTag (name, MakeKinds, K_MACRO);
+		    boolean append = (boolean)(c == '+');
+		    if (c == ':')
+			in_rule = TRUE;
+		    c = nextChar ();
+		    if (c != '=')
+			fileUngetc (c);
+		    else if (append)
+		    {
+			skipLine ();
+			continue;
+		    }
+		}
+		if (c == '=')
+		{
+		    makeSimpleTag (name, MakeKinds, K_MACRO);
+		    in_rule = FALSE;
+		    skipLine ();
 		}
 	    }
-	    else if (isspace ((int) *cp) ||  *cp == ':')
-		possible = TRUE;
-	    else
-		possible = FALSE;
-	    if (*cp != '\0')
-		++cp;
 	}
-	line_continuation = (boolean)
-	    (cp > line + 2  &&  strcmp ((const char *) cp - 2, "\\\n") == 0);
+	else
+	    variable_possible = FALSE;
     }
     vStringDelete (name);
 }

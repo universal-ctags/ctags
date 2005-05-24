@@ -3,7 +3,7 @@ Current Version: @@VERSION@@
 ctags-5.5.5 (Mon May 23 2005)
 * Changed --langmap to first unmap each supplied extension from other languages.
 * Added support for ASP constants [ASP, Patch #961842].
-* Added support for multi-line define of GNU make.
+* Added support for GNU make extensions [Make].
 * Added .mk as extension recognized as a make language file [Make].
 * Added missing help for list-maps options [Bug #1201826].
 * Extended functionality of Ruby parser with patch from Elliot Hughes [Ruby].
