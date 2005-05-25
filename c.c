@@ -2096,6 +2096,8 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 			c = skipToNonWhite ();
 			if (c == '(')
 			    skipToMatch ("()");
+			else
+			    cppUngetc (c);
 		    }
 		    else
 		    {

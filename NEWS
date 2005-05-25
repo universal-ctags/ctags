@@ -13,6 +13,7 @@ ctags-5.5.5 (Mon May 23 2005)
 * Fixed incorrect tag for first field of table [SQL].
 * Fixed missing tags for functions beginning with underscore [Sh].
 * Fixed missing tags for functions with variable arg list [C, Bug #1201689].
+* Fixed parsing problem with parentheses in argument list [C, Bug #1085585].
 
 ctags-5.5.4 (Thu Mar 25 2004)
 * Fixed broken -R option.
