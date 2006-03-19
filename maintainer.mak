@@ -55,7 +55,7 @@ CC		= gcc
 INCLUDE	= -I.
 DEFS	= -DHAVE_CONFIG_H
 COMP_FLAGS = $(INCLUDE) $(DEFS) $(CFLAGS)
-PROF_OPT= -O3 -march=i686 -mcpu=i686 
+PROF_OPT= -O3 -march=i686
 OPT		= $(PROF_OPT) -fomit-frame-pointer
 DCFLAGS	= $(COMP_FLAGS) -DDEBUG -DINTERNAL_SORT
 LD		= gcc
@@ -91,7 +91,7 @@ ctags: $(SOURCES:.c=.o)
 
 dctags: $(SOURCES:.c=.od) debug.od
 	@ echo "-- Building $@"
-	$(LD) -o $@ $(LDFLAGS) $^ -lefence
+	$(LD) -o $@ $(LDFLAGS) $^
 
 mctags: $(SOURCES:.c=.om) debug.om safe_malloc.om
 	@ echo "-- Building $@"
