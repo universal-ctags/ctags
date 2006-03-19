@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.5 (Mon May 23 2005)
+ctags-5.5.5 (Sun Mar 19 2006)
 * Changed --langmap to first unmap each supplied extension from other languages.
 * Added support for ASP constants [ASP, Patch #961842].
 * Added support for GNU make extensions [Make].
@@ -14,6 +14,7 @@ ctags-5.5.5 (Mon May 23 2005)
 * Fixed missing tags for functions beginning with underscore [Sh].
 * Fixed missing tags for functions with variable arg list [C, Bug #1201689].
 * Fixed parsing problem with parentheses in argument list [C, Bug #1085585].
+* Fixed problem in preprocessor directive handling [C, Bug #1086609].
 
 ctags-5.5.4 (Thu Mar 25 2004)
 * Fixed broken -R option.

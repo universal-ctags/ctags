@@ -319,7 +319,8 @@ static void directiveDefine (const int c)
     if (isident1 (c))
     {
 	readIdentifier (c, Cpp.directive.name);
-	makeDefineTag (vStringValue (Cpp.directive.name));
+	if (! isIgnore ())
+	    makeDefineTag (vStringValue (Cpp.directive.name));
     }
     Cpp.directive.state = DRCTV_NONE;
 }
@@ -399,7 +400,7 @@ static boolean directiveHash (const int c)
  */
 static boolean handleDirective (const int c)
 {
-    boolean ignore = FALSE;
+    boolean ignore = isIgnore ();
 
     switch (Cpp.directive.state)
     {
