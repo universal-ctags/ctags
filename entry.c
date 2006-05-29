@@ -729,6 +729,13 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 			   tag->extensionFields.scope [0],
 			   tag->extensionFields.scope [1]);
 
+    if (Option.extensionFields.typeRef  &&
+	    tag->extensionFields.typeRef [0] != NULL  &&
+	    tag->extensionFields.typeRef [1] != NULL)
+	length += fprintf (TagFile.fp, "%s\ttyperef:%s:%s", sep,
+			   tag->extensionFields.typeRef [0],
+			   tag->extensionFields.typeRef [1]);
+
     if (Option.extensionFields.fileScope  &&  tag->isFileScope)
 	length += fprintf (TagFile.fp, "%s\tfile:", sep);
 

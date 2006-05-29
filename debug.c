@@ -105,6 +105,12 @@ extern void debugEntry (const tagEntryInfo *const tag)
 		tag->extensionFields.implementation != NULL)
 	    printf (" [imp:%s]", tag->extensionFields.implementation);
 
+	if (Option.extensionFields.typeRef  &&
+		tag->extensionFields.typeRef [0] != NULL  &&
+		tag->extensionFields.typeRef [1] != NULL)
+	    printf (" [%s:%s]", tag->extensionFields.typeRef [0],
+		    tag->extensionFields.typeRef [1]);
+
 	printf ("#>");
 	fflush (stdout);
     }

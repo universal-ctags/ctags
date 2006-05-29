@@ -32,7 +32,7 @@ test.include: $(CTAGS_TEST) $(CTAGS_REF)
 	@- $(DIFF)
 
 REF_FIELD_OPTIONS = $(TEST_OPTIONS) --fields=+afmikKlnsSz
-TEST_FIELD_OPTIONS = $(TEST_OPTIONS) --fields=+afmikKlnsSz
+TEST_FIELD_OPTIONS = $(TEST_OPTIONS) --fields=+afmikKlnsStz
 test.fields: $(CTAGS_TEST) $(CTAGS_REF)
 	@ echo -n "Testing extension fields..."
 	@ $(CTAGS_REF) -R $(REF_FIELD_OPTIONS) -o tags.ref Test

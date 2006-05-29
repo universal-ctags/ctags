@@ -1,11 +1,12 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.5 (Sun Mar 19 2006)
+ctags-5.5.5 (Sun May 28 2006)
 * Changed --langmap to first unmap each supplied extension from other languages.
 * Added support for ASP constants [ASP, Patch #961842].
 * Added support for GNU make extensions [Make].
 * Added .mk as extension recognized as a make language file [Make].
 * Added missing help for list-maps options [Bug #1201826].
+* Added new extension field "typeref" [thanks to Bram Moolenaar].
 * Extended functionality of Ruby parser with patch from Elliot Hughes [Ruby].
 * Fixed creation of TAGS file with etags-include but no files [Bug #941233].
 * Fixed problem reading last line of list file (-L) without final newline.

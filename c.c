@@ -261,6 +261,9 @@ static langType Lang_vera;
 static vString *Signature;
 static boolean CollectingSignature;
 
+/* Number used to uniquely identify anonymous structs and unions. */
+static int AnonymousID = 0;
+
 /* Used to index into the CKinds table. */
 typedef enum {
     CK_UNDEFINED = -1,
@@ -756,15 +759,19 @@ static void reinitStatement (statementInfo *const st, const boolean partial)
     st->tokenIndex	= 0;
 
     if (st->parent != NULL)
-    {
 	st->inFunction = st->parent->inFunction;
-    }
 
     for (i = 0  ;  i < (unsigned int) NumTokens  ;  ++i)
 	initToken (st->token [i]);
 
     initToken (st->context);
-    initToken (st->blockName);
+
+    /*	Keep the block name, so that a variable following after a comma will
+     *	still have the structure name.
+     */
+    if (! partial)
+	initToken (st->blockName);
+
     vStringClear (st->parentClasses);
 
     /*  Init member info.
@@ -945,8 +952,17 @@ static const char* accessField (const statementInfo *const st)
     return result;
 }
 
+static void addContextSeparator (vString *const scope)
+{
+    if (isLanguage (Lang_c)  ||  isLanguage (Lang_cpp))
+	vStringCatS (scope, "::");
+    else if (isLanguage (Lang_java) || isLanguage (Lang_csharp))
+	vStringCatS (scope, ".");
+}
+
 static void addOtherFields (tagEntryInfo* const tag, const tagType type,
-			    const statementInfo *const st, vString *const scope)
+			    const statementInfo *const st,
+			    vString *const scope, vString *const typeRef)
 {
     /*  For selected tag types, append an extension flag designating the
      *  parent object in which the tag is defined.
@@ -1003,33 +1019,49 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 	    }
 	    break;
     }
-}
 
-static void addContextSeparator (vString *const scope)
-{
-    if (isLanguage (Lang_c)  ||  isLanguage (Lang_cpp))
-	vStringCatS (scope, "::");
-    else if (isLanguage (Lang_java) || isLanguage (Lang_csharp))
-	vStringCatS (scope, ".");
+    /* Add typename info, type of the tag and name of struct/union/etc. */
+    if ((type == TAG_TYPEDEF || type == TAG_VARIABLE || type == TAG_MEMBER)
+	    && isContextualStatement(st))
+    {
+	char *p;
+
+	tag->extensionFields.typeRef [0] =
+			tagName (declToTagType (st->declaration));
+	p = vStringValue (st->blockName->name);
+
+	/*  If there was no {} block get the name from the token before the
+	 *  name (current token is ';' or ',', previous token is the name).
+	 */
+	if (p == NULL || *p == '\0')
+	{
+	    tokenInfo *const prev2 = prevToken (st, 2);
+	    if (isType (prev2, TOKEN_NAME))
+		p = vStringValue (prev2->name);
+	}
+
+	/* Prepend the scope name if there is one. */
+	if (vStringLength (scope) > 0)
+	{
+	    vStringCopy(typeRef, scope);
+	    addContextSeparator (typeRef);
+	    vStringCatS(typeRef, p);
+	    p = vStringValue (typeRef);
+	}
+	tag->extensionFields.typeRef [1] = p;
+    }
 }
 
 static void findScopeHierarchy (vString *const string,
 				const statementInfo *const st)
 {
-    const char* const anon = "<anonymous>";
-    boolean nonAnonPresent = FALSE;
-
     vStringClear (string);
     if (isType (st->context, TOKEN_NAME))
-    {
 	vStringCopy (string, st->context->name);
-	nonAnonPresent = TRUE;
-    }
     if (st->parent != NULL)
     {
 	vString *temp = vStringNew ();
 	const statementInfo *s;
-
 	for (s = st->parent  ;  s != NULL  ;  s = s->parent)
 	{
 	    if (isContextualStatement (s) ||
@@ -1038,28 +1070,20 @@ static void findScopeHierarchy (vString *const string,
 	    {
 		vStringCopy (temp, string);
 		vStringClear (string);
-		if (isType (s->blockName, TOKEN_NAME))
+		Assert (isType (s->blockName, TOKEN_NAME));
+		if (isType (s->context, TOKEN_NAME) &&
+		    vStringLength (s->context->name) > 0)
 		{
-		    if (isType (s->context, TOKEN_NAME) &&
-			vStringLength (s->context->name) > 0)
-		    {
-			vStringCat (string, s->context->name);
-			addContextSeparator (string);
-		    }
-		    vStringCat (string, s->blockName->name);
-		    nonAnonPresent = TRUE;
+		    vStringCat (string, s->context->name);
+		    addContextSeparator (string);
 		}
-		else
-		    vStringCopyS (string, anon);
+		vStringCat (string, s->blockName->name);
 		if (vStringLength (temp) > 0)
 		    addContextSeparator (string);
 		vStringCat (string, temp);
 	    }
 	}
 	vStringDelete (temp);
-
-	if (! nonAnonPresent)
-	    vStringClear (string);
     }
 }
 
@@ -1108,6 +1132,10 @@ static void makeTag (const tokenInfo *const token,
 	includeTag (type, isFileScope))
     {
 	vString *scope = vStringNew ();
+	/* Use "typeRef" to store the typename from addOtherFields() until
+	 * it's used in makeTagEntry().
+	 */
+	vString *typeRef = vStringNew ();
 	tagEntryInfo e;
 
 	initTagEntry (&e, vStringValue (token->name));
@@ -1119,11 +1147,12 @@ static void makeTag (const tokenInfo *const token,
 	e.kind		= tagLetter (type);
 
 	findScopeHierarchy (scope, st);
-	addOtherFields (&e, type, st, scope);
+	addOtherFields (&e, type, st, scope, typeRef);
 
 	makeTagEntry (&e);
 	makeExtraTagEntry (type, &e, scope);
 	vStringDelete (scope);
+	vStringDelete (typeRef);
     }
 }
 
@@ -2586,6 +2615,17 @@ static void tagCheck (statementInfo *const st)
 	    {
 		if (isType (prev, TOKEN_NAME))
 		    copyToken (st->blockName, prev);
+		else
+		{
+		    /*  For an anonymous struct or union we use a unique ID
+		     *  a number, so that the members can be found.
+		     */
+		    char buf [20];  /* length of "_anon" + digits  + null */
+		    sprintf (buf, "__anon%d", ++AnonymousID);
+		    vStringCopyS (st->blockName->name, buf);
+		    st->blockName->type = TOKEN_NAME;
+		    st->blockName->keyword = KEYWORD_NONE;
+		}
 		qualifyBlockTag (st, prev);
 	    }
 	    else if (isLanguage (Lang_csharp))
