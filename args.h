@@ -14,7 +14,7 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 
 #include <stdio.h>
 
@@ -25,23 +25,23 @@
 typedef enum { ARG_NONE, ARG_STRING, ARG_ARGV, ARG_FILE } argType;
 
 typedef struct sArgs {
-    argType type;
-    union {
-	struct sStringArgs {
-	    const char* string;
-	    const char* next;
-	    const char* item;
-	} stringArgs;
-	struct sArgvArgs {
-	    char* const* argv;
-	    char* const* item;
-	} argvArgs;
-	struct sFileArgs {
-	    FILE* fp;
-	} fileArgs;
-    } u;
-    char* item;
-    boolean lineMode;
+	argType type;
+	union {
+		struct sStringArgs {
+			const char* string;
+			const char* next;
+			const char* item;
+		} stringArgs;
+		struct sArgvArgs {
+			char* const* argv;
+			char* const* item;
+		} argvArgs;
+		struct sFileArgs {
+			FILE* fp;
+		} fileArgs;
+	} u;
+	char* item;
+	boolean lineMode;
 } Arguments;
 
 /*
@@ -58,6 +58,6 @@ extern void argSetLineMode (Arguments* const current);
 extern void argForth (Arguments* const current);
 extern void argDelete (Arguments* const current);
 
-#endif	/* _ARGS_H */
+#endif  /* _ARGS_H */
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

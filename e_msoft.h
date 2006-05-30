@@ -14,7 +14,7 @@
 /*  MS-DOS/Windows doesn't allow manipulation of standard error,
  *  so we send it to stdout instead.
  */
-#define errout	stdout
+#define errout  stdout
 
 #define CASE_INSENSITIVE_FILENAMES 1
 #define MANUAL_GLOBBING 1
@@ -50,9 +50,9 @@
 # define HAVE_DIRECT_H 1
 
 # if _MSC_VER >= 1300
-#  define findfirst_t intptr_t		/* Visual Studio 7 */
+#  define findfirst_t intptr_t  /* Visual Studio 7 */
 # else
-#  define findfirst_t long		/* Visual Studio 6 or earlier */
+#  define findfirst_t long      /* Visual Studio 6 or earlier */
 # endif
 
 #elif defined (__MINGW32__)

@@ -1,6 +1,7 @@
 Current Version: @@VERSION@@
 
-ctags-5.5.5 (Sun May 28 2006)
+ctags-5.6 (Mon May 29 2006)
+* Reformatted code for independence of tab stop setting.
 * Changed --langmap to first unmap each supplied extension from other languages.
 * Added support for ASP constants [ASP, Patch #961842].
 * Added support for GNU make extensions [Make].

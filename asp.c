@@ -13,7 +13,7 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 
 #include <string.h>
 
@@ -25,14 +25,14 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-    K_CONST, K_FUNCTION, K_SUB, K_DIM
+	K_CONST, K_FUNCTION, K_SUB, K_DIM
 } aspKind;
 
 static kindOption AspKinds [] = {
-    { TRUE, 'c', "constant",   "constants"},
-    { TRUE, 'f', "function",   "functions"},
-    { TRUE, 's', "subroutine", "subroutines"},
-    { TRUE, 'v', "variable",   "variables"}
+	{ TRUE, 'c', "constant",   "constants"},
+	{ TRUE, 'f', "function",   "functions"},
+	{ TRUE, 's', "subroutine", "subroutines"},
+	{ TRUE, 'v', "variable",   "variables"}
 };
 
 /*
@@ -41,169 +41,171 @@ static kindOption AspKinds [] = {
 
 static void findAspTags (void)
 {
-    vString *name = vStringNew ();
-    const unsigned char *line;
+	vString *name = vStringNew ();
+	const unsigned char *line;
 
-    while ((line = fileReadLine ()) != NULL)
-    {
-	const unsigned char *cp = line;
-
-	while (*cp != '\0')
+	while ((line = fileReadLine ()) != NULL)
 	{
-	    /* jump over whitespace */
-	    while (isspace ((int)*cp))
-		cp++;
+		const unsigned char *cp = line;
 
-	    /* jump over strings */
-	    if (*cp == '"')
-	    {
-		cp++;
-		while (*cp!='"' && *cp!='\0')
-		    cp++;
-	    }
-
-	    /* jump over comments */ 
-	    else if (*cp == '\'')		    
-		break;
-	    
-	    /* jump over end function/sub lines */
-	    else if (strncasecmp ((const char*) cp, "end", (size_t) 3)== 0)
-	    {
-		cp += 3;
-		if (isspace ((int)*cp))
+		while (*cp != '\0')
 		{
-		    while (isspace ((int)*cp))
-			++cp;
+			/* jump over whitespace */
+			while (isspace ((int)*cp))
+				cp++;
 
-		    if (strncasecmp ((const char*) cp, "function", (size_t) 8) == 0)
-		    {
-			cp+=8;
-			break;
-		    }
+			/* jump over strings */
+			if (*cp == '"')
+			{
+				cp++;
+				while (*cp!='"' && *cp!='\0')
+					cp++;
+			}
 
-		    else if (strncasecmp ((const char*) cp, "sub", (size_t) 3) == 0)
-		    {
-			cp+=3;
-			break;
-		    }
+			/* jump over comments */ 
+			else if (*cp == '\'')
+				break;
+			
+			/* jump over end function/sub lines */
+			else if (strncasecmp ((const char*) cp, "end", (size_t) 3)== 0)
+			{
+				cp += 3;
+				if (isspace ((int)*cp))
+				{
+					while (isspace ((int)*cp))
+						++cp;
+
+					if (strncasecmp ((const char*) cp, "function", (size_t) 8) == 0)
+					{
+						cp+=8;
+						break;
+					}
+
+					else if (strncasecmp ((const char*) cp, "sub", (size_t) 3) == 0)
+					{
+						cp+=3;
+						break;
+					}
+				}
+			}
+
+			/* jump over exit function/sub lines */
+			else if (strncasecmp ((const char*) cp, "exit", (size_t) 4)==0)
+			{
+				cp += 4;
+				if (isspace ((int) *cp))
+				{
+					while (isspace ((int) *cp))
+						++cp;
+
+					if (strncasecmp ((const char*) cp, "function", (size_t) 8) == 0)
+					{
+						cp+=8;
+						break;
+					}
+
+					else if (strncasecmp ((const char*) cp, "sub", (size_t) 3) == 0)
+					{
+						cp+=3;
+						break;
+					}
+				}
+			}
+
+			/* function? */
+			else if (strncasecmp ((const char*) cp, "function", (size_t) 8) == 0)
+			{
+				cp += 8;
+
+				if (isspace ((int) *cp))
+				{
+					while (isspace ((int) *cp))
+						++cp;
+					while (isalnum ((int) *cp)  ||  *cp == '_')
+					{
+						vStringPut (name, (int) *cp);
+						++cp;
+					}
+					vStringTerminate (name);
+					makeSimpleTag (name, AspKinds, K_FUNCTION);
+					vStringClear (name);
+				}
+			}
+
+			/* sub? */
+			else if (strncasecmp ((const char*) cp, "sub", (size_t) 3) == 0)
+			{
+				cp += 3;
+				if (isspace ((int) *cp))
+				{
+					while (isspace ((int) *cp))
+						++cp;
+					while (isalnum ((int) *cp)  ||  *cp == '_')
+					{
+						vStringPut (name, (int) *cp);
+						++cp;
+					}
+					vStringTerminate (name);
+					makeSimpleTag (name, AspKinds, K_SUB);
+					vStringClear (name);
+				}
+			}
+
+			/* dim variable? */
+			else if (strncasecmp ((const char*) cp, "dim", (size_t) 3) == 0)
+			{
+				cp += 3;
+				if (isspace ((int) *cp))
+				{
+					while (isspace ((int) *cp))
+						++cp;
+					while (isalnum ((int) *cp)  ||  *cp == '_')
+					{
+						vStringPut (name, (int) *cp);
+						++cp;
+					}
+					vStringTerminate (name);
+					makeSimpleTag (name, AspKinds, K_DIM);
+					vStringClear (name);
+				}
+			}
+
+			/* const declaration? */
+			else if (strncasecmp ((const char*) cp, "const", (size_t) 5) == 0)
+			{
+				cp += 5;
+				if (isspace ((int) *cp))
+				{
+					while (isspace ((int) *cp))
+						++cp;
+					while (isalnum ((int) *cp)  ||  *cp == '_')
+					{
+						vStringPut (name, (int) *cp);
+						++cp;
+					}
+					vStringTerminate (name);
+					makeSimpleTag (name, AspKinds, K_CONST);
+					vStringClear (name);
+				}
+			}
+
+			/* nothing relevant */
+			else if (*cp != '\0')
+				cp++;
 		}
-	    }
-
-	    /* jump over exit function/sub lines */
-	    else if (strncasecmp ((const char*) cp, "exit", (size_t) 4)==0)
-	    {
-		cp += 4;
-		if (isspace ((int) *cp))
-		{
-		    while (isspace ((int) *cp))
-			++cp;
-
-		    if (strncasecmp ((const char*) cp, "function", (size_t) 8) == 0)
-		    {
-			cp+=8;
-			break;
-		    }
-
-		    else if (strncasecmp ((const char*) cp, "sub", (size_t) 3) == 0)
-		    {
-			cp+=3;
-			break;
-		    }
-		}
-	    }
-
-	    /* function? */
-	    else if (strncasecmp ((const char*) cp, "function", (size_t) 8) == 0)
-	    {
-		cp += 8;
-
-		if (isspace ((int) *cp))
-		{
-		    while (isspace ((int) *cp))
-			++cp;
-		    while (isalnum ((int) *cp)  ||  *cp == '_')
-		    {
-			vStringPut (name, (int) *cp);
-			++cp;
-		    }
-		    vStringTerminate (name);
-		    makeSimpleTag (name, AspKinds, K_FUNCTION);
-		    vStringClear (name);
-		}
-	    }
-
-	    /* sub? */
-	    else if (strncasecmp ((const char*) cp, "sub", (size_t) 3) == 0)
-	    {
-		cp += 3;
-		if (isspace ((int) *cp))
-		{
-		    while (isspace ((int) *cp))
-			++cp;
-		    while (isalnum ((int) *cp)  ||  *cp == '_')
-		    {
-			vStringPut (name, (int) *cp);
-			++cp;
-		    }
-		    vStringTerminate (name);
-		    makeSimpleTag (name, AspKinds, K_SUB);
-		    vStringClear (name);
-		}
-	    }
-
-	    /* dim variable? */
-	    else if (strncasecmp ((const char*) cp, "dim", (size_t) 3) == 0)
-	    {
-		cp += 3;
-		if (isspace ((int) *cp))
-		{
-		    while (isspace ((int) *cp))
-			++cp;
-		    while (isalnum ((int) *cp)  ||  *cp == '_')
-		    {
-			vStringPut (name, (int) *cp);
-			++cp;
-		    }
-		    vStringTerminate (name);
-		    makeSimpleTag (name, AspKinds, K_DIM);
-		    vStringClear (name);
-		}
-	    }
-
-	    /* const declaration? */
-	    else if (strncasecmp ((const char*) cp, "const", (size_t) 5) == 0)
-	    {
-		cp += 5;
-		if (isspace ((int) *cp))
-		{
-		    while (isspace ((int) *cp))
-			++cp;
-		    while (isalnum ((int) *cp)  ||  *cp == '_')
-		    {
-			vStringPut (name, (int) *cp);
-			++cp;
-		    }
-		    vStringTerminate (name);
-		    makeSimpleTag (name, AspKinds, K_CONST);
-		    vStringClear (name);
-		}
-	    }
-
-	    /* nothing relevant */
-	    else if (*cp != '\0')
-		cp++;
 	}
-    }
-    vStringDelete (name);
+	vStringDelete (name);
 }
 
 extern parserDefinition* AspParser (void)
 {
-    static const char *const extensions [] = { "asp", "asa", NULL };
-    parserDefinition* def = parserNew ("Asp");
-    def->kinds      = AspKinds;
-    def->kindCount  = KIND_COUNT (AspKinds);
-    def->extensions = extensions;
-    def->parser     = findAspTags;
-    return def;
+	static const char *const extensions [] = { "asp", "asa", NULL };
+	parserDefinition* def = parserNew ("Asp");
+	def->kinds      = AspKinds;
+	def->kindCount  = KIND_COUNT (AspKinds);
+	def->extensions = extensions;
+	def->parser     = findAspTags;
+	return def;
 }
+
+/* vi:set tabstop=4 shiftwidth=4: */

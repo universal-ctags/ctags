@@ -14,7 +14,7 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 
 #include "parse.h"
 
@@ -28,6 +28,6 @@ extern void freeKeywordTable (void);
 extern void printKeywordTable (void);
 #endif
 
-#endif	/* _KEYWORD_H */
+#endif  /* _KEYWORD_H */
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

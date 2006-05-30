@@ -56,7 +56,8 @@ INCLUDE	= -I.
 DEFS	= -DHAVE_CONFIG_H
 COMP_FLAGS = $(INCLUDE) $(DEFS) $(CFLAGS)
 PROF_OPT= -O3 -march=i686
-OPT		= $(PROF_OPT) -fomit-frame-pointer
+#OPT		= $(PROF_OPT) -fomit-frame-pointer
+OPT		= $(PROF_OPT)
 DCFLAGS	= $(COMP_FLAGS) -DDEBUG -DINTERNAL_SORT
 LD		= gcc
 LDFLAGS	= 

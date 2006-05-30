@@ -16,7 +16,7 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 
 #include <string.h>
 
@@ -24,7 +24,7 @@
 # include <ctype.h>
 # include <stddef.h>
 # ifdef HAVE_SYS_TYPES_H
-#  include <sys/types.h> /* declare off_t (not known to regex.h on FreeBSD) */
+#  include <sys/types.h>  /* declare off_t (not known to regex.h on FreeBSD) */
 # endif
 # include "regex.h"
 #endif
@@ -56,33 +56,33 @@
 #if defined (POSIX_REGEX)
 
 struct sKind {
-    boolean enabled;
-    char letter;
-    char* name;
-    char* description;
+	boolean enabled;
+	char letter;
+	char* name;
+	char* description;
 };
 
 enum pType { PTRN_TAG, PTRN_CALLBACK };
 
 typedef struct {
-    regex_t *pattern;
-    enum pType type;
-    union {
-	struct {
-	    char *name_pattern;
-	    struct sKind kind;
-	} tag;
-	struct {
-	    regexCallback function;
-	} callback;
-    } u;
+	regex_t *pattern;
+	enum pType type;
+	union {
+		struct {
+			char *name_pattern;
+			struct sKind kind;
+		} tag;
+		struct {
+			regexCallback function;
+		} callback;
+	} u;
 } regexPattern;
 
 #endif
 
 typedef struct {
-    regexPattern *patterns;
-    unsigned int count;
+	regexPattern *patterns;
+	unsigned int count;
 } patternSet;
 
 /*
@@ -93,7 +93,7 @@ static boolean regexBroken = FALSE;
 
 /* Array of pattern sets, indexed by language */
 static patternSet* Sets = NULL;
-static int SetUpper = -1;	/* upper language index in list */
+static int SetUpper = -1;  /* upper language index in list */
 
 /*
 *   FUNCTION DEFINITIONS
@@ -101,29 +101,29 @@ static int SetUpper = -1;	/* upper language index in list */
 
 static void clearPatternSet (const langType language)
 {
-    if (language < SetUpper)
-    {
-	patternSet* const set = Sets + language;
-	unsigned int i;
-	for (i = 0  ;  i < set->count  ;  ++i)
+	if (language < SetUpper)
 	{
+		patternSet* const set = Sets + language;
+		unsigned int i;
+		for (i = 0  ;  i < set->count  ;  ++i)
+		{
 #if defined (POSIX_REGEX)
-	    regfree (set->patterns [i].pattern);
+			regfree (set->patterns [i].pattern);
 #endif
-	    eFree (set->patterns [i].pattern);
-	    set->patterns [i].pattern = NULL;
+			eFree (set->patterns [i].pattern);
+			set->patterns [i].pattern = NULL;
 
-	    if (set->patterns [i].type == PTRN_TAG)
-	    {
-		eFree (set->patterns [i].u.tag.name_pattern);
-		set->patterns [i].u.tag.name_pattern = NULL;
-	    }
+			if (set->patterns [i].type == PTRN_TAG)
+			{
+				eFree (set->patterns [i].u.tag.name_pattern);
+				set->patterns [i].u.tag.name_pattern = NULL;
+			}
+		}
+		if (set->patterns != NULL)
+			eFree (set->patterns);
+		set->patterns = NULL;
+		set->count = 0;
 	}
-	if (set->patterns != NULL)
-	    eFree (set->patterns);
-	set->patterns = NULL;
-	set->count = 0;
-    }
 }
 
 /*
@@ -131,18 +131,18 @@ static void clearPatternSet (const langType language)
 */
 
 static void makeRegexTag (
-	const vString* const name, const struct sKind* const kind)
+		const vString* const name, const struct sKind* const kind)
 {
-    if (kind->enabled)
-    {
-	tagEntryInfo e;
-	Assert (name != NULL  &&  vStringLength (name) > 0);
-	Assert (kind != NULL);
-	initTagEntry (&e, vStringValue (name));
-	e.kind     = kind->letter;
-	e.kindName = kind->name;
-	makeTagEntry (&e);
-    }
+	if (kind->enabled)
+	{
+		tagEntryInfo e;
+		Assert (name != NULL  &&  vStringLength (name) > 0);
+		Assert (kind != NULL);
+		initTagEntry (&e, vStringValue (name));
+		e.kind     = kind->letter;
+		e.kindName = kind->name;
+		makeTagEntry (&e);
+	}
 }
 
 /*
@@ -158,37 +158,37 @@ static void makeRegexTag (
  */
 static char* scanSeparators (char* name)
 {
-    char sep = name [0];
-    char *copyto = name;
-    boolean quoted = FALSE;
+	char sep = name [0];
+	char *copyto = name;
+	boolean quoted = FALSE;
 
-    for (++name ; *name != '\0' ; ++name)
-    {
-	if (quoted)
+	for (++name ; *name != '\0' ; ++name)
 	{
-	    if (*name == sep)
-		*copyto++ = sep;
-	    else if (*name == 't')
-		*copyto++ = '\t';
-	    else
-	    {
-		/* Something else is quoted, so preserve the quote. */
-		*copyto++ = '\\';
-		*copyto++ = *name;
-	    }
-	    quoted = FALSE;
+		if (quoted)
+		{
+			if (*name == sep)
+				*copyto++ = sep;
+			else if (*name == 't')
+				*copyto++ = '\t';
+			else
+			{
+				/* Something else is quoted, so preserve the quote. */
+				*copyto++ = '\\';
+				*copyto++ = *name;
+			}
+			quoted = FALSE;
+		}
+		else if (*name == '\\')
+			quoted = TRUE;
+		else if (*name == sep)
+		{
+			break;
+		}
+		else
+			*copyto++ = *name;
 	}
-	else if (*name == '\\')
-	    quoted = TRUE;
-	else if (*name == sep)
-	{
-	    break;
-	}
-	else
-	    *copyto++ = *name;
-    }
-    *copyto = '\0';
-    return name;
+	*copyto = '\0';
+	return name;
 }
 
 /* Parse `regexp', in form "/regex/name/[k,Kind/]flags" (where the separator
@@ -201,215 +201,215 @@ static char* scanSeparators (char* name)
  * correct format, a false value is returned.
  */
 static boolean parseTagRegex (
-	char* const regexp, char** const name,
-	char** const kinds, char** const flags)
+		char* const regexp, char** const name,
+		char** const kinds, char** const flags)
 {
-    boolean result = FALSE;
-    const int separator = (unsigned char) regexp [0];
+	boolean result = FALSE;
+	const int separator = (unsigned char) regexp [0];
 
-    *name = scanSeparators (regexp);
-    if (*regexp == '\0')
-	error (WARNING, "empty regexp");
-    else if (**name != separator)
-	error (WARNING, "%s: incomplete regexp", regexp);
-    else
-    {
-	char* const third = scanSeparators (*name);
-	if (**name == '\0')
-	    error (WARNING, "%s: regexp missing name pattern", regexp);
-	if ((*name) [strlen (*name) - 1] == '\\')
-	    error (WARNING, "error in name pattern: \"%s\"", *name);
-	if (*third != separator)
-	    error (WARNING, "%s: regexp missing final separator", regexp);
+	*name = scanSeparators (regexp);
+	if (*regexp == '\0')
+		error (WARNING, "empty regexp");
+	else if (**name != separator)
+		error (WARNING, "%s: incomplete regexp", regexp);
 	else
 	{
-	    char* const fourth = scanSeparators (third);
-	    if (*fourth == separator)
-	    {
-		*kinds = third;
-		scanSeparators (fourth);
-		*flags = fourth;
-	    }
-	    else
-	    {
-		*flags = third;
-		*kinds = NULL;
-	    }
-	    result = TRUE;
+		char* const third = scanSeparators (*name);
+		if (**name == '\0')
+			error (WARNING, "%s: regexp missing name pattern", regexp);
+		if ((*name) [strlen (*name) - 1] == '\\')
+			error (WARNING, "error in name pattern: \"%s\"", *name);
+		if (*third != separator)
+			error (WARNING, "%s: regexp missing final separator", regexp);
+		else
+		{
+			char* const fourth = scanSeparators (third);
+			if (*fourth == separator)
+			{
+				*kinds = third;
+				scanSeparators (fourth);
+				*flags = fourth;
+			}
+			else
+			{
+				*flags = third;
+				*kinds = NULL;
+			}
+			result = TRUE;
+		}
 	}
-    }
-    return result;
+	return result;
 }
 
 static void addCompiledTagPattern (
-	const langType language, regex_t* const pattern,
-	char* const name, const char kind, char* const kindName,
-	char *const description)
+		const langType language, regex_t* const pattern,
+		char* const name, const char kind, char* const kindName,
+		char *const description)
 {
-    patternSet* set;
-    regexPattern *ptrn;
-    if (language > SetUpper)
-    {
-	int i;
-	Sets = xRealloc (Sets, (language + 1), patternSet);
-	for (i = SetUpper + 1  ;  i <= language  ;  ++i)
+	patternSet* set;
+	regexPattern *ptrn;
+	if (language > SetUpper)
 	{
-	    Sets [i].patterns = NULL;
-	    Sets [i].count = 0;
+		int i;
+		Sets = xRealloc (Sets, (language + 1), patternSet);
+		for (i = SetUpper + 1  ;  i <= language  ;  ++i)
+		{
+			Sets [i].patterns = NULL;
+			Sets [i].count = 0;
+		}
+		SetUpper = language;
 	}
-	SetUpper = language;
-    }
-    set = Sets + language;
-    set->patterns = xRealloc (set->patterns, (set->count + 1), regexPattern);
-    ptrn = &set->patterns [set->count];
-    set->count += 1;
+	set = Sets + language;
+	set->patterns = xRealloc (set->patterns, (set->count + 1), regexPattern);
+	ptrn = &set->patterns [set->count];
+	set->count += 1;
 
-    ptrn->pattern = pattern;
-    ptrn->type    = PTRN_TAG;
-    ptrn->u.tag.name_pattern = name;
-    ptrn->u.tag.kind.enabled = TRUE;
-    ptrn->u.tag.kind.letter  = kind;
-    ptrn->u.tag.kind.name    = kindName;
-    ptrn->u.tag.kind.description = description;
+	ptrn->pattern = pattern;
+	ptrn->type    = PTRN_TAG;
+	ptrn->u.tag.name_pattern = name;
+	ptrn->u.tag.kind.enabled = TRUE;
+	ptrn->u.tag.kind.letter  = kind;
+	ptrn->u.tag.kind.name    = kindName;
+	ptrn->u.tag.kind.description = description;
 }
 
 static void addCompiledCallbackPattern (
-	const langType language, regex_t* const pattern,
-	const regexCallback callback)
+		const langType language, regex_t* const pattern,
+		const regexCallback callback)
 {
-    patternSet* set;
-    regexPattern *ptrn;
-    if (language > SetUpper)
-    {
-	int i;
-	Sets = xRealloc (Sets, (language + 1), patternSet);
-	for (i = SetUpper + 1  ;  i <= language  ;  ++i)
+	patternSet* set;
+	regexPattern *ptrn;
+	if (language > SetUpper)
 	{
-	    Sets [i].patterns = NULL;
-	    Sets [i].count = 0;
+		int i;
+		Sets = xRealloc (Sets, (language + 1), patternSet);
+		for (i = SetUpper + 1  ;  i <= language  ;  ++i)
+		{
+			Sets [i].patterns = NULL;
+			Sets [i].count = 0;
+		}
+		SetUpper = language;
 	}
-	SetUpper = language;
-    }
-    set = Sets + language;
-    set->patterns = xRealloc (set->patterns, (set->count + 1), regexPattern);
-    ptrn = &set->patterns [set->count];
-    set->count += 1;
+	set = Sets + language;
+	set->patterns = xRealloc (set->patterns, (set->count + 1), regexPattern);
+	ptrn = &set->patterns [set->count];
+	set->count += 1;
 
-    ptrn->pattern = pattern;
-    ptrn->type    = PTRN_CALLBACK;
-    ptrn->u.callback.function = callback;
+	ptrn->pattern = pattern;
+	ptrn->type    = PTRN_CALLBACK;
+	ptrn->u.callback.function = callback;
 }
 
 #if defined (POSIX_REGEX)
 
 static regex_t* compileRegex (const char* const regexp, const char* const flags)
 {
-    int cflags = REG_EXTENDED | REG_NEWLINE;
-    regex_t *result = NULL;
-    int errcode;
-    int i;
-    for (i = 0  ; flags != NULL  &&  flags [i] != '\0'  ;  ++i)
-    {
-	switch ((int) flags [i])
+	int cflags = REG_EXTENDED | REG_NEWLINE;
+	regex_t *result = NULL;
+	int errcode;
+	int i;
+	for (i = 0  ; flags != NULL  &&  flags [i] != '\0'  ;  ++i)
 	{
-	    case 'b': cflags &= ~REG_EXTENDED; break;
-	    case 'e': cflags |= REG_EXTENDED;  break;
-	    case 'i': cflags |= REG_ICASE;     break;
-	    default: error (WARNING, "unknown regex flag: '%c'", *flags); break;
+		switch ((int) flags [i])
+		{
+			case 'b': cflags &= ~REG_EXTENDED; break;
+			case 'e': cflags |= REG_EXTENDED;  break;
+			case 'i': cflags |= REG_ICASE;     break;
+			default: error (WARNING, "unknown regex flag: '%c'", *flags); break;
+		}
 	}
-    }
-    result = xMalloc (1, regex_t);
-    errcode = regcomp (result, regexp, cflags);
-    if (errcode != 0)
-    {
-	char errmsg[256];
-	regerror (errcode, result, errmsg, 256);
-	error (WARNING, "%s", errmsg);
-	regfree (result);
-	eFree (result);
-	result = NULL;
-    }
-    return result;
+	result = xMalloc (1, regex_t);
+	errcode = regcomp (result, regexp, cflags);
+	if (errcode != 0)
+	{
+		char errmsg[256];
+		regerror (errcode, result, errmsg, 256);
+		error (WARNING, "%s", errmsg);
+		regfree (result);
+		eFree (result);
+		result = NULL;
+	}
+	return result;
 }
 
 #endif
 
 static void parseKinds (
-	const char* const kinds, char* const kind, char** const kindName,
-	char **description)
+		const char* const kinds, char* const kind, char** const kindName,
+		char **description)
 {
-    *kind = '\0';
-    *kindName = NULL;
-    *description = NULL;
-    if (kinds == NULL  ||  kinds [0] == '\0')
-    {
-	*kind = 'r';
-	*kindName = eStrdup ("regex");
-    }
-    else if (kinds [0] != '\0')
-    {
-	const char* k = kinds;
-	if (k [0] != ','  &&  (k [1] == ','  ||  k [1] == '\0'))
-	    *kind = *k++;
-	else
-	    *kind = 'r';
-	if (*k == ',')
-	    ++k;
-	if (k [0] == '\0')
-	    *kindName = eStrdup ("regex");
-	else
+	*kind = '\0';
+	*kindName = NULL;
+	*description = NULL;
+	if (kinds == NULL  ||  kinds [0] == '\0')
 	{
-	    const char *const comma = strchr (k, ',');
-	    if (comma == NULL)
-		*kindName = eStrdup (k);
-	    else
-	    {
-		*kindName = (char*) eMalloc (comma - k + 1);
-		strncpy (*kindName, k, comma - k);
-		(*kindName) [comma - k] = '\0';
-		k = comma + 1;
-		if (k [0] != '\0')
-		    *description = eStrdup (k);
-	    }
+		*kind = 'r';
+		*kindName = eStrdup ("regex");
 	}
-    }
+	else if (kinds [0] != '\0')
+	{
+		const char* k = kinds;
+		if (k [0] != ','  &&  (k [1] == ','  ||  k [1] == '\0'))
+			*kind = *k++;
+		else
+			*kind = 'r';
+		if (*k == ',')
+			++k;
+		if (k [0] == '\0')
+			*kindName = eStrdup ("regex");
+		else
+		{
+			const char *const comma = strchr (k, ',');
+			if (comma == NULL)
+				*kindName = eStrdup (k);
+			else
+			{
+				*kindName = (char*) eMalloc (comma - k + 1);
+				strncpy (*kindName, k, comma - k);
+				(*kindName) [comma - k] = '\0';
+				k = comma + 1;
+				if (k [0] != '\0')
+					*description = eStrdup (k);
+			}
+		}
+	}
 }
 
 static void printRegexKind (const regexPattern *pat, unsigned int i, boolean indent)
 {
-    const struct sKind *const kind = &pat [i].u.tag.kind;
-    const char *const indentation = indent ? "    " : "";
-    Assert (pat [i].type == PTRN_TAG);
-    printf ("%s%c  %s %s\n", indentation,
-	    kind->letter != '\0' ? kind->letter : '?',
-	    kind->description != NULL ? kind->description : kind->name,
-	    kind->enabled ? "" : " [off]");
+	const struct sKind *const kind = &pat [i].u.tag.kind;
+	const char *const indentation = indent ? "    " : "";
+	Assert (pat [i].type == PTRN_TAG);
+	printf ("%s%c  %s %s\n", indentation,
+			kind->letter != '\0' ? kind->letter : '?',
+			kind->description != NULL ? kind->description : kind->name,
+			kind->enabled ? "" : " [off]");
 }
 
 static void processLanguageRegex (const langType language,
-	const char* const parameter)
+		const char* const parameter)
 {
-    if (parameter == NULL  ||  parameter [0] == '\0')
-	clearPatternSet (language);
-    else if (parameter [0] != '@')
-	addLanguageRegex (language, parameter);
-    else if (! doesFileExist (parameter + 1))
-	error (WARNING, "cannot open regex file");
-    else
-    {
-	const char* regexfile = parameter + 1;
-	FILE* const fp = fopen (regexfile, "r");
-	if (fp == NULL)
-	    error (WARNING | PERROR, regexfile);
+	if (parameter == NULL  ||  parameter [0] == '\0')
+		clearPatternSet (language);
+	else if (parameter [0] != '@')
+		addLanguageRegex (language, parameter);
+	else if (! doesFileExist (parameter + 1))
+		error (WARNING, "cannot open regex file");
 	else
 	{
-	    vString* const regex = vStringNew ();
-	    while (readLine (regex, fp))
-		addLanguageRegex (language, vStringValue (regex));
-	    fclose (fp);
-	    vStringDelete (regex);
+		const char* regexfile = parameter + 1;
+		FILE* const fp = fopen (regexfile, "r");
+		if (fp == NULL)
+			error (WARNING | PERROR, regexfile);
+		else
+		{
+			vString* const regex = vStringNew ();
+			while (readLine (regex, fp))
+				addLanguageRegex (language, vStringValue (regex));
+			fclose (fp);
+			vStringDelete (regex);
+		}
 	}
-    }
 }
 
 /*
@@ -419,83 +419,83 @@ static void processLanguageRegex (const langType language,
 #if defined (POSIX_REGEX)
 
 static vString* substitute (
-	const char* const in, const char* out,
-	const int nmatch, const regmatch_t* const pmatch)
+		const char* const in, const char* out,
+		const int nmatch, const regmatch_t* const pmatch)
 {
-    vString* result = vStringNew ();
-    const char* p;
-    for (p = out  ;  *p != '\0'  ;  p++)
-    {
-	if (*p == '\\'  &&  isdigit ((int) *++p))
+	vString* result = vStringNew ();
+	const char* p;
+	for (p = out  ;  *p != '\0'  ;  p++)
 	{
-	    const int dig = *p - '0';
-	    if (0 < dig  &&  dig < nmatch  &&  pmatch [dig].rm_so != -1)
-	    {
-		const int diglen = pmatch [dig].rm_eo - pmatch [dig].rm_so;
-		vStringNCatS (result, in + pmatch [dig].rm_so, diglen);
-	    }
+		if (*p == '\\'  &&  isdigit ((int) *++p))
+		{
+			const int dig = *p - '0';
+			if (0 < dig  &&  dig < nmatch  &&  pmatch [dig].rm_so != -1)
+			{
+				const int diglen = pmatch [dig].rm_eo - pmatch [dig].rm_so;
+				vStringNCatS (result, in + pmatch [dig].rm_so, diglen);
+			}
+		}
+		else if (*p != '\n'  &&  *p != '\r')
+			vStringPut (result, *p);
 	}
-	else if (*p != '\n'  &&  *p != '\r')
-	    vStringPut (result, *p);
-    }
-    vStringTerminate (result);
-    return result;
+	vStringTerminate (result);
+	return result;
 }
 
 static void matchTagPattern (const vString* const line,
-	const regexPattern* const patbuf,
-	const regmatch_t* const pmatch)
+		const regexPattern* const patbuf,
+		const regmatch_t* const pmatch)
 {
-    vString *const name = substitute (vStringValue (line),
-	    patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch);
-    vStringStripLeading (name);
-    vStringStripTrailing (name);
-    if (vStringLength (name) > 0)
-	makeRegexTag (name, &patbuf->u.tag.kind);
-    else
-	error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
-	    getInputFileName (), getInputLineNumber (),
-	    patbuf->u.tag.name_pattern);
-    vStringDelete (name);
+	vString *const name = substitute (vStringValue (line),
+			patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch);
+	vStringStripLeading (name);
+	vStringStripTrailing (name);
+	if (vStringLength (name) > 0)
+		makeRegexTag (name, &patbuf->u.tag.kind);
+	else
+		error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
+			getInputFileName (), getInputLineNumber (),
+			patbuf->u.tag.name_pattern);
+	vStringDelete (name);
 }
 
 static void matchCallbackPattern (
-	const vString* const line, const regexPattern* const patbuf,
-	const regmatch_t* const pmatch)
+		const vString* const line, const regexPattern* const patbuf,
+		const regmatch_t* const pmatch)
 {
-    regexMatch matches [BACK_REFERENCE_COUNT];
-    unsigned int count = 0;
-    int i;
-    for (i = 0  ;  i < BACK_REFERENCE_COUNT  &&  pmatch [i].rm_so != -1  ;  ++i)
-    {
-	matches [i].start  = pmatch [i].rm_so;
-	matches [i].length = pmatch [i].rm_eo - pmatch [i].rm_so;
-	++count;
-    }
-    patbuf->u.callback.function (vStringValue (line), matches, count);
+	regexMatch matches [BACK_REFERENCE_COUNT];
+	unsigned int count = 0;
+	int i;
+	for (i = 0  ;  i < BACK_REFERENCE_COUNT  &&  pmatch [i].rm_so != -1  ;  ++i)
+	{
+		matches [i].start  = pmatch [i].rm_so;
+		matches [i].length = pmatch [i].rm_eo - pmatch [i].rm_so;
+		++count;
+	}
+	patbuf->u.callback.function (vStringValue (line), matches, count);
 }
 
 static boolean matchRegexPattern (const vString* const line,
-	const regexPattern* const patbuf)
+		const regexPattern* const patbuf)
 {
-    boolean result = FALSE;
-    regmatch_t pmatch [BACK_REFERENCE_COUNT];
-    const int match = regexec (patbuf->pattern, vStringValue (line),
-			       BACK_REFERENCE_COUNT, pmatch, 0);
-    if (match == 0)
-    {
-	result = TRUE;
-	if (patbuf->type == PTRN_TAG)
-	    matchTagPattern (line, patbuf, pmatch);
-	else if (patbuf->type == PTRN_CALLBACK)
-	    matchCallbackPattern (line, patbuf, pmatch);
-	else
+	boolean result = FALSE;
+	regmatch_t pmatch [BACK_REFERENCE_COUNT];
+	const int match = regexec (patbuf->pattern, vStringValue (line),
+							   BACK_REFERENCE_COUNT, pmatch, 0);
+	if (match == 0)
 	{
-	    Assert ("invalid pattern type" == NULL);
-	    result = FALSE;
+		result = TRUE;
+		if (patbuf->type == PTRN_TAG)
+			matchTagPattern (line, patbuf, pmatch);
+		else if (patbuf->type == PTRN_CALLBACK)
+			matchCallbackPattern (line, patbuf, pmatch);
+		else
+		{
+			Assert ("invalid pattern type" == NULL);
+			result = FALSE;
+		}
 	}
-    }
-    return result;
+	return result;
 }
 
 #endif
@@ -507,85 +507,85 @@ static boolean matchRegexPattern (const vString* const line,
  */
 extern boolean matchRegex (const vString* const line, const langType language)
 {
-    boolean result = FALSE;
-    if (language != LANG_IGNORE  &&  language <= SetUpper  &&
-	Sets [language].count > 0)
-    {
-	const patternSet* const set = Sets + language;
-	unsigned int i;
-	for (i = 0  ;  i < set->count  ;  ++i)
-	    if (matchRegexPattern (line, set->patterns + i))
-		result = TRUE;
-    }
-    return result;
+	boolean result = FALSE;
+	if (language != LANG_IGNORE  &&  language <= SetUpper  &&
+		Sets [language].count > 0)
+	{
+		const patternSet* const set = Sets + language;
+		unsigned int i;
+		for (i = 0  ;  i < set->count  ;  ++i)
+			if (matchRegexPattern (line, set->patterns + i))
+				result = TRUE;
+	}
+	return result;
 }
 
 extern void findRegexTags (void)
 {
-    /* merely read all lines of the file */
-    while (fileReadLine () != NULL)
-	;
+	/* merely read all lines of the file */
+	while (fileReadLine () != NULL)
+		;
 }
 
-#endif /* HAVE_REGEX */
+#endif  /* HAVE_REGEX */
 
 extern void addTagRegex (
-	const langType language __unused__,
-	const char* const regex __unused__,
-	const char* const name __unused__,
-	const char* const kinds __unused__,
-	const char* const flags __unused__)
+		const langType language __unused__,
+		const char* const regex __unused__,
+		const char* const name __unused__,
+		const char* const kinds __unused__,
+		const char* const flags __unused__)
 {
 #ifdef HAVE_REGEX
-    Assert (regex != NULL);
-    Assert (name != NULL);
-    if (! regexBroken)
-    {
-	regex_t* const cp = compileRegex (regex, flags);
-	if (cp != NULL)
+	Assert (regex != NULL);
+	Assert (name != NULL);
+	if (! regexBroken)
 	{
-	    char kind;
-	    char* kindName;
-	    char* description;
-	    parseKinds (kinds, &kind, &kindName, &description);
-	    addCompiledTagPattern (language, cp, eStrdup (name),
-		    kind, kindName, description);
+		regex_t* const cp = compileRegex (regex, flags);
+		if (cp != NULL)
+		{
+			char kind;
+			char* kindName;
+			char* description;
+			parseKinds (kinds, &kind, &kindName, &description);
+			addCompiledTagPattern (language, cp, eStrdup (name),
+					kind, kindName, description);
+		}
 	}
-    }
 #endif
 }
 
 extern void addCallbackRegex (
-	const langType language __unused__,
-	const char* const regex __unused__,
-	const char* const flags __unused__,
-	const regexCallback callback __unused__)
+		const langType language __unused__,
+		const char* const regex __unused__,
+		const char* const flags __unused__,
+		const regexCallback callback __unused__)
 {
 #ifdef HAVE_REGEX
-    Assert (regex != NULL);
-    if (! regexBroken)
-    {
-	regex_t* const cp = compileRegex (regex, flags);
-	if (cp != NULL)
-	    addCompiledCallbackPattern (language, cp, callback);
-    }
+	Assert (regex != NULL);
+	if (! regexBroken)
+	{
+		regex_t* const cp = compileRegex (regex, flags);
+		if (cp != NULL)
+			addCompiledCallbackPattern (language, cp, callback);
+	}
 #endif
 }
 
 extern void addLanguageRegex (
-	const langType language __unused__, const char* const regex __unused__)
+		const langType language __unused__, const char* const regex __unused__)
 {
 #ifdef HAVE_REGEX
-    if (! regexBroken)
-    {
-	char *const regex_pat = eStrdup (regex);
-	char *name, *kinds, *flags;
-	if (parseTagRegex (regex_pat, &name, &kinds, &flags))
+	if (! regexBroken)
 	{
-	    addTagRegex (language, regex_pat, name, kinds, flags);
-	    eFree (regex_pat);
+		char *const regex_pat = eStrdup (regex);
+		char *name, *kinds, *flags;
+		if (parseTagRegex (regex_pat, &name, &kinds, &flags))
+		{
+			addTagRegex (language, regex_pat, name, kinds, flags);
+			eFree (regex_pat);
+		}
 	}
-    }
 #endif
 }
 
@@ -594,88 +594,88 @@ extern void addLanguageRegex (
 */
 
 extern boolean processRegexOption (const char *const option,
-				   const char *const parameter __unused__)
+								   const char *const parameter __unused__)
 {
-    boolean handled = FALSE;
-    const char* const dash = strchr (option, '-');
-    if (dash != NULL  &&  strncmp (option, "regex", dash - option) == 0)
-    {
+	boolean handled = FALSE;
+	const char* const dash = strchr (option, '-');
+	if (dash != NULL  &&  strncmp (option, "regex", dash - option) == 0)
+	{
 #ifdef HAVE_REGEX
-	langType language;
-	language = getNamedLanguage (dash + 1);
-	if (language == LANG_IGNORE)
-	    error (WARNING, "unknown language in --%s option", option);
-	else
-	    processLanguageRegex (language, parameter);
+		langType language;
+		language = getNamedLanguage (dash + 1);
+		if (language == LANG_IGNORE)
+			error (WARNING, "unknown language in --%s option", option);
+		else
+			processLanguageRegex (language, parameter);
 #else
-	error (WARNING, "regex support not available; required for --%s option",
-	   option);
+		error (WARNING, "regex support not available; required for --%s option",
+		   option);
 #endif
-	handled = TRUE;
-    }
-    return handled;
+		handled = TRUE;
+	}
+	return handled;
 }
 
 extern void disableRegexKinds (const langType language __unused__)
 {
 #ifdef HAVE_REGEX
-    if (language <= SetUpper  &&  Sets [language].count > 0)
-    {
-	patternSet* const set = Sets + language;
-	unsigned int i;
-	for (i = 0  ;  i < set->count  ;  ++i)
-	    if (set->patterns [i].type == PTRN_TAG)
-		set->patterns [i].u.tag.kind.enabled = FALSE;
-    }
+	if (language <= SetUpper  &&  Sets [language].count > 0)
+	{
+		patternSet* const set = Sets + language;
+		unsigned int i;
+		for (i = 0  ;  i < set->count  ;  ++i)
+			if (set->patterns [i].type == PTRN_TAG)
+				set->patterns [i].u.tag.kind.enabled = FALSE;
+	}
 #endif
 }
 
 extern boolean enableRegexKind (
-	const langType language __unused__,
-	const int kind __unused__, const boolean mode __unused__)
+		const langType language __unused__,
+		const int kind __unused__, const boolean mode __unused__)
 {
-    boolean result = FALSE;
+	boolean result = FALSE;
 #ifdef HAVE_REGEX
-    if (language <= SetUpper  &&  Sets [language].count > 0)
-    {
-	patternSet* const set = Sets + language;
-	unsigned int i;
-	for (i = 0  ;  i < set->count  ;  ++i)
-	    if (set->patterns [i].type == PTRN_TAG &&
-		set->patterns [i].u.tag.kind.letter == kind)
-	    {
-		set->patterns [i].u.tag.kind.enabled = mode;
-		result = TRUE;
-	    }
-    }
+	if (language <= SetUpper  &&  Sets [language].count > 0)
+	{
+		patternSet* const set = Sets + language;
+		unsigned int i;
+		for (i = 0  ;  i < set->count  ;  ++i)
+			if (set->patterns [i].type == PTRN_TAG &&
+				set->patterns [i].u.tag.kind.letter == kind)
+			{
+				set->patterns [i].u.tag.kind.enabled = mode;
+				result = TRUE;
+			}
+	}
 #endif
-    return result;
+	return result;
 }
 
 extern void printRegexKinds (const langType language __unused__, boolean indent)
 {
 #ifdef HAVE_REGEX
-    if (language <= SetUpper  &&  Sets [language].count > 0)
-    {
-	patternSet* const set = Sets + language;
-	unsigned int i;
-	for (i = 0  ;  i < set->count  ;  ++i)
-	    if (set->patterns [i].type == PTRN_TAG)
-		printRegexKind (set->patterns, i, indent);
-    }
+	if (language <= SetUpper  &&  Sets [language].count > 0)
+	{
+		patternSet* const set = Sets + language;
+		unsigned int i;
+		for (i = 0  ;  i < set->count  ;  ++i)
+			if (set->patterns [i].type == PTRN_TAG)
+				printRegexKind (set->patterns, i, indent);
+	}
 #endif
 }
 
 extern void freeRegexResources (void)
 {
 #ifdef HAVE_REGEX
-    int i;
-    for (i = 0  ;  i <= SetUpper  ;  ++i)
-	clearPatternSet (i);
-    if (Sets != NULL)
-	eFree (Sets);
-    Sets = NULL;
-    SetUpper = -1;
+	int i;
+	for (i = 0  ;  i <= SetUpper  ;  ++i)
+		clearPatternSet (i);
+	if (Sets != NULL)
+		eFree (Sets);
+	Sets = NULL;
+	SetUpper = -1;
 #endif
 }
 
@@ -683,14 +683,14 @@ extern void freeRegexResources (void)
 extern void checkRegex (void)
 {
 #if defined (HAVE_REGEX) && defined (CHECK_REGCOMP)
-    regex_t patbuf;
-    int errcode;
-    if (regcomp (&patbuf, "/hello/", 0) != 0)
-    {
-	error (WARNING, "Disabling broken regex");
-	regexBroken = TRUE;
-    }
+	regex_t patbuf;
+	int errcode;
+	if (regcomp (&patbuf, "/hello/", 0) != 0)
+	{
+		error (WARNING, "Disabling broken regex");
+		regexBroken = TRUE;
+	}
 #endif
 }
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

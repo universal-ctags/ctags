@@ -13,7 +13,7 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 #include "parse.h"
 
 /*
@@ -23,25 +23,27 @@
 static void installHtmlRegex (const langType language)
 {
 #define POSSIBLE_ATTRIBUTES "([ \t]+[a-z]+=\"?[^>\"]*\"?)*"
-    addTagRegex (language,
-	    "<a"
-	    POSSIBLE_ATTRIBUTES
-	    "[ \t]+name=\"?([^>\"]+)\"?"
-	    POSSIBLE_ATTRIBUTES
-	    "[ \t]*>",
-	    "\\2", "a,anchor,named anchors", "i");
+	addTagRegex (language,
+		"<a"
+		POSSIBLE_ATTRIBUTES
+		"[ \t]+name=\"?([^>\"]+)\"?"
+		POSSIBLE_ATTRIBUTES
+		"[ \t]*>",
+		"\\2", "a,anchor,named anchors", "i");
 
-    addTagRegex (language, "^[ \t]*function[ \t]*([A-Za-z0-9_]+)[ \t]*\\(",
-	    "\\1", "f,function,JavaScript functions", NULL);
+	addTagRegex (language, "^[ \t]*function[ \t]*([A-Za-z0-9_]+)[ \t]*\\(",
+		"\\1", "f,function,JavaScript functions", NULL);
 }
 
 /* Create parser definition stucture */
 extern parserDefinition* HtmlParser (void)
 {
-    static const char *const extensions [] = { "htm", "html", NULL };
-    parserDefinition *const def = parserNew ("HTML");
-    def->extensions = extensions;
-    def->initialize = installHtmlRegex;
-    def->regex      = TRUE;
-    return def;
+	static const char *const extensions [] = { "htm", "html", NULL };
+	parserDefinition *const def = parserNew ("HTML");
+	def->extensions = extensions;
+	def->initialize = installHtmlRegex;
+	def->regex      = TRUE;
+	return def;
 }
+
+/* vi:set tabstop=4 shiftwidth=4: */

@@ -57,7 +57,7 @@
  *  to prevent warnings about unused variables.
  */
 #if (__GNUC__ > 2  ||  (__GNUC__ == 2  &&  __GNUC_MINOR__ >= 7)) && !(defined (__APPLE_CC__) || defined (__GNUG__))
-# define __unused__	__attribute__((unused))
+# define __unused__  __attribute__((unused))
 # define __printf__(s,f)  __attribute__((format (printf, s, f)))
 #else
 # define __unused__
@@ -122,6 +122,6 @@ extern void *unlink (const char *);
 extern char *getenv (const char *);
 #endif
 
-#endif	/* _GENERAL_H */
+#endif  /* _GENERAL_H */
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

@@ -14,7 +14,7 @@
 /*
  *   INCLUDE FILES
  */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 #include "parse.h"
 
 /*
@@ -22,20 +22,20 @@
  */
 static void installSlangRegex (const langType language)
 {
-    addTagRegex (language,
-	"^.*define[ \t]+([A-Z_][A-Z0-9_]*)[^;]*$",
-	"\\1", "f,function,functions", "i");
-    addTagRegex (language,
-	"^[ \t]*implements[ \t]+\\([ \t]*\"([^\"]*)\"[ \t]*\\)[ \t]*;",
-	"\\1", "n,namespace,namespaces", NULL);
+	addTagRegex (language,
+		"^.*define[ \t]+([A-Z_][A-Z0-9_]*)[^;]*$",
+		"\\1", "f,function,functions", "i");
+	addTagRegex (language,
+		"^[ \t]*implements[ \t]+\\([ \t]*\"([^\"]*)\"[ \t]*\\)[ \t]*;",
+		"\\1", "n,namespace,namespaces", NULL);
 }
 
 extern parserDefinition* SlangParser (void)
 {
-    static const char *const extensions [] = { "sl", NULL };
-    parserDefinition* const def = parserNew ("SLang");
-    def->extensions = extensions;
-    def->initialize = installSlangRegex;
-    def->regex      = TRUE;
-    return def;
+	static const char *const extensions [] = { "sl", NULL };
+	parserDefinition* const def = parserNew ("SLang");
+	def->extensions = extensions;
+	def->initialize = installSlangRegex;
+	def->regex      = TRUE;
+	return def;
 }

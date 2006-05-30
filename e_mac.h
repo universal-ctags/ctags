@@ -54,43 +54,43 @@
 	Linux distribution
 */
 
-typedef unsigned long	mode_t;
-typedef unsigned long	ino_t;
-typedef unsigned long	dev_t;
-typedef short			nlink_t;
-typedef unsigned long	uid_t;
-typedef unsigned long	gid_t;
+typedef unsigned long  mode_t;
+typedef unsigned long  ino_t;
+typedef unsigned long  dev_t;
+typedef short          nlink_t;
+typedef unsigned long  uid_t;
+typedef unsigned long  gid_t;
 
 /* Encoding of the file mode.  */
-#define	S_IFMT		0170000	/* These bits determine file type.  */
+#define	S_IFMT  0170000  /* These bits determine file type.  */
 
 /* File types.  */
-#define	S_IFDIR		0040000	/* Directory.  */
-#define	S_IFCHR		0020000	/* Character device.  */
-#define	S_IFBLK		0060000	/* Block device.  */
-#define	S_IFREG		0100000	/* Regular file.  */
+#define	S_IFDIR  0040000  /* Directory.  */
+#define	S_IFCHR  0020000  /* Character device.  */
+#define	S_IFBLK  0060000  /* Block device.  */
+#define	S_IFREG  0100000  /* Regular file.  */
 
-#define	S_ISTYPE(mode, mask)	(((mode) & S_IFMT) == (mask))
+#define	S_ISTYPE(mode, mask)  (((mode) & S_IFMT) == (mask))
 
-#define	S_ISDIR(mode)	 S_ISTYPE((mode), S_IFDIR)
-#define	S_ISCHR(mode)	 S_ISTYPE((mode), S_IFCHR)
-#define	S_ISBLK(mode)	 S_ISTYPE((mode), S_IFBLK)
-#define	S_ISREG(mode)	 S_ISTYPE((mode), S_IFREG)
+#define	S_ISDIR(mode)  S_ISTYPE((mode), S_IFDIR)
+#define	S_ISCHR(mode)  S_ISTYPE((mode), S_IFCHR)
+#define	S_ISBLK(mode)  S_ISTYPE((mode), S_IFBLK)
+#define	S_ISREG(mode)  S_ISTYPE((mode), S_IFREG)
 
 struct stat {
-    dev_t				st_dev;			/* Device.  */
-    unsigned short int	__pad1;
-    ino_t				st_ino;			/* File serial number.	*/
-    mode_t				st_mode;		/* File mode.  */
-    nlink_t				st_nlink;		/* Link count.  */
-    uid_t				st_uid;			/* User ID of the file's owner.	*/
-    gid_t				st_gid;			/* Group ID of the file's group.*/
-    off_t				st_size;		/* Size of file, in bytes.  */
-    unsigned long int	st_blksize;		/* Optimal block size for I/O.  */
-    long				st_blocks;		/* Number 512-byte blocks allocated. */
-    time_t				st_atime;		/* Time of last access.  */
-    time_t				st_mtime;		/* Time of last modification.  */
-	time_t				st_ctime;		/* Time of last status change.  */
+	dev_t              st_dev;      /* Device.  */
+	unsigned short int __pad1;
+	ino_t              st_ino;      /* File serial number.	*/
+	mode_t             st_mode;     /* File mode.  */
+	nlink_t            st_nlink;    /* Link count.  */
+	uid_t              st_uid;      /* User ID of the file's owner.	*/
+	gid_t              st_gid;      /* Group ID of the file's group.*/
+	off_t              st_size;     /* Size of file, in bytes.  */
+	unsigned long int  st_blksize;  /* Optimal block size for I/O.  */
+	long               st_blocks;   /* Number 512-byte blocks allocated. */
+	time_t             st_atime;    /* Time of last access.  */
+	time_t             st_mtime;    /* Time of last modification.  */
+	time_t             st_ctime;    /* Time of last status change.  */
 };
 
 int fstat(int fildes, struct stat *buf);
@@ -110,33 +110,33 @@ int fstat(int fildes, struct stat *buf);
 int mstat(const char *path, struct stat *buf);
 
 struct dirent {
-	char			d_name[64];
+	char d_name[64];
 };
 
 typedef struct {
-	FSSpec			file;
-	int				index;
-	struct dirent	ent;
+	FSSpec file;
+	int index;
+	struct dirent ent;
 } DIR;
 
-extern DIR*				opendir(const char *dirname);
-extern struct dirent*	readdir(DIR* dirp);
-extern int				closedir(DIR* dirp);
-extern void				rewinddir(DIR* dirp);
-extern char*			getcwd(char*, int);
+extern DIR* opendir(const char *dirname);
+extern struct dirent* readdir(DIR* dirp);
+extern int closedir(DIR* dirp);
+extern void rewinddir(DIR* dirp);
+extern char* getcwd(char*, int);
 
 /*
 	Our own fopen, accepts unix like paths.
 */
-extern FILE*			mfopen(const char* file, const char* mode);
+extern FILE* mfopen(const char* file, const char* mode);
 
 /*
 	Dirty, define the standard functions fopen, stat and lstat to map to our
 	own routines.
 */
-#define fopen			mfopen
-#define stat(a,b)		mstat(a,b)
-#define lstat(a,b)		mstat(a,b)
+#define fopen       mfopen
+#define stat(a,b)   mstat(a,b)
+#define lstat(a,b)  mstat(a,b)
 
 #endif
 

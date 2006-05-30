@@ -14,7 +14,7 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 
 #include "vstring.h"
 
@@ -22,9 +22,9 @@
 *   DATA DECLARATIONS
 */
 typedef struct sStringList {
-    unsigned int max;
-    unsigned int count;
-    vString **list;
+	unsigned int max;
+	unsigned int count;
+	vString    **list;
 } stringList;
 
 /*
@@ -49,6 +49,6 @@ extern boolean stringListExtensionMatched (const stringList* const list, const c
 extern boolean stringListFileMatched (const stringList* const list, const char* const str);
 extern void stringListPrint (const stringList *const current);
 
-#endif	/* _STRLIST_H */
+#endif  /* _STRLIST_H */
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

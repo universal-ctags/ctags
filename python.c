@@ -12,7 +12,7 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 
 #include <string.h>
 
@@ -26,13 +26,13 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-    K_CLASS, K_FUNCTION, K_MEMBER
+	K_CLASS, K_FUNCTION, K_MEMBER
 } pythonKind;
 
 static kindOption PythonKinds[] = {
-    {TRUE, 'c', "class",    "classes"},
-    {TRUE, 'f', "function", "functions"},
-    {TRUE, 'm', "member",   "class members"}
+	{TRUE, 'c', "class",    "classes"},
+	{TRUE, 'f', "function", "functions"},
+	{TRUE, 'm', "member",   "class members"}
 };
 
 /*
@@ -44,180 +44,180 @@ static kindOption PythonKinds[] = {
 
 static boolean isIdentifierFirstCharacter (int c)
 {
-    return (boolean) (isalpha (c) || c == '_');
+	return (boolean) (isalpha (c) || c == '_');
 }
 
 static boolean isIdentifierCharacter (int c)
 {
-    return (boolean) (isalnum (c) || c == '_');
+	return (boolean) (isalnum (c) || c == '_');
 }
 
 static void makeFunctionTag (vString *const function, vString *const class)
 {
-    tagEntryInfo tag;
-    initTagEntry (&tag, vStringValue (function));
-    if (vStringLength (class) > 0)
-    {
-	tag.kindName = "member";
-	tag.kind = 'm';
-	tag.extensionFields.scope [0] = "class";
-	tag.extensionFields.scope [1] = vStringValue (class);
-    }
-    else
-    {
-	tag.kindName = "function";
-	tag.kind = 'f';
-    }
-    if (strncmp (vStringValue (function), "__", 2) == 0 &&
-	strcmp (vStringValue (function), "__init__") != 0)
-    {
-	tag.extensionFields.access = "private";
-	tag.isFileScope = TRUE;
-    }
-    else
-    {
-	tag.extensionFields.access = "public";
-    }
-    makeTagEntry (&tag);
-    if (vStringLength (class) > 0  &&  Option.include.qualifiedTags)
-    {
-	vString *tagname = vStringNew ();
-	vStringCat (tagname, class);
-	vStringPut (tagname, '.');
-	vStringCat (tagname, function);
-	tag.name = vStringValue (tagname);
+	tagEntryInfo tag;
+	initTagEntry (&tag, vStringValue (function));
+	if (vStringLength (class) > 0)
+	{
+		tag.kindName = "member";
+		tag.kind = 'm';
+		tag.extensionFields.scope [0] = "class";
+		tag.extensionFields.scope [1] = vStringValue (class);
+	}
+	else
+	{
+		tag.kindName = "function";
+		tag.kind = 'f';
+	}
+	if (strncmp (vStringValue (function), "__", 2) == 0 &&
+		strcmp (vStringValue (function), "__init__") != 0)
+	{
+		tag.extensionFields.access = "private";
+		tag.isFileScope = TRUE;
+	}
+	else
+	{
+		tag.extensionFields.access = "public";
+	}
 	makeTagEntry (&tag);
-	vStringDelete (tagname);
-    }
+	if (vStringLength (class) > 0  &&  Option.include.qualifiedTags)
+	{
+		vString *tagname = vStringNew ();
+		vStringCat (tagname, class);
+		vStringPut (tagname, '.');
+		vStringCat (tagname, function);
+		tag.name = vStringValue (tagname);
+		makeTagEntry (&tag);
+		vStringDelete (tagname);
+	}
 }
 
 static void makeClassTag (vString *const class, vString *const inheritance)
 {
-    tagEntryInfo tag;
-    initTagEntry (&tag, vStringValue (class));
-    tag.kindName = "class";
-    tag.kind = 'c';
-    tag.extensionFields.inheritance = vStringValue (inheritance);
-    makeTagEntry (&tag);
+	tagEntryInfo tag;
+	initTagEntry (&tag, vStringValue (class));
+	tag.kindName = "class";
+	tag.kind = 'c';
+	tag.extensionFields.inheritance = vStringValue (inheritance);
+	makeTagEntry (&tag);
 }
 
 static const unsigned char *skipSpace (const unsigned char *cp)
 {
-    while (isspace ((int) *cp))
-	++cp;
-    return cp;
+	while (isspace ((int) *cp))
+		++cp;
+	return cp;
 }
 
 static const unsigned char *parseIdentifier (
-	const unsigned char *cp, vString *const identifier)
+		const unsigned char *cp, vString *const identifier)
 {
-    vStringClear (identifier);
-    while (isIdentifierCharacter ((int) *cp))
-    {
-	vStringPut (identifier, (int) *cp);
-	++cp;
-    }
-    vStringTerminate (identifier);
-    return cp;
+	vStringClear (identifier);
+	while (isIdentifierCharacter ((int) *cp))
+	{
+		vStringPut (identifier, (int) *cp);
+		++cp;
+	}
+	vStringTerminate (identifier);
+	return cp;
 }
 
 static void parseClass (const unsigned char *cp, vString *const class)
 {
-    vString *const inheritance = vStringNew ();
-    vStringClear (inheritance);
-    cp = parseIdentifier (cp, class);
-    cp = skipSpace (cp);
-    if (*cp == '(')
-    {
-	++cp;
-	while (*cp != ')'  &&  *cp != '\0')
+	vString *const inheritance = vStringNew ();
+	vStringClear (inheritance);
+	cp = parseIdentifier (cp, class);
+	cp = skipSpace (cp);
+	if (*cp == '(')
 	{
-	    vStringPut (inheritance, *cp);
-	    ++cp;
+		++cp;
+		while (*cp != ')'  &&  *cp != '\0')
+		{
+			vStringPut (inheritance, *cp);
+			++cp;
+		}
+		vStringTerminate (inheritance);
 	}
-	vStringTerminate (inheritance);
-    }
-    makeClassTag (class, inheritance);
-    vStringDelete (inheritance);
+	makeClassTag (class, inheritance);
+	vStringDelete (inheritance);
 }
 
 static void parseFunction (const unsigned char *cp, vString *const class)
 {
-    vString *const identifier = vStringNew ();
-    cp = parseIdentifier (cp, identifier);
-    makeFunctionTag (identifier, class);
-    vStringDelete (identifier);
+	vString *const identifier = vStringNew ();
+	cp = parseIdentifier (cp, identifier);
+	makeFunctionTag (identifier, class);
+	vStringDelete (identifier);
 }
 
 static void findPythonTags (void)
 {
-    vString *const class = vStringNew ();
-    vString *const identifier = vStringNew ();
-    const unsigned char *line;
-    int class_indent = 0;
-    boolean longStringLiteral = FALSE;
+	vString *const class = vStringNew ();
+	vString *const identifier = vStringNew ();
+	const unsigned char *line;
+	int class_indent = 0;
+	boolean longStringLiteral = FALSE;
 
-    while ((line = fileReadLine ()) != NULL)
-    {
-	const unsigned char *cp = line;
-	int indent;
-
-	cp = skipSpace (cp);
-	indent = cp - line;
-
-	if (*cp == '#' || *cp == '\0')	/* skip comment or blank line */
-	    continue;
-	
-	if (longStringLiteral)
+	while ((line = fileReadLine ()) != NULL)
 	{
-	    cp = (const unsigned char*) strstr ((const char*) cp, "\"\"\"");
-	    if (cp == NULL)
-		continue;
-	    else
-	    {
-		longStringLiteral = FALSE;
-		cp += 3;
-	    }
-	}
-	if (isIdentifierFirstCharacter ((int) *cp))
-	{
-	    if (indent <= class_indent)
-		vStringClear (class);
+		const unsigned char *cp = line;
+		int indent;
 
-	    cp = parseIdentifier (cp, identifier);
-	    if (isspace ((int) *cp))
-	    {
 		cp = skipSpace (cp);
-		if (strcmp (vStringValue (identifier), "def") == 0)
-		    parseFunction (cp, class);
-		else if (strcmp (vStringValue (identifier), "class") == 0)
+		indent = cp - line;
+
+		if (*cp == '#' || *cp == '\0')  /* skip comment or blank line */
+			continue;
+		
+		if (longStringLiteral)
 		{
-		    parseClass (cp, class);
-		    class_indent = indent;
+			cp = (const unsigned char*) strstr ((const char*) cp, "\"\"\"");
+			if (cp == NULL)
+				continue;
+			else
+			{
+				longStringLiteral = FALSE;
+				cp += 3;
+			}
 		}
-	    }
+		if (isIdentifierFirstCharacter ((int) *cp))
+		{
+			if (indent <= class_indent)
+				vStringClear (class);
+
+			cp = parseIdentifier (cp, identifier);
+			if (isspace ((int) *cp))
+			{
+				cp = skipSpace (cp);
+				if (strcmp (vStringValue (identifier), "def") == 0)
+					parseFunction (cp, class);
+				else if (strcmp (vStringValue (identifier), "class") == 0)
+				{
+					parseClass (cp, class);
+					class_indent = indent;
+				}
+			}
+		}
+		if ((cp = (const unsigned char*) strstr ((const char*)cp, "\"\"\"")) != NULL)
+		{
+			cp += 3;
+			cp = (const unsigned char*) strstr ((const char*) cp, "\"\"\"");
+			if (cp == NULL)
+				longStringLiteral = TRUE;
+		}
 	}
-	if ((cp = (const unsigned char*) strstr ((const char*)cp, "\"\"\"")) != NULL)
-	{
-	    cp += 3;
-	    cp = (const unsigned char*) strstr ((const char*) cp, "\"\"\"");
-	    if (cp == NULL)
-		longStringLiteral = TRUE;
-	}
-    }
-    vStringDelete (identifier);
-    vStringDelete (class);
+	vStringDelete (identifier);
+	vStringDelete (class);
 }
 
 extern parserDefinition *PythonParser (void)
 {
-    static const char *const extensions[] = { "py", "python", NULL };
-    parserDefinition *def = parserNew ("Python");
-    def->kinds = PythonKinds;
-    def->kindCount = KIND_COUNT (PythonKinds);
-    def->extensions = extensions;
-    def->parser = findPythonTags;
-    return def;
+	static const char *const extensions[] = { "py", "python", NULL };
+	parserDefinition *def = parserNew ("Python");
+	def->kinds = PythonKinds;
+	def->kindCount = KIND_COUNT (PythonKinds);
+	def->extensions = extensions;
+	def->parser = findPythonTags;
+	return def;
 }
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

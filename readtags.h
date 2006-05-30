@@ -31,7 +31,7 @@ extern "C" {
 
 /* Options for tagsSetSortType() */
 typedef enum {
-    TAG_UNSORTED, TAG_SORTED, TAG_FOLDSORTED
+	TAG_UNSORTED, TAG_SORTED, TAG_FOLDSORTED
 } sortType ;
 
 /* Options for tagsFind() */
@@ -55,35 +55,35 @@ typedef struct sTagFile tagFile;
 typedef struct {
 
 	struct {
-		    /* was the tag file successfully opened? */
+			/* was the tag file successfully opened? */
 		int opened;
 
-		    /* errno value when 'opened' is false */
+			/* errno value when 'opened' is false */
 		int error_number;
 	} status;
 
-	    /* information about the structure of the tag file */
+		/* information about the structure of the tag file */
 	struct {
-		    /* format of tag file (1 = original, 2 = extended) */
-		short format;
+				/* format of tag file (1 = original, 2 = extended) */
+			short format;
 
-		    /* how is the tag file sorted? */
-		sortType sort;
+				/* how is the tag file sorted? */
+			sortType sort;
 	} file;
 
 
-	    /* information about the program which created this tag file */
+		/* information about the program which created this tag file */
 	struct {
-		    /* name of author of generating program (may be null) */
+			/* name of author of generating program (may be null) */
 		const char *author;
 
-		    /* name of program (may be null) */
+			/* name of program (may be null) */
 		const char *name;
 
-		    /* URL of distribution (may be null) */
+			/* URL of distribution (may be null) */
 		const char *url;
 
-		    /* program version (may be null) */
+			/* program version (may be null) */
 		const char *version;
 	} program;
 
@@ -94,10 +94,10 @@ typedef struct {
  */
 typedef struct {
 
-	    /* the key of the extension field */
+		/* the key of the extension field */
 	const char *key;
 
-	    /* the value of the extension field (may be an empty string) */
+		/* the value of the extension field (may be an empty string) */
 	const char *value;
 
 } tagExtensionField;
@@ -105,35 +105,35 @@ typedef struct {
 /* This structure contains information about a specific tag. */
 typedef struct {
 
-	    /* name of tag */
+		/* name of tag */
 	const char *name;
 
-	    /* path of source file containing definition of tag */
+		/* path of source file containing definition of tag */
 	const char *file;
 
-	    /* address for locating tag in source file */
+		/* address for locating tag in source file */
 	struct {
-		    /* pattern for locating source line
-		     * (may be NULL if not present) */
+			/* pattern for locating source line
+			 * (may be NULL if not present) */
 		const char *pattern;
 
-		    /* line number in source file of tag definition
-		     * (may be zero if not known) */
+			/* line number in source file of tag definition
+			 * (may be zero if not known) */
 		unsigned long lineNumber;
 	} address;
 
-	    /* kind of tag (may by name, character, or NULL if not known) */
+		/* kind of tag (may by name, character, or NULL if not known) */
 	const char *kind;
 
-	    /* is tag of file-limited scope? */
+		/* is tag of file-limited scope? */
 	short fileScope;
 
-	    /* miscellaneous extension fields */
+		/* miscellaneous extension fields */
 	struct {
-		    /* number of entries in `list' */
+			/* number of entries in `list' */
 		unsigned short count;
 
-		    /* list of key value pairs */
+			/* list of key value pairs */
 		tagExtensionField *list;
 	} fields;
 
@@ -249,4 +249,4 @@ extern tagResult tagsClose (tagFile *const file);
 
 #endif
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

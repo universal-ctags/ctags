@@ -14,7 +14,7 @@
 /*
 *   Include files
 */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 
 #ifdef DEBUG
 # include <assert.h>
@@ -26,10 +26,10 @@
 */
 
 #ifdef DEBUG
-# define debug(level)	((Option.debugLevel & (long)(level)) != 0)
-# define DebugStatement(x)	x
-# define PrintStatus(x)		if (debug(DEBUG_STATUS)) printf x;
-# define Assert(c)		assert(c)
+# define debug(level)      ((Option.debugLevel & (long)(level)) != 0)
+# define DebugStatement(x) x
+# define PrintStatus(x)    if (debug(DEBUG_STATUS)) printf x;
+# define Assert(c)         assert(c)
 #else
 # define DebugStatement(x)
 # define PrintStatus(x)
@@ -46,12 +46,12 @@
 /*  Defines the debugging levels.
  */
 enum eDebugLevels {
-    DEBUG_READ	 = 0x01,	/* echo raw (filtered) characters */
-    DEBUG_PARSE	 = 0x02,	/* echo parsing results */
-    DEBUG_STATUS = 0x04,	/* echo file status information */
-    DEBUG_OPTION = 0x08,	/* echo option parsing */
-    DEBUG_CPP	 = 0x10,	/* echo characters out of pre-processor */
-    DEBUG_RAW	 = 0x20		/* echo raw (filtered) characters */
+	DEBUG_READ   = 0x01,  /* echo raw (filtered) characters */
+	DEBUG_PARSE  = 0x02,  /* echo parsing results */
+	DEBUG_STATUS = 0x04,  /* echo file status information */
+	DEBUG_OPTION = 0x08,  /* echo option parsing */
+	DEBUG_CPP    = 0x10,  /* echo characters out of pre-processor */
+	DEBUG_RAW    = 0x20   /* echo raw (filtered) characters */
 };
 
 /*
@@ -66,6 +66,6 @@ extern void debugCppIgnore (const boolean ignore);
 extern void clearString (char *const string, const int length);
 extern void debugEntry (const tagEntryInfo *const tag);
 
-#endif	/* _DEBUG_H */
+#endif  /* _DEBUG_H */
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

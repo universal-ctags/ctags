@@ -12,7 +12,7 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 
 #include <string.h>
 #include "parse.h"
@@ -23,18 +23,18 @@
 
 static void installYaccRegex (const langType language)
 {
-    addTagRegex (language,
-        "^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1", "l,label,labels", NULL);
+	addTagRegex (language,
+		"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1", "l,label,labels", NULL);
 }
 
 extern parserDefinition* YaccParser ()
 {
-    static const char *const extensions [] = { "y", NULL };
-    parserDefinition* const def = parserNew ("YACC");
-    def->extensions = extensions;
-    def->initialize = installYaccRegex;
-    def->regex      = TRUE;
-    return def;
+	static const char *const extensions [] = { "y", NULL };
+	parserDefinition* const def = parserNew ("YACC");
+	def->extensions = extensions;
+	def->initialize = installYaccRegex;
+	def->regex      = TRUE;
+	return def;
 }
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

@@ -12,7 +12,7 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 
 #include <string.h>
 #include <ctype.h>
@@ -26,11 +26,11 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-    K_MACRO
+	K_MACRO
 } shKind;
 
 static kindOption MakeKinds [] = {
-    { TRUE, 'm', "macro", "macros"}
+	{ TRUE, 'm', "macro", "macros"}
 };
 
 /*
@@ -39,173 +39,173 @@ static kindOption MakeKinds [] = {
 
 static int nextChar (void)
 {
-    int c = fileGetc ();
-    if (c == '\\')
-    {
-	c = fileGetc ();
-	if (c == '\n')
-	    c = fileGetc ();
-    }
-    return c;
+	int c = fileGetc ();
+	if (c == '\\')
+	{
+		c = fileGetc ();
+		if (c == '\n')
+			c = fileGetc ();
+	}
+	return c;
 }
 
 static void skipLine (void)
 {
-    int c;
-    do
-	c = nextChar ();
-    while (c != EOF  &&  c != '\n');
-    if (c == '\n')
-	fileUngetc (c);
+	int c;
+	do
+		c = nextChar ();
+	while (c != EOF  &&  c != '\n');
+	if (c == '\n')
+		fileUngetc (c);
 }
 
 static int skipToNonWhite (void)
 {
-    int c;
-    do
-	c = nextChar ();
-    while (c != '\n' && isspace (c));
-    return c;
+	int c;
+	do
+		c = nextChar ();
+	while (c != '\n' && isspace (c));
+	return c;
 }
 
 static boolean isIdentifier (int c)
 {
-    return (boolean)(c != '\0' && (isalnum (c)  ||  strchr (".-_", c) != NULL));
+	return (boolean)(c != '\0' && (isalnum (c)  ||  strchr (".-_", c) != NULL));
 }
 
 static void readIdentifier (const int first, vString *const id)
 {
-    int c = first;
-    vStringClear (id);
-    while (isIdentifier (c))
-    {
-	vStringPut (id, c);
-	c = nextChar ();
-    }
-    fileUngetc (c);
-    vStringTerminate (id);
+	int c = first;
+	vStringClear (id);
+	while (isIdentifier (c))
+	{
+		vStringPut (id, c);
+		c = nextChar ();
+	}
+	fileUngetc (c);
+	vStringTerminate (id);
 }
 
 static void skipToMatch (const char *const pair)
 {
-    const int begin = pair [0], end = pair [1];
-    const unsigned long inputLineNumber = getInputLineNumber ();
-    int matchLevel = 1;
-    int c = '\0';
+	const int begin = pair [0], end = pair [1];
+	const unsigned long inputLineNumber = getInputLineNumber ();
+	int matchLevel = 1;
+	int c = '\0';
 
-    while (matchLevel > 0)
-    {
-	c = nextChar ();
-	if (c == begin)
-	    ++matchLevel;
-	else if (c == end)
-	    --matchLevel;
-	else if (c == '\n')
-	    break;
-    }
-    if (c == EOF)
-	verbose ("%s: failed to find match for '%c' at line %lu\n",
-		getInputFileName (), begin, inputLineNumber);
+	while (matchLevel > 0)
+	{
+		c = nextChar ();
+		if (c == begin)
+			++matchLevel;
+		else if (c == end)
+			--matchLevel;
+		else if (c == '\n')
+			break;
+	}
+	if (c == EOF)
+		verbose ("%s: failed to find match for '%c' at line %lu\n",
+				getInputFileName (), begin, inputLineNumber);
 }
 
 static void findMakeTags (void)
 {
-    vString *name = vStringNew ();
-    boolean newline = TRUE;
-    boolean in_define = FALSE;
-    boolean in_rule = FALSE;
-    boolean variable_possible = TRUE;
-    int c;
+	vString *name = vStringNew ();
+	boolean newline = TRUE;
+	boolean in_define = FALSE;
+	boolean in_rule = FALSE;
+	boolean variable_possible = TRUE;
+	int c;
 
-    while ((c = nextChar ()) != EOF)
-    {
-	if (newline)
+	while ((c = nextChar ()) != EOF)
 	{
-	    if (in_rule)
-	    {
-		if (c == '\t')
+		if (newline)
 		{
-		    skipLine ();        /* skip rule */
-		    continue;
+			if (in_rule)
+			{
+				if (c == '\t')
+				{
+					skipLine ();  /* skip rule */
+					continue;
+				}
+				else
+					in_rule = FALSE;
+			}
+			variable_possible = (boolean)(!in_rule);
+			newline = FALSE;
+		}
+		if (c == '\n')
+			newline = TRUE;
+		else if (isspace (c))
+			continue;
+		else if (c == '#')
+			skipLine ();
+		else if (c == '(')
+			skipToMatch ("()");
+		else if (c == '{')
+			skipToMatch ("{}");
+		else if (c == ':')
+		{
+			variable_possible = TRUE;
+			in_rule = TRUE;
+		}
+		else if (variable_possible && isIdentifier (c))
+		{
+			readIdentifier (c, name);
+			if (strcmp (vStringValue (name), "endef") == 0)
+				in_define = FALSE;
+			else if (in_define)
+				skipLine ();
+			else if (strcmp (vStringValue (name), "define") == 0  &&
+				isIdentifier (c))
+			{
+				in_define = TRUE;
+				c = skipToNonWhite ();
+				readIdentifier (c, name);
+				makeSimpleTag (name, MakeKinds, K_MACRO);
+				skipLine ();
+			}
+			else {
+				c = skipToNonWhite ();
+				if (strchr (":?+", c) != NULL)
+				{
+					boolean append = (boolean)(c == '+');
+					if (c == ':')
+						in_rule = TRUE;
+					c = nextChar ();
+					if (c != '=')
+						fileUngetc (c);
+					else if (append)
+					{
+						skipLine ();
+						continue;
+					}
+				}
+				if (c == '=')
+				{
+					makeSimpleTag (name, MakeKinds, K_MACRO);
+					in_rule = FALSE;
+					skipLine ();
+				}
+			}
 		}
 		else
-		    in_rule = FALSE;
-	    }
-	    variable_possible = (boolean)(!in_rule);
-	    newline = FALSE;
+			variable_possible = FALSE;
 	}
-	if (c == '\n')
-	    newline = TRUE;
-	else if (isspace (c))
-	    continue;
-	else if (c == '#')
-	    skipLine ();
-	else if (c == '(')
-	    skipToMatch ("()");
-	else if (c == '{')
-	    skipToMatch ("{}");
-	else if (c == ':')
-	{
-	    variable_possible = TRUE;
-	    in_rule = TRUE;
-	}
-	else if (variable_possible && isIdentifier (c))
-	{
-	    readIdentifier (c, name);
-	    if (strcmp (vStringValue (name), "endef") == 0)
-		in_define = FALSE;
-	    else if (in_define)
-		skipLine ();
-	    else if (strcmp (vStringValue (name), "define") == 0  &&
-		isIdentifier (c))
-	    {
-		in_define = TRUE;
-		c = skipToNonWhite ();
-		readIdentifier (c, name);
-		makeSimpleTag (name, MakeKinds, K_MACRO);
-		skipLine ();
-	    }
-	    else {
-		c = skipToNonWhite ();
-		if (strchr (":?+", c) != NULL)
-		{
-		    boolean append = (boolean)(c == '+');
-		    if (c == ':')
-			in_rule = TRUE;
-		    c = nextChar ();
-		    if (c != '=')
-			fileUngetc (c);
-		    else if (append)
-		    {
-			skipLine ();
-			continue;
-		    }
-		}
-		if (c == '=')
-		{
-		    makeSimpleTag (name, MakeKinds, K_MACRO);
-		    in_rule = FALSE;
-		    skipLine ();
-		}
-	    }
-	}
-	else
-	    variable_possible = FALSE;
-    }
-    vStringDelete (name);
+	vStringDelete (name);
 }
 
 extern parserDefinition* MakefileParser (void)
 {
-    static const char *const patterns [] = { "[Mm]akefile", NULL };
-    static const char *const extensions [] = { "mak", "mk", NULL };
-    parserDefinition* const def = parserNew ("Make");
-    def->kinds      = MakeKinds;
-    def->kindCount  = KIND_COUNT (MakeKinds);
-    def->patterns   = patterns;
-    def->extensions = extensions;
-    def->parser     = findMakeTags;
-    return def;
+	static const char *const patterns [] = { "[Mm]akefile", NULL };
+	static const char *const extensions [] = { "mak", "mk", NULL };
+	parserDefinition* const def = parserNew ("Make");
+	def->kinds      = MakeKinds;
+	def->kindCount  = KIND_COUNT (MakeKinds);
+	def->patterns   = patterns;
+	def->extensions = extensions;
+	def->parser     = findMakeTags;
+	return def;
 }
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

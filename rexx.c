@@ -13,8 +13,8 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"    /* always include first */
-#include "parse.h"      /* always include */
+#include "general.h"  /* always include first */
+#include "parse.h"    /* always include */
 
 /*
 *   FUNCTION DEFINITIONS
@@ -22,18 +22,18 @@
 
 static void installRexxRegex (const langType language)
 {
-    addTagRegex (language, "^([A-Za-z0-9@#$\\.!?_]+)[ \t]*:",
-	"\\1", "s,subroutine,subroutines", NULL);
+	addTagRegex (language, "^([A-Za-z0-9@#$\\.!?_]+)[ \t]*:",
+		"\\1", "s,subroutine,subroutines", NULL);
 }
 
 extern parserDefinition* RexxParser (void)
 {
-    static const char *const extensions [] = { "cmd", "rexx", "rx", NULL };
-    parserDefinition* const def = parserNew ("REXX");
-    def->extensions = extensions;
-    def->initialize = installRexxRegex;
-    def->regex      = TRUE;
-    return def;
+	static const char *const extensions [] = { "cmd", "rexx", "rx", NULL };
+	parserDefinition* const def = parserNew ("REXX");
+	def->extensions = extensions;
+	def->initialize = installRexxRegex;
+	def->regex      = TRUE;
+	return def;
 }
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

@@ -14,7 +14,7 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 
 #include <stdio.h>
 
@@ -27,6 +27,6 @@ extern void addTotals (const unsigned int files, const long unsigned int lines, 
 extern boolean isDestinationStdout (void);
 extern int main (int argc, char **argv);
 
-#endif	/* _MAIN_H */
+#endif  /* _MAIN_H */
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

@@ -14,7 +14,7 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 
 /*
 *   MACROS
@@ -53,29 +53,29 @@ typedef int errorSelection;
 enum eErrorTypes { FATAL = 1, WARNING = 2, PERROR = 4 };
 
 typedef struct {
-	/* Name of file for which status is valid */
-    char* name;
+		/* Name of file for which status is valid */
+	char* name;
 
-	/* Does file exist? If not, members below do not contain valid data. */
-    boolean exists;
+		/* Does file exist? If not, members below do not contain valid data. */
+	boolean exists;
 
-	/* is file path a symbolic link to another file? */
-    boolean isSymbolicLink;
+		/* is file path a symbolic link to another file? */
+	boolean isSymbolicLink;
 
-	/* Is file (pointed to) a directory? */
-    boolean isDirectory;
+		/* Is file (pointed to) a directory? */
+	boolean isDirectory;
 
-	/* Is file (pointed to) a normal file? */
-    boolean isNormalFile;
+		/* Is file (pointed to) a normal file? */
+	boolean isNormalFile;
 
-	/* Is file (pointed to) executable? */
-    boolean isExecutable;
+		/* Is file (pointed to) executable? */
+	boolean isExecutable;
 
-	/* Is file (pointed to) setuid? */
-    boolean isSetuid;
+		/* Is file (pointed to) setuid? */
+	boolean isSetuid;
 
-	/* Size of file (pointed to) */
-    unsigned long size;
+		/* Size of file (pointed to) */
+	unsigned long size;
 } fileStatus; 
 
 /*
@@ -127,6 +127,6 @@ extern char* absoluteDirname (char *file);
 extern char* relativeFilename (const char *file, const char *dir);
 extern FILE *tempFile (const char *const mode, char **const pName);
 
-#endif	/* _ROUTINES_H */
+#endif  /* _ROUTINES_H */
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

@@ -12,7 +12,7 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 
 #include <string.h>
 
@@ -24,11 +24,11 @@
 *   DATA DEFINITIONS
 */
 typedef enum eAwkKinds {
-    K_FUNCTION
+	K_FUNCTION
 } awkKind;
 
 static kindOption AwkKinds [] = {
-    { TRUE, 'f', "function", "functions" }
+	{ TRUE, 'f', "function", "functions" }
 };
 
 /*
@@ -37,45 +37,45 @@ static kindOption AwkKinds [] = {
 
 static void findAwkTags (void)
 {
-    vString *name = vStringNew ();
-    const unsigned char *line;
+	vString *name = vStringNew ();
+	const unsigned char *line;
 
-    while ((line = fileReadLine ()) != NULL)
-    {
-	if (strncmp ((const char*) line, "function", (size_t) 8) == 0  &&
-	    isspace ((int) line [8]))
+	while ((line = fileReadLine ()) != NULL)
 	{
-	    const unsigned char *cp = line + 8;
+		if (strncmp ((const char*) line, "function", (size_t) 8) == 0  &&
+			isspace ((int) line [8]))
+		{
+			const unsigned char *cp = line + 8;
 
-	    while (isspace ((int) *cp))
-		++cp;
-	    while (isalnum ((int) *cp)  ||  *cp == '_')
-	    {
-		vStringPut (name, (int) *cp);
-		++cp;
-	    }
-	    vStringTerminate (name);
-	    while (isspace ((int) *cp))
-		++cp;
-	    if (*cp == '(')
-		makeSimpleTag (name, AwkKinds, K_FUNCTION);
-	    vStringClear (name);
-	    if (*cp != '\0')
-		++cp;
+			while (isspace ((int) *cp))
+				++cp;
+			while (isalnum ((int) *cp)  ||  *cp == '_')
+			{
+				vStringPut (name, (int) *cp);
+				++cp;
+			}
+			vStringTerminate (name);
+			while (isspace ((int) *cp))
+				++cp;
+			if (*cp == '(')
+				makeSimpleTag (name, AwkKinds, K_FUNCTION);
+			vStringClear (name);
+			if (*cp != '\0')
+				++cp;
+		}
 	}
-    }
-    vStringDelete (name);
+	vStringDelete (name);
 }
 
 extern parserDefinition* AwkParser ()
 {
-    static const char *const extensions [] = { "awk", "gawk", "mawk", NULL };
-    parserDefinition* def = parserNew ("Awk");
-    def->kinds      = AwkKinds;
-    def->kindCount  = KIND_COUNT (AwkKinds);
-    def->extensions = extensions;
-    def->parser     = findAwkTags;
-    return def;
+	static const char *const extensions [] = { "awk", "gawk", "mawk", NULL };
+	parserDefinition* def = parserNew ("Awk");
+	def->kinds      = AwkKinds;
+	def->kindCount  = KIND_COUNT (AwkKinds);
+	def->extensions = extensions;
+	def->parser     = findAwkTags;
+	return def;
 }
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

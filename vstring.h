@@ -14,36 +14,36 @@
 /*
 *   INCLUDE FILES
 */
-#include "general.h"	/* must always come first */
+#include "general.h"  /* must always come first */
 
 #if defined(HAVE_STDLIB_H)
-# include <stdlib.h>	/* to define size_t */
+# include <stdlib.h>  /* to define size_t */
 #endif
 
 /*
 *   MACROS
 */
-#define vStringValue(vs)	((vs)->buffer)
-#define vStringItem(vs,i)	((vs)->buffer[i])
-#define vStringLength(vs)	((vs)->length)
-#define vStringSize(vs)		((vs)->size)
-#define vStringCat(vs,s)	vStringCatS((vs), vStringValue((s)))
-#define vStringNCat(vs,s,l)	vStringNCatS((vs), vStringValue((s)), (l))
-#define vStringCopy(vs,s)	vStringCopyS((vs), vStringValue((s)))
-#define vStringNCopy(vs,s,l)	vStringNCopyS((vs), vStringValue((s)), (l))
-#define vStringChar(vs,i)	((vs)->buffer[i])
-#define vStringTerminate(vs)	vStringPut(vs, '\0')
-#define vStringLower(vs)	toLowerString((vs)->buffer)
-#define vStringUpper(vs)	toUpperString((vs)->buffer)
+#define vStringValue(vs)      ((vs)->buffer)
+#define vStringItem(vs,i)     ((vs)->buffer[i])
+#define vStringLength(vs)     ((vs)->length)
+#define vStringSize(vs)       ((vs)->size)
+#define vStringCat(vs,s)      vStringCatS((vs), vStringValue((s)))
+#define vStringNCat(vs,s,l)   vStringNCatS((vs), vStringValue((s)), (l))
+#define vStringCopy(vs,s)     vStringCopyS((vs), vStringValue((s)))
+#define vStringNCopy(vs,s,l)  vStringNCopyS((vs), vStringValue((s)), (l))
+#define vStringChar(vs,i)     ((vs)->buffer[i])
+#define vStringTerminate(vs)  vStringPut(vs, '\0')
+#define vStringLower(vs)      toLowerString((vs)->buffer)
+#define vStringUpper(vs)      toUpperString((vs)->buffer)
 
 #ifndef DEBUG
 # define VSTRING_PUTC_MACRO 1
 #endif
 #ifdef VSTRING_PUTC_MACRO
 #define vStringPut(s,c) \
-    (void)(((s)->length == (s)->size ? vStringAutoResize (s) : 0), \
-    ((s)->buffer [(s)->length++] = (c)), \
-    ((c) == '\0' ? (s)->length-- : 0))
+	(void)(((s)->length == (s)->size ? vStringAutoResize (s) : 0), \
+	((s)->buffer [(s)->length++] = (c)), \
+	((c) == '\0' ? (s)->length-- : 0))
 #endif
 
 /*
@@ -51,9 +51,9 @@
 */
 
 typedef struct sVString {
-    size_t	length;		/* size of buffer used */
-    size_t	size;		/* allocated size of buffer */
-    char *	buffer;		/* location of buffer */
+	size_t  length;  /* size of buffer used */
+	size_t  size;    /* allocated size of buffer */
+	char   *buffer;  /* location of buffer */
 } vString;
 
 /*
@@ -79,6 +79,6 @@ extern void vStringNCopyS (vString *const string, const char *const s, const siz
 extern void vStringCopyToLower (vString *const dest, const vString *const src);
 extern void vStringSetLength (vString *const string);
 
-#endif	/* _VSTRING_H */
+#endif  /* _VSTRING_H */
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */

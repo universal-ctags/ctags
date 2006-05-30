@@ -244,7 +244,7 @@ char* getcwd(char* out_path, int out_path_len)
 		pb.dirInfo.ioNamePtr = cwd.name;
 		pb.dirInfo.ioVRefNum = cwd.vRefNum;
 		pb.dirInfo.ioDrParID = cwd.parID;
-		do	/* loop until we have an error or find the root directory */
+		do  /* loop until we have an error or find the root directory */
 		{
 			pb.dirInfo.ioFDirIndex = -1;
 			pb.dirInfo.ioDrDirID = pb.dirInfo.ioDrParID;
