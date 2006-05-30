@@ -48,7 +48,7 @@ dnl AC_ARG_WITH(perl-regex,
 dnl [  --with-perl-regex       use Perl pcre interface, if available])
 
 AC_ARG_ENABLE(etags,
-[  --disable-etags         disable the installation of links for etags])
+[  --enable-etags          enable the installation of links for etags])
 
 AC_ARG_ENABLE(extended-format,
 [  --disable-extended-format
@@ -89,7 +89,7 @@ fi
 
 install_targets="install-ctags"
 AC_MSG_CHECKING(whether to install link to etags)
-if test no != "$enable_etags"; then
+if test yes = "$enable_etags"; then
 	AC_MSG_RESULT(yes)
 	install_targets="$install_targets install-etags"
 else
