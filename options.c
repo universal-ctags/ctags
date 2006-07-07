@@ -1764,7 +1764,7 @@ extern void initOptions (void)
 	processExcludeOption (NULL, "SCCS");
 	processExcludeOption (NULL, "RCS");
 	processExcludeOption (NULL, "CVS");
-
+	processExcludeOption (NULL, ".svn");
 }
 
 extern void freeOptionResources (void)

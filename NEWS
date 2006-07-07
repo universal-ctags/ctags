@@ -1,5 +1,8 @@
 Current Version: @@VERSION@@
 
+ctags-5.6.1 (Mon July 07 2006)
+* Added .svn to list of directories ignored during recursion (--recurse).
+
 ctags-5.6 (Mon May 29 2006)
 * Reformatted code for independence of tab stop setting.
 * Changed default configuration to disable installation of etags links.
