@@ -8,6 +8,7 @@
 --case-indentation0
 --comment-indentation0
 --continuation-indentation4
+--cuddle-do-while
 --declaration-comment-column0
 --declaration-indentation0
 --dont-break-function-decl-args
@@ -16,6 +17,8 @@
 --honour-newlines
 --indent-level4
 --line-length80
+--paren-indentation4
+--preprocessor-indentation1
 --no-blank-lines-after-commas
 --space-after-cast
 --space-after-for
@@ -25,4 +28,4 @@
 --space-special-semicolon
 --start-left-side-of-comments
 --struct-brace-indentation4
---tab-size8
+--tab-size4
