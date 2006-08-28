@@ -74,12 +74,17 @@ test.eiffel: $(CTAGS_TEST) $(CTAGS_REF)
 
 REF_LINUX_OPTIONS = $(TEST_OPTIONS) --fields=k
 TEST_LINUX_OPTIONS = $(TEST_OPTIONS) --fields=k
-LINUX_DIRECTORY := $(shell ls -dtr /usr/src/kernels/* | tail -1)
+LINUX_DIRECTORY := $(shell ls -dtr /usr/src/darren/* 2>/dev/null | tail -1)
+ifeq ($(LINUX_DIRECTORY),)
+test.linux:
+	@ echo "No Linux kernel source found in /usr/src/kernels for testing"
+else
 test.linux: $(CTAGS_TEST) $(CTAGS_REF)
 	@ echo -n "Testing Linux tag inclusion..."
 	@ $(CTAGS_REF) -R $(REF_LINUX_OPTIONS) -o tags.ref $(LINUX_DIRECTORY)
 	@ $(CTAGS_TEST) -R $(TEST_LINUX_OPTIONS) -o tags.test $(LINUX_DIRECTORY)
 	@- $(DIFF)
+endif
 
 TEST_ARTIFACTS = test.*.diff tags.ref tags.test
 
