@@ -5,6 +5,7 @@ config.cache
 config.log
 config.h
 autom4te.cache
+Makefile
 *.o
 *.od
 ctags
