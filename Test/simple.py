@@ -24,10 +24,14 @@ class one:
     def __private_function__(self, key, data):
     
     def public_function(self, key):
+        class this_is_ignored:
 
     def _pack(self, i, s):
     
+    class so_is_this:
+
 def _test(test, code, outcome, exception):
+    def ignored_function():
 
 if __name__ == '__main__':
 

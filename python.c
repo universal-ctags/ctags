@@ -108,6 +108,7 @@ static const unsigned char *skipSpace (const unsigned char *cp)
 	return cp;
 }
 
+/* Starting at ''cp'', parse an identifier into ''identifier''. */
 static const unsigned char *parseIdentifier (
 		const unsigned char *cp, vString *const identifier)
 {
@@ -141,20 +142,22 @@ static void parseClass (const unsigned char *cp, vString *const class)
 	vStringDelete (inheritance);
 }
 
-static void parseFunction (const unsigned char *cp, vString *const class)
+static void parseFunction (const unsigned char *cp, vString *const def,
+	vString *const class)
 {
-	vString *const identifier = vStringNew ();
-	cp = parseIdentifier (cp, identifier);
-	makeFunctionTag (identifier, class);
-	vStringDelete (identifier);
+	cp = parseIdentifier (cp, def);
+	makeFunctionTag (def, class);
 }
 
 static void findPythonTags (void)
 {
-	vString *const class = vStringNew ();
+	vString *const class = vStringNew (); /* current class */
+	vString *const def = vStringNew (); /* current function */
 	vString *const identifier = vStringNew ();
 	const unsigned char *line;
 	int class_indent = 0;
+	int def_indent = 0;
+	int skip_indent = 0;
 	boolean longStringLiteral = FALSE;
 
 	while ((line = fileReadLine ()) != NULL)
@@ -184,16 +187,45 @@ static void findPythonTags (void)
 			if (indent <= class_indent)
 				vStringClear (class);
 
+			if (indent <= def_indent)
+				vStringClear (def);
+
 			cp = parseIdentifier (cp, identifier);
 			if (isspace ((int) *cp))
 			{
 				cp = skipSpace (cp);
-				if (strcmp (vStringValue (identifier), "def") == 0)
-					parseFunction (cp, class);
-				else if (strcmp (vStringValue (identifier), "class") == 0)
+				if (!skip_indent || indent <= skip_indent)
 				{
-					parseClass (cp, class);
-					class_indent = indent;
+					if (strcmp (vStringValue (identifier), "def") == 0)
+					{
+						/* Currently, ctags can not handle functions in
+						 * functions for python - they are simple ignored.
+						 */
+						if (!vStringLength (def))
+						{
+							parseFunction (cp, def, class);
+							def_indent = indent;
+						}
+						else
+						{
+							skip_indent = indent;
+						}
+						}
+						else if (strcmp (vStringValue (identifier), "class")
+							== 0)
+						{
+						/* Currently, ctags can not handle classes in functions
+						 * or classes for python - they are simply ignored. */
+						if (!vStringLength (class) && !vStringLength (def))
+						{
+							parseClass (cp, class);
+							class_indent = indent;
+						}
+						else
+						{
+							skip_indent = indent;
+						}
+					}
 				}
 			}
 		}
@@ -207,6 +239,7 @@ static void findPythonTags (void)
 	}
 	vStringDelete (identifier);
 	vStringDelete (class);
+	vStringDelete (def);
 }
 
 extern parserDefinition *PythonParser (void)
