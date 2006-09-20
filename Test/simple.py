@@ -38,3 +38,15 @@ if __name__ == '__main__':
 class two (one):
 
     def only(arg):
+
+# line continuation
+class\
+three\
+(A, B,
+C):
+
+def\
+foo(
+x
+,
+y,    z):

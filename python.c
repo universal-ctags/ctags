@@ -42,6 +42,8 @@ static kindOption PythonKinds[] = {
  * necessary. If successful you will find class name in vString
  */
 
+#define vStringLast(vs) ((vs)->buffer[(vs)->length - 1])
+
 static boolean isIdentifierFirstCharacter (int c)
 {
 	return (boolean) (isalpha (c) || c == '_');
@@ -131,8 +133,16 @@ static void parseClass (const unsigned char *cp, vString *const class)
 	if (*cp == '(')
 	{
 		++cp;
-		while (*cp != ')'  &&  *cp != '\0')
+		while (*cp != ')')
 		{
+			if (*cp == '\0')
+			{
+				/* Closing parenthesis can be in follow up line. */
+				cp = fileReadLine ();
+				if (!cp) break;
+				vStringPut (inheritance, ' ');
+				continue;
+			}
 			vStringPut (inheritance, *cp);
 			++cp;
 		}
@@ -154,10 +164,12 @@ static void findPythonTags (void)
 	vString *const class = vStringNew (); /* current class */
 	vString *const def = vStringNew (); /* current function */
 	vString *const identifier = vStringNew ();
+	vString *const continuation = vStringNew ();
 	const unsigned char *line;
 	int class_indent = 0;
 	int def_indent = 0;
 	int skip_indent = 0;
+	int line_skip = 0;
 	boolean longStringLiteral = FALSE;
 
 	while ((line = fileReadLine ()) != NULL)
@@ -166,11 +178,26 @@ static void findPythonTags (void)
 		int indent;
 
 		cp = skipSpace (cp);
-		indent = cp - line;
 
 		if (*cp == '#' || *cp == '\0')  /* skip comment or blank line */
 			continue;
-		
+
+		/* Deal with line continuation. */
+		if (!line_skip) vStringClear(continuation);
+		vStringCatS(continuation, line);
+		vStringStripTrailing(continuation);
+		if (vStringLast(continuation) == '\\')
+		{
+			vStringChop(continuation);
+			vStringCatS(continuation, " ");
+			line_skip = 1;
+			continue;
+		}
+		cp = line = vStringValue(continuation);
+		cp = skipSpace (cp);
+		indent = cp - line;
+		line_skip = 0;
+
 		if (longStringLiteral)
 		{
 			cp = (const unsigned char*) strstr ((const char*) cp, "\"\"\"");
@@ -210,10 +237,9 @@ static void findPythonTags (void)
 						{
 							skip_indent = indent;
 						}
-						}
-						else if (strcmp (vStringValue (identifier), "class")
-							== 0)
-						{
+					}
+					else if (strcmp (vStringValue (identifier), "class") == 0)
+					{
 						/* Currently, ctags can not handle classes in functions
 						 * or classes for python - they are simply ignored. */
 						if (!vStringLength (class) && !vStringLength (def))
@@ -240,6 +266,7 @@ static void findPythonTags (void)
 	vStringDelete (identifier);
 	vStringDelete (class);
 	vStringDelete (def);
+	vStringDelete (continuation);
 }
 
 extern parserDefinition *PythonParser (void)

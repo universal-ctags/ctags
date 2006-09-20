@@ -1,5 +1,6 @@
 Current Version: @@VERSION@@
 * Fixed parsing of inner classes [Python, Bug #1411963].
+* Line continuation now works [Python, Bug #928001, Patch #819471].
 
 ctags-5.6.1 (Mon July 07 2006)
 * Added .svn to list of directories ignored during recursion (--recurse).
