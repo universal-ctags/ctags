@@ -2316,8 +2316,11 @@ static void processAngleBracket (void)
 	int c = cppGetc ();
 	if (c == '>')
 		;  /* already found match for template */
-	else if (isLanguage (Lang_cpp) &&  c != '<' && c != '=')
+	else if ((isLanguage (Lang_cpp) || isLanguage (Lang_java)) &&
+		c != '<' && c != '=')
+	{
 		skipToMatch ("<>");        /* this is a template */
+	}
 	else
 		cppUngetc (c);
 }
