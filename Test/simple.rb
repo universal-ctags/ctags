@@ -14,6 +14,9 @@ module ModuleExample
         def class_method_question?
             puts "in class_method_question?"
         end
+        def `(command)
+            return "just testing a backquote override"
+        end
     end
     def module_method
         puts "in module_method"

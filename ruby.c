@@ -112,6 +112,7 @@ static boolean parseRubyOperator (vString* name, const unsigned char** cp)
 	    "^", "|",
 	    "<=", "<", ">", ">=",
 	    "<=>", "==", "===", "!=", "=~", "!~",
+	    "`",
 	    0
 	};
 	int i;
