@@ -12,6 +12,7 @@ SOURCES = \
 	asm.c \
 	asp.c \
 	awk.c \
+	basic.c \
 	beta.c \
 	c.c \
 	cobol.c \
@@ -62,6 +63,7 @@ OBJECTS = \
 	asm.$(OBJEXT) \
 	asp.$(OBJEXT) \
 	awk.$(OBJEXT) \
+	basic.$(OBJEXT) \
 	beta.$(OBJEXT) \
 	c.$(OBJEXT) \
 	cobol.$(OBJEXT) \

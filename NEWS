@@ -1,4 +1,5 @@
 Current Version: @@VERSION@@
+* Added support for BlitzBasic, PureBasic and FreeBasic [FR #1100506].
 * Fixed parsing of inner classes [Python, Bug #1411963].
 * Line continuation now works [Python, Bug #928001, Patch #819471].
 
