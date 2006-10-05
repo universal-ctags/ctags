@@ -126,11 +126,11 @@ static const keywordDesc JsKeywordTable [] = {
     { "function",	KEYWORD_function		},
     { "prototype",	KEYWORD_prototype		},
     { "var",		KEYWORD_var		        },
-    { "this",		KEYWORD_this		        },
+    { "this",		KEYWORD_this		    },
     { "for",		KEYWORD_for		        },
-    { "while",		KEYWORD_while		        },
-    { "do",		KEYWORD_do		        },
-    { "if",		KEYWORD_if		        }
+    { "while",		KEYWORD_while		    },
+    { "do",			KEYWORD_do		        },
+    { "if",			KEYWORD_if		        }
 };
 
 /*
@@ -702,6 +702,14 @@ static void parseIf (tokenInfo *const token)
      *     if ( ... ) {
      *        return elem
      *     }
+	 *
+	 * TODO:  Deal with statements that can optional end
+	 *        without a semi-colon.  Currently this messes up
+	 *        the parsing of blocks.
+	 *        Need to somehow detect this has happened, and either
+	 *        backup a token, or skip reading the next token if 
+	 *        that is possible from all code locations.
+	 *
      */
 
     readToken (token);
