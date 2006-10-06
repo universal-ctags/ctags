@@ -276,6 +276,7 @@ static const keywordDesc SqlKeywordTable [] = {
 
 static void parseBlock (tokenInfo *const token, const boolean local);
 static void makeConstTag (tokenInfo *const token, const sqlKind kind);
+static boolean isCmdTerm (tokenInfo *const token);
 
 /*
  *   DEBUG function

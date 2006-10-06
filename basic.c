@@ -93,15 +93,16 @@ static void extract_name (char const *pos, vString * name)
 }
 
 /* Match a keyword starting at p (case insensitive). */
-static void match_keyword (char const *p, char const *keyword, BasicKind kind)
+static void match_keyword (const char *p, const char *keyword, BasicKind kind)
 {
-	int i;
+	vString *name;
+	size_t i;
 	for (i = 0; i < strlen (keyword); i++)
 	{
 		if (tolower (p[i]) != keyword[i])
 			return;
 	}
-	vString *name = vStringNew ();
+	name = vStringNew ();
 	extract_name (p + i, name);
 	makeSimpleTag (name, BasicKinds, kind);
 	vStringDelete (name);
@@ -135,13 +136,13 @@ static void match_dot_label (char const *p)
 }
 
 static void findBasicTags (KeyWord const keywords[],
-	void (*label) (char const *))
+	void (*label) (const char *))
 {
-	unsigned char const *line;
+	const char *line;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = (const char *) fileReadLine ()) != NULL)
 	{
-		char const *p = line;
+		const char *p = line;
 		KeyWord const *kw;
 
 		while (isspace (*p))
