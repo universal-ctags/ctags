@@ -484,11 +484,6 @@ getNextChar:
                           }
                           else if (d == '/')	// is this the start of a comment? 
                           {
-                              printf( "\n Skipping comment line  l:%lu  p:%ld \n"
-                                      , getSourceLineNumber ()
-                                      , getInputFilePosition ()
-                                    );
-
                               skipToCharacter ('\n');
                               goto getNextChar;
                           }
