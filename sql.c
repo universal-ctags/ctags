@@ -279,62 +279,17 @@ static void makeConstTag (tokenInfo *const token, const sqlKind kind);
 static boolean isCmdTerm (tokenInfo *const token);
 
 /*
- *   DEBUG function
- */
-
-static void dispToken (tokenInfo *const token, char * location)
-{
-#ifdef DEBUG
-    if ( isCmdTerm(token) )
-        printf( "\nmatches command terminator");
-
-    if ( isKeyword(token, KEYWORD_NONE) )
-    {
-        if ( isType(token, TOKEN_IDENTIFIER) || isType(token, TOKEN_STRING)  )
-        {
-            printf( "\n%s: token string  t:%s  s:%s  l:%lu  p:%ld \n"
-                    , location
-                    , vStringValue(token->string)
-                    , vStringValue(token->scope)
-                    , token->lineNumber
-                    , token->filePosition
-                  );
-        } 
-		else 
-		{
-            printf( "\n%s: token  t:%d  s:%s  l:%lu  p:%lu\n"
-                    , location
-                    , token->type
-                    , vStringValue(token->scope)
-                    , token->lineNumber
-                    , token->filePosition
-                  );
-        }
-    } 
-	else 
-	{
-        printf( "\n%s: keyword:%s k:%d  s:%s  l:%lu  p:%ld\n"
-                , location
-                , vStringValue(token->string)
-                , token->keyword
-                , vStringValue(token->scope)
-                , token->lineNumber
-                , token->filePosition
-              );
-    }
-#endif
-}
-
-/*
  *   FUNCTION DEFINITIONS
  */
 
 static boolean isIdentChar1 (const int c)
 {
-    // Other databases are less restrictive on the first character of
-    // an identifier.
-    // isIdentChar1 is used to identify the first character of an 
-    // identifier, so we are removing some restrictions.
+	/*
+     * Other databases are less restrictive on the first character of
+     * an identifier.
+     * isIdentChar1 is used to identify the first character of an 
+     * identifier, so we are removing some restrictions.
+	 */
     return (boolean)
         (isalpha (c) || c == '@' || c == '_' );
 }
@@ -642,22 +597,23 @@ getNextChar:
                   }
                   break;
     }
-    //dispToken(token, "rte");
 }
 
 /*
  *   Token parsing functions
  */
 
-static void addContext (tokenInfo* const parent, const tokenInfo* const child)
-{
-    if (vStringLength (parent->string) > 0)
-    {
-        vStringCatS (parent->string, ".");
-    }
-    vStringCatS (parent->string, vStringValue(child->string));
-    vStringTerminate(parent->string);
-}
+/*
+ * static void addContext (tokenInfo* const parent, const tokenInfo* const child)
+ * {
+ *     if (vStringLength (parent->string) > 0)
+ *     {
+ *         vStringCatS (parent->string, ".");
+ *     }
+ *     vStringCatS (parent->string, vStringValue(child->string));
+ *     vStringTerminate(parent->string);
+ * }
+ */
 
 static void addToScope (tokenInfo* const token, vString* const extra)
 {
@@ -822,8 +778,6 @@ static void parseSubProgram (tokenInfo *const token)
                )
                 makeSqlTag (name, kind);
 
-            //dispToken(name, "SubProgram: parseBlock name");
-            //dispToken(token, "SubProgram: parseBlock token");
             parseBlock (token, TRUE);
             vStringClear (token->scope);
         } 
@@ -1255,12 +1209,10 @@ static void parsePackage (tokenInfo *const token)
         if ( isType(token, TOKEN_PERIOD) )
         {
             readToken (name);
-            //dispToken(name, "parsePackage new name");
         }
     }
     if (isKeyword (token, KEYWORD_is))
     {
-        //dispToken(token, "parsePackage processing IS");
         if (isType (name, TOKEN_IDENTIFIER) ||
                 isType (name, TOKEN_STRING))
             makeSqlTag (name, SQLTAG_PACKAGE);
@@ -1567,7 +1519,6 @@ static void parseDrop (tokenInfo *const token)
      * the issue for all types.
      */
 
-    //dispToken(token, "parseDrop");
     findCmdTerm (token, FALSE);
 }
 
@@ -1806,7 +1757,6 @@ static void parseSqlFile (tokenInfo *const token)
     do
     {
         readToken (token);
-        //dispToken(token, "psf");
 
         if (isType (token, TOKEN_BLOCK_LABEL_BEGIN))
             parseLabel (token);

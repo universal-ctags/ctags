@@ -59,7 +59,8 @@ typedef enum eKeywordId {
     KEYWORD_for,
     KEYWORD_while,
     KEYWORD_do,
-    KEYWORD_if
+    KEYWORD_if,
+    KEYWORD_switch
 } keywordId;
 
 /*  Used to determine whether keyword is valid for the token language and
@@ -130,52 +131,9 @@ static const keywordDesc JsKeywordTable [] = {
     { "for",		KEYWORD_for		        },
     { "while",		KEYWORD_while		    },
     { "do",			KEYWORD_do		        },
-    { "if",			KEYWORD_if		        }
+    { "if",			KEYWORD_if		        },
+    { "switch",		KEYWORD_switch	        }
 };
-
-/*
- *   DEBUG function
- */
-
-static void dispToken (tokenInfo *const token, char * location)
-{
-#ifdef DEBUG
-    if ( isKeyword(token, KEYWORD_NONE) )
-    {
-        if ( isType(token, TOKEN_IDENTIFIER) || isType(token, TOKEN_STRING)  )
-        {
-            printf( "\n%s: token string  value:%s  scope:%s  line:%lu  pos:%ld \n"
-                    , location
-                    , vStringValue(token->string)
-                    , vStringValue(token->scope)
-                    , token->lineNumber
-                    , token->filePosition
-                  );
-        } 
-		else 
-		{
-            printf( "\n%s: token  type:%d  scope:%s  line:%lu  pos:%lu\n"
-                    , location
-                    , token->type
-                    , vStringValue(token->scope)
-                    , token->lineNumber
-                    , token->filePosition
-                  );
-        }
-    } 
-	else 
-	{
-        printf( "\n%s: keyword:%s k:%d  s:%s  l:%lu  p:%ld\n"
-                , location
-                , vStringValue(token->string)
-                , token->keyword
-                , vStringValue(token->scope)
-                , token->lineNumber
-                , token->filePosition
-              );
-    }
-#endif
-}
 
 /*
  *   FUNCTION DEFINITIONS
@@ -190,10 +148,12 @@ static void parseStatement (tokenInfo *const token, boolean is_inside_class);
 
 static boolean isIdentChar1 (const int c)
 {
-    // Other databases are less restrictive on the first character of
-    // an identifier.
-    // isIdentChar1 is used to identify the first character of an 
-    // identifier, so we are removing some restrictions.
+	/*
+     * Other databases are less restrictive on the first character of
+     * an identifier.
+     * isIdentChar1 is used to identify the first character of an 
+     * identifier, so we are removing some restrictions.
+	 */
     return (boolean)
         (isalpha (c) || c == '@' || c == '_' );
 }
@@ -203,30 +163,6 @@ static boolean isIdentChar (const int c)
     return (boolean)
         (isalpha (c) || isdigit (c) || c == '$' || 
          c == '@' || c == '_' || c == '#');
-}
-
-static boolean isCmdTerm (tokenInfo *const token)
-{
-#ifdef DEBUGed
-    printf( "\n isCmdTerm: token same  tt:%d  tk:%d\n"
-            , token->type
-            , token->keyword
-          );
-#endif
-
-    /*
-     * Based on the various customer sites I have been at
-     * the most common command delimiters are
-     *     ;
-     *     close curly brace
-     * This routine will check for any of these, more
-     * can easily be added by modifying readToken and
-     * either adding the character to:
-     *     enum eTokenType
-     *     enum eTokenType
-     */
-    return ( isType (token, TOKEN_SEMICOLON) || 
-            isType (token, TOKEN_CLOSE_CURLY) );
 }
 
 static void skipArgumentList (tokenInfo *const token)
@@ -243,7 +179,6 @@ static void skipArgumentList (tokenInfo *const token)
     if (isType (token, TOKEN_OPEN_PAREN))	/* arguments? */
     {
         nest_level++;
-        //findToken (token, TOKEN_CLOSE_PAREN);
         while (! (isType (token, TOKEN_CLOSE_PAREN) && (nest_level == 0)))
         {
             readToken (token);
@@ -507,7 +442,6 @@ getNextChar:
                   }
                   break;
     }
-    //dispToken(token, "rte");
 }
 
 /*
@@ -538,15 +472,7 @@ static void addToScope (tokenInfo* const token, vString* const extra)
  *   Scanning functions
  */
 
-static void findToken (tokenInfo *const token, const tokenType type)
-{
-    while (! isType (token, type))
-    {
-        readToken (token);
-    }
-}
-
-static void findCmdTerm (tokenInfo *const token, const boolean check_first)
+static void findCmdTerm (tokenInfo *const token)
 {
     /*
      * Read until we find either a semicolon or closing brace. 
@@ -726,7 +652,7 @@ static void parseIf (tokenInfo *const token)
     } 
 	else 
 	{
-        findCmdTerm (token, TRUE);
+        findCmdTerm (token);
     }
 }
 
@@ -853,7 +779,7 @@ static void parseMethods (tokenInfo *const token, tokenInfo *const class)
         }
     } while ( isType(token, TOKEN_COMMA) );
 
-    findCmdTerm (token, TRUE);
+    findCmdTerm (token);
 
     deleteToken (name);
 }
@@ -903,7 +829,7 @@ static void parseFunction (tokenInfo *const token)
         }
     }
 
-    findCmdTerm (token, TRUE);
+    findCmdTerm (token);
 
     deleteToken (name);
 }
@@ -941,6 +867,9 @@ static void parseLine (tokenInfo *const token, boolean is_inside_class)
                 break;
             case KEYWORD_if:
                 parseIf (token); 
+                break;
+            case KEYWORD_switch:
+                parseSwitch (token); 
                 break;
             default:               
                 parseStatement (token, is_inside_class); 
@@ -1006,7 +935,7 @@ static void parseStatement (tokenInfo *const token, boolean is_inside_class)
                     makeJsTag (token, JSTAG_METHOD);
 
                     // Find to the end of the statement
-                    findCmdTerm (token, TRUE);
+                    findCmdTerm (token);
                     goto cleanUp;
                 } 
 				else 
@@ -1081,7 +1010,7 @@ static void parseStatement (tokenInfo *const token, boolean is_inside_class)
             parseMethods(token, name);
         }
     }
-    findCmdTerm (token, TRUE);
+    findCmdTerm (token);
 
 cleanUp:
     vStringCopy(token->scope, saveScope);
@@ -1119,7 +1048,7 @@ static void parseGobalVar (tokenInfo *const token)
     {
         makeJsTag (name, JSTAG_VARIABLE);
     }
-    findCmdTerm (token, TRUE);
+    findCmdTerm (token);
 
     deleteToken (name);
 }
