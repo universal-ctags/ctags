@@ -103,7 +103,7 @@ static void makeClassTag (vString *const class, vString *const inheritance)
 	makeTagEntry (&tag);
 }
 
-static const unsigned char *skipSpace (const unsigned char *cp)
+static const char *skipSpace (const char *cp)
 {
 	while (isspace ((int) *cp))
 		++cp;
@@ -111,8 +111,7 @@ static const unsigned char *skipSpace (const unsigned char *cp)
 }
 
 /* Starting at ''cp'', parse an identifier into ''identifier''. */
-static const unsigned char *parseIdentifier (
-		const unsigned char *cp, vString *const identifier)
+static const char *parseIdentifier (const char *cp, vString *const identifier)
 {
 	vStringClear (identifier);
 	while (isIdentifierCharacter ((int) *cp))
@@ -124,7 +123,7 @@ static const unsigned char *parseIdentifier (
 	return cp;
 }
 
-static void parseClass (const unsigned char *cp, vString *const class)
+static void parseClass (const char *cp, vString *const class)
 {
 	vString *const inheritance = vStringNew ();
 	vStringClear (inheritance);
@@ -138,7 +137,7 @@ static void parseClass (const unsigned char *cp, vString *const class)
 			if (*cp == '\0')
 			{
 				/* Closing parenthesis can be in follow up line. */
-				cp = fileReadLine ();
+				cp = (const char *) fileReadLine ();
 				if (!cp) break;
 				vStringPut (inheritance, ' ');
 				continue;
@@ -152,7 +151,7 @@ static void parseClass (const unsigned char *cp, vString *const class)
 	vStringDelete (inheritance);
 }
 
-static void parseFunction (const unsigned char *cp, vString *const def,
+static void parseFunction (const char *cp, vString *const def,
 	vString *const class)
 {
 	cp = parseIdentifier (cp, def);
@@ -165,16 +164,16 @@ static void findPythonTags (void)
 	vString *const def = vStringNew (); /* current function */
 	vString *const identifier = vStringNew ();
 	vString *const continuation = vStringNew ();
-	const unsigned char *line;
+	const char *line;
 	int class_indent = 0;
 	int def_indent = 0;
 	int skip_indent = 0;
 	int line_skip = 0;
 	boolean longStringLiteral = FALSE;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = (const char *) fileReadLine ()) != NULL)
 	{
-		const unsigned char *cp = line;
+		const char *cp = line;
 		int indent;
 
 		cp = skipSpace (cp);
@@ -200,7 +199,7 @@ static void findPythonTags (void)
 
 		if (longStringLiteral)
 		{
-			cp = (const unsigned char*) strstr ((const char*) cp, "\"\"\"");
+			cp = strstr (cp, "\"\"\"");
 			if (cp == NULL)
 				continue;
 			else
@@ -255,10 +254,10 @@ static void findPythonTags (void)
 				}
 			}
 		}
-		if ((cp = (const unsigned char*) strstr ((const char*)cp, "\"\"\"")) != NULL)
+		if ((cp = strstr (cp, "\"\"\"")) != NULL)
 		{
 			cp += 3;
-			cp = (const unsigned char*) strstr ((const char*) cp, "\"\"\"");
+			cp = strstr (cp, "\"\"\"");
 			if (cp == NULL)
 				longStringLiteral = TRUE;
 		}
