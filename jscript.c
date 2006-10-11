@@ -44,22 +44,26 @@
 typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
 
 /*
- * Tracks class names already created
+ * Tracks class and function names already created
  */
 static stringList *ClassNames;
+static stringList *FunctionNames;
 
 /*  Used to specify type of keyword.
 */
 typedef enum eKeywordId {
     KEYWORD_NONE = -1,
     KEYWORD_function,
+    KEYWORD_capital_function,
     KEYWORD_prototype,
     KEYWORD_var,
+    KEYWORD_new,
     KEYWORD_this,
     KEYWORD_for,
     KEYWORD_while,
     KEYWORD_do,
     KEYWORD_if,
+    KEYWORD_else,
     KEYWORD_switch
 } keywordId;
 
@@ -97,6 +101,7 @@ typedef struct sTokenInfo {
     vString *	scope;
     unsigned long lineNumber;
     fpos_t filePosition;
+	int         nestLevel;
 } tokenInfo;
 
 /*
@@ -124,15 +129,18 @@ static kindOption JsKinds [] = {
 
 static const keywordDesc JsKeywordTable [] = {
     /* keyword		keyword ID */
-    { "function",	KEYWORD_function		},
-    { "prototype",	KEYWORD_prototype		},
-    { "var",		KEYWORD_var		        },
-    { "this",		KEYWORD_this		    },
-    { "for",		KEYWORD_for		        },
-    { "while",		KEYWORD_while		    },
-    { "do",			KEYWORD_do		        },
-    { "if",			KEYWORD_if		        },
-    { "switch",		KEYWORD_switch	        }
+    { "function",	KEYWORD_function			},
+    { "Function",	KEYWORD_capital_function	},
+    { "prototype",	KEYWORD_prototype			},
+    { "var",		KEYWORD_var		        	},
+    { "new",		KEYWORD_new		        	},
+    { "this",		KEYWORD_this		    	},
+    { "for",		KEYWORD_for		        	},
+    { "while",		KEYWORD_while		    	},
+    { "do",			KEYWORD_do		        	},
+    { "if",			KEYWORD_if		        	},
+    { "else",		KEYWORD_else	        	},
+    { "switch",		KEYWORD_switch	        	}
 };
 
 /*
@@ -141,10 +149,10 @@ static const keywordDesc JsKeywordTable [] = {
 
 static void makeConstTag (tokenInfo *const token, const jsKind kind);
 static void readToken (tokenInfo *const token);
-static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent);
 static void parseFunction (tokenInfo *const token);
-static void parseLine (tokenInfo *const token, boolean is_inside_class);
-static void parseStatement (tokenInfo *const token, boolean is_inside_class);
+static boolean parseStatement (tokenInfo *const token, boolean is_inside_class);
+static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent);
+static boolean parseLine (tokenInfo *const token, boolean is_inside_class);
 
 static boolean isIdentChar1 (const int c)
 {
@@ -218,6 +226,7 @@ static tokenInfo *newToken (void)
     token->keyword      = KEYWORD_NONE;
     token->string       = vStringNew ();
     token->scope        = vStringNew ();
+    token->nestLevel    = 0;
 
     return token;
 }
@@ -283,6 +292,15 @@ static void makeClassTag (tokenInfo *const token)
     }
 }
 
+static void makeFunctionTag (tokenInfo *const token)
+{
+    if ( ! stringListHas(FunctionNames, vStringValue (token->string)) )
+    {
+        stringListAdd (FunctionNames, vStringNewCopy (token->string));
+        makeJsTag (token, JSTAG_FUNCTION);
+    }
+}
+
 /*
  *   Parsing functions
  */
@@ -343,6 +361,7 @@ static keywordId analyzeToken (vString *const name)
 
 static void copyToken (tokenInfo *const dest, tokenInfo *const src)
 {
+    dest->nestLevel = src->nestLevel;
     dest->lineNumber = src->lineNumber;
     dest->filePosition = src->filePosition;
     dest->type = src->type;
@@ -659,8 +678,10 @@ static void parseIf (tokenInfo *const token)
 static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 {
     boolean is_class = FALSE;
+    boolean read_next_token = TRUE;
     vString * saveScope = vStringNew ();
 
+	token->nestLevel++;
     /*
      * Make this routine a bit more forgiving.
      * If called on an open_curly advance it
@@ -677,6 +698,7 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
          */
         do
         {
+			read_next_token = TRUE;
             if (isKeyword (token, KEYWORD_this))
             {
                 /*
@@ -721,15 +743,31 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
             } 
 			else 
             {
-                parseLine (token, is_class);
+				/*
+				 * It is possible for a line to have no terminator
+				 * if the following line is a closing brace.
+				 * parseLine will detect this case and indicate
+				 * whether we should read an additional token.
+				 */
+                read_next_token = parseLine (token, is_class);
             }
 
-            readToken(token);
+			/*
+			 * Always read a new token unless we find a statement without
+			 * a ending terminator
+			 */
+			if( read_next_token ) 
+				readToken(token);
 
-        } while (! isType (token, TOKEN_CLOSE_CURLY));
+			/*
+			 * If we find a statement without a terminator consider the 
+			 * block finished, otherwise the stack will be off by one.
+			 */
+        } while (! isType (token, TOKEN_CLOSE_CURLY) && read_next_token );
     }
 
     vStringDelete(saveScope);
+	token->nestLevel--;
 
     return is_class;
 }
@@ -797,6 +835,7 @@ static void parseFunction (tokenInfo *const token)
     readToken (name);
     // Add scope in case this is an INNER function
     addToScope(name, token->scope);
+
     readToken (token);
     if (isType (token, TOKEN_PERIOD))
     {
@@ -812,21 +851,15 @@ static void parseFunction (tokenInfo *const token)
     }
 
     if ( isType (token, TOKEN_OPEN_PAREN) )
-    {
         skipArgumentList(token);
-    }
 
     if ( isType (token, TOKEN_OPEN_CURLY) )
     {
         is_class = parseBlock (token, name);
         if ( is_class ) 
-        {
             makeClassTag (name);
-        } 
 		else 
-		{
-            makeJsTag (name, JSTAG_FUNCTION);
-        }
+            makeFunctionTag (name);
     }
 
     findCmdTerm (token);
@@ -834,26 +867,17 @@ static void parseFunction (tokenInfo *const token)
     deleteToken (name);
 }
 
-static void parseLine (tokenInfo *const token, boolean is_inside_class)
+static boolean parseLine (tokenInfo *const token, boolean is_inside_class)
 {
+	boolean is_terminated = TRUE;
     /*
-     * Functions can be named or unnamed.
-     * This deals with these formats:
-     * Function
-     *     validFunctionOne = function(a,b) {}
-     *     testlib.validFunctionFive = function(a,b) {}
-     *     var innerThree = function(a,b) {}
-     *     var innerFour = (a,b) {}
-     * Class
-     *     testlib.extras.ValidClassOne = function(a,b) {
-     *         this.a = a; 
-     *     }
-     * Class Methods
-     *     testlib.extras.ValidClassOne.prototype = {
-     *         'validMethodOne' : function(a,b) {},
-     *         'validMethodTwo' : function(a,b) {}
-     *     }
-     *     Database.prototype.getTodaysDate = Database_getTodaysDate;
+     * Detect the common statements, if, while, for, do, ...
+     * This is necessary since the last statement within a block "{}"
+	 * can be optionally terminated.
+	 *
+	 * If the statement is not terminated, we need to tell
+	 * the calling routine to prevent reading an additional token
+	 * looking for the end of the statement.
      */
 
     if (isType(token, TOKEN_KEYWORD))
@@ -866,6 +890,7 @@ static void parseLine (tokenInfo *const token, boolean is_inside_class)
                 parseLoop (token); 
                 break;
             case KEYWORD_if:
+            case KEYWORD_else:
                 parseIf (token); 
                 break;
             case KEYWORD_switch:
@@ -878,15 +903,24 @@ static void parseLine (tokenInfo *const token, boolean is_inside_class)
     } 
 	else 
 	{
-        parseStatement (token, is_inside_class); 
+		/*
+		 * Special case where single line statements may not be
+		 * SEMICOLON termianted.  parseBlock needs to know this
+		 * so that it does not read the next token.
+		 */
+        is_terminated = parseStatement (token, is_inside_class); 
     }
+	return is_terminated;
 }
 
-static void parseStatement (tokenInfo *const token, boolean is_inside_class)
+static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 {
     tokenInfo *const name = newToken ();
+    tokenInfo *const secondary_name = newToken ();
     vString * saveScope = vStringNew ();
     boolean is_class = FALSE;
+    boolean is_terminated = TRUE;
+    boolean is_global = FALSE;
 
     vStringClear(saveScope);
     /*
@@ -897,6 +931,8 @@ static void parseStatement (tokenInfo *const token, boolean is_inside_class)
      *     testlib.validFunctionFive = function(a,b) {}
      *     var innerThree = function(a,b) {}
      *     var innerFour = (a,b) {}
+     *     var D2 = secondary_fcn_name(a,b) {}
+     *     var D3 = new Function("a", "b", "return a+b;");
      * Class
      *     testlib.extras.ValidClassOne = function(a,b) {
      *         this.a = a; 
@@ -915,7 +951,16 @@ static void parseStatement (tokenInfo *const token, boolean is_inside_class)
      * var can preceed an inner function
      */
     if ( isKeyword(token, KEYWORD_var) )
+	{
+		/*
+		 * Only create variables for global scope
+		 */
+		if ( token->nestLevel == 0 )
+		{
+			is_global = TRUE;
+		}
         readToken(token);
+	}
 
     copyToken(name, token);
 
@@ -923,6 +968,10 @@ static void parseStatement (tokenInfo *const token, boolean is_inside_class)
     readToken (token);
     if (isType (token, TOKEN_PERIOD))
     {
+		/*
+		 * Cannot be a global variable is it has dot references in the name
+		 */
+		is_global = FALSE;
         do
         {
             readToken (token);
@@ -939,9 +988,7 @@ static void parseStatement (tokenInfo *const token, boolean is_inside_class)
                     goto cleanUp;
                 } 
 				else 
-				{
                     addContext (name, token);
-                }
             } 
 			else if ( isKeyword(token, KEYWORD_prototype) ) 
 			{
@@ -956,13 +1003,36 @@ static void parseStatement (tokenInfo *const token, boolean is_inside_class)
     {
         readToken (token);
 
-        if (isKeyword (token, KEYWORD_function))
+        if ( isKeyword (token, KEYWORD_function) )
         {
             readToken (token);
+
+		    if ( isKeyword (token, KEYWORD_NONE) && 
+					! isType (token, TOKEN_OPEN_PAREN) )
+			{
+				/*
+				 * Functions of this format:
+                 *     var D2A=function theAdd(a, b) 
+                 *     {                     
+                 *        return a+b;
+                 *     }                     
+				 * Are really two separately defined functions and 
+				 * can be referenced in two ways:
+				 *     alert(D2A(1,2));           // produces 3
+				 *     alert(theAdd(1,2));        // also produces 3
+				 * So it must have two tags:
+				 *     D2A
+				 *     theAdd
+				 * Save the reference to the name for later use, once
+				 * we have established this is a valid function we will
+				 * create the secondary reference to it.
+				 */
+				copyToken(secondary_name, token);
+				readToken (token);
+			}
+
             if ( isType (token, TOKEN_OPEN_PAREN) )
-            {
                 skipArgumentList(token);
-            }
 
             if (isType (token, TOKEN_OPEN_CURLY)) 
 			{
@@ -973,19 +1043,20 @@ static void parseStatement (tokenInfo *const token, boolean is_inside_class)
                 if ( is_inside_class ) 
 				{
                     makeJsTag (name, JSTAG_METHOD);
+					if ( vStringLength(secondary_name->string) > 0 )
+						makeFunctionTag (secondary_name);
                     parseBlock (token, name);
                 } 
 				else 
 				{
                     is_class = parseBlock (token, name);
                     if ( is_class ) 
-                    {
                         makeClassTag (name);
-                    } 
 					else 
-					{
-                        makeJsTag (name, JSTAG_FUNCTION);
-                    }
+						makeFunctionTag (name);
+
+					if ( vStringLength(secondary_name->string) > 0 )
+						makeFunctionTag (secondary_name);
                 }
             }
         } 
@@ -1009,48 +1080,90 @@ static void parseStatement (tokenInfo *const token, boolean is_inside_class)
 		{
             parseMethods(token, name);
         }
+		else if (isKeyword (token, KEYWORD_new))
+		{
+			readToken (token);
+			if ( isKeyword (token, KEYWORD_function) || 
+					isKeyword (token, KEYWORD_capital_function) )
+			{
+				readToken (token);
+				if ( isType (token, TOKEN_OPEN_PAREN) )
+					skipArgumentList(token);
+
+				if (isType (token, TOKEN_SEMICOLON)) 
+					makeFunctionTag (name);
+			}
+		}
+		else if (isKeyword (token, KEYWORD_NONE))
+		{
+			/*
+			 * Only create variables for global scope
+			 */
+			if ( token->nestLevel == 0 && is_global )
+			{
+				/*
+				 * A pointer can be created to the function.  
+				 * If we recognize the function/class name ignore the variable.
+				 * This format looks identical to a variable definition.
+				 * A variable defined outside of a block is considered
+				 * a global variable:
+				 *     var g_var1 = 1;
+				 *     var g_var2;
+				 * This is not a global variable:
+				 *     var g_var = function;
+				 * This is a global variable:
+				 *     var g_var = different_var_name;
+				 */
+				if ( ! stringListHas(FunctionNames, vStringValue (token->string)) &&
+						! stringListHas(ClassNames, vStringValue (token->string)) )
+				{
+					readToken (token);
+					if (isType (token, TOKEN_SEMICOLON)) 
+						makeJsTag (name, JSTAG_VARIABLE);
+				}
+			}
+        }
     }
+	else
+	{
+		/*
+		 * Only create variables for global scope
+		 */
+		if ( token->nestLevel == 0 && is_global )
+		{
+			/*
+			 * Handles this syntax:
+			 *     var g_var2;
+			 */
+			if (isType (token, TOKEN_SEMICOLON)) 
+				makeJsTag (name, JSTAG_VARIABLE);
+		}
+	}
     findCmdTerm (token);
+
+	/*
+	 * Statements can be optionally terminated in the case of 
+	 * statement prior to a close curly brace as in the
+	 * document.write line below:
+	 *
+     * function checkForUpdate() {
+     *     if( 1==1 ) {
+     *         document.write("hello from checkForUpdate<br>")
+     *     }
+     *     return 1;
+     * }
+	 */
+	if (isType (token, TOKEN_CLOSE_CURLY)) 
+		is_terminated = FALSE;
+
 
 cleanUp:
     vStringCopy(token->scope, saveScope);
     deleteToken (name);
+    deleteToken (secondary_name);
     vStringDelete(saveScope);
-}
 
-static void parseGobalVar (tokenInfo *const token)
-{
-    tokenInfo *const name = newToken ();
-
-    /*
-     * A variable defined outside of a block is considered
-     * a global variable:
-     *     var g_var1 = 1;
-     *     var g_var2;
-     * This is not a global variable:
-     *     var g_var = function;
-     */
-
-    // Potentially the name of the function
-    readToken (name);
-    readToken (token);
-
-    if ( isType (token, TOKEN_EQUAL_SIGN) )
-    {
-        readToken (token);
-
-        if (!isKeyword (token, KEYWORD_function))
-        {
-            makeJsTag (name, JSTAG_VARIABLE);
-        }
-    } 
-	else if ( isType (token, TOKEN_SEMICOLON) ) 
-    {
-        makeJsTag (name, JSTAG_VARIABLE);
-    }
-    findCmdTerm (token);
-
-    deleteToken (name);
+	return is_terminated;
 }
 
 static void parseJsFile (tokenInfo *const token)
@@ -1064,8 +1177,7 @@ static void parseJsFile (tokenInfo *const token)
             switch (token->keyword)
             {
                 case KEYWORD_function:  parseFunction (token); break;
-                case KEYWORD_var:       parseGobalVar (token); break;
-                default:                break;
+                default:                parseLine (token, FALSE); break;
             }
         } 
 		else 
@@ -1087,12 +1199,15 @@ static void findJsTags (void)
     tokenInfo *const token = newToken ();
     exception_t exception = (exception_t) (setjmp (Exception));
     ClassNames = stringListNew ();
+    FunctionNames = stringListNew ();
 
     while (exception == ExceptionNone)
         parseJsFile (token);
 
     stringListDelete (ClassNames);
+    stringListDelete (FunctionNames);
     ClassNames = NULL;
+    FunctionNames = NULL;
     deleteToken (token);
 }
 
