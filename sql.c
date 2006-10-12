@@ -274,9 +274,8 @@ static const keywordDesc SqlKeywordTable [] = {
  *	 FUNCTION DECLARATIONS
  */
 
+/* Recursive calls */
 static void parseBlock (tokenInfo *const token, const boolean local);
-static void makeConstTag (tokenInfo *const token, const sqlKind kind);
-static boolean isCmdTerm (tokenInfo *const token);
 
 /*
  *	 FUNCTION DEFINITIONS
@@ -364,6 +363,23 @@ static void deleteToken (tokenInfo *const token)
  *	 Tag generation functions
  */
 
+static void makeConstTag (tokenInfo *const token, const sqlKind kind)
+{
+	if (SqlKinds [kind].enabled)
+	{
+		const char *const name = vStringValue (token->string);
+		tagEntryInfo e;
+		initTagEntry (&e, name);
+
+		e.lineNumber   = token->lineNumber;
+		e.filePosition = token->filePosition;
+		e.kindName	   = SqlKinds [kind].name;
+		e.kind		   = SqlKinds [kind].letter;
+
+		makeTagEntry (&e);
+	}
+}
+
 static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 {
 	vString *	fulltag;
@@ -385,23 +401,6 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 			vStringDelete (fulltag);
 		}
 		makeConstTag (token, kind);
-	}
-}
-
-static void makeConstTag (tokenInfo *const token, const sqlKind kind)
-{
-	if (SqlKinds [kind].enabled)
-	{
-		const char *const name = vStringValue (token->string);
-		tagEntryInfo e;
-		initTagEntry (&e, name);
-
-		e.lineNumber   = token->lineNumber;
-		e.filePosition = token->filePosition;
-		e.kindName	   = SqlKinds [kind].name;
-		e.kind		   = SqlKinds [kind].letter;
-
-		makeTagEntry (&e);
 	}
 }
 
