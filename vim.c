@@ -1,19 +1,19 @@
 /*
-*   $Id$
+*	$Id$
 *
-*   Copyright (c) 2000-2003, Darren Hiebert
+*	Copyright (c) 2000-2003, Darren Hiebert
 *
-*   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*	This source code is released for free distribution under the terms of the
+*	GNU General Public License.
 *
-*   Thanks are due to Jay Glanville for significant improvements.
+*	Thanks are due to Jay Glanville for significant improvements.
 *
-*   This module contains functions for generating tags for user-defined
-*   functions for the Vim editor.
+*	This module contains functions for generating tags for user-defined
+*	functions for the Vim editor.
 */
 
 /*
-*   INCLUDE FILES
+*	INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
 
@@ -24,7 +24,7 @@
 #include "vstring.h"
 
 /*
-*   DATA DEFINITIONS
+*	DATA DEFINITIONS
 */
 typedef enum {
 	K_AUGROUP,
@@ -39,7 +39,7 @@ static kindOption VimKinds [] = {
 };
 
 /*
-*   FUNCTION DEFINITIONS
+*	FUNCTION DEFINITIONS
 */
 
 /* This function takes a char pointer, tries to find a scope separator in the
@@ -50,6 +50,7 @@ static kindOption VimKinds [] = {
 static const unsigned char* skipPrefix (const unsigned char* name, int *scope)
 {
 	const unsigned char* result = name;
+	int counter;
 	if (scope != NULL)
 		*scope = '\0';
 	if (name[1] == ':')
@@ -63,6 +64,32 @@ static const unsigned char* skipPrefix (const unsigned char* name, int *scope)
 		if (scope != NULL)
 			*scope = *name;
 		result = name + 5;
+	}
+	else
+	{
+		/*
+		 * Vim7 check for dictionaries or autoload function names
+		 */
+		counter = 0;
+		do
+		{
+			switch ( name[counter] )
+			{
+				case '.':
+					/* Set the scope to d - Dictionary */
+					*scope = 'd';
+					break;
+				case '#':
+					/* Set the scope to a - autoload */
+					*scope = 'a';
+					break;
+			}
+			++counter;
+		} while (isalnum ((int) name[counter]) ||  
+				name[counter] == '_'		   ||  
+				name[counter] == '.'		   ||  
+				name[counter] == '#'
+				);
 	}
 	return result;
 }
@@ -85,9 +112,9 @@ static void findVimTags (void)
 			const unsigned char *cp = line + 1;
 			inFunction = TRUE;
 
-			if ((int) *++cp == 'n'  &&  (int) *++cp == 'c'  &&
-				(int) *++cp == 't'  &&  (int) *++cp == 'i'  &&
-				(int) *++cp == 'o'  &&  (int) *++cp == 'n')
+			if ((int) *++cp == 'n'	&&	(int) *++cp == 'c'	&&
+				(int) *++cp == 't'	&&	(int) *++cp == 'i'	&&
+				(int) *++cp == 'o'	&&	(int) *++cp == 'n')
 					++cp;
 			if ((int) *cp == '!')
 				++cp;
@@ -96,13 +123,17 @@ static void findVimTags (void)
 				while (isspace ((int) *cp))
 					++cp;
 				cp = skipPrefix (cp, &scope);
-				if (isupper ((int) *cp)  ||  scope == 's'  ||  scope == '<')
+				if (isupper ((int) *cp)  ||  
+						scope == 's'  ||  /* script scope */
+						scope == '<'  ||  /* script scope */
+						scope == 'd'  ||  /* dictionary */
+						scope == 'a')	  /* autoload */
 				{
 					do
 					{
 						vStringPut (name, (int) *cp);
 						++cp;
-					} while (isalnum ((int) *cp)  ||  *cp == '_');
+					} while (isalnum ((int) *cp) ||  *cp == '_' ||	*cp == '.' ||  *cp == '#');
 					vStringTerminate (name);
 					makeSimpleTag (name, VimKinds, K_FUNCTION);
 					vStringClear (name);
@@ -110,7 +141,7 @@ static void findVimTags (void)
 			}
 		}
 
-	    if  (strncmp ((const char*) line, "aug", (size_t) 3) == 0)
+		if	(strncmp ((const char*) line, "aug", (size_t) 3) == 0)
 		{
 			/* Found Autocommand Group (augroup) */
 			const unsigned char *cp = line + 2;
@@ -122,7 +153,7 @@ static void findVimTags (void)
 				while (isspace ((int) *cp))
 					++cp; 
 				if (strncasecmp ((const char*) cp, "end", (size_t) 3) != 0)
-				{    
+				{	 
 					do
 					{
 						vStringPut (name, (int) *cp);
@@ -168,11 +199,11 @@ extern parserDefinition* VimParser (void)
 {
 	static const char *const extensions [] = { "vim", NULL };
 	parserDefinition* def = parserNew ("Vim");
-	def->kinds      = VimKinds;
-	def->kindCount  = KIND_COUNT (VimKinds);
+	def->kinds		= VimKinds;
+	def->kindCount	= KIND_COUNT (VimKinds);
 	def->extensions = extensions;
-	def->parser     = findVimTags;
+	def->parser		= findVimTags;
 	return def;
 }
 
-/* vi:set tabstop=4 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4 noexpandtab: */
