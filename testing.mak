@@ -66,11 +66,17 @@ test.etags: $(CTAGS_TEST) $(CTAGS_REF)
 REF_EIFFEL_OPTIONS = $(TEST_OPTIONS) --format=1 --languages=eiffel
 TEST_EIFFEL_OPTIONS = $(TEST_OPTIONS) --format=1 --languages=eiffel
 EIFFEL_DIRECTORY = $(ISE_EIFFEL)/library
+HAVE_EIFFEL := $(shell ls -dtr $(EIFFEL_DIRECTORY) 2>/dev/null)
+ifeq ($(HAVE_EIFFEL),)
+test.eiffel:
+	@ echo "No Eiffel library source found for testing"
+else
 test.eiffel: $(CTAGS_TEST) $(CTAGS_REF)
 	@ echo -n "Testing Eiffel tag inclusion..."
 	@ $(CTAGS_REF) -R $(REF_EIFFEL_OPTIONS) -o tags.ref $(EIFFEL_DIRECTORY)
 	@ $(CTAGS_TEST) -R $(TEST_EIFFEL_OPTIONS) -o tags.test $(EIFFEL_DIRECTORY)
 	@- $(DIFF)
+endif
 
 REF_LINUX_OPTIONS = $(TEST_OPTIONS) --fields=k
 TEST_LINUX_OPTIONS = $(TEST_OPTIONS) --fields=k
