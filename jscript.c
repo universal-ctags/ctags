@@ -150,6 +150,7 @@ static const keywordDesc JsKeywordTable [] = {
 /* Recursive functions */
 static void parseFunction (tokenInfo *const token);
 static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent);
+static boolean parseLine (tokenInfo *const token, boolean is_inside_class);
 
 static boolean isIdentChar1 (const int c)
 {
@@ -286,7 +287,6 @@ static void parseString (vString *const string, const int delimiter)
 	while (! end)
 	{
 		c = fileGetc ();
-		//		  printf( "\nps: %c\n", c  );
 		if (c == EOF)
 			end = TRUE;
 		else if (c == delimiter)
@@ -314,6 +314,15 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		fileUngetc (c);		/* unget non-identifier character */
 }
 
+static keywordId analyzeToken (vString *const name)
+{
+	static vString *keyword = NULL;
+	if (keyword == NULL)
+		keyword = vStringNew ();
+	vStringCopyToLower (keyword, name);
+	return (keywordId) lookupKeyword (vStringValue (keyword), Lang_js);
+}
+
 static void readToken (tokenInfo *const token)
 {
 	int c;
@@ -326,7 +335,6 @@ getNextChar:
 	do
 	{
 		c = fileGetc ();
-		//		  printf( "\nrtc: %c\n", c );
 		/* 
 		 * Added " to the list of ignores, not sure what this 
 		 * might break but it gets by this issue:
@@ -360,7 +368,7 @@ getNextChar:
 				  {
 					  int d = fileGetc ();
 					  if ( (d != '*') &&		/* is this the start of a comment? */
-							  (d != '/') )			// is a one line comment?
+							  (d != '/') )		/* is a one line comment? */
 					  {
 						  token->type = TOKEN_FORWARD_SLASH;
 						  fileUngetc (d);
@@ -380,7 +388,7 @@ getNextChar:
 							  } while (c != EOF && c != '\0');
 							  goto getNextChar;
 						  }
-						  else if (d == '/')	// is this the start of a comment? 
+						  else if (d == '/')	/* is this the start of a comment?  */
 						  {
 							  skipToCharacter ('\n');
 							  goto getNextChar;
@@ -405,15 +413,6 @@ getNextChar:
 				  }
 				  break;
 	}
-}
-
-static keywordId analyzeToken (vString *const name)
-{
-	static vString *keyword = NULL;
-	if (keyword == NULL)
-		keyword = vStringNew ();
-	vStringCopyToLower (keyword, name);
-	return (keywordId) lookupKeyword (vStringValue (keyword), Lang_js);
 }
 
 static void copyToken (tokenInfo *const dest, tokenInfo *const src)
@@ -459,7 +458,7 @@ static void skipArgumentList (tokenInfo *const token)
 					nest_level--;
 				}
 			}
-		} //while
+		} 
 		readToken (token);
 	}
 }
@@ -497,7 +496,7 @@ static void findCmdTerm (tokenInfo *const token)
 	while (! ( isType (token, TOKEN_SEMICOLON) ||
 				isType (token, TOKEN_CLOSE_CURLY) ) )
 	{
-		// Handle nested blocks
+		/* Handle nested blocks */
 		if ( isType (token, TOKEN_OPEN_CURLY))
 		{
 			parseBlock (token, token);
@@ -527,17 +526,21 @@ static void parseSwitch (tokenInfo *const token)
 
 	if (isType (token, TOKEN_OPEN_PAREN)) 
 	{
-		// Handle nameless functions, these will only
-		// be considered methods.
+		/*
+		 * Handle nameless functions, these will only
+		 * be considered methods.
+		 */
 		skipArgumentList(token);
 	}
 
 	if (isType (token, TOKEN_OPEN_CURLY)) 
 	{
-		// This will be either a function or a class.
-		// We can only determine this by checking the body
-		// of the function.  If we find a "this." we know
-		// it is a class, otherwise it is a function.
+		/* 
+		 * This will be either a function or a class.
+		 * We can only determine this by checking the body
+		 * of the function.  If we find a "this." we know
+		 * it is a class, otherwise it is a function.
+		 */
 		parseBlock (token, token);
 	}
 
@@ -573,17 +576,21 @@ static void parseLoop (tokenInfo *const token)
 
 		if (isType (token, TOKEN_OPEN_PAREN)) 
 		{
-			// Handle nameless functions, these will only
-			// be considered methods.
+			/*
+			 * Handle nameless functions, these will only
+			 * be considered methods.
+			 */
 			skipArgumentList(token);
 		}
 
 		if (isType (token, TOKEN_OPEN_CURLY)) 
 		{
-			// This will be either a function or a class.
-			// We can only determine this by checking the body
-			// of the function.  If we find a "this." we know
-			// it is a class, otherwise it is a function.
+			/*
+			 * This will be either a function or a class.
+			 * We can only determine this by checking the body
+			 * of the function.  If we find a "this." we know
+			 * it is a class, otherwise it is a function.
+			 */
 			parseBlock (token, token);
 		} 
 		else 
@@ -597,10 +604,12 @@ static void parseLoop (tokenInfo *const token)
 
 		if (isType (token, TOKEN_OPEN_CURLY)) 
 		{
-			// This will be either a function or a class.
-			// We can only determine this by checking the body
-			// of the function.  If we find a "this." we know
-			// it is a class, otherwise it is a function.
+			/*
+			 * This will be either a function or a class.
+			 * We can only determine this by checking the body
+			 * of the function.  If we find a "this." we know
+			 * it is a class, otherwise it is a function.
+			 */
 			parseBlock (token, token);
 		} 
 		else 
@@ -616,8 +625,10 @@ static void parseLoop (tokenInfo *const token)
 
 			if (isType (token, TOKEN_OPEN_PAREN)) 
 			{
-				// Handle nameless functions, these will only
-				// be considered methods.
+				/*
+				 * Handle nameless functions, these will only
+				 * be considered methods.
+				 */
 				skipArgumentList(token);
 			}
 		}
@@ -653,17 +664,21 @@ static void parseIf (tokenInfo *const token)
 
 	if (isType (token, TOKEN_OPEN_PAREN)) 
 	{
-		// Handle nameless functions, these will only
-		// be considered methods.
+		/* 
+		 * Handle nameless functions, these will only
+		 * be considered methods.
+		 */
 		skipArgumentList(token);
 	}
 
 	if (isType (token, TOKEN_OPEN_CURLY)) 
 	{
-		// This will be either a function or a class.
-		// We can only determine this by checking the body
-		// of the function.  If we find a "this." we know
-		// it is a class, otherwise it is a function.
+		/*
+		 * This will be either a function or a class.
+		 * We can only determine this by checking the body
+		 * of the function.  If we find a "this." we know
+		 * it is a class, otherwise it is a function.
+		 */
 		parseBlock (token, token);
 	} 
 	else 
@@ -683,7 +698,7 @@ static void parseFunction (tokenInfo *const token)
 	 */
 
 	readToken (name);
-	// Add scope in case this is an INNER function
+	/* Add scope in case this is an INNER function */
 	addToScope(name, token->scope);
 
 	readToken (token);
@@ -750,10 +765,10 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 				is_class = TRUE;
 				vStringCopy(saveScope, token->scope);
 				addToScope (token, parent->string);
-				// Move past this
+				/* Move past this */
 				readToken(token);
 
-				// Move past a potential .
+				/* Move past a potential . */
 				if ( isType (token, TOKEN_PERIOD) )
 					readToken(token);
 
@@ -780,7 +795,7 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 			} 
 			else if (isType (token, TOKEN_OPEN_CURLY))
 			{
-				// Handle nested blocks
+				/* Handle nested blocks */
 				parseBlock (token, parent);
 			} 
 			else 
@@ -915,7 +930,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 
 	copyToken(name, token);
 
-	// Potentially the name of the function
+	/* Potentially the name of the function */
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
@@ -934,7 +949,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 					addToScope(token, name->string);
 					makeJsTag (token, JSTAG_METHOD);
 
-					// Find to the end of the statement
+					/* Find to the end of the statement */
 					findCmdTerm (token);
 					goto cleanUp;
 				} 
@@ -987,10 +1002,12 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 
 			if (isType (token, TOKEN_OPEN_CURLY)) 
 			{
-				// This will be either a function or a class.
-				// We can only determine this by checking the body
-				// of the function.  If we find a "this." we know
-				// it is a class, otherwise it is a function.
+				/*
+				 * This will be either a function or a class.
+				 * We can only determine this by checking the body
+				 * of the function.  If we find a "this." we know
+				 * it is a class, otherwise it is a function.
+				 */
 				if ( is_inside_class ) 
 				{
 					makeJsTag (name, JSTAG_METHOD);
@@ -1013,16 +1030,20 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 		} 
 		else if (isType (token, TOKEN_OPEN_PAREN)) 
 		{
-			// Handle nameless functions, these will only
-			// be considered methods.
+			/*
+			 * Handle nameless functions, these will only
+			 * be considered methods.
+			 */
 			skipArgumentList(token);
 
 			if (isType (token, TOKEN_OPEN_CURLY)) 
 			{
-				// This will be either a function or a class.
-				// We can only determine this by checking the body
-				// of the function.  If we find a "this." we know
-				// it is a class, otherwise it is a function.
+				/*
+				 * This will be either a function or a class.
+				 * We can only determine this by checking the body
+				 * of the function.  If we find a "this." we know
+				 * it is a class, otherwise it is a function.
+				 */
 				makeJsTag (name, JSTAG_METHOD);
 				parseBlock (token, name);
 			}

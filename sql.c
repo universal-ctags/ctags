@@ -425,7 +425,6 @@ static void parseString (vString *const string, const int delimiter)
 	while (! end)
 	{
 		c = fileGetc ();
-		//		  printf( "\nps: %c\n", c  );
 		if (c == EOF)
 			end = TRUE;
 		else if (c == delimiter)
@@ -473,7 +472,6 @@ getNextChar:
 	do
 	{
 		c = fileGetc ();
-		//		  printf( "\nrtc: %c\n", c );
 		/* 
 		 * Added " to the list of ignores, not sure what this 
 		 * might break but it gets by this issue:
@@ -545,7 +543,7 @@ getNextChar:
 				  {
 					  int d = fileGetc ();
 					  if ( (d != '*') &&		/* is this the start of a comment? */
-							  (d != '/') )			// is a one line comment?
+							  (d != '/') )			/* is a one line comment? */
 					  {
 						  token->type = TOKEN_FORWARD_SLASH;
 						  fileUngetc (d);
@@ -565,7 +563,7 @@ getNextChar:
 							  } while (c != EOF && c != '\0');
 							  goto getNextChar;
 						  }
-						  else if (d == '/')	// is this the start of a comment? 
+						  else if (d == '/')	/* is this the start of a comment?  */
 						  {
 							  skipToCharacter ('\n');
 							  goto getNextChar;
@@ -663,7 +661,6 @@ static void skipArgumentList (tokenInfo *const token)
 	if (isType (token, TOKEN_OPEN_PAREN))	/* arguments? */
 	{
 		nest_level++;
-		//findToken (token, TOKEN_CLOSE_PAREN);
 		while (! (isType (token, TOKEN_CLOSE_PAREN) && (nest_level == 0)))
 		{
 			readToken (token);
@@ -678,7 +675,7 @@ static void skipArgumentList (tokenInfo *const token)
 					nest_level--;
 				}
 			}
-		} //while
+		} 
 		readToken (token);
 	}
 }
@@ -743,14 +740,15 @@ static void parseSubProgram (tokenInfo *const token)
 	{
 		if (isKeyword (token, KEYWORD_return))
 		{
-			// Read datatype
+			/* Read datatype */
 			readToken (token);
-			// Read token after which could be the
-			// command terminator if a prototype
+			/*
+			 * Read token after which could be the
+			 * command terminator if a prototype
+			 */
 			readToken (token);
 		}
 	}
-	//if( isType (token, TOKEN_SEMICOLON) )
 	if( isCmdTerm (token) )
 	{
 		makeSqlTag (name, SQLTAG_PROTOTYPE);
@@ -760,7 +758,6 @@ static void parseSubProgram (tokenInfo *const token)
 		while (!(isKeyword (token, KEYWORD_is) ||
 					isKeyword (token, KEYWORD_begin) ||
 					isCmdTerm (token)
-					//isType (token, TOKEN_SEMICOLON)
 				)
 			  )
 		{
@@ -786,8 +783,10 @@ static void parseSubProgram (tokenInfo *const token)
 
 static void parseRecord (tokenInfo *const token)
 {
-	// Make it a bit forgiving, this is called from
-	// multiple functions, parseTable, parseType
+	/*
+	 * Make it a bit forgiving, this is called from
+	 * multiple functions, parseTable, parseType
+	 */
 	if (!isType (token, TOKEN_OPEN_PAREN))
 		readToken (token);
 
@@ -844,7 +843,7 @@ static void parseRecord (tokenInfo *const token)
 			 */
 			if (isType (token, TOKEN_OPEN_PAREN))
 			{
-				// Reads to the next token after the TOKEN_CLOSE_PAREN
+				/* Reads to the next token after the TOKEN_CLOSE_PAREN */
 				skipArgumentList(token);
 			}
 		}
@@ -857,7 +856,7 @@ static void parseType (tokenInfo *const token)
 	vString * saveScope = vStringNew ();
 
 	vStringCopy(saveScope, token->scope);
-	// If a scope has been set, add it to the name
+	/* If a scope has been set, add it to the name */
 	addToScope (name, token->scope);
 	readToken (name);
 	if (isType (name, TOKEN_IDENTIFIER))
@@ -897,7 +896,7 @@ static void parseType (tokenInfo *const token)
 
 static void parseSimple (tokenInfo *const token, const sqlKind kind)
 {
-	// This will simply make the tagname from the first word found
+	/* This will simply make the tagname from the first word found */
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER) ||
 			isType (token, TOKEN_STRING))
@@ -1137,9 +1136,11 @@ static void parseStatements (tokenInfo *const token)
 				readToken (token);
 			}
 		}
-		// We assumed earlier all statements ended with a semi-colon,
-		// see comment above, now, only read if the current token 
-		// is not a semi-colon
+		/*
+		 * We assumed earlier all statements ended with a semi-colon,
+		 * see comment above, now, only read if the current token 
+		 * is not a semi-colon
+		 */
 		if ( isType (token, TOKEN_SEMICOLON) )
 		{
 			readToken (token);
@@ -1201,7 +1202,7 @@ static void parsePackage (tokenInfo *const token)
 		 */
 		readToken (name);
 	}
-	// Check for owner.pkg_name
+	/* Check for owner.pkg_name */
 	while (! isKeyword (token, KEYWORD_is))
 	{
 		readToken (token);
@@ -1378,7 +1379,7 @@ static void parseTrigger (tokenInfo *const token)
 		readToken (token);
 	}
 
-	//if (! isType (token, TOKEN_SEMICOLON) )
+	/*if (! isType (token, TOKEN_SEMICOLON) ) */
 	if (! isCmdTerm (token) )
 	{
 		readToken (table);
@@ -1392,7 +1393,6 @@ static void parseTrigger (tokenInfo *const token)
 		while (! (isKeyword (token, KEYWORD_begin) ||
 					(isKeyword (token, KEYWORD_call)) ||
 					(	isCmdTerm (token)))    )
-			//(   isType (token, TOKEN_SEMICOLON)))    )
 		{
 			readToken (token);
 			if ( isKeyword (token, KEYWORD_declare) )
