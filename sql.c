@@ -52,8 +52,9 @@
 
 typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
 
-/*	Used to specify type of keyword.
-*/
+/*
+ * Used to specify type of keyword.
+ */
 typedef enum eKeywordId {
 	KEYWORD_NONE = -1,
 	KEYWORD_is,
@@ -114,7 +115,8 @@ typedef enum eKeywordId {
 	KEYWORD_go
 } keywordId;
 
-/*	Used to determine whether keyword is valid for the token language and
+/*
+ * Used to determine whether keyword is valid for the token language and
  *	what its ID is.
  */
 typedef struct sKeywordDesc {
@@ -1805,6 +1807,7 @@ static void findSqlTags (void)
 
 	while (exception == ExceptionNone)
 		parseSqlFile (token);
+
 	deleteToken (token);
 }
 
