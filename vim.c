@@ -62,15 +62,19 @@ static kindOption VimKinds [] = {
  *	 DATA DECLARATIONS
  */
 
+#if 0
 typedef enum eException {
 	ExceptionNone, ExceptionEOF 
 } exception_t;
+#endif
 
 /*
  *	DATA DEFINITIONS
  */
 
+#if 0
 static jmp_buf Exception;
+#endif
 
 /*
 *	FUNCTION DEFINITIONS
@@ -225,7 +229,7 @@ static const unsigned char * readVimLine (void)
 static void parseFunction (const unsigned char *line)
 {
 	vString *name = vStringNew ();
-	boolean inFunction = FALSE;
+	/* boolean inFunction = FALSE; */
 	int scope;
 
 	const unsigned char *cp = line + 1;
@@ -280,7 +284,6 @@ static void parseFunction (const unsigned char *line)
 static void parseAutogroup (const unsigned char *line)
 {
 	vString *name = vStringNew ();
-	int scope;
 
 	/* Found Autocommand Group (augroup) */
 	const unsigned char *cp = line + 2;
@@ -314,7 +317,6 @@ static boolean parseCommand (const unsigned char *line)
 {
 	vString *name = vStringNew ();
 	boolean cmdProcessed = TRUE;
-	int scope;
 
 	/* 
 	 * Found a user-defined command 
@@ -424,7 +426,6 @@ cleanUp:
 static void parseLet (const unsigned char *line)
 {
 	vString *name = vStringNew ();
-	int scope;
 
 	/* we've found a variable declared outside of a function!! */
 	const unsigned char *cp = line + 3;
@@ -481,7 +482,6 @@ cleanUp:
 static boolean parseMap (const unsigned char *line)
 {
 	vString *name = vStringNew ();
-	int scope;
 
 	const unsigned char *cp = line;
 
@@ -557,7 +557,6 @@ static boolean parseMap (const unsigned char *line)
 	makeSimpleTag (name, VimKinds, K_MAP);
 	vStringClear (name);
 
-cleanUp:
 	vStringDelete (name);
 
 	return TRUE;
