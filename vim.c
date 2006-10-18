@@ -28,6 +28,7 @@
 #include "read.h"
 #include "vstring.h"
 
+#if 0
 typedef struct sLineInfo {
 	tokenType	type;
 	keywordId	keyword;
@@ -36,6 +37,7 @@ typedef struct sLineInfo {
 	unsigned long lineNumber;
 	fpos_t filePosition;
 } lineInfo;
+#endif
 
 /*
 *	DATA DEFINITIONS
@@ -485,6 +487,9 @@ static boolean parseMap (const unsigned char *line)
 
 	/* Remove map */
 	while (*cp && isalnum ((int) *cp))
+		++cp;
+
+	if ((int) *cp == '!')
 		++cp;
 
 	/*

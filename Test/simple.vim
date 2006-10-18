@@ -108,7 +108,7 @@ endfunction
 " ,,,
 " (
 nnoremap <silent> <F8> :Tlist<CR>
-map <unique> <Leader>scdt <Plug>GetColumnDataType
+map! <unique> <Leader>scdt <Plug>GetColumnDataType
 inoremap ,,, <esc>diwi<<esc>pa><cr></<esc>pa><esc>kA
 inoremap <buffer> ( <C-R>=PreviewFunctionSignature()<LF> 
 
