@@ -77,8 +77,8 @@ static jmp_buf Exception;
 #endif
 
 /*
-*	FUNCTION DEFINITIONS
-*/
+ *	FUNCTION DEFINITIONS
+ */
 
 /* This function takes a char pointer, tries to find a scope separator in the
  * string, and if it does, returns a pointer to the character after the colon,
@@ -89,7 +89,7 @@ static const unsigned char* skipPrefix (const unsigned char* name, int *scope)
 {
 	const unsigned char* result = name;
 	int counter;
-	int length;
+	size_t length;
 	length = strlen(name);
 	if (scope != NULL)
 		*scope = '\0';
