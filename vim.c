@@ -90,7 +90,7 @@ static const unsigned char* skipPrefix (const unsigned char* name, int *scope)
 	const unsigned char* result = name;
 	int counter;
 	size_t length;
-	length = strlen(name);
+	length = strlen((const char*)name);
 	if (scope != NULL)
 		*scope = '\0';
 	if (length > 3 && name[1] == ':')
