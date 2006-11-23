@@ -6,7 +6,7 @@ Proposal for extended Vi tags file format
 Version: 0.06 DRAFT
    Date: 1998 Feb 8
  Author: Bram Moolenaar <Bram at vim.org>
-    and: Darren Hiebert <darren at hiebert.com>
+    and: Darren Hiebert <darren at users.sourceforge.net>
 
 
 1. Introduction
