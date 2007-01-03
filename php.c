@@ -42,6 +42,43 @@ static kindOption PhpKinds [] = {
 *   FUNCTION DEFINITIONS
 */
 
+/* JavaScript patterns are duplicated in jscript.c */
+
+static void installPHPRegex (const langType language)
+{
+	addTagRegex(language, "(^|[ \t])class[ \t]+([A-Za-z\x7F-\xFF_][0-9A-Za-z\x7F-\xFF_]*)",
+		"\\2", "c,class,classes", NULL);
+	addTagRegex(language, "(^|[ \t])interface[ \t]+([A-Za-z\x7F-\xFF_][0-9A-Za-z\x7F-\xFF_]*)",
+		"\\2", "i,interface,interfaces", NULL);
+	addTagRegex(language, "(^|[ \t])define[ \t]*\\([ \t]*['\"]?([A-Za-z\x7F-\xFF_][0-9A-Za-z\x7F-\xFF_]*)",
+		"\\2", "d,define,constant definitions", NULL);
+	addTagRegex(language, "(^|[ \t])function[ \t]+&?[ \t]*([A-Za-z\x7F-\xFF_][0-9A-Za-z\x7F-\xFF_]*)",
+		"\\2", "f,function,functions", NULL);
+	addTagRegex(language, "(^|[ \t])\\$([A-Za-z\x7F-\xFF_][0-9A-Za-z\x7F-\xFF_]*)[ \t]*=",
+		"\\2", "v,variable,variables", NULL);
+
+	// function regex is covered by PHP regex
+	addTagRegex (language, "(^|[ \t])([A-Za-z0-9_]+)[ \t]*[=:][ \t]*function[ \t]*\\(",
+		"\\2", "j,jsfunction,javascript functions", NULL);
+	addTagRegex (language, "(^|[ \t])([A-Za-z0-9_.]+)\\.([A-Za-z0-9_]+)[ \t]*=[ \t]*function[ \t]*\\(",
+		"\\2.\\3", "j,jsfunction,javascript functions", NULL);
+	addTagRegex (language, "(^|[ \t])([A-Za-z0-9_.]+)\\.([A-Za-z0-9_]+)[ \t]*=[ \t]*function[ \t]*\\(",
+		"\\3", "j,jsfunction,javascript functions", NULL);
+}
+
+/* Create parser definition stucture */
+extern parserDefinition* PhpParser (void)
+{
+	static const char *const extensions [] = { "php", "php3", "phtml", NULL };
+	parserDefinition* def = parserNew ("PHP");
+	def->extensions = extensions;
+	def->initialize = installPHPRegex;
+	def->regex      = TRUE;
+	return def;
+}
+
+#if 0
+
 static boolean isLetter(const int c)
 {
 	return (boolean)(isalpha(c) || (c >= 127  &&  c <= 255));
@@ -65,6 +102,7 @@ static void findPhpTags (void)
 	while ((line = fileReadLine ()) != NULL)
 	{
 		const unsigned char *cp = line;
+		const char* f;
 
 		while (isspace (*cp))
 			cp++;
@@ -87,16 +125,22 @@ static void findPhpTags (void)
 				vStringClear (name);
 			}
 		}
-		else if (strncmp ((const char*) cp, "function", (size_t) 8) == 0  &&
-			isspace ((int) cp [8]))
+		else if ((f = strstr ((const char*) cp, "function")) != NULL &&
+			(f == (const char*) cp || isspace ((int) f [-1])) &&
+			isspace ((int) f [8]))
 		{
-			cp += 8;
+			cp = ((const unsigned char *) f) + 8;
 
 			while (isspace ((int) *cp))
 				++cp;
 
-			if (*cp == '&')  /* skip reference character */
+			if (*cp == '&')	/* skip reference character and following whitespace */
+			{
 				cp++;
+
+				while (isspace ((int) *cp))
+					++cp; 
+			}
 
 			vStringClear (name);
 			while (isalnum ((int) *cp)  ||  *cp == '_')
@@ -167,5 +211,7 @@ extern parserDefinition* PhpParser (void)
 	def->parser     = findPhpTags;
 	return def;
 }
+
+#endif
 
 /* vi:set tabstop=4 shiftwidth=4: */
