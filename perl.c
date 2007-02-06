@@ -177,11 +177,20 @@ static void findPerlTags (void)
 		}
 		if (kind != K_NONE)
 		{
-			if (spaceRequired && !isspace (*cp))
+			if (spaceRequired && *cp && !isspace (*cp))
 				continue;
 
 			while (isspace (*cp))
 				cp++;
+
+			while (!*cp) {	/* Gobble up empty lines */
+				cp = fileReadLine ();
+				if (!cp)
+					goto END_MAIN_WHILE;
+				while (isspace (*cp))
+					cp++;
+			}
+
 			while (isIdentifier (*cp))
 			{
 				vStringPut (name, (int) *cp);
@@ -204,6 +213,8 @@ static void findPerlTags (void)
 			vStringClear (name);
 		}
 	}
+
+END_MAIN_WHILE:
 	vStringDelete (name);
 	if (package != NULL)
 		vStringDelete (package);
@@ -220,4 +231,4 @@ extern parserDefinition* PerlParser (void)
 	return def;
 }
 
-/* vi:set tabstop=4 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4 noexpandtab: */
