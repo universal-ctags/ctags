@@ -29,12 +29,14 @@ typedef enum {
 	K_NONE = -1,
 	K_CONSTANT,
 	K_LABEL,
+	K_PACKAGE,
 	K_SUBROUTINE
 } perlKind;
 
 static kindOption PerlKinds [] = {
 	{ TRUE, 'c', "constant",   "constants" },
-	{ TRUE, 'l', "label",      "labels" },
+	{ TRUE, 'l', "label",	  "labels" },
+	{ TRUE, 'p', "package",	"packages" },
 	{ TRUE, 's', "subroutine", "subroutines" }
 };
 
@@ -140,7 +142,10 @@ static void findPerlTags (void)
 		}
 		else if (strncmp((const char*) cp, "package", (size_t) 7) == 0)
 		{
-			cp += 7;
+			/* This will point to space after 'package' so that a tag
+			   can be made */
+			const unsigned char *space = cp += 7;
+
 			if (package == NULL)
 				package = vStringNew ();
 			else
@@ -153,6 +158,11 @@ static void findPerlTags (void)
 				cp++;
 			}
 			vStringCatS (package, "::");
+
+			cp = space;	 /* Rewind */
+			kind = K_PACKAGE;
+			spaceRequired = TRUE;
+			qualified = TRUE;
 		}
 		else
 		{
