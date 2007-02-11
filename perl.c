@@ -31,6 +31,7 @@
 typedef enum {
 	K_NONE = -1,
 	K_CONSTANT,
+	K_FORMAT,
 	K_LABEL,
 	K_PACKAGE,
 	K_SUBROUTINE,
@@ -39,6 +40,7 @@ typedef enum {
 
 static kindOption PerlKinds [] = {
 	{ TRUE,  'c', "constant",               "constants" },
+	{ TRUE,  'f', "format",                 "formats" },
 	{ TRUE,  'l', "label",                  "labels" },
 	{ TRUE,  'p', "package",                "packages" },
 	{ TRUE,  's', "subroutine",             "subroutines" },
@@ -246,6 +248,13 @@ static void findPerlTags (void)
 			spaceRequired = TRUE;
 			qualified = TRUE;
 		}
+		else if (strncmp((const char*) cp, "format", (size_t) 6) == 0)
+		{
+			cp += 6;
+			kind = K_FORMAT;
+			spaceRequired = TRUE;
+			qualified = TRUE;
+		}
 		else
 		{
 			if (isIdentifier1 (*cp))
@@ -280,6 +289,16 @@ static void findPerlTags (void)
 				vStringPut (name, (int) *cp);
 				cp++;
 			}
+
+			if (K_FORMAT == kind &&
+				vStringLength (name) == 0 && /* cp did not advance */
+				'=' == *cp)
+			{
+				/* format's name is optional.  If it's omitted, 'STDOUT'
+				   is assumed. */
+				vStringCatS (name, "STDOUT");
+			}
+
 			vStringTerminate (name);
 			TRACE("name: %s\n", name->buffer);
 
