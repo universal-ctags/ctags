@@ -28,6 +28,8 @@ sub quo;
 
 quo;
 
+Test::quo;
+
 sub quo {
     goto END;
     die;

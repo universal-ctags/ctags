@@ -253,7 +253,7 @@ static void findPerlTags (void)
 				const unsigned char *p = cp;
 				while (isIdentifier (*p))
 					++p;
-				if ((int) *p == ':')
+				if ((int) *p == ':' && (int) *(p + 1) != ':')
 					kind = K_LABEL;
 			}
 		}
