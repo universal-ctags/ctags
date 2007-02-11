@@ -12,7 +12,8 @@ ctags-NEXT (Wed Oct 11 2006)
 * Added support for Perl's multi-line subroutine, package, and constant
   definitions.
 * Added support for Perl subroutine declarations (off by default).
-* Don't mistake fully qualified function call as a label (Perl).
+* Don't mistake fully qualified function calls for labels (Perl).
+* Ignore comments mixed into Perl's definitions and declarations.
 * Added support for Perl's formats.
 
 ctags-5.6 (Mon May 29 2006)
