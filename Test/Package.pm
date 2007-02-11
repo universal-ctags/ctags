@@ -42,7 +42,9 @@ sub xuz :lvalue;
 
 sub xtz (&@;$) :lvalue;
   
-sub dude
+sub
+# This should create a tag
+dude
 {
     1;
 }

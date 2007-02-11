@@ -276,7 +276,8 @@ static void findPerlTags (void)
 			while (isspace (*cp))
 				cp++;
 
-			while (!*cp) {	/* Gobble up empty lines */
+			while (!*cp || '#' == *cp) { /* Gobble up empty lines
+				                            and comments */
 				cp = fileReadLine ();
 				if (!cp)
 					goto END_MAIN_WHILE;
