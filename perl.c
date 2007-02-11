@@ -22,6 +22,9 @@
 #include "routines.h"
 #include "vstring.h"
 
+#define TRACE_PERL_C 0
+#define TRACE if (TRACE_PERL_C) printf("perl.c:%d: ", __LINE__), printf
+
 /*
 *   DATA DEFINITIONS
 */
@@ -30,14 +33,16 @@ typedef enum {
 	K_CONSTANT,
 	K_LABEL,
 	K_PACKAGE,
-	K_SUBROUTINE
+	K_SUBROUTINE,
+	K_SUBROUTINE_DECLARATION
 } perlKind;
 
 static kindOption PerlKinds [] = {
-	{ TRUE, 'c', "constant",   "constants" },
-	{ TRUE, 'l', "label",      "labels" },
-	{ TRUE, 'p', "package",    "packages" },
-	{ TRUE, 's', "subroutine", "subroutines" }
+	{ TRUE,  'c', "constant",               "constants" },
+	{ TRUE,  'l', "label",                  "labels" },
+	{ TRUE,  'p', "package",                "packages" },
+	{ TRUE,  's', "subroutine",             "subroutines" },
+	{ FALSE, 'd', "subroutine declaration", "subroutine declarations" },
 };
 
 /*
@@ -78,6 +83,82 @@ static boolean isPodWord (const char *word)
 		eFree (id);
 	}
 	return result;
+}
+
+/*
+ * Perl subroutine declaration may look like one of the following:
+ *
+ *  sub abc;
+ *  sub abc :attr;
+ *  sub abc (proto);
+ *  sub abc (proto) :attr;
+ *
+ * Note that there may be more than one attribute.  Attributes may
+ * have things in parentheses (they look like arguments).  Anything
+ * inside of those parentheses goes.  Prototypes may contain semi-colons.
+ * The matching end when we encounter (outside of any parentheses) either
+ * a semi-colon (that'd be a declaration) or an left curly brace
+ * (definition).
+ *
+ * This is pretty complicated parsing (plus we all know that only perl can
+ * parse Perl), so we are only promising best effort here.
+ *
+ * If we can't determine what this is (due to a file ending, for example),
+ * we will return FALSE.
+ */
+static boolean isSubroutineDeclaration (const unsigned char *cp)
+{
+	boolean attr = FALSE;
+	int nparens = 0;
+
+	do {
+		for ( ; *cp; ++cp) {
+SUB_DECL_SWITCH:
+			switch (*cp) {
+				case ':':
+					if (nparens)
+						break;
+					else if (TRUE == attr)
+						return FALSE;    /* Invalid attribute name */
+					else
+						attr = TRUE;
+					break;
+				case '(':
+					++nparens;
+					break;
+				case ')':
+					--nparens;
+					break;
+				case ' ':
+				case '\t':
+					break;
+				case ';':
+					if (!nparens)
+						return TRUE;
+				case '{':
+					if (!nparens)
+						return FALSE;
+				default:
+					if (attr) {
+						if (isIdentifier1(*cp)) {
+							cp++;
+							while (isIdentifier (*cp))
+								cp++;
+							attr = FALSE;
+							goto SUB_DECL_SWITCH; /* Instead of --cp; */
+						} else {
+							return FALSE;
+						}
+					} else if (nparens) {
+						break;
+					} else {
+						return FALSE;
+					}
+			}
+		}
+	} while (NULL != (cp = fileReadLine ()));
+
+	return FALSE;
 }
 
 /* Algorithm adapted from from GNU etags.
@@ -121,6 +202,7 @@ static void findPerlTags (void)
 
 		if (strncmp((const char*) cp, "sub", (size_t) 3) == 0)
 		{
+			TRACE("this looks like a sub\n");
 			cp += 3;
 			kind = K_SUBROUTINE;
 			spaceRequired = TRUE;
@@ -177,9 +259,11 @@ static void findPerlTags (void)
 		}
 		if (kind != K_NONE)
 		{
+			TRACE("cp0: %s\n", (const char *) cp);
 			if (spaceRequired && *cp && !isspace (*cp))
 				continue;
 
+			TRACE("cp1: %s\n", (const char *) cp);
 			while (isspace (*cp))
 				cp++;
 
@@ -197,6 +281,18 @@ static void findPerlTags (void)
 				cp++;
 			}
 			vStringTerminate (name);
+			TRACE("name: %s\n", name->buffer);
+
+			if (K_SUBROUTINE == kind && TRUE == isSubroutineDeclaration(cp))
+			{
+				if (TRUE == PerlKinds[K_SUBROUTINE_DECLARATION].enabled) {
+					kind = K_SUBROUTINE_DECLARATION;
+				} else {
+					vStringClear (name);
+					continue;
+				}
+			}
+
 			if (vStringLength (name) > 0)
 			{
 				makeSimpleTag (name, PerlKinds, kind);

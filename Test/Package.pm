@@ -10,7 +10,9 @@ package Test;
 use strict;
 use warnings;
 
-sub init {
+sub
+
+ init {
 }
 
 use constant
@@ -22,6 +24,10 @@ This is 'quo' subroutine
 
 =cut
 
+sub quo;
+
+quo;
+
 sub quo {
     goto END;
     die;
@@ -30,13 +36,13 @@ END:
     return;
 }
 
-sub
+sub xuz :lvalue;
+
+sub xtz (&@;$) :lvalue;
   
-dude
+sub dude
 {
     1;
 }
-
-quo;
 
 1;
