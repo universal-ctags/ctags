@@ -94,10 +94,6 @@ dctags: $(SOURCES:.c=.od) debug.od
 	@ echo "-- Building $@"
 	$(LD) -o $@ $(LDFLAGS) $^
 
-mctags: $(SOURCES:.c=.om) debug.om safe_malloc.om
-	@ echo "-- Building $@"
-	$(LD) -o $@ $(LDFLAGS) $^
-
 ctags.prof: $(SOURCES) $(HEADERS) Makefile
 	$(CC) -pg $(PROF_OPT) $(COMP_FLAGS) $(WARNINGS) $(SOURCES) -o $@
 
@@ -154,7 +150,7 @@ gcovclean:
 	rm -f $(COV_GEN)
 
 clean: depclean profclean gcovclean clean-test
-	rm -f *.[ois] *.o[dm] ctags dctags mctags ctags*.exe readtags etyperef \
+	rm -f *.[ois] *.o[dm] ctags dctags ctags*.exe readtags etyperef \
 		ctags.html ctags.prof ctags.cov *.bb *.bbg tags TAGS syntax.vim \
 		$(ERRFILE)
 
@@ -355,7 +351,7 @@ rerelease-%: cvs-retag-% internal-release-%
 #
 $(DEP_DIR)/%.d: %.c maintainer.mak
 	@ if [ ! -d $(DEP_DIR) ] ;then mkdir -p $(DEP_DIR) ;fi
-	@ $(CC) -M $(DCFLAGS) $< | sed 's/\($*\.o\)\([ :]\)/\1 $*.od $*.om $(@F)\2/g' > $@
+	@ $(CC) -M $(DCFLAGS) $< | sed 's/\($*\.o\)\([ :]\)/\1 $*.od $(@F)\2/g' > $@
 
 
 %.inc: %.c Makefile
@@ -371,10 +367,6 @@ $(DEP_DIR)/%.d: %.c maintainer.mak
 %.od: %.c
 	@ echo "-- Compiling (debug) $<"
 	@ $(CC) -g $(DCFLAGS) $(WARNINGS) -o $*.od -c $<
-
-%.om: %.c
-	@ echo "-- Compiling (safe alloc) $<"
-	@ $(CC) -g -DTRAP_MEMORY_CALLS $(DCFLAGS) $(WARNINGS) -o $*.om -c $<
 
 %.i: %.c FORCE
 	$(CC) $(DCFLAGS) $(WARNINGS) -Wuninitialized -O -E $< > $@

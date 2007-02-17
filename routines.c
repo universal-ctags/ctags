@@ -62,10 +62,6 @@
 #include "debug.h"
 #include "routines.h"
 
-#ifdef TRAP_MEMORY_CALLS
-# include "safe_malloc.h"
-#endif
-
 /*
 *   MACROS
 */

@@ -27,10 +27,6 @@
 #include "routines.h"
 #include "sort.h"
 
-#ifdef TRAP_MEMORY_CALLS
-# include "safe_malloc.h"
-#endif
-
 /*
 *   FUNCTION DEFINITIONS
 */
