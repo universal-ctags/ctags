@@ -5,6 +5,10 @@
 #   somefunction
 #   {...
 
+package Test::One;
+
+package Test::One::Two;
+
 package Test;
 
 use strict;

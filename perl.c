@@ -285,7 +285,7 @@ static void findPerlTags (void)
 					cp++;
 			}
 
-			while (isIdentifier (*cp))
+			while (isIdentifier (*cp) || (K_PACKAGE == kind && ':' == *cp))
 			{
 				vStringPut (name, (int) *cp);
 				cp++;
