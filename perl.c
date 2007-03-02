@@ -317,6 +317,7 @@ static void findPerlTags (void)
 			{
 				makeSimpleTag (name, PerlKinds, kind);
 				if (Option.include.qualifiedTags && qualified &&
+					K_PACKAGE != kind &&
 					package != NULL  && vStringLength (package) > 0)
 				{
 					vString *const qualifiedName = vStringNew ();
