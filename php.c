@@ -31,12 +31,14 @@ typedef enum {
 	K_CLASS, K_DEFINE, K_FUNCTION, K_VARIABLE
 } phpKind;
 
+#if 0
 static kindOption PhpKinds [] = {
 	{ TRUE, 'c', "class",    "classes" },
 	{ TRUE, 'd', "define",   "constant definitions" },
 	{ TRUE, 'f', "function", "functions" },
 	{ TRUE, 'v', "variable", "variables" }
 };
+#endif
 
 /*
 *   FUNCTION DEFINITIONS
@@ -57,7 +59,7 @@ static void installPHPRegex (const langType language)
 	addTagRegex(language, "(^|[ \t])\\$([A-Za-z\x7F-\xFF_][0-9A-Za-z\x7F-\xFF_]*)[ \t]*=",
 		"\\2", "v,variable,variables", NULL);
 
-	// function regex is covered by PHP regex
+	/* function regex is covered by PHP regex */
 	addTagRegex (language, "(^|[ \t])([A-Za-z0-9_]+)[ \t]*[=:][ \t]*function[ \t]*\\(",
 		"\\2", "j,jsfunction,javascript functions", NULL);
 	addTagRegex (language, "(^|[ \t])([A-Za-z0-9_.]+)\\.([A-Za-z0-9_]+)[ \t]*=[ \t]*function[ \t]*\\(",
