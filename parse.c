@@ -599,11 +599,11 @@ static void makeFileTag (const char *const fileName)
 	}
 }
 
-static boolean createTagsForFile (
+static rescanReason createTagsForFile (
 		const char *const fileName, const langType language,
 		const unsigned int passCount)
 {
-	boolean retried = FALSE;
+	rescanReason rescan = RESCAN_NONE;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	if (fileOpen (fileName, language))
 	{
@@ -616,7 +616,7 @@ static boolean createTagsForFile (
 		if (lang->parser != NULL)
 			lang->parser ();
 		else if (lang->parser2 != NULL)
-			retried = lang->parser2 (passCount);
+			rescan = lang->parser2 (passCount);
 
 		if (Option.etags)
 			endEtagsFile (getSourceFileTagPath ());
@@ -624,25 +624,36 @@ static boolean createTagsForFile (
 		fileClose ();
 	}
 
-	return retried;
+	return rescan;
 }
 
 static boolean createTagsWithFallback (
 		const char *const fileName, const langType language)
 {
-	const unsigned long numTags	= TagFile.numTags.added;
+	unsigned long numTags	= TagFile.numTags.added;
 	fpos_t tagFilePosition;
 	unsigned int passCount = 0;
 	boolean tagFileResized = FALSE;
+	rescanReason whyRescan;
 
 	fgetpos (TagFile.fp, &tagFilePosition);
-	while (createTagsForFile (fileName, language, ++passCount))
+	while ( ( whyRescan =
+	            createTagsForFile (fileName, language, ++passCount) )
+	                != RESCAN_NONE)
 	{
-		/*  Restore prior state of tag file.
-		 */
-		fsetpos (TagFile.fp, &tagFilePosition);
-		TagFile.numTags.added = numTags;
-		tagFileResized = TRUE;
+		if (whyRescan == RESCAN_FAILED)
+		{
+			/*  Restore prior state of tag file.
+			*/
+			fsetpos (TagFile.fp, &tagFilePosition);
+			TagFile.numTags.added = numTags;
+			tagFileResized = TRUE;
+		}
+		else if (whyRescan == RESCAN_APPEND)
+		{
+			fgetpos(TagFile.fp, &tagFilePosition);
+			numTags = TagFile.numTags.added;
+		}
 	}
 	return tagFileResized;
 }

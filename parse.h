@@ -31,9 +31,15 @@
 */
 typedef int langType;
 
+typedef enum {
+	RESCAN_NONE,   /* No rescan needed */
+	RESCAN_FAILED, /* Scan failed, clear out tags added, rescan */
+	RESCAN_APPEND  /* Scan succeeded, rescan */
+} rescanReason;
+
 typedef void (*createRegexTag) (const vString* const name);
 typedef void (*simpleParser) (void);
-typedef boolean (*rescanParser) (const unsigned int passCount);
+typedef rescanReason (*rescanParser) (const unsigned int passCount);
 typedef void (*parserInitialize) (langType language);
 
 typedef struct sKindOption {

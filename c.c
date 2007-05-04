@@ -2793,17 +2793,17 @@ static void createTags (const unsigned int nestLevel,
 	DebugStatement ( if (nestLevel > 0) debugParseNest (FALSE, nestLevel - 1); )
 }
 
-static boolean findCTags (const unsigned int passCount)
+static rescanReason findCTags (const unsigned int passCount)
 {
 	exception_t exception;
-	boolean retry;
+	rescanReason rescan;
 
 	Assert (passCount < 3);
 	cppInit ((boolean) (passCount > 1), isLanguage (Lang_csharp));
 	Signature = vStringNew ();
 
 	exception = (exception_t) setjmp (Exception);
-	retry = FALSE;
+	rescan = RESCAN_NONE;
 	if (exception == ExceptionNone)
 		createTags (0, NULL);
 	else
@@ -2811,14 +2811,14 @@ static boolean findCTags (const unsigned int passCount)
 		deleteAllStatements ();
 		if (exception == ExceptionBraceFormattingError  &&  passCount == 1)
 		{
-			retry = TRUE;
-		   verbose ("%s: retrying file with fallback brace matching algorithm\n",
+			rescan = RESCAN_FAILED;
+			verbose ("%s: retrying file with fallback brace matching algorithm\n",
 					getInputFileName ());
 		}
 	}
 	vStringDelete (Signature);
 	cppTerminate ();
-	return retry;
+	return rescan;
 }
 
 static void buildKeywordHash (const langType language, unsigned int idx)

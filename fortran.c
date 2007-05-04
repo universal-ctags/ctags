@@ -2138,11 +2138,11 @@ static void parseProgramUnit (tokenInfo *const token)
 	} while (TRUE);
 }
 
-static boolean findFortranTags (const unsigned int passCount)
+static rescanReason findFortranTags (const unsigned int passCount)
 {
 	tokenInfo *token;
 	exception_t exception;
-	boolean retry;
+	rescanReason rescan;
 
 	Assert (passCount < 3);
 	Parent = newToken ();
@@ -2151,23 +2151,23 @@ static boolean findFortranTags (const unsigned int passCount)
 	Column = 0;
 	exception = (exception_t) setjmp (Exception);
 	if (exception == ExceptionEOF)
-		retry = FALSE;
+		rescan = RESCAN_NONE;
 	else if (exception == ExceptionFixedFormat  &&  ! FreeSourceForm)
 	{
 		verbose ("%s: not fixed source form; retry as free source form\n",
 				getInputFileName ());
-		retry = TRUE;
+		rescan = RESCAN_FAILED;
 	}
 	else
 	{
 		parseProgramUnit (token);
-		retry = FALSE;
+		rescan = RESCAN_NONE;
 	}
 	ancestorClear ();
 	deleteToken (token);
 	deleteToken (Parent);
 
-	return retry;
+	return rescan;
 }
 
 static void initialize (const langType language)
