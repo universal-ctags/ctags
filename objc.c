@@ -138,7 +138,7 @@ static char *readToNonIdentifier(int *ender)
  */
 static int myIsNotMethod(int c, int pos)
 {
-	return c != '-' && c != '+' && c != '@' && c != '{';
+	return c != '-' && c != '+' && c != '@' && c != '{' && c != '[';
 }
 static char *readToMethod(int *ender)
 {
@@ -159,16 +159,23 @@ static int myIsNotMatchingBrace(int c, int pos)
 	static int parens;
 	static int skipnext;
 	static int inQuotes;
+	static int squares;
 
 	if (pos == 0) {
 		braces = 0;
 		parens = 0;
 		inQuotes = 0;
 		skipnext = 0;
+		squares = 0;
 	}
 
 	if (skipnext) {
 		skipnext = 0;
+		return 1;
+	}
+
+	/* Ignore any braces in quotes */
+	if (inQuotes && c != '"' && c != '\'') {
 		return 1;
 	}
 
@@ -197,12 +204,18 @@ static int myIsNotMatchingBrace(int c, int pos)
 		case ')':
 			parens--;
 			break;
+		case '[':
+			squares++;
+			break;
+		case ']':
+			squares--;
+			break;
 		default:
-			return 1;
+			break;
 	}
 
 
-	return parens || braces || inQuotes;
+	return parens || braces || inQuotes || squares;
 }
 
 static char *readToMatchingBrace(int *ender)
@@ -399,6 +412,7 @@ static void readObjCMethods(objcKind mType, const char *scope, const char *inher
 				if (temp && !strcmp(temp, "end"))
 					return;
 				break;
+			case '[':
 			case '{':
 				readToMatchingBrace(0);
 				break;
