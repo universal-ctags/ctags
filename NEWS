@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-NEXT (Sat Feb 17 2007)
+ctags-NEXT (Wed May 16 2007)
 * Added .svn to list of directories ignored during recursion (--recurse).
 * Added support for BlitzBasic, PureBasic and FreeBasic [FR #1100506].
 * Added support for interfaces and static/public/protected/private functions [PHP].
@@ -8,6 +8,7 @@ ctags-NEXT (Sat Feb 17 2007)
 * Added support for multi-line subroutine, package, and constant definitions [Perl].
 * Added support for optional subroutine declarations [Perl].
 * Added support for formats [Perl].
+* Added support for new convert keyword [Eiffel].
 * Ignore comments mixed into definitions and declarations [Perl].
 * Fixed parsing of generic classes/interfaces [Java, Bug #1447756].
 * Fixed misidentification of fully qualified function calls as labels [Perl].

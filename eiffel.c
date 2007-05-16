@@ -54,7 +54,7 @@ typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
 typedef enum eKeywordId {
 	KEYWORD_NONE = -1,
 	KEYWORD_alias, KEYWORD_all, KEYWORD_and, KEYWORD_as, KEYWORD_check,
-	KEYWORD_class, KEYWORD_create, KEYWORD_creation, KEYWORD_Current,
+	KEYWORD_class, KEYWORD_convert, KEYWORD_create, KEYWORD_creation, KEYWORD_Current,
 	KEYWORD_debug, KEYWORD_deferred, KEYWORD_do, KEYWORD_else,
 	KEYWORD_elseif, KEYWORD_end, KEYWORD_ensure, KEYWORD_expanded,
 	KEYWORD_export, KEYWORD_external, KEYWORD_false, KEYWORD_feature,
@@ -154,6 +154,7 @@ static const keywordDesc EiffelKeywordTable [] = {
 	{ "as",             KEYWORD_as         },
 	{ "check",          KEYWORD_check      },
 	{ "class",          KEYWORD_class      },
+	{ "convert",        KEYWORD_convert    },
 	{ "create",         KEYWORD_create     },
 	{ "creation",       KEYWORD_creation   },
 	{ "current",        KEYWORD_Current    },
@@ -1135,6 +1136,30 @@ static void parseInherit (tokenInfo *const token)
 #endif
 }
 
+static void parseConvert (tokenInfo *const token)
+{
+	Assert (isKeyword (token, KEYWORD_convert));
+	do
+	{
+		readToken (token);
+		if (! isType (token, TOKEN_IDENTIFIER))
+			break;
+		else if (isType (token, TOKEN_OPEN_PAREN))
+		{
+			while (! isType (token, TOKEN_CLOSE_PAREN))
+				readToken (token);
+		}
+		else if (isType (token, TOKEN_COLON))
+		{
+			readToken (token);
+			if (! isType (token, TOKEN_OPEN_BRACE))
+				break;
+			else while (! isType (token, TOKEN_CLOSE_BRACE))
+				readToken (token);
+		}
+	} while (isType (token, TOKEN_COMMA));
+}
+
 static void parseClass (tokenInfo *const token)
 {
 	Assert (isKeyword (token, KEYWORD_class));
@@ -1165,6 +1190,7 @@ static void parseClass (tokenInfo *const token)
 		{
 			case KEYWORD_inherit:  parseInherit (token);        break;
 			case KEYWORD_feature:  parseFeatureClauses (token); break;
+			case KEYWORD_convert:  parseConvert (token);        break;
 			default:               readToken (token);           break;
 		}
 	} while (! isKeyword (token, KEYWORD_end));
