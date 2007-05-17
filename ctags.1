@@ -948,7 +948,7 @@ this class is derived (i.e. inherits from).
 
 .TP 12
 .I signature
-When present, \fIvalue\fP. is a language-dependent representation of the
+When present, \fIvalue\fP is a language-dependent representation of the
 signature of a routine. A routine signature in its complete form specifies the
 return type of a routine and its formal argument list. This extension field is
 presently supported only for C-based languages and does not include the return
@@ -1020,13 +1020,7 @@ reported problems. In particular, the use of preprocessor constructs which
 alter the textual syntax of C can fool \fBctags\fP. You can work around many
 such problems by using the \fB-I\fP option.
 
-White space is treated as a separator for file names and options read from
-list files, specified using the \fB-L\fP option, and in filter mode (specified
-using the \fB--filter\fP option). Therefore, it is not currently possible to
-supply file names or other options containing embedded white space (spaces,
-etc.) through these options.
-
-Note that when \fBctags\fP generates uses patterns for locating tags (see
+Note that since \fBctags\fP generates patterns for locating tags (see
 the \fB--excmd\fP option), it is entirely possible that the wrong line may be
 found by your editor if there exists another source line which is identical to
 the line containing the tag. The following example demonstrates this condition:
@@ -1079,7 +1073,7 @@ default options which are read when \fBctags\fP starts, after the
 configuration files listed in \fBFILES\fP, below, are read, but before any
 command line options are read. Options appearing on the command line will
 override options specified in this variable. Only options will be read from
-this variable. Note that all white space in this variable in considered a
+this variable. Note that all white space in this variable is considered a
 separator, making it impossible to pass an option parameter containing an
 embedded space. If this is a problem, use a configuration file instead.
 
