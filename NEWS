@@ -9,6 +9,7 @@ ctags-NEXT (Wed May 16 2007)
 * Added support for optional subroutine declarations [Perl].
 * Added support for formats [Perl].
 * Added support for new convert keyword [Eiffel].
+* Added optional tags for forward variable declarations (e.g. 'struct C;') [C, C++].
 * Changed parsing of option input file (-L) to strip trailing white space.
 * Ignore comments mixed into definitions and declarations [Perl].
 * Fixed parsing of generic classes/interfaces [Java, Bug #1447756].

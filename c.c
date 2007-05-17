@@ -287,7 +287,7 @@ static kindOption CKinds [] = {
 	{ TRUE,  't', "typedef",    "typedefs"},
 	{ TRUE,  'u', "union",      "union names"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
-	{ FALSE, 'x', "externvar",  "external variable declarations"},
+	{ FALSE, 'x', "externvar",  "external and forward variable declarations"},
 };
 
 typedef enum {
@@ -2642,7 +2642,7 @@ static void tagCheck (statementInfo *const st)
 			else if (isType (prev, TOKEN_NAME))
 			{
 				if (isContextualKeyword (prev2))
-					st->scope = SCOPE_EXTERN;
+					makeTag (prev, st, TRUE, TAG_EXTERN_VAR);
 				else
 					qualifyVariableTag (st, prev);
 			}
