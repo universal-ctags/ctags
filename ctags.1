@@ -235,8 +235,9 @@ input. File names read using this option are processed following file names
 appearing on the command line. Options are also accepted in this input. If
 this option is specified more than once, only the last will apply. \fBNote:\fP
 \fIfile\fP is read in line-oriented mode, where a new line is the only
-delimiter and spaces are considered significant, in order that file names
-containing spaces may be supplied; this can affect how options are parsed if
+delimiter and non-trailing white space is considered significant, in order
+that file names containing spaces may be supplied (however, trailing white
+space is stripped from lines); this can affect how options are parsed if
 included in the input.
 
 .TP 5
