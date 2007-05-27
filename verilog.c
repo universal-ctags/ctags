@@ -25,6 +25,7 @@
 #include <setjmp.h>
 
 #include "debug.h"
+#include "get.h"
 #include "keyword.h"
 #include "parse.h"
 #include "read.h"
@@ -145,16 +146,7 @@ static int vGetc (void)
 		}
 		else if (c2 == '*')  /* strip block comment */
 		{
-			do
-			{
-				do
-					c = fileGetc ();
-				while (c != '*'  &&  c != EOF);
-				if (c != EOF)
-					c = fileGetc ();
-			} while (c != '/'  &&  c != EOF);
-			if (c != EOF)
-				c = ' ';  /* comment equivalent to white space */
+			c = skipOverCComment();
 		}
 		else
 			Ungetc = c2;

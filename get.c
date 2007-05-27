@@ -434,7 +434,7 @@ static Comment isComment (void)
 /*  Skips over a C style comment. According to ANSI specification a comment
  *  is treated as white space, so we perform this subsitution.
  */
-static int skipOverCComment (void)
+int skipOverCComment (void)
 {
 	int c = fileGetc ();
 

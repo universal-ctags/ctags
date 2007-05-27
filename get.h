@@ -43,6 +43,7 @@ extern void cppBeginStatement (void);
 extern void cppEndStatement (void);
 extern void cppUngetc (const int c);
 extern int cppGetc (void);
+extern int skipOverCComment (void);
 
 #endif  /* _GET_H */
 
