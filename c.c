@@ -847,7 +847,7 @@ static javaKind javaTagKind (const tagType type)
 	{
 		case TAG_CLASS:     result = JK_CLASS;     break;
 		
-		// Bug #1517143. Treat Java enums as classes.
+		/* Bug #1517143. Treat Java enums as classes. */
 		case TAG_ENUM:      result = JK_CLASS;     break;
 		case TAG_ENUMERATOR:result = JK_FIELD;     break;
 		
