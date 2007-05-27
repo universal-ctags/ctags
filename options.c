@@ -1760,10 +1760,24 @@ extern void initOptions (void)
 
 	/* always excluded by default */
 	verbose ("  Installing default exclude patterns:\n");
-	processExcludeOption (NULL, "EIFGEN");
-	processExcludeOption (NULL, "SCCS");
-	processExcludeOption (NULL, "RCS");
+	processExcludeOption (NULL, "{arch}");
+	processExcludeOption (NULL, ".arch-ids");
+	processExcludeOption (NULL, ".arch-inventory");
+	processExcludeOption (NULL, "autom4te.cache");
+	processExcludeOption (NULL, "BitKeeper");
+	processExcludeOption (NULL, ".bzr");
+	processExcludeOption (NULL, ".bzrignore");
 	processExcludeOption (NULL, "CVS");
+	processExcludeOption (NULL, ".cvsignore");
+	processExcludeOption (NULL, "_darcs");
+	processExcludeOption (NULL, ".deps");
+	processExcludeOption (NULL, "EIFGEN");
+	processExcludeOption (NULL, ".git");
+	processExcludeOption (NULL, ".hg");
+	processExcludeOption (NULL, "PENDING");
+	processExcludeOption (NULL, "RCS");
+	processExcludeOption (NULL, "RESYNC");
+	processExcludeOption (NULL, "SCCS");
 	processExcludeOption (NULL, ".svn");
 }
 
