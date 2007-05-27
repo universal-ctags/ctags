@@ -372,7 +372,7 @@ static void findRubyTags (void)
 			{
 				/* Leave the most recent scope. */
 				vStringDelete (stringListLast (nesting));
-			stringListRemoveLast (nesting);
+				stringListRemoveLast (nesting);
 			}
 			else if (*cp != '\0')
 			{
