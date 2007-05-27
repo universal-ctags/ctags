@@ -382,7 +382,7 @@ static const keywordDesc KeywordTable [] = {
 	{ "delete",         KEYWORD_DELETE,         { 0, 1, 0, 0, 0 } },
 	{ "double",         KEYWORD_DOUBLE,         { 1, 1, 1, 1, 0 } },
 	{ "else",           KEYWORD_ELSE,           { 1, 1, 0, 1, 0 } },
-	{ "enum",           KEYWORD_ENUM,           { 1, 1, 1, 0, 1 } },
+	{ "enum",           KEYWORD_ENUM,           { 1, 1, 1, 1, 1 } },
 	{ "event",          KEYWORD_EVENT,          { 0, 0, 1, 0, 1 } },
 	{ "explicit",       KEYWORD_EXPLICIT,       { 0, 1, 1, 0, 0 } },
 	{ "extends",        KEYWORD_EXTENDS,        { 0, 0, 0, 1, 1 } },
@@ -713,6 +713,8 @@ static void initMemberInfo (statementInfo *const st)
 	if (st->parent != NULL) switch (st->parent->declaration)
 	{
 		case DECL_ENUM:
+			accessDefault = (isLanguage (Lang_java) ? ACCESS_PUBLIC : ACCESS_UNDEFINED);
+			break;
 		case DECL_NAMESPACE:
 		case DECL_UNION:
 			accessDefault = ACCESS_UNDEFINED;
@@ -844,6 +846,11 @@ static javaKind javaTagKind (const tagType type)
 	switch (type)
 	{
 		case TAG_CLASS:     result = JK_CLASS;     break;
+		
+		// Bug #1517143. Treat Java enums as classes.
+		case TAG_ENUM:      result = JK_CLASS;     break;
+		case TAG_ENUMERATOR:result = JK_FIELD;     break;
+		
 		case TAG_FIELD:     result = JK_FIELD;     break;
 		case TAG_INTERFACE: result = JK_INTERFACE; break;
 		case TAG_LOCAL:     result = JK_LOCAL;     break;
