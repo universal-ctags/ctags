@@ -1748,6 +1748,7 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_VOID:      st->declaration = DECL_BASE;            break;
 		case KEYWORD_VOLATILE:  st->declaration = DECL_BASE;            break;
 		case KEYWORD_VIRTUAL:   st->implementation = IMP_VIRTUAL;       break;
+		case KEYWORD_WCHAR_T:   st->declaration = DECL_BASE;            break;
 		
 		case KEYWORD_NAMESPACE: readPackageOrNamespace (st, DECL_NAMESPACE); break;
 		case KEYWORD_PACKAGE:   readPackageOrNamespace (st, DECL_PACKAGE);   break;
