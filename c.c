@@ -1499,15 +1499,25 @@ static void readPackageName (tokenInfo *const token, const int firstChar)
 	cppUngetc (c);        /* unget non-package character */
 }
 
-static void readPackage (statementInfo *const st)
+static void readPackageOrNamespace (statementInfo *const st, const declType declaration)
 {
-	tokenInfo *const token = activeToken (st);
-	Assert (isType (token, TOKEN_KEYWORD));
-	readPackageName (token, skipToNonWhite ());
-	token->type = TOKEN_NAME;
-	st->declaration = DECL_PACKAGE;
-	st->gotName = TRUE;
-	st->haveQualifyingName = TRUE;
+	st->declaration = declaration;
+	
+	if (declaration == DECL_NAMESPACE && !isLanguage (Lang_csharp))
+	{
+		/* In C++ a namespace is specified one level at a time. */
+		return;
+	}
+	else
+	{
+		/* In C#, a namespace can also be specified like a Java package name. */
+		tokenInfo *const token = activeToken (st);
+		Assert (isType (token, TOKEN_KEYWORD));
+		readPackageName (token, skipToNonWhite ());
+		token->type = TOKEN_NAME;
+		st->gotName = TRUE;
+		st->haveQualifyingName = TRUE;
+	}
 }
 
 static void processName (statementInfo *const st)
@@ -1713,9 +1723,7 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_INTERFACE: st->declaration = DECL_INTERFACE;       break;
 		case KEYWORD_LOCAL:     setAccess (st, ACCESS_LOCAL);           break;
 		case KEYWORD_LONG:      st->declaration = DECL_BASE;            break;
-		case KEYWORD_NAMESPACE: st->declaration = DECL_NAMESPACE;       break;
 		case KEYWORD_OPERATOR:  readOperator (st);                      break;
-		case KEYWORD_PACKAGE:   readPackage (st);                       break;
 		case KEYWORD_PRIVATE:   setAccess (st, ACCESS_PRIVATE);         break;
 		case KEYWORD_PROGRAM:   st->declaration = DECL_PROGRAM;         break;
 		case KEYWORD_PROTECTED: setAccess (st, ACCESS_PROTECTED);       break;
@@ -1733,7 +1741,10 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_VOID:      st->declaration = DECL_BASE;            break;
 		case KEYWORD_VOLATILE:  st->declaration = DECL_BASE;            break;
 		case KEYWORD_VIRTUAL:   st->implementation = IMP_VIRTUAL;       break;
-
+		
+		case KEYWORD_NAMESPACE: readPackageOrNamespace (st, DECL_NAMESPACE); break;
+		case KEYWORD_PACKAGE:   readPackageOrNamespace (st, DECL_PACKAGE);   break;
+		
 		case KEYWORD_EVENT:
 			if (isLanguage (Lang_csharp))
 				st->declaration = DECL_EVENT;

@@ -21,3 +21,11 @@ namespace SomeNameSpace
       }
    }
 }
+
+// namespace can nest multiple levels at once.
+namespace SomeNameSpace.Nested
+{
+	public class AlternativeNestedNameSpaceClass
+	{
+	}
+}
