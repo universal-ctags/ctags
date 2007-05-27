@@ -1687,28 +1687,57 @@ extern void previewFirstOption (cookedArgs* const args)
 	}
 }
 
+static void parseConfigurationFileOptionsInDirectoryWithLeafname (const char* directory, const char* leafname)
+{
+	vString* const pathname = combinePathAndFile (directory, leafname);
+	parseFileOptions (vStringValue (pathname));
+	vStringDelete (pathname);
+}
+
+static void parseConfigurationFileOptionsInDirectory (const char* directory)
+{
+#ifdef MSDOS_STYLE_PATH
+	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, "ctags.cnf");
+#endif
+	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, ".ctags");
+}
+
 static void parseConfigurationFileOptions (void)
 {
+	/* We parse .ctags on all systems, and additionally ctags.cnf on DOS. */
 	const char* const home = getenv ("HOME");
-	const char* conf;
 #ifdef CUSTOM_CONFIGURATION_FILE
 	parseFileOptions (CUSTOM_CONFIGURATION_FILE);
 #endif
 #ifdef MSDOS_STYLE_PATH
 	parseFileOptions ("/ctags.cnf");
-	conf = "ctags.cnf";
-#else
-	conf = ".ctags";
 #endif
 	parseFileOptions ("/etc/ctags.conf");
 	parseFileOptions ("/usr/local/etc/ctags.conf");
 	if (home != NULL)
 	{
-		vString* const homeFile = combinePathAndFile (home, conf);
-		parseFileOptions (vStringValue (homeFile));
-		vStringDelete (homeFile);
+		parseConfigurationFileOptionsInDirectory (home);
 	}
-	parseFileOptions (conf);
+	else
+	{
+#ifdef MSDOS_STYLE_PATH
+		/*
+		 * Windows users don't usually set HOME.
+		 * The OS sets HOMEDRIVE and HOMEPATH for them.
+		 */
+		const char* homeDrive = getenv ("HOMEDRIVE");
+		const char* homePath = getenv ("HOMEPATH");
+		if (homeDrive != NULL && homePath != NULL)
+		{
+			vString* const windowsHome = vStringNew ();
+			vStringCatS (windowsHome, homeDrive);
+			vStringCatS (windowsHome, homePath);
+			parseConfigurationFileOptionsInDirectory (vStringValue (windowsHome));
+			vStringDelete (windowsHome);
+		}
+#endif
+	}
+	parseConfigurationFileOptionsInDirectory (".");
 }
 
 static void parseEnvironmentOptions (void)
