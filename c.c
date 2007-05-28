@@ -1699,6 +1699,11 @@ static void skipStatement (statementInfo *const st)
 	skipToOneOf (";");
 }
 
+static void processInterface (statementInfo *const st)
+{
+	st->declaration = DECL_INTERFACE;
+}
+
 static void processToken (tokenInfo *const token, statementInfo *const st)
 {
 	switch (token->keyword)        /* is it a reserved word? */
@@ -1727,7 +1732,7 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_IMPORT:    skipStatement (st);                     break;
 		case KEYWORD_INT:       st->declaration = DECL_BASE;            break;
 		case KEYWORD_INTEGER:   st->declaration = DECL_BASE;            break;
-		case KEYWORD_INTERFACE: st->declaration = DECL_INTERFACE;       break;
+		case KEYWORD_INTERFACE: processInterface (st);                  break;
 		case KEYWORD_LOCAL:     setAccess (st, ACCESS_LOCAL);           break;
 		case KEYWORD_LONG:      st->declaration = DECL_BASE;            break;
 		case KEYWORD_OPERATOR:  readOperator (st);                      break;
@@ -2422,10 +2427,35 @@ static void parseIdentifier (statementInfo *const st, const int c)
 		processToken (token, st);
 }
 
+static void parseJavaAnnotation (statementInfo *const st)
+{
+	/*
+	 * @Override
+	 * @Target(ElementType.METHOD)
+	 * @SuppressWarnings(value = "unchecked")
+	 *
+	 * But watch out for "@interface"!
+	 */
+	tokenInfo *const token = activeToken (st);
+	
+	int c = skipToNonWhite ();
+	readIdentifier (token, c);
+	if (token->keyword == KEYWORD_INTERFACE)
+	{
+		/* Oops. This was actually "@interface" defining a new annotation. */
+		processInterface (st);
+	}
+	else
+	{
+		/* Bug #1691412: skip any annotation arguments. */
+		skipParens ();
+	}
+}
+
 static void parseGeneralToken (statementInfo *const st, const int c)
 {
 	const tokenInfo *const prev = prevToken (st, 1);
-
+	
 	if (isident1 (c) || (isLanguage (Lang_java) && isHighChar (c)))
 	{
 		parseIdentifier (st, c);
@@ -2451,6 +2481,10 @@ static void parseGeneralToken (statementInfo *const st, const int c)
 		int c2 = cppGetc ();
 		if (c2 != '=')
 			cppUngetc (c2);
+	}
+	else if (c == '@' && isLanguage (Lang_java))
+	{
+		parseJavaAnnotation (st);
 	}
 	else if (isExternCDecl (st, c))
 	{
