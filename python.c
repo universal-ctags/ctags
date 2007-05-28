@@ -263,8 +263,9 @@ static void findPythonTags (void)
 	vString *const class = vStringNew ();
 
 	/* These variables keep track of the parent. */
-	// FIXME: If nesting of 1024 is reached, we should print a warning, and
-	// ignore any tags with a nesting > 1024.
+	/* FIXME: If nesting of 1024 is reached, we should print a warning, and
+	 * ignore any tags with a nesting > 1024.
+	 */
 	vString *parent = vStringNew();
 	vString *nested_parent[1024] = {NULL};
 	boolean nested_is_class[1024] = {0};
@@ -349,8 +350,9 @@ static void findPythonTags (void)
 
 			if (found)
 			{
+				boolean is_parent_class;
 				nesting_level = indent;
-				boolean is_parent_class =
+				is_parent_class =
 					constructParentString(parent, nesting_level, nested_parent,
 						nested_is_class);
 						
