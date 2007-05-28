@@ -54,22 +54,35 @@ static boolean isIdentifierCharacter (int c)
 	return (boolean) (isalnum (c) || c == '_');
 }
 
-static void makeFunctionTag (vString *const function, vString *const class)
+static void makeFunctionTag (vString *const function,
+	vString *const parent, int is_class_parent)
 {
 	tagEntryInfo tag;
 	initTagEntry (&tag, vStringValue (function));
-	if (vStringLength (class) > 0)
+	
+	tag.kindName = "function";
+	tag.kind = 'f';
+
+	if (vStringLength (parent) > 0)
 	{
-		tag.kindName = "member";
-		tag.kind = 'm';
-		tag.extensionFields.scope [0] = "class";
-		tag.extensionFields.scope [1] = vStringValue (class);
+		if (is_class_parent)
+		{
+			tag.kindName = "member";
+			tag.kind = 'm';
+			tag.extensionFields.scope [0] = "class";
+			tag.extensionFields.scope [1] = vStringValue (parent);
+		}
+		else
+		{
+			tag.extensionFields.scope [0] = "function";
+			tag.extensionFields.scope [1] = vStringValue (parent);
+		}
 	}
-	else
-	{
-		tag.kindName = "function";
-		tag.kind = 'f';
-	}
+
+	/* If a function starts with __, we mark it as file scope.
+	 * FIXME: What is the proper way to signal such attributes?
+	 * TODO: What does functions/classes starting with _ and __ mean in python?
+	 */
 	if (strncmp (vStringValue (function), "__", 2) == 0 &&
 		strcmp (vStringValue (function), "__init__") != 0)
 	{
@@ -81,26 +94,84 @@ static void makeFunctionTag (vString *const function, vString *const class)
 		tag.extensionFields.access = "public";
 	}
 	makeTagEntry (&tag);
-	if (vStringLength (class) > 0  &&  Option.include.qualifiedTags)
-	{
-		vString *tagname = vStringNew ();
-		vStringCat (tagname, class);
-		vStringPut (tagname, '.');
-		vStringCat (tagname, function);
-		tag.name = vStringValue (tagname);
-		makeTagEntry (&tag);
-		vStringDelete (tagname);
-	}
 }
 
-static void makeClassTag (vString *const class, vString *const inheritance)
+static void makeClassTag (vString *const class, vString *const inheritance,
+	vString *const parent, int is_class_parent)
 {
 	tagEntryInfo tag;
 	initTagEntry (&tag, vStringValue (class));
 	tag.kindName = "class";
 	tag.kind = 'c';
+	if (vStringLength (parent) > 0)
+	{
+		if (is_class_parent)
+		{
+			tag.extensionFields.scope [0] = "class";
+			tag.extensionFields.scope [1] = vStringValue (parent);
+		}
+		else
+		{
+			tag.extensionFields.scope [0] = "function";
+			tag.extensionFields.scope [1] = vStringValue (parent);
+		}
+	}
 	tag.extensionFields.inheritance = vStringValue (inheritance);
 	makeTagEntry (&tag);
+}
+
+/* Skip a single or double quoted string. */
+static const char *skipString (const char *cp)
+{
+	const char *start = cp;
+	int escaped = 0;
+	for (cp++; *cp; cp++)
+	{
+		if (escaped)
+			escaped--;
+		else if (*cp == '\\')
+			escaped++;
+		else if (*cp == *start)
+			return cp + 1;
+	}
+	return cp;
+}
+
+/* Skip everything up to an identifier start. */
+static const char *skipEverything (const char *cp)
+{
+	for (; *cp; cp++)
+	{
+		if (isIdentifierFirstCharacter ((int) *cp))
+			return cp;
+		if (*cp == '"' || *cp == '\'')
+		{
+			cp = skipString(cp);
+		}
+    }
+    return cp;
+}
+
+/* Skip everything up to an identifier start. */
+static const char *skipIdentifier (const char *cp)
+{
+	while (isIdentifierCharacter ((int) *cp))
+		cp++;
+    return cp;
+}
+
+static const char *findDefinitionOrClass (const char *cp)
+{
+	while (*cp)
+	{
+		cp = skipEverything (cp);
+		if (!strncmp(cp, "def", 3) || !strncmp(cp, "class", 5))
+		{
+			return cp;
+		}
+		cp = skipIdentifier (cp);
+	}
+	return NULL;
 }
 
 static const char *skipSpace (const char *cp)
@@ -123,7 +194,8 @@ static const char *parseIdentifier (const char *cp, vString *const identifier)
 	return cp;
 }
 
-static void parseClass (const char *cp, vString *const class)
+static void parseClass (const char *cp, vString *const class,
+	vString *const parent, int is_class_parent)
 {
 	vString *const inheritance = vStringNew ();
 	vStringClear (inheritance);
@@ -147,33 +219,66 @@ static void parseClass (const char *cp, vString *const class)
 		}
 		vStringTerminate (inheritance);
 	}
-	makeClassTag (class, inheritance);
+	makeClassTag (class, inheritance, parent, is_class_parent);
 	vStringDelete (inheritance);
 }
 
 static void parseFunction (const char *cp, vString *const def,
-	vString *const class)
+	vString *const parent, int is_class_parent)
 {
 	cp = parseIdentifier (cp, def);
-	makeFunctionTag (def, class);
+	makeFunctionTag (def, parent, is_class_parent);
+}
+
+static boolean constructParentString(vString *const result, int nesting_level,
+	vString **nested_parent, boolean *is_nested_class)
+{
+	int i;
+	int prev = -1;
+	int is_class = FALSE;
+	vStringClear (result);
+	for (i = 0; i < nesting_level; i++)
+	{
+		if (nested_parent[i])
+		{
+			if (prev >= 0)
+			{
+				if (is_nested_class[prev])
+					vStringCatS(result, ".");
+				else
+					vStringCatS(result, "/");
+			}
+			vStringCat(result, nested_parent[i]);
+			is_class = is_nested_class[i];
+			prev = i;
+		}
+	}
+	return is_class;
 }
 
 static void findPythonTags (void)
 {
-	vString *const class = vStringNew (); /* current class */
-	vString *const def = vStringNew (); /* current function */
-	vString *const identifier = vStringNew ();
 	vString *const continuation = vStringNew ();
+	vString *const def = vStringNew ();
+	vString *const class = vStringNew ();
+
+	/* These variables keep track of the parent. */
+	// FIXME: If nesting of 1024 is reached, we should print a warning, and
+	// ignore any tags with a nesting > 1024.
+	vString *parent = vStringNew();
+	vString *nested_parent[1024] = {NULL};
+	boolean nested_is_class[1024] = {0};
+	int nesting_level = 0;
+
 	const char *line;
-	int class_indent = 0;
-	int def_indent = 0;
-	int skip_indent = 0;
 	int line_skip = 0;
 	boolean longStringLiteral = FALSE;
 
 	while ((line = (const char *) fileReadLine ()) != NULL)
 	{
 		const char *cp = line;
+		char *longstring;
+		const char *keyword;
 		int indent;
 
 		cp = skipSpace (cp);
@@ -197,80 +302,76 @@ static void findPythonTags (void)
 		indent = cp - line;
 		line_skip = 0;
 
+		/* Deal with multiline strings. */
 		if (longStringLiteral)
 		{
-			cp = strstr (cp, "\"\"\"");
-			if (cp == NULL)
-				continue;
-			else
-			{
+			/* Note: We do ignore anything in the same line after a multiline
+			 * string for now.
+			 */
+			if (strstr (cp, "\"\"\""))
 				longStringLiteral = FALSE;
-				cp += 3;
-			}
+			continue;
 		}
-		if (isIdentifierFirstCharacter ((int) *cp))
+		
+		/* Deal with multiline string start. */
+		if ((longstring = strstr (cp, "\"\"\"")) != NULL)
 		{
-			if (indent <= class_indent)
-				vStringClear (class);
-
-			if (indent <= def_indent)
-				vStringClear (def);
-
-			cp = parseIdentifier (cp, identifier);
-			if (isspace ((int) *cp))
+			/* Note: For our purposes, the line just ends at the first long
+			 * string.
+			 */
+			*longstring = '\0';
+			longstring += 3;
+			longStringLiteral = TRUE;
+			while ((longstring = strstr (longstring, "\"\"\"")) != NULL)
 			{
-				cp = skipSpace (cp);
-				if (!skip_indent || indent <= skip_indent)
-				{
-					if (strcmp (vStringValue (identifier), "def") == 0)
-					{
-						/* Currently, ctags can not handle functions in
-						 * functions for python - they are simple ignored.
-						 */
-						if (!vStringLength (def))
-						{
-							parseFunction (cp, def, class);
-							def_indent = indent;
-						}
-						else
-						{
-							skip_indent = indent;
-						}
-					}
-					else if (strcmp (vStringValue (identifier), "class") == 0)
-					{
-						/* Currently, ctags can not handle classes in functions
-						 * or classes for python - they are simply ignored. */
-						if (!vStringLength (class) && !vStringLength (def))
-						{
-							parseClass (cp, class);
-							class_indent = indent;
-						}
-						else
-						{
-							skip_indent = indent;
-						}
-					}
-				}
+				longstring += 3;
+				longStringLiteral = !longStringLiteral;
 			}
 		}
-		if ((cp = strstr (cp, "\"\"\"")) != NULL)
+
+		/* Deal with def and class keywords. */
+		keyword = findDefinitionOrClass (cp);
+		if (keyword)
 		{
-			cp += 3;
-			cp = strstr (cp, "\"\"\"");
-			if (cp == NULL)
-				longStringLiteral = TRUE;
+			vString *found = NULL;
+			boolean is_class = FALSE;
+			if (!strncmp (keyword, "def", 3))
+			{
+				cp = skipSpace (keyword + 3);
+				found = def;
+			}
+			else if (!strncmp (keyword, "class", 5))
+			{
+				cp = skipSpace (keyword + 5);
+				found = class;
+				is_class = TRUE;
+			}
+
+			if (found)
+			{
+				nesting_level = indent;
+				boolean is_parent_class =
+					constructParentString(parent, nesting_level, nested_parent,
+						nested_is_class);
+						
+				if (is_class)
+					parseClass (cp, class, parent, is_parent_class);
+				else
+					parseFunction(cp, def, parent, is_parent_class);
+
+				if (!nested_parent[nesting_level])
+					nested_parent[nesting_level] = vStringNew();
+				vStringCopy(nested_parent[nesting_level], found);
+				nested_is_class[nesting_level] = is_class;
+			}
 		}
 	}
-	vStringDelete (identifier);
-	vStringDelete (class);
-	vStringDelete (def);
 	vStringDelete (continuation);
 }
 
 extern parserDefinition *PythonParser (void)
 {
-	static const char *const extensions[] = { "py", "python", NULL };
+	static const char *const extensions[] = { "py", "pyx", "pxd", "scons", NULL };
 	parserDefinition *def = parserNew ("Python");
 	def->kinds = PythonKinds;
 	def->kindCount = KIND_COUNT (PythonKinds);

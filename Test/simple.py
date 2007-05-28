@@ -19,7 +19,7 @@ class one:
 
     def __init__(self, filename, pathsep='', treegap=64):
         """Another string
-	literal"""
+    literal"""
 
     def __private_function__(self, key, data):
     
@@ -32,6 +32,11 @@ class one:
 
 def _test(test, code, outcome, exception):
     def ignored_function():
+        def more_nesting():
+            class deeply_nested():
+                def even_more():
+                    @blah class this is seen???
+                        @bleh def this also? good!
 
 if __name__ == '__main__':
 
