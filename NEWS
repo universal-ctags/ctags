@@ -1,6 +1,19 @@
 Current Version: @@VERSION@@
 
-ctags-NEXT (Wed May 16 2007)
+ctags-NEXT (Mon May 28 2007)
+* Added support for verbatim string literals [C#, Bug #1515910].
+* Fixed parsing of annotations [Java, Bug #1691412].
+* Fixed block-comment parsing [Verilog, Patch #1458042, Bug #960316, Bug
+  #1111214, Bug #1606569, Bug #1615060].
+* Added support for .ctags as well as ctags.cnf on Windows [Bug #1246506].
+* Added support for non-extern, non-static functions returning wchar_t [C++,
+  Patch #1458930].
+* Added support for numerous revision control systems including Bazaar and
+  Mercurial [Bug #1472894].
+* Added support for enums [Java, Bug #1517143].
+* Added support for multiple-level namespace declarations [C#].
+* Fixed typo in man page [Debian bug #366412].
+* Fixed parsing of ` as a method name [Ruby].
 * Added .svn to list of directories ignored during recursion (--recurse).
 * Added support for BlitzBasic, PureBasic and FreeBasic [FR #1100506].
 * Added support for interfaces and static/public/protected/private functions [PHP].
