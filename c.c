@@ -2761,7 +2761,7 @@ static boolean findCTags (const unsigned int passCount)
 	boolean retry;
 
 	Assert (passCount < 3);
-	cppInit ((boolean) (passCount > 1));
+	cppInit ((boolean) (passCount > 1), isLanguage (Lang_csharp));
 	Signature = vStringNew ();
 
 	exception = (exception_t) setjmp (Exception);

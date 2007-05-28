@@ -37,7 +37,7 @@
 */
 extern boolean isBraceFormat (void);
 extern unsigned int getDirectiveNestLevel (void);
-extern void cppInit (const boolean state);
+extern void cppInit (const boolean state, const boolean hasAtLiteralStrings);
 extern void cppTerminate (void);
 extern void cppBeginStatement (void);
 extern void cppEndStatement (void);
