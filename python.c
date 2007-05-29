@@ -35,12 +35,26 @@ static kindOption PythonKinds[] = {
 	{TRUE, 'm', "member",   "class members"}
 };
 
+typedef struct NestingLevel NestingLevel;
+typedef struct NestingLevels NestingLevels;
+
+struct NestingLevel
+{
+	int indentation;
+	vString *name;
+	boolean is_class;
+};
+
+struct NestingLevels
+{
+	NestingLevel *levels;
+	int n;
+	int allocated;
+};
+
 /*
 *   FUNCTION DEFINITIONS
 */
-/* tagEntryInfo and vString should be preinitialized/preallocated but not
- * necessary. If successful you will find class name in vString
- */
 
 #define vStringLast(vs) ((vs)->buffer[(vs)->length - 1])
 
@@ -54,6 +68,9 @@ static boolean isIdentifierCharacter (int c)
 	return (boolean) (isalnum (c) || c == '_');
 }
 
+/* Given a string with the contents of a line directly after the "def" keyword,
+ * extract all relevant information and create a tag.
+ */
 static void makeFunctionTag (vString *const function,
 	vString *const parent, int is_class_parent)
 {
@@ -96,6 +113,9 @@ static void makeFunctionTag (vString *const function,
 	makeTagEntry (&tag);
 }
 
+/* Given a string with the contents of the line directly after the "class"
+ * keyword, extract all necessary information and create a tag.
+ */
 static void makeClassTag (vString *const class, vString *const inheritance,
 	vString *const parent, int is_class_parent)
 {
@@ -152,7 +172,7 @@ static const char *skipEverything (const char *cp)
     return cp;
 }
 
-/* Skip everything up to an identifier start. */
+/* Skip an identifier. */
 static const char *skipIdentifier (const char *cp)
 {
 	while (isIdentifierCharacter ((int) *cp))
@@ -230,46 +250,98 @@ static void parseFunction (const char *cp, vString *const def,
 	makeFunctionTag (def, parent, is_class_parent);
 }
 
-static boolean constructParentString(vString *const result, int nesting_level,
-	vString **nested_parent, boolean *is_nested_class)
+/* Get the combined name of a nested symbol. Classes are separated with ".",
+ * functions with "/". For example this code:
+ * class MyClass:
+ *     def myFunction:
+ *         def SubFunction:
+ *             class SubClass:
+ *                 def Method:
+ *                     pass
+ * Would produce this string:
+ * MyClass.MyFunction/SubFunction/SubClass.Method
+ */
+static boolean constructParentString(NestingLevels *nls, int indent,
+	vString *result)
 {
 	int i;
-	int prev = -1;
+	NestingLevel *prev = NULL;
 	int is_class = FALSE;
 	vStringClear (result);
-	for (i = 0; i < nesting_level; i++)
+	for (i = 0; i < nls->n; i++)
 	{
-		if (nested_parent[i])
+		NestingLevel *nl = nls->levels + i;
+		if (indent <= nl->indentation)
+			break;
+		if (prev)
 		{
-			if (prev >= 0)
-			{
-				if (is_nested_class[prev])
-					vStringCatS(result, ".");
-				else
-					vStringCatS(result, "/");
-			}
-			vStringCat(result, nested_parent[i]);
-			is_class = is_nested_class[i];
-			prev = i;
+			if (prev->is_class)
+				vStringCatS(result, ".");
+			else
+				vStringCatS(result, "/");
 		}
+		vStringCat(result, nl->name);
+		is_class = nl->is_class;
+		prev = nl;
 	}
 	return is_class;
+}
+
+static NestingLevels *newNestingLevels(void)
+{
+	NestingLevels *nls = calloc(1, sizeof *nls);
+	return nls;
+}
+
+static void freeNestingLevels(NestingLevels *nls)
+{
+	int i;
+	for (i = 0; i < nls->allocated; i++)
+		vStringDelete(nls->levels[i].name);
+	free(nls->levels);
+	free(nls);
+}
+
+/* TODO: This is totally out of place in pythonc, but strlist.h is not useable.
+ * Maybe should just move these three functions to a separate file, even if no
+ * other parser uses them.
+ */
+static void addNestingLevel(NestingLevels *nls, int indentation,
+	vString *name, boolean is_class)
+{
+	int i;
+	NestingLevel *nl;
+
+	for (i = 0; i < nls->n; i++)
+	{
+		nl = nls->levels + i;
+		if (indentation <= nl->indentation) break;
+	}
+	if (i == nls->n)
+	{
+		if (i >= nls->allocated)
+		{
+			nls->allocated++;
+			nls->levels = realloc(nls->levels,
+				nls->allocated * sizeof *nls->levels);
+			nls->levels[i].name = vStringNew();
+		}
+		nl = nls->levels + i;
+	}
+	nls->n = i + 1;
+
+	vStringCopy(nl->name, name);
+	nl->indentation = indentation;
+	nl->is_class = is_class;
 }
 
 static void findPythonTags (void)
 {
 	vString *const continuation = vStringNew ();
-	vString *const def = vStringNew ();
-	vString *const class = vStringNew ();
+	vString *const name = vStringNew ();
+	vString *const parent = vStringNew();
 
-	/* These variables keep track of the parent. */
-	/* FIXME: If nesting of 1024 is reached, we should print a warning, and
-	 * ignore any tags with a nesting > 1024.
-	 */
-	vString *parent = vStringNew();
-	vString *nested_parent[1024] = {NULL};
-	boolean nested_is_class[1024] = {0};
-	int nesting_level = 0;
+	NestingLevels *const nesting_levels = newNestingLevels();
 
 	const char *line;
 	int line_skip = 0;
@@ -303,7 +375,7 @@ static void findPythonTags (void)
 		indent = cp - line;
 		line_skip = 0;
 
-		/* Deal with multiline strings. */
+		/* Deal with multiline string ending. */
 		if (longStringLiteral)
 		{
 			/* Note: We do ignore anything in the same line after a multiline
@@ -334,41 +406,41 @@ static void findPythonTags (void)
 		keyword = findDefinitionOrClass (cp);
 		if (keyword)
 		{
-			vString *found = NULL;
+			boolean found = FALSE;
 			boolean is_class = FALSE;
 			if (!strncmp (keyword, "def", 3))
 			{
 				cp = skipSpace (keyword + 3);
-				found = def;
+				found = TRUE;
 			}
 			else if (!strncmp (keyword, "class", 5))
 			{
 				cp = skipSpace (keyword + 5);
-				found = class;
+				found = TRUE;
 				is_class = TRUE;
 			}
 
 			if (found)
 			{
 				boolean is_parent_class;
-				nesting_level = indent;
-				is_parent_class =
-					constructParentString(parent, nesting_level, nested_parent,
-						nested_is_class);
-						
-				if (is_class)
-					parseClass (cp, class, parent, is_parent_class);
-				else
-					parseFunction(cp, def, parent, is_parent_class);
 
-				if (!nested_parent[nesting_level])
-					nested_parent[nesting_level] = vStringNew();
-				vStringCopy(nested_parent[nesting_level], found);
-				nested_is_class[nesting_level] = is_class;
+				is_parent_class =
+					constructParentString(nesting_levels, indent, parent);
+
+				if (is_class)
+					parseClass (cp, name, parent, is_parent_class);
+				else
+					parseFunction(cp, name, parent, is_parent_class);
+
+				addNestingLevel(nesting_levels, indent, name, is_class);
 			}
 		}
 	}
+	/* Clean up all memory we allocated. */
+	vStringDelete (parent);
+	vStringDelete (name);
 	vStringDelete (continuation);
+	freeNestingLevels (nesting_levels);
 }
 
 extern parserDefinition *PythonParser (void)
