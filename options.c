@@ -1696,10 +1696,10 @@ static void parseConfigurationFileOptionsInDirectoryWithLeafname (const char* di
 
 static void parseConfigurationFileOptionsInDirectory (const char* directory)
 {
+	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, ".ctags");
 #ifdef MSDOS_STYLE_PATH
 	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, "ctags.cnf");
 #endif
-	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, ".ctags");
 }
 
 static void parseConfigurationFileOptions (void)
