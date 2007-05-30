@@ -72,7 +72,7 @@ extern void vStringChop (vString *const string);
 extern void vStringStripTrailing (vString *const string);
 extern void vStringCatS (vString *const string, const char *const s);
 extern void vStringNCatS (vString *const string, const char *const s, const size_t length);
-extern vString *vStringNewCopy (vString *const string);
+extern vString *vStringNewCopy (const vString *const string);
 extern vString *vStringNewInit (const char *const s);
 extern void vStringCopyS (vString *const string, const char *const s);
 extern void vStringNCopyS (vString *const string, const char *const s, const size_t length);

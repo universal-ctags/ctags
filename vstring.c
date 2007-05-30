@@ -114,7 +114,7 @@ extern void vStringCatS (vString *const string, const char *const s)
 #endif
 }
 
-extern vString *vStringNewCopy (vString *const string)
+extern vString *vStringNewCopy (const vString *const string)
 {
 	vString *vs = vStringNew ();
 	vStringCatS (vs, string->buffer);
