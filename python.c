@@ -289,7 +289,7 @@ static boolean constructParentString(NestingLevels *nls, int indent,
 
 static NestingLevels *newNestingLevels(void)
 {
-	NestingLevels *nls = calloc(1, sizeof *nls);
+	NestingLevels *nls = eCalloc(1, sizeof *nls);
 	return nls;
 }
 
@@ -298,8 +298,8 @@ static void freeNestingLevels(NestingLevels *nls)
 	int i;
 	for (i = 0; i < nls->allocated; i++)
 		vStringDelete(nls->levels[i].name);
-	free(nls->levels);
-	free(nls);
+	eFree(nls->levels);
+	eFree(nls);
 }
 
 /* TODO: This is totally out of place in pythonc, but strlist.h is not useable.
@@ -322,7 +322,7 @@ static void addNestingLevel(NestingLevels *nls, int indentation,
 		if (i >= nls->allocated)
 		{
 			nls->allocated++;
-			nls->levels = realloc(nls->levels,
+			nls->levels = eRealloc(nls->levels,
 				nls->allocated * sizeof *nls->levels);
 			nls->levels[i].name = vStringNew();
 		}
