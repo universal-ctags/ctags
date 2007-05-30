@@ -2408,7 +2408,7 @@ static void processInitializer (statementInfo *const st)
 			setToken (st, TOKEN_SEMICOLON);
 		else if (c == ',')
 			setToken (st, TOKEN_COMMA);
-		else if ('}'  &&  inEnumBody)
+		else if (c == '}'  &&  inEnumBody)
 		{
 			cppUngetc (c);
 			setToken (st, TOKEN_COMMA);
