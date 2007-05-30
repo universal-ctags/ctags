@@ -298,7 +298,7 @@ static void freeNestingLevels(NestingLevels *nls)
 	int i;
 	for (i = 0; i < nls->allocated; i++)
 		vStringDelete(nls->levels[i].name);
-	eFree(nls->levels);
+	if (nls->levels) eFree(nls->levels);
 	eFree(nls);
 }
 
