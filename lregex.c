@@ -324,7 +324,7 @@ static regex_t* compileRegex (const char* const regexp, const char* const flags)
 	{
 		char errmsg[256];
 		regerror (errcode, result, errmsg, 256);
-		error (WARNING, "%s", errmsg);
+		error (WARNING, "regcomp %s: %s", regexp, errmsg);
 		regfree (result);
 		eFree (result);
 		result = NULL;
