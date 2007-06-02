@@ -26,7 +26,7 @@
 # ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>  /* declare off_t (not known to regex.h on FreeBSD) */
 # endif
-# include "regex.h"
+# include <regex.h>
 #endif
 
 #include "debug.h"
@@ -656,7 +656,7 @@ extern boolean enableRegexKind (
 	return result;
 }
 
-extern void printRegexKinds (const langType language __unused__, boolean indent)
+extern void printRegexKinds (const langType language __unused__, boolean indent __unused__)
 {
 #ifdef HAVE_REGEX
 	if (language <= SetUpper  &&  Sets [language].count > 0)
