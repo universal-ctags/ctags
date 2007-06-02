@@ -16,9 +16,6 @@
 #include "general.h"  /* must always come first */
 
 #include <string.h>
-#ifdef HAVE_FNMATCH_H
-#include <fnmatch.h>
-#endif
 
 #include "debug.h"
 #include "entry.h"
