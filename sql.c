@@ -455,11 +455,12 @@ static void parseIdentifier (vString *const string, const int firstChar)
 
 static keywordId analyzeToken (vString *const name)
 {
-	static vString *keyword = NULL;
-	if (keyword == NULL)
-		keyword = vStringNew ();
+	vString *keyword = vStringNew ();
+	keywordId result;
 	vStringCopyToLower (keyword, name);
-	return (keywordId) lookupKeyword (vStringValue (keyword), Lang_sql);
+	result = (keywordId) lookupKeyword (vStringValue (keyword), Lang_sql);
+	vStringDelete (keyword);
+	return result;
 }
 
 static void readToken (tokenInfo *const token)

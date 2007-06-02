@@ -203,6 +203,11 @@ extern const char *getExecutableName (void)
 	return ExecutableName;
 }
 
+extern const char *getExecutablePath (void)
+{
+	return ExecutableProgram;
+}
+
 extern void error (
 		const errorSelection selection, const char *const format, ...)
 {
@@ -416,8 +421,7 @@ extern fileStatus *eStat (const char *const fileName)
 	static fileStatus file;
 	if (file.name == NULL  ||  strcmp (fileName, file.name) != 0)
 	{
-		if (file.name != NULL)
-			eFree (file.name);
+		eStatFree (&file);
 		file.name = eStrdup (fileName);
 		if (lstat (file.name, &status) != 0)
 			file.exists = FALSE;
@@ -443,6 +447,15 @@ extern fileStatus *eStat (const char *const fileName)
 		}
 	}
 	return &file;
+}
+
+extern void eStatFree (fileStatus *status)
+{
+	if (status->name != NULL)
+	{
+		eFree (status->name);
+		status->name = NULL;
+	}
 }
 
 extern boolean doesFileExist (const char *const fileName)
@@ -851,6 +864,7 @@ extern FILE *tempFile (const char *const mode, char **const pName)
 	name = xMalloc (strlen (tmpdir) + 1 + strlen (pattern) + 1, char);
 	sprintf (name, "%s%c%s", tmpdir, OUTPUT_PATH_SEPARATOR, pattern);
 	fd = mkstemp (name);
+	eStatFree (file);
 #elif defined(HAVE_TEMPNAM)
 	name = tempnam (TMPDIR, "tags");
 	if (name == NULL)

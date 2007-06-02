@@ -381,11 +381,7 @@ static int skipToCharacter (const int c)
  */
 static vString *parseInteger (int c)
 {
-	static vString *string = NULL;
-
-	if (string == NULL)
-		string = vStringNew ();
-	vStringClear (string);
+	vString *string = vStringNew ();
 
 	if (c == '\0')
 		c = fileGetc ();
@@ -409,23 +405,26 @@ static vString *parseInteger (int c)
 
 static vString *parseNumeric (int c)
 {
-	static vString *string = NULL;
-
-	if (string == NULL)
-		string = vStringNew ();
-	vStringCopy (string, parseInteger (c));
+	vString *string = vStringNew ();
+	vString *integer = parseInteger (c);
+	vStringCopy (string, integer);
+	vStringDelete (integer);
 
 	c = fileGetc ();
 	if (c == '.')
 	{
+		integer = parseInteger ('\0');
 		vStringPut (string, c);
-		vStringCat (string, parseInteger ('\0'));
+		vStringCat (string, integer);
+		vStringDelete (integer);
 		c = fileGetc ();
 	}
 	if (tolower (c) == 'e')
 	{
+		integer = parseInteger ('\0');
 		vStringPut (string, c);
-		vStringCat (string, parseInteger ('\0'));
+		vStringCat (string, integer);
+		vStringDelete (integer);
 	}
 	else if (!isspace (c))
 		fileUngetc (c);
@@ -475,6 +474,7 @@ static int parseEscapedCharacter (void)
 			vString *string = parseInteger ('\0');
 			const char *value = vStringValue (string);
 			const unsigned long ascii = atol (value);
+			vStringDelete (string);
 
 			c = fileGetc ();
 			if (c == '/'  &&  ascii < 256)
@@ -507,8 +507,8 @@ static void parseString (vString *const string)
 	boolean verbatim = FALSE;
 	boolean align = FALSE;
 	boolean end = FALSE;
-	vString *verbatimCloser = NULL;
-	vString *lastLine = NULL;
+	vString *verbatimCloser = vStringNew ();
+	vString *lastLine = vStringNew ();
 	int prev = '\0';
 	int c;
 
@@ -532,8 +532,8 @@ static void parseString (vString *const string)
 			if (prev == '[' /* ||  prev == '{' */)
 			{
 				verbatim = TRUE;
-				verbatimCloser = vStringNew ();
-				lastLine = vStringNew ();
+				vStringClear (verbatimCloser);
+				vStringClear (lastLine);
 				if (prev == '{')
 					vStringPut (verbatimCloser, '}');
 				else
@@ -565,6 +565,8 @@ static void parseString (vString *const string)
 		}
 	}
 	vStringTerminate (string);
+	vStringDelete (lastLine);
+	vStringDelete (verbatimCloser);
 }
 
 /*  Read a C identifier beginning with "firstChar" and places it into "name".
@@ -601,13 +603,12 @@ static void parseFreeOperator (vString *const string, const int firstChar)
 
 static keywordId analyzeToken (vString *const name)
 {
-	static vString *keyword = NULL;
+	vString *keyword = vStringNew ();
 	keywordId id;
 
-	if (keyword == NULL)
-		keyword = vStringNew ();
 	vStringCopyToLower (keyword, name);
 	id = (keywordId) lookupKeyword (vStringValue (keyword), Lang_eiffel);
+	vStringDelete (keyword);
 
 	return id;
 }
@@ -728,7 +729,9 @@ getNextChar:
 			}
 			else if (isdigit (c))
 			{
-				vStringCat (token->string, parseNumeric (c));
+				vString* numeric = parseNumeric (c);
+				vStringCat (token->string, numeric);
+				vStringDelete (numeric);
 				token->type = TOKEN_NUMERIC;
 			}
 			else if (isFreeOperatorChar (c))

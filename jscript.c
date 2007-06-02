@@ -316,11 +316,12 @@ static void parseIdentifier (vString *const string, const int firstChar)
 
 static keywordId analyzeToken (vString *const name)
 {
-	static vString *keyword = NULL;
-	if (keyword == NULL)
-		keyword = vStringNew ();
+	vString *keyword = vStringNew ();
+	keywordId result;
 	vStringCopyToLower (keyword, name);
-	return (keywordId) lookupKeyword (vStringValue (keyword), Lang_js);
+	result = (keywordId) lookupKeyword (vStringValue (keyword), Lang_js);
+	vStringDelete (keyword);
+	return result;
 }
 
 static void readToken (tokenInfo *const token)
@@ -1215,10 +1216,12 @@ static void initialize (const langType language)
 static void findJsTags (void)
 {
 	tokenInfo *const token = newToken ();
-	exception_t exception = (exception_t) (setjmp (Exception));
+	exception_t exception;
+	
 	ClassNames = stringListNew ();
 	FunctionNames = stringListNew ();
-
+	
+	exception = (exception_t) (setjmp (Exception));
 	while (exception == ExceptionNone)
 		parseJsFile (token);
 

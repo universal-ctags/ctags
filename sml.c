@@ -146,6 +146,7 @@ static smlKind findNextIdentifier (const unsigned char **cp)
 		if (strcmp (id, SmlKeywordTypes [i].keyword) == 0)
 			result = SmlKeywordTypes [i].kind;
 	}
+	vStringDelete (identifier);
 	return result;
 }
 

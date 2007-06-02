@@ -304,6 +304,7 @@ static void findBetaTags (void)
 		endofline:
 		inquote = FALSE;  /* This shouldn't really make a difference */
 	} while (!feof (File.fp));
+	vStringDelete (line);
 }
 
 extern parserDefinition* BetaParser (void)

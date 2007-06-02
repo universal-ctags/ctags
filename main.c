@@ -302,6 +302,7 @@ static boolean createTagsForEntry (const char *const entryName)
 	else
 		resize = parseFile (entryName);
 
+	eStatFree (status);
 	return resize;
 }
 

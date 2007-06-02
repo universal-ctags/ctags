@@ -519,12 +519,9 @@ static void makeLabelTag (vString *const label)
 
 static lineType getLineType (void)
 {
-	static vString *label = NULL;
+	vString *label = vStringNew ();
 	int column = 0;
 	lineType type = LTYPE_UNDETERMINED;
-
-	if (label == NULL)
-		label = vStringNew ();
 
 	do  /* read in first 6 "margin" characters */
 	{
@@ -589,8 +586,8 @@ static lineType getLineType (void)
 	{
 		vStringTerminate (label);
 		makeLabelTag (label);
-		vStringClear (label);
 	}
+	vStringDelete (label);
 	return type;
 }
 
@@ -768,11 +765,7 @@ static void ungetChar (const int c)
  */
 static vString *parseInteger (int c)
 {
-	static vString *string = NULL;
-
-	if (string == NULL)
-		string = vStringNew ();
-	vStringClear (string);
+	vString *string = vStringNew ();
 
 	if (c == '-')
 	{
@@ -801,23 +794,26 @@ static vString *parseInteger (int c)
 
 static vString *parseNumeric (int c)
 {
-	static vString *string = NULL;
-
-	if (string == NULL)
-		string = vStringNew ();
-	vStringCopy (string, parseInteger (c));
+	vString *string = vStringNew ();
+	vString *integer = parseInteger (c);
+	vStringCopy (string, integer);
+	vStringDelete (integer);
 
 	c = getChar ();
 	if (c == '.')
 	{
+		integer = parseInteger ('\0');
 		vStringPut (string, c);
-		vStringCat (string, parseInteger ('\0'));
+		vStringCat (string, integer);
+		vStringDelete (integer);
 		c = getChar ();
 	}
 	if (tolower (c) == 'e')
 	{
+		integer = parseInteger ('\0');
 		vStringPut (string, c);
-		vStringCat (string, parseInteger ('\0'));
+		vStringCat (string, integer);
+		vStringDelete (integer);
 	}
 	else
 		ungetChar (c);
@@ -873,13 +869,12 @@ static void parseIdentifier (vString *const string, const int firstChar)
  */
 static keywordId analyzeToken (vString *const name)
 {
-	static vString *keyword = NULL;
+	vString *keyword = vStringNew ();
 	keywordId id;
 
-	if (keyword == NULL)
-		keyword = vStringNew ();
 	vStringCopyToLower (keyword, name);
 	id = (keywordId) lookupKeyword (vStringValue (keyword), Lang_fortran);
+	vStringDelete (keyword);
 
 	return id;
 }
@@ -1046,7 +1041,9 @@ getNextChar:
 				readIdentifier (token, c);
 			else if (isdigit (c))
 			{
-				vStringCat (token->string, parseNumeric (c));
+				vString *numeric = parseNumeric (c);
+				vStringCat (token->string, numeric);
+				vStringDelete (numeric);
 				token->type = TOKEN_NUMERIC;
 			}
 			else
@@ -1968,7 +1965,7 @@ static void parseInternalSubprogramPart (tokenInfo *const token)
 }
 
 /*  module is
- *      mudule-stmt (is MODULE module-name)
+ *      module-stmt (is MODULE module-name)
  *          [specification-part]
  *          [module-subprogram-part]
  *          end-module-stmt (is END [MODULE [module-name]])

@@ -129,13 +129,12 @@ static void buildAsmKeywordHash (void)
 
 static opKeyword analyzeOperator (const vString *const op)
 {
-	static vString *keyword = NULL;
-	opKeyword result = OP_UNDEFINED;
+	vString *keyword = vStringNew ();
+	opKeyword result;
 
-	if (keyword == NULL)
-		keyword = vStringNew ();
 	vStringCopyToLower (keyword, op);
 	result = (opKeyword) lookupKeyword (vStringValue (keyword), Lang_asm);
+	vStringDelete (keyword);
 	return result;
 }
 

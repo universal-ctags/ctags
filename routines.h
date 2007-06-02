@@ -84,6 +84,7 @@ typedef struct {
 extern void freeRoutineResources (void);
 extern void setExecutableName (const char *const path);
 extern const char *getExecutableName (void);
+extern const char *getExecutablePath (void);
 extern void error (const errorSelection selection, const char *const format, ...) __printf__ (2, 3);
 
 /* Memory allocation functions */
@@ -111,6 +112,7 @@ extern char* newUpperString (const char* str);
 /* File system functions */
 extern void setCurrentDirectory (void);
 extern fileStatus *eStat (const char *const fileName);
+extern void eStatFree (fileStatus *status);
 extern boolean doesFileExist (const char *const fileName);
 extern boolean isRecursiveLink (const char* const dirName);
 extern boolean isSameFile (const char *const name1, const char *const name2);

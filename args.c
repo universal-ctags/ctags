@@ -150,8 +150,8 @@ static char* nextFileLine (FILE* const fp)
 			vStringStripTrailing (vs);
 			result = xMalloc (vStringLength (vs) + 1, char);
 			strcpy (result, vStringValue (vs));
-			vStringDelete (vs);
 		}
+		vStringDelete (vs);
 	}
 	return result;
 }

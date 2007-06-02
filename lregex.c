@@ -101,7 +101,7 @@ static int SetUpper = -1;  /* upper language index in list */
 
 static void clearPatternSet (const langType language)
 {
-	if (language < SetUpper)
+	if (language <= SetUpper)
 	{
 		patternSet* const set = Sets + language;
 		unsigned int i;
@@ -117,6 +117,10 @@ static void clearPatternSet (const langType language)
 			{
 				eFree (set->patterns [i].u.tag.name_pattern);
 				set->patterns [i].u.tag.name_pattern = NULL;
+				eFree (set->patterns [i].u.tag.kind.name);
+				set->patterns [i].u.tag.kind.name = NULL;
+				eFree (set->patterns [i].u.tag.kind.description);
+				set->patterns [i].u.tag.kind.description = NULL;
 			}
 		}
 		if (set->patterns != NULL)

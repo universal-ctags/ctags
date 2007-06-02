@@ -453,6 +453,8 @@ extern void testEtagsInvocation (void)
 		verbose ("Running in etags mode\n");
 		setEtagsMode ();
 	}
+	eFree (execName);
+	eFree (etags);
 }
 
 /*
@@ -487,13 +489,13 @@ static void parseLongOption (cookedArgs *const args, const char *item)
 	const char* const equal = strchr (item, '=');
 	if (equal == NULL)
 	{
-		args->item = eStrdup (item);
+		args->item = eStrdup (item); /* FIXME: memory leak. */
 		args->parameter = "";
 	}
 	else
 	{
 		const size_t length = equal - item;
-		args->item = xMalloc (length + 1, char);
+		args->item = xMalloc (length + 1, char); /* FIXME: memory leak. */
 		strncpy (args->item, item, length);
 		args->item [length] = '\0';
 		args->parameter = equal + 1;

@@ -250,6 +250,7 @@ static void findPascalTags (void)
 			}
 		}  /* while not eof */
 	}
+	vStringDelete (name);
 }
 
 extern parserDefinition* PascalParser (void)

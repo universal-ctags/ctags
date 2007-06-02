@@ -41,6 +41,7 @@ extern void freeSourceFileResources (void)
 	vStringDelete (File.name);
 	vStringDelete (File.path);
 	vStringDelete (File.source.name);
+	eFree (File.source.tagPath);
 	vStringDelete (File.line);
 }
 
