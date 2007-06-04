@@ -12,7 +12,8 @@ ctags-NEXT (Mon June 4 2007)
   Patch #1458930].
 * Added support for numerous revision control systems including Bazaar and
   Mercurial [Bug #1472894].
-* Added support for enums [Java, Bug #1517143].
+* Added support for enums [Java, Bug #1730485, Bug #1517143, Patch #1027395,
+  Patch #1528507].
 * Added support for multiple-level namespace declarations [C#].
 * Fixed typo in man page [Debian bug #366412].
 * Fixed missing chunk of text in man page and over-use of hyphens in UTF-8
@@ -43,7 +44,7 @@ ctags-5.6 (Mon May 29 2006)
 * Added .mk as extension recognized as a make language file [Make].
 * Added missing help for list-maps options [Bug #1201826].
 * Added new extension field "typeref" [thanks to Bram Moolenaar].
-* Extended functionality of Ruby parser with patch from Elliot Hughes [Ruby].
+* Extended functionality of Ruby parser with patch from Elliott Hughes [Ruby].
 * Fixed creation of TAGS file with etags-include but no files [Bug #941233].
 * Fixed problem reading last line of list file (-L) without final newline.
 * Fixed infinite loop that could occur on files without final newline [C, Java].
