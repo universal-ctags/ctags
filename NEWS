@@ -1,7 +1,8 @@
 Current Version: @@VERSION@@
 
 ctags-NEXT (Mon June 4 2007)
-* Added support for arbitrary nesting depth [Python, Bug #1684786].
+* Added support for arbitrary nesting depth [Python, Bug #1684786, Debian
+  bug #409078].
 * Added support for verbatim string literals [C#, Bug #1515910].
 * Fixed parsing of annotations [Java, Bug #1691412].
 * Fixed block-comment parsing [Verilog, Patch #1458042, Bug #960316, Bug
@@ -14,6 +15,8 @@ ctags-NEXT (Mon June 4 2007)
 * Added support for enums [Java, Bug #1517143].
 * Added support for multiple-level namespace declarations [C#].
 * Fixed typo in man page [Debian bug #366412].
+* Fixed missing chunk of text in man page and over-use of hyphens in UTF-8
+  locales [Debian bug #271323].
 * Fixed parsing of ` as a method name [Ruby].
 * Added .svn to list of directories ignored during recursion (--recurse).
 * Added support for BlitzBasic, PureBasic and FreeBasic [FR #1100506].
