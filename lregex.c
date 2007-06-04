@@ -107,20 +107,24 @@ static void clearPatternSet (const langType language)
 		unsigned int i;
 		for (i = 0  ;  i < set->count  ;  ++i)
 		{
+			regexPattern *p = &set->patterns [i];
 #if defined (POSIX_REGEX)
-			regfree (set->patterns [i].pattern);
+			regfree (p->pattern);
 #endif
-			eFree (set->patterns [i].pattern);
-			set->patterns [i].pattern = NULL;
+			eFree (p->pattern);
+			p->pattern = NULL;
 
-			if (set->patterns [i].type == PTRN_TAG)
+			if (p->type == PTRN_TAG)
 			{
-				eFree (set->patterns [i].u.tag.name_pattern);
-				set->patterns [i].u.tag.name_pattern = NULL;
-				eFree (set->patterns [i].u.tag.kind.name);
-				set->patterns [i].u.tag.kind.name = NULL;
-				eFree (set->patterns [i].u.tag.kind.description);
-				set->patterns [i].u.tag.kind.description = NULL;
+				eFree (p->u.tag.name_pattern);
+				p->u.tag.name_pattern = NULL;
+				eFree (p->u.tag.kind.name);
+				p->u.tag.kind.name = NULL;
+				if (p->u.tag.kind.description != NULL)
+				{
+					eFree (p->u.tag.kind.description);
+					p->u.tag.kind.description = NULL;
+				}
 			}
 		}
 		if (set->patterns != NULL)
