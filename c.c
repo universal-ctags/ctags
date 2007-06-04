@@ -316,17 +316,19 @@ static kindOption CsharpKinds [] = {
 /* Used to index into the JavaKinds table. */
 typedef enum {
 	JK_UNDEFINED = -1,
-	JK_CLASS, JK_FIELD, JK_INTERFACE, JK_LOCAL, JK_METHOD,
-	JK_PACKAGE, JK_ACCESS, JK_CLASS_PREFIX
+	JK_CLASS, JK_ENUM_CONSTANT, JK_FIELD, JK_ENUM, JK_INTERFACE,
+	JK_LOCAL, JK_METHOD, JK_PACKAGE, JK_ACCESS, JK_CLASS_PREFIX
 } javaKind;
 
 static kindOption JavaKinds [] = {
-	{ TRUE,  'c', "class",     "classes"},
-	{ TRUE,  'f', "field",     "fields"},
-	{ TRUE,  'i', "interface", "interfaces"},
-	{ FALSE, 'l', "local",     "local variables"},
-	{ TRUE,  'm', "method",    "methods"},
-	{ TRUE,  'p', "package",   "packages"},
+	{ TRUE,  'c', "class",         "classes"},
+	{ TRUE,  'e', "enum constant", "enum constants"},
+	{ TRUE,  'f', "field",         "fields"},
+	{ TRUE,  'g', "enum",          "enum types"},
+	{ TRUE,  'i', "interface",     "interfaces"},
+	{ FALSE, 'l', "local",         "local variables"},
+	{ TRUE,  'm', "method",        "methods"},
+	{ TRUE,  'p', "package",       "packages"},
 };
 
 /* Used to index into the VeraKinds table. */
@@ -845,17 +847,14 @@ static javaKind javaTagKind (const tagType type)
 	javaKind result = JK_UNDEFINED;
 	switch (type)
 	{
-		case TAG_CLASS:     result = JK_CLASS;     break;
-		
-		/* Bug #1517143. Treat Java enums as classes. */
-		case TAG_ENUM:      result = JK_CLASS;     break;
-		case TAG_ENUMERATOR:result = JK_FIELD;     break;
-		
-		case TAG_FIELD:     result = JK_FIELD;     break;
-		case TAG_INTERFACE: result = JK_INTERFACE; break;
-		case TAG_LOCAL:     result = JK_LOCAL;     break;
-		case TAG_METHOD:    result = JK_METHOD;    break;
-		case TAG_PACKAGE:   result = JK_PACKAGE;   break;
+		case TAG_CLASS:      result = JK_CLASS;         break;
+		case TAG_ENUM:       result = JK_ENUM;          break;
+		case TAG_ENUMERATOR: result = JK_ENUM_CONSTANT; break;
+		case TAG_FIELD:      result = JK_FIELD;         break;
+		case TAG_INTERFACE:  result = JK_INTERFACE;     break;
+		case TAG_LOCAL:      result = JK_LOCAL;         break;
+		case TAG_METHOD:     result = JK_METHOD;        break;
+		case TAG_PACKAGE:    result = JK_PACKAGE;       break;
 
 		default: Assert ("Bad Java tag type" == NULL); break;
 	}
@@ -2705,6 +2704,13 @@ static void tagCheck (statementInfo *const st)
 					qualifyVariableTag (st, prev2);
 				else
 					qualifyFunctionDeclTag (st, prev2);
+			}
+			if (isLanguage (Lang_java) && token->type == TOKEN_SEMICOLON && insideEnumBody (st))
+			{
+				/* In Java, after an initial enum-like part,
+				 * a semicolon introduces a class-like part.
+				 * See Bug #1730485 for the full rationale. */
+				st->parent->declaration = DECL_CLASS;
 			}
 			break;
 
