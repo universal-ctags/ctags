@@ -1,6 +1,7 @@
 Current Version: @@VERSION@@
 
-ctags-NEXT (Mon May 28 2007)
+ctags-NEXT (Mon June 4 2007)
+* Added support for arbitrary nesting depth [Python, Bug #1684786].
 * Added support for verbatim string literals [C#, Bug #1515910].
 * Fixed parsing of annotations [Java, Bug #1691412].
 * Fixed block-comment parsing [Verilog, Patch #1458042, Bug #960316, Bug
