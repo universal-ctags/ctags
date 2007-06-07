@@ -86,6 +86,7 @@ extern vString *vStringNew (void)
 	return string;
 }
 
+#ifndef VSTRING_PUTC_MACRO
 extern void vStringPut (vString *const string, const int c)
 {
 	if (string->length == string->size)  /*  check for buffer overflow */
@@ -95,6 +96,7 @@ extern void vStringPut (vString *const string, const int c)
 	if (c != '\0')
 		string->length++;
 }
+#endif
 
 extern void vStringCatS (vString *const string, const char *const s)
 {
