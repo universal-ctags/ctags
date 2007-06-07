@@ -89,12 +89,12 @@ extern vString *vStringNew (void)
 #ifndef VSTRING_PUTC_MACRO
 extern void vStringPut (vString *const string, const int c)
 {
-	if (string->length == string->size)  /*  check for buffer overflow */
+	if (string->length + 1 == string->size)  /*  check for buffer overflow */
 		vStringAutoResize (string);
 
 	string->buffer [string->length] = c;
 	if (c != '\0')
-		string->length++;
+		string->buffer [++string->length] = '\0';
 }
 #endif
 
@@ -102,7 +102,7 @@ extern void vStringCatS (vString *const string, const char *const s)
 {
 #if 1
 	const size_t len = strlen (s);
-	while (string->length + len >= string->size)/*  check for buffer overflow */
+	while (string->length + len + 1 >= string->size)/*  check for buffer overflow */
 		vStringAutoResize (string);
 	strcpy (string->buffer + string->length, s);
 	string->length += len;

@@ -23,6 +23,16 @@
 /*
 *   MACROS
 */
+#ifndef DEBUG
+# define VSTRING_PUTC_MACRO 1
+#endif
+#ifdef VSTRING_PUTC_MACRO
+#define vStringPut(s,c) \
+	(void)(((s)->length + 1 == (s)->size ? vStringAutoResize (s) : 0), \
+	((s)->buffer [(s)->length] = (c)), \
+	((c) == '\0' ? 0 : ((s)->buffer [++(s)->length] = '\0')))
+#endif
+
 #define vStringValue(vs)      ((vs)->buffer)
 #define vStringItem(vs,i)     ((vs)->buffer[i])
 #define vStringLength(vs)     ((vs)->length)
@@ -35,16 +45,6 @@
 #define vStringTerminate(vs)  vStringPut(vs, '\0')
 #define vStringLower(vs)      toLowerString((vs)->buffer)
 #define vStringUpper(vs)      toUpperString((vs)->buffer)
-
-#ifndef DEBUG
-# define VSTRING_PUTC_MACRO 1
-#endif
-#ifdef VSTRING_PUTC_MACRO
-#define vStringPut(s,c) \
-	(void)(((s)->length == (s)->size ? vStringAutoResize (s) : 0), \
-	((s)->buffer [(s)->length++] = (c)), \
-	((c) == '\0' ? (s)->length-- : 0))
-#endif
 
 /*
 *   DATA DECLARATIONS
