@@ -1472,6 +1472,14 @@ static void readIdentifier (tokenInfo *const token, const int firstChar)
 
 	initToken (token);
 
+	/* Bug #1585745: strangely, C++ destructors allow whitespace between
+	 * the ~ and the class name. */
+	if (isLanguage (Lang_cpp) && firstChar == '~')
+	{
+		vStringPut (name, c);
+		c = skipToNonWhite ();
+	}
+
 	do
 	{
 		vStringPut (name, c);
