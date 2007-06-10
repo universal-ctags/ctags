@@ -718,7 +718,6 @@ static void initMemberInfo (statementInfo *const st)
 			accessDefault = (isLanguage (Lang_java) ? ACCESS_PUBLIC : ACCESS_UNDEFINED);
 			break;
 		case DECL_NAMESPACE:
-		case DECL_UNION:
 			accessDefault = ACCESS_UNDEFINED;
 			break;
 
@@ -731,6 +730,7 @@ static void initMemberInfo (statementInfo *const st)
 
 		case DECL_INTERFACE:
 		case DECL_STRUCT:
+		case DECL_UNION:
 			accessDefault = ACCESS_PUBLIC;
 			break;
 
