@@ -29,6 +29,7 @@ ctags-NEXT (Mon June 6 2007)
 * Fixed missing chunk of text in man page and over-use of hyphens in UTF-8 locales [Debian bug #271323].
 * Fixed parsing of ` as a method name [Ruby].
 * Fixed potential segmentation violation [Bug #1672834].
+* Fixed parsing of destructors with whitespace after the '~' [C++, Bug #1585745].
 
 ctags-5.6 (Mon May 29 2006)
 * Reformatted code for independence of tab stop setting.
