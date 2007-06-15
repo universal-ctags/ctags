@@ -46,17 +46,33 @@ static kindOption PhpKinds [] = {
 
 /* JavaScript patterns are duplicated in jscript.c */
 
+/*
+ * Cygwin doesn't support non-ASCII characters in character classes.
+ * This isn't a good solution to the underlying problem, because we're still
+ * making assumptions about the character encoding.
+ * Really, these regular expressions need to concentrate on what marks the
+ * end of an identifier, and we need something like iconv to take into
+ * account the user's locale (or an override on the command-line.)
+ */
+#ifdef __CYGWIN__
+#define ALPHA "[:alpha:]"
+#define ALNUM "[:alnum:]"
+#else
+#define ALPHA "A-Za-z\x7f-\xff"
+#define ALNUM "0-9A-Za-z\x7f-\xff"
+#endif
+
 static void installPHPRegex (const langType language)
 {
-	addTagRegex(language, "(^|[ \t])class[ \t]+([A-Za-z\x7F-\xFF_][0-9A-Za-z\x7F-\xFF_]*)",
+	addTagRegex(language, "(^|[ \t])class[ \t]+([" ALPHA "_][" ALNUM "_]*)",
 		"\\2", "c,class,classes", NULL);
-	addTagRegex(language, "(^|[ \t])interface[ \t]+([A-Za-z\x7F-\xFF_][0-9A-Za-z\x7F-\xFF_]*)",
+	addTagRegex(language, "(^|[ \t])interface[ \t]+([" ALPHA "_][" ALNUM "_]*)",
 		"\\2", "i,interface,interfaces", NULL);
-	addTagRegex(language, "(^|[ \t])define[ \t]*\\([ \t]*['\"]?([A-Za-z\x7F-\xFF_][0-9A-Za-z\x7F-\xFF_]*)",
+	addTagRegex(language, "(^|[ \t])define[ \t]*\\([ \t]*['\"]?([" ALPHA "_][" ALNUM "_]*)",
 		"\\2", "d,define,constant definitions", NULL);
-	addTagRegex(language, "(^|[ \t])function[ \t]+&?[ \t]*([A-Za-z\x7F-\xFF_][0-9A-Za-z\x7F-\xFF_]*)",
+	addTagRegex(language, "(^|[ \t])function[ \t]+&?[ \t]*([" ALPHA "_][" ALNUM "_]*)",
 		"\\2", "f,function,functions", NULL);
-	addTagRegex(language, "(^|[ \t])\\$([A-Za-z\x7F-\xFF_][0-9A-Za-z\x7F-\xFF_]*)[ \t]*=",
+	addTagRegex(language, "(^|[ \t])\\$([" ALPHA "_][" ALNUM "_]*)[ \t]*=",
 		"\\2", "v,variable,variables", NULL);
 
 	/* function regex is covered by PHP regex */
@@ -68,7 +84,7 @@ static void installPHPRegex (const langType language)
 		"\\3", "j,jsfunction,javascript functions", NULL);
 }
 
-/* Create parser definition stucture */
+/* Create parser definition structure */
 extern parserDefinition* PhpParser (void)
 {
 	static const char *const extensions [] = { "php", "php3", "phtml", NULL };
