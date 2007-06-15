@@ -68,13 +68,6 @@ extern void debugCppIgnore (const boolean ignore)
 	debugPrintf (DEBUG_CPP, "<*cpp:%s ignore*>", ignore ? "begin":"end");
 }
 
-extern void clearString (char *const string, const int length)
-{
-	int i;
-	for (i = 0 ; i < length ; ++i)
-		string [i] = '\0';
-}
-
 extern void debugEntry (const tagEntryInfo *const tag)
 {
 	const char *const scope = tag->isFileScope ? "{fs}" : "";

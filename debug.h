@@ -63,7 +63,6 @@ extern void debugPutc (const int level, const int c);
 extern void debugParseNest (const boolean increase, const unsigned int level);
 extern void debugCppNest (const boolean begin, const unsigned int level);
 extern void debugCppIgnore (const boolean ignore);
-extern void clearString (char *const string, const int length);
 extern void debugEntry (const tagEntryInfo *const tag);
 
 #endif  /* _DEBUG_H */

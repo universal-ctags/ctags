@@ -60,7 +60,7 @@ extern void vStringClear (vString *const string)
 {
 	string->length = 0;
 	string->buffer [0] = '\0';
-	DebugStatement ( clearString (string->buffer, string->size); )
+	DebugStatement ( memset (string->buffer, 0, string->size); )
 }
 
 extern void vStringDelete (vString *const string)
