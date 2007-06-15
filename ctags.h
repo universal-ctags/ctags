@@ -17,10 +17,11 @@
 #ifndef PROGRAM_VERSION
 # define PROGRAM_VERSION "@@VERSION@@"
 #endif
-#define PROGRAM_NAME  "Exuberant Ctags"
-#define PROGRAM_URL   "http://ctags.sourceforge.net"
-#define AUTHOR_NAME   "Darren Hiebert"
-#define AUTHOR_EMAIL  "dhiebert@users.sourceforge.net"
+#define PROGRAM_NAME      "Exuberant Ctags"
+#define PROGRAM_URL       "http://ctags.sourceforge.net"
+#define PROGRAM_COPYRIGHT "Copyright (C) 1996-2007"
+#define AUTHOR_NAME       "Darren Hiebert"
+#define AUTHOR_EMAIL      "dhiebert@users.sourceforge.net"
 
 #endif	/* _CTAGS_H */
 
