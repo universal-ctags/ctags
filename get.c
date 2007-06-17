@@ -66,7 +66,7 @@ typedef struct sCppState {
 	boolean hasAtLiteralStrings; /* supports @"c:\" strings */
 	struct sDirective {
 		enum eState state;       /* current directive being processed */
-		boolean	accept;          /* is a directive syntatically permitted? */
+		boolean	accept;          /* is a directive syntactically permitted? */
 		vString * name;          /* macro name */
 		unsigned int nestLevel;  /* level 0 is not used */
 		conditionalInfo ifdef [MaxCppNestingLevel];
@@ -435,7 +435,7 @@ static Comment isComment (void)
 }
 
 /*  Skips over a C style comment. According to ANSI specification a comment
- *  is treated as white space, so we perform this subsitution.
+ *  is treated as white space, so we perform this substitution.
  */
 int skipOverCComment (void)
 {
