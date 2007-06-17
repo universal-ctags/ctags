@@ -142,8 +142,6 @@ static kindOption EiffelKinds [] = {
 
 #endif
 
-static langType Lang_eiffel;
-
 static jmp_buf Exception;
 
 static const keywordDesc EiffelKeywordTable [] = {
