@@ -16,6 +16,7 @@
 #include "general.h"  /* must always come first */
 
 #include <string.h>
+#include <stdio.h>
 
 #include "get.h"
 #include "entry.h"
@@ -312,7 +313,7 @@ static char *readCategoryTag(void)
  * line of whatever we are emitting.
  */
 static unsigned recordedLineno = 0;
-static unsigned recordedPos = 0;
+static fpos_t recordedPos;
 static void recordPosition(void)
 {
 	recordedLineno = getSourceLineNumber();
