@@ -1,6 +1,7 @@
 Current Version: @@VERSION@@
 
 ctags-NEXT (Mon June 6 2007)
+* Added support for DIM AS [Freebasic, Bug #1741778].
 * Added support for arbitrary nesting depth [Python, Bug #1684786, Debian bug #409078].
 * Added support for verbatim string literals [C#, Bug #1515910].
 * Added support for .ctags as well as ctags.cnf on Windows [Bug #1246506].
