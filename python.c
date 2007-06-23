@@ -289,7 +289,7 @@ static boolean constructParentString(NestingLevels *nls, int indent,
 
 static NestingLevels *newNestingLevels(void)
 {
-	NestingLevels *nls = eCalloc(1, sizeof *nls);
+	NestingLevels *nls = xCalloc (1, NestingLevels);
 	return nls;
 }
 
@@ -302,7 +302,7 @@ static void freeNestingLevels(NestingLevels *nls)
 	eFree(nls);
 }
 
-/* TODO: This is totally out of place in pythonc, but strlist.h is not useable.
+/* TODO: This is totally out of place in python.c, but strlist.h is not usable.
  * Maybe should just move these three functions to a separate file, even if no
  * other parser uses them.
  */
@@ -322,8 +322,8 @@ static void addNestingLevel(NestingLevels *nls, int indentation,
 		if (i >= nls->allocated)
 		{
 			nls->allocated++;
-			nls->levels = eRealloc(nls->levels,
-				nls->allocated * sizeof *nls->levels);
+			nls->levels = xRealloc(nls->levels,
+				nls->allocated, NestingLevel);
 			nls->levels[i].name = vStringNew();
 		}
 		nl = nls->levels + i;
