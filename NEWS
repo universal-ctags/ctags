@@ -5,7 +5,7 @@ ctags-NEXT (Mon June 6 2007)
 * Added support for arbitrary nesting depth [Python, Bug #1684786, Debian bug #409078].
 * Added support for verbatim string literals [C#, Bug #1515910].
 * Added support for .ctags as well as ctags.cnf on Windows [Bug #1246506].
-* Added support for non-extern, non-static functions returning wchar_t [C++, Patch #1458930].
+* Added support for non-extern, non-static functions returning wchar_t, contributed by Aaron Peromsik [C++, Patch #1458930].
 * Added support for numerous revision control systems including Bazaar and Mercurial [Bug #1472894].
 * Added support for enums [Java, Bug #1730485, Bug #1517143, Patch #1027395, Patch #1528507].
 * Added support for multiple-level namespace declarations [C#].
@@ -32,6 +32,7 @@ ctags-NEXT (Mon June 6 2007)
 * Fixed potential segmentation violation [Bug #1672834, Bug #1222926].
 * Fixed parsing of destructors with whitespace after the '~' [C++, Bug #1585745].
 * Fixed default access of unions to be public [C++, Bug #1548443].
+* Fixed various memory leaks, mostly contributed by Dmitry Antipov.
 
 ctags-5.6 (Mon May 29 2006)
 * Reformatted code for independence of tab stop setting.
