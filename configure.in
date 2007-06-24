@@ -21,7 +21,7 @@ dnl -------------------------
 dnl CHECK_HEADER_DEFINE(LABEL, HEADER [,ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ] ])
 AC_DEFUN(CHECK_HEADER_DEFINE,
 [
-	AC_MSG_CHECKING("if $1 is defined in $2")
+	AC_MSG_CHECKING(if $1 is defined in $2)
 	AC_EGREP_CPP(yes,
 [#include <$2>
 #ifdef $1
@@ -123,7 +123,7 @@ AC_PROG_CC
 
 case `uname` in
 	HP-UX)
-		AC_MSG_CHECKING("HP-UX native compiler")
+		AC_MSG_CHECKING(HP-UX native compiler)
 		if test "$CC" = "cc"; then
 			AC_MSG_RESULT(yes; adding compiler options for ANSI support)
 			CFLAGS="$CFLAGS -Aa -D_HPUX_SOURCE"
@@ -133,7 +133,7 @@ case `uname` in
 		;;
 	SunOS)
 		if uname -r | grep '5\.' >/dev/null 2>&1; then
-			AC_MSG_CHECKING("Solaris native compiler")
+			AC_MSG_CHECKING(Solaris native compiler)
 			if test "$CC" = "cc" -a "`which cc`" = "/usr/ucb/cc"; then
 				AC_MSG_RESULT(yes; adding compiler option for ANSI support)
 				CC="$CC -Xa"
@@ -182,7 +182,7 @@ if test yes = "$interpval"; then
 fi
 
 dnl Test for case-insensitive filenames
-AC_MSG_CHECKING("for case-insensitive filenames")
+AC_MSG_CHECKING(for case-insensitive filenames)
 touch conftest.cif
 if test -f CONFTEST.CIF; then
 	AC_MSG_RESULT(yes)
@@ -242,14 +242,14 @@ dnl -------------------
 AC_TYPE_SIZE_T
 AC_TYPE_OFF_T
 
-AC_MSG_CHECKING("for fpos_t")
+AC_MSG_CHECKING(for fpos_t)
 AC_EGREP_HEADER(fpos_t, stdio.h, AC_MSG_RESULT(yes),
 [
 	AC_MSG_RESULT(no)
 	AC_DEFINE(fpos_t, long)
 ])
 
-AC_MSG_CHECKING("for clock_t")
+AC_MSG_CHECKING(for clock_t)
 AC_EGREP_HEADER(clock_t, time.h, AC_MSG_RESULT(yes),
 [
 	AC_MSG_RESULT(no)
@@ -328,7 +328,7 @@ if test "$have_setenv" != yes ; then
 	if test "$have_putenv" = yes ; then
 		AC_EGREP_HEADER(putenv, stdlib.h, have_putenv_prototype=yes)
 		if test "$have_putenv_prototype" = yes ; then
-			AC_MSG_CHECKING("putenv prototype")
+			AC_MSG_CHECKING(putenv prototype)
 			AC_EGREP_HEADER([[^A-Za-zo-9_]putenv[ 	]*\(.*const.*\)[ 	]*;],
 				stdlib.h, AC_MSG_RESULT(correct),
 				[
@@ -382,7 +382,7 @@ dnl fi
 
 dnl Checks for missing prototypes
 dnl -----------------------------
-AC_CHECKING("for missing prototypes")
+AC_CHECKING(for missing prototypes)
 
 AC_DEFUN(CHECK_PROTO, [AC_EGREP_HEADER([[^A-Za-z0-9_]$1([ 	]+[A-Za-z0-9_]*)?\(], $2,, AC_DEFINE(patsubst([NEED_PROTO_NAME], [NAME], translit($1, [a-z], [A-Z]))) AC_MSG_RESULT(adding prototype for $1))])
 
