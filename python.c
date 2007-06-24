@@ -310,7 +310,7 @@ static void addNestingLevel(NestingLevels *nls, int indentation,
 	vString *name, boolean is_class)
 {
 	int i;
-	NestingLevel *nl;
+	NestingLevel *nl = NULL;
 
 	for (i = 0; i < nls->n; i++)
 	{
