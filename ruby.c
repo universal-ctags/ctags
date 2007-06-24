@@ -346,7 +346,7 @@ static void findRubyTags (void)
 
 		while (*cp != '\0')
 		{
-			/* FIXME: we don't cope with here documents, or string literals,
+			/* FIXME: we don't cope with here documents,
 			* or regular expression literals, or ... you get the idea.
 			* Hopefully, the restriction above that insists on seeing
 			* definitions at the starts of lines should keep us out of
@@ -373,6 +373,15 @@ static void findRubyTags (void)
 				/* Leave the most recent scope. */
 				vStringDelete (stringListLast (nesting));
 				stringListRemoveLast (nesting);
+			}
+			else if (*cp == '"')
+			{
+				/* Skip string literals.
+				 * FIXME: should cope with escapes and interpolation.
+				 */
+				do {
+					++cp;
+				} while (*cp != 0 && *cp != '"');
 			}
 			else if (*cp != '\0')
 			{
