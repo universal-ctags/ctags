@@ -10,9 +10,9 @@
 *   (Hardware Description Language).
 * 
 *   Language definition documents:
-*       http://www.eg.bucknell.edu/~cs320/1995-fall/verilog-manual.html
+*       http://www.eg.bucknell.edu/~cs320/verilog/verilog-manual.html
 *       http://www.sutherland-hdl.com/on-line_ref_guide/vlog_ref_top.html
-*       http://home.europa.com/~celiac/VerilogBNF.html
+*       http://www.verilog.com/VerilogBNF.html
 *       http://eesun.free.fr/DOC/VERILOG/verilog_manual1.html
 */
 
@@ -253,9 +253,20 @@ static void tagNameList (const verilogKind kind, int c)
 
 static void findTag (vString *const name)
 {
-	const verilogKind kind = (verilogKind)
-			lookupKeyword (vStringValue (name), Lang_verilog);
-	if (kind != K_UNDEFINED)
+	const verilogKind kind = (verilogKind) lookupKeyword (vStringValue (name), Lang_verilog);
+	if (kind == K_CONSTANT && vStringItem (name, 0) == '`')
+	{
+		/* Bug #961001: Verilog compiler directives are line-based. */
+		int c = skipWhite (vGetc ());
+		readIdentifier (name, c);
+		makeSimpleTag (name, VerilogKinds, kind);
+		/* Skip the rest of the line. */
+		do {
+			c = vGetc();
+		} while (c != '\n');
+		vUngetc (c);
+	}
+	else if (kind != K_UNDEFINED)
 	{
 		int c = skipWhite (vGetc ());
 
