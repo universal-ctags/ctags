@@ -30,9 +30,7 @@
 /*
 *   MACROS
 */
-#define MaxFields   6
 
-#define stringValue(a)      #a
 #define activeToken(st)     ((st)->token [(int) (st)->tokenIndex])
 #define parentDecl(st)      ((st)->parent == NULL ? \
                             DECL_NONE : (st)->parent->declaration)
