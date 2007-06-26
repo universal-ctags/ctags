@@ -103,8 +103,14 @@ typedef enum eKeywordId {
 	KEYWORD_foreign,
 	KEYWORD_ml_table,
 	KEYWORD_ml_table_lang,
+	KEYWORD_ml_table_dnet,
+	KEYWORD_ml_table_java,
+	KEYWORD_ml_table_chk,
 	KEYWORD_ml_conn,
 	KEYWORD_ml_conn_lang,
+	KEYWORD_ml_conn_dnet,
+	KEYWORD_ml_conn_java,
+	KEYWORD_ml_conn_chk,
 	KEYWORD_local,
 	KEYWORD_temporary,
 	KEYWORD_drop,
@@ -215,61 +221,67 @@ static kindOption SqlKinds [] = {
 
 static const keywordDesc SqlKeywordTable [] = {
 	/* keyword		keyword ID */
-	{ "as",								KEYWORD_is				},
-	{ "begin",							KEYWORD_begin			},
-	{ "body",							KEYWORD_body			},
-	{ "cursor",							KEYWORD_cursor			},
-	{ "declare",						KEYWORD_declare			},
-	{ "end",							KEYWORD_end				},
-	{ "function",						KEYWORD_function		},
-	{ "if",								KEYWORD_if				},
-	{ "is",								KEYWORD_is				},
-	{ "loop",							KEYWORD_loop			},
-	{ "case",							KEYWORD_case			},
-	{ "for",							KEYWORD_for				},
-	{ "call",							KEYWORD_call			},
-	{ "package",						KEYWORD_package			},
-	{ "pragma",							KEYWORD_pragma			},
-	{ "procedure",						KEYWORD_procedure		},
-	{ "record",							KEYWORD_record			},
-	{ "object",							KEYWORD_object			},
-	{ "ref",							KEYWORD_ref				},
-	{ "rem",							KEYWORD_rem				},
-	{ "return",							KEYWORD_return			},
-	{ "returns",						KEYWORD_returns			},
-	{ "subtype",						KEYWORD_subtype			},
-	{ "table",							KEYWORD_table			},
-	{ "trigger",						KEYWORD_trigger			},
-	{ "type",							KEYWORD_type			},
-	{ "index",							KEYWORD_index			},
-	{ "event",							KEYWORD_event			},
-	{ "publication",					KEYWORD_publication		},
-	{ "service",						KEYWORD_service			},
-	{ "result",							KEYWORD_result			},
-	{ "when",							KEYWORD_when			},
-	{ "then",							KEYWORD_then			},
-	{ "variable",						KEYWORD_variable		},
-	{ "exception",						KEYWORD_exception		},
-	{ "at",								KEYWORD_at				},
-	{ "on",								KEYWORD_on				},
-	{ "primary",						KEYWORD_primary			},
-	{ "references",						KEYWORD_references		},
-	{ "unique",							KEYWORD_unique			},
-	{ "check",							KEYWORD_check			},
-	{ "constraint",						KEYWORD_constraint		},
-	{ "foreign",						KEYWORD_foreign			},
-	{ "ml_add_table_script",			KEYWORD_ml_table		},
-	{ "ml_add_lang_table_script",		KEYWORD_ml_table_lang	},
-	{ "ml_add_connection_script",		KEYWORD_ml_conn			},
-	{ "ml_add_lang_connection_script",	KEYWORD_ml_conn_lang	},
-	{ "local",							KEYWORD_local			},
-	{ "temporary",						KEYWORD_temporary		},
-	{ "drop",							KEYWORD_drop			},
-	{ "view",							KEYWORD_view			},
-	{ "synonym",						KEYWORD_synonym			},
-	{ "handler",						KEYWORD_handler			},
-	{ "comment",						KEYWORD_comment			},
-	{ "go",								KEYWORD_go				}
+	{ "as",								KEYWORD_is				      },
+	{ "begin",							KEYWORD_begin			      },
+	{ "body",							KEYWORD_body			      },
+	{ "cursor",							KEYWORD_cursor			      },
+	{ "declare",						KEYWORD_declare			      },
+	{ "end",							KEYWORD_end				      },
+	{ "function",						KEYWORD_function		      },
+	{ "if",								KEYWORD_if				      },
+	{ "is",								KEYWORD_is				      },
+	{ "loop",							KEYWORD_loop			      },
+	{ "case",							KEYWORD_case			      },
+	{ "for",							KEYWORD_for				      },
+	{ "call",							KEYWORD_call			      },
+	{ "package",						KEYWORD_package			      },
+	{ "pragma",							KEYWORD_pragma			      },
+	{ "procedure",						KEYWORD_procedure		      },
+	{ "record",							KEYWORD_record			      },
+	{ "object",							KEYWORD_object			      },
+	{ "ref",							KEYWORD_ref				      },
+	{ "rem",							KEYWORD_rem				      },
+	{ "return",							KEYWORD_return			      },
+	{ "returns",						KEYWORD_returns			      },
+	{ "subtype",						KEYWORD_subtype			      },
+	{ "table",							KEYWORD_table			      },
+	{ "trigger",						KEYWORD_trigger			      },
+	{ "type",							KEYWORD_type			      },
+	{ "index",							KEYWORD_index			      },
+	{ "event",							KEYWORD_event			      },
+	{ "publication",					KEYWORD_publication		      },
+	{ "service",						KEYWORD_service			      },
+	{ "result",							KEYWORD_result			      },
+	{ "when",							KEYWORD_when			      },
+	{ "then",							KEYWORD_then			      },
+	{ "variable",						KEYWORD_variable		      },
+	{ "exception",						KEYWORD_exception		      },
+	{ "at",								KEYWORD_at				      },
+	{ "on",								KEYWORD_on				      },
+	{ "primary",						KEYWORD_primary			      },
+	{ "references",						KEYWORD_references		      },
+	{ "unique",							KEYWORD_unique			      },
+	{ "check",							KEYWORD_check			      },
+	{ "constraint",						KEYWORD_constraint		      },
+	{ "foreign",						KEYWORD_foreign			      },
+	{ "ml_add_table_script",			KEYWORD_ml_table		      },
+	{ "ml_add_lang_table_script",		KEYWORD_ml_table_lang	      },
+	{ "ml_add_dnet_table_script",		KEYWORD_ml_table_dnet	      },
+	{ "ml_add_java_table_script",		KEYWORD_ml_table_java	      },
+	{ "ml_add_lang_table_script_chk",	KEYWORD_ml_table_chk	      },
+	{ "ml_add_connection_script",		KEYWORD_ml_conn			      },
+	{ "ml_add_lang_connection_script",	KEYWORD_ml_conn_lang	      },
+	{ "ml_add_dnet_connection_script",	KEYWORD_ml_conn_dnet	      },
+	{ "ml_add_java_connection_script",	KEYWORD_ml_conn_java	      },
+	{ "ml_add_lang_conn_script_chk",	KEYWORD_ml_conn_chk 	      },
+	{ "local",							KEYWORD_local			      },
+	{ "temporary",						KEYWORD_temporary		      },
+	{ "drop",							KEYWORD_drop			      },
+	{ "view",							KEYWORD_view			      },
+	{ "synonym",						KEYWORD_synonym			      },
+	{ "handler",						KEYWORD_handler			      },
+	{ "comment",						KEYWORD_comment			      },
+	{ "go",								KEYWORD_go				      }
 };
 
 /*
@@ -1776,8 +1788,14 @@ static void parseSqlFile (tokenInfo *const token)
 			case KEYWORD_index:			parseIndex (token); break;
 			case KEYWORD_ml_table:		parseMLTable (token); break;
 			case KEYWORD_ml_table_lang: parseMLTable (token); break;
+			case KEYWORD_ml_table_dnet: parseMLTable (token); break;
+			case KEYWORD_ml_table_java: parseMLTable (token); break;
+			case KEYWORD_ml_table_chk:  parseMLTable (token); break;
 			case KEYWORD_ml_conn:		parseMLConn (token); break;
 			case KEYWORD_ml_conn_lang:	parseMLConn (token); break;
+			case KEYWORD_ml_conn_dnet:	parseMLConn (token); break;
+			case KEYWORD_ml_conn_java:	parseMLConn (token); break;
+			case KEYWORD_ml_conn_chk:	parseMLConn (token); break;
 			case KEYWORD_package:		parsePackage (token); break;
 			case KEYWORD_procedure:		parseSubProgram (token); break;
 			case KEYWORD_publication:	parsePublication (token); break;
@@ -1789,7 +1807,7 @@ static void parseSqlFile (tokenInfo *const token)
 			case KEYWORD_type:			parseType (token); break;
 			case KEYWORD_variable:		parseVariable (token); break;
 			case KEYWORD_view:			parseView (token); break;
-			default:				break;
+			default:				    break;
 		}
 	} while (! isKeyword (token, KEYWORD_end));
 }
