@@ -149,7 +149,9 @@ static int vGetc (void)
 			c = skipOverCComment();
 		}
 		else
-			Ungetc = c2;
+		{
+			fileUngetc (c2);
+		}
 	}
 	else if (c == '"')  /* strip string contents */
 	{
