@@ -19,8 +19,8 @@
 	AsmParser, \
 	AspParser, \
 	AwkParser, \
+	BasicParser, \
 	BetaParser, \
-	BlitzBasicParser, \
 	CParser, \
 	CppParser, \
 	CsharpParser, \
@@ -28,7 +28,6 @@
 	EiffelParser, \
 	ErlangParser, \
 	FortranParser, \
-	FreeBasicParser, \
 	HtmlParser, \
 	JavaParser, \
 	JavaScriptParser, \
@@ -38,7 +37,6 @@
 	PascalParser, \
 	PerlParser, \
 	PhpParser, \
-	PureBasicParser, \
 	PythonParser, \
 	RexxParser, \
 	RubyParser, \

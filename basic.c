@@ -22,6 +22,7 @@
 #include "options.h"
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -32,8 +33,8 @@ typedef enum {
 	K_FUNCTION,
 	K_LABEL,
 	K_TYPE,
-    K_VARIABLE,
-    K_ENUM
+	K_VARIABLE,
+	K_ENUM
 } BasicKind;
 
 typedef struct {
@@ -117,8 +118,8 @@ static int match_keyword (const char *p, KeyWord const *kw)
 	p += i;
 	for (j = 0; j < 1 + kw->skip; j++)
 	{
-    	p = extract_name (p, name);
-    }	
+		p = extract_name (p, name);
+	}	
 	makeSimpleTag (name, BasicKinds, kw->kind);
 	vStringDelete (name);
 	return 1;
@@ -151,10 +152,18 @@ static void match_dot_label (char const *p)
 	}
 }
 
-static void findBasicTags (KeyWord const keywords[],
-	void (*label) (const char *))
+static void findBasicTags (void)
 {
 	const char *line;
+	const char *extension = fileExtension (vStringValue (File.name));
+	KeyWord *keywords;
+
+	if (strcmp (extension, "bb") == 0)
+		keywords = blitzbasic_keywords;
+	else if (strcmp (extension, "pb") == 0)
+		keywords = purebasic_keywords;
+	else
+		keywords = freebasic_keywords;
 
 	while ((line = (const char *) fileReadLine ()) != NULL)
 	{
@@ -173,55 +182,21 @@ static void findBasicTags (KeyWord const keywords[],
 			if (match_keyword (p, kw)) break;
 
 		/* Is it a label? */
-		label (p);
+		if (strcmp (extension, "bb") == 0)
+			match_dot_label (p);
+		else
+			match_colon_label (p);
 	}
 }
 
-static void findBlitzBasicTags (void)
+parserDefinition *BasicParser (void)
 {
-	findBasicTags (blitzbasic_keywords, match_dot_label);
-}
-
-static void findPureBasicTags (void)
-{
-	findBasicTags (purebasic_keywords, match_colon_label);
-}
-
-static void findFreeBasicTags (void)
-{
-	findBasicTags (freebasic_keywords, match_colon_label);
-}
-
-parserDefinition *BlitzBasicParser (void)
-{
-	static char const *extensions[] = { "bb", NULL };
-	parserDefinition *def = parserNew ("BlitzBasic");
+	static char const *extensions[] = { "bas", "bi", "bb", "pb", NULL };
+	parserDefinition *def = parserNew ("Basic");
 	def->kinds = BasicKinds;
 	def->kindCount = KIND_COUNT (BasicKinds);
 	def->extensions = extensions;
-	def->parser = findBlitzBasicTags;
-	return def;
-}
-
-parserDefinition *PureBasicParser (void)
-{
-	static char const *extensions[] = { "pb", NULL };
-	parserDefinition *def = parserNew ("PureBasic");
-	def->kinds = BasicKinds;
-	def->kindCount = KIND_COUNT (BasicKinds);
-	def->extensions = extensions;
-	def->parser = findPureBasicTags;
-	return def;
-}
-
-parserDefinition *FreeBasicParser (void)
-{
-	static char const *extensions[] = { "bas", "bi", NULL };
-	parserDefinition *def = parserNew ("FreeBasic");
-	def->kinds = BasicKinds;
-	def->kindCount = KIND_COUNT (BasicKinds);
-	def->extensions = extensions;
-	def->parser = findFreeBasicTags;
+	def->parser = findBasicTags;
 	return def;
 }
 
