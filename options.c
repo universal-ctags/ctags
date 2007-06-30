@@ -955,7 +955,7 @@ static void processLanguageForceOption (
 			   "\"--%s\" option is obsolete; use \"--language-force\" instead",
 			   option);
 	if (language == LANG_IGNORE)
-		error (FATAL, "Unknown language specified in \"%s\" option", option);
+		error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 	else
 		Option.language = language;
 }
@@ -1080,7 +1080,7 @@ static void processLanguageMapOption (
 	{
 		char* const next = processLanguageMap (map);
 		if (next == NULL)
-			error (WARNING, "Unknown language specified in \"%s\" option", option);
+			error (WARNING, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		map = next;
 	}
 	eFree (maps);
@@ -1122,7 +1122,7 @@ static void processLanguagesOption (
 			{
 				const langType language = getNamedLanguage (lang);
 				if (language == LANG_IGNORE)
-					error (WARNING, "Unknown language specified in \"%s\" option", option);
+					error (WARNING, "Unknown language \"%s\" in \"%s\" option", lang, option);
 				else
 					enableLanguage (language, (boolean) (mode != Remove));
 			}
@@ -1158,7 +1158,7 @@ static void processListKindsOption (
 	{
 		langType language = getNamedLanguage (parameter);
 		if (language == LANG_IGNORE)
-			error (FATAL, "Unknown language specified in \"%s\" option",option);
+			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
 			printLanguageKinds (language);
 	}
@@ -1175,7 +1175,7 @@ static void processListMapsOption (
 	{
 		langType language = getNamedLanguage (parameter);
 		if (language == LANG_IGNORE)
-			error (FATAL, "Unknown language specified in \"%s\" option",option);
+			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
 			printLanguageMaps (language);
 	}

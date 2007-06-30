@@ -612,7 +612,7 @@ extern boolean processRegexOption (const char *const option,
 		langType language;
 		language = getNamedLanguage (dash + 1);
 		if (language == LANG_IGNORE)
-			error (WARNING, "unknown language in --%s option", option);
+			error (WARNING, "unknown language \"%s\" in --%s option", (dash + 1), option);
 		else
 			processLanguageRegex (language, parameter);
 #else

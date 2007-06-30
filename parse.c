@@ -482,7 +482,7 @@ extern boolean processKindOption (
 		vStringNCopyS (langName, option, dash - option);
 		language = getNamedLanguage (vStringValue (langName));
 		if (language == LANG_IGNORE)
-			error (WARNING, "Unknown language specified in \"%s\" option", option);
+			error (WARNING, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
 		else
 			processLangKindOption (language, option, parameter);
 		vStringDelete (langName);
