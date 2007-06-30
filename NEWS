@@ -1,6 +1,6 @@
 Current Version: @@VERSION@@
 
-ctags-NEXT (Mon June 6 2007)
+ctags-NEXT (Sat June 30 2007)
 * Added support for DIM AS [Freebasic, Bug #1741778].
 * Added support for arbitrary nesting depth [Python, Bug #1684786, Debian bug #409078].
 * Added support for verbatim string literals [C#, Bug #1515910].
@@ -36,6 +36,7 @@ ctags-NEXT (Mon June 6 2007)
 * Fixed various memory leaks, mostly contributed by Dmitry Antipov.
 * Fixed parsing of `define [Verilog, Bug #961001].
 * Fixed crashes involving '/' [Verilog, Bug #1743330].
+* Fixed compilation problem on MinGW [Bug #1517424].
 
 ctags-5.6 (Mon May 29 2006)
 * Reformatted code for independence of tab stop setting.

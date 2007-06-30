@@ -66,6 +66,7 @@
 # define HAVE_DIR_H 1
 # define HAVE_DIRENT_H 1
 # define HAVE__FINDFIRST 1
+# define findfirst_t long
 # define ffblk _finddata_t
 # define FA_DIREC _A_SUBDIR
 # define ff_name name
