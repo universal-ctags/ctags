@@ -233,7 +233,7 @@ static int readTagLine (tagFile *const file)
 static tagResult growFields (tagFile *const file)
 {
 	tagResult result = TagFailure;
-	unsigned short newCount = 2 * file->fields.max;
+	unsigned short newCount = (unsigned short) 2 * file->fields.max;
 	tagExtensionField *newFields = (tagExtensionField*)
 			realloc (file->fields.list, newCount * sizeof (tagExtensionField));
 	if (newFields == NULL)
@@ -294,7 +294,6 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 	int i;
 	char *p = file->line.buffer;
 	char *tab = strchr (p, TAB);
-	int fieldsPresent = 0;
 
 	entry->fields.list = NULL;
 	entry->fields.count = 0;
@@ -310,6 +309,7 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 		tab = strchr (p, TAB);
 		if (tab != NULL)
 		{
+			int fieldsPresent;
 			*tab = '\0';
 			p = tab + 1;
 			if (*p == '/'  ||  *p == '?')
@@ -400,7 +400,7 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 			if (strcmp (key, "TAG_FILE_SORTED") == 0)
 				file->sortMethod = (sortType) atoi (value);
 			else if (strcmp (key, "TAG_FILE_FORMAT") == 0)
-				file->format = atoi (value);
+				file->format = (short) atoi (value);
 			else if (strcmp (key, "TAG_PROGRAM_AUTHOR") == 0)
 				file->program.author = duplicate (value);
 			else if (strcmp (key, "TAG_PROGRAM_NAME") == 0)
@@ -494,7 +494,7 @@ static void terminate (tagFile *const file)
 
 static tagResult readNext (tagFile *const file, tagEntry *const entry)
 {
-	tagResult result = TagFailure;
+	tagResult result;
 	if (file == NULL  ||  ! file->initialized)
 		result = TagFailure;
 	else if (! readTagLine (file))
@@ -650,7 +650,7 @@ static tagResult findSequential (tagFile *const file)
 static tagResult find (tagFile *const file, tagEntry *const entry,
 					   const char *const name, const int options)
 {
-	tagResult result = TagFailure;
+	tagResult result;
 	file->search.name = name;
 	file->search.nameLength = strlen (name);
 	file->search.partial = (options & TAG_PARTIALMATCH) != 0;
@@ -687,7 +687,7 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 
 static tagResult findNext (tagFile *const file, tagEntry *const entry)
 {
-	tagResult result = TagFailure;
+	tagResult result;
 	if ((file->sortMethod == TAG_SORTED      && !file->search.ignorecase) ||
 		(file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase))
 	{
