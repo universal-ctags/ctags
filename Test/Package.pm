@@ -38,6 +38,7 @@ sub quo {
     goto END;
     die;
 END:
+END2  :
     print "END!\n";
     return;
 }

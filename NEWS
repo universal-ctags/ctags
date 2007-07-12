@@ -20,6 +20,7 @@ ctags-NEXT (Sat June 30 2007)
 * Added optional tags for forward variable declarations (e.g. 'struct C;') [C, C++].
 * Changed parsing of option input file (-L) to strip trailing white space.
 * Ignore comments mixed into definitions and declarations [Perl].
+* Fixed detecting labels with whitespace after label name [Perl, Bug #1752361]
 * Fixed parsing of generic classes/interfaces [Java, Bug #1447756].
 * Fixed misidentification of fully qualified function calls as labels [Perl].
 * Fixed parsing of inner classes [Python, Bug #1411963].

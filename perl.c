@@ -262,6 +262,8 @@ static void findPerlTags (void)
 				const unsigned char *p = cp;
 				while (isIdentifier (*p))
 					++p;
+				while (isspace (*p))
+					++p;
 				if ((int) *p == ':' && (int) *(p + 1) != ':')
 					kind = K_LABEL;
 			}
