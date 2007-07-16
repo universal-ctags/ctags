@@ -1278,12 +1278,14 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 					skipArgumentList(token);
 
 				if (isType (token, TOKEN_SEMICOLON)) 
+				{
 					if ( is_class )
 					{
 						makeClassTag (name);
 					} else {
 						makeFunctionTag (name);
 					}
+				}
 			}
 		}
 		else if (isKeyword (token, KEYWORD_NONE))
