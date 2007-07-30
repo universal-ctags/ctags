@@ -6,7 +6,7 @@ Proposal for extended Vi tags file format
 Version: 0.06 DRAFT
    Date: 1998 Feb 8
  Author: Bram Moolenaar <Bram at vim.org>
-    and: Darren Hiebert <darren at users.sourceforge.net>
+    and: Darren Hiebert <dhiebert at users.sourceforge.net>
 
 
 1. Introduction
@@ -38,8 +38,8 @@ To make this proposal into a standard for tags files, it needs to be supported
 by most people working on versions of Vi, ctags, etc..  Currently this
 standard is supported by:
 
-Darren Hiebert <darren at hiebert.com>		Exuberant ctags
-Bram Moolenaar <Bram at vim.org>		Vim (Vi IMproved)
+Darren Hiebert <dhiebert at users.sourceforge.net>   Exuberant ctags
+Bram Moolenaar <Bram at vim.org>                     Vim (Vi IMproved)
 
 These have been or will be asked to support this standard:
 
