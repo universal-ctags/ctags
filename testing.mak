@@ -80,10 +80,11 @@ endif
 
 REF_LINUX_OPTIONS = $(TEST_OPTIONS) --fields=k
 TEST_LINUX_OPTIONS = $(TEST_OPTIONS) --fields=k
-LINUX_DIRECTORY := $(shell ls -dtr /usr/src/darren/* 2>/dev/null | tail -1)
+LINUX_KERNELS_DIRECTORY :=
+LINUX_DIRECTORY := $(shell find $(LINUX_KERNELS_DIRECTORY) -maxdepth 1 -type d -name 'linux-[1-9]*' 2>/dev/null | tail -1)
 ifeq ($(LINUX_DIRECTORY),)
 test.linux:
-	@ echo "No Linux kernel source found in /usr/src/kernels for testing"
+	@ echo "No Linux kernel source found for testing"
 else
 test.linux: $(CTAGS_TEST) $(CTAGS_REF)
 	@ echo -n "Testing Linux tag inclusion..."
