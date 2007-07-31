@@ -39,6 +39,7 @@ ctags-@VERSION@ (@DATE@)
 * Fixed crashes involving '/' [Verilog, Bug #1743330].
 * Fixed compilation problem on MinGW [Bug #1517424].
 * Fixed generation of HTML-formatted man page [Bug #1645864].
+* Fixed recognition of Python scripts having '#!/usr/bin/python' as first line [Bug #1764148].
 
 ctags-5.6 (Mon May 29 2006)
 * Reformatted code for independence of tab stop setting.

@@ -154,6 +154,8 @@ static langType getInterpreterLanguage (const char *const fileName)
 			const char *const cmd = lastSlash != NULL ? lastSlash+1 : line+2;
 			vString* const interpreter = determineInterpreter (cmd);
 			result = getExtensionLanguage (vStringValue (interpreter));
+			if (result == LANG_IGNORE)
+				result = getNamedLanguage (vStringValue (interpreter));
 			vStringDelete (interpreter);
 		}
 		vStringDelete (vLine);
