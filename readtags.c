@@ -57,7 +57,7 @@ struct sTagFile {
 				/* file position of last match for tag */
 			off_t pos; 
 				/* name of tag last searched for */
-			const char *name;
+			char *name;
 				/* length of name for partial matches */
 			size_t nameLength;
 				/* peforming partial match */
@@ -361,11 +361,9 @@ static char *duplicate (const char *str)
 	char *result = NULL;
 	if (str != NULL)
 	{
-		result = (char*) malloc (strlen (str) + 1);
+		result = strdup (str);
 		if (result == NULL)
 			perror (NULL);
-		else
-			strcpy (result, str);
 	}
 	return result;
 }
@@ -441,15 +439,14 @@ static void gotoFirstLogicalTag (tagFile *const file)
 
 static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 {
-	tagFile *result = (tagFile*) malloc (sizeof (tagFile));
+	tagFile *result = (tagFile*) calloc ((size_t) 1, sizeof (tagFile));
 	if (result != NULL)
 	{
-		memset (result, 0, sizeof (tagFile));
 		growString (&result->line);
 		growString (&result->name);
 		result->fields.max = 20;
-		result->fields.list = (tagExtensionField*) malloc (
-			result->fields.max * sizeof (tagExtensionField));
+		result->fields.list = (tagExtensionField*) calloc (
+			result->fields.max, sizeof (tagExtensionField));
 		result->fp = fopen (filePath, "r");
 		if (result->fp == NULL)
 		{
@@ -486,6 +483,8 @@ static void terminate (tagFile *const file)
 		free (file->program.url);
 	if (file->program.version != NULL)
 		free (file->program.version);
+	if (file->search.name != NULL)
+		free (file->search.name);
 
 	memset (file, 0, sizeof (tagFile));
 
@@ -651,7 +650,9 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 					   const char *const name, const int options)
 {
 	tagResult result;
-	file->search.name = name;
+	if (file->search.name != NULL)
+		free (file->search.name);
+	file->search.name = duplicate (name);
 	file->search.nameLength = strlen (name);
 	file->search.partial = (options & TAG_PARTIALMATCH) != 0;
 	file->search.ignorecase = (options & TAG_IGNORECASE) != 0;
