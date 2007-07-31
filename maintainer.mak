@@ -359,12 +359,12 @@ svn_url := https://ctags.svn.sourceforge.net/svnroot/ctags
 
 release-svn-%: svn-tagcheck-%
 	@ echo "---------- Tagging release $*"
-	@ echo svn copy -m'Release of ctags-$*' $(svn_url)/trunk $(svn_url)/tags/ctags-$*
+	svn copy -m'Release of ctags-$*' $(svn_url)/trunk $(svn_url)/tags/ctags-$*
 
 rerelease-svn-%:
 	@ echo "---------- Tagging release $*"
-	@ echo svn remove -m'Regenerating release of ctags-$*' $(svn_url)/tags/ctags-$*
-	@ echo svn copy -m'Release of ctags-$*' $(svn_url)/trunk $(svn_url)/tags/ctags-$*
+	svn remove -m'Regenerating release of ctags-$*' $(svn_url)/tags/ctags-$*
+	svn copy -m'Release of ctags-$*' $(svn_url)/trunk $(svn_url)/tags/ctags-$*
 
 svn-tagcheck-%:
 	if svn list $(svn_url)/tags/ | grep -q 'ctags-$*/$$' >/dev/null 2>&1 ;then \
