@@ -13,7 +13,9 @@ AC_CONFIG_HEADER(config.h)
 
 dnl Report system info
 dnl ------------------
-echo 'Exuberant Ctags, version @@VERSION@@'
+program_name=[`grep 'PROGRAM_NAME  *"' ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
+program_version=[`grep 'PROGRAM_VERSION  *"' ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
+echo "$program_name, version $program_version"
 uname -mrsv 2>/dev/null
 
 dnl Define convenience macros

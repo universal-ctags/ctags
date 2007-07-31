@@ -1,79 +1,86 @@
 #	$Id$
 #
-#	Copyright (c) 1996-2002, Darren Hiebert
+#	Copyright (c) 1996-2007, Darren Hiebert
 #
-#	Development makefile for Exuberant Ctags, used to build releases.
+#	Development makefile for Exuberant Ctags. Also used to build releases.
 #	Requires GNU make.
 
-OBJEXT = o
+OBJEXT := o
 
 include source.mak
 
-DSOURCES	=	$(SOURCES) debug.c
+DSOURCES     := $(SOURCES) debug.c
 
-DOS_VER_FILES=	ctags.h ctags.1 ctags.lsm NEWS
+VERSION_FILES:= ctags.h ctags.1 NEWS
 
-VERSION_FILES=	$(DOS_VER_FILES) configure.in ctags.spec
+LIB_FILES    := readtags.c readtags.h
 
-LIB_FILES	=	readtags.c readtags.h
-
-ENVIRONMENT_MAKEFILES = \
+ENVIRONMENT_MAKEFILES := \
 				mk_bc3.mak mk_bc5.mak mk_djg.mak mk_manx.mak mk_ming.mak \
 				mk_mpw.mak mk_mvc.mak mk_os2.mak mk_qdos.mak mk_sas.mak \
 
-COMMON_FILES =	COPYING EXTENDING.html FAQ INSTALL.oth NEWS README \
+COMMON_FILES := COPYING EXTENDING.html FAQ INSTALL.oth NEWS README \
 				$(ENVIRONMENT_MAKEFILES) source.mak \
 				$(DSOURCES) $(HEADERS) $(LIB_FILES) \
 				$(ENVIRONMENT_SOURCES) $(ENVIRONMENT_HEADERS)
 
-UNIX_FILES	=	$(COMMON_FILES) \
+UNIX_FILES   := $(COMMON_FILES) \
 				.indent.pro INSTALL acconfig.h configure.in \
 				Makefile.in maintainer.mak testing.mak \
 				descrip.mms mkinstalldirs magic.diff \
-				ctags.1 ctags.lsm
+				ctags.spec ctags.1
 
-DOS_FILES	=	$(COMMON_FILES)
+WIN_FILES    := $(COMMON_FILES) $(VERSION_FILES)
+WIN_REGEX    := regex.c regex.h
+ 
+SVN_FILES    := $(UNIX_FILES)
 
-CVS_FILES	=	$(UNIX_FILES)
-
-WARNINGS	=	-Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
+WARNINGS     := -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
 				-Wmissing-prototypes -Wmissing-declarations \
 				-Wnested-externs -Wcast-qual -Wshadow -pedantic \
 				-Wstrict-prototypes \
 				# -Wtraditional -Wconversion -Werror
 
-ERRFILE	= errors
-REDIR	= 2>&1 | tee $(ERRFILE)
+PRODUCER := Darren B. Hiebert
+EMAIL := dhiebert@users.sourceforge.net
+CTAGS_WEBSITE := http://ctags.sourceforge.net
+RPM_ROOT := rpms
+RPM_ABS_ROOT := $(PWD)/$(RPM_ROOT)
+WINDOWS_DIR := win32
+RELEASE_DIR := releases
+CTAGS_WEBDIR := website
+win_version = $(subst .,,$(version))
+DEP_DIR := .deps
+HOST_ARCH := $(shell uname -p)
 
-RPM_ROOT= $(HOME)/Rpm
-CTAGS_DOSDIR = win32
-WEB_ARCHIVE_DIR = releases
-CTAGS_WEBSITE = website
-DEP_DIR	= .deps
+ifneq ($(findstring $(HOST_ARCH),i386 i686),)
+COMP_ARCH := -march=i686
+endif
 
-CC		= gcc
-INCLUDE	= -I.
-DEFS	= -DHAVE_CONFIG_H
-COMP_FLAGS = $(INCLUDE) $(DEFS) $(CFLAGS)
-PROF_OPT= -O3 -march=i686
-#OPT		= $(PROF_OPT) -fomit-frame-pointer
-OPT		= $(PROF_OPT)
-DCFLAGS	= $(COMP_FLAGS) -DDEBUG -DINTERNAL_SORT
-LD		= gcc
-LDFLAGS	= 
+CC         := gcc
+INCLUDE    := -I.
+DEFS       := -DHAVE_CONFIG_H
+COMP_FLAGS := $(INCLUDE) $(DEFS) $(CFLAGS)
+PROF_OPT   := -O3 $(COMP_ARCH)
+#OPT        := $(PROF_OPT) -fomit-frame-pointer
+OPT        := $(PROF_OPT)
+DCFLAGS    := $(COMP_FLAGS) -DDEBUG -DINTERNAL_SORT
+LD         := gcc
+LDFLAGS    := 
+RPM_FLAGS  := -O3 $(COMP_ARCH)
 
-readtags.err: DCFLAGS += -DREADTAGS_MAIN
+AUTO_GEN   := configure config.h.in
+CONFIG_GEN := config.cache config.log config.status config.run config.h Makefile
+PROF_GEN   := gmon.out
+COV_GEN	   := *.da *.gcov
 
-AUTO_GEN	= configure config.h.in
-CONFIG_GEN	= config.cache config.log config.status config.run config.h Makefile
-PROF_GEN	= gmon.out
-COV_GEN		= *.da *.gcov
+UNIX2DOS := perl -pe 's/$$/\r/'
+MAN2HTML := tbl | groff -Wall -mtty-char -mandoc -Thtml -c
 
 #
 # Targets
 #
 ifeq ($(findstring clean,$(MAKECMDGOALS)),)
-ifneq ($(MAKECMDGOALS),setup)
 ifeq ($(wildcard config.h),)
 ctags dctags ctags.prof ctags.cov:
 	$(MAKE) config.h
@@ -116,10 +123,6 @@ etyperef.o: eiffel.c
 
 endif
 endif
-endif
-
-ctags32.exe: $(SOURCES) $(HEADERS)
-	gcc-dos -DMSDOS -O2 -Wall -s -o $@ $(SOURCES)
 
 #
 # Support targets
@@ -151,8 +154,7 @@ gcovclean:
 
 clean: depclean profclean gcovclean clean-test
 	rm -f *.[ois] *.o[dm] ctags dctags ctags*.exe readtags etyperef \
-		ctags.html ctags.prof ctags.cov *.bb *.bbg tags TAGS syntax.vim \
-		$(ERRFILE)
+		ctags.man ctags.html ctags.prof ctags.cov *.bb *.bbg tags TAGS syntax.vim
 
 distclean: clean
 	rm -f $(CONFIG_GEN)
@@ -160,11 +162,11 @@ distclean: clean
 maintainer-clean maintclean: distclean
 	rm -f $(AUTO_GEN)
 
-ctags.man: ctags.1
-	groff -Tascii -mandoc $< | sed 's/.//g' > $@
+%.man: %.1 Makefile
+	tbl $< | groff -Wall -mtty-char -mandoc -Tascii -c | sed 's/.//g' > $@
 
-ctags.html: ctags.1
-	man2html $< > $@
+%.html: %.1 Makefile
+	cat $< | $(MAN2HTML) > $@
 
 tags: $(DSOURCES) $(HEADERS) $(LIB_FILES) Makefile *.mak
 	@ echo "-- Building tag file"
@@ -183,168 +185,195 @@ syntax.vim: $(DSOURCES) $(HEADERS) $(LIB_FILES)
 #
 # Testing
 #
-include testing.mak
-
-#
-# CVS management
-#
-status:
-	@ cvs -n -q update
-
-cvs-retag-%: CVS_TAG_OPTIONS := -F
-
-cvs-tag-% cvs-retag-%: cvs-tagcheck-%
-	@ echo "---------- Tagging release `echo $* | sed 's/\./_/g'`"
-	@ cvs tag -c $(CVS_TAG_OPTIONS) Ctags-`echo $* | sed 's/\./_/g'`
-
-cvs-tagcheck-%:
-	@ if test -z "$(CVS_TAG_OPTIONS)"; then \
-		if cvs update -p -r Ctags-`echo $* | sed 's/\./_/g'` maintainer.mak >/dev/null 2>&1 ;then \
-			echo "release-$* already exists; use rerelease-$*" >&2 ;\
-			exit 1 ;\
-		fi ;\
-	fi
-
-cvs-files:
-	@ls -1 $(CVS_FILES)
-
-#
-# Web site files
-#
-website-%: website-man-% website-index-% $(CTAGS_WEBSITE)/news.html \
-		$(CTAGS_WEBSITE)/EXTENDING.html
-	:
-
-website-man-%: ctags.1 Makefile
-	@ echo "---------- Generating $(CTAGS_WEBSITE)/ctags.html"
-	umask 022 ; \
-	man2html $< | sed -e "s/@@VERSION@@/$*/g" \
-		-e 's%<A HREF="mailto:[^"]*">\([^@]*\)@\([^<]*\)</A>%\1\ at \2%' \
-		> $(CTAGS_WEBSITE)/ctags.html
-
-website-index-%: index.html Makefile
-	@ echo "---------- Generating $(CTAGS_WEBSITE)/index.html"
-	umask 022 ; \
-	sed -e "s/@@VERSION@@/$*/g" \
-		-e "s/@@DOS_VERSION@@/`echo $* | sed 's/\.//g'`/g" \
-		-e "s/@@DATE@@/`date +'%d %B %Y'`/" \
-		$< > $(CTAGS_WEBSITE)/index.html
-
-$(CTAGS_WEBSITE)/EXTENDING.html: EXTENDING.html
-	@ echo "---------- Generating $(CTAGS_WEBSITE)/EXTENDING.html"
-	cp $< $@ && chmod 644 $@
-
-$(CTAGS_WEBSITE)/news.html: NEWS Makefile
-	@ echo "---------- Generating $(CTAGS_WEBSITE)/news.html"
-	umask 022 ; \
-	sed -e 's/</\&lt;/g' -e 's/>/\&gt;/g' \
-		-e 's@^Current Version:.*$$@<html><head><title>Exuberant Ctags: Change Notes</title></head><body><h1>Change Notes</h1><pre>@' \
-		-e 's@\(^ctags-.* (.*)\)$$@<b>\1</b>@' \
-		-e 's@^vim:.*$$@</pre><hr><a href="http:index.html">Back to <strong>Exuberant Ctags</strong></a></body></html>@' \
-		$< > $@
+-include testing.mak
 
 #
 # Release management
 #
-ctags-%.lsm: ctags.lsm
-	sed -e "s/@@VERSION@@/$*/" -e "s/@@LSMDATE@@/`date +'%Y-%m-%d'`/" $< > $@
 
-ctags-%.tar.gz: $(UNIX_FILES) $(VERSION_FILES)
+.SECONDARY:
+
+RPM_ARCH := i386
+RPM_SUBDIRS := BUILD SOURCES SPECS SRPMS RPMS
+RPM_DIRS := $(addprefix $(RPM_ROOT)/,$(RPM_SUBDIRS))
+
+$(RELEASE_DIR)/ctags-%-1.$(RPM_ARCH).rpm: \
+		$(RPM_ROOT)/RPMS/$(RPM_ARCH)/ctags-%-1.$(RPM_ARCH).rpm \
+		| $(RELEASE_DIR)
+	ln -f $< $@
+	chmod 644 $@
+
+$(RELEASE_DIR)/ctags-%-1.src.rpm: \
+		$(RPM_ROOT)/SRPMS/ctags-%-1.src.rpm \
+		| $(RELEASE_DIR)
+	ln -f $< $@
+	chmod 644 $@
+
+$(eval $(RPM_DIRS) $(RELEASE_DIR): ; mkdir -p $$@)
+
+$(RPM_ROOT)/SRPMS/ctags-%-1.src.rpm \
+$(RPM_ROOT)/RPMS/$(RPM_ARCH)/ctags-%-1.$(RPM_ARCH).rpm: \
+		$(RPM_ROOT)/SOURCES/ctags-%.tar.gz \
+		$(RPM_ROOT)/SPECS/ctags-%.spec \
+		| $(RPM_DIRS)
+	rpmbuild --define '_topdir $(RPM_ABS_ROOT)' --define 'optflags $(RPM_FLAGS)' --define 'packager $(PRODUCER) $(CTAGS_WEBSITE)' -ba $(RPM_ROOT)/SPECS/ctags-$*.spec
+	rm -fr $(RPM_ROOT)/BUILD/ctags-$*
+
+$(RPM_ROOT)/rpmrc: rpmmacros maintainer.mak
+	echo "optflags: $(RPM_ARCH) $(RPM_FLAGS)" > $@
+	echo "macrofiles: $(PWD)/rpmmacros" >> $@
+
+$(RPM_ROOT)/rpmmacros: maintainer.mak
+	echo "%_topdir $(RPM_ABS_ROOT)" > $@
+	echo '%_gpg_name "$(PRODUCER) <$(EMAIL)>"' >> $@
+	echo "%packager $(PRODUCER) $(CTAGS_WEBSITE)" >> $@
+	echo "%_i18ndomains %{nil}" >> $@
+	echo "%debug_package %{nil}" >> $@
+
+$(RPM_ROOT)/SPECS/ctags-%.spec: ctags.spec | $(RPM_ROOT)/SPECS
+	sed -e "s/@VERSION@/$*/" ctags.spec > $(RPM_ROOT)/SPECS/ctags-$*.spec
+
+$(RPM_ROOT)/SOURCES/ctags-%.tar.gz: $(RELEASE_DIR)/ctags-%.tar.gz | $(RPM_ROOT)/SOURCES
+	ln -f $< $@
+
+$(RELEASE_DIR)/ctags-%.tar.gz: $(UNIX_FILES) | $(RELEASE_DIR)
 	@ echo "---------- Building tar ball"
-	if [ -d ctags-$* ] ;then rm -fr ctags-$** ;fi
-	mkdir ctags-$*
-	cp -p $(UNIX_FILES) ctags-$*/
-	for file in $(VERSION_FILES) ;do \
-		rm -f ctags-$*/$${file} ;\
-		sed -e "s/@@VERSION@@/$*/" \
-		    -e "s/@@LSMDATE@@/`date +'%Y-%m-%d'`/" \
-			$${file} > ctags-$*/$${file} ;\
-	done
-	chmod 644 ctags-$*/*
-	chmod 755 ctags-$*/mkinstalldirs
-	(cd ctags-$* ;\
+	if [ -d $(@D)/dirs/ctags-$* ]; then rm -fr $(@D)/dirs/ctags-$*; fi
+	mkdir -p $(@D)/dirs/ctags-$*
+	cp -p $(UNIX_FILES) $(@D)/dirs/ctags-$*/
+	sed -e 's/\(PROGRAM_VERSION\) "\([^ ]*\)"/\1 "$*"/' ctags.h > $(@D)/dirs/ctags-$*/ctags.h
+	sed -e 's/"\(Version\) \([^ ]*\)"/"\1 $*"/' ctags.1 > $(@D)/dirs/ctags-$*/ctags.1
+	sed -e 's/\(Current Version:\) [^ ]*/\1 $*/' -e 's/@VERSION@/$*/' -e "s/@DATE@/`date +'%d %b %Y'`/" NEWS > $(@D)/dirs/ctags-$*/NEWS
+	(cd $(@D)/dirs/ctags-$* ;\
+		chmod 644 * ;\
+		chmod 755 mkinstalldirs ;\
 		autoheader ;\
 		chmod 644 config.h.in ;\
 		autoconf ;\
 		chmod 755 configure ;\
 		rm -fr autom4te.cache ;\
-		man2html ctags.1 > ctags.html ;\
+		cat ctags.1 | $(MAN2HTML) > ctags.html ;\
 	)
-	tar -zcf $@ ctags-$*
+	cd $(@D)/dirs && tar -zcf ../$(@F) ctags-$*
+	chmod 644 $@
 
-ctags-%.tar.Z: ctags-%.tar.gz
-	tar -Zcf $@ ctags-$*
+clean-rpm:
+	rm -fr $(RPM_ROOT)
 
-$(CTAGS_DOSDIR)/ctags%: FORCE
-	if [ -d $(CTAGS_DOSDIR)/ctags$* ] ;\
-		then rm -fr $(CTAGS_DOSDIR)/ctags$*/* ;\
-		else mkdir -p $(CTAGS_DOSDIR)/ctags$* ;\
-	fi
+ifneq ($(findstring win-,$(MAKECMDGOALS)),)
+ifeq ($(version),,)
+$(error $(MAKECMDGOALS) target requires value for 'version')
+endif
+endif
 
-dos1-%: $(DOS_FILES)
-	for file in $^ ;do \
-		unix2dos < $${file} > $(CTAGS_DOSDIR)/ctags$*/$${file} ;\
+check-version-%:
+	@ if [ -z "$(version)" ]; then echo "target requires value for 'version'" >&2; exit 1; fi
+
+$(WINDOWS_DIR)/ctags$(win_version): \
+		$(RELEASE_DIR)/ctags-$(version).tar.gz maintainer.mak \
+		| $(WINDOWS_DIR)
+	@ echo "---------- Building Win32 release directory"
+	rm -fr "$(WINDOWS_DIR)/ctags$(win_version)"
+	mkdir -p "$(WINDOWS_DIR)/ctags$(win_version)"
+	for file in $(WIN_FILES) ctags.html; do \
+		$(UNIX2DOS) < "$(RELEASE_DIR)/dirs/ctags-$(version)/$${file}" > $@/$${file} ;\
 	done
-	cd $(CTAGS_DOSDIR); sed -e "s/@@DOS_VERSION@@/$*/" makefile.in > makefile
+	for file in $(WIN_REGEX); do \
+		$(UNIX2DOS) < "gnu_regex/$${file}" > $@/$${file} ;\
+	done
 
-dos2-%: $(DOS_VER_FILES)
-	for file in $^ ;do \
-		rm -f $(CTAGS_DOSDIR)/ctags`echo $*|sed 's/\.//g'`/$${file} ;\
-		sed -e "s/@@VERSION@@/$*/" \
-		    -e "s/@@LSMDATE@@/`date +'%d%b%y' | tr 'a-z' 'A-Z'`/" $${file} |\
-			unix2dos > $(CTAGS_DOSDIR)/ctags`echo $*|sed 's/\.//g'`/$${file} ;\
-	done ;\
-	cd $(CTAGS_DOSDIR)/ctags`echo $*|sed 's/\.//g'` ; man2html ctags.1 > ctags.html
+$(RELEASE_DIR)/ctags%.zip: \
+		check-version-% \
+		$(WINDOWS_DIR)/ctags% \
+		$(WINDOWS_DIR)/ctags%/ctags.exe
+	cd $(WINDOWS_DIR) && zip -r ../$@ ctags$*
 
-dos-%:
-	@ echo "---------- Building MSDOS release directory"
-	$(MAKE) $(CTAGS_DOSDIR)/ctags`echo $*|sed 's/\.//g'` \
-			dos1-`echo $*|sed 's/\.//g'` dos2-$*
+win-source: $(WINDOWS_DIR)/ctags$(win_version)
 
-$(RPM_ROOT)/SOURCES $(RPM_ROOT)/SPECS:
+win-bin:
+	$(RELEASE_DIR)/ctags$(win_version).zip
+
+release-win-%:
+	$(MAKE) version="$*" win-source
+
+release-tar-%: $(RELEASE_DIR)/ctags-%.tar.gz
+	:
+
+release-rpm-%: \
+		$(RELEASE_DIR)/ctags-%-1.$(RPM_ARCH).rpm \
+		$(RELEASE_DIR)/ctags-%-1.src.rpm
+	:
+
+release-source-%: $(RELEASE_DIR)/ctags-%.tar.gz
+	$(MAKE) version="$*" win-source
+
+release-bin-%: \
+		$(RELEASE_DIR)/ctags-%-1.$(RPM_ARCH).rpm \
+		$(RELEASE_DIR)/ctags-%-1.src.rpm
+	$(MAKE) version="$*" win-bin
+
+$(WINDOWS_DIR):
 	mkdir -p $@
 
-rpm-%: ctags-%.tar.gz ctags.spec $(RPM_ROOT)/SOURCES $(RPM_ROOT)/SPECS 
-	@ echo "---------- Building RPM"
-	cp -p ctags-$*.tar.gz $(RPM_ROOT)/SOURCES/
-	sed -e "s/@@VERSION@@/$*/" ctags.spec > $(RPM_ROOT)/SPECS/ctags-$*.spec
-	(cd $(RPM_ROOT)/SPECS; CC=gcc rpmbuild -ba ctags-$*.spec)
-	rm -fr $(RPM_ROOT)/BUILD/ctags-$*
-
-ctags32-%: ctags-%.tar.gz
-	@ echo "---------- Building DPMS binary for MSDOS"
-	(cd ctags-$*; $(MAKE) -f ../Makefile ctags32.exe; mv ctags32.exe ..)
-	rm -f $(CTAGS_DOSDIR)/ctags32.exe
-	mcopy ctags32.exe $(CTAGS_DOSDIR)
-
 #
-# Prevent make from deleting these automatically
+# Web site files
 #
-.PRECIOUS: ctags-%.tar.gz ctags-%.tar.Z
-
-cleanrelease-%:
-	rm -f ctags-$*.tar.gz
-	rm -fr ctags-$*
-	rm -fr $(CTAGS_DOSDIR)/ctags`echo $*|sed 's/\.//g'`
-	rm -f $(RPM_ROOT)/SOURCES/ctags-$*.tar.gz
-	rm -f $(RPM_ROOT)/RPMS/i386/ctags-$*-1.i386.rpm
-	rm -f $(RPM_ROOT)/SRPMS/ctags-$*-1.src.rpm
-	rm -f $(RPM_ROOT)/SPECS/ctags-$*.spec
-
-internal-release-%: ctags-%.tar.gz dos-% rpm-% website-%
-	@ echo "---------- Copying files to web archive"
-	cp -p ctags-$*.tar.* $(WEB_ARCHIVE_DIR)
-	cp -p $(RPM_ROOT)/RPMS/i386/ctags-$*-1.i386.rpm $(WEB_ARCHIVE_DIR)
-	cp -p $(RPM_ROOT)/SRPMS/ctags-$*-1.src.rpm $(WEB_ARCHIVE_DIR)
-	cp -p ctags-$*/ctags.lsm $(WEB_ARCHIVE_DIR)/ctags-$*.lsm
-	chmod o+r $(WEB_ARCHIVE_DIR)/*
-	@ echo "---------- Release $* completed"
-
-release-%: cvs-tag-% internal-release-%
+website-%: website-man-% website-index-% website-news-% \
+		$(CTAGS_WEBDIR)/EXTENDING.html
 	:
 
-rerelease-%: cvs-retag-% internal-release-%
-	:
+website-man-%: ctags.1 Makefile
+	@ echo "---------- Generating $(CTAGS_WEBDIR)/ctags.html"
+	umask 022 ; \
+	sed -e 's/"\(Version\) \([^ ]*\)"/"\1 $*"/' ctags.1 |\
+	$(MAN2HTML) > $(CTAGS_WEBDIR)/ctags.html
+
+website-index-%: index.html Makefile
+	@ echo "---------- Generating $(CTAGS_WEBDIR)/index.html"
+	umask 022 ; \
+	sed -e "s/@VERSION@/$*/g" \
+		-e "s/@DOS_VERSION@/`echo $* | sed 's/\.//g'`/g" \
+		-e "s/@DATE@/`date +'%d %B %Y'`/" \
+		$< > $(CTAGS_WEBDIR)/index.html
+
+website-news-%: NEWS maintainer.mak
+	@ echo "---------- Generating $(CTAGS_WEBDIR)/news.html"
+	umask 022 ; \
+	sed -e 's/\(Current Version:\) [^ ]*/\1 $*/' \
+	    -e 's/@VERSION@/$*/' \
+		-e "s/@DATE@/`date +'%d %b %Y'`/" \
+		-e 's/</\&lt;/g' -e 's/>/\&gt;/g' \
+		-e 's@^Current Version:.*$$@<html><head><title>Exuberant Ctags: Change Notes</title></head><body><h1>Change Notes</h1><pre>@' \
+		-e 's@\(^ctags-.* (.*)\)$$@<b>\1</b>@' \
+		-e 's@^vim:.*$$@</pre><hr><a href="http:index.html">Back to <strong>Exuberant Ctags</strong></a></body></html>@' \
+		$< > $(CTAGS_WEBDIR)/news.html
+
+$(CTAGS_WEBDIR)/EXTENDING.html: EXTENDING.html
+	@ echo "---------- Generating $(CTAGS_WEBDIR)/EXTENDING.html"
+	cp $< $@ && chmod 644 $@
+
+#
+# SVN management
+#
+svn_url := https://ctags.svn.sourceforge.net/svnroot/ctags
+
+release-svn-%: svn-tagcheck-%
+	@ echo "---------- Tagging release $*"
+	@ echo svn copy -m'Release of ctags-$*' $(svn_url)/trunk $(svn_url)/tags/ctags-$*
+
+rerelease-svn-%:
+	@ echo "---------- Tagging release $*"
+	@ echo svn remove -m'Regenerating release of ctags-$*' $(svn_url)/tags/ctags-$*
+	@ echo svn copy -m'Release of ctags-$*' $(svn_url)/trunk $(svn_url)/tags/ctags-$*
+
+svn-tagcheck-%:
+	if svn list $(svn_url)/tags/ | grep -q 'ctags-$*/$$' >/dev/null 2>&1 ;then \
+		echo "ctags-$* already exists; use rerelease-$*" >&2 ;\
+		exit 1 ;\
+	fi
+
+svn-files:
+	@ls -1 $(SVN_FILES)
 
 #
 # Dependency file generation
@@ -372,10 +401,12 @@ $(DEP_DIR)/%.d: %.c maintainer.mak
 	$(CC) $(DCFLAGS) $(WARNINGS) -Wuninitialized -O -E $< > $@
 
 %.ic: %.c FORCE
-	$(CC) $(DCFLAGS) $(WARNINGS) -Wuninitialized -O -E $< | noblanks > $@
+	$(CC) $(DCFLAGS) $(WARNINGS) -Wuninitialized -O -E $< | sed '/^[	]*$/d' > $@
 
 %.s: %.c FORCE
 	$(CC) $(DCFLAGS) $(WARNINGS) -S $< > $@
+
+readtags.err: DCFLAGS += -DREADTAGS_MAIN
 
 %.err: %.c
 	@ $(CC) $(DCFLAGS) $(WARNINGS) -Wuninitialized -O -c $<
@@ -389,5 +420,25 @@ $(DEP_DIR)/%.d: %.c maintainer.mak
 
 %.proto: %.c
 	@ genproto -e -m __ARGS $<
+
+# Print out the value of a variable
+# From http://www.cmcrossroads.com/ubbthreads/showflat.php?Cat=0&Board=cmbasics&Number=28829
+print-%:
+	@echo $* = $($*)
+
+# Print out the expanded values of all variables
+# From http://www.cmcrossroads.com/ubbthreads/showflat.php?Cat=0&Number=29581
+.PHONY: print-vars
+print-vars:
+	@$(foreach V,$(sort $(.VARIABLES)), \
+		$(if $(filter-out environment% default automatic, \
+			$(origin $V)),$(warning $V=$($V))))
+
+# Print out the declared values of all variables
+.PHONY: print-vars-decl
+print-vars-decl:
+	@$(foreach V,$(sort $(.VARIABLES)), \
+		$(if $(filter-out environment% default automatic, \
+			$(origin $V)),$(warning $V=$(value $V))))
 
 # vi:ts=4 sw=4
