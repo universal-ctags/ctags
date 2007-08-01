@@ -17,6 +17,7 @@
 
 #include <string.h>
 
+#include "entry.h"
 #include "options.h"
 #include "read.h"
 #include "routines.h"
@@ -180,6 +181,7 @@ static void findPerlTags (void)
 		boolean qualified = FALSE;
 		const unsigned char *cp = line;
 		perlKind kind = K_NONE;
+		tagEntryInfo e;
 
 		if (skipPodDoc)
 		{
@@ -305,17 +307,39 @@ static void findPerlTags (void)
 			vStringTerminate (name);
 			TRACE("name: %s\n", name->buffer);
 
-			if (K_SUBROUTINE == kind && TRUE == isSubroutineDeclaration(cp))
+			if (K_SUBROUTINE == kind)
 			{
-				if (TRUE == PerlKinds[K_SUBROUTINE_DECLARATION].enabled) {
-					kind = K_SUBROUTINE_DECLARATION;
-				} else {
-					vStringClear (name);
-					continue;
-				}
-			}
+				/*
+				 * isSubroutineDeclaration() may consume several lines.  So
+				 * we record line positions.
+				 */
+				initTagEntry(&e, vStringValue(name));
 
-			if (vStringLength (name) > 0)
+				if (TRUE == isSubroutineDeclaration(cp)) {
+					if (TRUE == PerlKinds[K_SUBROUTINE_DECLARATION].enabled) {
+						kind = K_SUBROUTINE_DECLARATION;
+					} else {
+						vStringClear (name);
+						continue;
+					}
+				}
+
+				e.kind     = PerlKinds[kind].letter;
+				e.kindName = PerlKinds[kind].name;
+
+				makeTagEntry(&e);
+
+				if (Option.include.qualifiedTags && qualified &&
+					package != NULL  && vStringLength (package) > 0)
+				{
+					vString *const qualifiedName = vStringNew ();
+					vStringCopy (qualifiedName, package);
+					vStringCat (qualifiedName, name);
+					e.name = vStringValue(qualifiedName);
+					makeTagEntry(&e);
+					vStringDelete (qualifiedName);
+				}
+			} else if (vStringLength (name) > 0)
 			{
 				makeSimpleTag (name, PerlKinds, kind);
 				if (Option.include.qualifiedTags && qualified &&
