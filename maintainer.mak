@@ -26,7 +26,7 @@ COMMON_FILES := COPYING EXTENDING.html FAQ INSTALL.oth MAINTAINERS NEWS README \
 
 UNIX_FILES   := $(COMMON_FILES) \
 				.indent.pro INSTALL acconfig.h configure.in \
-				Makefile.in maintainer.mak testing.mak \
+				Makefile.in maintainer.mak \
 				descrip.mms mkinstalldirs magic.diff \
 				ctags.spec ctags.1
 
