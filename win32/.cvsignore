@@ -1,5 +1,0 @@
-makefile
-ctagsw32.exe
-ctagsos2.exe
-ctags[1-9]*
-ec[1-9]*.zip
