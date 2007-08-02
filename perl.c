@@ -307,6 +307,11 @@ static void findPerlTags (void)
 			vStringTerminate (name);
 			TRACE("name: %s\n", name->buffer);
 
+			if (0 == vStringLength(name)) {
+				vStringClear(name);
+				continue;
+			}
+
 			if (K_SUBROUTINE == kind)
 			{
 				/*
