@@ -985,7 +985,7 @@ getNextChar:
 			{
 				do
 				   c = getChar ();
-				while (c != '\n');
+				while (c != '\n' && c != EOF);
 			}
 			else
 			{
