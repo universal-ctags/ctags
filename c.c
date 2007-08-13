@@ -2340,18 +2340,26 @@ static void processColon (statementInfo *const st)
 	}
 }
 
-static void processAngleBracket (void)
+static void processAngleBracket (statementInfo *const st)
 {
 	int c = cppGetc ();
-	if (c == '>')
-		;  /* already found match for template */
-	else if ((isLanguage (Lang_cpp) || isLanguage (Lang_java)) &&
+	if (c == '>') {
+		/* already found match for template */
+	} else if ((isLanguage (Lang_cpp) || isLanguage (Lang_java)) &&
 		c != '<' && c != '=')
 	{
-		skipToMatch ("<>");        /* this is a template */
-	}
-	else
+		/* this is a template */
+		skipToMatch ("<>");
+	} else if (c == '<') {
+		/* skip "<<" or "<<=". */
+		c = cppGetc ();
+		if (c != '=') {
+			cppUngetc (c);
+		}
+		skipStatement (st);
+	} else {
 		cppUngetc (c);
+	}
 }
 
 /*  Skips over any initializing value which may follow an '=' character in a
@@ -2511,7 +2519,7 @@ static void nextToken (statementInfo *const st)
 		{
 			case EOF: longjmp (Exception, (int) ExceptionEOF);  break;
 			case '(': analyzeParens (st);                       break;
-			case '<': processAngleBracket ();                   break;
+			case '<': processAngleBracket (st);                 break;
 			case '*': st->haveQualifyingName = FALSE;           break;
 			case ',': setToken (st, TOKEN_COMMA);               break;
 			case ':': processColon (st);                        break;
