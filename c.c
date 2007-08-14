@@ -2340,7 +2340,7 @@ static void processColon (statementInfo *const st)
 	}
 }
 
-static void processAngleBracket (statementInfo *const st)
+static void processAngleBracket ()
 {
 	int c = cppGetc ();
 	if (c == '>') {
@@ -2356,7 +2356,6 @@ static void processAngleBracket (statementInfo *const st)
 		if (c != '=') {
 			cppUngetc (c);
 		}
-		skipStatement (st);
 	} else {
 		cppUngetc (c);
 	}
@@ -2519,7 +2518,7 @@ static void nextToken (statementInfo *const st)
 		{
 			case EOF: longjmp (Exception, (int) ExceptionEOF);  break;
 			case '(': analyzeParens (st);                       break;
-			case '<': processAngleBracket (st);                 break;
+			case '<': processAngleBracket ();                   break;
 			case '*': st->haveQualifyingName = FALSE;           break;
 			case ',': setToken (st, TOKEN_COMMA);               break;
 			case ':': processColon (st);                        break;
