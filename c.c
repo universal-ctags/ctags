@@ -2047,6 +2047,26 @@ static void analyzePostParens (statementInfo *const st, parenInfo *const info)
 	}
 }
 
+static void processAngleBracket (void)
+{
+	int c = cppGetc ();
+	if (c == '>') {
+		/* already found match for template */
+	} else if ((isLanguage (Lang_cpp) || isLanguage (Lang_java)) && c != '<' && c != '=') {
+		/* this is a template */
+		cppUngetc (c);
+		skipToMatch ("<>");
+	} else if (c == '<') {
+		/* skip "<<" or "<<=". */
+		c = cppGetc ();
+		if (c != '=') {
+			cppUngetc (c);
+		}
+	} else {
+		cppUngetc (c);
+	}
+}
+
 static int parseParens (statementInfo *const st, parenInfo *const info)
 {
 	tokenInfo *const token = activeToken (st);
@@ -2127,7 +2147,7 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 
 			case '<':
 				info->isKnrParamList = FALSE;
-				skipToMatch ("<>");
+				processAngleBracket ();
 				break;
 
 			case ')':
@@ -2337,27 +2357,6 @@ static void processColon (statementInfo *const st)
 				reinitStatement (st, FALSE);
 			}
 		}
-	}
-}
-
-static void processAngleBracket ()
-{
-	int c = cppGetc ();
-	if (c == '>') {
-		/* already found match for template */
-	} else if ((isLanguage (Lang_cpp) || isLanguage (Lang_java)) &&
-		c != '<' && c != '=')
-	{
-		/* this is a template */
-		skipToMatch ("<>");
-	} else if (c == '<') {
-		/* skip "<<" or "<<=". */
-		c = cppGetc ();
-		if (c != '=') {
-			cppUngetc (c);
-		}
-	} else {
-		cppUngetc (c);
 	}
 }
 
