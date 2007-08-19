@@ -1488,7 +1488,7 @@ static void readIdentifier (tokenInfo *const token, const int firstChar)
 			first = FALSE;
 		}
 		c = cppGetc ();
-	} while (isident (c) || (isLanguage (Lang_java) && isHighChar (c)));
+	} while (isident (c) || (isLanguage (Lang_java) && (isHighChar (c) || c == '.')));
 	vStringTerminate (name);
 	cppUngetc (c);        /* unget non-identifier character */
 
