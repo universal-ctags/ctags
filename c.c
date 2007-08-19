@@ -2387,6 +2387,7 @@ static int skipInitializer (statementInfo *const st)
 			case '[': skipToMatch ("[]"); break;
 			case '(': skipToMatch ("()"); break;
 			case '{': skipToMatch ("{}"); break;
+			case '<': processAngleBracket(); break;
 
 			case '}':
 				if (insideEnumBody (st))
