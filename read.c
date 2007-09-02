@@ -358,9 +358,9 @@ readnext:
 	}
 	else if (c == CRETURN)
 	{
-		/*  Turn line breaks into a canonical form. The three commonly
-		 *  used forms if line breaks: LF (UNIX), CR (MacIntosh), and
-		 *  CR-LF (MS-DOS) are converted into a generic newline.
+		/* Turn line breaks into a canonical form. The three commonly
+		 * used forms if line breaks: LF (UNIX/Mac OS X), CR (Mac OS 9),
+		 * and CR-LF (MS-DOS) are converted into a generic newline.
 		 */
 		const int next = getc (File.fp);  /* is CR followed by LF? */
 
