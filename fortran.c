@@ -899,9 +899,8 @@ static void checkForLabel (void)
 		vStringPut (token->string, c);
 		c = getChar ();
 	}
-	if (length > 0)
+	if (length > 0  &&  token != NULL)
 	{
-		Assert (token != NULL);
 		vStringTerminate (token->string);
 		makeFortranTag (token, TAG_LABEL);
 		deleteToken (token);
@@ -1059,7 +1058,6 @@ static void readSubToken (tokenInfo *const token)
 		token->secondary = newToken ();
 		readToken (token->secondary);
 	}
-	Assert (token->secondary != NULL);
 }
 
 /*
@@ -1454,7 +1452,7 @@ static void parseMap (tokenInfo *const token)
 	while (! isKeyword (token, KEYWORD_end))
 		parseFieldDefinition (token);
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_map));
+	/* should be at KEYWORD_map token */
 	skipToNextStatement (token);
 }
 
@@ -1492,9 +1490,9 @@ static void parseUnionStmt (tokenInfo *const token)
 	skipToNextStatement (token);
 	while (isKeyword (token, KEYWORD_map))
 		parseMap (token);
-	Assert (isKeyword (token, KEYWORD_end));
+	/* should be at KEYWORD_end token */
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_union));
+	/* secondary token should be KEYWORD_end token */
 	skipToNextStatement (token);
 }
 
@@ -1560,7 +1558,7 @@ static void parseStructureStmt (tokenInfo *const token)
 	while (! isKeyword (token, KEYWORD_end))
 		parseFieldDefinition (token);
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_structure));
+	/* secondary token should be KEYWORD_structure token */
 	skipToNextStatement (token);
 	ancestorPop ();
 	deleteToken (name);
@@ -1671,7 +1669,7 @@ static void parseDerivedTypeDef (tokenInfo *const token)
 			skipToNextStatement (token);
 	}
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_type));
+	/* secondary token should be KEYWORD_type token */
 	skipToToken (token, TOKEN_STATEMENT_END);
 	ancestorPop ();
 }
@@ -1745,7 +1743,7 @@ static void parseInterfaceBlock (tokenInfo *const token)
 		}
 	}
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_interface));
+	/* secondary token should be KEYWORD_interface token */
 	skipToNextStatement (token);
 	ancestorPop ();
 	deleteToken (name);
@@ -1924,8 +1922,7 @@ static void parseBlockData (tokenInfo *const token)
 	while (! isKeyword (token, KEYWORD_end))
 		skipToNextStatement (token);
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_NONE) ||
-			isSecondaryKeyword (token, KEYWORD_block));
+	/* secondary token should be KEYWORD_NONE or KEYWORD_block token */
 	skipToNextStatement (token);
 	ancestorPop ();
 }
@@ -1993,8 +1990,7 @@ static void parseModule (tokenInfo *const token)
 	while (! isKeyword (token, KEYWORD_end))
 		skipToNextStatement (token);
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_NONE) ||
-			isSecondaryKeyword (token, KEYWORD_module));
+	/* secondary token should be KEYWORD_NONE or KEYWORD_module token */
 	skipToNextStatement (token);
 	ancestorPop ();
 }
@@ -2070,12 +2066,11 @@ static void parseSubprogram (tokenInfo *const token, const tagType tag)
 	parseExecutionPart (token);
 	if (isKeyword (token, KEYWORD_contains))
 		parseInternalSubprogramPart (token);
-	Assert (isKeyword (token, KEYWORD_end));
+	/* should be at KEYWORD_end token */
 	readSubToken (token);
-	Assert (isSecondaryKeyword (token, KEYWORD_NONE) ||
-			isSecondaryKeyword (token, KEYWORD_program) ||
-			isSecondaryKeyword (token, KEYWORD_function) ||
-			isSecondaryKeyword (token, KEYWORD_subroutine));
+	/* secondary token should be one of KEYWORD_NONE, KEYWORD_program,
+	 * KEYWORD_function, KEYWORD_function
+	 */
 	skipToNextStatement (token);
 	ancestorPop ();
 }
