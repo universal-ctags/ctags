@@ -43,6 +43,7 @@ ctags-@VERSION@ (@DATE@)
 * Fixed parsing of Fortran comment-to-end-of-line with no newline before EOF [Debian bug #432872].
 * Fixed parsing of << [C/C++, Bugs #1020715, #1093123, #1770479, #1770607].
 * Fixed parsing of fully-qualified type names [Java, Bug #814263].
+* Fixed handling of lone carriage-return characters in file [Bug #1773926].
 
 ctags-5.6 (Mon May 29 2006)
 * Reformatted code for independence of tab stop setting.
