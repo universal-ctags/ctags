@@ -74,7 +74,7 @@ CONFIG_GEN := config.cache config.log config.status config.run config.h Makefile
 PROF_GEN   := gmon.out
 COV_GEN	   := *.da *.gcov
 
-UNIX2DOS := perl -pe 's/$$/\r/'
+UNIX2DOS := perl -pe 's/(\r\n|\n|\r)/\r\n/g'
 MAN2HTML := tbl | groff -Wall -mtty-char -mandoc -Thtml -c
 
 #
@@ -191,6 +191,15 @@ syntax.vim: $(DSOURCES) $(HEADERS) $(LIB_FILES)
 # Release management
 #
 
+release-help:
+	@ echo "1. make release-svn-X.Y"
+	@ echo "2. make release-source-X.Y"
+	@ echo "3. move ctags-X.Y.tar.gz to Linux"
+	@ echo "4. On Linux: Extract tar and compile; make -f maintainer.mak release-rpm-X.Y"
+	@ echo "5. On Windows: cd $(WINDOWS_DIR)/winXY; nmake -f mk_mvc.mak ctags.exe mostlyclean"
+	@ echo "6. make version=X.Y win-bin"
+	@ echo "7. make website-X.Y"
+
 .SECONDARY:
 
 RPM_ARCH := i386
@@ -290,8 +299,7 @@ $(RELEASE_DIR)/ctags%.zip: \
 
 win-source: $(WINDOWS_DIR)/ctags$(win_version)
 
-win-bin:
-	$(RELEASE_DIR)/ctags$(win_version).zip
+win-bin: $(RELEASE_DIR)/ctags$(win_version).zip
 
 release-win-%:
 	$(MAKE) version="$*" win-source
@@ -307,9 +315,7 @@ release-rpm-%: \
 release-source-%: $(RELEASE_DIR)/ctags-%.tar.gz
 	$(MAKE) version="$*" win-source
 
-release-bin-%: \
-		$(RELEASE_DIR)/ctags-%-1.$(RPM_ARCH).rpm \
-		$(RELEASE_DIR)/ctags-%-1.src.rpm
+release-bin-%: release-rpm-%
 	$(MAKE) version="$*" win-bin
 
 $(WINDOWS_DIR):
