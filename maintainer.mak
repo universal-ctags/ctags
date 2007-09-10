@@ -16,7 +16,7 @@ VERSION_FILES:= ctags.h ctags.1 NEWS
 LIB_FILES    := readtags.c readtags.h
 
 ENVIRONMENT_MAKEFILES := \
-				mk_bc3.mak mk_bc5.mak mk_djg.mak mk_manx.mak mk_ming.mak \
+				mk_bc3.mak mk_bc5.mak mk_djg.mak mk_manx.mak mk_mingw.mak \
 				mk_mpw.mak mk_mvc.mak mk_os2.mak mk_qdos.mak mk_sas.mak \
 
 COMMON_FILES := COPYING EXTENDING.html FAQ INSTALL.oth MAINTAINERS NEWS README \
@@ -29,6 +29,8 @@ UNIX_FILES   := $(COMMON_FILES) \
 				Makefile.in maintainer.mak \
 				descrip.mms mkinstalldirs magic.diff \
 				ctags.spec ctags.1
+
+REGEX_DIR    := gnu_regex
 
 WIN_FILES    := $(COMMON_FILES) $(VERSION_FILES)
 WIN_REGEX    := regex.c regex.h
@@ -249,13 +251,15 @@ $(RELEASE_DIR)/ctags-%.tar.gz: $(UNIX_FILES) | $(RELEASE_DIR)
 	@ echo "---------- Building tar ball"
 	if [ -d $(@D)/dirs/ctags-$* ]; then rm -fr $(@D)/dirs/ctags-$*; fi
 	mkdir -p $(@D)/dirs/ctags-$*
-	cp -p $(UNIX_FILES) $(@D)/dirs/ctags-$*/
+	cp -pr $(UNIX_FILES) $(REGEX_DIR) $(@D)/dirs/ctags-$*/
 	sed -e 's/\(PROGRAM_VERSION\) "\([^ ]*\)"/\1 "$*"/' ctags.h > $(@D)/dirs/ctags-$*/ctags.h
 	sed -e 's/"\(Version\) \([^ ]*\)"/"\1 $*"/' ctags.1 > $(@D)/dirs/ctags-$*/ctags.1
 	sed -e 's/\(Current Version:\) [^ ]*/\1 $*/' -e 's/@VERSION@/$*/' -e "s/@DATE@/`date +'%d %b %Y'`/" NEWS > $(@D)/dirs/ctags-$*/NEWS
 	(cd $(@D)/dirs/ctags-$* ;\
 		chmod 644 * ;\
 		chmod 755 mkinstalldirs ;\
+		chmod 755 $(REGEX_DIR) ;\
+		chmod 644 $(REGEX_DIR)/* ;\
 		autoheader ;\
 		chmod 644 config.h.in ;\
 		autoconf ;\
@@ -287,9 +291,13 @@ $(WINDOWS_DIR)/ctags$(win_version): \
 	for file in $(WIN_FILES) ctags.html; do \
 		$(UNIX2DOS) < "$(RELEASE_DIR)/dirs/ctags-$(version)/$${file}" > $@/$${file} ;\
 	done
-	for file in $(WIN_REGEX); do \
-		$(UNIX2DOS) < "gnu_regex/$${file}" > $@/$${file} ;\
+	mkdir $@/$(REGEX_DIR)
+	for file in $(REGEX_DIR)/*; do \
+		$(UNIX2DOS) < "$${file}" > $@/$(REGEX_DIR)/`basename $${file}` ;\
 	done
+	chmod 644 $@/*
+	chmod 755 $@/$(REGEX_DIR)
+	chmod 644 $@/$(REGEX_DIR)/*
 
 $(RELEASE_DIR)/ctags%.zip: \
 		check-version-% \
@@ -395,6 +403,10 @@ $(DEP_DIR)/%.d: %.c maintainer.mak
 #
 # Compilation rules
 #
+regex.o: gnu_regex/regex.c
+	@ echo "-- Compiling $<"
+	@ $(CC) $(COMP_FLAGS) -DEXTERNAL_SORT $(OPT) $(WARNINGS) -Wuninitialized -c -Ignu_regex $<
+
 %.o: %.c
 	@ echo "-- Compiling $<"
 	@ $(CC) $(COMP_FLAGS) -DEXTERNAL_SORT $(OPT) $(WARNINGS) -Wuninitialized -c $<

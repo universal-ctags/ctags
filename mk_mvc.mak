@@ -4,30 +4,31 @@
 
 include source.mak
 
-REGEX_DEFINE = -DHAVE_REGCOMP -DREGEX_MALLOC -DSTDC_HEADERS=1
-EXTRA_LIBS = regex.obj
-
-DEFINES = -DWIN32 $(REGEX_DEFINE)
-INCLUDES = -I.
+REGEX_DEFINES = -DHAVE_REGCOMP -DREGEX_MALLOC -DSTDC_HEADERS=1
+DEFINES = -DWIN32 $(REGEX_DEFINES)
+INCLUDES = -I. -Ignu_regex
 OPT = /O2
 
 ctags: ctags.exe
 
-ctags.exe: $(SOURCES) respmvc $(EXTRA_LIBS)
+ctags.exe: respmvc
 	cl $(OPT) /Fe$@ @respmvc /link setargv.obj
 
 readtags.exe: readtags.c
 	cl /clr $(OPT) /Fe$@ $(DEFINES) -DREADTAGS_MAIN readtags.c /link setargv.obj
 
 # Debug version
-dctags.exe: $(SOURCES) respmvc $(EXTRA_LIBS)
+dctags.exe: respmvc
 	cl /Zi -DDEBUG /Fe$@ @respmvc debug.c /link setargv.obj
 
 regex.obj:
 	cl /c $(OPT) /Fo$@ $(DEFINES) -Dconst= regex.c
 
-respmvc: $(SOURCES) $(HEADERS) mk_mvc.mak
-	echo $(DEFINES) $(INCLUDES) $(SOURCES) $(EXTRA_LIBS) > $@
+respmvc: $(SOURCES) $(REGEX_SOURCES) $(HEADERS) $(REGEX_HEADERS) mk_mvc.mak
+	echo $(DEFINES) > $@
+	echo $(INCLUDES) >> $@
+	echo $(SOURCES) >> $@
+	echo $(REGEX_SOURCES) >> $@
 
 mostlyclean:
 	- del *.obj

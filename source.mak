@@ -58,6 +58,10 @@ ENVIRONMENT_HEADERS = \
 ENVIRONMENT_SOURCES = \
     argproc.c mac.c qdos.c
 
+REGEX_SOURCES = gnu_regex/regex.c
+
+REGEX_HEADERS = gnu_regex/regex.h
+
 OBJECTS = \
 	args.$(OBJEXT) \
 	asm.$(OBJEXT) \

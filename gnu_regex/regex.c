@@ -1,5 +1,5 @@
 /* Extended regular expression matching and search library,
-   version 0.12, which minor changes by Darren Hiebert.
+   version 0.12, with minor changes by Darren Hiebert.
    (Implements POSIX draft P10003.2/D11.2, except for
    internationalization features.)
 
@@ -880,7 +880,7 @@ static reg_errcode_t compile_range ();
 
 /* Make sure we have at least N more bytes of space in buffer.  */
 #define GET_BUFFER_SPACE(n)						\
-    while (b - bufp->buffer + (n) > bufp->allocated)			\
+    while ((unsigned long)(b - bufp->buffer + (n)) > bufp->allocated)			\
       EXTEND_BUFFER ()
 
 /* Make sure we have one more byte of buffer space and then add C to it.  */
@@ -1624,10 +1624,12 @@ regex_compile (pattern, size, syntax, bufp)
               if (syntax & RE_NO_BK_PARENS) goto normal_backslash;
 
               if (COMPILE_STACK_EMPTY)
+                {
                 if (syntax & RE_UNMATCHED_RIGHT_PAREN_ORD)
                   goto normal_backslash;
                 else
                   return REG_ERPAREN;
+                }
 
             handle_close:
               if (fixup_alt_jump)
@@ -1644,10 +1646,12 @@ regex_compile (pattern, size, syntax, bufp)
 
               /* See similar code for backslashed left paren above.  */
               if (COMPILE_STACK_EMPTY)
+                {
                 if (syntax & RE_UNMATCHED_RIGHT_PAREN_ORD)
                   goto normal_char;
                 else
                   return REG_ERPAREN;
+                }
 
               /* Since we just checked for an empty stack above, this
                  ``can't happen''.  */
@@ -2218,8 +2222,8 @@ compile_range (p_ptr, pend, translate, syntax, b)
 
      We also want to fetch the endpoints without translating them; the 
      appropriate translation is done in the bit-setting loop below.  */
-  range_start = ((unsigned char *) p)[-2];
-  range_end   = ((unsigned char *) p)[0];
+  range_start = ((const unsigned char *) p)[-2];
+  range_end   = ((const unsigned char *) p)[0];
 
   /* Have to increment the pointer into the pattern string, so the
      caller isn't still at the ending character.  */

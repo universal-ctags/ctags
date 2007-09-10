@@ -1,6 +1,9 @@
 Current Version: @VERSION@
 
 ctags-@VERSION@ (@DATE@)
+Added regex support when compiling with MinGW. Gnu regex module now included in all distributions.
+
+ctags-5.7 (04 Sep 2007)
 * Added support for DIM AS [Freebasic, Bug #1741778].
 * Added support for arbitrary nesting depth [Python, Bug #1684786, Debian bug #409078].
 * Added support for verbatim string literals [C#, Bug #1515910].

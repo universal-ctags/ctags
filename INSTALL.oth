@@ -11,7 +11,7 @@ For non-Unix platforms, simple makefiles are provided:
     mk_bc5.mak    For Win32 using Borland C++ 5.5
     mk_djg.mak    For MSDOS using DJGPP Gnu GCC (better to follow Unix install)
     mk_manx.mak   For Amiga using Aztec/Manx C 5.0
-    mk_ming.mak   For Win32 using Mingw32
+    mk_mingw.mak  For Win32 using MinGW
     mk_mpw.mak    For Macintosh using MPW
     mk_mvc.mak    For Win32 using Microsoft Visual C++
     mk_os2.mak    For OS/2 using GCC (EMX)
@@ -22,17 +22,6 @@ For non-Unix platforms, simple makefiles are provided:
 
 Special Notes
 =============
-
-Win32:
-------
-
-  Regex support on Win32 is available when compiled to use the Win32 port of
-  the Gnu regex library, which can be obtained here:
-
-    http://people.delphiforums.com/gjc/gnu_regex.html
-
-  See the makefiles, mk_mvc.mak or mk_bc5.mak, to learn how to build with
-  this library.
 
 DJGPP:
 ------
