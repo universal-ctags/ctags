@@ -72,8 +72,10 @@ static void installPHPRegex (const langType language)
 		"\\2", "d,define,constant definitions", NULL);
 	addTagRegex(language, "(^|[ \t])function[ \t]+&?[ \t]*([" ALPHA "_][" ALNUM "_]*)",
 		"\\2", "f,function,functions", NULL);
-	addTagRegex(language, "(^|[ \t])\\$([" ALPHA "_][" ALNUM "_]*)[ \t]*=",
-		"\\2", "v,variable,variables", NULL);
+	addTagRegex(language, "(^|[ \t])(\\$|::\\$|\\$this->)([" ALPHA "_][" ALNUM "_]*)[ \t]*=",
+		"\\3", "v,variable,variables", NULL);
+	addTagRegex(language, "(^|[ \t])(var|public|protected|private|static)[ \t]+\\$([" ALPHA "_][" ALNUM "_]*)[ \t]*[=;]",
+		"\\3", "v,variable,variables", NULL);
 
 	/* function regex is covered by PHP regex */
 	addTagRegex (language, "(^|[ \t])([A-Za-z0-9_]+)[ \t]*[=:][ \t]*function[ \t]*\\(",

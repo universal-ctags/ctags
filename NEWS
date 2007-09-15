@@ -1,7 +1,8 @@
 Current Version: @VERSION@
 
 ctags-@VERSION@ (@DATE@)
-Added regex support when compiling with MinGW. Gnu regex module now included in all distributions.
+* Added regex support when compiling with MinGW. Gnu regex module now included in all distributions.
+* Added support for class and member variables [PHP, Bug #1037086]
 
 ctags-5.7 (04 Sep 2007)
 * Added support for DIM AS [Freebasic, Bug #1741778].
