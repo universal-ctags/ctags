@@ -2322,7 +2322,7 @@ static boolean inheritingDeclaration (declType decl)
 
 static void processColon (statementInfo *const st)
 {
-	int c = skipToNonWhite ();
+	int c = (isLanguage (Lang_cpp) ? cppGetc () : skipToNonWhite ());
 	const boolean doubleColon = (boolean) (c == ':');
 
 	if (doubleColon)
