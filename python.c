@@ -162,12 +162,13 @@ static const char *skipEverything (const char *cp)
 {
 	for (; *cp; cp++)
 	{
-		if (isIdentifierFirstCharacter ((int) *cp))
-			return cp;
-		if (*cp == '"' || *cp == '\'')
+	    if (*cp == '"' || *cp == '\'')
 		{
 			cp = skipString(cp);
+			if (!*cp) break;
 		}
+		if (isIdentifierFirstCharacter ((int) *cp))
+			return cp;
     }
     return cp;
 }
