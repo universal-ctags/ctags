@@ -147,6 +147,8 @@ typedef enum eTokenType {
 	TOKEN_PERIOD,
 	TOKEN_OPEN_CURLY,
 	TOKEN_CLOSE_CURLY,
+	TOKEN_OPEN_SQUARE,
+	TOKEN_CLOSE_SQUARE,
 	TOKEN_TILDE,
 	TOKEN_FORWARD_SLASH
 } tokenType;
@@ -362,6 +364,8 @@ static tokenInfo *newToken (void)
 	token->keyword		= KEYWORD_NONE;
 	token->string		= vStringNew ();
 	token->scope		= vStringNew ();
+	token->lineNumber   = getSourceLineNumber ();
+	token->filePosition = getInputFilePosition ();
 
 	return token;
 }
@@ -487,6 +491,8 @@ getNextChar:
 	do
 	{
 		c = fileGetc ();
+		token->lineNumber   = getSourceLineNumber ();
+		token->filePosition = getInputFilePosition ();
 		/* 
 		 * Added " to the list of ignores, not sure what this 
 		 * might break but it gets by this issue:
@@ -505,11 +511,13 @@ getNextChar:
 		case '(': token->type = TOKEN_OPEN_PAREN;		break;
 		case ')': token->type = TOKEN_CLOSE_PAREN;		break;
 		case ';': token->type = TOKEN_SEMICOLON;		break;
-		case '.': token->type = TOKEN_PERIOD;				break;
+		case '.': token->type = TOKEN_PERIOD;			break;
 		case ',': token->type = TOKEN_COMMA;			break;
 		case '{': token->type = TOKEN_OPEN_CURLY;		break;
 		case '}': token->type = TOKEN_CLOSE_CURLY;		break;
 		case '~': token->type = TOKEN_TILDE;			break;
+		case '[': token->type = TOKEN_OPEN_SQUARE;		break;
+		case ']': token->type = TOKEN_CLOSE_SQUARE;		break;
 
 		case '\'':
 		case '"':
@@ -1252,14 +1260,64 @@ static void parseTable (tokenInfo *const token)
 	 *	   create table bob."t7" (c1 int);
 	 * Proxy tables use this format:
 	 *	   create existing table bob."t7" AT '...';
+	 * SQL Server and Sybase formats
+     *     create table OnlyTable (
+     *     create table dbo.HasOwner (
+     *     create table [dbo].[HasOwnerSquare] (
+     *     create table master.dbo.HasDb (
+     *     create table master..HasDbNoOwner (
+     *     create table [master].dbo.[HasDbAndOwnerSquare] (
+     *     create table [master]..[HasDbNoOwnerSquare] (
 	 */
 
+	/* This could be a database, owner or table name */
 	readToken (name);
+	if (isType (name, TOKEN_OPEN_SQUARE))
+	{
+		readToken (name);
+		/* Read close square */
+		readToken (token);
+	} 
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
+		/* 
+		 * This could be a owner or table name.
+		 * But this is also a special case since the table can be 
+		 * referenced with a blank owner:
+		 *     dbname..tablename
+		 */
 		readToken (name);
+		if (isType (name, TOKEN_OPEN_SQUARE))
+		{
+			readToken (name);
+			/* Read close square */
+			readToken (token);
+		} 
+		/* Check if a blank name was provided */
+		if (isType (name, TOKEN_PERIOD))
+		{
+			readToken (name);
+			if (isType (name, TOKEN_OPEN_SQUARE))
+			{
+				readToken (name);
+				/* Read close square */
+				readToken (token);
+			} 
+		}
 		readToken (token);
+		if (isType (token, TOKEN_PERIOD))
+		{
+			/* This can only be the table name */
+			readToken (name);
+			if (isType (name, TOKEN_OPEN_SQUARE))
+			{
+				readToken (name);
+				/* Read close square */
+				readToken (token);
+			} 
+			readToken (token);
+		}
 	}
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
