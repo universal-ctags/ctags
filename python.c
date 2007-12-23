@@ -409,12 +409,12 @@ static void findPythonTags (void)
 		{
 			boolean found = FALSE;
 			boolean is_class = FALSE;
-			if (!strncmp (keyword, "def", 3))
+			if (!strncmp (keyword, "def ", 4))
 			{
 				cp = skipSpace (keyword + 3);
 				found = TRUE;
 			}
-			else if (!strncmp (keyword, "class", 5))
+			else if (!strncmp (keyword, "class ", 6))
 			{
 				cp = skipSpace (keyword + 5);
 				found = TRUE;
