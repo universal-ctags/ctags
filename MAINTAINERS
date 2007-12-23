@@ -17,3 +17,65 @@ SML             jkoshy          Joseph Koshy
 SQL             dfishburn       David Fishburn
 Vim             dfishburn       David Fishburn
 All else        dhiebert        Darren Hiebert
+
+How To Build & Test Like A Maintainer
+=====================================
+
+Prerequisites
+-------------
+
+  Debian/Ubuntu:
+
+    sudo apt-get install build-essential subversion autoconf
+
+  Mac OS:
+
+    Install the Xcode developer tools, available here:
+    http://developer.apple.com/tools/download/
+
+  RedHat:
+
+    up2date --nosig subversion autoheader autoconf
+
+  Windows:
+
+    Install Cygwin plus its Subversion and GNU Make packages.
+
+Building
+--------
+
+  First time:
+
+    svn co https://ctags.svn.sourceforget.net/svnroot/ctags/trunk ctags
+    # Miss off the "/trunk" above if you want access to old releases or the
+    # web site.
+    cd ctags
+    autoheader
+    autoconf
+    ./configure --enable-maintainer-mode
+    make -j
+
+  Later:
+
+    cd ctags
+    svn update
+    make -j
+
+Testing
+-------
+
+  First time:
+
+    cd ctags
+    cp /usr/bin/ctags ctags.ref
+    # Edit "testing.mak" so CTAGS_TEST = ./dctags
+    # Edit "testing.mak" so CTAGS_REF = ./ctags.ref
+    make test
+
+  Later:
+
+    make test
+
+  Whenever you're happy with the results and update/commit:
+
+    cp ./dctags ./ctags.ref
