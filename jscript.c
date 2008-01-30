@@ -165,18 +165,6 @@ static void parseFunction (tokenInfo *const token);
 static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent);
 static boolean parseLine (tokenInfo *const token, boolean is_inside_class);
 
-static boolean isIdentChar1 (const int c)
-{
-	/*
-	 * Other databases are less restrictive on the first character of
-	 * an identifier.
-	 * isIdentChar1 is used to identify the first character of an 
-	 * identifier, so we are removing some restrictions.
-	 */
-	return (boolean)
-		(isalpha (c) || c == '@' || c == '_' );
-}
-
 static boolean isIdentChar (const int c)
 {
 	return (boolean)
@@ -206,6 +194,8 @@ static tokenInfo *newToken (void)
 	token->scope		= vStringNew ();
 	token->nestLevel	= 0;
 	token->ignoreTag	= FALSE;
+	token->lineNumber   = getSourceLineNumber ();
+	token->filePosition = getInputFilePosition ();
 
 	return token;
 }
@@ -304,11 +294,17 @@ static void parseString (vString *const string, const int delimiter)
 {
 	boolean end = FALSE;
 	int c;
+	int d;
 	while (! end)
 	{
 		c = fileGetc ();
 		if (c == EOF)
 			end = TRUE;
+		else if (c == '\\')
+		{
+			c = fileGetc(); // this maybe a ' or "
+			vStringPut(string, c);
+		}
 		else if (c == delimiter)
 			end = TRUE;
 		else
@@ -323,7 +319,7 @@ static void parseString (vString *const string, const int delimiter)
 static void parseIdentifier (vString *const string, const int firstChar)
 {
 	int c = firstChar;
-	Assert (isIdentChar1 (c));
+	Assert (isIdentChar (c));
 	do
 	{
 		vStringPut (string, c);
@@ -356,11 +352,8 @@ getNextChar:
 	do
 	{
 		c = fileGetc ();
-		/* 
-		 * Added " to the list of ignores, not sure what this 
-		 * might break but it gets by this issue:
-		 *	  create table "t1" (...)
-		 */
+		token->lineNumber   = getSourceLineNumber ();
+		token->filePosition = getInputFilePosition ();
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\n');
 
@@ -383,6 +376,15 @@ getNextChar:
 		case '"':
 				  token->type = TOKEN_STRING;
 				  parseString (token->string, c);
+				  token->lineNumber = getSourceLineNumber ();
+				  token->filePosition = getInputFilePosition ();
+				  break;
+
+		case '\\':
+				  c = fileGetc ();
+				  if (c != '\\'  && c != '"'  &&  !isspace (c))
+					  fileUngetc (c);
+				  token->type = TOKEN_CHARACTER;
 				  token->lineNumber = getSourceLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
@@ -421,7 +423,7 @@ getNextChar:
 				  }
 
 		default:
-				  if (! isIdentChar1 (c))
+				  if (! isIdentChar (c))
 					  token->type = TOKEN_UNDEFINED;
 				  else
 				  {
@@ -1387,7 +1389,7 @@ static boolean parseLine (tokenInfo *const token, boolean is_inside_class)
 	{
 		/*
 		 * Special case where single line statements may not be
-		 * SEMICOLON termianted.  parseBlock needs to know this
+		 * SEMICOLON terminated.  parseBlock needs to know this
 		 * so that it does not read the next token.
 		 */
 		is_terminated = parseStatement (token, is_inside_class); 
