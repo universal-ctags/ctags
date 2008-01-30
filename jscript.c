@@ -698,21 +698,39 @@ static void parseLoop (tokenInfo *const token)
 	}
 }
 
-static void parseIf (tokenInfo *const token)
+static boolean parseIf (tokenInfo *const token)
 {
+	boolean read_next_token = TRUE;
 	/*
 	 * If statements have two forms
 	 *	   if ( ... )
 	 *		   one line;
 	 *
+	 *	   if ( ... )  
+	 *		  statement;
+	 *	   else
+	 *		  statement
+	 *	    
 	 *	   if ( ... ) {
 	 *		  multiple;
 	 *		  statements;
 	 *	   }
 	 *
+	 *
 	 *	   if ( ... ) {
 	 *		  return elem
 	 *	   }
+	 *
+	 *     This example if correctly written, but the
+	 *     else contains only 1 statement without a terminator
+	 *     since the function finishes with the closing brace.
+	 *
+     *     function a(flag){
+     *         if(flag)
+     *             test(1);
+     *         else
+     *             test(2)
+     *     }
 	 *
 	 * TODO:  Deal with statements that can optional end
 	 *		  without a semi-colon.  Currently this messes up
@@ -747,7 +765,39 @@ static void parseIf (tokenInfo *const token)
 	else 
 	{
 		findCmdTerm (token);
+
+		/*
+		 * The IF could be followed by an ELSE statement.
+		 * This too could have two formats, a curly braced
+		 * multiline section, or another single line.
+		 */
+
+		if (isType (token, TOKEN_CLOSE_CURLY)) 
+		{
+			/*
+			 * This statement did not have a line terminator.
+			 */
+			read_next_token = FALSE;
+		} 
+		else 
+		{
+			readToken (token);
+
+			if (isType (token, TOKEN_CLOSE_CURLY)) 
+			{
+				/*
+				* This statement did not have a line terminator.
+				*/
+				read_next_token = FALSE;
+			} 
+			else
+			{
+				if (isKeyword (token, KEYWORD_else))
+					read_next_token = parseIf (token); 
+			}
+		} 
 	}
+	return read_next_token;
 }
 
 static void parseFunction (tokenInfo *const token)
@@ -1390,7 +1440,7 @@ static boolean parseLine (tokenInfo *const token, boolean is_inside_class)
 			case KEYWORD_catch:
 			case KEYWORD_finally:
 				/* Common semantics */
-				parseIf (token); 
+				is_terminated = parseIf (token); 
 				break;
 			case KEYWORD_switch:
 				parseSwitch (token); 
