@@ -124,15 +124,17 @@ typedef enum {
 	JSTAG_FUNCTION,
 	JSTAG_CLASS,
 	JSTAG_METHOD,
+	JSTAG_PROPERTY,
 	JSTAG_VARIABLE,
 	JSTAG_COUNT
 } jsKind;
 
 static kindOption JsKinds [] = {
-	{ TRUE,  'f', "function",	  "functions"			   },
+	{ TRUE,  'f', "function",	  "functions"		   },
 	{ TRUE,  'c', "class",		  "classes"			   },
 	{ TRUE,  'm', "method",		  "methods"			   },
-	{ TRUE,  'v', "variable",	  "global variables"	   }
+	{ TRUE,  'p', "property",	  "properties"		   },
+	{ TRUE,  'v', "variable",	  "global variables"   }
 };
 
 static const keywordDesc JsKeywordTable [] = {
@@ -895,13 +897,15 @@ static void parseMethods (tokenInfo *const token, tokenInfo *const class)
 
 	/*
 	 * This deals with these formats
-	 *	   'validMethod' : function(a,b) {}
+	 *	   validProperty  : 2,
+	 *	   validMethod    : function(a,b) {}
+	 *	   'validMethod2' : function(a,b) {}
 	 */
 
 	do
 	{
 		readToken (token);
-		if (isType (token, TOKEN_STRING))
+		if (isType (token, TOKEN_STRING) || isKeyword(token, KEYWORD_NONE))
 		{
 			copyToken(name, token);
 
@@ -925,10 +929,21 @@ static void parseMethods (tokenInfo *const token, tokenInfo *const class)
 
 						/*
 						 * Read to the closing curly, check next
-						 * token, if comma, we must loop again
+						 * token, if a comma, we must loop again
 						 */
 						readToken (token);
 					}
+				}
+				else
+				{
+						addToScope (name, class->string);
+						makeJsTag (name, JSTAG_PROPERTY);
+
+						/*
+						 * Read the next token, if a comma
+						 * we must loop again
+						 */
+						readToken (token);
 				}
 			}
 		}
