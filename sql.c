@@ -445,6 +445,11 @@ static void parseString (vString *const string, const int delimiter)
 		c = fileGetc ();
 		if (c == EOF)
 			end = TRUE;
+		else if (c == '\\')
+		{
+			c = fileGetc(); // this maybe a ' or "
+			vStringPut(string, c);
+		}
 		else if (c == delimiter)
 			end = TRUE;
 		else
@@ -561,6 +566,15 @@ getNextChar:
 					  }
 					  break;
 				  }
+
+		case '\\':
+				  c = fileGetc ();
+				  if (c != '\\'  && c != '"'  &&  !isspace (c))
+					  fileUngetc (c);
+				  token->type = TOKEN_CHARACTER;
+				  token->lineNumber = getSourceLineNumber ();
+				  token->filePosition = getInputFilePosition ();
+				  break;
 
 		case '/':
 				  {
