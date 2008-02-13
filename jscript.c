@@ -11,6 +11,8 @@
  *
  *	 This is a good reference for different forms of the function statement:
  *		 http://www.permadi.com/tutorial/jsFunc/
+ *   Another good reference:
+ *       http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Guide
  */
 
 /*
