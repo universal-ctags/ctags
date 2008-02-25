@@ -439,15 +439,14 @@ static int skipToCharacter (const int c)
 static void parseString (vString *const string, const int delimiter)
 {
 	boolean end = FALSE;
-	int c;
 	while (! end)
 	{
-		c = fileGetc ();
+		int c = fileGetc ();
 		if (c == EOF)
 			end = TRUE;
 		else if (c == '\\')
 		{
-			c = fileGetc(); // this maybe a ' or "
+			c = fileGetc(); /* This maybe a ' or ". */
 			vStringPut(string, c);
 		}
 		else if (c == delimiter)
