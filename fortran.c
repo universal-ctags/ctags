@@ -216,7 +216,8 @@ static kindOption FortranKinds [] = {
 	{ TRUE,  'v', "variable",   "program (global) and module variables"}
 };
 
-/* For a definition of Fortran 77 with extensions:
+/* For efinitions of Fortran 77 with extensions:
+ * http://www.fortran.com/fortran/F77_std/rjcnf0001.html
  * http://scienide.uwaterloo.ca/MIPSpro7/007-2362-004/sgi_html/index.html
  *
  * For the Compaq Fortran Reference Manual:
