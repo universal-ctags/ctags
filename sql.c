@@ -777,8 +777,6 @@ static void skipToMatched(tokenInfo *const token)
 
 static void skipArgumentList (tokenInfo *const token)
 {
-	int nest_level = 0;
-
 	/*
 	 * Other databases can have arguments with fully declared
 	 * datatypes:
