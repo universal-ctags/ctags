@@ -68,7 +68,8 @@ typedef enum eKeywordId {
 	KEYWORD_DOUBLE,
 	KEYWORD_ELSE, KEYWORD_ENUM, KEYWORD_EXPLICIT, KEYWORD_EXTERN,
 	KEYWORD_EXTENDS, KEYWORD_EVENT,
-	KEYWORD_FINAL, KEYWORD_FLOAT, KEYWORD_FOR, KEYWORD_FRIEND, KEYWORD_FUNCTION,
+	KEYWORD_FINAL, KEYWORD_FLOAT, KEYWORD_FOR, KEYWORD_FOREACH,
+	KEYWORD_FRIEND, KEYWORD_FUNCTION,
 	KEYWORD_GOTO,
 	KEYWORD_IF, KEYWORD_IMPLEMENTS, KEYWORD_IMPORT, KEYWORD_INLINE, KEYWORD_INT,
 	KEYWORD_INOUT, KEYWORD_INPUT, KEYWORD_INTEGER, KEYWORD_INTERFACE,
@@ -390,6 +391,7 @@ static const keywordDesc KeywordTable [] = {
 	{ "final",          KEYWORD_FINAL,          { 0, 0, 0, 1, 0 } },
 	{ "float",          KEYWORD_FLOAT,          { 1, 1, 1, 1, 0 } },
 	{ "for",            KEYWORD_FOR,            { 1, 1, 1, 1, 0 } },
+	{ "foreach",        KEYWORD_FOREACH,        { 0, 0, 1, 0, 0 } },
 	{ "friend",         KEYWORD_FRIEND,         { 0, 1, 0, 0, 0 } },
 	{ "function",       KEYWORD_FUNCTION,       { 0, 0, 0, 0, 1 } },
 	{ "goto",           KEYWORD_GOTO,           { 1, 1, 1, 1, 0 } },
@@ -1792,6 +1794,7 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 			break;
 
 		case KEYWORD_FOR:
+		case KEYWORD_FOREACH:
 		case KEYWORD_IF:
 		case KEYWORD_SWITCH:
 		case KEYWORD_WHILE:
