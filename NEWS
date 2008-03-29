@@ -4,6 +4,7 @@ ctags-@VERSION@ (@DATE@)
 * Added regex support when compiling with MinGW. Gnu regex module now included in all distributions.
 * Added support for class and member variables [PHP, Bug #1037086]
 * Fixed parsing of global scope qualifiers in base class lists. [C++, Bug #1799343].
+* Fixed parsing of "else". [C#, Bug #1830344].
 * Fixed bug with detecting identifiers inside variables. [Python, Bug  #1809024].
 * Fixed bug with detecting identifiers at the start of variables. [Python, Bug #1856363].
 * Fixed parsing of triple single-quoted multi-line strings. [Python, Bug #1906062].
