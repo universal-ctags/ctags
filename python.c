@@ -52,6 +52,9 @@ struct NestingLevels
 	int allocated;
 };
 
+static char const * const singletriple = "'''";
+static char const * const doubletriple = "\"\"\"";
+
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -336,6 +339,39 @@ static void addNestingLevel(NestingLevels *nls, int indentation,
 	nl->is_class = is_class;
 }
 
+/* Return a pointer to the start of the next triple string, or NULL. Store
+ * the kind of triple string in "which" if the return is not NULL.
+ */
+static char *find_triple_start(char const *string, char const **which)
+{
+    char *s;
+    if ((s = strstr (string, doubletriple)))
+        *which = doubletriple;
+    else if ((s = strstr (string, singletriple)))
+        *which = singletriple;
+    return s;
+}
+
+/* Find the end of a triple string as pointed to by "which", and update "which"
+ * with any other triple strings following in the given string.
+ */
+static void find_triple_end(char const *string, char const **which)
+{
+    char const *s = string;
+    while (1)
+	{
+	    /* Check if the sting ends in the same line. */
+	    s = strstr (string, *which);
+		if (!s) break;
+		s += 3;
+		*which = NULL;
+		/* If yes, check if another one starts in the same line. */
+		s = find_triple_start(s, which);
+		if (!s) break;
+		s += 3;
+	}
+}
+
 static void findPythonTags (void)
 {
 	vString *const continuation = vStringNew ();
@@ -346,7 +382,7 @@ static void findPythonTags (void)
 
 	const char *line;
 	int line_skip = 0;
-	boolean longStringLiteral = FALSE;
+	char const *longStringLiteral = NULL;
 
 	while ((line = (const char *) fileReadLine ()) != NULL)
 	{
@@ -379,28 +415,22 @@ static void findPythonTags (void)
 		/* Deal with multiline string ending. */
 		if (longStringLiteral)
 		{
-			/* Note: We do ignore anything in the same line after a multiline
-			 * string for now.
-			 */
-			if (strstr (cp, "\"\"\""))
-				longStringLiteral = FALSE;
+		    find_triple_end(cp, &longStringLiteral);
 			continue;
 		}
 		
 		/* Deal with multiline string start. */
-		if ((longstring = strstr (cp, "\"\"\"")) != NULL)
+		longstring = find_triple_start(cp, &longStringLiteral);
+		if (longstring)
 		{
 			/* Note: For our purposes, the line just ends at the first long
-			 * string.
+			 * string. I.e. we don't parse for any tags in the rest of the
+			 * line, but we do look for the string ending of course.
 			 */
 			*longstring = '\0';
+
 			longstring += 3;
-			longStringLiteral = TRUE;
-			while ((longstring = strstr (longstring, "\"\"\"")) != NULL)
-			{
-				longstring += 3;
-				longStringLiteral = !longStringLiteral;
-			}
+			find_triple_end(longstring, &longStringLiteral);
 		}
 
 		/* Deal with def and class keywords. */
