@@ -6,6 +6,7 @@ ctags-@VERSION@ (@DATE@)
 * Fixed parsing of global scope qualifiers in base class lists [C++, Bug #1799343].
 * Fixed bug where namespace members were given kinds corresponding to globals [C++, Bug #1924919, #1575055].
 * Fixed parsing of "else" [C#, Bug #1830344].
+* Fixed parsing of derived enums [C#, Bug #1515910].
 * Fixed parsing of "foreach" [C#, Bug #1830343].
 * Fixed bug with detecting identifiers inside variables [Python, Bug #1809024].
 * Fixed bug with detecting identifiers at the start of variables [Python, Bug #1856363].
