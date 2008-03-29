@@ -381,7 +381,7 @@ static const keywordDesc KeywordTable [] = {
 	{ "delegate",       KEYWORD_DELEGATE,       { 0, 0, 1, 0, 0 } },
 	{ "delete",         KEYWORD_DELETE,         { 0, 1, 0, 0, 0 } },
 	{ "double",         KEYWORD_DOUBLE,         { 1, 1, 1, 1, 0 } },
-	{ "else",           KEYWORD_ELSE,           { 1, 1, 0, 1, 0 } },
+	{ "else",           KEYWORD_ELSE,           { 1, 1, 1, 1, 0 } },
 	{ "enum",           KEYWORD_ENUM,           { 1, 1, 1, 1, 1 } },
 	{ "event",          KEYWORD_EVENT,          { 0, 0, 1, 0, 1 } },
 	{ "explicit",       KEYWORD_EXPLICIT,       { 0, 1, 1, 0, 0 } },
