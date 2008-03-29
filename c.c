@@ -2051,12 +2051,18 @@ static void analyzePostParens (statementInfo *const st, parenInfo *const info)
 	}
 }
 
+static boolean languageSupportsGenerics (void)
+{
+	return (boolean) (isLanguage (Lang_cpp) || isLanguage (Lang_csharp) ||
+		isLanguage (Lang_java));
+}
+
 static void processAngleBracket (void)
 {
 	int c = cppGetc ();
 	if (c == '>') {
 		/* already found match for template */
-	} else if ((isLanguage (Lang_cpp) || isLanguage (Lang_java)) && c != '<' && c != '=') {
+	} else if (languageSupportsGenerics () && c != '<' && c != '=') {
 		/* this is a template */
 		cppUngetc (c);
 		skipToMatch ("<>");

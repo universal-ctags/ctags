@@ -8,6 +8,7 @@ ctags-@VERSION@ (@DATE@)
 * Fixed parsing of "else" [C#, Bug #1830344].
 * Fixed parsing of derived enums [C#, Bug #1515910].
 * Fixed parsing of "foreach" [C#, Bug #1830343].
+* Fixed parsing of simple generic classes [C#, Bug #1515910].
 * Fixed bug with detecting identifiers inside variables [Python, Bug #1809024].
 * Fixed bug with detecting identifiers at the start of variables [Python, Bug #1856363].
 * Fixed parsing of triple single-quoted multi-line strings [Python, Bug #1906062].
