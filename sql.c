@@ -30,8 +30,8 @@
 #include "vstring.h"
 
 /*
- *	On-line PL/SQL Reference Guide:
- *	http://info-it.umsystem.edu/oradocs/doc/server/doc/PLS23/toc.htm
+ *	On-line "Oracle Database PL/SQL Language Reference":
+ *	http://download.oracle.com/docs/cd/B28359_01/appdev.111/b28370/toc.htm
  *
  *	Sample PL/SQL code is available from:
  *	http://www.orafaq.com/faqscrpt.htm#GENPLSQL
@@ -848,7 +848,7 @@ static void parseSubProgram (tokenInfo *const token)
 
 	if (kind == SQLTAG_FUNCTION)
 	{
-		if (isKeyword (token, KEYWORD_return))
+		if (isKeyword (token, KEYWORD_return) || isKeyword (token, KEYWORD_returns))
 		{
 			/* Read datatype */
 			readToken (token);
