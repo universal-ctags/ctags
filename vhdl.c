@@ -147,21 +147,13 @@ typedef struct sKeywordDesc {
 	keywordId id;
 } keywordDesc;
 
-/*  Used for reporting the type of object parsed by nextToken ().
- */
 typedef enum eTokenType {
 	TOKEN_NONE,		/* none */
-	TOKEN_ARGS,		/* a parenthetical pair and its contents */
 	TOKEN_OPEN_PAREN,	/* ( */
 	TOKEN_CLOSE_PAREN,	/* ) */
-	TOKEN_BRACE_CLOSE,	/* } */
-	TOKEN_BRACE_OPEN,	/* { */
-	TOKEN_COLON,		/* the colon character */
 	TOKEN_COMMA,		/* the comma character */
-	TOKEN_DOUBLE_COLON,	/* double colon indicates nested-name-specifier */
 	TOKEN_IDENTIFIER,
 	TOKEN_KEYWORD,
-	TOKEN_PACKAGE,		/* a package name */
 	TOKEN_PERIOD,		/* . */
 	TOKEN_OPERATOR,
 	TOKEN_SEMICOLON,	/* the semicolon character */
@@ -199,16 +191,16 @@ typedef enum {
 } vhdlKind;
 
 static kindOption VhdlKinds[] = {
-	{TRUE, 'c', "constant", "constants declaration"},
-	{TRUE, 't', "type", "types definitions"},
-	{TRUE, 'T', "subtype", "subtypes definitions"},
+	{TRUE, 'c', "constant", "constant declarations"},
+	{TRUE, 't', "type", "type definitions"},
+	{TRUE, 'T', "subtype", "subtype definitions"},
 	{TRUE, 'r', "record", "record names"},
-	{TRUE, 'e', "entity", "entities declarations"},
-	{TRUE, 'C', "component", "components declarations"},
+	{TRUE, 'e', "entity", "entity declarations"},
+	{TRUE, 'C', "component", "component declarations"},
 	{TRUE, 'd', "prototype", "prototypes"},
 	{TRUE, 'f', "function", "function prototypes and declarations"},
 	{TRUE, 'p', "procedure", "procedure prototypes and declarations"},
-	{TRUE, 'P', "package", "packages definitions"}
+	{TRUE, 'P', "package", "package definitions"}
 };
 
 static keywordDesc VhdlKeywordTable[] = {
@@ -378,7 +370,7 @@ static void parseString (vString * const string, const int delimiter)
 	vStringTerminate (string);
 }
 
-/*  Read a C identifier beginning with "firstChar" and places it into "name".
+/*  Read a VHDL identifier beginning with "firstChar" and place it into "name".
 */
 static void parseIdentifier (vString * const string, const int firstChar)
 {
@@ -781,7 +773,7 @@ static void findVhdlTags (void)
 extern parserDefinition *VhdlParser (void)
 {
 	static const char *const extensions[] = { "vhdl", "vhd", NULL };
-	parserDefinition *def = parserNew ("Vhdl");
+	parserDefinition *def = parserNew ("VHDL");
 	def->kinds = VhdlKinds;
 	def->kindCount = KIND_COUNT (VhdlKinds);
 	def->extensions = extensions;
