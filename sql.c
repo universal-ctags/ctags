@@ -464,16 +464,6 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
  *	 Parsing functions
  */
 
-static int skipToCharacter (const int c)
-{
-	int d;
-	do
-	{
-		d = fileGetc ();
-	} while (d != EOF  &&  d != c);
-	return d;
-}
-
 static void parseString (vString *const string, const int delimiter)
 {
 	boolean end = FALSE;
@@ -563,7 +553,7 @@ getNextChar:
 				  c = fileGetc ();
 				  if (c == '-')		/* -- is this the start of a comment? */
 				  {
-					  skipToCharacter ('\n');
+					  fileSkipToCharacter ('\n');
 					  goto getNextChar;
 				  }
 				  else
@@ -618,7 +608,7 @@ getNextChar:
 						  {
 							  do
 							  {
-								  skipToCharacter ('*');
+								  fileSkipToCharacter ('*');
 								  c = fileGetc ();
 								  if (c == '/')
 									  break;
@@ -629,7 +619,7 @@ getNextChar:
 						  }
 						  else if (d == '/')	/* is this the start of a comment?  */
 						  {
-							  skipToCharacter ('\n');
+							  fileSkipToCharacter ('\n');
 							  goto getNextChar;
 						  }
 					  }
@@ -648,7 +638,7 @@ getNextChar:
 					  if (isKeyword (token, KEYWORD_rem))
 					  {
 						  vStringClear (token->string);
-						  skipToCharacter ('\n');
+						  fileSkipToCharacter ('\n');
 						  goto getNextChar;
 					  }
 					  else if (isKeyword (token, KEYWORD_NONE))

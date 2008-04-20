@@ -449,6 +449,16 @@ extern int fileGetc (void)
 	return c;
 }
 
+extern int fileSkipToCharacter (const int c)
+{
+	int d;
+	do
+	{
+		d = fileGetc ();
+	} while (d != EOF && d != c);
+	return d;
+}
+
 /*  An alternative interface to fileGetc (). Do not mix use of fileReadLine()
  *  and fileGetc() for the same file. The returned string does not contain
  *  the terminating newline. A NULL return value means that all lines in the

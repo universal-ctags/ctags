@@ -363,15 +363,6 @@ static void deleteToken (tokenInfo * const token)
 /*
  *   Parsing functions
  */
-static int skipToCharacter (const int c)
-{
-	int d;
-	do
-	{
-		d = fileGetc ();
-	} while (d != EOF && d != c);
-	return d;
-}
 
 static void parseString (vString * const string, const int delimiter)
 {
@@ -459,7 +450,7 @@ static void readToken (tokenInfo * const token)
 		c = fileGetc ();
 		if (c == '-')	/* start of a comment */
 		{
-			skipToCharacter ('\n');
+			fileSkipToCharacter ('\n');
 			goto getNextChar;
 		}
 		else
@@ -620,7 +611,7 @@ static void parseModule (tokenInfo * const token)
 	{
 		makeVhdlTag (name, VHDLTAG_COMPONENT);
 		skipToKeyword (KEYWORD_END);
-		skipToCharacter (';');
+		fileSkipToCharacter (';');
 	}
 	else
 	{
@@ -629,7 +620,7 @@ static void parseModule (tokenInfo * const token)
 		{
 			makeVhdlTag (name, VHDLTAG_ENTITY);
 			skipToKeyword (KEYWORD_END);
-			skipToCharacter (';');
+			fileSkipToCharacter (';');
 		}
 	}
 	deleteToken (name);
@@ -643,12 +634,12 @@ static void parseRecord (tokenInfo * const token)
 	{
 		readToken (name);
 		readToken (token);	/* should be a colon */
-		skipToCharacter (';');
+		fileSkipToCharacter (';');
 		makeVhdlTag (name, VHDLTAG_RECORD);
 		readToken (token);
 	}
 	while (isKeyword (token, KEYWORD_END));
-	skipToCharacter (';');
+	fileSkipToCharacter (';');
 	deleteToken (name);
 }
 
@@ -691,7 +682,7 @@ static void parseConstant (tokenInfo * const token, boolean local)
 	{
 		makeVhdlTag (name, VHDLTAG_CONSTANT);
 	}
-	skipToCharacter (';');
+	fileSkipToCharacter (';');
 	deleteToken (name);
 }
 
@@ -741,7 +732,7 @@ static void parseSubProgram (tokenInfo * const token)
 					readToken (token);
 					endSubProgram = isKeywordOrIdent (token,
 						KEYWORD_FUNCTION, name->string);
-					skipToCharacter (';');
+					fileSkipToCharacter (';');
 				}
 				else
 				{
@@ -760,7 +751,7 @@ static void parseSubProgram (tokenInfo * const token)
 					readToken (token);
 					endSubProgram = isKeywordOrIdent (token,
 						KEYWORD_PROCEDURE, name->string);
-					skipToCharacter (';');
+					fileSkipToCharacter (';');
 				}
 				else
 				{
@@ -779,7 +770,7 @@ static void parseKeywords (tokenInfo * const token, boolean local)
 	switch (token->keyword)
 	{
 	case KEYWORD_END:
-		skipToCharacter (';');
+		fileSkipToCharacter (';');
 		break;
 	case KEYWORD_CONSTANT:
 		parseConstant (token, local);

@@ -266,6 +266,18 @@ static int fileGetc (void)
 	return c;
 }
 
+static int fileSkipToCharacter (const int c)
+{
+	int d;
+	
+	do
+	{
+		d = fileGetc ();
+	} while (d != EOF  &&  d != c);
+	
+	return d;
+}
+
 static int fileUngetc (c)
 {
 	return ungetc (c, File);
@@ -362,18 +374,6 @@ static void makeEiffelLocalTag (tokenInfo *const token)
 *   Parsing functions
 */
 
-static int skipToCharacter (const int c)
-{
-	int d;
-
-	do
-	{
-		d = fileGetc ();
-	} while (d != EOF  &&  d != c);
-
-	return d;
-}
-
 /*  If a numeric is passed in 'c', this is used as the first digit of the
  *  numeric being parsed.
  */
@@ -465,7 +465,7 @@ static int parseEscapedCharacter (void)
 		case '<':  d = '{';   break;
 		case '>':  d = '}';   break;
 
-		case '\n': skipToCharacter ('%'); break;
+		case '\n': fileSkipToCharacter ('%'); break;
 
 		case '/':
 		{
@@ -495,7 +495,7 @@ static int parseCharacter (void)
 
 	c = fileGetc ();
 	if (c != '\'')
-		skipToCharacter ('\n');
+		fileSkipToCharacter ('\n');
 
 	return result;
 }
@@ -641,7 +641,7 @@ getNextChar:
 				token->type = TOKEN_CONSTRAINT;
 			else if (c == '-')  /* is this the start of a comment? */
 			{
-				skipToCharacter ('\n');
+				fileSkipToCharacter ('\n');
 				goto getNextChar;
 			}
 			else

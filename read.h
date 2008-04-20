@@ -105,6 +105,7 @@ extern boolean fileOpen (const char *const fileName, const langType language);
 extern boolean fileEOF (void);
 extern void fileClose (void);
 extern int fileGetc (void);
+extern int fileSkipToCharacter (int c);
 extern void fileUngetc (int c);
 extern const unsigned char *fileReadLine (void);
 extern char *readLine (vString *const vLine, FILE *const fp);
