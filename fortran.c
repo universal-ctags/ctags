@@ -824,13 +824,13 @@ static vString *parseNumeric (int c)
 	return string;
 }
 
-static void parseString (vString *const string, const int delimeter)
+static void parseString (vString *const string, const int delimiter)
 {
 	const unsigned long inputLineNumber = getInputLineNumber ();
 	int c;
 	ParsingString = TRUE;
 	c = getChar ();
-	while (c != delimeter  &&  c != '\n'  &&  c != EOF)
+	while (c != delimiter  &&  c != '\n'  &&  c != EOF)
 	{
 		vStringPut (string, c);
 		c = getChar ();
