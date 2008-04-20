@@ -599,18 +599,6 @@ static void parseFreeOperator (vString *const string, const int firstChar)
 		fileUngetc (c);  /* unget non-identifier character */
 }
 
-static keywordId analyzeToken (vString *const name)
-{
-	vString *keyword = vStringNew ();
-	keywordId id;
-
-	vStringCopyToLower (keyword, name);
-	id = (keywordId) lookupKeyword (vStringValue (keyword), Lang_eiffel);
-	vStringDelete (keyword);
-
-	return id;
-}
-
 static void readToken (tokenInfo *const token)
 {
 	int c;
@@ -719,7 +707,8 @@ getNextChar:
 			if (isalpha (c))
 			{
 				parseIdentifier (token->string, c);
-				token->keyword = analyzeToken (token->string);
+				token->keyword =
+					analyzeToken (token->string, Lang_eiffel);
 				if (isKeyword (token, KEYWORD_NONE))
 					token->type = TOKEN_IDENTIFIER;
 				else

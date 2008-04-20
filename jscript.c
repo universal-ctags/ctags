@@ -332,16 +332,6 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		fileUngetc (c);		/* unget non-identifier character */
 }
 
-static keywordId analyzeToken (vString *const name)
-{
-	vString *keyword = vStringNew ();
-	keywordId result;
-	vStringCopyToLower (keyword, name);
-	result = (keywordId) lookupKeyword (vStringValue (keyword), Lang_js);
-	vStringDelete (keyword);
-	return result;
-}
-
 static void readToken (tokenInfo *const token)
 {
 	int c;
@@ -432,7 +422,7 @@ getNextChar:
 					  parseIdentifier (token->string, c);
 					  token->lineNumber = getSourceLineNumber ();
 					  token->filePosition = getInputFilePosition ();
-					  token->keyword = analyzeToken (token->string);
+					  token->keyword = analyzeToken (token->string, Lang_js);
 					  if (isKeyword (token, KEYWORD_NONE))
 						  token->type = TOKEN_IDENTIFIER;
 					  else

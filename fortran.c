@@ -864,22 +864,6 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	ungetChar (c);  /* unget non-identifier character */
 }
 
-/*  Analyzes the identifier contained in a statement described by the
- *  statement structure and adjusts the structure according the significance
- *  of the identifier.
- */
-static keywordId analyzeToken (vString *const name)
-{
-	vString *keyword = vStringNew ();
-	keywordId id;
-
-	vStringCopyToLower (keyword, name);
-	id = (keywordId) lookupKeyword (vStringValue (keyword), Lang_fortran);
-	vStringDelete (keyword);
-
-	return id;
-}
-
 static void checkForLabel (void)
 {
 	tokenInfo* token = NULL;
@@ -912,7 +896,7 @@ static void checkForLabel (void)
 static void readIdentifier (tokenInfo *const token, const int c)
 {
 	parseIdentifier (token->string, c);
-	token->keyword = analyzeToken (token->string);
+	token->keyword = analyzeToken (token->string, Lang_fortran);
 	if (! isKeyword (token, KEYWORD_NONE))
 		token->type = TOKEN_KEYWORD;
 	else
@@ -921,7 +905,7 @@ static void readIdentifier (tokenInfo *const token, const int c)
 		if (strncmp (vStringValue (token->string), "end", 3) == 0)
 		{
 			vString *const sub = vStringNewInit (vStringValue (token->string) + 3);
-			const keywordId kw = analyzeToken (sub);
+			const keywordId kw = analyzeToken (sub, Lang_fortran);
 			vStringDelete (sub);
 			if (kw != KEYWORD_NONE)
 			{

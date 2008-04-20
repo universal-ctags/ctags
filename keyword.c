@@ -192,6 +192,16 @@ extern void freeKeywordTable (void)
 	}
 }
 
+extern int analyzeToken (vString *const name, langType language)
+{
+	vString *keyword = vStringNew ();
+	int result;
+	vStringCopyToLower (keyword, name);
+	result = lookupKeyword (vStringValue (keyword), language);
+	vStringDelete (keyword);
+	return result;
+}
+
 #ifdef DEBUG
 
 static void printEntry (const hashEntry *const entry)
