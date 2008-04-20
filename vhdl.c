@@ -187,7 +187,8 @@ typedef enum {
 	VHDLTAG_PROTOTYPE,
 	VHDLTAG_FUNCTION,
 	VHDLTAG_PROCEDURE,
-	VHDLTAG_PACKAGE
+	VHDLTAG_PACKAGE,
+	VHDLTAG_LOCAL
 } vhdlKind;
 
 static kindOption VhdlKinds[] = {
@@ -196,11 +197,12 @@ static kindOption VhdlKinds[] = {
 	{TRUE, 'T', "subtype", "subtype definitions"},
 	{TRUE, 'r', "record", "record names"},
 	{TRUE, 'e', "entity", "entity declarations"},
-	{TRUE, 'C', "component", "component declarations"},
-	{TRUE, 'd', "prototype", "prototypes"},
+	{FALSE, 'C', "component", "component declarations"},
+	{FALSE, 'd', "prototype", "prototypes"},
 	{TRUE, 'f', "function", "function prototypes and declarations"},
 	{TRUE, 'p', "procedure", "procedure prototypes and declarations"},
-	{TRUE, 'P', "package", "package definitions"}
+	{TRUE, 'P', "package", "package definitions"},
+	{FALSE, 'l', "local", "local definitions"}
 };
 
 static keywordDesc VhdlKeywordTable[] = {
@@ -302,6 +304,11 @@ static keywordDesc VhdlKeywordTable[] = {
 };
 
 /*
+ *   FUNCTION DECLARATIONS
+ */
+static void parseKeywords (tokenInfo * const token, boolean local);
+
+/*
  *   FUNCTION DEFINITIONS
  */
 
@@ -313,6 +320,22 @@ static boolean isIdentChar1 (const int c)
 static boolean isIdentChar (const int c)
 {
 	return (boolean) (isalpha (c) || isdigit (c) || c == '_');
+}
+
+static boolean isIdentifierMatch (const tokenInfo * const token,
+	const vString * const name)
+{
+	return (boolean) (isType (token, TOKEN_IDENTIFIER) &&
+		strcasecmp (vStringValue (token->string), vStringValue (name)) == 0);
+	/* XXX this is copy/paste from eiffel.c and slightly modified */
+	/* shouldn't we use strNcasecmp ? */
+}
+
+static boolean isKeywordOrIdent (const tokenInfo * const token,
+	const keywordId keyword, const vString * const name)
+{
+	return (boolean) (isKeyword (token, keyword) ||
+		isIdentifierMatch (token, name));
 }
 
 static tokenInfo *newToken (void)
@@ -332,6 +355,7 @@ static void deleteToken (tokenInfo * const token)
 	if (token != NULL)
 	{
 		vStringDelete (token->string);
+		vStringDelete (token->scope);
 		eFree (token);
 	}
 }
@@ -433,7 +457,8 @@ static void readToken (tokenInfo * const token)
 	case ',':
 		token->type = TOKEN_COMMA;
 		break;
-	case '\'':
+	case '\'':	/* only single char are inside simple quotes */
+		break;	/* or it is for attributes so we don't care */
 	case '"':
 		token->type = TOKEN_STRING;
 		parseString (token->string, c);
@@ -480,6 +505,7 @@ static void skipToKeyword (const keywordId keyword)
 		readToken (token);
 	}
 	while (!isKeyword (token, keyword));
+	deleteToken (token);
 }
 
 static void skipToMatched (tokenInfo * const token)
@@ -589,6 +615,7 @@ static void parsePackage (tokenInfo * const token)
 	{
 		makeVhdlTag (token, VHDLTAG_PACKAGE);
 	}
+	deleteToken (name);
 }
 
 static void parseModule (tokenInfo * const token)
@@ -615,6 +642,7 @@ static void parseModule (tokenInfo * const token)
 			skipToCharacter (';');
 		}
 	}
+	deleteToken (name);
 }
 
 static void parseRecord (tokenInfo * const token)
@@ -631,6 +659,7 @@ static void parseRecord (tokenInfo * const token)
 	}
 	while (isKeyword (token, KEYWORD_END));
 	skipToCharacter (';');
+	deleteToken (name);
 }
 
 static void parseTypes (tokenInfo * const token)
@@ -656,20 +685,30 @@ static void parseTypes (tokenInfo * const token)
 			makeVhdlTag (name, kind);
 		}
 	}
+	deleteToken (name);
 }
 
-static void parseConstant (tokenInfo * const token)
+static void parseConstant (tokenInfo * const token, boolean local)
 {
 	tokenInfo *const name = newToken ();
 	Assert (isKeyword (token, KEYWORD_CONSTANT));
 	readToken (name);
-	makeVhdlTag (name, VHDLTAG_CONSTANT);
+	if (local)
+	{
+		makeVhdlTag (name, VHDLTAG_LOCAL);
+	}
+	else
+	{
+		makeVhdlTag (name, VHDLTAG_CONSTANT);
+	}
 	skipToCharacter (';');
+	deleteToken (name);
 }
 
 static void parseSubProgram (tokenInfo * const token)
 {
 	tokenInfo *const name = newToken ();
+	boolean endSubProgram = FALSE;
 	const vhdlKind kind = isKeyword (token, KEYWORD_FUNCTION) ?
 		VHDLTAG_FUNCTION : VHDLTAG_PROCEDURE;
 	Assert (isKeyword (token, KEYWORD_FUNCTION) ||
@@ -699,22 +738,53 @@ static void parseSubProgram (tokenInfo * const token)
 	{
 		makeVhdlTag (name, VHDLTAG_PROTOTYPE);
 	}
-	if (isKeyword (token, KEYWORD_IS))
+	else if (isKeyword (token, KEYWORD_IS))
 	{
 		if (kind == VHDLTAG_FUNCTION)
 		{
 			makeVhdlTag (name, VHDLTAG_FUNCTION);
+			do
+			{
+				readToken (token);
+				if (isKeyword (token, KEYWORD_END))
+				{
+					readToken (token);
+					endSubProgram = isKeywordOrIdent (token,
+						KEYWORD_FUNCTION, name->string);
+					skipToCharacter (';');
+				}
+				else
+				{
+					parseKeywords (token, TRUE);
+				}
+			} while (!endSubProgram);
 		}
 		else
 		{
 			makeVhdlTag (name, VHDLTAG_PROCEDURE);
+			do
+			{
+				readToken (token);
+				if (isKeyword (token, KEYWORD_END))
+				{
+					readToken (token);
+					endSubProgram = isKeywordOrIdent (token,
+						KEYWORD_PROCEDURE, name->string);
+					skipToCharacter (';');
+				}
+				else
+				{
+					parseKeywords (token, TRUE);
+				}
+			} while (!endSubProgram);
 		}
 	}
+	deleteToken (name);
 }
 
 /* TODO */
 /* records */
-static void parseKeywords (tokenInfo * const token)
+static void parseKeywords (tokenInfo * const token, boolean local)
 {
 	switch (token->keyword)
 	{
@@ -722,7 +792,7 @@ static void parseKeywords (tokenInfo * const token)
 		skipToCharacter (';');
 		break;
 	case KEYWORD_CONSTANT:
-		parseConstant (token);
+		parseConstant (token, local);
 		break;
 	case KEYWORD_TYPE:
 		parseTypes (token);
@@ -755,7 +825,7 @@ static void parseVhdlFile (tokenInfo * const token)
 	do
 	{
 		readToken (token);
-		parseKeywords (token);
+		parseKeywords (token, FALSE);
 	} while (!isKeyword (token, KEYWORD_END));
 }
 
@@ -782,4 +852,4 @@ extern parserDefinition *VhdlParser (void)
 	return def;
 }
 
-/* vi:set tabstop=4 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4 noet: */
