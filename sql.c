@@ -824,7 +824,11 @@ static void parseSubProgram (tokenInfo *const token)
 		readToken (name);
 		readToken (token);
 	}
-	skipArgumentList (token);
+	if (isType (token, TOKEN_OPEN_PAREN))
+	{
+		/* Reads to the next token after the TOKEN_CLOSE_PAREN */
+		skipArgumentList(token);
+	}
 
 	if (kind == SQLTAG_FUNCTION)
 	{
@@ -835,8 +839,14 @@ static void parseSubProgram (tokenInfo *const token)
 			/*
 			 * Read token after which could be the
 			 * command terminator if a prototype
+			 * or an open parantheses
 			 */
 			readToken (token);
+			if (isType (token, TOKEN_OPEN_PAREN))
+			{
+				/* Reads to the next token after the TOKEN_CLOSE_PAREN */
+				skipArgumentList(token);
+			}
 		}
 	}
 	if( isCmdTerm (token) )
