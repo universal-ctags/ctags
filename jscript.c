@@ -258,25 +258,55 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind)
 
 static void makeClassTag (tokenInfo *const token)
 { 
+	vString *	fulltag;
+
 	if ( ! token->ignoreTag )
 	{
-		if ( ! stringListHas(ClassNames, vStringValue (token->string)) )
+		fulltag = vStringNew ();
+		if (vStringLength (token->scope) > 0)
 		{
-			stringListAdd (ClassNames, vStringNewCopy (token->string));
+			vStringCopy(fulltag, token->scope);
+			vStringCatS (fulltag, ".");
+			vStringCatS (fulltag, vStringValue(token->string));
+		}
+		else
+		{
+			vStringCopy(fulltag, token->string);
+		}
+		vStringTerminate(fulltag);
+		if ( ! stringListHas(ClassNames, vStringValue (fulltag)) )
+		{
+			stringListAdd (ClassNames, vStringNewCopy (fulltag));
 			makeJsTag (token, JSTAG_CLASS);
 		}
+		vStringDelete (fulltag);
 	}
 }
 
 static void makeFunctionTag (tokenInfo *const token)
 { 
+	vString *	fulltag;
+
 	if ( ! token->ignoreTag )
 	{
-		if ( ! stringListHas(FunctionNames, vStringValue (token->string)) )
+		fulltag = vStringNew ();
+		if (vStringLength (token->scope) > 0)
 		{
-			stringListAdd (FunctionNames, vStringNewCopy (token->string));
+			vStringCopy(fulltag, token->scope);
+			vStringCatS (fulltag, ".");
+			vStringCatS (fulltag, vStringValue(token->string));
+		}
+		else
+		{
+			vStringCopy(fulltag, token->string);
+		}
+		vStringTerminate(fulltag);
+		if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) )
+		{
+			stringListAdd (FunctionNames, vStringNewCopy (fulltag));
 			makeJsTag (token, JSTAG_FUNCTION);
 		}
+		vStringDelete (fulltag);
 	}
 }
 
@@ -930,6 +960,7 @@ static void parseMethods (tokenInfo *const token, tokenInfo *const class)
 	 *	   validProperty  : 2,
 	 *	   validMethod    : function(a,b) {}
 	 *	   'validMethod2' : function(a,b) {}
+     *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		
 	 */
 
 	do
@@ -993,6 +1024,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 	boolean is_terminated = TRUE;
 	boolean is_global = FALSE;
 	boolean is_prototype = FALSE;
+	vString *	fulltag;
 
 	vStringClear(saveScope);
 	/*
@@ -1307,6 +1339,14 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 			 *     }
 			 */
 			parseMethods(token, name);
+			if (isType (token, TOKEN_CLOSE_CURLY)) 
+			{
+				/*
+				 * Assume the closing parantheses terminates
+				 * this statements.
+				 */
+				is_terminated = TRUE;
+			}
 		}
 		else if (isKeyword (token, KEYWORD_new))
 		{
@@ -1355,13 +1395,26 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 				 * This is a global variable:
 				 *	   var g_var = different_var_name;
 				 */
-				if ( ! stringListHas(FunctionNames, vStringValue (token->string)) &&
-						! stringListHas(ClassNames, vStringValue (token->string)) )
+				fulltag = vStringNew ();
+				if (vStringLength (token->scope) > 0)
+				{
+					vStringCopy(fulltag, token->scope);
+					vStringCatS (fulltag, ".");
+					vStringCatS (fulltag, vStringValue(token->string));
+				}
+				else
+				{
+					vStringCopy(fulltag, token->string);
+				}
+				vStringTerminate(fulltag);
+				if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
+						! stringListHas(ClassNames, vStringValue (fulltag)) )
 				{
 					findCmdTerm (token);
 					if (isType (token, TOKEN_SEMICOLON)) 
 						makeJsTag (name, JSTAG_VARIABLE);
 				}
+				vStringDelete (fulltag);
 			}
 		}
 	}
@@ -1379,7 +1432,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 	 *	   return 1;
 	 * }
 	 */
-	if (isType (token, TOKEN_CLOSE_CURLY)) 
+	if ( ! is_terminated && isType (token, TOKEN_CLOSE_CURLY)) 
 		is_terminated = FALSE;
 
 
