@@ -1366,11 +1366,14 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 
 				if (isType (token, TOKEN_SEMICOLON)) 
 				{
-					if ( is_class )
+					if ( token->nestLevel == 0 )
 					{
-						makeClassTag (name);
-					} else {
-						makeFunctionTag (name);
+						if ( is_class )
+						{
+							makeClassTag (name);
+						} else {
+							makeFunctionTag (name);
+						}
 					}
 				}
 			}
