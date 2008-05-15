@@ -753,6 +753,14 @@ static boolean parseIf (tokenInfo *const token)
 
 	readToken (token);
 
+	if (isKeyword (token, KEYWORD_if))
+	{
+		/*
+		 * Check for an "else if" and consume the "if"
+		 */
+		readToken (token);
+	}
+
 	if (isType (token, TOKEN_OPEN_PAREN)) 
 	{
 		/* 
