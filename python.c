@@ -366,14 +366,29 @@ static void addNestingLevel(NestingLevels *nls, int indentation,
 /* Return a pointer to the start of the next triple string, or NULL. Store
  * the kind of triple string in "which" if the return is not NULL.
  */
-static char *find_triple_start(char const *string, char const **which)
-{
-    char *s;
-    if ((s = strstr (string, doubletriple)))
-        *which = doubletriple;
-    else if ((s = strstr (string, singletriple)))
-        *which = singletriple;
-    return s;
+static char const *find_triple_start(char const *string, char const **which)
+{    
+    char const *cp = string;
+
+    for (; *cp; cp++)
+	{
+	    if (*cp == '"' || *cp == '\'')
+		{
+		    if (strcmp(cp, doubletriple) == 0)
+		    {
+		        *which = doubletriple;
+		        return cp;
+		    }
+		    if (strcmp(cp, singletriple) == 0)
+		    {
+		        *which = singletriple;
+		        return cp;
+		    }
+			cp = skipString(cp);
+			if (!*cp) break;
+		}
+	}
+    return NULL;
 }
 
 /* Find the end of a triple string as pointed to by "which", and update "which"
@@ -457,6 +472,7 @@ static void findPythonTags (void)
 			 * string. I.e. we don't parse for any tags in the rest of the
 			 * line, but we do look for the string ending of course.
 			 */
+			/* FIXME: can we actually write to the string here? */
 			*longstring = '\0';
 
 			longstring += 3;
