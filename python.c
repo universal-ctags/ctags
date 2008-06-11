@@ -291,6 +291,30 @@ static boolean constructParentString(NestingLevels *nls, int indent,
 	return is_class;
 }
 
+/* Check whether parent's indentation level is higher than the current level and
+ * if so, remove it.
+ */
+static void checkParent(NestingLevels *nls, int indent, vString *parent)
+{
+	int i;
+	NestingLevel *n;
+
+	for (i = 0; i < nls->n; i++)
+	{
+		n = nls->levels + i;
+		/* is there a better way to compare two vStrings? */
+		if (strcmp(vStringValue(parent), vStringValue(n->name)) == 0)
+		{
+			if (n && indent <= n->indentation)
+			{
+				/* remove this level by clearing its name */
+				vStringClear(n->name);
+			}
+			break;
+		}
+	}
+}
+
 static NestingLevels *newNestingLevels(void)
 {
 	NestingLevels *nls = xCalloc (1, NestingLevels);
@@ -411,6 +435,8 @@ static void findPythonTags (void)
 		cp = skipSpace (cp);
 		indent = cp - line;
 		line_skip = 0;
+		
+		checkParent(nesting_levels, indent, parent);
 
 		/* Deal with multiline string ending. */
 		if (longStringLiteral)
