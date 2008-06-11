@@ -384,8 +384,8 @@ static void find_triple_end(char const *string, char const **which)
     char const *s = string;
     while (1)
 	{
-	    /* Check if the sting ends in the same line. */
-	    s = strstr (string, *which);
+	    /* Check if the string ends in the same line. */
+	    s = strstr (s, *which);
 		if (!s) break;
 		s += 3;
 		*which = NULL;
@@ -417,8 +417,12 @@ static void findPythonTags (void)
 
 		cp = skipSpace (cp);
 
-		if (*cp == '#' || *cp == '\0')  /* skip comment or blank line */
+		if (*cp == '\0')  /* skip blank line */
 			continue;
+		
+		/* Skip comment if we are not inside a multi-line string. */
+		if (*cp == '#' && !longStringLiteral)
+		    continue;
 
 		/* Deal with line continuation. */
 		if (!line_skip) vStringClear(continuation);
