@@ -26,13 +26,14 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-	K_CLASS, K_FUNCTION, K_MEMBER
+	K_CLASS, K_FUNCTION, K_MEMBER, K_VARIABLE
 } pythonKind;
 
 static kindOption PythonKinds[] = {
 	{TRUE, 'c', "class",    "classes"},
 	{TRUE, 'f', "function", "functions"},
-	{TRUE, 'm', "member",   "class members"}
+	{TRUE, 'm', "member",   "class members"},
+    {TRUE, 'v', "variable", "variables"}
 };
 
 typedef struct NestingLevel NestingLevel;
@@ -140,6 +141,20 @@ static void makeClassTag (vString *const class, vString *const inheritance,
 		}
 	}
 	tag.extensionFields.inheritance = vStringValue (inheritance);
+	makeTagEntry (&tag);
+}
+
+static void makeVariableTag (vString *const var, vString *const parent)
+{
+	tagEntryInfo tag;
+	initTagEntry (&tag, vStringValue (var));
+	tag.kindName = "variable";
+	tag.kind = 'v';
+	if (vStringLength (parent) > 0)
+	{
+		tag.extensionFields.scope [0] = "class";
+		tag.extensionFields.scope [1] = vStringValue (parent);
+	}
 	makeTagEntry (&tag);
 }
 
@@ -411,6 +426,45 @@ static void find_triple_end(char const *string, char const **which)
 	}
 }
 
+static const char *findVariable(const char *line)
+{
+	/* Parse global and class variable names (C.x) from assignment statements.
+	 * Object attributes (obj.x) are ignored.
+	 * Assignment to a tuple 'x, y = 2, 3' not supported.
+	 * TODO: ignore duplicate tags from reassignment statements. */
+	const char *cp, *sp, *eq, *start;
+
+	cp = strstr(line, "=");
+	if (!cp)
+		return NULL;
+	eq = cp + 1;
+	while (*eq)
+	{
+		if (*eq == '=')
+			return NULL;	/* ignore '==' operator and 'x=5,y=6)' function lines */
+		if (*eq == '(')
+			break;	/* allow 'x = func(b=2,y=2,' lines */
+		eq++;
+	}
+
+	/* go backwards to the start of the line, checking we have valid chars */
+	start = cp - 1;
+	while (start >= line && isspace ((int) *start))
+		--start;
+	while (start >= line && isIdentifierCharacter ((int) *start))
+		--start;
+	if (!isIdentifierFirstCharacter(*(start + 1)))
+		return NULL;
+	sp = start;
+	while (sp >= line && isspace ((int) *sp))
+		--sp;
+	if ((sp + 1) != line)	/* the line isn't a simple variable assignment */
+		return NULL;
+	/* the line is valid, parse the variable name */
+	++start;
+	return start;
+}
+
 static void findPythonTags (void)
 {
 	vString *const continuation = vStringNew ();
@@ -427,14 +481,14 @@ static void findPythonTags (void)
 	{
 		const char *cp = line;
 		char const *longstring;
-		const char *keyword;
+		char const *keyword, *variable;
 		int indent;
 
 		cp = skipSpace (cp);
 
 		if (*cp == '\0')  /* skip blank line */
 			continue;
-		
+
 		/* Skip comment if we are not inside a multi-line string. */
 		if (*cp == '#' && !longStringLiteral)
 			continue;
@@ -506,6 +560,28 @@ static void findPythonTags (void)
 
 				addNestingLevel(nesting_levels, indent, name, is_class);
 			}
+		}
+		/* Find global and class variables */
+		variable = findVariable(line);
+		if (variable)
+		{
+			const char *start = variable;
+			boolean parent_is_class;
+
+			vStringClear (name);
+			while (isIdentifierCharacter ((int) *start))
+			{
+				vStringPut (name, (int) *start);
+				++start;
+			}
+			vStringTerminate (name);
+
+			parent_is_class = constructParentString(nesting_levels, indent, parent);
+			/* skip variables in methods */
+			if (! parent_is_class && vStringLength(parent) > 0)
+				continue;
+
+			makeVariableTag (name, parent);
 		}
 	}
 	/* Clean up all memory we allocated. */
