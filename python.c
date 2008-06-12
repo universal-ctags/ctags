@@ -374,12 +374,12 @@ static char const *find_triple_start(char const *string, char const **which)
 	{
 		if (*cp == '"' || *cp == '\'')
 		{
-			if (strcmp(cp, doubletriple) == 0)
+			if (strncmp(cp, doubletriple, 3) == 0)
 			{
 				*which = doubletriple;
 				return cp;
 			}
-			if (strcmp(cp, singletriple) == 0)
+			if (strncmp(cp, singletriple, 3) == 0)
 			{
 				*which = singletriple;
 				return cp;
