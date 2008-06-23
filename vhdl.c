@@ -630,15 +630,15 @@ static void parseRecord (tokenInfo * const token)
 {
 	tokenInfo *const name = newToken ();
 	Assert (isKeyword (token, KEYWORD_RECORD));
+	readToken (name);
 	do
 	{
-		readToken (name);
 		readToken (token);	/* should be a colon */
 		fileSkipToCharacter (';');
 		makeVhdlTag (name, VHDLTAG_RECORD);
-		readToken (token);
+		readToken (name);
 	}
-	while (isKeyword (token, KEYWORD_END));
+	while (!isKeyword (name, KEYWORD_END));
 	fileSkipToCharacter (';');
 	deleteToken (name);
 }
