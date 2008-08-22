@@ -204,7 +204,8 @@ static const char *findDefinitionOrClass (const char *cp)
 	while (*cp)
 	{
 		cp = skipEverything (cp);
-		if (!strncmp(cp, "def", 3) || !strncmp(cp, "class", 5))
+		if (!strncmp(cp, "def", 3) || !strncmp(cp, "class", 5) ||
+			!strncmp(cp, "cdef", 4) || !strncmp(cp, "cpdef", 5))
 		{
 			return cp;
 		}
@@ -465,6 +466,37 @@ static const char *findVariable(const char *line)
 	return start;
 }
 
+/* Skip type declaration that optionally follows a cdef/cpdef */
+static const char *skipTypeDecl (const char *cp, boolean *is_class) 
+{ 
+	const char *lastStart = cp, *ptr = cp;
+	int loopCount = 0;
+	ptr = skipSpace(cp);
+	if (!strncmp("extern", ptr, 6)) { 
+		ptr += 6; 
+		ptr = skipSpace(ptr); 
+		if (!strncmp("from", ptr, 4)) { return NULL; }
+	}
+	if (!strncmp("class", ptr, 5)) {
+		ptr += 5 ; 
+		*is_class = TRUE;
+		ptr = skipSpace(ptr);
+		return ptr;
+	}
+	/* limit so that we don't pick off "int item = obj()" */
+	while (*ptr && loopCount++ < 2) {
+		while (*ptr && *ptr != '(' && !isspace(*ptr)) ptr++;
+		if (!*ptr) return NULL;
+		if (*ptr == '(') {
+		    return lastStart; /* if we stopped on a '(' we are done */
+		}                             
+		ptr = skipSpace(ptr);
+		lastStart = ptr;
+		while (*lastStart == '*') lastStart++;  /* cdef int *identifier */
+	}
+	return NULL;
+}
+
 static void findPythonTags (void)
 {
 	vString *const continuation = vStringNew ();
@@ -479,7 +511,7 @@ static void findPythonTags (void)
 
 	while ((line = (const char *) fileReadLine ()) != NULL)
 	{
-		const char *cp = line;
+		const char *cp = line, *candidate;
 		char const *longstring;
 		char const *keyword, *variable;
 		int indent;
@@ -545,6 +577,27 @@ static void findPythonTags (void)
 				found = TRUE;
 				is_class = TRUE;
 			}
+			else if (!strncmp (keyword, "cdef ", 5))
+		    { 
+		        cp = skipSpace(keyword + 4);
+		        candidate = skipTypeDecl (cp, &is_class);
+		        if (candidate)
+		        {
+		    		found = TRUE;
+		    		cp = candidate;
+		        }
+
+		    }
+    		else if (!strncmp (keyword, "cpdef ", 6))
+		    { 
+		        cp = skipSpace(keyword + 5);
+		        candidate = skipTypeDecl (cp, &is_class);
+		        if (candidate)
+		        {
+		    		found = TRUE;
+		    		cp = candidate;
+		        }
+		    }
 
 			if (found)
 			{
