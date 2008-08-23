@@ -483,10 +483,10 @@ static const char *skipTypeDecl (const char *cp, boolean *is_class)
 		ptr = skipSpace(ptr);
 		return ptr;
 	}
-	/* limit so that we don't pick off "int item = obj()" */
+	/* limit so that we don't pick off "int item=obj()" */
 	while (*ptr && loopCount++ < 2) {
-		while (*ptr && *ptr != '(' && !isspace(*ptr)) ptr++;
-		if (!*ptr) return NULL;
+		while (*ptr && *ptr != '=' && *ptr != '(' && !isspace(*ptr)) ptr++;
+		if (!*ptr || *ptr == '=') return NULL;
 		if (*ptr == '(') {
 		    return lastStart; /* if we stopped on a '(' we are done */
 		}                             
@@ -646,7 +646,7 @@ static void findPythonTags (void)
 
 extern parserDefinition *PythonParser (void)
 {
-	static const char *const extensions[] = { "py", "pyx", "pxd", "scons", NULL };
+    static const char *const extensions[] = { "py", "pyx", "pxd", "pxi" ,"scons", NULL };
 	parserDefinition *def = parserNew ("Python");
 	def->kinds = PythonKinds;
 	def->kindCount = KIND_COUNT (PythonKinds);
