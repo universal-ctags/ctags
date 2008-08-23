@@ -1,6 +1,7 @@
 Current Version: @VERSION@
 
 ctags-@VERSION@ (@DATE@)
+* Pyrex/Cython declarations are now recognized in Python files [Python].
 * The Python language now has a "v" kind for variables.
 * Fixed detection of triple strings inside other strings [Python, But #1988130].
 * Fixed an endless loop with comments in triple strings [Python, Bug #1988027].
