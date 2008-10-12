@@ -166,6 +166,12 @@ static void findMakeTags (void)
 				skipLine ();
 			}
 			else {
+				if (strcmp(vStringValue (name), "export") == 0 &&
+					isIdentifier (c))
+				{
+					c = skipToNonWhite ();
+					readIdentifier (c, name);
+				}
 				c = skipToNonWhite ();
 				if (strchr (":?+", c) != NULL)
 				{
