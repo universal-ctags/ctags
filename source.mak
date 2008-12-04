@@ -19,6 +19,7 @@ SOURCES = \
 	eiffel.c \
 	entry.c \
 	erlang.c \
+	flex.c \
 	fortran.c \
 	get.c \
 	html.c \
@@ -75,6 +76,7 @@ OBJECTS = \
 	eiffel.$(OBJEXT) \
 	entry.$(OBJEXT) \
 	erlang.$(OBJEXT) \
+	flex.$(OBJEXT) \
 	fortran.$(OBJEXT) \
 	get.$(OBJEXT) \
 	html.$(OBJEXT) \
