@@ -27,6 +27,7 @@
 	CobolParser, \
 	EiffelParser, \
 	ErlangParser, \
+	FlexParser, \
 	FortranParser, \
 	HtmlParser, \
 	JavaParser, \
