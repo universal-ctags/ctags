@@ -196,6 +196,7 @@ static const keywordDesc FlexKeywordTable [] = {
 static void parseFunction (tokenInfo *const token);
 static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent);
 static boolean parseLine (tokenInfo *const token);
+static boolean parseActionScript (tokenInfo *const token);
 
 static boolean isIdentChar (const int c)
 {
