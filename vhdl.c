@@ -707,11 +707,11 @@ static void parseSubProgram (tokenInfo * const token)
 		{
 			/* Read datatype */
 			readToken (token);
-			/* 
-			 * Read what should be "is" or ";" 
-			 * if body or prototype 
-			 */
-			readToken (token);
+			while (! isKeyword (token, KEYWORD_IS) &&
+					! isType (token, TOKEN_SEMICOLON))
+			{
+				readToken (token);
+			}
 		}
 	}
 
