@@ -850,22 +850,18 @@ static void parseSwitch (tokenInfo *const token)
 
 	if (isType (token, TOKEN_OPEN_PAREN)) 
 	{
-		/*
-		 * Handle nameless functions, these will only
-		 * be considered methods.
-		 */
 		skipArgumentList(token);
 	}
 
 	if (isType (token, TOKEN_OPEN_CURLY)) 
 	{
-		/* 
-		 * This will be either a function or a class.
-		 * We can only determine this by checking the body
-		 * of the function.  If we find a "this." we know
-		 * it is a class, otherwise it is a function.
-		 */
-		parseBlock (token, token);
+		do
+		{
+			readToken (token);
+		} while (! (isType (token, TOKEN_CLOSE_SGML) || 
+					isType (token, TOKEN_CLOSE_MXML) ||
+					isType (token, TOKEN_CLOSE_CURLY) ||
+					isType (token, TOKEN_GREATER_THAN)) ); 
 	}
 
 }
@@ -1291,7 +1287,6 @@ static boolean parseVar (tokenInfo *const token, boolean is_public)
 	tokenInfo *const secondary_name = newToken ();
 	vString * saveScope = vStringNew ();
 	boolean is_terminated = TRUE;
-	vString *	fulltag;
 
 	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
@@ -1338,7 +1333,6 @@ static boolean parseVar (tokenInfo *const token, boolean is_public)
 		}
 	}
 
-cleanUp:
 	vStringCopy(token->scope, saveScope);
 	deleteToken (name);
 	deleteToken (secondary_name);
@@ -1352,7 +1346,6 @@ static boolean parseClass (tokenInfo *const token)
 	tokenInfo *const name = newToken ();
 	vString * saveScope = vStringNew ();
 	boolean saveIsClass = token->isClass;
-	vString *	fulltag;
 
 	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
@@ -1394,9 +1387,8 @@ static boolean parseClass (tokenInfo *const token)
 			, vStringValue(token->string)
 		  );
 #endif
-cleanUp:
 	vStringCopy(token->scope, saveScope);
-	token->isClass, saveIsClass;
+	token->isClass = saveIsClass;
 	deleteToken (name);
 	vStringDelete(saveScope);
 
@@ -1409,7 +1401,6 @@ static boolean parseStatement (tokenInfo *const token)
 	tokenInfo *const secondary_name = newToken ();
 	vString * saveScope = vStringNew ();
 	boolean is_public = FALSE;
-	boolean is_var = FALSE;
 	boolean is_class = FALSE;
 	boolean is_terminated = TRUE;
 	boolean is_global = FALSE;
