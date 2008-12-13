@@ -2077,6 +2077,31 @@ static void processAngleBracket (void)
 	}
 }
 
+static void parseJavaAnnotation (statementInfo *const st)
+{
+	/*
+	 * @Override
+	 * @Target(ElementType.METHOD)
+	 * @SuppressWarnings(value = "unchecked")
+	 *
+	 * But watch out for "@interface"!
+	 */
+	tokenInfo *const token = activeToken (st);
+	
+	int c = skipToNonWhite ();
+	readIdentifier (token, c);
+	if (token->keyword == KEYWORD_INTERFACE)
+	{
+		/* Oops. This was actually "@interface" defining a new annotation. */
+		processInterface (st);
+	}
+	else
+	{
+		/* Bug #1691412: skip any annotation arguments. */
+		skipParens ();
+	}
+}
+
 static int parseParens (statementInfo *const st, parenInfo *const info)
 {
 	tokenInfo *const token = activeToken (st);
@@ -2201,7 +2226,11 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 				break;
 
 			default:
-				if (isident1 (c))
+				if (c == '@' && isLanguage (Lang_java))
+				{
+					parseJavaAnnotation(st);
+				}
+				else if (isident1 (c))
 				{
 					if (++identifierCount > 1)
 						info->isKnrParamList = FALSE;
@@ -2452,31 +2481,6 @@ static void parseIdentifier (statementInfo *const st, const int c)
 	readIdentifier (token, c);
 	if (! isType (token, TOKEN_NONE))
 		processToken (token, st);
-}
-
-static void parseJavaAnnotation (statementInfo *const st)
-{
-	/*
-	 * @Override
-	 * @Target(ElementType.METHOD)
-	 * @SuppressWarnings(value = "unchecked")
-	 *
-	 * But watch out for "@interface"!
-	 */
-	tokenInfo *const token = activeToken (st);
-	
-	int c = skipToNonWhite ();
-	readIdentifier (token, c);
-	if (token->keyword == KEYWORD_INTERFACE)
-	{
-		/* Oops. This was actually "@interface" defining a new annotation. */
-		processInterface (st);
-	}
-	else
-	{
-		/* Bug #1691412: skip any annotation arguments. */
-		skipParens ();
-	}
 }
 
 static void parseGeneralToken (statementInfo *const st, const int c)
