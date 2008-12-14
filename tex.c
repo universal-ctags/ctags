@@ -98,9 +98,6 @@ typedef struct sTokenInfo {
 	vString *		scope;
 	unsigned long 	lineNumber;
 	fpos_t 			filePosition;
-	int				nestLevel;
-	boolean			ignoreTag;
-	boolean			isClass;
 } tokenInfo;
 
 /*
@@ -168,9 +165,6 @@ static tokenInfo *newToken (void)
 	token->keyword		= KEYWORD_NONE;
 	token->string		= vStringNew ();
 	token->scope		= vStringNew ();
-	token->nestLevel	= 0;
-	token->isClass		= FALSE;
-	token->ignoreTag	= FALSE;
 	token->lineNumber   = getSourceLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
@@ -190,7 +184,7 @@ static void deleteToken (tokenInfo *const token)
 
 static void makeConstTag (tokenInfo *const token, const texKind kind)
 {
-	if (TexKinds [kind].enabled && ! token->ignoreTag )
+	if (TexKinds [kind].enabled )
 	{
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
@@ -209,7 +203,7 @@ static void makeTexTag (tokenInfo *const token, texKind kind)
 {
 	vString *	fulltag;
 
-	if (TexKinds [kind].enabled && ! token->ignoreTag )
+	if (TexKinds [kind].enabled)
 	{
 		/*
 		 * If a scope has been added to the token, change the token
@@ -366,100 +360,12 @@ static void findToken (tokenInfo *const token, const tokenType type)
 
 static void copyToken (tokenInfo *const dest, tokenInfo *const src)
 {
-	dest->nestLevel = src->nestLevel;
 	dest->lineNumber = src->lineNumber;
 	dest->filePosition = src->filePosition;
 	dest->type = src->type;
 	dest->keyword = src->keyword;
-	dest->isClass = src->isClass;
 	vStringCopy (dest->string, src->string);
 	vStringCopy (dest->scope, src->scope);
-}
-
-/*
- *	 Token parsing functions
- */
-
-static void skipArgumentList (tokenInfo *const token)
-{
-	int nest_level = 0;
-
-	/*
-	 * Check for nested open and closing parantheses
-	 */
-
-	if (isType (token, TOKEN_OPEN_PAREN))	/* arguments? */
-	{
-		nest_level++;
-		while (! (isType (token, TOKEN_CLOSE_PAREN) && (nest_level == 0)))
-		{
-			readToken (token);
-			if (isType (token, TOKEN_OPEN_PAREN))
-			{
-				nest_level++;
-			}
-			if (isType (token, TOKEN_CLOSE_PAREN))
-			{
-				if (nest_level > 0)
-				{
-					nest_level--;
-				}
-			}
-		} 
-		readToken (token);
-	}
-}
-
-static void skipArrayList (tokenInfo *const token)
-{
-	int nest_level = 0;
-
-	/*
-	 * Handle square brackets
-	 *	 var name[1]
-	 * So we must check for nested open and closing square brackets
-	 */
-
-	if (isType (token, TOKEN_OPEN_SQUARE))	/* arguments? */
-	{
-		nest_level++;
-		while (! (isType (token, TOKEN_CLOSE_SQUARE) && (nest_level == 0)))
-		{
-			readToken (token);
-			if (isType (token, TOKEN_OPEN_SQUARE))
-			{
-				nest_level++;
-			}
-			if (isType (token, TOKEN_CLOSE_SQUARE))
-			{
-				if (nest_level > 0)
-				{
-					nest_level--;
-				}
-			}
-		} 
-		readToken (token);
-	}
-}
-
-static void addContext (tokenInfo* const parent, const tokenInfo* const child)
-{
-	if (vStringLength (parent->string) > 0)
-	{
-		vStringCatS (parent->string, ".");
-	}
-	vStringCatS (parent->string, vStringValue (child->string));
-	vStringTerminate (parent->string);
-}
-
-static void addToScope (tokenInfo* const token, vString* const extra)
-{
-	if (vStringLength (token->scope) > 0)
-	{
-		vStringCatS (token->scope, ".");
-	}
-	vStringCatS (token->scope, vStringValue (extra));
-	vStringTerminate (token->scope);
 }
 
 /*
@@ -513,7 +419,8 @@ static boolean parseTag (tokenInfo *const token, texKind kind)
 		{
 			if (isType (token, TOKEN_IDENTIFIER))
 			{
-				if (strlen(vStringValue(fullname)) > 0)
+				/*if (strlen(vStringValue(fullname)) > 0)*/
+				if (fullname->length > 0)
 					vStringCatS (fullname, " ");
 				vStringCatS (fullname, vStringValue (token->string));
 			}
