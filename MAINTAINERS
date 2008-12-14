@@ -5,18 +5,22 @@ To send email to any one of them, send it to <username@users.sourceforge.net>.
 Ctags           SourgeForge     Full
 Parser          username        Name
 ----------      -----------     -----
+Ant             dfishburn       David Fishburn
 AWK             jkoshy          Joseph Koshy
 Basic           elias           Elias Pschernig
 C#              elliotth        Elliott Hughes
+DosBatch        dfishburn       David Fishburn
 Flex            dfishburn       David Fishburn
 Java            elliotth        Elliott Hughes
 JavaScript      dfishburn       David Fishburn
+MatLab          dfishburn       David Fishburn
 Perl            perlguy0        Dmitri Tikhonov
 PHP             jafl            John Lindal
 Python          elias           Elias Pschernig
 Ruby            elliotth        Elliott Hughes
 SML             jkoshy          Joseph Koshy
 SQL             dfishburn       David Fishburn
+Tex             dfishburn       David Fishburn
 Vim             dfishburn       David Fishburn
 All else        dhiebert        Darren Hiebert
 

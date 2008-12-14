@@ -16,6 +16,7 @@
 
 /* Add the name of any new parser definition function here */
 #define PARSER_LIST \
+	AntParser, \
 	AsmParser, \
 	AspParser, \
 	AwkParser, \
@@ -25,6 +26,7 @@
 	CppParser, \
 	CsharpParser, \
 	CobolParser, \
+	DosBatchParser, \
 	EiffelParser, \
 	ErlangParser, \
 	FlexParser, \
@@ -35,6 +37,7 @@
 	LispParser, \
 	LuaParser, \
 	MakefileParser, \
+	MatLabParser, \
 	PascalParser, \
 	PerlParser, \
 	PhpParser, \
@@ -47,6 +50,7 @@
 	SmlParser, \
 	SqlParser, \
 	TclParser, \
+	TexParser, \
 	VeraParser, \
 	VerilogParser, \
 	VhdlParser, \

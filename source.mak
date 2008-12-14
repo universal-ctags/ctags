@@ -9,6 +9,7 @@ HEADERS = \
 
 SOURCES = \
 	args.c \
+	ant.c \
 	asm.c \
 	asp.c \
 	awk.c \
@@ -16,6 +17,7 @@ SOURCES = \
 	beta.c \
 	c.c \
 	cobol.c \
+	dosbatch.c \
 	eiffel.c \
 	entry.c \
 	erlang.c \
@@ -30,6 +32,7 @@ SOURCES = \
 	lua.c \
 	main.c \
 	make.c \
+	matlab.c \
 	options.c \
 	parse.c \
 	pascal.c \
@@ -48,6 +51,7 @@ SOURCES = \
 	sql.c \
 	strlist.c \
 	tcl.c \
+	tex.c \
 	verilog.c \
 	vhdl.c \
 	vim.c \
