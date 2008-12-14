@@ -70,6 +70,7 @@ REGEX_HEADERS = gnu_regex/regex.h
 
 OBJECTS = \
 	args.$(OBJEXT) \
+	ant.$(OBJEXT) \
 	asm.$(OBJEXT) \
 	asp.$(OBJEXT) \
 	awk.$(OBJEXT) \
@@ -77,6 +78,7 @@ OBJECTS = \
 	beta.$(OBJEXT) \
 	c.$(OBJEXT) \
 	cobol.$(OBJEXT) \
+	dosbatch.$(OBJEXT) \
 	eiffel.$(OBJEXT) \
 	entry.$(OBJEXT) \
 	erlang.$(OBJEXT) \
@@ -91,6 +93,7 @@ OBJECTS = \
 	lua.$(OBJEXT) \
 	main.$(OBJEXT) \
 	make.$(OBJEXT) \
+	matlab.$(OBJEXT) \
 	options.$(OBJEXT) \
 	parse.$(OBJEXT) \
 	pascal.$(OBJEXT) \
@@ -109,6 +112,7 @@ OBJECTS = \
 	sql.$(OBJEXT) \
 	strlist.$(OBJEXT) \
 	tcl.$(OBJEXT) \
+	tex.$(OBJEXT) \
 	verilog.$(OBJEXT) \
 	vhdl.$(OBJEXT) \
 	vim.$(OBJEXT) \
