@@ -350,14 +350,6 @@ getNextChar:
 	}
 }
 
-static void findToken (tokenInfo *const token, const tokenType type)
-{
-	while (! isType (token, type))
-	{
-		readToken (token);
-	}
-}
-
 static void copyToken (tokenInfo *const dest, tokenInfo *const src)
 {
 	dest->lineNumber = src->lineNumber;
