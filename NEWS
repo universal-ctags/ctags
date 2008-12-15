@@ -9,7 +9,7 @@ ctags-@VERSION@ (@DATE@)
 * Fixed detection of triple strings inside other strings [Python, Bug #1988130].
 * Fixed an endless loop with comments in triple strings [Python, Bug #1988027].
 * Fixed bug where functions were sometimes seen as methods [Python, Bug #1988026].
-* Fixed parsing of method parameter annotations, fix contributed by "blaisorblade" [Java, Bug #2049723, #2117073].
+* Fixed parsing of method parameter annotations, fix contributed by Paolo "blaisorblade" Giarrusso [Java, Bug #2049723, #2117073].
 * Fixed parsing of global scope qualifiers in base class lists [C++, Bug #1799343].
 * Fixed bug where namespace members were given kinds corresponding to globals [C++, Bug #1924919, #1575055].
 * Fixed parsing of "else" [C#, Bug #1830344].
