@@ -268,13 +268,14 @@ static void makeFlexTag (tokenInfo *const token, flexKind kind)
 
 	if (FlexKinds [kind].enabled && ! token->ignoreTag )
 	{
-#ifdef DEBUG
-	printf( "\n makeFlexTag start: token isClass:%d  scope:%s  name:%s\n"
-			, token->isClass
-			, vStringValue(token->scope)
-			, vStringValue(token->string)
-		  );
-#endif
+	DebugStatement ( 
+			debugPrintf (DEBUG_PARSE
+				, "\n makeFlexTag start: token isClass:%d  scope:%s  name:%s\n"
+				, token->isClass
+				, vStringValue(token->scope)
+				, vStringValue(token->string)
+				);
+			);
 		if (kind == FLEXTAG_FUNCTION && token->isClass )
 		{
 			kind = FLEXTAG_METHOD;
@@ -1084,18 +1085,22 @@ static void parseFunction (tokenInfo *const token)
 	addToScope(name, token->scope);
 	*/
 
-#ifdef DEBUG
-	printf( "\n parseFunction: token isClass:%d  scope:%s  name:%s\n"
-			, token->isClass
-			, vStringValue(token->scope)
-			, vStringValue(token->string)
-		  );
-	printf( "\n parseFunction: name isClass:%d  scope:%s  name:%s\n"
-			, name->isClass
-			, vStringValue(name->scope)
-			, vStringValue(name->string)
-		  );
-#endif
+	DebugStatement ( 
+			debugPrintf (DEBUG_PARSE
+				, "\n parseFunction: token isClass:%d  scope:%s  name:%s\n"
+				, token->isClass
+				, vStringValue(token->scope)
+				, vStringValue(token->string)
+				);
+			);
+	DebugStatement ( 
+			debugPrintf (DEBUG_PARSE
+				, "\n parseFunction: name isClass:%d  scope:%s  name:%s\n"
+				, name->isClass
+				, vStringValue(name->scope)
+				, vStringValue(name->string)
+				);
+			);
 
 	readToken (token);
 
@@ -1113,28 +1118,39 @@ static void parseFunction (tokenInfo *const token)
 
 	if ( isType (token, TOKEN_OPEN_CURLY) )
 	{
-#ifdef DEBUG
-	printf( "\n parseFunction end: name isClass:%d  scope:%s  name:%s\n"
-			, name->isClass
-			, vStringValue(name->scope)
-			, vStringValue(name->string)
-		  );
-#endif
+		DebugStatement ( 
+				debugPrintf (DEBUG_PARSE
+					, "\n parseFunction end: name isClass:%d  scope:%s  name:%s\n"
+					, name->isClass
+					, vStringValue(name->scope)
+					, vStringValue(name->string)
+					);
+				);
 		parseBlock (token, name);
-#ifdef DEBUG
-	printf( "\n parseFunction end2: token isClass:%d  scope:%s  name:%s\n"
-			, token->isClass
-			, vStringValue(token->scope)
-			, vStringValue(token->string)
-		  );
-#endif
-#ifdef DEBUG
-	printf( "\n parseFunction end3: name isClass:%d  scope:%s  name:%s\n"
-			, name->isClass
-			, vStringValue(name->scope)
-			, vStringValue(name->string)
-		  );
-#endif
+		DebugStatement ( 
+				debugPrintf (DEBUG_PARSE
+					, "\n parseFunction end2: token isClass:%d  scope:%s  name:%s\n"
+					, token->isClass
+					, vStringValue(token->scope)
+					, vStringValue(token->string)
+					);
+				);
+		DebugStatement ( 
+				debugPrintf (DEBUG_PARSE
+					, "\n parseFunction end2: token isClass:%d  scope:%s  name:%s\n"
+					, token->isClass
+					, vStringValue(token->scope)
+					, vStringValue(token->string)
+					);
+				);
+		DebugStatement ( 
+				debugPrintf (DEBUG_PARSE
+					, "\n parseFunction end3: name isClass:%d  scope:%s  name:%s\n"
+					, name->isClass
+					, vStringValue(name->scope)
+					, vStringValue(name->string)
+					);
+				);
 		makeFunctionTag (name);
 	}
 
@@ -1151,13 +1167,14 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
 	token->nestLevel++;
-#ifdef DEBUG
-	printf( "\n parseBlock start: token isClass:%d  scope:%s  name:%s\n"
-			, token->isClass
-			, vStringValue(token->scope)
-			, vStringValue(token->string)
-		  );
-#endif
+	DebugStatement ( 
+			debugPrintf (DEBUG_PARSE
+				, "\n parseBlock start: token isClass:%d  scope:%s  name:%s\n"
+				, token->isClass
+				, vStringValue(token->scope)
+				, vStringValue(token->string)
+				);
+			);
 	/*
 	 * Make this routine a bit more forgiving.
 	 * If called on an open_curly advance it
@@ -1207,13 +1224,14 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 	vStringDelete(saveScope);
 	token->nestLevel--;
 
-#ifdef DEBUG
-	printf( "\n parseBlock end: token isClass:%d  scope:%s  name:%s\n"
-			, token->isClass
-			, vStringValue(token->scope)
-			, vStringValue(token->string)
-		  );
-#endif
+	DebugStatement ( 
+			debugPrintf (DEBUG_PARSE
+				, "\n parseBlock end: token isClass:%d  scope:%s  name:%s\n"
+				, token->isClass
+				, vStringValue(token->scope)
+				, vStringValue(token->string)
+				);
+			);
 	return FALSE;
 }
 
@@ -1367,26 +1385,28 @@ static boolean parseClass (tokenInfo *const token)
 	copyToken (name, token);
 	readToken(token);
 
-#ifdef DEBUG
-	printf( "\n parseClass start: token isClass:%d  scope:%s  name:%s\n"
-			, token->isClass
-			, vStringValue(token->scope)
-			, vStringValue(token->string)
-		  );
-#endif
+	DebugStatement ( 
+			debugPrintf (DEBUG_PARSE
+				, "\n parseClass start: token isClass:%d  scope:%s  name:%s\n"
+				, token->isClass
+				, vStringValue(token->scope)
+				, vStringValue(token->string)
+				);
+			);
 	if ( isType (token, TOKEN_OPEN_CURLY) )
 	{
 		makeClassTag (name);
 		parseBlock (token, name);
 	}
 
-#ifdef DEBUG
-	printf( "\n parseClass end: token isClass:%d  scope:%s  name:%s\n"
-			, token->isClass
-			, vStringValue(token->scope)
-			, vStringValue(token->string)
-		  );
-#endif
+	DebugStatement ( 
+			debugPrintf (DEBUG_PARSE
+				, "\n parseClass end: token isClass:%d  scope:%s  name:%s\n"
+				, token->isClass
+				, vStringValue(token->scope)
+				, vStringValue(token->string)
+				);
+			);
 	vStringCopy(token->scope, saveScope);
 	token->isClass = saveIsClass;
 	deleteToken (name);
@@ -1409,13 +1429,14 @@ static boolean parseStatement (tokenInfo *const token)
 
 	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
-#ifdef DEBUG
-	printf( "\n parseStatement: token isClass:%d  scope:%s  name:%s\n"
-			, token->isClass
-			, vStringValue(token->scope)
-			, vStringValue(token->string)
-		  );
-#endif
+	DebugStatement ( 
+			debugPrintf (DEBUG_PARSE
+				, "\n parseStatement: token isClass:%d  scope:%s  name:%s\n"
+				, token->isClass
+				, vStringValue(token->scope)
+				, vStringValue(token->string)
+				);
+			);
 	/*
 	 * Functions can be named or unnamed.
 	 * This deals with these formats:
@@ -2039,14 +2060,6 @@ static boolean parseMXML (tokenInfo *const token)
 	readToken (token);
 	do
 	{
-/*		
-#ifdef DEBUG
-	printf( "\n parseMXML start: token tokenType:%d  keywordId:%d \n",
-			token->type,
-			token->keyword
-		  );
-#endif
-*/
 		if (isType (token, TOKEN_OPEN_MXML))
 		{
 			parseMXML (token);
