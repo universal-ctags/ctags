@@ -51,7 +51,7 @@ typedef enum eKeywordId {
 	KEYWORD_section,
 	KEYWORD_subsection,
 	KEYWORD_subsubsection,
-	KEYWORD_usepackage
+	KEYWORD_part
 } keywordId;
 
 /*	Used to determine whether keyword is valid for the token language and
@@ -113,7 +113,7 @@ typedef enum {
 	TEXTAG_SECTION,
 	TEXTAG_SUBSECTION,
 	TEXTAG_SUBSUBSECTION,
-	TEXTAG_PACKAGE,
+	TEXTAG_PART,
 	TEXTAG_COUNT
 } texKind;
 
@@ -122,7 +122,7 @@ static kindOption TexKinds [] = {
 	{ TRUE,  's', "section",		  "sections"		   },
 	{ TRUE,  'u', "subsection",		  "subsections"		   },
 	{ TRUE,  'b', "subsubsection",	  "subsubsections"	   },
-	{ TRUE,  'p', "package",		  "packages"		   }
+	{ TRUE,  'p', "part",			  "parts"			   }
 };
 
 static const keywordDesc TexKeywordTable [] = {
@@ -131,7 +131,7 @@ static const keywordDesc TexKeywordTable [] = {
 	{ "section",		KEYWORD_section				},
 	{ "subsection",		KEYWORD_subsection			},
 	{ "subsubsection",	KEYWORD_subsubsection		},
-	{ "usepackage",		KEYWORD_usepackage			}
+	{ "part",			KEYWORD_part				}
 };
 
 /*
@@ -376,6 +376,10 @@ static boolean parseTag (tokenInfo *const token, texKind kind)
 {
 	tokenInfo *const name = newToken ();
 	vString *	fullname;
+	boolean		useLongName = TRUE;
+
+	fullname = vStringNew ();
+	vStringClear (fullname);
 
 	/*
 	 * Tex tags are of these formats:
@@ -393,33 +397,15 @@ static boolean parseTag (tokenInfo *const token, texKind kind)
 		readToken (token);
 	}
 
-	if (isType (token, TOKEN_STAR))
-	{
-		readToken (token);
-	}
-
 	if (isType (token, TOKEN_OPEN_SQUARE))
 	{
-		findToken (token, TOKEN_CLOSE_SQUARE);
-		readToken (token);
-	}
-
-	if (isType (token, TOKEN_STAR))
-	{
-		readToken (token);
-	}
-
-	if (isType (token, TOKEN_OPEN_CURLY))
-	{
-		fullname = vStringNew ();
-		vStringClear (fullname);
+		useLongName = FALSE;
 
 		readToken (token);
-		while (! isType (token, TOKEN_CLOSE_CURLY) )
+		while (! isType (token, TOKEN_CLOSE_SQUARE) )
 		{
 			if (isType (token, TOKEN_IDENTIFIER))
 			{
-				/*if (strlen(vStringValue(fullname)) > 0)*/
 				if (fullname->length > 0)
 					vStringCatS (fullname, " ");
 				vStringCatS (fullname, vStringValue (token->string));
@@ -431,7 +417,34 @@ static boolean parseTag (tokenInfo *const token, texKind kind)
 		makeTexTag (name, kind);
 	}
 
+	if (isType (token, TOKEN_STAR))
+	{
+		readToken (token);
+	}
+
+	if (isType (token, TOKEN_OPEN_CURLY))
+	{
+		readToken (token);
+		while (! isType (token, TOKEN_CLOSE_CURLY) )
+		{
+			if (isType (token, TOKEN_IDENTIFIER) && useLongName)
+			{
+				if (fullname->length > 0)
+					vStringCatS (fullname, " ");
+				vStringCatS (fullname, vStringValue (token->string));
+			}
+			readToken (token);
+		}
+		if (useLongName) 
+		{
+			vStringTerminate (fullname);
+			vStringCopy (name->string, fullname);
+			makeTexTag (name, kind);
+		}
+	}
+
 	deleteToken (name);
+	vStringDelete (fullname);
 	return TRUE;
 }
 
@@ -457,8 +470,8 @@ static void parseTexFile (tokenInfo *const token)
 				case KEYWORD_subsubsection:	
 					parseTag (token, TEXTAG_SUBSUBSECTION); 
 					break;
-				case KEYWORD_usepackage:	
-					parseTag (token, TEXTAG_PACKAGE); 
+				case KEYWORD_part:	
+					parseTag (token, TEXTAG_PART); 
 					break;
 				default:
 					break;
