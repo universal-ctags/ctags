@@ -89,6 +89,9 @@ typedef enum eKeywordId {
 	KEYWORD_domain,
 	KEYWORD_datatype,
 	KEYWORD_result,
+	KEYWORD_url,
+	KEYWORD_internal,
+	KEYWORD_external,
 	KEYWORD_when,
 	KEYWORD_then,
 	KEYWORD_variable,
@@ -258,6 +261,9 @@ static const keywordDesc SqlKeywordTable [] = {
 	{ "domain",							KEYWORD_domain				  },
 	{ "datatype",						KEYWORD_datatype		      },
 	{ "result",							KEYWORD_result			      },
+	{ "url",							KEYWORD_url				      },
+	{ "internal",						KEYWORD_internal		      },
+	{ "external",						KEYWORD_external		      },
 	{ "when",							KEYWORD_when			      },
 	{ "then",							KEYWORD_then			      },
 	{ "variable",						KEYWORD_variable		      },
@@ -325,12 +331,13 @@ static boolean isIdentChar (const int c)
 
 static boolean isCmdTerm (tokenInfo *const token)
 {
-#ifdef DEBUGed
-	printf( "\n isCmdTerm: token same  tt:%d  tk:%d\n"
-			, token->type
-			, token->keyword
-		  );
-#endif
+	DebugStatement ( 
+			debugPrintf (DEBUG_PARSE
+				, "\n isCmdTerm: token same  tt:%d  tk:%d\n"
+				, token->type
+				, token->keyword
+				);
+			);
 
 	/*
 	 * Based on the various customer sites I have been at
@@ -472,11 +479,13 @@ static void parseString (vString *const string, const int delimiter)
 		int c = fileGetc ();
 		if (c == EOF)
 			end = TRUE;
+		/*
 		else if (c == '\\')
 		{
-			c = fileGetc(); /* This maybe a ' or ". */
+			c = fileGetc(); // This maybe a ' or ". //
 			vStringPut(string, c);
 		}
+		*/
 		else if (c == delimiter)
 			end = TRUE;
 		else
@@ -586,7 +595,7 @@ getNextChar:
 
 		case '\\':
 				  c = fileGetc ();
-				  if (c != '\\'  && c != '"'  &&  !isspace (c))
+				  if (c != '\\'  && c != '"'  && c != '\''  &&  !isspace (c))
 					  fileUngetc (c);
 				  token->type = TOKEN_CHARACTER;
 				  token->lineNumber = getSourceLineNumber ();
@@ -857,13 +866,40 @@ static void parseSubProgram (tokenInfo *const token)
 	{
 		while (!(isKeyword (token, KEYWORD_is) ||
 					isKeyword (token, KEYWORD_begin) ||
+					isKeyword (token, KEYWORD_at) ||
+					isKeyword (token, KEYWORD_internal) ||
+					isKeyword (token, KEYWORD_external) ||
+					isKeyword (token, KEYWORD_url) ||
 					isCmdTerm (token)
 				)
 			  )
 		{
-			/* read return type */
-			readToken (token);
+			if ( isKeyword (token, KEYWORD_result) )
+			{
+				readToken (token);
+				if (isType (token, TOKEN_OPEN_PAREN))
+				{
+					/* Reads to the next token after the TOKEN_CLOSE_PAREN */
+					skipArgumentList(token);
+				}
+			} else {
+				readToken (token);
+			}
 		}
+		if (isKeyword (token, KEYWORD_at) || 
+				isKeyword (token, KEYWORD_url) ||
+				isKeyword (token, KEYWORD_internal) ||
+				isKeyword (token, KEYWORD_external) )
+		{
+			addToScope(token, name->string);
+			if (isType (name, TOKEN_IDENTIFIER) ||
+					isType (name, TOKEN_STRING) ||
+					!isKeyword (token, KEYWORD_NONE)
+			   )
+				makeSqlTag (name, kind);
+
+			vStringClear (token->scope);
+		} 
 		if (isKeyword (token, KEYWORD_is) || 
 				isKeyword (token, KEYWORD_begin) )
 		{
