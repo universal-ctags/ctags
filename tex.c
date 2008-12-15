@@ -51,7 +51,9 @@ typedef enum eKeywordId {
 	KEYWORD_section,
 	KEYWORD_subsection,
 	KEYWORD_subsubsection,
-	KEYWORD_part
+	KEYWORD_part,
+	KEYWORD_paragraph,
+	KEYWORD_subparagraph
 } keywordId;
 
 /*	Used to determine whether keyword is valid for the token language and
@@ -114,6 +116,8 @@ typedef enum {
 	TEXTAG_SUBSECTION,
 	TEXTAG_SUBSUBSECTION,
 	TEXTAG_PART,
+	TEXTAG_PARAGRAPH,
+	TEXTAG_SUBPARAGRAPH,
 	TEXTAG_COUNT
 } texKind;
 
@@ -122,7 +126,9 @@ static kindOption TexKinds [] = {
 	{ TRUE,  's', "section",		  "sections"		   },
 	{ TRUE,  'u', "subsection",		  "subsections"		   },
 	{ TRUE,  'b', "subsubsection",	  "subsubsections"	   },
-	{ TRUE,  'p', "part",			  "parts"			   }
+	{ TRUE,  'p', "part",			  "parts"			   },
+	{ TRUE,  'P', "paragraph",		  "paragraphs"		   },
+	{ TRUE,  'G', "subparagraph",	  "subparagraphs"	   }
 };
 
 static const keywordDesc TexKeywordTable [] = {
@@ -131,7 +137,9 @@ static const keywordDesc TexKeywordTable [] = {
 	{ "section",		KEYWORD_section				},
 	{ "subsection",		KEYWORD_subsection			},
 	{ "subsubsection",	KEYWORD_subsubsection		},
-	{ "part",			KEYWORD_part				}
+	{ "part",			KEYWORD_part				},
+	{ "paragraph",		KEYWORD_paragraph			},
+	{ "subparagraph",	KEYWORD_subparagraph		}
 };
 
 /*
@@ -142,7 +150,7 @@ static boolean isIdentChar (const int c)
 {
 	return (boolean)
 		(isalpha (c) || isdigit (c) || c == '$' || 
-		 c == '@' || c == '_' || c == '#');
+		  c == '_' || c == '#');
 }
 
 static void buildTexKeywordHash (void)
@@ -464,6 +472,12 @@ static void parseTexFile (tokenInfo *const token)
 					break;
 				case KEYWORD_part:	
 					parseTag (token, TEXTAG_PART); 
+					break;
+				case KEYWORD_paragraph:	
+					parseTag (token, TEXTAG_PARAGRAPH); 
+					break;
+				case KEYWORD_subparagraph:	
+					parseTag (token, TEXTAG_SUBPARAGRAPH); 
 					break;
 				default:
 					break;
