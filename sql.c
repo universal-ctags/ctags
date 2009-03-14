@@ -157,7 +157,7 @@ typedef enum eTokenType {
 	TOKEN_FORWARD_SLASH
 } tokenType;
 
-typedef struct sTokenInfo {
+typedef struct sTokenInfoSQL {
 	tokenType	type;
 	keywordId	keyword;
 	vString *	string;
@@ -1618,7 +1618,7 @@ static void parseEvent (tokenInfo *const token)
 		{
 			parseBlock (token, TRUE);
 		}
-		findCmdTerm (token, FALSE);
+		findCmdTerm (token, TRUE);
 	}
 	deleteToken (name);
 }
