@@ -524,6 +524,8 @@ static void findRubyTags (void)
 				do {
 					++cp;
 				} while (*cp != 0 && *cp != '"');
+				if (*cp == '"')
+					cp++; /* skip the last found '"' */
 			}
 			else if (*cp == ';')
 			{
