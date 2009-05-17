@@ -443,8 +443,8 @@ static const char *findVariable(const char *line)
 	{
 		if (*eq == '=')
 			return NULL;	/* ignore '==' operator and 'x=5,y=6)' function lines */
-		if (*eq == '(')
-			break;	/* allow 'x = func(b=2,y=2,' lines */
+		if (*eq == '(' || *eq == '#')
+			break;	/* allow 'x = func(b=2,y=2,' lines and comments at the end of line */
 		eq++;
 	}
 
