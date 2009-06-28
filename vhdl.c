@@ -669,10 +669,9 @@ static void parseTypes (tokenInfo * const token)
 	deleteToken (name);
 }
 
-static void parseConstant (tokenInfo * const token, boolean local)
+static void parseConstant (boolean local)
 {
 	tokenInfo *const name = newToken ();
-	Assert (isKeyword (token, KEYWORD_CONSTANT));
 	readToken (name);
 	if (local)
 	{
@@ -773,7 +772,7 @@ static void parseKeywords (tokenInfo * const token, boolean local)
 		fileSkipToCharacter (';');
 		break;
 	case KEYWORD_CONSTANT:
-		parseConstant (token, local);
+		parseConstant (local);
 		break;
 	case KEYWORD_TYPE:
 		parseTypes (token);
