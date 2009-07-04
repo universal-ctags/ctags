@@ -21,6 +21,7 @@ ctags-@VERSION@ (@DATE@)
 * Fixed bug with detecting identifiers inside variables [Python, Bug #1809024].
 * Fixed bug with detecting identifiers at the start of variables [Python, Bug #1856363].
 * Fixed parsing of triple single-quoted multi-line strings [Python, Bug #1906062].
+* Changed to newer version of autoconf, changing configure.in to configure.ac.
 
 ctags-5.7 (04 Sep 2007)
 * Added support for DIM AS [Freebasic, Bug #1741778].
