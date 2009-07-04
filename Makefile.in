@@ -17,6 +17,7 @@ SHELL = /bin/sh
 # runs.
 #
 exec_prefix = @exec_prefix@
+datarootdir = @datarootdir@
 prefix	= @prefix@
 bindir	= @bindir@
 srcdir	= @srcdir@

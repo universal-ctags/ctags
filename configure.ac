@@ -1,29 +1,129 @@
-dnl $Id$
+# $Id$
 
-dnl	Copyright (c) 1996-2002, Darren Hiebert
-dnl
-dnl	This source code is released for free distribution under the terms
-dnl	of the GNU General Public License.
+#	Copyright (c) 2009, Darren Hiebert
+#
+#	This source code is released for free distribution under the terms
+#	of the GNU General Public License.
 
-dnl	Process this file with autoconf to produce a configure script.
+#	Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(1.12)
-AC_INIT(ctags.h)
-AC_CONFIG_HEADER(config.h)
+AC_PREREQ([2.61])
+AC_INIT([ctags.h])
+AC_CONFIG_HEADERS([config.h])
 
-dnl Report system info
-dnl ------------------
+AH_TEMPLATE([PACKAGE], [Package name.])
+AH_TEMPLATE([VERSION], [Package version.])
+AH_TEMPLATE([clock_t],
+	[Define to the appropriate type if <time.h> does not define this.])
+AH_TEMPLATE([fpos_t],
+	[Define to long if <stdio.h> does not define this.])
+AH_TEMPLATE([L_tmpnam],
+	[Define to the appropriate size for tmpnam() if <stdio.h> does not define
+	this.])
+AH_TEMPLATE([HAVE_STAT_ST_INO],
+	[Define this macro if the field "st_ino" exists in struct stat in
+	<sys/stat.h>.])
+AH_TEMPLATE([remove],
+	[Define remove to unlink if you have unlink(), but not remove().])
+AH_TEMPLATE([SEEK_SET],
+	[Define this value used by fseek() appropriately if <stdio.h>
+	(or <unistd.h> on SunOS 4.1.x) does not define them.])
+AH_TEMPLATE([INT_MAX],
+	[Define as the maximum integer on your system if not defined <limits.h>.])
+AH_TEMPLATE([CUSTOM_CONFIGURATION_FILE],
+	[You can define this label to be a string containing the name of a
+	site-specific configuration file containing site-wide default options. The
+	files /etc/ctags.conf and /usr/local/etc/ctags.conf are already checked,
+	so only define one here if you need a file somewhere else.])
+AH_TEMPLATE([MACROS_USE_PATTERNS],
+	[Define this label if you want macro tags (defined lables) to use patterns
+	in the EX command by default (original ctags behavior is to use line
+	numbers).])
+AH_VERBATIM([DEFAULT_FILE_FORMAT], [
+/* Define this as desired.
+ * 1:  Original ctags format
+ * 2:  Extended ctags format with extension flags in EX-style comment.
+ */
+#define DEFAULT_FILE_FORMAT	2
+])
+AH_TEMPLATE([SYS_INTERPRETER],
+	[Define this label if your system supports starting scripts with a line of
+	the form "#! /bin/sh" to select the interpreter to use for the script.])
+AH_TEMPLATE([CASE_INSENSITIVE_FILENAMES],
+	[Define this label if your system uses case-insensitive file names])
+AH_VERBATIM([EXTERNAL_SORT], [
+/* Define this label to use the system sort utility (which is probably more
+*  efficient) over the internal sorting algorithm.
+*/
+#ifndef INTERNAL_SORT
+# undef EXTERNAL_SORT
+#endif
+])
+AH_TEMPLATE([TMPDIR],
+	[If you wish to change the directory in which temporary files are stored,
+	define this label to the directory desired.])
+AH_TEMPLATE([REGCOMP_BROKEN],
+	[Define this label if regcomp() is broken.])
+AH_TEMPLATE([CHECK_REGCOMP],
+	[Define this label if you wish to check the regcomp() function at run time
+	for correct behavior. This function is currently broken on Cygwin.])
+AH_TEMPLATE([__USE_FIXED_PROTOTYPES__],
+	[This corrects the problem of missing prototypes for certain functions
+	in some GNU installations (e.g. SunOS 4.1.x).])
+AH_TEMPLATE([NON_CONST_PUTENV_PROTOTYPE],
+	[Define this is you have a prototype for putenv() in <stdlib.h>, but
+	doesn't declare its argument as "const char *".])
+AH_TEMPLATE([NEED_PROTO_REMOVE],
+	[If you receive error or warning messages indicating that you are missing
+	a prototype for, or a type mismatch using, the following function, define
+	this label and remake.])
+AH_TEMPLATE([NEED_PROTO_UNLINK],
+	[If you receive error or warning messages indicating that you are missing
+	a prototype for, or a type mismatch using, the following function, define
+	this label and remake.])
+AH_TEMPLATE([NEED_PROTO_MALLOC],
+	[If you receive error or warning messages indicating that you are missing
+	a prototype for, or a type mismatch using, the following function, define
+	this label and remake.])
+AH_TEMPLATE([NEED_PROTO_GETENV],
+	[If you receive error or warning messages indicating that you are missing
+	a prototype for, or a type mismatch using, the following function, define
+	this label and remake.])
+AH_TEMPLATE([NEED_PROTO_FGETPOS],
+	[If you receive error or warning messages indicating that you are missing
+	a prototype for, or a type mismatch using, the following function, define
+	this label and remake.])
+AH_TEMPLATE([NEED_PROTO_STAT],
+	[If you receive error or warning messages indicating that you are missing
+	a prototype for, or a type mismatch using, the following function, define
+	this label and remake.])
+AH_TEMPLATE([NEED_PROTO_LSTAT],
+	[If you receive error or warning messages indicating that you are missing
+	a prototype for, or a type mismatch using, the following function, define
+	this label and remake.])
+AH_TEMPLATE([NEED_PROTO_TRUNCATE],
+	[If you receive error or warning messages indicating that you are missing
+	a prototype for, or a type mismatch using, the following function, define
+	this label and remake.])
+AH_TEMPLATE([NEED_PROTO_FTRUNCATE],
+	[If you receive error or warning messages indicating that you are missing
+	a prototype for, or a type mismatch using, the following function, define
+	this label and remake.])
+
+
+
+# Report system info
+# ------------------
 program_name=[`grep 'PROGRAM_NAME  *"' ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
 program_version=[`grep 'PROGRAM_VERSION  *"' ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
 echo "$program_name, version $program_version"
 uname -mrsv 2>/dev/null
 
-dnl Define convenience macros
-dnl -------------------------
-dnl CHECK_HEADER_DEFINE(LABEL, HEADER [,ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ] ])
-AC_DEFUN(CHECK_HEADER_DEFINE,
-[
-	AC_MSG_CHECKING(if $1 is defined in $2)
+# Define convenience macros
+# -------------------------
+# CHECK_HEADER_DEFINE(LABEL, HEADER [,ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ] ])
+AC_DEFUN([CHECK_HEADER_DEFINE], [
+	AC_MSG_CHECKING([if $1 is defined in $2])
 	AC_EGREP_CPP(yes,
 [#include <$2>
 #ifdef $1
@@ -31,14 +131,14 @@ AC_DEFUN(CHECK_HEADER_DEFINE,
 #endif
 ], [
 	AC_MSG_RESULT(yes)
-	$3
+	[$3]
 ], [
 	AC_MSG_RESULT(no)
-	$4
+	[$4]
 ]) ])
 
-dnl Checks for configuration options
-dnl --------------------------------
+# Checks for configuration options
+# --------------------------------
 
 AC_ARG_WITH(posix-regex,
 [  --with-posix-regex      use Posix regex interface, if available])
@@ -46,8 +146,8 @@ AC_ARG_WITH(posix-regex,
 AC_ARG_WITH(readlib,
 [  --with-readlib          include readtags library object during install])
 
-dnl AC_ARG_WITH(perl-regex,
-dnl [  --with-perl-regex       use Perl pcre interface, if available])
+# AC_ARG_WITH(perl-regex,
+# [  --with-perl-regex       use Perl pcre interface, if available])
 
 AC_ARG_ENABLE(etags,
 [  --enable-etags          enable the installation of links for etags])
@@ -82,8 +182,8 @@ AC_ARG_ENABLE(tmpdir,
 	tmpdir_specified=yes)
 
 
-dnl Process configuration options
-dnl -----------------------------
+# Process configuration options
+# -----------------------------
 
 if test "$enable_maintainer_mode" = yes ; then
 	AC_MSG_RESULT(enabling maintainer mode)
@@ -118,8 +218,8 @@ if test "$enable_macro_patterns" = yes ; then
 	AC_MSG_RESULT(tag file will use patterns for macros by default)
 fi
 
-dnl Checks for programs
-dnl -------------------
+# Checks for programs
+# -------------------
 
 AC_PROG_CC
 
@@ -150,10 +250,10 @@ AC_PROG_LN_S
 AC_CHECK_PROG(STRIP, strip, strip, :)
 
 
-dnl Checks for operating environment
-dnl --------------------------------
+# Checks for operating environment
+# --------------------------------
 
-dnl Check for temporary directory
+# Check for temporary directory
 AC_MSG_CHECKING(directory to use for temporary files)
 if test -n "$enable_tmpdir"; then
 	tmpdir="$enable_tmpdir"
@@ -177,13 +277,13 @@ else
 	AC_MSG_ERROR($tmpdir does not exist)
 fi
 
-dnl Check whether system supports #! scripts
+# Check whether system supports #! scripts
 AC_SYS_INTERPRETER
 if test yes = "$interpval"; then
 	AC_DEFINE(SYS_INTERPRETER)
 fi
 
-dnl Test for case-insensitive filenames
+# Test for case-insensitive filenames
 AC_MSG_CHECKING(for case-insensitive filenames)
 touch conftest.cif
 if test -f CONFTEST.CIF; then
@@ -220,26 +320,26 @@ if test "$enable_external_sort" != yes ; then
 fi
 
 
-dnl Checks for header files
-dnl -----------------------
+# Checks for header files
+# -----------------------
 
-AC_CHECK_HEADERS(dirent.h fcntl.h fnmatch.h stat.h stdlib.h string.h)
-AC_CHECK_HEADERS(time.h types.h unistd.h)
-AC_CHECK_HEADERS(sys/dir.h sys/stat.h sys/times.h sys/types.h)
+AC_CHECK_HEADERS_ONCE([dirent.h fcntl.h fnmatch.h stat.h stdlib.h string.h])
+AC_CHECK_HEADERS_ONCE([time.h types.h unistd.h])
+AC_CHECK_HEADERS_ONCE([sys/dir.h sys/stat.h sys/times.h sys/types.h])
 
 
-dnl Checks for header file macros
-dnl -----------------------------
+# Checks for header file macros
+# -----------------------------
 
-CHECK_HEADER_DEFINE(L_tmpnam, stdio.h,, AC_DEFINE(L_tmpnam, 20))
+CHECK_HEADER_DEFINE(L_tmpnam, [stdio.h],, AC_DEFINE(L_tmpnam, 20))
 
-CHECK_HEADER_DEFINE(INT_MAX, limits.h,,
-	CHECK_HEADER_DEFINE(MAXINT, limits.h,
+CHECK_HEADER_DEFINE(INT_MAX, [limits.h],,
+	CHECK_HEADER_DEFINE(MAXINT, [limits.h],
 		AC_DEFINE(INT_MAX, MAXINT), AC_DEFINE(INT_MAX, 32767)))
 
 
-dnl Checks for typedefs
-dnl -------------------
+# Checks for typedefs
+# -------------------
 
 AC_TYPE_SIZE_T
 AC_TYPE_OFF_T
@@ -259,11 +359,11 @@ AC_EGREP_HEADER(clock_t, time.h, AC_MSG_RESULT(yes),
 ])
 
 
-dnl Checks for compiler characteristics
-dnl -----------------------------------
+# Checks for compiler characteristics
+# -----------------------------------
 
-dnl AC_CYGWIN
-dnl AC_MINGW32
+# AC_CYGWIN
+# AC_MINGW32
 AC_C_CONST
 AC_OBJEXT
 AC_EXEEXT
@@ -281,8 +381,8 @@ if test yes = "$have_st_ino"; then
 fi
 
 
-dnl Checks for library functions
-dnl ----------------------------
+# Checks for library functions
+# ----------------------------
 
 AC_CHECK_FUNCS(fnmatch)
 AC_CHECK_FUNCS(strstr)
@@ -290,7 +390,7 @@ AC_CHECK_FUNCS(strcasecmp stricmp, break)
 AC_CHECK_FUNCS(strncasecmp strnicmp, break)
 AC_CHECK_FUNCS(fgetpos, have_fgetpos=yes)
 
-dnl SEEK_SET should be in stdio.h, but may be in unistd.h on SunOS 4.1.x
+# SEEK_SET should be in stdio.h, but may be in unistd.h on SunOS 4.1.x
 if test "$have_fgetpos" != yes ; then
 	CHECK_HEADER_DEFINE(SEEK_SET, stdio.h,,
 		CHECK_HEADER_DEFINE(SEEK_SET, unistd.h,,
@@ -315,7 +415,7 @@ AC_CHECK_FUNCS(remove, have_remove=yes,
 	CHECK_HEADER_DEFINE(remove, unistd.h,, AC_DEFINE(remove, unlink)))
 
 AC_CHECK_FUNCS(truncate, have_truncate=yes)
-dnl === Cannot nest AC_CHECK_FUNCS() calls
+# === Cannot nest AC_CHECK_FUNCS() calls
 if test "$have_truncate" != yes  ; then
 	AC_CHECK_FUNCS(ftruncate, have_ftruncate=yes)
 	if test "$have_ftruncate" != yes ; then
@@ -324,7 +424,7 @@ if test "$have_truncate" != yes  ; then
 fi
 
 AC_CHECK_FUNCS(setenv, have_setenv=yes)
-dnl === Cannot nest AC_CHECK_FUNCS() calls
+# === Cannot nest AC_CHECK_FUNCS() calls
 if test "$have_setenv" != yes ; then
 	AC_CHECK_FUNCS(putenv, have_putenv=yes)
 	if test "$have_putenv" = yes ; then
@@ -341,8 +441,8 @@ if test "$have_setenv" != yes ; then
 	fi
 fi
 
-dnl
-dnl if test yes = "$CYGWIN"; then with_posix_regex=no; fi
+#
+# if test yes = "$CYGWIN"; then with_posix_regex=no; fi
 if test no != "$with_posix_regex"; then
 	AC_CHECK_FUNCS(regcomp)
 	AC_MSG_CHECKING(if regcomp works)
@@ -359,34 +459,41 @@ main() {
 	fi
 fi
 
-dnl if test yes = "$with_perl_regex"; then
-dnl 	AC_MSG_CHECKING(for Perl regex library)
-dnl 	pcre_candidates="$with_perl_regex $HOME/local/lib* /usr*/local/lib* /usr/lib*"
-dnl 	for lib in $pcre_candidates; do
-dnl 		if test -f $lib/libpcreposix.so; then
-dnl 			pcre_lib="-L$lib -lpcreposix"
-dnl 			break
-dnl 		elif test -f $lib/libpcreposix.a; then
-dnl 			pcre_lib="$lib/libpcreposix.a"
-dnl 			break
-dnl 		fi
-dnl 	done
-dnl 	if test -z "$pcre_lib"; then
-dnl 		AC_MSG_RESULT(not found)
-dnl 	else
-dnl 		AC_MSG_RESULT($lib)
-dnl 		AC_DEFINE(HAVE_REGCOMP)
-dnl 		LDFLAGS="$LDFLAGS $pcre_lib"
-dnl 		have_regex=yes
-dnl 	fi
-dnl fi
+# if test yes = "$with_perl_regex"; then
+# 	AC_MSG_CHECKING(for Perl regex library)
+# 	pcre_candidates="$with_perl_regex $HOME/local/lib* /usr*/local/lib* /usr/lib*"
+# 	for lib in $pcre_candidates; do
+# 		if test -f $lib/libpcreposix.so; then
+# 			pcre_lib="-L$lib -lpcreposix"
+# 			break
+# 		elif test -f $lib/libpcreposix.a; then
+# 			pcre_lib="$lib/libpcreposix.a"
+# 			break
+# 		fi
+# 	done
+# 	if test -z "$pcre_lib"; then
+# 		AC_MSG_RESULT(not found)
+# 	else
+# 		AC_MSG_RESULT($lib)
+# 		AC_DEFINE(HAVE_REGCOMP)
+# 		LDFLAGS="$LDFLAGS $pcre_lib"
+# 		have_regex=yes
+# 	fi
+# fi
 
 
-dnl Checks for missing prototypes
-dnl -----------------------------
-AC_CHECKING(for missing prototypes)
+# Checks for missing prototypes
+# -----------------------------
+AC_CHECKING(for new missing prototypes)
 
-AC_DEFUN(CHECK_PROTO, [AC_EGREP_HEADER([[^A-Za-z0-9_]$1([ 	]+[A-Za-z0-9_]*)?\(], $2,, AC_DEFINE(patsubst([NEED_PROTO_NAME], [NAME], translit($1, [a-z], [A-Z]))) AC_MSG_RESULT(adding prototype for $1))])
+AC_DEFUN(CHECK_PROTO, [
+	AC_EGREP_HEADER([[^A-Za-z0-9_]$1([ 	]+[A-Za-z0-9_]*)?[	 ]*\(],
+	$2,
+	,
+	[
+		AC_MSG_RESULT([adding prototype for $1])
+		AC_DEFINE(patsubst([NEED_PROTO_NAME], [NAME], translit([$1], [[a-z]], [[A-Z]])))
+	])])
 
 if test "$have_remove" = yes ; then
 	CHECK_PROTO(remove, stdio.h)
@@ -408,8 +515,8 @@ if test "$have_ftruncate" = yes ; then
 fi
 
 
-dnl Output files
-dnl ------------
+# Output files
+# ------------
 
 
 rm -f Makefile
@@ -422,4 +529,4 @@ else
 fi
 AC_OUTPUT($makefile_out)
 
-dnl vim:ts=4:sw=4:
+# vim:ts=4:sw=4:

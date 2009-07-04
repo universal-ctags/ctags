@@ -1,6 +1,6 @@
 #	$Id$
 #
-#	Copyright (c) 1996-2007, Darren Hiebert
+#	Copyright (c) 1996-2009, Darren Hiebert
 #
 #	Development makefile for Exuberant Ctags. Also used to build releases.
 #	Requires GNU make.
@@ -25,7 +25,7 @@ COMMON_FILES := COPYING EXTENDING.html FAQ INSTALL.oth MAINTAINERS NEWS README \
 				$(ENVIRONMENT_SOURCES) $(ENVIRONMENT_HEADERS)
 
 UNIX_FILES   := $(COMMON_FILES) \
-				.indent.pro INSTALL acconfig.h configure.in \
+				.indent.pro INSTALL configure.ac \
 				Makefile.in maintainer.mak \
 				descrip.mms mkinstalldirs magic.diff \
 				ctags.spec ctags.1
@@ -33,9 +33,12 @@ UNIX_FILES   := $(COMMON_FILES) \
 REGEX_DIR    := gnu_regex
 
 WIN_FILES    := $(COMMON_FILES) $(VERSION_FILES)
-WIN_REGEX    := regex.c regex.h
  
 SVN_FILES    := $(UNIX_FILES)
+
+OBJECTS      := $(patsubst %.c,%.o,$(notdir $(SOURCES)))
+DOBJECTS     := $(patsubst %.c,%.od,$(notdir $(DSOURCES)))
+DEPS         := $(patsubst %.c,$(DEP_DIR)/%.d,$(notdir $(SOURCES)))
 
 WARNINGS     := -Wall -W -Wpointer-arith -Wcast-align -Wwrite-strings \
 				-Wmissing-prototypes -Wmissing-declarations \
@@ -90,16 +93,16 @@ ctags dctags ctags.prof ctags.cov:
 else
 all: dctags tags syntax.vim
 
--include $(DSOURCES:%.c=$(DEP_DIR)/%.d) $(DEP_DIR)/readtags.d
+-include $(DEPS) $(DEP_DIR)/readtags.d
 
 #
 # Executable targets
 #
-ctags: $(SOURCES:.c=.o)
+ctags: $(OBJECTS)
 	@ echo "-- Linking $@"
 	@ $(LD) -o $@ $(LDFLAGS) $^
 
-dctags: $(SOURCES:.c=.od) debug.od
+dctags: $(DOBJECTS) debug.od
 	@ echo "-- Building $@"
 	$(LD) -o $@ $(LDFLAGS) $^
 
@@ -131,11 +134,11 @@ endif
 #
 FORCE:
 
-config.h.in: acconfig.h configure.in
+config.h.in: configure.ac
 	autoheader
 	@ touch $@
 
-configure: configure.in
+configure: configure.ac
 	autoconf
 
 config.status: configure
@@ -146,7 +149,7 @@ config.h: config.h.in config.status
 	touch $@
 
 depclean:
-	rm -f $(DEP_DIR)/*.d
+	rm -f $(DEPS)
 
 profclean:
 	rm -f $(PROF_GEN)
@@ -392,7 +395,7 @@ svn-files:
 #
 # Dependency file generation
 #
-$(DEP_DIR)/%.d: %.c maintainer.mak
+$(DEPS): %.c maintainer.mak
 	@ if [ ! -d $(DEP_DIR) ] ;then mkdir -p $(DEP_DIR) ;fi
 	@ $(CC) -M $(DCFLAGS) $< | sed 's/\($*\.o\)\([ :]\)/\1 $*.od $(@F)\2/g' > $@
 
@@ -403,9 +406,9 @@ $(DEP_DIR)/%.d: %.c maintainer.mak
 #
 # Compilation rules
 #
-regex.o: gnu_regex/regex.c
-	@ echo "-- Compiling $<"
-	@ $(CC) $(COMP_FLAGS) -DEXTERNAL_SORT $(OPT) $(WARNINGS) -Wuninitialized -c -Ignu_regex $<
+%.o %.od: gnu_regex/%.c
+#	@ echo "-- Compiling $<"
+	$(CC) $(CFLAGS) -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -I$(REGEX_DIR) $(OPT) -c $<
 
 %.o: %.c
 	@ echo "-- Compiling $<"
