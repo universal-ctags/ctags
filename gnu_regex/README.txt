@@ -1,5 +1,5 @@
-These source files were taken from the GNU regex-0.12 package, found at:
+These source files were taken from the GNU glibc-2.10.1 package.
 
-    http://directory.fsf.org/GNU/regex.html
+    ftp://ftp.gnu.org/gnu/glibc/glibc-2.10.1.tar.bz2
 
-Corrections were then made to eliminate compiler errors.
+Minor changes were made to eliminate compiler errors and warnings.

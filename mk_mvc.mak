@@ -4,7 +4,7 @@
 
 include source.mak
 
-REGEX_DEFINES = -DHAVE_REGCOMP -DREGEX_MALLOC -DSTDC_HEADERS=1
+REGEX_DEFINES = -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrcasecmp=stricmp
 DEFINES = -DWIN32 $(REGEX_DEFINES)
 INCLUDES = -I. -Ignu_regex
 OPT = /O2
@@ -22,7 +22,7 @@ dctags.exe: respmvc
 	cl /Zi -DDEBUG /Fe$@ @respmvc debug.c /link setargv.obj
 
 regex.obj:
-	cl /c $(OPT) /Fo$@ $(DEFINES) -Dconst= regex.c
+	cl /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) gnu_regex/regex.c
 
 respmvc: $(SOURCES) $(REGEX_SOURCES) $(HEADERS) $(REGEX_HEADERS) mk_mvc.mak
 	echo $(DEFINES) > $@
