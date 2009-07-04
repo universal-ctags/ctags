@@ -449,7 +449,7 @@ extern int fileGetc (void)
 	return c;
 }
 
-extern int fileSkipToCharacter (const int c)
+extern int fileSkipToCharacter (int c)
 {
 	int d;
 	do
