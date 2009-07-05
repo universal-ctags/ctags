@@ -19,38 +19,23 @@
 #include "entry.h"
 #include "options.h"
 #include "read.h"
-#include "routines.h"
+#include "main.h"
 #include "vstring.h"
+#include "nestlevel.h"
 
 /*
 *   DATA DEFINITIONS
 */
 typedef enum {
-	K_CLASS, K_FUNCTION, K_MEMBER, K_VARIABLE
+	K_CLASS, K_FUNCTION, K_MEMBER, K_VARIABLE, K_IMPORT
 } pythonKind;
 
 static kindOption PythonKinds[] = {
 	{TRUE, 'c', "class",    "classes"},
 	{TRUE, 'f', "function", "functions"},
 	{TRUE, 'm', "member",   "class members"},
-    {TRUE, 'v', "variable", "variables"}
-};
-
-typedef struct NestingLevel NestingLevel;
-typedef struct NestingLevels NestingLevels;
-
-struct NestingLevel
-{
-	int indentation;
-	vString *name;
-	boolean is_class;
-};
-
-struct NestingLevels
-{
-	NestingLevel *levels;
-	int n;
-	int allocated;
+    {TRUE, 'v', "variable", "variables"},
+    {TRUE, 'i', "namespace", "imports"}
 };
 
 static char const * const singletriple = "'''";
@@ -76,13 +61,14 @@ static boolean isIdentifierCharacter (int c)
  * extract all relevant information and create a tag.
  */
 static void makeFunctionTag (vString *const function,
-	vString *const parent, int is_class_parent)
+	vString *const parent, int is_class_parent, const char *arglist)
 {
 	tagEntryInfo tag;
 	initTagEntry (&tag, vStringValue (function));
-	
+
 	tag.kindName = "function";
 	tag.kind = 'f';
+	//tag.extensionFields.arglist = arglist;
 
 	if (vStringLength (parent) > 0)
 	{
@@ -263,11 +249,82 @@ static void parseClass (const char *cp, vString *const class,
 	vStringDelete (inheritance);
 }
 
+static void parseImports (const char *cp)
+{
+	const char *pos;
+	vString *name, *name_next;
+
+	cp = skipEverything (cp);
+
+	if ((pos = strstr (cp, "import")) == NULL)
+		return;
+
+	cp = pos + 6;
+
+	/* continue only if there is some space between the keyword and the identifier */
+	if (! isspace (*cp))
+		return;
+
+	cp++;
+	cp = skipSpace (cp);
+
+	name = vStringNew ();
+	name_next = vStringNew ();
+
+	cp = skipEverything (cp);
+	while (*cp)
+	{
+		cp = parseIdentifier (cp, name);
+
+		cp = skipEverything (cp);
+		/* we parse the next possible import statement as well to be able to ignore 'foo' in
+		 * 'import foo as bar' */
+		parseIdentifier (cp, name_next);
+
+		/* take the current tag only if the next one is not "as" */
+		if (strcmp (vStringValue (name_next), "as") != 0 &&
+			strcmp (vStringValue (name), "as") != 0)
+		{
+			makeSimpleTag (name, PythonKinds, K_IMPORT);
+		}
+	}
+	vStringDelete (name);
+	vStringDelete (name_next);
+}
+
+/* modified from get.c getArglistFromStr().
+ * warning: terminates rest of string past arglist!
+ * note: does not ignore brackets inside strings! */
+static char *parseArglist(const char *buf)
+{
+	char *start, *end;
+	int level;
+	if (NULL == buf)
+		return NULL;
+	if (NULL == (start = strchr(buf, '(')))
+		return NULL;
+	for (level = 1, end = start + 1; level > 0; ++end)
+	{
+		if ('\0' == *end)
+			break;
+		else if ('(' == *end)
+			++ level;
+		else if (')' == *end)
+			-- level;
+	}
+	*end = '\0';
+	return strdup(start);
+}
+
 static void parseFunction (const char *cp, vString *const def,
 	vString *const parent, int is_class_parent)
 {
+	char *arglist;
+
 	cp = parseIdentifier (cp, def);
-	makeFunctionTag (def, parent, is_class_parent);
+	arglist = parseArglist (cp);
+	makeFunctionTag (def, parent, is_class_parent, arglist);
+	eFree (arglist);
 }
 
 /* Get the combined name of a nested symbol. Classes are separated with ".",
@@ -295,13 +352,16 @@ static boolean constructParentString(NestingLevels *nls, int indent,
 			break;
 		if (prev)
 		{
-			if (prev->is_class)
+			vStringCatS(result, ".");	/* make Geany symbol list grouping work properly */
+/*
+			if (prev->type == K_CLASS)
 				vStringCatS(result, ".");
 			else
 				vStringCatS(result, "/");
+*/
 		}
 		vStringCat(result, nl->name);
-		is_class = nl->is_class;
+		is_class = (nl->type == K_CLASS);
 		prev = nl;
 	}
 	return is_class;
@@ -331,27 +391,8 @@ static void checkParent(NestingLevels *nls, int indent, vString *parent)
 	}
 }
 
-static NestingLevels *newNestingLevels(void)
-{
-	NestingLevels *nls = xCalloc (1, NestingLevels);
-	return nls;
-}
-
-static void freeNestingLevels(NestingLevels *nls)
-{
-	int i;
-	for (i = 0; i < nls->allocated; i++)
-		vStringDelete(nls->levels[i].name);
-	if (nls->levels) eFree(nls->levels);
-	eFree(nls);
-}
-
-/* TODO: This is totally out of place in python.c, but strlist.h is not usable.
- * Maybe should just move these three functions to a separate file, even if no
- * other parser uses them.
- */
 static void addNestingLevel(NestingLevels *nls, int indentation,
-	vString *name, boolean is_class)
+	const vString *name, boolean is_class)
 {
 	int i;
 	NestingLevel *nl = NULL;
@@ -363,20 +404,16 @@ static void addNestingLevel(NestingLevels *nls, int indentation,
 	}
 	if (i == nls->n)
 	{
-		if (i >= nls->allocated)
-		{
-			nls->allocated++;
-			nls->levels = xRealloc(nls->levels,
-				nls->allocated, NestingLevel);
-			nls->levels[i].name = vStringNew();
-		}
+		nestingLevelsPush(nls, name, 0);
 		nl = nls->levels + i;
 	}
-	nls->n = i + 1;
-
-	vStringCopy(nl->name, name);
+	else
+	{	/* reuse existing slot */
+		nls->n = i + 1;
+		vStringCopy(nl->name, name);
+	}
 	nl->indentation = indentation;
-	nl->is_class = is_class;
+	nl->type = is_class ? K_CLASS : !K_CLASS;
 }
 
 /* Return a pointer to the start of the next triple string, or NULL. Store
@@ -467,18 +504,18 @@ static const char *findVariable(const char *line)
 }
 
 /* Skip type declaration that optionally follows a cdef/cpdef */
-static const char *skipTypeDecl (const char *cp, boolean *is_class) 
-{ 
+static const char *skipTypeDecl (const char *cp, boolean *is_class)
+{
 	const char *lastStart = cp, *ptr = cp;
 	int loopCount = 0;
 	ptr = skipSpace(cp);
-	if (!strncmp("extern", ptr, 6)) { 
-		ptr += 6; 
-		ptr = skipSpace(ptr); 
+	if (!strncmp("extern", ptr, 6)) {
+		ptr += 6;
+		ptr = skipSpace(ptr);
 		if (!strncmp("from", ptr, 4)) { return NULL; }
 	}
 	if (!strncmp("class", ptr, 5)) {
-		ptr += 5 ; 
+		ptr += 5 ;
 		*is_class = TRUE;
 		ptr = skipSpace(ptr);
 		return ptr;
@@ -489,7 +526,7 @@ static const char *skipTypeDecl (const char *cp, boolean *is_class)
 		if (!*ptr || *ptr == '=') return NULL;
 		if (*ptr == '(') {
 		    return lastStart; /* if we stopped on a '(' we are done */
-		}                             
+		}
 		ptr = skipSpace(ptr);
 		lastStart = ptr;
 		while (*lastStart == '*') lastStart++;  /* cdef int *identifier */
@@ -503,7 +540,7 @@ static void findPythonTags (void)
 	vString *const name = vStringNew ();
 	vString *const parent = vStringNew();
 
-	NestingLevels *const nesting_levels = newNestingLevels();
+	NestingLevels *const nesting_levels = nestingLevelsNew();
 
 	const char *line;
 	int line_skip = 0;
@@ -540,7 +577,7 @@ static void findPythonTags (void)
 		cp = skipSpace (cp);
 		indent = cp - line;
 		line_skip = 0;
-		
+
 		checkParent(nesting_levels, indent, parent);
 
 		/* Deal with multiline string ending. */
@@ -549,7 +586,7 @@ static void findPythonTags (void)
 			find_triple_end(cp, &longStringLiteral);
 			continue;
 		}
-		
+
 		/* Deal with multiline string start. */
 		longstring = find_triple_start(cp, &longStringLiteral);
 		if (longstring)
@@ -578,7 +615,7 @@ static void findPythonTags (void)
 				is_class = TRUE;
 			}
 			else if (!strncmp (keyword, "cdef ", 5))
-		    { 
+		    {
 		        cp = skipSpace(keyword + 4);
 		        candidate = skipTypeDecl (cp, &is_class);
 		        if (candidate)
@@ -589,7 +626,7 @@ static void findPythonTags (void)
 
 		    }
     		else if (!strncmp (keyword, "cpdef ", 6))
-		    { 
+		    {
 		        cp = skipSpace(keyword + 5);
 		        candidate = skipTypeDecl (cp, &is_class);
 		        if (candidate)
@@ -636,12 +673,14 @@ static void findPythonTags (void)
 
 			makeVariableTag (name, parent);
 		}
+		/* Find and parse imports */
+		parseImports(line);
 	}
 	/* Clean up all memory we allocated. */
 	vStringDelete (parent);
 	vStringDelete (name);
 	vStringDelete (continuation);
-	freeNestingLevels (nesting_levels);
+	nestingLevelsFree (nesting_levels);
 }
 
 extern parserDefinition *PythonParser (void)

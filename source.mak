@@ -5,7 +5,7 @@
 HEADERS = \
 	args.h ctags.h debug.h entry.h general.h get.h keyword.h \
 	main.h options.h parse.h parsers.h read.h routines.h sort.h \
-	strlist.h vstring.h
+	strlist.h vstring.h nestlevel.h
 
 SOURCES = \
 	args.c \
@@ -33,6 +33,7 @@ SOURCES = \
 	main.c \
 	make.c \
 	matlab.c \
+	nestlevel.c \
 	options.c \
 	parse.c \
 	pascal.c \
@@ -94,6 +95,7 @@ OBJECTS = \
 	main.$(OBJEXT) \
 	make.$(OBJEXT) \
 	matlab.$(OBJEXT) \
+	nestlevel.$(OBJEXT) \
 	options.$(OBJEXT) \
 	parse.$(OBJEXT) \
 	pascal.$(OBJEXT) \
