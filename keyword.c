@@ -123,8 +123,7 @@ static hashEntry *newEntry (
 extern void addKeyword (const char *const string, langType language, int value)
 {
 	const unsigned long hashedValue = hashValue (string);
-	hashEntry *tableEntry = getHashTableEntry (hashedValue);
-	hashEntry *entry = tableEntry;
+	hashEntry *entry = getHashTableEntry (hashedValue);
 
 	if (entry == NULL)
 	{
