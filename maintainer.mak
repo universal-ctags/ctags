@@ -36,6 +36,8 @@ WIN_FILES    := $(COMMON_FILES) $(VERSION_FILES)
  
 SVN_FILES    := $(UNIX_FILES)
 
+DEP_DIR := .deps
+
 OBJECTS      := $(patsubst %.c,%.o,$(notdir $(SOURCES)))
 DOBJECTS     := $(patsubst %.c,%.od,$(notdir $(DSOURCES)))
 DEPS         := $(patsubst %.c,$(DEP_DIR)/%.d,$(notdir $(SOURCES)))
@@ -55,7 +57,6 @@ WINDOWS_DIR := win32
 RELEASE_DIR := releases
 CTAGS_WEBDIR := website
 win_version = $(subst .,,$(version))
-DEP_DIR := .deps
 HOST_ARCH := $(shell uname -p)
 
 ifneq ($(findstring $(HOST_ARCH),i386 i686),)
