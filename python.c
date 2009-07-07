@@ -21,15 +21,36 @@
 #include "read.h"
 #include "main.h"
 #include "vstring.h"
-#include "nestlevel.h"
+#include "routines.h"
+#include "debug.h"
 
 /*
-*   DATA DEFINITIONS
+*   DATA DECLARATIONS
 */
+typedef struct NestingLevel NestingLevel;
+typedef struct NestingLevels NestingLevels;
+
+struct NestingLevel
+{
+	int indentation;
+	vString *name;
+	int type;
+};
+
+struct NestingLevels
+{
+	NestingLevel *levels;
+	int n;					/* number of levels in use */
+	int allocated;
+};
+
 typedef enum {
 	K_CLASS, K_FUNCTION, K_MEMBER, K_VARIABLE, K_IMPORT
 } pythonKind;
 
+/*
+*   DATA DEFINITIONS
+*/
 static kindOption PythonKinds[] = {
 	{TRUE, 'c', "class",    "classes"},
 	{TRUE, 'f', "function", "functions"},
@@ -45,7 +66,60 @@ static char const * const doubletriple = "\"\"\"";
 *   FUNCTION DEFINITIONS
 */
 
-#define vStringLast(vs) ((vs)->buffer[(vs)->length - 1])
+static NestingLevels *nestingLevelsNew (void)
+{
+	NestingLevels *nls = xCalloc (1, NestingLevels);
+	return nls;
+}
+
+static void nestingLevelsFree (NestingLevels *nls)
+{
+	int i;
+	for (i = 0; i < nls->allocated; i++)
+		vStringDelete(nls->levels[i].name);
+	if (nls->levels) eFree(nls->levels);
+	eFree(nls);
+}
+
+static void nestingLevelsPush (NestingLevels *nls,
+	const vString *name, int type)
+{
+	NestingLevel *nl = NULL;
+
+	if (nls->n >= nls->allocated)
+	{
+		nls->allocated++;
+		nls->levels = xRealloc(nls->levels,
+			nls->allocated, NestingLevel);
+		nls->levels[nls->n].name = vStringNew();
+	}
+	nl = &nls->levels[nls->n];
+	nls->n++;
+
+	vStringCopy(nl->name, name);
+	nl->type = type;
+}
+
+#if 0
+static NestingLevel *nestingLevelsGetCurrent (NestingLevels *nls)
+{
+	Assert (nls != NULL);
+
+	if (nls->n < 1)
+		return NULL;
+
+	return &nls->levels[nls->n - 1];
+}
+
+static void nestingLevelsPop (NestingLevels *nls)
+{
+	const NestingLevel *nl = nestingLevelsGetCurrent(nls);
+
+	Assert (nl != NULL);
+	vStringClear(nl->name);
+	nls->n--;
+}
+#endif
 
 static boolean isIdentifierFirstCharacter (int c)
 {
@@ -61,14 +135,14 @@ static boolean isIdentifierCharacter (int c)
  * extract all relevant information and create a tag.
  */
 static void makeFunctionTag (vString *const function,
-	vString *const parent, int is_class_parent, const char *arglist)
+	vString *const parent, int is_class_parent, const char *arglist __unused__)
 {
 	tagEntryInfo tag;
 	initTagEntry (&tag, vStringValue (function));
 
 	tag.kindName = "function";
 	tag.kind = 'f';
-	//tag.extensionFields.arglist = arglist;
+	/* tag.extensionFields.arglist = arglist; */
 
 	if (vStringLength (parent) > 0)
 	{
