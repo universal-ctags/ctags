@@ -126,7 +126,7 @@ static void findLispTags (void)
 extern parserDefinition* LispParser (void)
 {
 	static const char *const extensions [] = {
-		"cl", "clisp", "el", "l", "lisp", "lsp", "ml", NULL
+		"cl", "clisp", "el", "l", "lisp", "lsp", NULL
 	};
 	parserDefinition* def = parserNew ("Lisp");
 	def->kinds      = LispKinds;

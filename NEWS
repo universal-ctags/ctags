@@ -1,6 +1,8 @@
 Current Version: @VERSION@
 
 ctags-@VERSION@ (@DATE@)
+* Removed ".ml" as a Lisp extension (now OCaml) [Lisp].
+* Added support for Objective Camel (OCaml), provided by Vincent Berthoux [OCaml, Patch #2738723].
 * Added support for Pyrex/Cython declarations [Python].
 * Added support for "v" kind for variables [Python].
 * Added support for new language: VHDL, contributed by Nicolas Vincent [VHDL, Bug #1943306].

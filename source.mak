@@ -34,6 +34,7 @@ SOURCES = \
 	make.c \
 	matlab.c \
 	nestlevel.c \
+	ocaml.c \
 	options.c \
 	parse.c \
 	pascal.c \
@@ -96,6 +97,7 @@ OBJECTS = \
 	make.$(OBJEXT) \
 	matlab.$(OBJEXT) \
 	nestlevel.$(OBJEXT) \
+	ocaml.$(OBJEXT) \
 	options.$(OBJEXT) \
 	parse.$(OBJEXT) \
 	pascal.$(OBJEXT) \
@@ -120,4 +122,3 @@ OBJECTS = \
 	vim.$(OBJEXT) \
 	yacc.$(OBJEXT) \
 	vstring.$(OBJEXT)
-
