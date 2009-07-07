@@ -35,6 +35,7 @@
 
 #define vStringValue(vs)      ((vs)->buffer)
 #define vStringItem(vs,i)     ((vs)->buffer[i])
+#define vStringLast(vs)       ((vs)->buffer[(vs)->length - 1])
 #define vStringLength(vs)     ((vs)->length)
 #define vStringSize(vs)       ((vs)->size)
 #define vStringCat(vs,s)      vStringCatS((vs), vStringValue((s)))
