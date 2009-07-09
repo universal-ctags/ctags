@@ -1,12 +1,12 @@
 /*
-*   $Id: yacc.c 443 2006-05-30 04:37:13Z darren $
+*   $Id$
 *
-*   Copyright (c) 2001-2002, Nick Hibma <n_hibma@van-laarhoven.org>
+*   Copyright (c) 2008, David Fishburn
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License.
 *
-*   This module contains functions for generating tags for YACC language files.
+*   This module contains functions for generating tags for Ant language files.
 */
 
 /*

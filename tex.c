@@ -1,12 +1,12 @@
 /*
  *	 $Id: tex.c 666 2008-05-15 17:47:31Z dfishburn $
  *
- *	 Copyright (c) 2003, Darren Hiebert
+ *	 Copyright (c) 2008, David Fishburn
  *
  *	 This source code is released for free distribution under the terms of the
  *	 GNU General Public License.
  *
- *	 This module contains functions for generating tags for Tex languages.
+ *	 This module contains functions for generating tags for TeX language files.
  *
  *	 Tex language reference:
  *		 http://en.wikibooks.org/wiki/TeX#The_Structure_of_TeX

@@ -1,7 +1,7 @@
 /*
  *	 $Id: flex.c 666 2008-05-15 17:47:31Z dfishburn $
  *
- *	 Copyright (c) 2003, Darren Hiebert
+ *	 Copyright (c) 2008, David Fishburn
  *
  *	 This source code is released for free distribution under the terms of the
  *	 GNU General Public License.
@@ -11,7 +11,6 @@
  *	     Flex
  *	         MXML files (*.mMacromedia XML)
  *	         ActionScript files (*.as)
- *	 
  *
  *	 Flex 3 language reference
  *		 http://livedocs.adobe.com/flex/3/langref/index.html

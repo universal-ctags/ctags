@@ -2,14 +2,19 @@ Current Version: @VERSION@
 
 ctags-@VERSION@ (@DATE@)
 * Removed ".ml" as a Lisp extension (now OCaml) [Lisp].
-* Added support for Objective Camel (OCaml), provided by Vincent Berthoux [OCaml, Patch #2738723].
+* Added support for Ant language, contributed by David Fishburn.
+* Added support for DOS Batch language, contributed by David Fishburn.
+* Added support for Flex (Adobe) language, contributed by David Fishburn.
+* Added support for MATLAB language, contributed by David Fishburn.
+* Added support for Objective Camel (OCaml), provided by Vincent Berthoux [Patch #2738723].
+* Added support for TeX language, contributed by David Fishburn.
+* Added support for VHDL language, contributed by Nicolas Vincent [Bug #1943306].
 * Added support for Pyrex/Cython declarations [Python].
-* Added support for "v" kind for variables [Python].
-* Added support for new language: VHDL, contributed by Nicolas Vincent [VHDL, Bug #1943306].
-* Added regex support when compiling with MinGW. Gnu regex module now included in all distributions.
+* Added support for "v" kind, for variables [Python].
 * Added support for class and member variables [PHP, Bug #1037086].
 * Added support for recent enhancements to Eiffel language [Eiffel].
 * Added support for ASP classes, contributed by Zendhi Nagao; changes meaning of 'c' kind flag [ASP].
+* Added regex support when compiling with MinGW. Gnu regex module now included in all distributions.
 * Fixed detection of triple strings inside other strings [Python, Bug #1988130].
 * Fixed an endless loop with comments in triple strings [Python, Bug #1988027].
 * Fixed bug where functions were sometimes seen as methods [Python, Bug #1988026].
