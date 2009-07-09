@@ -211,9 +211,9 @@ help-release:
 	@ echo "1. make release-svn-X.Y"
 	@ echo "2. make release-source-X.Y"
 	@ echo "3. move ctags-X.Y.tar.gz to Linux"
-	@ echo "4. On Linux: Extract tar and compile; make -f maintainer.mak release-rpm-X.Y"
+	@ echo "4. On Linux: Extract tar; make -f maintainer.mak release-rpm-X.Y"
 	@ echo "5. On Windows: cd $(WINDOWS_DIR)/winXY; nmake -f mk_mvc.mak ctags.exe mostlyclean"
-	@ echo "6. make version=X.Y win-bin"
+	@ echo "6. make version=X.Y win-zip"
 	@ echo "7. make website-X.Y"
 
 .SECONDARY:
@@ -321,7 +321,7 @@ $(RELEASE_DIR)/ctags%.zip: \
 
 win-source: $(WINDOWS_DIR)/ctags$(win_version)
 
-win-bin: $(RELEASE_DIR)/ctags$(win_version).zip
+win-zip: $(RELEASE_DIR)/ctags$(win_version).zip
 
 release-win-%:
 	$(MAKE) version="$*" win-source
@@ -338,7 +338,7 @@ release-source-%: $(RELEASE_DIR)/ctags-%.tar.gz
 	$(MAKE) version="$*" win-source
 
 release-bin-%: release-rpm-%
-	$(MAKE) version="$*" win-bin
+	$(MAKE) version="$*" win-zip
 
 $(WINDOWS_DIR):
 	mkdir -p $@
