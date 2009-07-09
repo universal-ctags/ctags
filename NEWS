@@ -1,6 +1,8 @@
 Current Version: @VERSION@
 
 ctags-@VERSION@ (@DATE@)
+
+ctags-5.8 (09 Jul 2009)
 * Removed ".ml" as a Lisp extension (now OCaml) [Lisp].
 * Added support for Ant language, contributed by David Fishburn.
 * Added support for DOS Batch language, contributed by David Fishburn.
