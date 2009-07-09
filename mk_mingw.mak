@@ -5,10 +5,10 @@
 
 include source.mak
 
-REGEX_DEFINES = -DHAVE_REGCOMP -DREGEX_MALLOC -DSTDC_HEADERS=1
+REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrcasecmp=stricmp
 
 CFLAGS = -Wall
-DEFINES = -DWIN32 $(REGEX_DEFINES) $(DEBUG)
+DEFINES = -DWIN32 $(REGEX_DEFINES)
 INCLUDES = -I. -Ignu_regex
 CC = gcc
 
