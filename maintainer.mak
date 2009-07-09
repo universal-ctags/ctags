@@ -215,6 +215,9 @@ help-release:
 	@ echo "5. On Windows: cd $(WINDOWS_DIR)/winXY; nmake -f mk_mvc.mak ctags.exe mostlyclean"
 	@ echo "6. make version=X.Y win-zip"
 	@ echo "7. make website-X.Y"
+	@ echo "8. make upload-X.Y [uploads release files to SourceForge]"
+	@ echo "9. Create SourceForge release."
+	@ echo "9. make upload-website"
 
 .SECONDARY:
 
@@ -342,6 +345,24 @@ release-bin-%: release-rpm-%
 
 $(WINDOWS_DIR):
 	mkdir -p $@
+
+upload-%:
+	$(MAKE) version="$*" upload
+
+UPLOAD_FILES := \
+	ctags-$(version).tar.gz \
+	ctags-$(version)-1.i386.rpm \
+	ctags-$(version)-1.src.rpm \
+	ctags$(win_version).zip
+
+UPLOAD_PATHS := $(addprefix $(RELEASE_DIR)/,$(UPLOAD_FILES)) 
+
+upload: #$(UPLOAD_PATHS)
+	echo scp -p $^ dhiebert@frs.sourceforge.net:uploads
+
+upload-website:
+	chmod 644 website/*
+	scp -p website/*.html dhiebert,ctags@web.sourceforge.net:htdocs
 
 #
 # Web site files
