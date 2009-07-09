@@ -86,6 +86,7 @@ MAN2HTML := tbl | groff -Wall -mtty-char -mandoc -Thtml -c
 #
 # Targets
 #
+default: all
 ifeq ($(findstring clean,$(MAKECMDGOALS)),)
 ifeq ($(wildcard config.h),)
 ctags dctags ctags.prof ctags.cov:
@@ -194,10 +195,19 @@ syntax.vim: $(DSOURCES) $(HEADERS) $(LIB_FILES)
 -include testing.mak
 
 #
+# Help
+#
+help:
+	@ echo "Major targets:"
+	@ echo "default     : Build dctags, with debugging support"
+	@ echo "ctags       : Build optimized binary"
+	@ echo "help-release: Print help on releasing ctags"
+
+#
 # Release management
 #
 
-release-help:
+help-release:
 	@ echo "1. make release-svn-X.Y"
 	@ echo "2. make release-source-X.Y"
 	@ echo "3. move ctags-X.Y.tar.gz to Linux"
