@@ -64,17 +64,17 @@ static kindOption PhpKinds [] = {
 
 static void installPHPRegex (const langType language)
 {
-	addTagRegex(language, "(^|[ \t])class[ \t]+([" ALPHA "_][" ALNUM "_]*)",
+	addTagRegex(language, "^[ \t]*(abstract[ \t]+)?class[ \t]+([" ALPHA "_][" ALNUM "_]*)",
 		"\\2", "c,class,classes", NULL);
-	addTagRegex(language, "(^|[ \t])interface[ \t]+([" ALPHA "_][" ALNUM "_]*)",
-		"\\2", "i,interface,interfaces", NULL);
-	addTagRegex(language, "(^|[ \t])define[ \t]*\\([ \t]*['\"]?([" ALPHA "_][" ALNUM "_]*)",
-		"\\2", "d,define,constant definitions", NULL);
-	addTagRegex(language, "(^|[ \t])function[ \t]+&?[ \t]*([" ALPHA "_][" ALNUM "_]*)",
-		"\\2", "f,function,functions", NULL);
-	addTagRegex(language, "(^|[ \t])(\\$|::\\$|\\$this->)([" ALPHA "_][" ALNUM "_]*)[ \t]*=",
-		"\\3", "v,variable,variables", NULL);
-	addTagRegex(language, "(^|[ \t])(var|public|protected|private|static)[ \t]+\\$([" ALPHA "_][" ALNUM "_]*)[ \t]*[=;]",
+	addTagRegex(language, "^[ \t]*interface[ \t]+([" ALPHA "_][" ALNUM "_]*)",
+		"\\1", "i,interface,interfaces", NULL);
+	addTagRegex(language, "^[ \t]*define[ \t]*\\([ \t]*['\"]?([" ALPHA "_][" ALNUM "_]*)",
+		"\\1", "d,define,constant definitions", NULL);
+	addTagRegex(language, "^[ \t]*((static|public|protected|private)[ \t]+)*function[ \t]+&?[ \t]*([" ALPHA "_][" ALNUM "_]*)",
+		"\\3", "f,function,functions", NULL);
+	addTagRegex(language, "^[ \t]*(\\$|::\\$|\\$this->)([" ALPHA "_][" ALNUM "_]*)[ \t]*=",
+		"\\2", "v,variable,variables", NULL);
+	addTagRegex(language, "^[ \t]*((var|public|protected|private|static)[ \t]+)+\\$([" ALPHA "_][" ALNUM "_]*)[ \t]*[=;]",
 		"\\3", "v,variable,variables", NULL);
 
 	/* function regex is covered by PHP regex */
