@@ -1,6 +1,7 @@
 Current Version: @VERSION@
 
 ctags-@VERSION@ (@DATE@)
+* Fixed PHP parser to ignore keywords inside comments [PHP, Bug #1795926].
 
 ctags-5.8 (09 Jul 2009)
 * Removed ".ml" as a Lisp extension (now OCaml) [Lisp].
