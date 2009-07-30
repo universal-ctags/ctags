@@ -80,7 +80,8 @@ typedef enum eKeywordId {
 	KEYWORD_id,
 	KEYWORD_script,
 	KEYWORD_cdata,
-	KEYWORD_mx
+	KEYWORD_mx,
+	KEYWORD_override
 } keywordId;
 
 /*	Used to determine whether keyword is valid for the token language and
@@ -184,7 +185,8 @@ static const keywordDesc FlexKeywordTable [] = {
 	{ "id",			KEYWORD_id					},
 	{ "script",		KEYWORD_script				},
 	{ "cdata",		KEYWORD_cdata				},
-	{ "mx",			KEYWORD_mx					}
+	{ "mx",			KEYWORD_mx					},
+	{ "override",	KEYWORD_override			}
 };
 
 /*
@@ -2154,6 +2156,33 @@ static boolean parseActionScript (tokenInfo *const token)
 		{
 			if (isType(token, TOKEN_KEYWORD))
 			{
+				if (isKeyword (token, KEYWORD_private)   ||
+				    isKeyword (token, KEYWORD_public)    ||
+				    isKeyword (token, KEYWORD_override)  )
+				{
+					/*
+					 * Methods can be defined as:
+					 *     private function f_name
+					 *     public override function f_name
+					 *     override private function f_name
+					 * Ignore these keywords if present.
+					 */
+					readToken (token);
+				}
+				if (isKeyword (token, KEYWORD_private)   ||
+				    isKeyword (token, KEYWORD_public)    ||
+				    isKeyword (token, KEYWORD_override)  )
+				{
+					/*
+					 * Methods can be defined as:
+					 *     private function f_name
+					 *     public override function f_name
+					 *     override private function f_name
+					 * Ignore these keywords if present.
+					 */
+					readToken (token);
+				}
+
 				switch (token->keyword)
 				{
 					case KEYWORD_function:	parseFunction (token); break;
@@ -2183,12 +2212,27 @@ static void parseFlexFile (tokenInfo *const token)
 			readToken (token);
 			if (isType (token, TOKEN_QUESTION_MARK))
 			{
+				/*
+				 * <?xml version="1.0" encoding="utf-8"?>
+				 */
 				readToken (token);
 				while (! isType (token, TOKEN_QUESTION_MARK) )
 				{
 					readToken (token);
 				} 
 				readToken (token);
+			}
+			else if (isKeyword (token, KEYWORD_NONE))
+			{
+				/*
+				 * This is a simple XML tag, read until the closing statement
+				 * <something .... >
+				 */
+				readToken (token);
+				while (! isType (token, TOKEN_GREATER_THAN) )
+				{
+					readToken (token);
+				} 
 			}
 		} 
 		else 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ATag xmlns="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			public override function get myGet():MyClass
+			{
+			}
+
+			private function save():void
+			{
+			}
+
+			
+			public override function myOverride():void
+			{
+				super.myOverride();
+			}
+		]]>
+	</mx:Script>
+</ATag>
