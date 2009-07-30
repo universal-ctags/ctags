@@ -2207,7 +2207,7 @@ static void parseFlexFile (tokenInfo *const token)
 		{
 			parseMXML (token);
 		} 
-		if (isType (token, TOKEN_LESS_THAN))
+		else if (isType (token, TOKEN_LESS_THAN))
 		{
 			readToken (token);
 			if (isType (token, TOKEN_QUESTION_MARK))
@@ -2227,6 +2227,7 @@ static void parseFlexFile (tokenInfo *const token)
 				/*
 				 * This is a simple XML tag, read until the closing statement
 				 * <something .... >
+				 * </something>
 				 */
 				readToken (token);
 				while (! isType (token, TOKEN_GREATER_THAN) )
