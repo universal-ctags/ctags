@@ -53,7 +53,8 @@ typedef enum eKeywordId {
 	KEYWORD_subsubsection,
 	KEYWORD_part,
 	KEYWORD_paragraph,
-	KEYWORD_subparagraph
+	KEYWORD_subparagraph,
+	KEYWORD_include
 } keywordId;
 
 /*	Used to determine whether keyword is valid for the token language and
@@ -68,27 +69,15 @@ typedef enum eTokenType {
 	TOKEN_UNDEFINED,
 	TOKEN_CHARACTER,
 	TOKEN_CLOSE_PAREN,
-	TOKEN_SEMICOLON,
-	TOKEN_COLON,
 	TOKEN_COMMA,
 	TOKEN_KEYWORD,
 	TOKEN_OPEN_PAREN,
-	TOKEN_OPERATOR,
 	TOKEN_IDENTIFIER,
 	TOKEN_STRING,
-	TOKEN_PERIOD,
 	TOKEN_OPEN_CURLY,
 	TOKEN_CLOSE_CURLY,
-	TOKEN_EQUAL_SIGN,
-	TOKEN_EXCLAMATION,
-	TOKEN_FORWARD_SLASH,
 	TOKEN_OPEN_SQUARE,
 	TOKEN_CLOSE_SQUARE,
-	TOKEN_OPEN_MXML,
-	TOKEN_CLOSE_MXML,
-	TOKEN_CLOSE_SGML,
-	TOKEN_LESS_THAN,
-	TOKEN_GREATER_THAN,
 	TOKEN_QUESTION_MARK,
 	TOKEN_STAR
 } tokenType;
@@ -118,6 +107,7 @@ typedef enum {
 	TEXTAG_PART,
 	TEXTAG_PARAGRAPH,
 	TEXTAG_SUBPARAGRAPH,
+	TEXTAG_INCLUDE,
 	TEXTAG_COUNT
 } texKind;
 
@@ -128,7 +118,8 @@ static kindOption TexKinds [] = {
 	{ TRUE,  'b', "subsubsection",	  "subsubsections"	   },
 	{ TRUE,  'p', "part",			  "parts"			   },
 	{ TRUE,  'P', "paragraph",		  "paragraphs"		   },
-	{ TRUE,  'G', "subparagraph",	  "subparagraphs"	   }
+	{ TRUE,  'G', "subparagraph",	  "subparagraphs"	   },
+	{ TRUE,  'i', "include",	  	  "includes"		   }
 };
 
 static const keywordDesc TexKeywordTable [] = {
@@ -139,7 +130,8 @@ static const keywordDesc TexKeywordTable [] = {
 	{ "subsubsection",	KEYWORD_subsubsection		},
 	{ "part",			KEYWORD_part				},
 	{ "paragraph",		KEYWORD_paragraph			},
-	{ "subparagraph",	KEYWORD_subparagraph		}
+	{ "subparagraph",	KEYWORD_subparagraph		},
+	{ "include",		KEYWORD_include				}
 };
 
 /*
@@ -150,7 +142,7 @@ static boolean isIdentChar (const int c)
 {
 	return (boolean)
 		(isalpha (c) || isdigit (c) || c == '$' || 
-		  c == '_' || c == '#');
+		  c == '_' || c == '#' || c == '-' || c == '.');
 }
 
 static void buildTexKeywordHash (void)
@@ -297,16 +289,11 @@ getNextChar:
 		case EOF: longjmp (Exception, (int)ExceptionEOF);	break;
 		case '(': token->type = TOKEN_OPEN_PAREN;			break;
 		case ')': token->type = TOKEN_CLOSE_PAREN;			break;
-		case ';': token->type = TOKEN_SEMICOLON;			break;
 		case ',': token->type = TOKEN_COMMA;				break;
-		case '.': token->type = TOKEN_PERIOD;				break;
-		case ':': token->type = TOKEN_COLON;				break;
 		case '{': token->type = TOKEN_OPEN_CURLY;			break;
 		case '}': token->type = TOKEN_CLOSE_CURLY;			break;
-		case '=': token->type = TOKEN_EQUAL_SIGN;			break;
 		case '[': token->type = TOKEN_OPEN_SQUARE;			break;
 		case ']': token->type = TOKEN_CLOSE_SQUARE;			break;
-		case '?': token->type = TOKEN_QUESTION_MARK;		break;
 		case '*': token->type = TOKEN_STAR;					break;
 
 		case '\'':
@@ -427,7 +414,8 @@ static boolean parseTag (tokenInfo *const token, texKind kind)
 		readToken (token);
 		while (! isType (token, TOKEN_CLOSE_CURLY) )
 		{
-			if (isType (token, TOKEN_IDENTIFIER) && useLongName)
+			/* if (isType (token, TOKEN_IDENTIFIER) && useLongName) */
+			if (useLongName)
 			{
 				if (fullname->length > 0)
 					vStringCatS (fullname, " ");
@@ -478,6 +466,9 @@ static void parseTexFile (tokenInfo *const token)
 					break;
 				case KEYWORD_subparagraph:	
 					parseTag (token, TEXTAG_SUBPARAGRAPH); 
+					break;
+				case KEYWORD_include:	
+					parseTag (token, TEXTAG_INCLUDE); 
 					break;
 				default:
 					break;
