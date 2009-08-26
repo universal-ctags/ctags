@@ -65,9 +65,13 @@ typedef enum eKeywordId {
 	KEYWORD_end,
 	KEYWORD_function,
 	KEYWORD_if,
+	KEYWORD_else,
+	KEYWORD_elseif,
+	KEYWORD_endif,
 	KEYWORD_loop,
 	KEYWORD_case,
 	KEYWORD_for,
+	KEYWORD_do,
 	KEYWORD_call,
 	KEYWORD_package,
 	KEYWORD_pragma,
@@ -237,9 +241,13 @@ static const keywordDesc SqlKeywordTable [] = {
 	{ "end",							KEYWORD_end				      },
 	{ "function",						KEYWORD_function		      },
 	{ "if",								KEYWORD_if				      },
+	{ "else",							KEYWORD_else			      },
+	{ "elseif",							KEYWORD_elseif			      },
+	{ "endif",							KEYWORD_endif			      },
 	{ "loop",							KEYWORD_loop			      },
 	{ "case",							KEYWORD_case			      },
 	{ "for",							KEYWORD_for				      },
+	{ "do",								KEYWORD_do				      },
 	{ "call",							KEYWORD_call			      },
 	{ "package",						KEYWORD_package			      },
 	{ "pragma",							KEYWORD_pragma			      },
@@ -1220,6 +1228,15 @@ static void parseStatements (tokenInfo *const token)
 					 *	IF...THEN
 					 *	END IF;
 					 *
+					 *	IF...THEN
+					 *	ELSE
+					 *	END IF;
+					 *
+					 *	IF...THEN
+					 *	ELSEIF...THEN
+					 *	ELSE
+					 *	END IF;
+					 *
 					 *	or non-ANSI
 					 *	IF ...
 					 *	BEGIN
@@ -1248,7 +1265,16 @@ static void parseStatements (tokenInfo *const token)
 					else
 					{
 						readToken (token);
-						parseStatements (token);
+
+						while( ! isKeyword (token, KEYWORD_end ) )
+						{
+							if ( isKeyword (token, KEYWORD_else) ||
+									isKeyword (token, KEYWORD_elseif)    )
+								readToken (token);
+
+							parseStatements (token);
+						}
+
 						/* 
 						 * parseStatements returns when it finds an END, an IF
 						 * should follow the END for ANSI anyway.
@@ -1258,7 +1284,16 @@ static void parseStatements (tokenInfo *const token)
 						if( isKeyword (token, KEYWORD_end ) )
 							readToken (token);
 
-						if( ! isKeyword (token, KEYWORD_if ) )
+						if( isKeyword (token, KEYWORD_if ) )
+						{
+							readToken (token);
+							if ( isCmdTerm(token) )
+							{
+								readToken (token);
+								return;
+							}
+						} 
+						else 
 						{
 							/*
 							 * Well we need to do something here.
@@ -1284,14 +1319,54 @@ static void parseStatements (tokenInfo *const token)
 					 *	END CASE;
 					 *	
 					 *	FOR loop_name AS cursor_name CURSOR FOR ...
+					 *	DO
 					 *	END FOR;
 					 */
+					if( isKeyword (token, KEYWORD_for ) )
+					{
+						/* loop name */
+						readToken (token);
+						/* AS */
+						readToken (token);
+
+						while ( ! isKeyword (token, KEYWORD_is) )
+						{
+							/*
+							 * If this is not an AS keyword this is 
+							 * not a proper FOR statement and should 
+							 * simply be ignored
+							 */
+							return;
+						}
+
+						while ( ! isKeyword (token, KEYWORD_do) )
+							readToken (token);
+					}
+					else
+						readToken (token);
+
 					readToken (token);
 					parseStatements (token);
 
 					if( isKeyword (token, KEYWORD_end ) )
 						readToken (token);
 
+					/*
+					 * Typically ended with 
+					 *    END LOOP [loop name];
+					 *    END CASE
+					 *    END FOR [loop name];
+					 */
+					if ( isKeyword (token, KEYWORD_loop) ||
+							isKeyword (token, KEYWORD_case) ||
+							isKeyword (token, KEYWORD_for)    )
+						readToken (token);
+
+					if ( isCmdTerm(token) )
+					{
+						readToken (token);
+						return;
+					}
 					break;
 
 				case KEYWORD_create:
@@ -1335,6 +1410,19 @@ static void parseStatements (tokenInfo *const token)
 				    isType (token, TOKEN_OPEN_CURLY)  ||
 				    isType (token, TOKEN_OPEN_SQUARE)  )
 						skipToMatched (token);
+
+				/*
+				 * Since we know how to parse various statements 
+				 * if we detect them, parse them to completion
+				 */
+				if (isType (token, TOKEN_BLOCK_LABEL_BEGIN) ||
+						isKeyword (token, KEYWORD_exception) ||
+						isKeyword (token, KEYWORD_if) ||
+						isKeyword (token, KEYWORD_loop) ||
+						isKeyword (token, KEYWORD_case) ||
+						isKeyword (token, KEYWORD_for) ||
+						isKeyword (token, KEYWORD_begin)    )
+					parseStatements (token);
 
 			}
 		}
