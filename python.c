@@ -240,7 +240,7 @@ static const char *skipEverything (const char *cp)
 {
 	for (; *cp; cp++)
 	{
-		if (*cp == '"' || *cp == '\'')
+		if (*cp == '"' || *cp == '\'' || *cp == '#')
 		{
 			cp = skipString(cp);
 			if (!*cp) break;

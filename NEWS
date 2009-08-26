@@ -1,6 +1,7 @@
 Current Version: @VERSION@
 
 ctags-@VERSION@ (@DATE@)
+* Don't parse comments after import statements and other tags, contributed by Huandari Lopez to Geany [Python].
 * Fixed PHP parser to ignore keywords inside comments [PHP, Bug #1795926].
 
 ctags-5.8 (09 Jul 2009)
