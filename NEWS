@@ -3,6 +3,7 @@ Current Version: @VERSION@
 ctags-@VERSION@ (@DATE@)
 * Don't parse comments after import statements and other tags, contributed by Huandari Lopez to Geany [Python].
 * Fixed PHP parser to ignore keywords inside comments [PHP, Bug #1795926].
+* Adjusted regexes for Ant so they won't span multiple tags [Ant].
 
 ctags-5.8 (09 Jul 2009)
 * Removed ".ml" as a Lisp extension (now OCaml) [Lisp].
