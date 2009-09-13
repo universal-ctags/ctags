@@ -69,6 +69,7 @@ typedef enum eKeywordId {
 	KEYWORD_elseif,
 	KEYWORD_endif,
 	KEYWORD_loop,
+	KEYWORD_while,
 	KEYWORD_case,
 	KEYWORD_for,
 	KEYWORD_do,
@@ -144,6 +145,7 @@ typedef enum eTokenType {
 	TOKEN_BLOCK_LABEL_END,
 	TOKEN_CHARACTER,
 	TOKEN_CLOSE_PAREN,
+	TOKEN_COLON,
 	TOKEN_SEMICOLON,
 	TOKEN_COMMA,
 	TOKEN_IDENTIFIER,
@@ -245,6 +247,7 @@ static const keywordDesc SqlKeywordTable [] = {
 	{ "elseif",							KEYWORD_elseif			      },
 	{ "endif",							KEYWORD_endif			      },
 	{ "loop",							KEYWORD_loop			      },
+	{ "while",							KEYWORD_while			      },
 	{ "case",							KEYWORD_case			      },
 	{ "for",							KEYWORD_for				      },
 	{ "do",								KEYWORD_do				      },
@@ -549,6 +552,7 @@ getNextChar:
 		case EOF: longjmp (Exception, (int)ExceptionEOF);	break;
 		case '(': token->type = TOKEN_OPEN_PAREN;		break;
 		case ')': token->type = TOKEN_CLOSE_PAREN;		break;
+		case ':': token->type = TOKEN_COLON;			break;
 		case ';': token->type = TOKEN_SEMICOLON;		break;
 		case '.': token->type = TOKEN_PERIOD;			break;
 		case ',': token->type = TOKEN_COMMA;			break;
@@ -1172,12 +1176,13 @@ static void parseLabel (tokenInfo *const token)
 	}
 }
 
-static void parseStatements (tokenInfo *const token)
+static void parseStatements (tokenInfo *const token, const boolean exit_on_endif )
 {
 	boolean isAnsi   = TRUE;
 	boolean stmtTerm = FALSE;
 	do
 	{
+
 		if (isType (token, TOKEN_BLOCK_LABEL_BEGIN))
 			parseLabel (token);
 		else
@@ -1266,13 +1271,15 @@ static void parseStatements (tokenInfo *const token)
 					{
 						readToken (token);
 
-						while( ! isKeyword (token, KEYWORD_end ) )
+						while( ! (isKeyword (token, KEYWORD_end ) ||
+						          isKeyword (token, KEYWORD_endif ) ) 
+								)
 						{
 							if ( isKeyword (token, KEYWORD_else) ||
 									isKeyword (token, KEYWORD_elseif)    )
 								readToken (token);
 
-							parseStatements (token);
+							parseStatements (token, true);
 						}
 
 						/* 
@@ -1284,7 +1291,7 @@ static void parseStatements (tokenInfo *const token)
 						if( isKeyword (token, KEYWORD_end ) )
 							readToken (token);
 
-						if( isKeyword (token, KEYWORD_if ) )
+						if( isKeyword (token, KEYWORD_if ) || isKeyword (token, KEYWORD_endif ) )
 						{
 							readToken (token);
 							if ( isCmdTerm(token) )
@@ -1342,11 +1349,20 @@ static void parseStatements (tokenInfo *const token)
 						while ( ! isKeyword (token, KEYWORD_do) )
 							readToken (token);
 					}
-					else
-						readToken (token);
+
 
 					readToken (token);
-					parseStatements (token);
+					while( ! isKeyword (token, KEYWORD_end ) )
+					{
+						/*
+						if ( isKeyword (token, KEYWORD_else) ||
+								isKeyword (token, KEYWORD_elseif)    )
+							readToken (token);
+							*/
+
+						parseStatements (token, false);
+					}
+
 
 					if( isKeyword (token, KEYWORD_end ) )
 						readToken (token);
@@ -1364,7 +1380,7 @@ static void parseStatements (tokenInfo *const token)
 
 					if ( isCmdTerm(token) )
 					{
-						readToken (token);
+						/* readToken (token); */
 						return;
 					}
 					break;
@@ -1399,11 +1415,36 @@ static void parseStatements (tokenInfo *const token)
 			 *
 			 * So we must read to the first semi-colon or an END block
 			 */
-			while ( ! stmtTerm && 
-					! (   isKeyword (token, KEYWORD_end) ||
-						 (isCmdTerm(token))              )	  
+			while ( ! stmtTerm                               && 
+					! (   isKeyword (token, KEYWORD_end)     ||
+						 (isCmdTerm(token))              )	 
 					)
 			{
+				if (   isKeyword (token, KEYWORD_endif)   &&
+						 exit_on_endif                   )	  
+					return;
+
+				if (isType (token, TOKEN_COLON) )
+				{
+					/*
+					 * A : can signal a loop name 
+					 *    myloop:
+					 *    LOOP 
+					 *        LEAVE myloop;
+					 *    END LOOP;
+					 * Unfortunately, labels do not have a
+					 * cmd terminator, therefore we have to check 
+					 * if the next token is a keyword and process 
+					 * it accordingly.
+					 */
+					readToken (token);
+					if ( isKeyword (token, KEYWORD_loop) ||
+							isKeyword (token, KEYWORD_while) ||
+							isKeyword (token, KEYWORD_for) )
+						/* parseStatements (token); */
+						return;
+				}
+
 				readToken (token);
 
 				if (isType (token, TOKEN_OPEN_PAREN)  ||
@@ -1417,12 +1458,13 @@ static void parseStatements (tokenInfo *const token)
 				 */
 				if (isType (token, TOKEN_BLOCK_LABEL_BEGIN) ||
 						isKeyword (token, KEYWORD_exception) ||
-						isKeyword (token, KEYWORD_if) ||
 						isKeyword (token, KEYWORD_loop) ||
 						isKeyword (token, KEYWORD_case) ||
 						isKeyword (token, KEYWORD_for) ||
 						isKeyword (token, KEYWORD_begin)    )
-					parseStatements (token);
+					parseStatements (token, false);
+				else if (isKeyword (token, KEYWORD_if))
+					parseStatements (token, true);
 
 			}
 		}
@@ -1435,7 +1477,10 @@ static void parseStatements (tokenInfo *const token)
 		{
 			readToken (token);
 		}
-	} while (! isKeyword (token, KEYWORD_end) && ! stmtTerm );
+				
+	} while (! isKeyword (token, KEYWORD_end) && 
+			 ! (exit_on_endif && isKeyword (token, KEYWORD_endif) ) && 
+			 ! stmtTerm );
 }
 
 static void parseBlock (tokenInfo *const token, const boolean local)
@@ -1466,7 +1511,7 @@ static void parseBlock (tokenInfo *const token, const boolean local)
 		token->begin_end_nest_lvl++;
 		while (! isKeyword (token, KEYWORD_end))
 		{
-			parseStatements (token);
+			parseStatements (token, false);
 		}
 		token->begin_end_nest_lvl--;
 
@@ -2127,7 +2172,7 @@ static void parseKeywords (tokenInfo *const token)
 			case KEYWORD_drop:			parseDrop (token); break;
 			case KEYWORD_event:			parseEvent (token); break;
 			case KEYWORD_function:		parseSubProgram (token); break;
-			case KEYWORD_if:			parseStatements (token); break;
+			case KEYWORD_if:			parseStatements (token, false); break;
 			case KEYWORD_index:			parseIndex (token); break;
 			case KEYWORD_ml_table:		parseMLTable (token); break;
 			case KEYWORD_ml_table_lang: parseMLTable (token); break;
