@@ -119,6 +119,7 @@ typedef enum eKeywordId {
 	KEYWORD_ml_conn_dnet,
 	KEYWORD_ml_conn_java,
 	KEYWORD_ml_conn_chk,
+	KEYWORD_ml_prop,
 	KEYWORD_local,
 	KEYWORD_temporary,
 	KEYWORD_drop,
@@ -204,6 +205,7 @@ typedef enum {
 	SQLTAG_SYNONYM,
 	SQLTAG_MLTABLE,
 	SQLTAG_MLCONN,
+	SQLTAG_MLPROP,
 	SQLTAG_COUNT
 } sqlKind;
 
@@ -229,7 +231,8 @@ static kindOption SqlKinds [] = {
 	{ TRUE,  'V', "view",		  "views"				   },
 	{ TRUE,  'n', "synonym",	  "synonyms"			   },
 	{ TRUE,  'x', "mltable",	  "MobiLink Table Scripts" },
-	{ TRUE,  'y', "mlconn",		  "MobiLink Conn Scripts"  }
+	{ TRUE,  'y', "mlconn",		  "MobiLink Conn Scripts"  },
+	{ TRUE,  'z', "mlprop",		  "MobiLink Properties "   }
 };
 
 static const keywordDesc SqlKeywordTable [] = {
@@ -297,6 +300,7 @@ static const keywordDesc SqlKeywordTable [] = {
 	{ "ml_add_dnet_connection_script",	KEYWORD_ml_conn_dnet	      },
 	{ "ml_add_java_connection_script",	KEYWORD_ml_conn_java	      },
 	{ "ml_add_lang_conn_script_chk",	KEYWORD_ml_conn_chk 	      },
+	{ "ml_add_property",				KEYWORD_ml_prop		 	      },
 	{ "local",							KEYWORD_local			      },
 	{ "temporary",						KEYWORD_temporary		      },
 	{ "drop",							KEYWORD_drop			      },
@@ -2131,6 +2135,70 @@ static void parseMLConn (tokenInfo *const token)
 	deleteToken (event);
 }
 
+static void parseMLProp (tokenInfo *const token)
+{
+	tokenInfo *const component     = newToken ();
+	tokenInfo *const prop_set_name = newToken ();
+	tokenInfo *const prop_name     = newToken ();
+
+	/*
+	 * This deals with these formats
+     *   ml_add_property ( 
+     *       'comp_name', 
+     *       'prop_set_name', 
+     *       'prop_name', 
+     *       'prop_value'
+     *   )
+	 */
+
+	readToken (token);
+	if ( isType (token, TOKEN_OPEN_PAREN) )
+	{
+		readToken (component);
+		readToken (token);
+		while (!(isType (token, TOKEN_COMMA) ||
+					isType (token, TOKEN_CLOSE_PAREN)
+				))
+		{
+			readToken (token);
+		}
+
+		if (isType (token, TOKEN_COMMA))
+		{
+			readToken (prop_set_name);
+			readToken (token);
+			while (!(isType (token, TOKEN_COMMA) ||
+						isType (token, TOKEN_CLOSE_PAREN)
+					))
+			{
+				readToken (token);
+			}
+
+			if (isType (token, TOKEN_COMMA))
+			{
+				readToken (prop_name);
+
+				if (isType (component, TOKEN_STRING) && 
+						isType (prop_set_name, TOKEN_STRING) && 
+						isType (prop_name, TOKEN_STRING) )
+				{
+					addToScope(component, prop_set_name->string);
+					addToScope(component, prop_name->string);
+					makeSqlTag (component, SQLTAG_MLPROP);
+				}
+			} 
+			if( !isType (token, TOKEN_CLOSE_PAREN) )
+				findToken (token, TOKEN_CLOSE_PAREN);
+		} 
+	}
+
+	findCmdTerm (token, TRUE);
+
+	deleteToken (component);
+	deleteToken (prop_set_name);
+	deleteToken (prop_name);
+}
+
 static void parseComment (tokenInfo *const token)
 {
 	/*
@@ -2188,6 +2256,7 @@ static void parseKeywords (tokenInfo *const token)
 			case KEYWORD_ml_conn_dnet:	parseMLConn (token); break;
 			case KEYWORD_ml_conn_java:	parseMLConn (token); break;
 			case KEYWORD_ml_conn_chk:	parseMLConn (token); break;
+			case KEYWORD_ml_prop:		parseMLProp (token); break;
 			case KEYWORD_package:		parsePackage (token); break;
 			case KEYWORD_procedure:		parseSubProgram (token); break;
 			case KEYWORD_publication:	parsePublication (token); break;
