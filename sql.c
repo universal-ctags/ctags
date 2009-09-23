@@ -1223,6 +1223,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 					 */
 					while (! isKeyword (token, KEYWORD_then))
 						readToken (token);
+
 					readToken (token);
 					continue;
 
@@ -1280,6 +1281,10 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 								readToken (token);
 
 							parseStatements (token, true);
+
+							if ( isCmdTerm(token) )
+								readToken (token);
+
 						}
 
 						/* 
@@ -1295,10 +1300,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 						{
 							readToken (token);
 							if ( isCmdTerm(token) )
-							{
-								readToken (token);
-								return;
-							}
+								stmtTerm = TRUE;
 						} 
 						else 
 						{
@@ -1361,6 +1363,9 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 							*/
 
 						parseStatements (token, false);
+
+						if ( isCmdTerm(token) )
+							readToken (token);
 					}
 
 
@@ -1379,10 +1384,8 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 						readToken (token);
 
 					if ( isCmdTerm(token) )
-					{
-						/* readToken (token); */
-						return;
-					}
+						stmtTerm = TRUE;
+
 					break;
 
 				case KEYWORD_create:
@@ -1473,10 +1476,8 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 		 * See comment above, now, only read if the current token 
 		 * is not a command terminator.
 		 */
-		if ( isCmdTerm(token) )
-		{
-			readToken (token);
-		}
+		if ( isCmdTerm(token) && ! stmtTerm )
+			stmtTerm = TRUE;
 				
 	} while (! isKeyword (token, KEYWORD_end) && 
 			 ! (exit_on_endif && isKeyword (token, KEYWORD_endif) ) && 
@@ -1512,6 +1513,9 @@ static void parseBlock (tokenInfo *const token, const boolean local)
 		while (! isKeyword (token, KEYWORD_end))
 		{
 			parseStatements (token, false);
+
+			if ( isCmdTerm(token) )
+				readToken (token);
 		}
 		token->begin_end_nest_lvl--;
 
