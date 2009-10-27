@@ -1470,7 +1470,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 						isKeyword (token, KEYWORD_case) ||
 						isKeyword (token, KEYWORD_for) ||
 						isKeyword (token, KEYWORD_begin)    )
-					parseStatements (token, false);
+					parseStatements (token, FALSE);
 				else if (isKeyword (token, KEYWORD_if))
 					parseStatements (token, TRUE);
 
@@ -2245,7 +2245,7 @@ static void parseKeywords (tokenInfo *const token)
 			case KEYWORD_drop:			parseDrop (token); break;
 			case KEYWORD_event:			parseEvent (token); break;
 			case KEYWORD_function:		parseSubProgram (token); break;
-			case KEYWORD_if:			parseStatements (token, false); break;
+			case KEYWORD_if:			parseStatements (token, FALSE); break;
 			case KEYWORD_index:			parseIndex (token); break;
 			case KEYWORD_ml_table:		parseMLTable (token); break;
 			case KEYWORD_ml_table_lang: parseMLTable (token); break;
