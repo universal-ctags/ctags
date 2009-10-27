@@ -239,6 +239,7 @@ static const keywordDesc SqlKeywordTable [] = {
 	/* keyword		keyword ID */
 	{ "as",								KEYWORD_is				      },
 	{ "is",								KEYWORD_is				      },
+	{ "=",								KEYWORD_is				      },
 	{ "begin",							KEYWORD_begin			      },
 	{ "body",							KEYWORD_body			      },
 	{ "cursor",							KEYWORD_cursor			      },
@@ -1284,7 +1285,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 									isKeyword (token, KEYWORD_elseif)    )
 								readToken (token);
 
-							parseStatements (token, true);
+							parseStatements (token, TRUE);
 
 							if ( isCmdTerm(token) )
 								readToken (token);
@@ -1366,7 +1367,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 							readToken (token);
 							*/
 
-						parseStatements (token, false);
+						parseStatements (token, FALSE);
 
 						if ( isCmdTerm(token) )
 							readToken (token);
@@ -1471,7 +1472,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 						isKeyword (token, KEYWORD_begin)    )
 					parseStatements (token, false);
 				else if (isKeyword (token, KEYWORD_if))
-					parseStatements (token, true);
+					parseStatements (token, TRUE);
 
 			}
 		}
@@ -1516,7 +1517,7 @@ static void parseBlock (tokenInfo *const token, const boolean local)
 		token->begin_end_nest_lvl++;
 		while (! isKeyword (token, KEYWORD_end))
 		{
-			parseStatements (token, false);
+			parseStatements (token, FALSE);
 
 			if ( isCmdTerm(token) )
 				readToken (token);
