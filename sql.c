@@ -161,7 +161,8 @@ typedef enum eTokenType {
 	TOKEN_OPEN_SQUARE,
 	TOKEN_CLOSE_SQUARE,
 	TOKEN_TILDE,
-	TOKEN_FORWARD_SLASH
+	TOKEN_FORWARD_SLASH,
+	TOKEN_EQUAL
 } tokenType;
 
 typedef struct sTokenInfoSQL {
@@ -239,7 +240,6 @@ static const keywordDesc SqlKeywordTable [] = {
 	/* keyword		keyword ID */
 	{ "as",								KEYWORD_is				      },
 	{ "is",								KEYWORD_is				      },
-	{ "=",								KEYWORD_is				      },
 	{ "begin",							KEYWORD_begin			      },
 	{ "body",							KEYWORD_body			      },
 	{ "cursor",							KEYWORD_cursor			      },
@@ -319,6 +319,7 @@ static const keywordDesc SqlKeywordTable [] = {
 
 /* Recursive calls */
 static void parseBlock (tokenInfo *const token, const boolean local);
+static void parseDeclare (tokenInfo *const token, const boolean local);
 static void parseKeywords (tokenInfo *const token);
 static void parseSqlFile (tokenInfo *const token);
 
@@ -566,6 +567,7 @@ getNextChar:
 		case '~': token->type = TOKEN_TILDE;			break;
 		case '[': token->type = TOKEN_OPEN_SQUARE;		break;
 		case ']': token->type = TOKEN_CLOSE_SQUARE;		break;
+		case '=': token->type = TOKEN_EQUAL;			break;
 
 		case '\'':
 		case '"':
@@ -887,6 +889,7 @@ static void parseSubProgram (tokenInfo *const token)
 					isKeyword (token, KEYWORD_internal) ||
 					isKeyword (token, KEYWORD_external) ||
 					isKeyword (token, KEYWORD_url) ||
+					isType (token, TOKEN_EQUAL) ||
 					isCmdTerm (token)
 				)
 			  )
@@ -917,6 +920,12 @@ static void parseSubProgram (tokenInfo *const token)
 
 			vStringClear (token->scope);
 		} 
+		if ( isType (token, TOKEN_EQUAL) )
+			readToken (token);
+
+		if ( isKeyword (token, KEYWORD_declare) )
+			parseDeclare (token, FALSE);
+
 		if (isKeyword (token, KEYWORD_is) || 
 				isKeyword (token, KEYWORD_begin) )
 		{
@@ -1083,18 +1092,18 @@ static void parseDeclare (tokenInfo *const token, const boolean local)
 			case KEYWORD_type:		parseType (token); break;
 
 			default:
-									if (isType (token, TOKEN_IDENTIFIER))
-									{
-										if (local)
-										{
-											makeSqlTag (token, SQLTAG_LOCAL_VARIABLE);
-										} 
-										else 
-										{
-											makeSqlTag (token, SQLTAG_VARIABLE);
-										}
-									}
-									break;
+				if (isType (token, TOKEN_IDENTIFIER))
+				{
+					if (local)
+					{
+						makeSqlTag (token, SQLTAG_LOCAL_VARIABLE);
+					} 
+					else 
+					{
+						makeSqlTag (token, SQLTAG_VARIABLE);
+					}
+				}
+				break;
 		}
 		findToken (token, TOKEN_SEMICOLON);
 		readToken (token);
