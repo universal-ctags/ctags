@@ -56,10 +56,11 @@ typedef enum eKeywordId {
 	KEYWORD_alias, KEYWORD_all, KEYWORD_and, KEYWORD_as, KEYWORD_assign,
 	KEYWORD_check, KEYWORD_class, KEYWORD_convert, KEYWORD_create,
 	KEYWORD_creation, KEYWORD_Current,
-	KEYWORD_debug, KEYWORD_deferred, KEYWORD_do, KEYWORD_else,
-	KEYWORD_elseif, KEYWORD_end, KEYWORD_ensure, KEYWORD_expanded,
-	KEYWORD_export, KEYWORD_external, KEYWORD_false, KEYWORD_feature,
-	KEYWORD_from, KEYWORD_frozen, KEYWORD_if, KEYWORD_implies,
+	KEYWORD_debug, KEYWORD_deferred, KEYWORD_detachable, KEYWORD_do,
+	KEYWORD_else, KEYWORD_elseif, KEYWORD_end, KEYWORD_ensure,
+	KEYWORD_expanded, KEYWORD_export, KEYWORD_external,
+	KEYWORD_false, KEYWORD_feature, KEYWORD_from, KEYWORD_frozen,
+	KEYWORD_if, KEYWORD_implies,
 	KEYWORD_indexing, KEYWORD_infix, KEYWORD_inherit, KEYWORD_inspect,
 	KEYWORD_invariant, KEYWORD_is, KEYWORD_like, KEYWORD_local,
 	KEYWORD_loop, KEYWORD_not, KEYWORD_obsolete, KEYWORD_old, KEYWORD_once,
@@ -162,6 +163,7 @@ static const keywordDesc EiffelKeywordTable [] = {
 	{ "current",        KEYWORD_Current    },
 	{ "debug",          KEYWORD_debug      },
 	{ "deferred",       KEYWORD_deferred   },
+	{ "detachable",     KEYWORD_detachable },
 	{ "do",             KEYWORD_do         },
 	{ "else",           KEYWORD_else       },
 	{ "elseif",         KEYWORD_elseif     },
@@ -870,7 +872,8 @@ static boolean parseType (tokenInfo *const token)
 	}
 	else
 	{
-		if (isKeyword (id, KEYWORD_expanded))
+		if (isKeyword (id, KEYWORD_detachable) ||
+		    isKeyword (id, KEYWORD_expanded))
 		{
 			copyToken (id, token);
 			readToken (token);
