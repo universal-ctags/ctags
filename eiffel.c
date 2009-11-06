@@ -53,7 +53,8 @@ typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
  */
 typedef enum eKeywordId {
 	KEYWORD_NONE = -1,
-	KEYWORD_alias, KEYWORD_all, KEYWORD_and, KEYWORD_as, KEYWORD_assign,
+	KEYWORD_alias, KEYWORD_all, KEYWORD_and,
+	KEYWORD_as, KEYWORD_assign, KEYWORD_attached,
 	KEYWORD_check, KEYWORD_class, KEYWORD_convert, KEYWORD_create,
 	KEYWORD_creation, KEYWORD_Current,
 	KEYWORD_debug, KEYWORD_deferred, KEYWORD_detachable, KEYWORD_do,
@@ -155,6 +156,7 @@ static const keywordDesc EiffelKeywordTable [] = {
 	{ "and",            KEYWORD_and        },
 	{ "as",             KEYWORD_as         },
 	{ "assign",         KEYWORD_assign     },
+	{ "attached",       KEYWORD_attached   },
 	{ "check",          KEYWORD_check      },
 	{ "class",          KEYWORD_class      },
 	{ "convert",        KEYWORD_convert    },
@@ -872,7 +874,8 @@ static boolean parseType (tokenInfo *const token)
 	}
 	else
 	{
-		if (isKeyword (id, KEYWORD_detachable) ||
+		if (isKeyword (id, KEYWORD_attached) ||
+		    isKeyword (id, KEYWORD_detachable) ||
 		    isKeyword (id, KEYWORD_expanded))
 		{
 			copyToken (id, token);
