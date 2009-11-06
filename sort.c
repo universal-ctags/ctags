@@ -109,7 +109,7 @@ static void failedSort (FILE *const fp, const char* msg)
 	if (fp != NULL)
 		fclose (fp);
 	if (msg == NULL)
-		error (FATAL | PERROR, cannotSort);
+		error (FATAL | PERROR, "%s", cannotSort);
 	else
 		error (FATAL, "%s: %s", msg, cannotSort);
 }
