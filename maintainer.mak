@@ -60,7 +60,7 @@ win_version = $(subst .,,$(version))
 HOST_ARCH := $(shell uname -p)
 
 ifneq ($(findstring $(HOST_ARCH),i386 i686),)
-COMP_ARCH := -march=i686
+#COMP_ARCH := -march=i686
 endif
 
 CC         := gcc
