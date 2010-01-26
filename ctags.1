@@ -387,7 +387,7 @@ pattern searches useless for finding all matches.
 Specifies whether to include extra tag entries for certain kinds of
 information. The parameter \fIflags\fP is a set of one-letter flags, each
 representing one kind of extra tag entry to include in the tag file. If
-\fIflags\fP is preceded by by either the '+' or '\-' character, the effect of
+\fIflags\fP is preceded by either the '+' or '\-' character, the effect of
 each flag is added to, or removed from, those currently enabled; otherwise the
 flags replace any current settings. The meaning of each flag is as follows:
 
@@ -494,7 +494,7 @@ Specifies a string to print to standard output following the tags for each
 file name parsed when the \fB\-\-filter\fP option is enabled. This may permit an
 application reading the output of ctags to determine when the output for each
 file is finished. Note that if the file name read is a directory and
-\fB\-\-recurse\fP is enabled, this string will be printed only one once at the
+\fB\-\-recurse\fP is enabled, this string will be printed only once at the
 end of all tags found for by descending the directory. This string will always
 be separated from the last tag line for the file by its terminating newline.
 This option is quite esoteric and is empty by default. This option must appear
@@ -1006,7 +1006,7 @@ For more commands, see the \fITags\fP topic in the Emacs info document.
 .SH "HOW TO USE WITH NEDIT"
 NEdit version 5.1 and later can handle the new extended tag file format (see
 \fB\-\-format\fP). To make NEdit use the tag file, select "File\->Load Tags
-File". To jump to the definition for a tag, highlight the word, the press
+File". To jump to the definition for a tag, highlight the word, then press
 Ctrl-D. NEdit 5.1 can can read multiple tag files from different directories.
 Setting the X resource nedit.tagFile to the name of a tag file instructs NEdit
 to automatically load that tag file at startup time.
