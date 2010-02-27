@@ -232,6 +232,7 @@ static void tagNameList (const verilogKind kind, int c)
 		c = skipWhite (c);
 		if (c == '=')
 		{
+			c = skipWhite (vGetc ());
 			if (c == '{')
 				skipPastMatch ("{}");
 			else
