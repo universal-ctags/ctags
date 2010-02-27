@@ -100,7 +100,7 @@ static void skipToMatch (const char *const pair)
 			++matchLevel;
 		else if (c == end)
 			--matchLevel;
-		else if (c == '\n')
+		else if (c == '\n' || c == EOF)
 			break;
 	}
 	if (c == EOF)
