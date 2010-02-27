@@ -5,6 +5,8 @@ ctags-@VERSION@ (@DATE@)
 * Fixed parsing of comments after import statements and other tags, contributed by Huandari Lopez to Geany [Python].
 * Fixed PHP parser to ignore keywords inside comments [PHP, Bug #1795926].
 * Fixed regular expressions for Ant so they won't span multiple tags [Ant].
+* Fixed infinite loop with malformed Makefiles, contributed by Martin Dorey [Make, Bug #2959889].
+* Fixed Verilog parameter parsing, contributed by Nicolas Vincent [Verilog, Patch #2747828].
 
 ctags-5.8 (09 Jul 2009)
 * Removed ".ml" as a Lisp extension (now OCaml) [Lisp].
