@@ -398,7 +398,9 @@ static void parseFunction (const char *cp, vString *const def,
 	cp = parseIdentifier (cp, def);
 	arglist = parseArglist (cp);
 	makeFunctionTag (def, parent, is_class_parent, arglist);
-	eFree (arglist);
+	if (arglist != NULL) {
+		eFree (arglist);
+	}
 }
 
 /* Get the combined name of a nested symbol. Classes are separated with ".",
