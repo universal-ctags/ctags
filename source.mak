@@ -16,6 +16,7 @@ SOURCES = \
 	basic.c \
 	beta.c \
 	c.c \
+	css.c \
 	cobol.c \
 	dosbatch.c \
 	eiffel.c \
@@ -79,6 +80,7 @@ OBJECTS = \
 	basic.$(OBJEXT) \
 	beta.$(OBJEXT) \
 	c.$(OBJEXT) \
+	css.$(OBJEXT) \
 	cobol.$(OBJEXT) \
 	dosbatch.$(OBJEXT) \
 	eiffel.$(OBJEXT) \
