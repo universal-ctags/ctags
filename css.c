@@ -38,6 +38,9 @@ typedef enum _CssParserState {  // state of parsing
 
 static void makeCssSimpleTag( vString *name, cssKind kind, boolean delete )
 {
+  if (kind == K_CLASS) {
+    vStringStripTrailing(name);
+  }
   vStringTerminate (name);
   makeSimpleTag (name, CssKinds, kind);
   vStringClear (name);
