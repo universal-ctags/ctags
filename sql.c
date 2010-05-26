@@ -783,6 +783,16 @@ static void skipToMatched(tokenInfo *const token)
 	}
 }
 
+static void copyToken (tokenInfo *const dest, tokenInfo *const src)
+{
+	dest->lineNumber = src->lineNumber;
+	dest->filePosition = src->filePosition;
+	dest->type = src->type;
+	dest->keyword = src->keyword;
+	vStringCopy(dest->string, src->string);
+	vStringCopy(dest->scope, src->scope);
+}
+
 static void skipArgumentList (tokenInfo *const token)
 {
 	/*
@@ -801,6 +811,7 @@ static void skipArgumentList (tokenInfo *const token)
 static void parseSubProgram (tokenInfo *const token)
 {
 	tokenInfo *const name  = newToken ();
+	vString * saveScope = vStringNew ();
 
 	/*
 	 * This must handle both prototypes and the body of
@@ -840,16 +851,33 @@ static void parseSubProgram (tokenInfo *const token)
 	 *	   
 	 *		   RETURN @name;
 	 *	   END;
+	 *
+	 * Note, a Package adds scope to the items within.
+     *     create or replace package demo_pkg is
+     *         test_var number;
+     *         function test_func return varchar2;
+     *         function more.test_func2 return varchar2;
+     *     end demo_pkg;
+	 * So the tags generated here, contain the package name:
+     *         demo_pkg.test_var
+     *         demo_pkg.test_func
+     *         demo_pkg.more.test_func2
 	 */
 	const sqlKind kind = isKeyword (token, KEYWORD_function) ?
 		SQLTAG_FUNCTION : SQLTAG_PROCEDURE;
 	Assert (isKeyword (token, KEYWORD_function) ||
 			isKeyword (token, KEYWORD_procedure));
-	readToken (name);
+
+	vStringCopy(saveScope, token->scope);
 	readToken (token);
+	copyToken (name, token);
+	readToken (token);
+
 	if (isType (token, TOKEN_PERIOD))
 	{
-		readToken (name);
+		addToScope(token, name->string);
+		readToken (token);
+		copyToken (name, token);
 		readToken (token);
 	}
 	if (isType (token, TOKEN_OPEN_PAREN))
@@ -940,7 +968,9 @@ static void parseSubProgram (tokenInfo *const token)
 			vStringClear (token->scope);
 		} 
 	}
+	vStringCopy(token->scope, saveScope);
 	deleteToken (name);
+	vStringDelete(saveScope);
 }
 
 static void parseRecord (tokenInfo *const token)
@@ -1566,7 +1596,7 @@ static void parsePackage (tokenInfo *const token)
 	 * or by specifying a package body
 	 *	   CREATE OR REPLACE PACKAGE BODY pkg_name AS
 	 *	   CREATE OR REPLACE PACKAGE BODY owner.pkg_name AS
-	 */
+ */
 	tokenInfo *const name = newToken ();
 	readToken (name);
 	if (isKeyword (name, KEYWORD_body))
@@ -1591,7 +1621,9 @@ static void parsePackage (tokenInfo *const token)
 		if (isType (name, TOKEN_IDENTIFIER) ||
 				isType (name, TOKEN_STRING))
 			makeSqlTag (name, SQLTAG_PACKAGE);
+		addToScope (token, name->string);
 		parseBlock (token, FALSE);
+		vStringClear (token->scope);
 	}
 	findCmdTerm (token, FALSE);
 	deleteToken (name);
