@@ -2201,6 +2201,10 @@ static boolean parseMXML (tokenInfo *const token)
 				addToScope (name, type->string);
 				makeMXTag (name);
 			}
+			else
+			{
+				readToken (token);
+			}
 		}
 		else
 		{
