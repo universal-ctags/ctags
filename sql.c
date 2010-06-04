@@ -875,12 +875,14 @@ static void parseSubProgram (tokenInfo *const token)
 
 	if (isType (token, TOKEN_PERIOD))
 	{
-		// If this is an Oracle package, then the token->scope should
-		// already be set.  If this is the case, also add this value to the
-		// scope.
-		// If this is not an Oracle package, chances are the scope should be
-		// blank and the value just read is the OWNER or CREATOR of the
-		// function and should not be considered part of the scope.
+		/*
+		 * If this is an Oracle package, then the token->scope should
+		 * already be set.  If this is the case, also add this value to the
+		 * scope.
+		 * If this is not an Oracle package, chances are the scope should be
+		 * blank and the value just read is the OWNER or CREATOR of the
+		 * function and should not be considered part of the scope.
+		 */
 		if ( vStringLength(saveScope) > 0 )
 		{
 			addToScope(token, name->string);
