@@ -362,6 +362,17 @@ static boolean parseCommand (const unsigned char *line)
 		if ((int) *cp == '!')
 			++cp;
 
+		if ((int) *cp != ' ')
+		{
+			/*
+			 * :command must be followed by a space.  If it is not, it is 
+			 * not a valid command.
+			 * Treat the line as processed and continue.
+			 */
+			cmdProcessed = TRUE;
+			goto cleanUp;
+		}
+
 		while (*cp && isspace ((int) *cp))
 			++cp; 
 	} 
@@ -389,7 +400,7 @@ static boolean parseCommand (const unsigned char *line)
 		else if (*cp == '-')
 		{
 			/* 
-			 * Read until the next space which sparates options or the name
+			 * Read until the next space which separates options or the name
 			 */
 			while (*cp && !isspace ((int) *cp))
 				++cp; 
