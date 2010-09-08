@@ -248,6 +248,7 @@ esac
 
 AC_PROG_LN_S
 AC_CHECK_PROG(STRIP, strip, strip, :)
+AC_SYS_LARGEFILE
 
 
 # Checks for operating environment
