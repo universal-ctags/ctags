@@ -7,6 +7,7 @@ ctags-@VERSION@ (@DATE@)
 * Fixed regular expressions for Ant so they won't span multiple tags [Ant].
 * Fixed infinite loop with malformed Makefiles, contributed by Martin Dorey [Make, Bug #2959889].
 * Fixed Verilog parameter parsing, contributed by Nicolas Vincent [Verilog, Patch #2747828].
+* Enabled Large File System support. [Bug #3062068]
 
 ctags-5.8 (09 Jul 2009)
 * Removed ".ml" as a Lisp extension (now OCaml) [Lisp].
