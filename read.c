@@ -271,7 +271,6 @@ extern boolean fileOpen (const char *const fileName, const langType language)
 		fgetpos (File.fp, &StartOfLine);
 		fgetpos (File.fp, &File.filePosition);
 		File.currentLine  = NULL;
-		File.language     = language;
 		File.lineNumber   = 0L;
 		File.eof          = FALSE;
 		File.newLine      = TRUE;
