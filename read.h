@@ -77,7 +77,6 @@ typedef struct sInputFile {
 	int         ungetch;       /* a single character that was ungotten */
 	boolean     eof;           /* have we reached the end of file? */
 	boolean     newLine;       /* will the next character begin a new line? */
-	langType    language;      /* language of input file */
 
 	/*  Contains data pertaining to the original source file in which the tag
 	 *  was defined. This may be different from the input file when #line
