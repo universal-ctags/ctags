@@ -772,6 +772,8 @@ static int writePatternEntry (const tagEntryInfo *const tag)
 	boolean newlineTerminated;
 	int length = 0;
 
+	if (line == NULL)
+		error (FATAL, "bad tag in %s", vStringValue (File.name));
 	if (tag->truncateLine)
 		truncateTagLine (line, tag->name, FALSE);
 	newlineTerminated = (boolean) (line [strlen (line) - 1] == '\n');
