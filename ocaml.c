@@ -866,6 +866,11 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, ocamlKind kind)
 	tag->kindName = OcamlKinds[kind].name;
 	tag->kind = OcamlKinds[kind].letter;
 
+	if (kind == K_MODULE)
+	{
+		tag->lineNumberEntry = TRUE;
+		tag->lineNumber = 1;
+	}
 	parentIndex = getLastNamedIndex ();
 	if (parentIndex >= 0)
 	{
@@ -880,9 +885,12 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, ocamlKind kind)
  * more information to it in the future */
 static void addTag (vString * const ident, int kind)
 {
-	tagEntryInfo toCreate;
-	prepareTag (&toCreate, ident, kind);
-	makeTagEntry (&toCreate);
+	if (OcamlKinds [kind].enabled  &&  ident != NULL  &&  vStringLength (ident) > 0)
+	{
+		tagEntryInfo toCreate;
+		prepareTag (&toCreate, ident, kind);
+		makeTagEntry (&toCreate);
+	}
 }
 
 boolean needStrongPoping = FALSE;
@@ -1769,7 +1777,7 @@ static void computeModuleName ( void )
 	if (isLowerAlpha (moduleName->buffer[0]))
 		moduleName->buffer[0] += ('A' - 'a');
 
-	makeSimpleTag (moduleName, OcamlKinds, K_MODULE);
+	addTag (moduleName, K_MODULE);
 	vStringDelete (moduleName);
 }
 

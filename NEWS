@@ -1,12 +1,13 @@
 Current Version: @VERSION@
 
 ctags-@VERSION@ (@DATE@)
-* Added support for new "detachable" keyword [Eiffel].
+* Added support for new "attached" and "detachable" keywords [Eiffel].
 * Fixed parsing of comments after import statements and other tags, contributed by Huandari Lopez to Geany [Python].
 * Fixed PHP parser to ignore keywords inside comments [PHP, Bug #1795926].
 * Fixed regular expressions for Ant so they won't span multiple tags [Ant].
 * Fixed infinite loop with malformed Makefiles, contributed by Martin Dorey [Make, Bug #2959889].
 * Fixed Verilog parameter parsing, contributed by Nicolas Vincent [Verilog, Patch #2747828].
+* Fixed error when parsing empty file [OCaml].
 * Enabled Large File System support. [Bug #3062068]
 
 ctags-5.8 (09 Jul 2009)
