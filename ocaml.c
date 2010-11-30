@@ -556,8 +556,7 @@ static int getLastNamedIndex ( void )
 
 	for (i = stackIndex - 1; i >= 0; --i)
 	{
-		if (stack[i].contextName->buffer &&
-			strlen (stack[i].contextName->buffer) > 0)
+        if (vStringLength (stack[i].contextName) > 0)
 		{
 			return i;
 		}
@@ -1811,6 +1810,7 @@ static void initStack ( void )
 	int i;
 	for (i = 0; i < OCAML_MAX_STACK_SIZE; ++i)
 		stack[i].contextName = vStringNew ();
+    stackIndex = 0;
 }
 
 static void clearStack ( void )
@@ -1826,8 +1826,8 @@ static void findOcamlTags (void)
 	lexingState st;
 	ocaToken tok;
 
-	computeModuleName ();
 	initStack ();
+	computeModuleName ();
 	tempIdent = vStringNew ();
 	lastModule = vStringNew ();
 	lastClass = vStringNew ();
