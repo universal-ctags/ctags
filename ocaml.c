@@ -316,6 +316,20 @@ static void eatComment (lexingState * st)
 			lastIsStar = FALSE;
             c++;
 		}
+		/* OCaml has a rule which says :
+		 *
+		 *   "Comments do not occur inside string or character literals.
+		 *    Nested comments are handled correctly."
+		 *
+		 * So if we encounter a string beginning, we must parse it to
+		 * get a good comment nesting (bug ID: 3117537)
+		 */
+        else if (*c == '"')
+        {
+            st->cp = c;
+            eatString (st);
+            c = st->cp;
+        }
 		else
         {
 			lastIsStar = '*' == *c;
