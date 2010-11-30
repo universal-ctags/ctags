@@ -308,7 +308,11 @@ static void eatComment (lexingState * st)
 		{
 			st->cp = c;
 			eatComment (st);
+
 			c = st->cp;
+			if (c == NULL)
+			    return;
+
 			lastIsStar = FALSE;
             c++;
 		}
