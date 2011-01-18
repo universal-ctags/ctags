@@ -1,5 +1,5 @@
 /*
-*   $Id$
+*   $Id: ruby.c 571 2007-06-24 23:32:14Z elliotth $
 *
 *   Copyright (c) 2000-2001, Thaddeus Covert <sahuagin@mediaone.net>
 *   Copyright (c) 2002 Matthias Veit <matthias_veit@yahoo.de>
@@ -28,7 +28,7 @@
 *   DATA DECLARATIONS
 */
 typedef enum {
-	K_UNDEFINED = -1, K_CLASS, K_METHOD, K_MODULE, K_SINGLETON
+	K_UNDEFINED = -1, K_CLASS, K_METHOD, K_MODULE, K_SINGLETON, K_DESCRIBE, K_CONTEXT
 } rubyKind;
 
 /*
@@ -38,7 +38,9 @@ static kindOption RubyKinds [] = {
 	{ TRUE, 'c', "class",  "classes" },
 	{ TRUE, 'f', "method", "methods" },
 	{ TRUE, 'm', "module", "modules" },
-	{ TRUE, 'F', "singleton method", "singleton methods" }
+	{ TRUE, 'F', "singleton method", "singleton methods" },
+	{ TRUE, 'd', "describe", "describes" },
+	{ TRUE, 'C', "context", "contexts" }
 };
 
 static stringList* nesting = 0;
@@ -180,7 +182,19 @@ static rubyKind parseIdentifier (
 	 * point or equals sign. These are all part of the name.
 	 * A method name may also contain a period if it's a singleton method.
 	 */
-	const char* also_ok = (kind == K_METHOD) ? "_.?!=" : "_";
+	const char* also_ok;
+    if (kind == K_METHOD)
+	{
+		also_ok = "_.?!=";
+	}
+	else if (kind == K_DESCRIBE || kind == K_CONTEXT)
+	{
+		also_ok = " ,\".#_?!='/-";
+	}
+	else 
+	{
+		also_ok = "_";
+	}
 
 	skipWhitespace (cp);
 
@@ -343,7 +357,14 @@ static void findRubyTags (void)
 		{
 			readAndEmitTag (&cp, K_METHOD);
 		}
-
+		else if (canMatch (&cp, "describe"))
+		{
+			readAndEmitTag (&cp, K_DESCRIBE);
+		}
+		else if (canMatch (&cp, "context"))
+		{
+			readAndEmitTag (&cp, K_CONTEXT);
+		}
 		while (*cp != '\0')
 		{
 			/* FIXME: we don't cope with here documents,
@@ -406,3 +427,4 @@ extern parserDefinition* RubyParser (void)
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */
+
