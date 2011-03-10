@@ -420,6 +420,9 @@ static void readObjCMethods(objcKind mType, const char *scope, const char *inher
 			case '-':
 			case '+':
 				getSingleObjCMethod(method);
+				char fullName[1024];
+				snprintf(fullName, sizeof(fullName), "%s#%s", scope, vStringValue(method));
+				emitObjCTag(fullName, mType, scope, inheritance);
 				emitObjCTag(vStringValue(method), mType, scope, inheritance);
 				break;
 			default:
