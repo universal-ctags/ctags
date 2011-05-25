@@ -365,8 +365,6 @@ static void getSingleObjCMethod(vString *method)
 
 	vStringClear(method);
 	recordPosition();
-	z = cppGetc();
-	vStringPut(method, z);
 	skipNextIdent = 0;
 	while ((z = cppGetc()) != EOF && z != ';' && z != '{') {
 		if (isspace(z))
