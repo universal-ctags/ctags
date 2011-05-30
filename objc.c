@@ -365,8 +365,6 @@ static void getSingleObjCMethod(vString *method)
 
 	vStringClear(method);
 	recordPosition();
-	z = cppGetc();
-	vStringPut(method, z);
 	skipNextIdent = 0;
 	while ((z = cppGetc()) != EOF && z != ';' && z != '{') {
 		if (isspace(z))
@@ -420,6 +418,9 @@ static void readObjCMethods(objcKind mType, const char *scope, const char *inher
 			case '-':
 			case '+':
 				getSingleObjCMethod(method);
+				char fullName[1024];
+				snprintf(fullName, sizeof(fullName), "%s#%s", scope, vStringValue(method));
+				emitObjCTag(fullName, mType, scope, inheritance);
 				emitObjCTag(vStringValue(method), mType, scope, inheritance);
 				break;
 			default:
