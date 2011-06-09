@@ -2481,6 +2481,8 @@ get_name_end_code_point(OnigCodePoint start)
   switch (start) {
   case '<':  return (OnigCodePoint )'>'; break;
   case '\'': return (OnigCodePoint )'\''; break;
+  case '(':  return (OnigCodePoint )')'; break;
+  case '{':  return (OnigCodePoint )'}'; break;
   default:
     break;
   }
@@ -2606,7 +2608,7 @@ fetch_name_with_level(OnigCodePoint start_code, UChar** src, UChar* end,
 #endif /* USE_BACKREF_WITH_LEVEL */
 
 /*
-  def: 0 -> define name    (don't allow number name)
+  ref: 0 -> define name    (don't allow number name)
        1 -> reference name (allow number name)
 */
 static int
@@ -3702,6 +3704,57 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
           }
           goto start;
         }
+#if defined(USE_SUBEXP_CALL) && defined(USE_PERL_SUBEXP_CALL)
+	/* (?&name), (?n), (?R), (?0), (?+n), (?-n) */
+	c = PPEEK;
+	if ((c == '&' || c == 'R' || ONIGENC_IS_CODE_DIGIT(enc, c)) &&
+	    IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_QMARK_SUBEXP_CALL)) {
+	  int gnum;
+	  UChar *name;
+	  UChar *name_end;
+
+	  if (c == 'R' || c == '0') {
+	    PFETCH(c);
+	    if (!PPEEK_IS(')')) return ONIGERR_INVALID_GROUP_NAME;
+	    PFETCH(c);
+	    name_end = name = p;
+	    gnum = 0;
+	  }
+	  else {
+	    if (c == '&') PFETCH(c);
+	    name = p;
+	    r = fetch_name((OnigCodePoint )'(', &p, end, &name_end, env, &gnum, 1);
+	    if (r < 0) return r;
+	  }
+
+	  tok->type = TK_CALL;
+	  tok->u.call.name     = name;
+	  tok->u.call.name_end = name_end;
+	  tok->u.call.gnum     = gnum;
+	  break;
+	}
+	else if ((c == '-' || c == '+') &&
+	    IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_QMARK_SUBEXP_CALL)) {  /* (?+n), (?-n) */
+	  int gnum;
+	  UChar *name;
+	  UChar *name_end;
+	  PFETCH_READY;
+
+	  PFETCH(c);
+	  c = PPEEK;
+	  if (ONIGENC_IS_CODE_DIGIT(enc, c)) {
+	    name = p;
+	    r = fetch_name((OnigCodePoint )'(', &p, end, &name_end, env, &gnum, 1);
+	    if (r < 0) return r;
+
+	    tok->type = TK_CALL;
+	    tok->u.call.name     = name;
+	    tok->u.call.name_end = name_end;
+	    tok->u.call.gnum     = gnum;
+	    break;
+	  }
+	}
+#endif
         PUNFETCH;
       }
 
@@ -4585,7 +4638,7 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
       else if (c == '!')
 	*np = onig_node_new_anchor(ANCHOR_LOOK_BEHIND_NOT);
 #ifdef USE_NAMED_GROUP
-      else {
+      else {    /* (?<name>...) */
 	if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_QMARK_LT_NAMED_GROUP)) {
 	  UChar *name;
 	  UChar *name_end;
