@@ -2259,6 +2259,7 @@ enum TokenSyms {
   TK_QUOTE_OPEN,
   TK_CHAR_PROPERTY,    /* \p{...}, \P{...} */
   TK_LINEBREAK,
+  TK_EXTENDED_GRAPHEME_CLUSTER,
   /* in cc */
   TK_CC_CLOSE,
   TK_CC_RANGE,
@@ -3569,6 +3570,12 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
     case 'R':
       if (IS_SYNTAX_OP2(syn, ONIG_SYN_OP2_ESC_CAPITAL_R_LINEBREAK)) {
 	tok->type = TK_LINEBREAK;
+      }
+      break;
+
+    case 'X':
+      if (IS_SYNTAX_OP2(syn, ONIG_SYN_OP2_ESC_CAPITAL_X_EXTENDED_GRAPHEME_CLUSTER)) {
+	tok->type = TK_EXTENDED_GRAPHEME_CLUSTER;
       }
       break;
 
@@ -5094,6 +5101,117 @@ node_linebreak(Node** np, ScanEnv* env)
 }
 
 static int
+node_extended_grapheme_cluster(Node** np, ScanEnv* env)
+{
+#if 0
+  /* same as (?:\P{M}\p{M}*) */
+  UChar* p;
+  UChar* end;
+  OnigToken tok;
+  OnigEncoding prevenc = env->enc;
+  int r;
+
+  if (onig_strncmp((UChar* )env->enc->name, (UChar* )"UTF", 3) == 0) {
+    env->enc = ONIG_ENCODING_UTF8;
+
+    p = (UChar* )"(?:\\P{M}\\p{M}*)";
+    end = p + strlen((char* )p);
+    r = fetch_token(&tok, &p, end, env);
+    if (r >= 0) {
+      r = parse_subexp(np, &tok, TK_EOT, &p, end, env);
+    }
+    env->enc = prevenc;
+  }
+  if (IS_NULL(*np)) {
+    /* (?s:.) */
+    OnigOptionType option;
+    Node* target = node_new_anychar();
+    if (IS_NULL(target)) return ONIGERR_MEMORY;
+
+    option = env->option;
+    ONOFF(option, ONIG_OPTION_MULTILINE, 0);
+    *np = node_new_option(option);
+    if (IS_NULL(*np)) {
+      onig_node_free(target);
+      return ONIGERR_MEMORY;
+    }
+    NENCLOSE(*np)->target = target;
+  }
+  return ONIG_NORMAL;
+#else
+  /* same as (?:\P{M}\p{M}*) */
+  Node* np1 = NULL;
+  Node* np2 = NULL;
+  Node* qn = NULL;
+  Node* list1 = NULL;
+  Node* list2 = NULL;
+  CClassNode* cc1;
+  CClassNode* cc2;
+  int r = 0;
+
+  if (onig_strncmp((UChar* )env->enc->name, (UChar* )"UTF", 3) == 0) {
+    /* UTF-8, UTF-16BE/LE, UTF-32BE/LE */
+    UChar* propname = (UChar* )"M";
+    int ctype = env->enc->property_name_to_ctype(ONIG_ENCODING_ASCII,
+	propname, propname + 1);
+    if (ctype >= 0) {
+      /* \P{M} */
+      np1 = node_new_cclass();
+      if (IS_NULL(np1)) goto err;
+      cc1 = NCCLASS(np1);
+      r = add_ctype_to_cc(cc1, ctype, 0, 1, env);
+      if (r != 0) goto err;
+      NCCLASS_SET_NOT(cc1);
+
+      /* \p{M}* */
+      np2 = node_new_cclass();
+      if (IS_NULL(np2)) goto err;
+      cc2 = NCCLASS(np2);
+      r = add_ctype_to_cc(cc2, ctype, 0, 1, env);
+      if (r != 0) goto err;
+
+      qn = node_new_quantifier(0, REPEAT_INFINITE, 0);
+      if (IS_NULL(qn)) goto err;
+      NQTFR(qn)->target = np2;
+
+      /* \P{M}\p{M}* */
+      list2 = node_new_list(qn, NULL_NODE);
+      if (IS_NULL(list2)) goto err;
+      list1 = node_new_list(np1, list2);
+      if (IS_NULL(list1)) goto err;
+
+      /* (?:...) */
+      *np = node_new_option(env->option);
+      if (IS_NULL(*np)) goto err;
+      NENCLOSE(*np)->target = list1;
+      return ONIG_NORMAL;
+    }
+  }
+  if (IS_NULL(*np)) {
+    /* (?s:.) */
+    OnigOptionType option;
+    np1 = node_new_anychar();
+    if (IS_NULL(np1)) goto err;
+
+    option = env->option;
+    ONOFF(option, ONIG_OPTION_MULTILINE, 0);
+    *np = node_new_option(option);
+    if (IS_NULL(*np)) goto err;
+    NENCLOSE(*np)->target = np1;
+  }
+  return ONIG_NORMAL;
+
+ err:
+  if (IS_NOT_NULL(np1))   onig_node_free(np1);
+  if (IS_NOT_NULL(np2))   onig_node_free(np2);
+  if (IS_NOT_NULL(qn))    onig_node_free(qn);
+  if (IS_NOT_NULL(list1)) onig_node_free(list1);
+  if (IS_NOT_NULL(list2)) onig_node_free(list2);
+  return (r == 0) ? ONIGERR_MEMORY : r;
+#endif
+}
+
+static int
 parse_exp(Node** np, OnigToken* tok, int term,
 	  UChar** src, UChar* end, ScanEnv* env)
 {
@@ -5142,6 +5260,11 @@ parse_exp(Node** np, OnigToken* tok, int term,
 
   case TK_LINEBREAK:
     r = node_linebreak(np, env);
+    if (r < 0) return r;
+    break;
+
+  case TK_EXTENDED_GRAPHEME_CLUSTER:
+    r = node_extended_grapheme_cluster(np, env);
     if (r < 0) return r;
     break;
 
