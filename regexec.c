@@ -3350,6 +3350,14 @@ extern int
 onig_search(regex_t* reg, const UChar* str, const UChar* end,
 	    const UChar* start, const UChar* range, OnigRegion* region, OnigOptionType option)
 {
+  return onig_search_gpos(reg, str, end, start, start, range, region, option);
+}
+
+extern int
+onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
+	    const UChar* global_pos,
+	    const UChar* start, const UChar* range, OnigRegion* region, OnigOptionType option)
+{
   int r;
   UChar *s, *prev;
   OnigMatchArg msa;
@@ -3563,7 +3571,7 @@ onig_search(regex_t* reg, const UChar* str, const UChar* end,
 	  (int )(end - str), (int )(start - str), (int )(range - str));
 #endif
 
-  MATCH_ARG_INIT(msa, option, region, orig_start);
+  MATCH_ARG_INIT(msa, option, region, global_pos);
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
   {
     int offset = (MIN(start, range) - str);
