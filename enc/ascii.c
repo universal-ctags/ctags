@@ -29,15 +29,6 @@
 
 #include "regenc.h"
 
-static int
-ascii_is_code_ctype(OnigCodePoint code, unsigned int ctype)
-{
-  if (code < 128)
-    return ONIGENC_IS_ASCII_CODE_CTYPE(code, ctype);
-  else
-    return FALSE;
-}
-
 OnigEncodingType OnigEncodingASCII = {
   onigenc_single_byte_mbc_enc_len,
   "US-ASCII",  /* name */
@@ -51,7 +42,7 @@ OnigEncodingType OnigEncodingASCII = {
   onigenc_ascii_apply_all_case_fold,
   onigenc_ascii_get_case_fold_codes_by_str,
   onigenc_minimum_property_name_to_ctype,
-  ascii_is_code_ctype,
+  onigenc_ascii_is_code_ctype,
   onigenc_not_support_get_ctype_code_range,
   onigenc_single_byte_left_adjust_char_head,
   onigenc_always_true_is_allowed_reverse_match
