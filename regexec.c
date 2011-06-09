@@ -501,13 +501,14 @@ stack_double(OnigStackType** arg_stk_base, OnigStackType** arg_stk_end,
     state_check_buff[x/8] |= (1<<(x%8));				\
   }
 
-#define STACK_PUSH(stack_type,pat,s,sprev) do {\
+#define STACK_PUSH(stack_type,pat,s,sprev,keep) do {\
   STACK_ENSURE(1);\
   stk->type = (stack_type);\
   stk->u.state.pcode     = (pat);\
   stk->u.state.pstr      = (s);\
   stk->u.state.pstr_prev = (sprev);\
   stk->u.state.state_check = 0;\
+  stk->u.state.pkeep     = (keep);\
   STACK_INC;\
 } while(0)
 
@@ -518,13 +519,14 @@ stack_double(OnigStackType** arg_stk_base, OnigStackType** arg_stk_end,
   STACK_INC;\
 } while(0)
 
-#define STACK_PUSH_ALT_WITH_STATE_CHECK(pat,s,sprev,snum) do {\
+#define STACK_PUSH_ALT_WITH_STATE_CHECK(pat,s,sprev,snum,keep) do {\
   STACK_ENSURE(1);\
   stk->type = STK_ALT;\
   stk->u.state.pcode     = (pat);\
   stk->u.state.pstr      = (s);\
   stk->u.state.pstr_prev = (sprev);\
   stk->u.state.state_check = ((state_check_buff != NULL) ? (snum) : 0);\
+  stk->u.state.pkeep     = (keep);\
   STACK_INC;\
 } while(0)
 
@@ -542,12 +544,13 @@ stack_double(OnigStackType** arg_stk_base, OnigStackType** arg_stk_end,
 
 #define ELSE_IF_STATE_CHECK_MARK(stk)
 
-#define STACK_PUSH(stack_type,pat,s,sprev) do {\
+#define STACK_PUSH(stack_type,pat,s,sprev,keep) do {\
   STACK_ENSURE(1);\
   stk->type = (stack_type);\
   stk->u.state.pcode     = (pat);\
   stk->u.state.pstr      = (s);\
   stk->u.state.pstr_prev = (sprev);\
+  stk->u.state.pkeep     = (keep);\
   STACK_INC;\
 } while(0)
 
@@ -558,12 +561,12 @@ stack_double(OnigStackType** arg_stk_base, OnigStackType** arg_stk_end,
 } while(0)
 #endif /* USE_COMBINATION_EXPLOSION_CHECK */
 
-#define STACK_PUSH_ALT(pat,s,sprev)     STACK_PUSH(STK_ALT,pat,s,sprev)
-#define STACK_PUSH_POS(s,sprev)         STACK_PUSH(STK_POS,NULL_UCHARP,s,sprev)
-#define STACK_PUSH_POS_NOT(pat,s,sprev) STACK_PUSH(STK_POS_NOT,pat,s,sprev)
+#define STACK_PUSH_ALT(pat,s,sprev,keep)     STACK_PUSH(STK_ALT,pat,s,sprev,keep)
+#define STACK_PUSH_POS(s,sprev,keep)         STACK_PUSH(STK_POS,NULL_UCHARP,s,sprev,keep)
+#define STACK_PUSH_POS_NOT(pat,s,sprev,keep) STACK_PUSH(STK_POS_NOT,pat,s,sprev,keep)
 #define STACK_PUSH_STOP_BT              STACK_PUSH_TYPE(STK_STOP_BT)
-#define STACK_PUSH_LOOK_BEHIND_NOT(pat,s,sprev) \
-        STACK_PUSH(STK_LOOK_BEHIND_NOT,pat,s,sprev)
+#define STACK_PUSH_LOOK_BEHIND_NOT(pat,s,sprev,keep) \
+        STACK_PUSH(STK_LOOK_BEHIND_NOT,pat,s,sprev,keep)
 
 #define STACK_PUSH_REPEAT(id, pat) do {\
   STACK_ENSURE(1);\
@@ -1252,6 +1255,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
   OnigCaseFoldType case_fold_flag = reg->case_fold_flag;
   UChar *s, *q, *sbegin;
   UChar *p = reg->p;
+  UChar *pkeep;
   char *alloca_base;
   OnigStackType *stk_alloc, *stk_base, *stk, *stk_end;
   OnigStackType *stkp; /* used as any purpose. */
@@ -1290,6 +1294,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
   STACK_PUSH_ENSURED(STK_ALT, FinishCode);  /* bottom stack */
   best_len = ONIG_MISMATCH;
   s = (UChar* )sstart;
+  pkeep = (UChar* )sstart;
   while (1) {
 #ifdef ONIG_DEBUG_MATCH
     {
@@ -1334,7 +1339,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  if (IS_POSIX_REGION(msa->options)) {
 	    posix_regmatch_t* rmt = (posix_regmatch_t* )region;
 
-	    rmt[0].rm_so = sstart - str;
+	    rmt[0].rm_so = ((pkeep > s) ? s : pkeep) - str;
 	    rmt[0].rm_eo = s      - str;
 	    for (i = 1; i <= num_mem; i++) {
 	      if (mem_end_stk[i] != INVALID_STACK_INDEX) {
@@ -1354,7 +1359,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  }
 	  else {
 #endif /* USE_POSIX_API_REGION_OPTION */
-	    region->beg[0] = sstart - str;
+	    region->beg[0] = ((pkeep > s) ? s : pkeep) - str;
 	    region->end[0] = s      - str;
 	    for (i = 1; i <= num_mem; i++) {
 	      if (mem_end_stk[i] != INVALID_STACK_INDEX) {
@@ -1387,7 +1392,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
               }
 
               node->group = 0;
-              node->beg   = sstart - str;
+              node->beg   = ((pkeep > s) ? s : pkeep) - str;
               node->end   = s      - str;
 
               stkp = stk_base;
@@ -1800,7 +1805,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
     case OP_ANYCHAR_STAR:  MOP_IN(OP_ANYCHAR_STAR);
       while (DATA_ENSURE_CHECK1) {
-	STACK_PUSH_ALT(p, s, sprev);
+	STACK_PUSH_ALT(p, s, sprev, pkeep);
 	n = enclen(encode, s);
         DATA_ENSURE(n);
         if (ONIGENC_IS_MBC_NEWLINE(encode, s, end))  goto fail;
@@ -1812,7 +1817,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
     case OP_ANYCHAR_ML_STAR:  MOP_IN(OP_ANYCHAR_ML_STAR);
       while (DATA_ENSURE_CHECK1) {
-	STACK_PUSH_ALT(p, s, sprev);
+	STACK_PUSH_ALT(p, s, sprev, pkeep);
 	n = enclen(encode, s);
 	if (n > 1) {
 	  DATA_ENSURE(n);
@@ -1830,7 +1835,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     case OP_ANYCHAR_STAR_PEEK_NEXT:  MOP_IN(OP_ANYCHAR_STAR_PEEK_NEXT);
       while (DATA_ENSURE_CHECK1) {
 	if (*p == *s) {
-	  STACK_PUSH_ALT(p + 1, s, sprev);
+	  STACK_PUSH_ALT(p + 1, s, sprev, pkeep);
 	}
 	n = enclen(encode, s);
         DATA_ENSURE(n);
@@ -1845,7 +1850,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     case OP_ANYCHAR_ML_STAR_PEEK_NEXT:MOP_IN(OP_ANYCHAR_ML_STAR_PEEK_NEXT);
       while (DATA_ENSURE_CHECK1) {
 	if (*p == *s) {
-	  STACK_PUSH_ALT(p + 1, s, sprev);
+	  STACK_PUSH_ALT(p + 1, s, sprev, pkeep);
 	}
 	n = enclen(encode, s);
 	if (n > 1) {
@@ -1869,7 +1874,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	STATE_CHECK_VAL(scv, mem);
 	if (scv) goto fail;
 
-	STACK_PUSH_ALT_WITH_STATE_CHECK(p, s, sprev, mem);
+	STACK_PUSH_ALT_WITH_STATE_CHECK(p, s, sprev, mem, pkeep);
 	n = enclen(encode, s);
         DATA_ENSURE(n);
         if (ONIGENC_IS_MBC_NEWLINE(encode, s, end))  goto fail;
@@ -1887,7 +1892,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	STATE_CHECK_VAL(scv, mem);
 	if (scv) goto fail;
 
-	STACK_PUSH_ALT_WITH_STATE_CHECK(p, s, sprev, mem);
+	STACK_PUSH_ALT_WITH_STATE_CHECK(p, s, sprev, mem, pkeep);
 	n = enclen(encode, s);
 	if (n > 1) {
 	  DATA_ENSURE(n);
@@ -2094,6 +2099,12 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     case OP_MEMORY_END:  MOP_IN(OP_MEMORY_END);
       GET_MEMNUM_INC(mem, p);
       mem_end_stk[mem] = (OnigStackIndex )((void* )s);
+      MOP_OUT;
+      continue;
+      break;
+
+    case OP_KEEP:  MOP_IN(OP_KEEP);
+      pkeep = s;
       MOP_OUT;
       continue;
       break;
@@ -2309,7 +2320,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 #if 0   /* no need: IS_DYNAMIC_OPTION() == 0 */
     case OP_SET_OPTION_PUSH:  MOP_IN(OP_SET_OPTION_PUSH);
       GET_OPTION_INC(option, p);
-      STACK_PUSH_ALT(p, s, sprev);
+      STACK_PUSH_ALT(p, s, sprev, pkeep);
       p += SIZE_OP_SET_OPTION + SIZE_OP_FAIL;
       MOP_OUT;
       continue;
@@ -2423,7 +2434,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
     case OP_PUSH:  MOP_IN(OP_PUSH);
       GET_RELADDR_INC(addr, p);
-      STACK_PUSH_ALT(p + addr, s, sprev);
+      STACK_PUSH_ALT(p + addr, s, sprev, pkeep);
       MOP_OUT;
       continue;
       break;
@@ -2435,7 +2446,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       if (scv) goto fail;
 
       GET_RELADDR_INC(addr, p);
-      STACK_PUSH_ALT_WITH_STATE_CHECK(p + addr, s, sprev, mem);
+      STACK_PUSH_ALT_WITH_STATE_CHECK(p + addr, s, sprev, mem, pkeep);
       MOP_OUT;
       continue;
       break;
@@ -2448,7 +2459,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	p += addr;
       }
       else {
-	STACK_PUSH_ALT_WITH_STATE_CHECK(p + addr, s, sprev, mem);
+	STACK_PUSH_ALT_WITH_STATE_CHECK(p + addr, s, sprev, mem, pkeep);
       }
       MOP_OUT;
       continue;
@@ -2475,7 +2486,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       GET_RELADDR_INC(addr, p);
       if (*p == *s && DATA_ENSURE_CHECK1) {
 	p++;
-	STACK_PUSH_ALT(p + addr, s, sprev);
+	STACK_PUSH_ALT(p + addr, s, sprev, pkeep);
 	MOP_OUT;
 	continue;
       }
@@ -2488,7 +2499,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       GET_RELADDR_INC(addr, p);
       if (*p == *s) {
 	p++;
-	STACK_PUSH_ALT(p + addr, s, sprev);
+	STACK_PUSH_ALT(p + addr, s, sprev, pkeep);
 	MOP_OUT;
 	continue;
       }
@@ -2507,7 +2518,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	STACK_PUSH_REPEAT(mem, p);
 
 	if (reg->repeat_range[mem].lower == 0) {
-	  STACK_PUSH_ALT(p + addr, s, sprev);
+	  STACK_PUSH_ALT(p + addr, s, sprev, pkeep);
 	}
       }
       MOP_OUT;
@@ -2524,7 +2535,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	STACK_PUSH_REPEAT(mem, p);
 
 	if (reg->repeat_range[mem].lower == 0) {
-	  STACK_PUSH_ALT(p, s, sprev);
+	  STACK_PUSH_ALT(p, s, sprev, pkeep);
 	  p += addr;
 	}
       }
@@ -2543,7 +2554,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
         /* end of repeat. Nothing to do. */
       }
       else if (stkp->u.repeat.count >= reg->repeat_range[mem].lower) {
-        STACK_PUSH_ALT(p, s, sprev);
+        STACK_PUSH_ALT(p, s, sprev, pkeep);
         p = STACK_AT(si)->u.repeat.pcode; /* Don't use stkp after PUSH. */
       }
       else {
@@ -2574,7 +2585,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
           UChar* pcode = stkp->u.repeat.pcode;
 
           STACK_PUSH_REPEAT_INC(si);
-          STACK_PUSH_ALT(pcode, s, sprev);
+          STACK_PUSH_ALT(pcode, s, sprev, pkeep);
         }
         else {
           p = stkp->u.repeat.pcode;
@@ -2597,7 +2608,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       break;
 
     case OP_PUSH_POS:  MOP_IN(OP_PUSH_POS);
-      STACK_PUSH_POS(s, sprev);
+      STACK_PUSH_POS(s, sprev, pkeep);
       MOP_OUT;
       continue;
       break;
@@ -2614,7 +2625,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
     case OP_PUSH_POS_NOT:  MOP_IN(OP_PUSH_POS_NOT);
       GET_RELADDR_INC(addr, p);
-      STACK_PUSH_POS_NOT(p + addr, s, sprev);
+      STACK_PUSH_POS_NOT(p + addr, s, sprev, pkeep);
       MOP_OUT;
       continue;
       break;
@@ -2656,7 +2667,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	/* goto fail; */
       }
       else {
-	STACK_PUSH_LOOK_BEHIND_NOT(p + addr, s, sprev);
+	STACK_PUSH_LOOK_BEHIND_NOT(p + addr, s, sprev, pkeep);
 	s = q;
 	sprev = (UChar* )onigenc_get_prev_char_head(encode, str, s);
       }
@@ -2698,6 +2709,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       p     = stk->u.state.pcode;
       s     = stk->u.state.pstr;
       sprev = stk->u.state.pstr_prev;
+      pkeep = stk->u.state.pkeep;
 
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
       if (stk->u.state.state_check != 0) {

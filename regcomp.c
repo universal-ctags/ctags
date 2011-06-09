@@ -1420,6 +1420,7 @@ compile_anchor_node(AnchorNode* node, regex_t* reg)
   case ANCHOR_WORD_BEGIN:     r = add_opcode(reg, OP_WORD_BEGIN);     break;
   case ANCHOR_WORD_END:       r = add_opcode(reg, OP_WORD_END);       break;
 #endif
+  case ANCHOR_KEEP:           r = add_opcode(reg, OP_KEEP);           break;
 
   case ANCHOR_PREC_READ:
     r = add_opcode(reg, OP_PUSH_POS);
@@ -6180,6 +6181,7 @@ print_indent_tree(FILE* f, Node* node, int indent)
     case ANCHOR_PREC_READ_NOT:   fputs("prec read not",  f); break;
     case ANCHOR_LOOK_BEHIND:     fputs("look_behind",    f); break;
     case ANCHOR_LOOK_BEHIND_NOT: fputs("look_behind_not",f); break;
+    case ANCHOR_KEEP:            fputs("keep",f);            break;
 
     default:
       fprintf(f, "ERROR: undefined anchor type.\n");

@@ -439,6 +439,8 @@ typedef struct _BBuf {
 #define ANCHOR_ANYCHAR_STAR     (1<<14)   /* ".*" optimize info */
 #define ANCHOR_ANYCHAR_STAR_ML  (1<<15)   /* ".*" optimize info (multi-line) */
 
+#define ANCHOR_KEEP             (1<<16)
+
 /* operation code */
 enum OpCode {
   OP_FINISH = 0,        /* matching process terminator (no more alternative) */
@@ -503,6 +505,8 @@ enum OpCode {
   OP_MEMORY_END_PUSH_REC, /* push back-tracker to stack */
   OP_MEMORY_END,
   OP_MEMORY_END_REC,      /* push marker to stack */
+
+  OP_KEEP,
 
   OP_FAIL,               /* pop stack and move */
   OP_JUMP,
@@ -700,6 +704,7 @@ typedef struct _OnigStackType {
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
       unsigned int state_check;
 #endif
+      UChar *pkeep;      /* keep pattern position */
     } state;
     struct {
       int   count;       /* for OP_REPEAT_INC, OP_REPEAT_INC_NG */

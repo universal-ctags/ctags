@@ -2260,6 +2260,7 @@ enum TokenSyms {
   TK_CHAR_PROPERTY,    /* \p{...}, \P{...} */
   TK_LINEBREAK,
   TK_EXTENDED_GRAPHEME_CLUSTER,
+  TK_KEEP,
   /* in cc */
   TK_CC_CLOSE,
   TK_CC_RANGE,
@@ -3576,6 +3577,12 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
     case 'X':
       if (IS_SYNTAX_OP2(syn, ONIG_SYN_OP2_ESC_CAPITAL_X_EXTENDED_GRAPHEME_CLUSTER)) {
 	tok->type = TK_EXTENDED_GRAPHEME_CLUSTER;
+      }
+      break;
+
+    case 'K':
+      if (IS_SYNTAX_OP2(syn, ONIG_SYN_OP2_ESC_CAPITAL_K_KEEP)) {
+	tok->type = TK_KEEP;
       }
       break;
 
@@ -5229,6 +5236,11 @@ parse_exp(Node** np, OnigToken* tok, int term,
   case TK_EXTENDED_GRAPHEME_CLUSTER:
     r = node_extended_grapheme_cluster(np, env);
     if (r < 0) return r;
+    break;
+
+  case TK_KEEP:
+    *np = onig_node_new_anchor(ANCHOR_KEEP);
+    CHECK_NULL_RETURN_MEMERR(*np);
     break;
 
   case TK_STRING:
