@@ -3658,6 +3658,7 @@ setup_tree(Node* node, regex_t* reg, int state, ScanEnv* env)
   int type;
   int r = 0;
 
+restart:
   type = NTYPE(node);
   switch (type) {
   case NT_LIST:
@@ -3874,6 +3875,7 @@ setup_tree(Node* node, regex_t* reg, int state, ScanEnv* env)
 	  if (r > 0) return ONIGERR_INVALID_LOOK_BEHIND_PATTERN;
 	  r = setup_look_behind(node, reg, env);
 	  if (r != 0) return r;
+	  if (NTYPE(node) != NT_ANCHOR) goto restart;
 	  r = setup_tree(an->target, reg, state, env);
 	}
 	break;
@@ -3886,6 +3888,7 @@ setup_tree(Node* node, regex_t* reg, int state, ScanEnv* env)
 	  if (r > 0) return ONIGERR_INVALID_LOOK_BEHIND_PATTERN;
 	  r = setup_look_behind(node, reg, env);
 	  if (r != 0) return r;
+	  if (NTYPE(node) != NT_ANCHOR) goto restart;
 	  r = setup_tree(an->target, reg, (state | IN_NOT), env);
 	}
 	break;
