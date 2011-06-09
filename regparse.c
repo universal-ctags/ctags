@@ -2258,6 +2258,7 @@ enum TokenSyms {
   TK_CC_OPEN,
   TK_QUOTE_OPEN,
   TK_CHAR_PROPERTY,    /* \p{...}, \P{...} */
+  TK_LINEBREAK,
   /* in cc */
   TK_CC_CLOSE,
   TK_CC_RANGE,
@@ -3562,6 +3563,12 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	  else
 	    PUNFETCH;
 	}
+      }
+      break;
+
+    case 'R':
+      if (IS_SYNTAX_OP2(syn, ONIG_SYN_OP2_ESC_CAPITAL_R_LINEBREAK)) {
+	tok->type = TK_LINEBREAK;
       }
       break;
 
@@ -5032,6 +5039,61 @@ i_apply_case_fold(OnigCodePoint from, OnigCodePoint to[],
 }
 
 static int
+node_linebreak(Node** np, ScanEnv* env)
+{
+  /* same as (?>\x0D\x0A|[\x0A-\x0D\x{85}\x{2028}\x{2029}]) */
+  Node* left = NULL;
+  Node* right = NULL;
+  Node* target1 = NULL;
+  Node* target2 = NULL;
+  CClassNode* cc;
+  int num1, num2;
+  UChar buf[ONIGENC_CODE_TO_MBC_MAXLEN * 2];
+
+  /* \x0D\x0A */
+  num1 = ONIGENC_CODE_TO_MBC(env->enc, 0x0D, buf);
+  if (num1 < 0) return num1;
+  num2 = ONIGENC_CODE_TO_MBC(env->enc, 0x0A, buf + num1);
+  if (num2 < 0) return num2;
+  left = node_new_str_raw(buf, buf + num1 + num2);
+  if (IS_NULL(left)) goto err;
+
+  /* [\x0A-\x0D] or [\x0A-\x0D\x{85}\x{2028}\x{2029}] */
+  right = node_new_cclass();
+  if (IS_NULL(right)) goto err;
+  cc = NCCLASS(right);
+  add_code_range(&(cc->mbuf), env, 0x0A, 0x0D);
+  bitset_set_range(cc->bs, 0x0A, 0x0D);
+
+#ifdef USE_UNICODE_ALL_LINE_TERMINATORS
+  if (onig_strncmp((UChar* )env->enc->name, (UChar* )"UTF", 3) == 0) {
+    /* UTF-8, UTF-16BE/LE, UTF-32BE/LE */
+    add_code_range(&(cc->mbuf), env, 0x85, 0x85);
+    add_code_range(&(cc->mbuf), env, 0x2028, 0x2029);
+  }
+#endif
+
+  /* ...|... */
+  target1 = onig_node_new_alt(right, NULL_NODE);
+  if (IS_NULL(target1)) goto err;
+  target2 = onig_node_new_alt(left, target1);
+  if (IS_NULL(target2)) goto err;
+
+  /* (?>...) */
+  *np = node_new_enclose(ENCLOSE_STOP_BACKTRACK);
+  if (IS_NULL(*np)) goto err;
+  NENCLOSE(*np)->target = target2;
+  return ONIG_NORMAL;
+
+ err:
+  if (IS_NOT_NULL(left))    onig_node_free(left);
+  if (IS_NOT_NULL(right))   onig_node_free(right);
+  if (IS_NOT_NULL(target1)) onig_node_free(target1);
+  if (IS_NOT_NULL(target2)) onig_node_free(target2);
+  return ONIGERR_MEMORY;
+}
+
+static int
 parse_exp(Node** np, OnigToken* tok, int term,
 	  UChar** src, UChar* end, ScanEnv* env)
 {
@@ -5076,6 +5138,11 @@ parse_exp(Node** np, OnigToken* tok, int term,
 
     if (tok->escaped) goto tk_raw_byte;
     else goto tk_byte;
+    break;
+
+  case TK_LINEBREAK:
+    r = node_linebreak(np, env);
+    if (r < 0) return r;
     break;
 
   case TK_STRING:
