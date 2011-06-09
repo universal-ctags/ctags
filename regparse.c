@@ -5103,42 +5103,6 @@ node_linebreak(Node** np, ScanEnv* env)
 static int
 node_extended_grapheme_cluster(Node** np, ScanEnv* env)
 {
-#if 0
-  /* same as (?:\P{M}\p{M}*) */
-  UChar* p;
-  UChar* end;
-  OnigToken tok;
-  OnigEncoding prevenc = env->enc;
-  int r;
-
-  if (onig_strncmp((UChar* )env->enc->name, (UChar* )"UTF", 3) == 0) {
-    env->enc = ONIG_ENCODING_UTF8;
-
-    p = (UChar* )"(?:\\P{M}\\p{M}*)";
-    end = p + strlen((char* )p);
-    r = fetch_token(&tok, &p, end, env);
-    if (r >= 0) {
-      r = parse_subexp(np, &tok, TK_EOT, &p, end, env);
-    }
-    env->enc = prevenc;
-  }
-  if (IS_NULL(*np)) {
-    /* (?s:.) */
-    OnigOptionType option;
-    Node* target = node_new_anychar();
-    if (IS_NULL(target)) return ONIGERR_MEMORY;
-
-    option = env->option;
-    ONOFF(option, ONIG_OPTION_MULTILINE, 0);
-    *np = node_new_option(option);
-    if (IS_NULL(*np)) {
-      onig_node_free(target);
-      return ONIGERR_MEMORY;
-    }
-    NENCLOSE(*np)->target = target;
-  }
-  return ONIG_NORMAL;
-#else
   /* same as (?:\P{M}\p{M}*) */
   Node* np1 = NULL;
   Node* np2 = NULL;
@@ -5208,7 +5172,6 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
   if (IS_NOT_NULL(list1)) onig_node_free(list1);
   if (IS_NOT_NULL(list2)) onig_node_free(list2);
   return (r == 0) ? ONIGERR_MEMORY : r;
-#endif
 }
 
 static int
