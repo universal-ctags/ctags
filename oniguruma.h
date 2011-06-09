@@ -458,10 +458,11 @@ ONIG_EXTERN OnigSyntaxType*   OnigDefaultSyntax;
 #define ONIG_SYN_OP_ESC_OCTAL3                  (1U<<28)  /* \OOO */
 #define ONIG_SYN_OP_ESC_X_HEX2                  (1U<<29)  /* \xHH */
 #define ONIG_SYN_OP_ESC_X_BRACE_HEX8            (1U<<30)  /* \x{7HHHHHHH} */
+#define ONIG_SYN_OP_ESC_O_BRACE_OCTAL           (1U<<31)  /* \o{OOO} */ /* NOTIMPL */
 
 #define ONIG_SYN_OP2_ESC_CAPITAL_Q_QUOTE        (1U<<0)  /* \Q...\E */
 #define ONIG_SYN_OP2_QMARK_GROUP_EFFECT         (1U<<1)  /* (?...) */
-#define ONIG_SYN_OP2_OPTION_PERL                (1U<<2)  /* (?imsx),(?-imsx) */
+#define ONIG_SYN_OP2_OPTION_PERL                (1U<<2)  /* (?imsxadlu), (?-imsx), (?^imsxalu) */
 #define ONIG_SYN_OP2_OPTION_RUBY                (1U<<3)  /* (?imx), (?-imx)  */
 #define ONIG_SYN_OP2_PLUS_POSSESSIVE_REPEAT     (1U<<4)  /* ?+,*+,++ */
 #define ONIG_SYN_OP2_PLUS_POSSESSIVE_INTERVAL   (1U<<5)  /* {n,m}+   */
@@ -480,6 +481,17 @@ ONIG_EXTERN OnigSyntaxType*   OnigDefaultSyntax;
 /* #define ONIG_SYN_OP2_CHAR_PROPERTY_PREFIX_IS (1U<<18) */
 #define ONIG_SYN_OP2_ESC_H_XDIGIT               (1U<<19) /* \h, \H */
 #define ONIG_SYN_OP2_INEFFECTIVE_ESCAPE         (1U<<20) /* \ */
+#define ONIG_SYN_OP2_ESC_CAPITAL_R_LINEBREAK    (1U<<21) /* \R as (?>\x0D\x0A|[\x0A-\x0D\x{85}\x{2028}\x{2029}]) */
+#define ONIG_SYN_OP2_ESC_CAPITAL_X_EXTENDED_GRAPHEME_CLUSTER (1U<<22) /* \X as (?:\P{M}\p{M}*) */
+#define ONIG_SYN_OP2_ESC_V_VERTICAL_WHITESPACE   (1U<<23) /* \v, \V -- Perl */ /* NOTIMPL */
+#define ONIG_SYN_OP2_ESC_H_HORIZONTAL_WHITESPACE (1U<<24) /* \h, \H -- Perl */ /* NOTIMPL */
+#define ONIG_SYN_OP2_ESC_CAPITAL_K_KEEP         (1U<<25) /* \K */
+#define ONIG_SYN_OP2_ESC_G_BRACE_BACKREF        (1U<<26) /* \g{name}, \g{n} */ /* NOTIMPL */
+#define ONIG_SYN_OP2_QMARK_SUBEXP_CALL          (1U<<27) /* (?&name), (?n), (?R), (?0) */
+#define ONIG_SYN_OP2_QMARK_BAR_BRANCH_RESET     (1U<<28) /* (?|...) */         /* NOTIMPL */
+#define ONIG_SYN_OP2_QMARK_LPAREN_CONDITION     (1U<<29) /* (?(cond)yes...|no...) */ /* NOTIMPL */
+#define ONIG_SYN_OP2_QMARK_CAPITAL_P_NAMED_GROUP (1U<<30) /* (?P<name>...), (?P=name), (?P>name) -- Python/PCRE */ /* NOTIMPL */
+#define ONIG_SYN_OP2_OPTION_JAVA                (1U<<31) /* (?idmsux), (?-idmsux) */ /* NOTIMPL */
 
 /* syntax (behavior) */
 #define ONIG_SYN_CONTEXT_INDEP_ANCHORS           (1U<<31) /* not implemented */
@@ -493,6 +505,7 @@ ONIG_EXTERN OnigSyntaxType*   OnigDefaultSyntax;
 #define ONIG_SYN_CAPTURE_ONLY_NAMED_GROUP        (1U<<7)  /* see doc/RE */
 #define ONIG_SYN_ALLOW_MULTIPLEX_DEFINITION_NAME (1U<<8)  /* (?<x>)(?<x>) */
 #define ONIG_SYN_FIXED_INTERVAL_IS_GREEDY_ONLY   (1U<<9)  /* a{n}?=(?:a{n})? */
+#define ONIG_SYN_CAPTURE_LEFT_MOST_NAMED_GROUP   (1U<<10) /* as Perl */ /* NOTIMPL */
 
 /* syntax (behavior) in char class [...] */
 #define ONIG_SYN_NOT_NEWLINE_IN_NEGATIVE_CC      (1U<<20) /* [^...] */
