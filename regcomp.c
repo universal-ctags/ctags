@@ -1414,11 +1414,23 @@ compile_anchor_node(AnchorNode* node, regex_t* reg)
   case ANCHOR_SEMI_END_BUF:   r = add_opcode(reg, OP_SEMI_END_BUF);   break;
   case ANCHOR_BEGIN_POSITION: r = add_opcode(reg, OP_BEGIN_POSITION); break;
 
-  case ANCHOR_WORD_BOUND:     r = add_opcode(reg, OP_WORD_BOUND);     break;
-  case ANCHOR_NOT_WORD_BOUND: r = add_opcode(reg, OP_NOT_WORD_BOUND); break;
+  case ANCHOR_WORD_BOUND:
+    if (node->ascii_range)    r = add_opcode(reg, OP_ASCII_WORD_BOUND);
+    else                      r = add_opcode(reg, OP_WORD_BOUND);
+    break;
+  case ANCHOR_NOT_WORD_BOUND:
+    if (node->ascii_range)    r = add_opcode(reg, OP_NOT_ASCII_WORD_BOUND);
+    else                      r = add_opcode(reg, OP_NOT_WORD_BOUND);
+    break;
 #ifdef USE_WORD_BEGIN_END
-  case ANCHOR_WORD_BEGIN:     r = add_opcode(reg, OP_WORD_BEGIN);     break;
-  case ANCHOR_WORD_END:       r = add_opcode(reg, OP_WORD_END);       break;
+  case ANCHOR_WORD_BEGIN:
+    if (node->ascii_range)    r = add_opcode(reg, OP_ASCII_WORD_BEGIN);
+    else                      r = add_opcode(reg, OP_WORD_BEGIN);
+    break;
+  case ANCHOR_WORD_END:
+    if (node->ascii_range)    r = add_opcode(reg, OP_ASCII_WORD_END);
+    else                      r = add_opcode(reg, OP_WORD_END);
+    break;
 #endif
   case ANCHOR_KEEP:           r = add_opcode(reg, OP_KEEP);           break;
 
@@ -1638,8 +1650,14 @@ compile_tree(Node* node, regex_t* reg)
 
       switch (NCTYPE(node)->ctype) {
       case ONIGENC_CTYPE_WORD:
-	if (NCTYPE(node)->not != 0)  op = OP_NOT_WORD;
-	else                         op = OP_WORD;
+	if (NCTYPE(node)->ascii_range != 0) {
+	  if (NCTYPE(node)->not != 0)  op = OP_NOT_ASCII_WORD;
+	  else                         op = OP_ASCII_WORD;
+	}
+	else {
+	  if (NCTYPE(node)->not != 0)  op = OP_NOT_WORD;
+	  else                         op = OP_WORD;
+	}
 	break;
       default:
 	return ONIGERR_TYPE_BUG;

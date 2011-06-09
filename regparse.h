@@ -236,6 +236,7 @@ typedef struct {
   int type;
   struct _Node* target;
   int char_len;
+  int ascii_range;
 } AnchorNode;
 
 typedef struct {
@@ -248,6 +249,7 @@ typedef struct {
   NodeBase base;
   int ctype;
   int not;
+  int ascii_range;
 } CtypeNode;
 
 typedef struct _Node {

@@ -1186,7 +1186,7 @@ node_new_cclass_by_codepoint_range(int not, OnigCodePoint sb_out,
 }
 
 static Node*
-node_new_ctype(int type, int not)
+node_new_ctype(int type, int not, int ascii_range)
 {
   Node* node = node_new();
   CHECK_NULL_RETURN(node);
@@ -1194,6 +1194,7 @@ node_new_ctype(int type, int not)
   SET_NTYPE(node, NT_CTYPE);
   NCTYPE(node)->ctype = type;
   NCTYPE(node)->not   = not;
+  NCTYPE(node)->ascii_range = ascii_range;
   return node;
 }
 
@@ -1265,6 +1266,7 @@ onig_node_new_anchor(int type)
   NANCHOR(node)->type     = type;
   NANCHOR(node)->target   = NULL;
   NANCHOR(node)->char_len = -1;
+  NANCHOR(node)->ascii_range = 0;
   return node;
 }
 
@@ -2278,8 +2280,10 @@ typedef struct {
     UChar* s;
     int   c;
     OnigCodePoint code;
-    int   anchor;
-    int   subtype;
+    struct {
+      int subtype;
+      int ascii_range;
+    } anchor;
     struct {
       int lower;
       int upper;
@@ -3245,26 +3249,30 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
     case 'b':
       if (! IS_SYNTAX_OP(syn, ONIG_SYN_OP_ESC_B_WORD_BOUND)) break;
       tok->type = TK_ANCHOR;
-      tok->u.anchor = ANCHOR_WORD_BOUND;
+      tok->u.anchor.subtype = ANCHOR_WORD_BOUND;
+      tok->u.anchor.ascii_range = IS_ASCII_RANGE(env->option);
       break;
 
     case 'B':
       if (! IS_SYNTAX_OP(syn, ONIG_SYN_OP_ESC_B_WORD_BOUND)) break;
       tok->type = TK_ANCHOR;
-      tok->u.anchor = ANCHOR_NOT_WORD_BOUND;
+      tok->u.anchor.subtype = ANCHOR_NOT_WORD_BOUND;
+      tok->u.anchor.ascii_range = IS_ASCII_RANGE(env->option);
       break;
 
 #ifdef USE_WORD_BEGIN_END
     case '<':
       if (! IS_SYNTAX_OP(syn, ONIG_SYN_OP_ESC_LTGT_WORD_BEGIN_END)) break;
       tok->type = TK_ANCHOR;
-      tok->u.anchor = ANCHOR_WORD_BEGIN;
+      tok->u.anchor.subtype = ANCHOR_WORD_BEGIN;
+      tok->u.anchor.ascii_range = IS_ASCII_RANGE(env->option);
       break;
 
     case '>':
       if (! IS_SYNTAX_OP(syn, ONIG_SYN_OP_ESC_LTGT_WORD_BEGIN_END)) break;
       tok->type = TK_ANCHOR;
-      tok->u.anchor = ANCHOR_WORD_END;
+      tok->u.anchor.subtype = ANCHOR_WORD_END;
+      tok->u.anchor.ascii_range = IS_ASCII_RANGE(env->option);
       break;
 #endif
 
@@ -3314,26 +3322,26 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
       if (! IS_SYNTAX_OP(syn, ONIG_SYN_OP_ESC_AZ_BUF_ANCHOR)) break;
     begin_buf:
       tok->type = TK_ANCHOR;
-      tok->u.subtype = ANCHOR_BEGIN_BUF;
+      tok->u.anchor.subtype = ANCHOR_BEGIN_BUF;
       break;
 
     case 'Z':
       if (! IS_SYNTAX_OP(syn, ONIG_SYN_OP_ESC_AZ_BUF_ANCHOR)) break;
       tok->type = TK_ANCHOR;
-      tok->u.subtype = ANCHOR_SEMI_END_BUF;
+      tok->u.anchor.subtype = ANCHOR_SEMI_END_BUF;
       break;
 
     case 'z':
       if (! IS_SYNTAX_OP(syn, ONIG_SYN_OP_ESC_AZ_BUF_ANCHOR)) break;
     end_buf:
       tok->type = TK_ANCHOR;
-      tok->u.subtype = ANCHOR_END_BUF;
+      tok->u.anchor.subtype = ANCHOR_END_BUF;
       break;
 
     case 'G':
       if (! IS_SYNTAX_OP(syn, ONIG_SYN_OP_ESC_CAPITAL_G_BEGIN_ANCHOR)) break;
       tok->type = TK_ANCHOR;
-      tok->u.subtype = ANCHOR_BEGIN_POSITION;
+      tok->u.anchor.subtype = ANCHOR_BEGIN_POSITION;
       break;
 
     case '`':
@@ -3770,15 +3778,15 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
     case '^':
       if (! IS_SYNTAX_OP(syn, ONIG_SYN_OP_LINE_ANCHOR)) break;
       tok->type = TK_ANCHOR;
-      tok->u.subtype = (IS_SINGLELINE(env->option)
-			? ANCHOR_BEGIN_BUF : ANCHOR_BEGIN_LINE);
+      tok->u.anchor.subtype = (IS_SINGLELINE(env->option)
+			       ? ANCHOR_BEGIN_BUF : ANCHOR_BEGIN_LINE);
       break;
 
     case '$':
       if (! IS_SYNTAX_OP(syn, ONIG_SYN_OP_LINE_ANCHOR)) break;
       tok->type = TK_ANCHOR;
-      tok->u.subtype = (IS_SINGLELINE(env->option)
-			? ANCHOR_SEMI_END_BUF : ANCHOR_END_LINE);
+      tok->u.anchor.subtype = (IS_SINGLELINE(env->option)
+			       ? ANCHOR_SEMI_END_BUF : ANCHOR_END_LINE);
       break;
 
     case '[':
@@ -3896,19 +3904,22 @@ add_ctype_to_cc_by_range(CClassNode* cc, int ctype ARG_UNUSED, int not,
 }
 
 static int
-add_ctype_to_cc(CClassNode* cc, int ctype, int not, ScanEnv* env)
+add_ctype_to_cc(CClassNode* cc, int ctype, int not, int char_prop, ScanEnv* env)
 {
   int c, r;
   const OnigCodePoint *ranges;
   OnigCodePoint sb_out;
   OnigEncoding enc = env->enc;
+  OnigOptionType option = env->option;
 
-  r = ONIGENC_GET_CTYPE_CODE_RANGE(enc, ctype, &sb_out, &ranges);
-  if (r == 0) {
-    return add_ctype_to_cc_by_range(cc, ctype, not, env->enc, sb_out, ranges);
-  }
-  else if (r != ONIG_NO_SUPPORT_CONFIG) {
-    return r;
+  if ((char_prop != 0) || ! IS_ASCII_RANGE(option)) {
+    r = ONIGENC_GET_CTYPE_CODE_RANGE(enc, ctype, &sb_out, &ranges);
+    if (r == 0) {
+      return add_ctype_to_cc_by_range(cc, ctype, not, env->enc, sb_out, ranges);
+    }
+    else if (r != ONIG_NO_SUPPORT_CONFIG) {
+      return r;
+    }
   }
 
   r = 0;
@@ -3946,13 +3957,16 @@ add_ctype_to_cc(CClassNode* cc, int ctype, int not, ScanEnv* env)
 	if (! ONIGENC_IS_CODE_CTYPE(enc, (OnigCodePoint )c, ctype))
 	  BITSET_SET_BIT(cc->bs, c);
       }
+      if (IS_ASCII_RANGE(option))
+        ADD_ALL_MULTI_BYTE_RANGE(enc, cc->mbuf);
     }
     else {
       for (c = 0; c < SINGLE_BYTE_SIZE; c++) {
 	if (ONIGENC_IS_CODE_CTYPE(enc, (OnigCodePoint )c, ctype))
 	  BITSET_SET_BIT(cc->bs, c);
       }
-      ADD_ALL_MULTI_BYTE_RANGE(enc, cc->mbuf);
+      if (! IS_ASCII_RANGE(option))
+        ADD_ALL_MULTI_BYTE_RANGE(enc, cc->mbuf);
     }
     break;
 
@@ -3961,7 +3975,8 @@ add_ctype_to_cc(CClassNode* cc, int ctype, int not, ScanEnv* env)
       for (c = 0; c < SINGLE_BYTE_SIZE; c++) {
 	if (IS_CODE_SB_WORD(enc, c)) BITSET_SET_BIT(cc->bs, c);
       }
-      ADD_ALL_MULTI_BYTE_RANGE(enc, cc->mbuf);
+      if (! IS_ASCII_RANGE(option))
+        ADD_ALL_MULTI_BYTE_RANGE(enc, cc->mbuf);
     }
     else {
       for (c = 0; c < SINGLE_BYTE_SIZE; c++) {
@@ -3969,6 +3984,8 @@ add_ctype_to_cc(CClassNode* cc, int ctype, int not, ScanEnv* env)
 	    && ! ONIGENC_IS_CODE_WORD(enc, c))
 	  BITSET_SET_BIT(cc->bs, c);
       }
+      if (IS_ASCII_RANGE(option))
+        ADD_ALL_MULTI_BYTE_RANGE(enc, cc->mbuf);
     }
     break;
 
@@ -4027,7 +4044,7 @@ parse_posix_bracket(CClassNode* cc, UChar** src, UChar* end, ScanEnv* env)
       if (onigenc_with_ascii_strncmp(enc, p, end, (UChar* )":]", 2) != 0)
 	return ONIGERR_INVALID_POSIX_BRACKET_TYPE;
 
-      r = add_ctype_to_cc(cc, pb->ctype, not, env);
+      r = add_ctype_to_cc(cc, pb->ctype, not, 0, env);
       if (r != 0) return r;
 
       PINC; PINC;
@@ -4100,7 +4117,7 @@ parse_char_property(Node** np, OnigToken* tok, UChar** src, UChar* end,
   *np = node_new_cclass();
   CHECK_NULL_RETURN_MEMERR(*np);
   cc = NCCLASS(*np);
-  r = add_ctype_to_cc(cc, ctype, 0, env);
+  r = add_ctype_to_cc(cc, ctype, 0, 1, env);
   if (r != 0) return r;
   if (tok->u.prop.not != 0) NCCLASS_SET_NOT(cc);
 
@@ -4392,7 +4409,7 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
       break;
 
     case TK_CHAR_TYPE:
-      r = add_ctype_to_cc(cc, tok->u.prop.ctype, tok->u.prop.not, env);
+      r = add_ctype_to_cc(cc, tok->u.prop.ctype, tok->u.prop.not, 0, env);
       if (r != 0) return r;
 
     next_class:
@@ -4406,7 +4423,7 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
 
 	ctype = fetch_char_property_to_ctype(&p, end, env);
 	if (ctype < 0) return ctype;
-	r = add_ctype_to_cc(cc, ctype, tok->u.prop.not, env);
+	r = add_ctype_to_cc(cc, ctype, tok->u.prop.not, 1, env);
 	if (r != 0) return r;
 	goto next_class;
       }
@@ -4710,10 +4727,25 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
       }
       break;
 
+    case '^':   /* loads default options */
+      if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_PERL)) {
+	/* d-imsx */
+	ONOFF(option, ONIG_OPTION_ASCII_RANGE, 1);
+	ONOFF(option, ONIG_OPTION_IGNORECASE, 1);
+	ONOFF(option, ONIG_OPTION_SINGLELINE, 0);
+	ONOFF(option, ONIG_OPTION_MULTILINE,  1);
+	ONOFF(option, ONIG_OPTION_EXTEND, 1);
+	PFETCH(c);
+      }
+      else {
+	return ONIGERR_UNDEFINED_GROUP_OPTION;
+      }
+      /* fall through */
 #ifdef USE_POSIXLINE_OPTION
     case 'p':
 #endif
     case '-': case 'i': case 'm': case 's': case 'x':
+    case 'a': case 'd': case 'l': case 'u':
       {
 	int neg = 0;
 
@@ -4749,6 +4781,23 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	    ONOFF(option, ONIG_OPTION_MULTILINE|ONIG_OPTION_SINGLELINE, neg);
 	    break;
 #endif
+
+	  case 'a':     /* limits \d, \s, \w and POSIX brackets into ASCII range */
+	    if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_PERL) && (neg == 0)) {
+	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 0);
+	    }
+	    else
+	      return ONIGERR_UNDEFINED_GROUP_OPTION;
+	    break;
+
+	  case 'd': case 'l': case 'u':
+	    if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_PERL) && (neg == 0)) {
+	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 1);
+	    }
+	    else
+	      return ONIGERR_UNDEFINED_GROUP_OPTION;
+	    break;
+
 	  default:
 	    return ONIGERR_UNDEFINED_GROUP_OPTION;
 	  }
@@ -5394,7 +5443,8 @@ parse_exp(Node** np, OnigToken* tok, int term,
     {
       switch (tok->u.prop.ctype) {
       case ONIGENC_CTYPE_WORD:
-	*np = node_new_ctype(tok->u.prop.ctype, tok->u.prop.not);
+	*np = node_new_ctype(tok->u.prop.ctype, tok->u.prop.not,
+			     IS_ASCII_RANGE(env->option));
 	CHECK_NULL_RETURN_MEMERR(*np);
 	break;
 
@@ -5459,7 +5509,7 @@ parse_exp(Node** np, OnigToken* tok, int term,
             *np = node_new_cclass();
             CHECK_NULL_RETURN_MEMERR(*np);
             cc = NCCLASS(*np);
-            add_ctype_to_cc(cc, tok->u.prop.ctype, 0, env);
+            add_ctype_to_cc(cc, tok->u.prop.ctype, 0, 0, env);
             if (tok->u.prop.not != 0) NCCLASS_SET_NOT(cc);
 #ifdef USE_SHARED_CCLASS_TABLE
           }
@@ -5558,7 +5608,9 @@ parse_exp(Node** np, OnigToken* tok, int term,
 #endif
 
   case TK_ANCHOR:
-    *np = onig_node_new_anchor(tok->u.anchor);
+    *np = onig_node_new_anchor(tok->u.anchor.subtype);
+    CHECK_NULL_RETURN_MEMERR(*np);
+    NANCHOR(*np)->ascii_range = tok->u.anchor.ascii_range;
     break;
 
   case TK_OP_REPEAT:

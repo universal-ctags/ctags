@@ -297,6 +297,7 @@ typedef unsigned int  BitStatusType;
 #define IS_NOTBOL(option)         ((option) & ONIG_OPTION_NOTBOL)
 #define IS_NOTEOL(option)         ((option) & ONIG_OPTION_NOTEOL)
 #define IS_POSIX_REGION(option)   ((option) & ONIG_OPTION_POSIX_REGION)
+#define IS_ASCII_RANGE(option)    ((option) & ONIG_OPTION_ASCII_RANGE)
 
 /* OP_SET_OPTION is required for these options.
 #define IS_DYNAMIC_OPTION(option) \
@@ -484,6 +485,13 @@ enum OpCode {
   OP_NOT_WORD_BOUND,
   OP_WORD_BEGIN,
   OP_WORD_END,
+
+  OP_ASCII_WORD,
+  OP_NOT_ASCII_WORD,
+  OP_ASCII_WORD_BOUND,
+  OP_NOT_ASCII_WORD_BOUND,
+  OP_ASCII_WORD_BEGIN,
+  OP_ASCII_WORD_END,
 
   OP_BEGIN_BUF,
   OP_END_BUF,
