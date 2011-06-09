@@ -2112,6 +2112,9 @@ conv_backslash_value(int c, ScanEnv* env)
   return c;
 }
 
+#ifdef USE_NO_INVALID_QUANTIFIER
+#define is_invalid_quantifier_target(node) 0
+#else
 static int
 is_invalid_quantifier_target(Node* node)
 {
@@ -2143,6 +2146,7 @@ is_invalid_quantifier_target(Node* node)
   }
   return 0;
 }
+#endif
 
 /* ?:0, *:1, +:2, ??:3, *?:4, +?:5 */
 static int

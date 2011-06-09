@@ -65,6 +65,7 @@
 #define USE_WARNING_REDUNDANT_NESTED_REPEAT_OPERATOR
 /* #define USE_RECOMPILE_API */
 /* !!! moved to regenc.h. */ /* #define USE_CRNL_AS_LINE_TERMINATOR */
+#define USE_NO_INVALID_QUANTIFIER
 
 /* internal config */
 #define USE_PARSE_TREE_NODE_RECYCLE
