@@ -1977,7 +1977,7 @@ static int
 and_cclass(CClassNode* dest, CClassNode* cc, OnigEncoding enc)
 {
   int r, not1, not2;
-  BBuf *buf1, *buf2, *pbuf;
+  BBuf *buf1, *buf2, *pbuf = 0;
   BitSetRef bsr1, bsr2;
   BitSet bs1, bs2;
 
@@ -2012,17 +2012,16 @@ and_cclass(CClassNode* dest, CClassNode* cc, OnigEncoding enc)
     else {
       r = and_code_range_buf(buf1, not1, buf2, not2, &pbuf);
       if (r == 0 && not1 != 0) {
-	BBuf *tbuf;
+	BBuf *tbuf = 0;
 	r = not_code_range_buf(enc, pbuf, &tbuf);
-	if (r != 0) {
-	  bbuf_free(pbuf);
-	  return r;
-	}
 	bbuf_free(pbuf);
 	pbuf = tbuf;
       }
     }
-    if (r != 0) return r;
+    if (r != 0) {
+      bbuf_free(pbuf);
+      return r;
+    }
 
     dest->mbuf = pbuf;
     bbuf_free(buf1);
@@ -2035,7 +2034,7 @@ static int
 or_cclass(CClassNode* dest, CClassNode* cc, OnigEncoding enc)
 {
   int r, not1, not2;
-  BBuf *buf1, *buf2, *pbuf;
+  BBuf *buf1, *buf2, *pbuf = 0;
   BitSetRef bsr1, bsr2;
   BitSet bs1, bs2;
 
@@ -2070,17 +2069,16 @@ or_cclass(CClassNode* dest, CClassNode* cc, OnigEncoding enc)
     else {
       r = or_code_range_buf(enc, buf1, not1, buf2, not2, &pbuf);
       if (r == 0 && not1 != 0) {
-	BBuf *tbuf;
+	BBuf *tbuf = 0;
 	r = not_code_range_buf(enc, pbuf, &tbuf);
-	if (r != 0) {
-	  bbuf_free(pbuf);
-	  return r;
-	}
 	bbuf_free(pbuf);
 	pbuf = tbuf;
       }
     }
-    if (r != 0) return r;
+    if (r != 0) {
+      bbuf_free(pbuf);
+      return r;
+    }
 
     dest->mbuf = pbuf;
     bbuf_free(buf1);
