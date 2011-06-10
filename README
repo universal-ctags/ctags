@@ -1,3 +1,17 @@
+README  2011/06/11
+
+Onigmo (Oniguruma-mod)  --  (C) K.Takata <kentkt AT csc DOT jp>
+
+https://github.com/k-takata/Onigmo
+
+Onigmo is a regular expressions library forked from Oniguruma.
+Some of new features introduced in Perl 5.10+ can be used.
+
+Some patches are merged from Ruby 1.9.2.
+
+
+Oniguruma's README follows:
+======================================================================
 README  2007/05/31
 
 Oniguruma  ----   (C) K.Kosako <sndgk393 AT ybb DOT ne DOT jp>

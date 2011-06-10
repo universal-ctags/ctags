@@ -1,4 +1,28 @@
-History
+History of Onigmo (Oniguruma-mod)
+
+2011/06/10: [bug]  char class may cause memory leak
+                   http://redmine.ruby-lang.org/issues/show/4061
+2011/06/10: [bug]  invalid backref number/name
+                   http://redmine.ruby-lang.org/issues/show/2759
+2011/06/10: [bug]  /(?<=a).*b/ =~ "aab" doesn't match
+                   http://redmine.ruby-lang.org/issues/show/3568
+2011/06/10: [bug]  Case Sensitivity in Regular Expressions with Lookbehind
+                   http://redmine.ruby-lang.org/issues/show/4088
+2011/06/10: [spec] allow any target for quantifiers.
+                   add USE_NO_INVALID_QUANTIFIER.
+2011/06/10: [new]  add Perl 5.14 compatible character set modifier:
+                   (?adlu) and (?^alu).
+2011/06/10: [new]  add (?&name), (?n) and (?-n).
+                   add USE_PERL_SUBEXP_CALL.
+2011/06/10: [new]  add \R, \X and \K.
+2011/06/10: [spec] allow negative look behind in look behind.
+2011/06/10: [new]  add: onig_search_gpos().
+
+2011/06/10: fork from Oniguruma 5.9.2.
+
+
+======================================================================
+History of Oniguruma
 
 2010/01/09: Version 5.9.2
 

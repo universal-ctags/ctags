@@ -1,4 +1,4 @@
-Oniguruma API  Version 5.9.2  2008/02/19
+Onigumo (Oniguruma-mod) API  Version 5.9.2  2011/06/10
 
 #include <oniguruma.h>
 
@@ -205,8 +205,11 @@ Oniguruma API  Version 5.9.2  2008/02/19
   1 reg: regex object.
 
 
-# int onig_search(regex_t* reg, const UChar* str, const UChar* end, const UChar* start,
+# long onig_search(regex_t* reg, const UChar* str, const UChar* end, const UChar* start,
                    const UChar* range, OnigRegion* region, OnigOptionType option)
+# long onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
+                   const UChar* global_pos,
+                   const UChar* start, const UChar* range, OnigRegion* region, OnigOptionType option)
 
   Search string and return search result and matching region.
 
@@ -214,22 +217,24 @@ Oniguruma API  Version 5.9.2  2008/02/19
   not found:     ONIG_MISMATCH (< 0)
 
   arguments
-  1 reg:    regex object
-  2 str:    target string
-  3 end:    terminate address of target string
-  4 start:  search start address of target string
-  5 range:  search terminate address of target string
+  1 reg:        regex object
+  2 str:        target string
+  3 end:        terminate address of target string
+  4 global_pos: position of \G
+                if not need, set same value as str.
+  5 start:      search start address of target string
+  6 range:      search terminate address of target string
     in forward search  (start <= searched string < range)
     in backward search (range <= searched string <= start)
-  6 region: address for return group match range info (NULL is allowed)
-  7 option: search time option
+  7 region:     address for return group match range info (NULL is allowed)
+  8 option:     search time option
 
     ONIG_OPTION_NOTBOL        string head(str) isn't considered as begin of line
     ONIG_OPTION_NOTEOL        string end (end) isn't considered as end of line
     ONIG_OPTION_POSIX_REGION  region argument is regmatch_t[] of POSIX API.
 
 
-# int onig_match(regex_t* reg, const UChar* str, const UChar* end, const UChar* at,
+# long onig_match(regex_t* reg, const UChar* str, const UChar* end, const UChar* at,
 		 OnigRegion* region, OnigOptionType option)
 
   Match string and return result and matching region.

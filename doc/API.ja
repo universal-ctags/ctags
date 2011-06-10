@@ -1,4 +1,4 @@
-鬼車インターフェース Version 5.9.2   2008/02/19
+Onigmo インターフェース Version 5.9.2   2011/06/10
 
 #include <oniguruma.h>
 
@@ -206,8 +206,11 @@
 
 
 
-# int onig_search(regex_t* reg, const UChar* str, const UChar* end, const UChar* start,
+# long onig_search(regex_t* reg, const UChar* str, const UChar* end, const UChar* start,
                    const UChar* range, OnigRegion* region, OnigOptionType option)
+# long onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
+                   const UChar* global_pos,
+                   const UChar* start, const UChar* range, OnigRegion* region, OnigOptionType option)
 
   正規表現で文字列を検索し、検索結果とマッチ領域を返す。
 
@@ -215,22 +218,24 @@
   検索失敗:       ONIG_MISMATCH (< 0)
 
   引数
-  1 reg:    正規表現オブジェクト
-  2 str:    検索対象文字列
-  3 end:    検索対象文字列の終端アドレス
-  4 start:  検索対象文字列の検索先頭位置アドレス
-  5 range:  検索対象文字列の検索終了位置アドレス
+  1 reg:        正規表現オブジェクト
+  2 str:        検索対象文字列
+  3 end:        検索対象文字列の終端アドレス
+  4 global_pos: \Gのアドレス
+                不要時はstrと同じ値を設定すること
+  5 start:      検索対象文字列の検索先頭位置アドレス
+  6 range:      検索対象文字列の検索終了位置アドレス
     前方探索  (start <= 探索される文字列 < range)
     後方探索  (range <= 探索される文字列 <= start)
-  6 region: マッチ領域情報(region)  (NULLも許される)
-  7 option: 検索時オプション
+  7 region:     マッチ領域情報(region)  (NULLも許される)
+  8 option:     検索時オプション
 
     ONIG_OPTION_NOTBOL        文字列の先頭(str)を行頭と看做さない
     ONIG_OPTION_NOTEOL        文字列の終端(end)を行末と看做さない
     ONIG_OPTION_POSIX_REGION  region引数をPOSIX APIのregmatch_t[]にする
 
 
-# int onig_match(regex_t* reg, const UChar* str, const UChar* end, const UChar* at,
+# long onig_match(regex_t* reg, const UChar* str, const UChar* end, const UChar* at,
 		 OnigRegion* region, OnigOptionType option)
 
   文字列の指定位置でマッチングを行い、結果とマッチ領域を返す。

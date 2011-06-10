@@ -1,3 +1,17 @@
+README.ja  2011/06/11
+
+Onigmo (Oniguruma-mod)  --  (C) K.Takata <kentkt AT csc DOT jp>
+
+https://github.com/k-takata/Onigmo
+
+Onigmo は、鬼車から派生した正規表現ライブラリである。
+Perl 5.10以降で新たに導入された正規表現の一部が使用可能になっている。
+
+一部のパッチは Ruby 1.9.2 からマージしている。
+
+
+以下、鬼車の README.ja:
+======================================================================
 README.ja  2007/05/31
 
 鬼車  ----   (C) K.Kosako <sndgk393 AT ybb DOT ne DOT jp>
