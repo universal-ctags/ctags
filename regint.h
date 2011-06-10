@@ -49,7 +49,7 @@
 
 #if defined(__i386) || defined(__i386__) || defined(_M_IX86) || \
     (defined(__ppc__) && defined(__APPLE__)) || \
-    defined(__x86_64) || defined(__x86_64__) || \
+    defined(__x86_64) || defined(__x86_64__) || defined(_M_AMD86) || \
     defined(__mc68020__)
 #define PLATFORM_UNALIGNED_WORD_ACCESS
 #endif
@@ -172,7 +172,7 @@
 #include <stdlib.h>
 #endif
 
-#if defined(HAVE_ALLOCA_H) && !defined(__GNUC__)
+#if defined(HAVE_ALLOCA_H) && (defined(_AIX) || !defined(__GNUC__))
 #include <alloca.h>
 #endif
 
@@ -233,13 +233,13 @@
 
 #define GET_ALIGNMENT_PAD_SIZE(addr,pad_size) do {\
   (pad_size) = WORD_ALIGNMENT_SIZE \
-               - ((unsigned int )(addr) % WORD_ALIGNMENT_SIZE);\
+               - ((uintptr_t )(addr) % WORD_ALIGNMENT_SIZE);\
   if ((pad_size) == WORD_ALIGNMENT_SIZE) (pad_size) = 0;\
 } while (0)
 
 #define ALIGNMENT_RIGHT(addr) do {\
   (addr) += (WORD_ALIGNMENT_SIZE - 1);\
-  (addr) -= ((unsigned int )(addr) % WORD_ALIGNMENT_SIZE);\
+  (addr) -= ((uintptr_t )(addr) % WORD_ALIGNMENT_SIZE);\
 } while (0)
 
 #endif /* PLATFORM_UNALIGNED_WORD_ACCESS */
@@ -327,7 +327,7 @@ typedef unsigned char  Bits;
 typedef Bits           BitSet[BITSET_SIZE];
 typedef Bits*          BitSetRef;
 
-#define SIZE_BITSET        sizeof(BitSet)
+#define SIZE_BITSET        (int )sizeof(BitSet)
 
 #define BITSET_CLEAR(bs) do {\
   int i;\
@@ -374,7 +374,7 @@ typedef struct _BBuf {
 } while (0)
 
 #define BBUF_WRITE(buf,pos,bytes,n) do{\
-  int used = (pos) + (n);\
+  int used = (pos) + (int )(n);\
   if ((buf)->alloc < (unsigned int )used) BBUF_EXPAND((buf),used);\
   xmemcpy((buf)->p + (pos), (bytes), (n));\
   if ((buf)->used < (unsigned int )used) (buf)->used = used;\
@@ -568,15 +568,15 @@ typedef short int StateCheckNumType;
 typedef void* PointerType;
 
 #define SIZE_OPCODE           1
-#define SIZE_RELADDR          sizeof(RelAddrType)
-#define SIZE_ABSADDR          sizeof(AbsAddrType)
-#define SIZE_LENGTH           sizeof(LengthType)
-#define SIZE_MEMNUM           sizeof(MemNumType)
-#define SIZE_STATE_CHECK_NUM  sizeof(StateCheckNumType)
-#define SIZE_REPEATNUM        sizeof(RepeatNumType)
-#define SIZE_OPTION           sizeof(OnigOptionType)
-#define SIZE_CODE_POINT       sizeof(OnigCodePoint)
-#define SIZE_POINTER          sizeof(PointerType)
+#define SIZE_RELADDR          (int )sizeof(RelAddrType)
+#define SIZE_ABSADDR          (int )sizeof(AbsAddrType)
+#define SIZE_LENGTH           (int )sizeof(LengthType)
+#define SIZE_MEMNUM           (int )sizeof(MemNumType)
+#define SIZE_STATE_CHECK_NUM  (int )sizeof(StateCheckNumType)
+#define SIZE_REPEATNUM        (int )sizeof(RepeatNumType)
+#define SIZE_OPTION           (int )sizeof(OnigOptionType)
+#define SIZE_CODE_POINT       (int )sizeof(OnigCodePoint)
+#define SIZE_POINTER          (int )sizeof(PointerType)
 
 
 #define GET_RELADDR_INC(addr,p)    PLATFORM_GET_INC(addr,   p, RelAddrType)
@@ -747,7 +747,7 @@ typedef struct _OnigStackType {
 
 typedef struct {
   void* stack_p;
-  int   stack_n;
+  size_t stack_n;
   OnigOptionType options;
   OnigRegion*    region;
   const UChar* start;   /* search start position (for \G: BEGIN_POSITION) */
@@ -769,7 +769,7 @@ typedef struct {
 
 typedef struct {
   short int opcode;
-  char*     name;
+  const char* name;
   short int arg_type;
 } OnigOpInfoType;
 
@@ -785,7 +785,7 @@ extern void onig_print_statistics P_((FILE* f));
 
 extern UChar* onig_error_code_to_format P_((int code));
 extern void  onig_snprintf_with_pattern PV_((UChar buf[], int bufsize, OnigEncoding enc, UChar* pat, UChar* pat_end, const UChar *fmt, ...));
-extern int  onig_bbuf_init P_((BBuf* buf, int size));
+extern int  onig_bbuf_init P_((BBuf* buf, OnigDistance size));
 extern int  onig_compile P_((regex_t* reg, const UChar* pattern, const UChar* pattern_end, OnigErrorInfo* einfo));
 extern void onig_chain_reduce P_((regex_t* reg));
 extern void onig_chain_link_add P_((regex_t* to, regex_t* add));

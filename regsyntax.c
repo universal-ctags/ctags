@@ -230,7 +230,7 @@ onig_set_default_syntax(OnigSyntaxType* syntax)
 }
 
 extern void
-onig_copy_syntax(OnigSyntaxType* to, OnigSyntaxType* from)
+onig_copy_syntax(OnigSyntaxType* to, const OnigSyntaxType* from)
 {
   *to = *from;
 }

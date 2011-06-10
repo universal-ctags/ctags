@@ -41,7 +41,7 @@
 extern UChar*
 onig_error_code_to_format(int code)
 {
-  char *p;
+  const char *p;
 
   if (code >= 0) return (UChar* )0;
 
@@ -232,7 +232,7 @@ static int to_ascii(OnigEncoding enc, UChar *s, UChar *end,
     *is_over = ((p < end) ? 1 : 0);
   }
   else {
-    len = MIN((end - s), buf_size);
+    len = (int )MIN((end - s), buf_size);
     xmemcpy(buf, s, (size_t )len);
     *is_over = ((buf_size < (end - s)) ? 1 : 0);
   }
@@ -256,7 +256,8 @@ onig_error_code_to_str(s, code, va_alist)
 {
   UChar *p, *q;
   OnigErrorInfo* einfo;
-  int len, is_over;
+  size_t len;
+  int is_over;
   UChar parbuf[MAX_ERROR_PAR_LEN];
   va_list vargs;
 
@@ -308,7 +309,7 @@ onig_error_code_to_str(s, code, va_alist)
   }
 
   va_end(vargs);
-  return len;
+  return (int )len;
 }
 
 
@@ -327,7 +328,8 @@ onig_snprintf_with_pattern(buf, bufsize, enc, pat, pat_end, fmt, va_alist)
     va_dcl
 #endif
 {
-  int n, need, len;
+  size_t need;
+  int n, len;
   UChar *p, *s, *bp;
   UChar bs[6];
   va_list args;
@@ -338,7 +340,7 @@ onig_snprintf_with_pattern(buf, bufsize, enc, pat, pat_end, fmt, va_alist)
 
   need = (pat_end - pat) * 4 + 4;
 
-  if (n + need < bufsize) {
+  if (n + need < (size_t )bufsize) {
     strcat((char* )buf, ": /");
     s = buf + onigenc_str_bytelen_null(ONIG_ENCODING_ASCII, buf);
 
@@ -362,7 +364,7 @@ onig_snprintf_with_pattern(buf, bufsize, enc, pat, pat_end, fmt, va_alist)
           int blen;
 
           while (len-- > 0) {
-	    sprint_byte_with_x((char* )bs, (unsigned int )(*p++));
+            sprint_byte_with_x((char* )bs, (unsigned int )(*p++));
             blen = onigenc_str_bytelen_null(ONIG_ENCODING_ASCII, bs);
             bp = bs;
             while (blen-- > 0) *s++ = *bp++;

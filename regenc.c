@@ -737,7 +737,7 @@ onigenc_mb2_code_to_mbc(OnigEncoding enc, OnigCodePoint code, UChar *buf)
   if (enclen(enc, buf) != (p - buf))
     return ONIGERR_INVALID_CODE_POINT_VALUE;
 #endif
-  return p - buf;
+  return (int )(p - buf);
 }
 
 extern int
@@ -760,13 +760,13 @@ onigenc_mb4_code_to_mbc(OnigEncoding enc, OnigCodePoint code, UChar *buf)
   if (enclen(enc, buf) != (p - buf))
     return ONIGERR_INVALID_CODE_POINT_VALUE;
 #endif
-  return p - buf;
+  return (int )(p - buf);
 }
 
 extern int
 onigenc_minimum_property_name_to_ctype(OnigEncoding enc, UChar* p, UChar* end)
 {
-  static PosixBracketEntryType PBS[] = {
+  static const PosixBracketEntryType PBS[] = {
     { (UChar* )"Alnum",  ONIGENC_CTYPE_ALNUM,  5 },
     { (UChar* )"Alpha",  ONIGENC_CTYPE_ALPHA,  5 },
     { (UChar* )"Blank",  ONIGENC_CTYPE_BLANK,  5 },
@@ -784,7 +784,7 @@ onigenc_minimum_property_name_to_ctype(OnigEncoding enc, UChar* p, UChar* end)
     { (UChar* )NULL, -1, 0 }
   };
 
-  PosixBracketEntryType *pb;
+  const PosixBracketEntryType *pb;
   int len;
 
   len = onigenc_strlen(enc, p, end);
@@ -850,7 +850,7 @@ onigenc_with_ascii_strncmp(OnigEncoding enc, const UChar* p, const UChar* end,
 static int
 resize_property_list(int new_size, const OnigCodePoint*** plist, int* psize)
 {
-  int size;
+  size_t size;
   const OnigCodePoint **list = *plist;
 
   size = sizeof(OnigCodePoint*) * new_size;

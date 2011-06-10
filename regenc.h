@@ -97,7 +97,7 @@ typedef struct {
 
 
 typedef struct {
-  UChar    *name;
+  const UChar *name;
   int       ctype;
   short int len;
 } PosixBracketEntryType;

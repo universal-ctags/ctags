@@ -218,7 +218,7 @@ onig_strncmp(const UChar* s1, const UChar* s2, int n)
 extern void
 onig_strcpy(UChar* dest, const UChar* src, const UChar* end)
 {
-  int len = end - src;
+  ptrdiff_t len = end - src;
   if (len > 0) {
     xmemcpy(dest, src, len);
     dest[len] = (UChar )0;
@@ -229,7 +229,8 @@ onig_strcpy(UChar* dest, const UChar* src, const UChar* end)
 static UChar*
 strdup_with_null(OnigEncoding enc, UChar* s, UChar* end)
 {
-  int slen, term_len, i;
+  ptrdiff_t slen;
+  int term_len, i;
   UChar *r;
 
   slen = end - s;
@@ -267,7 +268,7 @@ strdup_with_null(OnigEncoding enc, UChar* s, UChar* end)
 
 static UChar*
 strcat_capa(UChar* dest, UChar* dest_end, const UChar* src, const UChar* src_end,
-	      int capa)
+	      size_t capa)
 {
   UChar* r;
 
@@ -284,7 +285,7 @@ strcat_capa(UChar* dest, UChar* dest_end, const UChar* src, const UChar* src_end
 /* dest on static area */
 static UChar*
 strcat_capa_from_static(UChar* dest, UChar* dest_end,
-			const UChar* src, const UChar* src_end, int capa)
+			const UChar* src, const UChar* src_end, size_t capa)
 {
   UChar* r;
 
@@ -388,7 +389,7 @@ onig_st_insert_strend(hash_table_type* table, const UChar* str_key,
 
 typedef struct {
   UChar* name;
-  int    name_len;   /* byte length */
+  size_t name_len;   /* byte length */
   int    back_num;   /* number of backrefs */
   int    back_alloc;
   int    back_ref1;
@@ -827,6 +828,7 @@ onig_name_to_group_numbers(regex_t* reg, const UChar* name,
 
   switch (e->back_num) {
   case 0:
+    *nums = 0;
     break;
   case 1:
     *nums = &(e->back_ref1);
@@ -1413,14 +1415,14 @@ node_new_option(OnigOptionType option)
 extern int
 onig_node_str_cat(Node* node, const UChar* s, const UChar* end)
 {
-  int addlen = end - s;
+  ptrdiff_t addlen = end - s;
 
   if (addlen > 0) {
-    int len  = NSTR(node)->end - NSTR(node)->s;
+    ptrdiff_t len  = NSTR(node)->end - NSTR(node)->s;
 
     if (NSTR(node)->capa > 0 || (len + addlen > NODE_STR_BUF_SIZE - 1)) {
       UChar* p;
-      int capa = len + addlen + NODE_STR_MARGIN;
+      ptrdiff_t capa = len + addlen + NODE_STR_MARGIN;
 
       if (capa <= NSTR(node)->capa) {
 	onig_strcpy(NSTR(node)->s + len, s, end);
@@ -1434,7 +1436,7 @@ onig_node_str_cat(Node* node, const UChar* s, const UChar* end)
 
 	CHECK_NULL_RETURN_MEMERR(p);
 	NSTR(node)->s    = p;
-	NSTR(node)->capa = capa;
+	NSTR(node)->capa = (int )capa;
       }
     }
     else {
@@ -2184,7 +2186,7 @@ enum ReduceType {
   RQ_PQ_Q      /* to '+?)?' */
 };
 
-static enum ReduceType ReduceTypeTable[6][6] = {
+static enum ReduceType const ReduceTypeTable[6][6] = {
   {RQ_DEL,  RQ_A,    RQ_A,   RQ_QQ,   RQ_AQ,   RQ_ASIS}, /* '?'  */
   {RQ_DEL,  RQ_DEL,  RQ_DEL, RQ_P_QQ, RQ_P_QQ, RQ_DEL},  /* '*'  */
   {RQ_A,    RQ_A,    RQ_DEL, RQ_ASIS, RQ_P_QQ, RQ_DEL},  /* '+'  */
@@ -2665,7 +2667,7 @@ fetch_name(OnigCodePoint start_code, UChar** src, UChar* end,
       }
       else {
 	r = ONIGERR_INVALID_GROUP_NAME;
-	is_num = 0;	
+	is_num = 0;
       }
     }
     else if (!ONIGENC_IS_CODE_WORD(enc, c)) {
@@ -4007,7 +4009,7 @@ parse_posix_bracket(CClassNode* cc, UChar** src, UChar* end, ScanEnv* env)
 #define POSIX_BRACKET_CHECK_LIMIT_LENGTH  20
 #define POSIX_BRACKET_NAME_MIN_LEN         4
 
-  static PosixBracketEntryType PBS[] = {
+  static const PosixBracketEntryType PBS[] = {
     { (UChar* )"alnum",  ONIGENC_CTYPE_ALNUM,  5 },
     { (UChar* )"alpha",  ONIGENC_CTYPE_ALPHA,  5 },
     { (UChar* )"blank",  ONIGENC_CTYPE_BLANK,  5 },
@@ -4025,7 +4027,7 @@ parse_posix_bracket(CClassNode* cc, UChar** src, UChar* end, ScanEnv* env)
     { (UChar* )NULL,     -1, 0 }
   };
 
-  PosixBracketEntryType *pb;
+  const PosixBracketEntryType *pb;
   int not, i, r;
   OnigCodePoint c;
   OnigEncoding enc = env->enc;
@@ -4587,7 +4589,6 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
  err:
   if (cc != NCCLASS(*np))
     bbuf_free(cc->mbuf);
-  onig_node_free(*np);
   return r;
 }
 
@@ -4853,7 +4854,10 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
   r = fetch_token(tok, &p, end, env);
   if (r < 0) return r;
   r = parse_subexp(&target, tok, term, &p, end, env);
-  if (r < 0) return r;
+  if (r < 0) {
+    onig_node_free(target);
+    return r;
+  }
 
   if (NTYPE(*np) == NT_ANCHOR)
     NANCHOR(*np)->target = target;
@@ -4870,11 +4874,11 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
   return 0;
 }
 
-static const char* PopularQStr[] = {
+static const char* const PopularQStr[] = {
   "?", "*", "+", "??", "*?", "+?"
 };
 
-static const char* ReduceQStr[] = {
+static const char* const ReduceQStr[] = {
   "", "", "*", "*?", "??", "+ and ??", "+? and ?"
 };
 
@@ -5034,11 +5038,13 @@ i_free_shared_class(type_cclass_key* key, Node* node, void* arg ARG_UNUSED)
 extern int
 onig_free_shared_cclass_table(void)
 {
+  THREAD_ATOMIC_START;
   if (IS_NOT_NULL(OnigTypeCClassTable)) {
     onig_st_foreach(OnigTypeCClassTable, i_free_shared_class, 0);
     onig_st_free_table(OnigTypeCClassTable);
     OnigTypeCClassTable = NULL;
   }
+  THREAD_ATOMIC_END;
 
   return 0;
 }
@@ -5320,8 +5326,11 @@ parse_exp(Node** np, OnigToken* tok, int term,
       if (r < 0) return r;
       r = parse_subexp(&target, tok, term, src, end, env);
       env->option = prev;
-      if (r < 0) return r;
-      NENCLOSE(*np)->target = target;	
+      if (r < 0) {
+	onig_node_free(target);
+	return r;
+      }
+      NENCLOSE(*np)->target = target;
       return tok->type;
     }
     break;
@@ -5705,7 +5714,10 @@ parse_branch(Node** top, OnigToken* tok, int term,
 
   *top = NULL;
   r = parse_exp(&node, tok, term, src, end, env);
-  if (r < 0) return r;
+  if (r < 0) {
+    onig_node_free(node);
+    return r;
+  }
 
   if (r == TK_EOT || r == term || r == TK_ALT) {
     *top = node;
@@ -5715,7 +5727,10 @@ parse_branch(Node** top, OnigToken* tok, int term,
     headp = &(NCDR(*top));
     while (r != TK_EOT && r != term && r != TK_ALT) {
       r = parse_exp(&node, tok, term, src, end, env);
-      if (r < 0) return r;
+      if (r < 0) {
+	onig_node_free(node);
+	return r;
+      }
 
       if (NTYPE(node) == NT_LIST) {
 	*headp = node;
@@ -5757,7 +5772,10 @@ parse_subexp(Node** top, OnigToken* tok, int term,
       r = fetch_token(tok, src, end, env);
       if (r < 0) return r;
       r = parse_branch(&node, tok, term, src, end, env);
-      if (r < 0) return r;
+      if (r < 0) {
+	onig_node_free(node);
+	return r;
+      }
 
       *headp = onig_node_new_alt(node, NULL);
       headp = &(NCDR(*headp));
@@ -5767,6 +5785,7 @@ parse_subexp(Node** top, OnigToken* tok, int term,
       goto err;
   }
   else {
+    onig_node_free(node);
   err:
     if (term == TK_SUBEXP_CLOSE)
       return ONIGERR_END_PATTERN_WITH_UNMATCHED_PARENTHESIS;

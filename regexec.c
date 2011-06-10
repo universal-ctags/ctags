@@ -178,19 +178,35 @@ onig_region_resize(OnigRegion* region, int n)
 
   if (region->allocated == 0) {
     region->beg = (int* )xmalloc(n * sizeof(int));
-    region->end = (int* )xmalloc(n * sizeof(int));
-
-    if (region->beg == 0 || region->end == 0)
+    if (region->beg == 0)
       return ONIGERR_MEMORY;
+
+    region->end = (int* )xmalloc(n * sizeof(int));
+    if (region->end == 0) {
+      xfree(region->beg);
+      return ONIGERR_MEMORY;
+    }
 
     region->allocated = n;
   }
   else if (region->allocated < n) {
-    region->beg = (int* )xrealloc(region->beg, n * sizeof(int));
-    region->end = (int* )xrealloc(region->end, n * sizeof(int));
+    int *tmp;
 
-    if (region->beg == 0 || region->end == 0)
+    region->allocated = 0;
+    tmp = (int* )xrealloc(region->beg, n * sizeof(int));
+    if (tmp == 0) {
+      xfree(region->beg);
+      xfree(region->end);
       return ONIGERR_MEMORY;
+    }
+    region->beg = tmp;
+    tmp = (int* )xrealloc(region->end, n * sizeof(int));
+    if (tmp == 0) {
+      xfree(region->beg);
+      xfree(region->end);
+      return ONIGERR_MEMORY;
+    }
+    region->end = tmp;
 
     region->allocated = n;
   }
@@ -240,7 +256,8 @@ onig_region_new(void)
   OnigRegion* r;
 
   r = (OnigRegion* )xmalloc(sizeof(OnigRegion));
-  onig_region_init(r);
+  if (r)
+    onig_region_init(r);
   return r;
 }
 
@@ -264,22 +281,12 @@ extern void
 onig_region_copy(OnigRegion* to, OnigRegion* from)
 {
 #define RREGC_SIZE   (sizeof(int) * from->num_regs)
-  int i;
+  int i, r;
 
   if (to == from) return;
 
-  if (to->allocated == 0) {
-    if (from->num_regs > 0) {
-      to->beg = (int* )xmalloc(RREGC_SIZE);
-      to->end = (int* )xmalloc(RREGC_SIZE);
-      to->allocated = from->num_regs;
-    }
-  }
-  else if (to->allocated < from->num_regs) {
-    to->beg = (int* )xrealloc(to->beg, RREGC_SIZE);
-    to->end = (int* )xrealloc(to->end, RREGC_SIZE);
-    to->allocated = from->num_regs;
-  }
+  r = onig_region_resize(to, from->num_regs);
+  if (r) return;
 
   for (i = 0; i < from->num_regs; i++) {
     to->beg[i] = from->beg[i];
@@ -352,8 +359,10 @@ onig_region_copy(OnigRegion* to, OnigRegion* from)
     unsigned int size = (unsigned int )(((str_len) + 1) * (state_num) + 7) >> 3;\
     offset = ((offset) * (state_num)) >> 3;\
     if (size > 0 && offset < size && size < STATE_CHECK_BUFF_MAX_SIZE) {\
-      if (size >= STATE_CHECK_BUFF_MALLOC_THRESHOLD_SIZE) \
+      if (size >= STATE_CHECK_BUFF_MALLOC_THRESHOLD_SIZE) {\
         (msa).state_check_buff = (void* )xmalloc(size);\
+        CHECK_NULL_RETURN_MEMERR((msa).state_check_buff);\
+      }\
       else \
         (msa).state_check_buff = (void* )xalloca(size);\
       xmemset(((char* )((msa).state_check_buff)+(offset)), 0, \
@@ -405,7 +414,7 @@ onig_region_copy(OnigRegion* to, OnigRegion* from)
 #define STACK_SAVE do{\
   if (stk_base != stk_alloc) {\
     msa->stack_p = stk_base;\
-    msa->stack_n = stk_end - stk_base;\
+    msa->stack_n = stk_end - stk_base; /* TODO: check overflow */\
   };\
 } while(0)
 
@@ -428,7 +437,7 @@ static int
 stack_double(OnigStackType** arg_stk_base, OnigStackType** arg_stk_end,
 	     OnigStackType** arg_stk, OnigStackType* stk_alloc, OnigMatchArg* msa)
 {
-  unsigned int n;
+  size_t n;
   OnigStackType *x, *stk_base, *stk_end, *stk;
 
   stk_base = *arg_stk_base;
@@ -446,12 +455,13 @@ stack_double(OnigStackType** arg_stk_base, OnigStackType** arg_stk_end,
     n *= 2;
   }
   else {
+    unsigned int limit_size = MatchStackLimitSize;
     n *= 2;
-    if (MatchStackLimitSize != 0 && n > MatchStackLimitSize) {
-      if ((unsigned int )(stk_end - stk_base) == MatchStackLimitSize)
+    if (limit_size != 0 && n > limit_size) {
+      if ((unsigned int )(stk_end - stk_base) == limit_size)
         return ONIGERR_MATCH_STACK_LIMIT_OVER;
       else
-        n = MatchStackLimitSize;
+        n = limit_size;
     }
     x = (OnigStackType* )xrealloc(stk_base, sizeof(OnigStackType) * n);
     if (IS_NULL(x)) {
@@ -1242,7 +1252,7 @@ typedef struct {
 
 /* match data(str - end) from position (sstart). */
 /* if sstart == str then set sprev to NULL. */
-static int
+static long
 match_at(regex_t* reg, const UChar* str, const UChar* end,
 #ifdef USE_MATCH_RANGE_MUST_BE_INSIDE_OF_SPECIFIED_RANGE
 	 const UChar* right_range,
@@ -1251,7 +1261,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 {
   static UChar FinishCode[] = { OP_FINISH };
 
-  int i, n, num_mem, best_len, pop_level;
+  int i, num_mem, best_len, pop_level;
+  ptrdiff_t n;
   LengthType tlen, tlen2;
   MemNumType mem;
   RelAddrType addr;
@@ -1302,7 +1313,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
   pkeep = (UChar* )sstart;
   while (1) {
 #ifdef ONIG_DEBUG_MATCH
-    {
+    if (s) {
       UChar *q, *bp, buf[50];
       int len;
       fprintf(stderr, "%4d> \"", (int )(s - str));
@@ -1330,22 +1341,22 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 #ifdef USE_FIND_LONGEST_SEARCH_ALL_OF_RANGE
 	if (IS_FIND_LONGEST(option)) {
 	  if (n > msa->best_len) {
-	    msa->best_len = n;
+	    msa->best_len = (int )n;
 	    msa->best_s   = (UChar* )sstart;
 	  }
 	  else
 	    goto end_best_len;
         }
 #endif
-	best_len = n;
+	best_len = (int )n;
 	region = msa->region;
 	if (region) {
 #ifdef USE_POSIX_API_REGION_OPTION
 	  if (IS_POSIX_REGION(msa->options)) {
 	    posix_regmatch_t* rmt = (posix_regmatch_t* )region;
 
-	    rmt[0].rm_so = ((pkeep > s) ? s : pkeep) - str;
-	    rmt[0].rm_eo = s      - str;
+	    rmt[0].rm_so = (regoff_t )(((pkeep > s) ? s : pkeep) - str);
+	    rmt[0].rm_eo = (regoff_t )(s - str);
 	    for (i = 1; i <= num_mem; i++) {
 	      if (mem_end_stk[i] != INVALID_STACK_INDEX) {
 		if (BIT_STATUS_AT(reg->bt_mem_start, i))
@@ -1364,8 +1375,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  }
 	  else {
 #endif /* USE_POSIX_API_REGION_OPTION */
-	    region->beg[0] = ((pkeep > s) ? s : pkeep) - str;
-	    region->end[0] = s      - str;
+	    region->beg[0] = (int )(((pkeep > s) ? s : pkeep) - str);
+	    region->end[0] = (int )(s - str);
 	    for (i = 1; i <= num_mem; i++) {
 	      if (mem_end_stk[i] != INVALID_STACK_INDEX) {
 		if (BIT_STATUS_AT(reg->bt_mem_start, i))
@@ -1397,8 +1408,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
               }
 
               node->group = 0;
-              node->beg   = ((pkeep > s) ? s : pkeep) - str;
-              node->end   = s      - str;
+              node->beg   = (int )(((pkeep > s) ? s : pkeep) - str);
+              node->end   = (int )(s - str);
 
               stkp = stk_base;
               r = make_capture_history_tree(region->history_root, &stkp,
@@ -2353,7 +2364,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  DATA_ENSURE(n);
 	  sprev = s;
 	  swork = s;
-	  STRING_CMP_VALUE_IC(case_fold_flag, pstart, &swork, n, is_fail);
+	  STRING_CMP_VALUE_IC(case_fold_flag, pstart, &swork, (int )n, is_fail);
 	  if (is_fail) continue;
 	  s = swork;
 	  while (sprev + (len = enclen(encode, sprev)) < s)
@@ -2842,16 +2853,25 @@ slow_search(OnigEncoding enc, UChar* target, UChar* target_end,
 
   s = (UChar* )text;
 
+  if (enc->max_enc_len == enc->min_enc_len) {
+    int n = enc->max_enc_len;
+
+    while (s < end) {
+      if (*s == *target) {
+	p = s + 1;
+	t = target + 1;
+	if (target_end == t || memcmp(t, p, target_end - t) == 0)
+	  return s;
+      }
+      s += n;
+    }
+    return (UChar *)NULL;
+  }
   while (s < end) {
     if (*s == *target) {
       p = s + 1;
       t = target + 1;
-      while (t < target_end) {
-	if (*t != *p++)
-	  break;
-	t++;
-      }
-      if (t == target_end)
+      if (target_end == t || memcmp(t, p, target_end - t) == 0)
 	return s;
     }
     s += enclen(enc, s);
@@ -2970,7 +2990,7 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
 {
   const UChar *s, *se, *t, *p, *end;
   const UChar *tail;
-  int skip, tlen1;
+  ptrdiff_t skip, tlen1;
 
 #ifdef ONIG_DEBUG_SEARCH
   fprintf(stderr, "bm_search_notrev: text: %d, text_end: %d, text_range: %d\n",
@@ -3068,7 +3088,7 @@ set_bm_backward_skip(UChar* s, UChar* end, OnigEncoding enc ARG_UNUSED,
     if (IS_NULL(*skip)) return ONIGERR_MEMORY;
   }
 
-  len = end - s;
+  len = (int )(end - s);
   for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++)
     (*skip)[i] = len;
 
@@ -3136,11 +3156,11 @@ map_search_backward(OnigEncoding enc, UChar map[],
   return (UChar* )NULL;
 }
 
-extern int
+extern long
 onig_match(regex_t* reg, const UChar* str, const UChar* end, const UChar* at, OnigRegion* region,
 	    OnigOptionType option)
 {
-  int r;
+  long r;
   UChar *prev;
   OnigMatchArg msa;
 
@@ -3332,7 +3352,7 @@ static int set_bm_backward_skip P_((UChar* s, UChar* end, OnigEncoding enc,
 
 #define BM_BACKWARD_SEARCH_LENGTH_THRESHOLD   100
 
-static int
+static long
 backward_search_range(regex_t* reg, const UChar* str, const UChar* end,
 		      UChar* s, const UChar* range, UChar* adjrange,
 		      UChar** low, UChar** high)
@@ -3437,19 +3457,19 @@ backward_search_range(regex_t* reg, const UChar* str, const UChar* end,
 }
 
 
-extern int
+extern long
 onig_search(regex_t* reg, const UChar* str, const UChar* end,
 	    const UChar* start, const UChar* range, OnigRegion* region, OnigOptionType option)
 {
   return onig_search_gpos(reg, str, end, start, start, range, region, option);
 }
 
-extern int
+extern long
 onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 	    const UChar* global_pos,
 	    const UChar* start, const UChar* range, OnigRegion* region, OnigOptionType option)
 {
-  int r;
+  long r;
   UChar *s, *prev;
   OnigMatchArg msa;
   const UChar *orig_start = start;
