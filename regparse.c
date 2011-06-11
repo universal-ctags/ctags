@@ -3470,6 +3470,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	  int* backs;
 	  int back_num;
 
+	named_backref:
 	  prev = p;
 
 #ifdef USE_BACKREF_WITH_LEVEL
@@ -3534,8 +3535,16 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
       break;
 #endif
 
-#ifdef USE_SUBEXP_CALL
+#if defined(USE_SUBEXP_CALL) || defined(USE_NAMED_GROUP)
     case 'g':
+#ifdef USE_NAMED_GROUP
+      if (IS_SYNTAX_OP2(syn, ONIG_SYN_OP2_ESC_G_BRACE_BACKREF)) {
+	PFETCH(c);
+	if (c == '{') goto named_backref;
+	else PUNFETCH;
+      }
+#endif
+#ifdef USE_SUBEXP_CALL
       if (IS_SYNTAX_OP2(syn, ONIG_SYN_OP2_ESC_G_SUBEXP_CALL)) {
 	PFETCH(c);
 	if (c == '<' || c == '\'') {
@@ -3554,6 +3563,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	else
 	  PUNFETCH;
       }
+#endif
       break;
 #endif
 
