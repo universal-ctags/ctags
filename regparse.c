@@ -59,7 +59,7 @@ OnigSyntaxType OnigSyntaxRuby = {
       ONIG_SYN_FIXED_INTERVAL_IS_GREEDY_ONLY |
       ONIG_SYN_WARN_CC_OP_NOT_ESCAPED |
       ONIG_SYN_WARN_REDUNDANT_NESTED_REPEAT )
-  , ONIG_OPTION_NONE
+  , ONIG_OPTION_ASCII_RANGE
   ,
   {
       (OnigCodePoint )'\\'                       /* esc */
@@ -4856,7 +4856,7 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	    break;
 #endif
 
-	  case 'a':     /* limits \d, \s, \w and POSIX brackets into ASCII range */
+	  case 'a':     /* limits \d, \s, \w and POSIX brackets to ASCII range */
 	    if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_PERL) && (neg == 0)) {
 	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 0);
 	    }
