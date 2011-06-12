@@ -50,6 +50,97 @@ static const int EncLen_EUCJP[] = {
   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1
 };
 
+static const OnigPairCaseFoldCodes CaseFoldMap[] = {
+  /* Fullwidth Alphabet */
+  { 0xa3c1, 0xa3e1 },
+  { 0xa3c2, 0xa3e2 },
+  { 0xa3c3, 0xa3e3 },
+  { 0xa3c4, 0xa3e4 },
+  { 0xa3c5, 0xa3e5 },
+  { 0xa3c6, 0xa3e6 },
+  { 0xa3c7, 0xa3e7 },
+  { 0xa3c8, 0xa3e8 },
+  { 0xa3c9, 0xa3e9 },
+  { 0xa3ca, 0xa3ea },
+  { 0xa3cb, 0xa3eb },
+  { 0xa3cc, 0xa3ec },
+  { 0xa3cd, 0xa3ed },
+  { 0xa3ce, 0xa3ee },
+  { 0xa3cf, 0xa3ef },
+  { 0xa3d0, 0xa3f0 },
+  { 0xa3d1, 0xa3f1 },
+  { 0xa3d2, 0xa3f2 },
+  { 0xa3d3, 0xa3f3 },
+  { 0xa3d4, 0xa3f4 },
+  { 0xa3d5, 0xa3f5 },
+  { 0xa3d6, 0xa3f6 },
+  { 0xa3d7, 0xa3f7 },
+  { 0xa3d8, 0xa3f8 },
+  { 0xa3d9, 0xa3f9 },
+  { 0xa3da, 0xa3fa },
+
+  /* Greek */
+  { 0xa6a1, 0xa6c1 },
+  { 0xa6a2, 0xa6c2 },
+  { 0xa6a3, 0xa6c3 },
+  { 0xa6a4, 0xa6c4 },
+  { 0xa6a5, 0xa6c5 },
+  { 0xa6a6, 0xa6c6 },
+  { 0xa6a7, 0xa6c7 },
+  { 0xa6a8, 0xa6c8 },
+  { 0xa6a9, 0xa6c9 },
+  { 0xa6aa, 0xa6ca },
+  { 0xa6ab, 0xa6cb },
+  { 0xa6ac, 0xa6cc },
+  { 0xa6ad, 0xa6cd },
+  { 0xa6ae, 0xa6ce },
+  { 0xa6af, 0xa6cf },
+  { 0xa6b0, 0xa6d0 },
+  { 0xa6b1, 0xa6d1 },
+  { 0xa6b2, 0xa6d2 },
+  { 0xa6b3, 0xa6d3 },
+  { 0xa6b4, 0xa6d4 },
+  { 0xa6b5, 0xa6d5 },
+  { 0xa6b6, 0xa6d6 },
+  { 0xa6b7, 0xa6d7 },
+  { 0xa6b8, 0xa6d8 },
+
+  /* Cyrillic */
+  { 0xa7a1, 0xa7d1 },
+  { 0xa7a2, 0xa7d2 },
+  { 0xa7a3, 0xa7d3 },
+  { 0xa7a4, 0xa7d4 },
+  { 0xa7a5, 0xa7d5 },
+  { 0xa7a6, 0xa7d6 },
+  { 0xa7a7, 0xa7d7 },
+  { 0xa7a8, 0xa7d8 },
+  { 0xa7a9, 0xa7d9 },
+  { 0xa7aa, 0xa7da },
+  { 0xa7ab, 0xa7db },
+  { 0xa7ac, 0xa7dc },
+  { 0xa7ad, 0xa7dd },
+  { 0xa7ae, 0xa7de },
+  { 0xa7af, 0xa7df },
+  { 0xa7b0, 0xa7e0 },
+  { 0xa7b1, 0xa7e1 },
+  { 0xa7b2, 0xa7e2 },
+  { 0xa7b3, 0xa7e3 },
+  { 0xa7b4, 0xa7e4 },
+  { 0xa7b5, 0xa7e5 },
+  { 0xa7b6, 0xa7e6 },
+  { 0xa7b7, 0xa7e7 },
+  { 0xa7b8, 0xa7e8 },
+  { 0xa7b9, 0xa7e9 },
+  { 0xa7ba, 0xa7ea },
+  { 0xa7bb, 0xa7eb },
+  { 0xa7bc, 0xa7ec },
+  { 0xa7bd, 0xa7ed },
+  { 0xa7be, 0xa7ee },
+  { 0xa7bf, 0xa7ef },
+  { 0xa7c0, 0xa7f0 },
+  { 0xa7c1, 0xa7f1 },
+};
+
 static int
 mbc_enc_len(const UChar* p)
 {
@@ -120,10 +211,86 @@ code_to_mbc(OnigCodePoint code, UChar *buf)
 }
 
 static int
+apply_all_case_fold(OnigCaseFoldType flag,
+		    OnigApplyAllCaseFoldFunc f, void* arg)
+{
+  return onigenc_apply_all_case_fold_with_map(
+            sizeof(CaseFoldMap)/sizeof(OnigPairCaseFoldCodes), CaseFoldMap, 0,
+            flag, f, arg);
+}
+
+static OnigCodePoint
+get_lower_case(OnigCodePoint code)
+{
+  if (0xa3c1 <= code && code <= 0xa3da) {
+    /* Fullwidth Alphabet */
+    return (OnigCodePoint )(code + 0x0020);
+  }
+  else if (0xa6a1 <= code && code <= 0xa6b8) {
+    /* Greek */
+    return (OnigCodePoint )(code + 0x0020);
+  }
+  else if (0xa7a1 <= code && code <= 0xa7c1) {
+    /* Cyrillic */
+    return (OnigCodePoint )(code + 0x0030);
+  }
+  return code;
+}
+
+static OnigCodePoint
+get_upper_case(OnigCodePoint code)
+{
+  if (0xa3e1 <= code && code <= 0xa3fa) {
+    /* Fullwidth Alphabet */
+    return (OnigCodePoint )(code - 0x0020);
+  }
+  else if (0xa6c1 <= code && code <= 0xa6d8) {
+    /* Greek */
+    return (OnigCodePoint )(code - 0x0020);
+  }
+  else if (0xa7d1 <= code && code <= 0xa7f1) {
+    /* Cyrillic */
+    return (OnigCodePoint )(code - 0x0030);
+  }
+  return code;
+}
+
+static int
+get_case_fold_codes_by_str(OnigCaseFoldType flag,
+			   const OnigUChar* p, const OnigUChar* end,
+			   OnigCaseFoldCodeItem items[])
+{
+  int len;
+  OnigCodePoint code, code_lo, code_up;
+
+  code = mbc_to_code(p, end);
+  if (ONIGENC_IS_ASCII_CODE(code))
+    return onigenc_ascii_get_case_fold_codes_by_str(flag, p, end, items);
+
+  len = mbc_enc_len(p);
+  code_lo = get_lower_case(code);
+  code_up = get_upper_case(code);
+
+  if (code != code_lo) {
+    items[0].byte_len = len;
+    items[0].code_len = 1;
+    items[0].code[0] = code_lo;
+    return 1;
+  }
+  else if (code != code_up) {
+    items[0].byte_len = len;
+    items[0].code_len = 1;
+    items[0].code[0] = code_up;
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
 mbc_case_fold(OnigCaseFoldType flag ARG_UNUSED,
 	      const UChar** pp, const UChar* end ARG_UNUSED, UChar* lower)
 {
-  int len;
   const UChar* p = *pp;
 
   if (ONIGENC_IS_MBC_ASCII(p)) {
@@ -132,12 +299,11 @@ mbc_case_fold(OnigCaseFoldType flag ARG_UNUSED,
     return 1;
   }
   else {
-    int i;
+    OnigCodePoint code;
+    int len;
 
-    len = enclen(ONIG_ENCODING_EUC_JP, p);
-    for (i = 0; i < len; i++) {
-      *lower++ = *p++;
-    }
+    code = get_lower_case(mbc_to_code(p, end));
+    len = code_to_mbc(code, lower);
     (*pp) += len;
     return len; /* return byte length of converted char to lower */
   }
@@ -275,8 +441,8 @@ OnigEncodingType OnigEncodingEUC_JP = {
   code_to_mbclen,
   code_to_mbc,
   mbc_case_fold,
-  onigenc_ascii_apply_all_case_fold,
-  onigenc_ascii_get_case_fold_codes_by_str,
+  apply_all_case_fold,
+  get_case_fold_codes_by_str,
   property_name_to_ctype,
   is_code_ctype,
   get_ctype_code_range,
