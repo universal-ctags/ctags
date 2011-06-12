@@ -67,6 +67,97 @@ static const char SJIS_CAN_BE_TRAIL_TABLE[256] = {
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0
 };
 
+static const OnigPairCaseFoldCodes CaseFoldMap[] = {
+  /* Fullwidth Alphabet */
+  { 0x8260, 0x8281 },
+  { 0x8261, 0x8282 },
+  { 0x8262, 0x8283 },
+  { 0x8263, 0x8284 },
+  { 0x8264, 0x8285 },
+  { 0x8265, 0x8286 },
+  { 0x8266, 0x8287 },
+  { 0x8267, 0x8288 },
+  { 0x8268, 0x8289 },
+  { 0x8269, 0x828a },
+  { 0x826a, 0x828b },
+  { 0x826b, 0x828c },
+  { 0x826c, 0x828d },
+  { 0x826d, 0x828e },
+  { 0x826e, 0x828f },
+  { 0x826f, 0x8290 },
+  { 0x8270, 0x8291 },
+  { 0x8271, 0x8292 },
+  { 0x8272, 0x8293 },
+  { 0x8273, 0x8294 },
+  { 0x8274, 0x8295 },
+  { 0x8275, 0x8296 },
+  { 0x8276, 0x8297 },
+  { 0x8277, 0x8298 },
+  { 0x8278, 0x8299 },
+  { 0x8279, 0x829a },
+
+  /* Greek */
+  { 0x839f, 0x83bf },
+  { 0x83a0, 0x83c0 },
+  { 0x83a1, 0x83c1 },
+  { 0x83a2, 0x83c2 },
+  { 0x83a3, 0x83c3 },
+  { 0x83a4, 0x83c4 },
+  { 0x83a5, 0x83c5 },
+  { 0x83a6, 0x83c6 },
+  { 0x83a7, 0x83c7 },
+  { 0x83a8, 0x83c8 },
+  { 0x83a9, 0x83c9 },
+  { 0x83aa, 0x83ca },
+  { 0x83ab, 0x83cb },
+  { 0x83ac, 0x83cc },
+  { 0x83ad, 0x83cd },
+  { 0x83ae, 0x83ce },
+  { 0x83af, 0x83cf },
+  { 0x83b0, 0x83d0 },
+  { 0x83b1, 0x83d1 },
+  { 0x83b2, 0x83d2 },
+  { 0x83b3, 0x83d3 },
+  { 0x83b4, 0x83d4 },
+  { 0x83b5, 0x83d5 },
+  { 0x83b6, 0x83d6 },
+
+  /* Cyrillic */
+  { 0x8440, 0x8470 },
+  { 0x8441, 0x8471 },
+  { 0x8442, 0x8472 },
+  { 0x8443, 0x8473 },
+  { 0x8444, 0x8474 },
+  { 0x8445, 0x8475 },
+  { 0x8446, 0x8476 },
+  { 0x8447, 0x8477 },
+  { 0x8448, 0x8478 },
+  { 0x8449, 0x8479 },
+  { 0x844a, 0x847a },
+  { 0x844b, 0x847b },
+  { 0x844c, 0x847c },
+  { 0x844d, 0x847d },
+  { 0x844e, 0x847e },
+  { 0x844f, 0x8480 },
+  { 0x8450, 0x8481 },
+  { 0x8451, 0x8482 },
+  { 0x8452, 0x8483 },
+  { 0x8453, 0x8484 },
+  { 0x8454, 0x8485 },
+  { 0x8455, 0x8486 },
+  { 0x8456, 0x8487 },
+  { 0x8457, 0x8488 },
+  { 0x8458, 0x8489 },
+  { 0x8459, 0x848a },
+  { 0x845a, 0x848b },
+  { 0x845b, 0x848c },
+  { 0x845c, 0x848d },
+  { 0x845d, 0x848e },
+  { 0x845e, 0x848f },
+  { 0x845f, 0x8490 },
+  { 0x8460, 0x8491 },
+};
+
 #define SJIS_ISMB_FIRST(byte)  (EncLen_SJIS[byte] > 1)
 #define SJIS_ISMB_TRAIL(byte)  SJIS_CAN_BE_TRAIL_TABLE[(byte)]
 
@@ -127,6 +218,86 @@ code_to_mbc(OnigCodePoint code, UChar *buf)
 }
 
 static int
+apply_all_case_fold(OnigCaseFoldType flag,
+		    OnigApplyAllCaseFoldFunc f, void* arg)
+{
+  return onigenc_apply_all_case_fold_with_map(
+            sizeof(CaseFoldMap)/sizeof(OnigPairCaseFoldCodes), CaseFoldMap, 0,
+            flag, f, arg);
+}
+
+static OnigCodePoint
+get_lower_case(OnigCodePoint code)
+{
+  if (0x8260 <= code && code <= 0x8279) {
+    /* Fullwidth Alphabet */
+    return (OnigCodePoint )(code + 0x0021);
+  }
+  else if (0x839f <= code && code <= 0x83b6) {
+    /* Greek */
+    return (OnigCodePoint )(code + 0x0020);
+  }
+  else if (0x8440 <= code && code <= 0x8460) {
+    /* Cyrillic */
+    int d = (code >= 0x844f) ? 1 : 0;
+    return (OnigCodePoint )(code + (0x0030 + d));
+  }
+  return code;
+}
+
+static OnigCodePoint
+get_upper_case(OnigCodePoint code)
+{
+  if (0x8281 <= code && code <= 0x829a) {
+    /* Fullwidth Alphabet */
+    return (OnigCodePoint )(code - 0x0021);
+  }
+  else if (0x83bf <= code && code <= 0x83d6) {
+    /* Greek */
+    return (OnigCodePoint )(code - 0x0020);
+  }
+  else if ((0x8470 <= code && code <= 0x847e) ||
+	   (0x8480 <= code && code <= 0x8491)) {
+    /* Cyrillic */
+    int d = (code >= 0x8480) ? 1 : 0;
+    return (OnigCodePoint )(code - (0x0030 - d));
+  }
+  return code;
+}
+
+static int
+get_case_fold_codes_by_str(OnigCaseFoldType flag,
+			   const OnigUChar* p, const OnigUChar* end,
+			   OnigCaseFoldCodeItem items[])
+{
+  int len;
+  OnigCodePoint code, code_lo, code_up;
+
+  code = mbc_to_code(p, end);
+  if (ONIGENC_IS_ASCII_CODE(code))
+    return onigenc_ascii_get_case_fold_codes_by_str(flag, p, end, items);
+
+  len = mbc_enc_len(p);
+  code_lo = get_lower_case(code);
+  code_up = get_upper_case(code);
+
+  if (code != code_lo) {
+    items[0].byte_len = len;
+    items[0].code_len = 1;
+    items[0].code[0] = code_lo;
+    return 1;
+  }
+  else if (code != code_up) {
+    items[0].byte_len = len;
+    items[0].code_len = 1;
+    items[0].code[0] = code_up;
+    return 1;
+  }
+
+  return 0;
+}
+
+static int
 mbc_case_fold(OnigCaseFoldType flag ARG_UNUSED,
 	      const UChar** pp, const UChar* end ARG_UNUSED, UChar* lower)
 {
@@ -138,12 +309,11 @@ mbc_case_fold(OnigCaseFoldType flag ARG_UNUSED,
     return 1;
   }
   else {
-    int i;
-    int len = enclen(ONIG_ENCODING_SJIS, p);
+    OnigCodePoint code;
+    int len;
 
-    for (i = 0; i < len; i++) {
-      *lower++ = *p++;
-    }
+    code = get_lower_case(mbc_to_code(p, end));
+    len = code_to_mbc(code, lower);
     (*pp) += len;
     return len; /* return byte length of converted char to lower */
   }
@@ -307,8 +477,8 @@ OnigEncodingType OnigEncodingSJIS = {
   code_to_mbclen,
   code_to_mbc,
   mbc_case_fold,
-  onigenc_ascii_apply_all_case_fold,
-  onigenc_ascii_get_case_fold_codes_by_str,
+  apply_all_case_fold,
+  get_case_fold_codes_by_str,
   property_name_to_ctype,
   is_code_ctype,
   get_ctype_code_range,
