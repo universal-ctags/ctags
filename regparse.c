@@ -3731,19 +3731,20 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	c = PPEEK;
 	if ((c == '&' || c == 'R' || ONIGENC_IS_CODE_DIGIT(enc, c)) &&
 	    IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_QMARK_SUBEXP_CALL)) {
+	  /* (?&name), (?n), (?R), (?0) */
 	  int gnum;
 	  UChar *name;
 	  UChar *name_end;
 
 	  if (c == 'R' || c == '0') {
-	    PFETCH(c);
+	    PINC;   /* skip 'R' / '0' */
 	    if (!PPEEK_IS(')')) return ONIGERR_INVALID_GROUP_NAME;
-	    PFETCH(c);
+	    PINC;   /* skip ')' */
 	    name_end = name = p;
 	    gnum = 0;
 	  }
 	  else {
-	    if (c == '&') PFETCH(c);
+	    if (c == '&') PINC;
 	    name = p;
 	    r = fetch_name((OnigCodePoint )'(', &p, end, &name_end, env, &gnum, 1);
 	    if (r < 0) return r;
@@ -3757,12 +3758,13 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	}
 	else if ((c == '-' || c == '+') &&
 	    IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_QMARK_SUBEXP_CALL)) {  /* (?+n), (?-n) */
+	  /* (?+n), (?-n) */
 	  int gnum;
 	  UChar *name;
 	  UChar *name_end;
 	  PFETCH_READY;
 
-	  PFETCH(c);
+	  PINC;     /* skip '-' / '+' */
 	  c = PPEEK;
 	  if (ONIGENC_IS_CODE_DIGIT(enc, c)) {
 	    name = p;
