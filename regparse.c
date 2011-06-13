@@ -3782,15 +3782,20 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	  int gnum;
 	  UChar *name;
 	  UChar *name_end;
+	  OnigCodePoint cnext;
 	  PFETCH_READY;
 
 	  PINC;     /* skip '-' / '+' */
-	  c = PPEEK;
-	  if (ONIGENC_IS_CODE_DIGIT(enc, c)) {
+	  cnext = PPEEK;
+	  if (ONIGENC_IS_CODE_DIGIT(enc, cnext)) {
+	    if (c == '-') PUNFETCH;
 	    name = p;
 	    r = fetch_name((OnigCodePoint )'(', &p, end, &name_end, env, &gnum, 1);
 	    if (r < 0) return r;
 
+	    if (c == '+') {
+	      /* TODO: support for positive relative number */
+	    }
 	    tok->type = TK_CALL;
 	    tok->u.call.name     = name;
 	    tok->u.call.name_end = name_end;
