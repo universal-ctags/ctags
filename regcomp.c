@@ -3094,7 +3094,8 @@ setup_subexp_call(Node* node, ScanEnv* env)
 		 ONIGERR_UNDEFINED_NAME_REFERENCE, cn->name, cn->name_end);
 	  return ONIGERR_UNDEFINED_NAME_REFERENCE;
 	}
-	else if (n > 1) {
+	else if (n > 1 &&
+	    ! IS_SYNTAX_BV(env->syntax, ONIG_SYN_ALLOW_MULTIPLEX_DEFINITION_NAME_CALL)) {
 	  onig_scan_env_set_error_string(env,
 	    ONIGERR_MULTIPLEX_DEFINITION_NAME_CALL, cn->name, cn->name_end);
 	  return ONIGERR_MULTIPLEX_DEFINITION_NAME_CALL;
