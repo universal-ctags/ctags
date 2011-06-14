@@ -357,6 +357,34 @@ static const OnigCodePoint CR_Katakana[] = {
   0xaab1, 0xaadd
 }; /* CR_Katakana */
 
+static const OnigCodePoint CR_Han[] = {
+  4,
+  0xa1b8, 0xa1b8,
+  0xb0a1, 0xcfd3,
+  0xd0a1, 0xdefe,
+  0xdfa1, 0xf4a6,
+}; /* CR_Han */
+
+static const OnigCodePoint CR_Latin[] = {
+  4,
+  0x0041, 0x005a,
+  0x0061, 0x007a,
+  0xa3c1, 0xa3da,
+  0xa3e1, 0xa3fa,
+}; /* CR_Latin */
+
+static const OnigCodePoint CR_Greek[] = {
+  2,
+  0xa6a1, 0xa6b8,
+  0xa6c1, 0xa6d8,
+}; /* CR_Greek */
+
+static const OnigCodePoint CR_Cyrillic[] = {
+  2,
+  0xa7a1, 0xa7c1,
+  0xa7d1, 0xa7f1,
+}; /* CR_Cyrillic */
+
 static int
 init_property_list(void)
 {
@@ -364,6 +392,10 @@ init_property_list(void)
 
   PROPERTY_LIST_ADD_PROP("Hiragana", CR_Hiragana);
   PROPERTY_LIST_ADD_PROP("Katakana", CR_Katakana);
+  PROPERTY_LIST_ADD_PROP("Han", CR_Han);
+  PROPERTY_LIST_ADD_PROP("Latin", CR_Latin);
+  PROPERTY_LIST_ADD_PROP("Greek", CR_Greek);
+  PROPERTY_LIST_ADD_PROP("Cyrillic", CR_Cyrillic);
   PropertyInited = 1;
 
  end:
