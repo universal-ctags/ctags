@@ -1,4 +1,4 @@
-Onigumo (Oniguruma-mod) API  Version 5.9.2  2011/06/10
+Onigumo (Oniguruma-mod) API  Version 5.9.2  2011/06/14
 
 #include <oniguruma.h>
 
@@ -121,8 +121,9 @@ Onigumo (Oniguruma-mod) API  Version 5.9.2  2011/06/10
       ONIG_SYNTAX_GREP              grep
       ONIG_SYNTAX_GNU_REGEX         GNU regex
       ONIG_SYNTAX_JAVA              Java (Sun java.util.regex)
-      ONIG_SYNTAX_PERL              Perl
-      ONIG_SYNTAX_PERL_NG           Perl + named group
+      ONIG_SYNTAX_PERL58            Perl 5.8
+      ONIG_SYNTAX_PERL58_NG         Perl 5.8 + named group
+      ONIG_SYNTAX_PERL              Perl 5.10+
       ONIG_SYNTAX_RUBY              Ruby
       ONIG_SYNTAX_DEFAULT           default (== Ruby)
                                    onig_set_default_syntax()

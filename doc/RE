@@ -1,4 +1,4 @@
-Oniguruma Regular Expressions Version 5.9.1    2007/09/05
+Onigmo (Oniguruma-mod) Regular Expressions Version 5.9.2    2011/06/14
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -39,10 +39,13 @@ syntax: ONIG_SYNTAX_RUBY (default)
   \w       word character
 
            Not Unicode:
-             alphanumeric, "_" and multibyte char. 
+             alphanumeric and "_".
 
            Unicode:
              General_Category -- (Letter|Mark|Number|Connector_Punctuation)
+
+           It depends on ONIG_OPTION_ASCII_RANGE option that non-ASCII char
+           includes or not.
 
   \W       non word char
 
@@ -57,11 +60,17 @@ syntax: ONIG_SYNTAX_RUBY (default)
                               -- Paragraph_Separator
                               -- Space_Separator
 
+           It depends on ONIG_OPTION_ASCII_RANGE option that non-ASCII char
+           includes or not.
+
   \S       non whitespace char
 
   \d       decimal digit char
 
            Unicode: General_Category -- Decimal_Number
+
+           It depends on ONIG_OPTION_ASCII_RANGE option that non-ASCII char
+           includes or not.
 
   \D       non decimal digit char
 
@@ -99,6 +108,13 @@ syntax: ONIG_SYNTAX_RUBY (default)
        Oriya, Osmanya, Runic, Shavian, Sinhala, Syloti_Nagri, Syriac,
        Tagalog, Tagbanwa, Tai_Le, Tamil, Telugu, Thaana, Thai, Tibetan,
        Tifinagh, Ugaritic, Yi
+
+
+  \R       Linebreak
+           (?>\x0D\x0A|[\x0A-\x0D])
+
+  \X       eXtended grapheme cluster
+           (?:\P{M}\p{M}*)
 
 
 
@@ -201,6 +217,10 @@ syntax: ONIG_SYNTAX_RUBY (default)
       word     Letter | Mark | Decimal_Number | Connector_Punctuation
 
 
+    It depends on ONIG_OPTION_ASCII_RANGE option that non-ASCII char
+    includes or not.
+
+
 
 7. Extended groups
 
@@ -227,6 +247,10 @@ syntax: ONIG_SYNTAX_RUBY (default)
 
                      In negative-look-behind, captured group isn't allowed, 
                      but shy group(?:) is allowed.
+
+  \K                 keep
+                     Another expression of look-behind. Keep the stuff left
+                     of the \K, don't include it in the result.
 
   (?>subexp)         atomic group
                      don't backtrack in subexp.
@@ -368,13 +392,16 @@ A-2. Original extensions
    + subexp call                  \g<name>, \g<group-num>
 
 
-A-3. Lacked features compare with perl 5.8.0
+A-3. Lacked features compare with perl 5.14.0
 
-   + \N{name}
-   + \l,\u,\L,\U, \X, \C
+   + \N{name}, \N{U+xxxx}, \N
+   + \l,\u,\L,\U, \C
+   + \v, \V, \h, \H, \o{xxx}
    + (?{code})
    + (??{code})
    + (?(condition)yes-pat|no-pat)
+   + (?|...)
+   + (*VERB:ARG)
 
    * \Q...\E
      This is effective on ONIG_SYNTAX_PERL and ONIG_SYNTAX_JAVA.

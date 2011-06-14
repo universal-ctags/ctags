@@ -1,4 +1,4 @@
-鬼車 正規表現 Version 5.9.1    2007/09/05
+Onigmo (鬼車改) 正規表現 Version 5.9.2    2011/06/14
 
 使用文法: ONIG_SYNTAX_RUBY (既定値)
 
@@ -39,10 +39,13 @@
   \w       単語構成文字
 
            Unicode以外の場合:
-             英数字, "_" および 多バイト文字。
+             英数字 および "_"。
 
            Unicodeの場合:
              General_Category -- (Letter|Mark|Number|Connector_Punctuation)
+
+           ASCII外の文字を含むかどうかは ONIG_OPTION_ASCII_RANGE オプションに
+           依存する。
 
   \W       非単語構成文字
 
@@ -57,11 +60,17 @@
                               -- Paragraph_Separator
                               -- Space_Separator
 
+           ASCII外の文字を含むかどうかは ONIG_OPTION_ASCII_RANGE オプションに
+           依存する。
+
   \S       非空白文字
 
   \d       10進数字
 
            Unicodeの場合: General_Category -- Decimal_Number
+
+           ASCII外の文字を含むかどうかは ONIG_OPTION_ASCII_RANGE オプションに
+           依存する。
 
   \D       非10進数字
 
@@ -99,6 +108,13 @@
        Oriya, Osmanya, Runic, Shavian, Sinhala, Syloti_Nagri, Syriac,
        Tagalog, Tagbanwa, Tai_Le, Tamil, Telugu, Thaana, Thai, Tibetan,
        Tifinagh, Ugaritic, Yi
+
+
+  \R       改行文字 (Linebreak)
+           (?>\x0D\x0A|[\x0A-\x0D])
+
+  \X       eXtended grapheme cluster
+           (?:\P{M}\p{M}*)
 
 
 
@@ -200,6 +216,10 @@
       word     Letter | Mark | Decimal_Number | Connector_Punctuation
 
 
+    ASCII外の文字を含むかどうかは ONIG_OPTION_ASCII_RANGE オプションに
+    依存する。
+
+
 
 7. 拡張式集合
 
@@ -224,6 +244,9 @@
 
                     否定戻り読みでは、捕獲式集合は許されないが、
                     非捕獲式集合は許される。
+
+  \K                保持
+                    戻り読みの別表記。\K の左側を保持し、検索結果に含まない。
 
   (?>式)            原子的式集合
                     式全体を通過したとき、式の中での後退再試行を行なわない
@@ -372,13 +395,16 @@
    + 部分式呼出し            \g<name>, \g<group-num>
 
 
-補記 3. Perl 5.8.0と比較して存在しない機能
+補記 3. Perl 5.14.0と比較して存在しない機能
 
-   + \N{name}
-   + \l,\u,\L,\U, \X, \C
+   + \N{name}, \N{U+xxxx}, \N
+   + \l,\u,\L,\U, \C
+   + \v, \V, \h, \H, \o{xxx}
    + (?{code})
    + (??{code})
    + (?(condition)yes-pat|no-pat)
+   + (?|...)
+   + (*VERB:ARG)
 
    * \Q...\E
      但しONIG_SYNTAX_PERLとONIG_SYNTAX_JAVAでは有効
