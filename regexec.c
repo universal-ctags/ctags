@@ -386,10 +386,10 @@ onig_region_copy(OnigRegion* to, OnigRegion* from)
     if ((msa).state_check_buff) xfree((msa).state_check_buff);\
   }\
 } while(0)
-#else
+#else /* USE_COMBINATION_EXPLOSION_CHECK */
 #define STATE_CHECK_BUFF_INIT(msa, str_len, offset, state_num)
 #define MATCH_ARG_FREE(msa)  if ((msa).stack_p) xfree((msa).stack_p)
-#endif
+#endif /* USE_COMBINATION_EXPLOSION_CHECK */
 
 
 
@@ -1085,7 +1085,7 @@ make_capture_history_tree(OnigCaptureTreeNode* node, OnigStackType** kp,
 
   return 1; /* 1: root node ending. */
 }
-#endif
+#endif /* USE_CAPTURE_HISTORY */
 
 #ifdef USE_BACKREF_WITH_LEVEL
 static int mem_is_in_memp(int mem, int num, UChar* memp)
@@ -1173,14 +1173,14 @@ static struct timeval ts, te;
 #define GETTIME(t)        gettimeofday(&(t), (struct timezone* )0)
 #define TIMEDIFF(te,ts)   (((te).tv_usec - (ts).tv_usec) + \
                            (((te).tv_sec - (ts).tv_sec)*1000000))
-#else
+#else /* USE_TIMEOFDAY */
 #ifdef HAVE_SYS_TIMES_H
 #include <sys/times.h>
 #endif
 static struct tms ts, te;
 #define GETTIME(t)         times(&(t))
 #define TIMEDIFF(te,ts)   ((te).tms_utime - (ts).tms_utime)
-#endif
+#endif /* USE_TIMEOFDAY */
 
 static int OpCounter[256];
 static int OpPrevCounter[256];
@@ -1229,12 +1229,12 @@ onig_print_statistics(FILE* f)
     MaxStackDepth = stk - stk_base;\
 } while(0)
 
-#else
+#else /* ONIG_DEBUG_STATISTICS */
 #define STACK_INC     stk++
 
 #define MOP_IN(opcode)
 #define MOP_OUT
-#endif
+#endif /* ONIG_DEBUG_STATISTICS */
 
 
 #define IS_MBC_ASCII_WORD(enc,s,end) \

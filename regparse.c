@@ -3832,7 +3832,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	  }
 	  PUNFETCH;
 	}
-#endif
+#endif /* USE_CAPITAL_P_NAMED_GROUP */
         PUNFETCH;
       }
 
