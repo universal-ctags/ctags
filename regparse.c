@@ -5892,6 +5892,21 @@ parse_regexp(Node** top, UChar** src, UChar* end, ScanEnv* env)
   if (r < 0) return r;
   r = parse_subexp(top, &tok, TK_EOT, src, end, env);
   if (r < 0) return r;
+
+#ifdef USE_PERL_SUBEXP_CALL
+  if (env->num_call > 0) {
+    /* Capture the pattern itself. It is used for (?R) and (?0). */
+    const int num = 0;
+    Node* np;
+    np = node_new_enclose_memory(env->option, 0);
+    CHECK_NULL_RETURN_MEMERR(np);
+    NENCLOSE(np)->regnum = num;
+    NENCLOSE(np)->target = *top;
+    r = scan_env_set_mem_node(env, num, np);
+    if (r != 0) return r;
+    *top = np;
+  }
+#endif
   return 0;
 }
 

@@ -1283,6 +1283,23 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
   unsigned char* state_check_buff = msa->state_check_buff;
   int num_comb_exp_check = reg->num_comb_exp_check;
 #endif
+
+#ifdef USE_PERL_SUBEXP_CALL
+  /* Stack #0 is used to store the pattern itself and used for (?R). */
+  n = reg->num_repeat + (reg->num_mem + 1) * 2;
+
+  STACK_INIT(alloca_base, n, INIT_MATCH_STACK_SIZE);
+  pop_level = reg->stack_pop_level;
+  num_mem = reg->num_mem;
+  repeat_stk = (OnigStackIndex* )alloca_base;
+
+  mem_start_stk = (OnigStackIndex* )(repeat_stk + reg->num_repeat);
+  mem_end_stk   = mem_start_stk + (num_mem + 1);
+  for (i = 0; i <= num_mem; i++) {
+    mem_start_stk[i] = mem_end_stk[i] = INVALID_STACK_INDEX;
+  }
+#else /* USE_PERL_SUBEXP_CALL */
+  /* Stack #0 not is used. */
   n = reg->num_repeat + reg->num_mem * 2;
 
   STACK_INIT(alloca_base, n, INIT_MATCH_STACK_SIZE);
@@ -1299,6 +1316,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
   for (i = 1; i <= num_mem; i++) {
     mem_start_stk[i] = mem_end_stk[i] = INVALID_STACK_INDEX;
   }
+#endif /* USE_PERL_SUBEXP_CALL */
 
 #ifdef ONIG_DEBUG_MATCH
   fprintf(stderr, "match_at: str: %d, end: %d, start: %d, sprev: %d\n",

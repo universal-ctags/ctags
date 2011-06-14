@@ -3084,6 +3084,11 @@ setup_subexp_call(Node* node, ScanEnv* env)
 	cn->unset_addr_list = env->unset_addr_list;
       }
 #ifdef USE_NAMED_GROUP
+#ifdef USE_PERL_SUBEXP_CALL
+      else if (cn->name == cn->name_end) {
+	goto set_call_attr;
+      }
+#endif
       else {
 	int *refs;
 
