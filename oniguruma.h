@@ -413,8 +413,9 @@ ONIG_EXTERN OnigSyntaxType OnigSyntaxEmacs;
 ONIG_EXTERN OnigSyntaxType OnigSyntaxGrep;
 ONIG_EXTERN OnigSyntaxType OnigSyntaxGnuRegex;
 ONIG_EXTERN OnigSyntaxType OnigSyntaxJava;
+ONIG_EXTERN OnigSyntaxType OnigSyntaxPerl58;
+ONIG_EXTERN OnigSyntaxType OnigSyntaxPerl58_NG;
 ONIG_EXTERN OnigSyntaxType OnigSyntaxPerl;
-ONIG_EXTERN OnigSyntaxType OnigSyntaxPerl_NG;
 ONIG_EXTERN OnigSyntaxType OnigSyntaxRuby;
 
 /* predefined syntaxes (see regsyntax.c) */
@@ -425,8 +426,9 @@ ONIG_EXTERN OnigSyntaxType OnigSyntaxRuby;
 #define ONIG_SYNTAX_GREP               (&OnigSyntaxGrep)
 #define ONIG_SYNTAX_GNU_REGEX          (&OnigSyntaxGnuRegex)
 #define ONIG_SYNTAX_JAVA               (&OnigSyntaxJava)
+#define ONIG_SYNTAX_PERL58             (&OnigSyntaxPerl58)
+#define ONIG_SYNTAX_PERL58_NG          (&OnigSyntaxPerl58_NG)
 #define ONIG_SYNTAX_PERL               (&OnigSyntaxPerl)
-#define ONIG_SYNTAX_PERL_NG            (&OnigSyntaxPerl_NG)
 #define ONIG_SYNTAX_RUBY               (&OnigSyntaxRuby)
 
 /* default syntax */
