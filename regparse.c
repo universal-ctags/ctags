@@ -3746,7 +3746,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
           }
           goto start;
         }
-#if defined(USE_SUBEXP_CALL) && defined(USE_PERL_SUBEXP_CALL)
+#ifdef USE_PERL_SUBEXP_CALL
 	/* (?&name), (?n), (?R), (?0), (?+n), (?-n) */
 	c = PPEEK;
 	if ((c == '&' || c == 'R' || ONIGENC_IS_CODE_DIGIT(enc, c)) &&
@@ -3803,7 +3803,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	    break;
 	  }
 	}
-#endif
+#endif /* USE_PERL_SUBEXP_CALL */
 #ifdef USE_CAPITAL_P_NAMED_GROUP
 	if (PPEEK_IS('P') &&
 	    IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_QMARK_CAPITAL_P_NAMED_GROUP)) {

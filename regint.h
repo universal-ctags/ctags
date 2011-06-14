@@ -78,6 +78,13 @@
 #define INIT_MATCH_STACK_SIZE                     160
 #define DEFAULT_MATCH_STACK_LIMIT_SIZE              0 /* unlimited */
 
+/* check config */
+#if defined(USE_PERL_SUBEXP_CALL) || defined(USE_CAPITAL_P_NAMED_GROUP)
+#if !defined(USE_NAMED_GROUP) || !defined(USE_SUBEXP_CALL)
+#error USE_NAMED_GROUP and USE_SUBEXP_CALL must be defined.
+#endif
+#endif
+
 #if defined(__GNUC__)
 #  define ARG_UNUSED  __attribute__ ((unused))
 #else
