@@ -82,8 +82,8 @@
        Alnum, Alpha, Blank, Cntrl, Digit, Graph, Lower,
        Print, Punct, Space, Upper, XDigit, Word, ASCII,
 
-     + EUC-JP, Shift_JISで有効
-       Hiragana, Katakana
+     + EUC-JP, Shift_JIS, CP932で有効
+       Hiragana, Katakana, Han, Latin, Greek, Cyrillic
 
      + UTF8, UTF16, UTF32で有効
        Any, Assigned, C, Cc, Cf, Cn, Co, Cs, L, Ll, Lm, Lo, Lt, Lu,

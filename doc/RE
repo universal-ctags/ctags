@@ -82,8 +82,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
        Alnum, Alpha, Blank, Cntrl, Digit, Graph, Lower,
        Print, Punct, Space, Upper, XDigit, Word, ASCII,
 
-     + works on EUC_JP, Shift_JIS
-       Hiragana, Katakana
+     + works on EUC_JP, Shift_JIS, CP932
+       Hiragana, Katakana, Han, Latin, Greek, Cyrillic
 
      + works on UTF8, UTF16, UTF32
        Any, Assigned, C, Cc, Cf, Cn, Co, Cs, L, Ll, Lm, Lo, Lt, Lu,
