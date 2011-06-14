@@ -2308,6 +2308,7 @@ typedef struct {
       UChar* name;
       UChar* name_end;
       int    gnum;
+      int    rel;
     } call;
     struct {
       int ctype;
@@ -3579,6 +3580,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	  tok->u.call.name     = prev;
 	  tok->u.call.name_end = name_end;
 	  tok->u.call.gnum     = gnum;
+	  tok->u.call.rel      = 0;
 	}
 	else
 	  PUNFETCH;
@@ -3774,6 +3776,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	  tok->u.call.name     = name;
 	  tok->u.call.name_end = name_end;
 	  tok->u.call.gnum     = gnum;
+	  tok->u.call.rel      = 0;
 	  break;
 	}
 	else if ((c == '-' || c == '+') &&
@@ -3793,13 +3796,11 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	    r = fetch_name((OnigCodePoint )'(', &p, end, &name_end, env, &gnum, 1);
 	    if (r < 0) return r;
 
-	    if (c == '+') {
-	      /* TODO: support for positive relative number */
-	    }
 	    tok->type = TK_CALL;
 	    tok->u.call.name     = name;
 	    tok->u.call.name_end = name_end;
 	    tok->u.call.gnum     = gnum;
+	    tok->u.call.rel      = 1;
 	    break;
 	  }
 	}
@@ -3828,6 +3829,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	    tok->u.call.name     = name;
 	    tok->u.call.name_end = name_end;
 	    tok->u.call.gnum     = gnum;
+	    tok->u.call.rel      = 0;
 	    break;
 	  }
 	  PUNFETCH;
@@ -5694,7 +5696,8 @@ parse_exp(Node** np, OnigToken* tok, int term,
     {
       int gnum = tok->u.call.gnum;
 
-      if (gnum < 0) {
+      if (gnum < 0 || tok->u.call.rel != 0) {
+	if (gnum > 0) gnum--;
 	gnum = BACKREF_REL_TO_ABS(gnum, env);
 	if (gnum <= 0)
 	  return ONIGERR_INVALID_BACKREF;
