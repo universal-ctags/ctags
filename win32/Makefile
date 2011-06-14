@@ -35,7 +35,7 @@ onigobjs     = reggnu.obj regerror.obj regparse.obj regext.obj regcomp.obj \
 posixobjs    = regposix.obj regposerr.obj
 libobjs      = $(onigobjs) $(posixobjs)
 
-jp_objs      =  $(encdir)\euc_jp.obj $(encdir)\sjis.obj
+jp_objs      =  $(encdir)\euc_jp.obj $(encdir)\sjis.obj $(encdir)\cp932.obj
 iso8859_objs =  $(encdir)\iso8859_1.obj  $(encdir)\iso8859_2.obj \
 		$(encdir)\iso8859_3.obj  $(encdir)\iso8859_4.obj \
 		$(encdir)\iso8859_5.obj  $(encdir)\iso8859_6.obj \
