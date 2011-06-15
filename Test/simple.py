@@ -16,6 +16,9 @@ INDENT = 0x04
 DATA = 0x08 # Used by dbtreedata
 
 class one:
+    
+    x = lambda x: x
+    y = 0
 
     def __init__(self, filename, pathsep='', treegap=64):
         """Another string
