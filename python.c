@@ -238,9 +238,30 @@ static const char *skipString (const char *cp)
 /* Skip everything up to an identifier start. */
 static const char *skipEverything (const char *cp)
 {
+	int match;
 	for (; *cp; cp++)
 	{
+		match = 0;
 		if (*cp == '"' || *cp == '\'' || *cp == '#')
+			match = 1;
+
+		/* these checks find unicode, binary (Python 3) and raw strings */
+		if (!match && (
+			!strncasecmp(cp, "u'", 2) || !strncasecmp(cp, "u\"", 2) ||
+			!strncasecmp(cp, "r'", 2) || !strncasecmp(cp, "r\"", 2) ||
+			!strncasecmp(cp, "b'", 2) || !strncasecmp(cp, "b\"", 2)))
+		{
+			match = 1;
+			cp += 1;
+		}
+		if (!match && (
+			!strncasecmp(cp, "ur'", 3) || !strncasecmp(cp, "ur\"", 3) ||
+			!strncasecmp(cp, "br'", 3) || !strncasecmp(cp, "br\"", 3)))
+		{
+			match = 1;
+			cp += 2;
+		}
+		if (match)
 		{
 			cp = skipString(cp);
 			if (!*cp) break;
@@ -455,9 +476,9 @@ static void checkParent(NestingLevels *nls, int indent, vString *parent)
 	{
 		n = nls->levels + i;
 		/* is there a better way to compare two vStrings? */
-		if (strcmp(vStringValue(parent), vStringValue(n->name)) == 0)
+		if (n && strcmp(vStringValue(parent), vStringValue(n->name)) == 0)
 		{
-			if (n && indent <= n->indentation)
+			if (indent <= n->indentation)
 			{
 				/* remove this level by clearing its name */
 				vStringClear(n->name);
