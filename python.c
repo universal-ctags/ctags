@@ -522,6 +522,8 @@ static char const *find_triple_start(char const *string, char const **which)
 
 	for (; *cp; cp++)
 	{
+		if (*cp == '#')
+			break;
 		if (*cp == '"' || *cp == '\'')
 		{
 			if (strncmp(cp, doubletriple, 3) == 0)
