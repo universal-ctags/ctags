@@ -610,6 +610,49 @@ static const char *skipTypeDecl (const char *cp, boolean *is_class)
 	return NULL;
 }
 
+/* checks if there is a lambda at position of cp, and return its argument list
+ * if so.
+ * We don't return the lambda name since it is useless for now since we already
+ * know it when we call this function, and it would be a little slower. */
+static boolean varIsLambda (const char *cp, char **arglist)
+{
+	boolean is_lambda = FALSE;
+
+	cp = skipSpace (cp);
+	cp = skipIdentifier (cp); /* skip the lambda's name */
+	cp = skipSpace (cp);
+	if (*cp == '=')
+	{
+		cp++;
+		cp = skipSpace (cp);
+		if (strncmp (cp, "lambda", 6) == 0)
+		{
+			const char *tmp;
+
+			cp += 6; /* skip the lambda */
+			tmp = skipSpace (cp);
+			/* check if there is a space after lambda to detect assignations
+			 * starting with 'lambdaXXX' */
+			if (tmp != cp)
+			{
+				vString *args = vStringNew ();
+
+				cp = tmp;
+				vStringPut (args, '(');
+				for (; *cp != 0 && *cp != ':'; cp++)
+					vStringPut (args, *cp);
+				vStringPut (args, ')');
+				vStringTerminate (args);
+				if (arglist)
+					*arglist = strdup (vStringValue (args));
+				vStringDelete (args);
+				is_lambda = TRUE;
+			}
+		}
+	}
+	return is_lambda;
+}
+
 static void findPythonTags (void)
 {
 	vString *const continuation = vStringNew ();
@@ -732,6 +775,7 @@ static void findPythonTags (void)
 		if (variable)
 		{
 			const char *start = variable;
+			char *arglist;
 			boolean parent_is_class;
 
 			vStringClear (name);
@@ -743,11 +787,22 @@ static void findPythonTags (void)
 			vStringTerminate (name);
 
 			parent_is_class = constructParentString(nesting_levels, indent, parent);
-			/* skip variables in methods */
-			if (! parent_is_class && vStringLength(parent) > 0)
-				continue;
 
-			makeVariableTag (name, parent);
+			if (varIsLambda (variable, &arglist))
+			{
+				/* show class members or top-level script lambdas only */
+				if (parent_is_class || vStringLength(parent) == 0)
+					makeFunctionTag (name, parent, parent_is_class, arglist);
+				eFree (arglist);
+			}
+			else
+			{
+				/* skip variables in methods */
+				if (! parent_is_class && vStringLength(parent) > 0)
+					continue;
+ 
+				makeVariableTag (name, parent);
+			}
 		}
 		/* Find and parse imports */
 		parseImports(line);
