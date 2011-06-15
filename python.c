@@ -654,14 +654,14 @@ static void findPythonTags (void)
 		indent = cp - line;
 		line_skip = 0;
 
-		checkParent(nesting_levels, indent, parent);
-
 		/* Deal with multiline string ending. */
 		if (longStringLiteral)
 		{
 			find_triple_end(cp, &longStringLiteral);
 			continue;
 		}
+		
+		checkParent(nesting_levels, indent, parent);
 
 		/* Deal with multiline string start. */
 		longstring = find_triple_start(cp, &longStringLiteral);
