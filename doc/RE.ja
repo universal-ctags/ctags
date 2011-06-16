@@ -114,7 +114,12 @@ Onigmo (鬼車改) 正規表現 Version 5.9.2    2011/06/14
            (?>\x0D\x0A|[\x0A-\x0D])
 
   \X       eXtended grapheme cluster
-           (?:\P{M}\p{M}*)
+
+           Unicodeの場合:
+             (?:\P{M}\p{M}*)
+
+           Unicode以外の場合:
+             (?m:.)
 
 
 

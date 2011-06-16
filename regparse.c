@@ -5362,7 +5362,7 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
     }
   }
   if (IS_NULL(*np)) {
-    /* (?s:.) */
+    /* PerlSyntax: (?s:.), RubySyntax: (?m:.) */
     OnigOptionType option;
     np1 = node_new_anychar();
     if (IS_NULL(np1)) goto err;
