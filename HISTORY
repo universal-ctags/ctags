@@ -1,5 +1,7 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/06/18: Version 5.10.0
+
 2011/06/18: [impl] export onig_new_without_alloc() API.
 2011/06/15: [spec] change Ruby syntax options.
                    add \K, \R and \X.

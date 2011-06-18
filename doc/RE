@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Regular Expressions Version 5.9.2    2011/06/14
+Onigmo (Oniguruma-mod) Regular Expressions Version 5.10.0    2011/06/18
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -150,7 +150,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
     *+      0 or more times
     ++      1 or more times
 
-    ({n,m}+, {n,}+, {n}+ are possessive op. in ONIG_SYNTAX_JAVA only)
+    ({n,m}+, {n,}+, {n}+ are possessive op. in ONIG_SYNTAX_JAVA and
+    ONIG_SYNTAX_PERL only)
 
     ex. /a*+/ === /(?>a*)/
 
@@ -223,7 +224,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
 
 
     It depends on ONIG_OPTION_ASCII_RANGE option that non-ASCII char
-    includes or not.
+    includes or not. ONIG_SYNTAX_RUBY includes this option and
+    ONIG_SYNTAX_PERL doesn't.
 
 
 
@@ -270,6 +272,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
                      Assigning the same name as two or more subexps is allowed.
                      In this case, a subexp call can not be performed although
                      the back reference is possible.
+                     (ONIG_SYNTAX_PERL: a subexp call is allowed in this case.)
 
 
 8. Back reference
@@ -345,6 +348,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
     then the group's option is effective.
 
     ex. (?-i:\g<name>)(?i:(?<name>a)){0}  match to "A"
+
+  * ONIG_SYNTAX_PERL: use (?&name), (?n), (?-n), (?+n), (?R) or (?0) instead.
 
 
 10. Captured group
