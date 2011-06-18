@@ -1,5 +1,28 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/06/18: [impl] export onig_new_without_alloc() API.
+2011/06/15: [spec] change Ruby syntax options.
+                   add \K, \R and \X.
+2011/06/15: [spec] change Perl syntax options.
+                   Rename ONIG_SYNTAX_PERL to ONIG_SYNTAX_PERL58.
+                   Rename ONIG_SYNTAX_PERL_NG to ONIG_SYNTAX_PERL58_NG.
+                   Add ONIG_SYNTAX_PERL as Perl 5.10+ compatible syntax.
+2011/06/14: [new]  add (?R), (?0) and (?+n).
+2011/06/14: [new]  add new character properties in EUC-JP:
+                   Han, Latin, Greek and Cyrillic.
+2011/06/14: [new]  add new encoding: CP932.
+2011/06/14: [new]  add new character properties in Shift_JIS:
+                   Han, Latin, Greek and Cyrillic.
+2011/06/13: [bug]  (?-n) doesn't work
+2011/06/13: [new]  add ONIG_SYN_ALLOW_MULTIPLEX_DEFINITION_NAME_CALL
+2011/06/13: [impl] remove unused ONIG_SYN_CAPTURE_LEFT_MOST_NAMED_GROUP flag.
+2011/06/13: [bug]  (?a) doesn't work with Unicode encodings.
+2011/06/12: [new]  add EUC-JP case folding.
+2011/06/12: [new]  add Shift_JIS case folding.
+2011/06/12: [spec] add ONIG_OPTION_ASCII_RANGE option to OnigSyntaxRuby.
+2011/06/12: [new]  add Python/PCRE compatible named group:
+                   (?P<name>...), (?P=name) and (?P>name).
+2011/06/11: [new]  add \g{n}, \g{-n} and \g{name}.
 2011/06/10: [bug]  char class may cause memory leak
                    http://redmine.ruby-lang.org/issues/show/4061
 2011/06/10: [bug]  invalid backref number/name
