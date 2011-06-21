@@ -3770,9 +3770,13 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	    gnum = 0;
 	  }
 	  else {
-	    if (c == '&') PINC;
+	    int numref = 1;
+	    if (c == '&') {     /* (?&name) */
+	      PINC;
+	      numref = 0;       /* don't allow number name */
+	    }
 	    name = p;
-	    r = fetch_name((OnigCodePoint )'(', &p, end, &name_end, env, &gnum, 1);
+	    r = fetch_name((OnigCodePoint )'(', &p, end, &name_end, env, &gnum, numref);
 	    if (r < 0) return r;
 	  }
 
@@ -3784,7 +3788,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	  break;
 	}
 	else if ((c == '-' || c == '+') &&
-	    IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_QMARK_SUBEXP_CALL)) {  /* (?+n), (?-n) */
+	    IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_QMARK_SUBEXP_CALL)) {
 	  /* (?+n), (?-n) */
 	  int gnum;
 	  UChar *name;
@@ -3826,7 +3830,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	  }
 	  else if (c == '>') {  /* (?P>name): subexp call */
 	    name = p;
-	    r = fetch_name((OnigCodePoint )'(', &p, end, &name_end, env, &gnum, 1);
+	    r = fetch_name((OnigCodePoint )'(', &p, end, &name_end, env, &gnum, 0);
 	    if (r < 0) return r;
 
 	    tok->type = TK_CALL;
