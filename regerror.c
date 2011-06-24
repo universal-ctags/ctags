@@ -115,6 +115,8 @@ onig_error_code_to_format(int code)
     p = "invalid pattern in look-behind"; break;
   case ONIGERR_INVALID_REPEAT_RANGE_PATTERN:
     p = "invalid repeat range {lower,upper}"; break;
+  case ONIGERR_INVALID_CONDITION_PATTERN:
+    p = "invalid condition pattern"; break;
   case ONIGERR_TOO_BIG_NUMBER:
     p = "too big number"; break;
   case ONIGERR_TOO_BIG_NUMBER_FOR_REPEAT_RANGE:

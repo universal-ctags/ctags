@@ -2809,6 +2809,18 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       break;
 #endif
 
+    case OP_CONDITION:  MOP_IN(OP_CONDITION);
+      GET_MEMNUM_INC(mem, p);
+      GET_RELADDR_INC(addr, p);
+      if ((mem > num_mem) ||
+	  (mem_end_stk[mem]   == INVALID_STACK_INDEX) ||
+	  (mem_start_stk[mem] == INVALID_STACK_INDEX)) {
+	p += addr;
+      }
+      MOP_OUT;
+      continue;
+      break;
+
     case OP_FINISH:
       goto finish;
       break;

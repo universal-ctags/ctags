@@ -88,6 +88,7 @@
 #define ENCLOSE_MEMORY           (1<<0)
 #define ENCLOSE_OPTION           (1<<1)
 #define ENCLOSE_STOP_BACKTRACK   (1<<2)
+#define ENCLOSE_CONDITION        (1<<3)
 
 #define NODE_STR_MARGIN         16
 #define NODE_STR_BUF_SIZE       24  /* sizeof(CClassNode) - sizeof(int)*4 */
@@ -147,6 +148,7 @@
 #define IS_ENCLOSE_STOP_BT_SIMPLE_REPEAT(en) \
     (((en)->state & NST_STOP_BT_SIMPLE_REPEAT) != 0)
 #define IS_ENCLOSE_NAMED_GROUP(en)     (((en)->state & NST_NAMED_GROUP)   != 0)
+#define IS_ENCLOSE_NAME_REF(en)        (((en)->state & NST_NAME_REF)      != 0)
 
 #define SET_CALL_RECURSION(node)       (node)->u.call.state |= NST_RECURSION
 #define IS_CALL_RECURSION(cn)          (((cn)->state & NST_RECURSION)  != 0)

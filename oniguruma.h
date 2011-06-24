@@ -577,6 +577,7 @@ ONIG_EXTERN OnigSyntaxType*   OnigDefaultSyntax;
 #define ONIGERR_INVALID_POSIX_BRACKET_TYPE                   -121
 #define ONIGERR_INVALID_LOOK_BEHIND_PATTERN                  -122
 #define ONIGERR_INVALID_REPEAT_RANGE_PATTERN                 -123
+#define ONIGERR_INVALID_CONDITION_PATTERN                    -124
 /* values error (syntax error) */
 #define ONIGERR_TOO_BIG_NUMBER                               -200
 #define ONIGERR_TOO_BIG_NUMBER_FOR_REPEAT_RANGE              -201
