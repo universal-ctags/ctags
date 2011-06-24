@@ -1337,9 +1337,11 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       int len;
       fprintf(stderr, "%4d> \"", (int )(s - str));
       bp = buf;
-      for (i = 0, q = s; i < 7 && q < end; i++) {
-	len = enclen(encode, q);
-	while (len-- > 0) *bp++ = *q++;
+      if (*p != OP_FINISH) {    /* s may not be a valid pointer if OP_FINISH. */
+	for (i = 0, q = s; i < 7 && q < end; i++) {
+	  len = enclen(encode, q);
+	  while (len-- > 0) *bp++ = *q++;
+	}
       }
       if (q < end) { xmemcpy(bp, "...\"", 4); bp += 4; }
       else         { xmemcpy(bp, "\"",    1); bp += 1; }
