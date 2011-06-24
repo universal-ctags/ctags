@@ -5298,8 +5298,11 @@ node_linebreak(Node** np, ScanEnv* env)
   /* ...|... */
   target1 = onig_node_new_alt(right, NULL_NODE);
   if (IS_NULL(target1)) goto err;
+  right = NULL;
   target2 = onig_node_new_alt(left, target1);
   if (IS_NULL(target2)) goto err;
+  left = NULL;
+  target1 = NULL;
 
   /* (?>...) */
   *np = node_new_enclose(ENCLOSE_STOP_BACKTRACK);
@@ -5308,10 +5311,10 @@ node_linebreak(Node** np, ScanEnv* env)
   return ONIG_NORMAL;
 
  err:
-  if (IS_NOT_NULL(left))    onig_node_free(left);
-  if (IS_NOT_NULL(right))   onig_node_free(right);
-  if (IS_NOT_NULL(target1)) onig_node_free(target1);
-  if (IS_NOT_NULL(target2)) onig_node_free(target2);
+  onig_node_free(left);
+  onig_node_free(right);
+  onig_node_free(target1);
+  onig_node_free(target2);
   return ONIGERR_MEMORY;
 }
 
@@ -5352,12 +5355,16 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
       qn = node_new_quantifier(0, REPEAT_INFINITE, 0);
       if (IS_NULL(qn)) goto err;
       NQTFR(qn)->target = np2;
+      np2 = NULL;
 
       /* \P{M}\p{M}* */
       list2 = node_new_list(qn, NULL_NODE);
       if (IS_NULL(list2)) goto err;
+      qn = NULL;
       list1 = node_new_list(np1, list2);
       if (IS_NULL(list1)) goto err;
+      np1 = NULL;
+      list2 = NULL;
 
       /* (?:...) */
       *np = node_new_option(env->option);
@@ -5381,11 +5388,11 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
   return ONIG_NORMAL;
 
  err:
-  if (IS_NOT_NULL(np1))   onig_node_free(np1);
-  if (IS_NOT_NULL(np2))   onig_node_free(np2);
-  if (IS_NOT_NULL(qn))    onig_node_free(qn);
-  if (IS_NOT_NULL(list1)) onig_node_free(list1);
-  if (IS_NOT_NULL(list2)) onig_node_free(list2);
+  onig_node_free(np1);
+  onig_node_free(np2);
+  onig_node_free(qn);
+  onig_node_free(list1);
+  onig_node_free(list2);
   return (r == 0) ? ONIGERR_MEMORY : r;
 }
 
