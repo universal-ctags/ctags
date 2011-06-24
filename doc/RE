@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Regular Expressions Version 5.10.0    2011/06/18
+Onigmo (Oniguruma-mod) Regular Expressions Version 5.10.1    2011/06/24
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -274,6 +274,20 @@ syntax: ONIG_SYNTAX_RUBY (default)
                      the back reference is possible.
                      (ONIG_SYNTAX_PERL: a subexp call is allowed in this case.)
 
+  (?(cond)yes-subexp), (?(cond)yes-subexp|no-subexp)
+                    conditional expression
+                    Matches yes-subexp if (cond) yields a true value, matches
+                    no-subexp otherwise.
+                    Following (cond) can be used:
+
+                    (n)  (n >= 1)
+                        Checks if the numbered capturing group has matched
+                        something.
+
+                    (<name>), ('name')
+                        Checks if a group with the given name has matched
+                        something.
+
 
 8. Back reference
 
@@ -409,7 +423,6 @@ A-3. Lacked features compare with perl 5.14.0
    + \v, \V, \h, \H, \o{xxx}
    + (?{code})
    + (??{code})
-   + (?(condition)yes-pat|no-pat)
    + (?|...)
    + (*VERB:ARG)
 

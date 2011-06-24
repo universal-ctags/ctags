@@ -1,5 +1,12 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/06/24: Version 5.10.1
+
+2011/06/24: [new]  add (?(cond)yes) and (?(cond)yes|no).
+2011/06/24: [bug]  double free in \R and \X.
+2011/06/24: [tune] enable optimization for .* except look-behind.
+2011/06/21: [spec] number is not allowed in (?&name) and (?P>name).
+
 2011/06/18: Version 5.10.0
 
 2011/06/18: [impl] export onig_new_without_alloc() API.
