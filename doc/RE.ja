@@ -116,7 +116,7 @@
   \X       eXtended grapheme cluster
 
            Unicodeの場合:
-             (?:\P{M}\p{M}*)
+             (?>\P{M}\p{M}*)
 
            Unicode以外の場合:
              (?m:.)

@@ -116,7 +116,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
   \X       eXtended grapheme cluster
 
            Unicode:
-             (?:\P{M}\p{M}*)
+             (?>\P{M}\p{M}*)
 
            Not Unicode:
              (?m:.)

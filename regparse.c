@@ -5408,7 +5408,7 @@ node_linebreak(Node** np, ScanEnv* env)
 static int
 node_extended_grapheme_cluster(Node** np, ScanEnv* env)
 {
-  /* same as (?:\P{M}\p{M}*) */
+  /* same as (?>\P{M}\p{M}*) */
   Node* np1 = NULL;
   Node* np2 = NULL;
   Node* qn = NULL;
@@ -5453,8 +5453,8 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
       np1 = NULL;
       list2 = NULL;
 
-      /* (?:...) */
-      *np = node_new_option(env->option);
+      /* (?>...) */
+      *np = node_new_enclose(ENCLOSE_STOP_BACKTRACK);
       if (IS_NULL(*np)) goto err;
       NENCLOSE(*np)->target = list1;
       return ONIG_NORMAL;
