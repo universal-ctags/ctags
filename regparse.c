@@ -5664,6 +5664,7 @@ parse_exp(Node** np, OnigToken* tok, int term,
           r = ONIGENC_GET_CTYPE_CODE_RANGE(env->enc, tok->u.prop.ctype,
 					   &sb_out, &mbr);
           if (r == 0 &&
+              ! IS_ASCII_RANGE(env->option) &&
               ONIGENC_CODE_RANGE_NUM(mbr)
               >= THRESHOLD_RANGE_NUM_FOR_SHARE_CCLASS) {
             type_cclass_key  key;
