@@ -1,5 +1,12 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/06/29: Version 5.10.2
+
+2011/06/29: [tune] implicit-anchor optimization
+2011/06/28: [impl] remove duplicated debug log.
+2011/06/28: [bug]  (?a) doesn't work for \d, \h and \s.
+2011/06/28: [bug]  should not backtrack in \X.
+
 2011/06/24: Version 5.10.1
 
 2011/06/24: [new]  add (?(cond)yes) and (?(cond)yes|no).
