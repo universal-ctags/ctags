@@ -5418,6 +5418,7 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
   CClassNode* cc2;
   int r = 0;
 
+#ifdef USE_UNICODE_PROPERTIES
   if (onig_strncmp((UChar* )env->enc->name, (UChar* )"UTF", 3) == 0) {
     /* UTF-8, UTF-16BE/LE, UTF-32BE/LE */
     UChar* propname = (UChar* )"M";
@@ -5460,6 +5461,7 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
       return ONIG_NORMAL;
     }
   }
+#endif /* USE_UNICODE_PROPERTIES */
   if (IS_NULL(*np)) {
     /* PerlSyntax: (?s:.), RubySyntax: (?m:.) */
     OnigOptionType option;
