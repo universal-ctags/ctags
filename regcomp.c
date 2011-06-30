@@ -3271,7 +3271,7 @@ setup_look_behind(Node* node, regex_t* reg, ScanEnv* env)
 }
 
 static int
-next_setup(Node* node, Node* next_node, regex_t* reg)
+next_setup(Node* node, Node* next_node, int in_root, regex_t* reg)
 {
   int type;
 
@@ -3305,10 +3305,38 @@ next_setup(Node* node, Node* next_node, regex_t* reg)
 	  }
 	}
       }
+
+      if (in_root && /* qn->lower == 0 && */
+	  NTYPE(qn->target) == NT_CANY &&
+	  ! IS_MULTILINE(reg->options)) {
+	/* implicit anchor: /.*a/ ==> /(?:^|\G).*a/ */
+	Node *np, *na1, *na2;
+	np = onig_node_new_list(NULL_NODE, NULL_NODE);
+	CHECK_NULL_RETURN_MEMERR(np);
+	swap_node(node, np);
+	NCDR(node) = onig_node_new_list(np, NULL_NODE);
+	if (IS_NULL(NCDR(node))) {
+	  onig_node_free(np);
+	  return ONIGERR_MEMORY;
+	}
+	na1 = onig_node_new_alt(NULL_NODE, NULL_NODE);
+	CHECK_NULL_RETURN_MEMERR(na1);
+	NCAR(node) = na1;
+	np = onig_node_new_anchor(ANCHOR_BEGIN_LINE);
+	CHECK_NULL_RETURN_MEMERR(np);
+	NCAR(na1) = np;
+	na2 = onig_node_new_alt(NULL_NODE, NULL_NODE);
+	CHECK_NULL_RETURN_MEMERR(na2);
+	NCDR(na1) = na2;
+	np = onig_node_new_anchor(ANCHOR_BEGIN_POSITION);   /* \G */
+	CHECK_NULL_RETURN_MEMERR(np);
+	NCAR(na2) = np;
+      }
     }
   }
   else if (type == NT_ENCLOSE) {
     EncloseNode* en = NENCLOSE(node);
+    in_root = 0;
     if (en->type == ENCLOSE_MEMORY) {
       node = en->target;
       goto retry;
@@ -3776,6 +3804,7 @@ setup_comb_exp_check(Node* node, int state, ScanEnv* env)
 #define IN_NOT        (1<<1)
 #define IN_REPEAT     (1<<2)
 #define IN_VAR_REPEAT (1<<3)
+#define IN_ROOT       (1<<4)
 
 /* setup_tree does the following work.
  1. check empty loop. (set qn->target_empty_info)
@@ -3790,19 +3819,25 @@ setup_tree(Node* node, regex_t* reg, int state, ScanEnv* env)
 {
   int type;
   int r = 0;
+  int in_root = state & IN_ROOT;
 
+  state &= ~IN_ROOT;
 restart:
   type = NTYPE(node);
   switch (type) {
   case NT_LIST:
     {
       Node* prev = NULL_NODE;
+      int prev_in_root = 0;
+      state |= in_root;
       do {
 	r = setup_tree(NCAR(node), reg, state, env);
 	if (IS_NOT_NULL(prev) && r == 0) {
-	  r = next_setup(prev, NCAR(node), reg);
+	  r = next_setup(prev, NCAR(node), prev_in_root, reg);
 	}
 	prev = NCAR(node);
+	prev_in_root = state & IN_ROOT;
+	state &= ~IN_ROOT;
       } while (r == 0 && IS_NOT_NULL(node = NCDR(node)));
     }
     break;
@@ -3940,6 +3975,7 @@ restart:
       case ENCLOSE_OPTION:
 	{
 	  OnigOptionType options = reg->options;
+	  state |= in_root;
 	  reg->options = NENCLOSE(node)->option;
 	  r = setup_tree(NENCLOSE(node)->target, reg, state, env);
 	  reg->options = options;
@@ -4934,6 +4970,7 @@ optimize_node_left(Node* node, NodeOptInfo* opt, OptEnv* env)
 	if (env->mmd.max == 0 &&
 	    NTYPE(qn->target) == NT_CANY && qn->greedy) {
 	  if (IS_MULTILINE(env->options))
+	    /* implicit anchor: /.*a/ ==> /\A.*a/ */
 	    add_opt_anc_info(&opt->anc, ANCHOR_ANYCHAR_STAR_ML);
 	  else
 	    add_opt_anc_info(&opt->anc, ANCHOR_ANYCHAR_STAR);
@@ -5487,7 +5524,7 @@ onig_compile(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
     reg->num_call = 0;
 #endif
 
-  r = setup_tree(root, reg, 0, &scan_env);
+  r = setup_tree(root, reg, IN_ROOT, &scan_env);
   if (r != 0) goto err_unset;
 
 #ifdef ONIG_DEBUG_PARSE_TREE
