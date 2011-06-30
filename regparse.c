@@ -3987,6 +3987,7 @@ add_ctype_to_cc_by_range(CClassNode* cc, int ctype ARG_UNUSED, int not,
 static int
 add_ctype_to_cc(CClassNode* cc, int ctype, int not, int char_prop, ScanEnv* env)
 {
+  int maxcode, ascii_range;
   int c, r;
   const OnigCodePoint *ranges;
   OnigCodePoint sb_out;
@@ -4015,6 +4016,8 @@ add_ctype_to_cc(CClassNode* cc, int ctype, int not, int char_prop, ScanEnv* env)
     return r;
   }
 
+  ascii_range = IS_ASCII_RANGE(option) && (char_prop == 0);
+  maxcode = ascii_range ? 0x80 : SINGLE_BYTE_SIZE;
   r = 0;
   switch (ctype) {
   case ONIGENC_CTYPE_ALPHA:
@@ -4047,37 +4050,38 @@ add_ctype_to_cc(CClassNode* cc, int ctype, int not, int char_prop, ScanEnv* env)
   case ONIGENC_CTYPE_PRINT:
     if (not != 0) {
       for (c = 0; c < SINGLE_BYTE_SIZE; c++) {
-	if (! ONIGENC_IS_CODE_CTYPE(enc, (OnigCodePoint )c, ctype))
+	if (! ONIGENC_IS_CODE_CTYPE(enc, (OnigCodePoint )c, ctype)
+	    || c >= maxcode)
 	  BITSET_SET_BIT(cc->bs, c);
       }
-      if (IS_ASCII_RANGE(option))
+      if (ascii_range)
         ADD_ALL_MULTI_BYTE_RANGE(enc, cc->mbuf);
     }
     else {
-      for (c = 0; c < SINGLE_BYTE_SIZE; c++) {
+      for (c = 0; c < maxcode; c++) {
 	if (ONIGENC_IS_CODE_CTYPE(enc, (OnigCodePoint )c, ctype))
 	  BITSET_SET_BIT(cc->bs, c);
       }
-      if (! IS_ASCII_RANGE(option))
+      if (! ascii_range)
         ADD_ALL_MULTI_BYTE_RANGE(enc, cc->mbuf);
     }
     break;
 
   case ONIGENC_CTYPE_WORD:
     if (not == 0) {
-      for (c = 0; c < SINGLE_BYTE_SIZE; c++) {
-	if (IS_CODE_SB_WORD(enc, c)) BITSET_SET_BIT(cc->bs, c);
+      for (c = 0; c < maxcode; c++) {
+	if (ONIGENC_IS_CODE_WORD(enc, c)) BITSET_SET_BIT(cc->bs, c);
       }
-      if (! IS_ASCII_RANGE(option))
+      if (! ascii_range)
         ADD_ALL_MULTI_BYTE_RANGE(enc, cc->mbuf);
     }
     else {
       for (c = 0; c < SINGLE_BYTE_SIZE; c++) {
         if ((ONIGENC_CODE_TO_MBCLEN(enc, c) > 0) /* check invalid code point */
-	    && ! ONIGENC_IS_CODE_WORD(enc, c))
+	    && (! ONIGENC_IS_CODE_WORD(enc, c) || c >= maxcode))
 	  BITSET_SET_BIT(cc->bs, c);
       }
-      if (IS_ASCII_RANGE(option))
+      if (ascii_range)
         ADD_ALL_MULTI_BYTE_RANGE(enc, cc->mbuf);
     }
     break;

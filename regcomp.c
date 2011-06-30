@@ -2516,7 +2516,8 @@ is_not_included(Node* x, Node* y, regex_t* reg)
       switch (ytype) {
       case NT_CTYPE:
 	if (NCTYPE(y)->ctype == NCTYPE(x)->ctype &&
-	    NCTYPE(y)->not   != NCTYPE(x)->not)
+	    NCTYPE(y)->not   != NCTYPE(x)->not &&
+	    NCTYPE(y)->ascii_range == NCTYPE(x)->ascii_range)
 	  return 1;
 	else
 	  return 0;
@@ -2552,7 +2553,12 @@ is_not_included(Node* x, Node* y, regex_t* reg)
 	    if (IS_NULL(xc->mbuf) && !IS_NCCLASS_NOT(xc)) {
 	      for (i = 0; i < SINGLE_BYTE_SIZE; i++) {
 		if (BITSET_AT(xc->bs, i)) {
-		  if (IS_CODE_SB_WORD(reg->enc, i)) return 0;
+		  if (NCTYPE(y)->ascii_range) {
+		    if (IS_CODE_SB_WORD(reg->enc, i)) return 0;
+		  }
+		  else {
+		    if (ONIGENC_IS_CODE_WORD(reg->enc, i)) return 0;
+		  }
 		}
 	      }
 	      return 1;
@@ -2561,7 +2567,12 @@ is_not_included(Node* x, Node* y, regex_t* reg)
 	  }
 	  else {
 	    for (i = 0; i < SINGLE_BYTE_SIZE; i++) {
-	      if (! IS_CODE_SB_WORD(reg->enc, i)) {
+	      int is_word;
+	      if (NCTYPE(y)->ascii_range)
+		is_word = IS_CODE_SB_WORD(reg->enc, i);
+	      else
+		is_word = ONIGENC_IS_CODE_WORD(reg->enc, i);
+	      if (! is_word) {
 		if (!IS_NCCLASS_NOT(xc)) {
 		  if (BITSET_AT(xc->bs, i))
 		    return 0;
@@ -2624,10 +2635,18 @@ is_not_included(Node* x, Node* y, regex_t* reg)
       case NT_CTYPE:
 	switch (NCTYPE(y)->ctype) {
 	case ONIGENC_CTYPE_WORD:
-	  if (ONIGENC_IS_MBC_WORD(reg->enc, xs->s, xs->end))
-	    return NCTYPE(y)->not;
-	  else
-	    return !(NCTYPE(y)->not);
+	  if (NCTYPE(y)->ascii_range) {
+	    if (ONIGENC_IS_MBC_ASCII_WORD(reg->enc, xs->s, xs->end))
+	      return NCTYPE(y)->not;
+	    else
+	      return !(NCTYPE(y)->not);
+	  }
+	  else {
+	    if (ONIGENC_IS_MBC_WORD(reg->enc, xs->s, xs->end))
+	      return NCTYPE(y)->not;
+	    else
+	      return !(NCTYPE(y)->not);
+	  }
 	  break;
 	default:
 	  break;
@@ -3268,7 +3287,7 @@ next_setup(Node* node, Node* next_node, regex_t* reg)
 	qn->next_head_exact = n;
       }
 #endif
-      /* automatic posseivation a*b ==> (?>a*)b */
+      /* automatic possessivation a*b ==> (?>a*)b */
       if (qn->lower <= 1) {
 	int ttype = NTYPE(qn->target);
 	if (IS_NODE_TYPE_SIMPLE(ttype)) {
@@ -4805,23 +4824,25 @@ optimize_node_left(Node* node, NodeOptInfo* opt, OptEnv* env)
   case NT_CTYPE:
     {
       int i, min, max;
+      int maxcode;
 
       max = ONIGENC_MBC_MAXLEN_DIST(env->enc);
 
       if (max == 1) {
         min = 1;
 
+	maxcode = NCTYPE(node)->ascii_range ? 0x80 : SINGLE_BYTE_SIZE;
 	switch (NCTYPE(node)->ctype) {
 	case ONIGENC_CTYPE_WORD:
 	  if (NCTYPE(node)->not != 0) {
 	    for (i = 0; i < SINGLE_BYTE_SIZE; i++) {
-	      if (! ONIGENC_IS_CODE_WORD(env->enc, i)) {
+	      if (! ONIGENC_IS_CODE_WORD(env->enc, i) || i >= maxcode) {
 		add_char_opt_map_info(&opt->map, (UChar )i, env->enc);
 	      }
 	    }
 	  }
 	  else {
-	    for (i = 0; i < SINGLE_BYTE_SIZE; i++) {
+	    for (i = 0; i < maxcode; i++) {
 	      if (ONIGENC_IS_CODE_WORD(env->enc, i)) {
 		add_char_opt_map_info(&opt->map, (UChar )i, env->enc);
 	      }

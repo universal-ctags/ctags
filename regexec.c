@@ -1238,10 +1238,6 @@ onig_print_statistics(FILE* f)
 #endif /* ONIG_DEBUG_STATISTICS */
 
 
-#define IS_MBC_ASCII_WORD(enc,s,end) \
-   onigenc_ascii_is_code_ctype( \
-	ONIGENC_MBC_TO_CODE(enc,s,end),ONIGENC_CTYPE_WORD)
-
 
 /* matching region of POSIX API */
 typedef int regoff_t;
@@ -1956,7 +1952,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
     case OP_ASCII_WORD:  MOP_IN(OP_ASCII_WORD);
       DATA_ENSURE(1);
-      if (! IS_MBC_ASCII_WORD(encode, s, end))
+      if (! ONIGENC_IS_MBC_ASCII_WORD(encode, s, end))
 	goto fail;
 
       s += enclen(encode, s);
@@ -1974,7 +1970,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
     case OP_NOT_ASCII_WORD:  MOP_IN(OP_NOT_ASCII_WORD);
       DATA_ENSURE(1);
-      if (IS_MBC_ASCII_WORD(encode, s, end))
+      if (ONIGENC_IS_MBC_ASCII_WORD(encode, s, end))
 	goto fail;
 
       s += enclen(encode, s);
@@ -2003,16 +1999,16 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     case OP_ASCII_WORD_BOUND:  MOP_IN(OP_ASCII_WORD_BOUND);
       if (ON_STR_BEGIN(s)) {
 	DATA_ENSURE(1);
-	if (! IS_MBC_ASCII_WORD(encode, s, end))
+	if (! ONIGENC_IS_MBC_ASCII_WORD(encode, s, end))
 	  goto fail;
       }
       else if (ON_STR_END(s)) {
-	if (! IS_MBC_ASCII_WORD(encode, sprev, end))
+	if (! ONIGENC_IS_MBC_ASCII_WORD(encode, sprev, end))
 	  goto fail;
       }
       else {
-	if (IS_MBC_ASCII_WORD(encode, s, end)
-	    == IS_MBC_ASCII_WORD(encode, sprev, end))
+	if (ONIGENC_IS_MBC_ASCII_WORD(encode, s, end)
+	    == ONIGENC_IS_MBC_ASCII_WORD(encode, sprev, end))
 	  goto fail;
       }
       MOP_OUT;
@@ -2039,16 +2035,16 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
     case OP_NOT_ASCII_WORD_BOUND:  MOP_IN(OP_NOT_ASCII_WORD_BOUND);
       if (ON_STR_BEGIN(s)) {
-	if (DATA_ENSURE_CHECK1 && IS_MBC_ASCII_WORD(encode, s, end))
+	if (DATA_ENSURE_CHECK1 && ONIGENC_IS_MBC_ASCII_WORD(encode, s, end))
 	  goto fail;
       }
       else if (ON_STR_END(s)) {
-	if (IS_MBC_ASCII_WORD(encode, sprev, end))
+	if (ONIGENC_IS_MBC_ASCII_WORD(encode, sprev, end))
 	  goto fail;
       }
       else {
-	if (IS_MBC_ASCII_WORD(encode, s, end)
-	    != IS_MBC_ASCII_WORD(encode, sprev, end))
+	if (ONIGENC_IS_MBC_ASCII_WORD(encode, s, end)
+	    != ONIGENC_IS_MBC_ASCII_WORD(encode, sprev, end))
 	  goto fail;
       }
       MOP_OUT;
@@ -2067,8 +2063,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       break;
 
     case OP_ASCII_WORD_BEGIN:  MOP_IN(OP_ASCII_WORD_BEGIN);
-      if (DATA_ENSURE_CHECK1 && IS_MBC_ASCII_WORD(encode, s, end)) {
-	if (ON_STR_BEGIN(s) || !IS_MBC_ASCII_WORD(encode, sprev, end)) {
+      if (DATA_ENSURE_CHECK1 && ONIGENC_IS_MBC_ASCII_WORD(encode, s, end)) {
+	if (ON_STR_BEGIN(s) || !ONIGENC_IS_MBC_ASCII_WORD(encode, sprev, end)) {
 	  MOP_OUT;
 	  continue;
 	}
@@ -2087,8 +2083,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       break;
 
     case OP_ASCII_WORD_END:  MOP_IN(OP_ASCII_WORD_END);
-      if (!ON_STR_BEGIN(s) && IS_MBC_ASCII_WORD(encode, sprev, end)) {
-	if (ON_STR_END(s) || !IS_MBC_ASCII_WORD(encode, s, end)) {
+      if (!ON_STR_BEGIN(s) && ONIGENC_IS_MBC_ASCII_WORD(encode, sprev, end)) {
+	if (ON_STR_END(s) || !ONIGENC_IS_MBC_ASCII_WORD(encode, s, end)) {
 	  MOP_OUT;
 	  continue;
 	}
