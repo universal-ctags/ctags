@@ -3776,7 +3776,6 @@ setup_comb_exp_check(Node* node, int state, ScanEnv* env)
 #define IN_NOT        (1<<1)
 #define IN_REPEAT     (1<<2)
 #define IN_VAR_REPEAT (1<<3)
-#define IN_ROOT       (1<<4)
 
 /* setup_tree does the following work.
  1. check empty loop. (set qn->target_empty_info)
@@ -3791,19 +3790,15 @@ setup_tree(Node* node, regex_t* reg, int state, ScanEnv* env)
 {
   int type;
   int r = 0;
-  int in_root = state & IN_ROOT;
 
-  state &= ~IN_ROOT;
 restart:
   type = NTYPE(node);
   switch (type) {
   case NT_LIST:
     {
       Node* prev = NULL_NODE;
-      state |= in_root;
       do {
 	r = setup_tree(NCAR(node), reg, state, env);
-	state &= ~IN_ROOT;
 	if (IS_NOT_NULL(prev) && r == 0) {
 	  r = next_setup(prev, NCAR(node), reg);
 	}
@@ -3863,25 +3858,6 @@ restart:
       QtfrNode* qn = NQTFR(node);
       Node* target = qn->target;
 
-      if (in_root && IS_REPEAT_INFINITE(qn->upper) && /* qn->lower == 0 && */
-	  NTYPE(target) == NT_CANY) {
-	/* implicit anchor: /.*a/ ==> /^.*a/ */
-	Node *np;
-	np = onig_node_new_list(NULL, NULL);
-	CHECK_NULL_RETURN_MEMERR(np);
-	swap_node(node, np);
-	NCDR(node) = onig_node_new_list(np, NULL);
-	if (IS_NULL(NCDR(node))) {
-	  onig_node_free(np);
-	  return ONIGERR_MEMORY;
-	}
-	np = onig_node_new_anchor(IS_MULTILINE(reg->options)
-				  ? ANCHOR_BEGIN_BUF : ANCHOR_BEGIN_LINE);
-	CHECK_NULL_RETURN_MEMERR(np);
-	NCAR(node) = np;
-	r = setup_tree(target, reg, state, env);
-	break;
-      }
       if ((state & IN_REPEAT) != 0) {
         qn->state |= NST_IN_REPEAT;
       }
@@ -3964,7 +3940,6 @@ restart:
       case ENCLOSE_OPTION:
 	{
 	  OnigOptionType options = reg->options;
-	  state |= in_root;
 	  reg->options = NENCLOSE(node)->option;
 	  r = setup_tree(NENCLOSE(node)->target, reg, state, env);
 	  reg->options = options;
@@ -5512,7 +5487,7 @@ onig_compile(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
     reg->num_call = 0;
 #endif
 
-  r = setup_tree(root, reg, IN_ROOT, &scan_env);
+  r = setup_tree(root, reg, 0, &scan_env);
   if (r != 0) goto err_unset;
 
 #ifdef ONIG_DEBUG_PARSE_TREE
