@@ -1,5 +1,11 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/07/03: Version 5.10.3
+
+2011/07/01: [tune] implicit-anchor optimization
+2011/06/30: Revert "[tune] implicit-anchor optimization"
+2011/06/30: [bug]  (?a) doesn't work properly
+
 2011/06/29: Version 5.10.2
 
 2011/06/29: [tune] implicit-anchor optimization
