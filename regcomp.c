@@ -5309,7 +5309,7 @@ print_anchor(FILE* f, int anchor)
   }
   if (anchor & ANCHOR_ANYCHAR_STAR_ML) {
     if (q) fprintf(f, ", ");
-    fprintf(f, "anychar-star-pl");
+    fprintf(f, "anychar-star-ml");
   }
 
   fprintf(f, "]");
