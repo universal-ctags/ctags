@@ -3766,6 +3766,8 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 
         if ((reg->anchor & ANCHOR_ANYCHAR_STAR) != 0) {
           do {
+            if ((reg->anchor & ANCHOR_BEGIN_POSITION) == 0)
+              msa.gpos = s;     /* move \G position */
             MATCH_AND_RETURN_CHECK(orig_range);
             prev = s;
             s += enclen(reg->enc, s);
