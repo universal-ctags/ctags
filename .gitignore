@@ -1,8 +1,11 @@
 *.o
+*.lo
 *.so
 *.a
+*.la
 *.obj
 *.dll
+*.exe
 *.exp
 *.lib
 *.bak
@@ -12,5 +15,15 @@
 *.orig
 *.rej
 
+.deps
+.libs
+
+/autom4te.cache
 /config.h
+/config.log
+/config.status
+/libtool
+/onig-config
 /Makefile
+/sample/Makefile
+/stamp-h1
