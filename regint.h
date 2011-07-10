@@ -198,6 +198,14 @@
 #endif
 #endif
 
+#ifdef HAVE_STDINT_H
+# include <stdint.h>
+#endif
+
+#ifdef STDC_HEADERS
+# include <stddef.h>
+#endif
+
 #ifdef __BORLANDC__
 #include <malloc.h>
 #endif
