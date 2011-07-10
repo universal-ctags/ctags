@@ -38,7 +38,8 @@ fi
 
 dnl Checks for programs.
 AC_PROG_CC
-AM_PROG_LIBTOOL
+AC_PROG_LIBTOOL
+AM_PROG_CC_C_O
 LTVERSION="2:0:0"
 AC_SUBST(LTVERSION)
 
@@ -62,15 +63,15 @@ dnl Checks for library functions.
 AC_FUNC_ALLOCA
 AC_FUNC_MEMCMP
 
-AC_CACHE_CHECK(for prototypes, cv_have_prototypes,
+AC_CACHE_CHECK(for prototypes, _cv_have_prototypes,
   [AC_TRY_COMPILE([int foo(int x) { return 0; }], [return foo(10);],
-	cv_have_prototypes=yes,
-	cv_have_prototypes=no)])
-if test "$cv_have_prototypes" = yes; then
+	_cv_have_prototypes=yes,
+	_cv_have_prototypes=no)])
+if test "$_cv_have_prototypes" = yes; then
   AC_DEFINE(HAVE_PROTOTYPES,1,[Define if compilerr supports prototypes])
 fi
 
-AC_CACHE_CHECK(for variable length prototypes and stdarg.h, cv_stdarg,
+AC_CACHE_CHECK(for variable length prototypes and stdarg.h, _cv_stdarg,
   [AC_TRY_COMPILE([
 #include <stdarg.h>
 int foo(int x, ...) {
@@ -82,9 +83,9 @@ int foo(int x, ...) {
 	return 0;
 }
 ], [return foo(10, "", 3.14);],
-	cv_stdarg=yes,
-	cv_stdarg=no)])
-if test "$cv_stdarg" = yes; then
+	_cv_stdarg=yes,
+	_cv_stdarg=no)])
+if test "$_cv_stdarg" = yes; then
   AC_DEFINE(HAVE_STDARG_PROTOTYPES,1,[Define if compiler supports stdarg prototypes])
 fi
 
