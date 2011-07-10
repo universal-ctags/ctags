@@ -37,7 +37,7 @@ extern "C" {
 #define ONIGURUMA
 #define ONIGURUMA_VERSION_MAJOR   5
 #define ONIGURUMA_VERSION_MINOR   10
-#define ONIGURUMA_VERSION_TEENY   3
+#define ONIGURUMA_VERSION_TEENY   4
 
 #ifdef __cplusplus
 # ifndef  HAVE_PROTOTYPES
@@ -501,7 +501,7 @@ ONIG_EXTERN OnigSyntaxType*   OnigDefaultSyntax;
 #define ONIG_SYN_OP2_ESC_G_BRACE_BACKREF        (1U<<26) /* \g{name}, \g{n} */
 #define ONIG_SYN_OP2_QMARK_SUBEXP_CALL          (1U<<27) /* (?&name), (?n), (?R), (?0) */
 #define ONIG_SYN_OP2_QMARK_BAR_BRANCH_RESET     (1U<<28) /* (?|...) */         /* NOTIMPL */
-#define ONIG_SYN_OP2_QMARK_LPAREN_CONDITION     (1U<<29) /* (?(cond)yes...|no...) */ /* NOTIMPL */
+#define ONIG_SYN_OP2_QMARK_LPAREN_CONDITION     (1U<<29) /* (?(cond)yes...|no...) */
 #define ONIG_SYN_OP2_QMARK_CAPITAL_P_NAMED_GROUP (1U<<30) /* (?P<name>...), (?P=name), (?P>name) -- Python/PCRE */
 #define ONIG_SYN_OP2_OPTION_JAVA                (1U<<31) /* (?idmsux), (?-idmsux) */ /* NOTIMPL */
 

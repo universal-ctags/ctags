@@ -1,4 +1,4 @@
-README  2011/06/11
+README  2011/07/11
 
 Onigmo (Oniguruma-mod)  --  (C) K.Takata <kentkt AT csc DOT jp>
 
@@ -8,6 +8,19 @@ Onigmo is a regular expressions library forked from Oniguruma.
 Some of new features introduced in Perl 5.10+ can be used.
 
 Some patches are merged from Ruby 1.9.2.
+
+
+Main New features:
+  Regular Expressions (depends on the syntax):
+    \K, \R, \X, (?(cond)yes|no)
+    (?adlu), \g{name}, \g{n}, (?&name), (?n), (?R), (?0)
+    (?P<name>...), (?P=name), (?P>name)
+
+  API:
+    onig_search_gpos (for Perl-compatible \G)
+
+  Encoding:
+    CP932
 
 
 Oniguruma's README follows:

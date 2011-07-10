@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Regular Expressions Version 5.10.2    2011/06/29
+Onigmo (Oniguruma-mod) Regular Expressions Version 5.10.4    2011/07/11
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -305,6 +305,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
 
   * Back reference by group number is forbidden if named group is defined 
     in the pattern and ONIG_OPTION_CAPTURE_GROUP is not setted.
+
+  * ONIG_SYNTAX_PERL: \g{n}, \g{-n} and \g{name} can also be used.
 
 
   back reference with nest level

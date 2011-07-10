@@ -1,4 +1,4 @@
-README.ja  2011/06/11
+README.ja  2011/07/11
 
 鬼雲 (鬼車改)  --  (C) K.Takata <kentkt AT csc DOT jp>
 
@@ -8,6 +8,19 @@ https://github.com/k-takata/Onigmo
 Perl 5.10以降で新たに導入された正規表現の一部が使用可能になっている。
 
 一部のパッチは Ruby 1.9.2 からマージしている。
+
+
+主な新機能:
+  正規表現 (文法依存):
+    \K, \R, \X, (?(cond)yes|no)
+    (?adlu), \g{name}, \g{n}, (?&name), (?n), (?R), (?0)
+    (?P<name>...), (?P=name), (?P>name)
+
+  API:
+    onig_search_gpos (Perl互換の \G 用)
+
+  エンコーディング:
+    CP932
 
 
 以下、鬼車の README.ja:
