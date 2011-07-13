@@ -1,5 +1,7 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/07/11: Version 5.10.4
+
 2011/07/11: [dist] update autotools.
                    use automake 1.10.3, autoconf 2.68 and libtool 2.4.
 2011/07/11: [impl] add typedefs of intptr_t/uintptr_t for old VC++ compilers.
