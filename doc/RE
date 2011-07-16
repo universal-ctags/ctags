@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Regular Expressions Version 5.10.4    2011/07/11
+Onigmo (Oniguruma-mod) Regular Expressions Version 5.10.5    2011/07/16
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -350,8 +350,12 @@ syntax: ONIG_SYNTAX_RUBY (default)
   \g'name'    call by group name
   \g<n>       call by group number (n >= 1)
   \g'n'       call by group number (n >= 1)
+  \g<0>       call the whole pattern recursively
+  \g'0'       call the whole pattern recursively
   \g<-n>      call by relative group number (n >= 1)
   \g'-n'      call by relative group number (n >= 1)
+  \g<+n>      call by relative group number (n >= 1)
+  \g'+n'      call by relative group number (n >= 1)
 
   * left-most recursive call is not allowed.
      ex. (?<name>a|\g<name>b)   => error

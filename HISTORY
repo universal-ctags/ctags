@@ -1,5 +1,7 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/07/16: [new]  add \g<0> and \g<+n>.
+
 2011/07/11: Version 5.10.4
 
 2011/07/11: [dist] update autotools.
