@@ -3574,18 +3574,34 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
       if (IS_SYNTAX_OP2(syn, ONIG_SYN_OP2_ESC_G_SUBEXP_CALL)) {
 	PFETCH(c);
 	if (c == '<' || c == '\'') {
-	  int gnum;
+	  int gnum = -1, rel = 0;
 	  UChar* name_end;
+	  OnigCodePoint cnext;
 
+	  cnext = PPEEK;
+	  if (cnext == '0') {
+	    PINC;
+	    if (PPEEK_IS(get_name_end_code_point(c))) {  // \g<0>, \g'0'
+	      PINC;
+	      name_end = p;
+	      gnum = 0;
+	    }
+	  }
+	  else if (cnext == '+') {
+	    PINC;
+	    rel = 1;
+	  }
 	  prev = p;
-	  r = fetch_name((OnigCodePoint )c, &p, end, &name_end, env, &gnum, 1);
-	  if (r < 0) return r;
+	  if (gnum < 0) {
+	    r = fetch_name((OnigCodePoint )c, &p, end, &name_end, env, &gnum, 1);
+	    if (r < 0) return r;
+	  }
 
 	  tok->type = TK_CALL;
 	  tok->u.call.name     = prev;
 	  tok->u.call.name_end = name_end;
 	  tok->u.call.gnum     = gnum;
-	  tok->u.call.rel      = 0;
+	  tok->u.call.rel      = rel;
 	}
 	else
 	  PUNFETCH;
