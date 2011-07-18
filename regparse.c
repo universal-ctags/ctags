@@ -4743,10 +4743,10 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
     case '=':
       *np = onig_node_new_anchor(ANCHOR_PREC_READ);
       break;
-    case '!':  /*         preceding read */
+    case '!':   /* preceding read */
       *np = onig_node_new_anchor(ANCHOR_PREC_READ_NOT);
       break;
-    case '>':            /* (?>...) stop backtrack */
+    case '>':   /* (?>...) stop backtrack */
       *np = node_new_enclose(ENCLOSE_STOP_BACKTRACK);
       break;
 
@@ -5520,10 +5520,10 @@ parse_exp(Node** np, OnigToken* tok, int term,
   switch (tok->type) {
   case TK_ALT:
   case TK_EOT:
-  end_of_token:
-  *np = node_new_empty();
-  return tok->type;
-  break;
+    end_of_token:
+    *np = node_new_empty();
+    return tok->type;
+    break;
 
   case TK_SUBEXP_OPEN:
     r = parse_enclose(np, tok, TK_SUBEXP_CLOSE, src, end, env);
