@@ -4972,14 +4972,26 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 #endif
 
 	  case 'a':     /* limits \d, \s, \w and POSIX brackets to ASCII range */
-	    if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_PERL) && (neg == 0)) {
+	    if ((IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_PERL) ||
+	         IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_RUBY)) &&
+	        (neg == 0)) {
 	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 0);
 	    }
 	    else
 	      return ONIGERR_UNDEFINED_GROUP_OPTION;
 	    break;
 
-	  case 'd': case 'l': case 'u':
+	  case 'u':
+	    if ((IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_PERL) ||
+	         IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_RUBY)) &&
+	        (neg == 0)) {
+	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 1);
+	    }
+	    else
+	      return ONIGERR_UNDEFINED_GROUP_OPTION;
+	    break;
+
+	  case 'd': case 'l':
 	    if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_PERL) && (neg == 0)) {
 	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 1);
 	    }
