@@ -3310,7 +3310,8 @@ next_setup(Node* node, Node* next_node, int in_root, regex_t* reg)
       }
 
 #ifndef ONIG_DONT_OPTIMIZE
-      if (in_root && /* qn->lower == 0 && */
+      if (NTYPE(node) == NT_QTFR && /* the type may be changed by above block */
+	  in_root && /* qn->lower == 0 && */
 	  NTYPE(qn->target) == NT_CANY &&
 	  ! IS_MULTILINE(reg->options)) {
 	/* implicit anchor: /.*a/ ==> /(?:^|\G).*a/ */
