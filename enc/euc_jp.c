@@ -353,9 +353,9 @@ static const OnigCodePoint CR_Hiragana[] = {
 
 static const OnigCodePoint CR_Katakana[] = {
   3,
+  0x8ea6, 0x8eaf,	/* JIS X 0201 Katakana */
+  0x8eb1, 0x8edd,	/* JIS X 0201 Katakana */
   0xa5a1, 0xa5f6,
-  0xaaa6, 0xaaaf,
-  0xaab1, 0xaadd
 }; /* CR_Katakana */
 
 static const OnigCodePoint CR_Han[] = {
