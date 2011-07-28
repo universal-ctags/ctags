@@ -1,5 +1,6 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/07/28: [dist] change the encoding of Japanese documents to UTF-8.
 2011/07/26: [bug]  [^x]*x causes invalid pointer access.
 2011/07/19: [spec] allow (?au) in Ruby syntax mode.
 2011/07/16: [new]  add \g<0> and \g<+n>.
