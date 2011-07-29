@@ -348,23 +348,54 @@ static hash_table_type* PropertyNameTable;
 
 static const OnigCodePoint CR_Hiragana[] = {
   1,
+#ifdef ENC_EUC_JIS_2004
+  0xa4a1, 0xa4fb
+#else
   0xa4a1, 0xa4f3
+#endif
 }; /* CR_Hiragana */
 
+#ifdef ENC_EUC_JIS_2004
+static const OnigCodePoint CR_Katakana[] = {
+  5,
+  0x8ea6, 0x8eaf,	/* JIS X 0201 Katakana */
+  0x8eb1, 0x8edd,	/* JIS X 0201 Katakana */
+  0xa5a1, 0xa5fe,
+  0xa6ee, 0xa6fe,
+  0xa7f2, 0xa7f5,
+}; /* CR_Katakana */
+#else
 static const OnigCodePoint CR_Katakana[] = {
   3,
   0x8ea6, 0x8eaf,	/* JIS X 0201 Katakana */
   0x8eb1, 0x8edd,	/* JIS X 0201 Katakana */
   0xa5a1, 0xa5f6,
 }; /* CR_Katakana */
+#endif
 
+#ifdef ENC_EUC_JIS_2004
 static const OnigCodePoint CR_Han[] = {
-  4,
+  /* EUC-JIS-2004 (JIS X 0213:2004) */
+  7,
+  /* plane 1 */
   0xa1b8, 0xa1b8,
-  0xb0a1, 0xcfd3,
-  0xd0a1, 0xdefe,
-  0xdfa1, 0xf4a6,
+  0xaea1, 0xfefe,	/* Kanji level 1, 2 and 3 */
+  /* plane 2 */
+  0x8fa1a1, 0x8fa1fe,	/* row 1 */
+  0x8fa3a1, 0x8fa5fe,	/* row 3 .. 5 */
+  0x8fa8a1, 0x8fa8fe,	/* row 8 */
+  0x8faca1, 0x8faffe,	/* row 12 .. 15 */
+  0x8feea1, 0x8ffef6,	/* row 78 .. 94 */
 }; /* CR_Han */
+#else
+static const OnigCodePoint CR_Han[] = {
+  /* EUC-JP (JIS X 0208 based) */
+  3,
+  0xa1b8, 0xa1b8,
+  0xb0a1, 0xcfd3,	/* Kanji level 1 */
+  0xd0a1, 0xf4a6,	/* Kanji level 2 */
+}; /* CR_Han */
+#endif
 
 static const OnigCodePoint CR_Latin[] = {
   4,
@@ -372,12 +403,17 @@ static const OnigCodePoint CR_Latin[] = {
   0x0061, 0x007a,
   0xa3c1, 0xa3da,
   0xa3e1, 0xa3fa,
+  /* TODO: add raw 8 .. 11 to support EUC-JIS-2004 */
 }; /* CR_Latin */
 
 static const OnigCodePoint CR_Greek[] = {
   2,
   0xa6a1, 0xa6b8,
+#ifdef ENC_EUC_JIS_2004
+  0xa6c1, 0xa6d9,
+#else
   0xa6c1, 0xa6d8,
+#endif
 }; /* CR_Greek */
 
 static const OnigCodePoint CR_Cyrillic[] = {
