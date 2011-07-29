@@ -170,8 +170,8 @@ static int
 code_to_mbclen(OnigCodePoint code)
 {
   if (ONIGENC_IS_CODE_ASCII(code)) return 1;
-  else if ((code & 0xff0000) != 0) return 3;
-  else if ((code &   0xff00) != 0) return 2;
+  else if ((code & 0xff808080) == 0x00808080) return 3;
+  else if ((code & 0xffff8080) == 0x00008080) return 2;
   else
     return ONIGERR_INVALID_CODE_POINT_VALUE;
 }
