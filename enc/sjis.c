@@ -399,19 +399,19 @@ static const OnigCodePoint CR_Katakana[] = {
 static const OnigCodePoint CR_Han[] = {
   6,
   0x8157, 0x8157,
-  0x889f, 0x9872,
-  0x989f, 0x9ffc,
-  0xe040, 0xeaa4,
-  0xed40, 0xeeec,	/* NECëIíËIBMägí£ï∂éö(èúãLçÜ) */
-  0xfa5c, 0xfc4b,	/* IBMägí£ï∂éö(èúãLçÜ) */
+  0x889f, 0x9872,	/* Kanji level 1 */
+  0x989f, 0x9ffc,	/* Kanji level 2 */
+  0xe040, 0xeaa4,	/* Kanji level 2 */
+  0xed40, 0xeeec,	/* NEC-selected IBM extended characters (without symbols) */
+  0xfa5c, 0xfc4b,	/* IBM extended characters (without symbols) */
 }; /* CR_Han */
 #else
 static const OnigCodePoint CR_Han[] = {
   4,
   0x8157, 0x8157,
-  0x889f, 0x9872,
-  0x989f, 0x9ffc,
-  0xe040, 0xeaa4,
+  0x889f, 0x9872,	/* Kanji level 1 */
+  0x989f, 0x9ffc,	/* Kanji level 2 */
+  0xe040, 0xeaa4,	/* Kanji level 2 */
 }; /* CR_Han */
 #endif
 
