@@ -1,5 +1,13 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/07/30: [new]  EUC-JP: support for JIS X 0212 (Supplemental Kanji).
+2011/07/30: [impl] not to use ONIG_ENCODING_SJIS inside ONIG_ENCODING_CP932.
+2011/07/29: [new]  Add support for EUC-JIS-2004.
+                   (This feature is not enabled by default.)
+2011/07/29: [impl] EUC-JP: check the length more strictly.
+2011/07/29: [dist] translate Japanese comments to English.
+2011/07/29: [bug]  \p{Katakana} doesn't match JIS X 0201 Katakana when EUC-JP
+                   is used.
 2011/07/28: [dist] change the encoding of Japanese documents to UTF-8.
 2011/07/26: [bug]  [^x]*x causes invalid pointer access.
 2011/07/19: [spec] allow (?au) in Ruby syntax mode.
