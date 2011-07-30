@@ -390,10 +390,11 @@ static const OnigCodePoint CR_Han[] = {
 #else
 static const OnigCodePoint CR_Han[] = {
   /* EUC-JP (JIS X 0208 based) */
-  3,
+  4,
   0xa1b8, 0xa1b8,
   0xb0a1, 0xcfd3,	/* Kanji level 1 */
   0xd0a1, 0xf4a6,	/* Kanji level 2 */
+  0x8fb0a1, 0x8fedf3	/* JIS X 0212 Supplemental Kanji (row 16 .. 77) */
 }; /* CR_Han */
 #endif
 
@@ -404,6 +405,7 @@ static const OnigCodePoint CR_Latin[] = {
   0xa3c1, 0xa3da,
   0xa3e1, 0xa3fa,
   /* TODO: add raw 8 .. 11 to support EUC-JIS-2004 */
+  /* TODO: add JIS X 0212 row 9 .. 11 */
 }; /* CR_Latin */
 
 static const OnigCodePoint CR_Greek[] = {
@@ -413,6 +415,7 @@ static const OnigCodePoint CR_Greek[] = {
   0xa6c1, 0xa6d9,
 #else
   0xa6c1, 0xa6d8,
+  /* TODO: add JIS X 0212 row 6 */
 #endif
 }; /* CR_Greek */
 
@@ -420,6 +423,7 @@ static const OnigCodePoint CR_Cyrillic[] = {
   2,
   0xa7a1, 0xa7c1,
   0xa7d1, 0xa7f1,
+  /* TODO: add JIS X 0212 row 7 */
 }; /* CR_Cyrillic */
 
 static int
