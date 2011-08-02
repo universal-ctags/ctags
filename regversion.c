@@ -49,7 +49,7 @@ onig_copyright(void)
 {
   static char s[80];
 
-  sprintf(s, "Onigumo %d.%d.%d : Copyright (C) 2002-2009 K.Kosako, "
+  sprintf(s, "Onigmo %d.%d.%d : Copyright (C) 2002-2009 K.Kosako, "
 	     "2011 K.Takata",
           ONIGURUMA_VERSION_MAJOR,
           ONIGURUMA_VERSION_MINOR,
