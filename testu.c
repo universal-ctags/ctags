@@ -117,18 +117,21 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
   regex_t* reg;
   OnigCompileInfo ci;
   OnigErrorInfo einfo;
+  OnigSyntaxType syn = *ONIG_SYNTAX_DEFAULT;
+
+  ONIG_OPTION_OFF(syn.options, ONIG_OPTION_ASCII_RANGE);
 
   uconv(pattern, cpat, ulen(pattern));
   uconv(str,     cstr, ulen(str));
 
 #if 0
   r = onig_new(&reg, (UChar* )pattern, (UChar* )(pattern + ulen(pattern)),
-	       ONIG_OPTION_DEFAULT, ENC, ONIG_SYNTAX_DEFAULT, &einfo);
+	       ONIG_OPTION_DEFAULT, ENC, &syn, &einfo);
 #else
   ci.num_of_elements = 5;
   ci.pattern_enc = ENC;
   ci.target_enc  = ENC;
-  ci.syntax      = ONIG_SYNTAX_DEFAULT;
+  ci.syntax      = &syn;
   ci.option      = ONIG_OPTION_DEFAULT;
   ci.case_fold_flag = ONIGENC_CASE_FOLD_DEFAULT;
 

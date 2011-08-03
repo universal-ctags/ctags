@@ -88,9 +88,12 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
 #else
   regex_t* reg;
   OnigErrorInfo einfo;
+  OnigSyntaxType syn = *ONIG_SYNTAX_DEFAULT;
+
+  ONIG_OPTION_OFF(syn.options, ONIG_OPTION_ASCII_RANGE);
 
   r = onig_new(&reg, (UChar* )pattern, (UChar* )(pattern + SLEN(pattern)),
-	       ONIG_OPTION_DEFAULT, ONIG_ENCODING_EUC_JP, ONIG_SYNTAX_DEFAULT, &einfo);
+	       ONIG_OPTION_DEFAULT, ONIG_ENCODING_EUC_JP, &syn, &einfo);
   if (r) {
     char s[ONIG_MAX_ERROR_MESSAGE_LEN];
     onig_error_code_to_str((UChar* )s, r, &einfo);
