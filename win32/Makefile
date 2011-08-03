@@ -68,6 +68,7 @@ distfiles    = README COPYING HISTORY \
 		$(headers) $(libsources) $(patchfiles) \
 		test.rb testconv.rb
 testc        = testc
+testcu       = testu
 testp        = testp
 
 makeargs = $(MFLAGS) CPPFLAGS='$(CPPFLAGS)' CFLAGS='$(CFLAGS)' CC='$(CC)'
@@ -163,11 +164,11 @@ $(testp): $(testc).c $(dlllib)
 #$(testc)u.c: test.rb testconvu.rb
 #	ruby -Ke testconvu.rb test.rb > $@
 
-$(testc)u: $(testc)u.c $(libname)
-	$(CC) -nologo -o $(testc)u -DONIG_EXTERN=extern $(testc)u.c $(libname)
+$(testcu): $(testcu).c $(libname)
+	$(CC) -nologo -o $(testcu) -DONIG_EXTERN=extern $(testcu).c $(libname)
 
 clean:
-	del *.obj $(encdir)\*.obj *.lib *.exp *.dll $(testp).exe $(testc).exe $(testc).obj
+	del *.obj $(encdir)\*.obj *.lib *.exp *.dll $(testp).exe $(testc).exe $(testc).obj $(testcu).exe $(testcu).obj
 
 
 # backup file suffix
