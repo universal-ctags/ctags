@@ -1,5 +1,9 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/08/03: Version 5.10.5
+
+2011/08/03: [dist] update win32/Makefile.
+2011/08/03: [dist] update tests to support ONIG_OPTION_ASCII_RANGE option.
 2011/07/30: [new]  EUC-JP: support for JIS X 0212 (Supplemental Kanji).
 2011/07/30: [impl] not to use ONIG_ENCODING_SJIS inside ONIG_ENCODING_CP932.
 2011/07/29: [new]  Add support for EUC-JIS-2004.
