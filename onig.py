@@ -107,75 +107,75 @@ libonig = ctypes.cdll.LoadLibrary(_libname)
 #
 # Encodings
 #
-def load_encoding(enc):
-    return ctypes.cast(enc, OnigEncoding)
+def _load_encoding(enc):
+    return ctypes.pointer(OnigEncodingType.in_dll(libonig, enc))
 
-ONIG_ENCODING_ASCII         = load_encoding(libonig.OnigEncodingASCII)
-ONIG_ENCODING_ISO_8859_1    = load_encoding(libonig.OnigEncodingISO_8859_1)
-ONIG_ENCODING_ISO_8859_2    = load_encoding(libonig.OnigEncodingISO_8859_2)
-ONIG_ENCODING_ISO_8859_3    = load_encoding(libonig.OnigEncodingISO_8859_3)
-ONIG_ENCODING_ISO_8859_4    = load_encoding(libonig.OnigEncodingISO_8859_4)
-ONIG_ENCODING_ISO_8859_5    = load_encoding(libonig.OnigEncodingISO_8859_5)
-ONIG_ENCODING_ISO_8859_6    = load_encoding(libonig.OnigEncodingISO_8859_6)
-ONIG_ENCODING_ISO_8859_7    = load_encoding(libonig.OnigEncodingISO_8859_7)
-ONIG_ENCODING_ISO_8859_8    = load_encoding(libonig.OnigEncodingISO_8859_8)
-ONIG_ENCODING_ISO_8859_9    = load_encoding(libonig.OnigEncodingISO_8859_9)
-ONIG_ENCODING_ISO_8859_10   = load_encoding(libonig.OnigEncodingISO_8859_10)
-ONIG_ENCODING_ISO_8859_11   = load_encoding(libonig.OnigEncodingISO_8859_11)
-ONIG_ENCODING_ISO_8859_13   = load_encoding(libonig.OnigEncodingISO_8859_13)
-ONIG_ENCODING_ISO_8859_14   = load_encoding(libonig.OnigEncodingISO_8859_14)
-ONIG_ENCODING_ISO_8859_15   = load_encoding(libonig.OnigEncodingISO_8859_15)
-ONIG_ENCODING_ISO_8859_16   = load_encoding(libonig.OnigEncodingISO_8859_16)
-ONIG_ENCODING_UTF8          = load_encoding(libonig.OnigEncodingUTF8)
-ONIG_ENCODING_UTF16_LE      = load_encoding(libonig.OnigEncodingUTF16_LE)
-ONIG_ENCODING_UTF16_BE      = load_encoding(libonig.OnigEncodingUTF16_BE)
-ONIG_ENCODING_UTF32_LE      = load_encoding(libonig.OnigEncodingUTF32_LE)
-ONIG_ENCODING_UTF32_BE      = load_encoding(libonig.OnigEncodingUTF32_BE)
-ONIG_ENCODING_EUC_JP        = load_encoding(libonig.OnigEncodingEUC_JP)
-ONIG_ENCODING_EUC_TW        = load_encoding(libonig.OnigEncodingEUC_TW)
-ONIG_ENCODING_EUC_KR        = load_encoding(libonig.OnigEncodingEUC_KR)
-ONIG_ENCODING_EUC_CN        = load_encoding(libonig.OnigEncodingEUC_CN)
-ONIG_ENCODING_SJIS          = load_encoding(libonig.OnigEncodingSJIS)
+ONIG_ENCODING_ASCII         = _load_encoding("OnigEncodingASCII")
+ONIG_ENCODING_ISO_8859_1    = _load_encoding("OnigEncodingISO_8859_1")
+ONIG_ENCODING_ISO_8859_2    = _load_encoding("OnigEncodingISO_8859_2")
+ONIG_ENCODING_ISO_8859_3    = _load_encoding("OnigEncodingISO_8859_3")
+ONIG_ENCODING_ISO_8859_4    = _load_encoding("OnigEncodingISO_8859_4")
+ONIG_ENCODING_ISO_8859_5    = _load_encoding("OnigEncodingISO_8859_5")
+ONIG_ENCODING_ISO_8859_6    = _load_encoding("OnigEncodingISO_8859_6")
+ONIG_ENCODING_ISO_8859_7    = _load_encoding("OnigEncodingISO_8859_7")
+ONIG_ENCODING_ISO_8859_8    = _load_encoding("OnigEncodingISO_8859_8")
+ONIG_ENCODING_ISO_8859_9    = _load_encoding("OnigEncodingISO_8859_9")
+ONIG_ENCODING_ISO_8859_10   = _load_encoding("OnigEncodingISO_8859_10")
+ONIG_ENCODING_ISO_8859_11   = _load_encoding("OnigEncodingISO_8859_11")
+ONIG_ENCODING_ISO_8859_13   = _load_encoding("OnigEncodingISO_8859_13")
+ONIG_ENCODING_ISO_8859_14   = _load_encoding("OnigEncodingISO_8859_14")
+ONIG_ENCODING_ISO_8859_15   = _load_encoding("OnigEncodingISO_8859_15")
+ONIG_ENCODING_ISO_8859_16   = _load_encoding("OnigEncodingISO_8859_16")
+ONIG_ENCODING_UTF8          = _load_encoding("OnigEncodingUTF8")
+ONIG_ENCODING_UTF16_LE      = _load_encoding("OnigEncodingUTF16_LE")
+ONIG_ENCODING_UTF16_BE      = _load_encoding("OnigEncodingUTF16_BE")
+ONIG_ENCODING_UTF32_LE      = _load_encoding("OnigEncodingUTF32_LE")
+ONIG_ENCODING_UTF32_BE      = _load_encoding("OnigEncodingUTF32_BE")
+ONIG_ENCODING_EUC_JP        = _load_encoding("OnigEncodingEUC_JP")
+ONIG_ENCODING_EUC_TW        = _load_encoding("OnigEncodingEUC_TW")
+ONIG_ENCODING_EUC_KR        = _load_encoding("OnigEncodingEUC_KR")
+ONIG_ENCODING_EUC_CN        = _load_encoding("OnigEncodingEUC_CN")
+ONIG_ENCODING_SJIS          = _load_encoding("OnigEncodingSJIS")
 try:
-    ONIG_ENCODING_CP932     = load_encoding(libonig.OnigEncodingCP932)
-except AttributeError:
+    ONIG_ENCODING_CP932     = _load_encoding("OnigEncodingCP932")
+except ValueError:
     pass
-#ONIG_ENCODING_KOI8         = load_encoding(libonig.OnigEncodingKOI8)
-ONIG_ENCODING_KOI8_R        = load_encoding(libonig.OnigEncodingKOI8_R)
-ONIG_ENCODING_CP1251        = load_encoding(libonig.OnigEncodingCP1251)
-ONIG_ENCODING_BIG5          = load_encoding(libonig.OnigEncodingBIG5)
-ONIG_ENCODING_GB18030       = load_encoding(libonig.OnigEncodingGB18030)
+#ONIG_ENCODING_KOI8         = _load_encoding("OnigEncodingKOI8")
+ONIG_ENCODING_KOI8_R        = _load_encoding("OnigEncodingKOI8_R")
+ONIG_ENCODING_CP1251        = _load_encoding("OnigEncodingCP1251")
+ONIG_ENCODING_BIG5          = _load_encoding("OnigEncodingBIG5")
+ONIG_ENCODING_GB18030       = _load_encoding("OnigEncodingGB18030")
 
-ONIG_ENCODING_UNDEF         = OnigEncoding()
+#ONIG_ENCODING_UNDEF         = None
 
 
 #
 # Syntaxes
 #
-def load_syntax(syn):
-    return ctypes.cast(syn, ctypes.POINTER(OnigSyntaxType))
+def _load_syntax(syn):
+    return ctypes.pointer(OnigSyntaxType.in_dll(libonig, syn))
 
-ONIG_SYNTAX_ASIS            = load_syntax(libonig.OnigSyntaxASIS)
-ONIG_SYNTAX_POSIX_BASIC     = load_syntax(libonig.OnigSyntaxPosixBasic)
-ONIG_SYNTAX_POSIX_EXTENDED  = load_syntax(libonig.OnigSyntaxPosixExtended)
-ONIG_SYNTAX_EMACS           = load_syntax(libonig.OnigSyntaxEmacs)
-ONIG_SYNTAX_GREP            = load_syntax(libonig.OnigSyntaxGrep)
-ONIG_SYNTAX_GNU_REGEX       = load_syntax(libonig.OnigSyntaxGnuRegex)
-ONIG_SYNTAX_JAVA            = load_syntax(libonig.OnigSyntaxJava)
-ONIG_SYNTAX_PERL            = load_syntax(libonig.OnigSyntaxPerl)
+ONIG_SYNTAX_ASIS            = _load_syntax("OnigSyntaxASIS")
+ONIG_SYNTAX_POSIX_BASIC     = _load_syntax("OnigSyntaxPosixBasic")
+ONIG_SYNTAX_POSIX_EXTENDED  = _load_syntax("OnigSyntaxPosixExtended")
+ONIG_SYNTAX_EMACS           = _load_syntax("OnigSyntaxEmacs")
+ONIG_SYNTAX_GREP            = _load_syntax("OnigSyntaxGrep")
+ONIG_SYNTAX_GNU_REGEX       = _load_syntax("OnigSyntaxGnuRegex")
+ONIG_SYNTAX_JAVA            = _load_syntax("OnigSyntaxJava")
+ONIG_SYNTAX_PERL            = _load_syntax("OnigSyntaxPerl")
 try:
-    ONIG_SYNTAX_PERL58      = load_syntax(libonig.OnigSyntaxPerl58)
-    ONIG_SYNTAX_PERL58_NG   = load_syntax(libonig.OnigSyntaxPerl58_NG)
-except AttributeError:
+    ONIG_SYNTAX_PERL58      = _load_syntax("OnigSyntaxPerl58")
+    ONIG_SYNTAX_PERL58_NG   = _load_syntax("OnigSyntaxPerl58_NG")
+except ValueError:
     pass
 try:
-    ONIG_SYNTAX_PERL_NG     = load_syntax(libonig.OnigSyntaxPerl_NG)
-except AttributeError:
+    ONIG_SYNTAX_PERL_NG     = _load_syntax("OnigSyntaxPerl_NG")
+except ValueError:
     pass
-ONIG_SYNTAX_RUBY            = load_syntax(libonig.OnigSyntaxRuby)
+ONIG_SYNTAX_RUBY            = _load_syntax("OnigSyntaxRuby")
 
-ONIG_SYNTAX_DEFAULT = ctypes.cast(libonig.OnigDefaultSyntax,
-        ctypes.POINTER(ctypes.POINTER(OnigSyntaxType))).contents
+ONIG_SYNTAX_DEFAULT         = ctypes.POINTER(OnigSyntaxType).in_dll(
+                                    libonig, "OnigDefaultSyntax")
 
 
 #
