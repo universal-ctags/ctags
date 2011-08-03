@@ -101,7 +101,7 @@ regcomp.obj:   regcomp.c  $(onigheaders) config.h
 regexec.obj:   regexec.c  regint.h regenc.h oniguruma.h config.h
 reggnu.obj:    reggnu.c   regint.h regenc.h oniguruma.h config.h oniggnu.h
 regerror.obj:  regerror.c regint.h regenc.h oniguruma.h config.h
-regenc.obj:    regenc.c   regenc.h oniguruma.h config.h
+regenc.obj:    regenc.c   regint.h regenc.h oniguruma.h config.h
 regsyntax.obj: regsyntax.c regint.h regenc.h oniguruma.h config.h
 regversion.obj: regversion.c oniguruma.h config.h
 regposix.obj:  regposix.c $(posixheaders) oniguruma.h config.h
@@ -109,7 +109,7 @@ regposerr.obj: regposerr.c $(posixheaders) config.h
 st.obj:        st.c regint.h oniguruma.h config.h st.h
 
 $(encdir)\ascii.obj:      $(encdir)\ascii.c regenc.h config.h
-$(encdir)\unicode.obj:    $(encdir)\unicode.c regenc.h config.h
+$(encdir)\unicode.obj:    $(encdir)\unicode.c regint.h regenc.h config.h
 $(encdir)\utf8.obj:       $(encdir)\utf8.c regenc.h config.h
 $(encdir)\utf16_be.obj:   $(encdir)\utf16_be.c regenc.h config.h
 $(encdir)\utf16_le.obj:   $(encdir)\utf16_le.c regenc.h config.h
