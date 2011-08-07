@@ -420,6 +420,7 @@ ONIG_EXTERN OnigSyntaxType OnigSyntaxPerl58;
 ONIG_EXTERN OnigSyntaxType OnigSyntaxPerl58_NG;
 ONIG_EXTERN OnigSyntaxType OnigSyntaxPerl;
 ONIG_EXTERN OnigSyntaxType OnigSyntaxRuby;
+ONIG_EXTERN OnigSyntaxType OnigSyntaxPython;
 
 /* predefined syntaxes (see regsyntax.c) */
 #define ONIG_SYNTAX_ASIS               (&OnigSyntaxASIS)
@@ -433,6 +434,7 @@ ONIG_EXTERN OnigSyntaxType OnigSyntaxRuby;
 #define ONIG_SYNTAX_PERL58_NG          (&OnigSyntaxPerl58_NG)
 #define ONIG_SYNTAX_PERL               (&OnigSyntaxPerl)
 #define ONIG_SYNTAX_RUBY               (&OnigSyntaxRuby)
+#define ONIG_SYNTAX_PYTHON             (&OnigSyntaxPython)
 
 /* default syntax */
 ONIG_EXTERN OnigSyntaxType*   OnigDefaultSyntax;
