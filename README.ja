@@ -1,4 +1,4 @@
-README.ja  2011/07/11
+README.ja  2011/08/09
 
 鬼雲 (鬼車改)  --  (C) K.Takata <kentkt AT csc DOT jp>
 
@@ -21,6 +21,9 @@ Perl 5.10以降で新たに導入された正規表現の一部が使用可能�
 
   エンコーディング:
     CP932
+
+  文法:
+    Python
 
 
 以下、鬼車の README.ja:

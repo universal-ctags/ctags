@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Regular Expressions Version 5.10.5    2011/07/16
+Onigmo (Oniguruma-mod) Regular Expressions Version 5.10.6    2011/08/09
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -409,7 +409,7 @@ A-1. Syntax depend options
    + ONIG_SYNTAX_RUBY
      (?m): dot(.) match newline
 
-   + ONIG_SYNTAX_PERL and ONIG_SYNTAX_JAVA
+   + ONIG_SYNTAX_PERL, ONIG_SYNTAX_JAVA and ONIG_SYNTAX_PYTHON
      (?s): dot(.) match newline
      (?m): ^ match after newline, $ match before newline
 

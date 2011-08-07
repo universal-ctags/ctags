@@ -1,5 +1,12 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/08/09: Version 5.10.6
+
+2011/08/09: [dist] a .def file can be used to export APIs.
+2011/08/08: [dist] update win32/Makefile to support LTCG optimization.
+2011/08/07: [new]  add new test scripts: testpy.py and onig.py
+2011/08/07: [new]  add a new syntax: ONIG_SYNTAX_PYTHON
+
 2011/08/03: Version 5.10.5
 
 2011/08/03: [dist] update win32/Makefile.

@@ -1,4 +1,4 @@
-鬼雲 (鬼車改) 正規表現 Version 5.10.5    2011/07/16
+鬼雲 (鬼車改) 正規表現 Version 5.10.6    2011/08/09
 
 使用文法: ONIG_SYNTAX_RUBY (既定値)
 
@@ -413,7 +413,7 @@
    + ONIG_SYNTAX_RUBY
      (?m): 終止符記号(.)は改行と照合成功
 
-   + ONIG_SYNTAX_PERL と ONIG_SYNTAX_JAVA
+   + ONIG_SYNTAX_PERL、ONIG_SYNTAX_JAVA、ONIG_SYNTAX_PYTHON
      (?s): 終止符記号(.)は改行と照合成功
      (?m): ^ は改行の直後に照合する、$ は改行の直前に照合する
 
