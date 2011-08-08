@@ -2,6 +2,10 @@
 
 product_name = oniguruma
 
+# Comment out the next line, if you don't want to use LTCG.
+USE_LTCG = 1
+
+
 CPPFLAGS = 
 CFLAGS = -O2 -nologo /W3
 LDFLAGS =
@@ -11,6 +15,17 @@ ARLIB_FLAGS = -nologo
 ARDLL = cl
 ARDLL_FLAGS = -nologo -LD $(LINKFLAGS) -dll
 LINKFLAGS = -link -incremental:no -pdb:none
+
+!if DEFINED(USE_LTCG) && $(USE_LTCG)
+# Use LTCG (Link Time Code Generation)
+# Check the version of nmake.exe instead of cl.exe, because we can't check it
+# directly. Nmake can't compare strings, so we use cmd.exe's "if" command.
+!if [if "$(_NMAKE_VER)" GEQ "7.00" exit 1]
+CFLAGS = $(CFLAGS) -GL
+ARLIB_FLAGS = $(ARLIB_FLAGS) -LTCG
+ARDLL_FLAGS = $(ARDLL_FLAGS) -LTCG
+!endif
+!endif
 
 INSTALL = install -c
 CP      = copy
