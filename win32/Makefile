@@ -5,6 +5,9 @@ product_name = oniguruma
 # Comment out the next line, if you don't want to use LTCG.
 USE_LTCG = 1
 
+# Enable the next line, if you want to use a .def file.
+#DEFFILE = onig.def
+
 
 CPPFLAGS = 
 CFLAGS = -O2 -nologo /W3
@@ -27,11 +30,18 @@ ARDLL_FLAGS = $(ARDLL_FLAGS) -LTCG
 !endif
 !endif
 
+!ifdef DEFFILE
+# Use a .def file to export APIs.
+CFLAGS = $(CFLAGS) /DONIG_EXTERN=extern
+ARDLL_FLAGS = $(ARDLL_FLAGS) -def:$(DEFFILE)
+!endif
+
 INSTALL = install -c
 CP      = copy
 CC = cl
 DEFS = -DHAVE_CONFIG_H -DNOT_RUBY -DEXPORT
 RUBYDIR = ..
+PYTHON = python
 
 subdirs = 
 
@@ -107,7 +117,7 @@ all: $(libname) $(dllname)
 $(libname): $(libobjs) $(encobjs)
 	$(ARLIB) $(ARLIB_FLAGS) -out:$@ $(libobjs) $(encobjs)
 
-$(dllname): $(libobjs) $(encobjs)
+$(dllname): $(libobjs) $(encobjs) $(DEFFILE)
 	$(ARDLL) $(libobjs) $(encobjs) -Fe$@ $(ARDLL_FLAGS)
 
 regparse.obj:  regparse.c $(onigheaders) config.h st.h
@@ -181,6 +191,9 @@ $(testp): $(testc).c $(dlllib)
 
 $(testcu): $(testcu).c $(libname)
 	$(CC) -nologo -o $(testcu) -DONIG_EXTERN=extern $(testcu).c $(libname)
+
+$(libbase).def: win32\makedef.py oniguruma.h regenc.h oniggnu.h onigposix.h
+	$(PYTHON) win32\makedef.py > $@
 
 clean:
 	del *.obj $(encdir)\*.obj *.lib *.exp *.dll $(testp).exe $(testc).exe $(testc).obj $(testcu).exe $(testcu).obj
