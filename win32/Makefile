@@ -39,6 +39,7 @@ ARDLL_FLAGS = $(ARDLL_FLAGS) -def:$(DEFFILE)
 INSTALL = install -c
 CP      = copy
 CC = cl
+RC = rc
 DEFS = -DHAVE_CONFIG_H -DNOT_RUBY -DEXPORT
 RUBYDIR = ..
 PYTHON = python
@@ -80,6 +81,8 @@ encobjs      =  $(encdir)\ascii.obj $(encdir)\utf8.obj \
 		$(encdir)\koi8_r.obj  \
 		$(encdir)\cp1251.obj # $(encdir)\koi8.obj
 
+resobj       = win32\onig.res
+
 onigsources  = regerror.c regparse.c regext.c regcomp.c regexec.c regenc.c \
 	       regsyntax.c regtrav.c regversion.c reggnu.c st.c
 posixsources = regposix.c regposerr.c
@@ -99,10 +102,13 @@ testp        = testp
 makeargs = $(MFLAGS) CPPFLAGS='$(CPPFLAGS)' CFLAGS='$(CFLAGS)' CC='$(CC)'
 
 .SUFFIXES:
-.SUFFIXES: .obj .c .h .ps .dvi .info .texinfo
+.SUFFIXES: .obj .c .h .ps .dvi .info .texinfo .res .rc
 
 .c.obj:
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) /I. /I.. /Fo$@ /c $<
+
+.rc.res:
+	$(RC) /Fo$@ $<
 
 # targets
 default: all
@@ -117,8 +123,8 @@ all: $(libname) $(dllname)
 $(libname): $(libobjs) $(encobjs)
 	$(ARLIB) $(ARLIB_FLAGS) -out:$@ $(libobjs) $(encobjs)
 
-$(dllname): $(libobjs) $(encobjs) $(DEFFILE)
-	$(ARDLL) $(libobjs) $(encobjs) -Fe$@ $(ARDLL_FLAGS)
+$(dllname): $(libobjs) $(encobjs) $(resobj) $(DEFFILE)
+	$(ARDLL) $(libobjs) $(encobjs) $(resobj) -Fe$@ $(ARDLL_FLAGS)
 
 regparse.obj:  regparse.c $(onigheaders) config.h st.h
 regext.obj:    regext.c   $(onigheaders) config.h
@@ -167,6 +173,8 @@ $(encdir)\cp1251.obj:     $(encdir)\cp1251.c regenc.h config.h
 $(encdir)\big5.obj:       $(encdir)\big5.c   regenc.h config.h
 $(encdir)\gb18030.obj:    $(encdir)\gb18030.c   regenc.h config.h
 
+win32\onig.res: win32\onig.rc
+
 
 # Ruby test
 rtest:
@@ -196,7 +204,7 @@ $(libbase).def: win32\makedef.py oniguruma.h regenc.h oniggnu.h onigposix.h
 	$(PYTHON) win32\makedef.py > $@
 
 clean:
-	del *.obj $(encdir)\*.obj *.lib *.exp *.dll $(testp).exe $(testc).exe $(testc).obj $(testcu).exe $(testcu).obj
+	del *.obj $(encdir)\*.obj *.lib *.exp *.dll $(testp).exe $(testc).exe $(testc).obj $(testcu).exe $(testcu).obj win32\*.res
 
 
 # backup file suffix
