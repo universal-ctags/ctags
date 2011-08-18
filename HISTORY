@@ -1,5 +1,7 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/08/18: [dist] add a resource script for onig.dll (win32/onig.rc).
+
 2011/08/09: Version 5.10.6
 
 2011/08/09: [dist] a .def file can be used to export APIs.
