@@ -113,6 +113,9 @@ syntax: ONIG_SYNTAX_RUBY (default)
   \R       Linebreak
            (?>\x0D\x0A|[\x0A-\x0D])
 
+           If USE_UNICODE_ALL_LINE_TERMINATORS is defined in regenc.h:
+             (?>\x0D\x0A|[\x0A-\x0D\x{85}\x{2028}\x{2029}])
+
   \X       eXtended grapheme cluster
 
            Unicode:

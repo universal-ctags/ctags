@@ -113,6 +113,9 @@
   \R       改行文字 (Linebreak)
            (?>\x0D\x0A|[\x0A-\x0D])
 
+           USE_UNICODE_ALL_LINE_TERMINATORS が regenc.h で定義されている場合:
+             (?>\x0D\x0A|[\x0A-\x0D\x{85}\x{2028}\x{2029}])
+
   \X       eXtended grapheme cluster
 
            Unicodeの場合:
