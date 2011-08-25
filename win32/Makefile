@@ -19,11 +19,18 @@ ARDLL = cl
 ARDLL_FLAGS = -nologo -LD $(LINKFLAGS) -dll
 LINKFLAGS = -link -incremental:no -pdb:none
 
+INSTALL = install -c
+CP      = copy
+CC = cl
+RC = rc
+DEFS = -DHAVE_CONFIG_H -DNOT_RUBY -DEXPORT
+RUBYDIR = ..
+PYTHON = python
+
 !if DEFINED(USE_LTCG) && $(USE_LTCG)
-# Use LTCG (Link Time Code Generation)
-# Check the version of nmake.exe instead of cl.exe, because we can't check it
-# directly. Nmake can't compare strings, so we use cmd.exe's "if" command.
-!if [if "$(_NMAKE_VER)" GEQ "7.00" exit 1]
+# Use LTCG (Link Time Code Generation).
+# Check if cl.exe is newer than VC++ 7.0 (_MSC_VER >= 1300).
+!if [(echo _MSC_VER>mscver.c) && for /f %i in ('cmd /c "$(CC) /EP mscver.c 2>nul"') do @(del mscver.c && if %i GEQ 1300 exit 1)]
 CFLAGS = $(CFLAGS) -GL
 ARLIB_FLAGS = $(ARLIB_FLAGS) -LTCG
 ARDLL_FLAGS = $(ARDLL_FLAGS) -LTCG
@@ -35,14 +42,6 @@ ARDLL_FLAGS = $(ARDLL_FLAGS) -LTCG
 CFLAGS = $(CFLAGS) /DONIG_EXTERN=extern
 ARDLL_FLAGS = $(ARDLL_FLAGS) -def:$(DEFFILE)
 !endif
-
-INSTALL = install -c
-CP      = copy
-CC = cl
-RC = rc
-DEFS = -DHAVE_CONFIG_H -DNOT_RUBY -DEXPORT
-RUBYDIR = ..
-PYTHON = python
 
 subdirs = 
 
