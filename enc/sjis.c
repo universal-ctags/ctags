@@ -236,15 +236,15 @@ apply_all_case_fold(OnigCaseFoldType flag,
 static OnigCodePoint
 get_lower_case(OnigCodePoint code)
 {
-  if (code - 0x8260 <= 0x8279 - 0x8260) {
+  if (ONIGENC_IS_IN_RANGE(code, 0x8260, 0x8279)) {
     /* Fullwidth Alphabet */
     return (OnigCodePoint )(code + 0x0021);
   }
-  else if (code - 0x839f <= 0x83b6 - 0x839f) {
+  else if (ONIGENC_IS_IN_RANGE(code, 0x839f, 0x83b6)) {
     /* Greek */
     return (OnigCodePoint )(code + 0x0020);
   }
-  else if (code - 0x8440 <= 0x8460 - 0x8440) {
+  else if (ONIGENC_IS_IN_RANGE(code, 0x8440, 0x8460)) {
     /* Cyrillic */
     int d = (code >= 0x844f) ? 1 : 0;
     return (OnigCodePoint )(code + (0x0030 + d));
@@ -255,16 +255,16 @@ get_lower_case(OnigCodePoint code)
 static OnigCodePoint
 get_upper_case(OnigCodePoint code)
 {
-  if (code - 0x8281 <= 0x829a - 0x8281) {
+  if (ONIGENC_IS_IN_RANGE(code, 0x8281, 0x829a)) {
     /* Fullwidth Alphabet */
     return (OnigCodePoint )(code - 0x0021);
   }
-  else if (code - 0x83bf <= 0x83d6 - 0x83bf) {
+  else if (ONIGENC_IS_IN_RANGE(code, 0x83bf, 0x83d6)) {
     /* Greek */
     return (OnigCodePoint )(code - 0x0020);
   }
-  else if ((code - 0x8470 <= 0x847e - 0x8470) ||
-	   (code - 0x8480 <= 0x8491 - 0x8480)) {
+  else if (ONIGENC_IS_IN_RANGE(code, 0x8470, 0x847e) ||
+	   ONIGENC_IS_IN_RANGE(code, 0x8480, 0x8491)) {
     /* Cyrillic */
     int d = (code >= 0x8480) ? 1 : 0;
     return (OnigCodePoint )(code - (0x0030 - d));

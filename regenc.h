@@ -187,5 +187,9 @@ ONIG_EXTERN const unsigned short OnigEncAsciiCtypeTable[];
  (ONIGENC_IS_ASCII_CODE_CTYPE(code, ONIGENC_CTYPE_UPPER) ||\
   ONIGENC_IS_ASCII_CODE_CTYPE(code, ONIGENC_CTYPE_LOWER))
 
+/* Check if the code is in the range. (from <= code && code <= to) */
+#define ONIGENC_IS_IN_RANGE(code, from, to) \
+  ((OnigCodePoint )((code) - (from)) <= (OnigCodePoint )((to) - (from)))
+
 
 #endif /* REGENC_H */
