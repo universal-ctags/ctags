@@ -429,7 +429,7 @@ add_compile_string_length(UChar* s ARG_UNUSED, int mb_len, OnigDistance str_len,
   if (IS_NEED_STR_LEN_OP_EXACT(op))
     len += SIZE_LENGTH;
 
-  len += mb_len * str_len;
+  len += mb_len * (int)str_len;
   return len;
 }
 
@@ -4090,10 +4090,10 @@ set_bm_skip(UChar* s, UChar* end, OnigEncoding enc ARG_UNUSED,
 
   len = end - s;
   if (len < ONIG_CHAR_TABLE_SIZE) {
-    for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++) skip[i] = len;
+    for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++) skip[i] = (UChar)len;
 
     for (i = 0; i < len - 1; i++)
-      skip[s[i]] = len - 1 - i;
+      skip[s[i]] = (UChar)(len - 1 - i);
   }
   else {
     if (IS_NULL(*int_skip)) {

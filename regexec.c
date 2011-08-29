@@ -1379,13 +1379,13 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	    for (i = 1; i <= num_mem; i++) {
 	      if (mem_end_stk[i] != INVALID_STACK_INDEX) {
 		if (BIT_STATUS_AT(reg->bt_mem_start, i))
-		  rmt[i].rm_so = STACK_AT(mem_start_stk[i])->u.mem.pstr - str;
+		  rmt[i].rm_so = (regoff_t )(STACK_AT(mem_start_stk[i])->u.mem.pstr - str);
 		else
-		  rmt[i].rm_so = (UChar* )((void* )(mem_start_stk[i])) - str;
+		  rmt[i].rm_so = (regoff_t )((UChar* )((void* )(mem_start_stk[i])) - str);
 
-		rmt[i].rm_eo = (BIT_STATUS_AT(reg->bt_mem_end, i)
+		rmt[i].rm_eo = (regoff_t )((BIT_STATUS_AT(reg->bt_mem_end, i)
 				? STACK_AT(mem_end_stk[i])->u.mem.pstr
-				: (UChar* )((void* )mem_end_stk[i])) - str;
+				: (UChar* )((void* )mem_end_stk[i])) - str);
 	      }
 	      else {
 		rmt[i].rm_so = rmt[i].rm_eo = ONIG_REGION_NOTPOS;
@@ -1399,13 +1399,13 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	    for (i = 1; i <= num_mem; i++) {
 	      if (mem_end_stk[i] != INVALID_STACK_INDEX) {
 		if (BIT_STATUS_AT(reg->bt_mem_start, i))
-		  region->beg[i] = STACK_AT(mem_start_stk[i])->u.mem.pstr - str;
+		  region->beg[i] = (int )(STACK_AT(mem_start_stk[i])->u.mem.pstr - str);
 		else
-		  region->beg[i] = (UChar* )((void* )mem_start_stk[i]) - str;
+		  region->beg[i] = (int )((UChar* )((void* )mem_start_stk[i]) - str);
 
-		region->end[i] = (BIT_STATUS_AT(reg->bt_mem_end, i)
+		region->end[i] = (regoff_t )((BIT_STATUS_AT(reg->bt_mem_end, i)
 				  ? STACK_AT(mem_end_stk[i])->u.mem.pstr
-				  : (UChar* )((void* )mem_end_stk[i])) - str;
+				  : (UChar* )((void* )mem_end_stk[i])) - str);
 	      }
 	      else {
 		region->beg[i] = region->end[i] = ONIG_REGION_NOTPOS;
@@ -2311,7 +2311,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	n = pend - pstart;
 	DATA_ENSURE(n);
 	sprev = s;
-	STRING_CMP_IC(case_fold_flag, pstart, &s, n);
+	STRING_CMP_IC(case_fold_flag, pstart, &s, (int)n);
 	while (sprev + (len = enclen(encode, sprev)) < s)
 	  sprev += len;
 
@@ -3899,7 +3899,7 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
  match:
   ONIG_STATE_DEC_THREAD(reg);
   MATCH_ARG_FREE(msa);
-  return s - str;
+  return (long)(s - str);
 }
 
 extern OnigEncoding

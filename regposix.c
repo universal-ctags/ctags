@@ -41,7 +41,7 @@
   if (ONIGENC_MBC_MINLEN(enc) == 1) { \
     UChar* tmps = (UChar* )(s); \
     while (*tmps != 0) tmps++; \
-    len = tmps - (UChar* )(s); \
+    len = (int)(tmps - (UChar* )(s)); \
   } \
   else { \
     len = onigenc_str_bytelen_null(enc, (UChar* )s); \

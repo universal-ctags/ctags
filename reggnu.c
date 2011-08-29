@@ -54,7 +54,7 @@ re_adjust_startpos(regex_t* reg, const char* string, int size,
     else {
       p = ONIGENC_LEFT_ADJUST_CHAR_HEAD(reg->enc, (UChar* )string, s);
     }
-    return p - (UChar* )string;
+    return (int)(p - (UChar* )string);
   }
 
   return startpos;
