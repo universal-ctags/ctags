@@ -41,7 +41,7 @@
   if (ONIGENC_MBC_MINLEN(enc) == 1) { \
     UChar* tmps = (UChar* )(s); \
     while (*tmps != 0) tmps++; \
-    len = (int)(tmps - (UChar* )(s)); \
+    len = (int )(tmps - (UChar* )(s)); \
   } \
   else { \
     len = onigenc_str_bytelen_null(enc, (UChar* )s); \
@@ -192,7 +192,7 @@ regexec(regex_t* reg, const char* str, size_t nmatch,
 
   ENC_STRING_LEN(ONIG_C(reg)->enc, str, len);
   end = (UChar* )(str + len);
-  r = onig_search(ONIG_C(reg), (UChar* )str, end, (UChar* )str, end,
+  r = (int )onig_search(ONIG_C(reg), (UChar* )str, end, (UChar* )str, end,
 		  (OnigRegion* )pm, options);
 
   if (r >= 0) {

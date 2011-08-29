@@ -1251,7 +1251,7 @@ typedef struct {
 
 /* match data(str - end) from position (sstart). */
 /* if sstart == str then set sprev to NULL. */
-static long
+static ptrdiff_t
 match_at(regex_t* reg, const UChar* str, const UChar* end,
 #ifdef USE_MATCH_RANGE_MUST_BE_INSIDE_OF_SPECIFIED_RANGE
 	 const UChar* right_range,
@@ -1260,8 +1260,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 {
   static UChar FinishCode[] = { OP_FINISH };
 
-  int i, num_mem, best_len, pop_level;
-  ptrdiff_t n;
+  int i, num_mem, pop_level;
+  ptrdiff_t n, best_len;
   LengthType tlen, tlen2;
   MemNumType mem;
   RelAddrType addr;
@@ -1367,7 +1367,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	    goto end_best_len;
         }
 #endif
-	best_len = (int )n;
+	best_len = n;
 	region = msa->region;
 	if (region) {
 #ifdef USE_POSIX_API_REGION_OPTION
@@ -1403,7 +1403,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 		else
 		  region->beg[i] = (int )((UChar* )((void* )mem_start_stk[i]) - str);
 
-		region->end[i] = (regoff_t )((BIT_STATUS_AT(reg->bt_mem_end, i)
+		region->end[i] = (int )((BIT_STATUS_AT(reg->bt_mem_end, i)
 				  ? STACK_AT(mem_end_stk[i])->u.mem.pstr
 				  : (UChar* )((void* )mem_end_stk[i])) - str);
 	      }
@@ -2311,7 +2311,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	n = pend - pstart;
 	DATA_ENSURE(n);
 	sprev = s;
-	STRING_CMP_IC(case_fold_flag, pstart, &s, (int)n);
+	STRING_CMP_IC(case_fold_flag, pstart, &s, (int )n);
 	while (sprev + (len = enclen(encode, sprev)) < s)
 	  sprev += len;
 
@@ -3187,11 +3187,11 @@ map_search_backward(OnigEncoding enc, UChar map[],
   return (UChar* )NULL;
 }
 
-extern long
+extern ptrdiff_t
 onig_match(regex_t* reg, const UChar* str, const UChar* end, const UChar* at, OnigRegion* region,
 	    OnigOptionType option)
 {
-  long r;
+  ptrdiff_t r;
   UChar *prev;
   OnigMatchArg msa;
 
@@ -3383,7 +3383,7 @@ static int set_bm_backward_skip P_((UChar* s, UChar* end, OnigEncoding enc,
 
 #define BM_BACKWARD_SEARCH_LENGTH_THRESHOLD   100
 
-static long
+static int
 backward_search_range(regex_t* reg, const UChar* str, const UChar* end,
 		      UChar* s, const UChar* range, UChar* adjrange,
 		      UChar** low, UChar** high)
@@ -3488,19 +3488,19 @@ backward_search_range(regex_t* reg, const UChar* str, const UChar* end,
 }
 
 
-extern long
+extern ptrdiff_t
 onig_search(regex_t* reg, const UChar* str, const UChar* end,
 	    const UChar* start, const UChar* range, OnigRegion* region, OnigOptionType option)
 {
   return onig_search_gpos(reg, str, end, start, start, range, region, option);
 }
 
-extern long
+extern ptrdiff_t
 onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 	    const UChar* global_pos,
 	    const UChar* start, const UChar* range, OnigRegion* region, OnigOptionType option)
 {
-  long r;
+  ptrdiff_t r;
   UChar *s, *prev;
   OnigMatchArg msa;
   const UChar *orig_start = start;
@@ -3899,7 +3899,7 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
  match:
   ONIG_STATE_DEC_THREAD(reg);
   MATCH_ARG_FREE(msa);
-  return (long)(s - str);
+  return s - str;
 }
 
 extern OnigEncoding
