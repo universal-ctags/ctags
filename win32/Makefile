@@ -27,10 +27,13 @@ DEFS = -DHAVE_CONFIG_H -DNOT_RUBY -DEXPORT
 RUBYDIR = ..
 PYTHON = python
 
+# Command string to get the version of cl.exe
+_MSC_VER = [for /f %i in ('cmd /c "(echo _MSC_VER>mscver.c) && ($(CC) /EP mscver.c 2>nul) && del mscver.c"') do @exit %i]
+
 !if DEFINED(USE_LTCG) && $(USE_LTCG)
 # Use LTCG (Link Time Code Generation).
 # Check if cl.exe is newer than VC++ 7.0 (_MSC_VER >= 1300).
-!if [(echo _MSC_VER>mscver.c) && for /f %i in ('cmd /c "$(CC) /EP mscver.c 2>nul"') do @(del mscver.c && if %i GEQ 1300 exit 1)]
+!if $(_MSC_VER) >= 1300
 CFLAGS = $(CFLAGS) -GL
 ARLIB_FLAGS = $(ARLIB_FLAGS) -LTCG
 ARDLL_FLAGS = $(ARDLL_FLAGS) -LTCG
