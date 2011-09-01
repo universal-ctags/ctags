@@ -173,6 +173,10 @@ try:
 except ValueError:
     pass
 ONIG_SYNTAX_RUBY            = _load_syntax("OnigSyntaxRuby")
+try:
+    ONIG_SYNTAX_PYTHON      = _load_syntax("OnigSyntaxPython")
+except ValueError:
+    pass
 
 ONIG_SYNTAX_DEFAULT         = ctypes.POINTER(OnigSyntaxType).in_dll(
                                     libonig, "OnigDefaultSyntax")
