@@ -786,7 +786,7 @@ typedef struct {
   const UChar* start;   /* search start position */
   const UChar* gpos;    /* global position (for \G: BEGIN_POSITION) */
 #ifdef USE_FIND_LONGEST_SEARCH_ALL_OF_RANGE
-  int    best_len;      /* for ONIG_OPTION_FIND_LONGEST */
+  OnigPosition best_len;  /* for ONIG_OPTION_FIND_LONGEST */
   UChar* best_s;
 #endif
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
@@ -817,7 +817,7 @@ extern void onig_print_statistics P_((FILE* f));
 #endif
 #endif
 
-extern UChar* onig_error_code_to_format P_((int code));
+extern UChar* onig_error_code_to_format P_((OnigPosition code));
 extern void  onig_snprintf_with_pattern PV_((UChar buf[], int bufsize, OnigEncoding enc, UChar* pat, UChar* pat_end, const UChar *fmt, ...));
 extern int  onig_bbuf_init P_((BBuf* buf, OnigDistance size));
 extern int  onig_compile P_((regex_t* reg, const UChar* pattern, const UChar* pattern_end, OnigErrorInfo* einfo));

@@ -95,7 +95,7 @@ static int
 conv_encoding(OnigEncoding from, OnigEncoding to, const UChar* s, const UChar* end,
               UChar** conv, UChar** conv_end)
 {
-  int len = (int )(end - s);
+  ptrdiff_t len = end - s;
 
   if (to == ONIG_ENCODING_UTF16_BE) {
     if (from == ONIG_ENCODING_ASCII || from == ONIG_ENCODING_ISO_8859_1) {

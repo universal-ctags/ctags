@@ -103,6 +103,7 @@ typedef unsigned char  OnigUChar;
 typedef unsigned int   OnigCodePoint;
 typedef unsigned int   OnigCtype;
 typedef size_t         OnigDistance;
+typedef ptrdiff_t      OnigPosition;
 
 #define ONIG_INFINITE_DISTANCE  ~((OnigDistance )0)
 
@@ -622,8 +623,8 @@ ONIG_EXTERN OnigSyntaxType*   OnigDefaultSyntax;
 
 typedef struct OnigCaptureTreeNodeStruct {
   int group;   /* group number */
-  int beg;
-  int end;
+  OnigPosition beg;
+  OnigPosition end;
   int allocated;
   int num_childs;
   struct OnigCaptureTreeNodeStruct** childs;
@@ -633,8 +634,8 @@ typedef struct OnigCaptureTreeNodeStruct {
 struct re_registers {
   int  allocated;
   int  num_regs;
-  int* beg;
-  int* end;
+  OnigPosition* beg;
+  OnigPosition* end;
   /* extended */
   OnigCaptureTreeNode* history_root;  /* capture history tree root */
 };
@@ -740,7 +741,7 @@ typedef struct {
 ONIG_EXTERN
 int onig_init P_((void));
 ONIG_EXTERN
-int onig_error_code_to_str PV_((OnigUChar* s, ptrdiff_t err_code, ...));
+int onig_error_code_to_str PV_((OnigUChar* s, OnigPosition err_code, ...));
 ONIG_EXTERN
 void onig_set_warn_func P_((OnigWarnFunc f));
 ONIG_EXTERN
@@ -762,11 +763,11 @@ int onig_recompile P_((OnigRegex, const OnigUChar* pattern, const OnigUChar* pat
 ONIG_EXTERN
 int onig_recompile_deluxe P_((OnigRegex reg, const OnigUChar* pattern, const OnigUChar* pattern_end, OnigCompileInfo* ci, OnigErrorInfo* einfo));
 ONIG_EXTERN
-ptrdiff_t onig_search P_((OnigRegex, const OnigUChar* str, const OnigUChar* end, const OnigUChar* start, const OnigUChar* range, OnigRegion* region, OnigOptionType option));
+OnigPosition onig_search P_((OnigRegex, const OnigUChar* str, const OnigUChar* end, const OnigUChar* start, const OnigUChar* range, OnigRegion* region, OnigOptionType option));
 ONIG_EXTERN
-ptrdiff_t onig_search_gpos P_((OnigRegex, const OnigUChar* str, const OnigUChar* end, const OnigUChar* global_pos, const OnigUChar* start, const OnigUChar* range, OnigRegion* region, OnigOptionType option));
+OnigPosition onig_search_gpos P_((OnigRegex, const OnigUChar* str, const OnigUChar* end, const OnigUChar* global_pos, const OnigUChar* start, const OnigUChar* range, OnigRegion* region, OnigOptionType option));
 ONIG_EXTERN
-ptrdiff_t onig_match P_((OnigRegex, const OnigUChar* str, const OnigUChar* end, const OnigUChar* at, OnigRegion* region, OnigOptionType option));
+OnigPosition onig_match P_((OnigRegex, const OnigUChar* str, const OnigUChar* end, const OnigUChar* at, OnigRegion* region, OnigOptionType option));
 ONIG_EXTERN
 OnigRegion* onig_region_new P_((void));
 ONIG_EXTERN
@@ -796,7 +797,7 @@ int onig_number_of_capture_histories P_((OnigRegex reg));
 ONIG_EXTERN
 OnigCaptureTreeNode* onig_get_capture_tree P_((OnigRegion* region));
 ONIG_EXTERN
-int onig_capture_tree_traverse P_((OnigRegion* region, int at, int(*callback_func)(int,int,int,int,int,void*), void* arg));
+int onig_capture_tree_traverse P_((OnigRegion* region, int at, int(*callback_func)(int,OnigPosition,OnigPosition,int,int,void*), void* arg));
 ONIG_EXTERN
 int onig_noname_group_capture_is_active P_((OnigRegex reg));
 ONIG_EXTERN
