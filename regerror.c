@@ -40,7 +40,7 @@
 #endif
 
 extern UChar*
-onig_error_code_to_format(int code)
+onig_error_code_to_format(ptrdiff_t code)
 {
   const char *p;
 
@@ -249,11 +249,11 @@ static int to_ascii(OnigEncoding enc, UChar *s, UChar *end,
 
 extern int
 #ifdef HAVE_STDARG_PROTOTYPES
-onig_error_code_to_str(UChar* s, int code, ...)
+onig_error_code_to_str(UChar* s, ptrdiff_t code, ...)
 #else
 onig_error_code_to_str(s, code, va_alist)
   UChar* s;
-  int code;
+  ptrdiff_t code;
   va_dcl
 #endif
 {

@@ -740,7 +740,7 @@ typedef struct {
 ONIG_EXTERN
 int onig_init P_((void));
 ONIG_EXTERN
-int onig_error_code_to_str PV_((OnigUChar* s, int err_code, ...));
+int onig_error_code_to_str PV_((OnigUChar* s, ptrdiff_t err_code, ...));
 ONIG_EXTERN
 void onig_set_warn_func P_((OnigWarnFunc f));
 ONIG_EXTERN
