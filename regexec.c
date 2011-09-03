@@ -1,5 +1,5 @@
 /**********************************************************************
-  regexec.c -  Oniguruma (regular expression library)
+  regexec.c -  Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
