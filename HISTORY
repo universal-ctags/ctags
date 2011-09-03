@@ -1,5 +1,14 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/09/03: Version 5.11.0
+
+2011/09/01: [new]  add OnigPosition.
+2011/09/01: [new]  (thanks h-tom)
+                   support for x64.
+2011/09/01: [new]  add ONIG_SYNTAX_PYTHON (onig.py).
+2011/08/30: [dist] check _MSC_VER instead of _NMAKE_VER when LTCG is used.
+2011/08/25: [tune] reduce conditional branches.
+                   use ONIGENC_IS_IN_RANGE macro to check the code range.
 2011/08/18: [dist] add a resource script for onig.dll (win32/onig.rc).
 
 2011/08/09: Version 5.10.6

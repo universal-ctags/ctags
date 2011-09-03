@@ -1,4 +1,4 @@
-Onigumo (Oniguruma-mod) API  Version 5.9.2  2011/06/14
+Onigmo (Oniguruma-mod) API  Version 5.11.0  2011/09/03
 
 #include <oniguruma.h>
 
@@ -10,7 +10,7 @@ Onigumo (Oniguruma-mod) API  Version 5.9.2  2011/06/14
   You don't have to call it explicitly, because it is called in onig_new().
 
 
-# int onig_error_code_to_str(UChar* err_buf, int err_code, ...)
+# int onig_error_code_to_str(UChar* err_buf, OnigPosition err_code, ...)
 
   Get error message string.
   If this function is used for onig_new(),
@@ -206,11 +206,13 @@ Onigumo (Oniguruma-mod) API  Version 5.9.2  2011/06/14
   1 reg: regex object.
 
 
-# long onig_search(regex_t* reg, const UChar* str, const UChar* end, const UChar* start,
-                   const UChar* range, OnigRegion* region, OnigOptionType option)
-# long onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
+# OnigPosition onig_search(regex_t* reg, const UChar* str, const UChar* end,
+                   const UChar* start, const UChar* range, OnigRegion* region,
+                   OnigOptionType option)
+# OnigPosition onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
                    const UChar* global_pos,
-                   const UChar* start, const UChar* range, OnigRegion* region, OnigOptionType option)
+                   const UChar* start, const UChar* range, OnigRegion* region,
+                   OnigOptionType option)
 
   Search string and return search result and matching region.
 
@@ -235,8 +237,8 @@ Onigumo (Oniguruma-mod) API  Version 5.9.2  2011/06/14
     ONIG_OPTION_POSIX_REGION  region argument is regmatch_t[] of POSIX API.
 
 
-# long onig_match(regex_t* reg, const UChar* str, const UChar* end, const UChar* at,
-		 OnigRegion* region, OnigOptionType option)
+# OnigPosition onig_match(regex_t* reg, const UChar* str, const UChar* end,
+		 const UChar* at, OnigRegion* region, OnigOptionType option)
 
   Match string and return result and matching region.
 
@@ -400,7 +402,8 @@ Onigumo (Oniguruma-mod) API  Version 5.9.2  2011/06/14
 
 
 # int onig_capture_tree_traverse(OnigRegion* region, int at,
-                  int(*func)(int,int,int,int,int,void*), void* arg)
+                  int(*func)(int,OnigPosition,OnigPosition,int,int,void*),
+                  void* arg)
 
  Traverse and callback in capture history data tree.
 
@@ -419,8 +422,8 @@ Onigumo (Oniguruma-mod) API  Version 5.9.2  2011/06/14
   3 func:    callback function.
              if func does not return 0, then traverse is stopped.
 
-             int func(int group, int beg, int end, int level, int at,
-                      void* arg)
+             int func(int group, OnigPosition beg, OnigPosition end,
+                      int level, int at, void* arg)
 
                group: group number
                beg:   capture start position
