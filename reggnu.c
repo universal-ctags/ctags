@@ -54,7 +54,7 @@ re_adjust_startpos(regex_t* reg, const char* string, int size,
     else {
       p = ONIGENC_LEFT_ADJUST_CHAR_HEAD(reg->enc, (UChar* )string, s);
     }
-    return p - (UChar* )string;
+    return (int )(p - (UChar* )string);
   }
 
   return startpos;
@@ -64,7 +64,7 @@ extern int
 re_match(regex_t* reg, const char* str, int size, int pos,
 	 struct re_registers* regs)
 {
-  return onig_match(reg, (UChar* )str, (UChar* )(str + size),
+  return (int )onig_match(reg, (UChar* )str, (UChar* )(str + size),
 		    (UChar* )(str + pos), regs, ONIG_OPTION_NONE);
 }
 
@@ -72,7 +72,7 @@ extern int
 re_search(regex_t* bufp, const char* string, int size, int startpos, int range,
 	  struct re_registers* regs)
 {
-  return onig_search(bufp, (UChar* )string, (UChar* )(string + size),
+  return (int )onig_search(bufp, (UChar* )string, (UChar* )(string + size),
 		     (UChar* )(string + startpos),
 		     (UChar* )(string + startpos + range),
 		     regs, ONIG_OPTION_NONE);

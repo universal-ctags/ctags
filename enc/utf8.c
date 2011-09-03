@@ -187,7 +187,7 @@ code_to_mbc(OnigCodePoint code, UChar *buf)
     }
 
     *p++ = UTF8_TRAIL0(code);
-    return p - buf;
+    return (int )(p - buf);
   }
 }
 
