@@ -5403,8 +5403,12 @@ node_linebreak(Node** np, ScanEnv* env)
   right = node_new_cclass();
   if (IS_NULL(right)) goto err;
   cc = NCCLASS(right);
-  add_code_range(&(cc->mbuf), env, 0x0A, 0x0D);
-  bitset_set_range(cc->bs, 0x0A, 0x0D);
+  if (ONIGENC_MBC_MINLEN(env->enc) > 1) {
+    add_code_range(&(cc->mbuf), env, 0x0A, 0x0D);
+  }
+  else {
+    bitset_set_range(cc->bs, 0x0A, 0x0D);
+  }
 
 #ifdef USE_UNICODE_ALL_LINE_TERMINATORS
   if (onig_strncmp((UChar* )env->enc->name, (UChar* )"UTF", 3) == 0) {
