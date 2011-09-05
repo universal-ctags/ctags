@@ -72,7 +72,8 @@ Onigmo インターフェース Version 5.11.0   2011/09/03
       ONIG_OPTION_FIND_NOT_EMPTY     空マッチを無視
       ONIG_OPTION_NEGATE_SINGLELINE
             ONIG_SYNTAX_POSIX_BASIC, ONIG_SYNTAX_POSIX_EXTENDED,
-            ONIG_SYNTAX_PERL, ONIG_SYNTAX_PERL_NG, ONIG_SYNTAX_JAVAで
+            ONIG_SYNTAX_PERL, ONIG_SYNTAX_PERL58, ONIG_SYNTAX_PERL58_NG,
+            ONIG_SYNTAX_JAVA, ONIG_SYNTAX_PYTHONで
             デフォルトで有効なONIG_OPTION_SINGLELINEをクリアする。
 
       ONIG_OPTION_DONT_CAPTURE_GROUP 名前付き捕獲式集合のみ捕獲
@@ -125,6 +126,7 @@ Onigmo インターフェース Version 5.11.0   2011/09/03
       ONIG_SYNTAX_PERL58            Perl 5.8
       ONIG_SYNTAX_PERL58_NG         Perl 5.8 + 名前付き捕獲式集合
       ONIG_SYNTAX_PERL              Perl 5.10以降
+      ONIG_SYNTAX_PYTHON            Python
       ONIG_SYNTAX_RUBY              Ruby
       ONIG_SYNTAX_DEFAULT           default (== Ruby)
                                     onig_set_default_syntax()
