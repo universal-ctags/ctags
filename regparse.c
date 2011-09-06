@@ -5538,9 +5538,9 @@ countbits(unsigned int bits) {
 static int
 is_onechar_cclass(CClassNode* cc, OnigCodePoint* code)
 {
-  OnigCodePoint c1, c2;
-  int found1 = 0, found2 = 0;
-  int i, j;
+  OnigCodePoint c;
+  int found = 0;
+  int i, j = -1;
   Bits b1, b2;
   BBuf *bbuf = cc->mbuf;
 
@@ -5553,61 +5553,39 @@ is_onechar_cclass(CClassNode* cc, OnigCodePoint* code)
     data = (OnigCodePoint* )(bbuf->p) + 1;
     if ((n == 1) && (data[0] == data[1])) {
       /* only one char found in the bbuf, save the code point. */
-      found1 = 1;
-      c1 = data[0];
+      found = 1;
+      c = data[0];
     }
     else {
       return 0;  /* the bbuf contains multiple chars */
     }
   }
 
+  if (found && (c < SINGLE_BYTE_SIZE) && BITSET_AT(cc->bs, c)) {
+    /* c is included in the bitset, ignore the result of bbuf. */
+    found = 0;
+  }
+
   /* check bitset */
   for (i = 0; i < (int )BITSET_SIZE; i++) {
     b1 = cc->bs[i];
     if (b1 != 0) {
-      if ((b1 & (b1 - 1)) == 0) {
-        found2++;
+      if (((b1 & (b1 - 1)) == 0) && (found == 0)) {
+        found = 1;
         j = i;
         b2 = b1;
       } else {
-        found2 = -1;
-        return 0;  /* the bitset contains multiple chars */
+        return 0;  /* the character class contains multiple chars */
       }
     }
   }
-  if (found2 == 1) {
+  if (j >= 0) {
     /* only one char found in the bitset, calculate the code point. */
     b2--;
-    c2 = BITS_IN_ROOM * j + ((b2 == 0) ? 0 : countbits(b2));
+    c = BITS_IN_ROOM * j + ((b2 == 0) ? 0 : countbits(b2));
   }
-  else if (found2 > 1) {
-    return 0;  /* the bitset contains multiple chars */
-  }
-
-  if (found1 == 1) {
-    if (found2 == 1) {
-      if (c1 == c2) {
-        *code = c1;
-        return 1;
-      }
-      else {
-        return 0;
-      }
-    }
-    else {
-      *code = c1;
-      return 1;
-    }
-  }
-  else {
-    if (found2 == 1) {
-      *code = c2;
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
+  *code = c;
+  return 1;
 }
 
 
