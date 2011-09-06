@@ -5527,6 +5527,91 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
 }
 
 static int
+countbits(unsigned int bits) {
+  bits = (bits & 0x55555555) + ((bits >> 1) & 0x55555555);
+  bits = (bits & 0x33333333) + ((bits >> 2) & 0x33333333);
+  bits = (bits & 0x0f0f0f0f) + ((bits >> 4) & 0x0f0f0f0f);
+  bits = (bits & 0x00ff00ff) + ((bits >> 8) & 0x00ff00ff);
+  return (bits & 0x0000ffff) + ((bits >>16) & 0x0000ffff);
+}
+
+static int
+is_onechar_cclass(CClassNode* cc, OnigCodePoint* code)
+{
+  OnigCodePoint c1, c2;
+  int found1 = 0, found2 = 0;
+  int i, j;
+  Bits b1, b2;
+  BBuf *bbuf = cc->mbuf;
+
+  if (IS_NCCLASS_NOT(cc)) return 0;
+
+  /* check bbuf */
+  if (IS_NOT_NULL(bbuf)) {
+    OnigCodePoint n, *data;
+    GET_CODE_POINT(n, bbuf->p);
+    data = (OnigCodePoint* )(bbuf->p) + 1;
+    if ((n == 1) && (data[0] == data[1])) {
+      /* only one char found in the bbuf, save the code point. */
+      found1 = 1;
+      c1 = data[0];
+    }
+    else {
+      return 0;  /* the bbuf contains multiple chars */
+    }
+  }
+
+  /* check bitset */
+  for (i = 0; i < (int )BITSET_SIZE; i++) {
+    b1 = cc->bs[i];
+    if (b1 != 0) {
+      if ((b1 & (b1 - 1)) == 0) {
+        found2++;
+        j = i;
+        b2 = b1;
+      } else {
+        found2 = -1;
+        return 0;  /* the bitset contains multiple chars */
+      }
+    }
+  }
+  if (found2 == 1) {
+    /* only one char found in the bitset, calculate the code point. */
+    b2--;
+    c2 = BITS_IN_ROOM * j + ((b2 == 0) ? 0 : countbits(b2));
+  }
+  else if (found2 > 1) {
+    return 0;  /* the bitset contains multiple chars */
+  }
+
+  if (found1 == 1) {
+    if (found2 == 1) {
+      if (c1 == c2) {
+        *code = c1;
+        return 1;
+      }
+      else {
+        return 0;
+      }
+    }
+    else {
+      *code = c1;
+      return 1;
+    }
+  }
+  else {
+    if (found2 == 1) {
+      *code = c2;
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+}
+
+
+static int
 parse_exp(Node** np, OnigToken* tok, int term,
 	  UChar** src, UChar* end, ScanEnv* env)
 {
@@ -5654,6 +5739,7 @@ parse_exp(Node** np, OnigToken* tok, int term,
     break;
 
   case TK_CODE_POINT:
+  tk_code_point:
     {
       UChar buf[ONIGENC_CODE_TO_MBC_MAXLEN];
       int num = ONIGENC_CODE_TO_MBC(env->enc, tok->u.code, buf);
@@ -5779,11 +5865,17 @@ parse_exp(Node** np, OnigToken* tok, int term,
   case TK_CC_OPEN:
     {
       CClassNode* cc;
+      OnigCodePoint code;
 
       r = parse_char_class(np, tok, src, end, env);
       if (r != 0) return r;
 
       cc = NCCLASS(*np);
+      if (is_onechar_cclass(cc, &code)) {
+	tok->u.code = code;
+	onig_node_free(*np);
+	goto tk_code_point;
+      }
       if (IS_IGNORECASE(env->option)) {
 	IApplyCaseFoldArg iarg;
 
