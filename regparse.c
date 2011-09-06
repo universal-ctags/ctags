@@ -4010,20 +4010,26 @@ add_ctype_to_cc(CClassNode* cc, int ctype, int not, int char_prop, ScanEnv* env)
   OnigEncoding enc = env->enc;
   OnigOptionType option = env->option;
 
+  ascii_range = IS_ASCII_RANGE(option) && (char_prop == 0);
+
   r = ONIGENC_GET_CTYPE_CODE_RANGE(enc, ctype, &sb_out, &ranges);
   if (r == 0) {
     r = add_ctype_to_cc_by_range(cc, ctype, not, env->enc, sb_out, ranges);
-    if ((r == 0) && (char_prop == 0) && IS_ASCII_RANGE(option)) {
+    if ((r == 0) && ascii_range) {
       if (not != 0) {
 	r = add_code_range_to_buf(&(cc->mbuf), 0x80, ~((OnigCodePoint )0));
       }
       else {
 	CClassNode ccascii;
 	initialize_cclass(&ccascii);
-	add_code_range(&(ccascii.mbuf), env, 0x00, 0x7F);
-	bitset_set_range(ccascii.bs, 0x00, 0x7F);
+	if (ONIGENC_MBC_MINLEN(env->enc) > 1) {
+	  add_code_range(&(ccascii.mbuf), env, 0x00, 0x7F);
+	}
+	else {
+	  bitset_set_range(ccascii.bs, 0x00, 0x7F);
+	}
 	r = and_cclass(cc, &ccascii, enc);
-	bbuf_free(ccascii.mbuf);
+	if (IS_NOT_NULL(ccascii.mbuf)) bbuf_free(ccascii.mbuf);
       }
     }
     return r;
@@ -4032,7 +4038,6 @@ add_ctype_to_cc(CClassNode* cc, int ctype, int not, int char_prop, ScanEnv* env)
     return r;
   }
 
-  ascii_range = IS_ASCII_RANGE(option) && (char_prop == 0);
   maxcode = ascii_range ? 0x80 : SINGLE_BYTE_SIZE;
   r = 0;
   switch (ctype) {
