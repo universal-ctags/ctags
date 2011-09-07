@@ -6111,9 +6111,9 @@ parse_regexp(Node** top, UChar** src, UChar* end, ScanEnv* env)
   r = parse_subexp(top, &tok, TK_EOT, src, end, env);
   if (r < 0) return r;
 
-#ifdef USE_PERL_SUBEXP_CALL
+#ifdef USE_SUBEXP_CALL
   if (env->num_call > 0) {
-    /* Capture the pattern itself. It is used for (?R) and (?0). */
+    /* Capture the pattern itself. It is used for (?R), (?0) and \g<0>. */
     const int num = 0;
     Node* np;
     np = node_new_enclose_memory(env->option, 0);
