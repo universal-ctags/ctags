@@ -6267,14 +6267,14 @@ print_compiled_byte_code_list(FILE* f, regex_t* reg)
 
   fprintf(f, "code length: %d\n", reg->used);
 
-  ncode = 0;
+  ncode = -1;
   while (bp < end) {
     ncode++;
     if (bp > reg->p) {
       if (ncode % 5 == 0)
-	fprintf(f, "\n");
+	fprintf(f, "\n%ld:", bp - reg->p);
       else
-	fputs(" ", f);
+	fprintf(f, " %ld:", bp - reg->p);
     }
     onig_print_compiled_byte_code(f, bp, &bp, reg->enc);
   }
@@ -6285,7 +6285,7 @@ print_compiled_byte_code_list(FILE* f, regex_t* reg)
 static void
 print_indent_tree(FILE* f, Node* node, int indent)
 {
-  int i, type;
+  int i, type, container_p = 0;
   int add = 3;
   UChar* p;
 
@@ -6374,10 +6374,10 @@ print_indent_tree(FILE* f, Node* node, int indent)
     case ANCHOR_WORD_BEGIN:      fputs("word begin", f);     break;
     case ANCHOR_WORD_END:        fputs("word end", f);       break;
 #endif
-    case ANCHOR_PREC_READ:       fputs("prec read",      f); break;
-    case ANCHOR_PREC_READ_NOT:   fputs("prec read not",  f); break;
-    case ANCHOR_LOOK_BEHIND:     fputs("look_behind",    f); break;
-    case ANCHOR_LOOK_BEHIND_NOT: fputs("look_behind_not",f); break;
+    case ANCHOR_PREC_READ:       fputs("prec read",      f); container_p = TRUE; break;
+    case ANCHOR_PREC_READ_NOT:   fputs("prec read not",  f); container_p = TRUE; break;
+    case ANCHOR_LOOK_BEHIND:     fputs("look_behind",    f); container_p = TRUE; break;
+    case ANCHOR_LOOK_BEHIND_NOT: fputs("look_behind_not",f); container_p = TRUE; break;
     case ANCHOR_KEEP:            fputs("keep",f);            break;
 
     default:
@@ -6447,6 +6447,9 @@ print_indent_tree(FILE* f, Node* node, int indent)
   if (type != NT_LIST && type != NT_ALT && type != NT_QTFR &&
       type != NT_ENCLOSE)
     fprintf(f, "\n");
+
+  if (container_p) print_indent_tree(f, NANCHOR(node)->target, indent + add);
+
   fflush(f);
 }
 #endif /* ONIG_DEBUG */
