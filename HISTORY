@@ -1,5 +1,10 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/09/07: [bug]  \g<0> doesn't work when USE_PERL_SUBEXP_CALL isn't defined.
+2011/09/07: [tune] optimize character class.
+2011/09/06: [tune] optimize (?a).
+2011/09/06: [tune] optimize \R.
+
 2011/09/03: Version 5.11.0
 
 2011/09/01: [new]  add OnigPosition.

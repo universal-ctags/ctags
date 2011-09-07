@@ -511,7 +511,7 @@ Onigmo (Oniguruma-mod) API  Version 5.11.0  2011/09/03
   1 syntax: address of pattern syntax definition.
 
 
-# void onig_copy_syntax(OnigSyntaxType* to, OnigSyntaxType* from)
+# void onig_copy_syntax(OnigSyntaxType* to, const OnigSyntaxType* from)
 
   Copy syntax.
 

@@ -518,7 +518,7 @@ Onigmo インターフェース Version 5.11.0   2011/09/03
   1 syntax: 正規表現パターン文法
 
 
-# void onig_copy_syntax(OnigSyntaxType* to, OnigSyntaxType* from)
+# void onig_copy_syntax(OnigSyntaxType* to, const OnigSyntaxType* from)
 
   正規表現パターン文法をコピーする。
 
