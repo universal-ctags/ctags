@@ -1,0 +1,16 @@
+*.o
+*.so
+*.a
+*.obj
+*.dll
+*.exp
+*.lib
+*.bak
+*.BAK
+*~
+*.swp
+*.orig
+*.rej
+
+/config.h
+/Makefile
