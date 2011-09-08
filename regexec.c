@@ -2896,7 +2896,7 @@ slow_search(OnigEncoding enc, UChar* target, UChar* target_end,
       }
       s += n;
     }
-    return (UChar *)NULL;
+    return (UChar* )NULL;
   }
   while (s < end) {
     if (*s == *target) {
