@@ -16,6 +16,8 @@
 *.swp
 *.orig
 *.rej
+*.RES
+*.res
 
 .deps
 .libs

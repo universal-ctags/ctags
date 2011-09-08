@@ -1,10 +1,11 @@
 #ifndef ONIGURUMA_REGINT_H
 #define ONIGURUMA_REGINT_H
 /**********************************************************************
-  regint.h -  Oniguruma (regular expression library)
+  regint.h -  Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -57,12 +58,15 @@
 /* spec. config */
 #define USE_NAMED_GROUP
 #define USE_SUBEXP_CALL
+#define USE_PERL_SUBEXP_CALL
+#define USE_CAPITAL_P_NAMED_GROUP
 #define USE_BACKREF_WITH_LEVEL        /* \k<name+n>, \k<name-n> */
 #define USE_MONOMANIAC_CHECK_CAPTURES_IN_ENDLESS_REPEAT  /* /(?:()|())*\2/ */
 #define USE_NEWLINE_AT_END_OF_STRING_HAS_EMPTY_LINE     /* /\n$/ =~ "\n" */
 #define USE_WARNING_REDUNDANT_NESTED_REPEAT_OPERATOR
 /* #define USE_RECOMPILE_API */
 /* !!! moved to regenc.h. */ /* #define USE_CRNL_AS_LINE_TERMINATOR */
+#define USE_NO_INVALID_QUANTIFIER
 
 /* internal config */
 #define USE_PARSE_TREE_NODE_RECYCLE
@@ -73,6 +77,13 @@
 
 #define INIT_MATCH_STACK_SIZE                     160
 #define DEFAULT_MATCH_STACK_LIMIT_SIZE              0 /* unlimited */
+
+/* check config */
+#if defined(USE_PERL_SUBEXP_CALL) || defined(USE_CAPITAL_P_NAMED_GROUP)
+#if !defined(USE_NAMED_GROUP) || !defined(USE_SUBEXP_CALL)
+#error USE_NAMED_GROUP and USE_SUBEXP_CALL must be defined.
+#endif
+#endif
 
 #if defined(__GNUC__)
 #  define ARG_UNUSED  __attribute__ ((unused))
@@ -92,13 +103,14 @@
 #ifdef ONIG_ESCAPE_UCHAR_COLLISION
 #undef ONIG_ESCAPE_UCHAR_COLLISION
 #endif
+#define USE_WORD_BEGIN_END          /* "\<": word-begin, "\>": word-end */
 #undef USE_MATCH_RANGE_IS_COMPLETE_RANGE
 #undef USE_CAPTURE_HISTORY
 #define USE_VARIABLE_META_CHARS
-#define USE_WORD_BEGIN_END          /* "\<": word-begin, "\>": word-end */
-#define USE_POSIX_REGION_OPTION     /* needed for POSIX API support */
+#define USE_POSIX_API_REGION_OPTION     /* needed for POSIX API support */
 #define USE_FIND_LONGEST_SEARCH_ALL_OF_RANGE
 /* #define USE_COMBINATION_EXPLOSION_CHECK */     /* (X*)* */
+
 /* #define USE_MULTI_THREAD_SYSTEM */
 #define THREAD_SYSTEM_INIT      /* depend on thread system */
 #define THREAD_SYSTEM_END       /* depend on thread system */
@@ -218,9 +230,34 @@
 #include <sys/types.h>
 #endif
 
+#ifdef HAVE_STDINT_H
+# include <stdint.h>
+#endif
+
+#ifdef STDC_HEADERS
+# include <stddef.h>
+#endif
+
+#ifdef __BORLANDC__
+#include <malloc.h>
+#endif
+
 #ifdef ONIG_DEBUG
 # include <stdio.h>
 #endif
+
+#ifdef _WIN32
+#if defined(_MSC_VER) && (_MSC_VER < 1300)
+#ifndef _INTPTR_T_DEFINED
+#define _INTPTR_T_DEFINED
+typedef int intptr_t;
+#endif
+#ifndef _UINTPTR_T_DEFINED
+#define _UINTPTR_T_DEFINED
+typedef unsigned int uintptr_t;
+#endif
+#endif
+#endif /* _WIN32 */
 
 #include "regenc.h"
 
@@ -327,6 +364,7 @@ typedef unsigned int  BitStatusType;
 #define IS_NOTBOL(option)         ((option) & ONIG_OPTION_NOTBOL)
 #define IS_NOTEOL(option)         ((option) & ONIG_OPTION_NOTEOL)
 #define IS_POSIX_REGION(option)   ((option) & ONIG_OPTION_POSIX_REGION)
+#define IS_ASCII_RANGE(option)    ((option) & ONIG_OPTION_ASCII_RANGE)
 
 /* OP_SET_OPTION is required for these options.
 #define IS_DYNAMIC_OPTION(option) \
@@ -355,7 +393,7 @@ typedef unsigned char  Bits;
 typedef Bits           BitSet[BITSET_SIZE];
 typedef Bits*          BitSetRef;
 
-#define SIZE_BITSET        (int)sizeof(BitSet)
+#define SIZE_BITSET        (int )sizeof(BitSet)
 
 #define BITSET_CLEAR(bs) do {\
   int i;\
@@ -402,7 +440,7 @@ typedef struct _BBuf {
 } while (0)
 
 #define BBUF_WRITE(buf,pos,bytes,n) do{\
-  int used = (pos) + (int)(n);\
+  int used = (pos) + (int )(n);\
   if ((buf)->alloc < (unsigned int )used) BBUF_EXPAND((buf),used);\
   xmemcpy((buf)->p + (pos), (bytes), (n));\
   if ((buf)->used < (unsigned int )used) (buf)->used = used;\
@@ -470,6 +508,8 @@ typedef struct _BBuf {
 #define ANCHOR_ANYCHAR_STAR     (1<<14)   /* ".*" optimize info */
 #define ANCHOR_ANYCHAR_STAR_ML  (1<<15)   /* ".*" optimize info (multi-line) */
 
+#define ANCHOR_KEEP             (1<<16)
+
 /* operation code */
 enum OpCode {
   OP_FINISH = 0,        /* matching process terminator (no more alternative) */
@@ -513,6 +553,13 @@ enum OpCode {
   OP_WORD_BEGIN,
   OP_WORD_END,
 
+  OP_ASCII_WORD,
+  OP_NOT_ASCII_WORD,
+  OP_ASCII_WORD_BOUND,
+  OP_NOT_ASCII_WORD_BOUND,
+  OP_ASCII_WORD_BEGIN,
+  OP_ASCII_WORD_END,
+
   OP_BEGIN_BUF,
   OP_END_BUF,
   OP_BEGIN_LINE,
@@ -534,6 +581,8 @@ enum OpCode {
   OP_MEMORY_END_PUSH_REC, /* push back-tracker to stack */
   OP_MEMORY_END,
   OP_MEMORY_END_REC,      /* push marker to stack */
+
+  OP_KEEP,
 
   OP_FAIL,               /* pop stack and move */
   OP_JUMP,
@@ -565,6 +614,8 @@ enum OpCode {
   OP_CALL,                 /* \g<name> */
   OP_RETURN,
 
+  OP_CONDITION,
+
   OP_STATE_CHECK_PUSH,         /* combination explosion check and push */
   OP_STATE_CHECK_PUSH_OR_JUMP, /* check ok -> push, else jump  */
   OP_STATE_CHECK,              /* check only */
@@ -585,15 +636,15 @@ typedef short int StateCheckNumType;
 typedef void* PointerType;
 
 #define SIZE_OPCODE           1
-#define SIZE_RELADDR          (int)sizeof(RelAddrType)
-#define SIZE_ABSADDR          (int)sizeof(AbsAddrType)
-#define SIZE_LENGTH           (int)sizeof(LengthType)
-#define SIZE_MEMNUM           (int)sizeof(MemNumType)
-#define SIZE_STATE_CHECK_NUM  (int)sizeof(StateCheckNumType)
-#define SIZE_REPEATNUM        (int)sizeof(RepeatNumType)
-#define SIZE_OPTION           (int)sizeof(OnigOptionType)
-#define SIZE_CODE_POINT       (int)sizeof(OnigCodePoint)
-#define SIZE_POINTER          (int)sizeof(PointerType)
+#define SIZE_RELADDR          (int )sizeof(RelAddrType)
+#define SIZE_ABSADDR          (int )sizeof(AbsAddrType)
+#define SIZE_LENGTH           (int )sizeof(LengthType)
+#define SIZE_MEMNUM           (int )sizeof(MemNumType)
+#define SIZE_STATE_CHECK_NUM  (int )sizeof(StateCheckNumType)
+#define SIZE_REPEATNUM        (int )sizeof(RepeatNumType)
+#define SIZE_OPTION           (int )sizeof(OnigOptionType)
+#define SIZE_CODE_POINT       (int )sizeof(OnigCodePoint)
+#define SIZE_POINTER          (int )sizeof(PointerType)
 
 
 #define GET_RELADDR_INC(addr,p)    PLATFORM_GET_INC(addr,   p, RelAddrType)
@@ -645,6 +696,7 @@ typedef void* PointerType;
 #define SIZE_OP_FAIL_LOOK_BEHIND_NOT    SIZE_OPCODE
 #define SIZE_OP_CALL                   (SIZE_OPCODE + SIZE_ABSADDR)
 #define SIZE_OP_RETURN                  SIZE_OPCODE
+#define SIZE_OP_CONDITION              (SIZE_OPCODE + SIZE_MEMNUM + SIZE_RELADDR)
 
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
 #define SIZE_OP_STATE_CHECK            (SIZE_OPCODE + SIZE_STATE_CHECK_NUM)
@@ -731,6 +783,7 @@ typedef struct _OnigStackType {
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
       unsigned int state_check;
 #endif
+      UChar *pkeep;      /* keep pattern position */
     } state;
     struct {
       int   count;       /* for OP_REPEAT_INC, OP_REPEAT_INC_NG */
@@ -766,9 +819,10 @@ typedef struct {
   size_t stack_n;
   OnigOptionType options;
   OnigRegion*    region;
-  const UChar* start;   /* search start position (for \G: BEGIN_POSITION) */
+  const UChar* start;   /* search start position */
+  const UChar* gpos;    /* global position (for \G: BEGIN_POSITION) */
 #ifdef USE_FIND_LONGEST_SEARCH_ALL_OF_RANGE
-  int    best_len;      /* for ONIG_OPTION_FIND_LONGEST */
+  OnigPosition best_len;  /* for ONIG_OPTION_FIND_LONGEST */
   UChar* best_s;
 #endif
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
@@ -799,7 +853,7 @@ extern void onig_print_statistics P_((FILE* f));
 #endif
 #endif
 
-extern UChar* onig_error_code_to_format P_((int code));
+extern UChar* onig_error_code_to_format P_((OnigPosition code));
 extern void  onig_snprintf_with_pattern PV_((UChar buf[], int bufsize, OnigEncoding enc, UChar* pat, UChar* pat_end, const UChar *fmt, ...));
 extern int  onig_bbuf_init P_((BBuf* buf, OnigDistance size));
 extern int  onig_compile P_((regex_t* reg, const UChar* pattern, const UChar* pattern_end, OnigErrorInfo* einfo, const char *sourcefile, int sourceline));
@@ -815,7 +869,7 @@ typedef void hash_table_type;
 #include "ruby/st.h"
 typedef st_data_t hash_data_type;
 #else
-typedef unsigned long hash_data_type;
+typedef uintptr_t hash_data_type;
 #endif
 
 extern hash_table_type* onig_st_init_strend_table_with_size P_((st_index_t size));

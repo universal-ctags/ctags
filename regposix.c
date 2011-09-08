@@ -1,8 +1,9 @@
 /**********************************************************************
-  regposix.c - Oniguruma (regular expression library)
+  regposix.c - Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +41,7 @@
   if (ONIGENC_MBC_MINLEN(enc) == 1) { \
     UChar* tmps = (UChar* )(s); \
     while (*tmps != 0) tmps++; \
-    len = tmps - (UChar* )(s); \
+    len = (int )(tmps - (UChar* )(s)); \
   } \
   else { \
     len = onigenc_str_bytelen_null(enc, (UChar* )s); \
@@ -65,7 +66,7 @@ onig2posix_error_code(int code)
     { ONIGERR_STACK_BUG,                                  REG_EONIG_INTERNAL },
     { ONIGERR_UNDEFINED_BYTECODE,                         REG_EONIG_INTERNAL },
     { ONIGERR_UNEXPECTED_BYTECODE,                        REG_EONIG_INTERNAL },
-    { ONIGERR_DEFAULT_ENCODING_IS_NOT_SETTED,             REG_EONIG_BADARG },
+    { ONIGERR_DEFAULT_ENCODING_IS_NOT_SET,                REG_EONIG_BADARG },
     { ONIGERR_SPECIFIED_ENCODING_CANT_CONVERT_TO_WIDE_CHAR, REG_EONIG_BADARG },
     { ONIGERR_INVALID_ARGUMENT,                           REG_EONIG_BADARG },
     { ONIGERR_END_PATTERN_AT_LEFT_BRACE,                  REG_EBRACE  },
@@ -191,7 +192,7 @@ regexec(regex_t* reg, const char* str, size_t nmatch,
 
   ENC_STRING_LEN(ONIG_C(reg)->enc, str, len);
   end = (UChar* )(str + len);
-  r = onig_search(ONIG_C(reg), (UChar* )str, end, (UChar* )str, end,
+  r = (int )onig_search(ONIG_C(reg), (UChar* )str, end, (UChar* )str, end,
 		  (OnigRegion* )pm, options);
 
   if (r >= 0) {

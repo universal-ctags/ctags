@@ -1,4 +1,4 @@
-Oniguruma Regular Expressions Version 5.9.1    2007/09/05
+Onigmo (Oniguruma-mod) Regular Expressions Version 5.10.6    2011/08/09
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -39,10 +39,13 @@ syntax: ONIG_SYNTAX_RUBY (default)
   \w       word character
 
            Not Unicode:
-             alphanumeric, "_" and multibyte char. 
+             alphanumeric and "_".
 
            Unicode:
              General_Category -- (Letter|Mark|Number|Connector_Punctuation)
+
+           It depends on ONIG_OPTION_ASCII_RANGE option that non-ASCII char
+           includes or not.
 
   \W       non word char
 
@@ -57,11 +60,17 @@ syntax: ONIG_SYNTAX_RUBY (default)
                               -- Paragraph_Separator
                               -- Space_Separator
 
+           It depends on ONIG_OPTION_ASCII_RANGE option that non-ASCII char
+           includes or not.
+
   \S       non whitespace char
 
   \d       decimal digit char
 
            Unicode: General_Category -- Decimal_Number
+
+           It depends on ONIG_OPTION_ASCII_RANGE option that non-ASCII char
+           includes or not.
 
   \D       non decimal digit char
 
@@ -82,8 +91,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
        Alnum, Alpha, Blank, Cntrl, Digit, Graph, Lower,
        Print, Punct, Space, Upper, XDigit, Word, ASCII,
 
-     + works on EUC_JP, Shift_JIS
-       Hiragana, Katakana
+     + works on EUC_JP, Shift_JIS, CP932
+       Hiragana, Katakana, Han, Latin, Greek, Cyrillic
 
      + works on UTF8, UTF16, UTF32
        Any, Assigned, C, Cc, Cf, Cn, Co, Cs, L, Ll, Lm, Lo, Lt, Lu,
@@ -99,6 +108,21 @@ syntax: ONIG_SYNTAX_RUBY (default)
        Oriya, Osmanya, Runic, Shavian, Sinhala, Syloti_Nagri, Syriac,
        Tagalog, Tagbanwa, Tai_Le, Tamil, Telugu, Thaana, Thai, Tibetan,
        Tifinagh, Ugaritic, Yi
+
+
+  \R       Linebreak
+           (?>\x0D\x0A|[\x0A-\x0D])
+
+           If USE_UNICODE_ALL_LINE_TERMINATORS is defined in regenc.h:
+             (?>\x0D\x0A|[\x0A-\x0D\x{85}\x{2028}\x{2029}])
+
+  \X       eXtended grapheme cluster
+
+           Unicode:
+             (?>\P{M}\p{M}*)
+
+           Not Unicode:
+             (?m:.)
 
 
 
@@ -129,7 +153,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
     *+      0 or more times
     ++      1 or more times
 
-    ({n,m}+, {n,}+, {n}+ are possessive op. in ONIG_SYNTAX_JAVA only)
+    ({n,m}+, {n,}+, {n}+ are possessive op. in ONIG_SYNTAX_JAVA and
+    ONIG_SYNTAX_PERL only)
 
     ex. /a*+/ === /(?>a*)/
 
@@ -201,6 +226,11 @@ syntax: ONIG_SYNTAX_RUBY (default)
       word     Letter | Mark | Decimal_Number | Connector_Punctuation
 
 
+    It depends on ONIG_OPTION_ASCII_RANGE option that non-ASCII char
+    includes or not. ONIG_SYNTAX_RUBY includes this option and
+    ONIG_SYNTAX_PERL doesn't.
+
+
 
 7. Extended groups
 
@@ -228,6 +258,10 @@ syntax: ONIG_SYNTAX_RUBY (default)
                      In negative-look-behind, captured group isn't allowed, 
                      but shy group(?:) is allowed.
 
+  \K                 keep
+                     Another expression of look-behind. Keep the stuff left
+                     of the \K, don't include it in the result.
+
   (?>subexp)         atomic group
                      don't backtrack in subexp.
 
@@ -241,6 +275,21 @@ syntax: ONIG_SYNTAX_RUBY (default)
                      Assigning the same name as two or more subexps is allowed.
                      In this case, a subexp call can not be performed although
                      the back reference is possible.
+                     (ONIG_SYNTAX_PERL: a subexp call is allowed in this case.)
+
+  (?(cond)yes-subexp), (?(cond)yes-subexp|no-subexp)
+                    conditional expression
+                    Matches yes-subexp if (cond) yields a true value, matches
+                    no-subexp otherwise.
+                    Following (cond) can be used:
+
+                    (n)  (n >= 1)
+                        Checks if the numbered capturing group has matched
+                        something.
+
+                    (<name>), ('name')
+                        Checks if a group with the given name has matched
+                        something.
 
 
 8. Back reference
@@ -259,6 +308,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
 
   * Back reference by group number is forbidden if named group is defined 
     in the pattern and ONIG_OPTION_CAPTURE_GROUP is not setted.
+
+  * ONIG_SYNTAX_PERL: \g{n}, \g{-n} and \g{name} can also be used.
 
 
   back reference with nest level
@@ -302,8 +353,12 @@ syntax: ONIG_SYNTAX_RUBY (default)
   \g'name'    call by group name
   \g<n>       call by group number (n >= 1)
   \g'n'       call by group number (n >= 1)
+  \g<0>       call the whole pattern recursively
+  \g'0'       call the whole pattern recursively
   \g<-n>      call by relative group number (n >= 1)
   \g'-n'      call by relative group number (n >= 1)
+  \g<+n>      call by relative group number (n >= 1)
+  \g'+n'      call by relative group number (n >= 1)
 
   * left-most recursive call is not allowed.
      ex. (?<name>a|\g<name>b)   => error
@@ -316,6 +371,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
     then the group's option is effective.
 
     ex. (?-i:\g<name>)(?i:(?<name>a)){0}  match to "A"
+
+  * ONIG_SYNTAX_PERL: use (?&name), (?n), (?-n), (?+n), (?R) or (?0) instead.
 
 
 10. Captured group
@@ -355,7 +412,7 @@ A-1. Syntax depend options
    + ONIG_SYNTAX_RUBY
      (?m): dot(.) match newline
 
-   + ONIG_SYNTAX_PERL and ONIG_SYNTAX_JAVA
+   + ONIG_SYNTAX_PERL, ONIG_SYNTAX_JAVA and ONIG_SYNTAX_PYTHON
      (?s): dot(.) match newline
      (?m): ^ match after newline, $ match before newline
 
@@ -368,13 +425,15 @@ A-2. Original extensions
    + subexp call                  \g<name>, \g<group-num>
 
 
-A-3. Lacked features compare with perl 5.8.0
+A-3. Lacked features compare with perl 5.14.0
 
-   + \N{name}
-   + \l,\u,\L,\U, \X, \C
+   + \N{name}, \N{U+xxxx}, \N
+   + \l,\u,\L,\U, \C
+   + \v, \V, \h, \H, \o{xxx}
    + (?{code})
    + (??{code})
-   + (?(condition)yes-pat|no-pat)
+   + (?|...)
+   + (*VERB:ARG)
 
    * \Q...\E
      This is effective on ONIG_SYNTAX_PERL and ONIG_SYNTAX_JAVA.

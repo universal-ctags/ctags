@@ -1,8 +1,9 @@
 /**********************************************************************
-  regtrav.c -  Oniguruma (regular expression library)
+  regtrav.c -  Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2004  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,8 +34,8 @@
 
 static int
 capture_tree_traverse(OnigCaptureTreeNode* node, int at,
-                      int(*callback_func)(int,int,int,int,int,void*),
-                      int level, void* arg)
+              int(*callback_func)(int,OnigPosition,OnigPosition,int,int,void*),
+              int level, void* arg)
 {
   int r, i;
 
@@ -65,7 +66,8 @@ capture_tree_traverse(OnigCaptureTreeNode* node, int at,
 
 extern int
 onig_capture_tree_traverse(OnigRegion* region, int at,
-                  int(*callback_func)(int,int,int,int,int,void*), void* arg)
+              int(*callback_func)(int,OnigPosition,OnigPosition,int,int,void*),
+              void* arg)
 {
 #ifdef USE_CAPTURE_HISTORY
   return capture_tree_traverse(region->history_root, at,

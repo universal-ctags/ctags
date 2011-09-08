@@ -1,5 +1,5 @@
 /**********************************************************************
-  regversion.c -  Onigmo (Oniguruma-mod) (regular expression library)
+  cp932.c -  Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2009  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
@@ -28,31 +28,5 @@
  * SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "oniguruma.h"
-#include <stdio.h>
-
-extern const char*
-onig_version(void)
-{
-  static char s[12];
-
-  sprintf(s, "%d.%d.%d",
-          ONIGURUMA_VERSION_MAJOR,
-          ONIGURUMA_VERSION_MINOR,
-          ONIGURUMA_VERSION_TEENY);
-  return s;
-}
-
-extern const char*
-onig_copyright(void)
-{
-  static char s[80];
-
-  sprintf(s, "Onigmo %d.%d.%d : Copyright (C) 2002-2009 K.Kosako, "
-	     "2011 K.Takata",
-          ONIGURUMA_VERSION_MAJOR,
-          ONIGURUMA_VERSION_MINOR,
-          ONIGURUMA_VERSION_TEENY);
-  return s;
-}
+#define ENC_CP932
+#include "sjis.c"

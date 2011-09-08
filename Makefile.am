@@ -19,7 +19,8 @@ libonig_la_SOURCES = regint.h regparse.h regenc.h st.h \
 	$(encdir)/unicode.c $(encdir)/ascii.c $(encdir)/utf8.c \
 	$(encdir)/utf16_be.c $(encdir)/utf16_le.c \
 	$(encdir)/utf32_be.c $(encdir)/utf32_le.c \
-	$(encdir)/euc_jp.c $(encdir)/sjis.c $(encdir)/iso8859_1.c \
+	$(encdir)/euc_jp.c $(encdir)/sjis.c $(encdir)/cp932.c \
+	$(encdir)/iso8859_1.c \
 	$(encdir)/iso8859_2.c  $(encdir)/iso8859_3.c \
 	$(encdir)/iso8859_4.c  $(encdir)/iso8859_5.c \
 	$(encdir)/iso8859_6.c  $(encdir)/iso8859_7.c \

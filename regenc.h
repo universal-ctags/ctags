@@ -1,10 +1,11 @@
 #ifndef ONIGURUMA_REGENC_H
 #define ONIGURUMA_REGENC_H
 /**********************************************************************
-  regenc.h -  Oniguruma (regular expression library)
+  regenc.h -  Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -189,6 +190,11 @@ ONIG_EXTERN const unsigned short OnigEncAsciiCtypeTable[];
 #define ONIGENC_IS_ASCII_CODE_CASE_AMBIG(code) \
  (ONIGENC_IS_ASCII_CODE_CTYPE(code, ONIGENC_CTYPE_UPPER) ||\
   ONIGENC_IS_ASCII_CODE_CTYPE(code, ONIGENC_CTYPE_LOWER))
+
+/* Check if the code is in the range. (from <= code && code <= to) */
+#define ONIGENC_IS_IN_RANGE(code, from, to) \
+  ((OnigCodePoint )((code) - (from)) <= (OnigCodePoint )((to) - (from)))
+
 
 #ifdef ONIG_ENC_REGISTER
 extern int ONIG_ENC_REGISTER(const char *, OnigEncodingType*);

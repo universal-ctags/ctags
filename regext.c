@@ -1,8 +1,9 @@
 /**********************************************************************
-  regext.c -  Oniguruma (regular expression library)
+  regext.c -  Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -95,7 +96,7 @@ static int
 conv_encoding(OnigEncoding from, OnigEncoding to, const UChar* s, const UChar* end,
               UChar** conv, UChar** conv_end)
 {
-  int len = end - s;
+  ptrdiff_t len = end - s;
 
   if (to == ONIG_ENCODING_UTF16_BE) {
     if (from == ONIG_ENCODING_ASCII || from == ONIG_ENCODING_ISO_8859_1) {

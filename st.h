@@ -12,7 +12,8 @@ extern "C" {
 #endif
 #endif
 
-#include "ruby/defines.h"
+typedef uintptr_t st_data_t;
+#define ST_DATA_T_DEFINED
 
 #if   defined STDC_HEADERS
 #include <stddef.h>

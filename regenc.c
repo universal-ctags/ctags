@@ -1,8 +1,9 @@
 /**********************************************************************
-  regenc.c -  Oniguruma (regular expression library)
+  regenc.c -  Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2007  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -66,7 +67,7 @@ onigenc_get_right_adjust_char_head(OnigEncoding enc, const UChar* start, const U
 {
   UChar* p = ONIGENC_LEFT_ADJUST_CHAR_HEAD(enc, start, s, end);
   if (p < s) {
-      p += enclen(enc, p, end);
+    p += enclen(enc, p, end);
   }
   return p;
 }
@@ -759,7 +760,7 @@ onigenc_mb2_code_to_mbc(OnigEncoding enc, OnigCodePoint code, UChar *buf)
   if (enclen(enc, buf, p) != (p - buf))
     return ONIGERR_INVALID_CODE_POINT_VALUE;
 #endif
-  return (int)(p - buf);
+  return (int )(p - buf);
 }
 
 extern int
@@ -782,7 +783,7 @@ onigenc_mb4_code_to_mbc(OnigEncoding enc, OnigCodePoint code, UChar *buf)
   if (enclen(enc, buf, p) != (p - buf))
     return ONIGERR_INVALID_CODE_POINT_VALUE;
 #endif
-  return (int)(p - buf);
+  return (int )(p - buf);
 }
 
 extern int

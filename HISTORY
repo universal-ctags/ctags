@@ -1,4 +1,130 @@
-History
+History of Onigmo (Oniguruma-mod)
+
+2011/09/08: Version 5.11.1
+
+2011/09/08: [impl] merge some part of Ruby r29928. (update debug log.)
+2011/09/08: [impl] merge Ruby r32544.
+                   Power PC does not allow unaligned word access.
+2011/09/07: [bug]  \g<0> doesn't work when USE_PERL_SUBEXP_CALL isn't defined.
+2011/09/07: [tune] optimize character class.
+2011/09/06: [tune] optimize (?a).
+2011/09/06: [tune] optimize \R.
+
+2011/09/03: Version 5.11.0
+
+2011/09/01: [new]  add OnigPosition.
+2011/09/01: [new]  (thanks h-tom)
+                   support for x64.
+2011/09/01: [new]  add ONIG_SYNTAX_PYTHON (onig.py).
+2011/08/30: [dist] check _MSC_VER instead of _NMAKE_VER when LTCG is used.
+2011/08/25: [tune] reduce conditional branches.
+                   use ONIGENC_IS_IN_RANGE macro to check the code range.
+2011/08/18: [dist] add a resource script for onig.dll (win32/onig.rc).
+
+2011/08/09: Version 5.10.6
+
+2011/08/09: [dist] a .def file can be used to export APIs.
+2011/08/08: [dist] update win32/Makefile to support LTCG optimization.
+2011/08/07: [new]  add new test scripts: testpy.py and onig.py
+2011/08/07: [new]  add a new syntax: ONIG_SYNTAX_PYTHON
+
+2011/08/03: Version 5.10.5
+
+2011/08/03: [dist] update win32/Makefile.
+2011/08/03: [dist] update tests to support ONIG_OPTION_ASCII_RANGE option.
+2011/07/30: [new]  EUC-JP: support for JIS X 0212 (Supplemental Kanji).
+2011/07/30: [impl] not to use ONIG_ENCODING_SJIS inside ONIG_ENCODING_CP932.
+2011/07/29: [new]  Add support for EUC-JIS-2004.
+                   (This feature is not enabled by default.)
+2011/07/29: [impl] EUC-JP: check the length more strictly.
+2011/07/29: [dist] translate Japanese comments to English.
+2011/07/29: [bug]  \p{Katakana} doesn't match JIS X 0201 Katakana when EUC-JP
+                   is used.
+2011/07/28: [dist] change the encoding of Japanese documents to UTF-8.
+2011/07/26: [bug]  [^x]*x causes invalid pointer access.
+2011/07/19: [spec] allow (?au) in Ruby syntax mode.
+2011/07/16: [new]  add \g<0> and \g<+n>.
+
+2011/07/11: Version 5.10.4
+
+2011/07/11: [dist] update autotools.
+                   use automake 1.10.3, autoconf 2.68 and libtool 2.4.
+2011/07/11: [impl] add typedefs of intptr_t/uintptr_t for old VC++ compilers.
+2011/07/11: [impl] include stdint.h and stddef.h for intptr_t/uintptr_t.
+2011/07/04: [tune] implicit-anchor optimization
+2011/07/04: [bug]  onig_search_gpos() may return wrong OnigRegion.
+2011/07/04: [bug]  fix typo in debug log.
+2011/07/04: [tune] enable optimization for .* except look-behind.
+2011/07/04: [bug]  Revert "enable optimization for .* except look-behind"
+
+2011/07/03: Version 5.10.3
+
+2011/07/01: [tune] implicit-anchor optimization
+2011/06/30: [bug]  Revert "[tune] implicit-anchor optimization"
+2011/06/30: [bug]  (?a) doesn't work properly
+
+2011/06/29: Version 5.10.2
+
+2011/06/29: [tune] implicit-anchor optimization
+2011/06/28: [impl] remove duplicated debug log.
+2011/06/28: [bug]  (?a) doesn't work for \d, \h and \s.
+2011/06/28: [bug]  should not backtrack in \X.
+
+2011/06/24: Version 5.10.1
+
+2011/06/24: [new]  add (?(cond)yes) and (?(cond)yes|no).
+2011/06/24: [bug]  double free in \R and \X.
+2011/06/24: [tune] enable optimization for .* except look-behind.
+2011/06/21: [spec] number is not allowed in (?&name) and (?P>name).
+
+2011/06/18: Version 5.10.0
+
+2011/06/18: [impl] export onig_new_without_alloc() API.
+2011/06/15: [spec] change Ruby syntax options.
+                   add \K, \R and \X.
+2011/06/15: [spec] change Perl syntax options.
+                   Rename ONIG_SYNTAX_PERL to ONIG_SYNTAX_PERL58.
+                   Rename ONIG_SYNTAX_PERL_NG to ONIG_SYNTAX_PERL58_NG.
+                   Add ONIG_SYNTAX_PERL as Perl 5.10+ compatible syntax.
+2011/06/14: [new]  add (?R), (?0) and (?+n).
+2011/06/14: [new]  add new character properties in EUC-JP:
+                   Han, Latin, Greek and Cyrillic.
+2011/06/14: [new]  add new encoding: CP932.
+2011/06/14: [new]  add new character properties in Shift_JIS:
+                   Han, Latin, Greek and Cyrillic.
+2011/06/13: [bug]  (?-n) doesn't work
+2011/06/13: [new]  add ONIG_SYN_ALLOW_MULTIPLEX_DEFINITION_NAME_CALL
+2011/06/13: [impl] remove unused ONIG_SYN_CAPTURE_LEFT_MOST_NAMED_GROUP flag.
+2011/06/13: [bug]  (?a) doesn't work with Unicode encodings.
+2011/06/12: [new]  add EUC-JP case folding.
+2011/06/12: [new]  add Shift_JIS case folding.
+2011/06/12: [spec] add ONIG_OPTION_ASCII_RANGE option to OnigSyntaxRuby.
+2011/06/12: [new]  add Python/PCRE compatible named group:
+                   (?P<name>...), (?P=name) and (?P>name).
+2011/06/11: [new]  add \g{n}, \g{-n} and \g{name}.
+2011/06/10: [bug]  char class may cause memory leak
+                   http://redmine.ruby-lang.org/issues/show/4061
+2011/06/10: [bug]  invalid backref number/name
+                   http://redmine.ruby-lang.org/issues/show/2759
+2011/06/10: [bug]  /(?<=a).*b/ =~ "aab" doesn't match
+                   http://redmine.ruby-lang.org/issues/show/3568
+2011/06/10: [bug]  Case Sensitivity in Regular Expressions with Lookbehind
+                   http://redmine.ruby-lang.org/issues/show/4088
+2011/06/10: [spec] allow any target for quantifiers.
+                   add USE_NO_INVALID_QUANTIFIER.
+2011/06/10: [new]  add Perl 5.14 compatible character set modifier:
+                   (?adlu) and (?^alu).
+2011/06/10: [new]  add (?&name), (?n) and (?-n).
+                   add USE_PERL_SUBEXP_CALL.
+2011/06/10: [new]  add \R, \X and \K.
+2011/06/10: [spec] allow negative look behind in look behind.
+2011/06/10: [new]  add: onig_search_gpos().
+
+2011/06/10: fork from Oniguruma 5.9.2.
+
+
+======================================================================
+History of Oniguruma
 
 2010/01/09: Version 5.9.2
 

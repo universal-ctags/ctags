@@ -2,6 +2,13 @@
 
 product_name = oniguruma
 
+# Comment out the next line, if you don't want to use LTCG.
+USE_LTCG = 1
+
+# Enable the next line, if you want to use a .def file.
+#DEFFILE = onig.def
+
+
 CPPFLAGS = 
 CFLAGS = -O2 -nologo /W3
 LDFLAGS =
@@ -15,8 +22,29 @@ LINKFLAGS = -link -incremental:no -pdb:none
 INSTALL = install -c
 CP      = copy
 CC = cl
+RC = rc
 DEFS = -DHAVE_CONFIG_H -DNOT_RUBY -DEXPORT
 RUBYDIR = ..
+PYTHON = python
+
+# Command string to get the version of cl.exe
+_MSC_VER = [for /f %i in ('cmd /c "(echo _MSC_VER>mscver.c) && ($(CC) /EP mscver.c 2>nul) && del mscver.c"') do @exit %i]
+
+!if DEFINED(USE_LTCG) && $(USE_LTCG)
+# Use LTCG (Link Time Code Generation).
+# Check if cl.exe is newer than VC++ 7.0 (_MSC_VER >= 1300).
+!if $(_MSC_VER) >= 1300
+CFLAGS = $(CFLAGS) -GL
+ARLIB_FLAGS = $(ARLIB_FLAGS) -LTCG
+ARDLL_FLAGS = $(ARDLL_FLAGS) -LTCG
+!endif
+!endif
+
+!ifdef DEFFILE
+# Use a .def file to export APIs.
+CFLAGS = $(CFLAGS) /DONIG_EXTERN=extern
+ARDLL_FLAGS = $(ARDLL_FLAGS) -def:$(DEFFILE)
+!endif
 
 subdirs = 
 
@@ -35,7 +63,7 @@ onigobjs     = reggnu.obj regerror.obj regparse.obj regext.obj regcomp.obj \
 posixobjs    = regposix.obj regposerr.obj
 libobjs      = $(onigobjs) $(posixobjs)
 
-jp_objs      =  $(encdir)\euc_jp.obj $(encdir)\sjis.obj
+jp_objs      =  $(encdir)\euc_jp.obj $(encdir)\sjis.obj $(encdir)\cp932.obj
 iso8859_objs =  $(encdir)\iso8859_1.obj  $(encdir)\iso8859_2.obj \
 		$(encdir)\iso8859_3.obj  $(encdir)\iso8859_4.obj \
 		$(encdir)\iso8859_5.obj  $(encdir)\iso8859_6.obj \
@@ -55,6 +83,8 @@ encobjs      =  $(encdir)\ascii.obj $(encdir)\utf8.obj \
 		$(encdir)\koi8_r.obj  \
 		$(encdir)\cp1251.obj # $(encdir)\koi8.obj
 
+resobj       = win32\onig.res
+
 onigsources  = regerror.c regparse.c regext.c regcomp.c regexec.c regenc.c \
 	       regsyntax.c regtrav.c regversion.c reggnu.c st.c
 posixsources = regposix.c regposerr.c
@@ -68,15 +98,19 @@ distfiles    = README COPYING HISTORY \
 		$(headers) $(libsources) $(patchfiles) \
 		test.rb testconv.rb
 testc        = testc
+testcu       = testu
 testp        = testp
 
 makeargs = $(MFLAGS) CPPFLAGS='$(CPPFLAGS)' CFLAGS='$(CFLAGS)' CC='$(CC)'
 
 .SUFFIXES:
-.SUFFIXES: .obj .c .h .ps .dvi .info .texinfo
+.SUFFIXES: .obj .c .h .ps .dvi .info .texinfo .res .rc
 
 .c.obj:
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) /I. /I.. /Fo$@ /c $<
+
+.rc.res:
+	$(RC) /Fo$@ $<
 
 # targets
 default: all
@@ -91,8 +125,8 @@ all: $(libname) $(dllname)
 $(libname): $(libobjs) $(encobjs)
 	$(ARLIB) $(ARLIB_FLAGS) -out:$@ $(libobjs) $(encobjs)
 
-$(dllname): $(libobjs) $(encobjs)
-	$(ARDLL) $(libobjs) $(encobjs) -Fe$@ $(ARDLL_FLAGS)
+$(dllname): $(libobjs) $(encobjs) $(resobj) $(DEFFILE)
+	$(ARDLL) $(libobjs) $(encobjs) $(resobj) -Fe$@ $(ARDLL_FLAGS)
 
 regparse.obj:  regparse.c $(onigheaders) config.h st.h
 regext.obj:    regext.c   $(onigheaders) config.h
@@ -101,7 +135,7 @@ regcomp.obj:   regcomp.c  $(onigheaders) config.h
 regexec.obj:   regexec.c  regint.h regenc.h oniguruma.h config.h
 reggnu.obj:    reggnu.c   regint.h regenc.h oniguruma.h config.h oniggnu.h
 regerror.obj:  regerror.c regint.h regenc.h oniguruma.h config.h
-regenc.obj:    regenc.c   regenc.h oniguruma.h config.h
+regenc.obj:    regenc.c   regint.h regenc.h oniguruma.h config.h
 regsyntax.obj: regsyntax.c regint.h regenc.h oniguruma.h config.h
 regversion.obj: regversion.c oniguruma.h config.h
 regposix.obj:  regposix.c $(posixheaders) oniguruma.h config.h
@@ -109,7 +143,7 @@ regposerr.obj: regposerr.c $(posixheaders) config.h
 st.obj:        st.c regint.h oniguruma.h config.h st.h
 
 $(encdir)\ascii.obj:      $(encdir)\ascii.c regenc.h config.h
-$(encdir)\unicode.obj:    $(encdir)\unicode.c regenc.h config.h
+$(encdir)\unicode.obj:    $(encdir)\unicode.c regint.h regenc.h config.h
 $(encdir)\utf8.obj:       $(encdir)\utf8.c regenc.h config.h
 $(encdir)\utf16_be.obj:   $(encdir)\utf16_be.c regenc.h config.h
 $(encdir)\utf16_le.obj:   $(encdir)\utf16_le.c regenc.h config.h
@@ -119,6 +153,7 @@ $(encdir)\euc_jp.obj:     $(encdir)\euc_jp.c regenc.h config.h
 $(encdir)\euc_tw.obj:     $(encdir)\euc_tw.c regenc.h config.h
 $(encdir)\euc_kr.obj:     $(encdir)\euc_kr.c regenc.h config.h
 $(encdir)\sjis.obj:       $(encdir)\sjis.c regenc.h config.h
+$(encdir)\cp932.obj:      $(encdir)\cp932.c $(encdir)\sjis.c regenc.h config.h
 $(encdir)\iso8859_1.obj:  $(encdir)\iso8859_1.c regenc.h config.h
 $(encdir)\iso8859_2.obj:  $(encdir)\iso8859_2.c regenc.h config.h
 $(encdir)\iso8859_3.obj:  $(encdir)\iso8859_3.c regenc.h config.h
@@ -139,6 +174,8 @@ $(encdir)\koi8_r.obj:     $(encdir)\koi8_r.c regenc.h config.h
 $(encdir)\cp1251.obj:     $(encdir)\cp1251.c regenc.h config.h
 $(encdir)\big5.obj:       $(encdir)\big5.c   regenc.h config.h
 $(encdir)\gb18030.obj:    $(encdir)\gb18030.c   regenc.h config.h
+
+win32\onig.res: win32\onig.rc
 
 
 # Ruby test
@@ -162,11 +199,14 @@ $(testp): $(testc).c $(dlllib)
 #$(testc)u.c: test.rb testconvu.rb
 #	ruby -Ke testconvu.rb test.rb > $@
 
-$(testc)u: $(testc)u.c $(libname)
-	$(CC) -nologo -o $(testc)u -DONIG_EXTERN=extern $(testc)u.c $(libname)
+$(testcu): $(testcu).c $(libname)
+	$(CC) -nologo -o $(testcu) -DONIG_EXTERN=extern $(testcu).c $(libname)
+
+$(libbase).def: win32\makedef.py oniguruma.h regenc.h oniggnu.h onigposix.h
+	$(PYTHON) win32\makedef.py > $@
 
 clean:
-	del *.obj $(encdir)\*.obj *.lib *.exp *.dll $(testp).exe $(testc).exe $(testc).obj
+	del *.obj $(encdir)\*.obj *.lib *.exp *.dll $(testp).exe $(testc).exe $(testc).obj $(testcu).exe $(testcu).obj win32\*.res
 
 
 # backup file suffix
