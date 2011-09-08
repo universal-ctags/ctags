@@ -1,5 +1,5 @@
-#ifndef REGPARSE_H
-#define REGPARSE_H
+#ifndef ONIGURUMA_REGPARSE_H
+#define ONIGURUMA_REGPARSE_H
 /**********************************************************************
   regparse.h -  Oniguruma (regular expression library)
 **********************************************************************/
@@ -30,6 +30,10 @@
  */
 
 #include "regint.h"
+
+#if defined __GNUC__ && __GNUC__ >= 4
+#pragma GCC visibility push(default)
+#endif
 
 /* node type */
 #define NT_STR         0
@@ -96,7 +100,7 @@
 #define NSTR_AMBIG              (1<<1)
 #define NSTR_DONT_GET_OPT_INFO  (1<<2)
 
-#define NSTRING_LEN(node)             ((node)->u.str.end - (node)->u.str.s)
+#define NSTRING_LEN(node) (OnigDistance)((node)->u.str.end - (node)->u.str.s)
 #define NSTRING_SET_RAW(node)          (node)->u.str.flag |= NSTR_RAW
 #define NSTRING_CLEAR_RAW(node)        (node)->u.str.flag &= ~NSTR_RAW
 #define NSTRING_SET_AMBIG(node)        (node)->u.str.flag |= NSTR_AMBIG
@@ -192,7 +196,7 @@ typedef struct {
   AbsAddrType    call_addr;
   /* for multiple call reference */
   OnigDistance min_len; /* min length (byte) */
-  OnigDistance max_len; /* max length (byte) */ 
+  OnigDistance max_len; /* max length (byte) */
   int char_len;         /* character length  */
   int opt_count;        /* referenced count in optimize_node_left() */
 } EncloseNode;
@@ -279,7 +283,7 @@ typedef struct {
   OnigOptionType   option;
   OnigCaseFoldType case_fold_flag;
   OnigEncoding     enc;
-  OnigSyntaxType*  syntax;
+  const OnigSyntaxType* syntax;
   BitStatusType    capture_history;
   BitStatusType    bt_mem_start;
   BitStatusType    bt_mem_end;
@@ -306,6 +310,9 @@ typedef struct {
   int curr_max_regnum;
   int has_recursion;
 #endif
+  int warnings_flag;
+  const char* sourcefile;
+  int sourceline;
 } ScanEnv;
 
 
@@ -348,4 +355,8 @@ extern int onig_print_names(FILE*, regex_t*);
 #endif
 #endif
 
-#endif /* REGPARSE_H */
+#if defined __GNUC__ && __GNUC__ >= 4
+#pragma GCC visibility pop
+#endif
+
+#endif /* ONIGURUMA_REGPARSE_H */

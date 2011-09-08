@@ -68,7 +68,7 @@ static const unsigned short EncISO_8859_6_CtypeTable[256] = {
 };
 
 static int
-is_code_ctype(OnigCodePoint code, unsigned int ctype)
+is_code_ctype(OnigCodePoint code, unsigned int ctype, OnigEncoding enc ARG_UNUSED)
 {
   if (code < 256)
     return ENC_IS_ISO_8859_6_CTYPE(code, ctype);
@@ -76,7 +76,7 @@ is_code_ctype(OnigCodePoint code, unsigned int ctype)
     return FALSE;
 }
 
-OnigEncodingType OnigEncodingISO_8859_6 = {
+OnigEncodingDefine(iso_8859_6, ISO_8859_6) = {
   onigenc_single_byte_mbc_enc_len,
   "ISO-8859-6",  /* name */
   1,             /* max enc length */
@@ -94,3 +94,14 @@ OnigEncodingType OnigEncodingISO_8859_6 = {
   onigenc_single_byte_left_adjust_char_head,
   onigenc_always_true_is_allowed_reverse_match
 };
+ENC_ALIAS("ISO8859-6", "ISO-8859-6")
+
+/*
+ * Name: windows-1256
+ * MIBenum: 2256
+ * Link: http://www.iana.org/assignments/character-sets
+ * Link: http://www.microsoft.com/globaldev/reference/sbcs/1256.mspx
+ * Link: http://en.wikipedia.org/wiki/Windows-1256
+ */
+ENC_REPLICATE("Windows-1256", "ISO-8859-6")
+ENC_ALIAS("CP1256", "Windows-1256")

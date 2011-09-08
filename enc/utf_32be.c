@@ -1,5 +1,5 @@
 /**********************************************************************
-  utf32_be.c -  Oniguruma (regular expression library)
+  utf_32be.c -  Oniguruma (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2007  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
@@ -30,13 +30,15 @@
 #include "regenc.h"
 
 static int
-utf32be_mbc_enc_len(const UChar* p ARG_UNUSED)
+utf32be_mbc_enc_len(const UChar* p ARG_UNUSED, const OnigUChar* e ARG_UNUSED,
+		    OnigEncoding enc ARG_UNUSED)
 {
   return 4;
 }
 
 static int
-utf32be_is_mbc_newline(const UChar* p, const UChar* end)
+utf32be_is_mbc_newline(const UChar* p, const UChar* end,
+		       OnigEncoding enc ARG_UNUSED)
 {
   if (p + 3 < end) {
     if (*(p+3) == 0x0a && *(p+2) == 0 && *(p+1) == 0 && *p == 0)
@@ -58,19 +60,22 @@ utf32be_is_mbc_newline(const UChar* p, const UChar* end)
 }
 
 static OnigCodePoint
-utf32be_mbc_to_code(const UChar* p, const UChar* end ARG_UNUSED)
+utf32be_mbc_to_code(const UChar* p, const UChar* end ARG_UNUSED,
+		    OnigEncoding enc ARG_UNUSED)
 {
   return (OnigCodePoint )(((p[0] * 256 + p[1]) * 256 + p[2]) * 256 + p[3]);
 }
 
 static int
-utf32be_code_to_mbclen(OnigCodePoint code ARG_UNUSED)
+utf32be_code_to_mbclen(OnigCodePoint code ARG_UNUSED,
+		       OnigEncoding enc ARG_UNUSED)
 {
   return 4;
 }
 
 static int
-utf32be_code_to_mbc(OnigCodePoint code, UChar *buf)
+utf32be_code_to_mbc(OnigCodePoint code, UChar *buf,
+		    OnigEncoding enc ARG_UNUSED)
 {
   UChar* p = buf;
 
@@ -83,7 +88,8 @@ utf32be_code_to_mbc(OnigCodePoint code, UChar *buf)
 
 static int
 utf32be_mbc_case_fold(OnigCaseFoldType flag,
-		      const UChar** pp, const UChar* end, UChar* fold)
+		      const UChar** pp, const UChar* end, UChar* fold,
+		      OnigEncoding enc)
 {
   const UChar* p = *pp;
 
@@ -108,8 +114,8 @@ utf32be_mbc_case_fold(OnigCaseFoldType flag,
     return 4;
   }
   else
-    return onigenc_unicode_mbc_case_fold(ONIG_ENCODING_UTF32_BE, flag, pp, end,
-					 fold);
+    return onigenc_unicode_mbc_case_fold(enc, flag, pp,
+					 end, fold);
 }
 
 #if 0
@@ -146,9 +152,10 @@ utf32be_is_mbc_ambiguous(OnigCaseFoldType flag, const UChar** pp, const UChar* e
 #endif
 
 static UChar*
-utf32be_left_adjust_char_head(const UChar* start, const UChar* s)
+utf32be_left_adjust_char_head(const UChar* start, const UChar* s, const UChar* end,
+			      OnigEncoding enc ARG_UNUSED)
 {
-  int rem;
+  ptrdiff_t rem;
 
   if (s <= start) return (UChar* )s;
 
@@ -158,13 +165,15 @@ utf32be_left_adjust_char_head(const UChar* start, const UChar* s)
 
 static int
 utf32be_get_case_fold_codes_by_str(OnigCaseFoldType flag,
-    const OnigUChar* p, const OnigUChar* end, OnigCaseFoldCodeItem items[])
+				   const OnigUChar* p, const OnigUChar* end,
+				   OnigCaseFoldCodeItem items[],
+				   OnigEncoding enc)
 {
-  return onigenc_unicode_get_case_fold_codes_by_str(ONIG_ENCODING_UTF32_BE,
+  return onigenc_unicode_get_case_fold_codes_by_str(enc,
 						    flag, p, end, items);
 }
 
-OnigEncodingType OnigEncodingUTF32_BE = {
+OnigEncodingDefine(utf_32be, UTF_32BE) = {
   utf32be_mbc_enc_len,
   "UTF-32BE",   /* name */
   4,            /* max byte length */
@@ -182,3 +191,5 @@ OnigEncodingType OnigEncodingUTF32_BE = {
   utf32be_left_adjust_char_head,
   onigenc_always_false_is_allowed_reverse_match
 };
+ENC_ALIAS("UCS-4BE", "UTF-32BE")
+

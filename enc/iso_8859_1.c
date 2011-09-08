@@ -29,6 +29,8 @@
 
 #include "regenc.h"
 
+#define numberof(array) (int)(sizeof(array) / sizeof((array)[0]))
+
 #define ENC_IS_ISO_8859_1_CTYPE(code,ctype) \
   ((EncISO_8859_1_CtypeTable[code] & CTYPE_TO_BIT(ctype)) != 0)
 
@@ -103,17 +105,19 @@ static const OnigPairCaseFoldCodes CaseFoldMap[] = {
 
 static int
 apply_all_case_fold(OnigCaseFoldType flag,
-		    OnigApplyAllCaseFoldFunc f, void* arg)
+		    OnigApplyAllCaseFoldFunc f, void* arg,
+		    OnigEncoding enc ARG_UNUSED)
 {
   return onigenc_apply_all_case_fold_with_map(
-            sizeof(CaseFoldMap)/sizeof(OnigPairCaseFoldCodes), CaseFoldMap, 1,
+            numberof(CaseFoldMap), CaseFoldMap, 1,
             flag, f, arg);
 }
 
 static int
-get_case_fold_codes_by_str(OnigCaseFoldType flag ARG_UNUSED,
+get_case_fold_codes_by_str(OnigCaseFoldType flag,
 			   const OnigUChar* p, const OnigUChar* end,
-			   OnigCaseFoldCodeItem items[])
+			   OnigCaseFoldCodeItem items[],
+			   OnigEncoding enc ARG_UNUSED)
 {
   if (0x41 <= *p && *p <= 0x5a) {
     items[0].byte_len = 1;
@@ -199,8 +203,8 @@ get_case_fold_codes_by_str(OnigCaseFoldType flag ARG_UNUSED,
 }
 
 static int
-mbc_case_fold(OnigCaseFoldType flag, const UChar** pp,
-	      const UChar* end ARG_UNUSED, UChar* lower)
+mbc_case_fold(OnigCaseFoldType flag, const UChar** pp, const UChar* end ARG_UNUSED,
+	      UChar* lower, OnigEncoding enc ARG_UNUSED)
 {
   const UChar* p = *pp;
 
@@ -244,7 +248,7 @@ is_mbc_ambiguous(OnigCaseFoldType flag,
 #endif
 
 static int
-is_code_ctype(OnigCodePoint code, unsigned int ctype)
+is_code_ctype(OnigCodePoint code, unsigned int ctype, OnigEncoding enc ARG_UNUSED)
 {
   if (code < 256)
     return ENC_IS_ISO_8859_1_CTYPE(code, ctype);
@@ -252,7 +256,7 @@ is_code_ctype(OnigCodePoint code, unsigned int ctype)
     return FALSE;
 }
 
-OnigEncodingType OnigEncodingISO_8859_1 = {
+OnigEncodingDefine(iso_8859_1, ISO_8859_1) = {
   onigenc_single_byte_mbc_enc_len,
   "ISO-8859-1",  /* name */
   1,             /* max enc length */
@@ -270,3 +274,14 @@ OnigEncodingType OnigEncodingISO_8859_1 = {
   onigenc_single_byte_left_adjust_char_head,
   onigenc_always_true_is_allowed_reverse_match
 };
+ENC_ALIAS("ISO8859-1", "ISO-8859-1")
+
+/*
+ * Name: windows-1252
+ * MIBenum: 2252
+ * Link: http://www.iana.org/assignments/character-sets
+ * Link: http://www.microsoft.com/globaldev/reference/sbcs/1252.mspx
+ * Link: http://en.wikipedia.org/wiki/Windows-1252
+ */
+ENC_REPLICATE("Windows-1252", "ISO-8859-1")
+ENC_ALIAS("CP1252", "Windows-1252")

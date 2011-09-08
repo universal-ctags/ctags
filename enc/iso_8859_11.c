@@ -68,7 +68,7 @@ static const unsigned short EncISO_8859_11_CtypeTable[256] = {
 };
 
 static int
-is_code_ctype(OnigCodePoint code, unsigned int ctype)
+is_code_ctype(OnigCodePoint code, unsigned int ctype, OnigEncoding enc ARG_UNUSED)
 {
   if (code < 256)
     return ENC_IS_ISO_8859_11_CTYPE(code, ctype);
@@ -76,7 +76,7 @@ is_code_ctype(OnigCodePoint code, unsigned int ctype)
     return FALSE;
 }
 
-OnigEncodingType OnigEncodingISO_8859_11 = {
+OnigEncodingDefine(iso_8859_11, ISO_8859_11) = {
   onigenc_single_byte_mbc_enc_len,
   "ISO-8859-11",  /* name */
   1,             /* max enc length */
@@ -94,3 +94,18 @@ OnigEncodingType OnigEncodingISO_8859_11 = {
   onigenc_single_byte_left_adjust_char_head,
   onigenc_always_true_is_allowed_reverse_match
 };
+ENC_ALIAS("ISO8859-11", "ISO-8859-11")
+
+/*
+ * Name: TIS-620
+ * MIBenum: 2259
+ * Link: http://en.wikipedia.org/wiki/Thai_Industrial_Standard_620-2533
+ */
+ENC_REPLICATE("TIS-620", "ISO-8859-11")
+
+/*
+ * Name: Windows-874
+ * Link: http://www.microsoft.com/globaldev/reference/sbcs/874.mspx
+ */
+ENC_REPLICATE("Windows-874", "ISO-8859-11")
+ENC_ALIAS("CP874", "Windows-874")

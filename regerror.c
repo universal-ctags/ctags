@@ -41,7 +41,7 @@
 extern UChar*
 onig_error_code_to_format(int code)
 {
-  char *p;
+  const char *p;
 
   if (code >= 0) return (UChar* )0;
 
@@ -51,7 +51,7 @@ onig_error_code_to_format(int code)
   case ONIG_NO_SUPPORT_CONFIG:
     p = "no support in this configuration"; break;
   case ONIGERR_MEMORY:
-    p = "fail to memory allocation"; break;
+    p = "failed to allocate memory"; break;
   case ONIGERR_MATCH_STACK_LIMIT_OVER:
     p = "match-stack limit over"; break;
   case ONIGERR_TYPE_BUG:
@@ -225,14 +225,14 @@ static int to_ascii(OnigEncoding enc, UChar *s, UChar *end,
 	buf[len++] = (UChar )code;
       }
 
-      p += enclen(enc, p);
+      p += enclen(enc, p, end);
       if (len >= buf_size) break;
     }
 
     *is_over = ((p < end) ? 1 : 0);
   }
   else {
-    len = MIN((end - s), buf_size);
+    len = (int)MIN((end - s), buf_size);
     xmemcpy(buf, s, (size_t )len);
     *is_over = ((buf_size < (end - s)) ? 1 : 0);
   }
@@ -251,12 +251,13 @@ onig_error_code_to_str(UChar* s, int code, ...)
 onig_error_code_to_str(s, code, va_alist)
   UChar* s;
   int code;
-  va_dcl 
+  va_dcl
 #endif
 {
   UChar *p, *q;
   OnigErrorInfo* einfo;
-  int len, is_over;
+  size_t len;
+  int is_over;
   UChar parbuf[MAX_ERROR_PAR_LEN];
   va_list vargs;
 
@@ -308,37 +309,23 @@ onig_error_code_to_str(s, code, va_alist)
   }
 
   va_end(vargs);
-  return len;
+  return (int)len;
 }
 
-
 void
-#ifdef HAVE_STDARG_PROTOTYPES
-onig_snprintf_with_pattern(UChar buf[], int bufsize, OnigEncoding enc,
-                           UChar* pat, UChar* pat_end, const UChar *fmt, ...)
-#else
-onig_snprintf_with_pattern(buf, bufsize, enc, pat, pat_end, fmt, va_alist)
-    UChar buf[];
-    int bufsize;
-    OnigEncoding enc;
-    UChar* pat;
-    UChar* pat_end;
-    const UChar *fmt;
-    va_dcl
-#endif
+onig_vsnprintf_with_pattern(UChar buf[], int bufsize, OnigEncoding enc,
+                           UChar* pat, UChar* pat_end, const UChar *fmt, va_list args)
 {
-  int n, need, len;
+  size_t need;
+  int n, len;
   UChar *p, *s, *bp;
   UChar bs[6];
-  va_list args;
 
-  va_init_list(args, fmt);
   n = xvsnprintf((char* )buf, bufsize, (const char* )fmt, args);
-  va_end(args);
 
   need = (pat_end - pat) * 4 + 4;
 
-  if (n + need < bufsize) {
+  if (n + need < (size_t)bufsize) {
     strcat((char* )buf, ": /");
     s = buf + onigenc_str_bytelen_null(ONIG_ENCODING_ASCII, buf);
 
@@ -346,15 +333,15 @@ onig_snprintf_with_pattern(buf, bufsize, enc, pat, pat_end, fmt, va_alist)
     while (p < pat_end) {
       if (*p == '\\') {
 	*s++ = *p++;
-	len = enclen(enc, p);
+	len = enclen(enc, p, pat_end);
 	while (len-- > 0) *s++ = *p++;
       }
       else if (*p == '/') {
 	*s++ = (unsigned char )'\\';
 	*s++ = *p++;
       }
-      else if (ONIGENC_IS_MBC_HEAD(enc, p)) {
-        len = enclen(enc, p);
+      else if (ONIGENC_IS_MBC_HEAD(enc, p, pat_end)) {
+        len = enclen(enc, p, pat_end);
         if (ONIGENC_MBC_MINLEN(enc) == 1) {
           while (len-- > 0) *s++ = *p++;
         }
@@ -362,7 +349,7 @@ onig_snprintf_with_pattern(buf, bufsize, enc, pat, pat_end, fmt, va_alist)
           int blen;
 
           while (len-- > 0) {
-	    sprint_byte_with_x((char* )bs, (unsigned int )(*p++));
+            sprint_byte_with_x((char* )bs, (unsigned int )(*p++));
             blen = onigenc_str_bytelen_null(ONIG_ENCODING_ASCII, bs);
             bp = bs;
             while (blen-- > 0) *s++ = *bp++;
@@ -385,3 +372,26 @@ onig_snprintf_with_pattern(buf, bufsize, enc, pat, pat_end, fmt, va_alist)
     *s   = '\0';
   }
 }
+
+void
+#ifdef HAVE_STDARG_PROTOTYPES
+onig_snprintf_with_pattern(UChar buf[], int bufsize, OnigEncoding enc,
+                           UChar* pat, UChar* pat_end, const UChar *fmt, ...)
+#else
+onig_snprintf_with_pattern(buf, bufsize, enc, pat, pat_end, fmt, va_alist)
+    UChar buf[];
+    int bufsize;
+    OnigEncoding enc;
+    UChar* pat;
+    UChar* pat_end;
+    const UChar *fmt;
+    va_dcl
+#endif
+{
+  va_list args;
+  va_init_list(args, fmt);
+  onig_vsnprintf_with_pattern(buf, bufsize, enc,
+	  pat, pat_end, fmt, args);
+  va_end(args);
+}
+

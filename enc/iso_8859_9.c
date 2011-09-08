@@ -105,7 +105,8 @@ static const unsigned short EncISO_8859_9_CtypeTable[256] = {
 
 static int
 mbc_case_fold(OnigCaseFoldType flag,
-	      const UChar** pp, const UChar* end ARG_UNUSED, UChar* lower)
+	      const UChar** pp, const UChar* end ARG_UNUSED, UChar* lower,
+	      OnigEncoding enc ARG_UNUSED)
 {
   const UChar* p = *pp;
 
@@ -148,7 +149,7 @@ is_mbc_ambiguous(OnigCaseFoldType flag, const UChar** pp, const UChar* end)
 #endif
 
 static int
-is_code_ctype(OnigCodePoint code, unsigned int ctype)
+is_code_ctype(OnigCodePoint code, unsigned int ctype, OnigEncoding enc ARG_UNUSED)
 {
   if (code < 256)
     return ENC_IS_ISO_8859_9_CTYPE(code, ctype);
@@ -192,7 +193,8 @@ static const OnigPairCaseFoldCodes CaseFoldMap[] = {
 
 static int
 apply_all_case_fold(OnigCaseFoldType flag,
-		    OnigApplyAllCaseFoldFunc f, void* arg)
+			       OnigApplyAllCaseFoldFunc f, void* arg,
+			       OnigEncoding enc ARG_UNUSED)
 {
   return onigenc_apply_all_case_fold_with_map(
              sizeof(CaseFoldMap)/sizeof(OnigPairCaseFoldCodes), CaseFoldMap, 1,
@@ -201,14 +203,16 @@ apply_all_case_fold(OnigCaseFoldType flag,
 
 static int
 get_case_fold_codes_by_str(OnigCaseFoldType flag,
-    const OnigUChar* p, const OnigUChar* end, OnigCaseFoldCodeItem items[])
+				      const OnigUChar* p, const OnigUChar* end,
+				      OnigCaseFoldCodeItem items[],
+				      OnigEncoding enc ARG_UNUSED)
 {
   return onigenc_get_case_fold_codes_by_str_with_map(
 	     sizeof(CaseFoldMap)/sizeof(OnigPairCaseFoldCodes), CaseFoldMap, 1,
 	     flag, p, end, items);
 }
 
-OnigEncodingType OnigEncodingISO_8859_9 = {
+OnigEncodingDefine(iso_8859_9, ISO_8859_9) = {
   onigenc_single_byte_mbc_enc_len,
   "ISO-8859-9",  /* name */
   1,             /* max enc length */
@@ -226,3 +230,14 @@ OnigEncodingType OnigEncodingISO_8859_9 = {
   onigenc_single_byte_left_adjust_char_head,
   onigenc_always_true_is_allowed_reverse_match
 };
+ENC_ALIAS("ISO8859-9", "ISO-8859-9")
+
+/*
+ * Name: windows-1254
+ * MIBenum: 2254
+ * Link: http://www.iana.org/assignments/character-sets
+ * Link: http://www.microsoft.com/globaldev/reference/sbcs/1254.mspx
+ * Link: http://en.wikipedia.org/wiki/Windows-1254
+ */
+ENC_REPLICATE("Windows-1254", "ISO-8859-9")
+ENC_ALIAS("CP1254", "Windows-1254")

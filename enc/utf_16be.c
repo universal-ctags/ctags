@@ -1,5 +1,5 @@
 /**********************************************************************
-  utf16_be.c -  Oniguruma (regular expression library)
+  utf_16be.c -  Oniguruma (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
@@ -29,6 +29,10 @@
 
 #include "regenc.h"
 
+#define UTF16_IS_SURROGATE_FIRST(c)    (((c) & 0xfc) == 0xd8)
+#define UTF16_IS_SURROGATE_SECOND(c)   (((c) & 0xfc) == 0xdc)
+#define UTF16_IS_SURROGATE(c)          (((c) & 0xf8) == 0xd8)
+
 static const int EncLen_UTF16[] = {
   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -49,13 +53,36 @@ static const int EncLen_UTF16[] = {
 };
 
 static int
-utf16be_mbc_enc_len(const UChar* p)
+utf16be_mbc_enc_len(const UChar* p, const OnigUChar* e ARG_UNUSED,
+		    OnigEncoding enc ARG_UNUSED)
 {
-  return EncLen_UTF16[*p];
+  int byte = p[0];
+  if (!UTF16_IS_SURROGATE(byte)) {
+    if (2 <= e-p)
+      return ONIGENC_CONSTRUCT_MBCLEN_CHARFOUND(2);
+    else
+      return ONIGENC_CONSTRUCT_MBCLEN_NEEDMORE(1);
+  }
+  if (UTF16_IS_SURROGATE_FIRST(byte)) {
+    switch (e-p) {
+      case 1: return ONIGENC_CONSTRUCT_MBCLEN_NEEDMORE(3);
+      case 2: return ONIGENC_CONSTRUCT_MBCLEN_NEEDMORE(2);
+      case 3:
+        if (UTF16_IS_SURROGATE_SECOND(p[2]))
+          return ONIGENC_CONSTRUCT_MBCLEN_NEEDMORE(1);
+        break;
+      default:
+        if (UTF16_IS_SURROGATE_SECOND(p[2]))
+          return ONIGENC_CONSTRUCT_MBCLEN_CHARFOUND(4);
+        break;
+    }
+  }
+  return ONIGENC_CONSTRUCT_MBCLEN_INVALID();
 }
 
 static int
-utf16be_is_mbc_newline(const UChar* p, const UChar* end)
+utf16be_is_mbc_newline(const UChar* p, const UChar* end,
+		       OnigEncoding enc)
 {
   if (p + 1 < end) {
     if (*(p+1) == 0x0a && *p == 0x00)
@@ -75,14 +102,14 @@ utf16be_is_mbc_newline(const UChar* p, const UChar* end)
 }
 
 static OnigCodePoint
-utf16be_mbc_to_code(const UChar* p, const UChar* end ARG_UNUSED)
+utf16be_mbc_to_code(const UChar* p, const UChar* end ARG_UNUSED,
+		    OnigEncoding enc)
 {
   OnigCodePoint code;
 
   if (UTF16_IS_SURROGATE_FIRST(*p)) {
-    code = ((((p[0] - 0xd8) << 2) + ((p[1] & 0xc0) >> 6) + 1) << 16)
-         + ((((p[1] & 0x3f) << 2) + (p[2] - 0xdc)) << 8)
-         + p[3];
+    code = ((((p[0] << 8) + p[1]) & 0x03ff) << 10)
+         + (((p[2] << 8) + p[3]) & 0x03ff) + 0x10000;
   }
   else {
     code = p[0] * 256 + p[1];
@@ -91,25 +118,25 @@ utf16be_mbc_to_code(const UChar* p, const UChar* end ARG_UNUSED)
 }
 
 static int
-utf16be_code_to_mbclen(OnigCodePoint code)
+utf16be_code_to_mbclen(OnigCodePoint code,
+		       OnigEncoding enc)
 {
   return (code > 0xffff ? 4 : 2);
 }
 
 static int
-utf16be_code_to_mbc(OnigCodePoint code, UChar *buf)
+utf16be_code_to_mbc(OnigCodePoint code, UChar *buf,
+		    OnigEncoding enc)
 {
   UChar* p = buf;
 
   if (code > 0xffff) {
-    unsigned int plane, high;
-
-    plane = (code >> 16) - 1;
-    *p++ = (plane >> 2) + 0xd8;
-    high = (code & 0xff00) >> 8;
-    *p++ = ((plane & 0x03) << 6) + (high >> 2);
-    *p++ = (high & 0x03) + 0xdc;
-    *p   = (UChar )(code & 0xff);
+    unsigned int high = (code >> 10) + 0xD7C0;
+    unsigned int low = (code & 0x3FF) + 0xDC00;
+    *p++ = (high >> 8) & 0xFF;
+    *p++ = high & 0xFF;
+    *p++ = (low >> 8) & 0xFF;
+    *p++ = low & 0xFF;
     return 4;
   }
   else {
@@ -121,7 +148,8 @@ utf16be_code_to_mbc(OnigCodePoint code, UChar *buf)
 
 static int
 utf16be_mbc_case_fold(OnigCaseFoldType flag,
-		      const UChar** pp, const UChar* end, UChar* fold)
+		      const UChar** pp, const UChar* end, UChar* fold,
+		      OnigEncoding enc)
 {
   const UChar* p = *pp;
 
@@ -144,7 +172,7 @@ utf16be_mbc_case_fold(OnigCaseFoldType flag,
     return 2;
   }
   else
-    return onigenc_unicode_mbc_case_fold(ONIG_ENCODING_UTF16_BE, flag,
+    return onigenc_unicode_mbc_case_fold(enc, flag,
 					 pp, end, fold);
 }
 
@@ -183,7 +211,8 @@ utf16be_is_mbc_ambiguous(OnigCaseFoldType flag, const UChar** pp, const UChar* e
 #endif
 
 static UChar*
-utf16be_left_adjust_char_head(const UChar* start, const UChar* s)
+utf16be_left_adjust_char_head(const UChar* start, const UChar* s, const UChar* end,
+			      OnigEncoding enc ARG_UNUSED)
 {
   if (s <= start) return (UChar* )s;
 
@@ -199,13 +228,15 @@ utf16be_left_adjust_char_head(const UChar* start, const UChar* s)
 
 static int
 utf16be_get_case_fold_codes_by_str(OnigCaseFoldType flag,
-    const OnigUChar* p, const OnigUChar* end, OnigCaseFoldCodeItem items[])
+				   const OnigUChar* p, const OnigUChar* end,
+				   OnigCaseFoldCodeItem items[],
+				   OnigEncoding enc)
 {
-  return onigenc_unicode_get_case_fold_codes_by_str(ONIG_ENCODING_UTF16_BE,
+  return onigenc_unicode_get_case_fold_codes_by_str(enc,
 						    flag, p, end, items);
 }
 
-OnigEncodingType OnigEncodingUTF16_BE = {
+OnigEncodingDefine(utf_16be, UTF_16BE) = {
   utf16be_mbc_enc_len,
   "UTF-16BE",   /* name */
   4,            /* max byte length */
@@ -223,3 +254,4 @@ OnigEncodingType OnigEncodingUTF16_BE = {
   utf16be_left_adjust_char_head,
   onigenc_always_false_is_allowed_reverse_match
 };
+ENC_ALIAS("UCS-2BE", "UTF-16BE")
