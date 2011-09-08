@@ -4,10 +4,12 @@
 *.a
 *.la
 *.obj
+*.def
 *.dll
 *.exe
 *.exp
 *.lib
+*.pyc
 *.bak
 *.BAK
 *~
