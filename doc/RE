@@ -227,8 +227,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
 
 
     It depends on ONIG_OPTION_ASCII_RANGE option that non-ASCII char
-    includes or not. ONIG_SYNTAX_RUBY includes this option and
-    ONIG_SYNTAX_PERL doesn't.
+    includes or not. This option is enabled in ONIG_SYNTAX_RUBY and
+    not in ONIG_SYNTAX_PERL.
 
 
 
@@ -236,11 +236,18 @@ syntax: ONIG_SYNTAX_RUBY (default)
 
   (?#...)            comment
 
-  (?imx-imx)         option on/off
+  (?imxau-imx)       option on/off
                          i: ignore case
                          m: multi-line (dot(.) match newline)
                          x: extended form
-  (?imx-imx:subexp)  option on/off for subexp
+                         a: ASCII
+                            ONIG_OPTION_ASCII_RANGE option is turned on.
+                            \w, \d, \s and POSIX brackes doesn't match
+                            non-ASCII characters.
+                         u: Unicode
+                            ONIG_OPTION_ASCII_RANGE option is turned off.
+  (?imxau-imx:subexp)
+                     option on/off for subexp
 
   (?:subexp)         not captured group
   (subexp)           captured group

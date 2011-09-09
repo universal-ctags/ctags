@@ -226,19 +226,25 @@
 
 
     ASCII外の文字を含むかどうかは ONIG_OPTION_ASCII_RANGE オプションに
-    依存する。ONIG_SYNTAX_RUBY は、このオプションを含むが ONIG_SYNTAX_PERL
-    は、このオプションを含まない。
+    依存する。このオプションは ONIG_SYNTAX_RUBY では有効化されているが、
+    ONIG_SYNTAX_PERL では無効化されている。
 
 
 
 7. 拡張式集合
 
   (?#...)           注釈
-  (?imx-imx)        孤立オプション
+  (?imxau-imx)      孤立オプション
                       i: 大文字小文字照合
                       m: 複数行
                       x: 拡張形式
-  (?imx-imx:式)     式オプション
+                      a: ASCII
+                         ONIG_OPTION_ASCII_RANGEオプションがオンになる。
+                         \w, \d, \s, POSIXブラケットは、非ASCII文字に
+                         マッチしない。
+                      u: Unicode
+                         ONIG_OPTION_ASCII_RANGEオプションがオフになる。
+  (?imxau-imx:式)   式オプション
 
   (式)              捕獲式集合
   (?:式)            非捕獲式集合

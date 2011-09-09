@@ -1,5 +1,14 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/09/10: Version 5.11.2
+
+2011/09/09: [bug]  merge Ruby r24546.
+                   fix the first character bigger than sb_out was dropped.
+2011/09/09: [bug]  merge Ruby r19864.
+                   CCV_SB is only for single byte.
+2011/09/09: [bug]  merge Ruby r24550.
+                   fix memory leaks.
+
 2011/09/08: Version 5.11.1
 
 2011/09/08: [impl] merge some part of Ruby r29928. (update debug log.)
