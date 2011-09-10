@@ -4425,7 +4425,7 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
     switch (r) {
     case TK_CHAR:
       if ((tok->u.code >= SINGLE_BYTE_SIZE) ||
-         (len = ONIGENC_CODE_TO_MBCLEN(env->enc, tok->u.c)) > 1) {
+	  (len = ONIGENC_CODE_TO_MBCLEN(env->enc, tok->u.c)) > 1) {
 	in_type = CCV_CODE_POINT;
       }
       else if (len < 0) {
