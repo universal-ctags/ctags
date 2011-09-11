@@ -529,6 +529,7 @@ enum OpCode {
   OP_END_LINE,
   OP_SEMI_END_BUF,
   OP_BEGIN_POSITION,
+  OP_BEGIN_POS_OR_LINE,   /* used for implicit anchor optimization */
 
   OP_BACKREF1,
   OP_BACKREF2,
