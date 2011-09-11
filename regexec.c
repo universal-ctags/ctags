@@ -2111,6 +2111,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       break;
 
     case OP_BEGIN_LINE:  MOP_IN(OP_BEGIN_LINE);
+    op_begin_line:
       if (ON_STR_BEGIN(s)) {
 	if (IS_NOTBOL(msa->options)) goto fail;
 	MOP_OUT;
@@ -2181,6 +2182,14 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     case OP_BEGIN_POSITION:  MOP_IN(OP_BEGIN_POSITION);
       if (s != msa->gpos)
 	goto fail;
+
+      MOP_OUT;
+      continue;
+      break;
+
+    case OP_BEGIN_POS_OR_LINE:  MOP_IN(OP_BEGIN_POS_OR_LINE);
+      if (s != msa->gpos)
+	goto op_begin_line;
 
       MOP_OUT;
       continue;
