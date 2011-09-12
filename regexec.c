@@ -2140,7 +2140,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	continue;
       }
 #ifdef USE_CRNL_AS_LINE_TERMINATOR
-      else if (ONIGENC_IS_MBC_CRNL(encode, s, end)) {
+      else if (IS_NEWLINE_CRLF(reg->options) &&
+	       ONIGENC_IS_MBC_CRNL(encode, s, end)) {
 	MOP_OUT;
 	continue;
       }
@@ -2166,7 +2167,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	continue;
       }
 #ifdef USE_CRNL_AS_LINE_TERMINATOR
-      else if (ONIGENC_IS_MBC_CRNL(encode, s, end)) {
+      else if (IS_NEWLINE_CRLF(reg->options) &&
+	       ONIGENC_IS_MBC_CRNL(encode, s, end)) {
         UChar* ss = s + enclen(encode, s);
 	ss += enclen(encode, ss);
         if (ON_STR_END(ss)) {
@@ -3338,7 +3340,8 @@ forward_search_range(regex_t* reg, const UChar* str, const UChar* end, UChar* s,
 	}
 	else if (! ONIGENC_IS_MBC_NEWLINE(reg->enc, p, end)
 #ifdef USE_CRNL_AS_LINE_TERMINATOR
-              && ! ONIGENC_IS_MBC_CRNL(reg->enc, p, end)
+	      && (! IS_NEWLINE_CRLF(reg->options)
+                && ! ONIGENC_IS_MBC_CRNL(reg->enc, p, end))
 #endif
                 )
 	  goto retry_gate;
@@ -3464,7 +3467,8 @@ backward_search_range(regex_t* reg, const UChar* str, const UChar* end,
 	}
 	else if (! ONIGENC_IS_MBC_NEWLINE(reg->enc, p, end)
 #ifdef USE_CRNL_AS_LINE_TERMINATOR
-              && ! ONIGENC_IS_MBC_CRNL(reg->enc, p, end)
+	      && (! IS_NEWLINE_CRLF(reg->options)
+                && ! ONIGENC_IS_MBC_CRNL(reg->enc, p, end))
 #endif
                 ) {
 	  p = onigenc_get_prev_char_head(reg->enc, adjrange, p);
@@ -3677,6 +3681,7 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 #ifdef USE_CRNL_AS_LINE_TERMINATOR
 	pre_end = ONIGENC_STEP_BACK(reg->enc, str, pre_end, 1);
 	if (IS_NOT_NULL(pre_end) &&
+	    IS_NEWLINE_CRLF(reg->options) &&
 	    ONIGENC_IS_MBC_CRNL(reg->enc, pre_end, end)) {
 	  min_semi_end = pre_end;
 	}
