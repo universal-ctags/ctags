@@ -5413,13 +5413,11 @@ node_linebreak(Node** np, ScanEnv* env)
     bitset_set_range(cc->bs, 0x0A, 0x0D);
   }
 
-#ifdef USE_UNICODE_ALL_LINE_TERMINATORS
   if (onig_strncmp((UChar* )env->enc->name, (UChar* )"UTF", 3) == 0) {
     /* UTF-8, UTF-16BE/LE, UTF-32BE/LE */
     add_code_range(&(cc->mbuf), env, 0x85, 0x85);
     add_code_range(&(cc->mbuf), env, 0x2028, 0x2029);
   }
-#endif
 
   /* ...|... */
   target1 = onig_node_new_alt(right, NULL_NODE);
