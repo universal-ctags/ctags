@@ -72,9 +72,7 @@ is_mbc_newline(const UChar* p, const UChar* end)
     if (*p == 0x0a) return 1;
 
 #ifdef USE_UNICODE_ALL_LINE_TERMINATORS
-#ifndef USE_CRNL_AS_LINE_TERMINATOR
-    if (*p == 0x0d) return 1;
-#endif
+    if (*p == 0x0b || *p == 0x0c || *p == 0x0d) return 1;
     if (p + 1 < end) {
       if (*(p+1) == 0x85 && *p == 0xc2) /* U+0085 */
 	return 1;
