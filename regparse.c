@@ -1521,7 +1521,8 @@ static Node*
 node_new_str_raw(UChar* s, UChar* end)
 {
   Node* node = node_new_str(s, end);
-  NSTRING_SET_RAW(node);
+  if (IS_NOT_NULL(node))
+    NSTRING_SET_RAW(node);
   return node;
 }
 
@@ -1550,7 +1551,7 @@ str_node_split_last_char(StrNode* sn, OnigEncoding enc)
     p = onigenc_get_prev_char_head(enc, sn->s, sn->end);
     if (p && p > sn->s) { /* can be splitted. */
       n = node_new_str(p, sn->end);
-      if ((sn->flag & NSTR_RAW) != 0)
+      if (IS_NOT_NULL(n) && (sn->flag & NSTR_RAW) != 0)
 	NSTRING_SET_RAW(n);
       sn->end = (UChar* )p;
     }
