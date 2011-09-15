@@ -5715,7 +5715,6 @@ parse_exp(Node** np, OnigToken* tok, int term,
     break;
 
   case TK_CODE_POINT:
-  tk_code_point:
     {
       UChar buf[ONIGENC_CODE_TO_MBC_MAXLEN];
       int num = ONIGENC_CODE_TO_MBC(env->enc, tok->u.code, buf);
@@ -5848,9 +5847,11 @@ parse_exp(Node** np, OnigToken* tok, int term,
 
       cc = NCCLASS(*np);
       if (is_onechar_cclass(cc, &code)) {
-	tok->u.code = code;
-	onig_node_free(*np);
-	goto tk_code_point;
+	UChar buf[ONIGENC_CODE_TO_MBC_MAXLEN];
+	int num = ONIGENC_CODE_TO_MBC(env->enc, code, buf);
+	if (num < 0) return num;
+	*np = node_new_str(buf, buf + num);
+	CHECK_NULL_RETURN_MEMERR(*np);
       }
       if (IS_IGNORECASE(env->option)) {
 	IApplyCaseFoldArg iarg;
