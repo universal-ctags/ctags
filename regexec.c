@@ -3355,7 +3355,6 @@ forward_search_range(regex_t* reg, const UChar* str, const UChar* end, UChar* s,
 
       switch (reg->sub_anchor) {
       case ANCHOR_BEGIN_LINE:
-printf("ANCHOR_BEGIN_LINE\n");
 	if (!ON_STR_BEGIN(p)) {
 	  prev = onigenc_get_prev_char_head(reg->enc,
 					    (pprev ? pprev : str), p);
@@ -3365,7 +3364,6 @@ printf("ANCHOR_BEGIN_LINE\n");
 	break;
 
       case ANCHOR_END_LINE:
-printf("ANCHOR_END_LINE\n");
 	if (ON_STR_END(p)) {
 #ifndef USE_NEWLINE_AT_END_OF_STRING_HAS_EMPTY_LINE
 	  prev = (UChar* )onigenc_get_prev_char_head(reg->enc,
