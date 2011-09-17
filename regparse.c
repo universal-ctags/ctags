@@ -1469,6 +1469,15 @@ node_str_cat_char(Node* node, UChar c)
   return onig_node_str_cat(node, s, s + 1);
 }
 
+static int
+node_str_cat_codepoint(Node* node, OnigEncoding enc, OnigCodePoint c)
+{
+  UChar buf[ONIGENC_CODE_TO_MBC_MAXLEN];
+  int num = ONIGENC_CODE_TO_MBC(enc, c, buf);
+  if (num < 0) return num;
+  return onig_node_str_cat(node, buf, buf + num);
+}
+
 extern void
 onig_node_conv_to_str_node(Node* node, int flag)
 {
@@ -5658,12 +5667,21 @@ parse_exp(Node** np, OnigToken* tok, int term,
       *np = node_new_str(tok->backp, *src);
       CHECK_NULL_RETURN_MEMERR(*np);
 
+    string_loop:
       while (1) {
 	r = fetch_token(tok, src, end, env);
 	if (r < 0) return r;
-	if (r != TK_STRING) break;
-
-	r = onig_node_str_cat(*np, tok->backp, *src);
+	if (r == TK_STRING) {
+	  r = onig_node_str_cat(*np, tok->backp, *src);
+	}
+#ifndef NUMBERED_CHAR_IS_NOT_CASE_AMBIG
+	else if (r == TK_CODE_POINT) {
+	  r = node_str_cat_codepoint(*np, env->enc, tok->u.code);
+	}
+#endif
+	else {
+	  break;
+	}
 	if (r < 0) return r;
       }
 
@@ -5716,15 +5734,15 @@ parse_exp(Node** np, OnigToken* tok, int term,
 
   case TK_CODE_POINT:
     {
-      UChar buf[ONIGENC_CODE_TO_MBC_MAXLEN];
-      int num = ONIGENC_CODE_TO_MBC(env->enc, tok->u.code, buf);
-      if (num < 0) return num;
-#ifdef NUMBERED_CHAR_IS_NOT_CASE_AMBIG
-      *np = node_new_str_raw(buf, buf + num);
-#else
-      *np = node_new_str(buf, buf + num);
-#endif
+      *np = node_new_empty();
       CHECK_NULL_RETURN_MEMERR(*np);
+      r = node_str_cat_codepoint(*np, env->enc, tok->u.code);
+      if (r != 0) return r;
+#ifdef NUMBERED_CHAR_IS_NOT_CASE_AMBIG
+      NSTRING_SET_RAW(*np);
+#else
+      goto string_loop;
+#endif
     }
     break;
 
@@ -5847,11 +5865,11 @@ parse_exp(Node** np, OnigToken* tok, int term,
 
       cc = NCCLASS(*np);
       if (is_onechar_cclass(cc, &code)) {
-	UChar buf[ONIGENC_CODE_TO_MBC_MAXLEN];
-	int num = ONIGENC_CODE_TO_MBC(env->enc, code, buf);
-	if (num < 0) return num;
-	*np = node_new_str(buf, buf + num);
+	*np = node_new_empty();
 	CHECK_NULL_RETURN_MEMERR(*np);
+	r = node_str_cat_codepoint(*np, env->enc, code);
+	if (r != 0) return r;
+	goto string_loop;
       }
       if (IS_IGNORECASE(env->option)) {
 	IApplyCaseFoldArg iarg;
