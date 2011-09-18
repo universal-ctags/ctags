@@ -30,7 +30,7 @@ static void result(int no, int from, int to,
 
 static int
 x0(int no, char* pattern_arg, char* str_arg,
-   int start_offset, int expected_from, int expected_to)
+   int start_offset, int expected_from, int expected_to, int backward)
 {
   int r;
   unsigned char *start, *range, *end;
@@ -43,7 +43,7 @@ x0(int no, char* pattern_arg, char* str_arg,
   str     = (UChar* )str_arg;
 
   r = onig_new(&reg, pattern, pattern + strlen((char* )pattern),
-	ONIG_OPTION_NEWLINE_CRLF, /*ONIG_ENCODING_ASCII*/ONIG_ENCODING_UTF8, ONIG_SYNTAX_DEFAULT, &einfo);
+	ONIG_OPTION_NEWLINE_CRLF, ONIG_ENCODING_UTF8, ONIG_SYNTAX_DEFAULT, &einfo);
   if (r != ONIG_NORMAL) {
     char s[ONIG_MAX_ERROR_MESSAGE_LEN];
     onig_error_code_to_str(s, r, &einfo);
@@ -54,8 +54,14 @@ x0(int no, char* pattern_arg, char* str_arg,
   region = onig_region_new();
 
   end   = str + strlen((char* )str);
-  start = str + start_offset;
-  range = end;
+  if (backward) {
+    start = end + start_offset;
+    range = str;
+  }
+  else {
+    start = str + start_offset;
+    range = end;
+  }
   r = onig_search(reg, str, end, start, range, region, ONIG_OPTION_NONE);
   if (r >= 0 || r == ONIG_MISMATCH) {
     result(no, region->beg[0], region->end[0], expected_from, expected_to);
@@ -79,13 +85,13 @@ static int
 x(int no, char* pattern_arg, char* str_arg,
   int expected_from, int expected_to)
 {
-  return x0(no, pattern_arg, str_arg, 0, expected_from, expected_to);
+  return x0(no, pattern_arg, str_arg, 0, expected_from, expected_to, 0);
 }
 
 static int
-f0(int no, char* pattern_arg, char* str_arg, int start_offset)
+f0(int no, char* pattern_arg, char* str_arg, int start_offset, int backward)
 {
-  return x0(no, pattern_arg, str_arg, start_offset, -1, -1);
+  return x0(no, pattern_arg, str_arg, start_offset, -1, -1, backward);
 }
 
 static int
@@ -165,30 +171,42 @@ extern int main(int argc, char* argv[])
   x(36, "T$",      "T\n",         0,  1);
   x(37, "(?m).",   "\r\n",        0,  1);
   x(38, "(?m)..",  "\r\n",        0,  2);
-  x0(39, "^",      "\n.",     1,  1,  1);
-  x0(40, "^",      "\r\n.",   1,  2,  2);
-  x0(41, "^",      "\r\n.",   2,  2,  2);
-  x0(42, "$",      "\n\n",    1,  1,  1);
-  x0(43, "$",      "\r\n\n",  1,  2,  2);
-  x0(44, "$",      "\r\n\n",  2,  2,  2);
+  x0(39, "^",      "\n.",     1,  1,  1,  0);
+  x0(40, "^",      "\r\n.",   1,  2,  2,  0);
+  x0(41, "^",      "\r\n.",   2,  2,  2,  0);
+  x0(42, "$",      "\n\n",    1,  1,  1,  0);
+  x0(43, "$",      "\r\n\n",  1,  2,  2,  0);
+  x0(44, "$",      "\r\n\n",  2,  2,  2,  0);
 #ifdef USE_UNICODE_ALL_LINE_TERMINATORS
-  x0(45, "^$",     "\n\r",    1,  1,  1);
+  x0(45, "^$",     "\n\r",    1,  1,  1,  0);
 #else
-  f0(45, "^$",     "\n\r",    1);
+  f0(45, "^$",     "\n\r",    1,  0);
 #endif
-  x0(46, "^$",     "\n\r\n",  1,  1,  1);
-  x0(47, "^$",     "\r\n\n",  1,  2,  2);
-  x0(48, "\\Z",    "\r\n\n",  1,  2,  2);
-  f0(49, ".(?=\\Z)", "\r\n",  1);
-  x0(50, "(?=\\Z)", "\r\n",   1,  2,  2);
-  x0(51, "(?<=^).", "\r\n.",  0,  2,  3);
-  x0(52, "(?<=^).", "\r\n.",  1,  2,  3);
-  x0(53, "(?<=^).", "\r\n.",  2,  2,  3);
-  x0(54, "^a",      "\r\na",  0,  2,  3);
-  x0(55, "^a",      "\r\na",  1,  2,  3);
-  x0(56, "(?m)$.{1,2}a", "\r\na", 0,  0,  3);
-  f0(57, "(?m)$.{1,2}a", "\r\na", 1);
-  x0(58, ".*b",      "\r\naaab\r\n",  1,  2,  6);
+  x0(46, "^$",     "\n\r\n",  1,  1,  1,  0);
+  x0(47, "^$",     "\r\n\n",  1,  2,  2,  0);
+  x0(48, "\\Z",    "\r\n\n",  1,  2,  2,  0);
+  f0(49, ".(?=\\Z)", "\r\n",  1,  0);
+  x0(50, "(?=\\Z)", "\r\n",   1,  2,  2,  0);
+  x0(51, "(?<=^).", "\r\n.",  0,  2,  3,  0);
+  x0(52, "(?<=^).", "\r\n.",  1,  2,  3,  0);
+  x0(53, "(?<=^).", "\r\n.",  2,  2,  3,  0);
+  x0(54, "^a",      "\r\na",  0,  2,  3,  0);
+  x0(55, "^a",      "\r\na",  1,  2,  3,  0);
+  x0(56, "(?m)$.{1,2}a", "\r\na", 0,  0,  3,  0);
+  f0(57, "(?m)$.{1,2}a", "\r\na", 1,  0);
+  x0(58, ".*b",      "\r\naaab\r\n",  1,  2,  6,  0);
+
+  /* backward search */
+/*  x0(59, "$",      "\n\n",    0,  1,  1,  1); */	/* BUG? */
+  x0(60, "$",      "\n\n",   -1,  1,  1,  1);
+  x0(61, "$",      "\n\r\n", -1,  1,  1,  1);
+  x0(62, "$",      "\n\r\n", -2,  1,  1,  1);
+  x0(63, "^$",     "\n\r\n", -1,  1,  1,  1);
+  x0(64, "^$",     "\n\r\n",  0,  1,  1,  1);
+  x0(65, "^$",     "\r\n\n",  0,  2,  2,  1);
+  x0(66, "^a",     "\r\na",   0,  2,  3,  1);
+  x0(67, "^a",     "\r\na",  -1,  2,  3,  1);
+  f0(68, "^a",     "\r\na",  -2,  1);
 
   onig_end();
 
