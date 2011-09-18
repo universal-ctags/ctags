@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) API  Version 5.11.0  2011/09/03
+Onigmo (Oniguruma-mod) API  Version 5.11.3  2011/09/13
 
 #include <oniguruma.h>
 
@@ -77,6 +77,12 @@ Onigmo (Oniguruma-mod) API  Version 5.11.0  2011/09/03
 
       ONIG_OPTION_DONT_CAPTURE_GROUP only named group captured.
       ONIG_OPTION_CAPTURE_GROUP      named and no-named group captured.
+
+      ONIG_OPTION_NEWLINE_CRLF
+            Treat CR+LF as a newline too. (default: LF only)
+            To use this option, you must enable the following line in regenc.h.
+
+            /* #define USE_CRNL_AS_LINE_TERMINATOR */
 
   5 enc:        character encoding.
 

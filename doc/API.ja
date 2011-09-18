@@ -1,4 +1,4 @@
-Onigmo インターフェース Version 5.11.0   2011/09/03
+Onigmo インターフェース Version 5.11.3   2011/09/13
 
 #include <oniguruma.h>
 
@@ -78,6 +78,12 @@ Onigmo インターフェース Version 5.11.0   2011/09/03
 
       ONIG_OPTION_DONT_CAPTURE_GROUP 名前付き捕獲式集合のみ捕獲
       ONIG_OPTION_CAPTURE_GROUP      名前無し捕獲式集合も捕獲
+
+      ONIG_OPTION_NEWLINE_CRLF
+            CR+LFも改行として扱う。(デフォルトではLFのみ。)
+            この機能を使うには、regenc.hの以下の行を有効にする必要がある。
+
+            /* #define USE_CRNL_AS_LINE_TERMINATOR */
 
   5 enc:        文字エンコーディング
 
