@@ -2,6 +2,7 @@ History of Onigmo (Oniguruma-mod)
 
 2011/09/18: Version 5.11.3
 
+2011/09/18: [spec] \R matches \x85, \x2028 and \x2029 in Unicode encodings.
 2011/09/18: [new]  add ONIG_OPTION_NEWLINE_CRLF.
 2011/09/18: [tune] optimize \x{}.
 2011/09/17: [tune] expand a{n,m} to 'a...a' + a{0,m-n}.
