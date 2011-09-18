@@ -3935,21 +3935,46 @@ restart:
       /* expand string */
 #define EXPAND_STRING_MAX_LENGTH  100
       if (NTYPE(target) == NT_STR) {
-	if (!IS_REPEAT_INFINITE(qn->lower) && qn->lower == qn->upper &&
-	    qn->lower > 1 && qn->lower <= EXPAND_STRING_MAX_LENGTH) {
+	if (qn->lower > 1) {
+	  int i, n = qn->lower;
 	  OnigDistance len = NSTRING_LEN(target);
 	  StrNode* sn = NSTR(target);
+	  Node* np;
 
-	  if (len * qn->lower <= EXPAND_STRING_MAX_LENGTH) {
-	    int i, n = qn->lower;
-	    onig_node_conv_to_str_node(node, NSTR(target)->flag);
-	    for (i = 0; i < n; i++) {
-	      r = onig_node_str_cat(node, sn->s, sn->end);
-	      if (r) break;
+	  np = onig_node_new_str(sn->s, sn->end);
+	  if (IS_NULL(np)) return ONIGERR_MEMORY;
+
+	  for (i = 1; i < n && (i+1) * len <= EXPAND_STRING_MAX_LENGTH; i++) {
+	    r = onig_node_str_cat(np, sn->s, sn->end);
+	    if (r) {
+	      onig_node_free(np);
+	      return r;
 	    }
-	    onig_node_free(target);
-	    break; /* break case NT_QTFR: */
 	  }
+	  if (i < qn->upper || IS_REPEAT_INFINITE(qn->upper)) {
+	    Node *np1, *np2;
+
+	    qn->lower -= i;
+	    if (! IS_REPEAT_INFINITE(qn->upper))
+	      qn->upper -= i;
+
+	    np1 = onig_node_new_list(np, NULL);
+	    if (IS_NULL(np1)) {
+	      onig_node_free(np);
+	      return ONIGERR_MEMORY;
+	    }
+	    swap_node(np1, node);
+	    np2 = onig_node_list_add(node, np1);
+	    if (IS_NULL(np2)) {
+	      onig_node_free(np1);
+	      return ONIGERR_MEMORY;
+	    }
+	  }
+	  else {
+	    swap_node(np, node);
+	    onig_node_free(np);
+	  }
+	  break; /* break case NT_QTFR: */
 	}
       }
 

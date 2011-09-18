@@ -108,10 +108,10 @@ typedef struct {
 
 #define PosixBracketEntryInit(name, ctype) {(const UChar *)name, ctype, (short int)(sizeof(name) - 1)}
 
-/* #define USE_CRNL_AS_LINE_TERMINATOR */
+#define USE_CRNL_AS_LINE_TERMINATOR
 #define USE_UNICODE_PROPERTIES
 /* #define USE_UNICODE_CASE_FOLD_TURKISH_AZERI */
-/* #define USE_UNICODE_ALL_LINE_TERMINATORS */  /* see Unicode.org UTF#18 */
+/* #define USE_UNICODE_ALL_LINE_TERMINATORS */  /* see Unicode.org UTS #18 */
 
 
 #define ONIG_ENCODING_INIT_DEFAULT           ONIG_ENCODING_ASCII

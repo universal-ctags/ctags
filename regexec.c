@@ -35,8 +35,44 @@
 #ifdef USE_CRNL_AS_LINE_TERMINATOR
 #define ONIGENC_IS_MBC_CRNL(enc,p,end) \
   (ONIGENC_MBC_TO_CODE(enc,p,end) == 13 && \
-   ONIGENC_IS_MBC_NEWLINE(enc,(p+enclen(enc,p)),end))
-#endif
+   ONIGENC_MBC_TO_CODE(enc,(p+enclen(enc,p,enc)),end) == 10)
+#define ONIGENC_IS_MBC_NEWLINE_EX(enc,p,start,end,option,check_prev) \
+  is_mbc_newline_ex((enc),(p),(start),(end),(option),(check_prev))
+static int
+is_mbc_newline_ex(OnigEncoding enc, const UChar *p, const UChar *start,
+		  const UChar *end, OnigOptionType option, int check_prev)
+{
+  if (IS_NEWLINE_CRLF(option)) {
+    if (ONIGENC_MBC_TO_CODE(enc, p, end) == 0x0a) {
+      if (check_prev) {
+	const UChar *prev = onigenc_get_prev_char_head(enc, start, p, end);
+	if ((prev != NULL) && ONIGENC_MBC_TO_CODE(enc, prev, end) == 0x0d)
+	  return 0;
+	else
+	  return 1;
+      }
+      else
+	return 1;
+    }
+    else {
+      const UChar *pnext = p + enclen(enc, p, end);
+      if (pnext < end &&
+	  ONIGENC_MBC_TO_CODE(enc, p, end) == 0x0d &&
+	  ONIGENC_MBC_TO_CODE(enc, pnext, end) == 0x0a)
+	return 1;
+      if (ONIGENC_IS_MBC_NEWLINE(enc, p, end))
+	return 1;
+      return 0;
+    }
+  }
+  else {
+    return ONIGENC_IS_MBC_NEWLINE(enc, p, end);
+  }
+}
+#else /* USE_CRNL_AS_LINE_TERMINATOR */
+#define ONIGENC_IS_MBC_NEWLINE_EX(enc,p,start,end,option,check_prev) \
+  ONIGENC_IS_MBC_NEWLINE((enc), (p), (end))
+#endif /* USE_CRNL_AS_LINE_TERMINATOR */
 
 #ifdef USE_CAPTURE_HISTORY
 static void history_tree_free(OnigCaptureTreeNode* node);
@@ -1319,8 +1355,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 #endif /* USE_SUBEXP_CALL */
 
 #ifdef ONIG_DEBUG_MATCH
-  fprintf(stderr, "match_at: str: %"PRIdPTR", end: %"PRIdPTR", start: %"PRIdPTR", sprev: %"PRIdPTR"\n",
-	  (intptr_t)str, (intptr_t)end, (intptr_t)sstart, (intptr_t)sprev);
+  fprintf(stderr, "match_at: str: %"PRIdPTR" (%p), end: %"PRIdPTR" (%p), start: %"PRIdPTR" (%p), sprev: %"PRIdPTR" (%p)\n",
+	  (intptr_t)str, str, (intptr_t)end, end, (intptr_t)sstart, sstart, (intptr_t)sprev, sprev);
   fprintf(stderr, "size: %d, start offset: %d\n",
 	  (int )(end - str), (int )(sstart - str));
 #endif
@@ -1826,7 +1862,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       DATA_ENSURE(1);
       n = enclen(encode, s, end);
       DATA_ENSURE(n);
-      if (ONIGENC_IS_MBC_NEWLINE(encode, s, end)) goto fail;
+      if (ONIGENC_IS_MBC_NEWLINE_EX(encode, s, str, end, option, 0)) goto fail;
       s += n;
       MOP_OUT;
       break;
@@ -1844,7 +1880,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	STACK_PUSH_ALT(p, s, sprev, pkeep);
 	n = enclen(encode, s, end);
         DATA_ENSURE(n);
-        if (ONIGENC_IS_MBC_NEWLINE(encode, s, end))  goto fail;
+        if (ONIGENC_IS_MBC_NEWLINE_EX(encode, s, str, end, option, 0))  goto fail;
         sprev = s;
         s += n;
       }
@@ -1875,7 +1911,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	}
 	n = enclen(encode, s, end);
         DATA_ENSURE(n);
-        if (ONIGENC_IS_MBC_NEWLINE(encode, s, end))  goto fail;
+        if (ONIGENC_IS_MBC_NEWLINE_EX(encode, s, str, end, option, 0))  goto fail;
         sprev = s;
         s += n;
       }
@@ -1913,7 +1949,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	STACK_PUSH_ALT_WITH_STATE_CHECK(p, s, sprev, mem, pkeep);
 	n = enclen(encode, s, end);
         DATA_ENSURE(n);
-        if (ONIGENC_IS_MBC_NEWLINE(encode, s, end))  goto fail;
+        if (ONIGENC_IS_MBC_NEWLINE_EX(encode, s, str, end, option, 0))  goto fail;
         sprev = s;
         s += n;
       }
@@ -2117,7 +2153,12 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	MOP_OUT;
 	continue;
       }
-      else if (ONIGENC_IS_MBC_NEWLINE(encode, sprev, end) && !ON_STR_END(s)) {
+      else if (ONIGENC_IS_MBC_NEWLINE(encode, sprev, end)
+#ifdef USE_CRNL_AS_LINE_TERMINATOR
+		&& !(IS_NEWLINE_CRLF(option)
+		     && ONIGENC_IS_MBC_CRNL(encode, sprev, end))
+#endif
+		&& !ON_STR_END(s)) {
 	MOP_OUT;
 	continue;
       }
@@ -2127,7 +2168,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     case OP_END_LINE:  MOP_IN(OP_END_LINE);
       if (ON_STR_END(s)) {
 #ifndef USE_NEWLINE_AT_END_OF_STRING_HAS_EMPTY_LINE
-	if (IS_EMPTY_STR || !ONIGENC_IS_MBC_NEWLINE(encode, sprev, end)) {
+	if (IS_EMPTY_STR || !ONIGENC_IS_MBC_NEWLINE_EX(encode, sprev, str, end, option, 1)) {
 #endif
 	  if (IS_NOTEOL(msa->options)) goto fail;
 	  MOP_OUT;
@@ -2136,23 +2177,17 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	}
 #endif
       }
-      else if (ONIGENC_IS_MBC_NEWLINE(encode, s, end)) {
+      else if (ONIGENC_IS_MBC_NEWLINE_EX(encode, s, str, end, option, 1)) {
 	MOP_OUT;
 	continue;
       }
-#ifdef USE_CRNL_AS_LINE_TERMINATOR
-      else if (ONIGENC_IS_MBC_CRNL(encode, s, end)) {
-	MOP_OUT;
-	continue;
-      }
-#endif
       goto fail;
       break;
 
     case OP_SEMI_END_BUF:  MOP_IN(OP_SEMI_END_BUF);
       if (ON_STR_END(s)) {
 #ifndef USE_NEWLINE_AT_END_OF_STRING_HAS_EMPTY_LINE
-	if (IS_EMPTY_STR || !ONIGENC_IS_MBC_NEWLINE(encode, sprev, end)) {
+	if (IS_EMPTY_STR || !ONIGENC_IS_MBC_NEWLINE_EX(encode, sprev, str, end, option, 1)) {
 #endif
 	  if (IS_NOTEOL(msa->options)) goto fail;
 	  MOP_OUT;
@@ -2161,21 +2196,22 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	}
 #endif
       }
-      else if (ONIGENC_IS_MBC_NEWLINE(encode, s, end) &&
-	       ON_STR_END(s + enclen(encode, s, end))) {
-	MOP_OUT;
-	continue;
-      }
+      else if (ONIGENC_IS_MBC_NEWLINE_EX(encode, s, str, end, option, 1)) {
+	UChar* ss = s + enclen(encode, s, end);
+	if (ON_STR_END(ss)) {
+	  MOP_OUT;
+	  continue;
+	}
 #ifdef USE_CRNL_AS_LINE_TERMINATOR
-      else if (ONIGENC_IS_MBC_CRNL(encode, s, end)) {
-        UChar* ss = s + enclen(encode, s);
-	ss += enclen(encode, ss);
-        if (ON_STR_END(ss)) {
-          MOP_OUT;
-          continue;
-        }
-      }
+	else if (ss < end) {
+	  ss += enclen(encode, ss, end);
+	  if (ON_STR_END(ss)) {
+	    MOP_OUT;
+	    continue;
+	  }
+	}
 #endif
+      }
       goto fail;
       break;
 
@@ -2468,8 +2504,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	STACK_NULL_CHECK(isnull, mem, s);
 	if (isnull) {
 #ifdef ONIG_DEBUG_MATCH
-	  fprintf(stderr, "NULL_CHECK_END: skip  id:%d, s:%"PRIdPTR"\n",
-		  (int )mem, (intptr_t )s);
+	  fprintf(stderr, "NULL_CHECK_END: skip  id:%d, s:%"PRIdPTR" (%p)\n",
+		  (int )mem, (intptr_t )s, s);
 #endif
 	null_check_found:
 	  /* empty loop founded, skip next instruction */
@@ -2503,8 +2539,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	STACK_NULL_CHECK_MEMST(isnull, mem, s, reg);
 	if (isnull) {
 #ifdef ONIG_DEBUG_MATCH
-	  fprintf(stderr, "NULL_CHECK_END_MEMST: skip  id:%d, s:%"PRIdPTR"\n",
-		  (int )mem, (intptr_t )s);
+	  fprintf(stderr, "NULL_CHECK_END_MEMST: skip  id:%d, s:%"PRIdPTR" (%p)\n",
+		  (int )mem, (intptr_t )s, s);
 #endif
 	  if (isnull == -1) goto fail;
 	  goto 	null_check_found;
@@ -2529,8 +2565,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 #endif
 	if (isnull) {
 #ifdef ONIG_DEBUG_MATCH
-	  fprintf(stderr, "NULL_CHECK_END_MEMST_PUSH: skip  id:%d, s:%"PRIdPTR"\n",
-		  (int )mem, (intptr_t )s);
+	  fprintf(stderr, "NULL_CHECK_END_MEMST_PUSH: skip  id:%d, s:%"PRIdPTR" (%p)\n",
+		  (int )mem, (intptr_t )s, s);
 #endif
 	  if (isnull == -1) goto fail;
 	  goto 	null_check_found;
@@ -3034,8 +3070,8 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
   ptrdiff_t skip, tlen1;
 
 #ifdef ONIG_DEBUG_SEARCH
-  fprintf(stderr, "bm_search_notrev: text: %"PRIuPTR", text_end: %"PRIuPTR", text_range: %"PRIuPTR"\n",
-	  text, text_end, text_range);
+  fprintf(stderr, "bm_search_notrev: text: %"PRIuPTR" (%p), text_end: %"PRIuPTR" (%p), text_range: %"PRIuPTR" (%p)\n",
+	  text, text, text_end, text_end, text_range, text_range);
 #endif
 
   tail = target_end - 1;
@@ -3278,8 +3314,8 @@ forward_search_range(regex_t* reg, const UChar* str, const UChar* end, UChar* s,
   UChar *p, *pprev = (UChar* )NULL;
 
 #ifdef ONIG_DEBUG_SEARCH
-  fprintf(stderr, "forward_search_range: str: %"PRIuPTR", end: %"PRIuPTR", s: %"PRIuPTR", range: %"PRIuPTR"\n",
-	  str, end, s, range);
+  fprintf(stderr, "forward_search_range: str: %"PRIuPTR" (%p), end: %"PRIuPTR" (%p), s: %"PRIuPTR" (%p), range: %"PRIuPTR" (%p)\n",
+	  str, str, end, end, s, s, range, range);
 #endif
 
   p = s;
@@ -3332,7 +3368,7 @@ forward_search_range(regex_t* reg, const UChar* str, const UChar* end, UChar* s,
 	if (!ON_STR_BEGIN(p)) {
 	  prev = onigenc_get_prev_char_head(reg->enc,
 					    (pprev ? pprev : str), p, end);
-	  if (!ONIGENC_IS_MBC_NEWLINE(reg->enc, prev, end))
+	  if (!ONIGENC_IS_MBC_NEWLINE_EX(reg->enc, prev, str, end, reg->options, 0))
 	    goto retry_gate;
 	}
 	break;
@@ -3342,15 +3378,11 @@ forward_search_range(regex_t* reg, const UChar* str, const UChar* end, UChar* s,
 #ifndef USE_NEWLINE_AT_END_OF_STRING_HAS_EMPTY_LINE
 	  prev = (UChar* )onigenc_get_prev_char_head(reg->enc,
 					    (pprev ? pprev : str), p);
-	  if (prev && ONIGENC_IS_MBC_NEWLINE(reg->enc, prev, end))
+	  if (prev && ONIGENC_IS_MBC_NEWLINE_EX(reg->enc, prev, str, end, reg->options, 1))
 	    goto retry_gate;
 #endif
 	}
-	else if (! ONIGENC_IS_MBC_NEWLINE(reg->enc, p, end)
-#ifdef USE_CRNL_AS_LINE_TERMINATOR
-              && ! ONIGENC_IS_MBC_CRNL(reg->enc, p, end)
-#endif
-                )
+	else if (! ONIGENC_IS_MBC_NEWLINE_EX(reg->enc, p, str, end, reg->options, 1))
 	  goto retry_gate;
 	break;
       }
@@ -3454,7 +3486,7 @@ backward_search_range(regex_t* reg, const UChar* str, const UChar* end,
       case ANCHOR_BEGIN_LINE:
 	if (!ON_STR_BEGIN(p)) {
 	  prev = onigenc_get_prev_char_head(reg->enc, str, p, end);
-	  if (!ONIGENC_IS_MBC_NEWLINE(reg->enc, prev, end)) {
+	  if (!ONIGENC_IS_MBC_NEWLINE_EX(reg->enc, prev, str, end, reg->options, 0)) {
 	    p = prev;
 	    goto retry;
 	  }
@@ -3466,17 +3498,13 @@ backward_search_range(regex_t* reg, const UChar* str, const UChar* end,
 #ifndef USE_NEWLINE_AT_END_OF_STRING_HAS_EMPTY_LINE
 	  prev = onigenc_get_prev_char_head(reg->enc, adjrange, p);
 	  if (IS_NULL(prev)) goto fail;
-	  if (ONIGENC_IS_MBC_NEWLINE(reg->enc, prev, end)) {
+	  if (ONIGENC_IS_MBC_NEWLINE_EX(reg->enc, prev, str, end, reg->options, 1)) {
 	    p = prev;
 	    goto retry;
 	  }
 #endif
 	}
-	else if (! ONIGENC_IS_MBC_NEWLINE(reg->enc, p, end)
-#ifdef USE_CRNL_AS_LINE_TERMINATOR
-              && ! ONIGENC_IS_MBC_CRNL(reg->enc, p, end)
-#endif
-                ) {
+	else if (! ONIGENC_IS_MBC_NEWLINE_EX(reg->enc, p, str, end, reg->options, 1)) {
 	  p = onigenc_get_prev_char_head(reg->enc, adjrange, p, end);
 	  if (IS_NULL(p)) goto fail;
 	  goto retry;
@@ -3554,8 +3582,8 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 
 #ifdef ONIG_DEBUG_SEARCH
   fprintf(stderr,
-     "onig_search (entry point): str: %"PRIuPTR", end: %"PRIuPTR", start: %"PRIuPTR", range: %"PRIuPTR"\n",
-     str, end - str, start - str, range - str);
+     "onig_search (entry point): str: %"PRIuPTR" (%p), end: %"PRIuPTR", start: %"PRIuPTR", range: %"PRIuPTR"\n",
+     str, str, end - str, start - str, range - str);
 #endif
 
   if (region
@@ -3687,6 +3715,7 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 #ifdef USE_CRNL_AS_LINE_TERMINATOR
 	pre_end = ONIGENC_STEP_BACK(reg->enc, str, pre_end, end, 1);
 	if (IS_NOT_NULL(pre_end) &&
+	    IS_NEWLINE_CRLF(reg->options) &&
 	    ONIGENC_IS_MBC_CRNL(reg->enc, pre_end, end)) {
 	  min_semi_end = pre_end;
 	}
@@ -3792,7 +3821,8 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
             s += enclen(reg->enc, s, end);
 
             if ((reg->anchor & ANCHOR_LOOK_BEHIND) == 0) {
-              while (!ONIGENC_IS_MBC_NEWLINE(reg->enc, prev, end) && s < range) {
+              while (!ONIGENC_IS_MBC_NEWLINE_EX(reg->enc, prev, str, end, reg->options, 0)
+                     && s < range) {
                 prev = s;
                 s += enclen(reg->enc, s, end);
               }

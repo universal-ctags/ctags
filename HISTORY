@@ -1,5 +1,12 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/09/18: Version 5.11.3
+
+2011/09/18: [new]  add ONIG_OPTION_NEWLINE_CRLF.
+2011/09/18: [tune] optimize \x{}.
+2011/09/17: [tune] expand a{n,m} to 'a...a' + a{0,m-n}.
+2011/09/12: [bug]  /.*\Z/ doesn't match properly.
+
 2011/09/10: Version 5.11.2
 
 2011/09/09: [bug]  merge Ruby r24546.

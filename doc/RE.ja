@@ -1,4 +1,4 @@
-鬼雲 (鬼車改) 正規表現 Version 5.10.6    2011/08/09
+鬼雲 (鬼車改) 正規表現 Version 5.11.3    2011/09/18
 
 使用文法: ONIG_SYNTAX_RUBY (既定値)
 
@@ -111,10 +111,12 @@
 
 
   \R       改行文字 (Linebreak)
-           (?>\x0D\x0A|[\x0A-\x0D])
 
-           USE_UNICODE_ALL_LINE_TERMINATORS が regenc.h で定義されている場合:
+           Unicodeの場合:
              (?>\x0D\x0A|[\x0A-\x0D\x{85}\x{2028}\x{2029}])
+
+           Unicode以外の場合:
+             (?>\x0D\x0A|[\x0A-\x0D])
 
   \X       eXtended grapheme cluster
 

@@ -238,3 +238,4 @@ samples: all
 	$(CC) $(CFLAGS) -I. -o sql     sample\sql.c     $(dlllib)
 	$(CC) $(CFLAGS) -I. -o encode  sample\encode.c  $(dlllib)
 	$(CC) $(CFLAGS) -I. -o syntax  sample\syntax.c  $(dlllib)
+	$(CC) $(CFLAGS) -I. -o crnl    sample\crnl.c    $(dlllib)

@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Regular Expressions Version 5.10.6    2011/08/09
+Onigmo (Oniguruma-mod) Regular Expressions Version 5.11.3    2011/09/18
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -111,10 +111,12 @@ syntax: ONIG_SYNTAX_RUBY (default)
 
 
   \R       Linebreak
-           (?>\x0D\x0A|[\x0A-\x0D])
 
-           If USE_UNICODE_ALL_LINE_TERMINATORS is defined in regenc.h:
+           Unicode:
              (?>\x0D\x0A|[\x0A-\x0D\x{85}\x{2028}\x{2029}])
+
+           Not Unicode:
+             (?>\x0D\x0A|[\x0A-\x0D])
 
   \X       eXtended grapheme cluster
 
