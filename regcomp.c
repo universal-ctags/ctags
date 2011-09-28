@@ -4106,7 +4106,7 @@ restart:
   return r;
 }
 
-/* set skip map for Boyer-Moor search */
+/* set skip map for Boyer-Moore search */
 static int
 set_bm_skip(UChar* s, UChar* end, OnigEncoding enc ARG_UNUSED,
 	    UChar skip[], int** int_skip)
