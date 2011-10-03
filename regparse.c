@@ -4921,7 +4921,7 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 
 #if 0
     case '|':   /* branch reset: (?|...) */
-      if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_QMARK_BAR_BRANCH_RESET)) {
+      if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_QMARK_VBAR_BRANCH_RESET)) {
 	/* TODO */
       }
       else
