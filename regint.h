@@ -285,6 +285,8 @@ typedef unsigned int uintptr_t;
 #define ONIG_OPTIMIZE_EXACT_BM_NOT_REV  3   /* BM   (but not simple match) */
 #define ONIG_OPTIMIZE_EXACT_IC          4   /* Slow Search (ignore case) */
 #define ONIG_OPTIMIZE_MAP               5   /* char map */
+#define ONIG_OPTIMIZE_EXACT_BM_IC         6 /* BM (ignore case) */
+#define ONIG_OPTIMIZE_EXACT_BM_NOT_REV_IC 7 /* BM (but not simple match) (ignore case) */
 
 /* bit status */
 typedef unsigned int  BitStatusType;

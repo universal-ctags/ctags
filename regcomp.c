@@ -3850,7 +3850,14 @@ restart:
 
   case NT_STR:
     if (IS_IGNORECASE(reg->options) && !NSTRING_IS_RAW(node)) {
+#if 0
       r = expand_case_fold_string(node, reg);
+#else
+      r = update_string_node_case_fold(reg, node);
+      if (r == 0) {
+	NSTRING_SET_AMBIG(node);
+      }
+#endif
     }
     break;
 
@@ -4129,6 +4136,73 @@ set_bm_skip(UChar* s, UChar* end, OnigEncoding enc ARG_UNUSED,
 
     for (i = 0; i < len - 1; i++)
       (*int_skip)[s[i]] = (int )(len - 1 - i);
+  }
+  return 0;
+}
+
+/* set skip map for Boyer-Moore search (ignore case) */
+static int
+set_bm_skip_ic(UChar* s, UChar* end, regex_t* reg,
+	    UChar skip[], int** int_skip)
+{
+  OnigDistance i, len;
+  int clen, flen, n, j, k;
+  UChar *p, buf[ONIGENC_GET_CASE_FOLD_CODES_MAX_NUM][ONIGENC_MBC_CASE_FOLD_MAXLEN];
+  OnigCaseFoldCodeItem items[ONIGENC_GET_CASE_FOLD_CODES_MAX_NUM];
+  OnigEncoding enc = reg->enc;
+
+  len = end - s;
+  if (len < ONIG_CHAR_TABLE_SIZE) {
+    for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++) skip[i] = (UChar )len;
+
+    for (i = 0; i < len - 1; i += clen) {
+      p = s + i;
+      n = ONIGENC_GET_CASE_FOLD_CODES_BY_STR(enc, reg->case_fold_flag,
+					     p, end, items);
+      clen = enclen(enc, p);
+
+      for (j = 0; j < n; j++) {
+	if (items[j].code_len != 1)
+	  return 1;  /* different length isn't supported. */
+	flen = ONIGENC_CODE_TO_MBC(enc, items[j].code[0], buf[j]);
+	if (flen != clen)
+	  return 1;  /* different length isn't supported. */
+      }
+      for (j = 0; j < clen; j++) {
+	skip[s[i + j]] = (UChar )(len - 1 - i - j);
+	for (k = 0; k < n; k++) {
+	  skip[buf[k][j]] = (UChar )(len - 1 - i - j);
+	}
+      }
+    }
+  }
+  else {
+    if (IS_NULL(*int_skip)) {
+      *int_skip = (int* )xmalloc(sizeof(int) * ONIG_CHAR_TABLE_SIZE);
+      if (IS_NULL(*int_skip)) return ONIGERR_MEMORY;
+    }
+    for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++) (*int_skip)[i] = (int )len;
+
+    for (i = 0; i < len - 1; i += clen) {
+      p = s + i;
+      n = ONIGENC_GET_CASE_FOLD_CODES_BY_STR(enc, reg->case_fold_flag,
+					     p, end, items);
+      clen = enclen(enc, p);
+
+      for (j = 0; j < n; j++) {
+	if (items[j].code_len != 1)
+	  return 1;  /* different length isn't supported. */
+	flen = ONIGENC_CODE_TO_MBC(enc, items[j].code[0], buf[j]);
+	if (flen != clen)
+	  return 1;  /* different length isn't supported. */
+      }
+      for (j = 0; j < clen; j++) {
+	(*int_skip)[s[i + j]] = (int )(len - 1 - i - j);
+	for (k = 0; k < n; k++) {
+	  (*int_skip)[buf[k][j]] = (int )(len - 1 - i - j);
+	}
+      }
+    }
   }
   return 0;
 }
@@ -5095,26 +5169,34 @@ static int
 set_optimize_exact_info(regex_t* reg, OptExactInfo* e)
 {
   int r;
+  int allow_reverse;
 
   if (e->len == 0) return 0;
 
-  if (e->ignore_case) {
-    reg->exact = (UChar* )xmalloc(e->len);
-    CHECK_NULL_RETURN_MEMERR(reg->exact);
-    xmemcpy(reg->exact, e->s, e->len);
-    reg->exact_end = reg->exact + e->len;
-    reg->optimize = ONIG_OPTIMIZE_EXACT_IC;
-  }
-  else {
-    int allow_reverse;
+  reg->exact = str_dup(e->s, e->s + e->len);
+  CHECK_NULL_RETURN_MEMERR(reg->exact);
+  reg->exact_end = reg->exact + e->len;
 
-    reg->exact = str_dup(e->s, e->s + e->len);
-    CHECK_NULL_RETURN_MEMERR(reg->exact);
-    reg->exact_end = reg->exact + e->len;
-
-    allow_reverse =
+  allow_reverse =
 	ONIGENC_IS_ALLOWED_REVERSE_MATCH(reg->enc, reg->exact, reg->exact_end);
 
+  if (e->ignore_case) {
+    if (e->len >= 3 || (e->len >= 2 && allow_reverse)) {
+      r = set_bm_skip_ic(reg->exact, reg->exact_end, reg,
+			 reg->map, &(reg->int_map));
+      if (r == 0) {
+	reg->optimize = (allow_reverse != 0
+			 ? ONIG_OPTIMIZE_EXACT_BM_IC : ONIG_OPTIMIZE_EXACT_BM_NOT_REV_IC);
+      }
+      else {
+	reg->optimize = ONIG_OPTIMIZE_EXACT_IC;
+      }
+    }
+    else {
+      reg->optimize = ONIG_OPTIMIZE_EXACT_IC;
+    }
+  }
+  else {
     if (e->len >= 3 || (e->len >= 2 && allow_reverse)) {
       r = set_bm_skip(reg->exact, reg->exact_end, reg->enc,
 	              reg->map, &(reg->int_map));
@@ -5341,7 +5423,8 @@ static void
 print_optimize_info(FILE* f, regex_t* reg)
 {
   static const char* on[] = { "NONE", "EXACT", "EXACT_BM", "EXACT_BM_NOT_REV",
-                              "EXACT_IC", "MAP" };
+                              "EXACT_IC", "MAP",
+                              "EXACT_BM_IC", "EXACT_BM_NOT_REV_IC" };
 
   fprintf(f, "optimize: %s\n", on[reg->optimize]);
   fprintf(f, "  anchor: "); print_anchor(f, reg->anchor);
