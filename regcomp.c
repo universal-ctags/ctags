@@ -4116,35 +4116,8 @@ restart:
 #ifndef USE_SUNDAY_QUICK_SEARCH
 /* set skip map for Boyer-Moore search */
 static int
-set_bm_skip(UChar* s, UChar* end, OnigEncoding enc ARG_UNUSED,
-	    UChar skip[], int** int_skip)
-{
-  OnigDistance i, len;
-
-  len = end - s;
-  if (len < ONIG_CHAR_TABLE_SIZE) {
-    for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++) skip[i] = (UChar )len;
-
-    for (i = 0; i < len - 1; i++)
-      skip[s[i]] = (UChar )(len - 1 - i);
-  }
-  else {
-    if (IS_NULL(*int_skip)) {
-      *int_skip = (int* )xmalloc(sizeof(int) * ONIG_CHAR_TABLE_SIZE);
-      if (IS_NULL(*int_skip)) return ONIGERR_MEMORY;
-    }
-    for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++) (*int_skip)[i] = (int )len;
-
-    for (i = 0; i < len - 1; i++)
-      (*int_skip)[s[i]] = (int )(len - 1 - i);
-  }
-  return 0;
-}
-
-/* set skip map for Boyer-Moore search (ignore case) */
-static int
-set_bm_skip_ic(UChar* s, UChar* end, regex_t* reg,
-	    UChar skip[], int** int_skip)
+set_bm_skip(UChar* s, UChar* end, regex_t* reg,
+	    UChar skip[], int** int_skip, int ignore_case)
 {
   OnigDistance i, len;
   int clen, flen, n, j, k;
@@ -4156,10 +4129,12 @@ set_bm_skip_ic(UChar* s, UChar* end, regex_t* reg,
   if (len < ONIG_CHAR_TABLE_SIZE) {
     for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++) skip[i] = (UChar )len;
 
+    n = 0;
     for (i = 0; i < len - 1; i += clen) {
       p = s + i;
-      n = ONIGENC_GET_CASE_FOLD_CODES_BY_STR(enc, reg->case_fold_flag,
-					     p, end, items);
+      if (ignore_case)
+	n = ONIGENC_GET_CASE_FOLD_CODES_BY_STR(enc, reg->case_fold_flag,
+					       p, end, items);
       clen = enclen(enc, p);
 
       for (j = 0; j < n; j++) {
@@ -4184,10 +4159,12 @@ set_bm_skip_ic(UChar* s, UChar* end, regex_t* reg,
     }
     for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++) (*int_skip)[i] = (int )len;
 
+    n = 0;
     for (i = 0; i < len - 1; i += clen) {
       p = s + i;
-      n = ONIGENC_GET_CASE_FOLD_CODES_BY_STR(enc, reg->case_fold_flag,
-					     p, end, items);
+      if (ignore_case)
+	n = ONIGENC_GET_CASE_FOLD_CODES_BY_STR(enc, reg->case_fold_flag,
+					       p, end, items);
       clen = enclen(enc, p);
 
       for (j = 0; j < n; j++) {
@@ -4212,35 +4189,8 @@ set_bm_skip_ic(UChar* s, UChar* end, regex_t* reg,
 
 /* set skip map for Sunday's quick search */
 static int
-set_bm_skip(UChar* s, UChar* end, OnigEncoding enc ARG_UNUSED,
-	    UChar skip[], int** int_skip)
-{
-  OnigDistance i, len;
-
-  len = end - s;
-  if (len < ONIG_CHAR_TABLE_SIZE) {
-    for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++) skip[i] = (UChar )(len + 1);
-
-    for (i = 0; i < len; i++)
-      skip[s[i]] = (UChar )(len - i);
-  }
-  else {
-    if (IS_NULL(*int_skip)) {
-      *int_skip = (int* )xmalloc(sizeof(int) * ONIG_CHAR_TABLE_SIZE);
-      if (IS_NULL(*int_skip)) return ONIGERR_MEMORY;
-    }
-    for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++) (*int_skip)[i] = (int )(len + 1);
-
-    for (i = 0; i < len; i++)
-      (*int_skip)[s[i]] = (int )(len - i);
-  }
-  return 0;
-}
-
-/* set skip map for Sunday's quick search (ignore case) */
-static int
-set_bm_skip_ic(UChar* s, UChar* end, regex_t* reg,
-	    UChar skip[], int** int_skip)
+set_bm_skip(UChar* s, UChar* end, regex_t* reg,
+	    UChar skip[], int** int_skip, int ignore_case)
 {
   OnigDistance i, len;
   int clen, flen, n, j, k;
@@ -4252,10 +4202,12 @@ set_bm_skip_ic(UChar* s, UChar* end, regex_t* reg,
   if (len < ONIG_CHAR_TABLE_SIZE) {
     for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++) skip[i] = (UChar )(len + 1);
 
+    n = 0;
     for (i = 0; i < len; i += clen) {
       p = s + i;
-      n = ONIGENC_GET_CASE_FOLD_CODES_BY_STR(enc, reg->case_fold_flag,
-					     p, end, items);
+      if (ignore_case)
+	n = ONIGENC_GET_CASE_FOLD_CODES_BY_STR(enc, reg->case_fold_flag,
+					       p, end, items);
       clen = enclen(enc, p);
 
       for (j = 0; j < n; j++) {
@@ -4280,10 +4232,12 @@ set_bm_skip_ic(UChar* s, UChar* end, regex_t* reg,
     }
     for (i = 0; i < ONIG_CHAR_TABLE_SIZE; i++) (*int_skip)[i] = (int )(len + 1);
 
+    n = 0;
     for (i = 0; i < len; i += clen) {
       p = s + i;
-      n = ONIGENC_GET_CASE_FOLD_CODES_BY_STR(enc, reg->case_fold_flag,
-					     p, end, items);
+      if (ignore_case)
+	n = ONIGENC_GET_CASE_FOLD_CODES_BY_STR(enc, reg->case_fold_flag,
+					       p, end, items);
       clen = enclen(enc, p);
 
       for (j = 0; j < n; j++) {
@@ -5280,8 +5234,8 @@ set_optimize_exact_info(regex_t* reg, OptExactInfo* e)
 
   if (e->ignore_case) {
     if (e->len >= 3 || (e->len >= 2 && allow_reverse)) {
-      r = set_bm_skip_ic(reg->exact, reg->exact_end, reg,
-			 reg->map, &(reg->int_map));
+      r = set_bm_skip(reg->exact, reg->exact_end, reg,
+		      reg->map, &(reg->int_map), 1);
       if (r == 0) {
 	reg->optimize = (allow_reverse != 0
 			 ? ONIG_OPTIMIZE_EXACT_BM_IC : ONIG_OPTIMIZE_EXACT_BM_NOT_REV_IC);
@@ -5296,8 +5250,8 @@ set_optimize_exact_info(regex_t* reg, OptExactInfo* e)
   }
   else {
     if (e->len >= 3 || (e->len >= 2 && allow_reverse)) {
-      r = set_bm_skip(reg->exact, reg->exact_end, reg->enc,
-	              reg->map, &(reg->int_map));
+      r = set_bm_skip(reg->exact, reg->exact_end, reg,
+	              reg->map, &(reg->int_map), 0);
       if (r) return r;
 
       reg->optimize = (allow_reverse != 0
