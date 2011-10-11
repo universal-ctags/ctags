@@ -94,7 +94,7 @@ mbc_to_code(const UChar* p, const UChar* end ARG_UNUSED)
   int c, len;
   OnigCodePoint n;
 
-  len = enclen(ONIG_ENCODING_UTF8, p);
+  len = mbc_enc_len(p);
   c = *p++;
   if (len > 1) {
     len--;
@@ -228,7 +228,7 @@ is_mbc_ambiguous(OnigCaseFoldType flag, const UChar** pp, const UChar* end)
     return ONIGENC_IS_ASCII_CODE_CASE_AMBIG(*p);
   }
   else {
-    (*pp) += enclen(ONIG_ENCODING_UTF8, p);
+    (*pp) += mbc_enc_len(p);
 
     if (*p == 0xc3) {
       int c = *(p + 1);

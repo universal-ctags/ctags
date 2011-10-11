@@ -154,7 +154,7 @@ mbc_to_code(const UChar* p, const UChar* end)
   int c, i, len;
   OnigCodePoint n;
 
-  len = enclen(ONIG_ENCODING_EUC_JP, p);
+  len = mbc_enc_len(p);
   n = (OnigCodePoint )*p++;
   if (len == 1) return n;
 
@@ -205,7 +205,7 @@ code_to_mbc(OnigCodePoint code, UChar *buf)
   *p++ = (UChar )(code & 0xff);
 
 #if 1
-  if (enclen(ONIG_ENCODING_EUC_JP, buf) != (p - buf))
+  if (mbc_enc_len(buf) != (p - buf))
     return ONIGERR_INVALID_CODE_POINT_VALUE;
 #endif
   return (int )(p - buf);
@@ -323,7 +323,7 @@ left_adjust_char_head(const UChar* start, const UChar* s)
   p = s;
 
   while (!eucjp_islead(*p) && p > start) p--;
-  len = enclen(ONIG_ENCODING_EUC_JP, p);
+  len = mbc_enc_len(p);
   if (p + len > s) return (UChar* )p;
   p += len;
   return (UChar* )(p + ((s - p) & ~1));
