@@ -3264,6 +3264,8 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
   const UChar *s, *se, *t, *p, *end;
   const UChar *tail;
   ptrdiff_t skip, tlen1;
+  OnigEncoding enc = reg->enc;
+  int (*mbc_enc_len)(const OnigUChar* p) = enc->mbc_enc_len;
 
 #ifdef ONIG_DEBUG_SEARCH
   fprintf(stderr, "bm_search_notrev: text: %d (%p), text_end: %d (%p), text_range: %d (%p)\n",
@@ -3290,7 +3292,7 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
       skip = reg->map[se[1]];
       t = s;
       do {
-        s += enclen(reg->enc, s);
+        s += mbc_enc_len(s);
       } while ((s - t) < skip && s < end);
     }
   }
@@ -3306,7 +3308,7 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
       skip = reg->int_map[se[1]];
       t = s;
       do {
-        s += enclen(reg->enc, s);
+        s += mbc_enc_len(s);
       } while ((s - t) < skip && s < end);
     }
   }
@@ -3367,6 +3369,7 @@ bm_search_notrev_ic(regex_t* reg, const UChar* target, const UChar* target_end,
   const UChar *tail;
   ptrdiff_t skip, tlen1;
   OnigEncoding enc = reg->enc;
+  int (*mbc_enc_len)(const OnigUChar* p) = enc->mbc_enc_len;
   int case_fold_flag = reg->case_fold_flag;
 
 #ifdef ONIG_DEBUG_SEARCH
@@ -3392,7 +3395,7 @@ bm_search_notrev_ic(regex_t* reg, const UChar* target, const UChar* target_end,
       skip = reg->map[se[1]];
       t = s;
       do {
-        s += enclen(reg->enc, s);
+        s += mbc_enc_len(s);
       } while ((s - t) < skip && s < end);
     }
   }
@@ -3406,7 +3409,7 @@ bm_search_notrev_ic(regex_t* reg, const UChar* target, const UChar* target_end,
       skip = reg->int_map[se[1]];
       t = s;
       do {
-        s += enclen(reg->enc, s);
+        s += mbc_enc_len(s);
       } while ((s - t) < skip && s < end);
     }
   }
