@@ -1,4 +1,4 @@
-Onigmo インターフェース Version 5.11.3   2011/09/18
+Onigmo インターフェース Version 5.11.4   2011/10/08
 
 #include <oniguruma.h>
 
@@ -65,7 +65,8 @@ Onigmo インターフェース Version 5.11.3   2011/09/18
 
       ONIG_OPTION_NONE               オプションなし
       ONIG_OPTION_SINGLELINE         '^' -> '\A', '$' -> '\Z'
-      ONIG_OPTION_MULTILINE          '.'が改行にマッチする
+      ONIG_OPTION_DOTALL             '.'が改行にマッチする
+      ONIG_OPTION_MULTILINE          ONIG_OPTION_DOTALLと同じ
       ONIG_OPTION_IGNORECASE         曖昧マッチ オン
       ONIG_OPTION_EXTEND             パターン拡張形式
       ONIG_OPTION_FIND_LONGEST       最長マッチ

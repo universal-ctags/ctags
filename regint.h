@@ -74,6 +74,7 @@
 #define USE_QTFR_PEEK_NEXT
 #define USE_ST_LIBRARY
 #define USE_SHARED_CCLASS_TABLE
+#define USE_SUNDAY_QUICK_SEARCH
 
 #define INIT_MATCH_STACK_SIZE                     160
 #define DEFAULT_MATCH_STACK_LIMIT_SIZE              0 /* unlimited */
@@ -319,9 +320,11 @@ typedef unsigned int uintptr_t;
 #define ONIG_OPTIMIZE_NONE              0
 #define ONIG_OPTIMIZE_EXACT             1   /* Slow Search */
 #define ONIG_OPTIMIZE_EXACT_BM          2   /* Boyer Moore Search */
-#define ONIG_OPTIMIZE_EXACT_BM_NOT_REV  3   /* BM   (but not simple match) */
+#define ONIG_OPTIMIZE_EXACT_BM_NOT_REV  3   /* BM (applied to a multibyte string) */
 #define ONIG_OPTIMIZE_EXACT_IC          4   /* Slow Search (ignore case) */
 #define ONIG_OPTIMIZE_MAP               5   /* char map */
+#define ONIG_OPTIMIZE_EXACT_BM_IC         6 /* BM (ignore case) */
+#define ONIG_OPTIMIZE_EXACT_BM_NOT_REV_IC 7 /* BM (applied to a multibyte string) (ignore case) */
 
 /* bit status */
 typedef unsigned int  BitStatusType;

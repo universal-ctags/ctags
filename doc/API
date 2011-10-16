@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) API  Version 5.11.3  2011/09/18
+Onigmo (Oniguruma-mod) API  Version 5.11.4  2011/10/08
 
 #include <oniguruma.h>
 
@@ -64,7 +64,8 @@ Onigmo (Oniguruma-mod) API  Version 5.11.3  2011/09/18
 
       ONIG_OPTION_NONE               no option
       ONIG_OPTION_SINGLELINE         '^' -> '\A', '$' -> '\Z'
-      ONIG_OPTION_MULTILINE          '.' match with newline
+      ONIG_OPTION_DOTALL             '.' match with newline
+      ONIG_OPTION_MULTILINE          same as ONIG_OPTION_DOTALL
       ONIG_OPTION_IGNORECASE         ambiguity match on
       ONIG_OPTION_EXTEND             extended pattern form
       ONIG_OPTION_FIND_LONGEST       find longest match

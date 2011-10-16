@@ -270,7 +270,7 @@ mbc_to_code(const UChar* p, const UChar* end, OnigEncoding enc)
   int c, len;
   OnigCodePoint n;
 
-  len = enclen(enc, p, end);
+  len = mbc_enc_len(p, end, enc);
   c = *p++;
   if (len > 1) {
     len--;
