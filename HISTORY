@@ -1,5 +1,18 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/10/16: Version 5.11.4
+
+2011/10/15: [tune] optimize Sunday's quick search.
+2011/10/07: [API]  add ONIG_OPTION_DOTALL option as an alias of
+                   ONIG_OPTION_MULTILINE.
+2011/10/04: [impl] add Sunday's quick search.
+                   add config USE_SUNDAY_QUICK_SEARCH.
+2011/10/04: [impl] add case-insensitive Boyer-Moore-Horspool search.
+2011/10/03: [spec] check minimum digits of hexadecimal numbers.
+                   \uHHHH should be exactly four digits.
+2011/10/03: [API]  rename ONIG_SYN_OP2_QMARK_BAR_BRANCH_RESET to
+                   ONIG_SYN_OP2_QMARK_VBAR_BRANCH_RESET.
+
 2011/09/18: Version 5.11.3
 
 2011/09/18: [spec] \R matches \x85, \x2028 and \x2029 in Unicode encodings.
