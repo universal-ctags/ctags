@@ -453,7 +453,7 @@ static void parseTexFile (tokenInfo *const token)
 					parseTag (token, TEXTAG_SECTION); 
 					break;
 				case KEYWORD_subsection:	
-					parseTag (token, TEXTAG_SUBSUBSECTION); 
+					parseTag (token, TEXTAG_SUBSECTION); 
 					break;
 				case KEYWORD_subsubsection:	
 					parseTag (token, TEXTAG_SUBSUBSECTION); 
