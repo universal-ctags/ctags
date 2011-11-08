@@ -158,5 +158,6 @@ OnigEncodingType OnigEncodingBIG5 = {
   big5_is_code_ctype,
   onigenc_not_support_get_ctype_code_range,
   big5_left_adjust_char_head,
-  big5_is_allowed_reverse_match
+  big5_is_allowed_reverse_match,
+  ONIGENC_FLAG_NONE,
 };

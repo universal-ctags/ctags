@@ -299,5 +299,6 @@ OnigEncodingType OnigEncodingUTF8 = {
   onigenc_unicode_is_code_ctype,
   get_ctype_code_range,
   left_adjust_char_head,
-  onigenc_always_true_is_allowed_reverse_match
+  onigenc_always_true_is_allowed_reverse_match,
+  ONIGENC_FLAG_UNICODE,
 };

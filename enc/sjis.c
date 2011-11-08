@@ -542,7 +542,8 @@ OnigEncodingType OnigEncodingCP932 = {
   is_code_ctype,
   get_ctype_code_range,
   left_adjust_char_head,
-  is_allowed_reverse_match
+  is_allowed_reverse_match,
+  ONIGENC_FLAG_NONE,
 };
 #else
 OnigEncodingType OnigEncodingSJIS = {
@@ -561,6 +562,7 @@ OnigEncodingType OnigEncodingSJIS = {
   is_code_ctype,
   get_ctype_code_range,
   left_adjust_char_head,
-  is_allowed_reverse_match
+  is_allowed_reverse_match,
+  ONIGENC_FLAG_NONE,
 };
 #endif

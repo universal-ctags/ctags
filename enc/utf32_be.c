@@ -176,5 +176,6 @@ OnigEncodingType OnigEncodingUTF32_BE = {
   onigenc_unicode_is_code_ctype,
   onigenc_utf16_32_get_ctype_code_range,
   utf32be_left_adjust_char_head,
-  onigenc_always_false_is_allowed_reverse_match
+  onigenc_always_false_is_allowed_reverse_match,
+  ONIGENC_FLAG_UNICODE,
 };

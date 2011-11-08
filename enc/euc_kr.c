@@ -134,7 +134,8 @@ OnigEncodingType OnigEncodingEUC_KR = {
   euckr_is_code_ctype,
   onigenc_not_support_get_ctype_code_range,
   euckr_left_adjust_char_head,
-  euckr_is_allowed_reverse_match
+  euckr_is_allowed_reverse_match,
+  ONIGENC_FLAG_NONE,
 };
 
 /* Same with OnigEncodingEUC_KR except the name */
@@ -154,5 +155,6 @@ OnigEncodingType OnigEncodingEUC_CN = {
   euckr_is_code_ctype,
   onigenc_not_support_get_ctype_code_range,
   euckr_left_adjust_char_head,
-  euckr_is_allowed_reverse_match
+  euckr_is_allowed_reverse_match,
+  ONIGENC_FLAG_NONE,
 };

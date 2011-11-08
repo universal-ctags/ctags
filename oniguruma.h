@@ -163,6 +163,7 @@ typedef struct OnigEncodingTypeST {
   int    (*get_ctype_code_range)(OnigCtype ctype, OnigCodePoint* sb_out, const OnigCodePoint* ranges[]);
   OnigUChar* (*left_adjust_char_head)(const OnigUChar* start, const OnigUChar* p);
   int    (*is_allowed_reverse_match)(const OnigUChar* p, const OnigUChar* end);
+  unsigned int  flags;
 } OnigEncodingType;
 
 typedef OnigEncodingType* OnigEncoding;
@@ -259,6 +260,10 @@ ONIG_EXTERN OnigEncodingType OnigEncodingGB18030;
 #define ONIGENC_CTYPE_ASCII    14
 #define ONIGENC_MAX_STD_CTYPE  ONIGENC_CTYPE_ASCII
 
+/* flags */
+#define ONIGENC_FLAG_NONE       0U
+#define ONIGENC_FLAG_UNICODE    1U
+
 
 #define onig_enc_len(enc,p,end)        ONIGENC_MBC_ENC_LEN(enc,p)
 
@@ -272,6 +277,7 @@ ONIG_EXTERN OnigEncodingType OnigEncodingGB18030;
 #define ONIGENC_IS_MBC_ASCII_WORD(enc,s,end) \
    onigenc_ascii_is_code_ctype( \
 	ONIGENC_MBC_TO_CODE(enc,s,end),ONIGENC_CTYPE_WORD)
+#define ONIGENC_IS_UNICODE(enc)        ((enc)->flags & ONIGENC_FLAG_UNICODE)
 
 
 #define ONIGENC_NAME(enc)                      ((enc)->name)

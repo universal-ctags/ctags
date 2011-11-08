@@ -5433,7 +5433,8 @@ node_linebreak(Node** np, ScanEnv* env)
     bitset_set_range(cc->bs, 0x0A, 0x0D);
   }
 
-  if (onig_strncmp((UChar* )env->enc->name, (UChar* )"UTF", 3) == 0) {
+  /* TODO: move this block to enc/unicode.c */
+  if (ONIGENC_IS_UNICODE(env->enc)) {
     /* UTF-8, UTF-16BE/LE, UTF-32BE/LE */
     add_code_range(&(cc->mbuf), env, 0x85, 0x85);
     add_code_range(&(cc->mbuf), env, 0x2028, 0x2029);
@@ -5474,7 +5475,7 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
   int r = 0;
 
 #ifdef USE_UNICODE_PROPERTIES
-  if (onig_strncmp((UChar* )env->enc->name, (UChar* )"UTF", 3) == 0) {
+  if (ONIGENC_IS_UNICODE(env->enc)) {
     /* UTF-8, UTF-16BE/LE, UTF-32BE/LE */
     CClassNode* cc1;
     CClassNode* cc2;

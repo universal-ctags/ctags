@@ -208,5 +208,6 @@ OnigEncodingType OnigEncodingKOI8_R = {
   koi8_r_is_code_ctype,
   onigenc_not_support_get_ctype_code_range,
   onigenc_single_byte_left_adjust_char_head,
-  onigenc_always_true_is_allowed_reverse_match
+  onigenc_always_true_is_allowed_reverse_match,
+  ONIGENC_FLAG_NONE,
 };
