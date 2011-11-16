@@ -1,5 +1,8 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/11/17: [bug]  code ranges are not merged properly.
+2011/11/17: [bug]  /[\x{0}-X]/i doesn't match properly when UTF-16/32 is used.
+
 2011/10/16: Version 5.11.4
 
 2011/10/15: [tune] optimize Sunday's quick search.
