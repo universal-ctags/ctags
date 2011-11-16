@@ -1733,9 +1733,10 @@ add_code_range_to_buf(BBuf** pbuf, OnigCodePoint from, OnigCodePoint to)
   data = (OnigCodePoint* )(bbuf->p);
   data++;
 
-  for (low = 0, bound = n; low < bound; ) {
+  bound = (from == 0) ? 0 : n;
+  for (low = 0; low < bound; ) {
     x = (low + bound) >> 1;
-    if (from > data[x*2 + 1])
+    if (from - 1 > data[x*2 + 1])
       low = x + 1;
     else
       bound = x;
@@ -1761,13 +1762,15 @@ add_code_range_to_buf(BBuf** pbuf, OnigCodePoint from, OnigCodePoint to)
       to = data[(high - 1)*2 + 1];
   }
 
-  if (inc_n != 0 && (OnigCodePoint )high < n) {
+  if (inc_n != 0) {
     int from_pos = SIZE_CODE_POINT * (1 + high * 2);
     int to_pos   = SIZE_CODE_POINT * (1 + (low + 1) * 2);
-    int size = (n - high) * 2 * SIZE_CODE_POINT;
 
     if (inc_n > 0) {
-      BBUF_MOVE_RIGHT(bbuf, from_pos, to_pos, size);
+      if ((OnigCodePoint )high < n) {
+	int size = (n - high) * 2 * SIZE_CODE_POINT;
+	BBUF_MOVE_RIGHT(bbuf, from_pos, to_pos, size);
+      }
     }
     else {
       BBUF_MOVE_LEFT_REDUCE(bbuf, from_pos, to_pos);
