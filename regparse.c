@@ -1741,9 +1741,10 @@ add_code_range_to_buf(BBuf** pbuf, OnigCodePoint from, OnigCodePoint to)
       bound = x;
   }
 
-  for (high = low, bound = n; high < bound; ) {
+  high = (to == ~((OnigCodePoint )0)) ? n : low;
+  for (bound = n; high < bound; ) {
     x = (high + bound) >> 1;
-    if (to >= data[x*2] - 1)
+    if (to + 1 >= data[x*2])
       high = x + 1;
     else
       bound = x;
