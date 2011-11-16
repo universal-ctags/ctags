@@ -898,6 +898,7 @@ def main():
     n(u"(?i)(?<!b|aa)c", u"Aac")
     x2(u"a\\b?a", u"aa", 0, 2)
     x2(u"[^x]*x", u"aaax", 0, 4)
+    x2(u"(?i)[\\x{0}-B]+", u"\x00\x01\x02\x1f\x20@AaBbC", 0, 10)
     
     # character classes (tests for character class optimization)
     x2(u"[@][a]", u"@a", 0, 2);
