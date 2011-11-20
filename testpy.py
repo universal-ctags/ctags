@@ -121,6 +121,10 @@ def n(pattern, target):
     xx(pattern, target, 0, 0, 0, True)
 
 
+def is_unicode_encoding(enc):
+    return enc in (onig.ONIG_ENCODING_UTF16_LE,
+                   onig.ONIG_ENCODING_UTF16_BE,
+                   onig.ONIG_ENCODING_UTF8)
 
 def main():
     global region
@@ -877,9 +881,7 @@ def main():
     
     
     # additional test patterns
-    if (onig_encoding == onig.ONIG_ENCODING_UTF16_LE or
-            onig_encoding == onig.ONIG_ENCODING_UTF16_BE or
-            onig_encoding == onig.ONIG_ENCODING_UTF8):
+    if is_unicode_encoding(onig_encoding):
         x2(u"\\x{3042}\\x{3044}", u"あい", 0, 2)
     elif onig_encoding == onig.ONIG_ENCODING_SJIS:
         x2(u"\\x{82a0}\\x{82A2}", u"あい", 0, 2)
@@ -907,6 +909,11 @@ def main():
     x2(u"[abA]", u"a", 0, 1);
     x2(u"[[ab]&&[ac]]+", u"aaa", 0, 3);
     x2(u"[[あい]&&[あう]]+", u"あああ", 0, 3);
+    if is_unicode_encoding(onig_encoding):
+        try:
+            x2(u"\\p{Other_Default_Ignorable_Code_Point}+", u"\u034F\uFFF8\U000E0FFF", 0, 4)
+        except UnicodeEncodeError:
+            pass
     
     # possessive quantifiers
     n(u"a?+a", u"a")
@@ -929,9 +936,7 @@ def main():
     
     # extended grapheme cluster
     x2(u"\\X{5}", u"あいab\n", 0, 5)
-    if (onig_encoding == onig.ONIG_ENCODING_UTF16_LE or
-            onig_encoding == onig.ONIG_ENCODING_UTF16_BE or
-            onig_encoding == onig.ONIG_ENCODING_UTF8):
+    if is_unicode_encoding(onig_encoding):
         try:
             x2(u"\\X", u"\u306F\u309A\n", 0, 2)
         except UnicodeEncodeError:
