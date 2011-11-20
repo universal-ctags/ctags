@@ -167,6 +167,8 @@ ONIG_EXTERN const UChar OnigEncISO_8859_1_ToUpperCaseTable[];
 
 ONIG_EXTERN int
 onigenc_with_ascii_strncmp P_((OnigEncoding enc, const UChar* p, const UChar* end, const UChar* sascii /* ascii */, int n));
+ONIG_EXTERN int
+onigenc_with_ascii_strnicmp P_((OnigEncoding enc, const UChar* p, const UChar* end, const UChar* sascii /* ascii */, int n));
 ONIG_EXTERN UChar*
 onigenc_step P_((OnigEncoding enc, const UChar* p, const UChar* end, int n));
 
