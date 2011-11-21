@@ -124,7 +124,7 @@ def define_posix_props(data)
   data['Print'] = data['Graph'] + data['Blank'] - data['Cntrl']
 end
 
-def parse_scripts(data)
+def parse_scripts(data, categories)
   files = [
     {fn: 'DerivedCoreProperties.txt', title: 'Derived Property'},
     {fn: 'Scripts.txt', title: 'Script'},
@@ -137,7 +137,7 @@ def parse_scripts(data)
     IO.foreach(get_file(file[:fn])) do |line|
       if /^# Total code points: / =~ line
         data[current] = cps
-        make_const(current, cps, file[:title])
+        categories[current] = file[:title]
         (names[file[:title]] ||= []) << current
         cps = []
       elsif /^(\h+)(?:..(\h+))?\s*;\s*(\w+)/ =~ line
@@ -149,7 +149,7 @@ def parse_scripts(data)
   #  All code points not explicitly listed for Script
   #  have the value Unknown (Zzzz).
   data['Unknown'] =  (0..0x10ffff).to_a - data.values_at(*names['Script']).flatten
-  make_const('Unknown', data['Unknown'], 'Script')
+  categories['Unknown'] = 'Script'
   names.values.flatten << 'Unknown'
 end
 
@@ -244,9 +244,16 @@ end
 puts '%{'
 puts '#define long size_t'
 props, data = parse_unicode_data(get_file('UnicodeData.txt'))
+categories = {}
+props.concat parse_scripts(data, categories)
+aliases = parse_aliases(data)
+define_posix_props(data)
+POSIX_NAMES.each do |name|
+  make_const(name, data[name], "[[:#{name}:]]")
+end
 print "\n#ifdef USE_UNICODE_PROPERTIES"
 props.each do |name|
-  category =
+  category = categories[name] ||
     case name.size
     when 1 then 'Major Category'
     when 2 then 'General Category'
@@ -254,14 +261,8 @@ props.each do |name|
     end
   make_const(name, data[name], category)
 end
-props.concat parse_scripts(data)
-puts '#endif /* USE_UNICODE_PROPERTIES */'
-aliases = parse_aliases(data)
 ages = parse_age(data)
-define_posix_props(data)
-POSIX_NAMES.each do |name|
-  make_const(name, data[name], "[[:#{name}:]]")
-end
+puts '#endif /* USE_UNICODE_PROPERTIES */'
 puts(<<'__HEREDOC')
 
 static const OnigCodePoint* const CodeRanges[] = {
