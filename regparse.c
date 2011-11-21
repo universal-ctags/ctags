@@ -5471,13 +5471,13 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
   Node* qn = NULL;
   Node* list1 = NULL;
   Node* list2 = NULL;
-  CClassNode* cc1;
-  CClassNode* cc2;
   int r = 0;
 
 #ifdef USE_UNICODE_PROPERTIES
   if (onig_strncmp((UChar* )env->enc->name, (UChar* )"UTF", 3) == 0) {
     /* UTF-8, UTF-16BE/LE, UTF-32BE/LE */
+    CClassNode* cc1;
+    CClassNode* cc2;
     UChar* propname = (UChar* )"M";
     int ctype = env->enc->property_name_to_ctype(ONIG_ENCODING_ASCII,
 	propname, propname + 1);
