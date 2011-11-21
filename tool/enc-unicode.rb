@@ -83,11 +83,6 @@ def parse_unicode_data(file)
     # The 'Major' category is the first letter of the 'General' category, e.g.
     # 'Lu' -> 'L'
     (data[fields[2][0,1]] ||= []).concat(cps)
-
-    # Special case for LC (Cased_Letter). LC = Ll + Lt + Lu
-    if /^L[ltu]$/ =~ fields[2]
-      (data['LC'] ||= []).concat(cps)
-    end
     last_cp = cp
   end
 
@@ -96,6 +91,9 @@ def parse_unicode_data(file)
   cn_remainder = (last_cp.next..0x10ffff).to_a
   data['Cn'] += cn_remainder
   data['C'] += cn_remainder
+
+  # Special case for LC (Cased_Letter). LC = Ll + Lt + Lu
+  data['LC'] = data['Ll'] + data['Lt'] + data['Lu']
 
   # Define General Category properties
   gcps = data.keys.sort - POSIX_NAMES
