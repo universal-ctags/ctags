@@ -237,7 +237,7 @@ static int init_case_fold_table(void)
 
   THREAD_ATOMIC_START;
 
-  FoldTable = st_init_numtable_with_size(1200);
+  FoldTable = st_init_numtable_with_size(1400);
   if (ONIG_IS_NULL(FoldTable)) return ONIGERR_MEMORY;
   for (i = 0; i < numberof(CaseFold); i++) {
     p = &CaseFold[i];
@@ -248,7 +248,7 @@ static int init_case_fold_table(void)
     st_add_direct(FoldTable, (st_data_t )p->from, (st_data_t )&(p->to));
   }
 
-  Unfold1Table = st_init_numtable_with_size(1000);
+  Unfold1Table = st_init_numtable_with_size(1200);
   if (ONIG_IS_NULL(Unfold1Table)) return ONIGERR_MEMORY;
 
   for (i = 0; i < numberof(CaseUnfold_11); i++) {
