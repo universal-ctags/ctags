@@ -5,7 +5,7 @@
 #
 # To use this, get UnicodeData.txt, Scripts.txt, PropList.txt,
 # PropertyAliases.txt, PropertyValueAliases.txt, DerivedCoreProperties.txt,
-# and DerivedAge.txt  from unicode.org.
+# DerivedAge.txt and Blocks.txt  from unicode.org.
 # (http://unicode.org/Public/UNIDATA/) And run following command.
 # ruby1.9 tool/enc-unicode.rb data_dir > enc/unicode/name2ctype.kwd
 # You can get source file for gperf.  After this, simply make ruby.
@@ -203,6 +203,32 @@ def parse_age(data)
   ages
 end
 
+def parse_block(data)
+  current = nil
+  last_constname = nil
+  cps = []
+  blocks = []
+  no_block = (0..0x10ffff).to_a
+  IO.foreach(get_file('Blocks.txt')) do |line|
+    if /^(\h+)\.\.(\h+);\s*(.*)/ =~ line
+      cps = ($1.to_i(16)..$2.to_i(16)).to_a
+      constname = constantize_blockname($3)
+      data[constname] = cps
+      no_block -= cps
+      make_const(constname, cps, "Block")
+      blocks << constname
+    end
+  end
+
+  # All code points not belonging to any of the named blocks
+  # have the value No_Block.
+  constname = constantize_blockname("No_Block")
+  make_const(constname, no_block, "Block")
+  blocks << constname
+
+  blocks
+end
+
 $const_cache = {}
 # make_const(property, pairs, name): Prints a 'static const' structure for a
 # given property, group of paired codepoints, and a human-friendly name for
@@ -235,6 +261,10 @@ def constantize_agename(name)
   "Age_#{name.sub(/\./, '_')}"
 end
 
+def constantize_blockname(name)
+  "In_#{name.gsub(/\W/, '_')}"
+end
+
 def get_file(name)
   File.join(ARGV[0], name)
 end
@@ -262,6 +292,7 @@ props.each do |name|
   make_const(name, data[name], category)
 end
 ages = parse_age(data)
+blocks = parse_block(data)
 puts '#endif /* USE_UNICODE_PROPERTIES */'
 puts(<<'__HEREDOC')
 
@@ -269,8 +300,9 @@ static const OnigCodePoint* const CodeRanges[] = {
 __HEREDOC
 POSIX_NAMES.each{|name|puts"  CR_#{name},"}
 puts "#ifdef USE_UNICODE_PROPERTIES"
-props.each{|name|puts"  CR_#{name},"}
-ages.each{|name| puts"  CR_#{constantize_agename(name)},"}
+props.each{|name| puts"  CR_#{name},"}
+ages.each{|name|  puts"  CR_#{constantize_agename(name)},"}
+blocks.each{|name|puts"  CR_#{name},"}
 
 puts(<<'__HEREDOC')
 #endif /* USE_UNICODE_PROPERTIES */
@@ -307,6 +339,12 @@ end
 ages.each do |name|
   i += 1
   name = "age=#{name}"
+  name_to_index[name] = i
+  puts "%-40s %3d" % [name + ',', i]
+end
+blocks.each do |name|
+  i += 1
+  name = normalize_propname(name)
   name_to_index[name] = i
   puts "%-40s %3d" % [name + ',', i]
 end
