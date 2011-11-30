@@ -208,13 +208,11 @@ def parse_block(data)
   last_constname = nil
   cps = []
   blocks = []
-  no_block = (0..0x10ffff).to_a
   IO.foreach(get_file('Blocks.txt')) do |line|
     if /^(\h+)\.\.(\h+);\s*(.*)/ =~ line
       cps = ($1.to_i(16)..$2.to_i(16)).to_a
       constname = constantize_blockname($3)
       data[constname] = cps
-      no_block -= cps
       make_const(constname, cps, "Block")
       blocks << constname
     end
@@ -222,11 +220,10 @@ def parse_block(data)
 
   # All code points not belonging to any of the named blocks
   # have the value No_Block.
+  no_block = (0..0x10ffff).to_a - data.values_at(*blocks).flatten
   constname = constantize_blockname("No_Block")
   make_const(constname, no_block, "Block")
   blocks << constname
-
-  blocks
 end
 
 $const_cache = {}
