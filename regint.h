@@ -244,6 +244,8 @@ typedef unsigned int uintptr_t;
 #define CHECK_NULL_RETURN_MEMERR(p)   if (IS_NULL(p)) return ONIGERR_MEMORY
 #define NULL_UCHARP                   ((UChar* )0)
 
+#define ONIG_LAST_CODE_POINT    (~((OnigCodePoint )0))
+
 #ifdef PLATFORM_UNALIGNED_WORD_ACCESS
 
 #define PLATFORM_GET_INC(val,p,type) do{\

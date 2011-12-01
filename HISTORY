@@ -1,5 +1,7 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/12/01: [bug]  /a{2}/i doesn't match 'AA'.
+2011/11/21: [impl] use ONIG_LAST_CODE_POINT instead of ~((OnigCodePoint )0).
 2011/11/17: [bug]  code ranges are not merged properly.
 2011/11/17: [bug]  /[\x{0}-X]/i doesn't match properly when UTF-16/32 is used.
 
