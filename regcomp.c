@@ -3944,6 +3944,7 @@ restart:
 
 	  np = onig_node_new_str(sn->s, sn->end);
 	  if (IS_NULL(np)) return ONIGERR_MEMORY;
+	  NSTR(np)->flag = sn->flag;
 
 	  for (i = 1; i < n && (i+1) * len <= EXPAND_STRING_MAX_LENGTH; i++) {
 	    r = onig_node_str_cat(np, sn->s, sn->end);
