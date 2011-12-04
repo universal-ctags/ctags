@@ -22,7 +22,10 @@ class strptr:
         if not isinstance(s, bytes):
             raise TypeError
         self._str = s
-        self._ptr = cast(self._str, c_void_p)
+        if sys.subversion[0] == 'PyPy':
+            self._ptr = c_void_p(self._str)
+        else:
+            self._ptr = cast(self._str, c_void_p)
 
     def getptr(self, offset=0):
         if offset == -1:    # -1 means the end of the string

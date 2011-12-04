@@ -292,6 +292,7 @@ libonig.onig_match.restype = _c_ssize_t
 onig_match = libonig.onig_match
 
 # onig_region_new
+libonig.onig_region_new.argtypes = []
 libonig.onig_region_new.restype = ctypes.POINTER(OnigRegion)
 onig_region_new = libonig.onig_region_new
 
@@ -341,12 +342,15 @@ onig_copy_syntax = libonig.onig_copy_syntax
 # onig_set_match_stack_limit_size
 
 # onig_end
+libonig.onig_end.argtypes = []
 onig_end = libonig.onig_end
 
 # onig_version
+libonig.onig_version.argtypes = []
 libonig.onig_version.restype = ctypes.c_char_p
 onig_version = libonig.onig_version
 
 # onig_copyright
+libonig.onig_copyright.argtypes = []
 libonig.onig_copyright.restype = ctypes.c_char_p
 onig_copyright = libonig.onig_copyright
