@@ -90,7 +90,7 @@ def parse_unicode_data(file)
   # codepoints to Cn and C
   cn_remainder = (last_cp.next..0x10ffff).to_a
   data['Cn'] += cn_remainder
-  data['C'] += cn_remainder
+  data['C'] += data['Cn']
 
   # Special case for LC (Cased_Letter). LC = Ll + Lt + Lu
   data['LC'] = data['Ll'] + data['Lt'] + data['Lu']
