@@ -121,7 +121,7 @@ def define_posix_props(data)
   data['Word'] = data['Alpha'] + data['Mark'] + data['Digit'] + data['Connector_Punctuation']
   data['Graph'] = data['Any'] - data['Space'] - data['Cntrl'] -
     data['Surrogate'] - data['Unassigned']
-  data['Print'] = data['Graph'] + data['Blank'] - data['Cntrl']
+  data['Print'] = data['Graph'] + data['Space_Separator']
 end
 
 def parse_scripts(data, categories)

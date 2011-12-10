@@ -561,7 +561,7 @@ static int IsPrint(int enc, int c)
 
   switch (enc) {
   case UNICODE_ISO_8859_1:
-    if (c >= 0x09 && c <= 0x0d) return 1;
+    /* if (c >= 0x09 && c <= 0x0d) return 1; */
     if (c == 0x85) return 1;
     /* fall */
   case ISO_8859_1:
