@@ -24256,14 +24256,14 @@ struct uniname2ctype_struct {
 static const struct uniname2ctype_struct *uniname2ctype_p(const char *, unsigned int);
 
 #ifndef USE_UNICODE_PROPERTIES
-#define TOTAL_KEYWORDS 15
+#define TOTAL_KEYWORDS 14
 #define MIN_WORD_LENGTH 4
-#define MAX_WORD_LENGTH 7
-#define MIN_HASH_VALUE 7
-#define MAX_HASH_VALUE 21
-/* maximum key range = 15, duplicates = 0 */
+#define MAX_WORD_LENGTH 6
+#define MIN_HASH_VALUE 6
+#define MAX_HASH_VALUE 19
+/* maximum key range = 14, duplicates = 0 */
 #else /* USE_UNICODE_PROPERTIES */
-#define TOTAL_KEYWORDS 599
+#define TOTAL_KEYWORDS 598
 #define MIN_WORD_LENGTH 1
 #define MAX_WORD_LENGTH 44
 #define MIN_HASH_VALUE 3
@@ -24290,19 +24290,19 @@ uniname2ctype_hash (str, len)
 #endif /* USE_UNICODE_PROPERTIES */
     {
 #ifndef USE_UNICODE_PROPERTIES
-      22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
-      22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
-      22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
-      22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
-      22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
-      22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
-      22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
-      22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
-      22, 22, 22, 22, 22, 22, 22, 22, 22, 22,
-      22, 22, 22, 22, 22, 22, 22,  3, 13,  6,
-       4, 22, 22, 11, 22,  1, 22, 22, 10, 22,
-       2, 22,  1, 22, 10,  8,  4,  7, 22,  3,
-       4, 22, 22, 22, 22, 22, 22, 22
+      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+      20, 20, 20, 20, 20, 20, 20, 20, 20, 20,
+      20, 20, 20, 20, 20, 20, 20,  3, 11,  5,
+       4, 20, 20,  9, 20,  1, 20, 20, 10, 20,
+       2, 20,  1, 20,  1,  7,  4,  6, 20,  1,
+       4, 20, 20, 20, 20, 20, 20, 20
 #else /* USE_UNICODE_PROPERTIES */
       4176, 4176, 4176, 4176, 4176, 4176, 4176, 4176, 4176, 4176,
       4176, 4176, 4176, 4176, 4176, 4176, 4176, 4176, 4176, 4176,
@@ -24364,21 +24364,20 @@ uniname2ctype_hash (str, len)
 struct uniname2ctype_pool_t
   {
 #ifndef USE_UNICODE_PROPERTIES
+    char uniname2ctype_pool_str6[sizeof("word")];
     char uniname2ctype_pool_str7[sizeof("print")];
     char uniname2ctype_pool_str8[sizeof("punct")];
     char uniname2ctype_pool_str9[sizeof("alpha")];
     char uniname2ctype_pool_str10[sizeof("alnum")];
     char uniname2ctype_pool_str11[sizeof("xdigit")];
-    char uniname2ctype_pool_str12[sizeof("newline")];
-    char uniname2ctype_pool_str13[sizeof("upper")];
-    char uniname2ctype_pool_str14[sizeof("ascii")];
-    char uniname2ctype_pool_str15[sizeof("cntrl")];
-    char uniname2ctype_pool_str16[sizeof("space")];
-    char uniname2ctype_pool_str17[sizeof("word")];
-    char uniname2ctype_pool_str18[sizeof("lower")];
-    char uniname2ctype_pool_str19[sizeof("graph")];
-    char uniname2ctype_pool_str20[sizeof("digit")];
-    char uniname2ctype_pool_str21[sizeof("blank")];
+    char uniname2ctype_pool_str12[sizeof("upper")];
+    char uniname2ctype_pool_str13[sizeof("ascii")];
+    char uniname2ctype_pool_str14[sizeof("cntrl")];
+    char uniname2ctype_pool_str15[sizeof("space")];
+    char uniname2ctype_pool_str16[sizeof("lower")];
+    char uniname2ctype_pool_str17[sizeof("graph")];
+    char uniname2ctype_pool_str18[sizeof("digit")];
+    char uniname2ctype_pool_str19[sizeof("blank")];
 #else /* USE_UNICODE_PROPERTIES */
     char uniname2ctype_pool_str3[sizeof("n")];
     char uniname2ctype_pool_str5[sizeof("s")];
@@ -24461,7 +24460,6 @@ struct uniname2ctype_pool_t
     char uniname2ctype_pool_str216[sizeof("inrunic")];
     char uniname2ctype_pool_str217[sizeof("incarian")];
     char uniname2ctype_pool_str218[sizeof("insyriac")];
-    char uniname2ctype_pool_str220[sizeof("newline")];
     char uniname2ctype_pool_str221[sizeof("inenclosedalphanumerics")];
     char uniname2ctype_pool_str222[sizeof("taiviet")];
     char uniname2ctype_pool_str223[sizeof("carian")];
@@ -24984,12 +24982,12 @@ struct uniname2ctype_pool_t
 static const struct uniname2ctype_pool_t uniname2ctype_pool_contents =
   {
 #ifndef USE_UNICODE_PROPERTIES
+    "word",
     "print",
     "punct",
     "alpha",
     "alnum",
     "xdigit",
-    "newline",
     "upper",
 #else /* USE_UNICODE_PROPERTIES */
     "n",
@@ -25077,7 +25075,6 @@ static const struct uniname2ctype_pool_t uniname2ctype_pool_contents =
     "inrunic",
     "incarian",
     "insyriac",
-    "newline",
     "inenclosedalphanumerics",
     "taiviet",
     "carian",
@@ -25186,9 +25183,7 @@ static const struct uniname2ctype_pool_t uniname2ctype_pool_contents =
     "finalpunctuation",
 #endif /* USE_UNICODE_PROPERTIES */
     "space",
-#ifndef USE_UNICODE_PROPERTIES
-    "word",
-#else /* USE_UNICODE_PROPERTIES */
+#ifdef USE_UNICODE_PROPERTIES
     "inphoneticextensions",
     "format",
     "inmongolian",
@@ -25757,8 +25752,7 @@ uniname2ctype_p (str, len)
       {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str216,                                 254},
       {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str217,                                374},
       {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str218,                                227},
-      {-1},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str220,                                   0},
+      {-1}, {-1},
       {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str221,                 290},
       {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str222,                                 152},
       {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str223,                                  148},
@@ -26830,7 +26824,24 @@ uniname2ctype_p (str, len)
       {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
       {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
       {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+#endif /* USE_UNICODE_PROPERTIES */
       {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+#ifndef USE_UNICODE_PROPERTIES
+      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str6,                                     12},
+      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str7,                                     7},
+      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str8,                                     8},
+      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str9,                                     1},
+      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str10,                                    13},
+      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str11,                                   11},
+      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str12,                                    10},
+      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str13,                                    14},
+      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str14,                                     3},
+      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str15,                                     9},
+      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str16,                                     6},
+      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str17,                                     5},
+      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str18,                                     4},
+      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str19,                                     2}
+#else /* USE_UNICODE_PROPERTIES */
       {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str3645,                     154},
       {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
       {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
@@ -26891,25 +26902,7 @@ uniname2ctype_p (str, len)
       {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
       {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
       {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
-#endif /* USE_UNICODE_PROPERTIES */
       {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
-#ifndef USE_UNICODE_PROPERTIES
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str7,                                     7},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str8,                                     8},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str9,                                     1},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str10,                                    13},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str11,                                   11},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str12,                                   0},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str13,                                    10},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str14,                                    14},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str15,                                     3},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str16,                                     9},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str17,                                     12},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str18,                                     6},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str19,                                     5},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str20,                                     4},
-      {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str21,                                     2}
-#else /* USE_UNICODE_PROPERTIES */
       {(int)(long)&((struct uniname2ctype_pool_t *)0)->uniname2ctype_pool_str4175,                                     74}
 #endif /* USE_UNICODE_PROPERTIES */
     };
