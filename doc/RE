@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Regular Expressions Version 5.11.3    2011/09/18
+Onigmo (Oniguruma-mod) Regular Expressions Version 5.11.5    2011/12/10
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -196,9 +196,9 @@ syntax: ONIG_SYNTAX_RUBY (default)
       blank    \t, \x20
       cntrl
       digit    0-9
-      graph    include all of multibyte encoded characters
+      graph    \x21-\x7E and all of multibyte encoded characters
       lower
-      print    include all of multibyte encoded characters
+      print    \x20-\x7E and all of multibyte encoded characters
       punct
       space    \t, \n, \v, \f, \r, \x20
       upper
@@ -216,7 +216,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
       digit    Decimal_Number
       graph    [[:^space:]] && ^Control && ^Unassigned && ^Surrogate
       lower    Lowercase_Letter
-      print    [[:graph:]] | [[:space:]]
+      print    [[:graph:]] | Space_Separator
       punct    Connector_Punctuation | Dash_Punctuation | Close_Punctuation |
                Final_Punctuation | Initial_Punctuation | Other_Punctuation |
                Open_Punctuation

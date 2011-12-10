@@ -1,4 +1,4 @@
-鬼雲 (鬼車改) 正規表現 Version 5.11.3    2011/09/18
+鬼雲 (鬼車改) 正規表現 Version 5.11.5    2011/12/10
 
 使用文法: ONIG_SYNTAX_RUBY (既定値)
 
@@ -196,9 +196,9 @@
       blank    \t, \x20
       cntrl
       digit    0-9
-      graph    多バイト文字全部を含む
+      graph    \x21-\x7E および 多バイト文字全部を含む
       lower
-      print    多バイト文字全部を含む
+      print    \x20-\x7E および 多バイト文字全部を含む
       punct
       space    \t, \n, \v, \f, \r, \x20
       upper
@@ -215,7 +215,7 @@
       digit    Decimal_Number
       graph    [[:^space:]] && ^Control && ^Unassigned && ^Surrogate
       lower    Lowercase_Letter
-      print    [[:graph:]] | [[:space:]]
+      print    [[:graph:]] | Space_Separator
       punct    Connector_Punctuation | Dash_Punctuation | Close_Punctuation |
                Final_Punctuation | Initial_Punctuation | Other_Punctuation |
                Open_Punctuation
