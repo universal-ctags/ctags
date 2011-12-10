@@ -115,8 +115,7 @@ def define_posix_props(data)
                    (0x0061..0x0066).to_a
   data['Alnum'] = data['Alpha'] + data['Digit']
   data['Space'] = data['White_Space']
-  data['Blank'] = data['White_Space'] - [0x0A, 0x0B, 0x0C, 0x0D, 0x85] -
-    data['Line_Separator'] - data['Paragraph_Separator']
+  data['Blank'] = data['Space_Separator'] + [0x0009]
   data['Cntrl'] = data['Cc']
   data['Word'] = data['Alpha'] + data['Mark'] + data['Digit'] + data['Connector_Punctuation']
   data['Graph'] = data['Any'] - data['Space'] - data['Cntrl'] -
