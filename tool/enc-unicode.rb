@@ -317,6 +317,7 @@ i = -1
 name_to_index = {}
 POSIX_NAMES.each do |name|
   i += 1
+  next if name == 'NEWLINE'
   name = normalize_propname(name)
   name_to_index[name] = i
   puts"%-40s %3d" % [name + ',', i]
