@@ -1311,7 +1311,7 @@ static void mayRedeclare (vString * const ident, ocaToken what)
 	switch (what)
 	{
     case OcaKEYWORD_value:
-        // let globalScope handle it
+        /* let globalScope handle it */
         globalScope (ident, what);
         break;
 
