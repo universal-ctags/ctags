@@ -1,4 +1,4 @@
-鬼雲 (鬼車改) 正規表現 Version 5.11.5    2011/12/10
+鬼雲 (鬼車改) 正規表現 Version 5.12.0    2011/12/12
 
 使用文法: ONIG_SYNTAX_RUBY (既定値)
 
@@ -95,19 +95,7 @@
        Hiragana, Katakana, Han, Latin, Greek, Cyrillic
 
      + UTF8, UTF16, UTF32で有効
-       Any, Assigned, C, Cc, Cf, Cn, Co, Cs, L, Ll, Lm, Lo, Lt, Lu,
-       M, Mc, Me, Mn, N, Nd, Nl, No, P, Pc, Pd, Pe, Pf, Pi, Po, Ps,
-       S, Sc, Sk, Sm, So, Z, Zl, Zp, Zs, 
-       Arabic, Armenian, Bengali, Bopomofo, Braille, Buginese,
-       Buhid, Canadian_Aboriginal, Cherokee, Common, Coptic,
-       Cypriot, Cyrillic, Deseret, Devanagari, Ethiopic, Georgian,
-       Glagolitic, Gothic, Greek, Gujarati, Gurmukhi, Han, Hangul,
-       Hanunoo, Hebrew, Hiragana, Inherited, Kannada, Katakana,
-       Kharoshthi, Khmer, Lao, Latin, Limbu, Linear_B, Malayalam,
-       Mongolian, Myanmar, New_Tai_Lue, Ogham, Old_Italic, Old_Persian,
-       Oriya, Osmanya, Runic, Shavian, Sinhala, Syloti_Nagri, Syriac,
-       Tagalog, Tagbanwa, Tai_Le, Tamil, Telugu, Thaana, Thai, Tibetan,
-       Tifinagh, Ugaritic, Yi
+       UnicodeProps.txt 参照
 
 
   \R       改行文字 (Linebreak)
