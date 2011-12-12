@@ -603,7 +603,8 @@ OnigEncodingDefine(euc_jp, EUC_JP) = {
   get_ctype_code_range,
   left_adjust_char_head,
   is_allowed_reverse_match,
-  0
+  0,
+  ONIGENC_FLAG_NONE,
 };
 /*
  * Name: EUC-JP

@@ -33,12 +33,24 @@ class OnigRegexType(ctypes.Structure):
 regex_t = OnigRegexType
 OnigRegex = ctypes.POINTER(OnigRegexType)
 
+try:
+    # Python 2.7
+    _c_ssize_t = ctypes.c_ssize_t
+except AttributeError:
+    # Python 2.6
+    if ctypes.sizeof(ctypes.c_int) == ctypes.sizeof(ctypes.c_void_p):
+        _c_ssize_t = ctypes.c_int
+    elif ctypes.sizeof(ctypes.c_long) == ctypes.sizeof(ctypes.c_void_p):
+        _c_ssize_t = ctypes.c_long
+    elif ctypes.sizeof(ctypes.c_longlong) == ctypes.sizeof(ctypes.c_void_p):
+        _c_ssize_t = ctypes.c_longlong
+
 class OnigRegion(ctypes.Structure):
     _fields_ = [
         ("allocated",   ctypes.c_int),
         ("num_regs",    ctypes.c_int),
-        ("beg",         ctypes.POINTER(ctypes.c_ssize_t)),
-        ("end",         ctypes.POINTER(ctypes.c_ssize_t)),
+        ("beg",         ctypes.POINTER(_c_ssize_t)),
+        ("end",         ctypes.POINTER(_c_ssize_t)),
         ("history_root",ctypes.c_void_p),
     ]
 re_registers = OnigRegion
@@ -267,7 +279,7 @@ onig_free = libonig.onig_free
 libonig.onig_search.argtypes = [OnigRegex,
         ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p,
         ctypes.POINTER(OnigRegion), OnigOptionType]
-libonig.onig_search.restype = ctypes.c_ssize_t
+libonig.onig_search.restype = _c_ssize_t
 onig_search = libonig.onig_search
 
 # onig_search_gpos
@@ -276,10 +288,11 @@ onig_search = libonig.onig_search
 libonig.onig_match.argtypes = [OnigRegex,
         ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p,
         ctypes.POINTER(OnigRegion), OnigOptionType]
-libonig.onig_match.restype = ctypes.c_ssize_t
+libonig.onig_match.restype = _c_ssize_t
 onig_match = libonig.onig_match
 
 # onig_region_new
+libonig.onig_region_new.argtypes = []
 libonig.onig_region_new.restype = ctypes.POINTER(OnigRegion)
 onig_region_new = libonig.onig_region_new
 
@@ -329,12 +342,15 @@ onig_copy_syntax = libonig.onig_copy_syntax
 # onig_set_match_stack_limit_size
 
 # onig_end
+libonig.onig_end.argtypes = []
 onig_end = libonig.onig_end
 
 # onig_version
+libonig.onig_version.argtypes = []
 libonig.onig_version.restype = ctypes.c_char_p
 onig_version = libonig.onig_version
 
 # onig_copyright
+libonig.onig_copyright.argtypes = []
 libonig.onig_copyright.restype = ctypes.c_char_p
 onig_copyright = libonig.onig_copyright

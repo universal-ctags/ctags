@@ -35,7 +35,7 @@
 #ifdef USE_CRNL_AS_LINE_TERMINATOR
 #define ONIGENC_IS_MBC_CRNL(enc,p,end) \
   (ONIGENC_MBC_TO_CODE(enc,p,end) == 13 && \
-   ONIGENC_MBC_TO_CODE(enc,(p+enclen(enc,p,enc)),end) == 10)
+   ONIGENC_MBC_TO_CODE(enc,(p+enclen(enc,p,end)),end) == 10)
 #define ONIGENC_IS_MBC_NEWLINE_EX(enc,p,start,end,option,check_prev) \
   is_mbc_newline_ex((enc),(p),(start),(end),(option),(check_prev))
 static int

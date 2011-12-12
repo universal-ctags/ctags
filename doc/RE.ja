@@ -1,4 +1,4 @@
-鬼雲 (鬼車改) 正規表現 Version 5.11.3    2011/09/18
+鬼雲 (鬼車改) 正規表現 Version 5.12.0    2011/12/12
 
 使用文法: ONIG_SYNTAX_RUBY (既定値)
 
@@ -95,19 +95,7 @@
        Hiragana, Katakana, Han, Latin, Greek, Cyrillic
 
      + UTF8, UTF16, UTF32で有効
-       Any, Assigned, C, Cc, Cf, Cn, Co, Cs, L, Ll, Lm, Lo, Lt, Lu,
-       M, Mc, Me, Mn, N, Nd, Nl, No, P, Pc, Pd, Pe, Pf, Pi, Po, Ps,
-       S, Sc, Sk, Sm, So, Z, Zl, Zp, Zs, 
-       Arabic, Armenian, Bengali, Bopomofo, Braille, Buginese,
-       Buhid, Canadian_Aboriginal, Cherokee, Common, Coptic,
-       Cypriot, Cyrillic, Deseret, Devanagari, Ethiopic, Georgian,
-       Glagolitic, Gothic, Greek, Gujarati, Gurmukhi, Han, Hangul,
-       Hanunoo, Hebrew, Hiragana, Inherited, Kannada, Katakana,
-       Kharoshthi, Khmer, Lao, Latin, Limbu, Linear_B, Malayalam,
-       Mongolian, Myanmar, New_Tai_Lue, Ogham, Old_Italic, Old_Persian,
-       Oriya, Osmanya, Runic, Shavian, Sinhala, Syloti_Nagri, Syriac,
-       Tagalog, Tagbanwa, Tai_Le, Tamil, Telugu, Thaana, Thai, Tibetan,
-       Tifinagh, Ugaritic, Yi
+       UnicodeProps.txt 参照
 
 
   \R       改行文字 (Linebreak)
@@ -196,9 +184,9 @@
       blank    \t, \x20
       cntrl
       digit    0-9
-      graph    多バイト文字全部を含む
+      graph    \x21-\x7E および 多バイト文字全部を含む
       lower
-      print    多バイト文字全部を含む
+      print    \x20-\x7E および 多バイト文字全部を含む
       punct
       space    \t, \n, \v, \f, \r, \x20
       upper
@@ -215,7 +203,7 @@
       digit    Decimal_Number
       graph    [[:^space:]] && ^Control && ^Unassigned && ^Surrogate
       lower    Lowercase_Letter
-      print    [[:graph:]] | [[:space:]]
+      print    [[:graph:]] | Space_Separator
       punct    Connector_Punctuation | Dash_Punctuation | Close_Punctuation |
                Final_Punctuation | Initial_Punctuation | Other_Punctuation |
                Open_Punctuation

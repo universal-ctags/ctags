@@ -185,6 +185,8 @@ OnigEncodingDefine(utf_32le, UTF_32LE) = {
   onigenc_unicode_is_code_ctype,
   onigenc_utf16_32_get_ctype_code_range,
   utf32le_left_adjust_char_head,
-  onigenc_always_false_is_allowed_reverse_match
+  onigenc_always_false_is_allowed_reverse_match,
+  0,
+  ONIGENC_FLAG_UNICODE,
 };
 ENC_ALIAS("UCS-4LE", "UTF-32LE")

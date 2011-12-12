@@ -137,7 +137,7 @@ bbuf_clone(BBuf** rto, BBuf* from)
   (OnigCodePoint )(ONIGENC_MBC_MINLEN(enc) > 1 ? 0 : 0x80)
 
 #define SET_ALL_MULTI_BYTE_RANGE(enc, pbuf) \
-  add_code_range_to_buf(pbuf, env, MBCODE_START_POS(enc), ~((OnigCodePoint )0))
+  add_code_range_to_buf(pbuf, env, MBCODE_START_POS(enc), ONIG_LAST_CODE_POINT)
 
 #define ADD_ALL_MULTI_BYTE_RANGE(enc, mbuf) do {\
   if (! ONIGENC_IS_SINGLEBYTE(enc)) {\
@@ -1749,17 +1749,19 @@ add_code_range_to_buf0(BBuf** pbuf, ScanEnv* env, OnigCodePoint from, OnigCodePo
   data = (OnigCodePoint* )(bbuf->p);
   data++;
 
-  for (low = 0, bound = n; low < bound; ) {
+  bound = (from == 0) ? 0 : n;
+  for (low = 0; low < bound; ) {
     x = (low + bound) >> 1;
-    if (from > data[x*2 + 1])
+    if (from - 1 > data[x*2 + 1])
       low = x + 1;
     else
       bound = x;
   }
 
-  for (high = low, bound = n; high < bound; ) {
+  high = (to == ONIG_LAST_CODE_POINT) ? n : low;
+  for (bound = n; high < bound; ) {
     x = (high + bound) >> 1;
-    if (to >= data[x*2] - 1)
+    if (to + 1 >= data[x*2])
       high = x + 1;
     else
       bound = x;
@@ -1777,13 +1779,15 @@ add_code_range_to_buf0(BBuf** pbuf, ScanEnv* env, OnigCodePoint from, OnigCodePo
       to = data[(high - 1)*2 + 1];
   }
 
-  if (inc_n != 0 && (OnigCodePoint )high < n) {
+  if (inc_n != 0) {
     int from_pos = SIZE_CODE_POINT * (1 + high * 2);
     int to_pos   = SIZE_CODE_POINT * (1 + (low + 1) * 2);
-    int size = (n - high) * 2 * SIZE_CODE_POINT;
 
     if (inc_n > 0) {
-      BBUF_MOVE_RIGHT(bbuf, from_pos, to_pos, size);
+      if ((OnigCodePoint )high < n) {
+	int size = (n - high) * 2 * SIZE_CODE_POINT;
+	BBUF_MOVE_RIGHT(bbuf, from_pos, to_pos, size);
+      }
     }
     else {
       BBUF_MOVE_LEFT_REDUCE(bbuf, from_pos, to_pos);
@@ -1851,11 +1855,11 @@ not_code_range_buf(OnigEncoding enc, BBuf* bbuf, BBuf** pbuf, ScanEnv* env)
       r = add_code_range_to_buf(pbuf, env, pre, from - 1);
       if (r != 0) return r;
     }
-    if (to == ~((OnigCodePoint )0)) break;
+    if (to == ONIG_LAST_CODE_POINT) break;
     pre = to + 1;
   }
-  if (to < ~((OnigCodePoint )0)) {
-    r = add_code_range_to_buf(pbuf, env, to + 1, ~((OnigCodePoint )0));
+  if (to < ONIG_LAST_CODE_POINT) {
+    r = add_code_range_to_buf(pbuf, env, to + 1, ONIG_LAST_CODE_POINT);
   }
   return r;
 }
@@ -4107,7 +4111,7 @@ add_ctype_to_cc(CClassNode* cc, int ctype, int not, int char_prop, ScanEnv* env)
     r = add_ctype_to_cc_by_range(cc, ctype, not, env, sb_out, ranges);
     if ((r == 0) && ascii_range) {
       if (not != 0) {
-	r = add_code_range_to_buf(&(cc->mbuf), env, 0x80, ~((OnigCodePoint )0));
+	r = add_code_range_to_buf(&(cc->mbuf), env, 0x80, ONIG_LAST_CODE_POINT);
       }
       else {
 	CClassNode ccascii;
@@ -5504,7 +5508,8 @@ node_linebreak(Node** np, ScanEnv* env)
     bitset_set_range(env, cc->bs, 0x0A, 0x0D);
   }
 
-  if (onig_strncmp((UChar* )env->enc->name, (UChar* )"UTF", 3) == 0) {
+  /* TODO: move this block to enc/unicode.c */
+  if (ONIGENC_IS_UNICODE(env->enc)) {
     /* UTF-8, UTF-16BE/LE, UTF-32BE/LE */
     add_code_range(&(cc->mbuf), env, 0x85, 0x85);
     add_code_range(&(cc->mbuf), env, 0x2028, 0x2029);
@@ -5542,13 +5547,13 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
   Node* qn = NULL;
   Node* list1 = NULL;
   Node* list2 = NULL;
-  CClassNode* cc1;
-  CClassNode* cc2;
   int r = 0;
 
 #ifdef USE_UNICODE_PROPERTIES
-  if (onig_strncmp((UChar* )env->enc->name, (UChar* )"UTF", 3) == 0) {
+  if (ONIGENC_IS_UNICODE(env->enc)) {
     /* UTF-8, UTF-16BE/LE, UTF-32BE/LE */
+    CClassNode* cc1;
+    CClassNode* cc2;
     UChar* propname = (UChar* )"M";
     int ctype = env->enc->property_name_to_ctype(ONIG_ENCODING_ASCII,
 	propname, propname + 1);

@@ -1,5 +1,21 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/12/12: Version 5.12.0
+
+2011/12/11: [impl] use ONIGENC_IS_UNICODE to check if the encoding is Unicode
+                   encoding.
+2011/12/10: [new]  support for Unicode 6.0.
+                   new scripts, ages, blocks (\p{In_XXX}) and case foldings.
+                   tool/enc-unicode.rb is imported from Ruby 1.9.3.
+2011/12/10: [spec] \p{Print} shouldn't include newlines.
+                   \p{Print} = \p{Graph} + \p{Space_Separator}
+2011/12/10: [bug]  \p{NEWLINE} should not be allowed.
+2011/12/05: [new]  support for PyPy 1.7. (onig.py and testpy.py)
+2011/12/01: [bug]  /a{2}/i doesn't match 'AA'.
+2011/11/21: [impl] use ONIG_LAST_CODE_POINT instead of ~((OnigCodePoint )0).
+2011/11/17: [bug]  code ranges are not merged properly.
+2011/11/17: [bug]  /[\x{0}-X]/i doesn't match properly when UTF-16/32 is used.
+
 2011/10/16: Version 5.11.4
 
 2011/10/15: [tune] optimize Sunday's quick search.

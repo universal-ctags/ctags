@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Regular Expressions Version 5.11.3    2011/09/18
+Onigmo (Oniguruma-mod) Regular Expressions Version 5.12.0    2011/12/12
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -95,19 +95,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
        Hiragana, Katakana, Han, Latin, Greek, Cyrillic
 
      + works on UTF8, UTF16, UTF32
-       Any, Assigned, C, Cc, Cf, Cn, Co, Cs, L, Ll, Lm, Lo, Lt, Lu,
-       M, Mc, Me, Mn, N, Nd, Nl, No, P, Pc, Pd, Pe, Pf, Pi, Po, Ps,
-       S, Sc, Sk, Sm, So, Z, Zl, Zp, Zs, 
-       Arabic, Armenian, Bengali, Bopomofo, Braille, Buginese,
-       Buhid, Canadian_Aboriginal, Cherokee, Common, Coptic,
-       Cypriot, Cyrillic, Deseret, Devanagari, Ethiopic, Georgian,
-       Glagolitic, Gothic, Greek, Gujarati, Gurmukhi, Han, Hangul,
-       Hanunoo, Hebrew, Hiragana, Inherited, Kannada, Katakana,
-       Kharoshthi, Khmer, Lao, Latin, Limbu, Linear_B, Malayalam,
-       Mongolian, Myanmar, New_Tai_Lue, Ogham, Old_Italic, Old_Persian,
-       Oriya, Osmanya, Runic, Shavian, Sinhala, Syloti_Nagri, Syriac,
-       Tagalog, Tagbanwa, Tai_Le, Tamil, Telugu, Thaana, Thai, Tibetan,
-       Tifinagh, Ugaritic, Yi
+       see UnicodeProps.txt
 
 
   \R       Linebreak
@@ -196,9 +184,9 @@ syntax: ONIG_SYNTAX_RUBY (default)
       blank    \t, \x20
       cntrl
       digit    0-9
-      graph    include all of multibyte encoded characters
+      graph    \x21-\x7E and all of multibyte encoded characters
       lower
-      print    include all of multibyte encoded characters
+      print    \x20-\x7E and all of multibyte encoded characters
       punct
       space    \t, \n, \v, \f, \r, \x20
       upper
@@ -216,7 +204,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
       digit    Decimal_Number
       graph    [[:^space:]] && ^Control && ^Unassigned && ^Surrogate
       lower    Lowercase_Letter
-      print    [[:graph:]] | [[:space:]]
+      print    [[:graph:]] | Space_Separator
       punct    Connector_Punctuation | Dash_Punctuation | Close_Punctuation |
                Final_Punctuation | Initial_Punctuation | Other_Punctuation |
                Open_Punctuation

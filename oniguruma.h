@@ -39,8 +39,8 @@ extern "C" {
 
 #define ONIGURUMA
 #define ONIGURUMA_VERSION_MAJOR   5
-#define ONIGURUMA_VERSION_MINOR   11
-#define ONIGURUMA_VERSION_TEENY   4
+#define ONIGURUMA_VERSION_MINOR   12
+#define ONIGURUMA_VERSION_TEENY   0
 
 #ifdef __cplusplus
 # ifndef  HAVE_PROTOTYPES
@@ -175,6 +175,7 @@ typedef struct OnigEncodingTypeST {
   OnigUChar* (*left_adjust_char_head)(const OnigUChar* start, const OnigUChar* p, const OnigUChar* end, struct OnigEncodingTypeST* enc);
   int    (*is_allowed_reverse_match)(const OnigUChar* p, const OnigUChar* end, struct OnigEncodingTypeST* enc);
   int ruby_encoding_index;
+  unsigned int  flags;
 } OnigEncodingType;
 
 typedef OnigEncodingType* OnigEncoding;
@@ -209,6 +210,9 @@ ONIG_EXTERN OnigEncodingType OnigEncodingASCII;
 #define ONIGENC_CTYPE_ASCII    14
 #define ONIGENC_MAX_STD_CTYPE  ONIGENC_CTYPE_ASCII
 
+/* flags */
+#define ONIGENC_FLAG_NONE       0U
+#define ONIGENC_FLAG_UNICODE    1U
 
 #define onig_enc_len(enc,p,e)          ONIGENC_MBC_ENC_LEN(enc, p, e)
 
@@ -222,6 +226,7 @@ ONIG_EXTERN OnigEncodingType OnigEncodingASCII;
 #define ONIGENC_IS_MBC_ASCII_WORD(enc,s,end) \
    onigenc_ascii_is_code_ctype( \
 	ONIGENC_MBC_TO_CODE(enc,s,end),ONIGENC_CTYPE_WORD,enc)
+#define ONIGENC_IS_UNICODE(enc)        ((enc)->flags & ONIGENC_FLAG_UNICODE)
 
 
 #define ONIGENC_NAME(enc)                      ((enc)->name)

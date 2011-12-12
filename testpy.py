@@ -22,7 +22,10 @@ class strptr:
         if not isinstance(s, bytes):
             raise TypeError
         self._str = s
-        self._ptr = cast(self._str, c_void_p)
+        try:
+            self._ptr = cast(self._str, c_void_p)   # CPython 2.x
+        except TypeError:
+            self._ptr = c_void_p(self._str)         # PyPy 1.7
 
     def getptr(self, offset=0):
         if offset == -1:    # -1 means the end of the string
@@ -42,6 +45,15 @@ def cc_to_cb(s, enc, cc):
     if cc > len(s):
         raise IndexError
     return len(s[0:cc].encode(enc))
+
+def print_result(result, pattern, file=None):
+    if not file:
+        file = sys.stdout
+    print(result + ": ", end='', file=file)
+    try:
+        print(pattern, file=file)
+    except UnicodeEncodeError as e:
+        print('(' + str(e) + ')')
 
 def xx(pattern, target, s_from, s_to, mem, not_match):
     global nerror
@@ -74,7 +86,7 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
     if r != 0:
         onig.onig_error_code_to_str(msg, r, byref(einfo))
         nerror += 1
-        print("ERROR: %s (/%s/ '%s')" % (msg.value, pattern, target),
+        print_result("ERROR", "%s (/%s/ '%s')" % (msg.value, pattern, target),
                 file=sys.stderr)
         return
     
@@ -84,30 +96,30 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
     if r < onig.ONIG_MISMATCH:
         onig.onig_error_code_to_str(msg, r)
         nerror += 1
-        print("ERROR: %s (/%s/ '%s')" % (msg.value, pattern, target),
+        print_result("ERROR", "%s (/%s/ '%s')" % (msg.value, pattern, target),
                 file=sys.stderr)
         return
     
     if r == onig.ONIG_MISMATCH:
         if not_match:
             nsucc += 1
-            print("OK(N): /%s/ '%s'" % (pattern, target))
+            print_result("OK(N)", "/%s/ '%s'" % (pattern, target))
         else:
             nfail += 1
-            print("FAIL: /%s/ '%s'" % (pattern, target))
+            print_result("FAIL", "/%s/ '%s'" % (pattern, target))
     else:
         if not_match:
             nfail += 1
-            print("FAIL(N): /%s/ '%s'" % (pattern, target))
+            print_result("FAIL(N)", "/%s/ '%s'" % (pattern, target))
         else:
             start = region[0].beg[mem]
             end = region[0].end[mem]
             if (start == s_from) and (end == s_to):
                 nsucc += 1
-                print("OK: /%s/ '%s'" % (pattern, target))
+                print_result("OK", "/%s/ '%s'" % (pattern, target))
             else:
                 nfail += 1
-                print("FAIL: /%s/ '%s' %d-%d : %d-%d\n" % (pattern, target,
+                print_result("FAIL", "/%s/ '%s' %d-%d : %d-%d" % (pattern, target,
                         s_from, s_to, start, end))
     onig.onig_free(reg)
 
@@ -121,6 +133,10 @@ def n(pattern, target):
     xx(pattern, target, 0, 0, 0, True)
 
 
+def is_unicode_encoding(enc):
+    return enc in (onig.ONIG_ENCODING_UTF16_LE,
+                   onig.ONIG_ENCODING_UTF16_BE,
+                   onig.ONIG_ENCODING_UTF8)
 
 def main():
     global region
@@ -131,18 +147,16 @@ def main():
     
     # set encoding of the test target
     if len(sys.argv) > 1:
-        if sys.argv[1] == "EUC-JP":
-            onig_encoding = onig.ONIG_ENCODING_EUC_JP
-        elif sys.argv[1] == "SJIS":
-            onig_encoding = onig.ONIG_ENCODING_SJIS
-        elif sys.argv[1] == "UTF-8":
-            onig_encoding = onig.ONIG_ENCODING_UTF8
-        elif sys.argv[1] == "UTF-16LE":
-            onig_encoding = onig.ONIG_ENCODING_UTF16_LE
-        elif sys.argv[1] == "UTF-16BE":
-            onig_encoding = onig.ONIG_ENCODING_UTF16_BE
-        else:
+        encs = {"EUC-JP": onig.ONIG_ENCODING_EUC_JP,
+                "SJIS": onig.ONIG_ENCODING_SJIS,
+                "UTF-8": onig.ONIG_ENCODING_UTF8,
+                "UTF-16LE": onig.ONIG_ENCODING_UTF16_LE,
+                "UTF-16BE": onig.ONIG_ENCODING_UTF16_BE}
+        try:
+            onig_encoding = encs[sys.argv[1]]
+        except KeyError:
             print("test target encoding error")
+            print("Usage: python testpy.py [test target encoding] [output encoding]")
             sys.exit()
         encoding = onig_encoding[0].name
     
@@ -877,9 +891,7 @@ def main():
     
     
     # additional test patterns
-    if (onig_encoding == onig.ONIG_ENCODING_UTF16_LE or
-            onig_encoding == onig.ONIG_ENCODING_UTF16_BE or
-            onig_encoding == onig.ONIG_ENCODING_UTF8):
+    if is_unicode_encoding(onig_encoding):
         x2(u"\\x{3042}\\x{3044}", u"あい", 0, 2)
     elif onig_encoding == onig.ONIG_ENCODING_SJIS:
         x2(u"\\x{82a0}\\x{82A2}", u"あい", 0, 2)
@@ -898,6 +910,13 @@ def main():
     n(u"(?i)(?<!b|aa)c", u"Aac")
     x2(u"a\\b?a", u"aa", 0, 2)
     x2(u"[^x]*x", u"aaax", 0, 4)
+    x2(u"(?i)[\\x{0}-B]+", u"\x00\x01\x02\x1f\x20@AaBbC", 0, 10)
+    x2(u"(?i)a{2}", u"AA", 0, 2)
+    if is_unicode_encoding(onig_encoding):
+        # The longest script name
+        x2(u"\\p{Other_Default_Ignorable_Code_Point}+", u"\u034F\uFFF8\U000E0FFF", 0, 4)
+        # The longest block name
+        x2(u"\\p{In_Unified_Canadian_Aboriginal_Syllabics_Extended}+", u"\u18B0\u18FF", 0, 2)
     
     # character classes (tests for character class optimization)
     x2(u"[@][a]", u"@a", 0, 2);
@@ -928,14 +947,8 @@ def main():
     
     # extended grapheme cluster
     x2(u"\\X{5}", u"あいab\n", 0, 5)
-    if (onig_encoding == onig.ONIG_ENCODING_UTF16_LE or
-            onig_encoding == onig.ONIG_ENCODING_UTF16_BE or
-            onig_encoding == onig.ONIG_ENCODING_UTF8):
-        try:
-            x2(u"\\X", u"\u306F\u309A\n", 0, 2)
-        except UnicodeEncodeError:
-            # "\u309A" can not be encoded by some encodings
-            pass
+    if is_unicode_encoding(onig_encoding):
+        x2(u"\\X", u"\u306F\u309A\n", 0, 2)
     
     # keep
     x2(u"ab\\Kcd", u"abcd", 2, 4)

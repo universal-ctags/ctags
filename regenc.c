@@ -812,7 +812,7 @@ onigenc_minimum_property_name_to_ctype(OnigEncoding enc, UChar* p, UChar* end)
   len = onigenc_strlen(enc, p, end);
   for (pbe = (pb = PBS) + sizeof(PBS)/sizeof(PBS[0]); pb < pbe; ++pb) {
     if (len == pb->len &&
-        STRNCASECMP((char *)p, (char *)pb->name, len) == 0)
+        onigenc_with_ascii_strnicmp(enc, p, end, pb->name, pb->len) == 0)
       return pb->ctype;
   }
 
@@ -860,6 +860,27 @@ onigenc_with_ascii_strncmp(OnigEncoding enc, const UChar* p, const UChar* end,
 
     c = (int )ONIGENC_MBC_TO_CODE(enc, p, end);
     x = *sascii - c;
+    if (x) return x;
+
+    sascii++;
+    p += enclen(enc, p, end);
+  }
+  return 0;
+}
+
+extern int
+onigenc_with_ascii_strnicmp(OnigEncoding enc, const UChar* p, const UChar* end,
+                            const UChar* sascii /* ascii */, int n)
+{
+  int x, c;
+
+  while (n-- > 0) {
+    if (p >= end) return (int )(*sascii);
+
+    c = (int )ONIGENC_MBC_TO_CODE(enc, p, end);
+    if (ONIGENC_IS_ASCII_CODE(c))
+      c = ONIGENC_ASCII_CODE_TO_LOWER_CASE(c);
+    x = ONIGENC_ASCII_CODE_TO_LOWER_CASE(*sascii) - c;
     if (x) return x;
 
     sascii++;

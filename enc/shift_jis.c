@@ -590,7 +590,8 @@ OnigEncodingDefine(shift_jis, Shift_JIS) = {
   get_ctype_code_range,
   left_adjust_char_head,
   is_allowed_reverse_match,
-  0
+  0,
+  ONIGENC_FLAG_NONE,
 };
 /*
  * Name: Shift_JIS
