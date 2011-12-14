@@ -138,6 +138,9 @@ def is_unicode_encoding(enc):
                    onig.ONIG_ENCODING_UTF16_BE,
                    onig.ONIG_ENCODING_UTF8)
 
+def is_ucs2():
+    return len(u"\U0010FFFF") == 2
+
 def main():
     global region
     global onig_encoding
@@ -914,7 +917,10 @@ def main():
     x2(u"(?i)a{2}", u"AA", 0, 2)
     if is_unicode_encoding(onig_encoding):
         # The longest script name
-        x2(u"\\p{Other_Default_Ignorable_Code_Point}+", u"\u034F\uFFF8\U000E0FFF", 0, 4)
+        if is_ucs2():
+            x2(u"\\p{Other_Default_Ignorable_Code_Point}+", u"\u034F\uFFF8\U000E0FFF", 0, 4)
+        else:
+            x2(u"\\p{Other_Default_Ignorable_Code_Point}+", u"\u034F\uFFF8\U000E0FFF", 0, 3)
         # The longest block name
         x2(u"\\p{In_Unified_Canadian_Aboriginal_Syllabics_Extended}+", u"\u18B0\u18FF", 0, 2)
     
