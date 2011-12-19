@@ -5557,6 +5557,7 @@ size_t
 onig_memsize(const regex_t *reg)
 {
     size_t size = sizeof(regex_t);
+    if (IS_NULL(reg)) return 0;
     if (IS_NOT_NULL(reg->p))                size += reg->alloc;
     if (IS_NOT_NULL(reg->exact))            size += reg->exact_end - reg->exact;
     if (IS_NOT_NULL(reg->int_map))          size += sizeof(int) * ONIG_CHAR_TABLE_SIZE;
@@ -5564,6 +5565,15 @@ onig_memsize(const regex_t *reg)
     if (IS_NOT_NULL(reg->repeat_range))     size += reg->repeat_range_alloc * sizeof(OnigRepeatRange);
     if (IS_NOT_NULL(reg->chain))            size += onig_memsize(reg->chain);
 
+    return size;
+}
+
+size_t
+onig_region_memsize(const OnigRegion *regs)
+{
+    size_t size = sizeof(*regs);
+    if (IS_NULL(regs)) return 0;
+    size += regs->allocated * (sizeof(*regs->beg) + sizeof(*regs->end));
     return size;
 }
 
