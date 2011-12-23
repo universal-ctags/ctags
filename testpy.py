@@ -147,7 +147,7 @@ def is_unicode_encoding(enc):
                    onig.ONIG_ENCODING_UTF8)
 
 def is_ucs2():
-    return len(u"\U0010FFFF") == 2
+    return sys.maxunicode == 0xFFFF
 
 def main():
     global region
