@@ -348,9 +348,11 @@ onig_end = libonig.onig_end
 # onig_version
 libonig.onig_version.argtypes = []
 libonig.onig_version.restype = ctypes.c_char_p
-onig_version = libonig.onig_version
+def onig_version():
+    return libonig.onig_version().decode()
 
 # onig_copyright
 libonig.onig_copyright.argtypes = []
 libonig.onig_copyright.restype = ctypes.c_char_p
-onig_copyright = libonig.onig_copyright
+def onig_copyright():
+    return libonig.onig_copyright().decode()
