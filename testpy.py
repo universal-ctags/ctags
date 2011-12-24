@@ -50,9 +50,11 @@ def cc_to_cb(s, enc, cc):
       enc -- encoding name
       cc -- char count
     """
-    if cc > len(s):
+    s = s.encode('UTF-32LE')
+    clen = cc * 4
+    if clen > len(s):
         raise IndexError
-    return len(s[0:cc].encode(enc))
+    return len(s[:clen].decode('UTF-32LE').encode(enc))
 
 def print_result(result, pattern, file=None):
     if not file:
@@ -145,9 +147,6 @@ def is_unicode_encoding(enc):
     return enc in (onig.ONIG_ENCODING_UTF16_LE,
                    onig.ONIG_ENCODING_UTF16_BE,
                    onig.ONIG_ENCODING_UTF8)
-
-def is_ucs2():
-    return sys.maxunicode == 0xFFFF
 
 def main():
     global region
@@ -925,10 +924,7 @@ def main():
     x2("(?i)a{2}", "AA", 0, 2)
     if is_unicode_encoding(onig_encoding):
         # The longest script name
-        if is_ucs2():
-            x2("\\p{Other_Default_Ignorable_Code_Point}+", "\u034F\uFFF8\U000E0FFF", 0, 4)
-        else:
-            x2("\\p{Other_Default_Ignorable_Code_Point}+", "\u034F\uFFF8\U000E0FFF", 0, 3)
+        x2("\\p{Other_Default_Ignorable_Code_Point}+", "\u034F\uFFF8\U000E0FFF", 0, 3)
         # The longest block name
         x2("\\p{In_Unified_Canadian_Aboriginal_Syllabics_Extended}+", "\u18B0\u18FF", 0, 2)
     
