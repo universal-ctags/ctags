@@ -1,5 +1,8 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/12/24: [new]  support for Python 3.x. (onig.py and testpy.py)
+2011/12/14: [bug]  testpy.py doesn't work on Ubuntu.
+
 2011/12/12: Version 5.12.0
 
 2011/12/11: [impl] use ONIGENC_IS_UNICODE to check if the encoding is Unicode
