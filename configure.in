@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(onig, 5.12.0)
+AC_INIT(onig, 5.12.1)
 
 AM_INIT_AUTOMAKE
 AC_CONFIG_HEADER(config.h)
