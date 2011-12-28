@@ -1,5 +1,7 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/12/28: Version 5.12.1
+
 2011/12/24: [new]  merge Ruby r23714, r28980 and r34050.
                    add onig_memsize() and onig_region_memsize().
 2011/12/24: [new]  support for Python 3.x. (onig.py and testpy.py)
