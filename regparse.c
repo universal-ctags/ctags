@@ -63,7 +63,8 @@ const OnigSyntaxType OnigSyntaxRuby = {
       ONIG_SYN_FIXED_INTERVAL_IS_GREEDY_ONLY |
       ONIG_SYN_WARN_CC_OP_NOT_ESCAPED |
       ONIG_SYN_WARN_CC_DUP |
-      ONIG_SYN_WARN_REDUNDANT_NESTED_REPEAT )
+      ONIG_SYN_WARN_REDUNDANT_NESTED_REPEAT |
+      ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE )
   , ONIG_OPTION_ASCII_RANGE
   ,
   {
@@ -4261,7 +4262,9 @@ parse_posix_bracket(CClassNode* cc, UChar** src, UChar* end, ScanEnv* env)
       if (onigenc_with_ascii_strncmp(enc, p, end, (UChar* )":]", 2) != 0)
 	return ONIGERR_INVALID_POSIX_BRACKET_TYPE;
 
-      r = add_ctype_to_cc(cc, pb->ctype, not, 0, env);
+      r = add_ctype_to_cc(cc, pb->ctype, not,
+	    IS_SYNTAX_BV(env->syntax, ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE),
+	    env);
       if (r != 0) return r;
 
       PINC; PINC;
