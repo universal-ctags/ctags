@@ -88,8 +88,10 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
         target2 = target.encode(encoding)
     targetp = strptr(target2)
     
+    # special syntactic settings
     onig.onig_copy_syntax(byref(syn), onig.ONIG_SYNTAX_DEFAULT)
-    syn.options = syn.options & ~onig.ONIG_OPTION_ASCII_RANGE
+    syn.options &= ~onig.ONIG_OPTION_ASCII_RANGE
+    syn.behavior &= ~onig.ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE
     
     r = onig.onig_new(byref(reg), patternp.getptr(), patternp.getptr(-1),
             onig.ONIG_OPTION_DEFAULT, onig_encoding, byref(syn), byref(einfo));
