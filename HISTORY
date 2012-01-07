@@ -1,5 +1,11 @@
 History of Onigmo (Oniguruma-mod)
 
+2011/12/31: [bug]  /^ss$/i doesn't match "\x{DF}".
+2011/12/30: [new]  add ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE option.
+2011/12/29: [bug]  (thanks Nobuyoshi Nakada)
+                   C standard requires va_end() to be placed before return.
+                   quote macro expansions.
+
 2011/12/28: Version 5.12.1
 
 2011/12/24: [new]  merge Ruby r23714, r28980 and r34050.
