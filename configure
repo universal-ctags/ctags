@@ -2916,7 +2916,7 @@ if test "${enable_combination_explosion_check+set}" = set; then :
   enableval=$enable_combination_explosion_check; comb_expl_check=$enableval
 fi
 
-if test $comb_expl_check = yes; then
+if test x"$comb_expl_check" = xyes; then
 
 $as_echo "#define USE_COMBINATION_EXPLOSION_CHECK 1" >>confdefs.h
 
@@ -2927,7 +2927,7 @@ if test "${enable_crnl_as_line_terminator+set}" = set; then :
   enableval=$enable_crnl_as_line_terminator; crnl_as_line_terminator=$enableval
 fi
 
-if test $crnl_as_line_terminator = yes; then
+if test x"$crnl_as_line_terminator" = xyes; then
 
 $as_echo "#define USE_CRNL_AS_LINE_TERMINATOR 1" >>confdefs.h
 
@@ -12229,7 +12229,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $_cv_have_prototypes" >&5
 $as_echo "$_cv_have_prototypes" >&6; }
-if test "$_cv_have_prototypes" = yes; then
+if test x"$_cv_have_prototypes" = xyes; then
 
 $as_echo "#define HAVE_PROTOTYPES 1" >>confdefs.h
 
@@ -12250,6 +12250,7 @@ int foo(int x, ...) {
 	va_arg(va, int);
 	va_arg(va, char *);
 	va_arg(va, double);
+	va_end(va);
 	return 0;
 }
 
@@ -12270,7 +12271,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $_cv_stdarg" >&5
 $as_echo "$_cv_stdarg" >&6; }
-if test "$_cv_stdarg" = yes; then
+if test x"$_cv_stdarg" = xyes; then
 
 $as_echo "#define HAVE_STDARG_PROTOTYPES 1" >>confdefs.h
 

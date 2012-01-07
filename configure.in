@@ -23,7 +23,7 @@ dnl check for COMBINATION_EXPLOSION
 AC_ARG_ENABLE(combination-explosion-check,
 	[  --enable-combination-explosion-check   enable combination explosion check],
 	[comb_expl_check=$enableval])
-if test $comb_expl_check = yes; then
+if test x"$comb_expl_check" = xyes; then
   AC_DEFINE(USE_COMBINATION_EXPLOSION_CHECK,1,[Define if combination explosion check])
 fi
 
@@ -31,7 +31,7 @@ dnl check for CRNL_AS_LINE_TERMINATOR
 AC_ARG_ENABLE(crnl-as-line-terminator,
 	[  --enable-crnl-as-line-terminator   enable CR+NL as line terminator],
 	[crnl_as_line_terminator=$enableval])
-if test $crnl_as_line_terminator = yes; then
+if test x"$crnl_as_line_terminator" = xyes; then
   AC_DEFINE(USE_CRNL_AS_LINE_TERMINATOR,1,[Define if enable CR+NL as line terminator])
 fi
 
@@ -67,7 +67,7 @@ AC_CACHE_CHECK(for prototypes, _cv_have_prototypes,
   [AC_TRY_COMPILE([int foo(int x) { return 0; }], [return foo(10);],
 	_cv_have_prototypes=yes,
 	_cv_have_prototypes=no)])
-if test "$_cv_have_prototypes" = yes; then
+if test x"$_cv_have_prototypes" = xyes; then
   AC_DEFINE(HAVE_PROTOTYPES,1,[Define if compilerr supports prototypes])
 fi
 
@@ -80,12 +80,13 @@ int foo(int x, ...) {
 	va_arg(va, int);
 	va_arg(va, char *);
 	va_arg(va, double);
+	va_end(va);
 	return 0;
 }
 ], [return foo(10, "", 3.14);],
 	_cv_stdarg=yes,
 	_cv_stdarg=no)])
-if test "$_cv_stdarg" = yes; then
+if test x"$_cv_stdarg" = xyes; then
   AC_DEFINE(HAVE_STDARG_PROTOTYPES,1,[Define if compiler supports stdarg prototypes])
 fi
 
