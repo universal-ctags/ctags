@@ -402,8 +402,10 @@ typedef unsigned int        OnigOptionType;
 #define ONIG_OPTION_POSIX_REGION         (ONIG_OPTION_NOTEOL << 1)
 /* options (ctype range) */
 #define ONIG_OPTION_ASCII_RANGE          (ONIG_OPTION_POSIX_REGION << 1)
+#define ONIG_OPTION_POSIX_BRACKET_ALL_RANGE (ONIG_OPTION_ASCII_RANGE << 1)
+#define ONIG_OPTION_WORD_BOUND_ALL_RANGE    (ONIG_OPTION_POSIX_BRACKET_ALL_RANGE << 1)
 /* options (newline) */
-#define ONIG_OPTION_NEWLINE_CRLF         (ONIG_OPTION_ASCII_RANGE << 1)
+#define ONIG_OPTION_NEWLINE_CRLF         (ONIG_OPTION_WORD_BOUND_ALL_RANGE << 1)
 #define ONIG_OPTION_MAXBIT               ONIG_OPTION_NEWLINE_CRLF  /* limit */
 
 #define ONIG_OPTION_ON(options,regopt)      ((options) |= (regopt))
@@ -487,7 +489,7 @@ ONIG_EXTERN OnigSyntaxType*   OnigDefaultSyntax;
 #define ONIG_SYN_OP2_ESC_CAPITAL_Q_QUOTE        (1U<<0)  /* \Q...\E */
 #define ONIG_SYN_OP2_QMARK_GROUP_EFFECT         (1U<<1)  /* (?...) */
 #define ONIG_SYN_OP2_OPTION_PERL                (1U<<2)  /* (?imsxadlu), (?-imsx), (?^imsxalu) */
-#define ONIG_SYN_OP2_OPTION_RUBY                (1U<<3)  /* (?imx), (?-imx)  */
+#define ONIG_SYN_OP2_OPTION_RUBY                (1U<<3)  /* (?imxadu), (?-imx)  */
 #define ONIG_SYN_OP2_PLUS_POSSESSIVE_REPEAT     (1U<<4)  /* ?+,*+,++ */
 #define ONIG_SYN_OP2_PLUS_POSSESSIVE_INTERVAL   (1U<<5)  /* {n,m}+   */
 #define ONIG_SYN_OP2_CCLASS_SET_OP              (1U<<6)  /* [...&&..[..]..] */
@@ -532,7 +534,6 @@ ONIG_EXTERN OnigSyntaxType*   OnigDefaultSyntax;
 #define ONIG_SYN_ALLOW_MULTIPLEX_DEFINITION_NAME_CALL (1U<<10)  /* (?<x>)(?<x>)(?&x) */
 
 /* syntax (behavior) in char class [...] */
-#define ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE  (1U<<19) /* (?a) doesn't affect POSIX brackets */
 #define ONIG_SYN_NOT_NEWLINE_IN_NEGATIVE_CC      (1U<<20) /* [^...] */
 #define ONIG_SYN_BACKSLASH_ESCAPE_IN_CC          (1U<<21) /* [..\w..] etc.. */
 #define ONIG_SYN_ALLOW_EMPTY_RANGE_IN_CC         (1U<<22)
