@@ -245,6 +245,8 @@ static int
 code_to_mbclen(OnigCodePoint code, OnigEncoding enc ARG_UNUSED)
 {
   if (ONIGENC_IS_CODE_ASCII(code)) return 1;
+  else if (code > 0x00ffffff)
+    return ONIGERR_TOO_BIG_WIDE_CHAR_VALUE;
   else if ((code & 0xff808080) == 0x00808080) return 3;
   else if ((code & 0xffff8080) == 0x00008080) return 2;
   else
