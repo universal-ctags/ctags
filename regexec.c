@@ -95,6 +95,8 @@ history_tree_clear(OnigCaptureTreeNode* node)
     node->beg = ONIG_REGION_NOTPOS;
     node->end = ONIG_REGION_NOTPOS;
     node->group = -1;
+    xfree(node->childs);
+    node->childs = (OnigCaptureTreeNode** )0;
   }
 }
 
