@@ -16,14 +16,6 @@ region = 0
 onig_encoding = onig.ONIG_ENCODING_EUC_JP
 encoding = onig_encoding[0].name.decode()
 
-# work around for Python 2.x
-org_print = print
-def print(*args, **kwargs):
-    kw = dict(kwargs)
-    kw.setdefault('end', '\n')      # 'end' must be a unicode string
-    return org_print(*args, **kw)
-
-
 class strptr:
     """a helper class to get a pointer to a string"""
     def __init__(self, s):
@@ -177,8 +169,22 @@ def main():
         outenc = sys.argv[2]
     else:
         outenc = locale.getpreferredencoding()
-    sys.stdout = io.open(sys.stdout.fileno(), "w", encoding=outenc, closefd=False)
-    sys.stderr = io.open(sys.stderr.fileno(), "w", encoding=outenc, closefd=False)
+    
+    class TextWriter:
+        def __init__(self, fileno, **kwargs):
+            kw = dict(kwargs)
+            kw.setdefault('errors', 'backslashreplace')
+            kw.setdefault('closefd', False)
+            self._writer = io.open(fileno, mode='w', **kw)
+            self._write = self._writer.write
+            # work around for Python 2.x
+            self._writer.write = lambda s: self._write("" + s)  # convert to unistr
+        
+        def getwriter(self):
+            return self._writer
+    
+    sys.stdout = TextWriter(sys.stdout.fileno(), encoding=outenc).getwriter()
+    sys.stderr = TextWriter(sys.stderr.fileno(), encoding=outenc).getwriter()
     
     # onig-5.9.2/testc.c からコピー
     #   trigraph 対策の ?\? は ?? に置き換え
