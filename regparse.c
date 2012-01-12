@@ -4068,16 +4068,14 @@ add_ctype_to_cc_by_range(CClassNode* cc, int ctype ARG_UNUSED, int not,
 }
 
 static int
-add_ctype_to_cc(CClassNode* cc, int ctype, int not, int char_prop, ScanEnv* env)
+add_ctype_to_cc(CClassNode* cc, int ctype, int not, int ascii_range, ScanEnv* env)
 {
-  int maxcode, ascii_range;
+  int maxcode;
   int c, r;
   const OnigCodePoint *ranges;
   OnigCodePoint sb_out;
   OnigEncoding enc = env->enc;
   OnigOptionType option = env->option;
-
-  ascii_range = IS_ASCII_RANGE(option) && (char_prop == 0);
 
   r = ONIGENC_GET_CTYPE_CODE_RANGE(enc, ctype, &sb_out, &ranges);
   if (r == 0) {
@@ -4241,8 +4239,9 @@ parse_posix_bracket(CClassNode* cc, UChar** src, UChar* end, ScanEnv* env)
         return ONIGERR_INVALID_POSIX_BRACKET_TYPE;
 
       r = add_ctype_to_cc(cc, pb->ctype, not,
-	    IS_POSIX_BRACKET_ALL_RANGE(env->option),
-	    env);
+			  IS_ASCII_RANGE(env->option) &&
+				! IS_POSIX_BRACKET_ALL_RANGE(env->option),
+			  env);
       if (r != 0) return r;
 
       PINC_S; PINC_S;
@@ -4314,7 +4313,7 @@ parse_char_property(Node** np, OnigToken* tok, UChar** src, UChar* end,
   *np = node_new_cclass();
   CHECK_NULL_RETURN_MEMERR(*np);
   cc = NCCLASS(*np);
-  r = add_ctype_to_cc(cc, ctype, 0, 1, env);
+  r = add_ctype_to_cc(cc, ctype, 0, 0, env);
   if (r != 0) return r;
   if (tok->u.prop.not != 0) NCCLASS_SET_NOT(cc);
 
@@ -4605,7 +4604,8 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
       break;
 
     case TK_CHAR_TYPE:
-      r = add_ctype_to_cc(cc, tok->u.prop.ctype, tok->u.prop.not, 0, env);
+      r = add_ctype_to_cc(cc, tok->u.prop.ctype, tok->u.prop.not,
+			  IS_ASCII_RANGE(env->option), env);
       if (r != 0) return r;
 
     next_class:
@@ -4619,7 +4619,7 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
 
 	ctype = fetch_char_property_to_ctype(&p, end, env);
 	if (ctype < 0) return ctype;
-	r = add_ctype_to_cc(cc, ctype, tok->u.prop.not, 1, env);
+	r = add_ctype_to_cc(cc, ctype, tok->u.prop.not, 0, env);
 	if (r != 0) return r;
 	goto next_class;
       }
@@ -5580,7 +5580,7 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
       np1 = node_new_cclass();
       if (IS_NULL(np1)) goto err;
       cc1 = NCCLASS(np1);
-      r = add_ctype_to_cc(cc1, ctype, 0, 1, env);
+      r = add_ctype_to_cc(cc1, ctype, 0, 0, env);
       if (r != 0) goto err;
       NCCLASS_SET_NOT(cc1);
 
@@ -5588,7 +5588,7 @@ node_extended_grapheme_cluster(Node** np, ScanEnv* env)
       np2 = node_new_cclass();
       if (IS_NULL(np2)) goto err;
       cc2 = NCCLASS(np2);
-      r = add_ctype_to_cc(cc2, ctype, 0, 1, env);
+      r = add_ctype_to_cc(cc2, ctype, 0, 0, env);
       if (r != 0) goto err;
 
       qn = node_new_quantifier(0, REPEAT_INFINITE, 0);
@@ -5935,7 +5935,8 @@ parse_exp(Node** np, OnigToken* tok, int term,
             *np = node_new_cclass();
             CHECK_NULL_RETURN_MEMERR(*np);
             cc = NCCLASS(*np);
-            r = add_ctype_to_cc(cc, tok->u.prop.ctype, 0, 0, env);
+            r = add_ctype_to_cc(cc, tok->u.prop.ctype, 0,
+			    IS_ASCII_RANGE(env->option), env);
 	    if (r != 0) return r;
             if (tok->u.prop.not != 0) NCCLASS_SET_NOT(cc);
 #ifdef USE_SHARED_CCLASS_TABLE
