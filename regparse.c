@@ -4711,8 +4711,10 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
       if (ONIGENC_IS_CODE_NEWLINE(env->enc, NEWLINE_CODE)) {
         if (ONIGENC_CODE_TO_MBCLEN(env->enc, NEWLINE_CODE) == 1)
           BITSET_SET_BIT(cc->bs, NEWLINE_CODE);
-        else
-          add_code_range(&(cc->mbuf), env, NEWLINE_CODE, NEWLINE_CODE);
+        else {
+          r = add_code_range(&(cc->mbuf), env, NEWLINE_CODE, NEWLINE_CODE);
+          if (r < 0) goto err;
+        }
       }
     }
   }
