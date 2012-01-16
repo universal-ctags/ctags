@@ -39,8 +39,7 @@
 	LispParser, \
 	LuaParser, \
 	MakefileParser, \
-	ObjCParser, \
-	ObjCppParser, \
+	ObjcParser, \
 	OcamlParser, \
 	PascalParser, \
 	PerlParser, \
