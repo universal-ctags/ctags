@@ -333,6 +333,8 @@ typedef unsigned int  BitStatusType;
 #define IS_NOTEOL(option)         ((option) & ONIG_OPTION_NOTEOL)
 #define IS_POSIX_REGION(option)   ((option) & ONIG_OPTION_POSIX_REGION)
 #define IS_ASCII_RANGE(option)    ((option) & ONIG_OPTION_ASCII_RANGE)
+#define IS_POSIX_BRACKET_ALL_RANGE(option)  ((option) & ONIG_OPTION_POSIX_BRACKET_ALL_RANGE)
+#define IS_WORD_BOUND_ALL_RANGE(option)     ((option) & ONIG_OPTION_WORD_BOUND_ALL_RANGE)
 #define IS_NEWLINE_CRLF(option)   ((option) & ONIG_OPTION_NEWLINE_CRLF)
 
 /* OP_SET_OPTION is required for these options.

@@ -63,9 +63,9 @@ OnigSyntaxType OnigSyntaxRuby = {
       ONIG_SYN_ALLOW_MULTIPLEX_DEFINITION_NAME |
       ONIG_SYN_FIXED_INTERVAL_IS_GREEDY_ONLY |
       ONIG_SYN_WARN_CC_OP_NOT_ESCAPED |
-      ONIG_SYN_WARN_REDUNDANT_NESTED_REPEAT |
-      ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE )
-  , ONIG_OPTION_ASCII_RANGE
+      ONIG_SYN_WARN_REDUNDANT_NESTED_REPEAT )
+  , ( ONIG_OPTION_ASCII_RANGE | ONIG_OPTION_POSIX_BRACKET_ALL_RANGE |
+      ONIG_OPTION_WORD_BOUND_ALL_RANGE )
   ,
   {
       (OnigCodePoint )'\\'                       /* esc */
@@ -3360,14 +3360,16 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
       if (! IS_SYNTAX_OP(syn, ONIG_SYN_OP_ESC_B_WORD_BOUND)) break;
       tok->type = TK_ANCHOR;
       tok->u.anchor.subtype = ANCHOR_WORD_BOUND;
-      tok->u.anchor.ascii_range = IS_ASCII_RANGE(env->option);
+      tok->u.anchor.ascii_range = IS_ASCII_RANGE(env->option)
+		&& ! IS_WORD_BOUND_ALL_RANGE(env->option);
       break;
 
     case 'B':
       if (! IS_SYNTAX_OP(syn, ONIG_SYN_OP_ESC_B_WORD_BOUND)) break;
       tok->type = TK_ANCHOR;
       tok->u.anchor.subtype = ANCHOR_NOT_WORD_BOUND;
-      tok->u.anchor.ascii_range = IS_ASCII_RANGE(env->option);
+      tok->u.anchor.ascii_range = IS_ASCII_RANGE(env->option)
+		&& ! IS_WORD_BOUND_ALL_RANGE(env->option);
       break;
 
 #ifdef USE_WORD_BEGIN_END
@@ -4187,7 +4189,7 @@ parse_posix_bracket(CClassNode* cc, UChar** src, UChar* end, ScanEnv* env)
 	return ONIGERR_INVALID_POSIX_BRACKET_TYPE;
 
       r = add_ctype_to_cc(cc, pb->ctype, not,
-	    IS_SYNTAX_BV(env->syntax, ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE),
+	    IS_POSIX_BRACKET_ALL_RANGE(env->option),
 	    env);
       if (r != 0) return r;
 
@@ -4958,6 +4960,18 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	ONOFF(option, ONIG_OPTION_EXTEND, 1);
 	PFETCH(c);
       }
+#if 0
+      else if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_RUBY)) {
+	/* d-imx */
+	ONOFF(option, ONIG_OPTION_ASCII_RANGE, 0);
+	ONOFF(option, ONIG_OPTION_POSIX_BRACKET_ALL_RANGE, 0);
+	ONOFF(option, ONIG_OPTION_WORD_BOUND_ALL_RANGE, 0);
+	ONOFF(option, ONIG_OPTION_IGNORECASE, 1);
+	ONOFF(option, ONIG_OPTION_MULTILINE,  1);
+	ONOFF(option, ONIG_OPTION_EXTEND, 1);
+	PFETCH(c);
+      }
+#endif
       else {
 	return ONIGERR_UNDEFINED_GROUP_OPTION;
       }
@@ -5008,6 +5022,8 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	         IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_RUBY)) &&
 	        (neg == 0)) {
 	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 0);
+	      ONOFF(option, ONIG_OPTION_POSIX_BRACKET_ALL_RANGE, 1);
+	      ONOFF(option, ONIG_OPTION_WORD_BOUND_ALL_RANGE, 1);
 	    }
 	    else
 	      return ONIGERR_UNDEFINED_GROUP_OPTION;
@@ -5018,12 +5034,29 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	         IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_RUBY)) &&
 	        (neg == 0)) {
 	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 1);
+	      ONOFF(option, ONIG_OPTION_POSIX_BRACKET_ALL_RANGE, 1);
+	      ONOFF(option, ONIG_OPTION_WORD_BOUND_ALL_RANGE, 1);
 	    }
 	    else
 	      return ONIGERR_UNDEFINED_GROUP_OPTION;
 	    break;
 
-	  case 'd': case 'l':
+	  case 'd':
+	    if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_PERL) &&
+	        (neg == 0)) {
+	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 1);
+	    }
+	    else if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_RUBY) &&
+	        (neg == 0)) {
+	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 0);
+	      ONOFF(option, ONIG_OPTION_POSIX_BRACKET_ALL_RANGE, 0);
+	      ONOFF(option, ONIG_OPTION_WORD_BOUND_ALL_RANGE, 0);
+	    }
+	    else
+	      return ONIGERR_UNDEFINED_GROUP_OPTION;
+	    break;
+
+	  case 'l':
 	    if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_PERL) && (neg == 0)) {
 	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 1);
 	    }
