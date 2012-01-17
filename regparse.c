@@ -767,10 +767,12 @@ name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
     }
     else if (t->num == t->alloc) {
       int i;
+      NameEntry* p;
 
       alloc = t->alloc * 2;
-      t->e = (NameEntry* )xrealloc(t->e, sizeof(NameEntry) * alloc);
-      CHECK_NULL_RETURN_MEMERR(t->e);
+      p = (NameEntry* )xrealloc(t->e, sizeof(NameEntry) * alloc);
+      CHECK_NULL_RETURN_MEMERR(p);
+      t->e = p;
       t->alloc = alloc;
 
     clear:
@@ -812,9 +814,11 @@ name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
     }
     else {
       if (e->back_num > e->back_alloc) {
+	int* p;
 	alloc = e->back_alloc * 2;
-	e->back_refs = (int* )xrealloc(e->back_refs, sizeof(int) * alloc);
-	CHECK_NULL_RETURN_MEMERR(e->back_refs);
+	p = (int* )xrealloc(e->back_refs, sizeof(int) * alloc);
+	CHECK_NULL_RETURN_MEMERR(p);
+	e->back_refs = p;
 	e->back_alloc = alloc;
       }
       e->back_refs[e->back_num - 1] = backref;

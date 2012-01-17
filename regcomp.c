@@ -3365,8 +3365,12 @@ update_string_node_case_fold(regex_t* reg, Node *node)
     q = buf;
     for (i = 0; i < len; i++) {
       if (sp >= ebuf) {
-	sbuf = (UChar* )xrealloc(sbuf, sbuf_size * 2);
-	CHECK_NULL_RETURN_MEMERR(sbuf);
+	UChar* p = (UChar* )xrealloc(sbuf, sbuf_size * 2);
+	if (IS_NULL(p)) {
+	  xfree(sbuf);
+	  return ONIGERR_MEMORY;
+	}
+	sbuf = p;
 	sp = sbuf + sbuf_size;
 	sbuf_size *= 2;
 	ebuf = sbuf + sbuf_size;
