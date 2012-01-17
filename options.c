@@ -137,6 +137,7 @@ optionValues Option = {
 	NULL,       /* -L */
 	NULL,       /* -o */
 	NULL,       /* -h */
+	NULL,		/* --config-filename */
 	NULL,       /* --etags-include */
 	DEFAULT_FILE_FORMAT,/* --format */
 	FALSE,      /* --if0 */
@@ -195,6 +196,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"  -x   Print a tabular cross reference file to standard output."},
  {1,"  --append=[yes|no]"},
  {1,"       Should tags should be appended to existing tag file [no]?"},
+ {1,"  --config-filename=fileName"},
+ {1,"      Use 'fileName' instead of 'ctags' in option file names."},
  {1,"  --etags-include=file"},
  {1,"      Include reference to 'file' in Emacs-style tag file (requires -e)."},
  {1,"  --exclude=pattern"},
@@ -713,6 +716,13 @@ extern boolean isIncludeFile (const char *const fileName)
 /*
  *  Specific option processing
  */
+
+ static void processConfigFilenameOption (
+ 		const char *const option __unused__, const char *const parameter)
+ {
+ 	freeString (&Option.configFilename);
+ 	Option.configFilename = stringCopy (parameter);
+ }
 
 static void processEtagsInclude (
 		const char *const option, const char *const parameter)
@@ -1370,6 +1380,7 @@ static void processVersionOption (
  */
 
 static parametricOption ParametricOptions [] = {
+	{ "config-filename",      	processConfigFilenameOption,  	TRUE    },
 	{ "etags-include",          processEtagsInclude,            FALSE   },
 	{ "exclude",                processExcludeOption,           FALSE   },
 	{ "excmd",                  processExcmdOption,             FALSE   },
@@ -1676,7 +1687,7 @@ extern void previewFirstOption (cookedArgs* const args)
 {
 	while (cArgIsOption (args))
 	{
-		if (strcmp (args->item, "V") == 0 || strcmp (args->item, "verbose") == 0)
+		if (strcmp (args->item, "V") == 0 || strcmp (args->item, "verbose") == 0 || strcmp (args->item, "config-filename") == 0 )
 			parseOption (args);
 		else if (strcmp (args->item, "options") == 0  &&
 				strcmp (args->parameter, "NONE") == 0)
@@ -1699,9 +1710,15 @@ static void parseConfigurationFileOptionsInDirectoryWithLeafname (const char* di
 
 static void parseConfigurationFileOptionsInDirectory (const char* directory)
 {
-	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, ".ctags");
+	char	*leafname = NULL;
+	
+	asprintf (&leafname,".%s",(Option.configFilename)?Option.configFilename:"ctags");
+	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, leafname);
+	free (leafname);
 #ifdef MSDOS_STYLE_PATH
-	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, "ctags.cnf");
+	asprintf (&leafname,"%s.cnf",(Option.configFilename)?Option.configFilename:"ctags");
+	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, leafname);
+	free (leafname);
 #endif
 }
 
@@ -1709,14 +1726,23 @@ static void parseConfigurationFileOptions (void)
 {
 	/* We parse .ctags on all systems, and additionally ctags.cnf on DOS. */
 	const char* const home = getenv ("HOME");
+	char *filename = NULL;
+	
 #ifdef CUSTOM_CONFIGURATION_FILE
 	parseFileOptions (CUSTOM_CONFIGURATION_FILE);
 #endif
 #ifdef MSDOS_STYLE_PATH
-	parseFileOptions ("/ctags.cnf");
+	
+	asprintf (&filename,"/%s.cnf",(Option.configFilename)?Option.configFilename:"ctags");
+	parseFileOptions (filename);
+	free (filename);
 #endif
-	parseFileOptions ("/etc/ctags.conf");
-	parseFileOptions ("/usr/local/etc/ctags.conf");
+	asprintf (&filename,"/etc/%s.conf",(Option.configFilename)?Option.configFilename:"ctags");
+	parseFileOptions (filename);
+	free (filename);
+	asprintf (&filename,"/usr/local/etc/%s.conf",(Option.configFilename)?Option.configFilename:"ctags");
+	parseFileOptions (filename);
+	free (filename);
 	if (home != NULL)
 	{
 		parseConfigurationFileOptionsInDirectory (home);
