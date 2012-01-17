@@ -664,7 +664,7 @@ onig_names_free(regex_t* reg)
 }
 
 static NameEntry*
-name_find(regex_t* reg, UChar* name, UChar* name_end)
+name_find(regex_t* reg, const UChar* name, const UChar* name_end)
 {
   int i, len;
   NameEntry* e;
