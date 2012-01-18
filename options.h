@@ -97,6 +97,7 @@ typedef struct sOptionValues {
 	char *fileList;         /* -L  name of file containing names of files */
 	char *tagFileName;      /* -o  name of tags file */
 	stringList* headerExt;  /* -h  header extensions */
+	char* configFilename;   /* --config-filename  use instead of 'ctags' in option file names */
 	stringList* etagsInclude;/* --etags-include  list of TAGS files to include*/
 	unsigned int tagFileFormat;/* --format  tag file format (level) */
 	boolean if0;            /* --if0  examine code within "#if 0" branch */
