@@ -3,7 +3,7 @@
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2006  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
+ * Copyright (c) 2011-2012  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -154,7 +154,8 @@ const OnigSyntaxType OnigSyntaxJava = {
       ONIG_SYN_OP2_ESC_V_VTAB | ONIG_SYN_OP2_ESC_U_HEX4 |
       ONIG_SYN_OP2_ESC_P_BRACE_CHAR_PROPERTY )
   , ( SYN_GNU_REGEX_BV | ONIG_SYN_DIFFERENT_LEN_ALT_LOOK_BEHIND )
-  , ONIG_OPTION_SINGLELINE
+  , ( ONIG_OPTION_SINGLELINE | ONIG_OPTION_ASCII_RANGE |
+      ONIG_OPTION_WORD_BOUND_ALL_RANGE )
   ,
   {
       (OnigCodePoint )'\\'                       /* esc */

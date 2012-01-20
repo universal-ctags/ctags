@@ -3,7 +3,7 @@
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
+ * Copyright (c) 2011-2012  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -95,6 +95,8 @@ history_tree_clear(OnigCaptureTreeNode* node)
     node->beg = ONIG_REGION_NOTPOS;
     node->end = ONIG_REGION_NOTPOS;
     node->group = -1;
+    xfree(node->childs);
+    node->childs = (OnigCaptureTreeNode** )0;
   }
 }
 
@@ -143,14 +145,20 @@ history_tree_add_child(OnigCaptureTreeNode* parent, OnigCaptureTreeNode* child)
       n = HISTORY_TREE_INIT_ALLOC_SIZE;
       parent->childs =
         (OnigCaptureTreeNode** )xmalloc(sizeof(OnigCaptureTreeNode*) * n);
+      CHECK_NULL_RETURN_MEMERR(parent->childs);
     }
     else {
+      OnigCaptureTreeNode** tmp;
       n = parent->allocated * 2;
-      parent->childs =
+      tmp =
         (OnigCaptureTreeNode** )xrealloc(parent->childs,
                                          sizeof(OnigCaptureTreeNode*) * n);
+      if (tmp == 0) {
+	history_tree_clear(parent);
+	return ONIGERR_MEMORY;
+      }
+      parent->childs = tmp;
     }
-    CHECK_NULL_RETURN_MEMERR(parent->childs);
     for (i = parent->allocated; i < n; i++) {
       parent->childs[i] = (OnigCaptureTreeNode* )0;
     }
@@ -165,7 +173,7 @@ history_tree_add_child(OnigCaptureTreeNode* parent, OnigCaptureTreeNode* child)
 static OnigCaptureTreeNode*
 history_tree_clone(OnigCaptureTreeNode* node)
 {
-  int i;
+  int i, r;
   OnigCaptureTreeNode *clone, *child;
 
   clone = history_node_new();
@@ -179,7 +187,12 @@ history_tree_clone(OnigCaptureTreeNode* node)
       history_tree_free(clone);
       return (OnigCaptureTreeNode* )0;
     }
-    history_tree_add_child(clone, child);
+    r = history_tree_add_child(clone, child);
+    if (r != 0) {
+      history_tree_free(child);
+      history_tree_free(clone);
+      return (OnigCaptureTreeNode* )0;
+    }
   }
 
   return clone;
@@ -1101,7 +1114,10 @@ make_capture_history_tree(OnigCaptureTreeNode* node, OnigStackType** kp,
         child->group = n;
         child->beg = k->u.mem.pstr - str;
         r = history_tree_add_child(node, child);
-        if (r != 0) return r;
+        if (r != 0) {
+          history_tree_free(child);
+          return r;
+        }
         *kp = (k + 1);
         r = make_capture_history_tree(child, kp, stk_top, str, reg);
         if (r != 0) return r;

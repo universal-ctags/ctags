@@ -1,5 +1,21 @@
 History of Onigmo (Oniguruma-mod)
 
+2012/01/20: Version 5.13.0
+
+2012/01/17: [bug]  memory leak occurs when xrealloc fails.
+2012/01/15: [bug]  Calling function "add_code_range" without checking return
+                   value.
+2012/01/12: [bug]  testpy.py: error messages are not displayed when Python 2.x
+                   is used.
+2012/01/11: [bug]  memory leak occurs when history_tree_add_child fails.
+2012/01/11: [bug]  (thanks Masashi Tsuji)
+                   OnigCaptureTreeNode memory leak.
+2012/01/09: [spec] ONIG_OPTION_ASCII_RANGE should be enabled in
+                   ONIG_SYNTAX_JAVA.
+2012/01/09: [new]  support for Ruby 1.9.3 compatible \b, \B and POSIX brackets.
+                   add ONIG_OPTION_WORD_BOUND_ALL_RANGE and
+                   ONIG_OPTION_POSIX_BRACKET_ALL_RANGE.
+                   remove ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE.
 2011/12/31: [bug]  /^ss$/i doesn't match "\x{DF}".
 2011/12/30: [new]  add ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE option.
 2011/12/29: [bug]  (thanks Nobuyoshi Nakada)

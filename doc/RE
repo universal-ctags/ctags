@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Regular Expressions Version 5.12.0    2011/12/12
+Onigmo (Oniguruma-mod) Regular Expressions Version 5.13.0    2012/01/19
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -216,9 +216,9 @@ syntax: ONIG_SYNTAX_RUBY (default)
       word     Letter | Mark | Decimal_Number | Connector_Punctuation
 
 
-    It depends on ONIG_OPTION_ASCII_RANGE option that non-ASCII char
-    includes or not. This option is enabled in ONIG_SYNTAX_RUBY and
-    not in ONIG_SYNTAX_PERL.
+    It depends on ONIG_OPTION_ASCII_RANGE option and
+    ONIG_OPTION_POSIX_BRACKET_ALL_RANGE option that POSIX brackets
+    match non-ASCII char or not.
 
 
 
@@ -226,17 +226,27 @@ syntax: ONIG_SYNTAX_RUBY (default)
 
   (?#...)            comment
 
-  (?imxau-imx)       option on/off
+  (?imxdau-imx)      option on/off
                          i: ignore case
                          m: multi-line (dot(.) match newline)
                          x: extended form
+
+                       character set option (character range option)
+                         d: Default (compatible with Ruby 1.9.3)
+                            \w, \d and \s doesn't match non-ASCII characters.
+                            \b, \B and POSIX brackets use the each encoding's
+                            rules.
                          a: ASCII
                             ONIG_OPTION_ASCII_RANGE option is turned on.
-                            \w, \d, \s and POSIX brackes doesn't match
+                            \w, \d, \s and POSIX brackets doesn't match
                             non-ASCII characters.
+                            \b and \B use the ASCII rules.
                          u: Unicode
                             ONIG_OPTION_ASCII_RANGE option is turned off.
-  (?imxau-imx:subexp)
+                            \w (\W), \d (\D), \s (\S), \b (\B) and POSIX
+                            brackets use the each encoding's rules.
+
+  (?imxdau-imx:subexp)
                      option on/off for subexp
 
   (?:subexp)         not captured group
@@ -412,6 +422,9 @@ A-1. Syntax depend options
    + ONIG_SYNTAX_PERL, ONIG_SYNTAX_JAVA and ONIG_SYNTAX_PYTHON
      (?s): dot(.) match newline
      (?m): ^ match after newline, $ match before newline
+
+   + ONIG_SYNTAX_PERL
+     (?d), (?l): same as (?u)
 
 
 A-2. Original extensions

@@ -3,7 +3,7 @@
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
+ * Copyright (c) 2011-2012  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -682,7 +682,7 @@ onig_names_free(regex_t* reg)
 }
 
 static NameEntry*
-name_find(regex_t* reg, UChar* name, UChar* name_end)
+name_find(regex_t* reg, const UChar* name, const UChar* name_end)
 {
   int i, len;
   NameEntry* e;
@@ -786,10 +786,12 @@ name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
     }
     else if (t->num == t->alloc) {
       int i;
+      NameEntry* p;
 
       alloc = t->alloc * 2;
-      t->e = (NameEntry* )xrealloc(t->e, sizeof(NameEntry) * alloc);
-      CHECK_NULL_RETURN_MEMERR(t->e);
+      p = (NameEntry* )xrealloc(t->e, sizeof(NameEntry) * alloc);
+      CHECK_NULL_RETURN_MEMERR(p);
+      t->e = p;
       t->alloc = alloc;
 
     clear:
@@ -831,9 +833,11 @@ name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
     }
     else {
       if (e->back_num > e->back_alloc) {
+	int* p;
 	alloc = e->back_alloc * 2;
-	e->back_refs = (int* )xrealloc(e->back_refs, sizeof(int) * alloc);
-	CHECK_NULL_RETURN_MEMERR(e->back_refs);
+	p = (int* )xrealloc(e->back_refs, sizeof(int) * alloc);
+	CHECK_NULL_RETURN_MEMERR(p);
+	e->back_refs = p;
 	e->back_alloc = alloc;
       }
       e->back_refs[e->back_num - 1] = backref;
@@ -4793,8 +4797,10 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
       if (ONIGENC_IS_CODE_NEWLINE(env->enc, NEWLINE_CODE)) {
         if (ONIGENC_CODE_TO_MBCLEN(env->enc, NEWLINE_CODE) == 1)
           BITSET_SET_BIT_CHKDUP(cc->bs, NEWLINE_CODE);
-        else
-          add_code_range(&(cc->mbuf), env, NEWLINE_CODE, NEWLINE_CODE);
+        else {
+          r = add_code_range(&(cc->mbuf), env, NEWLINE_CODE, NEWLINE_CODE);
+          if (r < 0) goto err;
+        }
       }
     }
   }

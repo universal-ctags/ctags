@@ -3,7 +3,7 @@
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
+ * Copyright (c) 2011-2012  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -3371,8 +3371,12 @@ update_string_node_case_fold(regex_t* reg, Node *node)
     q = buf;
     for (i = 0; i < len; i++) {
       if (sp >= ebuf) {
-	sbuf = (UChar* )xrealloc(sbuf, sbuf_size * 2);
-	CHECK_NULL_RETURN_MEMERR(sbuf);
+	UChar* p = (UChar* )xrealloc(sbuf, sbuf_size * 2);
+	if (IS_NULL(p)) {
+	  xfree(sbuf);
+	  return ONIGERR_MEMORY;
+	}
+	sbuf = p;
 	sp = sbuf + sbuf_size;
 	sbuf_size *= 2;
 	ebuf = sbuf + sbuf_size;
