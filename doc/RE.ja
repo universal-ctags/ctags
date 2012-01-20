@@ -1,4 +1,4 @@
-鬼雲 (鬼車改) 正規表現 Version 5.12.0    2011/12/12
+鬼雲 (鬼車改) 正規表現 Version 5.13.0    2012/01/19
 
 使用文法: ONIG_SYNTAX_RUBY (既定値)
 
@@ -215,26 +215,36 @@
       word     Letter | Mark | Decimal_Number | Connector_Punctuation
 
 
-    ASCII外の文字を含むかどうかは ONIG_OPTION_ASCII_RANGE オプションに
-    依存する。このオプションは ONIG_SYNTAX_RUBY では有効化されているが、
-    ONIG_SYNTAX_PERL では無効化されている。
+    POSIXブラケットがASCII外の文字にマッチするかどうかは
+    ONIG_OPTION_ASCII_RANGEオプションとONIG_OPTION_POSIX_BRACKET_ALL_RANGE
+    オプションに依存する。
 
 
 
 7. 拡張式集合
 
   (?#...)           注釈
-  (?imxau-imx)      孤立オプション
+  (?imxdau-imx)     孤立オプション
                       i: 大文字小文字照合
                       m: 複数行
                       x: 拡張形式
+
+                     文字集合オプション (文字範囲オプション)
+                      d: デフォルト (Ruby 1.9.3 互換)
+                         \w, \d, \s は、非ASCII文字にマッチしない。
+                         \b, \B, POSIXブラケットは、各エンコーディングの
+                         ルールに従う。
                       a: ASCII
                          ONIG_OPTION_ASCII_RANGEオプションがオンになる。
                          \w, \d, \s, POSIXブラケットは、非ASCII文字に
                          マッチしない。
+                         \b, \B は、ASCIIのルールに従う。
                       u: Unicode
                          ONIG_OPTION_ASCII_RANGEオプションがオフになる。
-  (?imxau-imx:式)   式オプション
+                         \w (\W), \d (\D), \s (\S), \b (\B), POSIXブラケット
+                         は、各エンコーディングのルールに従う。
+
+  (?imxdau-imx:式)  式オプション
 
   (式)              捕獲式集合
   (?:式)            非捕獲式集合
@@ -415,6 +425,9 @@
    + ONIG_SYNTAX_PERL、ONIG_SYNTAX_JAVA、ONIG_SYNTAX_PYTHON
      (?s): 終止符記号(.)は改行と照合成功
      (?m): ^ は改行の直後に照合する、$ は改行の直前に照合する
+
+   + ONIG_SYNTAX_PERL
+     (?d), (?l): (?u)と同じ
 
 
 補記 2. 独自拡張機能
