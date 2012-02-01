@@ -26,6 +26,7 @@ SOURCES = \
 	flex.c \
 	fortran.c \
 	get.c \
+	go.c \
 	html.c \
 	jscript.c \
 	keyword.c \
@@ -90,6 +91,7 @@ OBJECTS = \
 	flex.$(OBJEXT) \
 	fortran.$(OBJEXT) \
 	get.$(OBJEXT) \
+	go.$(OBJEXT) \
 	html.$(OBJEXT) \
 	jscript.$(OBJEXT) \
 	keyword.$(OBJEXT) \

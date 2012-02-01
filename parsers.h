@@ -30,9 +30,10 @@
 	DosBatchParser, \
 	EiffelParser, \
 	ErlangParser, \
-        FalconParser, \
+	FalconParser, \
 	FlexParser, \
 	FortranParser, \
+	GoParser, \
 	HtmlParser, \
 	JavaParser, \
 	JavaScriptParser, \
