@@ -1,5 +1,10 @@
 History of Onigmo (Oniguruma-mod)
 
+2012/02/05: Version 5.13.1
+
+2012/02/04: [spec] allow \b and \B in look-behind.
+2012/02/01: [new]  support for Unicode 6.1.
+
 2012/01/20: Version 5.13.0
 
 2012/01/17: [bug]  memory leak occurs when xrealloc fails.
