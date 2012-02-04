@@ -926,6 +926,8 @@ def main():
     n("(?<=(?<!A)B)C", "ABC")
     n("(?i)(?<!aa|b)c", "Aac")
     n("(?i)(?<!b|aa)c", "Aac")
+    x2("(?<=\\babc)d", " abcd", 4, 5)
+    x2("(?<=\\Babc)d", "aabcd", 4, 5)
     x2("a\\b?a", "aa", 0, 2)
     x2("[^x]*x", "aaax", 0, 4)
     x2("(?i)[\\x{0}-B]+", "\x00\x01\x02\x1f\x20@AaBbC", 0, 10)
