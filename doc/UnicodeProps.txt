@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Unicode Properties  Version 5.12.0    2011/12/12
+Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
 
 * POSIX brackets
     Alpha
@@ -75,6 +75,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.12.0    2011/12/12
     Buhid
     Canadian_Aboriginal
     Carian
+    Chakma
     Cham
     Cherokee
     Common
@@ -119,6 +120,9 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.12.0    2011/12/12
     Malayalam
     Mandaic
     Meetei_Mayek
+    Meroitic_Cursive
+    Meroitic_Hieroglyphs
+    Miao
     Mongolian
     Myanmar
     New_Tai_Lue
@@ -137,8 +141,10 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.12.0    2011/12/12
     Runic
     Samaritan
     Saurashtra
+    Sharada
     Shavian
     Sinhala
+    Sora_Sompeng
     Sundanese
     Syloti_Nagri
     Syriac
@@ -147,6 +153,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.12.0    2011/12/12
     Tai_Le
     Tai_Tham
     Tai_Viet
+    Takri
     Tamil
     Telugu
     Thaana
@@ -407,6 +414,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.12.0    2011/12/12
     Age=5.1
     Age=5.2
     Age=6.0
+    Age=6.1
 
 * Blocks
     In_Basic_Latin
@@ -428,6 +436,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.12.0    2011/12/12
     In_NKo
     In_Samaritan
     In_Mandaic
+    In_Arabic_Extended_A
     In_Devanagari
     In_Bengali
     In_Gurmukhi
@@ -468,6 +477,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.12.0    2011/12/12
     In_Batak
     In_Lepcha
     In_Ol_Chiki
+    In_Sundanese_Supplement
     In_Vedic_Extensions
     In_Phonetic_Extensions
     In_Phonetic_Extensions_Supplement
@@ -543,6 +553,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.12.0    2011/12/12
     In_Cham
     In_Myanmar_Extended_A
     In_Tai_Viet
+    In_Meetei_Mayek_Extensions
     In_Ethiopic_Extended_A
     In_Meetei_Mayek
     In_Hangul_Syllables
@@ -581,6 +592,8 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.12.0    2011/12/12
     In_Imperial_Aramaic
     In_Phoenician
     In_Lydian
+    In_Meroitic_Hieroglyphs
+    In_Meroitic_Cursive
     In_Kharoshthi
     In_Old_South_Arabian
     In_Avestan
@@ -590,10 +603,15 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.12.0    2011/12/12
     In_Rumi_Numeral_Symbols
     In_Brahmi
     In_Kaithi
+    In_Sora_Sompeng
+    In_Chakma
+    In_Sharada
+    In_Takri
     In_Cuneiform
     In_Cuneiform_Numbers_and_Punctuation
     In_Egyptian_Hieroglyphs
     In_Bamum_Supplement
+    In_Miao
     In_Kana_Supplement
     In_Byzantine_Musical_Symbols
     In_Musical_Symbols
@@ -601,6 +619,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.12.0    2011/12/12
     In_Tai_Xuan_Jing_Symbols
     In_Counting_Rod_Numerals
     In_Mathematical_Alphanumeric_Symbols
+    In_Arabic_Mathematical_Alphabetic_Symbols
     In_Mahjong_Tiles
     In_Domino_Tiles
     In_Playing_Cards
