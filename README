@@ -29,7 +29,7 @@ Main New features:
 New Source Files:
   enc/cp932.c                   CP932 encoding.
   enc/unicode/casefold.h        Unicode case folding data.
-  enc/unicode/name2ctype.h      Unicode propeties data.
+  enc/unicode/name2ctype.h      Unicode properties data.
 
   onig.py                       onig.dll/libonig.so loader.
   testpy.py                     test program.
