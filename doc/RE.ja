@@ -325,6 +325,10 @@
     \k<n-level>     (n >= 1)
     \k'n+level'     (n >= 1)
     \k'n-level'     (n >= 1)
+    \k<-n+level>    (n >= 1)
+    \k<-n-level>    (n >= 1)
+    \k'-n+level'    (n >= 1)
+    \k'-n-level'    (n >= 1)
 
     \k<name+level>
     \k<name-level>
