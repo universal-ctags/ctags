@@ -125,9 +125,9 @@ end
 
 def parse_scripts(data, categories)
   files = [
-    {fn: 'DerivedCoreProperties.txt', title: 'Derived Property'},
-    {fn: 'Scripts.txt', title: 'Script'},
-    {fn: 'PropList.txt', title: 'Binary Property'}
+    {:fn => 'DerivedCoreProperties.txt', :title => 'Derived Property'},
+    {:fn => 'Scripts.txt', :title => 'Script'},
+    {:fn => 'PropList.txt', :title => 'Binary Property'}
   ]
   current = nil
   cps = []
@@ -139,7 +139,7 @@ def parse_scripts(data, categories)
         categories[current] = file[:title]
         (names[file[:title]] ||= []) << current
         cps = []
-      elsif /^(\h+)(?:..(\h+))?\s*;\s*(\w+)/ =~ line
+      elsif /^([0-9a-fA-F]+)(?:..([0-9a-fA-F]+))?\s*;\s*(\w+)/ =~ line
         current = $3
         $2 ? cps.concat(($1.to_i(16)..$2.to_i(16)).to_a) : cps.push($1.to_i(16))
       end
@@ -194,7 +194,7 @@ def parse_age(data)
       ages << current
       last_constname = constname
       cps = []
-    elsif /^(\h+)(?:..(\h+))?\s*;\s*(\d+\.\d+)/ =~ line
+    elsif /^([0-9a-fA-F]+)(?:..([0-9a-fA-F]+))?\s*;\s*(\d+\.\d+)/ =~ line
       current = $3
       $2 ? cps.concat(($1.to_i(16)..$2.to_i(16)).to_a) : cps.push($1.to_i(16))
     end
@@ -208,7 +208,7 @@ def parse_block(data)
   cps = []
   blocks = []
   IO.foreach(get_file('Blocks.txt')) do |line|
-    if /^(\h+)\.\.(\h+);\s*(.*)/ =~ line
+    if /^([0-9a-fA-F]+)\.\.([0-9a-fA-F]+);\s*(.*)/ =~ line
       cps = ($1.to_i(16)..$2.to_i(16)).to_a
       constname = constantize_blockname($3)
       data[constname] = cps
@@ -231,7 +231,7 @@ $const_cache = {}
 # the group
 def make_const(prop, data, name)
   puts "\n/* '#{prop}': #{name} */"
-  if origprop = $const_cache.key(data)
+  if origprop = $const_cache.index(data)
     puts "#define CR_#{prop} CR_#{origprop}"
   else
     $const_cache[prop] = data
