@@ -7,6 +7,7 @@ History of Onigmo (Oniguruma-mod)
 
 2012/01/20: Version 5.13.0
 
+2012/01/20: [dist] update LTVERSION to "5:0:0".
 2012/01/17: [bug]  memory leak occurs when xrealloc fails.
 2012/01/15: [bug]  Calling function "add_code_range" without checking return
                    value.
@@ -36,6 +37,7 @@ History of Onigmo (Oniguruma-mod)
 
 2011/12/12: Version 5.12.0
 
+2011/12/12: [dist] update LTVERSION to "4:0:0".
 2011/12/11: [impl] use ONIGENC_IS_UNICODE to check if the encoding is Unicode
                    encoding.
 2011/12/10: [new]  support for Unicode 6.0.
@@ -52,6 +54,7 @@ History of Onigmo (Oniguruma-mod)
 
 2011/10/16: Version 5.11.4
 
+2011/10/16: [dist] update LTVERSION to "3:0:2".
 2011/10/15: [tune] optimize Sunday's quick search.
 2011/10/07: [API]  add ONIG_OPTION_DOTALL option as an alias of
                    ONIG_OPTION_MULTILINE.
@@ -65,6 +68,7 @@ History of Onigmo (Oniguruma-mod)
 
 2011/09/18: Version 5.11.3
 
+2011/09/18: [dist] update LTVERSION to "3:0:1".
 2011/09/18: [spec] \R matches \x85, \x2028 and \x2029 in Unicode encodings.
 2011/09/18: [new]  add ONIG_OPTION_NEWLINE_CRLF.
 2011/09/18: [tune] optimize \x{}.
@@ -92,6 +96,7 @@ History of Onigmo (Oniguruma-mod)
 
 2011/09/03: Version 5.11.0
 
+2011/09/03: [dist] update LTVERSION to "3:0:0".
 2011/09/01: [new]  add OnigPosition.
 2011/09/01: [new]  (thanks h-tom)
                    support for x64.
