@@ -1717,7 +1717,7 @@ static int
 add_code_range_to_buf(BBuf** pbuf, OnigCodePoint from, OnigCodePoint to)
 {
   int r, inc_n, pos;
-  int low, high, bound, x;
+  OnigCodePoint low, high, bound, x;
   OnigCodePoint n, *data;
   BBuf* bbuf;
 
@@ -3166,7 +3166,6 @@ fetch_named_backref_token(OnigCodePoint c, OnigToken* tok, UChar** src,
 			  UChar* end, ScanEnv* env)
 {
   int r, num;
-  OnigEncoding enc = env->enc;
   OnigSyntaxType* syn = env->syntax;
   UChar* prev;
   UChar* p = *src;
