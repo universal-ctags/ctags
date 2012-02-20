@@ -1772,7 +1772,7 @@ add_code_range_to_buf(BBuf** pbuf, OnigCodePoint from, OnigCodePoint to)
     int to_pos   = SIZE_CODE_POINT * (1 + (low + 1) * 2);
 
     if (inc_n > 0) {
-      if ((OnigCodePoint )high < n) {
+      if (high < n) {
 	int size = (n - high) * 2 * SIZE_CODE_POINT;
 	BBUF_MOVE_RIGHT(bbuf, from_pos, to_pos, size);
       }
