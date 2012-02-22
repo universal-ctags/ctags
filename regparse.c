@@ -1738,7 +1738,7 @@ add_code_range_to_buf0(BBuf** pbuf, ScanEnv* env, OnigCodePoint from, OnigCodePo
 	int checkdup)
 {
   int r, inc_n, pos;
-  int low, high, bound, x;
+  OnigCodePoint low, high, bound, x;
   OnigCodePoint n, *data;
   BBuf* bbuf;
 
@@ -1794,7 +1794,7 @@ add_code_range_to_buf0(BBuf** pbuf, ScanEnv* env, OnigCodePoint from, OnigCodePo
     int to_pos   = SIZE_CODE_POINT * (1 + (low + 1) * 2);
 
     if (inc_n > 0) {
-      if ((OnigCodePoint )high < n) {
+      if (high < n) {
 	int size = (n - high) * 2 * SIZE_CODE_POINT;
 	BBUF_MOVE_RIGHT(bbuf, from_pos, to_pos, size);
       }
@@ -3239,7 +3239,6 @@ fetch_named_backref_token(OnigCodePoint c, OnigToken* tok, UChar** src,
 			  UChar* end, ScanEnv* env)
 {
   int r, num;
-  OnigEncoding enc = env->enc;
   const OnigSyntaxType* syn = env->syntax;
   UChar* prev;
   UChar* p = *src;
@@ -3683,7 +3682,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	  cnext = PPEEK;
 	  if (cnext == '0') {
 	    PINC;
-	    if (PPEEK_IS(get_name_end_code_point(c))) {  // \g<0>, \g'0'
+	    if (PPEEK_IS(get_name_end_code_point(c))) {  /* \g<0>, \g'0' */
 	      PINC;
 	      name_end = p;
 	      gnum = 0;
