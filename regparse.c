@@ -5423,36 +5423,44 @@ i_apply_case_fold(OnigCodePoint from, OnigCodePoint to[],
   ScanEnv* env;
   CClassNode* cc;
   BitSetRef bs;
+  int add_flag;
 
   iarg = (IApplyCaseFoldArg* )arg;
   env = iarg->env;
   cc  = iarg->cc;
   bs = cc->bs;
+  add_flag = (ONIGENC_IS_ASCII_CODE(from) == ONIGENC_IS_ASCII_CODE(*to));
 
   if (to_len == 1) {
     int is_in = onig_is_code_in_cc(env->enc, from, cc);
 #ifdef CASE_FOLD_IS_APPLIED_INSIDE_NEGATIVE_CCLASS
     if ((is_in != 0 && !IS_NCCLASS_NOT(cc)) ||
 	(is_in == 0 &&  IS_NCCLASS_NOT(cc))) {
-      if (ONIGENC_MBC_MINLEN(env->enc) > 1 || *to >= SINGLE_BYTE_SIZE) {
-	add_code_range(&(cc->mbuf), env, *to, *to);
-      }
-      else {
-	BITSET_SET_BIT(bs, *to);
+      if (add_flag) {
+	if (ONIGENC_MBC_MINLEN(env->enc) > 1 || *to >= SINGLE_BYTE_SIZE) {
+	  add_code_range(&(cc->mbuf), env, *to, *to);
+	}
+	else {
+	  BITSET_SET_BIT(bs, *to);
+	}
       }
     }
 #else
     if (is_in != 0) {
       if (ONIGENC_MBC_MINLEN(env->enc) > 1 || *to >= SINGLE_BYTE_SIZE) {
 	if (IS_NCCLASS_NOT(cc)) clear_not_flag_cclass(cc, env->enc);
-	add_code_range(&(cc->mbuf), env, *to, *to);
+	if (add_flag)
+	  add_code_range(&(cc->mbuf), env, *to, *to);
       }
       else {
 	if (IS_NCCLASS_NOT(cc)) {
-	  BITSET_CLEAR_BIT(bs, *to);
+	  if (add_flag)
+	    BITSET_CLEAR_BIT(bs, *to);
 	}
-	else
-	  BITSET_SET_BIT(bs, *to);
+	else {
+	  if (add_flag)
+	    BITSET_SET_BIT(bs, *to);
+	}
       }
     }
 #endif /* CASE_FOLD_IS_APPLIED_INSIDE_NEGATIVE_CCLASS */
