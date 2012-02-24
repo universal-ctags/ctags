@@ -2228,3 +2228,8 @@ static const CaseUnfold_13_Type CaseUnfold_13[] = {
  { {0x03c5, 0x0313, 0x0342}, {1, {0x1f56 }}},
  { {0x03c9, 0x0342, 0x03b9}, {1, {0x1ff7 }}},
 };
+
+#define FOLD_TABLE_SIZE		1357
+#define UNFOLD1_TABLE_SIZE	1207
+#define UNFOLD2_TABLE_SIZE	88
+#define UNFOLD3_TABLE_SIZE	23

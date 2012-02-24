@@ -122,6 +122,15 @@ def print_case_folding_data(filename):
         print(" }}},")
     print("};")
     
+    # table sizes
+    fold_table_size = len(fold) + len(fold_locale)
+    print("#define FOLD_TABLE_SIZE\t\t%d" % int(fold_table_size * 1.2))
+    unfold1_table_size = len(unfold[0]) + len(unfold_locale[0])
+    print("#define UNFOLD1_TABLE_SIZE\t%d" % int(unfold1_table_size * 1.2))
+    unfold2_table_size = len(unfold[1]) + len(unfold_locale[1])
+    print("#define UNFOLD2_TABLE_SIZE\t%d" % int(unfold2_table_size * 1.5))
+    unfold3_table_size = len(unfold[2])
+    print("#define UNFOLD3_TABLE_SIZE\t%d" % int(unfold3_table_size * 1.7))
 
 def main():
     filename = 'CaseFolding.txt'
