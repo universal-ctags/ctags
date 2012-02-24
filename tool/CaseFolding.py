@@ -10,8 +10,8 @@ import sys
 import re
 
 def print_case_folding_data(filename):
-    pattern = re.compile("([0-9A-Z]{4,6}); ([CFT]); " +
-            "([0-9A-Z]{4,6})(?: ([0-9A-Z]{4,6}))?(?: ([0-9A-Z]{4,6}))?;")
+    pattern = re.compile("([0-9A-F]{4,6}); ([CFT]); " +
+            "([0-9A-F]{4,6})(?: ([0-9A-F]{4,6}))?(?: ([0-9A-F]{4,6}))?;")
     
     fold = {}
     unfold = [{}, {}, {}]
