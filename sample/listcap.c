@@ -8,7 +8,8 @@
 #include "oniguruma.h"
 
 static int
-node_callback(int group, int beg, int end, int level, int at, void* arg)
+node_callback(int group, OnigPosition beg, OnigPosition end, int level,
+	      int at, void* arg)
 {
   int i;
 
@@ -19,7 +20,7 @@ node_callback(int group, int beg, int end, int level, int at, void* arg)
   for (i = 0; i < level * 2; i++)
     fputc(' ', stderr);
 
-  fprintf(stderr, "%d: (%d-%d)\n", group, beg, end);
+  fprintf(stderr, "%d: (%ld-%ld)\n", group, beg, end);
   return 0;
 }
 
@@ -56,7 +57,7 @@ extern int ex(unsigned char* str, unsigned char* pattern,
 
     fprintf(stderr, "match at %d\n", r);
     for (i = 0; i < region->num_regs; i++) {
-      fprintf(stderr, "%d: (%d-%d)\n", i, region->beg[i], region->end[i]);
+      fprintf(stderr, "%d: (%ld-%ld)\n", i, region->beg[i], region->end[i]);
     }
     fprintf(stderr, "\n");
 

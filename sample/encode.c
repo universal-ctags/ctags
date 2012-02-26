@@ -22,7 +22,7 @@ search(regex_t* reg, unsigned char* str, unsigned char* end)
     fprintf(stderr, "match at %d  (%s)\n", r,
             ONIGENC_NAME(onig_get_encoding(reg)));
     for (i = 0; i < region->num_regs; i++) {
-      fprintf(stderr, "%d: (%d-%d)\n", i, region->beg[i], region->end[i]);
+      fprintf(stderr, "%d: (%ld-%ld)\n", i, region->beg[i], region->end[i]);
     }
   }
   else if (r == ONIG_MISMATCH) {
