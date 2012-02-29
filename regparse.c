@@ -5643,7 +5643,7 @@ is_onechar_cclass(CClassNode* cc, OnigCodePoint* code)
   }
   if (j >= 0) {
     /* only one char found in the bitset, calculate the code point. */
-    c = BITS_IN_ROOM * j + (countbits(b2 - 1) & 0x1f);
+    c = BITS_IN_ROOM * j + countbits(b2 - 1);
   }
   *code = c;
   return 1;
