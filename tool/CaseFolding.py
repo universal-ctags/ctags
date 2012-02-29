@@ -61,14 +61,14 @@ def print_case_folding_data(filename):
     # CaseFold
     print("static const CaseFold_11_Type CaseFold[] = {")
     for k, v in sorted(fold.items()):
-        sv = ", ".join(["0x%04x" % i for i in v])
+        sv = ", ".join("0x%04x" % i for i in v)
         print(" { 0x%04x, {%d, {%s}}}," % (k, len(v), sv))
     print("};\n")
     
     # CaseFold_Locale
     print("static const CaseFold_11_Type CaseFold_Locale[] = {")
     for k, v in sorted(fold_locale.items()):
-        sv = ", ".join(["0x%04x" % i for i in v])
+        sv = ", ".join("0x%04x" % i for i in v)
         print(" { 0x%04x, {%d, {%s}}}," % (k, len(v), sv))
     print("};\n")
     
@@ -77,38 +77,38 @@ def print_case_folding_data(filename):
     # CaseUnfold_11
     print("static const CaseUnfold_11_Type CaseUnfold_11[] = {")
     for k, v in sorted(unfold[0].items()):
-        sv = ", ".join(["0x%04x" % i for i in v])
+        sv = ", ".join("0x%04x" % i for i in v)
         print(" { 0x%04x, {%d, {%s }}}," % (k[0], len(v), sv))
     print("};\n")
     
     # CaseUnfold_11_Locale
     print("static const CaseUnfold_11_Type CaseUnfold_11_Locale[] = {")
     for k, v in sorted(unfold_locale[0].items()):
-        sv = ", ".join(["0x%04x" % i for i in v])
+        sv = ", ".join("0x%04x" % i for i in v)
         print(" { 0x%04x, {%d, {%s }}}," % (k[0], len(v), sv))
     print("};\n")
     
     # CaseUnfold_12
     print("static const CaseUnfold_12_Type CaseUnfold_12[] = {")
     for k, v in sorted(unfold[1].items()):
-        sk = ", ".join(["0x%04x" % i for i in k])
-        sv = ", ".join(["0x%04x" % i for i in v])
+        sk = ", ".join("0x%04x" % i for i in k)
+        sv = ", ".join("0x%04x" % i for i in v)
         print(" { {%s}, {%d, {%s }}}," % (sk, len(v), sv))
     print("};\n")
     
     # CaseUnfold_12_Locale
     print("static const CaseUnfold_12_Type CaseUnfold_12_Locale[] = {")
     for k, v in sorted(unfold_locale[1].items()):
-        sk = ", ".join(["0x%04x" % i for i in k])
-        sv = ", ".join(["0x%04x" % i for i in v])
+        sk = ", ".join("0x%04x" % i for i in k)
+        sv = ", ".join("0x%04x" % i for i in v)
         print(" { {%s}, {%d, {%s }}}," % (sk, len(v), sv))
     print("};\n")
     
     # CaseUnfold_13
     print("static const CaseUnfold_13_Type CaseUnfold_13[] = {")
     for k, v in sorted(unfold[2].items()):
-        sk = ", ".join(["0x%04x" % i for i in k])
-        sv = ", ".join(["0x%04x" % i for i in v])
+        sk = ", ".join("0x%04x" % i for i in k)
+        sv = ", ".join("0x%04x" % i for i in v)
         print(" { {%s}, {%d, {%s }}}," % (sk, len(v), sv))
     print("};\n")
     
