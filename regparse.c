@@ -5665,7 +5665,7 @@ parse_exp(Node** np, OnigToken* tok, int term,
   switch (tok->type) {
   case TK_ALT:
   case TK_EOT:
-    end_of_token:
+  end_of_token:
     *np = node_new_empty();
     return tok->type;
     break;
