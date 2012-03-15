@@ -4930,6 +4930,8 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	  num = backs[0];       /* XXX: use left most named group as Perl */
 	}
 #endif
+	else
+	  return ONIGERR_INVALID_CONDITION_PATTERN;
 	*np = node_new_enclose(ENCLOSE_CONDITION);
 	CHECK_NULL_RETURN_MEMERR(*np);
 	NENCLOSE(*np)->regnum = num;
