@@ -5892,7 +5892,8 @@ parse_exp(Node** np, OnigToken* tok, int term,
             *np = node_new_cclass();
             CHECK_NULL_RETURN_MEMERR(*np);
             cc = NCCLASS(*np);
-            add_ctype_to_cc(cc, tok->u.prop.ctype, 0, 0, env);
+            r = add_ctype_to_cc(cc, tok->u.prop.ctype, 0, 0, env);
+	    if (r != 0) return r;
             if (tok->u.prop.not != 0) NCCLASS_SET_NOT(cc);
 #ifdef USE_SHARED_CCLASS_TABLE
           }
