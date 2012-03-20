@@ -1,5 +1,19 @@
 History of Onigmo (Oniguruma-mod)
 
+2012/02/29: [bug]  unexpected match occurs when a char class contains no char.
+2012/02/25: [impl] CaseFolding.py: fix regexp.
+2012/02/25: [impl] define the sizes of case folding tables in casefold.h.
+2012/02/24: [dist] fix samples to support x64.
+                   NOTE: This is a preliminary fix.
+2012/02/23: [impl] merge Ruby r34730.
+                   don't use // comment.
+2012/02/20: [impl] merge Ruby r34684, r34688 and r34692.
+                   fix-up warnings.
+2012/02/17: [dist] (thanks NARUSE, Yui)
+                   tool/enc-unicode.rb: Don't use \h to work with Ruby 1.8.
+2012/02/14: [spec] relative group reference in back reference with nest level
+                   is allowed.
+
 2012/02/05: Version 5.13.1
 
 2012/02/04: [spec] allow \b and \B in look-behind.
