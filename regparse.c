@@ -5923,6 +5923,7 @@ parse_exp(Node** np, OnigToken* tok, int term,
 
       cc = NCCLASS(*np);
       if (is_onechar_cclass(cc, &code)) {
+	onig_node_free(*np);
 	*np = node_new_empty();
 	CHECK_NULL_RETURN_MEMERR(*np);
 	r = node_str_cat_codepoint(*np, env->enc, code);
