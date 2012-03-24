@@ -4477,7 +4477,7 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
 	UChar* psave = p;
 	int i, base = tok->base;
 
-	buf[0] = tok->u.c;
+	buf[0] = (UChar )tok->u.c;
 	for (i = 1; i < ONIGENC_MBC_MAXLEN(env->enc); i++) {
 	  r = fetch_token_in_cc(tok, &p, end, env);
 	  if (r < 0) goto err;
@@ -4485,7 +4485,7 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
 	    fetched = 1;
 	    break;
 	  }
-	  buf[i] = tok->u.c;
+	  buf[i] = (UChar )tok->u.c;
 	}
 
 	if (i < ONIGENC_MBC_MINLEN(env->enc)) {

@@ -420,7 +420,7 @@ typedef struct _BBuf {
 #define BBUF_WRITE1(buf,pos,byte) do{\
   int used = (pos) + 1;\
   if ((buf)->alloc < (unsigned int )used) BBUF_EXPAND((buf),used);\
-  (buf)->p[(pos)] = (byte);\
+  (buf)->p[(pos)] = (UChar )(byte);\
   if ((buf)->used < (unsigned int )used) (buf)->used = used;\
 } while (0)
 
