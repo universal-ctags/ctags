@@ -368,7 +368,7 @@ typedef Bits*          BitSetRef;
 
 #define BITSET_CLEAR(bs) do {\
   int i;\
-  for (i = 0; i < (int )BITSET_SIZE; i++) { (bs)[i] = 0; }	\
+  for (i = 0; i < BITSET_SIZE; i++) { (bs)[i] = 0; }	\
 } while (0)
 
 #define BS_ROOM(bs,pos)            (bs)[(int )(pos) / BITS_IN_ROOM]

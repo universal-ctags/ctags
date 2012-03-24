@@ -149,7 +149,7 @@ bbuf_clone(BBuf** rto, BBuf* from)
 #define BITSET_IS_EMPTY(bs,empty) do {\
   int i;\
   empty = 1;\
-  for (i = 0; i < (int )BITSET_SIZE; i++) {\
+  for (i = 0; i < BITSET_SIZE; i++) {\
     if ((bs)[i] != 0) {\
       empty = 0; break;\
     }\
@@ -178,35 +178,35 @@ static void
 bitset_invert(BitSetRef bs)
 {
   int i;
-  for (i = 0; i < (int )BITSET_SIZE; i++) { bs[i] = ~(bs[i]); }
+  for (i = 0; i < BITSET_SIZE; i++) { bs[i] = ~(bs[i]); }
 }
 
 static void
 bitset_invert_to(BitSetRef from, BitSetRef to)
 {
   int i;
-  for (i = 0; i < (int )BITSET_SIZE; i++) { to[i] = ~(from[i]); }
+  for (i = 0; i < BITSET_SIZE; i++) { to[i] = ~(from[i]); }
 }
 
 static void
 bitset_and(BitSetRef dest, BitSetRef bs)
 {
   int i;
-  for (i = 0; i < (int )BITSET_SIZE; i++) { dest[i] &= bs[i]; }
+  for (i = 0; i < BITSET_SIZE; i++) { dest[i] &= bs[i]; }
 }
 
 static void
 bitset_or(BitSetRef dest, BitSetRef bs)
 {
   int i;
-  for (i = 0; i < (int )BITSET_SIZE; i++) { dest[i] |= bs[i]; }
+  for (i = 0; i < BITSET_SIZE; i++) { dest[i] |= bs[i]; }
 }
 
 static void
 bitset_copy(BitSetRef dest, BitSetRef bs)
 {
   int i;
-  for (i = 0; i < (int )BITSET_SIZE; i++) { dest[i] = bs[i]; }
+  for (i = 0; i < BITSET_SIZE; i++) { dest[i] = bs[i]; }
 }
 
 extern int
@@ -5628,7 +5628,7 @@ is_onechar_cclass(CClassNode* cc, OnigCodePoint* code)
   }
 
   /* check bitset */
-  for (i = 0; i < (int )BITSET_SIZE; i++) {
+  for (i = 0; i < BITSET_SIZE; i++) {
     b1 = cc->bs[i];
     if (b1 != 0) {
       if (((b1 & (b1 - 1)) == 0) && (found == 0)) {
