@@ -9,6 +9,7 @@ ctags-@VERSION@ (@DATE@)
 * Fixed Verilog parameter parsing, contributed by Nicolas Vincent [Verilog, Patch #2747828].
 * Fixed error when parsing empty file [OCaml].
 * Fixed problem detecting function definitions using circumflexes for MS.NET managed types. [C++]
+* Fixed bug caused by use of strlen() where strings overlapped.
 * Enabled Large File System support. [Bug #3062068]
 
 ctags-5.8 (09 Jul 2009)
