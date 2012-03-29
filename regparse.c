@@ -156,7 +156,7 @@ bbuf_clone(BBuf** rto, BBuf* from)
 #define BITSET_IS_EMPTY(bs,empty) do {\
   int i;\
   empty = 1;\
-  for (i = 0; i < (int )BITSET_SIZE; i++) {\
+  for (i = 0; i < BITSET_SIZE; i++) {\
     if ((bs)[i] != 0) {\
       empty = 0; break;\
     }\
@@ -185,35 +185,35 @@ static void
 bitset_invert(BitSetRef bs)
 {
   int i;
-  for (i = 0; i < (int )BITSET_SIZE; i++) { bs[i] = ~(bs[i]); }
+  for (i = 0; i < BITSET_SIZE; i++) { bs[i] = ~(bs[i]); }
 }
 
 static void
 bitset_invert_to(BitSetRef from, BitSetRef to)
 {
   int i;
-  for (i = 0; i < (int )BITSET_SIZE; i++) { to[i] = ~(from[i]); }
+  for (i = 0; i < BITSET_SIZE; i++) { to[i] = ~(from[i]); }
 }
 
 static void
 bitset_and(BitSetRef dest, BitSetRef bs)
 {
   int i;
-  for (i = 0; i < (int )BITSET_SIZE; i++) { dest[i] &= bs[i]; }
+  for (i = 0; i < BITSET_SIZE; i++) { dest[i] &= bs[i]; }
 }
 
 static void
 bitset_or(BitSetRef dest, BitSetRef bs)
 {
   int i;
-  for (i = 0; i < (int )BITSET_SIZE; i++) { dest[i] |= bs[i]; }
+  for (i = 0; i < BITSET_SIZE; i++) { dest[i] |= bs[i]; }
 }
 
 static void
 bitset_copy(BitSetRef dest, BitSetRef bs)
 {
   int i;
-  for (i = 0; i < (int )BITSET_SIZE; i++) { dest[i] = bs[i]; }
+  for (i = 0; i < BITSET_SIZE; i++) { dest[i] = bs[i]; }
 }
 
 extern int
@@ -4562,7 +4562,7 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
 	UChar* psave = p;
 	int i, base = tok->base;
 
-	buf[0] = tok->u.c;
+	buf[0] = (UChar )tok->u.c;
 	for (i = 1; i < ONIGENC_MBC_MAXLEN(env->enc); i++) {
 	  r = fetch_token_in_cc(tok, &p, end, env);
 	  if (r < 0) goto err;
@@ -4570,7 +4570,7 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
 	    fetched = 1;
 	    break;
 	  }
-	  buf[i] = tok->u.c;
+	  buf[i] = (UChar )tok->u.c;
 	}
 
 	if (i < ONIGENC_MBC_MINLEN(env->enc)) {
@@ -5713,7 +5713,7 @@ is_onechar_cclass(CClassNode* cc, OnigCodePoint* code)
   }
 
   /* check bitset */
-  for (i = 0; i < (int )BITSET_SIZE; i++) {
+  for (i = 0; i < BITSET_SIZE; i++) {
     b1 = cc->bs[i];
     if (b1 != 0) {
       if (((b1 & (b1 - 1)) == 0) && (found == 0)) {
