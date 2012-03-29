@@ -1,5 +1,23 @@
 History of Onigmo (Oniguruma-mod)
 
+2012/03/29: Version 5.13.2
+
+2012/03/24: [impl] suppress warnings.
+2012/03/24: [impl] remove unnecessary casts.
+2012/03/23: [impl] merge Ruby r35107.
+                   suppress warnings.
+2012/03/21: [bug]  memory leak occurs when char class contains only one char.
+2012/03/21: [impl] use actual type to get the size.
+                   see: http://bugs.ruby-lang.org/issues/6144
+2012/03/15: [impl] check the return code of add_ctype_to_cc().
+                   see: http://bugs.ruby-lang.org/issues/6145
+2012/03/15: [impl] fix error message.
+2012/03/15: [bug]  broken conditional expressions are allowed.
+                   see: http://bugs.ruby-lang.org/issues/6143
+2012/03/15: [impl] merge Ruby r35027.
+                   adjust style.
+2012/03/06: [impl] merge Ruby r34905.
+                   Remove unused variables.
 2012/02/29: [bug]  unexpected match occurs when a char class contains no char.
 2012/02/25: [impl] CaseFolding.py: fix regexp.
 2012/02/25: [impl] define the sizes of case folding tables in casefold.h.
