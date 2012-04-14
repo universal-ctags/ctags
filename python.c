@@ -142,7 +142,7 @@ static void makeFunctionTag (vString *const function,
 
 	tag.kindName = "function";
 	tag.kind = 'f';
-	/* tag.extensionFields.arglist = arglist; */
+	tag.extensionFields.signature = arglist;
 
 	if (vStringLength (parent) > 0)
 	{
