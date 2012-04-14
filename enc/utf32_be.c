@@ -42,11 +42,7 @@ utf32be_is_mbc_newline(const UChar* p, const UChar* end)
     if (*(p+3) == 0x0a && *(p+2) == 0 && *(p+1) == 0 && *p == 0)
       return 1;
 #ifdef USE_UNICODE_ALL_LINE_TERMINATORS
-    if ((
-#ifndef USE_CRNL_AS_LINE_TERMINATOR
-	 *(p+3) == 0x0d ||
-#endif
-	 *(p+3) == 0x85)
+    if ((*(p+3) == 0x0b || *(p+3) == 0x0c || *(p+3) == 0x0d || *(p+3) == 0x85)
 	&& *(p+2) == 0 && *(p+1) == 0 && *p == 0x00)
       return 1;
     if (*(p+2) == 0x20 && (*(p+3) == 0x29 || *(p+3) == 0x28)
@@ -180,5 +176,6 @@ OnigEncodingType OnigEncodingUTF32_BE = {
   onigenc_unicode_is_code_ctype,
   onigenc_utf16_32_get_ctype_code_range,
   utf32be_left_adjust_char_head,
-  onigenc_always_false_is_allowed_reverse_match
+  onigenc_always_false_is_allowed_reverse_match,
+  ONIGENC_FLAG_UNICODE,
 };

@@ -1,4 +1,4 @@
-Onigmo インターフェース Version 5.11.0   2011/09/03
+Onigmo インターフェース Version 5.11.4   2011/10/08
 
 #include <oniguruma.h>
 
@@ -65,7 +65,8 @@ Onigmo インターフェース Version 5.11.0   2011/09/03
 
       ONIG_OPTION_NONE               オプションなし
       ONIG_OPTION_SINGLELINE         '^' -> '\A', '$' -> '\Z'
-      ONIG_OPTION_MULTILINE          '.'が改行にマッチする
+      ONIG_OPTION_DOTALL             '.'が改行にマッチする
+      ONIG_OPTION_MULTILINE          ONIG_OPTION_DOTALLと同じ
       ONIG_OPTION_IGNORECASE         曖昧マッチ オン
       ONIG_OPTION_EXTEND             パターン拡張形式
       ONIG_OPTION_FIND_LONGEST       最長マッチ
@@ -78,6 +79,12 @@ Onigmo インターフェース Version 5.11.0   2011/09/03
 
       ONIG_OPTION_DONT_CAPTURE_GROUP 名前付き捕獲式集合のみ捕獲
       ONIG_OPTION_CAPTURE_GROUP      名前無し捕獲式集合も捕獲
+
+      ONIG_OPTION_NEWLINE_CRLF
+            CR+LFも改行として扱う。(デフォルトではLFのみ。)
+            この機能を使うには、regenc.hの以下の行を有効にする必要がある。
+
+            /* #define USE_CRNL_AS_LINE_TERMINATOR */
 
   5 enc:        文字エンコーディング
 
@@ -518,7 +525,7 @@ Onigmo インターフェース Version 5.11.0   2011/09/03
   1 syntax: 正規表現パターン文法
 
 
-# void onig_copy_syntax(OnigSyntaxType* to, OnigSyntaxType* from)
+# void onig_copy_syntax(OnigSyntaxType* to, const OnigSyntaxType* from)
 
   正規表現パターン文法をコピーする。
 

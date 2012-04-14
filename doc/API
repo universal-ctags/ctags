@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) API  Version 5.11.0  2011/09/03
+Onigmo (Oniguruma-mod) API  Version 5.11.4  2011/10/08
 
 #include <oniguruma.h>
 
@@ -64,7 +64,8 @@ Onigmo (Oniguruma-mod) API  Version 5.11.0  2011/09/03
 
       ONIG_OPTION_NONE               no option
       ONIG_OPTION_SINGLELINE         '^' -> '\A', '$' -> '\Z'
-      ONIG_OPTION_MULTILINE          '.' match with newline
+      ONIG_OPTION_DOTALL             '.' match with newline
+      ONIG_OPTION_MULTILINE          same as ONIG_OPTION_DOTALL
       ONIG_OPTION_IGNORECASE         ambiguity match on
       ONIG_OPTION_EXTEND             extended pattern form
       ONIG_OPTION_FIND_LONGEST       find longest match
@@ -77,6 +78,12 @@ Onigmo (Oniguruma-mod) API  Version 5.11.0  2011/09/03
 
       ONIG_OPTION_DONT_CAPTURE_GROUP only named group captured.
       ONIG_OPTION_CAPTURE_GROUP      named and no-named group captured.
+
+      ONIG_OPTION_NEWLINE_CRLF
+            Treat CR+LF as a newline too. (default: LF only)
+            To use this option, you must enable the following line in regenc.h.
+
+            /* #define USE_CRNL_AS_LINE_TERMINATOR */
 
   5 enc:        character encoding.
 
@@ -511,7 +518,7 @@ Onigmo (Oniguruma-mod) API  Version 5.11.0  2011/09/03
   1 syntax: address of pattern syntax definition.
 
 
-# void onig_copy_syntax(OnigSyntaxType* to, OnigSyntaxType* from)
+# void onig_copy_syntax(OnigSyntaxType* to, const OnigSyntaxType* from)
 
   Copy syntax.
 

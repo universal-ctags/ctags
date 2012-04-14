@@ -72,9 +72,7 @@ is_mbc_newline(const UChar* p, const UChar* end)
     if (*p == 0x0a) return 1;
 
 #ifdef USE_UNICODE_ALL_LINE_TERMINATORS
-#ifndef USE_CRNL_AS_LINE_TERMINATOR
-    if (*p == 0x0d) return 1;
-#endif
+    if (*p == 0x0b || *p == 0x0c || *p == 0x0d) return 1;
     if (p + 1 < end) {
       if (*(p+1) == 0x85 && *p == 0xc2) /* U+0085 */
 	return 1;
@@ -96,7 +94,7 @@ mbc_to_code(const UChar* p, const UChar* end ARG_UNUSED)
   int c, len;
   OnigCodePoint n;
 
-  len = enclen(ONIG_ENCODING_UTF8, p);
+  len = mbc_enc_len(p);
   c = *p++;
   if (len > 1) {
     len--;
@@ -230,7 +228,7 @@ is_mbc_ambiguous(OnigCaseFoldType flag, const UChar** pp, const UChar* end)
     return ONIGENC_IS_ASCII_CODE_CASE_AMBIG(*p);
   }
   else {
-    (*pp) += enclen(ONIG_ENCODING_UTF8, p);
+    (*pp) += mbc_enc_len(p);
 
     if (*p == 0xc3) {
       int c = *(p + 1);
@@ -301,5 +299,6 @@ OnigEncodingType OnigEncodingUTF8 = {
   onigenc_unicode_is_code_ctype,
   get_ctype_code_range,
   left_adjust_char_head,
-  onigenc_always_true_is_allowed_reverse_match
+  onigenc_always_true_is_allowed_reverse_match,
+  ONIGENC_FLAG_UNICODE,
 };

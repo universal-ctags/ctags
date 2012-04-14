@@ -104,10 +104,10 @@ typedef struct {
 } PosixBracketEntryType;
 
 
-/* #define USE_CRNL_AS_LINE_TERMINATOR */
+#define USE_CRNL_AS_LINE_TERMINATOR
 #define USE_UNICODE_PROPERTIES
 /* #define USE_UNICODE_CASE_FOLD_TURKISH_AZERI */
-/* #define USE_UNICODE_ALL_LINE_TERMINATORS */  /* see Unicode.org UTF#18 */
+/* #define USE_UNICODE_ALL_LINE_TERMINATORS */  /* see Unicode.org UTS #18 */
 
 
 #define ONIG_ENCODING_INIT_DEFAULT           ONIG_ENCODING_ASCII
@@ -167,6 +167,8 @@ ONIG_EXTERN const UChar OnigEncISO_8859_1_ToUpperCaseTable[];
 
 ONIG_EXTERN int
 onigenc_with_ascii_strncmp P_((OnigEncoding enc, const UChar* p, const UChar* end, const UChar* sascii /* ascii */, int n));
+ONIG_EXTERN int
+onigenc_with_ascii_strnicmp P_((OnigEncoding enc, const UChar* p, const UChar* end, const UChar* sascii /* ascii */, int n));
 ONIG_EXTERN UChar*
 onigenc_step P_((OnigEncoding enc, const UChar* p, const UChar* end, int n));
 

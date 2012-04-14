@@ -5,7 +5,7 @@
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
+ * Copyright (c) 2011-2012  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,6 @@
 #endif
 
 #if defined(__i386) || defined(__i386__) || defined(_M_IX86) || \
-    (defined(__ppc__) && defined(__APPLE__)) || \
     defined(__x86_64) || defined(__x86_64__) || defined(_M_AMD86) || \
     defined(__mc68020__)
 #define PLATFORM_UNALIGNED_WORD_ACCESS
@@ -75,6 +74,7 @@
 #define USE_QTFR_PEEK_NEXT
 #define USE_ST_LIBRARY
 #define USE_SHARED_CCLASS_TABLE
+#define USE_SUNDAY_QUICK_SEARCH
 
 #define INIT_MATCH_STACK_SIZE                     160
 #define DEFAULT_MATCH_STACK_LIMIT_SIZE              0 /* unlimited */
@@ -244,6 +244,8 @@ typedef unsigned int uintptr_t;
 #define CHECK_NULL_RETURN_MEMERR(p)   if (IS_NULL(p)) return ONIGERR_MEMORY
 #define NULL_UCHARP                   ((UChar* )0)
 
+#define ONIG_LAST_CODE_POINT    (~((OnigCodePoint )0))
+
 #ifdef PLATFORM_UNALIGNED_WORD_ACCESS
 
 #define PLATFORM_GET_INC(val,p,type) do{\
@@ -283,9 +285,11 @@ typedef unsigned int uintptr_t;
 #define ONIG_OPTIMIZE_NONE              0
 #define ONIG_OPTIMIZE_EXACT             1   /* Slow Search */
 #define ONIG_OPTIMIZE_EXACT_BM          2   /* Boyer Moore Search */
-#define ONIG_OPTIMIZE_EXACT_BM_NOT_REV  3   /* BM   (but not simple match) */
+#define ONIG_OPTIMIZE_EXACT_BM_NOT_REV  3   /* BM (applied to a multibyte string) */
 #define ONIG_OPTIMIZE_EXACT_IC          4   /* Slow Search (ignore case) */
 #define ONIG_OPTIMIZE_MAP               5   /* char map */
+#define ONIG_OPTIMIZE_EXACT_BM_IC         6 /* BM (ignore case) */
+#define ONIG_OPTIMIZE_EXACT_BM_NOT_REV_IC 7 /* BM (applied to a multibyte string) (ignore case) */
 
 /* bit status */
 typedef unsigned int  BitStatusType;
@@ -329,6 +333,9 @@ typedef unsigned int  BitStatusType;
 #define IS_NOTEOL(option)         ((option) & ONIG_OPTION_NOTEOL)
 #define IS_POSIX_REGION(option)   ((option) & ONIG_OPTION_POSIX_REGION)
 #define IS_ASCII_RANGE(option)    ((option) & ONIG_OPTION_ASCII_RANGE)
+#define IS_POSIX_BRACKET_ALL_RANGE(option)  ((option) & ONIG_OPTION_POSIX_BRACKET_ALL_RANGE)
+#define IS_WORD_BOUND_ALL_RANGE(option)     ((option) & ONIG_OPTION_WORD_BOUND_ALL_RANGE)
+#define IS_NEWLINE_CRLF(option)   ((option) & ONIG_OPTION_NEWLINE_CRLF)
 
 /* OP_SET_OPTION is required for these options.
 #define IS_DYNAMIC_OPTION(option) \
@@ -346,7 +353,7 @@ typedef unsigned int  BitStatusType;
 /* bitset */
 #define BITS_PER_BYTE      8
 #define SINGLE_BYTE_SIZE   (1 << BITS_PER_BYTE)
-#define BITS_IN_ROOM       (sizeof(Bits) * BITS_PER_BYTE)
+#define BITS_IN_ROOM       ((int )sizeof(Bits) * BITS_PER_BYTE)
 #define BITSET_SIZE        (SINGLE_BYTE_SIZE / BITS_IN_ROOM)
 
 #ifdef PLATFORM_UNALIGNED_WORD_ACCESS
@@ -361,11 +368,11 @@ typedef Bits*          BitSetRef;
 
 #define BITSET_CLEAR(bs) do {\
   int i;\
-  for (i = 0; i < (int )BITSET_SIZE; i++) { (bs)[i] = 0; }	\
+  for (i = 0; i < BITSET_SIZE; i++) { (bs)[i] = 0; }	\
 } while (0)
 
-#define BS_ROOM(bs,pos)            (bs)[pos / BITS_IN_ROOM]
-#define BS_BIT(pos)                (1 << (pos % BITS_IN_ROOM))
+#define BS_ROOM(bs,pos)            (bs)[(int )(pos) / BITS_IN_ROOM]
+#define BS_BIT(pos)                (1 << ((int )(pos) % BITS_IN_ROOM))
 
 #define BITSET_AT(bs, pos)         (BS_ROOM(bs,pos) & BS_BIT(pos))
 #define BITSET_SET_BIT(bs, pos)     BS_ROOM(bs,pos) |= BS_BIT(pos)
@@ -413,7 +420,7 @@ typedef struct _BBuf {
 #define BBUF_WRITE1(buf,pos,byte) do{\
   int used = (pos) + 1;\
   if ((buf)->alloc < (unsigned int )used) BBUF_EXPAND((buf),used);\
-  (buf)->p[(pos)] = (byte);\
+  (buf)->p[(pos)] = (UChar )(byte);\
   if ((buf)->used < (unsigned int )used) (buf)->used = used;\
 } while (0)
 
@@ -530,6 +537,7 @@ enum OpCode {
   OP_END_LINE,
   OP_SEMI_END_BUF,
   OP_BEGIN_POSITION,
+  OP_BEGIN_POS_OR_LINE,   /* used for implicit anchor optimization */
 
   OP_BACKREF1,
   OP_BACKREF2,
@@ -853,5 +861,8 @@ extern int onigenc_property_list_add_property P_((UChar* name, const OnigCodePoi
 typedef int (*ONIGENC_INIT_PROPERTY_LIST_FUNC_TYPE)(void);
 
 extern int onigenc_property_list_init P_((ONIGENC_INIT_PROPERTY_LIST_FUNC_TYPE));
+
+extern size_t onig_memsize P_((const regex_t *reg));
+extern size_t onig_region_memsize P_((const struct re_registers *regs));
 
 #endif /* REGINT_H */

@@ -1,4 +1,4 @@
-FAQ    2007/07/23
+FAQ    2011/09/18
 
 1. 最長マッチ
 
@@ -11,7 +11,7 @@ FAQ    2007/07/23
    スレッドセーフにするには、以下の(A)と(B)のどちらかを行なえば
    よい。
 
-   (A) Oniguruma Layer
+   (A) Onigmo Layer
 
        oniguruma/regint.hの中の以下のマクロを定義する。
 
@@ -39,14 +39,15 @@ FAQ    2007/07/23
 
    DOSの改行(CR(0x0c) + LF(0x0a)の連続)
 
-   regenc.hの中の、以下の部分を有効にする。
+   regenc.hの中の、以下の部分を有効にし、onig_new()で
+   ONIG_OPTION_NEWLINE_CRLFオプションを使用する。
 
      /* #define USE_CRNL_AS_LINE_TERMINATOR */
 
 
 4. メーリングリスト
 
-   鬼車に関するメーリングリストは存在しない。
+   鬼雲/鬼車に関するメーリングリストは存在しない。
 
 //END
 

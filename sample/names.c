@@ -19,7 +19,7 @@ name_callback(const UChar* name, const UChar* name_end,
     ref = onig_name_to_backref_number(reg, name, name_end, region);
     s = (ref == gn ? "*" : "");
     fprintf(stderr, "%s (%d): ", name, gn);
-    fprintf(stderr, "(%d-%d) %s\n", region->beg[gn], region->end[gn], s);
+    fprintf(stderr, "(%ld-%ld) %s\n", region->beg[gn], region->end[gn], s);
   }
   return 0;  /* 0: continue */
 }

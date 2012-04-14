@@ -116,7 +116,7 @@ onig_error_code_to_format(OnigPosition code)
   case ONIGERR_INVALID_REPEAT_RANGE_PATTERN:
     p = "invalid repeat range {lower,upper}"; break;
   case ONIGERR_INVALID_CONDITION_PATTERN:
-    p = "invalid condition pattern"; break;
+    p = "invalid conditional pattern"; break;
   case ONIGERR_TOO_BIG_NUMBER:
     p = "too big number"; break;
   case ONIGERR_TOO_BIG_NUMBER_FOR_REPEAT_RANGE:
@@ -143,6 +143,8 @@ onig_error_code_to_format(OnigPosition code)
     p = "numbered backref/call is not allowed. (use name)"; break;
   case ONIGERR_TOO_BIG_WIDE_CHAR_VALUE:
     p = "too big wide-char value"; break;
+  case ONIGERR_TOO_SHORT_DIGITS:
+    p = "too short digits"; break;
   case ONIGERR_TOO_LONG_WIDE_CHAR_VALUE:
     p = "too long wide-char value"; break;
   case ONIGERR_INVALID_CODE_POINT_VALUE:

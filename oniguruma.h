@@ -5,7 +5,7 @@
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2009  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
+ * Copyright (c) 2011-2012  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,8 @@ extern "C" {
 
 #define ONIGURUMA
 #define ONIGURUMA_VERSION_MAJOR   5
-#define ONIGURUMA_VERSION_MINOR   11
-#define ONIGURUMA_VERSION_TEENY   0
+#define ONIGURUMA_VERSION_MINOR   13
+#define ONIGURUMA_VERSION_TEENY   2
 
 #ifdef __cplusplus
 # ifndef  HAVE_PROTOTYPES
@@ -163,6 +163,7 @@ typedef struct OnigEncodingTypeST {
   int    (*get_ctype_code_range)(OnigCtype ctype, OnigCodePoint* sb_out, const OnigCodePoint* ranges[]);
   OnigUChar* (*left_adjust_char_head)(const OnigUChar* start, const OnigUChar* p);
   int    (*is_allowed_reverse_match)(const OnigUChar* p, const OnigUChar* end);
+  unsigned int  flags;
 } OnigEncodingType;
 
 typedef OnigEncodingType* OnigEncoding;
@@ -259,6 +260,10 @@ ONIG_EXTERN OnigEncodingType OnigEncodingGB18030;
 #define ONIGENC_CTYPE_ASCII    14
 #define ONIGENC_MAX_STD_CTYPE  ONIGENC_CTYPE_ASCII
 
+/* flags */
+#define ONIGENC_FLAG_NONE       0U
+#define ONIGENC_FLAG_UNICODE    1U
+
 
 #define onig_enc_len(enc,p,end)        ONIGENC_MBC_ENC_LEN(enc,p)
 
@@ -272,6 +277,7 @@ ONIG_EXTERN OnigEncodingType OnigEncodingGB18030;
 #define ONIGENC_IS_MBC_ASCII_WORD(enc,s,end) \
    onigenc_ascii_is_code_ctype( \
 	ONIGENC_MBC_TO_CODE(enc,s,end),ONIGENC_CTYPE_WORD)
+#define ONIGENC_IS_UNICODE(enc)        ((enc)->flags & ONIGENC_FLAG_UNICODE)
 
 
 #define ONIGENC_NAME(enc)                      ((enc)->name)
@@ -383,6 +389,7 @@ typedef unsigned int        OnigOptionType;
 #define ONIG_OPTION_IGNORECASE           1U
 #define ONIG_OPTION_EXTEND               (ONIG_OPTION_IGNORECASE         << 1)
 #define ONIG_OPTION_MULTILINE            (ONIG_OPTION_EXTEND             << 1)
+#define ONIG_OPTION_DOTALL                ONIG_OPTION_MULTILINE
 #define ONIG_OPTION_SINGLELINE           (ONIG_OPTION_MULTILINE          << 1)
 #define ONIG_OPTION_FIND_LONGEST         (ONIG_OPTION_SINGLELINE         << 1)
 #define ONIG_OPTION_FIND_NOT_EMPTY       (ONIG_OPTION_FIND_LONGEST       << 1)
@@ -394,8 +401,12 @@ typedef unsigned int        OnigOptionType;
 #define ONIG_OPTION_NOTEOL               (ONIG_OPTION_NOTBOL << 1)
 #define ONIG_OPTION_POSIX_REGION         (ONIG_OPTION_NOTEOL << 1)
 /* options (ctype range) */
-#define ONIG_OPTION_ASCII_RANGE          (ONIG_OPTION_POSIX_REGION    << 1)
-#define ONIG_OPTION_MAXBIT               ONIG_OPTION_ASCII_RANGE  /* limit */
+#define ONIG_OPTION_ASCII_RANGE          (ONIG_OPTION_POSIX_REGION << 1)
+#define ONIG_OPTION_POSIX_BRACKET_ALL_RANGE (ONIG_OPTION_ASCII_RANGE << 1)
+#define ONIG_OPTION_WORD_BOUND_ALL_RANGE    (ONIG_OPTION_POSIX_BRACKET_ALL_RANGE << 1)
+/* options (newline) */
+#define ONIG_OPTION_NEWLINE_CRLF         (ONIG_OPTION_WORD_BOUND_ALL_RANGE << 1)
+#define ONIG_OPTION_MAXBIT               ONIG_OPTION_NEWLINE_CRLF  /* limit */
 
 #define ONIG_OPTION_ON(options,regopt)      ((options) |= (regopt))
 #define ONIG_OPTION_OFF(options,regopt)     ((options) &= ~(regopt))
@@ -478,7 +489,7 @@ ONIG_EXTERN OnigSyntaxType*   OnigDefaultSyntax;
 #define ONIG_SYN_OP2_ESC_CAPITAL_Q_QUOTE        (1U<<0)  /* \Q...\E */
 #define ONIG_SYN_OP2_QMARK_GROUP_EFFECT         (1U<<1)  /* (?...) */
 #define ONIG_SYN_OP2_OPTION_PERL                (1U<<2)  /* (?imsxadlu), (?-imsx), (?^imsxalu) */
-#define ONIG_SYN_OP2_OPTION_RUBY                (1U<<3)  /* (?imx), (?-imx)  */
+#define ONIG_SYN_OP2_OPTION_RUBY                (1U<<3)  /* (?imxadu), (?-imx)  */
 #define ONIG_SYN_OP2_PLUS_POSSESSIVE_REPEAT     (1U<<4)  /* ?+,*+,++ */
 #define ONIG_SYN_OP2_PLUS_POSSESSIVE_INTERVAL   (1U<<5)  /* {n,m}+   */
 #define ONIG_SYN_OP2_CCLASS_SET_OP              (1U<<6)  /* [...&&..[..]..] */
@@ -497,13 +508,13 @@ ONIG_EXTERN OnigSyntaxType*   OnigDefaultSyntax;
 #define ONIG_SYN_OP2_ESC_H_XDIGIT               (1U<<19) /* \h, \H */
 #define ONIG_SYN_OP2_INEFFECTIVE_ESCAPE         (1U<<20) /* \ */
 #define ONIG_SYN_OP2_ESC_CAPITAL_R_LINEBREAK    (1U<<21) /* \R as (?>\x0D\x0A|[\x0A-\x0D\x{85}\x{2028}\x{2029}]) */
-#define ONIG_SYN_OP2_ESC_CAPITAL_X_EXTENDED_GRAPHEME_CLUSTER (1U<<22) /* \X as (?:\P{M}\p{M}*) */
+#define ONIG_SYN_OP2_ESC_CAPITAL_X_EXTENDED_GRAPHEME_CLUSTER (1U<<22) /* \X as (?>\P{M}\p{M}*) */
 #define ONIG_SYN_OP2_ESC_V_VERTICAL_WHITESPACE   (1U<<23) /* \v, \V -- Perl */ /* NOTIMPL */
 #define ONIG_SYN_OP2_ESC_H_HORIZONTAL_WHITESPACE (1U<<24) /* \h, \H -- Perl */ /* NOTIMPL */
 #define ONIG_SYN_OP2_ESC_CAPITAL_K_KEEP         (1U<<25) /* \K */
 #define ONIG_SYN_OP2_ESC_G_BRACE_BACKREF        (1U<<26) /* \g{name}, \g{n} */
 #define ONIG_SYN_OP2_QMARK_SUBEXP_CALL          (1U<<27) /* (?&name), (?n), (?R), (?0) */
-#define ONIG_SYN_OP2_QMARK_BAR_BRANCH_RESET     (1U<<28) /* (?|...) */         /* NOTIMPL */
+#define ONIG_SYN_OP2_QMARK_VBAR_BRANCH_RESET    (1U<<28) /* (?|...) */         /* NOTIMPL */
 #define ONIG_SYN_OP2_QMARK_LPAREN_CONDITION     (1U<<29) /* (?(cond)yes...|no...) */
 #define ONIG_SYN_OP2_QMARK_CAPITAL_P_NAMED_GROUP (1U<<30) /* (?P<name>...), (?P=name), (?P>name) -- Python/PCRE */
 #define ONIG_SYN_OP2_OPTION_JAVA                (1U<<31) /* (?idmsux), (?-idmsux) */ /* NOTIMPL */
@@ -595,6 +606,7 @@ ONIG_EXTERN OnigSyntaxType*   OnigDefaultSyntax;
 #define ONIGERR_TOO_BIG_BACKREF_NUMBER                       -207
 #define ONIGERR_INVALID_BACKREF                              -208
 #define ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED         -209
+#define ONIGERR_TOO_SHORT_DIGITS                             -210
 #define ONIGERR_TOO_LONG_WIDE_CHAR_VALUE                     -212
 #define ONIGERR_EMPTY_GROUP_NAME                             -214
 #define ONIGERR_INVALID_GROUP_NAME                           -215

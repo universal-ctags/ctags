@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Regular Expressions Version 5.10.6    2011/08/09
+Onigmo (Oniguruma-mod) Regular Expressions Version 5.13.0    2012/01/19
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -95,26 +95,16 @@ syntax: ONIG_SYNTAX_RUBY (default)
        Hiragana, Katakana, Han, Latin, Greek, Cyrillic
 
      + works on UTF8, UTF16, UTF32
-       Any, Assigned, C, Cc, Cf, Cn, Co, Cs, L, Ll, Lm, Lo, Lt, Lu,
-       M, Mc, Me, Mn, N, Nd, Nl, No, P, Pc, Pd, Pe, Pf, Pi, Po, Ps,
-       S, Sc, Sk, Sm, So, Z, Zl, Zp, Zs, 
-       Arabic, Armenian, Bengali, Bopomofo, Braille, Buginese,
-       Buhid, Canadian_Aboriginal, Cherokee, Common, Coptic,
-       Cypriot, Cyrillic, Deseret, Devanagari, Ethiopic, Georgian,
-       Glagolitic, Gothic, Greek, Gujarati, Gurmukhi, Han, Hangul,
-       Hanunoo, Hebrew, Hiragana, Inherited, Kannada, Katakana,
-       Kharoshthi, Khmer, Lao, Latin, Limbu, Linear_B, Malayalam,
-       Mongolian, Myanmar, New_Tai_Lue, Ogham, Old_Italic, Old_Persian,
-       Oriya, Osmanya, Runic, Shavian, Sinhala, Syloti_Nagri, Syriac,
-       Tagalog, Tagbanwa, Tai_Le, Tamil, Telugu, Thaana, Thai, Tibetan,
-       Tifinagh, Ugaritic, Yi
+       see UnicodeProps.txt
 
 
   \R       Linebreak
-           (?>\x0D\x0A|[\x0A-\x0D])
 
-           If USE_UNICODE_ALL_LINE_TERMINATORS is defined in regenc.h:
+           Unicode:
              (?>\x0D\x0A|[\x0A-\x0D\x{85}\x{2028}\x{2029}])
+
+           Not Unicode:
+             (?>\x0D\x0A|[\x0A-\x0D])
 
   \X       eXtended grapheme cluster
 
@@ -194,9 +184,9 @@ syntax: ONIG_SYNTAX_RUBY (default)
       blank    \t, \x20
       cntrl
       digit    0-9
-      graph    include all of multibyte encoded characters
+      graph    \x21-\x7E and all of multibyte encoded characters
       lower
-      print    include all of multibyte encoded characters
+      print    \x20-\x7E and all of multibyte encoded characters
       punct
       space    \t, \n, \v, \f, \r, \x20
       upper
@@ -214,7 +204,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
       digit    Decimal_Number
       graph    [[:^space:]] && ^Control && ^Unassigned && ^Surrogate
       lower    Lowercase_Letter
-      print    [[:graph:]] | [[:space:]]
+      print    [[:graph:]] | Space_Separator
       punct    Connector_Punctuation | Dash_Punctuation | Close_Punctuation |
                Final_Punctuation | Initial_Punctuation | Other_Punctuation |
                Open_Punctuation
@@ -226,9 +216,9 @@ syntax: ONIG_SYNTAX_RUBY (default)
       word     Letter | Mark | Decimal_Number | Connector_Punctuation
 
 
-    It depends on ONIG_OPTION_ASCII_RANGE option that non-ASCII char
-    includes or not. ONIG_SYNTAX_RUBY includes this option and
-    ONIG_SYNTAX_PERL doesn't.
+    It depends on ONIG_OPTION_ASCII_RANGE option and
+    ONIG_OPTION_POSIX_BRACKET_ALL_RANGE option that POSIX brackets
+    match non-ASCII char or not.
 
 
 
@@ -236,11 +226,28 @@ syntax: ONIG_SYNTAX_RUBY (default)
 
   (?#...)            comment
 
-  (?imx-imx)         option on/off
+  (?imxdau-imx)      option on/off
                          i: ignore case
                          m: multi-line (dot(.) match newline)
                          x: extended form
-  (?imx-imx:subexp)  option on/off for subexp
+
+                       character set option (character range option)
+                         d: Default (compatible with Ruby 1.9.3)
+                            \w, \d and \s doesn't match non-ASCII characters.
+                            \b, \B and POSIX brackets use the each encoding's
+                            rules.
+                         a: ASCII
+                            ONIG_OPTION_ASCII_RANGE option is turned on.
+                            \w, \d, \s and POSIX brackets doesn't match
+                            non-ASCII characters.
+                            \b and \B use the ASCII rules.
+                         u: Unicode
+                            ONIG_OPTION_ASCII_RANGE option is turned off.
+                            \w (\W), \d (\D), \s (\S), \b (\B) and POSIX
+                            brackets use the each encoding's rules.
+
+  (?imxdau-imx:subexp)
+                     option on/off for subexp
 
   (?:subexp)         not captured group
   (subexp)           captured group
@@ -320,6 +327,10 @@ syntax: ONIG_SYNTAX_RUBY (default)
     \k<n-level>     (n >= 1)
     \k'n+level'     (n >= 1)
     \k'n-level'     (n >= 1)
+    \k<-n+level>    (n >= 1)
+    \k<-n-level>    (n >= 1)
+    \k'-n+level'    (n >= 1)
+    \k'-n-level'    (n >= 1)
 
     \k<name+level>
     \k<name-level>
@@ -415,6 +426,9 @@ A-1. Syntax depend options
    + ONIG_SYNTAX_PERL, ONIG_SYNTAX_JAVA and ONIG_SYNTAX_PYTHON
      (?s): dot(.) match newline
      (?m): ^ match after newline, $ match before newline
+
+   + ONIG_SYNTAX_PERL
+     (?d), (?l): same as (?u)
 
 
 A-2. Original extensions

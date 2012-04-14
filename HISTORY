@@ -1,7 +1,134 @@
 History of Onigmo (Oniguruma-mod)
 
+2012/03/29: Version 5.13.2
+
+2012/03/24: [impl] suppress warnings.
+2012/03/24: [impl] remove unnecessary casts.
+2012/03/23: [impl] merge Ruby r35107.
+                   suppress warnings.
+2012/03/21: [bug]  memory leak occurs when char class contains only one char.
+2012/03/21: [impl] use actual type to get the size.
+                   see: http://bugs.ruby-lang.org/issues/6144
+2012/03/15: [impl] check the return code of add_ctype_to_cc().
+                   see: http://bugs.ruby-lang.org/issues/6145
+2012/03/15: [impl] fix error message.
+2012/03/15: [bug]  broken conditional expressions are allowed.
+                   see: http://bugs.ruby-lang.org/issues/6143
+2012/03/15: [impl] merge Ruby r35027.
+                   adjust style.
+2012/03/06: [impl] merge Ruby r34905.
+                   Remove unused variables.
+2012/02/29: [bug]  unexpected match occurs when a char class contains no char.
+2012/02/25: [impl] CaseFolding.py: fix regexp.
+2012/02/25: [impl] define the sizes of case folding tables in casefold.h.
+2012/02/24: [dist] fix samples to support x64.
+                   NOTE: This is a preliminary fix.
+2012/02/23: [impl] merge Ruby r34730.
+                   don't use // comment.
+2012/02/20: [impl] merge Ruby r34684, r34688 and r34692.
+                   fix-up warnings.
+2012/02/17: [dist] (thanks NARUSE, Yui)
+                   tool/enc-unicode.rb: Don't use \h to work with Ruby 1.8.
+2012/02/14: [spec] relative group reference in back reference with nest level
+                   is allowed.
+
+2012/02/05: Version 5.13.1
+
+2012/02/04: [spec] allow \b and \B in look-behind.
+2012/02/01: [new]  support for Unicode 6.1.
+
+2012/01/20: Version 5.13.0
+
+2012/01/20: [dist] update LTVERSION to "5:0:0".
+2012/01/17: [bug]  memory leak occurs when xrealloc fails.
+2012/01/15: [bug]  Calling function "add_code_range" without checking return
+                   value.
+2012/01/12: [bug]  testpy.py: error messages are not displayed when Python 2.x
+                   is used.
+2012/01/11: [bug]  memory leak occurs when history_tree_add_child fails.
+2012/01/11: [bug]  (thanks Masashi Tsuji)
+                   OnigCaptureTreeNode memory leak.
+2012/01/09: [spec] ONIG_OPTION_ASCII_RANGE should be enabled in
+                   ONIG_SYNTAX_JAVA.
+2012/01/09: [new]  support for Ruby 1.9.3 compatible \b, \B and POSIX brackets.
+                   add ONIG_OPTION_WORD_BOUND_ALL_RANGE and
+                   ONIG_OPTION_POSIX_BRACKET_ALL_RANGE.
+                   remove ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE.
+2011/12/31: [bug]  /^ss$/i doesn't match "\x{DF}".
+2011/12/30: [new]  add ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE option.
+2011/12/29: [bug]  (thanks Nobuyoshi Nakada)
+                   C standard requires va_end() to be placed before return.
+                   quote macro expansions.
+
+2011/12/28: Version 5.12.1
+
+2011/12/24: [new]  merge Ruby r23714, r28980 and r34050.
+                   add onig_memsize() and onig_region_memsize().
+2011/12/24: [new]  support for Python 3.x. (onig.py and testpy.py)
+2011/12/14: [bug]  testpy.py doesn't work on Ubuntu.
+
+2011/12/12: Version 5.12.0
+
+2011/12/12: [dist] update LTVERSION to "4:0:0".
+2011/12/11: [impl] use ONIGENC_IS_UNICODE to check if the encoding is Unicode
+                   encoding.
+2011/12/10: [new]  support for Unicode 6.0.
+                   new scripts, ages, blocks (\p{In_XXX}) and case foldings.
+                   tool/enc-unicode.rb is imported from Ruby 1.9.3.
+2011/12/10: [spec] \p{Print} shouldn't include newlines.
+                   \p{Print} = \p{Graph} + \p{Space_Separator}
+2011/12/10: [bug]  \p{NEWLINE} should not be allowed.
+2011/12/05: [new]  support for PyPy 1.7. (onig.py and testpy.py)
+2011/12/01: [bug]  /a{2}/i doesn't match 'AA'.
+2011/11/21: [impl] use ONIG_LAST_CODE_POINT instead of ~((OnigCodePoint )0).
+2011/11/17: [bug]  code ranges are not merged properly.
+2011/11/17: [bug]  /[\x{0}-X]/i doesn't match properly when UTF-16/32 is used.
+
+2011/10/16: Version 5.11.4
+
+2011/10/16: [dist] update LTVERSION to "3:0:2".
+2011/10/15: [tune] optimize Sunday's quick search.
+2011/10/07: [API]  add ONIG_OPTION_DOTALL option as an alias of
+                   ONIG_OPTION_MULTILINE.
+2011/10/04: [impl] add Sunday's quick search.
+                   add config USE_SUNDAY_QUICK_SEARCH.
+2011/10/04: [impl] add case-insensitive Boyer-Moore-Horspool search.
+2011/10/03: [spec] check minimum digits of hexadecimal numbers.
+                   \uHHHH should be exactly four digits.
+2011/10/03: [API]  rename ONIG_SYN_OP2_QMARK_BAR_BRANCH_RESET to
+                   ONIG_SYN_OP2_QMARK_VBAR_BRANCH_RESET.
+
+2011/09/18: Version 5.11.3
+
+2011/09/18: [dist] update LTVERSION to "3:0:1".
+2011/09/18: [spec] \R matches \x85, \x2028 and \x2029 in Unicode encodings.
+2011/09/18: [new]  add ONIG_OPTION_NEWLINE_CRLF.
+2011/09/18: [tune] optimize \x{}.
+2011/09/17: [tune] expand a{n,m} to 'a...a' + a{0,m-n}.
+2011/09/12: [bug]  /.*\Z/ doesn't match properly.
+
+2011/09/10: Version 5.11.2
+
+2011/09/09: [bug]  merge Ruby r24546.
+                   fix the first character bigger than sb_out was dropped.
+2011/09/09: [bug]  merge Ruby r19864.
+                   CCV_SB is only for single byte.
+2011/09/09: [bug]  merge Ruby r24550.
+                   fix memory leaks.
+
+2011/09/08: Version 5.11.1
+
+2011/09/08: [impl] merge some part of Ruby r29928. (update debug log.)
+2011/09/08: [impl] merge Ruby r32544.
+                   Power PC does not allow unaligned word access.
+2011/09/07: [bug]  \g<0> doesn't work when USE_PERL_SUBEXP_CALL isn't defined.
+2011/09/07: [tune] optimize character class.
+2011/09/06: [tune] optimize (?a).
+2011/09/06: [tune] optimize \R.
+
 2011/09/03: Version 5.11.0
 
+2011/09/03: [dist] update LTVERSION to "3:0:0".
 2011/09/01: [new]  add OnigPosition.
 2011/09/01: [new]  (thanks h-tom)
                    support for x64.

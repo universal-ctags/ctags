@@ -154,7 +154,7 @@ mbc_to_code(const UChar* p, const UChar* end)
   int c, i, len;
   OnigCodePoint n;
 
-  len = enclen(ONIG_ENCODING_EUC_JP, p);
+  len = mbc_enc_len(p);
   n = (OnigCodePoint )*p++;
   if (len == 1) return n;
 
@@ -205,7 +205,7 @@ code_to_mbc(OnigCodePoint code, UChar *buf)
   *p++ = (UChar )(code & 0xff);
 
 #if 1
-  if (enclen(ONIG_ENCODING_EUC_JP, buf) != (p - buf))
+  if (mbc_enc_len(buf) != (p - buf))
     return ONIGERR_INVALID_CODE_POINT_VALUE;
 #endif
   return (int )(p - buf);
@@ -323,7 +323,7 @@ left_adjust_char_head(const UChar* start, const UChar* s)
   p = s;
 
   while (!eucjp_islead(*p) && p > start) p--;
-  len = enclen(ONIG_ENCODING_EUC_JP, p);
+  len = mbc_enc_len(p);
   if (p + len > s) return (UChar* )p;
   p += len;
   return (UChar* )(p + ((s - p) & ~1));
@@ -431,12 +431,12 @@ init_property_list(void)
 {
   int r;
 
-  PROPERTY_LIST_ADD_PROP("Hiragana", CR_Hiragana);
-  PROPERTY_LIST_ADD_PROP("Katakana", CR_Katakana);
-  PROPERTY_LIST_ADD_PROP("Han", CR_Han);
-  PROPERTY_LIST_ADD_PROP("Latin", CR_Latin);
-  PROPERTY_LIST_ADD_PROP("Greek", CR_Greek);
-  PROPERTY_LIST_ADD_PROP("Cyrillic", CR_Cyrillic);
+  PROPERTY_LIST_ADD_PROP("hiragana", CR_Hiragana);
+  PROPERTY_LIST_ADD_PROP("katakana", CR_Katakana);
+  PROPERTY_LIST_ADD_PROP("han", CR_Han);
+  PROPERTY_LIST_ADD_PROP("latin", CR_Latin);
+  PROPERTY_LIST_ADD_PROP("greek", CR_Greek);
+  PROPERTY_LIST_ADD_PROP("cyrillic", CR_Cyrillic);
   PropertyInited = 1;
 
  end:
@@ -447,11 +447,17 @@ static int
 property_name_to_ctype(OnigEncoding enc, UChar* p, UChar* end)
 {
   hash_data_type ctype;
+  UChar *s, *e;
 
   PROPERTY_LIST_INIT_CHECK;
 
-  if (onig_st_lookup_strend(PropertyNameTable, p, end, &ctype) == 0) {
-    return onigenc_minimum_property_name_to_ctype(enc, p, end);
+  s = e = xalloca(end - p + 1);
+  for (; p < end; p++) {
+    *e++ = ONIGENC_ASCII_CODE_TO_LOWER_CASE(*p);
+  }
+
+  if (onig_st_lookup_strend(PropertyNameTable, s, e, &ctype) == 0) {
+    return onigenc_minimum_property_name_to_ctype(enc, s, e);
   }
 
   return (int )ctype;
@@ -520,5 +526,6 @@ OnigEncodingType OnigEncodingEUC_JP = {
   is_code_ctype,
   get_ctype_code_range,
   left_adjust_char_head,
-  is_allowed_reverse_match
+  is_allowed_reverse_match,
+  ONIGENC_FLAG_NONE,
 };

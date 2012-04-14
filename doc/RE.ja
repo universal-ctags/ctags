@@ -1,4 +1,4 @@
-鬼雲 (鬼車改) 正規表現 Version 5.10.6    2011/08/09
+鬼雲 (鬼車改) 正規表現 Version 5.13.0    2012/01/19
 
 使用文法: ONIG_SYNTAX_RUBY (既定値)
 
@@ -95,26 +95,16 @@
        Hiragana, Katakana, Han, Latin, Greek, Cyrillic
 
      + UTF8, UTF16, UTF32で有効
-       Any, Assigned, C, Cc, Cf, Cn, Co, Cs, L, Ll, Lm, Lo, Lt, Lu,
-       M, Mc, Me, Mn, N, Nd, Nl, No, P, Pc, Pd, Pe, Pf, Pi, Po, Ps,
-       S, Sc, Sk, Sm, So, Z, Zl, Zp, Zs, 
-       Arabic, Armenian, Bengali, Bopomofo, Braille, Buginese,
-       Buhid, Canadian_Aboriginal, Cherokee, Common, Coptic,
-       Cypriot, Cyrillic, Deseret, Devanagari, Ethiopic, Georgian,
-       Glagolitic, Gothic, Greek, Gujarati, Gurmukhi, Han, Hangul,
-       Hanunoo, Hebrew, Hiragana, Inherited, Kannada, Katakana,
-       Kharoshthi, Khmer, Lao, Latin, Limbu, Linear_B, Malayalam,
-       Mongolian, Myanmar, New_Tai_Lue, Ogham, Old_Italic, Old_Persian,
-       Oriya, Osmanya, Runic, Shavian, Sinhala, Syloti_Nagri, Syriac,
-       Tagalog, Tagbanwa, Tai_Le, Tamil, Telugu, Thaana, Thai, Tibetan,
-       Tifinagh, Ugaritic, Yi
+       UnicodeProps.txt 参照
 
 
   \R       改行文字 (Linebreak)
-           (?>\x0D\x0A|[\x0A-\x0D])
 
-           USE_UNICODE_ALL_LINE_TERMINATORS が regenc.h で定義されている場合:
+           Unicodeの場合:
              (?>\x0D\x0A|[\x0A-\x0D\x{85}\x{2028}\x{2029}])
+
+           Unicode以外の場合:
+             (?>\x0D\x0A|[\x0A-\x0D])
 
   \X       eXtended grapheme cluster
 
@@ -194,9 +184,9 @@
       blank    \t, \x20
       cntrl
       digit    0-9
-      graph    多バイト文字全部を含む
+      graph    \x21-\x7E および 多バイト文字全部を含む
       lower
-      print    多バイト文字全部を含む
+      print    \x20-\x7E および 多バイト文字全部を含む
       punct
       space    \t, \n, \v, \f, \r, \x20
       upper
@@ -213,7 +203,7 @@
       digit    Decimal_Number
       graph    [[:^space:]] && ^Control && ^Unassigned && ^Surrogate
       lower    Lowercase_Letter
-      print    [[:graph:]] | [[:space:]]
+      print    [[:graph:]] | Space_Separator
       punct    Connector_Punctuation | Dash_Punctuation | Close_Punctuation |
                Final_Punctuation | Initial_Punctuation | Other_Punctuation |
                Open_Punctuation
@@ -225,20 +215,36 @@
       word     Letter | Mark | Decimal_Number | Connector_Punctuation
 
 
-    ASCII外の文字を含むかどうかは ONIG_OPTION_ASCII_RANGE オプションに
-    依存する。ONIG_SYNTAX_RUBY は、このオプションを含むが ONIG_SYNTAX_PERL
-    は、このオプションを含まない。
+    POSIXブラケットがASCII外の文字にマッチするかどうかは
+    ONIG_OPTION_ASCII_RANGEオプションとONIG_OPTION_POSIX_BRACKET_ALL_RANGE
+    オプションに依存する。
 
 
 
 7. 拡張式集合
 
   (?#...)           注釈
-  (?imx-imx)        孤立オプション
+  (?imxdau-imx)     孤立オプション
                       i: 大文字小文字照合
                       m: 複数行
                       x: 拡張形式
-  (?imx-imx:式)     式オプション
+
+                     文字集合オプション (文字範囲オプション)
+                      d: デフォルト (Ruby 1.9.3 互換)
+                         \w, \d, \s は、非ASCII文字にマッチしない。
+                         \b, \B, POSIXブラケットは、各エンコーディングの
+                         ルールに従う。
+                      a: ASCII
+                         ONIG_OPTION_ASCII_RANGEオプションがオンになる。
+                         \w, \d, \s, POSIXブラケットは、非ASCII文字に
+                         マッチしない。
+                         \b, \B は、ASCIIのルールに従う。
+                      u: Unicode
+                         ONIG_OPTION_ASCII_RANGEオプションがオフになる。
+                         \w (\W), \d (\D), \s (\S), \b (\B), POSIXブラケット
+                         は、各エンコーディングのルールに従う。
+
+  (?imxdau-imx:式)  式オプション
 
   (式)              捕獲式集合
   (?:式)            非捕獲式集合
@@ -319,6 +325,10 @@
     \k<n-level>     (n >= 1)
     \k'n+level'     (n >= 1)
     \k'n-level'     (n >= 1)
+    \k<-n+level>    (n >= 1)
+    \k<-n-level>    (n >= 1)
+    \k'-n+level'    (n >= 1)
+    \k'-n-level'    (n >= 1)
 
     \k<name+level>
     \k<name-level>
@@ -419,6 +429,9 @@
    + ONIG_SYNTAX_PERL、ONIG_SYNTAX_JAVA、ONIG_SYNTAX_PYTHON
      (?s): 終止符記号(.)は改行と照合成功
      (?m): ^ は改行の直後に照合する、$ は改行の直前に照合する
+
+   + ONIG_SYNTAX_PERL
+     (?d), (?l): (?u)と同じ
 
 
 補記 2. 独自拡張機能

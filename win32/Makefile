@@ -143,7 +143,7 @@ regposerr.obj: regposerr.c $(posixheaders) config.h
 st.obj:        st.c regint.h oniguruma.h config.h st.h
 
 $(encdir)\ascii.obj:      $(encdir)\ascii.c regenc.h config.h
-$(encdir)\unicode.obj:    $(encdir)\unicode.c regint.h regenc.h config.h
+$(encdir)\unicode.obj:    $(encdir)\unicode.c regint.h regenc.h config.h $(encdir)\unicode\casefold.h $(encdir)\unicode\name2ctype.h
 $(encdir)\utf8.obj:       $(encdir)\utf8.c regenc.h config.h
 $(encdir)\utf16_be.obj:   $(encdir)\utf16_be.c regenc.h config.h
 $(encdir)\utf16_le.obj:   $(encdir)\utf16_le.c regenc.h config.h
@@ -238,3 +238,4 @@ samples: all
 	$(CC) $(CFLAGS) -I. -o sql     sample\sql.c     $(dlllib)
 	$(CC) $(CFLAGS) -I. -o encode  sample\encode.c  $(dlllib)
 	$(CC) $(CFLAGS) -I. -o syntax  sample\syntax.c  $(dlllib)
+	$(CC) $(CFLAGS) -I. -o crnl    sample\crnl.c    $(dlllib)
