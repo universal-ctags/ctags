@@ -251,7 +251,7 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
   OnigErrorInfo einfo;
   OnigSyntaxType syn = *ONIG_SYNTAX_DEFAULT;
 
-  ONIG_OPTION_OFF(syn.options, ONIG_OPTION_ASCII_RANGE);
+  /* ONIG_OPTION_OFF(syn.options, ONIG_OPTION_ASCII_RANGE); */
 
   uconv(pattern, cpat, ulen(pattern));
   uconv(str,     cstr, ulen(str));
@@ -405,7 +405,7 @@ ICV_LE.close
 
 print(<<'EOS')
   fprintf(stdout,
-       "\nRESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Oniguruma %s)\n",
+       "\nRESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)\n",
        nsucc, nfail, nerror, onig_version());
 
 #ifndef POSIX_TEST
