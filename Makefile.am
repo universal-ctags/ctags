@@ -45,6 +45,7 @@ EXTRA_DIST = .gitignore HISTORY README.ja index.html index_ja.html \
 	$(sampledir)/encode.c $(sampledir)/listcap.c $(sampledir)/names.c \
 	$(sampledir)/posix.c $(sampledir)/simple.c $(sampledir)/sql.c \
 	$(sampledir)/syntax.c $(sampledir)/crnl.c \
+	test.rb testconv.rb testconvu.rb \
 	onig.py testpy.py
 
 bin_SCRIPTS = onig-config
@@ -89,13 +90,13 @@ testcu_SOURCES = testu.c
 testcu_LDADD = libonig.la
 
 
-#testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
-#	ruby -Ke $(srcdir)/testconv.rb < $(srcdir)/test.rb > $@
+testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
+	ruby -Ke $(srcdir)/testconv.rb < $(srcdir)/test.rb > $@
 
-#testu.c: $(srcdir)/test.rb $(srcdir)/testconvu.rb
-#	ruby -Ke $(srcdir)/testconvu.rb $(srcdir)/test.rb > $@
+testu.c: $(srcdir)/test.rb $(srcdir)/testconvu.rb
+	ruby -Ke $(srcdir)/testconvu.rb $(srcdir)/test.rb > $@
 
-#win32/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
-#	ruby -Ke $(srcdir)/testconv.rb -win < $(srcdir)/test.rb | nkf -cs > $@
+win32/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
+	ruby -Ke $(srcdir)/testconv.rb -win < $(srcdir)/test.rb | nkf -cs > $@
 
 ## END OF FILE
