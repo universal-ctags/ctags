@@ -30,6 +30,14 @@
 /onig-config
 /Makefile
 /sample/Makefile
+/sample/crnl
+/sample/encode
+/sample/listcap
+/sample/names
+/sample/posix
+/sample/simple
+/sample/sql
+/sample/syntax
 /stamp-h1
 
 tags
