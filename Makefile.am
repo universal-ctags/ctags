@@ -19,6 +19,7 @@ libonig_la_SOURCES = regint.h regparse.h regenc.h st.h \
 	$(encdir)/unicode.c $(encdir)/ascii.c $(encdir)/utf8.c \
 	$(encdir)/utf16_be.c $(encdir)/utf16_le.c \
 	$(encdir)/utf32_be.c $(encdir)/utf32_le.c \
+	$(encdir)/unicode/casefold.h $(encdir)/unicode/name2ctype.h \
 	$(encdir)/euc_jp.c $(encdir)/sjis.c $(encdir)/cp932.c \
 	$(encdir)/iso8859_1.c \
 	$(encdir)/iso8859_2.c  $(encdir)/iso8859_3.c \
@@ -33,13 +34,19 @@ libonig_la_SOURCES = regint.h regparse.h regenc.h st.h \
 
 libonig_la_LDFLAGS = -version-info $(LTVERSION)
 
-EXTRA_DIST = HISTORY README.ja index.html index_ja.html \
+EXTRA_DIST = .gitignore HISTORY README.ja index.html index_ja.html \
 	doc/API doc/API.ja doc/RE doc/RE.ja doc/FAQ doc/FAQ.ja \
+	doc/UnicodeProps.txt \
+	tool/.gitignore tool/CaseFolding.py tool/convert-name2ctype.sh \
+	tool/enc-unicode.rb \
 	win32/Makefile win32/config.h win32/testc.c \
+	win32/makedef.py win32/onig.rc \
 	$(encdir)/koi8.c $(encdir)/mktable.c \
 	$(sampledir)/encode.c $(sampledir)/listcap.c $(sampledir)/names.c \
 	$(sampledir)/posix.c $(sampledir)/simple.c $(sampledir)/sql.c \
-	$(sampledir)/syntax.c
+	$(sampledir)/syntax.c $(sampledir)/crnl.c \
+	test.rb testconv.rb testconvu.rb \
+	onig.py testpy.py
 
 bin_SCRIPTS = onig-config
 
@@ -83,13 +90,13 @@ testcu_SOURCES = testu.c
 testcu_LDADD = libonig.la
 
 
-#testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
-#	ruby -Ke $(srcdir)/testconv.rb < $(srcdir)/test.rb > $@
+testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
+	ruby -Ke $(srcdir)/testconv.rb < $(srcdir)/test.rb > $@
 
-#testu.c: $(srcdir)/test.rb $(srcdir)/testconvu.rb
-#	ruby -Ke $(srcdir)/testconvu.rb $(srcdir)/test.rb > $@
+testu.c: $(srcdir)/test.rb $(srcdir)/testconvu.rb
+	ruby -Ke $(srcdir)/testconvu.rb $(srcdir)/test.rb > $@
 
-#win32/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
-#	ruby -Ke $(srcdir)/testconv.rb -win < $(srcdir)/test.rb | nkf -cs > $@
+win32/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
+	ruby -Ke $(srcdir)/testconv.rb -win < $(srcdir)/test.rb | nkf -cs > $@
 
 ## END OF FILE
