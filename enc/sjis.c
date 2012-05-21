@@ -184,6 +184,9 @@ code_to_mbclen(OnigCodePoint code)
       return 0;
   }
   else if (code <= 0xffff) {
+    int low = code & 0xff;
+    if (! SJIS_ISMB_TRAIL(low))
+      return ONIGERR_INVALID_CODE_POINT_VALUE;
     return 2;
   }
   else
