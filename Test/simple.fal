@@ -4,6 +4,8 @@
  * COMMENT
  */
 
+import from socket
+
 const CONSTANT = "1"
 
 test = "
