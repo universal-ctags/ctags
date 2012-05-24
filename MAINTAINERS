@@ -41,9 +41,9 @@ Prerequisites
     Install the Xcode developer tools, available here:
     http://developer.apple.com/tools/download/
 
-  RedHat:
+  Fedora:
 
-    up2date --nosig subversion autoheader autoconf
+    yum install subversion autoheader autoconf
 
   Windows:
 
