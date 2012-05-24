@@ -54,9 +54,7 @@ Building
 
   First time:
 
-    svn co https://ctags.svn.sourceforget.net/svnroot/ctags/trunk ctags
-    # Miss off the "/trunk" above if you want access to old releases or the
-    # web site.
+    git clone git://github.com/fishman/ctags.git    
     cd ctags
     autoheader
     autoconf
@@ -66,7 +64,7 @@ Building
   Later:
 
     cd ctags
-    svn update
+    git pull
     make -j
 
 Testing
