@@ -4,16 +4,16 @@ Exuberant Ctags. They are listed by their Github username.
 Ctags           Github            Full
 Parser          username          Name
 ----------      -----------       -----
-Ant             fishman           David Fishburn
+Ant                               David Fishburn
 AWK                               Joseph Koshy
 Basic           elias-pschernig   Elias Pschernig
 C#                                Elliott Hughes
-DosBatch        fishman           David Fishburn
+DosBatch                          David Fishburn
 Falcon          steveno           Steven Oliver
-Flex            fishman           David Fishburn
+Flex                              David Fishburn
 Java                              Elliott Hughes
-JavaScript      fishman           David Fishburn
-MATlAB          fishman           David Fishburn
+JavaScript                        David Fishburn
+MATlAB                            David Fishburn
 Objective-C                       Andrew Ruder
 OCaml                             Vincent Berthoux
 Perl                              Dmitri Tikhonov
@@ -21,9 +21,9 @@ PHP                               John Lindal
 Python          elias-pschernig   Elias Pschernig
 Ruby                              Elliott Hughes
 SML                               Joseph Koshy
-SQL             fishman           David Fishburn
-TeX             fishman           David Fishburn
-Vim             fishman           David Fishburn
+SQL                               David Fishburn
+TeX                               David Fishburn
+Vim                               David Fishburn
 All else                          Darren Hiebert
 
 How To Build & Test Like A Maintainer
