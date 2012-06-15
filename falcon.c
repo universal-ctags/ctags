@@ -19,7 +19,6 @@
 #include <string.h>
 #include <ctype.h>   
 
-#include "parse.h"
 #include "read.h"  
 
 /*
@@ -58,23 +57,9 @@ static const char *skipSpace (const char *cp)
     return cp;
 }
 
-static const char *skipString (const char *cp)
-{
-    const char *start = cp;
-    int escaped = 0;
-    
-    for (cp++; *cp; cp++)
-    {
-        if (escaped)
-            escaped--;
-        else if (*cp == '\\')
-            escaped++;
-        else if (*cp == *start)
-            return cp + 1;
-    }
-    
-    return cp;
-}
+/*
+ * Main parsing function
+ */
 
 static void findFalconTags (void)
 {
@@ -85,6 +70,8 @@ static void findFalconTags (void)
     {
         const unsigned char *cp = line;
 
+        // Skip lines starting with # which in falcon
+        // would only be the "crunch bang" statement
         if (*cp == '#')
             continue;
 
@@ -119,6 +106,20 @@ static void findFalconTags (void)
         else if (strncmp ((const char*) cp, "load", (size_t) 4) == 0)
         {
             cp += 4;
+            cp = skipSpace (cp);
+            
+            while (isIdentifierChar ((int) *cp))
+            {
+                vStringPut (name, (int) *cp);
+                ++cp;
+            }
+            vStringTerminate (name);
+            makeSimpleTag (name, FalconKinds, K_NAMESPACE);
+            vStringClear (name);
+        }
+        else if (strncmp ((const char*) cp, "import from", (size_t) 11) == 0)
+        {
+            cp += 12;
             cp = skipSpace (cp);
             
             while (isIdentifierChar ((int) *cp))
