@@ -264,8 +264,8 @@ strdup_with_null(OnigEncoding enc, UChar* s, UChar* end)
 #define PEND_VALUE   0
 
 #ifdef __GNUC__
-/* get rid of Wunused-but-set-variable */
-#define PFETCH_READY  UChar* pfetch_prev = NULL
+/* get rid of Wunused-but-set-variable and Wuninitialized */
+#define PFETCH_READY  UChar* pfetch_prev = NULL; (void)pfetch_prev
 #else
 #define PFETCH_READY  UChar* pfetch_prev
 #endif
