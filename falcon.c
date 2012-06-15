@@ -47,7 +47,7 @@ static kindOption FalconKinds [] = {
 
 static boolean isIdentifierChar (int c)
 {
-    return (boolean) (isalnum (c) || c == '_');
+    return (boolean) (isalnum (c));
 }
 
 static const char *skipSpace (const char *cp)
