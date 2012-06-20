@@ -625,7 +625,6 @@ static boolean parseVimLine (const unsigned char *line)
 static void parseVimFile (const unsigned char *line)
 {
 	boolean readNextLine = TRUE;
-	// line = readVimLine();
 
 	while (line != NULL)
 	{
@@ -639,7 +638,6 @@ static void parseVimFile (const unsigned char *line)
 
 static void parseVimBallFile (const unsigned char *line)
 {
-	boolean readNextLine = TRUE;
 	vString *fname = vStringNew ();
 	const unsigned char *cp;
 	int file_line_count;
@@ -667,7 +665,6 @@ static void parseVimBallFile (const unsigned char *line)
 	}
 	while (line != NULL)
 	{
-		readNextLine = true;
 		/* Next line should be a filename */
 		line = readVimLine();
 		if (line == NULL)
@@ -696,7 +693,7 @@ static void parseVimBallFile (const unsigned char *line)
 		}
 		else
 		{
-			file_line_count = atoi(line);
+			file_line_count = atoi( (const char *) line );
 		}
 
 		/* Read all lines of the file */
@@ -711,15 +708,6 @@ static void parseVimBallFile (const unsigned char *line)
 	}
 
 	vStringDelete (fname);
-	// while (line != NULL)
-	// {
-	// 	readNextLine = true;
-	// 	// readNextLine = parseVimLine(line);
-
-	// 	if ( readNextLine )
-	// 		line = readVimLine();
-
-	// }
 }
 
 static void findVimTags (void)
