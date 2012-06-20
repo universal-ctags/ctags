@@ -47,7 +47,8 @@ typedef enum {
 	K_COMMAND,
 	K_FUNCTION,
 	K_MAP,
-	K_VARIABLE
+	K_VARIABLE,
+	K_FILENAME
 } vimKind;
 
 static kindOption VimKinds [] = {
@@ -56,6 +57,7 @@ static kindOption VimKinds [] = {
 	{ TRUE,  'f', "function", "function definitions" },
 	{ TRUE,  'm', "map",      "maps" },
 	{ TRUE,  'v', "variable", "variable definitions" },
+	{ TRUE,  'n', "filename", "vimball filename" },
 };
 
 /*
@@ -220,6 +222,18 @@ static const unsigned char * readVimLine (void)
 		if ((int) *line == '"')
 			continue;  /* skip comment */
 
+		break;
+	}
+
+	return line;
+}
+
+static const unsigned char * readVimballLine (void)
+{
+	const unsigned char *line;
+
+	while ((line = fileReadLine ()) != NULL)
+	{
 		break;
 	}
 
@@ -611,7 +625,7 @@ static boolean parseVimLine (const unsigned char *line)
 static void parseVimFile (const unsigned char *line)
 {
 	boolean readNextLine = TRUE;
-	line = readVimLine();
+	// line = readVimLine();
 
 	while (line != NULL)
 	{
@@ -623,19 +637,111 @@ static void parseVimFile (const unsigned char *line)
 	}
 }
 
+static void parseVimBallFile (const unsigned char *line)
+{
+	boolean readNextLine = TRUE;
+	vString *fname = vStringNew ();
+	const unsigned char *cp;
+	int file_line_count;
+	int i;
+
+	/*
+	 * Vimball Archives follow this format
+	 *    " Vimball Archiver comment
+	 *    UseVimball
+	 *    finish
+	 *    filename
+	 *    line count (n) for filename
+	 *    (n) lines
+	 *    filename
+	 *    line count (n) for filename
+	 *    (n) lines
+	 *    ...
+	 */
+
+	/* Next line should be "finish" */
+	line = readVimLine();
+	if (line == NULL)
+	{
+		return;
+	}
+	while (line != NULL)
+	{
+		readNextLine = true;
+		/* Next line should be a filename */
+		line = readVimLine();
+		if (line == NULL)
+		{
+			return;
+		}
+		else
+		{
+			cp = line;
+			do
+			{
+				vStringPut (fname, (int) *cp);
+				++cp;
+			} while (isalnum ((int) *cp) ||  *cp == '.' ||  *cp == '/' ||	*cp == '\\');
+			vStringTerminate (fname);
+			makeSimpleTag (fname, VimKinds, K_FILENAME);
+			vStringClear (fname);
+		}
+
+		file_line_count = 0;
+		/* Next line should be the line count of the file */
+		line = readVimLine();
+		if (line == NULL)
+		{
+			return;
+		}
+		else
+		{
+			file_line_count = atoi(line);
+		}
+
+		/* Read all lines of the file */
+		for ( i=0; i<file_line_count; i++ )
+		{
+			line = readVimballLine();
+			if (line == NULL)
+			{
+				return;
+			}
+		}
+	}
+
+	vStringDelete (fname);
+	// while (line != NULL)
+	// {
+	// 	readNextLine = true;
+	// 	// readNextLine = parseVimLine(line);
+
+	// 	if ( readNextLine )
+	// 		line = readVimLine();
+
+	// }
+}
+
 static void findVimTags (void)
 {
 	const unsigned char *line;
-		/* TODO - change this into a structure */
+	/* TODO - change this into a structure */
 
-	line = '\0';
+	line = readVimLine();
 
-	parseVimFile (line);
+	if ( strncmp ((const char*) line, "UseVimball", (size_t) 10) == 0 )
+	{
+		parseVimBallFile (line);
+	}
+	else
+	{
+		parseVimFile (line);
+	}
 }
 
 extern parserDefinition* VimParser (void)
 {
-	static const char *const extensions [] = { "vim", NULL };
+	static const char *const extensions [] = { "vim", "vba", NULL };
 	parserDefinition* def = parserNew ("Vim");
 	def->kinds		= VimKinds;
 	def->kindCount	= KIND_COUNT (VimKinds);
