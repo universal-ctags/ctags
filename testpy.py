@@ -23,9 +23,9 @@ class strptr:
             raise TypeError
         self._str = s
         try:
-            self._ptr = cast(self._str, c_void_p)   # CPython 2.x
+            self._ptr = cast(self._str, c_void_p)   # CPython 2.x/3.x
         except TypeError:
-            self._ptr = c_void_p(self._str)         # PyPy 1.7
+            self._ptr = c_void_p(self._str)         # PyPy 1.x
 
     def getptr(self, offset=0):
         if offset == -1:    # -1 means the end of the string
@@ -176,9 +176,12 @@ def main():
             kw.setdefault('errors', 'backslashreplace')
             kw.setdefault('closefd', False)
             self._writer = io.open(fileno, mode='w', **kw)
-            self._write = self._writer.write
+            
             # work around for Python 2.x
-            self._writer.write = lambda s: self._write("" + s)  # convert to unistr
+            _write = self._writer.write    # save the original write() function
+            enc = locale.getpreferredencoding()
+            self._writer.write = lambda s: _write(s.decode(enc)) \
+                    if isinstance(s, bytes) else _write(s)  # convert to unistr
         
         def getwriter(self):
             return self._writer
