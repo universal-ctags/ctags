@@ -170,24 +170,21 @@ def main():
     else:
         outenc = locale.getpreferredencoding()
     
-    class TextWriter:
-        def __init__(self, fileno, **kwargs):
-            kw = dict(kwargs)
-            kw.setdefault('errors', 'backslashreplace')
-            kw.setdefault('closefd', False)
-            self._writer = io.open(fileno, mode='w', **kw)
-            
-            # work around for Python 2.x
-            _write = self._writer.write    # save the original write() function
-            enc = locale.getpreferredencoding()
-            self._writer.write = lambda s: _write(s.decode(enc)) \
-                    if isinstance(s, bytes) else _write(s)  # convert to unistr
+    def get_text_writer(fileno, **kwargs):
+        kw = dict(kwargs)
+        kw.setdefault('errors', 'backslashreplace')
+        kw.setdefault('closefd', False)
+        writer = io.open(fileno, mode='w', **kw)
         
-        def getwriter(self):
-            return self._writer
+        # work around for Python 2.x
+        write = writer.write    # save the original write() function
+        enc = locale.getpreferredencoding()
+        writer.write = lambda s: write(s.decode(enc)) \
+                if isinstance(s, bytes) else write(s)  # convert to unistr
+        return writer
     
-    sys.stdout = TextWriter(sys.stdout.fileno(), encoding=outenc).getwriter()
-    sys.stderr = TextWriter(sys.stderr.fileno(), encoding=outenc).getwriter()
+    sys.stdout = get_text_writer(sys.stdout.fileno(), encoding=outenc)
+    sys.stderr = get_text_writer(sys.stderr.fileno(), encoding=outenc)
     
     # onig-5.9.2/testc.c からコピー
     #   trigraph 対策の ?\? は ?? に置き換え
