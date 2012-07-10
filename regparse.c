@@ -2582,7 +2582,7 @@ fetch_name_with_level(OnigCodePoint start_code, UChar** src, UChar* end,
     name_end = p;
     PFETCH(c);
     if (c == end_code || c == ')' || c == '+' || c == '-') {
-      if (is_num == 2) 	r = ONIGERR_INVALID_GROUP_NAME;
+      if (is_num == 2) r = ONIGERR_INVALID_GROUP_NAME;
       break;
     }
 
@@ -2707,7 +2707,7 @@ fetch_name(OnigCodePoint start_code, UChar** src, UChar* end,
       name_end = p;
       PFETCH(c);
       if (c == end_code || c == ')') {
-	if (is_num == 2) 	r = ONIGERR_INVALID_GROUP_NAME;
+	if (is_num == 2) r = ONIGERR_INVALID_GROUP_NAME;
 	break;
       }
 
