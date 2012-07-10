@@ -225,6 +225,16 @@ def parse_block(data)
   blocks << constname
 end
 
+# Suppress warning of Hash#index on Ruby 1.9:
+# "warning: Hash#index is deprecated; use Hash#key".
+class Hash
+  if method_defined?(:key)
+    def index(val)
+      key(val)
+    end
+  end
+end
+
 $const_cache = {}
 # make_const(property, pairs, name): Prints a 'static const' structure for a
 # given property, group of paired codepoints, and a human-friendly name for
