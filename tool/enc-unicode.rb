@@ -225,13 +225,10 @@ def parse_block(data)
   blocks << constname
 end
 
-# Suppress warning of Hash#index on Ruby 1.9:
-# "warning: Hash#index is deprecated; use Hash#key".
-class Hash
-  if method_defined?(:key)
-    def index(val)
-      key(val)
-    end
+# shim for Ruby 1.8
+unless {}.respond_to?(:key)
+  class Hash
+    alias key index
   end
 end
 
@@ -241,7 +238,7 @@ $const_cache = {}
 # the group
 def make_const(prop, data, name)
   puts "\n/* '#{prop}': #{name} */"
-  if origprop = $const_cache.index(data) # don't use Hash#key because it is 1.9 feature
+  if origprop = $const_cache.key(data)
     puts "#define CR_#{prop} CR_#{origprop}"
   else
     $const_cache[prop] = data
