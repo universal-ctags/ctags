@@ -407,9 +407,6 @@ typedef struct {
 typedef st_table  NameTable;
 typedef st_data_t HashDataType;   /* 1.6 st.h doesn't define st_data_t type */
 
-#define NAMEBUF_SIZE    24
-#define NAMEBUF_SIZE_1  25
-
 #ifdef ONIG_DEBUG
 static int
 i_print_name_entry(UChar* key, NameEntry* e, void* arg)
