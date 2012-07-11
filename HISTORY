@@ -1,5 +1,29 @@
 History of Onigmo (Oniguruma-mod)
 
+2012/07/11: [dist] tool/enc-unicode.rb: suppress warning of Hash#index on
+                   Ruby 1.9.
+2012/07/10: [dist] testpy.py: return the result of test.
+2012/07/10: [dist] testpy.py: simplify the method of setting output encoding.
+2012/07/03: [dist] testpy.py: error messages are not displayed.
+2012/06/16: [impl] merge Ruby r36072 partially.
+                   regparse.c (is_onechar_cclass): restructured to clarify
+                   that c is used if found == 1.
+2012/06/16: [dist] merge Ruby r36070.
+                   tool/enc-unicode.rb: add comment why it uses Hash#index.
+2012/05/22: [impl] merge Ruby r35724.
+                   enc/sjis.c (code_to_mbclen): return
+                   ONIGERR_INVALID_CODE_POINT_VALUE if the code is invalid.
+2012/05/11: [dist] update .gitignore.
+2012/04/30: [dist] configure.in: add 'foreign' option in AM_INIT_AUTOMAKE.
+2012/04/18: [dist] fix samples to support x64.
+                   NOTE: This is a preliminary fix. It is needed that
+                   additional support for the LLP64 data model such as
+                   Visual C++ x64.
+2012/04/14: [dist] update Makefile.{am,in}.
+                   Add new files.
+                   Enable making test[cu].c from test*.rb.
+2012/04/14: [dist] update tests. (testc.c, testu.c, etc.)
+
 2012/03/29: Version 5.13.2
 
 2012/03/24: [impl] suppress warnings.

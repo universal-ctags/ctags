@@ -23,9 +23,9 @@ class strptr:
             raise TypeError
         self._str = s
         try:
-            self._ptr = cast(self._str, c_void_p)   # CPython 2.x
+            self._ptr = cast(self._str, c_void_p)   # CPython 2.x/3.x
         except TypeError:
-            self._ptr = c_void_p(self._str)         # PyPy 1.7
+            self._ptr = c_void_p(self._str)         # PyPy 1.x
 
     def getptr(self, offset=0):
         if offset == -1:    # -1 means the end of the string
@@ -170,21 +170,21 @@ def main():
     else:
         outenc = locale.getpreferredencoding()
     
-    class TextWriter:
-        def __init__(self, fileno, **kwargs):
-            kw = dict(kwargs)
-            kw.setdefault('errors', 'backslashreplace')
-            kw.setdefault('closefd', False)
-            self._writer = io.open(fileno, mode='w', **kw)
-            self._write = self._writer.write
-            # work around for Python 2.x
-            self._writer.write = lambda s: self._write("" + s)  # convert to unistr
+    def get_text_writer(fileno, **kwargs):
+        kw = dict(kwargs)
+        kw.setdefault('errors', 'backslashreplace')
+        kw.setdefault('closefd', False)
+        writer = io.open(fileno, mode='w', **kw)
         
-        def getwriter(self):
-            return self._writer
+        # work around for Python 2.x
+        write = writer.write    # save the original write() function
+        enc = locale.getpreferredencoding()
+        writer.write = lambda s: write(s.decode(enc)) \
+                if isinstance(s, bytes) else write(s)  # convert to unistr
+        return writer
     
-    sys.stdout = TextWriter(sys.stdout.fileno(), encoding=outenc).getwriter()
-    sys.stderr = TextWriter(sys.stderr.fileno(), encoding=outenc).getwriter()
+    sys.stdout = get_text_writer(sys.stdout.fileno(), encoding=outenc)
+    sys.stderr = get_text_writer(sys.stderr.fileno(), encoding=outenc)
     
     # onig-5.9.2/testc.c からコピー
     #   trigraph 対策の ?\? は ?? に置き換え
@@ -1096,6 +1096,11 @@ def main():
     
     onig.onig_region_free(region, 1)
     onig.onig_end()
+    
+    if (nfail == 0 and nerror == 0):
+        exit(0)
+    else:
+        exit(-1)
 
 if __name__ == '__main__':
     main()
