@@ -1,5 +1,8 @@
 History of Onigmo (Oniguruma-mod)
 
+2012/09/02: [impl] merge Ruby r36440.
+                   remove "found" indirect flag to suppress warnings by
+                   gcc 4.7.
 2012/07/11: [dist] tool/enc-unicode.rb: suppress warning of Hash#index on
                    Ruby 1.9.
 2012/07/10: [dist] testpy.py: return the result of test.
