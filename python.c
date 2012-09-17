@@ -135,7 +135,7 @@ static boolean isIdentifierCharacter (int c)
  * extract all relevant information and create a tag.
  */
 static void makeFunctionTag (vString *const function,
-	vString *const parent, int is_class_parent, const char *arglist __unused__)
+	vString *const parent, int is_class_parent, const char *arglist)
 {
 	tagEntryInfo tag;
 	initTagEntry (&tag, vStringValue (function));
@@ -394,6 +394,8 @@ static char *parseArglist(const char *buf)
 {
 	char *start, *end;
 	int level;
+	char *arglist, *from, *to;
+	int len;
 	if (NULL == buf)
 		return NULL;
 	if (NULL == (start = strchr(buf, '(')))
@@ -408,7 +410,20 @@ static char *parseArglist(const char *buf)
 			-- level;
 	}
 	*end = '\0';
-	return strdup(start);
+
+	len = strlen(start) + 1;
+	arglist = eMalloc(len);
+	from = start;
+	to = arglist;
+	while (*from != '\0') {
+		if (*from == '\t')
+			; /* tabs are illegal in field values */
+		else
+			*to++ = *from;
+		++from;
+	}
+	*to = '\0';
+	return arglist;
 }
 
 static void parseFunction (const char *cp, vString *const def,
