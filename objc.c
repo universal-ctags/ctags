@@ -508,22 +508,22 @@ static void tillTokenOrFallBack (vString * const UNUSED (ident), objcToken what)
 	}
 }
 
+static int ignoreBalanced_count = 0;
 static void ignoreBalanced (vString * const UNUSED (ident), objcToken what)
 {
-	static int count = 0;
 
 	switch (what)
 	{
 	case Tok_PARL:
 	case Tok_CurlL:
 	case Tok_SQUAREL:
-		count++;
+		ignoreBalanced_count++;
 		break;
 
 	case Tok_PARR:
 	case Tok_CurlR:
 	case Tok_SQUARER:
-		count--;
+		ignoreBalanced_count--;
 		break;
 
 	default:
@@ -531,7 +531,7 @@ static void ignoreBalanced (vString * const UNUSED (ident), objcToken what)
 		break;
 	}
 
-	if (count == 0)
+	if (ignoreBalanced_count == 0)
 		toDoNext = comeAfter;
 }
 
@@ -818,22 +818,21 @@ static void parseStructMembers (vString * const ident, objcToken what)
 }
 
 /* Called just after the struct keyword */
+static boolean parseStruct_gotName = FALSE;
 static void parseStruct (vString * const ident, objcToken what)
 {
-	static boolean gotName = FALSE;
-
 	switch (what)
 	{
 	case ObjcIDENTIFIER:
-		if (!gotName)
+		if (!parseStruct_gotName)
 		{
 			addTag (ident, K_STRUCT);
 			pushEnclosingContext (ident, K_STRUCT);
-			gotName = TRUE;
+			parseStruct_gotName = TRUE;
 		}
 		else
 		{
-			gotName = FALSE;
+			parseStruct_gotName = FALSE;
 			popEnclosingContext ();
 			toDoNext = comeAfter;
 			comeAfter (ident, what);
@@ -847,7 +846,7 @@ static void parseStruct (vString * const ident, objcToken what)
 		/* maybe it was just a forward declaration
 		 * in which case, we pop the context */
 	case Tok_semi:
-		if (gotName)
+		if (parseStruct_gotName)
 			popEnclosingContext ();
 
 		toDoNext = comeAfter;
@@ -861,21 +860,20 @@ static void parseStruct (vString * const ident, objcToken what)
 }
 
 /* Parse enumeration members, ignoring potential initialization */
+static parseNext parseEnumFields_prev = NULL;
 static void parseEnumFields (vString * const ident, objcToken what)
 {
-	static parseNext prev = NULL;
-
-	if (prev != NULL)
+	if (parseEnumFields_prev != NULL)
 	{
-		comeAfter = prev;
-		prev = NULL;
+		comeAfter = parseEnumFields_prev;
+		parseEnumFields_prev = NULL;
 	}
 
 	switch (what)
 	{
 	case ObjcIDENTIFIER:
 		addTag (ident, K_ENUM);
-		prev = comeAfter;
+		parseEnumFields_prev = comeAfter;
 		waitedToken = Tok_COMA;
 		/* last item might not have a coma */
 		fallBackToken = Tok_CurlR;
@@ -896,22 +894,21 @@ static void parseEnumFields (vString * const ident, objcToken what)
 }
 
 /* parse enum ... { ... */
+static boolean parseEnum_named = FALSE;
 static void parseEnum (vString * const ident, objcToken what)
 {
-	static boolean named = FALSE;
-
 	switch (what)
 	{
 	case ObjcIDENTIFIER:
-		if (!named)
+		if (!parseEnum_named)
 		{
 			addTag (ident, K_ENUM);
 			pushEnclosingContext (ident, K_ENUM);
-			named = TRUE;
+			parseEnum_named = TRUE;
 		}
 		else
 		{
-			named = FALSE;
+			parseEnum_named = FALSE;
 			popEnclosingContext ();
 			toDoNext = comeAfter;
 			comeAfter (ident, what);
@@ -920,11 +917,11 @@ static void parseEnum (vString * const ident, objcToken what)
 
 	case Tok_CurlL:	/* '{' */
 		toDoNext = &parseEnumFields;
-		named = FALSE;
+		parseEnum_named = FALSE;
 		break;
 
 	case Tok_semi:	/* ';' */
-		if (named)
+		if (parseEnum_named)
 			popEnclosingContext ();
 		toDoNext = comeAfter;
 		comeAfter (ident, what);
@@ -971,20 +968,19 @@ static void parseTypedef (vString * const ident, objcToken what)
 	}
 }
 
+static boolean ignorePreprocStuff_escaped = FALSE;
 static void ignorePreprocStuff (vString * const UNUSED (ident), objcToken what)
 {
-	static boolean escaped = FALSE;
-
 	switch (what)
 	{
 	case Tok_Backslash:
-		escaped = TRUE;
+		ignorePreprocStuff_escaped = TRUE;
 		break;
 
 	case Tok_EOL:
-		if (escaped)
+		if (ignorePreprocStuff_escaped)
 		{
-			escaped = FALSE;
+			ignorePreprocStuff_escaped = FALSE;
 		}
 		else
 		{
@@ -993,7 +989,7 @@ static void ignorePreprocStuff (vString * const UNUSED (ident), objcToken what)
 		break;
 
 	default:
-		escaped = FALSE;
+		ignorePreprocStuff_escaped = FALSE;
 		break;
 	}
 }
@@ -1101,6 +1097,17 @@ static void findObjcTags (void)
 	tempName = vStringNew ();
 	fullMethodName = vStringNew ();
 	prevIdent = vStringNew ();
+
+	/* (Re-)initialize state variables, this might be a second file */
+	comeAfter = NULL;
+	fallback = NULL;
+	parentType = K_INTERFACE;
+	ignoreBalanced_count = 0;
+	methodKind = 0;
+	parseStruct_gotName = FALSE;
+	parseEnumFields_prev = NULL;
+	parseEnum_named = FALSE;
+	ignorePreprocStuff_escaped = FALSE;
 
 	st.name = vStringNew ();
 	st.cp = fileReadLine ();
