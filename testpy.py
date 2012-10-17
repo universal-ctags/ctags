@@ -937,6 +937,8 @@ def main():
         x2("\\p{Other_Default_Ignorable_Code_Point}+", "\u034F\uFFF8\U000E0FFF", 0, 3)
         # The longest block name
         x2("\\p{In_Unified_Canadian_Aboriginal_Syllabics_Extended}+", "\u18B0\u18FF", 0, 2)
+    x2("[0-9-a]+", " 0123456789-a ", 1, 13)     # same as [0-9\-a]
+    x2("[0-9-\\s]+", " 0123456789-a ", 0, 12)   # same as [0-9\-\s]
     
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
