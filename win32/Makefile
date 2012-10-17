@@ -106,8 +106,16 @@ makeargs = $(MFLAGS) CPPFLAGS='$(CPPFLAGS)' CFLAGS='$(CFLAGS)' CC='$(CC)'
 .SUFFIXES:
 .SUFFIXES: .obj .c .h .ps .dvi .info .texinfo .res .rc
 
+!ifdef NOBatch
 .c.obj:
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) /I. /I.. /Fo$@ /c $<
+!else
+# batch-mode inference rules
+.c.obj::
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) /I. /I.. /Fo.\ /c $<
+{$(encdir)\}.c{$(encdir)\}.obj::
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) /I. /I.. /Fo$(encdir)\ /c $<
+!endif
 
 .rc.res:
 	$(RC) /Fo$@ $<
