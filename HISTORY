@@ -1,5 +1,8 @@
 History of Onigmo (Oniguruma-mod)
 
+2012/10/17: [bug]  merge Ruby r37175.
+                   should match with a hyphen after a range in a character
+                   class.
 2012/09/02: [impl] merge Ruby r36440.
                    remove "found" indirect flag to suppress warnings by
                    gcc 4.7.
