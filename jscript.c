@@ -224,7 +224,9 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind)
  		const char *p;
 		tagEntryInfo e;
  
- 		if ((p = strrchr (name, '.')) != NULL)
+ 		/* if ((p = strrchr (name, '.')) != NULL) */
+ 		p = strrchr (name, '.');
+ 		if ( p != NULL )
  		{
  			if (vStringLength (fullscope) > 0)
  				vStringPut (fullscope, '.');
@@ -1050,7 +1052,6 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 	boolean is_class = FALSE;
 	boolean is_terminated = TRUE;
 	boolean is_global = FALSE;
-	boolean is_prototype = FALSE;
 	boolean has_methods = FALSE;
 	vString *	fulltag;
 
@@ -1162,7 +1163,6 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 					 */
 					makeClassTag (name);
 					is_class = TRUE;
-					is_prototype = TRUE;
 
 					/*
 					 * There should a ".function_name" next.
