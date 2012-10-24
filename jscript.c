@@ -215,13 +215,23 @@ static void deleteToken (tokenInfo *const token)
  *	 Tag generation functions
  */
 
-/*
-static void makeConstTag (tokenInfo *const token, const jsKind kind)
+static void makeJsTag (tokenInfo *const token, const jsKind kind)
 {
 	if (JsKinds [kind].enabled && ! token->ignoreTag )
 	{
-		const char *const name = vStringValue (token->string);
+ 		const char *name = vStringValue (token->string);
+ 		vString *fullscope = vStringNewCopy (token->scope);
+ 		const char *p;
 		tagEntryInfo e;
+ 
+ 		if ((p = strrchr (name, '.')) != NULL)
+ 		{
+ 			if (vStringLength (fullscope) > 0)
+ 				vStringPut (fullscope, '.');
+ 			vStringNCatS (fullscope, name, (size_t) (p - name));
+ 			name = p + 1;
+ 		}
+ 
 		initTagEntry (&e, name);
 
 		e.lineNumber   = token->lineNumber;
@@ -229,63 +239,7 @@ static void makeConstTag (tokenInfo *const token, const jsKind kind)
 		e.kindName	   = JsKinds [kind].name;
 		e.kind		   = JsKinds [kind].letter;
 
-		makeTagEntry (&e);
-	}
-}
-
-static void makeJsTag (tokenInfo *const token, const jsKind kind)
-{
-	vString *	fulltag;
-
-	if (JsKinds [kind].enabled && ! token->ignoreTag )
-	{
-		*
-		 * If a scope has been added to the token, change the token
-		 * string to include the scope when making the tag.
-		 *
-		if ( vStringLength(token->scope) > 0 )
-		{
-			*
-			fulltag = vStringNew ();
-			vStringCopy(fulltag, token->scope);
-			vStringCatS (fulltag, ".");
-			vStringCatS (fulltag, vStringValue(token->string));
-			vStringTerminate(fulltag);
-			vStringCopy(token->string, fulltag);
-			vStringDelete (fulltag);
-			*
- 			jsKind parent_kind = JSTAG_CLASS;
- 
- 			* 
-			 * if we're creating a function (and not a method),
- 			 * guess we're inside another function 
-			 *
- 			if (kind == JSTAG_FUNCTION)
- 				parent_kind = JSTAG_FUNCTION;
- 
- 			e.extensionFields.scope[0] = JsKinds [parent_kind].name;
- 			e.extensionFields.scope[1] = vStringValue (token->scope);
-		}
-		* makeConstTag (token, kind); *
- 		makeTagEntry (&e);
-	}
-}
-*/
-
-static void makeJsTag (tokenInfo *const token, const jsKind kind)
-{
-	if (JsKinds [kind].enabled && ! token->ignoreTag )
-	{
-		const char *const name = vStringValue (token->string);
-		tagEntryInfo e;
-		initTagEntry (&e, name);
-
-		e.lineNumber   = token->lineNumber;
-		e.filePosition = token->filePosition;
-		e.kindName	   = JsKinds [kind].name;
-		e.kind		   = JsKinds [kind].letter;
-
-		if ( vStringLength(token->scope) > 0 )
+ 		if ( vStringLength(fullscope) > 0 )
 		{
 			jsKind parent_kind = JSTAG_CLASS;
 
@@ -297,7 +251,7 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind)
 				parent_kind = JSTAG_FUNCTION;
 
 			e.extensionFields.scope[0] = JsKinds [parent_kind].name;
-			e.extensionFields.scope[1] = vStringValue (token->scope);
+ 			e.extensionFields.scope[1] = vStringValue (fullscope);
 		}
 
 		makeTagEntry (&e);
