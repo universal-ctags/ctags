@@ -412,10 +412,11 @@ getNextChar:
 	do
 	{
 		c = fileGetc ();
-		token->lineNumber   = getSourceLineNumber ();
-		token->filePosition = getInputFilePosition ();
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\n');
+
+	token->lineNumber   = getSourceLineNumber ();
+	token->filePosition = getInputFilePosition ();
 
 	switch (c)
 	{
