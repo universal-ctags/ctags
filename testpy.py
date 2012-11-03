@@ -186,9 +186,9 @@ def main():
     sys.stdout = get_text_writer(sys.stdout.fileno(), encoding=outenc)
     sys.stderr = get_text_writer(sys.stderr.fileno(), encoding=outenc)
     
-    # onig-5.9.2/testc.c からコピー
-    #   trigraph 対策の ?\? は ?? に置き換え
-    #   マッチ位置の指定をバイト単位から文字数単位に変更
+    # Copied from onig-5.9.2/testc.c
+    #   '?\?' which is used to avoid trigraph is replaced by '??'.
+    #   Match positions are specified by unit of character instead of byte.
     
     x2("", "", 0, 0);
     x2("^", "", 0, 0);
