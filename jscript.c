@@ -25,6 +25,7 @@
 #include <stdio.h>
 #endif
 
+#include <string.h>
 #include "debug.h"
 #include "entry.h"
 #include "keyword.h"
@@ -224,9 +225,7 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind)
  		const char *p;
 		tagEntryInfo e;
  
- 		/* if ((p = strrchr (name, '.')) != NULL) */
- 		p = strrchr (name, '.');
- 		if ( p != NULL )
+ 		if ( (p = strrchr (name, '.')) != NULL )
  		{
  			if (vStringLength (fullscope) > 0)
  				vStringPut (fullscope, '.');
@@ -257,6 +256,7 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind)
 		}
 
 		makeTagEntry (&e);
+ 		vStringDelete (fullscope);
 	}
 }
 
