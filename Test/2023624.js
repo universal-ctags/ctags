@@ -7,9 +7,9 @@
  */
 
 function f1() {
-var str = 'This function will be listed.';
+    var str = 'This function will be listed.';
 }
 
 function f2() {
-var str = 'This function won\'t.';
+    var str = 'This function won\'t.';
 }
