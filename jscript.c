@@ -330,7 +330,16 @@ static void parseString (vString *const string, const int delimiter)
 		else if (c == '\\')
 		{
 			c = fileGetc(); /* This maybe a ' or ". */
-			vStringPut(string, c);
+			if (c == ' ' )
+			{
+				/* Line continuation character ignore reset of line */
+				fileSkipToCharacter ('\n');
+			}
+			else if (c != '\n');
+			{
+				/* Line continuation character already at end of line */
+				vStringPut(string, c);
+			}
 		}
 		else if (c == delimiter)
 			end = TRUE;
