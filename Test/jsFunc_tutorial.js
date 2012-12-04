@@ -103,7 +103,8 @@ alert(D3(3,4));        // produces 7
 // Example D4
 
 var D4=new Function("a", "b", 
-  "('adding '+a+' and ' +b);\    // separate string using "\"
+    // separate string using "\"
+  "('adding '+a+' and ' +b);\
    return a+b;");
 alert(D4(3,4));        // produces 7
 
