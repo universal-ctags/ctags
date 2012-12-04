@@ -8,6 +8,7 @@
 //     functions
 //       a
 //       b
+//       baz [f]
 //       c
 //       d
 //       e
@@ -29,15 +30,13 @@
 //       u
 //       v
 //       w
-//       w.w_sub1
-//       w.w_sub2
-//
-//    classes
-//      MyClass
-//
-//    methods
-//      MyClass.MyClass_sub1
-//      MyClass.MyClass_sub2
+//       w_sub1 [w]
+//       w_sub2 [w]
+//     classes
+//       MyClass
+//     methods
+//       MyClass_sub1 [MyClass]
+//       MyClass_sub2 [MyClass]
 
 function a(flag){
     if(flag)
