@@ -691,6 +691,19 @@ static boolean varIsLambda (const char *cp, char **arglist)
 	return is_lambda;
 }
 
+/* checks if @p cp has keyword @p keyword at the start, and fills @p cp_n with
+ * the position of the next non-whitespace after the keyword */
+static boolean matchKeyword (const char *keyword, const char *cp, const char **cp_n)
+{
+	size_t kw_len = strlen (keyword);
+	if (strncmp (cp, keyword, kw_len) == 0 && isspace (cp[kw_len]))
+	{
+		*cp_n = skipSpace (&cp[kw_len + 1]);
+		return TRUE;
+	}
+	return FALSE;
+}
+
 static void findPythonTags (void)
 {
 	vString *const continuation = vStringNew ();
@@ -760,20 +773,17 @@ static void findPythonTags (void)
 		{
 			boolean found = FALSE;
 			boolean is_class = FALSE;
-			if (!strncmp (keyword, "def ", 4))
+			if (matchKeyword ("def", keyword, &cp))
 			{
-				cp = skipSpace (keyword + 3);
 				found = TRUE;
 			}
-			else if (!strncmp (keyword, "class ", 6))
+			else if (matchKeyword ("class", keyword, &cp))
 			{
-				cp = skipSpace (keyword + 5);
 				found = TRUE;
 				is_class = TRUE;
 			}
-			else if (!strncmp (keyword, "cdef ", 5))
+			else if (matchKeyword ("cdef", keyword, &cp))
 		    {
-		        cp = skipSpace(keyword + 4);
 		        candidate = skipTypeDecl (cp, &is_class);
 		        if (candidate)
 		        {
@@ -782,9 +792,8 @@ static void findPythonTags (void)
 		        }
 
 		    }
-    		else if (!strncmp (keyword, "cpdef ", 6))
+    		else if (matchKeyword ("cpdef", keyword, &cp))
 		    {
-		        cp = skipSpace(keyword + 5);
 		        candidate = skipTypeDecl (cp, &is_class);
 		        if (candidate)
 		        {
