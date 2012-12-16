@@ -440,7 +440,6 @@ getNextChar:
 					  if ( (d != '*') &&		/* is this the start of a comment? */
 							  (d != '/') )		/* is a one line comment? */
 					  {
-						  token->type = TOKEN_FORWARD_SLASH;
 						  fileUngetc (d);
 						  switch (LastTokenType)
 						  {
