@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Test for properties values.  Everything is valid here and must be
  * correctly parsed.
  * 
