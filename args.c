@@ -156,11 +156,33 @@ static char* nextFileLine (FILE* const fp)
 	return result;
 }
 
+static boolean isCommentLine (char* line)
+{
+	while (isspace(*line))
+		++line;
+	return (*line == '#');
+}
+
+static char* nextFileLineSkippingComments (FILE* const fp)
+{
+	char* result;
+	boolean comment;
+
+	do
+	{
+		result = nextFileLine (fp);
+		comment = (result && isCommentLine (result));
+		if (comment)
+			eFree (result);
+	} while (comment);
+	return result;
+}
+
 static char* nextFileString (const Arguments* const current, FILE* const fp)
 {
 	char* result;
 	if (current->lineMode)
-		result = nextFileLine (fp);
+		result = nextFileLineSkippingComments (fp);
 	else
 		result = nextFileArg (fp);
 	return result;
