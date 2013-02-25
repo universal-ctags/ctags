@@ -45,7 +45,7 @@ New Source Files:
 ToDo:
   * Reduce the size of Unicode Character Data.
   * (?|...)
-  * Improve (?(cond)yes|no). (support look-ahead/behind assertioins.)
+  * Improve (?(cond)yes|no). (support look-ahead/behind assertions.)
 
 
 Oniguruma's README follows:
