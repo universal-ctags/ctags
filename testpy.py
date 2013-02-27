@@ -939,6 +939,10 @@ def main():
         x2("\\p{In_Unified_Canadian_Aboriginal_Syllabics_Extended}+", "\u18B0\u18FF", 0, 2)
     x2("[0-9-a]+", " 0123456789-a ", 1, 13)     # same as [0-9\-a]
     x2("[0-9-\\s]+", " 0123456789-a ", 0, 12)   # same as [0-9\-\s]
+    x2("(?i:a) B", "a B", 0, 3);
+    x2("(?i:a )B", "a B", 0, 3);
+    x2("B (?i:a)", "B a", 0, 3);
+    x2("B(?i: a)", "B a", 0, 3);
     
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
