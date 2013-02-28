@@ -3,7 +3,7 @@
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011-2012  K.Takata  <kentkt AT csc DOT jp>
+ * Copyright (c) 2011-2013  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -4121,23 +4121,35 @@ add_ctype_to_cc(CClassNode* cc, int ctype, int not, int char_prop, ScanEnv* env)
 
   r = ONIGENC_GET_CTYPE_CODE_RANGE(enc, ctype, &sb_out, &ranges);
   if (r == 0) {
-    r = add_ctype_to_cc_by_range(cc, ctype, not, env, sb_out, ranges);
-    if ((r == 0) && ascii_range) {
-      if (not != 0) {
-	r = add_code_range_to_buf0(&(cc->mbuf), env, 0x80, ONIG_LAST_CODE_POINT, FALSE);
-      }
-      else {
-	CClassNode ccascii;
-	initialize_cclass(&ccascii);
-	if (ONIGENC_MBC_MINLEN(env->enc) > 1) {
-	  add_code_range(&(ccascii.mbuf), env, 0x00, 0x7F);
+    if (ascii_range) {
+      CClassNode ccwork;
+      initialize_cclass(&ccwork);
+      r = add_ctype_to_cc_by_range(&ccwork, ctype, not, env, sb_out,
+				   ranges);
+      if (r == 0) {
+	if (not) {
+	  r = add_code_range_to_buf0(&(ccwork.mbuf), env, 0x80, ONIG_LAST_CODE_POINT, FALSE);
 	}
 	else {
-	  bitset_set_range(env, ccascii.bs, 0x00, 0x7F);
+	  CClassNode ccascii;
+	  initialize_cclass(&ccascii);
+	  if (ONIGENC_MBC_MINLEN(env->enc) > 1) {
+	    add_code_range(&(ccascii.mbuf), env, 0x00, 0x7F);
+	  }
+	  else {
+	    bitset_set_range(env, ccascii.bs, 0x00, 0x7F);
+	  }
+	  r = and_cclass(&ccwork, &ccascii, env);
+	  if (IS_NOT_NULL(ccascii.mbuf)) bbuf_free(ccascii.mbuf);
 	}
-	r = and_cclass(cc, &ccascii, env);
-	if (IS_NOT_NULL(ccascii.mbuf)) bbuf_free(ccascii.mbuf);
+	if (r == 0) {
+	  r = or_cclass(cc, &ccwork, env);
+	}
+	if (IS_NOT_NULL(ccwork.mbuf)) bbuf_free(ccwork.mbuf);
       }
+    }
+    else {
+      r = add_ctype_to_cc_by_range(cc, ctype, not, env, sb_out, ranges);
     }
     return r;
   }
