@@ -939,6 +939,11 @@ def main():
         x2("\\p{In_Unified_Canadian_Aboriginal_Syllabics_Extended}+", "\u18B0\u18FF", 0, 2)
     x2("[0-9-a]+", " 0123456789-a ", 1, 13)     # same as [0-9\-a]
     x2("[0-9-\\s]+", " 0123456789-a ", 0, 12)   # same as [0-9\-\s]
+    if is_unicode_encoding(onig_encoding):
+        x2("(?a)[\p{Space}\d]", u"\u00a0", 0, 1)
+        x2("(?a)[\d\p{Space}]", u"\u00a0", 0, 1)
+        n("(?a)[^\p{Space}\d]", u"\u00a0")
+        n("(?a)[^\d\p{Space}]", u"\u00a0")
     
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
