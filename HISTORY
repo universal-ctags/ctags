@@ -1,5 +1,8 @@
 History of Onigmo (Oniguruma-mod)
 
+2013/03/01: [bug]  fix character class with ASCII flag.
+2013/02/27: [bug]  fix case-insensitive group.
+
 2012/11/03: Version 5.13.3
 
 2012/10/18: [dist] Win32: add batch-mode inference rules.
