@@ -23,6 +23,7 @@
 
 # don't want to ignore
 !.gitignore
+!.editorconfig
 
 # working dirs
 .deps
