@@ -8,14 +8,14 @@ AC_CONFIG_HEADER(config.h)
 dnl default value for RUBYDIR
 RUBYDIR=".."
 AC_ARG_WITH(rubydir,
-	[  --with-rubydir=RUBYDIR  specify value for RUBYDIR (default ..)], 
+	[  --with-rubydir=RUBYDIR  specify value for RUBYDIR (default ..)],
 	[ RUBYDIR=$withval ])
 AC_SUBST(RUBYDIR)
 
 dnl default value for STATISTICS
 STATISTICS=""
 AC_ARG_WITH(statistics,
-	[  --with-statistics       take matching time statistical data], 
+	[  --with-statistics       take matching time statistical data],
 	[ STATISTICS=-DONIG_DEBUG_STATISTICS ])
 AC_SUBST(STATISTICS)
 

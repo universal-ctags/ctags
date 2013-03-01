@@ -175,7 +175,7 @@ Onigmo (Oniguruma-mod) API  Version 5.11.4  2011/10/08
     ci->target_enc:      target string character encoding.
     ci->syntax:          address of pattern syntax definition.
     ci->option:          compile time option.
-    ci->case_fold_flag:  character matching case fold bit flag for 
+    ci->case_fold_flag:  character matching case fold bit flag for
                          ONIG_OPTION_IGNORECASE mode.
 
        ONIGENC_CASE_FOLD_MIN:           minimum
