@@ -25,14 +25,14 @@ end
 
 def rok(result_opt, reg, str, n = 0, *range)
   result = "OK" + result_opt
-  result += " " * (7 - result.length) 
+  result += " " * (7 - result.length)
   pr(result, reg, str, n, *range) unless $SILENT
   $rok += 1
 end
 
 def rfail(result_opt, reg, str, n = 0, *range)
   result = "FAIL" + result_opt
-  result += " " * (7 - result.length) 
+  result += " " * (7 - result.length)
   pr(result, reg, str, n, *range)
   $rfail += 1
 end

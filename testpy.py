@@ -36,7 +36,7 @@ class strptr:
 
 def cc_to_cb(s, enc, cc):
     """convert char count to byte count
-    
+
     arguments:
       s -- unicode string
       enc -- encoding name
@@ -62,29 +62,29 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
     global nsucc
     global nfail
     global region
-    
+
     reg = onig.OnigRegex()
     einfo = onig.OnigErrorInfo()
     syn = onig.OnigSyntaxType()
     msg = create_string_buffer(onig.ONIG_MAX_ERROR_MESSAGE_LEN)
-    
+
     pattern2 = pattern
     if not isinstance(pattern, bytes):
         pattern2 = pattern.encode(encoding)
     patternp = strptr(pattern2)
-    
+
     target2 = target
     if not isinstance(target, bytes):
         s_from = cc_to_cb(target, encoding, s_from)
         s_to = cc_to_cb(target, encoding, s_to)
         target2 = target.encode(encoding)
     targetp = strptr(target2)
-    
+
     # special syntactic settings
     onig.onig_copy_syntax(byref(syn), onig.ONIG_SYNTAX_DEFAULT)
     syn.options &= ~onig.ONIG_OPTION_ASCII_RANGE
     syn.behavior &= ~onig.ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE
-    
+
     r = onig.onig_new(byref(reg), patternp.getptr(), patternp.getptr(-1),
             onig.ONIG_OPTION_DEFAULT, onig_encoding, byref(syn), byref(einfo));
     if r != 0:
@@ -93,7 +93,7 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
         print_result("ERROR", "%s (/%s/ '%s')" % (msg.value, pattern, target),
                 file=sys.stderr)
         return
-    
+
     r = onig.onig_search(reg, targetp.getptr(), targetp.getptr(-1),
                     targetp.getptr(), targetp.getptr(-1),
                     region, onig.ONIG_OPTION_NONE);
@@ -103,7 +103,7 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
         print_result("ERROR", "%s (/%s/ '%s')" % (msg.value, pattern, target),
                 file=sys.stderr)
         return
-    
+
     if r == onig.ONIG_MISMATCH:
         if not_match:
             nsucc += 1
@@ -146,9 +146,9 @@ def main():
     global region
     global onig_encoding
     global encoding
-    
+
     region = onig.onig_region_new()
-    
+
     # set encoding of the test target
     if len(sys.argv) > 1:
         encs = {"EUC-JP": onig.ONIG_ENCODING_EUC_JP,
@@ -163,33 +163,33 @@ def main():
             print("Usage: python testpy.py [test target encoding] [output encoding]")
             sys.exit()
         encoding = onig_encoding[0].name.decode()
-    
+
     # set encoding of stdout/stderr
     if len(sys.argv) > 2:
         outenc = sys.argv[2]
     else:
         outenc = locale.getpreferredencoding()
-    
+
     def get_text_writer(fileno, **kwargs):
         kw = dict(kwargs)
         kw.setdefault('errors', 'backslashreplace')
         kw.setdefault('closefd', False)
         writer = io.open(fileno, mode='w', **kw)
-        
+
         # work around for Python 2.x
         write = writer.write    # save the original write() function
         enc = locale.getpreferredencoding()
         writer.write = lambda s: write(s.decode(enc)) \
                 if isinstance(s, bytes) else write(s)  # convert to unistr
         return writer
-    
+
     sys.stdout = get_text_writer(sys.stdout.fileno(), encoding=outenc)
     sys.stderr = get_text_writer(sys.stderr.fileno(), encoding=outenc)
-    
+
     # Copied from onig-5.9.2/testc.c
     #   '?\?' which is used to avoid trigraph is replaced by '??'.
     #   Match positions are specified by unit of character instead of byte.
-    
+
     x2("", "", 0, 0);
     x2("^", "", 0, 0);
     x2("$", "", 0, 0);
@@ -906,8 +906,8 @@ def main():
     n("[^[^a-zあいう]&&[^bcdefgうえお]g-w]", "2");
     x2("a<b>バージョンのダウンロード<\\/b>", "a<b>バージョンのダウンロード</b>", 0, 20);
     x2(".<b>バージョンのダウンロード<\\/b>", "a<b>バージョンのダウンロード</b>", 0, 20);
-    
-    
+
+
     # additional test patterns
     if is_unicode_encoding(onig_encoding):
         x2("\\x{3042}\\x{3044}", "あい", 0, 2)
@@ -948,7 +948,7 @@ def main():
         x2("(?a)[\d\p{Space}]", u"\u00a0", 0, 1)
         n("(?a)[^\p{Space}\d]", u"\u00a0")
         n("(?a)[^\d\p{Space}]", u"\u00a0")
-    
+
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
     x2(".*[a][b][c][d][e]", "abcde", 0, 5);
@@ -956,18 +956,18 @@ def main():
     x2("[abA]", "a", 0, 1);
     x2("[[ab]&&[ac]]+", "aaa", 0, 3);
     x2("[[あい]&&[あう]]+", "あああ", 0, 3);
-    
+
     # possessive quantifiers
     n("a?+a", "a")
     n("a*+a", "aaaa")
     n("a++a", "aaaa")
 #    n("a{2,3}+a", "aaa")    # ONIG_SYNTAX_DEFAULT doesn't support this
-    
+
     # linebreak
     x2("\\R", "\n", 0, 1)
     x2("\\R", "\r", 0, 1)
     x2("\\R{3}", "\r\r\n\n", 0, 4)
-    
+
 #    if (onig_encoding == onig.ONIG_ENCODING_UTF16_LE or
 #            onig_encoding == onig.ONIG_ENCODING_UTF16_BE or
 #            onig_encoding == onig.ONIG_ENCODING_UTF8):
@@ -975,12 +975,12 @@ def main():
 #        x2("\\R", "\u0085", 0, 1)
 #        x2("\\R", "\u2028", 0, 1)
 #        x2("\\R", "\u2029", 0, 1)
-    
+
     # extended grapheme cluster
     x2("\\X{5}", "あいab\n", 0, 5)
     if is_unicode_encoding(onig_encoding):
         x2("\\X", "\u306F\u309A\n", 0, 2)
-    
+
     # keep
     x2("ab\\Kcd", "abcd", 2, 4)
     x2("ab\\Kc(\\Kd|z)", "abcd", 3, 4)
@@ -991,7 +991,7 @@ def main():
     x2("ab(?=c\Kd)", "abcd", 2, 2)          # This behaviour is currently not well defined. (see: perlre)
     x2("(?<=a\\Kb|aa)cd", "abcd", 1, 4)     # This behaviour is currently not well defined. (see: perlre)
     x2("(?<=ab|a\\Ka)cd", "abcd", 2, 4)     # This behaviour is currently not well defined. (see: perlre)
-    
+
     # named group and subroutine call
 #    x2("(?<name_2>ab)(?&name_2)", "abab", 0, 4);
 #    x2("(?<name_2>ab)(?1)", "abab", 0, 4);
@@ -1005,28 +1005,28 @@ def main():
 #    x2("(?-i:(?+1))(?i:(a)){0}", "A", 0, 1);
     x2("(?-i:\g<+1>)(?i:(a)){0}", "A", 0, 1);
     x2("(?-i:\g'+1')(?i:(a)){0}", "A", 0, 1);
-    
+
     # character set modifiers
     x2("(?u)\\w+", "あa#", 0, 2);
     x2("(?a)\\w+", "あa#", 1, 2);
     x2("(?u)\\W+", "あa#", 2, 3);
     x2("(?a)\\W+", "あa#", 0, 1);
-    
+
     x2("(?a)\\b", "あa", 1, 1);
     x2("(?a)\\w\\b", "aあ", 0, 1);
     x2("(?a)\\B", "a ああ ", 2, 2);
-    
+
     x2("(?u)\\B", "あ ", 2, 2);
     x2("(?a)\\B", "あ ", 0, 0);
     x2("(?a)\\B", "aあ ", 2, 2);
-    
+
     x2("(?a)\\p{Alpha}\\P{Alpha}", "a。", 0, 2);
     x2("(?u)\\p{Alpha}\\P{Alpha}", "a。", 0, 2);
     x2("(?a)[[:word:]]+", "aあ", 0, 1);
     x2("(?a)[[:^word:]]+", "aあ", 1, 2);
     x2("(?u)[[:word:]]+", "aあ", 0, 2);
     n("(?u)[[:^word:]]+", "aあ");
-    
+
     # \g{} backref
 #    x2("((?<name1>\\d)|(?<name2>\\w))(\\g{name1}|\\g{name2})", "ff", 0, 2);
 #    x2("(?:(?<x>)|(?<x>efg))\\g{x}", "", 0, 0);
@@ -1037,42 +1037,42 @@ def main():
 #    x2("((.*)a\\g{-1}f)", "bacbabf", 3, 7);
 #    x2("(.*)a\\g{-1}f", "baczzzzzz\nbazz\nzzzzbabf", 19, 23);
 #    x2("(あ*)(い*)\\g{-2}\\g{-1}", "あああいいあああいい", 0, 10);
-    
+
     # Python/PCRE compatible named group
 #    x2("(?P<name_2>ab)(?P>name_2)", "abab", 0, 4);
 #    x2("(?P<n>|\\((?P>n)\\))+$", "()(())", 0, 6);
 #    x2("((?P<name1>\\d)|(?P<name2>\\w))((?P=name1)|(?P=name2))", "ff", 0, 2);
-    
+
     # Fullwidth Alphabet
     n("ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ", "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ");
     x2("(?i)ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ", "ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ", 0, 26);
     x2("(?i)ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ", "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ", 0, 26);
     x2("(?i)ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ", "ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ", 0, 26);
     x2("(?i)ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ", "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ", 0, 26);
-    
+
     # Greek
     n("αβγδεζηθικλμνξοπρστυφχψω", "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ");
     x2("(?i)αβγδεζηθικλμνξοπρστυφχψω", "αβγδεζηθικλμνξοπρστυφχψω", 0, 24);
     x2("(?i)αβγδεζηθικλμνξοπρστυφχψω", "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ", 0, 24);
     x2("(?i)ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ", "αβγδεζηθικλμνξοπρστυφχψω", 0, 24);
     x2("(?i)ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ", "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ", 0, 24);
-    
+
     # Cyrillic
     n("абвгдеёжзийклмнопрстуфхцчшщъыьэюя", "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ");
     x2("(?i)абвгдеёжзийклмнопрстуфхцчшщъыьэюя", "абвгдеёжзийклмнопрстуфхцчшщъыьэюя", 0, 33);
     x2("(?i)абвгдеёжзийклмнопрстуфхцчшщъыьэюя", "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ", 0, 33);
     x2("(?i)АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ", "абвгдеёжзийклмнопрстуфхцчшщъыьэюя", 0, 33);
     x2("(?i)АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ", "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ", 0, 33);
-    
+
     # multiple name definition
     x2("(?<a>a)(?<a>b)\\k<a>", "aba", 0, 3)
 #    x2("(?<a>a)(?<a>b)(?&a)", "aba", 0, 3)
 #    x2("(?<a>(a|.)(?<a>b))(?&a)", "abcb", 0, 4)
-    
+
     # branch reset
 #    x3("(?|(c)|(?:(b)|(a)))", "a", 0, 1, 2)
 #    x3("(?|(c)|(?|(b)|(a)))", "a", 0, 1, 1)
-    
+
     # conditional expression
     x2("(?:(a)|(b))(?(1)cd)e", "acde", 0, 4)
     n("(?:(a)|(b))(?(1)cd)e", "ae")
@@ -1089,7 +1089,7 @@ def main():
     n("(?:(?<x>a)|(?<y>b))(?:(?(<y>)cd|x)e|fg)", "bxe")
     x2("((?<=a))?(?(1)b|c)", "abc", 1, 2)
     x2("((?<=a))?(?(1)b|c)", "bc", 1, 2)
-    
+
     # Implicit-anchor optimization
     x2("(?m:.*abc)", "dddabdd\nddabc", 0, 13)   # optimized /(?m:.*abc)/ ==> /\A(?m:.*abc)/
     x2("(?m:.+abc)", "dddabdd\nddabc", 0, 13)   # optimized
@@ -1100,14 +1100,14 @@ def main():
     x2("(?m:.*\\Z)", "dddabdd\nddabc", 0, 13)   # optimized /(?m:.*\Z)/ ==> /\A(?m:.*\Z)/
     x2("(?-m:.*\\Z)", "dddabdd\nddabc", 8, 13)  # optimized /(?-m:.*\Z)/ ==> /(?:^|\A)(?m:.*\Z)/
     x2("(.*)X\\1", "1234X2345", 1, 8)           # not optimized
-    
-    
+
+
     print("\nRESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
           nsucc, nfail, nerror, onig.onig_version()))
-    
+
     onig.onig_region_free(region, 1)
     onig.onig_end()
-    
+
     if (nfail == 0 and nerror == 0):
         exit(0)
     else:

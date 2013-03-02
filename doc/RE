@@ -8,7 +8,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
   \       escape (enable or disable meta character meaning)
   |       alternation
   (...)   group
-  [...]   character class  
+  [...]   character class
 
 
 2. Characters
@@ -55,7 +55,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
              \t, \n, \v, \f, \r, \x20
 
            Unicode:
-             0009, 000A, 000B, 000C, 000D, 0085(NEL), 
+             0009, 000A, 000B, 000C, 000D, 0085(NEL),
              General_Category -- Line_Separator
                               -- Paragraph_Separator
                               -- Space_Separator
@@ -133,7 +133,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
     ??      1 or 0 times
     *?      0 or more times
     +?      1 or more times
-    {n,m}?  at least n but not more than m times  
+    {n,m}?  at least n but not more than m times
     {n,}?   at least n times
     {,n}?   at least 0 but not more than n times (== {0,n}?)
 
@@ -158,7 +158,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
   \A      beginning of string
   \Z      end of string, or before newline at the end
   \z      end of string
-  \G      matching start position 
+  \G      matching start position
 
 
 6. Character class
@@ -167,7 +167,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
   x-y     range from x to y
   [...]   set (character class in character class)
   ..&&..  intersection (low precedence at the next of ^)
-          
+
     ex. [a-w&&[^c-g]z] ==> ([a-w] AND ([^c-g] OR z)) ==> [abh-w]
 
   * If you want to use '[', '-', ']' as a normal character
@@ -262,7 +262,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
                      alternatives only.
                      ex. (?<=a|bc) is OK. (?<=aaa(?:b|cd)) is not allowed.
 
-                     In negative-look-behind, captured group isn't allowed, 
+                     In negative-look-behind, captured group isn't allowed,
                      but shy group(?:) is allowed.
 
   \K                 keep
@@ -313,7 +313,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
   a subexp with a large number is referred to preferentially.
   (When not matched, a group of the small number is referred to.)
 
-  * Back reference by group number is forbidden if named group is defined 
+  * Back reference by group number is forbidden if named group is defined
     in the pattern and ONIG_OPTION_CAPTURE_GROUP is not setted.
 
   * ONIG_SYNTAX_PERL: \g{n}, \g{-n} and \g{name} can also be used.
@@ -337,7 +337,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
     \k'name+level'
     \k'name-level'
 
-    Destinate relative nest level from back reference position.    
+    Destinate relative nest level from back reference position.
 
     ex 1.
 
@@ -463,7 +463,7 @@ A-4. Differences with Japanized GNU regex(version 0.12) of Ruby 1.8
    + add operations in character class. [], &&
      ('[' must be escaped as an usual char in character class.)
    + add named group and subexp call.
-   + octal or hexadecimal number sequence can be treated as 
+   + octal or hexadecimal number sequence can be treated as
      a multibyte code char in character class if multibyte encoding
      is specified.
      (ex. [\xa1\xa2], [\xa1\xa7-\xa4\xa1])

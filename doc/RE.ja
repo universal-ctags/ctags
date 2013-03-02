@@ -55,7 +55,7 @@
              \t, \n, \v, \f, \r, \x20
 
            Unicodeの場合:
-             0009, 000A, 000B, 000C, 000D, 0085(NEL), 
+             0009, 000A, 000B, 000C, 000D, 0085(NEL),
              General_Category -- Line_Separator
                               -- Paragraph_Separator
                               -- Space_Separator

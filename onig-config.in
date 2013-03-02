@@ -35,7 +35,7 @@ while test $# -gt 0; do
   case "$1" in
   -*=*) val=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'`
      ;;
-  *) val= 
+  *) val=
      ;;
   esac
 
