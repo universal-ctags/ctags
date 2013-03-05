@@ -948,6 +948,11 @@ def main():
         x2("(?a)[\d\p{Space}]", u"\u00a0", 0, 1)
         n("(?a)[^\p{Space}\d]", u"\u00a0")
         n("(?a)[^\d\p{Space}]", u"\u00a0")
+    n("x.*?\\Z$", u"x\ny")
+    n("x.*?\\Z$", u"x\r\ny")
+    x2("x.*?\\Z$", u"x\n", 0, 1)
+    x2("x.*?\\Z$", u"x\r\n", 0, 2)  # \Z will match between \r and \n, if
+                                    # ONIG_OPTION_NEWLINE_CRLF isn't specified.
 
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
