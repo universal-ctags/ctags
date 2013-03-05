@@ -1,5 +1,6 @@
 History of Onigmo (Oniguruma-mod)
 
+2013/03/05: [bug]  fix \Z matches where it shouldn't.
 2013/03/02: [dist] add .editorconfig (see: http://editorconfig.org/)
 2013/03/01: [bug]  fix character class with ASCII flag.
 2013/02/27: [bug]  fix case-insensitive group.
