@@ -2218,7 +2218,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  continue;
 	}
 #ifdef USE_CRNL_AS_LINE_TERMINATOR
-	else if (ss < end) {
+	else if (IS_NEWLINE_CRLF(option)
+	    && ONIGENC_IS_MBC_CRNL(encode, s, end)) {
 	  ss += enclen(encode, ss);
 	  if (ON_STR_END(ss)) {
 	    MOP_OUT;
