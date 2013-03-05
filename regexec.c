@@ -2218,7 +2218,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  continue;
 	}
 #ifdef USE_CRNL_AS_LINE_TERMINATOR
-	else if (ss < end) {
+	else if (ss < end && ONIGENC_MBC_TO_CODE(encode, s, end) == 0x0d) {
 	  ss += enclen(encode, ss);
 	  if (ON_STR_END(ss)) {
 	    MOP_OUT;
