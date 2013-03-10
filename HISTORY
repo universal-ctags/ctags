@@ -1,5 +1,7 @@
 History of Onigmo (Oniguruma-mod)
 
+2013/03/10: [bug]  fix lookbehind assertion fails with /m mode enabled.
+                   see: http://bugs.ruby-lang.org/issues/8023
 2013/03/05: [bug]  fix \Z matches where it shouldn't.
                    see: http://bugs.ruby-lang.org/issues/8001
 2013/03/02: [dist] add .editorconfig (see: http://editorconfig.org/)
@@ -938,7 +940,7 @@ History of Oniguruma
 2005/03/08: [impl] (thanks matz) [ruby-dev:25783]
                    should not allocate memory for key data in st.c.
                    move st_*_strend() functions from st.c. fixed some
-	           potential memory leaks.
+                   potential memory leaks.
                    (imported from Ruby 1.9 2005-03-08)
 
 2005/03/07: Version 3.7.1
@@ -2007,7 +2009,7 @@ History of Oniguruma
 2003/02/25: [spec] allow to assign same name to different group.
                    add OP_BACKREF_MULTI.
 2003/02/24: [impl] reduce redundant repeat of empty target.
-	           ex. /()*/ ==> /()?/, /()+/ ==> /()/, /(?:)+/ ==> //
+                   ex. /()*/ ==> /()?/, /()+/ ==> /()/, /(?:)+/ ==> //
 2003/02/24: [impl] change condition in regex_is_allow_reverse_match().
 2003/02/24: [impl] convert i(/../, ...) functions in testconv.rb.
 2003/02/24: [impl] change name table struct.
