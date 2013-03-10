@@ -944,18 +944,18 @@ def main():
     x2("B (?i:a)", "B a", 0, 3);
     x2("B(?i: a)", "B a", 0, 3);
     if is_unicode_encoding(onig_encoding):
-        x2("(?a)[\p{Space}\d]", u"\u00a0", 0, 1)
-        x2("(?a)[\d\p{Space}]", u"\u00a0", 0, 1)
-        n("(?a)[^\p{Space}\d]", u"\u00a0")
-        n("(?a)[^\d\p{Space}]", u"\u00a0")
-    n("x.*?\\Z$", u"x\ny")
-    n("x.*?\\Z$", u"x\r\ny")
-    x2("x.*?\\Z$", u"x\n", 0, 1)
-    x2("x.*?\\Z$", u"x\r\n", 0, 2)  # \Z will match between \r and \n, if
+        x2("(?a)[\p{Space}\d]", "\u00a0", 0, 1)
+        x2("(?a)[\d\p{Space}]", "\u00a0", 0, 1)
+        n("(?a)[^\p{Space}\d]", "\u00a0")
+        n("(?a)[^\d\p{Space}]", "\u00a0")
+    n("x.*?\\Z$", "x\ny")
+    n("x.*?\\Z$", "x\r\ny")
+    x2("x.*?\\Z$", "x\n", 0, 1)
+    x2("x.*?\\Z$", "x\r\n", 0, 2)   # \Z will match between \r and \n, if
                                     # ONIG_OPTION_NEWLINE_CRLF isn't specified.
-    x2("(?<=fo).*", u"foo", 2, 3)
-    x2("(?m)(?<=fo).*", u"foo", 2, 3)
-    x2("(?m)(?<=fo).+", u"foo", 2, 3)
+    x2("(?<=fo).*", "foo", 2, 3)
+    x2("(?m)(?<=fo).*", "foo", 2, 3)
+    x2("(?m)(?<=fo).+", "foo", 2, 3)
 
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
