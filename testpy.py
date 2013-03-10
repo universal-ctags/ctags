@@ -953,6 +953,9 @@ def main():
     x2("x.*?\\Z$", u"x\n", 0, 1)
     x2("x.*?\\Z$", u"x\r\n", 0, 2)  # \Z will match between \r and \n, if
                                     # ONIG_OPTION_NEWLINE_CRLF isn't specified.
+    x2("(?<=fo).*", u"foo", 2, 3)
+    x2("(?m)(?<=fo).*", u"foo", 2, 3)
+    x2("(?m)(?<=fo).+", u"foo", 2, 3)
 
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
