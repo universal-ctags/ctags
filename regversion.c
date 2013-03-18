@@ -3,7 +3,7 @@
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2009  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011-2012  K.Takata  <kentkt AT csc DOT jp>
+ * Copyright (c) 2011-2013  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -50,7 +50,7 @@ onig_copyright(void)
   static char s[80];
 
   sprintf(s, "Onigmo %d.%d.%d : Copyright (C) 2002-2009 K.Kosako, "
-	     "2011-2012 K.Takata",
+	     "2011-2013 K.Takata",
           ONIGURUMA_VERSION_MAJOR,
           ONIGURUMA_VERSION_MINOR,
           ONIGURUMA_VERSION_TEENY);

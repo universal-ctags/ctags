@@ -474,7 +474,7 @@ A-4. Differences with Japanized GNU regex(version 0.12) of Ruby 1.8
      ex. (?:(?i)a|b) is interpreted as (?:(?i:a|b)), not (?:(?i:a)|b).
    + isolated option is not transparent to previous pattern.
      ex. a(?i)* is a syntax error pattern.
-   + allowed incompleted left brace as an usual string.
+   + allowed incomplete left brace as an usual string.
      ex. /{/, /({)/, /a{2,3/ etc...
    + negative POSIX bracket [:^xxxx:] is supported.
    + POSIX bracket [:ascii:] is added.
@@ -484,7 +484,7 @@ A-4. Differences with Japanized GNU regex(version 0.12) of Ruby 1.8
      ex. /\x61/i =~ "A"
    + In the range quantifier, the number of the minimum is omissible.
      /a{,n}/ == /a{0,n}/
-     The simultanious abbreviation of the number of times of the minimum
+     The simultaneous abbreviation of the number of times of the minimum
      and the maximum is not allowed. (/a{,}/)
    + /a{n}?/ is not a non-greedy operator.
      /a{n}?/ == /(?:a{n})?/
