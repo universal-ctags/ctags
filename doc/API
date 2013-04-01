@@ -423,9 +423,9 @@ Onigmo (Oniguruma-mod) API  Version 5.11.4  2011/10/08
   1 region:  match region data.
   2 at:      callback position.
 
-    ONIG_TRAVERSE_CALLBACK_AT_FIRST: callback first, then traverse childs.
-    ONIG_TRAVERSE_CALLBACK_AT_LAST:  traverse childs first, then callback.
-    ONIG_TRAVERSE_CALLBACK_AT_BOTH:  callback first, then traverse childs,
+    ONIG_TRAVERSE_CALLBACK_AT_FIRST: callback first, then traverse children.
+    ONIG_TRAVERSE_CALLBACK_AT_LAST:  traverse children first, then callback.
+    ONIG_TRAVERSE_CALLBACK_AT_BOTH:  callback first, then traverse children,
                                      and at last callback again.
 
   3 func:    callback function.

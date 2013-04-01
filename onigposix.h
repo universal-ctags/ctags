@@ -39,7 +39,7 @@ extern "C" {
 #define REG_NEWLINE        (1<<1)
 #define REG_NOTBOL         (1<<2)
 #define REG_NOTEOL         (1<<3)
-#define REG_EXTENDED       (1<<4) /* if not setted, Basic Onigular Expression */
+#define REG_EXTENDED       (1<<4) /* if not set, Basic Onigular Expression */
 #define REG_NOSUB          (1<<5)
 
 /* POSIX error codes */

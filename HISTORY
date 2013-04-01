@@ -1379,7 +1379,7 @@ History of Oniguruma
 2004/04/15: [new]  add onig_get_ambig_flag().
 2004/04/14: [bug]  (thanks Isao Sonobe)
                    undefined bytecode error happens if ONIG_OPTION_FIND_LONGEST
-                   is setted.
+                   is set.
                    should finish matching process if find-condition
                    is fail at OP_END in match_at().
 2004/04/12: [impl] add ambig_flag to regex_t.
@@ -1937,7 +1937,7 @@ History of Oniguruma
 2003/03/12: [spec] change named backref and subexp call format.
                    backref: \k<name>, call: \g<name>     (thanks akr)
 2003/03/11: [inst] add regparse.[ch] in win32/Makefile.
-2003/03/11: [bug]  if UNALIGNED_WORD_ACCESS isn't setted
+2003/03/11: [bug]  if UNALIGNED_WORD_ACCESS isn't set
                    then compile error in unset_addr_list_fix().  (thanks knu)
 2003/03/10: [impl] divide regcomp.c to regcomp.c, regparse.c and regparse.h.
 2003/03/10: [bug]  should handle multi-byte code name in fetch_name().
@@ -2004,7 +2004,7 @@ History of Oniguruma
 2003/02/28: [impl] add opcode OP_CALL, OP_RETURN.
                    add stack type STK_CALL_FRAME, STK_RETURN, STK_MEM_END.
 2003/02/26: [spec] add new syntax behavior REG_SYN_STRICT_CHECK_BACKREF_NUMBER.
-                   if it is setted, then error /(\1)/, /\1(..)/ etc...
+                   if it is set, then error /(\1)/, /\1(..)/ etc...
 2003/02/26: [spec] if backref number is greater than max group number,
                    then return compile error. (REGERR_INVALID_BACKREF_NUMBER)
 2003/02/26: [tune] bad implemented N_ALT case in get_min_match_length().
