@@ -7,7 +7,7 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[**.c]
+[**.[ch]]
 indent_style = tab
 indent_size = 2
 tab_width = 8
