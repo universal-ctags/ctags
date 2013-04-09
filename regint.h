@@ -876,6 +876,7 @@ typedef void hash_table_type;
 #include "ruby/st.h"
 typedef st_data_t hash_data_type;
 #else
+#include "st.h"
 typedef uintptr_t hash_data_type;
 #endif
 
