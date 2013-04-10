@@ -4012,15 +4012,14 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 	  start = min_semi_end - reg->anchor_dmax;
 	  if (start < end)
 	    start = onigenc_get_right_adjust_char_head(reg->enc, str, start);
-	  else { /* match with empty at end */
-	    start = onigenc_get_prev_char_head(reg->enc, str, end);
-	  }
 	}
 	if ((OnigDistance )(max_semi_end - (range - 1)) < reg->anchor_dmin) {
 	  range = max_semi_end - reg->anchor_dmin + 1;
 	}
 
-	if (start >= range) goto mismatch_no_msa;
+	if (start > range) goto mismatch_no_msa;
+	/* If start == range, match with empty at end.
+	   Backward search is used. */
       }
       else {
 	if ((OnigDistance )(min_semi_end - range) > reg->anchor_dmax) {
