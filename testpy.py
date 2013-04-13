@@ -956,6 +956,10 @@ def main():
     x2("(?<=fo).*", "foo", 2, 3)
     x2("(?m)(?<=fo).*", "foo", 2, 3)
     x2("(?m)(?<=fo).+", "foo", 2, 3)
+    x2("\\n?\\z", "hello", 5, 5)
+    x2("\\z", "hello", 5, 5)
+    x2("\\n?\\z", "こんにちは", 5, 5)
+    x2("\\z", "こんにちは", 5, 5)
 
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);

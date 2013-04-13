@@ -1,5 +1,8 @@
 History of Onigmo (Oniguruma-mod)
 
+2013/04/10: [bug]  fix problem with optimization of \z.
+                   see: http://bugs.ruby-lang.org/issues/8210
+
 2013/03/17: Version 5.13.4
 
 2013/03/17: [dist] update LTVERSION to "5:0:4".
