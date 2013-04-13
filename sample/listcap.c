@@ -96,7 +96,7 @@ extern int main(int argc, char* argv[])
 
  /* enable capture hostory */
   onig_copy_syntax(&syn, ONIG_SYNTAX_DEFAULT);
-  onig_set_syntax_op2(&syn, 
+  onig_set_syntax_op2(&syn,
        onig_get_syntax_op2(&syn) | ONIG_SYN_OP2_ATMARK_CAPTURE_HISTORY);
 
   r = ex(str1, pattern1, &syn);

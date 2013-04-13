@@ -49,7 +49,7 @@
 #endif
 
 #if defined(__i386) || defined(__i386__) || defined(_M_IX86) || \
-    defined(__x86_64) || defined(__x86_64__) || defined(_M_AMD86) || \
+    defined(__x86_64) || defined(__x86_64__) || defined(_M_AMD64) || \
     defined(__mc68020__)
 #define PLATFORM_UNALIGNED_WORD_ACCESS
 #endif
@@ -803,7 +803,7 @@ typedef struct _OnigStackType {
     struct {
       int num;           /* memory num */
       UChar *pstr;       /* start/end position */
-      /* Following information is setted, if this stack type is MEM-START */
+      /* Following information is set, if this stack type is MEM-START */
       OnigStackIndex start;  /* prev. info (for backtrack  "(...)*" ) */
       OnigStackIndex end;    /* prev. info (for backtrack  "(...)*" ) */
     } mem;

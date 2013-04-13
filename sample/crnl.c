@@ -2,7 +2,7 @@
  * crnl.c  2007/05/30  K.Kosako
  *
  * !!! You should enable USE_CRNL_AS_LINE_TERMINATOR. !!!
- * 
+ *
  * USE_CRNL_AS_LINE_TERMINATOR config test program.
  */
 #include <stdio.h>

@@ -314,7 +314,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
   (When not matched, a group of the small number is referred to.)
 
   * Back reference by group number is forbidden if named group is defined
-    in the pattern and ONIG_OPTION_CAPTURE_GROUP is not setted.
+    in the pattern and ONIG_OPTION_CAPTURE_GROUP is not set.
 
   * ONIG_SYNTAX_PERL: \g{n}, \g{-n} and \g{name} can also be used.
 
@@ -376,7 +376,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
          (?<name>a|b\g<name>c)  => OK
 
   * Call by group number is forbidden if named group is defined in the pattern
-    and ONIG_OPTION_CAPTURE_GROUP is not setted.
+    and ONIG_OPTION_CAPTURE_GROUP is not set.
 
   * If the option status of called group is different from calling position
     then the group's option is effective.

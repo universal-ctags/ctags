@@ -1,4 +1,4 @@
-README.ja  2011/12/12
+README.ja  2013/03/21
 
 鬼雲 (鬼車改)  --  (C) K.Takata <kentkt AT csc DOT jp>
 
@@ -7,7 +7,7 @@ https://github.com/k-takata/Onigmo
 鬼雲は、鬼車から派生した正規表現ライブラリである。
 Perl 5.10以降で新たに導入された正規表現の一部が使用可能になっている。
 
-一部のパッチは Ruby 1.9.3 からマージしている。
+一部のパッチは Ruby 2.0.0 からマージしている。
 
 
 主な新機能:
