@@ -3,6 +3,7 @@ encdir    = $(top_srcdir)/enc
 sampledir = $(top_srcdir)/sample
 libname = libonig.la
 
+ACLOCAL_AMFLAGS = -I m4
 #AM_CFLAGS = -DNOT_RUBY
 AM_CFLAGS =
 INCLUDES  = -I$(top_srcdir) -I$(includedir)
