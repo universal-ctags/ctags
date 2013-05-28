@@ -33,7 +33,7 @@ libonig_la_SOURCES = regint.h regparse.h regenc.h st.h \
 
 libonig_la_LDFLAGS = -version-info $(LTVERSION)
 
-EXTRA_DIST = HISTORY README.ja index.html index_ja.html \
+EXTRA_DIST = oniguruma.pc.in HISTORY README.ja index.html index_ja.html \
 	doc/API doc/API.ja doc/RE doc/RE.ja doc/FAQ doc/FAQ.ja \
 	win32/Makefile win32/config.h win32/testc.c \
 	$(encdir)/koi8.c $(encdir)/mktable.c \
@@ -44,6 +44,21 @@ EXTRA_DIST = HISTORY README.ja index.html index_ja.html \
 bin_SCRIPTS = onig-config
 
 onig-config: onig-config.in
+
+do_subst = sed                                          \
+      -e 's,[@]datadir[@],$(datadir),g'                 \
+      -e 's,[@]datarootdir[@],$(datarootdir),g'         \
+      -e 's,[@]PACKAGE_VERSION[@],$(PACKAGE_VERSION),g' \
+      -e 's,[@]prefix[@],$(prefix),g'                   \
+      -e 's,[@]exec_prefix[@],$(exec_prefix),g'         \
+      -e 's,[@]libdir[@],$(libdir),g'                   \
+      -e 's,[@]includedir[@],$(includedir),g'
+
+oniguruma.pc: $(srcdir)/oniguruma.pc.in Makefile
+	$(do_subst) < $(<) > $(@)
+
+pkgconfigdir   = $(libdir)/pkgconfig
+pkgconfig_DATA = oniguruma.pc
 
 dll:
 	$(CXX) -shared -Wl,--output-def,libonig.def -o libonig.dll *.o \

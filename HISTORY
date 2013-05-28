@@ -1,5 +1,11 @@
 History
 
+2013/04/04: Version 5.9.4
+
+2013/04/04: [dev]  remove Makefile.in from git repository.
+2013/04/04: [dist] add oniguruma.pc.in file. (for pkg-config)
+                   (thanks Giulio Paci)
+
 2012/10/26: Version 5.9.3
 
 2012/10/15: remove warnings "test: =: unary operator expected" in ./configure.
