@@ -29,6 +29,9 @@
 #define HAVE_LIMITS_H 1
 #define HAVE_FCNTL_H 1
 #define HAVE_SYS_UTIME_H 1
+#if _MSC_VER >= 1600
+#define HAVE_STDINT_H 1
+#endif
 #define uid_t int
 #define gid_t int
 #define HAVE_STRUCT_STAT_ST_RDEV 1
