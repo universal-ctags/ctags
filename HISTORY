@@ -1,5 +1,10 @@
 History of Onigmo (Oniguruma-mod)
 
+2013/05/30: [dist] Merge Oniguruma 5.9.3 and 5.9.4.
+                   Also change the version of autotools.
+                   (automake 1.11.1, autoconf 2.65, libtool 2.2.6b)
+2013/05/29: [spec] (thanks Akinori MUSHA)
+                   Allow ENCLOSE_OPTION in look-behind.
 2013/04/10: [bug]  fix problem with optimization of \z.
                    see: http://bugs.ruby-lang.org/issues/8210
 
