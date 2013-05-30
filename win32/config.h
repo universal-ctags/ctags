@@ -26,13 +26,12 @@
 #endif
 #endif
 #define HAVE_DECL_SYS_NERR 1
-#define STDC_HEADERS 1
-#define HAVE_STDLIB_H 1
-#define HAVE_STRING_H 1
 #define HAVE_LIMITS_H 1
 #define HAVE_FCNTL_H 1
 #define HAVE_SYS_UTIME_H 1
-#define HAVE_MEMORY_H 1
+#if _MSC_VER >= 1600
+#define HAVE_STDINT_H 1
+#endif
 #define uid_t int
 #define gid_t int
 #define HAVE_STRUCT_STAT_ST_RDEV 1

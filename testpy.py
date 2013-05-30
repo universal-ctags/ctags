@@ -1113,6 +1113,16 @@ def main():
     x2("(?-m:.*\\Z)", "dddabdd\nddabc", 8, 13)  # optimized /(?-m:.*\Z)/ ==> /(?:^|\A)(?m:.*\Z)/
     x2("(.*)X\\1", "1234X2345", 1, 8)           # not optimized
 
+    # Allow options in look-behind
+    x2("(?<=(?i)ab)cd", "ABcd", 2, 4)
+    x2("(?<=(?i:ab))cd", "ABcd", 2, 4)
+    n("(?<=(?i)ab)cd", "ABCD")
+    n("(?<=(?i:ab))cd", "ABCD")
+    x2("(?<!(?i)ab)cd", "aacd", 2, 4)
+    x2("(?<!(?i:ab))cd", "aacd", 2, 4)
+    n("(?<!(?i)ab)cd", "ABcd")
+    n("(?<!(?i:ab))cd", "ABcd")
+
 
     print("\nRESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
           nsucc, nfail, nerror, onig.onig_version()))

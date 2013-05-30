@@ -1,5 +1,10 @@
 History of Onigmo (Oniguruma-mod)
 
+2013/05/30: [dist] Merge Oniguruma 5.9.3 and 5.9.4.
+                   Also change the version of autotools.
+                   (automake 1.11.1, autoconf 2.65, libtool 2.2.6b)
+2013/05/29: [spec] (thanks Akinori MUSHA)
+                   Allow ENCLOSE_OPTION in look-behind.
 2013/04/10: [bug]  fix problem with optimization of \z.
                    see: http://bugs.ruby-lang.org/issues/8210
 
@@ -292,6 +297,18 @@ History of Onigmo (Oniguruma-mod)
 
 ======================================================================
 History of Oniguruma
+
+2013/04/04: Version 5.9.4
+
+2013/04/04: [dev]  remove Makefile.in from git repository.
+2013/04/04: [dist] add oniguruma.pc.in file. (for pkg-config)
+                   (thanks Giulio Paci)
+
+2012/10/26: Version 5.9.3
+
+2012/10/15: remove warnings "test: =: unary operator expected" in ./configure.
+            (thanks t_okazaki)
+2012/10/15: fix print_tree ENCLOSE_OPTION bug. (thanks Suraj N. Kurapati)
 
 2010/01/09: Version 5.9.2
 
