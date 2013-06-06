@@ -1120,6 +1120,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 	tokenInfo *const method_body_token = newToken ();
 	vString * saveScope = vStringNew ();
 	boolean is_class = FALSE;
+	boolean is_var = FALSE;
 	boolean is_terminated = TRUE;
 	boolean is_global = FALSE;
 	boolean has_methods = FALSE;
@@ -1503,9 +1504,11 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 		else if (isKeyword (token, KEYWORD_new))
 		{
 			readToken (token);
+			is_var = isType (token, TOKEN_IDENTIFIER);
 			if ( isKeyword (token, KEYWORD_function) ||
 					isKeyword (token, KEYWORD_capital_function) ||
-					isKeyword (token, KEYWORD_capital_object) )
+					isKeyword (token, KEYWORD_capital_object) ||
+					is_var )
 			{
 				if ( isKeyword (token, KEYWORD_capital_object) )
 					is_class = TRUE;
@@ -1518,11 +1521,18 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 				{
 					if ( token->nestLevel == 0 )
 					{
-						if ( is_class )
+						if ( is_var )
 						{
-							makeClassTag (name);
-						} else {
-							makeFunctionTag (name);
+							makeJsTag (name, JSTAG_VARIABLE);
+						}
+						else
+						{
+							if ( is_class )
+							{
+								makeClassTag (name);
+							} else {
+								makeFunctionTag (name);
+							}
 						}
 					}
 				}
