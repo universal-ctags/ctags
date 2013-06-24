@@ -680,6 +680,26 @@ getNextChar:
 }
 
 /*
+ * reads an indentifier, possibly quoted:
+ * 		identifier
+ * 		"identifier"
+ * 		[identifier]
+ */
+static void readIdentifier (tokenInfo *const token)
+{
+	readToken (token);
+	if (isType (token, TOKEN_OPEN_SQUARE))
+	{
+		tokenInfo *const close_square = newToken ();
+
+		readToken (token);
+		/* eat close swuare */
+		readToken (close_square);
+		deleteToken (close_square);
+	}
+}
+
+/*
  *	 Token parsing functions
  */
 
@@ -1615,14 +1635,14 @@ static void parsePackage (tokenInfo *const token, TrashBox *trash_box)
 	tokenInfo *const name = newToken ();
 
 	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
-	readToken (name);
+	readIdentifier (name);
 	if (isKeyword (name, KEYWORD_body))
 	{
 		/*
 		 * Ignore the BODY tag since we will process
 		 * the body or prototypes in the same manner
 		 */
-		readToken (name);
+		readIdentifier (name);
 	}
 	/* Check for owner.pkg_name */
 	while (! isKeyword (token, KEYWORD_is))
@@ -1630,7 +1650,7 @@ static void parsePackage (tokenInfo *const token, TrashBox *trash_box)
 		readToken (token);
 		if ( isType(token, TOKEN_PERIOD) )
 		{
-			readToken (name);
+			readIdentifier (name);
 		}
 	}
 	if (isKeyword (token, KEYWORD_is))
@@ -1672,13 +1692,7 @@ static void parseTable (tokenInfo *const token, TrashBox *trash_box)
 	 */
 
 	/* This could be a database, owner or table name */
-	readToken (name);
-	if (isType (name, TOKEN_OPEN_SQUARE))
-	{
-		readToken (name);
-		/* Read close square */
-		readToken (token);
-	} 
+	readIdentifier (name);
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
@@ -1688,35 +1702,17 @@ static void parseTable (tokenInfo *const token, TrashBox *trash_box)
 		 * referenced with a blank owner:
 		 *     dbname..tablename
 		 */
-		readToken (name);
-		if (isType (name, TOKEN_OPEN_SQUARE))
-		{
-			readToken (name);
-			/* Read close square */
-			readToken (token);
-		} 
+		readIdentifier (name);
 		/* Check if a blank name was provided */
 		if (isType (name, TOKEN_PERIOD))
 		{
-			readToken (name);
-			if (isType (name, TOKEN_OPEN_SQUARE))
-			{
-				readToken (name);
-				/* Read close square */
-				readToken (token);
-			} 
+			readIdentifier (name);
 		}
 		readToken (token);
 		if (isType (token, TOKEN_PERIOD))
 		{
 			/* This can only be the table name */
-			readToken (name);
-			if (isType (name, TOKEN_OPEN_SQUARE))
-			{
-				readToken (name);
-				/* Read close square */
-				readToken (token);
-			} 
+			readIdentifier (name);
 			readToken (token);
 		}
 	}
@@ -1758,21 +1754,21 @@ static void parseIndex (tokenInfo *const token, TrashBox *trash_box)
 	 *	   create bitmap index "i6" on t1(c1)
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
-		readToken (name);
+		readIdentifier (name);
 		readToken (token);
 	}
 	if ( isKeyword (token, KEYWORD_on) &&
 			(isType (name, TOKEN_IDENTIFIER) || isType (name, TOKEN_STRING) ) )
 	{
-		readToken (owner);
+		readIdentifier (owner);
 		readToken (token);
 		if (isType (token, TOKEN_PERIOD))
 		{
-			readToken (owner);
+			readIdentifier (owner);
 			readToken (token);
 		}
 		addToScope(name, owner->string);
@@ -1794,11 +1790,11 @@ static void parseEvent (tokenInfo *const token, TrashBox *trash_box)
 	 *	   create event "dba"."e4" handler begin end;
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
-		readToken (name);
+		readIdentifier (name);
 	}
 	while (! (isKeyword (token, KEYWORD_handler) ||
 				(isType (token, TOKEN_SEMICOLON)))	  )
@@ -1841,11 +1837,11 @@ static void parseTrigger (tokenInfo *const token, TrashBox *trash_box)
 	 *	   create trigger "tr6" begin end;
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
-		readToken (name);
+		readIdentifier (name);
 		readToken (token);
 	}
 
@@ -1910,11 +1906,11 @@ static void parsePublication (tokenInfo *const token, TrashBox *trash_box)
 	 *	   create publication "dba"."pu4" ()
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
-		readToken (name);
+		readIdentifier (name);
 		readToken (token);
 	}
 	if (isType (token, TOKEN_OPEN_PAREN))
@@ -1943,7 +1939,7 @@ static void parseService (tokenInfo *const token, TrashBox *trash_box)
 	 *		   CALL sp_Something();
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if (isKeyword (token, KEYWORD_type))
 	{
@@ -1966,10 +1962,10 @@ static void parseDomain (tokenInfo *const token, TrashBox *trash_box)
 	 *	   CREATE DOMAIN|DATATYPE [AS] your_name ...;
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	if (isKeyword (name, KEYWORD_is))
 	{
-		readToken (name);
+		readIdentifier (name);
 	}
 	readToken (token);
 	if (isType (name, TOKEN_IDENTIFIER) ||
@@ -2008,7 +2004,7 @@ static void parseVariable (tokenInfo *const token, TrashBox *trash_box)
 	 *	   drop   variable @varname3;
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if ( (isType (name, TOKEN_IDENTIFIER) || isType (name, TOKEN_STRING))
 			&& !isType (token, TOKEN_SEMICOLON) )
@@ -2031,7 +2027,7 @@ static void parseSynonym (tokenInfo *const token, TrashBox *trash_box)
 	 *	   drop   variable @varname3;
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if ( (isType (name, TOKEN_IDENTIFIER) || isType (name, TOKEN_STRING))
 			&& isKeyword (token, KEYWORD_for) )
@@ -2054,11 +2050,11 @@ static void parseView (tokenInfo *const token, TrashBox *trash_box)
 	 *	   drop   variable @varname3;
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
-		readToken (name);
+		readIdentifier (name);
 		readToken (token);
 	}
 	if ( isType (token, TOKEN_OPEN_PAREN) )
