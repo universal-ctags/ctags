@@ -661,19 +661,87 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	vStringTerminate (string);
 }
 
+static int skipWhitespaces (int c)
+{
+	while (c == '\t' || c == ' ' || c == '\n' || c == '\r')
+		c = fileGetc ();
+	return c;
+}
+
+/* <script[:white:]+language[:white:]*=[:white:]*(php|'php'|"php")[:white:]*>
+ * 
+ * This is ugly, but the whole "<script language=php>" tag is and we can't
+ * really do better without adding a lot of code only for this */
+static boolean isOpenScriptLanguagePhp (int c)
+{
+	int quote = 0;
+
+	/* <script[:white:]+language[:white:]*= */
+	if (c                                   != '<' ||
+		tolower ((c = fileGetc ()))         != 's' ||
+		tolower ((c = fileGetc ()))         != 'c' ||
+		tolower ((c = fileGetc ()))         != 'r' ||
+		tolower ((c = fileGetc ()))         != 'i' ||
+		tolower ((c = fileGetc ()))         != 'p' ||
+		tolower ((c = fileGetc ()))         != 't' ||
+		((c = fileGetc ()) != '\t' &&
+		  c                != ' '  &&
+		  c                != '\n' &&
+		  c                != '\r')                ||
+		tolower ((c = skipWhitespaces (c))) != 'l' ||
+		tolower ((c = fileGetc ()))         != 'a' ||
+		tolower ((c = fileGetc ()))         != 'n' ||
+		tolower ((c = fileGetc ()))         != 'g' ||
+		tolower ((c = fileGetc ()))         != 'u' ||
+		tolower ((c = fileGetc ()))         != 'a' ||
+		tolower ((c = fileGetc ()))         != 'g' ||
+		tolower ((c = fileGetc ()))         != 'e' ||
+		(c = skipWhitespaces (fileGetc ())) != '=')
+		return FALSE;
+
+	/* (php|'php'|"php")> */
+	c = skipWhitespaces (fileGetc ());
+	if (c == '"' || c == '\'')
+	{
+		quote = c;
+		c = fileGetc ();
+	}
+	if (tolower (c)                         != 'p' ||
+		tolower ((c = fileGetc ()))         != 'h' ||
+		tolower ((c = fileGetc ()))         != 'p' ||
+		(quote != 0 && (c = fileGetc ()) != quote) ||
+		(c = skipWhitespaces (fileGetc ())) != '>')
+		return FALSE;
+
+	return TRUE;
+}
+
 static int findPhpStart (void)
 {
 	int c;
 	do
 	{
-		if ((c = fileGetc ()) == '<' &&
-			(c = fileGetc ()) == '?' &&
-			/* don't enter PHP mode on "<?xml", yet still support short open tags (<?) */
-			(tolower ((c = fileGetc ())) != 'x' ||
-			 tolower ((c = fileGetc ())) != 'm' ||
-			 tolower ((c = fileGetc ())) != 'l'))
+		if ((c = fileGetc ()) == '<')
 		{
-			break;
+			c = fileGetc ();
+			/* <? and <?php, but not <?xml */
+			if (c == '?')
+			{
+				/* don't enter PHP mode on "<?xml", yet still support short open tags (<?) */
+				if (tolower ((c = fileGetc ())) != 'x' ||
+					tolower ((c = fileGetc ())) != 'm' ||
+					tolower ((c = fileGetc ())) != 'l')
+				{
+					break;
+				}
+			}
+			/* <script language="php"> */
+			else
+			{
+				fileUngetc (c);
+				if (isOpenScriptLanguagePhp ('<'))
+					break;
+			}
 		}
 	}
 	while (c != EOF);
@@ -773,17 +841,36 @@ getNextChar:
 
 		case '<':
 		{
-			int d;
-			if ((d = fileGetc ()) != '<' ||
-				(d = fileGetc ()) != '<')
+			int d = fileGetc ();
+			if (d == '/')
 			{
-				fileUngetc (d);
-				token->type = TOKEN_UNDEFINED;
+				/* </script[:white:]*> */
+				if (tolower ((d = fileGetc ())) == 's' &&
+					tolower ((d = fileGetc ())) == 'c' &&
+					tolower ((d = fileGetc ())) == 'r' &&
+					tolower ((d = fileGetc ())) == 'i' &&
+					tolower ((d = fileGetc ())) == 'p' &&
+					tolower ((d = fileGetc ())) == 't' &&
+					(d = skipWhitespaces (fileGetc ())) == '>')
+				{
+					InPhp = FALSE;
+					goto getNextChar;
+				}
+				else
+				{
+					fileUngetc (d);
+					token->type = TOKEN_UNDEFINED;
+				}
 			}
-			else
+			else if (d == '<' && (d = fileGetc ()) == '<')
 			{
 				token->type = TOKEN_STRING;
 				parseHeredoc (token->string);
+			}
+			else
+			{
+				fileUngetc (d);
+				token->type = TOKEN_UNDEFINED;
 			}
 			break;
 		}
