@@ -1940,7 +1940,7 @@ renumber_by_map(Node* node, GroupNumRemap* map)
     {
       EncloseNode* en = NENCLOSE(node);
       if (en->type == ENCLOSE_CONDITION)
-        en->regnum = map[en->regnum].new_val; 
+        en->regnum = map[en->regnum].new_val;
       r = renumber_by_map(en->target, map);
     }
     break;
