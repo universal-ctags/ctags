@@ -1101,6 +1101,10 @@ def main():
     n("(?:(?<x>a)|(?<y>b))(?:(?(<y>)cd|x)e|fg)", "bxe")
     x2("((?<=a))?(?(1)b|c)", "abc", 1, 2)
     x2("((?<=a))?(?(1)b|c)", "bc", 1, 2)
+    x2("((?<x>x)|(?<y>y))(?(<x>)y|x)", "xy", 0, 2)
+    x2("((?<x>x)|(?<y>y))(?(<x>)y|x)", "yx", 0, 2)
+    n("((?<x>x)|(?<y>y))(?(<x>)y|x)", "xx")
+    n("((?<x>x)|(?<y>y))(?(<x>)y|x)", "yy")
 
     # Implicit-anchor optimization
     x2("(?m:.*abc)", "dddabdd\nddabc", 0, 13)   # optimized /(?m:.*abc)/ ==> /\A(?m:.*abc)/
