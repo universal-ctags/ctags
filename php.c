@@ -54,6 +54,7 @@ typedef enum {
 	KEYWORD_endwhile,
 	KEYWORD_extends,
 	KEYWORD_final,
+	KEYWORD_finally,
 	KEYWORD_for,
 	KEYWORD_foreach,
 	KEYWORD_function,
@@ -84,7 +85,8 @@ typedef enum {
 	KEYWORD_use,
 	KEYWORD_var,
 	KEYWORD_while,
-	KEYWORD_xor
+	KEYWORD_xor,
+	KEYWORD_yield
 } keywordId;
 
 typedef enum {
@@ -158,6 +160,7 @@ static const keywordDesc PhpKeywordTable[] = {
 	{ "endwhile",		KEYWORD_endwhile		},
 	{ "extends",		KEYWORD_extends			},
 	{ "final",			KEYWORD_final			},
+	{ "finally",		KEYWORD_finally			},
 	{ "for",			KEYWORD_for				},
 	{ "foreach",		KEYWORD_foreach			},
 	{ "function",		KEYWORD_function		},
@@ -188,7 +191,8 @@ static const keywordDesc PhpKeywordTable[] = {
 	{ "use",			KEYWORD_use				},
 	{ "var",			KEYWORD_var				},
 	{ "while",			KEYWORD_while			},
-	{ "xor",			KEYWORD_xor				}
+	{ "xor",			KEYWORD_xor				},
+	{ "yield",			KEYWORD_yield			}
 };
 
 
