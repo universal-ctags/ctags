@@ -1,5 +1,12 @@
 History of Onigmo (Oniguruma-mod)
 
+2013/07/03: Version 5.13.5
+
+2013/07/03: [dist] update LTVERSION to "5:0:5".
+2013/07/02: [bug]  (thanks Akinori MUSHA and Ippei Obayashi)
+                   Fix a renumbering bug in condition regexp with a named
+		   capture.
+		   see: https://bugs.ruby-lang.org/issues/8583
 2013/05/30: [dist] Merge Oniguruma 5.9.3 and 5.9.4.
                    Also change the version of autotools.
                    (automake 1.11.1, autoconf 2.65, libtool 2.2.6b)

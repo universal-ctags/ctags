@@ -1943,7 +1943,12 @@ renumber_by_map(Node* node, GroupNumRemap* map)
     r = renumber_by_map(NQTFR(node)->target, map);
     break;
   case NT_ENCLOSE:
-    r = renumber_by_map(NENCLOSE(node)->target, map);
+    {
+      EncloseNode* en = NENCLOSE(node);
+      if (en->type == ENCLOSE_CONDITION)
+        en->regnum = map[en->regnum].new_val;
+      r = renumber_by_map(en->target, map);
+    }
     break;
 
   case NT_BREF:

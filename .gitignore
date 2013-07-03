@@ -36,6 +36,7 @@
 /config.status
 /libtool
 /onig-config
+/oniguruma.pc
 /Makefile
 /sample/Makefile
 /stamp-h1
