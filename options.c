@@ -349,6 +349,7 @@ static const char *const Features [] = {
 *   FUNCTION PROTOTYPES
 */
 static boolean parseFileOptions (const char *const fileName);
+static boolean parseAllConfigurationFilesOptionsInDirectory(const char *const fileName);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -1243,10 +1244,18 @@ static void processListLanguagesOption (
 static void processOptionFile (
 		const char *const option, const char *const parameter)
 {
+	boolean opened_as_file, opened_as_dir;
 	if (parameter [0] == '\0')
 		error (WARNING, "no option file supplied for \"%s\"", option);
-	else if (! parseFileOptions (parameter))
-		error (FATAL | PERROR, "cannot open option file \"%s\"", parameter);
+	else
+	{
+
+		opened_as_file = parseFileOptions (parameter);
+		opened_as_dir  = parseAllConfigurationFilesOptionsInDirectory (parameter);
+
+		if ((opened_as_file == FALSE) && (opened_as_dir == FALSE))
+			error (FATAL | PERROR, "cannot open option file \"%s\"", parameter);
+	}
 }
 
 static void processSortOption (
