@@ -636,7 +636,13 @@ static const char *skipTypeDecl (const char *cp, boolean *is_class)
 	}
 	/* limit so that we don't pick off "int item=obj()" */
 	while (*ptr && loopCount++ < 2) {
-		while (*ptr && *ptr != '=' && *ptr != '(' && !isspace(*ptr)) ptr++;
+		while (*ptr && *ptr != '=' && *ptr != '(' && !isspace(*ptr)) {
+			/* skip over e.g. 'cpdef numpy.ndarray[dtype=double, ndim=1]' */
+			if(*ptr == '[') {
+				while(*ptr && *ptr != ']') ptr++;
+			}
+			ptr++;
+		}
 		if (!*ptr || *ptr == '=') return NULL;
 		if (*ptr == '(') {
 		    return lastStart; /* if we stopped on a '(' we are done */
