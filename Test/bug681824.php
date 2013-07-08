@@ -1,3 +1,4 @@
+<?php
 // Bugs item #681824, was opened at 2003-02-06 18:14
 // You can respond by visiting: 
 // https://sourceforge.net/tracker/?func=detail&atid=106556&aid=681824&group_id=6556
