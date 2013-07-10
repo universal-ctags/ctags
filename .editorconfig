@@ -21,6 +21,13 @@ indent_style = space
 indent_size = 2
 tab_width = 8
 
+[{HISTORY,history}]
+; [HISTORY] doesn't work?
+indent_style = space
+
+[doc/*]
+indent_style = space
+
 [win32/*]
 end_of_line = crlf
 

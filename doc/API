@@ -247,7 +247,7 @@ Onigmo (Oniguruma-mod) API  Version 5.11.4  2011/10/08
 
 
 # OnigPosition onig_match(regex_t* reg, const UChar* str, const UChar* end,
-		 const UChar* at, OnigRegion* region, OnigOptionType option)
+                 const UChar* at, OnigRegion* region, OnigOptionType option)
 
   Match string and return result and matching region.
 
