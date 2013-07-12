@@ -673,9 +673,15 @@ These language names are case insensitive and may be used in the
 \fB\-\-regex\-<LANG>\fP options.
 
 .TP 5
-\fB\-\-options\fP=\fIfile\fP
-Read additional options from \fIfile\fP. The file should contain one option
-per line. As a special case, if
+\fB\-\-options\fP=\fIfile\fP|\fIdirectory\fP
+Read additional options from \fIfile\fP or \fIdirectory\fP. If a file is
+specified, it should contain one option per line. If a directory is
+specified(and scandir function is available at build configuration time),
+files suffixed with .ctags or .conf under the directory are read. (On MSDOS
+or MSWindows this directory traverse feature is temporary disable because the
+contributor of this feature has no access to the platfroms.
+Volunters are welcome).
+As a special case, if
 \fB\-\-options\fP=\fINONE\fP is specified as the first option on the command
 line, it will disable the automatic reading of any configuration options from
 either a file or the environment (see \fBFILES\fP).
@@ -1105,9 +1111,15 @@ ignored.
 .br
 .I /etc/ctags.conf
 .br
+.I /etc/ctags.conf.d/*.{ctags,conf} (not on MSDOS, MSWindows)
+.br
 .I /usr/local/etc/ctags.conf
 .br
+.I /usr/local/etc/ctags.conf.d/*.{ctags,conf} (not on MSDOS, MSWindows)
+.br
 .I $HOME/.ctags
+.br
+.I $HOME/.ctags.d/*.{ctags,conf} (not on MSDOS, MSWindows)
 .br
 .I $HOME/ctags.cnf (on MSDOS, MSWindows only)
 .br
