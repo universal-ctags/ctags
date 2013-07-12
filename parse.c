@@ -431,18 +431,18 @@ static kindOption *langKindOption (const langType language, const int flag)
 	return result;
 }
 
-static void disableLanguageKinds (const langType language)
+static void resetLanguageKinds (const langType language, const boolean mode)
 {
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
 	if (lang->regex)
-		disableRegexKinds (language);
+		resetRegexKinds (language, mode);
 	else
 	{
 		unsigned int i;
 		for (i = 0  ;  i < lang->kindCount  ;  ++i)
-			lang->kinds [i].enabled = FALSE;
+			lang->kinds [i].enabled = mode;
 	}
 }
 
@@ -473,8 +473,15 @@ static void processLangKindOption (
 	int c;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	if (*p != '+'  &&  *p != '-')
-		disableLanguageKinds (language);
+
+	if (*p == '*')
+	{
+		resetLanguageKinds (language, TRUE);
+		p++;
+	}
+	else if (*p != '+'  &&  *p != '-')
+		resetLanguageKinds (language, FALSE);
+
 	while ((c = *p++) != '\0') switch (c)
 	{
 		case '+': mode = TRUE;  break;

@@ -624,7 +624,8 @@ extern boolean processRegexOption (const char *const option,
 	return handled;
 }
 
-extern void disableRegexKinds (const langType language __unused__)
+extern void resetRegexKinds (const langType language __unused__,
+			     boolean mode)
 {
 #ifdef HAVE_REGEX
 	if (language <= SetUpper  &&  Sets [language].count > 0)
@@ -633,7 +634,7 @@ extern void disableRegexKinds (const langType language __unused__)
 		unsigned int i;
 		for (i = 0  ;  i < set->count  ;  ++i)
 			if (set->patterns [i].type == PTRN_TAG)
-				set->patterns [i].u.tag.kind.enabled = FALSE;
+				set->patterns [i].u.tag.kind.enabled = mode;
 	}
 #endif
 }
