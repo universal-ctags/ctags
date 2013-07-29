@@ -107,11 +107,21 @@
 /* #define USE_COMBINATION_EXPLOSION_CHECK */     /* (X*)* */
 
 /* #define USE_MULTI_THREAD_SYSTEM */
+#ifndef THREAD_SYSTEM_INIT
 #define THREAD_SYSTEM_INIT      /* depend on thread system */
+#endif
+#ifndef THREAD_SYSTEM_END
 #define THREAD_SYSTEM_END       /* depend on thread system */
+#endif
+#ifndef THREAD_ATOMIC_START
 #define THREAD_ATOMIC_START     /* depend on thread system */
+#endif
+#ifndef THREAD_ATOMIC_END
 #define THREAD_ATOMIC_END       /* depend on thread system */
+#endif
+#ifndef THREAD_PASS
 #define THREAD_PASS             /* depend on thread system */
+#endif
 #define xmalloc     malloc
 #define xrealloc    realloc
 #define xcalloc     calloc
