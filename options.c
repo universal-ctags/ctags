@@ -354,6 +354,62 @@ static boolean parseAllConfigurationFilesOptionsInDirectory(const char *const fi
 /*
 *   FUNCTION DEFINITIONS
 */
+
+
+
+#if defined(_WIN32)
+
+/* Some versions of MinGW are missing _vscprintf's declaration, although they
+ * still provide the symbol in the import library.
+ */
+#ifdef __MINGW32__
+_CRTIMP int _vscprintf(const char *format, va_list argptr);
+#endif
+
+#ifndef va_copy
+#define va_copy(dest, src) (dest = src)
+#endif
+
+int asprintf(char **strp, const char *fmt, ...)
+{
+	va_list args;
+	va_list args_copy;
+	int length;
+	size_t size;
+
+	va_start(args, fmt);
+
+	va_copy(args_copy, args);
+
+#ifdef _WIN32
+	/* We need to use _vcsprintf to calculate the length as vsnprintf returns -1
+	 * if the number of characters to write is greater than count.
+	 */
+	length = _vscprintf(fmt, args_copy);
+#else
+	char dummy;
+	length = vsnprintf(&dummy, sizeof dummy, fmt, args_copy);
+#endif
+
+	va_end(args_copy);
+
+	Assert(length >= 0);
+	size = length + 1;
+
+	*strp = malloc(size);
+	if (!*strp) {
+		return -1;
+	}
+
+	va_start(args, fmt);
+	vsnprintf(*strp, size, fmt, args);
+	va_end(args);
+
+	return length;
+}
+#endif
+
+
 #if (defined (__SVR4) && defined (__sun))
 int vasprintf(char **ret, const char *format, va_list args)
 {
