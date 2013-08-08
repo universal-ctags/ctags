@@ -665,9 +665,15 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	vStringTerminate (string);
 }
 
+static boolean isSpace (int c)
+{
+	return (c == '\t' || c == ' ' || c == '\v' ||
+			c == '\n' || c == '\r' || c == '\f');
+}
+
 static int skipWhitespaces (int c)
 {
-	while (c == '\t' || c == ' ' || c == '\n' || c == '\r')
+	while (isSpace (c))
 		c = fileGetc ();
 	return c;
 }
@@ -688,10 +694,7 @@ static boolean isOpenScriptLanguagePhp (int c)
 		tolower ((c = fileGetc ()))         != 'i' ||
 		tolower ((c = fileGetc ()))         != 'p' ||
 		tolower ((c = fileGetc ()))         != 't' ||
-		((c = fileGetc ()) != '\t' &&
-		  c                != ' '  &&
-		  c                != '\n' &&
-		  c                != '\r')                ||
+		! isSpace ((c = fileGetc ()))              ||
 		tolower ((c = skipWhitespaces (c))) != 'l' ||
 		tolower ((c = fileGetc ()))         != 'a' ||
 		tolower ((c = fileGetc ()))         != 'n' ||
@@ -799,10 +802,7 @@ getNextChar:
 	else
 		c = fileGetc ();
 
-	while (c == '\t' || c == ' ' || c == '\n' || c == '\r')
-	{
-		c = fileGetc ();
-	}
+	c = skipWhitespaces (c);
 
 	token->lineNumber   = getSourceLineNumber ();
 	token->filePosition = getInputFilePosition ();
