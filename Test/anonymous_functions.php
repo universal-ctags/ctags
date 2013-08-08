@@ -8,6 +8,8 @@ functions:
   c
   d
   e
+  f
+  f_sub [f]
 
 global variables:
   _g
@@ -34,5 +36,12 @@ $d = function() {
 $_g = 42;
 $e = function&() {
   global $_g;
+  return $_g;
+};
+
+$f = function&() use (&$_g) {
+  
+  function f_sub() {}
+  
   return $_g;
 };

@@ -1078,7 +1078,8 @@ static boolean parseTrait (tokenInfo *const token)
  *
  * if @name is not NULL, parses an anonymous function with name @name
  * 	$foo = function($foo, $bar) {}
- * 	$foo = function&($foo, $bar) {} */
+ * 	$foo = function&($foo, $bar) {}
+ * 	$foo = function($foo, $bar) use ($x, &$y) {} */
 static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 {
 	boolean readNext = TRUE;
@@ -1175,8 +1176,33 @@ static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 		makeFunctionTag (name, arglist, access, impl);
 		vStringDelete (arglist);
 
-		readToken (token); /* normally it's an open brace or a semicolon */
+		readToken (token); /* normally it's an open brace or "use" keyword */
 	}
+
+	/* skip use(...) */
+	if (token->type == TOKEN_KEYWORD && token->keyword == KEYWORD_use)
+	{
+		readToken (token);
+		if (token->type == TOKEN_OPEN_PAREN)
+		{
+			int depth = 1;
+
+			do
+			{
+				readToken (token);
+				switch (token->type)
+				{
+					case TOKEN_OPEN_PAREN:  depth++; break;
+					case TOKEN_CLOSE_PAREN: depth--; break;
+					default: break;
+				}
+			}
+			while (token->type != TOKEN_EOF && depth > 0);
+
+			readToken (token);
+		}
+	}
+
 	if (token->type == TOKEN_OPEN_CURLY)
 		enterScope (token, name->string, K_FUNCTION);
 	else
