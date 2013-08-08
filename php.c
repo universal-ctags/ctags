@@ -1077,7 +1077,8 @@ static boolean parseTrait (tokenInfo *const token)
  * 	function &myfunc($foo, $bar) {}
  *
  * if @name is not NULL, parses an anonymous function with name @name
- * 	$foo = function($foo, $bar) {} */
+ * 	$foo = function($foo, $bar) {}
+ * 	$foo = function&($foo, $bar) {} */
 static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 {
 	boolean readNext = TRUE;
@@ -1085,20 +1086,21 @@ static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 	implType impl = CurrentStatement.impl;
 	tokenInfo *nameFree = NULL;
 
+	readToken (token);
+	/* skip a possible leading ampersand (return by reference) */
+	if (token->type == TOKEN_AMPERSAND)
+		readToken (token);
+
 	if (! name)
 	{
-		readToken (token);
-		/* skip a possible leading ampersand (return by reference) */
-		if (token->type == TOKEN_AMPERSAND)
-			readToken (token);
 		if (token->type != TOKEN_IDENTIFIER)
 			return FALSE;
 
 		name = nameFree = newToken ();
 		copyToken (nameFree, token, TRUE);
+		readToken (token);
 	}
 
-	readToken (token);
 	if (token->type == TOKEN_OPEN_PAREN)
 	{
 		vString *arglist = vStringNew ();
