@@ -2149,6 +2149,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
     case OP_BEGIN_BUF:  MOP_IN(OP_BEGIN_BUF);
       if (! ON_STR_BEGIN(s)) goto fail;
+      if (IS_NOTBOS(msa->options)) goto fail;
 
       MOP_OUT;
       continue;
@@ -2156,6 +2157,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
     case OP_END_BUF:  MOP_IN(OP_END_BUF);
       if (! ON_STR_END(s)) goto fail;
+      if (IS_NOTEOS(msa->options)) goto fail;
 
       MOP_OUT;
       continue;
