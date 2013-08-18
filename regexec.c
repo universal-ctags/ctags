@@ -4173,11 +4173,6 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
     }
   }
   else {  /* backward search */
-#ifdef USE_MATCH_RANGE_MUST_BE_INSIDE_OF_SPECIFIED_RANGE
-    if (orig_start < end)
-      orig_start += enclen(reg->enc, orig_start); /* is upper range */
-#endif
-
     if (reg->optimize != ONIG_OPTIMIZE_NONE) {
       UChar *low, *high, *adjrange, *sch_start;
 
