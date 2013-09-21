@@ -57,6 +57,7 @@
 	TexParser, \
 	VeraParser, \
 	VerilogParser, \
+	SystemVerilogParser, \
 	VhdlParser, \
 	VimParser, \
 	YaccParser
