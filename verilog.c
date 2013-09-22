@@ -208,7 +208,7 @@ static boolean readIdentifier (vString *const name, int c)
 		vUngetc (c);
 		vStringTerminate (name);
 	}
-	return (boolean)(name->length > 0);
+	return (boolean)(vStringLength (name) > 0);
 }
 
 static void tagNameList (const verilogKind kind, int c)
