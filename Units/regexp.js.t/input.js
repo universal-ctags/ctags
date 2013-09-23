@@ -2,6 +2,10 @@
  * ctags should return the following for parsing this file using:
  * ctags -f - simple.js
  * 
+ * functions:
+ *    func1
+ *    func2
+ * 
  * variables:
  *    no_re1
  *    no_re2
@@ -36,3 +40,10 @@ var re6 = /\(([a-z]*_)+/;
 var str1 = "a/b/c".replace(/\//g, '-');
 var str2 = "Hello".replace(/O/ig, 'O');
 
+function func1() {
+  return /function bug1(foo){/;
+}
+
+function func2() {
+  return /\(/;
+}
