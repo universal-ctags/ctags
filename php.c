@@ -234,13 +234,13 @@ static langType Lang_php;
 static boolean InPhp = FALSE; /* whether we are between <? ?> */
 
 /* current statement details */
-struct {
+static struct {
 	accessType access;
 	implType impl;
 } CurrentStatement;
 
 /* Current namespace */
-vString *CurrentNamesapce;
+static vString *CurrentNamesapce;
 
 
 static void buildPhpKeywordHash (void)
