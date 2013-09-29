@@ -214,6 +214,7 @@ static boolean readIdentifier (vString *const name, int c)
 static void tagNameList (const verilogKind kind, int c)
 {
 	vString *name = vStringNew ();
+	verilogKind localKind;
 	boolean repeat;
 	Assert (isIdentifierCharacter (c));
 	do
@@ -222,7 +223,16 @@ static void tagNameList (const verilogKind kind, int c)
 		if (isIdentifierCharacter (c))
 		{
 			readIdentifier (name, c);
-			makeSimpleTag (name, VerilogKinds, kind);
+			/* Check if "name" is in fact a keyword */
+			localKind = (verilogKind) lookupKeyword (vStringValue (name), getSourceLanguage () );
+			if (kind != K_PORT || localKind == K_UNDEFINED)
+			{
+				makeSimpleTag (name, VerilogKinds, kind);
+			}
+			else
+			{
+				repeat = TRUE;
+			}
 		}
 		else
 			break;
@@ -247,8 +257,6 @@ static void tagNameList (const verilogKind kind, int c)
 			c = skipWhite (vGetc ());
 			repeat = TRUE;
 		}
-		else
-			repeat = FALSE;
 	} while (repeat);
 	vStringDelete (name);
 	vUngetc (c);
@@ -308,6 +316,7 @@ static void findVerilogTags (void)
 		switch (c)
 		{
 			case ';':
+			case '(':
 			case '\n':
 				newStatement = TRUE;
 				break;
