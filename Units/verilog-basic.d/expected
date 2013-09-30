@@ -1,26 +1,26 @@
 DEFINE	Units/verilog-basic.d/input.v	/^`define DEFINE$/;"	c
-PARAM	Units/verilog-basic.d/input.v	/^parameter PARAM = 1;$/;"	c
-a	Units/verilog-basic.d/input.v	/^input a,b, c, d ;$/;"	p
-a	Units/verilog-basic.d/input.v	/^wire a,b,c,d,e;$/;"	n
-add	Units/verilog-basic.d/input.v	/^task add;$/;"	t
-b	Units/verilog-basic.d/input.v	/^input a,b, c, d ;$/;"	p
-b	Units/verilog-basic.d/input.v	/^wire a,b,c,d,e;$/;"	n
-c	Units/verilog-basic.d/input.v	/^input a,b, c, d ;$/;"	p
-c	Units/verilog-basic.d/input.v	/^wire a,b,c,d,e;$/;"	n
-d	Units/verilog-basic.d/input.v	/^input a,b, c, d ;$/;"	p
-d	Units/verilog-basic.d/input.v	/^wire a,b,c,d,e;$/;"	n
-e	Units/verilog-basic.d/input.v	/^output e;$/;"	p
-e	Units/verilog-basic.d/input.v	/^wire a,b,c,d,e;$/;"	n
-f	Units/verilog-basic.d/input.v	/^output f;$/;"	p
-f	Units/verilog-basic.d/input.v	/^reg f;$/;"	r
-g	Units/verilog-basic.d/input.v	/^inout g;$/;"	p
-g	Units/verilog-basic.d/input.v	/^wire g;$/;"	n
-k	Units/verilog-basic.d/input.v	/^real k;$/;"	r
-l	Units/verilog-basic.d/input.v	/^integer l;$/;"	r
+PARAM	Units/verilog-basic.d/input.v	/^parameter PARAM = 1;$/;"	c	module:mod
+a	Units/verilog-basic.d/input.v	/^input a,b, c, d ;$/;"	p	module:mod
+a	Units/verilog-basic.d/input.v	/^wire a,b,c,d,e;$/;"	n	module:mod
+add	Units/verilog-basic.d/input.v	/^task add;$/;"	t	module:mod
+b	Units/verilog-basic.d/input.v	/^input a,b, c, d ;$/;"	p	module:mod
+b	Units/verilog-basic.d/input.v	/^wire a,b,c,d,e;$/;"	n	module:mod
+c	Units/verilog-basic.d/input.v	/^input a,b, c, d ;$/;"	p	module:mod
+c	Units/verilog-basic.d/input.v	/^wire a,b,c,d,e;$/;"	n	module:mod
+d	Units/verilog-basic.d/input.v	/^input a,b, c, d ;$/;"	p	module:mod
+d	Units/verilog-basic.d/input.v	/^wire a,b,c,d,e;$/;"	n	module:mod
+e	Units/verilog-basic.d/input.v	/^output e;$/;"	p	module:mod
+e	Units/verilog-basic.d/input.v	/^wire a,b,c,d,e;$/;"	n	module:mod
+f	Units/verilog-basic.d/input.v	/^output f;$/;"	p	module:mod
+f	Units/verilog-basic.d/input.v	/^reg f;$/;"	r	module:mod
+g	Units/verilog-basic.d/input.v	/^inout g;$/;"	p	module:mod
+g	Units/verilog-basic.d/input.v	/^wire g;$/;"	n	module:mod
+k	Units/verilog-basic.d/input.v	/^real k;$/;"	r	module:mod
+l	Units/verilog-basic.d/input.v	/^integer l;$/;"	r	module:mod
 mod	Units/verilog-basic.d/input.v	/^module mod ($/;"	m
-mult	Units/verilog-basic.d/input.v	/^function mult;$/;"	f
-x	Units/verilog-basic.d/input.v	/^    input x, y;$/;"	p
-x	Units/verilog-basic.d/input.v	/^    input x;$/;"	p
-y	Units/verilog-basic.d/input.v	/^    input x, y;$/;"	p
-y	Units/verilog-basic.d/input.v	/^    input y;$/;"	p
-z	Units/verilog-basic.d/input.v	/^    output z;$/;"	p
+mult	Units/verilog-basic.d/input.v	/^function mult;$/;"	f	module:mod
+x	Units/verilog-basic.d/input.v	/^    input x, y;$/;"	p	task:mod.add
+x	Units/verilog-basic.d/input.v	/^    input x;$/;"	p	function:mod.mult
+y	Units/verilog-basic.d/input.v	/^    input x, y;$/;"	p	task:mod.add
+y	Units/verilog-basic.d/input.v	/^    input y;$/;"	p	function:mod.mult
+z	Units/verilog-basic.d/input.v	/^    output z;$/;"	p	task:mod.add
