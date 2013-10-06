@@ -17,6 +17,7 @@ echo CONSTANT; // outputs "Hello world."
 echo Constant; // outputs "Constant" and issues a notice.
 ?>
 
+<?php
 function foo ($arg_1, $arg_2, ..., $arg_n)
 {
     echo "Example function.\n";
