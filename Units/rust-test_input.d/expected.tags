@@ -7,8 +7,11 @@ Foo	input.rs	/^impl Foo {$/;"	c
 Foo	input.rs	/^impl Testable for Foo {$/;"	c
 Foo	input.rs	/^struct Foo{foo_field_1:int}$/;"	s
 Foo2	input.rs	/^struct Foo2 {$/;"	s
+ParametrizedTrait	input.rs	/^trait ParametrizedTrait<T> {$/;"	i
+S1	input.rs	/^struct S1 {$/;"	s
 SuperTraitTest	input.rs	/^trait SuperTraitTest:Testable+DoZ {$/;"	i
 Testable	input.rs	/^trait Testable $/;"	i
+TraitedStructTest	input.rs	/^impl<T: Clone> ParametrizedTrait<T> for TraitedStructTest<T> {$/;"	c
 TraitedStructTest	input.rs	/^struct TraitedStructTest<X> {$/;"	s
 a_anteater	input.rs	/^	a_anteater(int),$/;"	e	enum:Animal
 a_bear	input.rs	/^	a_bear(int),$/;"	e	enum:Animal
@@ -20,15 +23,21 @@ foo_field_1	input.rs	/^struct Foo{foo_field_1:int}$/;"	m	struct:Foo
 gfunc	input.rs	/^fn gfunc<X:Testable+DoZ>(x:&X) {$/;"	f	signature:<X:Testable+DoZ>(x:&X)
 main	input.rs	/^fn main() {	$/;"	f	signature:()
 my_method	input.rs	/^	fn my_method(&self,_:int){ print("my_method of foo");}$/;"	F	class:Foo	signature:(&self,_:int)
+nested	input.rs	/^	fn nested() {}$/;"	f	function:main	signature:()
+only_field	input.rs	/^	only_field: [int, ..size]$/;"	m	struct:S1
+size	input.rs	/^static size: uint = 1;$/;"	v
 some2	input.rs	/^fn some2(a:Animal) {$/;"	f	signature:(a:Animal)
 test	input.rs	/^	fn test(&self) {$/;"	F	class:Foo	signature:(&self)
+test	input.rs	/^	fn test(&self) {$/;"	F	class:TraitedStructTest	signature:(&self)
+test	input.rs	/^	fn test(&self);$/;"	F	interface:ParametrizedTrait	signature:(&self)
 test	input.rs	/^{	fn test(&self);$/;"	F	interface:Testable	signature:(&self)
-test1	input.rs	/^	fn test1(&self) $/;"	F	class:Foo	signature:(&self)
+test1	input.rs	/^	fn test1(&self) {$/;"	F	class:Foo	signature:(&self)
 test1	input.rs	/^	fn test1(&self);$/;"	F	interface:Testable	signature:(&self)
+test2	input.rs	/^	fn test2(&self) {$/;"	F	class:Foo	signature:(&self)
 test2	input.rs	/^	fn test2(&self);$/;"	F	interface:Testable	signature:(&self)
-test2	input.rs	/^	}	fn test2(&self) $/;"	F	class:Foo	signature:(&self)
 test_input2	input.rs	/^mod test_input2;$/;"	n
+test_macro	input.rs	/^macro_rules! test_macro$/;"	M
 x	input.rs	/^		x:int,$/;"	m	struct:Foo2
 x	input.rs	/^	x:X$/;"	m	struct:TraitedStructTest
 y	input.rs	/^		y:int$/;"	m	struct:Foo2
-yada	input.rs	/^fn yada(a:int,c:Foo,b:test_input2::fruit::SomeStruct)->~str { a.to_str() }$/;"	f	signature:(a:int,c:Foo,b:test_input2::fruit::SomeStruct)->~str
+yada	input.rs	/^fn yada(a:int,c:Foo,b:test_input2::fruit::SomeStruct) -> ~str {$/;"	f	signature:(a:int,c:Foo,b:test_input2::fruit::SomeStruct) -> ~str

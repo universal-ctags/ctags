@@ -6,12 +6,12 @@ pub fn foo_bar_test_func(apples:fruit::SomeStruct,(oranges,lemon):(int,int))->in
 	some_var_name-apples.red_value+lemon+a.v
 }
 
-
 pub mod fruit {
 	pub struct SomeStruct{
 		red_value:int,green_value:int,blue_value:int
 	}
 }
+
 fn free_func() {
 }
 
@@ -22,7 +22,6 @@ impl SomeLongStructName {
 	}
 }
 
-
 pub struct SomeLongStructName {v:int}
 
 mod veg{
@@ -30,8 +29,6 @@ mod veg{
 		a+b+c
 	}
 }
-
-
 
 mod mineral {
 	fn granite() {

@@ -1,9 +1,36 @@
+#! fn ignored_in_comment() {}
 #[feature(globs)];
+#[feature(macro_rules)];
 use std::*;
 use test_input2::*;
 mod test_input2;
 
-fn yada(a:int,c:Foo,b:test_input2::fruit::SomeStruct)->~str { a.to_str() }
+/*
+ * fn ignored_in_comment() {}
+ */
+
+// fn ignored_in_comment() {}
+
+/* /*
+ * */
+ fn ignored_in_nested_comment() {}
+ */
+
+static size: uint = 1;
+
+struct S1 {
+	only_field: [int, ..size]
+}
+
+macro_rules! test_macro
+{
+	() => {1}
+}
+
+fn yada(a:int,c:Foo,b:test_input2::fruit::SomeStruct) -> ~str {
+	a.to_str()
+}
+
 fn main() {	
 	use test_input2::fruit::*;	
 	io::println(foo_bar_test_func(SomeStruct{red_value:1,green_value:2,blue_value:3},(4,5)).to_str());
@@ -12,11 +39,25 @@ fn main() {
 	let c=a_cat(3);
 	let d=Foo{foo_field_1:a.foo_field_1+2}; a.test();
 	println(a.foo_field_1.to_str());
+	ignore!
+	(
+		fn ignored_inside_macro() {}
+	)
+
+	let _ = "fn ignored_in_string() {}
+	";
+
+	let _ = r##"fn ignored_in_raw_string() {}""##;
+
+	fn nested() {}
 }
+
 struct Bar(int);
+
 struct Baz(int);
 
 struct Foo{foo_field_1:int}
+
 struct Foo2 {
 		x:int,
 		y:int
@@ -38,6 +79,7 @@ trait Testable
 	fn test1(&self);
 	fn test2(&self);
 }
+
 trait DoZ {
 	fn do_z(&self);
 }
@@ -46,15 +88,16 @@ impl Testable for Foo {
 	fn test(&self) {
 		println(self.foo_field_1.to_str());
 	}
-	fn test1(&self) 
-	{
-		println(self.foo_field_1.to_str());
-	}	fn test2(&self) 
-	{
+
+	fn test1(&self) {
 		println(self.foo_field_1.to_str());
 	}
 
+	fn test2(&self) {
+		println(self.foo_field_1.to_str());
+	}
 }
+
 impl DoZ for Foo {
 	fn do_z(&self) {
 		println(self.foo_field_1.to_str());
@@ -72,9 +115,20 @@ fn gfunc<X:Testable+DoZ>(x:&X) {
 	x.test();
 	x.do_z();
 }
+
 struct TraitedStructTest<X> {
 	x:X
 }
+
+trait ParametrizedTrait<T> {
+	fn test(&self);
+}
+
+impl<T: Clone> ParametrizedTrait<T> for TraitedStructTest<T> {
+	fn test(&self) {
+	}
+}
+
 fn some2(a:Animal) {
 	match a {
 		a_cat(x)=> println("cat"),
@@ -82,9 +136,3 @@ fn some2(a:Animal) {
 	}
 
 }
-
-
-
-
-
-
