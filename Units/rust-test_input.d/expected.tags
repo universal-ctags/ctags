@@ -1,0 +1,34 @@
+Animal	input.rs	/^enum Animal {$/;"	g
+Bar	input.rs	/^struct Bar(int);$/;"	s
+Baz	input.rs	/^struct Baz(int);$/;"	s
+DoZ	input.rs	/^trait DoZ {$/;"	i
+Foo	input.rs	/^impl DoZ for Foo {$/;"	c
+Foo	input.rs	/^impl Foo {$/;"	c
+Foo	input.rs	/^impl Testable for Foo {$/;"	c
+Foo	input.rs	/^struct Foo{foo_field_1:int}$/;"	s
+Foo2	input.rs	/^struct Foo2 {$/;"	s
+SuperTraitTest	input.rs	/^trait SuperTraitTest:Testable+DoZ {$/;"	i
+Testable	input.rs	/^trait Testable $/;"	i
+TraitedStructTest	input.rs	/^struct TraitedStructTest<X> {$/;"	s
+a_anteater	input.rs	/^	a_anteater(int),$/;"	e	enum:Animal
+a_bear	input.rs	/^	a_bear(int),$/;"	e	enum:Animal
+a_cat	input.rs	/^	a_cat(int),$/;"	e	enum:Animal
+a_dog	input.rs	/^	a_dog(int),$/;"	e	enum:Animal
+do_z	input.rs	/^	fn do_z(&self) {$/;"	F	class:Foo	signature:(&self)
+do_z	input.rs	/^	fn do_z(&self);$/;"	F	interface:DoZ	signature:(&self)
+foo_field_1	input.rs	/^struct Foo{foo_field_1:int}$/;"	m	struct:Foo
+gfunc	input.rs	/^fn gfunc<X:Testable+DoZ>(x:&X) {$/;"	f	signature:<X:Testable+DoZ>(x:&X)
+main	input.rs	/^fn main() {	$/;"	f	signature:()
+my_method	input.rs	/^	fn my_method(&self,_:int){ print("my_method of foo");}$/;"	F	class:Foo	signature:(&self,_:int)
+some2	input.rs	/^fn some2(a:Animal) {$/;"	f	signature:(a:Animal)
+test	input.rs	/^	fn test(&self) {$/;"	F	class:Foo	signature:(&self)
+test	input.rs	/^{	fn test(&self);$/;"	F	interface:Testable	signature:(&self)
+test1	input.rs	/^	fn test1(&self) $/;"	F	class:Foo	signature:(&self)
+test1	input.rs	/^	fn test1(&self);$/;"	F	interface:Testable	signature:(&self)
+test2	input.rs	/^	fn test2(&self);$/;"	F	interface:Testable	signature:(&self)
+test2	input.rs	/^	}	fn test2(&self) $/;"	F	class:Foo	signature:(&self)
+test_input2	input.rs	/^mod test_input2;$/;"	n
+x	input.rs	/^		x:int,$/;"	m	struct:Foo2
+x	input.rs	/^	x:X$/;"	m	struct:TraitedStructTest
+y	input.rs	/^		y:int$/;"	m	struct:Foo2
+yada	input.rs	/^fn yada(a:int,c:Foo,b:test_input2::fruit::SomeStruct)->~str { a.to_str() }$/;"	f	signature:(a:int,c:Foo,b:test_input2::fruit::SomeStruct)->~str

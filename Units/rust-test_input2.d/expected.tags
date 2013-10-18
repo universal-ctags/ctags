@@ -1,0 +1,18 @@
+SomeLongStructName	input.rs	/^impl SomeLongStructName {$/;"	c
+SomeLongStructName	input.rs	/^pub struct SomeLongStructName {v:int}$/;"	s
+SomeStruct	input.rs	/^	pub struct SomeStruct{$/;"	s	namespace:fruit
+another_function	input.rs	/^	pub fn another_function(a:int,b:int,c:int)->int {$/;"	f	namespace:veg	signature:(a:int,b:int,c:int)->int
+baaz	input.rs	/^	fn baaz() {$/;"	F	class:SomeLongStructName	signature:()
+blue_value	input.rs	/^		red_value:int,green_value:int,blue_value:int$/;"	m	struct:fruit::SomeStruct
+chalk	input.rs	/^	fn chalk() {$/;"	f	namespace:mineral	signature:()
+foo_bar_test_func	input.rs	/^pub fn foo_bar_test_func(apples:fruit::SomeStruct,(oranges,lemon):(int,int))->int{$/;"	f	signature:(apples:fruit::SomeStruct,(oranges,lemon):(int,int))->int
+fooo	input.rs	/^	fn fooo() {$/;"	F	class:SomeLongStructName	signature:()
+free_func	input.rs	/^fn free_func() {$/;"	f	signature:()
+fruit	input.rs	/^pub mod fruit {$/;"	n
+granite	input.rs	/^	fn granite() {$/;"	f	namespace:mineral	signature:()
+green_value	input.rs	/^		red_value:int,green_value:int,blue_value:int$/;"	m	struct:fruit::SomeStruct
+limestone	input.rs	/^	fn limestone() {$/;"	f	namespace:mineral	signature:()
+mineral	input.rs	/^mod mineral {$/;"	n
+red_value	input.rs	/^		red_value:int,green_value:int,blue_value:int$/;"	m	struct:fruit::SomeStruct
+v	input.rs	/^pub struct SomeLongStructName {v:int}$/;"	m	struct:SomeLongStructName
+veg	input.rs	/^mod veg{$/;"	n
