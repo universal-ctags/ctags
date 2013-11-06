@@ -146,6 +146,9 @@ AC_ARG_WITH(posix-regex,
 AC_ARG_WITH(readlib,
 [  --with-readlib          include readtags library object during install])
 
+AC_ARG_WITH(readcmd,
+[  --with-readcmd          include readtags command during install])
+
 # AC_ARG_WITH(perl-regex,
 # [  --with-perl-regex       use Perl pcre interface, if available])
 
@@ -201,6 +204,13 @@ AC_MSG_CHECKING(whether to install readtags object file)
 if test yes = "$with_readlib"; then
 	AC_MSG_RESULT(yes)
 	install_targets="$install_targets install-lib"
+else
+	AC_MSG_RESULT(no)
+fi
+AC_MSG_CHECKING(whether to install readtags command)
+if test yes = "$with_readcmd"; then
+	AC_MSG_RESULT(yes)
+	install_targets="$install_targets install-cmd"
 else
 	AC_MSG_RESULT(no)
 fi
