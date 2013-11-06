@@ -85,8 +85,10 @@ EMAN	= $(ETAGS_PROG).$(manext)
 #
 CTAGS_EXEC	= $(CTAGS_PROG)$(EXEEXT)
 ETAGS_EXEC	= $(ETAGS_PROG)$(EXEEXT)
+READ_CMD	= readtags$(EXEEXT)
 DEST_CTAGS	= $(bindir)/$(CTAGS_EXEC)
 DEST_ETAGS	= $(bindir)/$(ETAGS_EXEC)
+DEST_READ_CMD	= $(bindir)/$(READ_CMD)
 DEST_READ_LIB	= $(libdir)/$(READ_LIB)
 DEST_READ_INC	= $(incdir)/$(READ_INC)
 DEST_CMAN	= $(man1dir)/$(CMAN)
@@ -95,7 +97,7 @@ DEST_EMAN	= $(man1dir)/$(EMAN)
 #
 # primary rules
 #
-all: $(CTAGS_EXEC) $(READ_LIB)
+all: $(CTAGS_EXEC) $(READ_LIB) $(READ_CMD)
 
 $(CTAGS_EXEC): $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
@@ -103,7 +105,7 @@ $(CTAGS_EXEC): $(OBJECTS)
 dctags$(EXEEXT): debug.c $(SOURCES) $(HEADERS)
 	$(CC) -I. -I$(srcdir) $(DEFS) -DDEBUG -g $(LDFLAGS) -o $@ debug.c $(SOURCES)
 
-readtags$(EXEEXT): readtags.c readtags.h
+$(READ_CMD): readtags.c readtags.h
 	$(CC) -DREADTAGS_MAIN -I. -I$(srcdir) $(DEFS) $(CFLAGS) $(LDFLAGS) -o $@ readtags.c
 
 ETYPEREF_OBJS = etyperef.o keyword.o routines.o strlist.o vstring.o
@@ -137,6 +139,7 @@ install-bin: install-cbin install-ebin install-lib
 install-cbin: $(DEST_CTAGS)
 install-ebin: $(DEST_ETAGS)
 install-lib: $(DEST_READ_LIB) $(DEST_READ_INC)
+install-cmd: $(DEST_READ_CMD)
 
 $(DEST_CTAGS): $(CTAGS_EXEC) $(bindir) FORCE
 	$(INSTALL_PROG) $(CTAGS_EXEC) $@  &&  chmod 755 $@
@@ -170,17 +173,25 @@ $(DEST_READ_LIB): $(READ_LIB) $(libdir) FORCE
 $(DEST_READ_INC): $(READ_INC) $(incdir) FORCE
 	$(INSTALL_PROG) $(READ_INC) $@  &&  chmod 644 $@
 
+#
+# install the readtags command
+#
+$(DEST_READ_CMD): $(READ_CMD) $(bindir) FORCE
+	$(INSTALL_PROG) $(READ_CMD) $@  &&  chmod 755 $@
 
 #
 # rules for uninstalling
 #
-uninstall: uninstall-bin uninstall-lib uninstall-man
+uninstall: uninstall-bin uninstall-lib uninstall-cmd uninstall-man
 
 uninstall-bin:
 	- rm -f $(DEST_CTAGS) $(DEST_ETAGS)
 
 uninstall-lib:
 	- rm -f $(DEST_READ_LIB) $(DEST_READ_INC)
+
+uninstall-cmd:
+	- rm -f $(READ_CMD)
 
 uninstall-man:
 	- rm -f $(DEST_CMAN) $(DEST_EMAN)
@@ -202,7 +213,7 @@ TAGS: $(CTAGS_EXEC)
 
 clean:
 	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB) 
-	rm -f dctags$(EXEEXT) readtags$(EXEEXT)
+	rm -f dctags$(EXEEXT) $(READ_CMD)
 	rm -f etyperef$(EXEEXT) etyperef.$(OBJEXT)
 
 mostlyclean: clean
