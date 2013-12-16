@@ -65,28 +65,32 @@ static boolean isIdentifier (int c)
 
 static boolean isPodWord (const char *word)
 {
-	boolean result = FALSE;
-	if (isalpha (*word))
-	{
-		const char *const pods [] = {
-			"head1", "head2", "head3", "head4", "over", "item", "back",
-			"pod", "begin", "end", "for"
-		};
-		const size_t count = sizeof (pods) / sizeof (pods [0]);
-		const char *white = strpbrk (word, " \t");
-		const size_t len = (white!=NULL) ? (size_t)(white-word) : strlen (word);
-		char *const id = (char*) eMalloc (len + 1);
-		size_t i;
-		strncpy (id, word, len);
-		id [len] = '\0';
-		for (i = 0  ;  i < count  &&  ! result  ;  ++i)
-		{
-			if (strcmp (id, pods [i]) == 0)
-				result = TRUE;
-		}
-		eFree (id);
+	/* Perl POD words are three to five characters in size.  We use this
+	 * fact to find (or not find) the right side of the word and then
+	 * perform comparisons, if necessary, of POD words of that size.
+	 */
+	size_t len;
+	for (len = 0; len < 6; ++len)
+		if ('\0' == word[len] || ' ' == word[len] || '\t' == word[len])
+			break;
+	switch (len) {
+		case 3:
+			return 0 == strncmp(word, "end", 3)
+				|| 0 == strncmp(word, "for", 3)
+				|| 0 == strncmp(word, "pod", 3);
+		case 4:
+			return 0 == strncmp(word, "back", 4)
+				|| 0 == strncmp(word, "item", 4)
+				|| 0 == strncmp(word, "over", 4);
+		case 5:
+			return 0 == strncmp(word, "begin", 5)
+				|| 0 == strncmp(word, "head1", 5)
+				|| 0 == strncmp(word, "head2", 5)
+				|| 0 == strncmp(word, "head3", 5)
+				|| 0 == strncmp(word, "head4", 5);
+		default:
+			return FALSE;
 	}
-	return result;
 }
 
 /*
