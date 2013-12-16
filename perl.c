@@ -355,7 +355,7 @@ static void findPerlTags (void)
 				vStringClear (package);
 			while (isspace (*cp))
 				cp++;
-			while ((int) *cp != ';'  &&  !isspace ((int) *cp))
+			while (*cp && (int) *cp != ';'  &&  !isspace ((int) *cp))
 			{
 				vStringPut (package, (int) *cp);
 				cp++;
