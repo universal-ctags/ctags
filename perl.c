@@ -14,6 +14,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+#include "debug.h"
 
 #include <string.h>
 
@@ -164,6 +165,98 @@ SUB_DECL_SWITCH:
 	return FALSE;
 }
 
+/* `end' points to the equal sign.  Parse from right to left to get the
+ * identifier.  Assume we're dealing with something of form \s*\w+\s*=>
+ */
+static void makeTagFromLeftSide (const char *begin, const char *end,
+	vString *name, vString *package)
+{
+	tagEntryInfo entry;
+	const char *b, *e;
+	for (e = end - 1; e > begin && isspace(*e); --e)
+		;
+	if (e < begin)
+		return;
+	for (b = e; b >= begin && isIdentifier(*b); --b)
+		;
+	/* Identifier must be either beginning of line of have some whitespace
+	 * on its left:
+	 */
+	if (b < begin || isspace(*b) || ',' == *b)
+		++b;
+	else if (b != begin)
+		return;
+	Assert(e - b + 1 > 0);
+	vStringClear(name);
+	vStringNCatS(name, b, e - b + 1);
+	initTagEntry(&entry, vStringValue(name));
+	entry.kind = PerlKinds[K_CONSTANT].letter;
+	entry.kindName = PerlKinds[K_CONSTANT].name;
+	makeTagEntry(&entry);
+	if (Option.include.qualifiedTags && package && vStringLength(package)) {
+		vStringClear(name);
+		vStringCopy(name, package);
+		vStringNCatS(name, b, e - b + 1);
+		initTagEntry(&entry, vStringValue(name));
+		entry.kind = PerlKinds[K_CONSTANT].letter;
+		entry.kindName = PerlKinds[K_CONSTANT].name;
+		makeTagEntry(&entry);
+	}
+}
+
+enum const_state { CONST_STATE_NEXT_LINE, CONST_STATE_HIT_END };
+
+/* Parse a single line, find as many NAME => VALUE pairs as we can and try
+ * to detect the end of the hashref.
+ */
+static enum const_state parseConstantsFromLine (const char *cp,
+	vString *name, vString *package)
+{
+	while (1) {
+		const size_t sz = strcspn(cp, "#}=");
+		switch (cp[sz]) {
+			case '=':
+				if (cp[sz + 1] && '>' == cp[sz + 1])
+					makeTagFromLeftSide(cp, cp + sz, name, package);
+				break;
+			case '}':	/* Assume this is the end of the hashref. */
+				return CONST_STATE_HIT_END;
+			case '\0':	/* End of the line. */
+			case '#':	/* Assume this is a comment and thus end of the line. */
+				return CONST_STATE_NEXT_LINE;
+		}
+		cp += sz + 1;
+	}
+}
+
+/* Parse constants declared via hash reference, like this:
+ * use constant {
+ *   A => 1,
+ *   B => 2,
+ * };
+ * The approach we take is simplistic, but it covers the vast majority of
+ * cases well.  There can be some false positives.
+ * Returns 0 if found the end of the hashref, -1 if we hit EOF
+ */
+static int parseConstantsFromHashRef (const unsigned char *cp,
+	vString *name, vString *package)
+{
+	while (1) {
+		enum const_state state =
+			parseConstantsFromLine((const char *) cp, name, package);
+		switch (state) {
+			case CONST_STATE_NEXT_LINE:
+				cp = fileReadLine();
+				if (cp)
+					break;
+				else
+					return -1;
+			case CONST_STATE_HIT_END:
+				return 0;
+		}
+	}
+}
+
 /* Algorithm adapted from from GNU etags.
  * Perl support by Bart Robinson <lomew@cs.utah.edu>
  * Perl sub names: look for /^ [ \t\n]sub [ \t\n]+ [^ \t\n{ (]+/
@@ -222,8 +315,28 @@ static void findPerlTags (void)
 			if (strncmp((const char*) cp, "constant", (size_t) 8) != 0)
 				continue;
 			cp += 8;
+			/* Skip up to the first non-space character, skipping empty
+			 * and comment lines.
+			 */
+			while (isspace(*cp))
+				cp++;
+			while (!*cp || '#' == *cp) {
+				cp = fileReadLine ();
+				if (!cp)
+					goto END_MAIN_WHILE;
+				while (isspace (*cp))
+					cp++;
+			}
+			if ('{' == *cp) {
+				++cp;
+				if (0 == parseConstantsFromHashRef(cp, name, package)) {
+					vStringClear(name);
+					continue;
+				} else
+					goto END_MAIN_WHILE;
+			}
 			kind = K_CONSTANT;
-			spaceRequired = TRUE;
+			spaceRequired = FALSE;
 			qualified = TRUE;
 		}
 		else if (strncmp((const char*) cp, "package", (size_t) 7) == 0)
