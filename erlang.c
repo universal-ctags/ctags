@@ -27,7 +27,7 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-	K_MACRO, K_FUNCTION, K_MODULE, K_RECORD
+	K_MACRO, K_FUNCTION, K_MODULE, K_RECORD, K_TYPE
 } erlangKind;
 
 static kindOption ErlangKinds[] = {
@@ -35,6 +35,7 @@ static kindOption ErlangKinds[] = {
 	{TRUE, 'f', "function", "functions"},
 	{TRUE, 'm', "module",   "modules"},
 	{TRUE, 'r', "record",   "record definitions"},
+	{TRUE, 't', "type",     "type definitions"},
 };
 
 /*
@@ -125,6 +126,8 @@ static void parseFunctionTag (const unsigned char *cp, vString *const module)
  * -module(foo)
  * -define(foo, bar)
  * -record(graph, {vtab = notable, cyclic = true}).
+ * -type some_type() :: any().
+ * -opaque some_opaque_type() :: any().
  */
 static void parseDirective (const unsigned char *cp, vString *const module)
 {
@@ -143,6 +146,10 @@ static void parseDirective (const unsigned char *cp, vString *const module)
 		parseSimpleTag (cp, K_RECORD);
 	else if (strcmp (drtv, "define") == 0)
 		parseSimpleTag (cp, K_MACRO);
+	else if (strcmp (drtv, "type") == 0)
+		parseSimpleTag (cp, K_TYPE);
+	else if (strcmp (drtv, "opaque") == 0)
+		parseSimpleTag (cp, K_TYPE);
 	else if (strcmp (drtv, "module") == 0)
 		parseModuleTag (cp, module);
 	/* Otherwise, it was an import, export, etc. */
