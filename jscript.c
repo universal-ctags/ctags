@@ -489,6 +489,22 @@ getNextChar:
 					  break;
 				  }
 
+		case '#':
+				  /* skip shebang in case of e.g. Node.js scripts */
+				  if (token->lineNumber > 1)
+					  token->type = TOKEN_UNDEFINED;
+				  else if ((c = fileGetc ()) != '!')
+				  {
+					  fileUngetc (c);
+					  token->type = TOKEN_UNDEFINED;
+				  }
+				  else
+				  {
+					  fileSkipToCharacter ('\n');
+					  goto getNextChar;
+				  }
+				  break;
+
 		default:
 				  if (! isIdentChar (c))
 					  token->type = TOKEN_UNDEFINED;
