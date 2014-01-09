@@ -5,7 +5,7 @@ KEY	input.py	/^KEY = 0x01$/;"	v
 TREEID	input.py	/^TREEID = 0x02$/;"	v
 VERSION	input.py	/^VERSION = '1.2.0'$/;"	v
 __init__	input.py	/^    def __init__(self, filename, pathsep='', treegap=64):$/;"	m	class:one
-__private_function__	input.py	/^    def __private_function__(self, key, data):$/;"	m	class:one	file:
+__private_function__	input.py	/^    def __private_function__(self, key, data):$/;"	m	class:one
 _test	input.py	/^def _test(test, code, outcome, exception):$/;"	f
 btopen	input.py	/^from bsddb import btopen$/;"	i
 deeply_nested	input.py	/^            class deeply_nested():$/;"	c	function:_test.ignored_function.more_nesting
