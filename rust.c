@@ -173,7 +173,7 @@ static boolean isIdentifierContinue (int c)
 
 static void scanWhitespace (lexerState *lexer)
 {
-	while (!fileEOF() && isWhitespace(lexer->cur_c))
+	while (isWhitespace(lexer->cur_c))
 		advanceChar(lexer);
 }
 
@@ -188,14 +188,14 @@ static void scanComments (lexerState *lexer)
 	if (lexer->next_c == '/' || lexer->next_c == '!')
 	{
 		advanceNChar(lexer, 2);
-		while (!fileEOF() && lexer->cur_c != '\n')
+		while (lexer->cur_c != EOF && lexer->cur_c != '\n')
 			advanceChar(lexer);
 	}
 	else if (lexer->next_c == '*')
 	{
 		int level = 1;
 		advanceNChar(lexer, 2);
-		while (!fileEOF() && level > 0)
+		while (lexer->cur_c != EOF && level > 0)
 		{
 			if (lexer->cur_c == '*' && lexer->next_c == '/')
 			{
@@ -222,7 +222,7 @@ static void scanIdentifier (lexerState *lexer)
 	{
 		vStringPut(lexer->token_str, (char) lexer->cur_c);
 		advanceChar(lexer);
-	} while(!fileEOF() && isIdentifierContinue(lexer->cur_c));
+	} while(lexer->cur_c != EOF && isIdentifierContinue(lexer->cur_c));
 }
 
 /* Double-quoted strings, we only care about the \" escape. These
@@ -234,7 +234,7 @@ static void scanString (lexerState *lexer)
 {
 	vStringClear(lexer->token_str);
 	advanceChar(lexer);
-	while (!fileEOF() && lexer->cur_c != '"')
+	while (lexer->cur_c != EOF && lexer->cur_c != '"')
 	{
 		if (lexer->cur_c == '\\' && lexer->next_c == '"')
 			advanceChar(lexer);
@@ -253,7 +253,7 @@ static void scanRawString (lexerState *lexer)
 	vStringClear(lexer->token_str);
 	advanceChar(lexer);
 	/* Count how many leading hashes there are */
-	while (!fileEOF() && lexer->cur_c == '#')
+	while (lexer->cur_c == '#')
 	{
 		num_initial_hashes++;
 		advanceChar(lexer);
@@ -261,7 +261,7 @@ static void scanRawString (lexerState *lexer)
 	if (lexer->cur_c != '"')
 		return;
 	advanceChar(lexer);
-	while (!fileEOF())
+	while (lexer->cur_c != EOF)
 	{
 		if (vStringLength(lexer->token_str) < MAX_STRING_LENGTH)
 			vStringPut(lexer->token_str, (char) lexer->cur_c);
@@ -271,7 +271,7 @@ static void scanRawString (lexerState *lexer)
 		{
 			size_t num_trailing_hashes = 0;
 			advanceChar(lexer);
-			while (!fileEOF() && lexer->cur_c == '#' && num_trailing_hashes < num_initial_hashes)
+			while (lexer->cur_c == '#' && num_trailing_hashes < num_initial_hashes)
 			{
 				num_trailing_hashes++;
 
@@ -306,7 +306,7 @@ static int advanceToken (lexerState *lexer, boolean skip_whitspace)
 	boolean have_whitespace = FALSE;
 	lexer->line = getSourceLineNumber();
 	lexer->pos = getInputFilePosition();
-	while (!fileEOF())
+	while (lexer->cur_c != EOF)
 	{
 		if (isWhitespace(lexer->cur_c))
 		{
@@ -327,7 +327,7 @@ static int advanceToken (lexerState *lexer, boolean skip_whitspace)
 	}
 	lexer->line = getSourceLineNumber();
 	lexer->pos = getInputFilePosition();
-	while (!fileEOF())
+	while (lexer->cur_c != EOF)
 	{
 		if (lexer->cur_c == '"')
 		{
