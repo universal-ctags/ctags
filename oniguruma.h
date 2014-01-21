@@ -406,7 +406,9 @@ typedef unsigned int        OnigOptionType;
 #define ONIG_OPTION_WORD_BOUND_ALL_RANGE    (ONIG_OPTION_POSIX_BRACKET_ALL_RANGE << 1)
 /* options (newline) */
 #define ONIG_OPTION_NEWLINE_CRLF         (ONIG_OPTION_WORD_BOUND_ALL_RANGE << 1)
-#define ONIG_OPTION_MAXBIT               ONIG_OPTION_NEWLINE_CRLF  /* limit */
+#define ONIG_OPTION_NOTBOS               (ONIG_OPTION_NEWLINE_CRLF << 1)
+#define ONIG_OPTION_NOTEOS               (ONIG_OPTION_NOTBOS << 1)
+#define ONIG_OPTION_MAXBIT               ONIG_OPTION_NOTEOS  /* limit */
 
 #define ONIG_OPTION_ON(options,regopt)      ((options) |= (regopt))
 #define ONIG_OPTION_OFF(options,regopt)     ((options) &= ~(regopt))

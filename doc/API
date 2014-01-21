@@ -243,6 +243,8 @@ Onigmo (Oniguruma-mod) API  Version 5.11.4  2011/10/08
 
     ONIG_OPTION_NOTBOL        string head(str) isn't considered as begin of line
     ONIG_OPTION_NOTEOL        string end (end) isn't considered as end of line
+    ONIG_OPTION_NOTBOS        string head(str) isn't considered as begin of string (\A)
+    ONIG_OPTION_NOTEOS        string end (end) isn't considered as end of string (\z)
     ONIG_OPTION_POSIX_REGION  region argument is regmatch_t[] of POSIX API.
 
 
@@ -264,6 +266,8 @@ Onigmo (Oniguruma-mod) API  Version 5.11.4  2011/10/08
 
     ONIG_OPTION_NOTBOL       string head(str) isn't considered as begin of line
     ONIG_OPTION_NOTEOL       string end (end) isn't considered as end of line
+    ONIG_OPTION_NOTBOS       string head(str) isn't considered as begin of string (\A)
+    ONIG_OPTION_NOTEOS       string end (end) isn't considered as end of string (\z)
     ONIG_OPTION_POSIX_REGION region argument is regmatch_t[] type of POSIX API.
 
 
