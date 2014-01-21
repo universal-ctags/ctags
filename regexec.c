@@ -444,9 +444,22 @@ onig_region_copy(OnigRegion* to, OnigRegion* from)
 
 
 
-#define STACK_INIT(alloc_addr, ptr_num, stack_num)  do {\
-  if (msa->stack_p) {\
+#define MAX_PTR_NUM 100
+
+#define STACK_INIT(alloc_addr, heap_addr, ptr_num, stack_num)  do {\
+  if (ptr_num > MAX_PTR_NUM) {\
+    xfree(msa->stack_p);\
+    alloc_addr = (char* )xmalloc(sizeof(OnigStackIndex) * (ptr_num));\
+    heap_addr  = alloc_addr;\
+    stk_alloc  = (OnigStackType* )xmalloc(sizeof(OnigStackIndex) * (stack_num));\
+    stk_base   = stk_alloc;\
+    stk        = stk_base;\
+    stk_end    = stk_base + (stack_num);\
+    msa->stack_p = stk_alloc;\
+    msa->stack_n = stk_end - stk_base;\
+  } else if (msa->stack_p) {\
     alloc_addr = (char* )xalloca(sizeof(OnigStackIndex) * (ptr_num));\
+    heap_addr  = NULL;\
     stk_alloc  = (OnigStackType* )(msa->stack_p);\
     stk_base   = stk_alloc;\
     stk        = stk_base;\
@@ -455,6 +468,7 @@ onig_region_copy(OnigRegion* to, OnigRegion* from)
   else {\
     alloc_addr = (char* )xalloca(sizeof(OnigStackIndex) * (ptr_num)\
 		       + sizeof(OnigStackType) * (stack_num));\
+    heap_addr  = NULL;\
     stk_alloc  = (OnigStackType* )(alloc_addr + sizeof(OnigStackIndex) * (ptr_num));\
     stk_base   = stk_alloc;\
     stk        = stk_base;\
@@ -1325,6 +1339,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
   UChar *p = reg->p;
   UChar *pkeep;
   char *alloca_base;
+  char *xmalloc_base;
   OnigStackType *stk_alloc, *stk_base, *stk, *stk_end;
   OnigStackType *stkp; /* used as any purpose. */
   OnigStackIndex si;
@@ -1340,7 +1355,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
   /* Stack #0 is used to store the pattern itself and used for (?R), \g<0>, etc. */
   n = reg->num_repeat + (reg->num_mem + 1) * 2;
 
-  STACK_INIT(alloca_base, n, INIT_MATCH_STACK_SIZE);
+  STACK_INIT(alloca_base, xmalloc_base, n, INIT_MATCH_STACK_SIZE);
   pop_level = reg->stack_pop_level;
   num_mem = reg->num_mem;
   repeat_stk = (OnigStackIndex* )alloca_base;
@@ -1354,7 +1369,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
   /* Stack #0 not is used. */
   n = reg->num_repeat + reg->num_mem * 2;
 
-  STACK_INIT(alloca_base, n, INIT_MATCH_STACK_SIZE);
+  STACK_INIT(alloca_base, xmalloc_base, n, INIT_MATCH_STACK_SIZE);
   pop_level = reg->stack_pop_level;
   num_mem = reg->num_mem;
   repeat_stk = (OnigStackIndex* )alloca_base;
@@ -2150,6 +2165,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
     case OP_BEGIN_BUF:  MOP_IN(OP_BEGIN_BUF);
       if (! ON_STR_BEGIN(s)) goto fail;
+      if (IS_NOTBOS(msa->options)) goto fail;
 
       MOP_OUT;
       continue;
@@ -2157,6 +2173,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
     case OP_END_BUF:  MOP_IN(OP_END_BUF);
       if (! ON_STR_END(s)) goto fail;
+      if (IS_NOTEOS(msa->options)) goto fail;
 
       MOP_OUT;
       continue;
@@ -2916,20 +2933,24 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
  finish:
   STACK_SAVE;
+  xfree(xmalloc_base);
   return best_len;
 
 #ifdef ONIG_DEBUG
  stack_error:
   STACK_SAVE;
+  xfree(xmalloc_base);
   return ONIGERR_STACK_BUG;
 #endif
 
  bytecode_error:
   STACK_SAVE;
+  xfree(xmalloc_base);
   return ONIGERR_UNDEFINED_BYTECODE;
 
  unexpected_bytecode_error:
   STACK_SAVE;
+  xfree(xmalloc_base);
   return ONIGERR_UNEXPECTED_BYTECODE;
 }
 
@@ -4181,11 +4202,6 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
     }
   }
   else {  /* backward search */
-#ifdef USE_MATCH_RANGE_MUST_BE_INSIDE_OF_SPECIFIED_RANGE
-    if (orig_start < end)
-      orig_start += enclen(reg->enc, orig_start, end); /* is upper range */
-#endif
-
     if (reg->optimize != ONIG_OPTIMIZE_NONE) {
       UChar *low, *high, *adjrange, *sch_start;
 

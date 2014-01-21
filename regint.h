@@ -376,6 +376,8 @@ typedef unsigned int  BitStatusType;
           (ONIG_OPTION_FIND_LONGEST | ONIG_OPTION_FIND_NOT_EMPTY))
 #define IS_NOTBOL(option)         ((option) & ONIG_OPTION_NOTBOL)
 #define IS_NOTEOL(option)         ((option) & ONIG_OPTION_NOTEOL)
+#define IS_NOTBOS(option)         ((option) & ONIG_OPTION_NOTBOS)
+#define IS_NOTEOS(option)         ((option) & ONIG_OPTION_NOTEOS)
 #define IS_POSIX_REGION(option)   ((option) & ONIG_OPTION_POSIX_REGION)
 #define IS_ASCII_RANGE(option)    ((option) & ONIG_OPTION_ASCII_RANGE)
 #define IS_POSIX_BRACKET_ALL_RANGE(option)  ((option) & ONIG_OPTION_POSIX_BRACKET_ALL_RANGE)
