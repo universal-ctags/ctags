@@ -294,5 +294,5 @@ extern int main(int argc, char* argv[])
   set_case_fold(ONIGENC_CASE_FOLD_MIN);
 #endif
 
-  return 0;
+  return r;
 }

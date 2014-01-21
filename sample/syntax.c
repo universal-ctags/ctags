@@ -70,5 +70,5 @@ extern int main(int argc, char* argv[])
            "abc def* e+ g?ddd[a-rvvv] (vv){3,7}hv\\dvv(?:aczui ss)\\W\\w$",
            "abc def* e+ g?ddd[a-rvvv] (vv){3,7}hv\\dvv(?:aczui ss)\\W\\w$");
   onig_end();
-  return 0;
+  return r;
 }
