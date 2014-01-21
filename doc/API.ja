@@ -244,8 +244,8 @@ Onigmo インターフェース Version 5.11.4   2011/10/08
 
     ONIG_OPTION_NOTBOL        文字列の先頭(str)を行頭と看做さない
     ONIG_OPTION_NOTEOL        文字列の終端(end)を行末と看做さない
-    ONIG_OPTION_NOTBOS        string head(str) isn't considered as begin of string (\A)
-    ONIG_OPTION_NOTEOS        string end (end) isn't considered as end of string (\z)
+    ONIG_OPTION_NOTBOS        文字列の先頭(str)を先頭(\A)と見做さない
+    ONIG_OPTION_NOTEOS        文字列の終端(end)を終端(\z)と見做さない
     ONIG_OPTION_POSIX_REGION  region引数をPOSIX APIのregmatch_t[]にする
 
 
@@ -267,8 +267,8 @@ Onigmo インターフェース Version 5.11.4   2011/10/08
 
     ONIG_OPTION_NOTBOL        文字列の先頭(str)を行頭と看做さない
     ONIG_OPTION_NOTEOL        文字列の終端(end)を行末と看做さない
-    ONIG_OPTION_NOTBOS        string head(str) isn't considered as begin of string (\A)
-    ONIG_OPTION_NOTEOS        string end (end) isn't considered as end of string (\z)
+    ONIG_OPTION_NOTBOS        文字列の先頭(str)を先頭(\A)と見做さない
+    ONIG_OPTION_NOTEOS        文字列の終端(end)を終端(\z)と見做さない
     ONIG_OPTION_POSIX_REGION  region引数をPOSIX APIのregmatch_t[]にする
 
 
