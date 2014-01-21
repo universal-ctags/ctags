@@ -103,5 +103,5 @@ extern int main(int argc, char* argv[])
   r = ex(str3, pattern3, &syn);
 
   onig_end();
-  return 0;
+  return r;
 }
