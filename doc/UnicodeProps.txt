@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
+Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.5    2014/01/22
 
 * POSIX brackets
     Alpha
@@ -415,6 +415,8 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Age=5.2
     Age=6.0
     Age=6.1
+    Age=6.2
+    Age=6.3
 
 * Blocks
     In_Basic_Latin
