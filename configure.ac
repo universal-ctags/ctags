@@ -482,6 +482,7 @@ fi
 # 	fi
 # fi
 
+AC_CHECK_FUNCS(scandir)
 
 # Checks for missing prototypes
 # -----------------------------

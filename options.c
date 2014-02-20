@@ -20,6 +20,10 @@
 #include <stdio.h>
 #include <ctype.h>  /* to declare isspace () */
 
+#if defined(HAVE_SCANDIR)
+#include <dirent.h>
+#endif
+
 #include "ctags.h"
 #include "debug.h"
 #include "main.h"
@@ -345,6 +349,7 @@ static const char *const Features [] = {
 *   FUNCTION PROTOTYPES
 */
 static boolean parseFileOptions (const char *const fileName);
+static boolean parseAllConfigurationFilesOptionsInDirectory(const char *const fileName);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -1239,10 +1244,18 @@ static void processListLanguagesOption (
 static void processOptionFile (
 		const char *const option, const char *const parameter)
 {
+	boolean opened_as_file, opened_as_dir;
 	if (parameter [0] == '\0')
 		error (WARNING, "no option file supplied for \"%s\"", option);
-	else if (! parseFileOptions (parameter))
-		error (FATAL | PERROR, "cannot open option file \"%s\"", parameter);
+	else
+	{
+
+		opened_as_file = parseFileOptions (parameter);
+		opened_as_dir  = parseAllConfigurationFilesOptionsInDirectory (parameter);
+
+		if ((opened_as_file == FALSE) && (opened_as_dir == FALSE))
+			error (FATAL | PERROR, "cannot open option file \"%s\"", parameter);
+	}
 }
 
 static void processSortOption (
@@ -1747,7 +1760,7 @@ static void parseConfigurationFileOptionsInDirectoryWithLeafname (const char* di
 static void parseConfigurationFileOptionsInDirectory (const char* directory)
 {
 	char	*leafname = NULL;
-	
+
 	asprintf (&leafname,".%s",(Option.configFilename)?Option.configFilename:"ctags");
 	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, leafname);
 	free (leafname);
@@ -1758,30 +1771,109 @@ static void parseConfigurationFileOptionsInDirectory (const char* directory)
 #endif
 }
 
+#if defined(HAVE_SCANDIR)
+static int accept_only_dot_ctags(const struct dirent* dent)
+{
+	size_t len;
+
+	/* Ignore a file which name is started from dot. */
+	if (*dent->d_name == '.')
+		return 0;
+
+	/* accept only a file ended with ".conf" or ".ctags" */
+	len = strlen(dent->d_name);
+
+	if (len < 6)
+		return 0;
+	if (strcmp(dent->d_name + (len - 5), ".conf") == 0)
+		return 1;
+
+	if (len < 7)
+		return 0;
+	if (strcmp(dent->d_name + (len - 6), ".ctags") == 0)
+		return 1;
+
+	return 0;
+}
+
+static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const dirName)
+{
+	struct dirent **dents;
+	int i, n;
+
+	n = scandir (dirName, &dents, accept_only_dot_ctags, alphasort);
+	if (n < 0)
+		return FALSE;
+	
+	for (i = 0; i < n; i++)
+	{
+		parseConfigurationFileOptionsInDirectoryWithLeafname (dirName,
+								      dents[i]->d_name);
+		free (dents[i]);
+	}
+	free (dents);
+	return TRUE;
+}
+#else
+static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const dirName)
+{
+	return FALSE;
+}
+#endif
+
 static void parseConfigurationFileOptions (void)
 {
 	/* We parse .ctags on all systems, and additionally ctags.cnf on DOS. */
 	const char* const home = getenv ("HOME");
 	char *filename = NULL;
-	
+	char *filename_body;
+
 #ifdef CUSTOM_CONFIGURATION_FILE
 	parseFileOptions (CUSTOM_CONFIGURATION_FILE);
 #endif
+	filename_body = (Option.configFilename)?Option.configFilename:"ctags";
 #ifdef MSDOS_STYLE_PATH
-	
-	asprintf (&filename,"/%s.cnf",(Option.configFilename)?Option.configFilename:"ctags");
+
+	asprintf (&filename,"/%s.cnf", filename_body);
 	parseFileOptions (filename);
 	free (filename);
 #endif
-	asprintf (&filename,"/etc/%s.conf",(Option.configFilename)?Option.configFilename:"ctags");
+	asprintf (&filename,"/etc/%s.conf", filename_body);
 	parseFileOptions (filename);
 	free (filename);
-	asprintf (&filename,"/usr/local/etc/%s.conf",(Option.configFilename)?Option.configFilename:"ctags");
+
+#ifndef MSDOS_STYLE_PATH
+	if (!Option.configFilename)
+	{
+		asprintf (&filename,"/etc/%s.conf.d", filename_body);
+		parseAllConfigurationFilesOptionsInDirectory(filename);
+		free (filename);
+	}
+#endif
+
+	asprintf (&filename,"/usr/local/etc/%s.conf", filename_body);
 	parseFileOptions (filename);
 	free (filename);
+
+#ifndef MSDOS_STYLE_PATH
+	if (!Option.configFilename)
+	{
+		asprintf (&filename,"/usr/local/etc/%s.conf.d", filename_body);
+		parseAllConfigurationFilesOptionsInDirectory(filename);
+		free (filename);
+	}
+#endif
+
 	if (home != NULL)
 	{
 		parseConfigurationFileOptionsInDirectory (home);
+#ifndef MSDOS_STYLE_PATH
+		{
+			vString* const pathname = combinePathAndFile (home, ".ctags.d");
+			parseAllConfigurationFilesOptionsInDirectory(vStringValue (pathname));
+			vStringDelete (pathname);
+		}
+#endif
 	}
 	else
 	{
