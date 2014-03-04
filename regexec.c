@@ -1400,7 +1400,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     if (s) {
       UChar *q, *bp, buf[50];
       int len;
-      fprintf(stderr, "%4d> \"", (int )(s - str));
+      fprintf(stderr, "%4d> \"", (*p == OP_FINISH) ? -1 : (int )(s - str));
       bp = buf;
       if (*p != OP_FINISH) {    /* s may not be a valid pointer if OP_FINISH. */
 	for (i = 0, q = s; i < 7 && q < end; i++) {
