@@ -46,6 +46,7 @@ if test "${multithread}" = yes; then
 	[AC_DEFINE(USE_MULTI_THREAD_SYSTEM,1,[Define if enbale multithread support])
 	 AC_DEFINE(USE_DEFAULT_MULTI_THREAD_SYSTEM,1,[Define if enable the default multithread system])
   ])
+  AC_CHECK_LIB(pthread, pthread_mutex_init)
 fi
 
 
