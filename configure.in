@@ -37,6 +37,17 @@ if test "${crnl_as_line_terminator}" = yes; then
   AC_DEFINE(USE_CRNL_AS_LINE_TERMINATOR,1,[Define if enable CR+NL as line terminator])
 fi
 
+dnl check for multithread
+AC_ARG_ENABLE(multithread,
+	[  --enable-multithread    enable multithread support],
+	[multithread=$enableval])
+if test "${multithread}" = yes; then
+  AC_CHECK_HEADERS(pthread.h,
+	[AC_DEFINE(USE_MULTI_THREAD_SYSTEM,1,[Define if enbale multithread support])
+	 AC_DEFINE(USE_DEFAULT_MULTI_THREAD_SYSTEM,1,[Define if enable the default multithread system])
+  ])
+fi
+
 
 dnl Checks for programs.
 AC_PROG_CC
