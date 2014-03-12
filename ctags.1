@@ -411,7 +411,7 @@ more than double the size of the tag file.
 .RE
 
 .TP 5
-\fB\-\-fields\fP=\fI[+|\-]flags\fP
+\fB\-\-fields\fP=\fI[+|\-]flags\fP|\fi*\fP
 Specifies the available extension fields which are to be included in the
 entries of the tag file (see \fBTAG FILE FORMAT\fP, below, for more
 information). The parameter \fIflags\fP is a set of one-letter flags, each
@@ -464,7 +464,8 @@ Type and name of a variable or typedef as "typeref:" field [enabled]
 Each letter or group of letters may be preceded by either '+' to add it to the
 default set, or '\-' to exclude it. In the absence of any preceding '+' or '\-'
 sign, only those kinds explicitly listed in \fIflags\fP will be included in
-the output (i.e. overriding the default set). This option is ignored if the
+the output (i.e. overriding the default set). All fields are included if '*'
+is given. This option is ignored if the
 option \fB\-\-format\fP=\fI1\fP has been specified. The default value 
 of this option is \fIfkst\fP.
 .RE

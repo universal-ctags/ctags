@@ -928,6 +928,12 @@ static void processExtraTagsOption (
 	}
 }
 
+static void resetFieldsOption (
+		struct sExtFields *field, boolean mode)
+{
+	memset(field, mode? ~0: 0, sizeof(*field));
+}
+
 static void processFieldsOption (
 		const char *const option, const char *const parameter)
 {
@@ -936,19 +942,16 @@ static void processFieldsOption (
 	boolean mode = TRUE;
 	int c;
 
-	if (*p != '+'  &&  *p != '-')
+
+	if (*p == '*')
 	{
-		field->access           = FALSE;
-		field->fileScope        = FALSE;
-		field->implementation   = FALSE;
-		field->inheritance      = FALSE;
-		field->kind             = FALSE;
-		field->kindKey          = FALSE;
-		field->kindLong         = FALSE;
-		field->language         = FALSE;
-		field->scope            = FALSE;
-		field->typeRef          = FALSE;
+		resetFieldsOption(field, TRUE);
+		p++;
 	}
+	else if (*p != '+'  &&  *p != '-')
+		resetFieldsOption(field, FALSE);
+
+
 	while ((c = *p++) != '\0') switch (c)
 	{
 		case '+': mode = TRUE;                  break;
