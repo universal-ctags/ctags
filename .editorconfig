@@ -21,8 +21,7 @@ indent_style = space
 indent_size = 2
 tab_width = 8
 
-[{HISTORY,history}]
-; [HISTORY] doesn't work?
+[HISTORY]
 indent_style = space
 
 [doc/*]
