@@ -67,6 +67,7 @@ typedef enum {
 	TOKEN_IDENT,
 	TOKEN_LSHIFT,
 	TOKEN_RSHIFT,
+	TOKEN_RARROW,
 	TOKEN_EOF
 } tokenType;
 
@@ -128,6 +129,9 @@ static void writeCurTokenToStr (lexerState *lexer, vString *out_str)
 			break;
 		case TOKEN_RSHIFT:
 			vStringCatS(out_str, ">>");
+			break;
+		case TOKEN_RARROW:
+			vStringCatS(out_str, "->");
 			break;
 		default:
 			vStringPut(out_str, (char) lexer->cur_token);
@@ -355,6 +359,11 @@ static int advanceToken (lexerState *lexer, boolean skip_whitspace)
 		{
 			advanceNChar(lexer, 2);
 			return lexer->cur_token = TOKEN_LSHIFT;
+		}
+		else if (lexer->cur_c == '-' && lexer->next_c == '>')
+		{
+			advanceNChar(lexer, 2);
+			return lexer->cur_token = TOKEN_RARROW;
 		}
 		else
 		{
