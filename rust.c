@@ -715,9 +715,29 @@ static void parseStructOrEnum (lexerState *lexer, vString *scope, int parent_kin
 		vString *field_name = vStringNew();
 		while (lexer->cur_token != TOKEN_EOF)
 		{
+			int goal_tokens2[] = {'}', ','};
+			/* Skip attributes. Format:
+			 * #[..] or #![..]
+			 * */
+			if (lexer->cur_token == '#')
+			{
+				advanceToken(lexer, TRUE);
+				if (lexer->cur_token == '!')
+					advanceToken(lexer, TRUE);
+				if (lexer->cur_token == '[')
+				{
+					/* It's an attribute, skip it. */
+					skipUntil(lexer, NULL, 0);
+				}
+				else
+				{
+					/* Something's up with this field, skip to the next one */
+					skipUntil(lexer, goal_tokens2, 2);
+					continue;
+				}
+			}
 			if (lexer->cur_token == TOKEN_IDENT)
 			{
-				int goal_tokens2[] = {'}', ','};
 				if (strcmp(lexer->token_str->buffer, "priv") == 0)
 				{
 					advanceToken(lexer, TRUE);
