@@ -1,4 +1,6 @@
+A	input.rs	/^pub struct A$/;"	s
 Animal	input.rs	/^enum Animal {$/;"	g
+B	input.rs	/^pub struct B$/;"	s
 Bar	input.rs	/^struct Bar(int);$/;"	s
 Baz	input.rs	/^struct Baz(int);$/;"	s
 DoZ	input.rs	/^trait DoZ {$/;"	i
@@ -17,12 +19,17 @@ a_anteater	input.rs	/^	a_anteater(int),$/;"	e	enum:Animal
 a_bear	input.rs	/^	a_bear(int),$/;"	e	enum:Animal
 a_cat	input.rs	/^	a_cat(int),$/;"	e	enum:Animal
 a_dog	input.rs	/^	a_dog(int),$/;"	e	enum:Animal
+bar	input.rs	/^	bar: int$/;"	m	struct:A
+bar	input.rs	/^	bar: int$/;"	m	struct:B
 do_z	input.rs	/^	fn do_z(&self) {$/;"	F	class:Foo	signature:(&self)
 do_z	input.rs	/^	fn do_z(&self);$/;"	F	interface:DoZ	signature:(&self)
+foo	input.rs	/^	foo: fn() -> int,$/;"	m	struct:A
+foo	input.rs	/^	foo: int,$/;"	m	struct:B
 foo_field_1	input.rs	/^struct Foo{foo_field_1:int}$/;"	m	struct:Foo
 gfunc	input.rs	/^fn gfunc<X:Testable+DoZ>(x:&X) {$/;"	f	signature:<X:Testable+DoZ>(x:&X)
+ignore	input.rs	/^macro_rules! ignore (($($x:tt)*) => (()))$/;"	M
 main	input.rs	/^fn main() {	$/;"	f	signature:()
-my_method	input.rs	/^	fn my_method(&self,_:int){ print("my_method of foo");}$/;"	F	class:Foo	signature:(&self,_:int)
+my_method	input.rs	/^	fn my_method(&self,_:int){ println("my_method of foo");}$/;"	F	class:Foo	signature:(&self,_:int)
 nested	input.rs	/^	fn nested() {}$/;"	f	function:main	signature:()
 only_field	input.rs	/^	only_field: [int, ..size]$/;"	m	struct:S1
 size	input.rs	/^static size: uint = 1;$/;"	v
