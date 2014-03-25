@@ -775,19 +775,22 @@ static void skipMacro (lexerState *lexer)
 	int minus_token = 0;
 
 	advanceToken(lexer, TRUE);
-	if (lexer->cur_token == '(')
+	switch (lexer->cur_token)
 	{
-		plus_token = '(';
-		minus_token = ')';
-	}
-	else if (lexer->cur_token == '{')
-	{
-		plus_token = '{';
-		minus_token = '}';
-	}
-	else
-	{
-		return;
+		case '(':
+			plus_token = '(';
+			minus_token = ')';
+			break;
+		case '{':
+			plus_token = '{';
+			minus_token = '}';
+			break;
+		case '[':
+			plus_token = '[';
+			minus_token = ']';
+			break;
+		default:
+			return;
 	}
 
 	while (lexer->cur_token != TOKEN_EOF)
