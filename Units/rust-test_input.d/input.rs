@@ -32,8 +32,9 @@ pub struct B
 
 static size: uint = 1;
 
+#[cfg(test)]
 struct S1 {
-	only_field: [int, ..size]
+	priv only_field: [int, ..size]
 }
 
 macro_rules! test_macro
