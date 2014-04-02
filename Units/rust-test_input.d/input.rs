@@ -14,10 +14,8 @@ pub struct A
 
 pub struct B
 {
-	#![cfg(test)]
 	#[cfg(test)]
 	foo: int,
-	#![cfg(test)]
 	bar: int
 }
 
@@ -65,6 +63,10 @@ fn main() {
 	[
 		fn ignored_inside_macro() {}
 	]
+	ignore!
+	{
+		fn ignored_inside_macro() {}
+	}
 
 	let _ = "fn ignored_in_string() {}
 	";
