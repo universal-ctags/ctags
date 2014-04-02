@@ -738,7 +738,8 @@ static void parseStructOrEnum (lexerState *lexer, vString *scope, int parent_kin
 			}
 			if (lexer->cur_token == TOKEN_IDENT)
 			{
-				if (strcmp(lexer->token_str->buffer, "priv") == 0)
+				if (strcmp(lexer->token_str->buffer, "priv") == 0
+				    || strcmp(lexer->token_str->buffer, "pub") == 0)
 				{
 					advanceToken(lexer, TRUE);
 					if (lexer->cur_token != TOKEN_IDENT)
