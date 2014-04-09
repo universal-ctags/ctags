@@ -449,15 +449,19 @@ onig_region_copy(OnigRegion* to, OnigRegion* from)
 
 #define STACK_INIT(alloc_addr, heap_addr, ptr_num, stack_num)  do {\
   if (ptr_num > MAX_PTR_NUM) {\
-    if (msa->stack_p) xfree(msa->stack_p);\
     alloc_addr = (char* )xmalloc(sizeof(OnigStackIndex) * (ptr_num));\
     heap_addr  = alloc_addr;\
-    stk_alloc  = NULL;\
-    stk_base   = (OnigStackType* )xmalloc(sizeof(OnigStackIndex) * (stack_num));\
-    stk        = stk_base;\
-    stk_end    = stk_base + (stack_num);\
-    msa->stack_p = stk_base;\
-    msa->stack_n = stk_end - stk_base;\
+    if (msa->stack_p) {\
+      stk_alloc = (OnigStackType* )(msa->stack_p);\
+      stk_base  = stk_alloc;\
+      stk       = stk_base;\
+      stk_end   = stk_base + msa->stack_n;\
+    } else {\
+      stk_alloc = (OnigStackType* )xalloca(sizeof(OnigStackType) * (stack_num));\
+      stk_base  = stk_alloc;\
+      stk       = stk_base;\
+      stk_end   = stk_base + (stack_num);\
+    }\
   } else if (msa->stack_p) {\
     alloc_addr = (char* )xalloca(sizeof(OnigStackIndex) * (ptr_num));\
     heap_addr  = NULL;\
