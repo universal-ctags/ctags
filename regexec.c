@@ -448,15 +448,19 @@ onig_region_copy(OnigRegion* to, OnigRegion* from)
 
 #define STACK_INIT(alloc_addr, heap_addr, ptr_num, stack_num)  do {\
   if (ptr_num > MAX_PTR_NUM) {\
-    xfree(msa->stack_p);\
     alloc_addr = (char* )xmalloc(sizeof(OnigStackIndex) * (ptr_num));\
     heap_addr  = alloc_addr;\
-    stk_alloc  = (OnigStackType* )xmalloc(sizeof(OnigStackIndex) * (stack_num));\
-    stk_base   = stk_alloc;\
-    stk        = stk_base;\
-    stk_end    = stk_base + (stack_num);\
-    msa->stack_p = stk_alloc;\
-    msa->stack_n = stk_end - stk_base;\
+    if (msa->stack_p) {\
+      stk_alloc = (OnigStackType* )(msa->stack_p);\
+      stk_base  = stk_alloc;\
+      stk       = stk_base;\
+      stk_end   = stk_base + msa->stack_n;\
+    } else {\
+      stk_alloc = (OnigStackType* )xalloca(sizeof(OnigStackType) * (stack_num));\
+      stk_base  = stk_alloc;\
+      stk       = stk_base;\
+      stk_end   = stk_base + (stack_num);\
+    }\
   } else if (msa->stack_p) {\
     alloc_addr = (char* )xalloca(sizeof(OnigStackIndex) * (ptr_num));\
     heap_addr  = NULL;\
@@ -543,7 +547,11 @@ stack_double(OnigStackType** arg_stk_base, OnigStackType** arg_stk_end,
 #define STACK_ENSURE(n)	do {\
   if (stk_end - stk < (n)) {\
     int r = stack_double(&stk_base, &stk_end, &stk, stk_alloc, msa);\
-    if (r != 0) { STACK_SAVE; return r; } \
+    if (r != 0) {\
+      STACK_SAVE;\
+      if (xmalloc_base) xfree(xmalloc_base);\
+      return r;\
+    }\
   }\
 } while(0)
 
@@ -1339,7 +1347,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
   UChar *p = reg->p;
   UChar *pkeep;
   char *alloca_base;
-  char *xmalloc_base;
+  char *xmalloc_base = NULL;
   OnigStackType *stk_alloc, *stk_base, *stk, *stk_end;
   OnigStackType *stkp; /* used as any purpose. */
   OnigStackIndex si;
@@ -1401,7 +1409,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     if (s) {
       UChar *q, *bp, buf[50];
       int len;
-      fprintf(stderr, "%4d> \"", (int )(s - str));
+      fprintf(stderr, "%4d> \"", (*p == OP_FINISH) ? -1 : (int )(s - str));
       bp = buf;
       if (*p != OP_FINISH) {    /* s may not be a valid pointer if OP_FINISH. */
 	for (i = 0, q = s; i < 7 && q < end; i++) {
@@ -2933,24 +2941,24 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
  finish:
   STACK_SAVE;
-  xfree(xmalloc_base);
+  if (xmalloc_base) xfree(xmalloc_base);
   return best_len;
 
 #ifdef ONIG_DEBUG
  stack_error:
   STACK_SAVE;
-  xfree(xmalloc_base);
+  if (xmalloc_base) xfree(xmalloc_base);
   return ONIGERR_STACK_BUG;
 #endif
 
  bytecode_error:
   STACK_SAVE;
-  xfree(xmalloc_base);
+  if (xmalloc_base) xfree(xmalloc_base);
   return ONIGERR_UNDEFINED_BYTECODE;
 
  unexpected_bytecode_error:
   STACK_SAVE;
-  xfree(xmalloc_base);
+  if (xmalloc_base) xfree(xmalloc_base);
   return ONIGERR_UNEXPECTED_BYTECODE;
 }
 
