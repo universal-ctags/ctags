@@ -1,5 +1,22 @@
 History of Onigmo (Oniguruma-mod)
 
+2014/04/12: [new]  (thanks mattn)
+                   Fix build on mingw (Issue #33)
+2014/04/12: [new]  improve multithread support
+                   Add the default multithread implementations for Win32 and
+                   Unix. Add --enable-multithread option in configure.
+2014/04/12: [bug]  fix: segmation fault occurs when many groups are used
+                   (Issue #24)
+                   see: https://bugs.ruby-lang.org/issues/8716
+2014/01/22: [new]  (thanks Allan Odgaard)
+                   Add option to indicate search range is not begin/end of
+                   string (Issue #27)
+2014/01/22: [bug]  fix: Backwards search not respecting range (Issue #22)
+2014/01/21: [dist] Merge Oniguruma 5.9.5
+2013/07/29: [new]  (thanks Allan Odgaard)
+                   Add 'ifndef ... endif' guard around thread locking macros
+                   (Issue #23)
+
 2013/07/03: Version 5.13.5
 
 2013/07/03: [dist] update LTVERSION to "5:0:5".
