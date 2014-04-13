@@ -5,6 +5,7 @@ History of Onigmo (Oniguruma-mod)
 2014/04/12: [new]  improve multithread support
                    Add the default multithread implementations for Win32 and
                    Unix. Add --enable-multithread option in configure.
+2014/04/12: [bug]  deadlock occurs when recursive lock is not allowed
 2014/04/12: [bug]  fix: segmation fault occurs when many groups are used
                    (Issue #24)
                    see: https://bugs.ruby-lang.org/issues/8716
