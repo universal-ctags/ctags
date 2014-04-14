@@ -526,7 +526,7 @@ conditionals are too complex follows all branches of a conditional. This
 option is disabled by default.
 
 .TP 5
-\fB\-\-<LANG>\-kinds\fP=\fI[+|\-]kinds\fP
+\fB\-\-<LANG>\-kinds\fP=\fI[+|\-]kinds\fP|\fi*\fP
 Specifies a list of language-specific kinds of tags (or kinds) to include in
 the output file for a particular language, where \fB<LANG>\fP is
 case-insensitive and is one of the built-in language names (see the
@@ -539,6 +539,10 @@ preceded by either '+' to add it to, or '\-' to remove it from, the default
 set. In the absence of any preceding '+' or '\-' sign, only those kinds
 explicitly listed in \fIkinds\fP will be included in the output (i.e.
 overriding the default for the specified language).
+
+Specifies '*' as the parameter \fIkinds\fP to include all kinds implemented
+in <LANG> in the output. Further more if '*' is given as <LANG>, specification
+of the parameter \fIkinds\fP affects all languages defined in ctags.
 
 As an example for the C language, in order to add prototypes and external
 variable declarations to the default set of tag kinds, but exclude macros,

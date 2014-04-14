@@ -186,6 +186,22 @@ extern langType getFileLanguage (const char *const fileName)
 	return language;
 }
 
+typedef void (*languageCallback)  (langType language, void* user_data);
+static void foreachLanguage(languageCallback callback, void *user_data)
+{
+	langType result = LANG_IGNORE;
+
+	Assert (name != NULL);
+
+	unsigned int i;
+	for (i = 0  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
+	{
+		const parserDefinition* const lang = LanguageTable [i];
+		if (lang->name != NULL)
+			callback(i, user_data);
+	}
+}
+
 extern void printLanguageMap (const langType language)
 {
 	boolean first = TRUE;
@@ -415,18 +431,18 @@ static kindOption *langKindOption (const langType language, const int flag)
 	return result;
 }
 
-static void disableLanguageKinds (const langType language)
+static void resetLanguageKinds (const langType language, const boolean mode)
 {
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
 	if (lang->regex)
-		disableRegexKinds (language);
+		resetRegexKinds (language, mode);
 	else
 	{
 		unsigned int i;
 		for (i = 0  ;  i < lang->kindCount  ;  ++i)
-			lang->kinds [i].enabled = FALSE;
+			lang->kinds [i].enabled = mode;
 	}
 }
 
@@ -457,8 +473,15 @@ static void processLangKindOption (
 	int c;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	if (*p != '+'  &&  *p != '-')
-		disableLanguageKinds (language);
+
+	if (*p == '*')
+	{
+		resetLanguageKinds (language, TRUE);
+		p++;
+	}
+	else if (*p != '+'  &&  *p != '-')
+		resetLanguageKinds (language, FALSE);
+
 	while ((c = *p++) != '\0') switch (c)
 	{
 		case '+': mode = TRUE;  break;
@@ -471,6 +494,17 @@ static void processLangKindOption (
 	}
 }
 
+struct langKindOptionStruct {
+	const char *const option;
+	const char *const parameter;
+};
+static void processLangKindOptionEach(
+	langType lang, void* user_data)
+{
+	struct langKindOptionStruct *arg = user_data;
+	processLangKindOption (lang, arg->option, arg->parameter);
+}
+
 extern boolean processKindOption (
 		const char *const option, const char *const parameter)
 {
@@ -480,14 +514,28 @@ extern boolean processKindOption (
 		(strcmp (dash + 1, "kinds") == 0  ||  strcmp (dash + 1, "types") == 0))
 	{
 		langType language;
-		vString* langName = vStringNew ();
-		vStringNCopyS (langName, option, dash - option);
-		language = getNamedLanguage (vStringValue (langName));
-		if (language == LANG_IGNORE)
-			error (WARNING, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
+		size_t len = dash - option;
+
+		if ((len == 1) && (*option == '*'))
+		{
+			struct langKindOptionStruct arg = {
+				.option = option,
+				.parameter = parameter,
+			};
+
+			foreachLanguage(processLangKindOptionEach, &arg);
+		}
 		else
-			processLangKindOption (language, option, parameter);
-		vStringDelete (langName);
+		{
+			vString* langName = vStringNew ();
+			vStringNCopyS (langName, option, len);
+			language = getNamedLanguage (vStringValue (langName));
+			if (language == LANG_IGNORE)
+				error (WARNING, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
+			else
+				processLangKindOption (language, option, parameter);
+			vStringDelete (langName);
+		}
 		handled = TRUE;
 	}
 	return handled;
