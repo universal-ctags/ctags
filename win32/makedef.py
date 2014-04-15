@@ -33,16 +33,13 @@ rx1 = re.compile("(ONIG_EXTERN.*)$")
 rx2 = re.compile(r"(\w+)( +PV?_\(\(.*\)\)|\[.*\])?;\s*(/\*.*\*/)?$")
 for filename in header_files:
     with open(filename, "r") as f:
-        while True:
-            line = f.readline()
-            if not line:
-                break
+        for line in f:
             m = rx1.match(line)
             if not m:
                 continue
             s = m.group(1)
             if s[-1] != ';':
-                s += ' ' + f.readline()
+                s += ' ' + next(f)
             m2 = rx2.search(s)
             if m2 and (not m2.group(1) in exclude_symbols):
                 symbols.add(m2.group(1))
