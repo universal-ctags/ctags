@@ -958,7 +958,7 @@ def main():
     x2("\\z", "hello", 5, 5)
     x2("\\n?\\z", "こんにちは", 5, 5)
     x2("\\z", "こんにちは", 5, 5)
-    x2("()" * 32768, "", 0, 0)      # Issue #24
+    x2("()" * 32767, "", 0, 0)      # Issue #24
 
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
