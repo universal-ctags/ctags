@@ -112,7 +112,7 @@ makeargs = $(MFLAGS) CPPFLAGS='$(CPPFLAGS)' CFLAGS='$(CFLAGS)' CC='$(CC)'
 !else
 # batch-mode inference rules
 .c.obj::
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) /I. /I.. /Fo.\ /c $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) /I. /Fo.\ /c $<
 {$(encdir)\}.c{$(encdir)\}.obj::
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) /I. /I.. /Fo$(encdir)\ /c $<
 !endif
