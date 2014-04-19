@@ -25,7 +25,7 @@ CC = cl
 RC = rc
 DEFS = -DHAVE_CONFIG_H -DNOT_RUBY -DEXPORT
 RUBYDIR = ..
-PYTHON = python
+PYTHON = py
 
 # Command string to get the version of cl.exe
 _MSC_VER = [for /f %i in ('cmd /c "(echo _MSC_VER>mscver.c) && ($(CC) /EP mscver.c 2>nul) && del mscver.c"') do @exit %i]

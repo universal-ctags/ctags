@@ -25,7 +25,7 @@ CC = gcc
 RC = windres
 DEFS = -DHAVE_CONFIG_H -DNOT_RUBY -DEXPORT
 RUBYDIR = ..
-PYTHON = python
+PYTHON = py
 
 ifdef DEFFILE
 # Use a .def file to export APIs.
