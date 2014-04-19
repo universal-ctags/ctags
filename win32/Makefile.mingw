@@ -113,7 +113,7 @@ $(libname): $(libobjs) $(encobjs)
 	$(ARLIB) $(ARLIB_FLAGS) $@ $(libobjs) $(encobjs)
 
 $(dllname): $(libobjs) $(encobjs) $(resobj) $(DEFFILE)
-	$(ARDLL) $(libobjs) $(encobjs) $(resobj) -o $@ $(ARDLL_FLAGS)
+	$(ARDLL) $(libobjs) $(encobjs) $(resobj) -o $@ $(ARDLL_FLAGS) -Wl,--out-implib,$(dlllib)
 
 regparse.o:  regparse.c $(onigheaders) config.h st.h
 regext.o:    regext.c   $(onigheaders) config.h
