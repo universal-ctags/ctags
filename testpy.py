@@ -11,7 +11,6 @@ import locale
 nerror = 0
 nsucc = 0
 nfail = 0
-region = 0
 
 onig_encoding = onig.ONIG_ENCODING_EUC_JP
 encoding = onig_encoding[0].name.decode()
@@ -61,7 +60,6 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
     global nerror
     global nsucc
     global nfail
-    global region
 
     reg = onig.OnigRegex()
     einfo = onig.OnigErrorInfo()
@@ -94,6 +92,7 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
                 file=sys.stderr)
         return
 
+    region = onig.onig_region_new()
     r = onig.onig_search(reg, targetp.getptr(), targetp.getptr(-1),
                     targetp.getptr(), targetp.getptr(-1),
                     region, onig.ONIG_OPTION_NONE);
@@ -102,6 +101,7 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
         nerror += 1
         print_result("ERROR", "%s (/%s/ '%s')" % (msg.value, pattern, target),
                 file=sys.stderr)
+        onig.onig_region_free(region, 1)
         return
 
     if r == onig.ONIG_MISMATCH:
@@ -126,6 +126,7 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
                 print_result("FAIL", "/%s/ '%s' %d-%d : %d-%d" % (pattern, target,
                         s_from, s_to, start, end))
     onig.onig_free(reg)
+    onig.onig_region_free(region, 1)
 
 def x2(pattern, target, s_from, s_to):
     xx(pattern, target, s_from, s_to, 0, False)
@@ -143,11 +144,8 @@ def is_unicode_encoding(enc):
                    onig.ONIG_ENCODING_UTF8)
 
 def main():
-    global region
     global onig_encoding
     global encoding
-
-    region = onig.onig_region_new()
 
     # set encoding of the test target
     if len(sys.argv) > 1:
@@ -960,7 +958,7 @@ def main():
     x2("\\z", "hello", 5, 5)
     x2("\\n?\\z", "こんにちは", 5, 5)
     x2("\\z", "こんにちは", 5, 5)
-    x2("()" * 32768, "", 0, 0)      # Issue #24
+    x2("()" * 32767, "", 0, 0)      # Issue #24
 
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
@@ -1132,7 +1130,6 @@ def main():
     print("\nRESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
           nsucc, nfail, nerror, onig.onig_version()))
 
-    onig.onig_region_free(region, 1)
     onig.onig_end()
 
     if (nfail == 0 and nerror == 0):

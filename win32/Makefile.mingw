@@ -20,12 +20,12 @@ ARDLL_FLAGS = -shared $(LINKFLAGS)
 LINKFLAGS =
 
 INSTALL = install -c
-CP      = copy
+CP      = cp
 CC = gcc
 RC = windres
 DEFS = -DHAVE_CONFIG_H -DNOT_RUBY -DEXPORT
 RUBYDIR = ..
-PYTHON = python
+PYTHON = py
 
 ifdef DEFFILE
 # Use a .def file to export APIs.
@@ -97,14 +97,14 @@ makeargs = $(MFLAGS) CPPFLAGS='$(CPPFLAGS)' CFLAGS='$(CFLAGS)' CC='$(CC)'
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) -I. -I.. -o $@ -c $<
 
 .rc.res:
-	$(RC) -O coff $< $@
+	$(RC) -O coff -I. $< $@
 
 # targets
 default: all
 
 setup:
-	$(CP) win32\config.h config.h
-	$(CP) win32\testc.c  testc.c
+	$(CP) win32/config.h config.h
+	$(CP) win32/testc.c  testc.c
 
 
 all: $(libname) $(dllname) 
@@ -113,7 +113,7 @@ $(libname): $(libobjs) $(encobjs)
 	$(ARLIB) $(ARLIB_FLAGS) $@ $(libobjs) $(encobjs)
 
 $(dllname): $(libobjs) $(encobjs) $(resobj) $(DEFFILE)
-	$(ARDLL) $(libobjs) $(encobjs) $(resobj) -o $@ $(ARDLL_FLAGS)
+	$(ARDLL) $(libobjs) $(encobjs) $(resobj) -o $@ $(ARDLL_FLAGS) -Wl,--out-implib,$(dlllib)
 
 regparse.o:  regparse.c $(onigheaders) config.h st.h
 regext.o:    regext.c   $(onigheaders) config.h
@@ -178,22 +178,22 @@ ptest: $(testp)
 	.\$(testp)
 
 $(testc): $(testc).c $(libname)
-	$(CC) -nologo -o $(testc) -DONIG_EXTERN=extern $(testc).c $(libname)
+	$(CC) -o $(testc) -DONIG_EXTERN=extern $(testc).c $(libname)
 
 $(testp): $(testc).c $(dlllib)
-	$(CC) -nologo -DPOSIX_TEST -o $(testp) $(testc).c $(dlllib)
+	$(CC) -DPOSIX_TEST -o $(testp) $(testc).c $(dlllib)
 
 #$(testc)u.c: test.rb testconvu.rb
 #	ruby -Ke testconvu.rb test.rb > $@
 
 $(testcu): $(testcu).c $(libname)
-	$(CC) -nologo -o $(testcu) -DONIG_EXTERN=extern $(testcu).c $(libname)
+	$(CC) -o $(testcu) -DONIG_EXTERN=extern $(testcu).c $(libname)
 
 $(libbase).def: win32\makedef.py oniguruma.h regenc.h oniggnu.h onigposix.h
 	$(PYTHON) win32\makedef.py > $@
 
 clean:
-	del *.o $(encdir)\*.o *.a *.dll $(testp).exe $(testc).exe $(testc).o $(testcu).exe $(testcu).o win32\*.res
+	rm *.o $(encdir)/*.o *.a *.dll $(testp).exe $(testc).exe $(testcu).exe win32/*.res
 
 
 # backup file suffix
