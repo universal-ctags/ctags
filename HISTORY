@@ -1,5 +1,21 @@
 History of Onigmo (Oniguruma-mod)
 
+2014/04/18: [bug]  fix warning about alloca() with MinGW (Issue #35)
+2014/04/17: [spec] add checking the number of capture groups (Issue #24)
+                   Now the maximum number of capture groups is explicitly
+                   limited to ONIG_MAX_CAPTURE_GROUP_NUM (32767).
+                   Also add a new error code: ONIGERR_TOO_MANY_CAPTURE_GROUPS.
+2014/04/17: [bug]  double free may occur
+2014/04/15: [dist] testpy.py: change 'region' to a local variable
+                   Now, it becomes easy to execute a test manually from the
+                   python's interactive shell.
+
+                   E.g.:
+                        $ LD_LIBRARY_PATH=.libs python
+                        >>> import testpy
+                        >>> testpy.x2(r"a+b+", "aab", 0, 3)
+                        OK: /a+b+/ 'aab'
+
 2014/04/12: [new]  (thanks mattn)
                    Fix build on mingw (Issue #33)
 2014/04/12: [new]  improve multithread support
