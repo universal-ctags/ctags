@@ -191,8 +191,6 @@ static void foreachLanguage(languageCallback callback, void *user_data)
 {
 	langType result = LANG_IGNORE;
 
-	Assert (name != NULL);
-
 	unsigned int i;
 	for (i = 0  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
 	{
