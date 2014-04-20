@@ -393,7 +393,7 @@ static boolean parseTag (tokenInfo *const token, texKind kind)
 		{
 			if (isType (token, TOKEN_IDENTIFIER))
 			{
-				if (fullname->length > 0)
+				if (vStringLength (length) > 0)
 					vStringCatS (fullname, " ");
 				vStringCatS (fullname, vStringValue (token->string));
 			}
