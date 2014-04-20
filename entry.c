@@ -680,7 +680,7 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 {
 	int length;
 
-	if (tag->isFileEntry)
+	if (tag->isFileEntry || (tag->lineNumberEntry && (tag->lineNumber == 1)))
 		length = fprintf (TagFile.etags.fp, "\177%s\001%lu,0\n",
 				tag->name, tag->lineNumber);
 	else
