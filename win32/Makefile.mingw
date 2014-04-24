@@ -193,7 +193,7 @@ $(libbase).def: win32\makedef.py oniguruma.h regenc.h oniggnu.h onigposix.h
 	$(PYTHON) win32\makedef.py > $@
 
 clean:
-	rm *.o $(encdir)/*.o *.a *.dll $(testp).exe $(testc).exe $(testcu).exe win32/*.res
+	-rm -f *.o $(encdir)/*.o *.a *.dll $(testp).exe $(testc).exe $(testcu).exe win32/*.res
 
 
 # backup file suffix
