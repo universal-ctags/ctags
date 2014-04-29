@@ -1,0 +1,73 @@
+This is working note for tracking activity at exuberant tree.
+
+subversion
+============================================================
+
+* status
+
+  Revisions up to <r807> are merged except:
+
+	  <r779> - conflicts
+	  <r785> - conflicts
+	  <r788> - conflicts
+
+  (Tue Apr 29 15:34:30 2014 by yamato)
+
+* howto
+
+  [svn] -> [local exuberant git repo] -> [exuberant branch of local fishman git repo] 
+
+  1. prepare fishman repo: a local git repo forked from github.
+
+     You may know how to do it.
+
+  2. prepare exuberant repo: a local git repo clone from exuberant svn tree.
+
+    You can make a clone repo with following command line:
+
+    $ git svn clone http://svn.code.sf.net/p/ctags/code -T trunk
+
+    Rename `code' to $DIR/exuberant.
+
+    If you have exuberant repo already, do git svn fetch to get
+    the latest changes.
+
+  3. add exuberant as remote repo to config of fishman repos
+
+     [remote "exuberant"]
+	url = file:///$DIR/exuberant
+	fetch = +refs/heads/master:refs/remotes/exuberant
+
+  4. fetch the changes
+
+     $ git fetch exuberant
+
+  5. cherry-pick
+
+     5.1 Make a branch at local fishman repo and switch to it.
+     5.2 Do cherry-pick like:
+
+	 $ git cherry-pick -s -x c81a8ce
+
+	 You can find commit id on the another terminal:
+
+	 $ git checkout exuberant
+	 $ git log
+	 or
+	 $ git long --oneline
+
+	 If conflicts are occurred in cherry-picking, you can
+	 abort/reset cherry-picking with:
+
+	 $ git reset --hard
+
+	 at the branch for picking.
+
+
+bugs
+============================================================
+Do nothing yet.
+
+patches
+============================================================
+Do nothing yet.
