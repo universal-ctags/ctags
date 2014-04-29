@@ -1,4 +1,16 @@
+*~
 *.o
+*.od
 *.obj
 ctags.exe
 respmvc
+Makefile
+config.h
+config.log
+config.status
+ctags
+ctags.ref
+dctags
+tags
+TAGS
+autom4te.cache

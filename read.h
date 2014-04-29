@@ -14,7 +14,9 @@
 #if defined(FILE_WRITE) || defined(VAXC)
 # define CONST_FILE
 #else
-# define CONST_FILE const
+# define CONST_FILE /* const */
+/* TEMPORARY FIX 
+   `File' global variable should be file local. */
 #endif
 
 /*

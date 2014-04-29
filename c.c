@@ -2121,6 +2121,9 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 
 		switch (c)
 		{
+			case '^':
+				break;
+
 			case '&':
 			case '*':
 				info->isPointer = TRUE;

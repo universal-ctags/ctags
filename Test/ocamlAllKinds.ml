@@ -16,6 +16,13 @@ let (+-) a b =
     in
     (aplus, aminus)
 
+let shall_appear () =
+    let sub_not 1 = 2
+    and shall_not_either fu = () in
+    let nope = 3
+and must_appear_also 4 = ()
+
+
 let foo_function a b = (a, b)
 
 class  fooClass =
