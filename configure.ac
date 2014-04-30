@@ -143,12 +143,12 @@ AC_DEFUN([CHECK_HEADER_DEFINE], [
 AC_ARG_WITH(posix-regex,
 [  --with-posix-regex      use Posix regex interface, if available])
 
-AC_ARG_WITH(readlib,
-[  --with-readlib          include readtags library object during install])
+AC_ARG_ENABLE(readlib,
+[  --enable-readlib        include readtags library object during install])
 
-AC_ARG_WITH(readcmd,
-[  --without-readcmd       do not include readtags command during install],
-[], [with_readcmd=yes])
+AC_ARG_ENABLE(readcmd,
+[  --disable-readcmd       do not include readtags command during install],
+[], [enable_readcmd=yes])
 
 # AC_ARG_WITH(perl-regex,
 # [  --with-perl-regex       use Perl pcre interface, if available])
@@ -202,14 +202,14 @@ else
 	AC_MSG_RESULT(no)
 fi
 AC_MSG_CHECKING(whether to install readtags object file)
-if test yes = "$with_readlib"; then
+if test yes = "$enable_readlib"; then
 	AC_MSG_RESULT(yes)
 	install_targets="$install_targets install-lib"
 else
 	AC_MSG_RESULT(no)
 fi
 AC_MSG_CHECKING(whether to install readtags command)
-if test no = "$with_readcmd"; then
+if test no = "$enable_readcmd"; then
 	AC_MSG_RESULT(no)
 else
 	AC_MSG_RESULT(yes)
