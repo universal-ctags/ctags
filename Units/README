@@ -1,0 +1,76 @@
+About units test facility
+============================================================
+
+Background
+------------------------------------------------------------
+Exuberant ctags has a test facility. Main aim of the facility is
+detecting regression. All files under Tests directory are given as
+input for old and new version of ctags commands.  The output tags
+files of both versions are compared.
+
+The units test facility I describe here takes a different approach. An
+input file and an expected output file are given by a contributor of a
+language parser. The units test facility runs ctags command with the
+input file and compares its output and the expected output file.
+
+If a contributor sends a patch which may improve a language parser,
+and if a reviewer is not familiar with that language, s/he cannot
+evaluate it.
+
+Unit test files, the pair of input file and expected output file may
+be able to explain the intent of patch well; and may help the
+reviewer.
+
+How to write a test case
+------------------------------------------------------------
+The test facility recognizes an input file and an expected
+output file by patterns of file name. They should be at
+Units directory.
+
+input-*.*
+
+	Input file must have a prefix "input-". The
+	rest of the name should explain the name of test case.
+
+
+expected-*.*
+
+	Expected output file must have a prefix "expected-".
+	The rest of the name should be the same as associated
+	input file.
+
+args-*.*
+
+	TBW
+
+filter-*.*
+
+	TBW
+
+Example of files
+------------------------------------------------------------
+
+See input-c-sample.c and expected-c-sample.c under Units
+directory.
+
+How to run unit tests
+------------------------------------------------------------
+
+test.units target is added to testing.mak.
+
+
+	 $ make -f testing.mak test.units
+
+The result of unit tests is reported by lines.
+
+During testing OUTPUT-*.*, EXPECTED-*.* and DIFF-*.* files are
+generated. These are removed when the unit test is "Passed".
+
+Example of running
+------------------------------------------------------------
+
+	$ make -f testing.mak test.units
+	Testing cpp-type-alias-with-using-keyword.cpp...Passed
+	Testing c-sample.c...Passed
+
+Masatake YAMATO <yamato@redhat.com>

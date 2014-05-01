@@ -10,16 +10,17 @@ CTAGS_REF = ./ctags.ref
 TEST_OPTIONS = -nu --c-kinds=+lpx
 
 DIFF_OPTIONS = -U 0 -I '^!_TAG'
-DIFF = if diff $(DIFF_OPTIONS) tags.ref tags.test > $(DIFF_FILE); then \
-		rm -f tags.ref tags.test $(DIFF_FILE) ; \
+DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
+DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
+		rm -f $1 $2 $3 ; \
 		echo "Passed" ; \
 	  else \
-		echo "FAILED: differences left in $(DIFF_FILE)" ; \
+		echo "FAILED: differences left in $3" ; \
 	  fi
 
-.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux
+.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units
 
-test: test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux
+test: test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units
 
 test.%: DIFF_FILE = $@.diff
 
@@ -93,8 +94,23 @@ test.linux: $(CTAGS_TEST) $(CTAGS_REF)
 	@- $(DIFF)
 endif
 
-TEST_ARTIFACTS = test.*.diff tags.ref tags.test
 
+UNITS_ARTIFACTS=Units/EXPECTED-* Units/TMP-* Units/DIFF-*
+test.units: $(CTAGS_TEST)
+	@ for input in Units/input-*; do							\
+		name=$${input/*\/input-};							\
+		echo -n "Testing $${name}...";							\
+		args="Units/args-$${name}";							\
+		out="Units/OUTPUT-$${name}";							\
+		filter="Units/filter-$${name}";							\
+		$(CTAGS_TEST) -o - $$(test -f "$${args}" && cat "$${args}") "$${input}" |	\
+		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${out}";		\
+		expected=Units/EXPECTED-$${name};						\
+		cp "Units/expected-$${name}" "Units/EXPECTED-$${name}";				\
+		$(call DIFF_BASE,$${expected},$${out},Units/DIFF-$${name}.diff);	        \
+	done
+
+TEST_ARTIFACTS = test.*.diff tags.ref tags.test $(UNITS_ARTIFACTS)
 clean-test:
 	rm -f $(TEST_ARTIFACTS)
 
