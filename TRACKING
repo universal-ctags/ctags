@@ -66,7 +66,13 @@ subversion
 
 bugs
 ============================================================
-Do nothing yet.
+
+   <355> - fixed
+   	   02ec2066b5be6b129eba49685bd0b17fef4acfa
+
+   <341> - merged the improved version
+   	   216880c5287e0421d9c49898d983144db61c83aa
+   	   
 
 patches
 ============================================================
