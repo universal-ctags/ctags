@@ -95,19 +95,25 @@ test.linux: $(CTAGS_TEST) $(CTAGS_REF)
 endif
 
 
-UNITS_ARTIFACTS=Units/EXPECTED-* Units/TMP-* Units/DIFF-*
+UNITS_ARTIFACTS=Units/*.d/EXPECTED Units/*.d/OUTPUT Units/*.d/DIFF
 test.units: $(CTAGS_TEST)
-	@ for input in Units/input-*; do							\
-		name=$${input/*\/input-};							\
-		echo -n "Testing $${name}...";							\
-		args="Units/args-$${name}";							\
-		out="Units/OUTPUT-$${name}";							\
-		filter="Units/filter-$${name}";							\
-		$(CTAGS_TEST) -o - $$(test -f "$${args}" && cat "$${args}") "$${input}" |	\
-		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${out}";		\
-		expected=Units/EXPECTED-$${name};						\
-		cp "Units/expected-$${name}" "Units/EXPECTED-$${name}";				\
-		$(call DIFF_BASE,$${expected},$${out},Units/DIFF-$${name}.diff);	        \
+	@ for input in Units/*.d/input.*; do \
+		t=$${input%/input.*}; \
+		name=$${t/.d/}; \
+		\
+		expected="$$t"/expected; \
+		expectedtmp="$$t"/EXPECTED; \
+		args="$$t"/args; \
+		filter="$$t"/filter; \
+		output="$$t"/OUTPUT; \
+		diff="$$t"/DIFF; \
+		\
+		echo -n "Testing $${name}..."; \
+		\
+		$(CTAGS_TEST) -o - $$(test -f "$${args}" && cat "$$args") "$$input" |	\
+		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
+		cp "$$expected" "$$expectedtmp"; \
+		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff"); \
 	done
 
 TEST_ARTIFACTS = test.*.diff tags.ref tags.test $(UNITS_ARTIFACTS)
