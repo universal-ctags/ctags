@@ -3,6 +3,7 @@
 *.od
 *.obj
 ctags.exe
+readtags
 respmvc
 Makefile
 config.h
@@ -11,6 +12,7 @@ config.status
 ctags
 ctags.ref
 dctags
+readtags.exe
 tags
 TAGS
 autom4te.cache
