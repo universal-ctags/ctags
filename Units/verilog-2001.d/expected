@@ -1,0 +1,19 @@
+DEFINE	Units/verilog-2001.d/input.v	/^`define DEFINE$/;"	c
+PARAM	Units/verilog-2001.d/input.v	/^parameter PARAM = 1;$/;"	c
+a	Units/verilog-2001.d/input.v	/^    input wire a,$/;"	p
+add	Units/verilog-2001.d/input.v	/^task add ($/;"	t
+b	Units/verilog-2001.d/input.v	/^    b,c,$/;"	p
+c	Units/verilog-2001.d/input.v	/^    b,c,$/;"	p
+d	Units/verilog-2001.d/input.v	/^    d ,$/;"	p
+e	Units/verilog-2001.d/input.v	/^    output wire e ,$/;"	p
+f	Units/verilog-2001.d/input.v	/^    output reg f,$/;"	p
+g	Units/verilog-2001.d/input.v	/^    inout wire g$/;"	p
+k	Units/verilog-2001.d/input.v	/^real k;$/;"	r
+l	Units/verilog-2001.d/input.v	/^integer l;$/;"	r
+mod	Units/verilog-2001.d/input.v	/^module mod ($/;"	m
+mult	Units/verilog-2001.d/input.v	/^function mult ($/;"	f
+x	Units/verilog-2001.d/input.v	/^    input x, y,$/;"	p
+x	Units/verilog-2001.d/input.v	/^    input x,$/;"	p
+y	Units/verilog-2001.d/input.v	/^    input x, y,$/;"	p
+y	Units/verilog-2001.d/input.v	/^    input y);$/;"	p
+z	Units/verilog-2001.d/input.v	/^    output z$/;"	p
