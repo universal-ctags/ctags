@@ -638,10 +638,35 @@ static void findCmdTerm (tokenInfo *const token)
 	}
 }
 
+static void findMatchingToken (tokenInfo *const token, tokenType begin_token, tokenType end_token)
+{
+	int nest_level = 0;
+
+	if ( ! isType (token, end_token))
+	{
+		nest_level++;
+		while (! (isType (token, end_token) && (nest_level == 0)))
+		{
+			readToken (token);
+			if (isType (token, begin_token))
+			{
+				nest_level++;
+			}
+			if (isType (token, end_token))
+			{
+				if (nest_level > 0)
+				{
+					nest_level--;
+				}
+			}
+		}
+	}
+}
+
 static void parseSwitch (tokenInfo *const token)
 {
 	/*
-	 * switch (expression){
+	 * switch (expression) {
 	 * case value1:
 	 *	   statement;
 	 *	   break;
@@ -665,13 +690,7 @@ static void parseSwitch (tokenInfo *const token)
 
 	if (isType (token, TOKEN_OPEN_CURLY))
 	{
-		/*
-		 * This will be either a function or a class.
-		 * We can only determine this by checking the body
-		 * of the function.  If we find a "this." we know
-		 * it is a class, otherwise it is a function.
-		 */
-		parseBlock (token, token);
+		findMatchingToken (token, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY);
 	}
 
 }
