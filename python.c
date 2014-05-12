@@ -788,6 +788,38 @@ static void findPythonTags (void)
 		
 		checkParent(nesting_levels, indent, parent);
 
+		/* Find global and class variables */
+		variable = findVariable(line);
+		if (variable)
+		{
+			const char *start = variable;
+			char *arglist;
+			boolean parent_is_class;
+
+			vStringClear (name);
+			while (isIdentifierCharacter ((int) *start))
+			{
+				vStringPut (name, (int) *start);
+				++start;
+			}
+			vStringTerminate (name);
+
+			parent_is_class = constructParentString(nesting_levels, indent, parent);
+			if (varIsLambda (variable, &arglist))
+			{
+				/* show class members or top-level script lambdas only */
+				if (parent_is_class || vStringLength(parent) == 0)
+					makeFunctionTag (name, parent, parent_is_class, arglist);
+				eFree (arglist);
+			}
+			else
+			{
+				/* skip variables in methods */
+				if (parent_is_class || vStringLength(parent) == 0)
+					makeVariableTag (name, parent);
+			}
+		}
+
 		/* Deal with multiline string start. */
 		longstring = find_triple_start(cp, &longStringLiteral);
 		if (longstring)
@@ -846,40 +878,6 @@ static void findPythonTags (void)
 					parseFunction(cp, name, parent, is_parent_class);
 
 				addNestingLevel(nesting_levels, indent, name, is_class);
-			}
-		}
-		/* Find global and class variables */
-		variable = findVariable(line);
-		if (variable)
-		{
-			const char *start = variable;
-			char *arglist;
-			boolean parent_is_class;
-
-			vStringClear (name);
-			while (isIdentifierCharacter ((int) *start))
-			{
-				vStringPut (name, (int) *start);
-				++start;
-			}
-			vStringTerminate (name);
-
-			parent_is_class = constructParentString(nesting_levels, indent, parent);
-
-			if (varIsLambda (variable, &arglist))
-			{
-				/* show class members or top-level script lambdas only */
-				if (parent_is_class || vStringLength(parent) == 0)
-					makeFunctionTag (name, parent, parent_is_class, arglist);
-				eFree (arglist);
-			}
-			else
-			{
-				/* skip variables in methods */
-				if (! parent_is_class && vStringLength(parent) > 0)
-					continue;
- 
-				makeVariableTag (name, parent);
 			}
 		}
 		/* Find and parse imports */
