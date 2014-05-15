@@ -65,7 +65,8 @@
 	VhdlParser, \
 	VimParser, \
 	WindResParser, \
-	YaccParser
+	YaccParser, \
+	ZephirParser
 
 #endif  /* _PARSERS_H */
 
