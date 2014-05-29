@@ -95,18 +95,18 @@ test.linux: $(CTAGS_TEST) $(CTAGS_REF)
 endif
 
 
-UNITS_ARTIFACTS=Units/*.d/EXPECTED Units/*.d/OUTPUT Units/*.d/DIFF
+UNITS_ARTIFACTS=Units/*.d/EXPECTED.TMP Units/*.d/OUTPUT.TMP Units/*.d/DIFF.TMP
 test.units: $(CTAGS_TEST)
 	@ for input in Units/*.d/input.*; do \
 		t=$${input%/input.*}; \
 		name=$${t/.d/}; \
 		\
 		expected="$$t"/expected; \
-		expectedtmp="$$t"/EXPECTED; \
+		expectedtmp="$$t"/EXPECTED.TMP; \
 		args="$$t"/args; \
 		filter="$$t"/filter; \
-		output="$$t"/OUTPUT; \
-		diff="$$t"/DIFF; \
+		output="$$t"/OUTPUT.TMP; \
+		diff="$$t"/DIFF.TMP; \
 		\
 		echo -n "Testing $${name}..."; \
 		\
