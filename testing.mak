@@ -66,7 +66,7 @@ test.etags: $(CTAGS_TEST) $(CTAGS_REF)
 
 REF_EIFFEL_OPTIONS = $(TEST_OPTIONS) --format=1 --languages=eiffel
 TEST_EIFFEL_OPTIONS = $(TEST_OPTIONS) --format=1 --languages=eiffel
-EIFFEL_DIRECTORY = $(ISE_EIFFEL)/library
+EIFFEL_DIRECTORY = $(ISE_EIFFEL)/library/base
 HAVE_EIFFEL := $(shell ls -dtr $(EIFFEL_DIRECTORY) 2>/dev/null)
 ifeq ($(HAVE_EIFFEL),)
 test.eiffel:
