@@ -7,7 +7,7 @@
  *      D2A
  *      theAdd
  *    variables
- *      global
+ *      my_global_var1
  */
 function D1(a, b) 
 {                     

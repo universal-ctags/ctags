@@ -1,0 +1,95 @@
+This is working note for tracking activity at exuberant tree.
+
+subversion
+============================================================
+
+* status
+
+  Revisions up to <r807> are merged except:
+
+	  <r779> - conflicts
+	  <r785> - conflicts
+	  <r788> - conflicts
+
+  (Wed May 28 00:24:02 2014 by yamato)
+
+* howto
+
+  <svn>
+  => <git: local exuberant repo>
+     => <git: local fishman repo>
+
+
+  0. prepare exuberant repo: a local git repo clone from exuberant svn tree.
+     <git: local exuberant git repo>
+
+    You can make a clone repo with following command line:
+
+    $ git svn clone http://svn.code.sf.net/p/ctags/code -T trunk
+
+    Rename `code' to $DIR/exuberant.
+
+    If you have exuberant git repo already, do 
+
+    $ git svn fetch
+    $ git svn rebase
+
+    to get the latest changes and reflect it to the local copy.
+
+  1. prepare your own fishman repo: a local git repo cloned from github.
+     <git: local fishman repo>
+
+     You may know how to do it :)
+
+    $ git clone https://github.com/fishman/ctags.git
+
+  2. add exuberant as remote repo to config of fishman repos
+     <git: local fishman repo>
+
+     [remote "exuberant"]
+	url = file:///$DIR/exuberant
+	fetch = +refs/heads/master:refs/remotes/exuberant
+
+  4. fetch the changes
+      <git: local fishman repo>
+
+     $ git fetch exuberant
+
+  5. cherry-pick
+      <git: local fishman repo>
+
+     5.1 Make a branch at local fishman repo and switch to it.
+     5.2 Do cherry-pick like:
+
+	 $ git cherry-pick -s -x c81a8ce
+
+	 You can find commit id on the another terminal:
+         <git: local exuberant repo>
+
+	 $ git log
+	 or
+	 $ git log --oneline
+
+	 If conflicts are occurred in cherry-picking, you can
+	 abort/reset cherry-picking with:
+
+	 $ git reset --hard
+	 <git: local fishman repo>
+	 at the branch for picking.
+
+bugs
+============================================================
+
+   <355> - fixed
+   	   02ec2066b5be6b129eba49685bd0b17fef4acfa
+
+   <341> - merged the improved version
+   	   216880c5287e0421d9c49898d983144db61c83aa
+   	   
+
+patches
+============================================================
+
+   <84> - solved by annother implementation
+	  c93e3bfa05b70d7fbc2539454c957eb2169e16b3
+	  502355489b1ba748b1a235641bbd512ba6da315e

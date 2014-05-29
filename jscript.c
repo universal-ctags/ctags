@@ -25,6 +25,7 @@
 #include <stdio.h>
 #endif
 
+#include <string.h>
 #include "debug.h"
 #include "entry.h"
 #include "keyword.h"
@@ -57,7 +58,6 @@ typedef enum eKeywordId {
 	KEYWORD_NONE = -1,
 	KEYWORD_function,
 	KEYWORD_capital_function,
-	KEYWORD_object,
 	KEYWORD_capital_object,
 	KEYWORD_prototype,
 	KEYWORD_var,
@@ -71,7 +71,8 @@ typedef enum eKeywordId {
 	KEYWORD_switch,
 	KEYWORD_try,
 	KEYWORD_catch,
-	KEYWORD_finally
+	KEYWORD_finally,
+	KEYWORD_sap
 } keywordId;
 
 /*	Used to determine whether keyword is valid for the token language and
@@ -100,7 +101,8 @@ typedef enum eTokenType {
 	TOKEN_EQUAL_SIGN,
 	TOKEN_FORWARD_SLASH,
 	TOKEN_OPEN_SQUARE,
-	TOKEN_CLOSE_SQUARE
+	TOKEN_CLOSE_SQUARE,
+	TOKEN_REGEXP
 } tokenType;
 
 typedef struct sTokenInfo {
@@ -117,6 +119,8 @@ typedef struct sTokenInfo {
 /*
  *	DATA DEFINITIONS
  */
+
+static tokenType LastTokenType;
 
 static langType Lang_js;
 
@@ -143,7 +147,6 @@ static const keywordDesc JsKeywordTable [] = {
 	/* keyword		keyword ID */
 	{ "function",	KEYWORD_function			},
 	{ "Function",	KEYWORD_capital_function	},
-	{ "object",		KEYWORD_object				},
 	{ "Object",		KEYWORD_capital_object		},
 	{ "prototype",	KEYWORD_prototype			},
 	{ "var",		KEYWORD_var					},
@@ -157,7 +160,8 @@ static const keywordDesc JsKeywordTable [] = {
 	{ "switch",		KEYWORD_switch				},
 	{ "try",		KEYWORD_try					},
 	{ "catch",		KEYWORD_catch				},
-	{ "finally",	KEYWORD_finally				}
+	{ "finally",	KEYWORD_finally				},
+	{ "sap",	    KEYWORD_sap    				}
 };
 
 /*
@@ -168,11 +172,12 @@ static const keywordDesc JsKeywordTable [] = {
 static void parseFunction (tokenInfo *const token);
 static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent);
 static boolean parseLine (tokenInfo *const token, boolean is_inside_class);
+static void parseUI5 (tokenInfo *const token);
 
 static boolean isIdentChar (const int c)
 {
 	return (boolean)
-		(isalpha (c) || isdigit (c) || c == '$' || 
+		(isalpha (c) || isdigit (c) || c == '$' ||
 		 c == '@' || c == '_' || c == '#');
 }
 
@@ -215,12 +220,23 @@ static void deleteToken (tokenInfo *const token)
  *	 Tag generation functions
  */
 
-static void makeConstTag (tokenInfo *const token, const jsKind kind)
+static void makeJsTag (tokenInfo *const token, const jsKind kind)
 {
 	if (JsKinds [kind].enabled && ! token->ignoreTag )
 	{
-		const char *const name = vStringValue (token->string);
+		const char *name = vStringValue (token->string);
+		vString *fullscope = vStringNewCopy (token->scope);
+		const char *p;
 		tagEntryInfo e;
+
+		if ( (p = strrchr (name, '.')) != NULL )
+		{
+			if (vStringLength (fullscope) > 0)
+				vStringPut (fullscope, '.');
+			vStringNCatS (fullscope, name, (size_t) (p - name));
+			name = p + 1;
+		}
+
 		initTagEntry (&e, name);
 
 		e.lineNumber   = token->lineNumber;
@@ -228,36 +244,28 @@ static void makeConstTag (tokenInfo *const token, const jsKind kind)
 		e.kindName	   = JsKinds [kind].name;
 		e.kind		   = JsKinds [kind].letter;
 
-		makeTagEntry (&e);
-	}
-}
-
-static void makeJsTag (tokenInfo *const token, const jsKind kind)
-{
-	vString *	fulltag;
-
-	if (JsKinds [kind].enabled && ! token->ignoreTag )
-	{
-		/*
-		 * If a scope has been added to the token, change the token
-		 * string to include the scope when making the tag.
-		 */
-		if ( vStringLength(token->scope) > 0 )
+		if ( vStringLength(fullscope) > 0 )
 		{
-			fulltag = vStringNew ();
-			vStringCopy(fulltag, token->scope);
-			vStringCatS (fulltag, ".");
-			vStringCatS (fulltag, vStringValue(token->string));
-			vStringTerminate(fulltag);
-			vStringCopy(token->string, fulltag);
-			vStringDelete (fulltag);
+			jsKind parent_kind = JSTAG_CLASS;
+
+			/*
+			 * If we're creating a function (and not a method),
+			 * guess we're inside another function
+			 */
+			if (kind == JSTAG_FUNCTION)
+				parent_kind = JSTAG_FUNCTION;
+
+			e.extensionFields.scope[0] = JsKinds [parent_kind].name;
+			e.extensionFields.scope[1] = vStringValue (fullscope);
 		}
-		makeConstTag (token, kind);
+
+		makeTagEntry (&e);
+		vStringDelete (fullscope);
 	}
 }
 
 static void makeClassTag (tokenInfo *const token)
-{ 
+{
 	vString *	fulltag;
 
 	if ( ! token->ignoreTag )
@@ -284,7 +292,7 @@ static void makeClassTag (tokenInfo *const token)
 }
 
 static void makeFunctionTag (tokenInfo *const token)
-{ 
+{
 	vString *	fulltag;
 
 	if ( ! token->ignoreTag )
@@ -324,7 +332,8 @@ static void parseString (vString *const string, const int delimiter)
 			end = TRUE;
 		else if (c == '\\')
 		{
-			c = fileGetc(); /* This maybe a ' or ". */
+			/* This maybe a ' or ". */
+			c = fileGetc();
 			vStringPut(string, c);
 		}
 		else if (c == delimiter)
@@ -333,6 +342,32 @@ static void parseString (vString *const string, const int delimiter)
 			vStringPut (string, c);
 	}
 	vStringTerminate (string);
+}
+
+static void parseRegExp (void)
+{
+	int c;
+	boolean in_range = FALSE;
+
+	do
+	{
+		c = fileGetc ();
+		if (! in_range && c == '/')
+		{
+			do /* skip flags */
+			{
+				c = fileGetc ();
+			} while (isalpha (c));
+			fileUngetc (c);
+			break;
+		}
+		else if (c == '\\')
+			c = fileGetc (); /* skip next character */
+		else if (c == '[')
+			in_range = TRUE;
+		else if (c == ']')
+			in_range = FALSE;
+	} while (c != EOF);
 }
 
 /*	Read a C identifier beginning with "firstChar" and places it into
@@ -364,10 +399,11 @@ getNextChar:
 	do
 	{
 		c = fileGetc ();
-		token->lineNumber   = getSourceLineNumber ();
-		token->filePosition = getInputFilePosition ();
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\n');
+
+	token->lineNumber   = getSourceLineNumber ();
+	token->filePosition = getInputFilePosition ();
 
 	switch (c)
 	{
@@ -407,8 +443,26 @@ getNextChar:
 					  if ( (d != '*') &&		/* is this the start of a comment? */
 							  (d != '/') )		/* is a one line comment? */
 					  {
-						  token->type = TOKEN_FORWARD_SLASH;
 						  fileUngetc (d);
+						  switch (LastTokenType)
+						  {
+							  case TOKEN_CHARACTER:
+							  case TOKEN_KEYWORD:
+							  case TOKEN_IDENTIFIER:
+							  case TOKEN_STRING:
+							  case TOKEN_CLOSE_CURLY:
+							  case TOKEN_CLOSE_PAREN:
+							  case TOKEN_CLOSE_SQUARE:
+								  token->type = TOKEN_FORWARD_SLASH;
+								  break;
+
+							  default:
+								  token->type = TOKEN_REGEXP;
+								  parseRegExp ();
+								  token->lineNumber = getSourceLineNumber ();
+								  token->filePosition = getInputFilePosition ();
+								  break;
+						  }
 					  }
 					  else
 					  {
@@ -450,6 +504,8 @@ getNextChar:
 				  }
 				  break;
 	}
+
+	LastTokenType = token->type;
 }
 
 static void copyToken (tokenInfo *const dest, tokenInfo *const src)
@@ -495,7 +551,7 @@ static void skipArgumentList (tokenInfo *const token)
 					nest_level--;
 				}
 			}
-		} 
+		}
 		readToken (token);
 	}
 }
@@ -527,7 +583,7 @@ static void skipArrayList (tokenInfo *const token)
 					nest_level--;
 				}
 			}
-		} 
+		}
 		readToken (token);
 	}
 }
@@ -559,7 +615,7 @@ static void addToScope (tokenInfo* const token, vString* const extra)
 static void findCmdTerm (tokenInfo *const token)
 {
 	/*
-	 * Read until we find either a semicolon or closing brace. 
+	 * Read until we find either a semicolon or closing brace.
 	 * Any nested braces will be handled within.
 	 */
 	while (! ( isType (token, TOKEN_SEMICOLON) ||
@@ -569,22 +625,48 @@ static void findCmdTerm (tokenInfo *const token)
 		if ( isType (token, TOKEN_OPEN_CURLY))
 		{
 			parseBlock (token, token);
-		} 
+			readToken (token);
+		}
 		else if ( isType (token, TOKEN_OPEN_PAREN) )
 		{
 			skipArgumentList(token);
 		}
-		else 
+		else
 		{
 			readToken (token);
 		}
-	} 
+	}
+}
+
+static void findMatchingToken (tokenInfo *const token, tokenType begin_token, tokenType end_token)
+{
+	int nest_level = 0;
+
+	if ( ! isType (token, end_token))
+	{
+		nest_level++;
+		while (! (isType (token, end_token) && (nest_level == 0)))
+		{
+			readToken (token);
+			if (isType (token, begin_token))
+			{
+				nest_level++;
+			}
+			if (isType (token, end_token))
+			{
+				if (nest_level > 0)
+				{
+					nest_level--;
+				}
+			}
+		}
+	}
 }
 
 static void parseSwitch (tokenInfo *const token)
 {
 	/*
-	 * switch (expression){
+	 * switch (expression) {
 	 * case value1:
 	 *	   statement;
 	 *	   break;
@@ -597,7 +679,7 @@ static void parseSwitch (tokenInfo *const token)
 
 	readToken (token);
 
-	if (isType (token, TOKEN_OPEN_PAREN)) 
+	if (isType (token, TOKEN_OPEN_PAREN))
 	{
 		/*
 		 * Handle nameless functions, these will only
@@ -606,15 +688,9 @@ static void parseSwitch (tokenInfo *const token)
 		skipArgumentList(token);
 	}
 
-	if (isType (token, TOKEN_OPEN_CURLY)) 
+	if (isType (token, TOKEN_OPEN_CURLY))
 	{
-		/* 
-		 * This will be either a function or a class.
-		 * We can only determine this by checking the body
-		 * of the function.  If we find a "this." we know
-		 * it is a class, otherwise it is a function.
-		 */
-		parseBlock (token, token);
+		findMatchingToken (token, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY);
 	}
 
 }
@@ -625,17 +701,17 @@ static void parseLoop (tokenInfo *const token)
 	 * Handles these statements
 	 *	   for (x=0; x<3; x++)
 	 *		   document.write("This text is repeated three times<br>");
-	 *	   
+	 *
 	 *	   for (x=0; x<3; x++)
 	 *	   {
 	 *		   document.write("This text is repeated three times<br>");
 	 *	   }
-	 *	   
+	 *
 	 *	   while (number<5){
 	 *		   document.write(number+"<br>");
 	 *		   number++;
 	 *	   }
-	 *	   
+	 *
 	 *	   do{
 	 *		   document.write(number+"<br>");
 	 *		   number++;
@@ -647,7 +723,7 @@ static void parseLoop (tokenInfo *const token)
 	{
 		readToken(token);
 
-		if (isType (token, TOKEN_OPEN_PAREN)) 
+		if (isType (token, TOKEN_OPEN_PAREN))
 		{
 			/*
 			 * Handle nameless functions, these will only
@@ -656,7 +732,7 @@ static void parseLoop (tokenInfo *const token)
 			skipArgumentList(token);
 		}
 
-		if (isType (token, TOKEN_OPEN_CURLY)) 
+		if (isType (token, TOKEN_OPEN_CURLY))
 		{
 			/*
 			 * This will be either a function or a class.
@@ -665,17 +741,17 @@ static void parseLoop (tokenInfo *const token)
 			 * it is a class, otherwise it is a function.
 			 */
 			parseBlock (token, token);
-		} 
-		else 
+		}
+		else
 		{
 			parseLine(token, FALSE);
 		}
-	} 
+	}
 	else if (isKeyword (token, KEYWORD_do))
 	{
 		readToken(token);
 
-		if (isType (token, TOKEN_OPEN_CURLY)) 
+		if (isType (token, TOKEN_OPEN_CURLY))
 		{
 			/*
 			 * This will be either a function or a class.
@@ -684,8 +760,8 @@ static void parseLoop (tokenInfo *const token)
 			 * it is a class, otherwise it is a function.
 			 */
 			parseBlock (token, token);
-		} 
-		else 
+		}
+		else
 		{
 			parseLine(token, FALSE);
 		}
@@ -696,7 +772,7 @@ static void parseLoop (tokenInfo *const token)
 		{
 			readToken(token);
 
-			if (isType (token, TOKEN_OPEN_PAREN)) 
+			if (isType (token, TOKEN_OPEN_PAREN))
 			{
 				/*
 				 * Handle nameless functions, these will only
@@ -716,11 +792,11 @@ static boolean parseIf (tokenInfo *const token)
 	 *	   if ( ... )
 	 *		   one line;
 	 *
-	 *	   if ( ... )  
+	 *	   if ( ... )
 	 *		  statement;
 	 *	   else
 	 *		  statement
-	 *	    
+	 *
 	 *	   if ( ... ) {
 	 *		  multiple;
 	 *		  statements;
@@ -746,7 +822,7 @@ static boolean parseIf (tokenInfo *const token)
 	 *		  without a semi-colon.  Currently this messes up
 	 *		  the parsing of blocks.
 	 *		  Need to somehow detect this has happened, and either
-	 *		  backup a token, or skip reading the next token if 
+	 *		  backup a token, or skip reading the next token if
 	 *		  that is possible from all code locations.
 	 *
 	 */
@@ -761,16 +837,16 @@ static boolean parseIf (tokenInfo *const token)
 		readToken (token);
 	}
 
-	if (isType (token, TOKEN_OPEN_PAREN)) 
+	if (isType (token, TOKEN_OPEN_PAREN))
 	{
-		/* 
+		/*
 		 * Handle nameless functions, these will only
 		 * be considered methods.
 		 */
 		skipArgumentList(token);
 	}
 
-	if (isType (token, TOKEN_OPEN_CURLY)) 
+	if (isType (token, TOKEN_OPEN_CURLY))
 	{
 		/*
 		 * This will be either a function or a class.
@@ -779,41 +855,14 @@ static boolean parseIf (tokenInfo *const token)
 		 * it is a class, otherwise it is a function.
 		 */
 		parseBlock (token, token);
-	} 
-	else 
+	}
+	else
 	{
 		findCmdTerm (token);
 
-		/*
-		 * The IF could be followed by an ELSE statement.
-		 * This too could have two formats, a curly braced
-		 * multiline section, or another single line.
-		 */
-
-		if (isType (token, TOKEN_CLOSE_CURLY)) 
-		{
-			/*
-			 * This statement did not have a line terminator.
-			 */
-			read_next_token = FALSE;
-		} 
-		else 
-		{
-			readToken (token);
-
-			if (isType (token, TOKEN_CLOSE_CURLY)) 
-			{
-				/*
-				* This statement did not have a line terminator.
-				*/
-				read_next_token = FALSE;
-			} 
-			else
-			{
-				if (isKeyword (token, KEYWORD_else))
-					read_next_token = parseIf (token); 
-			}
-		} 
+		/* The next token should only be read if this statement had its own
+		 * terminator */
+		read_next_token = isType (token, TOKEN_SEMICOLON);
 	}
 	return read_next_token;
 }
@@ -833,17 +882,14 @@ static void parseFunction (tokenInfo *const token)
 	addToScope(name, token->scope);
 
 	readToken (token);
-	if (isType (token, TOKEN_PERIOD))
+	while (isType (token, TOKEN_PERIOD))
 	{
-		do
+		readToken (token);
+		if ( isKeyword(token, KEYWORD_NONE) )
 		{
+			addContext (name, token);
 			readToken (token);
-			if ( isKeyword(token, KEYWORD_NONE) )
-			{
-				addContext (name, token);
-				readToken (token);
-			}
-		} while (isType (token, TOKEN_PERIOD));
+		}
 	}
 
 	if ( isType (token, TOKEN_OPEN_PAREN) )
@@ -852,9 +898,9 @@ static void parseFunction (tokenInfo *const token)
 	if ( isType (token, TOKEN_OPEN_CURLY) )
 	{
 		is_class = parseBlock (token, name);
-		if ( is_class ) 
+		if ( is_class )
 			makeClassTag (name);
-		else 
+		else
 			makeFunctionTag (name);
 	}
 
@@ -874,14 +920,14 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 	 * Make this routine a bit more forgiving.
 	 * If called on an open_curly advance it
 	 */
-	if ( isType (token, TOKEN_OPEN_CURLY) && 
+	if ( isType (token, TOKEN_OPEN_CURLY) &&
 			isKeyword(token, KEYWORD_NONE) )
 		readToken(token);
 
 	if (! isType (token, TOKEN_CLOSE_CURLY))
 	{
 		/*
-		 * Read until we find the closing brace, 
+		 * Read until we find the closing brace,
 		 * any nested braces will be handled within
 		 */
 		do
@@ -904,7 +950,7 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 				parseLine (token, is_class);
 
 				vStringCopy(token->scope, saveScope);
-			} 
+			}
 			else if (isKeyword (token, KEYWORD_var))
 			{
 				/*
@@ -915,20 +961,20 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 				addToScope (token, parent->string);
 				parseLine (token, is_class);
 				vStringCopy(token->scope, saveScope);
-			} 
+			}
 			else if (isKeyword (token, KEYWORD_function))
 			{
 				vStringCopy(saveScope, token->scope);
 				addToScope (token, parent->string);
 				parseFunction (token);
 				vStringCopy(token->scope, saveScope);
-			} 
+			}
 			else if (isType (token, TOKEN_OPEN_CURLY))
 			{
 				/* Handle nested blocks */
 				parseBlock (token, parent);
-			} 
-			else 
+			}
+			else
 			{
 				/*
 				 * It is possible for a line to have no terminator
@@ -943,11 +989,11 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 			 * Always read a new token unless we find a statement without
 			 * a ending terminator
 			 */
-			if( read_next_token ) 
+			if( read_next_token )
 				readToken(token);
 
 			/*
-			 * If we find a statement without a terminator consider the 
+			 * If we find a statement without a terminator consider the
 			 * block finished, otherwise the stack will be off by one.
 			 */
 		} while (! isType (token, TOKEN_CLOSE_CURLY) && read_next_token );
@@ -969,13 +1015,13 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 	 *	   validProperty  : 2,
 	 *	   validMethod    : function(a,b) {}
 	 *	   'validMethod2' : function(a,b) {}
-     *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		
+     *     container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}
 	 */
 
 	do
 	{
 		readToken (token);
-		if (isType (token, TOKEN_CLOSE_CURLY)) 
+		if (isType (token, TOKEN_CLOSE_CURLY))
 		{
 			/*
 			 * This was most likely a variable declaration of a hash table.
@@ -1001,7 +1047,7 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 						skipArgumentList(token);
 					}
 
-					if (isType (token, TOKEN_OPEN_CURLY)) 
+					if (isType (token, TOKEN_OPEN_CURLY))
 					{
 						has_methods = TRUE;
 						addToScope (name, class->string);
@@ -1017,15 +1063,43 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 				}
 				else
 				{
+						vString * saveScope = vStringNew ();
+						boolean has_child_methods = FALSE;
+
+						/* skip whatever is the value */
+						while (! isType (token, TOKEN_COMMA) &&
+						       ! isType (token, TOKEN_CLOSE_CURLY))
+						{
+							if (isType (token, TOKEN_OPEN_CURLY))
+							{
+								/* Recurse to find child properties/methods */
+								vStringCopy (saveScope, token->scope);
+								addToScope (token, class->string);
+								has_child_methods = parseMethods (token, name);
+								vStringCopy (token->scope, saveScope);
+								readToken (token);
+							}
+							else if (isType (token, TOKEN_OPEN_PAREN))
+							{
+								skipArgumentList (token);
+							}
+							else if (isType (token, TOKEN_OPEN_SQUARE))
+							{
+								skipArrayList (token);
+							}
+							else
+							{
+								readToken (token);
+							}
+						}
+						vStringDelete (saveScope);
+
 						has_methods = TRUE;
 						addToScope (name, class->string);
-						makeJsTag (name, JSTAG_PROPERTY);
-
-						/*
-						 * Read the next token, if a comma
-						 * we must loop again
-						 */
-						readToken (token);
+						if (has_child_methods)
+							makeJsTag (name, JSTAG_CLASS);
+						else
+							makeJsTag (name, JSTAG_PROPERTY);
 				}
 			}
 		}
@@ -1043,11 +1117,11 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 {
 	tokenInfo *const name = newToken ();
 	tokenInfo *const secondary_name = newToken ();
+	tokenInfo *const method_body_token = newToken ();
 	vString * saveScope = vStringNew ();
 	boolean is_class = FALSE;
 	boolean is_terminated = TRUE;
 	boolean is_global = FALSE;
-	boolean is_prototype = FALSE;
 	boolean has_methods = FALSE;
 	vString *	fulltag;
 
@@ -1064,14 +1138,14 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 	 *	   var D3 = new Function("a", "b", "return a+b;");
 	 * Class
 	 *	   testlib.extras.ValidClassOne = function(a,b) {
-	 *		   this.a = a; 
+	 *		   this.a = a;
 	 *	   }
 	 * Class Methods
 	 *	   testlib.extras.ValidClassOne.prototype = {
 	 *		   'validMethodOne' : function(a,b) {},
 	 *		   'validMethodTwo' : function(a,b) {}
 	 *	   }
-     *     ValidClassTwo = function () 
+     *     ValidClassTwo = function ()
      *     {
      *         this.validMethodThree = function() {}
      *         // unnamed method
@@ -1080,7 +1154,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 	 *	   Database.prototype.validMethodThree = Database_getTodaysDate;
 	 */
 
-	if ( is_inside_class ) 
+	if ( is_inside_class )
 		is_class = TRUE;
 	/*
 	 * var can preceed an inner function
@@ -1129,11 +1203,11 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 					{
 						vStringCopy(saveScope, token->scope);
 						addToScope(token, name->string);
-					} 
-					else 
+					}
+					else
 						addContext (name, token);
-				} 
-				else if ( isKeyword(token, KEYWORD_prototype) ) 
+				}
+				else if ( isKeyword(token, KEYWORD_prototype) )
 				{
 					/*
 					 * When we reach the "prototype" tag, we infer:
@@ -1141,12 +1215,12 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 					 *     "build"     is a method
 					 *
 					 * function BindAgent( repeatableIdName, newParentIdName ) {
-					 * }	
+					 * }
 					 *
 					 * CASE 1
 					 * Specified function name: "build"
 					 *     BindAgent.prototype.build = function( mode ) {
-					 *     	  ignore everything within this function
+					 *     	  maybe parse nested functions
 					 *     }
 					 *
 					 * CASE 2
@@ -1159,7 +1233,6 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 					 */
 					makeClassTag (name);
 					is_class = TRUE;
-					is_prototype = TRUE;
 
 					/*
 					 * There should a ".function_name" next.
@@ -1175,28 +1248,32 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 						{
 							vStringCopy(saveScope, token->scope);
 							addToScope(token, name->string);
-
 							makeJsTag (token, JSTAG_METHOD);
-							/*
-							 * We can read until the end of the block / statement.
-							 * We need to correctly parse any nested blocks, but
-							 * we do NOT want to create any tags based on what is
-							 * within the blocks.
-							 */
-							token->ignoreTag = TRUE;
-							/*
-							 * Find to the end of the statement 
-							 */
-							findCmdTerm (token);
-							token->ignoreTag = FALSE;
+
+							readToken (method_body_token);
+							vStringCopy (method_body_token->scope, token->scope);
+
+							while (! ( isType (method_body_token, TOKEN_SEMICOLON) ||
+							           isType (method_body_token, TOKEN_CLOSE_CURLY) ||
+							           isType (method_body_token, TOKEN_OPEN_CURLY)) )
+							{
+								if ( isType (method_body_token, TOKEN_OPEN_PAREN) )
+									skipArgumentList(method_body_token);
+								else
+									readToken (method_body_token);
+							}
+
+							if ( isType (method_body_token, TOKEN_OPEN_CURLY))
+								parseBlock (method_body_token, token);
+
 							is_terminated = TRUE;
 							goto cleanUp;
 						}
-					} 
-					else if (isType (token, TOKEN_EQUAL_SIGN)) 
+					}
+					else if (isType (token, TOKEN_EQUAL_SIGN))
 					{
 						readToken (token);
-						if (isType (token, TOKEN_OPEN_CURLY)) 
+						if (isType (token, TOKEN_OPEN_CURLY))
 						{
 							/*
 							 * Handle CASE 2
@@ -1209,7 +1286,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 							 */
 							parseMethods(token, name);
 							/*
-							 * Find to the end of the statement 
+							 * Find to the end of the statement
 							 */
 							findCmdTerm (token);
 							token->ignoreTag = FALSE;
@@ -1258,10 +1335,10 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 			 * Handles this syntax:
 			 *	   var g_var2;
 			 */
-			if (isType (token, TOKEN_SEMICOLON)) 
+			if (isType (token, TOKEN_SEMICOLON))
 				makeJsTag (name, JSTAG_VARIABLE);
 		}
-		/* 
+		/*
 		 * Statement has ended.
 		 * This deals with calls to functions, like:
 		 *     alert(..);
@@ -1277,16 +1354,16 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 		{
 			readToken (token);
 
-			if ( isKeyword (token, KEYWORD_NONE) && 
+			if ( isKeyword (token, KEYWORD_NONE) &&
 					! isType (token, TOKEN_OPEN_PAREN) )
 			{
 				/*
 				 * Functions of this format:
-				 *	   var D2A = function theAdd(a, b) 
-				 *	   {					 
+				 *	   var D2A = function theAdd(a, b)
+				 *	   {
 				 *		  return a+b;
-				 *	   }					 
-				 * Are really two separate defined functions and 
+				 *	   }
+				 * Are really two separate defined functions and
 				 * can be referenced in two ways:
 				 *	   alert( D2A(1,2) );			  // produces 3
 				 *	   alert( theAdd(1,2) );		  // also produces 3
@@ -1304,7 +1381,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 			if ( isType (token, TOKEN_OPEN_PAREN) )
 				skipArgumentList(token);
 
-			if (isType (token, TOKEN_OPEN_CURLY)) 
+			if (isType (token, TOKEN_OPEN_CURLY))
 			{
 				/*
 				 * This will be either a function or a class.
@@ -1312,32 +1389,32 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 				 * of the function.  If we find a "this." we know
 				 * it is a class, otherwise it is a function.
 				 */
-				if ( is_inside_class ) 
+				if ( is_inside_class )
 				{
 					makeJsTag (name, JSTAG_METHOD);
 					if ( vStringLength(secondary_name->string) > 0 )
 						makeFunctionTag (secondary_name);
 					parseBlock (token, name);
-				} 
-				else 
+				}
+				else
 				{
 					is_class = parseBlock (token, name);
-					if ( is_class ) 
+					if ( is_class )
 						makeClassTag (name);
-					else 
+					else
 						makeFunctionTag (name);
 
 					if ( vStringLength(secondary_name->string) > 0 )
 						makeFunctionTag (secondary_name);
 
 					/*
-					 * Find to the end of the statement 
+					 * Find to the end of the statement
 					 */
 					goto cleanUp;
 				}
 			}
-		} 
-		else if (isType (token, TOKEN_OPEN_PAREN)) 
+		}
+		else if (isType (token, TOKEN_OPEN_PAREN))
 		{
 			/*
 			 * Handle nameless functions
@@ -1345,7 +1422,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 			 */
 			skipArgumentList(token);
 
-			if (isType (token, TOKEN_OPEN_CURLY)) 
+			if (isType (token, TOKEN_OPEN_CURLY))
 			{
 				/*
 				 * Nameless functions are only setup as methods.
@@ -1353,8 +1430,10 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 				makeJsTag (name, JSTAG_METHOD);
 				parseBlock (token, name);
 			}
-		} 
-		else if (isType (token, TOKEN_OPEN_CURLY)) 
+			else if (isType (token, TOKEN_CLOSE_CURLY))
+				is_terminated = FALSE;
+		}
+		else if (isType (token, TOKEN_OPEN_CURLY))
 		{
 			/*
 			 * Creates tags for each of these class methods
@@ -1366,7 +1445,9 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 			 *     var z = {};
 			 */
 			has_methods = parseMethods(token, name);
-			if ( ! has_methods )
+			if (has_methods)
+				makeJsTag (name, JSTAG_CLASS);
+			else
 			{
 				/*
 				 * Only create variables for global scope
@@ -1374,7 +1455,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 				if ( token->nestLevel == 0 && is_global )
 				{
 					/*
-					 * A pointer can be created to the function.  
+					 * A pointer can be created to the function.
 					 * If we recognize the function/class name ignore the variable.
 					 * This format looks identical to a variable definition.
 					 * A variable defined outside of a block is considered
@@ -1402,15 +1483,15 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 							! stringListHas(ClassNames, vStringValue (fulltag)) )
 					{
 						readToken (token);
-						if ( ! isType (token, TOKEN_SEMICOLON)) 
+						if ( ! isType (token, TOKEN_SEMICOLON))
 							findCmdTerm (token);
-						if (isType (token, TOKEN_SEMICOLON)) 
+						if (isType (token, TOKEN_SEMICOLON))
 							makeJsTag (name, JSTAG_VARIABLE);
 					}
 					vStringDelete (fulltag);
 				}
 			}
-			if (isType (token, TOKEN_CLOSE_CURLY)) 
+			if (isType (token, TOKEN_CLOSE_CURLY))
 			{
 				/*
 				 * Assume the closing parantheses terminates
@@ -1422,20 +1503,18 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 		else if (isKeyword (token, KEYWORD_new))
 		{
 			readToken (token);
-			if ( isKeyword (token, KEYWORD_function) || 
+			if ( isKeyword (token, KEYWORD_function) ||
 					isKeyword (token, KEYWORD_capital_function) ||
-					isKeyword (token, KEYWORD_object) ||
 					isKeyword (token, KEYWORD_capital_object) )
 			{
-				if ( isKeyword (token, KEYWORD_object) || 
-						isKeyword (token, KEYWORD_capital_object) )
+				if ( isKeyword (token, KEYWORD_capital_object) )
 					is_class = TRUE;
 
 				readToken (token);
 				if ( isType (token, TOKEN_OPEN_PAREN) )
 					skipArgumentList(token);
 
-				if (isType (token, TOKEN_SEMICOLON)) 
+				if (isType (token, TOKEN_SEMICOLON))
 				{
 					if ( token->nestLevel == 0 )
 					{
@@ -1447,6 +1526,8 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 						}
 					}
 				}
+				else if (isType (token, TOKEN_CLOSE_CURLY))
+					is_terminated = FALSE;
 			}
 		}
 		else if (isKeyword (token, KEYWORD_NONE))
@@ -1457,7 +1538,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 			if ( token->nestLevel == 0 && is_global )
 			{
 				/*
-				 * A pointer can be created to the function.  
+				 * A pointer can be created to the function.
 				 * If we recognize the function/class name ignore the variable.
 				 * This format looks identical to a variable definition.
 				 * A variable defined outside of a block is considered
@@ -1485,38 +1566,94 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 						! stringListHas(ClassNames, vStringValue (fulltag)) )
 				{
 					findCmdTerm (token);
-					if (isType (token, TOKEN_SEMICOLON)) 
+					if (isType (token, TOKEN_SEMICOLON))
 						makeJsTag (name, JSTAG_VARIABLE);
 				}
 				vStringDelete (fulltag);
 			}
 		}
 	}
-	findCmdTerm (token);
+	/* if we aren't already at the cmd end, advance to it and check whether
+	 * the statement was terminated */
+	if (! isType (token, TOKEN_CLOSE_CURLY) &&
+	    ! isType (token, TOKEN_SEMICOLON))
+	{
+		findCmdTerm (token);
 
-	/*
-	 * Statements can be optionally terminated in the case of 
-	 * statement prior to a close curly brace as in the
-	 * document.write line below:
-	 *
-	 * function checkForUpdate() {
-	 *	   if( 1==1 ) {
-	 *		   document.write("hello from checkForUpdate<br>")
-	 *	   }
-	 *	   return 1;
-	 * }
-	 */
-	if ( ! is_terminated && isType (token, TOKEN_CLOSE_CURLY)) 
-		is_terminated = FALSE;
-
+		/*
+		 * Statements can be optionally terminated in the case of
+		 * statement prior to a close curly brace as in the
+		 * document.write line below:
+		 *
+		 * function checkForUpdate() {
+		 *	   if( 1==1 ) {
+		 *		   document.write("hello from checkForUpdate<br>")
+		 *	   }
+		 *	   return 1;
+		 * }
+		 */
+		if (isType (token, TOKEN_CLOSE_CURLY))
+			is_terminated = FALSE;
+	}
 
 cleanUp:
 	vStringCopy(token->scope, saveScope);
 	deleteToken (name);
 	deleteToken (secondary_name);
+	deleteToken (method_body_token);
 	vStringDelete(saveScope);
 
 	return is_terminated;
+}
+
+static void parseUI5 (tokenInfo *const token)
+{
+	tokenInfo *const name = newToken ();
+	boolean is_inside_class = FALSE;
+	/*
+	 * SAPUI5 is built on top of jQuery.
+	 * It follows a standard format:
+	 *     sap.ui.controller("id.of.controller", {
+	 *         method_name : function... {
+	 *         },
+	 *
+	 *         method_name : function ... {
+	 *         }
+	 *     }
+	 *
+	 * Handle the parsing of the initial controller (and the 
+	 * same for "view") and then allow the methods to be
+	 * parsed as usual.
+	 */
+
+	readToken (token);
+
+	if (isType (token, TOKEN_PERIOD))
+	{
+		readToken (token);
+		while (! isType (token, TOKEN_OPEN_PAREN) )
+		{
+			readToken (token);
+		}
+		readToken (token);
+
+		if (isType (token, TOKEN_STRING))
+		{
+			copyToken(name, token);
+			readToken (token);
+		}
+
+		if (isType (token, TOKEN_COMMA))
+			readToken (token);
+
+		do
+		{
+			parseMethods (token, name);
+		} while (! isType (token, TOKEN_CLOSE_CURLY) );
+	}
+cleanUp:
+	deleteToken (name);
+
 }
 
 static boolean parseLine (tokenInfo *const token, boolean is_inside_class)
@@ -1536,10 +1673,10 @@ static boolean parseLine (tokenInfo *const token, boolean is_inside_class)
 	{
 		switch (token->keyword)
 		{
-			case KEYWORD_for:	   
+			case KEYWORD_for:
 			case KEYWORD_while:
 			case KEYWORD_do:
-				parseLoop (token); 
+				parseLoop (token);
 				break;
 			case KEYWORD_if:
 			case KEYWORD_else:
@@ -1547,24 +1684,24 @@ static boolean parseLine (tokenInfo *const token, boolean is_inside_class)
 			case KEYWORD_catch:
 			case KEYWORD_finally:
 				/* Common semantics */
-				is_terminated = parseIf (token); 
+				is_terminated = parseIf (token);
 				break;
 			case KEYWORD_switch:
-				parseSwitch (token); 
+				parseSwitch (token);
 				break;
-			default:			   
-				parseStatement (token, is_inside_class); 
+			default:
+				parseStatement (token, is_inside_class);
 				break;
 		}
-	} 
-	else 
+	}
+	else
 	{
 		/*
 		 * Special case where single line statements may not be
 		 * SEMICOLON terminated.  parseBlock needs to know this
 		 * so that it does not read the next token.
 		 */
-		is_terminated = parseStatement (token, is_inside_class); 
+		is_terminated = parseStatement (token, is_inside_class);
 	}
 	return is_terminated;
 }
@@ -1575,18 +1712,12 @@ static void parseJsFile (tokenInfo *const token)
 	{
 		readToken (token);
 
-		if (isType(token, TOKEN_KEYWORD))
-		{
-			switch (token->keyword)
-			{
-				case KEYWORD_function:	parseFunction (token); break;
-				default:				parseLine (token, FALSE); break;
-			}
-		} 
-		else 
-		{
-			parseLine (token, FALSE); 
-		}
+		if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_function)
+			parseFunction (token);
+		else if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_sap)
+			parseUI5 (token);
+		else
+			parseLine (token, FALSE);
 	} while (TRUE);
 }
 
@@ -1601,10 +1732,11 @@ static void findJsTags (void)
 {
 	tokenInfo *const token = newToken ();
 	exception_t exception;
-	
+
 	ClassNames = stringListNew ();
 	FunctionNames = stringListNew ();
-	
+	LastTokenType = TOKEN_UNDEFINED;
+
 	exception = (exception_t) (setjmp (Exception));
 	while (exception == ExceptionNone)
 		parseJsFile (token);

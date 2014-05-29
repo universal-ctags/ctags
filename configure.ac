@@ -141,44 +141,54 @@ AC_DEFUN([CHECK_HEADER_DEFINE], [
 # --------------------------------
 
 AC_ARG_WITH(posix-regex,
-[  --with-posix-regex      use Posix regex interface, if available])
+	[AS_HELP_STRING([--with-posix-regex],
+		[use Posix regex interface, if available])])
 
-AC_ARG_WITH(readlib,
-[  --with-readlib          include readtags library object during install])
+AC_ARG_ENABLE(readlib,
+	[AS_HELP_STRING([--enable-readlib],
+		[include readtags library object during install])])
+
+AC_ARG_ENABLE(readcmd,
+	[AS_HELP_STRING([--disable-readcmd],
+		[do not include readtags command during install])],
+	[], [enable_readcmd=yes])
 
 # AC_ARG_WITH(perl-regex,
-# [  --with-perl-regex       use Perl pcre interface, if available])
+# 	[AS_HELP_STRING([--with-perl-regex],
+# 	    [use Perl pcre interface, if available])])
 
 AC_ARG_ENABLE(etags,
-[  --enable-etags          enable the installation of links for etags])
+	[AS_HELP_STRING([--enable-etags],
+		[enable the installation of links for etags])])
 
 AC_ARG_ENABLE(extended-format,
-[  --disable-extended-format
-                          disable extension flags; use original ctags file
-                          format only],
+	[AS_HELP_STRING([--disable-extended-format],
+		[disable extension flags; use original ctags file format only])],
 	AC_DEFINE(DEFAULT_FILE_FORMAT, 1), AC_DEFINE(DEFAULT_FILE_FORMAT, 2))
 
 AC_ARG_ENABLE(external-sort,
-[  --disable-external-sort use internal sort algorithm instead of sort program])
+	[AS_HELP_STRING([--disable-external-sort],
+		[use internal sort algorithm instead of sort program])])
 
 AC_ARG_ENABLE(custom-config,
-[  --enable-custom-config=FILE
-                          enable custom config file for site-wide defaults])
+	[AS_HELP_STRING([--enable-custom-config=FILE],
+		[enable custom config file for site-wide defaults])])
 
 AC_ARG_ENABLE(macro-patterns,
-[  --enable-macro-patterns use patterns as default method to locate macros
-                          instead of line numbers])
+	[AS_HELP_STRING([--enable-macro-patterns],
+		[use patterns as default method to locate macros instead of line numbers])])
 
 AC_ARG_ENABLE(maintainer-mode,
-[  --enable-maintainer-mode
-                          use maintainer makefile])
+	[AS_HELP_STRING([--enable-maintainer-mode],
+		[use maintainer makefile])])
 
 AC_ARG_ENABLE(shell-globbing,
-[  --enable-shell-globbing=DIR
-                          does shell expand wildcards (yes|no)? [yes]])
+	[AS_HELP_STRING([--enable-shell-globbing=DIR],
+		[does shell expand wildcards (yes|no)? [yes]])])
 
 AC_ARG_ENABLE(tmpdir,
-[  --enable-tmpdir=DIR     default directory for temporary files [ARG=/tmp]],
+	[AS_HELP_STRING([--enable-tmpdir=DIR],
+		[default directory for temporary files [ARG=/tmp]])],
 	tmpdir_specified=yes)
 
 
@@ -198,11 +208,18 @@ else
 	AC_MSG_RESULT(no)
 fi
 AC_MSG_CHECKING(whether to install readtags object file)
-if test yes = "$with_readlib"; then
+if test yes = "$enable_readlib"; then
 	AC_MSG_RESULT(yes)
 	install_targets="$install_targets install-lib"
 else
 	AC_MSG_RESULT(no)
+fi
+AC_MSG_CHECKING(whether to install readtags command)
+if test no = "$enable_readcmd"; then
+	AC_MSG_RESULT(no)
+else
+	AC_MSG_RESULT(yes)
+	install_targets="$install_targets install-cmd"
 fi
 AC_SUBST(install_targets)
 

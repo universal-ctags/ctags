@@ -1,5 +1,7 @@
 // This file should generate the following tags:
 //
+//   classes
+//     objectLiteral
 //   methods
 //     objectLiteral.objLiteralMethod
 //   properties
@@ -19,7 +21,4 @@ objLiteralProperty : 1,
 */
 objLiteralMethod : function(){}
 }
-
-// When I run ctags on this (ctags -f - test.js) I get no output. I expect it
-// to give me something for both "objectLiteral" and "objLiteralMethod".
 
