@@ -99,7 +99,7 @@ UNITS_ARTIFACTS=Units/*.d/EXPECTED.TMP Units/*.d/OUTPUT.TMP Units/*.d/DIFF.TMP
 test.units: $(CTAGS_TEST)
 	@ for input in Units/*.d/input.*; do \
 		t=$${input%/input.*}; \
-		name=$${t/.d/}; \
+		name=$${t%.d}; \
 		\
 		expected="$$t"/expected; \
 		expectedtmp="$$t"/EXPECTED.TMP; \
