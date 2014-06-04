@@ -14,8 +14,10 @@ DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
 DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 		rm -f $1 $2 $3 ; \
 		echo "Passed" ; \
+		true ; \
 	  else \
 		echo "FAILED: differences left in $3" ; \
+		false ; \
 	  fi
 
 .PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units
@@ -97,7 +99,9 @@ endif
 
 UNITS_ARTIFACTS=Units/*.d/EXPECTED.TMP Units/*.d/OUTPUT.TMP Units/*.d/DIFF.TMP
 test.units: $(CTAGS_TEST)
-	@ for input in Units/*.d/input.*; do \
+	@ \
+	success=true; \
+	for input in Units/*.d/input.*; do \
 		t=$${input%/input.*}; \
 		name=$${t/.d/}; \
 		\
@@ -114,7 +118,9 @@ test.units: $(CTAGS_TEST)
 		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
 		cp "$$expected" "$$expectedtmp"; \
 		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff"); \
-	done
+		test $$? -eq 0 || success=false; \
+	done; \
+	$$success
 
 TEST_ARTIFACTS = test.*.diff tags.ref tags.test $(UNITS_ARTIFACTS)
 clean-test:
