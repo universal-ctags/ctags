@@ -103,7 +103,7 @@ test.units: $(CTAGS_TEST)
 	success=true; \
 	for input in Units/*.d/input.*; do \
 		t=$${input%/input.*}; \
-		name=$${t/.d/}; \
+		name=$${t%.d}; \
 		\
 		expected="$$t"/expected; \
 		expectedtmp="$$t"/EXPECTED.TMP; \
