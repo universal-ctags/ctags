@@ -1,0 +1,8 @@
+a	Units/php-strings.d/input.php	/^$a = "hello";$/;"	v
+b	Units/php-strings.d/input.php	/^$b = 'hello';$/;"	v
+c	Units/php-strings.d/input.php	/^$c = "hello \\"buddy\\"";$/;"	v
+d	Units/php-strings.d/input.php	/^$d = 'hello \\'buddy\\'';$/;"	v
+e	Units/php-strings.d/input.php	/^$e = <<<EOS$/;"	v
+f	Units/php-strings.d/input.php	/^$f = <<<'EOS'$/;"	v
+g	Units/php-strings.d/input.php	/^$g = <<<"EOS"$/;"	v
+zzz_end	Units/php-strings.d/input.php	/^$zzz_end = 42;$/;"	v

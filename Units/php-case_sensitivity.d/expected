@@ -1,0 +1,16 @@
+A	Units/php-case_sensitivity.d/input.php	/^class A {}$/;"	c
+B	Units/php-case_sensitivity.d/input.php	/^CLASS B {}$/;"	c
+C	Units/php-case_sensitivity.d/input.php	/^Class C {}$/;"	c
+D	Units/php-case_sensitivity.d/input.php	/^ClAsS D {}$/;"	c
+a	Units/php-case_sensitivity.d/input.php	/^function a() {}$/;"	f
+b	Units/php-case_sensitivity.d/input.php	/^FUNCTION b() {}$/;"	f
+c	Units/php-case_sensitivity.d/input.php	/^Function c() {}$/;"	f
+d	Units/php-case_sensitivity.d/input.php	/^FuNcTiOn d() {}$/;"	f
+iA	Units/php-case_sensitivity.d/input.php	/^interface iA {}$/;"	i
+iB	Units/php-case_sensitivity.d/input.php	/^INTERFACE iB {}$/;"	i
+iC	Units/php-case_sensitivity.d/input.php	/^Interface iC {}$/;"	i
+iD	Units/php-case_sensitivity.d/input.php	/^InTeRfAcE iD {}$/;"	i
+tA	Units/php-case_sensitivity.d/input.php	/^trait tA {}$/;"	t
+tB	Units/php-case_sensitivity.d/input.php	/^TRAIT tB {}$/;"	t
+tC	Units/php-case_sensitivity.d/input.php	/^Trait tC {}$/;"	t
+tD	Units/php-case_sensitivity.d/input.php	/^TrAiT tD {}$/;"	t

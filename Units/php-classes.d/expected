@@ -1,0 +1,7 @@
+Bar	Units/php-classes.d/input.php	/^class Bar {$/;"	c
+Foo	Units/php-classes.d/input.php	/^class Foo {$/;"	c
+__construct	Units/php-classes.d/input.php	/^	function __construct () {$/;"	f	class:Bar
+__construct	Units/php-classes.d/input.php	/^	function __construct($a, $b) {$/;"	f	class:Foo
+method1	Units/php-classes.d/input.php	/^	function method1 () {$/;"	f	class:Bar
+method1	Units/php-classes.d/input.php	/^	function method1($arg) {$/;"	f	class:Foo
+method2	Units/php-classes.d/input.php	/^	function method2() {$/;"	f	class:Foo
