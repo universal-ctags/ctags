@@ -35,6 +35,7 @@ SOURCES = \
 	lua.c \
 	main.c \
 	make.c \
+	matlab.c \
 	objc.c \
 	ocaml.c \
 	options.c \
@@ -100,6 +101,7 @@ OBJECTS = \
 	lua.$(OBJEXT) \
 	main.$(OBJEXT) \
 	make.$(OBJEXT) \
+	matlab.$(OBJEXT) \
 	objc.$(OBJEXT) \
 	ocaml.$(OBJEXT) \
 	options.$(OBJEXT) \

@@ -2,6 +2,7 @@
  *	 $Id: tex.c 666 2008-05-15 17:47:31Z dfishburn $
  *
  *	 Copyright (c) 2008, David Fishburn
+ *	 Copyright (c) 2012, Jan Larres
  *
  *	 This source code is released for free distribution under the terms of the
  *	 GNU General Public License.
@@ -47,13 +48,14 @@ typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
  */
 typedef enum eKeywordId {
 	KEYWORD_NONE = -1,
+	KEYWORD_part,
 	KEYWORD_chapter,
 	KEYWORD_section,
 	KEYWORD_subsection,
 	KEYWORD_subsubsection,
-	KEYWORD_part,
 	KEYWORD_paragraph,
 	KEYWORD_subparagraph,
+	KEYWORD_label,
 	KEYWORD_include
 } keywordId;
 
@@ -99,38 +101,47 @@ static langType Lang_js;
 
 static jmp_buf Exception;
 
+static vString *lastPart;
+static vString *lastChapter;
+static vString *lastSection;
+static vString *lastSubS;
+static vString *lastSubSubS;
+
 typedef enum {
+	TEXTAG_PART,
 	TEXTAG_CHAPTER,
 	TEXTAG_SECTION,
 	TEXTAG_SUBSECTION,
 	TEXTAG_SUBSUBSECTION,
-	TEXTAG_PART,
 	TEXTAG_PARAGRAPH,
 	TEXTAG_SUBPARAGRAPH,
+	TEXTAG_LABEL,
 	TEXTAG_INCLUDE,
 	TEXTAG_COUNT
 } texKind;
 
 static kindOption TexKinds [] = {
+	{ TRUE,  'p', "part",			  "parts"			   },
 	{ TRUE,  'c', "chapter",		  "chapters"		   },
 	{ TRUE,  's', "section",		  "sections"		   },
 	{ TRUE,  'u', "subsection",		  "subsections"		   },
 	{ TRUE,  'b', "subsubsection",	  "subsubsections"	   },
-	{ TRUE,  'p', "part",			  "parts"			   },
 	{ TRUE,  'P', "paragraph",		  "paragraphs"		   },
 	{ TRUE,  'G', "subparagraph",	  "subparagraphs"	   },
+	{ TRUE,  'l', "label",			  "labels"			   },
 	{ TRUE,  'i', "include",	  	  "includes"		   }
 };
 
 static const keywordDesc TexKeywordTable [] = {
 	/* keyword			keyword ID */
+	{ "part",			KEYWORD_part				},
 	{ "chapter",		KEYWORD_chapter				},
 	{ "section",		KEYWORD_section				},
 	{ "subsection",		KEYWORD_subsection			},
 	{ "subsubsection",	KEYWORD_subsubsection		},
-	{ "part",			KEYWORD_part				},
 	{ "paragraph",		KEYWORD_paragraph			},
 	{ "subparagraph",	KEYWORD_subparagraph		},
+	{ "label",			KEYWORD_label				},
 	{ "include",		KEYWORD_include				}
 };
 
@@ -141,8 +152,8 @@ static const keywordDesc TexKeywordTable [] = {
 static boolean isIdentChar (const int c)
 {
 	return (boolean)
-		(isalpha (c) || isdigit (c) || c == '$' || 
-		  c == '_' || c == '#' || c == '-' || c == '.');
+		(isalpha (c) || isdigit (c) || c == '$' ||
+		  c == '_' || c == '#' || c == '-' || c == '.' || c == ':');
 }
 
 static void buildTexKeywordHash (void)
@@ -178,15 +189,76 @@ static void deleteToken (tokenInfo *const token)
 	eFree (token);
 }
 
+static void getScopeInfo(texKind kind, vString *const parentKind,
+	vString *const parentName)
+{
+	int i;
+
+	/*
+	 * Put labels separately instead of under their scope.
+	 * Is this The Right Thing To Do?
+	 */
+	if (kind >= TEXTAG_LABEL) {
+		return;
+	}
+
+	/*
+	 * This abuses the enum internals somewhat, but it should be ok in this
+	 * case.
+	 */
+	for (i = kind - 1; i >= TEXTAG_PART; --i) {
+		if (i == TEXTAG_SUBSECTION && vStringLength(lastSubS) > 0) {
+			vStringCopyS(parentKind, "subsection");
+			break;
+		} else if (i == TEXTAG_SECTION && vStringLength(lastSection) > 0) {
+			vStringCopyS(parentKind, "section");
+			break;
+		} else if (i == TEXTAG_CHAPTER && vStringLength(lastChapter) > 0) {
+			vStringCopyS(parentKind, "chapter");
+			break;
+		} else if (i == TEXTAG_PART && vStringLength(lastPart) > 0) {
+			vStringCopyS(parentKind, "part");
+			break;
+		}
+	}
+
+	/*
+	 * Is '""' the best way to separate scopes? It has to be something that
+	 * should ideally never occur in normal LaTeX text.
+	 */
+	for (i = TEXTAG_PART; i < (int)kind; ++i) {
+		if (i == TEXTAG_PART && vStringLength(lastPart) > 0) {
+			vStringCat(parentName, lastPart);
+		} else if (i == TEXTAG_CHAPTER && vStringLength(lastChapter) > 0) {
+			if (vStringLength(parentName) > 0) {
+				vStringCatS(parentName, "\"\"");
+			}
+			vStringCat(parentName, lastChapter);
+		} else if (i == TEXTAG_SECTION && vStringLength(lastSection) > 0) {
+			if (vStringLength(parentName) > 0) {
+				vStringCatS(parentName, "\"\"");
+			}
+			vStringCat(parentName, lastSection);
+		} else if (i == TEXTAG_SUBSECTION && vStringLength(lastSubS) > 0) {
+			if (vStringLength(parentName) > 0) {
+				vStringCatS(parentName, "\"\"");
+			}
+			vStringCat(parentName, lastSubS);
+		}
+	}
+}
+
 /*
  *	 Tag generation functions
  */
 
-static void makeConstTag (tokenInfo *const token, const texKind kind)
+static void makeTexTag (tokenInfo *const token, texKind kind)
 {
-	if (TexKinds [kind].enabled )
+	if (TexKinds [kind].enabled)
 	{
 		const char *const name = vStringValue (token->string);
+		vString *parentKind = vStringNew();
+		vString *parentName = vStringNew();
 		tagEntryInfo e;
 		initTagEntry (&e, name);
 
@@ -195,31 +267,13 @@ static void makeConstTag (tokenInfo *const token, const texKind kind)
 		e.kindName	   = TexKinds [kind].name;
 		e.kind		   = TexKinds [kind].letter;
 
-		makeTagEntry (&e);
-	}
-}
-
-static void makeTexTag (tokenInfo *const token, texKind kind)
-{
-	vString *	fulltag;
-
-	if (TexKinds [kind].enabled)
-	{
-		/*
-		 * If a scope has been added to the token, change the token
-		 * string to include the scope when making the tag.
-		 */
-		if ( vStringLength (token->scope) > 0 )
-		{
-			fulltag = vStringNew ();
-			vStringCopy (fulltag, token->scope);
-			vStringCatS (fulltag, ".");
-			vStringCatS (fulltag, vStringValue (token->string));
-			vStringTerminate (fulltag);
-			vStringCopy (token->string, fulltag);
-			vStringDelete (fulltag);
+		getScopeInfo(kind, parentKind, parentName);
+		if (vStringLength(parentKind) > 0) {
+			e.extensionFields.scope [0] = vStringValue(parentKind);
+			e.extensionFields.scope [1] = vStringValue(parentName);
 		}
-		makeConstTag (token, kind);
+
+		makeTagEntry (&e);
 	}
 }
 
@@ -227,28 +281,7 @@ static void makeTexTag (tokenInfo *const token, texKind kind)
  *	 Parsing functions
  */
 
-static void parseString (vString *const string, const int delimiter)
-{
-	boolean end = FALSE;
-	while (! end)
-	{
-		int c = fileGetc ();
-		if (c == EOF)
-			end = TRUE;
-		else if (c == '\\')
-		{
-			c = fileGetc(); /* This maybe a ' or ". */
-			vStringPut (string, c);
-		}
-		else if (c == delimiter)
-			end = TRUE;
-		else
-			vStringPut (string, c);
-	}
-	vStringTerminate (string);
-}
-
-/*	
+/*
  *	Read a C identifier beginning with "firstChar" and places it into
  *	"name".
  */
@@ -295,14 +328,6 @@ getNextChar:
 		case '[': token->type = TOKEN_OPEN_SQUARE;			break;
 		case ']': token->type = TOKEN_CLOSE_SQUARE;			break;
 		case '*': token->type = TOKEN_STAR;					break;
-
-		case '\'':
-		case '"':
-				  token->type = TOKEN_STRING;
-				  parseString (token->string, c);
-				  token->lineNumber = getSourceLineNumber ();
-				  token->filePosition = getInputFilePosition ();
-				  break;
 
 		case '\\':
 				  /*
@@ -423,12 +448,47 @@ static boolean parseTag (tokenInfo *const token, texKind kind)
 			}
 			readToken (token);
 		}
-		if (useLongName) 
+		if (useLongName)
 		{
 			vStringTerminate (fullname);
 			vStringCopy (name->string, fullname);
 			makeTexTag (name, kind);
 		}
+	}
+
+	/*
+	 * save the name of the last section definitions for scope-resolution
+	 * later
+	 */
+	switch (kind)
+	{
+		case TEXTAG_PART:
+			vStringCopy(lastPart, fullname);
+			vStringClear(lastChapter);
+			vStringClear(lastSection);
+			vStringClear(lastSubS);
+			vStringClear(lastSubSubS);
+			break;
+		case TEXTAG_CHAPTER:
+			vStringCopy(lastChapter, fullname);
+			vStringClear(lastSection);
+			vStringClear(lastSubS);
+			vStringClear(lastSubSubS);
+			break;
+		case TEXTAG_SECTION:
+			vStringCopy(lastSection, fullname);
+			vStringClear(lastSubS);
+			vStringClear(lastSubSubS);
+			break;
+		case TEXTAG_SUBSECTION:
+			vStringCopy(lastSubS, fullname);
+			vStringClear(lastSubSubS);
+			break;
+		case TEXTAG_SUBSUBSECTION:
+			vStringCopy(lastSubSubS, fullname);
+			break;
+		default:
+			break;
 	}
 
 	deleteToken (name);
@@ -446,34 +506,37 @@ static void parseTexFile (tokenInfo *const token)
 		{
 			switch (token->keyword)
 			{
-				case KEYWORD_chapter:	
-					parseTag (token, TEXTAG_CHAPTER); 
+				case KEYWORD_part:
+					parseTag (token, TEXTAG_PART);
 					break;
-				case KEYWORD_section:	
-					parseTag (token, TEXTAG_SECTION); 
+				case KEYWORD_chapter:
+					parseTag (token, TEXTAG_CHAPTER);
 					break;
-				case KEYWORD_subsection:	
-					parseTag (token, TEXTAG_SUBSECTION); 
+				case KEYWORD_section:
+					parseTag (token, TEXTAG_SECTION);
 					break;
-				case KEYWORD_subsubsection:	
-					parseTag (token, TEXTAG_SUBSUBSECTION); 
+				case KEYWORD_subsection:
+					parseTag (token, TEXTAG_SUBSECTION);
 					break;
-				case KEYWORD_part:	
-					parseTag (token, TEXTAG_PART); 
+				case KEYWORD_subsubsection:
+					parseTag (token, TEXTAG_SUBSUBSECTION);
 					break;
-				case KEYWORD_paragraph:	
-					parseTag (token, TEXTAG_PARAGRAPH); 
+				case KEYWORD_paragraph:
+					parseTag (token, TEXTAG_PARAGRAPH);
 					break;
-				case KEYWORD_subparagraph:	
-					parseTag (token, TEXTAG_SUBPARAGRAPH); 
+				case KEYWORD_subparagraph:
+					parseTag (token, TEXTAG_SUBPARAGRAPH);
 					break;
-				case KEYWORD_include:	
-					parseTag (token, TEXTAG_INCLUDE); 
+				case KEYWORD_label:
+					parseTag (token, TEXTAG_LABEL);
+					break;
+				case KEYWORD_include:
+					parseTag (token, TEXTAG_INCLUDE);
 					break;
 				default:
 					break;
 			}
-		} 
+		}
 	} while (TRUE);
 }
 
@@ -482,13 +545,19 @@ static void initialize (const langType language)
 	Assert (sizeof (TexKinds) / sizeof (TexKinds [0]) == TEXTAG_COUNT);
 	Lang_js = language;
 	buildTexKeywordHash ();
+
+	lastPart    = vStringNew();
+	lastChapter = vStringNew();
+	lastSection = vStringNew();
+	lastSubS    = vStringNew();
+	lastSubSubS = vStringNew();
 }
 
 static void findTexTags (void)
 {
 	tokenInfo *const token = newToken ();
 	exception_t exception;
-	
+
 	exception = (exception_t) (setjmp (Exception));
 	while (exception == ExceptionNone)
 		parseTexFile (token);

@@ -7,11 +7,13 @@ subversion
 
   Revisions up to <r807> are merged except:
 
-	  <r779> - conflicts
-	  <r785> - conflicts
-	  <r788> - conflicts
+	NOTHING HERE NOW
 
   (Wed May 28 00:24:02 2014 by yamato)
+
+  + matlab parser is disabled temporary.
+
+    See the log of caaf50762338a17672263c57bff5ebce70e5a396.
 
 * howto
 
