@@ -37,18 +37,6 @@ if test "${crnl_as_line_terminator}" = yes; then
   AC_DEFINE(USE_CRNL_AS_LINE_TERMINATOR,1,[Define if enable CR+NL as line terminator])
 fi
 
-dnl check for multithread
-AC_ARG_ENABLE(multithread,
-	[  --enable-multithread    enable multithread support],
-	[multithread=$enableval])
-if test "${multithread}" = yes; then
-  AC_CHECK_HEADERS(pthread.h,
-	[AC_DEFINE(USE_MULTI_THREAD_SYSTEM,1,[Define if enbale multithread support])
-	 AC_DEFINE(USE_DEFAULT_MULTI_THREAD_SYSTEM,1,[Define if enable the default multithread system])
-  ])
-  AC_CHECK_LIB(pthread, pthread_mutex_init)
-fi
-
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -102,6 +90,19 @@ int foo(int x, ...) {
 	_cv_stdarg=no)])
 if test "$_cv_stdarg" = yes; then
   AC_DEFINE(HAVE_STDARG_PROTOTYPES,1,[Define if compiler supports stdarg prototypes])
+fi
+
+dnl check for multithread
+AC_ARG_ENABLE(multithread,
+	[  --enable-multithread    enable multithread support],
+	[multithread=$enableval])
+if test "${multithread}" = yes; then
+  dnl This check must be after AC_PROG_CC.
+  AC_CHECK_HEADERS(pthread.h,
+	[AC_DEFINE(USE_MULTI_THREAD_SYSTEM,1,[Define if enbale multithread support])
+	 AC_DEFINE(USE_DEFAULT_MULTI_THREAD_SYSTEM,1,[Define if enable the default multithread system])
+  ])
+  AC_CHECK_LIB(pthread, pthread_mutex_init)
 fi
 
 
