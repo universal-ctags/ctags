@@ -78,6 +78,13 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
         target2 = target.encode(encoding)
     targetp = strptr(target2)
 
+    # cut very long outputs
+    limit = 100
+    if len(target) > limit:
+        target = target[:limit] + "..."
+    if len(pattern) > limit:
+        pattern = pattern[:limit] + "..."
+
     # special syntactic settings
     onig.onig_copy_syntax(byref(syn), onig.ONIG_SYNTAX_DEFAULT)
     syn.options &= ~onig.ONIG_OPTION_ASCII_RANGE
