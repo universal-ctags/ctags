@@ -1,0 +1,17 @@
+language: c
+
+compiler:
+        - gcc
+        - clang
+
+env:
+        - CONFOPT=
+        - CONFOPT=--enable-multithread
+
+before_script:
+        - ./configure $CONFOPT && make
+
+script:
+        - LD_LIBRARY_PATH=.libs python ./testpy.py SJIS
+        - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-8
+        - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-16LE
