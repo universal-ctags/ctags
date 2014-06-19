@@ -1,0 +1,13 @@
+language: c
+
+compiler:
+        - gcc
+        - clang
+
+before_script:
+        - ./configure && make
+
+script:
+        - LD_LIBRARY_PATH=.libs python ./testpy.py SJIS
+        - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-8
+        - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-16LE
