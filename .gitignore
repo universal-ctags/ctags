@@ -21,9 +21,15 @@
 *.RES
 *.res
 
+# gcov files
+*.gcda
+*.gcno
+*.gcov
+
 # don't want to ignore
 !.gitignore
 !.editorconfig
+!.travis.yml
 
 # working dirs
 .deps

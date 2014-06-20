@@ -30,6 +30,15 @@
 
 #include "regparse.h"
 
+#if defined(USE_MULTI_THREAD_SYSTEM) \
+  && defined(USE_DEFAULT_MULTI_THREAD_SYSTEM)
+#ifdef _WIN32
+CRITICAL_SECTION gOnigMutex;
+#else
+pthread_mutex_t gOnigMutex;
+#endif
+#endif
+
 OnigCaseFoldType OnigDefaultCaseFoldFlag = ONIGENC_CASE_FOLD_MIN;
 
 extern OnigCaseFoldType

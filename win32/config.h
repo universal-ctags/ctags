@@ -29,7 +29,7 @@
 #define HAVE_LIMITS_H 1
 #define HAVE_FCNTL_H 1
 #define HAVE_SYS_UTIME_H 1
-#if _MSC_VER >= 1600
+#if defined(__MINGW32__) || (defined(_MSC_VER) && _MSC_VER >= 1600)
 #define HAVE_STDINT_H 1
 #endif
 #define uid_t int

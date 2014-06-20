@@ -966,6 +966,8 @@ scan_env_add_mem_entry(ScanEnv* env)
   Node** p;
 
   need = env->num_mem + 1;
+  if (need > ONIG_MAX_CAPTURE_GROUP_NUM)
+    return ONIGERR_TOO_MANY_CAPTURE_GROUPS;
   if (need >= SCANENV_MEMNODES_SIZE) {
     if (env->mem_alloc <= need) {
       if (IS_NULL(env->mem_nodes_dynamic)) {
@@ -1131,6 +1133,25 @@ node_new(void)
   return node;
 }
 
+#if defined(USE_MULTI_THREAD_SYSTEM) && \
+    defined(USE_SHARED_CCLASS_TABLE) && \
+    defined(USE_PARSE_TREE_NODE_RECYCLE)
+static Node*
+node_new_locked(void)
+{
+  Node* node;
+
+  if (IS_NOT_NULL(FreeNodeList)) {
+    node = (Node* )FreeNodeList;
+    FreeNodeList = FreeNodeList->next;
+    return node;
+  }
+
+  node = (Node* )xmalloc(sizeof(Node));
+  /* xmemset(node, 0, sizeof(Node)); */
+  return node;
+}
+#endif
 
 static void
 initialize_cclass(CClassNode* cc)
@@ -1152,6 +1173,24 @@ node_new_cclass(void)
   return node;
 }
 
+#if defined(USE_MULTI_THREAD_SYSTEM) && \
+    defined(USE_SHARED_CCLASS_TABLE) && \
+    defined(USE_PARSE_TREE_NODE_RECYCLE)
+static Node*
+node_new_cclass_locked(void)
+{
+  Node* node = node_new_locked();
+  CHECK_NULL_RETURN(node);
+
+  SET_NTYPE(node, NT_CCLASS);
+  initialize_cclass(NCCLASS(node));
+  return node;
+}
+#else
+#define node_new_cclass_locked()  node_new_cclass()
+#endif
+
+#ifdef USE_SHARED_CCLASS_TABLE
 static Node*
 node_new_cclass_by_codepoint_range(int not, OnigCodePoint sb_out,
 				   const OnigCodePoint ranges[])
@@ -1160,7 +1199,7 @@ node_new_cclass_by_codepoint_range(int not, OnigCodePoint sb_out,
   CClassNode* cc;
   OnigCodePoint j;
 
-  Node* node = node_new_cclass();
+  Node* node = node_new_cclass_locked();
   CHECK_NULL_RETURN(node);
 
   cc = NCCLASS(node);
@@ -1201,6 +1240,7 @@ node_new_cclass_by_codepoint_range(int not, OnigCodePoint sb_out,
 
   return node;
 }
+#endif /* USE_SHARED_CCLASS_TABLE */
 
 static Node*
 node_new_ctype(int type, int not, int ascii_range)
@@ -4877,14 +4917,10 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	*np = node_new_enclose_memory(env->option, 0);
 	CHECK_NULL_RETURN_MEMERR(*np);
 	num = scan_env_add_mem_entry(env);
-	if (num < 0) {
-	  onig_node_free(*np);
-	  return num;
-	}
-	else if (num >= (int )BIT_STATUS_BITS_NUM) {
-	  onig_node_free(*np);
+	if (num < 0) return num;
+	if (num >= (int )BIT_STATUS_BITS_NUM)
 	  return ONIGERR_GROUP_NUMBER_OVER_FOR_CAPTURE_HISTORY;
-	}
+
 	NENCLOSE(*np)->regnum = num;
 	BIT_STATUS_ON_AT_SIMPLE(env->capture_history, num);
       }
@@ -5330,13 +5366,13 @@ i_free_shared_class(type_cclass_key* key, Node* node, void* arg ARG_UNUSED)
 extern int
 onig_free_shared_cclass_table(void)
 {
-  THREAD_ATOMIC_START;
+  /* THREAD_ATOMIC_START; */
   if (IS_NOT_NULL(OnigTypeCClassTable)) {
     onig_st_foreach(OnigTypeCClassTable, i_free_shared_class, 0);
     onig_st_free_table(OnigTypeCClassTable);
     OnigTypeCClassTable = NULL;
   }
-  THREAD_ATOMIC_END;
+  /* THREAD_ATOMIC_END; */
 
   return 0;
 }

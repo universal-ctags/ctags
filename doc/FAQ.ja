@@ -1,4 +1,4 @@
-FAQ    2011/09/18
+FAQ    2014/03/07
 
 1. 最長マッチ
 
@@ -13,7 +13,14 @@ FAQ    2011/09/18
 
    (A) Onigmo Layer
 
-       oniguruma/regint.hの中の以下のマクロを定義する。
+       onigmo/regint.hの中の以下のマクロのコメントを解除する。
+       (./configure を実行する際に --enable-multithread オプションを
+       追加しても同じ効果がある。)
+
+       /* #define USE_MULTI_THREAD_SYSTEM */
+       /* #define USE_DEFAULT_MULTI_THREAD_SYSTEM */
+
+       または、onigmo/regint.hの中の以下のマクロを定義する。
 
        USE_MULTI_THREAD_SYSTEM
        THREAD_ATOMIC_START
@@ -56,8 +63,8 @@ FAQ    2011/09/18
 スレッドセーフに関する補足
 
 スレッドセーフにするには、個別のアプリケーションの中で行うか、
-Onigurumaライブラリの中で行うか、どちらかを選ぶことができます。
-(Onigurumaを使用する側で対処するか、Onigurumaに対処させるか
+Onigmoライブラリの中で行うか、どちらかを選ぶことができます。
+(Onigmoを使用する側で対処するか、Onigmoに対処させるか
 どちらか片方で行う必要があるということです。)
 
 これらの方法について、以下(A)と(B)で説明します。
@@ -67,9 +74,17 @@ Onigurumaライブラリの中で行うか、どちらかを選ぶことがで�
 書くことは無理です。実際に使用されるマルチスレッドAPIで、
 対応する機能のものを指定してください。
 
-(A) Onigurumaの中で対応する場合
+(A) Onigmoの中で対応する場合
 
-oniguruma/regint.hの中で以下のマクロを定義して再コンパイルしてください。
+デフォルトのマルチスレッド実装を使用する場合は、onigmo/regint.hの
+以下のマクロのコメントを解除して再コンパイルしてください。
+
+/* #define USE_MULTI_THREAD_SYSTEM */
+/* #define USE_DEFAULT_MULTI_THREAD_SYSTEM */
+
+WindowsではWin32 APIが使用され、Unix系OSではpthreadが使用されます。
+それ以外の実装を使う必要がある場合は、onigmo/regint.hの中で以下の
+マクロを定義して再コンパイルしてください。
 
 USE_MULTI_THREAD_SYSTEM
 

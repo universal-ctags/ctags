@@ -92,5 +92,18 @@ if test "$_cv_stdarg" = yes; then
   AC_DEFINE(HAVE_STDARG_PROTOTYPES,1,[Define if compiler supports stdarg prototypes])
 fi
 
+dnl check for multithread
+AC_ARG_ENABLE(multithread,
+	[  --enable-multithread    enable multithread support],
+	[multithread=$enableval])
+if test "${multithread}" = yes; then
+  dnl This check must be after AC_PROG_CC.
+  AC_CHECK_HEADERS(pthread.h,
+	[AC_DEFINE(USE_MULTI_THREAD_SYSTEM,1,[Define if enbale multithread support])
+	 AC_DEFINE(USE_DEFAULT_MULTI_THREAD_SYSTEM,1,[Define if enable the default multithread system])
+  ])
+  AC_CHECK_LIB(pthread, pthread_mutex_init)
+fi
+
 
 AC_OUTPUT([Makefile onig-config sample/Makefile], [chmod +x onig-config])

@@ -25,7 +25,7 @@ CC = cl
 RC = rc
 DEFS = -DHAVE_CONFIG_H -DNOT_RUBY -DEXPORT
 RUBYDIR = ..
-PYTHON = python
+PYTHON = py
 
 # Command string to get the version of cl.exe
 _MSC_VER = [for /f %i in ('cmd /c "(echo _MSC_VER>mscver.c) && ($(CC) /EP mscver.c 2>nul) && del mscver.c"') do @exit %i]
@@ -112,7 +112,7 @@ makeargs = $(MFLAGS) CPPFLAGS='$(CPPFLAGS)' CFLAGS='$(CFLAGS)' CC='$(CC)'
 !else
 # batch-mode inference rules
 .c.obj::
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) /I. /I.. /Fo.\ /c $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) /I. /Fo.\ /c $<
 {$(encdir)\}.c{$(encdir)\}.obj::
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) /I. /I.. /Fo$(encdir)\ /c $<
 !endif
@@ -214,7 +214,7 @@ $(libbase).def: win32\makedef.py oniguruma.h regenc.h oniggnu.h onigposix.h
 	$(PYTHON) win32\makedef.py > $@
 
 clean:
-	del *.obj $(encdir)\*.obj *.lib *.exp *.dll $(testp).exe $(testc).exe $(testc).obj $(testcu).exe $(testcu).obj win32\*.res
+	-del *.obj $(encdir)\*.obj *.lib *.exp *.dll $(testp).exe $(testc).exe $(testcu).exe win32\*.res
 
 
 # backup file suffix
