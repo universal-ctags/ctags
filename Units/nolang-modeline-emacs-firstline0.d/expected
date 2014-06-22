@@ -1,0 +1,1 @@
+hello-world	Units/nolang-modeline-emacs-firstline0.d/input.nolang	/^(defun hello-world () (message "hello, world"))$/;"	f
