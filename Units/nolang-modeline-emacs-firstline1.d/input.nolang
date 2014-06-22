@@ -1,0 +1,6 @@
+/* -*- C -*- */
+int
+hello (void)
+{
+  return printf("hello, world\n");
+}
