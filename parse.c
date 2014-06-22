@@ -227,6 +227,65 @@ static langType getEmacsModeLanguageAtFirstLine (const char *const fileName)
 	return result;
 }
 
+static vString* determineEmacsModeAtEOF (FILE* const fp)
+{
+	vString* const vLine = vStringNew ();
+	const char* line;
+	boolean headerFound = FALSE;
+	const char* p;
+	vString* mode = vStringNew ();
+
+	while ((line = readLine (vLine, fp)) != NULL)
+	{
+		if (headerFound && ((p = strstr (line, "mode:")) != NULL))
+		{
+			vStringClear (mode);
+			headerFound = FALSE;
+
+			p += strlen ("mode:");
+			for ( ;  isspace ((int) *p)  ;  ++p)
+				;  /* no-op */
+			for ( ;  *p != '\0'  &&  isalnum ((int) *p)  ;  ++p)
+				vStringPut (mode, (int) *p);
+			vStringTerminate (mode);
+		}
+		else if (headerFound && (p = strstr(line, "End:")))
+			headerFound = FALSE;
+		else if (strstr (line, "Local Variables:"))
+			headerFound = TRUE;
+	}
+	vStringDelete (vLine);
+	return mode;
+}
+
+static langType getEmacsModeLanguageAtEOF (const char *const fileName)
+{
+	langType result = LANG_IGNORE;
+	FILE* const fp = fopen (fileName, "r");
+
+	if (fp == NULL)
+		return result;
+
+	/* "48.2.4.1 Specifying File Variables" of Emacs info:
+	   ---------------------------------------------------
+	   you can define file local variables using a "local
+	   variables list" near the end of the file.  The start of the
+	   local variables list should be no more than 3000 characters
+	   from the end of the file, */
+	fseek(fp, -3000, SEEK_END);
+
+	{
+		vString* const mode = determineEmacsModeAtEOF (fp);
+		result = getExtensionLanguage (vStringValue (mode));
+		if (result == LANG_IGNORE)
+			result = getNamedLanguage (vStringValue (mode));
+		vStringDelete (mode);
+	}
+
+	fclose(fp);
+	return result;
+}
+
 extern langType getFileLanguage (const char *const fileName)
 {
 	langType language = Option.language;
@@ -245,6 +304,8 @@ extern langType getFileLanguage (const char *const fileName)
 #endif
 		if (language == LANG_IGNORE)
 			language = getEmacsModeLanguageAtFirstLine (fileName);
+		if (language == LANG_IGNORE)
+			language = getEmacsModeLanguageAtEOF (fileName);
 	}
 	return language;
 }
