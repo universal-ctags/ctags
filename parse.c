@@ -166,6 +166,67 @@ static langType getInterpreterLanguage (const char *const fileName)
 
 #endif
 
+static vString* determineEmacsModeAtFirstLine (const char* const line)
+{
+	vString* mode = vStringNew ();
+
+	char* p = strstr(line, "-*-");
+	if (p == NULL)
+		return mode;
+	p += strlen("-*-");
+
+	for ( ;  isspace ((int) *p)  ;  ++p)
+		;  /* no-op */
+
+	if (strncmp(p, "mode:", strlen("mode:")) == 0)
+	{
+		/* -*- mode: MODE; -*- */
+		p += strlen("mode:");
+		for ( ;  isspace ((int) *p)  ;  ++p)
+			;  /* no-op */
+		for ( ;  *p != '\0'  &&  isalnum ((int) *p)  ;  ++p)
+			vStringPut (mode, (int) *p);
+		vStringTerminate (mode);
+	}
+	else
+	{
+		/* -*- MODE -*- */
+		for ( ;  *p != '\0'  &&  isalnum ((int) *p)  ;  ++p)
+			vStringPut (mode, (int) *p);
+		vStringTerminate (mode);
+
+		for ( ;  isspace ((int) *p)  ;  ++p)
+			;  /* no-op */
+		if (strncmp(p, "-*-", strlen("-*-")) != 0)
+			vStringClear (mode);
+	}
+
+	return mode;
+
+}
+
+static langType getEmacsModeLanguageAtFirstLine (const char *const fileName)
+{
+	langType result = LANG_IGNORE;
+	FILE* const fp = fopen (fileName, "r");
+	if (fp != NULL)
+	{
+		vString* const vLine = vStringNew ();
+		const char* const line = readLine (vLine, fp);
+		if (line != NULL)
+		{
+			vString* const mode = determineEmacsModeAtFirstLine (line);
+			result = getExtensionLanguage (vStringValue (mode));
+			if (result == LANG_IGNORE)
+				result = getNamedLanguage (vStringValue (mode));
+			vStringDelete (mode);
+		}
+		vStringDelete (vLine);
+		fclose (fp);
+	}
+	return result;
+}
+
 extern langType getFileLanguage (const char *const fileName)
 {
 	langType language = Option.language;
@@ -182,6 +243,8 @@ extern langType getFileLanguage (const char *const fileName)
 				language = getInterpreterLanguage (fileName);
 		}
 #endif
+		if (language == LANG_IGNORE)
+			language = getEmacsModeLanguageAtFirstLine (fileName);
 	}
 	return language;
 }
