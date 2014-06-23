@@ -120,6 +120,7 @@ static langType getPatternLanguage (const char *const fileName)
 }
 
 #ifdef SYS_INTERPRETER
+static langType getEmacsModeLanguageAtFirstLineFromFILE (FILE* const fp);
 
 /*  The name of the language interpreter, either directly or as the argument
  *  to "env".
@@ -150,14 +151,31 @@ static langType getInterpreterLanguage (const char *const fileName)
 		const char* const line = readLine (vLine, fp);
 		if (line != NULL  &&  line [0] == '#'  &&  line [1] == '!')
 		{
-			const char* const lastSlash = strrchr (line, '/');
-			const char *const cmd = lastSlash != NULL ? lastSlash+1 : line+2;
-			vString* const interpreter = determineInterpreter (cmd);
-			result = getExtensionLanguage (vStringValue (interpreter));
-			if (result == LANG_IGNORE)
-				result = getNamedLanguage (vStringValue (interpreter));
-			vStringDelete (interpreter);
+			/* "48.2.4.1 Specifying File Variables" of Emacs info:
+			   ---------------------------------------------------
+			   In shell scripts, the first line is used to
+			   identify the script interpreter, so you
+			   cannot put any local variables there.  To
+			   accommodate this, Emacs looks for local
+			   variable specifications in the _second_
+			   line if the first line specifies an
+			   interpreter.  */
+
+			result = getEmacsModeLanguageAtFirstLineFromFILE (fp);
+			if (result != LANG_IGNORE)
+				goto out;
+			else
+			{
+				const char* const lastSlash = strrchr (line, '/');
+				const char *const cmd = lastSlash != NULL ? lastSlash+1 : line+2;
+				vString* const interpreter = determineInterpreter (cmd);
+				result = getExtensionLanguage (vStringValue (interpreter));
+				if (result == LANG_IGNORE)
+					result = getNamedLanguage (vStringValue (interpreter));
+				vStringDelete (interpreter);
+			}
 		}
+	  out:
 		vStringDelete (vLine);
 		fclose (fp);
 	}
@@ -205,23 +223,30 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 
 }
 
+static langType getEmacsModeLanguageAtFirstLineFromFILE (FILE* const fp)
+{
+	langType result = LANG_IGNORE;
+	vString* const vLine = vStringNew ();
+	const char* const line = readLine (vLine, fp);
+	if (line != NULL)
+	{
+		vString* const mode = determineEmacsModeAtFirstLine (line);
+		result = getExtensionLanguage (vStringValue (mode));
+		if (result == LANG_IGNORE)
+			result = getNamedLanguage (vStringValue (mode));
+		vStringDelete (mode);
+	}
+	vStringDelete (vLine);
+	return result;
+}
+
 static langType getEmacsModeLanguageAtFirstLine (const char *const fileName)
 {
 	langType result = LANG_IGNORE;
 	FILE* const fp = fopen (fileName, "r");
 	if (fp != NULL)
 	{
-		vString* const vLine = vStringNew ();
-		const char* const line = readLine (vLine, fp);
-		if (line != NULL)
-		{
-			vString* const mode = determineEmacsModeAtFirstLine (line);
-			result = getExtensionLanguage (vStringValue (mode));
-			if (result == LANG_IGNORE)
-				result = getNamedLanguage (vStringValue (mode));
-			vStringDelete (mode);
-		}
-		vStringDelete (vLine);
+		result = getEmacsModeLanguageAtFirstLineFromFILE(fp);
 		fclose (fp);
 	}
 	return result;
