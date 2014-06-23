@@ -8,6 +8,7 @@
 CTAGS_TEST = ./ctags
 CTAGS_REF = ./ctags.ref
 TEST_OPTIONS = -nu --c-kinds=+lpx
+FUZZ_TIMEOUT=10
 
 DIFF_OPTIONS = -U 0 -I '^!_TAG'
 DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
@@ -20,7 +21,7 @@ DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 		false ; \
 	  fi
 
-.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units
+.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units fuzz
 
 test: test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units
 
@@ -125,5 +126,23 @@ test.units: $(CTAGS_TEST)
 TEST_ARTIFACTS = test.*.diff tags.ref tags.test $(UNITS_ARTIFACTS)
 clean-test:
 	rm -f $(TEST_ARTIFACTS)
+
+HAVE_TIMEOUT := $(shell which timeout 2>/dev/null)
+ifeq ($(HAVE_TIMEOUT),)
+fuzz:
+	@ echo "No timeout command of GNU coreutils found"
+else
+fuzz: $(CTAGS_TEST)
+	@ \
+	for lang in $$($(CTAGS_TEST) --list-languages); do \
+		for input in Test/* Units/*.d/input.*; do \
+			if ! timeout -s INT $(FUZZ_TIMEOUT) \
+				$(CTAGS_TEST) --language-force=$${lang} -o - $${input} \
+				> /dev/null 2>&1; then \
+				echo Fuzz testing failure: lang: $${lang} input: $${input}; \
+			fi;\
+		done; \
+	done
+endif
 
 # vi:ts=4 sw=4
