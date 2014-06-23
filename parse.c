@@ -311,6 +311,116 @@ static langType getEmacsModeLanguageAtEOF (const char *const fileName)
 	return result;
 }
 
+static vString* determineVimFileType (const char *const line)
+{
+	/* considerable combinations:
+	   --------------------------
+	   set ... filetype=
+	   se ... filetype=
+	   set ... ft=
+	   se ... ft= */
+
+	int i, j;
+	const char* p;
+	const char* q;
+
+	const char* const set_prefix[] = {"set ", "se "};
+	const char* const filetype_prefix[] = {"filetype=", "ft="};
+	vString* const filetype = vStringNew ();
+
+	for (i = 0; i < sizeof(set_prefix)/sizeof(set_prefix[0]); i++)
+	{
+		if ((p = strstr(line, set_prefix[i])) == NULL)
+			continue;
+		p += strlen(set_prefix[i]);
+		for (j = 0; j < sizeof(filetype_prefix)/sizeof(filetype_prefix[0]); j++)
+		{
+			if ((q = strstr(p, filetype_prefix[j])) == NULL)
+				continue;
+			q += strlen(filetype_prefix[j]);
+			for ( ;  *q != '\0'  &&  isalnum ((int) *q)  ;  ++q)
+				vStringPut (filetype, (int) *q);
+			vStringTerminate (filetype);
+			goto out;
+		}
+	}
+  out:
+	return filetype;
+}
+
+static langType getVimFileTypeLanguage (const char *const fileName)
+{
+	/* http://vimdoc.sourceforge.net/htmldoc/options.html#modeline
+
+	   [text]{white}{vi:|vim:|ex:}[white]se[t] {options}:[text]
+	   options=> filetype=TYPE or ft=TYPE
+
+	   'modelines' 'mls'	number	(default 5)
+			global
+			{not in Vi}
+	    If 'modeline' is on 'modelines' gives the number of lines that is
+	    checked for set commands. */
+
+	langType result = LANG_IGNORE;
+	FILE* const fp = fopen (fileName, "r");
+#define RING_SIZE 5
+	vString* ring[RING_SIZE];
+	int i, j, k;
+	const char* const prefix[] = {
+		"vim:", "vi:", "ex:"
+	};
+
+	if (fp == NULL)
+		return result;
+
+	for (i = 0; i < RING_SIZE; i++)
+		ring[i] = vStringNew ();
+
+	i = 0;
+	while ((readLine (ring[i++], fp)) != NULL)
+		if (i == RING_SIZE)
+			i = 0;
+
+	j = i;
+	do
+	{
+		const char* p;
+		vString* filetype = NULL;
+
+		j--;
+		if (j < 0)
+			j = RING_SIZE - 1;
+
+		for (k = 0; k < (sizeof(prefix)/sizeof(prefix[0])); k++)
+			if ((p = strstr (vStringValue (ring[j]), prefix[k])) != NULL)
+			{
+				p += strlen(prefix[k]);
+				for ( ;  isspace ((int) *p)  ;  ++p)
+					;  /* no-op */
+				filetype = determineVimFileType(p);
+				break;
+			}
+
+		if (filetype != NULL)
+		{
+			result = getExtensionLanguage (vStringValue (filetype));
+			if (result == LANG_IGNORE)
+				result = getNamedLanguage (vStringValue (filetype));
+			vStringDelete (filetype);
+		}
+	} while (((i == RING_SIZE)? (j != RING_SIZE - 1): (j != i)) && result == LANG_IGNORE);
+
+	for (i = RING_SIZE - 1; i >= 0; i--)
+		vStringDelete (ring[i]);
+
+	fclose(fp);
+#undef RING_SIZE
+	return result;
+
+	/* TODO:
+	   [text]{white}{vi:|vim:|ex:}[white]{options} */
+}
+
 extern langType getFileLanguage (const char *const fileName)
 {
 	langType language = Option.language;
@@ -327,6 +437,8 @@ extern langType getFileLanguage (const char *const fileName)
 			language = getEmacsModeLanguageAtFirstLine (fileName);
 		if (language == LANG_IGNORE)
 			language = getEmacsModeLanguageAtEOF (fileName);
+		if (language == LANG_IGNORE)
+			language = getVimFileTypeLanguage (fileName);
 	}
 	return language;
 }
