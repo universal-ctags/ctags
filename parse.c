@@ -426,19 +426,19 @@ extern langType getFileLanguage (const char *const fileName)
 	langType language = Option.language;
 	if (language == LANG_AUTO)
 	{
-		language = getExtensionLanguage (fileExtension (fileName));
-		if (language == LANG_IGNORE)
-			language = getPatternLanguage (fileName);
+		language = getEmacsModeLanguageAtFirstLine (fileName);
 #ifdef SYS_INTERPRETER
 		if (language == LANG_IGNORE)
 			language = getInterpreterLanguage (fileName);
 #endif
 		if (language == LANG_IGNORE)
-			language = getEmacsModeLanguageAtFirstLine (fileName);
-		if (language == LANG_IGNORE)
 			language = getEmacsModeLanguageAtEOF (fileName);
 		if (language == LANG_IGNORE)
 			language = getVimFileTypeLanguage (fileName);
+		if (language == LANG_IGNORE)
+			language = getExtensionLanguage (fileExtension (fileName));
+		if (language == LANG_IGNORE)
+			language = getPatternLanguage (fileName);
 	}
 	return language;
 }
