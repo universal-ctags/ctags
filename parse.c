@@ -296,11 +296,7 @@ extern langType getFileLanguage (const char *const fileName)
 			language = getPatternLanguage (fileName);
 #ifdef SYS_INTERPRETER
 		if (language == LANG_IGNORE)
-		{
-			fileStatus *status = eStat (fileName);
-			if (status->isExecutable)
-				language = getInterpreterLanguage (fileName);
-		}
+			language = getInterpreterLanguage (fileName);
 #endif
 		if (language == LANG_IGNORE)
 			language = getEmacsModeLanguageAtFirstLine (fileName);
