@@ -41,6 +41,7 @@
 	LuaParser, \
 	MakefileParser, \
 	ObjcParser, \
+	MatLabParser, \
 	OcamlParser, \
 	PascalParser, \
 	PerlParser, \
