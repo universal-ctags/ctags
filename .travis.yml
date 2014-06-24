@@ -5,8 +5,12 @@ compiler:
         - clang
 
 env:
-        - CONFOPT=
-        - CONFOPT=--enable-multithread
+        - CFLAGS=--coverage CONFOPT=
+        - CFLAGS=--coverage CONFOPT=--enable-multithread
+
+before_install:
+        - sudo apt-get update -qq
+        - sudo pip install cpp-coveralls
 
 before_script:
         - ./configure $CONFOPT && make
@@ -15,3 +19,6 @@ script:
         - LD_LIBRARY_PATH=.libs python ./testpy.py SJIS
         - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-8
         - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-16LE
+
+after_success:
+        - coveralls --gcov-options '-o .libs' -e sample -e win32 -e testc.c -e testu.c
