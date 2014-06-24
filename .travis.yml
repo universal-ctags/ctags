@@ -16,9 +16,11 @@ before_script:
         - ./configure $CONFOPT && make
 
 script:
+        - LD_LIBRARY_PATH=.libs python ./testpy.py EUC-JP
         - LD_LIBRARY_PATH=.libs python ./testpy.py SJIS
         - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-8
         - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-16LE
+        - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-16BE
 
 after_success:
         - coveralls --gcov-options '-o .libs' -e sample -e win32 -e testc.c -e testu.c
