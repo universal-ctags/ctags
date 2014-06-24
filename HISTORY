@@ -1,5 +1,9 @@
 History of Onigmo (Oniguruma-mod)
 
+2014/06/22: [new]  Support for Unicode 7.0. (Issue #12)
+2014/06/20: [new]  Add a new definition USE_UNICODE_AGE_PROPERTIES.
+                   If undefine this, age properties (e.g. \p{Age=6.3}) are
+                   disabled. Disabling this reduces the size of Unicode data.
 2014/04/18: [bug]  fix warning about alloca() with MinGW (Issue #35)
 2014/04/17: [spec] add checking the number of capture groups (Issue #24)
                    Now the maximum number of capture groups is explicitly
