@@ -21,6 +21,14 @@ script:
         - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-8
         - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-16LE
         - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-16BE
+        - ./sample/crnl
+        - ./sample/encode
+        - ./sample/listcap
+        - ./sample/names
+        - ./sample/posix
+        - ./sample/simple
+        - ./sample/sql
+        - ./sample/syntax
 
 after_success:
         - coveralls --gcov-options '-o .libs' -e sample -e win32 -e testc.c -e testu.c
