@@ -122,7 +122,7 @@ extern int main(int argc, char* argv[])
   int r;
   /* ISO 8859-1 test */
   static unsigned char str[] = { 0xc7, 0xd6, 0xfe, 0xea, 0xe0, 0xe2, 0x00 };
-  static unsigned char pattern[] = { 0xe7, 0xf6, 0xde, '\\', 'w', '+', 0x00 };
+  static unsigned char pattern[] = { '(', '?', 'u', ')', 0xe7, 0xf6, 0xde, '\\', 'w', '+', 0x00 };
 
   r = exec(ONIG_ENCODING_CP1251, ONIG_OPTION_IGNORECASE,
 	   "aBc", " AbC");
