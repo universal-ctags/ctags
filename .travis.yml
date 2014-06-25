@@ -10,7 +10,8 @@ env:
 
 before_install:
         - sudo apt-get update -qq
-        - sudo pip install cpp-coveralls
+        - sudo apt-get install -qq lcov rubygems
+        - gem install lcoveralls
 
 before_script:
         - ./configure $CONFOPT && make
@@ -31,4 +32,5 @@ script:
         - ./sample/syntax
 
 after_success:
-        - coveralls --gcov-options '-o .libs' -e sample -e win32 -e testc.c -e testu.c
+        - lcov -c -d .libs -o coverage.info
+        - lcoveralls --retry-count 5 coverage.info
