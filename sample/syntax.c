@@ -38,9 +38,11 @@ extern int exec(OnigSyntaxType* syntax,
     for (i = 0; i < region->num_regs; i++) {
       fprintf(stderr, "%d: (%ld-%ld)\n", i, region->beg[i], region->end[i]);
     }
+    r = 0;
   }
   else if (r == ONIG_MISMATCH) {
     fprintf(stderr, "search fail\n");
+    r = -1;
   }
   else { /* error */
     char s[ONIG_MAX_ERROR_MESSAGE_LEN];
@@ -52,21 +54,21 @@ extern int exec(OnigSyntaxType* syntax,
   onig_region_free(region, 1 /* 1:free self, 0:free contents only */);
   onig_free(reg);
   onig_end();
-  return 0;
+  return r;
 }
 
 extern int main(int argc, char* argv[])
 {
-  int r;
+  int r = 0;
 
-  r = exec(ONIG_SYNTAX_PERL,
+  r |= exec(ONIG_SYNTAX_PERL,
 	   "\\p{XDigit}\\P{XDigit}\\p{^XDigit}\\P{^XDigit}\\p{XDigit}",
 	   "bgh3a");
 
-  r = exec(ONIG_SYNTAX_JAVA,
+  r |= exec(ONIG_SYNTAX_JAVA,
 	   "\\p{XDigit}\\P{XDigit}[a-c&&b-g]", "bgc");
 
-  r = exec(ONIG_SYNTAX_ASIS,
+  r |= exec(ONIG_SYNTAX_ASIS,
            "abc def* e+ g?ddd[a-rvvv] (vv){3,7}hv\\dvv(?:aczui ss)\\W\\w$",
            "abc def* e+ g?ddd[a-rvvv] (vv){3,7}hv\\dvv(?:aczui ss)\\W\\w$");
   onig_end();
