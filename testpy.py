@@ -146,28 +146,40 @@ def n(pattern, target):
 
 
 def is_unicode_encoding(enc):
-    return enc in (onig.ONIG_ENCODING_UTF16_LE,
+    return enc in (onig.ONIG_ENCODING_UTF32_LE,
+                   onig.ONIG_ENCODING_UTF32_BE,
+                   onig.ONIG_ENCODING_UTF16_LE,
                    onig.ONIG_ENCODING_UTF16_BE,
                    onig.ONIG_ENCODING_UTF8)
 
-def main():
+
+def set_encoding(enc):
     global onig_encoding
     global encoding
 
-    # set encoding of the test target
-    if len(sys.argv) > 1:
+    if isinstance(enc, onig.OnigEncoding):
+        onig_encoding = enc
+    else:
         encs = {"EUC-JP": onig.ONIG_ENCODING_EUC_JP,
                 "SJIS": onig.ONIG_ENCODING_SJIS,
                 "UTF-8": onig.ONIG_ENCODING_UTF8,
                 "UTF-16LE": onig.ONIG_ENCODING_UTF16_LE,
-                "UTF-16BE": onig.ONIG_ENCODING_UTF16_BE}
+                "UTF-16BE": onig.ONIG_ENCODING_UTF16_BE,
+                "UTF-32LE": onig.ONIG_ENCODING_UTF32_LE,
+                "UTF-32BE": onig.ONIG_ENCODING_UTF32_BE}
+        onig_encoding = encs[enc]
+    encoding = onig_encoding[0].name.decode()
+
+
+def main():
+    # set encoding of the test target
+    if len(sys.argv) > 1:
         try:
-            onig_encoding = encs[sys.argv[1]]
+            set_encoding(sys.argv[1])
         except KeyError:
             print("test target encoding error")
             print("Usage: python testpy.py [test target encoding] [output encoding]")
             sys.exit()
-        encoding = onig_encoding[0].name.decode()
 
     # set encoding of stdout/stderr
     if len(sys.argv) > 2:
@@ -942,6 +954,13 @@ def main():
         x2("\\p{Other_Default_Ignorable_Code_Point}+", "\u034F\uFFF8\U000E0FFF", 0, 3)
         # The longest block name
         x2("\\p{In_Unified_Canadian_Aboriginal_Syllabics_Extended}+", "\u18B0\u18FF", 0, 2)
+        # Unicode case fold
+        x2("(?i)\u1ffc", "\u2126\u1fbe", 0, 2)
+        x2("(?i)\u1ffc", "\u1ff3", 0, 1)
+        x2("(?i)\u0390", "\u03b9\u0308\u0301", 0, 3)
+        x2("(?i)\u03b9\u0308\u0301", "\u0390", 0, 1)
+        x2("(?i)ff", "\ufb00", 0, 1)
+        x2("(?i)\ufb01", "fi", 0, 2)
     x2("[0-9-a]+", " 0123456789-a ", 1, 13)     # same as [0-9\-a]
     x2("[0-9-\\s]+", " 0123456789-a ", 0, 12)   # same as [0-9\-\s]
     x2("(?i:a) B", "a B", 0, 3);
@@ -986,13 +1005,10 @@ def main():
     x2("\\R", "\r", 0, 1)
     x2("\\R{3}", "\r\r\n\n", 0, 4)
 
-#    if (onig_encoding == onig.ONIG_ENCODING_UTF16_LE or
-#            onig_encoding == onig.ONIG_ENCODING_UTF16_BE or
-#            onig_encoding == onig.ONIG_ENCODING_UTF8):
-#        # USE_UNICODE_ALL_LINE_TERMINATORS must be defined
-#        x2("\\R", "\u0085", 0, 1)
-#        x2("\\R", "\u2028", 0, 1)
-#        x2("\\R", "\u2029", 0, 1)
+    if (is_unicode_encoding(onig_encoding)):
+        x2("\\R", "\u0085", 0, 1)
+        x2("\\R", "\u2028", 0, 1)
+        x2("\\R", "\u2029", 0, 1)
 
     # extended grapheme cluster
     x2("\\X{5}", "あいab\n", 0, 5)
@@ -1134,7 +1150,8 @@ def main():
     n("(?<!(?i:ab))cd", "ABcd")
 
 
-    print("\nRESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
+    print("\nEncoding:", encoding)
+    print("RESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
           nsucc, nfail, nerror, onig.onig_version()))
 
     onig.onig_end()
