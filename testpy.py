@@ -150,24 +150,34 @@ def is_unicode_encoding(enc):
                    onig.ONIG_ENCODING_UTF16_BE,
                    onig.ONIG_ENCODING_UTF8)
 
-def main():
+
+def set_encoding(enc):
     global onig_encoding
     global encoding
 
-    # set encoding of the test target
-    if len(sys.argv) > 1:
+    if isinstance(enc, onig.OnigEncoding):
+        onig_encoding = enc
+    else:
         encs = {"EUC-JP": onig.ONIG_ENCODING_EUC_JP,
                 "SJIS": onig.ONIG_ENCODING_SJIS,
                 "UTF-8": onig.ONIG_ENCODING_UTF8,
                 "UTF-16LE": onig.ONIG_ENCODING_UTF16_LE,
-                "UTF-16BE": onig.ONIG_ENCODING_UTF16_BE}
+                "UTF-16BE": onig.ONIG_ENCODING_UTF16_BE,
+                "UTF-32LE": onig.ONIG_ENCODING_UTF32_LE,
+                "UTF-32BE": onig.ONIG_ENCODING_UTF32_BE}
+        onig_encoding = encs[enc]
+    encoding = onig_encoding[0].name.decode()
+
+
+def main():
+    # set encoding of the test target
+    if len(sys.argv) > 1:
         try:
-            onig_encoding = encs[sys.argv[1]]
+            set_encoding(sys.argv[1])
         except KeyError:
             print("test target encoding error")
             print("Usage: python testpy.py [test target encoding] [output encoding]")
             sys.exit()
-        encoding = onig_encoding[0].name.decode()
 
     # set encoding of stdout/stderr
     if len(sys.argv) > 2:
