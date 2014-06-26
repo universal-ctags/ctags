@@ -1146,7 +1146,8 @@ def main():
     n("(?<!(?i:ab))cd", "ABcd")
 
 
-    print("\nRESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
+    print("\nEncoding:", encoding)
+    print("RESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
           nsucc, nfail, nerror, onig.onig_version()))
 
     onig.onig_end()
