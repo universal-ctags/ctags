@@ -954,6 +954,13 @@ def main():
         x2("\\p{Other_Default_Ignorable_Code_Point}+", "\u034F\uFFF8\U000E0FFF", 0, 3)
         # The longest block name
         x2("\\p{In_Unified_Canadian_Aboriginal_Syllabics_Extended}+", "\u18B0\u18FF", 0, 2)
+        # Unicode case fold
+        x2("(?i)\u1ffc", "\u2126\u1fbe", 0, 2)
+        x2("(?i)\u1ffc", "\u1ff3", 0, 1)
+        x2("(?i)\u0390", "\u03b9\u0308\u0301", 0, 3)
+        x2("(?i)\u03b9\u0308\u0301", "\u0390", 0, 1)
+        x2("(?i)ff", "\ufb00", 0, 1)
+        x2("(?i)\ufb01", "fi", 0, 2)
     x2("[0-9-a]+", " 0123456789-a ", 1, 13)     # same as [0-9\-a]
     x2("[0-9-\\s]+", " 0123456789-a ", 0, 12)   # same as [0-9\-\s]
     x2("(?i:a) B", "a B", 0, 3);
