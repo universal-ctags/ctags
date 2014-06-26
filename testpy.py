@@ -146,7 +146,9 @@ def n(pattern, target):
 
 
 def is_unicode_encoding(enc):
-    return enc in (onig.ONIG_ENCODING_UTF16_LE,
+    return enc in (onig.ONIG_ENCODING_UTF32_LE,
+                   onig.ONIG_ENCODING_UTF32_BE,
+                   onig.ONIG_ENCODING_UTF16_LE,
                    onig.ONIG_ENCODING_UTF16_BE,
                    onig.ONIG_ENCODING_UTF8)
 
