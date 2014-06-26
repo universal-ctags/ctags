@@ -998,13 +998,10 @@ def main():
     x2("\\R", "\r", 0, 1)
     x2("\\R{3}", "\r\r\n\n", 0, 4)
 
-#    if (onig_encoding == onig.ONIG_ENCODING_UTF16_LE or
-#            onig_encoding == onig.ONIG_ENCODING_UTF16_BE or
-#            onig_encoding == onig.ONIG_ENCODING_UTF8):
-#        # USE_UNICODE_ALL_LINE_TERMINATORS must be defined
-#        x2("\\R", "\u0085", 0, 1)
-#        x2("\\R", "\u2028", 0, 1)
-#        x2("\\R", "\u2029", 0, 1)
+    if (is_unicode_encoding(onig_encoding)):
+        x2("\\R", "\u0085", 0, 1)
+        x2("\\R", "\u2028", 0, 1)
+        x2("\\R", "\u2029", 0, 1)
 
     # extended grapheme cluster
     x2("\\X{5}", "あいab\n", 0, 5)
