@@ -95,5 +95,8 @@ patches
 ctags-devel@sourceforge list
 ============================================================
 
-   <MESSAGE-ID> - what we do
-	  commit-id...
+    [Ctags] Shebang with python3 instead of python
+    From: Martin Ueding <dev@ma...> - 2013-01-26 18:36:32
+
+	Added python, python2 and python3 as extensions of
+	python parser.
