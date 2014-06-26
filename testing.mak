@@ -7,7 +7,7 @@
 
 CTAGS_TEST = ./ctags
 CTAGS_REF = ./ctags.ref
-TEST_OPTIONS = -nu --c-kinds=+lpx
+TEST_OPTIONS = -nu --c-kinds=+lpx --langmap=MatLab:"(mat*.m)",ObjectiveC:"(obj*.[mh]).mm"
 
 DIFF_OPTIONS = -U 0 -I '^!_TAG'
 DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
