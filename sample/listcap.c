@@ -81,7 +81,7 @@ extern int ex(unsigned char* str, unsigned char* pattern,
 
 extern int main(int argc, char* argv[])
 {
-  int r;
+  int r = 0;
   OnigSyntaxType syn;
 
   static UChar* str1 = (UChar* )"((())())";
@@ -99,9 +99,9 @@ extern int main(int argc, char* argv[])
   onig_set_syntax_op2(&syn,
        onig_get_syntax_op2(&syn) | ONIG_SYN_OP2_ATMARK_CAPTURE_HISTORY);
 
-  r = ex(str1, pattern1, &syn);
-  r = ex(str2, pattern2, &syn);
-  r = ex(str3, pattern3, &syn);
+  r |= ex(str1, pattern1, &syn);
+  r |= ex(str2, pattern2, &syn);
+  r |= ex(str3, pattern3, &syn);
 
   onig_end();
   return r;

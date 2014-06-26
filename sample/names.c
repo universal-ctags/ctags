@@ -58,6 +58,7 @@ extern int main(int argc, char* argv[])
   }
   else if (r == ONIG_MISMATCH) {
     fprintf(stderr, "search fail\n");
+    r = -1;
   }
   else { /* error */
     char s[ONIG_MAX_ERROR_MESSAGE_LEN];
@@ -68,5 +69,5 @@ extern int main(int argc, char* argv[])
   onig_region_free(region, 1 /* 1:free self, 0:free contents only */);
   onig_free(reg);
   onig_end();
-  return 0;
+  return r;
 }
