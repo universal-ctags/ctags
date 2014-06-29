@@ -139,17 +139,14 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
     onig.onig_free(reg)
     onig.onig_region_free(region, 1)
 
-def x2(pattern, target, s_from, s_to,
-        syn=syntax_default, opt=onig.ONIG_OPTION_DEFAULT):
-    xx(pattern, target, s_from, s_to, 0, False, syn=syn, opt=opt)
+def x2(pattern, target, s_from, s_to, **kwargs):
+    xx(pattern, target, s_from, s_to, 0, False, **kwargs)
 
-def x3(pattern, target, s_from, s_to, mem,
-        syn=syntax_default, opt=onig.ONIG_OPTION_DEFAULT):
-    xx(pattern, target, s_from, s_to, mem, False, syn=syn, opt=opt)
+def x3(pattern, target, s_from, s_to, mem, **kwargs):
+    xx(pattern, target, s_from, s_to, mem, False, **kwargs)
 
-def n(pattern, target,
-        syn=syntax_default, opt=onig.ONIG_OPTION_DEFAULT):
-    xx(pattern, target, 0, 0, 0, True, syn=syn, opt=opt)
+def n(pattern, target, **kwargs):
+    xx(pattern, target, 0, 0, 0, True, **kwargs)
 
 
 def is_unicode_encoding(enc):
