@@ -145,4 +145,7 @@ fuzz: $(CTAGS_TEST)
 	done
 endif
 
+# Local Variables:
+# Mode: makefile
+# End:
 # vi:ts=4 sw=4
