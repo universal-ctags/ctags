@@ -1032,16 +1032,16 @@ def main():
     x2("(?<=ab|a\\Ka)cd", "abcd", 2, 4)     # This behaviour is currently not well defined. (see: perlre)
 
     # named group and subroutine call
-#    x2("(?<name_2>ab)(?&name_2)", "abab", 0, 4);
-#    x2("(?<name_2>ab)(?1)", "abab", 0, 4);
-#    x2("(?<n>|\\((?&n)\\))+$", "()(())", 0, 6);
-#    x2("(a|x(?-1)x)", "xax", 0, 3);
-#    x2("(a|(x(?-2)x))", "xax", 0, 3);
-#    x2("a|x(?0)x", "xax", 0, 3);
-#    x2("a|x(?R)x", "xax", 0, 3);
+    x2("(?<name_2>ab)(?&name_2)", "abab", 0, 4, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(?<name_2>ab)(?1)", "abab", 0, 4, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(?<n>|\\((?&n)\\))+$", "()(())", 0, 6, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(a|x(?-1)x)", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(a|(x(?-2)x))", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
+    x2("a|x(?0)x", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
+    x2("a|x(?R)x", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
     x2("(a|x\g<0>x)", "xax", 0, 3);
     x2("(a|x\g'0'x)", "xax", 0, 3);
-#    x2("(?-i:(?+1))(?i:(a)){0}", "A", 0, 1);
+    x2("(?-i:(?+1))(?i:(a)){0}", "A", 0, 1, syn=onig.ONIG_SYNTAX_PERL);
     x2("(?-i:\g<+1>)(?i:(a)){0}", "A", 0, 1);
     x2("(?-i:\g'+1')(?i:(a)){0}", "A", 0, 1);
 
@@ -1067,20 +1067,20 @@ def main():
     n("(?u)[[:^word:]]+", "aあ");
 
     # \g{} backref
-#    x2("((?<name1>\\d)|(?<name2>\\w))(\\g{name1}|\\g{name2})", "ff", 0, 2);
-#    x2("(?:(?<x>)|(?<x>efg))\\g{x}", "", 0, 0);
-#    x2("(?:(?<x>abc)|(?<x>efg))\\g{x}", "abcefgefg", 3, 9);
-#    n("(?:(?<x>abc)|(?<x>efg))\\g{x}", "abcefg");
-#    x2("((.*)a\\g{2}f)", "bacbabf", 3, 7);
-#    x2("(.*)a\\g{1}f", "baczzzzzz\nbazz\nzzzzbabf", 19, 23);
-#    x2("((.*)a\\g{-1}f)", "bacbabf", 3, 7);
-#    x2("(.*)a\\g{-1}f", "baczzzzzz\nbazz\nzzzzbabf", 19, 23);
-#    x2("(あ*)(い*)\\g{-2}\\g{-1}", "あああいいあああいい", 0, 10);
+    x2("((?<name1>\\d)|(?<name2>\\w))(\\g{name1}|\\g{name2})", "ff", 0, 2, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(?:(?<x>)|(?<x>efg))\\g{x}", "", 0, 0, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(?:(?<x>abc)|(?<x>efg))\\g{x}", "abcefgefg", 3, 9, syn=onig.ONIG_SYNTAX_PERL);
+    n("(?:(?<x>abc)|(?<x>efg))\\g{x}", "abcefg", syn=onig.ONIG_SYNTAX_PERL);
+    x2("((.*)a\\g{2}f)", "bacbabf", 3, 7, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(.*)a\\g{1}f", "baczzzzzz\nbazz\nzzzzbabf", 19, 23, syn=onig.ONIG_SYNTAX_PERL);
+    x2("((.*)a\\g{-1}f)", "bacbabf", 3, 7, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(.*)a\\g{-1}f", "baczzzzzz\nbazz\nzzzzbabf", 19, 23, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(あ*)(い*)\\g{-2}\\g{-1}", "あああいいあああいい", 0, 10, syn=onig.ONIG_SYNTAX_PERL);
 
     # Python/PCRE compatible named group
-#    x2("(?P<name_2>ab)(?P>name_2)", "abab", 0, 4);
-#    x2("(?P<n>|\\((?P>n)\\))+$", "()(())", 0, 6);
-#    x2("((?P<name1>\\d)|(?P<name2>\\w))((?P=name1)|(?P=name2))", "ff", 0, 2);
+    x2("(?P<name_2>ab)(?P>name_2)", "abab", 0, 4, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(?P<n>|\\((?P>n)\\))+$", "()(())", 0, 6, syn=onig.ONIG_SYNTAX_PERL);
+    x2("((?P<name1>\\d)|(?P<name2>\\w))((?P=name1)|(?P=name2))", "ff", 0, 2, syn=onig.ONIG_SYNTAX_PERL);
 
     # Fullwidth Alphabet
     n("ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ", "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ");
@@ -1153,6 +1153,9 @@ def main():
     x2("(?<!(?i:ab))cd", "aacd", 2, 4)
     n("(?<!(?i)ab)cd", "ABcd")
     n("(?<!(?i:ab))cd", "ABcd")
+
+    # Perl syntax
+    x2("\\Q()\\\\E", "()\\", 0, 3, syn=onig.ONIG_SYNTAX_PERL)
 
 
     print("\nEncoding:", encoding)
