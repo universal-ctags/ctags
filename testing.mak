@@ -9,6 +9,8 @@ CTAGS_TEST = ./ctags
 CTAGS_REF = ./ctags.ref
 TEST_OPTIONS = -nu --c-kinds=+lpx
 FUZZ_TIMEOUT=10
+# You can specify one of language listed in $(./ctags --list-languages).
+FUZZ_LANGUAGE=
 
 DIFF_OPTIONS = -U 0 -I '^!_TAG'
 DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
@@ -135,13 +137,15 @@ else
 fuzz: $(CTAGS_TEST)
 	@ \
 	for lang in $$($(CTAGS_TEST) --list-languages); do \
-		for input in Test/* Units/*.d/input.*; do \
-			if ! timeout -s INT $(FUZZ_TIMEOUT) \
-				$(CTAGS_TEST) --language-force=$${lang} -o - $${input} \
-				> /dev/null 2>&1; then \
-				echo Fuzz testing failure: lang: $${lang} input: $${input}; \
-			fi;\
-		done; \
+		if test -z "$(FUZZ_LANGUAGE)" || test "$(FUZZ_LANGUAGE)" = "$${lang}"; then \
+			for input in Test/* Units/*.d/input.*; do \
+				if ! timeout -s INT $(FUZZ_TIMEOUT) \
+					$(CTAGS_TEST) --language-force=$${lang} -o - $${input} \
+					> /dev/null 2>&1; then \
+					echo Fuzz testing failure: lang: $${lang} input: $${input}; \
+				fi;\
+			done; \
+		fi ; \
 	done
 endif
 
