@@ -65,7 +65,8 @@ def print_result(result, pattern, file=None):
     except UnicodeEncodeError as e:
         print('(' + str(e) + ')')
 
-def xx(pattern, target, s_from, s_to, mem, not_match, syn=syntax_default):
+def xx(pattern, target, s_from, s_to, mem, not_match,
+        syn=syntax_default, opt=onig.ONIG_OPTION_DEFAULT):
     global nerror
     global nsucc
     global nfail
@@ -94,7 +95,7 @@ def xx(pattern, target, s_from, s_to, mem, not_match, syn=syntax_default):
         pattern = pattern[:limit] + "..."
 
     r = onig.onig_new(byref(reg), patternp.getptr(), patternp.getptr(-1),
-            onig.ONIG_OPTION_DEFAULT, onig_encoding, syn, byref(einfo));
+            opt, onig_encoding, syn, byref(einfo));
     if r != 0:
         onig.onig_error_code_to_str(msg, r, byref(einfo))
         nerror += 1
@@ -138,14 +139,17 @@ def xx(pattern, target, s_from, s_to, mem, not_match, syn=syntax_default):
     onig.onig_free(reg)
     onig.onig_region_free(region, 1)
 
-def x2(pattern, target, s_from, s_to, syn=syntax_default):
-    xx(pattern, target, s_from, s_to, 0, False, syn=syn)
+def x2(pattern, target, s_from, s_to,
+        syn=syntax_default, opt=onig.ONIG_OPTION_DEFAULT):
+    xx(pattern, target, s_from, s_to, 0, False, syn=syn, opt=opt)
 
-def x3(pattern, target, s_from, s_to, mem, syn=syntax_default):
-    xx(pattern, target, s_from, s_to, mem, False, syn=syn)
+def x3(pattern, target, s_from, s_to, mem,
+        syn=syntax_default, opt=onig.ONIG_OPTION_DEFAULT):
+    xx(pattern, target, s_from, s_to, mem, False, syn=syn, opt=opt)
 
-def n(pattern, target, syn=syntax_default):
-    xx(pattern, target, 0, 0, 0, True, syn=syn)
+def n(pattern, target,
+        syn=syntax_default, opt=onig.ONIG_OPTION_DEFAULT):
+    xx(pattern, target, 0, 0, 0, True, syn=syn, opt=opt)
 
 
 def is_unicode_encoding(enc):
