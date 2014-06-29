@@ -994,6 +994,18 @@ def main():
     x2("\\n?\\z", "こんにちは", 5, 5)
     x2("\\z", "こんにちは", 5, 5)
     x2("()" * 32767, "", 0, 0)      # Issue #24
+    x2("\\h+ \\H+", " 0123456789aBcDeF gh", 1, 20)
+    x2("\\A(|.|(?:(.)\\g<1>\\k<2+0>))\\z", "reer", 0, 4)
+    x2("\\A(?<a>|.|(?:(?<b>.)\\g<a>\\k<b+0>))\\z", "reer", 0, 4)
+    x2(''' # Extended pattern
+      (?<element> \g<stag> \g<content>* \g<etag> ){0}
+      (?<stag> < \g<name> \s* > ){0}
+      (?<name> [a-zA-Z_:]+ ){0}
+      (?<content> [^<&]+ (\g<element> | [^<&]+)* ){0}
+      (?<etag> </ \k<name+1> >){0}
+      \g<element>''',
+      "<foo>f<bar>bbb</bar>f</foo>", 0, 27, opt=onig.ONIG_OPTION_EXTEND)
+
 
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
@@ -1160,7 +1172,6 @@ def main():
 
     # Perl syntax
     x2("\\Q()\\\\E", "()\\", 0, 3, syn=onig.ONIG_SYNTAX_PERL)
-
 
     print("\nEncoding:", encoding)
     print("RESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
