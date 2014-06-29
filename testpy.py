@@ -12,8 +12,17 @@ nerror = 0
 nsucc = 0
 nfail = 0
 
+# default encoding
 onig_encoding = onig.ONIG_ENCODING_EUC_JP
 encoding = onig_encoding[0].name.decode()
+
+# special syntactic settings
+_syntax_default = onig.OnigSyntaxType()
+onig.onig_copy_syntax(byref(_syntax_default), onig.ONIG_SYNTAX_DEFAULT)
+_syntax_default.options &= ~onig.ONIG_OPTION_ASCII_RANGE
+_syntax_default.behavior &= ~onig.ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE
+syntax_default = byref(_syntax_default)
+
 
 class strptr:
     """a helper class to get a pointer to a string"""
@@ -56,14 +65,13 @@ def print_result(result, pattern, file=None):
     except UnicodeEncodeError as e:
         print('(' + str(e) + ')')
 
-def xx(pattern, target, s_from, s_to, mem, not_match):
+def xx(pattern, target, s_from, s_to, mem, not_match, syn=syntax_default):
     global nerror
     global nsucc
     global nfail
 
     reg = onig.OnigRegex()
     einfo = onig.OnigErrorInfo()
-    syn = onig.OnigSyntaxType()
     msg = create_string_buffer(onig.ONIG_MAX_ERROR_MESSAGE_LEN)
 
     pattern2 = pattern
@@ -85,13 +93,8 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
     if len(pattern) > limit:
         pattern = pattern[:limit] + "..."
 
-    # special syntactic settings
-    onig.onig_copy_syntax(byref(syn), onig.ONIG_SYNTAX_DEFAULT)
-    syn.options &= ~onig.ONIG_OPTION_ASCII_RANGE
-    syn.behavior &= ~onig.ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE
-
     r = onig.onig_new(byref(reg), patternp.getptr(), patternp.getptr(-1),
-            onig.ONIG_OPTION_DEFAULT, onig_encoding, byref(syn), byref(einfo));
+            onig.ONIG_OPTION_DEFAULT, onig_encoding, syn, byref(einfo));
     if r != 0:
         onig.onig_error_code_to_str(msg, r, byref(einfo))
         nerror += 1
@@ -135,14 +138,14 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
     onig.onig_free(reg)
     onig.onig_region_free(region, 1)
 
-def x2(pattern, target, s_from, s_to):
-    xx(pattern, target, s_from, s_to, 0, False)
+def x2(pattern, target, s_from, s_to, syn=syntax_default):
+    xx(pattern, target, s_from, s_to, 0, False, syn=syn)
 
-def x3(pattern, target, s_from, s_to, mem):
-    xx(pattern, target, s_from, s_to, mem, False)
+def x3(pattern, target, s_from, s_to, mem, syn=syntax_default):
+    xx(pattern, target, s_from, s_to, mem, False, syn=syn)
 
-def n(pattern, target):
-    xx(pattern, target, 0, 0, 0, True)
+def n(pattern, target, syn=syntax_default):
+    xx(pattern, target, 0, 0, 0, True, syn=syn)
 
 
 def is_unicode_encoding(enc):
