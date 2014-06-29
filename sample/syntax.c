@@ -66,7 +66,7 @@ extern int main(int argc, char* argv[])
 	   "bgh3a");
 
   r |= exec(ONIG_SYNTAX_JAVA,
-	   "\\p{XDigit}\\P{XDigit}[a-c&&b-g]", "bgc");
+	   "\\p{XDigit}\\P{XDigit}[a-c&&b-g]\\u0020", "bgc ");
 
   r |= exec(ONIG_SYNTAX_ASIS,
            "abc def* e+ g?ddd[a-rvvv] (vv){3,7}hv\\dvv(?:aczui ss)\\W\\w$",
