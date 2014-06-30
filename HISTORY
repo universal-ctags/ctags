@@ -1,9 +1,16 @@
 History of Onigmo (Oniguruma-mod)
 
+2014/06/30: [bug]  SEGV may occur in onig_error_code_to_str()
+2014/06/30: [bug]  onig.py: onig_error_code_to_str() didn't work on 64-bit OS
+2014/06/25: [bug]  /\x{1ffc}/i =~ "\x1ff3" didn't match
+2014/06/24: [new]  Enable Coveralls
+                   See: https://coveralls.io/r/k-takata/Onigmo
 2014/06/22: [new]  Support for Unicode 7.0. (Issue #12)
 2014/06/20: [new]  Add a new definition USE_UNICODE_AGE_PROPERTIES.
                    If undefine this, age properties (e.g. \p{Age=6.3}) are
                    disabled. Disabling this reduces the size of Unicode data.
+2014/06/19: [new]  Enable Travis CI (Issue #36)
+                   See: https://travis-ci.org/k-takata/Onigmo
 2014/04/18: [bug]  fix warning about alloca() with MinGW (Issue #35)
 2014/04/17: [spec] add checking the number of capture groups (Issue #24)
                    Now the maximum number of capture groups is explicitly
