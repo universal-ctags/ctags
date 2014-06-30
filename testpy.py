@@ -1016,6 +1016,7 @@ def main():
     x2("\\z", "こんにちは", 5, 5)
     x2("()" * 32767, "", 0, 0)      # Issue #24
     x2("\\h+ \\H+", " 0123456789aBcDeF gh", 1, 20)
+    x2("[\\h]+ [\\H]+", " 0123456789aBcDeF gh", 1, 20)
     x2("\\A(|.|(?:(.)\\g<1>\\k<2+0>))\\z", "reer", 0, 4)
     x2("\\A(?<a>|.|(?:(?<b>.)\\g<a>\\k<b+0>))\\z", "reer", 0, 4)
     x2(''' # Extended pattern
@@ -1071,7 +1072,7 @@ def main():
     # named group and subroutine call
     x2("(?<name_2>ab)(?&name_2)", "abab", 0, 4, syn=onig.ONIG_SYNTAX_PERL);
     x2("(?<name_2>ab)(?1)", "abab", 0, 4, syn=onig.ONIG_SYNTAX_PERL);
-    x2("(?<n>|\\((?&n)\\))+$", "()(())", 0, 6, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(?'n'|\\((?&n)\\))+$", "()(())", 0, 6, syn=onig.ONIG_SYNTAX_PERL);
     x2("(a|x(?-1)x)", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
     x2("(a|(x(?-2)x))", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
     x2("a|x(?0)x", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
