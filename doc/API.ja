@@ -1,4 +1,4 @@
-Onigmo インターフェース Version 5.11.4   2011/10/08
+Onigmo インターフェース Version 5.14.0   2014/07/01
 
 #include <oniguruma.h>
 
@@ -114,6 +114,7 @@ Onigmo インターフェース Version 5.11.4   2011/10/08
       ONIG_ENCODING_EUC_KR        EUC-KR
       ONIG_ENCODING_EUC_CN        EUC-CN
       ONIG_ENCODING_SJIS          Shift_JIS
+      ONIG_ENCODING_CP932         CP932
       ONIG_ENCODING_KOI8_R        KOI8-R
       ONIG_ENCODING_CP1251        CP1251
       ONIG_ENCODING_BIG5          Big5

@@ -1,5 +1,8 @@
 History of Onigmo (Oniguruma-mod)
 
+2014/07/01: Version 5.14.0
+
+2014/07/01: [dist] update LTVERSION to "5:1:0".
 2014/06/30: [bug]  SEGV may occur in onig_error_code_to_str()
 2014/06/30: [bug]  onig.py: onig_error_code_to_str() didn't work on 64-bit OS
 2014/06/25: [bug]  /\x{1ffc}/i =~ "\x1ff3" didn't match
