@@ -527,7 +527,7 @@ extern char *readLine (vString *const vLine, FILE *const fp)
 				eol = vStringValue (vLine) + vStringLength (vLine) - 1;
 				if (*eol == '\r')
 					*eol = '\n';
-				else if (*(eol - 1) == '\r'  &&  *eol == '\n')
+				else if (vStringLength (vLine) != 1 && *(eol - 1) == '\r'  &&  *eol == '\n')
 				{
 					*(eol - 1) = '\n';
 					*eol = '\0';
