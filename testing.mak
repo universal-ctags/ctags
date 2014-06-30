@@ -155,6 +155,7 @@ fuzz: $(CTAGS_TEST)
 	@ \
 	for lang in $$($(CTAGS_TEST) --list-languages); do \
 		if test -z "$(FUZZ_LANGUAGE)" || test "$(FUZZ_LANGUAGE)" = "$${lang}"; then \
+			echo "Fuzz-testing: $${lang}"; \
 			for input in Test/* Units/*.d/input.*; do \
 				$(call run-ctags,"$${lang}","$${input}"); \
 			done; \
