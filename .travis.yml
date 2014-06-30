@@ -22,6 +22,8 @@ script:
         - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-8
         - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-16LE
         - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-16BE
+        - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-32LE
+        - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-32BE
         - ./sample/crnl
         - ./sample/encode
         - ./sample/listcap

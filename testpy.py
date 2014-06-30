@@ -229,6 +229,10 @@ def main():
         x2("\\x61\\x00", "a", 0, 1);
     elif onig_encoding == onig.ONIG_ENCODING_UTF16_BE:
         x2("\\x00\\x61", "a", 0, 1);
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_LE:
+        x2("\\x61\\x00\\x00\\x00", "a", 0, 1);
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_BE:
+        x2("\\x00\\x00\\x00\\x61", "a", 0, 1);
     else:
         x2("\\x61", "a", 0, 1);
     x2("aa", "aa", 0, 2);
@@ -244,6 +248,12 @@ def main():
     elif onig_encoding == onig.ONIG_ENCODING_UTF16_BE:
         x2("\\00\\17", "\017", 0, 1);
         x2("\\x00\\x1f", "\x1f", 0, 1);
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_LE:
+        x2("\\17\\00\\00\\00", "\017", 0, 1);
+        x2("\\x1f\\x00\\x00\\x00", "\x1f", 0, 1);
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_BE:
+        x2("\\00\\00\\00\\17", "\017", 0, 1);
+        x2("\\x00\\x00\\x00\\x1f", "\x1f", 0, 1);
     else:
         x2("\\17", "\017", 0, 1);
         x2("\\x1f", "\x1f", 0, 1);
@@ -302,6 +312,16 @@ def main():
         x2("[\\x00\\x5a-\\x00\\x5c]", "\x5b", 0, 1);
         x2("[\\x00\\x6A-\\x00\\x6D]", "\x6c", 0, 1);
         n("[\\x00\\x6A-\\x00\\x6D]", "\x6E");
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_LE:
+        x2("[\\044\\000\\000\\000-\\047\\000\\000\\000]", "\046", 0, 1);
+        x2("[\\x5a\\x00\\x00\\x00-\\x5c\\x00\\x00\\x00]", "\x5b", 0, 1);
+        x2("[\\x6A\\x00\\x00\\x00-\\x6D\\x00\\x00\\x00]", "\x6c", 0, 1);
+        n("[\\x6A\\x00\\x00\\x00-\\x6D\\x00\\x00\\x00]", "\x6E");
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_BE:
+        x2("[\\000\\000\\000\\044-\\000\\000\\000\\047]", "\046", 0, 1);
+        x2("[\\x00\\x00\\x00\\x5a-\\x00\\x00\\x00\\x5c]", "\x5b", 0, 1);
+        x2("[\\x00\\x00\\x00\\x6A-\\x00\\x00\\x00\\x6D]", "\x6c", 0, 1);
+        n("[\\x00\\x00\\x00\\x6A-\\x00\\x00\\x00\\x6D]", "\x6E");
     else:
         x2("[\\044-\\047]", "\046", 0, 1);
         x2("[\\x5a-\\x5c]", "\x5b", 0, 1);
@@ -647,6 +667,10 @@ def main():
         x2("\\xFA\\x8F", "\u8ffa", 0, 1);
     elif onig_encoding == onig.ONIG_ENCODING_UTF16_BE:
         x2("\\x8F\\xFA", "\u8ffa", 0, 1);
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_LE:
+        x2("\\xFA\\x8F\\x00\\x00", "\u8ffa", 0, 1);
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_BE:
+        x2("\\x00\\x00\\x8F\\xFA", "\u8ffa", 0, 1);
     elif onig_encoding == onig.ONIG_ENCODING_UTF8:
         x2("\\xE8\\xBF\\xBA", "\u8ffa", 0, 1);
     elif onig_encoding == onig.ONIG_ENCODING_SJIS:
