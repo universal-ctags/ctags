@@ -39,8 +39,8 @@ EXTRA_DIST = .gitignore oniguruma.pc.in HISTORY README.ja index.html \
 	index_ja.html doc/API doc/API.ja doc/RE doc/RE.ja doc/FAQ doc/FAQ.ja \
 	doc/UnicodeProps.txt \
 	tool/.gitignore tool/CaseFolding.py tool/convert-name2ctype.sh \
-	tool/enc-unicode.rb \
-	win32/Makefile win32/config.h win32/testc.c \
+	tool/enc-unicode.rb tool/download-ucd.sh tool/update-doc.py \
+	win32/Makefile win32/Makefile.mingw win32/config.h win32/testc.c \
 	win32/makedef.py win32/onig.rc \
 	$(encdir)/koi8.c $(encdir)/mktable.c \
 	$(sampledir)/encode.c $(sampledir)/listcap.c $(sampledir)/names.c \
