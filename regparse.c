@@ -4938,11 +4938,14 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	  PUNFETCH;
 	  r = fetch_name((OnigCodePoint )'(', &p, end, &name_end, env, &num, 1);
 	  if (r < 0) return r;
+#if 0
+	  /* Relative number is not currently supported. (same as Perl) */
 	  if (num < 0) {
 	    num = BACKREF_REL_TO_ABS(num, env);
 	    if (num <= 0)
 	      return ONIGERR_INVALID_BACKREF;
 	  }
+#endif
 	  if (IS_SYNTAX_BV(env->syntax, ONIG_SYN_STRICT_CHECK_BACKREF)) {
 	    if (num > env->num_mem ||
 	        IS_NULL(SCANENV_MEM_NODES(env)[num]))
