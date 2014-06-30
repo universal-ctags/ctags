@@ -24,6 +24,18 @@ DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 		false ; \
 	  fi
 
+#
+# Run unit test s under valgrind:
+#
+# 	$ make -f testing.mak VG=1 test.units
+#
+VALGRIND_COMMAND       = valgrind
+VALGRIND_OPTIONS       = --quiet --leak-check=full --show-leak-kinds=all
+VALGRIND_EXTRA_OPTIONS =
+ifdef VG
+VALGRIND = $(VALGRIND_COMMAND) $(VALGRIND_OPTIONS) $(VALGRIND_EXTRA_OPTIONS)
+endif
+
 .PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units fuzz
 
 test: test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units
@@ -118,7 +130,7 @@ test.units: $(CTAGS_TEST)
 		\
 		echo -n "Testing $${name}..."; \
 		\
-		$(CTAGS_TEST) -o - $$(test -f "$${args}" && cat "$$args") "$$input" |	\
+		$(VALGRIND) $(CTAGS_TEST) -o - $$(test -f "$${args}" && cat "$$args") "$$input" |	\
 		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
 		cp "$$expected" "$$expectedtmp"; \
 		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff"); \
