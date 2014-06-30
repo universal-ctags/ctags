@@ -3,7 +3,7 @@
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2007  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
- * Copyright (c) 2011       K.Takata  <kentkt AT csc DOT jp>
+ * Copyright (c) 2011-2014  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -309,8 +309,12 @@ onig_error_code_to_str(s, code, va_alist)
 
   default:
     q = onig_error_code_to_format(code);
-    len = onigenc_str_bytelen_null(ONIG_ENCODING_ASCII, q);
-    xmemcpy(s, q, len);
+    if (q) {
+      len = onigenc_str_bytelen_null(ONIG_ENCODING_ASCII, q);
+      xmemcpy(s, q, len);
+    } else {
+      len = 0;
+    }
     s[len] = '\0';
     break;
   }

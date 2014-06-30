@@ -35,7 +35,7 @@ endif
 
 subdirs = 
 
-libbase   = libonig
+libbase   = onig
 libname   = $(libbase)_s.a
 dllname   = $(libbase).dll
 dlllib    = $(libbase).a

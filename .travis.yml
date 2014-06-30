@@ -1,0 +1,38 @@
+language: c
+
+compiler:
+        - gcc
+        - clang
+
+env:
+        - CFLAGS=--coverage CONFOPT=
+        - CFLAGS=--coverage CONFOPT=--enable-multithread
+
+before_install:
+        - sudo apt-get update -qq
+        - sudo apt-get install -qq lcov rubygems
+        - gem install lcoveralls
+
+before_script:
+        - ./configure $CONFOPT && make
+
+script:
+        - LD_LIBRARY_PATH=.libs python ./testpy.py EUC-JP
+        - LD_LIBRARY_PATH=.libs python ./testpy.py SJIS
+        - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-8
+        - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-16LE
+        - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-16BE
+        - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-32LE
+        - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-32BE
+        - ./sample/crnl
+        - ./sample/encode
+        - ./sample/listcap
+        - ./sample/names
+        - ./sample/posix
+        - ./sample/simple
+        - ./sample/sql
+        - ./sample/syntax
+
+after_success:
+        - lcov -c -d .libs -o coverage.info
+        - lcoveralls --retry-count 5 coverage.info

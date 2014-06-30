@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
+Onigmo (Oniguruma-mod) Unicode Properties  Version 5.14.0    2014/06/22
 
 * POSIX brackets
     Alpha
@@ -66,6 +66,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Avestan
     Balinese
     Bamum
+    Bassa_Vah
     Batak
     Bengali
     Bopomofo
@@ -75,6 +76,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Buhid
     Canadian_Aboriginal
     Carian
+    Caucasian_Albanian
     Chakma
     Cham
     Cherokee
@@ -85,11 +87,14 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Cyrillic
     Deseret
     Devanagari
+    Duployan
     Egyptian_Hieroglyphs
+    Elbasan
     Ethiopic
     Georgian
     Glagolitic
     Gothic
+    Grantha
     Greek
     Gujarati
     Gurmukhi
@@ -109,40 +114,56 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Kayah_Li
     Kharoshthi
     Khmer
+    Khojki
+    Khudawadi
     Lao
     Latin
     Lepcha
     Limbu
+    Linear_A
     Linear_B
     Lisu
     Lycian
     Lydian
+    Mahajani
     Malayalam
     Mandaic
+    Manichaean
     Meetei_Mayek
+    Mende_Kikakui
     Meroitic_Cursive
     Meroitic_Hieroglyphs
     Miao
+    Modi
     Mongolian
+    Mro
     Myanmar
+    Nabataean
     New_Tai_Lue
     Nko
     Ogham
     Ol_Chiki
     Old_Italic
+    Old_North_Arabian
+    Old_Permic
     Old_Persian
     Old_South_Arabian
     Old_Turkic
     Oriya
     Osmanya
+    Pahawh_Hmong
+    Palmyrene
+    Pau_Cin_Hau
     Phags_Pa
     Phoenician
+    Psalter_Pahlavi
     Rejang
     Runic
     Samaritan
     Saurashtra
     Sharada
     Shavian
+    Siddham
     Sinhala
     Sora_Sompeng
     Sundanese
@@ -160,9 +181,11 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Thai
     Tibetan
     Tifinagh
+    Tirhuta
     Ugaritic
     Unknown
     Vai
+    Warang_Citi
     Yi
 
 * DerivedCoreProperties
@@ -229,8 +252,8 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     CWL
     CWT
     CWU
-    Dep
     DI
+    Dep
     Dia
     Ext
     Gr_Base
@@ -238,10 +261,10 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Gr_Link
     Hex
     IDC
-    Ideo
     IDS
     IDSB
     IDST
+    Ideo
     Join_C
     LOE
     NChar
@@ -279,6 +302,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Titlecase_Letter
     Uppercase_Letter
     Mark
+    Combining_Mark
     Spacing_Mark
     Enclosing_Mark
     Nonspacing_Mark
@@ -287,13 +311,13 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Letter_Number
     Other_Number
     Punctuation
-    Connector_Punctation
-    Dash_Punctation
-    Close_Punctation
-    Final_Punctation
-    Initial_Punctation
-    Other_Punctation
-    Open_Punctation
+    Connector_Punctuation
+    Dash_Punctuation
+    Close_Punctuation
+    Final_Punctuation
+    Initial_Punctuation
+    Other_Punctuation
+    Open_Punctuation
     Symbol
     Currency_Symbol
     Modifier_Symbol
@@ -305,12 +329,14 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Space_Separator
 
 * PropertyValueAliases (Script)
+    Aghb
     Arab
     Armi
     Armn
     Avst
     Bali
     Bamu
+    Bass
     Batk
     Beng
     Bopo
@@ -318,6 +344,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Brai
     Bugi
     Buhd
+    Cakm
     Cans
     Cari
     Cher
@@ -327,11 +354,14 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Cyrl
     Deva
     Dsrt
+    Dupl
     Egyp
+    Elba
     Ethi
     Geor
     Glag
     Goth
+    Gran
     Grek
     Gujr
     Guru
@@ -340,12 +370,14 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Hano
     Hebr
     Hira
+    Hmng
     Ital
     Java
     Kali
     Kana
     Khar
     Khmr
+    Khoj
     Knda
     Kthi
     Lana
@@ -353,23 +385,37 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Latn
     Lepc
     Limb
+    Lina
     Linb
     Lyci
     Lydi
+    Mahj
     Mand
+    Mani
+    Mend
+    Merc
+    Mero
     Mlym
     Mong
+    Mroo
     Mtei
     Mymr
+    Narb
+    Nbat
     Nkoo
     Ogam
     Olck
     Orkh
     Orya
     Osma
+    Palm
+    Pauc
+    Perm
     Phag
     Phli
+    Phlp
     Phnx
+    Plrd
     Prti
     Rjng
     Runr
@@ -377,11 +423,16 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Sarb
     Saur
     Shaw
+    Shrd
+    Sidd
+    Sind
     Sinh
+    Sora
     Sund
     Sylo
     Syrc
     Tagb
+    Takr
     Tale
     Talu
     Taml
@@ -391,8 +442,10 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Tglg
     Thaa
     Tibt
+    Tirh
     Ugar
     Vaii
+    Wara
     Xpeo
     Xsux
     Yiii
@@ -415,6 +468,9 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     Age=5.2
     Age=6.0
     Age=6.1
+    Age=6.2
+    Age=6.3
+    Age=7.0
 
 * Blocks
     In_Basic_Latin
@@ -472,6 +528,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     In_Khmer_Symbols
     In_Buginese
     In_Tai_Tham
+    In_Combining_Diacritical_Marks_Extended
     In_Balinese
     In_Sundanese
     In_Batak
@@ -550,11 +607,13 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     In_Rejang
     In_Hangul_Jamo_Extended_A
     In_Javanese
+    In_Myanmar_Extended_B
     In_Cham
     In_Myanmar_Extended_A
     In_Tai_Viet
     In_Meetei_Mayek_Extensions
     In_Ethiopic_Extended_A
+    In_Latin_Extended_E
     In_Meetei_Mayek
     In_Hangul_Syllables
     In_Hangul_Jamo_Extended_B
@@ -581,54 +640,83 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 5.13.1    2012/02/01
     In_Phaistos_Disc
     In_Lycian
     In_Carian
+    In_Coptic_Epact_Numbers
     In_Old_Italic
     In_Gothic
+    In_Old_Permic
     In_Ugaritic
     In_Old_Persian
     In_Deseret
     In_Shavian
     In_Osmanya
+    In_Elbasan
+    In_Caucasian_Albanian
+    In_Linear_A
     In_Cypriot_Syllabary
     In_Imperial_Aramaic
+    In_Palmyrene
+    In_Nabataean
     In_Phoenician
     In_Lydian
     In_Meroitic_Hieroglyphs
     In_Meroitic_Cursive
     In_Kharoshthi
     In_Old_South_Arabian
+    In_Old_North_Arabian
+    In_Manichaean
     In_Avestan
     In_Inscriptional_Parthian
     In_Inscriptional_Pahlavi
+    In_Psalter_Pahlavi
     In_Old_Turkic
     In_Rumi_Numeral_Symbols
     In_Brahmi
     In_Kaithi
     In_Sora_Sompeng
     In_Chakma
+    In_Mahajani
     In_Sharada
+    In_Sinhala_Archaic_Numbers
+    In_Khojki
+    In_Khudawadi
+    In_Grantha
+    In_Tirhuta
+    In_Siddham
+    In_Modi
     In_Takri
+    In_Warang_Citi
+    In_Pau_Cin_Hau
     In_Cuneiform
     In_Cuneiform_Numbers_and_Punctuation
     In_Egyptian_Hieroglyphs
     In_Bamum_Supplement
+    In_Mro
+    In_Bassa_Vah
+    In_Pahawh_Hmong
     In_Miao
     In_Kana_Supplement
+    In_Duployan
+    In_Shorthand_Format_Controls
     In_Byzantine_Musical_Symbols
     In_Musical_Symbols
     In_Ancient_Greek_Musical_Notation
     In_Tai_Xuan_Jing_Symbols
     In_Counting_Rod_Numerals
     In_Mathematical_Alphanumeric_Symbols
+    In_Mende_Kikakui
     In_Arabic_Mathematical_Alphabetic_Symbols
     In_Mahjong_Tiles
     In_Domino_Tiles
     In_Playing_Cards
     In_Enclosed_Alphanumeric_Supplement
     In_Enclosed_Ideographic_Supplement
-    In_Miscellaneous_Symbols_And_Pictographs
+    In_Miscellaneous_Symbols_and_Pictographs
     In_Emoticons
-    In_Transport_And_Map_Symbols
+    In_Ornamental_Dingbats
+    In_Transport_and_Map_Symbols
     In_Alchemical_Symbols
+    In_Geometric_Shapes_Extended
+    In_Supplemental_Arrows_C
     In_CJK_Unified_Ideographs_Extension_B
     In_CJK_Unified_Ideographs_Extension_C
     In_CJK_Unified_Ideographs_Extension_D

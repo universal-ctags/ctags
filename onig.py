@@ -354,7 +354,7 @@ ONIGERR_OVER_THREAD_PASS_LIMIT_COUNT    = -1001
 onig_init = libonig.onig_init
 
 # onig_error_code_to_str
-libonig.onig_error_code_to_str.argtypes = [ctypes.c_char_p, ctypes.c_int,
+libonig.onig_error_code_to_str.argtypes = [ctypes.c_char_p, _c_ssize_t,
         ctypes.POINTER(OnigErrorInfo)]
 def onig_error_code_to_str(err_buf, err_code, err_info=None):
     return libonig.onig_error_code_to_str(err_buf, err_code, err_info)

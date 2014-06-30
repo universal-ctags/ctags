@@ -12,8 +12,17 @@ nerror = 0
 nsucc = 0
 nfail = 0
 
+# default encoding
 onig_encoding = onig.ONIG_ENCODING_EUC_JP
 encoding = onig_encoding[0].name.decode()
+
+# special syntactic settings
+_syntax_default = onig.OnigSyntaxType()
+onig.onig_copy_syntax(byref(_syntax_default), onig.ONIG_SYNTAX_DEFAULT)
+_syntax_default.options &= ~onig.ONIG_OPTION_ASCII_RANGE
+_syntax_default.behavior &= ~onig.ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE
+syntax_default = byref(_syntax_default)
+
 
 class strptr:
     """a helper class to get a pointer to a string"""
@@ -56,14 +65,14 @@ def print_result(result, pattern, file=None):
     except UnicodeEncodeError as e:
         print('(' + str(e) + ')')
 
-def xx(pattern, target, s_from, s_to, mem, not_match):
+def xx(pattern, target, s_from, s_to, mem, not_match,
+        syn=syntax_default, opt=onig.ONIG_OPTION_DEFAULT):
     global nerror
     global nsucc
     global nfail
 
     reg = onig.OnigRegex()
     einfo = onig.OnigErrorInfo()
-    syn = onig.OnigSyntaxType()
     msg = create_string_buffer(onig.ONIG_MAX_ERROR_MESSAGE_LEN)
 
     pattern2 = pattern
@@ -78,13 +87,15 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
         target2 = target.encode(encoding)
     targetp = strptr(target2)
 
-    # special syntactic settings
-    onig.onig_copy_syntax(byref(syn), onig.ONIG_SYNTAX_DEFAULT)
-    syn.options &= ~onig.ONIG_OPTION_ASCII_RANGE
-    syn.behavior &= ~onig.ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE
+    # cut very long outputs
+    limit = 100
+    if len(target) > limit:
+        target = target[:limit] + "..."
+    if len(pattern) > limit:
+        pattern = pattern[:limit] + "..."
 
     r = onig.onig_new(byref(reg), patternp.getptr(), patternp.getptr(-1),
-            onig.ONIG_OPTION_DEFAULT, onig_encoding, byref(syn), byref(einfo));
+            opt, onig_encoding, syn, byref(einfo));
     if r != 0:
         onig.onig_error_code_to_str(msg, r, byref(einfo))
         nerror += 1
@@ -128,39 +139,51 @@ def xx(pattern, target, s_from, s_to, mem, not_match):
     onig.onig_free(reg)
     onig.onig_region_free(region, 1)
 
-def x2(pattern, target, s_from, s_to):
-    xx(pattern, target, s_from, s_to, 0, False)
+def x2(pattern, target, s_from, s_to, **kwargs):
+    xx(pattern, target, s_from, s_to, 0, False, **kwargs)
 
-def x3(pattern, target, s_from, s_to, mem):
-    xx(pattern, target, s_from, s_to, mem, False)
+def x3(pattern, target, s_from, s_to, mem, **kwargs):
+    xx(pattern, target, s_from, s_to, mem, False, **kwargs)
 
-def n(pattern, target):
-    xx(pattern, target, 0, 0, 0, True)
+def n(pattern, target, **kwargs):
+    xx(pattern, target, 0, 0, 0, True, **kwargs)
 
 
 def is_unicode_encoding(enc):
-    return enc in (onig.ONIG_ENCODING_UTF16_LE,
+    return enc in (onig.ONIG_ENCODING_UTF32_LE,
+                   onig.ONIG_ENCODING_UTF32_BE,
+                   onig.ONIG_ENCODING_UTF16_LE,
                    onig.ONIG_ENCODING_UTF16_BE,
                    onig.ONIG_ENCODING_UTF8)
 
-def main():
+
+def set_encoding(enc):
     global onig_encoding
     global encoding
 
-    # set encoding of the test target
-    if len(sys.argv) > 1:
+    if isinstance(enc, onig.OnigEncoding):
+        onig_encoding = enc
+    else:
         encs = {"EUC-JP": onig.ONIG_ENCODING_EUC_JP,
                 "SJIS": onig.ONIG_ENCODING_SJIS,
                 "UTF-8": onig.ONIG_ENCODING_UTF8,
                 "UTF-16LE": onig.ONIG_ENCODING_UTF16_LE,
-                "UTF-16BE": onig.ONIG_ENCODING_UTF16_BE}
+                "UTF-16BE": onig.ONIG_ENCODING_UTF16_BE,
+                "UTF-32LE": onig.ONIG_ENCODING_UTF32_LE,
+                "UTF-32BE": onig.ONIG_ENCODING_UTF32_BE}
+        onig_encoding = encs[enc]
+    encoding = onig_encoding[0].name.decode()
+
+
+def main():
+    # set encoding of the test target
+    if len(sys.argv) > 1:
         try:
-            onig_encoding = encs[sys.argv[1]]
+            set_encoding(sys.argv[1])
         except KeyError:
             print("test target encoding error")
             print("Usage: python testpy.py [test target encoding] [output encoding]")
             sys.exit()
-        encoding = onig_encoding[0].name.decode()
 
     # set encoding of stdout/stderr
     if len(sys.argv) > 2:
@@ -206,6 +229,10 @@ def main():
         x2("\\x61\\x00", "a", 0, 1);
     elif onig_encoding == onig.ONIG_ENCODING_UTF16_BE:
         x2("\\x00\\x61", "a", 0, 1);
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_LE:
+        x2("\\x61\\x00\\x00\\x00", "a", 0, 1);
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_BE:
+        x2("\\x00\\x00\\x00\\x61", "a", 0, 1);
     else:
         x2("\\x61", "a", 0, 1);
     x2("aa", "aa", 0, 2);
@@ -221,6 +248,12 @@ def main():
     elif onig_encoding == onig.ONIG_ENCODING_UTF16_BE:
         x2("\\00\\17", "\017", 0, 1);
         x2("\\x00\\x1f", "\x1f", 0, 1);
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_LE:
+        x2("\\17\\00\\00\\00", "\017", 0, 1);
+        x2("\\x1f\\x00\\x00\\x00", "\x1f", 0, 1);
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_BE:
+        x2("\\00\\00\\00\\17", "\017", 0, 1);
+        x2("\\x00\\x00\\x00\\x1f", "\x1f", 0, 1);
     else:
         x2("\\17", "\017", 0, 1);
         x2("\\x1f", "\x1f", 0, 1);
@@ -279,6 +312,16 @@ def main():
         x2("[\\x00\\x5a-\\x00\\x5c]", "\x5b", 0, 1);
         x2("[\\x00\\x6A-\\x00\\x6D]", "\x6c", 0, 1);
         n("[\\x00\\x6A-\\x00\\x6D]", "\x6E");
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_LE:
+        x2("[\\044\\000\\000\\000-\\047\\000\\000\\000]", "\046", 0, 1);
+        x2("[\\x5a\\x00\\x00\\x00-\\x5c\\x00\\x00\\x00]", "\x5b", 0, 1);
+        x2("[\\x6A\\x00\\x00\\x00-\\x6D\\x00\\x00\\x00]", "\x6c", 0, 1);
+        n("[\\x6A\\x00\\x00\\x00-\\x6D\\x00\\x00\\x00]", "\x6E");
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_BE:
+        x2("[\\000\\000\\000\\044-\\000\\000\\000\\047]", "\046", 0, 1);
+        x2("[\\x00\\x00\\x00\\x5a-\\x00\\x00\\x00\\x5c]", "\x5b", 0, 1);
+        x2("[\\x00\\x00\\x00\\x6A-\\x00\\x00\\x00\\x6D]", "\x6c", 0, 1);
+        n("[\\x00\\x00\\x00\\x6A-\\x00\\x00\\x00\\x6D]", "\x6E");
     else:
         x2("[\\044-\\047]", "\046", 0, 1);
         x2("[\\x5a-\\x5c]", "\x5b", 0, 1);
@@ -624,6 +667,10 @@ def main():
         x2("\\xFA\\x8F", "\u8ffa", 0, 1);
     elif onig_encoding == onig.ONIG_ENCODING_UTF16_BE:
         x2("\\x8F\\xFA", "\u8ffa", 0, 1);
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_LE:
+        x2("\\xFA\\x8F\\x00\\x00", "\u8ffa", 0, 1);
+    elif onig_encoding == onig.ONIG_ENCODING_UTF32_BE:
+        x2("\\x00\\x00\\x8F\\xFA", "\u8ffa", 0, 1);
     elif onig_encoding == onig.ONIG_ENCODING_UTF8:
         x2("\\xE8\\xBF\\xBA", "\u8ffa", 0, 1);
     elif onig_encoding == onig.ONIG_ENCODING_SJIS:
@@ -935,6 +982,15 @@ def main():
         x2("\\p{Other_Default_Ignorable_Code_Point}+", "\u034F\uFFF8\U000E0FFF", 0, 3)
         # The longest block name
         x2("\\p{In_Unified_Canadian_Aboriginal_Syllabics_Extended}+", "\u18B0\u18FF", 0, 2)
+        # Unicode case fold
+        x2("(?i)\u1ffc", "\u2126\u1fbe", 0, 2)
+        x2("(?i)\u1ffc", "\u1ff3", 0, 1)
+        x2("(?i)\u0390", "\u03b9\u0308\u0301", 0, 3)
+        x2("(?i)\u03b9\u0308\u0301", "\u0390", 0, 1)
+        x2("(?i)ff", "\ufb00", 0, 1)
+        x2("(?i)\ufb01", "fi", 0, 2)
+        # Other Unicode tests
+        x2("\\x{25771}", "\U00025771", 0, 1)
     x2("[0-9-a]+", " 0123456789-a ", 1, 13)     # same as [0-9\-a]
     x2("[0-9-\\s]+", " 0123456789-a ", 0, 12)   # same as [0-9\-\s]
     x2("(?i:a) B", "a B", 0, 3);
@@ -959,6 +1015,19 @@ def main():
     x2("\\n?\\z", "こんにちは", 5, 5)
     x2("\\z", "こんにちは", 5, 5)
     x2("()" * 32767, "", 0, 0)      # Issue #24
+    x2("\\h+ \\H+", " 0123456789aBcDeF gh", 1, 20)
+    x2("[\\h]+ [\\H]+", " 0123456789aBcDeF gh", 1, 20)
+    x2("\\A(|.|(?:(.)\\g<1>\\k<2+0>))\\z", "reer", 0, 4)
+    x2("\\A(?<a>|.|(?:(?<b>.)\\g<a>\\k<b+0>))\\z", "reer", 0, 4)
+    x2(''' # Extended pattern
+      (?<element> \g<stag> \g<content>* \g<etag> ){0}
+      (?<stag> < \g<name> \s* > ){0}
+      (?<name> [a-zA-Z_:]+ ){0}
+      (?<content> [^<&]+ (\g<element> | [^<&]+)* ){0}
+      (?<etag> </ \k<name+1> >){0}
+      \g<element>''',
+      "<foo>f<bar>bbb</bar>f</foo>", 0, 27, opt=onig.ONIG_OPTION_EXTEND)
+
 
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
@@ -979,13 +1048,10 @@ def main():
     x2("\\R", "\r", 0, 1)
     x2("\\R{3}", "\r\r\n\n", 0, 4)
 
-#    if (onig_encoding == onig.ONIG_ENCODING_UTF16_LE or
-#            onig_encoding == onig.ONIG_ENCODING_UTF16_BE or
-#            onig_encoding == onig.ONIG_ENCODING_UTF8):
-#        # USE_UNICODE_ALL_LINE_TERMINATORS must be defined
-#        x2("\\R", "\u0085", 0, 1)
-#        x2("\\R", "\u2028", 0, 1)
-#        x2("\\R", "\u2029", 0, 1)
+    if (is_unicode_encoding(onig_encoding)):
+        x2("\\R", "\u0085", 0, 1)
+        x2("\\R", "\u2028", 0, 1)
+        x2("\\R", "\u2029", 0, 1)
 
     # extended grapheme cluster
     x2("\\X{5}", "あいab\n", 0, 5)
@@ -1004,16 +1070,16 @@ def main():
     x2("(?<=ab|a\\Ka)cd", "abcd", 2, 4)     # This behaviour is currently not well defined. (see: perlre)
 
     # named group and subroutine call
-#    x2("(?<name_2>ab)(?&name_2)", "abab", 0, 4);
-#    x2("(?<name_2>ab)(?1)", "abab", 0, 4);
-#    x2("(?<n>|\\((?&n)\\))+$", "()(())", 0, 6);
-#    x2("(a|x(?-1)x)", "xax", 0, 3);
-#    x2("(a|(x(?-2)x))", "xax", 0, 3);
-#    x2("a|x(?0)x", "xax", 0, 3);
-#    x2("a|x(?R)x", "xax", 0, 3);
+    x2("(?<name_2>ab)(?&name_2)", "abab", 0, 4, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(?<name_2>ab)(?1)", "abab", 0, 4, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(?'n'|\\((?&n)\\))+$", "()(())", 0, 6, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(a|x(?-1)x)", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(a|(x(?-2)x))", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
+    x2("a|x(?0)x", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
+    x2("a|x(?R)x", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
     x2("(a|x\g<0>x)", "xax", 0, 3);
     x2("(a|x\g'0'x)", "xax", 0, 3);
-#    x2("(?-i:(?+1))(?i:(a)){0}", "A", 0, 1);
+    x2("(?-i:(?+1))(?i:(a)){0}", "A", 0, 1, syn=onig.ONIG_SYNTAX_PERL);
     x2("(?-i:\g<+1>)(?i:(a)){0}", "A", 0, 1);
     x2("(?-i:\g'+1')(?i:(a)){0}", "A", 0, 1);
 
@@ -1039,20 +1105,20 @@ def main():
     n("(?u)[[:^word:]]+", "aあ");
 
     # \g{} backref
-#    x2("((?<name1>\\d)|(?<name2>\\w))(\\g{name1}|\\g{name2})", "ff", 0, 2);
-#    x2("(?:(?<x>)|(?<x>efg))\\g{x}", "", 0, 0);
-#    x2("(?:(?<x>abc)|(?<x>efg))\\g{x}", "abcefgefg", 3, 9);
-#    n("(?:(?<x>abc)|(?<x>efg))\\g{x}", "abcefg");
-#    x2("((.*)a\\g{2}f)", "bacbabf", 3, 7);
-#    x2("(.*)a\\g{1}f", "baczzzzzz\nbazz\nzzzzbabf", 19, 23);
-#    x2("((.*)a\\g{-1}f)", "bacbabf", 3, 7);
-#    x2("(.*)a\\g{-1}f", "baczzzzzz\nbazz\nzzzzbabf", 19, 23);
-#    x2("(あ*)(い*)\\g{-2}\\g{-1}", "あああいいあああいい", 0, 10);
+    x2("((?<name1>\\d)|(?<name2>\\w))(\\g{name1}|\\g{name2})", "ff", 0, 2, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(?:(?<x>)|(?<x>efg))\\g{x}", "", 0, 0, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(?:(?<x>abc)|(?<x>efg))\\g{x}", "abcefgefg", 3, 9, syn=onig.ONIG_SYNTAX_PERL);
+    n("(?:(?<x>abc)|(?<x>efg))\\g{x}", "abcefg", syn=onig.ONIG_SYNTAX_PERL);
+    x2("((.*)a\\g{2}f)", "bacbabf", 3, 7, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(.*)a\\g{1}f", "baczzzzzz\nbazz\nzzzzbabf", 19, 23, syn=onig.ONIG_SYNTAX_PERL);
+    x2("((.*)a\\g{-1}f)", "bacbabf", 3, 7, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(.*)a\\g{-1}f", "baczzzzzz\nbazz\nzzzzbabf", 19, 23, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(あ*)(い*)\\g{-2}\\g{-1}", "あああいいあああいい", 0, 10, syn=onig.ONIG_SYNTAX_PERL);
 
     # Python/PCRE compatible named group
-#    x2("(?P<name_2>ab)(?P>name_2)", "abab", 0, 4);
-#    x2("(?P<n>|\\((?P>n)\\))+$", "()(())", 0, 6);
-#    x2("((?P<name1>\\d)|(?P<name2>\\w))((?P=name1)|(?P=name2))", "ff", 0, 2);
+    x2("(?P<name_2>ab)(?P>name_2)", "abab", 0, 4, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(?P<n>|\\((?P>n)\\))+$", "()(())", 0, 6, syn=onig.ONIG_SYNTAX_PERL);
+    x2("((?P<name1>\\d)|(?P<name2>\\w))((?P=name1)|(?P=name2))", "ff", 0, 2, syn=onig.ONIG_SYNTAX_PERL);
 
     # Fullwidth Alphabet
     n("ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ", "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ");
@@ -1126,8 +1192,11 @@ def main():
     n("(?<!(?i)ab)cd", "ABcd")
     n("(?<!(?i:ab))cd", "ABcd")
 
+    # Perl syntax
+    x2("\\Q()\\\\E", "()\\", 0, 3, syn=onig.ONIG_SYNTAX_PERL)
 
-    print("\nRESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
+    print("\nEncoding:", encoding)
+    print("RESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
           nsucc, nfail, nerror, onig.onig_version()))
 
     onig.onig_end()
