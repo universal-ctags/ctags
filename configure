@@ -11673,7 +11673,7 @@ if test "$am_t" != yes; then
 fi
 
 
-LTVERSION="5:0:5"
+LTVERSION="5:1:0"
 
 
 

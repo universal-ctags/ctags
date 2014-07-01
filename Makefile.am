@@ -1,4 +1,4 @@
-## Makefile.am for Oniguruma
+## Makefile.am for Onigmo
 encdir    = $(top_srcdir)/enc
 sampledir = $(top_srcdir)/sample
 libname = libonig.la

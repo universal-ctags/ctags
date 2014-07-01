@@ -1,6 +1,6 @@
-# Oniguruma Makefile for mingw32
+# Onigmo Makefile for mingw32
 
-product_name = oniguruma
+product_name = onigmo
 
 # Comment out the next line, if you don't want to use LTCG.
 USE_LTCG = 1
