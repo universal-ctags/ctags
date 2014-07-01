@@ -1,5 +1,9 @@
 language: c
 
+branches:
+        except:
+                - ruby-2.x
+
 compiler:
         - gcc
         - clang
