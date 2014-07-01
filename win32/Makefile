@@ -63,25 +63,25 @@ onigobjs     = reggnu.obj regerror.obj regparse.obj regext.obj regcomp.obj \
 posixobjs    = regposix.obj regposerr.obj
 libobjs      = $(onigobjs) $(posixobjs)
 
-jp_objs      =  $(encdir)\euc_jp.obj $(encdir)\sjis.obj $(encdir)\cp932.obj
-iso8859_objs =  $(encdir)\iso8859_1.obj  $(encdir)\iso8859_2.obj \
-		$(encdir)\iso8859_3.obj  $(encdir)\iso8859_4.obj \
-		$(encdir)\iso8859_5.obj  $(encdir)\iso8859_6.obj \
-		$(encdir)\iso8859_7.obj  $(encdir)\iso8859_8.obj \
-		$(encdir)\iso8859_9.obj  $(encdir)\iso8859_10.obj \
-		$(encdir)\iso8859_11.obj $(encdir)\iso8859_13.obj \
-		$(encdir)\iso8859_14.obj $(encdir)\iso8859_15.obj \
-		$(encdir)\iso8859_16.obj
+jp_objs      =  $(encdir)\euc_jp.obj $(encdir)\shift_jis.obj $(encdir)\windows_31j.obj
+iso_8859_objs =  $(encdir)\iso_8859_1.obj  $(encdir)\iso_8859_2.obj \
+		$(encdir)\iso_8859_3.obj  $(encdir)\iso_8859_4.obj \
+		$(encdir)\iso_8859_5.obj  $(encdir)\iso_8859_6.obj \
+		$(encdir)\iso_8859_7.obj  $(encdir)\iso_8859_8.obj \
+		$(encdir)\iso_8859_9.obj  $(encdir)\iso_8859_10.obj \
+		$(encdir)\iso_8859_11.obj $(encdir)\iso_8859_13.obj \
+		$(encdir)\iso_8859_14.obj $(encdir)\iso_8859_15.obj \
+		$(encdir)\iso_8859_16.obj
 
-encobjs      =  $(encdir)\ascii.obj $(encdir)\utf8.obj \
+encobjs      =  $(encdir)\ascii.obj $(encdir)\utf_8.obj \
 		$(encdir)\unicode.obj \
-		$(encdir)\utf16_be.obj $(encdir)\utf16_le.obj \
-		$(encdir)\utf32_be.obj $(encdir)\utf32_le.obj \
-		$(jp_objs) $(iso8859_objs) \
+		$(encdir)\utf_16be.obj $(encdir)\utf_16le.obj \
+		$(encdir)\utf_32be.obj $(encdir)\utf_32le.obj \
+		$(jp_objs) $(iso_8859_objs) \
 		$(encdir)\euc_tw.obj $(encdir)\euc_kr.obj $(encdir)\big5.obj \
 		$(encdir)\gb18030.obj \
 		$(encdir)\koi8_r.obj  \
-		$(encdir)\cp1251.obj # $(encdir)\koi8.obj
+		$(encdir)\windows_1251.obj # $(encdir)\koi8.obj
 
 resobj       = win32\onig.res
 
@@ -152,34 +152,34 @@ st.obj:        st.c regint.h oniguruma.h config.h st.h
 
 $(encdir)\ascii.obj:      $(encdir)\ascii.c regenc.h config.h
 $(encdir)\unicode.obj:    $(encdir)\unicode.c regint.h regenc.h config.h $(encdir)\unicode\casefold.h $(encdir)\unicode\name2ctype.h
-$(encdir)\utf8.obj:       $(encdir)\utf8.c regenc.h config.h
-$(encdir)\utf16_be.obj:   $(encdir)\utf16_be.c regenc.h config.h
-$(encdir)\utf16_le.obj:   $(encdir)\utf16_le.c regenc.h config.h
-$(encdir)\utf32_be.obj:   $(encdir)\utf32_be.c regenc.h config.h
-$(encdir)\utf32_le.obj:   $(encdir)\utf32_le.c regenc.h config.h
+$(encdir)\utf_8.obj:       $(encdir)\utf_8.c regenc.h config.h
+$(encdir)\utf_16be.obj:   $(encdir)\utf_16be.c regenc.h config.h
+$(encdir)\utf_16le.obj:   $(encdir)\utf_16le.c regenc.h config.h
+$(encdir)\utf_32be.obj:   $(encdir)\utf_32be.c regenc.h config.h
+$(encdir)\utf_32le.obj:   $(encdir)\utf_32le.c regenc.h config.h
 $(encdir)\euc_jp.obj:     $(encdir)\euc_jp.c regenc.h config.h
 $(encdir)\euc_tw.obj:     $(encdir)\euc_tw.c regenc.h config.h
 $(encdir)\euc_kr.obj:     $(encdir)\euc_kr.c regenc.h config.h
-$(encdir)\sjis.obj:       $(encdir)\sjis.c regenc.h config.h
-$(encdir)\cp932.obj:      $(encdir)\cp932.c $(encdir)\sjis.c regenc.h config.h
-$(encdir)\iso8859_1.obj:  $(encdir)\iso8859_1.c regenc.h config.h
-$(encdir)\iso8859_2.obj:  $(encdir)\iso8859_2.c regenc.h config.h
-$(encdir)\iso8859_3.obj:  $(encdir)\iso8859_3.c regenc.h config.h
-$(encdir)\iso8859_4.obj:  $(encdir)\iso8859_4.c regenc.h config.h
-$(encdir)\iso8859_5.obj:  $(encdir)\iso8859_5.c regenc.h config.h
-$(encdir)\iso8859_6.obj:  $(encdir)\iso8859_6.c regenc.h config.h
-$(encdir)\iso8859_7.obj:  $(encdir)\iso8859_7.c regenc.h config.h
-$(encdir)\iso8859_8.obj:  $(encdir)\iso8859_8.c regenc.h config.h
-$(encdir)\iso8859_9.obj:  $(encdir)\iso8859_9.c regenc.h config.h
-$(encdir)\iso8859_10.obj: $(encdir)\iso8859_10.c regenc.h config.h
-$(encdir)\iso8859_11.obj: $(encdir)\iso8859_11.c regenc.h config.h
-$(encdir)\iso8859_13.obj: $(encdir)\iso8859_13.c regenc.h config.h
-$(encdir)\iso8859_14.obj: $(encdir)\iso8859_14.c regenc.h config.h
-$(encdir)\iso8859_15.obj: $(encdir)\iso8859_15.c regenc.h config.h
-$(encdir)\iso8859_16.obj: $(encdir)\iso8859_16.c regenc.h config.h
+$(encdir)\shift_jis.obj:   $(encdir)\shift_jis.c regenc.h config.h
+$(encdir)\windows_31j.obj: $(encdir)\windows_31j.c $(encdir)\shift_jis.c regenc.h config.h
+$(encdir)\iso_8859_1.obj:  $(encdir)\iso_8859_1.c regenc.h config.h
+$(encdir)\iso_8859_2.obj:  $(encdir)\iso_8859_2.c regenc.h config.h
+$(encdir)\iso_8859_3.obj:  $(encdir)\iso_8859_3.c regenc.h config.h
+$(encdir)\iso_8859_4.obj:  $(encdir)\iso_8859_4.c regenc.h config.h
+$(encdir)\iso_8859_5.obj:  $(encdir)\iso_8859_5.c regenc.h config.h
+$(encdir)\iso_8859_6.obj:  $(encdir)\iso_8859_6.c regenc.h config.h
+$(encdir)\iso_8859_7.obj:  $(encdir)\iso_8859_7.c regenc.h config.h
+$(encdir)\iso_8859_8.obj:  $(encdir)\iso_8859_8.c regenc.h config.h
+$(encdir)\iso_8859_9.obj:  $(encdir)\iso_8859_9.c regenc.h config.h
+$(encdir)\iso_8859_10.obj: $(encdir)\iso_8859_10.c regenc.h config.h
+$(encdir)\iso_8859_11.obj: $(encdir)\iso_8859_11.c regenc.h config.h
+$(encdir)\iso_8859_13.obj: $(encdir)\iso_8859_13.c regenc.h config.h
+$(encdir)\iso_8859_14.obj: $(encdir)\iso_8859_14.c regenc.h config.h
+$(encdir)\iso_8859_15.obj: $(encdir)\iso_8859_15.c regenc.h config.h
+$(encdir)\iso_8859_16.obj: $(encdir)\iso_8859_16.c regenc.h config.h
 $(encdir)\koi8.obj:       $(encdir)\koi8.c   regenc.h config.h
 $(encdir)\koi8_r.obj:     $(encdir)\koi8_r.c regenc.h config.h
-$(encdir)\cp1251.obj:     $(encdir)\cp1251.c regenc.h config.h
+$(encdir)\windows_1251.obj: $(encdir)\windows_1251.c regenc.h config.h
 $(encdir)\big5.obj:       $(encdir)\big5.c   regenc.h config.h
 $(encdir)\gb18030.obj:    $(encdir)\gb18030.c   regenc.h config.h
 
@@ -232,9 +232,9 @@ SORIG = ruby_orig
 	$(CP) regenc.h      $(RUBYDIR)
 	$(CP) oniguruma.h   $(RUBYDIR)
 	$(CP) enc\ascii.c   $(RUBYDIR)
-	$(CP) enc\utf8.c    $(RUBYDIR)
+	$(CP) enc\utf_8.c    $(RUBYDIR)
 	$(CP) enc\euc_jp.c  $(RUBYDIR)
-	$(CP) enc\sjis.c    $(RUBYDIR)
+	$(CP) enc\shift_jis.c    $(RUBYDIR)
 	$(CP) enc\unicode.c $(RUBYDIR)
 
 

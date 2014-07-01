@@ -92,13 +92,13 @@ libonig_la_LIBADD =
 am_libonig_la_OBJECTS = regerror.lo regparse.lo regext.lo regcomp.lo \
 	regexec.lo reggnu.lo regenc.lo regsyntax.lo regtrav.lo \
 	regversion.lo st.lo regposix.lo regposerr.lo unicode.lo \
-	ascii.lo utf8.lo utf16_be.lo utf16_le.lo utf32_be.lo \
-	utf32_le.lo euc_jp.lo sjis.lo cp932.lo iso8859_1.lo \
-	iso8859_2.lo iso8859_3.lo iso8859_4.lo iso8859_5.lo \
-	iso8859_6.lo iso8859_7.lo iso8859_8.lo iso8859_9.lo \
-	iso8859_10.lo iso8859_11.lo iso8859_13.lo iso8859_14.lo \
-	iso8859_15.lo iso8859_16.lo euc_tw.lo euc_kr.lo big5.lo \
-	gb18030.lo koi8_r.lo cp1251.lo
+	ascii.lo utf_8.lo utf_16be.lo utf_16le.lo utf_32be.lo \
+	utf_32le.lo euc_jp.lo shift_jis.lo windows_31j.lo \
+	iso_8859_1.lo iso_8859_2.lo iso_8859_3.lo iso_8859_4.lo \
+	iso_8859_5.lo iso_8859_6.lo iso_8859_7.lo iso_8859_8.lo \
+	iso_8859_9.lo iso_8859_10.lo iso_8859_11.lo iso_8859_13.lo \
+	iso_8859_14.lo iso_8859_15.lo iso_8859_16.lo euc_tw.lo \
+	euc_kr.lo big5.lo gb18030.lo koi8_r.lo windows_1251.lo
 libonig_la_OBJECTS = $(am_libonig_la_OBJECTS)
 libonig_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -323,21 +323,21 @@ libonig_la_SOURCES = regint.h regparse.h regenc.h st.h \
 	regerror.c regparse.c regext.c regcomp.c regexec.c reggnu.c \
 	regenc.c regsyntax.c regtrav.c regversion.c st.c \
 	regposix.c regposerr.c \
-	$(encdir)/unicode.c $(encdir)/ascii.c $(encdir)/utf8.c \
-	$(encdir)/utf16_be.c $(encdir)/utf16_le.c \
-	$(encdir)/utf32_be.c $(encdir)/utf32_le.c \
+	$(encdir)/unicode.c $(encdir)/ascii.c $(encdir)/utf_8.c \
+	$(encdir)/utf_16be.c $(encdir)/utf_16le.c \
+	$(encdir)/utf_32be.c $(encdir)/utf_32le.c \
 	$(encdir)/unicode/casefold.h $(encdir)/unicode/name2ctype.h \
-	$(encdir)/euc_jp.c $(encdir)/sjis.c $(encdir)/cp932.c \
-	$(encdir)/iso8859_1.c \
-	$(encdir)/iso8859_2.c  $(encdir)/iso8859_3.c \
-	$(encdir)/iso8859_4.c  $(encdir)/iso8859_5.c \
-	$(encdir)/iso8859_6.c  $(encdir)/iso8859_7.c \
-	$(encdir)/iso8859_8.c  $(encdir)/iso8859_9.c \
-	$(encdir)/iso8859_10.c $(encdir)/iso8859_11.c \
-	$(encdir)/iso8859_13.c $(encdir)/iso8859_14.c \
-	$(encdir)/iso8859_15.c $(encdir)/iso8859_16.c \
+	$(encdir)/euc_jp.c $(encdir)/shift_jis.c $(encdir)/windows_31j.c \
+	$(encdir)/iso_8859_1.c \
+	$(encdir)/iso_8859_2.c  $(encdir)/iso_8859_3.c \
+	$(encdir)/iso_8859_4.c  $(encdir)/iso_8859_5.c \
+	$(encdir)/iso_8859_6.c  $(encdir)/iso_8859_7.c \
+	$(encdir)/iso_8859_8.c  $(encdir)/iso_8859_9.c \
+	$(encdir)/iso_8859_10.c $(encdir)/iso_8859_11.c \
+	$(encdir)/iso_8859_13.c $(encdir)/iso_8859_14.c \
+	$(encdir)/iso_8859_15.c $(encdir)/iso_8859_16.c \
 	$(encdir)/euc_tw.c $(encdir)/euc_kr.c $(encdir)/big5.c \
-	$(encdir)/gb18030.c $(encdir)/koi8_r.c $(encdir)/cp1251.c
+	$(encdir)/gb18030.c $(encdir)/koi8_r.c $(encdir)/windows_1251.c
 
 libonig_la_LDFLAGS = -version-info $(LTVERSION)
 EXTRA_DIST = .gitignore oniguruma.pc.in HISTORY README.ja index.html \
@@ -521,27 +521,25 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ascii.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/big5.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cp1251.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cp932.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/euc_jp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/euc_kr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/euc_tw.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gb18030.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_1.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_10.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_11.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_13.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_14.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_15.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_16.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_2.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_3.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_4.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_5.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_6.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_7.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_8.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso8859_9.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_1.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_10.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_11.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_13.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_14.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_15.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_16.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_3.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_4.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_5.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_6.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_7.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_8.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_9.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/koi8_r.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/regcomp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/regenc.Plo@am__quote@
@@ -555,17 +553,19 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/regsyntax.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/regtrav.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/regversion.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sjis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shift_jis.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/st.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testp-testc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/testu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unicode.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utf16_be.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utf16_le.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utf32_be.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utf32_le.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utf8.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utf_16be.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utf_16le.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utf_32be.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utf_32le.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utf_8.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/windows_1251.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/windows_31j.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -602,40 +602,40 @@ ascii.lo: $(encdir)/ascii.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ascii.lo `test -f '$(encdir)/ascii.c' || echo '$(srcdir)/'`$(encdir)/ascii.c
 
-utf8.lo: $(encdir)/utf8.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utf8.lo -MD -MP -MF $(DEPDIR)/utf8.Tpo -c -o utf8.lo `test -f '$(encdir)/utf8.c' || echo '$(srcdir)/'`$(encdir)/utf8.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utf8.Tpo $(DEPDIR)/utf8.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/utf8.c' object='utf8.lo' libtool=yes @AMDEPBACKSLASH@
+utf_8.lo: $(encdir)/utf_8.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utf_8.lo -MD -MP -MF $(DEPDIR)/utf_8.Tpo -c -o utf_8.lo `test -f '$(encdir)/utf_8.c' || echo '$(srcdir)/'`$(encdir)/utf_8.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utf_8.Tpo $(DEPDIR)/utf_8.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/utf_8.c' object='utf_8.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utf8.lo `test -f '$(encdir)/utf8.c' || echo '$(srcdir)/'`$(encdir)/utf8.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utf_8.lo `test -f '$(encdir)/utf_8.c' || echo '$(srcdir)/'`$(encdir)/utf_8.c
 
-utf16_be.lo: $(encdir)/utf16_be.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utf16_be.lo -MD -MP -MF $(DEPDIR)/utf16_be.Tpo -c -o utf16_be.lo `test -f '$(encdir)/utf16_be.c' || echo '$(srcdir)/'`$(encdir)/utf16_be.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utf16_be.Tpo $(DEPDIR)/utf16_be.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/utf16_be.c' object='utf16_be.lo' libtool=yes @AMDEPBACKSLASH@
+utf_16be.lo: $(encdir)/utf_16be.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utf_16be.lo -MD -MP -MF $(DEPDIR)/utf_16be.Tpo -c -o utf_16be.lo `test -f '$(encdir)/utf_16be.c' || echo '$(srcdir)/'`$(encdir)/utf_16be.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utf_16be.Tpo $(DEPDIR)/utf_16be.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/utf_16be.c' object='utf_16be.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utf16_be.lo `test -f '$(encdir)/utf16_be.c' || echo '$(srcdir)/'`$(encdir)/utf16_be.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utf_16be.lo `test -f '$(encdir)/utf_16be.c' || echo '$(srcdir)/'`$(encdir)/utf_16be.c
 
-utf16_le.lo: $(encdir)/utf16_le.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utf16_le.lo -MD -MP -MF $(DEPDIR)/utf16_le.Tpo -c -o utf16_le.lo `test -f '$(encdir)/utf16_le.c' || echo '$(srcdir)/'`$(encdir)/utf16_le.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utf16_le.Tpo $(DEPDIR)/utf16_le.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/utf16_le.c' object='utf16_le.lo' libtool=yes @AMDEPBACKSLASH@
+utf_16le.lo: $(encdir)/utf_16le.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utf_16le.lo -MD -MP -MF $(DEPDIR)/utf_16le.Tpo -c -o utf_16le.lo `test -f '$(encdir)/utf_16le.c' || echo '$(srcdir)/'`$(encdir)/utf_16le.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utf_16le.Tpo $(DEPDIR)/utf_16le.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/utf_16le.c' object='utf_16le.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utf16_le.lo `test -f '$(encdir)/utf16_le.c' || echo '$(srcdir)/'`$(encdir)/utf16_le.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utf_16le.lo `test -f '$(encdir)/utf_16le.c' || echo '$(srcdir)/'`$(encdir)/utf_16le.c
 
-utf32_be.lo: $(encdir)/utf32_be.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utf32_be.lo -MD -MP -MF $(DEPDIR)/utf32_be.Tpo -c -o utf32_be.lo `test -f '$(encdir)/utf32_be.c' || echo '$(srcdir)/'`$(encdir)/utf32_be.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utf32_be.Tpo $(DEPDIR)/utf32_be.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/utf32_be.c' object='utf32_be.lo' libtool=yes @AMDEPBACKSLASH@
+utf_32be.lo: $(encdir)/utf_32be.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utf_32be.lo -MD -MP -MF $(DEPDIR)/utf_32be.Tpo -c -o utf_32be.lo `test -f '$(encdir)/utf_32be.c' || echo '$(srcdir)/'`$(encdir)/utf_32be.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utf_32be.Tpo $(DEPDIR)/utf_32be.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/utf_32be.c' object='utf_32be.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utf32_be.lo `test -f '$(encdir)/utf32_be.c' || echo '$(srcdir)/'`$(encdir)/utf32_be.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utf_32be.lo `test -f '$(encdir)/utf_32be.c' || echo '$(srcdir)/'`$(encdir)/utf_32be.c
 
-utf32_le.lo: $(encdir)/utf32_le.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utf32_le.lo -MD -MP -MF $(DEPDIR)/utf32_le.Tpo -c -o utf32_le.lo `test -f '$(encdir)/utf32_le.c' || echo '$(srcdir)/'`$(encdir)/utf32_le.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utf32_le.Tpo $(DEPDIR)/utf32_le.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/utf32_le.c' object='utf32_le.lo' libtool=yes @AMDEPBACKSLASH@
+utf_32le.lo: $(encdir)/utf_32le.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT utf_32le.lo -MD -MP -MF $(DEPDIR)/utf_32le.Tpo -c -o utf_32le.lo `test -f '$(encdir)/utf_32le.c' || echo '$(srcdir)/'`$(encdir)/utf_32le.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/utf_32le.Tpo $(DEPDIR)/utf_32le.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/utf_32le.c' object='utf_32le.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utf32_le.lo `test -f '$(encdir)/utf32_le.c' || echo '$(srcdir)/'`$(encdir)/utf32_le.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o utf_32le.lo `test -f '$(encdir)/utf_32le.c' || echo '$(srcdir)/'`$(encdir)/utf_32le.c
 
 euc_jp.lo: $(encdir)/euc_jp.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT euc_jp.lo -MD -MP -MF $(DEPDIR)/euc_jp.Tpo -c -o euc_jp.lo `test -f '$(encdir)/euc_jp.c' || echo '$(srcdir)/'`$(encdir)/euc_jp.c
@@ -644,124 +644,124 @@ euc_jp.lo: $(encdir)/euc_jp.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o euc_jp.lo `test -f '$(encdir)/euc_jp.c' || echo '$(srcdir)/'`$(encdir)/euc_jp.c
 
-sjis.lo: $(encdir)/sjis.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sjis.lo -MD -MP -MF $(DEPDIR)/sjis.Tpo -c -o sjis.lo `test -f '$(encdir)/sjis.c' || echo '$(srcdir)/'`$(encdir)/sjis.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/sjis.Tpo $(DEPDIR)/sjis.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/sjis.c' object='sjis.lo' libtool=yes @AMDEPBACKSLASH@
+shift_jis.lo: $(encdir)/shift_jis.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT shift_jis.lo -MD -MP -MF $(DEPDIR)/shift_jis.Tpo -c -o shift_jis.lo `test -f '$(encdir)/shift_jis.c' || echo '$(srcdir)/'`$(encdir)/shift_jis.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/shift_jis.Tpo $(DEPDIR)/shift_jis.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/shift_jis.c' object='shift_jis.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sjis.lo `test -f '$(encdir)/sjis.c' || echo '$(srcdir)/'`$(encdir)/sjis.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o shift_jis.lo `test -f '$(encdir)/shift_jis.c' || echo '$(srcdir)/'`$(encdir)/shift_jis.c
 
-cp932.lo: $(encdir)/cp932.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cp932.lo -MD -MP -MF $(DEPDIR)/cp932.Tpo -c -o cp932.lo `test -f '$(encdir)/cp932.c' || echo '$(srcdir)/'`$(encdir)/cp932.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cp932.Tpo $(DEPDIR)/cp932.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/cp932.c' object='cp932.lo' libtool=yes @AMDEPBACKSLASH@
+windows_31j.lo: $(encdir)/windows_31j.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT windows_31j.lo -MD -MP -MF $(DEPDIR)/windows_31j.Tpo -c -o windows_31j.lo `test -f '$(encdir)/windows_31j.c' || echo '$(srcdir)/'`$(encdir)/windows_31j.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/windows_31j.Tpo $(DEPDIR)/windows_31j.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/windows_31j.c' object='windows_31j.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cp932.lo `test -f '$(encdir)/cp932.c' || echo '$(srcdir)/'`$(encdir)/cp932.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o windows_31j.lo `test -f '$(encdir)/windows_31j.c' || echo '$(srcdir)/'`$(encdir)/windows_31j.c
 
-iso8859_1.lo: $(encdir)/iso8859_1.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_1.lo -MD -MP -MF $(DEPDIR)/iso8859_1.Tpo -c -o iso8859_1.lo `test -f '$(encdir)/iso8859_1.c' || echo '$(srcdir)/'`$(encdir)/iso8859_1.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_1.Tpo $(DEPDIR)/iso8859_1.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_1.c' object='iso8859_1.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_1.lo: $(encdir)/iso_8859_1.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_1.lo -MD -MP -MF $(DEPDIR)/iso_8859_1.Tpo -c -o iso_8859_1.lo `test -f '$(encdir)/iso_8859_1.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_1.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_1.Tpo $(DEPDIR)/iso_8859_1.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_1.c' object='iso_8859_1.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_1.lo `test -f '$(encdir)/iso8859_1.c' || echo '$(srcdir)/'`$(encdir)/iso8859_1.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_1.lo `test -f '$(encdir)/iso_8859_1.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_1.c
 
-iso8859_2.lo: $(encdir)/iso8859_2.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_2.lo -MD -MP -MF $(DEPDIR)/iso8859_2.Tpo -c -o iso8859_2.lo `test -f '$(encdir)/iso8859_2.c' || echo '$(srcdir)/'`$(encdir)/iso8859_2.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_2.Tpo $(DEPDIR)/iso8859_2.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_2.c' object='iso8859_2.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_2.lo: $(encdir)/iso_8859_2.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_2.lo -MD -MP -MF $(DEPDIR)/iso_8859_2.Tpo -c -o iso_8859_2.lo `test -f '$(encdir)/iso_8859_2.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_2.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_2.Tpo $(DEPDIR)/iso_8859_2.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_2.c' object='iso_8859_2.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_2.lo `test -f '$(encdir)/iso8859_2.c' || echo '$(srcdir)/'`$(encdir)/iso8859_2.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_2.lo `test -f '$(encdir)/iso_8859_2.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_2.c
 
-iso8859_3.lo: $(encdir)/iso8859_3.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_3.lo -MD -MP -MF $(DEPDIR)/iso8859_3.Tpo -c -o iso8859_3.lo `test -f '$(encdir)/iso8859_3.c' || echo '$(srcdir)/'`$(encdir)/iso8859_3.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_3.Tpo $(DEPDIR)/iso8859_3.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_3.c' object='iso8859_3.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_3.lo: $(encdir)/iso_8859_3.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_3.lo -MD -MP -MF $(DEPDIR)/iso_8859_3.Tpo -c -o iso_8859_3.lo `test -f '$(encdir)/iso_8859_3.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_3.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_3.Tpo $(DEPDIR)/iso_8859_3.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_3.c' object='iso_8859_3.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_3.lo `test -f '$(encdir)/iso8859_3.c' || echo '$(srcdir)/'`$(encdir)/iso8859_3.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_3.lo `test -f '$(encdir)/iso_8859_3.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_3.c
 
-iso8859_4.lo: $(encdir)/iso8859_4.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_4.lo -MD -MP -MF $(DEPDIR)/iso8859_4.Tpo -c -o iso8859_4.lo `test -f '$(encdir)/iso8859_4.c' || echo '$(srcdir)/'`$(encdir)/iso8859_4.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_4.Tpo $(DEPDIR)/iso8859_4.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_4.c' object='iso8859_4.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_4.lo: $(encdir)/iso_8859_4.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_4.lo -MD -MP -MF $(DEPDIR)/iso_8859_4.Tpo -c -o iso_8859_4.lo `test -f '$(encdir)/iso_8859_4.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_4.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_4.Tpo $(DEPDIR)/iso_8859_4.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_4.c' object='iso_8859_4.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_4.lo `test -f '$(encdir)/iso8859_4.c' || echo '$(srcdir)/'`$(encdir)/iso8859_4.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_4.lo `test -f '$(encdir)/iso_8859_4.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_4.c
 
-iso8859_5.lo: $(encdir)/iso8859_5.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_5.lo -MD -MP -MF $(DEPDIR)/iso8859_5.Tpo -c -o iso8859_5.lo `test -f '$(encdir)/iso8859_5.c' || echo '$(srcdir)/'`$(encdir)/iso8859_5.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_5.Tpo $(DEPDIR)/iso8859_5.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_5.c' object='iso8859_5.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_5.lo: $(encdir)/iso_8859_5.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_5.lo -MD -MP -MF $(DEPDIR)/iso_8859_5.Tpo -c -o iso_8859_5.lo `test -f '$(encdir)/iso_8859_5.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_5.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_5.Tpo $(DEPDIR)/iso_8859_5.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_5.c' object='iso_8859_5.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_5.lo `test -f '$(encdir)/iso8859_5.c' || echo '$(srcdir)/'`$(encdir)/iso8859_5.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_5.lo `test -f '$(encdir)/iso_8859_5.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_5.c
 
-iso8859_6.lo: $(encdir)/iso8859_6.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_6.lo -MD -MP -MF $(DEPDIR)/iso8859_6.Tpo -c -o iso8859_6.lo `test -f '$(encdir)/iso8859_6.c' || echo '$(srcdir)/'`$(encdir)/iso8859_6.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_6.Tpo $(DEPDIR)/iso8859_6.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_6.c' object='iso8859_6.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_6.lo: $(encdir)/iso_8859_6.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_6.lo -MD -MP -MF $(DEPDIR)/iso_8859_6.Tpo -c -o iso_8859_6.lo `test -f '$(encdir)/iso_8859_6.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_6.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_6.Tpo $(DEPDIR)/iso_8859_6.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_6.c' object='iso_8859_6.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_6.lo `test -f '$(encdir)/iso8859_6.c' || echo '$(srcdir)/'`$(encdir)/iso8859_6.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_6.lo `test -f '$(encdir)/iso_8859_6.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_6.c
 
-iso8859_7.lo: $(encdir)/iso8859_7.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_7.lo -MD -MP -MF $(DEPDIR)/iso8859_7.Tpo -c -o iso8859_7.lo `test -f '$(encdir)/iso8859_7.c' || echo '$(srcdir)/'`$(encdir)/iso8859_7.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_7.Tpo $(DEPDIR)/iso8859_7.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_7.c' object='iso8859_7.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_7.lo: $(encdir)/iso_8859_7.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_7.lo -MD -MP -MF $(DEPDIR)/iso_8859_7.Tpo -c -o iso_8859_7.lo `test -f '$(encdir)/iso_8859_7.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_7.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_7.Tpo $(DEPDIR)/iso_8859_7.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_7.c' object='iso_8859_7.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_7.lo `test -f '$(encdir)/iso8859_7.c' || echo '$(srcdir)/'`$(encdir)/iso8859_7.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_7.lo `test -f '$(encdir)/iso_8859_7.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_7.c
 
-iso8859_8.lo: $(encdir)/iso8859_8.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_8.lo -MD -MP -MF $(DEPDIR)/iso8859_8.Tpo -c -o iso8859_8.lo `test -f '$(encdir)/iso8859_8.c' || echo '$(srcdir)/'`$(encdir)/iso8859_8.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_8.Tpo $(DEPDIR)/iso8859_8.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_8.c' object='iso8859_8.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_8.lo: $(encdir)/iso_8859_8.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_8.lo -MD -MP -MF $(DEPDIR)/iso_8859_8.Tpo -c -o iso_8859_8.lo `test -f '$(encdir)/iso_8859_8.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_8.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_8.Tpo $(DEPDIR)/iso_8859_8.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_8.c' object='iso_8859_8.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_8.lo `test -f '$(encdir)/iso8859_8.c' || echo '$(srcdir)/'`$(encdir)/iso8859_8.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_8.lo `test -f '$(encdir)/iso_8859_8.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_8.c
 
-iso8859_9.lo: $(encdir)/iso8859_9.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_9.lo -MD -MP -MF $(DEPDIR)/iso8859_9.Tpo -c -o iso8859_9.lo `test -f '$(encdir)/iso8859_9.c' || echo '$(srcdir)/'`$(encdir)/iso8859_9.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_9.Tpo $(DEPDIR)/iso8859_9.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_9.c' object='iso8859_9.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_9.lo: $(encdir)/iso_8859_9.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_9.lo -MD -MP -MF $(DEPDIR)/iso_8859_9.Tpo -c -o iso_8859_9.lo `test -f '$(encdir)/iso_8859_9.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_9.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_9.Tpo $(DEPDIR)/iso_8859_9.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_9.c' object='iso_8859_9.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_9.lo `test -f '$(encdir)/iso8859_9.c' || echo '$(srcdir)/'`$(encdir)/iso8859_9.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_9.lo `test -f '$(encdir)/iso_8859_9.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_9.c
 
-iso8859_10.lo: $(encdir)/iso8859_10.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_10.lo -MD -MP -MF $(DEPDIR)/iso8859_10.Tpo -c -o iso8859_10.lo `test -f '$(encdir)/iso8859_10.c' || echo '$(srcdir)/'`$(encdir)/iso8859_10.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_10.Tpo $(DEPDIR)/iso8859_10.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_10.c' object='iso8859_10.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_10.lo: $(encdir)/iso_8859_10.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_10.lo -MD -MP -MF $(DEPDIR)/iso_8859_10.Tpo -c -o iso_8859_10.lo `test -f '$(encdir)/iso_8859_10.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_10.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_10.Tpo $(DEPDIR)/iso_8859_10.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_10.c' object='iso_8859_10.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_10.lo `test -f '$(encdir)/iso8859_10.c' || echo '$(srcdir)/'`$(encdir)/iso8859_10.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_10.lo `test -f '$(encdir)/iso_8859_10.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_10.c
 
-iso8859_11.lo: $(encdir)/iso8859_11.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_11.lo -MD -MP -MF $(DEPDIR)/iso8859_11.Tpo -c -o iso8859_11.lo `test -f '$(encdir)/iso8859_11.c' || echo '$(srcdir)/'`$(encdir)/iso8859_11.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_11.Tpo $(DEPDIR)/iso8859_11.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_11.c' object='iso8859_11.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_11.lo: $(encdir)/iso_8859_11.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_11.lo -MD -MP -MF $(DEPDIR)/iso_8859_11.Tpo -c -o iso_8859_11.lo `test -f '$(encdir)/iso_8859_11.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_11.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_11.Tpo $(DEPDIR)/iso_8859_11.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_11.c' object='iso_8859_11.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_11.lo `test -f '$(encdir)/iso8859_11.c' || echo '$(srcdir)/'`$(encdir)/iso8859_11.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_11.lo `test -f '$(encdir)/iso_8859_11.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_11.c
 
-iso8859_13.lo: $(encdir)/iso8859_13.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_13.lo -MD -MP -MF $(DEPDIR)/iso8859_13.Tpo -c -o iso8859_13.lo `test -f '$(encdir)/iso8859_13.c' || echo '$(srcdir)/'`$(encdir)/iso8859_13.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_13.Tpo $(DEPDIR)/iso8859_13.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_13.c' object='iso8859_13.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_13.lo: $(encdir)/iso_8859_13.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_13.lo -MD -MP -MF $(DEPDIR)/iso_8859_13.Tpo -c -o iso_8859_13.lo `test -f '$(encdir)/iso_8859_13.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_13.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_13.Tpo $(DEPDIR)/iso_8859_13.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_13.c' object='iso_8859_13.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_13.lo `test -f '$(encdir)/iso8859_13.c' || echo '$(srcdir)/'`$(encdir)/iso8859_13.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_13.lo `test -f '$(encdir)/iso_8859_13.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_13.c
 
-iso8859_14.lo: $(encdir)/iso8859_14.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_14.lo -MD -MP -MF $(DEPDIR)/iso8859_14.Tpo -c -o iso8859_14.lo `test -f '$(encdir)/iso8859_14.c' || echo '$(srcdir)/'`$(encdir)/iso8859_14.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_14.Tpo $(DEPDIR)/iso8859_14.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_14.c' object='iso8859_14.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_14.lo: $(encdir)/iso_8859_14.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_14.lo -MD -MP -MF $(DEPDIR)/iso_8859_14.Tpo -c -o iso_8859_14.lo `test -f '$(encdir)/iso_8859_14.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_14.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_14.Tpo $(DEPDIR)/iso_8859_14.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_14.c' object='iso_8859_14.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_14.lo `test -f '$(encdir)/iso8859_14.c' || echo '$(srcdir)/'`$(encdir)/iso8859_14.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_14.lo `test -f '$(encdir)/iso_8859_14.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_14.c
 
-iso8859_15.lo: $(encdir)/iso8859_15.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_15.lo -MD -MP -MF $(DEPDIR)/iso8859_15.Tpo -c -o iso8859_15.lo `test -f '$(encdir)/iso8859_15.c' || echo '$(srcdir)/'`$(encdir)/iso8859_15.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_15.Tpo $(DEPDIR)/iso8859_15.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_15.c' object='iso8859_15.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_15.lo: $(encdir)/iso_8859_15.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_15.lo -MD -MP -MF $(DEPDIR)/iso_8859_15.Tpo -c -o iso_8859_15.lo `test -f '$(encdir)/iso_8859_15.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_15.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_15.Tpo $(DEPDIR)/iso_8859_15.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_15.c' object='iso_8859_15.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_15.lo `test -f '$(encdir)/iso8859_15.c' || echo '$(srcdir)/'`$(encdir)/iso8859_15.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_15.lo `test -f '$(encdir)/iso_8859_15.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_15.c
 
-iso8859_16.lo: $(encdir)/iso8859_16.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso8859_16.lo -MD -MP -MF $(DEPDIR)/iso8859_16.Tpo -c -o iso8859_16.lo `test -f '$(encdir)/iso8859_16.c' || echo '$(srcdir)/'`$(encdir)/iso8859_16.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso8859_16.Tpo $(DEPDIR)/iso8859_16.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso8859_16.c' object='iso8859_16.lo' libtool=yes @AMDEPBACKSLASH@
+iso_8859_16.lo: $(encdir)/iso_8859_16.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT iso_8859_16.lo -MD -MP -MF $(DEPDIR)/iso_8859_16.Tpo -c -o iso_8859_16.lo `test -f '$(encdir)/iso_8859_16.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_16.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iso_8859_16.Tpo $(DEPDIR)/iso_8859_16.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/iso_8859_16.c' object='iso_8859_16.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso8859_16.lo `test -f '$(encdir)/iso8859_16.c' || echo '$(srcdir)/'`$(encdir)/iso8859_16.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o iso_8859_16.lo `test -f '$(encdir)/iso_8859_16.c' || echo '$(srcdir)/'`$(encdir)/iso_8859_16.c
 
 euc_tw.lo: $(encdir)/euc_tw.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT euc_tw.lo -MD -MP -MF $(DEPDIR)/euc_tw.Tpo -c -o euc_tw.lo `test -f '$(encdir)/euc_tw.c' || echo '$(srcdir)/'`$(encdir)/euc_tw.c
@@ -798,12 +798,12 @@ koi8_r.lo: $(encdir)/koi8_r.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o koi8_r.lo `test -f '$(encdir)/koi8_r.c' || echo '$(srcdir)/'`$(encdir)/koi8_r.c
 
-cp1251.lo: $(encdir)/cp1251.c
-@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cp1251.lo -MD -MP -MF $(DEPDIR)/cp1251.Tpo -c -o cp1251.lo `test -f '$(encdir)/cp1251.c' || echo '$(srcdir)/'`$(encdir)/cp1251.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cp1251.Tpo $(DEPDIR)/cp1251.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/cp1251.c' object='cp1251.lo' libtool=yes @AMDEPBACKSLASH@
+windows_1251.lo: $(encdir)/windows_1251.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT windows_1251.lo -MD -MP -MF $(DEPDIR)/windows_1251.Tpo -c -o windows_1251.lo `test -f '$(encdir)/windows_1251.c' || echo '$(srcdir)/'`$(encdir)/windows_1251.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/windows_1251.Tpo $(DEPDIR)/windows_1251.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/windows_1251.c' object='windows_1251.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cp1251.lo `test -f '$(encdir)/cp1251.c' || echo '$(srcdir)/'`$(encdir)/cp1251.c
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o windows_1251.lo `test -f '$(encdir)/windows_1251.c' || echo '$(srcdir)/'`$(encdir)/windows_1251.c
 
 testp-testc.o: testc.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(testp_CFLAGS) $(CFLAGS) -MT testp-testc.o -MD -MP -MF $(DEPDIR)/testp-testc.Tpo -c -o testp-testc.o `test -f 'testc.c' || echo '$(srcdir)/'`testc.c

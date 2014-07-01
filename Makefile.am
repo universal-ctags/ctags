@@ -17,21 +17,21 @@ libonig_la_SOURCES = regint.h regparse.h regenc.h st.h \
 	regerror.c regparse.c regext.c regcomp.c regexec.c reggnu.c \
 	regenc.c regsyntax.c regtrav.c regversion.c st.c \
 	regposix.c regposerr.c \
-	$(encdir)/unicode.c $(encdir)/ascii.c $(encdir)/utf8.c \
-	$(encdir)/utf16_be.c $(encdir)/utf16_le.c \
-	$(encdir)/utf32_be.c $(encdir)/utf32_le.c \
+	$(encdir)/unicode.c $(encdir)/ascii.c $(encdir)/utf_8.c \
+	$(encdir)/utf_16be.c $(encdir)/utf_16le.c \
+	$(encdir)/utf_32be.c $(encdir)/utf_32le.c \
 	$(encdir)/unicode/casefold.h $(encdir)/unicode/name2ctype.h \
-	$(encdir)/euc_jp.c $(encdir)/sjis.c $(encdir)/cp932.c \
-	$(encdir)/iso8859_1.c \
-	$(encdir)/iso8859_2.c  $(encdir)/iso8859_3.c \
-	$(encdir)/iso8859_4.c  $(encdir)/iso8859_5.c \
-	$(encdir)/iso8859_6.c  $(encdir)/iso8859_7.c \
-	$(encdir)/iso8859_8.c  $(encdir)/iso8859_9.c \
-	$(encdir)/iso8859_10.c $(encdir)/iso8859_11.c \
-	$(encdir)/iso8859_13.c $(encdir)/iso8859_14.c \
-	$(encdir)/iso8859_15.c $(encdir)/iso8859_16.c \
+	$(encdir)/euc_jp.c $(encdir)/shift_jis.c $(encdir)/windows_31j.c \
+	$(encdir)/iso_8859_1.c \
+	$(encdir)/iso_8859_2.c  $(encdir)/iso_8859_3.c \
+	$(encdir)/iso_8859_4.c  $(encdir)/iso_8859_5.c \
+	$(encdir)/iso_8859_6.c  $(encdir)/iso_8859_7.c \
+	$(encdir)/iso_8859_8.c  $(encdir)/iso_8859_9.c \
+	$(encdir)/iso_8859_10.c $(encdir)/iso_8859_11.c \
+	$(encdir)/iso_8859_13.c $(encdir)/iso_8859_14.c \
+	$(encdir)/iso_8859_15.c $(encdir)/iso_8859_16.c \
 	$(encdir)/euc_tw.c $(encdir)/euc_kr.c $(encdir)/big5.c \
-	$(encdir)/gb18030.c $(encdir)/koi8_r.c $(encdir)/cp1251.c
+	$(encdir)/gb18030.c $(encdir)/koi8_r.c $(encdir)/windows_1251.c
 
 libonig_la_LDFLAGS = -version-info $(LTVERSION)
 
