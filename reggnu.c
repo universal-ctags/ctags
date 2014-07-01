@@ -48,12 +48,13 @@ re_adjust_startpos(regex_t* reg, const char* string, int size,
   if (startpos > 0 && ONIGENC_MBC_MAXLEN(reg->enc) != 1 && startpos < size) {
     UChar *p;
     UChar *s = (UChar* )string + startpos;
+    UChar *e = (UChar* )string + size;
 
     if (range > 0) {
-      p = onigenc_get_right_adjust_char_head(reg->enc, (UChar* )string, s);
+      p = onigenc_get_right_adjust_char_head(reg->enc, (UChar* )string, s, e);
     }
     else {
-      p = ONIGENC_LEFT_ADJUST_CHAR_HEAD(reg->enc, (UChar* )string, s);
+      p = ONIGENC_LEFT_ADJUST_CHAR_HEAD(reg->enc, (UChar* )string, s, e);
     }
     return (int )(p - (UChar* )string);
   }
@@ -85,7 +86,8 @@ re_compile_pattern(const char* pattern, int size, regex_t* reg, char* ebuf)
   int r;
   OnigErrorInfo einfo;
 
-  r = onig_compile(reg, (UChar* )pattern, (UChar* )(pattern + size), &einfo);
+  r = onig_compile(reg, (UChar* )pattern, (UChar* )(pattern + size), &einfo,
+      NULL, 0);
   if (r != ONIG_NORMAL) {
     if (IS_NOT_NULL(ebuf))
       (void )onig_error_code_to_str((UChar* )ebuf, r, &einfo);

@@ -135,7 +135,7 @@ extern int
 regcomp(regex_t* reg, const char* pattern, int posix_options)
 {
   int r, len;
-  OnigSyntaxType* syntax = OnigDefaultSyntax;
+  const OnigSyntaxType* syntax = OnigDefaultSyntax;
   OnigOptionType options;
 
   if ((posix_options & REG_EXTENDED) == 0)

@@ -189,7 +189,7 @@ onig_new_deluxe(regex_t** reg, const UChar* pattern, const UChar* pattern_end,
 		    ci->syntax);
   if (r) goto err;
 
-  r = onig_compile(*reg, cpat, cpat_end, einfo);
+  r = onig_compile(*reg, cpat, cpat_end, einfo, NULL, 0);
   if (r) {
   err:
     onig_free(*reg);

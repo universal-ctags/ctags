@@ -712,7 +712,7 @@ typedef struct {
   int             num_of_elements;
   OnigEncoding    pattern_enc;
   OnigEncoding    target_enc;
-  OnigSyntaxType* syntax;
+  const OnigSyntaxType* syntax;
   OnigOptionType  option;
   OnigCaseFoldType   case_fold_flag;
 } OnigCompileInfo;

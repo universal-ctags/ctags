@@ -5,7 +5,7 @@
 #include <string.h>
 #include "oniguruma.h"
 
-extern int exec(OnigSyntaxType* syntax,
+extern int exec(const OnigSyntaxType* syntax,
 		char* apattern, char* astr)
 {
   int r;
