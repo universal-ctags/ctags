@@ -205,8 +205,7 @@ extern int main(int argc, char* argv[])
   x0(64, "^$",     "\n\r\n",  0,  1,  1,  1);
   x0(65, "^$",     "\r\n\n",  0,  2,  2,  1);
   x0(66, "^a",     "\r\na",   0,  2,  3,  1);
-/*  x0(67, "^a",     "\r\na",  -1,  2,  3,  1); */
-  f0(67, "^a",     "\r\na",  -1,  1);	/* This should not match after the fix of Issue #22. */
+  x0(67, "^a",     "\r\na",  -1,  2,  3,  1);
   f0(68, "^a",     "\r\na",  -2,  1);
 
   onig_end();
