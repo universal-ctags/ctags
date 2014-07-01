@@ -1321,9 +1321,6 @@ typedef struct {
   regoff_t  rm_eo;
 } posix_regmatch_t;
 
-void onig_print_compiled_byte_code(FILE* f, UChar* bp, UChar* bpend, UChar** nextp,
-                              OnigEncoding enc);
-
 /* match data(str - end) from position (sstart). */
 /* if sstart == str then set sprev to NULL. */
 static OnigPosition
