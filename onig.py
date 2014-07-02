@@ -334,16 +334,77 @@ ONIG_INEFFECTIVE_META_CHAR          = 0
 def ONIG_IS_PATTERN_ERROR(ecode):
     return ((ecode) <= -100 and (ecode) > -1000)
 # normal return
-ONIG_NORMAL             =  0
-ONIG_MISMATCH           = -1
-ONIG_NO_SUPPORT_CONFIG  = -2
+ONIG_NORMAL                                             =     0
+ONIG_MISMATCH                                           =    -1
+ONIG_NO_SUPPORT_CONFIG                                  =    -2
 # internal error
+ONIGERR_MEMORY                                          =    -5
+ONIGERR_TYPE_BUG                                        =    -6
+ONIGERR_PARSER_BUG                                      =   -11
+ONIGERR_STACK_BUG                                       =   -12
+ONIGERR_UNDEFINED_BYTECODE                              =   -13
+ONIGERR_UNEXPECTED_BYTECODE                             =   -14
+ONIGERR_MATCH_STACK_LIMIT_OVER                          =   -15
+ONIGERR_DEFAULT_ENCODING_IS_NOT_SET                     =   -21
+ONIGERR_SPECIFIED_ENCODING_CANT_CONVERT_TO_WIDE_CHAR    =   -22
 # general error
-ONIGERR_INVALID_ARGUMENT    = -30
+ONIGERR_INVALID_ARGUMENT                                =   -30
 # syntax error
+ONIGERR_END_PATTERN_AT_LEFT_BRACE                       =  -100
+ONIGERR_END_PATTERN_AT_LEFT_BRACKET                     =  -101
+ONIGERR_EMPTY_CHAR_CLASS                                =  -102
+ONIGERR_PREMATURE_END_OF_CHAR_CLASS                     =  -103
+ONIGERR_END_PATTERN_AT_ESCAPE                           =  -104
+ONIGERR_END_PATTERN_AT_META                             =  -105
+ONIGERR_END_PATTERN_AT_CONTROL                          =  -106
+ONIGERR_META_CODE_SYNTAX                                =  -108
+ONIGERR_CONTROL_CODE_SYNTAX                             =  -109
+ONIGERR_CHAR_CLASS_VALUE_AT_END_OF_RANGE                =  -110
+ONIGERR_CHAR_CLASS_VALUE_AT_START_OF_RANGE              =  -111
+ONIGERR_UNMATCHED_RANGE_SPECIFIER_IN_CHAR_CLASS         =  -112
+ONIGERR_TARGET_OF_REPEAT_OPERATOR_NOT_SPECIFIED         =  -113
+ONIGERR_TARGET_OF_REPEAT_OPERATOR_INVALID               =  -114
+ONIGERR_NESTED_REPEAT_OPERATOR                          =  -115
+ONIGERR_UNMATCHED_CLOSE_PARENTHESIS                     =  -116
+ONIGERR_END_PATTERN_WITH_UNMATCHED_PARENTHESIS          =  -117
+ONIGERR_END_PATTERN_IN_GROUP                            =  -118
+ONIGERR_UNDEFINED_GROUP_OPTION                          =  -119
+ONIGERR_INVALID_POSIX_BRACKET_TYPE                      =  -121
+ONIGERR_INVALID_LOOK_BEHIND_PATTERN                     =  -122
+ONIGERR_INVALID_REPEAT_RANGE_PATTERN                    =  -123
+ONIGERR_INVALID_CONDITION_PATTERN                       =  -124
 # values error (syntax error)
+ONIGERR_TOO_BIG_NUMBER                                  =  -200
+ONIGERR_TOO_BIG_NUMBER_FOR_REPEAT_RANGE                 =  -201
+ONIGERR_UPPER_SMALLER_THAN_LOWER_IN_REPEAT_RANGE        =  -202
+ONIGERR_EMPTY_RANGE_IN_CHAR_CLASS                       =  -203
+ONIGERR_MISMATCH_CODE_LENGTH_IN_CLASS_RANGE             =  -204
+ONIGERR_TOO_MANY_MULTI_BYTE_RANGES                      =  -205
+ONIGERR_TOO_SHORT_MULTI_BYTE_STRING                     =  -206
+ONIGERR_TOO_BIG_BACKREF_NUMBER                          =  -207
+ONIGERR_INVALID_BACKREF                                 =  -208
+ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED            =  -209
+ONIGERR_TOO_SHORT_DIGITS                                =  -210
+ONIGERR_TOO_LONG_WIDE_CHAR_VALUE                        =  -212
+ONIGERR_EMPTY_GROUP_NAME                                =  -214
+ONIGERR_INVALID_GROUP_NAME                              =  -215
+ONIGERR_INVALID_CHAR_IN_GROUP_NAME                      =  -216
+ONIGERR_UNDEFINED_NAME_REFERENCE                        =  -217
+ONIGERR_UNDEFINED_GROUP_REFERENCE                       =  -218
+ONIGERR_MULTIPLEX_DEFINED_NAME                          =  -219
+ONIGERR_MULTIPLEX_DEFINITION_NAME_CALL                  =  -220
+ONIGERR_NEVER_ENDING_RECURSION                          =  -221
+ONIGERR_GROUP_NUMBER_OVER_FOR_CAPTURE_HISTORY           =  -222
+ONIGERR_INVALID_CHAR_PROPERTY_NAME                      =  -223
+ONIGERR_TOO_MANY_CAPTURE_GROUPS                         =  -224
+ONIGERR_INVALID_CODE_POINT_VALUE                        =  -400
+ONIGERR_INVALID_WIDE_CHAR_VALUE                         =  -400
+ONIGERR_TOO_BIG_WIDE_CHAR_VALUE                         =  -401
+ONIGERR_NOT_SUPPORTED_ENCODING_COMBINATION              =  -402
+ONIGERR_INVALID_COMBINATION_OF_OPTIONS                  =  -403
+
 # errors related to thread
-ONIGERR_OVER_THREAD_PASS_LIMIT_COUNT    = -1001
+ONIGERR_OVER_THREAD_PASS_LIMIT_COUNT                    = -1001
 
 
 #
