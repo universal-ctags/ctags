@@ -1120,6 +1120,16 @@ def main():
     x2("(?u)[[:word:]]+", "aあ", 0, 2);
     n("(?u)[[:^word:]]+", "aあ");
 
+    if is_unicode_encoding(onig_encoding):
+        n("(?ia)\\w+", "\u212a\u017f");      # KELVIN SIGN, LATIN SMALL LETTER LONG S
+        n("(?ia)[\\w]+", "\u212a\u017f");
+        n("(?ia)[^\\W]+", "\u212a\u017f");
+        x2("(?ia)[^\\W]+", "ks", 0, 2);
+        n("(?iu)[\\p{ASCII}]", "\u212a");
+        n("(?iu)[\\P{ASCII}]", "s");
+        x2("(?iu)[^s]+", "Ss\u017f ", 3, 4);
+        x2("(?ia)[^s]+", "Ss\u017f ", 3, 4);
+
     # \g{} backref
     x2("((?<name1>\\d)|(?<name2>\\w))(\\g{name1}|\\g{name2})", "ff", 0, 2, syn=onig.ONIG_SYNTAX_PERL);
     x2("(?:(?<x>)|(?<x>efg))\\g{x}", "", 0, 0, syn=onig.ONIG_SYNTAX_PERL);
