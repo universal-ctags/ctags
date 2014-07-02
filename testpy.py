@@ -190,11 +190,11 @@ def set_output_encoding(enc=None):
     if enc is None:
         enc = locale.getpreferredencoding()
 
-    def get_text_writer(fileno, **kwargs):
+    def get_text_writer(fo, **kwargs):
         kw = dict(kwargs)
         kw.setdefault('errors', 'backslashreplace') # use \uXXXX style
         kw.setdefault('closefd', False)
-        writer = io.open(fileno, mode='w', **kw)
+        writer = io.open(fo.fileno(), mode='w', **kw)
 
         # work around for Python 2.x
         write = writer.write    # save the original write() function
@@ -203,8 +203,8 @@ def set_output_encoding(enc=None):
                 if isinstance(s, bytes) else write(s)  # convert to unistr
         return writer
 
-    sys.stdout = get_text_writer(sys.stdout.fileno(), encoding=enc)
-    sys.stderr = get_text_writer(sys.stderr.fileno(), encoding=enc)
+    sys.stdout = get_text_writer(sys.stdout, encoding=enc)
+    sys.stderr = get_text_writer(sys.stderr, encoding=enc)
 
 
 def main():
