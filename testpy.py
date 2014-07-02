@@ -101,11 +101,12 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
         onig.onig_error_code_to_str(msg, r, byref(einfo))
         if r == err:
             nsucc += 1
-            print_result("OK(E)", "%s (/%s/ '%s')" % (msg.value, pattern, target))
+            print_result("OK(E)", "%s (/%s/ '%s')" % \
+                    (msg.value.decode(), pattern, target))
         else:
             nerror += 1
-            print_result("ERROR", "%s (/%s/ '%s')" % (msg.value, pattern, target),
-                    file=sys.stderr)
+            print_result("ERROR", "%s (/%s/ '%s')" % \
+                    (msg.value.decode(), pattern, target), file=sys.stderr)
         return
 
     region = onig.onig_region_new()
@@ -116,11 +117,12 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
         onig.onig_error_code_to_str(msg, r)
         if r == err:
             nsucc += 1
-            print_result("OK(E)", "%s (/%s/ '%s')" % (msg.value, pattern, target))
+            print_result("OK(E)", "%s (/%s/ '%s')" % \
+                    (msg.value.decode(), pattern, target))
         else:
             nerror += 1
-            print_result("ERROR", "%s (/%s/ '%s')" % (msg.value, pattern, target),
-                    file=sys.stderr)
+            print_result("ERROR", "%s (/%s/ '%s')" % \
+                    (msg.value.decode(), pattern, target), file=sys.stderr)
         onig.onig_region_free(region, 1)
         return
 
