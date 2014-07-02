@@ -4460,6 +4460,9 @@ code_exist_check(OnigCodePoint c, UChar* from, UChar* end, int ignore_escaped,
   return 0;
 }
 
+static int cclass_case_fold(Node** np, CClassNode* cc, int ascii_range,
+			    ScanEnv* env);
+
 static int
 parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
 		 ScanEnv* env)
@@ -4468,6 +4471,7 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
   OnigCodePoint v, vs;
   UChar *p;
   Node* node;
+  Node* alt_node = NULL;
   CClassNode *cc, *prev_cc;
   CClassNode work_cc;
 
@@ -5418,6 +5422,7 @@ typedef struct {
   CClassNode* cc;
   Node*       alt_root;
   Node**      ptail;
+  int         ascii_range;
 } IApplyCaseFoldArg;
 
 static int
@@ -5434,7 +5439,8 @@ i_apply_case_fold(OnigCodePoint from, OnigCodePoint to[],
   env = iarg->env;
   cc  = iarg->cc;
   bs = cc->bs;
-  add_flag = (ONIGENC_IS_ASCII_CODE(from) == ONIGENC_IS_ASCII_CODE(*to));
+  add_flag = (! iarg->ascii_range) ||
+	      (ONIGENC_IS_ASCII_CODE(from) == ONIGENC_IS_ASCII_CODE(*to));
 
   if (to_len == 1) {
     int is_in = onig_is_code_in_cc(env->enc, from, cc);
@@ -5505,6 +5511,35 @@ i_apply_case_fold(OnigCodePoint from, OnigCodePoint to[],
   }
 
   return 0;
+}
+
+static int
+cclass_case_fold(Node** np, CClassNode* cc, int ascii_range, ScanEnv* env)
+{
+  int r;
+  IApplyCaseFoldArg iarg;
+
+  iarg.env         = env;
+  iarg.cc          = cc;
+  iarg.alt_root    = NULL_NODE;
+  iarg.ptail       = &(iarg.alt_root);
+  iarg.ascii_range = ascii_range;
+
+  r = ONIGENC_APPLY_ALL_CASE_FOLD(env->enc, env->case_fold_flag,
+				  i_apply_case_fold, &iarg);
+  if (r != 0) {
+    onig_node_free(iarg.alt_root);
+    return r;
+  }
+  if (IS_NOT_NULL(iarg.alt_root)) {
+    Node* work = onig_node_new_alt(*np, iarg.alt_root);
+    if (IS_NULL(work)) {
+      onig_node_free(iarg.alt_root);
+      return ONIGERR_MEMORY;
+    }
+    *np = work;
+  }
+  return r;
 }
 
 static int
@@ -5978,7 +6013,7 @@ parse_exp(Node** np, OnigToken* tok, int term,
       if (r != 0) return r;
 
       cc = NCCLASS(*np);
-      if (is_onechar_cclass(cc, &code)) {
+      if (NTYPE(*np) == NT_CCLASS && is_onechar_cclass(cc, &code)) {
 	onig_node_free(*np);
 	*np = node_new_empty();
 	CHECK_NULL_RETURN_MEMERR(*np);
@@ -5993,6 +6028,7 @@ parse_exp(Node** np, OnigToken* tok, int term,
 	iarg.cc       = cc;
 	iarg.alt_root = NULL_NODE;
 	iarg.ptail    = &(iarg.alt_root);
+	iarg.ascii_range = 1; /* XXX */
 
 	r = ONIGENC_APPLY_ALL_CASE_FOLD(env->enc, env->case_fold_flag,
 					i_apply_case_fold, &iarg);
