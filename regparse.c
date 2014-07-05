@@ -5447,19 +5447,18 @@ i_apply_case_fold(OnigCodePoint from, OnigCodePoint to[],
     }
 #else
     if (is_in != 0) {
-      if (ONIGENC_MBC_MINLEN(env->enc) > 1 || *to >= SINGLE_BYTE_SIZE) {
-	if (IS_NCCLASS_NOT(cc)) clear_not_flag_cclass(cc, env->enc);
-	if (add_flag)
+      if (add_flag) {
+	if (ONIGENC_MBC_MINLEN(env->enc) > 1 || *to >= SINGLE_BYTE_SIZE) {
+	  if (IS_NCCLASS_NOT(cc)) clear_not_flag_cclass(cc, env->enc);
 	  add_code_range(&(cc->mbuf), env, *to, *to);
-      }
-      else {
-	if (IS_NCCLASS_NOT(cc)) {
-	  if (add_flag)
-	    BITSET_CLEAR_BIT(bs, *to);
 	}
 	else {
-	  if (add_flag)
+	  if (IS_NCCLASS_NOT(cc)) {
+	    BITSET_CLEAR_BIT(bs, *to);
+	  }
+	  else {
 	    BITSET_SET_BIT(bs, *to);
+	  }
 	}
       }
     }
