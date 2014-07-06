@@ -121,9 +121,9 @@ test.units: $(CTAGS_TEST)
 		t=$${input%/input.*}; \
 		name=$${t%.d}; \
 		\
-		expected="$$t"/expected; \
+		expected="$$t"/expected.tags; \
 		expectedtmp="$$t"/EXPECTED.TMP; \
-		args="$$t"/args; \
+		args="$$t"/args.ctags; \
 		filter="$$t"/filter; \
 		output="$$t"/OUTPUT.TMP; \
 		diff="$$t"/DIFF.TMP; \

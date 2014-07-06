@@ -31,21 +31,23 @@ The test facility recognizes an input file and an expected
 output file by patterns of file name. Each test case should
 have its own directory under Units directory.
 
-Units/TEST/input.*
+Units/TEST/input.* [requisite]
 
 	Input file name must have a "input" as basename. TEST
 	part should explain the test case well.
 
-Units/TEST/expected
+Units/TEST/expected.tags [requisite]
 
-	Expected output file must have a name "expected". It
+	Expected output file must have a name "expected.tags". It
 	should be the same directory of the input file.
 
-args-*.*
+Units/TEST/args.ctags [optional]
 
-	TBW
+	'-o -' is used as default optional argument when running a
+	unit test ctags. If you want to add more options, enumerate
+	options in args.ctags file. This file is an optional.
 
-filter-*.*
+filter-*.* [optional]
 
 	TBW
 
