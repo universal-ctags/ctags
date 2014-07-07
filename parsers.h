@@ -40,6 +40,7 @@
 	LispParser, \
 	LuaParser, \
 	MakefileParser, \
+	MatLabParser, \
 	ObjcParser, \
 	OcamlParser, \
 	PascalParser, \

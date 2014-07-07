@@ -57,6 +57,7 @@ SOURCES = \
 	strlist.c \
 	tcl.c \
 	tex.c \
+	tg.c \
 	verilog.c \
 	vhdl.c \
 	vim.c \
@@ -123,6 +124,7 @@ OBJECTS = \
 	strlist.$(OBJEXT) \
 	tcl.$(OBJEXT) \
 	tex.$(OBJEXT) \
+	tg.$(OBJEXT) \
 	verilog.$(OBJEXT) \
 	vhdl.$(OBJEXT) \
 	vim.$(OBJEXT) \

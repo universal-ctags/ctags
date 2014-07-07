@@ -50,6 +50,15 @@ typedef struct sKindOption {
 } kindOption;
 
 typedef struct {
+	/* two gram table which represents the
+	   characteristic of its language.
+	   This can be used when file extension
+	   is conflicted another parser. */
+	const char* const extension;
+	const unsigned char* const tg_table;
+} tgTableEntry;
+
+typedef struct {
 	/* defined by parser */
 	char* name;                    /* name of language */
 	kindOption* kinds;             /* tag kinds handled by parser */
@@ -60,6 +69,7 @@ typedef struct {
 	simpleParser parser;           /* simple parser (common case) */
 	rescanParser parser2;          /* rescanning parser (unusual case) */
 	boolean regex;                 /* is this a regex parser? */
+	const tgTableEntry *tg_entries;
 
 	/* used internally */
 	unsigned int id;               /* id assigned to language */
