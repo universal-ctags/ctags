@@ -120,6 +120,7 @@ static langType getPatternLanguage (const char *const fileName)
 }
 
 #ifdef SYS_INTERPRETER
+static langType getEmacsModeLanguageAtFirstLineFromFILE (FILE* const fp);
 
 /*  The name of the language interpreter, either directly or as the argument
  *  to "env".
@@ -150,14 +151,31 @@ static langType getInterpreterLanguage (const char *const fileName)
 		const char* const line = readLine (vLine, fp);
 		if (line != NULL  &&  line [0] == '#'  &&  line [1] == '!')
 		{
-			const char* const lastSlash = strrchr (line, '/');
-			const char *const cmd = lastSlash != NULL ? lastSlash+1 : line+2;
-			vString* const interpreter = determineInterpreter (cmd);
-			result = getExtensionLanguage (vStringValue (interpreter));
-			if (result == LANG_IGNORE)
-				result = getNamedLanguage (vStringValue (interpreter));
-			vStringDelete (interpreter);
+			/* "48.2.4.1 Specifying File Variables" of Emacs info:
+			   ---------------------------------------------------
+			   In shell scripts, the first line is used to
+			   identify the script interpreter, so you
+			   cannot put any local variables there.  To
+			   accommodate this, Emacs looks for local
+			   variable specifications in the _second_
+			   line if the first line specifies an
+			   interpreter.  */
+
+			result = getEmacsModeLanguageAtFirstLineFromFILE (fp);
+			if (result != LANG_IGNORE)
+				goto out;
+			else
+			{
+				const char* const lastSlash = strrchr (line, '/');
+				const char *const cmd = lastSlash != NULL ? lastSlash+1 : line+2;
+				vString* const interpreter = determineInterpreter (cmd);
+				result = getExtensionLanguage (vStringValue (interpreter));
+				if (result == LANG_IGNORE)
+					result = getNamedLanguage (vStringValue (interpreter));
+				vStringDelete (interpreter);
+			}
 		}
+	  out:
 		vStringDelete (vLine);
 		fclose (fp);
 	}
@@ -166,22 +184,261 @@ static langType getInterpreterLanguage (const char *const fileName)
 
 #endif
 
+static vString* determineEmacsModeAtFirstLine (const char* const line)
+{
+	vString* mode = vStringNew ();
+
+	const char* p = strstr(line, "-*-");
+	if (p == NULL)
+		return mode;
+	p += strlen("-*-");
+
+	for ( ;  isspace ((int) *p)  ;  ++p)
+		;  /* no-op */
+
+	if (strncmp(p, "mode:", strlen("mode:")) == 0)
+	{
+		/* -*- mode: MODE; -*- */
+		p += strlen("mode:");
+		for ( ;  isspace ((int) *p)  ;  ++p)
+			;  /* no-op */
+		for ( ;  *p != '\0'  &&  isalnum ((int) *p)  ;  ++p)
+			vStringPut (mode, (int) *p);
+		vStringTerminate (mode);
+	}
+	else
+	{
+		/* -*- MODE -*- */
+		for ( ;  *p != '\0'  &&  isalnum ((int) *p)  ;  ++p)
+			vStringPut (mode, (int) *p);
+		vStringTerminate (mode);
+
+		for ( ;  isspace ((int) *p)  ;  ++p)
+			;  /* no-op */
+		if (strncmp(p, "-*-", strlen("-*-")) != 0)
+			vStringClear (mode);
+	}
+
+	return mode;
+
+}
+
+static langType getEmacsModeLanguageAtFirstLineFromFILE (FILE* const fp)
+{
+	langType result = LANG_IGNORE;
+	vString* const vLine = vStringNew ();
+	const char* const line = readLine (vLine, fp);
+	if (line != NULL)
+	{
+		vString* const mode = determineEmacsModeAtFirstLine (line);
+		result = getExtensionLanguage (vStringValue (mode));
+		if (result == LANG_IGNORE)
+			result = getNamedLanguage (vStringValue (mode));
+		vStringDelete (mode);
+	}
+	vStringDelete (vLine);
+	return result;
+}
+
+static langType getEmacsModeLanguageAtFirstLine (const char *const fileName)
+{
+	langType result = LANG_IGNORE;
+	FILE* const fp = fopen (fileName, "r");
+	if (fp != NULL)
+	{
+		result = getEmacsModeLanguageAtFirstLineFromFILE(fp);
+		fclose (fp);
+	}
+	return result;
+}
+
+static vString* determineEmacsModeAtEOF (FILE* const fp)
+{
+	vString* const vLine = vStringNew ();
+	const char* line;
+	boolean headerFound = FALSE;
+	const char* p;
+	vString* mode = vStringNew ();
+
+	while ((line = readLine (vLine, fp)) != NULL)
+	{
+		if (headerFound && ((p = strstr (line, "mode:")) != NULL))
+		{
+			vStringClear (mode);
+			headerFound = FALSE;
+
+			p += strlen ("mode:");
+			for ( ;  isspace ((int) *p)  ;  ++p)
+				;  /* no-op */
+			for ( ;  *p != '\0'  &&  isalnum ((int) *p)  ;  ++p)
+				vStringPut (mode, (int) *p);
+			vStringTerminate (mode);
+		}
+		else if (headerFound && (p = strstr(line, "End:")))
+			headerFound = FALSE;
+		else if (strstr (line, "Local Variables:"))
+			headerFound = TRUE;
+	}
+	vStringDelete (vLine);
+	return mode;
+}
+
+static langType getEmacsModeLanguageAtEOF (const char *const fileName)
+{
+	langType result = LANG_IGNORE;
+	FILE* const fp = fopen (fileName, "r");
+
+	if (fp == NULL)
+		return result;
+
+	/* "48.2.4.1 Specifying File Variables" of Emacs info:
+	   ---------------------------------------------------
+	   you can define file local variables using a "local
+	   variables list" near the end of the file.  The start of the
+	   local variables list should be no more than 3000 characters
+	   from the end of the file, */
+	fseek(fp, -3000, SEEK_END);
+
+	{
+		vString* const mode = determineEmacsModeAtEOF (fp);
+		result = getExtensionLanguage (vStringValue (mode));
+		if (result == LANG_IGNORE)
+			result = getNamedLanguage (vStringValue (mode));
+		vStringDelete (mode);
+	}
+
+	fclose(fp);
+	return result;
+}
+
+static vString* determineVimFileType (const char *const line)
+{
+	/* considerable combinations:
+	   --------------------------
+	   set ... filetype=
+	   se ... filetype=
+	   set ... ft=
+	   se ... ft= */
+
+	int i, j;
+	const char* p;
+	const char* q;
+
+	const char* const set_prefix[] = {"set ", "se "};
+	const char* const filetype_prefix[] = {"filetype=", "ft="};
+	vString* const filetype = vStringNew ();
+
+	for (i = 0; i < sizeof(set_prefix)/sizeof(set_prefix[0]); i++)
+	{
+		if ((p = strstr(line, set_prefix[i])) == NULL)
+			continue;
+		p += strlen(set_prefix[i]);
+		for (j = 0; j < sizeof(filetype_prefix)/sizeof(filetype_prefix[0]); j++)
+		{
+			if ((q = strstr(p, filetype_prefix[j])) == NULL)
+				continue;
+			q += strlen(filetype_prefix[j]);
+			for ( ;  *q != '\0'  &&  isalnum ((int) *q)  ;  ++q)
+				vStringPut (filetype, (int) *q);
+			vStringTerminate (filetype);
+			goto out;
+		}
+	}
+  out:
+	return filetype;
+}
+
+static langType getVimFileTypeLanguage (const char *const fileName)
+{
+	/* http://vimdoc.sourceforge.net/htmldoc/options.html#modeline
+
+	   [text]{white}{vi:|vim:|ex:}[white]se[t] {options}:[text]
+	   options=> filetype=TYPE or ft=TYPE
+
+	   'modelines' 'mls'	number	(default 5)
+			global
+			{not in Vi}
+	    If 'modeline' is on 'modelines' gives the number of lines that is
+	    checked for set commands. */
+
+	langType result = LANG_IGNORE;
+	FILE* const fp = fopen (fileName, "r");
+#define RING_SIZE 5
+	vString* ring[RING_SIZE];
+	int i, j, k;
+	const char* const prefix[] = {
+		"vim:", "vi:", "ex:"
+	};
+
+	if (fp == NULL)
+		return result;
+
+	for (i = 0; i < RING_SIZE; i++)
+		ring[i] = vStringNew ();
+
+	i = 0;
+	while ((readLine (ring[i++], fp)) != NULL)
+		if (i == RING_SIZE)
+			i = 0;
+
+	j = i;
+	do
+	{
+		const char* p;
+		vString* filetype = NULL;
+
+		j--;
+		if (j < 0)
+			j = RING_SIZE - 1;
+
+		for (k = 0; k < (sizeof(prefix)/sizeof(prefix[0])); k++)
+			if ((p = strstr (vStringValue (ring[j]), prefix[k])) != NULL)
+			{
+				p += strlen(prefix[k]);
+				for ( ;  isspace ((int) *p)  ;  ++p)
+					;  /* no-op */
+				filetype = determineVimFileType(p);
+				break;
+			}
+
+		if (filetype != NULL)
+		{
+			result = getExtensionLanguage (vStringValue (filetype));
+			if (result == LANG_IGNORE)
+				result = getNamedLanguage (vStringValue (filetype));
+			vStringDelete (filetype);
+		}
+	} while (((i == RING_SIZE)? (j != RING_SIZE - 1): (j != i)) && result == LANG_IGNORE);
+
+	for (i = RING_SIZE - 1; i >= 0; i--)
+		vStringDelete (ring[i]);
+
+	fclose(fp);
+#undef RING_SIZE
+	return result;
+
+	/* TODO:
+	   [text]{white}{vi:|vim:|ex:}[white]{options} */
+}
+
 extern langType getFileLanguage (const char *const fileName)
 {
 	langType language = Option.language;
 	if (language == LANG_AUTO)
 	{
-		language = getExtensionLanguage (fileExtension (fileName));
-		if (language == LANG_IGNORE)
-			language = getPatternLanguage (fileName);
+		language = getEmacsModeLanguageAtFirstLine (fileName);
 #ifdef SYS_INTERPRETER
 		if (language == LANG_IGNORE)
-		{
-			fileStatus *status = eStat (fileName);
-			if (status->isExecutable)
-				language = getInterpreterLanguage (fileName);
-		}
+			language = getInterpreterLanguage (fileName);
 #endif
+		if (language == LANG_IGNORE)
+			language = getEmacsModeLanguageAtEOF (fileName);
+		if (language == LANG_IGNORE)
+			language = getVimFileTypeLanguage (fileName);
+		if (language == LANG_IGNORE)
+			language = getExtensionLanguage (fileExtension (fileName));
+		if (language == LANG_IGNORE)
+			language = getPatternLanguage (fileName);
 	}
 	return language;
 }

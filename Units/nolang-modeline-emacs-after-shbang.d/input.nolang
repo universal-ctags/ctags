@@ -1,0 +1,4 @@
+#!/bin/sh
+#| -*- scheme -*- |#
+:; exec gosh -- $0 "$@"
+(define (main args) 1)
