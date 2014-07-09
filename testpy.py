@@ -101,11 +101,12 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
         onig.onig_error_code_to_str(msg, r, byref(einfo))
         if r == err:
             nsucc += 1
-            print_result("OK(E)", "%s (/%s/ '%s')" % (msg.value, pattern, target))
+            print_result("OK(E)", "%s (/%s/ '%s')" % \
+                    (msg.value.decode(), pattern, target))
         else:
             nerror += 1
-            print_result("ERROR", "%s (/%s/ '%s')" % (msg.value, pattern, target),
-                    file=sys.stderr)
+            print_result("ERROR", "%s (/%s/ '%s')" % \
+                    (msg.value.decode(), pattern, target), file=sys.stderr)
         return
 
     region = onig.onig_region_new()
@@ -116,11 +117,12 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
         onig.onig_error_code_to_str(msg, r)
         if r == err:
             nsucc += 1
-            print_result("OK(E)", "%s (/%s/ '%s')" % (msg.value, pattern, target))
+            print_result("OK(E)", "%s (/%s/ '%s')" % \
+                    (msg.value.decode(), pattern, target))
         else:
             nerror += 1
-            print_result("ERROR", "%s (/%s/ '%s')" % (msg.value, pattern, target),
-                    file=sys.stderr)
+            print_result("ERROR", "%s (/%s/ '%s')" % \
+                    (msg.value.decode(), pattern, target), file=sys.stderr)
         onig.onig_region_free(region, 1)
         return
 
@@ -184,6 +186,27 @@ def set_encoding(enc):
     encoding = onig_encoding[0].name.decode()
 
 
+def set_output_encoding(enc=None):
+    if enc is None:
+        enc = locale.getpreferredencoding()
+
+    def get_text_writer(fo, **kwargs):
+        kw = dict(kwargs)
+        kw.setdefault('errors', 'backslashreplace') # use \uXXXX style
+        kw.setdefault('closefd', False)
+        writer = io.open(fo.fileno(), mode='w', **kw)
+
+        # work around for Python 2.x
+        write = writer.write    # save the original write() function
+        enc = locale.getpreferredencoding()
+        writer.write = lambda s: write(s.decode(enc)) \
+                if isinstance(s, bytes) else write(s)  # convert to unistr
+        return writer
+
+    sys.stdout = get_text_writer(sys.stdout, encoding=enc)
+    sys.stderr = get_text_writer(sys.stderr, encoding=enc)
+
+
 def main():
     # set encoding of the test target
     if len(sys.argv) > 1:
@@ -195,26 +218,10 @@ def main():
             sys.exit()
 
     # set encoding of stdout/stderr
+    outenc = None
     if len(sys.argv) > 2:
         outenc = sys.argv[2]
-    else:
-        outenc = locale.getpreferredencoding()
-
-    def get_text_writer(fileno, **kwargs):
-        kw = dict(kwargs)
-        kw.setdefault('errors', 'backslashreplace')
-        kw.setdefault('closefd', False)
-        writer = io.open(fileno, mode='w', **kw)
-
-        # work around for Python 2.x
-        write = writer.write    # save the original write() function
-        enc = locale.getpreferredencoding()
-        writer.write = lambda s: write(s.decode(enc)) \
-                if isinstance(s, bytes) else write(s)  # convert to unistr
-        return writer
-
-    sys.stdout = get_text_writer(sys.stdout.fileno(), encoding=outenc)
-    sys.stderr = get_text_writer(sys.stderr.fileno(), encoding=outenc)
+    set_output_encoding(outenc)
 
     # Copied from onig-5.9.2/testc.c
     #   '?\?' which is used to avoid trigraph is replaced by '??'.

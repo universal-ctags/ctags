@@ -44,6 +44,7 @@ typedef unsigned LONG_LONG st_data_t;
 #endif
 
 typedef struct st_table st_table;
+typedef int st_index_t;
 
 typedef st_data_t st_index_t;
 typedef int st_compare_func(st_data_t, st_data_t);
