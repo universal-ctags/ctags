@@ -10,6 +10,7 @@ typedef uintptr_t st_data_t;
 #define ST_DATA_T_DEFINED
 
 typedef struct st_table st_table;
+typedef int st_index_t;
 
 struct st_hash_type {
     int (*compare)();
