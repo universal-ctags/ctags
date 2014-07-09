@@ -1,5 +1,8 @@
 History of Onigmo (Oniguruma-mod)
 
+2014/07/09: [impl] Merge Ruby's casefold.h which uses gperf.
+                   Merge Ruby r46056-46057, r46266-46273 and r46317
+
 2014/07/01: Version 5.14.1
 
 2014/07/01: [dist] update LTVERSION to "5:1:0". (Issue #37)
