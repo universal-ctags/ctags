@@ -20,7 +20,6 @@ encoding = onig_encoding[0].name.decode()
 _syntax_default = onig.OnigSyntaxType()
 onig.onig_copy_syntax(byref(_syntax_default), onig.ONIG_SYNTAX_DEFAULT)
 _syntax_default.options &= ~onig.ONIG_OPTION_ASCII_RANGE
-_syntax_default.behavior &= ~onig.ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE
 syntax_default = byref(_syntax_default)
 
 
