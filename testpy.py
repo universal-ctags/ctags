@@ -1013,10 +1013,12 @@ def main():
     x2("B (?i:a)", "B a", 0, 3);
     x2("B(?i: a)", "B a", 0, 3);
     if is_unicode_encoding(onig_encoding):
-        x2("(?a)[\p{Space}\d]", "\u00a0", 0, 1)
-        x2("(?a)[\d\p{Space}]", "\u00a0", 0, 1)
-        n("(?a)[^\p{Space}\d]", "\u00a0")
-        n("(?a)[^\d\p{Space}]", "\u00a0")
+        x2("(?a)[\\p{Space}\\d]", "\u00a0", 0, 1)
+        x2("(?a)[\\d\\p{Space}]", "\u00a0", 0, 1)
+        n("(?a)[^\\p{Space}\\d]", "\u00a0")
+        n("(?a)[^\\d\\p{Space}]", "\u00a0")
+        x2("(?d)[[:space:]\\d]", "\u00a0", 0, 1)
+        n("(?d)[^\\d[:space:]]", "\u00a0")
     n("x.*?\\Z$", "x\ny")
     n("x.*?\\Z$", "x\r\ny")
     x2("x.*?\\Z$", "x\n", 0, 1)
@@ -1042,6 +1044,8 @@ def main():
       (?<etag> </ \k<name+1> >){0}
       \g<element>''',
       "<foo>f<bar>bbb</bar>f</foo>", 0, 27, opt=onig.ONIG_OPTION_EXTEND)
+    x2("\\p{Print}+", "\n a", 1, 3)
+    x2("\\p{Graph}+", "\n a", 2, 3)
 
 
     # character classes (tests for character class optimization)
@@ -1158,8 +1162,14 @@ def main():
 
     # multiple name definition
     x2("(?<a>a)(?<a>b)\\k<a>", "aba", 0, 3)
-#    x2("(?<a>a)(?<a>b)(?&a)", "aba", 0, 3)
-#    x2("(?<a>(a|.)(?<a>b))(?&a)", "abcb", 0, 4)
+    x2("(?<a>a)(?<a>b)\\k<a>", "abb", 0, 3)
+    x2("(?<a>a)(?<a>b)\\g{a}", "aba", 0, 3, syn=onig.ONIG_SYNTAX_PERL)
+#    n("(?<a>a)(?<a>b)\\g{a}", "abb", syn=onig.ONIG_SYNTAX_PERL)
+    n("(?<a>a)(?<a>b)\\g<a>", "aba", err=onig.ONIGERR_MULTIPLEX_DEFINITION_NAME_CALL)
+    x2("(?<a>[ac])(?<a>b)(?&a)", "abc", 0, 3, syn=onig.ONIG_SYNTAX_PERL)
+    n("(?<a>[ac])(?<a>b)(?&a)", "abb", syn=onig.ONIG_SYNTAX_PERL)
+    x2("(?:(?<x>abc)|(?<x>efg))(?i:\\k<x>)", "abcefgEFG", 3, 9)
+    x2("(?<x>a)(?<x>b)(?i:\\k<x>)+", "abAB", 0, 4)
 
     # branch reset
 #    x3("(?|(c)|(?:(b)|(a)))", "a", 0, 1, 2)
