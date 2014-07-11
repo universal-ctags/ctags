@@ -47,7 +47,7 @@ EXTRA_DIST = .gitignore oniguruma.pc.in HISTORY README.ja index.html \
 	$(sampledir)/posix.c $(sampledir)/simple.c $(sampledir)/sql.c \
 	$(sampledir)/syntax.c $(sampledir)/crnl.c \
 	test.rb testconv.rb testconvu.rb \
-	onig.py testpy.py
+	onig.py testpy.py .editorconfig
 
 bin_SCRIPTS = onig-config
 
