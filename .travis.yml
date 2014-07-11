@@ -25,13 +25,7 @@ script:
         - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-32LE
         - LD_LIBRARY_PATH=.libs python ./testpy.py UTF-32BE
         - ./sample/crnl
-        - ./sample/encode
-        - ./sample/listcap
-        - ./sample/names
-        - ./sample/posix
-        - ./sample/simple
-        - ./sample/sql
-        - ./sample/syntax
+        - make -C sample test
 
 after_success:
         - lcov -c -d .libs -o coverage.info
