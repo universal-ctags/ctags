@@ -27,7 +27,7 @@ subversion
 
     Rename `code' to $DIR/exuberant.
 
-    If you have exuberant git repo already, do 
+    If you have exuberant git repo already, do
 
     $ git svn fetch
     $ git svn rebase
@@ -62,7 +62,7 @@ subversion
 	 $ git cherry-pick -s -x c81a8ce
 
 	 You can find commit id on the another terminal:
-         <git: local exuberant repo>
+	 <git: local exuberant repo>
 
 	 $ git log
 	 or
@@ -79,18 +79,78 @@ bugs
 ============================================================
 
    <355> - fixed
-   	   02ec2066b5be6b129eba49685bd0b17fef4acfa
+	   02ec2066b5be6b129eba49685bd0b17fef4acfa
 
    <341> - merged the improved version
-   	   216880c5287e0421d9c49898d983144db61c83aa
-   	   
+	   216880c5287e0421d9c49898d983144db61c83aa
 
-patches
+
+patches (https://sourceforge.net/p/ctags/patches/%d)
 ============================================================
 
-   <84> - solved by annother implementation
+Tracking the tickets in patch tracker is quite fruitful.
+Patches are always there. So it is easy to evaluate the value:)
+
+   [(<]TICKET#[>)] TITLE
+	+ STATUS
+	  - MORE STATUS
+
+   <TICKET#> means the ticket is closed from the view of fishman tree
+   developers.  We don't have to take time for this ticket.
+
+   (TICKET#) means the ticket is still opened from the view of fishman
+   tree developers.  We don't have to take time for this ticket.
+
+------------------------------------------------------------
+
+   <84> C++11 new using semantics
+	+ solved by annother implementation
 	  c93e3bfa05b70d7fbc2539454c957eb2169e16b3
 	  502355489b1ba748b1a235641bbd512ba6da315e
+
+   <83> New full non-regex PHP parser
+	+ contributed by the original author
+
+   <82> Support for comments in .ctags files
+	+ contributed by the original author
+	  cab4735e4f99ce23c52b78dc879bc06af66796fd
+
+   <81> ocaml parser segfaults on invalid files
+	+ the bug is not reproduced
+
+   <80> Add support for falcon pl
+	+ contributed by the original author
+
+   <67> Objective C language parser
+	+ This is the implementation is we have in fishman tree.
+
+   <65> absoluteFilename uses strcpy on overlapping strings
+	+ Fixed in exuberant tree, however the ticket is still open.
+	d2bdf505abb7569deae2b50305ea1edce6208557
+
+   <64> Fix strcpy() misuse
+	+ Fixed in exuberant tree, however the ticket is still open.
+	d2bdf505abb7569deae2b50305ea1edce6208557
+
+   (51) Ada support
+	+ Ada support is in prgress in fishman tree.
+
+   (38) Ada support
+	+ Ada support is in prgress in fishman tree.
+
+
+   <33> Add basic ObjC support
+	+ This one is written in regexp.
+	+ we have better objc parser.
+
+    (1) bibtex parser
+	+ Rject because...
+	  - the owner of the ticket is anonymous.
+	  - the name of patch author is not written explicitly at
+	    the header of patch.
+	+ Alternative
+	  https://gist.github.com/ptrv/4576213
+
 
 ctags-devel@sourceforge list
 ============================================================
@@ -100,3 +160,5 @@ ctags-devel@sourceforge list
 
 	Added python, python2 and python3 as extensions of
 	python parser.
+
+	bb81485205c67617f1b34f61341e60b9e8030502
