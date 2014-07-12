@@ -1046,6 +1046,7 @@ def main():
       "<foo>f<bar>bbb</bar>f</foo>", 0, 27, opt=onig.ONIG_OPTION_EXTEND)
     x2("\\p{Print}+", "\n a", 1, 3)
     x2("\\p{Graph}+", "\n a", 2, 3)
+    n("a(?!b)", "ab");
 
 
     # character classes (tests for character class optimization)
