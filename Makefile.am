@@ -115,4 +115,14 @@ testu.c: $(srcdir)/test.rb $(srcdir)/testconvu.rb
 win32/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
 	ruby -Ke $(srcdir)/testconv.rb -win < $(srcdir)/test.rb | nkf -cs > $@
 
+# Python TEST
+pytest:
+	LD_LIBRARY_PATH=.libs python testpy.py EUC-JP
+	LD_LIBRARY_PATH=.libs python testpy.py SJIS
+	LD_LIBRARY_PATH=.libs python testpy.py UTF-8
+	LD_LIBRARY_PATH=.libs python testpy.py UTF-16LE
+	LD_LIBRARY_PATH=.libs python testpy.py UTF-16BE
+	LD_LIBRARY_PATH=.libs python testpy.py UTF-32LE
+	LD_LIBRARY_PATH=.libs python testpy.py UTF-32BE
+
 ## END OF FILE
