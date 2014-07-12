@@ -1123,6 +1123,15 @@ def main():
     x2("(?u)[[:word:]]+", "aあ", 0, 2);
     n("(?u)[[:^word:]]+", "aあ");
 
+    # \< and \>
+    x2("\\<abc\\>", " abc ", 1, 4, syn=onig.ONIG_SYNTAX_GREP)
+    n("\\<abc\\>", "zabc ", syn=onig.ONIG_SYNTAX_GREP)
+    n("\\<abc\\>", " abcd", syn=onig.ONIG_SYNTAX_GREP)
+    n("\\<abc\\>", "あabcい", syn=onig.ONIG_SYNTAX_GREP)
+    x2("\\<abc\\>", "あabcい", 1, 4, syn=onig.ONIG_SYNTAX_GREP, opt=onig.ONIG_OPTION_ASCII_RANGE)
+    n("\\<abc\\>", "zabcい", syn=onig.ONIG_SYNTAX_GREP, opt=onig.ONIG_OPTION_ASCII_RANGE)
+    n("\\<abc\\>", "あabcd", syn=onig.ONIG_SYNTAX_GREP, opt=onig.ONIG_OPTION_ASCII_RANGE)
+
     # \g{} backref
     x2("((?<name1>\\d)|(?<name2>\\w))(\\g{name1}|\\g{name2})", "ff", 0, 2, syn=onig.ONIG_SYNTAX_PERL);
     x2("(?:(?<x>)|(?<x>efg))\\g{x}", "", 0, 0, syn=onig.ONIG_SYNTAX_PERL);
