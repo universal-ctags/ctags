@@ -12,25 +12,32 @@
 #define SIZEOF_LONG_LONG 0
 #define SIZEOF___INT64 8
 #define SIZEOF_OFF_T 4
-#define SIZEOF_VOIDP 4
+#ifdef _WIN64
+# define SIZEOF_VOIDP 8
+#else
+# define SIZEOF_VOIDP 4
+#endif
 #define SIZEOF_FLOAT 4
 #define SIZEOF_DOUBLE 8
 #define HAVE_PROTOTYPES 1
 #define TOKEN_PASTE(x,y) x##y
 #define HAVE_STDARG_PROTOTYPES 1
 #ifndef NORETURN
-#if _MSC_VER > 1100
-#define NORETURN(x) __declspec(noreturn) x
-#else
-#define NORETURN(x) x
-#endif
+# if _MSC_VER > 1100
+#  define NORETURN(x) __declspec(noreturn) x
+# else
+#  define NORETURN(x) x
+# endif
 #endif
 #define HAVE_DECL_SYS_NERR 1
 #define HAVE_LIMITS_H 1
 #define HAVE_FCNTL_H 1
 #define HAVE_SYS_UTIME_H 1
 #if defined(__MINGW32__) || (defined(_MSC_VER) && _MSC_VER >= 1600)
-#define HAVE_STDINT_H 1
+# define HAVE_STDINT_H 1
+#endif
+#if defined(__MINGW32__) || (defined(_MSC_VER) && _MSC_VER >= 1800)
+# define HAVE_INTTYPES_H 1
 #endif
 #define uid_t int
 #define gid_t int
