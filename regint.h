@@ -92,8 +92,6 @@
 #  define ARG_UNUSED
 #endif
 
-/* */
-/* escape other system UChar definition */
 #ifndef RUBY_DEFINES_H
 #include "ruby/ruby.h"
 #undef xmalloc
@@ -101,9 +99,13 @@
 #undef xcalloc
 #undef xfree
 #endif
+
+/* */
+/* escape other system UChar definition */
 #ifdef ONIG_ESCAPE_UCHAR_COLLISION
 #undef ONIG_ESCAPE_UCHAR_COLLISION
 #endif
+
 #define USE_WORD_BEGIN_END          /* "\<": word-begin, "\>": word-end */
 #undef USE_CAPTURE_HISTORY
 #define USE_VARIABLE_META_CHARS
