@@ -1394,7 +1394,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
 #ifdef ONIG_DEBUG_MATCH
   fprintf(stderr, "match_at: str: %"PRIdPTR" (%p), end: %"PRIdPTR" (%p), start: %"PRIdPTR" (%p), sprev: %"PRIdPTR" (%p)\n",
-	  (intptr_t)str, str, (intptr_t)end, end, (intptr_t)sstart, sstart, (intptr_t)sprev, sprev);
+	  (intptr_t )str, str, (intptr_t )end, end, (intptr_t )sstart, sstart, (intptr_t )sprev, sprev);
   fprintf(stderr, "size: %d, start offset: %d\n",
 	  (int )(end - str), (int )(sstart - str));
 #endif
@@ -3187,7 +3187,7 @@ bm_search(regex_t* reg, const UChar* target, const UChar* target_end,
       p = s;
       t = tail;
 #ifdef ONIG_DEBUG_SEARCH
-  fprintf(stderr, "bm_search_loop: pos: %"PRIdPTR" %s\n",
+      fprintf(stderr, "bm_search_loop: pos: %"PRIdPTR" %s\n",
 	  (intptr_t )(s - text), s);
 #endif
       while (*p == *t) {
