@@ -99,10 +99,10 @@
 #undef ONIG_ESCAPE_UCHAR_COLLISION
 #endif
 
-#define USE_WORD_BEGIN_END        /* "\<", "\>" */
+#define USE_WORD_BEGIN_END          /* "\<": word-begin, "\>": word-end */
 #define USE_CAPTURE_HISTORY
 #define USE_VARIABLE_META_CHARS
-#define USE_POSIX_API_REGION_OPTION
+#define USE_POSIX_API_REGION_OPTION     /* needed for POSIX API support */
 #define USE_FIND_LONGEST_SEARCH_ALL_OF_RANGE
 /* #define USE_COMBINATION_EXPLOSION_CHECK */     /* (X*)* */
 
