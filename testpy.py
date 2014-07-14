@@ -20,7 +20,6 @@ encoding = onig_encoding[0].name.decode()
 _syntax_default = onig.OnigSyntaxType()
 onig.onig_copy_syntax(byref(_syntax_default), onig.ONIG_SYNTAX_DEFAULT)
 _syntax_default.options &= ~onig.ONIG_OPTION_ASCII_RANGE
-_syntax_default.behavior &= ~onig.ONIG_SYN_POSIX_BRACKET_ALWAYS_ALL_RANGE
 syntax_default = byref(_syntax_default)
 
 
@@ -1014,10 +1013,12 @@ def main():
     x2("B (?i:a)", "B a", 0, 3);
     x2("B(?i: a)", "B a", 0, 3);
     if is_unicode_encoding(onig_encoding):
-        x2("(?a)[\p{Space}\d]", "\u00a0", 0, 1)
-        x2("(?a)[\d\p{Space}]", "\u00a0", 0, 1)
-        n("(?a)[^\p{Space}\d]", "\u00a0")
-        n("(?a)[^\d\p{Space}]", "\u00a0")
+        x2("(?a)[\\p{Space}\\d]", "\u00a0", 0, 1)
+        x2("(?a)[\\d\\p{Space}]", "\u00a0", 0, 1)
+        n("(?a)[^\\p{Space}\\d]", "\u00a0")
+        n("(?a)[^\\d\\p{Space}]", "\u00a0")
+        x2("(?d)[[:space:]\\d]", "\u00a0", 0, 1)
+        n("(?d)[^\\d[:space:]]", "\u00a0")
     n("x.*?\\Z$", "x\ny")
     n("x.*?\\Z$", "x\r\ny")
     x2("x.*?\\Z$", "x\n", 0, 1)
@@ -1043,7 +1044,15 @@ def main():
       (?<etag> </ \k<name+1> >){0}
       \g<element>''',
       "<foo>f<bar>bbb</bar>f</foo>", 0, 27, opt=onig.ONIG_OPTION_EXTEND)
+    x2("\\p{Print}+", "\n a", 1, 3)
+    x2("\\p{Graph}+", "\n a", 2, 3)
+    n("a(?!b)", "ab");
+    x2("(?:(.)\\1)*", "a" * 300, 0, 300)
+    x2("\\cA\\C-B\\a[\\b]\\t\\n\\v\\f\\r\\e\\c?", "\x01\x02\x07\x08\x09\x0a\x0b\x0c\x0d\x1b\x7f", 0, 11)
 
+    # ONIG_OPTION_FIND_LONGEST option
+    x2("foo|foobar", "foobar", 0, 3)
+    x2("foo|foobar", "foobar", 0, 6, opt=onig.ONIG_OPTION_FIND_LONGEST)
 
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
@@ -1057,7 +1066,9 @@ def main():
     n("a?+a", "a")
     n("a*+a", "aaaa")
     n("a++a", "aaaa")
-#    n("a{2,3}+a", "aaa")    # ONIG_SYNTAX_DEFAULT doesn't support this
+    x2("a{2,3}+a", "aaa", 0, 3) # Not a possessive quantifier in Ruby,
+                                # same as "(?:a{2,3})+a"
+    n("a{2,3}+a", "aaa", syn=onig.ONIG_SYNTAX_PERL)
 
     # linebreak
     x2("\\R", "\n", 0, 1)
@@ -1113,12 +1124,29 @@ def main():
     x2("(?a)\\B", "あ ", 0, 0);
     x2("(?a)\\B", "aあ ", 2, 2);
 
+    x2("(?a)a\\b", " a", 1, 2)
+    x2("(?u)a\\b", " a", 1, 2)
+    n("(?a)a\\B", " a")
+    n("(?a)あ\\b", " あ")
+    x2("(?u)あ\\b", " あ", 1, 2)
+    x2("(?a)あ\\B", " あ", 1, 2)
+    n("(?u)あ\\B", " あ")
+
     x2("(?a)\\p{Alpha}\\P{Alpha}", "a。", 0, 2);
     x2("(?u)\\p{Alpha}\\P{Alpha}", "a。", 0, 2);
     x2("(?a)[[:word:]]+", "aあ", 0, 1);
     x2("(?a)[[:^word:]]+", "aあ", 1, 2);
     x2("(?u)[[:word:]]+", "aあ", 0, 2);
     n("(?u)[[:^word:]]+", "aあ");
+
+    # \< and \>
+    x2("\\<abc\\>", " abc ", 1, 4, syn=onig.ONIG_SYNTAX_GREP)
+    n("\\<abc\\>", "zabc ", syn=onig.ONIG_SYNTAX_GREP)
+    n("\\<abc\\>", " abcd", syn=onig.ONIG_SYNTAX_GREP)
+    n("\\<abc\\>", "あabcい", syn=onig.ONIG_SYNTAX_GREP)
+    x2("\\<abc\\>", "あabcい", 1, 4, syn=onig.ONIG_SYNTAX_GREP, opt=onig.ONIG_OPTION_ASCII_RANGE)
+    n("\\<abc\\>", "zabcい", syn=onig.ONIG_SYNTAX_GREP, opt=onig.ONIG_OPTION_ASCII_RANGE)
+    n("\\<abc\\>", "あabcd", syn=onig.ONIG_SYNTAX_GREP, opt=onig.ONIG_OPTION_ASCII_RANGE)
 
     # \g{} backref
     x2("((?<name1>\\d)|(?<name2>\\w))(\\g{name1}|\\g{name2})", "ff", 0, 2, syn=onig.ONIG_SYNTAX_PERL);
@@ -1159,8 +1187,14 @@ def main():
 
     # multiple name definition
     x2("(?<a>a)(?<a>b)\\k<a>", "aba", 0, 3)
-#    x2("(?<a>a)(?<a>b)(?&a)", "aba", 0, 3)
-#    x2("(?<a>(a|.)(?<a>b))(?&a)", "abcb", 0, 4)
+    x2("(?<a>a)(?<a>b)\\k<a>", "abb", 0, 3)
+    x2("(?<a>a)(?<a>b)\\g{a}", "aba", 0, 3, syn=onig.ONIG_SYNTAX_PERL)
+#    n("(?<a>a)(?<a>b)\\g{a}", "abb", syn=onig.ONIG_SYNTAX_PERL)
+    n("(?<a>a)(?<a>b)\\g<a>", "aba", err=onig.ONIGERR_MULTIPLEX_DEFINITION_NAME_CALL)
+    x2("(?<a>[ac])(?<a>b)(?&a)", "abc", 0, 3, syn=onig.ONIG_SYNTAX_PERL)
+    n("(?<a>[ac])(?<a>b)(?&a)", "abb", syn=onig.ONIG_SYNTAX_PERL)
+    x2("(?:(?<x>abc)|(?<x>efg))(?i:\\k<x>)", "abcefgEFG", 3, 9)
+    x2("(?<x>a)(?<x>b)(?i:\\k<x>)+", "abAB", 0, 4)
 
     # branch reset
 #    x3("(?|(c)|(?:(b)|(a)))", "a", 0, 1, 2)

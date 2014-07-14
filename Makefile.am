@@ -38,7 +38,7 @@ libonig_la_LDFLAGS = -version-info $(LTVERSION)
 EXTRA_DIST = .gitignore oniguruma.pc.in HISTORY README.ja index.html \
 	index_ja.html doc/API doc/API.ja doc/RE doc/RE.ja doc/FAQ doc/FAQ.ja \
 	doc/UnicodeProps.txt \
-	tool/.gitignore tool/CaseFolding.py tool/convert-name2ctype.sh \
+	tool/.gitignore tool/case-folding.rb tool/convert-name2ctype.sh \
 	tool/enc-unicode.rb tool/download-ucd.sh tool/update-doc.py \
 	win32/Makefile win32/Makefile.mingw win32/config.h win32/testc.c \
 	win32/makedef.py win32/onig.rc \
@@ -47,7 +47,7 @@ EXTRA_DIST = .gitignore oniguruma.pc.in HISTORY README.ja index.html \
 	$(sampledir)/posix.c $(sampledir)/simple.c $(sampledir)/sql.c \
 	$(sampledir)/syntax.c $(sampledir)/crnl.c \
 	test.rb testconv.rb testconvu.rb \
-	onig.py testpy.py
+	onig.py testpy.py .editorconfig
 
 bin_SCRIPTS = onig-config
 
@@ -114,5 +114,15 @@ testu.c: $(srcdir)/test.rb $(srcdir)/testconvu.rb
 
 win32/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
 	ruby -Ke $(srcdir)/testconv.rb -win < $(srcdir)/test.rb | nkf -cs > $@
+
+# Python TEST
+pytest:
+	LD_LIBRARY_PATH=.libs python testpy.py EUC-JP
+	LD_LIBRARY_PATH=.libs python testpy.py SJIS
+	LD_LIBRARY_PATH=.libs python testpy.py UTF-8
+	LD_LIBRARY_PATH=.libs python testpy.py UTF-16LE
+	LD_LIBRARY_PATH=.libs python testpy.py UTF-16BE
+	LD_LIBRARY_PATH=.libs python testpy.py UTF-32LE
+	LD_LIBRARY_PATH=.libs python testpy.py UTF-32BE
 
 ## END OF FILE

@@ -277,6 +277,10 @@ extern pthread_mutex_t gOnigMutex;
 # include <stdint.h>
 #endif
 
+#ifdef HAVE_INTTYPES_H
+# include <inttypes.h>
+#endif
+
 #ifdef STDC_HEADERS
 # include <stddef.h>
 #endif
@@ -301,6 +305,18 @@ typedef unsigned int uintptr_t;
 #endif
 #endif
 #endif /* _WIN32 */
+
+#ifndef PRIdPTR
+#ifdef _WIN64
+#define PRIdPTR	"I64d"
+#define PRIuPTR	"I64u"
+#define PRIxPTR	"I64x"
+#else
+#define PRIdPTR	"ld"
+#define PRIuPTR	"lu"
+#define PRIxPTR	"lx"
+#endif
+#endif
 
 #include "regenc.h"
 
