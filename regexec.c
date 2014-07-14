@@ -1393,8 +1393,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 #endif /* USE_SUBEXP_CALL */
 
 #ifdef ONIG_DEBUG_MATCH
-  fprintf(stderr, "match_at: str: %d (%p), end: %d (%p), start: %d (%p), sprev: %d (%p)\n",
-	  (int )str, str, (int )end, end, (int )sstart, sstart, (int )sprev, sprev);
+  fprintf(stderr, "match_at: str: %"PRIdPTR" (%p), end: %"PRIdPTR" (%p), start: %"PRIdPTR" (%p), sprev: %"PRIdPTR" (%p)\n",
+	  (intptr_t)str, str, (intptr_t)end, end, (intptr_t)sstart, sstart, (intptr_t)sprev, sprev);
   fprintf(stderr, "size: %d, start offset: %d\n",
 	  (int )(end - str), (int )(sstart - str));
 #endif
@@ -2545,8 +2545,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	STACK_NULL_CHECK(isnull, mem, s);
 	if (isnull) {
 #ifdef ONIG_DEBUG_MATCH
-	  fprintf(stderr, "NULL_CHECK_END: skip  id:%d, s:%d (%p)\n",
-		  (int )mem, (int )s, s);
+	  fprintf(stderr, "NULL_CHECK_END: skip  id:%d, s:%"PRIdPTR" (%p)\n",
+		  (int )mem, (intptr_t )s, s);
 #endif
 	null_check_found:
 	  /* empty loop founded, skip next instruction */
@@ -2580,8 +2580,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	STACK_NULL_CHECK_MEMST(isnull, mem, s, reg);
 	if (isnull) {
 #ifdef ONIG_DEBUG_MATCH
-	  fprintf(stderr, "NULL_CHECK_END_MEMST: skip  id:%d, s:%d (%p)\n",
-		  (int )mem, (int )s, s);
+	  fprintf(stderr, "NULL_CHECK_END_MEMST: skip  id:%d, s:%"PRIdPTR" (%p)\n",
+		  (int )mem, (intptr_t )s, s);
 #endif
 	  if (isnull == -1) goto fail;
 	  goto null_check_found;
@@ -2606,8 +2606,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 #endif
 	if (isnull) {
 #ifdef ONIG_DEBUG_MATCH
-	  fprintf(stderr, "NULL_CHECK_END_MEMST_PUSH: skip  id:%d, s:%d (%p)\n",
-		  (int )mem, (int )s, s);
+	  fprintf(stderr, "NULL_CHECK_END_MEMST_PUSH: skip  id:%d, s:%"PRIdPTR" (%p)\n",
+		  (int )mem, (intptr_t )s, s);
 #endif
 	  if (isnull == -1) goto fail;
 	  goto null_check_found;
@@ -3117,8 +3117,8 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
   ptrdiff_t skip, tlen1;
 
 #ifdef ONIG_DEBUG_SEARCH
-  fprintf(stderr, "bm_search_notrev: text: %d (%p), text_end: %d (%p), text_range: %d (%p)\n",
-	  (int )text, text, (int )text_end, text_end, (int )text_range, text_range);
+  fprintf(stderr, "bm_search_notrev: text: %"PRIuPTR" (%p), text_end: %"PRIuPTR" (%p), text_range: %"PRIuPTR" (%p)\n",
+	  text, text, text_end, text_end, text_range, text_range);
 #endif
 
   tail = target_end - 1;
@@ -3171,6 +3171,11 @@ bm_search(regex_t* reg, const UChar* target, const UChar* target_end,
   const UChar *s, *t, *p, *end;
   const UChar *tail;
 
+#ifdef ONIG_DEBUG_SEARCH
+  fprintf(stderr, "bm_search: text: %"PRIuPTR", text_end: %"PRIuPTR", text_range: %"PRIuPTR"\n",
+	  text, text_end, text_range);
+#endif
+
   end = text_range + (target_end - target) - 1;
   if (end > text_end)
     end = text_end;
@@ -3181,6 +3186,10 @@ bm_search(regex_t* reg, const UChar* target, const UChar* target_end,
     while (s < end) {
       p = s;
       t = tail;
+#ifdef ONIG_DEBUG_SEARCH
+  fprintf(stderr, "bm_search_loop: pos: %d %s\n",
+	  (int)(s - text), s);
+#endif
       while (*p == *t) {
 	if (t == target) return (UChar* )p;
 	p--; t--;
@@ -3661,8 +3670,8 @@ forward_search_range(regex_t* reg, const UChar* str, const UChar* end, UChar* s,
   UChar *p, *pprev = (UChar* )NULL;
 
 #ifdef ONIG_DEBUG_SEARCH
-  fprintf(stderr, "forward_search_range: str: %d (%p), end: %d (%p), s: %d (%p), range: %d (%p)\n",
-	  (int )str, str, (int )end, end, (int )s, s, (int )range, range);
+  fprintf(stderr, "forward_search_range: str: %"PRIuPTR" (%p), end: %"PRIuPTR" (%p), s: %"PRIuPTR" (%p), range: %"PRIuPTR" (%p)\n",
+	  str, str, end, end, s, s, range, range);
 #endif
 
   p = s;
@@ -3939,8 +3948,8 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 
 #ifdef ONIG_DEBUG_SEARCH
   fprintf(stderr,
-     "onig_search (entry point): str: %d (%p), end: %d, start: %d, range: %d\n",
-     (int )str, str, (int )(end - str), (int )(start - str), (int )(range - str));
+     "onig_search (entry point): str: %"PRIuPTR" (%p), end: %"PRIuPTR", start: %"PRIuPTR", range: %"PRIuPTR"\n",
+     str, str, end - str, start - str, range - str);
 #endif
 
   if (region

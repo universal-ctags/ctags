@@ -5454,14 +5454,14 @@ print_distance_range(FILE* f, OnigDistance a, OnigDistance b)
   if (a == ONIG_INFINITE_DISTANCE)
     fputs("inf", f);
   else
-    fprintf(f, "(%u)", a);
+    fprintf(f, "(%"PRIuSIZE")", a);
 
   fputs("-", f);
 
   if (b == ONIG_INFINITE_DISTANCE)
     fputs("inf", f);
   else
-    fprintf(f, "(%u)", b);
+    fprintf(f, "(%"PRIuSIZE")", b);
 }
 
 static void
@@ -5538,7 +5538,7 @@ print_optimize_info(FILE* f, regex_t* reg)
     for (p = reg->exact; p < reg->exact_end; p++) {
       fputc(*p, f);
     }
-    fprintf(f, "]: length: %d\n", (reg->exact_end - reg->exact));
+    fprintf(f, "]: length: %ld\n", (reg->exact_end - reg->exact));
   }
   else if (reg->optimize & ONIG_OPTIMIZE_MAP) {
     int c, i, n = 0;
@@ -6389,7 +6389,7 @@ onig_print_compiled_byte_code(FILE* f, UChar* bp, UChar** nextp,
 
         GET_POINTER_INC(cc, bp);
         n = bitset_on_num(cc->bs);
-        fprintf(f, ":%u:%d", (unsigned int )cc, n);
+        fprintf(f, ":%"PRIuPTR":%d", (uintptr_t)cc, n);
       }
       break;
 
@@ -6525,9 +6525,9 @@ print_indent_tree(FILE* f, Node* node, int indent)
   case NT_LIST:
   case NT_ALT:
     if (NTYPE(node) == NT_LIST)
-      fprintf(f, "<list:%x>\n", (int )node);
+      fprintf(f, "<list:%"PRIxPTR">\n", (intptr_t)node);
     else
-      fprintf(f, "<alt:%x>\n", (int )node);
+      fprintf(f, "<alt:%"PRIxPTR">\n", (intptr_t)node);
 
     print_indent_tree(f, NCAR(node), indent + add);
     while (IS_NOT_NULL(node = NCDR(node))) {
@@ -6540,8 +6540,8 @@ print_indent_tree(FILE* f, Node* node, int indent)
     break;
 
   case NT_STR:
-    fprintf(f, "<string%s:%x>",
-	    (NSTRING_IS_RAW(node) ? "-raw" : ""), (int )node);
+    fprintf(f, "<string%s:%"PRIxPTR">",
+	    (NSTRING_IS_RAW(node) ? "-raw" : ""), (intptr_t)node);
     for (p = NSTR(node)->s; p < NSTR(node)->end; p++) {
       if (*p >= 0x20 && *p < 0x7f)
 	fputc(*p, f);
@@ -6552,7 +6552,7 @@ print_indent_tree(FILE* f, Node* node, int indent)
     break;
 
   case NT_CCLASS:
-    fprintf(f, "<cclass:%x>", (int )node);
+    fprintf(f, "<cclass:%"PRIxPTR">", (intptr_t)node);
     if (IS_NCCLASS_NOT(NCCLASS(node))) fputs(" not", f);
     if (NCCLASS(node)->mbuf) {
       BBuf* bbuf = NCCLASS(node)->mbuf;
@@ -6564,7 +6564,7 @@ print_indent_tree(FILE* f, Node* node, int indent)
     break;
 
   case NT_CTYPE:
-    fprintf(f, "<ctype:%x> ", (int )node);
+    fprintf(f, "<ctype:%"PRIxPTR"> ", (intptr_t)node);
     switch (NCTYPE(node)->ctype) {
     case ONIGENC_CTYPE_WORD:
       if (NCTYPE(node)->not != 0)
@@ -6580,11 +6580,11 @@ print_indent_tree(FILE* f, Node* node, int indent)
     break;
 
   case NT_CANY:
-    fprintf(f, "<anychar:%x>", (int )node);
+    fprintf(f, "<anychar:%"PRIxPTR">", (intptr_t)node);
     break;
 
   case NT_ANCHOR:
-    fprintf(f, "<anchor:%x> ", (int )node);
+    fprintf(f, "<anchor:%"PRIxPTR"> ", (intptr_t)node);
     switch (NANCHOR(node)->type) {
     case ANCHOR_BEGIN_BUF:      fputs("begin buf",      f); break;
     case ANCHOR_END_BUF:        fputs("end buf",        f); break;
@@ -6617,7 +6617,7 @@ print_indent_tree(FILE* f, Node* node, int indent)
       int* p;
       BRefNode* br = NBREF(node);
       p = BACKREFS_P(br);
-      fprintf(f, "<backref:%x>", (int )node);
+      fprintf(f, "<backref:%"PRIxPTR">", (intptr_t)node);
       for (i = 0; i < br->back_num; i++) {
 	if (i > 0) fputs(", ", f);
 	fprintf(f, "%d", p[i]);
@@ -6629,21 +6629,21 @@ print_indent_tree(FILE* f, Node* node, int indent)
   case NT_CALL:
     {
       CallNode* cn = NCALL(node);
-      fprintf(f, "<call:%x>", (int )node);
+      fprintf(f, "<call:%"PRIxPTR">", (intptr_t)node);
       p_string(f, cn->name_end - cn->name, cn->name);
     }
     break;
 #endif
 
   case NT_QTFR:
-    fprintf(f, "<quantifier:%x>{%d,%d}%s\n", (int )node,
+    fprintf(f, "<quantifier:%"PRIxPTR">{%d,%d}%s\n", (intptr_t)node,
 	    NQTFR(node)->lower, NQTFR(node)->upper,
 	    (NQTFR(node)->greedy ? "" : "?"));
     print_indent_tree(f, NQTFR(node)->target, indent + add);
     break;
 
   case NT_ENCLOSE:
-    fprintf(f, "<enclose:%x> ", (int )node);
+    fprintf(f, "<enclose:%"PRIxPTR"> ", (intptr_t)node);
     switch (NENCLOSE(node)->type) {
     case ENCLOSE_OPTION:
       fprintf(f, "option:%d", NENCLOSE(node)->option);
