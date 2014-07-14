@@ -1047,7 +1047,12 @@ def main():
     x2("\\p{Print}+", "\n a", 1, 3)
     x2("\\p{Graph}+", "\n a", 2, 3)
     n("a(?!b)", "ab");
+    x2("(?:(.)\\1)*", "a" * 300, 0, 300)
+    x2("\\cA\\C-B\\a[\\b]\\t\\n\\v\\f\\r\\e\\c?", "\x01\x02\x07\x08\x09\x0a\x0b\x0c\x0d\x1b\x7f", 0, 11)
 
+    # ONIG_OPTION_FIND_LONGEST option
+    x2("foo|foobar", "foobar", 0, 3)
+    x2("foo|foobar", "foobar", 0, 6, opt=onig.ONIG_OPTION_FIND_LONGEST)
 
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
@@ -1061,7 +1066,9 @@ def main():
     n("a?+a", "a")
     n("a*+a", "aaaa")
     n("a++a", "aaaa")
-#    n("a{2,3}+a", "aaa")    # ONIG_SYNTAX_DEFAULT doesn't support this
+    x2("a{2,3}+a", "aaa", 0, 3) # Not a possessive quantifier in Ruby,
+                                # same as "(?:a{2,3})+a"
+    n("a{2,3}+a", "aaa", syn=onig.ONIG_SYNTAX_PERL)
 
     # linebreak
     x2("\\R", "\n", 0, 1)
@@ -1116,6 +1123,14 @@ def main():
     x2("(?u)\\B", "あ ", 2, 2);
     x2("(?a)\\B", "あ ", 0, 0);
     x2("(?a)\\B", "aあ ", 2, 2);
+
+    x2("(?a)a\\b", " a", 1, 2)
+    x2("(?u)a\\b", " a", 1, 2)
+    n("(?a)a\\B", " a")
+    n("(?a)あ\\b", " あ")
+    x2("(?u)あ\\b", " あ", 1, 2)
+    x2("(?a)あ\\B", " あ", 1, 2)
+    n("(?u)あ\\B", " あ")
 
     x2("(?a)\\p{Alpha}\\P{Alpha}", "a。", 0, 2);
     x2("(?u)\\p{Alpha}\\P{Alpha}", "a。", 0, 2);
