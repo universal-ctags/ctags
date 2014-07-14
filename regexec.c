@@ -3323,8 +3323,8 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
   int (*mbc_enc_len)(const OnigUChar* p) = enc->mbc_enc_len;
 
 #ifdef ONIG_DEBUG_SEARCH
-  fprintf(stderr, "bm_search_notrev: text: %d (%p), text_end: %d (%p), text_range: %d (%p)\n",
-	  (int )text, text, (int )text_end, text_end, (int )text_range, text_range);
+  fprintf(stderr, "bm_search_notrev: text: %"PRIdPTR" (%p), text_end: %"PRIdPTR" (%p), text_range: %"PRIdPTR" (%p)\n",
+	  (intptr_t )text, text, (intptr_t )text_end, text_end, (intptr_t )text_range, text_range);
 #endif
 
   tail = target_end - 1;
@@ -3428,8 +3428,8 @@ bm_search_notrev_ic(regex_t* reg, const UChar* target, const UChar* target_end,
   int case_fold_flag = reg->case_fold_flag;
 
 #ifdef ONIG_DEBUG_SEARCH
-  fprintf(stderr, "bm_search_notrev_ic: text: %d (%p), text_end: %d (%p), text_range: %d (%p)\n",
-	  (int )text, text, (int )text_end, text_end, (int )text_range, text_range);
+  fprintf(stderr, "bm_search_notrev_ic: text: %"PRIdPTR" (%p), text_end: %"PRIdPTR" (%p), text_range: %"PRIdPTR" (%p)\n",
+	  (intptr_t )text, text, (intptr_t )text_end, text_end, (intptr_t )text_range, text_range);
 #endif
 
   tail = target_end - 1;
@@ -3484,8 +3484,8 @@ bm_search_ic(regex_t* reg, const UChar* target, const UChar* target_end,
   int case_fold_flag = reg->case_fold_flag;
 
 #ifdef ONIG_DEBUG_SEARCH
-  fprintf(stderr, "bm_search_ic: text: %d (%p), text_end: %d (%p), text_range: %d (%p)\n",
-	  (int )text, text, (int )text_end, text_end, (int )text_range, text_range);
+  fprintf(stderr, "bm_search_ic: text: %"PRIdPTR" (%p), text_end: %"PRIdPTR" (%p), text_range: %"PRIdPTR" (%p)\n",
+	  (intptr_t )text, text, (intptr_t )text_end, text_end, (intptr_t )text_range, text_range);
 #endif
 
   tail = target_end - 1;
@@ -3671,7 +3671,7 @@ forward_search_range(regex_t* reg, const UChar* str, const UChar* end, UChar* s,
 
 #ifdef ONIG_DEBUG_SEARCH
   fprintf(stderr, "forward_search_range: str: %"PRIuPTR" (%p), end: %"PRIuPTR" (%p), s: %"PRIuPTR" (%p), range: %"PRIuPTR" (%p)\n",
-	  str, str, end, end, s, s, range, range);
+	  (intptr_t )str, str, (intptr_t )end, end, (intptr_t )s, s, (intptr_t )range, range);
 #endif
 
   p = s;
@@ -3784,8 +3784,8 @@ forward_search_range(regex_t* reg, const UChar* str, const UChar* end, UChar* s,
 
 #ifdef ONIG_DEBUG_SEARCH
     fprintf(stderr,
-    "forward_search_range success: low: %d, high: %d, dmin: %d, dmax: %d\n",
-	    (int )(*low - str), (int )(*high - str), reg->dmin, reg->dmax);
+    "forward_search_range success: low: %"PRIdPTR", high: %"PRIdPTR", dmin: %"PRIdPTR", dmax: %"PRIdPTR"\n",
+	    *low - str, *high - str, reg->dmin, reg->dmax);
 #endif
     return 1; /* success */
   }
@@ -3949,7 +3949,7 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 #ifdef ONIG_DEBUG_SEARCH
   fprintf(stderr,
      "onig_search (entry point): str: %"PRIuPTR" (%p), end: %"PRIuPTR", start: %"PRIuPTR", range: %"PRIuPTR"\n",
-     str, str, end - str, start - str, range - str);
+     (intptr_t )str, str, end - str, start - str, range - str);
 #endif
 
   if (region
@@ -4293,7 +4293,7 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 
 #ifdef ONIG_DEBUG
   if (r != ONIG_MISMATCH)
-    fprintf(stderr, "onig_search: error %d\n", r);
+    fprintf(stderr, "onig_search: error %"PRIdPTR"\n", r);
 #endif
   return r;
 
@@ -4303,7 +4303,7 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
   ONIG_STATE_DEC_THREAD(reg);
 #ifdef ONIG_DEBUG
   if (r != ONIG_MISMATCH)
-    fprintf(stderr, "onig_search: error %d\n", r);
+    fprintf(stderr, "onig_search: error %"PRIdPTR"\n", r);
 #endif
   return r;
 
