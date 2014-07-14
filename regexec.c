@@ -3187,8 +3187,8 @@ bm_search(regex_t* reg, const UChar* target, const UChar* target_end,
       p = s;
       t = tail;
 #ifdef ONIG_DEBUG_SEARCH
-  fprintf(stderr, "bm_search_loop: pos: %d %s\n",
-	  (int)(s - text), s);
+  fprintf(stderr, "bm_search_loop: pos: %"PRIdPTR" %s\n",
+	  (intptr_t )(s - text), s);
 #endif
       while (*p == *t) {
 	if (t == target) return (UChar* )p;
