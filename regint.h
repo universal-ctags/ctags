@@ -234,9 +234,7 @@ extern pthread_mutex_t gOnigMutex;
 
 #include <ctype.h>
 #ifdef HAVE_SYS_TYPES_H
-#ifndef __BORLANDC__
 #include <sys/types.h>
-#endif
 #endif
 
 #ifdef HAVE_STDINT_H
