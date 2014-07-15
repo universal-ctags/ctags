@@ -1,5 +1,6 @@
 History of Onigmo (Oniguruma-mod)
 
+2014/07/15: [bug]  /[a-c#]+\W/ =~ "def#" fails when encoding is UTF-16/32
 2014/07/09: [impl] Merge Ruby's casefold.h which uses gperf.
                    Merge Ruby r46056-46057, r46266-46273 and r46317
 
