@@ -1049,6 +1049,7 @@ def main():
     n("a(?!b)", "ab");
     x2("(?:(.)\\1)*", "a" * 300, 0, 300)
     x2("\\cA\\C-B\\a[\\b]\\t\\n\\v\\f\\r\\e\\c?", "\x01\x02\x07\x08\x09\x0a\x0b\x0c\x0d\x1b\x7f", 0, 11)
+    x2("(?<=(?:[a-z]|\\w){3})x", "ab1x", 3, 4)  # repeat inside look-behind
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
@@ -1069,6 +1070,20 @@ def main():
     x2("a{2,3}+a", "aaa", 0, 3) # Not a possessive quantifier in Ruby,
                                 # same as "(?:a{2,3})+a"
     n("a{2,3}+a", "aaa", syn=onig.ONIG_SYNTAX_PERL)
+
+    # automatic possessification
+    x2("\\w+\\W", "abc#", 0, 4)
+    x2("[a-c]+\\W", "abc#", 0, 4)
+    x2("[a-c#]+\\W", "abc#", 0, 4)
+    x2("[^a-c]+\\W", "def#", 0, 4)
+    x2("(?a)[^a-c]+\\W", "def#", 0, 4)
+    x2("a+\\w", "aaaa", 0, 4)
+    x2("#+\\w", "###a", 0, 4)
+    x2("(?a)a+\\w", "aaaa", 0, 4)
+    x2("(?a)あ+\\w", "あああa", 0, 4)
+    x2("[a-c]+[d-f]", "abcd", 0, 4)
+    x2("[^d-f]+[d-f]", "abcd", 0, 4)
+    x2("[a-cあ]+[d-f]", "abcd", 0, 4)
 
     # linebreak
     x2("\\R", "\n", 0, 1)
