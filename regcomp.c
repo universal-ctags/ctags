@@ -2585,6 +2585,7 @@ is_not_included(Node* x, Node* y, regex_t* reg)
 	    return 0;
 	  }
 	  else {
+	    if (IS_NOT_NULL(xc->mbuf)) return 0;
 	    for (i = 0; i < SINGLE_BYTE_SIZE; i++) {
 	      int is_word;
 	      if (NCTYPE(y)->ascii_range)
