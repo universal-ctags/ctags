@@ -3306,7 +3306,7 @@ next_setup(Node* node, Node* next_node, int in_root, regex_t* reg)
 	qn->next_head_exact = n;
       }
 #endif
-      /* automatic possessivation a*b ==> (?>a*)b */
+      /* automatic possessification a*b ==> (?>a*)b */
       if (qn->lower <= 1) {
 	int ttype = NTYPE(qn->target);
 	if (IS_NODE_TYPE_SIMPLE(ttype)) {
