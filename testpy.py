@@ -1050,6 +1050,7 @@ def main():
     x2("(?:(.)\\1)*", "a" * 300, 0, 300)
     x2("\\cA\\C-B\\a[\\b]\\t\\n\\v\\f\\r\\e\\c?", "\x01\x02\x07\x08\x09\x0a\x0b\x0c\x0d\x1b\x7f", 0, 11)
     x2("(?<=(?:[a-z]|\\w){3})x", "ab1x", 3, 4)  # repeat inside look-behind
+    x2("(?<n>(a|b\\g<n>c){3,5}?)", "baaaaca", 1, 4)
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
@@ -1124,6 +1125,9 @@ def main():
     x2("(?-i:(?+1))(?i:(a)){0}", "A", 0, 1, syn=onig.ONIG_SYNTAX_PERL);
     x2("(?-i:\g<+1>)(?i:(a)){0}", "A", 0, 1);
     x2("(?-i:\g'+1')(?i:(a)){0}", "A", 0, 1);
+    n("(.(?=\\g<1>))", "", err=onig.ONIGERR_NEVER_ENDING_RECURSION)
+    n("(a)(?<n>b)\\g<1>\\g<n>", "abab", err=onig.ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED)
+    x2("(a)(?<n>b)(?1)(?&n)", "abab", 0, 4, syn=onig.ONIG_SYNTAX_PERL)
 
     # character set modifiers
     x2("(?u)\\w+", "あa#", 0, 2);
@@ -1235,6 +1239,8 @@ def main():
     x2("((?<x>x)|(?<y>y))(?(<x>)y|x)", "yx", 0, 2)
     n("((?<x>x)|(?<y>y))(?(<x>)y|x)", "xx")
     n("((?<x>x)|(?<y>y))(?(<x>)y|x)", "yy")
+    n("(a)?(?<n>b)?(?(1)a)(?(<n>)b)", "aa", err=onig.ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED)
+    x2("(a)?(?<n>b)?(?(1)a)(?(<n>)b)", "aa", 0, 2, syn=onig.ONIG_SYNTAX_PERL)
 
     # Implicit-anchor optimization
     x2("(?m:.*abc)", "dddabdd\nddabc", 0, 13)   # optimized /(?m:.*abc)/ ==> /\A(?m:.*abc)/
