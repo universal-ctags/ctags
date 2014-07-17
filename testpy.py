@@ -1051,6 +1051,8 @@ def main():
     x2("\\cA\\C-B\\a[\\b]\\t\\n\\v\\f\\r\\e\\c?", "\x01\x02\x07\x08\x09\x0a\x0b\x0c\x0d\x1b\x7f", 0, 11)
     x2("(?<=(?:[a-z]|\\w){3})x", "ab1x", 3, 4)  # repeat inside look-behind
     x2("(?<n>(a|b\\g<n>c){3,5}?)", "baaaaca", 1, 4)
+    x2("\\p{WoRd}", "a", 0, 1)  # property name is not case sensitive
+    n("[[:WoRd:]]", "a", err=onig.ONIGERR_INVALID_POSIX_BRACKET_TYPE)   # POSIX bracket name is case sensitive
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
