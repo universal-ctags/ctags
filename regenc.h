@@ -29,6 +29,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
 #ifndef REGINT_H
 #ifndef RUBY_EXTERN
 #include "ruby/config.h"
@@ -38,6 +39,7 @@
 #undef ONIG_ESCAPE_UCHAR_COLLISION
 #endif
 #endif
+
 #include "ruby/oniguruma.h"
 
 RUBY_SYMBOL_EXPORT_BEGIN
