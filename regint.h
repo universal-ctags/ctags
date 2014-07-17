@@ -153,10 +153,12 @@ extern pthread_mutex_t gOnigMutex;
 
 #endif /* USE_DEFAULT_MULTI_THREAD_SYSTEM */
 
+#ifndef xmalloc
 #define xmalloc     malloc
 #define xrealloc    realloc
 #define xcalloc     calloc
 #define xfree       free
+#endif
 
 #define CHECK_INTERRUPT_IN_MATCH_AT
 
