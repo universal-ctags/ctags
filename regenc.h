@@ -104,7 +104,9 @@ typedef struct {
   short int len;
 } PosixBracketEntryType;
 
-#define PosixBracketEntryInit(name, ctype) {(const UChar *)name, ctype, (short int)(sizeof(name) - 1)}
+#define POSIX_BRACKET_ENTRY_INIT(name, ctype) \
+  {(const UChar* )(name), (ctype), (short int )(sizeof(name) - 1)}
+
 
 #define USE_CRNL_AS_LINE_TERMINATOR
 #define USE_UNICODE_PROPERTIES
