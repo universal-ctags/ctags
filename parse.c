@@ -106,6 +106,30 @@ static langType getExtensionLanguage (const char *const extension)
 	return result;
 }
 
+static langType getExtensionOrNameLanguage (const char *const key, langType start_index)
+{
+	langType result = LANG_IGNORE;
+	unsigned int i;
+
+
+	if (start_index == LANG_AUTO)
+	        start_index = 0;
+	else if (start_index == LANG_IGNORE || start_index >= LanguageCount)
+		return result;
+
+	for (i = start_index  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
+	{
+		const parserDefinition* const lang = LanguageTable [i];
+		stringList* const exts = lang->currentExtensions;
+
+		if (exts != NULL  &&  stringListExtensionMatched (exts, key))
+			result = i;
+		else if (lang->name != NULL && strcasecmp (key, lang->name) == 0)
+			result = i;
+	}
+	return result;
+}
+
 /* If multiple parsers are found, return LANG_AUTO */
 static langType checkExtensionLanguageCandidates (const char *const extension)
 {
@@ -193,9 +217,7 @@ static langType getInterpreterLanguage (const char *const fileName)
 				const char* const lastSlash = strrchr (line, '/');
 				const char *const cmd = lastSlash != NULL ? lastSlash+1 : line+2;
 				vString* const interpreter = determineInterpreter (cmd);
-				result = getExtensionLanguage (vStringValue (interpreter));
-				if (result == LANG_IGNORE)
-					result = getNamedLanguage (vStringValue (interpreter));
+				result = getExtensionOrNameLanguage (vStringValue (interpreter), LANG_AUTO);
 				vStringDelete (interpreter);
 			}
 		}
@@ -255,9 +277,7 @@ static langType getEmacsModeLanguageAtFirstLineFromFILE (FILE* const fp)
 	if (line != NULL)
 	{
 		vString* const mode = determineEmacsModeAtFirstLine (line);
-		result = getExtensionLanguage (vStringValue (mode));
-		if (result == LANG_IGNORE)
-			result = getNamedLanguage (vStringValue (mode));
+		result = getExtensionOrNameLanguage (vStringValue (mode), LANG_AUTO);
 		vStringDelete (mode);
 	}
 	vStringDelete (vLine);
@@ -325,9 +345,7 @@ static langType getEmacsModeLanguageAtEOF (const char *const fileName)
 
 	{
 		vString* const mode = determineEmacsModeAtEOF (fp);
-		result = getExtensionLanguage (vStringValue (mode));
-		if (result == LANG_IGNORE)
-			result = getNamedLanguage (vStringValue (mode));
+		result = getExtensionOrNameLanguage(vStringValue (mode), LANG_AUTO);
 		vStringDelete (mode);
 	}
 
@@ -427,9 +445,7 @@ static langType getVimFileTypeLanguage (const char *const fileName)
 
 		if (filetype != NULL)
 		{
-			result = getExtensionLanguage (vStringValue (filetype));
-			if (result == LANG_IGNORE)
-				result = getNamedLanguage (vStringValue (filetype));
+			result = getExtensionOrNameLanguage (vStringValue (filetype), LANG_AUTO);
 			vStringDelete (filetype);
 		}
 	} while (((i == RING_SIZE)? (j != RING_SIZE - 1): (j != i)) && result == LANG_IGNORE);
