@@ -581,8 +581,8 @@ onigenc_ascii_mbc_case_fold(OnigCaseFoldType flag ARG_UNUSED, const UChar** p,
 
 #if 0
 extern int
-onigenc_ascii_is_mbc_ambiguous(OnigCaseFoldType flag,
-			       const UChar** pp, const UChar* end)
+onigenc_ascii_is_mbc_ambiguous(OnigCaseFoldType flag ARG_UNUSED,
+			       const UChar** pp, const UChar* end ARG_UNUSED)
 {
   const UChar* p = *pp;
 
@@ -692,7 +692,7 @@ onigenc_mbn_mbc_case_fold(OnigEncoding enc, OnigCaseFoldType flag ARG_UNUSED,
 #if 0
 extern int
 onigenc_mbn_is_mbc_ambiguous(OnigEncoding enc, OnigCaseFoldType flag,
-                             const UChar** pp, const UChar* end)
+                             const UChar** pp, const UChar* end ARG_UNUSED)
 {
   const UChar* p = *pp;
 
