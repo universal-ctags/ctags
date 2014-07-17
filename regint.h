@@ -914,9 +914,7 @@ typedef struct {
 
 extern OnigOpInfoType OnigOpInfo[];
 
-#ifdef ONIG_DEBUG
 extern void onig_print_compiled_byte_code P_((FILE* f, UChar* bp, UChar* bpend, UChar** nextp, OnigEncoding enc));
-#endif
 
 #ifdef ONIG_DEBUG_STATISTICS
 extern void onig_statistics_init P_((void));
