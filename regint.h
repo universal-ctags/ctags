@@ -295,6 +295,8 @@ typedef unsigned int uintptr_t;
 #define MIN(a,b) (((a)>(b))?(b):(a))
 #define MAX(a,b) (((a)<(b))?(b):(a))
 
+#define numberof(array) (int)(sizeof(array) / sizeof((array)[0]))
+
 #define IS_NULL(p)                    (((void*)(p)) == (void*)0)
 #define IS_NOT_NULL(p)                (((void*)(p)) != (void*)0)
 #define CHECK_NULL_RETURN(p)          if (IS_NULL(p)) return NULL

@@ -398,9 +398,7 @@ onigenc_ascii_apply_all_case_fold(OnigCaseFoldType flag ARG_UNUSED,
   OnigCodePoint code;
   int i, r;
 
-  for (i = 0;
-       i < (int )(sizeof(OnigAsciiLowerMap)/sizeof(OnigPairCaseFoldCodes));
-       i++) {
+  for (i = 0; i < numberof(OnigAsciiLowerMap); i++) {
     code = OnigAsciiLowerMap[i].to;
     r = (*f)(OnigAsciiLowerMap[i].from, &code, 1, arg);
     if (r != 0) return r;

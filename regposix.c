@@ -123,7 +123,7 @@ onig2posix_error_code(int code)
 
   if (code >= 0) return 0;
 
-  for (i = 0; i < (int )(sizeof(o2p) / sizeof(o2p[0])); i++) {
+  for (i = 0; i < numberof(o2p); i++) {
     if (code == o2p[i].onig_err)
       return o2p[i].posix_err;
   }

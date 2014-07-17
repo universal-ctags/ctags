@@ -4362,7 +4362,7 @@ map_position_value(OnigEncoding enc, int i)
      6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  6,  5,  5,  5,  5,  1
   };
 
-  if (i < (int )(sizeof(ByteValTable)/sizeof(ByteValTable[0]))) {
+  if (i < numberof(ByteValTable)) {
     if (i == 0 && ONIGENC_MBC_MINLEN(enc) > 1)
       return 20;
     else
@@ -4394,7 +4394,7 @@ distance_value(MinMaxLen* mm)
   if (mm->max == ONIG_INFINITE_DISTANCE) return 0;
 
   d = mm->max - mm->min;
-  if (d < sizeof(dist_vals)/sizeof(dist_vals[0]))
+  if (d < numberof(dist_vals))
     /* return dist_vals[d] * 16 / (mm->min + 12); */
     return (int )dist_vals[d];
   else
