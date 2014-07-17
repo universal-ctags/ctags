@@ -746,7 +746,8 @@ name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
 
     e->name = strdup_with_null(reg->enc, name, name_end);
     if (IS_NULL(e->name)) {
-      xfree(e);  return ONIGERR_MEMORY;
+      xfree(e);
+      return ONIGERR_MEMORY;
     }
     onig_st_insert_strend(t, e->name, (e->name + (name_end - name)),
                           (HashDataType )e);
