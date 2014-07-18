@@ -1,4 +1,4 @@
-README.ja  2013/03/21
+README.ja  2014/07/18
 
 鬼雲 (鬼車改)  --  (C) K.Takata <kentkt AT csc DOT jp>
 
@@ -7,7 +7,7 @@ https://github.com/k-takata/Onigmo
 鬼雲は、鬼車から派生した正規表現ライブラリである。
 Perl 5.10以降で新たに導入された正規表現の一部が使用可能になっている。
 
-一部のパッチは Ruby 2.0.0 からマージしている。
+一部のパッチは Ruby 2.x からマージしている。
 
 
 主な新機能:
@@ -28,15 +28,19 @@ Perl 5.10以降で新たに導入された正規表現の一部が使用可能�
 
 新規ソースファイル:
   enc/cp932.c                   CP932 エンコーディング
+  enc/jis/props.h               JIS 文字プロパティーデータ
+  enc/jis/props.kwd             JIS 文字プロパティーデータ
   enc/unicode/casefold.h        Unicodeケースフォールドデータ
   enc/unicode/name2ctype.h      Unicodeプロパティデータ
 
   onig.py                       onig.dll/libonig.so ローダ
   testpy.py                     テストプログラム
 
-  tool/CaseFolding.py           casefold.hを生成
+  tool/download-ucd.sh          Unicode Character Database (UCD)をダウンロード
+  tool/case-folding.rb          UCDからcasefold.hを生成
+  tool/convert-jis-props.sh     props.kwdをprops.hに変換
   tool/convert-name2ctype.sh    name2ctype.kwdをname2ctypes.hに変換
-  tool/enc-unicode.rb           name2ctype.kwdを生成
+  tool/enc-unicode.rb           UCDからname2ctype.kwdを生成
 
   win32/makedef.py              onig.defを作成
   win32/onig.rc                 onig.dll用リソースファイル
