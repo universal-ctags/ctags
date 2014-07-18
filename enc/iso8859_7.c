@@ -188,7 +188,7 @@ apply_all_case_fold(OnigCaseFoldType flag,
 		    OnigApplyAllCaseFoldFunc f, void* arg)
 {
   return onigenc_apply_all_case_fold_with_map(
-             sizeof(CaseFoldMap)/sizeof(OnigPairCaseFoldCodes), CaseFoldMap, 0,
+             numberof(CaseFoldMap), CaseFoldMap, 0,
              flag, f, arg);
 }
 
@@ -197,7 +197,7 @@ get_case_fold_codes_by_str(OnigCaseFoldType flag,
    const OnigUChar* p, const OnigUChar* end, OnigCaseFoldCodeItem items[])
 {
   return onigenc_get_case_fold_codes_by_str_with_map(
-	     sizeof(CaseFoldMap)/sizeof(OnigPairCaseFoldCodes), CaseFoldMap, 0,
+	     numberof(CaseFoldMap), CaseFoldMap, 0,
 	     flag, p, end, items);
 }
 
