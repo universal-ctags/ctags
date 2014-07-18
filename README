@@ -1,4 +1,4 @@
-README  2013/03/21
+README  2014/07/18
 
 Onigmo (Oniguruma-mod)  --  (C) K.Takata <kentkt AT csc DOT jp>
 
@@ -7,7 +7,7 @@ https://github.com/k-takata/Onigmo
 Onigmo is a regular expressions library forked from Oniguruma.
 Some of new features introduced in Perl 5.10+ can be used.
 
-Some patches are merged from Ruby 2.0.0.
+Some patches are merged from Ruby 2.x.
 
 
 Main New features:
@@ -28,15 +28,19 @@ Main New features:
 
 New Source Files:
   enc/cp932.c                   CP932 encoding.
+  enc/jis/props.h               JIS character properties data.
+  enc/jis/props.kwd             JIS character properties data.
   enc/unicode/casefold.h        Unicode case folding data.
   enc/unicode/name2ctype.h      Unicode properties data.
 
   onig.py                       onig.dll/libonig.so loader.
   testpy.py                     test program.
 
-  tool/CaseFolding.py           generates casefold.h.
+  tool/download-ucd.sh          downloads Unicode Character Database (UCD).
+  tool/case-folding.rb          generates casefold.h from UCD.
+  tool/convert-jis-props.sh     converts props.kwd to props.h.
   tool/convert-name2ctype.sh    converts name2ctype.kwd to name2ctypes.h.
-  tool/enc-unicode.rb           generates name2ctype.kwd.
+  tool/enc-unicode.rb           generates name2ctype.kwd from UCD.
 
   win32/makedef.py              creates onig.def.
   win32/onig.rc                 resource file for onig.dll.
