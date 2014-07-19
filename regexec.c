@@ -1397,7 +1397,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  (int )(end - str), (int )(sstart - str));
 #endif
 
-  STACK_PUSH_ENSURED(STK_ALT, (UChar *)FinishCode);  /* bottom stack */
+  STACK_PUSH_ENSURED(STK_ALT, (UChar* )FinishCode);  /* bottom stack */
   best_len = ONIG_MISMATCH;
   s = (UChar* )sstart;
   pkeep = (UChar* )sstart;
