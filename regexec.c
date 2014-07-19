@@ -1332,7 +1332,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 #endif
 	 const UChar* sstart, UChar* sprev, OnigMatchArg* msa)
 {
-  static UChar FinishCode[] = { OP_FINISH };
+  static const UChar FinishCode[] = { OP_FINISH };
 
   int i, num_mem, pop_level;
   ptrdiff_t n, best_len;
@@ -1399,7 +1399,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  (int )(end - str), (int )(sstart - str));
 #endif
 
-  STACK_PUSH_ENSURED(STK_ALT, FinishCode);  /* bottom stack */
+  STACK_PUSH_ENSURED(STK_ALT, (UChar *)FinishCode);  /* bottom stack */
   best_len = ONIG_MISMATCH;
   s = (UChar* )sstart;
   pkeep = (UChar* )sstart;
@@ -4101,7 +4101,7 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
     }
   }
   else if (str == end) { /* empty string */
-    static const UChar* address_for_empty_string = (UChar* )"";
+    static const UChar address_for_empty_string[] = "";
 
 #ifdef ONIG_DEBUG_SEARCH
     fprintf(stderr, "onig_search: empty string.\n");
