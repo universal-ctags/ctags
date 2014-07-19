@@ -35,9 +35,10 @@
 #include "ruby/config.h"
 #include "ruby/defines.h"
 #endif
+#endif
+
 #ifdef ONIG_ESCAPE_UCHAR_COLLISION
 #undef ONIG_ESCAPE_UCHAR_COLLISION
-#endif
 #endif
 
 #include "ruby/oniguruma.h"
