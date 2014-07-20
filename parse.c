@@ -281,16 +281,21 @@ static langType getEmacsModeLanguageAtFirstLineFromFILE (FILE* const fp)
 	return result;
 }
 
-static langType getEmacsModeLanguageAtFirstLine (const char *const fileName)
+static vString* extracEmacsModeAtFirstLine(FILE* input)
 {
-	langType result = LANG_IGNORE;
-	FILE* const fp = fopen (fileName, "r");
-	if (fp != NULL)
+	vString* const vLine = vStringNew ();
+	const char* const line = readLine (vLine, input);
+	vString* mode = NULL;
+	if (line != NULL)
+		mode = determineEmacsModeAtFirstLine (line);
+	vStringDelete (vLine);
+
+	if (mode && (vStringLength(mode) == 0))
 	{
-		result = getEmacsModeLanguageAtFirstLineFromFILE(fp);
-		fclose (fp);
+		vStringDelete(mode);
+		mode = NULL;
 	}
-	return result;
+	return mode;
 }
 
 static vString* determineEmacsModeAtEOF (FILE* const fp)
@@ -571,9 +576,24 @@ extern langType getFileLanguage (const char *const fileName)
 	langType language = Option.language;
 	if (language == LANG_AUTO)
 	{
-		const char *spec;
+		vString* spec;
+		FILE* input;
 
-		language = getEmacsModeLanguageAtFirstLine (fileName);
+		language = LANG_IGNORE;
+
+		input = fopen (fileName, "rb");
+		if (!input)
+			goto nofp;
+
+		if ((spec = extracEmacsModeAtFirstLine (input)))
+		{
+			language = getSpecLanguage (fileName, vStringValue(spec));
+			vStringDelete (spec);
+		}
+		fclose (input);
+
+	  nofp:
+
 #ifdef SYS_INTERPRETER
 		if (language == LANG_IGNORE)
 			language = getInterpreterLanguage (fileName);
@@ -584,8 +604,8 @@ extern langType getFileLanguage (const char *const fileName)
 			language = getVimFileTypeLanguage (fileName);
 		if (language == LANG_IGNORE)
 		{
-			spec = fileExtension (fileName);
-			language = getSpecLanguage(fileName, spec);
+			const char* const ext = fileExtension (fileName);
+			language = getSpecLanguage(fileName, ext);
 		}
 
 		if (language == LANG_IGNORE)
