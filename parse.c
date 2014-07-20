@@ -131,26 +131,23 @@ static langType getExtensionOrNameLanguage (const char *const key, langType star
 }
 
 /* If multiple parsers are found, return LANG_AUTO */
-static langType checkExtensionLanguageCandidates (const char *const extension)
+static unsigned int nominateLanguageCandidates (const char *const key, langType** candidates)
 {
-	langType result = LANG_IGNORE;
-	unsigned int i, count;
+	unsigned int count;
+	langType i;
 
+	*candidates = xMalloc(LanguageCount, langType);
+	for (i = 0; i < LanguageCount; i++)
+		(*candidates)[i] = LANG_IGNORE;
 
-	for (count = 0, i = 0  ;  i < LanguageCount ;  ++i)
+	for (count = 0, i = LANG_AUTO; i != LANG_IGNORE; )
 	{
-		stringList* const exts = LanguageTable [i]->currentExtensions;
-		if (exts != NULL  &&  stringListExtensionMatched (exts, extension))
-		{
-			if (result == LANG_IGNORE)
-				result = i;
-			count++;
-		}
+		i = getExtensionOrNameLanguage(key, i);
+		if (i != LANG_IGNORE)
+			(*candidates)[count++] = i++;
 	}
 
-	if (count > 1)
-		result = LANG_AUTO;
-	return result;
+	return count;
 }
 
 static langType getPatternLanguage (const char *const fileName)
@@ -477,7 +474,7 @@ static const tgTableEntry* const findTgTableEntry(const parserDefinition* const 
 }
 
 static langType determineTwoGramLanguage(const unsigned char *const t,
-					 langType  *candidates, unsigned int n_candidates,
+					 const langType  * const candidates, unsigned int n_candidates,
 					 const char* const extension)
 {
 	unsigned int i, winner;
@@ -503,66 +500,44 @@ static langType determineTwoGramLanguage(const unsigned char *const t,
 	return candidates[winner];
 }
 
-static langType getTwoGramLanguage (const char *const fileName)
+static langType getTwoGramLanguage (const char *const fileName, const char *const spec,
+				    const langType  *const candidates, unsigned int n_candidates)
 {
 	langType result;
-	unsigned int i, count;
-	langType  *candidates;
-	const char* const extension = fileExtension (fileName);
+	unsigned int i;
 
-	candidates = xMalloc(LanguageCount, langType);
-	for (i = 0; i < LanguageCount; i++)
-		candidates[i] = LANG_IGNORE;
-
-	for (count = 0, i = 0  ;  i < LanguageCount  ;  ++i)
-	{
-		stringList* const exts = LanguageTable [i]->currentExtensions;
-		if (exts != NULL  &&  stringListExtensionMatched (exts, extension))
-			candidates[count++] = i;
-	}
-
-	if (count == 0)
-		result = LANG_IGNORE;
-	else if (count == 1)
-		result = candidates[0];
-	else
-	{
-		for (result = LANG_AUTO, i = 0; i < count; i++)
-			if (LanguageTable [candidates[i]]->tg_entries == NULL
-			    || findTgTableEntry(LanguageTable [candidates[i]],
-						extension) == NULL)
-			{
-				result = candidates[0];
-				break;
-			}
-
-		if (result == LANG_AUTO)
+	for (result = LANG_AUTO, i = 0; candidates[i] != LANG_IGNORE; i++)
+		if (LanguageTable [candidates[i]]->tg_entries == NULL
+		    || findTgTableEntry(LanguageTable [candidates[i]], spec) == NULL)
 		{
-			FILE *fp;
-
-			fp = fopen(fileName, "rb");
-			if (fp)
-			{
-				unsigned char* t;
-
-				t = tg_create();
-				tg_load(t, fp);
-				fclose(fp);
-
-				result = determineTwoGramLanguage(t, candidates, count,
-								  extension);
-
-				verbose("tg tournament filename %s winner: %s\n",
-					fileName, LanguageTable[result]->name);
-
-				tg_destroy(t);
-
-			}			else
-				result = LANG_IGNORE;
+			result = LANG_IGNORE;
+			break;
 		}
-	}
 
-	eFree(candidates);
+	if (result == LANG_AUTO)
+	{
+		FILE *fp;
+
+		fp = fopen(fileName, "rb");
+		if (fp)
+		{
+			unsigned char* t;
+
+			t = tg_create();
+			tg_load(t, fp);
+			fclose(fp);
+
+			result = determineTwoGramLanguage(t, candidates, n_candidates, spec);
+
+			verbose("tg tournament filename %s winner: %s\n",
+				fileName, LanguageTable[result]->name);
+
+			tg_destroy(t);
+
+		}
+		else
+			result = LANG_IGNORE;
+	}
 	return result;
 }
 
@@ -571,6 +546,10 @@ extern langType getFileLanguage (const char *const fileName)
 	langType language = Option.language;
 	if (language == LANG_AUTO)
 	{
+		const char *spec;
+		langType  *candidates;
+		unsigned int n_candidates;
+
 		language = getEmacsModeLanguageAtFirstLine (fileName);
 #ifdef SYS_INTERPRETER
 		if (language == LANG_IGNORE)
@@ -581,9 +560,21 @@ extern langType getFileLanguage (const char *const fileName)
 		if (language == LANG_IGNORE)
 			language = getVimFileTypeLanguage (fileName);
 		if (language == LANG_IGNORE)
-			language = checkExtensionLanguageCandidates (fileExtension (fileName));
-		if (language == LANG_AUTO)
-			language = getTwoGramLanguage(fileName);
+		{
+			spec = fileExtension (fileName);
+			n_candidates = nominateLanguageCandidates(spec, &candidates);
+			if (n_candidates == 1)
+				language = candidates[0];
+			else if (n_candidates > 1)
+			{
+				language = getTwoGramLanguage(fileName, spec, candidates, n_candidates);
+				if (language == LANG_IGNORE)
+					language = candidates[0];
+			}
+			eFree(candidates);
+			candidates = NULL;
+		}
+
 		if (language == LANG_IGNORE)
 			language = getPatternLanguage (fileName);
 	}
