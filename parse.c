@@ -470,7 +470,7 @@ static langType determineTwoGramLanguage(const unsigned char *const t,
 	return candidates[winner];
 }
 
-static langType getTwoGramLanguage (const char *const fileName, const char *const spec,
+static langType getTwoGramLanguage (FILE* input, const char *const spec,
 				    const langType  *const candidates, unsigned int n_candidates)
 {
 	langType result;
@@ -486,32 +486,23 @@ static langType getTwoGramLanguage (const char *const fileName, const char *cons
 
 	if (result == LANG_AUTO)
 	{
-		FILE *fp;
 
-		fp = fopen(fileName, "rb");
-		if (fp)
-		{
-			unsigned char* t;
+		unsigned char* t;
 
-			t = tg_create();
-			tg_load(t, fp);
-			fclose(fp);
+		t = tg_create();
+		tg_load(t, input);
 
-			result = determineTwoGramLanguage(t, candidates, n_candidates, spec);
+		result = determineTwoGramLanguage(t, candidates, n_candidates, spec);
 
-			verbose("tg tournament filename %s winner: %s\n",
-				fileName, LanguageTable[result]->name);
+		verbose("winner of tg tournament: %s\n", LanguageTable[result]->name);
 
-			tg_destroy(t);
+		tg_destroy(t);
 
-		}
-		else
-			result = LANG_IGNORE;
 	}
 	return result;
 }
 
-static langType getSpecLanguage (const char *const fileName, const char *const spec)
+static langType getSpecLanguage (const char *const spec, FILE* input)
 {
 	langType language;
 	langType  *candidates;
@@ -519,11 +510,15 @@ static langType getSpecLanguage (const char *const fileName, const char *const s
 
 	n_candidates = nominateLanguageCandidates(spec, &candidates);
 
-	if (n_candidates == 1)
+	if (input == NULL && n_candidates > 1)
+		/* This is needed for backward compatibility
+		   about #line directive behavior. */
+		language = candidates[0];
+	else if (n_candidates == 1)
 		language = candidates[0];
 	else if (n_candidates > 1)
 	{
-		language = getTwoGramLanguage(fileName, spec, candidates, n_candidates);
+		language = getTwoGramLanguage(input, spec, candidates, n_candidates);
 		if (language == LANG_IGNORE)
 			language = candidates[0];
 	}
@@ -548,11 +543,11 @@ extern langType getFileLanguage (const char *const fileName)
 
 		input = fopen (fileName, "rb");
 		if (!input)
-			goto nofp;
+			goto accept_nofile;
 
 		if ((spec = extracEmacsModeAtFirstLine (input)))
 		{
-			language = getSpecLanguage (fileName, vStringValue(spec));
+			language = getSpecLanguage (vStringValue (spec), input);
 			vStringDelete (spec);
 		}
 		rewind(input);
@@ -560,7 +555,7 @@ extern langType getFileLanguage (const char *const fileName)
 #ifdef SYS_INTERPRETER
 		if (language == LANG_IGNORE && (spec = extractInterpreter (input)))
 		{
-			language = getSpecLanguage (fileName, vStringValue(spec));
+			language = getSpecLanguage (vStringValue (spec), input);
 			vStringDelete (spec);
 		}
 		rewind(input);
@@ -568,28 +563,30 @@ extern langType getFileLanguage (const char *const fileName)
 
 		if (language == LANG_IGNORE && (spec = extractEmacsModeLanguageAtEOF (input)))
 		{
-			language = getSpecLanguage (fileName, vStringValue(spec));
+			language = getSpecLanguage (vStringValue (spec), input);
 			vStringDelete (spec);
 		}
 		rewind(input);
 
 		if (language == LANG_IGNORE && (spec = extractVimFileType (input)))
 		{
-			language = getSpecLanguage (fileName, vStringValue(spec));
+			language = getSpecLanguage (vStringValue (spec), input);
 			vStringDelete (spec);
 		}
 		rewind(input);
 
-		fclose (input);
-	  nofp:
+	  accept_nofile:
 		if (language == LANG_IGNORE)
 		{
 			const char* const ext = fileExtension (fileName);
-			language = getSpecLanguage(fileName, ext);
+			language = getSpecLanguage(ext, input);
 		}
 
 		if (language == LANG_IGNORE)
 			language = getPatternLanguage (fileName);
+
+		if (input)
+			fclose (input);
 	}
 	return language;
 }
