@@ -165,7 +165,7 @@ static langType getPatternLanguage (const char *const fileName)
 }
 
 #ifdef SYS_INTERPRETER
-static langType getEmacsModeLanguageAtFirstLineFromFILE (FILE* const fp);
+static vString* extracEmacsModeAtFirstLine(FILE* input);
 
 /*  The name of the language interpreter, either directly or as the argument
  *  to "env".
@@ -186,43 +186,34 @@ static vString* determineInterpreter (const char* const cmd)
 	return interpreter;
 }
 
-static langType getInterpreterLanguage (const char *const fileName)
+static vString* extractInterpreter (FILE* input)
 {
-	langType result = LANG_IGNORE;
-	FILE* const fp = fopen (fileName, "r");
-	if (fp != NULL)
-	{
-		vString* const vLine = vStringNew ();
-		const char* const line = readLine (vLine, fp);
-		if (line != NULL  &&  line [0] == '#'  &&  line [1] == '!')
-		{
-			/* "48.2.4.1 Specifying File Variables" of Emacs info:
-			   ---------------------------------------------------
-			   In shell scripts, the first line is used to
-			   identify the script interpreter, so you
-			   cannot put any local variables there.  To
-			   accommodate this, Emacs looks for local
-			   variable specifications in the _second_
-			   line if the first line specifies an
-			   interpreter.  */
+	vString* const vLine = vStringNew ();
+	const char* const line = readLine (vLine, input);
+	vString* interpreter = NULL;
 
-			result = getEmacsModeLanguageAtFirstLineFromFILE (fp);
-			if (result != LANG_IGNORE)
-				goto out;
-			else
-			{
-				const char* const lastSlash = strrchr (line, '/');
-				const char *const cmd = lastSlash != NULL ? lastSlash+1 : line+2;
-				vString* const interpreter = determineInterpreter (cmd);
-				result = getExtensionOrNameLanguage (vStringValue (interpreter), LANG_AUTO);
-				vStringDelete (interpreter);
-			}
+	if (line != NULL  &&  line [0] == '#'  &&  line [1] == '!')
+	{
+		/* "48.2.4.1 Specifying File Variables" of Emacs info:
+		   ---------------------------------------------------
+		   In shell scripts, the first line is used to
+		   identify the script interpreter, so you
+		   cannot put any local variables there.  To
+		   accommodate this, Emacs looks for local
+		   variable specifications in the _second_
+		   line if the first line specifies an
+		   interpreter.  */
+
+		interpreter = extracEmacsModeAtFirstLine(input);
+		if (!interpreter)
+		{
+			const char* const lastSlash = strrchr (line, '/');
+			const char *const cmd = lastSlash != NULL ? lastSlash+1 : line+2;
+			interpreter = determineInterpreter (cmd);
 		}
-	  out:
-		vStringDelete (vLine);
-		fclose (fp);
 	}
-	return result;
+	vStringDelete (vLine);
+	return interpreter;
 }
 
 #endif
@@ -264,21 +255,6 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 
 	return mode;
 
-}
-
-static langType getEmacsModeLanguageAtFirstLineFromFILE (FILE* const fp)
-{
-	langType result = LANG_IGNORE;
-	vString* const vLine = vStringNew ();
-	const char* const line = readLine (vLine, fp);
-	if (line != NULL)
-	{
-		vString* const mode = determineEmacsModeAtFirstLine (line);
-		result = getExtensionOrNameLanguage (vStringValue (mode), LANG_AUTO);
-		vStringDelete (mode);
-	}
-	vStringDelete (vLine);
-	return result;
 }
 
 static vString* extracEmacsModeAtFirstLine(FILE* input)
@@ -590,14 +566,19 @@ extern langType getFileLanguage (const char *const fileName)
 			language = getSpecLanguage (fileName, vStringValue(spec));
 			vStringDelete (spec);
 		}
+		rewind(input);
+
+#ifdef SYS_INTERPRETER
+		if (language == LANG_IGNORE && (spec = extractInterpreter (input)))
+		{
+			language = getSpecLanguage (fileName, vStringValue(spec));
+			vStringDelete (spec);
+		}
+		rewind(input);
+#endif
 		fclose (input);
 
 	  nofp:
-
-#ifdef SYS_INTERPRETER
-		if (language == LANG_IGNORE)
-			language = getInterpreterLanguage (fileName);
-#endif
 		if (language == LANG_IGNORE)
 			language = getEmacsModeLanguageAtEOF (fileName);
 		if (language == LANG_IGNORE)
