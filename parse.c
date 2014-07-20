@@ -364,7 +364,7 @@ static vString* determineVimFileType (const char *const line)
 	return filetype;
 }
 
-static langType getVimFileTypeLanguage (const char *const fileName)
+static vString* extractVimFileType(FILE* input)
 {
 	/* http://vimdoc.sourceforge.net/htmldoc/options.html#modeline
 
@@ -377,8 +377,7 @@ static langType getVimFileTypeLanguage (const char *const fileName)
 	    If 'modeline' is on 'modelines' gives the number of lines that is
 	    checked for set commands. */
 
-	langType result = LANG_IGNORE;
-	FILE* const fp = fopen (fileName, "r");
+	vString* filetype = NULL;
 #define RING_SIZE 5
 	vString* ring[RING_SIZE];
 	int i, j, k;
@@ -386,14 +385,11 @@ static langType getVimFileTypeLanguage (const char *const fileName)
 		"vim:", "vi:", "ex:"
 	};
 
-	if (fp == NULL)
-		return result;
-
 	for (i = 0; i < RING_SIZE; i++)
 		ring[i] = vStringNew ();
 
 	i = 0;
-	while ((readLine (ring[i++], fp)) != NULL)
+	while ((readLine (ring[i++], input)) != NULL)
 		if (i == RING_SIZE)
 			i = 0;
 
@@ -401,7 +397,6 @@ static langType getVimFileTypeLanguage (const char *const fileName)
 	do
 	{
 		const char* p;
-		vString* filetype = NULL;
 
 		j--;
 		if (j < 0)
@@ -416,20 +411,18 @@ static langType getVimFileTypeLanguage (const char *const fileName)
 				filetype = determineVimFileType(p);
 				break;
 			}
-
-		if (filetype != NULL)
-		{
-			result = getExtensionOrNameLanguage (vStringValue (filetype), LANG_AUTO);
-			vStringDelete (filetype);
-		}
-	} while (((i == RING_SIZE)? (j != RING_SIZE - 1): (j != i)) && result == LANG_IGNORE);
+	} while (((i == RING_SIZE)? (j != RING_SIZE - 1): (j != i)) && (!filetype));
 
 	for (i = RING_SIZE - 1; i >= 0; i--)
 		vStringDelete (ring[i]);
-
-	fclose(fp);
 #undef RING_SIZE
-	return result;
+
+	if (filetype && (vStringLength (filetype) == 0))
+	{
+		vStringDelete (filetype);
+		filetype = NULL;
+        }
+	return filetype;
 
 	/* TODO:
 	   [text]{white}{vi:|vim:|ex:}[white]{options} */
@@ -580,11 +573,15 @@ extern langType getFileLanguage (const char *const fileName)
 		}
 		rewind(input);
 
-		fclose (input);
+		if (language == LANG_IGNORE && (spec = extractVimFileType (input)))
+		{
+			language = getSpecLanguage (fileName, vStringValue(spec));
+			vStringDelete (spec);
+		}
+		rewind(input);
 
+		fclose (input);
 	  nofp:
-		if (language == LANG_IGNORE)
-			language = getVimFileTypeLanguage (fileName);
 		if (language == LANG_IGNORE)
 		{
 			const char* const ext = fileExtension (fileName);
