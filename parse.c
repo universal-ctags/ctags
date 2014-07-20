@@ -541,14 +541,37 @@ static langType getTwoGramLanguage (const char *const fileName, const char *cons
 	return result;
 }
 
+static langType getSpecLanguage (const char *const fileName, const char *const spec)
+{
+	langType language;
+	langType  *candidates;
+	unsigned int n_candidates;
+
+	n_candidates = nominateLanguageCandidates(spec, &candidates);
+
+	if (n_candidates == 1)
+		language = candidates[0];
+	else if (n_candidates > 1)
+	{
+		language = getTwoGramLanguage(fileName, spec, candidates, n_candidates);
+		if (language == LANG_IGNORE)
+			language = candidates[0];
+	}
+	else
+		language = LANG_IGNORE;
+
+	eFree(candidates);
+	candidates = NULL;
+
+	return language;
+}
+
 extern langType getFileLanguage (const char *const fileName)
 {
 	langType language = Option.language;
 	if (language == LANG_AUTO)
 	{
 		const char *spec;
-		langType  *candidates;
-		unsigned int n_candidates;
 
 		language = getEmacsModeLanguageAtFirstLine (fileName);
 #ifdef SYS_INTERPRETER
@@ -562,17 +585,7 @@ extern langType getFileLanguage (const char *const fileName)
 		if (language == LANG_IGNORE)
 		{
 			spec = fileExtension (fileName);
-			n_candidates = nominateLanguageCandidates(spec, &candidates);
-			if (n_candidates == 1)
-				language = candidates[0];
-			else if (n_candidates > 1)
-			{
-				language = getTwoGramLanguage(fileName, spec, candidates, n_candidates);
-				if (language == LANG_IGNORE)
-					language = candidates[0];
-			}
-			eFree(candidates);
-			candidates = NULL;
+			language = getSpecLanguage(fileName, spec);
 		}
 
 		if (language == LANG_IGNORE)
