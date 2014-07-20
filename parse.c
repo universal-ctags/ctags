@@ -305,13 +305,9 @@ static vString* determineEmacsModeAtEOF (FILE* const fp)
 	return mode;
 }
 
-static langType getEmacsModeLanguageAtEOF (const char *const fileName)
+static vString* extractEmacsModeLanguageAtEOF (FILE* input)
 {
-	langType result = LANG_IGNORE;
-	FILE* const fp = fopen (fileName, "r");
-
-	if (fp == NULL)
-		return result;
+	vString* mode;
 
 	/* "48.2.4.1 Specifying File Variables" of Emacs info:
 	   ---------------------------------------------------
@@ -319,16 +315,16 @@ static langType getEmacsModeLanguageAtEOF (const char *const fileName)
 	   variables list" near the end of the file.  The start of the
 	   local variables list should be no more than 3000 characters
 	   from the end of the file, */
-	fseek(fp, -3000, SEEK_END);
+	fseek(input, -3000, SEEK_END);
 
+	mode = determineEmacsModeAtEOF (input);
+	if (mode && (vStringLength (mode) == 0))
 	{
-		vString* const mode = determineEmacsModeAtEOF (fp);
-		result = getExtensionOrNameLanguage(vStringValue (mode), LANG_AUTO);
 		vStringDelete (mode);
+		mode = NULL;
 	}
 
-	fclose(fp);
-	return result;
+	return mode;
 }
 
 static vString* determineVimFileType (const char *const line)
@@ -576,11 +572,17 @@ extern langType getFileLanguage (const char *const fileName)
 		}
 		rewind(input);
 #endif
+
+		if (language == LANG_IGNORE && (spec = extractEmacsModeLanguageAtEOF (input)))
+		{
+			language = getSpecLanguage (fileName, vStringValue(spec));
+			vStringDelete (spec);
+		}
+		rewind(input);
+
 		fclose (input);
 
 	  nofp:
-		if (language == LANG_IGNORE)
-			language = getEmacsModeLanguageAtEOF (fileName);
 		if (language == LANG_IGNORE)
 			language = getVimFileTypeLanguage (fileName);
 		if (language == LANG_IGNORE)
