@@ -540,6 +540,7 @@ extern langType getFileLanguage (const char *const fileName)
 		FILE* input;
 
 		language = LANG_IGNORE;
+		verbose ("Get file language for %s\n", fileName);
 
 		input = fopen (fileName, "rb");
 		if (!input)
@@ -547,6 +548,7 @@ extern langType getFileLanguage (const char *const fileName)
 
 		if ((spec = extracEmacsModeAtFirstLine (input)))
 		{
+			verbose ("	emacs mode at the first line: %s\n", vStringValue (spec));
 			language = getSpecLanguage (vStringValue (spec), input);
 			vStringDelete (spec);
 		}
@@ -555,6 +557,7 @@ extern langType getFileLanguage (const char *const fileName)
 #ifdef SYS_INTERPRETER
 		if (language == LANG_IGNORE && (spec = extractInterpreter (input)))
 		{
+			verbose ("	interpreter: %s\n", vStringValue (spec));
 			language = getSpecLanguage (vStringValue (spec), input);
 			vStringDelete (spec);
 		}
@@ -563,6 +566,7 @@ extern langType getFileLanguage (const char *const fileName)
 
 		if (language == LANG_IGNORE && (spec = extractEmacsModeLanguageAtEOF (input)))
 		{
+			verbose ("	emacs mode at the EOF: %s\n", vStringValue (spec));
 			language = getSpecLanguage (vStringValue (spec), input);
 			vStringDelete (spec);
 		}
@@ -570,6 +574,7 @@ extern langType getFileLanguage (const char *const fileName)
 
 		if (language == LANG_IGNORE && (spec = extractVimFileType (input)))
 		{
+			verbose ("	vim modeline: %s\n", vStringValue (spec));
 			language = getSpecLanguage (vStringValue (spec), input);
 			vStringDelete (spec);
 		}
@@ -579,11 +584,15 @@ extern langType getFileLanguage (const char *const fileName)
 		if (language == LANG_IGNORE)
 		{
 			const char* const ext = fileExtension (fileName);
+			verbose ("	file extension: %s\n", ext);
 			language = getSpecLanguage(ext, input);
 		}
 
 		if (language == LANG_IGNORE)
+		{
+			verbose ("	pattern language\n");
 			language = getPatternLanguage (fileName);
+		}
 
 		if (input)
 			fclose (input);
