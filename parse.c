@@ -106,7 +106,7 @@ static langType getExtensionLanguage (const char *const extension)
 	return result;
 }
 
-static langType getExtensionOrNameLanguage (const char *const key, langType start_index)
+static langType getExtensionOrNameLanguageAndSpec (const char *const key, langType start_index, const char **const spec)
 {
 	langType result = LANG_IGNORE;
 	unsigned int i;
@@ -121,30 +121,57 @@ static langType getExtensionOrNameLanguage (const char *const key, langType star
 	{
 		const parserDefinition* const lang = LanguageTable [i];
 		stringList* const exts = lang->currentExtensions;
+		vString* tmp;
 
-		if (exts != NULL  &&  stringListExtensionMatched (exts, key))
+		if (exts != NULL  &&  (tmp = stringListExtensionFinds (exts, key)))
+		{
 			result = i;
+			*spec = vStringValue(tmp);
+		}
 		else if (lang->name != NULL && strcasecmp (key, lang->name) == 0)
+		{
 			result = i;
+			*spec = lang->name;
+		}
 	}
 	return result;
 }
 
+typedef struct {
+	langType lang;
+	const char* spec;
+}  parserCandidate;
+static parserCandidate* parserCandidateNew(unsigned int count)
+{
+	parserCandidate* candidates;
+	langType i;
+
+	candidates= xMalloc(LanguageCount, parserCandidate);
+	for (i = 0; i < LanguageCount; i++)
+	{
+		candidates[i].lang = LANG_IGNORE;
+		candidates[i].spec = NULL;
+	}
+	return candidates;
+}
+
 /* If multiple parsers are found, return LANG_AUTO */
-static unsigned int nominateLanguageCandidates (const char *const key, langType** candidates)
+static unsigned int nominateLanguageCandidates (const char *const key, parserCandidate** candidates)
 {
 	unsigned int count;
 	langType i;
+	const char* spec;
 
-	*candidates = xMalloc(LanguageCount, langType);
-	for (i = 0; i < LanguageCount; i++)
-		(*candidates)[i] = LANG_IGNORE;
+	*candidates = parserCandidateNew(LanguageCount);
 
 	for (count = 0, i = LANG_AUTO; i != LANG_IGNORE; )
 	{
-		i = getExtensionOrNameLanguage(key, i);
+		i = getExtensionOrNameLanguageAndSpec(key, i, &spec);
 		if (i != LANG_IGNORE)
-			(*candidates)[count++] = i++;
+		{
+			(*candidates)[count].lang = i++;
+			(*candidates)[count++].spec = spec;
+		}
 	}
 
 	return count;
@@ -444,41 +471,40 @@ static const tgTableEntry* const findTgTableEntry(const parserDefinition* const 
 }
 
 static langType determineTwoGramLanguage(const unsigned char *const t,
-					 const langType  * const candidates, unsigned int n_candidates,
-					 const char* const extension)
+					 const parserCandidate * const candidates, unsigned int n_candidates)
 {
 	unsigned int i, winner;
 
 	for (winner = 0, i = 1; i < n_candidates; i++)
 	{
 		int r;
-		const tgTableEntry *const winner_entry = findTgTableEntry(LanguageTable[candidates[winner]],
-									  extension);
-		const tgTableEntry *const i_entry = findTgTableEntry(LanguageTable[candidates[i]],
-								     extension);
+		const tgTableEntry *const winner_entry = findTgTableEntry(LanguageTable[candidates[winner].lang],
+									 candidates[winner].spec);
+		const tgTableEntry *const i_entry = findTgTableEntry(LanguageTable[candidates[i].lang],
+								     candidates[i].spec);
 
 		r = tg_compare(winner_entry->tg_table, i_entry->tg_table, t);
 
 		verbose ("tg tournament %s:%s v.s. %s:%s => %d\n",
-			 LanguageTable[candidates[winner]]->name, winner_entry->extension,
-			 LanguageTable[candidates[i]]->name, i_entry->extension,
+			 LanguageTable[candidates[winner].lang]->name, candidates[winner].spec,
+			 LanguageTable[candidates[i].lang]->name, candidates[i].spec,
 			 r);
 
 		if (r > 0)
 			winner = i;
 	}
-	return candidates[winner];
+	return candidates[winner].lang;
 }
 
-static langType getTwoGramLanguage (FILE* input, const char *const spec,
-				    const langType  *const candidates, unsigned int n_candidates)
+static langType getTwoGramLanguage (FILE* input,
+				    const parserCandidate  *const candidates, unsigned int n_candidates)
 {
 	langType result;
 	unsigned int i;
 
-	for (result = LANG_AUTO, i = 0; candidates[i] != LANG_IGNORE; i++)
-		if (LanguageTable [candidates[i]]->tg_entries == NULL
-		    || findTgTableEntry(LanguageTable [candidates[i]], spec) == NULL)
+	for (result = LANG_AUTO, i = 0; candidates[i].lang != LANG_IGNORE; i++)
+		if (LanguageTable [candidates[i].lang]->tg_entries == NULL
+		    || findTgTableEntry(LanguageTable [candidates[i].lang], candidates[i].spec) == NULL)
 		{
 			result = LANG_IGNORE;
 			break;
@@ -492,7 +518,7 @@ static langType getTwoGramLanguage (FILE* input, const char *const spec,
 		t = tg_create();
 		tg_load(t, input);
 
-		result = determineTwoGramLanguage(t, candidates, n_candidates, spec);
+		result = determineTwoGramLanguage(t, candidates, n_candidates);
 
 		verbose("winner of tg tournament: %s\n", LanguageTable[result]->name);
 
@@ -505,7 +531,7 @@ static langType getTwoGramLanguage (FILE* input, const char *const spec,
 static langType getSpecLanguage (const char *const spec, FILE* input)
 {
 	langType language;
-	langType  *candidates;
+	parserCandidate  *candidates;
 	unsigned int n_candidates;
 
 	n_candidates = nominateLanguageCandidates(spec, &candidates);
@@ -513,14 +539,14 @@ static langType getSpecLanguage (const char *const spec, FILE* input)
 	if (input == NULL && n_candidates > 1)
 		/* This is needed for backward compatibility
 		   about #line directive behavior. */
-		language = candidates[0];
+		language = candidates[0].lang;
 	else if (n_candidates == 1)
-		language = candidates[0];
+		language = candidates[0].lang;
 	else if (n_candidates > 1)
 	{
-		language = getTwoGramLanguage(input, spec, candidates, n_candidates);
+		language = getTwoGramLanguage(input, candidates, n_candidates);
 		if (language == LANG_IGNORE)
-			language = candidates[0];
+			language = candidates[0].lang;
 	}
 	else
 		language = LANG_IGNORE;
