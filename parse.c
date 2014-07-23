@@ -93,19 +93,6 @@ extern langType getNamedLanguage (const char *const name)
 	return result;
 }
 
-static langType getExtensionLanguage (const char *const extension)
-{
-	langType result = LANG_IGNORE;
-	unsigned int i;
-	for (i = 0  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
-	{
-		stringList* const exts = LanguageTable [i]->currentExtensions;
-		if (exts != NULL  &&  stringListExtensionMatched (exts, extension))
-			result = i;
-	}
-	return result;
-}
-
 static langType getExtensionOrNameLanguageAndSpec (const char *const key, langType start_index, const char **const spec)
 {
 	langType result = LANG_IGNORE;
@@ -132,6 +119,31 @@ static langType getExtensionOrNameLanguageAndSpec (const char *const key, langTy
 		{
 			result = i;
 			*spec = lang->name;
+		}
+	}
+	return result;
+}
+
+static langType getPatternLanguageAndSpec (const char *const baseName, langType start_index, const char **const spec)
+{
+	langType result = LANG_IGNORE;
+	unsigned int i;
+
+	if (start_index == LANG_AUTO)
+	        start_index = 0;
+	else if (start_index == LANG_IGNORE || start_index >= LanguageCount)
+		return result;
+
+	*spec = NULL;
+	for (i = start_index  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
+	{
+		stringList* const ptrns = LanguageTable [i]->currentPatterns;
+		vString* tmp;
+
+		if (ptrns != NULL && (tmp = stringListFileFinds (ptrns, baseName)))
+		{
+			result = i;
+			*spec = vStringValue(tmp);
 		}
 	}
 	return result;
@@ -177,18 +189,25 @@ static unsigned int nominateLanguageCandidates (const char *const key, parserCan
 	return count;
 }
 
-static langType getPatternLanguage (const char *const fileName)
+static unsigned int
+nominateLanguageCandidatesForPattern(const char *const baseName, parserCandidate** candidates)
 {
-	langType result = LANG_IGNORE;
-	const char* base = baseFilename (fileName);
-	unsigned int i;
-	for (i = 0  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
+	unsigned int count;
+	langType i;
+	const char* spec;
+
+	*candidates = parserCandidateNew(LanguageCount);
+
+	for (count = 0, i = LANG_AUTO; i != LANG_IGNORE; )
 	{
-		stringList* const ptrns = LanguageTable [i]->currentPatterns;
-		if (ptrns != NULL  &&  stringListFileMatched (ptrns, base))
-			result = i;
+		i = getPatternLanguageAndSpec (baseName, i, &spec);
+		if (i != LANG_IGNORE)
+		{
+			(*candidates)[count].lang   = i++;
+			(*candidates)[count++].spec = spec;
+		}
 	}
-	return result;
+	return count;
 }
 
 #ifdef SYS_INTERPRETER
@@ -528,13 +547,14 @@ static langType getTwoGramLanguage (FILE* input,
 	return result;
 }
 
-static langType getSpecLanguage (const char *const spec, FILE* input)
+static langType getSpecLanguageCommon (const char *const spec, FILE* input,
+				       unsigned int nominate (const char *const, parserCandidate**))
 {
 	langType language;
 	parserCandidate  *candidates;
 	unsigned int n_candidates;
 
-	n_candidates = nominateLanguageCandidates(spec, &candidates);
+	n_candidates = (*nominate)(spec, &candidates);
 
 	if (input == NULL && n_candidates > 1)
 		/* This is needed for backward compatibility
@@ -555,6 +575,16 @@ static langType getSpecLanguage (const char *const spec, FILE* input)
 	candidates = NULL;
 
 	return language;
+}
+
+static langType getSpecLanguage (const char *const spec, FILE* input)
+{
+	return getSpecLanguageCommon(spec, input, nominateLanguageCandidates);
+}
+
+static langType getPatternLanguage (const char *const baseName, FILE* input)
+{
+	return getSpecLanguageCommon(baseName, input, nominateLanguageCandidatesForPattern);
 }
 
 extern langType getFileLanguage (const char *const fileName)
@@ -614,10 +644,13 @@ extern langType getFileLanguage (const char *const fileName)
 			language = getSpecLanguage(ext, input);
 		}
 
+		if (input)
+			rewind (input);
 		if (language == LANG_IGNORE)
 		{
-			verbose ("	pattern language\n");
-			language = getPatternLanguage (fileName);
+			const char* baseName = baseFilename (fileName);
+			verbose ("	pattern: %s\n", baseName);
+			language = getPatternLanguage(baseName, input);
 		}
 
 		if (input)
