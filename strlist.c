@@ -195,6 +195,22 @@ extern boolean stringListHas (
 	return result;
 }
 
+static vString* stringListFinds (
+		const stringList *const current, const char *const string,
+		boolean (*test)(const char *s, vString *const vs))
+{
+	int i;
+
+	Assert (current != NULL);
+	Assert (string != NULL);
+
+	i = stringListIndex (current, string, test);
+	if (i == -1)
+		return NULL;
+	else
+		return stringListItem(current, i);
+}
+
 extern boolean stringListHasInsensitive (
 		const stringList *const current, const char *const string)
 {
@@ -247,6 +263,16 @@ extern boolean stringListExtensionMatched (
 #endif
 }
 
+extern vString* stringListExtensionFinds (
+		const stringList* const current, const char* const extension)
+{
+#ifdef CASE_INSENSITIVE_FILENAMES
+	return stringListFinds (current, extension, compareStringInsensitive);
+#else
+	return stringListFinds (current, extension, compareString);
+#endif
+}
+
 static boolean fileNameMatched (
 		const vString* const vpattern, const char* const fileName)
 {
@@ -261,13 +287,23 @@ static boolean fileNameMatched (
 }
 
 extern boolean stringListFileMatched (
+			const stringList* const current, const char* const fileName)
+{
+	return stringListFileFinds (current, fileName)? TRUE: FALSE;
+}
+
+extern vString* stringListFileFinds (
 		const stringList* const current, const char* const fileName)
 {
-	boolean result = FALSE;
+	vString* vstr = NULL;
+	boolean matched = FALSE;
 	unsigned int i;
-	for (i = 0  ;  ! result  &&  i < stringListCount (current)  ;  ++i)
-		result = fileNameMatched (stringListItem (current, i), fileName);
-	return result;
+	for (i = 0  ;  ! matched  &&  i < stringListCount (current)  ;  ++i)
+	{
+		vstr = stringListItem (current, i);
+		matched = fileNameMatched (vstr, fileName);
+	}
+	return matched? vstr: NULL;
 }
 
 extern void stringListPrint (const stringList *const current)
