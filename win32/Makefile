@@ -157,11 +157,11 @@ $(encdir)\utf_16be.obj:   $(encdir)\utf_16be.c regenc.h config.h
 $(encdir)\utf_16le.obj:   $(encdir)\utf_16le.c regenc.h config.h
 $(encdir)\utf_32be.obj:   $(encdir)\utf_32be.c regenc.h config.h
 $(encdir)\utf_32le.obj:   $(encdir)\utf_32le.c regenc.h config.h
-$(encdir)\euc_jp.obj:     $(encdir)\euc_jp.c regenc.h config.h
+$(encdir)\euc_jp.obj:     $(encdir)\euc_jp.c regenc.h config.h $(encdir)\jis\props.h
 $(encdir)\euc_tw.obj:     $(encdir)\euc_tw.c regenc.h config.h
 $(encdir)\euc_kr.obj:     $(encdir)\euc_kr.c regenc.h config.h
-$(encdir)\shift_jis.obj:   $(encdir)\shift_jis.c regenc.h config.h
-$(encdir)\windows_31j.obj: $(encdir)\windows_31j.c $(encdir)\shift_jis.c regenc.h config.h
+$(encdir)\shift_jis.obj:   $(encdir)\shift_jis.c regenc.h config.h $(encdir)\jis\props.h
+$(encdir)\windows_31j.obj: $(encdir)\windows_31j.c $(encdir)\shift_jis.c regenc.h config.h $(encdir)\jis\props.h
 $(encdir)\iso_8859_1.obj:  $(encdir)\iso_8859_1.c regenc.h config.h
 $(encdir)\iso_8859_2.obj:  $(encdir)\iso_8859_2.c regenc.h config.h
 $(encdir)\iso_8859_3.obj:  $(encdir)\iso_8859_3.c regenc.h config.h

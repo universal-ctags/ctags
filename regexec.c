@@ -1419,6 +1419,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       *bp = 0;
       fputs((char* )buf, stderr);
       for (i = 0; i < 20 - (bp - buf); i++) fputc(' ', stderr);
+      fprintf(stderr, "%4"PRIdPTR":", p - reg->p);
       onig_print_compiled_byte_code(stderr, p, p + strlen((char *)p), NULL, encode);
       fprintf(stderr, "\n");
     }
