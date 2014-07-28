@@ -183,7 +183,7 @@ $(encdir)\cp1251.obj:     $(encdir)\cp1251.c regenc.h config.h
 $(encdir)\big5.obj:       $(encdir)\big5.c   regenc.h config.h
 $(encdir)\gb18030.obj:    $(encdir)\gb18030.c   regenc.h config.h
 
-win32\onig.res: win32\onig.rc
+win32\onig.res: win32\onig.rc oniguruma.h
 
 
 # Ruby test
