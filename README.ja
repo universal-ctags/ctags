@@ -42,6 +42,7 @@ Perl 5.10以降で新たに導入された正規表現の一部が使用可能�
   tool/convert-name2ctype.sh    name2ctype.kwdをname2ctypes.hに変換
   tool/enc-unicode.rb           UCDからname2ctype.kwdを生成
 
+  win32/Makefile.mingw          Win32用 Makefile (for MinGW)
   win32/makedef.py              onig.defを作成
   win32/onig.rc                 onig.dll用リソースファイル
 

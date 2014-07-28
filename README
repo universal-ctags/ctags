@@ -42,6 +42,7 @@ New Source Files:
   tool/convert-name2ctype.sh    converts name2ctype.kwd to name2ctypes.h.
   tool/enc-unicode.rb           generates name2ctype.kwd from UCD.
 
+  win32/Makefile.mingw          Makefile for Win32 (MinGW)
   win32/makedef.py              creates onig.def.
   win32/onig.rc                 resource file for onig.dll.
 
