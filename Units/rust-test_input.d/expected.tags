@@ -32,6 +32,7 @@ main	input.rs	/^fn main() {	$/;"	f	signature:()
 my_method	input.rs	/^	fn my_method(&self,_:int){ println("my_method of foo");}$/;"	F	class:Foo	signature:(&self,_:int)
 nested	input.rs	/^	fn nested() {}$/;"	f	function:main	signature:()
 only_field	input.rs	/^	priv only_field: [int, ..size]$/;"	m	struct:S1
+preserve_string_delims	input.rs	/^fn preserve_string_delims(_bar: extern r#"C"# fn()) {}$/;"	f	signature:(_bar: extern r#"C"# fn())
 size	input.rs	/^static size: uint = 1;$/;"	v
 some2	input.rs	/^fn some2(a:Animal) {$/;"	f	signature:(a:Animal)
 test	input.rs	/^	fn test(&self) {$/;"	F	class:Foo	signature:(&self)

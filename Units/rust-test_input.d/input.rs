@@ -6,6 +6,8 @@ use std::io::stdio::println;
 use test_input2::*;
 mod test_input2;
 
+fn preserve_string_delims(_bar: extern r#"C"# fn()) {}
+
 pub struct A
 {
 	foo: fn() -> int,
