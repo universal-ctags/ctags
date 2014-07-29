@@ -3432,21 +3432,17 @@ expand_case_fold_string_alt(int item_num, OnigCaseFoldCodeItem items[],
 			    UChar *p, int slen, UChar *end,
 			    regex_t* reg, Node **rnode)
 {
-  int r, i, j, len, varlen, varclen;
+  int r, i, j, len, varlen;
   Node *anode, *var_anode, *snode, *xnode, *an;
   UChar buf[ONIGENC_CODE_TO_MBC_MAXLEN];
 
   *rnode = var_anode = NULL_NODE;
 
   varlen = 0;
-  varclen = 0;
   for (i = 0; i < item_num; i++) {
     if (items[i].byte_len != slen) {
       varlen = 1;
       break;
-    }
-    if (items[i].code_len != 1) {
-      varclen = 1;
     }
   }
 
@@ -3532,8 +3528,6 @@ expand_case_fold_string_alt(int item_num, OnigCaseFoldCodeItem items[],
     }
   }
 
-  if (varclen && !varlen)
-    return 2;
   return varlen;
 
  mem_err2:
@@ -3614,7 +3608,6 @@ expand_case_fold_string(Node* node, regex_t* reg)
 
       r = expand_case_fold_string_alt(n, items, p, len, end, reg, &prev_node);
       if (r < 0) goto mem_err;
-      if (r > 0) varlen = 1;
       if (r == 1) {
 	if (IS_NULL(root)) {
 	  top_root = prev_node;
@@ -3628,7 +3621,7 @@ expand_case_fold_string(Node* node, regex_t* reg)
 
 	root = NCAR(prev_node);
       }
-      else { /* r == 0 || r == 2 */
+      else { /* r == 0 */
 	if (IS_NOT_NULL(root)) {
 	  if (IS_NULL(onig_node_list_add(root, prev_node))) {
 	    onig_node_free(prev_node);
@@ -3671,20 +3664,9 @@ expand_case_fold_string(Node* node, regex_t* reg)
 
   /* ending */
   top_root = (IS_NOT_NULL(top_root) ? top_root : prev_node);
-  if (!varlen) {
-    /* When all expanded strings are same length, case-insensitive
-       BM search will be used. */
-    r = update_string_node_case_fold(reg, node);
-    if (r == 0) {
-      NSTRING_SET_AMBIG(node);
-    }
-  }
-  else {
-    swap_node(node, top_root);
-    r = 0;
-  }
+  swap_node(node, top_root);
   onig_node_free(top_root);
-  return r;
+  return 0;
 
  mem_err:
   r = ONIGERR_MEMORY;
