@@ -24,7 +24,7 @@
 /*
 *   MACROS
 */
-#define MAX_STRING_LENGTH 64
+#define MAX_STRING_LENGTH 256
 
 /*
 *   DATA DECLARATIONS
@@ -117,9 +117,7 @@ static void writeCurTokenToStr (lexerState *lexer, vString *out_str)
 			vStringCat(out_str, lexer->token_str);
 			break;
 		case TOKEN_STRING:
-			vStringPut(out_str, '"');
 			vStringCat(out_str, lexer->token_str);
-			vStringPut(out_str, '"');
 			break;
 		case TOKEN_WHITESPACE:
 			vStringPut(out_str, ' ');
@@ -152,6 +150,14 @@ static void advanceNChar (lexerState *lexer, int n)
 		advanceChar(lexer);
 }
 
+/* Store the current character in lexerState::token_str if there is space
+ * (set by MAX_STRING_LENGTH), and then read the next character from the file */
+static void advanceAndStoreChar (lexerState *lexer)
+{
+	if (vStringLength(lexer->token_str) < MAX_STRING_LENGTH)
+		vStringPut(lexer->token_str, (char) lexer->cur_c);
+	advanceChar(lexer);
+}
 
 static boolean isWhitespace (int c)
 {
@@ -224,8 +230,7 @@ static void scanIdentifier (lexerState *lexer)
 	vStringClear(lexer->token_str);
 	do
 	{
-		vStringPut(lexer->token_str, (char) lexer->cur_c);
-		advanceChar(lexer);
+		advanceAndStoreChar(lexer);
 	} while(lexer->cur_c != EOF && isIdentifierContinue(lexer->cur_c));
 }
 
@@ -237,16 +242,14 @@ static void scanIdentifier (lexerState *lexer)
 static void scanString (lexerState *lexer)
 {
 	vStringClear(lexer->token_str);
-	advanceChar(lexer);
+	advanceAndStoreChar(lexer);
 	while (lexer->cur_c != EOF && lexer->cur_c != '"')
 	{
 		if (lexer->cur_c == '\\' && lexer->next_c == '"')
-			advanceChar(lexer);
-		if (vStringLength(lexer->token_str) < MAX_STRING_LENGTH)
-			vStringPut(lexer->token_str, (char) lexer->cur_c);
-		advanceChar(lexer);
+			advanceAndStoreChar(lexer);
+		advanceAndStoreChar(lexer);
 	}
-	advanceChar(lexer);
+	advanceAndStoreChar(lexer);
 }
 
 /* Raw strings look like this: r"" or r##""## where the number of
@@ -255,48 +258,36 @@ static void scanRawString (lexerState *lexer)
 {
 	size_t num_initial_hashes = 0;
 	vStringClear(lexer->token_str);
-	advanceChar(lexer);
+	advanceAndStoreChar(lexer);
 	/* Count how many leading hashes there are */
 	while (lexer->cur_c == '#')
 	{
 		num_initial_hashes++;
-		advanceChar(lexer);
+		advanceAndStoreChar(lexer);
 	}
 	if (lexer->cur_c != '"')
 		return;
-	advanceChar(lexer);
+	advanceAndStoreChar(lexer);
 	while (lexer->cur_c != EOF)
 	{
-		if (vStringLength(lexer->token_str) < MAX_STRING_LENGTH)
-			vStringPut(lexer->token_str, (char) lexer->cur_c);
 		/* Count how many trailing hashes there are. If the number is equal or more
 		 * than the number of leading hashes, break. */
 		if (lexer->cur_c == '"')
 		{
 			size_t num_trailing_hashes = 0;
-			advanceChar(lexer);
+			advanceAndStoreChar(lexer);
 			while (lexer->cur_c == '#' && num_trailing_hashes < num_initial_hashes)
 			{
 				num_trailing_hashes++;
 
-				if (vStringLength(lexer->token_str) < MAX_STRING_LENGTH)
-					vStringPut(lexer->token_str, (char) lexer->cur_c);
-				advanceChar(lexer);
+				advanceAndStoreChar(lexer);
 			}
 			if (num_trailing_hashes == num_initial_hashes)
-			{
-				/* Strip the trailing hashes and quotes */
-				if (vStringLength(lexer->token_str) < MAX_STRING_LENGTH && vStringLength(lexer->token_str) > num_trailing_hashes + 1)
-				{
-					lexer->token_str->length = vStringLength(lexer->token_str) - num_trailing_hashes - 1;
-					lexer->token_str->buffer[lexer->token_str->length] = '\0';
-				}
 				break;
-			}
 		}
 		else
 		{
-			advanceChar(lexer);
+			advanceAndStoreChar(lexer);
 		}
 	}
 }
