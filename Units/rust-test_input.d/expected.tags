@@ -50,4 +50,4 @@ test_macro	input.rs	/^macro_rules! test_macro$/;"	M
 x	input.rs	/^		x:int,$/;"	m	struct:Foo2
 x	input.rs	/^	x:X$/;"	m	struct:TraitedStructTest
 y	input.rs	/^		y:int$/;"	m	struct:Foo2
-yada	input.rs	/^fn yada(a:int,c:Foo,b:test_input2::fruit::SomeStruct) -> ~str {$/;"	f	signature:(a:int,c:Foo,b:test_input2::fruit::SomeStruct) -> ~str
+yada	input.rs	/^fn yada(a:int,c:Foo,b:test_input2::fruit::SomeStruct) -> String {$/;"	f	signature:(a:int,c:Foo,b:test_input2::fruit::SomeStruct) -> String

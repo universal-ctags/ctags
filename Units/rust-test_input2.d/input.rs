@@ -1,7 +1,7 @@
 #![cfg(not(test))] fn not_hashbang() {}
-use std::io::stdio::println;
 
 pub fn foo_bar_test_func(apples:fruit::SomeStruct,(oranges,lemon):(int,int))->int{
+	use std::io::stdio::println;
 	let some_var_name=2*oranges;
 	let a=SomeLongStructName{v:0};
 	println("a");println("b");	println("c");
