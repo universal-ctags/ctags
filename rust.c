@@ -292,6 +292,41 @@ static void scanRawString (lexerState *lexer)
 	}
 }
 
+/* This deals with character literals: 'n', '\n', '\uFFFF'; and lifetimes:
+ * 'lifetime. We'll use this approximate regexp for the literals:
+ * \' \\ [^']+ \' or \' [^'] \' or \' \\ \' \'. Either way, we'll treat this
+ * token as a string, so it gets preserved as is for function signatures with
+ * lifetimes. */
+static void scanCharacterOrLifetime (lexerState *lexer)
+{
+	vStringClear(lexer->token_str);
+	advanceAndStoreChar(lexer);
+
+	if (lexer->cur_c == '\\')
+	{
+		advanceAndStoreChar(lexer);
+		/* The \' \\ \' \' (literally '\'') case */
+		if (lexer->cur_c == '\'' && lexer->next_c == '\'')
+		{
+			advanceAndStoreChar(lexer);
+			advanceAndStoreChar(lexer);
+		}
+		/* The \' \\ [^']+ \' case */
+		else
+		{
+			while (lexer->cur_c != EOF && lexer->cur_c != '\'')
+				advanceAndStoreChar(lexer);
+		}
+	}
+	/* The \' [^'] \' case */
+	else if (lexer->cur_c != '\'' && lexer->next_c == '\'')
+	{
+		advanceAndStoreChar(lexer);
+		advanceAndStoreChar(lexer);
+	}
+	/* Otherwise it is malformed, or a lifetime */
+}
+
 /* Advances the parser one token, optionally skipping whitespace
  * (otherwise it is concatenated and returned as a single whitespace token).
  * Whitespace is needed to properly render function signatures. Unrecognized
@@ -332,6 +367,11 @@ static int advanceToken (lexerState *lexer, boolean skip_whitspace)
 		else if (lexer->cur_c == 'r' && (lexer->next_c == '#' || lexer->next_c == '"'))
 		{
 			scanRawString(lexer);
+			return lexer->cur_token = TOKEN_STRING;
+		}
+		else if (lexer->cur_c == '\'')
+		{
+			scanCharacterOrLifetime(lexer);
 			return lexer->cur_token = TOKEN_STRING;
 		}
 		else if (isIdentifierStart(lexer->cur_c))
