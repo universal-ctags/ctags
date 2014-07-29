@@ -1,3 +1,4 @@
+#![cfg(not(test))] fn not_hashbang() {}
 use std::io::stdio::println;
 
 pub fn foo_bar_test_func(apples:fruit::SomeStruct,(oranges,lemon):(int,int))->int{

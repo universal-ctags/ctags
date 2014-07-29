@@ -13,6 +13,7 @@ granite	input.rs	/^	fn granite() {$/;"	f	namespace:mineral	signature:()
 green_value	input.rs	/^		pub green_value: int,$/;"	m	struct:fruit::SomeStruct
 limestone	input.rs	/^	fn limestone() {$/;"	f	namespace:mineral	signature:()
 mineral	input.rs	/^mod mineral {$/;"	n
+not_hashbang	input.rs	/^#![cfg(not(test))] fn not_hashbang() {}$/;"	f	signature:()
 red_value	input.rs	/^		pub red_value: int,$/;"	m	struct:fruit::SomeStruct
 v	input.rs	/^pub struct SomeLongStructName {v:int}$/;"	m	struct:SomeLongStructName
 veg	input.rs	/^mod veg{$/;"	n
