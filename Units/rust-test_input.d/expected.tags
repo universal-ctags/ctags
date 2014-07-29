@@ -28,9 +28,11 @@ foo	input.rs	/^	foo: int,$/;"	m	struct:B
 foo_field_1	input.rs	/^struct Foo{foo_field_1:int}$/;"	m	struct:Foo
 gfunc	input.rs	/^fn gfunc<X:Testable+DoZ>(x:&X) {$/;"	f	signature:<X:Testable+DoZ>(x:&X)
 ignore	input.rs	/^macro_rules! ignore (($($x:tt)*) => (()))$/;"	M
+lifetime_and_char	input.rs	/^fn lifetime_and_char<'lifetime>(_: &'lifetime int)$/;"	f	signature:<'lifetime>(_: &'lifetime int)
 main	input.rs	/^fn main() {	$/;"	f	signature:()
 my_method	input.rs	/^	fn my_method(&self,_:int){ println("my_method of foo");}$/;"	F	class:Foo	signature:(&self,_:int)
 nested	input.rs	/^	fn nested() {}$/;"	f	function:main	signature:()
+not_hidden_by_char	input.rs	/^	fn not_hidden_by_char() {}$/;"	f	function:lifetime_and_char	signature:()
 only_field	input.rs	/^	priv only_field: [int, ..size]$/;"	m	struct:S1
 preserve_string_delims	input.rs	/^fn preserve_string_delims(_bar: extern r#"C"# fn()) {}$/;"	f	signature:(_bar: extern r#"C"# fn())
 size	input.rs	/^static size: uint = 1;$/;"	v

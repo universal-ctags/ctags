@@ -6,6 +6,15 @@ use std::io::stdio::println;
 use test_input2::*;
 mod test_input2;
 
+fn lifetime_and_char<'lifetime>(_: &'lifetime int)
+{
+	let s = '"';
+	let s = '}';
+	let s = '\'';
+	let s = '\uffff';
+	fn not_hidden_by_char() {}
+}
+
 fn preserve_string_delims(_bar: extern r#"C"# fn()) {}
 
 pub struct A
