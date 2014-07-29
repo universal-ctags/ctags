@@ -188,19 +188,30 @@ static void scanWhitespace (lexerState *lexer)
 }
 
 /* Normal line comments start with two /'s and continue until the next \n
- * (NOT any other newline character!). Additionally, a shebang in the beginning
- * of the file also counts as a line comment.
+ * (potentially after a \r). Additionally, a shebang in the beginning of the
+ * file also counts as a line comment as long as it is not this sequence: #![ .
  * Block comments start with / followed by a * and end with a * followed by a /.
  * Unlike in C/C++ they nest. */
 static void scanComments (lexerState *lexer)
 {
-	/* // or #! */
-	if (lexer->next_c == '/' || lexer->next_c == '!')
+	/* // */
+	if (lexer->next_c == '/')
 	{
 		advanceNChar(lexer, 2);
 		while (lexer->cur_c != EOF && lexer->cur_c != '\n')
 			advanceChar(lexer);
 	}
+	/* #! */
+	else if (lexer->next_c == '!')
+	{
+		advanceNChar(lexer, 2);
+		/* If it is exactly #![ then it is not a comment, but an attribute */
+		if (lexer->cur_c == '[')
+			return;
+		while (lexer->cur_c != EOF && lexer->cur_c != '\n')
+			advanceChar(lexer);
+	}
+	/* block comment */
 	else if (lexer->next_c == '*')
 	{
 		int level = 1;
