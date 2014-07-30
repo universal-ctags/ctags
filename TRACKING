@@ -133,11 +133,12 @@ Patches are always there. So it is easy to evaluate the value:)
 	d2bdf505abb7569deae2b50305ea1edce6208557
 
    (51) Ada support
-	+ Ada support is in prgress in fishman tree.
-
+	+ Ada support is now available in fishman tree.
+	4b6b4a72f3d2d4ef969d7c650de1829d79f0ea7c
+	
    (38) Ada support
-	+ Ada support is in prgress in fishman tree.
-
+	+ Ada support is now available in fishman tree.
+	4b6b4a72f3d2d4ef969d7c650de1829d79f0ea7c
 
    <33> Add basic ObjC support
 	+ This one is written in regexp.
