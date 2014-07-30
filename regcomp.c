@@ -3428,6 +3428,23 @@ expand_case_fold_make_rem_string(Node** rnode, UChar *s, UChar *end,
 }
 
 static int
+is_case_fold_variable_len(int item_num, OnigCaseFoldCodeItem items[],
+			  int slen)
+{
+  int i;
+
+  for (i = 0; i < item_num; i++) {
+    if (items[i].byte_len != slen) {
+      return 1;
+    }
+    if (items[i].code_len != 1) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+static int
 expand_case_fold_string_alt(int item_num, OnigCaseFoldCodeItem items[],
 			    UChar *p, int slen, UChar *end,
 			    regex_t* reg, Node **rnode)
@@ -3571,7 +3588,8 @@ expand_case_fold_string(Node* node, regex_t* reg)
 
     len = enclen(reg->enc, p);
 
-    if (n == 0) {
+    varlen = is_case_fold_variable_len(n, items, len);
+    if (n == 0 || varlen == 0) {
       if (IS_NULL(snode)) {
 	if (IS_NULL(root) && IS_NOT_NULL(prev_node)) {
 	  top_root = root = onig_node_list_add(NULL_NODE, prev_node);
@@ -3598,6 +3616,12 @@ expand_case_fold_string(Node* node, regex_t* reg)
       alt_num *= (n + 1);
       if (alt_num > THRESHOLD_CASE_FOLD_ALT_FOR_EXPANSION) break;
 
+      if (IS_NOT_NULL(snode)) {
+	r = update_string_node_case_fold(reg, snode);
+	if (r == 0) {
+	  NSTRING_SET_AMBIG(snode);
+	}
+      }
       if (IS_NULL(root) && IS_NOT_NULL(prev_node)) {
 	top_root = root = onig_node_list_add(NULL_NODE, prev_node);
 	if (IS_NULL(root)) {
@@ -3634,6 +3658,12 @@ expand_case_fold_string(Node* node, regex_t* reg)
     }
 
     p += len;
+  }
+  if (IS_NOT_NULL(snode)) {
+    r = update_string_node_case_fold(reg, snode);
+    if (r == 0) {
+      NSTRING_SET_AMBIG(snode);
+    }
   }
 
   if (p < end) {
