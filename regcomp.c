@@ -3446,7 +3446,7 @@ expand_case_fold_string_alt(int item_num, OnigCaseFoldCodeItem items[],
       break;
     }
     if (items[i].code_len != 1) {
-      varclen |= 1;
+      varclen = 1;
     }
   }
 
@@ -3602,10 +3602,7 @@ expand_case_fold_string(Node* node, regex_t* reg)
     }
     else {
       alt_num *= (n + 1);
-      if (alt_num > THRESHOLD_CASE_FOLD_ALT_FOR_EXPANSION) {
-	varlen = 1; /* Assume that expanded strings are variable length. */
-	break;
-      }
+      if (alt_num > THRESHOLD_CASE_FOLD_ALT_FOR_EXPANSION) break;
 
       if (IS_NULL(root) && IS_NOT_NULL(prev_node)) {
 	top_root = root = onig_node_list_add(NULL_NODE, prev_node);
