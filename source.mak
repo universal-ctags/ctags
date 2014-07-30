@@ -8,6 +8,7 @@ HEADERS = \
 	strlist.h vstring.h
 
 SOURCES = \
+	ada.c \
 	args.c \
 	ant.c \
 	asm.c \
@@ -75,6 +76,7 @@ REGEX_SOURCES = gnu_regex/regex.c
 REGEX_HEADERS = gnu_regex/regex.h
 
 OBJECTS = \
+	ada.$(OBJEXT) \
 	args.$(OBJEXT) \
 	ant.$(OBJEXT) \
 	asm.$(OBJEXT) \

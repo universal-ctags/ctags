@@ -16,6 +16,7 @@
 
 /* Add the name of any new parser definition function here */
 #define PARSER_LIST \
+	AdaParser, \
 	AntParser, \
 	AsmParser, \
 	AspParser, \
