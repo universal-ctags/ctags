@@ -78,10 +78,12 @@ subversion
 bugs
 ============================================================
 
-   <355> - fixed
+   <355> Error when parsing empty file (OCaml)
+	 + fixed
 	   02ec2066b5be6b129eba49685bd0b17fef4acfa
 
-   <341> - merged the improved version
+   <341> Introducing ctags.conf.d
+	 + merged the improved version
 	   216880c5287e0421d9c49898d983144db61c83aa
 
 
@@ -132,11 +134,11 @@ Patches are always there. So it is easy to evaluate the value:)
 	+ Fixed in exuberant tree, however the ticket is still open.
 	d2bdf505abb7569deae2b50305ea1edce6208557
 
-   (51) Ada support
+   <51> Ada support
 	+ Ada support is now available in fishman tree.
 	4b6b4a72f3d2d4ef969d7c650de1829d79f0ea7c
 	
-   (38) Ada support
+   <38> Ada support
 	+ Ada support is now available in fishman tree.
 	4b6b4a72f3d2d4ef969d7c650de1829d79f0ea7c
 
