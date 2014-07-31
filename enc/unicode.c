@@ -141,7 +141,6 @@ code3_equal(const OnigCodePoint *x, const OnigCodePoint *y)
 
 #include "enc/unicode/name2ctype.h"
 
-#define numberof(array) (int)(sizeof(array) / sizeof((array)[0]))
 #define CODE_RANGES_NUM numberof(CodeRanges)
 
 extern int
@@ -254,10 +253,11 @@ onigenc_unicode_mbc_case_fold(OnigEncoding enc,
     }
 #if 0
     /* NO NEEDS TO CHECK */
-    else if ((flag & INTERNAL_ONIGENC_CASE_FOLD_MULTI_CHAR) != 0) {
+    else if ((flag & INTERNAL_ONIGENC_CASE_FOLD_MULTI_CHAR) != 0)
 #else
-    else {
+    else
 #endif
+    {
       rlen = 0;
       for (i = 0; i < to->n; i++) {
 	len = ONIGENC_CODE_TO_MBC(enc, to->code[i], fold);

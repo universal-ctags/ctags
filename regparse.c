@@ -256,7 +256,12 @@ strdup_with_null(OnigEncoding enc, UChar* s, UChar* end)
 /* scan pattern methods */
 #define PEND_VALUE   0
 
+#ifdef __GNUC__
+/* get rid of Wunused-but-set-variable and Wuninitialized */
+#define PFETCH_READY  UChar* pfetch_prev = NULL; (void)pfetch_prev
+#else
 #define PFETCH_READY  UChar* pfetch_prev
+#endif
 #define PEND         (p < end ?  0 : 1)
 #define PUNFETCH     p = pfetch_prev
 #define PINC       do { \
@@ -741,7 +746,8 @@ name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
 
     e->name = strdup_with_null(reg->enc, name, name_end);
     if (IS_NULL(e->name)) {
-      xfree(e);  return ONIGERR_MEMORY;
+      xfree(e);
+      return ONIGERR_MEMORY;
     }
     onig_st_insert_strend(t, e->name, (e->name + (name_end - name)),
                           (HashDataType )e);
@@ -4199,21 +4205,20 @@ parse_posix_bracket(CClassNode* cc, UChar** src, UChar* end, ScanEnv* env)
 #define POSIX_BRACKET_NAME_MIN_LEN         4
 
   static const PosixBracketEntryType PBS[] = {
-    { (UChar* )"alnum",  ONIGENC_CTYPE_ALNUM,  5 },
-    { (UChar* )"alpha",  ONIGENC_CTYPE_ALPHA,  5 },
-    { (UChar* )"blank",  ONIGENC_CTYPE_BLANK,  5 },
-    { (UChar* )"cntrl",  ONIGENC_CTYPE_CNTRL,  5 },
-    { (UChar* )"digit",  ONIGENC_CTYPE_DIGIT,  5 },
-    { (UChar* )"graph",  ONIGENC_CTYPE_GRAPH,  5 },
-    { (UChar* )"lower",  ONIGENC_CTYPE_LOWER,  5 },
-    { (UChar* )"print",  ONIGENC_CTYPE_PRINT,  5 },
-    { (UChar* )"punct",  ONIGENC_CTYPE_PUNCT,  5 },
-    { (UChar* )"space",  ONIGENC_CTYPE_SPACE,  5 },
-    { (UChar* )"upper",  ONIGENC_CTYPE_UPPER,  5 },
-    { (UChar* )"xdigit", ONIGENC_CTYPE_XDIGIT, 6 },
-    { (UChar* )"ascii",  ONIGENC_CTYPE_ASCII,  5 },
-    { (UChar* )"word",   ONIGENC_CTYPE_WORD,   4 },
-    { (UChar* )NULL,     -1, 0 }
+    POSIX_BRACKET_ENTRY_INIT("alnum",  ONIGENC_CTYPE_ALNUM),
+    POSIX_BRACKET_ENTRY_INIT("alpha",  ONIGENC_CTYPE_ALPHA),
+    POSIX_BRACKET_ENTRY_INIT("blank",  ONIGENC_CTYPE_BLANK),
+    POSIX_BRACKET_ENTRY_INIT("cntrl",  ONIGENC_CTYPE_CNTRL),
+    POSIX_BRACKET_ENTRY_INIT("digit",  ONIGENC_CTYPE_DIGIT),
+    POSIX_BRACKET_ENTRY_INIT("graph",  ONIGENC_CTYPE_GRAPH),
+    POSIX_BRACKET_ENTRY_INIT("lower",  ONIGENC_CTYPE_LOWER),
+    POSIX_BRACKET_ENTRY_INIT("print",  ONIGENC_CTYPE_PRINT),
+    POSIX_BRACKET_ENTRY_INIT("punct",  ONIGENC_CTYPE_PUNCT),
+    POSIX_BRACKET_ENTRY_INIT("space",  ONIGENC_CTYPE_SPACE),
+    POSIX_BRACKET_ENTRY_INIT("upper",  ONIGENC_CTYPE_UPPER),
+    POSIX_BRACKET_ENTRY_INIT("xdigit", ONIGENC_CTYPE_XDIGIT),
+    POSIX_BRACKET_ENTRY_INIT("ascii",  ONIGENC_CTYPE_ASCII),
+    POSIX_BRACKET_ENTRY_INIT("word",   ONIGENC_CTYPE_WORD),
   };
 
   const PosixBracketEntryType *pb;
@@ -4232,7 +4237,7 @@ parse_posix_bracket(CClassNode* cc, UChar** src, UChar* end, ScanEnv* env)
   if (onigenc_strlen(enc, p, end) < POSIX_BRACKET_NAME_MIN_LEN + 3)
     goto not_posix_bracket;
 
-  for (pb = PBS; IS_NOT_NULL(pb->name); pb++) {
+  for (pb = PBS; pb < PBS + numberof(PBS); pb++) {
     if (onigenc_with_ascii_strncmp(enc, p, end, pb->name, pb->len) == 0) {
       p = (UChar* )onigenc_step(enc, p, end, pb->len);
       if (onigenc_with_ascii_strncmp(enc, p, end, (UChar* )":]", 2) != 0)

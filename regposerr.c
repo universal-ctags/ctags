@@ -42,6 +42,8 @@
 #  define ARG_UNUSED
 #endif
 
+#define numberof(array) (int)(sizeof(array) / sizeof((array)[0]))
+
 static char* ESTRING[] = {
   NULL,
   "failed to match",                         /* REG_NOMATCH    */
@@ -77,7 +79,7 @@ regerror(int posix_ecode, const regex_t* reg ARG_UNUSED, char* buf,
   size_t len;
 
   if (posix_ecode > 0
-      && posix_ecode < (int )(sizeof(ESTRING) / sizeof(ESTRING[0]))) {
+      && posix_ecode < numberof(ESTRING)) {
     s = ESTRING[posix_ecode];
   }
   else if (posix_ecode == 0) {

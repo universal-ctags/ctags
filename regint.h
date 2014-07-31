@@ -50,6 +50,7 @@
 
 #if defined(__i386) || defined(__i386__) || defined(_M_IX86) || \
     defined(__x86_64) || defined(__x86_64__) || defined(_M_AMD64) || \
+    defined(__powerpc64__) || \
     defined(__mc68020__)
 #define PLATFORM_UNALIGNED_WORD_ACCESS
 #endif
@@ -153,10 +154,12 @@ extern pthread_mutex_t gOnigMutex;
 
 #endif /* USE_DEFAULT_MULTI_THREAD_SYSTEM */
 
+#ifndef xmalloc
 #define xmalloc     malloc
 #define xrealloc    realloc
 #define xcalloc     calloc
 #define xfree       free
+#endif
 
 #define CHECK_INTERRUPT_IN_MATCH_AT
 
@@ -234,9 +237,7 @@ extern pthread_mutex_t gOnigMutex;
 
 #include <ctype.h>
 #ifdef HAVE_SYS_TYPES_H
-#ifndef __BORLANDC__
 #include <sys/types.h>
-#endif
 #endif
 
 #ifdef HAVE_STDINT_H

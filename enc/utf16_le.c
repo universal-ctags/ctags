@@ -49,12 +49,6 @@ static const int EncLen_UTF16[] = {
 };
 
 static int
-utf16le_code_to_mbclen(OnigCodePoint code)
-{
-  return (code > 0xffff ? 4 : 2);
-}
-
-static int
 utf16le_mbc_enc_len(const UChar* p)
 {
   return EncLen_UTF16[*(p+1)];
@@ -93,6 +87,12 @@ utf16le_mbc_to_code(const UChar* p, const UChar* end ARG_UNUSED)
     code = c1 * 256 + p[0];
   }
   return code;
+}
+
+static int
+utf16le_code_to_mbclen(OnigCodePoint code)
+{
+  return (code > 0xffff ? 4 : 2);
 }
 
 static int

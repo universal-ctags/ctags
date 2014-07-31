@@ -1004,6 +1004,7 @@ def main():
         x2("(?i)\u03b9\u0308\u0301", "\u0390", 0, 1)
         x2("(?i)ff", "\ufb00", 0, 1)
         x2("(?i)\ufb01", "fi", 0, 2)
+        x2("(?i)\u0149\u0149", "\u0149\u0149", 0, 2)
         # Other Unicode tests
         x2("\\x{25771}", "\U00025771", 0, 1)
     x2("[0-9-a]+", " 0123456789-a ", 1, 13)     # same as [0-9\-a]
@@ -1049,6 +1050,10 @@ def main():
     n("a(?!b)", "ab");
     x2("(?:(.)\\1)*", "a" * 300, 0, 300)
     x2("\\cA\\C-B\\a[\\b]\\t\\n\\v\\f\\r\\e\\c?", "\x01\x02\x07\x08\x09\x0a\x0b\x0c\x0d\x1b\x7f", 0, 11)
+    x2("(?<=(?:[a-z]|\\w){3})x", "ab1x", 3, 4)  # repeat inside look-behind
+    x2("(?<n>(a|b\\g<n>c){3,5}?)", "baaaaca", 1, 4)
+    x2("\\p{WoRd}", "a", 0, 1)  # property name is not case sensitive
+    n("[[:WoRd:]]", "a", err=onig.ONIGERR_INVALID_POSIX_BRACKET_TYPE)   # POSIX bracket name is case sensitive
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
@@ -1069,6 +1074,20 @@ def main():
     x2("a{2,3}+a", "aaa", 0, 3) # Not a possessive quantifier in Ruby,
                                 # same as "(?:a{2,3})+a"
     n("a{2,3}+a", "aaa", syn=onig.ONIG_SYNTAX_PERL)
+
+    # automatic possessification
+    x2("\\w+\\W", "abc#", 0, 4)
+    x2("[a-c]+\\W", "abc#", 0, 4)
+    x2("[a-c#]+\\W", "abc#", 0, 4)
+    x2("[^a-c]+\\W", "def#", 0, 4)
+    x2("(?a)[^a-c]+\\W", "def#", 0, 4)
+    x2("a+\\w", "aaaa", 0, 4)
+    x2("#+\\w", "###a", 0, 4)
+    x2("(?a)a+\\w", "aaaa", 0, 4)
+    x2("(?a)あ+\\w", "あああa", 0, 4)
+    x2("[a-c]+[d-f]", "abcd", 0, 4)
+    x2("[^d-f]+[d-f]", "abcd", 0, 4)
+    x2("[a-cあ]+[d-f]", "abcd", 0, 4)
 
     # linebreak
     x2("\\R", "\n", 0, 1)
@@ -1109,6 +1128,9 @@ def main():
     x2("(?-i:(?+1))(?i:(a)){0}", "A", 0, 1, syn=onig.ONIG_SYNTAX_PERL);
     x2("(?-i:\g<+1>)(?i:(a)){0}", "A", 0, 1);
     x2("(?-i:\g'+1')(?i:(a)){0}", "A", 0, 1);
+    n("(.(?=\\g<1>))", "", err=onig.ONIGERR_NEVER_ENDING_RECURSION)
+    n("(a)(?<n>b)\\g<1>\\g<n>", "abab", err=onig.ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED)
+    x2("(a)(?<n>b)(?1)(?&n)", "abab", 0, 4, syn=onig.ONIG_SYNTAX_PERL)
 
     # character set modifiers
     x2("(?u)\\w+", "あa#", 0, 2);
@@ -1230,6 +1252,8 @@ def main():
     x2("((?<x>x)|(?<y>y))(?(<x>)y|x)", "yx", 0, 2)
     n("((?<x>x)|(?<y>y))(?(<x>)y|x)", "xx")
     n("((?<x>x)|(?<y>y))(?(<x>)y|x)", "yy")
+    n("(a)?(?<n>b)?(?(1)a)(?(<n>)b)", "aa", err=onig.ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED)
+    x2("(a)?(?<n>b)?(?(1)a)(?(<n>)b)", "aa", 0, 2, syn=onig.ONIG_SYNTAX_PERL)
 
     # Implicit-anchor optimization
     x2("(?m:.*abc)", "dddabdd\nddabc", 0, 13)   # optimized /(?m:.*abc)/ ==> /\A(?m:.*abc)/

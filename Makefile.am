@@ -22,6 +22,7 @@ libonig_la_SOURCES = regint.h regparse.h regenc.h st.h \
 	$(encdir)/utf32_be.c $(encdir)/utf32_le.c \
 	$(encdir)/unicode/casefold.h $(encdir)/unicode/name2ctype.h \
 	$(encdir)/euc_jp.c $(encdir)/sjis.c $(encdir)/cp932.c \
+	$(encdir)/jis/props.h $(encdir)/jis/props.kwd \
 	$(encdir)/iso8859_1.c \
 	$(encdir)/iso8859_2.c  $(encdir)/iso8859_3.c \
 	$(encdir)/iso8859_4.c  $(encdir)/iso8859_5.c \
@@ -39,6 +40,7 @@ EXTRA_DIST = .gitignore oniguruma.pc.in HISTORY README.ja index.html \
 	index_ja.html doc/API doc/API.ja doc/RE doc/RE.ja doc/FAQ doc/FAQ.ja \
 	doc/UnicodeProps.txt \
 	tool/.gitignore tool/case-folding.rb tool/convert-name2ctype.sh \
+	tool/convert-jis-props.sh \
 	tool/enc-unicode.rb tool/download-ucd.sh tool/update-doc.py \
 	win32/Makefile win32/Makefile.mingw win32/config.h win32/testc.c \
 	win32/makedef.py win32/onig.rc \

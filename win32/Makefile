@@ -157,11 +157,11 @@ $(encdir)\utf16_be.obj:   $(encdir)\utf16_be.c regenc.h config.h
 $(encdir)\utf16_le.obj:   $(encdir)\utf16_le.c regenc.h config.h
 $(encdir)\utf32_be.obj:   $(encdir)\utf32_be.c regenc.h config.h
 $(encdir)\utf32_le.obj:   $(encdir)\utf32_le.c regenc.h config.h
-$(encdir)\euc_jp.obj:     $(encdir)\euc_jp.c regenc.h config.h
+$(encdir)\euc_jp.obj:     $(encdir)\euc_jp.c regenc.h config.h $(encdir)\jis\props.h
 $(encdir)\euc_tw.obj:     $(encdir)\euc_tw.c regenc.h config.h
 $(encdir)\euc_kr.obj:     $(encdir)\euc_kr.c regenc.h config.h
-$(encdir)\sjis.obj:       $(encdir)\sjis.c regenc.h config.h
-$(encdir)\cp932.obj:      $(encdir)\cp932.c $(encdir)\sjis.c regenc.h config.h
+$(encdir)\sjis.obj:       $(encdir)\sjis.c regenc.h config.h $(encdir)\jis\props.h
+$(encdir)\cp932.obj:      $(encdir)\cp932.c $(encdir)\sjis.c regenc.h config.h $(encdir)\jis\props.h
 $(encdir)\iso8859_1.obj:  $(encdir)\iso8859_1.c regenc.h config.h
 $(encdir)\iso8859_2.obj:  $(encdir)\iso8859_2.c regenc.h config.h
 $(encdir)\iso8859_3.obj:  $(encdir)\iso8859_3.c regenc.h config.h
@@ -183,7 +183,7 @@ $(encdir)\cp1251.obj:     $(encdir)\cp1251.c regenc.h config.h
 $(encdir)\big5.obj:       $(encdir)\big5.c   regenc.h config.h
 $(encdir)\gb18030.obj:    $(encdir)\gb18030.c   regenc.h config.h
 
-win32\onig.res: win32\onig.rc
+win32\onig.res: win32\onig.rc oniguruma.h
 
 
 # Ruby test
