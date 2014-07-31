@@ -1235,7 +1235,9 @@ static const tgTableEntry tg_entries [] = {
 
 extern parserDefinition *ObjcParser (void)
 {
-	static const char *const extensions[] = { "mm", "m", "h", NULL };
+	static const char *const extensions[] = { "mm", "m", "h",
+						  "objc", /* The major mode name in emacs */
+						  NULL };
 	parserDefinition *def = parserNew ("ObjectiveC");
 	def->kinds = ObjcKinds;
 	def->kindCount = KIND_COUNT (ObjcKinds);
