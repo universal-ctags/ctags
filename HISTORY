@@ -1,7 +1,11 @@
 History of Onigmo (Oniguruma-mod)
 
+2014/07/31: [bug]  /(?i)\u0149\u0149/ =~ "\u0149\u0149" doesn't match
+                   (Issue #40)
+
 2014/07/27: Version 5.14.2
 
+2014/07/27: [dist] update LTVERSION to "5:2:0".
 2014/07/25: [impl] Show byte offset of byte codes when debugging
 2014/07/24: [impl] Merge Ruby r46915
                    UNALIGNED_WORD_ACCESS on ppc64
