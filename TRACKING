@@ -18,44 +18,31 @@ subversion
      => <git: local fishman repo>
 
 
-  0. prepare exuberant repo: a local git repo clone from exuberant svn tree.
-     <git: local exuberant git repo>
+  1. prepare your own fishman repo: a local git repo cloned from github.
+     You may know how to do it :)
 
-    You can make a clone repo with following command line:
+    $ git clone https://github.com/fishman/ctags.git
 
-    $ git svn clone http://svn.code.sf.net/p/ctags/code -T trunk
+  2. prepare exuberant SVN repo: a local git repo clone from exuberant svn tree.
 
-    Rename `code' to $DIR/exuberant.
+    The original clone is already part of fishman tree.
 
-    If you have exuberant git repo already, do
+    To initialize your git repository with the required subversion information do
+
+    $ git svn init https://svn.code.sf.net/p/ctags/code/trunk
+    $ git update-ref refs/remotes/git-svn refs/remotes/origin/sourceforge
+
+    and then
 
     $ git svn fetch
     $ git svn rebase
 
     to get the latest changes and reflect it to the local copy.
 
-  1. prepare your own fishman repo: a local git repo cloned from github.
-     <git: local fishman repo>
+  3. merge
+    TODO
 
-     You may know how to do it :)
-
-    $ git clone https://github.com/fishman/ctags.git
-
-  2. add exuberant as remote repo to config of fishman repos
-     <git: local fishman repo>
-
-     [remote "exuberant"]
-	url = file:///$DIR/exuberant
-	fetch = +refs/heads/master:refs/remotes/exuberant
-
-  4. fetch the changes
-      <git: local fishman repo>
-
-     $ git fetch exuberant
-
-  5. cherry-pick
-      <git: local fishman repo>
-
+  4. cherry-pick
      5.1 Make a branch at local fishman repo and switch to it.
      5.2 Do cherry-pick like:
 
