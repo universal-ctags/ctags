@@ -191,8 +191,8 @@ typedef struct {
   int type;
   int regnum;
   OnigOptionType option;
-  struct _Node*  target;
   AbsAddrType    call_addr;
+  struct _Node*  target;
   /* for multiple call reference */
   OnigDistance min_len; /* min length (byte) */
   OnigDistance max_len; /* max length (byte) */
