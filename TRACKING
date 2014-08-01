@@ -65,6 +65,10 @@ subversion
 bugs
 ============================================================
 
+   <358>  Vim parser: Segmentation fault when reaing empty vim file 
+   	 + directly contributed by the original author of bug report and patch
+	   e0f854f0100e7a3cb8b959a23d6036e43f6b6c85
+
    <355> Error when parsing empty file (OCaml)
 	 + fixed
 	   02ec2066b5be6b129eba49685bd0b17fef4acfa
