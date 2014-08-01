@@ -17,20 +17,6 @@
 #include <string.h>
 #include "parse.h"
 
-/*
-*   FUNCTION DEFINITIONS
-*/
-
-static void installMatLabRegex (const langType language)
-{
-    /* function [x,y,z] = asdf */
-    addTagRegex (language, "^function[ \t]*\\[.*\\][ \t]*=[ \t]*([a-zA-Z0-9_]+)", "\\1", "f,function", NULL);
-    /* function x = asdf */
-    addTagRegex (language, "^function[ \t]*[a-zA-Z0-9_]+[ \t]*=[ \t]*([a-zA-Z0-9_]+)", "\\1", "f,function", NULL);
-    /* function asdf */
-    addTagRegex (language, "^function[ \t]*([a-zA-Z0-9_]+)[^=]*$", "\\1", "f,function", NULL);
-}
-
 static unsigned char matlab_m_tg_table [65536] =
 {
 	[    2597] =       55, /* N % */
@@ -129,10 +115,21 @@ static unsigned char matlab_m_tg_table [65536] =
 	[   32317] =        1, /* ~ = */
 };
 
-static const tgTableEntry tg_entries [] = {
-	{ "m",  matlab_m_tg_table },
-	{ NULL, NULL },
-};
+/*
+*   FUNCTION DEFINITIONS
+*/
+
+static void installMatLabRegex (const langType language)
+{
+    /* function [x,y,z] = asdf */
+    addTagRegex (language, "^function[ \t]*\\[.*\\][ \t]*=[ \t]*([a-zA-Z0-9_]+)", "\\1", "f,function", NULL);
+    /* function x = asdf */
+    addTagRegex (language, "^function[ \t]*[a-zA-Z0-9_]+[ \t]*=[ \t]*([a-zA-Z0-9_]+)", "\\1", "f,function", NULL);
+    /* function asdf */
+    addTagRegex (language, "^function[ \t]*([a-zA-Z0-9_]+)[^=]*$", "\\1", "f,function", NULL);
+
+    addTgEntry (language, "m", matlab_m_tg_table);
+}
 
 extern parserDefinition* MatLabParser ()
 {
@@ -141,7 +138,6 @@ extern parserDefinition* MatLabParser ()
 	def->extensions = extensions;
 	def->initialize = installMatLabRegex;
 	def->regex      = TRUE;
-	def->tg_entries = tg_entries;
 	return def;
 }
 

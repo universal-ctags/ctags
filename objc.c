@@ -1131,21 +1131,6 @@ static void findObjcTags (void)
 	fullMethodName = NULL;
 }
 
-static void objcInitialize (const langType language)
-{
-	Lang_ObjectiveC = language;
-
-	initKeywordHash ();
-}
-
-static void objcFinalize (const langType language)
-{
-	vStringDelete (parentName);
-	vStringDelete (tempName);
-	vStringDelete (fullMethodName);
-	vStringDelete (prevIdent);
-}
-
 static unsigned char objc_m_tg_table [65536] =
 {
 	[    2595] =        7, /* N # */
@@ -1237,10 +1222,21 @@ static unsigned char objc_m_tg_table [65536] =
 	[   32010] =       15, /* } N */
 };
 
-static const tgTableEntry tg_entries [] = {
-	{ "m",  objc_m_tg_table },
-	{ NULL, NULL },
-};
+static void objcInitialize (const langType language)
+{
+	Lang_ObjectiveC = language;
+
+	initKeywordHash ();
+	addTgEntry (language, "m", objc_m_tg_table);
+}
+
+static void objcFinalize (const langType language)
+{
+	vStringDelete (parentName);
+	vStringDelete (tempName);
+	vStringDelete (fullMethodName);
+	vStringDelete (prevIdent);
+}
 
 extern parserDefinition *ObjcParser (void)
 {
@@ -1254,6 +1250,5 @@ extern parserDefinition *ObjcParser (void)
 	def->parser = findObjcTags;
 	def->initialize = objcInitialize;
 	def->finalize = objcFinalize;
-	def->tg_entries = tg_entries;
 	return def;
 }

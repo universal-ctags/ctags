@@ -325,6 +325,14 @@ extern char* eStrdup (const char* str)
 	return result;
 }
 
+extern char* eStrndup (const char* str, size_t len)
+{
+	char* result = xMalloc (len + 1, char);
+	memset(result, 0, len + 1);
+	strncpy (result, str, len);
+	return result;
+}
+
 extern void toLowerString (char* str)
 {
 	while (*str != '\0')

@@ -50,13 +50,15 @@ typedef struct sKindOption {
 	const char* description;  /* displayed in --help output */
 } kindOption;
 
-typedef struct {
+typedef struct stgTableEntry{
 	/* two gram table which represents the
 	   characteristic of its language.
 	   This can be used when file extension
 	   is conflicted another parser. */
-	const char* const extension;
-	const unsigned char* const tg_table;
+	char* spec;
+	unsigned char* tg_table;
+	char* corpus_file;
+	struct stgTableEntry *next;
 } tgTableEntry;
 
 typedef struct {
@@ -71,7 +73,7 @@ typedef struct {
 	simpleParser parser;           /* simple parser (common case) */
 	rescanParser parser2;          /* rescanning parser (unusual case) */
 	boolean regex;                 /* is this a regex parser? */
-	const tgTableEntry *tg_entries;
+	tgTableEntry *tg_entries;
 
 	/* used internally */
 	unsigned int id;               /* id assigned to language */
@@ -114,6 +116,7 @@ extern void clearLanguageMap (const langType language);
 extern boolean removeLanguageExtensionMap (const char *const extension);
 extern void addLanguageExtensionMap (const langType language, const char* extension);
 extern void addLanguagePatternMap (const langType language, const char* ptrn);
+extern void addTgEntry (const langType language, char* const spec, unsigned char* const tg_table);
 extern void printLanguageMap (const langType language);
 extern void printLanguageMaps (const langType language);
 extern void enableLanguages (const boolean state);

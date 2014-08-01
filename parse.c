@@ -474,16 +474,16 @@ static vString* extractVimFileType(FILE* input)
 	   [text]{white}{vi:|vim:|ex:}[white]{options} */
 }
 
-static const tgTableEntry* const findTgTableEntry(const parserDefinition* const lang, const char* const extension)
+static const tgTableEntry* const findTgTableEntry(const parserDefinition* const lang, const char* const spec)
 {
 	const tgTableEntry *entry;
 
 	for (entry = lang->tg_entries;
-	     entry->extension != NULL;
-	     entry++)
-		if (strcmp (entry->extension, extension) == 0)
+	     entry != NULL;
+	     entry = entry->next)
+		if (strcmp (entry->spec, spec) == 0)
 			break;
-	if (entry->extension == NULL)
+	if (entry->spec == NULL)
 		entry = NULL;
 
 	return entry;
@@ -776,6 +776,46 @@ extern void addLanguageExtensionMap (
 	stringListAdd (LanguageTable [language]->currentExtensions, str);
 }
 
+static void addTgEntryFull (const langType language, char* const spec, unsigned char* const tg_table,
+			    char* const  corpus_file)
+{
+	tgTableEntry *entry;
+
+	entry = xMalloc(1, tgTableEntry);
+	entry->spec = spec;
+	entry->tg_table = tg_table;
+	entry->corpus_file = corpus_file;
+	entry->next = LanguageTable [language]->tg_entries;
+	LanguageTable [language]->tg_entries = entry;
+}
+
+
+extern void addTgEntry (const langType language, char* const spec, unsigned char* const tg_table)
+{
+	addTgEntryFull (language, spec, tg_table, NULL);
+}
+
+static tgTableEntry* freeTgEntry(tgTableEntry *entry)
+{
+	tgTableEntry* r;
+
+	if (entry->corpus_file)
+	{
+		eFree (entry->spec);
+		entry->spec = NULL;
+		eFree (entry->tg_table);
+		entry->tg_table = NULL;
+		eFree (entry->corpus_file);
+		entry->corpus_file = NULL;
+	}
+
+	r = entry->next;
+	entry->next = NULL;
+	eFree(entry);
+
+	return r;
+}
+
 extern void enableLanguage (const langType language, const boolean state)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
@@ -852,6 +892,10 @@ extern void freeParserResources (void)
 
 		freeList (&lang->currentPatterns);
 		freeList (&lang->currentExtensions);
+
+		while (lang->tg_entries)
+			lang->tg_entries = freeTgEntry(lang->tg_entries);
+
 		eFree (lang->name);
 		lang->name = NULL;
 		eFree (lang);
