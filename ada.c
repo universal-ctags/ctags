@@ -2186,6 +2186,8 @@ static void findAdaTags(void)
 
   /* read in the first line */
   readNewLine();
+  if (exception == EXCEPTION_EOF)
+    goto out;
 
   /* tokenize entire file */
   exception = setjmp(eofError);
@@ -2199,6 +2201,7 @@ static void findAdaTags(void)
     tmp = tmp->next;
   }
 
+ out:
   /* clean up tokens */
   freeAdaTokenList(&root.children);
 } /* static void findAdaTags(void) */
