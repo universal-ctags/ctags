@@ -1375,7 +1375,16 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 
 	if ( isType (token, TOKEN_EQUAL_SIGN) )
 	{
+		int parenDepth = 0;
+
 		readToken (token);
+
+		/* rvalue might be surrounded with parentheses */
+		while (isType (token, TOKEN_OPEN_PAREN))
+		{
+			parenDepth++;
+			readToken (token);
+		}
 
 		if ( isKeyword (token, KEYWORD_function) )
 		{
@@ -1433,36 +1442,8 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 
 					if ( vStringLength(secondary_name->string) > 0 )
 						makeFunctionTag (secondary_name);
-
-					/*
-					 * Find to the end of the statement
-					 */
-					goto cleanUp;
 				}
 			}
-		}
-		else if (isType (token, TOKEN_OPEN_PAREN))
-		{
-			/*
-			 * Handle nameless functions
-			 *     this.method_name = () {}
-			 * Also assignments starting with parentheses
-			 *     var foo = (1 + 2) * 3;
-			 */
-			skipArgumentList(token);
-
-			if (isType (token, TOKEN_OPEN_CURLY))
-			{
-				/*
-				 * Nameless functions are only setup as methods.
-				 */
-				makeJsTag (name, JSTAG_METHOD);
-				parseBlock (token, name);
-			}
-			else if (isType (token, TOKEN_CLOSE_CURLY))
-				is_terminated = FALSE;
-			else if (token->nestLevel == 0 && is_global)
-				makeJsTag (name, JSTAG_VARIABLE);
 		}
 		else if (isType (token, TOKEN_OPEN_CURLY))
 		{
@@ -1513,11 +1494,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 					if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 							! stringListHas(ClassNames, vStringValue (fulltag)) )
 					{
-						readToken (token);
-						if ( ! isType (token, TOKEN_SEMICOLON))
-							findCmdTerm (token);
-						if (isType (token, TOKEN_SEMICOLON))
-							makeJsTag (name, JSTAG_VARIABLE);
+						makeJsTag (name, JSTAG_VARIABLE);
 					}
 					vStringDelete (fulltag);
 				}
@@ -1605,12 +1582,24 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 				if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 						! stringListHas(ClassNames, vStringValue (fulltag)) )
 				{
-					findCmdTerm (token);
-					if (isType (token, TOKEN_SEMICOLON))
-						makeJsTag (name, JSTAG_VARIABLE);
+					makeJsTag (name, JSTAG_VARIABLE);
 				}
 				vStringDelete (fulltag);
 			}
+		}
+
+		if (parenDepth > 0)
+		{
+			while (parenDepth > 0)
+			{
+				if (isType (token, TOKEN_OPEN_PAREN))
+					parenDepth++;
+				else if (isType (token, TOKEN_CLOSE_PAREN))
+					parenDepth--;
+				readToken (token);
+			}
+			if (isType (token, TOKEN_CLOSE_CURLY))
+				is_terminated = FALSE;
 		}
 	}
 	/* if we aren't already at the cmd end, advance to it and check whether
