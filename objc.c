@@ -1118,6 +1118,7 @@ static void findObjcTags (void)
 		(*toDoNext) (st.name, tok);
 		tok = lex (&st);
 	}
+	vStringDelete(st.name);
 
 	vStringDelete (name);
 	vStringDelete (parentName);
@@ -1135,6 +1136,14 @@ static void objcInitialize (const langType language)
 	Lang_ObjectiveC = language;
 
 	initKeywordHash ();
+}
+
+static void objcFinalize (const langType language)
+{
+	vStringDelete (parentName);
+	vStringDelete (tempName);
+	vStringDelete (fullMethodName);
+	vStringDelete (prevIdent);
 }
 
 static unsigned char objc_m_tg_table [65536] =
@@ -1244,6 +1253,7 @@ extern parserDefinition *ObjcParser (void)
 	def->extensions = extensions;
 	def->parser = findObjcTags;
 	def->initialize = objcInitialize;
+	def->finalize = objcFinalize;
 	def->tg_entries = tg_entries;
 	return def;
 }
