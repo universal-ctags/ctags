@@ -3,7 +3,7 @@ Data	Units/ada-ads.d/input.ads	/^        Data: Data_Ptr;$/;"	c	type:Node	file:
 Data_Ptr	Units/ada-ads.d/input.ads	/^    type Data_Ptr is access StackData'Class;$/;"	t	packspec:GenStack	file:
 Empty	Units/ada-ads.d/input.ads	/^    function Empty(S: Stack) return Boolean;$/;"	R	packspec:GenStack
 Finalize	Units/ada-ads.d/input.ads	/^    procedure Finalize(S: in out Stack);$/;"	R	packspec:GenStack
-GenStack	Units/ada-ads.d/input.ads	/^package GenStack is$/;"	P	file:
+GenStack	Units/ada-ads.d/input.ads	/^package GenStack is$/;"	P
 Initialize	Units/ada-ads.d/input.ads	/^    procedure Initialize(S: in out Stack);$/;"	R	packspec:GenStack
 Next	Units/ada-ads.d/input.ads	/^        Next: Node_Ptr;$/;"	c	type:Node	file:
 Node	Units/ada-ads.d/input.ads	/^    type Node is record$/;"	t	packspec:GenStack	file:

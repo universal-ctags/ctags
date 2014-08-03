@@ -2182,6 +2182,7 @@ static void findAdaTags(void)
   root.isSpec = FALSE;
   root.name = NULL;
   root.parent = NULL;
+  root.isPrivate = FALSE;
   initAdaTokenList(&root.children);
 
   /* read in the first line */
