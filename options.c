@@ -256,6 +256,8 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Should #line directives be processed [no]?"},
  {1,"  --links=[yes|no]"},
  {1,"       Indicate whether symbolic links should be followed [yes]."},
+ {1,"  --list-corpora=[language|all]"},
+ {1,"       Output list of language corpora."},
  {1,"  --list-kinds=[language|all]"},
  {1,"       Output a list of all tag kinds for specified language or all."},
  {1,"  --list-languages"},
@@ -1294,6 +1296,33 @@ static void processListMapsOption (
 	exit (0);
 }
 
+static void processListCorporaOption (const char *const __unused__ option ,
+				      const char *const parameter)
+{
+	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+		printLanguageCorpus (LANG_AUTO, NULL);
+	else
+	{
+		char* const colon = strrchr (parameter, ':');
+		const char* spec  = NULL;
+		langType language;
+
+		if (colon)
+		{
+			*colon = '\0';
+			spec = colon + 1;
+		}
+
+		language = getNamedLanguage (parameter);
+
+		if (language == LANG_IGNORE)
+			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
+		else
+			printLanguageCorpus (language, spec);
+	}
+	exit (0);
+}
+
 static void processListLanguagesOption (
 		const char *const option __unused__,
 		const char *const parameter __unused__)
@@ -1506,6 +1535,7 @@ static parametricOption ParametricOptions [] = {
 	{ "langdef",                processLanguageDefineOption,    FALSE   },
 	{ "langmap",                processLanguageMapOption,       FALSE   },
 	{ "license",                processLicenseOption,           TRUE    },
+	{ "list-corpora",           processListCorporaOption,       TRUE    },
 	{ "list-kinds",             processListKindsOption,         TRUE    },
 	{ "list-maps",              processListMapsOption,          TRUE    },
 	{ "list-languages",         processListLanguagesOption,     TRUE    },

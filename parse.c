@@ -1126,6 +1126,45 @@ extern void printLanguageKinds (const langType language)
 		printKinds (language, FALSE);
 }
 
+static void printCorpus (langType language, const char* const spec, boolean indent)
+{
+	const parserDefinition* lang;
+	const tgTableEntry* entry;
+	const char *const indentation = indent ? "    " : "";
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+
+	for (entry = lang->tg_entries;
+	     entry != NULL;
+	     entry = entry->next)
+	{
+		const char* corpus_file = entry->corpus_file? entry->corpus_file: "ctags";
+
+		if (spec == NULL)
+			printf("%s%s: %s\n", indentation, entry->spec, corpus_file);
+		else if (strcmp (entry->spec, spec) == 0)
+			printf("%s%s: %s\n", indentation, entry->spec, corpus_file);
+	}
+}
+
+extern void printLanguageCorpus (langType language,
+				 const char *const spec)
+{
+	if (language == LANG_AUTO)
+	{
+		unsigned int i;
+		for (i = 0  ;  i < LanguageCount  ;  ++i)
+		{
+			const parserDefinition* const lang = LanguageTable [i];
+			printf ("%s%s\n", lang->name, lang->enabled ? "" : " [disabled]");
+			printCorpus (i, spec, TRUE);
+		}
+	}
+	else
+		printCorpus (language, spec, FALSE);
+}
+
 extern boolean processCorpusOption (
 		const char *const option, const char *const parameter)
 {
