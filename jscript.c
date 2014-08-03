@@ -1440,6 +1440,8 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 			/*
 			 * Handle nameless functions
 			 *     this.method_name = () {}
+			 * Also assignments starting with parentheses
+			 *     var foo = (1 + 2) * 3;
 			 */
 			skipArgumentList(token);
 
@@ -1453,6 +1455,8 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 			}
 			else if (isType (token, TOKEN_CLOSE_CURLY))
 				is_terminated = FALSE;
+			else if (token->nestLevel == 0 && is_global)
+				makeJsTag (name, JSTAG_VARIABLE);
 		}
 		else if (isType (token, TOKEN_OPEN_CURLY))
 		{
