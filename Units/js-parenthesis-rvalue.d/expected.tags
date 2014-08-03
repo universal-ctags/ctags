@@ -1,0 +1,22 @@
+a	input.js	/^var d1 = {a:'hello',b:'hi'};$/;"	p	class:d1
+a	input.js	/^var d2 = ({a:'hello',b:'hi'});$/;"	p	class:d2
+a1	input.js	/^var a1 = 42;$/;"	v
+a2	input.js	/^var a2 = (42);$/;"	v
+b	input.js	/^var d1 = {a:'hello',b:'hi'};$/;"	p	class:d1
+b	input.js	/^var d2 = ({a:'hello',b:'hi'});$/;"	p	class:d2
+b1	input.js	/^var b1 = function(){$/;"	f
+b1sub	input.js	/^  function b1sub(){}$/;"	f	function:b1
+b2	input.js	/^var b2 = (function(){$/;"	f
+b2sub	input.js	/^  function b2sub(){}$/;"	f	function:b2
+b3	input.js	/^var b3 = ((function(){$/;"	f
+b3sub	input.js	/^  function b3sub(){}$/;"	f	function:b3
+c1	input.js	/^var c1 = {};$/;"	v
+c2	input.js	/^var c2 = ({});$/;"	v
+d1	input.js	/^var d1 = {a:'hello',b:'hi'};$/;"	c
+d2	input.js	/^var d2 = ({a:'hello',b:'hi'});$/;"	c
+e1	input.js	/^var e1 = function(){$/;"	f
+e1sub	input.js	/^  function e1sub(){}$/;"	f	function:e1
+e2	input.js	/^var e2 = (function(){$/;"	f
+e2sub	input.js	/^  function e2sub(){}$/;"	f	function:e2
+e3	input.js	/^var e3 = ((function(){$/;"	f
+e3sub	input.js	/^  function e3sub(){}$/;"	f	function:e3
