@@ -553,6 +553,20 @@ static void initialize (const langType language)
 	lastSubSubS = vStringNew();
 }
 
+static void finalize (const langType language)
+{
+	vStringDelete(lastPart);
+	lastPart = NULL;
+	vStringDelete(lastChapter);
+	lastChapter = NULL;
+	vStringDelete(lastSection);
+	lastSection = NULL;
+	vStringDelete(lastSubS);
+	lastSubS = NULL;
+	vStringDelete(lastSubSubS);
+	lastSubSubS = NULL;
+}
+
 static void findTexTags (void)
 {
 	tokenInfo *const token = newToken ();
@@ -578,6 +592,7 @@ extern parserDefinition* TexParser (void)
 	def->kindCount	= KIND_COUNT (TexKinds);
 	def->parser		= findTexTags;
 	def->initialize = initialize;
+	def->finalize   = finalize;
 
 	return def;
 }
