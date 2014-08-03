@@ -280,16 +280,13 @@ static const char *implToString (const implType impl)
 	return names[impl];
 }
 
+static vString *fullScope;
 static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 						  const phpKind kind, const accessType access)
 {
-	static vString *fullScope = NULL;
 	int parentKind = -1;
 
-	if (fullScope == NULL)
-		fullScope = vStringNew ();
-	else
-		vStringClear (fullScope);
+	vStringClear (fullScope);
 
 	if (vStringLength (CurrentNamesapce) > 0)
 	{
@@ -1457,6 +1454,12 @@ static void initialize (const langType language)
 {
 	Lang_php = language;
 	buildPhpKeywordHash ();
+	fullScope = vStringNew ();
+}
+
+static void finalize (const langType language)
+{
+	vStringDelete(fullScope);
 }
 
 extern parserDefinition* PhpParser (void)
@@ -1468,6 +1471,7 @@ extern parserDefinition* PhpParser (void)
 	def->extensions = extensions;
 	def->parser     = findPhpTags;
 	def->initialize = initialize;
+	def->finalize   = finalize;
 	return def;
 }
 
