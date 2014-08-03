@@ -127,6 +127,7 @@ extern void processLanguageDefineOption (const char *const option, const char *c
 extern boolean processKindOption (const char *const option, const char *const parameter);
 extern void printKindOptions (void);
 extern void printLanguageKinds (const langType language);
+extern boolean processCorpusOption (const char *const option, const char *const parameter);
 extern void printLanguageList (void);
 extern boolean parseFile (const char *const fileName);
 

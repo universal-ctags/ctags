@@ -781,14 +781,41 @@ static void addTgEntryFull (const langType language, char* const spec, unsigned 
 {
 	tgTableEntry *entry;
 
-	entry = xMalloc(1, tgTableEntry);
+	entry = xMalloc (1, tgTableEntry);
 	entry->spec = spec;
 	entry->tg_table = tg_table;
 	entry->corpus_file = corpus_file;
 	entry->next = LanguageTable [language]->tg_entries;
 	LanguageTable [language]->tg_entries = entry;
+
+	if (corpus_file)
+		verbose ("Compile corpus %s for %s of %s\n",
+			 corpus_file, spec, LanguageTable [language]->name);
+	else
+		verbose ("Install tg for %s of %s\n", spec, LanguageTable [language]->name);
 }
 
+static void addCorpusFile (const langType language,
+			   char* const spec, char* const corpus_file)
+{
+	FILE *input;
+	unsigned char* tg_table;
+
+	input = fopen (corpus_file, "rb");
+	if (input == NULL)
+		error (FATAL,
+		       "failed in open %s as corpus", corpus_file);
+
+	tg_table = tg_create ();
+	if (!tg_table)
+		error (FATAL,
+		       "failed allocating memory for tg entry");
+
+	tg_load (tg_table, input);
+	fclose (input);
+
+	addTgEntryFull (language, spec, tg_table, corpus_file);
+}
 
 extern void addTgEntry (const langType language, char* const spec, unsigned char* const tg_table)
 {
@@ -1097,6 +1124,46 @@ extern void printLanguageKinds (const langType language)
 	}
 	else
 		printKinds (language, FALSE);
+}
+
+extern boolean processCorpusOption (
+		const char *const option, const char *const parameter)
+{
+	boolean handled = FALSE;
+	const char* const dash = strchr (option, '-');
+	langType language;
+	vString* langName;
+	const char* colon;
+	size_t len;
+	char* tg_file;
+	char* spec;
+
+	if (dash == NULL ||
+	    (strcmp (dash + 1, "corpus") != 0))
+		return FALSE;
+	len = dash - option;
+
+	langName = vStringNew ();
+	vStringNCopyS (langName, option, len);
+	language = getNamedLanguage (vStringValue (langName));
+	if (language == LANG_IGNORE)
+		error (FATAL, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
+	vStringDelete(langName);
+
+	if (parameter == NULL || parameter [0] == '\0')
+		error (FATAL, "no parameter is given for %s", option);
+	colon = strrchr(parameter, ':');
+	if (colon == NULL)
+		error (FATAL,
+		       "no colon(:) separator is found in parameter of %s", option);
+
+	len = colon - parameter;
+	tg_file = eStrdup(parameter + len + 1);
+	spec = eStrndup(parameter, len);
+
+	addCorpusFile(language, spec, tg_file);
+
+	return TRUE;
 }
 
 static void printMaps (const langType language)

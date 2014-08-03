@@ -236,6 +236,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Print this option summary."},
  {1,"  --if0=[yes|no]"},
  {1,"       Should C code within #if 0 conditional branches be parsed [no]?"},
+ {1,"  --<LANG>-corpus=spec:corpusFile"},
+ {1,"      Add two gram data calculated from corpusFile to spec of LANG."},
  {1,"  --<LANG>-kinds=[+|-]kinds"},
  {1,"       Enable/disable tag kinds for language <LANG>."},
  {1,"  --langdef=name"},
@@ -1612,6 +1614,8 @@ static void processLongOption (
 	else if (processParametricOption (option, parameter))
 		;
 	else if (processKindOption (option, parameter))
+		;
+	else if (processCorpusOption (option, parameter))
 		;
 	else if (processRegexOption (option, parameter))
 		;
