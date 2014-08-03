@@ -364,6 +364,7 @@ static void findTag (vString *const name)
 		{
 			currentContext = popToken (currentContext);
 		}
+		vStringDelete(endTokenName);
 	}
 
 	const verilogKind kind = (verilogKind) lookupKeyword (vStringValue (name), Lang_verilog);
@@ -434,6 +435,8 @@ static void findVerilogTags (void)
 				break;
 		}
 	}
+
+	vStringDelete (name);
 	deleteToken (currentContext);
 	currentContext = NULL;
 }
