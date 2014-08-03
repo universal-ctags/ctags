@@ -1717,6 +1717,10 @@ static boolean parseLine (tokenInfo *const token, boolean is_inside_class)
 			case KEYWORD_switch:
 				parseSwitch (token);
 				break;
+			case KEYWORD_return:
+				findCmdTerm (token);
+				is_terminated = isType (token, TOKEN_SEMICOLON);
+				break;
 			default:
 				is_terminated = parseStatement (token, is_inside_class);
 				break;
