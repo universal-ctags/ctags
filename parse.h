@@ -41,6 +41,7 @@ typedef void (*createRegexTag) (const vString* const name);
 typedef void (*simpleParser) (void);
 typedef rescanReason (*rescanParser) (const unsigned int passCount);
 typedef void (*parserInitialize) (langType language);
+typedef void (*parserFinalize) (langType language);
 
 typedef struct sKindOption {
 	boolean enabled;          /* are tags for kind enabled? */
@@ -66,6 +67,7 @@ typedef struct {
 	const char *const *extensions; /* list of default extensions */
 	const char *const *patterns;   /* list of default file name patterns */
 	parserInitialize initialize;   /* initialization routine, if needed */
+	parserFinalize finalize;       /* finalize routine, if needed */
 	simpleParser parser;           /* simple parser (common case) */
 	rescanParser parser2;          /* rescanning parser (unusual case) */
 	boolean regex;                 /* is this a regex parser? */

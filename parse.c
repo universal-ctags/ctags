@@ -761,6 +761,10 @@ extern void freeParserResources (void)
 	for (i = 0  ;  i < LanguageCount  ;  ++i)
 	{
 		parserDefinition* const lang = LanguageTable [i];
+
+		if (lang->finalize)
+			(lang->finalize)((langType)i);
+
 		freeList (&lang->currentPatterns);
 		freeList (&lang->currentExtensions);
 		eFree (lang->name);
