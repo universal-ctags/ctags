@@ -1868,13 +1868,30 @@ static void parseConfigurationFileOptionsInDirectory (const char* directory)
 }
 
 #if defined(HAVE_SCANDIR)
-static int accept_only_dot_ctags(const struct dirent* dent)
+static int ignore_dot_file(const struct dirent* dent)
 {
-	size_t len;
-
 	/* Ignore a file which name is started from dot. */
 	if (*dent->d_name == '.')
 		return 0;
+	else
+		return 1;
+}
+
+static int accept_only_dot_d(const struct dirent* dent)
+{
+	size_t len;
+
+	/* accept only a file ended with ".conf" or ".ctags" */
+	len = strlen(dent->d_name);
+
+	if (len < 3)
+		return 0;
+	return !strcmp(dent->d_name + (len - 2), ".d");
+}
+
+static int accept_only_dot_ctags(const struct dirent* dent)
+{
+	size_t len;
 
 	/* accept only a file ended with ".conf" or ".ctags" */
 	len = strlen(dent->d_name);
@@ -1897,15 +1914,27 @@ static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const d
 	struct dirent **dents;
 	int i, n;
 
-	n = scandir (dirName, &dents, accept_only_dot_ctags, alphasort);
+	n = scandir (dirName, &dents, ignore_dot_file, alphasort);
 	if (n < 0)
 		return FALSE;
 	
 	for (i = 0; i < n; i++)
 	{
-		parseConfigurationFileOptionsInDirectoryWithLeafname (dirName,
-								      dents[i]->d_name);
+		vString* const path = combinePathAndFile (dirName, dents[i]->d_name);
+		fileStatus *s = eStat (vStringValue (path));
+
+		if (!s)
+			goto next;
+
+		if (s->isDirectory && accept_only_dot_d(dents[i]))
+			parseAllConfigurationFilesOptionsInDirectory (vStringValue (path));
+		else if (accept_only_dot_ctags(dents[i]))
+			 parseConfigurationFileOptionsInDirectoryWithLeafname (dirName,
+									       dents[i]->d_name);
+		eStatFree (s);
+	  next:
 		free (dents[i]);
+		vStringDelete(path);
 	}
 	free (dents);
 	return TRUE;
