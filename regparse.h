@@ -294,10 +294,10 @@ typedef struct {
   UChar*           error;
   UChar*           error_end;
   regex_t*         reg;       /* for reg->names only */
-  int              num_call;
 #ifdef USE_SUBEXP_CALL
   UnsetAddrList*   unset_addr_list;
 #endif
+  int              num_call;
   int              num_mem;
 #ifdef USE_NAMED_GROUP
   int              num_named;
