@@ -346,6 +346,9 @@ static const char *const Features [] = {
 #ifdef DEBUG
 	"debug",
 #endif
+#ifdef HAVE_SCANDIR
+	"option-directory",
+#endif
 	NULL
 };
 
