@@ -6122,36 +6122,11 @@ parse_exp(Node** np, OnigToken* tok, int term,
 	goto string_loop;
       }
       if (IS_IGNORECASE(env->option)) {
-#if 0
-	IApplyCaseFoldArg iarg;
-
-	iarg.env      = env;
-	iarg.cc       = cc;
-	iarg.alt_root = NULL_NODE;
-	iarg.ptail    = &(iarg.alt_root);
-	iarg.ascii_range = 1; /* XXX */
-
-	r = ONIGENC_APPLY_ALL_CASE_FOLD(env->enc, env->case_fold_flag,
-					i_apply_case_fold, &iarg);
-	if (r != 0) {
-	  onig_node_free(iarg.alt_root);
-	  return r;
-	}
-	if (IS_NOT_NULL(iarg.alt_root)) {
-          Node* work = onig_node_new_alt(*np, iarg.alt_root);
-          if (IS_NULL(work)) {
-            onig_node_free(iarg.alt_root);
-            return ONIGERR_MEMORY;
-          }
-          *np = work;
-	}
-#else
 	r = cclass_case_fold(np, cc, NCCLASS(asc_node), env);
 	if (r != 0) {
 	  onig_node_free(asc_node);
 	  return r;
 	}
-#endif
       }
       onig_node_free(asc_node);
     }
