@@ -4199,7 +4199,8 @@ add_ctype_to_cc(CClassNode* cc, int ctype, int not, int ascii_range, ScanEnv* en
 }
 
 static int
-parse_posix_bracket(CClassNode* cc, UChar** src, UChar* end, ScanEnv* env)
+parse_posix_bracket(CClassNode* cc, CClassNode* asc_cc,
+		    UChar** src, UChar* end, ScanEnv* env)
 {
 #define POSIX_BRACKET_CHECK_LIMIT_LENGTH  20
 #define POSIX_BRACKET_NAME_MIN_LEN         4
@@ -4223,6 +4224,7 @@ parse_posix_bracket(CClassNode* cc, UChar** src, UChar* end, ScanEnv* env)
 
   const PosixBracketEntryType *pb;
   int not, i, r;
+  int ascii_range;
   OnigCodePoint c;
   OnigEncoding enc = env->enc;
   UChar *p = *src;
@@ -4237,17 +4239,24 @@ parse_posix_bracket(CClassNode* cc, UChar** src, UChar* end, ScanEnv* env)
   if (onigenc_strlen(enc, p, end) < POSIX_BRACKET_NAME_MIN_LEN + 3)
     goto not_posix_bracket;
 
+  ascii_range = IS_ASCII_RANGE(env->option) &&
+		  ! IS_POSIX_BRACKET_ALL_RANGE(env->option);
   for (pb = PBS; pb < PBS + numberof(PBS); pb++) {
     if (onigenc_with_ascii_strncmp(enc, p, end, pb->name, pb->len) == 0) {
       p = (UChar* )onigenc_step(enc, p, end, pb->len);
       if (onigenc_with_ascii_strncmp(enc, p, end, (UChar* )":]", 2) != 0)
         return ONIGERR_INVALID_POSIX_BRACKET_TYPE;
 
-      r = add_ctype_to_cc(cc, pb->ctype, not,
-			  IS_ASCII_RANGE(env->option) &&
-				! IS_POSIX_BRACKET_ALL_RANGE(env->option),
-			  env);
+      r = add_ctype_to_cc(cc, pb->ctype, not, ascii_range, env);
       if (r != 0) return r;
+
+      if (IS_NOT_NULL(asc_cc)) {
+	if (pb->ctype != ONIGENC_CTYPE_WORD &&
+	    pb->ctype != ONIGENC_CTYPE_ASCII &&
+	    !ascii_range)
+	  r = add_ctype_to_cc(asc_cc, pb->ctype, not, ascii_range, env);
+	if (r != 0) return r;
+      }
 
       PINC_S; PINC_S;
       *src = p;
@@ -4340,7 +4349,8 @@ enum CCVALTYPE {
 };
 
 static int
-next_state_class(CClassNode* cc, OnigCodePoint* vs, enum CCVALTYPE* type,
+next_state_class(CClassNode* cc, CClassNode* asc_cc,
+	         OnigCodePoint* vs, enum CCVALTYPE* type,
 		 enum CCSTATE* state, ScanEnv* env)
 {
   int r;
@@ -4349,11 +4359,18 @@ next_state_class(CClassNode* cc, OnigCodePoint* vs, enum CCVALTYPE* type,
     return ONIGERR_CHAR_CLASS_VALUE_AT_END_OF_RANGE;
 
   if (*state == CCS_VALUE && *type != CCV_CLASS) {
-    if (*type == CCV_SB)
+    if (*type == CCV_SB) {
       BITSET_SET_BIT(cc->bs, (int )(*vs));
+      if (IS_NOT_NULL(asc_cc))
+	BITSET_SET_BIT(asc_cc->bs, (int )(*vs));
+    }
     else if (*type == CCV_CODE_POINT) {
       r = add_code_range(&(cc->mbuf), env, *vs, *vs);
       if (r < 0) return r;
+      if (IS_NOT_NULL(asc_cc)) {
+	r = add_code_range(&(asc_cc->mbuf), env, *vs, *vs);
+	if (r < 0) return r;
+      }
     }
   }
 
@@ -4363,7 +4380,8 @@ next_state_class(CClassNode* cc, OnigCodePoint* vs, enum CCVALTYPE* type,
 }
 
 static int
-next_state_val(CClassNode* cc, OnigCodePoint *vs, OnigCodePoint v,
+next_state_val(CClassNode* cc, CClassNode* asc_cc,
+	       OnigCodePoint *vs, OnigCodePoint v,
 	       int* vs_israw, int v_israw,
 	       enum CCVALTYPE intype, enum CCVALTYPE* type,
 	       enum CCSTATE* state, ScanEnv* env)
@@ -4372,11 +4390,18 @@ next_state_val(CClassNode* cc, OnigCodePoint *vs, OnigCodePoint v,
 
   switch (*state) {
   case CCS_VALUE:
-    if (*type == CCV_SB)
+    if (*type == CCV_SB) {
       BITSET_SET_BIT(cc->bs, (int )(*vs));
+      if (IS_NOT_NULL(asc_cc))
+	BITSET_SET_BIT(asc_cc->bs, (int )(*vs));
+    }
     else if (*type == CCV_CODE_POINT) {
       r = add_code_range(&(cc->mbuf), env, *vs, *vs);
       if (r < 0) return r;
+      if (IS_NOT_NULL(asc_cc)) {
+	r = add_code_range(&(asc_cc->mbuf), env, *vs, *vs);
+	if (r < 0) return r;
+      }
     }
     break;
 
@@ -4393,10 +4418,16 @@ next_state_val(CClassNode* cc, OnigCodePoint *vs, OnigCodePoint v,
 	    return ONIGERR_EMPTY_RANGE_IN_CHAR_CLASS;
 	}
 	bitset_set_range(cc->bs, (int )*vs, (int )v);
+	if (IS_NOT_NULL(asc_cc))
+	  bitset_set_range(asc_cc->bs, (int )*vs, (int )v);
       }
       else {
 	r = add_code_range(&(cc->mbuf), env, *vs, v);
 	if (r < 0) return r;
+	if (IS_NOT_NULL(asc_cc)) {
+	  r = add_code_range(&(asc_cc->mbuf), env, *vs, v);
+	  if (r < 0) return r;
+	}
       }
     }
     else {
@@ -4412,6 +4443,11 @@ next_state_val(CClassNode* cc, OnigCodePoint *vs, OnigCodePoint v,
 	bitset_set_range(cc->bs, (int )*vs, (int )(v < 0xff ? v : 0xff));
 	r = add_code_range(&(cc->mbuf), env, (OnigCodePoint )*vs, v);
 	if (r < 0) return r;
+	if (IS_NOT_NULL(asc_cc)) {
+	  bitset_set_range(asc_cc->bs, (int )*vs, (int )(v < 0xff ? v : 0xff));
+	  r = add_code_range(&(asc_cc->mbuf), env, (OnigCodePoint )*vs, v);
+	  if (r < 0) return r;
+	}
 #if 0
       }
       else
@@ -4460,27 +4496,25 @@ code_exist_check(OnigCodePoint c, UChar* from, UChar* end, int ignore_escaped,
   return 0;
 }
 
-static int cclass_case_fold(Node** np, CClassNode* cc, int ascii_range,
-			    ScanEnv* env);
-
 static int
-parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
+parse_char_class(Node** np, Node** asc_np, OnigToken* tok, UChar** src, UChar* end,
 		 ScanEnv* env)
 {
   int r, neg, len, fetched, and_start;
   OnigCodePoint v, vs;
   UChar *p;
   Node* node;
-  Node* alt_node = NULL;
+  Node* asc_node;
   CClassNode *cc, *prev_cc;
-  CClassNode work_cc;
+  CClassNode *asc_cc, *asc_prev_cc;
+  CClassNode work_cc, asc_work_cc;
 
   enum CCSTATE state;
   enum CCVALTYPE val_type, in_type;
   int val_israw, in_israw;
 
-  prev_cc = (CClassNode* )NULL;
-  *np = NULL_NODE;
+  prev_cc = asc_prev_cc = (CClassNode* )NULL;
+  *np = *asc_np = NULL_NODE;
   r = fetch_token_in_cc(tok, src, end, env);
   if (r == TK_CHAR && tok->u.c == '^' && tok->escaped == 0) {
     neg = 1;
@@ -4503,6 +4537,16 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
   *np = node = node_new_cclass();
   CHECK_NULL_RETURN_MEMERR(node);
   cc = NCCLASS(node);
+
+  if (IS_IGNORECASE(env->option)) {
+    *asc_np = asc_node = node_new_cclass();
+    CHECK_NULL_RETURN_MEMERR(asc_node);
+    asc_cc = NCCLASS(asc_node);
+  }
+  else {
+    asc_node = NULL_NODE;
+    asc_cc = NULL;
+  }
 
   and_start = 0;
   state = CCS_START;
@@ -4594,13 +4638,13 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
       }
       in_type = (len == 1 ? CCV_SB : CCV_CODE_POINT);
     val_entry2:
-      r = next_state_val(cc, &vs, v, &val_israw, in_israw, in_type, &val_type,
+      r = next_state_val(cc, asc_cc, &vs, v, &val_israw, in_israw, in_type, &val_type,
 			 &state, env);
       if (r != 0) goto err;
       break;
 
     case TK_POSIX_BRACKET_OPEN:
-      r = parse_posix_bracket(cc, &p, end, env);
+      r = parse_posix_bracket(cc, asc_cc, &p, end, env);
       if (r < 0) goto err;
       if (r == 1) {  /* is not POSIX bracket */
 	CC_ESC_WARN(env, (UChar* )"[");
@@ -4616,9 +4660,15 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
       r = add_ctype_to_cc(cc, tok->u.prop.ctype, tok->u.prop.not,
 			  IS_ASCII_RANGE(env->option), env);
       if (r != 0) return r;
+      if (IS_NOT_NULL(asc_cc)) {
+	if (tok->u.prop.ctype != ONIGENC_CTYPE_WORD)
+	  r = add_ctype_to_cc(asc_cc, tok->u.prop.ctype, tok->u.prop.not,
+			      IS_ASCII_RANGE(env->option), env);
+	if (r != 0) return r;
+      }
 
     next_class:
-      r = next_state_class(cc, &vs, &val_type, &state, env);
+      r = next_state_class(cc, asc_cc, &vs, &val_type, &state, env);
       if (r != 0) goto err;
       break;
 
@@ -4630,6 +4680,11 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
 	if (ctype < 0) return ctype;
 	r = add_ctype_to_cc(cc, ctype, tok->u.prop.not, 0, env);
 	if (r != 0) return r;
+	if (IS_NOT_NULL(asc_cc)) {
+	  if (ctype != ONIGENC_CTYPE_ASCII)
+	    r = add_ctype_to_cc(asc_cc, ctype, tok->u.prop.not, 0, env);
+	  if (r != 0) return r;
+	}
 	goto next_class;
       }
       break;
@@ -4690,15 +4745,20 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
 
     case TK_CC_CC_OPEN: /* [ */
       {
-	Node *anode;
+	Node *anode, *aasc_node;
 	CClassNode* acc;
 
-	r = parse_char_class(&anode, tok, &p, end, env);
+	r = parse_char_class(&anode, &aasc_node, tok, &p, end, env);
 	if (r == 0) {
 	  acc = NCCLASS(anode);
 	  r = or_cclass(cc, acc, env->enc);
 	}
+	if (r == 0 && IS_NOT_NULL(aasc_node)) {
+	  acc = NCCLASS(aasc_node);
+	  r = or_cclass(asc_cc, acc, env->enc);
+	}
 	onig_node_free(anode);
+	onig_node_free(aasc_node);
 	if (r != 0) goto err;
       }
       break;
@@ -4706,7 +4766,7 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
     case TK_CC_AND: /* && */
       {
 	if (state == CCS_VALUE) {
-	  r = next_state_val(cc, &vs, 0, &val_israw, 0, val_type,
+	  r = next_state_val(cc, asc_cc, &vs, 0, &val_israw, 0, val_type,
 			     &val_type, &state, env);
 	  if (r != 0) goto err;
 	}
@@ -4718,12 +4778,23 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
 	  r = and_cclass(prev_cc, cc, env->enc);
 	  if (r != 0) goto err;
 	  bbuf_free(cc->mbuf);
+	  if (IS_NOT_NULL(asc_cc)) {
+	    r = and_cclass(asc_prev_cc, asc_cc, env->enc);
+	    if (r != 0) goto err;
+	    bbuf_free(asc_cc->mbuf);
+	  }
 	}
 	else {
 	  prev_cc = cc;
 	  cc = &work_cc;
+	  if (IS_NOT_NULL(asc_cc)) {
+	    asc_prev_cc = asc_cc;
+	    asc_cc = &asc_work_cc;
+	  }
 	}
 	initialize_cclass(cc);
+	if (IS_NOT_NULL(asc_cc))
+	  initialize_cclass(asc_cc);
       }
       break;
 
@@ -4746,7 +4817,7 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
   }
 
   if (state == CCS_VALUE) {
-    r = next_state_val(cc, &vs, 0, &val_israw, 0, val_type,
+    r = next_state_val(cc, asc_cc, &vs, 0, &val_israw, 0, val_type,
 		       &val_type, &state, env);
     if (r != 0) goto err;
   }
@@ -4756,12 +4827,24 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
     if (r != 0) goto err;
     bbuf_free(cc->mbuf);
     cc = prev_cc;
+    if (IS_NOT_NULL(asc_cc)) {
+      r = and_cclass(asc_prev_cc, asc_cc, env->enc);
+      if (r != 0) goto err;
+      bbuf_free(asc_cc->mbuf);
+      asc_cc = asc_prev_cc;
+    }
   }
 
-  if (neg != 0)
+  if (neg != 0) {
     NCCLASS_SET_NOT(cc);
-  else
+    if (IS_NOT_NULL(asc_cc))
+      NCCLASS_SET_NOT(asc_cc);
+  }
+  else {
     NCCLASS_CLEAR_NOT(cc);
+    if (IS_NOT_NULL(asc_cc))
+      NCCLASS_CLEAR_NOT(asc_cc);
+  }
   if (IS_NCCLASS_NOT(cc) &&
       IS_SYNTAX_BV(env->syntax, ONIG_SYN_NOT_NEWLINE_IN_NEGATIVE_CC)) {
     int is_empty;
@@ -4789,6 +4872,8 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
  err:
   if (cc != NCCLASS(*np))
     bbuf_free(cc->mbuf);
+  if (IS_NOT_NULL(asc_cc) && (asc_cc != NCCLASS(*asc_np)))
+    bbuf_free(asc_cc->mbuf);
   return r;
 }
 
@@ -5420,9 +5505,9 @@ clear_not_flag_cclass(CClassNode* cc, OnigEncoding enc)
 typedef struct {
   ScanEnv*    env;
   CClassNode* cc;
+  CClassNode* asc_cc;
   Node*       alt_root;
   Node**      ptail;
-  int         ascii_range;
 } IApplyCaseFoldArg;
 
 static int
@@ -5432,15 +5517,25 @@ i_apply_case_fold(OnigCodePoint from, OnigCodePoint to[],
   IApplyCaseFoldArg* iarg;
   ScanEnv* env;
   CClassNode* cc;
+  CClassNode* asc_cc;
   BitSetRef bs;
   int add_flag;
 
   iarg = (IApplyCaseFoldArg* )arg;
   env = iarg->env;
   cc  = iarg->cc;
+  asc_cc = iarg->asc_cc;
   bs = cc->bs;
-  add_flag = (! iarg->ascii_range) ||
-	      (ONIGENC_IS_ASCII_CODE(from) == ONIGENC_IS_ASCII_CODE(*to));
+
+  if (IS_NULL(asc_cc) ||
+      (ONIGENC_IS_ASCII_CODE(from) == ONIGENC_IS_ASCII_CODE(*to))) {
+    add_flag = 1;
+  }
+  else {
+    add_flag = onig_is_code_in_cc(env->enc, from, asc_cc);
+    if (IS_NCCLASS_NOT(asc_cc))
+      add_flag = !add_flag;
+  }
 
   if (to_len == 1) {
     int is_in = onig_is_code_in_cc(env->enc, from, cc);
@@ -5514,16 +5609,16 @@ i_apply_case_fold(OnigCodePoint from, OnigCodePoint to[],
 }
 
 static int
-cclass_case_fold(Node** np, CClassNode* cc, int ascii_range, ScanEnv* env)
+cclass_case_fold(Node** np, CClassNode* cc, CClassNode* asc_cc, ScanEnv* env)
 {
   int r;
   IApplyCaseFoldArg iarg;
 
   iarg.env         = env;
   iarg.cc          = cc;
+  iarg.asc_cc      = asc_cc;
   iarg.alt_root    = NULL_NODE;
   iarg.ptail       = &(iarg.alt_root);
-  iarg.ascii_range = ascii_range;
 
   r = ONIGENC_APPLY_ALL_CASE_FOLD(env->enc, env->case_fold_flag,
 				  i_apply_case_fold, &iarg);
@@ -6006,15 +6101,20 @@ parse_exp(Node** np, OnigToken* tok, int term,
 
   case TK_CC_OPEN:
     {
+      Node *asc_node;
       CClassNode* cc;
       OnigCodePoint code;
 
-      r = parse_char_class(np, tok, src, end, env);
-      if (r != 0) return r;
+      r = parse_char_class(np, &asc_node, tok, src, end, env);
+      if (r != 0) {
+	onig_node_free(asc_node);
+	return r;
+      }
 
       cc = NCCLASS(*np);
-      if (NTYPE(*np) == NT_CCLASS && is_onechar_cclass(cc, &code)) {
+      if (is_onechar_cclass(cc, &code)) {
 	onig_node_free(*np);
+	onig_node_free(asc_node);
 	*np = node_new_empty();
 	CHECK_NULL_RETURN_MEMERR(*np);
 	r = node_str_cat_codepoint(*np, env->enc, code);
@@ -6022,6 +6122,7 @@ parse_exp(Node** np, OnigToken* tok, int term,
 	goto string_loop;
       }
       if (IS_IGNORECASE(env->option)) {
+#if 0
 	IApplyCaseFoldArg iarg;
 
 	iarg.env      = env;
@@ -6044,7 +6145,15 @@ parse_exp(Node** np, OnigToken* tok, int term,
           }
           *np = work;
 	}
+#else
+	r = cclass_case_fold(np, cc, NCCLASS(asc_node), env);
+	if (r != 0) {
+	  onig_node_free(asc_node);
+	  return r;
+	}
+#endif
       }
+      onig_node_free(asc_node);
     }
     break;
 
