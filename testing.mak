@@ -130,7 +130,7 @@ test.units: $(CTAGS_TEST)
 		\
 		echo -n "Testing $${name}..."; \
 		\
-		$(VALGRIND) $(CTAGS_TEST) -o - $$(test -f "$${args}" && echo "--options=$${args}") "$$input" |	\
+		CTAGS_DATA_PATH=$$t $(VALGRIND) $(CTAGS_TEST) -o - $$(test -f "$${args}" && echo "--options=$${args}") "$$input" |	\
 		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
 		cp "$$expected" "$$expectedtmp"; \
 		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff"); \

@@ -1,0 +1,6 @@
+Animal	Units/conflib-simple.d/input.coffee	/^class Animal$/;"	c
+Horse	Units/conflib-simple.d/input.coffee	/^class Horse extends Animal$/;"	c
+Snake	Units/conflib-simple.d/input.coffee	/^class Snake extends Animal$/;"	c
+constructor	Units/conflib-simple.d/input.coffee	/^  constructor: (@name) ->$/;"	f
+move	Units/conflib-simple.d/input.coffee	/^  move: (meters) ->$/;"	f
+move	Units/conflib-simple.d/input.coffee	/^  move: ->$/;"	f
