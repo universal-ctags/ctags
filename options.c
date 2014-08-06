@@ -98,6 +98,11 @@ typedef const struct {
 
 static boolean NonOptionEncountered;
 static stringList *OptionFiles;
+
+typedef stringList searchPathList;
+static searchPathList *DataPathList;
+static searchPathList *ConfigPathList;
+
 static stringList* Excluded;
 static boolean FilesRequired = TRUE;
 static boolean SkipConfiguration;
@@ -1334,21 +1339,81 @@ static void processListLanguagesOption (
 	exit (0);
 }
 
+static searchPathList* extendSearchPathList (searchPathList* baseList, const char* leaf)
+{
+	unsigned int i;
+	vString* basePath;
+	vString* path;
+	searchPathList* extendedList;
+
+	extendedList = stringListNew ();
+	for (i = 0; i < stringListCount (baseList); ++i)
+	{
+		basePath = stringListItem (baseList, i);
+		path = combinePathAndFile (vStringValue (basePath), leaf);
+		stringListAdd (extendedList, path);
+	}
+
+	return extendedList;
+}
+
+static void freeSearchPathList (searchPathList** pathList)
+{
+	stringListClear (*pathList);
+	stringListDelete (*pathList);
+	*pathList = NULL;
+}
+
+static void verboseSearchPathList (const char *const varname, const searchPathList* pathList)
+{
+	unsigned int i;
+
+	verbose ("Install %s:\n", varname);
+	for (i = 0; i < stringListCount (pathList); ++i)
+		verbose ("  %s\n", vStringValue (stringListItem (pathList, i)));
+}
+
+static vString* expandOnSearchPathList (searchPathList *pathList, const char* leaf)
+{
+	unsigned int i;
+
+	for (i = 0; i < stringListCount (pathList); ++i)
+	{
+		const char* const body = vStringValue (stringListItem (pathList, i));
+		vString* const tmp = combinePathAndFile (body, leaf);
+
+		if (doesFileExist (vStringValue (tmp)))
+			return tmp;
+		else
+			vStringDelete (tmp);
+	}
+	return NULL;
+}
+
 static void processOptionFile (
 		const char *const option, const char *const parameter)
 {
+	const char* path;
+	vString* vpath = NULL;
 	boolean opened_as_file, opened_as_dir;
 	if (parameter [0] == '\0')
 		error (WARNING, "no option file supplied for \"%s\"", option);
-	else
+
+	if (parameter [0] != '/' && parameter [0] != '.')
 	{
-
-		opened_as_file = parseFileOptions (parameter);
-		opened_as_dir  = parseAllConfigurationFilesOptionsInDirectory (parameter);
-
-		if ((opened_as_file == FALSE) && (opened_as_dir == FALSE))
-			error (FATAL | PERROR, "cannot open option file \"%s\"", parameter);
+		vpath = expandOnSearchPathList (ConfigPathList, parameter);
+		path = vpath? vStringValue (vpath): parameter;
 	}
+	else
+		path = parameter;
+
+	opened_as_file = parseFileOptions (path);
+	opened_as_dir  = parseAllConfigurationFilesOptionsInDirectory (path);
+	if ((opened_as_file == FALSE) && (opened_as_dir == FALSE))
+		error (FATAL | PERROR, "cannot open option file \"%s\"", path);
+
+	if (vpath)
+		vStringDelete (vpath);
 }
 
 static void processSortOption (
@@ -2057,6 +2122,36 @@ extern void readOptionConfiguration (void)
 	}
 }
 
+static searchPathList* makeDataPathList ()
+{
+	char* dataPath = getenv ("CTAGS_DATA_PATH");
+	searchPathList* list = stringListNew ();
+
+	if (dataPath)
+	{
+		char* needle;
+
+		while (dataPath[0])
+		{
+			needle = strchr (dataPath, ':');
+			if (needle)
+				*needle = '\0';
+
+			stringListAdd (list, vStringNewInit (dataPath));
+
+			if (needle)
+			{
+				*needle = ':';
+				dataPath = needle + 1;
+			}
+			else
+				break;
+		}
+		stringListReverse (list);
+	}
+	return list;
+}
+
 /*
 *   Option initialization
 */
@@ -2064,6 +2159,10 @@ extern void readOptionConfiguration (void)
 extern void initOptions (void)
 {
 	OptionFiles = stringListNew ();
+	DataPathList = makeDataPathList ();
+	ConfigPathList = extendSearchPathList (DataPathList, "configs");
+	verboseSearchPathList ("ConfigPath", ConfigPathList);
+
 	verbose ("Setting option defaults\n");
 	installHeaderListDefaults ();
 	verbose ("  Installing default language mappings:\n");
@@ -2102,6 +2201,10 @@ extern void freeOptionResources (void)
 	freeList (&Option.ignore);
 	freeList (&Option.headerExt);
 	freeList (&Option.etagsInclude);
+
+	freeSearchPathList (&ConfigPathList);
+	freeSearchPathList (&DataPathList);
+
 	freeList (&OptionFiles);
 }
 

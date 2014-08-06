@@ -314,4 +314,18 @@ extern void stringListPrint (const stringList *const current)
 		printf ("%s%s", (i > 0) ? ", " : "", vStringValue (current->list [i]));
 }
 
+extern void stringListReverse (const stringList *const current)
+{
+	unsigned int i, j;
+	vString *tmp;
+
+	Assert (current != NULL);
+	for (i = 0, j = current->count - 1 ; i <  (current->count / 2); ++i, --j)
+	{
+		tmp = current->list[i];
+		current->list[i] = current->list[j];
+		current->list[i] = tmp;
+	}
+}
+
 /* vi:set tabstop=4 shiftwidth=4: */
