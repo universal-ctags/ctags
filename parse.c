@@ -483,9 +483,6 @@ static const tgTableEntry* const findTgTableEntry(const parserDefinition* const 
 	     entry = entry->next)
 		if (strcmp (entry->spec, spec) == 0)
 			break;
-	if (entry->spec == NULL)
-		entry = NULL;
-
 	return entry;
 }
 
