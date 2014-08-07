@@ -777,7 +777,7 @@ extern void addLanguageExtensionMap (
 }
 
 static void addTgEntryFull (const langType language, char* const spec, unsigned char* const tg_table,
-			    char* const  corpus_file)
+			    vString* corpus_file)
 {
 	tgTableEntry *entry;
 
@@ -790,21 +790,21 @@ static void addTgEntryFull (const langType language, char* const spec, unsigned 
 
 	if (corpus_file)
 		verbose ("Compile corpus %s for %s of %s\n",
-			 corpus_file, spec, LanguageTable [language]->name);
+			 vStringValue (corpus_file), spec, LanguageTable [language]->name);
 	else
 		verbose ("Install tg for %s of %s\n", spec, LanguageTable [language]->name);
 }
 
 static void addCorpusFile (const langType language,
-			   char* const spec, char* const corpus_file)
+			   char* const spec, vString* const corpus_file)
 {
 	FILE *input;
 	unsigned char* tg_table;
 
-	input = fopen (corpus_file, "rb");
+	input = fopen (vStringValue (corpus_file), "rb");
 	if (input == NULL)
 		error (FATAL,
-		       "failed in open %s as corpus", corpus_file);
+		       "failed in open %s as corpus", vStringValue (corpus_file));
 
 	tg_table = tg_create ();
 	if (!tg_table)
@@ -832,7 +832,7 @@ static tgTableEntry* freeTgEntry(tgTableEntry *entry)
 		entry->spec = NULL;
 		eFree (entry->tg_table);
 		entry->tg_table = NULL;
-		eFree (entry->corpus_file);
+		vStringDelete (entry->corpus_file);
 		entry->corpus_file = NULL;
 	}
 
@@ -1139,7 +1139,7 @@ static void printCorpus (langType language, const char* const spec, boolean inde
 	     entry != NULL;
 	     entry = entry->next)
 	{
-		const char* corpus_file = entry->corpus_file? entry->corpus_file: "ctags";
+		const char* corpus_file = entry->corpus_file? vStringValue (entry->corpus_file): "ctags";
 
 		if (spec == NULL)
 			printf("%s%s: %s\n", indentation, entry->spec, corpus_file);
@@ -1174,7 +1174,8 @@ extern boolean processCorpusOption (
 	vString* langName;
 	const char* colon;
 	size_t len;
-	char* tg_file;
+	const char* file_part;
+	vString* tg_file;
 	char* spec;
 
 	if (dash == NULL ||
@@ -1197,7 +1198,10 @@ extern boolean processCorpusOption (
 		       "no colon(:) separator is found in parameter of %s", option);
 
 	len = colon - parameter;
-	tg_file = eStrdup(parameter + len + 1);
+	file_part = parameter + len + 1;
+	tg_file = expandOnCorpusPathList (file_part);
+	if (tg_file == NULL)
+	  tg_file = vStringNewInit (file_part);
 	spec = eStrndup(parameter, len);
 
 	addCorpusFile(language, spec, tg_file);

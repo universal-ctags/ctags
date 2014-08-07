@@ -102,6 +102,7 @@ static stringList *OptionFiles;
 typedef stringList searchPathList;
 static searchPathList *DataPathList;
 static searchPathList *ConfigPathList;
+static searchPathList *CorpusPathList;
 
 static stringList* Excluded;
 static boolean FilesRequired = TRUE;
@@ -1390,6 +1391,16 @@ static vString* expandOnSearchPathList (searchPathList *pathList, const char* le
 	return NULL;
 }
 
+static vString* expandOnConfigPathList (const char* leaf)
+{
+  return expandOnSearchPathList (ConfigPathList, leaf);
+}
+
+extern vString* expandOnCorpusPathList (const char* leaf)
+{
+  return expandOnSearchPathList (CorpusPathList, leaf);
+}
+
 static void processOptionFile (
 		const char *const option, const char *const parameter)
 {
@@ -1401,7 +1412,7 @@ static void processOptionFile (
 
 	if (parameter [0] != '/' && parameter [0] != '.')
 	{
-		vpath = expandOnSearchPathList (ConfigPathList, parameter);
+		vpath = expandOnConfigPathList (parameter);
 		path = vpath? vStringValue (vpath): parameter;
 	}
 	else
@@ -2161,7 +2172,9 @@ extern void initOptions (void)
 	OptionFiles = stringListNew ();
 	DataPathList = makeDataPathList ();
 	ConfigPathList = extendSearchPathList (DataPathList, "configs");
-	verboseSearchPathList ("ConfigPath", ConfigPathList);
+	verboseSearchPathList ("ConfigPathList", ConfigPathList);
+	CorpusPathList = extendSearchPathList (DataPathList, "corpora");
+	verboseSearchPathList ("CorpusPathList", CorpusPathList);
 
 	verbose ("Setting option defaults\n");
 	installHeaderListDefaults ();
@@ -2202,6 +2215,7 @@ extern void freeOptionResources (void)
 	freeList (&Option.headerExt);
 	freeList (&Option.etagsInclude);
 
+	freeSearchPathList (&CorpusPathList);
 	freeSearchPathList (&ConfigPathList);
 	freeSearchPathList (&DataPathList);
 

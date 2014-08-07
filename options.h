@@ -150,6 +150,9 @@ extern void readOptionConfiguration (void);
 extern void initOptions (void);
 extern void freeOptionResources (void);
 
+extern vString* expandOnCorpusPathList (const char* leaf);
+/* Return vString must be freed by caller side. */
+
 #endif  /* _OPTIONS_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

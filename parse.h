@@ -57,7 +57,7 @@ typedef struct stgTableEntry{
 	   is conflicted another parser. */
 	char* spec;
 	unsigned char* tg_table;
-	char* corpus_file;
+	vString* corpus_file;
 	struct stgTableEntry *next;
 } tgTableEntry;
 
