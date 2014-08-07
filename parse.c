@@ -554,13 +554,20 @@ static langType getSpecLanguageCommon (const char *const spec, FILE* input,
 	n_candidates = (*nominate)(spec, &candidates);
 
 	if (input == NULL && n_candidates > 1)
+	{
 		/* This is needed for backward compatibility
 		   about #line directive behavior. */
+		verbose ("		#candidates: <no input>\n");
 		language = candidates[0].lang;
+	}
 	else if (n_candidates == 1)
+	{
+		verbose ("		#candidates: %u\n", n_candidates);
 		language = candidates[0].lang;
+	}
 	else if (n_candidates > 1)
 	{
+		verbose ("		#candidates: %u\n", n_candidates);
 		language = getTwoGramLanguage(input, candidates, n_candidates);
 		if (language == LANG_IGNORE)
 			language = candidates[0].lang;
