@@ -1,3 +1,2 @@
 REDHAT-MIB	Units/mib-simple.d/input.REDHAT-MIB	/^REDHAT-MIB DEFINITIONS ::= BEGIN$/;"	d
-REDHAT-MIB	Units/mib-simple.d/input.REDHAT-MIB	/^REDHAT-MIB DEFINITIONS ::= BEGIN$/;"	n
 redhat	Units/mib-simple.d/input.REDHAT-MIB	/^redhat MODULE-IDENTITY$/;"	n
