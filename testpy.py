@@ -1161,6 +1161,33 @@ def main():
     x2("(?u)[[:word:]]+", "aあ", 0, 2);
     n("(?u)[[:^word:]]+", "aあ");
 
+    #x2("(?iu)\\p{lower}\\p{upper}", "Ab", 0, 2);
+    #x2("(?ia)\\p{lower}\\p{upper}", "Ab", 0, 2);
+    x2("(?iu)[[:lower:]][[:upper:]]", "Ab", 0, 2);
+    x2("(?ia)[[:lower:]][[:upper:]]", "Ab", 0, 2);
+
+    if is_unicode_encoding(onig_encoding):
+        n("(?ia)\\w+", "\u212a\u017f");      # KELVIN SIGN, LATIN SMALL LETTER LONG S
+        n("(?ia)[\\w]+", "\u212a\u017f");
+        n("(?ia)[^\\W]+", "\u212a\u017f");
+        x2("(?ia)[^\\W]+", "ks", 0, 2);
+        n("(?iu)\\p{ASCII}", "\u212a");
+        n("(?iu)\\P{ASCII}", "s");
+        n("(?iu)[\\p{ASCII}]", "\u212a");
+        n("(?iu)[\\P{ASCII}]", "s");
+        n("(?ia)\\p{ASCII}", "\u212a");
+        n("(?ia)\\P{ASCII}", "s");
+        n("(?ia)[\\p{ASCII}]", "\u212a");
+        n("(?ia)[\\P{ASCII}]", "s");
+        x2("(?iu)[s]+", "Ss\u017f ", 0, 3);
+        x2("(?ia)[s]+", "Ss\u017f ", 0, 3);
+        x2("(?iu)[^s]+", "Ss\u017f ", 3, 4);
+        x2("(?ia)[^s]+", "Ss\u017f ", 3, 4);
+        x2("(?iu)[[:lower:]]", "\u017f", 0, 1);
+        n("(?ia)[[:lower:]]", "\u017f");
+        x2("(?u)[[:upper:]]", "\u212a", 0, 1);
+        n("(?a)[[:upper:]]", "\u212a");
+
     # \< and \>
     x2("\\<abc\\>", " abc ", 1, 4, syn=onig.ONIG_SYNTAX_GREP)
     n("\\<abc\\>", "zabc ", syn=onig.ONIG_SYNTAX_GREP)
