@@ -67,6 +67,7 @@ enum pType { PTRN_TAG, PTRN_CALLBACK };
 typedef struct {
 	regex_t *pattern;
 	enum pType type;
+	boolean exclusive;
 	union {
 		struct {
 			char *name_pattern;
@@ -274,10 +275,21 @@ static boolean parseTagRegex (
 	return result;
 }
 
+
+static void ptrn_flag_cut (char c, void* data)
+{
+	regexPattern *ptrn = data;
+	ptrn->exclusive = TRUE;
+}
+
+static flagDefinition ptrnFlagDef[] = {
+	{ '!', ptrn_flag_cut },
+};
+
 static void addCompiledTagPattern (
 		const langType language, regex_t* const pattern,
 		char* const name, const char kind, char* const kindName,
-		char *const description)
+		char *const description, const char* flags)
 {
 	patternSet* set;
 	regexPattern *ptrn;
@@ -299,16 +311,18 @@ static void addCompiledTagPattern (
 
 	ptrn->pattern = pattern;
 	ptrn->type    = PTRN_TAG;
+	ptrn->exclusive = FALSE;
 	ptrn->u.tag.name_pattern = name;
 	ptrn->u.tag.kind.enabled = TRUE;
 	ptrn->u.tag.kind.letter  = kind;
 	ptrn->u.tag.kind.name    = kindName;
 	ptrn->u.tag.kind.description = description;
+	evalFlags (flags, ptrnFlagDef, COUNT(ptrnFlagDef), ptrn);
 }
 
 static void addCompiledCallbackPattern (
 		const langType language, regex_t* const pattern,
-		const regexCallback callback)
+		const regexCallback callback, const char* flags)
 {
 	patternSet* set;
 	regexPattern *ptrn;
@@ -330,7 +344,9 @@ static void addCompiledCallbackPattern (
 
 	ptrn->pattern = pattern;
 	ptrn->type    = PTRN_CALLBACK;
+	ptrn->exclusive = FALSE;
 	ptrn->u.callback.function = callback;
+	evalFlags (flags, ptrnFlagDef, COUNT(ptrnFlagDef), ptrn);
 }
 
 #if defined (POSIX_REGEX)
@@ -563,8 +579,15 @@ extern boolean matchRegex (const vString* const line, const langType language)
 		const patternSet* const set = Sets + language;
 		unsigned int i;
 		for (i = 0  ;  i < set->count  ;  ++i)
-			if (matchRegexPattern (line, set->patterns + i))
+		{
+			regexPattern* ptrn = set->patterns + i;
+			if (matchRegexPattern (line, ptrn))
+			{
 				result = TRUE;
+				if (ptrn->exclusive)
+					break;
+			}
+		}
 	}
 	return result;
 }
@@ -598,7 +621,7 @@ extern void addTagRegex (
 			char* description;
 			parseKinds (kinds, &kind, &kindName, &description);
 			addCompiledTagPattern (language, cp, eStrdup (name),
-					kind, kindName, description);
+					kind, kindName, description, flags);
 		}
 	}
 #endif
@@ -616,7 +639,7 @@ extern void addCallbackRegex (
 	{
 		regex_t* const cp = compileRegex (regex, flags);
 		if (cp != NULL)
-			addCompiledCallbackPattern (language, cp, callback);
+			addCompiledCallbackPattern (language, cp, callback, flags);
 	}
 #endif
 }
