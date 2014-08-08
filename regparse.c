@@ -4314,6 +4314,8 @@ fetch_char_property_to_ctype(UChar** src, UChar* end, ScanEnv* env)
   return r;
 }
 
+static int cclass_case_fold(Node** np, CClassNode* cc, CClassNode* asc_cc, ScanEnv* env);
+
 static int
 parse_char_property(Node** np, OnigToken* tok, UChar** src, UChar* end,
 		    ScanEnv* env)
@@ -4331,6 +4333,13 @@ parse_char_property(Node** np, OnigToken* tok, UChar** src, UChar* end,
   if (r != 0) return r;
   if (tok->u.prop.not != 0) NCCLASS_SET_NOT(cc);
 
+  if (IS_IGNORECASE(env->option)) {
+    if (ctype == ONIGENC_CTYPE_ASCII)
+      r = cclass_case_fold(np, cc, NULL, env);
+    else
+      r = cclass_case_fold(np, cc, cc, env);
+    if (r != 0) return r;
+  }
   return 0;
 }
 
@@ -5527,8 +5536,10 @@ i_apply_case_fold(OnigCodePoint from, OnigCodePoint to[],
   asc_cc = iarg->asc_cc;
   bs = cc->bs;
 
-  if (IS_NULL(asc_cc) ||
-      (ONIGENC_IS_ASCII_CODE(from) == ONIGENC_IS_ASCII_CODE(*to))) {
+  if (IS_NULL(asc_cc)) {
+    add_flag = 0;
+  }
+  else if (ONIGENC_IS_ASCII_CODE(from) == ONIGENC_IS_ASCII_CODE(*to)) {
     add_flag = 1;
   }
   else {
