@@ -85,6 +85,12 @@ typedef struct {
 	unsigned int count;
 } patternSet;
 
+typedef struct {
+	char c;
+	void (* proc) (char c, void *data);
+} flagDefinition;
+#define COUNT(D) (sizeof(D)/sizeof(D[0]))
+
 /*
 *   DATA DEFINITIONS
 */
@@ -98,6 +104,25 @@ static int SetUpper = -1;  /* upper language index in list */
 /*
 *   FUNCTION DEFINITIONS
 */
+
+static void evalFlags (const char* flags, flagDefinition* defs, unsigned int ndefs, void* data)
+{
+	unsigned int i, j;
+
+	if (!flags)
+		return;
+	if (!defs)
+		return;
+
+	for (i = 0 ; flags [i] != '\0' ; ++i)
+	{
+		for (j = 0 ; j < ndefs ; ++j)
+		{
+			if (flags[i] == defs[j].c)
+				defs[j].proc(flags[i], data);
+		}
+	}
+}
 
 static void clearPatternSet (const langType language)
 {
@@ -310,22 +335,38 @@ static void addCompiledCallbackPattern (
 
 #if defined (POSIX_REGEX)
 
+static void regex_flag_basic (char c, void* data)
+{
+	int* cflags = data;
+	*cflags &= ~REG_EXTENDED;
+}
+static void regex_flag_extend (char c, void* data)
+{
+	int* cflags = data;
+	*cflags |= REG_EXTENDED;
+}
+static void regex_flag_icase (char c, void* data)
+{
+	int* cflags = data;
+	*cflags |= REG_ICASE;
+}
+
 static regex_t* compileRegex (const char* const regexp, const char* const flags)
 {
 	int cflags = REG_EXTENDED | REG_NEWLINE;
 	regex_t *result = NULL;
 	int errcode;
-	int i;
-	for (i = 0  ; flags != NULL  &&  flags [i] != '\0'  ;  ++i)
-	{
-		switch ((int) flags [i])
-		{
-			case 'b': cflags &= ~REG_EXTENDED; break;
-			case 'e': cflags |= REG_EXTENDED;  break;
-			case 'i': cflags |= REG_ICASE;     break;
-			default: error (WARNING, "unknown regex flag: '%c'", *flags); break;
-		}
-	}
+
+	flagDefinition regexFlagDefs[] = {
+		{ 'b', regex_flag_basic  },
+		{ 'e', regex_flag_extend },
+		{ 'i', regex_flag_icase  },
+	};
+	evalFlags (flags,
+		   regexFlagDefs,
+		   COUNT(regexFlagDefs),
+		   &cflags);
+
 	result = xMalloc (1, regex_t);
 	errcode = regcomp (result, regexp, cflags);
 	if (errcode != 0)
