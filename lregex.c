@@ -87,8 +87,10 @@ typedef struct {
 } patternSet;
 
 typedef struct {
-	char c;
-	void (* proc) (char c, void *data);
+	char short_char;
+	char *long_str;
+	void (* short_proc) (char c,  void *data);
+	void (* long_proc)  (const char* const s, void *data);
 } flagDefinition;
 #define COUNT(D) (sizeof(D)/sizeof(D[0]))
 
@@ -117,11 +119,27 @@ static void evalFlags (const char* flags, flagDefinition* defs, unsigned int nde
 
 	for (i = 0 ; flags [i] != '\0' ; ++i)
 	{
-		for (j = 0 ; j < ndefs ; ++j)
+		if (flags [i] == '[')
 		{
-			if (flags[i] == defs[j].c)
-				defs[j].proc(flags[i], data);
+			char* needle = strchr(flags + i + 1, ']');
+
+			if (needle == NULL)
+			{
+				error (WARNING, "long flags specifier opened with `[' is not closed `]'");
+				break;
+			}
+
+			*needle = '\0';
+			for ( j = 0 ; j < ndefs ; ++j )
+				if (defs[j].long_str && (strcmp(flags + i + 1, defs[j].long_str) == 0))
+					defs[j].long_proc(flags+ i + 1, data);
+			*needle = ']';
+
+			i = needle - flags;
 		}
+		else for (j = 0 ; j < ndefs ; ++j)
+			if (flags[i] == defs[j].short_char)
+				defs[j].short_proc(flags[i], data);
 	}
 }
 
@@ -276,14 +294,19 @@ static boolean parseTagRegex (
 }
 
 
-static void ptrn_flag_cut (char c, void* data)
+static void ptrn_flag_cut_short (char c, void* data)
 {
 	regexPattern *ptrn = data;
 	ptrn->exclusive = TRUE;
 }
 
+static void ptrn_flag_cut_long (const char* s, void* data)
+{
+	ptrn_flag_cut_short ('!', data);
+}
+
 static flagDefinition ptrnFlagDef[] = {
-	{ '!', ptrn_flag_cut },
+	{ '!', "cut", ptrn_flag_cut_short, ptrn_flag_cut_long },
 };
 
 static void addCompiledTagPattern (
@@ -351,21 +374,38 @@ static void addCompiledCallbackPattern (
 
 #if defined (POSIX_REGEX)
 
-static void regex_flag_basic (char c, void* data)
+static void regex_flag_basic_short (char c, void* data)
 {
 	int* cflags = data;
 	*cflags &= ~REG_EXTENDED;
 }
-static void regex_flag_extend (char c, void* data)
+static void regex_flag_basic_long (const char* s, void* data)
+{
+	regex_flag_basic_short ('b', data);
+}
+
+static void regex_flag_extend_short (char c, void* data)
 {
 	int* cflags = data;
 	*cflags |= REG_EXTENDED;
 }
-static void regex_flag_icase (char c, void* data)
+
+static void regex_flag_extend_long (const char* c, void* data)
+{
+	regex_flag_extend_short('e', data);
+}
+
+static void regex_flag_icase_short (char c, void* data)
 {
 	int* cflags = data;
 	*cflags |= REG_ICASE;
 }
+
+static void regex_flag_icase_long (const char* s, void* data)
+{
+	regex_flag_icase_short ('i', data);
+}
+
 
 static regex_t* compileRegex (const char* const regexp, const char* const flags)
 {
@@ -374,9 +414,9 @@ static regex_t* compileRegex (const char* const regexp, const char* const flags)
 	int errcode;
 
 	flagDefinition regexFlagDefs[] = {
-		{ 'b', regex_flag_basic  },
-		{ 'e', regex_flag_extend },
-		{ 'i', regex_flag_icase  },
+		{ 'b', "basic",  regex_flag_basic_short,  regex_flag_basic_long  },
+		{ 'e', "extend", regex_flag_extend_short, regex_flag_extend_long },
+		{ 'i', "icase",  regex_flag_icase_short,  regex_flag_icase_long  },
 	};
 	evalFlags (flags,
 		   regexFlagDefs,
