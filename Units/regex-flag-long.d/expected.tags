@@ -1,0 +1,4 @@
+a	Units/regex-flag-long.d/input.dummy	/^define:a$/;"	d
+b	Units/regex-flag-long.d/input.dummy	/^Define:b$/;"	d
+c	Units/regex-flag-long.d/input.dummy	/^DEFINE:c$/;"	d
+d	Units/regex-flag-long.d/input.dummy	/^definE:d$/;"	d
