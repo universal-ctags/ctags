@@ -1172,7 +1172,6 @@ extern void printLanguageCorpus (langType language,
 extern boolean processCorpusOption (
 		const char *const option, const char *const parameter)
 {
-	boolean handled = FALSE;
 	const char* const dash = strchr (option, '-');
 	langType language;
 	vString* langName;
