@@ -32,6 +32,7 @@ static void            tg_load_full   (unsigned char *mini_table,
 static int             tg_nonalnum_get_char (FILE *fp, void *dump);
 
 
+#ifdef TG_MAIN
 static void            tg_emit   (void * data, unsigned char *mini_table, FILE *fp,
 				  void (* emit_header) (void*, FILE*),
 				  void (* emit_trailer)(void*, FILE*),
@@ -40,6 +41,7 @@ static void tg_c_emit_header     (void * data, FILE *fp);
 static void tg_c_emit_trailer    (void * data, FILE *fp);
 static void tg_c_emit_entry      (void * data, FILE* fp,
 				  unsigned short index, unsigned char value, unsigned char c0, unsigned char c1);
+#endif	/* TG_MAIN */
 
 static unsigned short  tg_mini_size      (unsigned char *mini_table);
 static unsigned short* tg_big_create     (unsigned char *a, unsigned char *b, float ratio);
@@ -137,6 +139,7 @@ static int tg_nonalnum_get_char (FILE *fp, void *dump)
 }
 
 
+#ifdef TG_MAIN
 static void tg_c_emit_header(void * data, FILE *fp)
 {
 	fprintf(fp, "static unsigned char %s_tg_table [%u] =\n{\n", (char *)data, 256 * 256);
@@ -174,6 +177,7 @@ void tg_emit   (void * data, unsigned char *mini_table, FILE *fp,
 		}
 	emit_trailer(data, fp);
 }
+#endif	/* TG_MAIN */
 
 static unsigned short  tg_mini_size   (unsigned char *mini_table)
 {
@@ -513,4 +517,4 @@ int main(int argc, char** argv)
 	}
 }
 
-#endif
+#endif	/* TG_MAIN */
