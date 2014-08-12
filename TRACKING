@@ -1,7 +1,14 @@
-This is working note for tracking activity at exuberant tree.
+This is working note for tracking activities other projects,
+expecially activity at exuberant-ctags.
+
+* exuberant-ctags
+* Fedora
+
+exuberant-ctags
+============================================================
 
 subversion
-============================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * status
 
@@ -63,10 +70,10 @@ subversion
 	 at the branch for picking.
 
 bugs
-============================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   <358>  Vim parser: Segmentation fault when reaing empty vim file 
-   	 + directly contributed by the original author of bug report and patch
+   <358>  Vim parser: Segmentation fault when reaing empty vim file
+	 + directly contributed by the original author of bug report and patch
 	   e0f854f0100e7a3cb8b959a23d6036e43f6b6c85
 
    <355> Error when parsing empty file (OCaml)
@@ -79,7 +86,7 @@ bugs
 
 
 patches (https://sourceforge.net/p/ctags/patches/%d)
-============================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Tracking the tickets in patch tracker is quite fruitful.
 Patches are always there. So it is easy to evaluate the value:)
@@ -128,7 +135,7 @@ Patches are always there. So it is easy to evaluate the value:)
    <51> Ada support
 	+ Ada support is now available in fishman tree.
 	4b6b4a72f3d2d4ef969d7c650de1829d79f0ea7c
-	
+
    <38> Ada support
 	+ Ada support is now available in fishman tree.
 	4b6b4a72f3d2d4ef969d7c650de1829d79f0ea7c
@@ -146,13 +153,52 @@ Patches are always there. So it is easy to evaluate the value:)
 	  https://gist.github.com/ptrv/4576213
 
 
-ctags-devel@sourceforge list
-============================================================
+devel mailing list (ctags-devel@sourceforge)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    [Ctags] Shebang with python3 instead of python
+    <[Ctags] Shebang with python3 instead of python>
     From: Martin Ueding <dev@ma...> - 2013-01-26 18:36:32
 
 	Added python, python2 and python3 as extensions of
 	python parser.
 
 	bb81485205c67617f1b34f61341e60b9e8030502
+
+Fedora
+============================================================
+Some patches are maintained in ctags package of Fedora.
+
+(ctags-5.7-destdir.patch)
+
+	Related to build system.
+	Not inspected well yet.
+
+(ctags-5.7-segment-fault.patch)
+
+	Not inspected well yet.
+
+(ctags-5.8-cssparse.patch)
+
+	Not in fishman tree.
+	This must be merged.
+	A test case is needed.
+
+<ctags-5.8-css.patch>
+
+	This patch was merged in fishman ctags git tree.
+
+	80c1522a36df3ba52b8b7cd7f5c79d5c30437a63
+
+<ctags-5.8-memmove.patch>
+
+	This patch was merged in exuberant ctags svn tree.
+	As the result this patch is in fishman tree.
+
+	d2bdf505abb7569deae2b50305ea1edce6208557
+
+<ctags-5.8-ocaml-crash.patch>
+
+	This patch was merged in exuberant ctags svn tree.
+	As the result this patch is in fishman tree.
+
+	ddb29762b37d60a875252dcc401de0b7479527b1
