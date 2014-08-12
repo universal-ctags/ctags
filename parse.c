@@ -648,13 +648,42 @@ extern langType getFileLanguage (const char *const fileName)
 			language = getSpecLanguage(ext, input);
 		}
 
-		if (input)
-			rewind (input);
 		if (language == LANG_IGNORE)
 		{
 			const char* baseName = baseFilename (fileName);
 			verbose ("	pattern: %s\n", baseName);
+
+			if (input)
+				rewind (input);
 			language = getPatternLanguage(baseName, input);
+		}
+
+		if (language == LANG_IGNORE)
+		{
+			const char* const tExt = ".in";
+			char* const ext = templateFileExtensionNew (fileName, tExt);
+			if (ext)
+			{
+				verbose ("	file extension + template(%s): %s\n", tExt, ext);
+				if (input)
+					rewind (input);
+				language = getSpecLanguage(ext, input);
+				eFree (ext);
+			}
+		}
+
+		if (language == LANG_IGNORE)
+		{
+			const char* const tExt = ".in";
+			char* baseName = baseFilenameSansExtensionNew (fileName, tExt);
+			if (baseName)
+			{
+				verbose ("	pattern + template(%s): %s\n", tExt, baseName);
+				if (input)
+					rewind (input);
+				language = getPatternLanguage(baseName, input);
+				eFree (baseName);
+			}
 		}
 
 		if (input)
