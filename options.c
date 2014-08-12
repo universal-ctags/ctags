@@ -369,6 +369,15 @@ static boolean parseAllConfigurationFilesOptionsInDirectory(const char *const fi
 */
 
 
+static void cArgPutToTrash (cookedArgs *const args, char * item)
+{
+	args->trash = trashPut (args->trash, item);
+}
+
+static void cArgMakeTrashEmpty(cookedArgs *const args)
+{
+	args->trash = trashMakeEmpty (args->trash);
+}
 
 #if defined(_WIN32)
 
@@ -602,15 +611,15 @@ static void parseLongOption (cookedArgs *const args, const char *item)
 	const char* const equal = strchr (item, '=');
 	if (equal == NULL)
 	{
-		args->item = eStrdup (item); /* FIXME: memory leak. */
+		args->item = eStrdup (item);
+		cArgPutToTrash (args, args->item);
 		args->parameter = "";
 	}
 	else
 	{
 		const size_t length = equal - item;
-		args->item = xMalloc (length + 1, char); /* FIXME: memory leak. */
-		strncpy (args->item, item, length);
-		args->item [length] = '\0';
+		args->item = eStrndup (item, length);
+		cArgPutToTrash (args, args->item);
 		args->parameter = equal + 1;
 	}
 	Assert (args->item != NULL);
@@ -692,6 +701,7 @@ extern void cArgDelete (cookedArgs* const current)
 {
 	Assert (current != NULL);
 	argDelete (current->args);
+	cArgMakeTrashEmpty (current);
 	memset (current, 0, sizeof (cookedArgs));
 	eFree (current);
 }
