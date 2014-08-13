@@ -1,0 +1,8 @@
+#
+# Taken from https://github.com/fishman/dot_files/blob/master/ctags/.ctags
+#
+--langdef=coffee
+--langmap=coffee:.coffee
+--regex-coffee=/^[ \t]*class ([a-zA-Z_$][0-9a-zA-Z_.$]*).*$/\1/c,class/
+--regex-coffee=/^[ \t]*([a-zA-Z_$@][0-9a-zA-Z_$\.]*)[ \t]*[:=].*[=-]>.*$/\1/f,function/
+--regex-coffee=/^[ \t]*([a-zA-Z_$@][0-9a-zA-Z_$\.]*)[ \t]*=[^->\n]*$/\1/v,variable/

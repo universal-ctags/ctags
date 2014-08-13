@@ -1,0 +1,4 @@
+class	Units/ctags-simple.d/input.ctags	/^--regex-coffee=\/^[ \\t]*class ([a-zA-Z_$][0-9a-zA-Z_.$]*).*$\/\\1\/c,class\/$/;"	k
+coffee	Units/ctags-simple.d/input.ctags	/^--langdef=coffee$/;"	l
+function	Units/ctags-simple.d/input.ctags	/^--regex-coffee=\/^[ \\t]*([a-zA-Z_$@][0-9a-zA-Z_$\\.]*)[ \\t]*[:=].*[=-]>.*$\/\\1\/f,function\/$/;"	k
+variable	Units/ctags-simple.d/input.ctags	/^--regex-coffee=\/^[ \\t]*([a-zA-Z_$@][0-9a-zA-Z_$\\.]*)[ \\t]*=[^->\\n]*$\/\\1\/v,variable\/$/;"	k
