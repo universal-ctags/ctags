@@ -54,6 +54,13 @@ extern void makeSimpleTag (
 	}
 }
 
+static vString* ext2ptrnNew (const char *const ext)
+{
+	vString * ptrn = vStringNewInit ("*.");
+	vStringCatS (ptrn, ext);
+	return ptrn;
+}
+
 /*
 *   parserDescription mapping management
 */
@@ -481,7 +488,7 @@ static const tgTableEntry* const findTgTableEntry(const parserDefinition* const 
 	for (entry = lang->tg_entries;
 	     entry != NULL;
 	     entry = entry->next)
-		if (strcmp (entry->spec, spec) == 0)
+		if (strcmp (vStringValue (entry->spec), spec) == 0)
 			break;
 	return entry;
 }
@@ -809,7 +816,7 @@ extern void addLanguageExtensionMap (
 	stringListAdd (LanguageTable [language]->currentExtensions, str);
 }
 
-static void addTgEntryFull (const langType language, char* const spec, unsigned char* const tg_table,
+static void addTgEntryFull (const langType language, vString* const spec, unsigned char* const tg_table,
 			    vString* corpus_file)
 {
 	tgTableEntry *entry;
@@ -823,16 +830,17 @@ static void addTgEntryFull (const langType language, char* const spec, unsigned 
 
 	if (corpus_file)
 		verbose ("Compile corpus %s for %s of %s\n",
-			 vStringValue (corpus_file), spec, LanguageTable [language]->name);
+			 vStringValue (corpus_file), vStringValue (spec), LanguageTable [language]->name);
 	else
-		verbose ("Install tg for %s of %s\n", spec, LanguageTable [language]->name);
+		verbose ("Install tg for %s of %s\n", vStringValue (spec), LanguageTable [language]->name);
 }
 
-static void addCorpusFile (const langType language,
-			   char* const spec, vString* const corpus_file)
+extern void addCorpusFile (const langType language,
+			   const char* const spec, vString* const corpus_file, boolean pattern_p)
 {
 	FILE *input;
 	unsigned char* tg_table;
+	vString* vspec;
 
 	input = fopen (vStringValue (corpus_file), "rb");
 	if (input == NULL)
@@ -847,12 +855,19 @@ static void addCorpusFile (const langType language,
 	tg_load (tg_table, input);
 	fclose (input);
 
-	addTgEntryFull (language, spec, tg_table, corpus_file);
+	vspec = pattern_p? vStringNewInit (spec): ext2ptrnNew (spec);
+	addTgEntryFull (language, vspec, tg_table, corpus_file);
 }
 
-extern void addTgEntry (const langType language, char* const spec, unsigned char* const tg_table)
+extern void addTgEntryForPattern (const langType language, const char* const ptrn, unsigned char* const tg_table)
 {
-	addTgEntryFull (language, spec, tg_table, NULL);
+	addTgEntryFull (language, vStringNewInit (ptrn), tg_table, NULL);
+}
+
+extern void addTgEntryForExtension (const langType language, const char* const ext, unsigned char* const tg_table)
+{
+	vString *const ptrn = ext2ptrnNew (ext);
+	addTgEntryFull (language, ptrn, tg_table, NULL);
 }
 
 static tgTableEntry* freeTgEntry(tgTableEntry *entry)
@@ -861,13 +876,14 @@ static tgTableEntry* freeTgEntry(tgTableEntry *entry)
 
 	if (entry->corpus_file)
 	{
-		eFree (entry->spec);
-		entry->spec = NULL;
 		eFree (entry->tg_table);
 		entry->tg_table = NULL;
 		vStringDelete (entry->corpus_file);
 		entry->corpus_file = NULL;
 	}
+
+	vStringDelete (entry->spec);
+	entry->spec = NULL;
 
 	r = entry->next;
 	entry->next = NULL;
@@ -1175,9 +1191,9 @@ static void printCorpus (langType language, const char* const spec, boolean inde
 		const char* corpus_file = entry->corpus_file? vStringValue (entry->corpus_file): "ctags";
 
 		if (spec == NULL)
-			printf("%s%s: %s\n", indentation, entry->spec, corpus_file);
-		else if (strcmp (entry->spec, spec) == 0)
-			printf("%s%s: %s\n", indentation, entry->spec, corpus_file);
+			printf("%s%s: %s\n", indentation, vStringValue (entry->spec), corpus_file);
+		else if (strcmp (vStringValue (entry->spec), spec) == 0)
+			printf("%s%s: %s\n", indentation, vStringValue (entry->spec), corpus_file);
 	}
 }
 
@@ -1196,49 +1212,6 @@ extern void printLanguageCorpus (langType language,
 	}
 	else
 		printCorpus (language, spec, FALSE);
-}
-
-extern boolean processCorpusOption (
-		const char *const option, const char *const parameter)
-{
-	const char* const dash = strchr (option, '-');
-	langType language;
-	vString* langName;
-	const char* colon;
-	size_t len;
-	const char* file_part;
-	vString* tg_file;
-	char* spec;
-
-	if (dash == NULL ||
-	    (strcmp (dash + 1, "corpus") != 0))
-		return FALSE;
-	len = dash - option;
-
-	langName = vStringNew ();
-	vStringNCopyS (langName, option, len);
-	language = getNamedLanguage (vStringValue (langName));
-	if (language == LANG_IGNORE)
-		error (FATAL, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
-	vStringDelete(langName);
-
-	if (parameter == NULL || parameter [0] == '\0')
-		error (FATAL, "no parameter is given for %s", option);
-	colon = strrchr(parameter, ':');
-	if (colon == NULL)
-		error (FATAL,
-		       "no colon(:) separator is found in parameter of %s", option);
-
-	len = colon - parameter;
-	file_part = parameter + len + 1;
-	tg_file = expandOnCorpusPathList (file_part);
-	if (tg_file == NULL)
-	  tg_file = vStringNewInit (file_part);
-	spec = eStrndup(parameter, len);
-
-	addCorpusFile(language, spec, tg_file);
-
-	return TRUE;
 }
 
 static void printMaps (const langType language)

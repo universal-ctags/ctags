@@ -1103,33 +1103,41 @@ static char* skipPastMap (char* p)
 /* Parses the mapping beginning at `map', adds it to the language map, and
  * returns first character past the map.
  */
-static char* addLanguageMap (const langType language, char* map)
+static const char* extractMapFromParameter (const langType language,
+					    char* parameter,
+					    char** tail,
+					    boolean* pattern_p,
+					    char* (* skip) (char *))
 {
 	char* p = NULL;
-	const char first = *map;
+	const char first = *parameter;
+
 	if (first == EXTENSION_SEPARATOR)  /* extension map */
 	{
-		++map;
-		p = skipPastMap (map);
+		*pattern_p = FALSE;
+
+		++parameter;
+		p = (* skip) (parameter);
 		if (*p == '\0')
 		{
-			verbose (" .%s", map);
-			addLanguageExtensionMap (language, map);
-			p = map + strlen (map);
+			verbose (" .%s", parameter);
+			*tail = parameter + strlen (parameter);
+			return parameter;
 		}
 		else
 		{
-			const char separator = *p;
 			*p = '\0';
-			verbose (" .%s", map);
-			addLanguageExtensionMap (language, map);
-			*p = separator;
+			verbose (" .%s", parameter);
+			*tail = p + 1;
+			return parameter;
 		}
 	}
 	else if (first == PATTERN_START)  /* pattern map */
 	{
-		++map;
-		for (p = map  ;  *p != PATTERN_STOP  &&  *p != '\0'  ;  ++p)
+		*pattern_p = TRUE;
+
+		++parameter;
+		for (p = parameter  ;  *p != PATTERN_STOP  &&  *p != '\0'  ;  ++p)
 		{
 			if (*p == '\\'  &&  *(p + 1) == PATTERN_STOP)
 				++p;
@@ -1140,10 +1148,26 @@ static char* addLanguageMap (const langType language, char* map)
 		else
 		{
 			*p++ = '\0';
-			verbose (" (%s)", map);
-			addLanguagePatternMap (language, map);
+			verbose (" (%s)", parameter);
+			*tail = p;
+			return parameter;
 		}
 	}
+
+	return NULL;
+}
+
+static char* addLanguageMap (const langType language, char* map_parameter)
+{
+	char* p = NULL;
+	boolean pattern_p;
+	const char* map;
+
+	map = extractMapFromParameter (language, map_parameter, &p, &pattern_p, skipPastMap);
+	if (map && pattern_p == FALSE)
+		addLanguageExtensionMap (language, map);
+	else if (map && pattern_p == TRUE)
+		addLanguagePatternMap (language, map);
 	else
 		error (FATAL, "Badly formed language map for %s language",
 				getLanguageName (language));
@@ -1269,6 +1293,77 @@ static void processLanguagesOption (
 	}
 	verbose ("\n");
 	eFree (langs);
+}
+
+static char* skipTillColon (char* p)
+{
+	while (*p != ':'  && *p != '\0')
+		++p;
+	return p;
+}
+
+extern boolean processCorpusOption (
+		const char *const option, const char *const parameter)
+{
+	const char* const dash = strchr (option, '-');
+	langType language;
+	vString* langName;
+	char* parm;
+	char* colon;
+	size_t len;
+	const char* file_part;
+	vString* tg_file;
+	const char* spec;
+	boolean pattern_p;
+
+	if (dash == NULL ||
+	    (strcmp (dash + 1, "corpus") != 0))
+		return FALSE;
+	len = dash - option;
+
+	langName = vStringNew ();
+	vStringNCopyS (langName, option, len);
+	language = getNamedLanguage (vStringValue (langName));
+	if (language == LANG_IGNORE)
+		error (FATAL, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
+	vStringDelete(langName);
+
+	if (parameter == NULL || parameter [0] == '\0')
+		error (FATAL, "no parameter is given for %s", option);
+
+	parm = eStrdup (parameter);
+	spec = extractMapFromParameter (language, parm, &colon, &pattern_p, skipTillColon);
+	if (spec == NULL)
+	{
+		error (FATAL, "Badly formed language map specification for loading colon for %s language",
+		       getLanguageName (language));
+		eFree (parm);
+		return FALSE;
+	}
+	else if (pattern_p && (*colon != ':'))
+	{
+		error (FATAL,
+		       "no colon(:) separator is found in parameter of %s: %s", option, parameter);
+		eFree (parm);
+		return FALSE;
+	}
+	else if ((!pattern_p) && *colon == '\0')
+	{
+		error (FATAL,
+		       "no colon(:) separator is found in parameter of %s: %s", option, parameter);
+		eFree (parm);
+		return FALSE;
+	}
+
+	file_part = colon + (pattern_p? 1: 0);
+	tg_file = expandOnCorpusPathList (file_part);
+	if (tg_file == NULL)
+		tg_file = vStringNewInit (file_part);
+
+	addCorpusFile(language, spec, tg_file, pattern_p);
+
+	eFree (parm);
+	return TRUE;
 }
 
 static void processLicenseOption (

@@ -55,7 +55,7 @@ typedef struct stgTableEntry{
 	   characteristic of its language.
 	   This can be used when file extension
 	   is conflicted another parser. */
-	char* spec;
+	vString* spec;
 	unsigned char* tg_table;
 	vString* corpus_file;
 	struct stgTableEntry *next;
@@ -116,7 +116,11 @@ extern void clearLanguageMap (const langType language);
 extern boolean removeLanguageExtensionMap (const char *const extension);
 extern void addLanguageExtensionMap (const langType language, const char* extension);
 extern void addLanguagePatternMap (const langType language, const char* ptrn);
-extern void addTgEntry (const langType language, char* const spec, unsigned char* const tg_table);
+
+extern void addCorpusFile (const langType language, const char* const spec, vString* const corpus_file, boolean pattern_p);
+extern void addTgEntryForExtension (const langType language, const char* const ext, unsigned char* const tg_table);
+extern void addTgEntryForPattern (const langType language, const char* const pattern, unsigned char* const tg_table);
+
 extern void printLanguageMap (const langType language);
 extern void printLanguageMaps (const langType language);
 extern void enableLanguages (const boolean state);

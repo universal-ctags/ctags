@@ -1227,7 +1227,7 @@ static void objcInitialize (const langType language)
 	Lang_ObjectiveC = language;
 
 	initKeywordHash ();
-	addTgEntry (language, "m", objc_m_tg_table);
+	addTgEntryForExtension (language, "m", objc_m_tg_table);
 }
 
 static void objcFinalize (const langType language)

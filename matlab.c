@@ -128,7 +128,7 @@ static void installMatLabRegex (const langType language)
     /* function asdf */
     addTagRegex (language, "^function[ \t]*([a-zA-Z0-9_]+)[^=]*$", "\\1", "f,function", NULL);
 
-    addTgEntry (language, "m", matlab_m_tg_table);
+    addTgEntryForExtension (language, "m", matlab_m_tg_table);
 }
 
 extern parserDefinition* MatLabParser ()
