@@ -1887,10 +1887,13 @@ static void ocamlInitialize (const langType language)
 extern parserDefinition *OcamlParser (void)
 {
 	static const char *const extensions[] = { "ml", "mli", NULL };
+	static const char *const aliases[] = { "tuareg", /* mode name of emacs */
+					       NULL };
 	parserDefinition *def = parserNew ("OCaml");
 	def->kinds = OcamlKinds;
 	def->kindCount = KIND_COUNT (OcamlKinds);
 	def->extensions = extensions;
+	def->aliases = aliases;
 	def->parser = findOcamlTags;
 	def->initialize = ocamlInitialize;
 
