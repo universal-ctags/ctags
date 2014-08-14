@@ -123,6 +123,7 @@ extern void addTgEntryForPattern (const langType language, const char* const pat
 
 extern void printLanguageMap (const langType language);
 extern void printLanguageMaps (const langType language);
+extern void unifyLanguageMaps (void);
 extern void enableLanguages (const boolean state);
 extern void enableLanguage (const langType language, const boolean state);
 extern void initializeParsing (void);

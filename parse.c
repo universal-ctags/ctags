@@ -650,35 +650,13 @@ extern langType getFileLanguage (const char *const fileName)
 	  accept_nofile:
 		if (language == LANG_IGNORE)
 		{
-			const char* const ext = fileExtension (fileName);
-			verbose ("	file extension: %s\n", ext);
-			language = getSpecLanguage(ext, input);
-		}
-
-		if (language == LANG_IGNORE)
-		{
 			const char* baseName = baseFilename (fileName);
 			verbose ("	pattern: %s\n", baseName);
-
-			if (input)
-				rewind (input);
 			language = getPatternLanguage(baseName, input);
 		}
 
-		if (language == LANG_IGNORE)
-		{
-			const char* const tExt = ".in";
-			char* const ext = templateFileExtensionNew (fileName, tExt);
-			if (ext)
-			{
-				verbose ("	file extension + template(%s): %s\n", tExt, ext);
-				if (input)
-					rewind (input);
-				language = getSpecLanguage(ext, input);
-				eFree (ext);
-			}
-		}
-
+		if (input)
+			rewind (input);
 		if (language == LANG_IGNORE)
 		{
 			const char* const tExt = ".in";
@@ -686,8 +664,6 @@ extern langType getFileLanguage (const char *const fileName)
 			if (baseName)
 			{
 				verbose ("	pattern + template(%s): %s\n", tExt, baseName);
-				if (input)
-					rewind (input);
 				language = getPatternLanguage(baseName, input);
 				eFree (baseName);
 			}
@@ -1367,4 +1343,29 @@ extern boolean parseFile (const char *const fileName)
 	return tagFileResized;
 }
 
+static void unifyMaps (const langType language)
+{
+	const parserDefinition* lang;
+	unsigned int i;
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+	if (!lang->currentExtensions)
+		return;
+
+	for (i = 0 ; i < stringListCount (lang->currentExtensions)  ;  ++i)
+	{
+		const char* const ext = vStringValue (
+			stringListItem (lang->currentExtensions, i));
+		vString *const ptrn = ext2ptrnNew (ext);
+		addLanguagePatternMap (language, vStringValue (ptrn));
+		vStringDelete (ptrn);
+	}
+}
+
+extern void unifyLanguageMaps (void)
+{
+	unsigned int i;
+	for (i = 0; i < LanguageCount  ;  ++i)
+		unifyMaps (i);
+}
 /* vi:set tabstop=4 shiftwidth=4 nowrap: */
