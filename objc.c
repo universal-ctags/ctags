@@ -1241,12 +1241,14 @@ static void objcFinalize (const langType language)
 extern parserDefinition *ObjcParser (void)
 {
 	static const char *const extensions[] = { "mm", "m", "h",
-						  "objc", /* The major mode name in emacs */
 						  NULL };
+	static const char *const aliases[] = { "objc", "objective-c",
+					       NULL };
 	parserDefinition *def = parserNew ("ObjectiveC");
 	def->kinds = ObjcKinds;
 	def->kindCount = KIND_COUNT (ObjcKinds);
 	def->extensions = extensions;
+	def->aliases = aliases;
 	def->parser = findObjcTags;
 	def->initialize = objcInitialize;
 	def->finalize = objcFinalize;
