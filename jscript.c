@@ -1752,8 +1752,10 @@ static void findJsTags (void)
 extern parserDefinition* JavaScriptParser (void)
 {
 	static const char *const extensions [] = { "js", NULL };
+	static const char *const aliases [] = { "js", NULL };
 	parserDefinition *const def = parserNew ("JavaScript");
 	def->extensions = extensions;
+	def->extensions = aliases;
 	/*
 	 * New definitions for parsing instead of regex
 	 */
