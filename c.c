@@ -2902,10 +2902,12 @@ extern parserDefinition* CppParser (void)
 extern parserDefinition* CsharpParser (void)
 {
 	static const char *const extensions [] = { "cs", NULL };
+	static const char *const aliases [] = { "csharp", NULL };
 	parserDefinition* def = parserNew ("C#");
 	def->kinds      = CsharpKinds;
 	def->kindCount  = KIND_COUNT (CsharpKinds);
 	def->extensions = extensions;
+	def->aliases    = aliases;
 	def->parser2    = findCTags;
 	def->initialize = initializeCsharpParser;
 	return def;
