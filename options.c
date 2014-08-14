@@ -262,7 +262,7 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Should #line directives be processed [no]?"},
  {1,"  --links=[yes|no]"},
  {1,"       Indicate whether symbolic links should be followed [yes]."},
- {1,"  --list-corpora=[language|all]"},
+ {1,"  --list-corpora=[language[:spec]|all]"},
  {1,"       Output list of language corpora."},
  {1,"  --list-kinds=[language|all]"},
  {1,"       Output a list of all tag kinds for specified language or all."},
