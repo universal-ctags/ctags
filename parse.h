@@ -68,6 +68,7 @@ typedef struct {
 	unsigned int kindCount;        /* size of `kinds' list */
 	const char *const *extensions; /* list of default extensions */
 	const char *const *patterns;   /* list of default file name patterns */
+	const char *const *aliases;    /* list of default aliases (altenative names) */
 	parserInitialize initialize;   /* initialization routine, if needed */
 	parserFinalize finalize;       /* finalize routine, if needed */
 	simpleParser parser;           /* simple parser (common case) */
@@ -80,6 +81,7 @@ typedef struct {
 	boolean enabled;               /* currently enabled? */
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
+	stringList* currentAliaes;     /* current list of aliases */
 } parserDefinition;
 
 typedef parserDefinition* (parserDefinitionFunc) (void);
@@ -117,6 +119,11 @@ extern boolean removeLanguageExtensionMap (const char *const extension);
 extern void addLanguageExtensionMap (const langType language, const char* extension);
 extern void addLanguagePatternMap (const langType language, const char* ptrn);
 
+extern void installLanguageAliasesDefault (const langType language);
+extern void installLanguageAliasesDefaults (void);
+extern void clearLanguageAliases (const langType language);
+extern void addLanguageAlias (const langType language, const char* alias);
+
 extern void addCorpusFile (const langType language, const char* const spec, vString* const corpus_file, boolean pattern_p);
 extern void addTgEntryForExtension (const langType language, const char* const ext, unsigned char* const tg_table);
 extern void addTgEntryForPattern (const langType language, const char* const pattern, unsigned char* const tg_table);
@@ -134,6 +141,8 @@ extern void printKindOptions (void);
 extern void printLanguageKinds (const langType language);
 extern boolean processCorpusOption (const char *const option, const char *const parameter);
 extern void printLanguageCorpus (langType language, const char *const spec);
+extern boolean processAliasOption (const char *const option, const char *const parameter);
+extern void printLanguageAliases (const langType language);
 extern void printLanguageList (void);
 extern boolean parseFile (const char *const fileName);
 

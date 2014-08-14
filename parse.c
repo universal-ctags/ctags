@@ -100,7 +100,7 @@ extern langType getNamedLanguage (const char *const name)
 	return result;
 }
 
-static langType getExtensionOrNameLanguageAndSpec (const char *const key, langType start_index, const char **const spec)
+static langType getNameOrAliasesLanguageAndSpec (const char *const key, langType start_index, const char **const spec)
 {
 	langType result = LANG_IGNORE;
 	unsigned int i;
@@ -114,18 +114,18 @@ static langType getExtensionOrNameLanguageAndSpec (const char *const key, langTy
 	for (i = start_index  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
 	{
 		const parserDefinition* const lang = LanguageTable [i];
-		stringList* const exts = lang->currentExtensions;
+		stringList* const aliases = lang->currentAliaes;
 		vString* tmp;
 
-		if (exts != NULL  &&  (tmp = stringListExtensionFinds (exts, key)))
-		{
-			result = i;
-			*spec = vStringValue(tmp);
-		}
-		else if (lang->name != NULL && strcasecmp (key, lang->name) == 0)
+		if (lang->name != NULL && strcasecmp (key, lang->name) == 0)
 		{
 			result = i;
 			*spec = lang->name;
+		}
+		else if (aliases != NULL  &&  (tmp = stringListFileFinds (aliases, key)))
+		{
+			result = i;
+			*spec = vStringValue(tmp);
 		}
 	}
 	return result;
@@ -185,7 +185,7 @@ static unsigned int nominateLanguageCandidates (const char *const key, parserCan
 
 	for (count = 0, i = LANG_AUTO; i != LANG_IGNORE; )
 	{
-		i = getExtensionOrNameLanguageAndSpec(key, i, &spec);
+		i = getNameOrAliasesLanguageAndSpec (key, i, &spec);
 		if (i != LANG_IGNORE)
 		{
 			(*candidates)[count].lang = i++;
@@ -749,11 +749,47 @@ extern void installLanguageMapDefaults (void)
 	}
 }
 
+static void printAliases (const langType language);
+extern void installLanguageAliasesDefault (const langType language)
+{
+	parserDefinition* lang;
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+	if (lang->currentAliaes != NULL)
+		stringListDelete (lang->currentAliaes);
+
+	if (lang->aliases == NULL)
+		lang->currentAliaes = stringListNew ();
+	else
+	{
+		lang->currentAliaes =
+			stringListNewFromArgv (lang->aliases);
+	}
+	if (Option.verbose)
+		printAliases (language);
+	verbose ("\n");
+}
+extern void installLanguageAliasesDefaults (void)
+{
+	unsigned int i;
+	for (i = 0  ;  i < LanguageCount  ;  ++i)
+	{
+		verbose ("    %s: ", getLanguageName (i));
+		installLanguageAliasesDefault (i);
+	}
+}
+
 extern void clearLanguageMap (const langType language)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	stringListClear (LanguageTable [language]->currentPatterns);
 	stringListClear (LanguageTable [language]->currentExtensions);
+}
+
+extern void clearLanguageAliases (const langType language)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	stringListClear (LanguageTable [language]->currentAliaes);
 }
 
 extern void addLanguagePatternMap (const langType language, const char* ptrn)
@@ -792,6 +828,16 @@ extern void addLanguageExtensionMap (
 	stringListAdd (LanguageTable [language]->currentExtensions, str);
 }
 
+extern void addLanguageAlias (const langType language, const char* alias)
+{
+	vString* const str = vStringNewInit (alias);
+	parserDefinition* lang;
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+	if (lang->currentAliaes == NULL)
+		lang->currentAliaes = stringListNew ();
+	stringListAdd (lang->currentAliaes, str);
+}
 static void addTgEntryFull (const langType language, vString* const spec, unsigned char* const tg_table,
 			    vString* corpus_file)
 {
@@ -944,6 +990,7 @@ extern void freeParserResources (void)
 
 		freeList (&lang->currentPatterns);
 		freeList (&lang->currentExtensions);
+		freeList (&lang->currentAliaes);
 
 		while (lang->tg_entries)
 			lang->tg_entries = freeTgEntry(lang->tg_entries);
@@ -1151,6 +1198,73 @@ extern void printLanguageKinds (const langType language)
 		printKinds (language, FALSE);
 }
 
+static void processLangAliasOption (
+		const langType language, const char *const option,
+		const char *const parameter)
+{
+	const char* alias;
+	const parserDefinition * lang;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	Assert (parameter);
+	Assert (parameter[0]);
+	lang = LanguageTable [language];
+
+	if (parameter[0] == '+')
+	{
+		alias = parameter + 1;
+		addLanguageAlias(language, alias);
+		verbose ("add alias %s to %s\n", alias, lang->name);
+	}
+	else if (parameter[0] == '-')
+	{
+		vString* tmp;
+		if (lang->currentAliaes)
+		{
+			alias = parameter + 1;
+			tmp = stringListExtensionFinds(lang->currentAliaes, alias);
+			if (tmp)
+			{
+				verbose ("remove alias %s from %s\n", alias, lang->name);
+				stringListRemoveExtension (lang->currentAliaes, alias);
+				vStringDelete (tmp);
+			}
+		}
+	}
+	else
+	{
+		alias = parameter;
+		clearLanguageAliases (language);
+		addLanguageAlias(language, alias);
+		verbose ("set alias %s to %s\n", alias, lang->name);
+	}
+
+}
+
+extern boolean processAliasOption (
+		const char *const option, const char *const parameter)
+{
+	const char* const dash = strchr (option, '-');
+	langType language;
+	vString* langName;
+	size_t len;
+
+	if (dash == NULL ||
+	    (strcmp (dash + 1, "alias") != 0))
+		return FALSE;
+	len = dash - option;
+
+	langName = vStringNew ();
+	vStringNCopyS (langName, option, len);
+	language = getNamedLanguage (vStringValue (langName));
+	if (language == LANG_IGNORE)
+		error (FATAL, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
+	vStringDelete(langName);
+
+	processLangAliasOption (language, option, parameter);
+	return TRUE;
+}
+
 static void printCorpus (langType language, const char* const spec, boolean indent)
 {
 	const parserDefinition* lang;
@@ -1208,6 +1322,19 @@ static void printMaps (const langType language)
 	putchar ('\n');
 }
 
+static void printAliases (const langType language)
+{
+	const parserDefinition* lang;
+	unsigned int i;
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+
+	if (lang->currentAliaes != NULL)
+		for (i = 0  ;  i < stringListCount (lang->currentAliaes)  ;  ++i)
+			printf (" %s", vStringValue (
+					stringListItem (lang->currentAliaes, i)));
+}
+
 extern void printLanguageMaps (const langType language)
 {
 	if (language == LANG_AUTO)
@@ -1218,6 +1345,26 @@ extern void printLanguageMaps (const langType language)
 	}
 	else
 		printMaps (language);
+}
+
+extern void printLanguageAliases (const langType language)
+{
+	if (language == LANG_AUTO)
+	{
+		unsigned int i;
+		for (i = 0  ;  i < LanguageCount  ;  ++i)
+			printLanguageAliases (i);
+	}
+	else
+	{
+		const parserDefinition* lang;
+
+		Assert (0 <= language  &&  language < (int) LanguageCount);
+		lang = LanguageTable [language];
+		printf ("%-8s", lang->name);
+		printAliases (language);
+		putchar ('\n');
+	}
 }
 
 static void printLanguage (const langType language)

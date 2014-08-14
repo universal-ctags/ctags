@@ -242,6 +242,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Print this option summary."},
  {1,"  --if0=[yes|no]"},
  {1,"       Should C code within #if 0 conditional branches be parsed [no]?"},
+ {1,"  --<LANG>-alias=[+|-]aliasPattern"},
+ {1,"      Add a pattern detecting a name can be used as an alternative name for LANG."},
  {1,"  --<LANG>-corpus=spec:corpusFile"},
  {1,"      Add two gram data calculated from corpusFile to spec of LANG."},
  {1,"  --<LANG>-kinds=[+|-]kinds"},
@@ -262,6 +264,8 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Should #line directives be processed [no]?"},
  {1,"  --links=[yes|no]"},
  {1,"       Indicate whether symbolic links should be followed [yes]."},
+ {1,"  --list-aliases=[language|all]"},
+ {1,"       Output list of alias patterns."},
  {1,"  --list-corpora=[language[:spec]|all]"},
  {1,"       Output list of language corpora."},
  {1,"  --list-kinds=[language|all]"},
@@ -1377,6 +1381,22 @@ static void processLicenseOption (
 	exit (0);
 }
 
+static void processListAliasesOption (
+		const char *const option, const char *const parameter)
+{
+	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+		printLanguageAliases (LANG_AUTO);
+	else
+	{
+		langType language = getNamedLanguage (parameter);
+		if (language == LANG_IGNORE)
+			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
+		else
+			printLanguageAliases (language);
+	}
+	exit (0);
+}
+
 static void processListKindsOption (
 		const char *const option, const char *const parameter)
 {
@@ -1719,6 +1739,7 @@ static parametricOption ParametricOptions [] = {
 	{ "langdef",                processLanguageDefineOption,    FALSE   },
 	{ "langmap",                processLanguageMapOption,       FALSE   },
 	{ "license",                processLicenseOption,           TRUE    },
+	{ "list-aliases",           processListAliasesOption,       TRUE    },
 	{ "list-corpora",           processListCorporaOption,       TRUE    },
 	{ "list-kinds",             processListKindsOption,         TRUE    },
 	{ "list-maps",              processListMapsOption,          TRUE    },
@@ -1830,6 +1851,8 @@ static void processLongOption (
 	else if (processKindOption (option, parameter))
 		;
 	else if (processCorpusOption (option, parameter))
+		;
+	else if (processAliasOption (option, parameter))
 		;
 	else if (processRegexOption (option, parameter))
 		;
@@ -2285,6 +2308,8 @@ extern void initOptions (void)
 	installHeaderListDefaults ();
 	verbose ("  Installing default language mappings:\n");
 	installLanguageMapDefaults ();
+	verbose ("  Installing default language aliases:\n");
+	installLanguageAliasesDefaults ();
 
 	/* always excluded by default */
 	verbose ("  Installing default exclude patterns:\n");
