@@ -22,7 +22,7 @@
 #
 #
 --langdef=ctags
---langmap=ctags:.ctags
+--ctags-map=+.ctags
 --regex-ctags=/^--langdef=([^ \t]+)$/\1/l,langdef/
 --regex-ctags=/^--regex-[^=]+=.*\/.,(.+)\/.*/\1/k,kind/
 --ctags-corpus=.ctags:ctags.ctags
