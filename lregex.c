@@ -708,24 +708,34 @@ extern void addLanguageRegex (
 extern boolean processRegexOption (const char *const option,
 								   const char *const parameter __unused__)
 {
-	boolean handled = FALSE;
 	const char* const dash = strchr (option, '-');
-	if (dash != NULL  &&  strncmp (option, "regex", dash - option) == 0)
-	{
+	char* lang;
+	langType language;
+
+	if (dash == NULL)
+		return FALSE;
+
+	if (strncmp (option, "regex", dash - option) == 0)
+		lang = eStrdup (dash + 1);
+	else if (strcmp (dash + 1, "regex") == 0)
+		lang = eStrndup (option, dash - option);
+	else
+		return FALSE;
+
 #ifdef HAVE_REGEX
-		langType language;
-		language = getNamedLanguage (dash + 1);
-		if (language == LANG_IGNORE)
-			error (WARNING, "unknown language \"%s\" in --%s option", (dash + 1), option);
-		else
-			processLanguageRegex (language, parameter);
+	language = getNamedLanguage (lang);
+	if (language == LANG_IGNORE)
+		error (WARNING, "unknown language \"%s\" in --%s option", lang, option);
+	else
+		processLanguageRegex (language, parameter);
 #else
-		error (WARNING, "regex support not available; required for --%s option",
-		   option);
+	error (WARNING, "regex support not available; required for --%s option",
+	       option);
 #endif
-		handled = TRUE;
-	}
-	return handled;
+
+	eFree (lang);
+
+	return TRUE;
 }
 
 extern void resetRegexKinds (const langType language __unused__,
