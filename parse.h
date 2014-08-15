@@ -136,6 +136,7 @@ extern void enableLanguage (const langType language, const boolean state);
 extern void initializeParsing (void);
 extern void freeParserResources (void);
 extern void processLanguageDefineOption (const char *const option, const char *const parameter);
+extern boolean processMapOption (const char *const option, const char *const parameter);
 extern boolean processKindOption (const char *const option, const char *const parameter);
 extern void printKindOptions (void);
 extern void printLanguageKinds (const langType language);

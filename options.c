@@ -248,6 +248,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"      Add two gram data calculated from corpusFile to spec of LANG."},
  {1,"  --<LANG>-kinds=[+|-]kinds"},
  {1,"       Enable/disable tag kinds for language <LANG>."},
+ {1,"  --<LANG>-map=[+]map"},
+ {1,"       Simplified version of --langmap opton."},
  {1,"  --langdef=name"},
  {1,"       Define a new language to be parsed with regular expressions."},
  {1,"  --langmap=map(s)"},
@@ -1299,6 +1301,53 @@ static void processLanguagesOption (
 	eFree (langs);
 }
 
+extern boolean processMapOptoin (
+			const char *const option, const char *const parameter)
+{
+	const char* const dash = strchr (option, '-');
+	langType language;
+	vString* langName;
+	size_t len;
+	const char* spec;
+	char* map_parameter;
+	boolean clear = FALSE;
+
+	if (dash == NULL ||
+	    (strcmp (dash + 1, "map") != 0))
+		return FALSE;
+	len = dash - option;
+
+	langName = vStringNew ();
+	vStringNCopyS (langName, option, len);
+	language = getNamedLanguage (vStringValue (langName));
+	if (language == LANG_IGNORE)
+		error (FATAL, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
+	vStringDelete(langName);
+
+	if (parameter == NULL || parameter [0] == '\0')
+		error (FATAL, "no parameter is given for %s", option);
+
+	spec = parameter;
+	if (*spec == '+')
+		spec++;
+	else
+		clear = TRUE;
+
+	if (clear)
+	{
+		verbose ("    Setting %s language map:", getLanguageName (language));
+		clearLanguageMap (language);
+	}
+	else
+		verbose ("    Adding to %s language map:", getLanguageName (language));
+	map_parameter = eStrdup (spec);
+	addLanguageMap (language, map_parameter);
+	eFree (map_parameter);
+	verbose ("\n");
+
+	return TRUE;
+}
+
 static char* skipTillColon (char* p)
 {
 	while (*p != ':'  && *p != '\0')
@@ -1855,6 +1904,8 @@ static void processLongOption (
 	else if (processAliasOption (option, parameter))
 		;
 	else if (processRegexOption (option, parameter))
+		;
+	else if (processMapOptoin (option, parameter))
 		;
 #ifndef RECURSE_SUPPORTED
 	else if (strcmp (option, "recurse") == 0)
