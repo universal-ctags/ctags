@@ -1,0 +1,3 @@
+--langdef=foo
+--langmap=foo:+.foo
+--regex-foo=/^\/([a-z]) def$/\1/d,definition/

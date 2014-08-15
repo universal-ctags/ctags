@@ -1,0 +1,3 @@
+x	Units/option-lang-compatibility.d/input.foo	/^\/x def$/;"	d
+y	Units/option-lang-compatibility.d/input.foo	/^\/y def$/;"	d
+z	Units/option-lang-compatibility.d/input.foo	/^\/z def$/;"	d
