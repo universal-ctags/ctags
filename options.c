@@ -37,6 +37,7 @@
 */
 #define INVOCATION  "Usage: %s [options] [file(s)]\n"
 
+#define CTAGS_DATA_PATH_ENVIRONMENT "CTAGS_DATA_PATH"
 #define CTAGS_ENVIRONMENT  "CTAGS"
 #define ETAGS_ENVIRONMENT  "ETAGS"
 
@@ -2314,7 +2315,7 @@ extern void readOptionConfiguration (void)
 
 static searchPathList* makeDataPathList ()
 {
-	char* dataPath = getenv ("CTAGS_DATA_PATH");
+	char* dataPath = getenv (CTAGS_DATA_PATH_ENVIRONMENT);
 	searchPathList* list = stringListNew ();
 
 	if (dataPath)
