@@ -2337,7 +2337,6 @@ static searchPathList* makeDataPathList ()
 			else
 				break;
 		}
-		stringListReverse (list);
 	}
 	return list;
 }
