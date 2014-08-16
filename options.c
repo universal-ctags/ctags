@@ -65,6 +65,9 @@
 
 #define isCompoundOption(c)  (boolean) (strchr ("fohiILpDb", (c)) != NULL)
 
+#define SUBDIR_CONFIGS "configs"
+#define SUBDIR_CORPORA "corpora"
+
 /*
 *   Data declarations
 */
@@ -101,7 +104,6 @@ static boolean NonOptionEncountered;
 static stringList *OptionFiles;
 
 typedef stringList searchPathList;
-static searchPathList *DataPathList;
 static searchPathList *ConfigPathList;
 static searchPathList *CorpusPathList;
 
@@ -210,6 +212,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Should tags should be appended to existing tag file [no]?"},
  {1,"  --config-filename=fileName"},
  {1,"      Use 'fileName' instead of 'ctags' in option file names."},
+ {1,"  --data-dir=[+]DIR"},
+ {1,"      Add or set DIR to data directory search path."},
  {1,"  --etags-include=file"},
  {1,"      Include reference to 'file' in Emacs-style tag file (requires -e)."},
  {1,"  --exclude=pattern"},
@@ -1515,23 +1519,6 @@ static void processListLanguagesOption (
 	exit (0);
 }
 
-static searchPathList* extendSearchPathList (searchPathList* baseList, const char* leaf)
-{
-	unsigned int i;
-	vString* basePath;
-	vString* path;
-	searchPathList* extendedList;
-
-	extendedList = stringListNew ();
-	for (i = 0; i < stringListCount (baseList); ++i)
-	{
-		basePath = stringListItem (baseList, i);
-		path = combinePathAndFile (vStringValue (basePath), leaf);
-		stringListAdd (extendedList, path);
-	}
-
-	return extendedList;
-}
 
 static void freeSearchPathList (searchPathList** pathList)
 {
@@ -1768,12 +1755,77 @@ static void processVersionOption (
 	exit (0);
 }
 
+static void resetDataPathList (void)
+{
+	freeSearchPathList (&CorpusPathList);
+	freeSearchPathList (&ConfigPathList);
+
+	verbose ("Reset CorpusPathList\n");
+	verbose ("Reset ConfigPathList\n");
+
+	ConfigPathList = stringListNew ();
+	CorpusPathList = stringListNew ();
+}
+
+static void appendToDataPathListFull (const char *const dir, boolean report_in_verboe, const char* const action)
+{
+	vString* path;
+
+	path = combinePathAndFile (dir, SUBDIR_CONFIGS);
+	if (report_in_verboe)
+		verbose ("%s %s to %s\n", action, vStringValue (path), "ConfigPathList");
+	stringListAdd (ConfigPathList, path);
+
+	path = combinePathAndFile (dir, SUBDIR_CORPORA);
+	if (report_in_verboe)
+		verbose ("%s %s to %s\n", action, vStringValue (path), "CorpusPathList");
+	stringListAdd (CorpusPathList, path);
+}
+
+static void appendToDataPathList (const char *const dir, boolean report_in_verboe)
+{
+	appendToDataPathListFull (dir, report_in_verboe, report_in_verboe? "Append": NULL);
+}
+
+static void prependToDataPathList (const char *const dir, boolean report_in_verboe)
+{
+	stringListReverse (ConfigPathList);
+	stringListReverse (CorpusPathList);
+
+	appendToDataPathListFull (dir, report_in_verboe, report_in_verboe? "Prepend": NULL);
+
+	stringListReverse (ConfigPathList);
+	stringListReverse (CorpusPathList);
+}
+
+static void processDataDir (
+		const char *const option, const char *const parameter)
+{
+	const char* path;
+
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "Path for a directory is needed for \"%s\" option", option);
+
+	if (parameter[0] == '+')
+	{
+		path = parameter + 1;
+		prependToDataPathList (path, TRUE);
+	}
+	else
+	{
+		resetDataPathList ();
+		path = parameter;
+		appendToDataPathList (path, TRUE);
+	}
+}
+
 /*
  *  Option tables
  */
 
 static parametricOption ParametricOptions [] = {
 	{ "config-filename",      	processConfigFilenameOption,  	TRUE    },
+	{ "data-dir",               processDataDir,                 FALSE   },
 	{ "etags-include",          processEtagsInclude,            FALSE   },
 	{ "exclude",                processExcludeOption,           FALSE   },
 	{ "excmd",                  processExcmdOption,             FALSE   },
@@ -2313,10 +2365,12 @@ extern void readOptionConfiguration (void)
 	}
 }
 
-static searchPathList* makeDataPathList ()
+static void installDataPathList (void)
 {
 	char* dataPath = getenv (CTAGS_DATA_PATH_ENVIRONMENT);
-	searchPathList* list = stringListNew ();
+
+	ConfigPathList = stringListNew ();
+	CorpusPathList = stringListNew ();
 
 	if (dataPath)
 	{
@@ -2328,7 +2382,7 @@ static searchPathList* makeDataPathList ()
 			if (needle)
 				*needle = '\0';
 
-			stringListAdd (list, vStringNewInit (dataPath));
+			appendToDataPathList (dataPath, FALSE);
 
 			if (needle)
 			{
@@ -2339,7 +2393,6 @@ static searchPathList* makeDataPathList ()
 				break;
 		}
 	}
-	return list;
 }
 
 /*
@@ -2349,10 +2402,8 @@ static searchPathList* makeDataPathList ()
 extern void initOptions (void)
 {
 	OptionFiles = stringListNew ();
-	DataPathList = makeDataPathList ();
-	ConfigPathList = extendSearchPathList (DataPathList, "configs");
+	installDataPathList ();
 	verboseSearchPathList ("ConfigPathList", ConfigPathList);
-	CorpusPathList = extendSearchPathList (DataPathList, "corpora");
 	verboseSearchPathList ("CorpusPathList", CorpusPathList);
 
 	verbose ("Setting option defaults\n");
@@ -2398,7 +2449,6 @@ extern void freeOptionResources (void)
 
 	freeSearchPathList (&CorpusPathList);
 	freeSearchPathList (&ConfigPathList);
-	freeSearchPathList (&DataPathList);
 
 	freeList (&OptionFiles);
 }
