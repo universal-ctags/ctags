@@ -324,7 +324,7 @@ extern void stringListReverse (const stringList *const current)
 	{
 		tmp = current->list[i];
 		current->list[i] = current->list[j];
-		current->list[i] = tmp;
+		current->list[j] = tmp;
 	}
 }
 
