@@ -2189,7 +2189,7 @@ static int accept_only_dot_d(const struct dirent* dent)
 {
 	size_t len;
 
-	/* accept only a file ended with ".conf" or ".ctags" */
+	/* accept only a directory ended with ".d" */
 	len = strlen(dent->d_name);
 
 	if (len < 3)
