@@ -1536,7 +1536,8 @@ static void verboseSearchPathList (const char *const varname, const searchPathLi
 		verbose ("  %s\n", vStringValue (stringListItem (pathList, i)));
 }
 
-static vString* expandOnSearchPathList (searchPathList *pathList, const char* leaf)
+static vString* expandOnSearchPathList (searchPathList *pathList, const char* leaf,
+					boolean (* check) (const char *const))
 {
 	unsigned int i;
 
@@ -1545,7 +1546,7 @@ static vString* expandOnSearchPathList (searchPathList *pathList, const char* le
 		const char* const body = vStringValue (stringListItem (pathList, i));
 		vString* const tmp = combinePathAndFile (body, leaf);
 
-		if (doesFileExist (vStringValue (tmp)))
+		if ((* check) (vStringValue (tmp)))
 			return tmp;
 		else
 			vStringDelete (tmp);
@@ -1553,14 +1554,57 @@ static vString* expandOnSearchPathList (searchPathList *pathList, const char* le
 	return NULL;
 }
 
+static boolean isDirectory (const char *const dirName)
+{
+	fileStatus *status = eStat (dirName);
+	return status->isDirectory;
+}
+
 static vString* expandOnConfigPathList (const char* leaf)
 {
-  return expandOnSearchPathList (ConfigPathList, leaf);
+	vString* r;
+	vString* leaf_with_suffix;
+
+	leaf_with_suffix = vStringNewInit (leaf);
+	vStringCatS (leaf_with_suffix, ".d");
+
+	r = expandOnSearchPathList (ConfigPathList, vStringValue (leaf_with_suffix),
+				    isDirectory);
+
+	if (!r)
+	{
+		vStringCopyS (leaf_with_suffix, leaf);
+		vStringCatS (leaf_with_suffix, ".conf");
+		r = expandOnSearchPathList (ConfigPathList, vStringValue (leaf_with_suffix),
+					    doesFileExist);
+	}
+
+	if (!r)
+	{
+		vStringCopyS (leaf_with_suffix, leaf);
+		vStringCatS (leaf_with_suffix, ".ctags");
+		r = expandOnSearchPathList (ConfigPathList, vStringValue (leaf_with_suffix),
+					    doesFileExist);
+	}
+
+#ifdef MSDOS_STYLE_PATH
+	if (!r)
+	{
+		vStringCopyS (leaf_with_suffix, leaf);
+		vStringCatS (leaf_with_suffix, ".cnf");
+		r = expandOnSearchPathList (ConfigPathList, vStringValue (leaf_with_suffix),
+					    doesFileExist);
+	}
+#endif
+
+	vStringDelete (leaf_with_suffix);
+
+	return r;
 }
 
 extern vString* expandOnCorpusPathList (const char* leaf)
 {
-  return expandOnSearchPathList (CorpusPathList, leaf);
+  return expandOnSearchPathList (CorpusPathList, leaf, doesFileExist);
 }
 
 static void processOptionFile (

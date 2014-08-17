@@ -1,2 +1,2 @@
---options=mib.ctags
---options=wrongmib.ctags
+--options=mib
+--options=wrongmib
