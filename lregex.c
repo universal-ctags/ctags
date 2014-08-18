@@ -294,19 +294,19 @@ static boolean parseTagRegex (
 }
 
 
-static void ptrn_flag_cut_short (char c, void* data)
+static void ptrn_flag_exclusive_short (char c, void* data)
 {
 	regexPattern *ptrn = data;
 	ptrn->exclusive = TRUE;
 }
 
-static void ptrn_flag_cut_long (const char* s, void* data)
+static void ptrn_flag_exclusive_long (const char* s, void* data)
 {
-	ptrn_flag_cut_short ('!', data);
+	ptrn_flag_exclusive_short ('x', data);
 }
 
 static flagDefinition ptrnFlagDef[] = {
-	{ '!', "cut", ptrn_flag_cut_short, ptrn_flag_cut_long },
+	{ 'x', "exclusive", ptrn_flag_exclusive_short, ptrn_flag_exclusive_long },
 };
 
 static void addCompiledTagPattern (
