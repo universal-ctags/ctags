@@ -4413,13 +4413,10 @@ parse_char_property(Node** np, OnigToken* tok, UChar** src, UChar* end,
   if (tok->u.prop.not != 0) NCCLASS_SET_NOT(cc);
 
   if (IS_IGNORECASE(env->option)) {
-    if (ctype == ONIGENC_CTYPE_ASCII)
-      r = cclass_case_fold(np, cc, NULL, env);
-    else
+    if (ctype != ONIGENC_CTYPE_ASCII)
       r = cclass_case_fold(np, cc, cc, env);
-    if (r != 0) return r;
   }
-  return 0;
+  return r;
 }
 
 

@@ -108,6 +108,12 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
                     (msg.value.decode(), pattern, target), file=sys.stderr)
         return
 
+    if err != onig.ONIG_NORMAL:
+        nfail += 1
+        print_result("FAIL(E)", "/%s/ '%s'" % (pattern, target))
+        onig.onig_free(reg)
+        return
+
     region = onig.onig_region_new()
     r = onig.onig_search(reg, targetp.getptr(), targetp.getptr(-1),
                     targetp.getptr(), targetp.getptr(-1),

@@ -1,5 +1,10 @@
 History of Onigmo (Oniguruma-mod)
 
+2014/08/08: [bug]  Character properties ignore the ignore case flag (Issue #41)
+2014/08/08: [bug]  Regex matching errors when using \W character class and /i
+                   option (Issue #4)
+                   https://bugs.ruby-lang.org/issues/4044
+2014/08/05: [impl] Reduce the size of some structures
 2014/07/31: [bug]  /(?i)\u0149\u0149/ =~ "\u0149\u0149" doesn't match
                    (Issue #40)
 

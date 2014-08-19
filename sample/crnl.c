@@ -63,7 +63,7 @@ x0(int no, char* pattern_arg, char* str_arg,
     range = end;
   }
   r = onig_search(reg, str, end, start, range, region, ONIG_OPTION_NONE);
-  if (r >= 0 || r == ONIG_MISMATCH) {
+  if (r >= 0) {
     result(no, region->beg[0], region->end[0], expected_from, expected_to);
   }
   else if (r == ONIG_MISMATCH) {
