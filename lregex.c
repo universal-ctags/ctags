@@ -270,10 +270,8 @@ static flagDefinition ptrnFlagDef[] = {
 	{ 'x', "exclusive", ptrn_flag_exclusive_short, ptrn_flag_exclusive_long },
 };
 
-static void addCompiledTagPattern (
-		const langType language, regex_t* const pattern,
-		char* const name, const char kind, char* const kindName,
-		char *const description, const char* flags)
+static regexPattern* addCompiledTagCommon (const langType language,
+					 regex_t* const pattern)
 {
 	patternSet* set;
 	regexPattern *ptrn;
@@ -290,12 +288,24 @@ static void addCompiledTagPattern (
 	}
 	set = Sets + language;
 	set->patterns = xRealloc (set->patterns, (set->count + 1), regexPattern);
-	ptrn = &set->patterns [set->count];
-	set->count += 1;
 
+	ptrn = &set->patterns [set->count];
 	ptrn->pattern = pattern;
-	ptrn->type    = PTRN_TAG;
 	ptrn->exclusive = FALSE;
+
+	set->count += 1;
+	return ptrn;
+}
+
+static void addCompiledTagPattern (
+		const langType language, regex_t* const pattern,
+		char* const name, const char kind, char* const kindName,
+		char *const description, const char* flags)
+{
+	regexPattern * ptrn;
+
+	ptrn  = addCompiledTagCommon(language, pattern);
+	ptrn->type    = PTRN_TAG;
 	ptrn->u.tag.name_pattern = name;
 	ptrn->u.tag.kind.enabled = TRUE;
 	ptrn->u.tag.kind.letter  = kind;
@@ -308,27 +318,10 @@ static void addCompiledCallbackPattern (
 		const langType language, regex_t* const pattern,
 		const regexCallback callback, const char* flags)
 {
-	patternSet* set;
-	regexPattern *ptrn;
-	if (language > SetUpper)
-	{
-		int i;
-		Sets = xRealloc (Sets, (language + 1), patternSet);
-		for (i = SetUpper + 1  ;  i <= language  ;  ++i)
-		{
-			Sets [i].patterns = NULL;
-			Sets [i].count = 0;
-		}
-		SetUpper = language;
-	}
-	set = Sets + language;
-	set->patterns = xRealloc (set->patterns, (set->count + 1), regexPattern);
-	ptrn = &set->patterns [set->count];
-	set->count += 1;
+	regexPattern * ptrn;
 
-	ptrn->pattern = pattern;
+	ptrn  = addCompiledTagCommon(language, pattern);
 	ptrn->type    = PTRN_CALLBACK;
-	ptrn->exclusive = FALSE;
 	ptrn->u.callback.function = callback;
 	flagsEval (flags, ptrnFlagDef, COUNT(ptrnFlagDef), ptrn);
 }
