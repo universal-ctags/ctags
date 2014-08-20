@@ -1067,17 +1067,12 @@ static void resetLanguageKinds (const langType language, const boolean mode)
 static boolean enableLanguageKind (
 		const langType language, const int kind, const boolean mode)
 {
-	boolean result = FALSE;
-	if (LanguageTable [language]->regex)
-		result = enableRegexKind (language, kind, mode);
-	else
+	boolean result = enableRegexKind (language, kind, mode);
+	kindOption* const opt = langKindOption (language, kind);
+	if (opt != NULL)
 	{
-		kindOption* const opt = langKindOption (language, kind);
-		if (opt != NULL)
-		{
-			opt->enabled = mode;
-			result = TRUE;
-		}
+		opt->enabled = mode;
+		result = TRUE;
 	}
 	return result;
 }
