@@ -166,6 +166,7 @@ extern boolean enableRegexKind (const langType language, const int kind, const b
 extern void printRegexKinds (const langType language, boolean indent);
 extern void freeRegexResources (void);
 extern void checkRegex (void);
+extern void useRegexMethod (const langType language);
 
 #endif  /* _PARSE_H */
 

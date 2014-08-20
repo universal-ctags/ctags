@@ -294,6 +294,7 @@ static regexPattern* addCompiledTagCommon (const langType language,
 	ptrn->exclusive = FALSE;
 
 	set->count += 1;
+	useRegexMethod(language);
 	return ptrn;
 }
 

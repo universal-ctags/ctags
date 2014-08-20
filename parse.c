@@ -1001,6 +1001,26 @@ extern void freeParserResources (void)
 	LanguageCount = 0;
 }
 
+#ifdef HAVE_REGEX
+static void doNothing (void)
+{
+}
+
+static void lazyInitialize (langType language)
+{
+	parserDefinition* lang;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+
+	lang->parser = doNothing;
+
+	if (lang->method & (METHOD_NOT_CRAFTED|METHOD_REGEX))
+		lang->parser = findRegexTags;
+
+}
+#endif
+
 /*
 *   Option parsing
 */
@@ -1017,10 +1037,10 @@ extern void processLanguageDefineOption (
 	{
 		unsigned int i = LanguageCount++;
 		parserDefinition* const def = parserNew (parameter);
-		def->parser            = findRegexTags;
+		def->initialize        = lazyInitialize;
 		def->currentPatterns   = stringListNew ();
 		def->currentExtensions = stringListNew ();
-		def->method            = METHOD_NOT_CRAFTED|METHOD_REGEX;
+		def->method            = METHOD_NOT_CRAFTED;
 		def->enabled           = TRUE;
 		def->id                = i;
 		LanguageTable = xRealloc (LanguageTable, i + 1, parserDefinition*);
@@ -1408,10 +1428,18 @@ static rescanReason createTagsForFile (
 
 		makeFileTag (fileName);
 
+	  retry:
 		if (lang->parser != NULL)
 			lang->parser ();
 		else if (lang->parser2 != NULL)
 			rescan = lang->parser2 (passCount);
+		else if (lang->initialize != NULL)
+		{
+			parserInitialize init = lang->initialize;
+			init(language);
+			Assert (lang->parser || lang->parser2);
+			goto retry;
+		}
 
 		if (Option.etags)
 			endEtagsFile (getSourceFileTagPath ());
@@ -1505,4 +1533,14 @@ extern void unifyLanguageMaps (void)
 	for (i = 0; i < LanguageCount  ;  ++i)
 		unifyMaps (i);
 }
+
+extern void useRegexMethod (const langType language)
+{
+	parserDefinition* lang;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+	lang->method |= METHOD_REGEX;
+}
+
 /* vi:set tabstop=4 shiftwidth=4 nowrap: */
