@@ -1054,9 +1054,8 @@ static void resetLanguageKinds (const langType language, const boolean mode)
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
-	if (lang->regex)
-		resetRegexKinds (language, mode);
-	else
+
+	resetRegexKinds (language, mode);
 	{
 		unsigned int i;
 		for (i = 0  ;  i < lang->kindCount  ;  ++i)
@@ -1168,13 +1167,13 @@ static void printKinds (langType language, boolean indent)
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
-	if (lang->kinds != NULL  ||  lang->regex)
+	if (lang->kinds != NULL)
 	{
 		unsigned int i;
 		for (i = 0  ;  i < lang->kindCount  ;  ++i)
 			printLanguageKind (lang->kinds + i, indent);
-		printRegexKinds (language, indent);
 	}
+	printRegexKinds (language, indent);
 }
 
 extern void printLanguageKinds (const langType language)
