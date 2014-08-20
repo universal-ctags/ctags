@@ -35,7 +35,7 @@ extern parserDefinition* DosBatchParser (void)
 	parserDefinition* const def = parserNew ("DosBatch");
 	def->extensions = extensions;
 	def->initialize = installDosBatchRegex;
-	def->regex      = TRUE;
+	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }
 

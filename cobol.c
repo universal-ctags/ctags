@@ -43,7 +43,7 @@ extern parserDefinition* CobolParser (void)
 	parserDefinition* def = parserNew ("Cobol");
 	def->extensions = extensions;
 	def->initialize = installCobolRegex;
-	def->regex      = TRUE;
+	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }
 

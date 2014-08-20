@@ -137,7 +137,7 @@ extern parserDefinition* MatLabParser (void)
 	parserDefinition* const def = parserNew ("MatLab");
 	def->extensions = extensions;
 	def->initialize = installMatLabRegex;
-	def->regex      = TRUE;
+	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }
 

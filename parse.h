@@ -61,6 +61,11 @@ typedef struct stgTableEntry{
 	struct stgTableEntry *next;
 } tgTableEntry;
 
+typedef enum  {
+  METHOD_NOT_CRAFTED = 1 << 0,
+  METHOD_REGEX       = 1 << 1,
+} parsingMethod;
+
 typedef struct {
 	/* defined by parser */
 	char* name;                    /* name of language */
@@ -73,7 +78,7 @@ typedef struct {
 	parserFinalize finalize;       /* finalize routine, if needed */
 	simpleParser parser;           /* simple parser (common case) */
 	rescanParser parser2;          /* rescanning parser (unusual case) */
-	boolean regex;                 /* is this a regex parser? */
+	unsigned int method;           /* See PARSE__... definitions above */
 	tgTableEntry *tg_entries;
 
 	/* used internally */

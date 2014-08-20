@@ -42,7 +42,7 @@ extern parserDefinition* HtmlParser (void)
 	parserDefinition *const def = parserNew ("HTML");
 	def->extensions = extensions;
 	def->initialize = installHtmlRegex;
-	def->regex      = TRUE;
+	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }
 

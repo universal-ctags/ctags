@@ -33,7 +33,7 @@ extern parserDefinition* YaccParser (void)
 	parserDefinition* const def = parserNew ("YACC");
 	def->extensions = extensions;
 	def->initialize = installYaccRegex;
-	def->regex      = TRUE;
+	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }
 

@@ -948,7 +948,7 @@ extern void initializeParsing (void)
 			boolean accepted = FALSE;
 			if (def->name == NULL  ||  def->name[0] == '\0')
 				error (FATAL, "parser definition must contain name\n");
-			else if (def->regex)
+			else if (def->method & ( METHOD_REGEX | METHOD_NOT_CRAFTED ))
 			{
 #ifdef HAVE_REGEX
 				def->parser = findRegexTags;
@@ -1020,7 +1020,7 @@ extern void processLanguageDefineOption (
 		def->parser            = findRegexTags;
 		def->currentPatterns   = stringListNew ();
 		def->currentExtensions = stringListNew ();
-		def->regex             = TRUE;
+		def->method            = METHOD_NOT_CRAFTED|METHOD_REGEX;
 		def->enabled           = TRUE;
 		def->id                = i;
 		LanguageTable = xRealloc (LanguageTable, i + 1, parserDefinition*);
@@ -1362,7 +1362,7 @@ static void printLanguage (const langType language)
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
-	if (lang->kinds != NULL  ||  lang->regex)
+	if (lang->kinds != NULL  ||  (lang->method & METHOD_REGEX))
 		printf ("%s%s\n", lang->name, lang->enabled ? "" : " [disabled]");
 }
 
