@@ -56,6 +56,8 @@ typedef struct sTagFields {
 typedef struct sTagEntryInfo {
 	boolean     lineNumberEntry;  /* pattern or line number entry */
 	unsigned long lineNumber;     /* line number of tag */
+	const char* pattern;	      /* pattern for locating source line
+				       * (may be NULL if not present) *//*  */
 	fpos_t      filePosition;     /* file position of line containing tag */
 	const char* language;         /* language of source file */
 	boolean     isFileScope;      /* is tag visibile only within source file? */
@@ -97,6 +99,11 @@ extern void beginEtagsFile (void);
 extern void endEtagsFile (const char *const name);
 extern void makeTagEntry (const tagEntryInfo *const tag);
 extern void initTagEntry (tagEntryInfo *const e, const char *const name);
+extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
+			      unsigned long lineNumber,
+			      const char* language,
+			      fpos_t      filePosition,
+			      const char *sourceFileName);
 
 #endif  /* _ENTRY_H */
 
