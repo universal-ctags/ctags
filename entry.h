@@ -105,6 +105,12 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      fpos_t      filePosition,
 			      const char *sourceFileName);
 
+/* language is optiona: can be NULL. */
+extern void writePseudoTag (const char *const tagName,
+			    const char *const fileName,
+			    const char *const pattern,
+			    const char *const language);
+
 #endif  /* _ENTRY_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */
