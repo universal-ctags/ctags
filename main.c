@@ -606,6 +606,7 @@ extern int main (int __unused__ argc, char **argv)
 	freeOptionResources ();
 	freeParserResources ();
 	freeRegexResources ();
+	freeXcmdResources ();
 
 	exit (0);
 	return 0;

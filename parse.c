@@ -61,6 +61,20 @@ static vString* ext2ptrnNew (const char *const ext)
 	return ptrn;
 }
 
+static boolean enabled_p (const langType language)
+{
+	const parserDefinition* const lang = LanguageTable [language];
+	if (!lang->enabled)
+		return FALSE;
+	else if ((lang->method & METHOD_XCMD) &&
+		 (!(lang->method & METHOD_XCMD_AVAILABLE)) &&
+		 (lang->kinds == NULL) &&
+		 (!(lang->method & METHOD_REGEX)))
+		return FALSE;
+	else
+		return TRUE;
+}
+
 /*
 *   parserDescription mapping management
 */
@@ -1072,6 +1086,7 @@ static void resetLanguageKinds (const langType language, const boolean mode)
 	lang = LanguageTable [language];
 
 	resetRegexKinds (language, mode);
+	resetXcmdKinds (language, mode);
 	{
 		unsigned int i;
 		for (i = 0  ;  i < lang->kindCount  ;  ++i)
@@ -1089,6 +1104,7 @@ static boolean enableLanguageKind (
 		opt->enabled = mode;
 		result = TRUE;
 	}
+	result = enableXcmdKind (language, kind, mode)? TRUE: result;
 	return result;
 }
 
@@ -1190,6 +1206,7 @@ static void printKinds (langType language, boolean indent)
 			printLanguageKind (lang->kinds + i, indent);
 	}
 	printRegexKinds (language, indent);
+	printXcmdKinds (language, indent);
 }
 
 extern void printLanguageKinds (const langType language)
@@ -1200,7 +1217,7 @@ extern void printLanguageKinds (const langType language)
 		for (i = 0  ;  i < LanguageCount  ;  ++i)
 		{
 			const parserDefinition* const lang = LanguageTable [i];
-			printf ("%s%s\n", lang->name, lang->enabled ? "" : " [disabled]");
+			printf ("%s%s\n", lang->name, enabled_p (i) ? "" : " [disabled]");
 			printKinds (i, TRUE);
 		}
 	}
@@ -1306,7 +1323,7 @@ extern void printLanguageCorpus (langType language,
 		for (i = 0  ;  i < LanguageCount  ;  ++i)
 		{
 			const parserDefinition* const lang = LanguageTable [i];
-			printf ("%s%s\n", lang->name, lang->enabled ? "" : " [disabled]");
+			printf ("%s%s\n", lang->name, enabled_p (i) ? "" : " [disabled]");
 			printCorpus (i, spec, TRUE);
 		}
 	}
@@ -1382,8 +1399,8 @@ static void printLanguage (const langType language)
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
-	if (lang->kinds != NULL  ||  (lang->method & METHOD_REGEX))
-		printf ("%s%s\n", lang->name, lang->enabled ? "" : " [disabled]");
+	if (lang->kinds != NULL  ||  (lang->method & METHOD_REGEX) || (lang->method & METHOD_XCMD))
+		printf ("%s%s\n", lang->name, enabled_p (language) ? "" : " [disabled]");
 }
 
 extern void printLanguageList (void)
@@ -1490,7 +1507,7 @@ extern boolean parseFile (const char *const fileName)
 	Assert (language != LANG_AUTO);
 	if (language == LANG_IGNORE)
 		verbose ("ignoring %s (unknown language)\n", fileName);
-	else if (! LanguageTable [language]->enabled)
+	else if (! enabled_p (language))
 		verbose ("ignoring %s (language disabled)\n", fileName);
 	else
 	{
@@ -1498,6 +1515,9 @@ extern boolean parseFile (const char *const fileName)
 			openTagFile ();
 
 		tagFileResized = createTagsWithFallback (fileName, language);
+#ifdef HAVE_COPROC
+		tagFileResized = invokeXcmd (fileName, language)? TRUE: tagFileResized;
+#endif
 
 		if (Option.filter)
 			closeTagFile (tagFileResized);
@@ -1541,6 +1561,24 @@ extern void useRegexMethod (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
 	lang->method |= METHOD_REGEX;
+}
+
+extern void useXcmdMethod (const langType language)
+{
+	parserDefinition* lang;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+	lang->method |= METHOD_XCMD;
+}
+
+extern void notifyAvailabilityXcmdMethod (const langType language)
+{
+	parserDefinition* lang;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+	lang->method |= METHOD_XCMD_AVAILABLE;
 }
 
 /* vi:set tabstop=4 shiftwidth=4 nowrap: */

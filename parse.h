@@ -62,8 +62,10 @@ typedef struct stgTableEntry{
 } tgTableEntry;
 
 typedef enum  {
-  METHOD_NOT_CRAFTED = 1 << 0,
-  METHOD_REGEX       = 1 << 1,
+  METHOD_NOT_CRAFTED    = 1 << 0,
+  METHOD_REGEX          = 1 << 1,
+  METHOD_XCMD           = 1 << 2,
+  METHOD_XCMD_AVAILABLE = 1 << 3,
 } parsingMethod;
 
 typedef struct {
@@ -167,6 +169,19 @@ extern void printRegexKinds (const langType language, boolean indent);
 extern void freeRegexResources (void);
 extern void checkRegex (void);
 extern void useRegexMethod (const langType language);
+
+#ifdef HAVE_COPROC
+extern boolean invokeXcmd (const char* const fileName, const langType language);
+#endif
+extern boolean processXcmdOption (const char *const option, const char *const parameter);
+extern void addLanguageXcmd (const langType language, const char* const path);
+extern void addTagXcmd (const langType language, vString* pathvstr);
+extern void resetXcmdKinds (const langType language, boolean mode);
+extern boolean enableXcmdKind (const langType language, const int kind, const boolean mode);
+extern void printXcmdKinds (const langType language, boolean indent);
+extern void freeXcmdResources (void);
+extern void useXcmdMethod (const langType language);
+extern void notifyAvailabilityXcmdMethod (const langType language);
 
 #endif  /* _PARSE_H */
 

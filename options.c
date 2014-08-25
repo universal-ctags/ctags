@@ -2096,6 +2096,8 @@ static void processLongOption (
 		;
 	else if (processRegexOption (option, parameter))
 		;
+	else if (processXcmdOption (option, parameter))
+		;
 	else if (processMapOption (option, parameter))
 		;
 #ifndef RECURSE_SUPPORTED
