@@ -315,11 +315,14 @@ static void tagNameList (const verilogKind kind, int c)
 				initTagEntry (&tag, vStringValue (name));
 				tag.kindName    = VerilogKinds[kind].name;
 				tag.kind        = VerilogKinds[kind].letter;
+				verbose ("Adding tag %s", vStringValue (name));
 				if (kind != K_MODULE && currentContext)
 				{
+					verbose (" to context %s\n", vStringValue (currentContext->name));
 					tag.extensionFields.scope [0] = VerilogKinds[currentContext->kind].name;
 					tag.extensionFields.scope [1] = vStringValue (currentContext->name);
 				}
+				verbose ("\n");
 				makeTagEntry (&tag);
 				if (isContainer (kind))
 				{
@@ -327,6 +330,7 @@ static void tagNameList (const verilogKind kind, int c)
 					vString *contextName;
 					vStringCopy (newScope->name, name);
 					newScope->kind = kind;
+					verbose ("Found new context %s\n", vStringValue (newScope->name));
 					currentContext = pushToken (currentContext, newScope);
 					contextName = genContext ();
 					vStringCopy (currentContext->name, contextName);
@@ -377,6 +381,7 @@ static void findTag (vString *const name)
 		vStringCatS (endTokenName, VerilogKinds[currentContext->kind].name);
 		if (strcmp (vStringValue (name), vStringValue (endTokenName)) == 0)
 		{
+			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
 			currentContext = popToken (currentContext);
 		}
 		vStringDelete(endTokenName);
