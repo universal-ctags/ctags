@@ -112,6 +112,19 @@ tokenInfo *currentContext = NULL;
  *   FUNCTION DEFINITIONS
  */
 
+static short isContainer (verilogKind kind)
+{
+	switch (kind)
+	{
+		case K_MODULE:
+		case K_TASK:
+		case K_FUNCTION:
+			return TRUE;
+		default:
+			return FALSE;
+	}
+}
+
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
@@ -308,7 +321,7 @@ static void tagNameList (const verilogKind kind, int c)
 					tag.extensionFields.scope [1] = vStringValue (currentContext->name);
 				}
 				makeTagEntry (&tag);
-				if (kind == K_MODULE || kind == K_FUNCTION || kind == K_TASK)
+				if (isContainer (kind))
 				{
 					tokenInfo *newScope = newToken ();
 					vString *contextName;
