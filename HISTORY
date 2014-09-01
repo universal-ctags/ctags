@@ -370,12 +370,16 @@ History of Onigmo (Oniguruma-mod)
 2011/06/11: [new]  add \g{n}, \g{-n} and \g{name}.
 2011/06/10: [bug]  char class may cause memory leak
                    http://redmine.ruby-lang.org/issues/show/4061
+                   New URL: http://bugs.ruby-lang.org/issues/4061
 2011/06/10: [bug]  invalid backref number/name
                    http://redmine.ruby-lang.org/issues/show/2759
+                   New URL: http://bugs.ruby-lang.org/issues/2759
 2011/06/10: [bug]  /(?<=a).*b/ =~ "aab" doesn't match
                    http://redmine.ruby-lang.org/issues/show/3568
+                   New URL: http://bugs.ruby-lang.org/issues/3568
 2011/06/10: [bug]  Case Sensitivity in Regular Expressions with Lookbehind
                    http://redmine.ruby-lang.org/issues/show/4088
+                   New URL: http://bugs.ruby-lang.org/issues/4088
 2011/06/10: [spec] allow any target for quantifiers.
                    add USE_NO_INVALID_QUANTIFIER.
 2011/06/10: [new]  add Perl 5.14 compatible character set modifier:
