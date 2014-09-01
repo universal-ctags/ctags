@@ -56,7 +56,8 @@ typedef enum {
 	K_REGISTER,
 	K_TASK,
 	K_BLOCK,
-	K_CLASS
+	K_CLASS,
+	K_PROGRAM
 } verilogKind;
 
 typedef struct {
@@ -102,7 +103,8 @@ static kindOption SystemVerilogKinds [] = {
  { TRUE, 'r', "register",  "register data types" },
  { TRUE, 't', "task",      "tasks" },
  { TRUE, 'b', "block",     "blocks" },
- { TRUE, 'c', "class",     "classes" }
+ { TRUE, 'c', "class",     "classes" },
+ { TRUE, 'P', "program",   "programs" }
 };
 
 static const keywordAssoc KeywordTable [] = {
@@ -140,6 +142,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "end",       K_BLOCK,     { 1, 1 } },
 	{ "signed",    K_IGNORE,    { 1, 1 } },
 	{ "class",     K_CLASS,     { 1, 0 } },
+	{ "program",   K_PROGRAM,   { 1, 0 } },
 	{ "logic",     K_REGISTER,  { 1, 0 } }
 };
 
@@ -158,6 +161,7 @@ static short isContainer (verilogKind kind)
 		case K_FUNCTION:
 		case K_BLOCK:
 		case K_CLASS:
+		case K_PROGRAM:
 			return TRUE;
 		default:
 			return FALSE;
