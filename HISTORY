@@ -1,5 +1,7 @@
 History of Onigmo (Oniguruma-mod)
 
+2014/09/01: [bug]  "ab" =~ /(?!^a).*b/ doesn't match (Issue #44)
+                   https://bugs.ruby-lang.org/issues/9728
 2014/08/08: [bug]  Character properties ignore the ignore case flag (Issue #41)
 2014/08/08: [bug]  Regex matching errors when using \W character class and /i
                    option (Issue #4)
