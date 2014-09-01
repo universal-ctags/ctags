@@ -1408,7 +1408,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     if (s) {
       UChar *q, *bp, buf[50];
       int len;
-      fprintf(stderr, "%4d> \"", (*p == OP_FINISH) ? -1 : (int )(s - str));
+      fprintf(stderr, "%4"PRIdPTR"> \"", (*p == OP_FINISH) ? (ptrdiff_t )-1 : s - str);
       bp = buf;
       if (*p != OP_FINISH) {    /* s may not be a valid pointer if OP_FINISH. */
 	for (i = 0, q = s; i < 7 && q < end; i++) {
@@ -1421,7 +1421,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       *bp = 0;
       fputs((char* )buf, stderr);
       for (i = 0; i < 20 - (bp - buf); i++) fputc(' ', stderr);
-      fprintf(stderr, "%4"PRIdPTR":", p - reg->p);
+      fprintf(stderr, "%4"PRIdPTR":", (p == FinishCode) ? (ptrdiff_t )-1 : p - reg->p);
       onig_print_compiled_byte_code(stderr, p, NULL, encode);
       fprintf(stderr, "\n");
     }
