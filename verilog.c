@@ -316,7 +316,7 @@ static void tagNameList (const verilogKind kind, int c)
 				tag.kindName    = VerilogKinds[kind].name;
 				tag.kind        = VerilogKinds[kind].letter;
 				verbose ("Adding tag %s", vStringValue (name));
-				if (kind != K_MODULE && currentContext)
+				if (currentContext)
 				{
 					verbose (" to context %s\n", vStringValue (currentContext->name));
 					tag.extensionFields.scope [0] = VerilogKinds[currentContext->kind].name;
