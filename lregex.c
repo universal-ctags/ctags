@@ -50,6 +50,9 @@
 
 #define REGEX_NAME "Regex"
 
+#define LONG_FLAG_OPEN  '{'
+#define LONG_FLAG_CLOSE '}'
+
 /*
 *   DATA DECLARATIONS
 */
@@ -119,23 +122,27 @@ static void evalFlags (const char* flags, flagDefinition* defs, unsigned int nde
 
 	for (i = 0 ; flags [i] != '\0' ; ++i)
 	{
-		if (flags [i] == '[')
+		if (flags [i] == LONG_FLAG_OPEN)
 		{
 			const char* aflag = flags + i + 1;
-			char* needle_close_paren = strchr(aflag, ']');
+			char* needle_close_paren = strchr(aflag, LONG_FLAG_CLOSE);
 			const char* param;
 			char* needle_eqaul;
 
 			if (needle_close_paren == NULL)
 			{
-				error (WARNING, "long flags specifier opened with `[' is not closed `]'");
+				error (WARNING, "long flags specifier opened with `%c' is not closed `%c'",
+				       LONG_FLAG_OPEN, LONG_FLAG_CLOSE);
 				break;
 			}
 
 			*needle_close_paren = '\0';
 			needle_eqaul = strchr(aflag, '=');
-			if (needle_eqaul == NULL)
+			if ((needle_eqaul == NULL || (needle_eqaul >= needle_close_paren)))
+			{
+				needle_eqaul = NULL;
 				param = NULL;
+			}
 			else
 			{
 				param = needle_eqaul + 1;
@@ -148,7 +155,7 @@ static void evalFlags (const char* flags, flagDefinition* defs, unsigned int nde
 
 			if (needle_eqaul)
 				*needle_eqaul = '=';
-			*needle_close_paren = ']';
+			*needle_close_paren = LONG_FLAG_CLOSE;
 
 			i = needle_close_paren - flags;
 		}

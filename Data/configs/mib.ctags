@@ -23,6 +23,6 @@
 #
 --langdef=mib
 --mib-map=+(*-MIB*)
---mib-regex=/^([^ \t]+)[ \t]+DEFINITIONS ::= BEGIN/\1/d,definitions/[exclusive]
+--mib-regex=/^([^ \t]+)[ \t]+DEFINITIONS ::= BEGIN/\1/d,definitions/{exclusive}
 --mib-regex=/^([a-zA-Z][^ \t]+)[ \t]+[A-Za-z]/\1/n,name/
 --mib-corpus=(*-MIB*):RFC1213-MIB.txt
