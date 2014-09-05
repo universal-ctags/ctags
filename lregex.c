@@ -90,7 +90,7 @@ typedef struct {
 	char short_char;
 	char *long_str;
 	void (* short_proc) (char c,  void *data);
-	void (* long_proc)  (const char* const s, void *data);
+	void (* long_proc)  (const char* const s, const char* const param, void *data);
 } flagDefinition;
 #define COUNT(D) (sizeof(D)/sizeof(D[0]))
 
@@ -121,21 +121,36 @@ static void evalFlags (const char* flags, flagDefinition* defs, unsigned int nde
 	{
 		if (flags [i] == '[')
 		{
-			char* needle = strchr(flags + i + 1, ']');
+			const char* aflag = flags + i + 1;
+			char* needle_close_paren = strchr(aflag, ']');
+			const char* param;
+			char* needle_eqaul;
 
-			if (needle == NULL)
+			if (needle_close_paren == NULL)
 			{
 				error (WARNING, "long flags specifier opened with `[' is not closed `]'");
 				break;
 			}
 
-			*needle = '\0';
-			for ( j = 0 ; j < ndefs ; ++j )
-				if (defs[j].long_str && (strcmp(flags + i + 1, defs[j].long_str) == 0))
-					defs[j].long_proc(flags+ i + 1, data);
-			*needle = ']';
+			*needle_close_paren = '\0';
+			needle_eqaul = strchr(aflag, '=');
+			if (needle_eqaul == NULL)
+				param = NULL;
+			else
+			{
+				param = needle_eqaul + 1;
+				*needle_eqaul = '\0';
+			}
 
-			i = needle - flags;
+			for ( j = 0 ; j < ndefs ; ++j )
+				if (defs[j].long_str && (strcmp(aflag, defs[j].long_str) == 0))
+					defs[j].long_proc(aflag, param, data);
+
+			if (needle_eqaul)
+				*needle_eqaul = '=';
+			*needle_close_paren = ']';
+
+			i = needle_close_paren - flags;
 		}
 		else for (j = 0 ; j < ndefs ; ++j)
 			if (flags[i] == defs[j].short_char)
@@ -300,7 +315,7 @@ static void ptrn_flag_exclusive_short (char c, void* data)
 	ptrn->exclusive = TRUE;
 }
 
-static void ptrn_flag_exclusive_long (const char* s, void* data)
+static void ptrn_flag_exclusive_long (const char* const s, const char* const unused, void* data)
 {
 	ptrn_flag_exclusive_short ('x', data);
 }
@@ -379,7 +394,7 @@ static void regex_flag_basic_short (char c, void* data)
 	int* cflags = data;
 	*cflags &= ~REG_EXTENDED;
 }
-static void regex_flag_basic_long (const char* s, void* data)
+static void regex_flag_basic_long (const char* const s, const char* const unused, void* data)
 {
 	regex_flag_basic_short ('b', data);
 }
@@ -390,7 +405,7 @@ static void regex_flag_extend_short (char c, void* data)
 	*cflags |= REG_EXTENDED;
 }
 
-static void regex_flag_extend_long (const char* c, void* data)
+static void regex_flag_extend_long (const char* const c, const char* const unused, void* data)
 {
 	regex_flag_extend_short('e', data);
 }
@@ -401,7 +416,7 @@ static void regex_flag_icase_short (char c, void* data)
 	*cflags |= REG_ICASE;
 }
 
-static void regex_flag_icase_long (const char* s, void* data)
+static void regex_flag_icase_long (const char* s, const char* const unused, void* data)
 {
 	regex_flag_icase_short ('i', data);
 }
