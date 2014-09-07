@@ -9,7 +9,7 @@ REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrca
 
 CFLAGS = -Wall
 DEFINES = -DWIN32 $(REGEX_DEFINES)
-INCLUDES = -I. -Ignu_regex
+INCLUDES = -I. -Ignu_regex -Ifnmatch
 CC = gcc
 
 ctags.exe: OPT = -O4
@@ -19,8 +19,8 @@ dctags.exe: SOURCES += debug.c
 
 ctags: ctags.exe
 
-ctags.exe dctags.exe: $(SOURCES) $(REGEX_SOURCES) $(HEADERS) $(REGEX_HEADERS)
-	$(CC) $(OPT) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(SOURCES) $(REGEX_SOURCES)
+ctags.exe dctags.exe: $(SOURCES) $(REGEX_SOURCES) $(HEADERS) $(REGEX_HEADERS) $(FNMATCH_HEADERS)
+	$(CC) $(OPT) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(SOURCES) $(REGEX_SOURCES) $(FNMATCH_SOURCES)
 
 readtags.exe: readtags.c
 	$(CC) $(OPT) $(CFLAGS) -DREADTAGS_MAIN $(DEFINES) $(INCLUDES) -o $@ $<

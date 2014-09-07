@@ -76,6 +76,10 @@ REGEX_SOURCES = gnu_regex/regex.c
 
 REGEX_HEADERS = gnu_regex/regex.h
 
+FNMATCH_SOURCES = fnmatch/fnmatch.c
+
+FNMATCH_HEADERS = fnmatch/fnmatch.h
+
 OBJECTS = \
 	ada.$(OBJEXT) \
 	args.$(OBJEXT) \
