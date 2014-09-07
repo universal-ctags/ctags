@@ -31,6 +31,7 @@
 
 #include "debug.h"
 #include "entry.h"
+#include "flags.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
@@ -49,9 +50,6 @@
 #endif
 
 #define REGEX_NAME "Regex"
-
-#define LONG_FLAG_OPEN  '{'
-#define LONG_FLAG_CLOSE '}'
 
 /*
 *   DATA DECLARATIONS
@@ -89,12 +87,6 @@ typedef struct {
 	unsigned int count;
 } patternSet;
 
-typedef struct {
-	char short_char;
-	char *long_str;
-	void (* short_proc) (char c,  void *data);
-	void (* long_proc)  (const char* const s, const char* const param, void *data);
-} flagDefinition;
 #define COUNT(D) (sizeof(D)/sizeof(D[0]))
 
 /*
@@ -111,59 +103,6 @@ static int SetUpper = -1;  /* upper language index in list */
 *   FUNCTION DEFINITIONS
 */
 
-static void evalFlags (const char* flags, flagDefinition* defs, unsigned int ndefs, void* data)
-{
-	unsigned int i, j;
-
-	if (!flags)
-		return;
-	if (!defs)
-		return;
-
-	for (i = 0 ; flags [i] != '\0' ; ++i)
-	{
-		if (flags [i] == LONG_FLAG_OPEN)
-		{
-			const char* aflag = flags + i + 1;
-			char* needle_close_paren = strchr(aflag, LONG_FLAG_CLOSE);
-			const char* param;
-			char* needle_eqaul;
-
-			if (needle_close_paren == NULL)
-			{
-				error (WARNING, "long flags specifier opened with `%c' is not closed `%c'",
-				       LONG_FLAG_OPEN, LONG_FLAG_CLOSE);
-				break;
-			}
-
-			*needle_close_paren = '\0';
-			needle_eqaul = strchr(aflag, '=');
-			if ((needle_eqaul == NULL || (needle_eqaul >= needle_close_paren)))
-			{
-				needle_eqaul = NULL;
-				param = NULL;
-			}
-			else
-			{
-				param = needle_eqaul + 1;
-				*needle_eqaul = '\0';
-			}
-
-			for ( j = 0 ; j < ndefs ; ++j )
-				if (defs[j].long_str && (strcmp(aflag, defs[j].long_str) == 0))
-					defs[j].long_proc(aflag, param, data);
-
-			if (needle_eqaul)
-				*needle_eqaul = '=';
-			*needle_close_paren = LONG_FLAG_CLOSE;
-
-			i = needle_close_paren - flags;
-		}
-		else for (j = 0 ; j < ndefs ; ++j)
-			if (flags[i] == defs[j].short_char)
-				defs[j].short_proc(flags[i], data);
-	}
-}
 
 static void clearPatternSet (const langType language)
 {

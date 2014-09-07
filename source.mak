@@ -3,7 +3,7 @@
 # Shared macros
 
 HEADERS = \
-	args.h ctags.h debug.h entry.h general.h get.h keyword.h \
+	args.h ctags.h debug.h entry.h flags.h general.h get.h keyword.h \
 	main.h options.h parse.h parsers.h read.h routines.h sort.h \
 	strlist.h trash.h vstring.h
 
@@ -24,6 +24,7 @@ SOURCES = \
 	entry.c \
 	erlang.c \
 	falcon.c \
+	flags.c \
 	flex.c \
 	fortran.c \
 	get.c \
@@ -93,6 +94,7 @@ OBJECTS = \
 	entry.$(OBJEXT) \
 	erlang.$(OBJEXT) \
 	falcon.$(OBJEXT) \
+	flags.$(OBJEXT) \
 	flex.$(OBJEXT) \
 	fortran.$(OBJEXT) \
 	get.$(OBJEXT) \
