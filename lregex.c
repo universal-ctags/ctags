@@ -301,7 +301,7 @@ static void addCompiledTagPattern (
 	ptrn->u.tag.kind.letter  = kind;
 	ptrn->u.tag.kind.name    = kindName;
 	ptrn->u.tag.kind.description = description;
-	evalFlags (flags, ptrnFlagDef, COUNT(ptrnFlagDef), ptrn);
+	flagsEval (flags, ptrnFlagDef, COUNT(ptrnFlagDef), ptrn);
 }
 
 static void addCompiledCallbackPattern (
@@ -330,7 +330,7 @@ static void addCompiledCallbackPattern (
 	ptrn->type    = PTRN_CALLBACK;
 	ptrn->exclusive = FALSE;
 	ptrn->u.callback.function = callback;
-	evalFlags (flags, ptrnFlagDef, COUNT(ptrnFlagDef), ptrn);
+	flagsEval (flags, ptrnFlagDef, COUNT(ptrnFlagDef), ptrn);
 }
 
 #if defined (POSIX_REGEX)
@@ -379,7 +379,7 @@ static regex_t* compileRegex (const char* const regexp, const char* const flags)
 		{ 'e', "extend", regex_flag_extend_short, regex_flag_extend_long },
 		{ 'i', "icase",  regex_flag_icase_short,  regex_flag_icase_long  },
 	};
-	evalFlags (flags,
+	flagsEval (flags,
 		   regexFlagDefs,
 		   COUNT(regexFlagDefs),
 		   &cflags);
