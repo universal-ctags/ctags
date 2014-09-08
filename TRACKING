@@ -165,8 +165,8 @@ devel mailing list (ctags-devel@sourceforge)
 	bb81485205c67617f1b34f61341e60b9e8030502
 
 
-	<[Ctags-devel] Lack of fnmatch(3) in Windows>
-	From: Frank Fesevur <ffes@us...> - 2013-08-24 20:25:47
+    <[Ctags-devel] Lack of fnmatch(3) in Windows>
+    From: Frank Fesevur <ffes@us...> - 2013-08-24 20:25:47
 
 	There is no fnmatch() in the Windows C library. Therefore
 	a string comparison is done in fileNameMatched() in
