@@ -268,30 +268,51 @@ static boolean readIdentifier (vString *const name, int c)
 	return (boolean)(vStringLength (name) > 0);
 }
 
-static vString *genContext ()
+static void createContext (tokenInfo *const scope)
 {
-	vString *context, *catNames;
-	tokenInfo *current;
+	if (scope)
+	{
+		vString *contextName = vStringNew ();
+
+		verbose ("Creating new context %s\n", vStringValue (scope->name));
+		/* Determine full context name */
+		if (currentContext)
+		{
+			vStringCopy (contextName, currentContext->name);
+			vStringCatS (contextName, ".");
+		}
+		vStringCat (contextName, scope->name);
+		/* Create context */
+		currentContext = pushToken (currentContext, scope);
+		vStringCopy (currentContext->name, contextName);
+		vStringDelete (contextName);
+	}
+}
+
+static void createTag (const verilogKind kind, vString *name)
+{
+	tagEntryInfo tag;
+
+	initTagEntry (&tag, vStringValue (name));
+	tag.kindName    = VerilogKinds[kind].name;
+	tag.kind        = VerilogKinds[kind].letter;
+	verbose ("Adding tag %s", vStringValue (name));
 	if (currentContext)
 	{
-		context = vStringNew ();
-		vStringCopy (context, currentContext->name);
-		current = currentContext->scope;
-		while (current) {
-			catNames = vStringNew ();
-
-			vStringCopy (catNames, current->name);
-			vStringCatS (catNames, ".");
-			vStringCat (catNames, context);
-			vStringCopy (context, catNames);
-
-			current = current->scope;
-			vStringDelete (catNames);
-		}
-		return context;
+		verbose (" to context %s\n", vStringValue (currentContext->name));
+		tag.extensionFields.scope [0] = VerilogKinds[currentContext->kind].name;
+		tag.extensionFields.scope [1] = vStringValue (currentContext->name);
 	}
-	else
-		return NULL;
+	verbose ("\n");
+	makeTagEntry (&tag);
+	if (isContainer (kind))
+	{
+		tokenInfo *newScope = newToken ();
+
+		vStringCopy (newScope->name, name);
+		newScope->kind = kind;
+		createContext (newScope);
+	}
 }
 
 static void tagNameList (const verilogKind kind, int c)
@@ -299,7 +320,6 @@ static void tagNameList (const verilogKind kind, int c)
 	vString *name = vStringNew ();
 	vString *scopedName;
 	verilogKind localKind;
-	tagEntryInfo tag;
 	boolean repeat;
 	Assert (isIdentifierCharacter (c));
 	do
@@ -312,30 +332,7 @@ static void tagNameList (const verilogKind kind, int c)
 			localKind = (verilogKind) lookupKeyword (vStringValue (name), getSourceLanguage () );
 			if (kind != K_PORT || localKind == K_UNDEFINED)
 			{
-				initTagEntry (&tag, vStringValue (name));
-				tag.kindName    = VerilogKinds[kind].name;
-				tag.kind        = VerilogKinds[kind].letter;
-				verbose ("Adding tag %s", vStringValue (name));
-				if (currentContext)
-				{
-					verbose (" to context %s\n", vStringValue (currentContext->name));
-					tag.extensionFields.scope [0] = VerilogKinds[currentContext->kind].name;
-					tag.extensionFields.scope [1] = vStringValue (currentContext->name);
-				}
-				verbose ("\n");
-				makeTagEntry (&tag);
-				if (isContainer (kind))
-				{
-					tokenInfo *newScope = newToken ();
-					vString *contextName;
-					vStringCopy (newScope->name, name);
-					newScope->kind = kind;
-					verbose ("Found new context %s\n", vStringValue (newScope->name));
-					currentContext = pushToken (currentContext, newScope);
-					contextName = genContext ();
-					vStringCopy (currentContext->name, contextName);
-					vStringDelete (contextName);
-				}
+				createTag (kind, name);
 			}
 			else
 			{
@@ -372,6 +369,7 @@ static void tagNameList (const verilogKind kind, int c)
 
 static void findTag (vString *const name)
 {
+	int c;
 	const verilogKind kind = (verilogKind) lookupKeyword (vStringValue (name), Lang_verilog);
 
 	/* Search for end of current context to drop respective context */
@@ -390,9 +388,9 @@ static void findTag (vString *const name)
 	if (kind == K_CONSTANT && vStringItem (name, 0) == '`')
 	{
 		/* Bug #961001: Verilog compiler directives are line-based. */
-		int c = skipWhite (vGetc ());
+		c = skipWhite (vGetc ());
 		readIdentifier (name, c);
-		makeSimpleTag (name, VerilogKinds, kind);
+		createTag (kind, name);
 		/* Skip the rest of the line. */
 		do {
 			c = vGetc();
@@ -401,7 +399,7 @@ static void findTag (vString *const name)
 	}
 	else if (kind != K_UNDEFINED)
 	{
-		int c = skipWhite (vGetc ());
+		c = skipWhite (vGetc ());
 
 		/* Many keywords can have bit width.
 		*   reg [3:0] net_name;
