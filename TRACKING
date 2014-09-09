@@ -174,6 +174,15 @@ devel mailing list (ctags-devel@sourceforge)
 
 	698bf2f3db692946d2358892d228a864014abc4b
 
+
+    Re: [Ctags-devel] WindRes parser
+    From: Frank Fesevur <ffes@us...> - 2013-08-30 21:23:50
+
+	A parser for Windows Resource files.
+	http://en.wikipedia.org/wiki/Resource_%28Windows%29
+
+	95b4806ba6c006e4b7e72a006700e33c720ab9e7
+
 Fedora
 ============================================================
 Some patches are maintained in ctags package of Fedora.

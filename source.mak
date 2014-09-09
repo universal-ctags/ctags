@@ -64,6 +64,7 @@ SOURCES = \
 	verilog.c \
 	vhdl.c \
 	vim.c \
+	windres.c \
 	yacc.c \
 	vstring.c
 
@@ -138,5 +139,6 @@ OBJECTS = \
 	verilog.$(OBJEXT) \
 	vhdl.$(OBJEXT) \
 	vim.$(OBJEXT) \
+	windres.$(OBJEXT) \
 	yacc.$(OBJEXT) \
 	vstring.$(OBJEXT)
