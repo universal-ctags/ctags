@@ -13,7 +13,7 @@ FUZZ_TIMEOUT=10
 FUZZ_LANGUAGE=
 FUZZ_SRC_DIRS=
 
-DIFF_OPTIONS = -U 0 -I '^!_TAG'
+DIFF_OPTIONS = -U 0 -I '^!_TAG' --strip-trailing-cr
 DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
 DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 		rm -f $1 $2 $3 ; \
@@ -138,7 +138,7 @@ test.units: $(CTAGS_TEST)
 	done; \
 	$$success
 
-TEST_ARTIFACTS = test.*.diff tags.ref tags.test $(UNITS_ARTIFACTS)
+TEST_ARTIFACTS = test.*.diff tags.ref ctags.ref.exe tags.test $(UNITS_ARTIFACTS)
 clean-test:
 	rm -f $(TEST_ARTIFACTS)
 

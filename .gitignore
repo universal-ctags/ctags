@@ -2,7 +2,10 @@
 *.o
 *.od
 *.obj
+*.TMP
 ctags.exe
+ctags.ref.exe
+dctags.exe
 readtags
 respmvc
 Makefile
