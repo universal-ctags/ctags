@@ -13,7 +13,7 @@ FUZZ_TIMEOUT=10
 FUZZ_LANGUAGE=
 FUZZ_SRC_DIRS=
 
-DIFF_OPTIONS = -U 0 -I '^!_TAG'
+DIFF_OPTIONS = -U 0 -I '^!_TAG' --strip-trailing-cr
 DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
 DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 		rm -f $1 $2 $3 ; \
@@ -133,7 +133,6 @@ test.units: $(CTAGS_TEST)
 		$(VALGRIND) $(CTAGS_TEST) --data-dir=Data --data-dir=+$$t -o - $$(test -f "$${args}" && echo "--options=$${args}") "$$input" |	\
 		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
 		cp "$$expected" "$$expectedtmp"; \
-		dos2unix -q "$$expectedtmp" "$$output" ; \
 		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff"); \
 		test $$? -eq 0 || success=false; \
 	done; \
