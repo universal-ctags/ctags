@@ -133,12 +133,13 @@ test.units: $(CTAGS_TEST)
 		$(VALGRIND) $(CTAGS_TEST) --data-dir=Data --data-dir=+$$t -o - $$(test -f "$${args}" && echo "--options=$${args}") "$$input" |	\
 		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
 		cp "$$expected" "$$expectedtmp"; \
+		dos2unix -q "$$expectedtmp" "$$output" ; \
 		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff"); \
 		test $$? -eq 0 || success=false; \
 	done; \
 	$$success
 
-TEST_ARTIFACTS = test.*.diff tags.ref tags.test $(UNITS_ARTIFACTS)
+TEST_ARTIFACTS = test.*.diff tags.ref ctags.ref.exe tags.test $(UNITS_ARTIFACTS)
 clean-test:
 	rm -f $(TEST_ARTIFACTS)
 
