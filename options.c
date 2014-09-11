@@ -1527,7 +1527,7 @@ static void freeSearchPathList (searchPathList** pathList)
 	*pathList = NULL;
 }
 
-static void verboseSearchPathList (const char *const varname, const searchPathList* pathList)
+static void verboseSearchPathList (const searchPathList* pathList, const char *const varname)
 {
 	unsigned int i;
 
@@ -1799,47 +1799,54 @@ static void processVersionOption (
 	exit (0);
 }
 
-static void resetDataPathList (void)
+static void resetDataPathList0 (searchPathList** pathList, const char *const varname)
 {
-	freeSearchPathList (&CorpusPathList);
-	freeSearchPathList (&ConfigPathList);
-
-	verbose ("Reset CorpusPathList\n");
-	verbose ("Reset ConfigPathList\n");
-
-	ConfigPathList = stringListNew ();
-	CorpusPathList = stringListNew ();
+	freeSearchPathList (pathList);
+	verbose ("Reset %s\n", varname);
+	*pathList = stringListNew ();
 }
 
-static void appendToDataPathListFull (const char *const dir, boolean report_in_verboe, const char* const action)
+static void resetDataPathList (void)
+{
+	resetDataPathList0(&ConfigPathList, "ConfigPathList");
+	resetDataPathList0(&CorpusPathList, "CorpusPathList");
+}
+
+static void appendToDataPathList0 (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
+				   boolean report_in_verboe, const char* const action)
 {
 	vString* path;
 
-	path = combinePathAndFile (dir, SUBDIR_CONFIGS);
+	path = combinePathAndFile (dir, subdir);
 	if (report_in_verboe)
-		verbose ("%s %s to %s\n", action, vStringValue (path), "ConfigPathList");
-	stringListAdd (ConfigPathList, path);
+		verbose ("%s %s to %s\n", action, vStringValue (path), varname);
+	stringListAdd (pathList, path);
 
-	path = combinePathAndFile (dir, SUBDIR_CORPORA);
-	if (report_in_verboe)
-		verbose ("%s %s to %s\n", action, vStringValue (path), "CorpusPathList");
-	stringListAdd (CorpusPathList, path);
+}
+
+static void prependToDataPathList0 (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
+				    boolean report_in_verboe, const char* const action)
+{
+	stringListReverse (pathList);
+	appendToDataPathList0(dir, subdir, pathList, varname, report_in_verboe, action);
+	stringListReverse (pathList);
+
 }
 
 static void appendToDataPathList (const char *const dir, boolean report_in_verboe)
 {
-	appendToDataPathListFull (dir, report_in_verboe, report_in_verboe? "Append": NULL);
+	appendToDataPathList0 (dir, SUBDIR_CONFIGS, ConfigPathList, "ConfigPathList",
+			       report_in_verboe, report_in_verboe? "Append": NULL);
+	appendToDataPathList0 (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
+			       report_in_verboe, report_in_verboe? "Append": NULL);
 }
 
 static void prependToDataPathList (const char *const dir, boolean report_in_verboe)
 {
-	stringListReverse (ConfigPathList);
-	stringListReverse (CorpusPathList);
-
-	appendToDataPathListFull (dir, report_in_verboe, report_in_verboe? "Prepend": NULL);
-
-	stringListReverse (ConfigPathList);
-	stringListReverse (CorpusPathList);
+	prependToDataPathList0 (dir, SUBDIR_CONFIGS, ConfigPathList, "ConfigPathList",
+				report_in_verboe, report_in_verboe? "Prepend": NULL);
+	prependToDataPathList0 (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
+				report_in_verboe, report_in_verboe? "Prepend": NULL);
 }
 
 static void processDataDir (
@@ -2447,8 +2454,8 @@ extern void initOptions (void)
 {
 	OptionFiles = stringListNew ();
 	installDataPathList ();
-	verboseSearchPathList ("ConfigPathList", ConfigPathList);
-	verboseSearchPathList ("CorpusPathList", CorpusPathList);
+	verboseSearchPathList (ConfigPathList, "ConfigPathList");
+	verboseSearchPathList (CorpusPathList, "CorpusPathList");
 
 	verbose ("Setting option defaults\n");
 	installHeaderListDefaults ();
