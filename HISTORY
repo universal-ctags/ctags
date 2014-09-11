@@ -1,5 +1,8 @@
 History of Onigmo (Oniguruma-mod)
 
+2014/09/11: Version 5.15.0
+
+2014/09/11: [dist] update LTVERSION to "5:3:0".
 2014/09/01: [bug]  "ab" =~ /(?!^a).*b/ doesn't match (Issue #44)
                    https://bugs.ruby-lang.org/issues/9728
 2014/08/08: [bug]  Character properties ignore the ignore case flag (Issue #41)
