@@ -560,4 +560,46 @@ extern char *readSourceLine (
 	return result;
 }
 
+/*
+ *   Similar to readLine but this doesn't use fgetpos/fsetpos.
+ *   Useful for reading from pipe.
+ */
+
+char* readLineWithNoSeek (vString* const vline, FILE *const pp)
+{
+	int c;
+	boolean nlcr;
+	char *result = NULL;
+
+	vStringClear (vline);
+	nlcr = FALSE;
+	
+	while (1)
+	{
+		c = fgetc (pp);
+		
+		if (c == EOF)
+		{
+			if (! feof (pp))
+				error (FATAL | PERROR, "Failure on attempt to read file");
+			else
+				break;
+		}
+
+		result = vStringValue (vline);
+		
+		if (c == '\n' || c == '\r')
+			nlcr = TRUE;
+		else if (nlcr)
+		{
+			ungetc (c, pp);
+			break;
+		}
+		else
+			vStringPut (vline, c);
+	}
+
+	return result;
+}
+
 /* vi:set tabstop=4 shiftwidth=4: */

@@ -112,6 +112,8 @@ extern const unsigned char *fileReadLine (void);
 extern char *readLine (vString *const vLine, FILE *const fp);
 extern char *readSourceLine (vString *const vLine, fpos_t location, long *const pSeekValue);
 
+extern char* readLineWithNoSeek (vString *const vline, FILE *const pp);
+
 #endif  /* _READ_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */
