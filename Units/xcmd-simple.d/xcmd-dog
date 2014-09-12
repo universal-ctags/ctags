@@ -1,0 +1,17 @@
+#!/bin/sh
+if test "z$1" = "z--list-kinds=dog"; then
+    echo "d  definition"
+else
+    cat <<EOF
+!_TAG_FILE_FORMAT	2	/extended format/
+!_TAG_FILE_SORTED	0	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Masatake YAMATO	/yamato@redhat.com/
+!_TAG_PROGRAM_NAME	xcmd-dog	//
+!_TAG_PROGRAM_URL	https://github.com/fishman/ctags/tree/deploy/Units	//
+!_TAG_PROGRAM_VERSION	Development	//
+dog	Units/xcmd-simple.d/input.dog	/^define: dog$/;"	d	line:1
+cat	Units/xcmd-simple.d/input.dog	/^define: cat/;"	d	line:2
+input.dog	Units/xcmd-simple.d/input.dog	1;"	F	line:1
+EOF
+fi
+exit 0
