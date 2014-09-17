@@ -449,23 +449,29 @@ typedef struct _BBuf {
 #define BBUF_INIT(buf,size)    onig_bbuf_init((BBuf* )(buf), (size))
 
 #define BBUF_SIZE_INC(buf,inc) do{\
+  UChar *tmp;\
   (buf)->alloc += (inc);\
-  (buf)->p = (UChar* )xrealloc((buf)->p, (buf)->alloc);\
-  if (IS_NULL((buf)->p)) return(ONIGERR_MEMORY);\
+  tmp = (UChar* )xrealloc((buf)->p, (buf)->alloc);\
+  if (IS_NULL(tmp)) return(ONIGERR_MEMORY);\
+  (buf)->p = tmp;\
 } while (0)
 
 #define BBUF_EXPAND(buf,low) do{\
+  UChar *tmp;\
   do { (buf)->alloc *= 2; } while ((buf)->alloc < (unsigned int )low);\
-  (buf)->p = (UChar* )xrealloc((buf)->p, (buf)->alloc);\
-  if (IS_NULL((buf)->p)) return(ONIGERR_MEMORY);\
+  tmp = (UChar* )xrealloc((buf)->p, (buf)->alloc);\
+  if (IS_NULL(tmp)) return(ONIGERR_MEMORY);\
+  (buf)->p = tmp;\
 } while (0)
 
 #define BBUF_ENSURE_SIZE(buf,size) do{\
   unsigned int new_alloc = (buf)->alloc;\
   while (new_alloc < (unsigned int )(size)) { new_alloc *= 2; }\
   if ((buf)->alloc != new_alloc) {\
-    (buf)->p = (UChar* )xrealloc((buf)->p, new_alloc);\
-    if (IS_NULL((buf)->p)) return(ONIGERR_MEMORY);\
+    UChar *tmp;\
+    tmp = (UChar* )xrealloc((buf)->p, new_alloc);\
+    if (IS_NULL(tmp)) return(ONIGERR_MEMORY);\
+    (buf)->p = tmp;\
     (buf)->alloc = new_alloc;\
   }\
 } while (0)
