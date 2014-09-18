@@ -1114,14 +1114,16 @@ static char* skipPastMap (char* p)
 /* Parses the mapping beginning at `map', adds it to the language map, and
  * returns first character past the map.
  */
-static const char* extractMapFromParameter (const langType language,
-					    char* parameter,
-					    char** tail,
-					    boolean* pattern_p,
-					    char* (* skip) (char *))
+static char* extractMapFromParameter (const langType language,
+				      char* parameter,
+				      char** tail,
+				      boolean* pattern_p,
+				      char* (* skip) (char *))
 {
 	char* p = NULL;
 	const char first = *parameter;
+	char  tmp;
+	char* result;
 
 	if (first == EXTENSION_SEPARATOR)  /* extension map */
 	{
@@ -1131,16 +1133,20 @@ static const char* extractMapFromParameter (const langType language,
 		p = (* skip) (parameter);
 		if (*p == '\0')
 		{
-			verbose (" .%s", parameter);
+			result = eStrdup (parameter);
+			verbose (" .%s", result);
 			*tail = parameter + strlen (parameter);
-			return parameter;
+			return result;
 		}
 		else
 		{
+			tmp = *p;
 			*p = '\0';
-			verbose (" .%s", parameter);
-			*tail = p + 1;
-			return parameter;
+			result = eStrdup (parameter);
+			verbose (" .%s", result);
+			*p = tmp;
+			*tail = p;
+			return result;
 		}
 	}
 	else if (first == PATTERN_START)  /* pattern map */
@@ -1158,10 +1164,13 @@ static const char* extractMapFromParameter (const langType language,
 			   getLanguageName (language));
 		else
 		{
-			*p++ = '\0';
-			verbose (" (%s)", parameter);
-			*tail = p;
-			return parameter;
+			tmp = *p;
+			*p = '\0';
+			result = eStrdup (parameter);
+			verbose (" (%s)", result);
+			*p = tmp;
+			*tail = p + 1;
+			return result;
 		}
 	}
 
@@ -1172,7 +1181,7 @@ static char* addLanguageMap (const langType language, char* map_parameter)
 {
 	char* p = NULL;
 	boolean pattern_p;
-	const char* map;
+	char* map;
 
 	map = extractMapFromParameter (language, map_parameter, &p, &pattern_p, skipPastMap);
 	if (map && pattern_p == FALSE)
@@ -1182,6 +1191,9 @@ static char* addLanguageMap (const langType language, char* map_parameter)
 	else
 		error (FATAL, "Badly formed language map for %s language",
 				getLanguageName (language));
+
+	if (map)
+		eFree (map);
 	return p;
 }
 
@@ -1371,7 +1383,7 @@ extern boolean processCorpusOption (
 	size_t len;
 	const char* file_part;
 	vString* tg_file;
-	const char* spec;
+	char* spec;
 	boolean pattern_p;
 
 	if (dash == NULL ||
@@ -1402,6 +1414,7 @@ extern boolean processCorpusOption (
 	{
 		error (FATAL,
 		       "no colon(:) separator is found in parameter of %s: %s", option, parameter);
+		eFree (spec);
 		eFree (parm);
 		return FALSE;
 	}
@@ -1409,17 +1422,18 @@ extern boolean processCorpusOption (
 	{
 		error (FATAL,
 		       "no colon(:) separator is found in parameter of %s: %s", option, parameter);
+		eFree (spec);
 		eFree (parm);
 		return FALSE;
 	}
-
-	file_part = colon + (pattern_p? 1: 0);
+	file_part = colon + 1;
 	tg_file = expandOnCorpusPathList (file_part);
 	if (tg_file == NULL)
 		tg_file = vStringNewInit (file_part);
 
 	addCorpusFile(language, spec, tg_file, pattern_p);
 
+	eFree (spec);
 	eFree (parm);
 	return TRUE;
 }
