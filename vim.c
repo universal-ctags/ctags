@@ -717,6 +717,11 @@ static void findVimTags (void)
 
 	line = readVimLine();
 
+    if (line == NULL)
+    {
+            return;
+    }
+
 	if ( strncmp ((const char*) line, "UseVimball", (size_t) 10) == 0 )
 	{
 		parseVimBallFile (line);
