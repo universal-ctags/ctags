@@ -427,8 +427,10 @@ static boolean parseCommand (const unsigned char *line)
 		 * We have reached the end of the line without finding the command name.
 		 * Read the next line and continue processing it as a command.
 		 */
-		line = readVimLine();
-		parseCommand(line);
+		if ((line = readVimLine ()) != NULL)
+			cmdProcessed = parseCommand(line);
+		else
+			cmdProcessed = FALSE;
 		goto cleanUp;
 	}
 
