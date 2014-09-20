@@ -186,6 +186,8 @@ devel mailing list (ctags-devel@sourceforge)
 Fedora
 ============================================================
 Some patches are maintained in ctags package of Fedora.
+Inventory of patches are
+http://pkgs.fedoraproject.org/cgit/ctags.git/tree/ctags.spec
 
 (ctags-5.7-destdir.patch)
 
@@ -221,3 +223,10 @@ Some patches are maintained in ctags package of Fedora.
 	As the result this patch is in fishman tree.
 
 	ddb29762b37d60a875252dcc401de0b7479527b1
+
+(ctags-5.8-format-security.patch)
+
+	This patch was merged in exuberant ctags svn tree.
+	As the result this patch is in fishman tree.
+
+	2f7a78ce21e4156ec3e63c821827cf1d5680ace8
