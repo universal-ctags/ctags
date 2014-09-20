@@ -275,6 +275,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of alias patterns."},
  {1,"  --list-corpora=[language[:spec]|all]"},
  {1,"       Output list of language corpora."},
+ {1,"  --list-features"},
+ {1,"       Output list of features."},
  {1,"  --list-kinds=[language|all]"},
  {1,"       Output a list of all tag kinds for specified language or all."},
  {1,"  --list-languages"},
@@ -1061,6 +1063,19 @@ static void printFeatureList (void)
 	}
 	if (i > 0)
 		putchar ('\n');
+}
+
+
+static void processListFeaturesOption(const char *const __unused__ option,
+				      const char *const __unused__ parameter)
+{
+	int i;
+
+	for (i = 0 ; Features [i] != NULL ; ++i)
+		printf ("%s\n", Features [i]);
+	if (i == 0)
+		putchar ('\n');
+	exit (0);
 }
 
 static void printProgramIdentification (void)
@@ -1908,6 +1923,7 @@ static parametricOption ParametricOptions [] = {
 	{ "license",                processLicenseOption,           TRUE    },
 	{ "list-aliases",           processListAliasesOption,       TRUE    },
 	{ "list-corpora",           processListCorporaOption,       TRUE    },
+	{ "list-features",          processListFeaturesOption,      TRUE    },
 	{ "list-kinds",             processListKindsOption,         TRUE    },
 	{ "list-languages",         processListLanguagesOption,     TRUE    },
 	{ "list-maps",              processListMapsOption,          TRUE    },
