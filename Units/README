@@ -47,9 +47,18 @@ Units/TEST/args.ctags [optional]
 	unit test ctags. If you want to add more options, enumerate
 	options in args.ctags file. This file is an optional.
 
-filter-*.* [optional]
+Units/TEST/filter-*.* [optional]
 
 	TBW
+
+Units/TEST/features [optional]
+
+	If a unit test case requires special features of ctags,
+	enumerate them in this file line by line. If a target ctags
+	doesn't have one of the features, the test is skipped.
+
+	All features built-in can be listed with passing
+	--list-features to ctags.
 
 Example of files
 ------------------------------------------------------------

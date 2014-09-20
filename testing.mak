@@ -24,6 +24,19 @@ DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 		false ; \
 	  fi
 
+CHECK_FEATURES = (\
+	while read; do \
+		found=no; \
+		for f in $$( $(CTAGS_TEST) --list-features); do \
+			if test "$$REPLY" = "$$f"; then found=yes; fi; \
+		done; \
+		if ! test $$found = yes; then \
+			echo "Skip (required feature $$REPLY is not available)"; \
+			exit 1; \
+		fi; \
+	done < $1; \
+	exit 0; \
+)
 #
 # Run unit test s under valgrind:
 #
@@ -52,7 +65,7 @@ test.include: $(CTAGS_TEST) $(CTAGS_REF)
 
 REF_FIELD_OPTIONS = $(TEST_OPTIONS) --fields=+afmikKlnsSz
 TEST_FIELD_OPTIONS = $(TEST_OPTIONS) --fields=+afmikKlnsStz
-test.fields: $(CTAGS_TEST) $(CTAGS_REF)
+FEAtest.fields: $(CTAGS_TEST) $(CTAGS_REF)
 	@ echo -n "Testing extension fields..."
 	@ $(CTAGS_REF) -R $(REF_FIELD_OPTIONS) -o tags.ref Test
 	@ $(CTAGS_TEST) -R $(TEST_FIELD_OPTIONS) -o tags.test Test
@@ -127,9 +140,15 @@ test.units: $(CTAGS_TEST)
 		filter="$$t"/filter; \
 		output="$$t"/OUTPUT.TMP; \
 		diff="$$t"/DIFF.TMP; \
+		features="$$t"/features; \
 		\
 		echo -n "Testing $${name}..."; \
 		\
+		if test -e "$$features"; then \
+			if ! $(call CHECK_FEATURES, "$$features"); then \
+				continue; \
+			fi; \
+		fi; \
 		$(VALGRIND) $(CTAGS_TEST) --data-dir=Data --data-dir=+$$t -o - $$(test -f "$${args}" && echo "--options=$${args}") "$$input" |	\
 		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
 		cp "$$expected" "$$expectedtmp"; \
