@@ -3,6 +3,7 @@ expecially activity at exuberant-ctags.
 
 * exuberant-ctags
 * Fedora
+* Debian
 
 exuberant-ctags
 ============================================================
@@ -230,3 +231,21 @@ http://pkgs.fedoraproject.org/cgit/ctags.git/tree/ctags.spec
 	As the result this patch is in fishman tree.
 
 	2f7a78ce21e4156ec3e63c821827cf1d5680ace8
+
+Debian
+============================================================
+Some patches are maintained in ctags package of Debian.
+Inventory of patches are
+http://anonscm.debian.org/cgit/users/cjwatson/exuberant-ctags.git/tree/debian/patches/series
+
+(python-disable-imports.patch)
+
+	Not in fishman tree.
+	Not inspected well yet.
+
+(vim-command-loop.patch)
+
+	Not in fishman tree.
+	This must be merged.
+
+	Discussed on https://github.com/fishman/ctags/issues/74
