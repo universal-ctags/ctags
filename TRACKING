@@ -246,9 +246,11 @@ http://anonscm.debian.org/cgit/users/cjwatson/exuberant-ctags.git/tree/debian/pa
 	Not in fishman tree.
 	Not inspected well yet.
 
-(vim-command-loop.patch)
+<vim-command-loop.patch>
 
-	Not in fishman tree.
-	This must be merged.
-
+	This patch was merged as an alternative for 
+	7fb36a2f4690374526e9e7ef4f1e24800b6914ec
+	
 	Discussed on https://github.com/fishman/ctags/issues/74
+
+	e59325a576e38bc63b91abb05a5a22d2cef25ab7
