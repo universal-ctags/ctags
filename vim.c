@@ -420,10 +420,8 @@ static boolean parseCommand (const unsigned char *line)
 				++cp; 
 		}
 		else
-		{
-			++cp;
-		}
-	} while ( *cp &&  !isalnum ((int) *cp) );
+			break;
+	} while ( *cp );
 
 	if ( ! *cp )
 	{
