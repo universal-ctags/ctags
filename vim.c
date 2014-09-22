@@ -419,6 +419,10 @@ static boolean parseCommand (const unsigned char *line)
 			while (*cp && !isspace ((int) *cp))
 				++cp; 
 		}
+		else
+		{
+			++cp;
+		}
 	} while ( *cp &&  !isalnum ((int) *cp) );
 
 	if ( ! *cp )
@@ -719,10 +723,10 @@ static void findVimTags (void)
 
 	line = readVimLine();
 
-	if (line == NULL)
-	{
-		return;
-	}
+    if (line == NULL)
+    {
+            return;
+    }
 
 	if ( strncmp ((const char*) line, "UseVimball", (size_t) 10) == 0 )
 	{

@@ -65,12 +65,12 @@ static boolean isIdentifier (int c)
 
 static boolean isPodWord (const char *word)
 {
-	/* Perl POD words are three to five characters in size.  We use this
+	/* Perl POD words are three to eight characters in size.  We use this
 	 * fact to find (or not find) the right side of the word and then
 	 * perform comparisons, if necessary, of POD words of that size.
 	 */
 	size_t len;
-	for (len = 0; len < 6; ++len)
+	for (len = 0; len < 9; ++len)
 		if ('\0' == word[len] || ' ' == word[len] || '\t' == word[len])
 			break;
 	switch (len) {
@@ -88,6 +88,8 @@ static boolean isPodWord (const char *word)
 				|| 0 == strncmp(word, "head2", 5)
 				|| 0 == strncmp(word, "head3", 5)
 				|| 0 == strncmp(word, "head4", 5);
+		case 8:
+			return 0 == strncmp(word, "encoding", 8);
 		default:
 			return FALSE;
 	}
