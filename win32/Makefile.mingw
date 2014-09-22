@@ -79,10 +79,9 @@ libsources   = $(posixsources) $(onigsources)
 rubysources  = $(onigsources)
 
 encdir       = enc
-patchfiles   = re.c.168.patch re.c.181.patch
 distfiles    = README COPYING HISTORY \
 		Makefile.in configure.in config.h.in configure \
-		$(headers) $(libsources) $(patchfiles) \
+		$(headers) $(libsources) \
 		test.rb testconv.rb
 testc        = testc
 testcu       = testu
