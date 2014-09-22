@@ -16,7 +16,7 @@ FUZZ_SRC_DIRS=
 DIFF_OPTIONS = -U 0 -I '^!_TAG' --strip-trailing-cr
 DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
 DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
-		rm -f $1 $2 $3 ; \
+		rm -f $1 $2 $3 $4; \
 		echo "Passed" ; \
 		true ; \
 	  else \
@@ -140,6 +140,7 @@ test.units: $(CTAGS_TEST)
 		filter="$$t"/filter; \
 		output="$$t"/OUTPUT.TMP; \
 		diff="$$t"/DIFF.TMP; \
+		stderr="$$t"/STDERR.TMP; \
 		features="$$t"/features; \
 		\
 		echo -n "Testing $${name}..."; \
@@ -149,10 +150,12 @@ test.units: $(CTAGS_TEST)
 				continue; \
 			fi; \
 		fi; \
-		$(VALGRIND) $(CTAGS_TEST) --data-dir=Data --data-dir=+$$t -o - $$(test -f "$${args}" && echo "--options=$${args}") "$$input" |	\
+		$(VALGRIND) $(CTAGS_TEST) --options=NONE --data-dir=Data --data-dir=+$$t -o - \
+		$$(test -f "$${args}" && echo "--options=$${args}") \
+		"$$input" 2> "$$stderr" | \
 		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
 		cp "$$expected" "$$expectedtmp"; \
-		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff"); \
+		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff","$$stderr"); \
 		test $$? -eq 0 || success=false; \
 	done; \
 	$$success
