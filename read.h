@@ -14,7 +14,9 @@
 #if defined(FILE_WRITE) || defined(VAXC)
 # define CONST_FILE
 #else
-# define CONST_FILE const
+# define CONST_FILE /* const */
+/* TEMPORARY FIX 
+   `File' global variable should be file local. */
 #endif
 
 /*
@@ -109,6 +111,8 @@ extern void fileUngetc (int c);
 extern const unsigned char *fileReadLine (void);
 extern char *readLine (vString *const vLine, FILE *const fp);
 extern char *readSourceLine (vString *const vLine, fpos_t location, long *const pSeekValue);
+
+extern char* readLineWithNoSeek (vString *const vline, FILE *const pp);
 
 #endif  /* _READ_H */
 

@@ -1,0 +1,2 @@
+--regex-c=/define (.*);/\1/f,function/
+--c-kinds=-f

@@ -1,0 +1,3 @@
+#!/bin/serpent
+def main (args):
+    print args

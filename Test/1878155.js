@@ -1,3 +1,11 @@
+// Tags should include:
+//   functions
+//       my_function
+//   classes
+//       RE
+//   global variables
+//       foo
+//
 
 // This should handle the escaped quote
 var RE={/foo\"/: "bar"};

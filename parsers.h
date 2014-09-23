@@ -16,6 +16,7 @@
 
 /* Add the name of any new parser definition function here */
 #define PARSER_LIST \
+	AdaParser, \
 	AntParser, \
 	AsmParser, \
 	AspParser, \
@@ -30,8 +31,10 @@
 	DosBatchParser, \
 	EiffelParser, \
 	ErlangParser, \
+	FalconParser, \
 	FlexParser, \
 	FortranParser, \
+	GoParser, \
 	HtmlParser, \
 	JavaParser, \
 	JavaScriptParser, \
@@ -39,8 +42,7 @@
 	LuaParser, \
 	MakefileParser, \
 	MatLabParser, \
-	ObjCParser, \
-	ObjCppParser, \
+	ObjcParser, \
 	OcamlParser, \
 	PascalParser, \
 	PerlParser, \
@@ -59,6 +61,7 @@
 	VerilogParser, \
 	VhdlParser, \
 	VimParser, \
+	WindResParser, \
 	YaccParser
 
 #endif  /* _PARSERS_H */

@@ -1,5 +1,7 @@
 
 // This file should generate the following tags:
+//    classes
+//      Test.RPC
 //    methods
 //      Test.RPC.asyncMethod
 //      Test.RPC.asyncRequest

@@ -432,16 +432,16 @@ typedef void (*parseNext) (vString * const ident, objcToken what);
 /********** Helpers */
 /* This variable hold the 'parser' which is going to
  * handle the next token */
-parseNext toDoNext;
+static parseNext toDoNext;
 
 /* Special variable used by parser eater to
  * determine which action to put after their
  * job is finished. */
-parseNext comeAfter;
+static parseNext comeAfter;
 
 /* Used by some parsers detecting certain token
  * to revert to previous parser. */
-parseNext fallback;
+static parseNext fallback;
 
 
 /********** Grammar */
@@ -467,13 +467,13 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, objcKind kind)
 	}
 }
 
-void pushEnclosingContext (const vString * parent, objcKind type)
+static void pushEnclosingContext (const vString * parent, objcKind type)
 {
 	vStringCopy (parentName, parent);
 	parentType = type;
 }
 
-void popEnclosingContext ()
+static void popEnclosingContext (void)
 {
 	vStringClear (parentName);
 }
@@ -487,7 +487,7 @@ static void addTag (vString * const ident, int kind)
 	makeTagEntry (&toCreate);
 }
 
-objcToken waitedToken, fallBackToken;
+static objcToken waitedToken, fallBackToken;
 
 /* Ignore everything till waitedToken and jump to comeAfter.
  * If the "end" keyword is encountered break, doesn't remember
@@ -508,22 +508,22 @@ static void tillTokenOrFallBack (vString * const UNUSED (ident), objcToken what)
 	}
 }
 
+static int ignoreBalanced_count = 0;
 static void ignoreBalanced (vString * const UNUSED (ident), objcToken what)
 {
-	static int count = 0;
 
 	switch (what)
 	{
 	case Tok_PARL:
 	case Tok_CurlL:
 	case Tok_SQUAREL:
-		count++;
+		ignoreBalanced_count++;
 		break;
 
 	case Tok_PARR:
 	case Tok_CurlR:
 	case Tok_SQUARER:
-		count--;
+		ignoreBalanced_count--;
 		break;
 
 	default:
@@ -531,7 +531,7 @@ static void ignoreBalanced (vString * const UNUSED (ident), objcToken what)
 		break;
 	}
 
-	if (count == 0)
+	if (ignoreBalanced_count == 0)
 		toDoNext = comeAfter;
 }
 
@@ -549,14 +549,12 @@ static void parseFields (vString * const ident, objcToken what)
 		comeAfter = &parseFields;
 		break;
 
-		// we got an identifier, keep track
-		// of it
+		/* we got an identifier, keep track of it */
 	case ObjcIDENTIFIER:
 		vStringCopy (tempName, ident);
 		break;
 
-		// our last kept identifier must be our
-		// variable name =)
+		/* our last kept identifier must be our variable name =) */
 	case Tok_semi:
 		addTag (tempName, K_FIELD);
 		vStringClear (tempName);
@@ -596,7 +594,7 @@ static void parseMethodsName (vString * const ident, objcToken what)
 
 	case Tok_CurlL:
 	case Tok_semi:
-		// method name is not simple
+		/* method name is not simple */
 		if (vStringLength (fullMethodName) != '\0')
 		{
 			addTag (fullMethodName, methodKind);
@@ -637,7 +635,7 @@ static void parseMethodsImplemName (vString * const ident, objcToken what)
 
 	case Tok_CurlL:
 	case Tok_semi:
-		// method name is not simple
+		/* method name is not simple */
 		if (vStringLength (fullMethodName) != '\0')
 		{
 			addTag (fullMethodName, methodKind);
@@ -696,14 +694,12 @@ static void parseProperty (vString * const ident, objcToken what)
 		waitedToken = Tok_PARR;
 		break;
 
-		// we got an identifier, keep track
-		// of it
+		/* we got an identifier, keep track of it */
 	case ObjcIDENTIFIER:
 		vStringCopy (tempName, ident);
 		break;
 
-		// our last kept identifier must be our
-		// variable name =)
+		/* our last kept identifier must be our variable name =) */
 	case Tok_semi:
 		addTag (tempName, K_PROPERTY);
 		vStringClear (tempName);
@@ -799,8 +795,9 @@ static void parseStructMembers (vString * const ident, objcToken what)
 		vStringClear (tempName);
 		break;
 
-		// some types are complex, the only one
-		// we will loose is the function type.
+		/* some types are complex, the only one
+		 * we will loose is the function type.
+		 */
 	case Tok_CurlL:	/* '{' */
 	case Tok_PARL:	/* '(' */
 	case Tok_SQUAREL:	/* '[' */
@@ -821,22 +818,21 @@ static void parseStructMembers (vString * const ident, objcToken what)
 }
 
 /* Called just after the struct keyword */
+static boolean parseStruct_gotName = FALSE;
 static void parseStruct (vString * const ident, objcToken what)
 {
-	static boolean gotName = FALSE;
-
 	switch (what)
 	{
 	case ObjcIDENTIFIER:
-		if (!gotName)
+		if (!parseStruct_gotName)
 		{
 			addTag (ident, K_STRUCT);
 			pushEnclosingContext (ident, K_STRUCT);
-			gotName = TRUE;
+			parseStruct_gotName = TRUE;
 		}
 		else
 		{
-			gotName = FALSE;
+			parseStruct_gotName = FALSE;
 			popEnclosingContext ();
 			toDoNext = comeAfter;
 			comeAfter (ident, what);
@@ -850,7 +846,7 @@ static void parseStruct (vString * const ident, objcToken what)
 		/* maybe it was just a forward declaration
 		 * in which case, we pop the context */
 	case Tok_semi:
-		if (gotName)
+		if (parseStruct_gotName)
 			popEnclosingContext ();
 
 		toDoNext = comeAfter;
@@ -864,21 +860,20 @@ static void parseStruct (vString * const ident, objcToken what)
 }
 
 /* Parse enumeration members, ignoring potential initialization */
+static parseNext parseEnumFields_prev = NULL;
 static void parseEnumFields (vString * const ident, objcToken what)
 {
-	static parseNext prev = NULL;
-
-	if (prev != NULL)
+	if (parseEnumFields_prev != NULL)
 	{
-		comeAfter = prev;
-		prev = NULL;
+		comeAfter = parseEnumFields_prev;
+		parseEnumFields_prev = NULL;
 	}
 
 	switch (what)
 	{
 	case ObjcIDENTIFIER:
 		addTag (ident, K_ENUM);
-		prev = comeAfter;
+		parseEnumFields_prev = comeAfter;
 		waitedToken = Tok_COMA;
 		/* last item might not have a coma */
 		fallBackToken = Tok_CurlR;
@@ -899,22 +894,21 @@ static void parseEnumFields (vString * const ident, objcToken what)
 }
 
 /* parse enum ... { ... */
+static boolean parseEnum_named = FALSE;
 static void parseEnum (vString * const ident, objcToken what)
 {
-	static boolean named = FALSE;
-
 	switch (what)
 	{
 	case ObjcIDENTIFIER:
-		if (!named)
+		if (!parseEnum_named)
 		{
 			addTag (ident, K_ENUM);
 			pushEnclosingContext (ident, K_ENUM);
-			named = TRUE;
+			parseEnum_named = TRUE;
 		}
 		else
 		{
-			named = FALSE;
+			parseEnum_named = FALSE;
 			popEnclosingContext ();
 			toDoNext = comeAfter;
 			comeAfter (ident, what);
@@ -923,11 +917,11 @@ static void parseEnum (vString * const ident, objcToken what)
 
 	case Tok_CurlL:	/* '{' */
 		toDoNext = &parseEnumFields;
-		named = FALSE;
+		parseEnum_named = FALSE;
 		break;
 
 	case Tok_semi:	/* ';' */
-		if (named)
+		if (parseEnum_named)
 			popEnclosingContext ();
 		toDoNext = comeAfter;
 		comeAfter (ident, what);
@@ -974,20 +968,19 @@ static void parseTypedef (vString * const ident, objcToken what)
 	}
 }
 
+static boolean ignorePreprocStuff_escaped = FALSE;
 static void ignorePreprocStuff (vString * const UNUSED (ident), objcToken what)
 {
-	static boolean escaped = FALSE;
-
 	switch (what)
 	{
 	case Tok_Backslash:
-		escaped = TRUE;
+		ignorePreprocStuff_escaped = TRUE;
 		break;
 
 	case Tok_EOL:
-		if (escaped)
+		if (ignorePreprocStuff_escaped)
 		{
-			escaped = FALSE;
+			ignorePreprocStuff_escaped = FALSE;
 		}
 		else
 		{
@@ -996,7 +989,7 @@ static void ignorePreprocStuff (vString * const UNUSED (ident), objcToken what)
 		break;
 
 	default:
-		escaped = FALSE;
+		ignorePreprocStuff_escaped = FALSE;
 		break;
 	}
 }
@@ -1105,6 +1098,17 @@ static void findObjcTags (void)
 	fullMethodName = vStringNew ();
 	prevIdent = vStringNew ();
 
+	/* (Re-)initialize state variables, this might be a second file */
+	comeAfter = NULL;
+	fallback = NULL;
+	parentType = K_INTERFACE;
+	ignoreBalanced_count = 0;
+	methodKind = 0;
+	parseStruct_gotName = FALSE;
+	parseEnumFields_prev = NULL;
+	parseEnum_named = FALSE;
+	ignorePreprocStuff_escaped = FALSE;
+
 	st.name = vStringNew ();
 	st.cp = fileReadLine ();
 	toDoNext = &globalScope;
@@ -1114,6 +1118,7 @@ static void findObjcTags (void)
 		(*toDoNext) (st.name, tok);
 		tok = lex (&st);
 	}
+	vStringDelete(st.name);
 
 	vStringDelete (name);
 	vStringDelete (parentName);
@@ -1126,22 +1131,126 @@ static void findObjcTags (void)
 	fullMethodName = NULL;
 }
 
+static unsigned char objc_m_tg_table [65536] =
+{
+	[    2595] =        7, /* N # */
+	[    2600] =        5, /* N ( */
+	[    2602] =        7, /* N * */
+	[    2603] =        3, /* N + */
+	[    2604] =        2, /* N , */
+	[    2605] =       11, /* N - */
+	[    2607] =        6, /* N / */
+	[    2618] =       13, /* N : */
+	[    2619] =        6, /* N ; */
+	[    2621] =       12, /* N = */
+	[    2624] =        6, /* N @ */
+	[    2651] =       13, /* N [ */
+	[    2653] =        1, /* N ] */
+	[    2655] =        1, /* N _ */
+	[    2683] =       15, /* N { */
+	[    2685] =       15, /* N } */
+	[    8714] =        3, /* " N */
+	[    8750] =        1, /* " . */
+	[    8751] =        2, /* " / */
+	[    8797] =        1, /* " ] */
+	[    8799] =        1, /* " _ */
+	[    8970] =        2, /* # N */
+	[    8994] =        3, /* # " */
+	[    9008] =        1, /* # 0 */
+	[    9020] =        2, /* # < */
+	[    9738] =        1, /* & N */
+	[   10281] =       15, /* ( ) */
+	[   10282] =       15, /* ( * */
+	[   10284] =        1, /* ( , */
+	[   10331] =        2, /* ( [ */
+	[   10506] =       20, /* ) N */
+	[   10545] =        2, /* ) 1 */
+	[   10554] =        9, /* ) : */
+	[   10555] =        2, /* ) ; */
+	[   10762] =        3, /* * N */
+	[   10793] =       16, /* * ) */
+	[   10794] =        2, /* * * */
+	[   10799] =        3, /* * / */
+	[   10813] =        4, /* * = */
+	[   11048] =        2, /* + ( */
+	[   11069] =        1, /* + = */
+	[   11274] =        2, /* , N */
+	[   11306] =        1, /* , * */
+	[   11560] =       11, /* - ( */
+	[   11786] =        1, /* . N */
+	[   11810] =        3, /* . " */
+	[   11838] =        2, /* . > */
+	[   12042] =        4, /* / N */
+	[   12066] =        1, /* / " */
+	[   12074] =        3, /* / * */
+	[   12078] =        3, /* / . */
+	[   12079] =        3, /* / / */
+	[   12127] =        1, /* / _ */
+	[   12298] =        1, /* 0 N */
+	[   12347] =        1, /* 0 ; */
+	[   12602] =        2, /* 1 : */
+	[   14858] =        7, /* : N */
+	[   14886] =        1, /* : & */
+	[   14888] =       15, /* : ( */
+	[   14912] =        1, /* : @ */
+	[   14939] =        1, /* : [ */
+	[   14941] =       10, /* : ] */
+	[   15114] =       39, /* ; N */
+	[   15406] =        1, /* < . */
+	[   15407] =        1, /* < / */
+	[   15657] =        2, /* = ) */
+	[   15664] =        1, /* = 0 */
+	[   15675] =        7, /* = ; */
+	[   15677] =        2, /* = = */
+	[   15707] =        9, /* = [ */
+	[   15882] =        2, /* > N */
+	[   16394] =        6, /* @ N */
+	[   16418] =        1, /* @ " */
+	[   23354] =       10, /* [ : */
+	[   23387] =        4, /* [ [ */
+	[   23389] =       15, /* [ ] */
+	[   23818] =        2, /* ] N */
+	[   23866] =        1, /* ] : */
+	[   23867] =       22, /* ] ; */
+	[   23869] =        2, /* ] = */
+	[   23901] =        2, /* ] ] */
+	[   24330] =        1, /* _ N */
+	[   24366] =        1, /* _ . */
+	[   24379] =        1, /* _ ; */
+	[   24415] =        1, /* _ _ */
+	[   31498] =       15, /* { N */
+	[   32010] =       15, /* } N */
+};
+
 static void objcInitialize (const langType language)
 {
 	Lang_ObjectiveC = language;
 
 	initKeywordHash ();
+	addTgEntryForExtension (language, "m", objc_m_tg_table);
+}
+
+static void objcFinalize (const langType language)
+{
+	vStringDelete (parentName);
+	vStringDelete (tempName);
+	vStringDelete (fullMethodName);
+	vStringDelete (prevIdent);
 }
 
 extern parserDefinition *ObjcParser (void)
 {
-	static const char *const extensions[] = { "m", "h", NULL };
+	static const char *const extensions[] = { "mm", "m", "h",
+						  NULL };
+	static const char *const aliases[] = { "objc", "objective-c",
+					       NULL };
 	parserDefinition *def = parserNew ("ObjectiveC");
 	def->kinds = ObjcKinds;
 	def->kindCount = KIND_COUNT (ObjcKinds);
 	def->extensions = extensions;
+	def->aliases = aliases;
 	def->parser = findObjcTags;
 	def->initialize = objcInitialize;
-
+	def->finalize = objcFinalize;
 	return def;
 }

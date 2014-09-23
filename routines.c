@@ -325,6 +325,14 @@ extern char* eStrdup (const char* str)
 	return result;
 }
 
+extern char* eStrndup (const char* str, size_t len)
+{
+	char* result = xMalloc (len + 1, char);
+	memset(result, 0, len + 1);
+	strncpy (result, str, len);
+	return result;
+}
+
 extern void toLowerString (char* str)
 {
 	while (*str != '\0')
@@ -617,6 +625,47 @@ extern const char *fileExtension (const char *const fileName)
 	return extension;
 }
 
+extern char* templateFileExtensionNew (const char *const fileName,
+				       const char *const templateExt)
+{
+	const char *pDelimiter = NULL;
+	const char *const base = baseFilename (fileName);
+	char* shorten_base;
+	const char* ext;
+	char* r;
+
+	pDelimiter = strrchr (base, templateExt[0]);
+
+	if (pDelimiter && (strcmp (pDelimiter, templateExt) == 0))
+	{
+		shorten_base = eStrndup (base, pDelimiter - base);
+		ext = fileExtension (shorten_base);
+		r = eStrdup (ext);
+		eFree (shorten_base);
+		return r;
+	}
+	else
+		return NULL;
+}
+
+extern char* baseFilenameSansExtensionNew (const char *const fileName,
+					   const char *const templateExt)
+{
+	const char *pDelimiter = NULL;
+	const char *const base = baseFilename (fileName);
+	char* shorten_base;
+
+	pDelimiter = strrchr (base, templateExt[0]);
+
+	if (pDelimiter && (strcmp (pDelimiter, templateExt) == 0))
+	{
+		shorten_base = eStrndup (base, pDelimiter - base);
+		return shorten_base;
+	}
+	else
+		return NULL;
+}
+
 extern boolean isAbsolutePath (const char *const path)
 {
 	boolean result = FALSE;
@@ -757,13 +806,13 @@ extern char* absoluteFilename (const char *file)
 				else if (cp [0] != PATH_SEPARATOR)
 					cp = slashp;
 #endif
-				strcpy (cp, slashp + 3);
+				memmove (cp, slashp + 3, strlen (slashp + 3) + 1);
 				slashp = cp;
 				continue;
 			}
 			else if (slashp [2] == PATH_SEPARATOR  ||  slashp [2] == '\0')
 			{
-				strcpy (slashp, slashp + 2);
+				memmove (slashp, slashp + 2, strlen (slashp + 2) + 1);
 				continue;
 			}
 		}

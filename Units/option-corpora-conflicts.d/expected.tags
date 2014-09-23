@@ -1,0 +1,2 @@
+DEFINITIONS	Units/option-corpora-conflicts.d/input.REDHAT-MIB	/^REDHAT-MIB DEFINITIONS ::= BEGIN$/;"	n
+MODULE	Units/option-corpora-conflicts.d/input.REDHAT-MIB	/^redhat MODULE-IDENTITY$/;"	n

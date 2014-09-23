@@ -27,6 +27,7 @@
 #include "args.h"
 #include "parse.h"
 #include "strlist.h"
+#include "trash.h"
 #include "vstring.h"
 
 /*
@@ -43,6 +44,7 @@ typedef struct sCookedArgs {
 	boolean isOption;
 	boolean longOption;
 	const char* parameter;
+	Trash* trash;
 	/* public */
 	char* item;
 } cookedArgs;
@@ -97,6 +99,7 @@ typedef struct sOptionValues {
 	char *fileList;         /* -L  name of file containing names of files */
 	char *tagFileName;      /* -o  name of tags file */
 	stringList* headerExt;  /* -h  header extensions */
+	char* configFilename;   /* --config-filename  use instead of 'ctags' in option file names */
 	stringList* etagsInclude;/* --etags-include  list of TAGS files to include*/
 	unsigned int tagFileFormat;/* --format  tag file format (level) */
 	boolean if0;            /* --if0  examine code within "#if 0" branch */
@@ -148,6 +151,9 @@ extern void previewFirstOption (cookedArgs* const cargs);
 extern void readOptionConfiguration (void);
 extern void initOptions (void);
 extern void freeOptionResources (void);
+
+extern vString* expandOnCorpusPathList (const char* leaf);
+/* Return vString must be freed by caller side. */
 
 #endif  /* _OPTIONS_H */
 

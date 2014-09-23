@@ -1,3 +1,13 @@
+=encoding utf-8
+
+Some more stuff to ignore
+
+  sub foo {
+      ...
+  }
+
+=cut
+
 =head1 NAME
 Some stuff to ignore
 package NotAPackage;

@@ -104,10 +104,14 @@ extern parserDefinition* ShParser (void)
 	static const char *const extensions [] = {
 		"sh", "SH", "bsh", "bash", "ksh", "zsh", NULL
 	};
+	static const char *const aliases [] = {
+		"sh", "bash", "ksh", "zsh", NULL
+	};
 	parserDefinition* def = parserNew ("Sh");
 	def->kinds      = ShKinds;
 	def->kindCount  = KIND_COUNT (ShKinds);
 	def->extensions = extensions;
+	def->aliases = aliases;
 	def->parser     = findShTags;
 	return def;
 }

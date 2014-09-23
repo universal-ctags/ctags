@@ -1,0 +1,2 @@
+a	Units/option-same-kind-in-regex-and-builtin.d/input.c	/^  define a;$/;"	f
+main	Units/option-same-kind-in-regex-and-builtin.d/input.c	/^main(void)$/;"	f

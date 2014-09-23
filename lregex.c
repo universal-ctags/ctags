@@ -31,6 +31,7 @@
 
 #include "debug.h"
 #include "entry.h"
+#include "flags.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
@@ -67,6 +68,7 @@ enum pType { PTRN_TAG, PTRN_CALLBACK };
 typedef struct {
 	regex_t *pattern;
 	enum pType type;
+	boolean exclusive;
 	union {
 		struct {
 			char *name_pattern;
@@ -85,6 +87,8 @@ typedef struct {
 	unsigned int count;
 } patternSet;
 
+#define COUNT(D) (sizeof(D)/sizeof(D[0]))
+
 /*
 *   DATA DEFINITIONS
 */
@@ -98,6 +102,7 @@ static int SetUpper = -1;  /* upper language index in list */
 /*
 *   FUNCTION DEFINITIONS
 */
+
 
 static void clearPatternSet (const langType language)
 {
@@ -249,10 +254,26 @@ static boolean parseTagRegex (
 	return result;
 }
 
+
+static void ptrn_flag_exclusive_short (char c, void* data)
+{
+	regexPattern *ptrn = data;
+	ptrn->exclusive = TRUE;
+}
+
+static void ptrn_flag_exclusive_long (const char* const s, const char* const unused, void* data)
+{
+	ptrn_flag_exclusive_short ('x', data);
+}
+
+static flagDefinition ptrnFlagDef[] = {
+	{ 'x', "exclusive", ptrn_flag_exclusive_short, ptrn_flag_exclusive_long },
+};
+
 static void addCompiledTagPattern (
 		const langType language, regex_t* const pattern,
 		char* const name, const char kind, char* const kindName,
-		char *const description)
+		char *const description, const char* flags)
 {
 	patternSet* set;
 	regexPattern *ptrn;
@@ -274,16 +295,18 @@ static void addCompiledTagPattern (
 
 	ptrn->pattern = pattern;
 	ptrn->type    = PTRN_TAG;
+	ptrn->exclusive = FALSE;
 	ptrn->u.tag.name_pattern = name;
 	ptrn->u.tag.kind.enabled = TRUE;
 	ptrn->u.tag.kind.letter  = kind;
 	ptrn->u.tag.kind.name    = kindName;
 	ptrn->u.tag.kind.description = description;
+	flagsEval (flags, ptrnFlagDef, COUNT(ptrnFlagDef), ptrn);
 }
 
 static void addCompiledCallbackPattern (
 		const langType language, regex_t* const pattern,
-		const regexCallback callback)
+		const regexCallback callback, const char* flags)
 {
 	patternSet* set;
 	regexPattern *ptrn;
@@ -305,27 +328,62 @@ static void addCompiledCallbackPattern (
 
 	ptrn->pattern = pattern;
 	ptrn->type    = PTRN_CALLBACK;
+	ptrn->exclusive = FALSE;
 	ptrn->u.callback.function = callback;
+	flagsEval (flags, ptrnFlagDef, COUNT(ptrnFlagDef), ptrn);
 }
 
 #if defined (POSIX_REGEX)
+
+static void regex_flag_basic_short (char c, void* data)
+{
+	int* cflags = data;
+	*cflags &= ~REG_EXTENDED;
+}
+static void regex_flag_basic_long (const char* const s, const char* const unused, void* data)
+{
+	regex_flag_basic_short ('b', data);
+}
+
+static void regex_flag_extend_short (char c, void* data)
+{
+	int* cflags = data;
+	*cflags |= REG_EXTENDED;
+}
+
+static void regex_flag_extend_long (const char* const c, const char* const unused, void* data)
+{
+	regex_flag_extend_short('e', data);
+}
+
+static void regex_flag_icase_short (char c, void* data)
+{
+	int* cflags = data;
+	*cflags |= REG_ICASE;
+}
+
+static void regex_flag_icase_long (const char* s, const char* const unused, void* data)
+{
+	regex_flag_icase_short ('i', data);
+}
+
 
 static regex_t* compileRegex (const char* const regexp, const char* const flags)
 {
 	int cflags = REG_EXTENDED | REG_NEWLINE;
 	regex_t *result = NULL;
 	int errcode;
-	int i;
-	for (i = 0  ; flags != NULL  &&  flags [i] != '\0'  ;  ++i)
-	{
-		switch ((int) flags [i])
-		{
-			case 'b': cflags &= ~REG_EXTENDED; break;
-			case 'e': cflags |= REG_EXTENDED;  break;
-			case 'i': cflags |= REG_ICASE;     break;
-			default: error (WARNING, "unknown regex flag: '%c'", *flags); break;
-		}
-	}
+
+	flagDefinition regexFlagDefs[] = {
+		{ 'b', "basic",  regex_flag_basic_short,  regex_flag_basic_long  },
+		{ 'e', "extend", regex_flag_extend_short, regex_flag_extend_long },
+		{ 'i', "icase",  regex_flag_icase_short,  regex_flag_icase_long  },
+	};
+	flagsEval (flags,
+		   regexFlagDefs,
+		   COUNT(regexFlagDefs),
+		   &cflags);
+
 	result = xMalloc (1, regex_t);
 	errcode = regcomp (result, regexp, cflags);
 	if (errcode != 0)
@@ -522,8 +580,15 @@ extern boolean matchRegex (const vString* const line, const langType language)
 		const patternSet* const set = Sets + language;
 		unsigned int i;
 		for (i = 0  ;  i < set->count  ;  ++i)
-			if (matchRegexPattern (line, set->patterns + i))
+		{
+			regexPattern* ptrn = set->patterns + i;
+			if (matchRegexPattern (line, ptrn))
+			{
 				result = TRUE;
+				if (ptrn->exclusive)
+					break;
+			}
+		}
 	}
 	return result;
 }
@@ -557,7 +622,7 @@ extern void addTagRegex (
 			char* description;
 			parseKinds (kinds, &kind, &kindName, &description);
 			addCompiledTagPattern (language, cp, eStrdup (name),
-					kind, kindName, description);
+					kind, kindName, description, flags);
 		}
 	}
 #endif
@@ -575,7 +640,7 @@ extern void addCallbackRegex (
 	{
 		regex_t* const cp = compileRegex (regex, flags);
 		if (cp != NULL)
-			addCompiledCallbackPattern (language, cp, callback);
+			addCompiledCallbackPattern (language, cp, callback, flags);
 	}
 #endif
 }
@@ -604,27 +669,38 @@ extern void addLanguageRegex (
 extern boolean processRegexOption (const char *const option,
 								   const char *const parameter __unused__)
 {
-	boolean handled = FALSE;
 	const char* const dash = strchr (option, '-');
-	if (dash != NULL  &&  strncmp (option, "regex", dash - option) == 0)
-	{
+	char* lang;
+	langType language;
+
+	if (dash == NULL)
+		return FALSE;
+
+	if (strncmp (option, "regex", dash - option) == 0)
+		lang = eStrdup (dash + 1);
+	else if (strcmp (dash + 1, "regex") == 0)
+		lang = eStrndup (option, dash - option);
+	else
+		return FALSE;
+
 #ifdef HAVE_REGEX
-		langType language;
-		language = getNamedLanguage (dash + 1);
-		if (language == LANG_IGNORE)
-			error (WARNING, "unknown language \"%s\" in --%s option", (dash + 1), option);
-		else
-			processLanguageRegex (language, parameter);
+	language = getNamedLanguage (lang);
+	if (language == LANG_IGNORE)
+		error (WARNING, "unknown language \"%s\" in --%s option", lang, option);
+	else
+		processLanguageRegex (language, parameter);
 #else
-		error (WARNING, "regex support not available; required for --%s option",
-		   option);
+	error (WARNING, "regex support not available; required for --%s option",
+	       option);
 #endif
-		handled = TRUE;
-	}
-	return handled;
+
+	eFree (lang);
+
+	return TRUE;
 }
 
-extern void disableRegexKinds (const langType language __unused__)
+extern void resetRegexKinds (const langType language __unused__,
+			     boolean mode)
 {
 #ifdef HAVE_REGEX
 	if (language <= SetUpper  &&  Sets [language].count > 0)
@@ -633,7 +709,7 @@ extern void disableRegexKinds (const langType language __unused__)
 		unsigned int i;
 		for (i = 0  ;  i < set->count  ;  ++i)
 			if (set->patterns [i].type == PTRN_TAG)
-				set->patterns [i].u.tag.kind.enabled = FALSE;
+				set->patterns [i].u.tag.kind.enabled = mode;
 	}
 #endif
 }

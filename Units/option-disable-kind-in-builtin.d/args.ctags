@@ -1,0 +1,2 @@
+--regex-c=/define (.*);/\1/X,XDEFINE/
+--c-kinds=-f

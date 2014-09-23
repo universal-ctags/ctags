@@ -1,0 +1,4 @@
+backtrack	Units/noext-tg-matlab.d/input.nolang	/^function [xn,fn,fcall] = backtrack(xc,d,fc,fnc,DDfnc,c,gamma,eps)$/;"	f
+func1	Units/noext-tg-matlab.d/input.nolang	/^function [x,y,z] = func1 $/;"	f
+func2	Units/noext-tg-matlab.d/input.nolang	/^function x = func2 $/;"	f
+func3	Units/noext-tg-matlab.d/input.nolang	/^function func3 $/;"	f

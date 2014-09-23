@@ -104,6 +104,7 @@ extern int strnuppercmp (const char *s1, const char *s2, size_t n);
 extern char* strstr (const char *str, const char *substr);
 #endif
 extern char* eStrdup (const char* str);
+extern char* eStrndup (const char* str, size_t len);
 extern void toLowerString (char* str);
 extern void toUpperString (char* str);
 extern char* newLowerString (const char* str);
@@ -128,6 +129,9 @@ extern char* absoluteFilename (const char *file);
 extern char* absoluteDirname (char *file);
 extern char* relativeFilename (const char *file, const char *dir);
 extern FILE *tempFile (const char *const mode, char **const pName);
+
+extern char* templateFileExtensionNew (const char *const fileName, const char *const templateExt);
+extern char* baseFilenameSansExtensionNew (const char *const fileName, const char *const templateExt);
 
 #endif  /* _ROUTINES_H */
 

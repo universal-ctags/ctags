@@ -14,6 +14,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+#include "debug.h"
 
 #include <string.h>
 
@@ -64,28 +65,34 @@ static boolean isIdentifier (int c)
 
 static boolean isPodWord (const char *word)
 {
-	boolean result = FALSE;
-	if (isalpha (*word))
-	{
-		const char *const pods [] = {
-			"head1", "head2", "head3", "head4", "over", "item", "back",
-			"pod", "begin", "end", "for"
-		};
-		const size_t count = sizeof (pods) / sizeof (pods [0]);
-		const char *white = strpbrk (word, " \t");
-		const size_t len = (white!=NULL) ? (size_t)(white-word) : strlen (word);
-		char *const id = (char*) eMalloc (len + 1);
-		size_t i;
-		strncpy (id, word, len);
-		id [len] = '\0';
-		for (i = 0  ;  i < count  &&  ! result  ;  ++i)
-		{
-			if (strcmp (id, pods [i]) == 0)
-				result = TRUE;
-		}
-		eFree (id);
+	/* Perl POD words are three to eight characters in size.  We use this
+	 * fact to find (or not find) the right side of the word and then
+	 * perform comparisons, if necessary, of POD words of that size.
+	 */
+	size_t len;
+	for (len = 0; len < 9; ++len)
+		if ('\0' == word[len] || ' ' == word[len] || '\t' == word[len])
+			break;
+	switch (len) {
+		case 3:
+			return 0 == strncmp(word, "end", 3)
+				|| 0 == strncmp(word, "for", 3)
+				|| 0 == strncmp(word, "pod", 3);
+		case 4:
+			return 0 == strncmp(word, "back", 4)
+				|| 0 == strncmp(word, "item", 4)
+				|| 0 == strncmp(word, "over", 4);
+		case 5:
+			return 0 == strncmp(word, "begin", 5)
+				|| 0 == strncmp(word, "head1", 5)
+				|| 0 == strncmp(word, "head2", 5)
+				|| 0 == strncmp(word, "head3", 5)
+				|| 0 == strncmp(word, "head4", 5);
+		case 8:
+			return 0 == strncmp(word, "encoding", 8);
+		default:
+			return FALSE;
 	}
-	return result;
 }
 
 /*
@@ -164,6 +171,98 @@ SUB_DECL_SWITCH:
 	return FALSE;
 }
 
+/* `end' points to the equal sign.  Parse from right to left to get the
+ * identifier.  Assume we're dealing with something of form \s*\w+\s*=>
+ */
+static void makeTagFromLeftSide (const char *begin, const char *end,
+	vString *name, vString *package)
+{
+	tagEntryInfo entry;
+	const char *b, *e;
+	for (e = end - 1; e > begin && isspace(*e); --e)
+		;
+	if (e < begin)
+		return;
+	for (b = e; b >= begin && isIdentifier(*b); --b)
+		;
+	/* Identifier must be either beginning of line of have some whitespace
+	 * on its left:
+	 */
+	if (b < begin || isspace(*b) || ',' == *b)
+		++b;
+	else if (b != begin)
+		return;
+	Assert(e - b + 1 > 0);
+	vStringClear(name);
+	vStringNCatS(name, b, e - b + 1);
+	initTagEntry(&entry, vStringValue(name));
+	entry.kind = PerlKinds[K_CONSTANT].letter;
+	entry.kindName = PerlKinds[K_CONSTANT].name;
+	makeTagEntry(&entry);
+	if (Option.include.qualifiedTags && package && vStringLength(package)) {
+		vStringClear(name);
+		vStringCopy(name, package);
+		vStringNCatS(name, b, e - b + 1);
+		initTagEntry(&entry, vStringValue(name));
+		entry.kind = PerlKinds[K_CONSTANT].letter;
+		entry.kindName = PerlKinds[K_CONSTANT].name;
+		makeTagEntry(&entry);
+	}
+}
+
+enum const_state { CONST_STATE_NEXT_LINE, CONST_STATE_HIT_END };
+
+/* Parse a single line, find as many NAME => VALUE pairs as we can and try
+ * to detect the end of the hashref.
+ */
+static enum const_state parseConstantsFromLine (const char *cp,
+	vString *name, vString *package)
+{
+	while (1) {
+		const size_t sz = strcspn(cp, "#}=");
+		switch (cp[sz]) {
+			case '=':
+				if (cp[sz + 1] && '>' == cp[sz + 1])
+					makeTagFromLeftSide(cp, cp + sz, name, package);
+				break;
+			case '}':	/* Assume this is the end of the hashref. */
+				return CONST_STATE_HIT_END;
+			case '\0':	/* End of the line. */
+			case '#':	/* Assume this is a comment and thus end of the line. */
+				return CONST_STATE_NEXT_LINE;
+		}
+		cp += sz + 1;
+	}
+}
+
+/* Parse constants declared via hash reference, like this:
+ * use constant {
+ *   A => 1,
+ *   B => 2,
+ * };
+ * The approach we take is simplistic, but it covers the vast majority of
+ * cases well.  There can be some false positives.
+ * Returns 0 if found the end of the hashref, -1 if we hit EOF
+ */
+static int parseConstantsFromHashRef (const unsigned char *cp,
+	vString *name, vString *package)
+{
+	while (1) {
+		enum const_state state =
+			parseConstantsFromLine((const char *) cp, name, package);
+		switch (state) {
+			case CONST_STATE_NEXT_LINE:
+				cp = fileReadLine();
+				if (cp)
+					break;
+				else
+					return -1;
+			case CONST_STATE_HIT_END:
+				return 0;
+		}
+	}
+}
+
 /* Algorithm adapted from from GNU etags.
  * Perl support by Bart Robinson <lomew@cs.utah.edu>
  * Perl sub names: look for /^ [ \t\n]sub [ \t\n]+ [^ \t\n{ (]+/
@@ -222,8 +321,28 @@ static void findPerlTags (void)
 			if (strncmp((const char*) cp, "constant", (size_t) 8) != 0)
 				continue;
 			cp += 8;
+			/* Skip up to the first non-space character, skipping empty
+			 * and comment lines.
+			 */
+			while (isspace(*cp))
+				cp++;
+			while (!*cp || '#' == *cp) {
+				cp = fileReadLine ();
+				if (!cp)
+					goto END_MAIN_WHILE;
+				while (isspace (*cp))
+					cp++;
+			}
+			if ('{' == *cp) {
+				++cp;
+				if (0 == parseConstantsFromHashRef(cp, name, package)) {
+					vStringClear(name);
+					continue;
+				} else
+					goto END_MAIN_WHILE;
+			}
 			kind = K_CONSTANT;
-			spaceRequired = TRUE;
+			spaceRequired = FALSE;
 			qualified = TRUE;
 		}
 		else if (strncmp((const char*) cp, "package", (size_t) 7) == 0)
@@ -238,7 +357,7 @@ static void findPerlTags (void)
 				vStringClear (package);
 			while (isspace (*cp))
 				cp++;
-			while ((int) *cp != ';'  &&  !isspace ((int) *cp))
+			while (*cp && (int) *cp != ';'  &&  !isspace ((int) *cp))
 			{
 				vStringPut (package, (int) *cp);
 				cp++;

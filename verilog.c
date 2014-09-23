@@ -29,7 +29,7 @@
 #include "keyword.h"
 #include "parse.h"
 #include "read.h"
-#include "vstring.h"
+#include "routines.h"
 
 /*
  *   DATA DECLARATIONS
@@ -52,6 +52,12 @@ typedef struct {
 	const char *keyword;
 	verilogKind kind;
 } keywordAssoc;
+
+typedef struct sTokenInfo {
+	verilogKind         kind;
+	vString*            name;          /* the name of the token */
+	struct sTokenInfo*  scope;         /* context of keyword */
+} tokenInfo;
 
 /*
  *   DATA DEFINITIONS
@@ -100,9 +106,47 @@ static keywordAssoc VerilogKeywordTable [] = {
 	{ "wor",       K_NET }
 };
 
+tokenInfo *currentContext = NULL;
+
 /*
  *   FUNCTION DEFINITIONS
  */
+
+static tokenInfo *newToken (void)
+{
+	tokenInfo *const token = xMalloc (1, tokenInfo);
+	token->kind = K_UNDEFINED;
+	token->name = vStringNew ();
+	token->scope = NULL;
+	return token;
+}
+
+static void deleteToken (tokenInfo * const token)
+{
+	if (token != NULL)
+	{
+		vStringDelete (token->name);
+		eFree (token);
+	}
+}
+
+static tokenInfo *pushToken (tokenInfo * const token, tokenInfo * const tokenPush)
+{
+	tokenPush->scope = token;
+	return tokenPush;
+}
+
+static tokenInfo *popToken (tokenInfo * const token)
+{
+	tokenInfo *localToken;
+	if (token != NULL)
+	{
+		localToken = token->scope;
+		deleteToken (token);
+		return localToken;
+	}
+	return NULL;
+}
 
 static void initialize (const langType language)
 {
@@ -208,12 +252,41 @@ static boolean readIdentifier (vString *const name, int c)
 		vUngetc (c);
 		vStringTerminate (name);
 	}
-	return (boolean)(name->length > 0);
+	return (boolean)(vStringLength (name) > 0);
+}
+
+static vString *genContext ()
+{
+	vString *context, *catNames;
+	tokenInfo *current;
+	if (currentContext)
+	{
+		context = vStringNew ();
+		vStringCopy (context, currentContext->name);
+		current = currentContext->scope;
+		while (current) {
+			catNames = vStringNew ();
+
+			vStringCopy (catNames, current->name);
+			vStringCatS (catNames, ".");
+			vStringCat (catNames, context);
+			vStringCopy (context, catNames);
+
+			current = current->scope;
+			vStringDelete (catNames);
+		}
+		return context;
+	}
+	else
+		return NULL;
 }
 
 static void tagNameList (const verilogKind kind, int c)
 {
 	vString *name = vStringNew ();
+	vString *scopedName;
+	verilogKind localKind;
+	tagEntryInfo tag;
 	boolean repeat;
 	Assert (isIdentifierCharacter (c));
 	do
@@ -222,7 +295,35 @@ static void tagNameList (const verilogKind kind, int c)
 		if (isIdentifierCharacter (c))
 		{
 			readIdentifier (name, c);
-			makeSimpleTag (name, VerilogKinds, kind);
+			/* Check if "name" is in fact a keyword */
+			localKind = (verilogKind) lookupKeyword (vStringValue (name), getSourceLanguage () );
+			if (kind != K_PORT || localKind == K_UNDEFINED)
+			{
+				initTagEntry (&tag, vStringValue (name));
+				tag.kindName    = VerilogKinds[kind].name;
+				tag.kind        = VerilogKinds[kind].letter;
+				if (kind != K_MODULE && currentContext)
+				{
+					tag.extensionFields.scope [0] = VerilogKinds[currentContext->kind].name;
+					tag.extensionFields.scope [1] = vStringValue (currentContext->name);
+				}
+				makeTagEntry (&tag);
+				if (kind == K_MODULE || kind == K_FUNCTION || kind == K_TASK)
+				{
+					tokenInfo *newScope = newToken ();
+					vString *contextName;
+					vStringCopy (newScope->name, name);
+					newScope->kind = kind;
+					currentContext = pushToken (currentContext, newScope);
+					contextName = genContext ();
+					vStringCopy (currentContext->name, contextName);
+					vStringDelete (contextName);
+				}
+			}
+			else
+			{
+				repeat = TRUE;
+			}
 		}
 		else
 			break;
@@ -247,8 +348,6 @@ static void tagNameList (const verilogKind kind, int c)
 			c = skipWhite (vGetc ());
 			repeat = TRUE;
 		}
-		else
-			repeat = FALSE;
 	} while (repeat);
 	vStringDelete (name);
 	vUngetc (c);
@@ -256,6 +355,18 @@ static void tagNameList (const verilogKind kind, int c)
 
 static void findTag (vString *const name)
 {
+	/* Search for end of current context to drop respective context */
+	if (currentContext)
+	{
+		vString *endTokenName = vStringNewInit("end");
+		vStringCatS (endTokenName, VerilogKinds[currentContext->kind].name);
+		if (strcmp (vStringValue (name), vStringValue (endTokenName)) == 0)
+		{
+			currentContext = popToken (currentContext);
+		}
+		vStringDelete(endTokenName);
+	}
+
 	const verilogKind kind = (verilogKind) lookupKeyword (vStringValue (name), Lang_verilog);
 	if (kind == K_CONSTANT && vStringItem (name, 0) == '`')
 	{
@@ -308,6 +419,7 @@ static void findVerilogTags (void)
 		switch (c)
 		{
 			case ';':
+			case '(':
 			case '\n':
 				newStatement = TRUE;
 				break;
@@ -323,7 +435,10 @@ static void findVerilogTags (void)
 				break;
 		}
 	}
+
 	vStringDelete (name);
+	deleteToken (currentContext);
+	currentContext = NULL;
 }
 
 extern parserDefinition* VerilogParser (void)

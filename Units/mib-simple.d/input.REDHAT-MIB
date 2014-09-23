@@ -1,0 +1,36 @@
+REDHAT-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises				FROM SNMPv2-SMI
+	MODULE-IDENTITY				FROM SNMPv2-SMI;
+
+redhat MODULE-IDENTITY
+    LAST-UPDATED "201005100000Z"
+    ORGANIZATION "Red Hat, Inc (www.redhat.com)"
+    CONTACT-INFO "postal:   Red Hat, Inc
+		   	    1801 Varsity Drive
+			    Raleigh, North Carolina 27606
+			    USA
+
+		  email:    customerservice@redhat.com
+                 "
+    DESCRIPTION  "Red Hat, Inc MIB
+		 "
+    REVISION     "201005100000Z"
+    DESCRIPTION  "Update to fix smilint isuses"
+    REVISION     "200512060000Z"            -- Dec 06 2005, midnight
+    DESCRIPTION  "Initial version.
+		 "
+    ::= { enterprises 2312 }
+
+
+
+-- 4 	Red Hat OS Development
+-- 5 	Red Hat IS/IT
+-- 6 	Red Hat Directory Server
+-- 7 	Red Hat Network
+-- 8    Red Hat Cluster Suite
+
+
+END

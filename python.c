@@ -135,14 +135,14 @@ static boolean isIdentifierCharacter (int c)
  * extract all relevant information and create a tag.
  */
 static void makeFunctionTag (vString *const function,
-	vString *const parent, int is_class_parent, const char *arglist __unused__)
+	vString *const parent, int is_class_parent, const char *arglist)
 {
 	tagEntryInfo tag;
 	initTagEntry (&tag, vStringValue (function));
 
 	tag.kindName = "function";
 	tag.kind = 'f';
-	/* tag.extensionFields.arglist = arglist; */
+	tag.extensionFields.signature = arglist;
 
 	if (vStringLength (parent) > 0)
 	{
@@ -394,6 +394,8 @@ static char *parseArglist(const char *buf)
 {
 	char *start, *end;
 	int level;
+	char *arglist, *from, *to;
+	int len;
 	if (NULL == buf)
 		return NULL;
 	if (NULL == (start = strchr(buf, '(')))
@@ -408,7 +410,20 @@ static char *parseArglist(const char *buf)
 			-- level;
 	}
 	*end = '\0';
-	return strdup(start);
+
+	len = strlen(start) + 1;
+	arglist = eMalloc(len);
+	from = start;
+	to = arglist;
+	while (*from != '\0') {
+		if (*from == '\t')
+			; /* tabs are illegal in field values */
+		else
+			*to++ = *from;
+		++from;
+	}
+	*to = '\0';
+	return arglist;
 }
 
 static void parseFunction (const char *cp, vString *const def,
@@ -839,11 +854,15 @@ static void findPythonTags (void)
 
 extern parserDefinition *PythonParser (void)
 {
-    static const char *const extensions[] = { "py", "pyx", "pxd", "pxi" ,"scons", NULL };
+        static const char *const extensions[] = { "py", "pyx", "pxd", "pxi" ,"scons",
+					      NULL };
+	static const char *const aliases[] = { "python[23]*", "scons",
+					      NULL };
 	parserDefinition *def = parserNew ("Python");
 	def->kinds = PythonKinds;
 	def->kindCount = KIND_COUNT (PythonKinds);
 	def->extensions = extensions;
+	def->aliases = aliases;
 	def->parser = findPythonTags;
 	return def;
 }

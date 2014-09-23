@@ -527,7 +527,7 @@ extern char *readLine (vString *const vLine, FILE *const fp)
 				eol = vStringValue (vLine) + vStringLength (vLine) - 1;
 				if (*eol == '\r')
 					*eol = '\n';
-				else if (*(eol - 1) == '\r'  &&  *eol == '\n')
+				else if (vStringLength (vLine) != 1 && *(eol - 1) == '\r'  &&  *eol == '\n')
 				{
 					*(eol - 1) = '\n';
 					*eol = '\0';
@@ -556,6 +556,48 @@ extern char *readSourceLine (
 	if (result == NULL)
 		error (FATAL, "Unexpected end of file: %s", vStringValue (File.name));
 	fsetpos (File.fp, &orignalPosition);
+
+	return result;
+}
+
+/*
+ *   Similar to readLine but this doesn't use fgetpos/fsetpos.
+ *   Useful for reading from pipe.
+ */
+
+char* readLineWithNoSeek (vString* const vline, FILE *const pp)
+{
+	int c;
+	boolean nlcr;
+	char *result = NULL;
+
+	vStringClear (vline);
+	nlcr = FALSE;
+	
+	while (1)
+	{
+		c = fgetc (pp);
+		
+		if (c == EOF)
+		{
+			if (! feof (pp))
+				error (FATAL | PERROR, "Failure on attempt to read file");
+			else
+				break;
+		}
+
+		result = vStringValue (vline);
+		
+		if (c == '\n' || c == '\r')
+			nlcr = TRUE;
+		else if (nlcr)
+		{
+			ungetc (c, pp);
+			break;
+		}
+		else
+			vStringPut (vline, c);
+	}
 
 	return result;
 }

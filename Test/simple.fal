@@ -1,0 +1,36 @@
+#!/usr/bin/env falcon
+
+/* 
+ * COMMENT
+ */
+
+import from socket
+
+const CONSTANT = "1"
+
+test = "
+This is a multi-line\n\n
+string"
+
+// If statement
+if test.len < 1 
+    > 'ERROR'
+end
+
+// Import statement
+load regex
+
+// Simple variables
+string_var = "falcon string"
+number_var = 8192
+
+// Function
+function test_func( parameter )
+   printl( "Hello ", parameter )
+end
+ 
+// Function call
+do_something( "world" ) 
+
+/* vim: set sw=4 sts=4 : */
+

@@ -1,0 +1,4 @@
+#
+# Taken from https://github.com/fishman/dot_files/blob/master/ctags/.ctags
+#
+--regex-coffee=/^[ \t]*([a-zA-Z_$@][0-9a-zA-Z_$\.]*)[ \t]*=[^->\n]*$/\1/v,variable/

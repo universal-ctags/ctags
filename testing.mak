@@ -8,18 +8,50 @@
 CTAGS_TEST = ./ctags
 CTAGS_REF = ./ctags.ref
 TEST_OPTIONS = -nu --c-kinds=+lpx
+FUZZ_TIMEOUT=10
+# You can specify one of language listed in $(./ctags --list-languages).
+FUZZ_LANGUAGE=
+FUZZ_SRC_DIRS=
 
-DIFF_OPTIONS = -U 0 -I '^!_TAG'
-DIFF = if diff $(DIFF_OPTIONS) tags.ref tags.test > $(DIFF_FILE); then \
-		rm -f tags.ref tags.test $(DIFF_FILE) ; \
+DIFF_OPTIONS = -U 0 -I '^!_TAG' --strip-trailing-cr
+DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
+DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
+		rm -f $1 $2 $3 $4; \
 		echo "Passed" ; \
+		true ; \
 	  else \
-		echo "FAILED: differences left in $(DIFF_FILE)" ; \
+		echo "FAILED: differences left in $3" ; \
+		false ; \
 	  fi
 
-.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux
+CHECK_FEATURES = (\
+	while read; do \
+		found=no; \
+		for f in $$( $(CTAGS_TEST) --list-features); do \
+			if test "$$REPLY" = "$$f"; then found=yes; fi; \
+		done; \
+		if ! test $$found = yes; then \
+			echo "Skip (required feature $$REPLY is not available)"; \
+			exit 1; \
+		fi; \
+	done < $1; \
+	exit 0; \
+)
+#
+# Run unit test s under valgrind:
+#
+# 	$ make -f testing.mak VG=1 test.units
+#
+VALGRIND_COMMAND       = valgrind
+VALGRIND_OPTIONS       = --quiet --leak-check=full --show-leak-kinds=all
+VALGRIND_EXTRA_OPTIONS =
+ifdef VG
+VALGRIND = $(VALGRIND_COMMAND) $(VALGRIND_OPTIONS) $(VALGRIND_EXTRA_OPTIONS)
+endif
 
-test: test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux
+.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units fuzz
+
+test: test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units
 
 test.%: DIFF_FILE = $@.diff
 
@@ -33,7 +65,7 @@ test.include: $(CTAGS_TEST) $(CTAGS_REF)
 
 REF_FIELD_OPTIONS = $(TEST_OPTIONS) --fields=+afmikKlnsSz
 TEST_FIELD_OPTIONS = $(TEST_OPTIONS) --fields=+afmikKlnsStz
-test.fields: $(CTAGS_TEST) $(CTAGS_REF)
+FEAtest.fields: $(CTAGS_TEST) $(CTAGS_REF)
 	@ echo -n "Testing extension fields..."
 	@ $(CTAGS_REF) -R $(REF_FIELD_OPTIONS) -o tags.ref Test
 	@ $(CTAGS_TEST) -R $(TEST_FIELD_OPTIONS) -o tags.test Test
@@ -65,7 +97,7 @@ test.etags: $(CTAGS_TEST) $(CTAGS_REF)
 
 REF_EIFFEL_OPTIONS = $(TEST_OPTIONS) --format=1 --languages=eiffel
 TEST_EIFFEL_OPTIONS = $(TEST_OPTIONS) --format=1 --languages=eiffel
-EIFFEL_DIRECTORY = $(ISE_EIFFEL)/library
+EIFFEL_DIRECTORY = $(ISE_EIFFEL)/library/base
 HAVE_EIFFEL := $(shell ls -dtr $(EIFFEL_DIRECTORY) 2>/dev/null)
 ifeq ($(HAVE_EIFFEL),)
 test.eiffel:
@@ -93,9 +125,85 @@ test.linux: $(CTAGS_TEST) $(CTAGS_REF)
 	@- $(DIFF)
 endif
 
-TEST_ARTIFACTS = test.*.diff tags.ref tags.test
 
+UNITS_ARTIFACTS=Units/*.d/EXPECTED.TMP Units/*.d/OUTPUT.TMP Units/*.d/DIFF.TMP
+test.units: $(CTAGS_TEST)
+	@ \
+	success=true; \
+	for input in Units/*.d/input.*; do \
+		t=$${input%/input.*}; \
+		name=$${t%.d}; \
+		\
+		expected="$$t"/expected.tags; \
+		expectedtmp="$$t"/EXPECTED.TMP; \
+		args="$$t"/args.ctags; \
+		filter="$$t"/filter; \
+		output="$$t"/OUTPUT.TMP; \
+		diff="$$t"/DIFF.TMP; \
+		stderr="$$t"/STDERR.TMP; \
+		features="$$t"/features; \
+		\
+		echo -n "Testing $${name}..."; \
+		\
+		if test -e "$$features"; then \
+			if ! $(call CHECK_FEATURES, "$$features"); then \
+				continue; \
+			fi; \
+		fi; \
+		$(VALGRIND) $(CTAGS_TEST) --options=NONE --data-dir=Data --data-dir=+$$t -o - \
+		$$(test -f "$${args}" && echo "--options=$${args}") \
+		"$$input" 2> "$$stderr" | \
+		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
+		cp "$$expected" "$$expectedtmp"; \
+		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff","$$stderr"); \
+		test $$? -eq 0 || success=false; \
+	done; \
+	$$success
+
+TEST_ARTIFACTS = test.*.diff tags.ref ctags.ref.exe tags.test $(UNITS_ARTIFACTS)
 clean-test:
 	rm -f $(TEST_ARTIFACTS)
 
+#
+# FUZZ Target
+#
+HAVE_TIMEOUT := $(shell which timeout 2>/dev/null)
+HAVE_FIND    := $(shell which find 2>/dev/null)
+ifeq ($(HAVE_TIMEOUT),)
+fuzz:
+	@ echo "No timeout command of GNU coreutils found"
+else ifeq ($(HAVE_FIND),)
+fuzz:
+	@ echo "No timeout command of find found"
+else
+
+define run-ctags
+	if ! timeout -s INT $(FUZZ_TIMEOUT) \
+		$(CTAGS_TEST) --language-force=$1 -o - $2 \
+		> /dev/null 2>&1; then \
+		echo Fuzz testing failure: lang: $1 input: $2; \
+	fi
+endef
+
+fuzz: $(CTAGS_TEST)
+	@ \
+	for lang in $$($(CTAGS_TEST) --list-languages); do \
+		if test -z "$(FUZZ_LANGUAGE)" || test "$(FUZZ_LANGUAGE)" = "$${lang}"; then \
+			echo "Fuzz-testing: $${lang}"; \
+			for input in Test/* Units/*.d/input.*; do \
+				$(call run-ctags,"$${lang}","$${input}"); \
+			done; \
+			for d in $(FUZZ_SRC_DIRS); do \
+				find "$$d" -type f \
+				| while read input; do \
+					$(call run-ctags,"$${lang}","$${input}"); \
+				done; \
+			done; \
+		fi ; \
+	done
+endif
+
+# Local Variables:
+# Mode: makefile
+# End:
 # vi:ts=4 sw=4

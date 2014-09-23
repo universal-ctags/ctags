@@ -3,11 +3,12 @@
 # Shared macros
 
 HEADERS = \
-	args.h ctags.h debug.h entry.h general.h get.h keyword.h \
+	args.h ctags.h debug.h entry.h flags.h general.h get.h keyword.h \
 	main.h options.h parse.h parsers.h read.h routines.h sort.h \
-	strlist.h vstring.h
+	strlist.h trash.h vstring.h
 
 SOURCES = \
+	ada.c \
 	args.c \
 	ant.c \
 	asm.c \
@@ -22,9 +23,12 @@ SOURCES = \
 	eiffel.c \
 	entry.c \
 	erlang.c \
+	falcon.c \
+	flags.c \
 	flex.c \
 	fortran.c \
 	get.c \
+	go.c \
 	html.c \
 	jscript.c \
 	keyword.c \
@@ -55,9 +59,12 @@ SOURCES = \
 	strlist.c \
 	tcl.c \
 	tex.c \
+	tg.c \
+	trash.c \
 	verilog.c \
 	vhdl.c \
 	vim.c \
+	windres.c \
 	yacc.c \
 	vstring.c
 
@@ -71,7 +78,12 @@ REGEX_SOURCES = gnu_regex/regex.c
 
 REGEX_HEADERS = gnu_regex/regex.h
 
+FNMATCH_SOURCES = fnmatch/fnmatch.c
+
+FNMATCH_HEADERS = fnmatch/fnmatch.h
+
 OBJECTS = \
+	ada.$(OBJEXT) \
 	args.$(OBJEXT) \
 	ant.$(OBJEXT) \
 	asm.$(OBJEXT) \
@@ -86,9 +98,12 @@ OBJECTS = \
 	eiffel.$(OBJEXT) \
 	entry.$(OBJEXT) \
 	erlang.$(OBJEXT) \
+	falcon.$(OBJEXT) \
+	flags.$(OBJEXT) \
 	flex.$(OBJEXT) \
 	fortran.$(OBJEXT) \
 	get.$(OBJEXT) \
+	go.$(OBJEXT) \
 	html.$(OBJEXT) \
 	jscript.$(OBJEXT) \
 	keyword.$(OBJEXT) \
@@ -119,8 +134,11 @@ OBJECTS = \
 	strlist.$(OBJEXT) \
 	tcl.$(OBJEXT) \
 	tex.$(OBJEXT) \
+	tg.$(OBJEXT) \
+	trash.$(OBJEXT) \
 	verilog.$(OBJEXT) \
 	vhdl.$(OBJEXT) \
 	vim.$(OBJEXT) \
+	windres.$(OBJEXT) \
 	yacc.$(OBJEXT) \
 	vstring.$(OBJEXT)

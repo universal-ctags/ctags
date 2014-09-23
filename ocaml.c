@@ -1311,7 +1311,7 @@ static void mayRedeclare (vString * const ident, ocaToken what)
 	switch (what)
 	{
     case OcaKEYWORD_value:
-        // let globalScope handle it
+        /* let globalScope handle it */
         globalScope (ident, what);
         break;
 
@@ -1732,8 +1732,14 @@ static void localScope (vString * const ident, ocaToken what)
 		break;
 
 	case OcaKEYWORD_and:
-		popLastNamed ();
-		toDoNext = &localLet;
+		popSoftContext ();
+		if (toDoNext != &mayRedeclare)
+			toDoNext(ident, what);
+		else
+		{
+			pushEmptyContext(localScope);
+			toDoNext = &localLet;
+		}
 		break;
 
 	case OcaKEYWORD_else:
@@ -1881,10 +1887,13 @@ static void ocamlInitialize (const langType language)
 extern parserDefinition *OcamlParser (void)
 {
 	static const char *const extensions[] = { "ml", "mli", NULL };
+	static const char *const aliases[] = { "tuareg", /* mode name of emacs */
+					       NULL };
 	parserDefinition *def = parserNew ("OCaml");
 	def->kinds = OcamlKinds;
 	def->kindCount = KIND_COUNT (OcamlKinds);
 	def->extensions = extensions;
+	def->aliases = aliases;
 	def->parser = findOcamlTags;
 	def->initialize = ocamlInitialize;
 

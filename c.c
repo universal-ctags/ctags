@@ -149,6 +149,7 @@ typedef enum eDeclaration {
 	DECL_STRUCT,
 	DECL_TASK,           /* Vera task */
 	DECL_UNION,
+	DECL_USING,
 	DECL_COUNT
 } declType;
 
@@ -1274,6 +1275,8 @@ static void qualifyVariableTag (const statementInfo *const st,
 				TAG_EVENT);
 	else if (st->declaration == DECL_PACKAGE)
 		makeTag (nameToken, st, FALSE, TAG_PACKAGE);
+	else if (st->declaration == DECL_USING && st->assignment)
+		makeTag (nameToken, st, TRUE, TAG_TYPEDEF);
 	else if (isValidTypeSpecifier (st->declaration))
 	{
 		if (st->notVariable)
@@ -1757,7 +1760,7 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_THROWS:    discardTypeList (token);                break;
 		case KEYWORD_UNION:     st->declaration = DECL_UNION;           break;
 		case KEYWORD_UNSIGNED:  st->declaration = DECL_BASE;            break;
-		case KEYWORD_USING:     skipStatement (st);                     break;
+		case KEYWORD_USING:     st->declaration = DECL_USING;           break;
 		case KEYWORD_VOID:      st->declaration = DECL_BASE;            break;
 		case KEYWORD_VOLATILE:  st->declaration = DECL_BASE;            break;
 		case KEYWORD_VIRTUAL:   st->implementation = IMP_VIRTUAL;       break;
@@ -2121,6 +2124,9 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 
 		switch (c)
 		{
+			case '^':
+				break;
+
 			case '&':
 			case '*':
 				info->isPointer = TRUE;
@@ -2896,10 +2902,12 @@ extern parserDefinition* CppParser (void)
 extern parserDefinition* CsharpParser (void)
 {
 	static const char *const extensions [] = { "cs", NULL };
+	static const char *const aliases [] = { "csharp", NULL };
 	parserDefinition* def = parserNew ("C#");
 	def->kinds      = CsharpKinds;
 	def->kindCount  = KIND_COUNT (CsharpKinds);
 	def->extensions = extensions;
+	def->aliases    = aliases;
 	def->parser2    = findCTags;
 	def->initialize = initializeCsharpParser;
 	return def;

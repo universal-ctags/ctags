@@ -680,7 +680,7 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 {
 	int length;
 
-	if (tag->isFileEntry)
+	if (tag->isFileEntry || (tag->lineNumberEntry && (tag->lineNumber == 1)))
 		length = fprintf (TagFile.etags.fp, "\177%s\001%lu,0\n",
 				tag->name, tag->lineNumber);
 	else
@@ -797,6 +797,8 @@ static int writeCtagsEntry (const tagEntryInfo *const tag)
 
 	if (tag->lineNumberEntry)
 		length += writeLineNumberEntry (tag);
+	else if (tag->pattern)
+		length += fprintf(TagFile.fp, tag->pattern);
 	else
 		length += writePatternEntry (tag);
 
@@ -836,13 +838,26 @@ extern void makeTagEntry (const tagEntryInfo *const tag)
 
 extern void initTagEntry (tagEntryInfo *const e, const char *const name)
 {
+	initTagEntryFull(e, name,
+			 getSourceLineNumber (),
+			 getSourceLanguageName (),
+			 getInputFilePosition (),
+			 getSourceFileTagPath ());
+}
+
+extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
+			      unsigned long lineNumber,
+			      const char* language,
+			      fpos_t      filePosition,
+			      const char *sourceFileName)
+{
 	Assert (File.source.name != NULL);
 	memset (e, 0, sizeof (tagEntryInfo));
 	e->lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
-	e->lineNumber      = getSourceLineNumber ();
-	e->language        = getSourceLanguageName ();
-	e->filePosition    = getInputFilePosition ();
-	e->sourceFileName  = getSourceFileTagPath ();
+	e->lineNumber      = lineNumber;
+	e->language        = language;
+	e->filePosition    = filePosition;
+	e->sourceFileName  = sourceFileName;
 	e->name            = name;
 }
 
