@@ -217,7 +217,6 @@ nominateLanguageCandidatesForPattern(const char *const baseName, parserCandidate
 	return count;
 }
 
-#ifdef SYS_INTERPRETER
 static vString* extracEmacsModeAtFirstLine(FILE* input);
 
 /*  The name of the language interpreter, either directly or as the argument
@@ -268,8 +267,6 @@ static vString* extractInterpreter (FILE* input)
 	vStringDelete (vLine);
 	return interpreter;
 }
-
-#endif
 
 static vString* determineEmacsModeAtFirstLine (const char* const line)
 {
@@ -621,7 +618,6 @@ extern langType getFileLanguage (const char *const fileName)
 		}
 		rewind(input);
 
-#ifdef SYS_INTERPRETER
 		if (language == LANG_IGNORE && (spec = extractInterpreter (input)))
 		{
 			verbose ("	interpreter: %s\n", vStringValue (spec));
@@ -629,7 +625,6 @@ extern langType getFileLanguage (const char *const fileName)
 			vStringDelete (spec);
 		}
 		rewind(input);
-#endif
 
 		if (language == LANG_IGNORE && (spec = extractEmacsModeLanguageAtEOF (input)))
 		{

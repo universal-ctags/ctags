@@ -46,9 +46,6 @@ AH_VERBATIM([DEFAULT_FILE_FORMAT], [
  */
 #define DEFAULT_FILE_FORMAT	2
 ])
-AH_TEMPLATE([SYS_INTERPRETER],
-	[Define this label if your system supports starting scripts with a line of
-	the form "#! /bin/sh" to select the interpreter to use for the script.])
 AH_TEMPLATE([CASE_INSENSITIVE_FILENAMES],
 	[Define this label if your system uses case-insensitive file names])
 AH_VERBATIM([EXTERNAL_SORT], [
