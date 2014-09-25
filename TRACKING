@@ -200,7 +200,8 @@ http://pkgs.fedoraproject.org/cgit/ctags.git/tree/ctags.spec
 
 (ctags-5.7-segment-fault.patch)
 
-	Not inspected well yet.
+	Not in fishman tree.
+	This must be merged.	
 
 (ctags-5.8-cssparse.patch)
 

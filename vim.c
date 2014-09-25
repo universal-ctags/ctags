@@ -342,7 +342,7 @@ static boolean parseCommand (const unsigned char *line)
 	 */
 	const unsigned char *cp = line;
 
-	if ( (int) *cp == '\\' ) 
+	if ( cp && ( (int) *cp == '\\' ) ) 
 	{
 		/*
 		 * We are recursively calling this function is the command
@@ -364,9 +364,10 @@ static boolean parseCommand (const unsigned char *line)
 		while (*cp && isspace ((int) *cp))
 			++cp; 
 	}
-	else if ( (!strncmp ((const char*) line, "comp", (size_t) 4) == 0) && 
-		     (!strncmp ((const char*) line, "comc", (size_t) 4) == 0) && 
-				(strncmp ((const char*) line, "com", (size_t) 3) == 0) )
+	else if ( line && 
+                     (!strncmp ((const char*) line, "comp", (size_t) 4) == 0) && 
+		                (!strncmp ((const char*) line, "comc", (size_t) 4) == 0) && 
+				          (strncmp ((const char*) line, "com", (size_t) 3) == 0) )
 	{
 		cp += 2;
 		if ((int) *++cp == 'm' && (int) *++cp == 'a' &&
@@ -419,9 +420,15 @@ static boolean parseCommand (const unsigned char *line)
 			while (*cp && !isspace ((int) *cp))
 				++cp; 
 		}
-		else
-			break;
-	} while ( *cp );
+		else if (!isalnum ((int) *cp))
+		{
+			/*
+			 * Broken syntax: throw away this line
+			 */
+			cmdProcessed = TRUE;
+			goto cleanUp;
+		}
+	} while ( *cp &&  !isalnum ((int) *cp) );
 
 	if ( ! *cp )
 	{
