@@ -252,6 +252,41 @@ static int skipPastMatch (const char *const pair)
 	return vGetc ();
 }
 
+static void skipToEOL ()
+{
+	volatile int c;
+	do
+	{
+		c = vGetc ();
+	} while (c != '\n');
+}
+
+static void skipComments (int c)
+{
+	volatile int p;
+
+	if (c == '/')
+	{
+		c = vGetc ();
+		if (c == '/')
+		{
+			skipToEOL ();
+		}
+		else if (c == '*')
+		{
+			do
+			{
+				p = c;
+				c = vGetc ();
+			} while (p != '*' && c != '/');
+		}
+		else
+		{
+			vUngetc (c);
+		}
+	}
+}
+
 static boolean readIdentifier (vString *const name, int c)
 {
 	vStringClear (name);
@@ -426,7 +461,6 @@ static void findTag (vString *const name)
 static void findVerilogTags (void)
 {
 	vString *const name = vStringNew ();
-	volatile boolean newStatement = TRUE;
 	volatile int c = '\0';
 	exception_t exception = (exception_t) setjmp (Exception);
 
@@ -435,21 +469,16 @@ static void findVerilogTags (void)
 		c = vGetc ();
 		switch (c)
 		{
-			case ';':
-			case '(':
-			case '\n':
-				newStatement = TRUE;
+			case '/':
+				skipComments (c);
 				break;
-
-			case ' ':
-			case '\t':
-				break;
-
-			default:
-				if (newStatement && readIdentifier (name, c))
+			default :
+				c = skipWhite (c);
+				if (isIdentifierCharacter (c))
+				{
+					readIdentifier (name, c);
 					findTag (name);
-				newStatement = FALSE;
-				break;
+				}
 		}
 	}
 
