@@ -45,7 +45,8 @@ typedef enum {
 	K_NET,
 	K_PORT,
 	K_REGISTER,
-	K_TASK
+	K_TASK,
+	K_BLOCK
 } verilogKind;
 
 typedef struct {
@@ -57,6 +58,7 @@ typedef struct sTokenInfo {
 	verilogKind         kind;
 	vString*            name;          /* the name of the token */
 	struct sTokenInfo*  scope;         /* context of keyword */
+	int                 nestLevel;     /* Current nest level */
 } tokenInfo;
 
 /*
@@ -74,7 +76,8 @@ static kindOption VerilogKinds [] = {
  { TRUE, 'n', "net",       "net data types" },
  { TRUE, 'p', "port",      "ports" },
  { TRUE, 'r', "register",  "register data types" },
- { TRUE, 't', "task",      "tasks" }
+ { TRUE, 't', "task",      "tasks" },
+ { TRUE, 'b', "block",     "blocks" }
 };
 
 static keywordAssoc VerilogKeywordTable [] = {
@@ -103,7 +106,9 @@ static keywordAssoc VerilogKeywordTable [] = {
 	{ "trireg",    K_NET },
 	{ "wand",      K_NET },
 	{ "wire",      K_NET },
-	{ "wor",       K_NET }
+	{ "wor",       K_NET },
+	{ "begin",     K_BLOCK },
+	{ "end",       K_BLOCK }
 };
 
 tokenInfo *currentContext = NULL;
@@ -119,6 +124,7 @@ static short isContainer (verilogKind kind)
 		case K_MODULE:
 		case K_TASK:
 		case K_FUNCTION:
+		case K_BLOCK:
 			return TRUE;
 		default:
 			return FALSE;
@@ -131,6 +137,7 @@ static tokenInfo *newToken (void)
 	token->kind = K_UNDEFINED;
 	token->name = vStringNew ();
 	token->scope = NULL;
+	token->nestLevel = 0;
 	return token;
 }
 
@@ -350,6 +357,57 @@ static void createTag (const verilogKind kind, vString *name)
 	}
 }
 
+static boolean findBlockName (vString *const name)
+{
+	int c;
+
+	c = skipWhite (vGetc ());
+	if (c == ':')
+	{
+		c = skipWhite (vGetc ());
+		readIdentifier (name, c);
+		return (boolean) (vStringLength (name) > 0);
+	}
+	else
+		vUngetc (c);
+	return FALSE;
+}
+
+static void processBlock (vString *const name, const verilogKind kind)
+{
+	boolean blockStart = FALSE;
+	boolean blockEnd   = FALSE;
+
+	if (currentContext)
+	{
+		if (strcmp (vStringValue (name), "begin") == 0)
+		{
+			currentContext->nestLevel++;
+			blockStart = TRUE;
+		}
+		if (strcmp (vStringValue (name), "end") == 0)
+		{
+			currentContext->nestLevel--;
+			blockEnd = TRUE;
+		}
+	}
+
+	if (findBlockName (name))
+	{
+		verbose ("Found block: %s\n", vStringValue (name));
+		if (blockStart)
+		{
+			createTag (kind, name);
+			verbose ("Current context %s\n", vStringValue (currentContext->name));
+		}
+		if (blockEnd && currentContext->kind == K_BLOCK && currentContext->nestLevel <= 1)
+		{
+			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
+			currentContext = popToken (currentContext);
+		}
+	}
+}
+
 static void tagNameList (const verilogKind kind, int c)
 {
 	vString *name = vStringNew ();
@@ -411,11 +469,19 @@ static void findTag (vString *const name)
 	if (currentContext)
 	{
 		vString *endTokenName = vStringNewInit("end");
-		vStringCatS (endTokenName, VerilogKinds[currentContext->kind].name);
-		if (strcmp (vStringValue (name), vStringValue (endTokenName)) == 0)
+		if (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0 && strcmp (vStringValue (name), vStringValue (endTokenName)) == 0)
 		{
 			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
 			currentContext = popToken (currentContext);
+		}
+		else
+		{
+			vStringCatS (endTokenName, VerilogKinds[currentContext->kind].name);
+			if (strcmp (vStringValue (name), vStringValue (endTokenName)) == 0)
+			{
+				verbose ("Dropping context %s\n", vStringValue (currentContext->name));
+				currentContext = popToken (currentContext);
+			}
 		}
 		vStringDelete(endTokenName);
 	}
@@ -431,6 +497,11 @@ static void findTag (vString *const name)
 			c = vGetc();
 		} while (c != '\n');
 		vUngetc (c);
+	}
+	else if (kind == K_BLOCK)
+	{
+		/* Process begin..end blocks */
+		processBlock (name, kind);
 	}
 	else if (kind != K_UNDEFINED)
 	{
