@@ -198,10 +198,11 @@ http://pkgs.fedoraproject.org/cgit/ctags.git/tree/ctags.spec
 	Related to build system.
 	Not inspected well yet.
 
-(ctags-5.7-segment-fault.patch)
+<ctags-5.7-segment-fault.patch>
 
-	Not in fishman tree.
-	This must be merged.	
+	This patch was merged in fishman ctags git tree.
+
+	8cc2b482f6c7257c5151893a6d02b8c79851fedd
 
 (ctags-5.8-cssparse.patch)
 
