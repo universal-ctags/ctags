@@ -292,12 +292,6 @@ else
 	AC_MSG_ERROR($tmpdir does not exist)
 fi
 
-# Check whether system supports #! scripts
-AC_SYS_INTERPRETER
-if test yes = "$interpval"; then
-	AC_DEFINE(SYS_INTERPRETER)
-fi
-
 # Test for case-insensitive filenames
 AC_MSG_CHECKING(for case-insensitive filenames)
 touch conftest.cif
