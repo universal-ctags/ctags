@@ -9,6 +9,9 @@ Some of new features introduced in Perl 5.10+ can be used.
 
 Some patches are merged from Ruby 2.x.
 
+See also the Wiki page:
+https://github.com/k-takata/Onigmo/wiki
+
 
 Main New features:
   Regular Expressions (depends on the syntax):
