@@ -1586,7 +1586,7 @@ static vString* expandOnSearchPathList (searchPathList *pathList, const char* le
 static boolean isDirectory (const char *const dirName)
 {
 	fileStatus *status = eStat (dirName);
-	return status->isDirectory;
+	return status->exists && status->isDirectory;
 }
 
 static vString* expandOnConfigPathList (const char* leaf)
