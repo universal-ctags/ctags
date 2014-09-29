@@ -2325,16 +2325,12 @@ static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const d
 		vString* const path = combinePathAndFile (dirName, dents[i]->d_name);
 		fileStatus *s = eStat (vStringValue (path));
 
-		if (!s)
-			goto next;
-
-		if (s->isDirectory && accept_only_dot_d(dents[i]))
+		if (s->exists && s->isDirectory && accept_only_dot_d(dents[i]))
 			parseAllConfigurationFilesOptionsInDirectory (vStringValue (path));
-		else if (accept_only_dot_ctags(dents[i]))
-			 parseConfigurationFileOptionsInDirectoryWithLeafname (dirName,
-									       dents[i]->d_name);
+		else if (s->exists && accept_only_dot_ctags(dents[i]))
+			parseConfigurationFileOptionsInDirectoryWithLeafname (dirName,
+									      dents[i]->d_name);
 		eStatFree (s);
-	  next:
 		free (dents[i]);
 		vStringDelete(path);
 	}
