@@ -1641,7 +1641,8 @@ static void processOptionFile (
 {
 	const char* path;
 	vString* vpath = NULL;
-	boolean opened_as_file, opened_as_dir;
+	fileStatus *status;
+
 	if (parameter [0] == '\0')
 		error (WARNING, "no option file supplied for \"%s\"", option);
 
@@ -1653,11 +1654,23 @@ static void processOptionFile (
 	else
 		path = parameter;
 
-	opened_as_file = parseFileOptions (path);
-	opened_as_dir  = parseAllConfigurationFilesOptionsInDirectory (path);
-	if ((opened_as_file == FALSE) && (opened_as_dir == FALSE))
-		error (FATAL | PERROR, "cannot open option file \"%s\"", path);
+	status = eStat (path);
+	if (!status->exists)
+	{
+		error (FATAL | PERROR, "cannot stat \"%s\"", path);
+	}
+	else if (status->isDirectory)
+	{
+		if (!parseAllConfigurationFilesOptionsInDirectory (path))
+			error (FATAL | PERROR, "cannot open option directory \"%s\"", path);
+	}
+	else
+	{
+		if (!parseFileOptions (path))
+			error (FATAL | PERROR, "cannot open option file \"%s\"", path);
+	}
 
+	eStatFree (status);
 	if (vpath)
 		vStringDelete (vpath);
 }
