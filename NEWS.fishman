@@ -1,0 +1,159 @@
+Changes in fishamn ctags of common part
+======================================================================
+
+Many changes have been introduced in fishman-ctags. Here I (Masatake
+YAMATO) enumerate the changes mainly in common part. About changes 
+not enumerated here especially in language parsers, inquire git-log.
+
+Proofreadin is welcome!
+
+Importing the most of all changes in exuberant-ctags svn repository
+---------------------------------------------------------------------
+See TRACKING file about the status of importation.
+
+Some changes in Fedora and Debian are also imported.
+
+
+New test facility named "Units"
+---------------------------------------------------------------------
+The existing test facility "Test" checks differences between the
+output of older ctags and newer ctags. If a difference is found, it is
+recognized as failed. "Test" expects older ctags works fine.
+
+This expectation is not always met. Consider you add a new parser for
+a language. You may want to add a sample source code for the language
+to "Test". Older ctags cannot make good tags file for the sample
+code. Newer ctags can make it. In this point a difference is found;
+and "Test" reports failure.
+
+In other hand "Units" compares the expected output which a test
+developer prepares and the output of ./ctags just built.  The expected
+output doesn't depend on ctags. Many part of changes I made is covered
+by "Units". Fore more detail see Units/README.
+
+
+Running tests under valgrind
+---------------------------------------------------------------------
+With the following command line tests can be run under valgrind memory
+checker.
+
+	$ make -f testing.mak VG=1
+
+The most of all memory leaks are fixed already.
+
+
+Semi-fuzz testing
+---------------------------------------------------------------------
+One of the frustrating thing is that ctags enters infinite loop 
+against unexpected input. I wanted detect this kind of bug.
+
+	$ make -f testing.mak fuzz FUZZ_LANGUAGE=LANG
+
+With this command line, you can given all test inputs
+including Test/* and Units/*/input.* to a parser specfied
+with FUZZ_LANGUAGE macro. You can get the list of LANG
+with
+
+	$ ./ctags --list-languages
+
+You can run the target fuzz under VG=1.
+
+
+Automatic parser selection
+---------------------------------------------------------------------
+For suffix .m ctags has two built-in parsers: ObjectiveC and Matlab.
+Which parser ctags should use? Here this situation is called "parser
+confliction".
+
+Like --language-force option ctags provides some ways to choose a
+parser manually. However, it is nice if ctags choose a proper parser
+without manual instruction.
+
+With --<LANG>-corpus=spec:corpusFile option you can prepare corpus a
+file to make ctags learn lexical tendency of a language. Ctags
+learns it as typical input of LANG. Based on the learning ctags
+tries to solve the parser confliction. See Data/configs/mib.ctags
+and Data/corpora/RFC1213-MIB.txt as an example of the usage of 
+--<LANG>-corpus.
+
+About ObjectiveC and Matlab parser, corpus files are embedded in the
+parser implementations. See objc.c and matlab.c.
+
+More documentation is needed.
+  
+
+Modeline based parser selection
+---------------------------------------------------------------------
+exuberant-ctags has ability to choose a proper parser based on shebang
+line(e.g. #!/bin/sh). This feature is extended in fishman-ctags.
+
+Editors like vim and emacs can recognize special patterns in editing
+text file. Here it is called modeline. The pattern in inserted by a
+user of text editor and represents a programming language of the text
+file. With the recognition the editor chooses a mode (in emacs) or a
+syntax (in vim). The editor can change its behavior specializing to a
+programming language based on the mode (or syntax).
+
+fishman-ctags can also recognize the modeline; and choose a language
+parser based on the modeline. 
+
+
+ctags recognizes following patterns used in emacs:
+
+  At the head of input file or at the line next of shebang line:
+
+    -*- mode: MODE; -*- 
+
+    -*- MODE -*-
+
+  At the end of input file:
+
+      Local Variables:
+      ...
+      mode: MODE
+      ...
+      End:
+
+
+ctags recognizes following patterns used in vim:
+
+  At the end of input file:
+
+      vim:set filetype=SYNTAX
+      ex:se ft=SYNTAX
+      
+
+Better parser selection for template files
+---------------------------------------------------------------------
+Consider an input file name foo.c.in.  Suffix '.in' is popular as a
+name for template files.  Welknown one is config.h.in used in GNU
+autotools.
+
+ctags used suffix here '*.in' for choosing a parser. '.in' shows
+nothing about the language used in the input file. When fishman-ctags
+finds '.in' as suffix, fishman-ctags checks the next suffix, here .c.
+
+Option directories
+---------------------------------------------------------------------
+
+TBW
+
+
+exclude flag in regex
+---------------------------------------------------------------------
+
+TBW
+
+
+Long regex flag
+---------------------------------------------------------------------
+
+TBW: regex-flag-long.d
+
+passing parameter for long regex flag
+---------------------------------------------------------------------
+
+External tag engine
+---------------------------------------------------------------------
+
+TBW
