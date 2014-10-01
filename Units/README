@@ -7,7 +7,7 @@ Background
 ------------------------------------------------------------
 
 Exuberant ctags has a test facility. Main aim of the facility is
-detecting regression. All files under Tests directory are given as
+detecting regression. All files under Test directory are given as
 input for old and new version of ctags commands.  The output tags
 files of both versions are compared.
 
@@ -59,6 +59,29 @@ Units/TEST/features [optional]
 
 	All features built-in can be listed with passing
 	--list-features to ctags.
+
+Note for importing a test case from Test directory
+------------------------------------------------------------
+
+I think all test cases under Test directory should be converted to
+Units.
+
+If you convert use following TEST name convention.
+
+* use test- as prefix for the name, and
+* replace "." in the original test name with "-"
+
+Here is an example:
+
+	Test/simple.sh
+
+This should be
+
+	Units/test-simple-sh.d
+
+With this name convention we can track which test case is converted or
+not.
+
 
 Example of files
 ------------------------------------------------------------
