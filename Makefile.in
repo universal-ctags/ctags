@@ -135,7 +135,7 @@ FORCE:
 #
 # install the executables
 #
-install-bin: install-cbin install-ebin install-lib
+install-bin: install-cbin install-ebin install-lib install-cmd
 install-cbin: $(DEST_CTAGS)
 install-ebin: $(DEST_ETAGS)
 install-lib: $(DEST_READ_LIB) $(DEST_READ_INC)
