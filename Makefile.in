@@ -191,7 +191,7 @@ uninstall-lib:
 	- rm -f $(DEST_READ_LIB) $(DEST_READ_INC)
 
 uninstall-cmd:
-	- rm -f $(READ_CMD)
+	- rm -f $(DEST_READ_CMD)
 
 uninstall-man:
 	- rm -f $(DEST_CMAN) $(DEST_EMAN)
