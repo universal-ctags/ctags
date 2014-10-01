@@ -1,4 +1,5 @@
 *~
+test.*.diff
 *.o
 *.od
 *.obj
