@@ -60,7 +60,7 @@ include $(srcdir)/source.mak
 
 VPATH	= $(srcdir)
 
-INSTALL		= cp
+INSTALL		= cp -p
 INSTALL_PROG	= $(INSTALL)
 INSTALL_DATA	= $(INSTALL)
 
@@ -142,7 +142,8 @@ install-lib: $(DEST_READ_LIB) $(DEST_READ_INC)
 install-cmd: $(DEST_READ_CMD)
 
 $(DEST_CTAGS): $(CTAGS_EXEC) $(bindir) FORCE
-	$(INSTALL_PROG) $(CTAGS_EXEC) $@  &&  chmod 755 $@
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(bindir)
+	$(INSTALL_PROG) $(CTAGS_EXEC) $(DESTDIR)$@  &&  chmod 755 $(DESTDIR)$@
 
 $(DEST_ETAGS):
 	- if [ -x $(DEST_CTAGS) ]; then \
@@ -157,7 +158,8 @@ install-cman: $(DEST_CMAN)
 install-eman: $(DEST_EMAN)
 
 $(DEST_CMAN): $(man1dir) $(MANPAGE) FORCE
-	- $(INSTALL_DATA) $(srcdir)/$(MANPAGE) $@  &&  chmod 644 $@
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(man1dir)
+	- $(INSTALL_DATA) $(srcdir)/$(MANPAGE) $(DESTDIR)$@  &&  chmod 644 $(DESTDIR)$@
 
 $(DEST_EMAN):
 	- if [ -f $(DEST_CMAN) ]; then \
@@ -168,9 +170,11 @@ $(DEST_EMAN):
 # install the library
 #
 $(DEST_READ_LIB): $(READ_LIB) $(libdir) FORCE
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(libdir)
 	$(INSTALL_PROG) $(READ_LIB) $@  &&  chmod 644 $@
 
 $(DEST_READ_INC): $(READ_INC) $(incdir) FORCE
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(incdir)
 	$(INSTALL_PROG) $(READ_INC) $@  &&  chmod 644 $@
 
 #
