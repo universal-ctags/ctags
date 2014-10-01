@@ -171,17 +171,18 @@ $(DEST_EMAN):
 #
 $(DEST_READ_LIB): $(READ_LIB) $(libdir) FORCE
 	$(srcdir)/mkinstalldirs $(DESTDIR)$(libdir)
-	$(INSTALL_PROG) $(READ_LIB) $@  &&  chmod 644 $@
+	$(INSTALL_PROG) $(READ_LIB) $(DESTDIR)$@  &&  chmod 644 $(DESTDIR)$@
 
 $(DEST_READ_INC): $(READ_INC) $(incdir) FORCE
 	$(srcdir)/mkinstalldirs $(DESTDIR)$(incdir)
-	$(INSTALL_PROG) $(READ_INC) $@  &&  chmod 644 $@
+	$(INSTALL_PROG) $(READ_INC) $(DESTDIR)$@  &&  chmod 644 $(DESTDIR)$@
 
 #
 # install the readtags command
 #
 $(DEST_READ_CMD): $(READ_CMD) $(bindir) FORCE
-	$(INSTALL_PROG) $(READ_CMD) $@  &&  chmod 755 $@
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(bindir)
+	$(INSTALL_PROG) $(READ_CMD) $(DESTDIR)$@  &&  chmod 755 $(DESTDIR)$@
 
 #
 # rules for uninstalling
