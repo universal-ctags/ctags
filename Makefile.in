@@ -146,8 +146,8 @@ $(DEST_CTAGS): $(CTAGS_EXEC) $(bindir) FORCE
 	$(INSTALL_PROG) $(CTAGS_EXEC) $(DESTDIR)$@  &&  chmod 755 $(DESTDIR)$@
 
 $(DEST_ETAGS):
-	- if [ -x $(DEST_CTAGS) ]; then \
-	    cd $(bindir) && $(SLINK) $(CTAGS_EXEC) $(ETAGS_EXEC); \
+	- if [ -x $(DESTDIR)$(DEST_CTAGS) ]; then \
+	    cd $(DESTDIR)$(bindir) && $(SLINK) $(CTAGS_EXEC) $(ETAGS_EXEC); \
 	fi
 
 #
@@ -162,8 +162,8 @@ $(DEST_CMAN): $(man1dir) $(MANPAGE) FORCE
 	- $(INSTALL_DATA) $(srcdir)/$(MANPAGE) $(DESTDIR)$@  &&  chmod 644 $(DESTDIR)$@
 
 $(DEST_EMAN):
-	- if [ -f $(DEST_CMAN) ]; then \
-	    cd $(man1dir) && $(SLINK) $(CMAN) $(EMAN); \
+	- if [ -f $(DESTDIR)$(DEST_CMAN) ]; then \
+	    cd $(DESTDIR)$(man1dir) && $(SLINK) $(CMAN) $(EMAN); \
 	fi
 
 #
