@@ -215,8 +215,15 @@ http://pkgs.fedoraproject.org/cgit/ctags.git/tree/ctags.spec
 (ctags-5.8-cssparse.patch)
 
 	Not in fishman tree.
-	This must be merged.
-	A test case is needed.
+
+	The reproducer is attached to following page:
+	https://bugzilla.redhat.com/show_bug.cgi?id=852101
+
+	However, fishman-ctags doesn't reproduce with it.
+
+	I, Masatake YAMATO, read the patch.  However, I don't
+	understand the patch.  The way to update position variable in
+	the patch looks bad for me.
 
 <ctags-5.8-css.patch>
 
