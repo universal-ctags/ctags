@@ -230,7 +230,7 @@ http://pkgs.fedoraproject.org/cgit/ctags.git/tree/ctags.spec
 
 	ddb29762b37d60a875252dcc401de0b7479527b1
 
-(ctags-5.8-format-security.patch)
+<ctags-5.8-format-security.patch>
 
 	This patch was merged in exuberant ctags svn tree.
 	As the result this patch is in fishman tree.
