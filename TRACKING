@@ -187,6 +187,13 @@ devel mailing list (ctags-devel@sourceforge)
 
 	95b4806ba6c006e4b7e72a006700e33c720ab9e7
 
+
+    ([Ctags-devel] Skip repeat PATH_SEPARATORs in relativeFilename())
+    From: Seth Dickson <whefxlr@gm...> - 2013-12-24 04:51:01
+
+	Looks interesting.
+
+
 Fedora
 ============================================================
 Some patches are maintained in ctags package of Fedora.
