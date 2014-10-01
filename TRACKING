@@ -261,7 +261,11 @@ http://anonscm.debian.org/cgit/users/cjwatson/exuberant-ctags.git/tree/debian/pa
 (python-disable-imports.patch)
 
 	Not in fishman tree.
-	Not inspected well yet.
+	
+	I don't want to merge this patch. I think ctags should extract
+	as much as possible informatoin from input source code.
+	The user has responsibility to filter out the noise.
+	The definition of noise is upto the user.
 
 <vim-command-loop.patch>
 
