@@ -193,10 +193,11 @@ Some patches are maintained in ctags package of Fedora.
 Inventory of patches are
 http://pkgs.fedoraproject.org/cgit/ctags.git/tree/ctags.spec
 
-(ctags-5.7-destdir.patch)
+<ctags-5.7-destdir.patch>
 
-	Related to build system.
-	Not inspected well yet.
+	This patch was merged in fishman ctags git tree.
+
+	d4b5972427a46cbdcbfb050a944cf62b300676be
 
 <ctags-5.7-segment-fault.patch>
 
