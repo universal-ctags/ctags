@@ -23,6 +23,11 @@
 */
 #include "general.h"  /* must always come first */
 
+#ifdef HAVE_DECL_ENVIRON
+#define _GNU_SOURCE
+#include <unistd.h>
+#endif
+
 #include <string.h>
 
 /*  To provide timings features if available.
@@ -518,6 +523,30 @@ static void makeTags (cookedArgs *args)
 #undef timeStamp
 }
 
+static void sanitizeEnviron (void)
+{
+#ifdef HAVE_DECL_ENVIRON
+	int i;
+
+	for (i = 0; environ[i]; i++)
+	{
+		char *name;
+		char *value;
+
+		value = strchr (environ[i], '=');
+		if (!value)
+			continue;
+
+		value++;
+		if (!strncmp (value, "() {", 4))
+		{
+			error (WARNING, "reset environment: %s", environ[i]);
+			value[0] = '\0';
+		}
+	}
+#endif
+}
+
 /*
  *		Start up code
  */
@@ -548,6 +577,7 @@ extern int main (int __unused__ argc, char **argv)
 
 	setCurrentDirectory ();
 	setExecutableName (*argv++);
+	sanitizeEnviron ();
 	checkRegex ();
 
 	args = cArgNewFromArgv (argv);

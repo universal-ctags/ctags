@@ -524,6 +524,13 @@ if test "$have_ftruncate" = yes ; then
 	CHECK_PROTO(ftruncate, unistd.h)
 fi
 
+# Checks for declaration
+# ----------------------
+AC_CHECK_DECLS([environ], [], [], [
+[#define _GNU_SOURCE]
+[#include <unistd.h>]
+])
+
 
 # Output files
 # ------------
