@@ -1,15 +1,15 @@
-DEFINE	Units/verilog-2001.d/input.v	/^`define DEFINE$/;"	c
-DEF_VALUE	Units/verilog-2001.d/input.v	/^`define DEF_VALUE   1'd100$/;"	c
-LOCALPARAM	Units/verilog-2001.d/input.v	/^localparam LOCALPARAM = 2**2;$/;"	c	module:mod
-PARAM1	Units/verilog-2001.d/input.v	/^    parameter PARAM1 = 10,$/;"	c	module:mod
-PARAM2	Units/verilog-2001.d/input.v	/^    parameter PARAM2 = 2.0$/;"	c	module:mod
-STATE1	Units/verilog-2001.d/input.v	/^localparam STATE1 = 4'h0,$/;"	c	module:mod
-STATE2	Units/verilog-2001.d/input.v	/^           STATE2 = 4'h1,$/;"	c	module:mod
-STATE3	Units/verilog-2001.d/input.v	/^           STATE3 = 4'h2,$/;"	c	module:mod
-STATE4	Units/verilog-2001.d/input.v	/^           STATE4 = 4'h5    ,$/;"	c	module:mod
-STATE5	Units/verilog-2001.d/input.v	/^           STATE5 = 4'h6    ,$/;"	c	module:mod
-STATE6	Units/verilog-2001.d/input.v	/^           STATE6 = 4'h7    ,$/;"	c	module:mod
-STATE7	Units/verilog-2001.d/input.v	/^           STATE7 = 4'h8;$/;"	c	module:mod
+DEFINE	Units/verilog-2001.d/input.v	/^`define DEFINE$/;"	k
+DEF_VALUE	Units/verilog-2001.d/input.v	/^`define DEF_VALUE   1'd100$/;"	k
+LOCALPARAM	Units/verilog-2001.d/input.v	/^localparam LOCALPARAM = 2**2;$/;"	k	module:mod
+PARAM1	Units/verilog-2001.d/input.v	/^    parameter PARAM1 = 10,$/;"	k	module:mod
+PARAM2	Units/verilog-2001.d/input.v	/^    parameter PARAM2 = 2.0$/;"	k	module:mod
+STATE1	Units/verilog-2001.d/input.v	/^localparam STATE1 = 4'h0,$/;"	k	module:mod
+STATE2	Units/verilog-2001.d/input.v	/^           STATE2 = 4'h1,$/;"	k	module:mod
+STATE3	Units/verilog-2001.d/input.v	/^           STATE3 = 4'h2,$/;"	k	module:mod
+STATE4	Units/verilog-2001.d/input.v	/^           STATE4 = 4'h5    ,$/;"	k	module:mod
+STATE5	Units/verilog-2001.d/input.v	/^           STATE5 = 4'h6    ,$/;"	k	module:mod
+STATE6	Units/verilog-2001.d/input.v	/^           STATE6 = 4'h7    ,$/;"	k	module:mod
+STATE7	Units/verilog-2001.d/input.v	/^           STATE7 = 4'h8;$/;"	k	module:mod
 a	Units/verilog-2001.d/input.v	/^    input wire a,$/;"	p	module:mod
 add	Units/verilog-2001.d/input.v	/^task add ($/;"	t	module:mod
 b	Units/verilog-2001.d/input.v	/^    b,c,$/;"	p	module:mod
@@ -21,16 +21,16 @@ g	Units/verilog-2001.d/input.v	/^    inout wire g$/;"	p	module:mod
 k	Units/verilog-2001.d/input.v	/^real k;$/;"	r	module:mod
 l	Units/verilog-2001.d/input.v	/^integer l;$/;"	r	module:mod
 mod	Units/verilog-2001.d/input.v	/^module mod#($/;"	m
-mod.LOCALPARAM	Units/verilog-2001.d/input.v	/^localparam LOCALPARAM = 2**2;$/;"	c	module:mod
-mod.PARAM1	Units/verilog-2001.d/input.v	/^    parameter PARAM1 = 10,$/;"	c	module:mod
-mod.PARAM2	Units/verilog-2001.d/input.v	/^    parameter PARAM2 = 2.0$/;"	c	module:mod
-mod.STATE1	Units/verilog-2001.d/input.v	/^localparam STATE1 = 4'h0,$/;"	c	module:mod
-mod.STATE2	Units/verilog-2001.d/input.v	/^           STATE2 = 4'h1,$/;"	c	module:mod
-mod.STATE3	Units/verilog-2001.d/input.v	/^           STATE3 = 4'h2,$/;"	c	module:mod
-mod.STATE4	Units/verilog-2001.d/input.v	/^           STATE4 = 4'h5    ,$/;"	c	module:mod
-mod.STATE5	Units/verilog-2001.d/input.v	/^           STATE5 = 4'h6    ,$/;"	c	module:mod
-mod.STATE6	Units/verilog-2001.d/input.v	/^           STATE6 = 4'h7    ,$/;"	c	module:mod
-mod.STATE7	Units/verilog-2001.d/input.v	/^           STATE7 = 4'h8;$/;"	c	module:mod
+mod.LOCALPARAM	Units/verilog-2001.d/input.v	/^localparam LOCALPARAM = 2**2;$/;"	k	module:mod
+mod.PARAM1	Units/verilog-2001.d/input.v	/^    parameter PARAM1 = 10,$/;"	k	module:mod
+mod.PARAM2	Units/verilog-2001.d/input.v	/^    parameter PARAM2 = 2.0$/;"	k	module:mod
+mod.STATE1	Units/verilog-2001.d/input.v	/^localparam STATE1 = 4'h0,$/;"	k	module:mod
+mod.STATE2	Units/verilog-2001.d/input.v	/^           STATE2 = 4'h1,$/;"	k	module:mod
+mod.STATE3	Units/verilog-2001.d/input.v	/^           STATE3 = 4'h2,$/;"	k	module:mod
+mod.STATE4	Units/verilog-2001.d/input.v	/^           STATE4 = 4'h5    ,$/;"	k	module:mod
+mod.STATE5	Units/verilog-2001.d/input.v	/^           STATE5 = 4'h6    ,$/;"	k	module:mod
+mod.STATE6	Units/verilog-2001.d/input.v	/^           STATE6 = 4'h7    ,$/;"	k	module:mod
+mod.STATE7	Units/verilog-2001.d/input.v	/^           STATE7 = 4'h8;$/;"	k	module:mod
 mod.a	Units/verilog-2001.d/input.v	/^    input wire a,$/;"	p	module:mod
 mod.add	Units/verilog-2001.d/input.v	/^task add ($/;"	t	module:mod
 mod.add.x	Units/verilog-2001.d/input.v	/^    input x, y,$/;"	p	task:mod.add

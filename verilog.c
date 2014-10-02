@@ -33,6 +33,13 @@
 #include "routines.h"
 
 /*
+*   MACROS
+*/
+#define NUMBER_LANGUAGES    2   /* Indicates number of defined indexes */
+#define IDX_SYSTEMVERILOG   0
+#define IDX_VERILOG         1
+
+/*
  *   DATA DECLARATIONS
  */
 typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
@@ -48,12 +55,14 @@ typedef enum {
 	K_PORT,
 	K_REGISTER,
 	K_TASK,
-	K_BLOCK
+	K_BLOCK,
+	K_CLASS
 } verilogKind;
 
 typedef struct {
 	const char *keyword;
 	verilogKind kind;
+	short isValid [NUMBER_LANGUAGES];
 } keywordAssoc;
 
 typedef struct sTokenInfo {
@@ -68,10 +77,11 @@ typedef struct sTokenInfo {
  */
 static int Ungetc;
 static int Lang_verilog;
+static int Lang_systemverilog;
 static jmp_buf Exception;
 
 static kindOption VerilogKinds [] = {
- { TRUE, 'c', "constant",  "constants (define, parameter, specparam)" },
+ { TRUE, 'k', "constant",  "constants (define, parameter, specparam)" },
  { TRUE, 'e', "event",     "events" },
  { TRUE, 'f', "function",  "functions" },
  { TRUE, 'm', "module",    "modules" },
@@ -82,37 +92,55 @@ static kindOption VerilogKinds [] = {
  { TRUE, 'b', "block",     "blocks" }
 };
 
-static keywordAssoc VerilogKeywordTable [] = {
-	{ "`define",   K_CONSTANT },
-	{ "event",     K_EVENT },
-	{ "function",  K_FUNCTION },
-	{ "inout",     K_PORT },
-	{ "input",     K_PORT },
-	{ "integer",   K_REGISTER },
-	{ "module",    K_MODULE },
-	{ "output",    K_PORT },
-	{ "parameter", K_CONSTANT },
-	{ "localparam",K_CONSTANT },
-	{ "real",      K_REGISTER },
-	{ "realtime",  K_REGISTER },
-	{ "reg",       K_REGISTER },
-	{ "specparam", K_CONSTANT },
-	{ "supply0",   K_NET },
-	{ "supply1",   K_NET },
-	{ "task",      K_TASK },
-	{ "time",      K_REGISTER },
-	{ "tri0",      K_NET },
-	{ "tri1",      K_NET },
-	{ "triand",    K_NET },
-	{ "tri",       K_NET },
-	{ "trior",     K_NET },
-	{ "trireg",    K_NET },
-	{ "wand",      K_NET },
-	{ "wire",      K_NET },
-	{ "wor",       K_NET },
-	{ "begin",     K_BLOCK },
-	{ "end",       K_BLOCK },
-	{ "signed",    K_IGNORE }
+static kindOption SystemVerilogKinds [] = {
+ { TRUE, 'k', "constant",  "constants (define, parameter, specparam)" },
+ { TRUE, 'e', "event",     "events" },
+ { TRUE, 'f', "function",  "functions" },
+ { TRUE, 'm', "module",    "modules" },
+ { TRUE, 'n', "net",       "net data types" },
+ { TRUE, 'p', "port",      "ports" },
+ { TRUE, 'r', "register",  "register data types" },
+ { TRUE, 't', "task",      "tasks" },
+ { TRUE, 'b', "block",     "blocks" },
+ { TRUE, 'c', "class",     "classes" }
+};
+
+static const keywordAssoc KeywordTable [] = {
+	/*                            SystemVerilog */
+	/*                            |  Verilog    */
+	/* keyword     keyword ID     |  |          */
+	{ "`define",   K_CONSTANT,  { 1, 1 } },
+	{ "event",     K_EVENT,     { 1, 1 } },
+	{ "function",  K_FUNCTION,  { 1, 1 } },
+	{ "inout",     K_PORT,      { 1, 1 } },
+	{ "input",     K_PORT,      { 1, 1 } },
+	{ "integer",   K_REGISTER,  { 1, 1 } },
+	{ "module",    K_MODULE,    { 1, 1 } },
+	{ "output",    K_PORT,      { 1, 1 } },
+	{ "parameter", K_CONSTANT,  { 1, 1 } },
+	{ "localparam",K_CONSTANT,  { 1, 1 } },
+	{ "real",      K_REGISTER,  { 1, 1 } },
+	{ "realtime",  K_REGISTER,  { 1, 1 } },
+	{ "reg",       K_REGISTER,  { 1, 1 } },
+	{ "specparam", K_CONSTANT,  { 1, 1 } },
+	{ "supply0",   K_NET,       { 1, 1 } },
+	{ "supply1",   K_NET,       { 1, 1 } },
+	{ "task",      K_TASK,      { 1, 1 } },
+	{ "time",      K_REGISTER,  { 1, 1 } },
+	{ "tri0",      K_NET,       { 1, 1 } },
+	{ "tri1",      K_NET,       { 1, 1 } },
+	{ "triand",    K_NET,       { 1, 1 } },
+	{ "tri",       K_NET,       { 1, 1 } },
+	{ "trior",     K_NET,       { 1, 1 } },
+	{ "trireg",    K_NET,       { 1, 1 } },
+	{ "wand",      K_NET,       { 1, 1 } },
+	{ "wire",      K_NET,       { 1, 1 } },
+	{ "wor",       K_NET,       { 1, 1 } },
+	{ "begin",     K_BLOCK,     { 1, 1 } },
+	{ "end",       K_BLOCK,     { 1, 1 } },
+	{ "signed",    K_IGNORE,    { 1, 1 } },
+	{ "class",     K_CLASS,     { 1, 0 } },
+	{ "logic",     K_REGISTER,  { 1, 0 } }
 };
 
 static tokenInfo *currentContext = NULL;
@@ -129,6 +157,7 @@ static short isContainer (verilogKind kind)
 		case K_TASK:
 		case K_FUNCTION:
 		case K_BLOCK:
+		case K_CLASS:
 			return TRUE;
 		default:
 			return FALSE;
@@ -172,17 +201,45 @@ static tokenInfo *popToken (tokenInfo * const token)
 	return NULL;
 }
 
-static void initialize (const langType language)
+static const char *kindName (const verilogKind kind)
+{
+	if (isLanguage (Lang_verilog))
+		return VerilogKinds[kind].name;
+	else if (isLanguage (Lang_systemverilog))
+		return SystemVerilogKinds[kind].name;
+}
+
+static char kindLetter (const verilogKind kind)
+{
+	if (isLanguage (Lang_verilog))
+		return VerilogKinds[kind].letter;
+	else if (isLanguage (Lang_systemverilog))
+		return SystemVerilogKinds[kind].letter;
+}
+
+static void buildKeywordHash (const langType language, unsigned int idx)
 {
 	size_t i;
 	const size_t count = 
-			sizeof (VerilogKeywordTable) / sizeof (VerilogKeywordTable [0]);
-	Lang_verilog = language;
+			sizeof (KeywordTable) / sizeof (KeywordTable [0]);
 	for (i = 0  ;  i < count  ;  ++i)
 	{
-		const keywordAssoc* const p = &VerilogKeywordTable [i];
-		addKeyword (p->keyword, language, (int) p->kind);
+		const keywordAssoc *p = &KeywordTable [i];
+		if (p->isValid [idx])
+			addKeyword (p->keyword, language, (int) p->kind);
 	}
+}
+
+static void initializeVerilog (const langType language)
+{
+	Lang_verilog = language;
+	buildKeywordHash (language, IDX_VERILOG);
+}
+
+static void initializeSystemVerilog (const langType language)
+{
+	Lang_systemverilog = language;
+	buildKeywordHash (language, IDX_SYSTEMVERILOG);
 }
 
 static void vUngetc (int c)
@@ -340,13 +397,13 @@ static void createTag (const verilogKind kind, vString *name)
 	tagEntryInfo tag;
 
 	initTagEntry (&tag, vStringValue (name));
-	tag.kindName    = VerilogKinds[kind].name;
-	tag.kind        = VerilogKinds[kind].letter;
+	tag.kindName    = kindName (kind);
+	tag.kind        = kindLetter (kind);
 	verbose ("Adding tag %s", vStringValue (name));
 	if (currentContext)
 	{
 		verbose (" to context %s\n", vStringValue (currentContext->name));
-		tag.extensionFields.scope [0] = VerilogKinds[currentContext->kind].name;
+		tag.extensionFields.scope [0] = kindName (currentContext->kind);
 		tag.extensionFields.scope [1] = vStringValue (currentContext->name);
 	}
 	verbose ("\n");
@@ -488,7 +545,7 @@ static void tagNameList (const verilogKind kind, int c)
 static void findTag (vString *const name)
 {
 	int c;
-	const verilogKind kind = (verilogKind) lookupKeyword (vStringValue (name), Lang_verilog);
+	const verilogKind kind = (verilogKind) lookupKeyword (vStringValue (name), getSourceLanguage () );
 
 	/* Search for end of current context to drop respective context */
 	if (currentContext)
@@ -501,7 +558,7 @@ static void findTag (vString *const name)
 		}
 		else
 		{
-			vStringCatS (endTokenName, VerilogKinds[currentContext->kind].name);
+			vStringCatS (endTokenName, kindName (currentContext->kind));
 			if (strcmp (vStringValue (name), vStringValue (endTokenName)) == 0)
 			{
 				verbose ("Dropping context %s\n", vStringValue (currentContext->name));
@@ -591,7 +648,19 @@ extern parserDefinition* VerilogParser (void)
 	def->kindCount  = KIND_COUNT (VerilogKinds);
 	def->extensions = extensions;
 	def->parser     = findVerilogTags;
-	def->initialize = initialize;
+	def->initialize = initializeVerilog;
+	return def;
+}
+
+extern parserDefinition* SystemVerilogParser (void)
+{
+	static const char *const extensions [] = { "sv", "svh", NULL };
+	parserDefinition* def = parserNew ("SystemVerilog");
+	def->kinds      = SystemVerilogKinds;
+	def->kindCount  = KIND_COUNT (SystemVerilogKinds);
+	def->extensions = extensions;
+	def->parser     = findVerilogTags;
+	def->initialize = initializeSystemVerilog;
 	return def;
 }
 

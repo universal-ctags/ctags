@@ -1,13 +1,13 @@
-DEFINE	Units/verilog-basic.d/input.v	/^`define DEFINE$/;"	c
-DEF_VALUE	Units/verilog-basic.d/input.v	/^`define DEF_VALUE   1'd100$/;"	c
-PARAM	Units/verilog-basic.d/input.v	/^parameter PARAM = 1;$/;"	c	module:mod
-STATE1	Units/verilog-basic.d/input.v	/^parameter STATE1 = 4'h0,$/;"	c	module:mod
-STATE2	Units/verilog-basic.d/input.v	/^          STATE2 = 4'h1,$/;"	c	module:mod
-STATE3	Units/verilog-basic.d/input.v	/^          STATE3 = 4'h2,$/;"	c	module:mod
-STATE4	Units/verilog-basic.d/input.v	/^          STATE4 = 4'h5    ,$/;"	c	module:mod
-STATE5	Units/verilog-basic.d/input.v	/^          STATE5 = 4'h6    ,$/;"	c	module:mod
-STATE6	Units/verilog-basic.d/input.v	/^          STATE6 = 4'h7    ,$/;"	c	module:mod
-STATE7	Units/verilog-basic.d/input.v	/^          STATE7 = 4'h8;$/;"	c	module:mod
+DEFINE	Units/verilog-basic.d/input.v	/^`define DEFINE$/;"	k
+DEF_VALUE	Units/verilog-basic.d/input.v	/^`define DEF_VALUE   1'd100$/;"	k
+PARAM	Units/verilog-basic.d/input.v	/^parameter PARAM = 1;$/;"	k	module:mod
+STATE1	Units/verilog-basic.d/input.v	/^parameter STATE1 = 4'h0,$/;"	k	module:mod
+STATE2	Units/verilog-basic.d/input.v	/^          STATE2 = 4'h1,$/;"	k	module:mod
+STATE3	Units/verilog-basic.d/input.v	/^          STATE3 = 4'h2,$/;"	k	module:mod
+STATE4	Units/verilog-basic.d/input.v	/^          STATE4 = 4'h5    ,$/;"	k	module:mod
+STATE5	Units/verilog-basic.d/input.v	/^          STATE5 = 4'h6    ,$/;"	k	module:mod
+STATE6	Units/verilog-basic.d/input.v	/^          STATE6 = 4'h7    ,$/;"	k	module:mod
+STATE7	Units/verilog-basic.d/input.v	/^          STATE7 = 4'h8;$/;"	k	module:mod
 a	Units/verilog-basic.d/input.v	/^input a,b, c, d ;$/;"	p	module:mod
 a	Units/verilog-basic.d/input.v	/^wire a,b,c,d,e;$/;"	n	module:mod
 add	Units/verilog-basic.d/input.v	/^task add;$/;"	t	module:mod
@@ -26,14 +26,14 @@ g	Units/verilog-basic.d/input.v	/^wire g;$/;"	n	module:mod
 k	Units/verilog-basic.d/input.v	/^real k;$/;"	r	module:mod
 l	Units/verilog-basic.d/input.v	/^integer l;$/;"	r	module:mod
 mod	Units/verilog-basic.d/input.v	/^module mod ($/;"	m
-mod.PARAM	Units/verilog-basic.d/input.v	/^parameter PARAM = 1;$/;"	c	module:mod
-mod.STATE1	Units/verilog-basic.d/input.v	/^parameter STATE1 = 4'h0,$/;"	c	module:mod
-mod.STATE2	Units/verilog-basic.d/input.v	/^          STATE2 = 4'h1,$/;"	c	module:mod
-mod.STATE3	Units/verilog-basic.d/input.v	/^          STATE3 = 4'h2,$/;"	c	module:mod
-mod.STATE4	Units/verilog-basic.d/input.v	/^          STATE4 = 4'h5    ,$/;"	c	module:mod
-mod.STATE5	Units/verilog-basic.d/input.v	/^          STATE5 = 4'h6    ,$/;"	c	module:mod
-mod.STATE6	Units/verilog-basic.d/input.v	/^          STATE6 = 4'h7    ,$/;"	c	module:mod
-mod.STATE7	Units/verilog-basic.d/input.v	/^          STATE7 = 4'h8;$/;"	c	module:mod
+mod.PARAM	Units/verilog-basic.d/input.v	/^parameter PARAM = 1;$/;"	k	module:mod
+mod.STATE1	Units/verilog-basic.d/input.v	/^parameter STATE1 = 4'h0,$/;"	k	module:mod
+mod.STATE2	Units/verilog-basic.d/input.v	/^          STATE2 = 4'h1,$/;"	k	module:mod
+mod.STATE3	Units/verilog-basic.d/input.v	/^          STATE3 = 4'h2,$/;"	k	module:mod
+mod.STATE4	Units/verilog-basic.d/input.v	/^          STATE4 = 4'h5    ,$/;"	k	module:mod
+mod.STATE5	Units/verilog-basic.d/input.v	/^          STATE5 = 4'h6    ,$/;"	k	module:mod
+mod.STATE6	Units/verilog-basic.d/input.v	/^          STATE6 = 4'h7    ,$/;"	k	module:mod
+mod.STATE7	Units/verilog-basic.d/input.v	/^          STATE7 = 4'h8;$/;"	k	module:mod
 mod.a	Units/verilog-basic.d/input.v	/^input a,b, c, d ;$/;"	p	module:mod
 mod.a	Units/verilog-basic.d/input.v	/^wire a,b,c,d,e;$/;"	n	module:mod
 mod.add	Units/verilog-basic.d/input.v	/^task add;$/;"	t	module:mod
