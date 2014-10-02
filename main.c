@@ -530,7 +530,6 @@ static void sanitizeEnviron (void)
 
 	for (i = 0; environ[i]; i++)
 	{
-		char *name;
 		char *value;
 
 		value = strchr (environ[i], '=');
