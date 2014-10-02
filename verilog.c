@@ -27,6 +27,7 @@
 #include "debug.h"
 #include "get.h"
 #include "keyword.h"
+#include "options.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
@@ -350,6 +351,19 @@ static void createTag (const verilogKind kind, vString *name)
 	}
 	verbose ("\n");
 	makeTagEntry (&tag);
+	if (Option.include.qualifiedTags && currentContext)
+	{
+		vString *const scopedName = vStringNew ();
+
+		vStringCopy (scopedName, currentContext->name);
+		vStringCatS (scopedName, ".");
+		vStringCatS (scopedName, vStringValue (name));
+		tag.name = vStringValue (scopedName);
+
+		makeTagEntry (&tag);
+
+		vStringDelete (scopedName);
+	}
 	if (isContainer (kind))
 	{
 		tokenInfo *newScope = newToken ();

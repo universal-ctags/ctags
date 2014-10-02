@@ -13,6 +13,26 @@ g	Units/verilog-2001.d/input.v	/^    inout wire g$/;"	p	module:mod
 k	Units/verilog-2001.d/input.v	/^real k;$/;"	r	module:mod
 l	Units/verilog-2001.d/input.v	/^integer l;$/;"	r	module:mod
 mod	Units/verilog-2001.d/input.v	/^module mod#($/;"	m
+mod.LOCALPARAM	Units/verilog-2001.d/input.v	/^localparam LOCALPARAM = 2**2;$/;"	c	module:mod
+mod.PARAM1	Units/verilog-2001.d/input.v	/^    parameter PARAM1 = 10,$/;"	c	module:mod
+mod.PARAM2	Units/verilog-2001.d/input.v	/^    parameter PARAM2 = 2.0$/;"	c	module:mod
+mod.a	Units/verilog-2001.d/input.v	/^    input wire a,$/;"	p	module:mod
+mod.add	Units/verilog-2001.d/input.v	/^task add ($/;"	t	module:mod
+mod.add.x	Units/verilog-2001.d/input.v	/^    input x, y,$/;"	p	task:mod.add
+mod.add.y	Units/verilog-2001.d/input.v	/^    input x, y,$/;"	p	task:mod.add
+mod.add.z	Units/verilog-2001.d/input.v	/^    output z$/;"	p	task:mod.add
+mod.b	Units/verilog-2001.d/input.v	/^    b,c,$/;"	p	module:mod
+mod.c	Units/verilog-2001.d/input.v	/^    b,c,$/;"	p	module:mod
+mod.d	Units/verilog-2001.d/input.v	/^    d ,$/;"	p	module:mod
+mod.e	Units/verilog-2001.d/input.v	/^    output wire e ,$/;"	p	module:mod
+mod.f	Units/verilog-2001.d/input.v	/^    output reg f,$/;"	p	module:mod
+mod.g	Units/verilog-2001.d/input.v	/^    inout wire g$/;"	p	module:mod
+mod.k	Units/verilog-2001.d/input.v	/^real k;$/;"	r	module:mod
+mod.l	Units/verilog-2001.d/input.v	/^integer l;$/;"	r	module:mod
+mod.mult	Units/verilog-2001.d/input.v	/^function mult ($/;"	f	module:mod
+mod.mult.x	Units/verilog-2001.d/input.v	/^    input x,$/;"	p	function:mod.mult
+mod.mult.y	Units/verilog-2001.d/input.v	/^    input y);$/;"	p	function:mod.mult
+mod.scounter	Units/verilog-2001.d/input.v	/^reg signed [3:0] scounter;$/;"	r	module:mod
 mult	Units/verilog-2001.d/input.v	/^function mult ($/;"	f	module:mod
 scounter	Units/verilog-2001.d/input.v	/^reg signed [3:0] scounter;$/;"	r	module:mod
 x	Units/verilog-2001.d/input.v	/^    input x, y,$/;"	p	task:mod.add
