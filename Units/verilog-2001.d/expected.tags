@@ -1,4 +1,5 @@
 DEFINE	Units/verilog-2001.d/input.v	/^`define DEFINE$/;"	c
+LOCALPARAM	Units/verilog-2001.d/input.v	/^localparam LOCALPARAM = 2**2;$/;"	c	module:mod
 PARAM1	Units/verilog-2001.d/input.v	/^    parameter PARAM1 = 10,$/;"	c	module:mod
 PARAM2	Units/verilog-2001.d/input.v	/^    parameter PARAM2 = 2.0$/;"	c	module:mod
 a	Units/verilog-2001.d/input.v	/^    input wire a,$/;"	p	module:mod

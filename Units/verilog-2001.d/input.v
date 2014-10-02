@@ -15,6 +15,8 @@ module mod#(
     inout wire g
 );
 
+localparam LOCALPARAM = 2**2;
+
 real k;
 integer l;
 

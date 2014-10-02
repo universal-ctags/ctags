@@ -90,6 +90,7 @@ static keywordAssoc VerilogKeywordTable [] = {
 	{ "module",    K_MODULE },
 	{ "output",    K_PORT },
 	{ "parameter", K_CONSTANT },
+	{ "localparam",K_CONSTANT },
 	{ "real",      K_REGISTER },
 	{ "realtime",  K_REGISTER },
 	{ "reg",       K_REGISTER },
