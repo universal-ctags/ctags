@@ -412,9 +412,10 @@ static void tagNameList (const verilogKind kind, int c)
 {
 	vString *name = vStringNew ();
 	vString *scopedName;
-	verilogKind localKind;
+	verilogKind localKind, nameKind;
 	boolean repeat;
 	Assert (isIdentifierCharacter (c));
+	localKind = kind;
 	do
 	{ 
 		repeat = FALSE;
@@ -422,13 +423,20 @@ static void tagNameList (const verilogKind kind, int c)
 		{
 			readIdentifier (name, c);
 			/* Check if "name" is in fact a keyword */
-			localKind = (verilogKind) lookupKeyword (vStringValue (name), getSourceLanguage () );
-			if (kind != K_PORT || localKind == K_UNDEFINED)
+			nameKind = (verilogKind) lookupKeyword (vStringValue (name), getSourceLanguage () );
+			/* Create tag in case name is not a known kind ... */
+			if (nameKind == K_UNDEFINED)
 			{
-				createTag (kind, name);
+				createTag (localKind, name);
 			}
+			/* ... or else continue searching for names */
 			else
 			{
+				/* Update local kind unless it's a port */
+				if (localKind != K_PORT)
+				{
+					localKind = nameKind;
+				}
 				repeat = TRUE;
 			}
 		}
@@ -445,9 +453,10 @@ static void tagNameList (const verilogKind kind, int c)
 				skipPastMatch ("{}");
 			else
 			{
+				/* Skip until end of current name, kind or parameter list definition */
 				do
 					c = vGetc ();
-				while (c != ','  &&  c != ';');
+				while (c != ','  &&  c != ';' && c != ')');
 			}
 		}
 		if (c == ',')

@@ -3,7 +3,10 @@
 // endmodule
 `define DEFINE
 
-module mod (
+module mod#(
+    parameter PARAM1 = 10,
+    parameter PARAM2 = 2.0
+) (
     input wire a,
     b,c,
     d ,
@@ -11,8 +14,6 @@ module mod (
     output reg f,
     inout wire g
 );
-
-parameter PARAM = 1;
 
 real k;
 integer l;
