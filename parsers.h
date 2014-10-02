@@ -61,6 +61,7 @@
 	TexParser, \
 	VeraParser, \
 	VerilogParser, \
+	SystemVerilogParser, \
 	VhdlParser, \
 	VimParser, \
 	WindResParser, \
