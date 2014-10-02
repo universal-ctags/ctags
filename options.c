@@ -2367,39 +2367,12 @@ static void parseConfigurationFileOptions (void)
 	parseFileOptions (filename);
 	free (filename);
 
-#ifndef MSDOS_STYLE_PATH
-	if (!Option.configFilename)
-	{
-		asprintf (&filename,"/etc/%s.conf.d", filename_body);
-		parseAllConfigurationFilesOptionsInDirectory(filename);
-		free (filename);
-	}
-#endif
-
 	asprintf (&filename,"/usr/local/etc/%s.conf", filename_body);
 	parseFileOptions (filename);
 	free (filename);
 
-#ifndef MSDOS_STYLE_PATH
-	if (!Option.configFilename)
-	{
-		asprintf (&filename,"/usr/local/etc/%s.conf.d", filename_body);
-		parseAllConfigurationFilesOptionsInDirectory(filename);
-		free (filename);
-	}
-#endif
-
 	if (home != NULL)
-	{
 		parseConfigurationFileOptionsInDirectory (home);
-#ifndef MSDOS_STYLE_PATH
-		{
-			vString* const pathname = combinePathAndFile (home, ".ctags.d");
-			parseAllConfigurationFilesOptionsInDirectory(vStringValue (pathname));
-			vStringDelete (pathname);
-		}
-#endif
-	}
 	else
 	{
 #ifdef MSDOS_STYLE_PATH
