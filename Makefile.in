@@ -24,10 +24,12 @@ srcdir	= @srcdir@
 libdir	= @libdir@
 incdir	= @includedir@
 mandir	= @mandir@
+datadir = @datarootdir@/@PACKAGE_NAME@
 SLINK	= @LN_S@
 STRIP	= @STRIP@
 CC	= @CC@
 DEFS	= @DEFS@
+CPPFLAGS = @CPPFLAGS@
 CFLAGS	= @CFLAGS@
 LDFLAGS	= @LDFLAGS@
 LIBS	= @LIBS@
@@ -50,6 +52,8 @@ OBJEXT	= @OBJEXT@
 #LDFLAGS=
 
 ALL_CFLAGS = $(CFLAGS) -Wall
+ALL_CPPFLAGS = $(CPPFLAGS) -DDATADIR=\"$(datadir)\"
+
 include $(srcdir)/source.mak
 
 #
@@ -59,7 +63,7 @@ include $(srcdir)/source.mak
 .SUFFIXES:
 .SUFFIXES: .c .$(OBJEXT)
 
-VPATH	= $(srcdir)
+VPATH	= $(srcdir) $(srcdir)/Data/corpora $(srcdir)/Data/configs
 
 INSTALL		= cp -p
 INSTALL_PROG	= $(INSTALL)
@@ -80,6 +84,18 @@ manext	= 1
 man1dir	= $(mandir)/man1
 CMAN	= $(CTAGS_PROG).$(manext)
 EMAN	= $(ETAGS_PROG).$(manext)
+
+#
+# corpora files
+#
+corporadir = $(datadir)/corpora
+CORPORA    = ctags.ctags RFC1213-MIB.txt
+
+#
+# config files
+#
+configsdir = $(datadir)/configs
+CONFIGS    = ctags.ctags mib.ctags
 
 #
 # destinations for installed files
@@ -104,17 +120,17 @@ $(CTAGS_EXEC): $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 dctags$(EXEEXT): debug.c $(SOURCES) $(HEADERS)
-	$(CC) -I. -I$(srcdir) $(DEFS) -DDEBUG -g $(LDFLAGS) -o $@ debug.c $(SOURCES)
+	$(CC) -I. -I$(srcdir) $(DEFS) $(ALL_CPPFLAGS) -DDEBUG -g $(LDFLAGS) -o $@ debug.c $(SOURCES)
 
 $(READ_CMD): readtags.c readtags.h
-	$(CC) -DREADTAGS_MAIN -I. -I$(srcdir) $(DEFS) $(ALL_CFLAGS) $(LDFLAGS) -o $@ readtags.c
+	$(CC) -DREADTAGS_MAIN -I. -I$(srcdir) $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ readtags.c
 
 ETYPEREF_OBJS = etyperef.o keyword.o routines.o strlist.o vstring.o
 etyperef$(EXEEXT): $(ETYPEREF_OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(ETYPEREF_OBJS)
 
 etyperef.o: eiffel.c
-	$(CC) -DTYPE_REFERENCE_TOOL -I. -I$(srcdir) $(DEFS) $(ALL_CFLAGS) -o $@ -c eiffel.c
+	$(CC) -DTYPE_REFERENCE_TOOL -I. -I$(srcdir) $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -o $@ -c eiffel.c
 
 $(OBJECTS): $(HEADERS) config.h
 
@@ -128,7 +144,7 @@ install-strip: install
 install-ctags: install-cbin install-cman
 install-etags: install-ebin install-eman
 
-$(bindir) $(man1dir) $(libdir) $(incdir):
+$(bindir) $(man1dir) $(libdir) $(incdir) $(corporadir) $(configsdir):
 	$(srcdir)/mkinstalldirs $@
 
 FORCE:
@@ -186,9 +202,24 @@ $(DEST_READ_CMD): $(READ_CMD) $(bindir) FORCE
 	$(INSTALL_PROG) $(READ_CMD) $(DESTDIR)$@  &&  chmod 755 $(DESTDIR)$@
 
 #
+# install data
+#
+install-data: @install_data_targets@
+install-data-corpora: $(corporadir) $(addprefix Data/corpora/,$(CORPORA)) FORCE
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(corporadir)
+	for c in $(CORPORA); do \
+		$(INSTALL_DATA) $(srcdir)/Data/corpora/$$c $(DESTDIR)$(corporadir)/$$c && chmod 644 $(DESTDIR)$(corporadir)/$$c; \
+	done
+install-data-configs: $(configsdir) $(addprefix Data/configs/,$(CONFIGS)) FORCE
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(configsdir)
+	for c in $(CONFIGS); do \
+		$(INSTALL_DATA) $(srcdir)/Data/configs/$$c $(DESTDIR)$(configsdir)/$$c && chmod 644 $(DESTDIR)$(configsdir)/$$c; \
+	done
+
+#
 # rules for uninstalling
 #
-uninstall: uninstall-bin uninstall-lib uninstall-cmd uninstall-man
+uninstall: uninstall-bin uninstall-lib uninstall-cmd uninstall-man uninstall-data
 
 uninstall-bin:
 	- rm -f $(DEST_CTAGS) $(DEST_ETAGS)
@@ -208,6 +239,15 @@ uninstall-ctags:
 uninstall-etags:
 	- rm -f $(DEST_ETAGS) $(DEST_EMAN)
 
+uninstall-data: uninstall-corpora uninstall-configs
+	- rmdir $(datadir)
+
+uninstall-corpora:
+	- rm -f $(addprefix $(corporadir)/,$(CORPORA))
+	- rmdir $(corporadir)
+uninstall-configs:
+	- rm -f $(addprefix $(configsdir)/,$(CONFIGS))
+	- rmdir $(configsdir)
 #
 # miscellaneous rules
 #
@@ -234,6 +274,6 @@ maintainerclean: distclean
 # implicit rules
 #
 .c.$(OBJEXT):
-	$(CC) -I. -I$(srcdir) $(DEFS) $(ALL_CFLAGS) -c $<
+	$(CC) -I. -I$(srcdir) $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $<
 
 # vi:set tabstop=8:

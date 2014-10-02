@@ -2458,6 +2458,10 @@ static void installDataPathList (void)
 				break;
 		}
 	}
+
+#ifdef DATADIR
+	appendToDataPathList (DATADIR, FALSE);
+#endif
 }
 
 /*

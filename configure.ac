@@ -8,7 +8,7 @@
 #	Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.61])
-AC_INIT([ctags.h])
+AC_INIT([ctags],[fishman])
 AC_CONFIG_HEADERS([config.h])
 
 AH_TEMPLATE([PACKAGE], [Package name.])
@@ -196,7 +196,7 @@ if test "$enable_maintainer_mode" = yes ; then
 	AC_MSG_RESULT(enabling maintainer mode)
 fi
 
-install_targets="install-ctags"
+install_targets="install-ctags install-data"
 AC_MSG_CHECKING(whether to install link to etags)
 if test yes = "$enable_etags"; then
 	AC_MSG_RESULT(yes)
@@ -490,7 +490,9 @@ fi
 # 	fi
 # fi
 
-AC_CHECK_FUNCS(scandir)
+install_data_targets="install-data-corpora"
+AC_CHECK_FUNCS(scandir,[install_data_targets="$install_data_targets install-data-configs"])
+AC_SUBST(install_data_targets)
 
 # Checks for missing prototypes
 # -----------------------------
