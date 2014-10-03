@@ -392,6 +392,33 @@ static void cArgMakeTrashEmpty(cookedArgs *const args)
 	args->trash = trashMakeEmpty (args->trash);
 }
 
+static vString* getHome (void)
+{
+	const char* const home = getenv ("HOME");
+
+	if (home)
+		return vStringNewInit (home);
+	else
+	{
+#ifdef MSDOS_STYLE_PATH
+		/*
+		 * Windows users don't usually set HOME.
+		 * The OS sets HOMEDRIVE and HOMEPATH for them.
+		 */
+		const char* homeDrive = getenv ("HOMEDRIVE");
+		const char* homePath = getenv ("HOMEPATH");
+		if (homeDrive != NULL && homePath != NULL)
+		{
+			vString* const windowsHome = vStringNew ();
+			vStringCatS (windowsHome, homeDrive);
+			vStringCatS (windowsHome, homePath);
+			return windowsHome;
+		}
+#endif
+		return NULL;
+	}
+}
+
 #if defined(_WIN32)
 
 /* Some versions of MinGW are missing _vscprintf's declaration, although they
@@ -2348,8 +2375,8 @@ static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const d
 
 static void parseConfigurationFileOptions (void)
 {
+	vString *home;
 	/* We parse .ctags on all systems, and additionally ctags.cnf on DOS. */
-	const char* const home = getenv ("HOME");
 	char *filename = NULL;
 	char *filename_body;
 
@@ -2371,27 +2398,13 @@ static void parseConfigurationFileOptions (void)
 	parseFileOptions (filename);
 	free (filename);
 
+	home = getHome ();
 	if (home != NULL)
-		parseConfigurationFileOptionsInDirectory (home);
-	else
 	{
-#ifdef MSDOS_STYLE_PATH
-		/*
-		 * Windows users don't usually set HOME.
-		 * The OS sets HOMEDRIVE and HOMEPATH for them.
-		 */
-		const char* homeDrive = getenv ("HOMEDRIVE");
-		const char* homePath = getenv ("HOMEPATH");
-		if (homeDrive != NULL && homePath != NULL)
-		{
-			vString* const windowsHome = vStringNew ();
-			vStringCatS (windowsHome, homeDrive);
-			vStringCatS (windowsHome, homePath);
-			parseConfigurationFileOptionsInDirectory (vStringValue (windowsHome));
-			vStringDelete (windowsHome);
-		}
-#endif
+		parseConfigurationFileOptionsInDirectory (vStringValue (home));
+		vStringDelete (home);
 	}
+
 	parseConfigurationFileOptionsInDirectory (".");
 }
 
