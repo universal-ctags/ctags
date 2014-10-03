@@ -7,7 +7,12 @@ Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
 
   Initialize library.
 
-  You don't have to call it explicitly, because it is called in onig_new().
+  Single thread program:
+    You don't have to call it explicitly, because it is called in onig_new().
+
+  Multi thread program:
+    You have to call it explicitly from a specific thread (normally the main
+    thread) before you use onig_new(), because onig_init() is not thread safe.
 
 
 # int onig_error_code_to_str(UChar* err_buf, OnigPosition err_code, ...)
