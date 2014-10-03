@@ -1904,6 +1904,8 @@ static void processDataDir (
 		path = parameter + 1;
 		prependToDataPathList (path, TRUE);
 	}
+	else if (!strcmp (parameter, "NONE"))
+		resetDataPathList ();
 	else
 	{
 		resetDataPathList ();
