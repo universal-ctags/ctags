@@ -2472,6 +2472,19 @@ static void installDataPathList (void)
 		}
 	}
 
+	{
+		vString *home = getHome ();
+		if (home != NULL)
+		{
+			vString *ctags_d;
+
+			ctags_d = combinePathAndFile (vStringValue (home), ".ctags.d");
+
+			appendToDataPathList (vStringValue (ctags_d), FALSE);
+			vStringDelete (ctags_d);
+			vStringDelete (home);
+		}
+	}
 #ifdef PKGCONFDIR
 	appendToDataPathList (PKGCONFDIR, FALSE);
 #endif
