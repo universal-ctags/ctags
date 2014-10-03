@@ -37,7 +37,8 @@
 typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
 
 typedef enum {
-	K_UNDEFINED = -1,
+	K_IGNORE = -2,
+	K_UNDEFINED,
 	K_CONSTANT,
 	K_EVENT,
 	K_FUNCTION,
@@ -109,7 +110,8 @@ static keywordAssoc VerilogKeywordTable [] = {
 	{ "wire",      K_NET },
 	{ "wor",       K_NET },
 	{ "begin",     K_BLOCK },
-	{ "end",       K_BLOCK }
+	{ "end",       K_BLOCK },
+	{ "signed",    K_IGNORE }
 };
 
 tokenInfo *currentContext = NULL;
@@ -433,8 +435,8 @@ static void tagNameList (const verilogKind kind, int c)
 			/* ... or else continue searching for names */
 			else
 			{
-				/* Update local kind unless it's a port */
-				if (localKind != K_PORT)
+				/* Update local kind unless it's a port or an ignored keyword */
+				if (localKind != K_PORT && nameKind != K_IGNORE)
 				{
 					localKind = nameKind;
 				}

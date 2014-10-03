@@ -14,6 +14,7 @@ k	Units/verilog-2001.d/input.v	/^real k;$/;"	r	module:mod
 l	Units/verilog-2001.d/input.v	/^integer l;$/;"	r	module:mod
 mod	Units/verilog-2001.d/input.v	/^module mod#($/;"	m
 mult	Units/verilog-2001.d/input.v	/^function mult ($/;"	f	module:mod
+scounter	Units/verilog-2001.d/input.v	/^reg signed [3:0] scounter;$/;"	r	module:mod
 x	Units/verilog-2001.d/input.v	/^    input x, y,$/;"	p	task:mod.add
 x	Units/verilog-2001.d/input.v	/^    input x,$/;"	p	function:mod.mult
 y	Units/verilog-2001.d/input.v	/^    input x, y,$/;"	p	task:mod.add

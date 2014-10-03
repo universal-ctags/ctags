@@ -19,6 +19,7 @@ localparam LOCALPARAM = 2**2;
 
 real k;
 integer l;
+reg signed [3:0] scounter;
 
 task add (
     input x, y,
