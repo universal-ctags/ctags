@@ -2459,6 +2459,10 @@ static void installDataPathList (void)
 		}
 	}
 
+#ifdef PKGCONFDIR
+	appendToDataPathList (PKGCONFDIR, FALSE);
+#endif
+
 #ifdef DATADIR
 	appendToDataPathList (DATADIR, FALSE);
 #endif
