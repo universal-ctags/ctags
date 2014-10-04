@@ -1,0 +1,4 @@
+afterpound1	Units/sh-comments.d/input.sh	/^foo="#"; afterpound1() {}$/;"	f
+afterpound2	Units/sh-comments.d/input.sh	/^foo="#\\""; afterpound2() {}$/;"	f
+afterpound3	Units/sh-comments.d/input.sh	/^foo='#'; afterpound3() {}$/;"	f
+afterpound4	Units/sh-comments.d/input.sh	/^foo='#'''; afterpound4() {}$/;"	f

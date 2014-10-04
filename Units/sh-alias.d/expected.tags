@@ -1,0 +1,10 @@
+afteralias	Units/sh-alias.d/input.sh	/^alias alias1=bar; afteralias() {}$/;"	f
+alias	Units/sh-alias.d/input.sh	/^function alias(); alias alias2=foo$/;"	f
+alias1	Units/sh-alias.d/input.sh	/^alias alias1=bar; afteralias() {}$/;"	a
+alias2	Units/sh-alias.d/input.sh	/^function alias(); alias alias2=foo$/;"	a
+alias_in_func1	Units/sh-alias.d/input.sh	/^  alias alias_in_func1=ls$/;"	a
+alias_in_func2	Units/sh-alias.d/input.sh	/^func2() alias alias_in_func2=ls$/;"	a
+alias_in_func3	Units/sh-alias.d/input.sh	/^func3() { alias alias_in_func3=ls }$/;"	a
+func1	Units/sh-alias.d/input.sh	/^func1() {$/;"	f
+func2	Units/sh-alias.d/input.sh	/^func2() alias alias_in_func2=ls$/;"	f
+func3	Units/sh-alias.d/input.sh	/^func3() { alias alias_in_func3=ls }$/;"	f
