@@ -19,6 +19,9 @@ DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 		rm -f $1 $2 $3 $4; \
 		echo "passed" ; \
 		true ; \
+	  elif test -d $(5).b; then \
+		echo "failed but KNOWN bug" ; \
+		true ; \
 	  else \
 		echo "FAILED" ; \
 		echo "	differences left in $3" ; \
@@ -127,13 +130,13 @@ test.linux: $(CTAGS_TEST) $(CTAGS_REF)
 endif
 
 
-UNITS_ARTIFACTS=Units/*.d/EXPECTED.TMP Units/*.d/OUTPUT.TMP Units/*.d/DIFF.TMP
+UNITS_ARTIFACTS=Units/*.[db]/EXPECTED.TMP Units/*.[db]/OUTPUT.TMP Units/*.[db]/DIFF.TMP
 test.units: $(CTAGS_TEST)
 	@ \
 	success=true; \
-	for input in Units/*.d/input.*; do \
+	for input in Units/*.[db]/input.*; do \
 		t=$${input%/input.*}; \
-		name=$${t%.d}; \
+		name=$${t%.[db]}; \
 		\
 		expected="$$t"/expected.tags; \
 		expectedtmp="$$t"/EXPECTED.TMP; \
@@ -156,7 +159,7 @@ test.units: $(CTAGS_TEST)
 		"$$input" 2> "$$stderr" | \
 		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
 		cp "$$expected" "$$expectedtmp"; \
-		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff","$$stderr"); \
+		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff","$$stderr","$$name"); \
 		test $$? -eq 0 || { echo "	cmdline: " \
 					$(CTAGS_TEST) --options=NONE --data-dir=Data --data-dir=+$$t -o - \
 					$$(test -f "$${args}" && echo "--options=$${args}") "$$input" ;\
@@ -194,7 +197,7 @@ fuzz: $(CTAGS_TEST)
 	for lang in $$($(CTAGS_TEST) --list-languages); do \
 		if test -z "$(FUZZ_LANGUAGE)" || test "$(FUZZ_LANGUAGE)" = "$${lang}"; then \
 			echo "Fuzz-testing: $${lang}"; \
-			for input in Test/* Units/*.d/input.*; do \
+			for input in Test/* Units/*.[db]/input.*; do \
 				$(call run-ctags,"$${lang}","$${input}"); \
 			done; \
 			for d in $(FUZZ_SRC_DIRS); do \
