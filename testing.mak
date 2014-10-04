@@ -47,7 +47,7 @@ CHECK_FEATURES = (\
 # 	$ make -f testing.mak VG=1 test.units
 #
 VALGRIND_COMMAND       = valgrind
-VALGRIND_OPTIONS       = --quiet --leak-check=full --show-leak-kinds=all
+VALGRIND_OPTIONS       = --quiet --leak-check=full
 VALGRIND_EXTRA_OPTIONS =
 ifdef VG
 VALGRIND = $(VALGRIND_COMMAND) $(VALGRIND_OPTIONS) $(VALGRIND_EXTRA_OPTIONS)
