@@ -112,6 +112,29 @@ Example of running
 	Testing Units/cpp-type-alias-with-using-keyword...Passed
 	Testing Units/c-sample...Passed
 
+
+Gathering test cases for known bugs
+------------------------------------------------------------
+
+When we met a bug, making a small test case that triggers the bug is
+important develoment activity. Even the bug cannot be fixed in soon,
+the test case is an important result of work. Such result should
+be merged to the source tree. However, we don't love "FAILED"
+message, too. What we should do?
+
+In such case, merge as usually but use ".b" as suffix for
+the directory of test case instead of ".d".
+
+Unix/css-singlequote-in-comment-issue2.b is an example
+of ".b".
+
+When you run test.units target, you will see
+
+    Testing Units/c-sample...passed
+    Testing Units/css-singlequote-in-comment...failed but KNOWN bug
+    Testing Units/ctags-simple...passed
+
+
 Acknowledgements
 ------------------------------------------------------------
 

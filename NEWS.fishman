@@ -69,7 +69,7 @@ with
 You can run the target fuzz under VG=1.
 
 
-Automatic parser selection
+Automatic parser selection based on corpora
 ---------------------------------------------------------------------
 For suffix .m ctags has two built-in parsers: ObjectiveC and Matlab.
 Which parser ctags should use? Here this situation is called "parser
