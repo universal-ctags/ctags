@@ -1,11 +1,11 @@
-Changes in fishamn ctags of common part
+Changes in fishman ctags of common part
 ======================================================================
 
 Many changes have been introduced in fishman-ctags. Here I (Masatake
-YAMATO) enumerate the changes mainly in common part. About changes 
+YAMATO) enumerate the changes mainly in common part. About changes
 not enumerated here especially in language parsers, inquire git-log.
 
-Proofreadin is welcome!
+Proofreading is welcome!
 
 Importing the most of all changes in exuberant-ctags svn repository
 ---------------------------------------------------------------------
@@ -54,13 +54,13 @@ The most of all memory leaks are fixed already.
 
 Semi-fuzz testing
 ---------------------------------------------------------------------
-One of the frustrating thing is that ctags enters infinite loop 
+One of the frustrating thing is that ctags enters infinite loop
 against unexpected input. I wanted detect this kind of bug.
 
 	$ make -f testing.mak fuzz FUZZ_LANGUAGE=LANG
 
 With this command line, you can given all test inputs
-including Test/* and Units/*/input.* to a parser specfied
+including Test/* and Units/*/input.* to a parser specified
 with FUZZ_LANGUAGE macro. You can get the list of LANG
 with
 
@@ -83,14 +83,14 @@ With --<LANG>-corpus=spec:corpusFile option you can prepare corpus a
 file to make ctags learn lexical tendency of a language. Ctags
 learns it as typical input of LANG. Based on the learning ctags
 tries to solve the parser confliction. See Data/configs/mib.ctags
-and Data/corpora/RFC1213-MIB.txt as an example of the usage of 
+and Data/corpora/RFC1213-MIB.txt as an example of the usage of
 --<LANG>-corpus.
 
 About ObjectiveC and Matlab parser, corpus files are embedded in the
 parser implementations. See objc.c and matlab.c.
 
 More documentation is needed.
-  
+
 
 Modeline based parser selection
 ---------------------------------------------------------------------
@@ -105,14 +105,14 @@ syntax (in vim). The editor can change its behavior specializing to a
 programming language based on the mode (or syntax).
 
 fishman-ctags can also recognize the modeline; and choose a language
-parser based on the modeline. 
+parser based on the modeline.
 
 
 ctags recognizes following patterns used in emacs:
 
   At the head of input file or at the line next of shebang line:
 
-    -*- mode: MODE; -*- 
+    -*- mode: MODE; -*-
 
     -*- MODE -*-
 
@@ -131,19 +131,186 @@ ctags recognizes following patterns used in vim:
 
       vim:set filetype=SYNTAX
       ex:se ft=SYNTAX
-      
+
 
 Better parser selection for template files
 ---------------------------------------------------------------------
 Consider an input file name foo.c.in.  Suffix '.in' is popular as a
-name for template files.  Welknown one is config.h.in used in GNU
+name for template files.  Well-Known one is config.h.in used in GNU
 autotools.
 
 ctags used suffix here '*.in' for choosing a parser. '.in' shows
 nothing about the language used in the input file. When fishman-ctags
 finds '.in' as suffix, fishman-ctags checks the next suffix, here .c.
 
-Option directories
+Option library
+---------------------------------------------------------------------
+
+exuberant-ctags provides the way to customize ctags with options like
+--langdef=<LANG> and --regex-<LANG>. An option file where options are
+written can be loaded with --options=OPTION_FILE.
+
+fishman-ctags extends this feature. fishman-ctags treats option files
+as libraries. Developers of fishman-ctags maintain some option files
+as part of fishman-ctags. They are shipped as part of fishman-ctags
+release. With "make install" they are also installed as ctags command
+is.
+
+fishman-ctags prepares directories where the option files are installed.
+
+Consider you use a GNU/Linux distribution.
+Following directories are searched when loading an option file.
+
+	 ~/.ctags.d/configs
+	 /etc/ctags/configs
+	 /usr/share/ctags/configs
+
+The name of an option file must have .conf or .ctags as suffix.
+
+If ctags is invoked with following command line:
+
+	$ ctags --options=mib ...
+
+Following files are searched with following order for finding mib:
+
+	  ~/.ctags.d/configs/mib.conf
+	  ~/.ctags.d/configs/mib.ctags
+	  /etc/ctags/configs/mib.conf
+	  /etc/ctags/configs/mib.ctags
+	  /usr/share/ctags/configs/mib.conf
+	  /usr/share/ctags/configs/mib.ctags
+
+These are called built-in search path.
+
+If you don't want ctags not to refer above search path, instead you
+want to specify directly an option file with --options, start the
+parameter of the option with "/" (absolute path) or "./" (relative path)
+like
+
+	$ ctags --option=/home/user/test/mib.cf
+	$ ctags --option=./test/mib.cf
+
+Here the restriction about suffix doesn't exist.
+
+On GNU/Linux you can add more directories with environment variable
+named CTAGS_DATA_PATH.
+
+	$ CTAGS_DATA_PATH=A:B ctags --options=mib ...
+
+Following files are searched with following order for finding "mib":
+
+	  A/configs/mib.conf
+	  A/configs/mib.ctags
+	  B/configs/mib.conf
+	  B/configs/mib.ctags
+	  ~/.ctags.d/configs/mib.conf
+	  ...
+
+Further more you can use --data-path=[+]PATH for adding more directories
+with environment variable.
+
+	$ CTAGS_DATA_PATH=A:B ctags --data-path=+C --options=mib ...
+
+In this case following files are searched with following order for
+finding mib:
+
+	C/configs/mib.conf
+	C/configs/mib.ctags
+	A/configs/mib.conf
+	A/configs/mib.ctags
+	B/configs/mib.conf
+	B/configs/mib.ctags
+	~/.ctags.d/configs/mib.conf
+	...
+
+If you omit "+", instead of adding you can set a directory:
+
+	$ CTAGS_DATA_PATH=A:B ctags --data-path=C --options=mib ...
+
+In this case following files are searched with following order for
+finding mib:
+
+	C/config/mib.conf
+	C/config/mib.ctags
+
+With reserved file name NONE, you can make the directory list empty:
+
+	$ CTAGS_DATA_PATH=A:B ctags --data-path=NONE --options=mib ...
+
+In this case ctags tries to load ./mib.
+
+See also "Loading option recursively".
+
+How a directory is set/added to the search path can be watched with
+--verbose option. This is useful for debugging this feature.
+
+fishman-ctags developers wait your pull request of well written
+option files.
+
+NOTE: Though --data-path is highest priority, --data-path doesn't
+affect a stage of automatic option file loading. Following files are
+automatically loaded when ctags starts:
+
+	/ctags.cnf (on MSDOS, MSWindows only)
+	/etc/ctags.conf
+	/usr/local/etc/ctags.conf
+	$HOME/.ctags
+	$HOME/ctags.cnf (on MSDOS, MSWindows only)
+	.ctags
+	ctags.cnf (on MSDOS, MSWindows only)
+
+NOTE: This feature is still in experimental. The name of directories,
+suffix rules, and other convention will change.
+
+TODO: Write about MSWindows more(.cnf).
+      accept_only_dot_ctags() doesn't  check .cnf.
+
+Loading option recursively
+---------------------------------------------------------------------
+
+The option file loading rules explained in "Option library" is more
+complex.  If you specify a directory as parameter for --option instead
+of a file, fishman-ctags loads option files under the directory
+recursively.
+
+Consider following command line on GNU/Linux distribution.
+
+	$ ctags --options=bundle ...
+
+Following directories are searched first:
+
+	  ~/.ctags.d/configs/bundle.d
+	  /etc/ctags/configs/bundle.d
+	  /usr/share/ctags/configs/bundle.d
+
+If bundle.d is found and it is a directory, files (*.ctags
+and *.conf), directories (*.d) are loaded recursively.
+
+NOTE, TODO: If bundle.d is not found above list, a file
+bundle.ctags or bundle.conf are searched. This rule is a bit
+ugly. Following search rules looks better.
+
+	  ~/.ctags.d/configs/bundle.d
+	  ~/.ctags.d/configs/bundle.ctags
+	  ~/.ctags.d/configs/bundle.conf
+	  /etc/ctags/configs/bundle.d
+	  /etc/ctags/configs/bundle.ctags
+	  /etc/ctags/configs/bundle.conf
+	  /usr/share/ctags/configs/bundle.d
+	  /usr/share/ctags/configs/bundle.ctags
+	  /usr/share/ctags/configs/bundle.conf
+
+NOTE: This feature requires scandir library function. This feature may
+be disabled on which platform scandir is not available. Check "option-directory"
+in the supported features:
+
+	$ ./ctags --list-features
+	wildcards
+	regex
+	option-directory
+
+
+Autoload directory
 ---------------------------------------------------------------------
 
 TBW
