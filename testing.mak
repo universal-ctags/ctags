@@ -17,10 +17,11 @@ DIFF_OPTIONS = -U 0 -I '^!_TAG' --strip-trailing-cr
 DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
 DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 		rm -f $1 $2 $3 $4; \
-		echo "Passed" ; \
+		echo "passed" ; \
 		true ; \
 	  else \
-		echo "FAILED: differences left in $3" ; \
+		echo "FAILED" ; \
+		echo "	differences left in $3" ; \
 		false ; \
 	  fi
 
@@ -31,7 +32,7 @@ CHECK_FEATURES = (\
 			if test "$$REPLY" = "$$f"; then found=yes; fi; \
 		done; \
 		if ! test $$found = yes; then \
-			echo "Skip (required feature $$REPLY is not available)"; \
+			echo "skipped (required feature $$REPLY is not available)"; \
 			exit 1; \
 		fi; \
 	done < $1; \
@@ -156,7 +157,10 @@ test.units: $(CTAGS_TEST)
 		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
 		cp "$$expected" "$$expectedtmp"; \
 		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff","$$stderr"); \
-		test $$? -eq 0 || success=false; \
+		test $$? -eq 0 || { echo "	cmdline: " \
+					$(CTAGS_TEST) --options=NONE --data-dir=Data --data-dir=+$$t -o - \
+					$$(test -f "$${args}" && echo "--options=$${args}") "$$input" ;\
+				    success=false; }; \
 	done; \
 	$$success
 
