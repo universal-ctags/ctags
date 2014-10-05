@@ -136,7 +136,7 @@ etyperef$(EXEEXT): $(ETYPEREF_OBJS)
 etyperef.o: eiffel.c
 	$(CC) -DTYPE_REFERENCE_TOOL -I. -I$(srcdir) $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -o $@ -c eiffel.c
 
-$(OBJECTS): $(HEADERS) config.h
+$(OBJECTS): $(HEADERS) config.h Makefile
 
 #
 # generic install rules
