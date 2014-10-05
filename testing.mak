@@ -134,7 +134,7 @@ UNITS_ARTIFACTS=Units/*.[db]/EXPECTED.TMP Units/*.[db]/OUTPUT.TMP Units/*.[db]/D
 test.units: $(CTAGS_TEST)
 	@ \
 	success=true; \
-	for input in Units/*.[db]/input.*; do \
+	for input in $$(ls Units/*.[db]/input.* | grep -v "~$$"); do \
 		t=$${input%/input.*}; \
 		name=$${t%.[db]}; \
 		\
