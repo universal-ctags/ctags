@@ -82,7 +82,7 @@ without manual instruction.
 With --<LANG>-corpus=spec:corpusFile option you can prepare corpus a
 file to make ctags learn lexical tendency of a language. Ctags
 learns it as typical input of LANG. Based on the learning ctags
-tries to solve the parser confliction. See Data/configs/mib.ctags
+tries to solve the parser confliction. See Data/optlib/mib.ctags
 and Data/corpora/RFC1213-MIB.txt as an example of the usage of
 --<LANG>-corpus.
 
@@ -161,9 +161,9 @@ fishman-ctags prepares directories where the option files are installed.
 Consider you use a GNU/Linux distribution.
 Following directories are searched when loading an option file.
 
-	 ~/.ctags.d/configs
-	 /etc/ctags/configs
-	 /usr/share/ctags/configs
+	 ~/.ctags.d/optlib
+	 /etc/ctags/optlib
+	 /usr/share/ctags/optlib
 
 The name of an option file must have .conf or .ctags as suffix.
 
@@ -173,12 +173,12 @@ If ctags is invoked with following command line:
 
 Following files are searched with following order for finding mib:
 
-	  ~/.ctags.d/configs/mib.conf
-	  ~/.ctags.d/configs/mib.ctags
-	  /etc/ctags/configs/mib.conf
-	  /etc/ctags/configs/mib.ctags
-	  /usr/share/ctags/configs/mib.conf
-	  /usr/share/ctags/configs/mib.ctags
+	  ~/.ctags.d/optlib/mib.conf
+	  ~/.ctags.d/optlib/mib.ctags
+	  /etc/ctags/optlib/mib.conf
+	  /etc/ctags/optlib/mib.ctags
+	  /usr/share/ctags/optlib/mib.conf
+	  /usr/share/ctags/optlib/mib.ctags
 
 These are called built-in search path.
 
@@ -199,11 +199,11 @@ named CTAGS_DATA_PATH.
 
 Following files are searched with following order for finding "mib":
 
-	  A/configs/mib.conf
-	  A/configs/mib.ctags
-	  B/configs/mib.conf
-	  B/configs/mib.ctags
-	  ~/.ctags.d/configs/mib.conf
+	  A/optlib/mib.conf
+	  A/optlib/mib.ctags
+	  B/optlib/mib.conf
+	  B/optlib/mib.ctags
+	  ~/.ctags.d/optlib/mib.conf
 	  ...
 
 Further more you can use --data-path=[+]PATH for adding more directories
@@ -214,13 +214,13 @@ with environment variable.
 In this case following files are searched with following order for
 finding mib:
 
-	C/configs/mib.conf
-	C/configs/mib.ctags
-	A/configs/mib.conf
-	A/configs/mib.ctags
-	B/configs/mib.conf
-	B/configs/mib.ctags
-	~/.ctags.d/configs/mib.conf
+	C/optlib/mib.conf
+	C/optlib/mib.ctags
+	A/optlib/mib.conf
+	A/optlib/mib.ctags
+	B/optlib/mib.conf
+	B/optlib/mib.ctags
+	~/.ctags.d/optlib/mib.conf
 	...
 
 If you omit "+", instead of adding you can set a directory:
@@ -279,9 +279,9 @@ Consider following command line on GNU/Linux distribution.
 
 Following directories are searched first:
 
-	  ~/.ctags.d/configs/bundle.d
-	  /etc/ctags/configs/bundle.d
-	  /usr/share/ctags/configs/bundle.d
+	  ~/.ctags.d/optlib/bundle.d
+	  /etc/ctags/optlib/bundle.d
+	  /usr/share/ctags/optlib/bundle.d
 
 If bundle.d is found and it is a directory, files (*.ctags
 and *.conf), directories (*.d) are loaded recursively.
@@ -290,15 +290,15 @@ NOTE, TODO: If bundle.d is not found above list, a file
 bundle.ctags or bundle.conf are searched. This rule is a bit
 ugly. Following search rules looks better.
 
-	  ~/.ctags.d/configs/bundle.d
-	  ~/.ctags.d/configs/bundle.ctags
-	  ~/.ctags.d/configs/bundle.conf
-	  /etc/ctags/configs/bundle.d
-	  /etc/ctags/configs/bundle.ctags
-	  /etc/ctags/configs/bundle.conf
-	  /usr/share/ctags/configs/bundle.d
-	  /usr/share/ctags/configs/bundle.ctags
-	  /usr/share/ctags/configs/bundle.conf
+	  ~/.ctags.d/optlib/bundle.d
+	  ~/.ctags.d/optlib/bundle.ctags
+	  ~/.ctags.d/optlib/bundle.conf
+	  /etc/ctags/optlib/bundle.d
+	  /etc/ctags/optlib/bundle.ctags
+	  /etc/ctags/optlib/bundle.conf
+	  /usr/share/ctags/optlib/bundle.d
+	  /usr/share/ctags/optlib/bundle.ctags
+	  /usr/share/ctags/optlib/bundle.conf
 
 NOTE: This feature requires scandir library function. This feature may
 be disabled on which platform scandir is not available. Check "option-directory"

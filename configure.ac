@@ -491,7 +491,7 @@ fi
 # fi
 
 install_data_targets="install-data-corpora"
-AC_CHECK_FUNCS(scandir,[install_data_targets="$install_data_targets install-data-configs"])
+AC_CHECK_FUNCS(scandir,[install_data_targets="$install_data_targets install-data-optlib"])
 AC_SUBST(install_data_targets)
 
 # Checks for missing prototypes

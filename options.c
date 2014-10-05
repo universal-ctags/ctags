@@ -65,7 +65,7 @@
 
 #define isCompoundOption(c)  (boolean) (strchr ("fohiILpDb", (c)) != NULL)
 
-#define SUBDIR_CONFIGS "configs"
+#define SUBDIR_OPTLIB "optlib"
 #define SUBDIR_CORPORA "corpora"
 
 /*
@@ -104,7 +104,7 @@ static boolean NonOptionEncountered;
 static stringList *OptionFiles;
 
 typedef stringList searchPathList;
-static searchPathList *ConfigPathList;
+static searchPathList *OptlibPathList;
 static searchPathList *CorpusPathList;
 
 static stringList* Excluded;
@@ -1616,7 +1616,7 @@ static boolean isDirectory (const char *const dirName)
 	return status->exists && status->isDirectory;
 }
 
-static vString* expandOnConfigPathList (const char* leaf)
+static vString* expandOnOptlibPathList (const char* leaf)
 {
 	vString* r;
 	vString* leaf_with_suffix;
@@ -1624,14 +1624,14 @@ static vString* expandOnConfigPathList (const char* leaf)
 	leaf_with_suffix = vStringNewInit (leaf);
 	vStringCatS (leaf_with_suffix, ".d");
 
-	r = expandOnSearchPathList (ConfigPathList, vStringValue (leaf_with_suffix),
+	r = expandOnSearchPathList (OptlibPathList, vStringValue (leaf_with_suffix),
 				    isDirectory);
 
 	if (!r)
 	{
 		vStringCopyS (leaf_with_suffix, leaf);
 		vStringCatS (leaf_with_suffix, ".conf");
-		r = expandOnSearchPathList (ConfigPathList, vStringValue (leaf_with_suffix),
+		r = expandOnSearchPathList (OptlibPathList, vStringValue (leaf_with_suffix),
 					    doesFileExist);
 	}
 
@@ -1639,7 +1639,7 @@ static vString* expandOnConfigPathList (const char* leaf)
 	{
 		vStringCopyS (leaf_with_suffix, leaf);
 		vStringCatS (leaf_with_suffix, ".ctags");
-		r = expandOnSearchPathList (ConfigPathList, vStringValue (leaf_with_suffix),
+		r = expandOnSearchPathList (OptlibPathList, vStringValue (leaf_with_suffix),
 					    doesFileExist);
 	}
 
@@ -1648,7 +1648,7 @@ static vString* expandOnConfigPathList (const char* leaf)
 	{
 		vStringCopyS (leaf_with_suffix, leaf);
 		vStringCatS (leaf_with_suffix, ".cnf");
-		r = expandOnSearchPathList (ConfigPathList, vStringValue (leaf_with_suffix),
+		r = expandOnSearchPathList (OptlibPathList, vStringValue (leaf_with_suffix),
 					    doesFileExist);
 	}
 #endif
@@ -1675,7 +1675,7 @@ static void processOptionFile (
 
 	if (parameter [0] != '/' && parameter [0] != '.')
 	{
-		vpath = expandOnConfigPathList (parameter);
+		vpath = expandOnOptlibPathList (parameter);
 		path = vpath? vStringValue (vpath): parameter;
 	}
 	else
@@ -1877,7 +1877,7 @@ static void resetDataPathList0 (searchPathList** pathList, const char *const var
 
 static void resetDataPathList (void)
 {
-	resetDataPathList0(&ConfigPathList, "ConfigPathList");
+	resetDataPathList0(&OptlibPathList, "OptlibPathList");
 	resetDataPathList0(&CorpusPathList, "CorpusPathList");
 }
 
@@ -1904,7 +1904,7 @@ static void prependToDataPathList0 (const char *const dir, const char *const sub
 
 static void appendToDataPathList (const char *const dir, boolean report_in_verboe)
 {
-	appendToDataPathList0 (dir, SUBDIR_CONFIGS, ConfigPathList, "ConfigPathList",
+	appendToDataPathList0 (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
 			       report_in_verboe, report_in_verboe? "Append": NULL);
 	appendToDataPathList0 (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
 			       report_in_verboe, report_in_verboe? "Append": NULL);
@@ -1912,7 +1912,7 @@ static void appendToDataPathList (const char *const dir, boolean report_in_verbo
 
 static void prependToDataPathList (const char *const dir, boolean report_in_verboe)
 {
-	prependToDataPathList0 (dir, SUBDIR_CONFIGS, ConfigPathList, "ConfigPathList",
+	prependToDataPathList0 (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
 				report_in_verboe, report_in_verboe? "Prepend": NULL);
 	prependToDataPathList0 (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
 				report_in_verboe, report_in_verboe? "Prepend": NULL);
@@ -2447,7 +2447,7 @@ static void installDataPathList (void)
 {
 	char* dataPath = getenv (CTAGS_DATA_PATH_ENVIRONMENT);
 
-	ConfigPathList = stringListNew ();
+	OptlibPathList = stringListNew ();
 	CorpusPathList = stringListNew ();
 
 	if (dataPath)
@@ -2502,7 +2502,7 @@ extern void initOptions (void)
 {
 	OptionFiles = stringListNew ();
 	installDataPathList ();
-	verboseSearchPathList (ConfigPathList, "ConfigPathList");
+	verboseSearchPathList (OptlibPathList, "OptlibPathList");
 	verboseSearchPathList (CorpusPathList, "CorpusPathList");
 
 	verbose ("Setting option defaults\n");
@@ -2547,7 +2547,7 @@ extern void freeOptionResources (void)
 	freeList (&Option.etagsInclude);
 
 	freeSearchPathList (&CorpusPathList);
-	freeSearchPathList (&ConfigPathList);
+	freeSearchPathList (&OptlibPathList);
 
 	freeList (&OptionFiles);
 }

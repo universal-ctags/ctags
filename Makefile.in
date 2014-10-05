@@ -65,7 +65,7 @@ include $(srcdir)/source.mak
 .SUFFIXES:
 .SUFFIXES: .c .$(OBJEXT)
 
-VPATH	= $(srcdir) $(srcdir)/Data/corpora $(srcdir)/Data/configs
+VPATH	= $(srcdir) $(srcdir)/Data/corpora $(srcdir)/Data/optlib
 
 INSTALL		= cp -p
 INSTALL_PROG	= $(INSTALL)
@@ -97,9 +97,9 @@ CORPORA    = ctags.ctags RFC1213-MIB.txt
 #
 # config files
 #
-configsdir = $(datadir)/configs
-pkgconf_configsdir = $(pkgconfdir)/configs
-CONFIGS    = ctags.ctags mib.ctags
+optlibdir = $(datadir)/optlib
+pkgconf_optlibdir = $(pkgconfdir)/optlib
+OPTLIB    = ctags.ctags mib.ctags
 
 #
 # destinations for installed files
@@ -148,7 +148,7 @@ install-strip: install
 install-ctags: install-cbin install-cman
 install-etags: install-ebin install-eman
 
-$(bindir) $(man1dir) $(libdir) $(incdir) $(corporadir) $(configsdir) $(pkgconf_corporadir) $(pkgconf_configsdir):
+$(bindir) $(man1dir) $(libdir) $(incdir) $(corporadir) $(optlibdir) $(pkgconf_corporadir) $(pkgconf_optlibdir):
 	$(srcdir)/mkinstalldirs $@
 
 FORCE:
@@ -215,11 +215,11 @@ install-data-corpora: $(addprefix Data/corpora/,$(CORPORA)) $(corporadir) $(pkgc
 	for c in $(CORPORA); do \
 		$(INSTALL_DATA) $(srcdir)/Data/corpora/$$c $(DESTDIR)$(corporadir)/$$c && chmod 644 $(DESTDIR)$(corporadir)/$$c; \
 	done
-install-data-configs: $(addprefix Data/configs/,$(CONFIGS))  $(configsdir) $(pkgconf_configsdir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(configsdir)
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(pkgconf_configsdir)
-	for c in $(CONFIGS); do \
-		$(INSTALL_DATA) $(srcdir)/Data/configs/$$c $(DESTDIR)$(configsdir)/$$c && chmod 644 $(DESTDIR)$(configsdir)/$$c; \
+install-data-optlib: $(addprefix Data/optlib/,$(OPTLIB))  $(optlibdir) $(pkgconf_optlibdir) FORCE
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(optlibdir)
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(pkgconf_optlibdir)
+	for c in $(OPTLIB); do \
+		$(INSTALL_DATA) $(srcdir)/Data/optlib/$$c $(DESTDIR)$(optlibdir)/$$c && chmod 644 $(DESTDIR)$(optlibdir)/$$c; \
 	done
 
 #
@@ -245,7 +245,7 @@ uninstall-ctags:
 uninstall-etags:
 	- rm -f $(DEST_ETAGS) $(DEST_EMAN)
 
-uninstall-data: uninstall-corpora uninstall-configs
+uninstall-data: uninstall-corpora uninstall-optlib
 	- rmdir $(datadir)
 	- rmdir $(pkgconfdir)
 
@@ -253,10 +253,10 @@ uninstall-corpora:
 	- rm -f $(addprefix $(corporadir)/,$(CORPORA))
 	- rmdir $(corporadir)
 	- rmdir $(pkgconf_corporadir)
-uninstall-configs:
-	- rm -f $(addprefix $(configsdir)/,$(CONFIGS))
-	- rmdir $(configsdir)
-	- rmdir $(pkgconf_configsdir)
+uninstall-optlib:
+	- rm -f $(addprefix $(optlibdir)/,$(OPTLIB))
+	- rmdir $(optlibdir)
+	- rmdir $(pkgconf_optlibdir)
 
 #
 # miscellaneous rules
