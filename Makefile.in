@@ -99,7 +99,7 @@ CORPORA    = ctags.ctags RFC1213-MIB.txt
 #
 optlibdir = $(datadir)/optlib
 pkgconf_optlibdir = $(pkgconfdir)/optlib
-OPTLIB    = ctags.ctags mib.ctags
+OPTLIB    = ctags.ctags mib.ctags rust.ctags
 
 #
 # destinations for installed files
