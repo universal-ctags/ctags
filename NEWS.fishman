@@ -18,9 +18,12 @@ New added(+) and heavily improved(*) language parsers
 ---------------------------------------------------------------------
 + ada
 + css
++ ctags option library
 + falcon
 + go
++ mib
 * php
++ rust
 + windres
 
 
