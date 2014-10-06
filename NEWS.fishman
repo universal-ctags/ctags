@@ -313,11 +313,82 @@ in the supported features:
 	option-directory
 
 
-Autoload directory
+Directories for preloading
 ---------------------------------------------------------------------
 
-TBW
+As written in "Option library", option libraries can be loaded with
+--options option. However, you may want to load them without
+specifying it explicitly.
 
+	~/.ctags
+	/ctags.cnf (on MSDOS, MSWindows only)
+	/etc/ctags.conf
+	/usr/local/etc/ctags.conf
+
+These files can be used for the purpose. This preloading feature
+comes from exuberant-ctags. However, I think two weaknesses in
+this implementation.
+
+w1. you have to edit the file when you want to add an
+    option library to be loaded.
+
+    If one wants to add or remove an --options= in a ctags.conf,
+    currently one may have to use sed or something tool for adding or
+    removing the line for the entry in /usr/local/etc/ctags.conf (or
+    etc/ctags.conf).
+
+    I made a discussion about the similar issue in
+    http://marc.info/?t=129794755000003&r=1&w=2 about /etc/exports
+    of NFS.
+
+w2. you cannot override the configuration defined in
+    system administrator.
+
+    A user must accept all configuration including --options=
+    in /etc/ctags.conf and /usr/local/etc/ctags.conf.
+
+I prepares another facility. Let's not use older facility like .ctags.
+I introduced following directories for preloading purpose.
+
+	~/.ctags.d/preload
+	/etc/ctags/preload
+	/usr/share/ctags/preload
+
+All files and directories under the directories are loaded recursively,
+but two restrictions:
+
+r1. file/directory name
+
+    The same suffix rules written in "Option library" and
+    "Loading option recursively" are applied in preloading, too.
+
+r2. overriding
+
+    The traversing and loading are done in the order listed above.
+    Once a file is loaded, another file with the same name is not loaded.
+    Once a directory is traversed, another directory with the same name is
+    not traversed.
+
+    fishman-ctags prepares /usr/share/ctags/preload/default.ctags.
+    If you want ctags not to load it, make an empty file at
+    ~/.ctags/default.ctags. If you want to customize
+    /usr/share/ctags/preload/default.ctags, copy the file to
+    ~/.ctags.d/default.ctags and edit it as you want.
+
+    Assume /usr/share/ctags/preload/something.d exits.
+    Some .ctags files are in the directory. With making
+    an empty directory at ~/.ctags.d/something.d, you
+    can make ctags not to traverse /usr/share/ctags/preload/something.d.
+    As the result .ctags files under /usr/share/ctags/preload/something.d
+    are not loaded.
+
+    If you want to customize one of file under
+    /usr/share/ctags/preload/something.d, you have to copy
+    /usr/share/ctags/preload/something.d to ~/.ctags.d/somethind.d recursively.
+    You can also use symbolic links. After copying or symbolic linking, edit
+    one of the copied file.
+
+This feature is heavily inspired by systemd.
 
 exclude flag in regex
 ---------------------------------------------------------------------
