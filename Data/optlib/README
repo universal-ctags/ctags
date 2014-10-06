@@ -112,7 +112,7 @@ Makefile.in
 Add your option library file and associative corpus file to 
 Makefile.in.
 
-1. add your config file, swine.ctags to OPTLIB variable of Makefile.in, and
+1. add your config file, swine.ctags to PRELOAD_OPTLIB variable of Makefile.in, and
 2. add your corpus file, swine.swn to CORPORA variable of Makefile.in.
 
 

@@ -95,11 +95,18 @@ pkgconf_corporadir = $(pkgconfdir)/corpora
 CORPORA    = ctags.ctags RFC1213-MIB.txt
 
 #
+# preload
+#
+preloaddir = $(datadir)/preload
+pkgconf_preloaddir = $(pkgconfdir)/preload
+PRELOAD_OPTLIB = ctags.ctags mib.ctags rust.ctags
+
+#
 # config files
 #
 optlibdir = $(datadir)/optlib
 pkgconf_optlibdir = $(pkgconfdir)/optlib
-OPTLIB    = ctags.ctags mib.ctags rust.ctags
+OPTLIB    = $(PRELOAD_OPTLIB)
 
 #
 # destinations for installed files
@@ -148,7 +155,7 @@ install-strip: install
 install-ctags: install-cbin install-cman
 install-etags: install-ebin install-eman
 
-$(bindir) $(man1dir) $(libdir) $(incdir) $(corporadir) $(optlibdir) $(pkgconf_corporadir) $(pkgconf_optlibdir):
+$(bindir) $(man1dir) $(libdir) $(incdir) $(corporadir) $(optlibdir) $(preloaddir) $(pkgconf_corporadir) $(pkgconf_optlibdir) $(pkgconf_preloaddir):
 	$(srcdir)/mkinstalldirs $@
 
 FORCE:
@@ -221,6 +228,13 @@ install-data-optlib: $(addprefix Data/optlib/,$(OPTLIB))  $(optlibdir) $(pkgconf
 	for c in $(OPTLIB); do \
 		$(INSTALL_DATA) $(srcdir)/Data/optlib/$$c $(DESTDIR)$(optlibdir)/$$c && chmod 644 $(DESTDIR)$(optlibdir)/$$c; \
 	done
+install-data-preload: $(preloaddir) $(pkgconf_preloaddir) FORCE
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(preloaddir)
+	$(srcdir)/mkinstalldirs $(DESTDIR)$(pkgconf_preloaddir)
+	for c in $(PRELOAD_OPTLIB); do \
+		echo "--options=$$(basename $$c .ctags)" >> $(DESTDIR)$(preloaddir)/default.ctags; \
+	done; \
+	chmod 644 $(DESTDIR)$(preloaddir)/default.ctags
 
 #
 # rules for uninstalling

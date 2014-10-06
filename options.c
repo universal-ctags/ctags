@@ -67,6 +67,7 @@
 
 #define SUBDIR_OPTLIB "optlib"
 #define SUBDIR_CORPORA "corpora"
+#define SUBDIR_PRELOAD "preload"
 
 /*
 *   Data declarations
@@ -106,6 +107,7 @@ static stringList *OptionFiles;
 typedef stringList searchPathList;
 static searchPathList *OptlibPathList;
 static searchPathList *CorpusPathList;
+static searchPathList *PreloadPathList;
 
 static stringList* Excluded;
 static boolean FilesRequired = TRUE;
@@ -375,7 +377,8 @@ static const char *const Features [] = {
 *   FUNCTION PROTOTYPES
 */
 static boolean parseFileOptions (const char *const fileName);
-static boolean parseAllConfigurationFilesOptionsInDirectory(const char *const fileName);
+static boolean parseAllConfigurationFilesOptionsInDirectory (const char *const fileName,
+							     stringList* const already_loaded_files);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -1688,7 +1691,7 @@ static void processOptionFile (
 	}
 	else if (status->isDirectory)
 	{
-		if (!parseAllConfigurationFilesOptionsInDirectory (path))
+		if (!parseAllConfigurationFilesOptionsInDirectory (path, NULL))
 			error (FATAL | PERROR, "cannot open option directory \"%s\"", path);
 	}
 	else
@@ -1902,20 +1905,28 @@ static void prependToDataPathList0 (const char *const dir, const char *const sub
 
 }
 
-static void appendToDataPathList (const char *const dir, boolean report_in_verboe)
+static void appendToDataPathList (const char *const dir, boolean from_cmdline)
 {
 	appendToDataPathList0 (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
-			       report_in_verboe, report_in_verboe? "Append": NULL);
+			       from_cmdline, from_cmdline? "Append": NULL);
 	appendToDataPathList0 (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
-			       report_in_verboe, report_in_verboe? "Append": NULL);
+			       from_cmdline, from_cmdline? "Append": NULL);
+
+	if (!from_cmdline)
+		appendToDataPathList0 (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
+				       FALSE, NULL);
 }
 
-static void prependToDataPathList (const char *const dir, boolean report_in_verboe)
+static void prependToDataPathList (const char *const dir, boolean from_cmdline)
 {
 	prependToDataPathList0 (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
-				report_in_verboe, report_in_verboe? "Prepend": NULL);
+				from_cmdline, from_cmdline? "Prepend": NULL);
 	prependToDataPathList0 (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
-				report_in_verboe, report_in_verboe? "Prepend": NULL);
+				from_cmdline, from_cmdline? "Prepend": NULL);
+
+	if (!from_cmdline)
+		prependToDataPathList0 (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
+					FALSE, NULL);
 }
 
 static void processDataDir (
@@ -2340,7 +2351,8 @@ static int accept_only_dot_ctags(const struct dirent* dent)
 	return 0;
 }
 
-static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const dirName)
+static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const dirName,
+							     stringList* const already_loaded_files)
 {
 	struct dirent **dents;
 	int i, n;
@@ -2351,11 +2363,20 @@ static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const d
 	
 	for (i = 0; i < n; i++)
 	{
-		vString* const path = combinePathAndFile (dirName, dents[i]->d_name);
-		fileStatus *s = eStat (vStringValue (path));
+		vString* path;
+		fileStatus *s;
+
+		if (already_loaded_files && stringListHas (already_loaded_files, dents[i]->d_name))
+			continue;
+		else if (already_loaded_files)
+			stringListAdd (already_loaded_files, vStringNewInit (dents[i]->d_name));
+
+		path = combinePathAndFile (dirName, dents[i]->d_name);
+		s = eStat (vStringValue (path));
 
 		if (s->exists && s->isDirectory && accept_only_dot_d(dents[i]))
-			parseAllConfigurationFilesOptionsInDirectory (vStringValue (path));
+			parseAllConfigurationFilesOptionsInDirectory (vStringValue (path),
+								      already_loaded_files);
 		else if (s->exists && accept_only_dot_ctags(dents[i]))
 			parseConfigurationFileOptionsInDirectoryWithLeafname (dirName,
 									      dents[i]->d_name);
@@ -2367,11 +2388,27 @@ static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const d
 	return TRUE;
 }
 #else
-static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const dirName)
+static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const dirName,
+							     stringList* already_loaded_files)
 {
 	return FALSE;
 }
 #endif
+
+static void preload (const searchPathList *const pathList)
+{
+	unsigned int i;
+	stringList* loaded;
+
+	loaded = stringListNew ();
+	for (i = 0; i < stringListCount (pathList); ++i)
+	{
+		const char* const dir = vStringValue (stringListItem (pathList, i));
+		parseAllConfigurationFilesOptionsInDirectory (dir, loaded);
+	}
+	stringListClear (loaded);
+	stringListDelete (loaded);
+}
 
 static void parseConfigurationFileOptions (void)
 {
@@ -2406,6 +2443,8 @@ static void parseConfigurationFileOptions (void)
 	}
 
 	parseConfigurationFileOptionsInDirectory (".");
+
+	preload (PreloadPathList);
 }
 
 static void parseEnvironmentOptions (void)
@@ -2449,6 +2488,7 @@ static void installDataPathList (void)
 
 	OptlibPathList = stringListNew ();
 	CorpusPathList = stringListNew ();
+	PreloadPathList = stringListNew ();
 
 	if (dataPath)
 	{
@@ -2502,8 +2542,9 @@ extern void initOptions (void)
 {
 	OptionFiles = stringListNew ();
 	installDataPathList ();
-	verboseSearchPathList (OptlibPathList, "OptlibPathList");
-	verboseSearchPathList (CorpusPathList, "CorpusPathList");
+	verboseSearchPathList (OptlibPathList,  "OptlibPathList");
+	verboseSearchPathList (CorpusPathList,  "CorpusPathList");
+	verboseSearchPathList (PreloadPathList, "PreloadPathList");
 
 	verbose ("Setting option defaults\n");
 	installHeaderListDefaults ();
@@ -2548,6 +2589,7 @@ extern void freeOptionResources (void)
 
 	freeSearchPathList (&CorpusPathList);
 	freeSearchPathList (&OptlibPathList);
+	freeSearchPathList (&PreloadPathList);
 
 	freeList (&OptionFiles);
 }
