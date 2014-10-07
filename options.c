@@ -1363,7 +1363,7 @@ static void processLanguagesOption (
 	eFree (langs);
 }
 
-extern boolean processMapOptoin (
+extern boolean processMapOption (
 			const char *const option, const char *const parameter)
 {
 	const char* const dash = strchr (option, '-');
@@ -2092,7 +2092,7 @@ static void processLongOption (
 		;
 	else if (processRegexOption (option, parameter))
 		;
-	else if (processMapOptoin (option, parameter))
+	else if (processMapOption (option, parameter))
 		;
 #ifndef RECURSE_SUPPORTED
 	else if (strcmp (option, "recurse") == 0)
