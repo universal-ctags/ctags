@@ -428,7 +428,7 @@ The characters { and } are not suitable in using command line.
 My intent is that using long flags in option libraries.
 
 
-Exclude flag in regex
+Exclusive flag in regex
 ---------------------------------------------------------------------
 
 A line read from input files was matched with ALL regular expressions
