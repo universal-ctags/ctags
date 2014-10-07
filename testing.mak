@@ -154,14 +154,14 @@ test.units: $(CTAGS_TEST)
 				continue; \
 			fi; \
 		fi; \
-		$(VALGRIND) $(CTAGS_TEST) --options=NONE --data-dir=Data --data-dir=+$$t -o - \
+		$(VALGRIND) $(CTAGS_TEST) --options=NONE --data-dir=data --data-dir=+$$t -o - \
 		$$(test -f "$${args}" && echo "--options=$${args}") \
 		"$$input" 2> "$$stderr" | \
 		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
 		cp "$$expected" "$$expectedtmp"; \
 		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff","$$stderr","$$name"); \
 		test $$? -eq 0 || { echo "	cmdline: " \
-					$(CTAGS_TEST) --options=NONE --data-dir=Data --data-dir=+$$t -o - \
+					$(CTAGS_TEST) --options=NONE --data-dir=data --data-dir=+$$t -o - \
 					$$(test -f "$${args}" && echo "--options=$${args}") "$$input" ;\
 				    success=false; }; \
 	done; \

@@ -65,7 +65,7 @@ include $(srcdir)/source.mak
 .SUFFIXES:
 .SUFFIXES: .c .$(OBJEXT)
 
-VPATH	= $(srcdir) $(srcdir)/Data/corpora $(srcdir)/Data/optlib
+VPATH	= $(srcdir) $(srcdir)/data/corpora $(srcdir)/data/optlib
 
 INSTALL		= cp -p
 INSTALL_PROG	= $(INSTALL)
@@ -211,13 +211,13 @@ $(DEST_READ_CMD): $(READ_CMD) $(DESTDIR)$(bindir) FORCE
 # install data
 #
 install-data: @install_data_targets@
-install-data-corpora: $(addprefix Data/corpora/,$(CORPORA)) $(DESTDIR)$(corporadir) $(DESTDIR)$(pkgconf_corporadir) FORCE
+install-data-corpora: $(addprefix data/corpora/,$(CORPORA)) $(DESTDIR)$(corporadir) $(DESTDIR)$(pkgconf_corporadir) FORCE
 	for c in $(CORPORA); do \
-		$(INSTALL_DATA) $(srcdir)/Data/corpora/$$c $(DESTDIR)$(corporadir)/$$c && chmod 644 $(DESTDIR)$(corporadir)/$$c; \
+		$(INSTALL_DATA) $(srcdir)/data/corpora/$$c $(DESTDIR)$(corporadir)/$$c && chmod 644 $(DESTDIR)$(corporadir)/$$c; \
 	done
-install-data-optlib: $(addprefix Data/optlib/,$(OPTLIB))  $(DESTDIR)$(optlibdir) $(DESTDIR)$(pkgconf_optlibdir) FORCE
+install-data-optlib: $(addprefix data/optlib/,$(OPTLIB))  $(DESTDIR)$(optlibdir) $(DESTDIR)$(pkgconf_optlibdir) FORCE
 	for c in $(OPTLIB); do \
-		$(INSTALL_DATA) $(srcdir)/Data/optlib/$$c $(DESTDIR)$(optlibdir)/$$c && chmod 644 $(DESTDIR)$(optlibdir)/$$c; \
+		$(INSTALL_DATA) $(srcdir)/data/optlib/$$c $(DESTDIR)$(optlibdir)/$$c && chmod 644 $(DESTDIR)$(optlibdir)/$$c; \
 	done
 install-data-preload: $(DESTDIR)$(preloaddir) $(DESTDIR)$(pkgconf_preloaddir) FORCE
 	for c in $(PRELOAD_OPTLIB); do \
