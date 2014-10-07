@@ -1230,7 +1230,7 @@ static void objcInitialize (const langType language)
 	addTgEntryForExtension (language, "m", objc_m_tg_table);
 }
 
-static void objcFinalize (const langType language)
+static void objcFinalize (const langType language __unused__)
 {
 	vStringDelete (parentName);
 	vStringDelete (tempName);

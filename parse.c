@@ -160,7 +160,7 @@ typedef struct {
 	langType lang;
 	const char* spec;
 }  parserCandidate;
-static parserCandidate* parserCandidateNew(unsigned int count)
+static parserCandidate* parserCandidateNew(unsigned int count __unused__)
 {
 	parserCandidate* candidates;
 	langType i;
@@ -1188,7 +1188,7 @@ extern void printLanguageKinds (const langType language)
 }
 
 static void processLangAliasOption (
-		const langType language, const char *const option,
+		const langType language, const char *const option __unused__,
 		const char *const parameter)
 {
 	const char* alias;

@@ -255,13 +255,13 @@ static boolean parseTagRegex (
 }
 
 
-static void ptrn_flag_exclusive_short (char c, void* data)
+static void ptrn_flag_exclusive_short (char c __unused__, void* data)
 {
 	regexPattern *ptrn = data;
 	ptrn->exclusive = TRUE;
 }
 
-static void ptrn_flag_exclusive_long (const char* const s, const char* const unused, void* data)
+static void ptrn_flag_exclusive_long (const char* const s __unused__, const char* const unused __unused__, void* data)
 {
 	ptrn_flag_exclusive_short ('x', data);
 }
@@ -335,34 +335,34 @@ static void addCompiledCallbackPattern (
 
 #if defined (POSIX_REGEX)
 
-static void regex_flag_basic_short (char c, void* data)
+static void regex_flag_basic_short (char c __unused__, void* data)
 {
 	int* cflags = data;
 	*cflags &= ~REG_EXTENDED;
 }
-static void regex_flag_basic_long (const char* const s, const char* const unused, void* data)
+static void regex_flag_basic_long (const char* const s __unused__, const char* const unused __unused__, void* data)
 {
 	regex_flag_basic_short ('b', data);
 }
 
-static void regex_flag_extend_short (char c, void* data)
+static void regex_flag_extend_short (char c __unused__, void* data)
 {
 	int* cflags = data;
 	*cflags |= REG_EXTENDED;
 }
 
-static void regex_flag_extend_long (const char* const c, const char* const unused, void* data)
+static void regex_flag_extend_long (const char* const c __unused__, const char* const unused __unused__, void* data)
 {
 	regex_flag_extend_short('e', data);
 }
 
-static void regex_flag_icase_short (char c, void* data)
+static void regex_flag_icase_short (char c __unused__, void* data)
 {
 	int* cflags = data;
 	*cflags |= REG_ICASE;
 }
 
-static void regex_flag_icase_long (const char* s, const char* const unused, void* data)
+static void regex_flag_icase_long (const char* s __unused__, const char* const unused __unused__, void* data)
 {
 	regex_flag_icase_short ('i', data);
 }
