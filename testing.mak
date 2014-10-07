@@ -138,6 +138,8 @@ test.units: $(CTAGS_TEST)
 		t=$${input%/input.*}; \
 		name=$${t%.[db]}; \
 		\
+		if test -n "$(UNIT)" -a "$${name}" != "Units/$(UNIT)"; then continue; fi; \
+		\
 		expected="$$t"/expected.tags; \
 		expectedtmp="$$t"/EXPECTED.TMP; \
 		args="$$t"/args.ctags; \

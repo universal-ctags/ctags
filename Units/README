@@ -96,7 +96,11 @@ test.units target is added to testing.mak.
 
 	 $ make -f testing.mak test.units
 
-The result of unit tests is reported by lines.
+The result of unit tests is reported by lines. You can specify
+a test case with UNIT=. Consider you want to run a test under
+vim-command.d only. You can do it with following command line:
+
+	$ make -f testing.mak test.units UNIT=vim-command
 
 During testing OUTPUT, EXPECTED and DIFF files are generated for each
 test case directory. These are removed when the unit test is "Passed".
