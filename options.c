@@ -2415,7 +2415,7 @@ static void parseConfigurationFileOptions (void)
 	vString *home;
 	/* We parse .ctags on all systems, and additionally ctags.cnf on DOS. */
 	char *filename = NULL;
-	char *filename_body;
+	const char *filename_body;
 
 #ifdef CUSTOM_CONFIGURATION_FILE
 	parseFileOptions (CUSTOM_CONFIGURATION_FILE);
