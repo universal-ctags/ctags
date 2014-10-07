@@ -255,7 +255,7 @@ static boolean readIdentifier (vString *const name, int c)
 	return (boolean)(vStringLength (name) > 0);
 }
 
-static vString *genContext ()
+static vString *genContext (void)
 {
 	vString *context, *catNames;
 	tokenInfo *current;
@@ -284,7 +284,6 @@ static vString *genContext ()
 static void tagNameList (const verilogKind kind, int c)
 {
 	vString *name = vStringNew ();
-	vString *scopedName;
 	verilogKind localKind;
 	tagEntryInfo tag;
 	boolean repeat;
