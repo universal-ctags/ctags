@@ -27,7 +27,7 @@ static void installYaccRegex (const langType language)
 		"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1", "l,label,labels", NULL);
 }
 
-extern parserDefinition* YaccParser ()
+extern parserDefinition* YaccParser (void)
 {
 	static const char *const extensions [] = { "y", NULL };
 	parserDefinition* const def = parserNew ("YACC");

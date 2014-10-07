@@ -29,7 +29,7 @@ static void installAntRegex (const langType language)
 		"^[ \t]*<[ \t]*target[^>]+name=\"([^\"]+)\".*", "\\1", "t,target,targets", NULL);
 }
 
-extern parserDefinition* AntParser ()
+extern parserDefinition* AntParser (void)
 {
 	static const char *const extensions [] = { "build.xml", NULL };
 	parserDefinition* const def = parserNew ("Ant");
