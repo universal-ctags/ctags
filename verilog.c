@@ -106,7 +106,7 @@ static keywordAssoc VerilogKeywordTable [] = {
 	{ "wor",       K_NET }
 };
 
-tokenInfo *currentContext = NULL;
+static tokenInfo *currentContext = NULL;
 
 /*
  *   FUNCTION DEFINITIONS
