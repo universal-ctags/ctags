@@ -17,6 +17,8 @@
 #include <ctype.h>
 #include <string.h>
 
+#include "tg.h"
+
 #ifndef xCalloc
 #define xCalloc(n,Type)    (Type *)calloc((size_t)(n), sizeof (Type))
 #endif
@@ -43,8 +45,8 @@ static void tg_c_emit_entry      (void * data, FILE* fp,
 				  unsigned short index, unsigned char value, unsigned char c0, unsigned char c1);
 #endif	/* TG_MAIN */
 
-static unsigned short  tg_mini_size      (unsigned char *mini_table);
-static unsigned short* tg_big_create     (unsigned char *a, unsigned char *b, float ratio);
+static unsigned short  tg_mini_size      (const unsigned char *mini_table);
+static unsigned short* tg_big_create     (const unsigned char *a, const unsigned char *b, float ratio);
 static unsigned long   tg_big_score      (unsigned short *t);
 static void            tg_big_destroy    (unsigned short *a);
 
@@ -179,7 +181,7 @@ void tg_emit   (void * data, unsigned char *mini_table, FILE *fp,
 }
 #endif	/* TG_MAIN */
 
-static unsigned short  tg_mini_size   (unsigned char *mini_table)
+static unsigned short  tg_mini_size   (const unsigned char *mini_table)
 {
 	unsigned short t;
 	unsigned int i;
@@ -191,7 +193,7 @@ static unsigned short  tg_mini_size   (unsigned char *mini_table)
 	return t;
 }
 
-static unsigned short* tg_big_create (unsigned char *a, unsigned char *b, float ratio)
+static unsigned short* tg_big_create (const unsigned char *a, const unsigned char *b, float ratio)
 {
 	unsigned int i;
 	unsigned short* big_table;
@@ -205,7 +207,8 @@ static unsigned short* tg_big_create (unsigned char *a, unsigned char *b, float 
 	return big_table;
 }
 
-void tg_dump (unsigned short *big_table, FILE *fp)
+#ifdef TG_MAIN
+static void tg_dump (unsigned short *big_table, FILE *fp)
 {
 	unsigned int   c[2];
 	unsigned short i;
@@ -224,6 +227,7 @@ void tg_dump (unsigned short *big_table, FILE *fp)
 				       );
 		}
 }
+#endif
 
 static unsigned long   tg_big_score (unsigned short *big_table)
 {
@@ -240,7 +244,7 @@ static void tg_big_destroy (unsigned short *big_table)
 	eFree(big_table);
 }
 
-int tg_compare(unsigned char *a, unsigned char *b, unsigned char *t)
+int tg_compare(const unsigned char *a, const unsigned char *b, const unsigned char *t)
 {
 	unsigned long asz, bsz, max;
 	unsigned short *abt, *bbt;
