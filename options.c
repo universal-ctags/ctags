@@ -1096,8 +1096,8 @@ static void printFeatureList (void)
 }
 
 
-static void processListFeaturesOption(const char *const __unused__ option,
-				      const char *const __unused__ parameter)
+static void processListFeaturesOption(const char *const option __unused__,
+				      const char *const parameter __unused__)
 {
 	int i;
 
