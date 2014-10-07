@@ -108,7 +108,7 @@ static langType getNameOrAliasesLanguageAndSpec (const char *const key, langType
 
 	if (start_index == LANG_AUTO)
 	        start_index = 0;
-	else if (start_index == LANG_IGNORE || start_index >= LanguageCount)
+	else if (start_index == LANG_IGNORE || start_index >= (int) LanguageCount)
 		return result;
 
 	for (i = start_index  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
@@ -138,7 +138,7 @@ static langType getPatternLanguageAndSpec (const char *const baseName, langType 
 
 	if (start_index == LANG_AUTO)
 	        start_index = 0;
-	else if (start_index == LANG_IGNORE || start_index >= LanguageCount)
+	else if (start_index == LANG_IGNORE || start_index >= (int) LanguageCount)
 		return result;
 
 	*spec = NULL;
