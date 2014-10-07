@@ -155,7 +155,7 @@ install-strip: install
 install-ctags: install-cbin install-cman
 install-etags: install-ebin install-eman
 
-$(bindir) $(man1dir) $(libdir) $(incdir) $(corporadir) $(optlibdir) $(preloaddir) $(pkgconf_corporadir) $(pkgconf_optlibdir) $(pkgconf_preloaddir):
+$(addprefix $(DESTDIR),$(bindir) $(man1dir) $(libdir) $(incdir) $(corporadir) $(optlibdir) $(preloaddir) $(pkgconf_corporadir) $(pkgconf_optlibdir) $(pkgconf_preloaddir)):
 	$(srcdir)/mkinstalldirs $@
 
 FORCE:
@@ -169,8 +169,7 @@ install-ebin: $(DEST_ETAGS)
 install-lib: $(DEST_READ_LIB) $(DEST_READ_INC)
 install-cmd: $(DEST_READ_CMD)
 
-$(DEST_CTAGS): $(CTAGS_EXEC) $(bindir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(bindir)
+$(DEST_CTAGS): $(CTAGS_EXEC) $(DESTDIR)$(bindir) FORCE
 	$(INSTALL_PROG) $(CTAGS_EXEC) $(DESTDIR)$@  &&  chmod 755 $(DESTDIR)$@
 
 $(DEST_ETAGS):
@@ -185,8 +184,7 @@ install-man: install-cman install-eman
 install-cman: $(DEST_CMAN)
 install-eman: $(DEST_EMAN)
 
-$(DEST_CMAN): $(man1dir) $(MANPAGE) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(man1dir)
+$(DEST_CMAN): $(DESTDIR)$(man1dir) $(MANPAGE) FORCE
 	- $(INSTALL_DATA) $(srcdir)/$(MANPAGE) $(DESTDIR)$@  &&  chmod 644 $(DESTDIR)$@
 
 $(DEST_EMAN):
@@ -197,40 +195,31 @@ $(DEST_EMAN):
 #
 # install the library
 #
-$(DEST_READ_LIB): $(READ_LIB) $(libdir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(libdir)
+$(DEST_READ_LIB): $(READ_LIB) $(DESTDIR)$(libdir) FORCE
 	$(INSTALL_PROG) $(READ_LIB) $(DESTDIR)$@  &&  chmod 644 $(DESTDIR)$@
 
-$(DEST_READ_INC): $(READ_INC) $(incdir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(incdir)
+$(DEST_READ_INC): $(READ_INC) $(DESTDIR)$(incdir) FORCE
 	$(INSTALL_PROG) $(READ_INC) $(DESTDIR)$@  &&  chmod 644 $(DESTDIR)$@
 
 #
 # install the readtags command
 #
-$(DEST_READ_CMD): $(READ_CMD) $(bindir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(bindir)
+$(DEST_READ_CMD): $(READ_CMD) $(DESTDIR)$(bindir) FORCE
 	$(INSTALL_PROG) $(READ_CMD) $(DESTDIR)$@  &&  chmod 755 $(DESTDIR)$@
 
 #
 # install data
 #
 install-data: @install_data_targets@
-install-data-corpora: $(addprefix Data/corpora/,$(CORPORA)) $(corporadir) $(pkgconf_corporadir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(corporadir)
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(pkgconf_corporadir)
+install-data-corpora: $(addprefix Data/corpora/,$(CORPORA)) $(DESTDIR)$(corporadir) $(DESTDIR)$(pkgconf_corporadir) FORCE
 	for c in $(CORPORA); do \
 		$(INSTALL_DATA) $(srcdir)/Data/corpora/$$c $(DESTDIR)$(corporadir)/$$c && chmod 644 $(DESTDIR)$(corporadir)/$$c; \
 	done
-install-data-optlib: $(addprefix Data/optlib/,$(OPTLIB))  $(optlibdir) $(pkgconf_optlibdir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(optlibdir)
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(pkgconf_optlibdir)
+install-data-optlib: $(addprefix Data/optlib/,$(OPTLIB))  $(DESTDIR)$(optlibdir) $(DESTDIR)$(pkgconf_optlibdir) FORCE
 	for c in $(OPTLIB); do \
 		$(INSTALL_DATA) $(srcdir)/Data/optlib/$$c $(DESTDIR)$(optlibdir)/$$c && chmod 644 $(DESTDIR)$(optlibdir)/$$c; \
 	done
-install-data-preload: $(preloaddir) $(pkgconf_preloaddir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(preloaddir)
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(pkgconf_preloaddir)
+install-data-preload: $(DESTDIR)$(preloaddir) $(DESTDIR)$(pkgconf_preloaddir) FORCE
 	for c in $(PRELOAD_OPTLIB); do \
 		echo "--options=$$(basename $$c .ctags)" >> $(DESTDIR)$(preloaddir)/default.ctags; \
 	done; \
