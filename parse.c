@@ -478,7 +478,7 @@ static vString* extractVimFileType(FILE* input)
 	   [text]{white}{vi:|vim:|ex:}[white]{options} */
 }
 
-static const tgTableEntry* const findTgTableEntry(const parserDefinition* const lang, const char* const spec)
+static const tgTableEntry* findTgTableEntry(const parserDefinition* const lang, const char* const spec)
 {
 	const tgTableEntry *entry;
 
