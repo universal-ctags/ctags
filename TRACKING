@@ -328,3 +328,26 @@ https://git.gnome.org/browse/anjuta/tree/plugins/symbol-db/anjuta-tags
 Anjuta is a Gnome IDE. They did not fork Exuberant ctags, but they did natively include it 
 in Anjuta. They have made several additions to thier version of it including fairly extensive
 Vala langauge support.
+
+
+External command(xcmd)
+============================================================
+Near feature fishman-ctags can invoke external command as a
+specialized parser though some glue code or script may be
+needed. Sometimes we may have to hack the external command to adjust
+the interface between the command and fishman-ctags.
+
+So let's track external commands maintained out fishman-ctags. If we
+prepare glue code ro script, mark it with <>, and if not, mark it with
+().
+
+(CoffeeTags)
+
+	https://github.com/lukaszkorecki/CoffeeTags
+
+	This is the primary target during developing xcmd
+	feature. CoffeeTags side hacking is done.
+
+(perl-tags)
+
+	https://github.com/dtikhonov/perl-tags
