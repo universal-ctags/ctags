@@ -390,19 +390,69 @@ r2. overriding
 
 This feature is heavily inspired by systemd.
 
-exclude flag in regex
+Long regex flag
+---------------------------------------------------------------------
+
+I'm thinking about making regex parser more useful by adding more kind
+of flags to --regex-<LANG> expression. As explained in ctags.1 man page,
+b, e and i are defined as flags in exuberant-ctags.
+
+Even if I add more flags like a, b, c,..., I guess users including I
+myself may not utilize them well. It is difficult for them to memorize.
+In addition If many "option libraries" are contributed, we have to
+maintain them.
+
+For both users and developers the variety short flags are just
+nightmares.
+
+So fishman-ctags prepares API for defining long flags, which can be
+used as aliases for short flags. The long flags requires more typing
+but more readable.
+
+Here is the mapping between short flag names and long flag names.
+
+	b => basic
+	e => extend
+	i => icase
+
+Long flags can be specified with surrounding { and }.
+So the following --regex-<LANG> expression
+
+   --m4-regex=/^m4_define\(\[([^]$\(]+).+$/\1/d,definition/x
+
+is the same as
+
+   --m4-regex=/^m4_define\(\[([^]$\(]+).+$/\1/d,definition/{extend}
+
+The characters { and } are not suitable in using command line.
+My intent is that using long flags in option libraries.
+
+
+Exclude flag in regex
+---------------------------------------------------------------------
+
+A line read from input files was matched with ALL regular expressions
+defined with --regex-<LANG> (or --<LANG>-regex). Each regular
+expression matched successfully emits a tag.
+
+In some cases another policy, exclusive-matching, is preferable to the
+all-matching policy. Exclusive-matching means the rest of regular
+expressions are not tried if one of regular expressions is matched
+successfully,
+
+For specifying exclusive-matching I introduced a flag "exclusive"
+(long) and "x" (short). It is used in data/optlib/mib.ctags:
+
+
+	--mib-regex=/^([^ \t]+)[ \t]+DEFINITIONS ::= BEGIN/\1/d,definitions/{exclusive}
+	--mib-regex=/^([a-zA-Z][^ \t]+)[ \t]+[A-Za-z]/\1/n,name/
+
+
+passing parameter for long regex flag
 ---------------------------------------------------------------------
 
 TBW
 
-
-Long regex flag
----------------------------------------------------------------------
-
-TBW: regex-flag-long.d
-
-passing parameter for long regex flag
----------------------------------------------------------------------
 
 External tag engine
 ---------------------------------------------------------------------
