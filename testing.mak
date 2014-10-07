@@ -29,13 +29,13 @@ DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 	  fi
 
 CHECK_FEATURES = (\
-	while read; do \
+	while read expected; do \
 		found=no; \
 		for f in $$( $(CTAGS_TEST) --list-features); do \
-			if test "$$REPLY" = "$$f"; then found=yes; fi; \
+			if test "$$expected" = "$$f"; then found=yes; fi; \
 		done; \
 		if ! test $$found = yes; then \
-			echo "skipped (required feature $$REPLY is not available)"; \
+			echo "skipped (required feature $$expected is not available)"; \
 			exit 1; \
 		fi; \
 	done < $1; \
