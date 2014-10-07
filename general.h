@@ -57,7 +57,11 @@
  *  to prevent warnings about unused variables.
  */
 #if (__GNUC__ > 2  ||  (__GNUC__ == 2  &&  __GNUC_MINOR__ >= 7)) && !defined (__GNUG__)
-# define __unused__  __attribute__((unused))
+# ifdef __MINGW32__
+#  define __unused__
+# else
+#  define __unused__ __attribute__((unused))
+# endif
 # define __printf__(s,f)  __attribute__((format (printf, s, f)))
 #else
 # define __unused__
