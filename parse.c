@@ -163,7 +163,7 @@ typedef struct {
 static parserCandidate* parserCandidateNew(unsigned int count __unused__)
 {
 	parserCandidate* candidates;
-	langType i;
+	unsigned int i;
 
 	candidates= xMalloc(LanguageCount, parserCandidate);
 	for (i = 0; i < LanguageCount; i++)
@@ -386,7 +386,7 @@ static vString* determineVimFileType (const char *const line)
 	   set ... ft=
 	   se ... ft= */
 
-	int i, j;
+	unsigned int i, j;
 	const char* p;
 	const char* q;
 
@@ -430,7 +430,8 @@ static vString* extractVimFileType(FILE* input)
 	vString* filetype = NULL;
 #define RING_SIZE 5
 	vString* ring[RING_SIZE];
-	int i, j, k;
+	int i, j;
+	unsigned int k;
 	const char* const prefix[] = {
 		"vim:", "vi:", "ex:"
 	};
