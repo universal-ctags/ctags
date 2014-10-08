@@ -1,5 +1,7 @@
 *~
 test.*.diff
+*.gcno
+*.gcda
 *.o
 *.od
 *.obj
