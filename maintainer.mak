@@ -27,7 +27,7 @@ COMMON_FILES := COPYING EXTENDING.html FAQ INSTALL.oth MAINTAINERS NEWS README \
 UNIX_FILES   := $(COMMON_FILES) \
 				.indent.pro INSTALL configure.ac \
 				Makefile.in maintainer.mak \
-				descrip.mms mkinstalldirs magic.diff \
+				descrip.mms mkinstalldirs \
 				ctags.spec ctags.1
 
 REGEX_DIR    := gnu_regex
