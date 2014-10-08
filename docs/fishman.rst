@@ -41,6 +41,6 @@ Contents
 .. include:: f-tracking.rst
 .. include:: f-news.rst
 .. include:: f-building.rst
-.. include:: f-optlib.rst
 .. include:: f-units.rst
+.. include:: f-optlib.rst
 .. include:: f-internal.rst
