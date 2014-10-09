@@ -373,6 +373,16 @@ Anjuta is a Gnome IDE. They did not fork Exuberant ctags, but they did
 natively include it in Anjuta. They have made several additions to
 thier version of it including fairly extensive Vala langauge support.
 
+tagbar
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Wiki
+
+	https://github.com/majutsushi/tagbar/wiki
+
+	This is a gold mine of xcmd and optlib.
+
+	
 External command(xcmd)
 ----------------------------------------------------------------------
 
