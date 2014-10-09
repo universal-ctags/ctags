@@ -59,7 +59,7 @@ ALL_CPPFLAGS = $(CPPFLAGS)			\
 	-DPKGCONFDIR=\"$(pkgconfdir)\"		\
 	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\"
 
-include $(srcdir)/source.mak
+include $(srcdir)/makefiles/source.mak
 
 #
 #--- You should not need to modify anything below this line. ---#
