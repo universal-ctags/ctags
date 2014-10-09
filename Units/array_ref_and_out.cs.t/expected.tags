@@ -1,0 +1,5 @@
+FillArray	Units/array_ref_and_out.cs.t/input.cs	/^   static public void FillArray(out int[] myArray) $/;"	m	class:TestOut
+Main	Units/array_ref_and_out.cs.t/input.cs	/^   static public void Main() $/;"	m	class:TestOut
+MyMethod	Units/array_ref_and_out.cs.t/input.cs	/^public static void MyMethod(out int[] arr) $/;"	m
+MyMethod	Units/array_ref_and_out.cs.t/input.cs	/^public static void MyMethod(ref int[] arr) $/;"	m
+TestOut	Units/array_ref_and_out.cs.t/input.cs	/^class TestOut $/;"	c

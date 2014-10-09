@@ -1,0 +1,15 @@
++-	Units/ocamlAllKinds.ml.t/input.ml	/^let (+-) a b =$/;"	f
+ConstructorBar	Units/ocamlAllKinds.ml.t/input.ml	/^        | ConstructorBar of int * char list$/;"	C	type:ModuleFoo/foobar
+ConstructorFoo	Units/ocamlAllKinds.ml.t/input.ml	/^          ConstructorFoo$/;"	C	type:ModuleFoo/foobar
+Input	Units/ocamlAllKinds.ml.t/input.ml	1;"	M
+ModuleFoo	Units/ocamlAllKinds.ml.t/input.ml	1;"	M
+barfield	Units/ocamlAllKinds.ml.t/input.ml	/^     barfield : int;$/;"	r	type:foorecord
+fooClass	Units/ocamlAllKinds.ml.t/input.ml	/^class  fooClass =$/;"	c
+fooMethod	Units/ocamlAllKinds.ml.t/input.ml	/^    method fooMethod = x$/;"	m	class:fooClass
+foo_function	Units/ocamlAllKinds.ml.t/input.ml	/^let foo_function a b = (a, b)$/;"	v
+foobar	Units/ocamlAllKinds.ml.t/input.ml	/^    type foobar =$/;"	t	Module:ModuleFoo
+foobarfield	Units/ocamlAllKinds.ml.t/input.ml	/^     mutable foobarfield : list char -> int -> unit }$/;"	r	type:foorecord
+foofield	Units/ocamlAllKinds.ml.t/input.ml	/^    { foofield : 'a;$/;"	r	type:foorecord
+foorecord	Units/ocamlAllKinds.ml.t/input.ml	/^type 'a foorecord =$/;"	t
+shall_appear	Units/ocamlAllKinds.ml.t/input.ml	/^let shall_appear () =$/;"	v
+x	Units/ocamlAllKinds.ml.t/input.ml	/^    val x = ()$/;"	v	class:fooClass

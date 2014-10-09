@@ -1,0 +1,3 @@
+C	Units/bug1611054.cs.t/input.cs	/^class C {$/;"	c
+a	Units/bug1611054.cs.t/input.cs	/^	public String a() {$/;"	m	class:C
+b	Units/bug1611054.cs.t/input.cs	/^	public void b() {$/;"	m	class:C

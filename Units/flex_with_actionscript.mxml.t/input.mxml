@@ -1,0 +1,16 @@
+<!--?xml version="1.0" encoding="utf-8"?-->
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+	<![CDATA[
+	public function dateToYYYYMMDD(aDate:Date):String {
+		return sDate; 
+	}
+	]]>
+	</mx:Script>
+
+	<mx:HTTPService 
+		id="ajaxData"
+		/>
+
+</mx:Application>
+

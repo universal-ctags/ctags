@@ -1,0 +1,4 @@
+Main	Units/keyword_volatile.cs.t/input.cs	/^   public static void Main()$/;"	m	class:Test
+Test	Units/keyword_volatile.cs.t/input.cs	/^   Test(int _i)$/;"	m	class:Test	file:
+Test	Units/keyword_volatile.cs.t/input.cs	/^class Test$/;"	c
+i	Units/keyword_volatile.cs.t/input.cs	/^   public volatile int i;$/;"	f	class:Test

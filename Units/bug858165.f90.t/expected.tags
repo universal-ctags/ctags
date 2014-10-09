@@ -1,0 +1,5 @@
+a	Units/bug858165.f90.t/input.f90	/^integer :: a,/;"	v	program:test
+b	Units/bug858165.f90.t/input.f90	/^           b,/;"	v	program:test
+c	Units/bug858165.f90.t/input.f90	/^           c,/;"	v	program:test
+d	Units/bug858165.f90.t/input.f90	/^           d /;"	v	program:test
+test	Units/bug858165.f90.t/input.f90	/^program test$/;"	p

@@ -1,0 +1,5 @@
+PROCEDURES	Units/procedures.e.t/input.e	/^deferred class PROCEDURES$/;"	c
+procedure0	Units/procedures.e.t/input.e	/^	procedure0 is$/;"	f	class:PROCEDURES
+procedure1	Units/procedures.e.t/input.e	/^	procedure1 (one: STRING) is$/;"	f	class:PROCEDURES
+procedure2	Units/procedures.e.t/input.e	/^	procedure2 (one: INTEGER; two: STRING) is$/;"	f	class:PROCEDURES
+procedure_full	Units/procedures.e.t/input.e	/^	procedure_full (one: STRING) is$/;"	f	class:PROCEDURES

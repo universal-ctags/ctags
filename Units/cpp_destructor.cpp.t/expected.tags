@@ -1,0 +1,3 @@
+~A	Units/cpp_destructor.cpp.t/input.cpp	/^A::~A() { }$/;"	f	class:A
+~B	Units/cpp_destructor.cpp.t/input.cpp	/^B:: ~B () { }$/;"	f	class:B
+~C	Units/cpp_destructor.cpp.t/input.cpp	/^C:: ~ C () { }$/;"	f	class:C

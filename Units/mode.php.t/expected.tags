@@ -1,0 +1,10 @@
+a	Units/mode.php.t/input.php	/^function a() {}$/;"	f
+b	Units/mode.php.t/input.php	/^function b() {}$/;"	f
+c	Units/mode.php.t/input.php	/^function c() {$/;"	f
+d	Units/mode.php.t/input.php	/^function d() {$/;"	f
+e	Units/mode.php.t/input.php	/^function e() {$/;"	f
+f	Units/mode.php.t/input.php	/^function f() {}$/;"	f
+g	Units/mode.php.t/input.php	/^function g() {}$/;"	f
+h	Units/mode.php.t/input.php	/^function h() {}$/;"	f
+i	Units/mode.php.t/input.php	/^function i() {}$/;"	f
+j	Units/mode.php.t/input.php	/^function j() {}$/;"	f

@@ -1,0 +1,4 @@
+A	Units/simple.pl.t/input.pl	/^use constant A => 3;$/;"	c
+A::B	Units/simple.pl.t/input.pl	/^package A::B;$/;"	p
+LABEL	Units/simple.pl.t/input.pl	/^LABEL:$/;"	l
+MySub	Units/simple.pl.t/input.pl	/^sub MySub {}$/;"	s

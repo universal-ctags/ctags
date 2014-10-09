@@ -1,0 +1,2 @@
+bar	Units/bug612621.pl.t/input.pl	/^sub bar() $/;"	s
+foo	Units/bug612621.pl.t/input.pl	/^sub foo {$/;"	s

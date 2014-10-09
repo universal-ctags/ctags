@@ -1,0 +1,2 @@
+C	Units/bug2411878.cs.t/input.cs	/^public class C {$/;"	c
+m_name	Units/bug2411878.cs.t/input.cs	/^  private System.String m_name;$/;"	f	class:C	file:

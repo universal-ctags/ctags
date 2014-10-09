@@ -1,0 +1,29 @@
+<!--?xml version="1.0" encoding="utf-8"?-->
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" >
+
+	<mx:Label x="162" y="176" text="Username:"/>
+	<mx:Array id="forms">
+		<mx:Object label="Issue Tracking"         data="12" custom="issueTracking" />
+	</mx:Array>
+
+	<mx:ViewStack x="149" y="55" id="viewstack1" width="831" height="605" change="onChangeViewStack(event);" >
+		<mx:Form label="{logInOut}" width="100%" height="100%" id="form_login_screen">
+			<mx:FormItem>
+				<mx:Canvas width="623" height="511">
+					<mx:Label x="162" y="176" text="Username:"/>
+					<mx:Label x="162" y="208" text="Password"/>
+					<mx:TextInput id="ls_ti_username" x="240" y="174" text="admin"/>
+					<mx:TextInput id="ls_ti_passwd" x="240" y="206" displayAsPassword="true" text="Demo05"/>
+					<mx:Button id="ls_bt_log_in_out" x="240" y="238" label="{logInOut}" enabled="true" click="onButtonClick(event)"/>
+					<mx:Label x="194" y="287" width="315" id="ls_lb_welcome" fontSize="16" fontWeight="bold"/>
+				</mx:Canvas>
+			</mx:FormItem>
+		</mx:Form>
+	</mx:ViewStack>
+
+	<mx:HTTPService 
+		id="myHTTPService"
+		result="resultHandler(event);"
+		/>
+
+</mx:Application>

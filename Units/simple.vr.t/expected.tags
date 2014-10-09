@@ -1,0 +1,22 @@
+DEFAULT_BIT	Units/simple.vr.t/input.vr	3;"	d	file:
+DEFAULT_INT	Units/simple.vr.t/input.vr	2;"	d	file:
+ExampleClass	Units/simple.vr.t/input.vr	/^class ExampleClass {$/;"	c
+getBit	Units/simple.vr.t/input.vr	/^    public function bit getBit() {$/;"	f	class:ExampleClass
+getData	Units/simple.vr.t/input.vr	/^    public function bit[7:0] getData() {$/;"	f	class:ExampleClass
+getInt	Units/simple.vr.t/input.vr	/^    public function integer getInt() {$/;"	f	class:ExampleClass
+getName	Units/simple.vr.t/input.vr	/^    public function string getName() {$/;"	f	class:ExampleClass
+getTrigger	Units/simple.vr.t/input.vr	/^function event ExampleClass::getTrigger() {$/;"	f	class:ExampleClass
+m_bit	Units/simple.vr.t/input.vr	/^    local bit       m_bit = DEFAULT_BIT;$/;"	m	class:ExampleClass	file:
+m_data	Units/simple.vr.t/input.vr	/^    local bit [7:0] m_data = 8'hzz;$/;"	m	class:ExampleClass	file:
+m_eTrigger	Units/simple.vr.t/input.vr	/^    local event     m_eTrigger;$/;"	m	class:ExampleClass	file:
+m_int	Units/simple.vr.t/input.vr	/^    local integer   m_int = DEFAULT_INT;$/;"	m	class:ExampleClass	file:
+m_sName	Units/simple.vr.t/input.vr	/^    local string    m_sName;$/;"	m	class:ExampleClass	file:
+main	Units/simple.vr.t/input.vr	/^program main {$/;"	p
+new	Units/simple.vr.t/input.vr	/^    public task new(string sInstName, integer index = DEFAULT_INT) {$/;"	t	class:ExampleClass
+setBit	Units/simple.vr.t/input.vr	/^    public task setBit(bit b) {$/;"	t	class:ExampleClass
+setData	Units/simple.vr.t/input.vr	/^    public task setData(bit[7:0] data) {$/;"	t	class:ExampleClass
+setInt	Units/simple.vr.t/input.vr	/^    public task setInt(integer i) {$/;"	t	class:ExampleClass
+setName	Units/simple.vr.t/input.vr	/^    public task setName(string name) {$/;"	t	class:ExampleClass
+setTrigger	Units/simple.vr.t/input.vr	/^task ExampleClass::setTrigger(event e) {$/;"	t	class:ExampleClass
+trigger	Units/simple.vr.t/input.vr	/^    public task trigger() {$/;"	t	class:ExampleClass
+wait	Units/simple.vr.t/input.vr	/^    public task wait() {$/;"	t	class:ExampleClass

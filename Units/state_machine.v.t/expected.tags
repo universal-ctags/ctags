@@ -1,0 +1,6 @@
+S0	Units/state_machine.v.t/input.v	/^  S0 = 2'h0,$/;"	c
+S1	Units/state_machine.v.t/input.v	/^  S1 = 2'h1,$/;"	c
+S2	Units/state_machine.v.t/input.v	/^  S2 = 2'h2,$/;"	c
+S3	Units/state_machine.v.t/input.v	/^  S3 = 2'h3;$/;"	c
+next_state	Units/state_machine.v.t/input.v	/^reg [1:0] \/* synopsys enum state_info *\/ next_state;$/;"	r
+state	Units/state_machine.v.t/input.v	/^reg [1:0] \/* synopsys enum state_info *\/ state;$/;"	r

@@ -1,0 +1,16 @@
+Add	Units/events.cs.t/input.cs	/^      public override int Add(object value) $/;"	m	class:MyCollections.ListWithChangedEvent
+Changed	Units/events.cs.t/input.cs	/^      public event ChangedEventHandler Changed;$/;"	E	class:MyCollections.ListWithChangedEvent
+Changed	Units/events.cs.t/input.cs	/^      public event EventHandler Changed;$/;"	E	class:MyCollections.ListWithChangedEvent
+ChangedEventHandler	Units/events.cs.t/input.cs	/^   public delegate void ChangedEventHandler(object sender, EventArgs e);$/;"	m	namespace:MyCollections
+Clear	Units/events.cs.t/input.cs	/^      public override void Clear() $/;"	m	class:MyCollections.ListWithChangedEvent
+Detach	Units/events.cs.t/input.cs	/^      public void Detach() $/;"	m	class:TestEvents.EventListener
+EventListener	Units/events.cs.t/input.cs	/^      public EventListener(ListWithChangedEvent list) $/;"	m	class:TestEvents.EventListener
+EventListener	Units/events.cs.t/input.cs	/^   class EventListener $/;"	c	namespace:TestEvents
+List	Units/events.cs.t/input.cs	/^      private ListWithChangedEvent List;$/;"	f	class:TestEvents.EventListener	file:
+ListChanged	Units/events.cs.t/input.cs	/^      private void ListChanged(object sender, EventArgs e) $/;"	m	class:TestEvents.EventListener	file:
+ListWithChangedEvent	Units/events.cs.t/input.cs	/^   public class ListWithChangedEvent: ArrayList $/;"	c	namespace:MyCollections
+Main	Units/events.cs.t/input.cs	/^      public static void Main() $/;"	m	class:TestEvents.Test
+MyCollections	Units/events.cs.t/input.cs	/^namespace MyCollections $/;"	n
+OnChanged	Units/events.cs.t/input.cs	/^      protected virtual void OnChanged(EventArgs e) $/;"	m	class:MyCollections.ListWithChangedEvent
+Test	Units/events.cs.t/input.cs	/^   class Test $/;"	c	namespace:TestEvents
+TestEvents	Units/events.cs.t/input.cs	/^namespace TestEvents $/;"	n

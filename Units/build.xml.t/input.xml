@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<project name="MyProject" default="deploy" basedir=".">
+
+  <target name="init">
+    <property environment="envvars" />
+    <property name="rootDir" value="." />
+    <property name="srcDir" value="${rootDir}/src" />
+  
+    <path id="base.classpath">
+      <pathelement location="${buildDir}" />
+    </path>
+  </target>
+
+  <target name="clean" depends="init">
+    <delete dir="${buildDir}"
+      verbose="false"
+      quiet="false"
+      />
+  </target>
+
+  <target name="compile_something" depends="init">
+    <mkdir dir="${buildDir}" />
+    <mkdir dir="${buildDir}/images" />
+    <javac srcdir="${javaDir}"
+      destdir="${buildDir}"
+      debug="on"
+      optimize="off"
+      verbose="no"
+      listfiles="yes"
+      deprecation="no"
+      classpathref="base.classpath"
+      />
+
+    <copy toDir="${buildDir}/images">
+      <fileset dir="${javaImagesDir}" includes="*.*" />
+    </copy>
+
+  </target>
+
+  <!--target name="generate_h_from_java" depends="compile_something">
+    <exec executable="javah" dir="${buildDir}">
+    </exec>
+  </target-->
+
+  <target name="generate_h_from_java" depends="compile_something">
+    <javah destdir="${ulgateDir}" classpath="${buildDir}">
+    </javah>
+  </target>
+
+  <target name="javadoc">
+    <delete dir="${javaDocDir}"
+      verbose="false"
+      quiet="false"
+      />
+    <mkdir dir="${javaDocDir}" />
+    <javadoc destdir="${javaDocDir}"
+      classpathref="base.classpath"
+      link="http://java.sun.com/j2se/1.4.1/docs/api/"
+      verbose="no"
+      additionalparam="-breakiterator"
+      >
+      <fileset dir="${javaDir}" />
+    </javadoc>
+  </target>
+
+    <target name="deploy" depends="compile_something, generate_h_from_java">
+
+      <delete dir="${deployDir}"
+        verbose="false"
+        quiet="false"
+        />
+      <mkdir dir="${deployDir}" />
+      <mkdir dir="${deployDir}/client" />
+      <mkdir dir="${deployDir}/server" />
+      
+      <jar jarfile="${deployDir}/server/something.jar">
+        <fileset dir="${buildDir}"
+           includes="images/**"
+          />
+      </jar>
+      
+      <copy toDir="${deployDir}/client" verbose="Yes" >
+          <fileset dir="${binDir}" includes="startClient.cmd" />
+		  <fileset dir="${binDir}" includes="killProcess.vbs" />
+      </copy>
+
+      <copy toDir="${deployDir}/server/sql" verbose="Yes" >
+  	      <fileset dir="${sqlDir}" includes="*.sql" />
+      </copy>
+
+      <copy toDir="${deployDir}/server/samples">
+        <fileset dir="${samplesDir}" includes="**/*.*" />
+      </copy>
+
+      <copy toDir="${deployDir}/doc">
+        <fileset dir="${docDir}" includes="**/*.*" />
+      </copy>
+
+    </target>
+  
+</project>

@@ -1,0 +1,15 @@
+<	Units/aliases.e.t/input.e	/^	a, infix "<", b (other: like Current): BOOLEAN is$/;"	f	class:ALIASES
+ALIASES	Units/aliases.e.t/input.e	/^class ALIASES$/;"	c
+^	Units/aliases.e.t/input.e	/^	yor, infix "^", zor (other: like Current): INTEGER is$/;"	f	class:ALIASES
+a	Units/aliases.e.t/input.e	/^	a, infix "<", b (other: like Current): BOOLEAN is$/;"	f	class:ALIASES
+attribute_a	Units/aliases.e.t/input.e	/^	attribute_a, attribute_b: INTEGER$/;"	f	class:ALIASES
+attribute_b	Units/aliases.e.t/input.e	/^	attribute_a, attribute_b: INTEGER$/;"	f	class:ALIASES
+b	Units/aliases.e.t/input.e	/^	a, infix "<", b (other: like Current): BOOLEAN is$/;"	f	class:ALIASES
+constant_a	Units/aliases.e.t/input.e	/^	constant_a, constant_b: INTEGER is 1$/;"	f	class:ALIASES
+constant_b	Units/aliases.e.t/input.e	/^	constant_a, constant_b: INTEGER is 1$/;"	f	class:ALIASES
+function1a	Units/aliases.e.t/input.e	/^	function1a, function1b (one: DOUBLE): DOUBLE is$/;"	f	class:ALIASES
+function1b	Units/aliases.e.t/input.e	/^	function1a, function1b (one: DOUBLE): DOUBLE is$/;"	f	class:ALIASES
+procedure1a	Units/aliases.e.t/input.e	/^	procedure1a, procedure1b (one: DOUBLE) is$/;"	f	class:ALIASES
+procedure1b	Units/aliases.e.t/input.e	/^	procedure1a, procedure1b (one: DOUBLE) is$/;"	f	class:ALIASES
+yor	Units/aliases.e.t/input.e	/^	yor, infix "^", zor (other: like Current): INTEGER is$/;"	f	class:ALIASES
+zor	Units/aliases.e.t/input.e	/^	yor, infix "^", zor (other: like Current): INTEGER is$/;"	f	class:ALIASES

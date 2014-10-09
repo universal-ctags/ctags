@@ -1,0 +1,2 @@
+main	Units/bug1988130.py.t/input.py	/^def main():$/;"	f
+testFunc	Units/bug1988130.py.t/input.py	/^def testFunc():$/;"	f

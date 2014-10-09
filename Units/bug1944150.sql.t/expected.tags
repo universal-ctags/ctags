@@ -1,0 +1,1 @@
+cash_trade_comment.	Units/bug1944150.sql.t/input.sql	/^CREATE TRIGGER [tr_d_cash_trade_comment] ON dbo.cash_trade_comment$/;"	T

@@ -1,0 +1,3 @@
+insig	Units/bug1111214-j-chan.v.t/input.v	/^input insig;$/;"	p	module:top
+outsig	Units/bug1111214-j-chan.v.t/input.v	/^output outsig;$/;"	p	module:top
+top	Units/bug1111214-j-chan.v.t/input.v	/^module top(outsig, insig);$/;"	m

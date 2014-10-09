@@ -1,0 +1,3 @@
+f1	Units/bug1799340.cpp.t/input.cpp	/^std::string & f1() {}$/;"	f
+f2	Units/bug1799340.cpp.t/input.cpp	/^const std::string & f2() {}$/;"	f
+f3	Units/bug1799340.cpp.t/input.cpp	/^std::string const & f3() {}$/;"	f	class:std

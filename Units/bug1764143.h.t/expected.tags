@@ -1,0 +1,2 @@
+arch_reset	Units/bug1764143.h.t/input.h	/^static inline void arch_reset(char mode)$/;"	f
+omap1_arch_reset	Units/bug1764143.h.t/input.h	/^static inline void omap1_arch_reset(char mode)$/;"	f

@@ -1,0 +1,8 @@
+ConstTest	Units/keyword_const.cs.t/input.cs	/^public class ConstTest $/;"	c
+Main	Units/keyword_const.cs.t/input.cs	/^   public static void Main() $/;"	m	class:ConstTest
+MyClass	Units/keyword_const.cs.t/input.cs	/^      public MyClass(int p1, int p2) $/;"	m	class:ConstTest.MyClass
+MyClass	Units/keyword_const.cs.t/input.cs	/^   class MyClass $/;"	c	class:ConstTest
+c1	Units/keyword_const.cs.t/input.cs	/^      public const int c1 = 5;$/;"	f	class:ConstTest.MyClass
+c2	Units/keyword_const.cs.t/input.cs	/^      public const int c2 = c1 + 5;$/;"	f	class:ConstTest.MyClass
+x	Units/keyword_const.cs.t/input.cs	/^      public int x;$/;"	f	class:ConstTest.MyClass
+y	Units/keyword_const.cs.t/input.cs	/^      public int y;$/;"	f	class:ConstTest.MyClass

@@ -1,0 +1,2 @@
+FOO	Units/debian_432872.f90.t/input.f90	/^  subroutine FOO /;"	s	module:FOO
+FOO	Units/debian_432872.f90.t/input.f90	/^module FOO$/;"	m

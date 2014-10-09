@@ -1,0 +1,2 @@
+f1	Units/simple.ksh.t/input.ksh	/^f1() {$/;"	f
+f2	Units/simple.ksh.t/input.ksh	/^function f2 {$/;"	f

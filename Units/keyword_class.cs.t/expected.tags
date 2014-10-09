@@ -1,0 +1,8 @@
+Kid	Units/keyword_class.cs.t/input.cs	/^   public Kid() $/;"	m	class:Kid
+Kid	Units/keyword_class.cs.t/input.cs	/^   public Kid(string name, int age) $/;"	m	class:Kid
+Kid	Units/keyword_class.cs.t/input.cs	/^public class Kid $/;"	c
+Main	Units/keyword_class.cs.t/input.cs	/^   public static void Main() $/;"	m	class:MainClass
+MainClass	Units/keyword_class.cs.t/input.cs	/^public class MainClass $/;"	c
+PrintKid	Units/keyword_class.cs.t/input.cs	/^   public void PrintKid() $/;"	m	class:Kid
+age	Units/keyword_class.cs.t/input.cs	/^   private int age;$/;"	f	class:Kid	file:
+name	Units/keyword_class.cs.t/input.cs	/^   private string name;$/;"	f	class:Kid	file:

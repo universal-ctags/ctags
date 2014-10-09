@@ -1,0 +1,5 @@
+      MODULE SEMI
+      
+      INTEGER (4) :: VAR1; INTEGER (4) VAR2
+
+      END MODULE SEMI

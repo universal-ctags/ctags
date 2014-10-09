@@ -1,0 +1,6 @@
+Author	Units/attributes.cs.t/input.cs	/^   public Author(string name) { this.name = name; version = 1.0; }$/;"	m	class:Author
+Author	Units/attributes.cs.t/input.cs	/^public class Author : Attribute$/;"	c
+MyDllimportClass	Units/attributes.cs.t/input.cs	/^[DllImport] public class MyDllimportClass {}$/;"	c
+TraceMethod	Units/attributes.cs.t/input.cs	/^[Conditional("DEBUG"), Conditional("TEST1")] void TraceMethod() {}$/;"	m
+name	Units/attributes.cs.t/input.cs	/^   string name;$/;"	f	class:Author	file:
+version	Units/attributes.cs.t/input.cs	/^   public double version;$/;"	f	class:Author

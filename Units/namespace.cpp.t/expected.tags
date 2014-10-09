@@ -1,0 +1,5 @@
+a	Units/namespace.cpp.t/input.cpp	/^namespace a {$/;"	n	file:
+a_b_f	Units/namespace.cpp.t/input.cpp	/^		void a_b_f() { }$/;"	f	namespace:a::b
+a_f	Units/namespace.cpp.t/input.cpp	/^	void a_f() { }$/;"	f	namespace:a
+anon_f	Units/namespace.cpp.t/input.cpp	/^	void anon_f() { }$/;"	f	namespace:__anon1
+b	Units/namespace.cpp.t/input.cpp	/^	namespace b {$/;"	n	namespace:a	file:

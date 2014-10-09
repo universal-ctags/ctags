@@ -1,0 +1,2 @@
+C	Units/bug1830344.cs.t/input.cs	/^public class C {$/;"	c
+m	Units/bug1830344.cs.t/input.cs	/^	public void m() {$/;"	m	class:C

@@ -1,0 +1,4 @@
+TestStruct	Units/bug1548443.cpp.t/input.cpp	/^struct TestStruct$/;"	s	file:
+TestUnion	Units/bug1548443.cpp.t/input.cpp	/^union TestUnion$/;"	u	file:
+_number	Units/bug1548443.cpp.t/input.cpp	/^int _number;$/;"	m	struct:TestStruct	file:
+_number	Units/bug1548443.cpp.t/input.cpp	/^int _number;$/;"	m	union:TestUnion	file:

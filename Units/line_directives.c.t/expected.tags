@@ -1,0 +1,3 @@
+a	Units/line_directives.c.t/input.c	/^int a;$/;"	v
+b	Units/line_directives.c.t/input.c	/^int b;$/;"	v
+c	Units/line_directives.c.t/input.c	/^int c;$/;"	v

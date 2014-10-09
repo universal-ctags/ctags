@@ -1,0 +1,6 @@
+a	Units/simple.bb.t/input.bb	/^Global a$/;"	v
+b	Units/simple.bb.t/input.bb	/^Dim b(100)$/;"	v
+f	Units/simple.bb.t/input.bb	/^Function f()$/;"	f
+one#	Units/simple.bb.t/input.bb	/^Const one# = 1.0$/;"	c
+start	Units/simple.bb.t/input.bb	/^.start$/;"	l
+test	Units/simple.bb.t/input.bb	/^Type test$/;"	t

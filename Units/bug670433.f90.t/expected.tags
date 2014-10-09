@@ -1,0 +1,4 @@
+bar	Units/bug670433.f90.t/input.f90	/^    subroutine bar /;"	s	module:foobar
+f	Units/bug670433.f90.t/input.f90	/^        real fu/;"	f	function:foo
+foo	Units/bug670433.f90.t/input.f90	/^    integer function foo /;"	f	module:foobar
+foobar	Units/bug670433.f90.t/input.f90	/^module foobar$/;"	m

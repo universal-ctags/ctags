@@ -1,0 +1,3 @@
+INFOOBAR	Units/misc_types.f.t/input.f	/^	INTEGER INFOOBAR$/;"	v	program:specs
+M	Units/misc_types.f.t/input.f	/^	INTEGER M(/;"	v	program:specs
+specs	Units/misc_types.f.t/input.f	/^	program specs$/;"	p

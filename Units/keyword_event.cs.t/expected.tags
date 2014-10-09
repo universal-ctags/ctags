@@ -1,0 +1,35 @@
+Event1	Units/keyword_event.cs.t/input.cs	/^   public event MyDelegate1 Event1 $/;"	p	class:PropertyEventsSample
+Event2	Units/keyword_event.cs.t/input.cs	/^   public event MyDelegate1 Event2 $/;"	p	class:PropertyEventsSample
+Event3	Units/keyword_event.cs.t/input.cs	/^   public event MyDelegate2 Event3 $/;"	p	class:PropertyEventsSample
+Event4	Units/keyword_event.cs.t/input.cs	/^   public event MyDelegate3 Event4 $/;"	p	class:PropertyEventsSample
+Event5	Units/keyword_event.cs.t/input.cs	/^   public event MyDelegate3 Event5 $/;"	p	class:PropertyEventsSample
+Event6	Units/keyword_event.cs.t/input.cs	/^   public event MyDelegate4 Event6 $/;"	p	class:PropertyEventsSample
+ExplicitEventsSample	Units/keyword_event.cs.t/input.cs	/^public class ExplicitEventsSample: I1, I2 $/;"	c
+FireAway	Units/keyword_event.cs.t/input.cs	/^   public void FireAway() $/;"	m	class:MyClass
+FireAway	Units/keyword_event.cs.t/input.cs	/^   void FireAway();$/;"	m	interface:I
+FireEvents	Units/keyword_event.cs.t/input.cs	/^   private void FireEvents() $/;"	m	class:ExplicitEventsSample	file:
+I	Units/keyword_event.cs.t/input.cs	/^public interface I $/;"	i
+I1	Units/keyword_event.cs.t/input.cs	/^public interface I1 $/;"	i
+I2	Units/keyword_event.cs.t/input.cs	/^public interface I2 $/;"	i
+I2.MyEvent	Units/keyword_event.cs.t/input.cs	/^   event MyDelegate2 I2.MyEvent   \/\/ explicit implementation of I2.MyEvent$/;"	p	class:ExplicitEventsSample
+Main	Units/keyword_event.cs.t/input.cs	/^   public static void Main() $/;"	m	class:MyClass
+Main	Units/keyword_event.cs.t/input.cs	/^   static public void Main () $/;"	m	class:MainClass
+MainClass	Units/keyword_event.cs.t/input.cs	/^public class MainClass $/;"	c
+MyClass	Units/keyword_event.cs.t/input.cs	/^public class MyClass $/;"	c
+MyClass	Units/keyword_event.cs.t/input.cs	/^public class MyClass: I $/;"	c
+MyDelegate	Units/keyword_event.cs.t/input.cs	/^public delegate void MyDelegate();   \/\/ delegate declaration$/;"	m
+MyDelegate1	Units/keyword_event.cs.t/input.cs	/^public delegate void MyDelegate1();$/;"	m
+MyDelegate1	Units/keyword_event.cs.t/input.cs	/^public delegate void MyDelegate1(int i);$/;"	m
+MyDelegate2	Units/keyword_event.cs.t/input.cs	/^public delegate int MyDelegate2(string s);$/;"	m
+MyDelegate2	Units/keyword_event.cs.t/input.cs	/^public delegate void MyDelegate2(string s);$/;"	m
+MyDelegate3	Units/keyword_event.cs.t/input.cs	/^public delegate void MyDelegate3(int i, object o);$/;"	m
+MyDelegate4	Units/keyword_event.cs.t/input.cs	/^public delegate void MyDelegate4();$/;"	m
+MyEvent	Units/keyword_event.cs.t/input.cs	/^   event MyDelegate MyEvent;$/;"	E	interface:I
+MyEvent	Units/keyword_event.cs.t/input.cs	/^   event MyDelegate1 MyEvent;$/;"	E	interface:I1
+MyEvent	Units/keyword_event.cs.t/input.cs	/^   event MyDelegate2 MyEvent;$/;"	E	interface:I2
+MyEvent	Units/keyword_event.cs.t/input.cs	/^   public event MyDelegate MyEvent;$/;"	E	class:MyClass
+MyEvent	Units/keyword_event.cs.t/input.cs	/^   public event MyDelegate1 MyEvent;  \/\/ normal implementation of I1.MyEvent.$/;"	E	class:ExplicitEventsSample
+MyEvent2Storage	Units/keyword_event.cs.t/input.cs	/^   private MyDelegate2 MyEvent2Storage;  \/\/ underlying storage for I2.MyEvent.$/;"	f	class:ExplicitEventsSample	file:
+PropertyEventsSample	Units/keyword_event.cs.t/input.cs	/^public class PropertyEventsSample $/;"	c
+eventTable	Units/keyword_event.cs.t/input.cs	/^   private Hashtable eventTable = new Hashtable();$/;"	f	class:PropertyEventsSample	file:
+f	Units/keyword_event.cs.t/input.cs	/^   static private void f() $/;"	m	class:MainClass	file:

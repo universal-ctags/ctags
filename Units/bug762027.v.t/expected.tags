@@ -1,0 +1,4 @@
+N_83	Units/bug762027.v.t/input.v	/^          N_83;     \/\/ then N_83 will be missing in tags.$/;"	n
+N_83	Units/bug762027.v.t/input.v	/^     wire N_84, N_83;     \/\/ is ok.$/;"	n
+N_84	Units/bug762027.v.t/input.v	/^     wire N_84, N_83;     \/\/ is ok.$/;"	n
+N_84	Units/bug762027.v.t/input.v	/^     wire N_84,$/;"	n

@@ -1,0 +1,30 @@
+20	Units/stdcall.f.t/input.f	/^   20 CONTINUE$/;"	l	file:
+40	Units/stdcall.f.t/input.f	/^   40 CONTINUE$/;"	l	file:
+60	Units/stdcall.f.t/input.f	/^   60 CONTINUE$/;"	l	file:
+80	Units/stdcall.f.t/input.f	/^   80 CONTINUE$/;"	l	file:
+99996	Units/stdcall.f.t/input.f	/^99996 FORMAT (1X,F8.2,3F13.5)$/;"	l	file:
+99997	Units/stdcall.f.t/input.f	/^99997 FORMAT (1X,A,3F13.5)$/;"	l	file:
+99998	Units/stdcall.f.t/input.f	/^99998 FORMAT (1X,A,F7.3)$/;"	l	file:
+99999	Units/stdcall.f.t/input.f	/^99999 FORMAT (1X,A,D8.1)$/;"	l	file:
+99999	Units/stdcall.f.t/input.f	/^99999 FORMAT (1X,F8.2,3F13.5)$/;"	l	subroutine:OUT	file:
+D02CJW	Units/stdcall.f.t/input.f	/^      DOUBLE PRECISION D02CJW,/;"	v
+FCN	Units/stdcall.f.t/input.f	/^      STDCALL SUBROUTINE FCN(/;"	s
+G	Units/stdcall.f.t/input.f	/^      DOUBLE PRECISION D02CJW, G,/;"	v
+G	Units/stdcall.f.t/input.f	/^      STDCALL DOUBLE PRECISION FUNCTION G(/;"	f
+H	Units/stdcall.f.t/input.f	/^      DOUBLE PRECISION H,/;"	v
+I	Units/stdcall.f.t/input.f	/^      IN/;"	v
+IFAIL	Units/stdcall.f.t/input.f	/^      INTEGER          I, IFAIL,/;"	v
+IW	Units/stdcall.f.t/input.f	/^      INTEGER          N, IW$/;"	v
+J	Units/stdcall.f.t/input.f	/^      INTEGER          I, IFAIL, J$/;"	v
+K	Units/stdcall.f.t/input.f	/^      INTEGER          K$/;"	v
+N	Units/stdcall.f.t/input.f	/^      INT/;"	v
+NOUT	Units/stdcall.f.t/input.f	/^      INTEGER          NOUT$/;"	v
+OUT	Units/stdcall.f.t/input.f	/^      STDCALL SUBROUTI/;"	s
+PI	Units/stdcall.f.t/input.f	/^      DOUBLE PRECISION PI,/;"	v
+RELABS	Units/stdcall.f.t/input.f	/^      CHARACTER        RELABS*/;"	v
+TOL	Units/stdcall.f.t/input.f	/^      DOUBLE PRECISION PI, TOL,/;"	v
+W	Units/stdcall.f.t/input.f	/^      DOUBLE PRECISION W(/;"	v
+X	Units/stdcall.f.t/input.f	/^      DOUBLE PRECISION PI, TOL, X$/;"	v
+X01AAF	Units/stdcall.f.t/input.f	/^      DOUBLE PRECISION D02CJW, G, X01AAF$/;"	v
+XEND	Units/stdcall.f.t/input.f	/^      DOUBLE PRECISION H, XEND$/;"	v
+Y	Units/stdcall.f.t/input.f	/^      DOUBLE PRECISION W(IW), Y(/;"	v

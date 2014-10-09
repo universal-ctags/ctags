@@ -1,0 +1,5 @@
+a.l	Units/simple.pb.t/input.pb	/^Global a.l$/;"	v
+b.l	Units/simple.pb.t/input.pb	/^Dim b.l(100)$/;"	v
+f.l	Units/simple.pb.t/input.pb	/^Procedure f.l()$/;"	f
+start	Units/simple.pb.t/input.pb	/^start:$/;"	l
+test	Units/simple.pb.t/input.pb	/^Structure test$/;"	t

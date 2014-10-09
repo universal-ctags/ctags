@@ -1,0 +1,4 @@
+c2	Units/bug877956.f90.t/input.f90	/^ INTEGER :: cm1 = -1, c2 /;"	v	program:test
+c2	Units/bug877956.f90.t/input.f90	/^ INTEGER :: cm1 =-1, c2 /;"	v	program:test
+cm1	Units/bug877956.f90.t/input.f90	/^ INTEGER :: cm1 /;"	v	program:test
+test	Units/bug877956.f90.t/input.f90	/^PROGRAM test$/;"	p

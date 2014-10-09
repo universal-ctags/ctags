@@ -1,0 +1,3 @@
+aa	Units/value.f.t/input.f	/^	REAL aa$/;"	v	program:figure
+fig	Units/value.f.t/input.f	/^	integer fig$/;"	v	program:figure
+figure	Units/value.f.t/input.f	/^	program figure(/;"	p
