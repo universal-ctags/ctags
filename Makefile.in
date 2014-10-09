@@ -289,4 +289,11 @@ maintainerclean: distclean
 .c.$(OBJEXT):
 	$(CC) -I. -I$(srcdir) $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $<
 
+#
+# check
+#
+include $(srcdir)/testing.mak
+check: $(CTAGS_TEST)
+	$(MAKE) -f testing.mak test.units
+
 # vi:set tabstop=8:
