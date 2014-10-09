@@ -63,8 +63,7 @@ Units.
 
 If you convert use following TEST name convention.
 
-* use test- as prefix for the name, and
-* replace *.* in the original test name with *-*.
+* use *.t* instead of *.d* as suffix for the name
 
 Here is an example::
 
@@ -72,7 +71,7 @@ Here is an example::
 
 This should be::
 
-	Units/test-simple-sh.d
+	Units/simple.sh.t
 
 With this name convention we can track which test case is converted or
 not.

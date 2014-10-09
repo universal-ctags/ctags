@@ -130,13 +130,13 @@ test.linux: $(CTAGS_TEST) $(CTAGS_REF)
 endif
 
 
-UNITS_ARTIFACTS=Units/*.[db]/EXPECTED.TMP Units/*.[db]/OUTPUT.TMP Units/*.[db]/DIFF.TMP
+UNITS_ARTIFACTS=Units/*.[dbt]/EXPECTED.TMP Units/*.[dbt]/OUTPUT.TMP Units/*.[dbt]/DIFF.TMP
 test.units: $(CTAGS_TEST)
 	@ \
 	success=true; \
-	for input in $$(ls Units/*.[db]/input.* | grep -v "~$$"); do \
+	for input in $$(ls Units/*.[dbt]/input.* | grep -v "~$$"); do \
 		t=$${input%/input.*}; \
-		name=$${t%.[db]}; \
+		name=$${t%.[dbt]}; \
 		\
 		if test -n "$(UNIT)" -a "$${name}" != "Units/$(UNIT)"; then continue; fi; \
 		\
@@ -199,7 +199,7 @@ fuzz: $(CTAGS_TEST)
 	for lang in $$($(CTAGS_TEST) --list-languages); do \
 		if test -z "$(FUZZ_LANGUAGE)" || test "$(FUZZ_LANGUAGE)" = "$${lang}"; then \
 			echo "Fuzz-testing: $${lang}"; \
-			for input in Test/* Units/*.[db]/input.*; do \
+			for input in Test/* Units/*.[dbt]/input.*; do \
 				$(call run-ctags,"$${lang}","$${input}"); \
 			done; \
 			for d in $(FUZZ_SRC_DIRS); do \
