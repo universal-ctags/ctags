@@ -18,13 +18,16 @@ DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
 DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 		rm -f $1 $2 $3 $4; \
 		echo "passed" ; \
+		: $$(( n_passed++ )); \
 		true ; \
 	  elif test -d $(5).b; then \
 		echo "failed but KNOWN bug" ; \
+		: $$(( n_known_bugs++ )); \
 		true ; \
 	  else \
 		echo "FAILED" ; \
 		echo "	differences left in $3" ; \
+		: $$(( n_failed++ )); \
 		false ; \
 	  fi
 
@@ -35,6 +38,7 @@ CHECK_FEATURES = (\
 			if test "$$expected" = "$$f"; then found=yes; fi; \
 		done; \
 		if ! test $$found = yes; then \
+			: $$(( n_skipped++ )); \
 			echo "skipped (required feature $$expected is not available)"; \
 			exit 1; \
 		fi; \
@@ -134,6 +138,10 @@ UNITS_ARTIFACTS=Units/*.[dbt]/EXPECTED.TMP Units/*.[dbt]/OUTPUT.TMP Units/*.[dbt
 test.units: $(CTAGS_TEST)
 	@ \
 	success=true; \
+	n_passed=0; \
+	n_failed=0; \
+	n_skipped=0; \
+	n_known_bugs=0; \
 	for input in $$(ls Units/*.[dbt]/input.* | grep -v "~$$"); do \
 		t=$${input%/input.*}; \
 		name=$${t%.[dbt]}; \
@@ -167,6 +175,14 @@ test.units: $(CTAGS_TEST)
 					$$(test -f "$${args}" && echo "--options=$${args}") "$$input" ;\
 				    success=false; }; \
 	done; \
+	echo; \
+	echo '  Summary of "Units" test'; \
+	echo '  -------------------------'; \
+	echo '	#passed: ' $$n_passed; \
+	echo '	#failed: ' $$n_failed; \
+	echo '	#skipped: ' $$n_skipped; \
+	echo '	#known-bugs: ' $$n_known_bugs; \
+	echo; \
 	$$success
 
 TEST_ARTIFACTS = test.*.diff tags.ref ctags.ref.exe tags.test $(UNITS_ARTIFACTS)
