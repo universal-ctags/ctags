@@ -274,6 +274,18 @@ static void findPerlTags (void)
 	boolean skipPodDoc = FALSE;
 	const unsigned char *line;
 
+	/* Core modules AutoLoader and SelfLoader support delayed compilation
+	 * by allowing Perl code that follows __END__ and __DATA__ tokens,
+	 * respectively.  When we detect that one of these modules is used
+	 * in the file, we continue processing even after we see the
+	 * corresponding token that would usually terminate parsing of the
+	 * file.
+	 */
+	enum {
+		RESPECT_END		= (1 << 0),
+		RESPECT_DATA	= (1 << 1),
+	} respect_token = RESPECT_END | RESPECT_DATA;
+
 	while ((line = fileReadLine ()) != NULL)
 	{
 		boolean spaceRequired = FALSE;
@@ -294,9 +306,19 @@ static void findPerlTags (void)
 			continue;
 		}
 		else if (strcmp ((const char*) line, "__DATA__") == 0)
-			break;
+		{
+			if (respect_token & RESPECT_DATA)
+				break;
+			else
+				continue;
+		}
 		else if (strcmp ((const char*) line, "__END__") == 0)
-			break;
+		{
+			if (respect_token & RESPECT_END)
+				break;
+			else
+				continue;
+		}
 		else if (line [0] == '#')
 			continue;
 
@@ -318,6 +340,14 @@ static void findPerlTags (void)
 				continue;
 			while (*cp && isspace (*cp))
 				++cp;
+			if (strncmp((const char*) cp, "AutoLoader", (size_t) 10) == 0) {
+				respect_token &= ~RESPECT_END;
+				continue;
+			}
+			if (strncmp((const char*) cp, "SelfLoader", (size_t) 10) == 0) {
+				respect_token &= ~RESPECT_DATA;
+				continue;
+			}
 			if (strncmp((const char*) cp, "constant", (size_t) 8) != 0)
 				continue;
 			cp += 8;
