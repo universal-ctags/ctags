@@ -1,7 +1,8 @@
-Circle	input.rs	/^impl Circle {$/;"	c
+Circle	input.rs	/^impl HasArea for Circle {$/;"	c
 Circle	input.rs	/^struct Circle {$/;"	s
+HasArea	input.rs	/^trait HasArea {$/;"	i
 area	input.rs	/^    fn area(&self) -> f64 {$/;"	F	class:Circle
-main	input.rs	/^fn main() {$/;"	f
+area	input.rs	/^    fn area(&self) -> f64;$/;"	F	interface:HasArea
 radius	input.rs	/^    radius: f64,$/;"	m	struct:Circle
 x	input.rs	/^    x: f64,$/;"	m	struct:Circle
 y	input.rs	/^    y: f64,$/;"	m	struct:Circle
