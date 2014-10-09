@@ -18,16 +18,16 @@ DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
 DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 		rm -f $1 $2 $3 $4; \
 		echo "passed" ; \
-		: $$(( n_passed++ )); \
+		n_passed=$$(expr $$n_passed + 1); \
 		true ; \
 	  elif test -d $(5).b; then \
 		echo "failed but KNOWN bug" ; \
-		: $$(( n_known_bugs++ )); \
+		n_known_bugs=$$(expr $$n_known_bugs + 1); \
 		true ; \
 	  else \
 		echo "FAILED" ; \
 		echo "	differences left in $3" ; \
-		: $$(( n_failed++ )); \
+		n_failed=$$(expr $$n_failed + 1); \
 		false ; \
 	  fi
 
@@ -38,7 +38,7 @@ CHECK_FEATURES = (\
 			if test "$$expected" = "$$f"; then found=yes; fi; \
 		done; \
 		if ! test $$found = yes; then \
-			: $$(( n_skipped++ )); \
+			n_skipped=$$(expr $$n_skipped + 1); \
 			echo "skipped (required feature $$expected is not available)"; \
 			exit 1; \
 		fi; \
