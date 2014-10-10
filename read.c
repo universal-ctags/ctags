@@ -105,8 +105,11 @@ static boolean setSourceFileName (vString *const fileName)
 		if (isAbsolutePath (vStringValue (fileName)) || File.path == NULL)
 			pathName = vStringNewCopy (fileName);
 		else
-			pathName = combinePathAndFile (
-					vStringValue (File.path), vStringValue (fileName));
+		{
+			char *tmp = combinePathAndFile (
+				vStringValue (File.path), vStringValue (fileName));
+			pathName = vStringNewOwn (tmp);
+		}
 		setSourceFileParameters (pathName);
 		result = TRUE;
 	}

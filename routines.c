@@ -692,7 +692,7 @@ extern boolean isAbsolutePath (const char *const path)
 	return result;
 }
 
-extern vString *combinePathAndFile (
+extern char *combinePathAndFile (
 	const char *const path, const char *const file)
 {
 	vString *const filePath = vStringNew ();
@@ -737,7 +737,7 @@ extern vString *combinePathAndFile (
 	vStringCatS (filePath, file);
 #endif
 
-	return filePath;
+	return vStringDeleteUnwrap (filePath);
 }
 
 /* Return a newly-allocated string whose contents concatenate those of

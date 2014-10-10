@@ -1603,12 +1603,15 @@ static vString* expandOnSearchPathList (searchPathList *pathList, const char* le
 	for (i = 0; i < stringListCount (pathList); ++i)
 	{
 		const char* const body = vStringValue (stringListItem (pathList, i));
-		vString* const tmp = combinePathAndFile (body, leaf);
+		char* tmp = combinePathAndFile (body, leaf);
 
-		if ((* check) (vStringValue (tmp)))
-			return tmp;
+		if ((* check) (tmp))
+		{
+			vString *r = vStringNewOwn (tmp);
+			return r;
+		}
 		else
-			vStringDelete (tmp);
+			eFree (tmp);
 	}
 	return NULL;
 }
@@ -1887,13 +1890,12 @@ static void resetDataPathList (void)
 static void appendToDataPathList0 (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
 				   boolean report_in_verboe, const char* const action)
 {
-	vString* path;
+	char* path;
 
 	path = combinePathAndFile (dir, subdir);
 	if (report_in_verboe)
-		verbose ("%s %s to %s\n", action, vStringValue (path), varname);
-	stringListAdd (pathList, path);
-
+		verbose ("%s %s to %s\n", action, path, varname);
+	stringListAdd (pathList, vStringNewOwn (path));
 }
 
 static void prependToDataPathList0 (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
@@ -2290,9 +2292,9 @@ extern void previewFirstOption (cookedArgs* const args)
 
 static void parseConfigurationFileOptionsInDirectoryWithLeafname (const char* directory, const char* leafname)
 {
-	vString* const pathname = combinePathAndFile (directory, leafname);
-	parseFileOptions (vStringValue (pathname));
-	vStringDelete (pathname);
+	char* pathname = combinePathAndFile (directory, leafname);
+	parseFileOptions (pathname);
+	eFree (pathname);
 }
 
 static void parseConfigurationFileOptionsInDirectory (const char* directory)
@@ -2363,7 +2365,7 @@ static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const d
 	
 	for (i = 0; i < n; i++)
 	{
-		vString* path;
+		char* path;
 		fileStatus *s;
 
 		if (already_loaded_files && stringListHas (already_loaded_files, dents[i]->d_name))
@@ -2372,17 +2374,17 @@ static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const d
 			stringListAdd (already_loaded_files, vStringNewInit (dents[i]->d_name));
 
 		path = combinePathAndFile (dirName, dents[i]->d_name);
-		s = eStat (vStringValue (path));
+		s = eStat (path);
 
 		if (s->exists && s->isDirectory && accept_only_dot_d(dents[i]))
-			parseAllConfigurationFilesOptionsInDirectory (vStringValue (path),
+			parseAllConfigurationFilesOptionsInDirectory (path,
 								      already_loaded_files);
 		else if (s->exists && accept_only_dot_ctags(dents[i]))
 			parseConfigurationFileOptionsInDirectoryWithLeafname (dirName,
 									      dents[i]->d_name);
 		eStatFree (s);
 		free (dents[i]);
-		vStringDelete(path);
+		eFree (path);
 	}
 	free (dents);
 	return TRUE;
@@ -2516,12 +2518,12 @@ static void installDataPathList (void)
 		vString *home = getHome ();
 		if (home != NULL)
 		{
-			vString *ctags_d;
+			char *ctags_d;
 
 			ctags_d = combinePathAndFile (vStringValue (home), ".ctags.d");
 
-			appendToDataPathList (vStringValue (ctags_d), FALSE);
-			vStringDelete (ctags_d);
+			appendToDataPathList (ctags_d, FALSE);
+			eFree (ctags_d);
 			vStringDelete (home);
 		}
 	}

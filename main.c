@@ -158,13 +158,18 @@ static boolean recurseUsingOpendir (const char *const dirName)
 			if (strcmp (entry->d_name, ".") != 0  &&
 				strcmp (entry->d_name, "..") != 0)
 			{
-				vString *filePath;
+				char *filePath;
+				boolean free_p = FALSE;
 				if (strcmp (dirName, ".") == 0)
-					filePath = vStringNewInit (entry->d_name);
+					filePath = entry->d_name;
 				else
+				  {
 					filePath = combinePathAndFile (dirName, entry->d_name);
-				resize |= createTagsForEntry (vStringValue (filePath));
-				vStringDelete (filePath);
+					free_p = TRUE;
+				  }
+				resize |= createTagsForEntry (filePath);
+				if (free_p)
+					eFree (filePath);
 			}
 		}
 		closedir (dir);
