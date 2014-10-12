@@ -494,6 +494,8 @@ install_data_targets="install-data-corpora"
 AC_CHECK_FUNCS(scandir,[install_data_targets="$install_data_targets install-data-optlib install-data-preload"])
 AC_SUBST(install_data_targets)
 
+AC_CHECK_FUNCS(fork waitpid execv pipe)
+
 # Checks for missing prototypes
 # -----------------------------
 AC_CHECKING(for new missing prototypes)

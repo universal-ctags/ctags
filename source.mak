@@ -4,7 +4,7 @@
 
 HEADERS = \
 	args.h ctags.h debug.h entry.h flags.h general.h get.h htable.h keyword.h \
-	main.h options.h parse.h parsers.h read.h routines.h sort.h \
+	main.h options.h parse.h parsers.h pcoproc.h read.h routines.h sort.h \
 	strlist.h trash.h vstring.h
 
 SOURCES = \
@@ -44,6 +44,7 @@ SOURCES = \
 	options.c \
 	parse.c \
 	pascal.c \
+	pcoproc.c \
 	perl.c \
 	php.c \
 	python.c \
@@ -120,6 +121,7 @@ OBJECTS = \
 	options.$(OBJEXT) \
 	parse.$(OBJEXT) \
 	pascal.$(OBJEXT) \
+	pcoproc.$(OBJEXT) \
 	perl.$(OBJEXT) \
 	php.$(OBJEXT) \
 	python.$(OBJEXT) \

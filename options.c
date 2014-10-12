@@ -374,6 +374,9 @@ static const char *const Features [] = {
 #ifdef HAVE_SCANDIR
 	"option-directory",
 #endif
+#ifdef HAVE_COPROC
+	"coproc",
+#endif
 	NULL
 };
 

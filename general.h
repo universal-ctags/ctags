@@ -16,6 +16,9 @@
 */
 #if defined (HAVE_CONFIG_H)
 # include <config.h>
+#if (defined (HAVE_FORK) && defined (HAVE_WAITPID) && defined (HAVE_EXECV) && defined (HAVE_PIPE))
+#define HAVE_COPROC
+#endif
 #elif defined (AMIGA)
 # include "e_amiga.h"
 #elif defined (DJGPP)
