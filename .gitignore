@@ -25,3 +25,8 @@ TAGS
 autom4te.cache
 configure
 tg
+tags.test
+tags.ref
+core.*
+syntax.vim
+
