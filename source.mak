@@ -3,7 +3,7 @@
 # Shared macros
 
 HEADERS = \
-	args.h ctags.h debug.h entry.h flags.h general.h get.h keyword.h \
+	args.h ctags.h debug.h entry.h flags.h general.h get.h htable.h keyword.h \
 	main.h options.h parse.h parsers.h read.h routines.h sort.h \
 	strlist.h trash.h vstring.h
 
@@ -30,6 +30,7 @@ SOURCES = \
 	get.c \
 	go.c \
 	html.c \
+	htable.c \
 	jscript.c \
 	keyword.c \
 	lisp.c \
@@ -105,6 +106,7 @@ OBJECTS = \
 	get.$(OBJEXT) \
 	go.$(OBJEXT) \
 	html.$(OBJEXT) \
+	htable.$(OBJEXT) \
 	jscript.$(OBJEXT) \
 	keyword.$(OBJEXT) \
 	lisp.$(OBJEXT) \
