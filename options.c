@@ -1476,11 +1476,19 @@ extern boolean processCorpusOption (
 		return FALSE;
 	}
 	file_part = colon + 1;
-	tg_file = expandOnCorpusPathList (file_part);
-	if (tg_file == NULL)
+	if (file_part[0] == '\0')
+		error (FATAL,
+		       "file part after colon it not given %s: %s", option, parameter);
+
+	if (file_part[0] != '/' && file_part[0] != '.')
+	{
+		tg_file = expandOnCorpusPathList (file_part);
+		tg_file = tg_file? tg_file: vStringNewInit (file_part);
+	}
+	else
 		tg_file = vStringNewInit (file_part);
 
-	addCorpusFile(language, spec, tg_file, pattern_p);
+	addCorpusFile (language, spec, tg_file, pattern_p);
 
 	eFree (spec);
 	eFree (parm);
