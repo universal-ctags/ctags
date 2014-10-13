@@ -1873,7 +1873,7 @@ static void processVersionOption (
 	exit (0);
 }
 
-static void resetDataPathList0 (searchPathList** pathList, const char *const varname)
+static void resetPathList (searchPathList** pathList, const char *const varname)
 {
 	freeSearchPathList (pathList);
 	verbose ("Reset %s\n", varname);
@@ -1882,11 +1882,11 @@ static void resetDataPathList0 (searchPathList** pathList, const char *const var
 
 static void resetDataPathList (void)
 {
-	resetDataPathList0(&OptlibPathList, "OptlibPathList");
-	resetDataPathList0(&CorpusPathList, "CorpusPathList");
+	resetPathList (&OptlibPathList, "OptlibPathList");
+	resetPathList (&CorpusPathList, "CorpusPathList");
 }
 
-static void appendToDataPathList0 (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
+static void appendToPathList (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
 				   boolean report_in_verboe, const char* const action)
 {
 	char* path;
@@ -1897,36 +1897,36 @@ static void appendToDataPathList0 (const char *const dir, const char *const subd
 	stringListAdd (pathList, vStringNewOwn (path));
 }
 
-static void prependToDataPathList0 (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
+static void prependToPathList (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
 				    boolean report_in_verboe, const char* const action)
 {
 	stringListReverse (pathList);
-	appendToDataPathList0(dir, subdir, pathList, varname, report_in_verboe, action);
+	appendToPathList(dir, subdir, pathList, varname, report_in_verboe, action);
 	stringListReverse (pathList);
 
 }
 
 static void appendToDataPathList (const char *const dir, boolean from_cmdline)
 {
-	appendToDataPathList0 (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
+	appendToPathList (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
 			       from_cmdline, from_cmdline? "Append": NULL);
-	appendToDataPathList0 (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
+	appendToPathList (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
 			       from_cmdline, from_cmdline? "Append": NULL);
 
 	if (!from_cmdline)
-		appendToDataPathList0 (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
+		appendToPathList (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
 				       FALSE, NULL);
 }
 
 static void prependToDataPathList (const char *const dir, boolean from_cmdline)
 {
-	prependToDataPathList0 (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
+	prependToPathList (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
 				from_cmdline, from_cmdline? "Prepend": NULL);
-	prependToDataPathList0 (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
+	prependToPathList (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
 				from_cmdline, from_cmdline? "Prepend": NULL);
 
 	if (!from_cmdline)
-		prependToDataPathList0 (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
+		prependToPathList (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
 					FALSE, NULL);
 }
 
