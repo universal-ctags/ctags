@@ -15,6 +15,7 @@ New parsers
 Following parsers are added.
 
 * ada
+* coffee *xcmd*
 * css
 * ctags option library *optlib*
 * falcon
@@ -24,6 +25,8 @@ Following parsers are added.
 * windres
 
 See "Option library" about  *optlib*.
+See "External tag engine" about *xcmd*.
+
 
 Heavily improved language parsers
 ---------------------------------------------------------------------

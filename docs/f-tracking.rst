@@ -392,12 +392,13 @@ needed. Sometimes we may have to hack the external command to adjust
 the interface between the command and fishman-ctags.
 
 So let's track external commands maintained out fishman-ctags. If we
-prepare glue code ro script, mark it with <>, and if not, mark it with
+prepare glue code or script, mark it with <>, and if not, mark it with
 ().
 
-`CoffeeTags <https://github.com/lukaszkorecki/CoffeeTags>`_
+<`CoffeeTags <https://github.com/lukaszkorecki/CoffeeTags>`_>
 	
 	This is the primary target during developing xcmd
 	feature. CoffeeTags side hacking is done.
 
-`perl-tags <https://github.com/dtikhonov/perl-tags>`_
+(`perl-tags <https://github.com/dtikhonov/perl-tags>`_)
+
