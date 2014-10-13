@@ -257,6 +257,10 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Enable/disable tag kinds for language <LANG>."},
  {1,"  --<LANG>-map=[+]map"},
  {1,"       Simplified version of --langmap opton."},
+#ifdef HAVE_REGEX
+ {1,"  --<LANG>-regex=/line_pattern/name_pattern/[flags]"},
+ {1,"       Same as --regex-<LANG>=..."},
+#endif
  {1,"  --langdef=name"},
  {1,"       Define a new language to be parsed with regular expressions."},
  {1,"  --langmap=map(s)"},
