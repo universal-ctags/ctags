@@ -1453,28 +1453,15 @@ extern boolean processCorpusOption (
 	parm = eStrdup (parameter);
 	spec = extractMapFromParameter (language, parm, &colon, &pattern_p, skipTillColon);
 	if (spec == NULL)
-	{
 		error (FATAL, "Badly formed language map specification for loading colon for %s language",
 		       getLanguageName (language));
-		eFree (parm);
-		return FALSE;
-	}
 	else if (pattern_p && (*colon != ':'))
-	{
 		error (FATAL,
 		       "no colon(:) separator is found in parameter of %s: %s", option, parameter);
-		eFree (spec);
-		eFree (parm);
-		return FALSE;
-	}
 	else if ((!pattern_p) && *colon == '\0')
-	{
 		error (FATAL,
 		       "no colon(:) separator is found in parameter of %s: %s", option, parameter);
-		eFree (spec);
-		eFree (parm);
-		return FALSE;
-	}
+
 	file_part = colon + 1;
 	if (file_part[0] == '\0')
 		error (FATAL,
