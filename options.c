@@ -1681,7 +1681,7 @@ static void processOptionFile (
 	fileStatus *status;
 
 	if (parameter [0] == '\0')
-		error (WARNING, "no option file supplied for \"%s\"", option);
+		error (FATAL, "no option file supplied for \"%s\"", option);
 
 	if (parameter [0] != '/' && parameter [0] != '.')
 	{
