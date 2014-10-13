@@ -115,6 +115,7 @@ extern void setCurrentDirectory (void);
 extern fileStatus *eStat (const char *const fileName);
 extern void eStatFree (fileStatus *status);
 extern boolean doesFileExist (const char *const fileName);
+extern boolean doesExecutableExist (const char *const fileName);
 extern boolean isRecursiveLink (const char* const dirName);
 extern boolean isSameFile (const char *const name1, const char *const name2);
 #if defined(NEED_PROTO_FGETPOS)

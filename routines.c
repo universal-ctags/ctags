@@ -472,6 +472,12 @@ extern boolean doesFileExist (const char *const fileName)
 	return status->exists;
 }
 
+extern boolean doesExecutableExist (const char *const fileName)
+{
+	fileStatus *status = eStat (fileName);
+	return status->exists && status->isExecutable;
+}
+
 extern boolean isRecursiveLink (const char* const dirName)
 {
 	boolean result = FALSE;
