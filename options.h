@@ -153,6 +153,7 @@ extern void initOptions (void);
 extern void freeOptionResources (void);
 
 extern vString* expandOnCorpusPathList (const char* leaf);
+extern vString* expandOnDriversPathList (const char* leaf);
 /* Return vString must be freed by caller side. */
 
 #endif  /* _OPTIONS_H */

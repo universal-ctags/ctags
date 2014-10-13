@@ -440,10 +440,19 @@ extern void addTagXcmd (const langType language, vString* pathvstr)
 #endif
 }
 extern void addLanguageXcmd (
-	const langType language __unused__, const char* const path __unused__)
+	const langType language __unused__, const char* const parameter __unused__)
 {
 #ifdef HAVE_COPROC
-	addTagXcmd (language, vStringNewInit(path));
+	vString* vpath;
+
+	if (parameter [0] != '/' && parameter [0] != '.')
+	{
+		vpath = expandOnDriversPathList (parameter);
+		vpath = vpath? vpath: vStringNewInit(parameter);
+	}
+	else
+		vpath = vStringNewInit(parameter);
+	addTagXcmd (language, vpath);
 #endif
 }
 
