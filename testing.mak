@@ -28,6 +28,7 @@ DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 		echo "FAILED" ; \
 		echo "	differences left in $3" ; \
 		n_failed=$$(expr $$n_failed + 1); \
+		failed_cases="$$failed_cases $5" ; \
 		false ; \
 	  fi
 
@@ -139,6 +140,7 @@ test.units: $(CTAGS_TEST)
 	@ \
 	success=true; \
 	n_passed=0; \
+	failed_cases=; \
 	n_failed=0; \
 	n_skipped=0; \
 	n_known_bugs=0; \
@@ -180,6 +182,7 @@ test.units: $(CTAGS_TEST)
 	echo '  -------------------------'; \
 	echo '	#passed: ' $$n_passed; \
 	echo '	#failed: ' $$n_failed; \
+	for f in $$failed_cases; do echo "		$$f"; done; \
 	echo '	#skipped: ' $$n_skipped; \
 	echo '	#known-bugs: ' $$n_known_bugs; \
 	echo; \
