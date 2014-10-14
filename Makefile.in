@@ -99,7 +99,15 @@ CORPORA    = ctags.ctags RFC1213-MIB.txt
 #
 preloaddir = $(datadir)/preload
 pkgconf_preloaddir = $(pkgconfdir)/preload
-PRELOAD_OPTLIB = ctags.ctags mib.ctags rust.ctags
+PRELOAD_OPTLIB =				\
+	\
+	coffee.ctags				\
+	ctags.ctags				\
+	mib.ctags				\
+	rust.ctags 				\
+	\
+	$(NULL)
+DEFAULT_PRELOAD_FILE=default.ctags
 
 #
 # config files
@@ -221,9 +229,9 @@ install-data-optlib: $(addprefix data/optlib/,$(OPTLIB))  $(DESTDIR)$(optlibdir)
 	done
 install-data-preload: $(DESTDIR)$(preloaddir) $(DESTDIR)$(pkgconf_preloaddir) FORCE
 	for c in $(PRELOAD_OPTLIB); do \
-		echo "--options=$$(basename $$c .ctags)" >> $(DESTDIR)$(preloaddir)/default.ctags; \
+		echo "--options=$$(basename $$c .ctags)" >> $(DESTDIR)$(preloaddir)/$(DEFAULT_PRELOAD_FILE); \
 	done; \
-	chmod 644 $(DESTDIR)$(preloaddir)/default.ctags
+	chmod 644 $(DESTDIR)$(preloaddir)/$(DEFAULT_PRELOAD_FILE)
 
 #
 # rules for uninstalling
