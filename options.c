@@ -2640,6 +2640,10 @@ static void installLibexecPathList (void)
 			vStringDelete (home);
 		}
 	}
+
+#ifdef PKGLIBEXECDIR
+	appendToLibexecPathList (PKGLIBEXECDIR, FALSE);
+#endif
 }
 
 /*

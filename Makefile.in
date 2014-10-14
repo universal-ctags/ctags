@@ -27,6 +27,8 @@ mandir	= @mandir@
 datadir = @datarootdir@/@PACKAGE_NAME@
 sysconfdir=@sysconfdir@
 pkgconfdir=@sysconfdir@/@PACKAGE_NAME@
+libexecdir=@libexecdir@
+pkglibexecdir=@libexecdir@/@PACKAGE_NAME@
 SLINK	= @LN_S@
 STRIP	= @STRIP@
 CC	= @CC@
@@ -54,7 +56,10 @@ OBJEXT	= @OBJEXT@
 #LDFLAGS=
 
 ALL_CFLAGS = $(CFLAGS) -Wall
-ALL_CPPFLAGS = $(CPPFLAGS) -DDATADIR=\"$(datadir)\" -DPKGCONFDIR=\"$(pkgconfdir)\"
+ALL_CPPFLAGS = $(CPPFLAGS)			\
+	-DDATADIR=\"$(datadir)\"		\
+	-DPKGCONFDIR=\"$(pkgconfdir)\"		\
+	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\"
 
 include $(srcdir)/source.mak
 
@@ -117,6 +122,13 @@ pkgconf_optlibdir = $(pkgconfdir)/optlib
 OPTLIB    = $(PRELOAD_OPTLIB)
 
 #
+# drivers
+#
+driversdir = $(pkglibexecdir)/drivers
+DRIVERS = coffeetags
+
+
+#
 # destinations for installed files
 #
 CTAGS_EXEC	= $(CTAGS_PROG)$(EXEEXT)
@@ -163,7 +175,11 @@ install-strip: install
 install-ctags: install-cbin install-cman
 install-etags: install-ebin install-eman
 
-$(addprefix $(DESTDIR),$(bindir) $(man1dir) $(libdir) $(incdir) $(corporadir) $(optlibdir) $(preloaddir) $(pkgconf_corporadir) $(pkgconf_optlibdir) $(pkgconf_preloaddir)):
+INSTALLDIRS = $(bindir) $(man1dir) $(libdir) $(incdir) \
+	$(corporadir) $(optlibdir) $(preloaddir) $(driversdir) \
+	$(pkgconf_corporadir) $(pkgconf_optlibdir) $(pkgconf_preloaddir)
+
+$(addprefix $(DESTDIR),$(INSTALLDIRS)):
 	$(srcdir)/mkinstalldirs $@
 
 FORCE:
@@ -234,9 +250,18 @@ install-data-preload: $(DESTDIR)$(preloaddir) $(DESTDIR)$(pkgconf_preloaddir) FO
 	chmod 644 $(DESTDIR)$(preloaddir)/$(DEFAULT_PRELOAD_FILE)
 
 #
+# install libexec
+#
+install-libexec: @install_libexec_targets@
+install-libexec-drivers: $(addprefix libexec/drivers/,$(DRIVERS)) $(DESTDIR)$(driversdir) FORCE
+	for x in $(DRIVERS); do \
+		$(INSTALL_PROG) $(srcdir)/libexec/drivers/$$x $(DESTDIR)$(driversdir)/$$x && chmod 755 $(DESTDIR)$(driversdir)/$$x; \
+	done
+
+#
 # rules for uninstalling
 #
-uninstall: uninstall-bin uninstall-lib uninstall-cmd uninstall-man uninstall-data
+uninstall: uninstall-bin uninstall-lib uninstall-cmd uninstall-man uninstall-data uninstall-libexec
 
 uninstall-bin:
 	- rm -f $(DEST_CTAGS) $(DEST_ETAGS)
@@ -273,6 +298,12 @@ uninstall-preload:
 	- rmdir $(preloaddir)
 	- rmdir $(pkgconf_preloaddir)
 
+uninstall-libexec: uninstall-drivers
+	- rmdir $(pkglibexecdir)
+
+uninstall-drivers:
+	- rm -f $(addprefix $(driversdir)/,$(DRIVERS))
+	- rmdir $(driversdir)
 
 #
 # miscellaneous rules
