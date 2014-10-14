@@ -32,6 +32,21 @@ DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 		false ; \
 	  fi
 
+CHECK_LANGUAGES  = (\
+	while read expected; do \
+		found=no; \
+		for f in $$( $(UNIT_CTAGS_CMDLINE) --list-languages  2>/dev/null) ; do \
+			if test "$$expected" = "$$f"; then found=yes; fi; \
+		done; \
+		if ! test $$found = yes; then \
+			n_skipped_languages=$$(expr $$n_skipped_languages + 1); \
+			echo "skipped (required language parser $$expected is not available)"; \
+			exit 1; \
+		fi; \
+	done < $1; \
+	exit 0; \
+)
+
 CHECK_FEATURES = (\
 	while read expected; do \
 		found=no; \
@@ -39,7 +54,7 @@ CHECK_FEATURES = (\
 			if test "$$expected" = "$$f"; then found=yes; fi; \
 		done; \
 		if ! test $$found = yes; then \
-			n_skipped=$$(expr $$n_skipped + 1); \
+			n_skipped_features=$$(expr $$n_skipped_features + 1); \
 			echo "skipped (required feature $$expected is not available)"; \
 			exit 1; \
 		fi; \
@@ -136,13 +151,20 @@ endif
 
 
 UNITS_ARTIFACTS=Units/*.[dbt]/EXPECTED.TMP Units/*.[dbt]/OUTPUT.TMP Units/*.[dbt]/DIFF.TMP
+UNIT_CTAGS_CMDLINE=$(call unit-ctags-cmdline)
+define unit-ctags-cmdline
+	$(CTAGS_TEST) --options=NONE --libexec-dir=libexec --libexec-dir=+$$t --data-dir=data --data-dir=+$$t -o - \
+		$$(test -f "$${args}" && echo "--options=$${args}")
+endef
+
 test.units: $(CTAGS_TEST)
 	@ \
 	success=true; \
 	n_passed=0; \
 	failed_cases=; \
 	n_failed=0; \
-	n_skipped=0; \
+	n_skipped_features=0; \
+	n_skipped_languages=0; \
 	n_known_bugs=0; \
 	for input in $$(ls Units/*.[dbt]/input.* | grep -v "~$$"); do \
 		t=$${input%/input.*}; \
@@ -158,6 +180,7 @@ test.units: $(CTAGS_TEST)
 		diff="$$t"/DIFF.TMP; \
 		stderr="$$t"/STDERR.TMP; \
 		features="$$t"/features; \
+		languages="$$t"/languages; \
 		\
 		echo -n "Testing $${name}..."; \
 		\
@@ -166,15 +189,18 @@ test.units: $(CTAGS_TEST)
 				continue; \
 			fi; \
 		fi; \
-		$(VALGRIND) $(CTAGS_TEST) --options=NONE --libexec-dir=libexec --libexec-dir=+$$t --data-dir=data --data-dir=+$$t -o - \
-		$$(test -f "$${args}" && echo "--options=$${args}") \
+		if test -e "$$languages"; then \
+			if ! $(call CHECK_LANGUAGES, "$$languages"); then \
+				continue; \
+			fi; \
+		fi; \
+		$(VALGRIND) $(UNIT_CTAGS_CMDLINE)\
 		"$$input" 2> "$$stderr" | \
 		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
 		cp "$$expected" "$$expectedtmp"; \
 		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff","$$stderr","$$name"); \
 		test $$? -eq 0 || { echo "	cmdline: " \
-					$(CTAGS_TEST) --options=NONE --libexec-dir=libexec --libexec-dir=+$$t --data-dir=data --data-dir=+$$t -o - \
-					$$(test -f "$${args}" && echo "--options=$${args}") "$$input" ;\
+					$(UNIT_CTAGS_CMDLINE) "$$input" ;\
 				    success=false; }; \
 	done; \
 	echo; \
@@ -183,7 +209,8 @@ test.units: $(CTAGS_TEST)
 	echo '	#passed: ' $$n_passed; \
 	echo '	#failed: ' $$n_failed; \
 	for f in $$failed_cases; do echo "		$$f"; done; \
-	echo '	#skipped: ' $$n_skipped; \
+	echo '	#skipped(features): ' $$n_skipped_features; \
+	echo '	#skipped(languages): ' $$n_skipped_languages; \
 	echo '	#known-bugs: ' $$n_known_bugs; \
 	echo; \
 	$$success

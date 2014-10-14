@@ -55,6 +55,15 @@ have its own directory under Units directory.
 	All features built-in can be listed with passing
 	``--list-features`` to ctags.
 
+*Units/TEST/languages* **optional**
+
+	If a unit test case requires that language parsers are enabled/available,
+	enumerate them in this file line by line. If one of them is
+	disabled/unavailable, the test is skipped.
+
+	language parsers enabled/available can be checked with passing
+	``--list-langauges`` to ctags.
+
 Note for importing a test case from Test directory
 ------------------------------------------------------------
 
