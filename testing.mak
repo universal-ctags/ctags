@@ -205,7 +205,7 @@ fuzz:
 	@ echo "No timeout command of find found"
 else
 
-define run-ctags
+define run-fuzz-ctags
 	if ! timeout -s INT $(FUZZ_TIMEOUT) \
 		$(CTAGS_TEST) --language-force=$1 -o - $2 \
 		> /dev/null 2>&1; then \
@@ -219,12 +219,12 @@ fuzz: $(CTAGS_TEST)
 		if test -z "$(FUZZ_LANGUAGE)" || test "$(FUZZ_LANGUAGE)" = "$${lang}"; then \
 			echo "Fuzz-testing: $${lang}"; \
 			for input in Test/* Units/*.[dbt]/input.*; do \
-				$(call run-ctags,"$${lang}","$${input}"); \
+				$(call run-fuzz-ctags,"$${lang}","$${input}"); \
 			done; \
 			for d in $(FUZZ_SRC_DIRS); do \
 				find "$$d" -type f \
 				| while read input; do \
-					$(call run-ctags,"$${lang}","$${input}"); \
+					$(call run-fuzz-ctags,"$${lang}","$${input}"); \
 				done; \
 			done; \
 		fi ; \
