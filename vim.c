@@ -615,17 +615,17 @@ static boolean parseVimLine (const unsigned char *line)
 		parseMap(line);
 	}
 
-	if (strncmp ((const char*) line, "fu", (size_t) 2) == 0)
+	else if (strncmp ((const char*) line, "fu", (size_t) 2) == 0)
 	{
 		parseFunction(line);
 	}
 
-	if	(strncmp ((const char*) line, "aug", (size_t) 3) == 0)
+	else if	(strncmp ((const char*) line, "aug", (size_t) 3) == 0)
 	{
 		parseAutogroup(line);
 	}
 
-	if ( strncmp ((const char*) line, "let", (size_t) 3) == 0 )
+	else if ( strncmp ((const char*) line, "let", (size_t) 3) == 0 )
 	{
 		parseLet(line);
 	}
