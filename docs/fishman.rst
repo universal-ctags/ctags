@@ -1,9 +1,18 @@
+..
+.. you can use rst2pdf or something rst2* to generate a sophisticated
+.. file for reading and printing from rst files.
+..
+.. TODO: Makefile targets for converting are needed.
+..
+
 ========================================================================
 fishman-ctags hacking guide
 ========================================================================
 
+
+
 :Version: Draft
-:Author: Masatake YAMATO <yamato@redhat.com>
+:Editor: Masatake YAMATO <yamato@redhat.com>
 :Web Page: https://github.com/fishman/ctags
 
 Introduction
@@ -31,16 +40,45 @@ Proofreading and pull-requests are welcome!
 Contents
 ======================================================================
 
-#. Tracking other projects
-#. Changes in fishman-ctags
-#. Building ctags
-#. Writing/using *Units*
-#. Contributing an optlib
-#. ctags Internal
+.. contents::
+
+.. section-numbering::
+
+.. raw:: pdf
+
+   PageBreak oneColumn
 
 .. include:: f-tracking.rst
+.. raw:: pdf
+
+   PageBreak oneColumn
+
 .. include:: f-news.rst
+.. raw:: pdf
+
+   PageBreak oneColumn
+
 .. include:: f-building.rst
+.. raw:: pdf
+
+   PageBreak oneColumn
+
 .. include:: f-units.rst
+.. raw:: pdf
+
+   PageBreak oneColumn
+
 .. include:: f-optlib.rst
+.. raw:: pdf
+
+   PageBreak oneColumn
+
+.. include:: f-xcmd.rst
+.. raw:: pdf
+
+   PageBreak oneColumn
+
 .. include:: f-internal.rst
+.. raw:: pdf
+
+   PageBreak oneColumn

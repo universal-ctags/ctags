@@ -16,7 +16,7 @@ section I explains the next step.
 .. _`How to Add Support for a New Language to Exuberant Ctags (EXTENDING)`: http://ctags.sourceforge.net/EXTENDING.html
 
 I use Swine as the name of programming language which your parser
-deals. Assume source files written in Swine language have a suffix
+deals with. Assume source files written in Swine language have a suffix
 *.swn*. The file name of option library is *swine.ctags*.
 
 Changes in options
