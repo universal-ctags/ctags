@@ -1868,6 +1868,7 @@ static void findOcamlTags (void)
 		tok = lex (&st);
 	}
 
+	vStringDelete (st.name);
 	vStringDelete (name);
 	vStringDelete (voidName);
 	vStringDelete (tempIdent);
