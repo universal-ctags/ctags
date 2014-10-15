@@ -274,6 +274,8 @@ static void makeTexTag (tokenInfo *const token, texKind kind)
 		}
 
 		makeTagEntry (&e);
+		vStringDelete (parentKind);
+		vStringDelete (parentName);
 	}
 }
 
