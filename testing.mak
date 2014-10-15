@@ -69,8 +69,26 @@ CHECK_FEATURES = (\
 VALGRIND_COMMAND       = valgrind
 VALGRIND_OPTIONS       = --quiet --leak-check=full
 VALGRIND_EXTRA_OPTIONS =
+
 ifdef VG
 VALGRIND = $(VALGRIND_COMMAND) $(VALGRIND_OPTIONS) $(VALGRIND_EXTRA_OPTIONS)
+ifeq ($(SHELL),/bin/bash)
+define STDERR
+	2> >(grep -v 'No options will be read from files or environment'  | \
+		tee $(1).vg | tee $(1) 1>&2; \
+		if ! grep -q "^==" $(1).vg; then \
+			rm $(1).vg; \
+		fi; \
+		)
+endef
+else
+define STDERR
+endef
+endif
+else
+define STDERR
+	2> $1
+endef
 endif
 
 .PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units fuzz
@@ -166,6 +184,11 @@ test.units: $(CTAGS_TEST)
 	n_skipped_features=0; \
 	n_skipped_languages=0; \
 	n_known_bugs=0; \
+	if [ -n "$(VALGRIND)" -a -n "$(UNIT)" ]; then \
+		rm -f Units/$(UNIT).[dbt]/STDERR.TMP.vg; \
+	elif [ -n "$(VALGRIND)" ]; then \
+		rm -f Units/*.[dbt]/STDERR.TMP.vg; \
+	fi; \
 	for input in $$(ls Units/*.[dbt]/input.* | grep -v "~$$"); do \
 		t=$${input%/input.*}; \
 		name=$${t%.[dbt]}; \
@@ -194,8 +217,8 @@ test.units: $(CTAGS_TEST)
 				continue; \
 			fi; \
 		fi; \
-		$(VALGRIND) $(UNIT_CTAGS_CMDLINE)\
-		"$$input" 2> "$$stderr" | \
+		$(VALGRIND) $(UNIT_CTAGS_CMDLINE) \
+		"$$input" $(call STDERR,"$$stderr") | \
 		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
 		cp "$$expected" "$$expectedtmp"; \
 		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff","$$stderr","$$name"); \
@@ -212,6 +235,21 @@ test.units: $(CTAGS_TEST)
 	echo '	#skipped(features): ' $$n_skipped_features; \
 	echo '	#skipped(languages): ' $$n_skipped_languages; \
 	echo '	#known-bugs: ' $$n_known_bugs; \
+	if [ -n "$(VALGRIND)" -a "$(SHELL)" = /bin/bash -a -n "$(UNIT)" ]; then \
+		if [ -f Units/$(UNIT).[dbt]/STDERR.TMP.vg ]; then\
+			echo '	#valgrind: 1'; \
+			echo '		$(UNIT)'; \
+		else \
+			echo '	#valgrind: 0'; \
+		fi; \
+	elif [ -n "$(VALGRIND)" -a "$(SHELL)" = /bin/bash ]; then \
+		echo '	#valgrind: ' $$(find Units -name 'STDERR.TMP.vg' |  wc -l); \
+		find Units -name 'STDERR.TMP.vg' | \
+		xargs -n 1 dirname 2>/dev/null | \
+		xargs -n 1 basename 2>/dev/null | \
+		sed -e 's/\(.*\)\../\1/' | \
+		xargs -n 1 echo "		"; \
+	fi; \
 	echo; \
 	$$success
 

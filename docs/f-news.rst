@@ -57,9 +57,9 @@ checker.
 
 ::
 
-	$ make -f testing.mak VG=1
+	$ make -f testing.mak VG=1 SHELL=/bin/bash
 
-The most of all memory leaks are fixed already.
+NOTE: ``/bin/bash`` is needed to report the result.
 
 
 Semi-fuzz testing
