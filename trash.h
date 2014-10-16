@@ -13,13 +13,19 @@
 #ifndef _TRASH_H
 #define _TRASH_H
 
+#include <setjmp.h>
+
+typedef void (* trashDestrctorProc) (void *);
+
 typedef struct sTrash {
 	void* item;
 	struct sTrash* next;
-	void (* destrctor) (void *);
+	trashDestrctorProc destrctor;
 } Trash;
 
-extern Trash* trashPut (Trash* trash, void* item);
+extern Trash* trashPut     (Trash* trash, void* item);
+extern Trash* trashPutFull (Trash* trash, void* item,
+			    trashDestrctorProc destrctor);
 extern Trash* trashTakeBack (Trash* trash, void* item);
 extern Trash* trashMakeEmpty (Trash* trash);
 

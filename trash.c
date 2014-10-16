@@ -17,10 +17,16 @@
 
 extern Trash* trashPut (Trash* trash, void* item)
 {
+	return trashPutFull (trash, item, eFree);
+}
+
+extern Trash* trashPutFull (Trash* trash, void* item,
+			    trashDestrctorProc destrctor)
+{
 	Trash* t = xMalloc (1, Trash);
 	t->next = trash;
 	t->item = item;
-	t->destrctor = eFree;
+	t->destrctor = destrctor? destrctor: eFree;
 	return t;
 }
 
