@@ -1,5 +1,10 @@
 xcmd protocol and writing a driver
 ======================================================================
+
+:Maintainer: Masatake YAMATO <yamato@redhat.com>
+
+----
+
 About the way to utilize external parser commands, see 
 "External parser command" in "Changes in fishman-ctags".
 

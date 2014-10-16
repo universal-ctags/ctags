@@ -1,6 +1,10 @@
 Changes in fishman-ctags
 ======================================================================
 
+:Maintainer: Masatake YAMATO <yamato@redhat.com>
+
+----
+
 Many changes have been introduced in fishman-ctags. Here I (Masatake
 YAMATO) enumerate the changes mainly in common part. About changes
 not enumerated here especially in language parsers, inquire git-log.

@@ -1,6 +1,10 @@
 Contributing an optlib
 ============================================================
 
+:Maintainer: Masatake YAMATO <yamato@redhat.com>
+
+----
+
 You are welcome.
 
 fishman-ctags provides a facility for "Option library".
