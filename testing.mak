@@ -96,7 +96,7 @@ define STDERR
 endef
 endif
 
-.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units fuzz
+.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units fuzz clean clean-test
 
 test: test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units
 
@@ -173,7 +173,7 @@ test.linux: $(CTAGS_TEST) $(CTAGS_REF)
 endif
 
 
-UNITS_ARTIFACTS=Units/*.[dbt]/EXPECTED.TMP Units/*.[dbt]/OUTPUT.TMP Units/*.[dbt]/DIFF.TMP
+UNITS_ARTIFACTS=Units/*.[dbt]/{EXPECTED.TMP,OUTPUT.TMP,DIFF.TMP,STDERR.TMP,STDERR.TMP.vg}
 UNIT_CTAGS_CMDLINE=$(call unit-ctags-cmdline)
 define unit-ctags-cmdline
 	$(CTAGS_TEST) --options=NONE --libexec-dir=libexec --libexec-dir=+$$t --data-dir=data --data-dir=+$$t -o - \
@@ -261,6 +261,7 @@ test.units: $(CTAGS_TEST)
 	$$success
 
 TEST_ARTIFACTS = test.*.diff tags.ref ctags.ref.exe tags.test $(UNITS_ARTIFACTS)
+clean: clean-test
 clean-test:
 	rm -f $(TEST_ARTIFACTS)
 
