@@ -73,6 +73,7 @@ typedef struct {
 
 		/* the value of the extension field (may be an empty string) */
 	const char *value;
+	int   pull_count;
 
 } tagExtensionField;
 
@@ -534,14 +535,36 @@ static const char* lookupKindLetter (const char* const kind_name, const xcmdPath
 	return NULL;
 
 }
-static const char* entryLookupField (tagEntry *const entry, const char *const kind)
+
+static const char* entryLookupField (tagEntry *const entry, const char *const kind, boolean pulling)
 {
 	int i;
 
 	for (i = 0; i < entry->fields.count; i++)
 	{
 		if (!strcmp (entry->fields.list [i].key, kind))
+		{
+			if (pulling)
+				entry->fields.list [i].pull_count++;
 			return entry->fields.list [i].value;
+		}
+	}
+	return NULL;
+}
+
+static const char* entryGetAnyUnpulledField (tagEntry *const entry, const char **const kind, boolean pulling)
+{
+	int i;
+
+	for (i = 0; i < entry->fields.count; i++)
+	{
+		if (entry->fields.list [i].pull_count == 0)
+		{
+			*kind = entry->fields.list [i].key;
+			if (pulling)
+				entry->fields.list [i].pull_count++;
+			return entry->fields.list [i].value;
+		}
 	}
 	return NULL;
 }
@@ -578,6 +601,7 @@ static void entryAddField (tagEntry *const entry, const char *const key, const c
 				       tagExtensionField);
 	entry->fields.list [entry->fields.count].key = key;
 	entry->fields.list [entry->fields.count].value = value;
+	entry->fields.list [entry->fields.count].pull_count = 0;
 	++entry->fields.count;
 }
 
@@ -650,7 +674,7 @@ static boolean fillEntry (const xcmdPath* path, tagEntry* entry)
 	}
 	else
 	{
-		const char* kind = entryLookupField (entry, "kind");
+		const char* kind = entryLookupField (entry, "kind", FALSE);
 		if (kind)
 		{
 			entry->kind = lookupKindLetter (kind, path);
@@ -771,7 +795,7 @@ static boolean makePseudoTagEntryFromTagEntry (tagEntry* entry)
 		 || (strcmp (tagName, "TAG_PROGRAM_VERSION") == 0))
 	{
 		writePseudoTag (tagName, fileName, pattern,
-				entryLookupField(entry, "language"));
+				entryLookupField(entry, "language", FALSE));
 		return TRUE;
 	}
 
@@ -798,24 +822,33 @@ static boolean makeTagEntryFromTagEntry (tagEntry* entry)
 	// pseudo if (entry->name...);
 	initTagEntryFull (&tag, entry->name,
 			  entry->address.lineNumber,
-			  entryLookupField(entry, "language"),
+			  entryLookupField(entry, "language", TRUE),
 			  filePosition,
 			  entry->file);
 
 	tag.kind = entry->kind[0];
-	tag.kindName = entryLookupField(entry, "kind");
+	tag.kindName = entryLookupField(entry, "kind", TRUE);
 	tag.pattern = entry->address.pattern;
 
 	tag.isFileScope = (boolean)entry->fileScope;
-	tag.extensionFields.access = entryLookupField(entry, "access");
-	/* fileScope??? */
-	tag.extensionFields.implementation = entryLookupField(entry, "implementation");
-	tag.extensionFields.inheritance = entryLookupField(entry, "inheritance");
-	/* scope??? */
-	tag.extensionFields.signature = entryLookupField(entry, "signature");
-	/* typeref */
-
-	/* TODO: REST */
+	tag.extensionFields.access = entryLookupField(entry, "access", TRUE);
+	tag.extensionFields.implementation = entryLookupField(entry, "implementation", TRUE);
+	tag.extensionFields.inheritance = entryLookupField(entry, "inherits", TRUE);
+	tag.extensionFields.signature = entryLookupField(entry, "signature", TRUE);
+	tag.extensionFields.typeRef[0] = entryLookupField(entry, "typeref", TRUE);
+	if (tag.extensionFields.typeRef[0])
+	{
+		char *tmp;
+		tmp = strchr (tag.extensionFields.typeRef[0], ':');
+		if (tmp)
+		{
+			*tmp = '\0';
+			tag.extensionFields.typeRef[1] = tmp + 1;
+		}
+	}
+	tag.extensionFields.scope[1] = entryGetAnyUnpulledField (entry,
+								 &tag.extensionFields.scope[0],
+								 TRUE);
 
 	makeTagEntry (&tag);
 	return TRUE;

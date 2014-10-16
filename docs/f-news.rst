@@ -558,26 +558,3 @@ doesn't work with ``-e``.
 
   ctags cannot generate TAGS, etags format output
   if ``--<LANG>-xcmd=COMMAND`` is specified.
-
-merges only subset of output from xcmds.
-
-  some of xcmds can generate extra
-  informations. They are not merged to tags.
-
-  e.g. When printing a function as a tag, CoffeeTags can
-  also report the name of object where the function is defined.
-  The name of object is reported with ``object:`` marker.
-  Though ctags drops the marker which ctags doesn't known.
-
-  CoffeeTags direct output::
-
-    do	f.coffee	/^  move: ->$/;"	f	line:10	object:Snake	type:function	language:coffee
-
-  Output merged by ctags(``--fields='*' --extra='+fq``)::
-
-    do	f.coffee	/^  move: ->$/;"	kind:function	line:10	language:coffee
-
-  As you can see, ``object:Sname`` is dropped.
-
-  TODO: ``--extra`` option must be extended to remove this restrictions.
-  e.g. making ctags accept ``--extra=+{coffee:object}`` per language extra flags
