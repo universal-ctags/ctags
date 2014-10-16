@@ -32,7 +32,9 @@ DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 		false ; \
 	  fi
 
-CHECK_LANGUAGES  = (\
+DEFINE_CHECK_LANGUAGES  =\
+check_languages()\
+{       local expected; \
 	while read expected; do \
 		found=no; \
 		for f in $$( $(UNIT_CTAGS_CMDLINE) --list-languages  2>/dev/null) ; do \
@@ -41,13 +43,15 @@ CHECK_LANGUAGES  = (\
 		if ! test $$found = yes; then \
 			n_skipped_languages=$$(expr $$n_skipped_languages + 1); \
 			echo "skipped (required language parser $$expected is not available)"; \
-			exit 1; \
+			return 1; \
 		fi; \
-	done < $1; \
-	exit 0; \
-)
+	done < $$1; \
+	return 0; \
+}
 
-CHECK_FEATURES = (\
+DEFINE_CHECK_FEATURES =\
+check_features()\
+{       local expected; \
 	while read expected; do \
 		found=no; \
 		for f in $$( $(CTAGS_TEST) --list-features); do \
@@ -56,11 +60,12 @@ CHECK_FEATURES = (\
 		if ! test $$found = yes; then \
 			n_skipped_features=$$(expr $$n_skipped_features + 1); \
 			echo "skipped (required feature $$expected is not available)"; \
-			exit 1; \
+			return 1; \
 		fi; \
-	done < $1; \
-	exit 0; \
-)
+	done < $$1; \
+	return 0; \
+}
+
 #
 # Run unit test s under valgrind:
 #
@@ -189,6 +194,8 @@ test.units: $(CTAGS_TEST)
 	elif [ -n "$(VALGRIND)" ]; then \
 		rm -f Units/*.[dbt]/STDERR.TMP.vg; \
 	fi; \
+	$(DEFINE_CHECK_FEATURES); \
+	$(DEFINE_CHECK_LANGUAGES); \
 	for input in $$(ls Units/*.[dbt]/input.* | grep -v "~$$"); do \
 		t=$${input%/input.*}; \
 		name=$${t%.[dbt]}; \
@@ -208,12 +215,12 @@ test.units: $(CTAGS_TEST)
 		echo -n "Testing $${name}..."; \
 		\
 		if test -e "$$features"; then \
-			if ! $(call CHECK_FEATURES, "$$features"); then \
+			if ! check_features "$$features"; then \
 				continue; \
 			fi; \
 		fi; \
 		if test -e "$$languages"; then \
-			if ! $(call CHECK_LANGUAGES, "$$languages"); then \
+			if ! check_languages "$$languages"; then \
 				continue; \
 			fi; \
 		fi; \
