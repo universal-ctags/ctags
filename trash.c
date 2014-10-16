@@ -38,7 +38,7 @@ static boolean trashTakeBack0  (Trash** trash, void* item)
 	removed = FALSE;
 	while (*trash)
 	{
-		if (strcmp ((*trash)->item, item) == 0)
+		if ( (*trash)->item ==  item )
 		{
 			tmp = *trash;
 			*trash = (*trash)->next;
@@ -92,7 +92,7 @@ int main (void)
 	trash = trashPut (trash, eStrdup ("c"));
 	trash = trashPut (trash, d);
 
-	trash = trashTakeBack (trash, "b");
+	trash = trashTakeBack (trash, b);
 	eFree (b);
 
 	fputs("expects: dca\nactual: ", stderr);
@@ -101,7 +101,7 @@ int main (void)
 	fputc('\n', stderr);
 
 
-	trash = trashTakeBack (trash, "d");
+	trash = trashTakeBack (trash, d);
 	eFree (d);
 
 	fputs("expects: ca\nactual: ", stderr);
