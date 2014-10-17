@@ -55,7 +55,7 @@ Contents
 
    PageBreak oneColumn
 
-.. include:: f-building.rst
+.. include:: f-windows.rst
 .. raw:: pdf
 
    PageBreak oneColumn
