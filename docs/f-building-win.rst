@@ -5,13 +5,13 @@ This part of the documentation is written by Frank Fesevur, co-maintainer of fis
 
 
 Compilers
-=============================================================================
+-----------------------------------------------------------------------------
 
 There are many compilers for Windows. Apart from the ones mentioned here others do exist, but not used by me.
 
 
 Microsoft Visual Studio
------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 http://www.visualstudio.com/
 
 Obviously there is Microsoft Visual Studio 2013. Many professional developers targeting Windows use Visual Studio. Visual Studio comes in a couple of different editions. Their Express Edition is free to use, but a Microsoft-account is required to download the .iso and when you want to continue using it after a 30-days trial period. All other editions you need to be paid for.
@@ -22,7 +22,7 @@ Note that ctags can not be build with Visual Studio older then 2013 anymore. The
 
 
 GCC
------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There are three flavors of GCC for Windows:
 
@@ -33,15 +33,15 @@ There are three flavors of GCC for Windows:
 MinGW started it all, but development stalled a while and no x64 was available. Then the MinGW-w64 fork emerged. It started as a 64-bit compiler, but soon they included both a 32-bit and a 64-bit compiler. But the name remained, a bit confusing. Another fork of MinGW is TDM-GCC. It also provides both 32-bit and 64-bit compilers. All have at least GCC 4.8. MinGW-w64 appears to be the most used flavor of MinGW at this moment. Many well known program the originate from Linux use MinGW-w64 to compile their Windows port.
 
 Building ctags from the command line
-=============================================================================
+-----------------------------------------------------------------------------
 
 Microsoft Visual Studio
------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Most users of Visual Studio will use the IDE and not the command line to compile a project. But by default a shortcut to the command prompt that sets the proper path is installed in the Start Menu. When this command prompt is used ``nmake -f mk_mvc.mak`` will compile ctags when a small patch is applied.
 
 GCC
------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **General**
 
@@ -84,17 +84,17 @@ I think all major distros have both MinGW and MinGW-w64 packages. I know Ubuntu 
 
 
 Building ctags with IDEs
-=============================================================================
+-----------------------------------------------------------------------------
 
 I have no idea how things work for most Linux developers, but most Windows developers are used to IDEs. Not many use a command prompt and running gdb from the command line is not a thing a Windows developers would normally do. Many IDEs exist for Windows, I use the two below.
 
 Microsoft Visual Studio
------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As already mentioned Microsoft Visual Studio 2013 has the free Express edition. For ctags the Windows Desktop Express Edition does the job. The IDE has a proper debugger. I have project-files for VS2013 to compile ctags with the IDE.
 
 Code::Blocks
------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 http://www.codeblocks.org/
 
 Code::Blocks is a decent GPL-licensed IDE that has good gcc and gdb integration. The TDM-GCC that can be installed together with Code::Blocks works fine and I can provide a project file. This is an easy way to have a free - free as in beer as well as in speech - solution and to have the debugger within the GUI as well.
