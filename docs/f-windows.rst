@@ -34,7 +34,7 @@ There are three flavors of GCC for Windows:
 - MinGW-w64 http://mingw-w64.sourceforge.net
 - TDM-GCC http://tdm-gcc.tdragon.net
 
-MinGW started it all, but development stalled a while and no x64 was available. Then the MinGW-w64 fork emerged. It started as a 64-bit compiler, but soon they included both a 32-bit and a 64-bit compiler. But the name remained, a bit confusing. Another fork of MinGW is TDM-GCC. It also provides both 32-bit and 64-bit compilers. All have at least GCC 4.8. MinGW-w64 appears to be the most used flavor of MinGW at this moment. Many well known program the originate from Linux use MinGW-w64 to compile their Windows port.
+MinGW started it all, but development stalled a while and no x64 was available. Then the MinGW-w64 fork emerged. It started as a 64-bit compiler, but soon they included both a 32-bit and a 64-bit compiler. But the name remained, a bit confusing. Another fork of MinGW is TDM-GCC. It also provides both 32-bit and 64-bit compilers. All have at least GCC 4.8. MinGW-w64 appears to be the most used flavor of MinGW at this moment. Many well known program the originate from GNU/Linux use MinGW-w64 to compile their Windows port.
 
 Building ctags from the command line
 -----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ GCC
 
 All the GCC's come with installers or with zipped archives. Install or extract them in a directory without spaces.
 GNU Make builds for Win32 are available as well, and sometimes are included with the compilers. Make sure it is in your path, for instance by copying the make.exe in the bin directory of your compiler.
-Native win32 version of the Linux command cp, rm and mv can be useful. rm is almost always used in by the ``clean`` target of a makefile.
+Native win32 version of the GNU/Linux command cp, rm and mv can be useful. rm is almost always used in by the ``clean`` target of a makefile.
 
 Note that ctags builds with MinGW and TDM-GCC but does not build with MinGW-w64 at the moment. To fix the MinGW-w64 build a small patch is required for general.h. I have to test if this patch does not effects the other GCCs.
 
@@ -74,23 +74,23 @@ MSYS2 is a more maintained version of MSYS, but specially geared towards MinGW-w
 
 **Cygwin**
 
-Cygwin provides ports of many Linux tools and a POSIX API layer. This is the most complete way to get the Linux terminal feel under Windows. Cygwin has a setup that helps you install all the tools you need. Drawback of Cygwin is that the POSIX API layer (cygwin1.dll) is not fast.
+Cygwin provides ports of many GNU/Linux tools and a POSIX API layer. This is the most complete way to get the GNU/Linux terminal feel under Windows. Cygwin has a setup that helps you install all the tools you need. Drawback of Cygwin is that the POSIX API layer (cygwin1.dll) is not fast.
 
-It is easy to build a Cygwin version of ctags using the normal Linux build steps. This ctags.exe will depend on cygwin1.dll and should only be used within the Cygwin ecosystem.
+It is easy to build a Cygwin version of ctags using the normal GNU/Linux build steps. This ctags.exe will depend on cygwin1.dll and should only be used within the Cygwin ecosystem.
 
 Cygwin has packages with a recent version of MinGW-w64 as well. This way it is easy to cross-compile a native Windows application. With ``make -f mk_mingw.mak  CC=i686-w64-mingw32-gcc`` a native Windows application can be compiled.
 
 You can also build a native Windows version when using ``./configure --host=i686-w64-mingw32`` but this also doesn't add the regex and fnmatch to the program. Similar problem as with MSYS.
 
-**Cross-compile from Linux**
+**Cross-compile from GNU/Linux**
 
-I think all major distros have both MinGW and MinGW-w64 packages. I know Ubuntu has them. Compiling works most likely the same way as with MSYS and Cygwin. A Windows application can be cross-compiled, with the same limitation when autoconf is used. I haven't tested this yet. When cross-compiling works with Linux, it could also be used with Travis-CI.
+I think all major distros have both MinGW and MinGW-w64 packages. I know Ubuntu has them. Compiling works most likely the same way as with MSYS and Cygwin. A Windows application can be cross-compiled, with the same limitation when autoconf is used. I haven't tested this yet. When cross-compiling works with GNU/Linux, it could also be used with Travis-CI.
 
 
 Building ctags with IDEs
 -----------------------------------------------------------------------------
 
-I have no idea how things work for most Linux developers, but most Windows developers are used to IDEs. Not many use a command prompt and running gdb from the command line is not a thing a Windows developers would normally do. Many IDEs exist for Windows, I use the two below.
+I have no idea how things work for most GNU/Linux developers, but most Windows developers are used to IDEs. Not many use a command prompt and running gdb from the command line is not a thing a Windows developers would normally do. Many IDEs exist for Windows, I use the two below.
 
 Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
