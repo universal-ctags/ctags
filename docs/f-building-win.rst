@@ -1,6 +1,10 @@
 Introduction
 =============================================================================
 
+:Maintainer: Frank Fesevur <ffes@users.sourceforge.net>
+
+----
+
 This part of the documentation is written by Frank Fesevur, co-maintainer of fishman-ctags and the maintainer of the Windows port of this project. It is still very much work in progress. Things still need to be written down, tested or even investigated. When building for Windows you need to know there are many compilers and many building environments. This is a summary of available options and things that have been tested so far.
 
 
