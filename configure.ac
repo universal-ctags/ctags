@@ -535,7 +535,9 @@ fi
 AC_CHECK_DECLS([__environ], [], [], [
 [#include <unistd.h>]
 ])
-
+AC_CHECK_DECLS([_NSGetEnviron],[],[],[
+[#include <crt_externs.h>]
+])
 
 # Output files
 # ------------

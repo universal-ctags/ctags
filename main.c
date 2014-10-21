@@ -23,8 +23,10 @@
 */
 #include "general.h"  /* must always come first */
 
-#ifdef HAVE_DECL___ENVIRON
+#if HAVE_DECL___ENVIRON
 #include <unistd.h>
+#elif HAVE_DECL__NSGETENVIRON
+#include <crt_externs.h>
 #endif
 
 #include <string.h>
@@ -529,25 +531,33 @@ static void makeTags (cookedArgs *args)
 
 static void sanitizeEnviron (void)
 {
-#ifdef HAVE_DECL___ENVIRON
+	char **e = NULL;
 	int i;
 
-	for (i = 0; __environ[i]; i++)
+#if HAVE_DECL___ENVIRON
+	e = __environ;
+#elif HAVE_DECL__NSGETENVIRON
+	e = _NSGetEnviron();
+#endif
+
+	if (!e)
+		return;
+
+	for (i = 0; e [i]; i++)
 	{
 		char *value;
 
-		value = strchr (__environ[i], '=');
+		value = strchr (e [i], '=');
 		if (!value)
 			continue;
 
 		value++;
 		if (!strncmp (value, "() {", 4))
 		{
-			error (WARNING, "reset environment: %s", __environ[i]);
-			value[0] = '\0';
+			error (WARNING, "reset environment: %s", e [i]);
+			value [0] = '\0';
 		}
 	}
-#endif
 }
 
 /*
