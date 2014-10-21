@@ -5,7 +5,7 @@
 HEADERS = \
 	args.h ctags.h debug.h entry.h flags.h general.h get.h htable.h keyword.h \
 	main.h options.h parse.h parsers.h pcoproc.h read.h routines.h sort.h \
-	strlist.h trash.h vstring.h
+	strlist.h trashbox.h vstring.h
 
 SOURCES = \
 	ada.c \
@@ -63,7 +63,7 @@ SOURCES = \
 	tcl.c \
 	tex.c \
 	tg.c \
-	trash.c \
+	trashbox.c \
 	verilog.c \
 	vhdl.c \
 	vim.c \
@@ -141,7 +141,7 @@ OBJECTS = \
 	tcl.$(OBJEXT) \
 	tex.$(OBJEXT) \
 	tg.$(OBJEXT) \
-	trash.$(OBJEXT) \
+	trashbox.$(OBJEXT) \
 	verilog.$(OBJEXT) \
 	vhdl.$(OBJEXT) \
 	vim.$(OBJEXT) \

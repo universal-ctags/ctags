@@ -28,7 +28,7 @@
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
-#include "trash.h"
+#include "trashbox.h"
 
 /*
  *	On-line "Oracle Database PL/SQL Language Reference":
@@ -319,10 +319,10 @@ static const keywordDesc SqlKeywordTable [] = {
  */
 
 /* Recursive calls */
-static void parseBlock (tokenInfo *const token, const boolean local, Trash **trash);
-static void parseDeclare (tokenInfo *const token, const boolean local, Trash **trash);
-static void parseKeywords (tokenInfo *const token, Trash **trash);
-static void parseSqlFile (tokenInfo *const token, Trash **trash);
+static void parseBlock (tokenInfo *const token, const boolean local, TrashBox *trash_box);
+static void parseDeclare (tokenInfo *const token, const boolean local, TrashBox *trash_box);
+static void parseKeywords (tokenInfo *const token, TrashBox *trash_box);
+static void parseSqlFile (tokenInfo *const token, TrashBox *trash_box);
 
 /*
  *	 FUNCTION DEFINITIONS
@@ -809,13 +809,13 @@ static void skipArgumentList (tokenInfo *const token)
 	}
 }
 
-static void parseSubProgram (tokenInfo *const token, Trash **trash)
+static void parseSubProgram (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const name  = newToken ();
 	vString * saveScope = vStringNew ();
 
-	*trash = trashPutFull (*trash, name, (trashDestrctorProc) deleteToken);
-	*trash = trashPutFull (*trash, saveScope, (trashDestrctorProc) vStringDelete);
+	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc) deleteToken);
+	trashBoxPut (trash_box, saveScope, (TrashBoxDestroyItemProc) vStringDelete);
 
 	/*
 	 * This must handle both prototypes and the body of
@@ -967,7 +967,7 @@ static void parseSubProgram (tokenInfo *const token, Trash **trash)
 			readToken (token);
 
 		if ( isKeyword (token, KEYWORD_declare) )
-			parseDeclare (token, FALSE, trash);
+			parseDeclare (token, FALSE, trash_box);
 
 		if (isKeyword (token, KEYWORD_is) || 
 				isKeyword (token, KEYWORD_begin) )
@@ -979,7 +979,7 @@ static void parseSubProgram (tokenInfo *const token, Trash **trash)
 			   )
 				makeSqlTag (name, kind);
 
-			parseBlock (token, TRUE, trash);
+			parseBlock (token, TRUE, trash_box);
 			vStringClear (token->scope);
 		} 
 	}
@@ -1055,13 +1055,13 @@ static void parseRecord (tokenInfo *const token)
 	} while (! isType (token, TOKEN_CLOSE_PAREN));
 }
 
-static void parseType (tokenInfo *const token, Trash **trash)
+static void parseType (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const name = newToken ();
 	vString * saveScope = vStringNew ();
 
-	*trash = trashPutFull (*trash, name, (trashDestrctorProc)deleteToken);
-	*trash = trashPutFull (*trash, saveScope, (trashDestrctorProc)vStringDelete);
+	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
+	trashBoxPut (trash_box, saveScope, (TrashBoxDestroyItemProc)vStringDelete);
 
 	vStringCopy(saveScope, token->scope);
 	/* If a scope has been set, add it to the name */
@@ -1109,7 +1109,7 @@ static void parseSimple (tokenInfo *const token, const sqlKind kind)
 		makeSqlTag (token, kind);
 }
 
-static void parseDeclare (tokenInfo *const token, const boolean local, Trash **trash)
+static void parseDeclare (tokenInfo *const token, const boolean local, TrashBox *trash_box)
 {
 	/*
 	 * PL/SQL declares are of this format:
@@ -1129,11 +1129,11 @@ static void parseDeclare (tokenInfo *const token, const boolean local, Trash **t
 		switch (token->keyword)
 		{
 			case KEYWORD_cursor:	parseSimple (token, SQLTAG_CURSOR); break;
-			case KEYWORD_function:	parseSubProgram (token, trash); break;
-			case KEYWORD_procedure: parseSubProgram (token, trash); break;
+			case KEYWORD_function:	parseSubProgram (token, trash_box); break;
+			case KEYWORD_procedure: parseSubProgram (token, trash_box); break;
 			case KEYWORD_subtype:	parseSimple (token, SQLTAG_SUBTYPE); break;
 			case KEYWORD_trigger:	parseSimple (token, SQLTAG_TRIGGER); break;
-			case KEYWORD_type:		parseType (token, trash); break;
+			case KEYWORD_type:		parseType (token, trash_box); break;
 
 			default:
 				if (isType (token, TOKEN_IDENTIFIER))
@@ -1154,11 +1154,11 @@ static void parseDeclare (tokenInfo *const token, const boolean local, Trash **t
 	}
 }
 
-static void parseDeclareANSI (tokenInfo *const token, const boolean local, Trash **trash)
+static void parseDeclareANSI (tokenInfo *const token, const boolean local, TrashBox *trash_box)
 {
 	tokenInfo *const type = newToken ();
 
-	*trash = trashPutFull (*trash, type, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, type, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * ANSI declares are of this format:
 	 *	 BEGIN
@@ -1209,7 +1209,7 @@ static void parseDeclareANSI (tokenInfo *const token, const boolean local, Trash
 	}
 }
 
-static void parseLabel (tokenInfo *const token, Trash **trash)
+static void parseLabel (tokenInfo *const token, TrashBox *trash_box)
 {
 	/*
 	 * A label has this format:
@@ -1235,7 +1235,7 @@ static void parseLabel (tokenInfo *const token, Trash **trash)
 	}
 }
 
-static void parseStatements (tokenInfo *const token, const boolean exit_on_endif, Trash **trash)
+static void parseStatements (tokenInfo *const token, const boolean exit_on_endif, TrashBox *trash_box)
 {
 	/* boolean isAnsi   = TRUE; */
 	boolean stmtTerm = FALSE;
@@ -1243,7 +1243,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 	{
 
 		if (isType (token, TOKEN_BLOCK_LABEL_BEGIN))
-			parseLabel (token, trash);
+			parseLabel (token, trash_box);
 		else
 		{
 			switch (token->keyword)
@@ -1316,7 +1316,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 					if( isKeyword (token, KEYWORD_begin ) )
 					{
 						/* isAnsi = FALSE; */
-						parseBlock(token, FALSE, trash);
+						parseBlock(token, FALSE, trash_box);
 
 						/*
 						 * Handle the non-Ansi IF blocks.
@@ -1339,7 +1339,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 									isKeyword (token, KEYWORD_elseif)    )
 								readToken (token);
 
-							parseStatements (token, TRUE, trash);
+							parseStatements (token, TRUE, trash_box);
 
 							if ( isCmdTerm(token) )
 								readToken (token);
@@ -1421,7 +1421,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 							readToken (token);
 							*/
 
-						parseStatements (token, FALSE, trash);
+						parseStatements (token, FALSE, trash_box);
 
 						if ( isCmdTerm(token) )
 							readToken (token);
@@ -1449,12 +1449,12 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 
 				case KEYWORD_create:
 					readToken (token);
-					parseKeywords(token, trash);
+					parseKeywords(token, trash_box);
 					break;
 
 				case KEYWORD_declare:
 				case KEYWORD_begin:
-					parseBlock (token, TRUE, trash);
+					parseBlock (token, TRUE, trash_box);
 					break;
 
 				case KEYWORD_end:
@@ -1524,9 +1524,9 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 						isKeyword (token, KEYWORD_case) ||
 						isKeyword (token, KEYWORD_for) ||
 						isKeyword (token, KEYWORD_begin)    )
-					parseStatements (token, FALSE, trash);
+					parseStatements (token, FALSE, trash_box);
 				else if (isKeyword (token, KEYWORD_if))
-					parseStatements (token, TRUE, trash);
+					parseStatements (token, TRUE, trash_box);
 
 			}
 		}
@@ -1543,11 +1543,11 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 			 ! stmtTerm );
 }
 
-static void parseBlock (tokenInfo *const token, const boolean local, Trash **trash)
+static void parseBlock (tokenInfo *const token, const boolean local, TrashBox *trash_box)
 {
 	if (isType (token, TOKEN_BLOCK_LABEL_BEGIN))
 	{
-		parseLabel (token, trash);
+		parseLabel (token, trash_box);
 		readToken (token);
 	}
 	if (! isKeyword (token, KEYWORD_begin))
@@ -1557,7 +1557,7 @@ static void parseBlock (tokenInfo *const token, const boolean local, Trash **tra
 		 * These are Oracle style declares which generally come
 		 * between an IS/AS and BEGIN block.
 		 */
-		parseDeclare (token, local, trash);
+		parseDeclare (token, local, trash_box);
 	}
 	if (isKeyword (token, KEYWORD_begin))
 	{
@@ -1567,11 +1567,11 @@ static void parseBlock (tokenInfo *const token, const boolean local, Trash **tra
 		 * a BEGIN statement.  This routine will not advance
 		 * the token if none are found.
 		 */
-		parseDeclareANSI (token, local, trash);
+		parseDeclareANSI (token, local, trash_box);
 		token->begin_end_nest_lvl++;
 		while (! isKeyword (token, KEYWORD_end))
 		{
-			parseStatements (token, FALSE, trash);
+			parseStatements (token, FALSE, trash_box);
 
 			if ( isCmdTerm(token) )
 				readToken (token);
@@ -1601,7 +1601,7 @@ static void parseBlock (tokenInfo *const token, const boolean local, Trash **tra
 	}
 }
 
-static void parsePackage (tokenInfo *const token, Trash **trash)
+static void parsePackage (tokenInfo *const token, TrashBox *trash_box)
 {
 	/* 
 	 * Packages can be specified in a number of ways:
@@ -1614,7 +1614,7 @@ static void parsePackage (tokenInfo *const token, Trash **trash)
  */
 	tokenInfo *const name = newToken ();
 
-	*trash = trashPutFull (*trash, name, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	readToken (name);
 	if (isKeyword (name, KEYWORD_body))
 	{
@@ -1639,17 +1639,17 @@ static void parsePackage (tokenInfo *const token, Trash **trash)
 				isType (name, TOKEN_STRING))
 			makeSqlTag (name, SQLTAG_PACKAGE);
 		addToScope (token, name->string);
-		parseBlock (token, FALSE, trash);
+		parseBlock (token, FALSE, trash_box);
 		vStringClear (token->scope);
 	}
 	findCmdTerm (token, FALSE);
 }
 
-static void parseTable (tokenInfo *const token, Trash **trash)
+static void parseTable (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const name = newToken ();
 
-	*trash = trashPutFull (*trash, name, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats:
 	 *	   create table t1 (c1 int);
@@ -1741,13 +1741,13 @@ static void parseTable (tokenInfo *const token, Trash **trash)
 	findCmdTerm (token, FALSE);
 }
 
-static void parseIndex (tokenInfo *const token, Trash **trash)
+static void parseIndex (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const name  = newToken ();
 	tokenInfo *const owner = newToken ();
 
-	*trash = trashPutFull (*trash, name, (trashDestrctorProc)deleteToken);
-	*trash = trashPutFull (*trash, owner, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
+	trashBoxPut (trash_box, owner, (TrashBoxDestroyItemProc)deleteToken);
 
 	/*
 	 * This deals with these formats
@@ -1781,11 +1781,11 @@ static void parseIndex (tokenInfo *const token, Trash **trash)
 	findCmdTerm (token, FALSE);
 }
 
-static void parseEvent (tokenInfo *const token, Trash **trash)
+static void parseEvent (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const name = newToken ();
 
-	*trash = trashPutFull (*trash, name, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   create event e1 handler begin end;
@@ -1817,19 +1817,19 @@ static void parseEvent (tokenInfo *const token, Trash **trash)
 		readToken (token);
 		if ( isKeyword (token, KEYWORD_begin) )
 		{
-			parseBlock (token, TRUE, trash);
+			parseBlock (token, TRUE, trash_box);
 		}
 		findCmdTerm (token, TRUE);
 	}
 }
 
-static void parseTrigger (tokenInfo *const token, Trash **trash)
+static void parseTrigger (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const name  = newToken ();
 	tokenInfo *const table = newToken ();
 
-	*trash = trashPutFull (*trash, name, (trashDestrctorProc)deleteToken);
-	*trash = trashPutFull (*trash, table, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
+	trashBoxPut (trash_box, table, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   create or replace trigger tr1 begin end;
@@ -1873,7 +1873,7 @@ static void parseTrigger (tokenInfo *const token, Trash **trash)
 			if ( isKeyword (token, KEYWORD_declare) )
 			{
 				addToScope(token, name->string);
-				parseDeclare(token, TRUE, trash);
+				parseDeclare(token, TRUE, trash_box);
 				vStringClear(token->scope);
 			}
 			else
@@ -1888,7 +1888,7 @@ static void parseTrigger (tokenInfo *const token, Trash **trash)
 			addToScope(token, table->string);
 			if ( isKeyword (token, KEYWORD_begin) )
 			{
-				parseBlock (token, TRUE, trash);
+				parseBlock (token, TRUE, trash_box);
 			}
 			vStringClear(token->scope);
 		}
@@ -1897,11 +1897,11 @@ static void parseTrigger (tokenInfo *const token, Trash **trash)
 	findCmdTerm (token, TRUE);
 }
 
-static void parsePublication (tokenInfo *const token, Trash **trash)
+static void parsePublication (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const name = newToken ();
 
-	*trash = trashPutFull (*trash, name, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   create or replace publication pu1 ()
@@ -1927,11 +1927,11 @@ static void parsePublication (tokenInfo *const token, Trash **trash)
 	}
 	findCmdTerm (token, FALSE);
 }
-static void parseService (tokenInfo *const token, Trash** trash)
+static void parseService (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const name = newToken ();
 
-	*trash = trashPutFull (*trash, name, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   CREATE SERVICE s1 TYPE 'HTML' 
@@ -1956,11 +1956,11 @@ static void parseService (tokenInfo *const token, Trash** trash)
 	findCmdTerm (token, FALSE);
 }
 
-static void parseDomain (tokenInfo *const token, Trash **trash)
+static void parseDomain (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const name = newToken ();
 
-	*trash = trashPutFull (*trash, name, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   CREATE DOMAIN|DATATYPE [AS] your_name ...;
@@ -1995,11 +1995,11 @@ static void parseDrop (tokenInfo *const token)
 	findCmdTerm (token, FALSE);
 }
 
-static void parseVariable (tokenInfo *const token, Trash **trash)
+static void parseVariable (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const name = newToken ();
 
-	*trash = trashPutFull (*trash, name, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   create variable varname1 integer;
@@ -2018,11 +2018,11 @@ static void parseVariable (tokenInfo *const token, Trash **trash)
 	findCmdTerm (token, TRUE);
 }
 
-static void parseSynonym (tokenInfo *const token, Trash **trash)
+static void parseSynonym (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const name = newToken ();
 
-	*trash = trashPutFull (*trash, name, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   create variable varname1 integer;
@@ -2041,11 +2041,11 @@ static void parseSynonym (tokenInfo *const token, Trash **trash)
 	findCmdTerm (token, TRUE);
 }
 
-static void parseView (tokenInfo *const token, Trash **trash)
+static void parseView (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const name = newToken ();
 
-	*trash = trashPutFull (*trash, name, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   create variable varname1 integer;
@@ -2083,15 +2083,15 @@ static void parseView (tokenInfo *const token, Trash **trash)
 	findCmdTerm (token, TRUE);
 }
 
-static void parseMLTable (tokenInfo *const token, Trash **trash)
+static void parseMLTable (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const version = newToken ();
 	tokenInfo *const table	 = newToken ();
 	tokenInfo *const event	 = newToken ();
 
-	*trash = trashPutFull (*trash, version, (trashDestrctorProc)deleteToken);
-	*trash = trashPutFull (*trash, table, (trashDestrctorProc)deleteToken);
-	*trash = trashPutFull (*trash, event, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, version, (TrashBoxDestroyItemProc)deleteToken);
+	trashBoxPut (trash_box, table, (TrashBoxDestroyItemProc)deleteToken);
+	trashBoxPut (trash_box, event, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	  call dbo.ml_add_table_script( 'version', 'table_name', 'event',
@@ -2143,13 +2143,13 @@ static void parseMLTable (tokenInfo *const token, Trash **trash)
 	findCmdTerm (token, TRUE);
 }
 
-static void parseMLConn (tokenInfo *const token, Trash **trash)
+static void parseMLConn (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const version = newToken ();
 	tokenInfo *const event	 = newToken ();
 
-	*trash = trashPutFull (*trash, version, (trashDestrctorProc)deleteToken);
-	*trash = trashPutFull (*trash, event, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, version, (TrashBoxDestroyItemProc)deleteToken);
+	trashBoxPut (trash_box, event, (TrashBoxDestroyItemProc)deleteToken);
 
 	/*
 	 * This deals with these formats
@@ -2189,15 +2189,15 @@ static void parseMLConn (tokenInfo *const token, Trash **trash)
 	findCmdTerm (token, TRUE);
 }
 
-static void parseMLProp (tokenInfo *const token, Trash **trash)
+static void parseMLProp (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const component     = newToken ();
 	tokenInfo *const prop_set_name = newToken ();
 	tokenInfo *const prop_name     = newToken ();
 
-	*trash = trashPutFull (*trash, component, (trashDestrctorProc)deleteToken);
-	*trash = trashPutFull (*trash, prop_set_name, (trashDestrctorProc)deleteToken);
-	*trash = trashPutFull (*trash, prop_name, (trashDestrctorProc)deleteToken);
+	trashBoxPut (trash_box, component, (TrashBoxDestroyItemProc)deleteToken);
+	trashBoxPut (trash_box, prop_set_name, (TrashBoxDestroyItemProc)deleteToken);
+	trashBoxPut (trash_box, prop_name, (TrashBoxDestroyItemProc)deleteToken);
 
 	/*
 	 * This deals with these formats
@@ -2253,7 +2253,7 @@ static void parseMLProp (tokenInfo *const token, Trash **trash)
 	findCmdTerm (token, TRUE);
 }
 
-static void parseComment (tokenInfo *const token, Trash **trash)
+static void parseComment (tokenInfo *const token, TrashBox *trash_box)
 {
 	/*
 	 * This deals with this statement:
@@ -2285,57 +2285,57 @@ static void parseComment (tokenInfo *const token, Trash **trash)
 }
 
 
-static void parseKeywords (tokenInfo *const token, Trash **trash)
+static void parseKeywords (tokenInfo *const token, TrashBox *trash_box)
 {
 		switch (token->keyword)
 		{
-			case KEYWORD_begin:			parseBlock (token, FALSE, trash); break;
-			case KEYWORD_comment:		parseComment (token, trash); break;
+			case KEYWORD_begin:			parseBlock (token, FALSE, trash_box); break;
+			case KEYWORD_comment:		parseComment (token, trash_box); break;
 			case KEYWORD_cursor:		parseSimple (token, SQLTAG_CURSOR); break;
-			case KEYWORD_datatype:		parseDomain (token, trash); break;
-			case KEYWORD_declare:		parseBlock (token, FALSE, trash); break;
-			case KEYWORD_domain:		parseDomain (token, trash); break;
+			case KEYWORD_datatype:		parseDomain (token, trash_box); break;
+			case KEYWORD_declare:		parseBlock (token, FALSE, trash_box); break;
+			case KEYWORD_domain:		parseDomain (token, trash_box); break;
 			case KEYWORD_drop:			parseDrop (token); break;
-			case KEYWORD_event:			parseEvent (token, trash); break;
-			case KEYWORD_function:		parseSubProgram (token, trash); break;
-			case KEYWORD_if:			parseStatements (token, FALSE, trash); break;
-			case KEYWORD_index:			parseIndex (token, trash); break;
-			case KEYWORD_ml_table:		parseMLTable (token, trash); break;
-			case KEYWORD_ml_table_lang: parseMLTable (token, trash); break;
-			case KEYWORD_ml_table_dnet: parseMLTable (token, trash); break;
-			case KEYWORD_ml_table_java: parseMLTable (token, trash); break;
-			case KEYWORD_ml_table_chk:  parseMLTable (token, trash); break;
-			case KEYWORD_ml_conn:		parseMLConn (token, trash); break;
-			case KEYWORD_ml_conn_lang:	parseMLConn (token, trash); break;
-			case KEYWORD_ml_conn_dnet:	parseMLConn (token, trash); break;
-			case KEYWORD_ml_conn_java:	parseMLConn (token, trash); break;
-			case KEYWORD_ml_conn_chk:	parseMLConn (token, trash); break;
-			case KEYWORD_ml_prop:		parseMLProp (token, trash); break;
-			case KEYWORD_package:		parsePackage (token, trash); break;
-			case KEYWORD_procedure:		parseSubProgram (token, trash); break;
-			case KEYWORD_publication:	parsePublication (token, trash); break;
-			case KEYWORD_service:		parseService (token, trash); break;
+			case KEYWORD_event:			parseEvent (token, trash_box); break;
+			case KEYWORD_function:		parseSubProgram (token, trash_box); break;
+			case KEYWORD_if:			parseStatements (token, FALSE, trash_box); break;
+			case KEYWORD_index:			parseIndex (token, trash_box); break;
+			case KEYWORD_ml_table:		parseMLTable (token, trash_box); break;
+			case KEYWORD_ml_table_lang: parseMLTable (token, trash_box); break;
+			case KEYWORD_ml_table_dnet: parseMLTable (token, trash_box); break;
+			case KEYWORD_ml_table_java: parseMLTable (token, trash_box); break;
+			case KEYWORD_ml_table_chk:  parseMLTable (token, trash_box); break;
+			case KEYWORD_ml_conn:		parseMLConn (token, trash_box); break;
+			case KEYWORD_ml_conn_lang:	parseMLConn (token, trash_box); break;
+			case KEYWORD_ml_conn_dnet:	parseMLConn (token, trash_box); break;
+			case KEYWORD_ml_conn_java:	parseMLConn (token, trash_box); break;
+			case KEYWORD_ml_conn_chk:	parseMLConn (token, trash_box); break;
+			case KEYWORD_ml_prop:		parseMLProp (token, trash_box); break;
+			case KEYWORD_package:		parsePackage (token, trash_box); break;
+			case KEYWORD_procedure:		parseSubProgram (token, trash_box); break;
+			case KEYWORD_publication:	parsePublication (token, trash_box); break;
+			case KEYWORD_service:		parseService (token, trash_box); break;
 			case KEYWORD_subtype:		parseSimple (token, SQLTAG_SUBTYPE); break;
-			case KEYWORD_synonym:		parseSynonym (token, trash); break;
-			case KEYWORD_table:			parseTable (token, trash); break;
-			case KEYWORD_trigger:		parseTrigger (token, trash); break;
-			case KEYWORD_type:			parseType (token, trash); break;
-			case KEYWORD_variable:		parseVariable (token, trash); break;
-			case KEYWORD_view:			parseView (token, trash); break;
+			case KEYWORD_synonym:		parseSynonym (token, trash_box); break;
+			case KEYWORD_table:			parseTable (token, trash_box); break;
+			case KEYWORD_trigger:		parseTrigger (token, trash_box); break;
+			case KEYWORD_type:			parseType (token, trash_box); break;
+			case KEYWORD_variable:		parseVariable (token, trash_box); break;
+			case KEYWORD_view:			parseView (token, trash_box); break;
 			default:				    break;
 		}
 }
 
-static void parseSqlFile (tokenInfo *const token, Trash **trash)
+static void parseSqlFile (tokenInfo *const token, TrashBox *trash_box)
 {
 	do
 	{
 		readToken (token);
 
 		if (isType (token, TOKEN_BLOCK_LABEL_BEGIN))
-			parseLabel (token, trash);
+			parseLabel (token, trash_box);
 		else 
-			parseKeywords (token, trash);
+			parseKeywords (token, trash_box);
 	} while (! isKeyword (token, KEYWORD_end));
 }
 
@@ -2348,17 +2348,18 @@ static void initialize (const langType language)
 
 static void findSqlTags (void)
 {
-	Trash* trash = NULL;
+	TrashBox* trash_box = NULL;
 	tokenInfo *const token = newToken ();
 	exception_t exception;
 
-	trash = trashPutFull (trash, token, (trashDestrctorProc)deleteToken);
+	trash_box = trashBoxNew ();
+	trashBoxPut (trash_box, token, (TrashBoxDestroyItemProc)deleteToken);
 	exception = (exception_t) (setjmp (Exception));
 
 	while (exception == ExceptionNone)
-		parseSqlFile (token, &trash);
+		parseSqlFile (token, trash_box);
 
-	trash = trashMakeEmpty (trash);
+	trashBoxDestroy (trash_box);
 }
 
 extern parserDefinition* SqlParser (void)

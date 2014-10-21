@@ -405,16 +405,6 @@ static boolean parseAllConfigurationFilesOptionsInDirectory (const char *const f
 */
 
 
-static void cArgPutToTrash (cookedArgs *const args, char * item)
-{
-	args->trash = trashPut (args->trash, item);
-}
-
-static void cArgMakeTrashEmpty(cookedArgs *const args)
-{
-	args->trash = trashMakeEmpty (args->trash);
-}
-
 static vString* getHome (void)
 {
 	const char* const home = getenv ("HOME");
@@ -675,14 +665,14 @@ static void parseLongOption (cookedArgs *const args, const char *item)
 	if (equal == NULL)
 	{
 		args->item = eStrdup (item);
-		cArgPutToTrash (args, args->item);
+		trashBoxPut (args->trash_box, args->item, (TrashBoxDestroyItemProc)eFree);
 		args->parameter = "";
 	}
 	else
 	{
 		const size_t length = equal - item;
 		args->item = eStrndup (item, length);
-		cArgPutToTrash (args, args->item);
+		trashBoxPut (args->trash_box, args->item, (TrashBoxDestroyItemProc)eFree);
 		args->parameter = equal + 1;
 	}
 	Assert (args->item != NULL);
@@ -729,6 +719,7 @@ extern cookedArgs* cArgNewFromString (const char* string)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromString (string);
+	result->trash_box = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -738,6 +729,7 @@ extern cookedArgs* cArgNewFromArgv (char* const* const argv)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromArgv (argv);
+	result->trash_box = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -747,6 +739,7 @@ extern cookedArgs* cArgNewFromFile (FILE* const fp)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromFile (fp);
+	result->trash_box = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -756,6 +749,7 @@ extern cookedArgs* cArgNewFromLineFile (FILE* const fp)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromLineFile (fp);
+	result->trash_box = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -764,7 +758,7 @@ extern void cArgDelete (cookedArgs* const current)
 {
 	Assert (current != NULL);
 	argDelete (current->args);
-	cArgMakeTrashEmpty (current);
+	trashBoxDestroy (current->trash_box);
 	memset (current, 0, sizeof (cookedArgs));
 	eFree (current);
 }

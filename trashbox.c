@@ -12,16 +12,59 @@
 #include <string.h>
 #include "vstring.h"
 #include "routines.h"
-#include "trash.h"
+#include "trashbox.h"
 #include "debug.h"
 
-extern Trash* trashPut (Trash* trash, void* item)
+typedef TrashBoxDestroyItemProc TrashDestroyItemProc;
+typedef struct sTrash {
+	void* item;
+	struct sTrash* next;
+	TrashDestroyItemProc destrctor;
+} Trash;
+
+struct sTrashBox {
+	Trash *trash;
+};
+
+static Trash* trashPut (Trash* trash, void* item,
+			TrashDestroyItemProc destrctor);
+static Trash* trashTakeBack (Trash* trash, void* item);
+static Trash* trashMakeEmpty (Trash* trash);
+
+
+
+extern TrashBox* trashBoxNew (void)
 {
-	return trashPutFull (trash, item, eFree);
+	TrashBox *t = xMalloc (1, TrashBox);
+	t->trash = NULL;
+	return t;
 }
 
-extern Trash* trashPutFull (Trash* trash, void* item,
-			    trashDestrctorProc destrctor)
+extern void trashBoxDestroy (TrashBox* trash_box)
+{
+	trashBoxMakeEmpty(trash_box);
+
+	eFree (trash_box);
+}
+
+extern void   trashBoxPut (TrashBox* trash_box, void* item, TrashBoxDestroyItemProc destroy)
+{
+	trash_box->trash = trashPut(trash_box->trash, item, destroy);
+}
+
+extern void   trashBoxTakeBack (TrashBox* trash_box, void* item)
+{
+	trash_box->trash = trashTakeBack(trash_box->trash, item);
+}
+
+extern void   trashBoxMakeEmpty (TrashBox* trash_box)
+{
+  trash_box->trash = trashMakeEmpty (trash_box->trash);
+}
+
+
+static Trash* trashPut (Trash* trash, void* item,
+			TrashDestroyItemProc destrctor)
 {
 	Trash* t = xMalloc (1, Trash);
 	t->next = trash;
@@ -57,13 +100,13 @@ static boolean trashTakeBack0  (Trash** trash, void* item)
 	return removed;
 }
 
-extern Trash* trashTakeBack (Trash* trash, void* item)
+static Trash* trashTakeBack (Trash* trash, void* item)
 {
 	trashTakeBack0 (&trash, item);
 	return trash;
 }
 
-extern Trash* trashMakeEmpty (Trash* trash)
+static Trash* trashMakeEmpty (Trash* trash)
 {
 	Trash* tmp;
 
