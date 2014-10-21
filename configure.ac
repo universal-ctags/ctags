@@ -532,8 +532,7 @@ fi
 
 # Checks for declaration
 # ----------------------
-AC_CHECK_DECLS([environ], [], [], [
-[#define _GNU_SOURCE]
+AC_CHECK_DECLS([__environ], [], [], [
 [#include <unistd.h>]
 ])
 

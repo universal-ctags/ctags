@@ -23,8 +23,7 @@
 */
 #include "general.h"  /* must always come first */
 
-#ifdef HAVE_DECL_ENVIRON
-#define _GNU_SOURCE
+#ifdef HAVE_DECL___ENVIRON
 #include <unistd.h>
 #endif
 
@@ -530,21 +529,21 @@ static void makeTags (cookedArgs *args)
 
 static void sanitizeEnviron (void)
 {
-#ifdef HAVE_DECL_ENVIRON
+#ifdef HAVE_DECL___ENVIRON
 	int i;
 
-	for (i = 0; environ[i]; i++)
+	for (i = 0; __environ[i]; i++)
 	{
 		char *value;
 
-		value = strchr (environ[i], '=');
+		value = strchr (__environ[i], '=');
 		if (!value)
 			continue;
 
 		value++;
 		if (!strncmp (value, "() {", 4))
 		{
-			error (WARNING, "reset environment: %s", environ[i]);
+			error (WARNING, "reset environment: %s", __environ[i]);
 			value[0] = '\0';
 		}
 	}
