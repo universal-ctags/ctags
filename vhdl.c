@@ -25,6 +25,7 @@
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
+#include "trashbox.h"
 
 /*
  *   MACROS
@@ -174,6 +175,7 @@ typedef struct sTokenInfo {
  */
 static int Lang_vhdl;
 static jmp_buf Exception;
+static TrashBox* trash_box;
 
 /* Used to index into the VhdlKinds table. */
 typedef enum {
@@ -338,9 +340,12 @@ static boolean isKeywordOrIdent (const tokenInfo * const token,
 		isIdentifierMatch (token, name));
 }
 
+static void deleteToken (tokenInfo * const token);
+
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
+	trashBoxPut (trash_box, token, (TrashBoxDestroyItemProc)deleteToken);
 	token->type = TOKEN_NONE;
 	token->keyword = KEYWORD_NONE;
 	token->string = vStringNew ();
@@ -486,7 +491,6 @@ static void skipToKeyword (const keywordId keyword)
 		readToken (token);
 	}
 	while (!isKeyword (token, keyword));
-	deleteToken (token);
 }
 
 static void skipToMatched (tokenInfo * const token)
@@ -596,7 +600,6 @@ static void parsePackage (tokenInfo * const token)
 	{
 		makeVhdlTag (token, VHDLTAG_PACKAGE);
 	}
-	deleteToken (name);
 }
 
 static void parseModule (tokenInfo * const token)
@@ -623,7 +626,6 @@ static void parseModule (tokenInfo * const token)
 			fileSkipToCharacter (';');
 		}
 	}
-	deleteToken (name);
 }
 
 static void parseRecord (tokenInfo * const token)
@@ -640,7 +642,6 @@ static void parseRecord (tokenInfo * const token)
 	}
 	while (!isKeyword (name, KEYWORD_END));
 	fileSkipToCharacter (';');
-	deleteToken (name);
 }
 
 static void parseTypes (tokenInfo * const token)
@@ -666,7 +667,6 @@ static void parseTypes (tokenInfo * const token)
 			makeVhdlTag (name, kind);
 		}
 	}
-	deleteToken (name);
 }
 
 static void parseConstant (boolean local)
@@ -682,7 +682,6 @@ static void parseConstant (boolean local)
 		makeVhdlTag (name, VHDLTAG_CONSTANT);
 	}
 	fileSkipToCharacter (';');
-	deleteToken (name);
 }
 
 static void parseSubProgram (tokenInfo * const token)
@@ -759,7 +758,6 @@ static void parseSubProgram (tokenInfo * const token)
 			} while (!endSubProgram);
 		}
 	}
-	deleteToken (name);
 }
 
 /* TODO */
@@ -811,13 +809,18 @@ static void parseVhdlFile (tokenInfo * const token)
 
 static void findVhdlTags (void)
 {
-	tokenInfo *const token = newToken ();
-	exception_t exception = (exception_t) (setjmp (Exception));
+	tokenInfo * token;
+	exception_t exception;
+
+	trash_box = trashBoxNew ();
+	token = newToken ();
+
+	exception = (exception_t) (setjmp (Exception));
 
 	while (exception == ExceptionNone)
 		parseVhdlFile (token);
 
-	deleteToken (token);
+	trashBoxDestroy (trash_box);
 }
 
 extern parserDefinition *VhdlParser (void)
