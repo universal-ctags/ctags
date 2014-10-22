@@ -105,7 +105,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      fpos_t      filePosition,
 			      const char *sourceFileName);
 
-/* language is optiona: can be NULL. */
+/* language is optional: can be NULL. */
 extern void writePseudoTag (const char *const tagName,
 			    const char *const fileName,
 			    const char *const pattern,
