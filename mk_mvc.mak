@@ -11,7 +11,7 @@ include source.mak
 
 REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrcasecmp=stricmp
 DEFINES = -DWIN32 $(REGEX_DEFINES)
-INCLUDES = -I. -Ignu_regex
+INCLUDES = -I. -Ignu_regex -Ifnmatch
 OPT = /O2
 
 ctags: ctags.exe
@@ -29,11 +29,15 @@ dctags.exe: respmvc
 regex.obj:
 	cl /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) gnu_regex/regex.c
 
-respmvc: $(SOURCES) $(REGEX_SOURCES) $(HEADERS) $(REGEX_HEADERS) mk_mvc.mak
+fnmatch.obj:
+	cl /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) fnmatch/fnmatch.c
+
+respmvc: $(SOURCES) $(REGEX_SOURCES) $(FNMATCH_SOURCES) $(HEADERS) $(REGEX_HEADERS) $(FNMATCH_HEADERS) mk_mvc.mak
 	echo $(DEFINES) > $@
 	echo $(INCLUDES) >> $@
 	echo $(SOURCES) >> $@
 	echo $(REGEX_SOURCES) >> $@
+	echo $(FNMATCH_SOURCES) >> $@
 
 mostlyclean:
 	- del *.obj
