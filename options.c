@@ -38,6 +38,7 @@
 #define INVOCATION  "Usage: %s [options] [file(s)]\n"
 
 #define CTAGS_DATA_PATH_ENVIRONMENT "CTAGS_DATA_PATH"
+#define CTAGS_LIBEXEC_PATH_ENVIRONMENT "CTAGS_LIBEXEC_PATH"
 #define CTAGS_ENVIRONMENT  "CTAGS"
 #define ETAGS_ENVIRONMENT  "ETAGS"
 
@@ -68,6 +69,7 @@
 #define SUBDIR_OPTLIB "optlib"
 #define SUBDIR_CORPORA "corpora"
 #define SUBDIR_PRELOAD "preload"
+#define SUBDIR_DRIVERS "drivers"
 
 /*
 *   Data declarations
@@ -108,6 +110,7 @@ typedef stringList searchPathList;
 static searchPathList *OptlibPathList;
 static searchPathList *CorpusPathList;
 static searchPathList *PreloadPathList;
+static searchPathList *DriversPathList;
 
 static stringList* Excluded;
 static boolean FilesRequired = TRUE;
@@ -257,6 +260,14 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Enable/disable tag kinds for language <LANG>."},
  {1,"  --<LANG>-map=[+]map"},
  {1,"       Simplified version of --langmap opton."},
+#ifdef HAVE_REGEX
+ {1,"  --<LANG>-regex=/line_pattern/name_pattern/[flags]"},
+ {1,"       Same as --regex-<LANG>=..."},
+#endif
+#ifdef HAVE_COPROC
+ {1,"  --<LANG>-xcmd=parser_command_path|parset_command_name"},
+ {1,"       Same as --xcmd-<LANG>=..."},
+#endif
  {1,"  --langdef=name"},
  {1,"       Define a new language to be parsed with regular expressions."},
  {1,"  --langmap=map(s)"},
@@ -267,6 +278,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Restrict files scanned for tags to those mapped to langauges"},
  {1,"       specified in the comma-separated 'list'. The list can contain any"},
  {1,"       built-in or user-defined language [all]."},
+ {1,"  --libexec-dir=[+]DIR"},
+ {1,"      Add or set DIR to libexec directory search path."},
  {1,"  --license"},
  {1,"       Print details of software license."},
  {0,"  --line-directives=[yes|no]"},
@@ -307,6 +320,10 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Enable verbose messages describing actions on each source file."},
  {1,"  --version"},
  {1,"       Print version identifier to standard output."},
+#ifdef HAVE_COPROC
+ {1,"  --xcmd-<LANG>=parser_command_path|parset_command_name"},
+ {1,"       Define external parser command path or name for specific language."},
+#endif
  {1, NULL}
 };
 
@@ -370,6 +387,9 @@ static const char *const Features [] = {
 #ifdef HAVE_SCANDIR
 	"option-directory",
 #endif
+#ifdef HAVE_COPROC
+	"coproc",
+#endif
 	NULL
 };
 
@@ -384,16 +404,6 @@ static boolean parseAllConfigurationFilesOptionsInDirectory (const char *const f
 *   FUNCTION DEFINITIONS
 */
 
-
-static void cArgPutToTrash (cookedArgs *const args, char * item)
-{
-	args->trash = trashPut (args->trash, item);
-}
-
-static void cArgMakeTrashEmpty(cookedArgs *const args)
-{
-	args->trash = trashMakeEmpty (args->trash);
-}
 
 static vString* getHome (void)
 {
@@ -655,14 +665,14 @@ static void parseLongOption (cookedArgs *const args, const char *item)
 	if (equal == NULL)
 	{
 		args->item = eStrdup (item);
-		cArgPutToTrash (args, args->item);
+		trashBoxPut (args->trash_box, args->item, (TrashBoxDestroyItemProc)eFree);
 		args->parameter = "";
 	}
 	else
 	{
 		const size_t length = equal - item;
 		args->item = eStrndup (item, length);
-		cArgPutToTrash (args, args->item);
+		trashBoxPut (args->trash_box, args->item, (TrashBoxDestroyItemProc)eFree);
 		args->parameter = equal + 1;
 	}
 	Assert (args->item != NULL);
@@ -709,6 +719,7 @@ extern cookedArgs* cArgNewFromString (const char* string)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromString (string);
+	result->trash_box = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -718,6 +729,7 @@ extern cookedArgs* cArgNewFromArgv (char* const* const argv)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromArgv (argv);
+	result->trash_box = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -727,6 +739,7 @@ extern cookedArgs* cArgNewFromFile (FILE* const fp)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromFile (fp);
+	result->trash_box = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -736,6 +749,7 @@ extern cookedArgs* cArgNewFromLineFile (FILE* const fp)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromLineFile (fp);
+	result->trash_box = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -744,7 +758,7 @@ extern void cArgDelete (cookedArgs* const current)
 {
 	Assert (current != NULL);
 	argDelete (current->args);
-	cArgMakeTrashEmpty (current);
+	trashBoxDestroy (current->trash_box);
 	memset (current, 0, sizeof (cookedArgs));
 	eFree (current);
 }
@@ -1096,8 +1110,8 @@ static void printFeatureList (void)
 }
 
 
-static void processListFeaturesOption(const char *const __unused__ option,
-				      const char *const __unused__ parameter)
+static void processListFeaturesOption(const char *const option __unused__,
+				      const char *const parameter __unused__)
 {
 	int i;
 
@@ -1363,7 +1377,7 @@ static void processLanguagesOption (
 	eFree (langs);
 }
 
-extern boolean processMapOptoin (
+extern boolean processMapOption (
 			const char *const option, const char *const parameter)
 {
 	const char* const dash = strchr (option, '-');
@@ -1449,34 +1463,29 @@ extern boolean processCorpusOption (
 	parm = eStrdup (parameter);
 	spec = extractMapFromParameter (language, parm, &colon, &pattern_p, skipTillColon);
 	if (spec == NULL)
-	{
 		error (FATAL, "Badly formed language map specification for loading colon for %s language",
 		       getLanguageName (language));
-		eFree (parm);
-		return FALSE;
-	}
 	else if (pattern_p && (*colon != ':'))
-	{
 		error (FATAL,
 		       "no colon(:) separator is found in parameter of %s: %s", option, parameter);
-		eFree (spec);
-		eFree (parm);
-		return FALSE;
-	}
 	else if ((!pattern_p) && *colon == '\0')
-	{
 		error (FATAL,
 		       "no colon(:) separator is found in parameter of %s: %s", option, parameter);
-		eFree (spec);
-		eFree (parm);
-		return FALSE;
-	}
+
 	file_part = colon + 1;
-	tg_file = expandOnCorpusPathList (file_part);
-	if (tg_file == NULL)
+	if (file_part[0] == '\0')
+		error (FATAL,
+		       "file part after colon it not given %s: %s", option, parameter);
+
+	if (file_part[0] != '/' && file_part[0] != '.')
+	{
+		tg_file = expandOnCorpusPathList (file_part);
+		tg_file = tg_file? tg_file: vStringNewInit (file_part);
+	}
+	else
 		tg_file = vStringNewInit (file_part);
 
-	addCorpusFile(language, spec, tg_file, pattern_p);
+	addCorpusFile (language, spec, tg_file, pattern_p);
 
 	eFree (spec);
 	eFree (parm);
@@ -1603,12 +1612,15 @@ static vString* expandOnSearchPathList (searchPathList *pathList, const char* le
 	for (i = 0; i < stringListCount (pathList); ++i)
 	{
 		const char* const body = vStringValue (stringListItem (pathList, i));
-		vString* const tmp = combinePathAndFile (body, leaf);
+		char* tmp = combinePathAndFile (body, leaf);
 
-		if ((* check) (vStringValue (tmp)))
-			return tmp;
+		if ((* check) (tmp))
+		{
+			vString *r = vStringNewOwn (tmp);
+			return r;
+		}
 		else
-			vStringDelete (tmp);
+			eFree (tmp);
 	}
 	return NULL;
 }
@@ -1666,6 +1678,11 @@ extern vString* expandOnCorpusPathList (const char* leaf)
   return expandOnSearchPathList (CorpusPathList, leaf, doesFileExist);
 }
 
+extern vString* expandOnDriversPathList (const char* leaf)
+{
+	return expandOnSearchPathList (DriversPathList, leaf, doesExecutableExist);
+}
+
 static void processOptionFile (
 		const char *const option, const char *const parameter)
 {
@@ -1674,7 +1691,7 @@ static void processOptionFile (
 	fileStatus *status;
 
 	if (parameter [0] == '\0')
-		error (WARNING, "no option file supplied for \"%s\"", option);
+		error (FATAL, "no option file supplied for \"%s\"", option);
 
 	if (parameter [0] != '/' && parameter [0] != '.')
 	{
@@ -1871,7 +1888,7 @@ static void processVersionOption (
 	exit (0);
 }
 
-static void resetDataPathList0 (searchPathList** pathList, const char *const varname)
+static void resetPathList (searchPathList** pathList, const char *const varname)
 {
 	freeSearchPathList (pathList);
 	verbose ("Reset %s\n", varname);
@@ -1880,53 +1897,69 @@ static void resetDataPathList0 (searchPathList** pathList, const char *const var
 
 static void resetDataPathList (void)
 {
-	resetDataPathList0(&OptlibPathList, "OptlibPathList");
-	resetDataPathList0(&CorpusPathList, "CorpusPathList");
+	resetPathList (&OptlibPathList, "OptlibPathList");
+	resetPathList (&CorpusPathList, "CorpusPathList");
 }
 
-static void appendToDataPathList0 (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
+static void resetLibexecPathList (void)
+{
+	resetPathList (&DriversPathList, "DriversPathList");
+}
+
+static void appendToPathList (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
 				   boolean report_in_verboe, const char* const action)
 {
-	vString* path;
+	char* path;
 
 	path = combinePathAndFile (dir, subdir);
 	if (report_in_verboe)
-		verbose ("%s %s to %s\n", action, vStringValue (path), varname);
-	stringListAdd (pathList, path);
-
+		verbose ("%s %s to %s\n", action, path, varname);
+	stringListAdd (pathList, vStringNewOwn (path));
 }
 
-static void prependToDataPathList0 (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
+static void prependToPathList (const char *const dir, const char *const subdir, searchPathList* const pathList, const char *const varname,
 				    boolean report_in_verboe, const char* const action)
 {
 	stringListReverse (pathList);
-	appendToDataPathList0(dir, subdir, pathList, varname, report_in_verboe, action);
+	appendToPathList(dir, subdir, pathList, varname, report_in_verboe, action);
 	stringListReverse (pathList);
 
 }
 
 static void appendToDataPathList (const char *const dir, boolean from_cmdline)
 {
-	appendToDataPathList0 (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
+	appendToPathList (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
 			       from_cmdline, from_cmdline? "Append": NULL);
-	appendToDataPathList0 (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
+	appendToPathList (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
 			       from_cmdline, from_cmdline? "Append": NULL);
 
 	if (!from_cmdline)
-		appendToDataPathList0 (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
+		appendToPathList (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
 				       FALSE, NULL);
+}
+
+static void appendToLibexecPathList (const char *const dir, boolean from_cmdline)
+{
+	appendToPathList (dir, SUBDIR_DRIVERS, DriversPathList, "DriversPathList",
+			       from_cmdline, from_cmdline? "Append": NULL);
 }
 
 static void prependToDataPathList (const char *const dir, boolean from_cmdline)
 {
-	prependToDataPathList0 (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
+	prependToPathList (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
 				from_cmdline, from_cmdline? "Prepend": NULL);
-	prependToDataPathList0 (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
+	prependToPathList (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
 				from_cmdline, from_cmdline? "Prepend": NULL);
 
 	if (!from_cmdline)
-		prependToDataPathList0 (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
+		prependToPathList (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
 					FALSE, NULL);
+}
+
+static void prependToLibexecPathList (const char *const dir, boolean from_cmdline)
+{
+	prependToPathList (dir, SUBDIR_DRIVERS, DriversPathList, "DriversPathList",
+			   from_cmdline, from_cmdline? "Prepend": NULL);
 }
 
 static void processDataDir (
@@ -1952,6 +1985,29 @@ static void processDataDir (
 	}
 }
 
+static void processLibexecDir (const char *const option,
+			       const char *const parameter)
+{
+	const char* path;
+
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "Path for a directory is needed for \"%s\" option", option);
+
+	if (parameter[0] == '+')
+	{
+		path = parameter + 1;
+		prependToLibexecPathList (path, TRUE);
+	}
+	else if (!strcmp (parameter, "NONE"))
+		resetLibexecPathList ();
+	else
+	{
+		resetLibexecPathList ();
+		path = parameter;
+		appendToLibexecPathList (path, TRUE);
+	}
+}
+
 /*
  *  Option tables
  */
@@ -1973,6 +2029,7 @@ static parametricOption ParametricOptions [] = {
 	{ "languages",              processLanguagesOption,         FALSE   },
 	{ "langdef",                processLanguageDefineOption,    FALSE   },
 	{ "langmap",                processLanguageMapOption,       FALSE   },
+	{ "libexec-dir",            processLibexecDir,              FALSE   },
 	{ "license",                processLicenseOption,           TRUE    },
 	{ "list-aliases",           processListAliasesOption,       TRUE    },
 	{ "list-corpora",           processListCorporaOption,       TRUE    },
@@ -2092,7 +2149,9 @@ static void processLongOption (
 		;
 	else if (processRegexOption (option, parameter))
 		;
-	else if (processMapOptoin (option, parameter))
+	else if (processXcmdOption (option, parameter))
+		;
+	else if (processMapOption (option, parameter))
 		;
 #ifndef RECURSE_SUPPORTED
 	else if (strcmp (option, "recurse") == 0)
@@ -2290,9 +2349,9 @@ extern void previewFirstOption (cookedArgs* const args)
 
 static void parseConfigurationFileOptionsInDirectoryWithLeafname (const char* directory, const char* leafname)
 {
-	vString* const pathname = combinePathAndFile (directory, leafname);
-	parseFileOptions (vStringValue (pathname));
-	vStringDelete (pathname);
+	char* pathname = combinePathAndFile (directory, leafname);
+	parseFileOptions (pathname);
+	eFree (pathname);
 }
 
 static void parseConfigurationFileOptionsInDirectory (const char* directory)
@@ -2363,7 +2422,7 @@ static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const d
 	
 	for (i = 0; i < n; i++)
 	{
-		vString* path;
+		char* path;
 		fileStatus *s;
 
 		if (already_loaded_files && stringListHas (already_loaded_files, dents[i]->d_name))
@@ -2372,17 +2431,17 @@ static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const d
 			stringListAdd (already_loaded_files, vStringNewInit (dents[i]->d_name));
 
 		path = combinePathAndFile (dirName, dents[i]->d_name);
-		s = eStat (vStringValue (path));
+		s = eStat (path);
 
 		if (s->exists && s->isDirectory && accept_only_dot_d(dents[i]))
-			parseAllConfigurationFilesOptionsInDirectory (vStringValue (path),
+			parseAllConfigurationFilesOptionsInDirectory (path,
 								      already_loaded_files);
 		else if (s->exists && accept_only_dot_ctags(dents[i]))
 			parseConfigurationFileOptionsInDirectoryWithLeafname (dirName,
 									      dents[i]->d_name);
 		eStatFree (s);
 		free (dents[i]);
-		vStringDelete(path);
+		eFree (path);
 	}
 	free (dents);
 	return TRUE;
@@ -2415,7 +2474,7 @@ static void parseConfigurationFileOptions (void)
 	vString *home;
 	/* We parse .ctags on all systems, and additionally ctags.cnf on DOS. */
 	char *filename = NULL;
-	char *filename_body;
+	const char *filename_body;
 
 #ifdef CUSTOM_CONFIGURATION_FILE
 	parseFileOptions (CUSTOM_CONFIGURATION_FILE);
@@ -2516,12 +2575,12 @@ static void installDataPathList (void)
 		vString *home = getHome ();
 		if (home != NULL)
 		{
-			vString *ctags_d;
+			char *ctags_d;
 
 			ctags_d = combinePathAndFile (vStringValue (home), ".ctags.d");
 
-			appendToDataPathList (vStringValue (ctags_d), FALSE);
-			vStringDelete (ctags_d);
+			appendToDataPathList (ctags_d, FALSE);
+			eFree (ctags_d);
 			vStringDelete (home);
 		}
 	}
@@ -2534,6 +2593,53 @@ static void installDataPathList (void)
 #endif
 }
 
+static void installLibexecPathList (void)
+{
+	char* libexecPath = getenv (CTAGS_LIBEXEC_PATH_ENVIRONMENT);
+
+	DriversPathList = stringListNew ();
+
+	if (libexecPath)
+	{
+		char* needle;
+
+		while (libexecPath[0])
+		{
+			needle = strchr (libexecPath, ':');
+			if (needle)
+				*needle = '\0';
+
+			appendToDataPathList (libexecPath, FALSE);
+
+			if (needle)
+			{
+				*needle = ':';
+				libexecPath = needle + 1;
+			}
+			else
+				break;
+		}
+	}
+
+	{
+		vString *home = getHome ();
+		if (home != NULL)
+		{
+			char *ctags_d;
+
+			ctags_d = combinePathAndFile (vStringValue (home), ".ctags.d");
+
+			appendToLibexecPathList (ctags_d, FALSE);
+			eFree (ctags_d);
+			vStringDelete (home);
+		}
+	}
+
+#ifdef PKGLIBEXECDIR
+	appendToLibexecPathList (PKGLIBEXECDIR, FALSE);
+#endif
+}
+
 /*
 *   Option initialization
 */
@@ -2542,9 +2648,11 @@ extern void initOptions (void)
 {
 	OptionFiles = stringListNew ();
 	installDataPathList ();
+	installLibexecPathList ();
 	verboseSearchPathList (OptlibPathList,  "OptlibPathList");
 	verboseSearchPathList (CorpusPathList,  "CorpusPathList");
 	verboseSearchPathList (PreloadPathList, "PreloadPathList");
+	verboseSearchPathList (DriversPathList, "DriversPathList");
 
 	verbose ("Setting option defaults\n");
 	installHeaderListDefaults ();
@@ -2590,6 +2698,7 @@ extern void freeOptionResources (void)
 	freeSearchPathList (&CorpusPathList);
 	freeSearchPathList (&OptlibPathList);
 	freeSearchPathList (&PreloadPathList);
+	freeSearchPathList (&DriversPathList);
 
 	freeList (&OptionFiles);
 }

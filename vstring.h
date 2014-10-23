@@ -80,6 +80,9 @@ extern void vStringNCopyS (vString *const string, const char *const s, const siz
 extern void vStringCopyToLower (vString *const dest, const vString *const src);
 extern void vStringSetLength (vString *const string);
 
+extern vString *vStringNewOwn (char *s);
+extern char    *vStringDeleteUnwrap (vString *const string);
+
 #endif  /* _VSTRING_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

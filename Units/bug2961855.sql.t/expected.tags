@@ -1,0 +1,2 @@
+demo_pkg	Units/bug2961855.sql.t/input.sql	/^create or replace package demo_pkg is$/;"	P
+demo_pkg.test_var	Units/bug2961855.sql.t/input.sql	/^test_var number;$/;"	v

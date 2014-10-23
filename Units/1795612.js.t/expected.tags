@@ -1,0 +1,4 @@
+RPC	Units/1795612.js.t/input.js	/^Test.RPC =$/;"	c	class:Test
+asyncMethod	Units/1795612.js.t/input.js	/^	asyncMethod: function($/;"	m	class:Test.RPC
+asyncRequest	Units/1795612.js.t/input.js	/^	asyncRequest: function($/;"	m	class:Test.RPC
+request_id	Units/1795612.js.t/input.js	/^	request_id: 0,$/;"	p	class:Test.RPC

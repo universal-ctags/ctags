@@ -1,0 +1,2 @@
+HTTPService.ajaxData	Units/flex_with_actionscript.mxml.t/input.mxml	/^		id="ajaxData"$/;"	x
+dateToYYYYMMDD	Units/flex_with_actionscript.mxml.t/input.mxml	/^	public function dateToYYYYMMDD(aDate:Date):String {$/;"	f

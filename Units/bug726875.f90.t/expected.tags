@@ -1,0 +1,3 @@
+coma	Units/bug726875.f90.t/input.f90	19;"	c
+comb	Units/bug726875.f90.t/input.f90	22;"	c
+comc	Units/bug726875.f90.t/input.f90	24;"	c

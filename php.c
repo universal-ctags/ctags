@@ -1457,7 +1457,7 @@ static void initialize (const langType language)
 	fullScope = vStringNew ();
 }
 
-static void finalize (const langType language)
+static void finalize (const langType language __unused__)
 {
 	vStringDelete(fullScope);
 }

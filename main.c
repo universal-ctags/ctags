@@ -23,9 +23,10 @@
 */
 #include "general.h"  /* must always come first */
 
-#ifdef HAVE_DECL_ENVIRON
-#define _GNU_SOURCE
+#if HAVE_DECL___ENVIRON
 #include <unistd.h>
+#elif HAVE_DECL__NSGETENVIRON
+#include <crt_externs.h>
 #endif
 
 #include <string.h>
@@ -158,13 +159,18 @@ static boolean recurseUsingOpendir (const char *const dirName)
 			if (strcmp (entry->d_name, ".") != 0  &&
 				strcmp (entry->d_name, "..") != 0)
 			{
-				vString *filePath;
+				char *filePath;
+				boolean free_p = FALSE;
 				if (strcmp (dirName, ".") == 0)
-					filePath = vStringNewInit (entry->d_name);
+					filePath = entry->d_name;
 				else
+				  {
 					filePath = combinePathAndFile (dirName, entry->d_name);
-				resize |= createTagsForEntry (vStringValue (filePath));
-				vStringDelete (filePath);
+					free_p = TRUE;
+				  }
+				resize |= createTagsForEntry (filePath);
+				if (free_p)
+					eFree (filePath);
 			}
 		}
 		closedir (dir);
@@ -525,25 +531,33 @@ static void makeTags (cookedArgs *args)
 
 static void sanitizeEnviron (void)
 {
-#ifdef HAVE_DECL_ENVIRON
+	char **e = NULL;
 	int i;
 
-	for (i = 0; environ[i]; i++)
+#if HAVE_DECL___ENVIRON
+	e = __environ;
+#elif HAVE_DECL__NSGETENVIRON
+	e = _NSGetEnviron();
+#endif
+
+	if (!e)
+		return;
+
+	for (i = 0; e [i]; i++)
 	{
 		char *value;
 
-		value = strchr (environ[i], '=');
+		value = strchr (e [i], '=');
 		if (!value)
 			continue;
 
 		value++;
 		if (!strncmp (value, "() {", 4))
 		{
-			error (WARNING, "reset environment: %s", environ[i]);
-			value[0] = '\0';
+			error (WARNING, "reset environment: %s", e [i]);
+			value [0] = '\0';
 		}
 	}
-#endif
 }
 
 /*
@@ -601,6 +615,7 @@ extern int main (int __unused__ argc, char **argv)
 	freeOptionResources ();
 	freeParserResources ();
 	freeRegexResources ();
+	freeXcmdResources ();
 
 	exit (0);
 	return 0;

@@ -1,0 +1,8 @@
+Global_Variables	Units/array_spec.f90.t/input.f90	/^module Global_Variables$/;"	m
+H	Units/array_spec.f90.t/input.f90	/^H /;"	v	module:Global_Variables
+H0	Units/array_spec.f90.t/input.f90	/^H0(/;"	v	module:Global_Variables
+H1	Units/array_spec.f90.t/input.f90	/^H1(/;"	v	module:Global_Variables
+H2	Units/array_spec.f90.t/input.f90	/^H2(/;"	v	module:Global_Variables
+H3	Units/array_spec.f90.t/input.f90	/^H3(/;"	v	module:Global_Variables
+H4	Units/array_spec.f90.t/input.f90	/^H4(/;"	v	module:Global_Variables
+H5	Units/array_spec.f90.t/input.f90	/^H5(/;"	v	module:Global_Variables

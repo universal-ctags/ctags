@@ -1,0 +1,19 @@
+Common Greek letters	Units/bug2886870.tex.t/input.tex	/^\\subsection{Common Greek letters}$/;"	u	section:Special Symbols
+Equations	Units/bug2886870.tex.t/input.tex	/^\\section{Equations}$/;"	s
+Figures	Units/bug2886870.tex.t/input.tex	/^\\section{Figures}$/;"	s
+Introduction	Units/bug2886870.tex.t/input.tex	/^\\section{Introduction}$/;"	s
+Lists	Units/bug2886870.tex.t/input.tex	/^\\section{Lists}$/;"	s
+Literal text	Units/bug2886870.tex.t/input.tex	/^\\section{Literal text}$/;"	s
+Special Symbols	Units/bug2886870.tex.t/input.tex	/^\\section{Special Symbols}$/;"	s
+Special symbols	Units/bug2886870.tex.t/input.tex	/^\\subsection{Special symbols}$/;"	u	section:Special Symbols
+Tables	Units/bug2886870.tex.t/input.tex	/^\\section{Tables}$/;"	s
+Test for ctags	Units/bug2886870.tex.t/input.tex	/^\\subsubsection{Test for ctags}$/;"	b	subsection:Special Symbols""Common Greek letters
+color  red	Units/bug2886870.tex.t/input.tex	/^\\section{\\color{red}Use of Color}$/;"	s
+eq:fine	Units/bug2886870.tex.t/input.tex	/^I = \\! \\int_{-\\infty}^\\infty f(x)\\,dx \\label{eq:fine}.$/;"	l
+eq:ising	Units/bug2886870.tex.t/input.tex	/^\\label{eq:ising}$/;"	l
+eq:mdiv	Units/bug2886870.tex.t/input.tex	/^\\label{eq:mdiv}$/;"	l
+fig:lj	Units/bug2886870.tex.t/input.tex	/^\\caption{\\label{fig:lj}Plot of the$/;"	l
+fig:qm  complexfunctions	Units/bug2886870.tex.t/input.tex	/^\\caption{\\label{fig:qm\/complexfunctions} Two representations of complex$/;"	l
+fig:typical	Units/bug2886870.tex.t/input.tex	/^\\caption{\\label{fig:typical}Show me a sine.}$/;"	l
+label  morefig	Units/bug2886870.tex.t/input.tex	/^\\section{\\label{morefig}Subfigures}$/;"	s
+tab:5  tc	Units/bug2886870.tex.t/input.tex	/^\\caption{\\label{tab:5\/tc}Comparison of the mean-field predictions$/;"	l

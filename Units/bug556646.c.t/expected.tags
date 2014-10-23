@@ -1,0 +1,20 @@
+A	Units/bug556646.c.t/input.c	/^  A = INDX_T2$/;"	e	enum:__anon1	file:
+INDX_C1	Units/bug556646.c.t/input.c	/^  INDX_C1,$/;"	e	enum:__anon1	file:
+INDX_C2	Units/bug556646.c.t/input.c	/^  INDX_C2,$/;"	e	enum:__anon1	file:
+INDX_IM1	Units/bug556646.c.t/input.c	/^  INDX_IM1,$/;"	e	enum:__anon1	file:
+INDX_IM2	Units/bug556646.c.t/input.c	/^  INDX_IM2,$/;"	e	enum:__anon1	file:
+INDX_L	Units/bug556646.c.t/input.c	/^  INDX_L,$/;"	e	enum:__anon1	file:
+INDX_L2	Units/bug556646.c.t/input.c	/^  INDX_L2,$/;"	e	enum:__anon1	file:
+INDX_M	Units/bug556646.c.t/input.c	/^  INDX_M,$/;"	e	enum:__anon1	file:
+INDX_NIL	Units/bug556646.c.t/input.c	/^  INDX_NIL =   0x00,$/;"	e	enum:__anon1	file:
+INDX_P	Units/bug556646.c.t/input.c	/^  INDX_P,$/;"	e	enum:__anon1	file:
+INDX_R	Units/bug556646.c.t/input.c	/^  INDX_R,$/;"	e	enum:__anon1	file:
+INDX_R2	Units/bug556646.c.t/input.c	/^  INDX_R2,$/;"	e	enum:__anon1	file:
+INDX_S	Units/bug556646.c.t/input.c	/^  INDX_S,$/;"	e	enum:__anon1	file:
+INDX_S1	Units/bug556646.c.t/input.c	/^  INDX_S1,$/;"	e	enum:__anon1	file:
+INDX_S2	Units/bug556646.c.t/input.c	/^  INDX_S2,$/;"	e	enum:__anon1	file:
+INDX_S3	Units/bug556646.c.t/input.c	/^  INDX_S3,$/;"	e	enum:__anon1	file:
+INDX_S4	Units/bug556646.c.t/input.c	/^  INDX_S4,$/;"	e	enum:__anon1	file:
+INDX_T	Units/bug556646.c.t/input.c	/^  INDX_T,$/;"	e	enum:__anon1	file:
+INDX_T2	Units/bug556646.c.t/input.c	/^  INDX_T2,$/;"	e	enum:__anon1	file:
+task_indx_type	Units/bug556646.c.t/input.c	/^} task_indx_type;$/;"	t	typeref:enum:__anon1	file:

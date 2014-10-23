@@ -13,7 +13,7 @@
 
 typedef struct {
 	char short_char;
-	char *long_str;
+	const char *long_str;
 	void (* short_proc) (char c,  void *data);
 	void (* long_proc)  (const char* const s, const char* const param, void *data);
   /* TODO: handler for help message */

@@ -196,7 +196,7 @@ if test "$enable_maintainer_mode" = yes ; then
 	AC_MSG_RESULT(enabling maintainer mode)
 fi
 
-install_targets="install-ctags install-data"
+install_targets="install-ctags install-data install-libexec"
 AC_MSG_CHECKING(whether to install link to etags)
 if test yes = "$enable_etags"; then
 	AC_MSG_RESULT(yes)
@@ -494,6 +494,10 @@ install_data_targets="install-data-corpora"
 AC_CHECK_FUNCS(scandir,[install_data_targets="$install_data_targets install-data-optlib install-data-preload"])
 AC_SUBST(install_data_targets)
 
+install_libexec_targets=
+AC_CHECK_FUNCS(fork waitpid execv pipe,[install_libexec_targets="$install_libexec_targets install-libexec-drivers"])
+AC_SUBST(install_libexec_targets)
+
 # Checks for missing prototypes
 # -----------------------------
 AC_CHECKING(for new missing prototypes)
@@ -528,11 +532,12 @@ fi
 
 # Checks for declaration
 # ----------------------
-AC_CHECK_DECLS([environ], [], [], [
-[#define _GNU_SOURCE]
+AC_CHECK_DECLS([__environ], [], [], [
 [#include <unistd.h>]
 ])
-
+AC_CHECK_DECLS([_NSGetEnviron],[],[],[
+[#include <crt_externs.h>]
+])
 
 # Output files
 # ------------

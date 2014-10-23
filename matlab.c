@@ -131,13 +131,13 @@ static void installMatLabRegex (const langType language)
     addTgEntryForExtension (language, "m", matlab_m_tg_table);
 }
 
-extern parserDefinition* MatLabParser ()
+extern parserDefinition* MatLabParser (void)
 {
 	static const char *const extensions [] = { "m", NULL };
 	parserDefinition* const def = parserNew ("MatLab");
 	def->extensions = extensions;
 	def->initialize = installMatLabRegex;
-	def->regex      = TRUE;
+	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }
 

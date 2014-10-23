@@ -1,0 +1,16 @@
+align_second_16	Units/misc_types.f90.t/input.f90	/^	integer(2) :: align_second_16$/;"	k	type:my_struct
+base_type	Units/misc_types.f90.t/input.f90	/^	integer base_type$/;"	v	program:testalloc
+first_byte	Units/misc_types.f90.t/input.f90	/^	integer(1) :: first_byte$/;"	k	type:my_struct
+i	Units/misc_types.f90.t/input.f90	/^	in/;"	v	program:testalloc
+i2	Units/misc_types.f90.t/input.f90	/^	integer i2$/;"	v	program:testalloc
+i3	Units/misc_types.f90.t/input.f90	/^	integer i3$/;"	v	program:testalloc
+i4	Units/misc_types.f90.t/input.f90	/^	integer i4$/;"	v	program:testalloc
+i5	Units/misc_types.f90.t/input.f90	/^	integer i5$/;"	v	program:testalloc
+i6	Units/misc_types.f90.t/input.f90	/^	integer i6$/;"	v	program:testalloc
+i7	Units/misc_types.f90.t/input.f90	/^	integer i7$/;"	v	program:testalloc
+i8	Units/misc_types.f90.t/input.f90	/^	integer i8$/;"	v	program:testalloc
+list	Units/misc_types.f90.t/input.f90	/^	real, dimension (:), allocatable :: list /;"	v	program:testalloc
+my_struct	Units/misc_types.f90.t/input.f90	/^	structure \/my_struct\//;"	t	program:testalloc
+status	Units/misc_types.f90.t/input.f90	/^	integer i, status$/;"	v	program:testalloc
+testalloc	Units/misc_types.f90.t/input.f90	/^	program testalloc$/;"	p
+the_struct	Units/misc_types.f90.t/input.f90	/^	record \/m_struct\/ the_struct /;"	v	program:testalloc

@@ -1,0 +1,6 @@
+itcl_class	Units/simple.tcl.t/input.tcl	/^itcl::class itcl_class$/;"	c
+method1	Units/simple.tcl.t/input.tcl	/^public method method1$/;"	m
+method2	Units/simple.tcl.t/input.tcl	/^protected method method2$/;"	m
+method3	Units/simple.tcl.t/input.tcl	/^private method method3$/;"	m
+simple1	Units/simple.tcl.t/input.tcl	/^proc simple1$/;"	p
+tcl_class	Units/simple.tcl.t/input.tcl	/^class tcl_class$/;"	c

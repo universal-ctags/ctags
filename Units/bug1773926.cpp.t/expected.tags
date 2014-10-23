@@ -1,0 +1,4 @@
+ERROR_HAPPENED	Units/bug1773926.cpp.t/input.cpp	3;"	d	file:
+NEXT_DEFINE	Units/bug1773926.cpp.t/input.cpp	5;"	d	file:
+OK	Units/bug1773926.cpp.t/input.cpp	4;"	d	file:
+main	Units/bug1773926.cpp.t/input.cpp	/^int main(int argc, char* argv[])$/;"	f

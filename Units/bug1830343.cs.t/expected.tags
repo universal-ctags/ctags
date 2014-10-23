@@ -1,0 +1,2 @@
+ForEachTest	Units/bug1830343.cs.t/input.cs	/^class ForEachTest {$/;"	c
+Main	Units/bug1830343.cs.t/input.cs	/^	static void Main(string[] args) {$/;"	m	class:ForEachTest	file:

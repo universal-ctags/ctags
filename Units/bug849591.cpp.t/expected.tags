@@ -1,0 +1,2 @@
+Foo	Units/bug849591.cpp.t/input.cpp	/^void MainClass< ParamClass1&, ParamClass2>::Foo()$/;"	f	class:MainClass
+Foo	Units/bug849591.cpp.t/input.cpp	/^void MainClass<ParamClass1&, ParamClass2>::Foo()$/;"	f	class:MainClass

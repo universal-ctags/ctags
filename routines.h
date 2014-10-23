@@ -115,6 +115,7 @@ extern void setCurrentDirectory (void);
 extern fileStatus *eStat (const char *const fileName);
 extern void eStatFree (fileStatus *status);
 extern boolean doesFileExist (const char *const fileName);
+extern boolean doesExecutableExist (const char *const fileName);
 extern boolean isRecursiveLink (const char* const dirName);
 extern boolean isSameFile (const char *const name1, const char *const name2);
 #if defined(NEED_PROTO_FGETPOS)
@@ -124,7 +125,7 @@ extern int fsetpos  (FILE *stream, fpos_t *pos);
 extern const char *baseFilename (const char *const filePath);
 extern const char *fileExtension (const char *const fileName);
 extern boolean isAbsolutePath (const char *const path);
-extern vString *combinePathAndFile (const char *const path, const char *const file);
+extern char *combinePathAndFile (const char *const path, const char *const file);
 extern char* absoluteFilename (const char *file);
 extern char* absoluteDirname (char *file);
 extern char* relativeFilename (const char *file, const char *dir);

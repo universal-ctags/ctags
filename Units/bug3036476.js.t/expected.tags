@@ -1,0 +1,4 @@
+container	Units/bug3036476.js.t/input.js	/^var container = {};$/;"	v
+method1	Units/bug3036476.js.t/input.js	/^container.object.method1 = function() {}$/;"	f	function:container.object
+method2	Units/bug3036476.js.t/input.js	/^container.object.method2 = function() {}$/;"	f	function:container.object
+object	Units/bug3036476.js.t/input.js	/^container.object = function() {}$/;"	f	function:container

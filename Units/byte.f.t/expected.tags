@@ -1,0 +1,10 @@
+A	Units/byte.f.t/input.f	/^	BYTE A,/;"	v	program:byte_test
+A1	Units/byte.f.t/input.f	/^	BYTE A1,/;"	v	program:byte_test
+A2	Units/byte.f.t/input.f	/^	BYTE A2 /;"	v	program:byte_test
+B	Units/byte.f.t/input.f	/^	BY/;"	v	program:byte_test
+B1	Units/byte.f.t/input.f	/^	BYTE A1, B1,/;"	v	program:byte_test
+B2	Units/byte.f.t/input.f	/^	BYTE A2 \/'x'\/, B2 /;"	v	program:byte_test
+C	Units/byte.f.t/input.f	/^	BYTE A, B, C /;"	v	program:byte_test
+C1	Units/byte.f.t/input.f	/^	BYTE A1, B1, C1(/;"	v	program:byte_test
+C2	Units/byte.f.t/input.f	/^	BYTE A2 \/'x'\/, B2 \/255\/, C2(/;"	v	program:byte_test
+byte_test	Units/byte.f.t/input.f	/^	program byte_test$/;"	p

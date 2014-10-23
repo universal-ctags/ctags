@@ -1,0 +1,9 @@
+Area	Units/keyword_override.cs.t/input.cs	/^      public override double Area() $/;"	m	class:TestClass.Cube
+Area	Units/keyword_override.cs.t/input.cs	/^      public virtual double Area() $/;"	m	class:TestClass.Square
+Cube	Units/keyword_override.cs.t/input.cs	/^      public Cube(double x): base(x) $/;"	m	class:TestClass.Cube
+Cube	Units/keyword_override.cs.t/input.cs	/^   class Cube: Square $/;"	c	class:TestClass
+Main	Units/keyword_override.cs.t/input.cs	/^   public static void Main()$/;"	m	class:TestClass
+Square	Units/keyword_override.cs.t/input.cs	/^      public Square(double x) $/;"	m	class:TestClass.Square
+Square	Units/keyword_override.cs.t/input.cs	/^   public class Square $/;"	c	class:TestClass
+TestClass	Units/keyword_override.cs.t/input.cs	/^class TestClass $/;"	c
+x	Units/keyword_override.cs.t/input.cs	/^      public double x;$/;"	f	class:TestClass.Square

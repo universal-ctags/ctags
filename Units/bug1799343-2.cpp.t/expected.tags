@@ -1,0 +1,14 @@
+A	Units/bug1799343-2.cpp.t/input.cpp	/^namespace A {$/;"	n	file:
+B	Units/bug1799343-2.cpp.t/input.cpp	/^namespace B {$/;"	n	file:
+C	Units/bug1799343-2.cpp.t/input.cpp	/^   namespace C {$/;"	n	namespace:A	file:
+P	Units/bug1799343-2.cpp.t/input.cpp	/^   class P {$/;"	c	namespace:A	file:
+P	Units/bug1799343-2.cpp.t/input.cpp	/^class P {$/;"	c	file:
+Q	Units/bug1799343-2.cpp.t/input.cpp	/^   class Q {$/;"	c	namespace:A	file:
+R	Units/bug1799343-2.cpp.t/input.cpp	/^     class R: ::P, A::Q {$/;"	c	namespace:A::C	file:
+S	Units/bug1799343-2.cpp.t/input.cpp	/^   class S : A::C::R {$/;"	c	namespace:B	file:
+f	Units/bug1799343-2.cpp.t/input.cpp	/^       int f (int v) { return v + x; }$/;"	f	class:A::C::R	file:
+t	Units/bug1799343-2.cpp.t/input.cpp	/^     int t;$/;"	m	class:B::S	file:
+x	Units/bug1799343-2.cpp.t/input.cpp	/^     int x;$/;"	m	class:A::P	file:
+x	Units/bug1799343-2.cpp.t/input.cpp	/^   int x;$/;"	m	class:P	file:
+y	Units/bug1799343-2.cpp.t/input.cpp	/^     int y;$/;"	m	class:A::Q	file:
+z	Units/bug1799343-2.cpp.t/input.cpp	/^       int z;$/;"	m	class:A::C::R	file:

@@ -1,0 +1,11 @@
+GetX	Units/keyword_abstract.cs.t/input.cs	/^   public abstract int GetX   \/\/ Abstract property$/;"	p	class:MyBaseC
+GetX	Units/keyword_abstract.cs.t/input.cs	/^   public override int GetX   \/\/ overriding property$/;"	p	class:MyDerivedC
+GetY	Units/keyword_abstract.cs.t/input.cs	/^   public abstract int GetY   \/\/ Abstract property$/;"	p	class:MyBaseC
+GetY	Units/keyword_abstract.cs.t/input.cs	/^   public override int GetY   \/\/ overriding property$/;"	p	class:MyDerivedC
+Main	Units/keyword_abstract.cs.t/input.cs	/^   public static void Main() $/;"	m	class:MyDerivedC
+MyBaseC	Units/keyword_abstract.cs.t/input.cs	/^abstract class MyBaseC   \/\/ Abstract class$/;"	c
+MyDerivedC	Units/keyword_abstract.cs.t/input.cs	/^class MyDerivedC: MyBaseC$/;"	c
+MyMethod	Units/keyword_abstract.cs.t/input.cs	/^   public abstract void MyMethod();   \/\/ Abstract method$/;"	m	class:MyBaseC
+MyMethod	Units/keyword_abstract.cs.t/input.cs	/^   public override void MyMethod() $/;"	m	class:MyDerivedC
+x	Units/keyword_abstract.cs.t/input.cs	/^   protected int x = 100; $/;"	f	class:MyBaseC
+y	Units/keyword_abstract.cs.t/input.cs	/^   protected int y = 150;$/;"	f	class:MyBaseC

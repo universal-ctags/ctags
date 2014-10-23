@@ -1,0 +1,3 @@
+C	Units/bug1800065.cs.t/input.cs	/^public class C {$/;"	c
+title	Units/bug1800065.cs.t/input.cs	/^ private string title;$/;"	f	class:C	file:
+window	Units/bug1800065.cs.t/input.cs	/^ private Gtk.Window window;$/;"	f	class:C	file:

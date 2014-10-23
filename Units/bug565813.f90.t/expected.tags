@@ -1,0 +1,7 @@
+N	Units/bug565813.f90.t/input.f90	/^    integer, parameter :: N /;"	v	module:ctags_bug
+bar	Units/bug565813.f90.t/input.f90	/^        integer :: bar$/;"	k	type:foo_t
+ctags_bug	Units/bug565813.f90.t/input.f90	/^module ctags_bug$/;"	m
+foo_getbar	Units/bug565813.f90.t/input.f90	/^    integer function foo_getbar /;"	f	module:ctags_bug
+foo_set_bar	Units/bug565813.f90.t/input.f90	/^    pure subroutine foo_set_bar /;"	s	module:ctags_bug
+foo_setbar	Units/bug565813.f90.t/input.f90	/^    subroutine foo_setbar /;"	s	module:ctags_bug
+foo_t	Units/bug565813.f90.t/input.f90	/^    type :: foo_t$/;"	t	module:ctags_bug

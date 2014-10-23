@@ -61,6 +61,13 @@ typedef struct stgTableEntry{
 	struct stgTableEntry *next;
 } tgTableEntry;
 
+typedef enum  {
+  METHOD_NOT_CRAFTED    = 1 << 0,
+  METHOD_REGEX          = 1 << 1,
+  METHOD_XCMD           = 1 << 2,
+  METHOD_XCMD_AVAILABLE = 1 << 3,
+} parsingMethod;
+
 typedef struct {
 	/* defined by parser */
 	char* name;                    /* name of language */
@@ -73,7 +80,7 @@ typedef struct {
 	parserFinalize finalize;       /* finalize routine, if needed */
 	simpleParser parser;           /* simple parser (common case) */
 	rescanParser parser2;          /* rescanning parser (unusual case) */
-	boolean regex;                 /* is this a regex parser? */
+	unsigned int method;           /* See PARSE__... definitions above */
 	tgTableEntry *tg_entries;
 
 	/* used internally */
@@ -161,6 +168,20 @@ extern boolean enableRegexKind (const langType language, const int kind, const b
 extern void printRegexKinds (const langType language, boolean indent);
 extern void freeRegexResources (void);
 extern void checkRegex (void);
+extern void useRegexMethod (const langType language);
+
+#ifdef HAVE_COPROC
+extern boolean invokeXcmd (const char* const fileName, const langType language);
+#endif
+extern boolean processXcmdOption (const char *const option, const char *const parameter);
+extern void addLanguageXcmd (const langType language, const char* const path);
+extern void addTagXcmd (const langType language, vString* pathvstr);
+extern void resetXcmdKinds (const langType language, boolean mode);
+extern boolean enableXcmdKind (const langType language, const int kind, const boolean mode);
+extern void printXcmdKinds (const langType language, boolean indent);
+extern void freeXcmdResources (void);
+extern void useXcmdMethod (const langType language);
+extern void notifyAvailabilityXcmdMethod (const langType language);
 
 #endif  /* _PARSE_H */
 

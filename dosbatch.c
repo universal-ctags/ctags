@@ -29,13 +29,13 @@ static void installDosBatchRegex (const langType language)
 		"set[ \t]+([A-Za-z_0-9]+)[ \t]*=", "\\1", "v,variable,variables", NULL);
 }
 
-extern parserDefinition* DosBatchParser ()
+extern parserDefinition* DosBatchParser (void)
 {
 	static const char *const extensions [] = { "bat", "cmd", NULL };
 	parserDefinition* const def = parserNew ("DosBatch");
 	def->extensions = extensions;
 	def->initialize = installDosBatchRegex;
-	def->regex      = TRUE;
+	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }
 

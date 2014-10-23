@@ -1,0 +1,6 @@
+C	Units/bug1799343-1.cpp.t/input.cpp	/^struct C { int x; };$/;"	s	file:
+D	Units/bug1799343-1.cpp.t/input.cpp	/^ D() { x = 123; }$/;"	f	struct:D
+D	Units/bug1799343-1.cpp.t/input.cpp	/^struct D : ::C {$/;"	s	file:
+main	Units/bug1799343-1.cpp.t/input.cpp	/^int main(void) {$/;"	f
+x	Units/bug1799343-1.cpp.t/input.cpp	/^struct C { int x; };$/;"	m	struct:C	file:
+~D	Units/bug1799343-1.cpp.t/input.cpp	/^ ~D() { std::cout << x << std::endl; }$/;"	f	struct:D

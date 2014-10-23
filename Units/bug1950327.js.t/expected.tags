@@ -1,0 +1,13 @@
+*	Units/bug1950327.js.t/input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	p	class:container.dirtyTab
+Different	Units/bug1950327.js.t/input.js	/^Different.prototype = {$/;"	c
+TabChrome	Units/bug1950327.js.t/input.js	/^TabChrome.prototype = {$/;"	c
+createTabTile	Units/bug1950327.js.t/input.js	/^	createTabTile: function(browser) $/;"	m	class:Different
+createTabTile	Units/bug1950327.js.t/input.js	/^	createTabTile: function(browser) $/;"	m	class:TabChrome
+destroyTabTile	Units/bug1950327.js.t/input.js	/^	destroyTabTile: function(tile)$/;"	m	class:Different
+destroyTabTile	Units/bug1950327.js.t/input.js	/^	destroyTabTile: function(tile)$/;"	m	class:TabChrome
+dirtyTab	Units/bug1950327.js.t/input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	c	class:container
+init	Units/bug1950327.js.t/input.js	/^	init: function() $/;"	m	class:Different
+init	Units/bug1950327.js.t/input.js	/^	init: function() $/;"	m	class:TabChrome
+snapshot	Units/bug1950327.js.t/input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	p	class:container.dirtyTab
+title	Units/bug1950327.js.t/input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	p	class:container.dirtyTab
+url	Units/bug1950327.js.t/input.js	/^		container.dirtyTab = {'url': false, 'title':false, 'snapshot':false, '*': false}		$/;"	p	class:container.dirtyTab

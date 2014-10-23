@@ -1,0 +1,3 @@
+func1	Units/matlab_test.m.t/input.m	/^function [x,y,z] = func1 $/;"	f
+func2	Units/matlab_test.m.t/input.m	/^function x = func2 $/;"	f
+func3	Units/matlab_test.m.t/input.m	/^function func3 $/;"	f

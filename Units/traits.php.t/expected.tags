@@ -1,0 +1,8 @@
+A	Units/traits.php.t/input.php	/^class A {$/;"	c
+B	Units/traits.php.t/input.php	/^class B {$/;"	c
+__construct	Units/traits.php.t/input.php	/^	public function __construct($p) {$/;"	f	class:B
+__construct	Units/traits.php.t/input.php	/^	public function __construct() {$/;"	f	class:A
+stuff	Units/traits.php.t/input.php	/^	protected function stuff($arg1, $arg2) {$/;"	f	trait:tBar
+stuff	Units/traits.php.t/input.php	/^	public function stuff() {$/;"	f	trait:tFoo
+tBar	Units/traits.php.t/input.php	/^trait tBar {$/;"	t
+tFoo	Units/traits.php.t/input.php	/^trait tFoo {$/;"	t

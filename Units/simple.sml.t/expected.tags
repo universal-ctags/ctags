@@ -1,0 +1,31 @@
+'a	Units/simple.sml.t/input.sml	/^  type 'a susp = unit -> 'a$/;"	t
+'a	Units/simple.sml.t/input.sml	/^  type 'a susp$/;"	t
+Change	Units/simple.sml.t/input.sml	/^exception Change$/;"	e
+Circular	Units/simple.sml.t/input.sml	/^	  exception Circular$/;"	e
+Factorial	Units/simple.sml.t/input.sml	/^exception Factorial$/;"	e
+Impossible	Units/simple.sml.t/input.sml	/^          exception Impossible$/;"	e
+Matcher	Units/simple.sml.t/input.sml	/^functor Matcher (structure RegExp : REGEXP) :> MATCHER = struct$/;"	c
+RegExp	Units/simple.sml.t/input.sml	/^    structure RegExp = RegExp$/;"	r
+RegExp	Units/simple.sml.t/input.sml	/^functor Matcher (structure RegExp : REGEXP) :> MATCHER = struct$/;"	r
+SUSP	Units/simple.sml.t/input.sml	/^signature SUSP = sig$/;"	s
+Susp	Units/simple.sml.t/input.sml	/^structure Susp :> SUSP = struct$/;"	r
+abstype_name	Units/simple.sml.t/input.sml	/^abstype abstype_name$/;"	t
+checked_factorial	Units/simple.sml.t/input.sml	/^    fun checked_factorial n =$/;"	f
+checked_factorial	Units/simple.sml.t/input.sml	/^fun checked_factorial n =$/;"	f
+delay	Units/simple.sml.t/input.sml	/^  fun delay (t : 'a susp) =$/;"	f
+delay	Units/simple.sml.t/input.sml	/^  val delay : (unit -> 'a) -> 'a susp$/;"	v
+dist	Units/simple.sml.t/input.sml	/^fun dist (x:real, y:real):real = sqrt (x*x + y*y)$/;"	f
+dist	Units/simple.sml.t/input.sml	/^val dist : real * real -> real = fn (x:real, y:real) => sqrt (x*x + y*y)$/;"	v
+fact	Units/simple.sml.t/input.sml	/^    fun fact 0 = 1$/;"	f
+force	Units/simple.sml.t/input.sml	/^  fun force t = t ()$/;"	f
+force	Units/simple.sml.t/input.sml	/^  val force : 'a susp -> 'a$/;"	v
+hyperlink	Units/simple.sml.t/input.sml	/^type hyperlink = { protocol : string, address : string, display : string }$/;"	t
+loopback	Units/simple.sml.t/input.sml	/^  fun loopback f =$/;"	f
+match	Units/simple.sml.t/input.sml	/^    fun match regexp string =$/;"	f
+match_is	Units/simple.sml.t/input.sml	/^    fun match_is Zero cs k = false$/;"	f
+memo	Units/simple.sml.t/input.sml	/^          val memo : 'a susp ref = ref (fn () => raise Impossible)$/;"	v
+r	Units/simple.sml.t/input.sml	/^	  val r = ref (fn () => raise Circular)$/;"	v
+r	Units/simple.sml.t/input.sml	/^              let val r = t () in memo := (fn () => r); r end$/;"	v
+suit	Units/simple.sml.t/input.sml	/^datatype suit = Spades | Hearts | Diamonds | Clubs$/;"	t
+t	Units/simple.sml.t/input.sml	/^	  fun t () = force (!r)$/;"	f
+t'	Units/simple.sml.t/input.sml	/^          fun t' () =$/;"	f

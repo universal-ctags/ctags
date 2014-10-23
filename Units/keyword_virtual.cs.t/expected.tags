@@ -1,0 +1,18 @@
+Area	Units/keyword_virtual.cs.t/input.cs	/^         public override double Area()$/;"	m	class:TestClass.Sphere
+Area	Units/keyword_virtual.cs.t/input.cs	/^      public override double Area() $/;"	m	class:TestClass.Circle
+Area	Units/keyword_virtual.cs.t/input.cs	/^      public override double Area() $/;"	m	class:TestClass.Cylinder
+Area	Units/keyword_virtual.cs.t/input.cs	/^      public virtual double Area() $/;"	m	class:TestClass.Dimensions
+Circle	Units/keyword_virtual.cs.t/input.cs	/^      public Circle(double r): base(r, 0) $/;"	m	class:TestClass.Circle
+Circle	Units/keyword_virtual.cs.t/input.cs	/^   public class Circle: Dimensions $/;"	c	class:TestClass
+Cylinder	Units/keyword_virtual.cs.t/input.cs	/^      public Cylinder(double r, double h): base(r, h) $/;"	m	class:TestClass.Cylinder
+Cylinder	Units/keyword_virtual.cs.t/input.cs	/^   class Cylinder: Dimensions $/;"	c	class:TestClass
+Dimensions	Units/keyword_virtual.cs.t/input.cs	/^      public Dimensions (double x, double y) $/;"	m	class:TestClass.Dimensions
+Dimensions	Units/keyword_virtual.cs.t/input.cs	/^      public Dimensions() $/;"	m	class:TestClass.Dimensions
+Dimensions	Units/keyword_virtual.cs.t/input.cs	/^   public class Dimensions $/;"	c	class:TestClass
+Main	Units/keyword_virtual.cs.t/input.cs	/^   public static void Main()  $/;"	m	class:TestClass
+Sphere	Units/keyword_virtual.cs.t/input.cs	/^      public Sphere(double r): base(r, 0) $/;"	m	class:TestClass.Sphere
+Sphere	Units/keyword_virtual.cs.t/input.cs	/^   class Sphere: Dimensions $/;"	c	class:TestClass
+TestClass	Units/keyword_virtual.cs.t/input.cs	/^class TestClass $/;"	c
+pi	Units/keyword_virtual.cs.t/input.cs	/^      public const double pi = Math.PI;$/;"	f	class:TestClass.Dimensions
+x	Units/keyword_virtual.cs.t/input.cs	/^      protected double x, y;$/;"	f	class:TestClass.Dimensions
+y	Units/keyword_virtual.cs.t/input.cs	/^      protected double x, y;$/;"	f	class:TestClass.Dimensions

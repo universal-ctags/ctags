@@ -1,0 +1,2 @@
+foo	Units/bug1770479.cpp.t/input.cpp	/^int foo (int i)$/;"	f
+main	Units/bug1770479.cpp.t/input.cpp	/^int main (int argc, char **argv)$/;"	f

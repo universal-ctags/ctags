@@ -1,0 +1,2 @@
+outer_procedure	Units/labels.sql.t/input.sql	/^PROCEDURE outer_procedure IS$/;"	p
+outer_procedure.my_label	Units/labels.sql.t/input.sql	/^    <<my_label>>$/;"	L

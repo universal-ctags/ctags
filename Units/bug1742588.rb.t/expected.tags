@@ -1,0 +1,3 @@
+A	Units/bug1742588.rb.t/input.rb	/^class A$/;"	c
+a	Units/bug1742588.rb.t/input.rb	/^ def a()$/;"	f	class:A
+b	Units/bug1742588.rb.t/input.rb	/^ def b()$/;"	f	class:A

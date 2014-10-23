@@ -472,6 +472,12 @@ extern boolean doesFileExist (const char *const fileName)
 	return status->exists;
 }
 
+extern boolean doesExecutableExist (const char *const fileName)
+{
+	fileStatus *status = eStat (fileName);
+	return status->exists && status->isExecutable;
+}
+
 extern boolean isRecursiveLink (const char* const dirName)
 {
 	boolean result = FALSE;
@@ -692,7 +698,7 @@ extern boolean isAbsolutePath (const char *const path)
 	return result;
 }
 
-extern vString *combinePathAndFile (
+extern char *combinePathAndFile (
 	const char *const path, const char *const file)
 {
 	vString *const filePath = vStringNew ();
@@ -737,7 +743,7 @@ extern vString *combinePathAndFile (
 	vStringCatS (filePath, file);
 #endif
 
-	return filePath;
+	return vStringDeleteUnwrap (filePath);
 }
 
 /* Return a newly-allocated string whose contents concatenate those of

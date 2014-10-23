@@ -1,3 +1,0 @@
-_a_b	Units/test-simple-sh.d/input.sh	/^function _a_b() {$/;"	f
-f1	Units/test-simple-sh.d/input.sh	/^f1() {$/;"	f
-f2	Units/test-simple-sh.d/input.sh	/^function f2() {$/;"	f

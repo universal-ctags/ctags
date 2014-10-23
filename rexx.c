@@ -32,7 +32,7 @@ extern parserDefinition* RexxParser (void)
 	parserDefinition* const def = parserNew ("REXX");
 	def->extensions = extensions;
 	def->initialize = installRexxRegex;
-	def->regex      = TRUE;
+	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }
 

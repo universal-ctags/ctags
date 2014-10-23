@@ -1,0 +1,5 @@
+FFunc	Units/rojas.h.t/input.h	/^typedef uint32 (*FFunc) (const astruct * pP, int n);$/;"	t
+FooBar	Units/rojas.h.t/input.h	/^typedef void * FooBar;$/;"	t
+astruct	Units/rojas.h.t/input.h	/^struct astruct$/;"	s
+astruct	Units/rojas.h.t/input.h	/^typedef struct astruct astruct;$/;"	t	typeref:struct:astruct
+m_member	Units/rojas.h.t/input.h	/^    int m_member;$/;"	m	struct:astruct

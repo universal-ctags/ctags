@@ -1,0 +1,18 @@
+Introduction	Units/intro.tex.t/input.tex	/^\\section{Introduction}$/;"	s	chapter:chapter text
+Part1	Units/intro.tex.t/input.tex	/^\\part{Part1}$/;"	p
+Part2	Units/intro.tex.t/input.tex	/^\\part{Part2}$/;"	p
+chapter text	Units/intro.tex.t/input.tex	/^\\chapter{chapter text}$/;"	c
+chapter1-intro.inc	Units/intro.tex.t/input.tex	/^\\include{chapter1-intro.inc}$/;"	i
+chapter2	Units/intro.tex.t/input.tex	/^\\chapter{chapter2}$/;"	c	part:Part2
+chapter2-intro.inc	Units/intro.tex.t/input.tex	/^\\include{chapter2-intro.inc}$/;"	i
+long paragraph2	Units/intro.tex.t/input.tex	/^\\paragraph{long paragraph2}$/;"	P	section:Part1""short section4
+long subparagraph2	Units/intro.tex.t/input.tex	/^\\subparagraph{long subparagraph2}$/;"	G	subsection:Part2""shorter intro2""subsec5 text
+section1 text	Units/intro.tex.t/input.tex	/^\\section{section1 text}$/;"	s	chapter:chapter text
+short para1	Units/intro.tex.t/input.tex	/^\\paragraph[short para1]{long paragraph1}$/;"	P	section:Part1""short section4
+short section4	Units/intro.tex.t/input.tex	/^\\section[short section4]{section4 text}$/;"	s	part:Part1
+short subpara1	Units/intro.tex.t/input.tex	/^\\subparagraph[short subpara1]{long subparagraph1}$/;"	G	subsection:Part2""shorter intro2""subsec5 text
+shorter intro2	Units/intro.tex.t/input.tex	/^\\section[shorter intro2]*{Introduction2longtitle}$/;"	s	part:Part2
+subsec5 text	Units/intro.tex.t/input.tex	/^\\subsection[subsec5 text]*{subsection5}$/;"	u	section:Part2""shorter intro2
+subsection2	Units/intro.tex.t/input.tex	/^\\subsection{subsection2}$/;"	u	part:Part1
+subsubsection3 with extra text	Units/intro.tex.t/input.tex	/^\\subsubsection{subsubsection3 with extra text}$/;"	b	subsection:Part1""subsection2
+subsubsection6 with extra text	Units/intro.tex.t/input.tex	/^\\subsubsection{subsubsection6 with extra text}$/;"	b	subsection:Part2""shorter intro2""subsec5 text

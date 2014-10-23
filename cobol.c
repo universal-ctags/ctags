@@ -36,14 +36,14 @@ static void installCobolRegex (const langType language)
 		"\\1", "s,section,sections", "i");
 }
 
-extern parserDefinition* CobolParser ()
+extern parserDefinition* CobolParser (void)
 {
 	static const char *const extensions [] = {
 			"cbl", "cob", "CBL", "COB", NULL };
 	parserDefinition* def = parserNew ("Cobol");
 	def->extensions = extensions;
 	def->initialize = installCobolRegex;
-	def->regex      = TRUE;
+	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }
 

@@ -229,4 +229,35 @@ extern void vStringSetLength (vString *const string)
 	string->length = strlen (string->buffer);
 }
 
+extern vString *vStringNewOwn (char *s)
+{
+	vString *r;
+
+	r = vStringNewInit (s);
+	eFree (s);
+
+	return r;
+}
+
+extern char    *vStringDeleteUnwrap       (vString *const string)
+{
+	char *buffer = NULL;
+
+
+	if (string != NULL)
+	{
+		buffer = string->buffer;
+		string->buffer = NULL;
+
+		string->size = 0;
+		string->length = 0;
+
+		eFree (string);
+	}
+
+	return buffer;
+}
+
+
+
 /* vi:set tabstop=4 shiftwidth=4: */

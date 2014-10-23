@@ -1,0 +1,49 @@
+Ball1	Units/jsFunc_tutorial.js.t/input.js	/^function Ball1()       \/\/ it may seem odd, but this declaration$/;"	f
+Ball3	Units/jsFunc_tutorial.js.t/input.js	/^function Ball3()       \/\/ it may seem odd, but declaration$/;"	f
+D1	Units/jsFunc_tutorial.js.t/input.js	/^function D1(a, b) $/;"	f
+D2	Units/jsFunc_tutorial.js.t/input.js	/^var D2=function(a, b) $/;"	f
+D2A	Units/jsFunc_tutorial.js.t/input.js	/^var D2A=function theAdd(a, b) $/;"	f
+D3	Units/jsFunc_tutorial.js.t/input.js	/^var D3=new Function("a", "b", "return a+b;");$/;"	f
+D4	Units/jsFunc_tutorial.js.t/input.js	/^var D4=new Function("a", "b", $/;"	f
+D5	Units/jsFunc_tutorial.js.t/input.js	/^function D5(myOperator)$/;"	f
+DT1	Units/jsFunc_tutorial.js.t/input.js	/^function DT1()$/;"	f
+DT2	Units/jsFunc_tutorial.js.t/input.js	/^function DT2(message)$/;"	f
+DT2A	Units/jsFunc_tutorial.js.t/input.js	/^function DT2A(message)$/;"	f
+DT3	Units/jsFunc_tutorial.js.t/input.js	/^function DT3()$/;"	f
+DT4	Units/jsFunc_tutorial.js.t/input.js	/^function DT4(message, specifiedName)$/;"	c
+DT5	Units/jsFunc_tutorial.js.t/input.js	/^function DT5(color, specifiedName, owner, weight)$/;"	c
+DT6	Units/jsFunc_tutorial.js.t/input.js	/^function DT6(name, salary, mySupervisor)$/;"	c
+DT7	Units/jsFunc_tutorial.js.t/input.js	/^function DT7(name, salary)$/;"	c
+DT7A	Units/jsFunc_tutorial.js.t/input.js	/^function DT7A(name, salary)$/;"	c
+DT8	Units/jsFunc_tutorial.js.t/input.js	/^function DT8(name, salary)$/;"	c
+DT9	Units/jsFunc_tutorial.js.t/input.js	/^function DT9(name, salary)$/;"	c
+PT1	Units/jsFunc_tutorial.js.t/input.js	/^function PT1()$/;"	f
+PT2	Units/jsFunc_tutorial.js.t/input.js	/^function PT2(name, color)$/;"	c
+PT3	Units/jsFunc_tutorial.js.t/input.js	/^function PT3(name, salary)$/;"	c
+add	Units/jsFunc_tutorial.js.t/input.js	/^myObject.add=function(a,b){return a+b};  $/;"	f	function:myObject
+addSalary	Units/jsFunc_tutorial.js.t/input.js	/^PT3.prototype.addSalary=function addSalaryFunction(addition)$/;"	m	class:PT3
+addSalaryFunction	Units/jsFunc_tutorial.js.t/input.js	/^function addSalaryFunction(addition)$/;"	c
+addSalaryFunctionDT9	Units/jsFunc_tutorial.js.t/input.js	/^function addSalaryFunctionDT9(addition)$/;"	c
+calculate	Units/jsFunc_tutorial.js.t/input.js	/^  function calculate(number)$/;"	f	function:getHalfOf7
+calculate	Units/jsFunc_tutorial.js.t/input.js	/^  function calculate(number)$/;"	f	function:getHalfOf8
+calculate8	Units/jsFunc_tutorial.js.t/input.js	/^function calculate8(number)$/;"	f
+getHalfOf7	Units/jsFunc_tutorial.js.t/input.js	/^function getHalfOf7(num1, num2, num3)     $/;"	f
+getHalfOf8	Units/jsFunc_tutorial.js.t/input.js	/^function getHalfOf8(num1, num2, num3)     $/;"	f
+getSalary	Units/jsFunc_tutorial.js.t/input.js	/^  this.getSalary=function()$/;"	m	class:DT7
+getSalary	Units/jsFunc_tutorial.js.t/input.js	/^  this.getSalary=function()$/;"	m	class:DT7A
+getSalary	Units/jsFunc_tutorial.js.t/input.js	/^  this.getSalary=function()$/;"	m	class:DT8
+getSalary	Units/jsFunc_tutorial.js.t/input.js	/^PT3.prototype.getSalary=function getSalaryFunction()$/;"	m	class:PT3
+getSalaryFunctionDT9	Units/jsFunc_tutorial.js.t/input.js	/^function getSalaryFunctionDT9()$/;"	f
+livesIn	Units/jsFunc_tutorial.js.t/input.js	/^PT2.prototype.livesIn="water";$/;"	m	class:PT2
+myFunction4	Units/jsFunc_tutorial.js.t/input.js	/^function myFunction4(message) $/;"	f
+myFunction5	Units/jsFunc_tutorial.js.t/input.js	/^function myFunction5() $/;"	f
+myFunction6	Units/jsFunc_tutorial.js.t/input.js	/^function myFunction6() $/;"	f
+myFunction6A	Units/jsFunc_tutorial.js.t/input.js	/^function myFunction6A() $/;"	f
+myFunction6AE	Units/jsFunc_tutorial.js.t/input.js	/^myFunction6AE=function()$/;"	f
+myFunction6B	Units/jsFunc_tutorial.js.t/input.js	/^function myFunction6B() $/;"	f
+myFunction6E	Units/jsFunc_tutorial.js.t/input.js	/^myFunction6E=function()$/;"	f
+my_global_var1	Units/jsFunc_tutorial.js.t/input.js	/^var my_global_var1 = 'global';$/;"	v
+price	Units/jsFunc_tutorial.js.t/input.js	/^PT2.prototype.price=20;$/;"	m	class:PT2
+savedFunc6B	Units/jsFunc_tutorial.js.t/input.js	/^savedFunc6B=function()$/;"	f
+sayName4A	Units/jsFunc_tutorial.js.t/input.js	/^function sayName4A(name) $/;"	f
+theAdd	Units/jsFunc_tutorial.js.t/input.js	/^var D2A=function theAdd(a, b) $/;"	f

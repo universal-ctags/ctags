@@ -1,0 +1,2 @@
+f	Units/bug816636.sml.t/input.sml	/^fun f x = 1 + g x$/;"	f
+g	Units/bug816636.sml.t/input.sml	/^and g x = 2 + f 0;$/;"	f

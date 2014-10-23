@@ -518,7 +518,7 @@ static void makeTag (tokenInfo *const token, const goKind kind)
 	}
 }
 
-static void parsePackage (tokenInfo *const token)
+static void parsePackage (tokenInfo *const token __unused__)
 {
 	tokenInfo *const name = newToken ();
 

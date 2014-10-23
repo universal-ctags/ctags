@@ -52,6 +52,7 @@
 *   MACROS
 */
 #define PSEUDO_TAG_PREFIX       "!_"
+#define PSEUDO_TAG_SEPARATOR    "!"
 
 #define includeExtensionFlags()         (Option.tagFileFormat > 1)
 
@@ -127,14 +128,19 @@ static void rememberMaxLengths (const size_t nameLength, const size_t lineLength
 		TagFile.max.line = lineLength;
 }
 
-static void writePseudoTag (
+extern void writePseudoTag (
 		const char *const tagName,
 		const char *const fileName,
-		const char *const pattern)
+		const char *const pattern,
+		const char *const language)
 {
-	const int length = fprintf (
-			TagFile.fp, "%s%s\t%s\t/%s/\n",
-			PSEUDO_TAG_PREFIX, tagName, fileName, pattern);
+	const int length = language
+	  ? fprintf (TagFile.fp, "%s%s%s%s\t%s\t%s\n",
+		     PSEUDO_TAG_PREFIX, tagName,
+		     PSEUDO_TAG_SEPARATOR, language, fileName, pattern)
+	  : fprintf (TagFile.fp, "%s%s\t%s\t/%s/\n",
+		     PSEUDO_TAG_PREFIX, tagName, fileName, pattern);
+
 	++TagFile.numTags.added;
 	rememberMaxLengths (strlen (tagName), (size_t) length);
 }
@@ -154,15 +160,16 @@ static void addPseudoTags (void)
 			formatComment =
 				"extended format; --format=1 will not append ;\" to lines";
 
-		writePseudoTag ("TAG_FILE_FORMAT", format, formatComment);
+		writePseudoTag ("TAG_FILE_FORMAT", format, formatComment, NULL);
 		writePseudoTag ("TAG_FILE_SORTED",
 			Option.sorted == SO_FOLDSORTED ? "2" :
 			(Option.sorted == SO_SORTED ? "1" : "0"),
-			"0=unsorted, 1=sorted, 2=foldcase");
-		writePseudoTag ("TAG_PROGRAM_AUTHOR",  AUTHOR_NAME,  AUTHOR_EMAIL);
-		writePseudoTag ("TAG_PROGRAM_NAME",    PROGRAM_NAME, "");
-		writePseudoTag ("TAG_PROGRAM_URL",     PROGRAM_URL,  "official site");
-		writePseudoTag ("TAG_PROGRAM_VERSION", PROGRAM_VERSION, "");
+			"0=unsorted, 1=sorted, 2=foldcase",
+			NULL);
+		writePseudoTag ("TAG_PROGRAM_AUTHOR",  AUTHOR_NAME,  AUTHOR_EMAIL, NULL);
+		writePseudoTag ("TAG_PROGRAM_NAME",    PROGRAM_NAME, "", NULL);
+		writePseudoTag ("TAG_PROGRAM_URL",     PROGRAM_URL,  "official site", NULL);
+		writePseudoTag ("TAG_PROGRAM_VERSION", PROGRAM_VERSION, "", NULL);
 	}
 }
 

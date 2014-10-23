@@ -1,0 +1,5 @@
+Main	Units/keyword_public.cs.t/input.cs	/^   public static void Main() $/;"	m	class:MyClass2
+MyClass1	Units/keyword_public.cs.t/input.cs	/^class MyClass1 $/;"	c
+MyClass2	Units/keyword_public.cs.t/input.cs	/^class MyClass2 $/;"	c
+x	Units/keyword_public.cs.t/input.cs	/^   public int x; $/;"	f	class:MyClass1
+y	Units/keyword_public.cs.t/input.cs	/^   public int y;$/;"	f	class:MyClass1

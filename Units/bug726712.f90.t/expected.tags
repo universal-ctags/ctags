@@ -1,0 +1,3 @@
+sub1	Units/bug726712.f90.t/input.f90	/^      subroutine sub1(/;"	s
+sub2	Units/bug726712.f90.t/input.f90	/^      subroutine sub2(/;"	s
+tagstest_ctrl	Units/bug726712.f90.t/input.f90	/^      subroutine tagstest_ctrl(/;"	s

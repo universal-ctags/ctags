@@ -1,0 +1,5 @@
+FooClass2	Units/bug872494.cpp.t/input.cpp	/^class FooClass2{};$/;"	c	file:
+TemplClass	Units/bug872494.cpp.t/input.cpp	/^template<> class TemplClass< char* > { int i;};$/;"	c	file:
+TemplClass	Units/bug872494.cpp.t/input.cpp	/^template<class T> class TemplClass { double i;};$/;"	c	file:
+i	Units/bug872494.cpp.t/input.cpp	/^template<> class TemplClass< char* > { int i;};$/;"	m	class:TemplClass	file:
+i	Units/bug872494.cpp.t/input.cpp	/^template<class T> class TemplClass { double i;};$/;"	m	class:TemplClass	file:

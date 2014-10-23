@@ -1,0 +1,9 @@
+ClassExample	Units/simple.rb.t/input.rb	/^    class ClassExample$/;"	c	class:ModuleExample
+ModuleExample	Units/simple.rb.t/input.rb	/^module ModuleExample$/;"	m
+`	Units/simple.rb.t/input.rb	/^        def `(command)$/;"	f	class:ModuleExample.ClassExample
+class_method	Units/simple.rb.t/input.rb	/^        def class_method$/;"	f	class:ModuleExample.ClassExample
+class_method_exclamation!	Units/simple.rb.t/input.rb	/^        def class_method_exclamation!$/;"	f	class:ModuleExample.ClassExample
+class_method_question?	Units/simple.rb.t/input.rb	/^        def class_method_question?$/;"	f	class:ModuleExample.ClassExample
+module_method	Units/simple.rb.t/input.rb	/^    def module_method$/;"	f	class:ModuleExample
+singleton_class_method	Units/simple.rb.t/input.rb	/^        def ClassExample.singleton_class_method$/;"	F	class:ModuleExample.ClassExample
+singleton_module_method	Units/simple.rb.t/input.rb	/^    def ModuleExample.singleton_module_method$/;"	F	class:ModuleExample

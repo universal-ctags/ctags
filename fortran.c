@@ -427,7 +427,7 @@ static tokenInfo *newToken (void)
 
 static tokenInfo *newTokenFrom (tokenInfo *const token)
 {
-	tokenInfo *result = newToken ();
+	tokenInfo *result = xMalloc (1, tokenInfo);
 	*result = *token;
 	result->string = vStringNewCopy (token->string);
 	token->secondary = NULL;

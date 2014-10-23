@@ -1,0 +1,19 @@
+FUNCTION_LIKE	Units/directives.c.t/input.c	3;"	d	file:
+MACRO_TO_SEE1	Units/directives.c.t/input.c	11;"	d	file:
+MACRO_TO_SEE2	Units/directives.c.t/input.c	14;"	d	file:
+MACRO_TO_SEE3	Units/directives.c.t/input.c	17;"	d	file:
+MACRO_TO_SEE4	Units/directives.c.t/input.c	20;"	d	file:
+PATH1	Units/directives.c.t/input.c	41;"	d	file:
+PATH1b	Units/directives.c.t/input.c	58;"	d	file:
+SEE_THIS_MACRO	Units/directives.c.t/input.c	35;"	d	file:
+VARIABLE_LIKE	Units/directives.c.t/input.c	2;"	d	file:
+WeakSymbol	Units/directives.c.t/input.c	4;"	d	file:
+a	Units/directives.c.t/input.c	/^int a;$/;"	v
+b	Units/directives.c.t/input.c	/^int b;$/;"	v
+bar1	Units/directives.c.t/input.c	/^int bar1 (void)$/;"	f
+c	Units/directives.c.t/input.c	/^int c;$/;"	v
+d	Units/directives.c.t/input.c	/^int d;$/;"	v
+foo1	Units/directives.c.t/input.c	/^int foo1 (void)$/;"	f
+g	Units/directives.c.t/input.c	/^int g;$/;"	v
+p1	Units/directives.c.t/input.c	/^int p1;$/;"	v
+with_long_comment	Units/directives.c.t/input.c	6;"	d	file:

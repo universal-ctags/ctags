@@ -1,0 +1,5 @@
+IMyInterface	Units/interface_indexers.cs.t/input.cs	/^public interface IMyInterface $/;"	i
+IndexerClass	Units/interface_indexers.cs.t/input.cs	/^class IndexerClass : IMyInterface$/;"	c
+Main	Units/interface_indexers.cs.t/input.cs	/^   public static void Main() $/;"	m	class:MainClass
+MainClass	Units/interface_indexers.cs.t/input.cs	/^public class MainClass $/;"	c
+myArray	Units/interface_indexers.cs.t/input.cs	/^   private int [] myArray = new int[100]; $/;"	f	class:IndexerClass	file:

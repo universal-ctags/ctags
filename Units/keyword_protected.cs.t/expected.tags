@@ -1,0 +1,5 @@
+Main	Units/keyword_protected.cs.t/input.cs	/^   public static void Main() $/;"	m	class:MyDerivedC
+MyClass	Units/keyword_protected.cs.t/input.cs	/^class MyClass $/;"	c
+MyDerivedC	Units/keyword_protected.cs.t/input.cs	/^class MyDerivedC: MyClass $/;"	c
+x	Units/keyword_protected.cs.t/input.cs	/^   protected int x; $/;"	f	class:MyClass
+y	Units/keyword_protected.cs.t/input.cs	/^   protected int y;$/;"	f	class:MyClass

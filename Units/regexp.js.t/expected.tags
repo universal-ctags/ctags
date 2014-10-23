@@ -1,0 +1,14 @@
+no_re1	Units/regexp.js.t/input.js	/^var no_re1 = 1 \/ 2;$/;"	v
+no_re2	Units/regexp.js.t/input.js	/^var no_re2 = 1 + (1 + 2) \/ 3;$/;"	v
+no_re3	Units/regexp.js.t/input.js	/^var no_re3 = 1 + {0:1}[0] \/ 2;$/;"	v
+no_re4	Units/regexp.js.t/input.js	/^var no_re4 = 1 + {0:1} \/ 8; \/\/ gives NaN$/;"	v
+no_re5	Units/regexp.js.t/input.js	/^var no_re5 = "foo" \/ 2; \/\/ so does this$/;"	v
+no_re6	Units/regexp.js.t/input.js	/^var no_re6 = no_re1 \/ 2;$/;"	v
+re1	Units/regexp.js.t/input.js	/^var re1 = \/foo\/;$/;"	v
+re2	Units/regexp.js.t/input.js	/^var re2 = \/\\\/\/;$/;"	v
+re3	Units/regexp.js.t/input.js	/^var re3 = \/[\/]\/;$/;"	v
+re4	Units/regexp.js.t/input.js	/^var re4 = \/'\/;$/;"	v
+re5	Units/regexp.js.t/input.js	/^var re5 = \/["'\/]\/;$/;"	v
+re6	Units/regexp.js.t/input.js	/^var re6 = \/\\(([a-z]*_)+\/;$/;"	v
+str1	Units/regexp.js.t/input.js	/^var str1 = "a\/b\/c".replace(\/\\\/\/g, '-');$/;"	v
+str2	Units/regexp.js.t/input.js	/^var str2 = "Hello".replace(\/O\/ig, 'O');$/;"	v

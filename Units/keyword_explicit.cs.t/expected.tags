@@ -1,0 +1,6 @@
+Digit	Units/keyword_explicit.cs.t/input.cs	/^   public Digit(byte value) $/;"	m	struct:Digit
+Digit	Units/keyword_explicit.cs.t/input.cs	/^struct Digit$/;"	s
+Main	Units/keyword_explicit.cs.t/input.cs	/^   public static void Main() $/;"	m	class:Test
+Test	Units/keyword_explicit.cs.t/input.cs	/^class Test $/;"	c
+operator Digit	Units/keyword_explicit.cs.t/input.cs	/^   public static explicit operator Digit(byte b) $/;"	m	struct:Digit
+value	Units/keyword_explicit.cs.t/input.cs	/^   byte value;$/;"	f	struct:Digit

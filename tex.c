@@ -274,6 +274,8 @@ static void makeTexTag (tokenInfo *const token, texKind kind)
 		}
 
 		makeTagEntry (&e);
+		vStringDelete (parentKind);
+		vStringDelete (parentName);
 	}
 }
 
@@ -553,7 +555,7 @@ static void initialize (const langType language)
 	lastSubSubS = vStringNew();
 }
 
-static void finalize (const langType language)
+static void finalize (const langType language __unused__)
 {
 	vStringDelete(lastPart);
 	lastPart = NULL;

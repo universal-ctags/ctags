@@ -1,0 +1,3 @@
+p1	Units/sql_single_quote.sql.t/input.sql	/^CREATE PROCEDURE "p1"($/;"	p
+p2	Units/sql_single_quote.sql.t/input.sql	/^CREATE PROCEDURE "p2"($/;"	p
+p3	Units/sql_single_quote.sql.t/input.sql	/^CREATE PROCEDURE "p3"($/;"	p

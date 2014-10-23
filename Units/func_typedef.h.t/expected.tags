@@ -1,0 +1,1 @@
+symlist_t	Units/func_typedef.h.t/input.h	/^typedef SLIST_HEAD(symlist, symbol_node) symlist_t;$/;"	t

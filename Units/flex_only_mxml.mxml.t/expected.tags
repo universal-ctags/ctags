@@ -1,0 +1,8 @@
+Array.forms	Units/flex_only_mxml.mxml.t/input.mxml	/^	<mx:Array id="forms">$/;"	x
+Button.ls_bt_log_in_out	Units/flex_only_mxml.mxml.t/input.mxml	/^					<mx:Button id="ls_bt_log_in_out" x="240" y="238" label="{logInOut}" enabled="true" click="onButtonClick(event)"\/>$/;"	x
+Form.form_login_screen	Units/flex_only_mxml.mxml.t/input.mxml	/^		<mx:Form label="{logInOut}" width="100%" height="100%" id="form_login_screen">$/;"	x
+HTTPService.myHTTPService	Units/flex_only_mxml.mxml.t/input.mxml	/^		id="myHTTPService"$/;"	x
+Label.ls_lb_welcome	Units/flex_only_mxml.mxml.t/input.mxml	/^					<mx:Label x="194" y="287" width="315" id="ls_lb_welcome" fontSize="16" fontWeight="bold"\/>$/;"	x
+TextInput.ls_ti_passwd	Units/flex_only_mxml.mxml.t/input.mxml	/^					<mx:TextInput id="ls_ti_passwd" x="240" y="206" displayAsPassword="true" text="Demo05"\/>$/;"	x
+TextInput.ls_ti_username	Units/flex_only_mxml.mxml.t/input.mxml	/^					<mx:TextInput id="ls_ti_username" x="240" y="174" text="admin"\/>$/;"	x
+ViewStack.viewstack1	Units/flex_only_mxml.mxml.t/input.mxml	/^	<mx:ViewStack x="149" y="55" id="viewstack1" width="831" height="605" change="onChangeViewStack(event);" >$/;"	x

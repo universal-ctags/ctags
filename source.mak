@@ -3,9 +3,9 @@
 # Shared macros
 
 HEADERS = \
-	args.h ctags.h debug.h entry.h flags.h general.h get.h keyword.h \
-	main.h options.h parse.h parsers.h read.h routines.h sort.h \
-	strlist.h trash.h vstring.h
+	args.h ctags.h debug.h entry.h flags.h general.h get.h htable.h keyword.h \
+	main.h options.h parse.h parsers.h pcoproc.h read.h routines.h sort.h \
+	strlist.h trashbox.h vstring.h
 
 SOURCES = \
 	ada.c \
@@ -30,11 +30,13 @@ SOURCES = \
 	get.c \
 	go.c \
 	html.c \
+	htable.c \
 	jscript.c \
 	keyword.c \
 	lisp.c \
 	lregex.c \
 	lua.c \
+	lxcmd.c \
 	main.c \
 	make.c \
 	matlab.c \
@@ -43,6 +45,7 @@ SOURCES = \
 	options.c \
 	parse.c \
 	pascal.c \
+	pcoproc.c \
 	perl.c \
 	php.c \
 	python.c \
@@ -60,7 +63,7 @@ SOURCES = \
 	tcl.c \
 	tex.c \
 	tg.c \
-	trash.c \
+	trashbox.c \
 	verilog.c \
 	vhdl.c \
 	vim.c \
@@ -105,11 +108,13 @@ OBJECTS = \
 	get.$(OBJEXT) \
 	go.$(OBJEXT) \
 	html.$(OBJEXT) \
+	htable.$(OBJEXT) \
 	jscript.$(OBJEXT) \
 	keyword.$(OBJEXT) \
 	lisp.$(OBJEXT) \
 	lregex.$(OBJEXT) \
 	lua.$(OBJEXT) \
+	lxcmd.$(OBJEXT) \
 	main.$(OBJEXT) \
 	make.$(OBJEXT) \
 	matlab.$(OBJEXT) \
@@ -118,6 +123,7 @@ OBJECTS = \
 	options.$(OBJEXT) \
 	parse.$(OBJEXT) \
 	pascal.$(OBJEXT) \
+	pcoproc.$(OBJEXT) \
 	perl.$(OBJEXT) \
 	php.$(OBJEXT) \
 	python.$(OBJEXT) \
@@ -135,7 +141,7 @@ OBJECTS = \
 	tcl.$(OBJEXT) \
 	tex.$(OBJEXT) \
 	tg.$(OBJEXT) \
-	trash.$(OBJEXT) \
+	trashbox.$(OBJEXT) \
 	verilog.$(OBJEXT) \
 	vhdl.$(OBJEXT) \
 	vim.$(OBJEXT) \

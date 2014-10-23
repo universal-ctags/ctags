@@ -1,0 +1,3 @@
+funcon	Units/initialization.f90.t/input.f90	/^      MODULE funcon$/;"	m
+imat	Units/initialization.f90.t/input.f90	/^         imat=/;"	v	module:funcon
+imat6	Units/initialization.f90.t/input.f90	/^         imat6=/;"	v	module:funcon

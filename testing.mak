@@ -18,29 +18,54 @@ DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
 DIFF_BASE = if diff $(DIFF_OPTIONS) $1 $2 > $3; then \
 		rm -f $1 $2 $3 $4; \
 		echo "passed" ; \
+		n_passed=$$(expr $$n_passed + 1); \
 		true ; \
 	  elif test -d $(5).b; then \
 		echo "failed but KNOWN bug" ; \
+		n_known_bugs=$$(expr $$n_known_bugs + 1); \
 		true ; \
 	  else \
 		echo "FAILED" ; \
 		echo "	differences left in $3" ; \
+		n_failed=$$(expr $$n_failed + 1); \
+		failed_cases="$$failed_cases $5" ; \
 		false ; \
 	  fi
 
-CHECK_FEATURES = (\
-	while read; do \
+DEFINE_CHECK_LANGUAGES  =\
+check_languages()\
+{       local expected; \
+	while read expected; do \
 		found=no; \
-		for f in $$( $(CTAGS_TEST) --list-features); do \
-			if test "$$REPLY" = "$$f"; then found=yes; fi; \
+		for f in $$( $(UNIT_CTAGS_CMDLINE) --list-languages  2>/dev/null) ; do \
+			if test "$$expected" = "$$f"; then found=yes; fi; \
 		done; \
 		if ! test $$found = yes; then \
-			echo "skipped (required feature $$REPLY is not available)"; \
-			exit 1; \
+			n_skipped_languages=$$(expr $$n_skipped_languages + 1); \
+			echo "skipped (required language parser $$expected is not available)"; \
+			return 1; \
 		fi; \
-	done < $1; \
-	exit 0; \
-)
+	done < $$1; \
+	return 0; \
+}
+
+DEFINE_CHECK_FEATURES =\
+check_features()\
+{       local expected; \
+	while read expected; do \
+		found=no; \
+		for f in $$( $(CTAGS_TEST) --list-features); do \
+			if test "$$expected" = "$$f"; then found=yes; fi; \
+		done; \
+		if ! test $$found = yes; then \
+			n_skipped_features=$$(expr $$n_skipped_features + 1); \
+			echo "skipped (required feature $$expected is not available)"; \
+			return 1; \
+		fi; \
+	done < $$1; \
+	return 0; \
+}
+
 #
 # Run unit test s under valgrind:
 #
@@ -49,11 +74,29 @@ CHECK_FEATURES = (\
 VALGRIND_COMMAND       = valgrind
 VALGRIND_OPTIONS       = --quiet --leak-check=full
 VALGRIND_EXTRA_OPTIONS =
+
 ifdef VG
 VALGRIND = $(VALGRIND_COMMAND) $(VALGRIND_OPTIONS) $(VALGRIND_EXTRA_OPTIONS)
+ifeq ($(SHELL),/bin/bash)
+define STDERR
+	2> >(grep -v 'No options will be read from files or environment'  | \
+		tee $(1).vg | tee $(1) 1>&2; \
+		if ! grep -q "^==" $(1).vg; then \
+			rm $(1).vg; \
+		fi; \
+		)
+endef
+else
+define STDERR
+endef
+endif
+else
+define STDERR
+	2> $1
+endef
 endif
 
-.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units fuzz
+.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units fuzz clean clean-test
 
 test: test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units
 
@@ -130,13 +173,34 @@ test.linux: $(CTAGS_TEST) $(CTAGS_REF)
 endif
 
 
-UNITS_ARTIFACTS=Units/*.[db]/EXPECTED.TMP Units/*.[db]/OUTPUT.TMP Units/*.[db]/DIFF.TMP
+UNITS_ARTIFACTS=Units/*.[dbt]/{EXPECTED.TMP,OUTPUT.TMP,DIFF.TMP,STDERR.TMP,STDERR.TMP.vg}
+UNIT_CTAGS_CMDLINE=$(call unit-ctags-cmdline)
+define unit-ctags-cmdline
+	$(CTAGS_TEST) --options=NONE --libexec-dir=libexec --libexec-dir=+$$t --data-dir=data --data-dir=+$$t -o - \
+		$$(test -f "$${args}" && echo "--options=$${args}")
+endef
+
 test.units: $(CTAGS_TEST)
 	@ \
 	success=true; \
-	for input in $$(ls Units/*.[db]/input.* | grep -v "~$$"); do \
+	n_passed=0; \
+	failed_cases=; \
+	n_failed=0; \
+	n_skipped_features=0; \
+	n_skipped_languages=0; \
+	n_known_bugs=0; \
+	if [ -n "$(VALGRIND)" -a -n "$(UNIT)" ]; then \
+		rm -f Units/$(UNIT).[dbt]/STDERR.TMP.vg; \
+	elif [ -n "$(VALGRIND)" ]; then \
+		rm -f Units/*.[dbt]/STDERR.TMP.vg; \
+	fi; \
+	$(DEFINE_CHECK_FEATURES); \
+	$(DEFINE_CHECK_LANGUAGES); \
+	for input in $$(ls Units/*.[dbt]/input.* | grep -v "~$$"); do \
 		t=$${input%/input.*}; \
-		name=$${t%.[db]}; \
+		name=$${t%.[dbt]}; \
+		\
+		if test -n "$(UNIT)" -a "$${name}" != "Units/$(UNIT)"; then continue; fi; \
 		\
 		expected="$$t"/expected.tags; \
 		expectedtmp="$$t"/EXPECTED.TMP; \
@@ -146,28 +210,58 @@ test.units: $(CTAGS_TEST)
 		diff="$$t"/DIFF.TMP; \
 		stderr="$$t"/STDERR.TMP; \
 		features="$$t"/features; \
+		languages="$$t"/languages; \
 		\
 		echo -n "Testing $${name}..."; \
 		\
 		if test -e "$$features"; then \
-			if ! $(call CHECK_FEATURES, "$$features"); then \
+			if ! check_features "$$features"; then \
 				continue; \
 			fi; \
 		fi; \
-		$(VALGRIND) $(CTAGS_TEST) --options=NONE --data-dir=Data --data-dir=+$$t -o - \
-		$$(test -f "$${args}" && echo "--options=$${args}") \
-		"$$input" 2> "$$stderr" | \
+		if test -e "$$languages"; then \
+			if ! check_languages "$$languages"; then \
+				continue; \
+			fi; \
+		fi; \
+		$(VALGRIND) $(UNIT_CTAGS_CMDLINE) \
+		"$$input" $(call STDERR,"$$stderr") | \
 		if test -x "$$filter"; then "$$filter"; else cat; fi > "$${output}";	\
 		cp "$$expected" "$$expectedtmp"; \
 		$(call DIFF_BASE,"$$expectedtmp","$$output","$$diff","$$stderr","$$name"); \
 		test $$? -eq 0 || { echo "	cmdline: " \
-					$(CTAGS_TEST) --options=NONE --data-dir=Data --data-dir=+$$t -o - \
-					$$(test -f "$${args}" && echo "--options=$${args}") "$$input" ;\
+					$(UNIT_CTAGS_CMDLINE) "$$input" ;\
 				    success=false; }; \
 	done; \
+	echo; \
+	echo '  Summary of "Units" test'; \
+	echo '  -------------------------'; \
+	echo '	#passed: ' $$n_passed; \
+	echo '	#failed: ' $$n_failed; \
+	for f in $$failed_cases; do echo "		$$f"; done; \
+	echo '	#skipped(features): ' $$n_skipped_features; \
+	echo '	#skipped(languages): ' $$n_skipped_languages; \
+	echo '	#known-bugs: ' $$n_known_bugs; \
+	if [ -n "$(VALGRIND)" -a "$(SHELL)" = /bin/bash -a -n "$(UNIT)" ]; then \
+		if [ -f Units/$(UNIT).[dbt]/STDERR.TMP.vg ]; then\
+			echo '	#valgrind: 1'; \
+			echo '		$(UNIT)'; \
+		else \
+			echo '	#valgrind: 0'; \
+		fi; \
+	elif [ -n "$(VALGRIND)" -a "$(SHELL)" = /bin/bash ]; then \
+		echo '	#valgrind: ' $$(find Units -name 'STDERR.TMP.vg' |  wc -l); \
+		find Units -name 'STDERR.TMP.vg' | \
+		xargs -n 1 dirname 2>/dev/null | \
+		xargs -n 1 basename 2>/dev/null | \
+		sed -e 's/\(.*\)\../\1/' | \
+		xargs -n 1 echo "		"; \
+	fi; \
+	echo; \
 	$$success
 
 TEST_ARTIFACTS = test.*.diff tags.ref ctags.ref.exe tags.test $(UNITS_ARTIFACTS)
+clean: clean-test
 clean-test:
 	rm -f $(TEST_ARTIFACTS)
 
@@ -184,7 +278,7 @@ fuzz:
 	@ echo "No timeout command of find found"
 else
 
-define run-ctags
+define run-fuzz-ctags
 	if ! timeout -s INT $(FUZZ_TIMEOUT) \
 		$(CTAGS_TEST) --language-force=$1 -o - $2 \
 		> /dev/null 2>&1; then \
@@ -197,13 +291,13 @@ fuzz: $(CTAGS_TEST)
 	for lang in $$($(CTAGS_TEST) --list-languages); do \
 		if test -z "$(FUZZ_LANGUAGE)" || test "$(FUZZ_LANGUAGE)" = "$${lang}"; then \
 			echo "Fuzz-testing: $${lang}"; \
-			for input in Test/* Units/*.[db]/input.*; do \
-				$(call run-ctags,"$${lang}","$${input}"); \
+			for input in Test/* Units/*.[dbt]/input.*; do \
+				$(call run-fuzz-ctags,"$${lang}","$${input}"); \
 			done; \
 			for d in $(FUZZ_SRC_DIRS); do \
 				find "$$d" -type f \
 				| while read input; do \
-					$(call run-ctags,"$${lang}","$${input}"); \
+					$(call run-fuzz-ctags,"$${lang}","$${input}"); \
 				done; \
 			done; \
 		fi ; \

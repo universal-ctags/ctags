@@ -27,6 +27,8 @@ mandir	= @mandir@
 datadir = @datarootdir@/@PACKAGE_NAME@
 sysconfdir=@sysconfdir@
 pkgconfdir=@sysconfdir@/@PACKAGE_NAME@
+libexecdir=@libexecdir@
+pkglibexecdir=@libexecdir@/@PACKAGE_NAME@
 SLINK	= @LN_S@
 STRIP	= @STRIP@
 CC	= @CC@
@@ -54,7 +56,10 @@ OBJEXT	= @OBJEXT@
 #LDFLAGS=
 
 ALL_CFLAGS = $(CFLAGS) -Wall
-ALL_CPPFLAGS = $(CPPFLAGS) -DDATADIR=\"$(datadir)\" -DPKGCONFDIR=\"$(pkgconfdir)\"
+ALL_CPPFLAGS = $(CPPFLAGS)			\
+	-DDATADIR=\"$(datadir)\"		\
+	-DPKGCONFDIR=\"$(pkgconfdir)\"		\
+	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\"
 
 include $(srcdir)/source.mak
 
@@ -65,7 +70,7 @@ include $(srcdir)/source.mak
 .SUFFIXES:
 .SUFFIXES: .c .$(OBJEXT)
 
-VPATH	= $(srcdir) $(srcdir)/Data/corpora $(srcdir)/Data/optlib
+VPATH	= $(srcdir) $(srcdir)/data/corpora $(srcdir)/data/optlib
 
 INSTALL		= cp -p
 INSTALL_PROG	= $(INSTALL)
@@ -99,7 +104,15 @@ CORPORA    = ctags.ctags RFC1213-MIB.txt
 #
 preloaddir = $(datadir)/preload
 pkgconf_preloaddir = $(pkgconfdir)/preload
-PRELOAD_OPTLIB = ctags.ctags mib.ctags rust.ctags
+PRELOAD_OPTLIB =				\
+	\
+	coffee.ctags				\
+	ctags.ctags				\
+	mib.ctags				\
+	rust.ctags 				\
+	\
+	$(NULL)
+DEFAULT_PRELOAD_FILE=default.ctags
 
 #
 # config files
@@ -107,6 +120,13 @@ PRELOAD_OPTLIB = ctags.ctags mib.ctags rust.ctags
 optlibdir = $(datadir)/optlib
 pkgconf_optlibdir = $(pkgconfdir)/optlib
 OPTLIB    = $(PRELOAD_OPTLIB)
+
+#
+# drivers
+#
+driversdir = $(pkglibexecdir)/drivers
+DRIVERS = coffeetags
+
 
 #
 # destinations for installed files
@@ -155,7 +175,11 @@ install-strip: install
 install-ctags: install-cbin install-cman
 install-etags: install-ebin install-eman
 
-$(bindir) $(man1dir) $(libdir) $(incdir) $(corporadir) $(optlibdir) $(preloaddir) $(pkgconf_corporadir) $(pkgconf_optlibdir) $(pkgconf_preloaddir):
+INSTALLDIRS = $(bindir) $(man1dir) $(libdir) $(incdir) \
+	$(corporadir) $(optlibdir) $(preloaddir) $(driversdir) \
+	$(pkgconf_corporadir) $(pkgconf_optlibdir) $(pkgconf_preloaddir)
+
+$(addprefix $(DESTDIR),$(INSTALLDIRS)):
 	$(srcdir)/mkinstalldirs $@
 
 FORCE:
@@ -169,8 +193,7 @@ install-ebin: $(DEST_ETAGS)
 install-lib: $(DEST_READ_LIB) $(DEST_READ_INC)
 install-cmd: $(DEST_READ_CMD)
 
-$(DEST_CTAGS): $(CTAGS_EXEC) $(bindir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(bindir)
+$(DEST_CTAGS): $(CTAGS_EXEC) $(DESTDIR)$(bindir) FORCE
 	$(INSTALL_PROG) $(CTAGS_EXEC) $(DESTDIR)$@  &&  chmod 755 $(DESTDIR)$@
 
 $(DEST_ETAGS):
@@ -185,8 +208,7 @@ install-man: install-cman install-eman
 install-cman: $(DEST_CMAN)
 install-eman: $(DEST_EMAN)
 
-$(DEST_CMAN): $(man1dir) $(MANPAGE) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(man1dir)
+$(DEST_CMAN): $(DESTDIR)$(man1dir) $(MANPAGE) FORCE
 	- $(INSTALL_DATA) $(srcdir)/$(MANPAGE) $(DESTDIR)$@  &&  chmod 644 $(DESTDIR)$@
 
 $(DEST_EMAN):
@@ -197,49 +219,49 @@ $(DEST_EMAN):
 #
 # install the library
 #
-$(DEST_READ_LIB): $(READ_LIB) $(libdir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(libdir)
+$(DEST_READ_LIB): $(READ_LIB) $(DESTDIR)$(libdir) FORCE
 	$(INSTALL_PROG) $(READ_LIB) $(DESTDIR)$@  &&  chmod 644 $(DESTDIR)$@
 
-$(DEST_READ_INC): $(READ_INC) $(incdir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(incdir)
+$(DEST_READ_INC): $(READ_INC) $(DESTDIR)$(incdir) FORCE
 	$(INSTALL_PROG) $(READ_INC) $(DESTDIR)$@  &&  chmod 644 $(DESTDIR)$@
 
 #
 # install the readtags command
 #
-$(DEST_READ_CMD): $(READ_CMD) $(bindir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(bindir)
+$(DEST_READ_CMD): $(READ_CMD) $(DESTDIR)$(bindir) FORCE
 	$(INSTALL_PROG) $(READ_CMD) $(DESTDIR)$@  &&  chmod 755 $(DESTDIR)$@
 
 #
 # install data
 #
 install-data: @install_data_targets@
-install-data-corpora: $(addprefix Data/corpora/,$(CORPORA)) $(corporadir) $(pkgconf_corporadir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(corporadir)
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(pkgconf_corporadir)
+install-data-corpora: $(addprefix data/corpora/,$(CORPORA)) $(DESTDIR)$(corporadir) $(DESTDIR)$(pkgconf_corporadir) FORCE
 	for c in $(CORPORA); do \
-		$(INSTALL_DATA) $(srcdir)/Data/corpora/$$c $(DESTDIR)$(corporadir)/$$c && chmod 644 $(DESTDIR)$(corporadir)/$$c; \
+		$(INSTALL_DATA) $(srcdir)/data/corpora/$$c $(DESTDIR)$(corporadir)/$$c && chmod 644 $(DESTDIR)$(corporadir)/$$c; \
 	done
-install-data-optlib: $(addprefix Data/optlib/,$(OPTLIB))  $(optlibdir) $(pkgconf_optlibdir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(optlibdir)
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(pkgconf_optlibdir)
+install-data-optlib: $(addprefix data/optlib/,$(OPTLIB))  $(DESTDIR)$(optlibdir) $(DESTDIR)$(pkgconf_optlibdir) FORCE
 	for c in $(OPTLIB); do \
-		$(INSTALL_DATA) $(srcdir)/Data/optlib/$$c $(DESTDIR)$(optlibdir)/$$c && chmod 644 $(DESTDIR)$(optlibdir)/$$c; \
+		$(INSTALL_DATA) $(srcdir)/data/optlib/$$c $(DESTDIR)$(optlibdir)/$$c && chmod 644 $(DESTDIR)$(optlibdir)/$$c; \
 	done
-install-data-preload: $(preloaddir) $(pkgconf_preloaddir) FORCE
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(preloaddir)
-	$(srcdir)/mkinstalldirs $(DESTDIR)$(pkgconf_preloaddir)
+install-data-preload: $(DESTDIR)$(preloaddir) $(DESTDIR)$(pkgconf_preloaddir) FORCE
 	for c in $(PRELOAD_OPTLIB); do \
-		echo "--options=$$(basename $$c .ctags)" >> $(DESTDIR)$(preloaddir)/default.ctags; \
+		echo "--options=$$(basename $$c .ctags)" >> $(DESTDIR)$(preloaddir)/$(DEFAULT_PRELOAD_FILE); \
 	done; \
-	chmod 644 $(DESTDIR)$(preloaddir)/default.ctags
+	chmod 644 $(DESTDIR)$(preloaddir)/$(DEFAULT_PRELOAD_FILE)
+
+#
+# install libexec
+#
+install-libexec: @install_libexec_targets@
+install-libexec-drivers: $(addprefix libexec/drivers/,$(DRIVERS)) $(DESTDIR)$(driversdir) FORCE
+	for x in $(DRIVERS); do \
+		$(INSTALL_PROG) $(srcdir)/libexec/drivers/$$x $(DESTDIR)$(driversdir)/$$x && chmod 755 $(DESTDIR)$(driversdir)/$$x; \
+	done
 
 #
 # rules for uninstalling
 #
-uninstall: uninstall-bin uninstall-lib uninstall-cmd uninstall-man uninstall-data
+uninstall: uninstall-bin uninstall-lib uninstall-cmd uninstall-man uninstall-data uninstall-libexec
 
 uninstall-bin:
 	- rm -f $(DEST_CTAGS) $(DEST_ETAGS)
@@ -259,7 +281,7 @@ uninstall-ctags:
 uninstall-etags:
 	- rm -f $(DEST_ETAGS) $(DEST_EMAN)
 
-uninstall-data: uninstall-corpora uninstall-optlib
+uninstall-data: uninstall-corpora uninstall-optlib uninstall-preload
 	- rmdir $(datadir)
 	- rmdir $(pkgconfdir)
 
@@ -271,6 +293,17 @@ uninstall-optlib:
 	- rm -f $(addprefix $(optlibdir)/,$(OPTLIB))
 	- rmdir $(optlibdir)
 	- rmdir $(pkgconf_optlibdir)
+uninstall-preload:
+	- rm -f $(preloaddir)/$(DEFAULT_PRELOAD_FILE)
+	- rmdir $(preloaddir)
+	- rmdir $(pkgconf_preloaddir)
+
+uninstall-libexec: uninstall-drivers
+	- rmdir $(pkglibexecdir)
+
+uninstall-drivers:
+	- rm -f $(addprefix $(driversdir)/,$(DRIVERS))
+	- rmdir $(driversdir)
 
 #
 # miscellaneous rules
@@ -299,5 +332,12 @@ maintainerclean: distclean
 #
 .c.$(OBJEXT):
 	$(CC) -I. -I$(srcdir) $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $<
+
+#
+# check
+#
+include $(srcdir)/testing.mak
+check: $(CTAGS_TEST)
+	$(MAKE) -f testing.mak test.units
 
 # vi:set tabstop=8:

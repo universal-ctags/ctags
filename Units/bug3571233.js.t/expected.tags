@@ -1,0 +1,10 @@
+MyClass	Units/bug3571233.js.t/input.js	/^MyClass.prototype.method2 = function() {$/;"	c
+MyClass	Units/bug3571233.js.t/input.js	/^function MyClass() {$/;"	f
+function1	Units/bug3571233.js.t/input.js	/^function function1() {$/;"	f
+function2	Units/bug3571233.js.t/input.js	/^function2 = function() {$/;"	f
+method2	Units/bug3571233.js.t/input.js	/^MyClass.prototype.method2 = function() {$/;"	m	class:MyClass
+nestedFunction1	Units/bug3571233.js.t/input.js	/^  function nestedFunction1() {$/;"	f	function:MyClass.method2
+nestedFunction2	Units/bug3571233.js.t/input.js	/^  function nestedFunction2() {$/;"	f	function:MyClass.method2
+nestedFunction3	Units/bug3571233.js.t/input.js	/^  function nestedFunction3() {$/;"	f	function:function1
+nestedFunction4	Units/bug3571233.js.t/input.js	/^  function nestedFunction4() {$/;"	f	function:function2
+nestedFunction5	Units/bug3571233.js.t/input.js	/^  function nestedFunction5() {$/;"	f	function:function2
