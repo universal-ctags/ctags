@@ -1,5 +1,5 @@
+do_this_stuff	Units/3184782.sql.t/input.sql	/^procedure do_this_stuff is begin$/;"	p	package:p_test
+myfn1	Units/3184782.sql.t/input.sql	/^procedure myfn1 ($/;"	p	package:p_test
+myfn2	Units/3184782.sql.t/input.sql	/^procedure myfn2 ($/;"	p	package:p_test
 p_test	Units/3184782.sql.t/input.sql	/^create or replace package body p_test is$/;"	P
-p_test.do_this_stuff	Units/3184782.sql.t/input.sql	/^procedure do_this_stuff is begin$/;"	p
-p_test.myfn1	Units/3184782.sql.t/input.sql	/^procedure myfn1 ($/;"	p
-p_test.myfn2	Units/3184782.sql.t/input.sql	/^procedure myfn2 ($/;"	p
-p_test.process_this	Units/3184782.sql.t/input.sql	/^procedure process_this ($/;"	p
+process_this	Units/3184782.sql.t/input.sql	/^procedure process_this ($/;"	p	package:p_test
