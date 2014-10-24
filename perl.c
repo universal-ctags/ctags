@@ -375,18 +375,24 @@ static void findPerlTags (void)
 			spaceRequired = FALSE;
 			qualified = TRUE;
 		}
-		else if (strncmp((const char*) cp, "package", (size_t) 7) == 0)
+		else if (strncmp((const char*) cp, "package", (size_t) 7) == 0 &&
+				 ('\0' == cp[7] || isspace(cp[7])))
 		{
-			/* This will point to space after 'package' so that a tag
-			   can be made */
-			const unsigned char *space = cp += 7;
-
+			cp += 8;
+			while (isspace (*cp))
+				cp++;
+			while (!*cp || '#' == *cp) {
+				cp = fileReadLine ();
+				if (!cp)
+					goto END_MAIN_WHILE;
+				while (isspace (*cp))
+					cp++;
+			}
 			if (package == NULL)
 				package = vStringNew ();
 			else
 				vStringClear (package);
-			while (isspace (*cp))
-				cp++;
+			const unsigned char *const first = cp;
 			while (*cp && (int) *cp != ';'  &&  !isspace ((int) *cp))
 			{
 				vStringPut (package, (int) *cp);
@@ -394,9 +400,9 @@ static void findPerlTags (void)
 			}
 			vStringCatS (package, "::");
 
-			cp = space;	 /* Rewind */
+			cp = first;	 /* Rewind */
 			kind = K_PACKAGE;
-			spaceRequired = TRUE;
+			spaceRequired = FALSE;
 			qualified = TRUE;
 		}
 		else if (strncmp((const char*) cp, "format", (size_t) 6) == 0)

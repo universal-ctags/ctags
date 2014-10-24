@@ -1,0 +1,6 @@
+AL	Units/perl-two-line-package.t/input.pm	/^    AL;$/;"	p
+AL::wild_thing	Units/perl-two-line-package.t/input.pm	/^sub wild_thing {$/;"	s
+Peggy	Units/perl-two-line-package.t/input.pm	/^Peggy$/;"	p
+Peggy::eat_bonbons	Units/perl-two-line-package.t/input.pm	/^sub eat_bonbons {$/;"	s
+eat_bonbons	Units/perl-two-line-package.t/input.pm	/^sub eat_bonbons {$/;"	s
+wild_thing	Units/perl-two-line-package.t/input.pm	/^sub wild_thing {$/;"	s
