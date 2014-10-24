@@ -328,7 +328,7 @@ fi
 # Checks for header files
 # -----------------------
 
-AC_CHECK_HEADERS_ONCE([dirent.h fcntl.h fnmatch.h stat.h stdlib.h string.h])
+AC_CHECK_HEADERS_ONCE([dirent.h fcntl.h stat.h stdlib.h string.h])
 AC_CHECK_HEADERS_ONCE([time.h types.h unistd.h])
 AC_CHECK_HEADERS_ONCE([sys/dir.h sys/stat.h sys/times.h sys/types.h])
 
@@ -389,8 +389,13 @@ fi
 
 # Checks for library functions
 # ----------------------------
+AC_CHECK_FUNCS(fnmatch,[],[
+AC_LIBOBJ([fnmatch])
+CPPFLAGS="$CPPFLAGS -I${srcdir}/fnmatch"
+AC_DEFINE(HAVE_FNMATCH)
+])
+AC_CHECK_HEADERS(fnmatch.h)
 
-AC_CHECK_FUNCS(fnmatch)
 AC_CHECK_FUNCS(strstr)
 AC_CHECK_FUNCS(strcasecmp stricmp, break)
 AC_CHECK_FUNCS(strncasecmp strnicmp, break)

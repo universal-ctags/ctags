@@ -72,7 +72,7 @@ include $(srcdir)/source.mak
 .SUFFIXES: .c .$(OBJEXT)
 
 VPATH	= $(srcdir) $(srcdir)/data/corpora $(srcdir)/data/optlib \
-	$(srcdir)/gnu_regex
+	$(srcdir)/gnu_regex $(srcdir)/fnmatch
 
 INSTALL		= cp -p
 INSTALL_PROG	= $(INSTALL)
