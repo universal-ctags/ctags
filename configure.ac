@@ -477,6 +477,7 @@ fi
 ],[
 dnl Using bundled regex implementation
 AC_LIBOBJ([regex])
+CPPFLAGS="$CPPFLAGS -I${srcdir}/gnu_regex"
 AC_DEFINE(HAVE_REGCOMP)
 ])
 # if test yes = "$with_perl_regex"; then

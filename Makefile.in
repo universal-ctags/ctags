@@ -335,7 +335,7 @@ maintainerclean: distclean
 .c.$(OBJEXT):
 	$(CC) -I. -I$(srcdir) $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $<
 $(addsuffix .$(OBJEXT),$(basename $(notdir $(REGEX_SOURCES)))): ALL_CPPFLAGS += \
-	-D_GNU_SOURCE -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -I$(srcdir)/gnu_regex
+	-D_GNU_SOURCE -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1
 
 #
 # check
