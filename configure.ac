@@ -137,10 +137,6 @@ AC_DEFUN([CHECK_HEADER_DEFINE], [
 # Checks for configuration options
 # --------------------------------
 
-AC_ARG_WITH(posix-regex,
-	[AS_HELP_STRING([--with-posix-regex],
-		[use Posix regex interface, if available])])
-
 AC_ARG_ENABLE(readlib,
 	[AS_HELP_STRING([--enable-readlib],
 		[include readtags library object during install])])
@@ -450,24 +446,39 @@ if test "$have_setenv" != yes ; then
 	fi
 fi
 
-#
-# if test yes = "$CYGWIN"; then with_posix_regex=no; fi
-if test no != "$with_posix_regex"; then
-	AC_CHECK_FUNCS(regcomp)
-	AC_MSG_CHECKING(if regcomp works)
-	AC_TRY_RUN([
+dnl
+dnl
+dnl Check regcomp
+dnl
+dnl If it is found but broken, define REGCOMP_BROKEN.
+dnl If it is found but cannot be test brokenness, define CHECK_REGCOMP.
+dnl If it is not found, use bundled implementation.
+dnl
+dnl If CHECK_REGCOMP is defined, ctags itself check the brokenness at runtime
+dnl (cross-compiling is assumed here).
+dnl
+dnl
+dnl The final result can be check with ./ctags --list-features.
+dnl
+dnl
+AC_CHECK_FUNCS(regcomp,[
+AC_MSG_CHECKING(if regcomp works)
+AC_TRY_RUN([
 #include <sys/types.h>
 #include <regex.h>
 main() {
 	regex_t patbuf;
 	exit (regcomp (&patbuf, "/hello/", 0) != 0);
 }],regcomp_works=yes,regcomp_works=no,AC_DEFINE(CHECK_REGCOMP))
-	AC_MSG_RESULT($regcomp_works)
-	if test yes != "$regcomp_works"; then
-		AC_DEFINE(REGCOMP_BROKEN)
-	fi
+AC_MSG_RESULT($regcomp_works)
+if test yes != "$regcomp_works"; then
+	AC_DEFINE(REGCOMP_BROKEN)
 fi
-
+],[
+dnl Using bundled regex implementation
+AC_LIBOBJ([regex])
+AC_DEFINE(HAVE_REGCOMP)
+])
 # if test yes = "$with_perl_regex"; then
 # 	AC_MSG_CHECKING(for Perl regex library)
 # 	pcre_candidates="$with_perl_regex $HOME/local/lib* /usr*/local/lib* /usr/lib*"

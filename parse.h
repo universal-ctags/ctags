@@ -167,7 +167,7 @@ extern void resetRegexKinds (const langType language, boolean mode);
 extern boolean enableRegexKind (const langType language, const int kind, const boolean mode);
 extern void printRegexKinds (const langType language, boolean indent);
 extern void freeRegexResources (void);
-extern void checkRegex (void);
+extern boolean checkRegex (void);
 extern void useRegexMethod (const langType language);
 
 #ifdef HAVE_COPROC

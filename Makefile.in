@@ -36,6 +36,7 @@ DEFS	= @DEFS@
 CPPFLAGS = @CPPFLAGS@
 CFLAGS	= @CFLAGS@
 LDFLAGS	= @LDFLAGS@
+LIBOBJS = @LIBOBJS@
 LIBS	= @LIBS@
 EXEEXT	= @EXEEXT@
 OBJEXT	= @OBJEXT@
@@ -70,7 +71,8 @@ include $(srcdir)/source.mak
 .SUFFIXES:
 .SUFFIXES: .c .$(OBJEXT)
 
-VPATH	= $(srcdir) $(srcdir)/data/corpora $(srcdir)/data/optlib
+VPATH	= $(srcdir) $(srcdir)/data/corpora $(srcdir)/data/optlib \
+	$(srcdir)/gnu_regex
 
 INSTALL		= cp -p
 INSTALL_PROG	= $(INSTALL)
@@ -332,6 +334,8 @@ maintainerclean: distclean
 #
 .c.$(OBJEXT):
 	$(CC) -I. -I$(srcdir) $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $<
+$(addsuffix .$(OBJEXT),$(basename $(notdir $(REGEX_SOURCES)))): ALL_CPPFLAGS += \
+	-D_GNU_SOURCE -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -I$(srcdir)/gnu_regex
 
 #
 # check

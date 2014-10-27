@@ -1099,7 +1099,8 @@ static void printFeatureList (void)
 	{
 		if (i == 0)
 			printf ("  Optional compiled features: ");
-		printf ("%s+%s", (i>0 ? ", " : ""), Features [i]);
+		if (strcmp (Features [i], "regex") != 0 || checkRegex ())
+			printf ("%s+%s", (i>0 ? ", " : ""), Features [i]);
 #ifdef CUSTOM_CONFIGURATION_FILE
 		if (strcmp (Features [i], "custom-conf") == 0)
 			printf ("=%s", CUSTOM_CONFIGURATION_FILE);
@@ -1116,7 +1117,8 @@ static void processListFeaturesOption(const char *const option __unused__,
 	int i;
 
 	for (i = 0 ; Features [i] != NULL ; ++i)
-		printf ("%s\n", Features [i]);
+		if (strcmp (Features [i], "regex") != 0 || checkRegex ())
+			printf ("%s\n", Features [i]);
 	if (i == 0)
 		putchar ('\n');
 	exit (0);
