@@ -1,6 +1,6 @@
 /*
 *   $Id: vhdl.c 652 2008-04-18 03:51:47Z elliotth $
-* 
+*
 *   Copyright (c) 2008, Nicolas Vincent
 *
 *   This source code is released for free distribution under the terms of the
@@ -174,7 +174,7 @@ typedef struct sTokenInfo {
  *   DATA DEFINITIONS
  */
 static int Lang_vhdl;
-static jmp_buf Exception;
+static jmp_buf* Exception;
 static TrashBox* trash_box;
 
 /* Used to index into the VhdlKinds table. */
@@ -426,7 +426,7 @@ static void readToken (tokenInfo * const token)
 	switch (c)
 	{
 	case EOF:
-		longjmp (Exception, (int) ExceptionEOF);
+		longjmp (*Exception, (int) ExceptionEOF);
 		break;
 	case '(':
 		token->type = TOKEN_OPEN_PAREN;
@@ -807,20 +807,19 @@ static void parseVhdlFile (tokenInfo * const token)
 	} while (!isKeyword (token, KEYWORD_END));
 }
 
-static void findVhdlTags (void)
+static rescanReason findVhdlTags (const unsigned int passCount __unused__,
+				  jmp_buf *jbuf, TrashBox *tbox)
 {
 	tokenInfo * token;
-	exception_t exception;
 
-	trash_box = trashBoxNew ();
+	Exception = jbuf;
+	trash_box = tbox;
+
 	token = newToken ();
 
-	exception = (exception_t) (setjmp (Exception));
+	parseVhdlFile (token);
 
-	while (exception == ExceptionNone)
-		parseVhdlFile (token);
-
-	trashBoxDestroy (trash_box);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition *VhdlParser (void)
@@ -830,7 +829,7 @@ extern parserDefinition *VhdlParser (void)
 	def->kinds = VhdlKinds;
 	def->kindCount = KIND_COUNT (VhdlKinds);
 	def->extensions = extensions;
-	def->parser = findVhdlTags;
+	def->parser_with_gc = findVhdlTags;
 	def->initialize = initialize;
 	return def;
 }

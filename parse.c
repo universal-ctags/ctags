@@ -22,7 +22,7 @@
 #include "main.h"
 #define OPTION_WRITE
 #include "options.h"
-#include "parsers.h" 
+#include "parsers.h"
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
@@ -969,7 +969,7 @@ extern void initializeParsing (void)
 				accepted = TRUE;
 #endif
 			}
-			else if ((def->parser == NULL)  ==  (def->parser2 == NULL))
+			else if ((def->parser == NULL)  &&  (def->parser2 == NULL) && (def->parser_with_gc == NULL))
 				error (FATAL,
 		"%s parser definition must define one and only one parsing routine\n",
 					   def->name);
@@ -1450,6 +1450,19 @@ static rescanReason createTagsForFile (
 			lang->parser ();
 		else if (lang->parser2 != NULL)
 			rescan = lang->parser2 (passCount);
+		else if (lang->parser_with_gc != NULL)
+		{
+			TrashBox* trash_box = trashBoxNew ();
+			jmp_buf jbuf;
+
+			while (!setjmp (jbuf))
+			{
+				trashBoxDestroy (trash_box);
+				trash_box = trashBoxNew ();
+				rescan = lang->parser_with_gc (passCount, &jbuf, trash_box);
+			}
+			trashBoxDestroy (trash_box);
+		}
 		else if (lang->initialize != NULL)
 		{
 			parserInitialize init = lang->initialize;
