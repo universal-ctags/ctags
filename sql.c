@@ -183,7 +183,7 @@ typedef struct sTokenInfoSQL {
 
 static langType Lang_sql;
 
-static jmp_buf Exception;
+static jmp_buf *Exception;
 
 typedef enum {
 	SQLTAG_CURSOR,
@@ -541,7 +541,7 @@ getNextChar:
 
 	switch (c)
 	{
-		case EOF: longjmp (Exception, (int)ExceptionEOF);	break;
+		case EOF: longjmp (*Exception, (int)ExceptionEOF);	break;
 		case '(': token->type = TOKEN_OPEN_PAREN;		break;
 		case ')': token->type = TOKEN_CLOSE_PAREN;		break;
 		case ':': token->type = TOKEN_COLON;			break;
@@ -2343,20 +2343,17 @@ static void initialize (const langType language)
 	buildSqlKeywordHash ();
 }
 
-static void findSqlTags (void)
+static rescanReason findSqlTags (const unsigned int passCount __unused__,
+				 jmp_buf *jbuf, TrashBox *tbox)
 {
-	TrashBox* trash_box = NULL;
 	tokenInfo *const token = newToken ();
-	exception_t exception;
 
-	trash_box = trashBoxNew ();
-	trashBoxPut (trash_box, token, (TrashBoxDestroyItemProc)deleteToken);
-	exception = (exception_t) (setjmp (Exception));
+	trashBoxPut (tbox, token, (TrashBoxDestroyItemProc)deleteToken);
+	Exception = jbuf;
 
-	while (exception == ExceptionNone)
-		parseSqlFile (token, trash_box);
+	parseSqlFile (token, tbox);
 
-	trashBoxDestroy (trash_box);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* SqlParser (void)
@@ -2366,7 +2363,7 @@ extern parserDefinition* SqlParser (void)
 	def->kinds		= SqlKinds;
 	def->kindCount	= KIND_COUNT (SqlKinds);
 	def->extensions = extensions;
-	def->parser		= findSqlTags;
+	def->parser_with_gc = findSqlTags;
 	def->initialize = initialize;
 	return def;
 }
