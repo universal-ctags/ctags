@@ -1460,6 +1460,7 @@ static rescanReason createTagsForFile (
 				trashBoxDelete (trash_box);
 				trash_box = trashBoxNew ();
 				rescan = lang->parser_with_gc (passCount, &jbuf, trash_box);
+				break;
 			}
 			trashBoxDelete (trash_box);
 		}
