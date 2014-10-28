@@ -47,9 +47,10 @@ extern void trashBoxDelete (TrashBox* trash_box)
 	eFree (trash_box);
 }
 
-extern void   trashBoxPut (TrashBox* trash_box, void* item, TrashBoxDestroyItemProc destroy)
+extern void*  trashBoxPut (TrashBox* trash_box, void* item, TrashBoxDestroyItemProc destroy)
 {
 	trash_box->trash = trashPut(trash_box->trash, item, destroy);
+	return item;
 }
 
 extern TrashBoxDestroyItemProc trashBoxTakeBack (TrashBox* trash_box, void* item)
