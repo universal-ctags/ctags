@@ -969,7 +969,7 @@ extern void initializeParsing (void)
 				accepted = TRUE;
 #endif
 			}
-			else if ((def->parser == NULL)  &&  (def->parser2 == NULL) && (def->parser_with_gc == NULL))
+			else if (((!!def->parser) + (!!def->parser2) + (!!def->parser_with_gc)) != 1)
 				error (FATAL,
 		"%s parser definition must define one and only one parsing routine\n",
 					   def->name);
