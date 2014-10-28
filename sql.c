@@ -2351,7 +2351,8 @@ static rescanReason findSqlTags (const unsigned int passCount __unused__,
 	trashBoxPut (tbox, token, (TrashBoxDestroyItemProc)deleteToken);
 	Exception = jbuf;
 
-	parseSqlFile (token, tbox);
+	while (1)
+		parseSqlFile (token, tbox);
 
 	return RESCAN_NONE;
 }

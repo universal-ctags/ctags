@@ -817,7 +817,8 @@ static rescanReason findVhdlTags (const unsigned int passCount __unused__,
 
 	token = newToken ();
 
-	parseVhdlFile (token);
+	while (1)
+		parseVhdlFile (token);
 
 	return RESCAN_NONE;
 }
