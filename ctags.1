@@ -401,14 +401,13 @@ Include an entry for the base file name of every source file (e.g.
 .I q
 Include an extra class-qualified tag entry for each tag which is a member
 of a class (for languages for which this information is extracted; currently
-C++, Eiffel, and Java). The actual form of the qualified tag depends upon the
-language from which the tag was derived (using a form that is most natural for
-how qualified calls are specified in the language). For C++, it is in the form
-"class::member"; for Eiffel and Java, it is in the form "class.member". This
-may allow easier location of a specific tags when multiple occurrences of a
-tag name occur in the tag file. Note, however, that this could potentially
-more than double the size of the tag file.
-.RE
+C++, Eiffel, Java, and Perl). The actual form of the qualified tag depends
+upon the language from which the tag was derived (using a form that is most
+natural for how qualified calls are specified in the language). For C++ and
+Perl, it is in the form "class::member"; for Eiffel and Java, it is in the
+form "class.member". This may allow easier location of a specific tags when
+multiple occurrences of a tag name occur in the tag file. Note, however,
+that this could potentially more than double the size of the tag file.  .RE
 
 .TP 5
 \fB\-\-fields\fP=\fI[+|\-]flags\fP|\fi*\fP
