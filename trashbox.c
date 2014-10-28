@@ -40,7 +40,7 @@ extern TrashBox* trashBoxNew (void)
 	return t;
 }
 
-extern void trashBoxDestroy (TrashBox* trash_box)
+extern void trashBoxDelete (TrashBox* trash_box)
 {
 	trashBoxMakeEmpty(trash_box);
 

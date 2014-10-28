@@ -758,7 +758,7 @@ extern void cArgDelete (cookedArgs* const current)
 {
 	Assert (current != NULL);
 	argDelete (current->args);
-	trashBoxDestroy (current->trash_box);
+	trashBoxDelete (current->trash_box);
 	memset (current, 0, sizeof (cookedArgs));
 	eFree (current);
 }

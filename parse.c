@@ -1457,11 +1457,11 @@ static rescanReason createTagsForFile (
 
 			while (!setjmp (jbuf))
 			{
-				trashBoxDestroy (trash_box);
+				trashBoxDelete (trash_box);
 				trash_box = trashBoxNew ();
 				rescan = lang->parser_with_gc (passCount, &jbuf, trash_box);
 			}
-			trashBoxDestroy (trash_box);
+			trashBoxDelete (trash_box);
 		}
 		else if (lang->initialize != NULL)
 		{
