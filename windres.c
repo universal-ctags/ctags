@@ -172,7 +172,7 @@ static ResParserState parseResLine(const unsigned char *line, ResParserState sta
 			case P_STATE_IN_STATEMENTS:
 			{
 				/* First BEGIN block */
-				if (*line == '{' || strcmp(line, "BEGIN") == 0)
+				if (*line == '{' || strcmp((const char *) line, "BEGIN") == 0)
 				{
 					_blockDepth = 1;
 					return P_STATE_IN_BLOCK;
@@ -182,11 +182,11 @@ static ResParserState parseResLine(const unsigned char *line, ResParserState sta
 			case P_STATE_IN_BLOCK:
 			{
 				/* Nested BEGIN blocks? */
-				if (*line == '{' || strcmp(line, "BEGIN") == 0)
+				if (*line == '{' || strcmp((const char *) line, "BEGIN") == 0)
 				{
 					_blockDepth++;
 				}
-				else if (*line == '}' || strcmp(line, "END") == 0)
+				else if (*line == '}' || strcmp((const char *) line, "END") == 0)
 				{
 					if (_blockDepth == 1)
 						return P_STATE_NONE;
