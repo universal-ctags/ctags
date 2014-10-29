@@ -805,7 +805,7 @@ static int writeCtagsEntry (const tagEntryInfo *const tag)
 	if (tag->lineNumberEntry)
 		length += writeLineNumberEntry (tag);
 	else if (tag->pattern)
-		length += fprintf(TagFile.fp, tag->pattern);
+		length += fprintf(TagFile.fp, "%s", tag->pattern);
 	else
 		length += writePatternEntry (tag);
 
