@@ -36,6 +36,9 @@
 #include "read.h"
 #include "routines.h"
 
+
+static boolean regexAvailable = FALSE;
+
 #if defined (HAVE_REGEX) && !defined (REGCOMP_BROKEN)
 
 /*
@@ -87,8 +90,6 @@ typedef struct {
 /*
 *   DATA DEFINITIONS
 */
-
-static boolean regexAvailable = FALSE;
 
 /* Array of pattern sets, indexed by language */
 static patternSet* Sets = NULL;
