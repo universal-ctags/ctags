@@ -1514,7 +1514,7 @@ static boolean createTagsWithFallback (
 
 static void printGuessedParser (const char* const fileName, langType language)
 {
-	char *parserName;
+	const char *parserName;
 
 	if (language == LANG_IGNORE)
 	{
