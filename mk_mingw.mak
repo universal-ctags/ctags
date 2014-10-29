@@ -11,16 +11,25 @@ CFLAGS = -Wall
 DEFINES = -DWIN32 $(REGEX_DEFINES)
 INCLUDES = -I. -Ignu_regex -Ifnmatch
 CC = gcc
+OBJEXT = o
+OBJECTS += $(REGEX_SOURCES:%.c=%.o)
+OBJECTS += $(FNMATCH_SOURCES:%.c=%.o)
 
 ctags.exe: OPT = -O4
 dctags.exe: OPT = -g
 dctags.exe: DEBUG = -DDEBUG
 dctags.exe: SOURCES += debug.c
 
-ctags: ctags.exe
+.SUFFIXES: .c.o
 
-ctags.exe dctags.exe: $(SOURCES) $(REGEX_SOURCES) $(HEADERS) $(REGEX_HEADERS) $(FNMATCH_HEADERS)
-	$(CC) $(OPT) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(SOURCES) $(REGEX_SOURCES) $(FNMATCH_SOURCES)
+.c.o:
+	$(CC) -c $(OPT) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
+
+ctags: ctags.exe
+dctags: dctags.exe
+
+ctags.exe dctags.exe: $(OBJECTS) $(HEADERS) $(REGEX_HEADERS) $(FNMATCH_HEADERS)
+	$(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(OBJECTS)
 
 readtags.exe: readtags.c
 	$(CC) $(OPT) $(CFLAGS) -DREADTAGS_MAIN $(DEFINES) $(INCLUDES) -o $@ $<
@@ -29,3 +38,4 @@ clean:
 	- rm -f ctags.exe
 	- rm -f dctags.exe
 	- rm -f tags
+	- rm -f *.o gnu_regex/*.o fnmatch/*.o
