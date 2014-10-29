@@ -515,7 +515,7 @@ AC_SUBST(install_libexec_targets)
 # -----------------------------
 AC_CHECKING(for new missing prototypes)
 
-AC_DEFUN(CHECK_PROTO, [
+AC_DEFUN([CHECK_PROTO], [
 	AC_EGREP_HEADER([[^A-Za-z0-9_]$1([ 	]+[A-Za-z0-9_]*)?[	 ]*\(],
 	$2,
 	,
