@@ -37,7 +37,7 @@ check_languages()\
 {       local expected; \
 	while read expected; do \
 		found=no; \
-		for f in $$( $(UNIT_CTAGS_CMDLINE) --list-languages  2>/dev/null) ; do \
+		for f in $$( $(UNIT_CTAGS_CMDLINE) --list-languages 2>/dev/null | sed -e 's/ //' ) ; do \
 			if test "$$expected" = "$$f"; then found=yes; fi; \
 		done; \
 		if ! test $$found = yes; then \
