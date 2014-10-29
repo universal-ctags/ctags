@@ -374,7 +374,8 @@ AC_OBJEXT
 AC_EXEEXT
 
 AC_MSG_CHECKING(if struct stat contains st_ino)
-AC_TRY_COMPILE([#include <sys/stat.h>], [
+AC_TRY_COMPILE([#include <sys/stat.h>
+				#include <stdlib.h>], [
 	struct stat st;
 	stat(".", &st);
 	if (st.st_ino > 0)
