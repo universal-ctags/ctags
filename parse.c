@@ -1512,6 +1512,21 @@ static boolean createTagsWithFallback (
 	return tagFileResized;
 }
 
+static void printGuessedParser (const char* const fileName, langType language)
+{
+	char *parserName;
+
+	if (language == LANG_IGNORE)
+	{
+		Option.guessParser = ((int)TRUE) + 1;
+		parserName = "NONE";
+	}
+	else
+		parserName = LanguageTable [language]->name;
+
+	printf("%s: %s\n", fileName, parserName);
+}
+
 extern boolean parseFile (const char *const fileName)
 {
 	boolean tagFileResized = FALSE;
@@ -1519,6 +1534,13 @@ extern boolean parseFile (const char *const fileName)
 	if (Option.language == LANG_AUTO)
 		language = getFileLanguage (fileName);
 	Assert (language != LANG_AUTO);
+
+	if (Option.guessParser)
+	{
+		printGuessedParser (fileName, language);
+		return tagFileResized;
+	}
+
 	if (language == LANG_IGNORE)
 		verbose ("ignoring %s (unknown language)\n", fileName);
 	else if (! enabled_p (language))

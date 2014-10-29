@@ -494,7 +494,7 @@ static void makeTags (cookedArgs *args)
 	}
 
 #define timeStamp(n) timeStamps[(n)]=(Option.printTotals ? clock():(clock_t)0)
-	if (! Option.filter)
+	if ((! Option.filter) && (! Option.guessParser))
 		openTagFile ();
 
 	timeStamp (0);
@@ -519,7 +519,7 @@ static void makeTags (cookedArgs *args)
 
 	timeStamp (1);
 
-	if (! Option.filter)
+	if ((! Option.filter) && (!Option.guessParser))
 		closeTagFile (resize);
 
 	timeStamp (2);
@@ -616,6 +616,9 @@ extern int main (int __unused__ argc, char **argv)
 	freeParserResources ();
 	freeRegexResources ();
 	freeXcmdResources ();
+
+	if (Option.guessParser)
+		return (Option.guessParser == TRUE)? 0: 1;
 
 	exit (0);
 	return 0;
