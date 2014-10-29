@@ -466,9 +466,9 @@ AC_MSG_CHECKING(if regcomp works)
 AC_TRY_RUN([
 #include <sys/types.h>
 #include <regex.h>
-main() {
+int main(void) {
 	regex_t patbuf;
-	exit (regcomp (&patbuf, "/hello/", 0) != 0);
+	return (regcomp (&patbuf, "/hello/", 0) != 0);
 }],regcomp_works=yes,regcomp_works=no,AC_DEFINE(CHECK_REGCOMP))
 AC_MSG_RESULT($regcomp_works)
 if test yes != "$regcomp_works"; then
