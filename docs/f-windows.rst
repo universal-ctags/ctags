@@ -1,4 +1,4 @@
-Introduction
+Building/hacking/using on MS-Windows
 =============================================================================
 
 :Maintainer: Frank Fesevur <ffes@users.sourceforge.net>
