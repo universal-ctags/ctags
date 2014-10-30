@@ -366,6 +366,11 @@ They have a these additional language parsers:
 * `txt2tags <http://en.wikipedia.org/wiki/Txt2tags>`_ 
 
 
+These changes have been merged:
+
+* Fix regex callback match count - https://github.com/fishman/ctags/pull/104 
+
+
 `VIM-Japan <https://github.com/vim-jp/ctags/>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
