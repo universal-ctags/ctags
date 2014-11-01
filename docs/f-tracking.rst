@@ -106,6 +106,11 @@ bugs
 
 	   	216880c5287e0421d9c49898d983144db61c83aa
 
+   <271> regex callback is broken; <320> [PATCH] fix regex callback match count
+	 * merged patch (with updated bug number)::
+
+		a12b3a24b62d6535a968e076675f68bac9ad32ba 
+
 
 `patches <https://sourceforge.net/p/ctags/patches/%d>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
