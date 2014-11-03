@@ -517,11 +517,16 @@ static void matchCallbackPattern (
 	regexMatch matches [BACK_REFERENCE_COUNT];
 	unsigned int count = 0;
 	int i;
-	for (i = 0  ;  i < BACK_REFERENCE_COUNT  &&  pmatch [i].rm_so != -1  ;  ++i)
+	for (i = 0  ;  i < BACK_REFERENCE_COUNT  ;  ++i)
 	{
 		matches [i].start  = pmatch [i].rm_so;
 		matches [i].length = pmatch [i].rm_eo - pmatch [i].rm_so;
-		++count;
+		/* a valid match may have both offsets == -1,
+		 * e.g. (foo)*(bar) matching "bar" - see CTags bug 271.
+		 * As POSIX regex doesn't seem to have a way to count matches,
+		 * we return the count up to the last non-empty match. */
+		if (pmatch [i].rm_so != -1)
+			count = i + 1;
 	}
 	patbuf->u.callback.function (vStringValue (line), matches, count);
 }
