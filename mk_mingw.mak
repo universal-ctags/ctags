@@ -15,7 +15,8 @@ OBJEXT = o
 OBJECTS += $(REGEX_SOURCES:%.c=%.o)
 OBJECTS += $(FNMATCH_SOURCES:%.c=%.o)
 
-ctags.exe: OPT = -O4
+ctags.exe: OPT = -O4 -Os -fexpensive-optimizations
+ctags.exe: LDFLAGS = -s
 dctags.exe: OPT = -g
 dctags.exe: DEBUG = -DDEBUG
 dctags.exe: SOURCES += debug.c
