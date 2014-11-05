@@ -1068,6 +1068,7 @@ static adaTokenInfo *adaParseSubprogram(adaTokenInfo *parent, adaKind kind)
     else
     {
       /* nothing found, move to the next word */
+      movePos(1); /* make sure to advance even if we aren't actually on a word */
       skipPastWord();
     }
   } /* while(exception != EXCEPTION_EOF && token != NULL) */
