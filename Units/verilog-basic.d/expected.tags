@@ -1,5 +1,6 @@
 DEFINE	input.v	/^`define DEFINE$/;"	c
 DEF_VALUE	input.v	/^`define DEF_VALUE   1'd100$/;"	c
+DEF_WITH_EQ	input.v	/^`define DEF_WITH_EQ = 1'd100$/;"	c
 PARAM	input.v	/^parameter PARAM = 1;$/;"	c	module:mod
 STATE1	input.v	/^parameter STATE1 = 4'h0,$/;"	c	module:mod
 STATE2	input.v	/^          STATE2 = 4'h1,$/;"	c	module:mod
