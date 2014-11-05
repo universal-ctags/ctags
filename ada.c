@@ -892,9 +892,9 @@ static adaTokenInfo *adaParseBlock(adaTokenInfo *parent, adaKind kind)
   skipWhiteSpace();
 
   /* task and protected types are allowed to have discriminants */
-  if(line[pos] == '(')
+  if(exception != EXCEPTION_EOF && line[pos] == '(')
   {
-    while(line[pos] != ')')
+    while(exception != EXCEPTION_EOF && line[pos] != ')')
     {
       movePos(1);
       adaParseVariables(token, ADA_KIND_AUTOMATIC_VARIABLE);
@@ -949,7 +949,13 @@ static adaTokenInfo *adaParseBlock(adaTokenInfo *parent, adaKind kind)
       /* nothing found, move to the next word */
       skipUntilWhiteSpace();
     }
-  } /* while(TRUE) - while the end of spec, or beginning of body not found */
+
+    if (exception == EXCEPTION_EOF)
+    {
+      freeAdaToken(&parent->children, token);
+      token = NULL;
+    }
+  } /* while(token != NULL) - while the end of spec, or beginning of body not found */
 
   return token;
 } /* static adaTokenInfo *adaParseBlock(adaTokenInfo *parent, adaKind kind) */
@@ -979,9 +985,9 @@ static adaTokenInfo *adaParseSubprogram(adaTokenInfo *parent, adaKind kind)
   skipWhiteSpace();
 
   /* if we find a '(' grab any parameters */
-  if(line[pos] == '(' && token != NULL)
+  if(exception != EXCEPTION_EOF && line[pos] == '(' && token != NULL)
   {
-    while(line[pos] != ')')
+    while(exception != EXCEPTION_EOF && line[pos] != ')')
     {
       movePos(1);
       tmpToken = adaParseVariables(token, ADA_KIND_AUTOMATIC_VARIABLE);
@@ -997,9 +1003,9 @@ static adaTokenInfo *adaParseSubprogram(adaTokenInfo *parent, adaKind kind)
        * pair */
       skipWhiteSpace();
 
-      if(line[pos] == '(')
+      if(exception != EXCEPTION_EOF && line[pos] == '(')
       {
-        while(line[pos] != ')')
+        while(exception != EXCEPTION_EOF && line[pos] != ')')
         {
           movePos(1);
           adaParseVariables(token, ADA_KIND_AUTOMATIC_VARIABLE);
@@ -1085,11 +1091,11 @@ static adaTokenInfo *adaParseType(adaTokenInfo *parent, adaKind kind)
   movePos(i);
   skipWhiteSpace();
 
-  if(line[pos] == '(')
+  if(exception != EXCEPTION_EOF && line[pos] == '(')
   {
     /* in this case there is a discriminant to this type, gather the
      * variables */
-    while(line[pos] != ')')
+    while(exception != EXCEPTION_EOF && line[pos] != ')')
     {
       movePos(1);
       adaParseVariables(token, ADA_KIND_AUTOMATIC_VARIABLE);
@@ -1104,7 +1110,7 @@ static adaTokenInfo *adaParseType(adaTokenInfo *parent, adaKind kind)
   {
     skipWhiteSpace();
     /* check to see if this may be a record or an enumeration */
-    if(line[pos] == '(')
+    if(exception != EXCEPTION_EOF && line[pos] == '(')
     {
       movePos(1);
       adaParseVariables(token, ADA_KIND_ENUM_LITERAL);
@@ -1421,7 +1427,11 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
     skipWhiteSpace();
 
     /* check some universal things to check for first */
-    if(isAdaComment(line, pos, lineLen))
+    if(exception == EXCEPTION_EOF)
+    {
+      break;
+    }
+    else if(isAdaComment(line, pos, lineLen))
     {
       readNewLine();
       continue;
@@ -1470,7 +1480,7 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
           skipWhiteSpace();
 
           /* skip over the "(" until we hit the tag */
-          if(line[pos] == '(')
+          if(exception != EXCEPTION_EOF && line[pos] == '(')
           {
             movePos(1);
             skipWhiteSpace();
@@ -1580,9 +1590,9 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
           movePos(i);
 
           /* now gather the parameters to this subprogram */
-          if(line[pos] == '(')
+          if(exception != EXCEPTION_EOF && line[pos] == '(')
           {
-            while(line[pos] != ')')
+            while(exception != EXCEPTION_EOF && line[pos] != ')')
             {
               movePos(1);
               adaParseVariables(genericParamsRoot.children.tail,
