@@ -1,5 +1,5 @@
 /* badinput.c: do bisect-quest to find minimal input which breaks the target command execution
-   
+
    Copyright (C) 2014 Masatake YAMATO
 
    This program is free software; you can redistribute it and/or modify
@@ -18,12 +18,12 @@
    Build
    =======================================================================
 
-   	$ gcc -Wall badinput.c -o badinput 
+	$ gcc -Wall badinput.c -o badinput
 
    Usage
    =======================================================================
 
-   	$ badinput CMDLINE_TEMPLATE INPUT OUTPUT
+	$ badinput CMDLINE_TEMPLATE INPUT OUTPUT
 
    Description
    =======================================================================
@@ -34,15 +34,15 @@
    This program truncates both the head and tail of the INPUT file and
    runs CMDLINE_TEMPLATE repeatedly till the process exits normally(==
    0); and reports the shortest input which causes the crash or infinite-loop.
-   
+
    Here is an example:
 
-   	$ misc/badinput "timeout 1 ./ctags -o - --language-force=Ada %s > /dev/null" Test/1880687.js /tmp/output.txt 
+	$ misc/badinput "timeout 1 ./ctags -o - --language-force=Ada %s > /dev/null" Test/1880687.js /tmp/output.txt
 
    Ada parser of ctags enters an infinite-loop when Test/1880687.js is given.
    The size of original Test/1880687.js is 2258 bytes.
 
-        $ misc/badinput "timeout 1 ./ctags -o - --language-force=Ada %s > /dev/null" Test/1880687.js /tmp/output.txt 
+	$ misc/badinput "timeout 1 ./ctags -o - --language-force=Ada %s > /dev/null" Test/1880687.js /tmp/output.txt
 	[0, 2448]...31744
 	[0, 0]...0
 	step(end): 0 [0, 2448]...31744
@@ -72,12 +72,12 @@
 	function baz() {
 	    }
 	}
-	
+
 	function g(
 	$
-   
+
    New shorter input, only 38 bytes, which can reproduce the issue is reported at the end.
-   This new input is useful for debugging. 
+   This new input is useful for debugging.
 
    The result is shown in stdout and is recorded to the file specified as OUTPUT. */
 
@@ -107,14 +107,14 @@ load (const char* input_file, char** input, size_t* len)
 {
 	int input_fd;
 	struct stat stat_buf;
-	
+
 	input_fd = open (input_file, O_RDONLY);
 	if (input_fd < 0)
 	{
 		perror ("open(input)");
 		exit(1);
 	}
-	
+
 	if (fstat(input_fd, &stat_buf) < 0)
 	{
 		perror ("fstat");
@@ -167,7 +167,7 @@ test (char* cmdline, char * input, off_t start, size_t len, int output_fd)
 	fprintf (stderr, "[%lu, %lu]...", start, start + len);
 	r = system(cmdline);
 	fprintf(stderr, "%d\n", r);
-	
+
 	return r;
 }
 
@@ -249,7 +249,7 @@ bisect(char* cmdline, char * input, size_t len, int output_fd)
 	len = end - start;
 	fprintf(stderr, "Minimal bad input:\n");
 	fwrite(input + start, 1, len, stdout);
-	prepare (output_fd, input + start, len);	
+	prepare (output_fd, input + start, len);
 	printf("\n");
 
 	return 0;
@@ -266,10 +266,10 @@ main(int argc, char** argv)
 	char * input;
 	size_t len;
 	int output_fd;
-	
 
-	if (argc == 2 
-	    && ((!strcmp(argv[2], "--help")) 
+
+	if (argc == 2
+	    && ((!strcmp(argv[2], "--help"))
 		|| (!strcmp(argv[2], "-h"))))
 		print_help(argv[0], stdout, 0);
 	else if (argc != 4)
@@ -295,7 +295,7 @@ main(int argc, char** argv)
 	{
 		perror ("open(output)");
 		exit (1);
-	}	
+	}
 
 	if (asprintf (&cmdline, cmdline_template, output_file) == -1)
 	{
@@ -308,12 +308,12 @@ main(int argc, char** argv)
 		fprintf(stderr, "the target command line exits normally against the original input\n");
 		exit (1);
 	}
-	
+
 	if (test (cmdline, input, 0, 0, output_fd) != 0)
 	{
 		fprintf(stderr, "the target command line exits normally against the empty input\n");
 		exit (1);
 	}
-	
+
 	return bisect(cmdline, input, len, output_fd);
 }
