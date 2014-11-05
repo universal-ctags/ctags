@@ -1,0 +1,4 @@
+f2	Units/verilog-scope.d/input.v	/^function f2()$/;"	f	module:mod
+f2deeper	Units/verilog-scope.d/input.v	/^    function f2deeper()$/;"	f	function:mod.f2.f2sub
+f2sub	Units/verilog-scope.d/input.v	/^  function f2sub()$/;"	f	function:mod.f2
+mod	Units/verilog-scope.d/input.v	/^module mod$/;"	m

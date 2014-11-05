@@ -257,24 +257,15 @@ static boolean readIdentifier (vString *const name, int c)
 
 static vString *genContext (void)
 {
-	vString *context, *catNames;
-	tokenInfo *current;
 	if (currentContext)
 	{
-		context = vStringNew ();
-		vStringCopy (context, currentContext->name);
-		current = currentContext->scope;
-		while (current) {
-			catNames = vStringNew ();
-
-			vStringCopy (catNames, current->name);
-			vStringCatS (catNames, ".");
-			vStringCat (catNames, context);
-			vStringCopy (context, catNames);
-
-			current = current->scope;
-			vStringDelete (catNames);
+		vString *context = vStringNew ();
+		if (currentContext->scope)
+		{
+			vStringCat (context, currentContext->scope->name);
+			vStringPut (context, '.');
 		}
+		vStringCat (context, currentContext->name);
 		return context;
 	}
 	else
