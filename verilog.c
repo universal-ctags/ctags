@@ -265,7 +265,7 @@ static int skipPastMatch (const char *const pair)
 
 static void skipToEOL ()
 {
-	volatile int c;
+	int c;
 	do
 	{
 		c = vGetc ();
@@ -274,7 +274,7 @@ static void skipToEOL ()
 
 static void skipComments (int c)
 {
-	volatile int p;
+	int p;
 
 	if (c == '/')
 	{
@@ -557,7 +557,7 @@ static void findTag (vString *const name)
 static void findVerilogTags (void)
 {
 	vString *const name = vStringNew ();
-	volatile int c = '\0';
+	int c = '\0';
 	exception_t exception = (exception_t) setjmp (Exception);
 
 	if (exception == ExceptionNone) while (c != EOF)
