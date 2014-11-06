@@ -487,7 +487,6 @@ static void tagNameList (const verilogKind kind, int c)
 
 static void findTag (vString *const name)
 {
-	int c;
 	const verilogKind kind = (verilogKind) lookupKeyword (vStringValue (name), Lang_verilog);
 
 	/* Search for end of current context to drop respective context */
@@ -514,7 +513,7 @@ static void findTag (vString *const name)
 	if (kind == K_CONSTANT && vStringItem (name, 0) == '`')
 	{
 		/* Bug #961001: Verilog compiler directives are line-based. */
-		c = skipWhite (vGetc ());
+		int c = skipWhite (vGetc ());
 		readIdentifier (name, c);
 		createTag (kind, name);
 		/* Skip the rest of the line. */
@@ -530,7 +529,7 @@ static void findTag (vString *const name)
 	}
 	else if (kind != K_UNDEFINED)
 	{
-		c = skipWhite (vGetc ());
+		int c = skipWhite (vGetc ());
 
 		/* Many keywords can have bit width.
 		*   reg [3:0] net_name;
