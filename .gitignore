@@ -30,3 +30,4 @@ tags.ref
 core.*
 syntax.vim
 STDERR.*
+badinput
