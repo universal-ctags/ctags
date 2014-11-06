@@ -188,6 +188,7 @@ test.units: $(CTAGS_TEST)
 	n_failed=0; \
 	n_skipped_features=0; \
 	n_skipped_languages=0; \
+	n_skipped_infinite_loops=0; \
 	n_known_bugs=0; \
 	if [ -n "$(VALGRIND)" -a -n "$(UNIT)" ]; then \
 		rm -f Units/$(UNIT).[dbt]/STDERR.TMP.vg; \
@@ -196,9 +197,9 @@ test.units: $(CTAGS_TEST)
 	fi; \
 	$(DEFINE_CHECK_FEATURES); \
 	$(DEFINE_CHECK_LANGUAGES); \
-	for input in $$(ls Units/*.[dbt]/input.* | grep -v "~$$"); do \
+	for input in $$(ls Units/*.[dbti]/input.* | grep -v "~$$"); do \
 		t=$${input%/input.*}; \
-		name=$${t%.[dbt]}; \
+		name=$${t%.[dbti]}; \
 		\
 		if test -n "$(UNIT)" -a "$${name}" != "Units/$(UNIT)"; then continue; fi; \
 		\
@@ -213,6 +214,13 @@ test.units: $(CTAGS_TEST)
 		languages="$$t"/languages; \
 		\
 		echo -n "Testing $${name}..."; \
+		\
+		ext=$${t##*${name}.}; \
+		if test "$${ext}" = "i"; then \
+			echo "skipped (infinite loop)"; \
+			n_skipped_infinite_loops=$$(expr $$n_skipped_infinite_loops + 1); \
+			continue; \
+		fi; \
 		\
 		if test -e "$$features"; then \
 			if ! check_features "$$features"; then \
@@ -241,6 +249,7 @@ test.units: $(CTAGS_TEST)
 	for f in $$failed_cases; do echo "		$$f"; done; \
 	echo '	#skipped(features): ' $$n_skipped_features; \
 	echo '	#skipped(languages): ' $$n_skipped_languages; \
+	echo '	#skipped(infinite loop): ' $$n_skipped_infinite_loops; \
 	echo '	#known-bugs: ' $$n_known_bugs; \
 	if [ -n "$(VALGRIND)" -a "$(SHELL)" = /bin/bash -a -n "$(UNIT)" ]; then \
 		if [ -f Units/$(UNIT).[dbt]/STDERR.TMP.vg ]; then\
