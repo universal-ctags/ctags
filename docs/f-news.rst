@@ -35,6 +35,7 @@ See "External parser command" about *xcmd*.
 Heavily improved language parsers
 ---------------------------------------------------------------------
 * php
+* verilog
 
 
 New test facility named *Units*

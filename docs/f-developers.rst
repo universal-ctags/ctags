@@ -29,3 +29,10 @@ Masatake YAMATO <yamato@redhat.com>
 	introduced optlib and xcmd. I'm working on Fedora. I don't
 	have access to the other platforms.
 
+Vitor Antunes <vitor.hda@gmail.com>
+
+	I've been working with Verilog for most of the last 10
+	years and am an avid Vim user. My goal is to improve the
+	Verilog parser such that Vim can get the most out of it
+	in plugins like Tagbar and to support the Omni
+	completion plugin I am writing.
