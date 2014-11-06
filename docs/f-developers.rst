@@ -3,9 +3,19 @@ Who we are
 
 Please, add your name, background and interests here If you are
 interested in contributing to fishman-ctags steadily. So we can
-dispatch a task and/or an issue to perper person!
+dispatch a task and/or an issue to the right person!
 
 (Keep the list in alphabetical order.)
+
+
+Frank Fesevur <ffes@users.sourceforge.net>
+
+	My current use of ctags is for a Notepad++ plug-in I'm writing.
+	The plug-in is not yet released because of problems with the
+	Windows version of ctags. Those problems are fixed by now.
+	I am a Windows developer, but also an occasional Ubuntu and
+	Raspbian user at home. I wrote the windres parser.
+
 
 Masatake YAMATO <yamato@redhat.com>
 
