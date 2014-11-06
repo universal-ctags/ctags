@@ -27,6 +27,7 @@
 #include "debug.h"
 #include "get.h"
 #include "keyword.h"
+#include "options.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
@@ -37,7 +38,8 @@
 typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
 
 typedef enum {
-	K_UNDEFINED = -1,
+	K_IGNORE = -2,
+	K_UNDEFINED,
 	K_CONSTANT,
 	K_EVENT,
 	K_FUNCTION,
@@ -45,7 +47,8 @@ typedef enum {
 	K_NET,
 	K_PORT,
 	K_REGISTER,
-	K_TASK
+	K_TASK,
+	K_BLOCK
 } verilogKind;
 
 typedef struct {
@@ -57,6 +60,7 @@ typedef struct sTokenInfo {
 	verilogKind         kind;
 	vString*            name;          /* the name of the token */
 	struct sTokenInfo*  scope;         /* context of keyword */
+	int                 nestLevel;     /* Current nest level */
 } tokenInfo;
 
 /*
@@ -74,7 +78,8 @@ static kindOption VerilogKinds [] = {
  { TRUE, 'n', "net",       "net data types" },
  { TRUE, 'p', "port",      "ports" },
  { TRUE, 'r', "register",  "register data types" },
- { TRUE, 't', "task",      "tasks" }
+ { TRUE, 't', "task",      "tasks" },
+ { TRUE, 'b', "block",     "blocks" }
 };
 
 static keywordAssoc VerilogKeywordTable [] = {
@@ -87,6 +92,7 @@ static keywordAssoc VerilogKeywordTable [] = {
 	{ "module",    K_MODULE },
 	{ "output",    K_PORT },
 	{ "parameter", K_CONSTANT },
+	{ "localparam",K_CONSTANT },
 	{ "real",      K_REGISTER },
 	{ "realtime",  K_REGISTER },
 	{ "reg",       K_REGISTER },
@@ -103,7 +109,10 @@ static keywordAssoc VerilogKeywordTable [] = {
 	{ "trireg",    K_NET },
 	{ "wand",      K_NET },
 	{ "wire",      K_NET },
-	{ "wor",       K_NET }
+	{ "wor",       K_NET },
+	{ "begin",     K_BLOCK },
+	{ "end",       K_BLOCK },
+	{ "signed",    K_IGNORE }
 };
 
 static tokenInfo *currentContext = NULL;
@@ -112,12 +121,27 @@ static tokenInfo *currentContext = NULL;
  *   FUNCTION DEFINITIONS
  */
 
+static short isContainer (verilogKind kind)
+{
+	switch (kind)
+	{
+		case K_MODULE:
+		case K_TASK:
+		case K_FUNCTION:
+		case K_BLOCK:
+			return TRUE;
+		default:
+			return FALSE;
+	}
+}
+
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
 	token->kind = K_UNDEFINED;
 	token->name = vStringNew ();
 	token->scope = NULL;
+	token->nestLevel = 0;
 	return token;
 }
 
@@ -239,6 +263,41 @@ static int skipPastMatch (const char *const pair)
 	return vGetc ();
 }
 
+static void skipToEOL ()
+{
+	volatile int c;
+	do
+	{
+		c = vGetc ();
+	} while (c != '\n');
+}
+
+static void skipComments (int c)
+{
+	volatile int p;
+
+	if (c == '/')
+	{
+		c = vGetc ();
+		if (c == '/')
+		{
+			skipToEOL ();
+		}
+		else if (c == '*')
+		{
+			do
+			{
+				p = c;
+				c = vGetc ();
+			} while (p != '*' && c != '/');
+		}
+		else
+		{
+			vUngetc (c);
+		}
+	}
+}
+
 static boolean readIdentifier (vString *const name, int c)
 {
 	vStringClear (name);
@@ -255,39 +314,124 @@ static boolean readIdentifier (vString *const name, int c)
 	return (boolean)(vStringLength (name) > 0);
 }
 
-static vString *genContext (void)
+static void createContext (tokenInfo *const scope)
 {
-	vString *context, *catNames;
-	tokenInfo *current;
+	if (scope)
+	{
+		vString *contextName = vStringNew ();
+
+		verbose ("Creating new context %s\n", vStringValue (scope->name));
+		/* Determine full context name */
+		if (currentContext)
+		{
+			vStringCopy (contextName, currentContext->name);
+			vStringCatS (contextName, ".");
+		}
+		vStringCat (contextName, scope->name);
+		/* Create context */
+		currentContext = pushToken (currentContext, scope);
+		vStringCopy (currentContext->name, contextName);
+		vStringDelete (contextName);
+	}
+}
+
+static void createTag (const verilogKind kind, vString *name)
+{
+	tagEntryInfo tag;
+
+	initTagEntry (&tag, vStringValue (name));
+	tag.kindName    = VerilogKinds[kind].name;
+	tag.kind        = VerilogKinds[kind].letter;
+	verbose ("Adding tag %s", vStringValue (name));
 	if (currentContext)
 	{
-		context = vStringNew ();
-		vStringCopy (context, currentContext->name);
-		current = currentContext->scope;
-		while (current) {
-			catNames = vStringNew ();
+		verbose (" to context %s\n", vStringValue (currentContext->name));
+		tag.extensionFields.scope [0] = VerilogKinds[currentContext->kind].name;
+		tag.extensionFields.scope [1] = vStringValue (currentContext->name);
+	}
+	verbose ("\n");
+	makeTagEntry (&tag);
+	if (Option.include.qualifiedTags && currentContext)
+	{
+		vString *const scopedName = vStringNew ();
 
-			vStringCopy (catNames, current->name);
-			vStringCatS (catNames, ".");
-			vStringCat (catNames, context);
-			vStringCopy (context, catNames);
+		vStringCopy (scopedName, currentContext->name);
+		vStringCatS (scopedName, ".");
+		vStringCatS (scopedName, vStringValue (name));
+		tag.name = vStringValue (scopedName);
 
-			current = current->scope;
-			vStringDelete (catNames);
-		}
-		return context;
+		makeTagEntry (&tag);
+
+		vStringDelete (scopedName);
+	}
+	if (isContainer (kind))
+	{
+		tokenInfo *newScope = newToken ();
+
+		vStringCopy (newScope->name, name);
+		newScope->kind = kind;
+		createContext (newScope);
+	}
+}
+
+static boolean findBlockName (vString *const name)
+{
+	int c;
+
+	c = skipWhite (vGetc ());
+	if (c == ':')
+	{
+		c = skipWhite (vGetc ());
+		readIdentifier (name, c);
+		return (boolean) (vStringLength (name) > 0);
 	}
 	else
-		return NULL;
+		vUngetc (c);
+	return FALSE;
+}
+
+static void processBlock (vString *const name, const verilogKind kind)
+{
+	boolean blockStart = FALSE;
+	boolean blockEnd   = FALSE;
+
+	if (currentContext)
+	{
+		if (strcmp (vStringValue (name), "begin") == 0)
+		{
+			currentContext->nestLevel++;
+			blockStart = TRUE;
+		}
+		if (strcmp (vStringValue (name), "end") == 0)
+		{
+			currentContext->nestLevel--;
+			blockEnd = TRUE;
+		}
+	}
+
+	if (findBlockName (name))
+	{
+		verbose ("Found block: %s\n", vStringValue (name));
+		if (blockStart)
+		{
+			createTag (kind, name);
+			verbose ("Current context %s\n", vStringValue (currentContext->name));
+		}
+		if (blockEnd && currentContext->kind == K_BLOCK && currentContext->nestLevel <= 1)
+		{
+			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
+			currentContext = popToken (currentContext);
+		}
+	}
 }
 
 static void tagNameList (const verilogKind kind, int c)
 {
 	vString *name = vStringNew ();
-	verilogKind localKind;
-	tagEntryInfo tag;
+	verilogKind localKind, nameKind;
 	boolean repeat;
 	Assert (isIdentifierCharacter (c));
+	localKind = kind;
 	do
 	{ 
 		repeat = FALSE;
@@ -295,32 +439,20 @@ static void tagNameList (const verilogKind kind, int c)
 		{
 			readIdentifier (name, c);
 			/* Check if "name" is in fact a keyword */
-			localKind = (verilogKind) lookupKeyword (vStringValue (name), getSourceLanguage () );
-			if (kind != K_PORT || localKind == K_UNDEFINED)
+			nameKind = (verilogKind) lookupKeyword (vStringValue (name), getSourceLanguage () );
+			/* Create tag in case name is not a known kind ... */
+			if (nameKind == K_UNDEFINED)
 			{
-				initTagEntry (&tag, vStringValue (name));
-				tag.kindName    = VerilogKinds[kind].name;
-				tag.kind        = VerilogKinds[kind].letter;
-				if (kind != K_MODULE && currentContext)
-				{
-					tag.extensionFields.scope [0] = VerilogKinds[currentContext->kind].name;
-					tag.extensionFields.scope [1] = vStringValue (currentContext->name);
-				}
-				makeTagEntry (&tag);
-				if (kind == K_MODULE || kind == K_FUNCTION || kind == K_TASK)
-				{
-					tokenInfo *newScope = newToken ();
-					vString *contextName;
-					vStringCopy (newScope->name, name);
-					newScope->kind = kind;
-					currentContext = pushToken (currentContext, newScope);
-					contextName = genContext ();
-					vStringCopy (currentContext->name, contextName);
-					vStringDelete (contextName);
-				}
+				createTag (localKind, name);
 			}
+			/* ... or else continue searching for names */
 			else
 			{
+				/* Update local kind unless it's a port or an ignored keyword */
+				if (localKind != K_PORT && nameKind != K_IGNORE)
+				{
+					localKind = nameKind;
+				}
 				repeat = TRUE;
 			}
 		}
@@ -337,9 +469,10 @@ static void tagNameList (const verilogKind kind, int c)
 				skipPastMatch ("{}");
 			else
 			{
+				/* Skip until end of current name, kind or parameter list definition */
 				do
 					c = vGetc ();
-				while (c != ','  &&  c != ';');
+				while (c != ','  &&  c != ';' && c != ')');
 			}
 		}
 		if (c == ',')
@@ -354,34 +487,50 @@ static void tagNameList (const verilogKind kind, int c)
 
 static void findTag (vString *const name)
 {
+	int c;
+	const verilogKind kind = (verilogKind) lookupKeyword (vStringValue (name), Lang_verilog);
+
 	/* Search for end of current context to drop respective context */
 	if (currentContext)
 	{
 		vString *endTokenName = vStringNewInit("end");
-		vStringCatS (endTokenName, VerilogKinds[currentContext->kind].name);
-		if (strcmp (vStringValue (name), vStringValue (endTokenName)) == 0)
+		if (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0 && strcmp (vStringValue (name), vStringValue (endTokenName)) == 0)
 		{
+			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
 			currentContext = popToken (currentContext);
+		}
+		else
+		{
+			vStringCatS (endTokenName, VerilogKinds[currentContext->kind].name);
+			if (strcmp (vStringValue (name), vStringValue (endTokenName)) == 0)
+			{
+				verbose ("Dropping context %s\n", vStringValue (currentContext->name));
+				currentContext = popToken (currentContext);
+			}
 		}
 		vStringDelete(endTokenName);
 	}
 
-	const verilogKind kind = (verilogKind) lookupKeyword (vStringValue (name), Lang_verilog);
 	if (kind == K_CONSTANT && vStringItem (name, 0) == '`')
 	{
 		/* Bug #961001: Verilog compiler directives are line-based. */
-		int c = skipWhite (vGetc ());
+		c = skipWhite (vGetc ());
 		readIdentifier (name, c);
-		makeSimpleTag (name, VerilogKinds, kind);
+		createTag (kind, name);
 		/* Skip the rest of the line. */
 		do {
 			c = vGetc();
 		} while (c != '\n');
 		vUngetc (c);
 	}
+	else if (kind == K_BLOCK)
+	{
+		/* Process begin..end blocks */
+		processBlock (name, kind);
+	}
 	else if (kind != K_UNDEFINED)
 	{
-		int c = skipWhite (vGetc ());
+		c = skipWhite (vGetc ());
 
 		/* Many keywords can have bit width.
 		*   reg [3:0] net_name;
@@ -408,7 +557,6 @@ static void findTag (vString *const name)
 static void findVerilogTags (void)
 {
 	vString *const name = vStringNew ();
-	volatile boolean newStatement = TRUE;
 	volatile int c = '\0';
 	exception_t exception = (exception_t) setjmp (Exception);
 
@@ -417,21 +565,16 @@ static void findVerilogTags (void)
 		c = vGetc ();
 		switch (c)
 		{
-			case ';':
-			case '(':
-			case '\n':
-				newStatement = TRUE;
+			case '/':
+				skipComments (c);
 				break;
-
-			case ' ':
-			case '\t':
-				break;
-
-			default:
-				if (newStatement && readIdentifier (name, c))
+			default :
+				c = skipWhite (c);
+				if (isIdentifierCharacter (c))
+				{
+					readIdentifier (name, c);
 					findTag (name);
-				newStatement = FALSE;
-				break;
+				}
 		}
 	}
 
