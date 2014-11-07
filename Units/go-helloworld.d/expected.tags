@@ -1,0 +1,2 @@
+main	input.go	/^func main() {$/;"	f
+main	input.go	/^package main$/;"	p
