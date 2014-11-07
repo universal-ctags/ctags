@@ -169,6 +169,11 @@ static tokenInfo *popToken (tokenInfo * const token)
 	return NULL;
 }
 
+static void pruneTokens (tokenInfo * token)
+{
+	while (token = popToken (token));
+}
+
 static void initialize (const langType language)
 {
 	size_t i;
@@ -572,7 +577,7 @@ static void findVerilogTags (void)
 	}
 
 	vStringDelete (name);
-	deleteToken (currentContext);
+	pruneTokens (currentContext);
 	currentContext = NULL;
 }
 
