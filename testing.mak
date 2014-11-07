@@ -11,6 +11,7 @@ TEST_OPTIONS = -nu --c-kinds=+lpx
 FUZZ_TIMEOUT=10
 # You can specify one of language listed in $(./ctags --list-languages).
 FUZZ_LANGUAGE=
+UNIT_LANGUAGE=
 FUZZ_SRC_DIRS=
 
 DIFF_OPTIONS = -U 0 -I '^!_TAG' --strip-trailing-cr
@@ -202,6 +203,10 @@ test.units: $(CTAGS_TEST)
 		name=$${t%.[dbti]}; \
 		\
 		if test -n "$(UNIT)" -a "$${name}" != "Units/$(UNIT)"; then continue; fi; \
+		if test -n "$(UNIT_LANGUAGE)"; then \
+			l="$$($(UNIT_CTAGS_CMDLINE) --guess-parser "$$input" 2>/dev/null | sed -nr 's/^.*: (.+)$$/\1/p')"; \
+			test "$$l" = "$(UNIT_LANGUAGE)" || continue; \
+		fi; \
 		\
 		expected="$$t"/expected.tags; \
 		expectedtmp="$$t"/EXPECTED.TMP; \
