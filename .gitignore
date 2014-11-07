@@ -31,3 +31,8 @@ core.*
 syntax.vim
 STDERR.*
 badinput
+win32/*.sdf
+win32/*.opensdf
+win32/*.suo
+win32/[Rr]elease/
+win32/[Dd]ebug/
