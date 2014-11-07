@@ -415,8 +415,8 @@ again:
 		if (isType (token, TOKEN_DOT))
 		{
 			readToken (token);
-			Assert (isType (token, TOKEN_IDENTIFIER));
-			readToken (token);
+			if (isType (token, TOKEN_IDENTIFIER))
+				readToken (token);
 		}
 		return;
 	}
@@ -426,7 +426,7 @@ again:
 	if (isKeyword (token, KEYWORD_struct) || isKeyword (token, KEYWORD_interface))
 	{
 		readToken (token);
-		Assert (isType (token, TOKEN_OPEN_CURLY));
+		// skip over "{}"
 		skipToMatched (token);
 		return;
 	}
@@ -454,7 +454,7 @@ again:
 	if (isKeyword (token, KEYWORD_map))
 	{
 		readToken (token);
-		Assert (isType (token, TOKEN_OPEN_SQUARE));
+		// skip over "[]"
 		skipToMatched (token);
 		goto again;
 	}
@@ -466,8 +466,7 @@ again:
 	if (isKeyword (token, KEYWORD_func))
 	{
 		readToken (token);
-		Assert (isType (token, TOKEN_OPEN_PAREN));
-		// Parameters
+		// Parameters, skip over "()"
 		skipToMatched (token);
 		// Result is parameters or type or nothing.  skipType treats anything
 		// surrounded by parentheses as a type, and does nothing if what
@@ -520,12 +519,14 @@ static void parsePackage (tokenInfo *const token __unused__)
 	tokenInfo *const name = newToken ();
 
 	readToken (name);
-	Assert (isType (name, TOKEN_IDENTIFIER));
-	makeTag (name, GOTAG_PACKAGE);
-	if (!scope && Option.include.qualifiedTags)
+	if (isType (name, TOKEN_IDENTIFIER))
 	{
-		scope = vStringNew ();
-		vStringCopy (scope, name->string);
+		makeTag (name, GOTAG_PACKAGE);
+		if (!scope && Option.include.qualifiedTags)
+		{
+			scope = vStringNew ();
+			vStringCopy (scope, name->string);
+		}
 	}
 
 	deleteToken (name);
@@ -546,20 +547,21 @@ static void parseFunctionOrMethod (tokenInfo *const token)
 	if (isType (name, TOKEN_OPEN_PAREN))
 		skipToMatched (name);
 
-	Assert (isType (name, TOKEN_IDENTIFIER));
-
-	// Skip over parameters.
-	readToken (token);
-	skipToMatched (token);
-
-	// Skip over result.
-	skipType (token);
-
-	// Skip over function body.
-	if (isType (token, TOKEN_OPEN_CURLY))
+	if (isType (name, TOKEN_IDENTIFIER))
+	{
+		// Skip over parameters.
+		readToken (token);
 		skipToMatched (token);
 
-	makeTag (name, GOTAG_FUNCTION);
+		// Skip over result.
+		skipType (token);
+
+		// Skip over function body.
+		if (isType (token, TOKEN_OPEN_CURLY))
+			skipToMatched (token);
+
+		makeTag (name, GOTAG_FUNCTION);
+	}
 
 	deleteToken (name);
 }
