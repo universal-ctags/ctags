@@ -1,0 +1,4 @@
+f1	input.go	/^func f1(a int, b int) int {$/;"	f
+f2	input.go	/^func f2(a int, b int) int {$/;"	f
+f3	input.go	/^func f3() {}$/;"	f
+test	input.go	/^package test$/;"	p

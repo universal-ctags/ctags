@@ -61,6 +61,7 @@ typedef enum eTokenType {
 	TOKEN_SEMICOLON,
 	TOKEN_STAR,
 	TOKEN_LEFT_ARROW,
+	TOKEN_LESS_THAN,
 	TOKEN_DOT,
 	TOKEN_COMMA,
 	TOKEN_EOF
@@ -284,13 +285,14 @@ getNextChar:
 			{
 				int d = fileGetc ();
 				if (d == '-')
-				{
 					token->type = TOKEN_LEFT_ARROW;
-					break;
-				}
 				else
-					goto getNextChar;
+				{
+					fileUngetc (d);
+					token->type = TOKEN_LESS_THAN;
+				}
 			}
+			break;
 
 		case '(':
 			token->type = TOKEN_OPEN_PAREN;
