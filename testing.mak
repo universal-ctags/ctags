@@ -97,7 +97,7 @@ define STDERR
 endef
 endif
 
-.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units units fuzz clean clean-test
+.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units units fuzz clean clean-test clean-units
 
 test: test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units
 
@@ -328,6 +328,11 @@ units: $(CTAGS_TEST)
 	$(SHELL) $${c} Units; \
 	[ $$? -eq 0 ]  || success=false; \
 	$$success
+clean-units:
+	\
+	c="misc/units clean"; \
+	$(SHELL) $${c} Units; \
+	true
 
 # Local Variables:
 # Mode: makefile

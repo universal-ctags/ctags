@@ -75,6 +75,7 @@ Usage:
 		--with-valgrind: run a test case under valgrind
 			       If this option given, DURATION is changed as
 			       DURATION = DURATION * ${_VG_TIMEOUT_FACTOR}
+	$0 clean UNITS-DIR
 EOF
 }
 
@@ -528,6 +529,11 @@ action_run ()
 	ERROR 1 "UNITS_DIR parameter is not given in ${action} action"
     fi
 
+    if ! [ -d "$units_dir" ]; then
+	ERROR 1 "No such directory: ${UNITS_DIR}"
+    fi
+	
+
     if ! [ -f "${CTAGS}" ]; then
 	ERROR 1 "no such file: ${CTAGS}"
     elif ! [ -e "${CTAGS}" ]; then
@@ -561,6 +567,32 @@ action_run ()
     fi
 }
 
+action_clean ()
+{
+    local action="$1"
+    shift
+    
+    local units_dir=$1
+    shift
+
+    if [ $# -gt 0 ]; then
+	ERROR 1 "too many arguments for ${action} action: $*"
+    elif [ -z "$units_dir" ]; then
+	ERROR 1 "UNITS_DIR parameter is not given in ${action} action"
+    fi
+    
+    if ! [ -d "$units_dir" ]; then
+	ERROR 1 "No such directory: ${UNITS_DIR}"
+    fi
+
+    check_availability find
+    check_availability rm
+
+    rm -f $(find "$units_dir" -name '*.tmp')
+    rm -f $(find "$units_dir" -name '*.TMP')
+    return 0
+}
+
 main ()
 {
     if [ $# = 0 ]; then
@@ -575,6 +607,10 @@ main ()
 	    ;;
 	run)
 	    action_run "$@"
+	    return $?
+	    ;;
+	clean)
+	    action_clean "$@"
 	    return $?
 	    ;;
 	*)
