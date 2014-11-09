@@ -297,6 +297,8 @@ run_tcase ()
 	clean_tcase "${t}"
 	if [ "$class" = 'b' ]; then
 	    L_FIXED="$L_FIXED ${category}/${name}"
+	elif [ "$class" = 'i' ]; then
+	    L_FIXED="$L_FIXED ${category}/${name}"
 	fi
 	L_PASSED="$L_PASSED ${category}/${name}"
 	run_result "passed"
