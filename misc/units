@@ -273,9 +273,9 @@ run_tcase ()
 	    run_result "TIMED OUT"
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 1
-	elif [ "$WITH_VALGRIND" = 'yes' ] && [ "${tmp}" = "${_VALGRIND_EXIT}" ] && ![ "${class}" = v ]; then
+	elif [ "$WITH_VALGRIND" = 'yes' ] && [ "${tmp}" = "${_VALGRIND_EXIT}" ] && ! [ "${class}" = v ]; then
 	    L_VALGRIND="${L_VALGRIND} ${category}/${name}"
-	    run_result "valgrind"
+	    run_result "valgrind-error"
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 1
 	elif [ "$class" = 'b' ]; then
@@ -447,6 +447,13 @@ run_summary ()
     count_list $L_KNOWN_BUGS
     echo "$?"
     for t in $L_KNOWN_BUGS; do
+	echo "	${t#${_DEFAULT_CATEGORY}/}"
+    done
+
+    printf '  %-40s' "#valgrind-error:"
+    count_list $L_VALGRIND
+    echo "$?"
+    for t in $L_VALGRIND; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
     done
 }

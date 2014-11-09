@@ -321,9 +321,12 @@ endif
 #
 # SHELL must be dash or bash.
 #
+ifdef VG
+UNITS_VALGRIND=--with-valgrind
+endif
 units: $(CTAGS_TEST)
 	@ \
-	c="misc/units run --language=$(UNIT_LANGUAGE) --unit=$(UNIT)"; \
+	c="misc/units run --language=$(UNIT_LANGUAGE) --unit=$(UNIT) $(UNITS_VALGRIND)"; \
 	success=true; \
 	$(SHELL) $${c} Units; \
 	[ $$? -eq 0 ]  || success=false; \
