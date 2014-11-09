@@ -6,6 +6,7 @@ test.*.diff
 *.od
 *.obj
 *.TMP
+*.tmp
 ctags.exe
 ctags.ref.exe
 dctags.exe
@@ -36,3 +37,5 @@ win32/*.opensdf
 win32/*.suo
 win32/[Rr]elease/
 win32/[Dd]ebug/
+perf.data*
+a.out
