@@ -278,6 +278,11 @@ run_tcase ()
 	    run_result "valgrind"
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 1
+	elif [ "$class" = 'b' ]; then
+	    L_KNOWN_BUGS="$L_KNOWN_BUGS ${category}/${name}"
+	    run_result "failed but KNOWN bug"
+	    echo "${_CMDLINE}" > "${ocmdline}"
+	    return 0
 	else
 	    L_FAILED_BY_STATUS="$L_FAILED_BY_STATUS ${category}/${name}"
 	    run_result "FAILED (unexpected exit status: $tmp)"
