@@ -20,7 +20,7 @@
 
 #
 # Global Parameters
-# 
+#
 CTAGS=./ctags
 DATADIR=./data
 WITH_TIMEOUT=0
@@ -70,11 +70,11 @@ Usage:
 		--skip NAME: skip the case NAME (TODO: NOT IMPLEMENTED YET)
 		--language PARSER: run only PARSER related cases
 		--with-timeout DURATION: run a test case under timeout
-			                 command with SECOND.
-			                 0 means no timeout(default).
+					 command with SECOND.
+					 0 means no timeout(default).
 		--with-valgrind: run a test case under valgrind
-                               If this option given, DURATION is changed as
-                               DURATION = DURATION * ${_VG_TIMEOUT_FACTOR}
+			       If this option given, DURATION is changed as
+			       DURATION = DURATION * ${_VG_TIMEOUT_FACTOR}
 EOF
 }
 
@@ -152,7 +152,7 @@ check_languages()
     local found
     local expected;
 
-    
+
     #
     # TODO: consider the value of LANGUAGE
     #
@@ -184,7 +184,7 @@ run_tcase ()
     local category="$5"
     shift 5
 
-    
+
     local fargs="$t/args.ctags"
     local ffeatures="$t/features"
     local flanguages="$t/languages"
@@ -219,7 +219,7 @@ run_tcase ()
     fi
 
     #
-    # Build _CMDLINE 
+    # Build _CMDLINE
     #
     _CMDLINE="${CTAGS} --options=NONE --libexec-dir=libexec --libexec-dir=+$t --data-dir=${DATADIR} --data-dir=+$t -o -"
     [ -f "${fargs}" ] && _CMDLINE="${_CMDLINE} --options=${fargs}"
@@ -236,7 +236,7 @@ run_tcase ()
 
     printf '%-60s' "Testing ${name}"
 
-    
+
     if [ -f "${ffeatures}" ] && ! tmp=$(check_features "${ffeatures}"); then
 	L_SKIPPED_BY_FEATURES="$L_SKIPPED_BY_FEATURES ${category}/${name}"
 	run_result "skipped (required feature \"$tmp\" is not available)"
@@ -311,7 +311,7 @@ run_tcase ()
 	elif ! [ "$WITH_TIMEOUT" = 0 ] && [ "${class}" = 'i' ]; then
 	    L_FIXED="$L_FIXED ${category}/${name}"
 	fi
-	  
+
 	L_PASSED="$L_PASSED ${category}/${name}"
 	run_result "passed"
 	return 0
@@ -533,7 +533,7 @@ action_run ()
     elif ! [ -e "${CTAGS}" ]; then
 	ERROR 1 "${CTAGS} is not an executable file"
     fi
-    
+
     [ -d "${DATADIR}" ] || ERROR 1 "no such directory: ${DATADIR}"
     : ${WITH_TIMEOUT:=0}
     [ "$WITH_TIMEOUT" = 0 ] || check_availability timeout
@@ -541,7 +541,7 @@ action_run ()
     check_availability grep
     check_availability diff
 
-    
+
     category="${_DEFAULT_CATEGORY}"
     run_dir "${category}" "${units_dir}"
 
