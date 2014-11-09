@@ -97,7 +97,7 @@ define STDERR
 endef
 endif
 
-.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units fuzz clean clean-test
+.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units units fuzz clean clean-test
 
 test: test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units
 
@@ -317,6 +317,17 @@ fuzz: $(CTAGS_TEST)
 		fi ; \
 	done
 endif
+
+#
+# SHELL must be dash or bash.
+#
+units: $(CTAGS_TEST)
+	@ \
+	c="misc/units run --language=$(UNIT_LANGUAGE) --unit=$(UNIT)"; \
+	success=true; \
+	$(SHELL) $${c} Units; \
+	[ $$? -eq 0 ]  || success=false; \
+	$$success
 
 # Local Variables:
 # Mode: makefile
