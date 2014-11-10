@@ -1,0 +1,38 @@
+a foo{ color: red }
+a #foo{ color: red }
+a .foo{ color: red }
+a foo bar{ color: red }
+a foo #bar{ color: red }
+a foo .bar{ color: red }
+a #foo bar{ color: red }
+a #foo #bar{ color: red }
+a #foo .bar{ color: red }
+a .foo bar{ color: red }
+a .foo #bar{ color: red }
+a .foo .bar{ color: red }
+
+#a foo{ color: red }
+#a #foo{ color: red }
+#a .foo{ color: red }
+#a foo bar{ color: red }
+#a foo #bar{ color: red }
+#a foo .bar{ color: red }
+#a #foo bar{ color: red }
+#a #foo #bar{ color: red }
+#a #foo .bar{ color: red }
+#a .foo bar{ color: red }
+#a .foo #bar{ color: red }
+#a .foo .bar{ color: red }
+
+.a foo{ color: red }
+.a #foo{ color: red }
+.a .foo{ color: red }
+.a foo bar{ color: red }
+.a foo #bar{ color: red }
+.a foo .bar{ color: red }
+.a #foo bar{ color: red }
+.a #foo #bar{ color: red }
+.a #foo .bar{ color: red }
+.a .foo bar{ color: red }
+.a .foo #bar{ color: red }
+.a .foo .bar{ color: red }
