@@ -173,13 +173,15 @@ static void findCssTags (void)
 		}
 		else if (token.type == TOKEN_SELECTOR)
 		{ /* collect selectors and make a tag */
-			cssKind kind = classifySelector (token.string);
+			cssKind kind = K_SELECTOR;
 			vString *selector = vStringNew ();
 			do
 			{
 				if (vStringLength (selector) > 0)
 					vStringPut (selector, ' ');
 				vStringCat (selector, token.string);
+
+				kind = classifySelector (token.string);
 
 				readToken (&token);
 			}
