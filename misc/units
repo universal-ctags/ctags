@@ -186,9 +186,32 @@ check_languages()
     return 0
 }
 
-run_result ()
+run_result_skip ()
 {
-    echo "$1"
+    if [ -n "$1" ]; then
+	echo -e "\e[0;33mskipped\e[0m"
+    else
+	echo -e "\e[0;33mskipped\e[0m ($1)"
+    fi
+}
+
+run_result_error ()
+{
+    if [ ! -n "$1" ]; then
+	echo -e "\e[0;31mfailed\e[0m"
+    else
+	echo -e "\e[0;31mfailed\e[0m ($1)"
+    fi
+}
+
+run_result_ok ()
+{
+    echo -e "\e[0;32mpassed\e[0m"
+}
+
+run_result_known_error ()
+{
+    echo -e "\e[0;33mfailed\e[0m (KNOWN bug)"
 }
 
 run_tcase ()
@@ -257,15 +280,15 @@ run_tcase ()
 
     if [ -f "${ffeatures}" ] && ! tmp=$(check_features "${ffeatures}"); then
 	L_SKIPPED_BY_FEATURES="$L_SKIPPED_BY_FEATURES ${category}/${name}"
-	run_result "skipped (required feature \"$tmp\" is not available)"
+	run_result_skip "required feature \"$tmp\" is not available"
 	return 1
     elif [ -f "${flanguages}" ] && ! tmp=$(check_languages "${flanguages}"); then
 	L_SKIPPED_BY_LANGUAGES="$L_SKIPPED_BY_LANGUAGES ${category}/${name}"
-	run_result "skipped (required language parser \"$tmp\" is not available)"
+	run_result_skip "required language parser \"$tmp\" is not available"
 	return 1
     elif [ "$WITH_TIMEOUT" = 0 ] && [ "${class}" = 'i' ]; then
 	L_SKIPPED_BY_ILOOP="$L_SKIPPED_BY_ILOOP ${category}/${name}"
-	run_result "skipped (may cause an infinite loop)"
+	run_result_skip "may cause an infinite loop"
 	return 1
     fi
 
@@ -287,22 +310,22 @@ run_tcase ()
     if [ "$tmp" != 0 ]; then
 	if ! [ "$WITH_TIMEOUT" = 0 ] && [ "${tmp}" = "${_TIMEOUT_EXIT}" ]; then
 	    L_FAILED_BY_TIMEED_OUT="${L_FAILED_BY_TIMEED_OUT} ${category}/${name}"
-	    run_result "TIMED OUT"
+	    run_result_error "TIMED OUT"
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 1
 	elif [ "$WITH_VALGRIND" = 'yes' ] && [ "${tmp}" = "${_VALGRIND_EXIT}" ] && ! [ "${class}" = v ]; then
 	    L_VALGRIND="${L_VALGRIND} ${category}/${name}"
-	    run_result "valgrind-error"
+	    run_result_error "valgrind-error"
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 1
 	elif [ "$class" = 'b' ]; then
 	    L_KNOWN_BUGS="$L_KNOWN_BUGS ${category}/${name}"
-	    run_result "failed but KNOWN bug"
+	    run_result_known_error
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 0
 	else
 	    L_FAILED_BY_STATUS="$L_FAILED_BY_STATUS ${category}/${name}"
-	    run_result "FAILED (unexpected exit status: $tmp)"
+	    run_result_error "unexpected exit status: $tmp"
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 1
 	fi
@@ -318,7 +341,7 @@ run_tcase ()
 	    L_FIXED="$L_FIXED ${category}/${name}"
 	fi
 	L_PASSED="$L_PASSED ${category}/${name}"
-	run_result "passed"
+	run_result_ok
 	return 0
     fi
 
@@ -341,17 +364,17 @@ run_tcase ()
 	fi
 
 	L_PASSED="$L_PASSED ${category}/${name}"
-	run_result "passed"
+	run_result_ok
 	return 0
     else
 	if [ "${class}" = 'b' ]; then
 	    L_KNOWN_BUGS="$L_KNOWN_BUGS ${category}/${name}"
-	    run_result "failed but KNOWN bug"
+	    run_result_known_error
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 0
 	else
 	    L_FAILED_BY_DIFF="$L_FAILED_BY_DIFF ${category}/${name}"
-	    run_result "FAILED  (unexpected output)"
+	    run_result_error "unexpected output"
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 1
 	fi
