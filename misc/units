@@ -101,7 +101,7 @@ line()
 
 count_list ()
 {
-    return $#
+    echo $#
 }
 
 clean_tcase ()
@@ -392,25 +392,21 @@ run_summary ()
 
     printf '  %-40s' "#passed:"
     count_list $L_PASSED
-    echo "$?"
 
     printf '  %-40s' "#FIXED:"
     count_list $L_FIXED
-    echo "$?"
     for t in $L_FIXED; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
     done
 
     printf '  %-40s' "#FAILED (unexpected-exit-status):"
     count_list $L_FAILED_BY_STATUS
-    echo "$?"
     for t in $L_FAILED_BY_STATUS; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
     done
 
     printf '  %-40s' "#FAILED (unexpected-output):"
     count_list $L_FAILED_BY_DIFF
-    echo "$?"
     for t in $L_FAILED_BY_DIFF; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
     done
@@ -418,7 +414,6 @@ run_summary ()
     if ! [ "$WITH_TIMEOUT" = 0 ]; then
 	printf '  %-40s' "#TIMED-OUT:"
 	count_list $L_FAILED_BY_TIMEED_OUT
-	echo "$?"
 	for t in $L_FAILED_BY_TIMEED_OUT; do
 	    echo "	${t#${_DEFAULT_CATEGORY}/}"
 	done
@@ -426,14 +421,12 @@ run_summary ()
 
     printf '  %-40s' "#skipped (features):"
     count_list $L_SKIPPED_BY_FEATURES
-    echo "$?"
     for t in $L_SKIPPED_BY_FEATURES; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
     done
 
     printf '  %-40s' "#skipped (languages):"
     count_list $L_SKIPPED_BY_LANGUAGES
-    echo "$?"
     for t in $L_SKIPPED_BY_LANGUAGES; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
     done
@@ -441,7 +434,6 @@ run_summary ()
     if [ "$WITH_TIMEOUT" = 0 ]; then
 	printf '  %-40s' "#skipped (infinite-loop):"
 	count_list $L_SKIPPED_BY_ILOOP
-	echo "$?"
 	for t in $L_SKIPPED_BY_ILOOP; do
 	    echo "	${t#${_DEFAULT_CATEGORY}/}"
 	done
@@ -449,14 +441,12 @@ run_summary ()
 
     printf '  %-40s' "#known-bugs:"
     count_list $L_KNOWN_BUGS
-    echo "$?"
     for t in $L_KNOWN_BUGS; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
     done
 
     printf '  %-40s' "#valgrind-error:"
     count_list $L_VALGRIND
-    echo "$?"
     for t in $L_VALGRIND; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
     done
