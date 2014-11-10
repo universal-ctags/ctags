@@ -170,7 +170,9 @@ static void parseString (vString *const string, const int delimiter)
 			end = TRUE;
 		else if (c == '\\' && delimiter != '`')
 		{
-			c = fileGetc ();	/* This maybe a ' or ". */
+			c = fileGetc ();
+			if (c != '\'' && c != '\"')
+				vStringPut (string, '\\');
 			vStringPut (string, c);
 		}
 		else if (c == delimiter)
