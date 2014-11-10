@@ -1,0 +1,5 @@
+a[href^="http://"]	Units/css-attribute-selectors.b/input.css	/^a[href^="http:\/\/"] { color: red; }$/;"	s
+a[href^="https://"]	Units/css-attribute-selectors.b/input.css	/^a[href^="https:\/\/"] { color: green; }$/;"	s
+a[lang~=en]	Units/css-attribute-selectors.b/input.css	/^a[lang~=en] { background-color: light-green; }$/;"	s
+body	Units/css-attribute-selectors.b/input.css	/^body { color: black; }$/;"	s
+p	Units/css-attribute-selectors.b/input.css	/^p { color: gray }$/;"	s
