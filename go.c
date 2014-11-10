@@ -654,6 +654,11 @@ static void parseGoFile (tokenInfo *const token)
 					break;
 			}
 		}
+		else if (isType (token, TOKEN_OPEN_PAREN) || isType (token, TOKEN_OPEN_CURLY) ||
+			isType (token, TOKEN_OPEN_SQUARE))
+		{
+			skipToMatched (token);
+		}
 	} while (token->type != TOKEN_EOF);
 }
 
