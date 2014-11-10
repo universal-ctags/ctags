@@ -169,7 +169,8 @@ static void findCssTags (void)
 		{ /* At-rules, from the "@" to the next block or semicolon */
 			boolean useContents;
 			readToken (&token);
-			useContents = strcmp (vStringValue (token.string), "media") == 0;
+			useContents = (strcmp (vStringValue (token.string), "media") == 0 ||
+						   strcmp (vStringValue (token.string), "supports") == 0);
 			while (token.type != TOKEN_EOF &&
 				   token.type != ';' && token.type != '{')
 			{
