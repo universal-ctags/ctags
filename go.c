@@ -416,6 +416,7 @@ static void skipType (tokenInfo *const token)
 {
 again:
 	// Type      = TypeName | TypeLit | "(" Type ")" .
+	// Skips also function multiple return values "(" Type {"," Type} ")"
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
 		skipToMatched (token);
@@ -488,16 +489,6 @@ again:
 		// surrounded by parentheses as a type, and does nothing if what
 		// follows is not a type.
 		goto again;
-	}
-}
-
-// Skip to the next semicolon, skipping over matching brackets.
-static void skipToTopLevelSemicolon (tokenInfo *const token)
-{
-	while (!isType (token, TOKEN_SEMICOLON) && !isType (token, TOKEN_EOF))
-	{
-		readToken (token);
-		skipToMatched (token);
 	}
 }
 
@@ -608,19 +599,27 @@ again:
 	{
 		makeTag (name, kind);
 		readToken (token);
-		if (!isType (token, TOKEN_COMMA) && !isType (token, TOKEN_CLOSE_PAREN))
+		if (!isType (token, TOKEN_COMMA))
 			break;
 		readToken (name);
 	}
 
 	skipType (token);
-	skipToTopLevelSemicolon (token);
+	while (!isType (token, TOKEN_SEMICOLON) && !isType (token, TOKEN_CLOSE_PAREN)
+			&& !isType (token, TOKEN_EOF))
+	{
+		readToken (token);
+		skipToMatched (token);
+	}
 
 	if (usesParens)
 	{
-		readToken (name);
-		if (!isType (name, TOKEN_CLOSE_PAREN) && !isType (name, TOKEN_EOF))
-			goto again;
+		if (!isType (token, TOKEN_CLOSE_PAREN)) // we are at TOKEN_SEMICOLON
+		{
+			readToken (name);
+			if (!isType (name, TOKEN_CLOSE_PAREN) && !isType (name, TOKEN_EOF))
+				goto again;
+		}
 	}
 
 	deleteToken (name);
