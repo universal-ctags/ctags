@@ -147,6 +147,10 @@ You can run only the tests for a specific language by setting
 
 	make -f testing.mak test.units UNIT_LANGUAGE=PHP
 
+Multiple languages can be selected using a comma separated list::
+
+	make -f testing.mak test.units UNIT_LANGUAGE=C,C++
+
 Gathering test cases for known bugs
 ------------------------------------------------------------
 
