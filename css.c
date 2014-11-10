@@ -85,11 +85,14 @@ getNextChar:
 			const int delimiter = c;
 			do
 			{
+				vStringPut (token->string, c);
 				c = fileGetc ();
 				if (c == '\\')
 					c = fileGetc ();
 			}
 			while (c != EOF && c != delimiter);
+			if (c != EOF)
+				vStringPut (token->string, c);
 			token->type = TOKEN_STRING;
 			break;
 		}
@@ -100,6 +103,7 @@ getNextChar:
 			if (d != '*')
 			{
 				fileUngetc (d);
+				vStringPut (token->string, c);
 				token->type = c;
 			}
 			else
@@ -118,7 +122,10 @@ getNextChar:
 
 		default:
 			if (! isSelectorChar (c))
+			{
+				vStringPut (token->string, c);
 				token->type = c;
+			}
 			else
 			{
 				parseSelector (token->string, c);
@@ -185,6 +192,24 @@ static void findCssTags (void)
 				kind = classifySelector (token.string);
 
 				readToken (&token);
+
+				/* handle attribute selectors */
+				if (token.type == '[')
+				{
+					int depth = 1;
+					while (depth > 0 && token.type != TOKEN_EOF)
+					{
+						vStringCat (selector, token.string);
+						readToken (&token);
+						if (token.type == '[')
+							depth++;
+						else if (token.type == ']')
+							depth--;
+					}
+					if (token.type != TOKEN_EOF)
+						vStringCat (selector, token.string);
+					readToken (&token);
+				}
 			}
 			while (token.type == TOKEN_SELECTOR);
 			/* we already consumed the next token, don't read it twice */
