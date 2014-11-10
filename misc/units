@@ -201,6 +201,8 @@ run_tcase ()
     local odiff="$t/DIFF.tmp"
     local ocmdline="$t/CMDLINE.tmp"
     local ovalgrind="$t/VALGRIND.tmp"
+    local oshstdout="$t/SHSTDOUT.tmp"
+    local oshstderr="$t/SHSTDERR.tmp"
     local tmp
 
 
@@ -264,7 +266,7 @@ run_tcase ()
     fi
 
     {
-	${_CMDLINE} 2> "${ostderr}" > "${orawout}"
+	( ${_CMDLINE} 2> "${ostderr}" > "${orawout}" ) 2> "${oshstderr}" > "${oshstdout}"
 	tmp="$?"
     }
     if [ "$tmp" != 0 ]; then
