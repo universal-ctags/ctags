@@ -46,8 +46,8 @@ typedef struct sKeywordDesc {
 
 typedef enum eTokenType {
 	TOKEN_NONE = -1,
-	// Don't need TOKEN_FORWARD_SLASH
-	TOKEN_FORWARD_SLASH,
+	// Token not important for top-level Go parsing
+	TOKEN_OTHER,
 	TOKEN_KEYWORD,
 	TOKEN_IDENTIFIER,
 	TOKEN_STRING,
@@ -60,7 +60,6 @@ typedef enum eTokenType {
 	TOKEN_SEMICOLON,
 	TOKEN_STAR,
 	TOKEN_LEFT_ARROW,
-	TOKEN_LESS_THAN,
 	TOKEN_DOT,
 	TOKEN_COMMA,
 	TOKEN_EOF
@@ -116,10 +115,16 @@ static keywordDesc GoKeywordTable[] = {
 */
 
 // XXX UTF-8
+static boolean isStartIdentChar (const int c)
+{
+	return (boolean)
+		(isalpha (c) ||  c == '_' || c > 128);
+}
+
 static boolean isIdentChar (const int c)
 {
 	return (boolean)
-		(isalpha (c) || isdigit (c) ||  c == '_' || c > 128);
+		(isStartIdentChar (c) || isdigit (c));
 }
 
 static void initialize (const langType language)
@@ -185,7 +190,6 @@ static void parseString (vString *const string, const int delimiter)
 static void parseIdentifier (vString *const string, const int firstChar)
 {
 	int c = firstChar;
-	//Assert (isIdentChar (c));
 	do
 	{
 		vStringPut (string, c);
@@ -212,6 +216,7 @@ getNextChar:
 		token->filePosition = getInputFilePosition ();
 		if (c == '\n' && (lastTokenType == TOKEN_IDENTIFIER ||
 						  lastTokenType == TOKEN_STRING ||
+						  lastTokenType == TOKEN_OTHER ||
 						  lastTokenType == TOKEN_CLOSE_PAREN ||
 						  lastTokenType == TOKEN_CLOSE_CURLY ||
 						  lastTokenType == TOKEN_CLOSE_SQUARE))
@@ -269,7 +274,7 @@ getNextChar:
 						fileUngetc (hasNewline ? '\n' : ' ');
 						goto getNextChar;
 					default:
-						token->type = TOKEN_FORWARD_SLASH;
+						token->type = TOKEN_OTHER;
 						fileUngetc (d);
 						break;
 				}
@@ -293,7 +298,7 @@ getNextChar:
 				else
 				{
 					fileUngetc (d);
-					token->type = TOKEN_LESS_THAN;
+					token->type = TOKEN_OTHER;
 				}
 			}
 			break;
@@ -335,14 +340,19 @@ getNextChar:
 			break;
 
 		default:
-			parseIdentifier (token->string, c);
-			token->lineNumber = getSourceLineNumber ();
-			token->filePosition = getInputFilePosition ();
-			token->keyword = lookupKeyword (vStringValue (token->string), Lang_go);
-			if (isKeyword (token, KEYWORD_NONE))
-				token->type = TOKEN_IDENTIFIER;
+			if (isStartIdentChar (c))
+			{
+				parseIdentifier (token->string, c);
+				token->lineNumber = getSourceLineNumber ();
+				token->filePosition = getInputFilePosition ();
+				token->keyword = lookupKeyword (vStringValue (token->string), Lang_go);
+				if (isKeyword (token, KEYWORD_NONE))
+					token->type = TOKEN_IDENTIFIER;
+				else
+					token->type = TOKEN_KEYWORD;
+			}
 			else
-				token->type = TOKEN_KEYWORD;
+				token->type = TOKEN_OTHER;
 			break;
 	}
 
