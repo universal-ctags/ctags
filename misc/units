@@ -26,7 +26,7 @@ DATADIR=./data
 WITH_TIMEOUT=0
 CATEGORY=
 UNIT=
-LANGUAGE=
+LANGUAGES=
 
 #
 # Internal variables and constants
@@ -68,7 +68,7 @@ Usage:
 		--category CATEGORY: run only CATEGORY
 		--name NAME: run only NAME
 		--skip NAME: skip the case NAME (TODO: NOT IMPLEMENTED YET)
-		--language PARSER: run only PARSER related cases
+		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
 		--with-timeout DURATION: run a test case under timeout
 					 command with SECOND.
 					 0 means no timeout(default).
@@ -102,6 +102,21 @@ line()
 count_list ()
 {
     echo $#
+}
+
+member_p ()
+{
+    local elt="$1"
+    shift
+    local x
+
+    for x in "$@"; do
+	if [ "$x" = "$elt" ]; then
+	    return 0
+	fi
+    done
+
+    return 1
 }
 
 clean_tcase ()
@@ -155,7 +170,7 @@ check_languages()
 
 
     #
-    # TODO: consider the value of LANGUAGE
+    # TODO: consider the value of LANGUAGES
     #
     while read expected; do
 	    found=no
@@ -228,11 +243,11 @@ run_tcase ()
     [ -f "${fargs}" ] && _CMDLINE="${_CMDLINE} --options=${fargs}"
 
     #
-    # Filtered by LANGUAGE
+    # Filtered by LANGUAGES
     #
-    if [ -n "${LANGUAGE}" ]; then
+    if [ -n "${LANGUAGES}" ]; then
 	tmp=$( ${_CMDLINE} --guess-parser "$input" 2>/dev/null | sed -nr 's/^.*: (.+)$/\1/p')
-	[ "${tmp}" = "${LANGUAGE}" ] || return 1
+	member_p "${tmp}" ${LANGUAGES} || return 1
     fi
 
     clean_tcase "${t}"
@@ -499,13 +514,13 @@ action_run ()
 		UNIT="${1#--unit=}"
 		shift
 		;;
-	    --language)
+	    --languages)
 		shift
-		LANGUAGE="$1"
+		LANGUAGES=$(echo "${1}" | tr ',' ' ')
 		shift
 		;;
-	    --language=*)
-		LANGUAGE="${1#--language=}"
+	    --languages=*)
+		LANGUAGES=$(echo "${1#--languages=}" | tr ',' ' ')
 		shift
 		;;
 	    --with-timeout)
