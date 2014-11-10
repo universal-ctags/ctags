@@ -153,10 +153,7 @@ units: $(CTAGS_TEST)
 	[ $$? -eq 0 ]  || success=false; \
 	$$success
 clean-units:
-	\
-	c="misc/units clean"; \
-	$(SHELL) $${c} Units; \
-	true
+	$(SHELL) misc/units clean Units
 
 # Local Variables:
 # Mode: makefile
