@@ -228,6 +228,10 @@ getNextChar:
 			token->type = TOKEN_EOF;
 			break;
 
+		case ';':
+			token->type = TOKEN_SEMICOLON;
+			break;
+
 		case '/':
 			{
 				boolean hasNewline = FALSE;
