@@ -8,6 +8,7 @@
 #include <string.h> 
 #include <ctype.h> 
 
+#include "entry.h"
 #include "parse.h" 
 #include "read.h" 
 
@@ -183,6 +184,8 @@ static void findCssTags (void)
 		else if (token.type == TOKEN_SELECTOR)
 		{ /* collect selectors and make a tag */
 			cssKind kind = K_SELECTOR;
+			fpos_t filePosition;
+			unsigned long lineNumber;
 			vString *selector = vStringNew ();
 			do
 			{
@@ -191,6 +194,8 @@ static void findCssTags (void)
 				vStringCat (selector, token.string);
 
 				kind = classifySelector (token.string);
+				lineNumber = getSourceLineNumber ();
+				filePosition = getInputFilePosition ();
 
 				readToken (&token);
 
@@ -217,7 +222,18 @@ static void findCssTags (void)
 			readNextToken = FALSE;
 
 			vStringTerminate (selector);
-			makeSimpleTag (selector, CssKinds, kind);
+			if (CssKinds[kind].enabled)
+			{
+				tagEntryInfo e;
+				initTagEntry (&e, vStringValue (selector));
+
+				e.lineNumber	= lineNumber;
+				e.filePosition	= filePosition;
+				e.kindName		= CssKinds[kind].name;
+				e.kind			= (char) CssKinds[kind].letter;
+
+				makeTagEntry (&e);
+			}
 			vStringDelete (selector);
 		}
 		else if (token.type == '{')
