@@ -1,0 +1,3 @@
+*|div	Units/css-namespace-selectors.b/input.css	/^*|div { color: blue; }$/;"	s
+svg|a	Units/css-namespace-selectors.b/input.css	/^svg|a { color: green; }$/;"	s
+|a	Units/css-namespace-selectors.b/input.css	/^|a { color: red; }$/;"	s
