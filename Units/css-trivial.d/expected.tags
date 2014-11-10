@@ -1,0 +1,5 @@
+a	Units/css-trivial.d/input.css	/^a{ color: red; }$/;"	s
+html	Units/css-trivial.d/input.css	/^html{ font: sans-serif; }$/;"	s
+input	Units/css-trivial.d/input.css	/^input, textarea{ border: 1px solid green; }$/;"	s
+p	Units/css-trivial.d/input.css	/^p{ text-align: justify; }$/;"	s
+textarea	Units/css-trivial.d/input.css	/^input, textarea{ border: 1px solid green; }$/;"	s

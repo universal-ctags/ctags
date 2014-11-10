@@ -1,0 +1,6 @@
+
+@supports ((test-property: 42) or (test-property2: 42)) {
+  html { test-property: 42; }
+}
+
+html { color: blue; }

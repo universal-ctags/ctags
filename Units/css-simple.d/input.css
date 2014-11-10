@@ -1,0 +1,27 @@
+
+* { padding:0; }
+
+html
+{
+  margin: 0
+}
+
+.header { font-size: 200%; }
+
+#footer { font-size: 80%; }
+
+div.magic 
+
+{
+/* haha */
+text-decoration: blink;
+}
+
+.red { color: red }
+
+ul li { padding-left: 1em; }
+.foo a, .foo b { color: blue; }
+
+ul > li > a {
+  font: monospace;
+}
