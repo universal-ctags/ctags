@@ -1,0 +1,27 @@
+
+@import "foo.css";
+
+@namespace url(http://www.w3.org/1999/xhtml);
+@namespace svg url(http://www.w3.org/2000/svg);
+
+@media screen {
+  body { font-size: 10pt; }
+}
+@media print {
+  body { font-size: 12px; }
+}
+@media screen, print {
+  body { line-height: 1.2 }
+}
+
+@page :first {
+  margin: 2in;
+}
+
+@font-face {
+  font-family: Sample;
+  src: local("Sample"),
+       url(Sample.ttf);
+}
+
+html { color: blue; }
