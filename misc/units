@@ -180,29 +180,29 @@ check_languages()
 run_result_skip ()
 {
     if [ -n "$1" ]; then
-	echo -e "\e[0;33mskipped\e[0m"
+	printf '%b\n' "\033[33mskipped\033[39m"
     else
-	echo -e "\e[0;33mskipped\e[0m ($1)"
+	printf '%b\n' "\033[33mskipped\033[39m ($1)"
     fi
 }
 
 run_result_error ()
 {
     if [ ! -n "$1" ]; then
-	echo -e "\e[0;31mfailed\e[0m"
+	printf '%b\n' "\033[31mfailed\033[39m"
     else
-	echo -e "\e[0;31mfailed\e[0m ($1)"
+	printf '%b\n' "\033[31mfailed\033[39m ($1)"
     fi
 }
 
 run_result_ok ()
 {
-    echo -e "\e[0;32mpassed\e[0m"
+    printf '%b\n' "\033[32mpassed\033[39m"
 }
 
 run_result_known_error ()
 {
-    echo -e "\e[0;33mfailed\e[0m (KNOWN bug)"
+    printf '%b\n' "\033[33mfailed\033[39m (KNOWN bug)"
 }
 
 run_tcase ()
