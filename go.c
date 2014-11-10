@@ -597,8 +597,11 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 again:
 	while (1)
 	{
-		makeTag (name, kind);
-		readToken (token);
+		if (isType (name, TOKEN_IDENTIFIER))
+		{
+			makeTag (name, kind);
+			readToken (token);
+		}
 		if (!isType (token, TOKEN_COMMA))
 			break;
 		readToken (name);
