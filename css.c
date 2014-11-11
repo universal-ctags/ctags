@@ -45,6 +45,8 @@ static boolean isSelectorChar (const int c)
 			c == '+' || // allow all sibling in a single tag
 			c == '>' || // allow all child in a single tag
 			c == '|' || // allow namespace separator
+			c == '(' || // allow pseudo-class arguments
+			c == ')' ||
 			c == '.' || // allow classes and selectors
 			c == ':' || // allow pseudo classes
 			c == '*' || // allow globs as P + *

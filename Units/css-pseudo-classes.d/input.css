@@ -1,0 +1,15 @@
+
+tr:nth-child(2n+1) { background-color: light-gray }
+tr:nth-child(odd) { background-color: light-gray }
+tr:nth-child(2n) { background-color: light-gray }
+tr:nth-child(even) { background-color: light-gray }
+tr:nth-child(10n+0) { background-color: gray }
+
+span:nth-child(0n+1) { color: lime; }
+span:nth-child(1) { color: lime; }
+span:nth-child(-n+3) { color: lime; }
+
+span:not(:first-child) { color: red; }
+body :not(span) { color: green; }
+
+a:lang(en):after { content: "[en]" }
