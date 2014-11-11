@@ -2454,7 +2454,7 @@ static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const d
 }
 #else
 static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const dirName,
-							     stringList* already_loaded_files)
+							     stringList* const already_loaded_files)
 {
 	return FALSE;
 }
