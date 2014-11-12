@@ -138,18 +138,18 @@ Example of running
 	Testing Units/c-sample...Passed
 	...
 
-Runnig unit tests for a specific language
+Runnig unit tests for specific languages
 ------------------------------------------------------------
 
 You can run only the tests for a specific language by setting
-``UNIT_LANGUAGE`` to a specific parser as reported by
+``UNIT_LANGUAGES`` to a specific parser as reported by
 ``ctags --list-languages``::
 
-	make -f testing.mak test.units UNIT_LANGUAGE=PHP
+	make -f testing.mak test.units UNIT_LANGUAGES=PHP
 
 Multiple languages can be selected using a comma separated list::
 
-	make -f testing.mak test.units UNIT_LANGUAGE=C,C++
+	make -f testing.mak test.units UNIT_LANGUAGES=C,C++
 
 Gathering test cases for known bugs
 ------------------------------------------------------------
