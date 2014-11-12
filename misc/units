@@ -60,25 +60,16 @@ action_help ()
 {
     cat <<EOF
 Usage:
-	$0 help|--help
-	$0 run [OPTIONS] UNITS-DIR
-	   OPTIONS:
-		--ctags CTAGS: ctags exectuable file for testing
-		--datadir DATADIR: data directory
-		--category CATEGORY: run only CATEGORY
-		--name NAME: run only NAME
-		--skip NAME: skip the case NAME (TODO: NOT IMPLEMENTED YET)
-		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
-		--with-timeout DURATION: run a test case under timeout
-					 command with SECOND.
-					 0 means no timeout(default).
-		--with-valgrind: run a test case under valgrind
-			       If this option given, DURATION is changed as
-			       DURATION = DURATION * ${_VG_TIMEOUT_FACTOR}
-	$0 clean UNITS-DIR
+	$(help_help)
+	$(help_run)
+	$(help_clean)
 EOF
 }
 
+help_help()
+{
+    echo "$0 help|--help"
+}
 
 ERROR ()
 {
@@ -616,6 +607,26 @@ action_run ()
     fi
 }
 
+help_run ()
+{
+cat <<EOF
+$0 run [OPTIONS] UNITS-DIR
+	   OPTIONS:
+		--ctags CTAGS: ctags exectuable file for testing
+		--datadir DATADIR: data directory
+		--category CATEGORY: run only CATEGORY
+		--name NAME: run only NAME
+		--skip NAME: skip the case NAME (TODO: NOT IMPLEMENTED YET)
+		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
+		--with-timeout DURATION: run a test case under timeout
+					 command with SECOND.
+					 0 means no timeout(default).
+		--with-valgrind: run a test case under valgrind
+			       If this option given, DURATION is changed to
+			       DURATION := DURATION * ${_VG_TIMEOUT_FACTOR}
+EOF
+}
+
 action_clean ()
 {
     local action="$1"
@@ -640,6 +651,11 @@ action_clean ()
     rm -f $(find "$units_dir" -name '*.tmp')
     rm -f $(find "$units_dir" -name '*.TMP')
     return 0
+}
+
+help_clean ()
+{
+    echo	"$0 clean UNITS-DIR"
 }
 
 main ()
