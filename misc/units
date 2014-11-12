@@ -241,6 +241,8 @@ run_tcase ()
     local ovalgrind="$t/VALGRIND.tmp"
     local oshstdout="$t/SHSTDOUT.tmp"
     local oshstderr="$t/SHSTDERR.tmp"
+
+    local guessed_lang
     local tmp
 
 
@@ -268,14 +270,14 @@ run_tcase ()
     #
     # Filtered by LANGUAGES
     #
+    guessed_lang=$( ${_CMDLINE} --guess-parser "$input" 2>/dev/null | sed -nr 's/^.*: (.+)$/\1/p')
     if [ -n "${LANGUAGES}" ]; then
-	tmp=$( ${_CMDLINE} --guess-parser "$input" 2>/dev/null | sed -nr 's/^.*: (.+)$/\1/p')
-	member_p "${tmp}" ${LANGUAGES} || return 1
+	member_p "${guessed_lang}" ${LANGUAGES} || return 1
     fi
 
     clean_tcase "${t}"
 
-    printf '%-60s' "Testing ${name}"
+    printf '%-60s' "Testing ${name} as ${guessed_lang}"
 
 
     if [ -f "${ffeatures}" ] && ! tmp=$(check_features "${ffeatures}"); then
