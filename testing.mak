@@ -143,11 +143,12 @@ UNITS_VALGRIND=--with-valgrind
 endif
 UNITS_TIMEOUT=0
 UNIT_LANGUAGES=
+UNITS=
 
 test.units: units
 units: $(CTAGS_TEST)
 	@ \
-	c="misc/units run --languages=$(UNIT_LANGUAGES) --unit=$(UNIT) $(UNITS_VALGRIND) --with-timeout=$(UNITS_TIMEOUT)"; \
+	c="misc/units run --languages=$(UNIT_LANGUAGES) --units=$(UNITS) $(UNITS_VALGRIND) --with-timeout=$(UNITS_TIMEOUT)"; \
 	success=true; \
 	$(SHELL) $${c} Units; \
 	[ $$? -eq 0 ]  || success=false; \

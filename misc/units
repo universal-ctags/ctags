@@ -28,7 +28,7 @@ WITH_VALGRIND=
 COLORIZED_OUTPUT=yes
 [ -f /dev/stdout ] && COLORIZED_OUTPUT=no
 CATEGORY=
-UNIT=
+UNITS=
 LANGUAGES=
 
 #
@@ -132,6 +132,25 @@ check_availability()
     local cmd="$1"
     shift
     type "${cmd}" > /dev/null 2>&1 || ERROR 1 "${cmd} command is not available"
+}
+
+check_units ()
+{
+    local name="$1"
+    local category="$2"
+    shift 2
+    local u
+
+    for u in "$@"; do
+	if echo "${u}" | grep -q /; then
+	    if [ "${u%/*}" = "${category}" ] && [ "${u#*/}" = "${name}" ]; then
+		return 0
+	    fi
+	elif [ "${u}" = "${name}" ]; then
+	    return 0
+	fi
+    done
+    return 1
 }
 
 check_features()
@@ -280,16 +299,8 @@ run_tcase ()
     #
     # Filtered by UNIT
     #
-    if [ -n "${UNIT}" ]; then
-	if echo "${UNIT}" | grep -q /; then
-	    if ! [ "${UNIT%/*}" = "${category}" ]; then
-		return 1;
-	    elif ! [ "${UNIT#*/}" = "${name}" ]; then
-		return 1;
-	    fi
-	elif ! [ "${UNIT}" = "${name}" ]; then
-	    return 1
-	fi
+    if [ -n "${UNITS}" ]; then
+	check_units "${name}" "${category}" ${UNITS} || return 1
     fi
 
     #
@@ -561,13 +572,13 @@ action_run ()
 		CATEGORY="${1#--category=}"
 		shift
 		;;
-	    --unit)
+	    --units)
 		shift
-		UNIT="$1"
+		UNITS=$(echo "$1" | tr ',' ' ')
 		shift
 		;;
-	    --unit=*)
-		UNIT="${1#--unit=}"
+	    --units=*)
+		UNITS=$(echo "${1#--units=}" | tr ',' ' ')
 		shift
 		;;
 	    --languages)
@@ -650,7 +661,7 @@ action_run ()
 	run_dir "${category}" "$d"
     done
 
-    [ -z "${UNIT}" ] && run_summary
+    run_summary
 
     if [ -n "${L_FAILED_BY_STATUS}" ] || [ -n "${L_FAILED_BY_DIFF}" ] || [ -n "${L_FAILED_BY_TIMEED_OUT}" ]; then
 	return 1
@@ -674,6 +685,7 @@ $0 run [OPTIONS] UNITS-DIR
 		--name NAME: run only NAME
 		--skip NAME: skip the case NAME (TODO: NOT IMPLEMENTED YET)
 		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
+		--units UNITS1[,UNITS2,...]: run only UNIT(S).
 		--with-timeout DURATION: run a test case under timeout
 					 command with SECOND.
 					 0 means no timeout(default).
