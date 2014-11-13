@@ -39,6 +39,7 @@ readonly _DEFAULT_CATEGORY=ROOT
 readonly _TIMEOUT_EXIT=124
 readonly _VG_TIMEOUT_FACTOR=10
 readonly _VALGRIND_EXIT=58
+readonly _LINE_SPLITER=$(if [ type dos2unix > /dev/null 2>&1 ]; then echo "dos2unix"; else echo "cat"; fi)
 
 #
 # Results
@@ -145,7 +146,7 @@ check_features()
 
     while read expected; do
 	    found=no
-	    for f in $( ${CTAGS} --list-features 2> /dev/null) ; do \
+	    for f in $( ${CTAGS} --list-features 2> /dev/null | "${_LINE_SPLITER}" ) ; do
 		[ "$expected" = "$f" ] && found=yes;
 	    done
 	    if ! [ "$found" = yes ]; then
@@ -172,7 +173,7 @@ check_languages()
     #
     while read expected; do
 	    found=no
-	    for l in $( ${_CMDLINE} --list-languages 2>/dev/null | sed -e 's/ //' ) ; do \
+	    for l in $( ${_CMDLINE} --list-languages 2>/dev/null | "${_LINE_SPLITER}" |sed -e 's/ //' ) ; do \
 		[ "$expected" = "$l" ] && found=yes
 	    done
 	    if ! [ "$found" = yes ]; then
