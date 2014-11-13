@@ -502,9 +502,9 @@ extern char *readLine (vString *const vLine, FILE *const fp)
 		do
 		{
 			char *const pLastChar = vStringValue (vLine) + vStringSize (vLine) -2;
-			fpos_t startOfLine;
+			long startOfLine;
 
-			fgetpos (fp, &startOfLine);
+			startOfLine = ftell(fp);
 			reReadLine = FALSE;
 			*pLastChar = '\0';
 			result = fgets (vStringValue (vLine), (int) vStringSize (vLine), fp);
@@ -519,14 +519,14 @@ extern char *readLine (vString *const vLine, FILE *const fp)
 				/*  buffer overflow */
 				reReadLine = vStringAutoResize (vLine);
 				if (reReadLine)
-					fsetpos (fp, &startOfLine);
+					fseek (fp, startOfLine, SEEK_SET);
 				else
 					error (FATAL | PERROR, "input line too big; out of memory");
 			}
 			else
 			{
 				char* eol;
-				vStringSetLength (vLine);
+				vStringLength(vLine) = ftell(fp) - startOfLine - 1;
 				/* canonicalize new line */
 				eol = vStringValue (vLine) + vStringLength (vLine) - 1;
 				if (*eol == '\r')
