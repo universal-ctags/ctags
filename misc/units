@@ -39,7 +39,7 @@ readonly _DEFAULT_CATEGORY=ROOT
 readonly _TIMEOUT_EXIT=124
 readonly _VG_TIMEOUT_FACTOR=10
 readonly _VALGRIND_EXIT=58
-readonly _LINE_SPLITER=$(if [ type dos2unix > /dev/null 2>&1 ]; then echo "dos2unix"; else echo "cat"; fi)
+readonly _LINE_SPLITER=$(if type dos2unix > /dev/null 2>&1; then echo "dos2unix"; else echo "cat"; fi)
 
 #
 # Results
