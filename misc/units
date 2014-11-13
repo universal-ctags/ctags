@@ -25,6 +25,8 @@ CTAGS=./ctags
 DATADIR=./data
 WITH_TIMEOUT=0
 WITH_VALGRIND=
+COLORIZED_OUTPUT=yes
+[ -f /dev/stdout ] && COLORIZED_OUTPUT=no
 CATEGORY=
 UNIT=
 LANGUAGES=
@@ -37,12 +39,6 @@ readonly _DEFAULT_CATEGORY=ROOT
 readonly _TIMEOUT_EXIT=124
 readonly _VG_TIMEOUT_FACTOR=10
 _VALGRIND_EXIT=58
-
-if [ -f /dev/stdout ]; then
-    _CONNECTED_TO_FILE=yes
-else
-    _CONNECTED_TO_FILE=no
-fi
 
 #
 # Results
@@ -193,7 +189,7 @@ decorate ()
     local decorator="$1"
     local msg="$2"
 
-    if [ "${_CONNECTED_TO_FILE}" = 'no' ]; then
+    if [ "${COLORIZED_OUTPUT}" = 'yes' ]; then
 	printf '%b\n' "\033[${decorator}m${msg}\033[39m"
     else
 	printf '%b\n' "${msg}"
@@ -575,6 +571,15 @@ action_run ()
 		shift
 		WITH_VALGRIND=yes
 		;;
+	    --colorized-output)
+		shift
+		COLORIZED_OUTPUT="$1"
+		shift
+		;;
+	    --colorized-output=*)
+		COLORIZED_OUTPUT="${1#--colorized-output=}"
+		shift
+		;;
 	    -*)
 		ERROR 1 "unknown option \"${1}\" for ${action} action"
 		;;
@@ -600,6 +605,10 @@ action_run ()
 	ERROR 1 "no such file: ${CTAGS}"
     elif ! [ -e "${CTAGS}" ]; then
 	ERROR 1 "${CTAGS} is not an executable file"
+    fi
+
+    if ! ( [ "${COLORIZED_OUTPUT}" = 'yes' ] || [ "${COLORIZED_OUTPUT}" = 'no' ] ); then
+	ERROR 1 "unexpected option argument for --colorized-output: ${COLORIZED_OUTPUT}"
     fi
 
     [ -d "${DATADIR}" ] || ERROR 1 "no such directory: ${DATADIR}"
@@ -640,6 +649,7 @@ $0 run [OPTIONS] UNITS-DIR
 		--ctags CTAGS: ctags exectuable file for testing
 		--datadir DATADIR: data directory
 		--category CATEGORY: run only CATEGORY
+		--colorized-output yes|no: print the result in color.
 		--name NAME: run only NAME
 		--skip NAME: skip the case NAME (TODO: NOT IMPLEMENTED YET)
 		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
