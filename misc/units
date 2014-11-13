@@ -121,8 +121,8 @@ clean_tcase ()
 {
     local d="$1"
 
-    if [ -d "$1" ]; then
-	rm -f $1/*.tmp $1/*.TMP
+    if [ -d "$d" ]; then
+	rm -f "$d"/*.tmp "$d"/*.TMP
     fi
 }
 
@@ -196,6 +196,25 @@ decorate ()
     fi
 }
 
+run_result ()
+{
+    local result_type="$1"
+    local output="$2"
+    shift 2
+    local f="run_result_${result_type}"
+    local tmp
+
+    type "$f" > /dev/null 2>&1 || ERROR 1 \
+	"INTERNAL ERROR: wrong run_result function: $f"
+
+    "$f" "$@"
+
+    tmp="${COLORIZED_OUTPUT}"
+    COLORIZED_OUTPUT=no
+    "$f" "$@" > "${output}"
+    COLORIZED_OUTPUT="${tmp}"
+}
+
 run_result_skip ()
 {
     if [ -n "$1" ]; then
@@ -251,6 +270,7 @@ run_tcase ()
     local ovalgrind="$t/VALGRIND.tmp"
     local oshstdout="$t/SHSTDOUT.tmp"
     local oshstderr="$t/SHSTDERR.tmp"
+    local oresult="$t/RESULT.tmp"
 
     local guessed_lang
     local tmp
@@ -292,15 +312,15 @@ run_tcase ()
 
     if [ -f "${ffeatures}" ] && ! tmp=$(check_features "${ffeatures}"); then
 	L_SKIPPED_BY_FEATURES="$L_SKIPPED_BY_FEATURES ${category}/${name}"
-	run_result_skip "required feature \"$tmp\" is not available"
+	run_result skip "${oresult}" "required feature \"$tmp\" is not available"
 	return 1
     elif [ -f "${flanguages}" ] && ! tmp=$(check_languages "${flanguages}"); then
 	L_SKIPPED_BY_LANGUAGES="$L_SKIPPED_BY_LANGUAGES ${category}/${name}"
-	run_result_skip "required language parser \"$tmp\" is not available"
+	run_result skip "${oresult}" "required language parser \"$tmp\" is not available"
 	return 1
     elif [ "$WITH_TIMEOUT" = 0 ] && [ "${class}" = 'i' ]; then
 	L_SKIPPED_BY_ILOOP="$L_SKIPPED_BY_ILOOP ${category}/${name}"
-	run_result_skip "may cause an infinite loop"
+	run_result skip "${oresult}" "may cause an infinite loop"
 	return 1
     fi
 
@@ -322,22 +342,22 @@ run_tcase ()
     if [ "$tmp" != 0 ]; then
 	if ! [ "$WITH_TIMEOUT" = 0 ] && [ "${tmp}" = "${_TIMEOUT_EXIT}" ]; then
 	    L_FAILED_BY_TIMEED_OUT="${L_FAILED_BY_TIMEED_OUT} ${category}/${name}"
-	    run_result_error "TIMED OUT"
+	    run_result error "${oresult}" "TIMED OUT"
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 1
 	elif [ "$WITH_VALGRIND" = 'yes' ] && [ "${tmp}" = "${_VALGRIND_EXIT}" ] && ! [ "${class}" = v ]; then
 	    L_VALGRIND="${L_VALGRIND} ${category}/${name}"
-	    run_result_error "valgrind-error"
+	    run_result error "${oresult}" "valgrind-error"
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 1
 	elif [ "$class" = 'b' ]; then
 	    L_KNOWN_BUGS="$L_KNOWN_BUGS ${category}/${name}"
-	    run_result_known_error
+	    run_result known_error "${oresult}"
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 0
 	else
 	    L_FAILED_BY_STATUS="$L_FAILED_BY_STATUS ${category}/${name}"
-	    run_result_error "unexpected exit status: $tmp"
+	    run_result error  "${oresult}" "unexpected exit status: $tmp"
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 1
 	fi
@@ -353,7 +373,7 @@ run_tcase ()
 	    L_FIXED="$L_FIXED ${category}/${name}"
 	fi
 	L_PASSED="$L_PASSED ${category}/${name}"
-	run_result_ok
+	run_result ok '/dev/null'
 	return 0
     fi
 
@@ -376,17 +396,17 @@ run_tcase ()
 	fi
 
 	L_PASSED="$L_PASSED ${category}/${name}"
-	run_result_ok
+	run_result ok '/dev/null'
 	return 0
     else
 	if [ "${class}" = 'b' ]; then
 	    L_KNOWN_BUGS="$L_KNOWN_BUGS ${category}/${name}"
-	    run_result_known_error
+	    run_result known_error "${oresult}"
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 0
 	else
 	    L_FAILED_BY_DIFF="$L_FAILED_BY_DIFF ${category}/${name}"
-	    run_result_error "unexpected output"
+	    run_result error "${oresult}" "unexpected output"
 	    echo "${_CMDLINE}" > "${ocmdline}"
 	    return 1
 	fi
