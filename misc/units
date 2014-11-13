@@ -38,7 +38,7 @@ _CMDLINE=
 readonly _DEFAULT_CATEGORY=ROOT
 readonly _TIMEOUT_EXIT=124
 readonly _VG_TIMEOUT_FACTOR=10
-_VALGRIND_EXIT=58
+readonly _VALGRIND_EXIT=58
 
 #
 # Results
