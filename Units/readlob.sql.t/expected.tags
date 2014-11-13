@@ -1,9 +1,9 @@
+b_file	Units/readlob.sql.t/input.sql	/^        b_file  BFILE );$/;"	F	table:lob_table
+b_lob	Units/readlob.sql.t/input.sql	/^        b_lob   BLOB,$/;"	F	table:lob_table
+c_lob	Units/readlob.sql.t/input.sql	/^        c_lob   CLOB,$/;"	F	table:lob_table
 charbuf	Units/readlob.sql.t/input.sql	/^   charbuf      VARCHAR2(20);$/;"	v
 clob_locator	Units/readlob.sql.t/input.sql	/^   clob_locator CLOB;$/;"	v
+id	Units/readlob.sql.t/input.sql	/^        id      INTEGER,$/;"	F	table:lob_table
 lob_table	Units/readlob.sql.t/input.sql	/^CREATE TABLE lob_table  ($/;"	t
-lob_table.b_file	Units/readlob.sql.t/input.sql	/^        b_file  BFILE );$/;"	F
-lob_table.b_lob	Units/readlob.sql.t/input.sql	/^        b_lob   BLOB,$/;"	F
-lob_table.c_lob	Units/readlob.sql.t/input.sql	/^        c_lob   CLOB,$/;"	F
-lob_table.id	Units/readlob.sql.t/input.sql	/^        id      INTEGER,$/;"	F
 read_amount	Units/readlob.sql.t/input.sql	/^   read_amount  INTEGER;$/;"	v
 read_offset	Units/readlob.sql.t/input.sql	/^   read_offset  INTEGER;$/;"	v

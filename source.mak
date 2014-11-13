@@ -147,4 +147,5 @@ OBJECTS = \
 	vim.$(OBJEXT) \
 	windres.$(OBJEXT) \
 	yacc.$(OBJEXT) \
-	vstring.$(OBJEXT)
+	vstring.$(OBJEXT) \
+	$(LIBOBJS)

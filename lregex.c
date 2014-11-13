@@ -36,7 +36,10 @@
 #include "read.h"
 #include "routines.h"
 
-#ifdef HAVE_REGEX
+
+static boolean regexAvailable = FALSE;
+
+#if defined (HAVE_REGEX) && !defined (REGCOMP_BROKEN)
 
 /*
 *   MACROS
@@ -45,16 +48,12 @@
 /* Back-references \0 through \9 */
 #define BACK_REFERENCE_COUNT 10
 
-#if defined (HAVE_REGCOMP) && !defined (REGCOMP_BROKEN)
-# define POSIX_REGEX
-#endif
 
 #define REGEX_NAME "Regex"
 
 /*
 *   DATA DECLARATIONS
 */
-#if defined (POSIX_REGEX)
 
 struct sKind {
 	boolean enabled;
@@ -80,7 +79,6 @@ typedef struct {
 	} u;
 } regexPattern;
 
-#endif
 
 typedef struct {
 	regexPattern *patterns;
@@ -92,8 +90,6 @@ typedef struct {
 /*
 *   DATA DEFINITIONS
 */
-
-static boolean regexBroken = FALSE;
 
 /* Array of pattern sets, indexed by language */
 static patternSet* Sets = NULL;
@@ -113,9 +109,7 @@ static void clearPatternSet (const langType language)
 		for (i = 0  ;  i < set->count  ;  ++i)
 		{
 			regexPattern *p = &set->patterns [i];
-#if defined (POSIX_REGEX)
 			regfree (p->pattern);
-#endif
 			eFree (p->pattern);
 			p->pattern = NULL;
 
@@ -327,7 +321,6 @@ static void addCompiledCallbackPattern (
 	flagsEval (flags, ptrnFlagDef, COUNT(ptrnFlagDef), ptrn);
 }
 
-#if defined (POSIX_REGEX)
 
 static void regex_flag_basic_short (char c __unused__, void* data)
 {
@@ -392,7 +385,6 @@ static regex_t* compileRegex (const char* const regexp, const char* const flags)
 	return result;
 }
 
-#endif
 
 static void parseKinds (
 		const char* const kinds, char* const kind, char** const kindName,
@@ -476,7 +468,6 @@ static void processLanguageRegex (const langType language,
 *   Regex pattern matching
 */
 
-#if defined (POSIX_REGEX)
 
 static vString* substitute (
 		const char* const in, const char* out,
@@ -526,11 +517,16 @@ static void matchCallbackPattern (
 	regexMatch matches [BACK_REFERENCE_COUNT];
 	unsigned int count = 0;
 	int i;
-	for (i = 0  ;  i < BACK_REFERENCE_COUNT  &&  pmatch [i].rm_so != -1  ;  ++i)
+	for (i = 0  ;  i < BACK_REFERENCE_COUNT  ;  ++i)
 	{
 		matches [i].start  = pmatch [i].rm_so;
 		matches [i].length = pmatch [i].rm_eo - pmatch [i].rm_so;
-		++count;
+		/* a valid match may have both offsets == -1,
+		 * e.g. (foo)*(bar) matching "bar" - see CTags bug 271.
+		 * As POSIX regex doesn't seem to have a way to count matches,
+		 * we return the count up to the last non-empty match. */
+		if (pmatch [i].rm_so != -1)
+			count = i + 1;
 	}
 	patbuf->u.callback.function (vStringValue (line), matches, count);
 }
@@ -558,7 +554,6 @@ static boolean matchRegexPattern (const vString* const line,
 	return result;
 }
 
-#endif
 
 /* PUBLIC INTERFACE */
 
@@ -606,7 +601,7 @@ extern void addTagRegex (
 #ifdef HAVE_REGEX
 	Assert (regex != NULL);
 	Assert (name != NULL);
-	if (! regexBroken)
+	if (regexAvailable)
 	{
 		regex_t* const cp = compileRegex (regex, flags);
 		if (cp != NULL)
@@ -630,7 +625,7 @@ extern void addCallbackRegex (
 {
 #ifdef HAVE_REGEX
 	Assert (regex != NULL);
-	if (! regexBroken)
+	if (regexAvailable)
 	{
 		regex_t* const cp = compileRegex (regex, flags);
 		if (cp != NULL)
@@ -643,7 +638,7 @@ extern void addLanguageRegex (
 		const langType language __unused__, const char* const regex __unused__)
 {
 #ifdef HAVE_REGEX
-	if (! regexBroken)
+	if (regexAvailable)
 	{
 		char *const regex_pat = eStrdup (regex);
 		char *name, *kinds, *flags;
@@ -757,18 +752,26 @@ extern void freeRegexResources (void)
 #endif
 }
 
-/* Check for broken regcomp() on Cygwin */
-extern void checkRegex (void)
+/* Return TRUE if available. */
+extern boolean checkRegex (void)
 {
-#if defined (HAVE_REGEX) && defined (CHECK_REGCOMP)
-	regex_t patbuf;
-	int errcode;
-	if (regcomp (&patbuf, "/hello/", 0) != 0)
+#if ! defined (HAVE_REGEX)
+	regexAvailable = FALSE;
+#elif defined (CHECK_REGCOMP)
 	{
-		error (WARNING, "Disabling broken regex");
-		regexBroken = TRUE;
+		/* Check for broken regcomp() on Cygwin */
+		regex_t patbuf;
+		int errcode;
+		if (regcomp (&patbuf, "/hello/", 0) != 0)
+			error (WARNING, "Disabling broken regex");
+		else
+			regexAvailable = TRUE;
 	}
+#else
+	/* We are using bundled regex engine. */
+	regexAvailable = TRUE;
 #endif
+	return regexAvailable;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

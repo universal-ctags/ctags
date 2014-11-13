@@ -1,0 +1,6 @@
+
+body { color: black; }
+a[href^="http://"] { color: red; }
+a[href^="https://"] { color: green; }
+a[lang~=en] { background-color: light-green; }
+p { color: gray }

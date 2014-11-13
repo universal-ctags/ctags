@@ -19,9 +19,10 @@ typedef void (* TrashBoxDestroyItemProc) (void *);
 typedef struct sTrashBox TrashBox;
 
 extern TrashBox* trashBoxNew       (void);
-extern void      trashBoxDestroy   (TrashBox* trash_box);
-extern void      trashBoxPut       (TrashBox* trash_box, void* item, TrashBoxDestroyItemProc destroy);
-extern void      trashBoxTakeBack  (TrashBox* trash_box, void* item);
+extern void      trashBoxDelete    (TrashBox* trash_box);
+extern void*     trashBoxPut       (TrashBox* trash_box, void* item, TrashBoxDestroyItemProc destroy);
+extern TrashBoxDestroyItemProc trashBoxTakeBack  (TrashBox* trash_box, void* item);
+extern void      trashBoxFree      (TrashBox* trash_box, void* item);
 extern void      trashBoxMakeEmpty (TrashBox* trash_box);
 
 #endif /* _TRASH_H */

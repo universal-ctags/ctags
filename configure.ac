@@ -111,8 +111,8 @@ AH_TEMPLATE([NEED_PROTO_FTRUNCATE],
 
 # Report system info
 # ------------------
-program_name=[`grep 'PROGRAM_NAME  *"' ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
-program_version=[`grep 'PROGRAM_VERSION  *"' ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
+program_name=[`grep 'PROGRAM_NAME  *"' $srcdir/ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
+program_version=[`grep 'PROGRAM_VERSION  *"' $srcdir/ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
 echo "$program_name, version $program_version"
 uname -mrsv 2>/dev/null
 
@@ -136,10 +136,6 @@ AC_DEFUN([CHECK_HEADER_DEFINE], [
 
 # Checks for configuration options
 # --------------------------------
-
-AC_ARG_WITH(posix-regex,
-	[AS_HELP_STRING([--with-posix-regex],
-		[use Posix regex interface, if available])])
 
 AC_ARG_ENABLE(readlib,
 	[AS_HELP_STRING([--enable-readlib],
@@ -332,7 +328,7 @@ fi
 # Checks for header files
 # -----------------------
 
-AC_CHECK_HEADERS_ONCE([dirent.h fcntl.h fnmatch.h stat.h stdlib.h string.h])
+AC_CHECK_HEADERS_ONCE([dirent.h fcntl.h stat.h stdlib.h string.h])
 AC_CHECK_HEADERS_ONCE([time.h types.h unistd.h])
 AC_CHECK_HEADERS_ONCE([sys/dir.h sys/stat.h sys/times.h sys/types.h])
 
@@ -378,7 +374,8 @@ AC_OBJEXT
 AC_EXEEXT
 
 AC_MSG_CHECKING(if struct stat contains st_ino)
-AC_TRY_COMPILE([#include <sys/stat.h>], [
+AC_TRY_COMPILE([#include <sys/stat.h>
+				#include <stdlib.h>], [
 	struct stat st;
 	stat(".", &st);
 	if (st.st_ino > 0)
@@ -392,8 +389,13 @@ fi
 
 # Checks for library functions
 # ----------------------------
+AC_CHECK_FUNCS(fnmatch,[],[
+AC_LIBOBJ([fnmatch])
+CPPFLAGS="$CPPFLAGS -I${srcdir}/fnmatch"
+AC_DEFINE(HAVE_FNMATCH)
+])
+AC_CHECK_HEADERS(fnmatch.h)
 
-AC_CHECK_FUNCS(fnmatch)
 AC_CHECK_FUNCS(strstr)
 AC_CHECK_FUNCS(strcasecmp stricmp, break)
 AC_CHECK_FUNCS(strncasecmp strnicmp, break)
@@ -450,24 +452,40 @@ if test "$have_setenv" != yes ; then
 	fi
 fi
 
-#
-# if test yes = "$CYGWIN"; then with_posix_regex=no; fi
-if test no != "$with_posix_regex"; then
-	AC_CHECK_FUNCS(regcomp)
-	AC_MSG_CHECKING(if regcomp works)
-	AC_TRY_RUN([
+dnl
+dnl
+dnl Check regcomp
+dnl
+dnl If it is found but broken, define REGCOMP_BROKEN.
+dnl If it is found but cannot be test brokenness, define CHECK_REGCOMP.
+dnl If it is not found, use bundled implementation.
+dnl
+dnl If CHECK_REGCOMP is defined, ctags itself check the brokenness at runtime
+dnl (cross-compiling is assumed here).
+dnl
+dnl
+dnl The final result can be check with ./ctags --list-features.
+dnl
+dnl
+AC_CHECK_FUNCS(regcomp,[
+AC_MSG_CHECKING(if regcomp works)
+AC_TRY_RUN([
 #include <sys/types.h>
 #include <regex.h>
-main() {
+int main(void) {
 	regex_t patbuf;
-	exit (regcomp (&patbuf, "/hello/", 0) != 0);
+	return (regcomp (&patbuf, "/hello/", 0) != 0);
 }],regcomp_works=yes,regcomp_works=no,AC_DEFINE(CHECK_REGCOMP))
-	AC_MSG_RESULT($regcomp_works)
-	if test yes != "$regcomp_works"; then
-		AC_DEFINE(REGCOMP_BROKEN)
-	fi
+AC_MSG_RESULT($regcomp_works)
+if test yes != "$regcomp_works"; then
+	AC_DEFINE(REGCOMP_BROKEN)
 fi
-
+],[
+dnl Using bundled regex implementation
+AC_LIBOBJ([regex])
+CPPFLAGS="$CPPFLAGS -I${srcdir}/gnu_regex"
+AC_DEFINE(HAVE_REGCOMP)
+])
 # if test yes = "$with_perl_regex"; then
 # 	AC_MSG_CHECKING(for Perl regex library)
 # 	pcre_candidates="$with_perl_regex $HOME/local/lib* /usr*/local/lib* /usr/lib*"
@@ -502,7 +520,7 @@ AC_SUBST(install_libexec_targets)
 # -----------------------------
 AC_CHECKING(for new missing prototypes)
 
-AC_DEFUN(CHECK_PROTO, [
+AC_DEFUN([CHECK_PROTO], [
 	AC_EGREP_HEADER([[^A-Za-z0-9_]$1([ 	]+[A-Za-z0-9_]*)?[	 ]*\(],
 	$2,
 	,

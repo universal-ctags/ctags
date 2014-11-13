@@ -1,0 +1,688 @@
+#!/bin/sh
+#
+# units - Units test harness for ctags
+#
+# Copyright (C) 2014 Masatake YAMATO
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+#
+# Global Parameters
+#
+CTAGS=./ctags
+DATADIR=./data
+WITH_TIMEOUT=0
+CATEGORY=
+UNIT=
+LANGUAGES=
+
+#
+# Internal variables and constants
+#
+_CMDLINE=
+readonly _DEFAULT_CATEGORY=ROOT
+readonly _TIMEOUT_EXIT=124
+readonly _VG_TIMEOUT_FACTOR=10
+_VALGRIND_EXIT=58
+
+#
+# Results
+#
+L_PASSED=
+L_FIXED=
+L_FAILED_BY_STATUS=
+L_FAILED_BY_DIFF=
+L_SKIPPED_BY_FEATURES=
+L_SKIPPED_BY_LANGUAGES=
+L_SKIPPED_BY_ILOOP=
+L_KNOWN_BUGS=
+L_FAILED_BY_TIMEED_OUT=
+
+#
+# TODO
+#
+#  * write new class 'r' (category directory) to f-units.rst.
+#  * write new class 'v' (skip the checkin by valgrind) to f-units.rst.
+#
+action_help ()
+{
+    cat <<EOF
+Usage:
+	$(help_help)
+	$(help_run)
+	$(help_clean)
+EOF
+}
+
+help_help()
+{
+    echo "$0 help|--help"
+}
+
+ERROR ()
+{
+    local status="$1"
+    local msg="$2"
+    shift 2
+    echo "$msg" 1>&2
+    exit $status
+}
+
+line()
+{
+    local i=0
+    while [ $i -lt 60 ]; do
+	printf '-'
+	i=$(( i + 1 ))
+    done
+    echo
+}
+
+count_list ()
+{
+    echo $#
+}
+
+member_p ()
+{
+    local elt="$1"
+    shift
+    local x
+
+    for x in "$@"; do
+	if [ "$x" = "$elt" ]; then
+	    return 0
+	fi
+    done
+
+    return 1
+}
+
+clean_tcase ()
+{
+    local d="$1"
+
+    if [ -d "$1" ]; then
+	rm -f $1/*.tmp $1/*.TMP
+    fi
+}
+
+check_availability()
+{
+    local cmd="$1"
+    shift
+    type "${cmd}" > /dev/null 2>&1 || ERROR 1 "${cmd} command is not available"
+}
+
+check_features()
+{
+    local ffile="$1"
+    shift
+
+    local f
+    local found
+    local expected;
+
+
+    while read expected; do
+	    found=no
+	    for f in $( ${CTAGS} --list-features 2> /dev/null) ; do \
+		[ "$expected" = "$f" ] && found=yes;
+	    done
+	    if ! [ "$found" = yes ]; then
+		echo "$expected"
+		return 1
+	    fi
+    done < "$ffile"
+
+    return 0
+}
+
+check_languages()
+{
+    local lfile="$1"
+    shift
+
+    local l
+    local found
+    local expected;
+
+
+    #
+    # TODO: consider the value of LANGUAGES
+    #
+    while read expected; do
+	    found=no
+	    for l in $( ${_CMDLINE} --list-languages 2>/dev/null | sed -e 's/ //' ) ; do \
+		[ "$expected" = "$l" ] && found=yes
+	    done
+	    if ! [ "$found" = yes ]; then
+		echo "$expected"
+		return 1
+	    fi
+    done < "$lfile"
+
+    return 0
+}
+
+run_result_skip ()
+{
+    if [ -n "$1" ]; then
+	echo -e "\e[0;33mskipped\e[0m"
+    else
+	echo -e "\e[0;33mskipped\e[0m ($1)"
+    fi
+}
+
+run_result_error ()
+{
+    if [ ! -n "$1" ]; then
+	echo -e "\e[0;31mfailed\e[0m"
+    else
+	echo -e "\e[0;31mfailed\e[0m ($1)"
+    fi
+}
+
+run_result_ok ()
+{
+    echo -e "\e[0;32mpassed\e[0m"
+}
+
+run_result_known_error ()
+{
+    echo -e "\e[0;33mfailed\e[0m (KNOWN bug)"
+}
+
+run_tcase ()
+{
+    local input="$1"
+    local t="$2"
+    local name="$3"
+    local class="$4"
+    local category="$5"
+    shift 5
+
+
+    local fargs="$t/args.ctags"
+    local ffeatures="$t/features"
+    local flanguages="$t/languages"
+    local ffilter="$t/filter"
+    local fexpected="$t/expected.tags"
+
+    #
+    # All generated file must have suffix ".tmp".
+    #
+    local ostderr="$t/STDERR.tmp"
+    local orawout="$t/RAWOUT.tmp"
+    local ofiltered="$t/FILTERED.tmp"
+    local odiff="$t/DIFF.tmp"
+    local ocmdline="$t/CMDLINE.tmp"
+    local ovalgrind="$t/VALGRIND.tmp"
+    local oshstdout="$t/SHSTDOUT.tmp"
+    local oshstderr="$t/SHSTDERR.tmp"
+
+    local guessed_lang
+    local tmp
+
+
+    #
+    # Filtered by UNIT
+    #
+    if [ -n "${UNIT}" ]; then
+	if echo "${UNIT}" | grep -q /; then
+	    if ! [ "${UNIT%/*}" = "${category}" ]; then
+		return 1;
+	    elif ! [ "${UNIT#*/}" = "${name}" ]; then
+		return 1;
+	    fi
+	elif ! [ "${UNIT}" = "${name}" ]; then
+	    return 1
+	fi
+    fi
+
+    #
+    # Build _CMDLINE
+    #
+    _CMDLINE="${CTAGS} --options=NONE --libexec-dir=libexec --libexec-dir=+$t --data-dir=${DATADIR} --data-dir=+$t -o -"
+    [ -f "${fargs}" ] && _CMDLINE="${_CMDLINE} --options=${fargs}"
+
+    #
+    # Filtered by LANGUAGES
+    #
+    guessed_lang=$( ${_CMDLINE} --guess-parser "$input" 2>/dev/null | sed -nr 's/^.*: (.+)$/\1/p')
+    if [ -n "${LANGUAGES}" ]; then
+	member_p "${guessed_lang}" ${LANGUAGES} || return 1
+    fi
+
+    clean_tcase "${t}"
+
+    printf '%-60s' "Testing ${name} as ${guessed_lang}"
+
+
+    if [ -f "${ffeatures}" ] && ! tmp=$(check_features "${ffeatures}"); then
+	L_SKIPPED_BY_FEATURES="$L_SKIPPED_BY_FEATURES ${category}/${name}"
+	run_result_skip "required feature \"$tmp\" is not available"
+	return 1
+    elif [ -f "${flanguages}" ] && ! tmp=$(check_languages "${flanguages}"); then
+	L_SKIPPED_BY_LANGUAGES="$L_SKIPPED_BY_LANGUAGES ${category}/${name}"
+	run_result_skip "required language parser \"$tmp\" is not available"
+	return 1
+    elif [ "$WITH_TIMEOUT" = 0 ] && [ "${class}" = 'i' ]; then
+	L_SKIPPED_BY_ILOOP="$L_SKIPPED_BY_ILOOP ${category}/${name}"
+	run_result_skip "may cause an infinite loop"
+	return 1
+    fi
+
+    _CMDLINE="${_CMDLINE} ${input}"
+
+    if [ "$WITH_VALGRIND" = yes ]; then
+	_CMDLINE="valgrind --quiet --leak-check=full --error-exitcode=${_VALGRIND_EXIT} --log-file=${ovalgrind} ${_CMDLINE}"
+	WITH_TIMEOUT=$(( WITH_TIMEOUT * ${_VG_TIMEOUT_FACTOR} ))
+    fi
+
+    if ! [ "$WITH_TIMEOUT" = 0 ]; then
+	_CMDLINE="timeout $WITH_TIMEOUT ${_CMDLINE}"
+    fi
+
+    {
+	( ${_CMDLINE} 2> "${ostderr}" > "${orawout}" ) 2> "${oshstderr}" > "${oshstdout}"
+	tmp="$?"
+    }
+    if [ "$tmp" != 0 ]; then
+	if ! [ "$WITH_TIMEOUT" = 0 ] && [ "${tmp}" = "${_TIMEOUT_EXIT}" ]; then
+	    L_FAILED_BY_TIMEED_OUT="${L_FAILED_BY_TIMEED_OUT} ${category}/${name}"
+	    run_result_error "TIMED OUT"
+	    echo "${_CMDLINE}" > "${ocmdline}"
+	    return 1
+	elif [ "$WITH_VALGRIND" = 'yes' ] && [ "${tmp}" = "${_VALGRIND_EXIT}" ] && ! [ "${class}" = v ]; then
+	    L_VALGRIND="${L_VALGRIND} ${category}/${name}"
+	    run_result_error "valgrind-error"
+	    echo "${_CMDLINE}" > "${ocmdline}"
+	    return 1
+	elif [ "$class" = 'b' ]; then
+	    L_KNOWN_BUGS="$L_KNOWN_BUGS ${category}/${name}"
+	    run_result_known_error
+	    echo "${_CMDLINE}" > "${ocmdline}"
+	    return 0
+	else
+	    L_FAILED_BY_STATUS="$L_FAILED_BY_STATUS ${category}/${name}"
+	    run_result_error "unexpected exit status: $tmp"
+	    echo "${_CMDLINE}" > "${ocmdline}"
+	    return 1
+	fi
+    elif [ "$WITH_VALGRIND" = 'yes' ] && [ "$class" = 'v' ]; then
+	L_FIXED="$L_FIXED ${category}/${name}"
+    fi
+
+    if ! [ -f "${fexpected}" ]; then
+	clean_tcase "${t}"
+	if [ "$class" = 'b' ]; then
+	    L_FIXED="$L_FIXED ${category}/${name}"
+	elif [ "$class" = 'i' ]; then
+	    L_FIXED="$L_FIXED ${category}/${name}"
+	fi
+	L_PASSED="$L_PASSED ${category}/${name}"
+	run_result_ok
+	return 0
+    fi
+
+    if [ -x "$ffilter" ]; then
+	"$ffilter" < "${orawout}" > "${ofiltered}"
+    else
+	cp "${orawout}" "${ofiltered}"
+    fi
+
+    {
+	diff -U 0 -I '^!_TAG' --strip-trailing-cr "${fexpected}" "${ofiltered}" > "${odiff}"
+	tmp="$?"
+    }
+    if [ "${tmp}" = 0 ]; then
+	clean_tcase "${t}"
+	if [ "${class}" = 'b' ]; then
+	    L_FIXED="$L_FIXED ${category}/${name}"
+	elif ! [ "$WITH_TIMEOUT" = 0 ] && [ "${class}" = 'i' ]; then
+	    L_FIXED="$L_FIXED ${category}/${name}"
+	fi
+
+	L_PASSED="$L_PASSED ${category}/${name}"
+	run_result_ok
+	return 0
+    else
+	if [ "${class}" = 'b' ]; then
+	    L_KNOWN_BUGS="$L_KNOWN_BUGS ${category}/${name}"
+	    run_result_known_error
+	    echo "${_CMDLINE}" > "${ocmdline}"
+	    return 0
+	else
+	    L_FAILED_BY_DIFF="$L_FAILED_BY_DIFF ${category}/${name}"
+	    run_result_error "unexpected output"
+	    echo "${_CMDLINE}" > "${ocmdline}"
+	    return 1
+	fi
+    fi
+}
+
+
+run_dir ()
+{
+    local category="$1"
+    local base_dir="$2"
+    shift 2
+
+    local tcase_dir
+    local input
+    local name
+    local class
+
+    #
+    # Filtered by CATEGORY
+    #
+    if [ -n "$CATEGORY" ] && ! [ "$CATEGORY" = "$category" ]; then
+	return 1
+    fi
+
+    echo "Category: $category"
+    line
+    for input in ${base_dir}/*.[dbtiv]/input.*; do
+	# ignore backup files
+	if echo "$input" | grep -q '~$'; then
+	    continue
+	elif echo "$input" | grep -q '\*'; then
+	    continue
+	fi
+
+	tcase_dir="${input%/input.*}"
+	name="${tcase_dir%.[dbtiv]}"
+	name="${name##*/}"
+	class="${tcase_dir#*${name}.}"
+	run_tcase "${input}" "${tcase_dir}" "${name}" "${class}" "${category}"
+    done
+
+    return 0
+}
+
+run_summary ()
+{
+    local t
+
+    echo
+    echo "Summary (see CMDLINE.tmp to reproduce without test harness)"
+    line
+
+    printf '  %-40s' "#passed:"
+    count_list $L_PASSED
+
+    printf '  %-40s' "#FIXED:"
+    count_list $L_FIXED
+    for t in $L_FIXED; do
+	echo "	${t#${_DEFAULT_CATEGORY}/}"
+    done
+
+    printf '  %-40s' "#FAILED (unexpected-exit-status):"
+    count_list $L_FAILED_BY_STATUS
+    for t in $L_FAILED_BY_STATUS; do
+	echo "	${t#${_DEFAULT_CATEGORY}/}"
+    done
+
+    printf '  %-40s' "#FAILED (unexpected-output):"
+    count_list $L_FAILED_BY_DIFF
+    for t in $L_FAILED_BY_DIFF; do
+	echo "	${t#${_DEFAULT_CATEGORY}/}"
+    done
+
+    if ! [ "$WITH_TIMEOUT" = 0 ]; then
+	printf '  %-40s' "#TIMED-OUT:"
+	count_list $L_FAILED_BY_TIMEED_OUT
+	for t in $L_FAILED_BY_TIMEED_OUT; do
+	    echo "	${t#${_DEFAULT_CATEGORY}/}"
+	done
+    fi
+
+    printf '  %-40s' "#skipped (features):"
+    count_list $L_SKIPPED_BY_FEATURES
+    for t in $L_SKIPPED_BY_FEATURES; do
+	echo "	${t#${_DEFAULT_CATEGORY}/}"
+    done
+
+    printf '  %-40s' "#skipped (languages):"
+    count_list $L_SKIPPED_BY_LANGUAGES
+    for t in $L_SKIPPED_BY_LANGUAGES; do
+	echo "	${t#${_DEFAULT_CATEGORY}/}"
+    done
+
+    if [ "$WITH_TIMEOUT" = 0 ]; then
+	printf '  %-40s' "#skipped (infinite-loop):"
+	count_list $L_SKIPPED_BY_ILOOP
+	for t in $L_SKIPPED_BY_ILOOP; do
+	    echo "	${t#${_DEFAULT_CATEGORY}/}"
+	done
+    fi
+
+    printf '  %-40s' "#known-bugs:"
+    count_list $L_KNOWN_BUGS
+    for t in $L_KNOWN_BUGS; do
+	echo "	${t#${_DEFAULT_CATEGORY}/}"
+    done
+
+    printf '  %-40s' "#valgrind-error:"
+    count_list $L_VALGRIND
+    for t in $L_VALGRIND; do
+	echo "	${t#${_DEFAULT_CATEGORY}/}"
+    done
+}
+
+action_run ()
+{
+    local action="$1"
+    shift
+
+    local units_dir
+    local d
+    local category
+
+    while [ $# -gt 0 ]; do
+	case $1 in
+	    --ctags)
+		shift
+		CTAGS="$1"
+		shift
+		;;
+	    --ctags=*)
+		CTAGS="${1#--ctags=}"
+		shift
+		;;
+	    --datadir)
+		shift
+		DATADIR="$1"
+		shift
+		;;
+	    --datadir=*)
+		DATADIR="${1#--datadir=}"
+		shift
+		;;
+	    --category)
+		shift
+		CATEGORY="$1"
+		shift
+		;;
+	    --category=*)
+		CATEGORY="${1#--category=}"
+		shift
+		;;
+	    --unit)
+		shift
+		UNIT="$1"
+		shift
+		;;
+	    --unit=*)
+		UNIT="${1#--unit=}"
+		shift
+		;;
+	    --languages)
+		shift
+		LANGUAGES=$(echo "${1}" | tr ',' ' ')
+		shift
+		;;
+	    --languages=*)
+		LANGUAGES=$(echo "${1#--languages=}" | tr ',' ' ')
+		shift
+		;;
+	    --with-timeout)
+		shift
+		WITH_TIMEOUT="$1"
+		shift
+		;;
+	    --with-timeout=*)
+		WITH_TIMEOUT="${1#--with-timeout=}"
+		shift
+		;;
+	    --with-valgrind)
+		shift
+		WITH_VALGRIND=yes
+		;;
+	    -*)
+		ERROR 1 "unknown option \"${1}\" for ${action} action"
+		;;
+	    *)
+		units_dir="$1"
+		shift
+		break;
+		;;
+	esac
+    done
+
+    if [ $# -gt 0 ]; then
+	ERROR 1 "too many arguments for ${action} action: $*"
+    elif [ -z "$units_dir" ]; then
+	ERROR 1 "UNITS_DIR parameter is not given in ${action} action"
+    fi
+
+    if ! [ -d "$units_dir" ]; then
+	ERROR 1 "No such directory: ${UNITS_DIR}"
+    fi
+	
+
+    if ! [ -f "${CTAGS}" ]; then
+	ERROR 1 "no such file: ${CTAGS}"
+    elif ! [ -e "${CTAGS}" ]; then
+	ERROR 1 "${CTAGS} is not an executable file"
+    fi
+
+    [ -d "${DATADIR}" ] || ERROR 1 "no such directory: ${DATADIR}"
+    : ${WITH_TIMEOUT:=0}
+    [ "$WITH_TIMEOUT" = 0 ] || check_availability timeout
+    [ "WITH_VALGRIND" = 'yes' ]  && check_availability valgrind
+    check_availability grep
+    check_availability diff
+
+
+    category="${_DEFAULT_CATEGORY}"
+    run_dir "${category}" "${units_dir}"
+
+    for d in ${units_dir}/*.r; do
+	[ -d "$d" ] || continue
+	category="${d##*/}"
+	category="${category%.r}"
+	run_dir "${category}" "$d"
+    done
+
+    [ -z "${UNIT}" ] && run_summary
+
+    if [ -n "${L_FAILED_BY_STATUS}" ] || [ -n "${L_FAILED_BY_DIFF}" ] || [ -n "${L_FAILED_BY_TIMEED_OUT}" ]; then
+	return 1
+    else
+	return 0
+    fi
+}
+
+help_run ()
+{
+cat <<EOF
+$0 run [OPTIONS] UNITS-DIR
+	   OPTIONS:
+		--ctags CTAGS: ctags exectuable file for testing
+		--datadir DATADIR: data directory
+		--category CATEGORY: run only CATEGORY
+		--name NAME: run only NAME
+		--skip NAME: skip the case NAME (TODO: NOT IMPLEMENTED YET)
+		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
+		--with-timeout DURATION: run a test case under timeout
+					 command with SECOND.
+					 0 means no timeout(default).
+		--with-valgrind: run a test case under valgrind
+			       If this option given, DURATION is changed to
+			       DURATION := DURATION * ${_VG_TIMEOUT_FACTOR}
+EOF
+}
+
+action_clean ()
+{
+    local action="$1"
+    shift
+    
+    local units_dir=$1
+    shift
+
+    if [ $# -gt 0 ]; then
+	ERROR 1 "too many arguments for ${action} action: $*"
+    elif [ -z "$units_dir" ]; then
+	ERROR 1 "UNITS_DIR parameter is not given in ${action} action"
+    fi
+    
+    if ! [ -d "$units_dir" ]; then
+	ERROR 1 "No such directory: ${UNITS_DIR}"
+    fi
+
+    check_availability find
+    check_availability rm
+
+    rm -f $(find "$units_dir" -name '*.tmp')
+    rm -f $(find "$units_dir" -name '*.TMP')
+    return 0
+}
+
+help_clean ()
+{
+    echo	"$0 clean UNITS-DIR"
+}
+
+main ()
+{
+    if [ $# = 0 ]; then
+	action_help 1>&2
+	exit 1;
+    fi
+
+    case $1 in
+	help|-h|--help)
+	    action_help
+	    return 0
+	    ;;
+	run)
+	    action_run "$@"
+	    return $?
+	    ;;
+	clean)
+	    action_clean "$@"
+	    return $?
+	    ;;
+	*)
+	    ERROR 1 "unknown action: $1"
+	    ;;
+    esac
+}
+
+main "$@"
+exit $?

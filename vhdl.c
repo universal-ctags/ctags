@@ -1,6 +1,6 @@
 /*
 *   $Id: vhdl.c 652 2008-04-18 03:51:47Z elliotth $
-* 
+*
 *   Copyright (c) 2008, Nicolas Vincent
 *
 *   This source code is released for free distribution under the terms of the
@@ -16,7 +16,6 @@
 
 #include <ctype.h>	/* to define isalpha () */
 #include <string.h>
-#include <setjmp.h>
 
 #include "debug.h"
 #include "entry.h"
@@ -35,7 +34,6 @@
 /*
  *   DATA DECLARATIONS
  */
-typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
 
 /*
  * Used to specify type of keyword.
@@ -149,6 +147,7 @@ typedef struct sKeywordDesc {
 
 typedef enum eTokenType {
 	TOKEN_NONE,		/* none */
+	TOKEN_EOF,		/* end-of-file */
 	TOKEN_OPEN_PAREN,	/* ( */
 	TOKEN_CLOSE_PAREN,	/* ) */
 	TOKEN_COMMA,		/* the comma character */
@@ -173,7 +172,6 @@ typedef struct sTokenInfo {
  *   DATA DEFINITIONS
  */
 static int Lang_vhdl;
-static jmp_buf Exception;
 
 /* Used to index into the VhdlKinds table. */
 typedef enum {
@@ -421,7 +419,7 @@ static void readToken (tokenInfo * const token)
 	switch (c)
 	{
 	case EOF:
-		longjmp (Exception, (int) ExceptionEOF);
+		token->type = TOKEN_EOF;
 		break;
 	case '(':
 		token->type = TOKEN_OPEN_PAREN;
@@ -485,7 +483,7 @@ static void skipToKeyword (const keywordId keyword)
 	{
 		readToken (token);
 	}
-	while (!isKeyword (token, keyword));
+	while (!isType (token, TOKEN_EOF) && !isKeyword (token, keyword));
 	deleteToken (token);
 }
 
@@ -513,7 +511,7 @@ static void skipToMatched (tokenInfo * const token)
 	if (isType (token, open_token))
 	{
 		nest_level++;
-		while (!(isType (token, close_token) && (nest_level == 0)))
+		while (!(isType (token, close_token) && (nest_level == 0)) && !isType (token, TOKEN_EOF))
 		{
 			readToken (token);
 			if (isType (token, open_token))
@@ -638,7 +636,7 @@ static void parseRecord (tokenInfo * const token)
 		makeVhdlTag (name, VHDLTAG_RECORD);
 		readToken (name);
 	}
-	while (!isKeyword (name, KEYWORD_END));
+	while (!isKeyword (name, KEYWORD_END) && !isType (name, TOKEN_EOF));
 	fileSkipToCharacter (';');
 	deleteToken (name);
 }
@@ -707,7 +705,8 @@ static void parseSubProgram (tokenInfo * const token)
 			/* Read datatype */
 			readToken (token);
 			while (! isKeyword (token, KEYWORD_IS) &&
-					! isType (token, TOKEN_SEMICOLON))
+					! isType (token, TOKEN_SEMICOLON) &&
+					! isType (token, TOKEN_EOF))
 			{
 				readToken (token);
 			}
@@ -735,7 +734,14 @@ static void parseSubProgram (tokenInfo * const token)
 				}
 				else
 				{
-					parseKeywords (token, TRUE);
+					if (isType (token, TOKEN_EOF))
+					{
+						endSubProgram = TRUE;
+					}
+					else
+					{
+						parseKeywords (token, TRUE);
+					}
 				}
 			} while (!endSubProgram);
 		}
@@ -754,7 +760,14 @@ static void parseSubProgram (tokenInfo * const token)
 				}
 				else
 				{
-					parseKeywords (token, TRUE);
+					if (isType (token, TOKEN_EOF))
+					{
+						endSubProgram = TRUE;
+					}
+					else
+					{
+						parseKeywords (token, TRUE);
+					}
 				}
 			} while (!endSubProgram);
 		}
@@ -800,22 +813,21 @@ static void parseKeywords (tokenInfo * const token, boolean local)
 	}
 }
 
-static void parseVhdlFile (tokenInfo * const token)
+static tokenType parseVhdlFile (tokenInfo * const token)
 {
 	do
 	{
 		readToken (token);
 		parseKeywords (token, FALSE);
-	} while (!isKeyword (token, KEYWORD_END));
+	} while (!isKeyword (token, KEYWORD_END) && !isType (token, TOKEN_EOF));
+	return token->type;
 }
 
 static void findVhdlTags (void)
 {
 	tokenInfo *const token = newToken ();
-	exception_t exception = (exception_t) (setjmp (Exception));
 
-	while (exception == ExceptionNone)
-		parseVhdlFile (token);
+	while (parseVhdlFile (token) != TOKEN_EOF);
 
 	deleteToken (token);
 }

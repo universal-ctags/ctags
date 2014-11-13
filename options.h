@@ -111,6 +111,7 @@ typedef struct sOptionValues {
 	boolean tagRelative;    /* --tag-relative file paths relative to tag file */
 	boolean printTotals;    /* --totals  print cumulative statistics */
 	boolean lineDirectives; /* --linedirectives  process #line directives */
+	boolean guessParser;	/* --guess-parser */
 #ifdef DEBUG
 	long debugLevel;        /* -D  debugging output */
 	unsigned long breakLine;/* -b  source line at which to call lineBreak() */

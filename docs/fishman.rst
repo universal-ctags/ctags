@@ -79,3 +79,8 @@ Contents
 .. raw:: pdf
 
    PageBreak oneColumn
+
+.. include:: f-developers.rst
+.. raw:: pdf
+
+   PageBreak oneColumn

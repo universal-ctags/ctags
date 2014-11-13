@@ -22,7 +22,7 @@
 #include "main.h"
 #define OPTION_WRITE
 #include "options.h"
-#include "parsers.h" 
+#include "parsers.h"
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
@@ -969,7 +969,7 @@ extern void initializeParsing (void)
 				accepted = TRUE;
 #endif
 			}
-			else if ((def->parser == NULL)  ==  (def->parser2 == NULL))
+			else if (((!!def->parser) + (!!def->parser2) + (!!def->parser_with_gc)) != 1)
 				error (FATAL,
 		"%s parser definition must define one and only one parsing routine\n",
 					   def->name);
@@ -1450,6 +1450,20 @@ static rescanReason createTagsForFile (
 			lang->parser ();
 		else if (lang->parser2 != NULL)
 			rescan = lang->parser2 (passCount);
+		else if (lang->parser_with_gc != NULL)
+		{
+			TrashBox* trash_box = trashBoxNew ();
+			jmp_buf jbuf;
+
+			while (!setjmp (jbuf))
+			{
+				trashBoxDelete (trash_box);
+				trash_box = trashBoxNew ();
+				rescan = lang->parser_with_gc (passCount, &jbuf, trash_box);
+				break;
+			}
+			trashBoxDelete (trash_box);
+		}
 		else if (lang->initialize != NULL)
 		{
 			parserInitialize init = lang->initialize;
@@ -1498,6 +1512,21 @@ static boolean createTagsWithFallback (
 	return tagFileResized;
 }
 
+static void printGuessedParser (const char* const fileName, langType language)
+{
+	const char *parserName;
+
+	if (language == LANG_IGNORE)
+	{
+		Option.guessParser = ((int)TRUE) + 1;
+		parserName = "NONE";
+	}
+	else
+		parserName = LanguageTable [language]->name;
+
+	printf("%s: %s\n", fileName, parserName);
+}
+
 extern boolean parseFile (const char *const fileName)
 {
 	boolean tagFileResized = FALSE;
@@ -1505,6 +1534,13 @@ extern boolean parseFile (const char *const fileName)
 	if (Option.language == LANG_AUTO)
 		language = getFileLanguage (fileName);
 	Assert (language != LANG_AUTO);
+
+	if (Option.guessParser)
+	{
+		printGuessedParser (fileName, language);
+		return tagFileResized;
+	}
+
 	if (language == LANG_IGNORE)
 		verbose ("ignoring %s (unknown language)\n", fileName);
 	else if (! enabled_p (language))

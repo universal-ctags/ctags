@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>ctags</ProjectName>
+    <ProjectGuid>{CE5CDD7C-2102-4753-8AAB-7915802BF658}</ProjectGuid>
+    <RootNamespace>ctags</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../gnu_regex;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;;HAVE_REGCOMP;__USE_GNU;bool=int;true=1;false=0;strcasecmp=stricmp;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../gnu_regex;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;HAVE_REGCOMP;__USE_GNU;bool=int;true=1;false=0;strcasecmp=stricmp;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ada.c" />
+    <ClCompile Include="..\ant.c" />
+    <ClCompile Include="..\args.c" />
+    <ClCompile Include="..\asm.c" />
+    <ClCompile Include="..\asp.c" />
+    <ClCompile Include="..\awk.c" />
+    <ClCompile Include="..\basic.c" />
+    <ClCompile Include="..\beta.c" />
+    <ClCompile Include="..\c.c" />
+    <ClCompile Include="..\cobol.c" />
+    <ClCompile Include="..\css.c" />
+    <ClCompile Include="..\debug.c" />
+    <ClCompile Include="..\dosbatch.c" />
+    <ClCompile Include="..\eiffel.c" />
+    <ClCompile Include="..\entry.c" />
+    <ClCompile Include="..\erlang.c" />
+    <ClCompile Include="..\falcon.c" />
+    <ClCompile Include="..\flags.c" />
+    <ClCompile Include="..\flex.c" />
+    <ClCompile Include="..\fnmatch\fnmatch.c" />
+    <ClCompile Include="..\fortran.c" />
+    <ClCompile Include="..\get.c" />
+    <ClCompile Include="..\go.c" />
+    <ClCompile Include="..\html.c" />
+    <ClCompile Include="..\jscript.c" />
+    <ClCompile Include="..\keyword.c" />
+    <ClCompile Include="..\lisp.c" />
+    <ClCompile Include="..\lregex.c" />
+    <ClCompile Include="..\lxcmd.c" />
+    <ClCompile Include="..\lua.c" />
+    <ClCompile Include="..\main.c" />
+    <ClCompile Include="..\make.c" />
+    <ClCompile Include="..\matlab.c" />
+    <ClCompile Include="..\objc.c" />
+    <ClCompile Include="..\ocaml.c" />
+    <ClCompile Include="..\options.c" />
+    <ClCompile Include="..\parse.c" />
+    <ClCompile Include="..\pascal.c" />
+    <ClCompile Include="..\perl.c" />
+    <ClCompile Include="..\php.c" />
+    <ClCompile Include="..\python.c" />
+    <ClCompile Include="..\read.c" />
+    <ClCompile Include="..\gnu_regex\regex.c">
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
+    </ClCompile>
+    <ClCompile Include="..\rexx.c" />
+    <ClCompile Include="..\routines.c" />
+    <ClCompile Include="..\ruby.c" />
+    <ClCompile Include="..\scheme.c" />
+    <ClCompile Include="..\sh.c" />
+    <ClCompile Include="..\slang.c" />
+    <ClCompile Include="..\sml.c" />
+    <ClCompile Include="..\sort.c" />
+    <ClCompile Include="..\sql.c" />
+    <ClCompile Include="..\strlist.c" />
+    <ClCompile Include="..\tcl.c" />
+    <ClCompile Include="..\tex.c" />
+    <ClCompile Include="..\tg.c" />
+    <ClCompile Include="..\trashbox.c" />
+    <ClCompile Include="..\verilog.c" />
+    <ClCompile Include="..\vhdl.c" />
+    <ClCompile Include="..\vim.c" />
+    <ClCompile Include="..\vstring.c" />
+    <ClCompile Include="..\windres.c" />
+    <ClCompile Include="..\yacc.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\e_msoft.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

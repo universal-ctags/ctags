@@ -171,6 +171,7 @@ typedef struct sTokenInfoSQL {
 	keywordId	keyword;
 	vString *	string;
 	vString *	scope;
+	int         scopeKind;
 	int         begin_end_nest_lvl;
 	unsigned long lineNumber;
 	fpos_t filePosition;
@@ -182,7 +183,7 @@ typedef struct sTokenInfoSQL {
 
 static langType Lang_sql;
 
-static jmp_buf Exception;
+static jmp_buf *Exception;
 
 typedef enum {
 	SQLTAG_CURSOR,
@@ -426,6 +427,7 @@ static tokenInfo *newToken (void)
 	token->keyword            = KEYWORD_NONE;
 	token->string             = vStringNew ();
 	token->scope              = vStringNew ();
+	token->scopeKind          = SQLTAG_COUNT;
 	token->begin_end_nest_lvl = 0;
 	token->lineNumber         = getSourceLineNumber ();
 	token->filePosition       = getInputFilePosition ();
@@ -444,7 +446,7 @@ static void deleteToken (tokenInfo *const token)
  *	 Tag generation functions
  */
 
-static void makeConstTag (tokenInfo *const token, const sqlKind kind)
+static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 {
 	if (SqlKinds [kind].enabled)
 	{
@@ -457,31 +459,14 @@ static void makeConstTag (tokenInfo *const token, const sqlKind kind)
 		e.kindName	   = SqlKinds [kind].name;
 		e.kind		   = SqlKinds [kind].letter;
 
-		makeTagEntry (&e);
-	}
-}
-
-static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
-{
-	vString *	fulltag;
-
-	if (SqlKinds [kind].enabled)
-	{
-		/*
-		 * If a scope has been added to the token, change the token
-		 * string to include the scope when making the tag.
-		 */
-		if ( vStringLength(token->scope) > 0 )
+		if (vStringLength (token->scope) > 0)
 		{
-			fulltag = vStringNew ();
-			vStringCopy(fulltag, token->scope);
-			vStringCatS (fulltag, ".");
-			vStringCatS (fulltag, vStringValue(token->string));
-			vStringTerminate(fulltag);
-			vStringCopy(token->string, fulltag);
-			vStringDelete (fulltag);
+			Assert (token->scopeKind < SQLTAG_COUNT);
+			e.extensionFields.scope[0] = SqlKinds [token->scopeKind].name;
+			e.extensionFields.scope[1] = vStringValue (token->scope);
 		}
-		makeConstTag (token, kind);
+
+		makeTagEntry (&e);
 	}
 }
 
@@ -556,7 +541,7 @@ getNextChar:
 
 	switch (c)
 	{
-		case EOF: longjmp (Exception, (int)ExceptionEOF);	break;
+		case EOF: longjmp (*Exception, (int)ExceptionEOF);	break;
 		case '(': token->type = TOKEN_OPEN_PAREN;		break;
 		case ')': token->type = TOKEN_CLOSE_PAREN;		break;
 		case ':': token->type = TOKEN_COLON;			break;
@@ -680,6 +665,26 @@ getNextChar:
 }
 
 /*
+ * reads an indentifier, possibly quoted:
+ * 		identifier
+ * 		"identifier"
+ * 		[identifier]
+ */
+static void readIdentifier (tokenInfo *const token)
+{
+	readToken (token);
+	if (isType (token, TOKEN_OPEN_SQUARE))
+	{
+		tokenInfo *const close_square = newToken ();
+
+		readToken (token);
+		/* eat close swuare */
+		readToken (close_square);
+		deleteToken (close_square);
+	}
+}
+
+/*
  *	 Token parsing functions
  */
 
@@ -695,7 +700,7 @@ getNextChar:
  * }
  */
 
-static void addToScope (tokenInfo* const token, vString* const extra)
+static void addToScope (tokenInfo* const token, vString* const extra, sqlKind kind)
 {
 	if (vStringLength (token->scope) > 0)
 	{
@@ -703,6 +708,7 @@ static void addToScope (tokenInfo* const token, vString* const extra)
 	}
 	vStringCatS (token->scope, vStringValue(extra));
 	vStringTerminate(token->scope);
+	token->scopeKind = kind;
 }
 
 /*
@@ -792,6 +798,7 @@ static void copyToken (tokenInfo *const dest, tokenInfo *const src)
 	dest->keyword = src->keyword;
 	vStringCopy(dest->string, src->string);
 	vStringCopy(dest->scope, src->scope);
+	dest->scopeKind = src->scopeKind;
 }
 
 static void skipArgumentList (tokenInfo *const token)
@@ -813,6 +820,7 @@ static void parseSubProgram (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const name  = newToken ();
 	vString * saveScope = vStringNew ();
+	sqlKind saveScopeKind;
 
 	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc) deleteToken);
 	trashBoxPut (trash_box, saveScope, (TrashBoxDestroyItemProc) vStringDelete);
@@ -873,6 +881,7 @@ static void parseSubProgram (tokenInfo *const token, TrashBox *trash_box)
 			isKeyword (token, KEYWORD_procedure));
 
 	vStringCopy(saveScope, token->scope);
+	saveScopeKind = token->scopeKind;
 	readToken (token);
 	copyToken (name, token);
 	readToken (token);
@@ -889,7 +898,7 @@ static void parseSubProgram (tokenInfo *const token, TrashBox *trash_box)
 		 */
 		if ( vStringLength(saveScope) > 0 )
 		{
-			addToScope(token, name->string);
+			addToScope(token, name->string, kind);
 		}
 		readToken (token);
 		copyToken (name, token);
@@ -954,7 +963,7 @@ static void parseSubProgram (tokenInfo *const token, TrashBox *trash_box)
 				isKeyword (token, KEYWORD_internal) ||
 				isKeyword (token, KEYWORD_external) )
 		{
-			addToScope(token, name->string);
+			addToScope(token, name->string, kind);
 			if (isType (name, TOKEN_IDENTIFIER) ||
 					isType (name, TOKEN_STRING) ||
 					!isKeyword (token, KEYWORD_NONE)
@@ -962,6 +971,7 @@ static void parseSubProgram (tokenInfo *const token, TrashBox *trash_box)
 				makeSqlTag (name, kind);
 
 			vStringClear (token->scope);
+			token->scopeKind = SQLTAG_COUNT;
 		} 
 		if ( isType (token, TOKEN_EQUAL) )
 			readToken (token);
@@ -972,7 +982,7 @@ static void parseSubProgram (tokenInfo *const token, TrashBox *trash_box)
 		if (isKeyword (token, KEYWORD_is) || 
 				isKeyword (token, KEYWORD_begin) )
 		{
-			addToScope(token, name->string);
+			addToScope(token, name->string, kind);
 			if (isType (name, TOKEN_IDENTIFIER) ||
 					isType (name, TOKEN_STRING) ||
 					!isKeyword (token, KEYWORD_NONE)
@@ -981,9 +991,11 @@ static void parseSubProgram (tokenInfo *const token, TrashBox *trash_box)
 
 			parseBlock (token, TRUE, trash_box);
 			vStringClear (token->scope);
+			token->scopeKind = SQLTAG_COUNT;
 		} 
 	}
 	vStringCopy(token->scope, saveScope);
+	token->scopeKind = saveScopeKind;
 }
 
 static void parseRecord (tokenInfo *const token)
@@ -1059,13 +1071,15 @@ static void parseType (tokenInfo *const token, TrashBox *trash_box)
 {
 	tokenInfo *const name = newToken ();
 	vString * saveScope = vStringNew ();
+	sqlKind saveScopeKind;
 
 	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	trashBoxPut (trash_box, saveScope, (TrashBoxDestroyItemProc)vStringDelete);
 
 	vStringCopy(saveScope, token->scope);
 	/* If a scope has been set, add it to the name */
-	addToScope (name, token->scope);
+	addToScope (name, token->scope, token->scopeKind);
+	saveScopeKind = token->scopeKind;
 	readToken (name);
 	if (isType (name, TOKEN_IDENTIFIER))
 	{
@@ -1073,12 +1087,12 @@ static void parseType (tokenInfo *const token, TrashBox *trash_box)
 		if (isKeyword (token, KEYWORD_is))
 		{
 			readToken (token);
-			addToScope (token, name->string);
 			switch (token->keyword)
 			{
 				case KEYWORD_record:
 				case KEYWORD_object:
 					makeSqlTag (name, SQLTAG_RECORD);
+					addToScope (token, name->string, SQLTAG_RECORD);
 					parseRecord (token);
 					break;
 
@@ -1095,9 +1109,11 @@ static void parseType (tokenInfo *const token, TrashBox *trash_box)
 				default: break;
 			}
 			vStringClear (token->scope);
+			token->scopeKind = SQLTAG_COUNT;
 		}
 	}
 	vStringCopy(token->scope, saveScope);
+	token->scopeKind = saveScopeKind;
 }
 
 static void parseSimple (tokenInfo *const token, const sqlKind kind)
@@ -1615,14 +1631,14 @@ static void parsePackage (tokenInfo *const token, TrashBox *trash_box)
 	tokenInfo *const name = newToken ();
 
 	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
-	readToken (name);
+	readIdentifier (name);
 	if (isKeyword (name, KEYWORD_body))
 	{
 		/*
 		 * Ignore the BODY tag since we will process
 		 * the body or prototypes in the same manner
 		 */
-		readToken (name);
+		readIdentifier (name);
 	}
 	/* Check for owner.pkg_name */
 	while (! isKeyword (token, KEYWORD_is))
@@ -1630,7 +1646,7 @@ static void parsePackage (tokenInfo *const token, TrashBox *trash_box)
 		readToken (token);
 		if ( isType(token, TOKEN_PERIOD) )
 		{
-			readToken (name);
+			readIdentifier (name);
 		}
 	}
 	if (isKeyword (token, KEYWORD_is))
@@ -1638,9 +1654,10 @@ static void parsePackage (tokenInfo *const token, TrashBox *trash_box)
 		if (isType (name, TOKEN_IDENTIFIER) ||
 				isType (name, TOKEN_STRING))
 			makeSqlTag (name, SQLTAG_PACKAGE);
-		addToScope (token, name->string);
+		addToScope (token, name->string, SQLTAG_PACKAGE);
 		parseBlock (token, FALSE, trash_box);
 		vStringClear (token->scope);
+		token->scopeKind = SQLTAG_COUNT;
 	}
 	findCmdTerm (token, FALSE);
 }
@@ -1672,13 +1689,7 @@ static void parseTable (tokenInfo *const token, TrashBox *trash_box)
 	 */
 
 	/* This could be a database, owner or table name */
-	readToken (name);
-	if (isType (name, TOKEN_OPEN_SQUARE))
-	{
-		readToken (name);
-		/* Read close square */
-		readToken (token);
-	} 
+	readIdentifier (name);
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
@@ -1688,35 +1699,17 @@ static void parseTable (tokenInfo *const token, TrashBox *trash_box)
 		 * referenced with a blank owner:
 		 *     dbname..tablename
 		 */
-		readToken (name);
-		if (isType (name, TOKEN_OPEN_SQUARE))
-		{
-			readToken (name);
-			/* Read close square */
-			readToken (token);
-		} 
+		readIdentifier (name);
 		/* Check if a blank name was provided */
 		if (isType (name, TOKEN_PERIOD))
 		{
-			readToken (name);
-			if (isType (name, TOKEN_OPEN_SQUARE))
-			{
-				readToken (name);
-				/* Read close square */
-				readToken (token);
-			} 
+			readIdentifier (name);
 		}
 		readToken (token);
 		if (isType (token, TOKEN_PERIOD))
 		{
 			/* This can only be the table name */
-			readToken (name);
-			if (isType (name, TOKEN_OPEN_SQUARE))
-			{
-				readToken (name);
-				/* Read close square */
-				readToken (token);
-			} 
+			readIdentifier (name);
 			readToken (token);
 		}
 	}
@@ -1727,8 +1720,10 @@ static void parseTable (tokenInfo *const token, TrashBox *trash_box)
 		{
 			makeSqlTag (name, SQLTAG_TABLE);
 			vStringCopy(token->scope, name->string);
+			token->scopeKind = SQLTAG_TABLE;
 			parseRecord (token);
 			vStringClear (token->scope);
+			token->scopeKind = SQLTAG_COUNT;
 		}
 	} 
 	else if (isKeyword (token, KEYWORD_at))
@@ -1758,24 +1753,24 @@ static void parseIndex (tokenInfo *const token, TrashBox *trash_box)
 	 *	   create bitmap index "i6" on t1(c1)
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
-		readToken (name);
+		readIdentifier (name);
 		readToken (token);
 	}
 	if ( isKeyword (token, KEYWORD_on) &&
 			(isType (name, TOKEN_IDENTIFIER) || isType (name, TOKEN_STRING) ) )
 	{
-		readToken (owner);
+		readIdentifier (owner);
 		readToken (token);
 		if (isType (token, TOKEN_PERIOD))
 		{
-			readToken (owner);
+			readIdentifier (owner);
 			readToken (token);
 		}
-		addToScope(name, owner->string);
+		addToScope(name, owner->string, SQLTAG_TABLE /* FIXME? */);
 		makeSqlTag (name, SQLTAG_INDEX);
 	}
 	findCmdTerm (token, FALSE);
@@ -1794,11 +1789,11 @@ static void parseEvent (tokenInfo *const token, TrashBox *trash_box)
 	 *	   create event "dba"."e4" handler begin end;
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
-		readToken (name);
+		readIdentifier (name);
 	}
 	while (! (isKeyword (token, KEYWORD_handler) ||
 				(isType (token, TOKEN_SEMICOLON)))	  )
@@ -1841,11 +1836,11 @@ static void parseTrigger (tokenInfo *const token, TrashBox *trash_box)
 	 *	   create trigger "tr6" begin end;
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
-		readToken (name);
+		readIdentifier (name);
 		readToken (token);
 	}
 
@@ -1872,9 +1867,10 @@ static void parseTrigger (tokenInfo *const token, TrashBox *trash_box)
 		{
 			if ( isKeyword (token, KEYWORD_declare) )
 			{
-				addToScope(token, name->string);
+				addToScope(token, name->string, SQLTAG_TRIGGER);
 				parseDeclare(token, TRUE, trash_box);
 				vStringClear(token->scope);
+				token->scopeKind = SQLTAG_COUNT;
 			}
 			else
 				readToken (token);
@@ -1883,14 +1879,15 @@ static void parseTrigger (tokenInfo *const token, TrashBox *trash_box)
 		if ( isKeyword (token, KEYWORD_begin) || 
 				isKeyword (token, KEYWORD_call)   )
 		{
-			addToScope(name, table->string);
+			addToScope(name, table->string, SQLTAG_TABLE);
 			makeSqlTag (name, SQLTAG_TRIGGER);
-			addToScope(token, table->string);
+			addToScope(token, table->string, SQLTAG_TABLE);
 			if ( isKeyword (token, KEYWORD_begin) )
 			{
 				parseBlock (token, TRUE, trash_box);
 			}
 			vStringClear(token->scope);
+			token->scopeKind = SQLTAG_COUNT;
 		}
 	}
 
@@ -1910,11 +1907,11 @@ static void parsePublication (tokenInfo *const token, TrashBox *trash_box)
 	 *	   create publication "dba"."pu4" ()
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
-		readToken (name);
+		readIdentifier (name);
 		readToken (token);
 	}
 	if (isType (token, TOKEN_OPEN_PAREN))
@@ -1943,7 +1940,7 @@ static void parseService (tokenInfo *const token, TrashBox *trash_box)
 	 *		   CALL sp_Something();
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if (isKeyword (token, KEYWORD_type))
 	{
@@ -1966,10 +1963,10 @@ static void parseDomain (tokenInfo *const token, TrashBox *trash_box)
 	 *	   CREATE DOMAIN|DATATYPE [AS] your_name ...;
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	if (isKeyword (name, KEYWORD_is))
 	{
-		readToken (name);
+		readIdentifier (name);
 	}
 	readToken (token);
 	if (isType (name, TOKEN_IDENTIFIER) ||
@@ -2008,7 +2005,7 @@ static void parseVariable (tokenInfo *const token, TrashBox *trash_box)
 	 *	   drop   variable @varname3;
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if ( (isType (name, TOKEN_IDENTIFIER) || isType (name, TOKEN_STRING))
 			&& !isType (token, TOKEN_SEMICOLON) )
@@ -2031,7 +2028,7 @@ static void parseSynonym (tokenInfo *const token, TrashBox *trash_box)
 	 *	   drop   variable @varname3;
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if ( (isType (name, TOKEN_IDENTIFIER) || isType (name, TOKEN_STRING))
 			&& isKeyword (token, KEYWORD_for) )
@@ -2054,11 +2051,11 @@ static void parseView (tokenInfo *const token, TrashBox *trash_box)
 	 *	   drop   variable @varname3;
 	 */
 
-	readToken (name);
+	readIdentifier (name);
 	readToken (token);
 	if (isType (token, TOKEN_PERIOD))
 	{
-		readToken (name);
+		readIdentifier (name);
 		readToken (token);
 	}
 	if ( isType (token, TOKEN_OPEN_PAREN) )
@@ -2130,8 +2127,8 @@ static void parseMLTable (tokenInfo *const token, TrashBox *trash_box)
 						isType (table, TOKEN_STRING) && 
 						isType (event, TOKEN_STRING) )
 				{
-					addToScope(version, table->string);
-					addToScope(version, event->string);
+					addToScope(version, table->string, SQLTAG_TABLE);
+					addToScope(version, event->string, SQLTAG_EVENT);
 					makeSqlTag (version, SQLTAG_MLTABLE);
 				}
 			} 
@@ -2177,7 +2174,7 @@ static void parseMLConn (tokenInfo *const token, TrashBox *trash_box)
 			if (isType (version, TOKEN_STRING) && 
 					isType (event, TOKEN_STRING) )
 			{
-				addToScope(version, event->string);
+				addToScope(version, event->string, SQLTAG_EVENT);
 				makeSqlTag (version, SQLTAG_MLCONN);
 			}
 		} 
@@ -2240,8 +2237,8 @@ static void parseMLProp (tokenInfo *const token, TrashBox *trash_box)
 						isType (prop_set_name, TOKEN_STRING) && 
 						isType (prop_name, TOKEN_STRING) )
 				{
-					addToScope(component, prop_set_name->string);
-					addToScope(component, prop_name->string);
+					addToScope(component, prop_set_name->string, SQLTAG_MLPROP /* FIXME */);
+					addToScope(component, prop_name->string, SQLTAG_MLPROP /* FIXME */);
 					makeSqlTag (component, SQLTAG_MLPROP);
 				}
 			} 
@@ -2346,20 +2343,18 @@ static void initialize (const langType language)
 	buildSqlKeywordHash ();
 }
 
-static void findSqlTags (void)
+static rescanReason findSqlTags (const unsigned int passCount __unused__,
+				 jmp_buf *jbuf, TrashBox *tbox)
 {
-	TrashBox* trash_box = NULL;
 	tokenInfo *const token = newToken ();
-	exception_t exception;
 
-	trash_box = trashBoxNew ();
-	trashBoxPut (trash_box, token, (TrashBoxDestroyItemProc)deleteToken);
-	exception = (exception_t) (setjmp (Exception));
+	trashBoxPut (tbox, token, (TrashBoxDestroyItemProc)deleteToken);
+	Exception = jbuf;
 
-	while (exception == ExceptionNone)
-		parseSqlFile (token, trash_box);
+	while (1)
+		parseSqlFile (token, tbox);
 
-	trashBoxDestroy (trash_box);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* SqlParser (void)
@@ -2369,7 +2364,7 @@ extern parserDefinition* SqlParser (void)
 	def->kinds		= SqlKinds;
 	def->kindCount	= KIND_COUNT (SqlKinds);
 	def->extensions = extensions;
-	def->parser		= findSqlTags;
+	def->parser_with_gc = findSqlTags;
 	def->initialize = initialize;
 	return def;
 }

@@ -248,7 +248,6 @@ getNextChar:
 					case '*':
 						do
 						{
-							int d;
 							do
 							{
 								d = fileGetc ();

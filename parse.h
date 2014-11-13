@@ -17,6 +17,7 @@
 #include "general.h"  /* must always come first */
 #include "parsers.h"  /* contains list of parsers */
 #include "strlist.h"
+#include "trashbox.h"
 
 /*
 *   MACROS
@@ -40,6 +41,9 @@ typedef enum {
 typedef void (*createRegexTag) (const vString* const name);
 typedef void (*simpleParser) (void);
 typedef rescanReason (*rescanParser) (const unsigned int passCount);
+typedef rescanReason (*rescanParserWithExceptionAndTrash) (const unsigned int passCount,
+							   jmp_buf *jbuf,
+							   TrashBox *tbox);
 typedef void (*parserInitialize) (langType language);
 typedef void (*parserFinalize) (langType language);
 
@@ -80,6 +84,7 @@ typedef struct {
 	parserFinalize finalize;       /* finalize routine, if needed */
 	simpleParser parser;           /* simple parser (common case) */
 	rescanParser parser2;          /* rescanning parser (unusual case) */
+	rescanParserWithExceptionAndTrash parser_with_gc;          /* rescanning parser (unusual case) */
 	unsigned int method;           /* See PARSE__... definitions above */
 	tgTableEntry *tg_entries;
 
@@ -167,7 +172,7 @@ extern void resetRegexKinds (const langType language, boolean mode);
 extern boolean enableRegexKind (const langType language, const int kind, const boolean mode);
 extern void printRegexKinds (const langType language, boolean indent);
 extern void freeRegexResources (void);
-extern void checkRegex (void);
+extern boolean checkRegex (void);
 extern void useRegexMethod (const langType language);
 
 #ifdef HAVE_COPROC

@@ -6,6 +6,7 @@ test.*.diff
 *.od
 *.obj
 *.TMP
+*.tmp
 ctags.exe
 ctags.ref.exe
 dctags.exe
@@ -30,3 +31,11 @@ tags.ref
 core.*
 syntax.vim
 STDERR.*
+badinput
+win32/*.sdf
+win32/*.opensdf
+win32/*.suo
+win32/[Rr]elease/
+win32/[Dd]ebug/
+perf.data*
+a.out

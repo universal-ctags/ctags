@@ -1,0 +1,10 @@
+#footer	Units/css-simple.d/input.css	/^#footer { font-size: 80%; }$/;"	i
+*	Units/css-simple.d/input.css	/^* { padding:0; }$/;"	s
+.foo a	Units/css-simple.d/input.css	/^.foo a, .foo b { color: blue; }$/;"	s
+.foo b	Units/css-simple.d/input.css	/^.foo a, .foo b { color: blue; }$/;"	s
+.header	Units/css-simple.d/input.css	/^.header { font-size: 200%; }$/;"	c
+.red	Units/css-simple.d/input.css	/^.red { color: red }$/;"	c
+div.magic	Units/css-simple.d/input.css	/^div.magic $/;"	c
+html	Units/css-simple.d/input.css	/^html$/;"	s
+ul > li > a	Units/css-simple.d/input.css	/^ul > li > a {$/;"	s
+ul li	Units/css-simple.d/input.css	/^ul li { padding-left: 1em; }$/;"	s

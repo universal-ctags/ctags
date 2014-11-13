@@ -35,6 +35,7 @@ See "External parser command" about *xcmd*.
 Heavily improved language parsers
 ---------------------------------------------------------------------
 * php
+* verilog
 
 
 New test facility named *Units*
@@ -164,6 +165,17 @@ autotools.
 ctags used suffix here *\*.in* for choosing a parser. *.in* shows
 nothing about the language used in the input file. When fishman-ctags
 finds *.in* as suffix, fishman-ctags checks the next suffix, here *.c*.
+
+Dry runnning
+---------------------------------------------------------------------
+With ``--guess-parser`` option, you can test the parser selector of
+ctags. e.g.::
+
+	$ ./ctags --guess-parser main.c
+	main.c: C
+
+If no parser is selected, ``NONE`` is printed as parser name.
+
 
 Option library
 ---------------------------------------------------------------------

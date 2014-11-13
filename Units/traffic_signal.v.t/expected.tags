@@ -1,13 +1,17 @@
+Init	Units/traffic_signal.v.t/input.v	/^initial begin: Init$/;"	b	module:traffic
 amber	Units/traffic_signal.v.t/input.v	/^reg clock, red, amber, green;$/;"	r	module:traffic
 amber_tics	Units/traffic_signal.v.t/input.v	/^          amber_tics = 3, green_tics = 20;$/;"	c	module:traffic
 clock	Units/traffic_signal.v.t/input.v	/^reg clock, red, amber, green;$/;"	r	module:traffic
+clock_wave	Units/traffic_signal.v.t/input.v	/^always begin: clock_wave$/;"	b	module:traffic
 color	Units/traffic_signal.v.t/input.v	/^   output color;$/;"	p	task:traffic.light
 green	Units/traffic_signal.v.t/input.v	/^reg clock, red, amber, green;$/;"	r	module:traffic
 green_tics	Units/traffic_signal.v.t/input.v	/^          amber_tics = 3, green_tics = 20;$/;"	c	module:traffic
 light	Units/traffic_signal.v.t/input.v	/^task light;$/;"	t	module:traffic
+main_process	Units/traffic_signal.v.t/input.v	/^always begin: main_process$/;"	b	module:traffic
 off	Units/traffic_signal.v.t/input.v	/^parameter on = 1, off = 0, red_tics = 35, $/;"	c	module:traffic
 on	Units/traffic_signal.v.t/input.v	/^parameter on = 1, off = 0, red_tics = 35, $/;"	c	module:traffic
 red	Units/traffic_signal.v.t/input.v	/^reg clock, red, amber, green;$/;"	r	module:traffic
 red_tics	Units/traffic_signal.v.t/input.v	/^parameter on = 1, off = 0, red_tics = 35, $/;"	c	module:traffic
+stop_at	Units/traffic_signal.v.t/input.v	/^initial begin: stop_at$/;"	b	module:traffic
 tics	Units/traffic_signal.v.t/input.v	/^   input [31:0] tics;$/;"	p	task:traffic.light
 traffic	Units/traffic_signal.v.t/input.v	/^module traffic;$/;"	m

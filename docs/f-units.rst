@@ -138,6 +138,19 @@ Example of running
 	Testing Units/c-sample...Passed
 	...
 
+Runnig unit tests for specific languages
+------------------------------------------------------------
+
+You can run only the tests for a specific language by setting
+``UNIT_LANGUAGES`` to a specific parser as reported by
+``ctags --list-languages``::
+
+	make -f testing.mak test.units UNIT_LANGUAGES=PHP
+
+Multiple languages can be selected using a comma separated list::
+
+	make -f testing.mak test.units UNIT_LANGUAGES=C,C++
+
 Gathering test cases for known bugs
 ------------------------------------------------------------
 
@@ -158,6 +171,25 @@ When you run test.units target, you will see::
     Testing Units/c-sample...passed
     Testing Units/css-singlequote-in-comment...failed but KNOWN bug
     Testing Units/ctags-simple...passed
+
+Suffix *.i* is a variant of *.b*. *.i* is for merging/gathering input
+which lets ctags process enter an infinite loop. Different from *.b*,
+test cases marked as *.i* are never executed. They are just skipped
+but reported the skips::
+
+    Testing Units/ada-ads...passed
+    Testing Units/ada-function...skipped (infinite loop)
+    Testing Units/ada-protected...passed
+    ...
+
+      Summary of "Units" test
+      -------------------------
+	    #passed:  336
+	    #failed:  0
+	    #skipped(features):  0
+	    #skipped(languages):  0
+	    #skipped(infinite loop):  1
+	    #known-bugs:  2
 
 
 Acknowledgements

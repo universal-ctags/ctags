@@ -106,6 +106,11 @@ bugs
 
 	   	216880c5287e0421d9c49898d983144db61c83aa
 
+   <271> regex callback is broken; <320> [PATCH] fix regex callback match count
+	 * merged patch (with updated bug number)::
+
+		a12b3a24b62d6535a968e076675f68bac9ad32ba 
+
 
 `patches <https://sourceforge.net/p/ctags/patches/%d>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -348,6 +353,7 @@ Geany has created a library out of ctags
 Their language parsers have many improvements to various parsers.
 Changes known by fishman devs worth backporting:
 
+* HTML reads <h1><h2><h3> tags
 * Make has support for targets
 * SQL tags are stored with scopes instead of "tablename.field"
 
@@ -357,13 +363,23 @@ They have a these additional language parsers:
 * `Abaqus <http://en.wikipedia.org/wiki/Abaqus>`_
 * `ActionScript <http://en.wikipedia.org/wiki/ActionScript>`_
 * `AsciiDoc <http://en.wikipedia.org/wiki/AsciiDoc>`_
+* `D (c.c) <http://dlang.org>`_
 * `DocBook <http://en.wikipedia.org/wiki/DocBook>`_
+* `Ferite (c.c) <http://en.wikipedia.org/wiki/Ferite>`_
+* `GLSL (c.c) <http://en.wikipedia.org/wiki/OpenGL_Shading_Language>`_
 * `Haskell <http://en.wikipedia.org/wiki/Haskell_%28programming_language%29>`_
 * `Haxe <http://en.wikipedia.org/wiki/Haxe>`_
 * `NSIS <http://en.wikipedia.org/wiki/Nullsoft_Scriptable_Install_System>`_
 * `R <http://en.wikipedia.org/wiki/R_%28programming_language%29>`_
+* `Rust <http://rust-lang.org>`_
 * `reStructuredText (reST) <http://en.wikipedia.org/wiki/ReStructuredText>`_
 * `txt2tags <http://en.wikipedia.org/wiki/Txt2tags>`_ 
+* `Vala (c.c) <http://en.wikipedia.org/wiki/Vala_%28programming_language%29>`_
+
+
+These changes have been merged:
+
+* Fix regex callback match count - https://github.com/fishman/ctags/pull/104 
 
 
 `VIM-Japan <https://github.com/vim-jp/ctags/>`_

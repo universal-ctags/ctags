@@ -49,7 +49,7 @@ static boolean isIdentifierChar (int c)
     return (boolean) (isalnum (c));
 }
 
-static const char *skipSpace (const char *cp)
+static const unsigned char *skipSpace (const unsigned char *cp)
 {
     while (isspace ((int) *cp))
         ++cp;

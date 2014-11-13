@@ -322,12 +322,12 @@ static void appendAdaTokenList(adaTokenInfo *parent, adaTokenList *children);
 /* prototypes of functions for moving through the DEFINED text */
 static void readNewLine(void);
 static void movePos(int amount);
-static boolean cmp(char *buf, int len, char *match);
-static boolean adaCmp(char *match);
+static boolean cmp(const char *buf, int len, const char *match);
+static boolean adaCmp(const char *match);
 static boolean adaKeywordCmp(adaKeyword keyword);
 static void skipUntilWhiteSpace(void);
 static void skipWhiteSpace(void);
-static void skipPast(char *past);
+static void skipPast(const char *past);
 static void skipPastKeyword(adaKeyword keyword);
 static void skipPastWord(void);
 
@@ -398,7 +398,7 @@ static adaTokenInfo *newAdaToken(const char *name, int len, adaKind kind,
   if(name != NULL && len != 0)
   {
     tmpName = xMalloc(len + 1, char);
-    strncpy((char *) tmpName, (char *) name, len);
+    strncpy(tmpName, name, len);
     tmpName[len] = '\0';
   }
 
@@ -594,7 +594,7 @@ static void readNewLine(void)
       }
     } /* if(line == NULL) */
 
-    lineLen = strlen((char *) line);
+    lineLen = strlen(line);
 
     if(lineLen > 0)
     {
@@ -620,7 +620,7 @@ static void movePos(int amount)
    (pos) < (len) && \
    strncasecmp(&(buf)[(pos)], "--", strlen("--")) == 0)
 
-static boolean cmp(char *buf, int len, char *match)
+static boolean cmp(const char *buf, int len, const char *match)
 {
   boolean status = FALSE;
 
@@ -653,7 +653,7 @@ static boolean cmp(char *buf, int len, char *match)
   return status;
 } /* static boolean cmp(char *buf, int len, char *match) */
 
-static boolean adaCmp(char *match)
+static boolean adaCmp(const char *match)
 {
   boolean status = FALSE;
 
@@ -664,7 +664,7 @@ static boolean adaCmp(char *match)
     return status;
   }
 
-  status = cmp((char *) &line[pos], lineLen - pos, match);
+  status = cmp(&line[pos], lineLen - pos, match);
 
   /* if we match, increment the position pointer */
   if(status == TRUE && match != NULL)
@@ -690,8 +690,7 @@ static boolean adaKeywordCmp(adaKeyword keyword)
     return status;
   }
 
-  status = cmp((char *) &line[pos], lineLen - pos,
-               (char *) AdaKeywords[keyword]);
+  status = cmp(&line[pos], lineLen - pos, AdaKeywords[keyword]);
 
   /* if we match, increment the position pointer */
   if(status == TRUE)
@@ -734,7 +733,7 @@ static void skipUntilWhiteSpace(void)
         return;
       }
 
-      lineLen = strlen((char *) line);
+      lineLen = strlen(line);
 
       return;
     } /* if(pos >= lineLen) */
@@ -768,7 +767,7 @@ static void skipWhiteSpace(void)
   } /* while(isspace(line[pos])) */
 } /* static void skipWhiteSpace(void) */
 
-static void skipPast(char *past)
+static void skipPast(const char *past)
 {
   /* first check for a comment line, because this would cause the isspace
    * check to fail immediately */
@@ -845,7 +844,7 @@ static void skipPastWord(void)
         return;
       }
 
-      lineLen = strlen((char *) line);
+      lineLen = strlen(line);
 
       return;
     } /* if(pos >= lineLen) */
@@ -893,9 +892,9 @@ static adaTokenInfo *adaParseBlock(adaTokenInfo *parent, adaKind kind)
   skipWhiteSpace();
 
   /* task and protected types are allowed to have discriminants */
-  if(line[pos] == '(')
+  if(exception != EXCEPTION_EOF && line[pos] == '(')
   {
-    while(line[pos] != ')')
+    while(exception != EXCEPTION_EOF && line[pos] != ')')
     {
       movePos(1);
       adaParseVariables(token, ADA_KIND_AUTOMATIC_VARIABLE);
@@ -950,7 +949,13 @@ static adaTokenInfo *adaParseBlock(adaTokenInfo *parent, adaKind kind)
       /* nothing found, move to the next word */
       skipUntilWhiteSpace();
     }
-  } /* while(TRUE) - while the end of spec, or beginning of body not found */
+
+    if (exception == EXCEPTION_EOF)
+    {
+      freeAdaToken(&parent->children, token);
+      token = NULL;
+    }
+  } /* while(token != NULL) - while the end of spec, or beginning of body not found */
 
   return token;
 } /* static adaTokenInfo *adaParseBlock(adaTokenInfo *parent, adaKind kind) */
@@ -980,9 +985,9 @@ static adaTokenInfo *adaParseSubprogram(adaTokenInfo *parent, adaKind kind)
   skipWhiteSpace();
 
   /* if we find a '(' grab any parameters */
-  if(line[pos] == '(' && token != NULL)
+  if(exception != EXCEPTION_EOF && line[pos] == '(' && token != NULL)
   {
-    while(line[pos] != ')')
+    while(exception != EXCEPTION_EOF && line[pos] != ')')
     {
       movePos(1);
       tmpToken = adaParseVariables(token, ADA_KIND_AUTOMATIC_VARIABLE);
@@ -998,9 +1003,9 @@ static adaTokenInfo *adaParseSubprogram(adaTokenInfo *parent, adaKind kind)
        * pair */
       skipWhiteSpace();
 
-      if(line[pos] == '(')
+      if(exception != EXCEPTION_EOF && line[pos] == '(')
       {
-        while(line[pos] != ')')
+        while(exception != EXCEPTION_EOF && line[pos] != ')')
         {
           movePos(1);
           adaParseVariables(token, ADA_KIND_AUTOMATIC_VARIABLE);
@@ -1063,6 +1068,7 @@ static adaTokenInfo *adaParseSubprogram(adaTokenInfo *parent, adaKind kind)
     else
     {
       /* nothing found, move to the next word */
+      movePos(1); /* make sure to advance even if we aren't actually on a word */
       skipPastWord();
     }
   } /* while(exception != EXCEPTION_EOF && token != NULL) */
@@ -1086,11 +1092,11 @@ static adaTokenInfo *adaParseType(adaTokenInfo *parent, adaKind kind)
   movePos(i);
   skipWhiteSpace();
 
-  if(line[pos] == '(')
+  if(exception != EXCEPTION_EOF && line[pos] == '(')
   {
     /* in this case there is a discriminant to this type, gather the
      * variables */
-    while(line[pos] != ')')
+    while(exception != EXCEPTION_EOF && line[pos] != ')')
     {
       movePos(1);
       adaParseVariables(token, ADA_KIND_AUTOMATIC_VARIABLE);
@@ -1105,7 +1111,7 @@ static adaTokenInfo *adaParseType(adaTokenInfo *parent, adaKind kind)
   {
     skipWhiteSpace();
     /* check to see if this may be a record or an enumeration */
-    if(line[pos] == '(')
+    if(exception != EXCEPTION_EOF && line[pos] == '(')
     {
       movePos(1);
       adaParseVariables(token, ADA_KIND_ENUM_LITERAL);
@@ -1259,12 +1265,12 @@ static adaTokenInfo *adaParseVariables(adaTokenInfo *parent, adaKind kind)
              buf[bufPos + 1] == ';'))
     {
       if(cmp(&buf[tokenStart], bufLen - tokenStart,
-             (char *) AdaKeywords[ADA_KEYWORD_CONSTANT]) == TRUE)
+             AdaKeywords[ADA_KEYWORD_CONSTANT]) == TRUE)
       {
         kind = ADA_KIND_CONSTANT;
       }
       else if(cmp(&buf[tokenStart], bufLen - tokenStart,
-                  (char *) AdaKeywords[ADA_KEYWORD_EXCEPTION]) == TRUE)
+                  AdaKeywords[ADA_KEYWORD_EXCEPTION]) == TRUE)
       {
         kind = ADA_KIND_EXCEPTION;
       }
@@ -1297,7 +1303,7 @@ static adaTokenInfo *adaParseVariables(adaTokenInfo *parent, adaKind kind)
 
       /* allocate space and store this into our buffer */
       bufLen += lineLen;
-      buf = xRealloc((char *) buf, bufLen + 1, char);
+      buf = xRealloc(buf, bufLen + 1, char);
       memcpy((void *) &buf[bufPos], (void *) line, lineLen);
       buf[bufLen] = '\0';
     } /* if(bufPos >= bufLen) */
@@ -1339,7 +1345,7 @@ static adaTokenInfo *adaParseVariables(adaTokenInfo *parent, adaKind kind)
         if(!cmp(&buf[tokenStart], varEndPos, "in") &&
            !cmp(&buf[tokenStart], varEndPos, "out"))
         {
-          token = newAdaToken((const char *) &buf[tokenStart], i - tokenStart,
+          token = newAdaToken(&buf[tokenStart], i - tokenStart,
                               kind, FALSE, parent);
 
           /* now set the proper line and file position counts for this
@@ -1366,7 +1372,7 @@ static adaTokenInfo *adaParseVariables(adaTokenInfo *parent, adaKind kind)
     /* if token start was 'started' then we should store the last token */
     if(tokenStart != -1)
     {
-      token = newAdaToken((const char *) &buf[tokenStart], i - tokenStart,
+      token = newAdaToken(&buf[tokenStart], i - tokenStart,
                           kind, FALSE, parent);
 
       /* now set the proper line and file position counts for this
@@ -1422,7 +1428,11 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
     skipWhiteSpace();
 
     /* check some universal things to check for first */
-    if(isAdaComment(line, pos, lineLen))
+    if(exception == EXCEPTION_EOF)
+    {
+      break;
+    }
+    else if(isAdaComment(line, pos, lineLen))
     {
       readNewLine();
       continue;
@@ -1471,7 +1481,7 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
           skipWhiteSpace();
 
           /* skip over the "(" until we hit the tag */
-          if(line[pos] == '(')
+          if(exception != EXCEPTION_EOF && line[pos] == '(')
           {
             movePos(1);
             skipWhiteSpace();
@@ -1581,9 +1591,9 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
           movePos(i);
 
           /* now gather the parameters to this subprogram */
-          if(line[pos] == '(')
+          if(exception != EXCEPTION_EOF && line[pos] == '(')
           {
-            while(line[pos] != ')')
+            while(exception != EXCEPTION_EOF && line[pos] != ')')
             {
               movePos(1);
               adaParseVariables(genericParamsRoot.children.tail,
@@ -1821,7 +1831,7 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
            * automatic loop iterator, But... The loop variable is only
            * available within the loop itself so make an anonymous label
            * parent for this loop var to be parsed in */
-          token = newAdaToken((const char *) AdaKeywords[ADA_KEYWORD_LOOP],
+          token = newAdaToken(AdaKeywords[ADA_KEYWORD_LOOP],
                               strlen(AdaKeywords[ADA_KEYWORD_LOOP]),
                               ADA_KIND_ANONYMOUS, FALSE, parent);
           adaParseLoopVar(token);
@@ -1829,7 +1839,7 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
         } /* else if(adaKeywordCmp(ADA_KEYWORD_FOR)) */
         else if(adaKeywordCmp(ADA_KEYWORD_WHILE))
         {
-          token = newAdaToken((const char *) AdaKeywords[ADA_KEYWORD_LOOP],
+          token = newAdaToken(AdaKeywords[ADA_KEYWORD_LOOP],
                               strlen(AdaKeywords[ADA_KEYWORD_LOOP]),
                               ADA_KIND_ANONYMOUS, FALSE, parent);
 
@@ -1840,7 +1850,7 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
         } /* else if(adaKeywordCmp(ADA_KEYWORD_WHILE)) */
         else if(adaKeywordCmp(ADA_KEYWORD_LOOP))
         {
-          token = newAdaToken((const char *) AdaKeywords[ADA_KEYWORD_LOOP],
+          token = newAdaToken(AdaKeywords[ADA_KEYWORD_LOOP],
                               strlen(AdaKeywords[ADA_KEYWORD_LOOP]),
                               ADA_KIND_ANONYMOUS, FALSE, parent);
 
@@ -1853,7 +1863,7 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
           adaParse(ADA_CODE, token);
         } /* else if(adaKeywordCmp(ADA_KEYWORD_LOOP)) */
         else if(line != NULL &&
-                strncasecmp((char *) &line[pos], "<<", strlen("<<")) == 0)
+                strncasecmp(&line[pos], "<<", strlen("<<")) == 0)
         {
           movePos(strlen("<<"));
 
@@ -1862,7 +1872,7 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent)
            * because we don't want to move the real pos until we know for
            * sure this is a label */
           for(i = 1; (pos + i) < lineLen &&
-              strncasecmp((char *) &line[pos + i], ">>", strlen(">>")) != 0;
+              strncasecmp(&line[pos + i], ">>", strlen(">>")) != 0;
               i++);
 
           /* if we didn't increment to the end of the line, a match was
@@ -2115,9 +2125,9 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
          * current tag name. */
         currentScope = xMalloc(strlen(parentScope) + strlen(token->name) + 2,
                                char);
-        strncpy((char *) currentScope, parentScope, strlen(parentScope));
+        strncpy(currentScope, parentScope, strlen(parentScope));
         currentScope[strlen(parentScope)] = '.';
-        strncpy((char *) &currentScope[strlen(parentScope) + 1], token->name,
+        strncpy(&currentScope[strlen(parentScope) + 1], token->name,
                 strlen(token->name));
         currentScope[strlen(parentScope) + 1 + strlen(token->name)] = '\0';
 
@@ -2148,7 +2158,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
    * data */
   if(token->kind == ADA_KIND_ANONYMOUS &&
      strncasecmp(token->name, AdaKeywords[ADA_KEYWORD_DECLARE],
-                 strlen((char *) AdaKeywords[ADA_KEYWORD_DECLARE])) == 0)
+                 strlen(AdaKeywords[ADA_KEYWORD_DECLARE])) == 0)
   {
     token->name = NULL;
     token->tag.name = NULL;

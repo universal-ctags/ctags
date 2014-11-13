@@ -2,7 +2,7 @@ cur1	Units/readlong.sql.t/input.sql	/^  cur1       PLS_INTEGER         := DBMS_S
 long_len	Units/readlong.sql.t/input.sql	/^  long_len   INTEGER             := 0;$/;"	v
 long_piece	Units/readlong.sql.t/input.sql	/^  long_piece VARCHAR2(256);$/;"	v
 long_tab	Units/readlong.sql.t/input.sql	/^  long_tab   DBMS_SQL.VARCHAR2S;$/;"	v
+longcol	Units/readlong.sql.t/input.sql	/^create table longtable (longcol long) tablespace TOOLS;$/;"	F	table:longtable
 longtable	Units/readlong.sql.t/input.sql	/^create table longtable (longcol long) tablespace TOOLS;$/;"	t
-longtable.longcol	Units/readlong.sql.t/input.sql	/^create table longtable (longcol long) tablespace TOOLS;$/;"	F
 piece_len	Units/readlong.sql.t/input.sql	/^  piece_len  INTEGER             := 0;$/;"	v
 rc	Units/readlong.sql.t/input.sql	/^  rc         NUMBER;$/;"	v

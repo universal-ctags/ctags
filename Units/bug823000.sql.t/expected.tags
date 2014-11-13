@@ -1,3 +1,3 @@
 TEST	Units/bug823000.sql.t/input.sql	/^CREATE OR REPLACE PACKAGE TEST IS$/;"	P
-TEST.TestFunc1	Units/bug823000.sql.t/input.sql	/^PROCEDURE TestFunc1$/;"	p
-TEST.TestFunc2	Units/bug823000.sql.t/input.sql	/^PROCEDURE TestFunc2$/;"	p
+TestFunc1	Units/bug823000.sql.t/input.sql	/^PROCEDURE TestFunc1$/;"	p	package:TEST
+TestFunc2	Units/bug823000.sql.t/input.sql	/^PROCEDURE TestFunc2$/;"	p	package:TEST

@@ -168,6 +168,7 @@ optionValues Option = {
 	FALSE,      /* --tag-relative */
 	FALSE,      /* --totals */
 	FALSE,      /* --line-directives */
+	FALSE,	    /* --guess-parser */
 #ifdef DEBUG
 	0, 0        /* -D, -b */
 #endif
@@ -248,6 +249,8 @@ static optionDescription LongOptionDescription [] = {
 #else
  {0,"       Force output of specified tag file format [2]."},
 #endif
+ {0,"  --guess-parser"},
+ {0,"       Don't make tags file but just print the parser name guessed from input file."},
  {1,"  --help"},
  {1,"       Print this option summary."},
  {1,"  --if0=[yes|no]"},
@@ -758,7 +761,7 @@ extern void cArgDelete (cookedArgs* const current)
 {
 	Assert (current != NULL);
 	argDelete (current->args);
-	trashBoxDestroy (current->trash_box);
+	trashBoxDelete (current->trash_box);
 	memset (current, 0, sizeof (cookedArgs));
 	eFree (current);
 }
@@ -1099,7 +1102,8 @@ static void printFeatureList (void)
 	{
 		if (i == 0)
 			printf ("  Optional compiled features: ");
-		printf ("%s+%s", (i>0 ? ", " : ""), Features [i]);
+		if (strcmp (Features [i], "regex") != 0 || checkRegex ())
+			printf ("%s+%s", (i>0 ? ", " : ""), Features [i]);
 #ifdef CUSTOM_CONFIGURATION_FILE
 		if (strcmp (Features [i], "custom-conf") == 0)
 			printf ("=%s", CUSTOM_CONFIGURATION_FILE);
@@ -1116,7 +1120,8 @@ static void processListFeaturesOption(const char *const option __unused__,
 	int i;
 
 	for (i = 0 ; Features [i] != NULL ; ++i)
-		printf ("%s\n", Features [i]);
+		if (strcmp (Features [i], "regex") != 0 || checkRegex ())
+			printf ("%s\n", Features [i]);
 	if (i == 0)
 		putchar ('\n');
 	exit (0);
@@ -2047,6 +2052,7 @@ static booleanOption BooleanOptions [] = {
 	{ "file-scope",     &Option.include.fileScope,      FALSE   },
 	{ "file-tags",      &Option.include.fileNames,      FALSE   },
 	{ "filter",         &Option.filter,                 TRUE    },
+	{ "guess-parser",   &Option.guessParser,	    TRUE    },
 	{ "if0",            &Option.if0,                    FALSE   },
 	{ "kind-long",      &Option.kindLong,               TRUE    },
 	{ "line-directives",&Option.lineDirectives,         FALSE   },
@@ -2448,7 +2454,7 @@ static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const d
 }
 #else
 static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const dirName,
-							     stringList* already_loaded_files)
+							     stringList* const already_loaded_files)
 {
 	return FALSE;
 }

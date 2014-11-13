@@ -28,7 +28,7 @@ struct sTrashBox {
 
 static Trash* trashPut (Trash* trash, void* item,
 			TrashDestroyItemProc destrctor);
-static Trash* trashTakeBack (Trash* trash, void* item);
+static Trash* trashTakeBack (Trash* trash, void* item, TrashDestroyItemProc* destrctor);
 static Trash* trashMakeEmpty (Trash* trash);
 
 
@@ -40,21 +40,25 @@ extern TrashBox* trashBoxNew (void)
 	return t;
 }
 
-extern void trashBoxDestroy (TrashBox* trash_box)
+extern void trashBoxDelete (TrashBox* trash_box)
 {
 	trashBoxMakeEmpty(trash_box);
 
 	eFree (trash_box);
 }
 
-extern void   trashBoxPut (TrashBox* trash_box, void* item, TrashBoxDestroyItemProc destroy)
+extern void*  trashBoxPut (TrashBox* trash_box, void* item, TrashBoxDestroyItemProc destroy)
 {
 	trash_box->trash = trashPut(trash_box->trash, item, destroy);
+	return item;
 }
 
-extern void   trashBoxTakeBack (TrashBox* trash_box, void* item)
+extern TrashBoxDestroyItemProc trashBoxTakeBack (TrashBox* trash_box, void* item)
 {
-	trash_box->trash = trashTakeBack(trash_box->trash, item);
+	TrashBoxDestroyItemProc d;
+
+	trash_box->trash = trashTakeBack(trash_box->trash, item, &d);
+	return d;
 }
 
 extern void   trashBoxMakeEmpty (TrashBox* trash_box)
@@ -62,6 +66,14 @@ extern void   trashBoxMakeEmpty (TrashBox* trash_box)
   trash_box->trash = trashMakeEmpty (trash_box->trash);
 }
 
+
+extern void      trashBoxFree      (TrashBox* trash_box, void* item)
+{
+	TrashBoxDestroyItemProc d;
+
+	d = trashBoxTakeBack (trash_box, item);
+	d (item);
+}
 
 static Trash* trashPut (Trash* trash, void* item,
 			TrashDestroyItemProc destrctor)
@@ -73,12 +85,12 @@ static Trash* trashPut (Trash* trash, void* item,
 	return t;
 }
 
-static boolean trashTakeBack0  (Trash** trash, void* item)
+static TrashBoxDestroyItemProc trashTakeBack0  (Trash** trash, void* item)
 {
-	boolean removed;
+	TrashBoxDestroyItemProc removed;
 	Trash* tmp;
 
-	removed = FALSE;
+	removed = NULL;
 	while (*trash)
 	{
 		if ( (*trash)->item ==  item )
@@ -87,9 +99,10 @@ static boolean trashTakeBack0  (Trash** trash, void* item)
 			*trash = (*trash)->next;
 			tmp->next = NULL;
 			tmp->item = NULL;
+			removed = tmp->destrctor;
+
 			eFree (tmp);
 			tmp = NULL;
-			removed = TRUE;
 			break;
 		}
 		else
@@ -100,9 +113,13 @@ static boolean trashTakeBack0  (Trash** trash, void* item)
 	return removed;
 }
 
-static Trash* trashTakeBack (Trash* trash, void* item)
+static Trash* trashTakeBack (Trash* trash, void* item, TrashDestroyItemProc *destrctor)
 {
-	trashTakeBack0 (&trash, item);
+	TrashDestroyItemProc d;
+	d = trashTakeBack0 (&trash, item);
+	if (destrctor)
+		*destrctor = d;
+
 	return trash;
 }
 
@@ -135,7 +152,7 @@ int main (void)
 	trash = trashPut (trash, eStrdup ("c"));
 	trash = trashPut (trash, d);
 
-	trash = trashTakeBack (trash, b);
+	trash = trashTakeBack (trash, b, NULL);
 	eFree (b);
 
 	fputs("expects: dca\nactual: ", stderr);
@@ -144,7 +161,7 @@ int main (void)
 	fputc('\n', stderr);
 
 
-	trash = trashTakeBack (trash, d);
+	trash = trashTakeBack (trash, d, NULL);
 	eFree (d);
 
 	fputs("expects: ca\nactual: ", stderr);

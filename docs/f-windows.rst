@@ -1,4 +1,4 @@
-Introduction
+Building/hacking/using on MS-Windows
 =============================================================================
 
 :Maintainer: Frank Fesevur <ffes@users.sourceforge.net>
@@ -95,7 +95,9 @@ I have no idea how things work for most GNU/Linux developers, but most Windows d
 Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As already mentioned Microsoft Visual Studio 2013 has the free Express edition. For ctags the Windows Desktop Express Edition does the job. The IDE has a proper debugger. I have project-files for VS2013 to compile ctags with the IDE.
+As already mentioned Microsoft Visual Studio 2013 has the free Express edition. For ctags the Windows Desktop Express Edition is enough to get the job done. The IDE has a proper debugger. Project files for VS2013 can be found in the win32 directory.
+
+Please know that when files are added to the sources.mak, these files need to be added to the .vcproj and .vcproj.filters files as well. The XML of these files should not be a problem.
 
 Code::Blocks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
