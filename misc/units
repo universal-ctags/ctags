@@ -67,8 +67,12 @@ action_help ()
     cat <<EOF
 Usage:
 	$(help_help)
+
 	$(help_run)
+
 	$(help_clean)
+
+	$(help_shrink)
 EOF
 }
 
@@ -590,7 +594,6 @@ action_run ()
     if ! [ -d "$units_dir" ]; then
 	ERROR 1 "No such directory: ${UNITS_DIR}"
     fi
-	
 
     if ! [ -f "${CTAGS}" ]; then
 	ERROR 1 "no such file: ${CTAGS}"
@@ -629,6 +632,9 @@ help_run ()
 {
 cat <<EOF
 $0 run [OPTIONS] UNITS-DIR
+
+	   Run all tests case under UNITS-DIR.
+
 	   OPTIONS:
 		--ctags CTAGS: ctags exectuable file for testing
 		--datadir DATADIR: data directory
@@ -673,8 +679,242 @@ action_clean ()
 
 help_clean ()
 {
-    echo	"$0 clean UNITS-DIR"
+cat <<EOF
+$0 clean UNITS-DIR
+
+	   Clean all files created during testing
+EOF
+
 }
+
+shrink_prepare ()
+{
+    local output="$1"
+    local input="$2"
+    local start="$3"
+    local len="$4"
+
+
+    dd bs=1 count="${len}" skip="${start}" < "${input}" 2>/dev/null > "${output}"
+}
+
+shrink_test ()
+{
+    local cmdline="$1"
+    local input="$2"
+    local start="$3"
+    local len="$4"
+    local output="$5"
+    local r
+
+    shrink_prepare "${output}" "${input}" "${start}" "${len}"
+    printf "[%u, %u]..." "${start}" $(( start + len )) 1>&2
+    eval "${cmdline}"
+    r="$?"
+    printf "%u\n" "$r" 1>&2
+    return $r
+}
+
+shrink_bisect ()
+{
+    local cmdline="$1"
+    local input="$2"
+    local len="$3"
+    local output="$4"
+
+    local end
+    local start
+    local step
+    local delta
+
+    local failed
+    local successful
+
+    end="${len}"
+    failed="${len}"
+    successful=0
+
+    step=0
+    while true; do
+	printf "step(end): %d " "${step}"
+	delta=$((len >> (step + 1)))
+	if [ "${delta}" -eq 0 ]; then
+	    delta=1
+	fi
+	if shrink_test "${cmdline}" "${input}" 0 "${end}" "${output}"; then
+	    successful="${end}"
+	    if [ $(( end + 1 )) -eq "${failed}" ]; then
+		end="${failed}"
+		break
+	    else
+		end=$((end + delta))
+	    fi
+	else
+	    failed="$end"
+	    if [ $(( successful + 1 )) -eq "${end}" ]; then
+		break
+	    else
+		end=$((end - delta))
+	    fi
+	fi
+	step=$((step + 1 ))
+    done
+
+    len="${end}"
+    start=0
+    failed=0
+    successful="${end}"
+    step=0
+    while true; do
+	printf "step(start): %d " "${step}"
+	delta=$((len >> (step + 1)))
+	if [ "${delta}" -eq 0 ]; then
+	    delta=1
+	fi
+	if shrink_test "${cmdline}" "${input}" "${start}" $((end - start)) "${output}"; then
+	    successful="${start}"
+	    if [ $(( start - 1 )) -eq "${failed}" ]; then
+		start=$((start - 1))
+		break
+	    else
+		start=$((start - delta))
+	    fi
+	else
+	    failed="${start}"
+	    if [ $((successful - 1)) -eq "${start}" ]; then
+		break
+	    else
+		start=$((start + delta))
+	    fi
+	fi
+	step=$((step + 1))
+    done
+
+    len=$((end - start))
+    echo "Minimal bad input" 2>/dev/null
+    shrink_prepare "${output}" "${input}" "${start}" "${len}"
+    cat "${output}"
+    echo
+
+    return 0
+}
+
+shrink_main ()
+{
+    local cmdline_template="$1"
+    local cmdline
+    local input="$2"
+    local len
+    local output="$3"
+    local duration="$4"
+    local foreground="$5"
+
+    if ! [ -f "${input}" ]; then
+	ERROR 1 "No such file: ${input}"
+    elif ! [ -r "${input}" ]; then
+	ERROR 1 "Cannot read a file: ${input}"
+    fi
+
+    if ! cat < /dev/null > "${output}"; then
+	ERROR 1 "Cannot modify a file: ${output}"
+    fi
+
+    cmdline=$(printf "${cmdline_template}" "${output}")
+    if [ -n "${duration}" ] && ! [ "${duration}" -eq 0 ]; then
+	if [ "${foreground}" = 'yes' ]; then
+	    cmdline="timeout --foreground ${duration} ${cmdline}"
+	else
+	    cmdline="timeout ${duration} ${cmdline}"
+	fi
+    fi
+
+    len=$(stat -c %s "${input}")
+
+    if shrink_test "${cmdline}" "${input}" 0 "${len}" "${output}"; then
+	printf "the target command line exits normally against the original input\n" 1>&2
+	return 1
+    fi
+
+    if ! shrink_test "${cmdline}" "${input}" 0 0 "${output}"; then
+	printf "the target command line exits normally against the empty input\n" 1>&2
+	return 1
+    fi
+
+    shrink_bisect "${cmdline}" "${input}" "${len}" "${output}"
+}
+
+action_shrink ()
+{
+    local action="$1"
+    shift
+
+    local cmdline_template
+    local input
+    local output
+
+    local timeout
+    local duration
+    local foreground
+
+
+    while [ $# -gt 0 ]; do
+	case $1 in
+	    --timeout)
+		shift
+		duration=$1
+		shift
+		;;
+	    --timeout=*)
+		duration="${1#--timeout=}"
+		shift
+		;;
+	    --foreground)
+		foreground=yes
+		shift
+		;;
+	    -*)
+		ERROR 1 "unknown option \"${1}\" for ${action} action"
+		;;
+	    *)
+		break
+		;;
+	    esac
+    done
+
+    if [ $# -lt 3 ]; then
+	ERROR 1 "too few arguments for ${action} action: $*"
+    elif [ $# -gt 3 ]; then
+	ERROR 1 "too many arguments for ${action} action: $*"
+    fi
+
+    if [ -n "${foreground}" ] && [ -z "${duration}" ]; then
+	ERROR 1 "--foreground option is meaningful only if --timeout option is specified."
+    fi
+
+    cmdline_template=$1
+    input=$2
+    output=$3
+    shift 3
+
+    shrink_main "${cmdline_template}" "${input}" "${output}" ${duration} ${foreground}
+    return $?
+}
+
+help_shrink ()
+{
+cat <<EOF
+$0 shrink [OPTIONS] CMD_TEMPLATE INPUT OUTPUT
+
+	   Shrink the input while the execution of CMD_TEMPLATE is failed
+           and find minimal unwanted input.
+
+	   OPTIONS:
+		--timeout N: Run CMD under timeout command with duration N
+		--foreground: add --foreground option to timeout command.
+                              can be used with --timeout option.
+EOF
+}
+#action_shrink shrink --timeout=1 --foreground "./a.out  < %s" input.txt output.txt
 
 main ()
 {
@@ -694,6 +934,10 @@ main ()
 	    ;;
 	clean)
 	    action_clean "$@"
+	    return $?
+	    ;;
+	shrink)
+	    action_shrink "$@"
 	    return $?
 	    ;;
 	*)
