@@ -30,6 +30,7 @@ COLORIZED_OUTPUT=yes
 CATEGORY=
 UNITS=
 LANGUAGES=
+RUN_SHRINK=
 
 #
 # Internal variables and constants
@@ -90,9 +91,10 @@ ERROR ()
 
 line()
 {
+    local c=${1:--}
     local i=0
     while [ $i -lt 60 ]; do
-	printf '-'
+	printf "%c" "$c"
 	i=$(( i + 1 ))
     done
     echo
@@ -263,6 +265,18 @@ run_result_known_error ()
     printf '%b\n' $(decorate 33 "failed")" (KNOWN bug)"
 }
 
+run_shrink ()
+{
+    local cmdline_template="$1"
+    local input="$2"
+    local output="$3"
+    local lang="$4"
+    shift 3
+
+    echo "Shringking ${input} as ${guessed_lang}"
+    shrink_main "${cmdline_template}" "${input}" "${output}"  1 yes
+}
+
 run_tcase ()
 {
     local input="$1"
@@ -291,8 +305,12 @@ run_tcase ()
     local oshstdout="$t/SHSTDOUT.tmp"
     local oshstderr="$t/SHSTDERR.tmp"
     local oresult="$t/RESULT.tmp"
+    local oshrink_template="$t/SHRINK-%s.tmp"
+    local oshrink
 
     local guessed_lang
+    local guessed_lang_no_slash
+    local cmdline_template
     local tmp
 
 
@@ -316,6 +334,8 @@ run_tcase ()
     if [ -n "${LANGUAGES}" ]; then
 	member_p "${guessed_lang}" ${LANGUAGES} || return 1
     fi
+    guessed_lang_no_slash=$(echo "${guessed_lang}" | tr '/' '-')
+    oshrink=$(printf "${oshrink_template}" "${guessed_lang_no_slash}")
 
     clean_tcase "${t}"
 
@@ -336,6 +356,7 @@ run_tcase ()
 	return 1
     fi
 
+    cmdline_template="${_CMDLINE} --language-force=${guessed_lang} %s > /dev/null 2>&1"
     _CMDLINE="${_CMDLINE} ${input}"
 
     if [ "$WITH_VALGRIND" = yes ]; then
@@ -356,6 +377,7 @@ run_tcase ()
 	    L_FAILED_BY_TIMEED_OUT="${L_FAILED_BY_TIMEED_OUT} ${category}/${name}"
 	    run_result error "${oresult}" "TIMED OUT"
 	    echo "${_CMDLINE}" > "${ocmdline}"
+	    [ "${RUN_SHRINK}" = 'yes' ] && run_shrink "${cmdline_template}" "${input}" "${oshrink}" "${guessed_lang}"
 	    return 1
 	elif [ "$WITH_VALGRIND" = 'yes' ] && [ "${tmp}" = "${_VALGRIND_EXIT}" ] && ! [ "${class}" = v ]; then
 	    L_VALGRIND="${L_VALGRIND} ${category}/${name}"
@@ -366,11 +388,13 @@ run_tcase ()
 	    L_KNOWN_BUGS="$L_KNOWN_BUGS ${category}/${name}"
 	    run_result known_error "${oresult}"
 	    echo "${_CMDLINE}" > "${ocmdline}"
+	    [ "${RUN_SHRINK}" = 'yes' ] && run_shrink "${cmdline_template}" "${input}" "${oshrink}" "${guessed_lang}"
 	    return 0
 	else
 	    L_FAILED_BY_STATUS="$L_FAILED_BY_STATUS ${category}/${name}"
 	    run_result error  "${oresult}" "unexpected exit status: $tmp"
 	    echo "${_CMDLINE}" > "${ocmdline}"
+	    [ "${RUN_SHRINK}" = 'yes' ] && run_shrink "${cmdline_template}" "${input}" "${oshrink}" "${guessed_lang}"
 	    return 1
 	fi
     elif [ "$WITH_VALGRIND" = 'yes' ] && [ "$class" = 'v' ]; then
@@ -612,6 +636,10 @@ action_run ()
 		COLORIZED_OUTPUT="${1#--colorized-output=}"
 		shift
 		;;
+	    --run-shrink)
+		RUN_SHRINK=yes
+		shift
+		;;
 	    -*)
 		ERROR 1 "unknown option \"${1}\" for ${action} action"
 		;;
@@ -750,12 +778,20 @@ shrink_test ()
     local len="$4"
     local output="$5"
     local r
+    local msg
 
     shrink_prepare "${output}" "${input}" "${start}" "${len}"
-    printf "[%u, %u]..." "${start}" $(( start + len )) 1>&2
+    printf "[%-5u %6u]..." "${start}" $(( start + len )) 1>&2
     eval "${cmdline}"
     r="$?"
-    printf "%u\n" "$r" 1>&2
+    if [ "$r" -eq 0 ]; then
+	msg='ok'
+    elif [ "$r" -eq "${_TIMEOUT_EXIT}" ]; then
+	msg='timeout'
+    else
+	msg='failed'
+    fi
+    printf "%s(%u)\n" "$msg" "$r" 1>&2
     return $r
 }
 
@@ -780,7 +816,6 @@ shrink_bisect ()
 
     step=0
     while true; do
-	printf "step(end): %d " "${step}"
 	delta=$((len >> (step + 1)))
 	if [ "${delta}" -eq 0 ]; then
 	    delta=1
@@ -810,7 +845,6 @@ shrink_bisect ()
     successful="${end}"
     step=0
     while true; do
-	printf "step(start): %d " "${step}"
 	delta=$((len >> (step + 1)))
 	if [ "${delta}" -eq 0 ]; then
 	    delta=1
@@ -835,8 +869,9 @@ shrink_bisect ()
     done
 
     len=$((end - start))
-    echo "Minimal bad input" 2>/dev/null
     shrink_prepare "${output}" "${input}" "${start}" "${len}"
+    echo "Minimal badinput input: ${output}"
+    line .
     cat "${output}"
     echo
 

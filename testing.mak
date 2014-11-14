@@ -144,11 +144,13 @@ endif
 UNITS_TIMEOUT=0
 UNIT_LANGUAGES=
 UNITS=
-
+ifdef SHRINK
+UNITS_RUN_SHRINK=--run-shrink
+endif
 test.units: units
 units: $(CTAGS_TEST)
 	@ \
-	c="misc/units run --languages=$(UNIT_LANGUAGES) --units=$(UNITS) $(UNITS_VALGRIND) --with-timeout=$(UNITS_TIMEOUT)"; \
+	c="misc/units run --languages=$(UNIT_LANGUAGES) --units=$(UNITS) $(UNITS_VALGRIND) $(UNITS_RUN_SHRINK) --with-timeout=$(UNITS_TIMEOUT)"; \
 	$(SHELL) $${c} Units
 clean-units:
 	$(SHELL) misc/units clean Units
