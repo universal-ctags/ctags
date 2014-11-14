@@ -308,8 +308,6 @@ run_tcase ()
     local odiff="$t/DIFF.tmp"
     local ocmdline="$t/CMDLINE.tmp"
     local ovalgrind="$t/VALGRIND.tmp"
-    local oshstdout="$t/SHSTDOUT.tmp"
-    local oshstderr="$t/SHSTDERR.tmp"
     local oresult="$t/RESULT.tmp"
     local oshrink_template="$t/SHRINK-%s.tmp"
     local oshrink
@@ -375,7 +373,12 @@ run_tcase ()
     fi
 
     {
-	( ${_CMDLINE} 2> "${ostderr}" > "${orawout}" ) 2> "${oshstderr}" > "${oshstdout}"
+	#
+	# When a lauched process is exited abnormally, the parent shell reports it
+	# to stderr: See j_strsignal function call in wait_for in bash-4.2/nojobs.c.
+	# This becomes noise; close the stderr of subshell.
+	#
+	(exec  2>&-; ${_CMDLINE} 2> "${ostderr}" > "${orawout}" )
 	tmp="$?"
     }
     if [ "$tmp" != 0 ]; then
