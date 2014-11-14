@@ -1,4 +1,4 @@
-main	Units/bug1491666.c.t/input.c	/^void main (void) {$/;"	f
-my_struct	Units/bug1491666.c.t/input.c	/^} my_struct;$/;"	t	typeref:struct:__anon1	file:
-x	Units/bug1491666.c.t/input.c	/^		x;$/;"	m	struct:__anon1	file:
-y	Units/bug1491666.c.t/input.c	/^		y;$/;"	m	struct:__anon1	file:
+main	input.c	/^void main (void) {$/;"	f
+my_struct	input.c	/^} my_struct;$/;"	t	typeref:struct:__anon1	file:
+x	input.c	/^		x;$/;"	m	struct:__anon1	file:
+y	input.c	/^		y;$/;"	m	struct:__anon1	file:

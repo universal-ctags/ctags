@@ -1,4 +1,4 @@
-common1	Units/common.f.t/input.f	2;"	c	program:main
-common2	Units/common.f.t/input.f	3;"	c	program:main
-common3	Units/common.f.t/input.f	3;"	c	program:main
-main	Units/common.f.t/input.f	/^        PROGRAM main$/;"	p
+common1	input.f	2;"	c	program:main
+common2	input.f	3;"	c	program:main
+common3	input.f	3;"	c	program:main
+main	input.f	/^        PROGRAM main$/;"	p

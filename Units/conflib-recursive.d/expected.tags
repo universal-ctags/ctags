@@ -1,6 +1,6 @@
-Animal	Units/conflib-recursive.d/input.coffee	/^class Animal$/;"	c
-Horse	Units/conflib-recursive.d/input.coffee	/^class Horse extends Animal$/;"	c
-Snake	Units/conflib-recursive.d/input.coffee	/^class Snake extends Animal$/;"	c
-constructor	Units/conflib-recursive.d/input.coffee	/^  constructor: (@name) ->$/;"	f
-move	Units/conflib-recursive.d/input.coffee	/^  move: (meters) ->$/;"	f
-move	Units/conflib-recursive.d/input.coffee	/^  move: ->$/;"	f
+Animal	input.coffee	/^class Animal$/;"	c
+Horse	input.coffee	/^class Horse extends Animal$/;"	c
+Snake	input.coffee	/^class Snake extends Animal$/;"	c
+constructor	input.coffee	/^  constructor: (@name) ->$/;"	f
+move	input.coffee	/^  move: (meters) ->$/;"	f
+move	input.coffee	/^  move: ->$/;"	f

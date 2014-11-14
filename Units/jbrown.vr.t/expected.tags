@@ -1,6 +1,6 @@
-Transaction	Units/jbrown.vr.t/input.vr	/^class Transaction {$/;"	c
-address	Units/jbrown.vr.t/input.vr	/^   rand bit[31:0] address;           \/\/ allow for address to be random$/;"	m	class:Transaction	file:
-data	Units/jbrown.vr.t/input.vr	/^   rand bit[31:0] data;              \/\/ allow for data to be random$/;"	m	class:Transaction	file:
-myProgram	Units/jbrown.vr.t/input.vr	/^program myProgram {$/;"	p
-new	Units/jbrown.vr.t/input.vr	/^   task new( (bit[31:0] address = -1), (bit[31:0] data = -1)) {$/;"	t	class:Transaction	file:
-writeBus	Units/jbrown.vr.t/input.vr	/^   task writeBus() {$/;"	t	class:Transaction	file:
+Transaction	input.vr	/^class Transaction {$/;"	c
+address	input.vr	/^   rand bit[31:0] address;           \/\/ allow for address to be random$/;"	m	class:Transaction	file:
+data	input.vr	/^   rand bit[31:0] data;              \/\/ allow for data to be random$/;"	m	class:Transaction	file:
+myProgram	input.vr	/^program myProgram {$/;"	p
+new	input.vr	/^   task new( (bit[31:0] address = -1), (bit[31:0] data = -1)) {$/;"	t	class:Transaction	file:
+writeBus	input.vr	/^   task writeBus() {$/;"	t	class:Transaction	file:

@@ -1,8 +1,8 @@
-DONE	Units/dosbatch_test.cmd.t/input.cmd	/^:DONE$/;"	l
-END	Units/dosbatch_test.cmd.t/input.cmd	/^:END$/;"	l
-ERROR	Units/dosbatch_test.cmd.t/input.cmd	/^:ERROR$/;"	l
-ERROR_OPTIONS	Units/dosbatch_test.cmd.t/input.cmd	/^:ERROR_OPTIONS$/;"	l
-OPTIONS	Units/dosbatch_test.cmd.t/input.cmd	/^@if "%OPTIONS%." EQU "1." set OPTIONS=$/;"	v
-PATH	Units/dosbatch_test.cmd.t/input.cmd	/^set PATH=%SQLANY11%\\bin32;%PATH%$/;"	v
-SAMPLE_DATA	Units/dosbatch_test.cmd.t/input.cmd	/^:SAMPLE_DATA$/;"	l
-UPDATE	Units/dosbatch_test.cmd.t/input.cmd	/^:UPDATE$/;"	l
+DONE	input.cmd	/^:DONE$/;"	l
+END	input.cmd	/^:END$/;"	l
+ERROR	input.cmd	/^:ERROR$/;"	l
+ERROR_OPTIONS	input.cmd	/^:ERROR_OPTIONS$/;"	l
+OPTIONS	input.cmd	/^@if "%OPTIONS%." EQU "1." set OPTIONS=$/;"	v
+PATH	input.cmd	/^set PATH=%SQLANY11%\\bin32;%PATH%$/;"	v
+SAMPLE_DATA	input.cmd	/^:SAMPLE_DATA$/;"	l
+UPDATE	input.cmd	/^:UPDATE$/;"	l

@@ -1,1 +1,1 @@
-label_forced_tags	Units/spurious_label_tags.c.t/input.c	/^static void label_forced_tags(void)$/;"	f	file:
+label_forced_tags	input.c	/^static void label_forced_tags(void)$/;"	f	file:

@@ -1,4 +1,4 @@
-C	Units/bug1691412.java.t/input.java	/^public class C {$/;"	c
-CustomAnnotation	Units/bug1691412.java.t/input.java	/^public @interface CustomAnnotation {$/;"	i
-newInstance	Units/bug1691412.java.t/input.java	/^ public static DefaultCipherDialog newInstance() {$/;"	m	class:C
-toString	Units/bug1691412.java.t/input.java	/^ public String toString() { return "hello"; }$/;"	m	class:C
+C	input.java	/^public class C {$/;"	c
+CustomAnnotation	input.java	/^public @interface CustomAnnotation {$/;"	i
+newInstance	input.java	/^ public static DefaultCipherDialog newInstance() {$/;"	m	class:C
+toString	input.java	/^ public String toString() { return "hello"; }$/;"	m	class:C

@@ -1,2 +1,2 @@
-STDOUT	Units/format.pl.t/input.pl	/^format =$/;"	f
-XYZ	Units/format.pl.t/input.pl	/^format XYZ =$/;"	f
+STDOUT	input.pl	/^format =$/;"	f
+XYZ	input.pl	/^format XYZ =$/;"	f

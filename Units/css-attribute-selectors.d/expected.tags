@@ -1,5 +1,5 @@
-a[href^="http://"]	Units/css-attribute-selectors.d/input.css	/^a[href^="http:\/\/"] { color: red; }$/;"	s
-a[href^="https://"]	Units/css-attribute-selectors.d/input.css	/^a[href^="https:\/\/"] { color: green; }$/;"	s
-a[lang~=en]	Units/css-attribute-selectors.d/input.css	/^a[lang~=en] { background-color: light-green; }$/;"	s
-body	Units/css-attribute-selectors.d/input.css	/^body { color: black; }$/;"	s
-p	Units/css-attribute-selectors.d/input.css	/^p { color: gray }$/;"	s
+a[href^="http://"]	input.css	/^a[href^="http:\/\/"] { color: red; }$/;"	s
+a[href^="https://"]	input.css	/^a[href^="https:\/\/"] { color: green; }$/;"	s
+a[lang~=en]	input.css	/^a[lang~=en] { background-color: light-green; }$/;"	s
+body	input.css	/^body { color: black; }$/;"	s
+p	input.css	/^p { color: gray }$/;"	s

@@ -1,1 +1,1 @@
-db_query	Units/bug681824.php.t/input.php	/^ function db_query$/;"	f
+db_query	input.php	/^ function db_query$/;"	f

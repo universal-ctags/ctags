@@ -1,8 +1,8 @@
-AlternativeNestedNameSpaceClass	Units/keyword_namespace.cs.t/input.cs	/^	public class AlternativeNestedNameSpaceClass$/;"	c	namespace:SomeNameSpace.Nested
-Main	Units/keyword_namespace.cs.t/input.cs	/^      public static void Main() $/;"	m	class:SomeNameSpace.MyClass
-MyClass	Units/keyword_namespace.cs.t/input.cs	/^   public class MyClass $/;"	c	namespace:SomeNameSpace
-Nested	Units/keyword_namespace.cs.t/input.cs	/^   namespace Nested   \/\/ a nested namespace$/;"	n	namespace:SomeNameSpace
-NestedNameSpaceClass	Units/keyword_namespace.cs.t/input.cs	/^      public class NestedNameSpaceClass $/;"	c	namespace:SomeNameSpace.Nested
-SayHello	Units/keyword_namespace.cs.t/input.cs	/^         public static void SayHello() $/;"	m	class:SomeNameSpace.Nested.NestedNameSpaceClass
-SomeNameSpace	Units/keyword_namespace.cs.t/input.cs	/^namespace SomeNameSpace$/;"	n
-SomeNameSpace.Nested	Units/keyword_namespace.cs.t/input.cs	/^namespace SomeNameSpace.Nested$/;"	n
+AlternativeNestedNameSpaceClass	input.cs	/^	public class AlternativeNestedNameSpaceClass$/;"	c	namespace:SomeNameSpace.Nested
+Main	input.cs	/^      public static void Main() $/;"	m	class:SomeNameSpace.MyClass
+MyClass	input.cs	/^   public class MyClass $/;"	c	namespace:SomeNameSpace
+Nested	input.cs	/^   namespace Nested   \/\/ a nested namespace$/;"	n	namespace:SomeNameSpace
+NestedNameSpaceClass	input.cs	/^      public class NestedNameSpaceClass $/;"	c	namespace:SomeNameSpace.Nested
+SayHello	input.cs	/^         public static void SayHello() $/;"	m	class:SomeNameSpace.Nested.NestedNameSpaceClass
+SomeNameSpace	input.cs	/^namespace SomeNameSpace$/;"	n
+SomeNameSpace.Nested	input.cs	/^namespace SomeNameSpace.Nested$/;"	n

@@ -1,9 +1,9 @@
-Counter	Units/property.cs.t/input.cs	/^   public static int Counter $/;"	p	class:Employee
-Employee	Units/property.cs.t/input.cs	/^   public Employee() $/;"	m	class:Employee
-Employee	Units/property.cs.t/input.cs	/^public class Employee $/;"	c
-Main	Units/property.cs.t/input.cs	/^   public static void Main() $/;"	m	class:MainClass
-MainClass	Units/property.cs.t/input.cs	/^public class MainClass$/;"	c
-Name	Units/property.cs.t/input.cs	/^   public string Name $/;"	p	class:Employee
-counter	Units/property.cs.t/input.cs	/^   private static int counter;$/;"	f	class:Employee	file:
-name	Units/property.cs.t/input.cs	/^   private string name;$/;"	f	class:Employee	file:
-numberOfEmployees	Units/property.cs.t/input.cs	/^   public static int numberOfEmployees;$/;"	f	class:Employee
+Counter	input.cs	/^   public static int Counter $/;"	p	class:Employee
+Employee	input.cs	/^   public Employee() $/;"	m	class:Employee
+Employee	input.cs	/^public class Employee $/;"	c
+Main	input.cs	/^   public static void Main() $/;"	m	class:MainClass
+MainClass	input.cs	/^public class MainClass$/;"	c
+Name	input.cs	/^   public string Name $/;"	p	class:Employee
+counter	input.cs	/^   private static int counter;$/;"	f	class:Employee	file:
+name	input.cs	/^   private string name;$/;"	f	class:Employee	file:
+numberOfEmployees	input.cs	/^   public static int numberOfEmployees;$/;"	f	class:Employee

@@ -1,2 +1,2 @@
-myOverride	Units/flex_override.mxml.t/input.mxml	/^			public override function myOverride():void$/;"	f
-save	Units/flex_override.mxml.t/input.mxml	/^			private function save():void$/;"	f
+myOverride	input.mxml	/^			public override function myOverride():void$/;"	f
+save	input.mxml	/^			private function save():void$/;"	f

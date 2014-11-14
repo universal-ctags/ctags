@@ -1,24 +1,24 @@
-Database	Units/simple.js.t/input.js	/^Database.prototype.getTodaysDate = Database_getTodaysDate;$/;"	c
-ValidClassOne	Units/simple.js.t/input.js	/^testlib.extras.ValidClassOne = function(a,b) { $/;"	c	class:testlib.extras
-ValidClassTwo	Units/simple.js.t/input.js	/^ValidClassTwo = function () $/;"	c
-calculate	Units/simple.js.t/input.js	/^  function calculate(number)$/;"	f	function:getHalfOf
-executeQueryString	Units/simple.js.t/input.js	/^Database.prototype.executeQueryString = Db_executeQueryString;$/;"	m	class:Database
-getHalfOf	Units/simple.js.t/input.js	/^function getHalfOf(num1, num2, num3)     $/;"	f
-getTodaysDate	Units/simple.js.t/input.js	/^Database.prototype.getTodaysDate = Database_getTodaysDate;$/;"	m	class:Database
-innerThree	Units/simple.js.t/input.js	/^    var innerThree = function(a,b) {}$/;"	f	function:validFunctionThree
-invalidInnerFunction	Units/simple.js.t/input.js	/^    var invalidInnerFunction = function(a,b) {}$/;"	f
-my_global_var1	Units/simple.js.t/input.js	/^var my_global_var1 = 33;$/;"	v
-my_global_var2	Units/simple.js.t/input.js	/^var my_global_var2 = "Something";$/;"	v
-my_global_var3	Units/simple.js.t/input.js	/^var my_global_var3;$/;"	v
-my_global_var4	Units/simple.js.t/input.js	/^    my_global_var4[i].onchange = function () {$/;"	f
-my_global_var4	Units/simple.js.t/input.js	/^var my_global_var4 = document.getElementsByTagName("input");$/;"	v
-validFunctionFive	Units/simple.js.t/input.js	/^testlib.validFunctionFive = function(a,b) {}$/;"	f	function:testlib
-validFunctionFour	Units/simple.js.t/input.js	/^function extra.validFunctionFour(a,b) {}$/;"	f	function:extra
-validFunctionOne	Units/simple.js.t/input.js	/^validFunctionOne = function(a,b) {}$/;"	f
-validFunctionSix	Units/simple.js.t/input.js	/^testlib.core.validFunctionSix = function(a,b) {}$/;"	f	function:testlib.core
-validFunctionThree	Units/simple.js.t/input.js	/^function validFunctionThree(a,b) {$/;"	f
-validFunctionTwo	Units/simple.js.t/input.js	/^function validFunctionTwo(a,b) {}$/;"	f
-validMethodFour	Units/simple.js.t/input.js	/^    this.validMethodFour = () {}$/;"	m	class:ValidClassTwo
-validMethodOne	Units/simple.js.t/input.js	/^    'validMethodOne' : function(a,b) {},$/;"	m	class:testlib.extras.ValidClassOne
-validMethodThree	Units/simple.js.t/input.js	/^    this.validMethodThree = function() {}$/;"	m	class:ValidClassTwo
-validMethodTwo	Units/simple.js.t/input.js	/^    'validMethodTwo' : function(a,b) {}$/;"	m	class:testlib.extras.ValidClassOne
+Database	input.js	/^Database.prototype.getTodaysDate = Database_getTodaysDate;$/;"	c
+ValidClassOne	input.js	/^testlib.extras.ValidClassOne = function(a,b) { $/;"	c	class:testlib.extras
+ValidClassTwo	input.js	/^ValidClassTwo = function () $/;"	c
+calculate	input.js	/^  function calculate(number)$/;"	f	function:getHalfOf
+executeQueryString	input.js	/^Database.prototype.executeQueryString = Db_executeQueryString;$/;"	m	class:Database
+getHalfOf	input.js	/^function getHalfOf(num1, num2, num3)     $/;"	f
+getTodaysDate	input.js	/^Database.prototype.getTodaysDate = Database_getTodaysDate;$/;"	m	class:Database
+innerThree	input.js	/^    var innerThree = function(a,b) {}$/;"	f	function:validFunctionThree
+invalidInnerFunction	input.js	/^    var invalidInnerFunction = function(a,b) {}$/;"	f
+my_global_var1	input.js	/^var my_global_var1 = 33;$/;"	v
+my_global_var2	input.js	/^var my_global_var2 = "Something";$/;"	v
+my_global_var3	input.js	/^var my_global_var3;$/;"	v
+my_global_var4	input.js	/^    my_global_var4[i].onchange = function () {$/;"	f
+my_global_var4	input.js	/^var my_global_var4 = document.getElementsByTagName("input");$/;"	v
+validFunctionFive	input.js	/^testlib.validFunctionFive = function(a,b) {}$/;"	f	function:testlib
+validFunctionFour	input.js	/^function extra.validFunctionFour(a,b) {}$/;"	f	function:extra
+validFunctionOne	input.js	/^validFunctionOne = function(a,b) {}$/;"	f
+validFunctionSix	input.js	/^testlib.core.validFunctionSix = function(a,b) {}$/;"	f	function:testlib.core
+validFunctionThree	input.js	/^function validFunctionThree(a,b) {$/;"	f
+validFunctionTwo	input.js	/^function validFunctionTwo(a,b) {}$/;"	f
+validMethodFour	input.js	/^    this.validMethodFour = () {}$/;"	m	class:ValidClassTwo
+validMethodOne	input.js	/^    'validMethodOne' : function(a,b) {},$/;"	m	class:testlib.extras.ValidClassOne
+validMethodThree	input.js	/^    this.validMethodThree = function() {}$/;"	m	class:ValidClassTwo
+validMethodTwo	input.js	/^    'validMethodTwo' : function(a,b) {}$/;"	m	class:testlib.extras.ValidClassOne

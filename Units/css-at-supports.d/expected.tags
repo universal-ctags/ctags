@@ -1,2 +1,2 @@
-html	Units/css-at-supports.d/input.css	/^  html { test-property: 42; }$/;"	s
-html	Units/css-at-supports.d/input.css	/^html { color: blue; }$/;"	s
+html	input.css	/^  html { test-property: 42; }$/;"	s
+html	input.css	/^html { color: blue; }$/;"	s

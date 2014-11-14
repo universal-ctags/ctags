@@ -1,2 +1,2 @@
-SL	Units/perl-selfloader.d/input.pm	/^package SL;$/;"	p
-xyz	Units/perl-selfloader.d/input.pm	/^sub xyz {$/;"	s
+SL	input.pm	/^package SL;$/;"	p
+xyz	input.pm	/^sub xyz {$/;"	s

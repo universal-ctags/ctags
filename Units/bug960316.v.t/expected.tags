@@ -1,6 +1,6 @@
-fail_define_2	Units/bug960316.v.t/input.v	/^`define fail_define_2 1'b1;$/;"	c
-fail_func_2	Units/bug960316.v.t/input.v	/^function fail_func_2;$/;"	f
-fail_task_2	Units/bug960316.v.t/input.v	/^task fail_task_2;$/;"	t
-pass_define_1	Units/bug960316.v.t/input.v	/^`define pass_define_1 1'b1;$/;"	c
-pass_func_1	Units/bug960316.v.t/input.v	/^function pass_func_1;$/;"	f
-pass_task_1	Units/bug960316.v.t/input.v	/^task pass_task_1;$/;"	t
+fail_define_2	input.v	/^`define fail_define_2 1'b1;$/;"	c
+fail_func_2	input.v	/^function fail_func_2;$/;"	f
+fail_task_2	input.v	/^task fail_task_2;$/;"	t
+pass_define_1	input.v	/^`define pass_define_1 1'b1;$/;"	c
+pass_func_1	input.v	/^function pass_func_1;$/;"	f
+pass_task_1	input.v	/^task pass_task_1;$/;"	t

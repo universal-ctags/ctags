@@ -1,7 +1,7 @@
-HtmlCutout	Units/simple.asp.t/input.asp	/^function HtmlCutout(lang, str)   'dig-out a piece of text from a multilang. string str$/;"	f
-constDecl	Units/simple.asp.t/input.asp	/^Const constDecl = 512$/;"	d
-f_translate_9data	Units/simple.asp.t/input.asp	/^Function f_translate_9data(id,defaulttext,data)   'lookup lang_???(id) and insert data at $0,$1,...$/;"	f
-js_erroralert	Units/simple.asp.t/input.asp	/^sub js_erroralert(txt)           'print inline-script to generate popup-window with txt$/;"	s
-lang_length	Units/simple.asp.t/input.asp	/^DIM lang_length     '(htmlct.inc) num.chars to get, i.e. mid(str, lang_start, lang_length)$/;"	v
-lang_start	Units/simple.asp.t/input.asp	/^Dim lang_start      '(htmlct.inc) char-index, use for multilanguage-strings$/;"	v
-lang_swe	Units/simple.asp.t/input.asp	/^dim lang_swe(230)   'translation-table for pagetitles, buttons, etc.$/;"	v
+HtmlCutout	input.asp	/^function HtmlCutout(lang, str)   'dig-out a piece of text from a multilang. string str$/;"	f
+constDecl	input.asp	/^Const constDecl = 512$/;"	d
+f_translate_9data	input.asp	/^Function f_translate_9data(id,defaulttext,data)   'lookup lang_???(id) and insert data at $0,$1,...$/;"	f
+js_erroralert	input.asp	/^sub js_erroralert(txt)           'print inline-script to generate popup-window with txt$/;"	s
+lang_length	input.asp	/^DIM lang_length     '(htmlct.inc) num.chars to get, i.e. mid(str, lang_start, lang_length)$/;"	v
+lang_start	input.asp	/^Dim lang_start      '(htmlct.inc) char-index, use for multilanguage-strings$/;"	v
+lang_swe	input.asp	/^dim lang_swe(230)   'translation-table for pagetitles, buttons, etc.$/;"	v

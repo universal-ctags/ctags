@@ -1,17 +1,17 @@
-FileTree	Units/objc-tg-corpus.d/input.m	/^@implementation FileTree$/;"	I	implementation:
-FolderTree	Units/objc-tg-corpus.d/input.m	/^@implementation FolderTree$/;"	I	implementation:
-MyClass	Units/objc-tg-corpus.d/input.m	/^@implementation MyClass$/;"	I	interface:
-addChild:	Units/objc-tg-corpus.d/input.m	/^{$/;"	m	implementation:FolderTree
-createFileList:atPlace:	Units/objc-tg-corpus.d/input.m	/^{$/;"	c	implementation:FolderTree
-createLayoutTree	Units/objc-tg-corpus.d/input.m	/^{$/;"	m	implementation:FileTree
-createLayoutTree	Units/objc-tg-corpus.d/input.m	/^{$/;"	m	implementation:FolderTree
-dealloc	Units/objc-tg-corpus.d/input.m	/^{$/;"	m	implementation:FileTree
-dealloc	Units/objc-tg-corpus.d/input.m	/^{$/;"	m	implementation:FolderTree
-getDiskSize	Units/objc-tg-corpus.d/input.m	/^{$/;"	m	implementation:FileTree
-initWithName:andSize:atPlace:	Units/objc-tg-corpus.d/input.m	/^{$/;"	m	implementation:FileTree
-initWithName:atPlace:	Units/objc-tg-corpus.d/input.m	/^{$/;"	m	implementation:FileTree
-initWithName:atPlace:	Units/objc-tg-corpus.d/input.m	/^{$/;"	m	implementation:FolderTree
-main	Units/objc-tg-corpus.d/input.m	/^int main(int argc, char** argv)$/;"	f	interface:
-myClassMethod:with:	Units/objc-tg-corpus.d/input.m	/^+ (void)myClassMethod:(int)arg1 with:(id)arg2;$/;"	c	implementation:MyClass
-myInstanceMethod:with:	Units/objc-tg-corpus.d/input.m	/^- (void)myInstanceMethod:(int)arg1 with:(id)arg2;$/;"	m	implementation:MyClass
-populateChildList:	Units/objc-tg-corpus.d/input.m	/^{$/;"	m	implementation:FolderTree
+FileTree	input.m	/^@implementation FileTree$/;"	I	implementation:
+FolderTree	input.m	/^@implementation FolderTree$/;"	I	implementation:
+MyClass	input.m	/^@implementation MyClass$/;"	I	interface:
+addChild:	input.m	/^{$/;"	m	implementation:FolderTree
+createFileList:atPlace:	input.m	/^{$/;"	c	implementation:FolderTree
+createLayoutTree	input.m	/^{$/;"	m	implementation:FileTree
+createLayoutTree	input.m	/^{$/;"	m	implementation:FolderTree
+dealloc	input.m	/^{$/;"	m	implementation:FileTree
+dealloc	input.m	/^{$/;"	m	implementation:FolderTree
+getDiskSize	input.m	/^{$/;"	m	implementation:FileTree
+initWithName:andSize:atPlace:	input.m	/^{$/;"	m	implementation:FileTree
+initWithName:atPlace:	input.m	/^{$/;"	m	implementation:FileTree
+initWithName:atPlace:	input.m	/^{$/;"	m	implementation:FolderTree
+main	input.m	/^int main(int argc, char** argv)$/;"	f	interface:
+myClassMethod:with:	input.m	/^+ (void)myClassMethod:(int)arg1 with:(id)arg2;$/;"	c	implementation:MyClass
+myInstanceMethod:with:	input.m	/^- (void)myInstanceMethod:(int)arg1 with:(id)arg2;$/;"	m	implementation:MyClass
+populateChildList:	input.m	/^{$/;"	m	implementation:FolderTree

@@ -1,3 +1,3 @@
-A	Units/bug3168705.py.t/input.py	/^class A:$/;"	c
-func1	Units/bug3168705.py.t/input.py	/^    def func1():$/;"	m	class:A
-func2	Units/bug3168705.py.t/input.py	/^    def func2():$/;"	m	class:A
+A	input.py	/^class A:$/;"	c
+func1	input.py	/^    def func1():$/;"	m	class:A
+func2	input.py	/^    def func2():$/;"	m	class:A

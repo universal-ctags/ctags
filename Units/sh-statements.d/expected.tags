@@ -1,7 +1,7 @@
-alias	Units/sh-statements.d/input.sh	/^mult1() echo 1; mult2() echo 2; mult3() { echo 1 }; alias alias=mult1$/;"	a
-baz	Units/sh-statements.d/input.sh	/^function baz() {}$/;"	f
-baz_2	Units/sh-statements.d/input.sh	/^function baz_2() {$/;"	f
-baz_2_inner	Units/sh-statements.d/input.sh	/^  baz_2_inner() baz$/;"	f
-mult1	Units/sh-statements.d/input.sh	/^mult1() echo 1; mult2() echo 2; mult3() { echo 1 }; alias alias=mult1$/;"	f
-mult2	Units/sh-statements.d/input.sh	/^mult1() echo 1; mult2() echo 2; mult3() { echo 1 }; alias alias=mult1$/;"	f
-mult3	Units/sh-statements.d/input.sh	/^mult1() echo 1; mult2() echo 2; mult3() { echo 1 }; alias alias=mult1$/;"	f
+alias	input.sh	/^mult1() echo 1; mult2() echo 2; mult3() { echo 1 }; alias alias=mult1$/;"	a
+baz	input.sh	/^function baz() {}$/;"	f
+baz_2	input.sh	/^function baz_2() {$/;"	f
+baz_2_inner	input.sh	/^  baz_2_inner() baz$/;"	f
+mult1	input.sh	/^mult1() echo 1; mult2() echo 2; mult3() { echo 1 }; alias alias=mult1$/;"	f
+mult2	input.sh	/^mult1() echo 1; mult2() echo 2; mult3() { echo 1 }; alias alias=mult1$/;"	f
+mult3	input.sh	/^mult1() echo 1; mult2() echo 2; mult3() { echo 1 }; alias alias=mult1$/;"	f

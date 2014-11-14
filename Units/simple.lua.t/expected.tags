@@ -1,2 +1,2 @@
-test.i_123 	Units/simple.lua.t/input.lua	/^ test.i_123 = function  (x)$/;"	f
-test.me_12a	Units/simple.lua.t/input.lua	/^function test.me_12a(one, two)$/;"	f
+test.i_123 	input.lua	/^ test.i_123 = function  (x)$/;"	f
+test.me_12a	input.lua	/^function test.me_12a(one, two)$/;"	f

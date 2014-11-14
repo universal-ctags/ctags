@@ -1,2 +1,2 @@
-BaseClass	Units/internal.cs.t/input.cs	/^internal class BaseClass $/;"	c
-IntM	Units/internal.cs.t/input.cs	/^   public static int IntM = 0;$/;"	f	class:BaseClass
+BaseClass	input.cs	/^internal class BaseClass $/;"	c
+IntM	input.cs	/^   public static int IntM = 0;$/;"	f	class:BaseClass

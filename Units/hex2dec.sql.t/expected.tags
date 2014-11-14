@@ -1,2 +1,2 @@
-hex2dec	Units/hex2dec.sql.t/input.sql	/^CREATE OR REPLACE FUNCTION hex2dec (hexnum in char) RETURN number IS$/;"	f
-num2hex	Units/hex2dec.sql.t/input.sql	/^CREATE OR REPLACE FUNCTION num2hex (N in number) RETURN varchar2 IS$/;"	f
+hex2dec	input.sql	/^CREATE OR REPLACE FUNCTION hex2dec (hexnum in char) RETURN number IS$/;"	f
+num2hex	input.sql	/^CREATE OR REPLACE FUNCTION num2hex (N in number) RETURN varchar2 IS$/;"	f

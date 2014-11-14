@@ -1,3 +1,3 @@
-bug1777340	Units/bug1777340.java.t/input.java	/^public @interface bug1777340 {$/;"	i
-m	Units/bug1777340.java.t/input.java	/^    String m();$/;"	m	interface:bug1777340
+bug1777340	input.java	/^public @interface bug1777340 {$/;"	i
+m	input.java	/^    String m();$/;"	m	interface:bug1777340
 Ó	Units/bug1777340.java.t/input.java	/^    String n() default "ninjas; monkeys!";$/;"	f	interface:bug1777340

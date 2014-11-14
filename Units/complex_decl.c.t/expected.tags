@@ -1,1 +1,1 @@
-ScanAction	Units/complex_decl.c.t/input.c	/^static void (* const(ScanAction[5][5]))(void *)= {};$/;"	v	file:
+ScanAction	input.c	/^static void (* const(ScanAction[5][5]))(void *)= {};$/;"	v	file:

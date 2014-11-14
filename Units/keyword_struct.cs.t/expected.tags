@@ -1,6 +1,6 @@
-Main	Units/keyword_struct.cs.t/input.cs	/^   public static void Main()  $/;"	m	class:MainClass
-MainClass	Units/keyword_struct.cs.t/input.cs	/^class MainClass $/;"	c
-Point	Units/keyword_struct.cs.t/input.cs	/^   public Point(int p1, int p2) $/;"	m	struct:Point
-Point	Units/keyword_struct.cs.t/input.cs	/^public struct Point $/;"	s
-x	Units/keyword_struct.cs.t/input.cs	/^   public int x, y;$/;"	f	struct:Point
-y	Units/keyword_struct.cs.t/input.cs	/^   public int x, y;$/;"	f	struct:Point
+Main	input.cs	/^   public static void Main()  $/;"	m	class:MainClass
+MainClass	input.cs	/^class MainClass $/;"	c
+Point	input.cs	/^   public Point(int p1, int p2) $/;"	m	struct:Point
+Point	input.cs	/^public struct Point $/;"	s
+x	input.cs	/^   public int x, y;$/;"	f	struct:Point
+y	input.cs	/^   public int x, y;$/;"	f	struct:Point

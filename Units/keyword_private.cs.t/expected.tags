@@ -1,7 +1,7 @@
-AccessSalary	Units/keyword_private.cs.t/input.cs	/^   public double AccessSalary() {$/;"	m	class:Employee
-Employee	Units/keyword_private.cs.t/input.cs	/^class Employee $/;"	c
-Main	Units/keyword_private.cs.t/input.cs	/^   public static void Main() $/;"	m	class:MainClass
-MainClass	Units/keyword_private.cs.t/input.cs	/^class MainClass $/;"	c
-name	Units/keyword_private.cs.t/input.cs	/^   public string name = "xx";$/;"	f	class:Employee
-not_visible	Units/keyword_private.cs.t/input.cs	/^   private int not_visible = 3;  \/\/ strangely, not in original example$/;"	f	class:Employee	file:
-salary	Units/keyword_private.cs.t/input.cs	/^   double salary = 100.00;   \/\/ private access by default$/;"	f	class:Employee	file:
+AccessSalary	input.cs	/^   public double AccessSalary() {$/;"	m	class:Employee
+Employee	input.cs	/^class Employee $/;"	c
+Main	input.cs	/^   public static void Main() $/;"	m	class:MainClass
+MainClass	input.cs	/^class MainClass $/;"	c
+name	input.cs	/^   public string name = "xx";$/;"	f	class:Employee
+not_visible	input.cs	/^   private int not_visible = 3;  \/\/ strangely, not in original example$/;"	f	class:Employee	file:
+salary	input.cs	/^   double salary = 100.00;   \/\/ private access by default$/;"	f	class:Employee	file:

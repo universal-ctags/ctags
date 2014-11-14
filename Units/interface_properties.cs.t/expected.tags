@@ -1,12 +1,12 @@
-Counter	Units/interface_properties.cs.t/input.cs	/^   int Counter $/;"	p	interface:IEmployee
-Counter	Units/interface_properties.cs.t/input.cs	/^   public int Counter $/;"	p	class:Employee
-Employee	Units/interface_properties.cs.t/input.cs	/^   public Employee() $/;"	m	class:Employee
-Employee	Units/interface_properties.cs.t/input.cs	/^public class Employee: IEmployee $/;"	c
-IEmployee	Units/interface_properties.cs.t/input.cs	/^interface IEmployee $/;"	i
-Main	Units/interface_properties.cs.t/input.cs	/^   public static void Main() $/;"	m	class:MainClass
-MainClass	Units/interface_properties.cs.t/input.cs	/^public class MainClass $/;"	c
-Name	Units/interface_properties.cs.t/input.cs	/^   public string Name $/;"	p	class:Employee
-Name	Units/interface_properties.cs.t/input.cs	/^   string Name $/;"	p	interface:IEmployee
-counter	Units/interface_properties.cs.t/input.cs	/^   private int counter;$/;"	f	class:Employee	file:
-name	Units/interface_properties.cs.t/input.cs	/^   private string name;$/;"	f	class:Employee	file:
-numberOfEmployees	Units/interface_properties.cs.t/input.cs	/^   public static int numberOfEmployees;$/;"	f	class:Employee
+Counter	input.cs	/^   int Counter $/;"	p	interface:IEmployee
+Counter	input.cs	/^   public int Counter $/;"	p	class:Employee
+Employee	input.cs	/^   public Employee() $/;"	m	class:Employee
+Employee	input.cs	/^public class Employee: IEmployee $/;"	c
+IEmployee	input.cs	/^interface IEmployee $/;"	i
+Main	input.cs	/^   public static void Main() $/;"	m	class:MainClass
+MainClass	input.cs	/^public class MainClass $/;"	c
+Name	input.cs	/^   public string Name $/;"	p	class:Employee
+Name	input.cs	/^   string Name $/;"	p	interface:IEmployee
+counter	input.cs	/^   private int counter;$/;"	f	class:Employee	file:
+name	input.cs	/^   private string name;$/;"	f	class:Employee	file:
+numberOfEmployees	input.cs	/^   public static int numberOfEmployees;$/;"	f	class:Employee

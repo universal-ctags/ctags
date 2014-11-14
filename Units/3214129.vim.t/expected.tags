@@ -1,87 +1,87 @@
-<Leader>hgG	Units/3214129.vim.t/input.vim	/^  nmap <unique> <Leader>hgG <Plug>HGClearAndGotoOriginal$/;"	m
-<Leader>hga	Units/3214129.vim.t/input.vim	/^  nmap <unique> <Leader>hga <Plug>HGAdd$/;"	m
-<Leader>hgc	Units/3214129.vim.t/input.vim	/^  nmap <unique> <Leader>hgc <Plug>HGCommit$/;"	m
-<Leader>hgd	Units/3214129.vim.t/input.vim	/^  nmap <unique> <Leader>hgd <Plug>HGDiff$/;"	m
-<Leader>hgg	Units/3214129.vim.t/input.vim	/^  nmap <unique> <Leader>hgg <Plug>HGGotoOriginal$/;"	m
-<Leader>hgl	Units/3214129.vim.t/input.vim	/^  nmap <unique> <Leader>hgl <Plug>HGLog$/;"	m
-<Leader>hgn	Units/3214129.vim.t/input.vim	/^  nmap <unique> <Leader>hgn <Plug>HGAnnotate$/;"	m
-<Leader>hgq	Units/3214129.vim.t/input.vim	/^  nmap <unique> <Leader>hgq <Plug>HGRevert$/;"	m
-<Leader>hgr	Units/3214129.vim.t/input.vim	/^  nmap <unique> <Leader>hgr <Plug>HGReview$/;"	m
-<Leader>hgs	Units/3214129.vim.t/input.vim	/^  nmap <unique> <Leader>hgs <Plug>HGStatus$/;"	m
-<Leader>hgu	Units/3214129.vim.t/input.vim	/^  nmap <unique> <Leader>hgu <Plug>HGUpdate$/;"	m
-<Leader>hgv	Units/3214129.vim.t/input.vim	/^  nmap <unique> <Leader>hgv <Plug>HGVimDiff$/;"	m
-<Plug>HGAdd	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGAdd :HGAdd<CR>$/;"	m
-<Plug>HGAnnotate	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGAnnotate :HGAnnotate<CR>$/;"	m
-<Plug>HGClearAndGotoOriginal	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGClearAndGotoOriginal :HGGotoOriginal!<CR>$/;"	m
-<Plug>HGCommit	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGCommit :HGCommit<CR>$/;"	m
-<Plug>HGDiff	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGDiff :HGDiff<CR>$/;"	m
-<Plug>HGGotoOriginal	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGGotoOriginal :HGGotoOriginal<CR>$/;"	m
-<Plug>HGLog	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGLog :HGLog<CR>$/;"	m
-<Plug>HGRevert	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGRevert :HGRevert<CR>$/;"	m
-<Plug>HGReview	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGReview :HGReview<CR>$/;"	m
-<Plug>HGStatus	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGStatus :HGStatus<CR>$/;"	m
-<Plug>HGUpdate	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGUpdate :HGUpdate<CR>$/;"	m
-<Plug>HGVimDiff	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGVimDiff :HGVimDiff<CR>$/;"	m
-<Plug>HGWatchAdd	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGWatchAdd :HGWatchAdd<CR>$/;"	m
-<Plug>HGWatchOff	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGWatchOff :HGWatchOff<CR>$/;"	m
-<Plug>HGWatchOn	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGWatchOn :HGWatchOn<CR>$/;"	m
-<Plug>HGWatchRemove	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGWatchRemove :HGWatchRemove<CR>$/;"	m
-<Plug>HGWatchers	Units/3214129.vim.t/input.vim	/^nnoremap <silent> <Plug>HGWatchers :HGWatchers<CR>$/;"	m
-HGAdd	Units/3214129.vim.t/input.vim	/^com! HGAdd call s:HGAdd()$/;"	c
-HGAdd	Units/3214129.vim.t/input.vim	/^function! s:HGAdd()$/;"	f
-HGAnnotate	Units/3214129.vim.t/input.vim	/^com! -nargs=? HGAnnotate call s:HGAnnotate(<f-args>)$/;"	c
-HGAnnotate	Units/3214129.vim.t/input.vim	/^function! s:HGAnnotate(...)$/;"	f
-HGBufferCheck	Units/3214129.vim.t/input.vim	/^function! s:HGBufferCheck(hgBuffer)$/;"	f
-HGChangeToCurrentFileDir	Units/3214129.vim.t/input.vim	/^function! s:HGChangeToCurrentFileDir(fileName)$/;"	f
-HGCommand	Units/3214129.vim.t/input.vim	/^      augroup HGCommand$/;"	a
-HGCommand	Units/3214129.vim.t/input.vim	/^augroup HGCommand$/;"	a
-HGCommit	Units/3214129.vim.t/input.vim	/^com! -bang -nargs=? HGCommit call s:HGCommit(<q-bang>, <q-args>)$/;"	c
-HGCommit	Units/3214129.vim.t/input.vim	/^function! s:HGCommit(...)$/;"	f
-HGCreateCommandBuffer	Units/3214129.vim.t/input.vim	/^function! s:HGCreateCommandBuffer(cmd, cmdName, statusText, origBuffNR)$/;"	f
-HGCurrentBufferCheck	Units/3214129.vim.t/input.vim	/^function! s:HGCurrentBufferCheck()$/;"	f
-HGDiff	Units/3214129.vim.t/input.vim	/^com! -nargs=* HGDiff call s:HGDiff(<f-args>)$/;"	c
-HGDiff	Units/3214129.vim.t/input.vim	/^function! s:HGDiff(...)$/;"	f
-HGDisableBufferSetup	Units/3214129.vim.t/input.vim	/^com! HGDisableBufferSetup call HGDisableBufferSetup()$/;"	c
-HGDisableBufferSetup	Units/3214129.vim.t/input.vim	/^function! HGDisableBufferSetup()$/;"	f
-HGDoCommand	Units/3214129.vim.t/input.vim	/^function! s:HGDoCommand(cmd, cmdName, statusText)$/;"	f
-HGEditFile	Units/3214129.vim.t/input.vim	/^function! s:HGEditFile(name, origBuffNR)$/;"	f
-HGEnableBufferSetup	Units/3214129.vim.t/input.vim	/^com! HGEnableBufferSetup call HGEnableBufferSetup()$/;"	c
-HGEnableBufferSetup	Units/3214129.vim.t/input.vim	/^function! HGEnableBufferSetup()$/;"	f
-HGFinishCommit	Units/3214129.vim.t/input.vim	/^function! s:HGFinishCommit(messageFile, targetDir, targetFile, origBuffNR)$/;"	f
-HGGetOption	Units/3214129.vim.t/input.vim	/^function! s:HGGetOption(name, default)$/;"	f
-HGGetRevision	Units/3214129.vim.t/input.vim	/^function! HGGetRevision()$/;"	f
-HGGetStatusLine	Units/3214129.vim.t/input.vim	/^function! HGGetStatusLine()$/;"	f
-HGGetStatusVars	Units/3214129.vim.t/input.vim	/^function! s:HGGetStatusVars(revisionVar, branchVar, repositoryVar)$/;"	f
-HGGotoOriginal	Units/3214129.vim.t/input.vim	/^com! -bang HGGotoOriginal call s:HGGotoOriginal(<q-bang>)$/;"	c
-HGGotoOriginal	Units/3214129.vim.t/input.vim	/^function! s:HGGotoOriginal(...)$/;"	f
-HGInstallDocumentation	Units/3214129.vim.t/input.vim	/^function! s:HGInstallDocumentation(full_name, revision)$/;"	f
-HGLog	Units/3214129.vim.t/input.vim	/^com! -nargs=? HGLog call s:HGLog(<f-args>)$/;"	c
-HGLog	Units/3214129.vim.t/input.vim	/^function! s:HGLog(...)$/;"	f
-HGMarkOrigBufferForSetup	Units/3214129.vim.t/input.vim	/^function! s:HGMarkOrigBufferForSetup(hgBuffer)$/;"	f
-HGOverrideOption	Units/3214129.vim.t/input.vim	/^function! s:HGOverrideOption(option, ...)$/;"	f
-HGReload	Units/3214129.vim.t/input.vim	/^com! HGReload unlet! loaded_hgcommand | runtime plugin\/hgcommand.vim$/;"	c
-HGResolveLink	Units/3214129.vim.t/input.vim	/^function! s:HGResolveLink(fileName)$/;"	f
-HGRevert	Units/3214129.vim.t/input.vim	/^com! HGRevert call s:HGRevert()$/;"	c
-HGRevert	Units/3214129.vim.t/input.vim	/^function! s:HGRevert()$/;"	f
-HGReview	Units/3214129.vim.t/input.vim	/^com! -nargs=? HGReview call s:HGReview(<f-args>)$/;"	c
-HGReview	Units/3214129.vim.t/input.vim	/^function! s:HGReview(...)$/;"	f
-HGSetupBuffer	Units/3214129.vim.t/input.vim	/^function! s:HGSetupBuffer()$/;"	f
-HGStatus	Units/3214129.vim.t/input.vim	/^com! HGStatus call s:HGStatus()$/;"	c
-HGStatus	Units/3214129.vim.t/input.vim	/^function! s:HGStatus()$/;"	f
-HGToggleDeleteOnHide	Units/3214129.vim.t/input.vim	/^function! s:HGToggleDeleteOnHide()$/;"	f
-HGUpdate	Units/3214129.vim.t/input.vim	/^com! HGUpdate call s:HGUpdate()$/;"	c
-HGUpdate	Units/3214129.vim.t/input.vim	/^function! s:HGUpdate()$/;"	f
-HGVimDiff	Units/3214129.vim.t/input.vim	/^com! -nargs=* HGVimDiff call s:HGVimDiff(<f-args>)$/;"	c
-HGVimDiff	Units/3214129.vim.t/input.vim	/^function! s:HGVimDiff(...)$/;"	f
-HGVimDiffRestore	Units/3214129.vim.t/input.vim	/^augroup HGVimDiffRestore$/;"	a
-HGVimDiffRestore	Units/3214129.vim.t/input.vim	/^function! s:HGVimDiffRestore(vimDiffBuff)$/;"	f
-HGWipeoutCommandBuffers	Units/3214129.vim.t/input.vim	/^function! s:HGWipeoutCommandBuffers(originalBuffer, hgCommand)$/;"	f
-\add	Units/3214129.vim.t/input.vim	/^      nmap \\add <Plug>HGAdd$/;"	m
-before	Units/3214129.vim.t/input.vim	/^   mappings before the plugin is loaded, such as in the vimrc, in the standard $/;"	m
-buffer	Units/3214129.vim.t/input.vim	/^                        command buffer.  The HGCommand buffer variables may be $/;"	c
-commit	Units/3214129.vim.t/input.vim	/^   not commit the newly-added file.$/;"	m
-loaded_hgcommand	Units/3214129.vim.t/input.vim	/^let loaded_hgcommand = 1$/;"	v
-loaded_hgcommand	Units/3214129.vim.t/input.vim	/^let loaded_hgcommand=2$/;"	v
-s:HGCommandEditFileRunning	Units/3214129.vim.t/input.vim	/^let s:HGCommandEditFileRunning = 0$/;"	v
-s:revision	Units/3214129.vim.t/input.vim	/^  let s:revision="0.1"$/;"	v
-to	Units/3214129.vim.t/input.vim	/^   mapping to quit a HGCommand scratch buffer: >$/;"	m
+<Leader>hgG	input.vim	/^  nmap <unique> <Leader>hgG <Plug>HGClearAndGotoOriginal$/;"	m
+<Leader>hga	input.vim	/^  nmap <unique> <Leader>hga <Plug>HGAdd$/;"	m
+<Leader>hgc	input.vim	/^  nmap <unique> <Leader>hgc <Plug>HGCommit$/;"	m
+<Leader>hgd	input.vim	/^  nmap <unique> <Leader>hgd <Plug>HGDiff$/;"	m
+<Leader>hgg	input.vim	/^  nmap <unique> <Leader>hgg <Plug>HGGotoOriginal$/;"	m
+<Leader>hgl	input.vim	/^  nmap <unique> <Leader>hgl <Plug>HGLog$/;"	m
+<Leader>hgn	input.vim	/^  nmap <unique> <Leader>hgn <Plug>HGAnnotate$/;"	m
+<Leader>hgq	input.vim	/^  nmap <unique> <Leader>hgq <Plug>HGRevert$/;"	m
+<Leader>hgr	input.vim	/^  nmap <unique> <Leader>hgr <Plug>HGReview$/;"	m
+<Leader>hgs	input.vim	/^  nmap <unique> <Leader>hgs <Plug>HGStatus$/;"	m
+<Leader>hgu	input.vim	/^  nmap <unique> <Leader>hgu <Plug>HGUpdate$/;"	m
+<Leader>hgv	input.vim	/^  nmap <unique> <Leader>hgv <Plug>HGVimDiff$/;"	m
+<Plug>HGAdd	input.vim	/^nnoremap <silent> <Plug>HGAdd :HGAdd<CR>$/;"	m
+<Plug>HGAnnotate	input.vim	/^nnoremap <silent> <Plug>HGAnnotate :HGAnnotate<CR>$/;"	m
+<Plug>HGClearAndGotoOriginal	input.vim	/^nnoremap <silent> <Plug>HGClearAndGotoOriginal :HGGotoOriginal!<CR>$/;"	m
+<Plug>HGCommit	input.vim	/^nnoremap <silent> <Plug>HGCommit :HGCommit<CR>$/;"	m
+<Plug>HGDiff	input.vim	/^nnoremap <silent> <Plug>HGDiff :HGDiff<CR>$/;"	m
+<Plug>HGGotoOriginal	input.vim	/^nnoremap <silent> <Plug>HGGotoOriginal :HGGotoOriginal<CR>$/;"	m
+<Plug>HGLog	input.vim	/^nnoremap <silent> <Plug>HGLog :HGLog<CR>$/;"	m
+<Plug>HGRevert	input.vim	/^nnoremap <silent> <Plug>HGRevert :HGRevert<CR>$/;"	m
+<Plug>HGReview	input.vim	/^nnoremap <silent> <Plug>HGReview :HGReview<CR>$/;"	m
+<Plug>HGStatus	input.vim	/^nnoremap <silent> <Plug>HGStatus :HGStatus<CR>$/;"	m
+<Plug>HGUpdate	input.vim	/^nnoremap <silent> <Plug>HGUpdate :HGUpdate<CR>$/;"	m
+<Plug>HGVimDiff	input.vim	/^nnoremap <silent> <Plug>HGVimDiff :HGVimDiff<CR>$/;"	m
+<Plug>HGWatchAdd	input.vim	/^nnoremap <silent> <Plug>HGWatchAdd :HGWatchAdd<CR>$/;"	m
+<Plug>HGWatchOff	input.vim	/^nnoremap <silent> <Plug>HGWatchOff :HGWatchOff<CR>$/;"	m
+<Plug>HGWatchOn	input.vim	/^nnoremap <silent> <Plug>HGWatchOn :HGWatchOn<CR>$/;"	m
+<Plug>HGWatchRemove	input.vim	/^nnoremap <silent> <Plug>HGWatchRemove :HGWatchRemove<CR>$/;"	m
+<Plug>HGWatchers	input.vim	/^nnoremap <silent> <Plug>HGWatchers :HGWatchers<CR>$/;"	m
+HGAdd	input.vim	/^com! HGAdd call s:HGAdd()$/;"	c
+HGAdd	input.vim	/^function! s:HGAdd()$/;"	f
+HGAnnotate	input.vim	/^com! -nargs=? HGAnnotate call s:HGAnnotate(<f-args>)$/;"	c
+HGAnnotate	input.vim	/^function! s:HGAnnotate(...)$/;"	f
+HGBufferCheck	input.vim	/^function! s:HGBufferCheck(hgBuffer)$/;"	f
+HGChangeToCurrentFileDir	input.vim	/^function! s:HGChangeToCurrentFileDir(fileName)$/;"	f
+HGCommand	input.vim	/^      augroup HGCommand$/;"	a
+HGCommand	input.vim	/^augroup HGCommand$/;"	a
+HGCommit	input.vim	/^com! -bang -nargs=? HGCommit call s:HGCommit(<q-bang>, <q-args>)$/;"	c
+HGCommit	input.vim	/^function! s:HGCommit(...)$/;"	f
+HGCreateCommandBuffer	input.vim	/^function! s:HGCreateCommandBuffer(cmd, cmdName, statusText, origBuffNR)$/;"	f
+HGCurrentBufferCheck	input.vim	/^function! s:HGCurrentBufferCheck()$/;"	f
+HGDiff	input.vim	/^com! -nargs=* HGDiff call s:HGDiff(<f-args>)$/;"	c
+HGDiff	input.vim	/^function! s:HGDiff(...)$/;"	f
+HGDisableBufferSetup	input.vim	/^com! HGDisableBufferSetup call HGDisableBufferSetup()$/;"	c
+HGDisableBufferSetup	input.vim	/^function! HGDisableBufferSetup()$/;"	f
+HGDoCommand	input.vim	/^function! s:HGDoCommand(cmd, cmdName, statusText)$/;"	f
+HGEditFile	input.vim	/^function! s:HGEditFile(name, origBuffNR)$/;"	f
+HGEnableBufferSetup	input.vim	/^com! HGEnableBufferSetup call HGEnableBufferSetup()$/;"	c
+HGEnableBufferSetup	input.vim	/^function! HGEnableBufferSetup()$/;"	f
+HGFinishCommit	input.vim	/^function! s:HGFinishCommit(messageFile, targetDir, targetFile, origBuffNR)$/;"	f
+HGGetOption	input.vim	/^function! s:HGGetOption(name, default)$/;"	f
+HGGetRevision	input.vim	/^function! HGGetRevision()$/;"	f
+HGGetStatusLine	input.vim	/^function! HGGetStatusLine()$/;"	f
+HGGetStatusVars	input.vim	/^function! s:HGGetStatusVars(revisionVar, branchVar, repositoryVar)$/;"	f
+HGGotoOriginal	input.vim	/^com! -bang HGGotoOriginal call s:HGGotoOriginal(<q-bang>)$/;"	c
+HGGotoOriginal	input.vim	/^function! s:HGGotoOriginal(...)$/;"	f
+HGInstallDocumentation	input.vim	/^function! s:HGInstallDocumentation(full_name, revision)$/;"	f
+HGLog	input.vim	/^com! -nargs=? HGLog call s:HGLog(<f-args>)$/;"	c
+HGLog	input.vim	/^function! s:HGLog(...)$/;"	f
+HGMarkOrigBufferForSetup	input.vim	/^function! s:HGMarkOrigBufferForSetup(hgBuffer)$/;"	f
+HGOverrideOption	input.vim	/^function! s:HGOverrideOption(option, ...)$/;"	f
+HGReload	input.vim	/^com! HGReload unlet! loaded_hgcommand | runtime plugin\/hgcommand.vim$/;"	c
+HGResolveLink	input.vim	/^function! s:HGResolveLink(fileName)$/;"	f
+HGRevert	input.vim	/^com! HGRevert call s:HGRevert()$/;"	c
+HGRevert	input.vim	/^function! s:HGRevert()$/;"	f
+HGReview	input.vim	/^com! -nargs=? HGReview call s:HGReview(<f-args>)$/;"	c
+HGReview	input.vim	/^function! s:HGReview(...)$/;"	f
+HGSetupBuffer	input.vim	/^function! s:HGSetupBuffer()$/;"	f
+HGStatus	input.vim	/^com! HGStatus call s:HGStatus()$/;"	c
+HGStatus	input.vim	/^function! s:HGStatus()$/;"	f
+HGToggleDeleteOnHide	input.vim	/^function! s:HGToggleDeleteOnHide()$/;"	f
+HGUpdate	input.vim	/^com! HGUpdate call s:HGUpdate()$/;"	c
+HGUpdate	input.vim	/^function! s:HGUpdate()$/;"	f
+HGVimDiff	input.vim	/^com! -nargs=* HGVimDiff call s:HGVimDiff(<f-args>)$/;"	c
+HGVimDiff	input.vim	/^function! s:HGVimDiff(...)$/;"	f
+HGVimDiffRestore	input.vim	/^augroup HGVimDiffRestore$/;"	a
+HGVimDiffRestore	input.vim	/^function! s:HGVimDiffRestore(vimDiffBuff)$/;"	f
+HGWipeoutCommandBuffers	input.vim	/^function! s:HGWipeoutCommandBuffers(originalBuffer, hgCommand)$/;"	f
+\add	input.vim	/^      nmap \\add <Plug>HGAdd$/;"	m
+before	input.vim	/^   mappings before the plugin is loaded, such as in the vimrc, in the standard $/;"	m
+buffer	input.vim	/^                        command buffer.  The HGCommand buffer variables may be $/;"	c
+commit	input.vim	/^   not commit the newly-added file.$/;"	m
+loaded_hgcommand	input.vim	/^let loaded_hgcommand = 1$/;"	v
+loaded_hgcommand	input.vim	/^let loaded_hgcommand=2$/;"	v
+s:HGCommandEditFileRunning	input.vim	/^let s:HGCommandEditFileRunning = 0$/;"	v
+s:revision	input.vim	/^  let s:revision="0.1"$/;"	v
+to	input.vim	/^   mapping to quit a HGCommand scratch buffer: >$/;"	m

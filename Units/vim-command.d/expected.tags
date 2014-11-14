@@ -1,1 +1,1 @@
-Foo	Units/vim-command.d/input.vim	/^com Foo call Foo()$/;"	c
+Foo	input.vim	/^com Foo call Foo()$/;"	c

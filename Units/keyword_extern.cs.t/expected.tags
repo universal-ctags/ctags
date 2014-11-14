@@ -1,3 +1,3 @@
-Main	Units/keyword_extern.cs.t/input.cs	/^   public static int Main() $/;"	m	class:MyClass
-MessageBox	Units/keyword_extern.cs.t/input.cs	/^   public static extern int MessageBox(int h, string m, string c, int type);$/;"	m	class:MyClass	file:
-MyClass	Units/keyword_extern.cs.t/input.cs	/^class MyClass $/;"	c
+Main	input.cs	/^   public static int Main() $/;"	m	class:MyClass
+MessageBox	input.cs	/^   public static extern int MessageBox(int h, string m, string c, int type);$/;"	m	class:MyClass	file:
+MyClass	input.cs	/^class MyClass $/;"	c

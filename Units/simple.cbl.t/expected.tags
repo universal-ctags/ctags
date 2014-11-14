@@ -1,18 +1,18 @@
-AUTHOR	Units/simple.cbl.t/input.cbl	/^       AUTHOR. Darren Hiebert.$/;"	p
-Begin	Units/simple.cbl.t/input.cbl	/^       Begin.$/;"	p
-DW-DAYS-IN-MONTH	Units/simple.cbl.t/input.cbl	/^             05  DW-DAYS-IN-MONTH   OCCURS 12 TIMES$/;"	d
-DW-DAYS-IN-MONTHS	Units/simple.cbl.t/input.cbl	/^           03  DW-DAYS-IN-MONTHS    VALUE "312831303130313130313031".$/;"	d
-Data-Item1	Units/simple.cbl.t/input.cbl	/^         02 Data-Item1              PIC 9 VALUE ZEROS.$/;"	d
-FILE	Units/simple.cbl.t/input.cbl	/^       FILE SECTION.$/;"	s
-FILE-CONTROL	Units/simple.cbl.t/input.cbl	/^       FILE-CONTROL.$/;"	p
-File-Data-Item	Units/simple.cbl.t/input.cbl	/^         02 File-Data-Item          PIC 9(7).$/;"	d
-File-Group-Name	Units/simple.cbl.t/input.cbl	/^       01 File-Group-Name.$/;"	g
-File-Name	Units/simple.cbl.t/input.cbl	/^       FD File-Name.$/;"	f
-Group-Name	Units/simple.cbl.t/input.cbl	/^       01 Group-Name.$/;"	g
-INPUT-OUPUT	Units/simple.cbl.t/input.cbl	/^       INPUT-OUPUT SECTION.$/;"	s
-PROGRAM-ID	Units/simple.cbl.t/input.cbl	/^       PROGRAM-ID. Program-Name.$/;"	p
-Program-Name	Units/simple.cbl.t/input.cbl	/^       PROGRAM-ID. Program-Name.$/;"	P
-SH-WORK-MMDDYYYY	Units/simple.cbl.t/input.cbl	/^           03 SH-WORK-MMDDYYYY      PIC  9(08)  VALUE 0.$/;"	d
-SH-WORK-MMDDYYYY-2	Units/simple.cbl.t/input.cbl	/^           03 SH-WORK-MMDDYYYY-2    REDEFINES SH-WORK-MMDDYYYY.$/;"	d
-Subprogram-Name	Units/simple.cbl.t/input.cbl	/^       Subprogram-Name.$/;"	p
-WORKING-STORAGE	Units/simple.cbl.t/input.cbl	/^       WORKING-STORAGE SECTION.$/;"	s
+AUTHOR	input.cbl	/^       AUTHOR. Darren Hiebert.$/;"	p
+Begin	input.cbl	/^       Begin.$/;"	p
+DW-DAYS-IN-MONTH	input.cbl	/^             05  DW-DAYS-IN-MONTH   OCCURS 12 TIMES$/;"	d
+DW-DAYS-IN-MONTHS	input.cbl	/^           03  DW-DAYS-IN-MONTHS    VALUE "312831303130313130313031".$/;"	d
+Data-Item1	input.cbl	/^         02 Data-Item1              PIC 9 VALUE ZEROS.$/;"	d
+FILE	input.cbl	/^       FILE SECTION.$/;"	s
+FILE-CONTROL	input.cbl	/^       FILE-CONTROL.$/;"	p
+File-Data-Item	input.cbl	/^         02 File-Data-Item          PIC 9(7).$/;"	d
+File-Group-Name	input.cbl	/^       01 File-Group-Name.$/;"	g
+File-Name	input.cbl	/^       FD File-Name.$/;"	f
+Group-Name	input.cbl	/^       01 Group-Name.$/;"	g
+INPUT-OUPUT	input.cbl	/^       INPUT-OUPUT SECTION.$/;"	s
+PROGRAM-ID	input.cbl	/^       PROGRAM-ID. Program-Name.$/;"	p
+Program-Name	input.cbl	/^       PROGRAM-ID. Program-Name.$/;"	P
+SH-WORK-MMDDYYYY	input.cbl	/^           03 SH-WORK-MMDDYYYY      PIC  9(08)  VALUE 0.$/;"	d
+SH-WORK-MMDDYYYY-2	input.cbl	/^           03 SH-WORK-MMDDYYYY-2    REDEFINES SH-WORK-MMDDYYYY.$/;"	d
+Subprogram-Name	input.cbl	/^       Subprogram-Name.$/;"	p
+WORKING-STORAGE	input.cbl	/^       WORKING-STORAGE SECTION.$/;"	s

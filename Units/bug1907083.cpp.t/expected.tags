@@ -1,4 +1,4 @@
-m1	Units/bug1907083.cpp.t/input.cpp	/^C::T * C::m1() {}$/;"	f	class:C
-m2	Units/bug1907083.cpp.t/input.cpp	/^C::T * const C::m2() {}$/;"	f	class:C::C
-m3	Units/bug1907083.cpp.t/input.cpp	/^C::T const * C::m3() {}$/;"	f	class:C::C
-m4	Units/bug1907083.cpp.t/input.cpp	/^C::T const * const C::m4() {}$/;"	f	class:C::C
+m1	input.cpp	/^C::T * C::m1() {}$/;"	f	class:C
+m2	input.cpp	/^C::T * const C::m2() {}$/;"	f	class:C::C
+m3	input.cpp	/^C::T const * C::m3() {}$/;"	f	class:C::C
+m4	input.cpp	/^C::T const * const C::m4() {}$/;"	f	class:C::C
