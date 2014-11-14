@@ -275,6 +275,7 @@ run_shrink ()
 
     echo "Shringking ${input} as ${guessed_lang}"
     shrink_main "${cmdline_template}" "${input}" "${output}"  1 yes
+}
 
 # filters out the directory prefix in a ctags input
 tags_basename_filter()
