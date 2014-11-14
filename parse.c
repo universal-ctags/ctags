@@ -622,10 +622,17 @@ extern langType getFileLanguage (const char *const fileName)
 		verbose ("Get file language for %s\n", fileName);
 
 		input = fopen (fileName, "rb");
-		if (!input)
-			goto accept_nofile;
+		{
+			const char* baseName = baseFilename (fileName);
+			verbose ("	pattern: %s\n", baseName);
+			language = getPatternLanguage (baseName, input);
+			if (input)
+				rewind (input);
+			else
+				goto template_file;
+		}
 
-		if ((spec = extracEmacsModeAtFirstLine (input)))
+		if (language == LANG_IGNORE && (spec = extracEmacsModeAtFirstLine (input)))
 		{
 			verbose ("	emacs mode at the first line: %s\n", vStringValue (spec));
 			language = getSpecLanguage (vStringValue (spec), input);
@@ -657,16 +664,7 @@ extern langType getFileLanguage (const char *const fileName)
 		}
 		rewind(input);
 
-	  accept_nofile:
-		if (language == LANG_IGNORE)
-		{
-			const char* baseName = baseFilename (fileName);
-			verbose ("	pattern: %s\n", baseName);
-			language = getPatternLanguage(baseName, input);
-		}
-
-		if (input)
-			rewind (input);
+	  template_file:
 		if (language == LANG_IGNORE)
 		{
 			const char* const tExt = ".in";
