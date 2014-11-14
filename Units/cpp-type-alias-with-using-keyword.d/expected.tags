@@ -1,2 +1,2 @@
-Integer	Units/cpp-type-alias-with-using-keyword.d/input.cpp	/^using Integer = int;$/;"	t	file:
-Vector	Units/cpp-type-alias-with-using-keyword.d/input.cpp	/^using Vector = std::vector<T>;$/;"	t	file:
+Integer	input.cpp	/^using Integer = int;$/;"	t	file:
+Vector	input.cpp	/^using Vector = std::vector<T>;$/;"	t	file:

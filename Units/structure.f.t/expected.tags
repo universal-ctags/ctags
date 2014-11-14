@@ -1,23 +1,23 @@
-a	Units/structure.f.t/input.f	/^                    integer a$/;"	k	type:anonymous
-clouds	Units/structure.f.t/input.f	/^                character*20  clouds /;"	k	type:weather
-clouds	Units/structure.f.t/input.f	/^        character*20   clouds$/;"	k	type:weather
-day	Units/structure.f.t/input.f	/^                integer*1     month \/08\/, day /;"	k	type:weather
-day	Units/structure.f.t/input.f	/^        integer        month, day,/;"	k	type:weather
-initialized_structure	Units/structure.f.t/input.f	/^        program initialized_structure$/;"	p
-latest	Units/structure.f.t/input.f	/^        record \/weather\/ latest$/;"	v	program:initialized_structure
-latest	Units/structure.f.t/input.f	/^        record \/weather\/ latest$/;"	v	program:uninitialized_structure
-level2	Units/structure.f.t/input.f	/^            structure \/nested\/ level2$/;"	k	type:top
-level3a	Units/structure.f.t/input.f	/^                structure level3a,/;"	k	type:nested
-level3b	Units/structure.f.t/input.f	/^                structure level3a, level3b$/;"	k	type:nested
-month	Units/structure.f.t/input.f	/^                integer*1     month /;"	k	type:weather
-month	Units/structure.f.t/input.f	/^        integer        month,/;"	k	type:weather
-nested	Units/structure.f.t/input.f	/^            structure \/nested\//;"	t	type:top
-nested_structure	Units/structure.f.t/input.f	/^        program nested_structure$/;"	p
-rainfall	Units/structure.f.t/input.f	/^                real   rainfall /;"	k	type:weather
-rainfall	Units/structure.f.t/input.f	/^        real           rainfall$/;"	k	type:weather
-top	Units/structure.f.t/input.f	/^        structure \/top\//;"	t	program:nested_structure
-uninitialized_structure	Units/structure.f.t/input.f	/^        program uninitialized_structure$/;"	p
-weather	Units/structure.f.t/input.f	/^        structure \/weather\//;"	t	program:initialized_structure
-weather	Units/structure.f.t/input.f	/^        structure \/weather\//;"	t	program:uninitialized_structure
-year	Units/structure.f.t/input.f	/^                integer*1     month \/08\/, day \/10\/, year /;"	k	type:weather
-year	Units/structure.f.t/input.f	/^        integer        month, day, year$/;"	k	type:weather
+a	input.f	/^                    integer a$/;"	k	type:anonymous
+clouds	input.f	/^                character*20  clouds /;"	k	type:weather
+clouds	input.f	/^        character*20   clouds$/;"	k	type:weather
+day	input.f	/^                integer*1     month \/08\/, day /;"	k	type:weather
+day	input.f	/^        integer        month, day,/;"	k	type:weather
+initialized_structure	input.f	/^        program initialized_structure$/;"	p
+latest	input.f	/^        record \/weather\/ latest$/;"	v	program:initialized_structure
+latest	input.f	/^        record \/weather\/ latest$/;"	v	program:uninitialized_structure
+level2	input.f	/^            structure \/nested\/ level2$/;"	k	type:top
+level3a	input.f	/^                structure level3a,/;"	k	type:nested
+level3b	input.f	/^                structure level3a, level3b$/;"	k	type:nested
+month	input.f	/^                integer*1     month /;"	k	type:weather
+month	input.f	/^        integer        month,/;"	k	type:weather
+nested	input.f	/^            structure \/nested\//;"	t	type:top
+nested_structure	input.f	/^        program nested_structure$/;"	p
+rainfall	input.f	/^                real   rainfall /;"	k	type:weather
+rainfall	input.f	/^        real           rainfall$/;"	k	type:weather
+top	input.f	/^        structure \/top\//;"	t	program:nested_structure
+uninitialized_structure	input.f	/^        program uninitialized_structure$/;"	p
+weather	input.f	/^        structure \/weather\//;"	t	program:initialized_structure
+weather	input.f	/^        structure \/weather\//;"	t	program:uninitialized_structure
+year	input.f	/^                integer*1     month \/08\/, day \/10\/, year /;"	k	type:weather
+year	input.f	/^        integer        month, day, year$/;"	k	type:weather

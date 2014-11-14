@@ -1,4 +1,4 @@
-VERBATIM	Units/verbatim.e.t/input.e	/^class VERBATIM$/;"	c
-constant	Units/verbatim.e.t/input.e	/^	constant: STRING is "[$/;"	f	class:VERBATIM
-cpp_query	Units/verbatim.e.t/input.e	/^	cpp_query (obj: FX_OBJECT; app: POINTER): POINTER is$/;"	f	class:VERBATIM	file:
-tail_attribute	Units/verbatim.e.t/input.e	/^	tail_attribute: INTEGER$/;"	f	class:VERBATIM	file:
+VERBATIM	input.e	/^class VERBATIM$/;"	c
+constant	input.e	/^	constant: STRING is "[$/;"	f	class:VERBATIM
+cpp_query	input.e	/^	cpp_query (obj: FX_OBJECT; app: POINTER): POINTER is$/;"	f	class:VERBATIM	file:
+tail_attribute	input.e	/^	tail_attribute: INTEGER$/;"	f	class:VERBATIM	file:

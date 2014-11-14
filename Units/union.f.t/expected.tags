@@ -1,8 +1,8 @@
-10	Units/union.f.t/input.f	/^10      format (a)$/;"	l	program:writedate	file:
-date	Units/union.f.t/input.f	/^                    character*6 date$/;"	k	type:start
-day	Units/union.f.t/input.f	/^                    character*2 day$/;"	k	type:start
-month	Units/union.f.t/input.f	/^                    character*2 month$/;"	k	type:start
-sdate	Units/union.f.t/input.f	/^        record \/start\/ sdate$/;"	v	program:writedate
-start	Units/union.f.t/input.f	/^        structure \/start\//;"	t	program:writedate
-writedate	Units/union.f.t/input.f	/^        program writedate$/;"	p
-year	Units/union.f.t/input.f	/^                    character*2 year$/;"	k	type:start
+10	input.f	/^10      format (a)$/;"	l	program:writedate	file:
+date	input.f	/^                    character*6 date$/;"	k	type:start
+day	input.f	/^                    character*2 day$/;"	k	type:start
+month	input.f	/^                    character*2 month$/;"	k	type:start
+sdate	input.f	/^        record \/start\/ sdate$/;"	v	program:writedate
+start	input.f	/^        structure \/start\//;"	t	program:writedate
+writedate	input.f	/^        program writedate$/;"	p
+year	input.f	/^                    character*2 year$/;"	k	type:start

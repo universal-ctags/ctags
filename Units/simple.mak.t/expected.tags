@@ -1,9 +1,9 @@
-A	Units/simple.mak.t/input.mak	/^A = 1$/;"	m
-B	Units/simple.mak.t/input.mak	/^B := 2$/;"	m
-C	Units/simple.mak.t/input.mak	/^define C$/;"	m
-D	Units/simple.mak.t/input.mak	/^a.o: D = 4$/;"	m
-E	Units/simple.mak.t/input.mak	/^	E = 5$/;"	m
-F	Units/simple.mak.t/input.mak	/^$(obj)\/raid6int1.c:   F := 6$/;"	m
-G	Units/simple.mak.t/input.mak	/^G = 7 # ignore comment$/;"	m
-H	Units/simple.mak.t/input.mak	/^H = $(A:.y=.c) ${B:.l=.c}$/;"	m
-I	Units/simple.mak.t/input.mak	/^export I = 8$/;"	m
+A	input.mak	/^A = 1$/;"	m
+B	input.mak	/^B := 2$/;"	m
+C	input.mak	/^define C$/;"	m
+D	input.mak	/^a.o: D = 4$/;"	m
+E	input.mak	/^	E = 5$/;"	m
+F	input.mak	/^$(obj)\/raid6int1.c:   F := 6$/;"	m
+G	input.mak	/^G = 7 # ignore comment$/;"	m
+H	input.mak	/^H = $(A:.y=.c) ${B:.l=.c}$/;"	m
+I	input.mak	/^export I = 8$/;"	m

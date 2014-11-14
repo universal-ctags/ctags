@@ -1,4 +1,4 @@
-F	Units/pure_elem.f95.t/input.f95	/^	PURE REAL FU/;"	f
-elem_maxabs	Units/pure_elem.f95.t/input.f95	/^	ELEMENTAL REAL FUNCTION elem_maxabs(/;"	f
-pure_func	Units/pure_elem.f95.t/input.f95	/^	PURE REAL FUNCTION pure_func(/;"	f
-pure_maxabs2	Units/pure_elem.f95.t/input.f95	/^	PURE REAL FUNCTION pure_maxabs2(/;"	f
+F	input.f95	/^	PURE REAL FU/;"	f
+elem_maxabs	input.f95	/^	ELEMENTAL REAL FUNCTION elem_maxabs(/;"	f
+pure_func	input.f95	/^	PURE REAL FUNCTION pure_func(/;"	f
+pure_maxabs2	input.f95	/^	PURE REAL FUNCTION pure_maxabs2(/;"	f

@@ -1,1 +1,1 @@
-func2	Units/bug1086609.c.t/input.c	/^int func2(int a)$/;"	f
+func2	input.c	/^int func2(int a)$/;"	f

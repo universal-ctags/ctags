@@ -1,5 +1,5 @@
-CRLF	Units/bd32.s.t/input.s	/^CRLF            dc.b    13,10,0         <cr>, <lf>, null$/;"	d
-TEST	Units/bd32.s.t/input.s	/^TEST            move.l  a0,a1           get argv in a1$/;"	l
-signon	Units/bd32.s.t/input.s	/^signon  dc.b    'TEST PROGRAM for BD32 programming drivers'$/;"	d
-test_1	Units/bd32.s.t/input.s	/^test_1          moveq.l #BD_PUTS,d0     puts () system call$/;"	l
-test_error	Units/bd32.s.t/input.s	/^test_error      moveq.l #BD_QUIT,d0     all done - quit$/;"	l
+CRLF	input.s	/^CRLF            dc.b    13,10,0         <cr>, <lf>, null$/;"	d
+TEST	input.s	/^TEST            move.l  a0,a1           get argv in a1$/;"	l
+signon	input.s	/^signon  dc.b    'TEST PROGRAM for BD32 programming drivers'$/;"	d
+test_1	input.s	/^test_1          moveq.l #BD_PUTS,d0     puts () system call$/;"	l
+test_error	input.s	/^test_error      moveq.l #BD_QUIT,d0     all done - quit$/;"	l

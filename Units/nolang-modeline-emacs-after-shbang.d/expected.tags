@@ -1,1 +1,1 @@
-main	Units/nolang-modeline-emacs-after-shbang.d/input.nolang	/^(define (main args) 1)$/;"	f
+main	input.nolang	/^(define (main args) 1)$/;"	f

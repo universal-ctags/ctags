@@ -1,12 +1,12 @@
-IPoint	Units/keyword_interface.cs.t/input.cs	/^interface IPoint $/;"	i
-Main	Units/keyword_interface.cs.t/input.cs	/^   public static void Main() $/;"	m	class:MainClass
-MainClass	Units/keyword_interface.cs.t/input.cs	/^class MainClass $/;"	c
-MyPoint	Units/keyword_interface.cs.t/input.cs	/^   public MyPoint(int x, int y) $/;"	m	class:MyPoint
-MyPoint	Units/keyword_interface.cs.t/input.cs	/^class MyPoint : IPoint $/;"	c
-PrintPoint	Units/keyword_interface.cs.t/input.cs	/^   private static void PrintPoint(IPoint p) $/;"	m	class:MainClass	file:
-myX	Units/keyword_interface.cs.t/input.cs	/^   private int myX;$/;"	f	class:MyPoint	file:
-myY	Units/keyword_interface.cs.t/input.cs	/^   private int myY;$/;"	f	class:MyPoint	file:
-x	Units/keyword_interface.cs.t/input.cs	/^   int x $/;"	p	interface:IPoint
-x	Units/keyword_interface.cs.t/input.cs	/^   public int x $/;"	p	class:MyPoint
-y	Units/keyword_interface.cs.t/input.cs	/^   int y $/;"	p	interface:IPoint
-y	Units/keyword_interface.cs.t/input.cs	/^   public int y $/;"	p	class:MyPoint
+IPoint	input.cs	/^interface IPoint $/;"	i
+Main	input.cs	/^   public static void Main() $/;"	m	class:MainClass
+MainClass	input.cs	/^class MainClass $/;"	c
+MyPoint	input.cs	/^   public MyPoint(int x, int y) $/;"	m	class:MyPoint
+MyPoint	input.cs	/^class MyPoint : IPoint $/;"	c
+PrintPoint	input.cs	/^   private static void PrintPoint(IPoint p) $/;"	m	class:MainClass	file:
+myX	input.cs	/^   private int myX;$/;"	f	class:MyPoint	file:
+myY	input.cs	/^   private int myY;$/;"	f	class:MyPoint	file:
+x	input.cs	/^   int x $/;"	p	interface:IPoint
+x	input.cs	/^   public int x $/;"	p	class:MyPoint
+y	input.cs	/^   int y $/;"	p	interface:IPoint
+y	input.cs	/^   public int y $/;"	p	class:MyPoint

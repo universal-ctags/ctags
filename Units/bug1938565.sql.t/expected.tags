@@ -1,3 +1,3 @@
-demo_pkg	Units/bug1938565.sql.t/input.sql	/^CREATE OR REPLACE PACKAGE demo_pkg$/;"	P
-func1	Units/bug1938565.sql.t/input.sql	/^FUNCTION func1( value in varchar ) RETURNS number IS$/;"	f	package:demo_pkg
-func2	Units/bug1938565.sql.t/input.sql	/^FUNCTION func2( value in varchar ) RETURN number IS$/;"	f	package:demo_pkg
+demo_pkg	input.sql	/^CREATE OR REPLACE PACKAGE demo_pkg$/;"	P
+func1	input.sql	/^FUNCTION func1( value in varchar ) RETURNS number IS$/;"	f	package:demo_pkg
+func2	input.sql	/^FUNCTION func2( value in varchar ) RETURN number IS$/;"	f	package:demo_pkg

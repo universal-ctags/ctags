@@ -1,10 +1,10 @@
-A	Units/java_enum.java.t/input.java	/^		A(1), B(2);$/;"	e	enum:C.FancyEnum	file:
-B	Units/java_enum.java.t/input.java	/^		A(1), B(2);$/;"	e	enum:C.FancyEnum	file:
-C	Units/java_enum.java.t/input.java	/^public class C {$/;"	c
-FIRST_VALUE	Units/java_enum.java.t/input.java	/^		FIRST_VALUE,$/;"	e	enum:C.TrivialEnum	file:
-FancyEnum	Units/java_enum.java.t/input.java	/^		FancyEnum(int i) {$/;"	m	class:C.FancyEnum
-FancyEnum	Units/java_enum.java.t/input.java	/^	public enum FancyEnum {$/;"	g	class:C
-SECOND_VALUE	Units/java_enum.java.t/input.java	/^		SECOND_VALUE$/;"	e	enum:C.TrivialEnum	file:
-TrivialEnum	Units/java_enum.java.t/input.java	/^	public enum TrivialEnum {$/;"	g	class:C
-i	Units/java_enum.java.t/input.java	/^		private int i;$/;"	f	class:C.FancyEnum	file:
-m	Units/java_enum.java.t/input.java	/^		void m() {$/;"	m	class:C.FancyEnum
+A	input.java	/^		A(1), B(2);$/;"	e	enum:C.FancyEnum	file:
+B	input.java	/^		A(1), B(2);$/;"	e	enum:C.FancyEnum	file:
+C	input.java	/^public class C {$/;"	c
+FIRST_VALUE	input.java	/^		FIRST_VALUE,$/;"	e	enum:C.TrivialEnum	file:
+FancyEnum	input.java	/^		FancyEnum(int i) {$/;"	m	class:C.FancyEnum
+FancyEnum	input.java	/^	public enum FancyEnum {$/;"	g	class:C
+SECOND_VALUE	input.java	/^		SECOND_VALUE$/;"	e	enum:C.TrivialEnum	file:
+TrivialEnum	input.java	/^	public enum TrivialEnum {$/;"	g	class:C
+i	input.java	/^		private int i;$/;"	f	class:C.FancyEnum	file:
+m	input.java	/^		void m() {$/;"	m	class:C.FancyEnum

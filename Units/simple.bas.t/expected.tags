@@ -1,7 +1,7 @@
-a	Units/simple.bas.t/input.bas	/^Common a As Integer$/;"	v
-b	Units/simple.bas.t/input.bas	/^Dim b As Integer$/;"	v
-f	Units/simple.bas.t/input.bas	/^Function f()$/;"	f
-one	Units/simple.bas.t/input.bas	/^Const one = 1$/;"	c
-start	Units/simple.bas.t/input.bas	/^start:$/;"	l
-str	Units/simple.bas.t/input.bas	/^DIM AS STRING str$/;"	v
-test	Units/simple.bas.t/input.bas	/^Type test$/;"	t
+a	input.bas	/^Common a As Integer$/;"	v
+b	input.bas	/^Dim b As Integer$/;"	v
+f	input.bas	/^Function f()$/;"	f
+one	input.bas	/^Const one = 1$/;"	c
+start	input.bas	/^start:$/;"	l
+str	input.bas	/^DIM AS STRING str$/;"	v
+test	input.bas	/^Type test$/;"	t

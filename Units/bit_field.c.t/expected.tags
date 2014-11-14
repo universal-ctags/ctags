@@ -1,22 +1,22 @@
-a	Units/bit_field.c.t/input.c	/^    unsigned int a: 1;$/;"	m	struct:bit_fields	file:
-b	Units/bit_field.c.t/input.c	/^    unsigned int b: 1;$/;"	m	struct:bit_fields	file:
-bad2	Units/bit_field.c.t/input.c	/^    BYTE 	bad2: 1;$/;"	m	struct:__anon2	file:
-bit_fields	Units/bit_field.c.t/input.c	/^struct bit_fields {$/;"	s	file:
-bitfield_flags	Units/bit_field.c.t/input.c	/^} bitfield_flags;$/;"	t	typeref:struct:__anon2	file:
-c	Units/bit_field.c.t/input.c	/^    unsigned int c: 2;$/;"	m	struct:bit_fields	file:
-exp	Units/bit_field.c.t/input.c	/^    unsigned exp   : _FP_EXPBITS_D;$/;"	m	struct:__anon1	file:
-frac0	Units/bit_field.c.t/input.c	/^    unsigned frac0 : _FP_W_TYPE_SIZE;$/;"	m	struct:__anon1	file:
-frac1	Units/bit_field.c.t/input.c	/^    unsigned frac1 : _FP_FRACBITS_D - (_FP_IMPLBIT_D != 0) - _FP_W_TYPE_SIZE;$/;"	m	struct:__anon1	file:
-group	Units/bit_field.c.t/input.c	/^    BYTE 	group: 1;$/;"	m	struct:__anon2	file:
-lower	Units/bit_field.c.t/input.c	/^	unsigned char lower:1,$/;"	m	struct:shortname_info	file:
-mystruct	Units/bit_field.c.t/input.c	/^} mystruct;$/;"	t	typeref:struct:__anon3	file:
-personal	Units/bit_field.c.t/input.c	/^    BYTE 	personal: 1;$/;"	m	struct:__anon2	file:
-private	Units/bit_field.c.t/input.c	/^    BYTE	private;$/;"	m	struct:__anon3	file:
-public	Units/bit_field.c.t/input.c	/^    BYTE	public;$/;"	m	struct:__anon3	file:
-public	Units/bit_field.c.t/input.c	/^    BYTE 	public: 1;$/;"	m	struct:__anon2	file:
-shortname_info	Units/bit_field.c.t/input.c	/^struct shortname_info {$/;"	s	file:
-sign	Units/bit_field.c.t/input.c	/^    unsigned sign  : 1;$/;"	m	struct:__anon1	file:
-that	Units/bit_field.c.t/input.c	/^    BYTE	that;$/;"	m	struct:__anon3	file:
-this	Units/bit_field.c.t/input.c	/^    BYTE	this;$/;"	m	struct:__anon3	file:
-upper	Units/bit_field.c.t/input.c	/^		      upper:1,$/;"	m	struct:shortname_info	file:
-valid	Units/bit_field.c.t/input.c	/^		      valid:1;$/;"	m	struct:shortname_info	file:
+a	input.c	/^    unsigned int a: 1;$/;"	m	struct:bit_fields	file:
+b	input.c	/^    unsigned int b: 1;$/;"	m	struct:bit_fields	file:
+bad2	input.c	/^    BYTE 	bad2: 1;$/;"	m	struct:__anon2	file:
+bit_fields	input.c	/^struct bit_fields {$/;"	s	file:
+bitfield_flags	input.c	/^} bitfield_flags;$/;"	t	typeref:struct:__anon2	file:
+c	input.c	/^    unsigned int c: 2;$/;"	m	struct:bit_fields	file:
+exp	input.c	/^    unsigned exp   : _FP_EXPBITS_D;$/;"	m	struct:__anon1	file:
+frac0	input.c	/^    unsigned frac0 : _FP_W_TYPE_SIZE;$/;"	m	struct:__anon1	file:
+frac1	input.c	/^    unsigned frac1 : _FP_FRACBITS_D - (_FP_IMPLBIT_D != 0) - _FP_W_TYPE_SIZE;$/;"	m	struct:__anon1	file:
+group	input.c	/^    BYTE 	group: 1;$/;"	m	struct:__anon2	file:
+lower	input.c	/^	unsigned char lower:1,$/;"	m	struct:shortname_info	file:
+mystruct	input.c	/^} mystruct;$/;"	t	typeref:struct:__anon3	file:
+personal	input.c	/^    BYTE 	personal: 1;$/;"	m	struct:__anon2	file:
+private	input.c	/^    BYTE	private;$/;"	m	struct:__anon3	file:
+public	input.c	/^    BYTE	public;$/;"	m	struct:__anon3	file:
+public	input.c	/^    BYTE 	public: 1;$/;"	m	struct:__anon2	file:
+shortname_info	input.c	/^struct shortname_info {$/;"	s	file:
+sign	input.c	/^    unsigned sign  : 1;$/;"	m	struct:__anon1	file:
+that	input.c	/^    BYTE	that;$/;"	m	struct:__anon3	file:
+this	input.c	/^    BYTE	this;$/;"	m	struct:__anon3	file:
+upper	input.c	/^		      upper:1,$/;"	m	struct:shortname_info	file:
+valid	input.c	/^		      valid:1;$/;"	m	struct:shortname_info	file:

@@ -1,2 +1,2 @@
-Input	Units/ocaml_stringTsts.ml.t/input.ml	1;"	M
-valueStr	Units/ocaml_stringTsts.ml.t/input.ml	/^let valueStr = "(*)(*)"$/;"	v
+Input	input.ml	1;"	M
+valueStr	input.ml	/^let valueStr = "(*)(*)"$/;"	v

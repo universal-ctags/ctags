@@ -1,17 +1,17 @@
-FileTree	Units/noext-tg-objc.d/input.nolang	/^@implementation FileTree$/;"	I	implementation:
-FolderTree	Units/noext-tg-objc.d/input.nolang	/^@implementation FolderTree$/;"	I	implementation:
-MyClass	Units/noext-tg-objc.d/input.nolang	/^@implementation MyClass$/;"	I	interface:
-addChild:	Units/noext-tg-objc.d/input.nolang	/^{$/;"	m	implementation:FolderTree
-createFileList:atPlace:	Units/noext-tg-objc.d/input.nolang	/^{$/;"	c	implementation:FolderTree
-createLayoutTree	Units/noext-tg-objc.d/input.nolang	/^{$/;"	m	implementation:FileTree
-createLayoutTree	Units/noext-tg-objc.d/input.nolang	/^{$/;"	m	implementation:FolderTree
-dealloc	Units/noext-tg-objc.d/input.nolang	/^{$/;"	m	implementation:FileTree
-dealloc	Units/noext-tg-objc.d/input.nolang	/^{$/;"	m	implementation:FolderTree
-getDiskSize	Units/noext-tg-objc.d/input.nolang	/^{$/;"	m	implementation:FileTree
-initWithName:andSize:atPlace:	Units/noext-tg-objc.d/input.nolang	/^{$/;"	m	implementation:FileTree
-initWithName:atPlace:	Units/noext-tg-objc.d/input.nolang	/^{$/;"	m	implementation:FileTree
-initWithName:atPlace:	Units/noext-tg-objc.d/input.nolang	/^{$/;"	m	implementation:FolderTree
-main	Units/noext-tg-objc.d/input.nolang	/^int main(int argc, char** argv)$/;"	f	interface:
-myClassMethod:with:	Units/noext-tg-objc.d/input.nolang	/^+ (void)myClassMethod:(int)arg1 with:(id)arg2;$/;"	c	implementation:MyClass
-myInstanceMethod:with:	Units/noext-tg-objc.d/input.nolang	/^- (void)myInstanceMethod:(int)arg1 with:(id)arg2;$/;"	m	implementation:MyClass
-populateChildList:	Units/noext-tg-objc.d/input.nolang	/^{$/;"	m	implementation:FolderTree
+FileTree	input.nolang	/^@implementation FileTree$/;"	I	implementation:
+FolderTree	input.nolang	/^@implementation FolderTree$/;"	I	implementation:
+MyClass	input.nolang	/^@implementation MyClass$/;"	I	interface:
+addChild:	input.nolang	/^{$/;"	m	implementation:FolderTree
+createFileList:atPlace:	input.nolang	/^{$/;"	c	implementation:FolderTree
+createLayoutTree	input.nolang	/^{$/;"	m	implementation:FileTree
+createLayoutTree	input.nolang	/^{$/;"	m	implementation:FolderTree
+dealloc	input.nolang	/^{$/;"	m	implementation:FileTree
+dealloc	input.nolang	/^{$/;"	m	implementation:FolderTree
+getDiskSize	input.nolang	/^{$/;"	m	implementation:FileTree
+initWithName:andSize:atPlace:	input.nolang	/^{$/;"	m	implementation:FileTree
+initWithName:atPlace:	input.nolang	/^{$/;"	m	implementation:FileTree
+initWithName:atPlace:	input.nolang	/^{$/;"	m	implementation:FolderTree
+main	input.nolang	/^int main(int argc, char** argv)$/;"	f	interface:
+myClassMethod:with:	input.nolang	/^+ (void)myClassMethod:(int)arg1 with:(id)arg2;$/;"	c	implementation:MyClass
+myInstanceMethod:with:	input.nolang	/^- (void)myInstanceMethod:(int)arg1 with:(id)arg2;$/;"	m	implementation:MyClass
+populateChildList:	input.nolang	/^{$/;"	m	implementation:FolderTree

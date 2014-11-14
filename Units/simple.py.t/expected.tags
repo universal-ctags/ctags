@@ -1,26 +1,26 @@
-ALL	Units/simple.py.t/input.py	/^ALL = 0xff $/;"	v
-DATA	Units/simple.py.t/input.py	/^DATA = 0x08 # Used by dbtreedata$/;"	v
-INDENT	Units/simple.py.t/input.py	/^INDENT = 0x04$/;"	v
-KEY	Units/simple.py.t/input.py	/^KEY = 0x01$/;"	v
-TREEID	Units/simple.py.t/input.py	/^TREEID = 0x02$/;"	v
-VERSION	Units/simple.py.t/input.py	/^VERSION = '1.2.0'$/;"	v
-__init__	Units/simple.py.t/input.py	/^    def __init__(self, filename, pathsep='', treegap=64):$/;"	m	class:one
-__private_function__	Units/simple.py.t/input.py	/^    def __private_function__(self, key, data):$/;"	m	class:one	file:
-_test	Units/simple.py.t/input.py	/^def _test(test, code, outcome, exception):$/;"	f
-btopen	Units/simple.py.t/input.py	/^from bsddb import btopen$/;"	i
-deeply_nested	Units/simple.py.t/input.py	/^            class deeply_nested():$/;"	c	function:_test.ignored_function.more_nesting
-even_more	Units/simple.py.t/input.py	/^                def even_more():$/;"	m	class:_test.ignored_function.more_nesting.deeply_nested
-foo	Units/simple.py.t/input.py	/^foo($/;"	f
-ignored_function	Units/simple.py.t/input.py	/^    def ignored_function():$/;"	f	function:_test
-more_nesting	Units/simple.py.t/input.py	/^        def more_nesting():$/;"	f	function:_test.ignored_function
-one	Units/simple.py.t/input.py	/^class one:$/;"	c
-only	Units/simple.py.t/input.py	/^    def only(arg):$/;"	m	class:two
-public_function	Units/simple.py.t/input.py	/^    def public_function(self, key):$/;"	m	class:one
-so_is_this	Units/simple.py.t/input.py	/^    class so_is_this:$/;"	c	class:one
-this	Units/simple.py.t/input.py	/^                        @bleh def this also? good!$/;"	m	class:_test.ignored_function.more_nesting.deeply_nested.even_more.this
-this	Units/simple.py.t/input.py	/^                    @blah class this is seen???$/;"	c	function:_test.ignored_function.more_nesting.deeply_nested.even_more
-this_is_ignored	Units/simple.py.t/input.py	/^        class this_is_ignored:$/;"	c	function:one.public_function
-three	Units/simple.py.t/input.py	/^C):$/;"	c
-two	Units/simple.py.t/input.py	/^class two (one):$/;"	c
-x	Units/simple.py.t/input.py	/^    x = lambda x: x$/;"	m	class:one
-y	Units/simple.py.t/input.py	/^    y = 0$/;"	v	class:one
+ALL	input.py	/^ALL = 0xff $/;"	v
+DATA	input.py	/^DATA = 0x08 # Used by dbtreedata$/;"	v
+INDENT	input.py	/^INDENT = 0x04$/;"	v
+KEY	input.py	/^KEY = 0x01$/;"	v
+TREEID	input.py	/^TREEID = 0x02$/;"	v
+VERSION	input.py	/^VERSION = '1.2.0'$/;"	v
+__init__	input.py	/^    def __init__(self, filename, pathsep='', treegap=64):$/;"	m	class:one
+__private_function__	input.py	/^    def __private_function__(self, key, data):$/;"	m	class:one	file:
+_test	input.py	/^def _test(test, code, outcome, exception):$/;"	f
+btopen	input.py	/^from bsddb import btopen$/;"	i
+deeply_nested	input.py	/^            class deeply_nested():$/;"	c	function:_test.ignored_function.more_nesting
+even_more	input.py	/^                def even_more():$/;"	m	class:_test.ignored_function.more_nesting.deeply_nested
+foo	input.py	/^foo($/;"	f
+ignored_function	input.py	/^    def ignored_function():$/;"	f	function:_test
+more_nesting	input.py	/^        def more_nesting():$/;"	f	function:_test.ignored_function
+one	input.py	/^class one:$/;"	c
+only	input.py	/^    def only(arg):$/;"	m	class:two
+public_function	input.py	/^    def public_function(self, key):$/;"	m	class:one
+so_is_this	input.py	/^    class so_is_this:$/;"	c	class:one
+this	input.py	/^                        @bleh def this also? good!$/;"	m	class:_test.ignored_function.more_nesting.deeply_nested.even_more.this
+this	input.py	/^                    @blah class this is seen???$/;"	c	function:_test.ignored_function.more_nesting.deeply_nested.even_more
+this_is_ignored	input.py	/^        class this_is_ignored:$/;"	c	function:one.public_function
+three	input.py	/^C):$/;"	c
+two	input.py	/^class two (one):$/;"	c
+x	input.py	/^    x = lambda x: x$/;"	m	class:one
+y	input.py	/^    y = 0$/;"	v	class:one

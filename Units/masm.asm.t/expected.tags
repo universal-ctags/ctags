@@ -1,11 +1,11 @@
-BYTE_BUFFER	Units/masm.asm.t/input.asm	/^BYTE_BUFFER    LABEL     BYTE$/;"	l
-LabelMaker1	Units/masm.asm.t/input.asm	/^LabelMaker1:$/;"	l
-LabelMaker2	Units/masm.asm.t/input.asm	/^LabelMaker2:$/;"	l
-Msg	Units/masm.asm.t/input.asm	/^Msg	DB "Text string"$/;"	d
-QUACK	Units/masm.asm.t/input.asm	/^QUACK  PROC PUBLIC$/;"	l
-WORD_BUFFER	Units/masm.asm.t/input.asm	/^WORD_BUFFER    DW        512 dup (?)$/;"	d
-hllequal	Units/masm.asm.t/input.asm	/^hllequal := 4$/;"	d
-myequ	Units/masm.asm.t/input.asm	/^myequ	EQU    3$/;"	d
-myequal	Units/masm.asm.t/input.asm	/^myequal = 4$/;"	d
-mymacro	Units/masm.asm.t/input.asm	/^mymacro macro args$/;"	m
-mystruct	Units/masm.asm.t/input.asm	/^mystruct struct$/;"	t
+BYTE_BUFFER	input.asm	/^BYTE_BUFFER    LABEL     BYTE$/;"	l
+LabelMaker1	input.asm	/^LabelMaker1:$/;"	l
+LabelMaker2	input.asm	/^LabelMaker2:$/;"	l
+Msg	input.asm	/^Msg	DB "Text string"$/;"	d
+QUACK	input.asm	/^QUACK  PROC PUBLIC$/;"	l
+WORD_BUFFER	input.asm	/^WORD_BUFFER    DW        512 dup (?)$/;"	d
+hllequal	input.asm	/^hllequal := 4$/;"	d
+myequ	input.asm	/^myequ	EQU    3$/;"	d
+myequal	input.asm	/^myequal = 4$/;"	d
+mymacro	input.asm	/^mymacro macro args$/;"	m
+mystruct	input.asm	/^mystruct struct$/;"	t

@@ -1,5 +1,5 @@
-onInit	Units/ui5.controller.js.t/input.js	/^    onInit : function () {$/;"	m	class:app.my_form
-refreshForm	Units/ui5.controller.js.t/input.js	/^    refreshForm : function (AUFNR) {$/;"	m	class:sap.app.my_form
-refreshSettlements	Units/ui5.controller.js.t/input.js	/^    refreshSettlements : function (AUFNR) {$/;"	m	class:app.my_form
-setRefreshed	Units/ui5.controller.js.t/input.js	/^    setRefreshed : function (value) {$/;"	m	class:app.my_form
-successfulRequest	Units/ui5.controller.js.t/input.js	/^    successfulRequest: function(data) {$/;"	m	class:app.my_form
+onInit	input.js	/^    onInit : function () {$/;"	m	class:app.my_form
+refreshForm	input.js	/^    refreshForm : function (AUFNR) {$/;"	m	class:sap.app.my_form
+refreshSettlements	input.js	/^    refreshSettlements : function (AUFNR) {$/;"	m	class:app.my_form
+setRefreshed	input.js	/^    setRefreshed : function (value) {$/;"	m	class:app.my_form
+successfulRequest	input.js	/^    successfulRequest: function(data) {$/;"	m	class:app.my_form

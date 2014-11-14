@@ -1,1 +1,1 @@
-test	Units/bug1201689.c.t/input.c	/^void test(a, ...)$/;"	f
+test	input.c	/^void test(a, ...)$/;"	f

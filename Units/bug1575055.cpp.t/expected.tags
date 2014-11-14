@@ -1,3 +1,3 @@
-MyClass	Units/bug1575055.cpp.t/input.cpp	/^	class MyClass { };$/;"	c	namespace:TheNamespace	file:
-TheNamespace	Units/bug1575055.cpp.t/input.cpp	/^namespace TheNamespace {$/;"	n	file:
-variable	Units/bug1575055.cpp.t/input.cpp	/^	int variable;$/;"	m	namespace:TheNamespace	file:
+MyClass	input.cpp	/^	class MyClass { };$/;"	c	namespace:TheNamespace	file:
+TheNamespace	input.cpp	/^namespace TheNamespace {$/;"	n	file:
+variable	input.cpp	/^	int variable;$/;"	m	namespace:TheNamespace	file:

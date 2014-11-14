@@ -1,1 +1,1 @@
-test	Units/bug842077.pl.t/input.pl	/^sub test {$/;"	s
+test	input.pl	/^sub test {$/;"	s

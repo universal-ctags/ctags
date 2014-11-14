@@ -1,4 +1,4 @@
-Circle	Units/rust-simple.d/input.rs	/^impl Circle {$/;"	i
-Circle	Units/rust-simple.d/input.rs	/^struct Circle {$/;"	s
-area	Units/rust-simple.d/input.rs	/^    fn area(&self) -> f64 {$/;"	f
-main	Units/rust-simple.d/input.rs	/^fn main() {$/;"	f
+Circle	input.rs	/^impl Circle {$/;"	i
+Circle	input.rs	/^struct Circle {$/;"	s
+area	input.rs	/^    fn area(&self) -> f64 {$/;"	f
+main	input.rs	/^fn main() {$/;"	f

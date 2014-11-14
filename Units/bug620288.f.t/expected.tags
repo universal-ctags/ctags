@@ -1,2 +1,2 @@
-bar	Units/bug620288.f.t/input.f	/^	double precision function bar(/;"	f
-foo	Units/bug620288.f.t/input.f	/^	integer function foo(/;"	f
+bar	input.f	/^	double precision function bar(/;"	f
+foo	input.f	/^	integer function foo(/;"	f

@@ -1,1 +1,1 @@
-f	Units/bug1020715.cpp.t/input.cpp	/^void f() {$/;"	f
+f	input.cpp	/^void f() {$/;"	f

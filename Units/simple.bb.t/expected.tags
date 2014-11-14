@@ -1,6 +1,6 @@
-a	Units/simple.bb.t/input.bb	/^Global a$/;"	v
-b	Units/simple.bb.t/input.bb	/^Dim b(100)$/;"	v
-f	Units/simple.bb.t/input.bb	/^Function f()$/;"	f
-one#	Units/simple.bb.t/input.bb	/^Const one# = 1.0$/;"	c
-start	Units/simple.bb.t/input.bb	/^.start$/;"	l
-test	Units/simple.bb.t/input.bb	/^Type test$/;"	t
+a	input.bb	/^Global a$/;"	v
+b	input.bb	/^Dim b(100)$/;"	v
+f	input.bb	/^Function f()$/;"	f
+one#	input.bb	/^Const one# = 1.0$/;"	c
+start	input.bb	/^.start$/;"	l
+test	input.bb	/^Type test$/;"	t

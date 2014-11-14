@@ -1,4 +1,4 @@
-FUNCTION_LIKE	Units/macros.c.t/input.c	2;"	d	file:
-VARIABLE_LIKE	Units/macros.c.t/input.c	1;"	d	file:
-WeakSymbol	Units/macros.c.t/input.c	3;"	d	file:
-foo	Units/macros.c.t/input.c	/^MACRO(foo);$/;"	v
+FUNCTION_LIKE	input.c	2;"	d	file:
+VARIABLE_LIKE	input.c	1;"	d	file:
+WeakSymbol	input.c	3;"	d	file:
+foo	input.c	/^MACRO(foo);$/;"	v

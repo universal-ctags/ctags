@@ -1,4 +1,4 @@
-A	Units/php-php5_5_class_kw.d/input.php	/^class A {$/;"	c
-B	Units/php-php5_5_class_kw.d/input.php	/^class B {$/;"	c
-C	Units/php-php5_5_class_kw.d/input.php	/^class C {$/;"	c
-__construct	Units/php-php5_5_class_kw.d/input.php	/^  public function __construct () {$/;"	f	class:B
+A	input.php	/^class A {$/;"	c
+B	input.php	/^class B {$/;"	c
+C	input.php	/^class C {$/;"	c
+__construct	input.php	/^  public function __construct () {$/;"	f	class:B

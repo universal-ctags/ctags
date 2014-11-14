@@ -1,10 +1,10 @@
-MXDDI	Units/char-selector.f90.t/input.f90	/^      INTEGER(4), PRIVATE, PARAMETER :: MXDDI=/;"	v	module:OUT_RD5
-OUT_RD5	Units/char-selector.f90.t/input.f90	/^      MODULE OUT_RD5$/;"	m
-fpshape	Units/char-selector.f90.t/input.f90	/^      CHARACTER(1024) :: fpshape$/;"	v	module:OUT_RD5
-fpshape2	Units/char-selector.f90.t/input.f90	/^      CHARACTER*(1024) :: fpshape2$/;"	v	module:OUT_RD5
-last	Units/char-selector.f90.t/input.f90	/^      INTEGER(4), PRIVATE :: last$/;"	v	module:OUT_RD5
-list	Units/char-selector.f90.t/input.f90	/^      INTEGER(4), PRIVATE, DIMENSION (MXDDI+1) :: list$/;"	v	module:OUT_RD5
-nout	Units/char-selector.f90.t/input.f90	/^      INTEGER(4), PRIVATE :: nout$/;"	v	module:OUT_RD5
-temp	Units/char-selector.f90.t/input.f90	/^      CHARACTER*(MXPATHLNGTH) temp$/;"	v	module:OUT_RD5
-titles	Units/char-selector.f90.t/input.f90	/^      CHARACTER*40 titles(/;"	v	module:OUT_RD5
-units	Units/char-selector.f90.t/input.f90	/^      CHARACTER*12 units(/;"	v	module:OUT_RD5
+MXDDI	input.f90	/^      INTEGER(4), PRIVATE, PARAMETER :: MXDDI=/;"	v	module:OUT_RD5
+OUT_RD5	input.f90	/^      MODULE OUT_RD5$/;"	m
+fpshape	input.f90	/^      CHARACTER(1024) :: fpshape$/;"	v	module:OUT_RD5
+fpshape2	input.f90	/^      CHARACTER*(1024) :: fpshape2$/;"	v	module:OUT_RD5
+last	input.f90	/^      INTEGER(4), PRIVATE :: last$/;"	v	module:OUT_RD5
+list	input.f90	/^      INTEGER(4), PRIVATE, DIMENSION (MXDDI+1) :: list$/;"	v	module:OUT_RD5
+nout	input.f90	/^      INTEGER(4), PRIVATE :: nout$/;"	v	module:OUT_RD5
+temp	input.f90	/^      CHARACTER*(MXPATHLNGTH) temp$/;"	v	module:OUT_RD5
+titles	input.f90	/^      CHARACTER*40 titles(/;"	v	module:OUT_RD5
+units	input.f90	/^      CHARACTER*12 units(/;"	v	module:OUT_RD5

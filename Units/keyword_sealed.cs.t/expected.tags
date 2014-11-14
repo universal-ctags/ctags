@@ -1,5 +1,5 @@
-Main	Units/keyword_sealed.cs.t/input.cs	/^   public static void Main() $/;"	m	class:MainClass
-MainClass	Units/keyword_sealed.cs.t/input.cs	/^class MainClass $/;"	c
-MyClass	Units/keyword_sealed.cs.t/input.cs	/^sealed class MyClass $/;"	c
-x	Units/keyword_sealed.cs.t/input.cs	/^   public int x; $/;"	f	class:MyClass
-y	Units/keyword_sealed.cs.t/input.cs	/^   public int y;$/;"	f	class:MyClass
+Main	input.cs	/^   public static void Main() $/;"	m	class:MainClass
+MainClass	input.cs	/^class MainClass $/;"	c
+MyClass	input.cs	/^sealed class MyClass $/;"	c
+x	input.cs	/^   public int x; $/;"	f	class:MyClass
+y	input.cs	/^   public int y;$/;"	f	class:MyClass

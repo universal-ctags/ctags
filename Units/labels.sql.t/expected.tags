@@ -1,2 +1,2 @@
-my_label	Units/labels.sql.t/input.sql	/^    <<my_label>>$/;"	L	procedure:outer_procedure
-outer_procedure	Units/labels.sql.t/input.sql	/^PROCEDURE outer_procedure IS$/;"	p
+my_label	input.sql	/^    <<my_label>>$/;"	L	procedure:outer_procedure
+outer_procedure	input.sql	/^PROCEDURE outer_procedure IS$/;"	p

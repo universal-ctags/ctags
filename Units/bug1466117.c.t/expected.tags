@@ -1,6 +1,6 @@
-a	Units/bug1466117.c.t/input.c	/^	int a;$/;"	m	struct:__anon1	file:
-a	Units/bug1466117.c.t/input.c	/^	int a;$/;"	m	struct:mystruct	file:
-b	Units/bug1466117.c.t/input.c	/^	int b;$/;"	m	struct:__anon1	file:
-b	Units/bug1466117.c.t/input.c	/^	int b;$/;"	m	struct:mystruct	file:
-mystruct	Units/bug1466117.c.t/input.c	/^typedef struct mystruct {$/;"	s	file:
-mystruct	Units/bug1466117.c.t/input.c	/^} mystruct;$/;"	t	typeref:struct:__anon1	file:
+a	input.c	/^	int a;$/;"	m	struct:__anon1	file:
+a	input.c	/^	int a;$/;"	m	struct:mystruct	file:
+b	input.c	/^	int b;$/;"	m	struct:__anon1	file:
+b	input.c	/^	int b;$/;"	m	struct:mystruct	file:
+mystruct	input.c	/^typedef struct mystruct {$/;"	s	file:
+mystruct	input.c	/^} mystruct;$/;"	t	typeref:struct:__anon1	file:
