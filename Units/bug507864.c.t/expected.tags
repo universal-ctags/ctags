@@ -1,2 +1,2 @@
-ENTSEQNO	Units/bug507864.c.t/input.c	/^FUNCSTS func1(ENTSEQNO(seq)) {}$/;"	f
-MEMTXT	Units/bug507864.c.t/input.c	/^FUNCSTS func2 (MEMTXT(form_msg), MEMTXT (text), MEMTXT (mail)) {}$/;"	f
+ENTSEQNO	input.c	/^FUNCSTS func1(ENTSEQNO(seq)) {}$/;"	f
+MEMTXT	input.c	/^FUNCSTS func2 (MEMTXT(form_msg), MEMTXT (text), MEMTXT (mail)) {}$/;"	f

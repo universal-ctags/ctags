@@ -1,8 +1,8 @@
-A	Units/php-traits.d/input.php	/^class A {$/;"	c
-B	Units/php-traits.d/input.php	/^class B {$/;"	c
-__construct	Units/php-traits.d/input.php	/^	public function __construct($p) {$/;"	f	class:B	access:public	signature:($p)
-__construct	Units/php-traits.d/input.php	/^	public function __construct() {$/;"	f	class:A	access:public	signature:()
-stuff	Units/php-traits.d/input.php	/^	protected function stuff($arg1, $arg2) {$/;"	f	trait:tBar	access:protected	signature:($arg1, $arg2)
-stuff	Units/php-traits.d/input.php	/^	public function stuff() {$/;"	f	trait:tFoo	access:public	signature:()
-tBar	Units/php-traits.d/input.php	/^trait tBar {$/;"	t
-tFoo	Units/php-traits.d/input.php	/^trait tFoo {$/;"	t
+A	input.php	/^class A {$/;"	c
+B	input.php	/^class B {$/;"	c
+__construct	input.php	/^	public function __construct($p) {$/;"	f	class:B	access:public	signature:($p)
+__construct	input.php	/^	public function __construct() {$/;"	f	class:A	access:public	signature:()
+stuff	input.php	/^	protected function stuff($arg1, $arg2) {$/;"	f	trait:tBar	access:protected	signature:($arg1, $arg2)
+stuff	input.php	/^	public function stuff() {$/;"	f	trait:tFoo	access:public	signature:()
+tBar	input.php	/^trait tBar {$/;"	t
+tFoo	input.php	/^trait tFoo {$/;"	t

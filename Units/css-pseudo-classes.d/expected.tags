@@ -1,11 +1,11 @@
-a:lang(en):after	Units/css-pseudo-classes.d/input.css	/^a:lang(en):after { content: "[en]" }$/;"	s
-body :not(span)	Units/css-pseudo-classes.d/input.css	/^body :not(span) { color: green; }$/;"	s
-span:not(:first-child)	Units/css-pseudo-classes.d/input.css	/^span:not(:first-child) { color: red; }$/;"	s
-span:nth-child(-n+3)	Units/css-pseudo-classes.d/input.css	/^span:nth-child(-n+3) { color: lime; }$/;"	s
-span:nth-child(0n+1)	Units/css-pseudo-classes.d/input.css	/^span:nth-child(0n+1) { color: lime; }$/;"	s
-span:nth-child(1)	Units/css-pseudo-classes.d/input.css	/^span:nth-child(1) { color: lime; }$/;"	s
-tr:nth-child(10n+0)	Units/css-pseudo-classes.d/input.css	/^tr:nth-child(10n+0) { background-color: gray }$/;"	s
-tr:nth-child(2n)	Units/css-pseudo-classes.d/input.css	/^tr:nth-child(2n) { background-color: light-gray }$/;"	s
-tr:nth-child(2n+1)	Units/css-pseudo-classes.d/input.css	/^tr:nth-child(2n+1) { background-color: light-gray }$/;"	s
-tr:nth-child(even)	Units/css-pseudo-classes.d/input.css	/^tr:nth-child(even) { background-color: light-gray }$/;"	s
-tr:nth-child(odd)	Units/css-pseudo-classes.d/input.css	/^tr:nth-child(odd) { background-color: light-gray }$/;"	s
+a:lang(en):after	input.css	/^a:lang(en):after { content: "[en]" }$/;"	s
+body :not(span)	input.css	/^body :not(span) { color: green; }$/;"	s
+span:not(:first-child)	input.css	/^span:not(:first-child) { color: red; }$/;"	s
+span:nth-child(-n+3)	input.css	/^span:nth-child(-n+3) { color: lime; }$/;"	s
+span:nth-child(0n+1)	input.css	/^span:nth-child(0n+1) { color: lime; }$/;"	s
+span:nth-child(1)	input.css	/^span:nth-child(1) { color: lime; }$/;"	s
+tr:nth-child(10n+0)	input.css	/^tr:nth-child(10n+0) { background-color: gray }$/;"	s
+tr:nth-child(2n)	input.css	/^tr:nth-child(2n) { background-color: light-gray }$/;"	s
+tr:nth-child(2n+1)	input.css	/^tr:nth-child(2n+1) { background-color: light-gray }$/;"	s
+tr:nth-child(even)	input.css	/^tr:nth-child(even) { background-color: light-gray }$/;"	s
+tr:nth-child(odd)	input.css	/^tr:nth-child(odd) { background-color: light-gray }$/;"	s

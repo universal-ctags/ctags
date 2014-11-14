@@ -1,2 +1,2 @@
-AL	Units/perl-autoloader.d/input.pm	/^package AL;$/;"	p
-xyz	Units/perl-autoloader.d/input.pm	/^sub xyz {$/;"	s
+AL	input.pm	/^package AL;$/;"	p
+xyz	input.pm	/^sub xyz {$/;"	s

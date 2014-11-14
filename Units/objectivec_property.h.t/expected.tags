@@ -1,2 +1,2 @@
-personAge	Units/objectivec_property.h.t/input.h	/^@property(readonly) int personAge;$/;"	v
-personName	Units/objectivec_property.h.t/input.h	/^@property(copy) NSString *personName;$/;"	v
+personAge	input.h	/^@property(readonly) int personAge;$/;"	v
+personName	input.h	/^@property(copy) NSString *personName;$/;"	v

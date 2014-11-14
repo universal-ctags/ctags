@@ -1,3 +1,3 @@
-MyClass	Units/objc.m.t/input.m	/^@implementation MyClass$/;"	I	interface:
-myClassMethod:with:	Units/objc.m.t/input.m	/^+ (void)myClassMethod:(int)arg1 with:(id)arg2;$/;"	c	implementation:MyClass
-myInstanceMethod:with:	Units/objc.m.t/input.m	/^- (void)myInstanceMethod:(int)arg1 with:(id)arg2;$/;"	m	implementation:MyClass
+MyClass	input.m	/^@implementation MyClass$/;"	I	interface:
+myClassMethod:with:	input.m	/^+ (void)myClassMethod:(int)arg1 with:(id)arg2;$/;"	c	implementation:MyClass
+myInstanceMethod:with:	input.m	/^- (void)myInstanceMethod:(int)arg1 with:(id)arg2;$/;"	m	implementation:MyClass

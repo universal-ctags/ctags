@@ -1,1 +1,1 @@
-main	Units/nolang-modeline-vim1.d/input.nolang	/^main(void)$/;"	f
+main	input.nolang	/^main(void)$/;"	f

@@ -1,1 +1,1 @@
-main	Units/option-add-alias.d/input.nolang	/^def main (args):$/;"	f
+main	input.nolang	/^def main (args):$/;"	f

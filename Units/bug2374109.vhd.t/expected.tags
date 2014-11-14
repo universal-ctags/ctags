@@ -1,1 +1,1 @@
-Pow2	Units/bug2374109.vhd.t/input.vhd	/^function Pow2( N, Exp : integer )  return mylib.myinteger is$/;"	f
+Pow2	input.vhd	/^function Pow2( N, Exp : integer )  return mylib.myinteger is$/;"	f

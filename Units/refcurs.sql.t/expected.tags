@@ -1,7 +1,7 @@
-cursortyp	Units/refcurs.sql.t/input.sql	/^   TYPE cursortyp is REF CURSOR;   -- use weak form$/;"	c	package:types
-get_cursor_ref	Units/refcurs.sql.t/input.sql	/^  FUNCTION get_cursor_ref(typ NUMBER) RETURN types.cursortyp IS$/;"	f	package:test_ref_cursor
-main	Units/refcurs.sql.t/input.sql	/^  PROCEDURE main IS$/;"	p	package:test_ref_cursor
-process_cursor	Units/refcurs.sql.t/input.sql	/^  PROCEDURE process_cursor(cur types.cursortyp) IS$/;"	p	package:test_ref_cursor
-test_ref_cursor	Units/refcurs.sql.t/input.sql	/^CREATE OR REPLACE PACKAGE BODY test_ref_cursor AS$/;"	P
-test_ref_cursor	Units/refcurs.sql.t/input.sql	/^CREATE OR REPLACE PACKAGE test_ref_cursor AS$/;"	P
-types	Units/refcurs.sql.t/input.sql	/^CREATE OR REPLACE PACKAGE types AS$/;"	P
+cursortyp	input.sql	/^   TYPE cursortyp is REF CURSOR;   -- use weak form$/;"	c	package:types
+get_cursor_ref	input.sql	/^  FUNCTION get_cursor_ref(typ NUMBER) RETURN types.cursortyp IS$/;"	f	package:test_ref_cursor
+main	input.sql	/^  PROCEDURE main IS$/;"	p	package:test_ref_cursor
+process_cursor	input.sql	/^  PROCEDURE process_cursor(cur types.cursortyp) IS$/;"	p	package:test_ref_cursor
+test_ref_cursor	input.sql	/^CREATE OR REPLACE PACKAGE BODY test_ref_cursor AS$/;"	P
+test_ref_cursor	input.sql	/^CREATE OR REPLACE PACKAGE test_ref_cursor AS$/;"	P
+types	input.sql	/^CREATE OR REPLACE PACKAGE types AS$/;"	P

@@ -1,4 +1,4 @@
-ENUM_1	Units/enum.c.t/input.c	/^    ENUM_1 = 1,$/;"	e	enum:test_enumeration	file:
-ENUM_2	Units/enum.c.t/input.c	/^    ENUM_2,$/;"	e	enum:test_enumeration	file:
-ENUM_3	Units/enum.c.t/input.c	/^    ENUM_3$/;"	e	enum:test_enumeration	file:
-test_enumeration	Units/enum.c.t/input.c	/^enum test_enumeration {$/;"	g	file:
+ENUM_1	input.c	/^    ENUM_1 = 1,$/;"	e	enum:test_enumeration	file:
+ENUM_2	input.c	/^    ENUM_2,$/;"	e	enum:test_enumeration	file:
+ENUM_3	input.c	/^    ENUM_3$/;"	e	enum:test_enumeration	file:
+test_enumeration	input.c	/^enum test_enumeration {$/;"	g	file:

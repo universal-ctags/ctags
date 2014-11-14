@@ -1,2 +1,2 @@
-Input	Units/ocamlCommentInStringAllowed.ml.t/input.ml	1;"	M
-p	Units/ocamlCommentInStringAllowed.ml.t/input.ml	/^let p = print_endline$/;"	v
+Input	input.ml	1;"	M
+p	input.ml	/^let p = print_endline$/;"	v

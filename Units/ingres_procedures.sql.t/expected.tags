@@ -1,6 +1,6 @@
-db0001	Units/ingres_procedures.sql.t/input.sql	/^CREATE PROCEDURE db0001 (short_name varchar(12) not null)  $/;"	p
-db0002	Units/ingres_procedures.sql.t/input.sql	/^PROCEDURE db0002 (short_name varchar(12) not null)  =$/;"	p
-db0003	Units/ingres_procedures.sql.t/input.sql	/^PROCEDURE db0003 (short_name varchar(12) not null)  $/;"	p
-err	Units/ingres_procedures.sql.t/input.sql	/^err = varchar(80) not null not default; $/;"	v
-n	Units/ingres_procedures.sql.t/input.sql	/^n = i4 not null; $/;"	v
-x	Units/ingres_procedures.sql.t/input.sql	/^x = varchar(12) not null; $/;"	v
+db0001	input.sql	/^CREATE PROCEDURE db0001 (short_name varchar(12) not null)  $/;"	p
+db0002	input.sql	/^PROCEDURE db0002 (short_name varchar(12) not null)  =$/;"	p
+db0003	input.sql	/^PROCEDURE db0003 (short_name varchar(12) not null)  $/;"	p
+err	input.sql	/^err = varchar(80) not null not default; $/;"	v
+n	input.sql	/^n = i4 not null; $/;"	v
+x	input.sql	/^x = varchar(12) not null; $/;"	v

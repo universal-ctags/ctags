@@ -1,2 +1,2 @@
-Foo	Units/bug1447756.java.t/input.java	/^	      public interface Foo<T> {$/;"	i
-bar	Units/bug1447756.java.t/input.java	/^		      public T bar();$/;"	m	interface:Foo
+Foo	input.java	/^	      public interface Foo<T> {$/;"	i
+bar	input.java	/^		      public T bar();$/;"	m	interface:Foo

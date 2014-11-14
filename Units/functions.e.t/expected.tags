@@ -1,8 +1,8 @@
-+	Units/functions.e.t/input.e	/^	prefix "+": like Current is$/;"	f	class:FUNCTIONS
-<	Units/functions.e.t/input.e	/^	infix "<" (other: like Current): BOOLEAN is$/;"	f	class:FUNCTIONS
-FUNCTIONS	Units/functions.e.t/input.e	/^deferred class FUNCTIONS$/;"	c
-function0	Units/functions.e.t/input.e	/^	function0: INTEGER is$/;"	f	class:FUNCTIONS
-function1	Units/functions.e.t/input.e	/^	function1 (one: STRING) is$/;"	f	class:FUNCTIONS
-function2	Units/functions.e.t/input.e	/^	function2 (one: INTEGER; two: STRING): INTEGER is$/;"	f	class:FUNCTIONS
-function_anchored	Units/functions.e.t/input.e	/^	function_anchored: like function0 is$/;"	f	class:FUNCTIONS
-function_full	Units/functions.e.t/input.e	/^	function_full (one: STRING) is$/;"	f	class:FUNCTIONS
++	input.e	/^	prefix "+": like Current is$/;"	f	class:FUNCTIONS
+<	input.e	/^	infix "<" (other: like Current): BOOLEAN is$/;"	f	class:FUNCTIONS
+FUNCTIONS	input.e	/^deferred class FUNCTIONS$/;"	c
+function0	input.e	/^	function0: INTEGER is$/;"	f	class:FUNCTIONS
+function1	input.e	/^	function1 (one: STRING) is$/;"	f	class:FUNCTIONS
+function2	input.e	/^	function2 (one: INTEGER; two: STRING): INTEGER is$/;"	f	class:FUNCTIONS
+function_anchored	input.e	/^	function_anchored: like function0 is$/;"	f	class:FUNCTIONS
+function_full	input.e	/^	function_full (one: STRING) is$/;"	f	class:FUNCTIONS

@@ -1,6 +1,6 @@
-ANOTHER_MACRO	Units/objectivec_interface.h.t/input.h	21;"	d
-A_MACRO_TEST	Units/objectivec_interface.h.t/input.h	15;"	d
-SampleTypedefObjC	Units/objectivec_interface.h.t/input.h	/^typedef something SampleTypedefObjC;$/;"	t
-aStruct	Units/objectivec_interface.h.t/input.h	/^struct aStruct$/;"	s
-aStructMember	Units/objectivec_interface.h.t/input.h	/^    int aStructMember;$/;"	m	struct:aStruct
-anotherStructMember	Units/objectivec_interface.h.t/input.h	/^    char *anotherStructMember[ NOT_IN_TAG ];$/;"	m	struct:aStruct
+ANOTHER_MACRO	input.h	21;"	d
+A_MACRO_TEST	input.h	15;"	d
+SampleTypedefObjC	input.h	/^typedef something SampleTypedefObjC;$/;"	t
+aStruct	input.h	/^struct aStruct$/;"	s
+aStructMember	input.h	/^    int aStructMember;$/;"	m	struct:aStruct
+anotherStructMember	input.h	/^    char *anotherStructMember[ NOT_IN_TAG ];$/;"	m	struct:aStruct

@@ -1,1 +1,1 @@
-foo	Units/bug722501.sql.t/input.sql	/^CREATE OR REPLACE PROCEDURE foo$/;"	p
+foo	input.sql	/^CREATE OR REPLACE PROCEDURE foo$/;"	p

@@ -1,3 +1,3 @@
-objLiteralMethod	Units/1850914.js.t/input.js	/^objLiteralMethod : function(){}$/;"	m	class:objectLiteral
-objLiteralProperty	Units/1850914.js.t/input.js	/^objLiteralProperty : 1,$/;"	p	class:objectLiteral
-objectLiteral	Units/1850914.js.t/input.js	/^var objectLiteral = {$/;"	c
+objLiteralMethod	input.js	/^objLiteralMethod : function(){}$/;"	m	class:objectLiteral
+objLiteralProperty	input.js	/^objLiteralProperty : 1,$/;"	p	class:objectLiteral
+objectLiteral	input.js	/^var objectLiteral = {$/;"	c

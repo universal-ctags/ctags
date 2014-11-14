@@ -1,8 +1,8 @@
-GUESTA	Units/bug961001.v.t/input.v	/^`define GUESTA 1$/;"	c
-GUESTB	Units/bug961001.v.t/input.v	/^`define GUESTB 2$/;"	c
-GUESTC	Units/bug961001.v.t/input.v	/^`define GUESTC 3$/;"	c
-GUESTD	Units/bug961001.v.t/input.v	/^`define GUESTD 4$/;"	c
-HOSTA	Units/bug961001.v.t/input.v	/^`define HOSTA$/;"	c
-HOSTB	Units/bug961001.v.t/input.v	/^`define HOSTB$/;"	c
-HOSTC	Units/bug961001.v.t/input.v	/^`define HOSTC$/;"	c
-HOSTD	Units/bug961001.v.t/input.v	/^`define HOSTD$/;"	c
+GUESTA	input.v	/^`define GUESTA 1$/;"	c
+GUESTB	input.v	/^`define GUESTB 2$/;"	c
+GUESTC	input.v	/^`define GUESTC 3$/;"	c
+GUESTD	input.v	/^`define GUESTD 4$/;"	c
+HOSTA	input.v	/^`define HOSTA$/;"	c
+HOSTB	input.v	/^`define HOSTB$/;"	c
+HOSTC	input.v	/^`define HOSTC$/;"	c
+HOSTD	input.v	/^`define HOSTD$/;"	c

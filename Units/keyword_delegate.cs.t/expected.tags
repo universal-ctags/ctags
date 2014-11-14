@@ -1,11 +1,11 @@
-DelegateFunction	Units/keyword_delegate.cs.t/input.cs	/^   public static void DelegateFunction(int i)$/;"	m	class:Program
-InstanceMethod	Units/keyword_delegate.cs.t/input.cs	/^   public void InstanceMethod() $/;"	m	class:MyClass
-Main	Units/keyword_delegate.cs.t/input.cs	/^   public static void Main()$/;"	m	class:Program
-Main	Units/keyword_delegate.cs.t/input.cs	/^   static public void Main() $/;"	m	class:MainClass
-MainClass	Units/keyword_delegate.cs.t/input.cs	/^public class MainClass $/;"	c
-MyClass	Units/keyword_delegate.cs.t/input.cs	/^public class MyClass $/;"	c
-MyDelegate	Units/keyword_delegate.cs.t/input.cs	/^delegate void MyDelegate();$/;"	m
-MyDelegate	Units/keyword_delegate.cs.t/input.cs	/^delegate void MyDelegate(int i);$/;"	m
-Program	Units/keyword_delegate.cs.t/input.cs	/^class Program$/;"	c
-StaticMethod	Units/keyword_delegate.cs.t/input.cs	/^   static public void StaticMethod() $/;"	m	class:MyClass
-TakesADelegate	Units/keyword_delegate.cs.t/input.cs	/^   public static void TakesADelegate(MyDelegate SomeFunction)$/;"	m	class:Program
+DelegateFunction	input.cs	/^   public static void DelegateFunction(int i)$/;"	m	class:Program
+InstanceMethod	input.cs	/^   public void InstanceMethod() $/;"	m	class:MyClass
+Main	input.cs	/^   public static void Main()$/;"	m	class:Program
+Main	input.cs	/^   static public void Main() $/;"	m	class:MainClass
+MainClass	input.cs	/^public class MainClass $/;"	c
+MyClass	input.cs	/^public class MyClass $/;"	c
+MyDelegate	input.cs	/^delegate void MyDelegate();$/;"	m
+MyDelegate	input.cs	/^delegate void MyDelegate(int i);$/;"	m
+Program	input.cs	/^class Program$/;"	c
+StaticMethod	input.cs	/^   static public void StaticMethod() $/;"	m	class:MyClass
+TakesADelegate	input.cs	/^   public static void TakesADelegate(MyDelegate SomeFunction)$/;"	m	class:Program

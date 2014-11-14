@@ -1,18 +1,18 @@
-Common Greek letters	Units/intro_orig.tex.t/input.tex	/^\\subsection{Common Greek letters}$/;"	u	section:Special Symbols
-Equations	Units/intro_orig.tex.t/input.tex	/^\\section{Equations}$/;"	s
-Figures	Units/intro_orig.tex.t/input.tex	/^\\section{Figures}$/;"	s
-Introduction	Units/intro_orig.tex.t/input.tex	/^\\section{Introduction}$/;"	s
-Lists	Units/intro_orig.tex.t/input.tex	/^\\section{Lists}$/;"	s
-Literal text	Units/intro_orig.tex.t/input.tex	/^\\section{Literal text}$/;"	s
-Special Symbols	Units/intro_orig.tex.t/input.tex	/^\\section{Special Symbols}$/;"	s
-Special symbols	Units/intro_orig.tex.t/input.tex	/^\\subsection{Special symbols}$/;"	u	section:Special Symbols
-Tables	Units/intro_orig.tex.t/input.tex	/^\\section{Tables}$/;"	s
-color  red	Units/intro_orig.tex.t/input.tex	/^\\section{\\color{red}Use of Color}$/;"	s
-eq:fine	Units/intro_orig.tex.t/input.tex	/^I = \\! \\int_{-\\infty}^\\infty f(x)\\,dx \\label{eq:fine}.$/;"	l
-eq:ising	Units/intro_orig.tex.t/input.tex	/^\\label{eq:ising}$/;"	l
-eq:mdiv	Units/intro_orig.tex.t/input.tex	/^\\label{eq:mdiv}$/;"	l
-fig:lj	Units/intro_orig.tex.t/input.tex	/^\\caption{\\label{fig:lj}Plot of the$/;"	l
-fig:qm  complexfunctions	Units/intro_orig.tex.t/input.tex	/^\\caption{\\label{fig:qm\/complexfunctions} Two representations of complex$/;"	l
-fig:typical	Units/intro_orig.tex.t/input.tex	/^\\caption{\\label{fig:typical}Show me a sine.}$/;"	l
-label  morefig	Units/intro_orig.tex.t/input.tex	/^\\section{\\label{morefig}Subfigures}$/;"	s
-tab:5  tc	Units/intro_orig.tex.t/input.tex	/^\\caption{\\label{tab:5\/tc}Comparison of the mean-field predictions$/;"	l
+Common Greek letters	input.tex	/^\\subsection{Common Greek letters}$/;"	u	section:Special Symbols
+Equations	input.tex	/^\\section{Equations}$/;"	s
+Figures	input.tex	/^\\section{Figures}$/;"	s
+Introduction	input.tex	/^\\section{Introduction}$/;"	s
+Lists	input.tex	/^\\section{Lists}$/;"	s
+Literal text	input.tex	/^\\section{Literal text}$/;"	s
+Special Symbols	input.tex	/^\\section{Special Symbols}$/;"	s
+Special symbols	input.tex	/^\\subsection{Special symbols}$/;"	u	section:Special Symbols
+Tables	input.tex	/^\\section{Tables}$/;"	s
+color  red	input.tex	/^\\section{\\color{red}Use of Color}$/;"	s
+eq:fine	input.tex	/^I = \\! \\int_{-\\infty}^\\infty f(x)\\,dx \\label{eq:fine}.$/;"	l
+eq:ising	input.tex	/^\\label{eq:ising}$/;"	l
+eq:mdiv	input.tex	/^\\label{eq:mdiv}$/;"	l
+fig:lj	input.tex	/^\\caption{\\label{fig:lj}Plot of the$/;"	l
+fig:qm  complexfunctions	input.tex	/^\\caption{\\label{fig:qm\/complexfunctions} Two representations of complex$/;"	l
+fig:typical	input.tex	/^\\caption{\\label{fig:typical}Show me a sine.}$/;"	l
+label  morefig	input.tex	/^\\section{\\label{morefig}Subfigures}$/;"	s
+tab:5  tc	input.tex	/^\\caption{\\label{tab:5\/tc}Comparison of the mean-field predictions$/;"	l

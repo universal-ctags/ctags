@@ -1,6 +1,6 @@
-df_mb_data	Units/array-spec.f90.t/input.f90	/^       df_mb_data(/;"	k	type:df_type
-df_mb_time	Units/array-spec.f90.t/input.f90	/^       df_mb_time(/;"	k	type:df_type
-df_type	Units/array-spec.f90.t/input.f90	/^      TYPE df_type$/;"	t	module:inm_df
-df_wb_data	Units/array-spec.f90.t/input.f90	/^       df_mb_data(:,:),  df_wb_data(/;"	k	type:df_type
-df_wb_time	Units/array-spec.f90.t/input.f90	/^       df_mb_time(:),              df_wb_time(/;"	k	type:df_type
-inm_df	Units/array-spec.f90.t/input.f90	/^      MODULE inm_df$/;"	m
+df_mb_data	input.f90	/^       df_mb_data(/;"	k	type:df_type
+df_mb_time	input.f90	/^       df_mb_time(/;"	k	type:df_type
+df_type	input.f90	/^      TYPE df_type$/;"	t	module:inm_df
+df_wb_data	input.f90	/^       df_mb_data(:,:),  df_wb_data(/;"	k	type:df_type
+df_wb_time	input.f90	/^       df_mb_time(:),              df_wb_time(/;"	k	type:df_type
+inm_df	input.f90	/^      MODULE inm_df$/;"	m

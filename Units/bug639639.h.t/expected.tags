@@ -1,2 +1,2 @@
-Namespace1	Units/bug639639.h.t/input.h	/^namespace Namespace1$/;"	n
-anon2	Units/bug639639.h.t/input.h	/^enum {anon2=1000};$/;"	e	enum:__anon1
+Namespace1	input.h	/^namespace Namespace1$/;"	n
+anon2	input.h	/^enum {anon2=1000};$/;"	e	enum:__anon1

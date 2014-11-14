@@ -1,4 +1,4 @@
-IndexerClass	Units/indexer.cs.t/input.cs	/^class IndexerClass $/;"	c
-Main	Units/indexer.cs.t/input.cs	/^   public static void Main() $/;"	m	class:MainClass
-MainClass	Units/indexer.cs.t/input.cs	/^public class MainClass $/;"	c
-myArray	Units/indexer.cs.t/input.cs	/^   private int [] myArray = new int[100]; $/;"	f	class:IndexerClass	file:
+IndexerClass	input.cs	/^class IndexerClass $/;"	c
+Main	input.cs	/^   public static void Main() $/;"	m	class:MainClass
+MainClass	input.cs	/^public class MainClass $/;"	c
+myArray	input.cs	/^   private int [] myArray = new int[100]; $/;"	f	class:IndexerClass	file:

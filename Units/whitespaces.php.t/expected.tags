@@ -1,8 +1,8 @@
-a	Units/whitespaces.php.t/input.php	/^function	a	()	{}$/;"	f
-b	Units/whitespaces.php.t/input.php	/^b$/;"	f
-c	Units/whitespaces.php.t/input.php	/^functionc(){}$/;"	f
-d	Units/whitespaces.php.t/input.php	/^functiond(){}$/;"	f
-e	Units/whitespaces.php.t/input.php	/^function$/;"	f
-f	Units/whitespaces.php.t/input.php	/^function f () {}$/;"	f
-g	Units/whitespaces.php.t/input.php	/^$/;"	f
-h	Units/whitespaces.php.t/input.php	/^function h(){}$/;"	f
+a	input.php	/^function	a	()	{}$/;"	f
+b	input.php	/^b$/;"	f
+c	input.php	/^functionc(){}$/;"	f
+d	input.php	/^functiond(){}$/;"	f
+e	input.php	/^function$/;"	f
+f	input.php	/^function f () {}$/;"	f
+g	input.php	/^$/;"	f
+h	input.php	/^function h(){}$/;"	f

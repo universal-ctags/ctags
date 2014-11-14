@@ -1,6 +1,6 @@
-approx	Units/recursive.f95.t/input.f95	/^	MODULE approx$/;"	m
-approx2	Units/recursive.f95.t/input.f95	/^	MODULE approx2$/;"	m
-parts	Units/recursive.f95.t/input.f95	/^	integer :: parts$/;"	v	module:approx
-parts2	Units/recursive.f95.t/input.f95	/^	integer :: parts2$/;"	v	module:approx2
-y	Units/recursive.f95.t/input.f95	/^	double precision :: y$/;"	v	module:approx
-z	Units/recursive.f95.t/input.f95	/^	double precision :: z$/;"	v	module:approx2
+approx	input.f95	/^	MODULE approx$/;"	m
+approx2	input.f95	/^	MODULE approx2$/;"	m
+parts	input.f95	/^	integer :: parts$/;"	v	module:approx
+parts2	input.f95	/^	integer :: parts2$/;"	v	module:approx2
+y	input.f95	/^	double precision :: y$/;"	v	module:approx
+z	input.f95	/^	double precision :: z$/;"	v	module:approx2

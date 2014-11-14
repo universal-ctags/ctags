@@ -1,20 +1,20 @@
-build	Units/maze.erl.t/input.erl	/^build() ->$/;"	f	module:maze
-generate	Units/maze.erl.t/input.erl	/^generate(#maze{}=M) ->$/;"	f	module:maze
-generate	Units/maze.erl.t/input.erl	/^generate(#maze{}=M, R, X, Y) ->$/;"	f	module:maze
-maze	Units/maze.erl.t/input.erl	/^-module(maze).$/;"	m
-pick	Units/maze.erl.t/input.erl	/^pick(List) ->$/;"	f	module:maze
-pick	Units/maze.erl.t/input.erl	/^pick(Tuple) when tuple(Tuple) ->$/;"	f	module:maze
-scramble	Units/maze.erl.t/input.erl	/^scramble(List) ->$/;"	f	module:maze
-scramble	Units/maze.erl.t/input.erl	/^scramble(List, Acc) ->$/;"	f	module:maze
-scramble	Units/maze.erl.t/input.erl	/^scramble(Tuple) when tuple(Tuple) ->$/;"	f	module:maze
-scramble	Units/maze.erl.t/input.erl	/^scramble([], Acc) -> Acc;$/;"	f	module:maze
-seed	Units/maze.erl.t/input.erl	/^seed() ->$/;"	f	module:maze
-tot_get	Units/maze.erl.t/input.erl	/^tot_get(X, Y, Tot) ->$/;"	f	module:maze
-tot_new	Units/maze.erl.t/input.erl	/^tot_new(W, H, Cell) ->$/;"	f	module:maze
-tot_print	Units/maze.erl.t/input.erl	/^tot_print(ToT) ->$/;"	f	module:maze
-tot_print	Units/maze.erl.t/input.erl	/^tot_print(Y, ToT) -> ok.$/;"	f	module:maze
-tot_print	Units/maze.erl.t/input.erl	/^tot_print(Y, ToT) when Y =< size(ToT) ->$/;"	f	module:maze
-tot_print_tuple	Units/maze.erl.t/input.erl	/^tot_print_tuple(T) ->$/;"	f	module:maze
-tot_print_tuple	Units/maze.erl.t/input.erl	/^tot_print_tuple(X, T) -> ok.$/;"	f	module:maze
-tot_print_tuple	Units/maze.erl.t/input.erl	/^tot_print_tuple(X, T) when X =< size(T) ->$/;"	f	module:maze
-tot_put	Units/maze.erl.t/input.erl	/^tot_put(X, Y, Tot, V) ->$/;"	f	module:maze
+build	input.erl	/^build() ->$/;"	f	module:maze
+generate	input.erl	/^generate(#maze{}=M) ->$/;"	f	module:maze
+generate	input.erl	/^generate(#maze{}=M, R, X, Y) ->$/;"	f	module:maze
+maze	input.erl	/^-module(maze).$/;"	m
+pick	input.erl	/^pick(List) ->$/;"	f	module:maze
+pick	input.erl	/^pick(Tuple) when tuple(Tuple) ->$/;"	f	module:maze
+scramble	input.erl	/^scramble(List) ->$/;"	f	module:maze
+scramble	input.erl	/^scramble(List, Acc) ->$/;"	f	module:maze
+scramble	input.erl	/^scramble(Tuple) when tuple(Tuple) ->$/;"	f	module:maze
+scramble	input.erl	/^scramble([], Acc) -> Acc;$/;"	f	module:maze
+seed	input.erl	/^seed() ->$/;"	f	module:maze
+tot_get	input.erl	/^tot_get(X, Y, Tot) ->$/;"	f	module:maze
+tot_new	input.erl	/^tot_new(W, H, Cell) ->$/;"	f	module:maze
+tot_print	input.erl	/^tot_print(ToT) ->$/;"	f	module:maze
+tot_print	input.erl	/^tot_print(Y, ToT) -> ok.$/;"	f	module:maze
+tot_print	input.erl	/^tot_print(Y, ToT) when Y =< size(ToT) ->$/;"	f	module:maze
+tot_print_tuple	input.erl	/^tot_print_tuple(T) ->$/;"	f	module:maze
+tot_print_tuple	input.erl	/^tot_print_tuple(X, T) -> ok.$/;"	f	module:maze
+tot_print_tuple	input.erl	/^tot_print_tuple(X, T) when X =< size(T) ->$/;"	f	module:maze
+tot_put	input.erl	/^tot_put(X, Y, Tot, V) ->$/;"	f	module:maze

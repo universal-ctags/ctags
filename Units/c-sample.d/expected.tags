@@ -1,1 +1,1 @@
-main	Units/c-sample.d/input.c	/^main(void)$/;"	f
+main	input.c	/^main(void)$/;"	f

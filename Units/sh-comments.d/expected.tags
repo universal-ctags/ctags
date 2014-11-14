@@ -1,4 +1,4 @@
-afterpound1	Units/sh-comments.d/input.sh	/^foo="#"; afterpound1() {}$/;"	f
-afterpound2	Units/sh-comments.d/input.sh	/^foo="#\\""; afterpound2() {}$/;"	f
-afterpound3	Units/sh-comments.d/input.sh	/^foo='#'; afterpound3() {}$/;"	f
-afterpound4	Units/sh-comments.d/input.sh	/^foo='#'''; afterpound4() {}$/;"	f
+afterpound1	input.sh	/^foo="#"; afterpound1() {}$/;"	f
+afterpound2	input.sh	/^foo="#\\""; afterpound2() {}$/;"	f
+afterpound3	input.sh	/^foo='#'; afterpound3() {}$/;"	f
+afterpound4	input.sh	/^foo='#'''; afterpound4() {}$/;"	f

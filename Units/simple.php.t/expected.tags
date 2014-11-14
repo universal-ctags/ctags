@@ -1,11 +1,11 @@
-4site	Units/simple.php.t/input.php	/^$4site = 'not yet';     \/\/ invalid; starts with a number$/;"	v
-CONSTANT	Units/simple.php.t/input.php	/^define("CONSTANT", "Hello world.");$/;"	d
-Cart	Units/simple.php.t/input.php	/^class Cart$/;"	c
-Var	Units/simple.php.t/input.php	/^$Var = "Joe";$/;"	v
-_4site	Units/simple.php.t/input.php	/^$_4site = 'not yet';    \/\/ valid; starts with an underscore$/;"	v
-add_item	Units/simple.php.t/input.php	/^    function add_item ($artnr, $num)$/;"	f	class:Cart
-foo	Units/simple.php.t/input.php	/^function foo ($arg_1, $arg_2, ..., $arg_n)$/;"	f
-items	Units/simple.php.t/input.php	/^    var $items;  \/\/ Items in our shopping cart$/;"	v	class:Cart
-remove_item	Units/simple.php.t/input.php	/^    function remove_item ($artnr, $num)$/;"	f	class:Cart
+4site	input.php	/^$4site = 'not yet';     \/\/ invalid; starts with a number$/;"	v
+CONSTANT	input.php	/^define("CONSTANT", "Hello world.");$/;"	d
+Cart	input.php	/^class Cart$/;"	c
+Var	input.php	/^$Var = "Joe";$/;"	v
+_4site	input.php	/^$_4site = 'not yet';    \/\/ valid; starts with an underscore$/;"	v
+add_item	input.php	/^    function add_item ($artnr, $num)$/;"	f	class:Cart
+foo	input.php	/^function foo ($arg_1, $arg_2, ..., $arg_n)$/;"	f
+items	input.php	/^    var $items;  \/\/ Items in our shopping cart$/;"	v	class:Cart
+remove_item	input.php	/^    function remove_item ($artnr, $num)$/;"	f	class:Cart
 täyte	Units/simple.php.t/input.php	/^$täyte = 'mansikka';    \/\/ valid; 'ä' is ASCII 228.$/;"	v
-var	Units/simple.php.t/input.php	/^$var = "Bob";$/;"	v
+var	input.php	/^$var = "Bob";$/;"	v

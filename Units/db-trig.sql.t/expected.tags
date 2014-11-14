@@ -1,2 +1,2 @@
-restrict_login	Units/db-trig.sql.t/input.sql	/^create or replace trigger restrict_login$/;"	T	table:database
-startup_db	Units/db-trig.sql.t/input.sql	/^CREATE OR REPLACE TRIGGER startup_db$/;"	T	table:database
+restrict_login	input.sql	/^create or replace trigger restrict_login$/;"	T	table:database
+startup_db	input.sql	/^CREATE OR REPLACE TRIGGER startup_db$/;"	T	table:database

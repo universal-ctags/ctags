@@ -1,4 +1,4 @@
-AUTO_TEST	Units/auto.f.t/input.f	/^	program AUTO_TEST$/;"	p
-D	Units/auto.f.t/input.f	/^	AUTOMATIC REAL P, D,/;"	v	program:AUTO_TEST
-P	Units/auto.f.t/input.f	/^	AUTOMATIC REAL P,/;"	v	program:AUTO_TEST
-Q	Units/auto.f.t/input.f	/^	AUTOMATIC REAL P, D, Q /;"	v	program:AUTO_TEST
+AUTO_TEST	input.f	/^	program AUTO_TEST$/;"	p
+D	input.f	/^	AUTOMATIC REAL P, D,/;"	v	program:AUTO_TEST
+P	input.f	/^	AUTOMATIC REAL P,/;"	v	program:AUTO_TEST
+Q	input.f	/^	AUTOMATIC REAL P, D, Q /;"	v	program:AUTO_TEST

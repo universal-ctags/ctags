@@ -1,11 +1,11 @@
-ATTRIBUTES	Units/attributes.e.t/input.e	/^expanded class ATTRIBUTES$/;"	c
-anchored	Units/attributes.e.t/input.e	/^	anchored: like one$/;"	f	class:ATTRIBUTES
-eight	Units/attributes.e.t/input.e	/^	eight: DOUBLE is 2.0$/;"	f	class:ATTRIBUTES
-five	Units/attributes.e.t/input.e	/^	five, six: INTEGER is unique$/;"	f	class:ATTRIBUTES
-four	Units/attributes.e.t/input.e	/^	four: DOUBLE$/;"	f	class:ATTRIBUTES
-nine	Units/attributes.e.t/input.e	/^	nine: STRING is "abc"$/;"	f	class:ATTRIBUTES
-one	Units/attributes.e.t/input.e	/^	one: INTEGER$/;"	f	class:ATTRIBUTES
-seven	Units/attributes.e.t/input.e	/^	seven: INTEGER is 1$/;"	f	class:ATTRIBUTES
-six	Units/attributes.e.t/input.e	/^	five, six: INTEGER is unique$/;"	f	class:ATTRIBUTES
-three	Units/attributes.e.t/input.e	/^	three: HASH_TABLE [ARRAY [DOUBLE], STRING]$/;"	f	class:ATTRIBUTES
-two	Units/attributes.e.t/input.e	/^	two: ARRAY [STRING]$/;"	f	class:ATTRIBUTES
+ATTRIBUTES	input.e	/^expanded class ATTRIBUTES$/;"	c
+anchored	input.e	/^	anchored: like one$/;"	f	class:ATTRIBUTES
+eight	input.e	/^	eight: DOUBLE is 2.0$/;"	f	class:ATTRIBUTES
+five	input.e	/^	five, six: INTEGER is unique$/;"	f	class:ATTRIBUTES
+four	input.e	/^	four: DOUBLE$/;"	f	class:ATTRIBUTES
+nine	input.e	/^	nine: STRING is "abc"$/;"	f	class:ATTRIBUTES
+one	input.e	/^	one: INTEGER$/;"	f	class:ATTRIBUTES
+seven	input.e	/^	seven: INTEGER is 1$/;"	f	class:ATTRIBUTES
+six	input.e	/^	five, six: INTEGER is unique$/;"	f	class:ATTRIBUTES
+three	input.e	/^	three: HASH_TABLE [ARRAY [DOUBLE], STRING]$/;"	f	class:ATTRIBUTES
+two	input.e	/^	two: ARRAY [STRING]$/;"	f	class:ATTRIBUTES

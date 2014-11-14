@@ -1,9 +1,9 @@
-CONST	Units/Package.pm.t/input.pm	/^CONST => 1;$/;"	c
-END	Units/Package.pm.t/input.pm	/^END:$/;"	l
-END2	Units/Package.pm.t/input.pm	/^END2  :$/;"	l
-Test	Units/Package.pm.t/input.pm	/^package Test;$/;"	p
-Test::One	Units/Package.pm.t/input.pm	/^package Test::One;$/;"	p
-Test::One::Two	Units/Package.pm.t/input.pm	/^package Test::One::Two;$/;"	p
-dude	Units/Package.pm.t/input.pm	/^dude$/;"	s
-init	Units/Package.pm.t/input.pm	/^ init {$/;"	s
-quo	Units/Package.pm.t/input.pm	/^sub quo {$/;"	s
+CONST	input.pm	/^CONST => 1;$/;"	c
+END	input.pm	/^END:$/;"	l
+END2	input.pm	/^END2  :$/;"	l
+Test	input.pm	/^package Test;$/;"	p
+Test::One	input.pm	/^package Test::One;$/;"	p
+Test::One::Two	input.pm	/^package Test::One::Two;$/;"	p
+dude	input.pm	/^dude$/;"	s
+init	input.pm	/^ init {$/;"	s
+quo	input.pm	/^sub quo {$/;"	s
