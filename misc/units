@@ -27,7 +27,7 @@ WITH_TIMEOUT=0
 WITH_VALGRIND=
 COLORIZED_OUTPUT=yes
 [ -f /dev/stdout ] && COLORIZED_OUTPUT=no
-CATEGORY=
+CATEGORIES=
 UNITS=
 LANGUAGES=
 RUN_SHRINK=
@@ -468,12 +468,13 @@ run_dir ()
     local class
 
     #
-    # Filtered by CATEGORY
+    # Filtered by CATEGORIES
     #
-    if [ -n "$CATEGORY" ] && ! [ "$CATEGORY" = "$category" ]; then
+    if [ -n "$CATEGORIES" ] && ! member_p "${category}" $CATEGORIES; then
 	return 1
     fi
 
+    echo
     echo "Category: $category"
     line
     for input in ${base_dir}/*.[dbtiv]/input.*; do
@@ -593,13 +594,13 @@ action_run ()
 		DATADIR="${1#--datadir=}"
 		shift
 		;;
-	    --category)
+	    --categories)
 		shift
-		CATEGORY="$1"
+		CATEGORIES=$(echo "$1" | tr ',' ' ')
 		shift
 		;;
-	    --category=*)
-		CATEGORY="${1#--category=}"
+	    --categories=*)
+		CATEGORIES=$(echo "${1#--categories=}" | tr ',' ' ')
 		shift
 		;;
 	    --units)
@@ -686,7 +687,10 @@ action_run ()
 
 
     category="${_DEFAULT_CATEGORY}"
-    run_dir "${category}" "${units_dir}"
+    if [ -z "$CATEGORIES" ] \
+	|| ( [ -n "$CATEGORIES" ] && member_p "${category}" $CATEGORIES ); then
+	run_dir "${category}" "${units_dir}"
+    fi
 
     for d in ${units_dir}/*.r; do
 	[ -d "$d" ] || continue
@@ -714,7 +718,14 @@ $0 run [OPTIONS] UNITS-DIR
 	   OPTIONS:
 		--ctags CTAGS: ctags exectuable file for testing
 		--datadir DATADIR: data directory
-		--category CATEGORY: run only CATEGORY
+		--categories CATEGORY1[,CATEGORY2,...]: run only CATEGORY* related cases.
+							Category selection is done in upper 
+							layer than unit selection. This
+							means even if a unit is specified
+							with --units, it can be ignored
+							is a category the units doesn't
+							belong to is specified with 
+							--categories option.
 		--colorized-output yes|no: print the result in color.
 		--name NAME: run only NAME
 		--skip NAME: skip the case NAME (TODO: NOT IMPLEMENTED YET)
