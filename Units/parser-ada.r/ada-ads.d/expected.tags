@@ -1,0 +1,16 @@
+Adjust	input.ads	/^    procedure Adjust(S: in out Stack);$/;"	R	packspec:GenStack
+Data	input.ads	/^        Data: Data_Ptr;$/;"	c	type:Node	file:
+Data_Ptr	input.ads	/^    type Data_Ptr is access StackData'Class;$/;"	t	packspec:GenStack	file:
+Empty	input.ads	/^    function Empty(S: Stack) return Boolean;$/;"	R	packspec:GenStack
+Finalize	input.ads	/^    procedure Finalize(S: in out Stack);$/;"	R	packspec:GenStack
+GenStack	input.ads	/^package GenStack is$/;"	P
+Initialize	input.ads	/^    procedure Initialize(S: in out Stack);$/;"	R	packspec:GenStack
+Next	input.ads	/^        Next: Node_Ptr;$/;"	c	type:Node	file:
+Node	input.ads	/^    type Node is record$/;"	t	packspec:GenStack	file:
+Node_Ptr	input.ads	/^    type Node_Ptr is access Node;$/;"	t	packspec:GenStack	file:
+Pop	input.ads	/^    procedure Pop(S: in out Stack; D: in out StackData'class);$/;"	R	packspec:GenStack
+Push	input.ads	/^    procedure Push(S: in out Stack; D: StackData'class);$/;"	R	packspec:GenStack
+Stack	input.ads	/^    type Stack is new Controlled with private;$/;"	t	packspec:GenStack
+Stack	input.ads	/^    type Stack is new Controlled with record$/;"	t	packspec:GenStack	file:
+StackData	input.ads	/^    type StackData is new Controlled with null record;$/;"	t	packspec:GenStack
+Top	input.ads	/^    procedure Top(S: Stack; Data: in out StackData'class);$/;"	R	packspec:GenStack

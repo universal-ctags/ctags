@@ -1,0 +1,7 @@
+Altivec	input.adb	/^procedure Altivec is$/;"	r
+Vector_A	input.adb	/^   Vector_A : constant vector_unsigned_int := To_Vector (View_A);$/;"	n	subprogram:Altivec	file:
+Vector_B	input.adb	/^   Vector_B : constant vector_unsigned_int := To_Vector (View_B);$/;"	n	subprogram:Altivec	file:
+Vector_C	input.adb	/^   Vector_C : vector_unsigned_int;$/;"	v	subprogram:Altivec	file:
+View_A	input.adb	/^   View_A   : constant VUI_View := (Values => (1, 2, 3, 4));$/;"	n	subprogram:Altivec	file:
+View_B	input.adb	/^   View_B   : constant VUI_View := (Values => (1, 1, 1, 1));$/;"	n	subprogram:Altivec	file:
+View_C	input.adb	/^   View_C   : VUI_View;$/;"	v	subprogram:Altivec	file:
