@@ -263,6 +263,12 @@ run_result_known_error ()
     printf '%b\n' $(decorate 33 "failed")" (KNOWN bug)"
 }
 
+# filters out the directory prefix in a ctags input
+tags_basename_filter()
+{
+    sed -r 's%(^[^\t]+\t)([^/\t]+/)*%\1%'
+}
+
 run_tcase ()
 {
     local input="$1"
@@ -389,11 +395,8 @@ run_tcase ()
 	return 0
     fi
 
-    if [ -x "$ffilter" ]; then
-	"$ffilter" < "${orawout}" > "${ofiltered}"
-    else
-	cp "${orawout}" "${ofiltered}"
-    fi
+    [ -x "$ffilter" ] || ffilter=cat
+    tags_basename_filter < "${orawout}" | "$ffilter" > "${ofiltered}"
 
     {
 	diff -U 0 -I '^!_TAG' --strip-trailing-cr "${fexpected}" "${ofiltered}" > "${odiff}"
