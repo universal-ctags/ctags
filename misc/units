@@ -665,7 +665,7 @@ action_run ()
     fi
 
     if ! [ -d "$units_dir" ]; then
-	ERROR 1 "No such directory: ${UNITS_DIR}"
+	ERROR 1 "No such directory: ${units_dir}"
     fi
 
     if ! [ -f "${CTAGS}" ]; then
@@ -754,7 +754,7 @@ action_clean ()
     fi
 
     if ! [ -d "$units_dir" ]; then
-	ERROR 1 "No such directory: ${UNITS_DIR}"
+	ERROR 1 "No such directory: ${units_dir}"
     fi
 
     check_availability find
