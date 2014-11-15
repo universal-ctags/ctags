@@ -70,22 +70,60 @@ NOTE: ``/bin/bash`` is needed to report the result.
 Semi-fuzz testing
 ---------------------------------------------------------------------
 One of the frustrating thing is that ctags enters infinite loop
-against unexpected input. I wanted detect this kind of bug.
+against unexpected input. I wanted to decrease this kind of bugs.
+In fuzz target of testing.mak I tried to spot them by giving
+semi-random(semi-broken) input to parses.
 
 ::
 
-	$ make -f testing.mak fuzz FUZZ_LANGUAGE=LANG
+	$ make -f testing.mak fuzz LANGUAGES=LANG1[,LANG2,...]
 
-With this command line, you can given all test inputs
-including *Test/\** and *Units/\*/input.\** to a parser specified
-with ``FUZZ_LANGUAGE`` macro variable. You can get the list of things
-which can be used as ``LANG`` with following command line
+With this command line, you can given all test inputs under
+*Units/\*/input.\** to parsers specified with ``LANGUAGES`` macro
+variable. The output of ctags is just ignored. This target just
+checks the exit status. Ctags is run under timeout command
+in fuzz target, therefore if ctags enters an infinite loop,
+ctags will exits with non-zero status because timeout command
+may terminate the ctags process. The timeout will be reported
+like this::
+
+	[timeout C]                Units/test.vhd.t/input.vhd
+
+This means C parser doesn't stop in 1 second when
+*Units/test.vhd.t/input.vhd* is given as an input. The default
+duration 1 second can be changed with ``TIMEOUT=N`` argument for
+*make* command. If no timeout but the exit status is non-zero,
+the target reports it as following::
+
+	[unexpected-status(N) C]                Units/test.vhd.t/input.vhd
+
+You can get the list of parsers which can be used as a value
+for ``LANGUAGES`` with following command line
 
 ::
 
 	$ ./ctags --list-languages
 
-You can run the target fuzz under ``VG=1``.
+Other than ``LANGUAGES`` and ``TIMEOUT`` fuzz target take following parameters:
+
+	``VG=1``
+
+		Run ctags under valgrind. If valgrind finds memory
+		error it is reported like::
+
+			[valgrind-error Verilog]                Units/array_spec.f90.t/input.f90
+
+		The report of valgrind is recorded at
+		``Units/\*/VALGRIND-${language}.tmp``.
+
+	``SHRINK=1``
+
+		If exit status is non-zero, run ``units shrink`` to
+		minimize the bad input. With bisection algorithm,
+		*misc/units shrink* tries to make the shortest input
+		which makes ctags exits with non-zero status.
+		The result is reported to ``Units/\*/SHRINK-${language}.tmp``.
+		Maybe useful to debug.
 
 Automatic parser selection based on corpora
 ---------------------------------------------------------------------
@@ -166,7 +204,7 @@ ctags used suffix here *\*.in* for choosing a parser. *.in* shows
 nothing about the language used in the input file. When fishman-ctags
 finds *.in* as suffix, fishman-ctags checks the next suffix, here *.c*.
 
-Dry runnning
+Dry running
 ---------------------------------------------------------------------
 With ``--guess-parser`` option, you can test the parser selector of
 ctags. e.g.::

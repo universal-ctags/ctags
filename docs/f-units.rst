@@ -35,10 +35,13 @@ have its own directory under Units directory.
 	Input file name must have a *input* as basename. *TEST*
 	part should explain the test case well.
 
-*Units/TEST/expected.tags* **requisite**
+*Units/TEST/expected.tags* **optional**
 
 	Expected output file must have a name *expected.tags*. It
 	should be the same directory of the input file.
+
+	If this file is not given, the exit status of ctags process
+	is just checked; the output is ignored.
 
 *Units/TEST/args.ctags* **optional**
 
@@ -48,7 +51,11 @@ have its own directory under Units directory.
 
 *Units/TEST/filter-\*.\** **optional**
 
-	TBW
+	You can rearrange the output of ctags with this command
+	before comparing with *executed.tags*.
+	This command is invoked with no argument. The output
+	ctags is given via stdin. Rearrange data should be
+	written to stdout.
 
 *Units/TEST/features* **optional**
 
@@ -66,7 +73,7 @@ have its own directory under Units directory.
 	disabled/unavailable, the test is skipped.
 
 	language parsers enabled/available can be checked with passing
-	``--list-langauges`` to ctags.
+	``--list-languages`` to ctags.
 
 Note for importing a test case from Test directory
 ------------------------------------------------------------
@@ -88,7 +95,7 @@ This should be::
 
 With this name convention we can track which test case is converted or
 not.
-	
+
 Example of files
 ------------------------------------------------------------
 
@@ -102,60 +109,65 @@ How to run unit tests
 	 $ make -f testing.mak test.units
 
 The result of unit tests is reported by lines. You can specify
-a test case with ``UNIT=``. Consider you want to run a test under
+test cases with ``UNITS=``. Consider you want to run a test under
 *vim-command.d* only. You can do it with following command line::
 
-	$ make -f testing.mak test.units UNIT=vim-command
+	$ make -f testing.mak test.units UNITS=vim-command
 
-During testing *OUTPUT*, *EXPECTED* and *DIFF* files are generated for each
-test case directory. These are removed when the unit test is **Passed**.
-If the result is **Failed**, it is kept for debugging. Following
-command line can clean up these generated files at once::
+You can list more than two test cases with comma separator to UNITS.
 
-         $ make -f testing.mak clean-test
+During testing *OUTPUT.tmp*, *EXPECTED.tmp* and *DIFF.tmp* files are
+generated for each test case directory. These are removed when the
+unit test is **passed**.  If the result is **FAILED**, it is kept for
+debugging. Following command line can clean up these generated files
+at once::
 
-Other than **Failed** and **Passed** two types of result are
+	$ make -f testing.mak clean
+
+Other than **FAILED** and **passed** two types of result are
 defined.
 
 
-**Skipped**
+**skipped**
 
-	means the ctags command, the testing target, doesn't
-	support the feature required by the test case.
-	See *Units/TEST/features*.
+	means running the test case is skipped in some reason.
 
-**failed but KNOWN bug**
+**failed (KNOWN bug)**
 
 	mean the result if failed but the failure is expected.
 	See "Gathering test cases for known bugs".
-	
+
 Example of running
 ------------------------------------------------------------
 ::
 
 	$ make -f testing.mak test.units
-	Testing Units/cpp-type-alias-with-using-keyword...Passed
-	Testing Units/c-sample...Passed
+	Category: ROOT
+	------------------------------------------------------------
+	Testing 1795612.js as JavaScript                            passed
+	Testing 1850914.js as JavaScript                            passed
+	Testing 1878155.js as JavaScript                            passed
+	Testing 1880687.js as JavaScript                            passed
+	Testing 2023624.js as JavaScript                            passed
+	Testing 3184782.sql as SQL                                  passed
 	...
 
-Runnig unit tests for specific languages
+Running unit tests for specific languages
 ------------------------------------------------------------
 
-You can run only the tests for a specific language by setting
-``UNIT_LANGUAGES`` to a specific parser as reported by
+You can run only the tests for specific languages by setting
+``LANGUAGES`` to parsers as reported by
 ``ctags --list-languages``::
 
-	make -f testing.mak test.units UNIT_LANGUAGES=PHP
+	make -f testing.mak test.units LANGUAGES=PHP,C
 
-Multiple languages can be selected using a comma separated list::
-
-	make -f testing.mak test.units UNIT_LANGUAGES=C,C++
+Multiple languages can be selected using a comma separated list.
 
 Gathering test cases for known bugs
 ------------------------------------------------------------
 
 When we met a bug, making a small test case that triggers the bug is
-important develoment activity. Even the bug cannot be fixed in soon,
+important development activity. Even the bug cannot be fixed in soon,
 the test case is an important result of work. Such result should
 be merged to the source tree. However, we don't love **FAILED**
 message, too. What we should do?
@@ -168,31 +180,86 @@ of *.b* suffix usage.
 
 When you run test.units target, you will see::
 
-    Testing Units/c-sample...passed
-    Testing Units/css-singlequote-in-comment...failed but KNOWN bug
-    Testing Units/ctags-simple...passed
+    Testing c-sample as C                                 passed
+    Testing css-singlequote-in-comment as CSS             failed (KNOWN bug)
+    Testing ctags-simple as ctags                         passed
 
 Suffix *.i* is a variant of *.b*. *.i* is for merging/gathering input
 which lets ctags process enter an infinite loop. Different from *.b*,
 test cases marked as *.i* are never executed. They are just skipped
 but reported the skips::
 
-    Testing Units/ada-ads...passed
-    Testing Units/ada-function...skipped (infinite loop)
-    Testing Units/ada-protected...passed
+    Testing ada-ads as Ada                                passed
+    Testing ada-function as Ada                           skipped (may cause an infinite loop)
+    Testing ada-protected as Ada                          passed
     ...
 
-      Summary of "Units" test
-      -------------------------
-	    #passed:  336
-	    #failed:  0
-	    #skipped(features):  0
-	    #skipped(languages):  0
-	    #skipped(infinite loop):  1
-	    #known-bugs:  2
+    Summary (see CMDLINE.tmp to reproduce without test harness)
+    ------------------------------------------------------------
+      #passed:                                347
+      #FIXED:                                 0
+      #FAILED (unexpected-exit-status):       0
+      #FAILED (unexpected-output):            0
+      #skipped (features):                    0
+      #skipped (languages):                   0
+      #skipped (infinite-loop):               1
+        ada-protected
+      ...
+
+Running under valgrind and timeout
+------------------------------------------------------------
+If ``VG=1`` is given, each test cases are run under valgrind.
+If valgrind detects an error, it is reported as::
+
+    $ make -f testing.mak units VG=1
+    Testing css-singlequote-in-comment as CSS             failed (valgrind-error)
+    ...
+    Summary (see CMDLINE.tmp to reproduce without test harness)
+    ------------------------------------------------------------
+    ...
+    #valgrind-error:                        1
+      css-singlequote-in-comment
+    ...
+
+In this case the report of valgrind is recorded to
+``Units/css-singlequote-in-comment/VALGRIND-CSS.tmp``.
+
+If ``TIMEOUT=N`` is given, each test cases are run under timeout
+command. If ctags doesn't stop in ``N`` second, it is stopped
+by timeout command and reported as::
+
+    $ make -f testing.mak units TIMEOUT=1
+    Testing css-singlequote-in-comment as CSS             failed (TIMED OUT)
+    ...
+    Summary (see CMDLINE.tmp to reproduce without test harness)
+    ------------------------------------------------------------
+    ...
+    #TIMED-OUT:                             1
+      css-singlequote-in-comment
+    ...
+
+If ``TIMEOUT=N`` is given, *.i* test cases are run. They will be
+reported as *TIMED-OUT*.
+
+Categories
+------------------------------------------------------------
+
+With *.r* suffix, you can put test cases under a sub directory
+of *Units*. ``Units/parser-ada.r`` is an example. If *misc/units*
+test harness, the sub directory is called a category. ``parser-ada``
+is the name category in the above example.
 
 
-Acknowledgements
+Finding minimal bad input
+------------------------------------------------------------
+
+If ``SHRINK=1`` is given as argument for make, the input causing
+``FAILED`` result is passed to *misc/units shrink*.  *misc/units
+shrink* tries to make the shortest input which makes ctags exits with
+non-zero status.  The result is reported to
+``Units/\*/SHRINK-${language}.tmp``.  Maybe useful to debug.
+
+Acknowledgments
 ------------------------------------------------------------
 
 The file name rule is suggested by Maxime Coste <frrrwww@gmail.com>.
