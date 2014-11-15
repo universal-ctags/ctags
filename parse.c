@@ -391,40 +391,30 @@ static vString* extractEmacsModeLanguageAtEOF (FILE* input)
 	return mode;
 }
 
-static vString* determineVimFileType (const char *const line)
+static vString* determineVimFileType (const char *const modeline)
 {
 	/* considerable combinations:
 	   --------------------------
-	   set ... filetype=
-	   se ... filetype=
-	   set ... ft=
-	   se ... ft= */
+	   ... filetype=
+	   ... ft= */
 
-	unsigned int i, j;
+	unsigned int i;
 	const char* p;
-	const char* q;
 
-	const char* const set_prefix[] = {"set ", "se "};
 	const char* const filetype_prefix[] = {"filetype=", "ft="};
 	vString* const filetype = vStringNew ();
 
-	for (i = 0; i < sizeof(set_prefix)/sizeof(set_prefix[0]); i++)
+	for (i = 0; i < sizeof(filetype_prefix)/sizeof(filetype_prefix[0]); i++)
 	{
-		if ((p = strstr(line, set_prefix[i])) == NULL)
+		if ((p = strrstr(modeline, filetype_prefix[i])) == NULL)
 			continue;
-		p += strlen(set_prefix[i]);
-		for (j = 0; j < sizeof(filetype_prefix)/sizeof(filetype_prefix[0]); j++)
-		{
-			if ((q = strstr(p, filetype_prefix[j])) == NULL)
-				continue;
-			q += strlen(filetype_prefix[j]);
-			for ( ;  *q != '\0'  &&  isalnum ((int) *q)  ;  ++q)
-				vStringPut (filetype, (int) *q);
-			vStringTerminate (filetype);
-			goto out;
-		}
+
+		p += strlen(filetype_prefix[i]);
+		for ( ;  *p != '\0'  &&  isalnum ((int) *p)  ;  ++p)
+			vStringPut (filetype, (int) *p);
+		vStringTerminate (filetype);
+		break;
 	}
-  out:
 	return filetype;
 }
 
@@ -486,7 +476,7 @@ static vString* extractVimFileType(FILE* input)
 	{
 		vStringDelete (filetype);
 		filetype = NULL;
-        }
+	}
 	return filetype;
 
 	/* TODO:
