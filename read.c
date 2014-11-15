@@ -526,7 +526,7 @@ extern char *readLine (vString *const vLine, FILE *const fp)
 			else
 			{
 				char* eol;
-				vStringLength(vLine) = ftell(fp) - startOfLine - 1;
+				vStringLength(vLine) = ftell(fp) - startOfLine;
 				/* canonicalize new line */
 				eol = vStringValue (vLine) + vStringLength (vLine) - 1;
 				if (*eol == '\r')
