@@ -23,7 +23,7 @@
 #
 CTAGS=./ctags
 DATADIR=./data
-WITH_TIMEOUT=0
+WITH_TIMEOUT=
 WITH_VALGRIND=
 COLORIZED_OUTPUT=yes
 [ -f /dev/stdout ] && COLORIZED_OUTPUT=no
@@ -37,6 +37,7 @@ QUIET=
 # Internal variables and constants
 #
 _CMDLINE=
+_cmdline_for_shrinking=
 readonly _DEFAULT_CATEGORY=ROOT
 readonly _TIMEOUT_EXIT=124
 readonly _VG_TIMEOUT_FACTOR=10
@@ -71,6 +72,8 @@ Usage:
 	$(help_run)
 
 	$(help_clean)
+
+	$(help_fuzz)
 
 	$(help_shrink)
 EOF
@@ -1016,6 +1019,241 @@ EOF
 }
 #action_shrink shrink --timeout=1 --foreground "./a.out  < %s" input.txt output.txt
 
+fuzz_shrink ()
+{
+    local cmdline_template="$1"
+    local input="$2"
+    local output="$3"
+    local lang="$4"
+    shift 3
+
+    [ "${QUIET}" = 'yes' ] || echo "Shringking ${input} as ${lang}"
+    shrink_main "${cmdline_template}" "${input}" "${output}"  1 yes
+}
+
+fuzz_lang_file ()
+{
+    local lang="$1"
+    local file="$2"
+    shift 2
+    local r
+
+    local dir="${file%/*}"
+    local ovalgrind="${dir}/VALGRIND-${lang}.tmp"
+    local ocmdline="${dir}/CMDLINE-${lang}.tmp"
+    local oshrink="${dir}/SHRINK-${lang}.tmp"
+
+    local cmdline
+    local cmdline_for_shirking
+
+    rm -f "${ovalgrind}" "${ocmdline}" "${oshrink}"
+
+
+    if [ "${WITH_VALGRIND}" = 'yes' ]; then
+	cmdline=$( printf "${_CMDLINE} --language-force=${lang} ${file}" "${ovalgrind}" )
+    else
+	cmdline="${_CMDLINE} --language-force=${lang} ${file}"
+
+    fi
+    cmdline_for_shirking="${_CMDLINE_FOR_SHRINKING} --language-force=${lang} %s"
+
+
+    [ "${QUIET}" = 'yes' ] || printf "."
+    echo "${cmdline}" > "${ocmdline}"
+    ( exec 2>&-; ${cmdline} 2> /dev/null > /dev/null )
+    r=$?
+
+    case $r in
+	0)
+	    return 0
+	    ;;
+	${_TIMEOUT_EXIT})
+	    [ "${QUIET}" = 'yes' ] || echo
+	    printf '%-40s' "[timeout $lang]"
+	    echo "$f"
+	    [ "${RUN_SHRINK}" = 'yes' ] && fuzz_shrink "${cmdline_for_shirking}" "${file}" "${oshrink}"
+	    return 1
+	    ;;
+	${_VALGRIND_EXIT})
+	    [ "${QUIET}" = 'yes' ] || echo
+	    printf '%-40s' "[valgrind-error $lang]"
+	    echo "$f"
+	    return 1
+	    ;;
+	*)
+	    [ "${QUIET}" = 'yes' ] || echo
+	    printf '%-40s' "[unexpected-status($r) $lang]"
+	    echo "$f"
+	    [ "${RUN_SHRINK}" = 'yes' ] && fuzz_shrink "${cmdline_for_shirking}" "${file}" "${oshrink}"
+	    return 1
+	    ;;
+    esac
+
+    return $r
+}
+
+fuzz_lang ()
+{
+    local lang="$1"
+    local dir="$2"
+    shift 2
+    local f
+
+    [ "${QUIET}" = 'yes' ] || printf '%-60s\n' "Semi-fuzzing (${lang})"
+    for f in $(find "${dir}" -type f -name 'input.*'); do
+	fuzz_lang_file "${lang}" "${f}"
+    done
+    [ "${QUIET}" = 'yes' ] || echo
+}
+
+action_fuzz ()
+{
+    local action="$1"
+    shift
+
+    local units_dir
+    local cmdline
+    local lang
+
+    while [ $# -gt 0 ]; do
+	case $1 in
+	    --ctags)
+		shift
+		CTAGS="$1"
+		shift
+		;;
+	    --ctags=*)
+		CTAGS="${1#--ctags=}"
+		shift
+		;;
+	    --datadir)
+		shift
+		DATADIR="$1"
+		shift
+		;;
+	    --datadir=*)
+		DATADIR="${1#--datadir=}"
+		shift
+		;;
+	    --languages)
+		shift
+		LANGUAGES=$(echo "${1}" | tr ',' ' ')
+		shift
+		;;
+	    --languages=*)
+		LANGUAGES=$(echo "${1#--languages=}" | tr ',' ' ')
+		shift
+		;;
+	    --quiet)
+		QUIET=yes
+		shift
+		;;
+	    --with-timeout)
+		shift
+		WITH_TIMEOUT="$1"
+		shift
+		;;
+	    --with-timeout=*)
+		WITH_TIMEOUT="${1#--with-timeout=}"
+		shift
+		;;
+	    --with-valgrind)
+		shift
+		WITH_VALGRIND=yes
+		;;
+	    --colorized-output)
+		shift
+		COLORIZED_OUTPUT="$1"
+		shift
+		;;
+	    --colorized-output=*)
+		COLORIZED_OUTPUT="${1#--colorized-output=}"
+		shift
+		;;
+	    --run-shrink)
+		RUN_SHRINK=yes
+		shift
+		;;
+	    -*)
+		ERROR 1 "unknown option \"${1}\" for ${action} action"
+		;;
+	    *)
+		units_dir="$1"
+		shift
+		break;
+		;;
+	esac
+    done
+
+    if [ $# -gt 0 ]; then
+	ERROR 1 "too many arguments for ${action} action: $*"
+    elif [ -z "$units_dir" ]; then
+	ERROR 1 "UNITS_DIR parameter is not given in ${action} action"
+    fi
+
+    if ! [ -d "$units_dir" ]; then
+	ERROR 1 "No such directory: ${units_dir}"
+    fi
+
+    if ! [ -f "${CTAGS}" ]; then
+	ERROR 1 "no such file: ${CTAGS}"
+    elif ! [ -e "${CTAGS}" ]; then
+	ERROR 1 "${CTAGS} is not an executable file"
+    fi
+
+    if ! ( [ "${COLORIZED_OUTPUT}" = 'yes' ] || [ "${COLORIZED_OUTPUT}" = 'no' ] ); then
+	ERROR 1 "unexpected option argument for --colorized-output: ${COLORIZED_OUTPUT}"
+    fi
+
+    [ -d "${DATADIR}" ] || ERROR 1 "no such directory: ${DATADIR}"
+    : ${WITH_TIMEOUT:=1}
+    [ "$WITH_TIMEOUT" = 0 ] || check_availability timeout
+    [ "WITH_VALGRIND" = 'yes' ]  && check_availability valgrind
+    check_availability find
+
+    cmdline="${CTAGS} --options=NONE --libexec-dir=libexec --data-dir=${DATADIR}"
+    _CMDLINE="${cmdline} -o - "
+    _CMDLINE_FOR_SHRINKING="${_CMDLINE}"
+    if [ "$WITH_VALGRIND" = yes ]; then
+	_CMDLINE="valgrind --quiet --leak-check=full --error-exitcode=${_VALGRIND_EXIT} --log-file=%s ${_CMDLINE}"
+	WITH_TIMEOUT=$(( WITH_TIMEOUT * ${_VG_TIMEOUT_FACTOR} ))
+    fi
+
+    if ! [ "$WITH_TIMEOUT" = 0 ]; then
+	_CMDLINE="timeout --foreground $WITH_TIMEOUT ${_CMDLINE}"
+	_CMDLINE_FOR_SHRINKING="timeout --foreground 1 ${_CMDLINE_FOR_SHRINKING}"
+    fi
+
+    for lang in $( ${cmdline} --list-languages 2>/dev/null | "${_LINE_SPLITER}" |sed -e 's/ //' ) ; do
+	if [ -n "${LANGUAGES}" ] && ! member_p "${lang}" ${LANGUAGES}; then
+	    continue
+	fi
+	fuzz_lang "${lang}" "${units_dir}"
+    done
+}
+
+help_fuzz ()
+{
+cat <<EOF
+$0 fuzz [OPTIONS] UNITS-DIR
+
+	   Run all tests case under UNITS-DIR.
+
+	   OPTIONS:
+		--ctags CTAGS: ctags exectuable file for testing
+		--datadir DATADIR: data directory
+		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
+		--quiet: don't print dots as passed test cases.
+		--with-timeout DURATION: run a test case under timeout
+					 command with SECOND.
+					 0 means no timeout.
+					 default is 1.
+		--with-valgrind: run a test case under valgrind
+			       If this option given, DURATION is changed to
+			       DURATION := DURATION * ${_VG_TIMEOUT_FACTOR}
+EOF
+}
+
 main ()
 {
     if [ $# = 0 ]; then
@@ -1034,6 +1272,10 @@ main ()
 	    ;;
 	clean)
 	    action_clean "$@"
+	    return $?
+	    ;;
+	fuzz)
+	    action_fuzz "$@"
 	    return $?
 	    ;;
 	shrink)

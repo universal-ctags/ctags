@@ -8,10 +8,6 @@
 CTAGS_TEST = ./ctags
 CTAGS_REF = ./ctags.ref
 TEST_OPTIONS = -nu --c-kinds=+lpx
-FUZZ_TIMEOUT=10
-# You can specify one of language listed in $(./ctags --list-languages).
-FUZZ_LANGUAGE=
-FUZZ_SRC_DIRS=
 
 DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
 
@@ -99,41 +95,22 @@ clean-test:
 #
 # FUZZ Target
 #
-HAVE_TIMEOUT := $(shell which timeout 2>/dev/null)
-HAVE_FIND    := $(shell which find 2>/dev/null)
-ifeq ($(HAVE_TIMEOUT),)
-fuzz:
-	@ echo "No timeout command of GNU coreutils found"
-else ifeq ($(HAVE_FIND),)
-fuzz:
-	@ echo "No timeout command of find found"
-else
-
-define run-fuzz-ctags
-	if ! timeout -s INT $(FUZZ_TIMEOUT) \
-		$(CTAGS_TEST) --language-force=$1 -o - $2 \
-		> /dev/null 2>&1; then \
-		echo Fuzz testing failure: lang: $1 input: $2; \
-	fi
-endef
+ifdef VG
+FUZZ_VALGRIND=--with-valgrind
+endif
+FUZZ_TIMEOUT=1
+FUZZ_LANGUAGES=
+ifdef SHRINK
+FUZZ_RUN_SHRINK=--run-shrink
+endif
 
 fuzz: $(CTAGS_TEST)
 	@ \
-	for lang in $$($(CTAGS_TEST) --list-languages); do \
-		if test -z "$(FUZZ_LANGUAGE)" || test "$(FUZZ_LANGUAGE)" = "$${lang}"; then \
-			echo "Fuzz-testing: $${lang}"; \
-			for input in Test/* Units/*.[dbt]/input.*; do \
-				$(call run-fuzz-ctags,"$${lang}","$${input}"); \
-			done; \
-			for d in $(FUZZ_SRC_DIRS); do \
-				find "$$d" -type f \
-				| while read input; do \
-					$(call run-fuzz-ctags,"$${lang}","$${input}"); \
-				done; \
-			done; \
-		fi ; \
-	done
-endif
+	c="misc/units fuzz \
+		--languages=$(FUZZ_LANGUAGES) \
+		$(FUZZ_VALGRIND) $(FUZZ_RUN_SHRINK) \
+		--with-timeout=$(FUZZ_TIMEOUT)"; \
+	$(SHELL) $${c} Units
 
 #
 # SHELL must be dash or bash.
