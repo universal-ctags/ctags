@@ -273,7 +273,7 @@ run_shrink ()
     local lang="$4"
     shift 3
 
-    echo "Shringking ${input} as ${guessed_lang}"
+    echo "Shringking ${input} as ${lang}"
     shrink_main "${cmdline_template}" "${input}" "${output}"  1 yes
 }
 
