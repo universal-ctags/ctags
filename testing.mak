@@ -9,6 +9,17 @@ CTAGS_TEST = ./ctags
 CTAGS_REF = ./ctags.ref
 TEST_OPTIONS = -nu --c-kinds=+lpx
 
+ifdef VG
+VALGRIND=--with-valgrind
+endif
+ifdef SHRINK
+RUN_SHRINK=--run-shrink
+endif
+TIMEOUT=
+LANGUAGES=
+CATEGORIES=
+UNITS=
+
 DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
 
 .PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units units fuzz clean clean-test clean-units
@@ -95,46 +106,38 @@ clean-test:
 #
 # FUZZ Target
 #
-ifdef VG
-FUZZ_VALGRIND=--with-valgrind
-endif
-FUZZ_TIMEOUT=1
-FUZZ_LANGUAGES=
-ifdef SHRINK
-FUZZ_RUN_SHRINK=--run-shrink
-endif
-
+# SHELL must be dash or bash.
+#
+fuzz: TIMEOUT := 1
 fuzz: $(CTAGS_TEST)
 	@ \
 	c="misc/units fuzz \
-		--languages=$(FUZZ_LANGUAGES) \
-		$(FUZZ_VALGRIND) $(FUZZ_RUN_SHRINK) \
-		--with-timeout=$(FUZZ_TIMEOUT)"; \
+		--ctags=$(CTAGS_TEST) \
+		--languages=$(LANGUAGES) \
+		$(VALGRIND) $(RUN_SHRINK) \
+		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} Units
 
-#
-# SHELL must be dash or bash.
-#
 ifdef VG
-UNITS_VALGRIND=--with-valgrind
+VALGRIND=--with-valgrind
 endif
-UNITS_TIMEOUT=0
-UNIT_LANGUAGES=
-UNIT_CATEGORIES=
-UNITS=
-ifdef SHRINK
-UNITS_RUN_SHRINK=--run-shrink
-endif
+
+#
+# UNITS Target
+#
 test.units: units
+units: TIMEOUT := 0
 units: $(CTAGS_TEST)
 	@ \
 	c="misc/units run \
-		--languages=$(UNIT_LANGUAGES) \
-		--categories=$(UNIT_CATEGORIES) \
+		--ctags=$(CTAGS_TEST) \
+		--languages=$(LANGUAGES) \
+		--categories=$(CATEGORIES) \
 		--units=$(UNITS) \
-		$(UNITS_VALGRIND) $(UNITS_RUN_SHRINK) \
-		--with-timeout=$(UNITS_TIMEOUT)"; \
+		$(VALGRIND) $(RUN_SHRINK) \
+		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} Units
+
 clean-units:
 	$(SHELL) misc/units clean Units
 
