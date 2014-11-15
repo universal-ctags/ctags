@@ -1563,6 +1563,9 @@ static rescanReason createTagsForFile (
 		if (Option.etags)
 			beginEtagsFile ();
 
+		if (LanguageTable [language]->use_cork)
+			corkTagFile();
+
 		makeFileTag (fileName);
 
 	  retry:
@@ -1591,6 +1594,9 @@ static rescanReason createTagsForFile (
 			Assert (lang->parser || lang->parser2);
 			goto retry;
 		}
+
+		if (LanguageTable [language]->use_cork)
+			uncorkTagFile();
 
 		if (Option.etags)
 			endEtagsFile (getSourceFileTagPath ());
