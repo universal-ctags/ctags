@@ -194,7 +194,7 @@ check_languages()
     #
     while read expected; do
 	    found=no
-	    for l in $( ${_CMDLINE} --list-languages 2>/dev/null | "${_LINE_SPLITER}" |sed -e 's/ //' ) ; do \
+	    for l in $( ${_CMDLINE} --list-languages 2>/dev/null | "${_LINE_SPLITER}" |sed -e 's/ //' ) ; do
 		[ "$expected" = "$l" ] && found=yes
 	    done
 	    if ! [ "$found" = yes ]; then
