@@ -85,6 +85,7 @@ typedef struct {
 	rescanParserWithExceptionAndTrash parser_with_gc;          /* rescanning parser (unusual case) */
 	unsigned int method;           /* See PARSE__... definitions above */
 	tgTableEntry *tg_entries;
+	boolean use_cork;
 
 	/* used internally */
 	unsigned int id;               /* id assigned to language */
