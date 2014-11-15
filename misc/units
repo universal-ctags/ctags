@@ -727,7 +727,6 @@ $0 run [OPTIONS] UNITS-DIR
 							belong to is specified with 
 							--categories option.
 		--colorized-output yes|no: print the result in color.
-		--name NAME: run only NAME
 		--skip NAME: skip the case NAME (TODO: NOT IMPLEMENTED YET)
 		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
 		--units UNITS1[,UNITS2,...]: run only UNIT(S).
