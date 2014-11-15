@@ -4,4 +4,4 @@ main(void)
 	return 0;
 }
 
-/* ex:set filetype=c.qt */
+/* ex:set filetype=c.qt: */

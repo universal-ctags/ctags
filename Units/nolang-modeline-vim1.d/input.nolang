@@ -4,4 +4,4 @@ main(void)
 	return 0;
 }
 
-/* vim:se ft=c.qt */
+/* vim: se noet ft=c.qt: */
