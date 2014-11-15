@@ -195,7 +195,7 @@ check_languages()
     #
     while read expected; do
 	    found=no
-	    for l in $( ${_CMDLINE} --list-languages 2>/dev/null | "${_LINE_SPLITER}" |sed -e 's/ //' ) ; do
+	    for l in $( ${_CMDLINE} --list-languages 2>/dev/null | "${_LINE_SPLITER}" |sed -e 's/ //' ); do
 		[ "$expected" = "$l" ] && found=yes
 	    done
 	    if ! [ "$found" = yes ]; then
@@ -720,12 +720,12 @@ $0 run [OPTIONS] UNITS-DIR
 		--ctags CTAGS: ctags exectuable file for testing
 		--datadir DATADIR: data directory
 		--categories CATEGORY1[,CATEGORY2,...]: run only CATEGORY* related cases.
-							Category selection is done in upper 
+							Category selection is done in upper
 							layer than unit selection. This
 							means even if a unit is specified
 							with --units, it can be ignored
 							is a category the units doesn't
-							belong to is specified with 
+							belong to is specified with
 							--categories option.
 		--colorized-output yes|no: print the result in color.
 		--skip NAME: skip the case NAME (TODO: NOT IMPLEMENTED YET)
@@ -1006,12 +1006,12 @@ cat <<EOF
 $0 shrink [OPTIONS] CMD_TEMPLATE INPUT OUTPUT
 
 	   Shrink the input while the execution of CMD_TEMPLATE is failed
-           and find minimal unwanted input.
+	   and find minimal unwanted input.
 
 	   OPTIONS:
 		--timeout N: Run CMD under timeout command with duration N
 		--foreground: add --foreground option to timeout command.
-                              can be used with --timeout option.
+			      can be used with --timeout option.
 EOF
 }
 #action_shrink shrink --timeout=1 --foreground "./a.out  < %s" input.txt output.txt
