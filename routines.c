@@ -318,6 +318,18 @@ extern char* strstr (const char *str, const char *substr)
 }
 #endif
 
+extern char* strrstr (const char *str, const char *substr)
+{
+	const size_t length = strlen (substr);
+	const char *match = NULL;
+	const char *p;
+
+	for (p = str + strlen(str) - length  ;  p >= str  &&  match == NULL  ;  --p)
+		if (strncmp (p, substr, length) == 0)
+			match = p;
+	return (char*) match;
+}
+
 extern char* eStrdup (const char* str)
 {
 	char* result = xMalloc (strlen (str) + 1, char);
