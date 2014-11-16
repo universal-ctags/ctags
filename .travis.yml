@@ -13,8 +13,7 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install update-manager-core software-properties-common
 script:
-  - aclocal
-  - autoconf
+  - autoreconf -f -i -v
   - ./configure
   - make
   - make check
