@@ -9,9 +9,6 @@ compiler:
 branches:
   only:
     - master
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install update-manager-core software-properties-common
 script:
   - autoreconf -f -i -v
   - ./configure
