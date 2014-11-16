@@ -6,9 +6,6 @@ language: c
 compiler:
   - gcc
   - clang
-branches:
-  only:
-    - master
 script:
   - autoreconf -f -i -v
   - ./configure
