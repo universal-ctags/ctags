@@ -12,5 +12,5 @@ branches:
 script:
   - autoreconf -f -i -v
   - ./configure
-  - make
+  - make -j2
   - make check
