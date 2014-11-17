@@ -79,7 +79,7 @@ typedef struct {
 	unsigned int kindCount;        /* size of `kinds' list */
 	const char *const *extensions; /* list of default extensions */
 	const char *const *patterns;   /* list of default file name patterns */
-	const char *const *aliases;    /* list of default aliases (altenative names) */
+	const char *const *aliases;    /* list of default aliases (alternative names) */
 	parserInitialize initialize;   /* initialization routine, if needed */
 	parserFinalize finalize;       /* finalize routine, if needed */
 	simpleParser parser;           /* simple parser (common case) */
