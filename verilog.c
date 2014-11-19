@@ -55,6 +55,8 @@ typedef enum {
 	K_TASK,
 	K_BLOCK,
 	K_CLASS,
+	K_INTERFACE,
+	K_MODPORT,
 	K_PROGRAM
 } verilogKind;
 
@@ -69,6 +71,7 @@ typedef struct sTokenInfo {
 	vString*            name;          /* the name of the token */
 	struct sTokenInfo*  scope;         /* context of keyword */
 	int                 nestLevel;     /* Current nest level */
+	verilogKind         lastKind;      /* Kind of last found tag */
 } tokenInfo;
 
 /*
@@ -101,6 +104,8 @@ static kindOption SystemVerilogKinds [] = {
  { TRUE, 't', "task",      "tasks" },
  { TRUE, 'b', "block",     "blocks" },
  { TRUE, 'C', "class",     "classes" },
+ { TRUE, 'I', "interface", "interfaces" },
+ { TRUE, 'M', "modport",   "modports" },
  { TRUE, 'P', "program",   "programs" }
 };
 
@@ -144,8 +149,10 @@ static const keywordAssoc KeywordTable [] = {
 	{ "byte",      K_REGISTER,  { 1, 0 } },
 	{ "class",     K_CLASS,     { 1, 0 } },
 	{ "int",       K_REGISTER,  { 1, 0 } },
+	{ "interface", K_INTERFACE, { 1, 0 } },
 	{ "logic",     K_REGISTER,  { 1, 0 } },
 	{ "longint",   K_REGISTER,  { 1, 0 } },
+	{ "modport",   K_MODPORT,   { 1, 0 } },
 	{ "program",   K_PROGRAM,   { 1, 0 } },
 	{ "shortint",  K_REGISTER,  { 1, 0 } },
 	{ "shortreal", K_REGISTER,  { 1, 0 } },
@@ -169,6 +176,7 @@ static short isContainer (verilogKind kind)
 		case K_FUNCTION:
 		case K_BLOCK:
 		case K_CLASS:
+		case K_INTERFACE:
 		case K_PROGRAM:
 			return TRUE;
 		default:
@@ -183,6 +191,7 @@ static tokenInfo *newToken (void)
 	token->name = vStringNew ();
 	token->scope = NULL;
 	token->nestLevel = 0;
+	token->lastKind = K_UNDEFINED;
 	return token;
 }
 
@@ -418,6 +427,7 @@ static void createTag (const verilogKind kind, vString *name)
 	if (currentContext)
 	{
 		verbose (" to context %s\n", vStringValue (currentContext->name));
+		currentContext->lastKind = kind;
 		tag.extensionFields.scope [0] = kindName (currentContext->kind);
 		tag.extensionFields.scope [1] = vStringValue (currentContext->name);
 	}
@@ -637,6 +647,13 @@ static void findVerilogTags (void)
 		{
 			case '/':
 				skipComments (c);
+				break;
+			/* Skip interface modport port declarations */
+			case '(':
+				if (currentContext && currentContext->lastKind == K_MODPORT)
+				{
+					skipPastMatch ("()");
+				}
 				break;
 			default :
 				c = skipWhite (c);
