@@ -1,0 +1,4 @@
+aa	input.js	/^  aa: function () {$/;"	m	class:o
+bb	input.js	/^  bb: function (a) {$/;"	m	class:o
+cc	input.js	/^  cc: function() {}$/;"	m	class:o
+o	input.js	/^var o = {$/;"	c

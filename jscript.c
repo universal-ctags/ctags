@@ -172,7 +172,7 @@ static const keywordDesc JsKeywordTable [] = {
 
 /* Recursive functions */
 static void parseFunction (tokenInfo *const token);
-static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent);
+static boolean parseBlock (tokenInfo *const token, tokenInfo *const orig_parent);
 static boolean parseLine (tokenInfo *const token, boolean is_inside_class);
 static void parseUI5 (tokenInfo *const token);
 
@@ -659,31 +659,6 @@ static void findCmdTerm (tokenInfo *const token)
 	}
 }
 
-static void findMatchingToken (tokenInfo *const token, tokenType begin_token, tokenType end_token)
-{
-	int nest_level = 0;
-
-	if ( ! isType (token, end_token))
-	{
-		nest_level++;
-		while (! (isType (token, end_token) && (nest_level == 0)))
-		{
-			readToken (token);
-			if (isType (token, begin_token))
-			{
-				nest_level++;
-			}
-			if (isType (token, end_token))
-			{
-				if (nest_level > 0)
-				{
-					nest_level--;
-				}
-			}
-		}
-	}
-}
-
 static void parseSwitch (tokenInfo *const token)
 {
 	/*
@@ -711,9 +686,8 @@ static void parseSwitch (tokenInfo *const token)
 
 	if (isType (token, TOKEN_OPEN_CURLY))
 	{
-		findMatchingToken (token, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY);
+		parseBlock (token, token);
 	}
-
 }
 
 static boolean parseLoop (tokenInfo *const token)
@@ -936,11 +910,15 @@ static void parseFunction (tokenInfo *const token)
 	deleteToken (name);
 }
 
-static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
+static boolean parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 {
 	boolean is_class = FALSE;
 	boolean read_next_token = TRUE;
 	vString * saveScope = vStringNew ();
+	tokenInfo *const parent = newToken ();
+
+	/* backup the parent token to allow calls like parseBlock(token, token) */
+	copyToken (parent, orig_parent);
 
 	token->nestLevel++;
 	/*
@@ -1026,6 +1004,7 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 		} while (! isType (token, TOKEN_CLOSE_CURLY) && read_next_token );
 	}
 
+	deleteToken (parent);
 	vStringDelete(saveScope);
 	token->nestLevel--;
 
@@ -1214,6 +1193,9 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 	       ! isType (token, TOKEN_SEMICOLON)   &&
 	       ! isType (token, TOKEN_EQUAL_SIGN)  )
 	{
+		if (isType (token, TOKEN_OPEN_CURLY))
+			parseBlock (token, token);
+
 		/* Potentially the name of the function */
 		readToken (token);
 		if (isType (token, TOKEN_PERIOD))
