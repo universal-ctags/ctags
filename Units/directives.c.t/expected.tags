@@ -1,13 +1,13 @@
-FUNCTION_LIKE	input.c	3;"	d	file:
-MACRO_TO_SEE1	input.c	11;"	d	file:
-MACRO_TO_SEE2	input.c	14;"	d	file:
-MACRO_TO_SEE3	input.c	17;"	d	file:
-MACRO_TO_SEE4	input.c	20;"	d	file:
-PATH1	input.c	41;"	d	file:
-PATH1b	input.c	58;"	d	file:
-SEE_THIS_MACRO	input.c	35;"	d	file:
-VARIABLE_LIKE	input.c	2;"	d	file:
-WeakSymbol	input.c	4;"	d	file:
+FUNCTION_LIKE	input.c	/^#define FUNCTION_LIKE(/;"	d	file:
+MACRO_TO_SEE1	input.c	/^# define MACRO_TO_SEE1 /;"	d	file:
+MACRO_TO_SEE2	input.c	/^# define MACRO_TO_SEE2 /;"	d	file:
+MACRO_TO_SEE3	input.c	/^# define MACRO_TO_SEE3 /;"	d	file:
+MACRO_TO_SEE4	input.c	/^# define MACRO_TO_SEE4 /;"	d	file:
+PATH1	input.c	/^#define PATH1$/;"	d	file:
+PATH1b	input.c	/^#define PATH1b$/;"	d	file:
+SEE_THIS_MACRO	input.c	/^# define SEE_THIS_MACRO /;"	d	file:
+VARIABLE_LIKE	input.c	/^#define VARIABLE_LIKE	/;"	d	file:
+WeakSymbol	input.c	/^#pragma weak WeakSymbol /;"	d	file:
 a	input.c	/^int a;$/;"	v
 b	input.c	/^int b;$/;"	v
 bar1	input.c	/^int bar1 (void)$/;"	f
@@ -16,4 +16,4 @@ d	input.c	/^int d;$/;"	v
 foo1	input.c	/^int foo1 (void)$/;"	f
 g	input.c	/^int g;$/;"	v
 p1	input.c	/^int p1;$/;"	v
-with_long_comment	input.c	6;"	d	file:
+with_long_comment	input.c	/^#define with_long_comment /;"	d	file:

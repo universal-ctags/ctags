@@ -1,5 +1,5 @@
-DEFAULT_BIT	input.vr	3;"	d	file:
-DEFAULT_INT	input.vr	2;"	d	file:
+DEFAULT_BIT	input.vr	/^#define DEFAULT_BIT /;"	d	file:
+DEFAULT_INT	input.vr	/^#define DEFAULT_INT /;"	d	file:
 ExampleClass	input.vr	/^class ExampleClass {$/;"	c
 getBit	input.vr	/^    public function bit getBit() {$/;"	f	class:ExampleClass
 getData	input.vr	/^    public function bit[7:0] getData() {$/;"	f	class:ExampleClass

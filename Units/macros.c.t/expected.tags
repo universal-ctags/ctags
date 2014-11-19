@@ -1,4 +1,4 @@
-FUNCTION_LIKE	input.c	2;"	d	file:
-VARIABLE_LIKE	input.c	1;"	d	file:
-WeakSymbol	input.c	3;"	d	file:
+FUNCTION_LIKE	input.c	/^#define FUNCTION_LIKE(/;"	d	file:
+VARIABLE_LIKE	input.c	/^#define VARIABLE_LIKE	/;"	d	file:
+WeakSymbol	input.c	/^#pragma weak WeakSymbol /;"	d	file:
 foo	input.c	/^MACRO(foo);$/;"	v

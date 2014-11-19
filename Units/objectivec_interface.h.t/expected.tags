@@ -1,5 +1,5 @@
-ANOTHER_MACRO	input.h	21;"	d
-A_MACRO_TEST	input.h	15;"	d
+ANOTHER_MACRO	input.h	/^ # define ANOTHER_MACRO(/;"	d
+A_MACRO_TEST	input.h	/^#define       A_MACRO_TEST$/;"	d
 SampleTypedefObjC	input.h	/^typedef something SampleTypedefObjC;$/;"	t
 aStruct	input.h	/^struct aStruct$/;"	s
 aStructMember	input.h	/^    int aStructMember;$/;"	m	struct:aStruct

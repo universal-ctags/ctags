@@ -1,4 +1,4 @@
-ERROR_HAPPENED	input.cpp	3;"	d	file:
-NEXT_DEFINE	input.cpp	5;"	d	file:
-OK	input.cpp	4;"	d	file:
+ERROR_HAPPENED	input.cpp	/^#define ERROR_HAPPENED/;"	d	file:
+NEXT_DEFINE	input.cpp	/^#define NEXT_DEFINE /;"	d	file:
+OK	input.cpp	/^#define OK /;"	d	file:
 main	input.cpp	/^int main(int argc, char* argv[])$/;"	f

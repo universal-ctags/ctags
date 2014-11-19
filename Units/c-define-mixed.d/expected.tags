@@ -1,0 +1,2 @@
+X	input.c	/^#define X /;"	d	line:1	file:
+Y	input.c	/^#define Y(/;"	d	line:6	file:

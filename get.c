@@ -305,7 +305,7 @@ static void makeDefineTag (const char *const name)
 	{
 		tagEntryInfo e;
 		initTagEntry (&e, name);
-		e.lineNumberEntry = (boolean) (Option.locate != EX_PATTERN);
+		e.lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
 		e.isFileScope  = isFileScope;
 		e.truncateLine = TRUE;
 		e.kindName     = "macro";
