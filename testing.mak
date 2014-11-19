@@ -118,10 +118,6 @@ fuzz: $(CTAGS_TEST)
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} Units
 
-ifdef VG
-VALGRIND=--with-valgrind
-endif
-
 #
 # UNITS Target
 #
