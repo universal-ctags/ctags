@@ -1753,7 +1753,7 @@ extern parserDefinition* JavaScriptParser (void)
 	static const char *const aliases [] = { "js", NULL };
 	parserDefinition *const def = parserNew ("JavaScript");
 	def->extensions = extensions;
-	def->extensions = aliases;
+	def->aliases = aliases;
 	/*
 	 * New definitions for parsing instead of regex
 	 */
