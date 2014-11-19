@@ -2,7 +2,7 @@ Tracking other projects
 ======================================================================
 
 This is working note for tracking activities other projects,
-expecially activity at exuberant-ctags.
+especially activity at exuberant-ctags.
 
 I put this as the top of this hacking guide because
 I consider tracking activities as the first class fruits
@@ -87,7 +87,7 @@ subversion
 bugs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   <358>  Vim parser: Segmentation fault when reaing empty vim file
+   <358>  Vim parser: Segmentation fault when reading empty vim file
 	 * directly contributed by the original author of bug report and patch::
 
 	   	e0f854f0100e7a3cb8b959a23d6036e43f6b6c85
@@ -138,7 +138,7 @@ Patches are always there. So it is easy to evaluate the value:)
 
    <84> C++11 new using semantics
 
-	* solved by annother implementation::
+	* solved by another implementation::
 
 	      c93e3bfa05b70d7fbc2539454c957eb2169e16b3
 	      502355489b1ba748b1a235641bbd512ba6da315e
@@ -317,9 +317,9 @@ http://anonscm.debian.org/cgit/users/cjwatson/exuberant-ctags.git/tree/debian/pa
 	Not in fishman tree.
 	
 	I don't want to merge this patch. I think ctags should extract
-	as much as possible informatoin from input source code.
+	as much as possible information from input source code.
 	The user has responsibility to filter out the noise.
-	The definition of noise is upto the user.
+	The definition of noise is up to the user.
 
 <vim-command-loop.patch>
 
@@ -355,7 +355,6 @@ Changes known by fishman devs worth backporting:
 
 * HTML reads <h1><h2><h3> tags
 * Make has support for targets
-* SQL tags are stored with scopes instead of "tablename.field"
 
 
 They have a these additional language parsers:
@@ -380,14 +379,20 @@ They have a these additional language parsers:
 These changes have been merged:
 
 * Fix regex callback match count - https://github.com/fishman/ctags/pull/104 
+* SQL tags are stored with scopes instead of "tablename.field" - https://github.com/fishman/ctags/pull/100
 
 
 `VIM-Japan <https://github.com/vim-jp/ctags/>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+VIM-Japan have some interesting things, especially regarding encoding
+
+`Anjuta <https://git.gnome.org/browse/anjuta/tree/plugins/symbol-db/anjuta-tags>`_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Anjuta is a Gnome IDE. They did not fork Exuberant ctags, but they did
 natively include it in Anjuta. They have made several additions to
-thier version of it including fairly extensive Vala langauge support.
+their version of it including fairly extensive Vala language support.
 
 tagbar
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -396,7 +401,7 @@ Wiki
 
 	https://github.com/majutsushi/tagbar/wiki
 
-	This is a gold mine of xcmd and optlib.
+This is a gold mine of xcmd and optlib.
 
 	
 External command(xcmd)
