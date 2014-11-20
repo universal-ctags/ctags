@@ -382,7 +382,7 @@ run_tcase ()
     _CMDLINE="${_CMDLINE} ${input}"
 
     if [ "$WITH_VALGRIND" = yes ]; then
-	_CMDLINE="valgrind --quiet --leak-check=full --error-exitcode=${_VALGRIND_EXIT} --log-file=${ovalgrind} ${_CMDLINE}"
+	_CMDLINE="valgrind --leak-check=full --error-exitcode=${_VALGRIND_EXIT} --log-file=${ovalgrind} ${_CMDLINE}"
 	WITH_TIMEOUT=$(( WITH_TIMEOUT * ${_VG_TIMEOUT_FACTOR} ))
     fi
 
@@ -1229,7 +1229,7 @@ action_fuzz ()
     _CMDLINE="${cmdline} -o - "
     _CMDLINE_FOR_SHRINKING="${_CMDLINE}"
     if [ "$WITH_VALGRIND" = yes ]; then
-	_CMDLINE="valgrind --quiet --leak-check=full --error-exitcode=${_VALGRIND_EXIT} --log-file=%s ${_CMDLINE}"
+	_CMDLINE="valgrind --leak-check=full --error-exitcode=${_VALGRIND_EXIT} --log-file=%s ${_CMDLINE}"
 	WITH_TIMEOUT=$(( WITH_TIMEOUT * ${_VG_TIMEOUT_FACTOR} ))
     fi
 
