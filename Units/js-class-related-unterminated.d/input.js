@@ -39,6 +39,18 @@ Cls.B.prototype.m5 = function(e) {
 Cls.B.prototype.m6 = function(f) {
 }
 
+Cls.C = function () {
+  this.a = 0;
+}
+
+Cls.C.prototype = {
+  n1: function() {
+    Cls.C.prototype = Cls.C.prototype
+  },
+  n2: function() {
+  }
+}
+
 function main() {
   var c = new Cls.B(1, 2);
   var d = new Cls.B.Sub();
