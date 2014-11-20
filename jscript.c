@@ -952,7 +952,7 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 				 * Ignore the remainder of the line
 				 * findCmdTerm(token);
 				 */
-				parseLine (token, is_class);
+				read_next_token = parseLine (token, is_class);
 
 				vStringCopy(token->scope, saveScope);
 			}
@@ -964,7 +964,7 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 				 */
 				vStringCopy(saveScope, token->scope);
 				addToScope (token, parent->string);
-				parseLine (token, is_class);
+				read_next_token = parseLine (token, is_class);
 				vStringCopy(token->scope, saveScope);
 			}
 			else if (isKeyword (token, KEYWORD_function))
@@ -1273,9 +1273,12 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 							}
 
 							if ( isType (method_body_token, TOKEN_OPEN_CURLY))
+							{
 								parseBlock (method_body_token, token);
-
-							is_terminated = TRUE;
+								is_terminated = TRUE;
+							}
+							else
+								is_terminated = isType (method_body_token, TOKEN_SEMICOLON);
 							goto cleanUp;
 						}
 					}
