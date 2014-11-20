@@ -1225,7 +1225,7 @@ action_fuzz ()
     [ "WITH_VALGRIND" = 'yes' ]  && check_availability valgrind
     check_availability find
 
-    cmdline="${CTAGS} --options=NONE --libexec-dir=libexec --data-dir=${DATADIR}"
+    cmdline="${CTAGS} --options=NONE --\*-kinds=\* --fields=\* --libexec-dir=libexec --data-dir=${DATADIR}"
     _CMDLINE="${cmdline} -o - "
     _CMDLINE_FOR_SHRINKING="${_CMDLINE}"
     if [ "$WITH_VALGRIND" = yes ]; then
