@@ -1223,7 +1223,6 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 				{
 					if ( is_class )
 					{
-						vStringCopy(saveScope, token->scope);
 						addToScope(token, name->string);
 					}
 					else
