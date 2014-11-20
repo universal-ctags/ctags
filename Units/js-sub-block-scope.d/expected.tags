@@ -1,0 +1,7 @@
+bar	input.js	/^  function bar() {$/;"	f	function:parent
+foo	input.js	/^  function foo() {$/;"	f	function:parent
+hello	input.js	/^      function hello() {$/;"	f	function:parent.foo
+hello2	input.js	/^    function hello2() {}$/;"	f	function:parent.bar
+hi	input.js	/^      function hi() {$/;"	f	function:parent.foo
+hi2	input.js	/^    function hi2() {}$/;"	f	function:parent.bar
+parent	input.js	/^function parent() {$/;"	f
