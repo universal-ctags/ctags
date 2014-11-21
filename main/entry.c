@@ -763,12 +763,23 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 	if (Option.extensionFields.language  &&  tag->language != NULL)
 		length += fprintf (TagFile.fp, "%s\tlanguage:%s", sep, tag->language);
 
-	if (Option.extensionFields.scope  &&
-			tag->extensionFields.scope [0] != NULL  &&
-			tag->extensionFields.scope [1] != NULL)
-		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				tag->extensionFields.scope [0],
-				tag->extensionFields.scope [1]);
+	if (Option.extensionFields.scope)
+	{
+		if (tag->extensionFields.scope [0] != NULL  &&
+		    tag->extensionFields.scope [1] != NULL)
+			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
+					   tag->extensionFields.scope [0],
+					   tag->extensionFields.scope [1]);
+		else if (tag->extensionFields.scope_index != SCOPE_NIL
+			 && TagFile.corkQueue.count > 0)
+		{
+			const tagEntryInfo * scope;
+
+			scope = getEntryInCorkQueue (tag->extensionFields.scope_index);
+			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
+					   scope->kindName, scope->name);
+		}
+	}
 
 	if (Option.extensionFields.typeRef  &&
 			tag->extensionFields.typeRef [0] != NULL  &&
@@ -1060,6 +1071,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->filePosition    = filePosition;
 	e->sourceFileName  = sourceFileName;
 	e->name            = name;
+	e->extensionFields.scope_index     = SCOPE_NIL;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */
