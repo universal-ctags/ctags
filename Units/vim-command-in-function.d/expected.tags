@@ -1,0 +1,1 @@
+MyCommand	input.vim	/^  command! MyCommand echom "foo"$/;"	c
