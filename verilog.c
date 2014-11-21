@@ -263,7 +263,7 @@ static int skipPastMatch (const char *const pair)
 	return vGetc ();
 }
 
-static void skipToEOL ()
+static void skipToEOL (void)
 {
 	int c;
 	do
