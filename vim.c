@@ -617,13 +617,18 @@ static boolean parseMap (const unsigned char *line)
 	return TRUE;
 }
 
+static boolean isCommand (const unsigned char* line)
+{
+	return ( (!strncmp ((const char*) line, "comp", (size_t) 4) == 0) &&
+			(!strncmp ((const char*) line, "comc", (size_t) 4) == 0) &&
+			(strncmp ((const char*) line, "com", (size_t) 3) == 0) );
+}
+
 static boolean parseVimLine (const unsigned char *line, int infunction)
 {
 	boolean readNextLine = TRUE;
 
-	if ( (!strncmp ((const char*) line, "comp", (size_t) 4) == 0) && 
-			(!strncmp ((const char*) line, "comc", (size_t) 4) == 0) && 
-			(strncmp ((const char*) line, "com", (size_t) 3) == 0) )
+	if (isCommand(line))
 	{
 		readNextLine = parseCommand(line);
 		/* TODO - Handle parseCommand returning FALSE */
