@@ -136,6 +136,19 @@ static const unsigned char* skipPrefix (const unsigned char* name, int *scope)
 	return result;
 }
 
+static boolean starts_with_cmd (const unsigned char* line, const char* word)
+{
+	int lenword = strlen(word);
+	if (strncmp((const char*) line, word, lenword) == 0
+			&& (line[lenword] == '\0' ||
+				line[lenword] == ' ' ||
+				line[lenword] == '!' ||
+				line[lenword] == '\t'))
+		return TRUE;
+	return FALSE;
+}
+
+
 static boolean isMap (const unsigned char* line)
 {
 	/*
@@ -143,67 +156,67 @@ static boolean isMap (const unsigned char* line)
 	 * This routine should capture all the permutations.
 	 */
 	if (
-			strncmp ((const char*) line, "map",      (size_t) 3) == 0 ||
-			strncmp ((const char*) line, "nm",       (size_t) 2) == 0 ||
-			strncmp ((const char*) line, "nma",      (size_t) 3) == 0 ||
-			strncmp ((const char*) line, "nmap",     (size_t) 4) == 0 ||
-			strncmp ((const char*) line, "vm",       (size_t) 2) == 0 ||
-			strncmp ((const char*) line, "vma",      (size_t) 3) == 0 ||
-			strncmp ((const char*) line, "vmap",     (size_t) 4) == 0 ||
-			strncmp ((const char*) line, "om",       (size_t) 2) == 0 ||
-			strncmp ((const char*) line, "oma",      (size_t) 3) == 0 ||
-			strncmp ((const char*) line, "omap",     (size_t) 4) == 0 ||
-			strncmp ((const char*) line, "im",       (size_t) 2) == 0 ||
-			strncmp ((const char*) line, "ima",      (size_t) 3) == 0 ||
-			strncmp ((const char*) line, "imap",     (size_t) 4) == 0 ||
-			strncmp ((const char*) line, "lm",       (size_t) 2) == 0 ||
-			strncmp ((const char*) line, "lma",      (size_t) 3) == 0 ||
-			strncmp ((const char*) line, "lmap",     (size_t) 4) == 0 ||
-			strncmp ((const char*) line, "cm",       (size_t) 2) == 0 ||
-			strncmp ((const char*) line, "cma",      (size_t) 3) == 0 ||
-			strncmp ((const char*) line, "cmap",     (size_t) 4) == 0 ||
-			strncmp ((const char*) line, "no",       (size_t) 2) == 0 ||
-			strncmp ((const char*) line, "nor",      (size_t) 3) == 0 ||
-			strncmp ((const char*) line, "nore",     (size_t) 4) == 0 ||
-			strncmp ((const char*) line, "norem",    (size_t) 5) == 0 ||
-			strncmp ((const char*) line, "norema",   (size_t) 6) == 0 ||
-			strncmp ((const char*) line, "noremap",  (size_t) 7) == 0 ||
-			strncmp ((const char*) line, "nno",      (size_t) 3) == 0 ||
-			strncmp ((const char*) line, "nnor",     (size_t) 4) == 0 ||
-			strncmp ((const char*) line, "nnore",    (size_t) 5) == 0 ||
-			strncmp ((const char*) line, "nnorem",   (size_t) 6) == 0 ||
-			strncmp ((const char*) line, "nnorema",  (size_t) 7) == 0 ||
-			strncmp ((const char*) line, "nnoremap", (size_t) 8) == 0 ||
-			strncmp ((const char*) line, "vno",      (size_t) 3) == 0 ||
-			strncmp ((const char*) line, "vnor",     (size_t) 4) == 0 ||
-			strncmp ((const char*) line, "vnore",    (size_t) 5) == 0 ||
-			strncmp ((const char*) line, "vnorem",   (size_t) 6) == 0 ||
-			strncmp ((const char*) line, "vnorema",  (size_t) 7) == 0 ||
-			strncmp ((const char*) line, "vnoremap", (size_t) 8) == 0 ||
-			strncmp ((const char*) line, "ono",      (size_t) 3) == 0 ||
-			strncmp ((const char*) line, "onor",     (size_t) 4) == 0 ||
-			strncmp ((const char*) line, "onore",    (size_t) 5) == 0 ||
-			strncmp ((const char*) line, "onorem",   (size_t) 6) == 0 ||
-			strncmp ((const char*) line, "onorema",  (size_t) 7) == 0 ||
-			strncmp ((const char*) line, "onoremap", (size_t) 8) == 0 ||
-			strncmp ((const char*) line, "ino",      (size_t) 3) == 0 ||
-			strncmp ((const char*) line, "inor",     (size_t) 4) == 0 ||
-			strncmp ((const char*) line, "inore",    (size_t) 5) == 0 ||
-			strncmp ((const char*) line, "inorem",   (size_t) 6) == 0 ||
-			strncmp ((const char*) line, "inorema",  (size_t) 7) == 0 ||
-			strncmp ((const char*) line, "inoremap", (size_t) 8) == 0 ||
-			strncmp ((const char*) line, "lno",      (size_t) 3) == 0 ||
-			strncmp ((const char*) line, "lnor",     (size_t) 4) == 0 ||
-			strncmp ((const char*) line, "lnore",    (size_t) 5) == 0 ||
-			strncmp ((const char*) line, "lnorem",   (size_t) 6) == 0 ||
-			strncmp ((const char*) line, "lnorema",  (size_t) 7) == 0 ||
-			strncmp ((const char*) line, "lnoremap", (size_t) 8) == 0 ||
-			strncmp ((const char*) line, "cno",      (size_t) 3) == 0 ||
-			strncmp ((const char*) line, "cnor",     (size_t) 4) == 0 ||
-			strncmp ((const char*) line, "cnore",    (size_t) 5) == 0 ||
-			strncmp ((const char*) line, "cnorem",   (size_t) 6) == 0 ||
-			strncmp ((const char*) line, "cnorema",  (size_t) 7) == 0 ||
-			strncmp ((const char*) line, "cnoremap", (size_t) 8) == 0 
+			starts_with_cmd(line, "map") ||
+			starts_with_cmd(line, "nm") ||
+			starts_with_cmd(line, "nma") ||
+			starts_with_cmd(line, "nmap") ||
+			starts_with_cmd(line, "vm") ||
+			starts_with_cmd(line, "vma") ||
+			starts_with_cmd(line, "vmap") ||
+			starts_with_cmd(line, "om") ||
+			starts_with_cmd(line, "oma") ||
+			starts_with_cmd(line, "omap") ||
+			starts_with_cmd(line, "im") ||
+			starts_with_cmd(line, "ima") ||
+			starts_with_cmd(line, "imap") ||
+			starts_with_cmd(line, "lm") ||
+			starts_with_cmd(line, "lma") ||
+			starts_with_cmd(line, "lmap") ||
+			starts_with_cmd(line, "cm") ||
+			starts_with_cmd(line, "cma") ||
+			starts_with_cmd(line, "cmap") ||
+			starts_with_cmd(line, "no") ||
+			starts_with_cmd(line, "nor") ||
+			starts_with_cmd(line, "nore") ||
+			starts_with_cmd(line, "norem") ||
+			starts_with_cmd(line, "norema") ||
+			starts_with_cmd(line, "noremap") ||
+			starts_with_cmd(line, "nno") ||
+			starts_with_cmd(line, "nnor") ||
+			starts_with_cmd(line, "nnore") ||
+			starts_with_cmd(line, "nnorem") ||
+			starts_with_cmd(line, "nnorema") ||
+			starts_with_cmd(line, "nnoremap") ||
+			starts_with_cmd(line, "vno") ||
+			starts_with_cmd(line, "vnor") ||
+			starts_with_cmd(line, "vnore") ||
+			starts_with_cmd(line, "vnorem") ||
+			starts_with_cmd(line, "vnorema") ||
+			starts_with_cmd(line, "vnoremap") ||
+			starts_with_cmd(line, "ono") ||
+			starts_with_cmd(line, "onor") ||
+			starts_with_cmd(line, "onore") ||
+			starts_with_cmd(line, "onorem") ||
+			starts_with_cmd(line, "onorema") ||
+			starts_with_cmd(line, "onoremap") ||
+			starts_with_cmd(line, "ino") ||
+			starts_with_cmd(line, "inor") ||
+			starts_with_cmd(line, "inore") ||
+			starts_with_cmd(line, "inorem") ||
+			starts_with_cmd(line, "inorema") ||
+			starts_with_cmd(line, "inoremap") ||
+			starts_with_cmd(line, "lno") ||
+			starts_with_cmd(line, "lnor") ||
+			starts_with_cmd(line, "lnore") ||
+			starts_with_cmd(line, "lnorem") ||
+			starts_with_cmd(line, "lnorema") ||
+			starts_with_cmd(line, "lnoremap") ||
+			starts_with_cmd(line, "cno") ||
+			starts_with_cmd(line, "cnor") ||
+			starts_with_cmd(line, "cnore") ||
+			starts_with_cmd(line, "cnorem") ||
+			starts_with_cmd(line, "cnorema") ||
+			starts_with_cmd(line, "cnoremap")
 			)
 			return TRUE;
 
