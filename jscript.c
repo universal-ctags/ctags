@@ -222,7 +222,7 @@ static void deleteToken (tokenInfo *const token)
  *	 Tag generation functions
  */
 
-static void makeJsTag (tokenInfo *const token, const jsKind kind)
+static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const signature)
 {
 	if (JsKinds [kind].enabled && ! token->ignoreTag )
 	{
@@ -261,12 +261,29 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind)
 			e.extensionFields.scope[1] = vStringValue (fullscope);
 		}
 
+		if (signature && vStringLength(signature))
+		{
+			size_t i;
+			/* sanitize signature by replacing all control characters with a
+			 * space (because it's simple).
+			 * there should never be any junk in a valid signature, but who
+			 * knows what the user wrote and CTags doesn't cope well with weird
+			 * characters. */
+			for (i = 0; i < signature->length; i++)
+			{
+				unsigned char c = (unsigned char) signature->buffer[i];
+				if (c < 0x20 /* below space */ || c == 0x7F /* DEL */)
+					signature->buffer[i] = ' ';
+			}
+			e.extensionFields.signature = vStringValue(signature);
+		}
+
 		makeTagEntry (&e);
 		vStringDelete (fullscope);
 	}
 }
 
-static void makeClassTag (tokenInfo *const token)
+static void makeClassTag (tokenInfo *const token, vString *const signature)
 {
 	vString *	fulltag;
 
@@ -287,13 +304,13 @@ static void makeClassTag (tokenInfo *const token)
 		if ( ! stringListHas(ClassNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (ClassNames, vStringNewCopy (fulltag));
-			makeJsTag (token, JSTAG_CLASS);
+			makeJsTag (token, JSTAG_CLASS, signature);
 		}
 		vStringDelete (fulltag);
 	}
 }
 
-static void makeFunctionTag (tokenInfo *const token)
+static void makeFunctionTag (tokenInfo *const token, vString *const signature)
 {
 	vString *	fulltag;
 
@@ -314,7 +331,7 @@ static void makeFunctionTag (tokenInfo *const token)
 		if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (FunctionNames, vStringNewCopy (fulltag));
-			makeJsTag (token, JSTAG_FUNCTION);
+			makeJsTag (token, JSTAG_FUNCTION, signature);
 		}
 		vStringDelete (fulltag);
 	}
@@ -385,27 +402,36 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		c = fileGetc ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
-	if (!isspace (c))
-		fileUngetc (c);		/* unget non-identifier character */
+	fileUngetc (c);		/* unget non-identifier character */
 }
 
-static void readToken (tokenInfo *const token)
+static void readTokenFull (tokenInfo *const token, vString *const repr)
 {
 	int c;
+	int i;
 
 	token->type			= TOKEN_UNDEFINED;
 	token->keyword		= KEYWORD_NONE;
 	vStringClear (token->string);
 
 getNextChar:
+	i = 0;
 	do
 	{
 		c = fileGetc ();
+		i++;
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\n');
 
 	token->lineNumber   = getSourceLineNumber ();
 	token->filePosition = getInputFilePosition ();
+
+	if (repr)
+	{
+		if (i > 1)
+			vStringPut (repr, ' ');
+		vStringPut (repr, c);
+	}
 
 	switch (c)
 	{
@@ -428,6 +454,11 @@ getNextChar:
 				  parseString (token->string, c);
 				  token->lineNumber = getSourceLineNumber ();
 				  token->filePosition = getInputFilePosition ();
+				  if (repr)
+				  {
+					  vStringCat (repr, token->string);
+					  vStringPut (repr, c);
+				  }
 				  break;
 
 		case '\\':
@@ -467,6 +498,8 @@ getNextChar:
 					  }
 					  else
 					  {
+						  if (repr) /* remove the / we added */
+							  repr->buffer[--repr->length] = 0;
 						  if (d == '*')
 						  {
 							  do
@@ -518,11 +551,18 @@ getNextChar:
 						  token->type = TOKEN_IDENTIFIER;
 					  else
 						  token->type = TOKEN_KEYWORD;
+					  if (repr && vStringLength (token->string) > 1)
+						  vStringCatS (repr, vStringValue (token->string) + 1);
 				  }
 				  break;
 	}
 
 	LastTokenType = token->type;
+}
+
+static void readToken (tokenInfo *const token)
+{
+	readTokenFull (token, NULL);
 }
 
 static void copyToken (tokenInfo *const dest, tokenInfo *const src)
@@ -540,7 +580,7 @@ static void copyToken (tokenInfo *const dest, tokenInfo *const src)
  *	 Token parsing functions
  */
 
-static void skipArgumentList (tokenInfo *const token)
+static void skipArgumentList (tokenInfo *const token, vString *const repr)
 {
 	int nest_level = 0;
 
@@ -554,9 +594,11 @@ static void skipArgumentList (tokenInfo *const token)
 	if (isType (token, TOKEN_OPEN_PAREN))	/* arguments? */
 	{
 		nest_level++;
+		if (repr)
+			vStringPut (repr, '(');
 		while (! (isType (token, TOKEN_CLOSE_PAREN) && (nest_level == 0)))
 		{
-			readToken (token);
+			readTokenFull (token, repr);
 			if (isType (token, TOKEN_OPEN_PAREN))
 			{
 				nest_level++;
@@ -646,7 +688,7 @@ static boolean findCmdTerm (tokenInfo *const token)
 		}
 		else if ( isType (token, TOKEN_OPEN_PAREN) )
 		{
-			skipArgumentList(token);
+			skipArgumentList(token, NULL);
 		}
 		else if ( isType (token, TOKEN_OPEN_SQUARE) )
 		{
@@ -683,7 +725,7 @@ static void parseSwitch (tokenInfo *const token)
 		 * Handle nameless functions, these will only
 		 * be considered methods.
 		 */
-		skipArgumentList(token);
+		skipArgumentList(token, NULL);
 	}
 
 	if (isType (token, TOKEN_OPEN_CURLY))
@@ -727,7 +769,7 @@ static boolean parseLoop (tokenInfo *const token, tokenInfo *const parent)
 			 * Handle nameless functions, these will only
 			 * be considered methods.
 			 */
-			skipArgumentList(token);
+			skipArgumentList(token, NULL);
 		}
 
 		if (isType (token, TOKEN_OPEN_CURLY))
@@ -777,7 +819,7 @@ static boolean parseLoop (tokenInfo *const token, tokenInfo *const parent)
 				 * Handle nameless functions, these will only
 				 * be considered methods.
 				 */
-				skipArgumentList(token);
+				skipArgumentList(token, NULL);
 			}
 			if (! isType (token, TOKEN_SEMICOLON))
 				is_terminated = FALSE;
@@ -846,7 +888,7 @@ static boolean parseIf (tokenInfo *const token, tokenInfo *const parent)
 		 * Handle nameless functions, these will only
 		 * be considered methods.
 		 */
-		skipArgumentList(token);
+		skipArgumentList(token, NULL);
 	}
 
 	if (isType (token, TOKEN_OPEN_CURLY))
@@ -871,6 +913,7 @@ static boolean parseIf (tokenInfo *const token, tokenInfo *const parent)
 static void parseFunction (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
+	vString *const signature = vStringNew ();
 	boolean is_class = FALSE;
 
 	/*
@@ -894,19 +937,20 @@ static void parseFunction (tokenInfo *const token)
 	}
 
 	if ( isType (token, TOKEN_OPEN_PAREN) )
-		skipArgumentList(token);
+		skipArgumentList(token, signature);
 
 	if ( isType (token, TOKEN_OPEN_CURLY) )
 	{
 		is_class = parseBlock (token, name);
 		if ( is_class )
-			makeClassTag (name);
+			makeClassTag (name, signature);
 		else
-			makeFunctionTag (name);
+			makeFunctionTag (name, signature);
 	}
 
 	findCmdTerm (token);
 
+	vStringDelete (signature);
 	deleteToken (name);
 }
 
@@ -1047,17 +1091,19 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 				readToken (token);
 				if ( isKeyword (token, KEYWORD_function) )
 				{
+					vString *const signature = vStringNew ();
+
 					readToken (token);
 					if ( isType (token, TOKEN_OPEN_PAREN) )
 					{
-						skipArgumentList(token);
+						skipArgumentList(token, signature);
 					}
 
 					if (isType (token, TOKEN_OPEN_CURLY))
 					{
 						has_methods = TRUE;
 						addToScope (name, class->string);
-						makeJsTag (name, JSTAG_METHOD);
+						makeJsTag (name, JSTAG_METHOD, signature);
 						parseBlock (token, name);
 
 						/*
@@ -1066,6 +1112,8 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 						 */
 						readToken (token);
 					}
+
+					vStringDelete (signature);
 				}
 				else
 				{
@@ -1087,7 +1135,7 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 							}
 							else if (isType (token, TOKEN_OPEN_PAREN))
 							{
-								skipArgumentList (token);
+								skipArgumentList (token, NULL);
 							}
 							else if (isType (token, TOKEN_OPEN_SQUARE))
 							{
@@ -1103,9 +1151,9 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 						has_methods = TRUE;
 						addToScope (name, class->string);
 						if (has_child_methods)
-							makeJsTag (name, JSTAG_CLASS);
+							makeJsTag (name, JSTAG_CLASS, NULL);
 						else if (!isType (name, TOKEN_REGEXP))
-							makeJsTag (name, JSTAG_PROPERTY);
+							makeJsTag (name, JSTAG_PROPERTY, NULL);
 				}
 			}
 		}
@@ -1242,7 +1290,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 					 *     }
 					 *
 					 */
-					makeClassTag (name);
+					makeClassTag (name, NULL);
 					is_class = TRUE;
 
 					/*
@@ -1257,9 +1305,10 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 						readToken (token);
 						if ( isKeyword(token, KEYWORD_NONE) )
 						{
+							vString *const signature = vStringNew ();
+
 							vStringCopy(saveScope, token->scope);
 							addToScope(token, name->string);
-							makeJsTag (token, JSTAG_METHOD);
 
 							readToken (method_body_token);
 							vStringCopy (method_body_token->scope, token->scope);
@@ -1269,10 +1318,14 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 							           isType (method_body_token, TOKEN_OPEN_CURLY)) )
 							{
 								if ( isType (method_body_token, TOKEN_OPEN_PAREN) )
-									skipArgumentList(method_body_token);
+									skipArgumentList(method_body_token,
+													 vStringLength (signature) == 0 ? signature : NULL);
 								else
 									readToken (method_body_token);
 							}
+
+							makeJsTag (token, JSTAG_METHOD, signature);
+							vStringDelete (signature);
 
 							if ( isType (method_body_token, TOKEN_OPEN_CURLY))
 							{
@@ -1315,7 +1368,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 		}
 
 		if ( isType (token, TOKEN_OPEN_PAREN) )
-			skipArgumentList(token);
+			skipArgumentList(token, NULL);
 
 		if ( isType (token, TOKEN_OPEN_SQUARE) )
 			skipArrayList(token);
@@ -1351,7 +1404,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 			 *	   var g_var2;
 			 */
 			if (isType (token, TOKEN_SEMICOLON))
-				makeJsTag (name, JSTAG_VARIABLE);
+				makeJsTag (name, JSTAG_VARIABLE, NULL);
 		}
 		/*
 		 * Statement has ended.
@@ -1376,6 +1429,8 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 
 		if ( isKeyword (token, KEYWORD_function) )
 		{
+			vString *const signature = vStringNew ();
+
 			readToken (token);
 
 			if ( isKeyword (token, KEYWORD_NONE) &&
@@ -1403,7 +1458,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 			}
 
 			if ( isType (token, TOKEN_OPEN_PAREN) )
-				skipArgumentList(token);
+				skipArgumentList(token, signature);
 
 			if (isType (token, TOKEN_OPEN_CURLY))
 			{
@@ -1415,23 +1470,25 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 				 */
 				if ( is_inside_class )
 				{
-					makeJsTag (name, JSTAG_METHOD);
+					makeJsTag (name, JSTAG_METHOD, signature);
 					if ( vStringLength(secondary_name->string) > 0 )
-						makeFunctionTag (secondary_name);
+						makeFunctionTag (secondary_name, signature);
 					parseBlock (token, name);
 				}
 				else
 				{
 					is_class = parseBlock (token, name);
 					if ( is_class )
-						makeClassTag (name);
+						makeClassTag (name, signature);
 					else
-						makeFunctionTag (name);
+						makeFunctionTag (name, signature);
 
 					if ( vStringLength(secondary_name->string) > 0 )
-						makeFunctionTag (secondary_name);
+						makeFunctionTag (secondary_name, signature);
 				}
 			}
+
+			vStringDelete (signature);
 		}
 		else if (isType (token, TOKEN_OPEN_CURLY))
 		{
@@ -1446,7 +1503,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 			 */
 			has_methods = parseMethods(token, name);
 			if (has_methods)
-				makeJsTag (name, JSTAG_CLASS);
+				makeJsTag (name, JSTAG_CLASS, NULL);
 			else
 			{
 				/*
@@ -1482,7 +1539,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 					if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 							! stringListHas(ClassNames, vStringValue (fulltag)) )
 					{
-						makeJsTag (name, JSTAG_VARIABLE);
+						makeJsTag (name, JSTAG_VARIABLE, NULL);
 					}
 					vStringDelete (fulltag);
 				}
@@ -1510,7 +1567,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 
 				readToken (token);
 				if ( isType (token, TOKEN_OPEN_PAREN) )
-					skipArgumentList(token);
+					skipArgumentList(token, NULL);
 
 				if (isType (token, TOKEN_SEMICOLON))
 				{
@@ -1518,15 +1575,18 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 					{
 						if ( is_var )
 						{
-							makeJsTag (name, JSTAG_VARIABLE);
+							makeJsTag (name, JSTAG_VARIABLE, NULL);
 						}
 						else
 						{
 							if ( is_class )
 							{
-								makeClassTag (name);
+								makeClassTag (name, NULL);
 							} else {
-								makeFunctionTag (name);
+								/* FIXME: we cannot really get a meaningful
+								 * signature from a `new Function()` call,
+								 * so for now just don't set any */
+								makeFunctionTag (name, NULL);
 							}
 						}
 					}
@@ -1570,7 +1630,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 				if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 						! stringListHas(ClassNames, vStringValue (fulltag)) )
 				{
-					makeJsTag (name, JSTAG_VARIABLE);
+					makeJsTag (name, JSTAG_VARIABLE, NULL);
 				}
 				vStringDelete (fulltag);
 			}
