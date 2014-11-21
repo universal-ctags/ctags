@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+/* now, some code to have tags.  we use some esoteric JavaScript syntax to
+ * hopefully not generate the appropriate tags if the wrong parser is chosen.
+ * for example `function hello(){}` is way too common of a syntax to be sure
+ * we matched the proper parser. */
+var MyClass = function () {
+  this.name = 'hello';
+}
+MyClass.prototype.stuff = function () { return this.name };
