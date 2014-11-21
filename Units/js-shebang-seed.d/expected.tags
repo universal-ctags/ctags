@@ -1,0 +1,2 @@
+MyClass	input.nolang	/^var MyClass = function () {$/;"	c
+stuff	input.nolang	/^MyClass.prototype.stuff = function () { return this.name };$/;"	m	class:MyClass
