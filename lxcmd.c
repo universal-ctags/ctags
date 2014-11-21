@@ -685,7 +685,7 @@ static boolean fillEntry (const xcmdPath* path, tagEntry* entry)
 	return FALSE;
 }
 
-const char *const PseudoTagPrefix = "!_";
+static const char *const PseudoTagPrefix = "!_";
 static boolean hasPseudoTagPrefix (const char* const name)
 {
 	const size_t prefixLength = strlen (PseudoTagPrefix);
