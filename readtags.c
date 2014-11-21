@@ -88,8 +88,8 @@ struct sTagFile {
 /*
 *   DATA DEFINITIONS
 */
-const char *const EmptyString = "";
-const char *const PseudoTagPrefix = "!_";
+static const char *const EmptyString = "";
+static const char *const PseudoTagPrefix = "!_";
 
 /*
 *   FUNCTION DEFINITIONS
@@ -865,7 +865,7 @@ static void listTags (void)
 	}
 }
 
-const char *const Usage =
+static const char *const Usage =
 	"Find tag file entries matching specified names.\n\n"
 	"Usage: %s [-ilp] [-s[0|1]] [-t file] [name(s)]\n\n"
 	"Options:\n"

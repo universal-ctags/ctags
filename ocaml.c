@@ -166,7 +166,7 @@ static const ocaKeywordDesc OcamlKeywordTable[] = {
 
 static langType Lang_Ocaml;
 
-boolean exportLocalInfo = FALSE;
+static boolean exportLocalInfo = FALSE;
 
 /*//////////////////////////////////////////////////////////////////
 //// lexingInit             */
@@ -176,7 +176,7 @@ typedef struct _lexingState {
 } lexingState;
 
 /* array of the size of all possible value for a char */
-boolean isOperator[1 << (8 * sizeof (char))] = { FALSE };
+static boolean isOperator[1 << (8 * sizeof (char))] = { FALSE };
 
 static void initKeywordHash ( void )
 {
@@ -514,26 +514,26 @@ typedef void (*parseNext) (vString * const ident, ocaToken what);
 /********** Helpers */
 /* This variable hold the 'parser' which is going to
  * handle the next token */
-parseNext toDoNext;
+static parseNext toDoNext;
 
 /* Special variable used by parser eater to
  * determine which action to put after their
  * job is finished. */
-parseNext comeAfter;
+static parseNext comeAfter;
 
 /* If a token put an end to current delcaration/
  * statement */
-ocaToken terminatingToken;
+static ocaToken terminatingToken;
 
 /* Token to be searched by the different
  * parser eater. */
-ocaToken waitedToken;
+static ocaToken waitedToken;
 
 /* name of the last class, used for
  * context stacking. */
-vString *lastClass;
+static vString *lastClass;
 
-vString *voidName;
+static vString *voidName;
 
 typedef enum _sContextKind {
 	ContextStrong,
@@ -559,9 +559,9 @@ typedef struct _sOcamlContext {
 
 /* context stack, can be used to output scope information
  * into the tag file. */
-ocamlContext stack[OCAML_MAX_STACK_SIZE];
+static ocamlContext stack[OCAML_MAX_STACK_SIZE];
 /* current position in the tag */
-int stackIndex;
+static int stackIndex;
 
 /* special function, often recalled, so putting it here */
 static void globalScope (vString * const ident, ocaToken what);
@@ -912,7 +912,7 @@ static void addTag (vString * const ident, int kind)
 	}
 }
 
-boolean needStrongPoping = FALSE;
+static boolean needStrongPoping = FALSE;
 static void requestStrongPoping ( void )
 {
 	needStrongPoping = TRUE;
@@ -983,8 +983,8 @@ static void exceptionDecl (vString * const ident, ocaToken what)
 	toDoNext = &globalScope;
 }
 
-tagEntryInfo tempTag;
-vString *tempIdent;
+static tagEntryInfo tempTag;
+static vString *tempIdent;
 
 /* Ensure a constructor is not a type path beginning
  * with a module */
@@ -1470,7 +1470,7 @@ static void methodDecl (vString * const ident, ocaToken what)
 
 /* name of the last module, used for
  * context stacking. */
-vString *lastModule;
+static vString *lastModule;
 
 
 /* parse
