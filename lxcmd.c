@@ -772,7 +772,7 @@ static boolean parseXcmdPath (char* line, xcmdPath* path, tagEntry* entry)
 static void freeTagEntry (tagEntry* entry)
 {
 	eFree (entry->fields.list);
-	entry->fields.list = 0;
+	entry->fields.list = NULL;
 	entry->fields.count = 0;
 }
 
