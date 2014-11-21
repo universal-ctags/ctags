@@ -35,6 +35,8 @@ HGBufferCheck	input.vim	/^function! s:HGBufferCheck(hgBuffer)$/;"	f
 HGChangeToCurrentFileDir	input.vim	/^function! s:HGChangeToCurrentFileDir(fileName)$/;"	f
 HGCommand	input.vim	/^      augroup HGCommand$/;"	a
 HGCommand	input.vim	/^augroup HGCommand$/;"	a
+HGCommandPlugin	input.vim	/^  augroup HGCommandPlugin$/;"	a
+HGCommit	input.vim	/^    augroup HGCommit$/;"	a
 HGCommit	input.vim	/^com! -bang -nargs=? HGCommit call s:HGCommit(<q-bang>, <q-args>)$/;"	c
 HGCommit	input.vim	/^function! s:HGCommit(...)$/;"	f
 HGCreateCommandBuffer	input.vim	/^function! s:HGCreateCommandBuffer(cmd, cmdName, statusText, origBuffNR)$/;"	f
@@ -78,6 +80,9 @@ HGVimDiffRestore	input.vim	/^function! s:HGVimDiffRestore(vimDiffBuff)$/;"	f
 HGWipeoutCommandBuffers	input.vim	/^function! s:HGWipeoutCommandBuffers(originalBuffer, hgCommand)$/;"	f
 \add	input.vim	/^      nmap \\add <Plug>HGAdd$/;"	m
 buffer	input.vim	/^                        command buffer.  The HGCommand buffer variables may be $/;"	c
+g:HGCommandDeleteOnHide	input.vim	/^    let g:HGCommandDeleteOnHide=1$/;"	v
+g:HGCommandEnableBufferSetup	input.vim	/^  let g:HGCommandEnableBufferSetup=0$/;"	v
+g:HGCommandEnableBufferSetup	input.vim	/^  let g:HGCommandEnableBufferSetup=1$/;"	v
 loaded_hgcommand	input.vim	/^let loaded_hgcommand = 1$/;"	v
 loaded_hgcommand	input.vim	/^let loaded_hgcommand=2$/;"	v
 s:HGCommandEditFileRunning	input.vim	/^let s:HGCommandEditFileRunning = 0$/;"	v

@@ -82,6 +82,8 @@ static jmp_buf Exception;
  *	FUNCTION DEFINITIONS
  */
 
+static boolean parseVimLine (const unsigned char *line, int infunction);
+
 /* This function takes a char pointer, tries to find a scope separator in the
  * string, and if it does, returns a pointer to the character after the colon,
  * and the character defining the scope.
@@ -303,7 +305,8 @@ static void parseFunction (const unsigned char *line)
 		if ( (!strncmp ((const char*) line, "endfo", (size_t) 5) == 0) && 
 				(strncmp ((const char*) line, "endf", (size_t) 4) == 0)   )
 			break;
-		/* TODO - call parseVimLine */
+
+		parseVimLine(line, TRUE);
 	}
 	vStringDelete (name);
 }
@@ -472,11 +475,10 @@ cleanUp:
 	return cmdProcessed;
 }
 
-static void parseLet (const unsigned char *line)
+static void parseLet (const unsigned char *line, int infunction)
 {
 	vString *name = vStringNew ();
 
-	/* we've found a variable declared outside of a function!! */
 	const unsigned char *cp = line + 3;
 	const unsigned char *np = line;
 	/* get the name */
@@ -501,6 +503,10 @@ static void parseLet (const unsigned char *line)
 		np = cp;
 		++np;
 		if ((int) *cp == 'v' && (int) *np == ':' )
+			goto cleanUp;
+
+		/* Skip non-global vars in functions */
+		if (infunction && (int) *cp != 'g')
 			goto cleanUp;
 
 		/* deal with spaces, $, @ and & */
@@ -611,7 +617,7 @@ static boolean parseMap (const unsigned char *line)
 	return TRUE;
 }
 
-static boolean parseVimLine (const unsigned char *line)
+static boolean parseVimLine (const unsigned char *line, int infunction)
 {
 	boolean readNextLine = TRUE;
 
@@ -623,7 +629,7 @@ static boolean parseVimLine (const unsigned char *line)
 		/* TODO - Handle parseCommand returning FALSE */
 	}
 
-	if (isMap(line))
+	else if (isMap(line))
 	{
 		parseMap(line);
 	}
@@ -640,7 +646,7 @@ static boolean parseVimLine (const unsigned char *line)
 
 	else if ( strncmp ((const char*) line, "let", (size_t) 3) == 0 )
 	{
-		parseLet(line);
+		parseLet(line, infunction);
 	}
 
 	return readNextLine;
@@ -652,7 +658,7 @@ static void parseVimFile (const unsigned char *line)
 
 	while (line != NULL)
 	{
-		readNextLine = parseVimLine(line);
+		readNextLine = parseVimLine(line, FALSE);
 
 		if ( readNextLine )
 			line = readVimLine();
