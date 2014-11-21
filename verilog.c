@@ -403,7 +403,7 @@ static void createContext (tokenInfo *const scope)
 
 		verbose ("Creating new context %s\n", vStringValue (scope->name));
 		/* Determine full context name */
-		if (currentContext)
+		if (currentContext->kind != K_UNDEFINED)
 		{
 			vStringCopy (contextName, currentContext->name);
 			vStringCatS (contextName, ".");
@@ -424,7 +424,7 @@ static void createTag (const verilogKind kind, vString *name)
 	tag.kindName    = kindName (kind);
 	tag.kind        = kindLetter (kind);
 	verbose ("Adding tag %s", vStringValue (name));
-	if (currentContext)
+	if (currentContext->kind != K_UNDEFINED)
 	{
 		verbose (" to context %s\n", vStringValue (currentContext->name));
 		currentContext->lastKind = kind;
@@ -433,7 +433,7 @@ static void createTag (const verilogKind kind, vString *name)
 	}
 	verbose ("\n");
 	makeTagEntry (&tag);
-	if (Option.include.qualifiedTags && currentContext)
+	if (Option.include.qualifiedTags && currentContext->kind != K_UNDEFINED)
 	{
 		vString *const scopedName = vStringNew ();
 
@@ -477,18 +477,15 @@ static void processBlock (vString *const name, const verilogKind kind)
 	boolean blockStart = FALSE;
 	boolean blockEnd   = FALSE;
 
-	if (currentContext)
+	if (strcmp (vStringValue (name), "begin") == 0)
 	{
-		if (strcmp (vStringValue (name), "begin") == 0)
-		{
-			currentContext->nestLevel++;
-			blockStart = TRUE;
-		}
-		if (strcmp (vStringValue (name), "end") == 0)
-		{
-			currentContext->nestLevel--;
-			blockEnd = TRUE;
-		}
+		currentContext->nestLevel++;
+		blockStart = TRUE;
+	}
+	else if (strcmp (vStringValue (name), "end") == 0)
+	{
+		currentContext->nestLevel--;
+		blockEnd = TRUE;
 	}
 
 	if (findBlockName (name))
@@ -572,7 +569,7 @@ static void findTag (vString *const name)
 	const verilogKind kind = (verilogKind) lookupKeyword (vStringValue (name), getSourceLanguage () );
 
 	/* Search for end of current context to drop respective context */
-	if (currentContext)
+	if (currentContext->kind != K_UNDEFINED)
 	{
 		vString *endTokenName = vStringNewInit("end");
 		if (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0 && strcmp (vStringValue (name), vStringValue (endTokenName)) == 0)
@@ -639,6 +636,7 @@ static void findVerilogTags (void)
 {
 	vString *const name = vStringNew ();
 	int c = '\0';
+	currentContext = newToken ();
 
 	while (c != EOF)
 	{
