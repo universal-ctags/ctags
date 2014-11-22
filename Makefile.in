@@ -316,6 +316,12 @@ tags: $(CTAGS_EXEC)
 TAGS: $(CTAGS_EXEC)
 	./$(CTAGS_EXEC) -e $(srcdir)/*
 
+test:
+	make -f testing.mak test
+
+test.units:
+	make -f testing.mak test.units
+
 clean:
 	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB) 
 	rm -f dctags$(EXEEXT) $(READ_CMD)
