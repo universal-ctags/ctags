@@ -10,4 +10,4 @@ script:
   - autoreconf -f -i -v
   - ./configure
   - make -j2
-  - make check
+  - make check TRAVIS=1

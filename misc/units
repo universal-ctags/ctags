@@ -32,6 +32,7 @@ UNITS=
 LANGUAGES=
 RUN_SHRINK=
 QUIET=
+SHOW_DIFF_OUTPUT=
 
 #
 # Internal variables and constants
@@ -43,6 +44,7 @@ readonly _TIMEOUT_EXIT=124
 readonly _VG_TIMEOUT_FACTOR=10
 readonly _VALGRIND_EXIT=58
 readonly _LINE_SPLITER=$(if type dos2unix > /dev/null 2>&1; then echo "dos2unix"; else echo "cat"; fi)
+readonly _DIFF_OUTPUT_NAME="DIFF.tmp"
 
 #
 # Results
@@ -324,7 +326,7 @@ run_tcase ()
     local ostderr="$t/STDERR.tmp"
     local orawout="$t/RAWOUT.tmp"
     local ofiltered="$t/FILTERED.tmp"
-    local odiff="$t/DIFF.tmp"
+    local odiff="$t/${_DIFF_OUTPUT_NAME}"
     local ocmdline="$t/CMDLINE.tmp"
     local ovalgrind="$t/VALGRIND.tmp"
     local oresult="$t/RESULT.tmp"
@@ -513,8 +515,20 @@ run_dir ()
     return 0
 }
 
+run_show_diff_output ()
+{
+    local units_dir="$1"
+    local t="$2"
+
+    printf "	"
+    line .
+    sed -e 's/./	\0/' ${units_dir}/${t}.*/${_DIFF_OUTPUT_NAME}
+    echo
+}
+
 run_summary ()
 {
+    local units_dir="${1}"
     local t
 
     echo
@@ -540,6 +554,9 @@ run_summary ()
     count_list $L_FAILED_BY_DIFF
     for t in $L_FAILED_BY_DIFF; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
+	if [ "${SHOW_DIFF_OUTPUT}" = yes ]; then
+	    run_show_diff_output "${units_dir}" "${t#${_DEFAULT_CATEGORY}/}"
+	fi
     done
 
     if ! [ "$WITH_TIMEOUT" = 0 ]; then
@@ -665,6 +682,10 @@ action_run ()
 		RUN_SHRINK=yes
 		shift
 		;;
+	    --show-diff-output)
+		SHOW_DIFF_OUTPUT=yes
+		shift
+		;;
 	    -*)
 		ERROR 1 "unknown option \"${1}\" for ${action} action"
 		;;
@@ -717,7 +738,7 @@ action_run ()
 	run_dir "${category}" "$d"
     done
 
-    run_summary
+    run_summary "${units_dir}"
 
     if [ -n "${L_FAILED_BY_STATUS}" ] || [ -n "${L_FAILED_BY_DIFF}" ] || [ -n "${L_FAILED_BY_TIMEED_OUT}" ]; then
 	return 1
@@ -746,7 +767,7 @@ $0 run [OPTIONS] UNITS-DIR
 							--categories option.
 		--colorized-output yes|no: print the result in color.
 		--skip NAME: skip the case NAME (TODO: NOT IMPLEMENTED YET)
-		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
+		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases.
 		--units UNITS1[,UNITS2,...]: run only UNIT(S).
 		--with-timeout DURATION: run a test case under timeout
 					 command with SECOND.
@@ -754,6 +775,7 @@ $0 run [OPTIONS] UNITS-DIR
 		--with-valgrind: run a test case under valgrind
 			       If this option given, DURATION is changed to
 			       DURATION := DURATION * ${_VG_TIMEOUT_FACTOR}
+		--show-diff-output: show diff output for failed test cases in the summary.
 EOF
 }
 

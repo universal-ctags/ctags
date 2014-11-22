@@ -19,6 +19,9 @@ TIMEOUT=
 LANGUAGES=
 CATEGORIES=
 UNITS=
+ifdef TRAVIS
+SHOW_DIFF_OUTPUT=--show-diff-output
+endif
 
 DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
 
@@ -131,8 +134,9 @@ units: $(CTAGS_TEST)
 		--categories=$(CATEGORIES) \
 		--units=$(UNITS) \
 		$(VALGRIND) $(RUN_SHRINK) \
-		--with-timeout=$(TIMEOUT)"; \
-	$(SHELL) $${c} Units
+		--with-timeout=$(TIMEOUT) \
+		$(SHOW_DIFF_OUTPUT)"; \
+	 $(SHELL) $${c} Units
 
 clean-units:
 	$(SHELL) misc/units clean Units
