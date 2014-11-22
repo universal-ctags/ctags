@@ -34,8 +34,12 @@ following two tings.
 
 Availability is detected by the exit status of 
 ``COMMAND`` process; 0 means available.
-If the status is other than 0, ``LANG`` parser is treated
-as ``disabled``.
+If the status is other than 0, the ``LANG`` parser is treated
+as ``disabled`` with warning messages. 77 is a special
+number; the ``LANG`` parser is treated as disabled without
+warning messages.
+
+
 
 Standard output contributes to know the lists.
 ctags expects following format when parsing the output::

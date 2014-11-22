@@ -26,6 +26,11 @@
 # CoffeeTags is developed at https://github.com/lukaszkorecki/CoffeeTags .
 #
 #
+
+if ! type coffeetags > /dev/null 2>&1; then
+    exit 77
+fi
+
 case "$1" in
     --list-kinds*)
 	coffeetags --list-kinds

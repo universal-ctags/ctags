@@ -13,6 +13,7 @@
 *
 */
 
+#define XCMD_NOT_AVAILABLE_STATUS 77
 
 /*
   XCMD PROTOCOL
@@ -286,11 +287,13 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 
 		/* TODO: Decode status */
 		verbose("	status: %d\n", status);
-
 		if (status != 0)
 		{
-			error (WARNING, "xcmd exits abnormally status(%d): [%s %s]",
-			       status, argv[0], argv[1]);
+			if (WIFEXITED (status) && (WEXITSTATUS (status) == XCMD_NOT_AVAILABLE_STATUS))
+				error (WARNING, "xcmd recognizes %s is not available", argv[0]);
+			else
+				error (WARNING, "xcmd exits abnormally status(%d): [%s %s]",
+				       status, argv[0], argv[1]);
 			vStringDelete (opt);
 			return FALSE;
 		}
