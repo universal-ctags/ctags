@@ -246,9 +246,10 @@ install-data-optlib: $(addprefix data/optlib/,$(OPTLIB))  $(DESTDIR)$(optlibdir)
 		$(INSTALL_DATA) $(srcdir)/data/optlib/$$c $(DESTDIR)$(optlibdir)/$$c && chmod 644 $(DESTDIR)$(optlibdir)/$$c; \
 	done
 install-data-preload: $(DESTDIR)$(preloaddir) $(DESTDIR)$(pkgconf_preloaddir) FORCE
+	echo > $(DESTDIR)$(preloaddir)/$(DEFAULT_PRELOAD_FILE)
 	for c in $(PRELOAD_OPTLIB); do \
 		echo "--options=$$(basename $$c .ctags)" >> $(DESTDIR)$(preloaddir)/$(DEFAULT_PRELOAD_FILE); \
-	done; \
+	done
 	chmod 644 $(DESTDIR)$(preloaddir)/$(DEFAULT_PRELOAD_FILE)
 
 #
