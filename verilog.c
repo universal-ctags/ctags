@@ -54,10 +54,12 @@ typedef enum {
 	K_REGISTER,
 	K_TASK,
 	K_BLOCK,
+	K_ASSERTION,
 	K_CLASS,
 	K_INTERFACE,
 	K_MODPORT,
-	K_PROGRAM
+	K_PROGRAM,
+	K_PROPERTY
 } verilogKind;
 
 typedef struct {
@@ -72,6 +74,7 @@ typedef struct sTokenInfo {
 	struct sTokenInfo*  scope;         /* context of keyword */
 	int                 nestLevel;     /* Current nest level */
 	verilogKind         lastKind;      /* Kind of last found tag */
+	vString*            blockName;     /* Current block name */
 } tokenInfo;
 
 /*
@@ -103,10 +106,12 @@ static kindOption SystemVerilogKinds [] = {
  { TRUE, 'r', "register",  "register data types" },
  { TRUE, 't', "task",      "tasks" },
  { TRUE, 'b', "block",     "blocks" },
+ { TRUE, 'A', "assert",    "assertions" },
  { TRUE, 'C', "class",     "classes" },
  { TRUE, 'I', "interface", "interfaces" },
  { TRUE, 'M', "modport",   "modports" },
- { TRUE, 'P', "program",   "programs" }
+ { TRUE, 'P', "program",   "programs" },
+ { TRUE, 'R', "property",  "properties" }
 };
 
 static const keywordAssoc KeywordTable [] = {
@@ -145,15 +150,20 @@ static const keywordAssoc KeywordTable [] = {
 	{ "end",       K_BLOCK,     { 1, 1 } },
 	{ "signed",    K_IGNORE,    { 1, 1 } },
 	{ "automatic", K_IGNORE,    { 1, 0 } },
+	{ "assert",    K_ASSERTION, { 1, 0 } },
+	{ "assume",    K_ASSERTION, { 1, 0 } },
 	{ "bit",       K_REGISTER,  { 1, 0 } },
 	{ "byte",      K_REGISTER,  { 1, 0 } },
 	{ "class",     K_CLASS,     { 1, 0 } },
+	{ "cover",     K_ASSERTION, { 1, 0 } },
 	{ "int",       K_REGISTER,  { 1, 0 } },
 	{ "interface", K_INTERFACE, { 1, 0 } },
+	{ "local",     K_IGNORE,    { 1, 0 } },
 	{ "logic",     K_REGISTER,  { 1, 0 } },
 	{ "longint",   K_REGISTER,  { 1, 0 } },
 	{ "modport",   K_MODPORT,   { 1, 0 } },
 	{ "program",   K_PROGRAM,   { 1, 0 } },
+	{ "property",  K_PROPERTY,  { 1, 0 } },
 	{ "shortint",  K_REGISTER,  { 1, 0 } },
 	{ "shortreal", K_REGISTER,  { 1, 0 } },
 	{ "static",    K_IGNORE,    { 1, 0 } },
@@ -178,6 +188,7 @@ static short isContainer (verilogKind kind)
 		case K_CLASS:
 		case K_INTERFACE:
 		case K_PROGRAM:
+		case K_PROPERTY:
 			return TRUE;
 		default:
 			return FALSE;
@@ -192,6 +203,7 @@ static tokenInfo *newToken (void)
 	token->scope = NULL;
 	token->nestLevel = 0;
 	token->lastKind = K_UNDEFINED;
+	token->blockName = vStringNew ();
 	return token;
 }
 
@@ -200,6 +212,7 @@ static void deleteToken (tokenInfo * const token)
 	if (token != NULL)
 	{
 		vStringDelete (token->name);
+		vStringDelete (token->blockName);
 		eFree (token);
 	}
 }
@@ -377,6 +390,15 @@ static void skipComments (int c)
 			vUngetc (c);
 		}
 	}
+}
+
+static void skipToSemiColon (void)
+{
+	int c;
+	do
+	{
+		c = vGetc ();
+	} while (c != EOF && c != ';');
 }
 
 static boolean readIdentifier (vString *const name, int c)
@@ -606,6 +628,14 @@ static void findTag (vString *const name)
 		/* Process begin..end blocks */
 		processBlock (name, kind);
 	}
+	else if (kind == K_ASSERTION)
+	{
+		if (vStringLength (currentContext->blockName) > 0)
+		{
+			createTag (kind, currentContext->blockName);
+			skipToSemiColon ();
+		}
+	}
 	else if (kind != K_UNDEFINED)
 	{
 		int c = skipWhite (vGetc ());
@@ -641,10 +671,17 @@ static void findVerilogTags (void)
 	while (c != EOF)
 	{
 		c = vGetc ();
+		c = skipWhite (c);
 		switch (c)
 		{
 			case '/':
 				skipComments (c);
+				break;
+			/* Store current block name whenever a : is found
+			 * This is used later by any tag type that requires this information
+			 * */
+			case ':':
+				vStringCopy (currentContext->blockName, name);
 				break;
 			/* Skip interface modport port declarations */
 			case '(':
@@ -654,7 +691,6 @@ static void findVerilogTags (void)
 				}
 				break;
 			default :
-				c = skipWhite (c);
 				if (isIdentifierCharacter (c))
 				{
 					readIdentifier (name, c);
