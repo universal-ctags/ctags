@@ -77,11 +77,8 @@ HGVimDiffRestore	input.vim	/^augroup HGVimDiffRestore$/;"	a
 HGVimDiffRestore	input.vim	/^function! s:HGVimDiffRestore(vimDiffBuff)$/;"	f
 HGWipeoutCommandBuffers	input.vim	/^function! s:HGWipeoutCommandBuffers(originalBuffer, hgCommand)$/;"	f
 \add	input.vim	/^      nmap \\add <Plug>HGAdd$/;"	m
-before	input.vim	/^   mappings before the plugin is loaded, such as in the vimrc, in the standard $/;"	m
 buffer	input.vim	/^                        command buffer.  The HGCommand buffer variables may be $/;"	c
-commit	input.vim	/^   not commit the newly-added file.$/;"	m
 loaded_hgcommand	input.vim	/^let loaded_hgcommand = 1$/;"	v
 loaded_hgcommand	input.vim	/^let loaded_hgcommand=2$/;"	v
 s:HGCommandEditFileRunning	input.vim	/^let s:HGCommandEditFileRunning = 0$/;"	v
 s:revision	input.vim	/^  let s:revision="0.1"$/;"	v
-to	input.vim	/^   mapping to quit a HGCommand scratch buffer: >$/;"	m
