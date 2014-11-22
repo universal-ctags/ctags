@@ -44,6 +44,8 @@
 #include <errno.h>
 #include <ctype.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include "debug.h"
 #include "main.h"
@@ -289,7 +291,9 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 		verbose("	status: %d\n", status);
 		if (status != 0)
 		{
-			if (WIFEXITED (status) && (WEXITSTATUS (status) == XCMD_NOT_AVAILABLE_STATUS))
+			if (status > 0 
+			    && WIFEXITED (status) 
+			    && (WEXITSTATUS (status) == XCMD_NOT_AVAILABLE_STATUS))
 				error (WARNING, "xcmd recognizes %s is not available", argv[0]);
 			else
 				error (WARNING, "xcmd exits abnormally status(%d): [%s %s]",
