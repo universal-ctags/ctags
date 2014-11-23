@@ -1,0 +1,14 @@
+a	input.js	/^var a = 1$/;"	v
+b	input.js	/^var b = function(){}$/;"	f
+c	input.js	/^function c() {}$/;"	f
+d	input.js	/^var d = {}$/;"	v
+e	input.js	/^function e() {}$/;"	f
+f	input.js	/^var f = []$/;"	v
+g	input.js	/^function g() {}$/;"	f
+h	input.js	/^var h = (1)$/;"	v
+i	input.js	/^function i() {}$/;"	f
+j	input.js	/^function j() {}$/;"	f
+k	input.js	/^var k = new Function('a','b','return a+b')$/;"	f
+l	input.js	/^function l() {}$/;"	f
+m	input.js	/^var m = 0 \/\/ a single comment doesn't eat the newline$/;"	v
+n	input.js	/^function n() {}$/;"	f
