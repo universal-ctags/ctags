@@ -16,7 +16,6 @@
 #include "general.h"	/* must always come first */
 
 #include <ctype.h>	/* to define isalpha () */
-#include <setjmp.h>
 #ifdef DEBUG
 #include <stdio.h>
 #endif
@@ -28,7 +27,6 @@
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
-#include "trashbox.h"
 
 /*
  *	On-line "Oracle Database PL/SQL Language Reference":
@@ -143,6 +141,7 @@ typedef struct sKeywordDesc {
 
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
+	TOKEN_EOF,
 	TOKEN_BLOCK_LABEL_BEGIN,
 	TOKEN_BLOCK_LABEL_END,
 	TOKEN_CHARACTER,
@@ -182,8 +181,6 @@ typedef struct sTokenInfoSQL {
  */
 
 static langType Lang_sql;
-
-static jmp_buf *Exception;
 
 typedef enum {
 	SQLTAG_CURSOR,
@@ -320,10 +317,10 @@ static const keywordDesc SqlKeywordTable [] = {
  */
 
 /* Recursive calls */
-static void parseBlock (tokenInfo *const token, const boolean local, TrashBox *trash_box);
-static void parseDeclare (tokenInfo *const token, const boolean local, TrashBox *trash_box);
-static void parseKeywords (tokenInfo *const token, TrashBox *trash_box);
-static void parseSqlFile (tokenInfo *const token, TrashBox *trash_box);
+static void parseBlock (tokenInfo *const token, const boolean local);
+static void parseDeclare (tokenInfo *const token, const boolean local);
+static void parseKeywords (tokenInfo *const token);
+static tokenType parseSqlFile (tokenInfo *const token);
 
 /*
  *	 FUNCTION DEFINITIONS
@@ -541,7 +538,7 @@ getNextChar:
 
 	switch (c)
 	{
-		case EOF: longjmp (*Exception, (int)ExceptionEOF);	break;
+		case EOF: token->type = TOKEN_EOF;				break;
 		case '(': token->type = TOKEN_OPEN_PAREN;		break;
 		case ')': token->type = TOKEN_CLOSE_PAREN;		break;
 		case ':': token->type = TOKEN_COLON;			break;
@@ -717,7 +714,7 @@ static void addToScope (tokenInfo* const token, vString* const extra, sqlKind ki
 
 static void findToken (tokenInfo *const token, const tokenType type)
 {
-	while (! isType (token, type))
+	while (! (isType (token, type) || isType (token, TOKEN_EOF)))
 	{
 		readToken (token);
 	}
@@ -735,7 +732,7 @@ static void findCmdTerm (tokenInfo *const token, const boolean check_first)
 	do
 	{
 		readToken (token);
-	} while ( !isCmdTerm(token) && !isMatchedEnd(token, begin_end_nest_lvl) );
+	} while ( !isCmdTerm(token) && !isMatchedEnd(token, begin_end_nest_lvl) && !isType (token, TOKEN_EOF));
 }
 
 static void skipToMatched(tokenInfo *const token)
@@ -771,7 +768,7 @@ static void skipToMatched(tokenInfo *const token)
 	if (isType (token, open_token))	
 	{
 		nest_level++;
-		while (! (isType (token, close_token) && (nest_level == 0)))
+		while (! (isType (token, close_token) && (nest_level == 0)) && !isType (token, TOKEN_EOF))
 		{
 			readToken (token);
 			if (isType (token, open_token))
@@ -816,14 +813,11 @@ static void skipArgumentList (tokenInfo *const token)
 	}
 }
 
-static void parseSubProgram (tokenInfo *const token, TrashBox *trash_box)
+static void parseSubProgram (tokenInfo *const token)
 {
 	tokenInfo *const name  = newToken ();
 	vString * saveScope = vStringNew ();
 	sqlKind saveScopeKind;
-
-	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc) deleteToken);
-	trashBoxPut (trash_box, saveScope, (TrashBoxDestroyItemProc) vStringDelete);
 
 	/*
 	 * This must handle both prototypes and the body of
@@ -942,6 +936,7 @@ static void parseSubProgram (tokenInfo *const token, TrashBox *trash_box)
 					isKeyword (token, KEYWORD_external) ||
 					isKeyword (token, KEYWORD_url) ||
 					isType (token, TOKEN_EQUAL) ||
+					isType (token, TOKEN_EOF) ||
 					isCmdTerm (token)
 				)
 			  )
@@ -977,7 +972,7 @@ static void parseSubProgram (tokenInfo *const token, TrashBox *trash_box)
 			readToken (token);
 
 		if ( isKeyword (token, KEYWORD_declare) )
-			parseDeclare (token, FALSE, trash_box);
+			parseDeclare (token, FALSE);
 
 		if (isKeyword (token, KEYWORD_is) || 
 				isKeyword (token, KEYWORD_begin) )
@@ -989,13 +984,15 @@ static void parseSubProgram (tokenInfo *const token, TrashBox *trash_box)
 			   )
 				makeSqlTag (name, kind);
 
-			parseBlock (token, TRUE, trash_box);
+			parseBlock (token, TRUE);
 			vStringClear (token->scope);
 			token->scopeKind = SQLTAG_COUNT;
 		} 
 	}
 	vStringCopy(token->scope, saveScope);
 	token->scopeKind = saveScopeKind;
+	deleteToken (name);
+	vStringDelete(saveScope);
 }
 
 static void parseRecord (tokenInfo *const token)
@@ -1041,7 +1038,8 @@ static void parseRecord (tokenInfo *const token)
 
 		while (!(isType (token, TOKEN_COMMA) ||
 					isType (token, TOKEN_CLOSE_PAREN) ||
-					isType (token, TOKEN_OPEN_PAREN) 
+					isType (token, TOKEN_OPEN_PAREN) ||
+					isType (token, TOKEN_EOF)
 				))
 		{
 			readToken (token);
@@ -1064,17 +1062,14 @@ static void parseRecord (tokenInfo *const token)
 				skipArgumentList(token);
 			}
 		}
-	} while (! isType (token, TOKEN_CLOSE_PAREN));
+	} while (! (isType (token, TOKEN_CLOSE_PAREN) || isType (token, TOKEN_EOF)));
 }
 
-static void parseType (tokenInfo *const token, TrashBox *trash_box)
+static void parseType (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
 	vString * saveScope = vStringNew ();
 	sqlKind saveScopeKind;
-
-	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
-	trashBoxPut (trash_box, saveScope, (TrashBoxDestroyItemProc)vStringDelete);
 
 	vStringCopy(saveScope, token->scope);
 	/* If a scope has been set, add it to the name */
@@ -1114,6 +1109,8 @@ static void parseType (tokenInfo *const token, TrashBox *trash_box)
 	}
 	vStringCopy(token->scope, saveScope);
 	token->scopeKind = saveScopeKind;
+	deleteToken (name);
+	vStringDelete(saveScope);
 }
 
 static void parseSimple (tokenInfo *const token, const sqlKind kind)
@@ -1125,7 +1122,7 @@ static void parseSimple (tokenInfo *const token, const sqlKind kind)
 		makeSqlTag (token, kind);
 }
 
-static void parseDeclare (tokenInfo *const token, const boolean local, TrashBox *trash_box)
+static void parseDeclare (tokenInfo *const token, const boolean local)
 {
 	/*
 	 * PL/SQL declares are of this format:
@@ -1140,16 +1137,16 @@ static void parseDeclare (tokenInfo *const token, const boolean local, TrashBox 
 
 	if (isKeyword (token, KEYWORD_declare))
 		readToken (token);
-	while (! isKeyword (token, KEYWORD_begin) && ! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_begin) && ! isKeyword (token, KEYWORD_end) && ! isType (token, TOKEN_EOF))
 	{
 		switch (token->keyword)
 		{
 			case KEYWORD_cursor:	parseSimple (token, SQLTAG_CURSOR); break;
-			case KEYWORD_function:	parseSubProgram (token, trash_box); break;
-			case KEYWORD_procedure: parseSubProgram (token, trash_box); break;
+			case KEYWORD_function:	parseSubProgram (token); break;
+			case KEYWORD_procedure: parseSubProgram (token); break;
 			case KEYWORD_subtype:	parseSimple (token, SQLTAG_SUBTYPE); break;
 			case KEYWORD_trigger:	parseSimple (token, SQLTAG_TRIGGER); break;
-			case KEYWORD_type:		parseType (token, trash_box); break;
+			case KEYWORD_type:		parseType (token); break;
 
 			default:
 				if (isType (token, TOKEN_IDENTIFIER))
@@ -1170,11 +1167,9 @@ static void parseDeclare (tokenInfo *const token, const boolean local, TrashBox 
 	}
 }
 
-static void parseDeclareANSI (tokenInfo *const token, const boolean local, TrashBox *trash_box)
+static void parseDeclareANSI (tokenInfo *const token, const boolean local)
 {
 	tokenInfo *const type = newToken ();
-
-	trashBoxPut (trash_box, type, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * ANSI declares are of this format:
 	 *	 BEGIN
@@ -1185,7 +1180,7 @@ static void parseDeclareANSI (tokenInfo *const token, const boolean local, Trash
 	 * This differ from PL/SQL where DECLARE preceeds the BEGIN block
 	 * and the DECLARE keyword is not repeated.
 	 */
-	while (isKeyword (token, KEYWORD_declare))
+	while (isKeyword (token, KEYWORD_declare) && ! isType (token, TOKEN_EOF))
 	{
 		readToken (token);
 		readToken (type);
@@ -1223,9 +1218,10 @@ static void parseDeclareANSI (tokenInfo *const token, const boolean local, Trash
 		findToken (token, TOKEN_SEMICOLON);
 		readToken (token);
 	}
+	deleteToken (type);
 }
 
-static void parseLabel (tokenInfo *const token, TrashBox *trash_box)
+static void parseLabel (tokenInfo *const token)
 {
 	/*
 	 * A label has this format:
@@ -1251,7 +1247,7 @@ static void parseLabel (tokenInfo *const token, TrashBox *trash_box)
 	}
 }
 
-static void parseStatements (tokenInfo *const token, const boolean exit_on_endif, TrashBox *trash_box)
+static void parseStatements (tokenInfo *const token, const boolean exit_on_endif )
 {
 	/* boolean isAnsi   = TRUE; */
 	boolean stmtTerm = FALSE;
@@ -1259,7 +1255,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 	{
 
 		if (isType (token, TOKEN_BLOCK_LABEL_BEGIN))
-			parseLabel (token, trash_box);
+			parseLabel (token);
 		else
 		{
 			switch (token->keyword)
@@ -1296,7 +1292,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 					 * of a nested BEGIN END block.  So read the next token
 					 * after the THEN and restart the LOOP.
 					 */
-					while (! isKeyword (token, KEYWORD_then))
+					while (! (isKeyword (token, KEYWORD_then) || isType (token, TOKEN_EOF)))
 						readToken (token);
 
 					readToken (token);
@@ -1324,7 +1320,8 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 					 *	END
 					 */
 					while ( ! isKeyword (token, KEYWORD_then)  &&
-							! isKeyword (token, KEYWORD_begin) )
+							! isKeyword (token, KEYWORD_begin) &&
+							! isType (token, TOKEN_EOF) )
 					{
 						readToken (token);
 					}
@@ -1332,7 +1329,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 					if( isKeyword (token, KEYWORD_begin ) )
 					{
 						/* isAnsi = FALSE; */
-						parseBlock(token, FALSE, trash_box);
+						parseBlock(token, FALSE);
 
 						/*
 						 * Handle the non-Ansi IF blocks.
@@ -1348,14 +1345,15 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 						readToken (token);
 
 						while( ! (isKeyword (token, KEYWORD_end ) ||
-						          isKeyword (token, KEYWORD_endif ) ) 
+						          isKeyword (token, KEYWORD_endif ) ||
+								  isType (token, TOKEN_EOF ) )
 								)
 						{
 							if ( isKeyword (token, KEYWORD_else) ||
 									isKeyword (token, KEYWORD_elseif)    )
 								readToken (token);
 
-							parseStatements (token, TRUE, trash_box);
+							parseStatements (token, TRUE);
 
 							if ( isCmdTerm(token) )
 								readToken (token);
@@ -1413,7 +1411,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 						/* AS */
 						readToken (token);
 
-						while ( ! isKeyword (token, KEYWORD_is) )
+						while ( ! (isKeyword (token, KEYWORD_is) || isType (token, TOKEN_EOF)) )
 						{
 							/*
 							 * If this is not an AS keyword this is 
@@ -1423,13 +1421,13 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 							return;
 						}
 
-						while ( ! isKeyword (token, KEYWORD_do) )
+						while ( ! (isKeyword (token, KEYWORD_do) || isType (token, TOKEN_EOF)))
 							readToken (token);
 					}
 
 
 					readToken (token);
-					while( ! isKeyword (token, KEYWORD_end ) )
+					while( ! (isKeyword (token, KEYWORD_end ) || isType (token, TOKEN_EOF )))
 					{
 						/*
 						if ( isKeyword (token, KEYWORD_else) ||
@@ -1437,7 +1435,7 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 							readToken (token);
 							*/
 
-						parseStatements (token, FALSE, trash_box);
+						parseStatements (token, FALSE);
 
 						if ( isCmdTerm(token) )
 							readToken (token);
@@ -1465,12 +1463,12 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 
 				case KEYWORD_create:
 					readToken (token);
-					parseKeywords(token, trash_box);
+					parseKeywords(token);
 					break;
 
 				case KEYWORD_declare:
 				case KEYWORD_begin:
-					parseBlock (token, TRUE, trash_box);
+					parseBlock (token, TRUE);
 					break;
 
 				case KEYWORD_end:
@@ -1495,7 +1493,8 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 			 */
 			while ( ! stmtTerm                               && 
 					! (   isKeyword (token, KEYWORD_end)     ||
-						 (isCmdTerm(token))              )	 
+						 (isCmdTerm(token))                  ||
+						 (isType(token, TOKEN_EOF))          )
 					)
 			{
 				if (   isKeyword (token, KEYWORD_endif)   &&
@@ -1540,9 +1539,9 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 						isKeyword (token, KEYWORD_case) ||
 						isKeyword (token, KEYWORD_for) ||
 						isKeyword (token, KEYWORD_begin)    )
-					parseStatements (token, FALSE, trash_box);
+					parseStatements (token, FALSE);
 				else if (isKeyword (token, KEYWORD_if))
-					parseStatements (token, TRUE, trash_box);
+					parseStatements (token, TRUE);
 
 			}
 		}
@@ -1556,14 +1555,15 @@ static void parseStatements (tokenInfo *const token, const boolean exit_on_endif
 				
 	} while (! isKeyword (token, KEYWORD_end) && 
 			 ! (exit_on_endif && isKeyword (token, KEYWORD_endif) ) && 
+			 ! isType (token, TOKEN_EOF) &&
 			 ! stmtTerm );
 }
 
-static void parseBlock (tokenInfo *const token, const boolean local, TrashBox *trash_box)
+static void parseBlock (tokenInfo *const token, const boolean local)
 {
 	if (isType (token, TOKEN_BLOCK_LABEL_BEGIN))
 	{
-		parseLabel (token, trash_box);
+		parseLabel (token);
 		readToken (token);
 	}
 	if (! isKeyword (token, KEYWORD_begin))
@@ -1573,7 +1573,7 @@ static void parseBlock (tokenInfo *const token, const boolean local, TrashBox *t
 		 * These are Oracle style declares which generally come
 		 * between an IS/AS and BEGIN block.
 		 */
-		parseDeclare (token, local, trash_box);
+		parseDeclare (token, local);
 	}
 	if (isKeyword (token, KEYWORD_begin))
 	{
@@ -1583,11 +1583,11 @@ static void parseBlock (tokenInfo *const token, const boolean local, TrashBox *t
 		 * a BEGIN statement.  This routine will not advance
 		 * the token if none are found.
 		 */
-		parseDeclareANSI (token, local, trash_box);
+		parseDeclareANSI (token, local);
 		token->begin_end_nest_lvl++;
-		while (! isKeyword (token, KEYWORD_end))
+		while (! (isKeyword (token, KEYWORD_end) || isType (token, TOKEN_EOF)))
 		{
-			parseStatements (token, FALSE, trash_box);
+			parseStatements (token, FALSE);
 
 			if ( isCmdTerm(token) )
 				readToken (token);
@@ -1617,7 +1617,7 @@ static void parseBlock (tokenInfo *const token, const boolean local, TrashBox *t
 	}
 }
 
-static void parsePackage (tokenInfo *const token, TrashBox *trash_box)
+static void parsePackage (tokenInfo *const token)
 {
 	/* 
 	 * Packages can be specified in a number of ways:
@@ -1629,8 +1629,6 @@ static void parsePackage (tokenInfo *const token, TrashBox *trash_box)
 	 *	   CREATE OR REPLACE PACKAGE BODY owner.pkg_name AS
  */
 	tokenInfo *const name = newToken ();
-
-	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	readIdentifier (name);
 	if (isKeyword (name, KEYWORD_body))
 	{
@@ -1641,7 +1639,7 @@ static void parsePackage (tokenInfo *const token, TrashBox *trash_box)
 		readIdentifier (name);
 	}
 	/* Check for owner.pkg_name */
-	while (! isKeyword (token, KEYWORD_is))
+	while (! (isKeyword (token, KEYWORD_is) || isType (token, TOKEN_EOF)))
 	{
 		readToken (token);
 		if ( isType(token, TOKEN_PERIOD) )
@@ -1655,18 +1653,18 @@ static void parsePackage (tokenInfo *const token, TrashBox *trash_box)
 				isType (name, TOKEN_STRING))
 			makeSqlTag (name, SQLTAG_PACKAGE);
 		addToScope (token, name->string, SQLTAG_PACKAGE);
-		parseBlock (token, FALSE, trash_box);
+		parseBlock (token, FALSE);
 		vStringClear (token->scope);
 		token->scopeKind = SQLTAG_COUNT;
 	}
 	findCmdTerm (token, FALSE);
+	deleteToken (name);
 }
 
-static void parseTable (tokenInfo *const token, TrashBox *trash_box)
+static void parseTable (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
 
-	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats:
 	 *	   create table t1 (c1 int);
@@ -1734,15 +1732,13 @@ static void parseTable (tokenInfo *const token, TrashBox *trash_box)
 		}
 	}
 	findCmdTerm (token, FALSE);
+	deleteToken (name);
 }
 
-static void parseIndex (tokenInfo *const token, TrashBox *trash_box)
+static void parseIndex (tokenInfo *const token)
 {
 	tokenInfo *const name  = newToken ();
 	tokenInfo *const owner = newToken ();
-
-	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
-	trashBoxPut (trash_box, owner, (TrashBoxDestroyItemProc)deleteToken);
 
 	/*
 	 * This deals with these formats
@@ -1774,13 +1770,14 @@ static void parseIndex (tokenInfo *const token, TrashBox *trash_box)
 		makeSqlTag (name, SQLTAG_INDEX);
 	}
 	findCmdTerm (token, FALSE);
+	deleteToken (name);
+	deleteToken (owner);
 }
 
-static void parseEvent (tokenInfo *const token, TrashBox *trash_box)
+static void parseEvent (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
 
-	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   create event e1 handler begin end;
@@ -1795,8 +1792,9 @@ static void parseEvent (tokenInfo *const token, TrashBox *trash_box)
 	{
 		readIdentifier (name);
 	}
-	while (! (isKeyword (token, KEYWORD_handler) ||
-				(isType (token, TOKEN_SEMICOLON)))	  )
+	while (! (isKeyword (token, KEYWORD_handler)  ||
+				(isType (token, TOKEN_SEMICOLON)) ||
+				(isType (token, TOKEN_EOF)))	  )
 	{
 		readToken (token);
 	}
@@ -1812,19 +1810,18 @@ static void parseEvent (tokenInfo *const token, TrashBox *trash_box)
 		readToken (token);
 		if ( isKeyword (token, KEYWORD_begin) )
 		{
-			parseBlock (token, TRUE, trash_box);
+			parseBlock (token, TRUE);
 		}
 		findCmdTerm (token, TRUE);
 	}
+	deleteToken (name);
 }
 
-static void parseTrigger (tokenInfo *const token, TrashBox *trash_box)
+static void parseTrigger (tokenInfo *const token)
 {
 	tokenInfo *const name  = newToken ();
 	tokenInfo *const table = newToken ();
 
-	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
-	trashBoxPut (trash_box, table, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   create or replace trigger tr1 begin end;
@@ -1845,6 +1842,7 @@ static void parseTrigger (tokenInfo *const token, TrashBox *trash_box)
 	}
 
 	while ( !isKeyword (token, KEYWORD_on) &&
+			!isType (token, TOKEN_EOF) &&
 			!isCmdTerm (token)		)
 	{
 		readToken (token);
@@ -1863,12 +1861,13 @@ static void parseTrigger (tokenInfo *const token, TrashBox *trash_box)
 
 		while (! (isKeyword (token, KEYWORD_begin) ||
 					(isKeyword (token, KEYWORD_call)) ||
-					(	isCmdTerm (token)))    )
+					(	isCmdTerm (token)) ||
+					(isType (token, TOKEN_EOF)) )  )
 		{
 			if ( isKeyword (token, KEYWORD_declare) )
 			{
 				addToScope(token, name->string, SQLTAG_TRIGGER);
-				parseDeclare(token, TRUE, trash_box);
+				parseDeclare(token, TRUE);
 				vStringClear(token->scope);
 				token->scopeKind = SQLTAG_COUNT;
 			}
@@ -1884,7 +1883,7 @@ static void parseTrigger (tokenInfo *const token, TrashBox *trash_box)
 			addToScope(token, table->string, SQLTAG_TABLE);
 			if ( isKeyword (token, KEYWORD_begin) )
 			{
-				parseBlock (token, TRUE, trash_box);
+				parseBlock (token, TRUE);
 			}
 			vStringClear(token->scope);
 			token->scopeKind = SQLTAG_COUNT;
@@ -1892,13 +1891,14 @@ static void parseTrigger (tokenInfo *const token, TrashBox *trash_box)
 	}
 
 	findCmdTerm (token, TRUE);
+	deleteToken (name);
+	deleteToken (table);
 }
 
-static void parsePublication (tokenInfo *const token, TrashBox *trash_box)
+static void parsePublication (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
 
-	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   create or replace publication pu1 ()
@@ -1923,12 +1923,12 @@ static void parsePublication (tokenInfo *const token, TrashBox *trash_box)
 		}
 	}
 	findCmdTerm (token, FALSE);
+	deleteToken (name);
 }
-static void parseService (tokenInfo *const token, TrashBox *trash_box)
+static void parseService (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
 
-	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   CREATE SERVICE s1 TYPE 'HTML' 
@@ -1951,13 +1951,13 @@ static void parseService (tokenInfo *const token, TrashBox *trash_box)
 		}
 	}
 	findCmdTerm (token, FALSE);
+	deleteToken (name);
 }
 
-static void parseDomain (tokenInfo *const token, TrashBox *trash_box)
+static void parseDomain (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
 
-	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   CREATE DOMAIN|DATATYPE [AS] your_name ...;
@@ -1975,6 +1975,7 @@ static void parseDomain (tokenInfo *const token, TrashBox *trash_box)
 		makeSqlTag (name, SQLTAG_DOMAIN);
 	}
 	findCmdTerm (token, FALSE);
+	deleteToken (name);
 }
 
 static void parseDrop (tokenInfo *const token)
@@ -1992,11 +1993,10 @@ static void parseDrop (tokenInfo *const token)
 	findCmdTerm (token, FALSE);
 }
 
-static void parseVariable (tokenInfo *const token, TrashBox *trash_box)
+static void parseVariable (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
 
-	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   create variable varname1 integer;
@@ -2013,13 +2013,14 @@ static void parseVariable (tokenInfo *const token, TrashBox *trash_box)
 		makeSqlTag (name, SQLTAG_VARIABLE);
 	}
 	findCmdTerm (token, TRUE);
+
+	deleteToken (name);
 }
 
-static void parseSynonym (tokenInfo *const token, TrashBox *trash_box)
+static void parseSynonym (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
 
-	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   create variable varname1 integer;
@@ -2036,13 +2037,14 @@ static void parseSynonym (tokenInfo *const token, TrashBox *trash_box)
 		makeSqlTag (name, SQLTAG_SYNONYM);
 	}
 	findCmdTerm (token, TRUE);
+
+	deleteToken (name);
 }
 
-static void parseView (tokenInfo *const token, TrashBox *trash_box)
+static void parseView (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
 
-	trashBoxPut (trash_box, name, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	   create variable varname1 integer;
@@ -2065,7 +2067,8 @@ static void parseView (tokenInfo *const token, TrashBox *trash_box)
 	}
 
 	while (!(isKeyword (token, KEYWORD_is) ||
-				isType (token, TOKEN_SEMICOLON)
+				isType (token, TOKEN_SEMICOLON) ||
+				isType (token, TOKEN_EOF)
 			))
 	{
 		readToken (token);
@@ -2078,17 +2081,16 @@ static void parseView (tokenInfo *const token, TrashBox *trash_box)
 	}
 
 	findCmdTerm (token, TRUE);
+
+	deleteToken (name);
 }
 
-static void parseMLTable (tokenInfo *const token, TrashBox *trash_box)
+static void parseMLTable (tokenInfo *const token)
 {
 	tokenInfo *const version = newToken ();
 	tokenInfo *const table	 = newToken ();
 	tokenInfo *const event	 = newToken ();
 
-	trashBoxPut (trash_box, version, (TrashBoxDestroyItemProc)deleteToken);
-	trashBoxPut (trash_box, table, (TrashBoxDestroyItemProc)deleteToken);
-	trashBoxPut (trash_box, event, (TrashBoxDestroyItemProc)deleteToken);
 	/*
 	 * This deals with these formats
 	 *	  call dbo.ml_add_table_script( 'version', 'table_name', 'event',
@@ -2102,7 +2104,8 @@ static void parseMLTable (tokenInfo *const token, TrashBox *trash_box)
 		readToken (version);
 		readToken (token);
 		while (!(isType (token, TOKEN_COMMA) ||
-					isType (token, TOKEN_CLOSE_PAREN)
+					isType (token, TOKEN_CLOSE_PAREN) ||
+					isType (token, TOKEN_EOF)
 				))
 		{
 			readToken (token);
@@ -2113,7 +2116,8 @@ static void parseMLTable (tokenInfo *const token, TrashBox *trash_box)
 			readToken (table);
 			readToken (token);
 			while (!(isType (token, TOKEN_COMMA) ||
-						isType (token, TOKEN_CLOSE_PAREN)
+						isType (token, TOKEN_CLOSE_PAREN) ||
+						isType (token, TOKEN_EOF)
 					))
 			{
 				readToken (token);
@@ -2138,15 +2142,16 @@ static void parseMLTable (tokenInfo *const token, TrashBox *trash_box)
 	}
 
 	findCmdTerm (token, TRUE);
+
+	deleteToken (version);
+	deleteToken (table);
+	deleteToken (event);
 }
 
-static void parseMLConn (tokenInfo *const token, TrashBox *trash_box)
+static void parseMLConn (tokenInfo *const token)
 {
 	tokenInfo *const version = newToken ();
 	tokenInfo *const event	 = newToken ();
-
-	trashBoxPut (trash_box, version, (TrashBoxDestroyItemProc)deleteToken);
-	trashBoxPut (trash_box, event, (TrashBoxDestroyItemProc)deleteToken);
 
 	/*
 	 * This deals with these formats
@@ -2161,7 +2166,8 @@ static void parseMLConn (tokenInfo *const token, TrashBox *trash_box)
 		readToken (version);
 		readToken (token);
 		while (!(isType (token, TOKEN_COMMA) ||
-					isType (token, TOKEN_CLOSE_PAREN)
+					isType (token, TOKEN_CLOSE_PAREN) ||
+					isType (token, TOKEN_EOF)
 				))
 		{
 			readToken (token);
@@ -2184,17 +2190,16 @@ static void parseMLConn (tokenInfo *const token, TrashBox *trash_box)
 	}
 
 	findCmdTerm (token, TRUE);
+
+	deleteToken (version);
+	deleteToken (event);
 }
 
-static void parseMLProp (tokenInfo *const token, TrashBox *trash_box)
+static void parseMLProp (tokenInfo *const token)
 {
 	tokenInfo *const component     = newToken ();
 	tokenInfo *const prop_set_name = newToken ();
 	tokenInfo *const prop_name     = newToken ();
-
-	trashBoxPut (trash_box, component, (TrashBoxDestroyItemProc)deleteToken);
-	trashBoxPut (trash_box, prop_set_name, (TrashBoxDestroyItemProc)deleteToken);
-	trashBoxPut (trash_box, prop_name, (TrashBoxDestroyItemProc)deleteToken);
 
 	/*
 	 * This deals with these formats
@@ -2212,7 +2217,8 @@ static void parseMLProp (tokenInfo *const token, TrashBox *trash_box)
 		readToken (component);
 		readToken (token);
 		while (!(isType (token, TOKEN_COMMA) ||
-					isType (token, TOKEN_CLOSE_PAREN)
+					isType (token, TOKEN_CLOSE_PAREN) ||
+					isType (token, TOKEN_EOF)
 				))
 		{
 			readToken (token);
@@ -2223,7 +2229,8 @@ static void parseMLProp (tokenInfo *const token, TrashBox *trash_box)
 			readToken (prop_set_name);
 			readToken (token);
 			while (!(isType (token, TOKEN_COMMA) ||
-						isType (token, TOKEN_CLOSE_PAREN)
+						isType (token, TOKEN_CLOSE_PAREN) ||
+						isType (token, TOKEN_EOF)
 					))
 			{
 				readToken (token);
@@ -2248,9 +2255,13 @@ static void parseMLProp (tokenInfo *const token, TrashBox *trash_box)
 	}
 
 	findCmdTerm (token, TRUE);
+
+	deleteToken (component);
+	deleteToken (prop_set_name);
+	deleteToken (prop_name);
 }
 
-static void parseComment (tokenInfo *const token, TrashBox *trash_box)
+static void parseComment (tokenInfo *const token)
 {
 	/*
 	 * This deals with this statement:
@@ -2268,7 +2279,7 @@ static void parseComment (tokenInfo *const token, TrashBox *trash_box)
 	 *			;
 	 * Or it could be a simple string with no curly braces
 	 */
-	while (! isKeyword (token, KEYWORD_is))
+	while (! (isKeyword (token, KEYWORD_is) || isType (token, TOKEN_EOF)))
 	{
 		readToken (token);
 	}
@@ -2282,58 +2293,60 @@ static void parseComment (tokenInfo *const token, TrashBox *trash_box)
 }
 
 
-static void parseKeywords (tokenInfo *const token, TrashBox *trash_box)
+static void parseKeywords (tokenInfo *const token)
 {
 		switch (token->keyword)
 		{
-			case KEYWORD_begin:			parseBlock (token, FALSE, trash_box); break;
-			case KEYWORD_comment:		parseComment (token, trash_box); break;
+			case KEYWORD_begin:			parseBlock (token, FALSE); break;
+			case KEYWORD_comment:		parseComment (token); break;
 			case KEYWORD_cursor:		parseSimple (token, SQLTAG_CURSOR); break;
-			case KEYWORD_datatype:		parseDomain (token, trash_box); break;
-			case KEYWORD_declare:		parseBlock (token, FALSE, trash_box); break;
-			case KEYWORD_domain:		parseDomain (token, trash_box); break;
+			case KEYWORD_datatype:		parseDomain (token); break;
+			case KEYWORD_declare:		parseBlock (token, FALSE); break;
+			case KEYWORD_domain:		parseDomain (token); break;
 			case KEYWORD_drop:			parseDrop (token); break;
-			case KEYWORD_event:			parseEvent (token, trash_box); break;
-			case KEYWORD_function:		parseSubProgram (token, trash_box); break;
-			case KEYWORD_if:			parseStatements (token, FALSE, trash_box); break;
-			case KEYWORD_index:			parseIndex (token, trash_box); break;
-			case KEYWORD_ml_table:		parseMLTable (token, trash_box); break;
-			case KEYWORD_ml_table_lang: parseMLTable (token, trash_box); break;
-			case KEYWORD_ml_table_dnet: parseMLTable (token, trash_box); break;
-			case KEYWORD_ml_table_java: parseMLTable (token, trash_box); break;
-			case KEYWORD_ml_table_chk:  parseMLTable (token, trash_box); break;
-			case KEYWORD_ml_conn:		parseMLConn (token, trash_box); break;
-			case KEYWORD_ml_conn_lang:	parseMLConn (token, trash_box); break;
-			case KEYWORD_ml_conn_dnet:	parseMLConn (token, trash_box); break;
-			case KEYWORD_ml_conn_java:	parseMLConn (token, trash_box); break;
-			case KEYWORD_ml_conn_chk:	parseMLConn (token, trash_box); break;
-			case KEYWORD_ml_prop:		parseMLProp (token, trash_box); break;
-			case KEYWORD_package:		parsePackage (token, trash_box); break;
-			case KEYWORD_procedure:		parseSubProgram (token, trash_box); break;
-			case KEYWORD_publication:	parsePublication (token, trash_box); break;
-			case KEYWORD_service:		parseService (token, trash_box); break;
+			case KEYWORD_event:			parseEvent (token); break;
+			case KEYWORD_function:		parseSubProgram (token); break;
+			case KEYWORD_if:			parseStatements (token, FALSE); break;
+			case KEYWORD_index:			parseIndex (token); break;
+			case KEYWORD_ml_table:		parseMLTable (token); break;
+			case KEYWORD_ml_table_lang: parseMLTable (token); break;
+			case KEYWORD_ml_table_dnet: parseMLTable (token); break;
+			case KEYWORD_ml_table_java: parseMLTable (token); break;
+			case KEYWORD_ml_table_chk:  parseMLTable (token); break;
+			case KEYWORD_ml_conn:		parseMLConn (token); break;
+			case KEYWORD_ml_conn_lang:	parseMLConn (token); break;
+			case KEYWORD_ml_conn_dnet:	parseMLConn (token); break;
+			case KEYWORD_ml_conn_java:	parseMLConn (token); break;
+			case KEYWORD_ml_conn_chk:	parseMLConn (token); break;
+			case KEYWORD_ml_prop:		parseMLProp (token); break;
+			case KEYWORD_package:		parsePackage (token); break;
+			case KEYWORD_procedure:		parseSubProgram (token); break;
+			case KEYWORD_publication:	parsePublication (token); break;
+			case KEYWORD_service:		parseService (token); break;
 			case KEYWORD_subtype:		parseSimple (token, SQLTAG_SUBTYPE); break;
-			case KEYWORD_synonym:		parseSynonym (token, trash_box); break;
-			case KEYWORD_table:			parseTable (token, trash_box); break;
-			case KEYWORD_trigger:		parseTrigger (token, trash_box); break;
-			case KEYWORD_type:			parseType (token, trash_box); break;
-			case KEYWORD_variable:		parseVariable (token, trash_box); break;
-			case KEYWORD_view:			parseView (token, trash_box); break;
+			case KEYWORD_synonym:		parseSynonym (token); break;
+			case KEYWORD_table:			parseTable (token); break;
+			case KEYWORD_trigger:		parseTrigger (token); break;
+			case KEYWORD_type:			parseType (token); break;
+			case KEYWORD_variable:		parseVariable (token); break;
+			case KEYWORD_view:			parseView (token); break;
 			default:				    break;
 		}
 }
 
-static void parseSqlFile (tokenInfo *const token, TrashBox *trash_box)
+static tokenType parseSqlFile (tokenInfo *const token)
 {
 	do
 	{
 		readToken (token);
 
 		if (isType (token, TOKEN_BLOCK_LABEL_BEGIN))
-			parseLabel (token, trash_box);
+			parseLabel (token);
 		else 
-			parseKeywords (token, trash_box);
-	} while (! isKeyword (token, KEYWORD_end));
+			parseKeywords (token);
+	} while (! (isKeyword (token, KEYWORD_end) || isType (token, TOKEN_EOF)));
+
+	return token->type;
 }
 
 static void initialize (const langType language)
@@ -2343,18 +2356,13 @@ static void initialize (const langType language)
 	buildSqlKeywordHash ();
 }
 
-static rescanReason findSqlTags (const unsigned int passCount __unused__,
-				 jmp_buf *jbuf, TrashBox *tbox)
+static void findSqlTags (void)
 {
 	tokenInfo *const token = newToken ();
 
-	trashBoxPut (tbox, token, (TrashBoxDestroyItemProc)deleteToken);
-	Exception = jbuf;
+	while (parseSqlFile (token) != TOKEN_EOF);
 
-	while (1)
-		parseSqlFile (token, tbox);
-
-	return RESCAN_NONE;
+	deleteToken (token);
 }
 
 extern parserDefinition* SqlParser (void)
@@ -2364,7 +2372,7 @@ extern parserDefinition* SqlParser (void)
 	def->kinds		= SqlKinds;
 	def->kindCount	= KIND_COUNT (SqlKinds);
 	def->extensions = extensions;
-	def->parser_with_gc = findSqlTags;
+	def->parser		= findSqlTags;
 	def->initialize = initialize;
 	return def;
 }
