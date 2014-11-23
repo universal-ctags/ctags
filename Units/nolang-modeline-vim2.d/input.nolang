@@ -4,4 +4,4 @@ main(void)
 	return 0;
 }
 
-/* ex:set filetype=c.qt: */
+// vim: noet ft=first ft=c.qt
