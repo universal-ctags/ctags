@@ -61,6 +61,7 @@ typedef enum eKeywordId {
 	KEYWORD_capital_object,
 	KEYWORD_prototype,
 	KEYWORD_var,
+	KEYWORD_const,
 	KEYWORD_new,
 	KEYWORD_this,
 	KEYWORD_for,
@@ -134,6 +135,7 @@ typedef enum {
 	JSTAG_CLASS,
 	JSTAG_METHOD,
 	JSTAG_PROPERTY,
+	JSTAG_CONSTANT,
 	JSTAG_VARIABLE,
 	JSTAG_COUNT
 } jsKind;
@@ -143,6 +145,7 @@ static kindOption JsKinds [] = {
 	{ TRUE,  'c', "class",		  "classes"			   },
 	{ TRUE,  'm', "method",		  "methods"			   },
 	{ TRUE,  'p', "property",	  "properties"		   },
+	{ TRUE,  'C', "constant",	  "constants"		   },
 	{ TRUE,  'v', "variable",	  "global variables"   }
 };
 
@@ -153,6 +156,7 @@ static const keywordDesc JsKeywordTable [] = {
 	{ "Object",		KEYWORD_capital_object		},
 	{ "prototype",	KEYWORD_prototype			},
 	{ "var",		KEYWORD_var					},
+	{ "const",		KEYWORD_const				},
 	{ "new",		KEYWORD_new					},
 	{ "this",		KEYWORD_this				},
 	{ "for",		KEYWORD_for					},
@@ -1065,7 +1069,8 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 
 				vStringCopy(token->scope, saveScope);
 			}
-			else if (isKeyword (token, KEYWORD_var))
+			else if (isKeyword (token, KEYWORD_var) ||
+					 isKeyword (token, KEYWORD_const))
 			{
 				/*
 				 * Potentially we have found an inner function.
@@ -1240,6 +1245,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 	vString * saveScope = vStringNew ();
 	boolean is_class = FALSE;
 	boolean is_var = FALSE;
+	boolean is_const = FALSE;
 	boolean is_terminated = TRUE;
 	boolean is_global = FALSE;
 	boolean has_methods = FALSE;
@@ -1279,8 +1285,10 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 	/*
 	 * var can preceed an inner function
 	 */
-	if ( isKeyword(token, KEYWORD_var) )
+	if ( isKeyword(token, KEYWORD_var) ||
+		 isKeyword(token, KEYWORD_const) )
 	{
+		is_const = isKeyword(token, KEYWORD_const);
 		/*
 		 * Only create variables for global scope
 		 */
@@ -1469,7 +1477,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 			 *	   var g_var2;
 			 */
 			if (isType (token, TOKEN_SEMICOLON))
-				makeJsTag (name, JSTAG_VARIABLE, NULL);
+				makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
 		}
 		/*
 		 * Statement has ended.
@@ -1604,7 +1612,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 					if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 							! stringListHas(ClassNames, vStringValue (fulltag)) )
 					{
-						makeJsTag (name, JSTAG_VARIABLE, NULL);
+						makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
 					}
 					vStringDelete (fulltag);
 				}
@@ -1640,7 +1648,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 					{
 						if ( is_var )
 						{
-							makeJsTag (name, JSTAG_VARIABLE, NULL);
+							makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
 						}
 						else
 						{
@@ -1695,7 +1703,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 				if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 						! stringListHas(ClassNames, vStringValue (fulltag)) )
 				{
-					makeJsTag (name, JSTAG_VARIABLE, NULL);
+					makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
 				}
 				vStringDelete (fulltag);
 			}
