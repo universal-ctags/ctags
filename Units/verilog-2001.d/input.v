@@ -2,6 +2,7 @@
 // module wrong;
 // endmodule
 `define DEFINE
+`define DEF_WITH_EQ = 1'd100
 `define DEF_VALUE   1'd100
 
 module mod#(
