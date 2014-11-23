@@ -127,7 +127,11 @@ Consideration
 
 Workflow
 ------------------------------------------------------
-TO BE WRITTEN.
+* All submissions to fishman/master must be done through Github pull requests,
+  except when importing patches introduced in Sourceforge or patches received
+  through email.
+
+TO BE COMPLETED.
 
 If any conflict occurs Jelveh, the founder of the fork is the right
 person to make a decision.
@@ -150,7 +154,7 @@ Next action
     + Rename current README to README.exuberant.
 
     + Rename current NEWS to NEWS.exuberant.
-  
+
     + preparing fishman tree own README. This document can be used as base.
 
     + preparing fishman tree own NEWS, which explains the difference from the
