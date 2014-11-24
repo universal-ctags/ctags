@@ -1,0 +1,7 @@
+A	input.js	/^const A = 1;$/;"	C
+B	input.js	/^const B = 1;$/;"	C
+Group	input.js	/^const Group = {$/;"	c
+X	input.js	/^  X:1,$/;"	p	class:Group
+Y	input.js	/^  Y:2,$/;"	p	class:Group
+Z	input.js	/^  Z:3$/;"	p	class:Group
+func	input.js	/^const func = function () {}$/;"	f

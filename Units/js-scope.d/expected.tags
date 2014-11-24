@@ -1,0 +1,3 @@
+A	input.js	/^function A() {$/;"	c
+m1	input.js	/^    m1 : function() {$/;"	m	class:A
+m2	input.js	/^    m2: function() {$/;"	m	class:A

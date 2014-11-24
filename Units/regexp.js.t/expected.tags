@@ -1,3 +1,5 @@
+func1	input.js	/^function func1() {$/;"	f
+func2	input.js	/^function func2() {$/;"	f
 no_re1	input.js	/^var no_re1 = 1 \/ 2;$/;"	v
 no_re2	input.js	/^var no_re2 = 1 + (1 + 2) \/ 3;$/;"	v
 no_re3	input.js	/^var no_re3 = 1 + {0:1}[0] \/ 2;$/;"	v

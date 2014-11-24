@@ -1,5 +1,5 @@
 
-// All these examples contain various forms of IF statements
+// All these examples contain various forms of statements
 // with missing semicolons.  Each of these are valid and must
 // be accommodated.
 //
@@ -7,6 +7,9 @@
 // The following tags should be generated:
 //     functions
 //       a
+//       aa
+//       aa_sub1 [aa]
+//       aa_sub2 [aa]
 //       b
 //       baz [f]
 //       c
@@ -32,6 +35,15 @@
 //       w
 //       w_sub1 [w]
 //       w_sub2 [w]
+//       x
+//       x_sub1 [x]
+//       x_sub2 [x]
+//       y
+//       y_sub1 [y]
+//       y_sub2 [y]
+//       z
+//       z_sub1 [z]
+//       z_sub2 [z]
 //     classes
 //       MyClass
 //     methods
@@ -189,3 +201,42 @@ MyClass = {
         var dummy5 = 42;
     }
 };
+
+function x(){
+    function x_sub1(){
+        while (1)
+            x_sub2()
+    }
+    function x_sub2(){
+    }
+}
+
+function y(){
+    function y_sub1(){
+        while (1) {
+            y_sub2()
+        }
+    }
+    function y_sub2(){
+    }
+}
+
+function z(){
+    function z_sub1(){
+        do {
+            z_sub2()
+        } while (0)
+    }
+    function z_sub2(){
+    }
+}
+
+function aa(){
+    function aa_sub1(){
+        do
+            aa_sub2()
+        while (0)
+    }
+    function aa_sub2(){
+    }
+}
