@@ -167,16 +167,20 @@ static boolean isMap (const unsigned char* line)
 	return (wordMatchLen(line, "map", 3) ||
 			wordMatchLen(line, "nmap", 2) ||
 			wordMatchLen(line, "vmap", 2) ||
+			wordMatchLen(line, "xmap", 2) ||
+			wordMatchLen(line, "smap", 4) ||
 			wordMatchLen(line, "omap", 2) ||
 			wordMatchLen(line, "imap", 2) ||
 			wordMatchLen(line, "lmap", 2) ||
 			wordMatchLen(line, "cmap", 2) ||
 			wordMatchLen(line, "noremap", 2) ||
-			wordMatchLen(line, "nnoremap", 3) ||
-			wordMatchLen(line, "vnoremap", 3) ||
+			wordMatchLen(line, "nnoremap", 2) ||
+			wordMatchLen(line, "vnoremap", 2) ||
+			wordMatchLen(line, "xnoremap", 2) ||
+			wordMatchLen(line, "snoremap", 4) ||
 			wordMatchLen(line, "onoremap", 3) ||
 			wordMatchLen(line, "inoremap", 3) ||
-			wordMatchLen(line, "lnoremap", 3) ||
+			wordMatchLen(line, "lnoremap", 2) ||
 			wordMatchLen(line, "cnoremap", 3));
 }
 
