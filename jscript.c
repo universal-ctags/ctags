@@ -1225,7 +1225,7 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 						addToScope (name, class->string);
 						if (has_child_methods)
 							makeJsTag (name, JSTAG_CLASS, NULL);
-						else if (!isType (name, TOKEN_REGEXP))
+						else
 							makeJsTag (name, JSTAG_PROPERTY, NULL);
 				}
 			}

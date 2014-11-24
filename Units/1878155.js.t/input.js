@@ -8,7 +8,7 @@
 //
 
 // This should handle the escaped quote
-var RE={/foo\"/: "bar"};
+var RE={"bar":/foo\"/};
 
 // This should also handle the escaped quote
 // A tag should be created for the global variable "foo".

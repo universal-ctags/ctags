@@ -1,3 +1,0 @@
-a	input.js	/^a={\/b\/:1, 'd':2, f:3};$/;"	c
-d	input.js	/^a={\/b\/:1, 'd':2, f:3};$/;"	p	class:a
-f	input.js	/^a={\/b\/:1, 'd':2, f:3};$/;"	p	class:a
