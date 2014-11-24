@@ -171,7 +171,7 @@ static tokenInfo *popToken (tokenInfo * const token)
 
 static void pruneTokens (tokenInfo * token)
 {
-	while (token = popToken (token));
+	while ((token = popToken (token)));
 }
 
 static void initialize (const langType language)
