@@ -38,10 +38,14 @@ task add (
     z = x + y;
 endtask
 
-function mult (
+function integer mult (
     input x,
     input y);
     mult = x * y;
+endfunction
+
+function [1:0] func_with_range (k, l);
+    func_with_range = {k, l};
 endfunction
 
 endmodule // mod

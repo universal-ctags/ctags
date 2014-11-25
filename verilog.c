@@ -549,6 +549,31 @@ static void processBlock (tokenInfo *const token)
 	}
 }
 
+static void processFunction (tokenInfo *const token)
+{
+	int c;
+
+	/* Search for function name
+	 * Last identifier found before a '(' or a ';' is the function name */
+	c = skipWhite (vGetc ());
+	do
+	{
+		readIdentifier (token, c);
+		c = skipWhite (vGetc ());
+	} while (c != '(' && c != ';' && c != EOF);
+
+	if ( vStringLength (token->name) > 0 )
+	{
+		verbose ("Found function: %s\n", vStringValue (token->name));
+
+		/* Creat tag */
+		createTag (token);
+
+		/* Get port list from function */
+		processPortList (c);
+	}
+}
+
 static void tagNameList (tokenInfo* token, int c)
 {
 	verilogKind localKind;
@@ -644,6 +669,12 @@ static void findTag (tokenInfo *const token)
 	{
 		/* Process begin..end blocks */
 		processBlock (token);
+	}
+	else if (token->kind == K_FUNCTION)
+	{
+		/* Functions are treated differently because they may also include the
+		 * type of the return value */
+		processFunction (token);
 	}
 	else if (token->kind == K_ASSERTION)
 	{
