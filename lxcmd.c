@@ -44,8 +44,7 @@
 #include <errno.h>
 #include <ctype.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+#include <stdlib.h>		/* for WIFEXITED and WEXITSTATUS */
 
 #include "debug.h"
 #include "main.h"
