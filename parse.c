@@ -578,7 +578,7 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 
 	n_candidates = (*nominate)(spec, &candidates);
 
-    if (n_candidates == 1)
+	if (n_candidates == 1)
 	{
 		verbose ("		#candidates: %u\n", n_candidates);
 		language = candidates[0].lang;
@@ -596,10 +596,10 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
         Assert(language != LANG_IGNORE && language != LANG_AUTO);
 	}
 	else
-    {
+	{
 fopen_error:
 		language = LANG_IGNORE;
-    }
+	}
 
 	eFree(candidates);
 	candidates = NULL;
