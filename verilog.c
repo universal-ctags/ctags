@@ -71,6 +71,8 @@ typedef struct {
 typedef struct sTokenInfo {
 	verilogKind         kind;
 	vString*            name;          /* the name of the token */
+	unsigned long       lineNumber;    /* line number where token was found */
+	fpos_t              filePosition;  /* file position where token was found */
 	struct sTokenInfo*  scope;         /* context of keyword */
 	int                 nestLevel;     /* Current nest level */
 	verilogKind         lastKind;      /* Kind of last found tag */
@@ -177,9 +179,9 @@ static tokenInfo *currentContext = NULL;
  *   FUNCTION DEFINITIONS
  */
 
-static short isContainer (verilogKind kind)
+static short isContainer (tokenInfo const* token)
 {
-	switch (kind)
+	switch (token->kind)
 	{
 		case K_MODULE:
 		case K_TASK:
@@ -200,6 +202,8 @@ static tokenInfo *newToken (void)
 	tokenInfo *const token = xMalloc (1, tokenInfo);
 	token->kind = K_UNDEFINED;
 	token->name = vStringNew ();
+	token->lineNumber = getSourceLineNumber ();
+	token->filePosition = getInputFilePosition ();
 	token->scope = NULL;
 	token->nestLevel = 0;
 	token->lastKind = K_UNDEFINED;
@@ -401,20 +405,32 @@ static void skipToSemiColon (void)
 	} while (c != EOF && c != ';');
 }
 
-static boolean readIdentifier (vString *const name, int c)
+static boolean readIdentifier (tokenInfo *const token, int c)
 {
-	vStringClear (name);
+	vStringClear (token->name);
 	if (isIdentifierCharacter (c))
 	{
 		while (isIdentifierCharacter (c))
 		{
-			vStringPut (name, c);
+			vStringPut (token->name, c);
 			c = vGetc ();
 		}
 		vUngetc (c);
-		vStringTerminate (name);
+		vStringTerminate (token->name);
+		token->lineNumber = getSourceLineNumber ();
+		token->filePosition = getInputFilePosition ();
 	}
-	return (boolean)(vStringLength (name) > 0);
+	return (boolean)(vStringLength (token->name) > 0);
+}
+
+static verilogKind getKind (tokenInfo *const token)
+{
+	return (verilogKind) lookupKeyword (vStringValue (token->name), getSourceLanguage () );
+}
+
+static void updateKind (tokenInfo *const token)
+{
+	token->kind = getKind (token);
 }
 
 static void createContext (tokenInfo *const scope)
@@ -438,18 +454,25 @@ static void createContext (tokenInfo *const scope)
 	}
 }
 
-static void createTag (const verilogKind kind, vString *name)
+static void createTag (tokenInfo *const token)
 {
 	tagEntryInfo tag;
 
-	initTagEntry (&tag, vStringValue (name));
-	tag.kindName    = kindName (kind);
-	tag.kind        = kindLetter (kind);
-	verbose ("Adding tag %s", vStringValue (name));
+	initTagEntryFull(
+			&tag,
+			vStringValue (token->name),
+			token->lineNumber,
+			getSourceLanguageName (),
+			token->filePosition,
+			getSourceFileTagPath ()
+			);
+	tag.kindName    = kindName (token->kind);
+	tag.kind        = kindLetter (token->kind);
+	verbose ("Adding tag %s (kind %d)", vStringValue (token->name), token->kind);
 	if (currentContext->kind != K_UNDEFINED)
 	{
 		verbose (" to context %s\n", vStringValue (currentContext->name));
-		currentContext->lastKind = kind;
+		currentContext->lastKind = token->kind;
 		tag.extensionFields.scope [0] = kindName (currentContext->kind);
 		tag.extensionFields.scope [1] = vStringValue (currentContext->name);
 	}
@@ -461,24 +484,24 @@ static void createTag (const verilogKind kind, vString *name)
 
 		vStringCopy (scopedName, currentContext->name);
 		vStringCatS (scopedName, ".");
-		vStringCatS (scopedName, vStringValue (name));
+		vStringCatS (scopedName, vStringValue (token->name));
 		tag.name = vStringValue (scopedName);
 
 		makeTagEntry (&tag);
 
 		vStringDelete (scopedName);
 	}
-	if (isContainer (kind))
+	if (isContainer (token))
 	{
 		tokenInfo *newScope = newToken ();
 
-		vStringCopy (newScope->name, name);
-		newScope->kind = kind;
+		vStringCopy (newScope->name, token->name);
+		newScope->kind = token->kind;
 		createContext (newScope);
 	}
 }
 
-static boolean findBlockName (vString *const name)
+static boolean findBlockName (tokenInfo *const token)
 {
 	int c;
 
@@ -486,36 +509,36 @@ static boolean findBlockName (vString *const name)
 	if (c == ':')
 	{
 		c = skipWhite (vGetc ());
-		readIdentifier (name, c);
-		return (boolean) (vStringLength (name) > 0);
+		readIdentifier (token, c);
+		return (boolean) (vStringLength (token->name) > 0);
 	}
 	else
 		vUngetc (c);
 	return FALSE;
 }
 
-static void processBlock (vString *const name, const verilogKind kind)
+static void processBlock (tokenInfo *const token)
 {
 	boolean blockStart = FALSE;
 	boolean blockEnd   = FALSE;
 
-	if (strcmp (vStringValue (name), "begin") == 0)
+	if (strcmp (vStringValue (token->name), "begin") == 0)
 	{
 		currentContext->nestLevel++;
 		blockStart = TRUE;
 	}
-	else if (strcmp (vStringValue (name), "end") == 0)
+	else if (strcmp (vStringValue (token->name), "end") == 0)
 	{
 		currentContext->nestLevel--;
 		blockEnd = TRUE;
 	}
 
-	if (findBlockName (name))
+	if (findBlockName (token))
 	{
-		verbose ("Found block: %s\n", vStringValue (name));
+		verbose ("Found block: %s\n", vStringValue (token->name));
 		if (blockStart)
 		{
-			createTag (kind, name);
+			createTag (token);
 			verbose ("Current context %s\n", vStringValue (currentContext->name));
 		}
 		if (blockEnd && currentContext->kind == K_BLOCK && currentContext->nestLevel <= 1)
@@ -526,33 +549,30 @@ static void processBlock (vString *const name, const verilogKind kind)
 	}
 }
 
-static void tagNameList (const verilogKind kind, int c)
+static void tagNameList (tokenInfo* token, int c)
 {
-	vString *name = vStringNew ();
-	verilogKind localKind, nameKind;
+	verilogKind localKind;
 	boolean repeat;
 	Assert (isIdentifierCharacter (c));
-	localKind = kind;
 	do
 	{ 
 		repeat = FALSE;
 		if (isIdentifierCharacter (c))
 		{
-			readIdentifier (name, c);
-			/* Check if "name" is in fact a keyword */
-			nameKind = (verilogKind) lookupKeyword (vStringValue (name), getSourceLanguage () );
+			readIdentifier (token, c);
+			localKind = getKind (token);
 			/* Create tag in case name is not a known kind ... */
-			if (nameKind == K_UNDEFINED)
+			if (localKind == K_UNDEFINED)
 			{
-				createTag (localKind, name);
+				createTag (token);
 			}
 			/* ... or else continue searching for names */
 			else
 			{
-				/* Update local kind unless it's a port or an ignored keyword */
-				if (localKind != K_PORT && nameKind != K_IGNORE)
+				/* Update kind unless it's a port or an ignored keyword */
+				if (token->kind != K_PORT && localKind != K_IGNORE)
 				{
-					localKind = nameKind;
+					token->kind = localKind;
 				}
 				repeat = TRUE;
 			}
@@ -582,19 +602,16 @@ static void tagNameList (const verilogKind kind, int c)
 			repeat = TRUE;
 		}
 	} while (repeat);
-	vStringDelete (name);
 	vUngetc (c);
 }
 
-static void findTag (vString *const name)
+static void findTag (tokenInfo *const token)
 {
-	const verilogKind kind = (verilogKind) lookupKeyword (vStringValue (name), getSourceLanguage () );
-
 	/* Search for end of current context to drop respective context */
 	if (currentContext->kind != K_UNDEFINED)
 	{
 		vString *endTokenName = vStringNewInit("end");
-		if (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0 && strcmp (vStringValue (name), vStringValue (endTokenName)) == 0)
+		if (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0 && strcmp (vStringValue (token->name), vStringValue (endTokenName)) == 0)
 		{
 			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
 			currentContext = popToken (currentContext);
@@ -602,7 +619,7 @@ static void findTag (vString *const name)
 		else
 		{
 			vStringCatS (endTokenName, kindName (currentContext->kind));
-			if (strcmp (vStringValue (name), vStringValue (endTokenName)) == 0)
+			if (strcmp (vStringValue (token->name), vStringValue (endTokenName)) == 0)
 			{
 				verbose ("Dropping context %s\n", vStringValue (currentContext->name));
 				currentContext = popToken (currentContext);
@@ -611,32 +628,33 @@ static void findTag (vString *const name)
 		vStringDelete(endTokenName);
 	}
 
-	if (kind == K_CONSTANT && vStringItem (name, 0) == '`')
+	if (token->kind == K_CONSTANT && vStringItem (token->name, 0) == '`')
 	{
 		/* Bug #961001: Verilog compiler directives are line-based. */
 		int c = skipWhite (vGetc ());
-		readIdentifier (name, c);
-		createTag (kind, name);
+		readIdentifier (token, c);
+		createTag (token);
 		/* Skip the rest of the line. */
 		do {
 			c = vGetc();
 		} while (c != EOF && c != '\n');
 		vUngetc (c);
 	}
-	else if (kind == K_BLOCK)
+	else if (token->kind == K_BLOCK)
 	{
 		/* Process begin..end blocks */
-		processBlock (name, kind);
+		processBlock (token);
 	}
-	else if (kind == K_ASSERTION)
+	else if (token->kind == K_ASSERTION)
 	{
 		if (vStringLength (currentContext->blockName) > 0)
 		{
-			createTag (kind, currentContext->blockName);
+			vStringCopy (token->name, currentContext->blockName);
+			createTag (token);
 			skipToSemiColon ();
 		}
 	}
-	else if (kind != K_UNDEFINED)
+	else if (token->kind != K_UNDEFINED)
 	{
 		int c = skipWhite (vGetc ());
 
@@ -658,13 +676,13 @@ static void findTag (vString *const name)
 		}
 		c = skipWhite (c);
 		if (isIdentifierCharacter (c))
-			tagNameList (kind, c);
+			tagNameList (token, c);
 	}
 }
 
 static void findVerilogTags (void)
 {
-	vString *const name = vStringNew ();
+	tokenInfo *const token = newToken ();
 	int c = '\0';
 	currentContext = newToken ();
 
@@ -681,7 +699,7 @@ static void findVerilogTags (void)
 			 * This is used later by any tag type that requires this information
 			 * */
 			case ':':
-				vStringCopy (currentContext->blockName, name);
+				vStringCopy (currentContext->blockName, token->name);
 				break;
 			/* Skip interface modport port declarations */
 			case '(':
@@ -693,13 +711,14 @@ static void findVerilogTags (void)
 			default :
 				if (isIdentifierCharacter (c))
 				{
-					readIdentifier (name, c);
-					findTag (name);
+					readIdentifier (token, c);
+					updateKind (token);
+					findTag (token);
 				}
 		}
 	}
 
-	vStringDelete (name);
+	deleteToken (token);
 	pruneTokens (currentContext);
 	currentContext = NULL;
 }
