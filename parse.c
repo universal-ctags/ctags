@@ -569,7 +569,7 @@ struct getLangCtx {
     boolean     err;
 };
 
-#define FOPEN_GLC_IF_NECESSARY(_glc_, _label_) do {         \
+#define GLC_FOPEN_IF_NECESSARY(_glc_, _label_) do {         \
     if (!(_glc_)->input) {                                  \
         (_glc_)->input = fopen((_glc_)->fileName, "rb");    \
         if (!(_glc_)->input) {                              \
@@ -578,6 +578,13 @@ struct getLangCtx {
         }                                                   \
     }                                                       \
 } while (0)                                                 \
+
+#define GLC_FCLOSE(_glc_) do {                              \
+    if ((_glc_)->input) {                                   \
+        fclose((_glc_)->input);                             \
+        (_glc_)->input = NULL;                              \
+    }                                                       \
+} while (0)
 
 static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx *glc,
 				       unsigned int nominate (const char *const, parserCandidate**))
@@ -596,7 +603,7 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 	else if (n_candidates > 1)
 	{
 		verbose ("		#candidates: %u\n", n_candidates);
-        FOPEN_GLC_IF_NECESSARY(glc, fopen_error);
+        GLC_FOPEN_IF_NECESSARY(glc, fopen_error);
 		language = getTwoGramLanguage(glc->input, candidates, n_candidates);
 		if (language == LANG_IGNORE)
 			language = candidates[0].lang;
@@ -701,7 +708,7 @@ getFileLanguageInternal (const char *const fileName)
         if (templateBaseName)
         {
             verbose ("	pattern + template(%s): %s\n", tExt, templateBaseName);
-            FOPEN_GLC_IF_NECESSARY(&glc, cleanup);
+            GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
             rewind(glc.input);
             language = getPatternLanguage(templateBaseName, &glc);
             if (language != LANG_IGNORE)
@@ -709,12 +716,11 @@ getFileLanguageInternal (const char *const fileName)
         }
     }
 
-    FOPEN_GLC_IF_NECESSARY(&glc, cleanup);
+    GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
     language = tasteLanguage(&glc);
 
   cleanup:
-    if (glc.input)
-        fclose (glc.input);
+    GLC_FCLOSE(&glc);
     if (templateBaseName)
         eFree (templateBaseName);
 	return language;
