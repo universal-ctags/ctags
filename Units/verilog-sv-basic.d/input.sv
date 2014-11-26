@@ -8,9 +8,12 @@
 class test;
     reg a;
     logic b;
-    function mult (a, b);
+    function mult (a, input b = 0);
         return a * b;
     endfunction : mult
+
+    extern virtual function void extern_func (input bit a, input b);
+
 endclass : test
 
 module mod#(

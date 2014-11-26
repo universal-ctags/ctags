@@ -77,6 +77,7 @@ typedef struct sTokenInfo {
 	int                 nestLevel;     /* Current nest level */
 	verilogKind         lastKind;      /* Kind of last found tag */
 	vString*            blockName;     /* Current block name */
+	boolean             singleStat;    /* Single statement (ends at next semi-colon) */
 } tokenInfo;
 
 /*
@@ -158,6 +159,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "byte",      K_REGISTER,  { 1, 0 } },
 	{ "class",     K_CLASS,     { 1, 0 } },
 	{ "cover",     K_ASSERTION, { 1, 0 } },
+	{ "extern",    K_IGNORE,    { 1, 0 } },
 	{ "int",       K_REGISTER,  { 1, 0 } },
 	{ "interface", K_INTERFACE, { 1, 0 } },
 	{ "local",     K_IGNORE,    { 1, 0 } },
@@ -170,7 +172,9 @@ static const keywordAssoc KeywordTable [] = {
 	{ "shortreal", K_REGISTER,  { 1, 0 } },
 	{ "static",    K_IGNORE,    { 1, 0 } },
 	{ "string",    K_REGISTER,  { 1, 0 } },
-	{ "unsigned",  K_IGNORE,    { 1, 0 } }
+	{ "unsigned",  K_IGNORE,    { 1, 0 } },
+	{ "virtual",   K_IGNORE,    { 1, 0 } },
+	{ "void",      K_IGNORE,    { 1, 0 } }
 };
 
 static tokenInfo *currentContext = NULL;
@@ -197,6 +201,32 @@ static short isContainer (tokenInfo const* token)
 	}
 }
 
+static short hasSimplePortList (tokenInfo const* token)
+{
+	switch (token->kind)
+	{
+		case K_TASK:
+		case K_FUNCTION:
+		case K_CLASS:
+		case K_INTERFACE:
+		case K_PROGRAM:
+		case K_PROPERTY:
+			return TRUE;
+		default:
+			return FALSE;
+	}
+}
+
+static short isSingleStatement (tokenInfo const* token)
+{
+	if (strcmp (vStringValue (token->name), "extern") == 0 )
+	{
+		return TRUE;
+	} else {
+		return FALSE;
+	}
+}
+
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
@@ -208,6 +238,7 @@ static tokenInfo *newToken (void)
 	token->nestLevel = 0;
 	token->lastKind = K_UNDEFINED;
 	token->blockName = vStringNew ();
+	token->singleStat = FALSE;
 	return token;
 }
 
@@ -549,6 +580,70 @@ static void processBlock (tokenInfo *const token)
 	}
 }
 
+static void processPortList (int c)
+{
+	if ((c = skipWhite (c)) == '(')
+	{
+		tokenInfo *token = newToken ();
+
+		/* Get next non-whitespace character after ( */
+		c = skipWhite (vGetc ());
+
+		while (c != ';' && c != EOF)
+		{
+			if (c == '[')
+			{
+				c = skipPastMatch ("[]");
+			}
+			else if (c == '(')
+			{
+				c = skipPastMatch ("()");
+			}
+			else if (c == '{')
+			{
+				c = skipPastMatch ("{}");
+			}
+			else if (c == '=')
+			{
+				/* Search for next port or end of port declaration */
+				while (c != ',' && c != ')' && c != EOF)
+				{
+					c = skipWhite (vGetc ());
+				}
+			}
+			else if (isIdentifierCharacter (c))
+			{
+				readIdentifier (token, c);
+				updateKind (token);
+				if (token->kind == K_UNDEFINED)
+				{
+					/* Only add port name if it is the last keyword.
+					 * First keyword can be a dynamic type, like a class name */
+					c = skipWhite (vGetc ());
+					if (! isIdentifierCharacter (c))
+					{
+						verbose ("Found port: %s\n", vStringValue (token->name));
+						token->kind = K_PORT;
+						createTag (token);
+					}
+				}
+				else
+				{
+					c = skipWhite (vGetc ());
+				}
+			}
+			else
+			{
+				c = skipWhite (vGetc ());
+			}
+		}
+
+		if (! isIdentifierCharacter (c)) vUngetc (c);
+
+		deleteToken (token);
+	}
+}
+
 static void processFunction (tokenInfo *const token)
 {
 	int c;
@@ -605,6 +700,14 @@ static void tagNameList (tokenInfo* token, int c)
 		else
 			break;
 		c = skipWhite (vGetc ());
+
+		/* Get port list */
+		if (getKind(token) == K_UNDEFINED && hasSimplePortList (token))
+		{
+			processPortList (c);
+			c = vGetc ();
+		}
+
 		if (c == '[')
 			c = skipPastMatch ("[]");
 		c = skipWhite (c);
@@ -670,10 +773,12 @@ static void findTag (tokenInfo *const token)
 		/* Process begin..end blocks */
 		processBlock (token);
 	}
-	else if (token->kind == K_FUNCTION)
+	else if (token->kind == K_FUNCTION || token->kind == K_TASK)
 	{
 		/* Functions are treated differently because they may also include the
-		 * type of the return value */
+		 * type of the return value.
+		 * Tasks are treated in the same way, although not having a return
+		 * value.*/
 		processFunction (token);
 	}
 	else if (token->kind == K_ASSERTION)
@@ -684,6 +789,10 @@ static void findTag (tokenInfo *const token)
 			createTag (token);
 			skipToSemiColon ();
 		}
+	}
+	else if (token->kind == K_IGNORE && isSingleStatement (token))
+	{
+		currentContext->singleStat = TRUE;
 	}
 	else if (token->kind != K_UNDEFINED)
 	{
@@ -737,6 +846,16 @@ static void findVerilogTags (void)
 				if (currentContext && currentContext->lastKind == K_MODPORT)
 				{
 					skipPastMatch ("()");
+				}
+				break;
+			/* Drop context on single statements, which don't have an end
+			 * statement */
+			case ';':
+				if (currentContext->scope && currentContext->scope->singleStat)
+				{
+					verbose ("Dropping context %s\n", vStringValue (currentContext->name));
+					currentContext = popToken (currentContext);
+					currentContext->singleStat = FALSE;
 				}
 				break;
 			default :
