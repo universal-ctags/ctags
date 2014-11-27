@@ -103,6 +103,7 @@ extern int strnuppercmp (const char *s1, const char *s2, size_t n);
 #ifndef HAVE_STRSTR
 extern char* strstr (const char *str, const char *substr);
 #endif
+extern char* strrstr (const char *str, const char *substr);
 extern char* eStrdup (const char* str);
 extern char* eStrndup (const char* str, size_t len);
 extern void toLowerString (char* str);

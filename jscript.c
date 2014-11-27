@@ -61,6 +61,8 @@ typedef enum eKeywordId {
 	KEYWORD_capital_object,
 	KEYWORD_prototype,
 	KEYWORD_var,
+	KEYWORD_let,
+	KEYWORD_const,
 	KEYWORD_new,
 	KEYWORD_this,
 	KEYWORD_for,
@@ -72,7 +74,8 @@ typedef enum eKeywordId {
 	KEYWORD_try,
 	KEYWORD_catch,
 	KEYWORD_finally,
-	KEYWORD_sap
+	KEYWORD_sap,
+	KEYWORD_return
 } keywordId;
 
 /*	Used to determine whether keyword is valid for the token language and
@@ -102,7 +105,9 @@ typedef enum eTokenType {
 	TOKEN_FORWARD_SLASH,
 	TOKEN_OPEN_SQUARE,
 	TOKEN_CLOSE_SQUARE,
-	TOKEN_REGEXP
+	TOKEN_REGEXP,
+	TOKEN_POSTFIX_OPERATOR,
+	TOKEN_BINARY_OPERATOR
 } tokenType;
 
 typedef struct sTokenInfo {
@@ -131,6 +136,7 @@ typedef enum {
 	JSTAG_CLASS,
 	JSTAG_METHOD,
 	JSTAG_PROPERTY,
+	JSTAG_CONSTANT,
 	JSTAG_VARIABLE,
 	JSTAG_COUNT
 } jsKind;
@@ -140,6 +146,7 @@ static kindOption JsKinds [] = {
 	{ TRUE,  'c', "class",		  "classes"			   },
 	{ TRUE,  'm', "method",		  "methods"			   },
 	{ TRUE,  'p', "property",	  "properties"		   },
+	{ TRUE,  'C', "constant",	  "constants"		   },
 	{ TRUE,  'v', "variable",	  "global variables"   }
 };
 
@@ -150,6 +157,8 @@ static const keywordDesc JsKeywordTable [] = {
 	{ "Object",		KEYWORD_capital_object		},
 	{ "prototype",	KEYWORD_prototype			},
 	{ "var",		KEYWORD_var					},
+	{ "let",		KEYWORD_let					},
+	{ "const",		KEYWORD_const				},
 	{ "new",		KEYWORD_new					},
 	{ "this",		KEYWORD_this				},
 	{ "for",		KEYWORD_for					},
@@ -161,7 +170,8 @@ static const keywordDesc JsKeywordTable [] = {
 	{ "try",		KEYWORD_try					},
 	{ "catch",		KEYWORD_catch				},
 	{ "finally",	KEYWORD_finally				},
-	{ "sap",	    KEYWORD_sap    				}
+	{ "sap",	    KEYWORD_sap    				},
+	{ "return",		KEYWORD_return				}
 };
 
 /*
@@ -170,8 +180,8 @@ static const keywordDesc JsKeywordTable [] = {
 
 /* Recursive functions */
 static void parseFunction (tokenInfo *const token);
-static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent);
-static boolean parseLine (tokenInfo *const token, boolean is_inside_class);
+static boolean parseBlock (tokenInfo *const token, tokenInfo *const orig_parent);
+static boolean parseLine (tokenInfo *const token, tokenInfo *const parent, boolean is_inside_class);
 static void parseUI5 (tokenInfo *const token);
 
 static boolean isIdentChar (const int c)
@@ -220,7 +230,7 @@ static void deleteToken (tokenInfo *const token)
  *	 Tag generation functions
  */
 
-static void makeJsTag (tokenInfo *const token, const jsKind kind)
+static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const signature)
 {
 	if (JsKinds [kind].enabled && ! token->ignoreTag )
 	{
@@ -259,12 +269,29 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind)
 			e.extensionFields.scope[1] = vStringValue (fullscope);
 		}
 
+		if (signature && vStringLength(signature))
+		{
+			size_t i;
+			/* sanitize signature by replacing all control characters with a
+			 * space (because it's simple).
+			 * there should never be any junk in a valid signature, but who
+			 * knows what the user wrote and CTags doesn't cope well with weird
+			 * characters. */
+			for (i = 0; i < signature->length; i++)
+			{
+				unsigned char c = (unsigned char) signature->buffer[i];
+				if (c < 0x20 /* below space */ || c == 0x7F /* DEL */)
+					signature->buffer[i] = ' ';
+			}
+			e.extensionFields.signature = vStringValue(signature);
+		}
+
 		makeTagEntry (&e);
 		vStringDelete (fullscope);
 	}
 }
 
-static void makeClassTag (tokenInfo *const token)
+static void makeClassTag (tokenInfo *const token, vString *const signature)
 {
 	vString *	fulltag;
 
@@ -285,13 +312,13 @@ static void makeClassTag (tokenInfo *const token)
 		if ( ! stringListHas(ClassNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (ClassNames, vStringNewCopy (fulltag));
-			makeJsTag (token, JSTAG_CLASS);
+			makeJsTag (token, JSTAG_CLASS, signature);
 		}
 		vStringDelete (fulltag);
 	}
 }
 
-static void makeFunctionTag (tokenInfo *const token)
+static void makeFunctionTag (tokenInfo *const token, vString *const signature)
 {
 	vString *	fulltag;
 
@@ -312,7 +339,7 @@ static void makeFunctionTag (tokenInfo *const token)
 		if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (FunctionNames, vStringNewCopy (fulltag));
-			makeJsTag (token, JSTAG_FUNCTION);
+			makeJsTag (token, JSTAG_FUNCTION, signature);
 		}
 		vStringDelete (fulltag);
 	}
@@ -383,27 +410,37 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		c = fileGetc ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
-	if (!isspace (c))
-		fileUngetc (c);		/* unget non-identifier character */
+	fileUngetc (c);		/* unget non-identifier character */
 }
 
-static void readToken (tokenInfo *const token)
+static void readTokenFull (tokenInfo *const token, boolean include_newlines, vString *const repr)
 {
 	int c;
+	int i;
 
 	token->type			= TOKEN_UNDEFINED;
 	token->keyword		= KEYWORD_NONE;
 	vStringClear (token->string);
 
 getNextChar:
+	i = 0;
 	do
 	{
 		c = fileGetc ();
+		i++;
 	}
-	while (c == '\t'  ||  c == ' ' ||  c == '\n');
+	while (c == '\t'  ||  c == ' ' ||
+		   ((c == '\r' || c == '\n') && ! include_newlines));
 
 	token->lineNumber   = getSourceLineNumber ();
 	token->filePosition = getInputFilePosition ();
+
+	if (repr)
+	{
+		if (i > 1)
+			vStringPut (repr, ' ');
+		vStringPut (repr, c);
+	}
 
 	switch (c)
 	{
@@ -420,12 +457,76 @@ getNextChar:
 		case '[': token->type = TOKEN_OPEN_SQUARE;			break;
 		case ']': token->type = TOKEN_CLOSE_SQUARE;			break;
 
+		case '+':
+		case '-':
+			{
+				int d = fileGetc ();
+				if (d == c) /* ++ or -- */
+					token->type = TOKEN_POSTFIX_OPERATOR;
+				else
+				{
+					fileUngetc (d);
+					token->type = TOKEN_BINARY_OPERATOR;
+				}
+				break;
+			}
+
+		case '*':
+		case '%':
+		case '?':
+		case '>':
+		case '<':
+		case '^':
+		case '|':
+		case '&':
+			token->type = TOKEN_BINARY_OPERATOR;
+			break;
+
+		case '\r':
+		case '\n':
+			/* This isn't strictly correct per the standard, but following the
+			 * real rules means understanding all statements, and that's not
+			 * what the parser currently does.  What we do here is a guess, by
+			 * avoiding inserting semicolons that would make the statement on
+			 * the left invalid.  Hopefully this should not have false negatives
+			 * (e.g. should not miss insertion of a semicolon) but might have
+			 * false positives (e.g. it will wrongfully emit a semicolon for the
+			 * newline in "foo\n+bar").
+			 * This should however be mostly harmless as we only deal with
+			 * newlines in specific situations where we know a false positive
+			 * wouldn't hurt too bad. */
+			switch (LastTokenType)
+			{
+				/* these cannot be the end of a statement, so hold the newline */
+				case TOKEN_EQUAL_SIGN:
+				case TOKEN_COLON:
+				case TOKEN_PERIOD:
+				case TOKEN_FORWARD_SLASH:
+				case TOKEN_BINARY_OPERATOR:
+				/* and these already end one, no need to duplicate it */
+				case TOKEN_SEMICOLON:
+				case TOKEN_COMMA:
+				case TOKEN_CLOSE_CURLY:
+				case TOKEN_OPEN_CURLY:
+					include_newlines = FALSE; /* no need to recheck */
+					goto getNextChar;
+					break;
+				default:
+					token->type = TOKEN_SEMICOLON;
+			}
+			break;
+
 		case '\'':
 		case '"':
 				  token->type = TOKEN_STRING;
 				  parseString (token->string, c);
 				  token->lineNumber = getSourceLineNumber ();
 				  token->filePosition = getInputFilePosition ();
+				  if (repr)
+				  {
+					  vStringCat (repr, token->string);
+					  vStringPut (repr, c);
+				  }
 				  break;
 
 		case '\\':
@@ -447,7 +548,6 @@ getNextChar:
 						  switch (LastTokenType)
 						  {
 							  case TOKEN_CHARACTER:
-							  case TOKEN_KEYWORD:
 							  case TOKEN_IDENTIFIER:
 							  case TOKEN_STRING:
 							  case TOKEN_CLOSE_CURLY:
@@ -466,6 +566,8 @@ getNextChar:
 					  }
 					  else
 					  {
+						  if (repr) /* remove the / we added */
+							  repr->buffer[--repr->length] = 0;
 						  if (d == '*')
 						  {
 							  do
@@ -482,11 +584,30 @@ getNextChar:
 						  else if (d == '/')	/* is this the start of a comment?  */
 						  {
 							  fileSkipToCharacter ('\n');
+							  /* if we care about newlines, put it back so it is seen */
+							  if (include_newlines)
+								  fileUngetc ('\n');
 							  goto getNextChar;
 						  }
 					  }
 					  break;
 				  }
+
+		case '#':
+				  /* skip shebang in case of e.g. Node.js scripts */
+				  if (token->lineNumber > 1)
+					  token->type = TOKEN_UNDEFINED;
+				  else if ((c = fileGetc ()) != '!')
+				  {
+					  fileUngetc (c);
+					  token->type = TOKEN_UNDEFINED;
+				  }
+				  else
+				  {
+					  fileSkipToCharacter ('\n');
+					  goto getNextChar;
+				  }
+				  break;
 
 		default:
 				  if (! isIdentChar (c))
@@ -501,11 +622,18 @@ getNextChar:
 						  token->type = TOKEN_IDENTIFIER;
 					  else
 						  token->type = TOKEN_KEYWORD;
+					  if (repr && vStringLength (token->string) > 1)
+						  vStringCatS (repr, vStringValue (token->string) + 1);
 				  }
 				  break;
 	}
 
 	LastTokenType = token->type;
+}
+
+static void readToken (tokenInfo *const token)
+{
+	readTokenFull (token, FALSE, NULL);
 }
 
 static void copyToken (tokenInfo *const dest, tokenInfo *const src)
@@ -523,7 +651,7 @@ static void copyToken (tokenInfo *const dest, tokenInfo *const src)
  *	 Token parsing functions
  */
 
-static void skipArgumentList (tokenInfo *const token)
+static void skipArgumentList (tokenInfo *const token, boolean include_newlines, vString *const repr)
 {
 	int nest_level = 0;
 
@@ -537,9 +665,11 @@ static void skipArgumentList (tokenInfo *const token)
 	if (isType (token, TOKEN_OPEN_PAREN))	/* arguments? */
 	{
 		nest_level++;
+		if (repr)
+			vStringPut (repr, '(');
 		while (! (isType (token, TOKEN_CLOSE_PAREN) && (nest_level == 0)))
 		{
-			readToken (token);
+			readTokenFull (token, FALSE, repr);
 			if (isType (token, TOKEN_OPEN_PAREN))
 			{
 				nest_level++;
@@ -552,11 +682,11 @@ static void skipArgumentList (tokenInfo *const token)
 				}
 			}
 		}
-		readToken (token);
+		readTokenFull (token, include_newlines, NULL);
 	}
 }
 
-static void skipArrayList (tokenInfo *const token)
+static void skipArrayList (tokenInfo *const token, boolean include_newlines)
 {
 	int nest_level = 0;
 
@@ -584,7 +714,7 @@ static void skipArrayList (tokenInfo *const token)
 				}
 			}
 		}
-		readToken (token);
+		readTokenFull (token, include_newlines, NULL);
 	}
 }
 
@@ -612,7 +742,7 @@ static void addToScope (tokenInfo* const token, vString* const extra)
  *	 Scanning functions
  */
 
-static void findCmdTerm (tokenInfo *const token)
+static boolean findCmdTerm (tokenInfo *const token, boolean include_newlines)
 {
 	/*
 	 * Read until we find either a semicolon or closing brace.
@@ -625,42 +755,23 @@ static void findCmdTerm (tokenInfo *const token)
 		if ( isType (token, TOKEN_OPEN_CURLY))
 		{
 			parseBlock (token, token);
-			readToken (token);
+			readTokenFull (token, include_newlines, NULL);
 		}
 		else if ( isType (token, TOKEN_OPEN_PAREN) )
 		{
-			skipArgumentList(token);
+			skipArgumentList(token, include_newlines, NULL);
+		}
+		else if ( isType (token, TOKEN_OPEN_SQUARE) )
+		{
+			skipArrayList(token, include_newlines);
 		}
 		else
 		{
-			readToken (token);
+			readTokenFull (token, include_newlines, NULL);
 		}
 	}
-}
 
-static void findMatchingToken (tokenInfo *const token, tokenType begin_token, tokenType end_token)
-{
-	int nest_level = 0;
-
-	if ( ! isType (token, end_token))
-	{
-		nest_level++;
-		while (! (isType (token, end_token) && (nest_level == 0)))
-		{
-			readToken (token);
-			if (isType (token, begin_token))
-			{
-				nest_level++;
-			}
-			if (isType (token, end_token))
-			{
-				if (nest_level > 0)
-				{
-					nest_level--;
-				}
-			}
-		}
-	}
+	return isType (token, TOKEN_SEMICOLON);
 }
 
 static void parseSwitch (tokenInfo *const token)
@@ -685,17 +796,16 @@ static void parseSwitch (tokenInfo *const token)
 		 * Handle nameless functions, these will only
 		 * be considered methods.
 		 */
-		skipArgumentList(token);
+		skipArgumentList(token, FALSE, NULL);
 	}
 
 	if (isType (token, TOKEN_OPEN_CURLY))
 	{
-		findMatchingToken (token, TOKEN_OPEN_CURLY, TOKEN_CLOSE_CURLY);
+		parseBlock (token, token);
 	}
-
 }
 
-static void parseLoop (tokenInfo *const token)
+static boolean parseLoop (tokenInfo *const token, tokenInfo *const parent)
 {
 	/*
 	 * Handles these statements
@@ -718,6 +828,7 @@ static void parseLoop (tokenInfo *const token)
 	 *	   }
 	 *	   while (number<5);
 	 */
+	boolean is_terminated = TRUE;
 
 	if (isKeyword (token, KEYWORD_for) || isKeyword (token, KEYWORD_while))
 	{
@@ -729,7 +840,7 @@ static void parseLoop (tokenInfo *const token)
 			 * Handle nameless functions, these will only
 			 * be considered methods.
 			 */
-			skipArgumentList(token);
+			skipArgumentList(token, FALSE, NULL);
 		}
 
 		if (isType (token, TOKEN_OPEN_CURLY))
@@ -740,11 +851,11 @@ static void parseLoop (tokenInfo *const token)
 			 * of the function.  If we find a "this." we know
 			 * it is a class, otherwise it is a function.
 			 */
-			parseBlock (token, token);
+			parseBlock (token, parent);
 		}
 		else
 		{
-			parseLine(token, FALSE);
+			is_terminated = parseLine(token, parent, FALSE);
 		}
 	}
 	else if (isKeyword (token, KEYWORD_do))
@@ -759,14 +870,15 @@ static void parseLoop (tokenInfo *const token)
 			 * of the function.  If we find a "this." we know
 			 * it is a class, otherwise it is a function.
 			 */
-			parseBlock (token, token);
+			parseBlock (token, parent);
 		}
 		else
 		{
-			parseLine(token, FALSE);
+			is_terminated = parseLine(token, parent, FALSE);
 		}
 
-		readToken(token);
+		if (is_terminated)
+			readToken(token);
 
 		if (isKeyword (token, KEYWORD_while))
 		{
@@ -778,13 +890,17 @@ static void parseLoop (tokenInfo *const token)
 				 * Handle nameless functions, these will only
 				 * be considered methods.
 				 */
-				skipArgumentList(token);
+				skipArgumentList(token, TRUE, NULL);
 			}
+			if (! isType (token, TOKEN_SEMICOLON))
+				is_terminated = FALSE;
 		}
 	}
+
+	return is_terminated;
 }
 
-static boolean parseIf (tokenInfo *const token)
+static boolean parseIf (tokenInfo *const token, tokenInfo *const parent)
 {
 	boolean read_next_token = TRUE;
 	/*
@@ -843,7 +959,7 @@ static boolean parseIf (tokenInfo *const token)
 		 * Handle nameless functions, these will only
 		 * be considered methods.
 		 */
-		skipArgumentList(token);
+		skipArgumentList(token, FALSE, NULL);
 	}
 
 	if (isType (token, TOKEN_OPEN_CURLY))
@@ -854,15 +970,13 @@ static boolean parseIf (tokenInfo *const token)
 		 * of the function.  If we find a "this." we know
 		 * it is a class, otherwise it is a function.
 		 */
-		parseBlock (token, token);
+		parseBlock (token, parent);
 	}
 	else
 	{
-		findCmdTerm (token);
-
 		/* The next token should only be read if this statement had its own
 		 * terminator */
-		read_next_token = isType (token, TOKEN_SEMICOLON);
+		read_next_token = findCmdTerm (token, TRUE);
 	}
 	return read_next_token;
 }
@@ -870,6 +984,7 @@ static boolean parseIf (tokenInfo *const token)
 static void parseFunction (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
+	vString *const signature = vStringNew ();
 	boolean is_class = FALSE;
 
 	/*
@@ -893,27 +1008,32 @@ static void parseFunction (tokenInfo *const token)
 	}
 
 	if ( isType (token, TOKEN_OPEN_PAREN) )
-		skipArgumentList(token);
+		skipArgumentList(token, FALSE, signature);
 
 	if ( isType (token, TOKEN_OPEN_CURLY) )
 	{
 		is_class = parseBlock (token, name);
 		if ( is_class )
-			makeClassTag (name);
+			makeClassTag (name, signature);
 		else
-			makeFunctionTag (name);
+			makeFunctionTag (name, signature);
 	}
 
-	findCmdTerm (token);
+	findCmdTerm (token, FALSE);
 
+	vStringDelete (signature);
 	deleteToken (name);
 }
 
-static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
+static boolean parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 {
 	boolean is_class = FALSE;
 	boolean read_next_token = TRUE;
 	vString * saveScope = vStringNew ();
+	tokenInfo *const parent = newToken ();
+
+	/* backup the parent token to allow calls like parseBlock(token, token) */
+	copyToken (parent, orig_parent);
 
 	token->nestLevel++;
 	/*
@@ -947,11 +1067,13 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 				 * Ignore the remainder of the line
 				 * findCmdTerm(token);
 				 */
-				parseLine (token, is_class);
+				read_next_token = parseLine (token, parent, is_class);
 
 				vStringCopy(token->scope, saveScope);
 			}
-			else if (isKeyword (token, KEYWORD_var))
+			else if (isKeyword (token, KEYWORD_var) ||
+					 isKeyword (token, KEYWORD_let) ||
+					 isKeyword (token, KEYWORD_const))
 			{
 				/*
 				 * Potentially we have found an inner function.
@@ -959,7 +1081,7 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 				 */
 				vStringCopy(saveScope, token->scope);
 				addToScope (token, parent->string);
-				parseLine (token, is_class);
+				read_next_token = parseLine (token, parent, is_class);
 				vStringCopy(token->scope, saveScope);
 			}
 			else if (isKeyword (token, KEYWORD_function))
@@ -982,7 +1104,7 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 				 * parseLine will detect this case and indicate
 				 * whether we should read an additional token.
 				 */
-				read_next_token = parseLine (token, is_class);
+				read_next_token = parseLine (token, parent, is_class);
 			}
 
 			/*
@@ -999,6 +1121,7 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 		} while (! isType (token, TOKEN_CLOSE_CURLY) && read_next_token );
 	}
 
+	deleteToken (parent);
 	vStringDelete(saveScope);
 	token->nestLevel--;
 
@@ -1041,17 +1164,19 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 				readToken (token);
 				if ( isKeyword (token, KEYWORD_function) )
 				{
+					vString *const signature = vStringNew ();
+
 					readToken (token);
 					if ( isType (token, TOKEN_OPEN_PAREN) )
 					{
-						skipArgumentList(token);
+						skipArgumentList(token, FALSE, signature);
 					}
 
 					if (isType (token, TOKEN_OPEN_CURLY))
 					{
 						has_methods = TRUE;
 						addToScope (name, class->string);
-						makeJsTag (name, JSTAG_METHOD);
+						makeJsTag (name, JSTAG_METHOD, signature);
 						parseBlock (token, name);
 
 						/*
@@ -1060,6 +1185,8 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 						 */
 						readToken (token);
 					}
+
+					vStringDelete (signature);
 				}
 				else
 				{
@@ -1081,11 +1208,11 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 							}
 							else if (isType (token, TOKEN_OPEN_PAREN))
 							{
-								skipArgumentList (token);
+								skipArgumentList (token, FALSE, NULL);
 							}
 							else if (isType (token, TOKEN_OPEN_SQUARE))
 							{
-								skipArrayList (token);
+								skipArrayList (token, FALSE);
 							}
 							else
 							{
@@ -1097,15 +1224,15 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 						has_methods = TRUE;
 						addToScope (name, class->string);
 						if (has_child_methods)
-							makeJsTag (name, JSTAG_CLASS);
-						else if (!isType (name, TOKEN_REGEXP))
-							makeJsTag (name, JSTAG_PROPERTY);
+							makeJsTag (name, JSTAG_CLASS, NULL);
+						else
+							makeJsTag (name, JSTAG_PROPERTY, NULL);
 				}
 			}
 		}
 	} while ( isType(token, TOKEN_COMMA) );
 
-	findCmdTerm (token);
+	findCmdTerm (token, FALSE);
 
 cleanUp:
 	deleteToken (name);
@@ -1113,13 +1240,15 @@ cleanUp:
 	return has_methods;
 }
 
-static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
+static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, boolean is_inside_class)
 {
 	tokenInfo *const name = newToken ();
 	tokenInfo *const secondary_name = newToken ();
 	tokenInfo *const method_body_token = newToken ();
 	vString * saveScope = vStringNew ();
 	boolean is_class = FALSE;
+	boolean is_var = FALSE;
+	boolean is_const = FALSE;
 	boolean is_terminated = TRUE;
 	boolean is_global = FALSE;
 	boolean has_methods = FALSE;
@@ -1159,8 +1288,11 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 	/*
 	 * var can preceed an inner function
 	 */
-	if ( isKeyword(token, KEYWORD_var) )
+	if ( isKeyword(token, KEYWORD_var) ||
+		 isKeyword(token, KEYWORD_let) ||
+		 isKeyword(token, KEYWORD_const) )
 	{
+		is_const = isKeyword(token, KEYWORD_const);
 		/*
 		 * Only create variables for global scope
 		 */
@@ -1186,6 +1318,9 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 	       ! isType (token, TOKEN_SEMICOLON)   &&
 	       ! isType (token, TOKEN_EQUAL_SIGN)  )
 	{
+		if (isType (token, TOKEN_OPEN_CURLY))
+			parseBlock (token, parent);
+
 		/* Potentially the name of the function */
 		readToken (token);
 		if (isType (token, TOKEN_PERIOD))
@@ -1201,11 +1336,12 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 				{
 					if ( is_class )
 					{
-						vStringCopy(saveScope, token->scope);
 						addToScope(token, name->string);
 					}
 					else
 						addContext (name, token);
+
+					readToken (token);
 				}
 				else if ( isKeyword(token, KEYWORD_prototype) )
 				{
@@ -1231,7 +1367,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 					 *     }
 					 *
 					 */
-					makeClassTag (name);
+					makeClassTag (name, NULL);
 					is_class = TRUE;
 
 					/*
@@ -1246,9 +1382,10 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 						readToken (token);
 						if ( isKeyword(token, KEYWORD_NONE) )
 						{
+							vString *const signature = vStringNew ();
+
 							vStringCopy(saveScope, token->scope);
 							addToScope(token, name->string);
-							makeJsTag (token, JSTAG_METHOD);
 
 							readToken (method_body_token);
 							vStringCopy (method_body_token->scope, token->scope);
@@ -1258,15 +1395,22 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 							           isType (method_body_token, TOKEN_OPEN_CURLY)) )
 							{
 								if ( isType (method_body_token, TOKEN_OPEN_PAREN) )
-									skipArgumentList(method_body_token);
+									skipArgumentList(method_body_token, FALSE,
+													 vStringLength (signature) == 0 ? signature : NULL);
 								else
 									readToken (method_body_token);
 							}
 
-							if ( isType (method_body_token, TOKEN_OPEN_CURLY))
-								parseBlock (method_body_token, token);
+							makeJsTag (token, JSTAG_METHOD, signature);
+							vStringDelete (signature);
 
-							is_terminated = TRUE;
+							if ( isType (method_body_token, TOKEN_OPEN_CURLY))
+							{
+								parseBlock (method_body_token, token);
+								is_terminated = TRUE;
+							}
+							else
+								is_terminated = isType (method_body_token, TOKEN_SEMICOLON);
 							goto cleanUp;
 						}
 					}
@@ -1288,22 +1432,23 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 							/*
 							 * Find to the end of the statement
 							 */
-							findCmdTerm (token);
+							findCmdTerm (token, FALSE);
 							token->ignoreTag = FALSE;
 							is_terminated = TRUE;
 							goto cleanUp;
 						}
 					}
 				}
-				readToken (token);
+				else
+					readToken (token);
 			} while (isType (token, TOKEN_PERIOD));
 		}
 
 		if ( isType (token, TOKEN_OPEN_PAREN) )
-			skipArgumentList(token);
+			skipArgumentList(token, FALSE, NULL);
 
 		if ( isType (token, TOKEN_OPEN_SQUARE) )
-			skipArrayList(token);
+			skipArrayList(token, FALSE);
 
 		/*
 		if ( isType (token, TOKEN_OPEN_CURLY) )
@@ -1336,7 +1481,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 			 *	   var g_var2;
 			 */
 			if (isType (token, TOKEN_SEMICOLON))
-				makeJsTag (name, JSTAG_VARIABLE);
+				makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
 		}
 		/*
 		 * Statement has ended.
@@ -1348,10 +1493,21 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 
 	if ( isType (token, TOKEN_EQUAL_SIGN) )
 	{
+		int parenDepth = 0;
+
 		readToken (token);
+
+		/* rvalue might be surrounded with parentheses */
+		while (isType (token, TOKEN_OPEN_PAREN))
+		{
+			parenDepth++;
+			readToken (token);
+		}
 
 		if ( isKeyword (token, KEYWORD_function) )
 		{
+			vString *const signature = vStringNew ();
+
 			readToken (token);
 
 			if ( isKeyword (token, KEYWORD_NONE) &&
@@ -1379,7 +1535,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 			}
 
 			if ( isType (token, TOKEN_OPEN_PAREN) )
-				skipArgumentList(token);
+				skipArgumentList(token, FALSE, signature);
 
 			if (isType (token, TOKEN_OPEN_CURLY))
 			{
@@ -1391,47 +1547,25 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 				 */
 				if ( is_inside_class )
 				{
-					makeJsTag (name, JSTAG_METHOD);
+					makeJsTag (name, JSTAG_METHOD, signature);
 					if ( vStringLength(secondary_name->string) > 0 )
-						makeFunctionTag (secondary_name);
+						makeFunctionTag (secondary_name, signature);
 					parseBlock (token, name);
 				}
 				else
 				{
 					is_class = parseBlock (token, name);
 					if ( is_class )
-						makeClassTag (name);
+						makeClassTag (name, signature);
 					else
-						makeFunctionTag (name);
+						makeFunctionTag (name, signature);
 
 					if ( vStringLength(secondary_name->string) > 0 )
-						makeFunctionTag (secondary_name);
-
-					/*
-					 * Find to the end of the statement
-					 */
-					goto cleanUp;
+						makeFunctionTag (secondary_name, signature);
 				}
 			}
-		}
-		else if (isType (token, TOKEN_OPEN_PAREN))
-		{
-			/*
-			 * Handle nameless functions
-			 *     this.method_name = () {}
-			 */
-			skipArgumentList(token);
 
-			if (isType (token, TOKEN_OPEN_CURLY))
-			{
-				/*
-				 * Nameless functions are only setup as methods.
-				 */
-				makeJsTag (name, JSTAG_METHOD);
-				parseBlock (token, name);
-			}
-			else if (isType (token, TOKEN_CLOSE_CURLY))
-				is_terminated = FALSE;
+			vStringDelete (signature);
 		}
 		else if (isType (token, TOKEN_OPEN_CURLY))
 		{
@@ -1446,7 +1580,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 			 */
 			has_methods = parseMethods(token, name);
 			if (has_methods)
-				makeJsTag (name, JSTAG_CLASS);
+				makeJsTag (name, JSTAG_CLASS, NULL);
 			else
 			{
 				/*
@@ -1482,11 +1616,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 					if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 							! stringListHas(ClassNames, vStringValue (fulltag)) )
 					{
-						readToken (token);
-						if ( ! isType (token, TOKEN_SEMICOLON))
-							findCmdTerm (token);
-						if (isType (token, TOKEN_SEMICOLON))
-							makeJsTag (name, JSTAG_VARIABLE);
+						makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
 					}
 					vStringDelete (fulltag);
 				}
@@ -1503,26 +1633,38 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 		else if (isKeyword (token, KEYWORD_new))
 		{
 			readToken (token);
+			is_var = isType (token, TOKEN_IDENTIFIER);
 			if ( isKeyword (token, KEYWORD_function) ||
 					isKeyword (token, KEYWORD_capital_function) ||
-					isKeyword (token, KEYWORD_capital_object) )
+					isKeyword (token, KEYWORD_capital_object) ||
+					is_var )
 			{
 				if ( isKeyword (token, KEYWORD_capital_object) )
 					is_class = TRUE;
 
 				readToken (token);
 				if ( isType (token, TOKEN_OPEN_PAREN) )
-					skipArgumentList(token);
+					skipArgumentList(token, TRUE, NULL);
 
 				if (isType (token, TOKEN_SEMICOLON))
 				{
 					if ( token->nestLevel == 0 )
 					{
-						if ( is_class )
+						if ( is_var )
 						{
-							makeClassTag (name);
-						} else {
-							makeFunctionTag (name);
+							makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
+						}
+						else
+						{
+							if ( is_class )
+							{
+								makeClassTag (name, NULL);
+							} else {
+								/* FIXME: we cannot really get a meaningful
+								 * signature from a `new Function()` call,
+								 * so for now just don't set any */
+								makeFunctionTag (name, NULL);
+							}
 						}
 					}
 				}
@@ -1565,12 +1707,24 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 				if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 						! stringListHas(ClassNames, vStringValue (fulltag)) )
 				{
-					findCmdTerm (token);
-					if (isType (token, TOKEN_SEMICOLON))
-						makeJsTag (name, JSTAG_VARIABLE);
+					makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
 				}
 				vStringDelete (fulltag);
 			}
+		}
+
+		if (parenDepth > 0)
+		{
+			while (parenDepth > 0)
+			{
+				if (isType (token, TOKEN_OPEN_PAREN))
+					parenDepth++;
+				else if (isType (token, TOKEN_CLOSE_PAREN))
+					parenDepth--;
+				readTokenFull (token, TRUE, NULL);
+			}
+			if (isType (token, TOKEN_CLOSE_CURLY))
+				is_terminated = FALSE;
 		}
 	}
 	/* if we aren't already at the cmd end, advance to it and check whether
@@ -1578,8 +1732,6 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 	if (! isType (token, TOKEN_CLOSE_CURLY) &&
 	    ! isType (token, TOKEN_SEMICOLON))
 	{
-		findCmdTerm (token);
-
 		/*
 		 * Statements can be optionally terminated in the case of
 		 * statement prior to a close curly brace as in the
@@ -1592,8 +1744,7 @@ static boolean parseStatement (tokenInfo *const token, boolean is_inside_class)
 		 *	   return 1;
 		 * }
 		 */
-		if (isType (token, TOKEN_CLOSE_CURLY))
-			is_terminated = FALSE;
+		is_terminated = findCmdTerm (token, TRUE);
 	}
 
 cleanUp:
@@ -1654,7 +1805,7 @@ static void parseUI5 (tokenInfo *const token)
 	deleteToken (name);
 }
 
-static boolean parseLine (tokenInfo *const token, boolean is_inside_class)
+static boolean parseLine (tokenInfo *const token, tokenInfo *const parent, boolean is_inside_class)
 {
 	boolean is_terminated = TRUE;
 	/*
@@ -1674,7 +1825,7 @@ static boolean parseLine (tokenInfo *const token, boolean is_inside_class)
 			case KEYWORD_for:
 			case KEYWORD_while:
 			case KEYWORD_do:
-				parseLoop (token);
+				is_terminated = parseLoop (token, parent);
 				break;
 			case KEYWORD_if:
 			case KEYWORD_else:
@@ -1682,13 +1833,16 @@ static boolean parseLine (tokenInfo *const token, boolean is_inside_class)
 			case KEYWORD_catch:
 			case KEYWORD_finally:
 				/* Common semantics */
-				is_terminated = parseIf (token);
+				is_terminated = parseIf (token, parent);
 				break;
 			case KEYWORD_switch:
 				parseSwitch (token);
 				break;
+			case KEYWORD_return:
+				is_terminated = findCmdTerm (token, TRUE);
+				break;
 			default:
-				parseStatement (token, is_inside_class);
+				is_terminated = parseStatement (token, parent, is_inside_class);
 				break;
 		}
 	}
@@ -1699,7 +1853,7 @@ static boolean parseLine (tokenInfo *const token, boolean is_inside_class)
 		 * SEMICOLON terminated.  parseBlock needs to know this
 		 * so that it does not read the next token.
 		 */
-		is_terminated = parseStatement (token, is_inside_class);
+		is_terminated = parseStatement (token, parent, is_inside_class);
 	}
 	return is_terminated;
 }
@@ -1715,7 +1869,7 @@ static void parseJsFile (tokenInfo *const token)
 		else if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_sap)
 			parseUI5 (token);
 		else
-			parseLine (token, FALSE);
+			parseLine (token, token, FALSE);
 	} while (TRUE);
 }
 
@@ -1750,7 +1904,8 @@ static void findJsTags (void)
 extern parserDefinition* JavaScriptParser (void)
 {
 	static const char *const extensions [] = { "js", NULL };
-	static const char *const aliases [] = { "js", NULL };
+	static const char *const aliases [] = { "js", "node", "nodejs",
+	                                        "seed", "gjs", NULL };
 	parserDefinition *const def = parserNew ("JavaScript");
 	def->extensions = extensions;
 	def->aliases = aliases;

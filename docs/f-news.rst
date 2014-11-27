@@ -150,21 +150,18 @@ More documentation is needed.
 
 Modeline based parser selection
 ---------------------------------------------------------------------
-exuberant-ctags has ability to choose a proper parser based on shebang
-line(e.g. *#!/bin/sh*). This feature is extended in fishman-ctags.
+exuberant-ctags has the ability to choose a proper parser based on shebang
+lines (e.g. *#!/bin/sh*). This feature is extended in fishman-ctags.
 
-Editors like vim and emacs can recognize special patterns in editing
-text file. Here it is called modeline. The pattern in inserted by a
-user of text editor and represents a programming language of the text
-file. With the recognition the editor chooses a mode (in emacs) or a
-syntax (in vim). The editor can change its behavior specializing to a
-programming language based on the mode (or syntax).
+Editors like vim and emacs recognize special patterns in files, which are
+called modelines. The line is inserted by a user of the text editor and can
+be used to set the file type (Vim) or mode (emacs).
 
-fishman-ctags can also recognize the modeline; and choose a language
-parser based on the modeline.
+fishman-ctags also recognizes these modeline and selects a language parser
+based on it.
 
 
-ctags recognizes following patterns used in emacs:
+ctags recognizes the following patterns used in emacs:
 
   * at the head of input file or at the line next of shebang line::
 
@@ -183,7 +180,7 @@ ctags recognizes following patterns used in emacs:
       End:
 
 
-ctags recognizes following patterns used in vim:
+ctags recognizes the following patterns used in vim:
 
   * at the end of input file::
 

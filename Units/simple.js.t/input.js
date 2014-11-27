@@ -69,7 +69,7 @@ ValidClassTwo = function ()
     this.validMethodThree = function() {}
 
     // unnamed method
-    this.validMethodFour = () {}
+    this.validMethodFour = function() {}
 }
 
 var my_global_var4 = document.getElementsByTagName("input");

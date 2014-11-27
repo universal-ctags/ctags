@@ -391,40 +391,30 @@ static vString* extractEmacsModeLanguageAtEOF (FILE* input)
 	return mode;
 }
 
-static vString* determineVimFileType (const char *const line)
+static vString* determineVimFileType (const char *const modeline)
 {
 	/* considerable combinations:
 	   --------------------------
-	   set ... filetype=
-	   se ... filetype=
-	   set ... ft=
-	   se ... ft= */
+	   ... filetype=
+	   ... ft= */
 
-	unsigned int i, j;
+	unsigned int i;
 	const char* p;
-	const char* q;
 
-	const char* const set_prefix[] = {"set ", "se "};
 	const char* const filetype_prefix[] = {"filetype=", "ft="};
 	vString* const filetype = vStringNew ();
 
-	for (i = 0; i < sizeof(set_prefix)/sizeof(set_prefix[0]); i++)
+	for (i = 0; i < sizeof(filetype_prefix)/sizeof(filetype_prefix[0]); i++)
 	{
-		if ((p = strstr(line, set_prefix[i])) == NULL)
+		if ((p = strrstr(modeline, filetype_prefix[i])) == NULL)
 			continue;
-		p += strlen(set_prefix[i]);
-		for (j = 0; j < sizeof(filetype_prefix)/sizeof(filetype_prefix[0]); j++)
-		{
-			if ((q = strstr(p, filetype_prefix[j])) == NULL)
-				continue;
-			q += strlen(filetype_prefix[j]);
-			for ( ;  *q != '\0'  &&  isalnum ((int) *q)  ;  ++q)
-				vStringPut (filetype, (int) *q);
-			vStringTerminate (filetype);
-			goto out;
-		}
+
+		p += strlen(filetype_prefix[i]);
+		for ( ;  *p != '\0'  &&  isalnum ((int) *p)  ;  ++p)
+			vStringPut (filetype, (int) *p);
+		vStringTerminate (filetype);
+		break;
 	}
-  out:
 	return filetype;
 }
 
@@ -486,7 +476,7 @@ static vString* extractVimFileType(FILE* input)
 	{
 		vStringDelete (filetype);
 		filetype = NULL;
-        }
+	}
 	return filetype;
 
 	/* TODO:
@@ -563,7 +553,30 @@ static langType getTwoGramLanguage (FILE* input,
 	return result;
 }
 
-static langType getSpecLanguageCommon (const char *const spec, FILE* input,
+struct getLangCtx {
+    const char *fileName;
+    FILE       *input;
+    boolean     err;
+};
+
+#define GLC_FOPEN_IF_NECESSARY(_glc_, _label_) do {         \
+    if (!(_glc_)->input) {                                  \
+        (_glc_)->input = fopen((_glc_)->fileName, "rb");    \
+        if (!(_glc_)->input) {                              \
+            (_glc_)->err = TRUE;                            \
+            goto _label_;                                   \
+        }                                                   \
+    }                                                       \
+} while (0)                                                 \
+
+#define GLC_FCLOSE(_glc_) do {                              \
+    if ((_glc_)->input) {                                   \
+        fclose((_glc_)->input);                             \
+        (_glc_)->input = NULL;                              \
+    }                                                       \
+} while (0)
+
+static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx *glc,
 				       unsigned int nominate (const char *const, parserCandidate**))
 {
 	langType language;
@@ -572,14 +585,7 @@ static langType getSpecLanguageCommon (const char *const spec, FILE* input,
 
 	n_candidates = (*nominate)(spec, &candidates);
 
-	if (input == NULL && n_candidates > 1)
-	{
-		/* This is needed for backward compatibility
-		   about #line directive behavior. */
-		verbose ("		#candidates: <no input>\n");
-		language = candidates[0].lang;
-	}
-	else if (n_candidates == 1)
+	if (n_candidates == 1)
 	{
 		verbose ("		#candidates: %u\n", n_candidates);
 		language = candidates[0].lang;
@@ -587,12 +593,20 @@ static langType getSpecLanguageCommon (const char *const spec, FILE* input,
 	else if (n_candidates > 1)
 	{
 		verbose ("		#candidates: %u\n", n_candidates);
-		language = getTwoGramLanguage(input, candidates, n_candidates);
+        GLC_FOPEN_IF_NECESSARY(glc, fopen_error);
+		language = getTwoGramLanguage(glc->input, candidates, n_candidates);
 		if (language == LANG_IGNORE)
 			language = candidates[0].lang;
+        /* At this point we are guaranteed that a language has been
+         * selected:
+         */
+        Assert(language != LANG_IGNORE && language != LANG_AUTO);
 	}
 	else
+	{
+fopen_error:
 		language = LANG_IGNORE;
+	}
 
 	eFree(candidates);
 	candidates = NULL;
@@ -600,87 +614,114 @@ static langType getSpecLanguageCommon (const char *const spec, FILE* input,
 	return language;
 }
 
-static langType getSpecLanguage (const char *const spec, FILE* input)
+static langType getSpecLanguage (const char *const spec,
+                                 struct getLangCtx *glc)
 {
-	return getSpecLanguageCommon(spec, input, nominateLanguageCandidates);
+	return getSpecLanguageCommon(spec, glc, nominateLanguageCandidates);
 }
 
-static langType getPatternLanguage (const char *const baseName, FILE* input)
+static langType getPatternLanguage (const char *const baseName,
+                                    struct getLangCtx *glc)
 {
-	return getSpecLanguageCommon(baseName, input, nominateLanguageCandidatesForPattern);
+	return getSpecLanguageCommon(baseName, glc,
+                                 nominateLanguageCandidatesForPattern);
+}
+
+/* This function tries to figure out language contained in a file by
+ * running a series of tests, trying to find some clues in the file.
+ */
+static langType
+tasteLanguage (struct getLangCtx *glc)
+{
+    typedef vString* (*tasteFunction)(FILE *);
+    static const struct {
+        tasteFunction   taste;
+        const char     *msg;
+    } tasters[] = {
+        {
+            .taste  = extracEmacsModeAtFirstLine,
+            .msg    = "emacs mode at the first line",
+        },
+        {
+            .taste  = extractInterpreter,
+            .msg    = "interpreter",
+        },
+        {
+            .taste  = extractEmacsModeLanguageAtEOF,
+            .msg    = "emacs mode at the EOF",
+        },
+        {
+            .taste  = extractVimFileType,
+            .msg    = "vim modeline",
+        },
+    };
+    int i;
+
+    for (i = 0; i < sizeof(tasters) / sizeof(tasters[0]); ++i) {
+        langType language;
+        vString* spec;
+        rewind(glc->input);
+        if (NULL != (spec = tasters[i].taste(glc->input))) {
+            verbose ("	%s: %s\n", tasters[i].msg, vStringValue (spec));
+            language = getSpecLanguage (vStringValue (spec), glc);
+            vStringDelete (spec);
+            if (language != LANG_IGNORE)
+                return language;
+        }
+    }
+
+    return LANG_IGNORE;
+}
+
+static langType
+getFileLanguageInternal (const char *const fileName)
+{
+    langType language;
+    struct getLangCtx glc = {
+        .fileName = fileName,
+        .input    = NULL,
+        .err      = FALSE,
+    };
+    const char* const baseName = baseFilename (fileName);
+    char *templateBaseName = NULL;
+
+    verbose ("Get file language for %s\n", fileName);
+
+    verbose ("	pattern: %s\n", baseName);
+    language = getPatternLanguage (baseName, &glc);
+    if (language != LANG_IGNORE || glc.err)
+        goto cleanup;
+
+    {
+        const char* const tExt = ".in";
+        templateBaseName = baseFilenameSansExtensionNew (fileName, tExt);
+        if (templateBaseName)
+        {
+            verbose ("	pattern + template(%s): %s\n", tExt, templateBaseName);
+            GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
+            rewind(glc.input);
+            language = getPatternLanguage(templateBaseName, &glc);
+            if (language != LANG_IGNORE)
+                goto cleanup;
+        }
+    }
+
+    GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
+    language = tasteLanguage(&glc);
+
+  cleanup:
+    GLC_FCLOSE(&glc);
+    if (templateBaseName)
+        eFree (templateBaseName);
+	return language;
 }
 
 extern langType getFileLanguage (const char *const fileName)
 {
-	langType language = Option.language;
-	if (language == LANG_AUTO)
-	{
-		vString* spec;
-		FILE* input;
-
-		language = LANG_IGNORE;
-		verbose ("Get file language for %s\n", fileName);
-
-		input = fopen (fileName, "rb");
-		{
-			const char* baseName = baseFilename (fileName);
-			verbose ("	pattern: %s\n", baseName);
-			language = getPatternLanguage (baseName, input);
-			if (input)
-				rewind (input);
-			else
-				goto template_file;
-		}
-
-		if (language == LANG_IGNORE && (spec = extracEmacsModeAtFirstLine (input)))
-		{
-			verbose ("	emacs mode at the first line: %s\n", vStringValue (spec));
-			language = getSpecLanguage (vStringValue (spec), input);
-			vStringDelete (spec);
-		}
-		rewind(input);
-
-		if (language == LANG_IGNORE && (spec = extractInterpreter (input)))
-		{
-			verbose ("	interpreter: %s\n", vStringValue (spec));
-			language = getSpecLanguage (vStringValue (spec), input);
-			vStringDelete (spec);
-		}
-		rewind(input);
-
-		if (language == LANG_IGNORE && (spec = extractEmacsModeLanguageAtEOF (input)))
-		{
-			verbose ("	emacs mode at the EOF: %s\n", vStringValue (spec));
-			language = getSpecLanguage (vStringValue (spec), input);
-			vStringDelete (spec);
-		}
-		rewind(input);
-
-		if (language == LANG_IGNORE && (spec = extractVimFileType (input)))
-		{
-			verbose ("	vim modeline: %s\n", vStringValue (spec));
-			language = getSpecLanguage (vStringValue (spec), input);
-			vStringDelete (spec);
-		}
-		rewind(input);
-
-	  template_file:
-		if (language == LANG_IGNORE)
-		{
-			const char* const tExt = ".in";
-			char* baseName = baseFilenameSansExtensionNew (fileName, tExt);
-			if (baseName)
-			{
-				verbose ("	pattern + template(%s): %s\n", tExt, baseName);
-				language = getPatternLanguage(baseName, input);
-				eFree (baseName);
-			}
-		}
-
-		if (input)
-			fclose (input);
-	}
-	return language;
+    if (LANG_AUTO == Option.language)
+        return getFileLanguageInternal(fileName);
+    else
+        return Option.language;
 }
 
 typedef void (*languageCallback)  (langType language, void* user_data);

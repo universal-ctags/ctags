@@ -18,7 +18,7 @@ validFunctionOne	input.js	/^validFunctionOne = function(a,b) {}$/;"	f
 validFunctionSix	input.js	/^testlib.core.validFunctionSix = function(a,b) {}$/;"	f	function:testlib.core
 validFunctionThree	input.js	/^function validFunctionThree(a,b) {$/;"	f
 validFunctionTwo	input.js	/^function validFunctionTwo(a,b) {}$/;"	f
-validMethodFour	input.js	/^    this.validMethodFour = () {}$/;"	m	class:ValidClassTwo
+validMethodFour	input.js	/^    this.validMethodFour = function() {}$/;"	m	class:ValidClassTwo
 validMethodOne	input.js	/^    'validMethodOne' : function(a,b) {},$/;"	m	class:testlib.extras.ValidClassOne
 validMethodThree	input.js	/^    this.validMethodThree = function() {}$/;"	m	class:ValidClassTwo
 validMethodTwo	input.js	/^    'validMethodTwo' : function(a,b) {}$/;"	m	class:testlib.extras.ValidClassOne

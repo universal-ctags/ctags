@@ -35,8 +35,6 @@
 /*
  *   DATA DECLARATIONS
  */
-typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
-
 typedef enum {
 	K_IGNORE = -2,
 	K_UNDEFINED,
@@ -68,7 +66,6 @@ typedef struct sTokenInfo {
  */
 static int Ungetc;
 static int Lang_verilog;
-static jmp_buf Exception;
 
 static kindOption VerilogKinds [] = {
  { TRUE, 'c', "constant",  "constants (define, parameter, specparam)" },
@@ -172,6 +169,11 @@ static tokenInfo *popToken (tokenInfo * const token)
 	return NULL;
 }
 
+static void pruneTokens (tokenInfo * token)
+{
+	while ((token = popToken (token)));
+}
+
 static void initialize (const langType language)
 {
 	size_t i;
@@ -205,7 +207,7 @@ static int vGetc (void)
 	{
 		int c2 = fileGetc ();
 		if (c2 == EOF)
-			longjmp (Exception, (int) ExceptionEOF);
+			return EOF;
 		else if (c2 == '/')  /* strip comment until end-of-line */
 		{
 			do
@@ -229,8 +231,6 @@ static int vGetc (void)
 		while (c2 != '"'  &&  c2 != EOF);
 		c = '@';
 	}
-	if (c == EOF)
-		longjmp (Exception, (int) ExceptionEOF);
 	return c;
 }
 
@@ -259,7 +259,7 @@ static int skipPastMatch (const char *const pair)
 		else if (c == end)
 			--matchLevel;
 	}
-	while (matchLevel > 0);
+	while (c != EOF && matchLevel > 0);
 	return vGetc ();
 }
 
@@ -269,7 +269,7 @@ static void skipToEOL (void)
 	do
 	{
 		c = vGetc ();
-	} while (c != '\n');
+	} while (c != EOF && c != '\n');
 }
 
 static void skipComments (int c)
@@ -289,7 +289,7 @@ static void skipComments (int c)
 			{
 				p = c;
 				c = vGetc ();
-			} while (p != '*' && c != '/');
+			} while (c != EOF && p != '*' && c != '/');
 		}
 		else
 		{
@@ -472,7 +472,7 @@ static void tagNameList (const verilogKind kind, int c)
 				/* Skip until end of current name, kind or parameter list definition */
 				do
 					c = vGetc ();
-				while (c != ','  &&  c != ';' && c != ')');
+				while (c != EOF && c != ','  &&  c != ';' && c != ')');
 			}
 		}
 		if (c == ',')
@@ -519,7 +519,7 @@ static void findTag (vString *const name)
 		/* Skip the rest of the line. */
 		do {
 			c = vGetc();
-		} while (c != '\n');
+		} while (c != EOF && c != '\n');
 		vUngetc (c);
 	}
 	else if (kind == K_BLOCK)
@@ -557,9 +557,8 @@ static void findVerilogTags (void)
 {
 	vString *const name = vStringNew ();
 	int c = '\0';
-	exception_t exception = (exception_t) setjmp (Exception);
 
-	if (exception == ExceptionNone) while (c != EOF)
+	while (c != EOF)
 	{
 		c = vGetc ();
 		switch (c)
@@ -578,7 +577,7 @@ static void findVerilogTags (void)
 	}
 
 	vStringDelete (name);
-	deleteToken (currentContext);
+	pruneTokens (currentContext);
 	currentContext = NULL;
 }
 
