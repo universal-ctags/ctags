@@ -1,0 +1,11 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Fishman Ctags	//
+!_TAG_PROGRAM_URL	https://github.com/fishman/ctags	/official site/
+!_TAG_PROGRAM_VERSION	Development	//
+Foo	input.d	/^class Foo$/;"	c	file:
+_bar	input.d	/^	private int _bar;$/;"	m	class:Foo	file:
+bar	input.d	/^	public int bar()$/;"	f	class:Foo
+main	input.d	/^void main(string[] args)$/;"	f
+this	input.d	/^	public this(int x)$/;"	f	class:Foo
