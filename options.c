@@ -2364,11 +2364,19 @@ static void parseConfigurationFileOptionsInDirectory (const char* directory)
 {
 	char	*leafname = NULL;
 
-	asprintf (&leafname,".%s",(Option.configFilename)?Option.configFilename:"ctags");
+	if (asprintf (&leafname,".%s",(Option.configFilename)?Option.configFilename:"ctags") == -1)
+	{
+		fprintf(stderr, "error in asprintf\n");
+		exit (1);
+	}
 	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, leafname);
 	free (leafname);
 #ifdef MSDOS_STYLE_PATH
-	asprintf (&leafname,"%s.cnf",(Option.configFilename)?Option.configFilename:"ctags");
+	if (asprintf (&leafname,"%s.cnf",(Option.configFilename)?Option.configFilename:"ctags") == -1)
+	{
+		fprintf(stderr, "error in asprintf\n");
+		exit (1);
+	}
 	parseConfigurationFileOptionsInDirectoryWithLeafname (directory, leafname);
 	free (leafname);
 #endif
@@ -2488,15 +2496,27 @@ static void parseConfigurationFileOptions (void)
 	filename_body = (Option.configFilename)?Option.configFilename:"ctags";
 #ifdef MSDOS_STYLE_PATH
 
-	asprintf (&filename,"/%s.cnf", filename_body);
+	if (asprintf (&filename,"/%s.cnf", filename_body) == -1)
+	{
+		fprintf(stderr, "error in asprintf\n");
+		exit (1);
+	}
 	parseFileOptions (filename);
 	free (filename);
 #endif
-	asprintf (&filename,"/etc/%s.conf", filename_body);
+	if (asprintf (&filename,"/etc/%s.conf", filename_body) == -1)
+	{
+		fprintf(stderr, "error in asprintf\n");
+		exit (1);
+	}
 	parseFileOptions (filename);
 	free (filename);
 
-	asprintf (&filename,"/usr/local/etc/%s.conf", filename_body);
+	if (asprintf (&filename,"/usr/local/etc/%s.conf", filename_body) == -1)
+	{
+		fprintf(stderr, "error in asprintf\n");
+		exit (1);
+	}
 	parseFileOptions (filename);
 	free (filename);
 
