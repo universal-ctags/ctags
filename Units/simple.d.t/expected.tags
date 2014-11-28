@@ -5,14 +5,12 @@
 !_TAG_PROGRAM_URL	https://github.com/fishman/ctags	/official site/
 !_TAG_PROGRAM_VERSION	Development	//
 AliasInt	input.d	/^alias AliasInt = int;$/;"	t	file:
-AliasString	input.d	/^	alias string AliasString;$/;"	t	file:
 Class	input.d	/^class Class : Interface$/;"	c	file:
 Interface	input.d	/^interface Interface$/;"	i	file:
 Struct	input.d	/^struct Struct$/;"	s	file:
 Union	input.d	/^	union Union$/;"	u	struct:Struct	file:
 _bar	input.d	/^	private AliasInt _bar;$/;"	m	class:Class	file:
 bar	input.d	/^	public AliasInt bar()$/;"	f	class:Class
-baz	input.d	/^	AliasString baz = "Hello, World!";$/;"	p
 globalVar	input.d	/^__gshared int globalVar;$/;"	v
 main	input.d	/^void main(string[] args)$/;"	f
 qar	input.d	/^		int qar;$/;"	m	union:Struct::Union	file:

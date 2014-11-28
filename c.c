@@ -341,26 +341,30 @@ static kindOption CsharpKinds [] = {
 typedef enum
 {
 	DK_UNDEFINED = -1,
-	DK_CLASS, DK_ENUMERATOR, DK_FUNCTION,
-	DK_ENUMERATION, DK_INTERFACE, DK_MEMBER, DK_NAMESPACE, DK_PROTOTYPE,
-	DK_STRUCT, DK_TYPEDEF, DK_UNION, DK_VARIABLE,
-	DK_EXTERN_VARIABLE
+	DK_CLASS, DK_ENUMERATION, DK_ENUMERATOR, DK_EXTERN_VARIABLE, DK_FUNCTION,
+	DK_INTERFACE, DK_LOCAL, DK_MEMBER, DK_MIXIN, DK_NAMESPACE,
+	DK_PROTOTYPE, DK_STRUCT, DK_TEMPLATE, DK_TYPEDEF, DK_UNION,
+	DK_VARIABLE, DK_VERSION
 } dKind;
 
 static kindOption DKinds [] = {
 	{ TRUE,  'c', "class",      "classes"},
-	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)"},
-	{ TRUE,  'f', "function",   "function definitions"},
 	{ TRUE,  'g', "enum",       "enumeration names"},
+	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)"},
+	{ FALSE, 'x', "externvar",  "external variable declarations"},
+	{ TRUE,  'f', "function",   "function definitions"},
 	{ TRUE,  'i', "interface",  "interfaces"},
+	{ FALSE, 'l', "local",      "local variables"},
 	{ TRUE,  'm', "member",     "class, struct, and union members"},
+	{ TRUE,  'X', "mixin",      "mixin"},
 	{ TRUE,  'n', "namespace",  "namespaces"},
 	{ FALSE, 'p', "prototype",  "function prototypes"},
 	{ TRUE,  's', "struct",     "structure names"},
+	{ TRUE,  'T', "template",   "templates"},
 	{ TRUE,  't', "typedef",    "typedefs"},
 	{ TRUE,  'u', "union",      "union names"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
-	{ FALSE, 'x', "externvar",  "external variable declarations"},
+	{ TRUE,  'V', "version",    "conditional compilation"}
 };
 
 /* Used to index into the JavaKinds table. */
@@ -975,16 +979,20 @@ static dKind dTagKind (const tagType type)
 		case TAG_CLASS:      result = DK_CLASS;           break;
 		case TAG_ENUM:       result = DK_ENUMERATION;     break;
 		case TAG_ENUMERATOR: result = DK_ENUMERATOR;      break;
+		case TAG_EXTERN_VAR: result = DK_EXTERN_VARIABLE; break;
 		case TAG_FUNCTION:   result = DK_FUNCTION;        break;
 		case TAG_INTERFACE:  result = DK_INTERFACE;       break;
+		case TAG_LOCAL:      result = DK_LOCAL;           break;
 		case TAG_MEMBER:     result = DK_MEMBER;          break;
+		case TAG_MIXIN:      result = DK_MIXIN;           break;
 		case TAG_NAMESPACE:  result = DK_NAMESPACE;       break;
 		case TAG_PROTOTYPE:  result = DK_PROTOTYPE;       break;
 		case TAG_STRUCT:     result = DK_STRUCT;          break;
+		case TAG_TEMPLATE:   result = DK_TEMPLATE;        break;
 		case TAG_TYPEDEF:    result = DK_TYPEDEF;         break;
 		case TAG_UNION:      result = DK_UNION;           break;
 		case TAG_VARIABLE:   result = DK_VARIABLE;        break;
-		case TAG_EXTERN_VAR: result = DK_EXTERN_VARIABLE; break;
+		case TAG_VERSION:    result = DK_VERSION;         break;
 
 		default: Assert ("Bad D tag type" == NULL); break;
 	}
