@@ -1,0 +1,19 @@
+0	input.json	/^    {$/;"	o	array:phoneNumbers
+1	input.json	/^    {$/;"	o	array:phoneNumbers
+address	input.json	/^  "address": {$/;"	o
+age	input.json	/^  "age": 25,$/;"	n
+children	input.json	/^  "children": [],$/;"	a
+city	input.json	/^    "city": "New York",$/;"	s	object:address
+firstName	input.json	/^  "firstName": "John",$/;"	s
+height_cm	input.json	/^  "height_cm": 167.6,$/;"	n
+isAlive	input.json	/^  "isAlive": true,$/;"	b
+lastName	input.json	/^  "lastName": "Smith",$/;"	s
+number	input.json	/^      "number": "212 555-1234"$/;"	s	object:phoneNumbers.0
+number	input.json	/^      "number": "646 555-4567"$/;"	s	object:phoneNumbers.1
+phoneNumbers	input.json	/^  "phoneNumbers": [$/;"	a
+postalCode	input.json	/^    "postalCode": "10021-3100"$/;"	s	object:address
+spouse	input.json	/^  "spouse": null$/;"	z
+state	input.json	/^    "state": "NY",$/;"	s	object:address
+streetAddress	input.json	/^    "streetAddress": "21 2nd Street",$/;"	s	object:address
+type	input.json	/^      "type": "home",$/;"	s	object:phoneNumbers.0
+type	input.json	/^      "type": "office",$/;"	s	object:phoneNumbers.1

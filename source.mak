@@ -32,6 +32,7 @@ SOURCES = \
 	html.c \
 	htable.c \
 	jscript.c \
+	json.c \
 	keyword.c \
 	lisp.c \
 	lregex.c \
