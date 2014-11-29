@@ -1,23 +1,50 @@
 import std.stdio;
 
-class Foo
-{
-	private int _bar;
+alias AliasInt = int;
 
-	public this(int x)
+struct Struct
+{
+	union Union
+	{
+		bool quxx;
+		int qar;
+	}
+}
+
+enum Enum : int
+{
+	foo,
+	bar,
+}
+
+interface Interface
+{
+	public AliasInt bar();
+}
+
+class Class : Interface
+{
+	private AliasInt _bar;
+
+	public this(AliasInt x)
 	{
 		this._bar = x;
 	}
 
-	public int bar()
+	public AliasInt bar()
 	{
 		return this._bar;
 	}
 }
 
+__gshared int globalVar;
+
 void main(string[] args)
 {
-	auto foo = new Foo(1337);
+	auto foo = new Class(1337);
+
+	alias string AliasString;
+	AliasString baz = "Hello, World!";
 
 	writefln("%s", foo.bar());
 }
