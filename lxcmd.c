@@ -44,7 +44,10 @@
 #include <errno.h>
 #include <ctype.h>
 #include <string.h>
-#include <stdlib.h>		/* for WIFEXITED and WEXITSTATUS */
+
+/* for WIFEXITED and WEXITSTATUS */
+#define _GNU_SOURCE
+#include <stdlib.h>
 
 #include "debug.h"
 #include "main.h"
