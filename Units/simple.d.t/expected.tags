@@ -4,8 +4,15 @@
 !_TAG_PROGRAM_NAME	Fishman Ctags	//
 !_TAG_PROGRAM_URL	https://github.com/fishman/ctags	/official site/
 !_TAG_PROGRAM_VERSION	Development	//
-Foo	input.d	/^class Foo$/;"	c	file:
-_bar	input.d	/^	private int _bar;$/;"	m	class:Foo	file:
-bar	input.d	/^	public int bar()$/;"	f	class:Foo
+AliasInt	input.d	/^alias AliasInt = int;$/;"	t	file:
+Class	input.d	/^class Class : Interface$/;"	c	file:
+Interface	input.d	/^interface Interface$/;"	i	file:
+Struct	input.d	/^struct Struct$/;"	s	file:
+Union	input.d	/^	union Union$/;"	u	struct:Struct	file:
+_bar	input.d	/^	private AliasInt _bar;$/;"	m	class:Class	file:
+bar	input.d	/^	public AliasInt bar()$/;"	f	class:Class
+globalVar	input.d	/^__gshared int globalVar;$/;"	v
 main	input.d	/^void main(string[] args)$/;"	f
-this	input.d	/^	public this(int x)$/;"	f	class:Foo
+qar	input.d	/^		int qar;$/;"	m	union:Struct::Union	file:
+quxx	input.d	/^		bool quxx;$/;"	m	union:Struct::Union	file:
+this	input.d	/^	public this(AliasInt x)$/;"	f	class:Class
