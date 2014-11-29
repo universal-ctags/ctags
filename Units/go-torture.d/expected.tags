@@ -1,0 +1,33 @@
+A	input.go	/^const (A = iota;B;C;$/;"	c
+B	input.go	/^const (A = iota;B;C;$/;"	c
+C	input.go	/^const (A = iota;B;C;$/;"	c
+D	input.go	/^	D = iota << (1 + iota*2)$/;"	c
+E	input.go	/^	E$/;"	c
+F	input.go	/^	F=3.14*(1+2*3)\/34e7;I=1)$/;"	c
+G	input.go	/^const ignored int*\/const (G=6); var g int$/;"	c
+H	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	c
+I	input.go	/^	F=3.14*(1+2*3)\/34e7;I=1)$/;"	c
+T1	input.go	/^	T1 map[string]int$/;"	t
+T2	input.go	/^	T2 <-chan float32$/;"	t
+T3	input.go	/^	T3 chan []string$/;"	t
+T4	input.go	/^	T4 chan<- *[12]string$/;"	t
+T5	input.go	/^	T5 interface {$/;"	t
+T6	input.go	/^type T6 struct {$/;"	t
+T7	input.go	/^type (T7 func (a struct{_ int; _ float32}, b int) (int, map[string]int);T8 float32)$/;"	t
+T8	input.go	/^type (T7 func (a struct{_ int; _ float32}, b int) (int, map[string]int);T8 float32)$/;"	t
+T9	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	t
+a	input.go	/^var (a, b, c int$/;"	v
+b	input.go	/^var (a, b, c int$/;"	v
+c	input.go	/^var (a, b, c int$/;"	v
+d	input.go	/^d T5$/;"	v
+e	input.go	/^e T4$/;"	v
+f	input.go	/^f interface{})$/;"	v
+f1	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	f
+f2	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	f
+f3	input.go	/^func (t *T1) f3() (a, b int){$/;"	f
+f4	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f
+f5	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f
+g	input.go	/^const ignored int*\/const (G=6); var g int$/;"	v
+h	input.go	/^}; var h int$/;"	v
+main	input.go	/^func main() {$/;"	f
+main	input.go	/^package main$/;"	p

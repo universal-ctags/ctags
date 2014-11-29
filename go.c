@@ -2,7 +2,6 @@
 *   INCLUDE FILES
 */
 #include "general.h"        /* must always come first */
-#include <setjmp.h>
 
 #include "debug.h"
 #include "entry.h"
@@ -22,8 +21,6 @@
 /*
  *	 DATA DECLARATIONS
  */
-
-typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
 
 typedef enum eKeywordId {
 	KEYWORD_NONE = -1,
@@ -49,9 +46,8 @@ typedef struct sKeywordDesc {
 
 typedef enum eTokenType {
 	TOKEN_NONE = -1,
-	TOKEN_CHARACTER,
-	// Don't need TOKEN_FORWARD_SLASH
-	TOKEN_FORWARD_SLASH,
+	// Token not important for top-level Go parsing
+	TOKEN_OTHER,
 	TOKEN_KEYWORD,
 	TOKEN_IDENTIFIER,
 	TOKEN_STRING,
@@ -65,7 +61,8 @@ typedef enum eTokenType {
 	TOKEN_STAR,
 	TOKEN_LEFT_ARROW,
 	TOKEN_DOT,
-	TOKEN_COMMA
+	TOKEN_COMMA,
+	TOKEN_EOF
 } tokenType;
 
 typedef struct sTokenInfo {
@@ -81,7 +78,6 @@ typedef struct sTokenInfo {
 */
 
 static int Lang_go;
-static jmp_buf Exception;
 static vString *scope;
 
 typedef enum {
@@ -119,11 +115,16 @@ static keywordDesc GoKeywordTable[] = {
 */
 
 // XXX UTF-8
+static boolean isStartIdentChar (const int c)
+{
+	return (boolean)
+		(isalpha (c) ||  c == '_' || c > 128);
+}
+
 static boolean isIdentChar (const int c)
 {
 	return (boolean)
-		(isalpha (c) || isdigit (c) || c == '$' ||
-		 c == '@' || c == '_' || c == '#' || c > 128);
+		(isStartIdentChar (c) || isdigit (c));
 }
 
 static void initialize (const langType language)
@@ -173,7 +174,9 @@ static void parseString (vString *const string, const int delimiter)
 			end = TRUE;
 		else if (c == '\\' && delimiter != '`')
 		{
-			c = fileGetc ();	/* This maybe a ' or ". */
+			c = fileGetc ();
+			if (c != '\'' && c != '\"')
+				vStringPut (string, '\\');
 			vStringPut (string, c);
 		}
 		else if (c == delimiter)
@@ -187,7 +190,6 @@ static void parseString (vString *const string, const int delimiter)
 static void parseIdentifier (vString *const string, const int firstChar)
 {
 	int c = firstChar;
-	//Assert (isIdentChar (c));
 	do
 	{
 		vStringPut (string, c);
@@ -214,6 +216,7 @@ getNextChar:
 		token->filePosition = getInputFilePosition ();
 		if (c == '\n' && (lastTokenType == TOKEN_IDENTIFIER ||
 						  lastTokenType == TOKEN_STRING ||
+						  lastTokenType == TOKEN_OTHER ||
 						  lastTokenType == TOKEN_CLOSE_PAREN ||
 						  lastTokenType == TOKEN_CLOSE_CURLY ||
 						  lastTokenType == TOKEN_CLOSE_SQUARE))
@@ -227,7 +230,11 @@ getNextChar:
 	switch (c)
 	{
 		case EOF:
-			longjmp (Exception, (int)ExceptionEOF);
+			token->type = TOKEN_EOF;
+			break;
+
+		case ';':
+			token->type = TOKEN_SEMICOLON;
 			break;
 
 		case '/':
@@ -267,7 +274,7 @@ getNextChar:
 						fileUngetc (hasNewline ? '\n' : ' ');
 						goto getNextChar;
 					default:
-						token->type = TOKEN_FORWARD_SLASH;
+						token->type = TOKEN_OTHER;
 						fileUngetc (d);
 						break;
 				}
@@ -287,13 +294,14 @@ getNextChar:
 			{
 				int d = fileGetc ();
 				if (d == '-')
-				{
 					token->type = TOKEN_LEFT_ARROW;
-					break;
-				}
 				else
-					goto getNextChar;
+				{
+					fileUngetc (d);
+					token->type = TOKEN_OTHER;
+				}
 			}
+			break;
 
 		case '(':
 			token->type = TOKEN_OPEN_PAREN;
@@ -332,14 +340,19 @@ getNextChar:
 			break;
 
 		default:
-			parseIdentifier (token->string, c);
-			token->lineNumber = getSourceLineNumber ();
-			token->filePosition = getInputFilePosition ();
-			token->keyword = lookupKeyword (vStringValue (token->string), Lang_go);
-			if (isKeyword (token, KEYWORD_NONE))
-				token->type = TOKEN_IDENTIFIER;
+			if (isStartIdentChar (c))
+			{
+				parseIdentifier (token->string, c);
+				token->lineNumber = getSourceLineNumber ();
+				token->filePosition = getInputFilePosition ();
+				token->keyword = lookupKeyword (vStringValue (token->string), Lang_go);
+				if (isKeyword (token, KEYWORD_NONE))
+					token->type = TOKEN_IDENTIFIER;
+				else
+					token->type = TOKEN_KEYWORD;
+			}
 			else
-				token->type = TOKEN_KEYWORD;
+				token->type = TOKEN_OTHER;
 			break;
 	}
 
@@ -379,7 +392,8 @@ static void skipToMatched (tokenInfo *const token)
 	if (isType (token, open_token))
 	{
 		nest_level++;
-		while (!(isType (token, close_token) && (nest_level == 0)))
+		while (!(isType (token, close_token) && (nest_level == 0)) &&
+			   !isType (token, TOKEN_EOF))
 		{
 			readToken (token);
 			if (isType (token, open_token))
@@ -402,6 +416,7 @@ static void skipType (tokenInfo *const token)
 {
 again:
 	// Type      = TypeName | TypeLit | "(" Type ")" .
+	// Skips also function multiple return values "(" Type {"," Type} ")"
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
 		skipToMatched (token);
@@ -417,8 +432,8 @@ again:
 		if (isType (token, TOKEN_DOT))
 		{
 			readToken (token);
-			Assert (isType (token, TOKEN_IDENTIFIER));
-			readToken (token);
+			if (isType (token, TOKEN_IDENTIFIER))
+				readToken (token);
 		}
 		return;
 	}
@@ -428,7 +443,7 @@ again:
 	if (isKeyword (token, KEYWORD_struct) || isKeyword (token, KEYWORD_interface))
 	{
 		readToken (token);
-		Assert (isType (token, TOKEN_OPEN_CURLY));
+		// skip over "{}"
 		skipToMatched (token);
 		return;
 	}
@@ -456,7 +471,7 @@ again:
 	if (isKeyword (token, KEYWORD_map))
 	{
 		readToken (token);
-		Assert (isType (token, TOKEN_OPEN_SQUARE));
+		// skip over "[]"
 		skipToMatched (token);
 		goto again;
 	}
@@ -468,23 +483,12 @@ again:
 	if (isKeyword (token, KEYWORD_func))
 	{
 		readToken (token);
-		Assert (isType (token, TOKEN_OPEN_PAREN));
-		// Parameters
+		// Parameters, skip over "()"
 		skipToMatched (token);
 		// Result is parameters or type or nothing.  skipType treats anything
 		// surrounded by parentheses as a type, and does nothing if what
 		// follows is not a type.
 		goto again;
-	}
-}
-
-// Skip to the next semicolon, skipping over matching brackets.
-static void skipToTopLevelSemicolon (tokenInfo *const token)
-{
-	while (!isType (token, TOKEN_SEMICOLON))
-	{
-		readToken (token);
-		skipToMatched (token);
 	}
 }
 
@@ -522,12 +526,14 @@ static void parsePackage (tokenInfo *const token __unused__)
 	tokenInfo *const name = newToken ();
 
 	readToken (name);
-	Assert (isType (name, TOKEN_IDENTIFIER));
-	makeTag (name, GOTAG_PACKAGE);
-	if (!scope && Option.include.qualifiedTags)
+	if (isType (name, TOKEN_IDENTIFIER))
 	{
-		scope = vStringNew ();
-		vStringCopy (scope, name->string);
+		makeTag (name, GOTAG_PACKAGE);
+		if (!scope && Option.include.qualifiedTags)
+		{
+			scope = vStringNew ();
+			vStringCopy (scope, name->string);
+		}
 	}
 
 	deleteToken (name);
@@ -548,20 +554,21 @@ static void parseFunctionOrMethod (tokenInfo *const token)
 	if (isType (name, TOKEN_OPEN_PAREN))
 		skipToMatched (name);
 
-	Assert (isType (name, TOKEN_IDENTIFIER));
-
-	// Skip over parameters.
-	readToken (token);
-	skipToMatched (token);
-
-	// Skip over result.
-	skipType (token);
-
-	// Skip over function body.
-	if (isType (token, TOKEN_OPEN_CURLY))
+	if (isType (name, TOKEN_IDENTIFIER))
+	{
+		// Skip over parameters.
+		readToken (token);
 		skipToMatched (token);
 
-	makeTag (name, GOTAG_FUNCTION);
+		// Skip over result.
+		skipType (token);
+
+		// Skip over function body.
+		if (isType (token, TOKEN_OPEN_CURLY))
+			skipToMatched (token);
+
+		makeTag (name, GOTAG_FUNCTION);
+	}
 
 	deleteToken (name);
 }
@@ -590,21 +597,32 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 again:
 	while (1)
 	{
-		makeTag (name, kind);
-		readToken (token);
-		if (!isType (token, TOKEN_COMMA) && !isType (token, TOKEN_CLOSE_PAREN))
+		if (isType (name, TOKEN_IDENTIFIER))
+		{
+			makeTag (name, kind);
+			readToken (token);
+		}
+		if (!isType (token, TOKEN_COMMA))
 			break;
 		readToken (name);
 	}
 
 	skipType (token);
-	skipToTopLevelSemicolon (token);
+	while (!isType (token, TOKEN_SEMICOLON) && !isType (token, TOKEN_CLOSE_PAREN)
+			&& !isType (token, TOKEN_EOF))
+	{
+		readToken (token);
+		skipToMatched (token);
+	}
 
 	if (usesParens)
 	{
-		readToken (name);
-		if (!isType (name, TOKEN_CLOSE_PAREN))
-			goto again;
+		if (!isType (token, TOKEN_CLOSE_PAREN)) // we are at TOKEN_SEMICOLON
+		{
+			readToken (name);
+			if (!isType (name, TOKEN_CLOSE_PAREN) && !isType (name, TOKEN_EOF))
+				goto again;
+		}
 	}
 
 	deleteToken (name);
@@ -639,17 +657,19 @@ static void parseGoFile (tokenInfo *const token)
 					break;
 			}
 		}
-	} while (TRUE);
+		else if (isType (token, TOKEN_OPEN_PAREN) || isType (token, TOKEN_OPEN_CURLY) ||
+			isType (token, TOKEN_OPEN_SQUARE))
+		{
+			skipToMatched (token);
+		}
+	} while (token->type != TOKEN_EOF);
 }
 
 static void findGoTags (void)
 {
 	tokenInfo *const token = newToken ();
-	exception_t exception;
 
-	exception = (exception_t) (setjmp (Exception));
-	while (exception == ExceptionNone)
-		parseGoFile (token);
+	parseGoFile (token);
 
 	deleteToken (token);
 	vStringDelete (scope);
