@@ -2805,7 +2805,6 @@ static void tagCheck (statementInfo *const st)
 	const tokenInfo *const token = activeToken (st);
 	const tokenInfo *const prev  = prevToken (st, 1);
 	const tokenInfo *const prev2 = prevToken (st, 2);
-	const tokenInfo *const prev3 = prevToken (st, 3);
 	switch (token->type)
 	{
 		case TOKEN_NAME:
