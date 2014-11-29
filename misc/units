@@ -38,13 +38,14 @@ SHOW_DIFF_OUTPUT=
 # Internal variables and constants
 #
 _CMDLINE=
-_cmdline_for_shrinking=
+_CMDLINE_FOR_SHRINKING=
 readonly _DEFAULT_CATEGORY=ROOT
 readonly _TIMEOUT_EXIT=124
 readonly _VG_TIMEOUT_FACTOR=10
 readonly _VALGRIND_EXIT=58
 readonly _LINE_SPLITER=$(if type dos2unix > /dev/null 2>&1; then echo "dos2unix"; else echo "cat"; fi)
 readonly _DIFF_OUTPUT_NAME="DIFF.tmp"
+readonly _NOISE_REPORT_MAX_COLUMN=50
 
 #
 # Results
@@ -78,6 +79,8 @@ Usage:
 	$(help_fuzz)
 
 	$(help_shrink)
+
+	$(help_noise)
 EOF
 }
 
@@ -98,12 +101,16 @@ ERROR ()
 line()
 {
     local c=${1:--}
+    local no_newline="${2}"
     local i=0
     while [ $i -lt 60 ]; do
 	printf "%c" "$c"
 	i=$(( i + 1 ))
     done
-    echo
+
+    if ! [ "${no_newline}" = "--no-newline" ]; then
+	echo
+    fi
 }
 
 count_list ()
@@ -277,9 +284,9 @@ run_shrink ()
     local input="$2"
     local output="$3"
     local lang="$4"
-    shift 3
+    shift 4
 
-    echo "Shringking ${input} as ${lang}"
+    echo "Shrinking ${input} as ${lang}"
     shrink_main "${cmdline_template}" "${input}" "${output}"  1 yes
 }
 
@@ -838,7 +845,7 @@ shrink_test ()
 
     shrink_prepare "${output}" "${input}" "${start}" "${len}"
     [ "${QUIET}" = 'yes' ] || printf "[%-5u %6u]..." "${start}" $(( start + len )) 1>&2
-    eval "${cmdline}"
+    eval "${cmdline}" > /dev/null 2>&1
     r="$?"
     if [ "$r" -eq 0 ]; then
 	msg='ok'
@@ -926,7 +933,7 @@ shrink_bisect ()
 
     len=$((end - start))
     shrink_prepare "${output}" "${input}" "${start}" "${len}"
-    [ "${QUIET}" = 'yes' ] || echo "Minimal badinput input: ${output}"
+    [ "${QUIET}" = 'yes' ] || echo "Minimal badinput: ${output}"
     [ "${QUIET}" = 'yes' ] || line .
     cat "${output}"
     echo
@@ -1061,9 +1068,12 @@ fuzz_shrink ()
     local input="$2"
     local output="$3"
     local lang="$4"
-    shift 3
+    shift 4
 
-    [ "${QUIET}" = 'yes' ] || echo "Shringking ${input} as ${lang}"
+    [ "${QUIET}" = 'yes' ] || {
+	echo "Shrinking ${input} as ${lang}"
+	line .
+    }
     shrink_main "${cmdline_template}" "${input}" "${output}"  1 yes
 }
 
@@ -1107,7 +1117,7 @@ fuzz_lang_file ()
 	    [ "${QUIET}" = 'yes' ] || echo
 	    printf '%-40s' "[timeout $lang]"
 	    echo "$f"
-	    [ "${RUN_SHRINK}" = 'yes' ] && fuzz_shrink "${cmdline_for_shirking}" "${file}" "${oshrink}"
+	    [ "${RUN_SHRINK}" = 'yes' ] && fuzz_shrink "${cmdline_for_shirking}" "${file}" "${oshrink}" "${lang}"
 	    return 1
 	    ;;
 	${_VALGRIND_EXIT})
@@ -1120,7 +1130,7 @@ fuzz_lang_file ()
 	    [ "${QUIET}" = 'yes' ] || echo
 	    printf '%-40s' "[unexpected-status($r) $lang]"
 	    echo "$f"
-	    [ "${RUN_SHRINK}" = 'yes' ] && fuzz_shrink "${cmdline_for_shirking}" "${file}" "${oshrink}"
+	    [ "${RUN_SHRINK}" = 'yes' ] && fuzz_shrink "${cmdline_for_shirking}" "${file}" "${oshrink}" "${lang}"
 	    return 1
 	    ;;
     esac
@@ -1144,12 +1154,19 @@ fuzz_lang ()
 
 action_fuzz ()
 {
-    local action="$1"
-    shift
+    action_fuzz_common fuzz_lang "$@"
+}
+
+action_fuzz_common ()
+{
+    local fn="$1"
+    local action="$2"
+    shift 2
 
     local units_dir
     local cmdline
     local lang
+    local r
 
     while [ $# -gt 0 ]; do
 	case $1 in
@@ -1242,7 +1259,7 @@ action_fuzz ()
     fi
 
     [ -d "${DATADIR}" ] || ERROR 1 "no such directory: ${DATADIR}"
-    : ${WITH_TIMEOUT:=1}
+    : ${WITH_TIMEOUT:=2}
     [ "$WITH_TIMEOUT" = 0 ] || check_availability timeout
     [ "WITH_VALGRIND" = 'yes' ]  && check_availability valgrind
     check_availability find
@@ -1264,8 +1281,11 @@ action_fuzz ()
 	if [ -n "${LANGUAGES}" ] && ! member_p "${lang}" ${LANGUAGES}; then
 	    continue
 	fi
-	fuzz_lang "${lang}" "${units_dir}"
+	"${fn}" "${lang}" "${units_dir}"
+	r=$?
     done
+
+    return $r
 }
 
 help_fuzz ()
@@ -1290,11 +1310,242 @@ $0 fuzz [OPTIONS] UNITS-DIR
 EOF
 }
 
+noise_reduce ()
+{
+    local input="$1"
+    local len="$2"
+    local pos="$3"
+    shift 3
+
+    dd bs=1 count=$pos skip=0 if="$input"
+    dd bs=1 count=$(( len - pos - 1 )) skip=$(( pos + 1 )) if="$input"
+}
+
+noise_inject ()
+{
+    local input="$1"
+    local len="$2"
+    local pos="$3"
+    local c="$4"
+    shift 4
+
+    dd bs=1 count=$pos skip=0 if="$input"
+    printf "%c" "$c"
+    dd bs=1 count=$(( len - pos )) skip=$pos if="$input"
+}
+
+noise_report_line ()
+{
+    local pos="$1"
+    local len="$2"
+    local status="$3"
+    local how="$4"
+
+    local progress_offset=$(( pos % _NOISE_REPORT_MAX_COLUMN ))
+    local nspace
+
+
+    if [ $((pos + 1)) -eq "${len}" ] || [ $status -gt 0 ]; then
+	nspace=0
+	while [ $nspace -lt $(( _NOISE_REPORT_MAX_COLUMN - progress_offset - 1)) ]; do
+	    printf ' '
+	    nspace=$((nspace + 1))
+	done
+	printf " %s %d/%d" "${how}" "$pos" "${len}"
+    fi
+}
+
+noise_lang_file_noisespec ()
+{
+    local input="$1"
+    local len="$2"
+    local pos="$3"
+    local c="$4"
+    local genfn="$5"
+    local lang="$6"
+    local how="$7"
+    shift 7
+
+    local msg
+    if [ "${how}" = + ]; then
+	msg=INJECTED
+	how="${how}${c}"
+    else
+	msg=REDUCED
+	how="${how} "
+    fi
+
+    local dir="${input%/*}"
+    local onoised=$(printf "%s/NOISE-INPUT-%s-%s-%d.tmp" "${dir}" "${msg}" "$pos" \'$c)
+    local ocmdline=$(printf "%s/NOISE-CMDLINE-%s-%s-%d.tmp" "${dir}" "${msg}" "$pos" \'$c)
+    local ovalgrind=$(printf "%s/NOISE-VALGRIND-%s-%s-%d.tmp" "${dir}" "${msg}" "$pos" \'$c)
+    local oshrink=$(printf "%s/NOISE-SHRINK-%s-%s-%d.tmp" "${dir}" "${msg}" "$pos" \'$c)
+
+    local cmdline
+    local cmdline_for_shirking
+    local progress_offset
+    local r
+
+    rm -f "${ocmdline}" "${ovalgrind}" "${onoised}" "${oshrink}"
+    if [ "${WITH_VALGRIND}" = 'yes' ]; then
+	cmdline=$( printf "${_CMDLINE} --language-force=${lang} ${onoised}" "${ovalgrind}" )
+	else
+	cmdline="${_CMDLINE} --language-force=${lang} ${onoised}"
+    fi
+    cmdline_for_shirking="${_CMDLINE_FOR_SHRINKING} --language-force=${lang} %s"
+
+    "${genfn}" "${input}" "${len}" "$pos" "$c" > "$onoised"  2> /dev/null
+
+    progress_offset=$(( pos % _NOISE_REPORT_MAX_COLUMN ))
+    if [ "${progress_offset}" -eq 0 ]; then
+	[ $pos -gt 0 ] && printf " %s %d/%d" "${how}" "$pos" "${len}"
+	echo
+    fi
+
+    echo "${cmdline}" > "${ocmdline}"
+    ( exec 2>&-; ${cmdline} 2> /dev/null > /dev/null )
+    r=$?
+    case $r in
+	    0)
+	    printf 'o'
+	    noise_report_line "${pos}" "${len}" "${r}" "${how}"
+	    rm "${onoised}"
+	    rm -f "${ovalgrind}" "${ocmdline}"
+	    ;;
+	${_TIMEOUT_EXIT})
+	    printf "T"
+	    noise_report_line "${pos}" "${len}" "${r}" "${how}"
+	    printf '\n%-20s' "[timeout $lang]"
+	    echo "$onoised"
+	    [ "${RUN_SHRINK}" = 'yes' ] && fuzz_shrink "${cmdline_for_shirking}" "${onoised}" "${oshrink}" "${lang}"
+	    ;;
+	${_VALGRIND_EXIT})
+	    printf "V"
+	    noise_report_line "${pos}" "${len}" "${r}" "${how}"
+	    printf '\n%-20s %s\n' "[valgrind-error $lang]" "$onoised"
+	    ;;
+	*)
+	    printf "!"
+	    noise_report_line "${pos}" "${len}" "${r}" "${how}"
+	    printf '\n%-20s %s\n' "[unexpected-status($r) $lang]" "$onoised"
+	    [ "${RUN_SHRINK}" = 'yes' ] && fuzz_shrink "${cmdline_for_shirking}" "${onoised}" "${oshrink}" "${lang}"
+	    ;;
+    esac
+    return $r
+}
+
+noise_lang_file ()
+{
+    local lang="$1"
+    local input="$2"
+    shift 2
+
+
+    local cmdline
+    local cmdline_for_shirking
+    local len=$(stat -c %s "${input}")
+    local r
+    local i
+    local c
+    local offset
+    local guessed_lang
+
+    guessed_lang=$( ${_CMDLINE_FOR_SHRINKING} --guess-parser "${input}" 2>/dev/null | sed -nr 's/^.*: (.+)$/\1/p')
+    if [ "${lang}" !=  "${guessed_lang}" ]; then
+	return 0
+    fi
+
+    i=0
+    c='!'
+    echo "Testing cases derived from: ${input}"
+    line '.' --no-newline
+    while [ "$i" -lt "$len" ]; do
+	if noise_lang_file_noisespec "${input}" "${len}" "$i" "$c" noise_reduce "${lang}" -; then
+	    i=$(( i + 1 ))
+	else
+	    echo
+	    return 1
+	fi
+    done
+
+    for c in 'a' '0'						\
+	'!' '@' '#' '$' '%' '^' '&' '*' '(' ')' '-' '=' '_'	\
+	'+' '|'  '[' ']' '{' '}' '\' ';' "'" ':' '"' ',' '.'    \
+	'/' '<' '>' '?' '`' '~'; do
+	i=0
+	while [ "$i" -lt "$len" ]; do
+	    if noise_lang_file_noisespec "${input}" "${len}" "$i" "$c" noise_inject "${lang}" +; then
+		i=$(( i + 1 ))
+	    else
+		echo
+		return 1
+	    fi
+	done
+    done
+    echo
+    return 0;
+}
+
+noise_lang ()
+{
+    local lang="$1"
+    local dir="$2"
+    shift 2
+    local f
+    local r
+    printf '%-60s\n' "Noised-fuzzing (${lang})"
+    line '-'
+
+    r=0
+    for f in $(find "${dir}" -type f -name 'input.*'); do
+	if ! noise_lang_file "${lang}" "${f}"; then
+	    r=1
+	    break
+	fi
+    done
+    echo
+    return $r
+}
+
+action_noise ()
+{
+    action_fuzz_common noise_lang "$@"
+}
+
+help_noise ()
+{
+cat <<EOF
+$0 noise [OPTIONS] UNITS-DIR
+
+	Run all tests case for LANGUAGE with "noise" for
+	finding unexepcted behavior like entering an
+	infinite loop.
+	Here "noise" means removing one byte from
+	somewhere file position of the original test case;
+	or adding something one byte to
+	somewhere file position of the original test case.
+
+	OPTIONS:
+	   OPTIONS:
+		--ctags CTAGS: ctags exectuable file for testing
+		--datadir DATADIR: data directory
+		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
+		--quiet: don't print dots as passed test cases.
+		--with-timeout DURATION: run a test case under timeout
+					 command with SECOND.
+					 0 means no timeout.
+					 default is 1.
+		--with-valgrind: run a test case under valgrind
+			       If this option given, DURATION is changed to
+			       DURATION := DURATION * ${_VG_TIMEOUT_FACTOR}
+EOF
+}
+
 main ()
 {
     if [ $# = 0 ]; then
 	action_help 1>&2
-	exit 1;
+	exit 1
     fi
 
     case $1 in
@@ -1312,6 +1563,10 @@ main ()
 	    ;;
 	fuzz)
 	    action_fuzz "$@"
+	    return $?
+	    ;;
+	noise)
+	    action_noise "$@"
 	    return $?
 	    ;;
 	shrink)
