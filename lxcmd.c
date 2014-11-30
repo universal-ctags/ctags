@@ -41,10 +41,11 @@
 */
 #include "general.h"  /* must always come first */
 
+#define _GNU_SOURCE   /* for WIFEXITED and WEXITSTATUS */
 #include <errno.h>
 #include <ctype.h>
+#include <stdlib.h>   /* for WIFEXITED and WEXITSTATUS */
 #include <string.h>
-#include <stdlib.h>		/* for WIFEXITED and WEXITSTATUS */
 
 #include "debug.h"
 #include "main.h"
