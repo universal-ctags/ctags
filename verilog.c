@@ -485,6 +485,28 @@ static void createContext (tokenInfo *const scope)
 	}
 }
 
+static void dropContext (tokenInfo *const token)
+{
+	verbose ("current context %s; context kind %0d; nest level %0d\n", vStringValue (currentContext->name), currentContext->kind, currentContext->nestLevel);
+	vString *endTokenName = vStringNewInit("end");
+	if (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0 && strcmp (vStringValue (token->name), vStringValue (endTokenName)) == 0)
+	{
+		verbose ("Dropping context %s\n", vStringValue (currentContext->name));
+		currentContext = popToken (currentContext);
+	}
+	else
+	{
+		vStringCatS (endTokenName, kindName (currentContext->kind));
+		if (strcmp (vStringValue (token->name), vStringValue (endTokenName)) == 0)
+		{
+			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
+			currentContext = popToken (currentContext);
+		}
+	}
+	vStringDelete(endTokenName);
+}
+
+
 static void createTag (tokenInfo *const token)
 {
 	tagEntryInfo tag;
@@ -735,25 +757,10 @@ static void tagNameList (tokenInfo* token, int c)
 
 static void findTag (tokenInfo *const token)
 {
-	/* Search for end of current context to drop respective context */
 	if (currentContext->kind != K_UNDEFINED)
 	{
-		vString *endTokenName = vStringNewInit("end");
-		if (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0 && strcmp (vStringValue (token->name), vStringValue (endTokenName)) == 0)
-		{
-			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
-			currentContext = popToken (currentContext);
-		}
-		else
-		{
-			vStringCatS (endTokenName, kindName (currentContext->kind));
-			if (strcmp (vStringValue (token->name), vStringValue (endTokenName)) == 0)
-			{
-				verbose ("Dropping context %s\n", vStringValue (currentContext->name));
-				currentContext = popToken (currentContext);
-			}
-		}
-		vStringDelete(endTokenName);
+		/* Drop context, but only if an end token is found */
+		dropContext (token);
 	}
 
 	if (token->kind == K_CONSTANT && vStringItem (token->name, 0) == '`')
