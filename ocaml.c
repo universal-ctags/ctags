@@ -1889,6 +1889,7 @@ extern parserDefinition *OcamlParser (void)
 {
 	static const char *const extensions[] = { "ml", "mli", "aug", NULL };
 	static const char *const aliases[] = { "tuareg", /* mode name of emacs */
+					       "caml",	 /* mode name of emacs */
 					       NULL };
 	parserDefinition *def = parserNew ("OCaml");
 	def->kinds = OcamlKinds;
