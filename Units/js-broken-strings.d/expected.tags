@@ -1,0 +1,4 @@
+s1	input.js	/^var s1 = "I'm invalid because not terminated$/;"	v
+s2	input.js	/^var s2 = "I'm valid, I have a line continuation:\\$/;"	v
+s3	input.js	/^var s3 = "I'm invalid because I'm not terminated either \\$/;"	v
+s4	input.js	/^var s4 = 'this is a separate, valid string'$/;"	v

@@ -355,12 +355,32 @@ static void parseString (vString *const string, const int delimiter)
 			end = TRUE;
 		else if (c == '\\')
 		{
-			/* This maybe a ' or ". */
+			/* Eat the escape sequence (\", \', etc).  We properly handle
+			 * <LineContinuation> by eating a whole \<CR><LF> not to see <LF>
+			 * as an unescaped character, which is invalid and handled below.
+			 * Also, handle the fact that <LineContinuation> produces an empty
+			 * sequence.
+			 * See ECMA-262 7.8.4 */
 			c = fileGetc();
-			vStringPut(string, c);
+			if (c != '\r' && c != '\n')
+				vStringPut(string, c);
+			else if (c == '\r')
+			{
+				c = fileGetc();
+				if (c != '\n')
+					fileUngetc (c);
+			}
 		}
 		else if (c == delimiter)
 			end = TRUE;
+		else if (c == '\r' || c == '\n')
+		{
+			/* those are invalid when not escaped */
+			end = TRUE;
+			/* we don't want to eat the newline itself to let the automatic
+			 * semicolon insertion code kick in */
+			fileUngetc (c);
+		}
 		else
 			vStringPut (string, c);
 	}
