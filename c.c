@@ -6,7 +6,7 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License.
 *
-*   This module contains functions for parsing and scanning C, C++ and Java
+*   This module contains functions for parsing and scanning C, C++, C#, D and Java
 *   source files.
 */
 
@@ -799,7 +799,7 @@ static void initMemberInfo (statementInfo *const st)
 		case DECL_CLASS:
 			if (isLanguage (Lang_java))
 				accessDefault = ACCESS_DEFAULT;
-			else if(isLanguage(Lang_d))
+			else if (isLanguage(Lang_d))
 				accessDefault = ACCESS_PUBLIC;
 			else
 				accessDefault = ACCESS_PRIVATE;
@@ -1045,9 +1045,9 @@ static const char* accessField (const statementInfo *const st)
 
 static void addContextSeparator (vString *const scope)
 {
-	if (isLanguage (Lang_c)  ||  isLanguage (Lang_cpp) || isLanguage(Lang_d))
+	if (isLanguage (Lang_c)  ||  isLanguage (Lang_cpp))
 		vStringCatS (scope, "::");
-	else if (isLanguage (Lang_java) || isLanguage (Lang_csharp))
+	else if (isLanguage (Lang_java) || isLanguage (Lang_csharp) || isLanguage(Lang_d))
 		vStringCatS (scope, ".");
 }
 
@@ -1100,7 +1100,7 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 			}
 			if (st->implementation != IMP_DEFAULT &&
 				(isLanguage (Lang_cpp) || isLanguage (Lang_csharp) ||
-				 isLanguage (Lang_java)))
+				 isLanguage (Lang_d) || isLanguage (Lang_java)))
 			{
 				tag->extensionFields.implementation =
 						implementationString (st->implementation);
@@ -1744,7 +1744,7 @@ static void setAccess (statementInfo *const st, const accessType access)
 {
 	if (isMember (st))
 	{
-		if (isLanguage (Lang_cpp))
+		if (isLanguage (Lang_cpp) || isLanguage (Lang_d))
 		{
 			int c = skipToNonWhite ();
 
@@ -1881,7 +1881,7 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_VIRTUAL:   st->implementation = IMP_VIRTUAL;       break;
 		case KEYWORD_WCHAR_T:   st->declaration = DECL_BASE;            break;
 		case KEYWORD_TEMPLATE:
-			if(isLanguage(Lang_d))
+			if (isLanguage(Lang_d))
 				st->declaration = DECL_TEMPLATE;
 			break;
 		case KEYWORD_NAMESPACE: readPackageOrNamespace (st, DECL_NAMESPACE); break;
@@ -2474,7 +2474,8 @@ static void addContext (statementInfo *const st, const tokenInfo* const token)
 		{
 			if (isLanguage (Lang_c)  ||  isLanguage (Lang_cpp))
 				vStringCatS (st->context->name, "::");
-			else if (isLanguage (Lang_java) || isLanguage (Lang_csharp))
+			else if (isLanguage (Lang_java) || isLanguage (Lang_csharp) ||
+				isLanguage (Lang_d))
 				vStringCatS (st->context->name, ".");
 		}
 		vStringCat (st->context->name, token->name);
@@ -2742,7 +2743,7 @@ static boolean isStatementEnd (const statementInfo *const st)
 		 * namespaces. All other blocks require a semicolon to terminate them.
 		 */
 		isEnd = (boolean) (isLanguage (Lang_java) || isLanguage (Lang_csharp) ||
-				! isContextualStatement (st));
+				 isLanguage (Lang_d) || ! isContextualStatement (st));
 	else
 		isEnd = FALSE;
 
@@ -2834,7 +2835,7 @@ static void tagCheck (statementInfo *const st)
 					if (isType (prev2, TOKEN_NAME))
 						copyToken (st->blockName, prev2);
 
-					if( st->declaration == DECL_CLASS)
+					if (st->declaration == DECL_CLASS)
 						qualifyBlockTag (st, prev2);
 					else
 						qualifyFunctionTag (st, prev2);

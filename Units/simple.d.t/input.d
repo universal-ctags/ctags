@@ -15,6 +15,11 @@ class Foo
 	}
 }
 
+Object obj;
+
+private:
+int i;
+
 void main(string[] args)
 {
 	auto foo = new Foo(1337);
