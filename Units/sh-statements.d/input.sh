@@ -10,3 +10,7 @@ function with-dash() {
     with-dash_inner() baz
   }
 }
+
+function noParen {
+    :
+}
