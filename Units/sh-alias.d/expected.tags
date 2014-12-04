@@ -1,5 +1,6 @@
 afteralias	input.sh	/^alias alias1=bar; afteralias() {}$/;"	f
 alias	input.sh	/^function alias(); alias alias2=foo$/;"	f
+alias-with-dash	input.sh	/^alias alias-with-dash=alias1$/;"	a
 alias1	input.sh	/^alias alias1=bar; afteralias() {}$/;"	a
 alias2	input.sh	/^function alias(); alias alias2=foo$/;"	a
 alias_in_func1	input.sh	/^  alias alias_in_func1=ls$/;"	a

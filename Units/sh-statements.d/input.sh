@@ -4,3 +4,9 @@ function baz() {}
 function baz_2() {
   baz_2_inner() baz
 }
+
+function with-dash() {
+  with-dash_2() {
+    with-dash_inner() baz
+  }
+}

@@ -110,14 +110,14 @@ static void findShTags (void)
 			}
 
 			// Get the name of the function or alias.
-			if (! (isalnum ((int) *cp) || *cp == '_'))
+			if (! (isalnum ((int) *cp) || *cp == '_' || *cp == '-'))
 			{
 				aliasFound = FALSE;
 				functionFound = FALSE;
 				++cp;
 				continue;
 			}
-			while (isalnum ((int) *cp) || *cp == '_')
+			while (isalnum ((int) *cp) || *cp == '_' || *cp == '-')
 			{
 				vStringPut (name, (int) *cp);
 				++cp;

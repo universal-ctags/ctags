@@ -5,3 +5,6 @@ baz_2_inner	input.sh	/^  baz_2_inner() baz$/;"	f
 mult1	input.sh	/^mult1() echo 1; mult2() echo 2; mult3() { echo 1 }; alias alias=mult1$/;"	f
 mult2	input.sh	/^mult1() echo 1; mult2() echo 2; mult3() { echo 1 }; alias alias=mult1$/;"	f
 mult3	input.sh	/^mult1() echo 1; mult2() echo 2; mult3() { echo 1 }; alias alias=mult1$/;"	f
+with-dash	input.sh	/^function with-dash() {$/;"	f
+with-dash_2	input.sh	/^  with-dash_2() {$/;"	f
+with-dash_inner	input.sh	/^    with-dash_inner() baz$/;"	f
