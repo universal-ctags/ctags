@@ -5,8 +5,8 @@
 #	Development makefile for Exuberant Ctags, used to build releases.
 #	Requires GNU make.
 
-CTAGS_TEST = ./ctags
-CTAGS_REF = ./ctags.ref
+CTAGS_TEST = ./ctags$(EXEEXT)
+CTAGS_REF = ./ctags.ref$(EXEEXT)
 TEST_OPTIONS = -nu --c-kinds=+lpx
 
 ifdef VG
