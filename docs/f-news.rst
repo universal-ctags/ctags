@@ -21,9 +21,11 @@ Following parsers are added.
 * ada
 * coffee *xcmd*
 * css
+* d
 * ctags option library *optlib*
 * falcon
 * go
+* json
 * mib *optlib*
 * rust *optlib*
 * windres
