@@ -595,7 +595,7 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 	}
 
 again:
-	while (1)
+	while (!isType (token, TOKEN_EOF) && !isType (name, TOKEN_EOF))
 	{
 		if (isType (name, TOKEN_IDENTIFIER))
 		{
@@ -617,7 +617,7 @@ again:
 
 	if (usesParens)
 	{
-		if (!isType (token, TOKEN_CLOSE_PAREN)) // we are at TOKEN_SEMICOLON
+		if (!isType (token, TOKEN_CLOSE_PAREN) && !isType (token, TOKEN_EOF)) // we are at TOKEN_SEMICOLON
 		{
 			readToken (name);
 			if (!isType (name, TOKEN_CLOSE_PAREN) && !isType (name, TOKEN_EOF))
