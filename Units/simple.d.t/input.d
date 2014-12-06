@@ -20,6 +20,10 @@ Object obj;
 private:
 int i;
 
+/+ 
+int error;
+ +/
+
 void main(string[] args)
 {
 	auto foo = new Foo(1337);
