@@ -246,9 +246,9 @@ run_result ()
 run_result_skip ()
 {
     if [ -n "$1" ]; then
-	printf '%b\n' $(decorate 33 "skipped")
-    else
 	printf '%b\n' $(decorate 33 "skipped")" ($1)"
+    else
+	printf '%b\n' $(decorate 33 "skipped")
     fi
 }
 
