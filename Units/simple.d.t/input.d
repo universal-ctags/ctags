@@ -24,6 +24,11 @@ int i;
 int error;
  +/
 
+static if (is(typeof(__traits(getMember, a, name)) == function))
+	T conditional;
+
+static assert( num < TL.length, "Name '"~name~"' is not found");
+
 void main(string[] args)
 {
 	auto foo = new Foo(1337);
