@@ -521,22 +521,18 @@ static void makeTag (tokenInfo *const token, const goKind kind)
 	}
 }
 
-static void parsePackage (tokenInfo *const token __unused__)
+static void parsePackage (tokenInfo *const token)
 {
-	tokenInfo *const name = newToken ();
-
-	readToken (name);
-	if (isType (name, TOKEN_IDENTIFIER))
+	readToken (token);
+	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		makeTag (name, GOTAG_PACKAGE);
+		makeTag (token, GOTAG_PACKAGE);
 		if (!scope && Option.include.qualifiedTags)
 		{
 			scope = vStringNew ();
-			vStringCopy (scope, name->string);
+			vStringCopy (scope, token->string);
 		}
 	}
-
-	deleteToken (name);
 }
 
 static void parseFunctionOrMethod (tokenInfo *const token)
@@ -547,15 +543,16 @@ static void parseFunctionOrMethod (tokenInfo *const token)
 	// MethodDecl   = "func" Receiver MethodName Signature [ Body ] .
 	// Receiver     = "(" [ identifier ] [ "*" ] BaseTypeName ")" .
 	// BaseTypeName = identifier .
-	tokenInfo *const name = newToken ();
 
 	// Skip over receiver.
-	readToken (name);
-	if (isType (name, TOKEN_OPEN_PAREN))
-		skipToMatched (name);
+	readToken (token);
+	if (isType (token, TOKEN_OPEN_PAREN))
+		skipToMatched (token);
 
-	if (isType (name, TOKEN_IDENTIFIER))
+	if (isType (token, TOKEN_IDENTIFIER))
 	{
+		makeTag (token, GOTAG_FUNCTION);
+		
 		// Skip over parameters.
 		readToken (token);
 		skipToMatched (token);
@@ -566,11 +563,7 @@ static void parseFunctionOrMethod (tokenInfo *const token)
 		// Skip over function body.
 		if (isType (token, TOKEN_OPEN_CURLY))
 			skipToMatched (token);
-
-		makeTag (name, GOTAG_FUNCTION);
 	}
-
-	deleteToken (name);
 }
 
 static void parseConstTypeVar (tokenInfo *const token, goKind kind)
@@ -583,49 +576,46 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 	// TypeSpec     = identifier Type .
 	// VarDecl     = "var" ( VarSpec | "(" { VarSpec ";" } ")" ) .
 	// VarSpec     = IdentifierList ( Type [ "=" ExpressionList ] | "=" ExpressionList ) .
-	tokenInfo *const name = newToken ();
 	boolean usesParens = FALSE;
 
-	readToken (name);
+	readToken (token);
 
-	if (isType (name, TOKEN_OPEN_PAREN))
+	if (isType (token, TOKEN_OPEN_PAREN))
 	{
 		usesParens = TRUE;
-		readToken (name);
+		readToken (token);
 	}
 
-again:
-	while (!isType (token, TOKEN_EOF) && !isType (name, TOKEN_EOF))
+	do
 	{
-		if (isType (name, TOKEN_IDENTIFIER))
+		while (!isType (token, TOKEN_EOF))
 		{
-			makeTag (name, kind);
+			if (isType (token, TOKEN_IDENTIFIER))
+			{
+				makeTag (token, kind);
+				readToken (token);
+			}
+			if (!isType (token, TOKEN_COMMA))
+				break;
 			readToken (token);
 		}
-		if (!isType (token, TOKEN_COMMA))
-			break;
-		readToken (name);
-	}
 
-	skipType (token);
-	while (!isType (token, TOKEN_SEMICOLON) && !isType (token, TOKEN_CLOSE_PAREN)
-			&& !isType (token, TOKEN_EOF))
-	{
-		readToken (token);
-		skipToMatched (token);
-	}
-
-	if (usesParens)
-	{
-		if (!isType (token, TOKEN_CLOSE_PAREN) && !isType (token, TOKEN_EOF)) // we are at TOKEN_SEMICOLON
+		skipType (token);
+		while (!isType (token, TOKEN_SEMICOLON) && !isType (token, TOKEN_CLOSE_PAREN)
+				&& !isType (token, TOKEN_EOF))
 		{
-			readToken (name);
-			if (!isType (name, TOKEN_CLOSE_PAREN) && !isType (name, TOKEN_EOF))
-				goto again;
+			readToken (token);
+			skipToMatched (token);
+		}
+
+		if (usesParens && !isType (token, TOKEN_CLOSE_PAREN))
+		{
+			// we are at TOKEN_SEMICOLON
+			readToken (token);
 		}
 	}
-
-	deleteToken (name);
+	while (!isType (token, TOKEN_EOF) &&
+			usesParens && !isType (token, TOKEN_CLOSE_PAREN));
 }
 
 static void parseGoFile (tokenInfo *const token)
