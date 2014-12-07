@@ -586,36 +586,36 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 		readToken (token);
 	}
 
-again:
-	while (!isType (token, TOKEN_EOF))
+	do
 	{
-		if (isType (token, TOKEN_IDENTIFIER))
+		while (!isType (token, TOKEN_EOF))
 		{
-			makeTag (token, kind);
+			if (isType (token, TOKEN_IDENTIFIER))
+			{
+				makeTag (token, kind);
+				readToken (token);
+			}
+			if (!isType (token, TOKEN_COMMA))
+				break;
 			readToken (token);
 		}
-		if (!isType (token, TOKEN_COMMA))
-			break;
-		readToken (token);
-	}
 
-	skipType (token);
-	while (!isType (token, TOKEN_SEMICOLON) && !isType (token, TOKEN_CLOSE_PAREN)
-			&& !isType (token, TOKEN_EOF))
-	{
-		readToken (token);
-		skipToMatched (token);
-	}
-
-	if (usesParens)
-	{
-		if (!isType (token, TOKEN_CLOSE_PAREN)) // we are at TOKEN_SEMICOLON
+		skipType (token);
+		while (!isType (token, TOKEN_SEMICOLON) && !isType (token, TOKEN_CLOSE_PAREN)
+				&& !isType (token, TOKEN_EOF))
 		{
 			readToken (token);
-			if (!isType (token, TOKEN_CLOSE_PAREN) && !isType (token, TOKEN_EOF))
-				goto again;
+			skipToMatched (token);
+		}
+
+		if (usesParens && !isType (token, TOKEN_CLOSE_PAREN))
+		{
+			// we are at TOKEN_SEMICOLON
+			readToken (token);
 		}
 	}
+	while (!isType (token, TOKEN_EOF) &&
+			usesParens && !isType (token, TOKEN_CLOSE_PAREN));
 }
 
 static void parseGoFile (tokenInfo *const token)
