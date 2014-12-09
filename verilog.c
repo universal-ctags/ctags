@@ -59,7 +59,8 @@ typedef enum {
 	K_INTERFACE,
 	K_MODPORT,
 	K_PROGRAM,
-	K_PROPERTY
+	K_PROPERTY,
+	K_TYPEDEF
 } verilogKind;
 
 typedef struct {
@@ -114,7 +115,8 @@ static kindOption SystemVerilogKinds [] = {
  { TRUE, 'I', "interface", "interfaces" },
  { TRUE, 'M', "modport",   "modports" },
  { TRUE, 'P', "program",   "programs" },
- { TRUE, 'R', "property",  "properties" }
+ { TRUE, 'R', "property",  "properties" },
+ { TRUE, 'T', "typedef",   "type declarations" }
 };
 
 static const keywordAssoc KeywordTable [] = {
@@ -172,6 +174,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "shortreal", K_REGISTER,  { 1, 0 } },
 	{ "static",    K_IGNORE,    { 1, 0 } },
 	{ "string",    K_REGISTER,  { 1, 0 } },
+	{ "typedef",   K_TYPEDEF,   { 1, 0 } },
 	{ "unsigned",  K_IGNORE,    { 1, 0 } },
 	{ "virtual",   K_IGNORE,    { 1, 0 } },
 	{ "void",      K_IGNORE,    { 1, 0 } }
@@ -691,6 +694,54 @@ static void processFunction (tokenInfo *const token)
 	}
 }
 
+static void processTypedef (tokenInfo *const token)
+{
+	/*Note: At the moment, only identifies typedef name and not its contents */
+	int c;
+
+	/* Get identifiers */
+	c = skipWhite (vGetc ());
+	while (isIdentifierCharacter (c))
+	{
+		readIdentifier (token, c);
+		c = skipWhite (vGetc ());
+	}
+
+	/* Skip bus width definition */
+	if (c == '[')
+	{
+		skipPastMatch ("[]");
+		c = skipWhite (vGetc ());
+	}
+
+	/* Skip typedef contents */
+	if (c == '{')
+	{
+		skipPastMatch ("{}");
+		c = skipWhite (vGetc ());
+	}
+
+	/* Skip past class parameter override */
+	if (c == '#')
+	{
+		c = skipWhite (vGetc ());
+		if (c == '(')
+		{
+			skipPastMatch ("()");
+		}
+		c = skipWhite (vGetc ());
+	}
+
+	/* Read new typedef identifier */
+	if (isIdentifierCharacter (c))
+	{
+		readIdentifier (token, c);
+	}
+
+	/* Use last identifier to create tag */
+	createTag (token);
+}
+
 static void tagNameList (tokenInfo* token, int c)
 {
 	verilogKind localKind;
@@ -796,6 +847,10 @@ static void findTag (tokenInfo *const token)
 			createTag (token);
 			skipToSemiColon ();
 		}
+	}
+	else if (token->kind == K_TYPEDEF)
+	{
+		processTypedef (token);
 	}
 	else if (token->kind == K_IGNORE && isSingleStatement (token))
 	{
