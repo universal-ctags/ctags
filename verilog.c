@@ -58,6 +58,7 @@ typedef enum {
 	K_CLASS,
 	K_INTERFACE,
 	K_MODPORT,
+	K_PACKAGE,
 	K_PROGRAM,
 	K_PROPERTY,
 	K_TYPEDEF
@@ -114,6 +115,7 @@ static kindOption SystemVerilogKinds [] = {
  { TRUE, 'C', "class",     "classes" },
  { TRUE, 'I', "interface", "interfaces" },
  { TRUE, 'M', "modport",   "modports" },
+ { TRUE, 'K', "package",   "packages" },
  { TRUE, 'P', "program",   "programs" },
  { TRUE, 'R', "property",  "properties" },
  { TRUE, 'T', "typedef",   "type declarations" }
@@ -168,6 +170,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "logic",     K_REGISTER,  { 1, 0 } },
 	{ "longint",   K_REGISTER,  { 1, 0 } },
 	{ "modport",   K_MODPORT,   { 1, 0 } },
+	{ "package",   K_PACKAGE,   { 1, 0 } },
 	{ "program",   K_PROGRAM,   { 1, 0 } },
 	{ "property",  K_PROPERTY,  { 1, 0 } },
 	{ "shortint",  K_REGISTER,  { 1, 0 } },
@@ -196,6 +199,7 @@ static short isContainer (tokenInfo const* token)
 		case K_BLOCK:
 		case K_CLASS:
 		case K_INTERFACE:
+		case K_PACKAGE:
 		case K_PROGRAM:
 		case K_PROPERTY:
 			return TRUE;
