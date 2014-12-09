@@ -29,6 +29,7 @@ Following parsers are added.
 * mib *optlib*
 * rust *optlib*
 * windres
+* SystemVerilog
 
 See "Option library" about  *optlib*.
 See "External parser command" about *xcmd*.
