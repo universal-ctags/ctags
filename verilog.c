@@ -56,6 +56,7 @@ typedef enum {
 	K_BLOCK,
 	K_ASSERTION,
 	K_CLASS,
+	K_COVERGROUP,
 	K_INTERFACE,
 	K_MODPORT,
 	K_PACKAGE,
@@ -113,6 +114,7 @@ static kindOption SystemVerilogKinds [] = {
  { TRUE, 'b', "block",     "blocks" },
  { TRUE, 'A', "assert",    "assertions" },
  { TRUE, 'C', "class",     "classes" },
+ { TRUE, 'V', "covergroup","covergroups" },
  { TRUE, 'I', "interface", "interfaces" },
  { TRUE, 'M', "modport",   "modports" },
  { TRUE, 'K', "package",   "packages" },
@@ -163,6 +165,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "byte",      K_REGISTER,  { 1, 0 } },
 	{ "class",     K_CLASS,     { 1, 0 } },
 	{ "cover",     K_ASSERTION, { 1, 0 } },
+	{ "covergroup",K_COVERGROUP,{ 1, 0 } },
 	{ "extern",    K_IGNORE,    { 1, 0 } },
 	{ "int",       K_REGISTER,  { 1, 0 } },
 	{ "interface", K_INTERFACE, { 1, 0 } },
@@ -198,6 +201,7 @@ static short isContainer (tokenInfo const* token)
 		case K_FUNCTION:
 		case K_BLOCK:
 		case K_CLASS:
+		case K_COVERGROUP:
 		case K_INTERFACE:
 		case K_PACKAGE:
 		case K_PROGRAM:
@@ -496,7 +500,9 @@ static void dropContext (tokenInfo *const token)
 {
 	verbose ("current context %s; context kind %0d; nest level %0d\n", vStringValue (currentContext->name), currentContext->kind, currentContext->nestLevel);
 	vString *endTokenName = vStringNewInit("end");
-	if (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0 && strcmp (vStringValue (token->name), vStringValue (endTokenName)) == 0)
+	if ((currentContext->kind == K_COVERGROUP && strcmp (vStringValue (token->name), "endgroup") == 0) ||
+	    (currentContext->kind == K_BLOCK && currentContext->nestLevel == 0 && strcmp (vStringValue (token->name), vStringValue (endTokenName)) == 0)
+	    )
 	{
 		verbose ("Dropping context %s\n", vStringValue (currentContext->name));
 		currentContext = popToken (currentContext);
