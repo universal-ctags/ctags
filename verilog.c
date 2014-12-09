@@ -212,6 +212,21 @@ static short isContainer (tokenInfo const* token)
 	}
 }
 
+static short isVariable (tokenInfo const* token)
+{
+	switch (token->kind)
+	{
+		case K_CONSTANT:
+		case K_EVENT:
+		case K_NET:
+		case K_PORT:
+		case K_REGISTER:
+			return TRUE;
+		default:
+			return FALSE;
+	}
+}
+
 static short hasSimplePortList (tokenInfo const* token)
 {
 	switch (token->kind)
@@ -756,10 +771,30 @@ static void tagNameList (tokenInfo* token, int c)
 {
 	verilogKind localKind;
 	boolean repeat;
+
+	/* Many keywords can have bit width.
+	*   reg [3:0] net_name;
+	*   inout [(`DBUSWIDTH-1):0] databus;
+	*/
+	if (c == '(')
+		c = skipPastMatch ("()");
+	c = skipWhite (c);
+	if (c == '[')
+		c = skipPastMatch ("[]");
+	c = skipWhite (c);
+	if (c == '#')
+	{
+		c = vGetc ();
+		if (c == '(')
+			c = skipPastMatch ("()");
+	}
+	c = skipWhite (c);
+
 	Assert (isIdentifierCharacter (c));
 	do
 	{ 
 		repeat = FALSE;
+
 		if (isIdentifierCharacter (c))
 		{
 			readIdentifier (token, c);
@@ -783,13 +818,6 @@ static void tagNameList (tokenInfo* token, int c)
 		else
 			break;
 		c = skipWhite (vGetc ());
-
-		/* Get port list */
-		if (getKind(token) == K_UNDEFINED && hasSimplePortList (token))
-		{
-			processPortList (c);
-			c = vGetc ();
-		}
 
 		if (c == '[')
 			c = skipPastMatch ("[]");
@@ -866,29 +894,37 @@ static void findTag (tokenInfo *const token)
 	{
 		currentContext->singleStat = TRUE;
 	}
-	else if (token->kind != K_UNDEFINED)
+	else if (isVariable (token))
 	{
 		int c = skipWhite (vGetc ());
 
-		/* Many keywords can have bit width.
-		*   reg [3:0] net_name;
-		*   inout [(`DBUSWIDTH-1):0] databus;
-		*/
-		if (c == '(')
-			c = skipPastMatch ("()");
-		c = skipWhite (c);
-		if (c == '[')
-			c = skipPastMatch ("[]");
-		c = skipWhite (c);
-		if (c == '#')
-		{
-			c = vGetc ();
-			if (c == '(')
-				c = skipPastMatch ("()");
-		}
-		c = skipWhite (c);
+		tagNameList (token, c);
+	}
+	else if (token->kind != K_UNDEFINED && token->kind != K_IGNORE)
+	{
+		int c = skipWhite (vGetc ());
+
 		if (isIdentifierCharacter (c))
-			tagNameList (token, c);
+		{
+			readIdentifier (token, c);
+			while (getKind (token) == K_IGNORE)
+			{
+				c = skipWhite (vGetc ());
+				readIdentifier (token, c);
+			}
+			createTag (token);
+
+			/* Get port list if required */
+			c = skipWhite (vGetc ());
+			if (c == '(' && hasSimplePortList (token))
+			{
+				processPortList (c);
+			}
+			else
+			{
+				vUngetc (c);
+			}
+		}
 	}
 }
 
