@@ -361,21 +361,18 @@ getNextChar:
 static void skipToMatched (tokenInfo *const token)
 {
 	int nest_level = 0;
-	tokenType open_token;
+	tokenType open_token = token->type;
 	tokenType close_token;
 
-	switch (token->type)
+	switch (open_token)
 	{
 		case TOKEN_OPEN_PAREN:
-			open_token = TOKEN_OPEN_PAREN;
 			close_token = TOKEN_CLOSE_PAREN;
 			break;
 		case TOKEN_OPEN_CURLY:
-			open_token = TOKEN_OPEN_CURLY;
 			close_token = TOKEN_CLOSE_CURLY;
 			break;
 		case TOKEN_OPEN_SQUARE:
-			open_token = TOKEN_OPEN_SQUARE;
 			close_token = TOKEN_CLOSE_SQUARE;
 			break;
 		default:
@@ -384,30 +381,18 @@ static void skipToMatched (tokenInfo *const token)
 
 	/*
 	 * This routine will skip to a matching closing token.
-	 * It will also handle nested tokens like the (, ) below.
-	 *   (  name varchar(30), text binary(10)  )
+	 * It will also handle nested tokens.
 	 */
-	if (isType (token, open_token))
+	nest_level++;
+	while (nest_level > 0 && !isType (token, TOKEN_EOF))
 	{
-		nest_level++;
-		while (!(isType (token, close_token) && (nest_level == 0)) &&
-			   !isType (token, TOKEN_EOF))
-		{
-			readToken (token);
-			if (isType (token, open_token))
-			{
-				nest_level++;
-			}
-			if (isType (token, close_token))
-			{
-				if (nest_level > 0)
-				{
-					nest_level--;
-				}
-			}
-		}
 		readToken (token);
+		if (isType (token, open_token))
+			nest_level++;
+		else if (isType (token, close_token))
+			nest_level--;
 	}
+	readToken (token);
 }
 
 static void skipType (tokenInfo *const token)
