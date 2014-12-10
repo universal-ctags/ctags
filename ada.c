@@ -1202,7 +1202,7 @@ static adaTokenInfo *adaParseVariables(adaTokenInfo *parent, adaKind kind)
    * bufLen match */
   buf[bufLen] = '\0';
 
-  while(TRUE)
+  while(exception != EXCEPTION_EOF)
   {
     /* make sure that we don't count anything in a comment as being valid to
      * parse */
@@ -1307,7 +1307,7 @@ static adaTokenInfo *adaParseVariables(adaTokenInfo *parent, adaKind kind)
       memcpy((void *) &buf[bufPos], (void *) line, lineLen);
       buf[bufLen] = '\0';
     } /* if(bufPos >= bufLen) */
-  } /* while(TRUE) */
+  } /* while(exception != EXCEPTION_EOF) */
 
   /* There is a special case if we are gathering enumeration values and we hit
    * a ')', that is allowed so we need to move varEndPos to where the ')' is */
