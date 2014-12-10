@@ -221,8 +221,7 @@ getNextChar:
 						  lastTokenType == TOKEN_CLOSE_CURLY ||
 						  lastTokenType == TOKEN_CLOSE_SQUARE))
 		{
-			token->type = TOKEN_SEMICOLON;
-			goto done;
+			c = ';';  // semicolon injection
 		}
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\r' || c == '\n');
@@ -356,28 +355,24 @@ getNextChar:
 			break;
 	}
 
-done:
 	lastTokenType = token->type;
 }
 
 static void skipToMatched (tokenInfo *const token)
 {
 	int nest_level = 0;
-	tokenType open_token;
+	tokenType open_token = token->type;
 	tokenType close_token;
 
-	switch (token->type)
+	switch (open_token)
 	{
 		case TOKEN_OPEN_PAREN:
-			open_token = TOKEN_OPEN_PAREN;
 			close_token = TOKEN_CLOSE_PAREN;
 			break;
 		case TOKEN_OPEN_CURLY:
-			open_token = TOKEN_OPEN_CURLY;
 			close_token = TOKEN_CLOSE_CURLY;
 			break;
 		case TOKEN_OPEN_SQUARE:
-			open_token = TOKEN_OPEN_SQUARE;
 			close_token = TOKEN_CLOSE_SQUARE;
 			break;
 		default:
@@ -386,35 +381,22 @@ static void skipToMatched (tokenInfo *const token)
 
 	/*
 	 * This routine will skip to a matching closing token.
-	 * It will also handle nested tokens like the (, ) below.
-	 *   (  name varchar(30), text binary(10)  )
+	 * It will also handle nested tokens.
 	 */
-	if (isType (token, open_token))
+	nest_level++;
+	while (nest_level > 0 && !isType (token, TOKEN_EOF))
 	{
-		nest_level++;
-		while (!(isType (token, close_token) && (nest_level == 0)) &&
-			   !isType (token, TOKEN_EOF))
-		{
-			readToken (token);
-			if (isType (token, open_token))
-			{
-				nest_level++;
-			}
-			if (isType (token, close_token))
-			{
-				if (nest_level > 0)
-				{
-					nest_level--;
-				}
-			}
-		}
 		readToken (token);
+		if (isType (token, open_token))
+			nest_level++;
+		else if (isType (token, close_token))
+			nest_level--;
 	}
+	readToken (token);
 }
 
 static void skipType (tokenInfo *const token)
 {
-again:
 	// Type      = TypeName | TypeLit | "(" Type ")" .
 	// Skips also function multiple return values "(" Type {"," Type} ")"
 	if (isType (token, TOKEN_OPEN_PAREN))
@@ -454,7 +436,8 @@ again:
 	if (isType (token, TOKEN_OPEN_SQUARE))
 	{
 		skipToMatched (token);
-		goto again;
+		skipType (token);
+		return;
 	}
 
 	// PointerType = "*" BaseType .
@@ -463,7 +446,8 @@ again:
 	if (isType (token, TOKEN_STAR) || isKeyword (token, KEYWORD_chan) || isType (token, TOKEN_LEFT_ARROW))
 	{
 		readToken (token);
-		goto again;
+		skipType (token);
+		return;
 	}
 
 	// MapType     = "map" "[" KeyType "]" ElementType .
@@ -473,7 +457,8 @@ again:
 		readToken (token);
 		// skip over "[]"
 		skipToMatched (token);
-		goto again;
+		skipType (token);
+		return;
 	}
 
 	// FunctionType   = "func" Signature .
@@ -488,7 +473,8 @@ again:
 		// Result is parameters or type or nothing.  skipType treats anything
 		// surrounded by parentheses as a type, and does nothing if what
 		// follows is not a type.
-		goto again;
+		skipType (token);
+		return;
 	}
 }
 
