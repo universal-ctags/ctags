@@ -10,6 +10,14 @@
 AC_PREREQ([2.61])
 AC_INIT([ctags],[fishman])
 AC_CONFIG_HEADERS([config.h])
+if ! test -e "${srcdir}/config.h.in"; then
+   echo "---"
+   echo "--- ${srcdir}/config.h.in IS NOT FOUND." 1>&2
+   echo "--- YOU MIGHT JUST RUN autoconf" 1>&2
+   echo "--- BUT YOU MAY HAVE TO RUN autoreconf." 1>&2
+   echo "---"
+   exit 1
+fi
 
 AH_TEMPLATE([PACKAGE], [Package name.])
 AH_TEMPLATE([VERSION], [Package version.])
