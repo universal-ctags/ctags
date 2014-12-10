@@ -221,8 +221,7 @@ getNextChar:
 						  lastTokenType == TOKEN_CLOSE_CURLY ||
 						  lastTokenType == TOKEN_CLOSE_SQUARE))
 		{
-			token->type = TOKEN_SEMICOLON;
-			goto done;
+			c = ';';  // semicolon injection
 		}
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\r' || c == '\n');
@@ -356,7 +355,6 @@ getNextChar:
 			break;
 	}
 
-done:
 	lastTokenType = token->type;
 }
 
@@ -414,7 +412,6 @@ static void skipToMatched (tokenInfo *const token)
 
 static void skipType (tokenInfo *const token)
 {
-again:
 	// Type      = TypeName | TypeLit | "(" Type ")" .
 	// Skips also function multiple return values "(" Type {"," Type} ")"
 	if (isType (token, TOKEN_OPEN_PAREN))
@@ -454,7 +451,8 @@ again:
 	if (isType (token, TOKEN_OPEN_SQUARE))
 	{
 		skipToMatched (token);
-		goto again;
+		skipType (token);
+		return;
 	}
 
 	// PointerType = "*" BaseType .
@@ -463,7 +461,8 @@ again:
 	if (isType (token, TOKEN_STAR) || isKeyword (token, KEYWORD_chan) || isType (token, TOKEN_LEFT_ARROW))
 	{
 		readToken (token);
-		goto again;
+		skipType (token);
+		return;
 	}
 
 	// MapType     = "map" "[" KeyType "]" ElementType .
@@ -473,7 +472,8 @@ again:
 		readToken (token);
 		// skip over "[]"
 		skipToMatched (token);
-		goto again;
+		skipType (token);
+		return;
 	}
 
 	// FunctionType   = "func" Signature .
@@ -488,7 +488,8 @@ again:
 		// Result is parameters or type or nothing.  skipType treats anything
 		// surrounded by parentheses as a type, and does nothing if what
 		// follows is not a type.
-		goto again;
+		skipType (token);
+		return;
 	}
 }
 
