@@ -205,10 +205,10 @@ finds *.in* as suffix, fishman-ctags checks the next suffix, here *.c*.
 
 Dry running
 ---------------------------------------------------------------------
-With ``--guess-parser`` option, you can test the parser selector of
+With ``--print-language`` option, you can test the parser selector of
 ctags. e.g.::
 
-	$ ./ctags --guess-parser main.c
+	$ ./ctags --print-language main.c
 	main.c: C
 
 If no parser is selected, ``NONE`` is printed as parser name.

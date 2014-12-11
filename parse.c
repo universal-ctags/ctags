@@ -1557,7 +1557,7 @@ static void printGuessedParser (const char* const fileName, langType language)
 
 	if (language == LANG_IGNORE)
 	{
-		Option.guessParser = ((int)TRUE) + 1;
+		Option.printLanguage = ((int)TRUE) + 1;
 		parserName = "NONE";
 	}
 	else
@@ -1574,7 +1574,7 @@ extern boolean parseFile (const char *const fileName)
 		language = getFileLanguage (fileName);
 	Assert (language != LANG_AUTO);
 
-	if (Option.guessParser)
+	if (Option.printLanguage)
 	{
 		printGuessedParser (fileName, language);
 		return tagFileResized;

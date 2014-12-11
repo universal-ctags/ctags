@@ -168,7 +168,7 @@ optionValues Option = {
 	FALSE,      /* --tag-relative */
 	FALSE,      /* --totals */
 	FALSE,      /* --line-directives */
-	FALSE,	    /* --guess-parser */
+	FALSE,	    /* --print-language */
 #ifdef DEBUG
 	0, 0        /* -D, -b */
 #endif
@@ -249,8 +249,6 @@ static optionDescription LongOptionDescription [] = {
 #else
  {0,"       Force output of specified tag file format [2]."},
 #endif
- {0,"  --guess-parser"},
- {0,"       Don't make tags file but just print the parser name guessed from input file."},
  {1,"  --help"},
  {1,"       Print this option summary."},
  {1,"  --if0=[yes|no]"},
@@ -303,6 +301,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of language mappings."},
  {1,"  --options=file"},
  {1,"       Specify file from which command line options should be read."},
+ {0,"  --print-language"},
+ {0,"       Don't make tags file but just print the guessed language name for input file."},
  {1,"  --recurse=[yes|no]"},
 #ifdef RECURSE_SUPPORTED
  {1,"       Recurse into directories supplied on command line [no]."},
@@ -2052,11 +2052,11 @@ static booleanOption BooleanOptions [] = {
 	{ "file-scope",     &Option.include.fileScope,      FALSE   },
 	{ "file-tags",      &Option.include.fileNames,      FALSE   },
 	{ "filter",         &Option.filter,                 TRUE    },
-	{ "guess-parser",   &Option.guessParser,	    TRUE    },
 	{ "if0",            &Option.if0,                    FALSE   },
 	{ "kind-long",      &Option.kindLong,               TRUE    },
 	{ "line-directives",&Option.lineDirectives,         FALSE   },
 	{ "links",          &Option.followLinks,            FALSE   },
+	{ "print-language", &Option.printLanguage,          TRUE    },
 #ifdef RECURSE_SUPPORTED
 	{ "recurse",        &Option.recurse,                FALSE   },
 #endif
