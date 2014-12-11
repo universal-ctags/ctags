@@ -16,6 +16,17 @@ Frank Fesevur <ffes@users.sourceforge.net>
 	I am a Windows developer, but also an occasional Ubuntu and
 	Raspbian user at home. I wrote the windres parser.
 
+Colomban Wendling <colomban@geany.org>
+
+	I am a developer of Geany, a lightweight IDE/editor that uses CTags
+	parsers to provide various code insights for a large variety of
+	languages. I don't use CTags directly but through a (currently)
+	internal library. Hence, my fields of interest are the quality of the
+	parsers (good and comprehensive results) and their code (speed, proof
+	against any inputs, absence of memory leaks, regression tests), and a
+	CTags library applications could use more readily. I am mostly a C
+	developer, but as the maintainer of the CTags parsers in Geany I work
+	on all parsers.
 
 Masatake YAMATO <yamato@redhat.com>
 
