@@ -138,6 +138,11 @@ static const unsigned char* skipPrefix (const unsigned char* name, int *scope)
 	return result;
 }
 
+static boolean isWordChar(const unsigned char c)
+{
+	return (isalnum (c) || c == '_');
+}
+
 /* checks if a word at the start of `p` matches at least `min_len` first
  * characters from `word` */
 static boolean wordMatchLen(const unsigned char *p, const char *const word, size_t min_len)
@@ -152,10 +157,17 @@ static boolean wordMatchLen(const unsigned char *p, const char *const word, size
 		n++;
 	}
 
-	if (*p == 0 || *p == ' ' || *p == '\t' || *p == '!')
-		return n >= min_len;
+	if (isWordChar (*p))
+		return FALSE;
 
-	return FALSE;
+	return n >= min_len;
+}
+
+static const unsigned char *skipWord(const unsigned char *p)
+{
+	while (*p && isWordChar (*p))
+		p++;
+	return p;
 }
 
 static boolean isMap (const unsigned char* line)
@@ -219,13 +231,8 @@ static void parseFunction (const unsigned char *line)
 	vString *name = vStringNew ();
 	/* boolean inFunction = FALSE; */
 	int scope;
+	const unsigned char *cp = line;
 
-	const unsigned char *cp = line + 1;
-
-	if ((int) *++cp == 'n'	&&	(int) *++cp == 'c'	&&
-		(int) *++cp == 't'	&&	(int) *++cp == 'i'	&&
-		(int) *++cp == 'o'	&&	(int) *++cp == 'n')
-			++cp;
 	if ((int) *cp == '!')
 		++cp;
 	if (isspace ((int) *cp))
@@ -257,12 +264,7 @@ static void parseFunction (const unsigned char *line)
 	/* TODO - update struct to indicate inside function */
 	while ((line = readVimLine ()) != NULL)
 	{
-		/* 
-		 * Vim7 added the for/endfo[r] construct, so we must first
-		 * check for an "endfo", before a "endf"
-		 */
-		if ( (!strncmp ((const char*) line, "endfo", (size_t) 5) == 0) && 
-				(strncmp ((const char*) line, "endf", (size_t) 4) == 0)   )
+		if (wordMatchLen (line, "endfunction", 4))
 			break;
 
 		parseVimLine(line, TRUE);
@@ -275,10 +277,7 @@ static void parseAutogroup (const unsigned char *line)
 	vString *name = vStringNew ();
 
 	/* Found Autocommand Group (augroup) */
-	const unsigned char *cp = line + 2;
-	if ((int) *++cp == 'r' && (int) *++cp == 'o' &&
-			(int) *++cp == 'u' && (int) *++cp == 'p')
-		++cp;
+	const unsigned char *cp = line;
 	if (isspace ((int) *cp))
 	{
 		while (*cp && isspace ((int) *cp))
@@ -286,13 +285,12 @@ static void parseAutogroup (const unsigned char *line)
 
 		if (*cp)
 		{
-			if (strncasecmp ((const char*) cp, "end", (size_t) 3) != 0)
-			{	 
-				do
-				{
-					vStringPut (name, (int) *cp);
-					++cp;
-				} while (isalnum ((int) *cp)  ||  *cp == '_');
+			const unsigned char *end = skipWord (cp);
+
+			/* "end" (caseless) has a special meaning and should not generate a tag */
+			if (end > cp && strncasecmp ((const char *) cp, "end", end - cp) != 0)
+			{
+				vStringNCatS (name, (const char *) cp, end - cp);
 				vStringTerminate (name);
 				makeSimpleTag (name, VimKinds, K_AUGROUP);
 				vStringClear (name);
@@ -339,15 +337,9 @@ static boolean parseCommand (const unsigned char *line)
 		while (*cp && isspace ((int) *cp))
 			++cp; 
 	}
-	else if ( line && 
-                     (!strncmp ((const char*) line, "comp", (size_t) 4) == 0) && 
-		                (!strncmp ((const char*) line, "comc", (size_t) 4) == 0) && 
-				          (strncmp ((const char*) line, "com", (size_t) 3) == 0) )
+	else if ( line && wordMatchLen (cp, "command", 3) )
 	{
-		cp += 2;
-		if ((int) *++cp == 'm' && (int) *++cp == 'a' &&
-				(int) *++cp == 'n' && (int) *++cp == 'd')
-			++cp;
+		cp = skipWord (cp);
 
 		if ((int) *cp == '!')
 			++cp;
@@ -438,7 +430,7 @@ static void parseLet (const unsigned char *line, int infunction)
 {
 	vString *name = vStringNew ();
 
-	const unsigned char *cp = line + 3;
+	const unsigned char *cp = line;
 	const unsigned char *np = line;
 	/* get the name */
 	if (isspace ((int) *cp))
@@ -496,12 +488,7 @@ cleanUp:
 static boolean parseMap (const unsigned char *line)
 {
 	vString *name = vStringNew ();
-
 	const unsigned char *cp = line;
-
-	/* Remove map */
-	while (*cp && isalnum ((int) *cp))
-		++cp;
 
 	if ((int) *cp == '!')
 		++cp;
@@ -576,18 +563,11 @@ static boolean parseMap (const unsigned char *line)
 	return TRUE;
 }
 
-static boolean isCommand (const unsigned char* line)
-{
-	return ( (!strncmp ((const char*) line, "comp", (size_t) 4) == 0) &&
-			(!strncmp ((const char*) line, "comc", (size_t) 4) == 0) &&
-			(strncmp ((const char*) line, "com", (size_t) 3) == 0) );
-}
-
 static boolean parseVimLine (const unsigned char *line, int infunction)
 {
 	boolean readNextLine = TRUE;
 
-	if (isCommand(line))
+	if (wordMatchLen (line, "command", 3))
 	{
 		readNextLine = parseCommand(line);
 		/* TODO - Handle parseCommand returning FALSE */
@@ -595,22 +575,22 @@ static boolean parseVimLine (const unsigned char *line, int infunction)
 
 	else if (isMap(line))
 	{
-		parseMap(line);
+		parseMap(skipWord(line));
 	}
 
-	else if (strncmp ((const char*) line, "fu", (size_t) 2) == 0)
+	else if (wordMatchLen (line, "function", 2))
 	{
-		parseFunction(line);
+		parseFunction(skipWord(line));
 	}
 
-	else if	(strncmp ((const char*) line, "aug", (size_t) 3) == 0)
+	else if	(wordMatchLen (line, "augroup", 3))
 	{
-		parseAutogroup(line);
+		parseAutogroup(skipWord(line));
 	}
 
-	else if ( strncmp ((const char*) line, "let", (size_t) 3) == 0 )
+	else if (wordMatchLen (line, "let", 3))
 	{
-		parseLet(line, infunction);
+		parseLet(skipWord(line), infunction);
 	}
 
 	return readNextLine;
