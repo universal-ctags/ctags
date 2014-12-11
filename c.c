@@ -289,9 +289,9 @@ static int AnonymousID = 0;
 typedef enum {
 	CK_UNDEFINED = -1,
 	CK_CLASS, CK_DEFINE, CK_ENUMERATOR, CK_FUNCTION,
-	CK_ENUMERATION, CK_LOCAL, CK_MEMBER, CK_MODULE, CK_NAMESPACE, CK_PROTOTYPE,
-	CK_STRUCT, CK_TYPEDEF, CK_TEMPLATE, CK_UNION, CK_VARIABLE,
-	CK_EXTERN_VARIABLE, CK_MIXIN, CK_VERSION
+	CK_ENUMERATION, CK_LOCAL, CK_MEMBER, CK_NAMESPACE, CK_PROTOTYPE,
+	CK_STRUCT, CK_TYPEDEF, CK_UNION, CK_VARIABLE,
+	CK_EXTERN_VARIABLE
 } cKind;
 
 static kindOption CKinds [] = {
@@ -302,17 +302,13 @@ static kindOption CKinds [] = {
 	{ TRUE,  'g', "enum",       "enumeration names"},
 	{ FALSE, 'l', "local",      "local variables"},
 	{ TRUE,  'm', "member",     "class, struct, and union members"},
-	{ TRUE,  'M', "module", 	"module"},
 	{ TRUE,  'n', "namespace",  "namespaces"},
 	{ FALSE, 'p', "prototype",  "function prototypes"},
 	{ TRUE,  's', "struct",     "structure names"},
 	{ TRUE,  't', "typedef",    "typedefs"},
-	{ TRUE,  'T', "template", 	"templates"},
 	{ TRUE,  'u', "union",      "union names"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
 	{ FALSE, 'x', "externvar",  "external and forward variable declarations"},
-	{ TRUE,  'X', "mixin", 		"mixin"},
-	{ TRUE,  'V', "version", 	"conditional compilation"}
 };
 
 typedef enum {
@@ -912,17 +908,13 @@ static cKind cTagKind (const tagType type)
 		case TAG_FUNCTION:   result = CK_FUNCTION;    break;
 		case TAG_LOCAL:      result = CK_LOCAL;       break;
 		case TAG_MEMBER:     result = CK_MEMBER;      break;
-		case TAG_PACKAGE: 	 result = CK_MODULE;	  break;
 		case TAG_NAMESPACE:  result = CK_NAMESPACE;   break;
 		case TAG_PROTOTYPE:  result = CK_PROTOTYPE;   break;
 		case TAG_STRUCT:     result = CK_STRUCT;      break;
 		case TAG_TYPEDEF:    result = CK_TYPEDEF;     break;
-		case TAG_TEMPLATE: 	 result = CK_TEMPLATE; 	  break;
 		case TAG_UNION:      result = CK_UNION;       break;
 		case TAG_VARIABLE:   result = CK_VARIABLE;    break;
-		case TAG_MIXIN:		 result = CK_MIXIN; 	  break;
 		case TAG_EXTERN_VAR: result = CK_EXTERN_VARIABLE; break;
-		case TAG_VERSION:    result = CK_VERSION;     break;
 
 		default: Assert ("Bad C tag type" == NULL); break;
 	}
