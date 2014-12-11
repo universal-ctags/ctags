@@ -120,6 +120,8 @@ static void findShTags (void)
 					hereDocIndented = TRUE;
 					cp++;
 				}
+				while (isspace (*cp))
+					cp++;
 				start = end = cp;
 				/* the delimiter can be surrounded by quotes */
 				if (*cp == '"')

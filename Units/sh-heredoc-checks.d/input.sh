@@ -54,5 +54,15 @@ cat<<-EOF
 	EOF
 
 f10(){ :; }
+cat << EOF
+bug(){ :; }
+EOF
+
+f11(){ :; }
+cat << 	 	EOF
+bug(){ :; }
+EOF
+
+f12(){ :; }
 
 fancy
