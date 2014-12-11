@@ -231,8 +231,7 @@ static void parseFunction (const unsigned char *line)
 	vString *name = vStringNew ();
 	/* boolean inFunction = FALSE; */
 	int scope;
-
-	const unsigned char *cp = skipWord (line);
+	const unsigned char *cp = line;
 
 	if ((int) *cp == '!')
 		++cp;
@@ -278,7 +277,7 @@ static void parseAutogroup (const unsigned char *line)
 	vString *name = vStringNew ();
 
 	/* Found Autocommand Group (augroup) */
-	const unsigned char *cp = skipWord (line);
+	const unsigned char *cp = line;
 	if (isspace ((int) *cp))
 	{
 		while (*cp && isspace ((int) *cp))
@@ -434,7 +433,7 @@ static void parseLet (const unsigned char *line, int infunction)
 {
 	vString *name = vStringNew ();
 
-	const unsigned char *cp = skipWord (line);
+	const unsigned char *cp = line;
 	const unsigned char *np = line;
 	/* get the name */
 	if (isspace ((int) *cp))
@@ -492,9 +491,7 @@ cleanUp:
 static boolean parseMap (const unsigned char *line)
 {
 	vString *name = vStringNew ();
-
-	/* Remove map */
-	const unsigned char *cp = skipWord (line);
+	const unsigned char *cp = line;
 
 	if ((int) *cp == '!')
 		++cp;
@@ -581,22 +578,22 @@ static boolean parseVimLine (const unsigned char *line, int infunction)
 
 	else if (isMap(line))
 	{
-		parseMap(line);
+		parseMap(skipWord(line));
 	}
 
 	else if (wordMatchLen (line, "function", 2))
 	{
-		parseFunction(line);
+		parseFunction(skipWord(line));
 	}
 
 	else if	(wordMatchLen (line, "augroup", 3))
 	{
-		parseAutogroup(line);
+		parseAutogroup(skipWord(line));
 	}
 
 	else if (wordMatchLen (line, "let", 3))
 	{
-		parseLet(line, infunction);
+		parseLet(skipWord(line), infunction);
 	}
 
 	return readNextLine;
