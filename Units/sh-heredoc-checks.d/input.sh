@@ -7,22 +7,22 @@ EOF
 
 f2(){ :; }
 cat<<EOF
-bug(){ :; }
+bug2(){ :; }
 EOF
 
 f3(){ :; }
 cat<<"EOF"
-bug(){ :; }
+bug3(){ :; }
 EOF
 
 f4(){ :; }
 cat<<'EOF'
-bug(){ :; }
+bug4(){ :; }
 EOF
 
 f5(){ :; }
 cat<<'End Of File'
-bug(){ :; }
+bug5(){ :; }
 End Of File
 
 f6(){ :; }
@@ -32,41 +32,41 @@ EOF
 EOF#test
  EOF
 
-bug(){ :; }
+bug6(){ :; }
 EOF
 
 f7(){ :; }
 cat<<"End Of \"File\""
-bug(){ :; }
+bug7(){ :; }
 End Of "File"
 
 f8(){ :; }
 # this is valid, the heredoc starts on the next line after the <<DELIM
 cat<<EOF; fancy() { echo hello; }
-bug(){ :; }
+bug8(){ :; }
 EOF
 
 f9(){ :; }
 cat<<-EOF
-	bug(){ :; }
+	bug9(){ :; }
   this isn't the end, only tabulations are stripped, not spaces
   EOF
 	EOF
 
 f10(){ :; }
 cat << EOF
-bug(){ :; }
+bug10(){ :; }
 EOF
 
 f11(){ :; }
 cat << 	 	EOF
-bug(){ :; }
+bug11(){ :; }
 EOF
 
 f12(){ :; }
 # this is not an indented here-document but a "-EOF" delimiter
 cat << -EOF
-bug(){ :; }
+bug12(){ :; }
 -EOF
 
 f13(){ :; }
