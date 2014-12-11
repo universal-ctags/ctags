@@ -64,5 +64,11 @@ bug(){ :; }
 EOF
 
 f12(){ :; }
+# this is not an indented here-document but a "-EOF" delimiter
+cat << -EOF
+bug(){ :; }
+-EOF
+
+f13(){ :; }
 
 fancy

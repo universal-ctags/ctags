@@ -2,6 +2,7 @@ f1	input.sh	/^f1()$/;"	f
 f10	input.sh	/^f10(){ :; }$/;"	f
 f11	input.sh	/^f11(){ :; }$/;"	f
 f12	input.sh	/^f12(){ :; }$/;"	f
+f13	input.sh	/^f13(){ :; }$/;"	f
 f2	input.sh	/^f2(){ :; }$/;"	f
 f3	input.sh	/^f3(){ :; }$/;"	f
 f4	input.sh	/^f4(){ :; }$/;"	f
