@@ -127,7 +127,7 @@ typedef enum eTokenType {
 	TOKEN_DOUBLE_COLON,  /* double colon indicates nested-name-specifier */
 	TOKEN_KEYWORD,
 	TOKEN_NAME,          /* an unknown name */
-	TOKEN_PACKAGE,       /* a Java package name / a D module name */
+	TOKEN_PACKAGE,       /* a Java package name */
 	TOKEN_PAREN_NAME,    /* a single name in parentheses */
 	TOKEN_SEMICOLON,     /* the semicolon character */
 	TOKEN_SPEC,          /* a storage class specifier, qualifier, type, etc. */
@@ -165,7 +165,7 @@ typedef enum eDeclaration {
 	DECL_TEMPLATE,
 	DECL_UNION,
 	DECL_USING,
-	DECL_VERSION, /* D conditional compile */
+	DECL_VERSION,        /* D conditional compile */
 	DECL_COUNT
 } declType;
 
@@ -242,7 +242,7 @@ typedef enum eTagType {
 	TAG_METHOD,      /* method declaration */
 	TAG_MIXIN, 		 /* D mixin */
 	TAG_NAMESPACE,   /* namespace name */
-	TAG_PACKAGE,     /* package name */
+	TAG_PACKAGE,     /* package name / D module name */
 	TAG_PROGRAM,     /* program name */
 	TAG_PROPERTY,    /* property name */
 	TAG_PROTOTYPE,   /* function prototype or declaration */
@@ -253,7 +253,7 @@ typedef enum eTagType {
 	TAG_UNION,       /* union name */
 	TAG_VARIABLE,    /* variable definition */
 	TAG_EXTERN_VAR,  /* external variable declaration */
-	TAG_VERSION, 	/* conditional template compilation */
+	TAG_VERSION, 	 /* conditional template compilation */
 	TAG_COUNT        /* must be last */
 } tagType;
 
@@ -338,7 +338,7 @@ typedef enum
 {
 	DK_UNDEFINED = -1,
 	DK_CLASS, DK_ENUMERATION, DK_ENUMERATOR, DK_EXTERN_VARIABLE, DK_FUNCTION,
-	DK_INTERFACE, DK_LOCAL, DK_MEMBER, DK_MIXIN, DK_NAMESPACE,
+	DK_INTERFACE, DK_LOCAL, DK_MEMBER, DK_MIXIN, DK_MODULE, DK_NAMESPACE,
 	DK_PROTOTYPE, DK_STRUCT, DK_TEMPLATE, DK_TYPEDEF, DK_UNION,
 	DK_VARIABLE, DK_VERSION
 } dKind;
@@ -352,7 +352,8 @@ static kindOption DKinds [] = {
 	{ TRUE,  'i', "interface",  "interfaces"},
 	{ FALSE, 'l', "local",      "local variables"},
 	{ TRUE,  'm', "member",     "class, struct, and union members"},
-	{ TRUE,  'X', "mixin",      "mixin"},
+	{ TRUE,  'X', "mixin",      "mixins"},
+	{ TRUE,  'M', "module",     "modules"},
 	{ TRUE,  'n', "namespace",  "namespaces"},
 	{ FALSE, 'p', "prototype",  "function prototypes"},
 	{ TRUE,  's', "struct",     "structure names"},
@@ -360,7 +361,7 @@ static kindOption DKinds [] = {
 	{ TRUE,  't', "typedef",    "typedefs"},
 	{ TRUE,  'u', "union",      "union names"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
-	{ TRUE,  'V', "version",    "conditional compilation"}
+	{ TRUE,  'V', "version",    "version statements"}
 };
 
 /* Used to index into the JavaKinds table. */
@@ -977,6 +978,7 @@ static dKind dTagKind (const tagType type)
 		case TAG_LOCAL:      result = DK_LOCAL;           break;
 		case TAG_MEMBER:     result = DK_MEMBER;          break;
 		case TAG_MIXIN:      result = DK_MIXIN;           break;
+		case TAG_PACKAGE:    result = DK_MODULE;          break;
 		case TAG_NAMESPACE:  result = DK_NAMESPACE;       break;
 		case TAG_PROTOTYPE:  result = DK_PROTOTYPE;       break;
 		case TAG_STRUCT:     result = DK_STRUCT;          break;

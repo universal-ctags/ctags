@@ -1,3 +1,5 @@
+module test.simple;
+
 import std.stdio;
 
 alias AliasInt = int;

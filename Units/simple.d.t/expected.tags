@@ -18,4 +18,5 @@ main	input.d	/^void main(string[] args)$/;"	f
 obj	input.d	/^Object obj;$/;"	v
 qar	input.d	/^		int qar;$/;"	m	union:Struct.Union	file:
 quxx	input.d	/^		bool quxx;$/;"	m	union:Struct.Union	file:
+test.simple	input.d	/^module test.simple;$/;"	M
 this	input.d	/^	public this(AliasInt x)$/;"	f	class:Class
