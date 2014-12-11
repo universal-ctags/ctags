@@ -14,3 +14,10 @@ function with-dash() {
 function noParen {
     :
 }
+
+function -starting-with-dash() {
+  -starting-with-dash_2() {
+    -starting-with-dash_inner() baz
+    _starting-with-underscore_inner() baz
+  }
+}

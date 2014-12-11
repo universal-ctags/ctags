@@ -1,3 +1,7 @@
+-starting-with-dash	input.sh	/^function -starting-with-dash() {$/;"	f
+-starting-with-dash_2	input.sh	/^  -starting-with-dash_2() {$/;"	f
+-starting-with-dash_inner	input.sh	/^    -starting-with-dash_inner() baz$/;"	f
+_starting-with-underscore_inner	input.sh	/^    _starting-with-underscore_inner() baz$/;"	f
 alias	input.sh	/^mult1() echo 1; mult2() echo 2; mult3() { echo 1 }; alias alias=mult1$/;"	a
 baz	input.sh	/^function baz() {}$/;"	f
 baz_2	input.sh	/^function baz_2() {$/;"	f
