@@ -69,6 +69,7 @@ static void findShTags (void)
 	vString *name = vStringNew ();
 	const unsigned char *line;
 	vString *hereDocDelimiter = NULL;
+	boolean hereDocIndented = FALSE;
 
 	while ((line = fileReadLine ()) != NULL)
 	{
@@ -78,7 +79,12 @@ static void findShTags (void)
 
 		if (hereDocDelimiter)
 		{
-			if (strcmp ((const char *) line, vStringValue (hereDocDelimiter)) == 0)
+			if (hereDocIndented)
+			{
+				while (*cp == '\t')
+					cp++;
+			}
+			if (strcmp ((const char *) cp, vStringValue (hereDocDelimiter)) == 0)
 			{
 				vStringDelete (hereDocDelimiter);
 				hereDocDelimiter = NULL;
@@ -106,6 +112,14 @@ static void findShTags (void)
 				const unsigned char *start, *end;
 				boolean trimEscapeSequences = FALSE;
 				cp += 2;
+				/* an optional "-" strips leading tabulations from the heredoc lines */
+				if (*cp != '-')
+					hereDocIndented = FALSE;
+				else
+				{
+					hereDocIndented = TRUE;
+					cp++;
+				}
 				start = end = cp;
 				/* the delimiter can be surrounded by quotes */
 				if (*cp == '"')

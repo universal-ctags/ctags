@@ -47,5 +47,12 @@ bug(){ :; }
 EOF
 
 f9(){ :; }
+cat<<-EOF
+	bug(){ :; }
+  this isn't the end, only tabulations are stripped, not spaces
+  EOF
+	EOF
+
+f10(){ :; }
 
 fancy
