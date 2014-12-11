@@ -125,7 +125,7 @@ fuzz: $(CTAGS_TEST)
 # UNITS Target
 #
 test.units: units
-units: TIMEOUT := 0
+units: TIMEOUT := 5
 units: $(CTAGS_TEST)
 	@ \
 	c="misc/units run \
