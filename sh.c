@@ -138,8 +138,9 @@ static void findShTags (void)
 
 			while (isspace ((int) *cp))
 				++cp;
-			if (*cp++ == '(')
+			if (*cp == '(')
 			{
+				++cp;
 				while (isspace ((int) *cp))
 					++cp;
 				if (*cp == ')'  && ! hackReject (name))
