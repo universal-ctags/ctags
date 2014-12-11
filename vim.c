@@ -285,15 +285,12 @@ static void parseAutogroup (const unsigned char *line)
 
 		if (*cp)
 		{
-			if (/* FIXME: does this really has to be caseless?  Also, can't it
-				 * use something like wordMatchLen(cp, "end...", 3)? */
-				strncasecmp ((const char*) cp, "end", (size_t) 3) != 0)
-			{	 
-				do
-				{
-					vStringPut (name, (int) *cp);
-					++cp;
-				} while (isalnum ((int) *cp)  ||  *cp == '_');
+			const unsigned char *end = skipWord (cp);
+
+			/* "end" (caseless) has a special meaning and should not generate a tag */
+			if (end > cp && strncasecmp ((const char *) cp, "end", end - cp) != 0)
+			{
+				vStringNCatS (name, (const char *) cp, end - cp);
 				vStringTerminate (name);
 				makeSimpleTag (name, VimKinds, K_AUGROUP);
 				vStringClear (name);
