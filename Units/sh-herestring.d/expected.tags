@@ -1,0 +1,4 @@
+f1	input.sh	/^f1(){ :; }$/;"	f
+f2	input.sh	/^f2(){ :; }$/;"	f
+f3	input.sh	/^f3(){ :; }$/;"	f
+f4	input.sh	/^f4(){ :; }$/;"	f
