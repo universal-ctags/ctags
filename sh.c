@@ -57,6 +57,26 @@ static boolean isIdentChar (int c)
 	return (isalnum (c) || c == '_' || c == '-');
 }
 
+static const unsigned char *skipDoubleString (const unsigned char *cp)
+{
+	const unsigned char* prev = cp;
+	cp++;
+	while ((*cp != '"' || *prev == '\\') && *cp != '\0')
+	{
+		prev = cp;
+		cp++;
+	}
+	return cp;
+}
+
+static const unsigned char *skipSingleString (const unsigned char *cp)
+{
+	cp++;
+	while (*cp != '\'' && *cp != '\0')
+		cp++;
+	return cp;
+}
+
 static void findShTags (void)
 {
 	vString *name = vStringNew ();
@@ -76,22 +96,9 @@ static void findShTags (void)
 
 			/* jump over strings */
 			if (*cp == '"')
-			{
-				const unsigned char* prev = cp;
-				cp++;
-				while ((*cp != '"' || *prev == '\\') && *cp != '\0')
-				{
-					prev = cp;
-					cp++;
-				}
-			}
+				cp = skipDoubleString (cp);
 			else if (*cp == '\'')
-			{
-				cp++;
-				while (*cp != '\'' && *cp != '\0')
-					cp++;
-			}
-
+				cp = skipSingleString (cp);
 			/* jump over comments */
 			else if (*cp == '#')
 				break;
