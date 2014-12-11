@@ -52,6 +52,11 @@ static boolean hackReject (const vString* const tagName)
 	return result;
 }
 
+static boolean isIdentChar (int c)
+{
+	return (isalnum (c) || c == '_' || c == '-');
+}
+
 static void findShTags (void)
 {
 	vString *name = vStringNew ();
@@ -110,14 +115,14 @@ static void findShTags (void)
 			}
 
 			// Get the name of the function or alias.
-			if (! (isalnum ((int) *cp) || *cp == '_' || *cp == '-'))
+			if (! isIdentChar ((int) *cp))
 			{
 				aliasFound = FALSE;
 				functionFound = FALSE;
 				++cp;
 				continue;
 			}
-			while (isalnum ((int) *cp) || *cp == '_' || *cp == '-')
+			while (isIdentChar ((int) *cp))
 			{
 				vStringPut (name, (int) *cp);
 				++cp;
