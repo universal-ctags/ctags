@@ -248,7 +248,7 @@ typedef enum eTagType {
 	TAG_PROTOTYPE,   /* function prototype or declaration */
 	TAG_STRUCT,      /* structure name */
 	TAG_TASK,        /* task name */
-	TAG_TYPEDEF,     /* typedef name */
+	TAG_TYPEDEF,     /* typedef name / D alias name */
 	TAG_TEMPLATE, 	 /* d template name */
 	TAG_UNION,       /* union name */
 	TAG_VARIABLE,    /* variable definition */
@@ -337,13 +337,14 @@ static kindOption CsharpKinds [] = {
 typedef enum
 {
 	DK_UNDEFINED = -1,
-	DK_CLASS, DK_ENUMERATION, DK_ENUMERATOR, DK_EXTERN_VARIABLE, DK_FUNCTION,
+	DK_ALIAS, DK_CLASS, DK_ENUMERATION, DK_ENUMERATOR, DK_EXTERN_VARIABLE, DK_FUNCTION,
 	DK_INTERFACE, DK_LOCAL, DK_MEMBER, DK_MIXIN, DK_MODULE, DK_NAMESPACE,
-	DK_PROTOTYPE, DK_STRUCT, DK_TEMPLATE, DK_TYPEDEF, DK_UNION,
+	DK_PROTOTYPE, DK_STRUCT, DK_TEMPLATE, DK_UNION,
 	DK_VARIABLE, DK_VERSION
 } dKind;
 
 static kindOption DKinds [] = {
+	{ TRUE,  'a', "alias",      "aliases"},
 	{ TRUE,  'c', "class",      "classes"},
 	{ TRUE,  'g', "enum",       "enumeration names"},
 	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)"},
@@ -357,8 +358,7 @@ static kindOption DKinds [] = {
 	{ TRUE,  'n', "namespace",  "namespaces"},
 	{ FALSE, 'p', "prototype",  "function prototypes"},
 	{ TRUE,  's', "struct",     "structure names"},
-	{ TRUE,  'T', "template",   "templates"},
-	{ TRUE,  't', "typedef",    "typedefs"},
+	{ TRUE,  't', "template",   "templates"},
 	{ TRUE,  'u', "union",      "union names"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
 	{ TRUE,  'V', "version",    "version statements"}
@@ -969,6 +969,7 @@ static dKind dTagKind (const tagType type)
 	dKind result = DK_UNDEFINED;
 	switch (type)
 	{
+		case TAG_TYPEDEF:    result = DK_ALIAS;           break;
 		case TAG_CLASS:      result = DK_CLASS;           break;
 		case TAG_ENUM:       result = DK_ENUMERATION;     break;
 		case TAG_ENUMERATOR: result = DK_ENUMERATOR;      break;
@@ -983,7 +984,6 @@ static dKind dTagKind (const tagType type)
 		case TAG_PROTOTYPE:  result = DK_PROTOTYPE;       break;
 		case TAG_STRUCT:     result = DK_STRUCT;          break;
 		case TAG_TEMPLATE:   result = DK_TEMPLATE;        break;
-		case TAG_TYPEDEF:    result = DK_TYPEDEF;         break;
 		case TAG_UNION:      result = DK_UNION;           break;
 		case TAG_VARIABLE:   result = DK_VARIABLE;        break;
 		case TAG_VERSION:    result = DK_VERSION;         break;

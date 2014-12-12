@@ -4,7 +4,7 @@
 !_TAG_PROGRAM_NAME	Fishman Ctags	//
 !_TAG_PROGRAM_URL	https://github.com/fishman/ctags	/official site/
 !_TAG_PROGRAM_VERSION	Development	//
-AliasInt	input.d	/^alias AliasInt = int;$/;"	t	file:
+AliasInt	input.d	/^alias AliasInt = int;$/;"	a	file:
 Class	input.d	/^class Class : Interface$/;"	c	file:
 Interface	input.d	/^interface Interface$/;"	i	file:
 Struct	input.d	/^struct Struct$/;"	s	file:
