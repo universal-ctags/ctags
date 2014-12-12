@@ -5,7 +5,7 @@ Release: 1
 License: GPL
 Group: Development/Tools
 Source: http://prdownloads.sourceforge.net/ctags/ctags-%{version}.tar.gz
-URL: http://ctags.sourceforge.net
+URL: http://github.com/exuberant-ctags/ctags
 Buildroot: %{_tmppath}/%{name}-%{version}-root
 
 %description

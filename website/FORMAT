@@ -342,6 +342,7 @@ file, and provided solely for documentation purposes:
 !_TAG_PROGRAM_AUTHOR	{author-name}	/{email-address}/
 !_TAG_PROGRAM_NAME	{program-name}	/optional comment/
 !_TAG_PROGRAM_URL	{URL}	/optional comment/
+!_TAG_PROGRAM_DEVURL	{URL}	/optional comment/
 !_TAG_PROGRAM_VERSION	{version-id}	/optional comment/
 
 

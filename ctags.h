@@ -18,8 +18,9 @@
 # define PROGRAM_VERSION "Development"
 #endif
 #define PROGRAM_NAME      "Exuberant Ctags"
-#define PROGRAM_URL       "https://github.com/fishman/ctags"
-#define PROGRAM_COPYRIGHT "Copyright (C) 1996-2009"
+#define PROGRAM_URL       "http://ctags.sourceforge.net"
+#define PROGRAM_DEVURL    "http://github.com/fishman/ctags"
+#define PROGRAM_COPYRIGHT "Copyright (C) 1996-2015"
 #define AUTHOR_NAME       "Darren Hiebert"
 #define AUTHOR_EMAIL      "dhiebert@users.sourceforge.net"
 

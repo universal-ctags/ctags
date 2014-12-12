@@ -1101,6 +1101,7 @@ static void printProgramIdentification (void)
 	        PROGRAM_COPYRIGHT, AUTHOR_NAME);
 	printf ("  Compiled: %s, %s\n", __DATE__, __TIME__);
 	printf ("  Addresses: <%s>, %s\n", AUTHOR_EMAIL, PROGRAM_URL);
+	printf ("  Development area: %s\n", PROGRAM_DEVURL);
 	printFeatureList ();
 }
 

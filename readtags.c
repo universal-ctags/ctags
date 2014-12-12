@@ -80,6 +80,8 @@ struct sTagFile {
 		char *name;
 			/* URL of distribution */
 		char *url;
+			/* URL of development */
+		char *devurl;
 			/* program version */
 		char *version;
 	} program;
@@ -379,6 +381,7 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 		info->program.author  = NULL;
 		info->program.name    = NULL;
 		info->program.url     = NULL;
+		info->program.devurl  = NULL;
 		info->program.version = NULL;
 	}
 	while (1)
@@ -405,6 +408,8 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 				file->program.name = duplicate (value);
 			else if (strcmp (key, "TAG_PROGRAM_URL") == 0)
 				file->program.url = duplicate (value);
+			else if (strcmp (key, "TAG_PROGRAM_DEVURL") == 0)
+				file->program.devurl = duplicate (value);
 			else if (strcmp (key, "TAG_PROGRAM_VERSION") == 0)
 				file->program.version = duplicate (value);
 			if (info != NULL)
@@ -414,6 +419,7 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 				info->program.author  = file->program.author;
 				info->program.name    = file->program.name;
 				info->program.url     = file->program.url;
+				info->program.devurl  = file->program.devurl;
 				info->program.version = file->program.version;
 			}
 		}
@@ -481,6 +487,8 @@ static void terminate (tagFile *const file)
 		free (file->program.name);
 	if (file->program.url != NULL)
 		free (file->program.url);
+	if (file->program.devurl != NULL)
+		free (file->program.devurl);
 	if (file->program.version != NULL)
 		free (file->program.version);
 	if (file->search.name != NULL)
