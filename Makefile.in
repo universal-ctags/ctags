@@ -317,7 +317,7 @@ tags: $(CTAGS_EXEC)
 TAGS: $(CTAGS_EXEC)
 	./$(CTAGS_EXEC) -e $(srcdir)/*
 
-clean:
+clean: clean-units
 	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB) 
 	rm -f dctags$(EXEEXT) $(READ_CMD)
 	rm -f etyperef$(EXEEXT) etyperef.$(OBJEXT)
@@ -341,8 +341,56 @@ $(addsuffix .$(OBJEXT),$(basename $(notdir $(REGEX_SOURCES)))): ALL_CPPFLAGS += 
 #
 # check
 #
-include $(srcdir)/testing.mak
-check: $(CTAGS_TEST)
-	$(MAKE) -f testing.mak test.units
+CTAGS_TEST = ./$(CTAGS_EXEC)
+ifdef VG
+VALGRIND=--with-valgrind
+endif
+ifdef SHRINK
+RUN_SHRINK=--run-shrink
+endif
+TIMEOUT=
+LANGUAGES=
+CATEGORIES=
+UNITS=
+ifdef TRAVIS
+SHOW_DIFF_OUTPUT=--show-diff-output
+endif
+
+.PHONY: check units fuzz  clean-units
+check: units
+
+#
+# FUZZ Target
+#
+# SHELL must be dash or bash.
+#
+fuzz: TIMEOUT := 1
+fuzz: $(CTAGS_TEST)
+	@ \
+	c="misc/units fuzz \
+		--ctags=$(CTAGS_TEST) \
+		--languages=$(LANGUAGES) \
+		$(VALGRIND) $(RUN_SHRINK) \
+		--with-timeout=$(TIMEOUT)"; \
+	$(SHELL) $${c} Units
+
+#
+# UNITS Target
+#
+units: TIMEOUT := 5
+units: $(CTAGS_TEST)
+	@ \
+	c="misc/units run \
+		--ctags=$(CTAGS_TEST) \
+		--languages=$(LANGUAGES) \
+		--categories=$(CATEGORIES) \
+		--units=$(UNITS) \
+		$(VALGRIND) $(RUN_SHRINK) \
+		--with-timeout=$(TIMEOUT) \
+		$(SHOW_DIFF_OUTPUT)"; \
+	 $(SHELL) $${c} Units
+
+clean-units:
+	$(SHELL) misc/units clean Units
 
 # vi:set tabstop=8:

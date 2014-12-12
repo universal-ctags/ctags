@@ -8,26 +8,11 @@
 CTAGS_TEST = ./ctags
 CTAGS_REF = ./ctags.ref
 TEST_OPTIONS = -nu --c-kinds=+lpx
-
-ifdef VG
-VALGRIND=--with-valgrind
-endif
-ifdef SHRINK
-RUN_SHRINK=--run-shrink
-endif
-TIMEOUT=
-LANGUAGES=
-CATEGORIES=
-UNITS=
-ifdef TRAVIS
-SHOW_DIFF_OUTPUT=--show-diff-output
-endif
-
 DIFF = $(call DIFF_BASE,tags.ref,tags.test,$(DIFF_FILE))
 
-.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units units fuzz clean clean-test clean-units
+.PHONY: test test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux clean clean-test
 
-test: test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux test.units units
+test: test.include test.fields test.extra test.linedir test.etags test.eiffel test.linux
 
 test.%: DIFF_FILE = $@.diff
 
@@ -102,44 +87,9 @@ test.linux: $(CTAGS_TEST) $(CTAGS_REF)
 endif
 
 TEST_ARTIFACTS = test.*.diff tags.ref ctags.ref.exe tags.test
-clean: clean-test clean-units
+clean: clean-test
 clean-test:
 	rm -f $(TEST_ARTIFACTS)
-
-#
-# FUZZ Target
-#
-# SHELL must be dash or bash.
-#
-fuzz: TIMEOUT := 1
-fuzz: $(CTAGS_TEST)
-	@ \
-	c="misc/units fuzz \
-		--ctags=$(CTAGS_TEST) \
-		--languages=$(LANGUAGES) \
-		$(VALGRIND) $(RUN_SHRINK) \
-		--with-timeout=$(TIMEOUT)"; \
-	$(SHELL) $${c} Units
-
-#
-# UNITS Target
-#
-test.units: units
-units: TIMEOUT := 5
-units: $(CTAGS_TEST)
-	@ \
-	c="misc/units run \
-		--ctags=$(CTAGS_TEST) \
-		--languages=$(LANGUAGES) \
-		--categories=$(CATEGORIES) \
-		--units=$(UNITS) \
-		$(VALGRIND) $(RUN_SHRINK) \
-		--with-timeout=$(TIMEOUT) \
-		$(SHOW_DIFF_OUTPUT)"; \
-	 $(SHELL) $${c} Units
-
-clean-units:
-	$(SHELL) misc/units clean Units
 
 # Local Variables:
 # Mode: makefile
