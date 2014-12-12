@@ -70,5 +70,21 @@ bug12(){ :; }
 -EOF
 
 f13(){ :; }
+# quoted empty delimiters are valid
+cat <<''
+bug13(){ :; }
+
+
+f14(){ :; }
+cat <<""
+bug14(){ :; }
+
+
+f15(){ :; }
+cat <<-""
+bug15(){ :; }
+	
+
+f16(){ :; }
 
 fancy

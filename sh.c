@@ -111,6 +111,7 @@ static void findShTags (void)
 			{
 				const unsigned char *start, *end;
 				boolean trimEscapeSequences = FALSE;
+				boolean quoted = FALSE;
 				cp += 2;
 				/* an optional "-" strips leading tabulations from the heredoc lines */
 				if (*cp != '-')
@@ -131,11 +132,13 @@ static void findShTags (void)
 					/* we need not to worry about variable substitution, they
 					 * don't happen in heredoc delimiter definition */
 					trimEscapeSequences = TRUE;
+					quoted = TRUE;
 				}
 				else if (*cp == '\'')
 				{
 					start++;
 					end = cp = skipSingleString (cp);
+					quoted = TRUE;
 				}
 				else
 				{
@@ -143,7 +146,7 @@ static void findShTags (void)
 						cp++;
 					end = cp;
 				}
-				if (end > start)
+				if (end > start || quoted)
 				{
 					hereDocDelimiter = vStringNew ();
 					for (; end > start; start++)
