@@ -539,6 +539,13 @@ static void createTag (tokenInfo *const token)
 {
 	tagEntryInfo tag;
 
+	/* Do nothing it tag name is empty */
+	if (vStringLength (token->name) == 0)
+	{
+		return;
+	}
+
+	/* Create tag */
 	initTagEntryFull(
 			&tag,
 			vStringValue (token->name),
