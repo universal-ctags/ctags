@@ -23,6 +23,8 @@
 #define xCalloc(n,Type)    (Type *)eCalloc((size_t)(n), sizeof (Type))
 #define xRealloc(p,n,Type) (Type *)eRealloc((p), (n) * sizeof (Type))
 
+#define ARRAY_SIZE(X)      (sizeof (X) / sizeof (X[0]))
+
 /*
  *  Portability macros
  */

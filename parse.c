@@ -404,7 +404,7 @@ static vString* determineVimFileType (const char *const modeline)
 	const char* const filetype_prefix[] = {"filetype=", "ft="};
 	vString* const filetype = vStringNew ();
 
-	for (i = 0; i < sizeof(filetype_prefix)/sizeof(filetype_prefix[0]); i++)
+	for (i = 0; i < ARRAY_SIZE(filetype_prefix); i++)
 	{
 		if ((p = strrstr(modeline, filetype_prefix[i])) == NULL)
 			continue;
@@ -457,7 +457,7 @@ static vString* extractVimFileType(FILE* input)
 		if (j < 0)
 			j = RING_SIZE - 1;
 
-		for (k = 0; k < (sizeof(prefix)/sizeof(prefix[0])); k++)
+		for (k = 0; k < ARRAY_SIZE(prefix); k++)
 			if ((p = strstr (vStringValue (ring[j]), prefix[k])) != NULL)
 			{
 				p += strlen(prefix[k]);
@@ -725,7 +725,7 @@ getFileLanguageInternal (const char *const fileName)
 		    GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
 		    language = tasteLanguage(&glc, 
 					     eager_tasters + 1,
-					     sizeof(eager_tasters) / sizeof(eager_tasters[0]) - 1);
+					     ARRAY_SIZE(eager_tasters) - 1);
 	    }
     }
 
@@ -1012,7 +1012,7 @@ extern void initializeParsing (void)
 	unsigned int builtInCount;
 	unsigned int i;
 
-	builtInCount = sizeof (BuiltInParsers) / sizeof (BuiltInParsers [0]);
+	builtInCount = ARRAY_SIZE (BuiltInParsers);
 	LanguageTable = xMalloc (builtInCount, parserDefinition*);
 
 	verbose ("Installing parsers: ");
