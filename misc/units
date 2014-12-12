@@ -1267,7 +1267,7 @@ action_fuzz_common ()
     check_availability find
 
     cmdline="${CTAGS} --options=NONE --\*-kinds=\* --fields=\* --libexec-dir=libexec --data-dir=${DATADIR}"
-    _CMDLINE="${cmdline} -o - "
+    _CMDLINE="${cmdline} -G -o - "
     _CMDLINE_FOR_SHRINKING="${_CMDLINE}"
     if [ "$WITH_VALGRIND" = yes ]; then
 	_CMDLINE="valgrind --leak-check=full --error-exitcode=${_VALGRIND_EXIT} --log-file=%s ${_CMDLINE}"
