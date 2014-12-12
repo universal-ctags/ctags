@@ -343,6 +343,7 @@ run_tcase ()
     local guessed_lang
     local guessed_lang_no_slash
     local cmdline_template
+    local timeout_value
     local tmp
 
 
@@ -390,13 +391,14 @@ run_tcase ()
     cmdline_template="${_CMDLINE} --language-force=${guessed_lang} %s > /dev/null 2>&1"
     _CMDLINE="${_CMDLINE} ${input}"
 
+    timeout_value=$WITH_TIMEOUT
     if [ "$WITH_VALGRIND" = yes ]; then
 	_CMDLINE="valgrind --leak-check=full --error-exitcode=${_VALGRIND_EXIT} --log-file=${ovalgrind} ${_CMDLINE}"
-	WITH_TIMEOUT=$(( WITH_TIMEOUT * ${_VG_TIMEOUT_FACTOR} ))
+	timeout_value=$(( timeout_value * ${_VG_TIMEOUT_FACTOR} ))
     fi
 
-    if ! [ "$WITH_TIMEOUT" = 0 ]; then
-	_CMDLINE="timeout $WITH_TIMEOUT ${_CMDLINE}"
+    if ! [ "$timeout_value" = 0 ]; then
+	_CMDLINE="timeout $timeout_value ${_CMDLINE}"
     fi
 
     {
