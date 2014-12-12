@@ -345,4 +345,16 @@ include $(srcdir)/testing.mak
 check: $(CTAGS_TEST)
 	$(MAKE) -f testing.mak test.units
 
+#
+# dist
+# Creates a tarball named after the current Git tag or revision
+#
+dist:
+	git rev-parse  # this will bail out if not in a Git repository
+	rev=$$(git tag --points-at HEAD); \
+	test -n "$$rev" || rev=$$(git rev-parse --short HEAD); \
+	name="ctags-$$rev"; \
+	git archive --prefix="$$name/" --format tar "$$rev" | \
+		gzip -9 > "$$name.tar.gz"
+
 # vi:set tabstop=8:
