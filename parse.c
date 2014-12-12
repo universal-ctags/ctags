@@ -630,34 +630,17 @@ static langType getPatternLanguage (const char *const baseName,
 /* This function tries to figure out language contained in a file by
  * running a series of tests, trying to find some clues in the file.
  */
-static langType
-tasteLanguage (struct getLangCtx *glc)
-{
-    typedef vString* (*tasteFunction)(FILE *);
-    static const struct {
-        tasteFunction   taste;
+struct taster {
+	vString* (* taste) (FILE *);
         const char     *msg;
-    } tasters[] = {
-        {
-            .taste  = extracEmacsModeAtFirstLine,
-            .msg    = "emacs mode at the first line",
-        },
-        {
-            .taste  = extractInterpreter,
-            .msg    = "interpreter",
-        },
-        {
-            .taste  = extractEmacsModeLanguageAtEOF,
-            .msg    = "emacs mode at the EOF",
-        },
-        {
-            .taste  = extractVimFileType,
-            .msg    = "vim modeline",
-        },
-    };
+};
+
+static langType
+tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n_tasters)
+{
     int i;
 
-    for (i = 0; i < sizeof(tasters) / sizeof(tasters[0]); ++i) {
+    for (i = 0; i < n_tasters; ++i) {
         langType language;
         vString* spec;
         rewind(glc->input);
@@ -673,6 +656,25 @@ tasteLanguage (struct getLangCtx *glc)
     return LANG_IGNORE;
 }
 
+static const struct taster eager_tasters[] = {
+        {
+		.taste  = extractInterpreter,
+		.msg    = "interpreter",
+        },
+        {
+		.taste  = extracEmacsModeAtFirstLine,
+		.msg    = "emacs mode at the first line",
+        },
+        {
+		.taste  = extractEmacsModeLanguageAtEOF,
+		.msg    = "emacs mode at the EOF",
+        },
+        {
+		.taste  = extractVimFileType,
+		.msg    = "vim modeline",
+        },
+};
+
 static langType
 getFileLanguageInternal (const char *const fileName)
 {
@@ -684,6 +686,7 @@ getFileLanguageInternal (const char *const fileName)
     };
     const char* const baseName = baseFilename (fileName);
     char *templateBaseName = NULL;
+    fileStatus *fstatus = NULL;
 
     verbose ("Get file language for %s\n", fileName);
 
@@ -706,14 +709,34 @@ getFileLanguageInternal (const char *const fileName)
         }
     }
 
-    GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
-    language = tasteLanguage(&glc);
+    fstatus = eStat (fileName);
+    if (fstatus && fstatus->exists)
+    {
+	    if (fstatus->isExecutable || Option.guessLanguageEagerly)
+	    {
+		    GLC_FOPEN_IF_NECESSARY (&glc, cleanup);
+		    language = tasteLanguage(&glc, &eager_tasters, 1);
+	    }
+	    if (language != LANG_IGNORE)
+		    goto cleanup;
+
+	    if (Option.guessLanguageEagerly)
+	    {
+		    GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
+		    language = tasteLanguage(&glc, 
+					     eager_tasters + 1,
+					     sizeof(eager_tasters) / sizeof(eager_tasters[0]) - 1);
+	    }
+    }
+
 
   cleanup:
     GLC_FCLOSE(&glc);
+    if (fstatus)
+	    eStatFree (fstatus);
     if (templateBaseName)
         eFree (templateBaseName);
-	return language;
+    return language;
 }
 
 extern langType getFileLanguage (const char *const fileName)

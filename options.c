@@ -169,6 +169,7 @@ optionValues Option = {
 	FALSE,      /* --totals */
 	FALSE,      /* --line-directives */
 	FALSE,	    /* --print-language */
+	FALSE,	    /* --guess-language-eagerly(-G) */
 #ifdef DEBUG
 	0, 0        /* -D, -b */
 #endif
@@ -194,6 +195,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Write tags to specified file. Value of \"-\" writes tags to stdout"},
  {1,"       [\"tags\"; or \"TAGS\" when -e supplied]."},
  {0,"  -F   Use forward searching patterns (/.../) (default)."},
+ {1,"  -G   Equivalent to --guess-language-eagerly."},
  {1,"  -h <list>"},
  {1,"       Specify list of file extensions to be treated as include files."},
  {1,"       [\".h.H.hh.hpp.hxx.h++\"]."},
@@ -243,6 +245,12 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --filter-terminator=string"},
  {1,"       Specify string to print to stdout following the tags for each file"},
  {1,"       parsed when --filter is enabled."},
+ {1,"  --guess-language-eagerly"},
+ {1,"       Guess the language of input file more eagerly: "},
+ {1,"       (but taking longer time for guessing)"},
+ {1,"       o shebang even the input file is not executable,"},
+ {1,"       o emacs mode specificatoin at the beginning and end of input file, and"},
+ {1,"       o vim syntax specificatoin at the end of input file."},
  {0,"  --format=level"},
 #if DEFAULT_FILE_FORMAT == 1
  {0,"       Force output of specified tag file format [1]."},
@@ -2052,6 +2060,7 @@ static booleanOption BooleanOptions [] = {
 	{ "file-scope",     &Option.include.fileScope,      FALSE   },
 	{ "file-tags",      &Option.include.fileNames,      FALSE   },
 	{ "filter",         &Option.filter,                 TRUE    },
+	{ "guess-language-eagerly", &Option.guessLanguageEagerly, TRUE },
 	{ "if0",            &Option.if0,                    FALSE   },
 	{ "kind-long",      &Option.kindLong,               TRUE    },
 	{ "line-directives",&Option.lineDirectives,         FALSE   },
@@ -2222,6 +2231,9 @@ static void processShortOption (
 			break;
 		case 'F':
 			Option.backward = FALSE;
+			break;
+		case 'G':
+			Option.guessLanguageEagerly = TRUE;
 			break;
 		case 'h':
 			processHeaderListOption (*option, parameter);

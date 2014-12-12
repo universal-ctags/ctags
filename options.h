@@ -112,6 +112,7 @@ typedef struct sOptionValues {
 	boolean printTotals;    /* --totals  print cumulative statistics */
 	boolean lineDirectives; /* --linedirectives  process #line directives */
 	boolean printLanguage;  /* --print-language */
+	boolean guessLanguageEagerly; /* --guess-language-eagerly|-G */
 #ifdef DEBUG
 	long debugLevel;        /* -D  debugging output */
 	unsigned long breakLine;/* -b  source line at which to call lineBreak() */
