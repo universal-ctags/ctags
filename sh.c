@@ -39,29 +39,58 @@ static kindOption ShKinds [] = {
 *   FUNCTION DEFINITIONS
 */
 
-/*  Reject any tag "main" from a file named "configure". These appear in
- *  here-documents in GNU autoconf scripts and will add a haystack to the
- *  needle.
- */
-static boolean hackReject (const vString* const tagName)
+static boolean isIdentChar (int c)
 {
-	const char *const scriptName = baseFilename (vStringValue (File.name));
-	boolean result = (boolean) (
-			strcmp (scriptName, "configure") == 0  &&
-			strcmp (vStringValue (tagName), "main") == 0);
-	return result;
+	return (isalnum (c) || c == '_' || c == '-');
+}
+
+static const unsigned char *skipDoubleString (const unsigned char *cp)
+{
+	const unsigned char* prev = cp;
+	cp++;
+	while ((*cp != '"' || *prev == '\\') && *cp != '\0')
+	{
+		prev = cp;
+		cp++;
+	}
+	return cp;
+}
+
+static const unsigned char *skipSingleString (const unsigned char *cp)
+{
+	cp++;
+	while (*cp != '\'' && *cp != '\0')
+		cp++;
+	return cp;
 }
 
 static void findShTags (void)
 {
 	vString *name = vStringNew ();
 	const unsigned char *line;
+	vString *hereDocDelimiter = NULL;
+	boolean hereDocIndented = FALSE;
 
 	while ((line = fileReadLine ()) != NULL)
 	{
 		const unsigned char* cp = line;
 		boolean aliasFound = FALSE;
 		boolean functionFound = FALSE;
+
+		if (hereDocDelimiter)
+		{
+			if (hereDocIndented)
+			{
+				while (*cp == '\t')
+					cp++;
+			}
+			if (strcmp ((const char *) cp, vStringValue (hereDocDelimiter)) == 0)
+			{
+				vStringDelete (hereDocDelimiter);
+				hereDocDelimiter = NULL;
+			}
+			continue;
+		}
 
 		while (*cp != '\0')
 		{
@@ -71,25 +100,63 @@ static void findShTags (void)
 
 			/* jump over strings */
 			if (*cp == '"')
-			{
-				const unsigned char* prev = cp;
-				cp++;
-				while ((*cp != '"' || *prev == '\\') && *cp != '\0')
-				{
-					prev = cp;
-					cp++;
-				}
-			}
+				cp = skipDoubleString (cp);
 			else if (*cp == '\'')
-			{
-				cp++;
-				while (*cp != '\'' && *cp != '\0')
-					cp++;
-			}
-
+				cp = skipSingleString (cp);
 			/* jump over comments */
 			else if (*cp == '#')
 				break;
+			/* jump over here-documents */
+			else if (cp[0] == '<' && cp[1] == '<')
+			{
+				const unsigned char *start, *end;
+				boolean trimEscapeSequences = FALSE;
+				boolean quoted = FALSE;
+				cp += 2;
+				/* an optional "-" strips leading tabulations from the heredoc lines */
+				if (*cp != '-')
+					hereDocIndented = FALSE;
+				else
+				{
+					hereDocIndented = TRUE;
+					cp++;
+				}
+				while (isspace (*cp))
+					cp++;
+				start = end = cp;
+				/* the delimiter can be surrounded by quotes */
+				if (*cp == '"')
+				{
+					start++;
+					end = cp = skipDoubleString (cp);
+					/* we need not to worry about variable substitution, they
+					 * don't happen in heredoc delimiter definition */
+					trimEscapeSequences = TRUE;
+					quoted = TRUE;
+				}
+				else if (*cp == '\'')
+				{
+					start++;
+					end = cp = skipSingleString (cp);
+					quoted = TRUE;
+				}
+				else
+				{
+					while (isIdentChar ((int) *cp))
+						cp++;
+					end = cp;
+				}
+				if (end > start || quoted)
+				{
+					hereDocDelimiter = vStringNew ();
+					for (; end > start; start++)
+					{
+						if (trimEscapeSequences && *start == '\\')
+							start++;
+						vStringPut (hereDocDelimiter, *start);
+					}
+				}
+			}
 
 			if (strncmp ((const char*) cp, "function", (size_t) 8) == 0  &&
 				isspace ((int) cp [8]))
@@ -110,14 +177,14 @@ static void findShTags (void)
 			}
 
 			// Get the name of the function or alias.
-			if (! (isalnum ((int) *cp) || *cp == '_' || *cp == '-'))
+			if (! isIdentChar ((int) *cp))
 			{
 				aliasFound = FALSE;
 				functionFound = FALSE;
 				++cp;
 				continue;
 			}
-			while (isalnum ((int) *cp) || *cp == '_' || *cp == '-')
+			while (isIdentChar ((int) *cp))
 			{
 				vStringPut (name, (int) *cp);
 				++cp;
@@ -126,11 +193,12 @@ static void findShTags (void)
 
 			while (isspace ((int) *cp))
 				++cp;
-			if (*cp++ == '(')
+			if (*cp == '(')
 			{
+				++cp;
 				while (isspace ((int) *cp))
 					++cp;
-				if (*cp == ')'  && ! hackReject (name))
+				if (*cp == ')')
 				{
 					functionFound = TRUE;
 					++cp;
@@ -150,6 +218,8 @@ static void findShTags (void)
 		}
 	}
 	vStringDelete (name);
+	if (hereDocDelimiter)
+		vStringDelete (hereDocDelimiter);
 }
 
 extern parserDefinition* ShParser (void)
