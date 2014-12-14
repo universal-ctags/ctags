@@ -608,9 +608,9 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 
 	n_candidates = (*nominate)(spec, &candidates);
 
+	verbose ("		#candidates: %u\n", n_candidates);
 	if (n_candidates == 1)
 	{
-		verbose ("		#candidates: %u\n", n_candidates);
 		language = candidates[0].lang;
 	}
 	else if (n_candidates > 1)
@@ -621,7 +621,6 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 					 ARRAY_SIZE(eager_tasters));
 		if (language == LANG_IGNORE)
 		{
-			verbose ("		#candidates: %u\n", n_candidates);
 			rewind(glc->input);
 			language = getTwoGramLanguage(glc->input, candidates, n_candidates);
 			if (language == LANG_IGNORE)
