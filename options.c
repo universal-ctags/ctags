@@ -249,8 +249,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Guess the language of input file more eagerly: "},
  {1,"       (but taking longer time for guessing)"},
  {1,"       o shebang even the input file is not executable,"},
- {1,"       o emacs mode specificatoin at the beginning and end of input file, and"},
- {1,"       o vim syntax specificatoin at the end of input file."},
+ {1,"       o emacs mode specification at the beginning and end of input file, and"},
+ {1,"       o vim syntax specification at the end of input file."},
  {0,"  --format=level"},
 #if DEFAULT_FILE_FORMAT == 1
  {0,"       Force output of specified tag file format [1]."},
