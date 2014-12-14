@@ -576,8 +576,57 @@ struct getLangCtx {
     }                                                       \
 } while (0)
 
+static const struct taster {
+	vString* (* taste) (FILE *);
+        const char     *msg;
+} eager_tasters[] = {
+        {
+		.taste  = extractInterpreter,
+		.msg    = "interpreter",
+        },
+        {
+		.taste  = extracEmacsModeAtFirstLine,
+		.msg    = "emacs mode at the first line",
+        },
+        {
+		.taste  = extractEmacsModeLanguageAtEOF,
+		.msg    = "emacs mode at the EOF",
+        },
+        {
+		.taste  = extractVimFileType,
+		.msg    = "vim modeline",
+        },
+};
+static langType tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n_tasters);
+
+
+static langType arbitrateByTwoGram (struct getLangCtx *glc, parserCandidate  *candidates,
+					      unsigned int n_candidates)
+{
+	langType language;
+
+	rewind (glc->input);
+	language = getTwoGramLanguage (glc->input, candidates, n_candidates);
+	if (language == LANG_IGNORE)
+		language = candidates[0].lang;
+	return language;
+}
+
+static langType arbitrateByTastingAndTwoGram (struct getLangCtx *glc, parserCandidate  *candidates,
+					      unsigned int n_candidates)
+{
+	langType language = tasteLanguage (glc,
+					   eager_tasters,
+					   ARRAY_SIZE(eager_tasters));
+	if (language == LANG_IGNORE)
+		language = arbitrateByTwoGram (glc, candidates, n_candidates);
+	return language;
+}
+
 static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx *glc,
-				       unsigned int nominate (const char *const, parserCandidate**))
+				       unsigned int nominate (const char *const, parserCandidate**),
+				       langType arbitrate (struct getLangCtx *, parserCandidate  *,
+							   unsigned int))
 {
 	langType language;
 	parserCandidate  *candidates;
@@ -593,9 +642,7 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 	else if (n_candidates > 1)
 	{
 		GLC_FOPEN_IF_NECESSARY(glc, fopen_error);
-		language = getTwoGramLanguage(glc->input, candidates, n_candidates);
-		if (language == LANG_IGNORE)
-			language = candidates[0].lang;
+		language = arbitrate (glc, candidates, n_candidates);
 		/* At this point we are guaranteed that a language has been
 		 * selected:
 		 */
@@ -616,24 +663,21 @@ fopen_error:
 static langType getSpecLanguage (const char *const spec,
                                  struct getLangCtx *glc)
 {
-	return getSpecLanguageCommon(spec, glc, nominateLanguageCandidates);
+	return getSpecLanguageCommon(spec, glc, nominateLanguageCandidates,
+				     arbitrateByTwoGram);
 }
 
 static langType getPatternLanguage (const char *const baseName,
                                     struct getLangCtx *glc)
 {
 	return getSpecLanguageCommon(baseName, glc,
-                                 nominateLanguageCandidatesForPattern);
+				     nominateLanguageCandidatesForPattern,
+				     arbitrateByTastingAndTwoGram);
 }
 
 /* This function tries to figure out language contained in a file by
  * running a series of tests, trying to find some clues in the file.
  */
-struct taster {
-	vString* (* taste) (FILE *);
-        const char     *msg;
-};
-
 static langType
 tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n_tasters)
 {
@@ -654,25 +698,6 @@ tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n
 
     return LANG_IGNORE;
 }
-
-static const struct taster eager_tasters[] = {
-        {
-		.taste  = extractInterpreter,
-		.msg    = "interpreter",
-        },
-        {
-		.taste  = extracEmacsModeAtFirstLine,
-		.msg    = "emacs mode at the first line",
-        },
-        {
-		.taste  = extractEmacsModeLanguageAtEOF,
-		.msg    = "emacs mode at the EOF",
-        },
-        {
-		.taste  = extractVimFileType,
-		.msg    = "vim modeline",
-        },
-};
 
 static langType
 getFileLanguageInternal (const char *const fileName)
