@@ -538,7 +538,7 @@ extern void verbose (const char *const format, ...)
 	{
 		va_list ap;
 		va_start (ap, format);
-		vprintf (format, ap);
+		vfprintf (stderr, format, ap);
 		va_end (ap);
 	}
 }
@@ -863,9 +863,9 @@ static void addExtensionList (
 	}
 	if (Option.verbose)
 	{
-		printf ("\n      now: ");
-		stringListPrint (slist);
-		putchar ('\n');
+		fprintf (stderr, "\n      now: ");
+		stringListPrint (slist, stderr);
+		putc ('\n', stderr);
 	}
 	eFree (extensionList);
 }
@@ -1755,9 +1755,9 @@ static void installHeaderListDefaults (void)
 	Option.headerExt = stringListNewFromArgv (HeaderExtensions);
 	if (Option.verbose)
 	{
-		printf ("    Setting default header extensions: ");
-		stringListPrint (Option.headerExt);
-		putchar ('\n');
+		fprintf (stderr, "    Setting default header extensions: ");
+		stringListPrint (Option.headerExt, stderr);
+		putc ('\n', stderr);
 	}
 }
 

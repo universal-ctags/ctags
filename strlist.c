@@ -306,12 +306,12 @@ extern vString* stringListFileFinds (
 	return matched? vstr: NULL;
 }
 
-extern void stringListPrint (const stringList *const current)
+extern void stringListPrint (const stringList *const current, FILE *fp)
 {
 	unsigned int i;
 	Assert (current != NULL);
 	for (i = 0  ;  i < current->count  ;  ++i)
-		printf ("%s%s", (i > 0) ? ", " : "", vStringValue (current->list [i]));
+		fprintf (fp, "%s%s", (i > 0) ? ", " : "", vStringValue (current->list [i]));
 }
 
 extern void stringListReverse (const stringList *const current)
