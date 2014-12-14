@@ -615,7 +615,7 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 	}
 	else if (n_candidates > 1)
 	{
-        GLC_FOPEN_IF_NECESSARY(glc, fopen_error);
+		GLC_FOPEN_IF_NECESSARY(glc, fopen_error);
 		language = tasteLanguage(glc,
 					 eager_tasters,
 					 ARRAY_SIZE(eager_tasters));
@@ -627,10 +627,10 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 			if (language == LANG_IGNORE)
 				language = candidates[0].lang;
 		}
-        /* At this point we are guaranteed that a language has been
-         * selected:
-         */
-        Assert(language != LANG_IGNORE && language != LANG_AUTO);
+		/* At this point we are guaranteed that a language has been
+		 * selected:
+		 */
+		Assert(language != LANG_IGNORE && language != LANG_AUTO);
 	}
 	else
 	{
