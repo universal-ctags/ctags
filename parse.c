@@ -715,7 +715,7 @@ getFileLanguageInternal (const char *const fileName)
 	    if (fstatus->isExecutable || Option.guessLanguageEagerly)
 	    {
 		    GLC_FOPEN_IF_NECESSARY (&glc, cleanup);
-		    language = tasteLanguage(&glc, &eager_tasters, 1);
+		    language = tasteLanguage(&glc, eager_tasters, 1);
 	    }
 	    if (language != LANG_IGNORE)
 		    goto cleanup;
