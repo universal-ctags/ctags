@@ -160,7 +160,7 @@ called modelines. The line is inserted by a user of the text editor and can
 be used to set the file type (Vim) or mode (emacs).
 
 fishman-ctags also recognizes these modeline and selects a language parser
-based on it.
+based on it if ``--guess-language-eagerly`` (or ``-G``) option is given.
 
 
 ctags recognizes the following patterns used in emacs:
@@ -193,6 +193,12 @@ ctags recognizes the following patterns used in vim:
       ex:se ft=SYNTAX
 
 
+NOTE: This feature takes some costs, opening the input file
+before parsing, than selecting a parser by the input
+file name. So this feature is enabled only if the option
+is given. If you like this feature, you can put
+``--guess-language-eagerly`` to your .ctags.
+
 Better parser selection for template files
 ---------------------------------------------------------------------
 Consider an input file name *foo.c.in*.  Suffix *.in* is popular as a
@@ -205,10 +211,10 @@ finds *.in* as suffix, fishman-ctags checks the next suffix, here *.c*.
 
 Dry running
 ---------------------------------------------------------------------
-With ``--guess-parser`` option, you can test the parser selector of
+With ``--print-language`` option, you can test the parser selector of
 ctags. e.g.::
 
-	$ ./ctags --guess-parser main.c
+	$ ./ctags --print-language main.c
 	main.c: C
 
 If no parser is selected, ``NONE`` is printed as parser name.

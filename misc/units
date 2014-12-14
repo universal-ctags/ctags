@@ -363,7 +363,7 @@ run_tcase ()
     #
     # Filtered by LANGUAGES
     #
-    guessed_lang=$( ${_CMDLINE} --guess-parser "$input" 2>/dev/null | sed -nr 's/^.*: (.+)$/\1/p')
+    guessed_lang=$( ${_CMDLINE} --print-language "$input" 2>/dev/null | sed -nr 's/^.*: (.+)$/\1/p')
     if [ -n "${LANGUAGES}" ]; then
 	member_p "${guessed_lang}" ${LANGUAGES} || return 1
     fi
@@ -1267,7 +1267,7 @@ action_fuzz_common ()
     check_availability find
 
     cmdline="${CTAGS} --options=NONE --\*-kinds=\* --fields=\* --libexec-dir=libexec --data-dir=${DATADIR}"
-    _CMDLINE="${cmdline} -o - "
+    _CMDLINE="${cmdline} -G -o - "
     _CMDLINE_FOR_SHRINKING="${_CMDLINE}"
     if [ "$WITH_VALGRIND" = yes ]; then
 	_CMDLINE="valgrind --leak-check=full --error-exitcode=${_VALGRIND_EXIT} --log-file=%s ${_CMDLINE}"
@@ -1452,7 +1452,7 @@ noise_lang_file ()
     local offset
     local guessed_lang
 
-    guessed_lang=$( ${_CMDLINE_FOR_SHRINKING} --guess-parser "${input}" 2>/dev/null | sed -nr 's/^.*: (.+)$/\1/p')
+    guessed_lang=$( ${_CMDLINE_FOR_SHRINKING} --print-language "${input}" 2>/dev/null | sed -nr 's/^.*: (.+)$/\1/p')
     if [ "${lang}" !=  "${guessed_lang}" ]; then
 	return 0
     fi
