@@ -2944,7 +2944,7 @@ static rescanReason findCTags (const unsigned int passCount)
 	rescanReason rescan;
 
 	Assert (passCount < 3);
-	cppInit ((boolean) (passCount > 1), isLanguage (Lang_csharp));
+	cppInit ((boolean) (passCount > 1), isLanguage (Lang_csharp), isLanguage(Lang_vera));
 	Signature = vStringNew ();
 
 	exception = (exception_t) setjmp (Exception);
