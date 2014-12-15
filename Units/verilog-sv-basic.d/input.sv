@@ -5,6 +5,17 @@
 `define DEF_WITH_EQ = 1'd100
 `define DEF_VALUE   1'd100
 
+class test;
+    reg a;
+    logic b;
+    function mult (a, input b = 0);
+        return a * b;
+    endfunction : mult
+
+    extern virtual function void extern_func (input bit a, input b);
+
+endclass : test
+
 module mod#(
     parameter PARAM1 = 10,
     parameter PARAM2 = 2.0
@@ -29,7 +40,7 @@ localparam STATE1 = 4'h0,
 
 real k;
 integer l;
-reg signed [3:0] scounter;
+test t;
 
 task add (
     input x, y,
@@ -38,14 +49,12 @@ task add (
     z = x + y;
 endtask
 
-function integer mult (
+function mult (
     input x,
     input y);
-    mult = x * y;
-endfunction
-
-function [1:0] func_with_range (k, l);
-    func_with_range = {k, l};
+    reg temp;
+    temp = x * y;
+    return temp;
 endfunction
 
 endmodule // mod

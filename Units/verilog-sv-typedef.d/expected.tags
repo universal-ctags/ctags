@@ -1,0 +1,8 @@
+myType	input.sv	/^} myType;$/;"	T
+myType2	input.sv	/^typedef classname#(paramvalue) myType2;$/;"	T
+type_class	input.sv	/^typedef class type_class;$/;"	T
+type_enum	input.sv	/^typedef enum type_enum;$/;"	T
+type_interface_class	input.sv	/^typedef interface class type_interface_class;$/;"	T
+type_struct	input.sv	/^typedef struct type_struct;$/;"	T
+type_union	input.sv	/^typedef union type_union;$/;"	T
+type_unnamed	input.sv	/^typedef type_unnamed;$/;"	T

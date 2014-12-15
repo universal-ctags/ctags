@@ -18,8 +18,11 @@ c	input.v	/^    b,c,$/;"	p	module:mod
 d	input.v	/^    d ,$/;"	p	module:mod
 e	input.v	/^    output wire e ,$/;"	p	module:mod
 f	input.v	/^    output reg f,$/;"	p	module:mod
+func_with_range	input.v	/^function [1:0] func_with_range (k, l);$/;"	f	module:mod
 g	input.v	/^    inout wire g$/;"	p	module:mod
+k	input.v	/^function [1:0] func_with_range (k, l);$/;"	p	function:mod.func_with_range
 k	input.v	/^real k;$/;"	r	module:mod
+l	input.v	/^function [1:0] func_with_range (k, l);$/;"	p	function:mod.func_with_range
 l	input.v	/^integer l;$/;"	r	module:mod
 mod	input.v	/^module mod#($/;"	m
 mod.LOCALPARAM	input.v	/^localparam LOCALPARAM = 2**2;$/;"	c	module:mod
@@ -42,14 +45,17 @@ mod.c	input.v	/^    b,c,$/;"	p	module:mod
 mod.d	input.v	/^    d ,$/;"	p	module:mod
 mod.e	input.v	/^    output wire e ,$/;"	p	module:mod
 mod.f	input.v	/^    output reg f,$/;"	p	module:mod
+mod.func_with_range	input.v	/^function [1:0] func_with_range (k, l);$/;"	f	module:mod
+mod.func_with_range.k	input.v	/^function [1:0] func_with_range (k, l);$/;"	p	function:mod.func_with_range
+mod.func_with_range.l	input.v	/^function [1:0] func_with_range (k, l);$/;"	p	function:mod.func_with_range
 mod.g	input.v	/^    inout wire g$/;"	p	module:mod
 mod.k	input.v	/^real k;$/;"	r	module:mod
 mod.l	input.v	/^integer l;$/;"	r	module:mod
-mod.mult	input.v	/^function mult ($/;"	f	module:mod
+mod.mult	input.v	/^function integer mult ($/;"	f	module:mod
 mod.mult.x	input.v	/^    input x,$/;"	p	function:mod.mult
 mod.mult.y	input.v	/^    input y);$/;"	p	function:mod.mult
 mod.scounter	input.v	/^reg signed [3:0] scounter;$/;"	r	module:mod
-mult	input.v	/^function mult ($/;"	f	module:mod
+mult	input.v	/^function integer mult ($/;"	f	module:mod
 scounter	input.v	/^reg signed [3:0] scounter;$/;"	r	module:mod
 x	input.v	/^    input x, y,$/;"	p	task:mod.add
 x	input.v	/^    input x,$/;"	p	function:mod.mult

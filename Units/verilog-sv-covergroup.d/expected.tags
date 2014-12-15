@@ -1,0 +1,20 @@
+deferred_assertion1	input.sv	/^    deferred_assertion1 : assert #0 () task();$/;"	A	covergroup:test
+deferred_assertion2	input.sv	/^    deferred_assertion2 : assert final () task();$/;"	A	covergroup:test
+deferred_assume1	input.sv	/^    deferred_assume1    : assume #0 () task();$/;"	A	covergroup:test
+deferred_assume2	input.sv	/^    deferred_assume2    : assume final () task();$/;"	A	covergroup:test
+deferred_cover1	input.sv	/^    deferred_cover1     : cover #0 () task();$/;"	A	covergroup:test
+deferred_cover2	input.sv	/^    deferred_cover2     : cover final () task();$/;"	A	covergroup:test
+immediate_assertion	input.sv	/^    immediate_assertion : assert () task();$/;"	A	covergroup:test
+immediate_assume	input.sv	/^    immediate_assume    : assume () task();$/;"	A	covergroup:test
+immediate_cover	input.sv	/^    immediate_cover     : cover () task();$/;"	A	covergroup:test
+test	input.sv	/^covergroup test;$/;"	V
+test.deferred_assertion1	input.sv	/^    deferred_assertion1 : assert #0 () task();$/;"	A	covergroup:test
+test.deferred_assertion2	input.sv	/^    deferred_assertion2 : assert final () task();$/;"	A	covergroup:test
+test.deferred_assume1	input.sv	/^    deferred_assume1    : assume #0 () task();$/;"	A	covergroup:test
+test.deferred_assume2	input.sv	/^    deferred_assume2    : assume final () task();$/;"	A	covergroup:test
+test.deferred_cover1	input.sv	/^    deferred_cover1     : cover #0 () task();$/;"	A	covergroup:test
+test.deferred_cover2	input.sv	/^    deferred_cover2     : cover final () task();$/;"	A	covergroup:test
+test.immediate_assertion	input.sv	/^    immediate_assertion : assert () task();$/;"	A	covergroup:test
+test.immediate_assume	input.sv	/^    immediate_assume    : assume () task();$/;"	A	covergroup:test
+test.immediate_cover	input.sv	/^    immediate_cover     : cover () task();$/;"	A	covergroup:test
+var_to_check_context	input.sv	/^reg var_to_check_context;$/;"	r

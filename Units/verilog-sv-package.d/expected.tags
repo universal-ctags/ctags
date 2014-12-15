@@ -1,0 +1,16 @@
+MyData	input.sv	/^    } MyData;$/;"	T	package:MyPackage
+MyPackage	input.sv	/^package MyPackage;$/;"	K
+MyPackage.MyData	input.sv	/^    } MyData;$/;"	T	package:MyPackage
+MyPackage.add	input.sv	/^    function MyData add(MyData x, y);$/;"	f	package:MyPackage
+MyPackage.add.x	input.sv	/^    function MyData add(MyData x, y);$/;"	p	function:MyPackage.add
+MyPackage.add.y	input.sv	/^    function MyData add(MyData x, y);$/;"	p	function:MyPackage.add
+MyPackage.mul	input.sv	/^    function MyData mul(MyData x, y);$/;"	f	package:MyPackage
+MyPackage.mul.x	input.sv	/^    function MyData mul(MyData x, y);$/;"	p	function:MyPackage.mul
+MyPackage.mul.y	input.sv	/^    function MyData mul(MyData x, y);$/;"	p	function:MyPackage.mul
+add	input.sv	/^    function MyData add(MyData x, y);$/;"	f	package:MyPackage
+mul	input.sv	/^    function MyData mul(MyData x, y);$/;"	f	package:MyPackage
+var_to_check_context	input.sv	/^reg var_to_check_context;$/;"	r
+x	input.sv	/^    function MyData add(MyData x, y);$/;"	p	function:MyPackage.add
+x	input.sv	/^    function MyData mul(MyData x, y);$/;"	p	function:MyPackage.mul
+y	input.sv	/^    function MyData add(MyData x, y);$/;"	p	function:MyPackage.add
+y	input.sv	/^    function MyData mul(MyData x, y);$/;"	p	function:MyPackage.mul

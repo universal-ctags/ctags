@@ -1,0 +1,33 @@
+DEFINE	input.v	/^`define DEFINE$/;"	c
+DEF_VALUE	input.v	/^`define DEF_VALUE   1'd100$/;"	c
+DEF_WITH_EQ	input.v	/^`define DEF_WITH_EQ = 1'd100$/;"	c
+LOCALPARAM	input.v	/^localparam LOCALPARAM = 2**2;$/;"	c
+PARAM	input.v	/^parameter PARAM = 1;$/;"	c
+STATE1	input.v	/^localparam STATE1 = 4'h0,$/;"	c
+STATE2	input.v	/^           STATE2 = 4'h1,$/;"	c
+STATE3	input.v	/^           STATE3 = 4'h2,$/;"	c
+STATE4	input.v	/^           STATE4 = 4'h5    ,$/;"	c
+STATE5	input.v	/^           STATE5 = 4'h6    ,$/;"	c
+STATE6	input.v	/^           STATE6 = 4'h7    ,$/;"	c
+STATE7	input.v	/^           STATE7 = 4'h8;$/;"	c
+a	input.v	/^wire a,b,c,d,e;$/;"	n
+add	input.v	/^task add;$/;"	t
+add.x	input.v	/^    input x, y;$/;"	p	task:add
+add.y	input.v	/^    input x, y;$/;"	p	task:add
+add.z	input.v	/^    output z;$/;"	p	task:add
+b	input.v	/^wire a,b,c,d,e;$/;"	n
+c	input.v	/^wire a,b,c,d,e;$/;"	n
+d	input.v	/^wire a,b,c,d,e;$/;"	n
+e	input.v	/^wire a,b,c,d,e;$/;"	n
+f	input.v	/^reg f;$/;"	r
+g	input.v	/^wire g;$/;"	n
+k	input.v	/^real k;$/;"	r
+l	input.v	/^integer l;$/;"	r
+mult	input.v	/^function mult;$/;"	f
+mult.x	input.v	/^    input x;$/;"	p	function:mult
+mult.y	input.v	/^    input y;$/;"	p	function:mult
+x	input.v	/^    input x, y;$/;"	p	task:add
+x	input.v	/^    input x;$/;"	p	function:mult
+y	input.v	/^    input x, y;$/;"	p	task:add
+y	input.v	/^    input y;$/;"	p	function:mult
+z	input.v	/^    output z;$/;"	p	task:add
