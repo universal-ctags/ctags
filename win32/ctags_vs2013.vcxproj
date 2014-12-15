@@ -116,6 +116,7 @@
     <ClCompile Include="..\go.c" />
     <ClCompile Include="..\html.c" />
     <ClCompile Include="..\jscript.c" />
+    <ClCompile Include="..\json.c" />
     <ClCompile Include="..\keyword.c" />
     <ClCompile Include="..\lisp.c" />
     <ClCompile Include="..\lregex.c" />

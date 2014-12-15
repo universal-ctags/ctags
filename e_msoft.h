@@ -51,6 +51,8 @@
 # define HAVE__FINDFIRST 1
 # define HAVE_DIRECT_H 1
 
+#define snprintf _snprintf
+
 # if _MSC_VER >= 1300
 #  define findfirst_t intptr_t  /* Visual Studio 7 */
 # else
