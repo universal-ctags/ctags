@@ -167,6 +167,13 @@ etyperef.o: eiffel.c
 
 $(OBJECTS): $(HEADERS) config.h Makefile
 
+# Regenerate the Makefile whenever this file (it's source) changed.  Any target
+# should trigger this as it may affect their rules.  This implementation only
+# works with GNU make but should be harmless for other implementations.
+%: Makefile
+Makefile: Makefile.in config.status
+	./config.status --file $@
+
 #
 # generic install rules
 #
