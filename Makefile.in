@@ -349,12 +349,30 @@ check: $(CTAGS_TEST)
 # dist
 # Creates a tarball named after the current Git tag or revision
 #
-dist: check
+dist:
 	git rev-parse  # this will bail out if not in a Git repository
 	rev=$$(git tag --points-at HEAD); \
 	test -n "$$rev" || rev=$$(git rev-parse --short HEAD); \
 	name="ctags-$$rev"; \
+	archive="$$name.tar.gz"; \
 	git archive --prefix="$$name/" --format tar "$$rev" | \
-		gzip -9 > "$$name.tar.gz"
+		gzip -9 > "$$archive" && \
+	\
+	farchive="$$PWD/$$archive" && \
+	tmpdir=$$(mktemp -d) && \
+	echo "* now testing $$archive (in $$tmpdir)" && \
+	trap "rm -fr '$$tmpdir/$$name' && rmdir '$$tmpdir'" INT QUIT TERM EXIT && \
+	(	cd "$$tmpdir" && \
+		tar -xf "$$farchive" && \
+		cd "$$name" && \
+		autoreconf -vfi && \
+		./configure --prefix="$$PWD/_install" && \
+		$(MAKE) && \
+		$(MAKE) check && \
+		$(MAKE) install \
+	) && \
+	echo && \
+	echo "All is well!  The archive $$archive is ready for distribution" | \
+		sed 'h;s/./=/g;p;x;p;g'
 
 # vi:set tabstop=8:
