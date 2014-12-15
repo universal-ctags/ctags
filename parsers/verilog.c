@@ -422,41 +422,6 @@ static int skipPastMatch (const char *const pair)
 	return vGetc ();
 }
 
-static void skipToEOL (void)
-{
-	int c;
-	do
-	{
-		c = vGetc ();
-	} while (c != EOF && c != '\n');
-}
-
-static void skipComments (int c)
-{
-	int p;
-
-	if (c == '/')
-	{
-		c = vGetc ();
-		if (c == '/')
-		{
-			skipToEOL ();
-		}
-		else if (c == '*')
-		{
-			do
-			{
-				p = c;
-				c = vGetc ();
-			} while (c != EOF && p != '*' && c != '/');
-		}
-		else
-		{
-			vUngetc (c);
-		}
-	}
-}
-
 static void skipToSemiColon (void)
 {
 	int c;
@@ -1082,9 +1047,6 @@ static void findVerilogTags (void)
 		c = skipWhite (c);
 		switch (c)
 		{
-			case '/':
-				skipComments (c);
-				break;
 			/* Store current block name whenever a : is found
 			 * This is used later by any tag type that requires this information
 			 * */
