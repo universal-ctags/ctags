@@ -204,6 +204,9 @@
     <ClCompile Include="..\flags.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\json.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\e_msoft.h">
