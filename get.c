@@ -64,6 +64,8 @@ typedef struct sCppState {
 	int		ungetch, ungetch2;   /* ungotten characters, if any */
 	boolean resolveRequired;     /* must resolve if/else/elif/endif branch */
 	boolean hasAtLiteralStrings; /* supports @"c:\" strings */
+	boolean hasSingleQuoteLiteralNumbers; /* supports vera number literals:
+						 'h..., 'o..., 'd..., and 'b... */
 	struct sDirective {
 		enum eState state;       /* current directive being processed */
 		boolean	accept;          /* is a directive syntactically permitted? */
@@ -85,6 +87,7 @@ static cppState Cpp = {
 	'\0', '\0',  /* ungetch characters */
 	FALSE,       /* resolveRequired */
 	FALSE,       /* hasAtLiteralStrings */
+	FALSE,	     /* hasSingleQuoteLiteralNumbers */
 	{
 		DRCTV_NONE,  /* state */
 		FALSE,       /* accept */
@@ -108,7 +111,8 @@ extern unsigned int getDirectiveNestLevel (void)
 	return Cpp.directive.nestLevel;
 }
 
-extern void cppInit (const boolean state, const boolean hasAtLiteralStrings)
+extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
+		     const boolean hasSingleQuoteLiteralNumbers)
 {
 	BraceFormat = state;
 
@@ -116,6 +120,7 @@ extern void cppInit (const boolean state, const boolean hasAtLiteralStrings)
 	Cpp.ungetch2        = '\0';
 	Cpp.resolveRequired = FALSE;
 	Cpp.hasAtLiteralStrings = hasAtLiteralStrings;
+	Cpp.hasSingleQuoteLiteralNumbers = hasSingleQuoteLiteralNumbers;
 
 	Cpp.directive.state     = DRCTV_NONE;
 	Cpp.directive.accept    = TRUE;
@@ -515,12 +520,15 @@ static int skipToEndOfChar (void)
 			fileUngetc (c);
 			break;
 		}
-		else if (count == 1  &&  strchr ("DHOB", toupper (c)) != NULL)
-			veraBase = c;
-		else if (veraBase != '\0'  &&  ! isalnum (c))
+		else if (Cpp.hasSingleQuoteLiteralNumbers)
 		{
-			fileUngetc (c);
-			break;
+			if (count == 1  &&  strchr ("DHOB", toupper (c)) != NULL)
+				veraBase = c;
+			else if (veraBase != '\0'  &&  ! isalnum (c))
+			{
+				fileUngetc (c);
+				break;
+			}
 		}
 	}
 	return CHAR_SYMBOL;  /* symbolic representation of character */
