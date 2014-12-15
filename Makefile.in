@@ -349,7 +349,7 @@ check: $(CTAGS_TEST)
 # dist
 # Creates a tarball named after the current Git tag or revision
 #
-dist:
+dist: check
 	git rev-parse  # this will bail out if not in a Git repository
 	rev=$$(git tag --points-at HEAD); \
 	test -n "$$rev" || rev=$$(git rev-parse --short HEAD); \
