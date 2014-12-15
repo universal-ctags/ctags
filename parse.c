@@ -761,7 +761,7 @@ static void foreachLanguage(languageCallback callback, void *user_data)
 	}
 }
 
-extern void printLanguageMap (const langType language)
+extern void printLanguageMap (const langType language, FILE *fp)
 {
 	boolean first = TRUE;
 	unsigned int i;
@@ -769,15 +769,15 @@ extern void printLanguageMap (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	for (i = 0  ;  map != NULL  &&  i < stringListCount (map)  ;  ++i)
 	{
-		printf ("%s(%s)", (first ? "" : " "),
-				vStringValue (stringListItem (map, i)));
+		fprintf (fp, "%s(%s)", (first ? "" : " "),
+			 vStringValue (stringListItem (map, i)));
 		first = FALSE;
 	}
 	map = LanguageTable [language]->currentExtensions;
 	for (i = 0  ;  map != NULL  &&  i < stringListCount (map)  ;  ++i)
 	{
-		printf ("%s.%s", (first ? "" : " "),
-				vStringValue (stringListItem (map, i)));
+		fprintf (fp, "%s.%s", (first ? "" : " "),
+			 vStringValue (stringListItem (map, i)));
 		first = FALSE;
 	}
 }
@@ -807,7 +807,7 @@ extern void installLanguageMapDefault (const langType language)
 			stringListNewFromArgv (lang->extensions);
 	}
 	if (Option.verbose)
-		printLanguageMap (language);
+		printLanguageMap (language, stderr);
 	verbose ("\n");
 }
 
@@ -821,7 +821,7 @@ extern void installLanguageMapDefaults (void)
 	}
 }
 
-static void printAliases (const langType language);
+static void printAliases (const langType language, FILE *fp);
 extern void installLanguageAliasesDefault (const langType language)
 {
 	parserDefinition* lang;
@@ -838,7 +838,7 @@ extern void installLanguageAliasesDefault (const langType language)
 			stringListNewFromArgv (lang->aliases);
 	}
 	if (Option.verbose)
-		printAliases (language);
+		printAliases (language, stderr);
 	verbose ("\n");
 }
 extern void installLanguageAliasesDefaults (void)
@@ -1411,7 +1411,7 @@ static void printMaps (const langType language)
 	putchar ('\n');
 }
 
-static void printAliases (const langType language)
+static void printAliases (const langType language, FILE *fp)
 {
 	const parserDefinition* lang;
 	unsigned int i;
@@ -1420,7 +1420,7 @@ static void printAliases (const langType language)
 
 	if (lang->currentAliaes != NULL)
 		for (i = 0  ;  i < stringListCount (lang->currentAliaes)  ;  ++i)
-			printf (" %s", vStringValue (
+			fprintf (fp, " %s", vStringValue (
 					stringListItem (lang->currentAliaes, i)));
 }
 
@@ -1451,7 +1451,7 @@ extern void printLanguageAliases (const langType language)
 		Assert (0 <= language  &&  language < (int) LanguageCount);
 		lang = LanguageTable [language];
 		printf ("%-8s", lang->name);
-		printAliases (language);
+		printAliases (language, stdout);
 		putchar ('\n');
 	}
 }

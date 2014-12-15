@@ -357,7 +357,7 @@ run_tcase ()
     #
     # Build _CMDLINE
     #
-    _CMDLINE="${CTAGS} --options=NONE --libexec-dir=libexec --libexec-dir=+$t --data-dir=${DATADIR} --data-dir=+$t -o -"
+    _CMDLINE="${CTAGS} --verbose --options=NONE --libexec-dir=libexec --libexec-dir=+$t --data-dir=${DATADIR} --data-dir=+$t -o -"
     [ -f "${fargs}" ] && _CMDLINE="${_CMDLINE} --options=${fargs}"
 
     #

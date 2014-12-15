@@ -18,6 +18,8 @@
 
 #include "vstring.h"
 
+#include <stdio.h>
+
 /*
 *   DATA DECLARATIONS
 */
@@ -49,7 +51,7 @@ extern boolean stringListExtensionMatched (const stringList* const list, const c
 extern vString* stringListExtensionFinds (const stringList* const list, const char* const extension);
 extern boolean stringListFileMatched (const stringList* const list, const char* const str);
 extern vString* stringListFileFinds (const stringList* const list, const char* const str);
-extern void stringListPrint (const stringList *const current);
+extern void stringListPrint (const stringList *const current, FILE *fp);
 extern void stringListReverse (const stringList *const current);
 
 #endif  /* _STRLIST_H */
