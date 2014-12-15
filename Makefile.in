@@ -351,7 +351,8 @@ check: $(CTAGS_TEST)
 #
 dist:
 	git rev-parse  # this will bail out if not in a Git repository
-	rev=$$(git tag --points-at HEAD); \
+	rev=$(REV); \
+	test -n "$$rev" || rev=$$(git tag --points-at HEAD); \
 	test -n "$$rev" || rev=$$(git rev-parse --short HEAD); \
 	name="ctags-$$rev"; \
 	archive="$$name.tar.gz"; \
