@@ -128,6 +128,10 @@ extern CONST_OPTION optionValues		Option;
 *   FUNCTION PROTOTYPES
 */
 extern void verbose (const char *const format, ...) __printf__ (1, 2);
+#define BEGIN_VERBOSE(VFP) do { if (Option.verbose) { \
+                                FILE* VFP = errout
+#define END_VERBOSE()      } } while (0)
+
 extern void freeList (stringList** const pString);
 extern void setDefaultTagFileName (void);
 extern void checkOptions (void);

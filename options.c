@@ -538,7 +538,7 @@ extern void verbose (const char *const format, ...)
 	{
 		va_list ap;
 		va_start (ap, format);
-		vfprintf (stderr, format, ap);
+		vfprintf (errout, format, ap);
 		va_end (ap);
 	}
 }
@@ -861,13 +861,13 @@ static void addExtensionList (
 		else
 			extension = separator + 1;
 	}
-	if (Option.verbose)
+	BEGIN_VERBOSE(vfp);
 	{
-		fprintf (stderr, "\n      now: ");
-		stringListPrint (slist, stderr);
-		putc ('\n', stderr);
+		fprintf (vfp, "\n      now: ");
+		stringListPrint (slist, vfp);
+		putc ('\n', vfp);
 	}
-	eFree (extensionList);
+	END_VERBOSE();
 }
 
 static boolean isFalse (const char *parameter)
@@ -1753,12 +1753,14 @@ static void processSortOption (
 static void installHeaderListDefaults (void)
 {
 	Option.headerExt = stringListNewFromArgv (HeaderExtensions);
-	if (Option.verbose)
+
+	BEGIN_VERBOSE(vfp);
 	{
-		fprintf (stderr, "    Setting default header extensions: ");
-		stringListPrint (Option.headerExt, stderr);
-		putc ('\n', stderr);
+		fprintf (vfp, "    Setting default header extensions: ");
+		stringListPrint (Option.headerExt, vfp);
+		putc ('\n', vfp);
 	}
+	END_VERBOSE();
 }
 
 static void processHeaderListOption (const int option, const char *parameter)

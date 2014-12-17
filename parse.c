@@ -830,9 +830,12 @@ extern void installLanguageMapDefault (const langType language)
 		lang->currentExtensions =
 			stringListNewFromArgv (lang->extensions);
 	}
-	if (Option.verbose)
-		printLanguageMap (language, stderr);
-	verbose ("\n");
+	BEGIN_VERBOSE(vfp);
+	{
+	printLanguageMap (language, vfp);
+	putc ('\n', vfp);
+	}
+	END_VERBOSE();
 }
 
 extern void installLanguageMapDefaults (void)
@@ -861,9 +864,10 @@ extern void installLanguageAliasesDefault (const langType language)
 		lang->currentAliaes =
 			stringListNewFromArgv (lang->aliases);
 	}
-	if (Option.verbose)
-		printAliases (language, stderr);
-	verbose ("\n");
+	BEGIN_VERBOSE(vfp);
+	printAliases (language, vfp);
+	putc ('\n', vfp);
+	END_VERBOSE();
 }
 extern void installLanguageAliasesDefaults (void)
 {
