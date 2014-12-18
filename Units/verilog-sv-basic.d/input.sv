@@ -24,7 +24,9 @@ module mod#(
     b,c,
     d ,
     output wire e ,
+    `ifndef DEFINE
     output reg f,
+    `endif
     inout wire g
 );
 
@@ -43,14 +45,18 @@ integer l;
 test t;
 
 task add (
-    input x, y,
-    output z
+    input x, y
+    `ifdef DEFINE
+    ,output z
+    `endif
 );
     z = x + y;
 endtask
 
 function mult (
+    `ifdef DEFINE
     input x,
+    `endif
     input y);
     reg temp;
     temp = x * y;

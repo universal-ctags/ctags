@@ -9,7 +9,9 @@ module mod (
     a,
     b,c,
     d , e ,
+    `ifdef DEFINE
     f,
+    `endif
     g
 );
 
