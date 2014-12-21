@@ -602,11 +602,13 @@ run_summary ()
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
     done
 
-    printf '  %-40s' "#valgrind-error:"
-    count_list $L_VALGRIND
-    for t in $L_VALGRIND; do
-	echo "	${t#${_DEFAULT_CATEGORY}/}"
-    done
+    if [ "$WITH_VALGRIND" = yes ]; then
+	printf '  %-40s' "#valgrind-error:"
+	count_list $L_VALGRIND
+	for t in $L_VALGRIND; do
+	    echo "	${t#${_DEFAULT_CATEGORY}/}"
+	done
+    fi
 }
 
 action_run ()
