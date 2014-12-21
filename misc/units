@@ -569,7 +569,7 @@ run_summary ()
     done
 
     if ! [ "$WITH_TIMEOUT" = 0 ]; then
-	printf '  %-40s' "#TIMED-OUT:"
+	printf '  %-40s' "#TIMED-OUT (${WITH_TIMEOUT}s)"
 	count_list $L_FAILED_BY_TIMEED_OUT
 	for t in $L_FAILED_BY_TIMEED_OUT; do
 	    echo "	${t#${_DEFAULT_CATEGORY}/}"
