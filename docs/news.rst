@@ -1,22 +1,21 @@
-Changes in fishman-ctags
+Introduced changes
 ======================================================================
 
 :Maintainer: Masatake YAMATO <yamato@redhat.com>
 
 ----
 
-Many changes have been introduced in fishman-ctags. Here I (Masatake
-YAMATO) enumerate the changes mainly in common part. About changes
-not enumerated here especially in language parsers, inquire git-log.
+Many changes have been introduced in exuberant-ctags. Use git-log to
+review changes not enumerated here, especially in language parsers.
 
-Importing the most of all changes from exuberant-ctags
+Importing most of the changes from exuberant-ctags
 ---------------------------------------------------------------------
 See "exuberant-ctags" in "Tracking other projects" about the status of
 importing. Some changes in Fedora and Debian are also imported.
 
 New parsers
 ---------------------------------------------------------------------
-Following parsers are added.
+The following parsers have been added:
 
 * ada
 * coffee *xcmd*
@@ -43,20 +42,20 @@ Heavily improved language parsers
 
 New test facility named *Units*
 ---------------------------------------------------------------------
-The existing test facility *Test* checks differences between the
-output of older ctags and newer ctags. If a difference is found, it is
-recognized as failed. *Test* expects older ctags works fine.
+The existing test facility *Test* checks for differences between the
+output of on older ctags and a newer ctags. If any difference is
+found the check fails. *Test* expects the older ctags binary to be
+correct.
 
-This expectation is not always met. Consider you add a new parser for
-a language. You may want to add a sample source code for the language
-to *Test*. Older ctags cannot make good tags file for the sample
-code. Newer ctags can make it. In this point a difference is found;
-and *Test* reports failure.
+This expectation is not always met. Consider that a parser for a new
+language is added. You may want to add a sample source code for that
+language to *Test*. An older ctags version is unable to generate a
+tags file for that sample code, but the newer ctags version does. At
+this point a difference is found and *Test* reports failure.
 
-In other hand *Units* compares the expected output which a test
-developer prepares and the output of ./ctags just built.  The expected
-output doesn't depend on ctags. Many part of changes I made
-is covered by *Units*. Fore more detail see "Using *Units*".
+On the other hand *Units* compares the expected output that a test
+developer prepares with the output of newly built ctags. The expected
+output doesn't depend on ctags. For more details see "Using *Units*".
 
 Running tests under valgrind
 ---------------------------------------------------------------------
@@ -72,95 +71,93 @@ NOTE: ``/bin/bash`` is needed to report the result.
 
 Semi-fuzz testing
 ---------------------------------------------------------------------
-One of the frustrating thing is that ctags enters infinite loop
-against unexpected input. I wanted to decrease this kind of bugs.
-In fuzz target of testing.mak I tried to spot them by giving
-semi-random(semi-broken) input to parses.
+Unexpected input can lead ctags to enter an infinite loop. The fuzz
+target of testing.mak tries to identify these conditions by passing
+semi-random (semi-broken) input to ctags.
 
 ::
 
 	$ make -f testing.mak fuzz LANGUAGES=LANG1[,LANG2,...]
 
-With this command line, you can given all test inputs under
-*Units/\*/input.\** to parsers specified with ``LANGUAGES`` macro
-variable. The output of ctags is just ignored. This target just
-checks the exit status. Ctags is run under timeout command
-in fuzz target, therefore if ctags enters an infinite loop,
-ctags will exits with non-zero status because timeout command
-may terminate the ctags process. The timeout will be reported
-like this::
+With this command line, ctags is run for random variations of all test
+inputs under *Units/\*/input.\** of languages defined by ``LANGUAGES``
+macro variable. In this target, the output of ctags is ignored and
+only the exit status is analyzed. The ctags binary is also run under
+timeout command, such that if an infinite loop is found it will exit
+with a non-zero status. The timeout will be reported as following::
 
 	[timeout C]                Units/test.vhd.t/input.vhd
 
-This means C parser doesn't stop in 1 second when
-*Units/test.vhd.t/input.vhd* is given as an input. The default
-duration 1 second can be changed with ``TIMEOUT=N`` argument for
-*make* command. If no timeout but the exit status is non-zero,
-the target reports it as following::
+This means that if C parser doesn't stop within N seconds when
+*Units/test.vhd.t/input.vhd* is given as an input, timeout will
+interrup ctags. The default duration can be changed using
+``TIMEOUT=N`` argument in *make* command. If there is no timeout but
+the exit status is non-zero, the target reports it as following::
 
 	[unexpected-status(N) C]                Units/test.vhd.t/input.vhd
 
-You can get the list of parsers which can be used as a value
-for ``LANGUAGES`` with following command line
+The list of parsers which can be used as a value for ``LANGUAGES`` can
+be obtained with following command line
 
 ::
 
 	$ ./ctags --list-languages
 
-Other than ``LANGUAGES`` and ``TIMEOUT`` fuzz target take following parameters:
+Besides ``LANGUAGES`` and ``TIMEOUT``, fuzz target also takes the
+following parameters:
 
 	``VG=1``
 
-		Run ctags under valgrind. If valgrind finds memory
-		error it is reported like::
+		Run ctags under valgrind. If valgrind finds a memory
+		error it is reported as::
 
 			[valgrind-error Verilog]                Units/array_spec.f90.t/input.f90
 
-		The report of valgrind is recorded at
+		The valgrind report is recorded at
 		``Units/\*/VALGRIND-${language}.tmp``.
 
 	``SHRINK=1``
 
 		If exit status is non-zero, run ``units shrink`` to
-		minimize the bad input. With bisection algorithm,
+		minimize the bad input. Using bisection algorithm,
 		*misc/units shrink* tries to make the shortest input
-		which makes ctags exits with non-zero status.
+		which makes ctags exit with non-zero status.
 		The result is reported to ``Units/\*/SHRINK-${language}.tmp``.
-		Maybe useful to debug.
+		This is very useful for debugging.
 
 Automatic parser selection based on corpora
 ---------------------------------------------------------------------
-For suffix *.m* ctags has two built-in parsers: ``ObjectiveC`` and
-``Matlab``.  Which parser ctags should use? Here this situation is
-called "parser confliction".
+Ctags has two built-in parsers for suffix *.m*: ``ObjectiveC`` and
+``Matlab``. The decision on which parser ctags should use is called
+"parser conflict".
 
-Like ``--language-force`` option ctags provides some ways to choose a
-parser manually. However, it is nice if ctags choose a proper parser
-without manual instruction.
+Like in ``--language-force`` option, ctags provides some ways to
+choose a parser manually. However, it would be nice if ctags could
+choose a proper parser without manual instruction.
 
 With ``--<LANG>-corpus=spec:corpusFile`` option you can prepare corpus a
 file to make ctags learn lexical tendency of a language. Ctags
-learns it as typical input of ``LANG``. Based on the learning ctags
-tries to solve the parser confliction. See *Data/optlib/mib.ctags*
+learns it as typical input of ``LANG``. Based on this learning ctags
+tries to solve the parser conflict. See *Data/optlib/mib.ctags*
 and *Data/corpora/RFC1213-MIB.txt* as an example of the usage of
 ``--<LANG>-corpus``.
 
-About ``ObjectiveC`` and ``Matlab`` parser, corpus files are embedded
-in the parser implementations. See *objc.c* and *matlab.c*.
+For ``ObjectiveC`` and ``Matlab`` parsers, corpus files are embedded
+within the parser implementations. See *objc.c* and *matlab.c*.
 
-More documentation is needed.
+.. TODO More documentation is needed.
 
 
 Modeline based parser selection
 ---------------------------------------------------------------------
 exuberant-ctags has the ability to choose a proper parser based on shebang
-lines (e.g. *#!/bin/sh*). This feature is extended in fishman-ctags.
+lines (e.g. *#!/bin/sh*).
 
-Editors like vim and emacs recognize special patterns in files, which are
-called modelines. The line is inserted by a user of the text editor and can
+Editors like vim and emacs recognize special patterns in files called
+modelines. The line is inserted by a user of the text editor and can
 be used to set the file type (Vim) or mode (emacs).
 
-fishman-ctags also recognizes these modeline and selects a language parser
+exuberant-ctags also recognizes these modeline and selects a language parser
 based on it if ``--guess-language-eagerly`` (or ``-G``) option is given.
 
 
@@ -194,11 +191,11 @@ ctags recognizes the following patterns used in vim:
       ex:se ft=SYNTAX
 
 
-NOTE: This feature takes some costs, opening the input file
-before parsing, than selecting a parser by the input
-file name. So this feature is enabled only if the option
-is given. If you like this feature, you can put
-``--guess-language-eagerly`` to your .ctags.
+NOTE: This feature takes a performance hit: it opens the input file
+once to detect the file type and a second time to process the file
+with the detected parser. For this reason, this feature is enabled
+only if the ``--guess-language-eagerly`` option is used. This option
+can be placed in the .ctags file to have this feature always enabled.
 
 Better parser selection for template files
 ---------------------------------------------------------------------
@@ -228,16 +225,15 @@ exuberant-ctags provides the way to customize ctags with options like
 ``--langdef=<LANG>`` and ``--regex-<LANG>``. An option file where options are
 written can be loaded with ``--options=OPTION_FILE``.
 
-fishman-ctags extends this feature. fishman-ctags treats option files
-as libraries. Developers of fishman-ctags maintain some option files
-as part of fishman-ctags. They are shipped as part of fishman-ctags
-release. With ``make install`` they are also installed as ctags command
-is.
+This feature was extended such that ctags treats option files
+as libraries. Developers of exuberant-ctags can maintain option files
+as part of exuberant-ctags, making part of its release. With ``make
+install`` they are also installed along with ctags command.
 
-fishman-ctags prepares directories where the option files are installed.
+exuberant-ctags prepares directories where the option files are installed.
 
-Consider you use a GNU/Linux distribution.
-Following directories are searched when loading an option file.
+Consider a GNU/Linux distribution.
+The following directories are searched when loading an option file:
 
 #. *~/.ctags.d/optlib*
 #. */etc/ctags/optlib*
@@ -258,26 +254,25 @@ Following files are searched with following order for finding ``mib``:
 #.  */usr/share/ctags/optlib/mib.conf*
 #.  */usr/share/ctags/optlib/mib.ctags*
 
-These are called built-in search path.
+These are called built-in search paths.
 
-If you don't want ctags not to refer above search path, instead you
-want to specify directly an option file with ``--options``, start the
-parameter of the option with */* (absolute path) or *./* (relative path)
-like::
+If these search paths are not desired, the full path of the option
+file can be directly specified with ``--options``. The parameter must
+start with */* (absolute path) or *./* (relative path) like::
 
 	$ ctags --option=/home/user/test/mib.cf
 	$ ctags --option=./test/mib.cf
 
-Here the restriction about suffix doesn't exist.
+Here the suffix restriction doesn't exist.
 
-On GNU/Linux you can add more directories with environment variable
-named ``CTAGS_DATA_PATH``.
+On GNU/Linux more directories can be added with the environment variable
+``CTAGS_DATA_PATH``.
 
 ::
 
 	$ CTAGS_DATA_PATH=A:B ctags --options=mib ...
 
-Following files are searched with following order for finding *mib*:
+The files are searched with the order described below for finding *mib*:
 
 #. *A/optlib/mib.conf*
 #. *A/optlib/mib.ctags*
@@ -286,13 +281,13 @@ Following files are searched with following order for finding *mib*:
 #. *~/.ctags.d/optlib/mib.conf*
 #.  ...
 
-Further more you can use ``--data-path=[+]PATH`` for adding more directories
-with environment variable::
+Further more ``--data-path=[+]PATH`` can be used for adding more
+directories with environment variable::
 
 	$ CTAGS_DATA_PATH=A:B ctags --data-path=+C --options=mib ...
 
-In this case following files are searched with following order for
-finding *mib*:
+In this case files are searched with the following order to find
+*mib*:
 
 #. *C/optlib/mib.conf*
 #. *C/optlib/mib.ctags*
@@ -303,31 +298,31 @@ finding *mib*:
 #. *~/.ctags.d/optlib/mib.conf*
 #. ...
 
-If you omit *+*, instead of adding you can set a directory::
+If *+* is omitted, the directory is set instead of added::
 
 	$ CTAGS_DATA_PATH=A:B ctags --data-path=C --options=mib ...
 
-In this case following files are searched with following order for
-finding mib:
+In this case files are searched with the following order to find
+*mib*:
 
 #. *C/config/mib.conf*
 #. *C/config/mib.ctags*
 
-With reserved file name ``NONE``, you can make the directory list empty::
+The directory list can be emptied using the reserved file name ``NONE``::
 
 	$ CTAGS_DATA_PATH=A:B ctags --data-path=NONE --options=mib ...
 
-In this case ctags tries to load *./mib*.
+In this case ctags only tries to load *./mib*.
 
 See also "Loading option recursively".
 
-How a directory is set/added to the search path can be watched with
+How a directory is set/added to the search path can be reviewed using
 ``--verbose`` option. This is useful for debugging this feature.
 
-fishman-ctags developers wait your pull request of well written
-option files.
+Pull requests with updated or new option files are welcome by ctags
+developers.
 
-NOTE: Though ``--data-path`` is highest priority, ``--data-path`` doesn't
+NOTE: Although ``--data-path`` has highest priority, ``--data-path`` doesn't
 affect a stage of automatic option file loading. Following files are
 automatically loaded when ctags starts:
 
@@ -339,13 +334,13 @@ automatically loaded when ctags starts:
 #. *.ctags*
 #. *ctags.cnf* (on MSDOS, MSWindows only)
 
-NOTE: This feature is still in experimental. The name of directories,
-suffix rules, and other convention will change.
+NOTE: This feature is still experimental. The name of directories,
+suffix rules and other conventions may change.
 
-TODO
-
-* Write about MSWindows more(*.cnf*).
-* ``accept_only_dot_ctags()`` doesn't  check *.cnf*.
+.. TODO
+..
+.. * Write about MSWindows more(*.cnf*).
+.. * ``accept_only_dot_ctags()`` doesn't  check *.cnf*.
 
 See "Contributing an optlib" if you have a good optlib.
 
@@ -353,26 +348,27 @@ Loading option recursively
 ---------------------------------------------------------------------
 
 The option file loading rules explained in "Option library" is more
-complex.  If you specify a directory as parameter for ``--option`` instead
-of a file, fishman-ctags loads option files under the directory
+complex. If a directory is specified as parameter for ``--option`` instead
+of a file, exuberant-ctags loads option files under the directory
 recursively.
 
-Consider following command line on GNU/Linux distribution::
+Consider the following command line on a GNU/Linux distribution::
 
 	$ ctags --options=bundle ...
 
-Following directories are searched first:
+The following directories are searched first:
 
 #. *~/.ctags.d/optlib/bundle.d*
 #. */etc/ctags/optlib/bundle.d*
 #. */usr/share/ctags/optlib/bundle.d*
 
-If *bundle.d* is found and it is a directory, files (*\*.ctags*
+If *bundle.d* is found and is a directory, files (*\*.ctags*
 and *\*.conf*), directories (\*.d) are loaded recursively.
 
-NOTE, TODO: If *bundle.d* is not found above list, a file
-*bundle.ctags* or *bundle.conf* are searched. This rule is a bit
-ugly. Following search rules looks better.
+.. TODO
+NOTE: If *bundle.d* is not found above list, file
+*bundle.ctags* or *bundle.conf* is searched. This rule is a bit
+ugly. Following search rules look better.
 
 #. *~/.ctags.d/optlib/bundle.d*
 #. *~/.ctags.d/optlib/bundle.ctags*
@@ -398,46 +394,44 @@ Directories for preloading
 ---------------------------------------------------------------------
 
 As written in "Option library", option libraries can be loaded with
-``--options`` option. However, you may want to load them without
-specifying it explicitly.
+``--options`` option. However, loading them without explicitly
+specifying it may be desired.
 
-Following files can be used for the purpose.
+Following files can be used for this purpose.
 
 * ~/.ctags
 * /ctags.cnf (on MSDOS, MSWindows only)
 * /etc/ctags.conf
 * /usr/local/etc/ctags.conf
 
-This preloading feature comes from exuberant-ctags. However, I
-think two weaknesses in this implementation.
+This preloading feature comes from exuberant-ctags. However, two
+weaknesses exist in this implementation.
 
-* You have to edit the file when you want to add an
-  option library to be loaded.
+* The file must be edited when an option library is to be loaded.
 
   If one wants to add or remove an ``--options=`` in a *ctags.conf*,
   currently one may have to use sed or something tool for adding or
   removing the line for the entry in */usr/local/etc/ctags.conf* (or
   */etc/ctags.conf*).
 
-  I made a discussion about the similar issue in
+  There is a discussion about a similar issue in
   *http://marc.info/?t=129794755000003&r=1&w=2* about */etc/exports*
   of NFS.
 
-* You cannot override the configuration defined in
-  system administrator.
+* The configuration defined by the system administrator cannot be
+  overriden.
 
   A user must accept all configuration including ``--options=``
   in */etc/ctags.conf* and */usr/local/etc/ctags.conf*.
 
-I prepare another facility. Let's not use older facility like *.ctags*.
-I introduced following directories for preloading purpose.
+The following directories were introduced for preloading purpose.
 
 #. *~/.ctags.d/preload*
 #. */etc/ctags/preload*
 #. */usr/share/ctags/preload*
 
 All files and directories under the directories are loaded recursively,
-but two restrictions:
+with two restrictions:
 
 * file/directory name
 
@@ -451,11 +445,11 @@ but two restrictions:
   Once a directory is traversed, another directory with the same name is
   not traversed.
 
-  fishman-ctags prepares */usr/share/ctags/preload/default.ctags*.
+  exuberant-ctags prepares */usr/share/ctags/preload/default.ctags*.
   If you want ctags not to load it, make an empty file at
-  *~/.ctags/default.ctags*. If you want to customize
+  *~/.ctags/default.ctags*. To customize
   */usr/share/ctags/preload/default.ctags*, copy the file to
-  *~/.ctags.d/default.ctags* and edit it as you want.
+  *~/.ctags.d/default.ctags* and edit it as desired.
 
   Assume */usr/share/ctags/preload/something.d* exits.
   Some *.ctags* files are in the directory. With making
@@ -464,10 +458,10 @@ but two restrictions:
   As the result *.ctags* files under */usr/share/ctags/preload/something.d*
   are not loaded.
 
-  If you want to customize one of file under
-  */usr/share/ctags/preload/something.d*, you have to copy
+  To customize one of file under
+  */usr/share/ctags/preload/something.d*, copy
   */usr/share/ctags/preload/something.d* to *~/.ctags.d/somethind.d* recursively.
-  You can also use symbolic links. After copying or symbolic linking, edit
+  Symbolic links can also be used. After copying or symbolic linking, edit
   one of the copied file.
 
 This feature is heavily inspired by systemd.
@@ -476,24 +470,24 @@ This feature is heavily inspired by systemd.
 Long regex flag
 ---------------------------------------------------------------------
 
-I am thinking about making regex parser more useful by adding
-more kind of flags to ``--regex-<LANG>`` expression. As explained in
+Regex parser is made more useful by adding more kinds of flags
+to ``--regex-<LANG>`` expression. As explained in
 *ctags.1* man page, ``b``, ``e`` and ``i`` are defined as flags in
 exuberant-ctags.
 
-Even if I add more flags like ``x``, ``y``, ``z``,..., I guess users
-including I myself may not utilize them well. It is difficult for them
-to memorize. In addition If many "option libraries" are contributed,
-we have to maintain them.
+Even if more flags are added like ``x``, ``y``, ``z``,..., users
+may not utilize them well because it is difficult to memorize them. In
+addition, if many "option libraries" are contributed, we have to
+maintain them.
 
-For both users and developers the variety short flags are just
+For both users and developers the variety of short flags are just
 nightmares.
 
-So fishman-ctags prepares API for defining long flags, which can be
+So exuberant-ctags now includes an API for defining long flags, which can be
 used as aliases for short flags. The long flags requires more typing
-but more readable.
+but are more readable.
 
-Here is the mapping between short flag names and long flag names.
+Here is the mapping between the standard short flag names and long flag names:
 
 =========== ===========
 short flag  long flag
@@ -512,8 +506,8 @@ is the same as ::
 
    --m4-regex=/^m4_define\(\[([^]$\(]+).+$/\1/d,definition/{extend}
 
-The characters ``{`` and ``}`` are not suitable in using command line.  My
-intent is that using long flags in option libraries.
+The characters ``{`` and ``}`` may not be suitable for command line
+use, but long flags are mostly intended for option libraries.
 
 
 Exclusive flag in regex
@@ -528,8 +522,8 @@ all-matching policy. Exclusive-matching means the rest of regular
 expressions are not tried if one of regular expressions is matched
 successfully,
 
-For specifying exclusive-matching I introduced a flag ``exclusive``
-(long) and ``x`` (short). It is used in *data/optlib/mib.ctags*::
+For specifying exclusive-matching the flags ``exclusive`` (long) and
+``x`` (short) were introduced. It is used in *data/optlib/mib.ctags*::
 
 
 	--mib-regex=/^([^ \t]+)[ \t]+DEFINITIONS ::= BEGIN/\1/d,definitions/{exclusive}
@@ -539,17 +533,17 @@ For specifying exclusive-matching I introduced a flag ``exclusive``
 passing parameter for long regex flag
 ---------------------------------------------------------------------
 
-In internal APIs long-flag can take a parameter.
+In the implemented API long-flags can take a parameters.
 Conceptual example::
 
 	--<LANG>-regex=/regexp1/replacement/kind-spec/{transformer=uppercase}
 	--<LANG>-regex=/regexp2/replacement/kind-spec/{transformer=lowercase}
 	--<LANG>-regex=/regexp2/replacement/kind-spec/{transformer=capitalize}
 
-This is not used yet any user visible places.
+This is not yet used in any user visible place.
 This is implemented for extending ctags in future.
 
-TBW
+.. TBW
 
 
 External parser command
@@ -559,16 +553,16 @@ There are commands generating tags file specialized to a language.
 `CoffeeTags <https://github.com/lukaszkorecki/CoffeeTags>`_ is an
 example. CoffeeTags deals with scripts of coffee language. It is written in
 Ruby. Therefore we cannot merge the parser into ctags
-directly(Remember ctags written in C). However, the format of tags
-file generated by CoffeeTags conforms `FORMAT
-<http://ctags.sourceforge.net/FORMAT>`_ well. This means we can reuse
-the output instead of reusing parser source code.
+directly (Remember ctags written in C). However, the format of tags
+file generated by CoffeeTags conforms to `FORMAT
+<http://ctags.sourceforge.net/FORMAT>`. This means we can reuse
+the output instead of reusing the parser source code.
 
-With new ``--<LANG>-xcmd=COMMAND`` option, ctags invokes ``COMMAND``
+With the new ``--<LANG>-xcmd=COMMAND`` option, ctags invokes ``COMMAND``
 as an external parser command(xcmd) for input files written in
 ``LANG``. ctags merges the output of ``COMMAND`` into tags file.
 
-By default following executable are searched with following order for finding
+By default the following executables are searched with following order for finding
 xcmd ``COMMAND``:
 
 #. *~/.ctags.d/drivers/COMMAND*
@@ -576,34 +570,34 @@ xcmd ``COMMAND``:
 
 These are called built-in search path.
 
-On GNU/Linux you can add more directories with environment variable
-named ``CTAGS_LIBEXEC_PATH``. As same as ``CTAGS_DATA_PATH``, you can
-set directories with ``:`` separators to ``CTAGS_LIBEXEC_PATH``.
+On GNU/Linux more directories can be added with the environment variable
+named ``CTAGS_LIBEXEC_PATH``. As same as ``CTAGS_DATA_PATH``,
+directories can be set with ``:`` separators to ``CTAGS_LIBEXEC_PATH``.
 When searching ``COMMAND``, ctags visits the directories before visiting
 the built-in search path.
 
-You can add more search paths with ``--libexec-dir=DIR`` option. ctags
+More search paths can be added with ``--libexec-dir=DIR`` option. ctags
 visits ``DIR/drivers`` before visiting the directories specified with
 ``CTAGS_LIBEXEC_PATH`` and built-in search path. If ctags cannot find
 ``COMMAND``, ctags treats ``COMMAND`` as an executable file, and tries
 to run it.
 
-If you want to specify an executable file as ``COMMAND`` explicitly,
+If an executable file as ``COMMAND`` needs to be specified explicitly,
 use absolute (starting with ``/``) or relative path (starting with
 ``.``) notations.
 
-Generally you don't want to specify an executable file as ``COMMAND``
-because ctags requires very specific behaviors(protocol) to
-``COMMAND``. Generally available tags generator like CoffeeTags
-doesn't conforms the protocol. Executable under the built-in search
+Generally, an executable file ``COMMAND`` should not be specified
+directly because ctags requires very specific behaviors (protocol).
+Generally available tags generator like CoffeeTags don't conform with
+the expected protocol. Executables under the built-in search
 path are expected to fill the gap between generally available tags
-generator and fishman-ctags. This is the reason why the name
+generator and exuberant-ctags. This is the reason why the name
 *drivers* is used as part of built-in search path.
 
-If you want to write a driver for a tags generator, read
+To write a driver for a tags generator, please read
 "xcmd protocol and writing a driver".
 
-There are some restrictions of utilizing the xcmds.
+There are some restrictions of utilizing the xcmds:
 
 doesn't work with ``-x``.
 

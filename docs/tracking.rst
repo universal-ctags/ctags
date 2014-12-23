@@ -29,10 +29,10 @@ subversion
 
       <svn>
       => <git: local exuberant repo>
-	 => <git: local fishman repo>
+	 => <git: local exuberant repo>
 
 
-  1. prepare your own fishman repo: a local git repo cloned from github.
+  1. prepare your own exuberant repo: a local git repo cloned from github.
      You may know how to do it :)
 
      ::
@@ -41,7 +41,7 @@ subversion
 
   2. prepare exuberant SVN repo: a local git repo clone from exuberant svn tree.
 
-    The original clone is already part of fishman tree.
+    The original clone is already part of exuberant tree.
 
     To initialize your git repository with the required subversion information do ::
 
@@ -61,7 +61,7 @@ subversion
 
   4. cherry-pick
 
-     4.1. Make a branch at local fishman repo and switch to it.
+     4.1. Make a branch at local exuberant repo and switch to it.
 
      4.2. Do cherry-pick like::
 
@@ -81,7 +81,7 @@ subversion
 
 	 $ git reset --hard
 
-     <git: local fishman repo>
+     <git: local exuberant repo>
       at the branch for picking.
 
 bugs
@@ -126,12 +126,12 @@ Patches are always there. So it is easy to evaluate the value:)
 
    <TICKET#> 
 
-   	means the ticket is closed from the view of fishman tree
+   	means the ticket is closed from the view of exuberant tree
    	developers.  We don't have to take time for this ticket.
 
    (TICKET#) 
 
-   	means the ticket is still opened from the view of fishman
+   	means the ticket is still opened from the view of exuberant
 	tree developers.  We don't have to take time for this ticket.
 
 ----
@@ -163,7 +163,7 @@ Patches are always there. So it is easy to evaluate the value:)
 
    <67> Objective C language parser
 
-	* This is the implementation is we have in fishman tree.
+	* This is the implementation is we have in exuberant tree.
 
    <65> absoluteFilename uses strcpy on overlapping strings
 
@@ -179,13 +179,13 @@ Patches are always there. So it is easy to evaluate the value:)
 
    <51> Ada support
 
-	* Ada support is now available in fishman tree::
+	* Ada support is now available in exuberant tree::
 
 		4b6b4a72f3d2d4ef969d7c650de1829d79f0ea7c
 
    <38> Ada support
 
-	* Ada support is now available in fishman tree::
+	* Ada support is now available in exuberant tree::
 
 		4b6b4a72f3d2d4ef969d7c650de1829d79f0ea7c
 
@@ -256,52 +256,52 @@ http://pkgs.fedoraproject.org/cgit/ctags.git/tree/ctags.spec
 
 <ctags-5.7-destdir.patch>
 
-	This patch was merged in fishman ctags git tree::
+	This patch was merged in exuberant ctags git tree::
 
 		d4b5972427a46cbdcbfb050a944cf62b300676be
 
 <ctags-5.7-segment-fault.patch>
 
-	This patch was merged in fishman ctags git tree::
+	This patch was merged in exuberant ctags git tree::
 
 		8cc2b482f6c7257c5151893a6d02b8c79851fedd
 
 (ctags-5.8-cssparse.patch)
 
-	Not in fishman tree.
+	Not in exuberant tree.
 
 	The reproducer is attached to following page:
 	https://bugzilla.redhat.com/show_bug.cgi?id=852101
 
-	However, fishman-ctags doesn't reproduce with it.
+	However, exuberant-ctags doesn't reproduce with it.
 
 	I, Masatake YAMATO, read the patch.  However, I don't
 	understand the patch.  
 
 <ctags-5.8-css.patch>
 
-	This patch was merged in fishman ctags git tree::
+	This patch was merged in exuberant ctags git tree::
 
 		80c1522a36df3ba52b8b7cd7f5c79d5c30437a63
 
 <ctags-5.8-memmove.patch>
 
 	This patch was merged in exuberant ctags svn tree.
-	As the result this patch is in fishman tree::
+	As the result this patch is in exuberant tree::
 
 		d2bdf505abb7569deae2b50305ea1edce6208557
 
 <ctags-5.8-ocaml-crash.patch>
 
 	This patch was merged in exuberant ctags svn tree.
-	As the result this patch is in fishman tree::
+	As the result this patch is in exuberant tree::
 
 		ddb29762b37d60a875252dcc401de0b7479527b1
 
 <ctags-5.8-format-security.patch>
 
 	This patch was merged in exuberant ctags svn tree.
-	As the result this patch is in fishman tree::
+	As the result this patch is in exuberant tree::
 
 		2f7a78ce21e4156ec3e63c821827cf1d5680ace8
 
@@ -314,7 +314,7 @@ http://anonscm.debian.org/cgit/users/cjwatson/exuberant-ctags.git/tree/debian/pa
 
 (python-disable-imports.patch)
 
-	Not in fishman tree.
+	Not in exuberant tree.
 	
 	I don't want to merge this patch. I think ctags should extract
 	as much as possible information from input source code.
@@ -351,7 +351,7 @@ Geany has created a library out of ctags
   	https://github.com/fishman/ctags/issues/63
 
 Their language parsers have many improvements to various parsers.
-Changes known by fishman devs worth backporting:
+Changes known by devs worth backporting:
 
 * HTML reads <h1><h2><h3> tags
 * Make has support for targets
@@ -409,12 +409,12 @@ This is a gold mine of xcmd and optlib.
 External command(xcmd)
 ----------------------------------------------------------------------
 
-Near feature fishman-ctags can invoke external command as a
+Near feature exuberant-ctags can invoke external command as a
 specialized parser though some glue code or script may be
 needed. Sometimes we may have to hack the external command to adjust
-the interface between the command and fishman-ctags.
+the interface between the command and exuberant-ctags.
 
-So let's track external commands maintained out fishman-ctags. If we
+So let's track external commands maintained out exuberant-ctags. If we
 prepare glue code or script, mark it with <>, and if not, mark it with
 ().
 

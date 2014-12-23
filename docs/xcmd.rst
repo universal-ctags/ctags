@@ -6,11 +6,11 @@ xcmd protocol and writing a driver
 ----
 
 About the way to utilize external parser commands, see 
-"External parser command" in "Changes in fishman-ctags".
+"External parser command" in "Changes in exuberant-ctags".
 
 Here I explain the way to write a xcmd driver.
 
-Interaction between fishman-ctags and xcmd is explained in "xcmd
+Interaction between exuberant-ctags and xcmd is explained in "xcmd
 protocol". Generally available tags generator like CoffeeTags doesn't
 conforms the protocol. Your driver must fill the gap.
 

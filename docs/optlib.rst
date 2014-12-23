@@ -7,10 +7,10 @@ Contributing an optlib
 
 You are welcome.
 
-fishman-ctags provides a facility for "Option library".
+exuberant-ctags provides a facility for "Option library".
 Read "Option library" about the concept and usage first.
 
-Here I will explain how to merge your .ctags into fishman-ctags as
+Here I will explain how to merge your .ctags into exuberant-ctags as
 part of option library. Here I assume you consider contributing
 an option library in which a regex based language parser is defined.
 See `How to Add Support for a New Language to Exuberant Ctags (EXTENDING)`_
@@ -25,10 +25,10 @@ deals with. Assume source files written in Swine language have a suffix
 
 Changes in options
 ---------------------------------------------------------------------
-fishman-ctags prepares aliases for options. 
+exuberant-ctags prepares aliases for options.
 
 ========================= ====================
-Exuberant                 Fishman aliases
+Exuberant                 New aliases
 ========================= ====================
 ``--langmap-swine:.swn``  ``--swine-map=.swn``
 ``--regex-swine=...``     ``--swine-regex=...``
@@ -80,7 +80,7 @@ or later version" may be required.
 *Units* test cases
 ---------------------------------------------------------------------
 
-We, fishman-ctags developers don't have enough time to learn all
+We, exuberant-ctags developers don't have enough time to learn all
 languages supported by ctags. In other word, we cannot review the
 code. Only test cases help us to know whether a contributed option
 library works well or not. We may reject any contribution without
@@ -159,4 +159,4 @@ Pull-request
 ---------------------------------------------------------------------
 
 Remember your *.ctags* is treasure and can be shared as a first class
-software component in fishman-ctags.  Again, pull-requests are welcome.
+software component in exuberant-ctags.  Again, pull-requests are welcome.
