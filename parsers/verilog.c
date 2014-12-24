@@ -176,6 +176,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "package",   K_PACKAGE,   { 1, 0 } },
 	{ "program",   K_PROGRAM,   { 1, 0 } },
 	{ "property",  K_PROPERTY,  { 1, 0 } },
+	{ "ref",       K_PORT,      { 1, 0 } },
 	{ "shortint",  K_REGISTER,  { 1, 0 } },
 	{ "shortreal", K_REGISTER,  { 1, 0 } },
 	{ "static",    K_IGNORE,    { 1, 0 } },
