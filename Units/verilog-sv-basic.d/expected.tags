@@ -41,9 +41,9 @@ mod.STATE6	input.sv	/^           STATE6 = 4'h7    ,$/;"	c	module:mod
 mod.STATE7	input.sv	/^           STATE7 = 4'h8;$/;"	c	module:mod
 mod.a	input.sv	/^    input wire a,$/;"	p	module:mod
 mod.add	input.sv	/^task add ($/;"	t	module:mod
-mod.add.x	input.sv	/^    input x, y,$/;"	p	task:mod.add
-mod.add.y	input.sv	/^    input x, y,$/;"	p	task:mod.add
-mod.add.z	input.sv	/^    output z$/;"	p	task:mod.add
+mod.add.x	input.sv	/^    input x, y$/;"	p	task:mod.add
+mod.add.y	input.sv	/^    input x, y$/;"	p	task:mod.add
+mod.add.z	input.sv	/^    ,output z$/;"	p	task:mod.add
 mod.b	input.sv	/^    b,c,$/;"	p	module:mod
 mod.c	input.sv	/^    b,c,$/;"	p	module:mod
 mod.d	input.sv	/^    d ,$/;"	p	module:mod
@@ -68,8 +68,8 @@ test.extern_func.b	input.sv	/^    extern virtual function void extern_func (inpu
 test.mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:test
 test.mult.a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
 test.mult.b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
-x	input.sv	/^    input x, y,$/;"	p	task:mod.add
+x	input.sv	/^    input x, y$/;"	p	task:mod.add
 x	input.sv	/^    input x,$/;"	p	function:mod.mult
-y	input.sv	/^    input x, y,$/;"	p	task:mod.add
+y	input.sv	/^    input x, y$/;"	p	task:mod.add
 y	input.sv	/^    input y);$/;"	p	function:mod.mult
-z	input.sv	/^    output z$/;"	p	task:mod.add
+z	input.sv	/^    ,output z$/;"	p	task:mod.add

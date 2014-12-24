@@ -480,6 +480,43 @@ static boolean readIdentifier (tokenInfo *const token, int c)
 	return (boolean)(vStringLength (token->name) > 0);
 }
 
+static int skipMacro (int c)
+{
+	tokenInfo *token = newToken ();;
+
+	if (c == '`')
+	{
+		/* Skip keyword */
+		if (isIdentifierCharacter (c = vGetc ()))
+		{
+			readIdentifier (token, c);
+			c = vGetc ();
+			/* Skip next keyword if macro is `ifdef or `ifndef or `elsif*/
+			if (strcmp (vStringValue (token->name), "ifdef") == 0 ||
+			    strcmp (vStringValue (token->name), "ifndef") == 0 ||
+				strcmp (vStringValue (token->name), "elsif") == 0)
+			{
+				verbose ("%c\n", c);
+				c = skipWhite (c);
+				readIdentifier (token, c);
+				c = vGetc ();
+				verbose ("Skipping conditional macro %s\n", vStringValue (token->name));
+			}
+			/* Skip macro functions */
+			else
+			{
+				c = skipWhite (c);
+				if (c == '(')
+				{
+					c = skipPastMatch ("()");
+				}
+			}
+		}
+	}
+	deleteToken (token);
+	return c;
+}
+
 static verilogKind getKind (tokenInfo *const token)
 {
 	return (verilogKind) lookupKeyword (vStringValue (token->name), getSourceLanguage () );
@@ -660,6 +697,10 @@ static void processPortList (int c)
 			{
 				c = skipPastMatch ("{}");
 			}
+			else if (c == '`')
+			{
+				c = skipMacro (c);
+			}
 			else if (c == '=')
 			{
 				/* Search for next port or end of port declaration */
@@ -677,7 +718,7 @@ static void processPortList (int c)
 					/* Only add port name if it is the last keyword.
 					 * First keyword can be a dynamic type, like a class name */
 					c = skipWhite (vGetc ());
-					if (! isIdentifierCharacter (c))
+					if (! isIdentifierCharacter (c) || c == '`')
 					{
 						verbose ("Found port: %s\n", vStringValue (token->name));
 						token->kind = K_PORT;
@@ -802,6 +843,10 @@ static void tagNameList (tokenInfo* token, int c)
 	{ 
 		repeat = FALSE;
 
+		while (c == '`' && c != EOF)
+		{
+			c = skipMacro (c);
+		}
 		if (isIdentifierCharacter (c))
 		{
 			readIdentifier (token, c);
