@@ -113,6 +113,7 @@ typedef struct sOptionValues {
 	boolean lineDirectives; /* --linedirectives  process #line directives */
 	boolean printLanguage;  /* --print-language */
 	boolean guessLanguageEagerly; /* --guess-language-eagerly|-G */
+	boolean quiet;		      /* --quiet */
 #ifdef DEBUG
 	long debugLevel;        /* -D  debugging output */
 	unsigned long breakLine;/* -b  source line at which to call lineBreak() */

@@ -170,6 +170,7 @@ optionValues Option = {
 	FALSE,      /* --line-directives */
 	FALSE,	    /* --print-language */
 	FALSE,	    /* --guess-language-eagerly(-G) */
+	FALSE,	    /* --quiet */
 #ifdef DEBUG
 	0, 0        /* -D, -b */
 #endif
@@ -311,6 +312,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Specify file from which command line options should be read."},
  {0,"  --print-language"},
  {0,"       Don't make tags file but just print the guessed language name for input file."},
+ {1,"  --quiet=[yes|no]"},
+ {0,"       Don't print NOTICE class messages [no]."},
  {1,"  --recurse=[yes|no]"},
 #ifdef RECURSE_SUPPORTED
  {1,"       Recurse into directories supplied on command line [no]."},
@@ -2082,6 +2085,7 @@ static booleanOption BooleanOptions [] = {
 	{ "line-directives",&Option.lineDirectives,         FALSE   },
 	{ "links",          &Option.followLinks,            FALSE   },
 	{ "print-language", &Option.printLanguage,          TRUE    },
+	{ "quiet",          &Option.quiet,                  FALSE   },
 #ifdef RECURSE_SUPPORTED
 	{ "recurse",        &Option.recurse,                FALSE   },
 #endif
@@ -2367,7 +2371,10 @@ extern void previewFirstOption (cookedArgs* const args)
 {
 	while (cArgIsOption (args))
 	{
-		if (strcmp (args->item, "V") == 0 || strcmp (args->item, "verbose") == 0 || strcmp (args->item, "config-filename") == 0 )
+		if (strcmp (args->item, "V") == 0
+		    || strcmp (args->item, "verbose") == 0
+		    || strcmp (args->item, "config-filename") == 0
+		    || strcmp (args->item, "quiet") == 0)
 			parseOption (args);
 		else if (strcmp (args->item, "options") == 0  &&
 				strcmp (args->parameter, "NONE") == 0)
