@@ -543,6 +543,20 @@ extern void verbose (const char *const format, ...)
 	}
 }
 
+extern void notice (const char *const format, ...)
+{
+	if (!Option.quiet)
+	{
+		va_list ap;
+		fprintf (errout, "%s: Notice: ", getExecutableName ());
+		va_start (ap, format);
+		vfprintf (errout, format, ap);
+		va_end (ap);
+		fputs ("\n", errout);
+	}
+}
+
+
 static char *stringCopy (const char *const string)
 {
 	char* result = NULL;
@@ -2358,7 +2372,7 @@ extern void previewFirstOption (cookedArgs* const args)
 		else if (strcmp (args->item, "options") == 0  &&
 				strcmp (args->parameter, "NONE") == 0)
 		{
-			fprintf (stderr, "No options will be read from files or environment\n");
+			notice ("No options will be read from files or environment\n");
 			SkipConfiguration = TRUE;
 			cArgForth (args);
 		}
