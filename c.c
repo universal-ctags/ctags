@@ -528,7 +528,7 @@ static const keywordDesc KeywordTable [] = {
      { "void",            KEYWORD_VOID,            { 1, 1, 1, 1, 1, 1 } },
      { "volatile",        KEYWORD_VOLATILE,        { 1, 1, 1, 1, 1, 0 } },
      { "wchar",           KEYWORD_WCHAR,           { 0, 0, 0, 1, 0, 0 } },
-     { "wchar_t",         KEYWORD_WCHAR_T,         { 1, 1, 1, 1, 0, 0 } },
+     { "wchar_t",         KEYWORD_WCHAR_T,         { 0, 1, 1, 0, 0, 0 } },
      { "while",           KEYWORD_WHILE,           { 1, 1, 1, 1, 1, 0 } },
      { "with",            KEYWORD_WITH,            { 0, 0, 0, 1, 0, 0 } },
 };
