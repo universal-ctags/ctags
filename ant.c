@@ -32,8 +32,10 @@ static void installAntRegex (const langType language)
 extern parserDefinition* AntParser (void)
 {
 	static const char *const extensions [] = { "build.xml", NULL };
+	static const char *const patterns [] = { "build.xml", NULL };
 	parserDefinition* const def = parserNew ("Ant");
 	def->extensions = extensions;
+	def->patterns = patterns;
 	def->initialize = installAntRegex;
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
