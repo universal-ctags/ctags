@@ -1,0 +1,2 @@
+size_t	input.c	/^typedef int size_t;$/;"	t	file:
+wchar_t	input.c	/^typedef int wchar_t;$/;"	t	file:

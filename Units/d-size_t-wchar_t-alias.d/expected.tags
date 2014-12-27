@@ -1,0 +1,2 @@
+size_t	input.d	/^alias size_t = int;$/;"	t	file:
+wchar_t	input.d	/^alias wchar_t = int;$/;"	t	file:
