@@ -200,15 +200,18 @@ file name. So this feature is enabled only if the option
 is given. If you like this feature, you can put
 ``--guess-language-eagerly`` to your .ctags.
 
-Better parser selection for template files
+Double extension file names
 ---------------------------------------------------------------------
-Consider an input file name *foo.c.in*.  Suffix *.in* is popular as a
-name for template files.  Well-known one is *config.h.in* used in GNU
-autotools.
+Consider an input file named *foo.c.in*. The *.in* suffix is popular
+when naming template files. A well-known example is *config.h.in*,
+which is used by GNU autotools.
 
-ctags used suffix here *\*.in* for choosing a parser. *.in* shows
-nothing about the language used in the input file. When fishman-ctags
-finds *.in* as suffix, fishman-ctags checks the next suffix, here *.c*.
+In this example, ctags would use the *\*.in* suffix to select the
+parser, but this suffix has no relation with any parser. When
+exuberant-ctags is unable to identify the parser from the file
+extension it tries removing the extension before giving up.
+As such, in the example above *foo.c* would be used, resulting in a
+correct parser detection.
 
 Dry running
 ---------------------------------------------------------------------
