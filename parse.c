@@ -720,11 +720,13 @@ getFileLanguageInternal (const char *const fileName)
         goto cleanup;
 
     {
-        const char* const tExt = ".in";
-        templateBaseName = baseFilenameSansExtensionNew (fileName, tExt);
+        /* Try obtaining language from file name after removing extension.
+         * This should make it possible to correctly detect file type on
+         * files named foo.c.in, foo.c.bak, etc */
+        templateBaseName = baseFilenameSansExtension (fileName);
         if (templateBaseName)
         {
-            verbose ("	pattern + template(%s): %s\n", tExt, templateBaseName);
+            verbose ("	pattern (without extension): %s\n", templateBaseName);
             GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
             rewind(glc.input);
             language = getPatternLanguage(templateBaseName, &glc);
