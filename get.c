@@ -33,7 +33,7 @@
 /*
 *   DATA DECLARATIONS
 */
-typedef enum { COMMENT_NONE, COMMENT_C, COMMENT_CPLUS } Comment;
+typedef enum { COMMENT_NONE, COMMENT_C, COMMENT_CPLUS, COMMENT_D } Comment;
 
 enum eCppLimits {
 	MaxCppNestingLevel = 20,
@@ -431,6 +431,8 @@ static Comment isComment (void)
 		comment = COMMENT_C;
 	else if (next == '/')
 		comment = COMMENT_CPLUS;
+	else if (next == '+')
+		comment = COMMENT_D;
 	else
 	{
 		fileUngetc (next);
@@ -478,6 +480,33 @@ static int skipOverCplusComment (void)
 			fileGetc ();  /* throw away next character, too */
 		else if (c == NEWLINE)
 			break;
+	}
+	return c;
+}
+
+/* Skips over a D style comment.
+ * Really we should match nested /+ comments. At least they're less common.
+ */
+static int skipOverDComment (void)
+{
+	int c = fileGetc ();
+
+	while (c != EOF)
+	{
+		if (c != '+')
+			c = fileGetc ();
+		else
+		{
+			const int next = fileGetc ();
+
+			if (next != '/')
+				c = next;
+			else
+			{
+				c = SPACE;  /* replace comment with space */
+				break;
+			}
+		}
 	}
 	return c;
 }
@@ -604,6 +633,8 @@ process:
 					if (c == NEWLINE)
 						fileUngetc (c);
 				}
+				else if (comment == COMMENT_D)
+					c = skipOverDComment ();
 				else
 					Cpp.directive.accept = FALSE;
 				break;

@@ -7,5 +7,8 @@
 Foo	input.d	/^class Foo$/;"	c	file:
 _bar	input.d	/^	private int _bar;$/;"	m	class:Foo	file:
 bar	input.d	/^	public int bar()$/;"	f	class:Foo
+conditional	input.d	/^	T conditional;$/;"	v	file:
+i	input.d	/^int i;$/;"	v
 main	input.d	/^void main(string[] args)$/;"	f
+obj	input.d	/^Object obj;$/;"	v
 this	input.d	/^	public this(int x)$/;"	f	class:Foo

@@ -355,14 +355,15 @@ Changes known by fishman devs worth backporting:
 
 * HTML reads <h1><h2><h3> tags
 * Make has support for targets
+* Various fixes for D parser (c.c), but currently the code diverges
+  from ours to some extent.
 
 
-They have a these additional language parsers:
+They have these additional language parsers:
 
 * `Abaqus <http://en.wikipedia.org/wiki/Abaqus>`_
 * `ActionScript <http://en.wikipedia.org/wiki/ActionScript>`_
 * `AsciiDoc <http://en.wikipedia.org/wiki/AsciiDoc>`_
-* `D (c.c) <http://dlang.org>`_
 * `DocBook <http://en.wikipedia.org/wiki/DocBook>`_
 * `Ferite (c.c) <http://en.wikipedia.org/wiki/Ferite>`_
 * `GLSL (c.c) <http://en.wikipedia.org/wiki/OpenGL_Shading_Language>`_
@@ -380,6 +381,7 @@ These changes have been merged:
 
 * Fix regex callback match count - https://github.com/fishman/ctags/pull/104 
 * SQL tags are stored with scopes instead of "tablename.field" - https://github.com/fishman/ctags/pull/100
+* Some fixes for D parser
 
 
 `VIM-Japan <https://github.com/vim-jp/ctags/>`_
