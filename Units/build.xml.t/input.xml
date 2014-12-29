@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <project name="MyProject" default="deploy" basedir=".">
-
+  <import file="another.ant"/>
   <target name="init">
     <property environment="envvars" />
     <property name="rootDir" value="." />

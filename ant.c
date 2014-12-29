@@ -29,6 +29,8 @@ static void installAntRegex (const langType language)
 		"^[ \t]*<[ \t]*target[^>]+name=\"([^\"]+)\".*", "\\1", "t,target,targets", NULL);
 	addTagRegex (language,
 		"^[ \t]*<[ \t]*property[^>]+name=\"([^\"]+)\".*", "\\1", "P,property,property", NULL);
+	addTagRegex (language,
+		"^[ \t]*<[ \t]*import[^>]+file=\"([^\"]+)\".*", "\\1", "i,import,imports", NULL);
 }
 
 extern parserDefinition* AntParser (void)

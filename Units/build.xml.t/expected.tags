@@ -1,4 +1,5 @@
 MyProject	input.xml	/^<project name="MyProject" default="deploy" basedir=".">$/;"	p
+another.ant	input.xml	/^  <import file="another.ant"\/>$/;"	i
 clean	input.xml	/^  <target name="clean" depends="init">$/;"	t
 compile_something	input.xml	/^  <target name="compile_something" depends="init">$/;"	t
 deploy	input.xml	/^    <target name="deploy" depends="compile_something, generate_h_from_java">$/;"	t
