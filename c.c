@@ -358,7 +358,7 @@ static kindOption DKinds [] = {
 	{ TRUE,  'n', "namespace",  "namespaces"},
 	{ FALSE, 'p', "prototype",  "function prototypes"},
 	{ TRUE,  's', "struct",     "structure names"},
-	{ TRUE,  't', "template",   "templates"},
+	{ TRUE,  'T', "template",   "templates"},
 	{ TRUE,  'u', "union",      "union names"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
 	{ TRUE,  'V', "version",    "version statements"}

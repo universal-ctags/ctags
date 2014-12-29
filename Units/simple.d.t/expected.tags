@@ -8,6 +8,8 @@ AliasInt	input.d	/^alias AliasInt = int;$/;"	a	file:
 Class	input.d	/^class Class : Interface$/;"	c	file:
 Interface	input.d	/^interface Interface$/;"	i	file:
 Struct	input.d	/^struct Struct$/;"	s	file:
+Template	input.d	/^template Template(alias a, T...)$/;"	T	file:
+TemplateAlias	input.d	/^	alias TemplateAlias = a!T;$/;"	a	file:
 Union	input.d	/^	union Union$/;"	u	struct:Struct	file:
 _bar	input.d	/^	private AliasInt _bar;$/;"	m	class:Class	file:
 bar	input.d	/^	public AliasInt bar()$/;"	f	class:Class
