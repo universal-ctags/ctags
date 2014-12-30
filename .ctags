@@ -1,3 +1,2 @@
 # Exclude directories that don't contain real code
 --exclude=Units
---exclude=Test
