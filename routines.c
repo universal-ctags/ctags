@@ -641,29 +641,6 @@ extern const char *fileExtension (const char *const fileName)
 	return extension;
 }
 
-extern char* templateFileExtensionNew (const char *const fileName,
-				       const char *const templateExt)
-{
-	const char *pDelimiter = NULL;
-	const char *const base = baseFilename (fileName);
-	char* shorten_base;
-	const char* ext;
-	char* r;
-
-	pDelimiter = strrchr (base, templateExt[0]);
-
-	if (pDelimiter && (strcmp (pDelimiter, templateExt) == 0))
-	{
-		shorten_base = eStrndup (base, pDelimiter - base);
-		ext = fileExtension (shorten_base);
-		r = eStrdup (ext);
-		eFree (shorten_base);
-		return r;
-	}
-	else
-		return NULL;
-}
-
 extern char* baseFilenameSansExtensionNew (const char *const fileName,
 					   const char *const templateExt)
 {
