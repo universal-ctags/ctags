@@ -127,7 +127,7 @@ typedef enum eTokenType {
 	TOKEN_DOUBLE_COLON,  /* double colon indicates nested-name-specifier */
 	TOKEN_KEYWORD,
 	TOKEN_NAME,          /* an unknown name */
-	TOKEN_PACKAGE,       /* a Java package name / a D module name */
+	TOKEN_PACKAGE,       /* a Java package name */
 	TOKEN_PAREN_NAME,    /* a single name in parentheses */
 	TOKEN_SEMICOLON,     /* the semicolon character */
 	TOKEN_SPEC,          /* a storage class specifier, qualifier, type, etc. */
@@ -165,7 +165,7 @@ typedef enum eDeclaration {
 	DECL_TEMPLATE,
 	DECL_UNION,
 	DECL_USING,
-	DECL_VERSION, /* D conditional compile */
+	DECL_VERSION,        /* D conditional compile */
 	DECL_COUNT
 } declType;
 
@@ -242,18 +242,18 @@ typedef enum eTagType {
 	TAG_METHOD,      /* method declaration */
 	TAG_MIXIN, 		 /* D mixin */
 	TAG_NAMESPACE,   /* namespace name */
-	TAG_PACKAGE,     /* package name */
+	TAG_PACKAGE,     /* package name / D module name */
 	TAG_PROGRAM,     /* program name */
 	TAG_PROPERTY,    /* property name */
 	TAG_PROTOTYPE,   /* function prototype or declaration */
 	TAG_STRUCT,      /* structure name */
 	TAG_TASK,        /* task name */
-	TAG_TYPEDEF,     /* typedef name */
+	TAG_TYPEDEF,     /* typedef name / D alias name */
 	TAG_TEMPLATE, 	 /* d template name */
 	TAG_UNION,       /* union name */
 	TAG_VARIABLE,    /* variable definition */
 	TAG_EXTERN_VAR,  /* external variable declaration */
-	TAG_VERSION, 	/* conditional template compilation */
+	TAG_VERSION, 	 /* conditional template compilation */
 	TAG_COUNT        /* must be last */
 } tagType;
 
@@ -289,9 +289,9 @@ static int AnonymousID = 0;
 typedef enum {
 	CK_UNDEFINED = -1,
 	CK_CLASS, CK_DEFINE, CK_ENUMERATOR, CK_FUNCTION,
-	CK_ENUMERATION, CK_LOCAL, CK_MEMBER, CK_MODULE, CK_NAMESPACE, CK_PROTOTYPE,
-	CK_STRUCT, CK_TYPEDEF, CK_TEMPLATE, CK_UNION, CK_VARIABLE,
-	CK_EXTERN_VARIABLE, CK_MIXIN, CK_VERSION
+	CK_ENUMERATION, CK_LOCAL, CK_MEMBER, CK_NAMESPACE, CK_PROTOTYPE,
+	CK_STRUCT, CK_TYPEDEF, CK_UNION, CK_VARIABLE,
+	CK_EXTERN_VARIABLE
 } cKind;
 
 static kindOption CKinds [] = {
@@ -302,17 +302,13 @@ static kindOption CKinds [] = {
 	{ TRUE,  'g', "enum",       "enumeration names"},
 	{ FALSE, 'l', "local",      "local variables"},
 	{ TRUE,  'm', "member",     "class, struct, and union members"},
-	{ TRUE,  'M', "module", 	"module"},
 	{ TRUE,  'n', "namespace",  "namespaces"},
 	{ FALSE, 'p', "prototype",  "function prototypes"},
 	{ TRUE,  's', "struct",     "structure names"},
 	{ TRUE,  't', "typedef",    "typedefs"},
-	{ TRUE,  'T', "template", 	"templates"},
 	{ TRUE,  'u', "union",      "union names"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
 	{ FALSE, 'x', "externvar",  "external and forward variable declarations"},
-	{ TRUE,  'X', "mixin", 		"mixin"},
-	{ TRUE,  'V', "version", 	"conditional compilation"}
 };
 
 typedef enum {
@@ -336,6 +332,36 @@ static kindOption CsharpKinds [] = {
 	{ TRUE,  'p', "property",   "properties"},
 	{ TRUE,  's', "struct",     "structure names"},
 	{ TRUE,  't', "typedef",    "typedefs"},
+};
+
+typedef enum
+{
+	DK_UNDEFINED = -1,
+	DK_ALIAS, DK_CLASS, DK_ENUMERATION, DK_ENUMERATOR, DK_EXTERN_VARIABLE, DK_FUNCTION,
+	DK_INTERFACE, DK_LOCAL, DK_MEMBER, DK_MIXIN, DK_MODULE, DK_NAMESPACE,
+	DK_PROTOTYPE, DK_STRUCT, DK_TEMPLATE, DK_UNION,
+	DK_VARIABLE, DK_VERSION
+} dKind;
+
+static kindOption DKinds [] = {
+	{ TRUE,  'a', "alias",      "aliases"},
+	{ TRUE,  'c', "class",      "classes"},
+	{ TRUE,  'g', "enum",       "enumeration names"},
+	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)"},
+	{ FALSE, 'x', "externvar",  "external variable declarations"},
+	{ TRUE,  'f', "function",   "function definitions"},
+	{ TRUE,  'i', "interface",  "interfaces"},
+	{ FALSE, 'l', "local",      "local variables"},
+	{ TRUE,  'm', "member",     "class, struct, and union members"},
+	{ TRUE,  'X', "mixin",      "mixins"},
+	{ TRUE,  'M', "module",     "modules"},
+	{ TRUE,  'n', "namespace",  "namespaces"},
+	{ FALSE, 'p', "prototype",  "function prototypes"},
+	{ TRUE,  's', "struct",     "structure names"},
+	{ TRUE,  'T', "template",   "templates"},
+	{ TRUE,  'u', "union",      "union names"},
+	{ TRUE,  'v', "variable",   "variable definitions"},
+	{ TRUE,  'V', "version",    "version statements"}
 };
 
 /* Used to index into the JavaKinds table. */
@@ -883,17 +909,13 @@ static cKind cTagKind (const tagType type)
 		case TAG_FUNCTION:   result = CK_FUNCTION;    break;
 		case TAG_LOCAL:      result = CK_LOCAL;       break;
 		case TAG_MEMBER:     result = CK_MEMBER;      break;
-		case TAG_PACKAGE: 	 result = CK_MODULE;	  break;
 		case TAG_NAMESPACE:  result = CK_NAMESPACE;   break;
 		case TAG_PROTOTYPE:  result = CK_PROTOTYPE;   break;
 		case TAG_STRUCT:     result = CK_STRUCT;      break;
 		case TAG_TYPEDEF:    result = CK_TYPEDEF;     break;
-		case TAG_TEMPLATE: 	 result = CK_TEMPLATE; 	  break;
 		case TAG_UNION:      result = CK_UNION;       break;
 		case TAG_VARIABLE:   result = CK_VARIABLE;    break;
-		case TAG_MIXIN:		 result = CK_MIXIN; 	  break;
 		case TAG_EXTERN_VAR: result = CK_EXTERN_VARIABLE; break;
-		case TAG_VERSION:    result = CK_VERSION;     break;
 
 		default: Assert ("Bad C tag type" == NULL); break;
 	}
@@ -942,6 +964,35 @@ static javaKind javaTagKind (const tagType type)
 	return result;
 }
 
+static dKind dTagKind (const tagType type)
+{
+	dKind result = DK_UNDEFINED;
+	switch (type)
+	{
+		case TAG_TYPEDEF:    result = DK_ALIAS;           break;
+		case TAG_CLASS:      result = DK_CLASS;           break;
+		case TAG_ENUM:       result = DK_ENUMERATION;     break;
+		case TAG_ENUMERATOR: result = DK_ENUMERATOR;      break;
+		case TAG_EXTERN_VAR: result = DK_EXTERN_VARIABLE; break;
+		case TAG_FUNCTION:   result = DK_FUNCTION;        break;
+		case TAG_INTERFACE:  result = DK_INTERFACE;       break;
+		case TAG_LOCAL:      result = DK_LOCAL;           break;
+		case TAG_MEMBER:     result = DK_MEMBER;          break;
+		case TAG_MIXIN:      result = DK_MIXIN;           break;
+		case TAG_PACKAGE:    result = DK_MODULE;          break;
+		case TAG_NAMESPACE:  result = DK_NAMESPACE;       break;
+		case TAG_PROTOTYPE:  result = DK_PROTOTYPE;       break;
+		case TAG_STRUCT:     result = DK_STRUCT;          break;
+		case TAG_TEMPLATE:   result = DK_TEMPLATE;        break;
+		case TAG_UNION:      result = DK_UNION;           break;
+		case TAG_VARIABLE:   result = DK_VARIABLE;        break;
+		case TAG_VERSION:    result = DK_VERSION;         break;
+
+		default: Assert ("Bad D tag type" == NULL); break;
+	}
+	return result;
+}
+
 static veraKind veraTagKind (const tagType type) {
 	veraKind result = VK_UNDEFINED;
 	switch (type)
@@ -971,6 +1022,8 @@ static const char *tagName (const tagType type)
 		result = CsharpKinds [csharpTagKind (type)].name;
 	else if (isLanguage (Lang_java))
 		result = JavaKinds [javaTagKind (type)].name;
+	else if (isLanguage (Lang_d))
+		result = DKinds [dTagKind (type)].name;
 	else if (isLanguage (Lang_vera))
 		result = VeraKinds [veraTagKind (type)].name;
 	else
@@ -985,6 +1038,8 @@ static int tagLetter (const tagType type)
 		result = CsharpKinds [csharpTagKind (type)].letter;
 	else if (isLanguage (Lang_java))
 		result = JavaKinds [javaTagKind (type)].letter;
+	else if (isLanguage (Lang_d))
+		result = DKinds [dTagKind (type)].letter;
 	else if (isLanguage (Lang_vera))
 		result = VeraKinds [veraTagKind (type)].letter;
 	else
@@ -1001,6 +1056,8 @@ static boolean includeTag (const tagType type, const boolean isFileScope)
 		result = CsharpKinds [csharpTagKind (type)].enabled;
 	else if (isLanguage (Lang_java))
 		result = JavaKinds [javaTagKind (type)].enabled;
+	else if (isLanguage (Lang_d))
+		result = DKinds [dTagKind (type)].enabled;
 	else if (isLanguage (Lang_vera))
 		result = VeraKinds [veraTagKind (type)].enabled;
 	else
@@ -3031,8 +3088,8 @@ extern parserDefinition* DParser (void)
 {
 	static const char *const extensions [] = { "d", "di", NULL };
 	parserDefinition* def = parserNew ("D");
-	def->kinds      = CKinds;
-	def->kindCount  = KIND_COUNT (CKinds);
+	def->kinds      = DKinds;
+	def->kindCount  = KIND_COUNT (DKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeDParser;

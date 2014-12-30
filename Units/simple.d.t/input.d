@@ -1,18 +1,47 @@
+module test.simple;
+
 import std.stdio;
 
-class Foo
-{
-	private int _bar;
+alias AliasInt = int;
 
-	public this(int x)
+struct Struct
+{
+	union Union
+	{
+		bool quxx;
+		int qar;
+	}
+}
+
+enum Enum : int
+{
+	foo,
+	bar,
+}
+
+interface Interface
+{
+	public AliasInt bar();
+}
+
+class Class : Interface
+{
+	private AliasInt _bar;
+
+	public this(AliasInt x)
 	{
 		this._bar = x;
 	}
 
-	public int bar()
+	public AliasInt bar()
 	{
 		return this._bar;
 	}
+}
+
+template Template(alias a, T...)
+{
+	alias TemplateAlias = a!T;
 }
 
 Object obj;
@@ -29,9 +58,14 @@ static if (is(typeof(__traits(getMember, a, name)) == function))
 
 static assert( num < TL.length, "Name '"~name~"' is not found");
 
+__gshared int globalVar;
+
 void main(string[] args)
 {
-	auto foo = new Foo(1337);
+	auto foo = new Class(1337);
+
+	alias string AliasString;
+	AliasString baz = "Hello, World!";
 
 	writefln("%s", foo.bar());
 }
