@@ -241,6 +241,9 @@ static struct {
 
 /* Current namespace */
 static vString *CurrentNamesapce;
+/* Cache variable to build the tag's scope.  It has no real meaning outside
+ * of initPhpEntry()'s scope. */
+static vString *FullScope;
 
 
 static void buildPhpKeywordHash (void)
@@ -280,17 +283,16 @@ static const char *implToString (const implType impl)
 	return names[impl];
 }
 
-static vString *fullScope;
 static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 						  const phpKind kind, const accessType access)
 {
 	int parentKind = -1;
 
-	vStringClear (fullScope);
+	vStringClear (FullScope);
 
 	if (vStringLength (CurrentNamesapce) > 0)
 	{
-		vStringCopy (fullScope, CurrentNamesapce);
+		vStringCopy (FullScope, CurrentNamesapce);
 		parentKind = K_NAMESPACE;
 	}
 
@@ -306,17 +308,17 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 	if (vStringLength (token->scope) > 0)
 	{
 		parentKind = token->parentKind;
-		if (vStringLength (fullScope) > 0)
-			vStringCatS (fullScope, SCOPE_SEPARATOR);
-		vStringCat (fullScope, token->scope);
+		if (vStringLength (FullScope) > 0)
+			vStringCatS (FullScope, SCOPE_SEPARATOR);
+		vStringCat (FullScope, token->scope);
 	}
-	if (vStringLength (fullScope) > 0)
+	if (vStringLength (FullScope) > 0)
 	{
 		Assert (parentKind >= 0);
 
-		vStringTerminate (fullScope);
+		vStringTerminate (FullScope);
 		e->extensionFields.scope[0] = PhpKinds[parentKind].name;
-		e->extensionFields.scope[1] = vStringValue (fullScope);
+		e->extensionFields.scope[1] = vStringValue (FullScope);
 	}
 }
 
@@ -1439,6 +1441,7 @@ static void findPhpTags (void)
 	CurrentStatement.access = ACCESS_UNDEFINED;
 	CurrentStatement.impl = IMPL_UNDEFINED;
 	CurrentNamesapce = vStringNew ();
+	FullScope = vStringNew ();
 
 	do
 	{
@@ -1446,6 +1449,7 @@ static void findPhpTags (void)
 	}
 	while (token->type != TOKEN_EOF); /* keep going even with unmatched braces */
 
+	vStringDelete (FullScope);
 	vStringDelete (CurrentNamesapce);
 	deleteToken (token);
 }
@@ -1454,12 +1458,6 @@ static void initialize (const langType language)
 {
 	Lang_php = language;
 	buildPhpKeywordHash ();
-	fullScope = vStringNew ();
-}
-
-static void finalize (const langType language __unused__)
-{
-	vStringDelete(fullScope);
 }
 
 extern parserDefinition* PhpParser (void)
@@ -1471,7 +1469,6 @@ extern parserDefinition* PhpParser (void)
 	def->extensions = extensions;
 	def->parser     = findPhpTags;
 	def->initialize = initialize;
-	def->finalize   = finalize;
 	return def;
 }
 
