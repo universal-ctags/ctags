@@ -73,10 +73,10 @@ SOURCES = \
 	vstring.c
 
 ENVIRONMENT_HEADERS = \
-    e_amiga.h e_djgpp.h e_mac.h e_msoft.h e_os2.h e_qdos.h e_riscos.h e_vms.h
+    e_amiga.h e_djgpp.h e_mac.h e_msoft.h e_os2.h e_qdos.h e_riscos.h
 
 ENVIRONMENT_SOURCES = \
-    argproc.c mac.c qdos.c
+    mac.c qdos.c
 
 REGEX_SOURCES = gnu_regex/regex.c
 

@@ -134,11 +134,7 @@ extern boolean isDestinationStdout (void)
 
 	if (Option.xref  ||  Option.filter  ||
 		(Option.tagFileName != NULL  &&  (strcmp (Option.tagFileName, "-") == 0
-#if defined (VMS)
-	|| strcmp (Option.tagFileName, "sys$output") == 0
-#else
-	|| strcmp (Option.tagFileName, "/dev/stdout") == 0
-#endif
+						  || strcmp (Option.tagFileName, "/dev/stdout") == 0
 		)))
 		toStdout = TRUE;
 	return toStdout;
@@ -567,12 +563,6 @@ static void sanitizeEnviron (void)
 extern int main (int __unused__ argc, char **argv)
 {
 	cookedArgs *args;
-#ifdef VMS
-	extern int getredirection (int *ac, char ***av);
-
-	/* do wildcard expansion and I/O redirection */
-	getredirection (&argc, &argv);
-#endif
 
 #ifdef AMIGA
 	/* This program doesn't work when started from the Workbench */

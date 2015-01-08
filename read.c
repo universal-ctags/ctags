@@ -249,11 +249,7 @@ static boolean parseLineDirective (void)
  */
 extern boolean fileOpen (const char *const fileName, const langType language)
 {
-#ifdef VMS
-	const char *const openMode = "r";
-#else
 	const char *const openMode = "rb";
-#endif
 	boolean opened = FALSE;
 
 	/*	If another file was already open, then close it.

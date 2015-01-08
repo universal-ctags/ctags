@@ -377,9 +377,6 @@ static const char *const Features [] = {
 #ifdef AMIGA
 	"amiga",
 #endif
-#ifdef VMS
-	"vms",
-#endif
 #ifdef HAVE_FNMATCH
 	"wildcards",
 #endif

@@ -33,11 +33,6 @@
 # include "e_qdos.h"
 #elif defined (RISCOS)
 # include "e_riscos.h"
-#elif defined (__vms) || defined (VMS)
-# include "e_vms.h"
-# ifndef VMS
-#  define VMS 1
-# endif
 #endif
 
 

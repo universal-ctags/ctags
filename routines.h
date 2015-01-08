@@ -47,7 +47,7 @@
 /*
 *   DATA DECLARATIONS
 */
-#if defined (MSDOS_STYLE_PATH) || defined (VMS)
+#if defined (MSDOS_STYLE_PATH)
 extern const char *const PathDelimiters;
 #endif
 extern char *CurrentDirectory;

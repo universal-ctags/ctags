@@ -152,8 +152,6 @@
 */
 #if defined (MSDOS_STYLE_PATH)
 const char *const PathDelimiters = ":/\\";
-#elif defined (VMS)
-const char *const PathDelimiters = ":]>";
 #endif
 
 char *CurrentDirectory;
@@ -170,7 +168,7 @@ extern int stat (const char *, struct stat *);
 #ifdef NEED_PROTO_LSTAT
 extern int lstat (const char *, struct stat *);
 #endif
-#if defined (MSDOS) || defined (WIN32) || defined (VMS) || defined (__EMX__) || defined (AMIGA)
+#if defined (MSDOS) || defined (WIN32) || defined (__EMX__) || defined (AMIGA)
 # define lstat(fn,buf) stat(fn,buf)
 #endif
 
@@ -540,7 +538,7 @@ extern int fsetpos (FILE *stream, fpos_t const *pos)
 static boolean isPathSeparator (const int c)
 {
 	boolean result;
-#if defined (MSDOS_STYLE_PATH) || defined (VMS)
+#if defined (MSDOS_STYLE_PATH)
 	result = (boolean) (strchr (PathDelimiters, c) != NULL);
 #else
 	result = (boolean) (c == PATH_SEPARATOR);
@@ -590,7 +588,7 @@ extern boolean isSameFile (const char *const name1, const char *const name2)
 
 extern const char *baseFilename (const char *const filePath)
 {
-#if defined (MSDOS_STYLE_PATH) || defined (VMS)
+#if defined (MSDOS_STYLE_PATH)
 	const char *tail = NULL;
 	unsigned int i;
 
@@ -677,8 +675,6 @@ extern boolean isAbsolutePath (const char *const path)
 				"%s: relative file names with drive letters not supported",
 				path);
 	}
-#elif defined (VMS)
-	result = (boolean) (strchr (path, ':') != NULL);
 #else
 	result = isPathSeparator (path [0]);
 #endif
@@ -689,35 +685,6 @@ extern char *combinePathAndFile (
 	const char *const path, const char *const file)
 {
 	vString *const filePath = vStringNew ();
-#ifdef VMS
-	const char *const directoryId = strstr (file, ".DIR;1");
-
-	if (directoryId == NULL)
-	{
-		const char *const versionId = strchr (file, ';');
-
-		vStringCopyS (filePath, path);
-		if (versionId == NULL)
-			vStringCatS (filePath, file);
-		else
-			vStringNCatS (filePath, file, versionId - file);
-		vStringCopyToLower (filePath, filePath);
-	}
-	else
-	{
-		/*  File really is a directory; append it to the path.
-		 *  Gotcha: doesn't work with logical names.
-		 */
-		vStringNCopyS (filePath, path, strlen (path) - 1);
-		vStringPut (filePath, '.');
-		vStringNCatS (filePath, file, directoryId - file);
-		if (strchr (path, '[') != NULL)
-			vStringPut (filePath, ']');
-		else
-			vStringPut (filePath, '>');
-		vStringTerminate (filePath);
-	}
-#else
 	const int lastChar = path [strlen (path) - 1];
 	boolean terminated = isPathSeparator (lastChar);
 
@@ -728,7 +695,6 @@ extern char *combinePathAndFile (
 		vStringTerminate (filePath);
 	}
 	vStringCatS (filePath, file);
-#endif
 
 	return vStringDeleteUnwrap (filePath);
 }
