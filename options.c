@@ -170,6 +170,7 @@ optionValues Option = {
 	FALSE,      /* --line-directives */
 	FALSE,	    /* --print-language */
 	FALSE,	    /* --guess-language-eagerly(-G) */
+	FALSE,	    /* --quiet */
 #ifdef DEBUG
 	0, 0        /* -D, -b */
 #endif
@@ -311,6 +312,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Specify file from which command line options should be read."},
  {0,"  --print-language"},
  {0,"       Don't make tags file but just print the guessed language name for input file."},
+ {1,"  --quiet=[yes|no]"},
+ {0,"       Don't print NOTICE class messages [no]."},
  {1,"  --recurse=[yes|no]"},
 #ifdef RECURSE_SUPPORTED
  {1,"       Recurse into directories supplied on command line [no]."},
@@ -538,10 +541,24 @@ extern void verbose (const char *const format, ...)
 	{
 		va_list ap;
 		va_start (ap, format);
-		vfprintf (stderr, format, ap);
+		vfprintf (errout, format, ap);
 		va_end (ap);
 	}
 }
+
+extern void notice (const char *const format, ...)
+{
+	if (!Option.quiet)
+	{
+		va_list ap;
+		fprintf (errout, "%s: Notice: ", getExecutableName ());
+		va_start (ap, format);
+		vfprintf (errout, format, ap);
+		va_end (ap);
+		fputs ("\n", errout);
+	}
+}
+
 
 static char *stringCopy (const char *const string)
 {
@@ -861,13 +878,13 @@ static void addExtensionList (
 		else
 			extension = separator + 1;
 	}
-	if (Option.verbose)
+	BEGIN_VERBOSE(vfp);
 	{
-		fprintf (stderr, "\n      now: ");
-		stringListPrint (slist, stderr);
-		putc ('\n', stderr);
+		fprintf (vfp, "\n      now: ");
+		stringListPrint (slist, vfp);
+		putc ('\n', vfp);
 	}
-	eFree (extensionList);
+	END_VERBOSE();
 }
 
 static boolean isFalse (const char *parameter)
@@ -1753,12 +1770,14 @@ static void processSortOption (
 static void installHeaderListDefaults (void)
 {
 	Option.headerExt = stringListNewFromArgv (HeaderExtensions);
-	if (Option.verbose)
+
+	BEGIN_VERBOSE(vfp);
 	{
-		fprintf (stderr, "    Setting default header extensions: ");
-		stringListPrint (Option.headerExt, stderr);
-		putc ('\n', stderr);
+		fprintf (vfp, "    Setting default header extensions: ");
+		stringListPrint (Option.headerExt, vfp);
+		putc ('\n', vfp);
 	}
+	END_VERBOSE();
 }
 
 static void processHeaderListOption (const int option, const char *parameter)
@@ -2066,6 +2085,7 @@ static booleanOption BooleanOptions [] = {
 	{ "line-directives",&Option.lineDirectives,         FALSE   },
 	{ "links",          &Option.followLinks,            FALSE   },
 	{ "print-language", &Option.printLanguage,          TRUE    },
+	{ "quiet",          &Option.quiet,                  FALSE   },
 #ifdef RECURSE_SUPPORTED
 	{ "recurse",        &Option.recurse,                FALSE   },
 #endif
@@ -2351,12 +2371,15 @@ extern void previewFirstOption (cookedArgs* const args)
 {
 	while (cArgIsOption (args))
 	{
-		if (strcmp (args->item, "V") == 0 || strcmp (args->item, "verbose") == 0 || strcmp (args->item, "config-filename") == 0 )
+		if (strcmp (args->item, "V") == 0
+		    || strcmp (args->item, "verbose") == 0
+		    || strcmp (args->item, "config-filename") == 0
+		    || strcmp (args->item, "quiet") == 0)
 			parseOption (args);
 		else if (strcmp (args->item, "options") == 0  &&
 				strcmp (args->parameter, "NONE") == 0)
 		{
-			fprintf (stderr, "No options will be read from files or environment\n");
+			notice ("No options will be read from files or environment\n");
 			SkipConfiguration = TRUE;
 			cArgForth (args);
 		}

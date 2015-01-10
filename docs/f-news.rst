@@ -614,3 +614,25 @@ doesn't work with ``-e``.
 
   ctags cannot generate TAGS, etags format output
   if ``--<LANG>-xcmd=COMMAND`` is specified.
+
+notice message and --quiet option
+---------------------------------------------------------------------
+There were 3 classes of message in ctags:
+
+*fatal*
+
+	A ciritical error is occured. ctags aborts the execution.
+
+*warning*
+
+	An error is occured but ctags continues the execution.
+
+*verbose*
+
+	Mainly for debugging prupose.
+
+
+*notice* is a new class of message. It is less important than warning*
+*but more important for users than *verbose*. Generally the user can
+*ignore *notice*. With ``--quiet`` option can be used to turn off the
+priting the *notice* class messages.
