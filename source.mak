@@ -73,10 +73,9 @@ SOURCES = \
 	vstring.c
 
 ENVIRONMENT_HEADERS = \
-    e_djgpp.h e_mac.h e_msoft.h e_os2.h e_riscos.h
+    e_djgpp.h e_msoft.h e_os2.h e_riscos.h
 
-ENVIRONMENT_SOURCES = \
-    mac.c
+ENVIRONMENT_SOURCES = 
 
 REGEX_SOURCES = gnu_regex/regex.c
 

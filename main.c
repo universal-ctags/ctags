@@ -507,10 +507,6 @@ extern int main (int __unused__ argc, char **argv)
 	_wildcard (&argc, &argv);  /* expand wildcards in argument list */
 #endif
 
-#if defined (macintosh) && BUILD_MPW_TOOL == 0
-	argc = ccommand (&argv);
-#endif
-
 	setCurrentDirectory ();
 	setExecutableName (*argv++);
 	sanitizeEnviron ();
