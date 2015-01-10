@@ -300,7 +300,7 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 		p += strlen("mode:");
 		for ( ;  isspace ((int) *p)  ;  ++p)
 			;  /* no-op */
-		for ( ;  *p != '\0'  &&  isalnum ((int) *p)  ;  ++p)
+		for ( ;  *p != '\0'  &&  (isalnum ((int) *p)  || *p == '-')  ;  ++p)
 			vStringPut (mode, (int) *p);
 		vStringTerminate (mode);
 	}
@@ -356,7 +356,7 @@ static vString* determineEmacsModeAtEOF (FILE* const fp)
 			p += strlen ("mode:");
 			for ( ;  isspace ((int) *p)  ;  ++p)
 				;  /* no-op */
-			for ( ;  *p != '\0'  &&  isalnum ((int) *p)  ;  ++p)
+			for ( ;  *p != '\0'  &&  (isalnum ((int) *p)  || *p == '-')  ;  ++p)
 				vStringPut (mode, (int) *p);
 			vStringTerminate (mode);
 		}
