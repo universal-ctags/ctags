@@ -371,9 +371,6 @@ static const char *const Features [] = {
 	"msdos_16",
 # endif
 #endif
-#ifdef OS2
-	"os2",
-#endif
 #ifdef HAVE_FNMATCH
 	"wildcards",
 #endif
@@ -386,7 +383,7 @@ static const char *const Features [] = {
 #ifdef CUSTOM_CONFIGURATION_FILE
 	"custom-conf",
 #endif
-#if (defined (MSDOS) || defined (WIN32) || defined (OS2)) && defined (UNIX_PATH_SEPARATOR)
+#if (defined (MSDOS) || defined (WIN32)) && defined (UNIX_PATH_SEPARATOR)
 	"unix-path-separator",
 #endif
 #ifdef DEBUG
@@ -1888,7 +1885,7 @@ static void processIgnoreOption (const char *const list)
 		const char* fileName = (*list == '@') ? list + 1 : list;
 		addIgnoreListFromFile (fileName);
 	}
-#if defined (MSDOS) || defined (WIN32) || defined (OS2)
+#if defined (MSDOS) || defined (WIN32)
 	else if (isalpha (list [0])  &&  list [1] == ':')
 		addIgnoreListFromFile (list);
 #endif

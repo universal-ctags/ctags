@@ -23,8 +23,6 @@
 # include "e_djgpp.h"
 #elif defined (MSDOS) || defined (WIN32)
 # include "e_msoft.h"
-#elif defined (OS2)
-# include "e_os2.h"
 #endif
 
 

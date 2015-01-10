@@ -11,7 +11,6 @@ For non-Unix platforms, simple makefiles are provided:
     mk_djg.mak    For MSDOS using DJGPP Gnu GCC (better to follow Unix install)
     mk_mingw.mak  For Win32 using MinGW
     mk_mvc.mak    For Win32 using Microsoft Visual C++
-    mk_os2.mak    For OS/2 using GCC (EMX)
 
 
 Special Notes
