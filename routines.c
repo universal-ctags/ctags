@@ -592,9 +592,6 @@ extern const char *fileExtension (const char *const fileName)
 	const char *extension;
 	const char *pDelimiter = NULL;
 	const char *const base = baseFilename (fileName);
-#ifdef QDOS
-	pDelimiter = strrchr (base, '_');
-#endif
 	if (pDelimiter == NULL)
 	    pDelimiter = strrchr (base, '.');
 

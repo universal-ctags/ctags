@@ -455,11 +455,7 @@ static int parseEscapedCharacter (void)
 		case 'H':  d = '\\';  break;
 		case 'L':  d = '~';   break;
 		case 'N':  d = '\n';  break;
-#ifdef QDOS
-		case 'Q':  d = 0x9F;  break;
-#else
 		case 'Q':  d = '`';   break;
-#endif
 		case 'R':  d = '\r';  break;
 		case 'S':  d = '#';   break;
 		case 'T':  d = '\t';  break;

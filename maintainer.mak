@@ -17,7 +17,7 @@ LIB_FILES    := readtags.c readtags.h
 
 ENVIRONMENT_MAKEFILES := \
 				mk_bc3.mak mk_bc5.mak mk_djg.mak mk_mingw.mak \
-				mk_mpw.mak mk_mvc.mak mk_os2.mak mk_qdos.mak \
+				mk_mpw.mak mk_mvc.mak mk_os2.mak
 
 COMMON_FILES := COPYING EXTENDING.html FAQ INSTALL.oth MAINTAINERS NEWS README \
 				$(ENVIRONMENT_MAKEFILES) source.mak \
