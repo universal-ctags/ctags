@@ -307,7 +307,7 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 	else
 	{
 		/* -*- MODE -*- */
-		for ( ;  *p != '\0'  &&  isalnum ((int) *p)  ;  ++p)
+		for ( ;  *p != '\0'  &&  (isalnum ((int) *p) || *p == '-')  ;  ++p)
 			vStringPut (mode, (int) *p);
 		vStringTerminate (mode);
 

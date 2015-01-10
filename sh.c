@@ -228,7 +228,10 @@ extern parserDefinition* ShParser (void)
 		"sh", "SH", "bsh", "bash", "ksh", "zsh", "ash", NULL
 	};
 	static const char *const aliases [] = {
-		"sh", "bash", "ksh", "zsh", "ash", NULL
+		"sh", "bash", "ksh", "zsh", "ash",
+		/* major mode name in emacs */
+		"shell-script",
+		NULL
 	};
 	parserDefinition* def = parserNew ("Sh");
 	def->kinds      = ShKinds;
