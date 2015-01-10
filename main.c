@@ -47,16 +47,6 @@
 
 /*  To provide directory searching for recursion feature.
  */
-#ifdef AMIGA
-# include <dos/dosasl.h>       /* for struct AnchorPath */
-# include <clib/dos_protos.h>  /* function prototypes */
-# define ANCHOR_BUF_SIZE 512
-# define ANCHOR_SIZE (sizeof (struct AnchorPath) + ANCHOR_BUF_SIZE)
-# ifdef __SASC
-   extern struct DosLibrary *DOSBase;
-#  include <pragmas/dos_pragmas.h>
-# endif
-#endif
 
 #ifdef HAVE_DIRENT_H
 # ifdef __BORLANDC__
@@ -98,17 +88,6 @@
 *   DATA DEFINITIONS
 */
 static struct { long files, lines, bytes; } Totals = { 0, 0, 0 };
-
-#ifdef AMIGA
-# include "ctags.h"
-  static const char *VERsion = "$VER: "PROGRAM_NAME" "PROGRAM_VERSION" "
-# ifdef __SASC
-  __AMIGADATE__
-# else
-  __DATE__
-# endif
-  " "AUTHOR_NAME" $";
-#endif
 
 /*
 *   FUNCTION PROTOTYPES
@@ -222,33 +201,6 @@ static boolean createTagsForWildcardUsingFindfirst (const char *const pattern)
 	return resize;
 }
 
-#elif defined (AMIGA)
-
-static boolean createTagsForAmigaWildcard (const char *const pattern)
-{
-	boolean resize = FALSE;
-	struct AnchorPath *const anchor =
-			(struct AnchorPath *) eMalloc ((size_t) ANCHOR_SIZE);
-	LONG result;
-
-	memset (anchor, 0, (size_t) ANCHOR_SIZE);
-	anchor->ap_Strlen = ANCHOR_BUF_SIZE;
-	/* Allow '.' for current directory */
-#ifdef APF_DODOT
-	anchor->ap_Flags = APF_DODOT | APF_DOWILD;
-#else
-	anchor->ap_Flags = APF_DoDot | APF_DoWild;
-#endif
-	result = MatchFirst ((UBYTE *) pattern, anchor);
-	while (result == 0)
-	{
-		resize |= createTagsForEntry ((char *) anchor->ap_Buf);
-		result = MatchNext (anchor);
-	}
-	MatchEnd (anchor);
-	eFree (anchor);
-	return resize;
-}
 #endif
 
 static boolean recurseIntoDirectory (const char *const dirName)
@@ -270,19 +222,6 @@ static boolean recurseIntoDirectory (const char *const dirName)
 			vStringPut (pattern, OUTPUT_PATH_SEPARATOR);
 			vStringCatS (pattern, "*.*");
 			resize = createTagsForWildcardUsingFindfirst (vStringValue (pattern));
-			vStringDelete (pattern);
-		}
-#elif defined (AMIGA)
-		{
-			vString *const pattern = vStringNew ();
-			if (*dirName != '\0'  &&  strcmp (dirName, ".") != 0)
-			{
-				vStringCopyS (pattern, dirName);
-				if (dirName [strlen (dirName) - 1] != '/')
-					vStringPut (pattern, '/');
-			}
-			vStringCatS (pattern, "#?");
-			resize = createTagsForAmigaWildcard (vStringValue (pattern));
 			vStringDelete (pattern);
 		}
 #endif
@@ -563,12 +502,6 @@ static void sanitizeEnviron (void)
 extern int main (int __unused__ argc, char **argv)
 {
 	cookedArgs *args;
-
-#ifdef AMIGA
-	/* This program doesn't work when started from the Workbench */
-	if (argc == 0)
-		exit (1);
-#endif
 
 #ifdef __EMX__
 	_wildcard (&argc, &argv);  /* expand wildcards in argument list */

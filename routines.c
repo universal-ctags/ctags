@@ -72,10 +72,8 @@
 /*  File type tests.
  */
 #ifndef S_ISREG
-# if defined (S_IFREG) && ! defined (AMIGA)
+# if defined (S_IFREG)
 #  define S_ISREG(mode)		((mode) & S_IFREG)
-# else
-#  define S_ISREG(mode)		TRUE  /* assume regular file */
 # endif
 #endif
 
@@ -168,7 +166,7 @@ extern int stat (const char *, struct stat *);
 #ifdef NEED_PROTO_LSTAT
 extern int lstat (const char *, struct stat *);
 #endif
-#if defined (MSDOS) || defined (WIN32) || defined (__EMX__) || defined (AMIGA)
+#if defined (MSDOS) || defined (WIN32) || defined (__EMX__)
 # define lstat(fn,buf) stat(fn,buf)
 #endif
 
@@ -389,18 +387,12 @@ extern char* newUpperString (const char* str)
 
 extern void setCurrentDirectory (void)
 {
-#ifndef AMIGA
 	char* buf;
-#endif
 	if (CurrentDirectory == NULL)
 		CurrentDirectory = xMalloc ((size_t) (PATH_MAX + 1), char);
-#ifdef AMIGA
-	strcpy (CurrentDirectory, ".");
-#else
 	buf = getcwd (CurrentDirectory, PATH_MAX);
 	if (buf == NULL)
 		perror ("");
-#endif
 	if (CurrentDirectory [strlen (CurrentDirectory) - (size_t) 1] !=
 			PATH_SEPARATOR)
 	{
@@ -408,27 +400,6 @@ extern void setCurrentDirectory (void)
 				OUTPUT_PATH_SEPARATOR);
 	}
 }
-
-#ifdef AMIGA
-static boolean isAmigaDirectory (const char *const name)
-{
-	boolean result = FALSE;
-	struct FileInfoBlock *const fib = xMalloc (1, struct FileInfoBlock);
-	if (fib != NULL)
-	{
-		const BPTR flock = Lock ((UBYTE *) name, (long) ACCESS_READ);
-
-		if (flock != (BPTR) NULL)
-		{
-			if (Examine (flock, fib))
-				result = ((fib->fib_DirEntryType >= 0) ? TRUE : FALSE);
-			UnLock (flock);
-		}
-		eFree (fib);
-	}
-	return result;
-}
-#endif
 
 /* For caching of stat() calls */
 extern fileStatus *eStat (const char *const fileName)
@@ -449,11 +420,7 @@ extern fileStatus *eStat (const char *const fileName)
 			else
 			{
 				file.exists = TRUE;
-#ifdef AMIGA
-				file.isDirectory = isAmigaDirectory (file.name);
-#else
 				file.isDirectory = (boolean) S_ISDIR (status.st_mode);
-#endif
 				file.isNormalFile = (boolean) (S_ISREG (status.st_mode));
 				file.isExecutable = (boolean) ((status.st_mode &
 					(S_IXUSR | S_IXGRP | S_IXOTH)) != 0);

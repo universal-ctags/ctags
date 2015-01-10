@@ -60,7 +60,7 @@
 # define DEFAULT_FILE_FORMAT  2
 #endif
 
-#if defined (HAVE_OPENDIR) || defined (HAVE_FINDFIRST) || defined (HAVE__FINDFIRST) || defined (AMIGA)
+#if defined (HAVE_OPENDIR) || defined (HAVE_FINDFIRST) || defined (HAVE__FINDFIRST)
 # define RECURSE_SUPPORTED
 #endif
 
@@ -373,9 +373,6 @@ static const char *const Features [] = {
 #endif
 #ifdef OS2
 	"os2",
-#endif
-#ifdef AMIGA
-	"amiga",
 #endif
 #ifdef HAVE_FNMATCH
 	"wildcards",
@@ -978,11 +975,6 @@ extern boolean isExcludedFile (const char* const name)
 		if (! result  &&  name != base)
 			result = stringListFileMatched (Excluded, name);
 	}
-#ifdef AMIGA
-	/* not a good solution, but the only one which works often */
-	if (! result)
-		result = (boolean) (strcmp (name, TagFile.name) == 0);
-#endif
 	return result;
 }
 
