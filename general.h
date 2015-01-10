@@ -25,8 +25,6 @@
 # include "e_msoft.h"
 #elif defined (OS2)
 # include "e_os2.h"
-#elif defined (RISCOS)
-# include "e_riscos.h"
 #endif
 
 

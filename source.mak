@@ -73,7 +73,7 @@ SOURCES = \
 	vstring.c
 
 ENVIRONMENT_HEADERS = \
-    e_djgpp.h e_msoft.h e_os2.h e_riscos.h
+    e_djgpp.h e_msoft.h e_os2.h
 
 ENVIRONMENT_SOURCES = 
 

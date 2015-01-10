@@ -12,7 +12,6 @@ For non-Unix platforms, simple makefiles are provided:
     mk_mingw.mak  For Win32 using MinGW
     mk_mvc.mak    For Win32 using Microsoft Visual C++
     mk_os2.mak    For OS/2 using GCC (EMX)
-    mk_riscos.mak For RISC OS using the GCC SDK <http://hard-mofo.dsvr.net>
 
 
 Special Notes
@@ -25,13 +24,3 @@ DJGPP:
   that you use BASH and requires a fairly complete installation of GJGPP
   packages. You can use mk_djg.mak if you can't run configure.
 
-RISC OS:
---------
-
-  Regex support on RISC OS is available when compiled to use the RISC OS port
-  of the GNU regex library, which can be obtained from:
- 
-    <http://www.sbellon.de/software.html>
- 
-  Using 'Set RexEx$Path <Obey$Dir>.' in the regex-0/12 directory will ensure
-  it can be found.
