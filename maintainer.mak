@@ -16,7 +16,7 @@ VERSION_FILES:= ctags.h ctags.1 NEWS
 LIB_FILES    := readtags.c readtags.h
 
 ENVIRONMENT_MAKEFILES := \
-				mk_bc3.mak mk_bc5.mak mk_djg.mak mk_mingw.mak \
+				mk_bc5.mak mk_mingw.mak \
 				mk_mvc.mak
 
 COMMON_FILES := COPYING EXTENDING.html FAQ INSTALL.oth MAINTAINERS NEWS README \

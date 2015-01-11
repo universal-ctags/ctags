@@ -72,8 +72,7 @@ SOURCES = \
 	yacc.c \
 	vstring.c
 
-ENVIRONMENT_HEADERS = \
-    e_djgpp.h e_msoft.h
+ENVIRONMENT_HEADERS = e_msoft.h
 
 ENVIRONMENT_SOURCES = 
 

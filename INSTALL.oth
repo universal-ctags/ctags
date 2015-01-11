@@ -6,20 +6,8 @@ Installation Notes
 
 For non-Unix platforms, simple makefiles are provided:
 
-    mk_bc3.mak    For MSDOS using Borland C/C++ 3.x
     mk_bc5.mak    For Win32 using Borland C++ 5.5
-    mk_djg.mak    For MSDOS using DJGPP Gnu GCC (better to follow Unix install)
     mk_mingw.mak  For Win32 using MinGW
     mk_mvc.mak    For Win32 using Microsoft Visual C++
 
-
-Special Notes
-=============
-
-DJGPP:
-------
-
-  It is better to follow the standard Unix install on DJGPP, but this requires
-  that you use BASH and requires a fairly complete installation of GJGPP
-  packages. You can use mk_djg.mak if you can't run configure.
 

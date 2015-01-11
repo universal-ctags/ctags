@@ -129,8 +129,6 @@
 # elif defined (__BORLANDC__)
 #  define PATH_MAX  MAXPATH
 #  define currentdrive() (getdisk() + 'A')
-# elif defined (DJGPP)
-#  define currentdrive() (getdisk() + 'A')
 # else
 #  define currentdrive() 'C'
 # endif
@@ -166,7 +164,7 @@ extern int stat (const char *, struct stat *);
 #ifdef NEED_PROTO_LSTAT
 extern int lstat (const char *, struct stat *);
 #endif
-#if defined (MSDOS) || defined (WIN32) || defined (__EMX__)
+#if defined (WIN32) || defined (__EMX__)
 # define lstat(fn,buf) stat(fn,buf)
 #endif
 

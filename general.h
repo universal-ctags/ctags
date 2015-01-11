@@ -19,9 +19,7 @@
 #if (defined (HAVE_FORK) && defined (HAVE_WAITPID) && defined (HAVE_EXECV) && defined (HAVE_PIPE))
 #define HAVE_COPROC
 #endif
-#elif defined (DJGPP)
-# include "e_djgpp.h"
-#elif defined (MSDOS) || defined (WIN32)
+#elif defined (WIN32)
 # include "e_msoft.h"
 #endif
 
