@@ -60,7 +60,7 @@
 # define DEFAULT_FILE_FORMAT  2
 #endif
 
-#if defined (HAVE_OPENDIR) || defined (HAVE_FINDFIRST) || defined (HAVE__FINDFIRST) || defined (AMIGA)
+#if defined (HAVE_OPENDIR) || defined (HAVE_FINDFIRST) || defined (HAVE__FINDFIRST)
 # define RECURSE_SUPPORTED
 #endif
 
@@ -364,22 +364,6 @@ static const char *const Features [] = {
 #ifdef WIN32
 	"win32",
 #endif
-#ifdef DJGPP
-	"msdos_32",
-#else
-# ifdef MSDOS
-	"msdos_16",
-# endif
-#endif
-#ifdef OS2
-	"os2",
-#endif
-#ifdef AMIGA
-	"amiga",
-#endif
-#ifdef VMS
-	"vms",
-#endif
 #ifdef HAVE_FNMATCH
 	"wildcards",
 #endif
@@ -392,7 +376,7 @@ static const char *const Features [] = {
 #ifdef CUSTOM_CONFIGURATION_FILE
 	"custom-conf",
 #endif
-#if (defined (MSDOS) || defined (WIN32) || defined (OS2)) && defined (UNIX_PATH_SEPARATOR)
+#if defined (WIN32) && defined (UNIX_PATH_SEPARATOR)
 	"unix-path-separator",
 #endif
 #ifdef DEBUG
@@ -981,11 +965,6 @@ extern boolean isExcludedFile (const char* const name)
 		if (! result  &&  name != base)
 			result = stringListFileMatched (Excluded, name);
 	}
-#ifdef AMIGA
-	/* not a good solution, but the only one which works often */
-	if (! result)
-		result = (boolean) (strcmp (name, TagFile.name) == 0);
-#endif
 	return result;
 }
 
@@ -1899,7 +1878,7 @@ static void processIgnoreOption (const char *const list)
 		const char* fileName = (*list == '@') ? list + 1 : list;
 		addIgnoreListFromFile (fileName);
 	}
-#if defined (MSDOS) || defined (WIN32) || defined (OS2)
+#if defined (WIN32)
 	else if (isalpha (list [0])  &&  list [1] == ':')
 		addIgnoreListFromFile (list);
 #endif

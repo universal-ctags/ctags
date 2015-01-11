@@ -19,25 +19,8 @@
 #if (defined (HAVE_FORK) && defined (HAVE_WAITPID) && defined (HAVE_EXECV) && defined (HAVE_PIPE))
 #define HAVE_COPROC
 #endif
-#elif defined (AMIGA)
-# include "e_amiga.h"
-#elif defined (DJGPP)
-# include "e_djgpp.h"
-#elif defined (macintosh)
-# include "e_mac.h"
-#elif defined (MSDOS) || defined (WIN32)
+#elif defined (WIN32)
 # include "e_msoft.h"
-#elif defined (OS2)
-# include "e_os2.h"
-#elif defined (QDOS)
-# include "e_qdos.h"
-#elif defined (RISCOS)
-# include "e_riscos.h"
-#elif defined (__vms) || defined (VMS)
-# include "e_vms.h"
-# ifndef VMS
-#  define VMS 1
-# endif
 #endif
 
 

@@ -72,10 +72,8 @@
 /*  File type tests.
  */
 #ifndef S_ISREG
-# if defined (S_IFREG) && ! defined (AMIGA)
+# if defined (S_IFREG)
 #  define S_ISREG(mode)		((mode) & S_IFREG)
-# else
-#  define S_ISREG(mode)		TRUE  /* assume regular file */
 # endif
 #endif
 
@@ -131,8 +129,6 @@
 # elif defined (__BORLANDC__)
 #  define PATH_MAX  MAXPATH
 #  define currentdrive() (getdisk() + 'A')
-# elif defined (DJGPP)
-#  define currentdrive() (getdisk() + 'A')
 # else
 #  define currentdrive() 'C'
 # endif
@@ -152,8 +148,6 @@
 */
 #if defined (MSDOS_STYLE_PATH)
 const char *const PathDelimiters = ":/\\";
-#elif defined (VMS)
-const char *const PathDelimiters = ":]>";
 #endif
 
 char *CurrentDirectory;
@@ -170,7 +164,7 @@ extern int stat (const char *, struct stat *);
 #ifdef NEED_PROTO_LSTAT
 extern int lstat (const char *, struct stat *);
 #endif
-#if defined (MSDOS) || defined (WIN32) || defined (VMS) || defined (__EMX__) || defined (AMIGA)
+#if defined (WIN32) || defined (__EMX__)
 # define lstat(fn,buf) stat(fn,buf)
 #endif
 
@@ -391,18 +385,12 @@ extern char* newUpperString (const char* str)
 
 extern void setCurrentDirectory (void)
 {
-#ifndef AMIGA
 	char* buf;
-#endif
 	if (CurrentDirectory == NULL)
 		CurrentDirectory = xMalloc ((size_t) (PATH_MAX + 1), char);
-#ifdef AMIGA
-	strcpy (CurrentDirectory, ".");
-#else
 	buf = getcwd (CurrentDirectory, PATH_MAX);
 	if (buf == NULL)
 		perror ("");
-#endif
 	if (CurrentDirectory [strlen (CurrentDirectory) - (size_t) 1] !=
 			PATH_SEPARATOR)
 	{
@@ -410,27 +398,6 @@ extern void setCurrentDirectory (void)
 				OUTPUT_PATH_SEPARATOR);
 	}
 }
-
-#ifdef AMIGA
-static boolean isAmigaDirectory (const char *const name)
-{
-	boolean result = FALSE;
-	struct FileInfoBlock *const fib = xMalloc (1, struct FileInfoBlock);
-	if (fib != NULL)
-	{
-		const BPTR flock = Lock ((UBYTE *) name, (long) ACCESS_READ);
-
-		if (flock != (BPTR) NULL)
-		{
-			if (Examine (flock, fib))
-				result = ((fib->fib_DirEntryType >= 0) ? TRUE : FALSE);
-			UnLock (flock);
-		}
-		eFree (fib);
-	}
-	return result;
-}
-#endif
 
 /* For caching of stat() calls */
 extern fileStatus *eStat (const char *const fileName)
@@ -451,11 +418,7 @@ extern fileStatus *eStat (const char *const fileName)
 			else
 			{
 				file.exists = TRUE;
-#ifdef AMIGA
-				file.isDirectory = isAmigaDirectory (file.name);
-#else
 				file.isDirectory = (boolean) S_ISDIR (status.st_mode);
-#endif
 				file.isNormalFile = (boolean) (S_ISREG (status.st_mode));
 				file.isExecutable = (boolean) ((status.st_mode &
 					(S_IXUSR | S_IXGRP | S_IXOTH)) != 0);
@@ -540,7 +503,7 @@ extern int fsetpos (FILE *stream, fpos_t const *pos)
 static boolean isPathSeparator (const int c)
 {
 	boolean result;
-#if defined (MSDOS_STYLE_PATH) || defined (VMS)
+#if defined (MSDOS_STYLE_PATH)
 	result = (boolean) (strchr (PathDelimiters, c) != NULL);
 #else
 	result = (boolean) (c == PATH_SEPARATOR);
@@ -590,7 +553,7 @@ extern boolean isSameFile (const char *const name1, const char *const name2)
 
 extern const char *baseFilename (const char *const filePath)
 {
-#if defined (MSDOS_STYLE_PATH) || defined (VMS)
+#if defined (MSDOS_STYLE_PATH)
 	const char *tail = NULL;
 	unsigned int i;
 
@@ -627,9 +590,6 @@ extern const char *fileExtension (const char *const fileName)
 	const char *extension;
 	const char *pDelimiter = NULL;
 	const char *const base = baseFilename (fileName);
-#ifdef QDOS
-	pDelimiter = strrchr (base, '_');
-#endif
 	if (pDelimiter == NULL)
 	    pDelimiter = strrchr (base, '.');
 
@@ -677,8 +637,6 @@ extern boolean isAbsolutePath (const char *const path)
 				"%s: relative file names with drive letters not supported",
 				path);
 	}
-#elif defined (VMS)
-	result = (boolean) (strchr (path, ':') != NULL);
 #else
 	result = isPathSeparator (path [0]);
 #endif
@@ -689,35 +647,6 @@ extern char *combinePathAndFile (
 	const char *const path, const char *const file)
 {
 	vString *const filePath = vStringNew ();
-#ifdef VMS
-	const char *const directoryId = strstr (file, ".DIR;1");
-
-	if (directoryId == NULL)
-	{
-		const char *const versionId = strchr (file, ';');
-
-		vStringCopyS (filePath, path);
-		if (versionId == NULL)
-			vStringCatS (filePath, file);
-		else
-			vStringNCatS (filePath, file, versionId - file);
-		vStringCopyToLower (filePath, filePath);
-	}
-	else
-	{
-		/*  File really is a directory; append it to the path.
-		 *  Gotcha: doesn't work with logical names.
-		 */
-		vStringNCopyS (filePath, path, strlen (path) - 1);
-		vStringPut (filePath, '.');
-		vStringNCatS (filePath, file, directoryId - file);
-		if (strchr (path, '[') != NULL)
-			vStringPut (filePath, ']');
-		else
-			vStringPut (filePath, '>');
-		vStringTerminate (filePath);
-	}
-#else
 	const int lastChar = path [strlen (path) - 1];
 	boolean terminated = isPathSeparator (lastChar);
 
@@ -728,7 +657,6 @@ extern char *combinePathAndFile (
 		vStringTerminate (filePath);
 	}
 	vStringCatS (filePath, file);
-#endif
 
 	return vStringDeleteUnwrap (filePath);
 }

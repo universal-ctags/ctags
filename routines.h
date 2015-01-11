@@ -31,8 +31,6 @@
 #ifndef PATH_SEPARATOR
 # if defined (MSDOS_STYLE_PATH)
 #  define PATH_SEPARATOR '\\'
-# elif defined (QDOS)
-#  define PATH_SEPARATOR '_'
 # else
 #  define PATH_SEPARATOR '/'
 # endif
@@ -47,7 +45,7 @@
 /*
 *   DATA DECLARATIONS
 */
-#if defined (MSDOS_STYLE_PATH) || defined (VMS)
+#if defined (MSDOS_STYLE_PATH)
 extern const char *const PathDelimiters;
 #endif
 extern char *CurrentDirectory;
