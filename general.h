@@ -79,17 +79,12 @@
 
 #undef FALSE
 #undef TRUE
-#ifdef VAXC
-typedef enum { FALSE, TRUE } booleanType;
-typedef int boolean;
-#else
-# ifdef __cplusplus
+#ifdef __cplusplus
 typedef bool boolean;
 #define FALSE false
 #define TRUE true
-# else
+#else
 typedef enum { FALSE, TRUE } boolean;
-# endif
 #endif
 
 #if ! defined (HAVE_FGETPOS) && ! defined (fpos_t)

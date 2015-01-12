@@ -176,14 +176,6 @@ extern void setExecutableName (const char *const path)
 {
 	ExecutableProgram = path;
 	ExecutableName = baseFilename (path);
-#ifdef VAXC
-{
-	/* remove filetype from executable name */
-	char *p = strrchr (ExecutableName, '.');
-	if (p != NULL)
-		*p = '\0';
-}
-#endif
 }
 
 extern const char *getExecutableName (void)
@@ -567,14 +559,6 @@ extern const char *baseFilename (const char *const filePath)
 		tail = filePath;
 	else
 		++tail;  /* step past last delimiter */
-#ifdef VAXC
-	{
-		/* remove version number from filename */
-		char *p = strrchr ((char *) tail, ';');
-		if (p != NULL)
-			*p = '\0';
-	}
-#endif
 
 	return tail;
 }
