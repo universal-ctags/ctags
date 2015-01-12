@@ -66,11 +66,6 @@
 #elif defined (__MINGW32__)
 
 # include <_mingw.h>
-# if defined (__MSVCRT__) && __MINGW32_MAJOR_VERSION == 1 && __MINGW32_MINOR_VERSION < 2
-/* Work-around for broken implementation of fgetpos()/fsetpos() on Mingw32 */
-#  undef HAVE_FGETPOS
-#  define NEED_PROTO_FGETPOS 1
-# endif
 # define HAVE_DIR_H 1
 # define HAVE_DIRENT_H 1
 # define HAVE__FINDFIRST 1
