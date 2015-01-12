@@ -123,9 +123,6 @@
 #  define getcwd  _getcwd
 #  define currentdrive() (_getdrive() + 'A' - 1)
 #  define PATH_MAX  _MAX_PATH
-# elif defined (__BORLANDC__)
-#  define PATH_MAX  MAXPATH
-#  define currentdrive() (getdisk() + 'A')
 # else
 #  define currentdrive() 'C'
 # endif

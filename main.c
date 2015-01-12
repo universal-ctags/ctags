@@ -49,9 +49,6 @@
  */
 
 #ifdef HAVE_DIRENT_H
-# ifdef __BORLANDC__
-#  define boolean BORLAND_boolean
-# endif
 # ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>  /* required by dirent.h */
 # endif

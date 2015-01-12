@@ -39,13 +39,7 @@
 #define tempnam(dir,pfx) _tempnam(dir,pfx)
 #define TMPDIR "\\"
 
-#ifdef __BORLANDC__
-
-# define HAVE_DIR_H 1
-# define HAVE_DIRENT_H 1
-# define HAVE_FINDFIRST 1
-
-#elif defined (_MSC_VER)
+#ifdef _MSC_VER
 
 # define HAVE__FINDFIRST 1
 # define HAVE_DIRECT_H 1
