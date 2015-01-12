@@ -39,10 +39,8 @@
 # define HAVE_REGEX 1
 #endif
 
-/*  This is a helpful internal feature of later versions (> 2.7) of GCC
- *  to prevent warnings about unused variables.
- */
-#if (__GNUC__ > 2  ||  (__GNUC__ == 2  &&  __GNUC_MINOR__ >= 7)) && !defined (__GNUG__)
+/*  Prevent warnings about unused variables in GCC. */
+#if defined (__GNUC__) && !defined (__GNUG__)
 # ifdef __MINGW32__
 #  define __unused__
 # else
