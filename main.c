@@ -497,10 +497,6 @@ extern int main (int __unused__ argc, char **argv)
 {
 	cookedArgs *args;
 
-#ifdef __EMX__
-	_wildcard (&argc, &argv);  /* expand wildcards in argument list */
-#endif
-
 	setCurrentDirectory ();
 	setExecutableName (*argv++);
 	sanitizeEnviron ();

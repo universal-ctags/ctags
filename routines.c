@@ -158,7 +158,7 @@ extern int stat (const char *, struct stat *);
 #ifdef NEED_PROTO_LSTAT
 extern int lstat (const char *, struct stat *);
 #endif
-#if defined (WIN32) || defined (__EMX__)
+#if defined (WIN32)
 # define lstat(fn,buf) stat(fn,buf)
 #endif
 
