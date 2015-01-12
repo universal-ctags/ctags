@@ -47,9 +47,6 @@
 # endif
 #endif
 
-#ifdef HAVE_DOS_H
-# include <dos.h>  /* to declare MAXPATH */
-#endif
 #ifdef HAVE_DIRECT_H
 # include <direct.h>  /* to _getcwd */
 #endif

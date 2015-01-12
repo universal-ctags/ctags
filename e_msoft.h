@@ -19,7 +19,6 @@
 #define CASE_INSENSITIVE_FILENAMES 1
 #define MANUAL_GLOBBING 1
 #define MSDOS_STYLE_PATH 1
-#define HAVE_DOS_H 1
 #define HAVE_FCNTL_H 1
 #define HAVE_IO_H 1
 #define HAVE_STDLIB_H 1
