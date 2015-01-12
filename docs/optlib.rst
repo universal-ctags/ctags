@@ -144,7 +144,7 @@ Let's verify all your work here.
 
 1. Run the tests and check whether your test case is passed or failed::
 
-	$ make -f testing.mak test.units
+	$ make units
 
 2. Verify your files are installed as expected::
 

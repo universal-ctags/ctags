@@ -104,15 +104,15 @@ See *Units/c-sample/input.c* and *Units/c-sample/expected*.
 How to run unit tests
 ------------------------------------------------------------
 
-*test.units* target is added to testing.mak::
+*test* make target::
 
-	 $ make -f testing.mak test.units
+	 $ make units
 
 The result of unit tests is reported by lines. You can specify
 test cases with ``UNITS=``. Consider you want to run a test under
 *vim-command.d* only. You can do it with following command line::
 
-	$ make -f testing.mak test.units UNITS=vim-command
+	$ make units UNITS=vim-command
 
 You can list more than two test cases with comma separator to UNITS.
 
@@ -122,7 +122,7 @@ unit test is **passed**.  If the result is **FAILED**, it is kept for
 debugging. Following command line can clean up these generated files
 at once::
 
-	$ make -f testing.mak clean
+	$ make clean-units
 
 Other than **FAILED** and **passed** two types of result are
 defined.
@@ -141,7 +141,7 @@ Example of running
 ------------------------------------------------------------
 ::
 
-	$ make -f testing.mak test.units
+	$ make units
 	Category: ROOT
 	------------------------------------------------------------
 	Testing 1795612.js as JavaScript                            passed
@@ -159,7 +159,7 @@ You can run only the tests for specific languages by setting
 ``LANGUAGES`` to parsers as reported by
 ``ctags --list-languages``::
 
-	make -f testing.mak test.units LANGUAGES=PHP,C
+	make units LANGUAGES=PHP,C
 
 Multiple languages can be selected using a comma separated list.
 
@@ -211,7 +211,7 @@ Running under valgrind and timeout
 If ``VG=1`` is given, each test cases are run under valgrind.
 If valgrind detects an error, it is reported as::
 
-    $ make -f testing.mak units VG=1
+    $ make units VG=1
     Testing css-singlequote-in-comment as CSS             failed (valgrind-error)
     ...
     Summary (see CMDLINE.tmp to reproduce without test harness)
@@ -228,7 +228,7 @@ If ``TIMEOUT=N`` is given, each test cases are run under timeout
 command. If ctags doesn't stop in ``N`` second, it is stopped
 by timeout command and reported as::
 
-    $ make -f testing.mak units TIMEOUT=1
+    $ make units TIMEOUT=1
     Testing css-singlequote-in-comment as CSS             failed (TIMED OUT)
     ...
     Summary (see CMDLINE.tmp to reproduce without test harness)

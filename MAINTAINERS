@@ -70,18 +70,5 @@ Building
 Testing
 -------
 
-  First time:
-
-    cd ctags
-    cp /usr/bin/ctags ctags.ref
-    # Edit "testing.mak" so CTAGS_TEST = ./dctags
-    # Edit "testing.mak" so CTAGS_REF = ./ctags.ref
-    make test
-
-  Later:
-
-    make test
-
-  Whenever you're happy with the results and update/commit:
-
-    cp ./dctags ./ctags.ref
+  cd ctags
+  make units

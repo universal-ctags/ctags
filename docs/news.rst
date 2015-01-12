@@ -64,7 +64,7 @@ checker.
 
 ::
 
-	$ make -f testing.mak VG=1 SHELL=/bin/bash
+	$ make units VG=1 SHELL=/bin/bash
 
 NOTE: ``/bin/bash`` is needed to report the result.
 
@@ -72,12 +72,12 @@ NOTE: ``/bin/bash`` is needed to report the result.
 Semi-fuzz testing
 ---------------------------------------------------------------------
 Unexpected input can lead ctags to enter an infinite loop. The fuzz
-target of testing.mak tries to identify these conditions by passing
+target tries to identify these conditions by passing
 semi-random (semi-broken) input to ctags.
 
 ::
 
-	$ make -f testing.mak fuzz LANGUAGES=LANG1[,LANG2,...]
+	$ make fuzz LANGUAGES=LANG1[,LANG2,...]
 
 With this command line, ctags is run for random variations of all test
 inputs under *Units/\*/input.\** of languages defined by ``LANGUAGES``
