@@ -1,0 +1,23 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Fishman Ctags	//
+!_TAG_PROGRAM_URL	https://github.com/fishman/ctags	/official site/
+!_TAG_PROGRAM_VERSION	Development	//
+A	input.cpp	/^enum A:int {A_a, A_b, A_c};$/;"	g	file:
+A_a	input.cpp	/^enum A:int {A_a, A_b, A_c};$/;"	e	enum:A	file:
+A_b	input.cpp	/^enum A:int {A_a, A_b, A_c};$/;"	e	enum:A	file:
+A_c	input.cpp	/^enum A:int {A_a, A_b, A_c};$/;"	e	enum:A	file:
+B	input.cpp	/^enum B:long {B_a, B_b, B_c};$/;"	g	file:
+B_a	input.cpp	/^enum B:long {B_a, B_b, B_c};$/;"	e	enum:B	file:
+B_b	input.cpp	/^enum B:long {B_a, B_b, B_c};$/;"	e	enum:B	file:
+B_c	input.cpp	/^enum B:long {B_a, B_b, B_c};$/;"	e	enum:B	file:
+C	input.cpp	/^enum C:unsigned int {C_a, C_b, C_c};$/;"	g	file:
+C_a	input.cpp	/^enum C:unsigned int {C_a, C_b, C_c};$/;"	e	enum:C	file:
+C_b	input.cpp	/^enum C:unsigned int {C_a, C_b, C_c};$/;"	e	enum:C	file:
+C_c	input.cpp	/^enum C:unsigned int {C_a, C_b, C_c};$/;"	e	enum:C	file:
+D	input.cpp	/^  enum D:int {a, b, c};$/;"	g	class:Foo	file:
+Foo	input.cpp	/^class Foo {$/;"	c	file:
+a	input.cpp	/^  enum D:int {a, b, c};$/;"	e	enum:Foo::D	file:
+b	input.cpp	/^  enum D:int {a, b, c};$/;"	e	enum:Foo::D	file:
+c	input.cpp	/^  enum D:int {a, b, c};$/;"	e	enum:Foo::D	file:

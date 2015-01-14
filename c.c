@@ -2542,10 +2542,11 @@ static void addContext (statementInfo *const st, const tokenInfo* const token)
 
 static boolean inheritingDeclaration (declType decl)
 {
-	/* C# supports inheritance for enums. C++0x will too, but not yet. */
+	/* enum base types */
 	if (decl == DECL_ENUM)
 	{
-		return (boolean) (isLanguage (Lang_csharp));
+		return (boolean) (isLanguage (Lang_cpp) || isLanguage (Lang_csharp) ||
+			isLanguage (Lang_d));
 	}
 	return (boolean) (
 		decl == DECL_CLASS ||
