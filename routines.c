@@ -47,9 +47,6 @@
 # endif
 #endif
 
-#ifdef HAVE_DOS_H
-# include <dos.h>  /* to declare MAXPATH */
-#endif
 #ifdef HAVE_DIRECT_H
 # include <direct.h>  /* to _getcwd */
 #endif
@@ -126,9 +123,6 @@
 #  define getcwd  _getcwd
 #  define currentdrive() (_getdrive() + 'A' - 1)
 #  define PATH_MAX  _MAX_PATH
-# elif defined (__BORLANDC__)
-#  define PATH_MAX  MAXPATH
-#  define currentdrive() (getdisk() + 'A')
 # else
 #  define currentdrive() 'C'
 # endif
@@ -164,7 +158,7 @@ extern int stat (const char *, struct stat *);
 #ifdef NEED_PROTO_LSTAT
 extern int lstat (const char *, struct stat *);
 #endif
-#if defined (WIN32) || defined (__EMX__)
+#if defined (WIN32)
 # define lstat(fn,buf) stat(fn,buf)
 #endif
 
@@ -182,14 +176,6 @@ extern void setExecutableName (const char *const path)
 {
 	ExecutableProgram = path;
 	ExecutableName = baseFilename (path);
-#ifdef VAXC
-{
-	/* remove filetype from executable name */
-	char *p = strrchr (ExecutableName, '.');
-	if (p != NULL)
-		*p = '\0';
-}
-#endif
 }
 
 extern const char *getExecutableName (void)
@@ -573,14 +559,6 @@ extern const char *baseFilename (const char *const filePath)
 		tail = filePath;
 	else
 		++tail;  /* step past last delimiter */
-#ifdef VAXC
-	{
-		/* remove version number from filename */
-		char *p = strrchr ((char *) tail, ';');
-		if (p != NULL)
-			*p = '\0';
-	}
-#endif
 
 	return tail;
 }

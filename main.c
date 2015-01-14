@@ -49,9 +49,6 @@
  */
 
 #ifdef HAVE_DIRENT_H
-# ifdef __BORLANDC__
-#  define boolean BORLAND_boolean
-# endif
 # ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>  /* required by dirent.h */
 # endif
@@ -60,9 +57,6 @@
 #endif
 #ifdef HAVE_DIRECT_H
 # include <direct.h>  /* to _getcwd() */
-#endif
-#ifdef HAVE_DOS_H
-# include <dos.h>  /* to declare FA_DIREC */
 #endif
 #ifdef HAVE_DIR_H
 # include <dir.h>  /* to declare findfirst() and findnext */
@@ -502,10 +496,6 @@ static void sanitizeEnviron (void)
 extern int main (int __unused__ argc, char **argv)
 {
 	cookedArgs *args;
-
-#ifdef __EMX__
-	_wildcard (&argc, &argv);  /* expand wildcards in argument list */
-#endif
 
 	setCurrentDirectory ();
 	setExecutableName (*argv++);

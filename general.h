@@ -39,10 +39,8 @@
 # define HAVE_REGEX 1
 #endif
 
-/*  This is a helpful internal feature of later versions (> 2.7) of GCC
- *  to prevent warnings about unused variables.
- */
-#if (__GNUC__ > 2  ||  (__GNUC__ == 2  &&  __GNUC_MINOR__ >= 7)) && !defined (__GNUG__)
+/*  Prevent warnings about unused variables in GCC. */
+#if defined (__GNUC__) && !defined (__GNUG__)
 # ifdef __MINGW32__
 #  define __unused__
 # else
@@ -79,17 +77,12 @@
 
 #undef FALSE
 #undef TRUE
-#ifdef VAXC
-typedef enum { FALSE, TRUE } booleanType;
-typedef int boolean;
-#else
-# ifdef __cplusplus
+#ifdef __cplusplus
 typedef bool boolean;
 #define FALSE false
 #define TRUE true
-# else
+#else
 typedef enum { FALSE, TRUE } boolean;
-# endif
 #endif
 
 #if ! defined (HAVE_FGETPOS) && ! defined (fpos_t)
