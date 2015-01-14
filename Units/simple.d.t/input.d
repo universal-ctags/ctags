@@ -37,6 +37,17 @@ class Class : Interface
 	{
 		return this._bar;
 	}
+	
+	protected:
+	auto tfun(T)(T v)
+	{
+		return v;
+	}
+}
+
+public
+{
+	int missing; // FIXME - parse protection blocks
 }
 
 template Template(alias a, T...)

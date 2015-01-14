@@ -152,7 +152,7 @@ typedef enum eDeclaration {
 	DECL_ENUM,
 	DECL_EVENT,
 	DECL_FUNCTION,
-	DECL_FUNCTION_TEMPLATE,
+	DECL_FUNCTION_TEMPLATE, /* D-only */
 	DECL_IGNORE,         /* non-taggable "declaration" */
 	DECL_INTERFACE,
 	DECL_MIXIN,
@@ -235,7 +235,6 @@ typedef enum eTagType {
 	TAG_EVENT,       /* event */
 	TAG_FIELD,       /* field (Java) */
 	TAG_FUNCTION,    /* function definition */
-	TAG_FUNCTION_TEMPLATE, /* D function template */
 	TAG_INTERFACE,   /* interface declaration */
 	TAG_LOCAL,       /* local variable definition */
 	TAG_MEMBER,      /* structure, class or interface member */
@@ -1075,7 +1074,7 @@ static tagType declToTagType (const declType declaration)
 		case DECL_ENUM:         type = TAG_ENUM;        break;
 		case DECL_EVENT:        type = TAG_EVENT;       break;
 		case DECL_FUNCTION:     type = TAG_FUNCTION;    break;
-		case DECL_FUNCTION_TEMPLATE: type = TAG_FUNCTION_TEMPLATE; break;
+		case DECL_FUNCTION_TEMPLATE: type = TAG_FUNCTION; break;
 		case DECL_INTERFACE:    type = TAG_INTERFACE;   break;
 		case DECL_NAMESPACE:    type = TAG_NAMESPACE;   break;
 		case DECL_PROGRAM:      type = TAG_PROGRAM;     break;
@@ -2501,10 +2500,11 @@ static void analyzeParens (statementInfo *const st)
 			st->gotParenName = TRUE;
 			if (! (c == '('  &&  info.nestedArgs))
 				st->isPointer = info.isPointer;
-			//if( c == '(' && isType (prev, TOKEN_NAME)){
-			//	st->declaration = DECL_FUNCTION_TEMPLATE;
-			//	copyToken (st->blockName, prev);
-			//}
+			if (isLanguage(Lang_d) && c == '(' && isType (prev, TOKEN_NAME))
+			{
+				st->declaration = DECL_FUNCTION_TEMPLATE;
+				copyToken (st->blockName, prev);
+			}
 		}
 		else if (! st->gotArgs  &&  info.isParamList)
 		{
