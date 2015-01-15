@@ -162,7 +162,7 @@ typedef enum eDeclaration {
 	DECL_PROGRAM,        /* Vera program */
 	DECL_STRUCT,
 	DECL_TASK,           /* Vera task */
-	DECL_TEMPLATE,
+	DECL_TEMPLATE,       /* D-only */
 	DECL_UNION,
 	DECL_USING,
 	DECL_VERSION,        /* D conditional compile */
@@ -248,7 +248,7 @@ typedef enum eTagType {
 	TAG_STRUCT,      /* structure name */
 	TAG_TASK,        /* task name */
 	TAG_TYPEDEF,     /* typedef name / D alias name */
-	TAG_TEMPLATE, 	 /* d template name */
+	TAG_TEMPLATE,    /* D template name */
 	TAG_UNION,       /* union name */
 	TAG_VARIABLE,    /* variable definition */
 	TAG_EXTERN_VAR,  /* external variable declaration */
@@ -2888,15 +2888,20 @@ static void tagCheck (statementInfo *const st)
 				}
 				else if (st->haveQualifyingName)
 				{
-					if (! isLanguage (Lang_vera) && st->declaration != DECL_CLASS)
-						st->declaration = DECL_FUNCTION;
 					if (isType (prev2, TOKEN_NAME))
 						copyToken (st->blockName, prev2);
 
-					if (st->declaration == DECL_CLASS)
+					/* D declaration templates */
+					if (isLanguage (Lang_d) &&
+						(st->declaration == DECL_CLASS || st->declaration == DECL_STRUCT ||
+						st->declaration == DECL_INTERFACE || st->declaration == DECL_UNION))
 						qualifyBlockTag (st, prev2);
 					else
+					{
+						if (! isLanguage (Lang_vera))
+							st->declaration = DECL_FUNCTION;
 						qualifyFunctionTag (st, prev2);
+					}
 				}
 			}
 			else if (isContextualStatement (st) ||
