@@ -111,7 +111,6 @@ PRELOAD_OPTLIB =				\
 	coffee.ctags				\
 	ctags.ctags				\
 	mib.ctags				\
-	rust.ctags 				\
 	\
 	$(NULL)
 DEFAULT_PRELOAD_FILE=default.ctags
