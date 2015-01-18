@@ -1,0 +1,4 @@
+Test	input.zep	/^class Test$/;"	c
+first	input.zep	/^    public function first(string str) -> string$/;"	f	class:Test	access:public	signature:(string str)
+nested	input.zep	/^        function nested() {$/;"	f	function:Test::first	signature:()
+second	input.zep	/^    public function second(int i) -> int$/;"	f	class:Test	access:public	signature:(int i)
