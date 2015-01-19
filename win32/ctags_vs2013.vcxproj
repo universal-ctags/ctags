@@ -141,6 +141,7 @@
     <ClCompile Include="..\rexx.c" />
     <ClCompile Include="..\routines.c" />
     <ClCompile Include="..\ruby.c" />
+    <ClCompile Include="..\rust.c" />
     <ClCompile Include="..\scheme.c" />
     <ClCompile Include="..\sh.c" />
     <ClCompile Include="..\slang.c" />
