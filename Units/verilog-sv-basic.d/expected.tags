@@ -11,20 +11,20 @@ STATE4	input.sv	/^           STATE4 = 4'h5    ,$/;"	c	module:mod
 STATE5	input.sv	/^           STATE5 = 4'h6    ,$/;"	c	module:mod
 STATE6	input.sv	/^           STATE6 = 4'h7    ,$/;"	c	module:mod
 STATE7	input.sv	/^           STATE7 = 4'h8;$/;"	c	module:mod
-a	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	function:test.extern_func
+a	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
 a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
 a	input.sv	/^    input wire a,$/;"	p	module:mod
 a	input.sv	/^    reg a;$/;"	r	class:test
 add	input.sv	/^task add ($/;"	t	module:mod
 array	input.sv	/^    for (gencnt = 0; gencnt < PARAM1; gencnt = gencnt + 1) begin: array$/;"	b	module:mod
 b	input.sv	/^    b,c,$/;"	p	module:mod
-b	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	function:test.extern_func
+b	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
 b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
 b	input.sv	/^    logic b;$/;"	r	class:test
 c	input.sv	/^    b,c,$/;"	p	module:mod
 d	input.sv	/^    d ,$/;"	p	module:mod
 e	input.sv	/^    output wire e ,$/;"	p	module:mod
-extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	f	class:test
+extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	Q	class:test
 f	input.sv	/^    output reg f,$/;"	p	module:mod
 g	input.sv	/^    inout wire g$/;"	p	module:mod
 gencnt	input.sv	/^genvar gencnt;$/;"	r	module:mod
@@ -72,9 +72,9 @@ temp	input.sv	/^    reg temp;$/;"	r	function:mod.mult
 test	input.sv	/^class test;$/;"	C
 test.a	input.sv	/^    reg a;$/;"	r	class:test
 test.b	input.sv	/^    logic b;$/;"	r	class:test
-test.extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	f	class:test
-test.extern_func.a	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	function:test.extern_func
-test.extern_func.b	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	function:test.extern_func
+test.extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	Q	class:test
+test.extern_func.a	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
+test.extern_func.b	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
 test.mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:test
 test.mult.a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
 test.mult.b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult

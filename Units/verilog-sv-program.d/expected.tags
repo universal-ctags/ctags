@@ -1,5 +1,5 @@
 count	input.sv	/^    byte count;$/;"	r	block:prog.stop
-external_program	input.sv	/^extern program external_program;$/;"	P
+external_program	input.sv	/^extern program external_program;$/;"	Q
 i	input.sv	/^    longint i;$/;"	r	block:prog.start
 in1	input.sv	/^    input in1,$/;"	p	program:prog
 in2	input.sv	/^    input [11:0] in2,$/;"	p	program:prog

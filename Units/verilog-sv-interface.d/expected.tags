@@ -3,7 +3,7 @@ b	input.sv	/^logic a, b, c, d;$/;"	r	interface:intf
 c	input.sv	/^logic a, b, c, d;$/;"	r	interface:intf
 d	input.sv	/^logic a, b, c, d;$/;"	r	interface:intf
 e	input.sv	/^logic [11:0] e;$/;"	r	interface:intf
-external_interface	input.sv	/^extern interface external_interface;$/;"	I
+external_interface	input.sv	/^extern interface external_interface;$/;"	Q
 in1	input.sv	/^    input in1,$/;"	p	interface:intf
 in2	input.sv	/^    input [11:0] in2,$/;"	p	interface:intf
 intf	input.sv	/^interface intf ($/;"	I
