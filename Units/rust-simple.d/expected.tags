@@ -1,6 +1,6 @@
 Circle	input.rs	/^impl Circle {$/;"	c
 Circle	input.rs	/^struct Circle {$/;"	s
-area	input.rs	/^    fn area(&self) -> f64 {$/;"	F	class:Circle	signature:(&self) -> f64
+area	input.rs	/^    fn area(&self) -> f64 {$/;"	F	implementation:Circle	signature:(&self) -> f64
 main	input.rs	/^fn main() {$/;"	f	signature:()
 radius	input.rs	/^    radius: f64,$/;"	m	struct:Circle
 x	input.rs	/^    x: f64,$/;"	m	struct:Circle

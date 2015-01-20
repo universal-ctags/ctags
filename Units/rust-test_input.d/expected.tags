@@ -21,7 +21,7 @@ a_cat	input.rs	/^	a_cat(int),$/;"	e	enum:Animal
 a_dog	input.rs	/^	a_dog(int),$/;"	e	enum:Animal
 bar	input.rs	/^	bar: int$/;"	m	struct:A
 bar	input.rs	/^	bar: int$/;"	m	struct:B
-do_z	input.rs	/^	fn do_z(&self) {$/;"	F	class:Foo	signature:(&self)
+do_z	input.rs	/^	fn do_z(&self) {$/;"	F	implementation:Foo	signature:(&self)
 do_z	input.rs	/^	fn do_z(&self);$/;"	F	interface:DoZ	signature:(&self)
 foo	input.rs	/^	foo: fn() -> int,$/;"	m	struct:A
 foo	input.rs	/^	foo: int,$/;"	m	struct:B
@@ -30,20 +30,20 @@ gfunc	input.rs	/^fn gfunc<X:Testable+DoZ>(x:&X) {$/;"	f	signature:<X:Testable+Do
 ignore	input.rs	/^macro_rules! ignore (($($x:tt)*) => (()))$/;"	M
 lifetime_and_char	input.rs	/^fn lifetime_and_char<'lifetime>(_: &'lifetime int)$/;"	f	signature:<'lifetime>(_: &'lifetime int)
 main	input.rs	/^fn main() {	$/;"	f	signature:()
-my_method	input.rs	/^	fn my_method(&self,_:int){ println("my_method of foo");}$/;"	F	class:Foo	signature:(&self,_:int)
+my_method	input.rs	/^	fn my_method(&self,_:int){ println("my_method of foo");}$/;"	F	implementation:Foo	signature:(&self,_:int)
 nested	input.rs	/^	fn nested() {}$/;"	f	function:main	signature:()
 not_hidden_by_char	input.rs	/^	fn not_hidden_by_char() {}$/;"	f	function:lifetime_and_char	signature:()
 only_field	input.rs	/^	priv only_field: [int, ..size]$/;"	m	struct:S1
 preserve_string_delims	input.rs	/^fn preserve_string_delims(_bar: extern r#"C"# fn()) {}$/;"	f	signature:(_bar: extern r#"C"# fn())
 size	input.rs	/^static size: uint = 1;$/;"	v
 some2	input.rs	/^fn some2(a:Animal) {$/;"	f	signature:(a:Animal)
-test	input.rs	/^	fn test(&self) {$/;"	F	class:Foo	signature:(&self)
-test	input.rs	/^	fn test(&self) {$/;"	F	class:TraitedStructTest	signature:(&self)
+test	input.rs	/^	fn test(&self) {$/;"	F	implementation:Foo	signature:(&self)
+test	input.rs	/^	fn test(&self) {$/;"	F	implementation:TraitedStructTest	signature:(&self)
 test	input.rs	/^	fn test(&self);$/;"	F	interface:ParametrizedTrait	signature:(&self)
 test	input.rs	/^{	fn test(&self);$/;"	F	interface:Testable	signature:(&self)
-test1	input.rs	/^	fn test1(&self) {$/;"	F	class:Foo	signature:(&self)
+test1	input.rs	/^	fn test1(&self) {$/;"	F	implementation:Foo	signature:(&self)
 test1	input.rs	/^	fn test1(&self);$/;"	F	interface:Testable	signature:(&self)
-test2	input.rs	/^	fn test2(&self) {$/;"	F	class:Foo	signature:(&self)
+test2	input.rs	/^	fn test2(&self) {$/;"	F	implementation:Foo	signature:(&self)
 test2	input.rs	/^	fn test2(&self);$/;"	F	interface:Testable	signature:(&self)
 test_input2	input.rs	/^mod test_input2;$/;"	n
 test_macro	input.rs	/^macro_rules! test_macro$/;"	M

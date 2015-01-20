@@ -1,17 +1,17 @@
 SomeLongStructName	input.rs	/^impl SomeLongStructName {$/;"	c
 SomeLongStructName	input.rs	/^pub struct SomeLongStructName {v:int}$/;"	s
-SomeStruct	input.rs	/^	pub struct SomeStruct{$/;"	s	namespace:fruit
-another_function	input.rs	/^	pub fn another_function(a:int,b:int,c:int)->int {$/;"	f	namespace:veg	signature:(a:int,b:int,c:int)->int
-baaz	input.rs	/^	fn baaz() {$/;"	F	class:SomeLongStructName	signature:()
+SomeStruct	input.rs	/^	pub struct SomeStruct{$/;"	s	module:fruit
+another_function	input.rs	/^	pub fn another_function(a:int,b:int,c:int)->int {$/;"	f	module:veg	signature:(a:int,b:int,c:int)->int
+baaz	input.rs	/^	fn baaz() {$/;"	F	implementation:SomeLongStructName	signature:()
 blue_value	input.rs	/^		pub blue_value: int$/;"	m	struct:fruit::SomeStruct
-chalk	input.rs	/^	fn chalk() {$/;"	f	namespace:mineral	signature:()
+chalk	input.rs	/^	fn chalk() {$/;"	f	module:mineral	signature:()
 foo_bar_test_func	input.rs	/^pub fn foo_bar_test_func(apples:fruit::SomeStruct,(oranges,lemon):(int,int))->int{$/;"	f	signature:(apples:fruit::SomeStruct,(oranges,lemon):(int,int))->int
-fooo	input.rs	/^	fn fooo() {$/;"	F	class:SomeLongStructName	signature:()
+fooo	input.rs	/^	fn fooo() {$/;"	F	implementation:SomeLongStructName	signature:()
 free_func	input.rs	/^fn free_func() {$/;"	f	signature:()
 fruit	input.rs	/^pub mod fruit {$/;"	n
-granite	input.rs	/^	fn granite() {$/;"	f	namespace:mineral	signature:()
+granite	input.rs	/^	fn granite() {$/;"	f	module:mineral	signature:()
 green_value	input.rs	/^		pub green_value: int,$/;"	m	struct:fruit::SomeStruct
-limestone	input.rs	/^	fn limestone() {$/;"	f	namespace:mineral	signature:()
+limestone	input.rs	/^	fn limestone() {$/;"	f	module:mineral	signature:()
 mineral	input.rs	/^mod mineral {$/;"	n
 not_hashbang	input.rs	/^#![cfg(not(test))] fn not_hashbang() {}$/;"	f	signature:()
 red_value	input.rs	/^		pub red_value: int,$/;"	m	struct:fruit::SomeStruct

@@ -47,10 +47,10 @@ typedef enum {
 } RustKind;
 
 static kindOption rustKinds[] = {
-	{TRUE, 'n', "namespace", "module"},
+	{TRUE, 'n', "module", "module"},
 	{TRUE, 's', "struct", "structural type"},
 	{TRUE, 'i', "interface", "trait interface"},
-	{TRUE, 'c', "class", "implementation"},
+	{TRUE, 'c', "implementation", "implementation"},
 	{TRUE, 'f', "function", "Function"},
 	{TRUE, 'g', "enum", "Enum"},
 	{TRUE, 't', "typedef", "Type Alias"},
