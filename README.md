@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/fishman/ctags.svg?branch=master)](https://travis-ci.org/fishman/ctags)
 
-fishman-ctags is a project forked from exuberant-ctags. The project is
+This project continues the development of exuberant-ctags, but with the work
 hosted at github.
 
 The purpose of the project is preparing and maintaining common/unified working
