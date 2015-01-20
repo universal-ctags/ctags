@@ -115,7 +115,7 @@ ctags merges the Psuedo-tag lines with ``!LANG`` suffix::
 	!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
 	!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
 	!_TAG_PROGRAM_AUTHOR!coffee	Łukasz Korecki	/lukasz@coffeesounds.com/
-	!_TAG_PROGRAM_NAME	Fishman Ctags	//
+	!_TAG_PROGRAM_NAME	Exuberant Ctags	//
 	!_TAG_PROGRAM_NAME!coffee	CoffeeTags	//
 	!_TAG_PROGRAM_URL	https://github.com/fishman/ctags	/official site/
 	!_TAG_PROGRAM_URL!coffee	https://github.com/lukaszkorecki/CoffeeTags	/GitHub repository/
