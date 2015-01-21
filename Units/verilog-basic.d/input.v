@@ -52,4 +52,13 @@ begin
 end
 endfunction
 
+wire [PARAM1-1:0] mynet;
+
+genvar gencnt;
+generate
+    for (gencnt = 0; gencnt < PARAM1; gencnt = gencnt + 1) begin: array
+        assign mynet[gencnt] = 1'b0;
+    end
+endgenerate
+
 endmodule // mod

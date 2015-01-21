@@ -137,6 +137,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "output",    K_PORT,      { 1, 1 } },
 	{ "parameter", K_CONSTANT,  { 1, 1 } },
 	{ "localparam",K_CONSTANT,  { 1, 1 } },
+	{ "genvar",    K_REGISTER,  { 1, 1 } },
 	{ "real",      K_REGISTER,  { 1, 1 } },
 	{ "realtime",  K_REGISTER,  { 1, 1 } },
 	{ "reg",       K_REGISTER,  { 1, 1 } },
