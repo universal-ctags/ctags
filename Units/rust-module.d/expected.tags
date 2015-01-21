@@ -1,0 +1,3 @@
+hello	input.rs	/^mod hello {$/;"	n
+main	input.rs	/^fn main() {$/;"	f
+print_hello	input.rs	/^    fn print_hello() {$/;"	f	namespace:hello

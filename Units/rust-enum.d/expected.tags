@@ -1,0 +1,4 @@
+Missing	input.rs	/^    Missing,$/;"	e	enum:OptionalInt
+OptionalInt	input.rs	/^enum OptionalInt {$/;"	g
+Value	input.rs	/^    Value(int),$/;"	e	enum:OptionalInt
+main	input.rs	/^fn main() {$/;"	f
