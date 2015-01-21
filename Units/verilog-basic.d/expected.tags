@@ -12,6 +12,7 @@ STATE7	input.v	/^          STATE7 = 4'h8;$/;"	c	module:mod
 a	input.v	/^input a,b, c, d ;$/;"	p	module:mod
 a	input.v	/^wire a,b,c,d,e;$/;"	n	module:mod
 add	input.v	/^task add;$/;"	t	module:mod
+array	input.v	/^    for (gencnt = 0; gencnt < PARAM1; gencnt = gencnt + 1) begin: array$/;"	b	module:mod
 b	input.v	/^input a,b, c, d ;$/;"	p	module:mod
 b	input.v	/^wire a,b,c,d,e;$/;"	n	module:mod
 c	input.v	/^input a,b, c, d ;$/;"	p	module:mod
@@ -24,6 +25,7 @@ f	input.v	/^output f;$/;"	p	module:mod
 f	input.v	/^reg f;$/;"	r	module:mod
 g	input.v	/^inout g;$/;"	p	module:mod
 g	input.v	/^wire g;$/;"	n	module:mod
+gencnt	input.v	/^genvar gencnt;$/;"	r	module:mod
 k	input.v	/^real k;$/;"	r	module:mod
 l	input.v	/^integer l;$/;"	r	module:mod
 mod	input.v	/^module mod ($/;"	m
@@ -41,6 +43,7 @@ mod.add	input.v	/^task add;$/;"	t	module:mod
 mod.add.x	input.v	/^    input x, y;$/;"	p	task:mod.add
 mod.add.y	input.v	/^    input x, y;$/;"	p	task:mod.add
 mod.add.z	input.v	/^    output z;$/;"	p	task:mod.add
+mod.array	input.v	/^    for (gencnt = 0; gencnt < PARAM1; gencnt = gencnt + 1) begin: array$/;"	b	module:mod
 mod.b	input.v	/^input a,b, c, d ;$/;"	p	module:mod
 mod.b	input.v	/^wire a,b,c,d,e;$/;"	n	module:mod
 mod.c	input.v	/^input a,b, c, d ;$/;"	p	module:mod
@@ -53,12 +56,15 @@ mod.f	input.v	/^output f;$/;"	p	module:mod
 mod.f	input.v	/^reg f;$/;"	r	module:mod
 mod.g	input.v	/^inout g;$/;"	p	module:mod
 mod.g	input.v	/^wire g;$/;"	n	module:mod
+mod.gencnt	input.v	/^genvar gencnt;$/;"	r	module:mod
 mod.k	input.v	/^real k;$/;"	r	module:mod
 mod.l	input.v	/^integer l;$/;"	r	module:mod
 mod.mult	input.v	/^function mult;$/;"	f	module:mod
 mod.mult.x	input.v	/^    input x;$/;"	p	function:mod.mult
 mod.mult.y	input.v	/^    input y;$/;"	p	function:mod.mult
+mod.mynet	input.v	/^wire [PARAM1-1:0] mynet;$/;"	n	module:mod
 mult	input.v	/^function mult;$/;"	f	module:mod
+mynet	input.v	/^wire [PARAM1-1:0] mynet;$/;"	n	module:mod
 x	input.v	/^    input x, y;$/;"	p	task:mod.add
 x	input.v	/^    input x;$/;"	p	function:mod.mult
 y	input.v	/^    input x, y;$/;"	p	task:mod.add
