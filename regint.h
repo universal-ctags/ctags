@@ -4,7 +4,7 @@
   regint.h -  Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
 /*-
- * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2002-2013  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
  * Copyright (c) 2011-2014  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
@@ -873,6 +873,14 @@ typedef struct {
 #define IS_CODE_SB_WORD(enc,code) \
   (ONIGENC_IS_CODE_ASCII(code) && ONIGENC_IS_CODE_WORD(enc,code))
 
+typedef struct OnigEndCallListItem {
+  struct OnigEndCallListItem* next;
+  void (*func)(void);
+} OnigEndCallListItemType;
+
+extern void onig_add_end_call(void (*func)(void));
+
+
 #ifdef ONIG_DEBUG
 
 typedef struct {
@@ -882,6 +890,7 @@ typedef struct {
 } OnigOpInfoType;
 
 extern OnigOpInfoType OnigOpInfo[];
+
 
 extern void onig_print_compiled_byte_code P_((FILE* f, UChar* bp, UChar** nextp, OnigEncoding enc));
 
