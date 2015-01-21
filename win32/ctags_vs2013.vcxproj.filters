@@ -135,6 +135,9 @@
     <ClCompile Include="..\ruby.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\rust.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\scheme.c">
       <Filter>Source Files</Filter>
     </ClCompile>
