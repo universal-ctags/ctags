@@ -1,8 +1,2 @@
-!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
-!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
-!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
-!_TAG_PROGRAM_NAME	Fishman Ctags	//
-!_TAG_PROGRAM_URL	https://github.com/fishman/ctags	/official site/
-!_TAG_PROGRAM_VERSION	Development	//
 size_t	input.d	/^alias size_t = int;$/;"	a	file:
 wchar_t	input.d	/^alias wchar_t = int;$/;"	a	file:
