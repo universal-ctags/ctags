@@ -42,7 +42,8 @@
 
 #define isOneOf(c,s)        (boolean) (strchr ((s), (c)) != NULL)
 
-#define isHighChar(c)       ((c) != EOF && (unsigned char)(c) >= 0xc0)
+#define isHighChar(c)       ((c) != EOF && (unsigned int)(c) >= 0xc0 && \
+							               (unsigned int)(c) <= 0xff)
 
 /*
 *   DATA DECLARATIONS
