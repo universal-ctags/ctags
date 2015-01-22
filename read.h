@@ -62,8 +62,9 @@ enum eCharacters {
 	SINGLE_QUOTE  = '\'',
 	BACKSLASH     = '\\',
 
-	STRING_SYMBOL = ('S' + 0x80),
-	CHAR_SYMBOL   = ('C' + 0x80)
+	/* symbolic representations, above 0xFF not to conflict with any byte */
+	STRING_SYMBOL = ('S' + 0xff),
+	CHAR_SYMBOL   = ('C' + 0xff)
 };
 
 /*  Maintains the state of the current source file.
