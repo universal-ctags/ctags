@@ -244,7 +244,8 @@ static short hasSimplePortList (tokenInfo const* token)
 
 static short isSingleStatement (tokenInfo const* token)
 {
-	if (strcmp (vStringValue (token->name), "extern") == 0 )
+	if (strcmp (vStringValue (token->name), "extern")  == 0 ||
+        strcmp (vStringValue (token->name), "virtual") == 0 )
 	{
 		return TRUE;
 	} else {
