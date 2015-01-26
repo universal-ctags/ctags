@@ -1,8 +1,6 @@
 indexing
 
 	description: "Abstraction of file containing tag records"
-	revision: "$Revision$"
-	date: "$Date$"
 	copyright: "Copyright 2002 Darren Hiebert and others"
 	license: "Eiffel Forum License, version 1"
 

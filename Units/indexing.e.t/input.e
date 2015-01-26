@@ -1,8 +1,6 @@
 indexing
 
 	description: "A simple description"
-	revision: "$Revision$"
-	date: "$Date$"
 
 class INDEXING
 

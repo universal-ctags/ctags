@@ -1,6 +1,4 @@
 /*
-*   $Id$
-*
 *   Copyright (c) 1996-2003, Darren Hiebert
 *
 *   This source code is released into the public domain.

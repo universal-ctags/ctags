@@ -1,7 +1,4 @@
-# $Id$
-#
 # Makefile for Exuberant Ctags under Win32 with MinGW compiler
-#
 
 include source.mak
 

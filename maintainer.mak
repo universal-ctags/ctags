@@ -1,5 +1,3 @@
-#	$Id$
-#
 #	Copyright (c) 1996-2009, Darren Hiebert
 #
 #	Development makefile for Exuberant Ctags. Also used to build releases.

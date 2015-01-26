@@ -1,5 +1,3 @@
-# $Id$
-#
 # Makefile for Win32 using Microsoft Visual C++ compiler
 # To use from the command line:
 # 1. Make sure C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\ is in the PATH

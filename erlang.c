@@ -1,6 +1,4 @@
 /*
-*   $Id$
-*
 *   Copyright (c) 2003, Brent Fulgham <bfulgham@debian.org>
 *
 *   This source code is released for free distribution under the terms of the

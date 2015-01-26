@@ -1,7 +1,4 @@
-# $Id$
-#
 # Makefile for UNIX-like platforms.
-#
 
 # These are the names of the installed programs, in case you wish to change
 # them.
