@@ -1,0 +1,35 @@
+BASE	input.sv	/^  type BASE=supertest #(test)$/;"	c	class:paramtest2
+BASE	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	c	class:paramtest
+DEFINE	input.sv	/^`define DEFINE$/;"	c
+DEF_VALUE	input.sv	/^`define DEF_VALUE   1'd100$/;"	c
+DEF_WITH_EQ	input.sv	/^`define DEF_WITH_EQ = 1'd100$/;"	c
+a	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	function:test.extern_func
+a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
+a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
+a	input.sv	/^    reg a;$/;"	r	class:test
+b	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	function:test.extern_func
+b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
+b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
+b	input.sv	/^    logic b;$/;"	r	class:test
+c	input.sv	/^    logic c;$/;"	r	class:supertest
+extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	f	class:test
+mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:supertest
+mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:test
+paramtest	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	C	inherits:BASE
+paramtest.BASE	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	c	class:paramtest
+paramtest2	input.sv	/^class paramtest2 #($/;"	C
+paramtest2.BASE	input.sv	/^  type BASE=supertest #(test)$/;"	c	class:paramtest2
+supertest	input.sv	/^class supertest extends test;$/;"	C	inherits:test
+supertest.c	input.sv	/^    logic c;$/;"	r	class:supertest
+supertest.mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:supertest
+supertest.mult.a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
+supertest.mult.b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
+test	input.sv	/^class test;$/;"	C
+test.a	input.sv	/^    reg a;$/;"	r	class:test
+test.b	input.sv	/^    logic b;$/;"	r	class:test
+test.extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	f	class:test
+test.extern_func.a	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	function:test.extern_func
+test.extern_func.b	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	function:test.extern_func
+test.mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:test
+test.mult.a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
+test.mult.b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
