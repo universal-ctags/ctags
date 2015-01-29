@@ -1,4 +1,30 @@
 
+_CONST1 = 42
+__CONST2 = 43
+
+class _NotAutoImported:
+    pass
+
+class __JustTheSame:
+    pass
+
+def _and_again():
+    def sub_is_private():
+        pass
+    def _even_with_underscore():
+        pass
+    class ClassesToo:
+        pass
+    class _ForReal:
+        pass
+    pass
+
+def __still_the_same():
+    pass
+
+def but_thankfully_im_pulic():
+    pass
+
 class C:
     def __init__(self):
         pass
@@ -13,4 +39,7 @@ class C:
         pass
 
     def baz(self):
+        pass
+
+    class __Cpriv:
         pass
