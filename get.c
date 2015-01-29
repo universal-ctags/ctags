@@ -330,6 +330,12 @@ static void directiveDefine (const int c)
 	Cpp.directive.state = DRCTV_NONE;
 }
 
+static void directiveUndef (const int c)
+{
+	// Ignore
+	Cpp.directive.state = DRCTV_NONE;
+}
+
 static void directivePragma (int c)
 {
 	if (isident1 (c))
@@ -414,7 +420,7 @@ static boolean handleDirective (const int c)
 		case DRCTV_HASH:    ignore = directiveHash (c);  break;
 		case DRCTV_IF:      ignore = directiveIf (c);    break;
 		case DRCTV_PRAGMA:  directivePragma (c);         break;
-		case DRCTV_UNDEF:   directiveDefine (c);         break;
+		case DRCTV_UNDEF:   directiveUndef (c);         break;
 	}
 	return ignore;
 }
