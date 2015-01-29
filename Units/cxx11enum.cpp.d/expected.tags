@@ -11,6 +11,14 @@ C_a	input.cpp	/^enum C:unsigned int {C_a, C_b, C_c};$/;"	e	enum:C	file:
 C_b	input.cpp	/^enum C:unsigned int {C_a, C_b, C_c};$/;"	e	enum:C	file:
 C_c	input.cpp	/^enum C:unsigned int {C_a, C_b, C_c};$/;"	e	enum:C	file:
 D	input.cpp	/^  enum D:int {a, b, c};$/;"	g	class:Foo	file:
+E1	input.cpp	/^enum class E1:short {E1_a, E1_b, E1_c};$/;"	g	file:
+E1_a	input.cpp	/^enum class E1:short {E1_a, E1_b, E1_c};$/;"	e	enum:E1	file:
+E1_b	input.cpp	/^enum class E1:short {E1_a, E1_b, E1_c};$/;"	e	enum:E1	file:
+E1_c	input.cpp	/^enum class E1:short {E1_a, E1_b, E1_c};$/;"	e	enum:E1	file:
+E2	input.cpp	/^  enum class E2:short {E2_a, E2_b, E2_c};$/;"	g	class:Foo	file:
+E2_a	input.cpp	/^  enum class E2:short {E2_a, E2_b, E2_c};$/;"	e	enum:Foo::E2	file:
+E2_b	input.cpp	/^  enum class E2:short {E2_a, E2_b, E2_c};$/;"	e	enum:Foo::E2	file:
+E2_c	input.cpp	/^  enum class E2:short {E2_a, E2_b, E2_c};$/;"	e	enum:Foo::E2	file:
 Foo	input.cpp	/^class Foo {$/;"	c	file:
 a	input.cpp	/^  enum D:int {a, b, c};$/;"	e	enum:Foo::D	file:
 b	input.cpp	/^  enum D:int {a, b, c};$/;"	e	enum:Foo::D	file:
