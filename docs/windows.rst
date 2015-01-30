@@ -42,7 +42,7 @@ Building ctags from the command line
 Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Most users of Visual Studio will use the IDE and not the command line to compile a project. But by default a shortcut to the command prompt that sets the proper path is installed in the Start Menu. When this command prompt is used ``nmake -f mk_mvc.mak`` will compile ctags.
+Most users of Visual Studio will use the IDE and not the command line to compile a project. But by default a shortcut to the command prompt that sets the proper path is installed in the Start Menu. When this command prompt is used ``nmake -f mk_mvc.mak`` will compile ctags. You can also go into the ``win32`` subdirectory and run ``msbuild ctags_vs2013.sln`` for the default build. Use ``msbuild ctags_vs2013.sln /p:Configuration=Release`` to specifically build a release build. MSBuild is what the IDE uses internally and therefore will product the same files as the IDE.
 
 GCC
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,8 +59,6 @@ Note that ctags builds with MinGW and TDM-GCC but does not build with MinGW-w64 
 **CMD**
 
 Any Windows includes a command prompt. Not the most advanced, but it is enough to do the build tasks. Make sure the path is set properly and ``make -f mk_mingw.mak`` should so the trick.
-
-I have a patch for mk_mingw.mak to generate separate object files.
 
 **MSYS**
 
@@ -84,7 +82,7 @@ You can also build a native Windows version when using ``./configure --host=i686
 
 **Cross-compile from GNU/Linux**
 
-I think all major distros have both MinGW and MinGW-w64 packages. I know Ubuntu has them. Compiling works most likely the same way as with MSYS and Cygwin. A Windows application can be cross-compiled, with the same limitation when autoconf is used. I haven't tested this yet. When cross-compiling works with GNU/Linux, it could also be used with Travis-CI.
+All major distros have both MinGW and MinGW-w64 packages. Compiling works the same way as with MSYS and Cygwin. A Windows application can be cross-compiled, with the same limitation when autoconf is used. Just like with Cygwin, with ``make -f mk_mingw.mak CC=i686-w64-mingw32-gcc`` a native Windows application can be compiled.
 
 
 Building ctags with IDEs
