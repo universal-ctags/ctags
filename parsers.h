@@ -37,6 +37,7 @@
 	FortranParser, \
 	GoParser, \
 	HtmlParser, \
+	JadeParser, \
 	JavaParser, \
 	JavaScriptParser, \
 	JsonParser, \

@@ -31,6 +31,7 @@ SOURCES = \
 	go.c \
 	html.c \
 	htable.c \
+	jade.c \
 	jscript.c \
 	json.c \
 	keyword.c \
