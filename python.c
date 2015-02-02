@@ -683,9 +683,11 @@ static const char *skipTypeDecl (const char *cp, boolean *is_class)
 		while (*ptr && *ptr != '=' && *ptr != '(' && !isspace(*ptr)) {
 			/* skip over e.g. 'cpdef numpy.ndarray[dtype=double, ndim=1]' */
 			if(*ptr == '[') {
-				while(*ptr && *ptr != ']') ptr++;
+				while (*ptr && *ptr != ']') ptr++;
+				if (*ptr) ptr++;
+			} else {
+				ptr++;
 			}
-			ptr++;
 		}
 		if (!*ptr || *ptr == '=') return NULL;
 		if (*ptr == '(') {
