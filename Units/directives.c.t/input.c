@@ -67,3 +67,5 @@ int p2;
 }
 int p3;
 #endif
+#undef MACRO_TO_SEE1
+
