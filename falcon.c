@@ -1,6 +1,4 @@
 /*
- * $Id$
- * 
  * Copyright (c) 2011, 2012 Steven Oliver <oliver.steven@gmail.com>
  * 
  * This source code is released for free distribution under the terms of the

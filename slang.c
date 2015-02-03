@@ -1,6 +1,4 @@
 /*
- *   $Id$
- *
  *   Copyright (c) 2000-2001, Francesc Rocher
  *
  *   Author: Francesc Rocher <f.rocher@computer.org>.

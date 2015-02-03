@@ -1,6 +1,4 @@
 /*
-*   $Id$
-*
 *   Copyright (c) 2013, Colomban Wendling <ban@herbesfolles.org>
 *
 *   This source code is released for free distribution under the terms of the

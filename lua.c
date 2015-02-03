@@ -1,6 +1,4 @@
 /*
-*   $Id$
-*
 *   Copyright (c) 2000-2001, Max Ischenko <mfi@ukr.net>.
 *
 *   This source code is released for free distribution under the terms of the

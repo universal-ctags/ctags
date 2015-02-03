@@ -1,5 +1,3 @@
-# $Id$
-
 #	Copyright (c) 2009, Darren Hiebert
 #
 #	This source code is released for free distribution under the terms

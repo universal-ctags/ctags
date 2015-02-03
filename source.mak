@@ -1,5 +1,3 @@
-# $Id$
-#
 # Shared macros
 
 HEADERS = \

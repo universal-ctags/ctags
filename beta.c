@@ -1,6 +1,4 @@
 /*
-*   $Id$
-*
 *   Copyright (c) 1999-2000, Mjølner Informatics
 *
 *   Written by Erik Corry <corry@mjolner.dk>

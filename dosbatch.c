@@ -1,6 +1,4 @@
 /*
-*   $Id$
-*
 *   Copyright (c) 2009, David Fishburn
 *
 *   This source code is released for free distribution under the terms of the
