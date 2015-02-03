@@ -365,6 +365,15 @@ maintainerclean: distclean
 $(addsuffix .$(OBJEXT),$(basename $(notdir $(REGEX_SOURCES)))): ALL_CPPFLAGS += \
 	-D_GNU_SOURCE -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1
 
+REV := $(shell git rev-parse --short HEAD 2>/dev/null || echo 0)
+ALL_CPPFLAGS += -DCTAGS_COMMIT_ID=0x$(REV)
+
+options.$(OBJEXT): commit-stamp
+
+commit-stamp: FORCE
+	echo "$(REV)" > $@.tmp
+	if diff -q $@ $@.tmp; then rm -f $@.tmp; else mv -f $@.tmp $@; fi
+
 #
 # check
 #
