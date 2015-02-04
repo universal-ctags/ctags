@@ -26,7 +26,7 @@ The following parsers have been added:
 * go
 * json
 * mib *optlib*
-* rust *optlib*
+* rust
 * windres
 * SystemVerilog
 
