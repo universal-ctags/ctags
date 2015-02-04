@@ -30,7 +30,7 @@ The test facility recognizes an input file and an expected
 output file by patterns of file name. Each test case should
 have its own directory under Units directory.
 
-*Units/TEST/input.\* **requisite**
+*Units/TEST/input.\** **requisite**
 
 	Input file name must have a *input* as basename. *TEST*
 	part should explain the test case well.
