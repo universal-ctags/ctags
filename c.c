@@ -151,7 +151,7 @@ typedef enum eDeclaration {
 	DECL_ENUM,
 	DECL_EVENT,
 	DECL_FUNCTION,
-	DECL_FUNCTION_TEMPLATE,
+	DECL_FUNCTION_TEMPLATE, /* D-only */
 	DECL_IGNORE,         /* non-taggable "declaration" */
 	DECL_INTERFACE,
 	DECL_MIXIN,
@@ -161,7 +161,7 @@ typedef enum eDeclaration {
 	DECL_PROGRAM,        /* Vera program */
 	DECL_STRUCT,
 	DECL_TASK,           /* Vera task */
-	DECL_TEMPLATE,
+	DECL_TEMPLATE,       /* D-only */
 	DECL_UNION,
 	DECL_USING,
 	DECL_VERSION,        /* D conditional compile */
@@ -234,7 +234,6 @@ typedef enum eTagType {
 	TAG_EVENT,       /* event */
 	TAG_FIELD,       /* field (Java) */
 	TAG_FUNCTION,    /* function definition */
-	TAG_FUNCTION_TEMPLATE, /* D function template */
 	TAG_INTERFACE,   /* interface declaration */
 	TAG_LOCAL,       /* local variable definition */
 	TAG_MEMBER,      /* structure, class or interface member */
@@ -248,7 +247,7 @@ typedef enum eTagType {
 	TAG_STRUCT,      /* structure name */
 	TAG_TASK,        /* task name */
 	TAG_TYPEDEF,     /* typedef name / D alias name */
-	TAG_TEMPLATE, 	 /* d template name */
+	TAG_TEMPLATE,    /* D template name */
 	TAG_UNION,       /* union name */
 	TAG_VARIABLE,    /* variable definition */
 	TAG_EXTERN_VAR,  /* external variable declaration */
@@ -1074,7 +1073,7 @@ static tagType declToTagType (const declType declaration)
 		case DECL_ENUM:         type = TAG_ENUM;        break;
 		case DECL_EVENT:        type = TAG_EVENT;       break;
 		case DECL_FUNCTION:     type = TAG_FUNCTION;    break;
-		case DECL_FUNCTION_TEMPLATE: type = TAG_FUNCTION_TEMPLATE; break;
+		case DECL_FUNCTION_TEMPLATE: type = TAG_FUNCTION; break;
 		case DECL_INTERFACE:    type = TAG_INTERFACE;   break;
 		case DECL_NAMESPACE:    type = TAG_NAMESPACE;   break;
 		case DECL_PROGRAM:      type = TAG_PROGRAM;     break;
@@ -2500,10 +2499,11 @@ static void analyzeParens (statementInfo *const st)
 			st->gotParenName = TRUE;
 			if (! (c == '('  &&  info.nestedArgs))
 				st->isPointer = info.isPointer;
-			//if( c == '(' && isType (prev, TOKEN_NAME)){
-			//	st->declaration = DECL_FUNCTION_TEMPLATE;
-			//	copyToken (st->blockName, prev);
-			//}
+			if (isLanguage(Lang_d) && c == '(' && isType (prev, TOKEN_NAME))
+			{
+				st->declaration = DECL_FUNCTION_TEMPLATE;
+				copyToken (st->blockName, prev);
+			}
 		}
 		else if (! st->gotArgs  &&  info.isParamList)
 		{
@@ -2887,15 +2887,20 @@ static void tagCheck (statementInfo *const st)
 				}
 				else if (st->haveQualifyingName)
 				{
-					if (! isLanguage (Lang_vera) && st->declaration != DECL_CLASS)
-						st->declaration = DECL_FUNCTION;
 					if (isType (prev2, TOKEN_NAME))
 						copyToken (st->blockName, prev2);
 
-					if (st->declaration == DECL_CLASS)
+					/* D declaration templates */
+					if (isLanguage (Lang_d) &&
+						(st->declaration == DECL_CLASS || st->declaration == DECL_STRUCT ||
+						st->declaration == DECL_INTERFACE || st->declaration == DECL_UNION))
 						qualifyBlockTag (st, prev2);
 					else
+					{
+						if (! isLanguage (Lang_vera))
+							st->declaration = DECL_FUNCTION;
 						qualifyFunctionTag (st, prev2);
+					}
 				}
 			}
 			else if (isContextualStatement (st) ||

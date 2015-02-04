@@ -37,7 +37,32 @@ class Class : Interface
 	{
 		return this._bar;
 	}
+	
+	protected:
+	auto tfun(T)(T v)
+	{
+		return v;
+	}
+	
+	class CT(T)
+	{
+		T member;
+		enum missing = T.init; // FIXME
+	}
 }
+
+public
+{
+	int missing; // FIXME - parse attribute blocks
+}
+
+// declaration templates
+interface IT(T){}
+struct ST(T){}
+union UT(T){}
+// FIXME - parsed as 'T'
+//alias AT(T) = T;
+//enum ET(T) = T.init;
 
 template Template(alias a, T...)
 {
