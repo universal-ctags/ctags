@@ -366,6 +366,7 @@ If *bundle.d* is found and is a directory, files (*\*.ctags*
 and *\*.conf*), directories (\*.d) are loaded recursively.
 
 .. TODO
+
 NOTE: If *bundle.d* is not found above list, file
 *bundle.ctags* or *bundle.conf* is searched. This rule is a bit
 ugly. Following search rules look better.
