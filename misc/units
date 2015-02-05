@@ -1521,15 +1521,14 @@ help_noise ()
 cat <<EOF
 $0 noise [OPTIONS] UNITS-DIR
 
-	Run all tests case for LANGUAGE with "noise" for
-	finding unexepcted behavior like entering an
-	infinite loop.
-	Here "noise" means removing one byte from
-	somewhere file position of the original test case;
-	or adding something one byte to
-	somewhere file position of the original test case.
+	   Run all tests case for LANGUAGE with "noise" for
+	   finding unexepcted behavior like entering an
+	   infinite loop.
+	   Here "noise" means removing one byte from
+	   somewhere file position of the original test case;
+	   or adding something one byte to
+	   somewhere file position of the original test case.
 
-	OPTIONS:
 	   OPTIONS:
 		--ctags CTAGS: ctags exectuable file for testing
 		--datadir DATADIR: data directory
