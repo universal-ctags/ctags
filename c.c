@@ -1896,7 +1896,9 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_BIT:       st->declaration = DECL_BASE;            break;
 		case KEYWORD_CATCH:     skipParens (); skipBraces ();           break;
 		case KEYWORD_CHAR:      st->declaration = DECL_BASE;            break;
-		case KEYWORD_CLASS:     st->declaration = DECL_CLASS;           break;
+		case KEYWORD_CLASS:     if(st->declaration != DECL_ENUM)
+									st->declaration = DECL_CLASS;       break;
+
 		case KEYWORD_CONST:     st->declaration = DECL_BASE;            break;
 		case KEYWORD_DOUBLE:    st->declaration = DECL_BASE;            break;
 		case KEYWORD_ENUM:      st->declaration = DECL_ENUM;            break;
