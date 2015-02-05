@@ -359,7 +359,7 @@ ifdef TRAVIS
 SHOW_DIFF_OUTPUT=--show-diff-output
 endif
 
-.PHONY: check units fuzz  clean-units
+.PHONY: check units fuzz noise clean-units
 check: units
 
 #
@@ -371,6 +371,18 @@ fuzz: TIMEOUT := 1
 fuzz: $(CTAGS_TEST)
 	@ \
 	c="misc/units fuzz \
+		--ctags=$(CTAGS_TEST) \
+		--languages=$(LANGUAGES) \
+		$(VALGRIND) $(RUN_SHRINK) \
+		--with-timeout=$(TIMEOUT)"; \
+	$(SHELL) $${c} Units
+
+#
+# NOISE Target
+#
+noise: $(CTAGS_TEST)
+	@ \
+	c="misc/units noise \
 		--ctags=$(CTAGS_TEST) \
 		--languages=$(LANGUAGES) \
 		$(VALGRIND) $(RUN_SHRINK) \
