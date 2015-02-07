@@ -11,6 +11,22 @@ C_a	input.cpp	/^enum C:unsigned int {C_a, C_b, C_c};$/;"	e	enum:C	file:
 C_b	input.cpp	/^enum C:unsigned int {C_a, C_b, C_c};$/;"	e	enum:C	file:
 C_c	input.cpp	/^enum C:unsigned int {C_a, C_b, C_c};$/;"	e	enum:C	file:
 D	input.cpp	/^  enum D:int {a, b, c};$/;"	g	class:Foo	file:
+EC1	input.cpp	/^enum class EC1:short {EC1_a, EC1_b, EC1_c};$/;"	g	file:
+EC1_a	input.cpp	/^enum class EC1:short {EC1_a, EC1_b, EC1_c};$/;"	e	enum:EC1	file:
+EC1_b	input.cpp	/^enum class EC1:short {EC1_a, EC1_b, EC1_c};$/;"	e	enum:EC1	file:
+EC1_c	input.cpp	/^enum class EC1:short {EC1_a, EC1_b, EC1_c};$/;"	e	enum:EC1	file:
+EC2	input.cpp	/^  enum class EC2:unsigned {EC2_a, EC2_b, EC2_c};$/;"	g	class:Foo	file:
+EC2_a	input.cpp	/^  enum class EC2:unsigned {EC2_a, EC2_b, EC2_c};$/;"	e	enum:Foo::EC2	file:
+EC2_b	input.cpp	/^  enum class EC2:unsigned {EC2_a, EC2_b, EC2_c};$/;"	e	enum:Foo::EC2	file:
+EC2_c	input.cpp	/^  enum class EC2:unsigned {EC2_a, EC2_b, EC2_c};$/;"	e	enum:Foo::EC2	file:
+ES1	input.cpp	/^enum struct ES1:unsigned {ES1_a, ES1_b, ES1_c};$/;"	g	file:
+ES1_a	input.cpp	/^enum struct ES1:unsigned {ES1_a, ES1_b, ES1_c};$/;"	e	enum:ES1	file:
+ES1_b	input.cpp	/^enum struct ES1:unsigned {ES1_a, ES1_b, ES1_c};$/;"	e	enum:ES1	file:
+ES1_c	input.cpp	/^enum struct ES1:unsigned {ES1_a, ES1_b, ES1_c};$/;"	e	enum:ES1	file:
+ES2	input.cpp	/^  enum struct ES2:int {ES2_a, ES2_b, ES2_c};$/;"	g	class:Foo	file:
+ES2_a	input.cpp	/^  enum struct ES2:int {ES2_a, ES2_b, ES2_c};$/;"	e	enum:Foo::ES2	file:
+ES2_b	input.cpp	/^  enum struct ES2:int {ES2_a, ES2_b, ES2_c};$/;"	e	enum:Foo::ES2	file:
+ES2_c	input.cpp	/^  enum struct ES2:int {ES2_a, ES2_b, ES2_c};$/;"	e	enum:Foo::ES2	file:
 Foo	input.cpp	/^class Foo {$/;"	c	file:
 a	input.cpp	/^  enum D:int {a, b, c};$/;"	e	enum:Foo::D	file:
 b	input.cpp	/^  enum D:int {a, b, c};$/;"	e	enum:Foo::D	file:
