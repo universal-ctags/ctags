@@ -4,8 +4,7 @@
  *   This source code is released for free distribution under the terms of the
  *   GNU General Public License.
  *
- *   This module contains code for generating tags for the PHP scripting
- *   language.
+ *   This module contains code for generating tags for the Clojure language.
  */
 
 #include <string.h>
@@ -31,20 +30,17 @@ static vString *CurrentNamespace;
 
 static int isNamespace (const unsigned char *strp)
 {
-	return strp[1] == 'n' && strp[2] == 's';
+	return strncmp (++strp, "ns", 2) == 0 && isspace (strp[2]);
 }
 
 static int isFunction (const unsigned char *strp)
 {
-	return strp[1] == 'd' && strp[2] == 'e' && strp[3] == 'f' && strp[4] == 'n';
+	return strncmp (++strp, "defn", 4) == 0 && isspace (strp[4]);
 }
 
 static int isQuote (const unsigned char *strp)
 {
-	return ((*(++strp) == 'q')
-		&& (*(++strp) == 'u')
-		&& (*(++strp) == 'o')
-		&& (*(++strp) == 't') && (*(++strp) == 'e') && isspace (*(++strp)));
+	return strncmp (++strp, "quote", 5) && isspace (strp[5]);
 }
 
 static void functionName (vString * const name, const unsigned char *dbp)
@@ -107,7 +103,7 @@ static void makeFunctionTag (vString * const name, const unsigned char *dbp)
 	}
 }
 
-static void skipSpaces (const unsigned char **p)
+static void skipToSymbol (const unsigned char **p)
 {
 	while (**p != '\0' && !isspace ((int) **p))
 		*p = *p + 1;
@@ -125,21 +121,25 @@ static void findClojureTags (void)
 	{
 		vStringClear (name);
 
+		while (isspace (*p))
+			p++;
+
 		if (*p == '(')
 		{
 			if (isNamespace (p))
 			{
-				skipSpaces (&p);
+				skipToSymbol (&p);
 				makeNamespaceTag (name, p);
 			}
 			else if (isFunction (p))
 			{
-				skipSpaces (&p);
+				skipToSymbol (&p);
 				makeFunctionTag (name, p);
 			}
 		}
 	}
 	vStringDelete (name);
+	vStringDelete (CurrentNamespace);
 }
 
 extern parserDefinition *ClojureParser (void)
