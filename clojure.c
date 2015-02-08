@@ -38,23 +38,12 @@ static int isFunction (const unsigned char *strp)
 	return strncmp (++strp, "defn", 4) == 0 && isspace (strp[4]);
 }
 
-static int isQuote (const unsigned char *strp)
-{
-	return strncmp (++strp, "quote", 5) == 0 && isspace (strp[5]);
-}
-
 static void functionName (vString * const name, const unsigned char *dbp)
 {
 	const unsigned char *p;
 
 	if (*dbp == '\'')
 		dbp++;
-	else if (*dbp == '(' && isQuote (dbp))
-	{
-		dbp += 7;
-		while (isspace (*dbp))
-			dbp++;
-	}
 
 	for (p = dbp; *p != '\0' && *p != '(' && !isspace ((int) *p) && *p != ')';
 		p++)
