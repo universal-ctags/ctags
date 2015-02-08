@@ -15,6 +15,7 @@ SOURCES = \
 	basic.c \
 	beta.c \
 	c.c \
+	clojure.c \
 	css.c \
 	cobol.c \
 	dosbatch.c \
@@ -73,7 +74,7 @@ SOURCES = \
 
 ENVIRONMENT_HEADERS = e_msoft.h
 
-ENVIRONMENT_SOURCES = 
+ENVIRONMENT_SOURCES =
 
 REGEX_SOURCES = gnu_regex/regex.c
 
