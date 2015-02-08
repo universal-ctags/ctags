@@ -380,6 +380,7 @@ These changes have been merged:
 * Fix regex callback match count - https://github.com/fishman/ctags/pull/104 
 * SQL tags are stored with scopes instead of "tablename.field" - https://github.com/fishman/ctags/pull/100
 * Some fixes for D parser
+* C++11's enum class/struct support
 
 
 `VIM-Japan <https://github.com/vim-jp/ctags/>`_
