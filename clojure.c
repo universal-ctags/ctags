@@ -40,7 +40,7 @@ static int isFunction (const unsigned char *strp)
 
 static int isQuote (const unsigned char *strp)
 {
-	return strncmp (++strp, "quote", 5) && isspace (strp[5]);
+	return strncmp (++strp, "quote", 5) == 0 && isspace (strp[5]);
 }
 
 static void functionName (vString * const name, const unsigned char *dbp)
