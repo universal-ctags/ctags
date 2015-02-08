@@ -15,6 +15,7 @@ SOURCES = \
 	basic.c \
 	beta.c \
 	c.c \
+	clojure.c \
 	css.c \
 	cobol.c \
 	dosbatch.c \
