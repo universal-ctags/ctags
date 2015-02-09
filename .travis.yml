@@ -19,4 +19,5 @@ script:
   - ./configure
   - make -j2
   - make check TRAVIS=1
+  - make fuzz VG=1
   - if [ $CC = 'gcc' ]; then make distclean; make -f mk_mingw.mak CC=i686-w64-mingw32-gcc; fi
