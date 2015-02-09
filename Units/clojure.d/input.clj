@@ -6,4 +6,4 @@
     (println "body"))
 
 '(defn quoted-function [])
-
+(quote not-a-function [])
