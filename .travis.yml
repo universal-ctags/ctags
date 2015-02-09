@@ -13,6 +13,9 @@ compiler:
 before_install:
   - if [ $CC = 'gcc' ]; then sudo apt-get update -qq; sudo apt-get install -y binutils-mingw-w64-i686 gcc-mingw-w64-i686; fi
 
+before_script:
+  - sudo apt-get install -y valgrind
+
 # Build and run tests. Only with gcc cross compile
 script:
   - autoreconf -f -i -v
