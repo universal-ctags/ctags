@@ -5,6 +5,10 @@
 
 language: c
 
+env:
+    - TEST_COMMAND="make check TRAVIS=1 && if [ $CC = 'gcc' ]; then make distclean; make -f mk_mingw.mak CC=i686-w64-mingw32-gcc; fi"
+    - TEST_COMMAND="make fuzz VG=1"
+
 compiler:
   - gcc
   - clang
@@ -22,6 +26,5 @@ script:
   - autoreconf -f -i -v
   - ./configure
   - make -j2
-  - make check TRAVIS=1
-  - make fuzz VG=1
-  - if [ $CC = 'gcc' ]; then make distclean; make -f mk_mingw.mak CC=i686-w64-mingw32-gcc; fi
+  - $TEST_COMMAND
+
