@@ -19,7 +19,6 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get update -qq
   - if [ $CC = 'gcc' ]; then sudo apt-get install -y binutils-mingw-w64-i686 gcc-mingw-w64-i686; fi
   - sudo apt-get install -y valgrind
 
