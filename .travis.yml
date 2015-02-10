@@ -20,7 +20,7 @@ before_install:
 
 install:
   - sudo apt-get update -qq
-  - [ $CC = 'gcc' ] && sudo apt-get install -y binutils-mingw-w64-i686 gcc-mingw-w64-i686
+  - if [ $CC = 'gcc' ]; then sudo apt-get install -y binutils-mingw-w64-i686 gcc-mingw-w64-i686; fi
   - sudo apt-get install -y valgrind
 
 # Build and run tests. Only with gcc cross compile
