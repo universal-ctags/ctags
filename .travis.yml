@@ -7,7 +7,6 @@ language: c
 
 env:
   - TEST_COMMAND="make check TRAVIS=1"
-  - TEST_COMMAND="if [ \"$CC\" = 'gcc' ]; then make distclean; make -f mk_mingw.mak CC=i686-w64-mingw32-gcc; fi"
   - TEST_COMMAND="make fuzz VG=1 LANGUAGES=Ada,Ant,Asm,Asp,Awk,Basic"
   - TEST_COMMAND="make fuzz VG=1 LANGUAGES=BETA,C,C++,CSS,C#,Cobol,D"
   - TEST_COMMAND="make fuzz VG=1 LANGUAGES=DosBatch,Eiffel,Erlan,Falcon"
@@ -20,6 +19,11 @@ env:
 compiler:
   - gcc
   - clang
+
+matrix:
+  include:
+    - env: TEST_COMMAND="make distclean; make -f mk_mingw.mak CC=i686-w64-mingw32-gcc"
+      compiler: gcc
 
 before_install:
   - sudo apt-get update -qq
