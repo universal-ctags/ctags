@@ -158,6 +158,7 @@ optionValues Option = {
 	NULL,       /* --etags-include */
 	DEFAULT_FILE_FORMAT,/* --format */
 	FALSE,      /* --if0 */
+	TRUE,       /* --undef */
 	FALSE,      /* --kind-long */
 	LANG_AUTO,  /* --lang */
 	TRUE,       /* --links */
@@ -259,7 +260,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --help"},
  {1,"       Print this option summary."},
  {1,"  --if0=[yes|no]"},
- {1,"       Should C code within #if 0 conditional branches be parsed [no]?"},
+ {1,"       Should code within #if 0 conditional branches be parsed [no]?"},
  {1,"  --<LANG>-alias=[+|-]aliasPattern"},
  {1,"      Add a pattern detecting a name can be used as an alternative name for LANG."},
  {1,"  --<LANG>-corpus=spec:corpusFile"},
@@ -328,6 +329,8 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Should paths be relative to location of tag file [no; yes when -e]?"},
  {1,"  --totals=[yes|no]"},
  {1,"       Print statistics about source and tag files [no]."},
+ {1,"  --undef=[yes|no]"},
+ {1,"       Should #undef directives generate a macro tag [yes]?"},
  {1,"  --verbose=[yes|no]"},
  {1,"       Enable verbose messages describing actions on each source file."},
  {1,"  --version"},
@@ -2031,6 +2034,7 @@ static booleanOption BooleanOptions [] = {
 #endif
 	{ "tag-relative",   &Option.tagRelative,            TRUE    },
 	{ "totals",         &Option.printTotals,            TRUE    },
+	{ "undef",          &Option.undef,                  FALSE   },
 	{ "verbose",        &Option.verbose,                FALSE   },
 };
 

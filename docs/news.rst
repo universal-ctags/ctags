@@ -631,3 +631,10 @@ There were 3 classes of message in ctags:
 *but more important for users than *verbose*. Generally the user can
 *ignore *notice*. With ``--quiet`` option can be used to turn off the
 priting the *notice* class messages.
+
+Miscellaneous new options
+---------------------------------------------------------------------
+
+``--undef[=yes|no]``
+    Allows disabling the generation of macro tags from ``#undef``
+    directives.

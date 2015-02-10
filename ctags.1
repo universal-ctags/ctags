@@ -791,6 +791,12 @@ the current invocation of \fBctags\fP. This option is off by default.
 This option must appear before the first file name.
 
 .TP 5
+\fB\-\-undef\fP[=\fIyes\fP|\fIno\fP]
+Specifies whether a macro tag should be generated from an #undef CPP directive
+(in a C/C++ file), as if it were a #define directive. This option is enabled by
+default.
+
+.TP 5
 \fB\-\-verbose\fP[=\fIyes\fP|\fIno\fP]
 Enable verbose mode. This prints out information on option processing and a
 brief message describing what action is being taken for each file considered
