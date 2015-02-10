@@ -1,0 +1,3 @@
+f1	input.py	/^def f1():$/;"	f
+f2	input.py	/^def f2():$/;"	f
+f3	input.py	/^def f3():$/;"	f
