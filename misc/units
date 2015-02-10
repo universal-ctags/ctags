@@ -63,8 +63,8 @@ L_FAILED_BY_TIMEED_OUT=
 #
 # TODO
 #
-#  * write new class 'r' (category directory) to f-units.rst.
-#  * write new class 'v' (skip the checkin by valgrind) to f-units.rst.
+#  * write new class 'r' (category directory) to units.rst.
+#  * write new class 'v' (skip the checkin by valgrind) to units.rst.
 #
 action_help ()
 {
