@@ -266,6 +266,8 @@ static const char *skipEverything (const char *cp)
 		}
 		if (isIdentifierFirstCharacter ((int) *cp))
 			return cp;
+		if (match)
+			cp--; /* avoid jumping over the character after a skipped string */
 	}
 	return cp;
 }
@@ -551,6 +553,7 @@ static char const *find_triple_start(char const *string, char const **which)
 			}
 			cp = skipString(cp);
 			if (!*cp) break;
+			cp--; /* avoid jumping over the character after a skipped string */
 		}
 	}
 	return NULL;
