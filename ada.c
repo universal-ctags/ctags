@@ -2098,6 +2098,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
    * scope flag is not set and this tag is a file scope tag. */
   if((token->kind > ADA_KIND_UNDEFINED) && (token->kind < ADA_KIND_COUNT) &&
      (AdaKinds[token->kind].enabled == TRUE) &&
+     (token->name != NULL) &&
      ((token->kind == ADA_KIND_ANONYMOUS && token->children.head != NULL) ||
       token->kind != ADA_KIND_ANONYMOUS) &&
      ((Option.include.fileScope == TRUE) ||
