@@ -1119,7 +1119,7 @@ static adaTokenInfo *adaParseType(adaTokenInfo *parent, adaKind kind)
     else if(adaKeywordCmp(ADA_KEYWORD_RECORD))
     {
       /* until we hit "end record" we need to gather type variables */
-      while(TRUE)
+      while(exception != EXCEPTION_EOF)
       {
         skipWhiteSpace();
 

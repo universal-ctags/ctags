@@ -1,0 +1,4 @@
+One	input.ads	/^        One: access T;$/;"	c	type:T	file:
+P	input.ads	/^package P is$/;"	P
+T	input.ads	/^    type T is record$/;"	t	packspec:P
+Two	input.ads	/^        Two: access T$/;"	c	type:T	file:
