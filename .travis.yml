@@ -5,18 +5,41 @@
 
 language: c
 
+env:
+  - TEST_COMMAND="make check TRAVIS=1"
+  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=BETA,SLang"
+  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=Ada,Ant,Asm,Asp,Awk,Basic"
+  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=C,C++,CSS"
+  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=C#,Cobol,D"
+  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=DosBatch,Eiffel,Erlan,Falcon"
+  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=Flex,Fortran,Go,HTML,Java,JavaScript"
+  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=JSON,Lisp,Lua,Make,MatLab,ObjectiveC"
+  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=OCaml,Pascal,Perl,PHP,Python,REXX,Rust"
+  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=Scheme,Sh,SML,SQL,Tcl,Tex,Vera"
+  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=Verilog,SystemVerilog,VHDL,Vim,VindRes,YACC,Zephir"
+
 compiler:
   - gcc
   - clang
 
-# Only with gcc get the mingw-w64 cross compilers
+matrix:
+  allow_failures:
+    - env: TEST_COMMAND="make fuzz VG=1 LANGUAGES=BETA,SLang"
+  include:
+    - env: TEST_COMMAND="make distclean; make -f mk_mingw.mak CC=i686-w64-mingw32-gcc"
+      compiler: gcc
+
 before_install:
-  - if [ $CC = 'gcc' ]; then sudo apt-get update -qq; sudo apt-get install -y binutils-mingw-w64-i686 gcc-mingw-w64-i686; fi
+  - sudo apt-get update -qq
+
+install:
+  - if [ $CC = 'gcc' ]; then sudo apt-get install -y binutils-mingw-w64-i686 gcc-mingw-w64-i686; fi
+  - sudo apt-get install -y valgrind
 
 # Build and run tests. Only with gcc cross compile
 script:
   - autoreconf -f -i -v
   - ./configure
   - make -j2
-  - make check TRAVIS=1
-  - if [ $CC = 'gcc' ]; then make distclean; make -f mk_mingw.mak CC=i686-w64-mingw32-gcc; fi
+  - bash -c "$TEST_COMMAND"
+
