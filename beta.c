@@ -103,7 +103,7 @@ static void findBetaTags (void)
 		last = vStringLength (line) - 1;
 		first = 0;
 		/* skip white space at start and end of line */
-		while (last && isspace ((int) vStringChar (line, last))) last--;
+		while (last > 0 && isspace ((int) vStringChar (line, last))) last--;
 		while (first < last && isspace ((int) vStringChar (line, first))) first++;
 		/* if line still has a reasonable length and ... */
 		if (last - first > 4 &&
