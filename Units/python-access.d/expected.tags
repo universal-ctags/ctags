@@ -1,0 +1,18 @@
+C	input.py	/^class C:$/;"	c	access:public
+ClassesToo	input.py	/^    class ClassesToo:$/;"	c	function:_and_again	access:private
+_CONST1	input.py	/^_CONST1 = 42$/;"	v	access:protected
+_ForReal	input.py	/^    class _ForReal:$/;"	c	function:_and_again	access:private
+_NotAutoImported	input.py	/^class _NotAutoImported:$/;"	c	access:protected
+__CONST2	input.py	/^__CONST2 = 43$/;"	v	access:protected
+__Cpriv	input.py	/^    class __Cpriv:$/;"	c	class:C	access:private
+__JustTheSame	input.py	/^class __JustTheSame:$/;"	c	access:protected
+__bar	input.py	/^    def __bar(self):$/;"	m	class:C	access:private
+__init__	input.py	/^    def __init__(self):$/;"	m	class:C	access:public
+__repr__	input.py	/^    def __repr__(self):$/;"	m	class:C	access:public
+__still_the_same	input.py	/^def __still_the_same():$/;"	f	access:protected
+_and_again	input.py	/^def _and_again():$/;"	f	access:protected
+_even_with_underscore	input.py	/^    def _even_with_underscore():$/;"	f	function:_and_again	access:private
+_foo	input.py	/^    def _foo(self):$/;"	m	class:C	access:protected
+baz	input.py	/^    def baz(self):$/;"	m	class:C	access:public
+but_thankfully_im_pulic	input.py	/^def but_thankfully_im_pulic():$/;"	f	access:public
+sub_is_private	input.py	/^    def sub_is_private():$/;"	f	function:_and_again	access:private

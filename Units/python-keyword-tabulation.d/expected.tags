@@ -1,0 +1,2 @@
+Bar	input.py	/^class	Bar:$/;"	c
+foo	input.py	/^def	foo():$/;"	f

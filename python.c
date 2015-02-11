@@ -57,6 +57,14 @@ static kindOption PythonKinds[] = {
     {TRUE, 'i', "namespace", "imports"}
 };
 
+typedef enum {
+	A_PUBLIC, A_PRIVATE, A_PROTECTED
+} pythonAccess;
+
+static const char *const PythonAccesses[] = {
+	"public", "private", "protected"
+};
+
 static char const * const singletriple = "'''";
 static char const * const doubletriple = "\"\"\"";
 
@@ -129,6 +137,48 @@ static boolean isIdentifierCharacter (int c)
 	return (boolean) (isalnum (c) || c == '_');
 }
 
+/* follows PEP-8, and always reports single-underscores as protected
+ * See:
+ * - http://www.python.org/dev/peps/pep-0008/#method-names-and-instance-variables
+ * - http://www.python.org/dev/peps/pep-0008/#designing-for-inheritance
+ */
+static pythonAccess accessFromIdentifier (const vString *const ident,
+	pythonKind kind, boolean has_parent, boolean parent_is_class)
+{
+	const char *const p = vStringValue (ident);
+	const size_t len = vStringLength (ident);
+
+	/* inside a function/method, private */
+	if (has_parent && !parent_is_class)
+		return A_PRIVATE;
+	/* not starting with "_", public */
+	else if (len < 1 || p[0] != '_')
+		return A_PUBLIC;
+	/* "__...__": magic methods */
+	else if (kind == K_MEMBER && parent_is_class &&
+			 len > 3 && p[1] == '_' && p[len - 2] == '_' && p[len - 1] == '_')
+		return A_PUBLIC;
+	/* "__...": name mangling */
+	else if (parent_is_class && len > 1 && p[1] == '_')
+		return A_PRIVATE;
+	/* "_...": suggested as non-public, but easily accessible */
+	else
+		return A_PROTECTED;
+}
+
+static void addAccessFields (tagEntryInfo *const entry,
+	const vString *const ident, pythonKind kind,
+	boolean has_parent, boolean parent_is_class)
+{
+	pythonAccess access;
+
+	access = accessFromIdentifier (ident, kind, has_parent, parent_is_class);
+	entry->extensionFields.access = PythonAccesses [access];
+	/* FIXME: should we really set isFileScope in addition to access? */
+	if (access == A_PRIVATE)
+		entry->isFileScope = TRUE;
+}
+
 /* Given a string with the contents of a line directly after the "def" keyword,
  * extract all relevant information and create a tag.
  */
@@ -138,40 +188,29 @@ static void makeFunctionTag (vString *const function,
 	tagEntryInfo tag;
 	initTagEntry (&tag, vStringValue (function));
 
-	tag.kindName = "function";
-	tag.kind = 'f';
+	tag.kindName = PythonKinds[K_FUNCTION].name;
+	tag.kind = PythonKinds[K_FUNCTION].letter;
 	tag.extensionFields.signature = arglist;
 
 	if (vStringLength (parent) > 0)
 	{
 		if (is_class_parent)
 		{
-			tag.kindName = "member";
-			tag.kind = 'm';
-			tag.extensionFields.scope [0] = "class";
+			tag.kindName = PythonKinds[K_MEMBER].name;
+			tag.kind = PythonKinds[K_MEMBER].letter;
+			tag.extensionFields.scope [0] = PythonKinds[K_CLASS].name;
 			tag.extensionFields.scope [1] = vStringValue (parent);
 		}
 		else
 		{
-			tag.extensionFields.scope [0] = "function";
+			tag.extensionFields.scope [0] = PythonKinds[K_FUNCTION].name;
 			tag.extensionFields.scope [1] = vStringValue (parent);
 		}
 	}
 
-	/* If a function starts with __, we mark it as file scope.
-	 * FIXME: What is the proper way to signal such attributes?
-	 * TODO: What does functions/classes starting with _ and __ mean in python?
-	 */
-	if (strncmp (vStringValue (function), "__", 2) == 0 &&
-		strcmp (vStringValue (function), "__init__") != 0)
-	{
-		tag.extensionFields.access = "private";
-		tag.isFileScope = TRUE;
-	}
-	else
-	{
-		tag.extensionFields.access = "public";
-	}
+	addAccessFields (&tag, function, is_class_parent ? K_MEMBER : K_FUNCTION,
+		vStringLength (parent) > 0, is_class_parent);
+
 	makeTagEntry (&tag);
 }
 
@@ -183,36 +222,41 @@ static void makeClassTag (vString *const class, vString *const inheritance,
 {
 	tagEntryInfo tag;
 	initTagEntry (&tag, vStringValue (class));
-	tag.kindName = "class";
-	tag.kind = 'c';
+	tag.kindName = PythonKinds[K_CLASS].name;
+	tag.kind = PythonKinds[K_CLASS].letter;
 	if (vStringLength (parent) > 0)
 	{
 		if (is_class_parent)
 		{
-			tag.extensionFields.scope [0] = "class";
+			tag.extensionFields.scope [0] = PythonKinds[K_CLASS].name;
 			tag.extensionFields.scope [1] = vStringValue (parent);
 		}
 		else
 		{
-			tag.extensionFields.scope [0] = "function";
+			tag.extensionFields.scope [0] = PythonKinds[K_FUNCTION].name;
 			tag.extensionFields.scope [1] = vStringValue (parent);
 		}
 	}
 	tag.extensionFields.inheritance = vStringValue (inheritance);
+	addAccessFields (&tag, class, K_CLASS, vStringLength (parent) > 0,
+		is_class_parent);
 	makeTagEntry (&tag);
 }
 
-static void makeVariableTag (vString *const var, vString *const parent)
+static void makeVariableTag (vString *const var, vString *const parent,
+	boolean is_class_parent)
 {
 	tagEntryInfo tag;
 	initTagEntry (&tag, vStringValue (var));
-	tag.kindName = "variable";
-	tag.kind = 'v';
+	tag.kindName = PythonKinds[K_VARIABLE].name;
+	tag.kind = PythonKinds[K_VARIABLE].letter;
 	if (vStringLength (parent) > 0)
 	{
-		tag.extensionFields.scope [0] = "class";
+		tag.extensionFields.scope [0] = PythonKinds[K_CLASS].name;
 		tag.extensionFields.scope [1] = vStringValue (parent);
 	}
+	addAccessFields (&tag, var, K_VARIABLE, vStringLength (parent) > 0,
+		is_class_parent);
 	makeTagEntry (&tag);
 }
 
@@ -637,7 +681,15 @@ static const char *skipTypeDecl (const char *cp, boolean *is_class)
 	}
 	/* limit so that we don't pick off "int item=obj()" */
 	while (*ptr && loopCount++ < 2) {
-		while (*ptr && *ptr != '=' && *ptr != '(' && !isspace(*ptr)) ptr++;
+		while (*ptr && *ptr != '=' && *ptr != '(' && !isspace(*ptr)) {
+			/* skip over e.g. 'cpdef numpy.ndarray[dtype=double, ndim=1]' */
+			if(*ptr == '[') {
+				while (*ptr && *ptr != ']') ptr++;
+				if (*ptr) ptr++;
+			} else {
+				ptr++;
+			}
+		}
 		if (!*ptr || *ptr == '=') return NULL;
 		if (*ptr == '(') {
 		    return lastStart; /* if we stopped on a '(' we are done */
@@ -690,6 +742,19 @@ static boolean varIsLambda (const char *cp, char **arglist)
 		}
 	}
 	return is_lambda;
+}
+
+/* checks if @p cp has keyword @p keyword at the start, and fills @p cp_n with
+ * the position of the next non-whitespace after the keyword */
+static boolean matchKeyword (const char *keyword, const char *cp, const char **cp_n)
+{
+	size_t kw_len = strlen (keyword);
+	if (strncmp (cp, keyword, kw_len) == 0 && isspace (cp[kw_len]))
+	{
+		*cp_n = skipSpace (&cp[kw_len + 1]);
+		return TRUE;
+	}
+	return FALSE;
 }
 
 static void findPythonTags (void)
@@ -745,6 +810,38 @@ static void findPythonTags (void)
 		
 		checkParent(nesting_levels, indent, parent);
 
+		/* Find global and class variables */
+		variable = findVariable(line);
+		if (variable)
+		{
+			const char *start = variable;
+			char *arglist;
+			boolean parent_is_class;
+
+			vStringClear (name);
+			while (isIdentifierCharacter ((int) *start))
+			{
+				vStringPut (name, (int) *start);
+				++start;
+			}
+			vStringTerminate (name);
+
+			parent_is_class = constructParentString(nesting_levels, indent, parent);
+			if (varIsLambda (variable, &arglist))
+			{
+				/* show class members or top-level script lambdas only */
+				if (parent_is_class || vStringLength(parent) == 0)
+					makeFunctionTag (name, parent, parent_is_class, arglist);
+				eFree (arglist);
+			}
+			else
+			{
+				/* skip variables in methods */
+				if (parent_is_class || vStringLength(parent) == 0)
+					makeVariableTag (name, parent, parent_is_class);
+			}
+		}
+
 		/* Deal with multiline string start. */
 		longstring = find_triple_start(cp, &longStringLiteral);
 		if (longstring)
@@ -761,20 +858,17 @@ static void findPythonTags (void)
 		{
 			boolean found = FALSE;
 			boolean is_class = FALSE;
-			if (!strncmp (keyword, "def ", 4))
+			if (matchKeyword ("def", keyword, &cp))
 			{
-				cp = skipSpace (keyword + 3);
 				found = TRUE;
 			}
-			else if (!strncmp (keyword, "class ", 6))
+			else if (matchKeyword ("class", keyword, &cp))
 			{
-				cp = skipSpace (keyword + 5);
 				found = TRUE;
 				is_class = TRUE;
 			}
-			else if (!strncmp (keyword, "cdef ", 5))
+			else if (matchKeyword ("cdef", keyword, &cp))
 		    {
-		        cp = skipSpace(keyword + 4);
 		        candidate = skipTypeDecl (cp, &is_class);
 		        if (candidate)
 		        {
@@ -783,9 +877,8 @@ static void findPythonTags (void)
 		        }
 
 		    }
-    		else if (!strncmp (keyword, "cpdef ", 6))
+    		else if (matchKeyword ("cpdef", keyword, &cp))
 		    {
-		        cp = skipSpace(keyword + 5);
 		        candidate = skipTypeDecl (cp, &is_class);
 		        if (candidate)
 		        {
@@ -807,40 +900,6 @@ static void findPythonTags (void)
 					parseFunction(cp, name, parent, is_parent_class);
 
 				addNestingLevel(nesting_levels, indent, name, is_class);
-			}
-		}
-		/* Find global and class variables */
-		variable = findVariable(line);
-		if (variable)
-		{
-			const char *start = variable;
-			char *arglist;
-			boolean parent_is_class;
-
-			vStringClear (name);
-			while (isIdentifierCharacter ((int) *start))
-			{
-				vStringPut (name, (int) *start);
-				++start;
-			}
-			vStringTerminate (name);
-
-			parent_is_class = constructParentString(nesting_levels, indent, parent);
-
-			if (varIsLambda (variable, &arglist))
-			{
-				/* show class members or top-level script lambdas only */
-				if (parent_is_class || vStringLength(parent) == 0)
-					makeFunctionTag (name, parent, parent_is_class, arglist);
-				eFree (arglist);
-			}
-			else
-			{
-				/* skip variables in methods */
-				if (! parent_is_class && vStringLength(parent) > 0)
-					continue;
- 
-				makeVariableTag (name, parent);
 			}
 		}
 		/* Find and parse imports */
