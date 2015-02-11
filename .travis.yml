@@ -7,13 +7,15 @@ language: c
 
 env:
   - TEST_COMMAND="make check TRAVIS=1"
+  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=BETA,SLang"
   - TEST_COMMAND="make fuzz VG=1 LANGUAGES=Ada,Ant,Asm,Asp,Awk,Basic"
-  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=BETA,C,C++,CSS,C#,Cobol,D"
+  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=C,C++,CSS"
+  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=C#,Cobol,D"
   - TEST_COMMAND="make fuzz VG=1 LANGUAGES=DosBatch,Eiffel,Erlan,Falcon"
   - TEST_COMMAND="make fuzz VG=1 LANGUAGES=Flex,Fortran,Go,HTML,Java,JavaScript"
   - TEST_COMMAND="make fuzz VG=1 LANGUAGES=JSON,Lisp,Lua,Make,MatLab,ObjectiveC"
   - TEST_COMMAND="make fuzz VG=1 LANGUAGES=OCaml,Pascal,Perl,PHP,Python,REXX,Rust"
-  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=Scheme,Sh,SLang,SML,SQL,Tcl,Tex,Vera"
+  - TEST_COMMAND="make fuzz VG=1 LANGUAGES=Scheme,Sh,SML,SQL,Tcl,Tex,Vera"
   - TEST_COMMAND="make fuzz VG=1 LANGUAGES=Verilog,SystemVerilog,VHDL,Vim,VindRes,YACC,Zephir"
 
 compiler:
@@ -21,6 +23,8 @@ compiler:
   - clang
 
 matrix:
+  allow_failures:
+    - env: TEST_COMMAND="make fuzz VG=1 LANGUAGES=BETA,SLang"
   include:
     - env: TEST_COMMAND="make distclean; make -f mk_mingw.mak CC=i686-w64-mingw32-gcc"
       compiler: gcc
