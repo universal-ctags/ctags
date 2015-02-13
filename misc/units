@@ -1148,12 +1148,19 @@ fuzz_lang ()
     local dir="$2"
     shift 2
     local f
+    local r=0
 
     [ "${QUIET}" = 'yes' ] || printf '%-60s\n' "Semi-fuzzing (${lang})"
     for f in $(find "${dir}" -type f -name 'input.*'); do
 	fuzz_lang_file "${lang}" "${f}"
+    local ret=$?
+    if [[ $r -eq 0 ]];then
+    r=$ret
+    fi
     done
     [ "${QUIET}" = 'yes' ] || echo
+
+    return $r
 }
 
 action_fuzz ()
