@@ -1154,7 +1154,7 @@ fuzz_lang ()
     for f in $(find "${dir}" -type f -name 'input.*'); do
 	fuzz_lang_file "${lang}" "${f}"
     local ret=$?
-    if [[ $r -eq 0 ]];then
+    if [ $r -eq 0 ]; then
     r=$ret
     fi
     done
