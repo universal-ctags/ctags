@@ -1,6 +1,7 @@
 Current Version: @VERSION@
 
 ctags-@VERSION@ (@DATE@)
+* Added support for code loaded by AutoLoader and SelfLoader [Perl].
 * Fixed parsing of inline docs: support encoding POD word [Perl].
 * Added support for constants declared via hash reference [Perl].
 * Added support for new "attached" and "detachable" keywords [Eiffel].
