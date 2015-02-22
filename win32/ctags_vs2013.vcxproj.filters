@@ -210,6 +210,9 @@
     <ClCompile Include="..\json.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\clojure.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\e_msoft.h">
