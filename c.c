@@ -1471,7 +1471,7 @@ static int skipToNonWhite (void)
 	while (1)
 	{
 		c = cppGetc ();
-		if (isspace (c))
+		if (c < 256 && isspace(c))
 			found = TRUE;
 		else
 			break;
