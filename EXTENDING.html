@@ -166,6 +166,12 @@ file, so that your new module will be compiled into the program.
 </p>
 
 <p>
+In case you have some problems run <code>ctags --verbose</code> to see if the
+extensions or patterns you defined for your language conflict with other
+languages.
+</p>
+
+<p>
 This is all there is to it. All other details are specific to the parser and
 how it wants to do its job. There are some support functions which can take
 care of some commonly needed parsing tasks, such as keyword table lookups (see
@@ -188,7 +194,7 @@ creating your own.
 Below you will find several example parsers demonstrating most of the
 facilities available. These include three alternative implementations
 of a Swine parser, which generate tags for lines beginning with
-"<CODE>def</CODE>" followed by some name.
+"<code>def</code>" followed by some name.
 </p>
 
 <code>
@@ -281,10 +287,9 @@ extern parserDefinition* SwineParser (void)
 {
     static const char *const extensions [] = { "swn", NULL };
     parserDefinition* def = parserNew ("Swine");
-    parserDefinition* const def = parserNew ("Makefile");
     def-&gt;patterns   = patterns;
     def-&gt;extensions = extensions;
-    def-&gt;initialize = installMakefileRegex;
+    def-&gt;initialize = installSwineRegex;
     def-&gt;regex      = TRUE;
     return def;
 }
