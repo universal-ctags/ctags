@@ -1,0 +1,3 @@
+app.controller	input.clj	/^(ns app.controller)$/;"	n
+empty-fn	input.clj	/^ (defn empty-fn [])$/;"	f	namespace:app.controller
+function-with-body	input.clj	/^(defn function-with-body []$/;"	f	namespace:app.controller
