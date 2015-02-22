@@ -21,6 +21,7 @@
 	AwkParser, \
 	BasicParser, \
 	BetaParser, \
+	ClojureParser, \
 	CParser, \
 	CppParser, \
 	CssParser, \
