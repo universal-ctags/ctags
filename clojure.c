@@ -28,24 +28,24 @@ static kindOption ClojureKinds[] = {
 
 static vString *CurrentNamespace;
 
-static int isNamespace (const unsigned char *strp)
+static int isNamespace (const char *strp)
 {
 	return strncmp (++strp, "ns", 2) == 0 && isspace (strp[2]);
 }
 
-static int isFunction (const unsigned char *strp)
+static int isFunction (const char *strp)
 {
 	return strncmp (++strp, "defn", 4) == 0 && isspace (strp[4]);
 }
 
-static int isQuote (const unsigned char *strp)
+static int isQuote (const char *strp)
 {
 	return strncmp (++strp, "quote", 5) == 0 && isspace (strp[5]);
 }
 
-static void functionName (vString * const name, const unsigned char *dbp)
+static void functionName (vString * const name, const char *dbp)
 {
-	const unsigned char *p;
+	const char *p;
 
 	if (*dbp == '\'')
 		dbp++;
@@ -62,7 +62,7 @@ static void functionName (vString * const name, const unsigned char *dbp)
 	vStringTerminate (name);
 }
 
-static void makeNamespaceTag (vString * const name, const unsigned char *dbp)
+static void makeNamespaceTag (vString * const name, const char *dbp)
 {
 	vStringClear (CurrentNamespace);
 
@@ -81,7 +81,7 @@ static void makeNamespaceTag (vString * const name, const unsigned char *dbp)
 	}
 }
 
-static void makeFunctionTag (vString * const name, const unsigned char *dbp)
+static void makeFunctionTag (vString * const name, const char *dbp)
 {
 	functionName (name, dbp);
 	if (vStringLength (name) > 0)
@@ -103,7 +103,7 @@ static void makeFunctionTag (vString * const name, const unsigned char *dbp)
 	}
 }
 
-static void skipToSymbol (const unsigned char **p)
+static void skipToSymbol (const char **p)
 {
 	while (**p != '\0' && !isspace ((int) **p))
 		*p = *p + 1;
@@ -114,10 +114,10 @@ static void skipToSymbol (const unsigned char **p)
 static void findClojureTags (void)
 {
 	vString *name = vStringNew ();
-	const unsigned char *p;
+	const char *p;
 	CurrentNamespace = vStringNew ();
 
-	while ((p = fileReadLine ()) != NULL)
+	while ((p = (char *)fileReadLine ()) != NULL)
 	{
 		vStringClear (name);
 
