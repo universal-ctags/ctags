@@ -1,0 +1,94 @@
+A1	input.cpp	/^int  A1 = i < 7 ? i : 7;$/;"	v
+A2	input.cpp	/^int  A2 = 8;$/;"	v
+A3	input.cpp	/^int  A3 = 9;$/;"	v
+A4	input.cpp	/^int  A4 = p->data;$/;"	v
+A5	input.cpp	/^int  A5 = 8;$/;"	v
+A6	input.cpp	/^int ( *A6 )( int, char ** ) = &main;$/;"	v
+A7	input.cpp	/^int  A7( short ( *p )( int ) );$/;"	p	file:	signature:( short ( *p )( int ) )
+B1	input.cpp	/^const char *B1( "uuu" );                \/\/variable$/;"	v
+B2	input.cpp	/^int B2( int ooo, const char* o );       \/\/prototype$/;"	p	file:	signature:( int ooo, const char* o )
+B3	input.cpp	/^int B3( int( 7 ) );                     \/\/variable$/;"	v
+C1	input.cpp	/^int C1( a >> ooo );                     \/\/variable$/;"	v
+C2	input.cpp	/^int C2( int * h );                      \/\/prototype$/;"	p	file:	signature:( int * h )
+C3	input.cpp	/^int C3( std::map<int>( 9 ) );           \/\/variable$/;"	v
+C4	input.cpp	/^int C4( std::map<int> a );              \/\/prototype$/;"	p	file:	signature:( std::map<int> a )
+C5	input.cpp	/^int C5( map<int>  & a );                \/\/prototype$/;"	p	file:	signature:( map<int> & a )
+C6	input.cpp	/^int C6( ooo & a );                      \/\/prototype$/;"	p	file:	signature:( ooo & a )
+C7	input.cpp	/^int C7( int & a );                      \/\/prototype$/;"	p	file:	signature:( int & a )
+C8	input.cpp	/^int C8( map<int> a );                   \/\/prototype$/;"	p	file:	signature:( map<int> a )
+C9	input.cpp	/^int C9( int a );                        \/\/prototype$/;"	p	file:	signature:( int a )
+D1	input.cpp	/^ind D1( a * 2 );                        \/\/variable$/;"	v
+D2	input.cpp	/^ind D2( "a" * 2 );                      \/\/variable$/;"	v
+D3	input.cpp	/^int D3( *j );                           \/\/variable$/;"	v
+F1	input.cpp	/^int F1( SomeType (*p)( int ) );         \/\/prototype$/;"	p	file:	signature:( SomeType (*p)( int ) )
+F2	input.cpp	/^SomeType (*F2)( int o );                \/\/variable$/;"	v
+F3	input.cpp	/^int F3( std::map<int> & a );            \/\/prototype$/;"	p	file:	signature:( std::map<int> & a )
+G1	input.cpp	/^int G1( SomeType a );                   \/\/prototype$/;"	p	file:	signature:( SomeType a )
+H1	input.cpp	/^char H1( const char *a = "a" );         \/\/prototype$/;"	p	file:	signature:( const char *a = <String> )
+H2	input.cpp	/^int H2();                               \/\/prototype$/;"	p	file:	signature:()
+H3	input.cpp	/^char H3( double );                      \/\/prototype$/;"	p	file:	signature:( double )
+H4	input.cpp	/^int H4( h u );                          \/\/prototype$/;"	p	file:	signature:( h u )
+P1	input.cpp	/^int (*P1)( int o );                     \/\/variable$/;"	v
+V4	input.cpp	/^int V4( iii( 'o' ) );                   \/\/variable$/;"	v
+V5	input.cpp	/^int V5( iii( o ) );                     \/\/variable$/;"	v
+V6	input.cpp	/^int V6( int (*p)( int ) );              \/\/prototype$/;"	p	file:	signature:( int (*p)( int ) )
+V7	input.cpp	/^int V7( 89 );                           \/\/variable$/;"	v
+V8	input.cpp	/^int V8( ooo );                          \/\/variable$/;"	v
+W1	input.cpp	/^int W1 __ARGS (( int a )){}             \/\/function$/;"	f	signature:( int a )
+W2	input.cpp	/^int W2 (( a - 5 ) \/ 6 );                \/\/variable$/;"	v
+X1	input.cpp	/^int X1( a.b );                          \/\/variable$/;"	v
+X2	input.cpp	/^int X2( a->b );                         \/\/variable$/;"	v
+X3	input.cpp	/^int X3( NS::a  b );                     \/\/prototype$/;"	p	file:	signature:( NS::a b )
+X4	input.cpp	/^int X4( a ^ b );                        \/\/variable $/;"	v
+X5	input.cpp	/^int X5( a ^ 6 );                        \/\/variable$/;"	v
+X6	input.cpp	/^int X6( a | b );                        \/\/variable$/;"	v
+X8	input.cpp	/^int X8( a & b & 2 );                    \/\/variable$/;"	v
+X9	input.cpp	/^int X9( a && b );                       \/\/variable$/;"	v
+a1	input.cpp	/^    int  a1 = i < 7 ? i : 7;$/;"	l
+a2	input.cpp	/^    int  a2 = 8;$/;"	l
+a3	input.cpp	/^    int  a3 = 9;$/;"	l
+a4	input.cpp	/^    int  a4 = p->data;$/;"	l
+a5	input.cpp	/^    int  a5 = 8;$/;"	l
+a6	input.cpp	/^    int ( *a6 )( int, char ** ) = &main;$/;"	l
+a7	input.cpp	/^    int  a7( short ( *p )( int ) );$/;"	p	file:	signature:( short ( *p )( int ) )
+a8	input.cpp	/^    short a8 = i;$/;"	l
+b1	input.cpp	/^    const char *b1( "uuu" );                \/\/variable$/;"	l
+b2	input.cpp	/^    int b2( int ooo, const char* o );       \/\/prototype$/;"	p	file:	signature:( int ooo, const char* o )
+b3	input.cpp	/^    int b3( int( 7 ) );                     \/\/variable$/;"	l
+c1	input.cpp	/^    int c1( a >> ooo );                     \/\/variable$/;"	l
+c2	input.cpp	/^    int c2( int * h );                      \/\/prototype$/;"	p	file:	signature:( int * h )
+c3	input.cpp	/^    int c3( std::map<int>( 9 ) );           \/\/variable$/;"	l
+c4	input.cpp	/^    int c4( std::map<int> a );              \/\/prototype$/;"	p	file:	signature:( std::map<int> a )
+c5	input.cpp	/^    int c5( map<int>  & a );                \/\/prototype$/;"	p	file:	signature:( map<int> & a )
+c6	input.cpp	/^    int c6( ooo & a );                      \/\/prototype$/;"	p	file:	signature:( ooo & a )
+c7	input.cpp	/^    int c7( int & a );                      \/\/prototype$/;"	p	file:	signature:( int & a )
+c8	input.cpp	/^    int c8( map<int> a );                   \/\/prototype$/;"	p	file:	signature:( map<int> a )
+c9	input.cpp	/^    int c9( int a );                        \/\/prototype$/;"	p	file:	signature:( int a )
+d1	input.cpp	/^    ind d1( a * 2 );                        \/\/variable$/;"	l
+d2	input.cpp	/^    ind d2( "a" * 2 );                      \/\/variable$/;"	l
+d3	input.cpp	/^    int d3( *j );                           \/\/variable$/;"	l
+f1	input.cpp	/^    int f1( SomeType (*p)( int ) );         \/\/prototype$/;"	p	file:	signature:( SomeType (*p)( int ) )
+f2	input.cpp	/^    SomeType (*f2)( int o );                \/\/variable$/;"	l
+f3	input.cpp	/^    int f3( std::map<int> & a );            \/\/prototype$/;"	p	file:	signature:( std::map<int> & a )
+g1	input.cpp	/^    int g1( SomeType a );                   \/\/prototype$/;"	p	file:	signature:( SomeType a )
+h1	input.cpp	/^    char h1( const char *a = "a" );         \/\/prototype$/;"	p	file:	signature:( const char *a = <String> )
+h2	input.cpp	/^    int h2();                               \/\/prototype$/;"	p	file:	signature:()
+h3	input.cpp	/^    char h3( double );                      \/\/prototype$/;"	p	file:	signature:( double )
+h4	input.cpp	/^    int h4( h u );                          \/\/prototype$/;"	p	file:	signature:( h u )
+main	input.cpp	/^int  main( int  argc, char ** argv )$/;"	f	signature:( int argc, char ** argv )
+p1	input.cpp	/^    int (*p1)( int o );                     \/\/variable$/;"	l
+v4	input.cpp	/^    int v4( iii( 'o' ) );                   \/\/variable$/;"	l
+v5	input.cpp	/^    int v5( iii( o ) );                     \/\/variable$/;"	l
+v6	input.cpp	/^    int v6( int (*p)( int ) );              \/\/prototype$/;"	p	file:	signature:( int (*p)( int ) )
+v7	input.cpp	/^    int v7( 89 );                           \/\/variable$/;"	l
+v8	input.cpp	/^    int v8( ooo );                          \/\/variable$/;"	l
+w1	input.cpp	/^    int w1 __ARGS (( int a ));              \/\/prototype$/;"	p	file:	signature:( int a )
+w2	input.cpp	/^    int w2 (( a - 5 ) \/ 6 );                \/\/variable$/;"	l
+x1	input.cpp	/^    int x1( a.b );                          \/\/variable$/;"	l
+x2	input.cpp	/^    int x2( a->b );                         \/\/variable$/;"	l
+x3	input.cpp	/^    int x3( NS::a  b );                     \/\/prototype$/;"	p	file:	signature:( NS::a b )
+x4	input.cpp	/^    int x4( a ^ b );                        \/\/variable $/;"	l
+x5	input.cpp	/^    int x5( a ^ 6 );                        \/\/variable$/;"	l
+x6	input.cpp	/^    int x6( a | b );                        \/\/variable$/;"	l
+x8	input.cpp	/^    int x8( a & b & 2 );                    \/\/variable$/;"	l
+x9	input.cpp	/^    int x9( a && b );                       \/\/variable$/;"	l
