@@ -33,7 +33,9 @@ Library General Public License for more details.  */
 #include <errno.h>
 #include <fnmatch.h>
 
-#if !defined(__GNU_LIBRARY__) && !defined(STDC_HEADERS)
+#if !defined(__GNU_LIBRARY__) \
+	&& !defined(STDC_HEADERS) \
+	&& !defined(_CRT_ERRNO_DEFINED)
 extern int errno;
 #endif
 
