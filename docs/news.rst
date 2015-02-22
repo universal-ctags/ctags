@@ -18,6 +18,7 @@ New parsers
 The following parsers have been added:
 
 * ada
+* clojure  
 * coffee *xcmd*
 * css
 * d
