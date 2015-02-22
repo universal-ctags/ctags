@@ -15,6 +15,7 @@
 #include <string.h>
 #include <ctype.h>        /* to define isspace () */
 #include <errno.h>
+#include <stdarg.h>
 
 #if defined (HAVE_SYS_TYPES_H)
 # include <sys/types.h>	  /* to declare off_t on some hosts */
@@ -113,6 +114,157 @@ extern const char *tagFileName (void)
 	return TagFile.name;
 }
 
+static char valueToXDigit (int v)
+{
+	Assert (v >= 0 && v <= 0xF);
+
+	if (v >= 0xA)
+		return 'A' + (v - 0xA);
+	else
+		return '0' + v;
+}
+
+static int printEscapedString (FILE *const fp, const char *s)
+{
+	int length = 0;
+
+	for (; *s; s++)
+	{
+		int c = *s;
+
+		/* escape control characters (incl. \t) */
+		if ((c >= 0x00 && c <= 0x1F) || c == 0x7F)
+		{
+			putc ('\\', fp);
+			length++;
+
+			switch (c)
+			{
+				/* use a short form for known escapes */
+				case '\0': c = '0'; break;
+				case '\a': c = 'a'; break;
+				case '\b': c = 'b'; break;
+				case '\t': c = 't'; break;
+				case '\n': c = 'n'; break;
+				case '\v': c = 'v'; break;
+				case '\f': c = 'f'; break;
+				case '\r': c = 'r'; break;
+
+				default:
+				{
+					putc ('x', fp);
+					putc (valueToXDigit ((c & 0xF0) >> 4), fp);
+					putc (valueToXDigit (c & 0x0F), fp);
+					length += 3;
+					continue; /* skip printing c */
+				}
+			}
+		}
+
+		putc (c, fp);
+		length ++;
+	}
+
+	return length;
+}
+
+/* escapes each %s argument.  Only supports basic formats (%c, %s, %ld, %lu,
+ * %d, %u) and escapes (\a, \b, \t, \n, \v, \f, \r and \NNN) */
+__printf__(2, 3)
+static int fprintfEscaped (FILE *fp, const char *fmt, ...)
+{
+	int length = 0;
+	va_list ap;
+	va_start (ap, fmt);
+
+	for (; *fmt; fmt++)
+	{
+		if (*fmt == '%')
+		{
+			++fmt;
+			switch (*fmt)
+			{
+				case 'c':
+					putc (va_arg (ap, int /* char is promoted through '...' */), fp);
+					length++;
+					break;
+				case 's':
+					length += printEscapedString (fp, va_arg (ap, const char *));
+					break;
+				case 'l':
+					switch (fmt[1])
+					{
+						case 'd':
+							++fmt;
+							length += fprintf (fp, "%ld", va_arg (ap, long int));
+							break;
+						case 'u':
+							++fmt;
+							length += fprintf (fp, "%lu", va_arg (ap, unsigned long int));
+							break;
+						default:
+							putc (*fmt, fp);
+							length++;
+							break;
+					}
+					break;
+				case 'd':
+					length += fprintf (fp, "%d", va_arg (ap, int));
+					break;
+				case 'u':
+					length += fprintf (fp, "%u", va_arg (ap, unsigned int));
+					break;
+
+				default:
+					Assert ("Unknown format" == NULL);
+				case '%':
+					putc (*fmt, fp);
+					length++;
+					break;
+			}
+		}
+		else if (*fmt == '\\')
+		{
+			int c;
+			++fmt;
+			switch (*fmt)
+			{
+				case 'a': c = '\a'; break;
+				case 'b': c = '\b'; break;
+				case 't': c = '\t'; break;
+				case 'n': c = '\n'; break;
+				case 'v': c = '\v'; break;
+				case 'f': c = '\f'; break;
+				case 'r': c = '\r'; break;
+
+				/* octal escape from \0 to \377 */
+				case '0': case '1': case '2': case '3':
+					c = (*fmt - '0');
+					if (fmt[1] >= '0' && fmt[1] <= '7')
+						c = (c << 3) | (*++fmt - '0');
+					if (fmt[1] >= '0' && fmt[1] <= '7')
+						c = (c << 3) | (*++fmt - '0');
+				break;
+
+				default:
+					Assert ("Unknown escape sequence" == NULL);
+					c = *fmt;
+					break;
+			}
+			putc (c, fp);
+			length++;
+		}
+		else
+		{
+			putc (*fmt, fp);
+			length++;
+		}
+	}
+
+	va_end (ap);
+	return length;
+}
+
 /*
 *   Pseudo tag support
 */
@@ -133,11 +285,11 @@ extern void writePseudoTag (
 		const char *const language)
 {
 	const int length = language
-	  ? fprintf (TagFile.fp, "%s%s%s%s\t%s\t%s\n",
-		     PSEUDO_TAG_PREFIX, tagName,
-		     PSEUDO_TAG_SEPARATOR, language, fileName, pattern)
-	  : fprintf (TagFile.fp, "%s%s\t%s\t/%s/\n",
-		     PSEUDO_TAG_PREFIX, tagName, fileName, pattern);
+	  ? fprintfEscaped (TagFile.fp, "%s%s%s%s\t%s\t%s\n",
+			    PSEUDO_TAG_PREFIX, tagName,
+			    PSEUDO_TAG_SEPARATOR, language, fileName, pattern)
+	  : fprintfEscaped (TagFile.fp, "%s%s\t%s\t/%s/\n",
+			    PSEUDO_TAG_PREFIX, tagName, fileName, pattern);
 
 	++TagFile.numTags.added;
 	rememberMaxLengths (strlen (tagName), (size_t) length);
@@ -519,7 +671,7 @@ static void writeEtagsIncludes (FILE *const fp)
 		for (i = 0  ;  i < stringListCount (Option.etagsInclude)  ;  ++i)
 		{
 			vString *item = stringListItem (Option.etagsInclude, i);
-			fprintf (fp, "\f\n%s,include\n", vStringValue (item));
+			fprintfEscaped (fp, "\f\n%s,include\n", vStringValue (item));
 		}
 	}
 }
@@ -556,7 +708,7 @@ extern void endEtagsFile (const char *const name)
 {
 	const char *line;
 
-	fprintf (TagFile.fp, "\f\n%s,%ld\n", name, (long) TagFile.etags.byteCount);
+	fprintfEscaped (TagFile.fp, "\f\n%s,%ld\n", name, (long) TagFile.etags.byteCount);
 	if (TagFile.etags.fp != NULL)
 	{
 		rewind (TagFile.etags.fp);
@@ -650,6 +802,7 @@ static int writeXrefEntry (const tagEntryInfo *const tag)
 			readSourceLine (TagFile.vLine, tag->filePosition, NULL);
 	int length;
 
+	/* FIXME */
 	if (Option.tagFileFormat == 1)
 		length = fprintf (TagFile.fp, "%-16s %4lu %-16s ", tag->name,
 				tag->lineNumber, tag->sourceFileName);
@@ -686,8 +839,8 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 	int length;
 
 	if (tag->isFileEntry || (tag->lineNumberEntry && (tag->lineNumber == 1)))
-		length = fprintf (TagFile.etags.fp, "\177%s\001%lu,0\n",
-				tag->name, tag->lineNumber);
+		length = fprintfEscaped (TagFile.etags.fp, "\177%s\001%lu,0\n",
+					 tag->name, tag->lineNumber);
 	else
 	{
 		long seekValue;
@@ -699,8 +852,8 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 		else
 			line [strlen (line) - 1] = '\0';
 
-		length = fprintf (TagFile.etags.fp, "%s\177%s\001%lu,%ld\n", line,
-				tag->name, tag->lineNumber, seekValue);
+		length = fprintfEscaped (TagFile.etags.fp, "%s\177%s\001%lu,%ld\n", line,
+					 tag->name, tag->lineNumber, seekValue);
 	}
 	TagFile.etags.byteCount += length;
 
@@ -719,52 +872,52 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 
 	if (tag->kindName != NULL && (Option.extensionFields.kindLong  ||
 		 (Option.extensionFields.kind  && tag->kind == '\0')))
-		length += fprintf (TagFile.fp,"%s\t%s%s", sep, kindKey, tag->kindName);
+		length += fprintfEscaped (TagFile.fp,"%s\t%s%s", sep, kindKey, tag->kindName);
 	else if (tag->kind != '\0'  && (Option.extensionFields.kind  ||
 			(Option.extensionFields.kindLong  &&  tag->kindName == NULL)))
-		length += fprintf (TagFile.fp, "%s\t%s%c", sep, kindKey, tag->kind);
+		length += fprintfEscaped (TagFile.fp, "%s\t%s%c", sep, kindKey, tag->kind);
 
 	if (Option.extensionFields.lineNumber)
-		length += fprintf (TagFile.fp, "%s\tline:%ld", sep, tag->lineNumber);
+		length += fprintfEscaped (TagFile.fp, "%s\tline:%ld", sep, tag->lineNumber);
 
 	if (Option.extensionFields.language  &&  tag->language != NULL)
-		length += fprintf (TagFile.fp, "%s\tlanguage:%s", sep, tag->language);
+		length += fprintfEscaped (TagFile.fp, "%s\tlanguage:%s", sep, tag->language);
 
 	if (Option.extensionFields.scope  &&
 			tag->extensionFields.scope [0] != NULL  &&
 			tag->extensionFields.scope [1] != NULL)
-		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				tag->extensionFields.scope [0],
-				tag->extensionFields.scope [1]);
+		length += fprintfEscaped (TagFile.fp, "%s\t%s:%s", sep,
+					  tag->extensionFields.scope [0],
+					  tag->extensionFields.scope [1]);
 
 	if (Option.extensionFields.typeRef  &&
 			tag->extensionFields.typeRef [0] != NULL  &&
 			tag->extensionFields.typeRef [1] != NULL)
-		length += fprintf (TagFile.fp, "%s\ttyperef:%s:%s", sep,
-				tag->extensionFields.typeRef [0],
-				tag->extensionFields.typeRef [1]);
+		length += fprintfEscaped (TagFile.fp, "%s\ttyperef:%s:%s", sep,
+					  tag->extensionFields.typeRef [0],
+					  tag->extensionFields.typeRef [1]);
 
 	if (Option.extensionFields.fileScope  &&  tag->isFileScope)
-		length += fprintf (TagFile.fp, "%s\tfile:", sep);
+		length += fprintfEscaped (TagFile.fp, "%s\tfile:", sep);
 
 	if (Option.extensionFields.inheritance  &&
 			tag->extensionFields.inheritance != NULL)
-		length += fprintf (TagFile.fp, "%s\tinherits:%s", sep,
-				tag->extensionFields.inheritance);
+		length += fprintfEscaped (TagFile.fp, "%s\tinherits:%s", sep,
+					  tag->extensionFields.inheritance);
 
 	if (Option.extensionFields.access  &&  tag->extensionFields.access != NULL)
-		length += fprintf (TagFile.fp, "%s\taccess:%s", sep,
-				tag->extensionFields.access);
+		length += fprintfEscaped (TagFile.fp, "%s\taccess:%s", sep,
+					  tag->extensionFields.access);
 
 	if (Option.extensionFields.implementation  &&
 			tag->extensionFields.implementation != NULL)
-		length += fprintf (TagFile.fp, "%s\timplementation:%s", sep,
-				tag->extensionFields.implementation);
+		length += fprintfEscaped (TagFile.fp, "%s\timplementation:%s", sep,
+					  tag->extensionFields.implementation);
 
 	if (Option.extensionFields.signature  &&
 			tag->extensionFields.signature != NULL)
-		length += fprintf (TagFile.fp, "%s\tsignature:%s", sep,
-				tag->extensionFields.signature);
+		length += fprintfEscaped (TagFile.fp, "%s\tsignature:%s", sep,
+					  tag->extensionFields.signature);
 
 	return length;
 #undef sep
@@ -797,13 +950,13 @@ static int writeLineNumberEntry (const tagEntryInfo *const tag)
 
 static int writeCtagsEntry (const tagEntryInfo *const tag)
 {
-	int length = fprintf (TagFile.fp, "%s\t%s\t",
+	int length = fprintfEscaped (TagFile.fp, "%s\t%s\t",
 		tag->name, tag->sourceFileName);
 
 	if (tag->lineNumberEntry)
 		length += writeLineNumberEntry (tag);
 	else if (tag->pattern)
-		length += fprintf(TagFile.fp, "%s", tag->pattern);
+		length += fprintfEscaped(TagFile.fp, "%s", tag->pattern);
 	else
 		length += writePatternEntry (tag);
 
