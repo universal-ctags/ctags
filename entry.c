@@ -117,6 +117,12 @@ extern const char *tagFileName (void)
 *   Pseudo tag support
 */
 
+static void abort_if_ferror(FILE *const fp)
+{
+	if (ferror (fp))
+		error (FATAL | PERROR, "cannot write tag file");
+}
+
 static void rememberMaxLengths (const size_t nameLength, const size_t lineLength)
 {
 	if (nameLength > TagFile.max.tag)
@@ -835,8 +841,7 @@ extern void makeTagEntry (const tagEntryInfo *const tag)
 		else
 			length = writeCtagsEntry (tag);
 
-		if (ferror (TagFile.fp))
-			error (FATAL | PERROR, "cannot write tag file");
+		abort_if_ferror (TagFile.fp);
 
 		++TagFile.numTags.added;
 		rememberMaxLengths (strlen (tag->name), (size_t) length);
