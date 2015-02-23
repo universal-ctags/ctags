@@ -202,7 +202,7 @@ static unsigned short* tg_big_create (const unsigned char *a, const unsigned cha
 
 	/* TODO: Maybe sqrt is needed. */
 	for (i = 0; i < 255 * 255; i++)
-		big_table[i] = ratio * a[i] * b[i];
+		big_table[i] = (unsigned short)(ratio * a[i] * b[i]);
 
 	return big_table;
 }
@@ -258,13 +258,13 @@ int tg_compare(const unsigned char *a, const unsigned char *b, const unsigned ch
 	else
 		max = bsz;
 
-	abt = tg_big_create(a, t, (1.0 * max) / (1.0 * asz));
-	bbt = tg_big_create(b, t, (1.0 * max) / (1.0 * bsz));
+	abt = tg_big_create(a, t, (1.0f * max) / (1.0f * asz));
+	bbt = tg_big_create(b, t, (1.0f * max) / (1.0f * bsz));
 	ascore = tg_big_score(abt);
 	bscore = tg_big_score(bbt);
 
 	if (ascore > bscore)
-		r = - ascore;
+		r = -1 * ascore;
 	else if (ascore < bscore)
 		r = bscore;
 	else
