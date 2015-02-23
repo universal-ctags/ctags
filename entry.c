@@ -841,11 +841,11 @@ extern void makeTagEntry (const tagEntryInfo *const tag)
 		else
 			length = writeCtagsEntry (tag);
 
-		abort_if_ferror (TagFile.fp);
-
 		++TagFile.numTags.added;
 		rememberMaxLengths (strlen (tag->name), (size_t) length);
 		DebugStatement ( fflush (TagFile.fp); )
+
+		abort_if_ferror (TagFile.fp);
 	}
 }
 
