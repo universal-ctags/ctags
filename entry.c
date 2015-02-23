@@ -145,6 +145,8 @@ extern void writePseudoTag (
 	  : fprintf (TagFile.fp, "%s%s\t%s\t/%s/\n",
 		     PSEUDO_TAG_PREFIX, tagName, fileName, pattern);
 
+	abort_if_ferror (TagFile.fp);
+
 	++TagFile.numTags.added;
 	rememberMaxLengths (strlen (tagName), (size_t) length);
 }
@@ -536,10 +538,13 @@ extern void closeTagFile (const boolean resize)
 
 	if (Option.etags)
 		writeEtagsIncludes (TagFile.fp);
+	abort_if_ferror (TagFile.fp);
 	desiredSize = ftell (TagFile.fp);
 	fseek (TagFile.fp, 0L, SEEK_END);
 	size = ftell (TagFile.fp);
-	fclose (TagFile.fp);
+	if (fclose (TagFile.fp) != 0)
+		error (FATAL | PERROR, "cannot close tag file");
+
 	if (resize  &&  desiredSize < size)
 	{
 		DebugStatement (
@@ -563,6 +568,8 @@ extern void endEtagsFile (const char *const name)
 	const char *line;
 
 	fprintf (TagFile.fp, "\f\n%s,%ld\n", name, (long) TagFile.etags.byteCount);
+	abort_if_ferror (TagFile.fp);
+
 	if (TagFile.etags.fp != NULL)
 	{
 		rewind (TagFile.etags.fp);
