@@ -623,6 +623,7 @@ static void movePos(int amount)
 static boolean cmp(const char *buf, int len, const char *match)
 {
   boolean status = FALSE;
+  int matchLen;
 
   /* if we are trying to match nothing, that is always true */
   if(match == NULL)
@@ -636,16 +637,18 @@ static boolean cmp(const char *buf, int len, const char *match)
     return status;
   }
 
+  matchLen = strlen(match);
+
   /* A match only happens the number of chars in the matching string match,
    * and whitespace follows... Which means we also must check to see if the
    * end of the line is after the matching string.  Also check for some
    * separation characters such as (, ), :, or ; */
-  if((strncasecmp(buf, match, strlen(match)) == 0) &&
-     (strlen(match) == len ||
-      (strlen(match) < len &&
-       (isspace(buf[strlen(match)]) || buf[strlen(match)] == '(' ||
-        buf[strlen(match)] == ')' || buf[strlen(match)] == ':' ||
-        buf[strlen(match)] == ';'))))
+  if ((strncasecmp(buf, match, matchLen) == 0) &&
+	  (matchLen == len ||
+	  (matchLen < len &&
+	   (isspace(buf[matchLen]) || buf[matchLen] == '(' ||
+	    buf[matchLen] == ')' || buf[matchLen] == ':' ||
+	    buf[matchLen] == ';'))))
   {
     status = TRUE;
   }
