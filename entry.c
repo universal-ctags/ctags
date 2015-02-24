@@ -836,10 +836,7 @@ extern void makeTagEntry (const tagEntryInfo *const tag)
 			length = writeCtagsEntry (tag);
 
 		if (ferror (TagFile.fp))
-		{
 			error (FATAL | PERROR, "cannot write tag file");
-			exit (1);
-		}
 
 		++TagFile.numTags.added;
 		rememberMaxLengths (strlen (tag->name), (size_t) length);
