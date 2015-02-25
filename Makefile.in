@@ -367,7 +367,7 @@ check: units
 #
 # SHELL must be dash or bash.
 #
-fuzz: TIMEOUT := 1
+fuzz: TIMEOUT := $(shell which timeout > /dev/null 2>&1 && echo 1 || echo 0)
 fuzz: $(CTAGS_TEST)
 	@ \
 	c="misc/units fuzz \
@@ -392,7 +392,7 @@ noise: $(CTAGS_TEST)
 #
 # UNITS Target
 #
-units: TIMEOUT := 5
+units: TIMEOUT := $(shell which timeout > /dev/null 2>&1 && echo 5 || echo 0)
 units: $(CTAGS_TEST)
 	@ \
 	c="misc/units run \
