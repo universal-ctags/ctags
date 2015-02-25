@@ -1549,6 +1549,14 @@ $0 noise [OPTIONS] UNITS-DIR
 EOF
 }
 
+# Avoid issues between sed and the locale settings by overriding it using
+# LC_ALL, which takes precedence over all other locale configurations:
+# https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
+prepare_environment ()
+{
+    LC_ALL="C"; export LC_ALL
+}
+
 main ()
 {
     if [ $# = 0 ]; then
@@ -1587,5 +1595,6 @@ main ()
     esac
 }
 
+prepare_environment
 main "$@"
 exit $?
