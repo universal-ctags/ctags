@@ -438,10 +438,7 @@ extern void openTagFile (void)
 			}
 		}
 		if (TagFile.fp == NULL)
-		{
 			error (FATAL | PERROR, "cannot open tag file");
-			exit (1);
-		}
 	}
 	if (TagsToStdout)
 		TagFile.directory = eStrdup (CurrentDirectory);
