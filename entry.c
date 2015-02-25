@@ -117,6 +117,12 @@ extern const char *tagFileName (void)
 *   Pseudo tag support
 */
 
+static void abort_if_ferror(FILE *const fp)
+{
+	if (ferror (fp))
+		error (FATAL | PERROR, "cannot write tag file");
+}
+
 static void rememberMaxLengths (const size_t nameLength, const size_t lineLength)
 {
 	if (nameLength > TagFile.max.tag)
@@ -138,6 +144,8 @@ extern void writePseudoTag (
 		     PSEUDO_TAG_SEPARATOR, language, fileName, pattern)
 	  : fprintf (TagFile.fp, "%s%s\t%s\t/%s/\n",
 		     PSEUDO_TAG_PREFIX, tagName, fileName, pattern);
+
+	abort_if_ferror (TagFile.fp);
 
 	++TagFile.numTags.added;
 	rememberMaxLengths (strlen (tagName), (size_t) length);
@@ -430,10 +438,7 @@ extern void openTagFile (void)
 			}
 		}
 		if (TagFile.fp == NULL)
-		{
 			error (FATAL | PERROR, "cannot open tag file");
-			exit (1);
-		}
 	}
 	if (TagsToStdout)
 		TagFile.directory = eStrdup (CurrentDirectory);
@@ -530,10 +535,13 @@ extern void closeTagFile (const boolean resize)
 
 	if (Option.etags)
 		writeEtagsIncludes (TagFile.fp);
+	abort_if_ferror (TagFile.fp);
 	desiredSize = ftell (TagFile.fp);
 	fseek (TagFile.fp, 0L, SEEK_END);
 	size = ftell (TagFile.fp);
-	fclose (TagFile.fp);
+	if (fclose (TagFile.fp) != 0)
+		error (FATAL | PERROR, "cannot close tag file");
+
 	if (resize  &&  desiredSize < size)
 	{
 		DebugStatement (
@@ -557,6 +565,8 @@ extern void endEtagsFile (const char *const name)
 	const char *line;
 
 	fprintf (TagFile.fp, "\f\n%s,%ld\n", name, (long) TagFile.etags.byteCount);
+	abort_if_ferror (TagFile.fp);
+
 	if (TagFile.etags.fp != NULL)
 	{
 		rewind (TagFile.etags.fp);
@@ -835,12 +845,11 @@ extern void makeTagEntry (const tagEntryInfo *const tag)
 		else
 			length = writeCtagsEntry (tag);
 
-		if (ferror (TagFile.fp))
-			error (FATAL | PERROR, "cannot write tag file");
-
 		++TagFile.numTags.added;
 		rememberMaxLengths (strlen (tag->name), (size_t) length);
 		DebugStatement ( fflush (TagFile.fp); )
+
+		abort_if_ferror (TagFile.fp);
 	}
 }
 
