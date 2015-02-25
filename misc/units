@@ -291,10 +291,10 @@ run_shrink ()
 }
 
 # filters out the directory prefix in a ctags input
-tags_basename_filter_regex='s%(^[^\t]+\t)([^/\t]+/)*%\1%'
+tags_basename_filter_regex='s%\(^[^	]\{1,\}	\)\([^/	]\{1,\}/\)*%\1%'
 tags_basename_filter()
 {
-    sed -r "${tags_basename_filter_regex}"
+    sed "${tags_basename_filter_regex}"
 }
 
 run_record_cmdline ()
@@ -304,7 +304,7 @@ run_record_cmdline ()
 
     printf "%s \\\\\n| %s \\\\\n| %s\n"  \
 	"${_CMDLINE}" \
-	"sed -r '${tags_basename_filter_regex}'" \
+	"sed '${tags_basename_filter_regex}'" \
 	"${ffilter}" \
 	> "${ocmdline}"
 }
@@ -363,7 +363,7 @@ run_tcase ()
     #
     # Filtered by LANGUAGES
     #
-    guessed_lang=$( ${_CMDLINE} --print-language "$input" 2>/dev/null | sed -nr 's/^.*: (.+)$/\1/p')
+    guessed_lang=$( ${_CMDLINE} --print-language "$input" 2>/dev/null | sed -n 's/^.*: //p')
     if [ -n "${LANGUAGES}" ]; then
 	member_p "${guessed_lang}" ${LANGUAGES} || return 1
     fi
@@ -1459,7 +1459,7 @@ noise_lang_file ()
     local offset
     local guessed_lang
 
-    guessed_lang=$( ${_CMDLINE_FOR_SHRINKING} --print-language "${input}" 2>/dev/null | sed -nr 's/^.*: (.+)$/\1/p')
+    guessed_lang=$( ${_CMDLINE_FOR_SHRINKING} --print-language "${input}" 2>/dev/null | sed -n 's/^.*: //p')
     if [ "${lang}" !=  "${guessed_lang}" ]; then
 	return 0
     fi
