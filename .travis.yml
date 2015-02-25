@@ -9,6 +9,22 @@ compiler:
   - gcc
   - clang
 
+env:
+  global:
+    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+    #   via the "travis encrypt" command using the project repo's public key
+    - secure: "FZunj1O8PR/2DEEN1tUAFzSxeo3jf2oOLkP7SmOSdeZ8W8QPo/5Nfhlhl0uambYOXOre/p/mCNXjudtsTwKHtq4uP6fejjPJl5cmHBCm/KtIoLnUaDyaSjoq6tKi2duJJhwY9H6X5ILtDxWveRbs5NhmKo9H+c1vHsBg0Wbuslg="
+
+  addons:
+    coverity_scan:
+      project:
+        name: "fishman/ctags"
+      description: "Build submitted via Travis CI"
+    notification_email: coverityctags@gmail.com
+    build_command_prepend: "autoreconf -f -i -v ; ./configure ; make clean"
+    build_command:   "make -j 4"
+    branch_pattern: master
+
 # Only with gcc get the mingw-w64 cross compilers
 before_install:
   - if [ $CC = 'gcc' ]; then sudo apt-get update -qq; sudo apt-get install -y binutils-mingw-w64-i686 gcc-mingw-w64-i686; fi
