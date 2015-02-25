@@ -31,7 +31,7 @@ env:
 
 # Only with gcc get the mingw-w64 cross compilers
 before_install:
-  - if [ $CC = 'gcc' ]; then sudo apt-get update -qq; sudo apt-get install -y binutils-mingw-w64-i686 gcc-mingw-w64-i686; fi
+  - if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then sudo apt-get update -qq; sudo apt-get install -y binutils-mingw-w64-i686 gcc-mingw-w64-i686; fi
 
 # Build and run tests. Only with gcc cross compile
 script:
@@ -39,4 +39,4 @@ script:
   - ./configure
   - make -j2
   - make check TRAVIS=1
-  - if [ $CC = 'gcc' ]; then make distclean; make -f mk_mingw.mak CC=i686-w64-mingw32-gcc; fi
+  - if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then make distclean; make -f mk_mingw.mak CC=i686-w64-mingw32-gcc; fi
