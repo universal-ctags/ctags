@@ -464,7 +464,11 @@ static void sanitizeEnviron (void)
 #if HAVE_DECL___ENVIRON
 	e = __environ;
 #elif HAVE_DECL__NSGETENVIRON
-	e = _NSGetEnviron();
+{
+	char ***ep = _NSGetEnviron();
+	if (ep)
+		e = *ep;
+}
 #endif
 
 	if (!e)
