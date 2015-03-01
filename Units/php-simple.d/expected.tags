@@ -7,5 +7,5 @@ add_item	input.php	/^    function add_item ($artnr, $num)$/;"	f	class:Cart	signa
 foo	input.php	/^function foo ($arg_1, $arg_2, ..., $arg_n)$/;"	f	signature:($arg_1, $arg_2, ..., $arg_n)
 items	input.php	/^    var $items;  \/\/ Items in our shopping cart$/;"	v	class:Cart	access:public
 remove_item	input.php	/^    function remove_item ($artnr, $num)$/;"	f	class:Cart	signature:($artnr, $num)
-täyte	Units/php-simple.d/input.php	/^$täyte = 'mansikka';    \/\/ valid; 'ä' is ASCII 228.$/;"	v
+täyte	input.php	/^$täyte = 'mansikka';    \/\/ valid; 'ä' is ASCII 228.$/;"	v
 var	input.php	/^$var = "Bob";$/;"	v

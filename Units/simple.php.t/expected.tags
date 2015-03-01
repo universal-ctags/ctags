@@ -7,5 +7,5 @@ add_item	input.php	/^    function add_item ($artnr, $num)$/;"	f	class:Cart
 foo	input.php	/^function foo ($arg_1, $arg_2, ..., $arg_n)$/;"	f
 items	input.php	/^    var $items;  \/\/ Items in our shopping cart$/;"	v	class:Cart
 remove_item	input.php	/^    function remove_item ($artnr, $num)$/;"	f	class:Cart
-täyte	Units/simple.php.t/input.php	/^$täyte = 'mansikka';    \/\/ valid; 'ä' is ASCII 228.$/;"	v
+täyte	input.php	/^$täyte = 'mansikka';    \/\/ valid; 'ä' is ASCII 228.$/;"	v
 var	input.php	/^$var = "Bob";$/;"	v
