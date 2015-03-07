@@ -78,6 +78,7 @@ typedef struct sTokenInfo {
 	int                 nestLevel;     /* Current nest level */
 	verilogKind         lastKind;      /* Kind of last found tag */
 	vString*            blockName;     /* Current block name */
+	vString*            inheritance;   /* Class inheritance */
 	boolean             singleStat;    /* Single statement (ends at next semi-colon) */
 } tokenInfo;
 
@@ -179,6 +180,7 @@ static const keywordAssoc KeywordTable [] = {
 	{ "shortreal", K_REGISTER,  { 1, 0 } },
 	{ "static",    K_IGNORE,    { 1, 0 } },
 	{ "string",    K_REGISTER,  { 1, 0 } },
+	{ "type",      K_IGNORE,    { 1, 0 } },
 	{ "typedef",   K_TYPEDEF,   { 1, 0 } },
 	{ "unsigned",  K_IGNORE,    { 1, 0 } },
 	{ "virtual",   K_IGNORE,    { 1, 0 } },
@@ -244,7 +246,8 @@ static short hasSimplePortList (tokenInfo const* token)
 
 static short isSingleStatement (tokenInfo const* token)
 {
-	if (strcmp (vStringValue (token->name), "extern") == 0 )
+	if (strcmp (vStringValue (token->name), "extern")  == 0 ||
+        strcmp (vStringValue (token->name), "virtual") == 0 )
 	{
 		return TRUE;
 	} else {
@@ -263,6 +266,7 @@ static tokenInfo *newToken (void)
 	token->nestLevel = 0;
 	token->lastKind = K_UNDEFINED;
 	token->blockName = vStringNew ();
+	token->inheritance = vStringNew ();
 	token->singleStat = FALSE;
 	return token;
 }
@@ -273,6 +277,7 @@ static void deleteToken (tokenInfo * const token)
 	{
 		vStringDelete (token->name);
 		vStringDelete (token->blockName);
+		vStringDelete (token->inheritance);
 		eFree (token);
 	}
 }
@@ -601,6 +606,11 @@ static void createTag (tokenInfo *const token)
 		tag.extensionFields.scope [1] = vStringValue (currentContext->name);
 	}
 	verbose ("\n");
+	if (vStringLength (token->inheritance) > 0)
+	{
+		tag.extensionFields.inheritance = vStringValue (token->inheritance);
+		verbose ("Class %s extends %s\n", vStringValue (token->name), tag.extensionFields.inheritance);
+	}
 	makeTagEntry (&tag);
 	if (Option.include.qualifiedTags && currentContext->kind != K_UNDEFINED)
 	{
@@ -615,6 +625,8 @@ static void createTag (tokenInfo *const token)
 
 		vStringDelete (scopedName);
 	}
+
+	/* Push token as context if it is a container */
 	if (isContainer (token))
 	{
 		tokenInfo *newScope = newToken ();
@@ -623,6 +635,9 @@ static void createTag (tokenInfo *const token)
 		newScope->kind = token->kind;
 		createContext (newScope);
 	}
+
+	/* Clear no longer required inheritance information */
+	vStringClear (token->inheritance);
 }
 
 static boolean findBlockName (tokenInfo *const token)
@@ -814,6 +829,78 @@ static void processTypedef (tokenInfo *const token)
 	createTag (token);
 }
 
+static void processClass (tokenInfo *const token)
+{
+	/*Note: At the moment, only identifies typedef name and not its contents */
+	int c;
+	tokenInfo *extra;
+	tokenInfo *parameters = NULL;
+
+	/* Get identifiers */
+	c = skipWhite (vGetc ());
+	if (isIdentifierCharacter (c))
+	{
+		readIdentifier (token, c);
+		c = skipWhite (vGetc ());
+	}
+
+	/* Find class parameters list */
+	if (c == '#')
+	{
+		c = skipWhite (vGetc ());
+		if (c == '(')
+		{
+			parameters = newToken ();
+			do
+			{
+				c = skipWhite (vGetc ());
+				readIdentifier (parameters, c);
+				updateKind (parameters);
+				verbose ("Found class parameter %s\n", vStringValue (parameters->name));
+				if (parameters->kind == K_UNDEFINED)
+				{
+					parameters->kind = K_CONSTANT;
+					parameters = pushToken (parameters, newToken ());
+					c = vGetc();
+					while (c != ',' && c != ')' && c != EOF)
+					{
+						c = vGetc();
+					}
+				}
+			} while (c != ')' && c != EOF);
+			c = vGetc ();
+			parameters = popToken (parameters);
+		}
+		c = skipWhite (vGetc ());
+	}
+
+	/* Search for inheritance information */
+	if (isIdentifierCharacter (c))
+	{
+		extra = newToken ();
+
+		readIdentifier (extra, c);
+		c = skipWhite (vGetc ());
+		if (strcmp (vStringValue (extra->name), "extends") == 0)
+		{
+			readIdentifier (extra, c);
+			vStringCopy (token->inheritance, extra->name);
+			verbose ("Inheritance %s\n", vStringValue (token->inheritance));
+		}
+		deleteToken (extra);
+	}
+
+	/* Use last identifier to create tag */
+	createTag (token);
+
+	/* Add parameter list */
+	while (parameters)
+	{
+		createTag (parameters);
+		parameters = popToken (parameters);
+	}
+}
+
 static void tagNameList (tokenInfo* token, int c)
 {
 	verilogKind localKind;
@@ -940,6 +1027,10 @@ static void findTag (tokenInfo *const token)
 	else if (token->kind == K_TYPEDEF)
 	{
 		processTypedef (token);
+	}
+	else if (token->kind == K_CLASS)
+	{
+		processClass (token);
 	}
 	else if (token->kind == K_IGNORE && isSingleStatement (token))
 	{
