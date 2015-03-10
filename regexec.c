@@ -3794,9 +3794,6 @@ forward_search_range(regex_t* reg, const UChar* str, const UChar* end, UChar* s,
   return 0; /* fail */
 }
 
-static int set_bm_backward_skip P_((UChar* s, UChar* end, OnigEncoding enc,
-				    int** skip));
-
 #define BM_BACKWARD_SEARCH_LENGTH_THRESHOLD   100
 
 static int
