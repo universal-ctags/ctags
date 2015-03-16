@@ -43,7 +43,7 @@ static int nextChar (void)
 	{
 		c = fileGetc ();
 		if (c == '\n')
-			c = fileGetc ();
+			c = nextChar ();
 	}
 	return c;
 }
