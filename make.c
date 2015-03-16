@@ -24,11 +24,12 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-	K_MACRO
+	K_MACRO, K_TARGET
 } shKind;
 
 static kindOption MakeKinds [] = {
-	{ TRUE, 'm', "macro", "macros"}
+	{ TRUE, 'm', "macro",  "macros"},
+	{ TRUE, 't', "target", "targets"}
 };
 
 /*
@@ -68,17 +69,72 @@ static int skipToNonWhite (void)
 
 static boolean isIdentifier (int c)
 {
-	return (boolean)(c != '\0' && (isalnum (c)  ||  strchr (".-_", c) != NULL));
+	return (boolean)(c != '\0' && (isalnum (c)  ||  strchr (".-_/", c) != NULL));
+}
+
+static boolean isSpecialTarget (vString *const name)
+{
+	size_t i = 0;
+	/* All special targets begin with '.'. */
+	if (vStringChar (name, i++) != '.') {
+		return FALSE;
+	}
+	while (i < vStringLength (name)) {
+		char ch = vStringChar (name, i++);
+		if (ch != '_' && !isupper (ch))
+		{
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
+static void newTarget (vString *const name)
+{
+	/* Ignore GNU Make's "special targets". */
+	if  (isSpecialTarget (name))
+	{
+		return;
+	}
+	makeSimpleTag (name, MakeKinds, K_TARGET);
+}
+
+static void newMacro (vString *const name)
+{
+	makeSimpleTag (name, MakeKinds, K_MACRO);
+}
+
+static void newMacroFromDefine (vString *const name)
+{
+	/* name is something like "define JAVAHPP_RULE", find the space and jump to the next char */
+	char *name_val = strchr (vStringValue (name), ' ');
+
+	if (name_val != NULL) {
+		vStringCopyS (name, name_val + 1);
+		makeSimpleTag (name, MakeKinds, K_MACRO);
+	}
 }
 
 static void readIdentifier (const int first, vString *const id)
 {
 	int c = first;
+	int c_prev = first;
+	int c_next = first;
 	vStringClear (id);
-	while (isIdentifier (c))
+	while (isIdentifier (c) || c == ' ')
 	{
-		vStringPut (id, c);
-		c = nextChar ();
+		c_next = nextChar ();
+		if (c == ' ') {
+			/* add the space character only if the previous and
+			 * next character are valid identifiers */
+			if (isIdentifier (c_prev) && isIdentifier (c_next))
+				vStringPut (id, c);
+		}
+		else {
+			vStringPut (id, c);
+		}
+		c_prev = c;
+		c = c_next;
 	}
 	fileUngetc (c);
 	vStringTerminate (id);
@@ -150,46 +206,58 @@ static void findMakeTags (void)
 		else if (variable_possible && isIdentifier (c))
 		{
 			readIdentifier (c, name);
-			if (strcmp (vStringValue (name), "endef") == 0)
+			if (strncmp (vStringValue (name), "endef", 5) == 0)
 				in_define = FALSE;
 			else if (in_define)
 				skipLine ();
-			else if (strcmp (vStringValue (name), "define") == 0  &&
+			else if (strncmp (vStringValue (name), "define", 6) == 0  &&
 				isIdentifier (c))
 			{
 				in_define = TRUE;
 				c = skipToNonWhite ();
-				readIdentifier (c, name);
-				makeSimpleTag (name, MakeKinds, K_MACRO);
+				newMacroFromDefine (name);
 				skipLine ();
 			}
 			else {
-				if (strcmp(vStringValue (name), "export") == 0 &&
-					isIdentifier (c))
-				{
-					c = skipToNonWhite ();
-					readIdentifier (c, name);
-				}
 				c = skipToNonWhite ();
 				if (strchr (":?+", c) != NULL)
 				{
 					boolean append = (boolean)(c == '+');
-					if (c == ':')
-						in_rule = TRUE;
+					boolean was_colon = (c == ':');
 					c = nextChar ();
-					if (c != '=')
-						fileUngetc (c);
+					if (was_colon)
+					{
+						if (c == '=')
+						{
+							newMacro (name);
+							in_rule = FALSE;
+							skipLine ();
+						}
+						else
+						{
+							in_rule = TRUE;
+							newTarget (name);
+						}
+					}
 					else if (append)
 					{
 						skipLine ();
 						continue;
 					}
+					else
+					{
+						fileUngetc (c);
+					}
 				}
-				if (c == '=')
+				else if (c == '=')
 				{
-					makeSimpleTag (name, MakeKinds, K_MACRO);
+					newMacro (name);
 					in_rule = FALSE;
 					skipLine ();
+				}
+				else
+				{
+					fileUngetc (c);
 				}
 			}
 		}
