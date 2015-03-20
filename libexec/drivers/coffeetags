@@ -27,9 +27,13 @@
 #
 #
 
-if ! type coffeetags > /dev/null 2>&1; then
-    exit 77
-fi
+{
+    if  [[ (! $(type coffeetags)) || \
+        ($(type rbenv) && ! $(rbenv which coffeetags)) ]]
+    then
+        exit 77
+    fi
+} > /dev/null 2>&1
 
 case "$1" in
     --list-kinds*)
