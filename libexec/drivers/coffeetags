@@ -28,10 +28,16 @@
 #
 
 {
-    if  [[ (! $(type coffeetags)) || \
-        ($(type rbenv) && ! $(rbenv which coffeetags)) ]]
-    then
-        exit 77
+    COMMAND_NOT_FOUND=77
+
+    if type rbenv; then
+        if ! rbenv which coffeetags; then
+            exit ${COMMAND_NOT_FOUND}
+        fi
+    else
+        if ! type coffeetags; then
+            exit ${COMMAND_NOT_FOUND}
+        fi
     fi
 } > /dev/null 2>&1
 
