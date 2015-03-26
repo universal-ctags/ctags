@@ -27,9 +27,19 @@
 #
 #
 
-if ! type coffeetags > /dev/null 2>&1; then
-    exit 77
-fi
+{
+    COMMAND_NOT_FOUND=77
+
+    if type rbenv; then
+        if ! rbenv which coffeetags; then
+            exit ${COMMAND_NOT_FOUND}
+        fi
+    else
+        if ! type coffeetags; then
+            exit ${COMMAND_NOT_FOUND}
+        fi
+    fi
+} > /dev/null 2>&1
 
 case "$1" in
     --list-kinds*)
