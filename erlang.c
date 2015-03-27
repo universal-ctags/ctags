@@ -32,8 +32,8 @@ static kindOption ErlangKinds[] = {
 	{TRUE, 'd', "macro",    "macro definitions"},
 	{TRUE, 'f', "function", "functions"},
 	{TRUE, 'm', "module",   "modules"},
-	{TRUE, 'r', "record",   "record definitions"},
-	{TRUE, 't', "type",     "type definitions"},
+	{TRUE, 'r', "struct",   "record definitions"},
+	{TRUE, 't', "typedef",     "type definitions"},
 };
 
 /*
