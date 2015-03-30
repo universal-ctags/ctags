@@ -1,0 +1,2 @@
+A	input.mak	/^A = \\$/;"	m
+B	input.mak	/^B = dummy$/;"	m
