@@ -180,7 +180,7 @@ static void findMakeTags (void)
 				if (c == '\t')
 				{
 					skipLine ();  /* skip rule */
-					continue;
+					c = nextChar ();
 				}
 				else
 					in_rule = FALSE;
@@ -235,6 +235,7 @@ static void findMakeTags (void)
 						}
 						else
 						{
+							fileUngetc (c);
 							in_rule = TRUE;
 							newTarget (name);
 						}
