@@ -58,12 +58,10 @@ static void skipLine (void)
 		fileUngetc (c);
 }
 
-static int skipToNonWhite (void)
+static int skipToNonWhite (int c)
 {
-	int c;
-	do
+	while (c != '\n' && isspace (c))
 		c = nextChar ();
-	while (c != '\n' && isspace (c));
 	return c;
 }
 
@@ -137,12 +135,12 @@ static void findMakeTags (void)
 		{
 			if (in_rule)
 			{
-				if (c == '\t')
+				if (c == '\t' || (c = skipToNonWhite (c)) == '#')
 				{
-					skipLine ();  /* skip rule */
+					skipLine ();  /* skip rule or comment */
 					c = nextChar ();
 				}
-				else
+				else if (c != '\n')
 					in_rule = FALSE;
 			}
 			stringListClear (identifiers);
@@ -197,7 +195,7 @@ static void findMakeTags (void)
 				else if (! strcmp (vStringValue (name), "define"))
 				{
 					in_define = TRUE;
-					c = skipToNonWhite ();
+					c = skipToNonWhite (nextChar ());
 					vStringClear (name);
 					/* all remaining characters on the line are the name -- even spaces */
 					while (c != EOF && c != '\n')
