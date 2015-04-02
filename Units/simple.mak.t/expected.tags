@@ -1,3 +1,4 @@
+$(obj)/raid6int1.c	input.mak	/^$(obj)\/raid6int1.c:   F := 6$/;"	t
 A	input.mak	/^A = 1$/;"	m
 B	input.mak	/^B := 2$/;"	m
 C	input.mak	/^define C$/;"	m
