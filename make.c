@@ -104,42 +104,19 @@ static void newMacro (vString *const name)
 	makeSimpleTag (name, MakeKinds, K_MACRO);
 }
 
-static void newMacroFromDefine (vString *const name)
-{
-	/* name is something like "define JAVAHPP_RULE", find the space and jump to the next char */
-	char *name_val = strchr (vStringValue (name), ' ');
-
-	if (name_val != NULL) {
-		vStringCopyS (name, name_val + 1);
-		makeSimpleTag (name, MakeKinds, K_MACRO);
-	}
-}
-
 static void readIdentifier (const int first, vString *const id)
 {
 	int depth = 0;
 	int c = first;
-	int c_prev = first;
-	int c_next = first;
 	vStringClear (id);
-	while (isIdentifier (c) || c == ' ' || (depth > 0 && c != EOF && c != '\n'))
+	while (isIdentifier (c) || (depth > 0 && c != EOF && c != '\n'))
 	{
-		c_next = nextChar ();
 		if (c == '(' || c == '}')
 			depth++;
 		else if (depth > 0 && (c == ')' || c == '}'))
 			depth--;
-		if (depth < 1 && c == ' ') {
-			/* add the space character only if the previous and
-			 * next character are valid identifiers */
-			if (isIdentifier (c_prev) && isIdentifier (c_next))
-				vStringPut (id, c);
-		}
-		else {
-			vStringPut (id, c);
-		}
-		c_prev = c;
-		c = c_next;
+		vStringPut (id, c);
+		c = nextChar ();
 	}
 	fileUngetc (c);
 	vStringTerminate (id);
@@ -147,7 +124,7 @@ static void readIdentifier (const int first, vString *const id)
 
 static void findMakeTags (void)
 {
-	vString *name = vStringNew ();
+	stringList *identifiers = stringListNew ();
 	boolean newline = TRUE;
 	boolean in_define = FALSE;
 	boolean in_rule = FALSE;
@@ -168,6 +145,7 @@ static void findMakeTags (void)
 				else
 					in_rule = FALSE;
 			}
+			stringListClear (identifiers);
 			variable_possible = (boolean)(!in_rule);
 			newline = FALSE;
 		}
@@ -177,74 +155,70 @@ static void findMakeTags (void)
 			continue;
 		else if (c == '#')
 			skipLine ();
-		else if (c == ':')
+		else if (variable_possible && c == '?')
 		{
-			variable_possible = TRUE;
-			in_rule = TRUE;
+			c = nextChar ();
+			fileUngetc (c);
+			variable_possible = (c == '=');
+		}
+		else if (variable_possible && c == ':' &&
+				 stringListCount (identifiers) > 0)
+		{
+			c = nextChar ();
+			fileUngetc (c);
+			if (c != '=')
+			{
+				unsigned int i;
+				for (i = 0; i < stringListCount (identifiers); i++)
+					newTarget (stringListItem (identifiers, i));
+				stringListClear (identifiers);
+				in_rule = TRUE;
+			}
+		}
+		else if (variable_possible && c == '=' &&
+				 stringListCount (identifiers) == 1)
+		{
+			newMacro (stringListItem (identifiers, 0));
+			skipLine ();
+			in_rule = FALSE;
 		}
 		else if (variable_possible && isIdentifier (c))
 		{
+			vString *name = vStringNew ();
 			readIdentifier (c, name);
-			if (strncmp (vStringValue (name), "endef", 5) == 0)
-				in_define = FALSE;
-			else if (in_define)
-				skipLine ();
-			else if (strncmp (vStringValue (name), "define", 6) == 0  &&
-				isIdentifier (c))
+			stringListAdd (identifiers, name);
+
+			if (stringListCount (identifiers) == 1)
 			{
-				in_define = TRUE;
-				c = skipToNonWhite ();
-				newMacroFromDefine (name);
-				skipLine ();
-			}
-			else {
-				c = skipToNonWhite ();
-				if (strchr (":?+", c) != NULL)
-				{
-					boolean append = (boolean)(c == '+');
-					boolean was_colon = (c == ':');
-					c = nextChar ();
-					if (was_colon)
-					{
-						if (c == '=')
-						{
-							newMacro (name);
-							in_rule = FALSE;
-							skipLine ();
-						}
-						else
-						{
-							fileUngetc (c);
-							in_rule = TRUE;
-							newTarget (name);
-						}
-					}
-					else if (append)
-					{
-						skipLine ();
-						continue;
-					}
-					else
-					{
-						fileUngetc (c);
-					}
-				}
-				else if (c == '=')
-				{
-					newMacro (name);
-					in_rule = FALSE;
+				if (in_define && ! strcmp (vStringValue (name), "endef"))
+					in_define = FALSE;
+				else if (in_define)
 					skipLine ();
-				}
-				else
+				else if (! strcmp (vStringValue (name), "define"))
 				{
-					fileUngetc (c);
+					in_define = TRUE;
+					c = skipToNonWhite ();
+					vStringClear (name);
+					/* all remaining characters on the line are the name -- even spaces */
+					while (c != EOF && c != '\n')
+					{
+						vStringPut (name, c);
+						c = nextChar ();
+					}
+					if (c == '\n')
+						fileUngetc (c);
+					vStringTerminate (name);
+					vStringStripTrailing (name);
+					newMacro (name);
 				}
+				else if (! strcmp (vStringValue (name), "export"))
+					stringListClear (identifiers);
 			}
 		}
 		else
 			variable_possible = FALSE;
 	}
-	vStringDelete (name);
+	stringListDelete (identifiers);
 }
 
 extern parserDefinition* MakefileParser (void)

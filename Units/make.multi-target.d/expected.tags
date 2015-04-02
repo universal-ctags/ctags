@@ -1,0 +1,4 @@
+all	input.mak	/^all: foo bar$/;"	t
+bar	input.mak	/^foo bar: baz$/;"	t
+baz	input.mak	/^baz:$/;"	t
+foo	input.mak	/^foo bar: baz$/;"	t
