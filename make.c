@@ -69,7 +69,7 @@ static int skipToNonWhite (void)
 
 static boolean isIdentifier (int c)
 {
-	return (boolean)(c != '\0' && (isalnum (c)  ||  strchr (".-_/", c) != NULL));
+	return (boolean)(c != '\0' && (isalnum (c)  ||  strchr (".-_/$(){}", c) != NULL));
 }
 
 static boolean isSpecialTarget (vString *const name)
@@ -117,14 +117,19 @@ static void newMacroFromDefine (vString *const name)
 
 static void readIdentifier (const int first, vString *const id)
 {
+	int depth = 0;
 	int c = first;
 	int c_prev = first;
 	int c_next = first;
 	vStringClear (id);
-	while (isIdentifier (c) || c == ' ')
+	while (isIdentifier (c) || c == ' ' || (depth > 0 && c != EOF && c != '\n'))
 	{
 		c_next = nextChar ();
-		if (c == ' ') {
+		if (c == '(' || c == '}')
+			depth++;
+		else if (depth > 0 && (c == ')' || c == '}'))
+			depth--;
+		if (depth < 1 && c == ' ') {
 			/* add the space character only if the previous and
 			 * next character are valid identifiers */
 			if (isIdentifier (c_prev) && isIdentifier (c_next))
@@ -138,28 +143,6 @@ static void readIdentifier (const int first, vString *const id)
 	}
 	fileUngetc (c);
 	vStringTerminate (id);
-}
-
-static void skipToMatch (const char *const pair)
-{
-	const int begin = pair [0], end = pair [1];
-	const unsigned long inputLineNumber = getInputLineNumber ();
-	int matchLevel = 1;
-	int c = '\0';
-
-	while (matchLevel > 0)
-	{
-		c = nextChar ();
-		if (c == begin)
-			++matchLevel;
-		else if (c == end)
-			--matchLevel;
-		else if (c == '\n' || c == EOF)
-			break;
-	}
-	if (c == EOF)
-		verbose ("%s: failed to find match for '%c' at line %lu\n",
-				getInputFileName (), begin, inputLineNumber);
 }
 
 static void findMakeTags (void)
@@ -194,10 +177,6 @@ static void findMakeTags (void)
 			continue;
 		else if (c == '#')
 			skipLine ();
-		else if (c == '(')
-			skipToMatch ("()");
-		else if (c == '{')
-			skipToMatch ("{}");
 		else if (c == ':')
 		{
 			variable_possible = TRUE;
