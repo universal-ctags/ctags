@@ -67,7 +67,7 @@ static int skipToNonWhite (int c)
 
 static boolean isIdentifier (int c)
 {
-	return (boolean)(c != '\0' && (isalnum (c)  ||  strchr (".-_/$(){}", c) != NULL));
+	return (boolean)(c != '\0' && (isalnum (c)  ||  strchr (".-_/$(){}%", c) != NULL));
 }
 
 static boolean isSpecialTarget (vString *const name)
