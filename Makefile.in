@@ -170,6 +170,12 @@ $(OBJECTS): $(HEADERS) config.h Makefile
 Makefile: Makefile.in config.status
 	./config.status --file $@
 
+# Regenerate the build system whenever it changed
+config.status: configure
+	./config.status --recheck
+configure: configure.ac
+	autoreconf -vi
+
 #
 # generic install rules
 #
