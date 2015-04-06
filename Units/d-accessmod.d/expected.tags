@@ -1,0 +1,35 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	https://github.com/fishman/ctags	/official site/
+!_TAG_PROGRAM_VERSION	Development	//
+A	input.d	/^class A$/;"	c	line:4	file:
+B	input.d	/^        class B {$/;"	c	line:47	class:A	file:	access:protected
+C	input.d	/^            private class C {$/;"	c	line:54	class:A.B	file:	access:private
+D	input.d	/^                class D {$/;"	c	line:63	class:A.B	file:	access:protected
+a	input.d	/^    void a()$/;"	f	line:6	class:A	access:public	signature:()
+b	input.d	/^    private void b()$/;"	f	line:10	class:A	file:	access:private	signature:()
+bar	input.d	/^    int bar;$/;"	m	line:91	file:	access:public
+c	input.d	/^    protected void c()$/;"	f	line:15	class:A	access:protected	signature:()
+d	input.d	/^        void d() $/;"	f	line:23	class:A	file:	access:private	signature:()
+e	input.d	/^        void e() $/;"	f	line:26	class:A	file:	access:private	signature:()
+f	input.d	/^        void f() $/;"	f	line:33	class:A	access:public	signature:()
+foo	input.d	/^    int foo;$/;"	m	line:86	file:	access:private
+g	input.d	/^        void g() $/;"	f	line:36	class:A	access:public	signature:()
+h	input.d	/^        void h()$/;"	f	line:43	class:A	access:protected	signature:()
+i	input.d	/^            void i() {$/;"	f	line:49	class:A.B	access:public	signature:()
+j	input.d	/^            void j() {$/;"	f	line:51	class:A.B	access:public	signature:()
+k	input.d	/^                void k() {$/;"	f	line:56	class:A.B.C	access:public	signature:()
+l	input.d	/^                private void l() {$/;"	f	line:58	class:A.B.C	file:	access:private	signature:()
+m	input.d	/^                    void m() {$/;"	f	line:65	class:A.B.D	access:public	signature:()
+n	input.d	/^                    public void n() {$/;"	f	line:67	class:A.B.D	access:public	signature:()
+o	input.d	/^    int o;$/;"	m	line:73	class:A	file:	access:public
+p	input.d	/^        int p;$/;"	m	line:75	class:A	file:	access:private
+q	input.d	/^        int q;$/;"	m	line:76	class:A	file:	access:private
+r	input.d	/^        int r;$/;"	m	line:78	class:A	file:	access:protected
+s	input.d	/^        int s;$/;"	m	line:79	class:A	file:	access:protected
+w	input.d	/^        int w;$/;"	m	line:22	class:A	file:	access:private
+x	input.d	/^            protected int x;$/;"	m	line:48	class:A.B	file:	access:protected
+y	input.d	/^                private int y;$/;"	m	line:55	class:A.B.C	file:	access:private
+z	input.d	/^                    int z;$/;"	m	line:64	class:A.B.D	file:	access:public
