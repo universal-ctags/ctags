@@ -53,7 +53,7 @@ class Class : Interface
 
 public
 {
-	int missing; // FIXME - parse attribute blocks
+	int modulevar;
 }
 
 // declaration templates
