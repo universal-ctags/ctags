@@ -74,7 +74,7 @@ static boolean isSpecialTarget (vString *const name)
 {
 	size_t i = 0;
 	/* All special targets begin with '.'. */
-	if (vStringChar (name, i++) != '.') {
+	if (vStringLength (name) < 1 || vStringChar (name, i++) != '.') {
 		return FALSE;
 	}
 	while (i < vStringLength (name)) {
