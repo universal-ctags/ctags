@@ -46,6 +46,9 @@
 #include <ctype.h>
 #include <stdlib.h>   /* for WIFEXITED and WEXITSTATUS */
 #include <string.h>
+#ifdef HAVE_SYS_WAIT_H
+# include <sys/wait.h> /* for WIFEXITED and WEXITSTATUS */
+#endif
 
 #include "debug.h"
 #include "main.h"
