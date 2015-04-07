@@ -171,8 +171,8 @@ extern void vStringStripLeading (vString *const string)
  */
 extern void vStringStripTrailing (vString *const string)
 {
-	while (isspace ((int) string->buffer [string->length - 1]) &&
-		   string->length > 0)
+	while (string->length > 0 &&
+		   isspace ((int) string->buffer [string->length - 1]))
 	{
 		string->length--;
 		string->buffer [string->length] = '\0';
