@@ -24,6 +24,7 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
+	K_NOTHING = -1,		/* place holder. Never appears on tags file. */
 	K_ALIAS,
 	K_FUNCTION
 } shKind;
@@ -72,8 +73,7 @@ static void findShTags (void)
 	while ((line = fileReadLine ()) != NULL)
 	{
 		const unsigned char* cp = line;
-		boolean aliasFound = FALSE;
-		boolean functionFound = FALSE;
+		shKind found_kind = K_NOTHING;
 
 		if (hereDocDelimiter)
 		{
@@ -164,7 +164,7 @@ static void findShTags (void)
 			if (strncmp ((const char*) cp, "function", (size_t) 8) == 0  &&
 				isspace ((int) cp [8]))
 			{
-				functionFound = TRUE;
+				found_kind = K_FUNCTION;
 				cp += 8;
 				while (isspace ((int) *cp))
 					++cp;
@@ -173,7 +173,7 @@ static void findShTags (void)
 			else if (strncmp ((const char*) cp, "alias", (size_t) 5) == 0  &&
 				isspace ((int) cp [5]))
 			{
-				aliasFound = TRUE;
+				found_kind = K_ALIAS;
 				cp += 5;
 				while (isspace ((int) *cp))
 					++cp;
@@ -182,8 +182,7 @@ static void findShTags (void)
 			// Get the name of the function or alias.
 			if (! isIdentChar ((int) *cp))
 			{
-				aliasFound = FALSE;
-				functionFound = FALSE;
+				found_kind = K_NOTHING;
 				if (*cp != '\0')
 					++cp;
 				continue;
@@ -204,19 +203,14 @@ static void findShTags (void)
 					++cp;
 				if (*cp == ')')
 				{
-					functionFound = TRUE;
+					found_kind = K_FUNCTION;
 					++cp;
 				}
 			}
-			if (aliasFound)
+			if (found_kind != K_NOTHING)
 			{
-				makeSimpleTag (name, ShKinds, K_ALIAS);
-				aliasFound = FALSE;
-			}
-			if (functionFound)
-			{
-				makeSimpleTag (name, ShKinds, K_FUNCTION);
-				functionFound = FALSE;
+				makeSimpleTag (name, ShKinds, found_kind);
+				found_kind = K_NOTHING;
 			}
 			vStringClear (name);
 		}
