@@ -184,7 +184,8 @@ static void findShTags (void)
 			{
 				aliasFound = FALSE;
 				functionFound = FALSE;
-				++cp;
+				if (*cp != '\0')
+					++cp;
 				continue;
 			}
 			while (isIdentChar ((int) *cp))
