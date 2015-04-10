@@ -341,6 +341,7 @@ distclean: clean
 
 maintainerclean: distclean
 	rm -f $(AUTO_GEN)
+	rm -rf autom4te.cache/
 
 #
 # implicit rules
