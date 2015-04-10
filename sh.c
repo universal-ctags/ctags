@@ -146,7 +146,12 @@ static void findShTags (void)
 				}
 				if (end > start || quoted)
 				{
-					hereDocDelimiter = vStringNew ();
+					/* The input may be broken as a shell script but we need to avoid
+					   memory leaking. */
+					if (hereDocDelimiter)
+						vStringClear(hereDocDelimiter);
+					else
+						hereDocDelimiter = vStringNew ();
 					for (; end > start; start++)
 					{
 						if (trimEscapeSequences && *start == '\\')
@@ -179,7 +184,8 @@ static void findShTags (void)
 			{
 				aliasFound = FALSE;
 				functionFound = FALSE;
-				++cp;
+				if (*cp != '\0')
+					++cp;
 				continue;
 			}
 			while (isIdentChar ((int) *cp))
