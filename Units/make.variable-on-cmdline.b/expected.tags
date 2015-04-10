@@ -1,2 +1,0 @@
-cmd	input.mak	/^	cmd -g FOO=BAR$/;"	m
-fixme	input.mak	/^fixme:$/;"	t

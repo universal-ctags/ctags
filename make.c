@@ -58,25 +58,23 @@ static void skipLine (void)
 		fileUngetc (c);
 }
 
-static int skipToNonWhite (void)
+static int skipToNonWhite (int c)
 {
-	int c;
-	do
+	while (c != '\n' && isspace (c))
 		c = nextChar ();
-	while (c != '\n' && isspace (c));
 	return c;
 }
 
 static boolean isIdentifier (int c)
 {
-	return (boolean)(c != '\0' && (isalnum (c)  ||  strchr (".-_/", c) != NULL));
+	return (boolean)(c != '\0' && (isalnum (c)  ||  strchr (".-_/$(){}%", c) != NULL));
 }
 
 static boolean isSpecialTarget (vString *const name)
 {
 	size_t i = 0;
 	/* All special targets begin with '.'. */
-	if (vStringChar (name, i++) != '.') {
+	if (vStringLength (name) < 1 || vStringChar (name, i++) != '.') {
 		return FALSE;
 	}
 	while (i < vStringLength (name)) {
@@ -104,67 +102,27 @@ static void newMacro (vString *const name)
 	makeSimpleTag (name, MakeKinds, K_MACRO);
 }
 
-static void newMacroFromDefine (vString *const name)
-{
-	/* name is something like "define JAVAHPP_RULE", find the space and jump to the next char */
-	char *name_val = strchr (vStringValue (name), ' ');
-
-	if (name_val != NULL) {
-		vStringCopyS (name, name_val + 1);
-		makeSimpleTag (name, MakeKinds, K_MACRO);
-	}
-}
-
 static void readIdentifier (const int first, vString *const id)
 {
+	int depth = 0;
 	int c = first;
-	int c_prev = first;
-	int c_next = first;
 	vStringClear (id);
-	while (isIdentifier (c) || c == ' ')
+	while (isIdentifier (c) || (depth > 0 && c != EOF && c != '\n'))
 	{
-		c_next = nextChar ();
-		if (c == ' ') {
-			/* add the space character only if the previous and
-			 * next character are valid identifiers */
-			if (isIdentifier (c_prev) && isIdentifier (c_next))
-				vStringPut (id, c);
-		}
-		else {
-			vStringPut (id, c);
-		}
-		c_prev = c;
-		c = c_next;
+		if (c == '(' || c == '}')
+			depth++;
+		else if (depth > 0 && (c == ')' || c == '}'))
+			depth--;
+		vStringPut (id, c);
+		c = nextChar ();
 	}
 	fileUngetc (c);
 	vStringTerminate (id);
 }
 
-static void skipToMatch (const char *const pair)
-{
-	const int begin = pair [0], end = pair [1];
-	const unsigned long inputLineNumber = getInputLineNumber ();
-	int matchLevel = 1;
-	int c = '\0';
-
-	while (matchLevel > 0)
-	{
-		c = nextChar ();
-		if (c == begin)
-			++matchLevel;
-		else if (c == end)
-			--matchLevel;
-		else if (c == '\n' || c == EOF)
-			break;
-	}
-	if (c == EOF)
-		verbose ("%s: failed to find match for '%c' at line %lu\n",
-				getInputFileName (), begin, inputLineNumber);
-}
-
 static void findMakeTags (void)
 {
-	vString *name = vStringNew ();
+	stringList *identifiers = stringListNew ();
 	boolean newline = TRUE;
 	boolean in_define = FALSE;
 	boolean in_rule = FALSE;
@@ -177,14 +135,15 @@ static void findMakeTags (void)
 		{
 			if (in_rule)
 			{
-				if (c == '\t')
+				if (c == '\t' || (c = skipToNonWhite (c)) == '#')
 				{
-					skipLine ();  /* skip rule */
-					continue;
+					skipLine ();  /* skip rule or comment */
+					c = nextChar ();
 				}
-				else
+				else if (c != '\n')
 					in_rule = FALSE;
 			}
+			stringListClear (identifiers);
 			variable_possible = (boolean)(!in_rule);
 			newline = FALSE;
 		}
@@ -194,77 +153,70 @@ static void findMakeTags (void)
 			continue;
 		else if (c == '#')
 			skipLine ();
-		else if (c == '(')
-			skipToMatch ("()");
-		else if (c == '{')
-			skipToMatch ("{}");
-		else if (c == ':')
+		else if (variable_possible && c == '?')
 		{
-			variable_possible = TRUE;
-			in_rule = TRUE;
+			c = nextChar ();
+			fileUngetc (c);
+			variable_possible = (c == '=');
+		}
+		else if (variable_possible && c == ':' &&
+				 stringListCount (identifiers) > 0)
+		{
+			c = nextChar ();
+			fileUngetc (c);
+			if (c != '=')
+			{
+				unsigned int i;
+				for (i = 0; i < stringListCount (identifiers); i++)
+					newTarget (stringListItem (identifiers, i));
+				stringListClear (identifiers);
+				in_rule = TRUE;
+			}
+		}
+		else if (variable_possible && c == '=' &&
+				 stringListCount (identifiers) == 1)
+		{
+			newMacro (stringListItem (identifiers, 0));
+			skipLine ();
+			in_rule = FALSE;
 		}
 		else if (variable_possible && isIdentifier (c))
 		{
+			vString *name = vStringNew ();
 			readIdentifier (c, name);
-			if (strncmp (vStringValue (name), "endef", 5) == 0)
-				in_define = FALSE;
-			else if (in_define)
-				skipLine ();
-			else if (strncmp (vStringValue (name), "define", 6) == 0  &&
-				isIdentifier (c))
+			stringListAdd (identifiers, name);
+
+			if (stringListCount (identifiers) == 1)
 			{
-				in_define = TRUE;
-				c = skipToNonWhite ();
-				newMacroFromDefine (name);
-				skipLine ();
-			}
-			else {
-				c = skipToNonWhite ();
-				if (strchr (":?+", c) != NULL)
-				{
-					boolean append = (boolean)(c == '+');
-					boolean was_colon = (c == ':');
-					c = nextChar ();
-					if (was_colon)
-					{
-						if (c == '=')
-						{
-							newMacro (name);
-							in_rule = FALSE;
-							skipLine ();
-						}
-						else
-						{
-							in_rule = TRUE;
-							newTarget (name);
-						}
-					}
-					else if (append)
-					{
-						skipLine ();
-						continue;
-					}
-					else
-					{
-						fileUngetc (c);
-					}
-				}
-				else if (c == '=')
-				{
-					newMacro (name);
-					in_rule = FALSE;
+				if (in_define && ! strcmp (vStringValue (name), "endef"))
+					in_define = FALSE;
+				else if (in_define)
 					skipLine ();
-				}
-				else
+				else if (! strcmp (vStringValue (name), "define"))
 				{
-					fileUngetc (c);
+					in_define = TRUE;
+					c = skipToNonWhite (nextChar ());
+					vStringClear (name);
+					/* all remaining characters on the line are the name -- even spaces */
+					while (c != EOF && c != '\n')
+					{
+						vStringPut (name, c);
+						c = nextChar ();
+					}
+					if (c == '\n')
+						fileUngetc (c);
+					vStringTerminate (name);
+					vStringStripTrailing (name);
+					newMacro (name);
 				}
+				else if (! strcmp (vStringValue (name), "export"))
+					stringListClear (identifiers);
 			}
 		}
 		else
 			variable_possible = FALSE;
 	}
-	vStringDelete (name);
+	stringListDelete (identifiers);
 }
 
 extern parserDefinition* MakefileParser (void)

@@ -1,0 +1,5 @@
+%.o	input.mak	/^%.o: %.c$/;"	t
+%.p	input.mak	/^%.p %.q: %.d$/;"	t
+%.q	input.mak	/^%.p %.q: %.d$/;"	t
+%a	input.mak	/^%a b%:$/;"	t
+b%	input.mak	/^%a b%:$/;"	t

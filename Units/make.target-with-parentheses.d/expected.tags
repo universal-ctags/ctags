@@ -1,0 +1,2 @@
+$(obj)/raid6int1.c	input.mak	/^$(obj)\/raid6int1.c:   F := 6$/;"	t
+F	input.mak	/^$(obj)\/raid6int1.c:   F := 6$/;"	m
