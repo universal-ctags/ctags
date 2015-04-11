@@ -158,7 +158,10 @@ typedef enum eDeclaration {
 	DECL_NAMESPACE,
 	DECL_NOMANGLE,       /* C++ name demangling block */
 	DECL_PACKAGE,
+	DECL_PRIVATE,
 	DECL_PROGRAM,        /* Vera program */
+	DECL_PROTECTED,
+	DECL_PUBLIC,
 	DECL_STRUCT,
 	DECL_TASK,           /* Vera task */
 	DECL_TEMPLATE,       /* D-only */
@@ -785,6 +788,9 @@ static boolean isContextualStatement (const statementInfo *const st)
 		case DECL_ENUM:
 		case DECL_INTERFACE:
 		case DECL_NAMESPACE:
+		case DECL_PRIVATE:
+		case DECL_PROTECTED:
+		case DECL_PUBLIC:
 		case DECL_STRUCT:
 		case DECL_UNION:
 		case DECL_TEMPLATE:
@@ -810,9 +816,17 @@ static boolean isMember (const statementInfo *const st)
 static void initMemberInfo (statementInfo *const st)
 {
 	accessType accessDefault = ACCESS_UNDEFINED;
-
 	if (st->parent != NULL) switch (st->parent->declaration)
 	{
+		case DECL_PRIVATE:
+			accessDefault = ACCESS_PRIVATE;
+			break;
+		case DECL_PROTECTED:
+			accessDefault = ACCESS_PROTECTED;
+			break;
+		case DECL_PUBLIC:
+			accessDefault = ACCESS_PUBLIC;
+			break;
 		case DECL_ENUM:
 			accessDefault = (isLanguage (Lang_java) ? ACCESS_PUBLIC : ACCESS_UNDEFINED);
 			break;
@@ -1077,6 +1091,9 @@ static tagType declToTagType (const declType declaration)
 		case DECL_INTERFACE:    type = TAG_INTERFACE;   break;
 		case DECL_NAMESPACE:    type = TAG_NAMESPACE;   break;
 		case DECL_PROGRAM:      type = TAG_PROGRAM;     break;
+		case DECL_PRIVATE:      type = TAG_CLASS;       break;
+		case DECL_PROTECTED:    type = TAG_CLASS;       break;
+		case DECL_PUBLIC:       type = TAG_CLASS;       break;
 		case DECL_TASK:         type = TAG_TASK;        break;
 		case DECL_TEMPLATE: 	type = TAG_TEMPLATE; 	break;
 		case DECL_STRUCT:       type = TAG_STRUCT;      break;
@@ -1215,6 +1232,12 @@ static void findScopeHierarchy (vString *const string,
 				s->declaration == DECL_NAMESPACE ||
 				s->declaration == DECL_PROGRAM)
 			{
+				if (s->declaration == DECL_PRIVATE ||
+					s->declaration == DECL_PROTECTED ||
+					s->declaration == DECL_PUBLIC) {
+					continue;
+				}
+
 				vStringCopy (temp, string);
 				vStringClear (string);
 				Assert (isType (s->blockName, TOKEN_NAME));
@@ -1797,9 +1820,41 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src)
 
 static void setAccess (statementInfo *const st, const accessType access)
 {
+	if (isLanguage (Lang_d))
+	{
+		int c = skipToNonWhite ();
+
+		if (c == '{')
+		{
+			switch(access)
+			{
+				case ACCESS_PRIVATE:
+					st->declaration = DECL_PRIVATE;
+					break;
+				case ACCESS_PUBLIC:
+					st->declaration = DECL_PUBLIC;
+					break;
+				case ACCESS_PROTECTED:
+					st->declaration = DECL_PROTECTED;
+					break;
+				default:
+					break;
+			}
+			st->member.access = access;
+		    cppUngetc (c);
+		}
+        else if (c == ':') {
+            reinitStatement (st, FALSE);
+			st->member.accessDefault = access;
+        }
+        else {
+            cppUngetc (c);
+        }
+	}
+
 	if (isMember (st))
 	{
-		if (isLanguage (Lang_cpp) || isLanguage (Lang_d))
+		if (isLanguage (Lang_cpp))
 		{
 			int c = skipToNonWhite ();
 
@@ -1809,6 +1864,17 @@ static void setAccess (statementInfo *const st, const accessType access)
 				cppUngetc (c);
 
 			st->member.accessDefault = access;
+		}
+		else if (isLanguage (Lang_d))
+		{
+			if (st->parent != NULL &&
+				(st->parent->declaration == DECL_PRIVATE ||
+				st->parent->declaration == DECL_PROTECTED ||
+				st->parent->declaration == DECL_PUBLIC))
+			{
+				st->member.access = st->parent->member.access;
+				return;
+			}
 		}
 		st->member.access = access;
 	}
@@ -2844,6 +2910,9 @@ static void nest (statementInfo *const st, const unsigned int nestLevel)
 		case DECL_INTERFACE:
 		case DECL_NAMESPACE:
 		case DECL_NOMANGLE:
+		case DECL_PRIVATE:
+		case DECL_PROTECTED:
+		case DECL_PUBLIC:
 		case DECL_STRUCT:
 		case DECL_UNION:
 			createTags (nestLevel, st);

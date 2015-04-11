@@ -17,8 +17,9 @@ conditional	input.d	/^	T conditional;$/;"	v	file:
 foo	input.d	/^	foo,$/;"	e	enum:Enum	file:
 globalVar	input.d	/^__gshared int globalVar;$/;"	v
 i	input.d	/^int i;$/;"	v
-main	input.d	/^void main(string[] args)$/;"	f
+main	input.d	/^void main(string[] args)$/;"	f	file:
 member	input.d	/^		T member;$/;"	m	class:Class.CT	file:
+modulevar	input.d	/^	int modulevar;$/;"	m	file:
 obj	input.d	/^Object obj;$/;"	v
 qar	input.d	/^		int qar;$/;"	m	union:Struct.Union	file:
 quxx	input.d	/^		bool quxx;$/;"	m	union:Struct.Union	file:
