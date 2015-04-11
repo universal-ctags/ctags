@@ -26,17 +26,29 @@
 typedef enum {
 	K_NOTHING = -1,		/* place holder. Never appears on tags file. */
 	K_ALIAS,
-	K_FUNCTION
+	K_FUNCTION,
+	K_SOURCE,
 } shKind;
 
 static kindOption ShKinds [] = {
 	{ TRUE, 'a', "alias", "aliases"},
-	{ TRUE, 'f', "function", "functions"}
+	{ TRUE, 'f', "function", "functions"},
+	{ FALSE, 's', "source", "read files"}
 };
 
 /*
 *   FUNCTION DEFINITIONS
 */
+
+static boolean isFileChar  (int c)
+{
+	return (isalnum (c)
+		|| c == '_' || c == '-'
+		|| c == '/' || c == '.'
+		|| c == '+' || c == '^'
+		|| c == '%' || c == '@'
+		|| c == '~');
+}
 
 static boolean isIdentChar (int c)
 {
@@ -69,6 +81,7 @@ static void findShTags (void)
 	const unsigned char *line;
 	vString *hereDocDelimiter = NULL;
 	boolean hereDocIndented = FALSE;
+	boolean (* check_char)(int);
 
 	while ((line = fileReadLine ()) != NULL)
 	{
@@ -179,15 +192,36 @@ static void findShTags (void)
 					++cp;
 			}
 
-			// Get the name of the function or alias.
-			if (! isIdentChar ((int) *cp))
+			else if (cp [0] == '.'
+				 && isspace((int) cp [1]))
+			{
+				found_kind = K_SOURCE;
+				++cp;
+				while (isspace ((int) *cp))
+					++cp;
+			}
+			else if (strncmp ((const char*) cp, "source", (size_t) 6) == 0
+				 && isspace((int) cp [6]))
+			{
+				found_kind = K_SOURCE;
+				cp += 6;
+				while (isspace ((int) *cp))
+					++cp;
+			}
+
+			// Get the name of the function, alias or file to be read by source
+			check_char = isIdentChar;
+			if (found_kind == K_SOURCE)
+				check_char = isFileChar;
+
+			if (! check_char ((int) *cp))
 			{
 				found_kind = K_NOTHING;
 				if (*cp != '\0')
 					++cp;
 				continue;
 			}
-			while (isIdentChar ((int) *cp))
+			while (check_char ((int) *cp))
 			{
 				vStringPut (name, (int) *cp);
 				++cp;
@@ -196,7 +230,9 @@ static void findShTags (void)
 
 			while (isspace ((int) *cp))
 				++cp;
-			if (*cp == '(')
+
+			if ((found_kind != K_SOURCE)
+			    && *cp == '(')
 			{
 				++cp;
 				while (isspace ((int) *cp))
