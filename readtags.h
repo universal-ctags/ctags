@@ -81,6 +81,9 @@ typedef struct {
 			/* URL of distribution (may be null) */
 		const char *url;
 
+			/* URL of development (may be null) */
+		const char *devurl;
+
 			/* program version (may be null) */
 		const char *version;
 	} program;

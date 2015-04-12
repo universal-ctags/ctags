@@ -802,6 +802,7 @@ static boolean makePseudoTagEntryFromTagEntry (tagEntry* entry)
 	else if ((strcmp (tagName, "TAG_PROGRAM_AUTHOR") == 0)
 		 || (strcmp (tagName, "TAG_PROGRAM_NAME") == 0)
 		 || (strcmp (tagName, "TAG_PROGRAM_URL") == 0)
+		 || (strcmp (tagName, "TAG_PROGRAM_DEVURL") == 0)
 		 || (strcmp (tagName, "TAG_PROGRAM_VERSION") == 0))
 	{
 		writePseudoTag (tagName, fileName, pattern,

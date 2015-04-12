@@ -175,6 +175,7 @@ static void addPseudoTags (void)
 		writePseudoTag ("TAG_PROGRAM_AUTHOR",  AUTHOR_NAME,  AUTHOR_EMAIL, NULL);
 		writePseudoTag ("TAG_PROGRAM_NAME",    PROGRAM_NAME, "", NULL);
 		writePseudoTag ("TAG_PROGRAM_URL",     PROGRAM_URL,  "official site", NULL);
+		writePseudoTag ("TAG_PROGRAM_DEVURL",  PROGRAM_DEVURL,  "development area", NULL);
 		writePseudoTag ("TAG_PROGRAM_VERSION", PROGRAM_VERSION, "", NULL);
 	}
 }

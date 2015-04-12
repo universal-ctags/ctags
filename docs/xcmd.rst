@@ -117,8 +117,9 @@ ctags merges the Psuedo-tag lines with ``!LANG`` suffix::
 	!_TAG_PROGRAM_AUTHOR!coffee	Łukasz Korecki	/lukasz@coffeesounds.com/
 	!_TAG_PROGRAM_NAME	Exuberant Ctags	//
 	!_TAG_PROGRAM_NAME!coffee	CoffeeTags	//
-	!_TAG_PROGRAM_URL	https://github.com/fishman/ctags	/official site/
+	!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 	!_TAG_PROGRAM_URL!coffee	https://github.com/lukaszkorecki/CoffeeTags	/GitHub repository/
+	!_TAG_PROGRAM_DEVURL	https://github.com/fishman/ctags	/development area/
 	!_TAG_PROGRAM_VERSION	Development	//
 	!_TAG_PROGRAM_VERSION!coffee	0.5.0	//
 
