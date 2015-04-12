@@ -179,8 +179,6 @@ static void findShTags (void)
 			{
 				found_kind = K_FUNCTION;
 				cp += 8;
-				while (isspace ((int) *cp))
-					++cp;
 			}
 
 			else if (strncmp ((const char*) cp, "alias", (size_t) 5) == 0  &&
@@ -188,8 +186,6 @@ static void findShTags (void)
 			{
 				found_kind = K_ALIAS;
 				cp += 5;
-				while (isspace ((int) *cp))
-					++cp;
 			}
 
 			else if (cp [0] == '.'
@@ -197,17 +193,17 @@ static void findShTags (void)
 			{
 				found_kind = K_SOURCE;
 				++cp;
-				while (isspace ((int) *cp))
-					++cp;
 			}
 			else if (strncmp ((const char*) cp, "source", (size_t) 6) == 0
 				 && isspace((int) cp [6]))
 			{
 				found_kind = K_SOURCE;
 				cp += 6;
+			}
+
+			if (found_kind != K_NOTHING)
 				while (isspace ((int) *cp))
 					++cp;
-			}
 
 			// Get the name of the function, alias or file to be read by source
 			check_char = isIdentChar;
