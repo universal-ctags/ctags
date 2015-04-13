@@ -24,12 +24,13 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-	K_MACRO, K_TARGET
+	K_MACRO, K_TARGET, K_INCLUDE
 } shKind;
 
 static kindOption MakeKinds [] = {
 	{ TRUE, 'm', "macro",  "macros"},
-	{ TRUE, 't', "target", "targets"}
+	{ TRUE, 't', "target", "targets"},
+	{ FALSE,'I', "include", "includes"}
 };
 
 /*
@@ -100,6 +101,18 @@ static void newTarget (vString *const name)
 static void newMacro (vString *const name)
 {
 	makeSimpleTag (name, MakeKinds, K_MACRO);
+}
+
+static void newInclude (vString *const name)
+{
+	makeSimpleTag (name, MakeKinds, K_INCLUDE);
+}
+
+static boolean isAcceptableAsInclude (vString *const name)
+{
+	if (strcmp (vStringValue (name), "$") == 0)
+		return FALSE;
+	return TRUE;
 }
 
 static void readIdentifier (const int first, vString *const id)
@@ -211,6 +224,35 @@ static void findMakeTags (void)
 				}
 				else if (! strcmp (vStringValue (name), "export"))
 					stringListClear (identifiers);
+				else if (! strcmp (vStringValue (name), "include")
+					 || ! strcmp (vStringValue (name), "sinclude")
+					 || ! strcmp (vStringValue (name), "-include"))
+				{
+					while (1)
+					{
+						c = skipToNonWhite (nextChar ());
+						readIdentifier (c, name);
+						vStringStripTrailing (name);
+						if (isAcceptableAsInclude(name))
+							newInclude (name);
+
+						/* non-space characters after readIdentifier() may
+						 * be rejected by the function:
+						 * e.g.
+						 * include $*
+						 *
+						 * Here, remove such characters from input stream.
+						 */
+						do
+							c = nextChar ();
+						while (c != EOF && c != '\n' && (!isspace (c)));
+						if (c == '\n')
+							fileUngetc (c);
+
+						if (c == EOF || c == '\n')
+							break;
+					}
+				}
 			}
 		}
 		else
