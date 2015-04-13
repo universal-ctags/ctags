@@ -481,6 +481,34 @@ static vString* extractVimFileType(FILE* input)
 	   [text]{white}{vi:|vim:|ex:}[white]{options} */
 }
 
+static vString* determineZshAutoloadTag (const char *const modeline)
+{
+	/* See "Autoloaded files" in zsh info.
+	   -------------------------------------
+	   #compdef ...
+	   #autoload [ OPTIONS ] */
+
+	if (((strncmp (modeline, "#compdef", 8) == 0) && isspace (*(modeline + 8)))
+	    || ((strncmp (modeline, "#autoload", 9) == 0)
+		&& (isspace (*(modeline + 9)) || *(modeline + 9) == '\0')))
+		return vStringNewInit ("zsh");
+	else
+		return NULL;
+}
+
+static vString* extractZshAutoloadTag(FILE* input)
+{
+	vString* const vLine = vStringNew ();
+	const char* const line = readLine (vLine, input);
+	vString* mode = NULL;
+
+	if (line)
+		mode = determineZshAutoloadTag (line);
+
+	vStringDelete (vLine);
+	return mode;
+}
+
 static const tgTableEntry* findTgTableEntry(const parserDefinition* const lang, const char* const spec)
 {
 	const tgTableEntry *entry;
@@ -582,6 +610,10 @@ static const struct taster {
 		.taste  = extractInterpreter,
 		.msg    = "interpreter",
         },
+	{
+		.taste  = extractZshAutoloadTag,
+		.msg    = "zsh autoload tag",
+	},
         {
 		.taste  = extracEmacsModeAtFirstLine,
 		.msg    = "emacs mode at the first line",
