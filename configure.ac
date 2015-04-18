@@ -41,6 +41,8 @@ AH_TEMPLATE([CUSTOM_CONFIGURATION_FILE],
 	site-specific configuration file containing site-wide default options. The
 	files /etc/ctags.conf and /usr/local/etc/ctags.conf are already checked,
 	so only define one here if you need a file somewhere else.])
+AH_TEMPLATE([ETAGS],
+	[Define the string to check (in executable name) for etags mode])
 AH_TEMPLATE([MACROS_USE_PATTERNS],
 	[Define this label if you want macro tags (defined lables) to use patterns
 	in the EX command by default (original ctags behavior is to use line
@@ -190,6 +192,7 @@ AC_ARG_ENABLE(tmpdir,
 		[default directory for temporary files [ARG=/tmp]])],
 	tmpdir_specified=yes)
 
+AC_ARG_PROGRAM
 
 # Process configuration options
 # -----------------------------
@@ -221,6 +224,14 @@ else
 	install_targets="$install_targets install-cmd"
 fi
 AC_SUBST(install_targets)
+
+dnl AC_MSG_RESULT(Change with $program_transform_name)
+ctags_name_executable=`echo ctags | sed "$program_transform_name"`
+AC_SUBST(ctags_name_executable)
+etags_name_executable=`echo etags | sed "$program_transform_name"`
+AC_SUBST(etags_name_executable)
+
+AC_DEFINE_UNQUOTED(ETAGS, "$etags_name_executable")
 
 if test "$enable_custom_config" = no -o "$enable_custom_config" = yes ; then
 	AC_MSG_RESULT(no name supplied for custom configuration file)
@@ -563,6 +574,14 @@ AC_CHECK_DECLS([_NSGetEnviron],[],[],[
 [#include <crt_externs.h>]
 ])
 
+if test "$ctags_name_executable" != ctags ; then
+	AC_MSG_RESULT(Changing name of 'ctags' for $ctags_name_executable)
+fi
+
+if test "$etags_name_executable" != etags ; then
+	AC_MSG_RESULT(Changing name of 'etags' for $etags_name_executable)
+fi
+
 # Output files
 # ------------
 
@@ -571,10 +590,10 @@ rm -f Makefile
 if test "$enable_maintainer_mode" = yes ; then
 	AC_MSG_RESULT(creating maintainer Makefile)
 	ln -s maintainer.mak Makefile
-	makefile_out=
 else
-	makefile_out=Makefile
+	AC_CONFIG_FILES(Makefile ctags.1)
 fi
-AC_OUTPUT($makefile_out)
+
+AC_OUTPUT
 
 # vim:ts=4:sw=4:
