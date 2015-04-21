@@ -865,15 +865,24 @@ static void listTags (void)
 
 static const char *const Usage =
 	"Find tag file entries matching specified names.\n\n"
-	"Usage: %s [-ilp] [-s[0|1]] [-t file] [name(s)]\n\n"
+	"Usage: \n"
+	"    %s -h\n"
+	"    %s [-ilp] [-s[0|1]] [-t file] [name(s)]\n\n"
 	"Options:\n"
 	"    -e           Include extension fields in output.\n"
+	"    -h           Print this help message.\n"
 	"    -i           Perform case-insensitive matching.\n"
 	"    -l           List all tags.\n"
 	"    -p           Perform partial matching.\n"
 	"    -s[0|1|2]    Override sort detection of tag file.\n"
 	"    -t file      Use specified tag file (default: \"tags\").\n"
 	"Note that options are acted upon as encountered, so order is significant.\n";
+
+static void printUsage(FILE* stream, int exitCode)
+{
+	fprintf (stream, Usage, ProgramName, ProgramName);
+	exit (exitCode);
+}
 
 extern int main (int argc, char **argv)
 {
@@ -882,10 +891,7 @@ extern int main (int argc, char **argv)
 	int i;
 	ProgramName = argv [0];
 	if (argc == 1)
-	{
-		fprintf (stderr, Usage, ProgramName);
-		exit (1);
-	}
+		printUsage(stderr, 1);
 	for (i = 1  ;  i < argc  ;  ++i)
 	{
 		const char *const arg = argv [i];
@@ -901,11 +907,12 @@ extern int main (int argc, char **argv)
 			{
 				switch (arg [j])
 				{
+					case 'h': printUsage (stdout, 0); break;
 					case 'e': extensionFields = 1;         break;
 					case 'i': options |= TAG_IGNORECASE;   break;
 					case 'p': options |= TAG_PARTIALMATCH; break;
 					case 'l': listTags (); actionSupplied = 1; break;
-			
+
 					case 't':
 						if (arg [j+1] != '\0')
 						{
@@ -915,10 +922,7 @@ extern int main (int argc, char **argv)
 						else if (i + 1 < argc)
 							TagFileName = argv [++i];
 						else
-						{
-							fprintf (stderr, Usage, ProgramName);
-							exit (1);
-						}
+							printUsage(stderr, 1);
 						break;
 					case 's':
 						SortOverride = 1;
@@ -928,10 +932,7 @@ extern int main (int argc, char **argv)
 						else if (strchr ("012", arg[j]) != NULL)
 							SortMethod = (sortType) (arg[j] - '0');
 						else
-						{
-							fprintf (stderr, Usage, ProgramName);
-							exit (1);
-						}
+							printUsage(stderr, 1);
 						break;
 					default:
 						fprintf (stderr, "%s: unknown option: %c\n",
