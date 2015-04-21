@@ -3,8 +3,8 @@
 # These are the names of the installed programs, in case you wish to change
 # them.
 #
-CTAGS_PROG = ctags
-ETAGS_PROG = etags
+CTAGS_PROG = @ctags_name_executable@
+ETAGS_PROG = @etags_name_executable@
 
 # Set this to the path to your shell (must run Bourne shell commands).
 #

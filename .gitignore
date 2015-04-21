@@ -8,6 +8,7 @@ test.*.diff
 *.TMP
 *.tmp
 ctags.exe
+ctags.1
 ctags.ref.exe
 dctags.exe
 readtags
