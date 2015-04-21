@@ -26,6 +26,7 @@ The following parsers have been added:
 * falcon
 * go
 * json
+* m4 *optlib*
 * mib *optlib*
 * rust
 * windres

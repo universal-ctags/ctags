@@ -113,6 +113,7 @@ PRELOAD_OPTLIB =				\
 	\
 	coffee.ctags				\
 	ctags.ctags				\
+	m4.ctags				\
 	mib.ctags				\
 	\
 	$(NULL)
