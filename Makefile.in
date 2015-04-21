@@ -80,7 +80,7 @@ READ_INC = readtags.h
 
 MANPAGE	= ctags.1
 
-AUTO_GEN   = configure config.h.in
+AUTO_GEN   = configure config.h.in commit_id.c
 CONFIG_GEN = config.cache config.log config.status config.run config.h Makefile
 
 #
@@ -145,8 +145,42 @@ DEST_EMAN	= $(man1dir)/$(EMAN)
 #
 all: $(CTAGS_EXEC) $(READ_LIB) $(READ_CMD)
 
-$(CTAGS_EXEC): $(OBJECTS)
-	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
+$(CTAGS_EXEC): $(OBJECTS) commit_id.$(OBJEXT)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) commit_id.$(OBJEXT) $(LIBS)
+
+GIT_TAG       := $(shell git rev-parse && git tag --points-at HEAD)
+GIT_COMMIT_ID := $(shell git rev-parse && git rev-parse --short HEAD)
+
+#
+# Considered cases:
+#
+# 1. if building is done in a git repository on Unix-like system, generate
+#    commit_id.c if necessary.
+#
+# 2. if building is done out of a git repository, check wheter commit_id.c exists or not.
+#    (Our tar ball may include commit_id.c.) A user of the tar ball can modify the source
+#    code, but commit_id.c is not updated. This is a risk but I will ignore the risk here.
+#
+# 3. if building is done in a git repository on Windows, "UNKNOWN" is used as a COMMIT ID.
+#    On windows ./configure is not run as part of building.
+#
+commit_id.c: FORCE
+	if [ -n "$(GIT_COMMIT_ID)" ]; then \
+		if [ -n "$(GIT_TAG)" ]; then \
+			echo "const char PROGRAM_GIT_COMMIT_ID[] = " "\"$(GIT_COMMIT_ID)($(GIT_TAG))\"" ";" > _$@; \
+		else \
+			echo "const char PROGRAM_GIT_COMMIT_ID[] = " "\"$(GIT_COMMIT_ID)\"" ";" > _$@; \
+		fi; \
+		if [ -f $@ ] && diff _$@ $@ > /dev/null; then \
+			rm _$@; \
+		else \
+			mv _$@ $@; \
+		fi; \
+	elif [ -f commit_id.c ]; then \
+		:; \
+	else \
+		echo "const char PROGRAM_GIT_COMMIT_ID[] = " "UNKNOWN" ";" > _$@; \
+	fi;
 
 dctags$(EXEEXT): debug.c $(SOURCES) $(HEADERS)
 	$(CC) -I. -I$(srcdir) $(DEFS) $(ALL_CPPFLAGS) -DDEBUG -g $(LDFLAGS) -o $@ debug.c $(SOURCES)

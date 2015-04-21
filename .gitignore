@@ -41,3 +41,4 @@ win32/[Rr]elease/
 win32/[Dd]ebug/
 perf.data*
 a.out
+commit_id.c

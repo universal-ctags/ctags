@@ -17,8 +17,10 @@
 #if (defined (HAVE_FORK) && defined (HAVE_WAITPID) && defined (HAVE_EXECV) && defined (HAVE_PIPE))
 #define HAVE_COPROC
 #endif
+extern const char PROGRAM_GIT_COMMIT_ID[];
 #elif defined (WIN32)
 # include "e_msoft.h"
+#define PROGRAM_GIT_COMMIT_ID "UNKNOWN"
 #endif
 
 
