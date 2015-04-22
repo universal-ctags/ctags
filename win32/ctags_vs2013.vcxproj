@@ -56,7 +56,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../gnu_regex;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;../gnu_regex;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;;HAVE_REGCOMP;__USE_GNU;bool=int;true=1;false=0;strcasecmp=stricmp;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -75,7 +75,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../gnu_regex;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;../gnu_regex;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;HAVE_REGCOMP;__USE_GNU;bool=int;true=1;false=0;strcasecmp=stricmp;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -92,78 +92,95 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\ada.c" />
-    <ClCompile Include="..\ant.c" />
+    <ClCompile Include="..\parsers\ada.c" />
+    <ClCompile Include="..\parsers\ant.c" />
     <ClCompile Include="..\args.c" />
-    <ClCompile Include="..\asm.c" />
-    <ClCompile Include="..\asp.c" />
-    <ClCompile Include="..\awk.c" />
-    <ClCompile Include="..\basic.c" />
-    <ClCompile Include="..\beta.c" />
-    <ClCompile Include="..\c.c" />
-    <ClCompile Include="..\clojure.c" />
-    <ClCompile Include="..\cobol.c" />
-    <ClCompile Include="..\css.c" />
+    <ClCompile Include="..\parsers\asm.c" />
+    <ClCompile Include="..\parsers\asp.c" />
+    <ClCompile Include="..\parsers\awk.c" />
+    <ClCompile Include="..\parsers\basic.c" />
+    <ClCompile Include="..\parsers\beta.c" />
+    <ClCompile Include="..\parsers\c.c" />
+    <ClCompile Include="..\parsers\clojure.c" />
+    <ClCompile Include="..\parsers\cobol.c" />
+    <ClCompile Include="..\parsers\css.c" />
     <ClCompile Include="..\debug.c" />
-    <ClCompile Include="..\dosbatch.c" />
-    <ClCompile Include="..\eiffel.c" />
+    <ClCompile Include="..\parsers\dosbatch.c" />
+    <ClCompile Include="..\parsers\eiffel.c" />
     <ClCompile Include="..\entry.c" />
-    <ClCompile Include="..\erlang.c" />
-    <ClCompile Include="..\falcon.c" />
+    <ClCompile Include="..\parsers\erlang.c" />
+    <ClCompile Include="..\parsers\falcon.c" />
     <ClCompile Include="..\flags.c" />
-    <ClCompile Include="..\flex.c" />
+    <ClCompile Include="..\parsers\flex.c" />
     <ClCompile Include="..\fnmatch\fnmatch.c" />
-    <ClCompile Include="..\fortran.c" />
+    <ClCompile Include="..\parsers\fortran.c" />
     <ClCompile Include="..\get.c" />
-    <ClCompile Include="..\go.c" />
-    <ClCompile Include="..\html.c" />
-    <ClCompile Include="..\jscript.c" />
-    <ClCompile Include="..\json.c" />
+    <ClCompile Include="..\parsers\go.c" />
+    <ClCompile Include="..\parsers\html.c" />
+    <ClCompile Include="..\parsers\jscript.c" />
+    <ClCompile Include="..\parsers\json.c" />
     <ClCompile Include="..\keyword.c" />
-    <ClCompile Include="..\lisp.c" />
+    <ClCompile Include="..\parsers\lisp.c" />
     <ClCompile Include="..\lregex.c" />
     <ClCompile Include="..\lxcmd.c" />
-    <ClCompile Include="..\lua.c" />
+    <ClCompile Include="..\parsers\lua.c" />
     <ClCompile Include="..\main.c" />
-    <ClCompile Include="..\make.c" />
-    <ClCompile Include="..\matlab.c" />
-    <ClCompile Include="..\objc.c" />
-    <ClCompile Include="..\ocaml.c" />
+    <ClCompile Include="..\parsers\make.c" />
+    <ClCompile Include="..\parsers\matlab.c" />
+    <ClCompile Include="..\parsers\objc.c" />
+    <ClCompile Include="..\parsers\ocaml.c" />
     <ClCompile Include="..\options.c" />
     <ClCompile Include="..\parse.c" />
-    <ClCompile Include="..\pascal.c" />
-    <ClCompile Include="..\perl.c" />
-    <ClCompile Include="..\php.c" />
-    <ClCompile Include="..\python.c" />
+    <ClCompile Include="..\parsers\pascal.c" />
+    <ClCompile Include="..\parsers\perl.c" />
+    <ClCompile Include="..\parsers\php.c" />
+    <ClCompile Include="..\parsers\python.c" />
     <ClCompile Include="..\read.c" />
     <ClCompile Include="..\gnu_regex\regex.c">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
-    <ClCompile Include="..\rexx.c" />
+    <ClCompile Include="..\parsers\rexx.c" />
     <ClCompile Include="..\routines.c" />
-    <ClCompile Include="..\ruby.c" />
-    <ClCompile Include="..\rust.c" />
-    <ClCompile Include="..\scheme.c" />
-    <ClCompile Include="..\sh.c" />
-    <ClCompile Include="..\slang.c" />
-    <ClCompile Include="..\sml.c" />
+    <ClCompile Include="..\parsers\ruby.c" />
+    <ClCompile Include="..\parsers\rust.c" />
+    <ClCompile Include="..\parsers\scheme.c" />
+    <ClCompile Include="..\parsers\sh.c" />
+    <ClCompile Include="..\parsers\slang.c" />
+    <ClCompile Include="..\parsers\sml.c" />
     <ClCompile Include="..\sort.c" />
-    <ClCompile Include="..\sql.c" />
+    <ClCompile Include="..\parsers\sql.c" />
     <ClCompile Include="..\strlist.c" />
-    <ClCompile Include="..\tcl.c" />
-    <ClCompile Include="..\tex.c" />
+    <ClCompile Include="..\parsers\tcl.c" />
+    <ClCompile Include="..\parsers\tex.c" />
     <ClCompile Include="..\tg.c" />
     <ClCompile Include="..\trashbox.c" />
-    <ClCompile Include="..\verilog.c" />
-    <ClCompile Include="..\vhdl.c" />
-    <ClCompile Include="..\vim.c" />
+    <ClCompile Include="..\parsers\verilog.c" />
+    <ClCompile Include="..\parsers\vhdl.c" />
+    <ClCompile Include="..\parsers\vim.c" />
     <ClCompile Include="..\vstring.c" />
-    <ClCompile Include="..\windres.c" />
-    <ClCompile Include="..\yacc.c" />
+    <ClCompile Include="..\parsers\windres.c" />
+    <ClCompile Include="..\parsers\yacc.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\args.h" />
+    <ClInclude Include="..\entry.h" />
     <ClInclude Include="..\e_msoft.h" />
+    <ClInclude Include="..\flags.h" />
+    <ClInclude Include="..\get.h" />
+    <ClInclude Include="..\gnu_regex\regex.h" />
+    <ClInclude Include="..\htable.h" />
+    <ClInclude Include="..\keyword.h" />
+    <ClInclude Include="..\main.h" />
+    <ClInclude Include="..\options.h" />
+    <ClInclude Include="..\parse.h" />
+    <ClInclude Include="..\parsers.h" />
+    <ClInclude Include="..\read.h" />
+    <ClInclude Include="..\sort.h" />
+    <ClInclude Include="..\strlist.h" />
+    <ClInclude Include="..\tg.h" />
+    <ClInclude Include="..\trashbox.h" />
+    <ClInclude Include="..\vstring.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
