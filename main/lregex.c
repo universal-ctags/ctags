@@ -66,6 +66,7 @@ typedef struct {
 	regex_t *pattern;
 	enum pType type;
 	boolean exclusive;
+	boolean ignore;
 	union {
 		struct {
 			char *name_pattern;
@@ -220,9 +221,7 @@ static boolean parseTagRegex (
 	else
 	{
 		char* const third = scanSeparators (*name);
-		if (**name == '\0')
-			error (WARNING, "%s: regexp missing name pattern", regexp);
-		if ((*name) [strlen (*name) - 1] == '\\')
+		if (**name != '\0' && (*name) [strlen (*name) - 1] == '\\')
 			error (WARNING, "error in name pattern: \"%s\"", *name);
 		if (*third != separator)
 			error (WARNING, "%s: regexp missing final separator", regexp);
@@ -284,13 +283,14 @@ static regexPattern* addCompiledTagCommon (const langType language,
 	ptrn = &set->patterns [set->count];
 	ptrn->pattern = pattern;
 	ptrn->exclusive = FALSE;
+	ptrn->ignore = FALSE;
 
 	set->count += 1;
 	useRegexMethod(language);
 	return ptrn;
 }
 
-static void addCompiledTagPattern (
+static regexPattern *addCompiledTagPattern (
 		const langType language, regex_t* const pattern,
 		char* const name, const char kind, char* const kindName,
 		char *const description, const char* flags)
@@ -305,6 +305,8 @@ static void addCompiledTagPattern (
 	ptrn->u.tag.kind.name    = kindName;
 	ptrn->u.tag.kind.description = description;
 	flagsEval (flags, ptrnFlagDef, COUNT(ptrnFlagDef), ptrn);
+
+	return ptrn;
 }
 
 static void addCompiledCallbackPattern (
@@ -493,7 +495,8 @@ static vString* substitute (
 
 static void matchTagPattern (const vString* const line,
 		const regexPattern* const patbuf,
-		const regmatch_t* const pmatch)
+		const regmatch_t* const pmatch,
+		boolean accept_null)
 {
 	vString *const name = substitute (vStringValue (line),
 			patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch);
@@ -501,7 +504,7 @@ static void matchTagPattern (const vString* const line,
 	vStringStripTrailing (name);
 	if (vStringLength (name) > 0)
 		makeRegexTag (name, &patbuf->u.tag.kind);
-	else
+	else if (!accept_null)
 		error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
 			getInputFileName (), getInputLineNumber (),
 			patbuf->u.tag.name_pattern);
@@ -540,7 +543,7 @@ static boolean matchRegexPattern (const vString* const line,
 	{
 		result = TRUE;
 		if (patbuf->type == PTRN_TAG)
-			matchTagPattern (line, patbuf, pmatch);
+			matchTagPattern (line, patbuf, pmatch, patbuf->ignore);
 		else if (patbuf->type == PTRN_CALLBACK)
 			matchCallbackPattern (line, patbuf, pmatch);
 		else
@@ -587,16 +590,14 @@ extern void findRegexTags (void)
 		;
 }
 
-#endif  /* HAVE_REGEX */
-
-extern void addTagRegex (
+static regexPattern *addTagRegexInternal (
 		const langType language __unused__,
 		const char* const regex __unused__,
 		const char* const name __unused__,
 		const char* const kinds __unused__,
 		const char* const flags __unused__)
 {
-#ifdef HAVE_REGEX
+	regexPattern *rptr = NULL;
 	Assert (regex != NULL);
 	Assert (name != NULL);
 	if (regexAvailable)
@@ -608,10 +609,24 @@ extern void addTagRegex (
 			char* kindName;
 			char* description;
 			parseKinds (kinds, &kind, &kindName, &description);
-			addCompiledTagPattern (language, cp, eStrdup (name),
-					kind, kindName, description, flags);
+			rptr = addCompiledTagPattern (language, cp, eStrdup (name),
+						      kind, kindName, description, flags);
 		}
 	}
+	return rptr;
+}
+
+#endif  /* HAVE_REGEX */
+
+extern void addTagRegex (
+		const langType language __unused__,
+		const char* const regex __unused__,
+		const char* const name __unused__,
+		const char* const kinds __unused__,
+		const char* const flags __unused__)
+{
+#ifdef HAVE_REGEX
+	addTagRegexInternal (language, regex, name, kinds, flags);
 #endif
 }
 
@@ -642,7 +657,15 @@ extern void addLanguageRegex (
 		char *name, *kinds, *flags;
 		if (parseTagRegex (regex_pat, &name, &kinds, &flags))
 		{
-			addTagRegex (language, regex_pat, name, kinds, flags);
+			regexPattern * r;
+			r = addTagRegexInternal (language, regex_pat, name, kinds, flags);
+			if (*name == '\0')
+			{
+				if (r->exclusive)
+					r->ignore = TRUE;
+				else
+					error (WARNING, "%s: regexp missing name pattern", regex);
+			}
 			eFree (regex_pat);
 		}
 	}

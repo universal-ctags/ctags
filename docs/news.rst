@@ -543,6 +543,20 @@ For specifying exclusive-matching the flags ``exclusive`` (long) and
 	--mib-regex=/^([^ \t]+)[ \t]+DEFINITIONS ::= BEGIN/\1/d,definitions/{exclusive}
 	--mib-regex=/^([a-zA-Z][^ \t]+)[ \t]+[A-Za-z]/\1/n,name/
 
+Another use case for this flag is for ignoring a line::
+
+	--m4-regex=/#.*(define|undefine|s?include)\>//x
+	--m4-regex=/\<dnl.*(define|undefine|s?include)\>//x
+
+Comments are started from ``#`` or ``dnl`` in many use case of m4 language.
+With above options ctags can ignore ``define`` in comments.
+
+If an empty name pattern(``//``) is found in ``--regex-<LANG>`` option
+ctags warns it as wrong usage of the option. However, the flags
+``exclusive`` or ``x`` is specified, the warning is suppressed. This
+is imperfect approach for ignoring text insides comments but it may
+be better than nothing.
+
 
 Passing parameter for long regex flag
 ---------------------------------------------------------------------
