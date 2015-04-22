@@ -532,7 +532,7 @@ For specifying exclusive-matching the flags ``exclusive`` (long) and
 	--mib-regex=/^([a-zA-Z][^ \t]+)[ \t]+[A-Za-z]/\1/n,name/
 
 
-passing parameter for long regex flag
+Passing parameter for long regex flag
 ---------------------------------------------------------------------
 
 In the implemented API long-flags can take a parameters.
@@ -611,7 +611,7 @@ doesn't work with ``-e``.
   ctags cannot generate TAGS, etags format output
   if ``--<LANG>-xcmd=COMMAND`` is specified.
 
-notice message and --quiet option
+Notice message and --quiet option
 ---------------------------------------------------------------------
 There were 3 classes of message in ctags:
 
@@ -640,7 +640,7 @@ Miscellaneous new options
     Allows disabling the generation of macro tags from ``#undef``
     directives.
 
-build system add possibility to change program name
+Build system add possibility to change program name
 ---------------------------------------------------------------------
 
 As on some systems (e.g. BSD) there is a 'ctags' program in the base
