@@ -59,7 +59,7 @@ ALL_CPPFLAGS = $(CPPFLAGS)			\
 	-DPKGCONFDIR=\"$(pkgconfdir)\"		\
 	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\"
 
-include $(srcdir)/source.mak
+include $(srcdir)/makefiles/source.mak
 
 #
 #--- You should not need to modify anything below this line. ---#
@@ -68,8 +68,8 @@ include $(srcdir)/source.mak
 .SUFFIXES:
 .SUFFIXES: .c .$(OBJEXT)
 
-VPATH	= $(srcdir) $(srcdir)/data/corpora $(srcdir)/data/optlib \
-	$(srcdir)/gnu_regex $(srcdir)/fnmatch
+VPATH	= $(srcdir) $(srcdir)/parsers $(srcdir)/data/corpora \
+	$(srcdir)/data/optlib $(srcdir)/gnu_regex $(srcdir)/fnmatch
 
 INSTALL		= cp -p
 INSTALL_PROG	= $(INSTALL)
