@@ -192,6 +192,18 @@ ctags recognizes the following patterns used in vim:
       ex:se ft=SYNTAX
 
 
+ctags recognizes the following patterns and considers the
+input as a zsh script:
+
+  * at the head of input file::
+
+      #autoload
+
+    or ::
+
+      #compdef ....
+
+
 NOTE: This feature takes a performance hit: it opens the input file
 once to detect the file type and a second time to process the file
 with the detected parser. For this reason, this feature is enabled
