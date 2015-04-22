@@ -28,7 +28,12 @@ libexecdir=@libexecdir@
 pkglibexecdir=@libexecdir@/@PACKAGE_NAME@
 SLINK	= @LN_S@
 STRIP	= @STRIP@
+ifdef SPARSE
+SPARSEFLAGS=-Wsparse-all
+CC	= cgcc $(SPARSEFLAGS)
+else
 CC	= @CC@
+endif
 DEFS	= @DEFS@
 CPPFLAGS = @CPPFLAGS@
 CFLAGS	= @CFLAGS@
