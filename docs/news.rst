@@ -547,6 +547,27 @@ This is implemented for extending ctags in future.
 
 .. TBW
 
+Wildcard in options
+---------------------------------------------------------------------
+
+For the purpose gathering as mach as possible information from source
+code "wildcard"(``*``) in option is introduced.
+
+``--fields=*``
+
+	Enables all available fields.
+
+``--<LANG>-kinds=*``
+
+	Enables all available kinds for ``LANG``.
+
+``--*-kinds=SPEC``
+
+	Applies SPEC as kinds to all available language parsers.
+
+``--*-kinds=*``
+
+	Enables all available kinds to all available language parsers.
 
 External parser command
 ---------------------------------------------------------------------
