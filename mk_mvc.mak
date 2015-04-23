@@ -9,7 +9,7 @@ include source.mak
 
 REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrcasecmp=stricmp
 DEFINES = -DWIN32 $(REGEX_DEFINES)
-INCLUDES = -I. -Ignu_regex -Ifnmatch
+INCLUDES = -I. -Icore -Ignu_regex -Ifnmatch
 OPT = /O2
 
 ctags: ctags.exe
