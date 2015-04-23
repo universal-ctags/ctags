@@ -11,6 +11,7 @@ CC = gcc
 OBJEXT = o
 OBJECTS += $(REGEX_SOURCES:%.c=%.o)
 OBJECTS += $(FNMATCH_SOURCES:%.c=%.o)
+VPATH = . ./parsers
 
 ctags.exe: OPT = -O4 -Os -fexpensive-optimizations
 ctags.exe: LDFLAGS = -s
