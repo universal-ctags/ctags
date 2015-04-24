@@ -557,6 +557,19 @@ ctags warns it as wrong usage of the option. However, the flags
 is imperfect approach for ignoring text insides comments but it may
 be better than nothing.
 
+Optional flag in regex
+---------------------------------------------------------------------
+
+Kinds defined with ``--regex-<LANG>`` (or ``--<LANG>-regex``) was
+enabled by default. A kind disabled by default can be defined
+with new flag ``optional`` (long only) like::
+
+	--m4-regex=/[[:space:]]include\(`([^']+)'/\1/I,inclusion/x{optional}
+
+A user can turn on this pattern with::
+
+       --m4-kinds=+I
+
 
 Passing parameter for long regex flag
 ---------------------------------------------------------------------

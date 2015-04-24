@@ -257,8 +257,15 @@ static void ptrn_flag_exclusive_long (const char* const s __unused__, const char
 	ptrn_flag_exclusive_short ('x', data);
 }
 
+static void ptrn_flag_optional_long (const char* const s, const char* const unused __unused__, void* data)
+{
+	regexPattern *ptrn = data;
+	ptrn->u.tag.kind.enabled = FALSE;
+}
+
 static flagDefinition ptrnFlagDef[] = {
-	{ 'x', "exclusive", ptrn_flag_exclusive_short, ptrn_flag_exclusive_long },
+	{ 'x',  "exclusive", ptrn_flag_exclusive_short, ptrn_flag_exclusive_long },
+	{ '\0', "optional",  NULL,                      ptrn_flag_optional_long  },
 };
 
 static regexPattern* addCompiledTagCommon (const langType language,
