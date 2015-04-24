@@ -24,6 +24,15 @@
 #include "routines.h"
 #include "options.h"
 
+#ifdef HAVE_REGCOMP
+# include <ctype.h>
+# include <stddef.h>
+# ifdef HAVE_SYS_TYPES_H
+#  include <sys/types.h>  /* declare off_t (not known to regex.h on FreeBSD) */
+# endif
+# include <regex.h>
+#endif
+
 /*
 *   DATA DEFINITIONS
 */
@@ -557,6 +566,116 @@ extern char *readSourceLine (
 	   what itself should do; just report it to the caller. */
 	return result;
 }
+
+#ifdef HAVE_REGEX
+/* If a xcmd parser is used, ctags cannot know the location for a tag.
+ * In the other hand, etags output and cross reference output require the
+ * line after the location.
+ *
+ * readSourceLineSlow retrieves the line for (lineNumber and pattern of a tag).
+ */
+
+extern char *readSourceLineSlow (vString *const vLine,
+				 unsigned long lineNumber,
+				 const char *pattern,
+				 long *const pSeekValue)
+{
+	char *result = NULL;
+
+
+	fpos_t orignalPosition;
+	char *line;
+	size_t len;
+	long pos;
+
+	regex_t patbuf;
+	char lastc;
+
+
+	/*
+	 * Compile the pattern
+	 */
+	{
+		char *pat;
+		int errcode;
+		char errmsg[256];
+
+		pat = eStrdup (pattern);
+		pat[strlen(pat) - 1] = '\0';
+		errcode = regcomp (&patbuf, pat + 1, 0);
+		eFree (pat);
+
+		if (errcode != 0)
+		{
+			regerror (errcode, &patbuf, errmsg, 256);
+			error (WARNING, "regcomp %s in readSourceLineSlow: %s", pattern, errmsg);
+			regfree (&patbuf);
+			return NULL;
+		}
+	}
+
+	/*
+	 * Get the line for lineNumber
+	 */
+	{
+		int n;
+
+		fgetpos (File.fp, &orignalPosition);
+		rewind (File.fp);
+		line = NULL;
+		pos = 0;
+		for (n = 0; n < lineNumber; n++)
+		{
+			pos = ftell (File.fp);
+			line = readLine (vLine, File.fp);
+			if (line == NULL)
+				break;
+		}
+		if (line == NULL)
+			goto out;
+		else
+			len = strlen(line);
+
+		if (len == 0)
+			goto out;
+
+		lastc = line[len - 1];
+		if (lastc == '\n')
+			line[len - 1] = '\0';
+	}
+
+	/*
+	 * Match
+	 */
+	{
+		regmatch_t pmatch;
+		int after_newline = 0;
+		if (regexec (&patbuf, line, 1, &pmatch, 0) == 0)
+		{
+			line[len - 1] = lastc;
+			result = line + pmatch.rm_so;
+			if (pSeekValue)
+			{
+				after_newline = ((lineNumber == 1)? 0: 1);
+				*pSeekValue = pos + after_newline + pmatch.rm_so;
+			}
+		}
+	}
+
+out:
+	regfree (&patbuf);
+	fsetpos (File.fp, &orignalPosition);
+	return result;
+}
+#else
+extern char *readSourceLineSlow (vString *const vLine,
+				 unsigned long lineNumber,
+				 const char *pattern,
+				 long *const pSeekValue)
+{
+	return NULL;
+}
+#endif
 
 /*
  *   Similar to readLine but this doesn't use fgetpos/fsetpos.
