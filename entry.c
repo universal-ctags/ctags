@@ -81,7 +81,13 @@ tagFile TagFile = {
     { 0, 0 },           /* numTags */
     { 0, 0, 0 },        /* max */
     { NULL, NULL, 0 },  /* etags */
-    NULL                /* vLine */
+    NULL,                /* vLine */
+    .cork = FALSE,
+    .corkQueue = {
+	    .queue = NULL,
+	    .length = 0,
+	    .count  = 0
+    }
 };
 
 static boolean TagsToStdout = FALSE;
@@ -584,12 +590,7 @@ extern void endEtagsFile (const char *const name)
  *  Tag entry management
  */
 
-/*  This function copies the current line out to a specified file. It has no
- *  effect on the fileGetc () function.  During copying, any '\' characters
- *  are doubled and a leading '^' or trailing '$' is also quoted. End of line
- *  characters (line feed or carriage return) are dropped.
- */
-static size_t writeSourceLine (FILE *const fp, const char *const line)
+static size_t appendSourceLine ( void putc_func (char , void *), const char *const line, void * data)
 {
 	size_t length = 0;
 	const char *p;
@@ -609,13 +610,35 @@ static size_t writeSourceLine (FILE *const fp, const char *const line)
 		if (c == BACKSLASH  ||  c == (Option.backward ? '?' : '/')  ||
 			(c == '$'  &&  (next == NEWLINE  ||  next == CRETURN)))
 		{
-			putc (BACKSLASH, fp);
+			putc_func (BACKSLASH, data);
 			++length;
 		}
-		putc (c, fp);
+		putc_func (c, data);
 		++length;
 	}
 	return length;
+}
+
+static void vstring_putc (char c, void *data)
+{
+	vString *str = data;
+	vStringPut (str, c);
+}
+
+static void file_putc (char c, void *data)
+{
+	FILE *fp = data;
+	putc (c, fp);
+}
+
+/*  This function copies the current line out to a specified file. It has no
+ *  effect on the fileGetc () function.  During copying, any '\' characters
+ *  are doubled and a leading '^' or trailing '$' is also quoted. End of line
+ *  characters (line feed or carriage return) are dropped.
+ */
+static size_t writeSourceLine (FILE *const fp, const char *const line)
+{
+	return appendSourceLine (file_putc, line, fp);
 }
 
 /*  Writes "line", stripping leading and duplicate white space.
@@ -740,12 +763,23 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 	if (Option.extensionFields.language  &&  tag->language != NULL)
 		length += fprintf (TagFile.fp, "%s\tlanguage:%s", sep, tag->language);
 
-	if (Option.extensionFields.scope  &&
-			tag->extensionFields.scope [0] != NULL  &&
-			tag->extensionFields.scope [1] != NULL)
-		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				tag->extensionFields.scope [0],
-				tag->extensionFields.scope [1]);
+	if (Option.extensionFields.scope)
+	{
+		if (tag->extensionFields.scope [0] != NULL  &&
+		    tag->extensionFields.scope [1] != NULL)
+			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
+					   tag->extensionFields.scope [0],
+					   tag->extensionFields.scope [1]);
+		else if (tag->extensionFields.scope_index != SCOPE_NIL
+			 && TagFile.corkQueue.count > 0)
+		{
+			const tagEntryInfo * scope;
+
+			scope = getEntryInCorkQueue (tag->extensionFields.scope_index);
+			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
+					   scope->kindName, scope->name);
+		}
+	}
 
 	if (Option.extensionFields.typeRef  &&
 			tag->extensionFields.typeRef [0] != NULL  &&
@@ -778,6 +812,29 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 
 	return length;
 #undef sep
+}
+
+static char* makePatternString (const tagEntryInfo *const tag)
+{
+	char *const line = readSourceLine (TagFile.vLine, tag->filePosition, NULL);
+	const int searchChar = Option.backward ? '?' : '/';
+	boolean newlineTerminated;
+	vString* pattern;
+
+	pattern = vStringNew ();
+	if (line == NULL)
+		error (FATAL, "bad tag in %s", vStringValue (File.name));
+	if (tag->truncateLine)
+		truncateTagLine (line, tag->name, FALSE);
+	newlineTerminated = (boolean) (line [strlen (line) - 1] == '\n');
+
+	vStringPut (pattern, searchChar);
+	vStringPut (pattern, '^');
+	appendSourceLine (vstring_putc, line, pattern);
+	vStringCatS (pattern, newlineTerminated ? "$":"");
+	vStringPut (pattern, searchChar);
+
+	return vStringDeleteUnwrap (pattern);
 }
 
 static int writePatternEntry (const tagEntryInfo *const tag)
@@ -825,8 +882,145 @@ static int writeCtagsEntry (const tagEntryInfo *const tag)
 	return length;
 }
 
-extern void makeTagEntry (const tagEntryInfo *const tag)
+static void recordCtagsEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* slot)
 {
+	*slot = *tag;
+
+	if (slot->pattern)
+		slot->pattern = eStrdup (slot->pattern);
+	else if (!slot->lineNumberEntry)
+		slot->pattern = makePatternString (slot);
+
+	slot->sourceFileName = eStrdup (slot->sourceFileName);
+	slot->name = eStrdup (slot->name);
+	if (slot->extensionFields.access)
+		slot->extensionFields.access = eStrdup (slot->extensionFields.access);
+	if (slot->extensionFields.fileScope)
+		slot->extensionFields.fileScope = eStrdup (slot->extensionFields.fileScope);
+	if (slot->extensionFields.implementation)
+		slot->extensionFields.implementation = eStrdup (slot->extensionFields.implementation);
+	if (slot->extensionFields.inheritance)
+		slot->extensionFields.inheritance = eStrdup (slot->extensionFields.inheritance);
+	if (slot->extensionFields.scope[0])
+		slot->extensionFields.scope[0] = eStrdup (slot->extensionFields.scope[0]);
+	if (slot->extensionFields.scope[1])
+		slot->extensionFields.scope[1] = eStrdup (slot->extensionFields.scope[1]);
+	if (slot->extensionFields.signature)
+		slot->extensionFields.signature = eStrdup (slot->extensionFields.signature);
+	if (slot->extensionFields.typeRef[0])
+		slot->extensionFields.typeRef[0] = eStrdup (slot->extensionFields.typeRef[0]);
+	if (slot->extensionFields.typeRef[1])
+		slot->extensionFields.typeRef[1] = eStrdup (slot->extensionFields.typeRef[1]);
+}
+
+static void clearCtagsEntryInQueue (tagEntryInfo* slot)
+{
+	if (slot->pattern)
+		eFree ((char *)slot->pattern);
+	eFree ((char *)slot->sourceFileName);
+	eFree ((char *)slot->name);
+
+	if (slot->extensionFields.access)
+		eFree ((char *)slot->extensionFields.access);
+	if (slot->extensionFields.fileScope)
+		eFree ((char *)slot->extensionFields.fileScope);
+	if (slot->extensionFields.implementation)
+		eFree ((char *)slot->extensionFields.implementation);
+	if (slot->extensionFields.inheritance)
+		eFree ((char *)slot->extensionFields.inheritance);
+	if (slot->extensionFields.scope[0])
+		eFree ((char *)slot->extensionFields.scope[0]);
+	if (slot->extensionFields.scope[1])
+		eFree ((char *)slot->extensionFields.scope[1]);
+	if (slot->extensionFields.signature)
+		eFree ((char *)slot->extensionFields.signature);
+	if (slot->extensionFields.typeRef[0])
+		eFree ((char *)slot->extensionFields.typeRef[0]);
+	if (slot->extensionFields.typeRef[1])
+		eFree ((char *)slot->extensionFields.typeRef[1]);
+}
+
+void corkTagFile(void)
+{
+	TagFile.cork++;
+	if (TagFile.cork == 1)
+	{
+		  TagFile.corkQueue.length = 1;
+		  TagFile.corkQueue.count = 1;
+		  TagFile.corkQueue.queue = eMalloc (sizeof (*TagFile.corkQueue.queue));
+		  memset (TagFile.corkQueue.queue, 0, sizeof (*TagFile.corkQueue.queue));
+	}
+}
+
+void uncorkTagFile(void)
+{
+	unsigned int i;
+	tagEntryInfo  *tag;
+	int length = 0;
+
+	TagFile.cork--;
+
+	if (TagFile.cork > 0)
+		return ;
+
+	for (i = 1; i < TagFile.corkQueue.count; i++)
+	{
+		tag = TagFile.corkQueue.queue + i;
+		length = writeCtagsEntry (tag);
+		rememberMaxLengths (strlen (tag->name), (size_t) length);
+		DebugStatement ( fflush (TagFile.fp); )
+	}
+	for (i = 1; i < TagFile.corkQueue.count; i++)
+		clearCtagsEntryInQueue (TagFile.corkQueue.queue + i);
+
+	memset (TagFile.corkQueue.queue, 0,
+		sizeof (*TagFile.corkQueue.queue) * TagFile.corkQueue.count);
+	TagFile.corkQueue.count = 0;
+
+}
+
+tagEntryInfo *getEntryInCorkQueue   (unsigned int n)
+{
+	return TagFile.corkQueue.queue + n;
+}
+
+size_t        countEntryInCorkQueue (void)
+{
+	return TagFile.corkQueue.count;
+}
+
+
+static unsigned int queueCtagsEntry(const tagEntryInfo *const tag)
+{
+	unsigned int i;
+	void *tmp;
+	tagEntryInfo * slot;
+
+	if (! (TagFile.corkQueue.count < TagFile.corkQueue.length))
+	{
+		if (!TagFile.corkQueue.length )
+			TagFile.corkQueue.length = 1;
+
+		tmp = eRealloc (TagFile.corkQueue.queue,
+				sizeof (*TagFile.corkQueue.queue) * TagFile.corkQueue.length * 2);
+
+		TagFile.corkQueue.length *= 2;
+		TagFile.corkQueue.queue = tmp;
+	}
+
+	i = TagFile.corkQueue.count;
+	TagFile.corkQueue.count++;
+
+
+	slot = TagFile.corkQueue.queue + i;
+	recordCtagsEntryInQueue (tag, slot);
+
+	return i;
+}
+
+extern int makeTagEntry (const tagEntryInfo *const tag)
+{
+	int r = -1;
 	Assert (tag->name != NULL);
 	if (tag->name [0] == '\0')
 		error (WARNING, "ignoring null tag in %s", vStringValue (File.name));
@@ -843,7 +1037,12 @@ extern void makeTagEntry (const tagEntryInfo *const tag)
 		else if (Option.etags)
 			length = writeEtagsEntry (tag);
 		else
-			length = writeCtagsEntry (tag);
+		{
+			if (TagFile.cork)
+				r = queueCtagsEntry (tag);
+			else
+				length = writeCtagsEntry (tag);
+		}
 
 		++TagFile.numTags.added;
 		rememberMaxLengths (strlen (tag->name), (size_t) length);
@@ -851,6 +1050,7 @@ extern void makeTagEntry (const tagEntryInfo *const tag)
 
 		abort_if_ferror (TagFile.fp);
 	}
+	return r;
 }
 
 extern void initTagEntry (tagEntryInfo *const e, const char *const name)
@@ -876,6 +1076,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->filePosition    = filePosition;
 	e->sourceFileName  = sourceFileName;
 	e->name            = name;
+	e->extensionFields.scope_index     = SCOPE_NIL;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */
