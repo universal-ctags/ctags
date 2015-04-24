@@ -87,6 +87,7 @@ static void *entry_find (hentry* entry, void* key, hashTableEqualFunc equalfn)
 	{
 		if (equalfn( key, entry->key))
 			return entry->value;
+		entry = entry->next;
 	}
 	return NULL;
 }
