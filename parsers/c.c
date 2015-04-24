@@ -292,7 +292,7 @@ typedef enum {
 	CK_CLASS, CK_DEFINE, CK_ENUMERATOR, CK_FUNCTION,
 	CK_ENUMERATION, CK_LOCAL, CK_MEMBER, CK_NAMESPACE, CK_PROTOTYPE,
 	CK_STRUCT, CK_TYPEDEF, CK_UNION, CK_VARIABLE,
-	CK_EXTERN_VARIABLE
+	CK_EXTERN_VARIABLE, CK_INCLUDE
 } cKind;
 
 static kindOption CKinds [] = {
@@ -310,6 +310,7 @@ static kindOption CKinds [] = {
 	{ TRUE,  'u', "union",      "union names"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
 	{ FALSE, 'x', "externvar",  "external and forward variable declarations"},
+	{ FALSE, 'I', "include",    "included file name"},
 };
 
 typedef enum {
@@ -572,6 +573,11 @@ static void createTags (const unsigned int nestLevel, statementInfo *const paren
 extern boolean includingDefineTags (void)
 {
 	return CKinds [CK_DEFINE].enabled;
+}
+
+extern boolean includingIncludeTags (void)
+{
+	return CKinds [CK_INCLUDE].enabled;
 }
 
 /*
