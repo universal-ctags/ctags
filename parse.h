@@ -115,6 +115,7 @@ extern parserDefinitionFunc PARSER_LIST;
 
 /* Legacy interface */
 extern boolean includingDefineTags (void);
+extern boolean includingIncludeTags (void);
 
 /* Language processing and parsing */
 extern void makeSimpleTag (const vString* const name, kindOption* const kinds, const int kind);

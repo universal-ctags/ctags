@@ -53,7 +53,8 @@ enum eState {
 	DRCTV_HASH,    /* initial '#' read; determine directive */
 	DRCTV_IF,      /* "#if" or "#ifdef" encountered */
 	DRCTV_PRAGMA,  /* #pragma encountered */
-	DRCTV_UNDEF    /* "#undef" encountered */
+	DRCTV_UNDEF,   /* "#undef" encountered */
+	DRCTV_INCLUDE, /* "#include" encountered */
 };
 
 /*  Defines the current state of the pre-processor.
@@ -209,6 +210,22 @@ static void readIdentifier (int c, vString *const name)
 	vStringTerminate (name);
 }
 
+static void readFilename (int c, vString *const name)
+{
+	int c_end = (c == '<')? '>': '"';
+
+	vStringClear (name);
+	do
+	{
+		vStringPut (name, c);
+	} while (c = fileGetc (), (c != EOF && c != c_end && c != '\n'));
+
+	if (c == c_end)
+		vStringPut (name, c);
+
+	vStringTerminate (name);
+}
+
 static conditionalInfo *currentConditional (void)
 {
 	return &Cpp.directive.ifdef [Cpp.directive.nestLevel];
@@ -317,6 +334,21 @@ static void makeDefineTag (const char *const name)
 	}
 }
 
+static void makeIncludeTag (const  char *const name)
+{
+	if (includingIncludeTags ())
+	{
+		tagEntryInfo e;
+		initTagEntry (&e, name);
+		e.lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
+		e.isFileScope  = FALSE;
+		e.truncateLine = TRUE;
+		e.kindName     = "include";
+		e.kind         = 'I';
+		makeTagEntry (&e);
+	}
+}
+
 static void directiveDefine (const int c)
 {
 	if (isident1 (c))
@@ -374,6 +406,18 @@ static boolean directiveIf (const int c)
 	return ignore;
 }
 
+
+static void directiveInclude (const int c)
+{
+	if (c == '<' || c == '"')
+	{
+		readFilename (c, Cpp.directive.name);
+		if (! isIgnore ())
+			makeIncludeTag (vStringValue (Cpp.directive.name));
+	}
+	Cpp.directive.state = DRCTV_NONE;
+}
+
 static boolean directiveHash (const int c)
 {
 	boolean ignore = FALSE;
@@ -383,6 +427,8 @@ static boolean directiveHash (const int c)
 	readDirective (c, directive, MaxDirectiveName);
 	if (stringMatch (directive, "define"))
 		Cpp.directive.state = DRCTV_DEFINE;
+	else if (stringMatch (directive, "include"))
+		Cpp.directive.state = DRCTV_INCLUDE;
 	else if (stringMatch (directive, "undef"))
 		Cpp.directive.state = DRCTV_UNDEF;
 	else if (strncmp (directive, "if", (size_t) 2) == 0)
@@ -425,6 +471,7 @@ static boolean handleDirective (const int c)
 		case DRCTV_IF:      ignore = directiveIf (c);    break;
 		case DRCTV_PRAGMA:  directivePragma (c);         break;
 		case DRCTV_UNDEF:   directiveUndef (c);         break;
+		case DRCTV_INCLUDE: directiveInclude (c);         break;
 	}
 	return ignore;
 }
@@ -613,8 +660,14 @@ process:
 				break;
 
 			case DOUBLE_QUOTE:
-				Cpp.directive.accept = FALSE;
-				c = skipToEndOfString (FALSE);
+				if (Cpp.directive.state == DRCTV_INCLUDE)
+					goto enter;
+				else
+				{
+					Cpp.directive.accept = FALSE;
+					c = skipToEndOfString (FALSE);
+				}
+
 				break;
 
 			case '#':
@@ -701,6 +754,7 @@ process:
 						break;
 					}
 				}
+			enter:
 				Cpp.directive.accept = FALSE;
 				if (directive)
 					ignore = handleDirective (c);
