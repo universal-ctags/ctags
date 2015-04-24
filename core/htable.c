@@ -192,6 +192,18 @@ extern void       hashTableForeachItem (hashTable *htable, hashTableForeachFunc 
 		entry_foreach(htable->table[i], proc, user_data);
 }
 
+static void count (void *key __unused__, void *value __unused__, void *data)
+{
+	int *c = data;
+	++*c;
+}
+
+extern int        hashTableCountItem   (hashTable *htable)
+{
+	int c = 0;
+	hashTableForeachItem (htable, count, &c);
+	return c;
+}
 unsigned int hash_ptrhash (void * x)
 {
 	union {
@@ -208,3 +220,4 @@ boolean hash_ptreq (void *a, void *b)
 {
 	return (a == b)? TRUE: FALSE;
 }
+

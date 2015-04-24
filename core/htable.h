@@ -33,6 +33,7 @@ extern void*      hashTableGetItem     (hashTable *htable, void *key);
 extern boolean    hashTableHasItem     (hashTable *htable, void *key);
 extern boolean    hashTableDeleteItem  (hashTable *htable, void *key);
 extern void       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data);
+extern int        hashTableCountItem   (hashTable *htable);
 
 #endif	/* _HTABLE_H */
 
