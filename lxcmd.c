@@ -823,6 +823,8 @@ static boolean makeTagEntryFromTagEntry (tagEntry* entry)
 			return FALSE;
 		else if (Option.xref)
 			return FALSE;
+		else if (Option.etags)
+			return FALSE;
 		else
 			return makePseudoTagEntryFromTagEntry (entry);
 	}
@@ -953,19 +955,6 @@ extern boolean invokeXcmd (const char* const fileName, const langType language)
 	{
 		const pathSet* const set = Sets + language;
 		unsigned int i;
-
-		if (Option.xref)
-		{
-			error (WARNING, "Xcmd(%s) does not support generating cross reference(xref, -x) for input %s",
-			       getLanguageName (language), fileName);
-			return FALSE;
-		}
-		else if (Option.etags)
-		{
-			error (WARNING, "Xcmd(%s) does not support generating etags(TAGS) file for input %s",
-			       getLanguageName (language), fileName);
-			return FALSE;
-		}
 
 		for (i = 0; i < set->count ; ++i)
 		{
