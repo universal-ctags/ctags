@@ -78,6 +78,11 @@ Contents
 
    PageBreak oneColumn
 
+.. include:: build.rst
+.. raw:: pdf
+
+   PageBreak oneColumn
+
 .. include:: developers.rst
 .. raw:: pdf
 
