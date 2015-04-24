@@ -61,8 +61,10 @@ static hentry* entry_destroy (hentry* entry,
 {
 	hentry* tmp;
 
-	keyfreefn (entry->key);
-	valfreefn (entry->value);
+	if (keyfreefn)
+		keyfreefn (entry->key);
+	if (valfreefn)
+		valfreefn (entry->value);
 	entry->key = NULL;
 	entry->value = NULL;
 	tmp = entry->next;
