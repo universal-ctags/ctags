@@ -1632,6 +1632,29 @@ static boolean createTagsWithFallback (
 	return tagFileResized;
 }
 
+static boolean createTagsWithXcmd (
+		const char *const fileName, const langType language)
+{
+	boolean tagFileResized = FALSE;
+
+	if (fileOpen (fileName, language))
+	{
+		if (Option.etags)
+			beginEtagsFile ();
+
+		tagFileResized = invokeXcmd (fileName, language);
+
+		if (Option.etags)
+			endEtagsFile (getSourceFileTagPath ());
+
+		/* TODO: File.lineNumber must be adjusted for the case
+		*  Option.printTotals is non-zero. */
+		fileClose ();
+	}
+
+	return tagFileResized;
+}
+
 static void printGuessedParser (const char* const fileName, langType language)
 {
 	const char *parserName;
@@ -1672,7 +1695,7 @@ extern boolean parseFile (const char *const fileName)
 
 		tagFileResized = createTagsWithFallback (fileName, language);
 #ifdef HAVE_COPROC
-		tagFileResized = invokeXcmd (fileName, language)? TRUE: tagFileResized;
+		tagFileResized = createTagsWithXcmd (fileName, language)? TRUE: tagFileResized;
 #endif
 
 		if (Option.filter)

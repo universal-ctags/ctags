@@ -654,11 +654,41 @@ static size_t writeCompactSourceLine (FILE *const fp, const char *const line)
 	return length;
 }
 
+static boolean isPosSet(fpos_t pos)
+{
+	char * p = (char *)&pos;
+	boolean r = FALSE;
+	int i;
+
+	for (i = 0; i < sizeof(pos); i++)
+		r |= p[i];
+	return r;
+}
+
+static char *readSourceLineAnyway (vString *const vLine, const tagEntryInfo *const tag,
+				   long *const pSeekValue)
+{
+	char * line;
+
+	if (isPosSet (tag->filePosition))
+		line = 	readSourceLine (vLine, tag->filePosition, pSeekValue);
+	else
+		line =  readSourceLineSlow (vLine, tag->lineNumber, tag->pattern, pSeekValue);
+
+	return line;
+}
 static int writeXrefEntry (const tagEntryInfo *const tag)
 {
 	const char *const line =
-			readSourceLine (TagFile.vLine, tag->filePosition, NULL);
+			readSourceLineAnyway (TagFile.vLine, tag, NULL);
 	int length;
+
+	if (line == NULL)
+	{
+		error (WARNING, "cannot find line again for %s(%s) in %s at %lu",
+		       tag->name, tag->pattern, tag->sourceFileName, tag->lineNumber);
+		return 0;
+	}
 
 	if (Option.tagFileFormat == 1)
 		length = fprintf (TagFile.fp, "%-16s %4lu %-16s ", tag->name,
@@ -702,7 +732,13 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 	{
 		long seekValue;
 		char *const line =
-				readSourceLine (TagFile.vLine, tag->filePosition, &seekValue);
+				readSourceLineAnyway (TagFile.vLine, tag, &seekValue);
+		if (line == NULL)
+		{
+			error (WARNING, "cannot find line again for %s(%s) in %s at %lu",
+			       tag->name, tag->pattern, tag->sourceFileName, tag->lineNumber);
+			return 0;
+		}
 
 		if (tag->truncateLine)
 			truncateTagLine (line, tag->name, TRUE);

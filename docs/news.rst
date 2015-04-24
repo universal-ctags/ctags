@@ -630,19 +630,8 @@ generator and exuberant-ctags. This is the reason why the name
 *drivers* is used as part of built-in search path.
 
 To write a driver for a tags generator, please read
-"xcmd protocol and writing a driver".
+-"xcmd protocol and writing a driver".
 
-There are some restrictions of utilizing the xcmds:
-
-doesn't work with ``-x``.
-
-  ctags cannot generate cross reference file if
-  ``--<LANG>-xcmd=COMMAND`` is specified.
-
-doesn't work with ``-e``.
-
-  ctags cannot generate TAGS, etags format output
-  if ``--<LANG>-xcmd=COMMAND`` is specified.
 
 Notice message and --quiet option
 ---------------------------------------------------------------------
