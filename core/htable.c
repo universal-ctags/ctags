@@ -150,6 +150,7 @@ extern void       hashTableDelete (hashTable *htable)
 		entry_reclaim (entry, htable->keyfreefn, htable->valfreefn);
 		htable->table[i] = NULL;
 	}
+	eFree (htable->table);
 	eFree (htable);
 }
 
