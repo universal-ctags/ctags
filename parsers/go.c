@@ -89,6 +89,7 @@ typedef enum {
 	GOTAG_VAR,
 	GOTAG_STRUCT,
 	GOTAG_INTERFACE,
+	GOTAG_MEMBER
 } goKind;
 
 static kindOption GoKinds[] = {
@@ -98,7 +99,8 @@ static kindOption GoKinds[] = {
 	{TRUE, 't', "type", "types"},
 	{TRUE, 'v', "var", "variables"},
 	{TRUE, 's', "struct", "structs"},
-	{TRUE, 'i', "interface", "interfaces"}
+	{TRUE, 'i', "interface", "interfaces"},
+	{TRUE, 'm', "member", "struct members"}
 };
 
 static keywordDesc GoKeywordTable[] = {
@@ -410,14 +412,14 @@ static void skipToMatched (tokenInfo *const token)
 	readToken (token);
 }
 
-static void skipType (tokenInfo *const token)
+static boolean skipType (tokenInfo *const token)
 {
 	// Type      = TypeName | TypeLit | "(" Type ")" .
 	// Skips also function multiple return values "(" Type {"," Type} ")"
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
 		skipToMatched (token);
-		return;
+		return TRUE;
 	}
 
 	// TypeName  = QualifiedIdent.
@@ -432,7 +434,7 @@ static void skipType (tokenInfo *const token)
 			if (isType (token, TOKEN_IDENTIFIER))
 				readToken (token);
 		}
-		return;
+		return TRUE;
 	}
 
 	// StructType     = "struct" "{" { FieldDecl ";" } "}"
@@ -442,7 +444,7 @@ static void skipType (tokenInfo *const token)
 		readToken (token);
 		// skip over "{}"
 		skipToMatched (token);
-		return;
+		return TRUE;
 	}
 
 	// ArrayType   = "[" ArrayLength "]" ElementType .
@@ -451,8 +453,7 @@ static void skipType (tokenInfo *const token)
 	if (isType (token, TOKEN_OPEN_SQUARE))
 	{
 		skipToMatched (token);
-		skipType (token);
-		return;
+		return skipType (token);
 	}
 
 	// PointerType = "*" BaseType .
@@ -461,8 +462,7 @@ static void skipType (tokenInfo *const token)
 	if (isType (token, TOKEN_STAR) || isKeyword (token, KEYWORD_chan) || isType (token, TOKEN_LEFT_ARROW))
 	{
 		readToken (token);
-		skipType (token);
-		return;
+		return skipType (token);
 	}
 
 	// MapType     = "map" "[" KeyType "]" ElementType .
@@ -472,8 +472,7 @@ static void skipType (tokenInfo *const token)
 		readToken (token);
 		// skip over "[]"
 		skipToMatched (token);
-		skipType (token);
-		return;
+		return skipType (token);
 	}
 
 	// FunctionType   = "func" Signature .
@@ -488,12 +487,13 @@ static void skipType (tokenInfo *const token)
 		// Result is parameters or type or nothing.  skipType treats anything
 		// surrounded by parentheses as a type, and does nothing if what
 		// follows is not a type.
-		skipType (token);
-		return;
+		return skipType (token);
 	}
+
+	return FALSE;
 }
 
-static void makeTag (tokenInfo *const token, const goKind kind)
+static void makeTag (tokenInfo *const token, const goKind kind, tokenInfo *const parent_token, const goKind parent_kind)
 {
 	const char *const name = vStringValue (token->string);
 
@@ -508,6 +508,11 @@ static void makeTag (tokenInfo *const token, const goKind kind)
 	e.kindName = GoKinds [kind].name;
 	e.kind = GoKinds [kind].letter;
 
+	if (parent_kind != GOTAG_UNDEFINED && parent_token != NULL)
+	{
+		e.extensionFields.scope[0] = GoKinds[parent_kind].name;
+		e.extensionFields.scope[1] = vStringValue (parent_token->string);
+	}
 	makeTagEntry (&e);
 
 	if (scope && Option.include.qualifiedTags)
@@ -527,7 +532,7 @@ static void parsePackage (tokenInfo *const token)
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		makeTag (token, GOTAG_PACKAGE);
+		makeTag (token, GOTAG_PACKAGE, NULL, GOTAG_UNDEFINED);
 		if (!scope && Option.include.qualifiedTags)
 		{
 			scope = vStringNew ();
@@ -552,7 +557,7 @@ static void parseFunctionOrMethod (tokenInfo *const token)
 
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		makeTag (token, GOTAG_FUNCTION);
+		makeTag (token, GOTAG_FUNCTION, NULL, GOTAG_UNDEFINED);
 		
 		// Skip over parameters.
 		readToken (token);
@@ -564,6 +569,75 @@ static void parseFunctionOrMethod (tokenInfo *const token)
 		// Skip over function body.
 		if (isType (token, TOKEN_OPEN_CURLY))
 			skipToMatched (token);
+	}
+}
+
+static void parseStructMembers (tokenInfo *const token, tokenInfo *const parent_token)
+{
+	// StructType     = "struct" "{" { FieldDecl ";" } "}" .
+	// FieldDecl      = (IdentifierList Type | AnonymousField) [ Tag ] .
+	// AnonymousField = [ "*" ] TypeName .
+	// Tag            = string_lit .
+
+	readToken (token);
+	if (!isType (token, TOKEN_OPEN_CURLY))
+		return;
+
+	readToken (token);
+	while (!isType (token, TOKEN_EOF) && !isType (token, TOKEN_CLOSE_CURLY))
+	{
+		tokenInfo *memberCandidate = NULL;
+		boolean first = TRUE;
+
+		while (!isType (token, TOKEN_EOF))
+		{
+			if (isType (token, TOKEN_IDENTIFIER))
+			{
+				if (first)
+				{
+					// could be anonymous field like in 'struct {int}' - we don't know yet
+					memberCandidate = copyToken (token);
+					first = FALSE;
+				}
+				else
+				{
+					if (memberCandidate)
+					{
+						// if we are here, there was a comma and memberCandidate isn't an anonymous field
+						makeTag (memberCandidate, GOTAG_MEMBER, parent_token, GOTAG_STRUCT);
+						deleteToken (memberCandidate);
+						memberCandidate = NULL;
+					}
+					makeTag (token, GOTAG_MEMBER, parent_token, GOTAG_STRUCT);
+				}
+				readToken (token);
+			}
+			if (!isType (token, TOKEN_COMMA))
+				break;
+			readToken (token);
+		}
+
+		// in the case of  an anonymous field, we already read part of the
+		// type into memberCandidate and skipType() should return FALSE so no tag should
+		// be generated in this case.
+		if (skipType (token) && memberCandidate)
+		{
+			makeTag (memberCandidate, GOTAG_MEMBER, parent_token, GOTAG_STRUCT);
+			deleteToken (memberCandidate);
+		}
+
+		while (!isType (token, TOKEN_SEMICOLON) && !isType (token, TOKEN_CLOSE_CURLY)
+				&& !isType (token, TOKEN_EOF))
+		{
+			readToken (token);
+			skipToMatched (token);
+		}
+
+		if (!isType (token, TOKEN_CLOSE_CURLY))
+		{
+			// we are at TOKEN_SEMICOLON
+			readToken (token);
+		}
 	}
 }
 
@@ -589,26 +663,26 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 
 	do
 	{
+		tokenInfo *typeToken = NULL;
+
 		while (!isType (token, TOKEN_EOF))
 		{
 			if (isType (token, TOKEN_IDENTIFIER))
 			{
 				if (kind == GOTAG_TYPE)
 				{
-					tokenInfo *typeToken = copyToken (token);
-
+					typeToken = copyToken (token);
 					readToken (token);
 					if (isKeyword (token, KEYWORD_struct))
-						makeTag (typeToken, GOTAG_STRUCT);
+						makeTag (typeToken, GOTAG_STRUCT, NULL, GOTAG_UNDEFINED);
 					else if (isKeyword (token, KEYWORD_interface))
-						makeTag (typeToken, GOTAG_INTERFACE);
+						makeTag (typeToken, GOTAG_INTERFACE, NULL, GOTAG_UNDEFINED);
 					else
-						makeTag (typeToken, kind);
-					deleteToken (typeToken);
+						makeTag (typeToken, kind, NULL, GOTAG_UNDEFINED);
 					break;
 				}
 				else
-					makeTag (token, kind);
+					makeTag (token, kind, NULL, GOTAG_UNDEFINED);
 				readToken (token);
 			}
 			if (!isType (token, TOKEN_COMMA))
@@ -616,7 +690,17 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 			readToken (token);
 		}
 
-		skipType (token);
+		if (typeToken)
+		{
+			if (isKeyword (token, KEYWORD_struct))
+				parseStructMembers (token, typeToken);
+			else
+				skipType (token);
+			deleteToken (typeToken);
+		}
+		else
+			skipType (token);
+
 		while (!isType (token, TOKEN_SEMICOLON) && !isType (token, TOKEN_CLOSE_PAREN)
 				&& !isType (token, TOKEN_EOF))
 		{
