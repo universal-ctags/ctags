@@ -722,7 +722,7 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 {
 	int length;
 
-	if (tag->isFileEntry || (tag->lineNumberEntry && (tag->lineNumber == 1)))
+	if (tag->isFileEntry)
 		length = fprintf (TagFile.etags.fp, "\177%s\001%lu,0\n",
 				tag->name, tag->lineNumber);
 	else
@@ -730,6 +730,9 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 		long seekValue;
 		char *const line =
 				readSourceLine (TagFile.vLine, tag->filePosition, &seekValue);
+
+		if (line == NULL)
+			return 0;
 
 		if (tag->truncateLine)
 			truncateTagLine (line, tag->name, TRUE);
