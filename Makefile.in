@@ -73,7 +73,7 @@ include $(srcdir)/source.mak
 .SUFFIXES:
 .SUFFIXES: .c .$(OBJEXT)
 
-VPATH	= $(srcdir) $(srcdir)/core $(srcdir)/parsers $(srcdir)/data/corpora \
+VPATH	= $(srcdir) $(srcdir)/main $(srcdir)/parsers $(srcdir)/data/corpora \
 	$(srcdir)/data/optlib $(srcdir)/gnu_regex $(srcdir)/fnmatch
 
 INSTALL		= cp -p
@@ -154,17 +154,17 @@ $(CTAGS_EXEC): $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 dctags$(EXEEXT): debug.c $(SOURCES) $(HEADERS)
-	$(CC) -I. -I$(srcdir) -I$(srcdir)/core $(DEFS) $(ALL_CPPFLAGS) -DDEBUG -g $(LDFLAGS) -o $@ debug.c $(SOURCES)
+	$(CC) -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS) -DDEBUG -g $(LDFLAGS) -o $@ debug.c $(SOURCES)
 
 $(READ_CMD): readtags.c readtags.h
-	$(CC) -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/core $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(srcdir)/readtags.c
+	$(CC) -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(srcdir)/readtags.c
 
 ETYPEREF_OBJS = etyperef.o keyword.o routines.o strlist.o vstring.o
 etyperef$(EXEEXT): $(ETYPEREF_OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(ETYPEREF_OBJS)
 
 etyperef.o: eiffel.c
-	$(CC) -DTYPE_REFERENCE_TOOL -I. -I$(srcdir) -I$(srcdir)/core $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -o $@ -c $(srcdir)/eiffel.c
+	$(CC) -DTYPE_REFERENCE_TOOL -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -o $@ -c $(srcdir)/eiffel.c
 
 $(OBJECTS): $(HEADERS) config.h Makefile
 
@@ -352,7 +352,7 @@ maintainerclean: distclean
 # implicit rules
 #
 .c.$(OBJEXT):
-	$(CC) -I. -I$(srcdir) -I$(srcdir)/core $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $<
+	$(CC) -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -c $<
 $(addsuffix .$(OBJEXT),$(basename $(notdir $(REGEX_SOURCES)))): ALL_CPPFLAGS += \
 	-D_GNU_SOURCE -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1
 
