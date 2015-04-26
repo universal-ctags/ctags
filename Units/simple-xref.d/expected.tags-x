@@ -1,0 +1,2 @@
+foo              function      2 input.c int foo (void) { return 0; }
+main             function      1 input.c int main(void) { return 0; }

@@ -690,7 +690,11 @@ static int writeXrefEntry (const tagEntryInfo *const tag)
 		length = fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s ", tag->name,
 				tag->kindName, tag->lineNumber, tag->sourceFileName);
 
-	length += writeCompactSourceLine (TagFile.fp, line);
+	/* If no associated line for tag is found, we cannot prepare
+	 * parameter to writeCompactSourceLine(). In this case we
+	 * use an empty string as LINE.
+	 */
+	length += writeCompactSourceLine (TagFile.fp, line? line: "");
 	putc (NEWLINE, TagFile.fp);
 	++length;
 

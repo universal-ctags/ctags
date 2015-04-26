@@ -551,10 +551,10 @@ extern char *readSourceLine (
 	if (pSeekValue != NULL)
 		*pSeekValue = ftell (File.fp);
 	result = readLine (vLine, File.fp);
-	if (result == NULL)
-		error (FATAL, "Unexpected end of file: %s", vStringValue (File.name));
 	fsetpos (File.fp, &orignalPosition);
-
+	/* If the file is empty, we cannt get the line
+	   for location 0. readSourceLine doesn't know
+	   what itself should do; just report it to the caller. */
 	return result;
 }
 
