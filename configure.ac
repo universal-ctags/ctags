@@ -119,8 +119,8 @@ AH_TEMPLATE([NEED_PROTO_FTRUNCATE],
 
 # Report system info
 # ------------------
-program_name=[`grep 'PROGRAM_NAME  *"' $srcdir/ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
-program_version=[`grep 'PROGRAM_VERSION  *"' $srcdir/ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
+program_name=[`grep 'PROGRAM_NAME  *"' $srcdir/core/ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
+program_version=[`grep 'PROGRAM_VERSION  *"' $srcdir/core/ctags.h | sed -e 's/.*"\([^"]*\)".*/\1/'`]
 echo "$program_name, version $program_version"
 uname -mrsv 2>/dev/null
 
