@@ -15,6 +15,7 @@
 /*
  *	 MACROS
  */
+#define MAX_SIGNATURE_LENGTH 512
 #define isType(token,t) (boolean) ((token)->type == (t))
 #define isKeyword(token,k) (boolean) ((token)->keyword == (k))
 
@@ -79,6 +80,7 @@ typedef struct sTokenInfo {
 
 static int Lang_go;
 static vString *scope;
+static vString *signature = NULL;
 
 typedef enum {
 	GOTAG_UNDEFINED = -1,
@@ -220,6 +222,8 @@ static void readToken (tokenInfo *const token)
 {
 	int c;
 	static tokenType lastTokenType = TOKEN_NONE;
+	boolean firstWhitespace = TRUE;
+	boolean whitespace;
 
 	token->type = TOKEN_NONE;
 	token->keyword = KEYWORD_NONE;
@@ -240,8 +244,14 @@ getNextChar:
 		{
 			c = ';';  // semicolon injection
 		}
+		whitespace = c == '\t'  ||  c == ' ' ||  c == '\r' || c == '\n';
+		if (signature && whitespace && firstWhitespace && vStringLength (signature) < MAX_SIGNATURE_LENGTH)
+		{
+			firstWhitespace = FALSE;
+			vStringPut(signature, ' ');
+		}
 	}
-	while (c == '\t'  ||  c == ' ' ||  c == '\r' || c == '\n');
+	while (whitespace);
 
 	switch (c)
 	{
@@ -372,10 +382,26 @@ getNextChar:
 			break;
 	}
 
+	if (signature && vStringLength (signature) < MAX_SIGNATURE_LENGTH)
+	{
+		if (token->type == TOKEN_STRING)
+		{
+			// only struct member annotations can appear in function prototypes
+			// so only `` type strings are possible
+			vStringPut(signature, '`');
+			vStringCat(signature, token->string);
+			vStringPut(signature, '`');
+		}
+		else if (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_KEYWORD)
+			vStringCat(signature, token->string);
+		else if (c != EOF)
+			vStringPut(signature, c);
+	}
+
 	lastTokenType = token->type;
 }
 
-static void skipToMatched (tokenInfo *const token)
+static boolean skipToMatchedNoRead (tokenInfo *const token)
 {
 	int nest_level = 0;
 	tokenType open_token = token->type;
@@ -393,7 +419,7 @@ static void skipToMatched (tokenInfo *const token)
 			close_token = TOKEN_CLOSE_SQUARE;
 			break;
 		default:
-			return;
+			return FALSE;
 	}
 
 	/*
@@ -409,7 +435,14 @@ static void skipToMatched (tokenInfo *const token)
 		else if (isType (token, close_token))
 			nest_level--;
 	}
-	readToken (token);
+
+	return TRUE;
+}
+
+static void skipToMatched (tokenInfo *const token)
+{
+	if (skipToMatchedNoRead (token))
+		readToken (token);
 }
 
 static boolean skipType (tokenInfo *const token)
@@ -493,7 +526,9 @@ static boolean skipType (tokenInfo *const token)
 	return FALSE;
 }
 
-static void makeTag (tokenInfo *const token, const goKind kind, tokenInfo *const parent_token, const goKind parent_kind)
+static void makeTag (tokenInfo *const token, const goKind kind,
+	tokenInfo *const parent_token, const goKind parent_kind,
+	const char *argList)
 {
 	const char *const name = vStringValue (token->string);
 
@@ -507,6 +542,8 @@ static void makeTag (tokenInfo *const token, const goKind kind, tokenInfo *const
 	e.filePosition = token->filePosition;
 	e.kindName = GoKinds [kind].name;
 	e.kind = GoKinds [kind].letter;
+	if (argList)
+		e.extensionFields.signature = argList;
 
 	if (parent_kind != GOTAG_UNDEFINED && parent_token != NULL)
 	{
@@ -532,7 +569,7 @@ static void parsePackage (tokenInfo *const token)
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		makeTag (token, GOTAG_PACKAGE, NULL, GOTAG_UNDEFINED);
+		makeTag (token, GOTAG_PACKAGE, NULL, GOTAG_UNDEFINED, NULL);
 		if (!scope && Option.include.qualifiedTags)
 		{
 			scope = vStringNew ();
@@ -557,11 +594,25 @@ static void parseFunctionOrMethod (tokenInfo *const token)
 
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		makeTag (token, GOTAG_FUNCTION, NULL, GOTAG_UNDEFINED);
-		
+		tokenInfo *functionToken = copyToken (token);
+
+		// Start recording signature
+		signature = vStringNew ();
+
 		// Skip over parameters.
 		readToken (token);
-		skipToMatched (token);
+		skipToMatchedNoRead (token);
+
+		vStringStripLeading (signature);
+		vStringStripTrailing (signature);
+		makeTag (functionToken, GOTAG_FUNCTION, NULL, GOTAG_UNDEFINED, signature->buffer);
+		deleteToken (functionToken);
+		vStringDelete(signature);
+
+		// Stop recording signature
+		signature = NULL;
+
+		readToken (token);
 
 		// Skip over result.
 		skipType (token);
@@ -604,11 +655,11 @@ static void parseStructMembers (tokenInfo *const token, tokenInfo *const parent_
 					if (memberCandidate)
 					{
 						// if we are here, there was a comma and memberCandidate isn't an anonymous field
-						makeTag (memberCandidate, GOTAG_MEMBER, parent_token, GOTAG_STRUCT);
+						makeTag (memberCandidate, GOTAG_MEMBER, parent_token, GOTAG_STRUCT, NULL);
 						deleteToken (memberCandidate);
 						memberCandidate = NULL;
 					}
-					makeTag (token, GOTAG_MEMBER, parent_token, GOTAG_STRUCT);
+					makeTag (token, GOTAG_MEMBER, parent_token, GOTAG_STRUCT, NULL);
 				}
 				readToken (token);
 			}
@@ -622,7 +673,7 @@ static void parseStructMembers (tokenInfo *const token, tokenInfo *const parent_
 		// be generated in this case.
 		if (skipType (token) && memberCandidate)
 		{
-			makeTag (memberCandidate, GOTAG_MEMBER, parent_token, GOTAG_STRUCT);
+			makeTag (memberCandidate, GOTAG_MEMBER, parent_token, GOTAG_STRUCT, NULL);
 			deleteToken (memberCandidate);
 		}
 
@@ -674,15 +725,15 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 					typeToken = copyToken (token);
 					readToken (token);
 					if (isKeyword (token, KEYWORD_struct))
-						makeTag (typeToken, GOTAG_STRUCT, NULL, GOTAG_UNDEFINED);
+						makeTag (typeToken, GOTAG_STRUCT, NULL, GOTAG_UNDEFINED, NULL);
 					else if (isKeyword (token, KEYWORD_interface))
-						makeTag (typeToken, GOTAG_INTERFACE, NULL, GOTAG_UNDEFINED);
+						makeTag (typeToken, GOTAG_INTERFACE, NULL, GOTAG_UNDEFINED, NULL);
 					else
-						makeTag (typeToken, kind, NULL, GOTAG_UNDEFINED);
+						makeTag (typeToken, kind, NULL, GOTAG_UNDEFINED, NULL);
 					break;
 				}
 				else
-					makeTag (token, kind, NULL, GOTAG_UNDEFINED);
+					makeTag (token, kind, NULL, GOTAG_UNDEFINED, NULL);
 				readToken (token);
 			}
 			if (!isType (token, TOKEN_COMMA))
