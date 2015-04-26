@@ -87,6 +87,8 @@ typedef enum {
 	GOTAG_CONST,
 	GOTAG_TYPE,
 	GOTAG_VAR,
+	GOTAG_STRUCT,
+	GOTAG_INTERFACE,
 } goKind;
 
 static kindOption GoKinds[] = {
@@ -94,7 +96,9 @@ static kindOption GoKinds[] = {
 	{TRUE, 'f', "func", "functions"},
 	{TRUE, 'c', "const", "constants"},
 	{TRUE, 't', "type", "types"},
-	{TRUE, 'v', "var", "variables"}
+	{TRUE, 'v', "var", "variables"},
+	{TRUE, 's', "struct", "structs"},
+	{TRUE, 'i', "interface", "interfaces"}
 };
 
 static keywordDesc GoKeywordTable[] = {
@@ -148,6 +152,17 @@ static tokenInfo *newToken (void)
 	token->string = vStringNew ();
 	token->lineNumber = getSourceLineNumber ();
 	token->filePosition = getInputFilePosition ();
+	return token;
+}
+
+static tokenInfo *copyToken (tokenInfo *other)
+{
+	tokenInfo *const token = xMalloc (1, tokenInfo);
+	token->type = other->type;
+	token->keyword = other->keyword;
+	token->string = vStringNewCopy (other->string);
+	token->lineNumber = other->lineNumber;
+	token->filePosition = other->filePosition;
 	return token;
 }
 
@@ -578,7 +593,22 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 		{
 			if (isType (token, TOKEN_IDENTIFIER))
 			{
-				makeTag (token, kind);
+				if (kind == GOTAG_TYPE)
+				{
+					tokenInfo *typeToken = copyToken (token);
+
+					readToken (token);
+					if (isKeyword (token, KEYWORD_struct))
+						makeTag (typeToken, GOTAG_STRUCT);
+					else if (isKeyword (token, KEYWORD_interface))
+						makeTag (typeToken, GOTAG_INTERFACE);
+					else
+						makeTag (typeToken, kind);
+					deleteToken (typeToken);
+					break;
+				}
+				else
+					makeTag (token, kind);
 				readToken (token);
 			}
 			if (!isType (token, TOKEN_COMMA))
