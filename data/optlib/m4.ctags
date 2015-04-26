@@ -32,7 +32,7 @@
 ##
 ## Ignore comments
 ##
---m4-regex=/^dnl.*$//c/{exclusive}
+--m4-regex=/^dnl.*$//{exclusive}
 
 ##
 ## define

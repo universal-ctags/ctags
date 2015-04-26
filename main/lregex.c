@@ -36,6 +36,13 @@
 #include "routines.h"
 
 
+#define KIND_DEFAULT 'r'
+#define KIND_DEFAULT_LONG "regex"
+/* We treat ' ' as a ghost kind.
+   It will never be listed up in --list-kinds. */
+#define KIND_GHOST   ' '
+#define KIND_GHOST_LONG "ghost"
+
 static boolean regexAvailable = FALSE;
 
 #if defined (HAVE_REGEX) && !defined (REGCOMP_BROKEN)
@@ -249,15 +256,15 @@ static boolean parseTagRegex (
 }
 
 
-static void ptrn_flag_exclusive_short (char c __unused__, void* data)
+static void pre_ptrn_flag_exclusive_short (char c __unused__, void* data)
 {
-	regexPattern *ptrn = data;
-	ptrn->exclusive = TRUE;
+	boolean *exclusive = data;
+	*exclusive = TRUE;
 }
 
-static void ptrn_flag_exclusive_long (const char* const s __unused__, const char* const unused __unused__, void* data)
+static void pre_ptrn_flag_exclusive_long (const char* const s __unused__, const char* const unused __unused__, void* data)
 {
-	ptrn_flag_exclusive_short ('x', data);
+	pre_ptrn_flag_exclusive_short ('x', data);
 }
 
 static void ptrn_flag_optional_long (const char* const s, const char* const unused __unused__, void* data)
@@ -266,9 +273,12 @@ static void ptrn_flag_optional_long (const char* const s, const char* const unus
 	ptrn->u.tag.kind->enabled = FALSE;
 }
 
+static flagDefinition prePtrnFlagDef[] = {
+	{ 'x',  "exclusive", pre_ptrn_flag_exclusive_short, pre_ptrn_flag_exclusive_long },
+};
+
 static flagDefinition ptrnFlagDef[] = {
-	{ 'x',  "exclusive", ptrn_flag_exclusive_short, ptrn_flag_exclusive_long },
-	{ '\0', "optional",  NULL,                      ptrn_flag_optional_long  },
+	{ '\0', "optional",  NULL, ptrn_flag_optional_long  },
 };
 
 static struct sKind *kindNew ()
@@ -352,14 +362,22 @@ static regexPattern* addCompiledTagCommon (const langType language,
 
 static regexPattern *addCompiledTagPattern (
 		const langType language, regex_t* const pattern,
-		const char* const name, const char kind, char* const kindName,
+		const char* const name, char kind, const char* kindName,
 		char *const description, const char* flags)
 {
 	regexPattern * ptrn;
+	boolean exclusive = FALSE;
 
+	flagsEval (flags, prePtrnFlagDef, COUNT(prePtrnFlagDef), &exclusive);
+	if (*name == '\0' && exclusive && kind == KIND_DEFAULT)
+	{
+		kind = KIND_GHOST;
+		kindName = KIND_GHOST_LONG;
+	}
 	ptrn  = addCompiledTagCommon(language, pattern, kind);
 	ptrn->type    = PTRN_TAG;
 	ptrn->u.tag.name_pattern = eStrdup (name);
+	ptrn->exclusive = exclusive;
 	if (ptrn->u.tag.kind->letter == '\0')
 	{
 		/* This is a newly registered kind. */
@@ -378,10 +396,12 @@ static void addCompiledCallbackPattern (
 		const regexCallback callback, const char* flags)
 {
 	regexPattern * ptrn;
-
+	boolean exclusive = FALSE;
+	flagsEval (flags, prePtrnFlagDef, COUNT(prePtrnFlagDef), &exclusive);
 	ptrn  = addCompiledTagCommon(language, pattern, '\0');
 	ptrn->type    = PTRN_CALLBACK;
 	ptrn->u.callback.function = callback;
+	ptrn->exclusive = exclusive;
 	flagsEval (flags, ptrnFlagDef, COUNT(ptrnFlagDef), ptrn);
 }
 
@@ -459,8 +479,8 @@ static void parseKinds (
 	*description = NULL;
 	if (kinds == NULL  ||  kinds [0] == '\0')
 	{
-		*kind = 'r';
-		*kindName = eStrdup ("regex");
+		*kind = KIND_DEFAULT;
+		*kindName = eStrdup (KIND_DEFAULT_LONG);
 	}
 	else if (kinds [0] != '\0')
 	{
@@ -468,11 +488,11 @@ static void parseKinds (
 		if (k [0] != ','  &&  (k [1] == ','  ||  k [1] == '\0'))
 			*kind = *k++;
 		else
-			*kind = 'r';
+			*kind = KIND_DEFAULT;
 		if (*k == ',')
 			++k;
 		if (k [0] == '\0')
-			*kindName = eStrdup ("regex");
+			*kindName = eStrdup (KIND_DEFAULT_LONG);
 		else
 		{
 			const char *const comma = strchr (k, ',');
@@ -507,7 +527,8 @@ static void printRegexKindCB (void *key, void *value, void* user_data)
 	c.p = key;
 	indent = user_data;
 
-	printRegexKind(c.c, value, *indent);
+	if (c.c != KIND_GHOST)
+		printRegexKind(c.c, value, *indent);
 }
 
 static void printRegexKindsInPatternSet (patternSet* const set, boolean indent)
