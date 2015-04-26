@@ -1,4 +1,4 @@
-f1	input.go	/^func f1(a int, b int) int {$/;"	f
-f2	input.go	/^func f2(a int, b int) int {$/;"	f
-f3	input.go	/^func f3() {}$/;"	f
+f1	input.go	/^func f1(a int, b int) int {$/;"	f	signature:(a int, b int)
+f2	input.go	/^func f2(a int, b int) int {$/;"	f	signature:(a int, b int)
+f3	input.go	/^func f3() {}$/;"	f	signature:()
 test	input.go	/^package test$/;"	p
