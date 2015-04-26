@@ -18,64 +18,64 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\core\args.c">
+    <ClCompile Include="..\main\args.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\debug.c">
+    <ClCompile Include="..\main\debug.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\entry.c">
+    <ClCompile Include="..\main\entry.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\get.c">
+    <ClCompile Include="..\main\get.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\keyword.c">
+    <ClCompile Include="..\main\keyword.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\lregex.c">
+    <ClCompile Include="..\main\lregex.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\lxcmd.c">
+    <ClCompile Include="..\main\lxcmd.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\main.c">
+    <ClCompile Include="..\main\main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\options.c">
+    <ClCompile Include="..\main\options.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\parse.c">
+    <ClCompile Include="..\main\parse.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\read.c">
+    <ClCompile Include="..\main\read.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\gnu_regex\regex.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\routines.c">
+    <ClCompile Include="..\main\routines.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\sort.c">
+    <ClCompile Include="..\main\sort.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\strlist.c">
+    <ClCompile Include="..\main\strlist.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\vstring.c">
+    <ClCompile Include="..\main\vstring.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\tg.c">
+    <ClCompile Include="..\main\tg.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\fnmatch\fnmatch.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\trashbox.c">
+    <ClCompile Include="..\main\trashbox.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\core\flags.c">
+    <ClCompile Include="..\main\flags.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\ada.c">
@@ -218,55 +218,55 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\core\e_msoft.h">
+    <ClInclude Include="..\main\e_msoft.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\args.h">
+    <ClInclude Include="..\main\args.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\entry.h">
+    <ClInclude Include="..\main\entry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\flags.h">
+    <ClInclude Include="..\main\flags.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\get.h">
+    <ClInclude Include="..\main\get.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\htable.h">
+    <ClInclude Include="..\main\htable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\keyword.h">
+    <ClInclude Include="..\main\keyword.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\main.h">
+    <ClInclude Include="..\main\main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\options.h">
+    <ClInclude Include="..\main\options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\parse.h">
+    <ClInclude Include="..\main\parse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\parsers.h">
+    <ClInclude Include="..\main\parsers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\read.h">
+    <ClInclude Include="..\main\read.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\sort.h">
+    <ClInclude Include="..\main\sort.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\strlist.h">
+    <ClInclude Include="..\main\strlist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\tg.h">
+    <ClInclude Include="..\main\tg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\trashbox.h">
+    <ClInclude Include="..\main\trashbox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\core\vstring.h">
+    <ClInclude Include="..\main\vstring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gnu_regex\regex.h">

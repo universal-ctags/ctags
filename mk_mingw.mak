@@ -6,12 +6,12 @@ REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrca
 
 CFLAGS = -Wall
 DEFINES = -DWIN32 $(REGEX_DEFINES)
-INCLUDES = -I. -Icore -Ignu_regex -Ifnmatch
+INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch
 CC = gcc
 OBJEXT = o
 OBJECTS += $(REGEX_SOURCES:%.c=%.o)
 OBJECTS += $(FNMATCH_SOURCES:%.c=%.o)
-VPATH = . ./core ./parsers
+VPATH = . ./main ./parsers
 
 ctags.exe: OPT = -O4 -Os -fexpensive-optimizations
 ctags.exe: LDFLAGS = -s
