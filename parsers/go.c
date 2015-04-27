@@ -672,10 +672,10 @@ static void parseStructMembers (tokenInfo *const token, tokenInfo *const parent_
 		// type into memberCandidate and skipType() should return FALSE so no tag should
 		// be generated in this case.
 		if (skipType (token) && memberCandidate)
-		{
 			makeTag (memberCandidate, GOTAG_MEMBER, parent_token, GOTAG_STRUCT, NULL);
+
+		if (memberCandidate)
 			deleteToken (memberCandidate);
-		}
 
 		while (!isType (token, TOKEN_SEMICOLON) && !isType (token, TOKEN_CLOSE_CURLY)
 				&& !isType (token, TOKEN_EOF))
