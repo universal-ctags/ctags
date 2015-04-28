@@ -11,23 +11,28 @@ T1	input.go	/^	T1 map[string]int$/;"	t
 T2	input.go	/^	T2 <-chan float32$/;"	t
 T3	input.go	/^	T3 chan []string$/;"	t
 T4	input.go	/^	T4 chan<- *[12]string$/;"	t
-T5	input.go	/^	T5 interface {$/;"	t
-T6	input.go	/^type T6 struct {$/;"	t
+T5	input.go	/^	T5 interface {$/;"	i
+T6	input.go	/^type T6 struct {$/;"	s
 T7	input.go	/^type (T7 func (a struct{_ int; _ float32}, b int) (int, map[string]int);T8 float32)$/;"	t
 T8	input.go	/^type (T7 func (a struct{_ int; _ float32}, b int) (int, map[string]int);T8 float32)$/;"	t
 T9	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	t
+_a	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:T6
+_b	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:T6
+_c	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:T6
+_d	input.go	/^	_a, _b, _c, _d int$/;"	m	struct:T6
+_e	input.go	/^	_e float32$/;"	m	struct:T6
 a	input.go	/^var (a, b, c int$/;"	v
 b	input.go	/^var (a, b, c int$/;"	v
 c	input.go	/^var (a, b, c int$/;"	v
 d	input.go	/^d T5$/;"	v
 e	input.go	/^e T4$/;"	v
 f	input.go	/^f interface{})$/;"	v
-f1	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	f
-f2	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	f
-f3	input.go	/^func (t *T1) f3() (a, b int){$/;"	f
-f4	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f
-f5	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f
+f1	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	f	signature:()
+f2	input.go	/^func f1() {};func f2() {};type\/*no newline here*\/T9 int\/*var ignored int$/;"	f	signature:()
+f3	input.go	/^func (t *T1) f3() (a, b int){$/;"	f	signature:()
+f4	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f	signature:(a func () func ())
+f5	input.go	/^func (tt * T7) f4(a func () func ()) (func (), int) {return func (){}, 1};func f5(){};const H=1$/;"	f	signature:()
 g	input.go	/^const ignored int*\/const (G=6); var g int$/;"	v
 h	input.go	/^}; var h int$/;"	v
-main	input.go	/^func main() {$/;"	f
+main	input.go	/^func main() {$/;"	f	signature:()
 main	input.go	/^package main$/;"	p

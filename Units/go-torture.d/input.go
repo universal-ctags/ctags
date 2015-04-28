@@ -15,8 +15,11 @@ type (
 )
 
 type T6 struct {
-	a, b, c, d int
-	e float32
+	_a, _b, _c, _d int
+	int
+	T1 `annotation`
+	*T2
+	_e float32
 	//ignored int
 }
 
