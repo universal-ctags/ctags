@@ -1115,6 +1115,7 @@ fuzz_lang_file ()
 
     case $r in
 	0)
+	    rm -f "${ovalgrind}" "${ocmdline}"
 	    return 0
 	    ;;
 	${_TIMEOUT_EXIT})
