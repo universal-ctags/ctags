@@ -1425,8 +1425,7 @@ noise_lang_file_noisespec ()
 	${_TIMEOUT_EXIT})
 	    printf "T"
 	    noise_report_line "${pos}" "${len}" "${r}" "${how}"
-	    printf '\n%-20s' "[timeout $lang]"
-	    echo "$onoised"
+	    printf '\n%-20s\n' "[timeout $lang]" "$onoised"
 	    [ "${RUN_SHRINK}" = 'yes' ] && fuzz_shrink "${cmdline_for_shirking}" "${onoised}" "${oshrink}" "${lang}"
 	    ;;
 	${_VALGRIND_EXIT})
