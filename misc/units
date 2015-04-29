@@ -1456,7 +1456,6 @@ noise_lang_file ()
     local r
     local i
     local c
-    local offset
     local guessed_lang
 
     guessed_lang=$( ${_CMDLINE_FOR_SHRINKING} --print-language "${input}" 2>/dev/null | sed -n 's/^.*: //p')
