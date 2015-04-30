@@ -26,6 +26,7 @@ The following parsers have been added:
 * falcon
 * go
 * json
+* m4 *optlib*
 * mib *optlib*
 * rust
 * windres
@@ -542,6 +543,33 @@ For specifying exclusive-matching the flags ``exclusive`` (long) and
 
 	--mib-regex=/^([^ \t]+)[ \t]+DEFINITIONS ::= BEGIN/\1/d,definitions/{exclusive}
 	--mib-regex=/^([a-zA-Z][^ \t]+)[ \t]+[A-Za-z]/\1/n,name/
+
+Another use case for this flag is for ignoring a line::
+
+	--m4-regex=/#.*(define|undefine|s?include)\>//x
+	--m4-regex=/\<dnl.*(define|undefine|s?include)\>//x
+
+Comments are started from ``#`` or ``dnl`` in many use case of m4 language.
+With above options ctags can ignore ``define`` in comments.
+
+If an empty name pattern(``//``) is found in ``--regex-<LANG>`` option
+ctags warns it as wrong usage of the option. However, the flags
+``exclusive`` or ``x`` is specified, the warning is suppressed. This
+is imperfect approach for ignoring text insides comments but it may
+be better than nothing.
+
+Optional flag in regex
+---------------------------------------------------------------------
+
+Kinds defined with ``--regex-<LANG>`` (or ``--<LANG>-regex``) was
+enabled by default. A kind disabled by default can be defined
+with new flag ``optional`` (long only) like::
+
+	--m4-regex=/[[:space:]]include\(`([^']+)'/\1/I,inclusion/x{optional}
+
+A user can turn on this pattern with::
+
+       --m4-kinds=+I
 
 
 Passing parameter for long regex flag
