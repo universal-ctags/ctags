@@ -49,6 +49,10 @@ have its own directory under Units directory.
 	unit test ctags. If you want to add more options, enumerate
 	options in **args.ctags** file. This file is an optional.
 
+	Remember you have to put one option in one line; don't
+	put multiple options to one line. Multiple options in
+	one line doesn't work.
+
 *Units/TEST/filter-\*.\** **optional**
 
 	You can rearrange the output of ctags with this command
