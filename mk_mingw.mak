@@ -37,4 +37,4 @@ clean:
 	- rm -f ctags.exe
 	- rm -f dctags.exe
 	- rm -f tags
-	- rm -f *.o gnu_regex/*.o fnmatch/*.o
+	- rm -f main/*.o parsers/*.o gnu_regex/*.o fnmatch/*.o
