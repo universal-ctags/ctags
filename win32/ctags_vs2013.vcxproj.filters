@@ -16,68 +16,11 @@
     <Filter Include="Source Files\Parsers">
       <UniqueIdentifier>{f77929ed-5bdf-496f-9ea6-c3c6180e6ca5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Main">
+      <UniqueIdentifier>{45974afc-d1c3-4696-a74a-60eeaa6e1441}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\main\args.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\debug.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\entry.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\get.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\keyword.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\lregex.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\lxcmd.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\main.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\options.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\parse.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\read.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\gnu_regex\regex.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\routines.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\sort.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\strlist.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\vstring.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\tg.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\fnmatch\fnmatch.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\trashbox.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\main\flags.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\parsers\ada.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
@@ -216,6 +159,69 @@
     <ClCompile Include="..\parsers\php.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\args.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\debug.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\entry.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\flags.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\fnmatch\fnmatch.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\get.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\htable.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\keyword.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\lregex.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\lxcmd.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\main.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\options.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\parse.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\read.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gnu_regex\regex.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\routines.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\sort.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\strlist.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\tg.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\trashbox.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\vstring.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\main\e_msoft.h">
@@ -270,6 +276,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\gnu_regex\regex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\fnmatch\fnmatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\general.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\routines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\ctags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

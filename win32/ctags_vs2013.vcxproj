@@ -92,6 +92,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\main\htable.c" />
     <ClCompile Include="..\parsers\ada.c" />
     <ClCompile Include="..\parsers\ant.c" />
     <ClCompile Include="..\main\args.c" />
@@ -163,10 +164,14 @@
     <ClCompile Include="..\parsers\yacc.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\fnmatch\fnmatch.h" />
     <ClInclude Include="..\main\args.h" />
+    <ClInclude Include="..\main\ctags.h" />
+    <ClInclude Include="..\main\debug.h" />
     <ClInclude Include="..\main\entry.h" />
     <ClInclude Include="..\main\e_msoft.h" />
     <ClInclude Include="..\main\flags.h" />
+    <ClInclude Include="..\main\general.h" />
     <ClInclude Include="..\main\get.h" />
     <ClInclude Include="..\gnu_regex\regex.h" />
     <ClInclude Include="..\main\htable.h" />
@@ -176,6 +181,7 @@
     <ClInclude Include="..\main\parse.h" />
     <ClInclude Include="..\main\parsers.h" />
     <ClInclude Include="..\main\read.h" />
+    <ClInclude Include="..\main\routines.h" />
     <ClInclude Include="..\main\sort.h" />
     <ClInclude Include="..\main\strlist.h" />
     <ClInclude Include="..\main\tg.h" />
