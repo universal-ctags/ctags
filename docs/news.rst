@@ -556,7 +556,8 @@ If an empty name pattern(``//``) is found in ``--regex-<LANG>`` option
 ctags warns it as wrong usage of the option. However, the flags
 ``exclusive`` or ``x`` is specified, the warning is suppressed. This
 is imperfect approach for ignoring text insides comments but it may
-be better than nothing.
+be better than nothing. Ghost kind is assigned to the empty name
+pattern. (See "Ghost kind in regex parser".)
 
 Optional flag in regex
 ---------------------------------------------------------------------
@@ -571,6 +572,15 @@ A user can turn on this pattern with::
 
        --m4-kinds=+I
 
+
+Ghost kind in regex parser
+---------------------------------------------------------------------
+
+If a whitespace is used as a kind letter, it is never printed when
+ctags is called with ``--list-kinds`` option.  This kind is
+automatically assigned to an empty name pattern.
+
+Normally you don't need to know this.
 
 Passing parameter for long regex flag
 ---------------------------------------------------------------------
