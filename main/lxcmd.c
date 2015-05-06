@@ -420,7 +420,7 @@ extern void addTagXcmd (const langType language, vString* pathvstr)
 #ifdef HAVE_COPROC
 	pathSet* set;
 	xcmdPath *path;
-	Assert (path != NULL);
+	Assert (pathvstr != NULL);
 
 	if (language > SetUpper)
 	{
