@@ -60,7 +60,10 @@ OBJEXT	= @OBJEXT@
 #LDFLAGS=
 
 ALL_CFLAGS = $(CFLAGS) -Wall
+
+DEBUG_CPPFLAGS ?= -DDEBUG
 ALL_CPPFLAGS = $(CPPFLAGS)			\
+	$(DEBUG_CPPFLAGS)			\
 	-DDATADIR=\"$(datadir)\"		\
 	-DPKGCONFDIR=\"$(pkgconfdir)\"		\
 	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\"
