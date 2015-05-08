@@ -60,7 +60,10 @@ OBJEXT	= @OBJEXT@
 #LDFLAGS=
 
 ALL_CFLAGS = $(CFLAGS) -Wall
+
+DEBUG_CPPFLAGS ?= -DDEBUG
 ALL_CPPFLAGS = $(CPPFLAGS)			\
+	$(DEBUG_CPPFLAGS)			\
 	-DDATADIR=\"$(datadir)\"		\
 	-DPKGCONFDIR=\"$(pkgconfdir)\"		\
 	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\"
@@ -154,9 +157,6 @@ all: $(CTAGS_EXEC) $(READ_LIB) $(READ_CMD)
 
 $(CTAGS_EXEC): $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
-
-dctags$(EXEEXT): debug.c $(SOURCES) $(HEADERS)
-	$(CC) -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS) -DDEBUG -g $(LDFLAGS) -o $@ debug.c $(SOURCES)
 
 $(READ_CMD): readtags.c readtags.h
 	$(CC) -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(srcdir)/readtags.c
@@ -338,7 +338,6 @@ TAGS: $(CTAGS_EXEC)
 
 clean: clean-units
 	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB) 
-	rm -f dctags$(EXEEXT) $(READ_CMD)
 	rm -f etyperef$(EXEEXT) etyperef.$(OBJEXT)
 
 mostlyclean: clean

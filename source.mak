@@ -3,10 +3,11 @@
 PARSER_DIR=parsers
 MAIN_DIR=main
 
+DEBUG_HEADERS = $(MAIN_DIR)/debug.h
+
 MAIN_HEADERS =				\
 	$(MAIN_DIR)/args.h		\
 	$(MAIN_DIR)/ctags.h		\
-	$(MAIN_DIR)/debug.h		\
 	$(MAIN_DIR)/entry.h		\
 	$(MAIN_DIR)/flags.h		\
 	$(MAIN_DIR)/general.h		\
@@ -27,7 +28,7 @@ MAIN_HEADERS =				\
 
 PARSER_HEADERS =
 
-HEADERS = $(MAIN_HEADERS) $(PARSER_HEADERS)
+HEADERS = $(MAIN_HEADERS) $(PARSER_HEADERS) $(DEBUG_HEADERS)
 
 PARSER_SOURCES =				\
 	$(PARSER_DIR)/ada.c			\
@@ -98,7 +99,9 @@ MAIN_SOURCES =					\
 	$(MAIN_DIR)/trashbox.c			\
 	$(MAIN_DIR)/vstring.c
 
-SOURCES = $(MAIN_SOURCES) $(PARSER_SOURCES)
+DEBUG_SOURCES = $(MAIN_DIR)/debug.c
+
+SOURCES = $(MAIN_SOURCES) $(PARSER_SOURCES) $(DEBUG_SOURCES)
 
 ENVIRONMENT_HEADERS = e_msoft.h
 
