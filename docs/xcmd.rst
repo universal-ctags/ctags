@@ -12,7 +12,7 @@ Here I explain the way to write a xcmd driver.
 
 Interaction between exuberant-ctags and xcmd is explained in "xcmd
 protocol". Generally available tags generator like CoffeeTags doesn't
-conforms the protocol. Your driver must fill the gap.
+conform to the protocol. Your driver must fill the gap.
 
 Call convention
 ----------------------------------------------------------------------
