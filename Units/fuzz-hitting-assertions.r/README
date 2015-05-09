@@ -1,0 +1,9 @@
+With compiling ctags with -DDEBUG option, Assert macros are
+enabled. Current -DDEBUG is given by default.
+
+The fuzz target could make some assertions false for -DDEBUG
+ctags. This directory contains such unwanted inputs found by the
+target. They are minimized by SHRINK=1.
+
+Let's fix them!
+Don't forget rename .b directory to .d.
