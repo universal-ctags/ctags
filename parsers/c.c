@@ -286,9 +286,11 @@ static boolean CollectingSignature;
 /* Number used to uniquely identify anonymous structs and unions. */
 static int AnonymousID = 0;
 
+#define COMMONK_UNDEFINED -1
+
 /* Used to index into the CKinds table. */
 typedef enum {
-	CK_UNDEFINED = -1,
+	CK_UNDEFINED = COMMONK_UNDEFINED,
 	CK_CLASS, CK_DEFINE, CK_ENUMERATOR, CK_FUNCTION,
 	CK_ENUMERATION, CK_LOCAL, CK_MEMBER, CK_NAMESPACE, CK_PROTOTYPE,
 	CK_STRUCT, CK_TYPEDEF, CK_UNION, CK_VARIABLE,
@@ -314,7 +316,7 @@ static kindOption CKinds [] = {
 };
 
 typedef enum {
-	CSK_UNDEFINED = -1,
+	CSK_UNDEFINED = COMMONK_UNDEFINED,
 	CSK_CLASS, CSK_DEFINE, CSK_ENUMERATOR, CSK_EVENT, CSK_FIELD,
 	CSK_ENUMERATION, CSK_INTERFACE, CSK_LOCAL, CSK_METHOD,
 	CSK_NAMESPACE, CSK_PROPERTY, CSK_STRUCT, CSK_TYPEDEF
@@ -338,7 +340,7 @@ static kindOption CsharpKinds [] = {
 
 typedef enum
 {
-	DK_UNDEFINED = -1,
+	DK_UNDEFINED = COMMONK_UNDEFINED,
 	DK_ALIAS, DK_CLASS, DK_ENUMERATION, DK_ENUMERATOR, DK_EXTERN_VARIABLE, DK_FUNCTION,
 	DK_INTERFACE, DK_LOCAL, DK_MEMBER, DK_MIXIN, DK_MODULE, DK_NAMESPACE,
 	DK_PROTOTYPE, DK_STRUCT, DK_TEMPLATE, DK_UNION,
@@ -368,7 +370,7 @@ static kindOption DKinds [] = {
 
 /* Used to index into the JavaKinds table. */
 typedef enum {
-	JK_UNDEFINED = -1,
+	JK_UNDEFINED = COMMONK_UNDEFINED,
 	JK_CLASS, JK_ENUM_CONSTANT, JK_FIELD, JK_ENUM, JK_INTERFACE,
 	JK_LOCAL, JK_METHOD, JK_PACKAGE, JK_ACCESS, JK_CLASS_PREFIX
 } javaKind;
@@ -386,7 +388,7 @@ static kindOption JavaKinds [] = {
 
 /* Used to index into the VeraKinds table. */
 typedef enum {
-	VK_UNDEFINED = -1,
+	VK_UNDEFINED = COMMONK_UNDEFINED,
 	VK_CLASS, VK_DEFINE, VK_ENUMERATOR, VK_FUNCTION,
 	VK_ENUMERATION, VK_LOCAL, VK_MEMBER, VK_PROGRAM, VK_PROTOTYPE,
 	VK_TASK, VK_TYPEDEF, VK_VARIABLE,
@@ -916,7 +918,9 @@ static void initStatement (statementInfo *const st, statementInfo *const parent)
 /*
 *   Tag generation functions
 */
-static cKind cTagKind (const tagType type)
+#define cTagKind(type) cTagKindFull(type, TRUE)
+#define cTagKindNoAssert(type) cTagKindFull(type, FALSE)
+static cKind cTagKindFull (const tagType type, const boolean with_assert)
 {
 	cKind result = CK_UNDEFINED;
 	switch (type)
@@ -935,12 +939,14 @@ static cKind cTagKind (const tagType type)
 		case TAG_VARIABLE:   result = CK_VARIABLE;    break;
 		case TAG_EXTERN_VAR: result = CK_EXTERN_VARIABLE; break;
 
-		default: Assert ("Bad C tag type" == NULL); break;
+		default: if (with_assert) Assert ("Bad C tag type" == NULL); break;
 	}
 	return result;
 }
 
-static csharpKind csharpTagKind (const tagType type)
+#define csharpTagKind(type) csharpTagKindFull(type, TRUE)
+#define csharpTagKindNoAssert(type) csharpTagKindFull(type, FALSE)
+static csharpKind csharpTagKindFull (const tagType type, const boolean with_assert)
 {
 	csharpKind result = CSK_UNDEFINED;
 	switch (type)
@@ -958,12 +964,14 @@ static csharpKind csharpTagKind (const tagType type)
 		case TAG_STRUCT:     result = CSK_STRUCT;          break;
 		case TAG_TYPEDEF:    result = CSK_TYPEDEF;         break;
 
-		default: Assert ("Bad C# tag type" == NULL); break;
+		default: if (with_assert) Assert ("Bad C# tag type" == NULL); break;
 	}
 	return result;
 }
 
-static javaKind javaTagKind (const tagType type)
+#define javaTagKind(type) javaTagKindFull(type, TRUE)
+#define javaTagKindNoAssert(type) javaTagKindFull(type, FALSE)
+static javaKind javaTagKindFull (const tagType type, boolean with_assert)
 {
 	javaKind result = JK_UNDEFINED;
 	switch (type)
@@ -977,12 +985,14 @@ static javaKind javaTagKind (const tagType type)
 		case TAG_METHOD:     result = JK_METHOD;        break;
 		case TAG_PACKAGE:    result = JK_PACKAGE;       break;
 
-		default: Assert ("Bad Java tag type" == NULL); break;
+		default: if (with_assert) Assert ("Bad Java tag type" == NULL); break;
 	}
 	return result;
 }
 
-static dKind dTagKind (const tagType type)
+#define dTagKind(type) dTagKindFull(type, TRUE)
+#define dTagKindNoAssert(type) dTagKindFull(type, FALSE)
+static dKind dTagKindFull (const tagType type, boolean with_assert)
 {
 	dKind result = DK_UNDEFINED;
 	switch (type)
@@ -1006,12 +1016,14 @@ static dKind dTagKind (const tagType type)
 		case TAG_VARIABLE:   result = DK_VARIABLE;        break;
 		case TAG_VERSION:    result = DK_VERSION;         break;
 
-		default: Assert ("Bad D tag type" == NULL); break;
+		default: if (with_assert) Assert ("Bad D tag type" == NULL); break;
 	}
 	return result;
 }
 
-static veraKind veraTagKind (const tagType type) {
+#define veraTagKind(type) veraTagKindFull(type, TRUE)
+#define veraTagKindNoAssert(type) veraTagKindFull(type, FALSE)
+static veraKind veraTagKindFull (const tagType type, boolean with_assert) {
 	veraKind result = VK_UNDEFINED;
 	switch (type)
 	{
@@ -1028,7 +1040,7 @@ static veraKind veraTagKind (const tagType type) {
 		case TAG_VARIABLE:   result = VK_VARIABLE;        break;
 		case TAG_EXTERN_VAR: result = VK_EXTERN_VARIABLE; break;
 
-		default: Assert ("Bad Vera tag type" == NULL); break;
+		default: if (with_assert) Assert ("Bad Vera tag type" == NULL); break;
 	}
 	return result;
 }
@@ -1068,18 +1080,46 @@ static int tagLetter (const tagType type)
 static boolean includeTag (const tagType type, const boolean isFileScope)
 {
 	boolean result;
+	int k;
+	kindOption* kopt = NULL;
+
 	if (isFileScope  &&  ! Option.include.fileScope)
 		result = FALSE;
 	else if (isLanguage (Lang_csharp))
-		result = CsharpKinds [csharpTagKind (type)].enabled;
+	{
+		k = csharpTagKindNoAssert (type);
+		kopt = CsharpKinds;
+	}
 	else if (isLanguage (Lang_java))
-		result = JavaKinds [javaTagKind (type)].enabled;
+	{
+		k = javaTagKindNoAssert (type);
+		kopt = JavaKinds;
+	}
 	else if (isLanguage (Lang_d))
-		result = DKinds [dTagKind (type)].enabled;
+	{
+		k = dTagKindNoAssert (type);
+		kopt = DKinds;
+	}
 	else if (isLanguage (Lang_vera))
-		result = VeraKinds [veraTagKind (type)].enabled;
+	{
+		k = veraTagKindNoAssert (type);
+		kopt = VeraKinds;
+	}
 	else
-		result = CKinds [cTagKind (type)].enabled;
+	{
+		k = cTagKindNoAssert (type);
+		kopt = CKinds;
+	}
+
+	if (kopt)
+	{
+		Assert (k >= COMMONK_UNDEFINED);
+		if (k == COMMONK_UNDEFINED)
+			result = FALSE;
+		else
+			result = kopt [k].enabled;
+	}
+
 	return result;
 }
 
@@ -1162,12 +1202,19 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 			if (vStringLength (scope) > 0  &&
 				(isMember (st) || st->parent->declaration == DECL_NAMESPACE))
 			{
+				tagType ptype;
+
 				if (isType (st->context, TOKEN_NAME))
+				{
 					tag->extensionFields.scope [0] = tagName (TAG_CLASS);
-				else
-					tag->extensionFields.scope [0] =
-						tagName (declToTagType (parentDecl (st)));
-				tag->extensionFields.scope [1] = vStringValue (scope);
+					tag->extensionFields.scope [1] = vStringValue (scope);
+				}
+				else if ((ptype = declToTagType (parentDecl (st))) &&
+					 includeTag (ptype, Option.include.fileScope))
+				{
+					tag->extensionFields.scope [0] = tagName (ptype);
+					tag->extensionFields.scope [1] = vStringValue (scope);
+				}
 			}
 			if ((type == TAG_CLASS  ||  type == TAG_INTERFACE  ||
 				 type == TAG_STRUCT) && vStringLength (st->parentClasses) > 0)
