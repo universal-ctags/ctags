@@ -9,6 +9,9 @@ Perl 5.10以降で新たに導入された正規表現の一部が使用可能�
 
 一部のパッチは Ruby 2.x からマージしている。
 
+Wikiページも参照のこと。
+https://github.com/k-takata/Onigmo/wiki
+
 
 主な新機能:
   正規表現 (文法依存):

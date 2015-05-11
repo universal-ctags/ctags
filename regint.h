@@ -4,7 +4,7 @@
   regint.h -  Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
 /*-
- * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2002-2013  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
  * Copyright (c) 2011-2014  K.Takata  <kentkt AT csc DOT jp>
  * All rights reserved.
  *
@@ -392,17 +392,17 @@ typedef unsigned int  BitStatusType;
 #define BIT_STATUS_CLEAR(stats)      (stats) = 0
 #define BIT_STATUS_ON_ALL(stats)     (stats) = ~((BitStatusType )0)
 #define BIT_STATUS_AT(stats,n) \
-  ((n) < (int )BIT_STATUS_BITS_NUM  ?  ((stats) & (1 << n)) : ((stats) & 1))
+  ((n) < (int )BIT_STATUS_BITS_NUM  ?  ((stats) & ((BitStatusType )1 << n)) : ((stats) & 1))
 
 #define BIT_STATUS_ON_AT(stats,n) do {\
-    if ((n) < (int )BIT_STATUS_BITS_NUM)	\
+  if ((n) < (int )BIT_STATUS_BITS_NUM)\
     (stats) |= (1 << (n));\
   else\
     (stats) |= 1;\
 } while (0)
 
 #define BIT_STATUS_ON_AT_SIMPLE(stats,n) do {\
-    if ((n) < (int )BIT_STATUS_BITS_NUM)\
+  if ((n) < (int )BIT_STATUS_BITS_NUM)\
     (stats) |= (1 << (n));\
 } while (0)
 
@@ -468,7 +468,7 @@ typedef Bits*          BitSetRef;
 } while (0)
 
 #define BS_ROOM(bs,pos)            (bs)[(int )(pos) / BITS_IN_ROOM]
-#define BS_BIT(pos)                (1 << ((int )(pos) % BITS_IN_ROOM))
+#define BS_BIT(pos)                (1U << ((int )(pos) % BITS_IN_ROOM))
 
 #define BITSET_AT(bs, pos)         (BS_ROOM(bs,pos) & BS_BIT(pos))
 #define BITSET_SET_BIT(bs, pos)     BS_ROOM(bs,pos) |= BS_BIT(pos)
@@ -909,6 +909,14 @@ typedef struct {
 #define IS_CODE_SB_WORD(enc,code) \
   (ONIGENC_IS_CODE_ASCII(code) && ONIGENC_IS_CODE_WORD(enc,code))
 
+typedef struct OnigEndCallListItem {
+  struct OnigEndCallListItem* next;
+  void (*func)(void);
+} OnigEndCallListItemType;
+
+extern void onig_add_end_call(void (*func)(void));
+
+
 #ifdef ONIG_DEBUG
 
 typedef struct {
@@ -918,6 +926,7 @@ typedef struct {
 } OnigOpInfoType;
 
 extern OnigOpInfoType OnigOpInfo[];
+
 
 extern void onig_print_compiled_byte_code P_((FILE* f, UChar* bp, UChar* bpend, UChar** nextp, OnigEncoding enc));
 
