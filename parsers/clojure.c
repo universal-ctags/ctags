@@ -26,8 +26,6 @@ static kindOption ClojureKinds[] = {
 	{TRUE, 'n', "namespace", "namespaces"}
 };
 
-static int CurrentNamespace = SCOPE_NIL;
-
 static int isNamespace (const char *strp)
 {
 	return strncmp (++strp, "ns", 2) == 0 && isspace (strp[2]);
@@ -62,10 +60,8 @@ static void functionName (vString * const name, const char *dbp)
 	vStringTerminate (name);
 }
 
-static void makeNamespaceTag (vString * const name, const char *dbp)
+static int makeNamespaceTag (vString * const name, const char *dbp)
 {
-	CurrentNamespace = SCOPE_NIL;
-
 	functionName (name, dbp);
 	if (vStringLength (name) > 0)
 	{
@@ -76,11 +72,13 @@ static void makeNamespaceTag (vString * const name, const char *dbp)
 		e.kindName = ClojureKinds[K_NAMESPACE].name;
 		e.kind = (char) ClojureKinds[K_NAMESPACE].letter;
 
-		CurrentNamespace = makeTagEntry (&e);
+		return makeTagEntry (&e);
 	}
+	else
+		return SCOPE_NIL;
 }
 
-static void makeFunctionTag (vString * const name, const char *dbp)
+static void makeFunctionTag (vString * const name, const char *dbp, int scope_index)
 {
 	functionName (name, dbp);
 	if (vStringLength (name) > 0)
@@ -92,9 +90,7 @@ static void makeFunctionTag (vString * const name, const char *dbp)
 		e.kindName = ClojureKinds[K_FUNCTION].name;
 		e.kind = (char) ClojureKinds[K_FUNCTION].letter;
 
-		if (CurrentNamespace >= 0)
-			e.extensionFields.scope_index =  CurrentNamespace;
-
+		e.extensionFields.scope_index =  scope_index;
 		makeTagEntry (&e);
 	}
 }
@@ -111,6 +107,7 @@ static void findClojureTags (void)
 {
 	vString *name = vStringNew ();
 	const char *p;
+	int scope_index = SCOPE_NIL;
 
 	while ((p = (char *)fileReadLine ()) != NULL)
 	{
@@ -124,12 +121,12 @@ static void findClojureTags (void)
 			if (isNamespace (p))
 			{
 				skipToSymbol (&p);
-				makeNamespaceTag (name, p);
+				scope_index = makeNamespaceTag (name, p);
 			}
 			else if (isFunction (p))
 			{
 				skipToSymbol (&p);
-				makeFunctionTag (name, p);
+				makeFunctionTag (name, p, scope_index);
 			}
 		}
 	}
