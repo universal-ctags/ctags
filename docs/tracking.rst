@@ -87,6 +87,11 @@ subversion
 bugs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+   <364>  Ruby method on self is missing the trailing ? in the generated tag name
+	 * fixed::
+
+	       ...
+
    <358>  Vim parser: Segmentation fault when reading empty vim file
 	 * directly contributed by the original author of bug report and patch::
 
