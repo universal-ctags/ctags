@@ -293,9 +293,9 @@ static int AnonymousID = 0;
 typedef enum {
 	CK_UNDEFINED = COMMONK_UNDEFINED,
 	CK_CLASS, CK_DEFINE, CK_ENUMERATOR, CK_FUNCTION,
-	CK_ENUMERATION, CK_LOCAL, CK_MEMBER, CK_NAMESPACE, CK_PROTOTYPE,
+	CK_ENUMERATION, CK_HEADER, CK_LOCAL, CK_MEMBER, CK_NAMESPACE, CK_PROTOTYPE,
 	CK_STRUCT, CK_TYPEDEF, CK_UNION, CK_VARIABLE,
-	CK_EXTERN_VARIABLE, CK_INCLUDE, CK_LABEL
+	CK_EXTERN_VARIABLE, CK_LABEL
 } cKind;
 
 static kindOption CKinds [] = {
@@ -304,6 +304,7 @@ static kindOption CKinds [] = {
 	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)"},
 	{ TRUE,  'f', "function",   "function definitions"},
 	{ TRUE,  'g', "enum",       "enumeration names"},
+	{ FALSE, 'h', "header",     "included header files"},
 	{ FALSE, 'l', "local",      "local variables"},
 	{ TRUE,  'm', "member",     "class, struct, and union members"},
 	{ TRUE,  'n', "namespace",  "namespaces"},
@@ -313,7 +314,6 @@ static kindOption CKinds [] = {
 	{ TRUE,  'u', "union",      "union names"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
 	{ FALSE, 'x', "externvar",  "external and forward variable declarations"},
-	{ FALSE, 'I', "include",    "included file name"},
 	{ FALSE, 'L', "label",      "goto label"},
 };
 
@@ -577,11 +577,6 @@ static void createTags (const unsigned int nestLevel, statementInfo *const paren
 extern boolean includingDefineTags (void)
 {
 	return CKinds [CK_DEFINE].enabled;
-}
-
-extern boolean includingIncludeTags (void)
-{
-	return CKinds [CK_INCLUDE].enabled;
 }
 
 /*
@@ -3140,9 +3135,14 @@ static rescanReason findCTags (const unsigned int passCount)
 {
 	exception_t exception;
 	rescanReason rescan;
+	boolean in_c_family;
 
 	Assert (passCount < 3);
-	cppInit ((boolean) (passCount > 1), isLanguage (Lang_csharp), isLanguage(Lang_vera));
+
+	in_c_family = (isLanguage (Lang_c) || isLanguage (Lang_cpp));
+	cppInit ((boolean) (passCount > 1), isLanguage (Lang_csharp), isLanguage(Lang_vera),
+		 in_c_family? CKinds+CK_HEADER: NULL);
+
 	Signature = vStringNew ();
 
 	exception = (exception_t) setjmp (Exception);
