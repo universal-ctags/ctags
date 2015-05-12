@@ -83,6 +83,11 @@ static vString* stringListToScope (const stringList* list)
 static boolean canMatch (const unsigned char** s, const char* literal)
 {
 	const int literal_length = strlen (literal);
+	const int s_length = strlen ((const char *)*s);
+
+	if (s_length < literal_length)
+		return FALSE;
+
 	const unsigned char next_char = *(*s + literal_length);
 	if (strncmp ((const char*) *s, literal, literal_length) != 0)
 	{
