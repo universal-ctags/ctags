@@ -574,11 +574,6 @@ static void createTags (const unsigned int nestLevel, statementInfo *const paren
 *   FUNCTION DEFINITIONS
 */
 
-extern boolean includingDefineTags (void)
-{
-	return CKinds [CK_DEFINE].enabled;
-}
-
 /*
 *   Token management
 */
@@ -3141,6 +3136,7 @@ static rescanReason findCTags (const unsigned int passCount)
 
 	in_c_family = (isLanguage (Lang_c) || isLanguage (Lang_cpp));
 	cppInit ((boolean) (passCount > 1), isLanguage (Lang_csharp), isLanguage(Lang_vera),
+		 in_c_family? CKinds+CK_DEFINE: NULL,
 		 in_c_family? CKinds+CK_HEADER: NULL);
 
 	Signature = vStringNew ();

@@ -40,6 +40,7 @@ struct sKindOption;
 extern void cppInit (const boolean state,
 		     const boolean hasAtLiteralStrings,
 		     const boolean hasSingleQuoteLiteralNumbers,
+		     const struct sKindOption *defineMacroKind,
 		     const struct sKindOption *headerKind);
 extern void cppTerminate (void);
 extern void cppBeginStatement (void);

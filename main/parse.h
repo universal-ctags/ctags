@@ -114,9 +114,6 @@ typedef void (*regexCallback) (const char *line, const regexMatch *matches, unsi
  */
 extern parserDefinitionFunc PARSER_LIST;
 
-/* Legacy interface */
-extern boolean includingDefineTags (void);
-
 /* Language processing and parsing */
 extern void makeSimpleTag (const vString* const name, kindOption* const kinds, const int kind);
 extern parserDefinition* parserNew (const char* name);
