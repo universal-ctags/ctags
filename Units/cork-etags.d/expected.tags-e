@@ -1,0 +1,5 @@
+
+input.clj,125
+(ns app.controller)app.controller1,0
+ (defn empty-fn [])empty-fn3,21
+(defn function-with-body []function-with-body5,42

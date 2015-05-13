@@ -1,0 +1,3 @@
+app.controller   namespace     1 input.clj (ns app.controller)
+empty-fn         function      3 input.clj (defn empty-fn [])
+function-with-body function      5 input.clj (defn function-with-body []

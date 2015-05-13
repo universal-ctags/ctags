@@ -29,6 +29,7 @@
 
 /*  Maintains the state of the tag file.
  */
+struct sTagEntryInfo;
 typedef struct eTagFile {
 	char *name;
 	char *directory;
@@ -41,6 +42,13 @@ typedef struct eTagFile {
 		size_t byteCount;
 	} etags;
 	vString *vLine;
+
+	unsigned int cork;
+	struct sCorkQueue {
+		struct sTagEntryInfo* queue;
+		unsigned int length;
+		unsigned int count;
+	} corkQueue;
 } tagFile;
 
 typedef struct sTagFields {
@@ -70,7 +78,14 @@ typedef struct sTagEntryInfo {
 		const char* fileScope;
 		const char* implementation;
 		const char* inheritance;
+
 		const char* scope [2];    /* value and key */
+#define SCOPE_NIL 0
+		int         scope_index;  /* cork queue entry for upper scope tag.
+					     This field is meaningful if the value
+					     is not SCOPE_NIL and scope[0]  and scope[1] are
+					     NULL. */
+
 		const char* signature;
 
 		/* type (union/struct/etc.) and name for a variable or typedef. */
@@ -95,7 +110,7 @@ extern void openTagFile (void);
 extern void closeTagFile (const boolean resize);
 extern void beginEtagsFile (void);
 extern void endEtagsFile (const char *const name);
-extern void makeTagEntry (const tagEntryInfo *const tag);
+extern int makeTagEntry (const tagEntryInfo *const tag);
 extern void initTagEntry (tagEntryInfo *const e, const char *const name);
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
@@ -108,6 +123,11 @@ extern void writePseudoTag (const char *const tagName,
 			    const char *const fileName,
 			    const char *const pattern,
 			    const char *const language);
+
+void          corkTagFile(void);
+void          uncorkTagFile(void);
+tagEntryInfo *getEntryInCorkQueue   (unsigned int n);
+size_t        countEntryInCorkQueue (void);
 
 #endif  /* _ENTRY_H */
 

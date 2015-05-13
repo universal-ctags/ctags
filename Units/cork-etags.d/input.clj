@@ -7,6 +7,3 @@
 
 '(defn quoted-function [])
 (quote quoted-function2 [])
-
-(ns another.name)
-(defn x [])

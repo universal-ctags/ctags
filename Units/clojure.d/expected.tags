@@ -1,3 +1,5 @@
+another.name	input.clj	/^(ns another.name)$/;"	n
 app.controller	input.clj	/^(ns app.controller)$/;"	n
 empty-fn	input.clj	/^ (defn empty-fn [])$/;"	f	namespace:app.controller
 function-with-body	input.clj	/^(defn function-with-body []$/;"	f	namespace:app.controller
+x	input.clj	/^(defn x [])$/;"	f	namespace:another.name

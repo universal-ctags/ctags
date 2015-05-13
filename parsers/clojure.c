@@ -26,8 +26,6 @@ static kindOption ClojureKinds[] = {
 	{TRUE, 'n', "namespace", "namespaces"}
 };
 
-static vString *CurrentNamespace;
-
 static int isNamespace (const char *strp)
 {
 	return strncmp (++strp, "ns", 2) == 0 && isspace (strp[2]);
@@ -62,26 +60,25 @@ static void functionName (vString * const name, const char *dbp)
 	vStringTerminate (name);
 }
 
-static void makeNamespaceTag (vString * const name, const char *dbp)
+static int makeNamespaceTag (vString * const name, const char *dbp)
 {
-	vStringClear (CurrentNamespace);
-
 	functionName (name, dbp);
-	vStringCopy (CurrentNamespace, name);
-	if (vStringLength (CurrentNamespace) > 0)
+	if (vStringLength (name) > 0)
 	{
 		tagEntryInfo e;
-		initTagEntry (&e, vStringValue (CurrentNamespace));
+		initTagEntry (&e, vStringValue (name));
 		e.lineNumber = getSourceLineNumber ();
 		e.filePosition = getInputFilePosition ();
 		e.kindName = ClojureKinds[K_NAMESPACE].name;
 		e.kind = (char) ClojureKinds[K_NAMESPACE].letter;
 
-		makeTagEntry (&e);
+		return makeTagEntry (&e);
 	}
+	else
+		return SCOPE_NIL;
 }
 
-static void makeFunctionTag (vString * const name, const char *dbp)
+static void makeFunctionTag (vString * const name, const char *dbp, int scope_index)
 {
 	functionName (name, dbp);
 	if (vStringLength (name) > 0)
@@ -93,12 +90,7 @@ static void makeFunctionTag (vString * const name, const char *dbp)
 		e.kindName = ClojureKinds[K_FUNCTION].name;
 		e.kind = (char) ClojureKinds[K_FUNCTION].letter;
 
-		if (vStringLength (CurrentNamespace) > 0)
-		{
-			e.extensionFields.scope[0] = ClojureKinds[K_NAMESPACE].name;
-			e.extensionFields.scope[1] = vStringValue (CurrentNamespace);
-		}
-
+		e.extensionFields.scope_index =  scope_index;
 		makeTagEntry (&e);
 	}
 }
@@ -115,7 +107,7 @@ static void findClojureTags (void)
 {
 	vString *name = vStringNew ();
 	const char *p;
-	CurrentNamespace = vStringNew ();
+	int scope_index = SCOPE_NIL;
 
 	while ((p = (char *)fileReadLine ()) != NULL)
 	{
@@ -129,17 +121,16 @@ static void findClojureTags (void)
 			if (isNamespace (p))
 			{
 				skipToSymbol (&p);
-				makeNamespaceTag (name, p);
+				scope_index = makeNamespaceTag (name, p);
 			}
 			else if (isFunction (p))
 			{
 				skipToSymbol (&p);
-				makeFunctionTag (name, p);
+				makeFunctionTag (name, p, scope_index);
 			}
 		}
 	}
 	vStringDelete (name);
-	vStringDelete (CurrentNamespace);
 }
 
 extern parserDefinition *ClojureParser (void)
@@ -157,6 +148,7 @@ extern parserDefinition *ClojureParser (void)
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findClojureTags;
+	def->use_cork = TRUE;
 	return def;
 }
 

@@ -43,6 +43,16 @@ have its own directory under Units directory.
 	If this file is not given, the exit status of ctags process
 	is just checked; the output is ignored.
 
+	If you want to test etags output (specified with ``-e`` ),
+	Use **.tags-e** as suffix instead of **.tags**.
+	In such case you don't have write ``-e`` to ``args.ctags``.
+	THe test facility sets ``-e`` automatically.
+
+	If you want to test corss reference output (specified with ``-x`` ),
+	Use **.tags-x** as suffix instead of **.tags**.
+	In such case you don't have write ``-x`` to ``args.ctags``.
+	THe test facility sets ``-x`` automatically.
+
 *Units/TEST/args.ctags* **optional**
 
 	``-o -`` is used as default optional argument when running a

@@ -291,10 +291,22 @@ run_shrink ()
 }
 
 # filters out the directory prefix in a ctags input
-tags_basename_filter_regex='s%\(^[^	]\{1,\}	\)\([^/	]\{1,\}/\)*%\1%'
-tags_basename_filter()
+ctags_basename_filter_regex='s%\(^[^	]\{1,\}	\)\([^/	]\{1,\}/\)*%\1%'
+ctags_basename_filter()
 {
-    sed "${tags_basename_filter_regex}"
+    sed "${ctags_basename_filter_regex}"
+}
+
+etags_basename_filter_regex='s%.*\/\([[:print:]]\{1,\}\),\([0-9]\{1,\}$\)%\1,\2%'
+etags_basename_filter()
+{
+    sed "${etags_basename_filter_regex}"
+}
+
+xref_basename_filter_regex='s%\(.*[[:digit:]]\{1,\} \)\([^ ]\{1,\}.\{1,\}\)/\([^ ].\{1,\}.\{1,\}$\)%\1\3%'
+xref_basename_filter()
+{
+    sed "${xref_basename_filter_regex}"
 }
 
 run_record_cmdline ()
@@ -323,7 +335,32 @@ run_tcase ()
     local ffeatures="$t/features"
     local flanguages="$t/languages"
     local ffilter="$t/filter"
+
+    #
+    # tags-e if for etags output(-e). TAGS is good
+    # suffix but foo.tags and foo.TAGS may be the same on Windows.
+    # tags-x is for corss reference output(-x).
+    #
+    # fexpected must be set even if none of
+    # expected.{tags,tags-e,xref} exits.
+    #
     local fexpected="$t/expected.tags"
+    local output_type=ctags
+    local output_label=
+    local output_tflag=
+    if [ -f "$t/expected.tags" ]; then
+	:
+    elif [ -f "$t/expected.tags-e" ]; then
+	fexpected=$t/expected.tags-e
+	output_type=etags
+	output_label=/${output_type}
+	output_tflag=-e
+    elif [ -f "$t/expected.tags-x" ]; then
+	fexpected=$t/expected.tags-x
+	output_type=xref
+	output_label=/${output_type}
+	output_tflag=-x
+    fi
 
     [ -x "$ffilter" ] || ffilter=cat
 
@@ -372,7 +409,7 @@ run_tcase ()
 
     clean_tcase "${t}"
 
-    printf '%-60s' "Testing ${name} as ${guessed_lang}"
+    printf '%-60s' "Testing ${name} as ${guessed_lang}${output_label}"
 
     if [ -f "${ffeatures}" ] && ! tmp=$(check_features "${ffeatures}"); then
 	L_SKIPPED_BY_FEATURES="$L_SKIPPED_BY_FEATURES ${category}/${name}"
@@ -389,7 +426,7 @@ run_tcase ()
     fi
 
     cmdline_template="${_CMDLINE} --language-force=${guessed_lang} %s > /dev/null 2>&1"
-    _CMDLINE="${_CMDLINE} ${input}"
+    _CMDLINE="${_CMDLINE} ${output_tflag} ${input}"
 
     timeout_value=$WITH_TIMEOUT
     if [ "$WITH_VALGRIND" = yes ]; then
@@ -452,7 +489,7 @@ run_tcase ()
 	return 0
     fi
 
-    tags_basename_filter < "${orawout}" | "$ffilter" > "${ofiltered}"
+    ${output_type}_basename_filter < "${orawout}" | "$ffilter" > "${ofiltered}"
 
     {
 	diff -U 0 -I '^!_TAG' --strip-trailing-cr "${fexpected}" "${ofiltered}" > "${odiff}"
