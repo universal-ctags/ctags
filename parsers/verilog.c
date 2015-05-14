@@ -924,7 +924,6 @@ static void tagNameList (tokenInfo* token, int c)
 	}
 	c = skipWhite (c);
 
-	Assert (isIdentifierCharacter (c));
 	do
 	{ 
 		repeat = FALSE;
