@@ -394,7 +394,7 @@ typedef enum {
 	VK_CLASS, VK_DEFINE, VK_ENUMERATOR, VK_FUNCTION,
 	VK_ENUMERATION, VK_LOCAL, VK_MEMBER, VK_PROGRAM, VK_PROTOTYPE,
 	VK_TASK, VK_TYPEDEF, VK_VARIABLE,
-	VK_EXTERN_VARIABLE
+	VK_EXTERN_VARIABLE, VK_HEADER
 } veraKind;
 
 static kindOption VeraKinds [] = {
@@ -410,7 +410,9 @@ static kindOption VeraKinds [] = {
 	{ TRUE,  't', "task",       "tasks"},
 	{ TRUE,  'T', "typedef",    "typedefs"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
-	{ FALSE, 'x', "externvar",  "external variable declarations"}
+	{ FALSE, 'x', "externvar",  "external variable declarations"},
+	{ FALSE, 'h', "system header",   "included system header file name"},
+	{ FALSE, 'H', "local header",    "included local header file name"}
 };
 
 static const keywordDesc KeywordTable [] = {
@@ -3130,14 +3132,25 @@ static rescanReason findCTags (const unsigned int passCount)
 {
 	exception_t exception;
 	rescanReason rescan;
-	boolean in_c_family;
+	kindOption *kind_for_define = NULL;
+	kindOption *kind_for_header = NULL;
 
 	Assert (passCount < 3);
 
-	in_c_family = (isLanguage (Lang_c) || isLanguage (Lang_cpp));
+	if (isLanguage (Lang_c) || isLanguage (Lang_cpp))
+	{
+		kind_for_define = CKinds+CK_DEFINE;
+		kind_for_header = CKinds+CK_HEADER;
+	}
+	else if (isLanguage (Lang_vera))
+	{
+		kind_for_define = VeraKinds+VK_DEFINE;
+		kind_for_header = VeraKinds+VK_HEADER;
+	}
+
 	cppInit ((boolean) (passCount > 1), isLanguage (Lang_csharp), isLanguage(Lang_vera),
-		 in_c_family? CKinds+CK_DEFINE: NULL,
-		 in_c_family? CKinds+CK_HEADER: NULL);
+		 kind_for_define,
+		 kind_for_header);
 
 	Signature = vStringNew ();
 
