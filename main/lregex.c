@@ -698,7 +698,15 @@ static regexPattern *addTagRegexInternal (
 			char kind;
 			char* kindName;
 			char* description;
+
 			parseKinds (kinds, &kind, &kindName, &description);
+			if (kind == KIND_FILE_DEFAULT)
+				error (FATAL,
+				       "Kind letter \'%c\' used in regex definition \"%s\" of %s language is reserved in ctags main",
+				       kind,
+				       regex,
+				       getLanguageName (language));
+
 			rptr = addCompiledTagPattern (language, cp, name,
 						      kind, kindName, description, flags);
 			if (kindName)
