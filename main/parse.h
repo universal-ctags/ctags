@@ -45,6 +45,16 @@ typedef rescanReason (*rescanParserWithExceptionAndTrash) (const unsigned int pa
 typedef void (*parserInitialize) (langType language);
 typedef void (*parserFinalize) (langType language);
 
+/*
+ * Predefined kinds
+ */
+#define KIND_REGEX_DEFAULT 'r'
+#define KIND_REGEX_DEFAULT_LONG "regex"
+/* We treat ' ' as a ghost kind.
+   It will never be listed up in --list-kinds. */
+#define KIND_GHOST   ' '
+#define KIND_GHOST_LONG "ghost"
+
 typedef struct sKindOption {
 	boolean enabled;          /* are tags for kind enabled? */
 	int letter;               /* kind letter */

@@ -35,14 +35,6 @@
 #include "read.h"
 #include "routines.h"
 
-
-#define KIND_REGEX_DEFAULT 'r'
-#define KIND_REGEX_DEFAULT_LONG "regex"
-/* We treat ' ' as a ghost kind.
-   It will never be listed up in --list-kinds. */
-#define KIND_GHOST   ' '
-#define KIND_GHOST_LONG "ghost"
-
 static boolean regexAvailable = FALSE;
 
 #if defined (HAVE_REGEX) && !defined (REGCOMP_BROKEN)
