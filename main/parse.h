@@ -55,6 +55,9 @@ typedef void (*parserFinalize) (langType language);
 #define KIND_GHOST   ' '
 #define KIND_GHOST_LONG "ghost"
 
+#define KIND_FILE_DEFAULT 'F'
+#define KIND_FILE_DEFAULT_LONG "file"
+
 typedef struct sKindOption {
 	boolean enabled;          /* are tags for kind enabled? */
 	int letter;               /* kind letter */
