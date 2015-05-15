@@ -1019,7 +1019,7 @@ shrink_main ()
     fi
 
     if ! shrink_test "${cmdline}" "${input}" 0 0 "${output}"; then
-	printf "the target command line exits normally against the empty input\n" 1>&2
+	printf "the target command line exits abnormally against the empty input\n" 1>&2
 	return 1
     fi
 
