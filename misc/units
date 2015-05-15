@@ -23,6 +23,7 @@
 #
 CTAGS=./ctags
 DATADIR=./data
+LIBEXECDIR=./libexec
 WITH_TIMEOUT=
 WITH_VALGRIND=
 COLORIZED_OUTPUT=yes
@@ -394,7 +395,7 @@ run_tcase ()
     #
     # Build _CMDLINE
     #
-    _CMDLINE="${CTAGS} --verbose --options=NONE --libexec-dir=libexec --libexec-dir=+$t --data-dir=${DATADIR} --data-dir=+$t -o -"
+    _CMDLINE="${CTAGS} --verbose --options=NONE --libexec-dir=${LIBEXECDIR} --libexec-dir=+$t --data-dir=${DATADIR} --data-dir=+$t -o -"
     [ -f "${fargs}" ] && _CMDLINE="${_CMDLINE} --options=${fargs}"
 
     #
@@ -677,6 +678,15 @@ action_run ()
 		DATADIR="${1#--datadir=}"
 		shift
 		;;
+	    --libexecdir)
+		shift
+		LIBEXECDIR="$1"
+		shift
+		;;
+	    --libexecdir=*)
+		LIBEXECDIR="${1#--libexecdir=}"
+		shift
+		;;
 	    --categories)
 		shift
 		CATEGORIES=$(echo "$1" | tr ',' ' ')
@@ -766,6 +776,7 @@ action_run ()
     fi
 
     [ -d "${DATADIR}" ] || ERROR 1 "no such directory: ${DATADIR}"
+    [ -d "${LIBEXECDIR}" ] || ERROR 1 "no such directory: ${LIBEXECDIR}"
     : ${WITH_TIMEOUT:=0}
     [ "$WITH_TIMEOUT" = 0 ] || check_availability timeout
     [ "WITH_VALGRIND" = 'yes' ]  && check_availability valgrind
@@ -1244,6 +1255,15 @@ action_fuzz_common ()
 		LANGUAGES=$(echo "${1#--languages=}" | tr ',' ' ')
 		shift
 		;;
+	    --libexecdir)
+		shift
+		LIBEXECDIR="$1"
+		shift
+		;;
+	    --libexecdir=*)
+		LIBEXECDIR="${1#--libexecdir=}"
+		shift
+		;;
 	    --quiet)
 		QUIET=yes
 		shift
@@ -1306,12 +1326,13 @@ action_fuzz_common ()
     fi
 
     [ -d "${DATADIR}" ] || ERROR 1 "no such directory: ${DATADIR}"
+    [ -d "${LIBEXECIDR}" ] || ERROR 1 "no such directory: ${LIBEXECDIR}"
     : ${WITH_TIMEOUT:=2}
     [ "$WITH_TIMEOUT" = 0 ] || check_availability timeout
     [ "WITH_VALGRIND" = 'yes' ]  && check_availability valgrind
     check_availability find
 
-    cmdline="${CTAGS} --options=NONE --\*-kinds=\* --fields=\* --libexec-dir=libexec --data-dir=${DATADIR}"
+    cmdline="${CTAGS} --options=NONE --\*-kinds=\* --fields=\* --libexec-dir=${LIBEXECDIR} --data-dir=${DATADIR}"
     _CMDLINE="${cmdline} -G -o - "
     _CMDLINE_FOR_SHRINKING="${_CMDLINE}"
     if [ "$WITH_VALGRIND" = yes ]; then
@@ -1346,6 +1367,7 @@ $0 fuzz [OPTIONS] UNITS-DIR
 		--ctags CTAGS: ctags exectuable file for testing
 		--datadir DATADIR: data directory
 		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
+		--libexecdir LIBEXECDIR: libexec directory
 		--quiet: don't print dots as passed test cases.
 		--with-timeout DURATION: run a test case under timeout
 					 command with SECOND.
@@ -1574,6 +1596,7 @@ $0 noise [OPTIONS] UNITS-DIR
 		--ctags CTAGS: ctags exectuable file for testing
 		--datadir DATADIR: data directory
 		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
+		--libexecdir LIBEXECDIR: libexec directory
 		--quiet: don't print dots as passed test cases.
 		--with-timeout DURATION: run a test case under timeout
 					 command with SECOND.
