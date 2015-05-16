@@ -21,6 +21,7 @@
 #
 # Global Parameters
 #
+SHELL=${SHELL:-/bin/bash}
 CTAGS=./ctags
 DATADIR=./data
 LIBEXECDIR=./libexec
@@ -82,6 +83,8 @@ Usage:
 	$(help_shrink)
 
 	$(help_noise)
+
+	$(help_tmain)
 EOF
 }
 
@@ -1608,6 +1611,191 @@ $0 noise [OPTIONS] UNITS-DIR
 EOF
 }
 
+
+tmain_compare()
+{
+    local subdir=$1
+    local aspect=$2
+    local generated
+
+    printf '%-60s' "${aspect}"
+    generated=${subdir}/${aspect}-diff.txt
+    if diff ${subdir}/${aspect}-actual.txt ${subdir}/${aspect}-expected.txt > ${generated} 2>&1; then
+	run_result ok '/dev/null'
+	rm ${generated}
+	return 0
+    else
+	run_result error '/dev/null' "diff: ${generated}"
+	return 1
+    fi
+}
+
+tmain_run ()
+{
+    local topdir=$1
+    local subdir
+    local basedir
+
+    local test_name
+    local failed
+    local f
+
+    local aspect
+    local engine
+
+    local status=0
+
+    basedir=$(pwd)
+    for subdir in ${topdir}/*.d; do
+	if [ "${subdir}" = ${topdir}/'*.d' ]; then
+	    return 1
+	fi
+
+	test_name=$(basename ${subdir} .d)
+
+	echo "Testing ${test_name}"
+	line '-'
+	(
+	    cd ${subdir}
+	    ${SHELL} run.sh ${basedir}/${CTAGS} ${basedir}/${DATADIR} ${basedir}/${LIBEXECDIR}
+	) > ${subdir}/stdout-actual.txt 2> ${subdir}/stderr-actual.txt
+	echo $? > ${subdir}/exit-actual.txt
+
+	for aspect in stdout stderr exit; do
+	    if [ -f ${subdir}/${aspect}-expected.txt ]; then
+		engine=compare
+		if tmain_${engine} ${subdir} ${aspect}; then
+		    rm ${subdir}/${aspect}-actual.txt
+		else
+		    failed="${failed} ${test_name}/${aspect}-${engine}"
+		    status=1
+		fi
+	    else
+		rm ${subdir}/${aspect}-actual.txt
+	    fi
+	done
+	echo
+    done
+
+    if [ -n "${failed}" ]; then
+	echo
+	echo Failed tests
+	line '='
+	for f in ${failed}; do
+	    echo $f
+	done
+	echo
+    fi
+
+    return $status
+}
+
+action_tmain ()
+{
+    local action="$1"
+    shift
+    local tmain_dir
+
+    while [ $# -gt 0 ]; do
+	case $1 in
+	    --ctags)
+		shift
+		CTAGS="$1"
+		shift
+		;;
+	    --ctags=*)
+		CTAGS="${1#--ctags=}"
+		shift
+		;;
+	    --datadir)
+		shift
+		DATADIR="$1"
+		shift
+		;;
+	    --datadir=*)
+		DATADIR="${1#--datadir=}"
+		shift
+		;;
+	    --libexecdir)
+		shift
+		LIBEXECDIR="$1"
+		shift
+		;;
+	    --libexecdir=*)
+		LIBEXECDIR="${1#--libexecdir=}"
+		shift
+		;;
+	    --colorized-output)
+		shift
+		COLORIZED_OUTPUT="$1"
+		shift
+		;;
+	    --colorized-output=*)
+		COLORIZED_OUTPUT="${1#--colorized-output=}"
+		shift
+		;;
+	    --with-valgrind)
+		shift
+		WITH_VALGRIND=yes
+		;;
+	    --show-diff-output)
+		SHOW_DIFF_OUTPUT=yes
+		shift
+		;;
+	    -*)
+		ERROR 1 "unknown option \"${1}\" for ${action} action"
+		;;
+	    *)
+		tmain_dir="$1"
+		shift
+		break
+		;;
+	esac
+    done
+
+    if [ $# -gt 0 ]; then
+	ERROR 1 "too many arguments for ${action} action: $*"
+    elif [ -z "$tmain_dir" ]; then
+	ERROR 1 "TMAIN_DIR parameter is not given in ${action} action"
+    fi
+
+    if ! [ -d "$tmain_dir" ]; then
+	ERROR 1 "No such directory: ${tmain_dir}"
+    fi
+
+    if ! [ -f "${CTAGS}" ]; then
+	ERROR 1 "no such file: ${CTAGS}"
+    elif ! [ -e "${CTAGS}" ]; then
+	ERROR 1 "${CTAGS} is not an executable file"
+    fi
+
+    if ! ( [ "${COLORIZED_OUTPUT}" = 'yes' ] || [ "${COLORIZED_OUTPUT}" = 'no' ] ); then
+	ERROR 1 "unexpected option argument for --colorized-output: ${COLORIZED_OUTPUT}"
+    fi
+
+    [ -d "${DATADIR}" ] || ERROR 1 "no such directory: ${DATADIR}"
+    [ -d "${LIBEXECDIR}" ] || ERROR 1 "no such directory: ${LIBEXECDIR}"
+
+    tmain_run ${tmain_dir}
+    return $?
+}
+
+help_tmain ()
+{
+    cat <<EOF
+$0 tmain [OPTIONS] TMAIN-DIR
+
+	Run tests for main part of ctags.
+
+	--ctags CTAGS: ctags exectuable file for testing
+	--datadir DATADIR: data directory
+	--libexecdir LIBEXECDIR: libexec directory
+	--colorized-output yes|no: print the result in color.
+	--with-valgrind: (not implemented) run a test case under valgrind
+	--show-diff-output: (not implemented)show diff output for failed test cases in the summary.
+EOF
+}
+
 # Avoid issues between sed and the locale settings by overriding it using
 # LC_ALL, which takes precedence over all other locale configurations:
 # https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
@@ -1642,6 +1830,10 @@ main ()
 	    ;;
 	noise)
 	    action_noise "$@"
+	    return $?
+	    ;;
+	tmain)
+	    action_tmain "$@"
 	    return $?
 	    ;;
 	shrink)
