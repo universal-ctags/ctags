@@ -1326,7 +1326,7 @@ action_fuzz_common ()
     fi
 
     [ -d "${DATADIR}" ] || ERROR 1 "no such directory: ${DATADIR}"
-    [ -d "${LIBEXECIDR}" ] || ERROR 1 "no such directory: ${LIBEXECDIR}"
+    [ -d "${LIBEXECDR}" ] || ERROR 1 "no such directory: ${LIBEXECDIR}"
     : ${WITH_TIMEOUT:=2}
     [ "$WITH_TIMEOUT" = 0 ] || check_availability timeout
     [ "WITH_VALGRIND" = 'yes' ]  && check_availability valgrind
