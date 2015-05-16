@@ -1323,7 +1323,8 @@ static void parseEntityDecl (tokenInfo *const token)
 			readToken (token);
 			skipPast (token, TOKEN_OPERATOR);
 		}
-		else if (strcmp (vStringValue (token->string), "=") == 0)
+		else if (strcmp (vStringValue (token->string), "=") == 0
+				 || strcmp (vStringValue (token->string), "=>") == 0)
 		{
 			while (! isType (token, TOKEN_COMMA) &&
 					! isType (token, TOKEN_STATEMENT_END))
