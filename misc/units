@@ -750,7 +750,7 @@ action_run ()
 	    *)
 		units_dir="$1"
 		shift
-		break;
+		break
 		;;
 	esac
     done
