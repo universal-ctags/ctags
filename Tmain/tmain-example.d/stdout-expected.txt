@@ -1,0 +1,6 @@
+c  classes
+f  methods
+m  modules
+F  singleton methods
+d  describes
+C  contexts
