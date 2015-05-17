@@ -7,6 +7,7 @@ test.*.diff
 *.obj
 *.TMP
 *.tmp
+*.mod
 ctags.exe
 ctags.1
 ctags.ref.exe
@@ -24,6 +25,9 @@ dctags
 readtags.exe
 tags
 TAGS
+GPATH
+GRTAGS
+GTAGS
 autom4te.cache
 configure
 tg

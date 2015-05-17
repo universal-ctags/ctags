@@ -101,15 +101,18 @@ typedef enum eKeywordId {
 	KEYWORD_map,
 	KEYWORD_module,
 	KEYWORD_namelist,
+	KEYWORD_nopass,
 	KEYWORD_operator,
 	KEYWORD_optional,
 	KEYWORD_parameter,
 	KEYWORD_pascal,
+	KEYWORD_pass,
 	KEYWORD_pexternal,
 	KEYWORD_pglobal,
 	KEYWORD_pointer,
 	KEYWORD_precision,
 	KEYWORD_private,
+	KEYWORD_procedure,
 	KEYWORD_program,
 	KEYWORD_public,
 	KEYWORD_pure,
@@ -264,15 +267,18 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "map",            KEYWORD_map          },
 	{ "module",         KEYWORD_module       },
 	{ "namelist",       KEYWORD_namelist     },
+	{ "nopass",         KEYWORD_nopass       },
 	{ "operator",       KEYWORD_operator     },
 	{ "optional",       KEYWORD_optional     },
 	{ "parameter",      KEYWORD_parameter    },
 	{ "pascal",         KEYWORD_pascal       },
+	{ "pass",           KEYWORD_pass         },
 	{ "pexternal",      KEYWORD_pexternal    },
 	{ "pglobal",        KEYWORD_pglobal      },
 	{ "pointer",        KEYWORD_pointer      },
 	{ "precision",      KEYWORD_precision    },
 	{ "private",        KEYWORD_private      },
+	{ "procedure",      KEYWORD_procedure    },
 	{ "program",        KEYWORD_program      },
 	{ "public",         KEYWORD_public       },
 	{ "pure",           KEYWORD_pure         },
@@ -1109,6 +1115,7 @@ static boolean isTypeSpec (tokenInfo *const token)
 		case KEYWORD_logical:
 		case KEYWORD_record:
 		case KEYWORD_type:
+		case KEYWORD_procedure:
 			result = TRUE;
 			break;
 		default:
@@ -1144,6 +1151,7 @@ static boolean isSubprogramPrefix (tokenInfo *const token)
  *      or CHARACTER [kind-selector]
  *      or LOGICAL [kind-selector]
  *      or TYPE ( type-name )
+ *      or PROCEDURE [(interface-name)] [[,binding-attr-list ]::] binding-name[=> procedure-name]
  *
  *  Note that INTEGER and REAL may be followed by "*N" where "N" is an integer
  */
@@ -1171,6 +1179,7 @@ static void parseTypeSpec (tokenInfo *const token)
 		case KEYWORD_integer:
 		case KEYWORD_logical:
 		case KEYWORD_real:
+		case KEYWORD_procedure:
 			readToken (token);
 			if (isType (token, TOKEN_PAREN_OPEN))
 				skipOverParens (token);  /* skip kind-selector */
@@ -1266,6 +1275,8 @@ static void parseQualifierSpecList (tokenInfo *const token)
 			case KEYWORD_public:
 			case KEYWORD_save:
 			case KEYWORD_target:
+			case KEYWORD_pass:
+			case KEYWORD_nopass:	
 				readToken (token);
 				break;
 
