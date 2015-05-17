@@ -255,6 +255,7 @@ typedef enum eTagType {
 	TAG_VARIABLE,    /* variable definition */
 	TAG_EXTERN_VAR,  /* external variable declaration */
 	TAG_VERSION, 	 /* conditional template compilation */
+	TAG_LABEL,	 /* goto label */
 	TAG_COUNT        /* must be last */
 } tagType;
 
@@ -294,7 +295,7 @@ typedef enum {
 	CK_CLASS, CK_DEFINE, CK_ENUMERATOR, CK_FUNCTION,
 	CK_ENUMERATION, CK_LOCAL, CK_MEMBER, CK_NAMESPACE, CK_PROTOTYPE,
 	CK_STRUCT, CK_TYPEDEF, CK_UNION, CK_VARIABLE,
-	CK_EXTERN_VARIABLE, CK_INCLUDE
+	CK_EXTERN_VARIABLE, CK_INCLUDE, CK_LABEL
 } cKind;
 
 static kindOption CKinds [] = {
@@ -313,6 +314,7 @@ static kindOption CKinds [] = {
 	{ TRUE,  'v', "variable",   "variable definitions"},
 	{ FALSE, 'x', "externvar",  "external and forward variable declarations"},
 	{ FALSE, 'I', "include",    "included file name"},
+	{ FALSE, 'L', "label",      "goto label"},
 };
 
 typedef enum {
@@ -938,6 +940,7 @@ static cKind cTagKindFull (const tagType type, const boolean with_assert)
 		case TAG_UNION:      result = CK_UNION;       break;
 		case TAG_VARIABLE:   result = CK_VARIABLE;    break;
 		case TAG_EXTERN_VAR: result = CK_EXTERN_VARIABLE; break;
+		case TAG_LABEL:      result = CK_LABEL; break;
 
 		default: if (with_assert) Assert ("Bad C tag type" == NULL); break;
 	}
@@ -2709,9 +2712,13 @@ static void processColon (statementInfo *const st)
 			const tokenInfo *const prev  = prevToken (st, 1);
 			const tokenInfo *const prev2 = prevToken (st, 2);
 			if (prev->keyword == KEYWORD_DEFAULT ||
-				prev2->keyword == KEYWORD_CASE ||
-				st->parent != NULL)
+				prev2->keyword == KEYWORD_CASE)
 			{
+				reinitStatement (st, FALSE);
+			}
+			else if (st->parent != NULL)
+			{
+				makeTag (prev, st, FALSE, TAG_LABEL);
 				reinitStatement (st, FALSE);
 			}
 		}
@@ -2976,7 +2983,7 @@ static void nest (statementInfo *const st, const unsigned int nestLevel)
 			st->inFunction = TRUE;
 			/* fall through */
 		default:
-			if (includeTag (TAG_LOCAL, FALSE))
+			if (includeTag (TAG_LOCAL, FALSE) || includeTag (TAG_LABEL, FALSE))
 				createTags (nestLevel, st);
 			else
 				skipToMatch ("{}");
