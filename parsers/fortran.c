@@ -342,7 +342,7 @@ static void parseUnionStmt (tokenInfo *const token);
 static void parseDerivedTypeDef (tokenInfo *const token);
 static void parseFunctionSubprogram (tokenInfo *const token);
 static void parseSubroutineSubprogram (tokenInfo *const token);
-static void parseGenericDeclaration (tokenInfo *const token);
+static tagType variableTagType (void);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -1219,7 +1219,12 @@ static void parseTypeSpec (tokenInfo *const token)
 
 		case KEYWORD_generic:
 			readToken (token);
-			parseGenericDeclaration(token);
+			if (isType (token, TOKEN_DOUBLE_COLON))
+				readToken (token);
+			makeFortranTag (newTokenFrom(token), variableTagType());
+			/* skip to => token */
+			skipToToken (token, TOKEN_OPERATOR);
+			break;
 			
 		case KEYWORD_byte:
 		case KEYWORD_complex:
@@ -1442,20 +1447,6 @@ static void parseEntityDeclList (tokenInfo *const token)
 			break;
 		}
 	}
-}
-
-/* generic type bound procedures:
- *   type [[, attr-spec] ... ::] type_name
- *   contains
- *     generic [::] sub => sub1, sub2, ...
- *   end type type_name
- */
-static void parseGenericDeclaration (tokenInfo *const token)
-{
-	if (isType (token, TOKEN_DOUBLE_COLON))
-		readToken (token);
-	makeFortranTag (token, variableTagType());
-	skipToNextStatement (token);
 }
 
 /*  type-declaration-stmt is

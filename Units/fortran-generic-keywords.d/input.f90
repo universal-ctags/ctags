@@ -26,7 +26,8 @@ module abstract_list_mod
     procedure, non_overridable :: next        !iterate to next value in list
     procedure, non_overridable :: currentValue! get current value in list
     procedure, non_overridable :: moreValues  ! more values to iterate?
-    generic :: add => addValue, addValues
+    generic :: add => addValue, addValues, &
+      addValues_2d
     procedure(printValues), deferred :: printList  ! print contents of list
   end type list
   abstract interface

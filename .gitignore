@@ -10,6 +10,7 @@ test.*.diff
 *.mod
 *.swp
 *.stackdump
+*.bak
 ctags.exe
 ctags.1
 ctags.ref.exe
