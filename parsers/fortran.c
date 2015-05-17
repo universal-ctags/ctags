@@ -77,6 +77,7 @@ typedef enum eKeywordId {
 	KEYWORD_cglobal,
 	KEYWORD_character,
 	KEYWORD_class,
+	KEYWORD_codimension,
 	KEYWORD_common,
 	KEYWORD_complex,
 	KEYWORD_contains,
@@ -168,6 +169,8 @@ typedef enum eTokenType {
 	TOKEN_PAREN_CLOSE,
 	TOKEN_PAREN_OPEN,
 	TOKEN_PERCENT,
+	TOKEN_SQUARE_OPEN,
+	TOKEN_SQUARE_CLOSE,
 	TOKEN_STATEMENT_END,
 	TOKEN_STRING
 } tokenType;
@@ -253,6 +256,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "cglobal",         KEYWORD_cglobal         },
 	{ "character",       KEYWORD_character       },
 	{ "class",           KEYWORD_class           },
+	{ "codimension",     KEYWORD_codimension     },
 	{ "common",          KEYWORD_common          },
 	{ "complex",         KEYWORD_complex         },
 	{ "contains",        KEYWORD_contains        },
@@ -970,10 +974,12 @@ getNextChar:
 		case EOF:  longjmp (Exception, (int) ExceptionEOF);  break;
 		case ' ':  goto getNextChar;
 		case '\t': goto getNextChar;
-		case ',':  token->type = TOKEN_COMMA;       break;
-		case '(':  token->type = TOKEN_PAREN_OPEN;  break;
-		case ')':  token->type = TOKEN_PAREN_CLOSE; break;
-		case '%':  token->type = TOKEN_PERCENT;     break;
+		case ',':  token->type = TOKEN_COMMA;        break;
+		case '(':  token->type = TOKEN_PAREN_OPEN;   break;
+		case ')':  token->type = TOKEN_PAREN_CLOSE;  break;
+		case '[':  token->type = TOKEN_SQUARE_OPEN;  break;
+		case ']':  token->type = TOKEN_SQUARE_CLOSE; break;
+		case '%':  token->type = TOKEN_PERCENT;      break;
 
 		case '*':
 		case '/':
@@ -1117,6 +1123,20 @@ static void skipOverParens (tokenInfo *const token)
 		else if (isType (token, TOKEN_PAREN_OPEN))
 			++level;
 		else if (isType (token, TOKEN_PAREN_CLOSE))
+			--level;
+		readToken (token);
+	} while (level > 0);
+}
+
+static void skipOverSquares (tokenInfo *const token)
+{
+	int level = 0;
+	do {
+		if (isType (token, TOKEN_STATEMENT_END))
+			break;
+		else if (isType (token, TOKEN_SQUARE_OPEN))
+			++level;
+		else if (isType (token, TOKEN_SQUARE_CLOSE))
 			--level;
 		readToken (token);
 	} while (level > 0);
@@ -1315,6 +1335,12 @@ static void parseQualifierSpecList (tokenInfo *const token)
 				readToken (token);
 				break;
 
+			case KEYWORD_codimension:
+				readToken (token);
+				Assert (isType (token, TOKEN_SQUARE_OPEN));
+				skipOverSquares (token);
+				break;
+
 			case KEYWORD_bind:
 			case KEYWORD_extends:
 				readToken (token);
@@ -1360,6 +1386,8 @@ static void parseEntityDecl (tokenInfo *const token)
 	readToken (token);
 	if (isType (token, TOKEN_PAREN_OPEN))
 		skipOverParens (token);
+	if (isType (token, TOKEN_SQUARE_OPEN))
+		skipOverSquares (token);
 	if (isType (token, TOKEN_OPERATOR) &&
 			strcmp (vStringValue (token->string), "*") == 0)
 	{
@@ -1385,6 +1413,8 @@ static void parseEntityDecl (tokenInfo *const token)
 				readToken (token);
 				if (isType (token, TOKEN_PAREN_OPEN))
 					skipOverParens (token);
+				if (isType (token, TOKEN_SQUARE_OPEN))
+					skipOverSquares (token);
 			}
 		}
 	}
