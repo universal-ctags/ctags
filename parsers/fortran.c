@@ -89,6 +89,7 @@ typedef enum eKeywordId {
 	KEYWORD_entry,
 	KEYWORD_equivalence,
 	KEYWORD_external,
+	KEYWORD_final,
 	KEYWORD_format,
 	KEYWORD_function,
 	KEYWORD_generic,
@@ -259,6 +260,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "entry",           KEYWORD_entry           },
 	{ "equivalence",     KEYWORD_equivalence     },
 	{ "external",        KEYWORD_external        },
+	{ "final",           KEYWORD_final           },
 	{ "format",          KEYWORD_format          },
 	{ "function",        KEYWORD_function        },
 	{ "generic",         KEYWORD_generic         },
@@ -1127,6 +1129,7 @@ static boolean isTypeSpec (tokenInfo *const token)
 		case KEYWORD_procedure:
 		case KEYWORD_generic:
 		case KEYWORD_class:
+		case KEYWORD_final:
 			result = TRUE;
 			break;
 		default:
@@ -1195,6 +1198,7 @@ static void parseTypeSpec (tokenInfo *const token)
 		case KEYWORD_real:
 		case KEYWORD_procedure:
 		case KEYWORD_class:
+		case KEYWORD_final:
 			readToken (token);
 			if (isType (token, TOKEN_PAREN_OPEN))
 				skipOverParens (token);  /* skip kind-selector */
