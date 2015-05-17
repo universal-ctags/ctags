@@ -8,6 +8,8 @@ test.*.diff
 *.TMP
 *.tmp
 *.mod
+*.swp
+*.stackdump
 ctags.exe
 ctags.1
 ctags.ref.exe
