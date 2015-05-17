@@ -1,0 +1,9 @@
+
+input.f90,199
+module test_bindtest_bind1,0
+  type, extends(type_b) :: type_ctype_c2,17
+    ini3,51
+  type, bind(c) :: type_dtype_d5,90
+    ini6,116
+  type, abstract :: type_etype_e8,155
+    ini9,182

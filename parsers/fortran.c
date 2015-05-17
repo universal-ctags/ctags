@@ -65,10 +65,12 @@ typedef enum eFortranLineType {
  */
 typedef enum eKeywordId {
 	KEYWORD_NONE = -1,
+	KEYWORD_abstract,
 	KEYWORD_allocatable,
 	KEYWORD_assignment,
 	KEYWORD_associate,
 	KEYWORD_automatic,
+	KEYWORD_bind,
 	KEYWORD_block,
 	KEYWORD_byte,
 	KEYWORD_cexternal,
@@ -89,6 +91,7 @@ typedef enum eKeywordId {
 	KEYWORD_end,
 	KEYWORD_entry,
 	KEYWORD_equivalence,
+	KEYWORD_extends,
 	KEYWORD_external,
 	KEYWORD_final,
 	KEYWORD_forall,
@@ -238,10 +241,12 @@ static kindOption FortranKinds [] = {
 
 static const keywordDesc FortranKeywordTable [] = {
 	/* keyword          keyword ID */
+	{ "abstract",        KEYWORD_abstract        },
 	{ "allocatable",     KEYWORD_allocatable     },
 	{ "assignment",      KEYWORD_assignment      },
 	{ "associate",       KEYWORD_associate       },
 	{ "automatic",       KEYWORD_automatic       },
+	{ "bind",            KEYWORD_bind            },
 	{ "block",           KEYWORD_block           },
 	{ "byte",            KEYWORD_byte            },
 	{ "cexternal",       KEYWORD_cexternal       },
@@ -262,6 +267,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "end",             KEYWORD_end             },
 	{ "entry",           KEYWORD_entry           },
 	{ "equivalence",     KEYWORD_equivalence     },
+	{ "extends",         KEYWORD_extends         },
 	{ "external",        KEYWORD_external        },
 	{ "final",           KEYWORD_final           },
 	{ "forall",          KEYWORD_forall          },
@@ -1305,7 +1311,15 @@ static void parseQualifierSpecList (tokenInfo *const token)
 			case KEYWORD_nopass:	
 			case KEYWORD_deferred:
 			case KEYWORD_non_overridable:
+			case KEYWORD_abstract:
 				readToken (token);
+				break;
+
+			case KEYWORD_bind:
+			case KEYWORD_extends:
+				readToken (token);
+				Assert(isType (token, TOKEN_PAREN_OPEN));
+				skipOverParens (token);
 				break;
 
 			case KEYWORD_dimension:
