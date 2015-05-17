@@ -73,10 +73,12 @@ typedef enum eKeywordId {
 	KEYWORD_cexternal,
 	KEYWORD_cglobal,
 	KEYWORD_character,
+	KEYWORD_class,
 	KEYWORD_common,
 	KEYWORD_complex,
 	KEYWORD_contains,
 	KEYWORD_data,
+	KEYWORD_deferred,
 	KEYWORD_dimension,
 	KEYWORD_dllexport,
 	KEYWORD_dllimport,
@@ -89,6 +91,7 @@ typedef enum eKeywordId {
 	KEYWORD_external,
 	KEYWORD_format,
 	KEYWORD_function,
+	KEYWORD_generic,
 	KEYWORD_if,
 	KEYWORD_implicit,
 	KEYWORD_include,
@@ -101,6 +104,7 @@ typedef enum eKeywordId {
 	KEYWORD_map,
 	KEYWORD_module,
 	KEYWORD_namelist,
+	KEYWORD_non_overridable,
 	KEYWORD_nopass,
 	KEYWORD_operator,
 	KEYWORD_optional,
@@ -231,77 +235,81 @@ static kindOption FortranKinds [] = {
 
 static const keywordDesc FortranKeywordTable [] = {
 	/* keyword          keyword ID */
-	{ "allocatable",    KEYWORD_allocatable  },
-	{ "assignment",     KEYWORD_assignment   },
-	{ "automatic",      KEYWORD_automatic    },
-	{ "block",          KEYWORD_block        },
-	{ "byte",           KEYWORD_byte         },
-	{ "cexternal",      KEYWORD_cexternal    },
-	{ "cglobal",        KEYWORD_cglobal      },
-	{ "character",      KEYWORD_character    },
-	{ "common",         KEYWORD_common       },
-	{ "complex",        KEYWORD_complex      },
-	{ "contains",       KEYWORD_contains     },
-	{ "data",           KEYWORD_data         },
-	{ "dimension",      KEYWORD_dimension    },
-	{ "dll_export",     KEYWORD_dllexport    },
-	{ "dll_import",     KEYWORD_dllimport    },
-	{ "do",             KEYWORD_do           },
-	{ "double",         KEYWORD_double       },
-	{ "elemental",      KEYWORD_elemental    },
-	{ "end",            KEYWORD_end          },
-	{ "entry",          KEYWORD_entry        },
-	{ "equivalence",    KEYWORD_equivalence  },
-	{ "external",       KEYWORD_external     },
-	{ "format",         KEYWORD_format       },
-	{ "function",       KEYWORD_function     },
-	{ "if",             KEYWORD_if           },
-	{ "implicit",       KEYWORD_implicit     },
-	{ "include",        KEYWORD_include      },
-	{ "inline",         KEYWORD_inline       },
-	{ "integer",        KEYWORD_integer      },
-	{ "intent",         KEYWORD_intent       },
-	{ "interface",      KEYWORD_interface    },
-	{ "intrinsic",      KEYWORD_intrinsic    },
-	{ "logical",        KEYWORD_logical      },
-	{ "map",            KEYWORD_map          },
-	{ "module",         KEYWORD_module       },
-	{ "namelist",       KEYWORD_namelist     },
-	{ "nopass",         KEYWORD_nopass       },
-	{ "operator",       KEYWORD_operator     },
-	{ "optional",       KEYWORD_optional     },
-	{ "parameter",      KEYWORD_parameter    },
-	{ "pascal",         KEYWORD_pascal       },
-	{ "pass",           KEYWORD_pass         },
-	{ "pexternal",      KEYWORD_pexternal    },
-	{ "pglobal",        KEYWORD_pglobal      },
-	{ "pointer",        KEYWORD_pointer      },
-	{ "precision",      KEYWORD_precision    },
-	{ "private",        KEYWORD_private      },
-	{ "procedure",      KEYWORD_procedure    },
-	{ "program",        KEYWORD_program      },
-	{ "public",         KEYWORD_public       },
-	{ "pure",           KEYWORD_pure         },
-	{ "real",           KEYWORD_real         },
-	{ "record",         KEYWORD_record       },
-	{ "recursive",      KEYWORD_recursive    },
-	{ "save",           KEYWORD_save         },
-	{ "select",         KEYWORD_select       },
-	{ "sequence",       KEYWORD_sequence     },
-	{ "static",         KEYWORD_static       },
-	{ "stdcall",        KEYWORD_stdcall      },
-	{ "structure",      KEYWORD_structure    },
-	{ "subroutine",     KEYWORD_subroutine   },
-	{ "target",         KEYWORD_target       },
-	{ "then",           KEYWORD_then         },
-	{ "type",           KEYWORD_type         },
-	{ "union",          KEYWORD_union        },
-	{ "use",            KEYWORD_use          },
-	{ "value",          KEYWORD_value        },
-	{ "virtual",        KEYWORD_virtual      },
-	{ "volatile",       KEYWORD_volatile     },
-	{ "where",          KEYWORD_where        },
-	{ "while",          KEYWORD_while        }
+	{ "allocatable",     KEYWORD_allocatable     },
+	{ "assignment",      KEYWORD_assignment      },
+	{ "automatic",       KEYWORD_automatic       },
+	{ "block",           KEYWORD_block           },
+	{ "byte",            KEYWORD_byte            },
+	{ "cexternal",       KEYWORD_cexternal       },
+	{ "cglobal",         KEYWORD_cglobal         },
+	{ "character",       KEYWORD_character       },
+	{ "class",           KEYWORD_class           },
+	{ "common",          KEYWORD_common          },
+	{ "complex",         KEYWORD_complex         },
+	{ "contains",        KEYWORD_contains        },
+	{ "data",            KEYWORD_data            },
+	{ "deferred",        KEYWORD_deferred        },
+	{ "dimension",       KEYWORD_dimension       },
+	{ "dll_export",      KEYWORD_dllexport       },
+	{ "dll_import",      KEYWORD_dllimport       },
+	{ "do",              KEYWORD_do              },
+	{ "double",          KEYWORD_double          },
+	{ "elemental",       KEYWORD_elemental       },
+	{ "end",             KEYWORD_end             },
+	{ "entry",           KEYWORD_entry           },
+	{ "equivalence",     KEYWORD_equivalence     },
+	{ "external",        KEYWORD_external        },
+	{ "format",          KEYWORD_format          },
+	{ "function",        KEYWORD_function        },
+	{ "generic",         KEYWORD_generic         },
+	{ "if",              KEYWORD_if              },
+	{ "implicit",        KEYWORD_implicit        },
+	{ "include",         KEYWORD_include         },
+	{ "inline",          KEYWORD_inline          },
+	{ "integer",         KEYWORD_integer         },
+	{ "intent",          KEYWORD_intent          },
+	{ "interface",       KEYWORD_interface       },
+	{ "intrinsic",       KEYWORD_intrinsic       },
+	{ "logical",         KEYWORD_logical         },
+	{ "map",             KEYWORD_map             },
+	{ "module",          KEYWORD_module          },
+	{ "namelist",        KEYWORD_namelist        },
+	{ "non_overridable", KEYWORD_non_overridable },
+	{ "nopass",          KEYWORD_nopass          },
+	{ "operator",        KEYWORD_operator        },
+	{ "optional",        KEYWORD_optional        },
+	{ "parameter",       KEYWORD_parameter       },
+	{ "pascal",          KEYWORD_pascal          },
+	{ "pass",            KEYWORD_pass            },
+	{ "pexternal",       KEYWORD_pexternal       },
+	{ "pglobal",         KEYWORD_pglobal         },
+	{ "pointer",         KEYWORD_pointer         },
+	{ "precision",       KEYWORD_precision       },
+	{ "private",         KEYWORD_private         },
+	{ "procedure",       KEYWORD_procedure       },
+	{ "program",         KEYWORD_program         },
+	{ "public",          KEYWORD_public          },
+	{ "pure",            KEYWORD_pure            },
+	{ "real",            KEYWORD_real            },
+	{ "record",          KEYWORD_record          },
+	{ "recursive",       KEYWORD_recursive       },
+	{ "save",            KEYWORD_save            },
+	{ "select",          KEYWORD_select          },
+	{ "sequence",        KEYWORD_sequence        },
+	{ "static",          KEYWORD_static          },
+	{ "stdcall",         KEYWORD_stdcall         },
+	{ "structure",       KEYWORD_structure       },
+	{ "subroutine",      KEYWORD_subroutine      },
+	{ "target",          KEYWORD_target          },
+	{ "then",            KEYWORD_then            },
+	{ "type",            KEYWORD_type            },
+	{ "union",           KEYWORD_union           },
+	{ "use",             KEYWORD_use             },
+	{ "value",           KEYWORD_value           },
+	{ "virtual",         KEYWORD_virtual         },
+	{ "volatile",        KEYWORD_volatile        },
+	{ "where",           KEYWORD_where           },
+	{ "while",           KEYWORD_while           }
 };
 
 static struct {
@@ -318,6 +326,7 @@ static void parseUnionStmt (tokenInfo *const token);
 static void parseDerivedTypeDef (tokenInfo *const token);
 static void parseFunctionSubprogram (tokenInfo *const token);
 static void parseSubroutineSubprogram (tokenInfo *const token);
+static void parseGenericDeclaration (tokenInfo *const token);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -1116,6 +1125,8 @@ static boolean isTypeSpec (tokenInfo *const token)
 		case KEYWORD_record:
 		case KEYWORD_type:
 		case KEYWORD_procedure:
+		case KEYWORD_generic:
+		case KEYWORD_class:
 			result = TRUE;
 			break;
 		default:
@@ -1151,7 +1162,7 @@ static boolean isSubprogramPrefix (tokenInfo *const token)
  *      or CHARACTER [kind-selector]
  *      or LOGICAL [kind-selector]
  *      or TYPE ( type-name )
- *      or PROCEDURE [(interface-name)] [[,binding-attr-list ]::] binding-name[=> procedure-name]
+ *      or PROCEDURE [interface-name]
  *
  *  Note that INTEGER and REAL may be followed by "*N" where "N" is an integer
  */
@@ -1173,13 +1184,17 @@ static void parseTypeSpec (tokenInfo *const token)
 				readToken (token);
 			break;
 
-
+		case KEYWORD_generic:
+			readToken (token);
+			parseGenericDeclaration(token);
+			
 		case KEYWORD_byte:
 		case KEYWORD_complex:
 		case KEYWORD_integer:
 		case KEYWORD_logical:
 		case KEYWORD_real:
 		case KEYWORD_procedure:
+		case KEYWORD_class:
 			readToken (token);
 			if (isType (token, TOKEN_PAREN_OPEN))
 				skipOverParens (token);  /* skip kind-selector */
@@ -1253,6 +1268,9 @@ static boolean skipStatementIfKeyword (tokenInfo *const token, keywordId keyword
  *      or POINTER
  *      or SAVE
  *      or TARGET
+ *      or PASS
+ *      or NOPASS
+ *      or DEFERRED
  * 
  *  component-attr-spec
  *      is POINTER
@@ -1277,6 +1295,8 @@ static void parseQualifierSpecList (tokenInfo *const token)
 			case KEYWORD_target:
 			case KEYWORD_pass:
 			case KEYWORD_nopass:	
+			case KEYWORD_deferred:
+			case KEYWORD_non_overridable:
 				readToken (token);
 				break;
 
@@ -1370,6 +1390,20 @@ static void parseEntityDeclList (tokenInfo *const token)
 			break;
 		}
 	}
+}
+
+/* generic type bound procedures:
+ *   type [[, attr-spec] ... ::] type_name
+ *   contains
+ *     generic [::] sub => sub1, sub2, ...
+ *   end type type_name
+ */
+static void parseGenericDeclaration (tokenInfo *const token)
+{
+	if (isType (token, TOKEN_DOUBLE_COLON))
+		readToken (token);
+	makeFortranTag (token, variableTagType());
+	skipToNextStatement (token);
 }
 
 /*  type-declaration-stmt is
