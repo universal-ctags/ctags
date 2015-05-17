@@ -1,5 +1,5 @@
 
-input.f90,1008
+input.f90,1045
 module abstract_list_modabstract_list_mod1,0
     PI PI4,63
     MASS_NEUTRON MASS_NEUTRON5,108
@@ -11,6 +11,7 @@ module abstract_list_modabstract_list_mod1,0
     ZERO ZERO11,498
     ONE ONE12,538
     TWO TWO13,578
+  type, abstract :: listlist15,604
     integer :: num num17,641
     class(link),pointer :: firstLink firstLink18,664
       secondLink secondLink19,714

@@ -1,11 +1,37 @@
 module test_bind
-  type, extends(type_b) :: type_c
-    integer :: i = 0
-  end type type_c
-  type, bind(c) :: type_d
-    integer :: i = 0
-  end type type_d
-  type, abstract :: type_e
-    integer :: i = 0
-  end type type_e
+
+  implicit none
+
+  type, bind(c) :: Earch
+    integer :: id = 0
+    integer :: type                  ! Type
+    integer :: n_cells               ! # of cells within
+    integer, allocatable :: cells(:) ! List of cells within
+    real(8) :: x0                    ! Translation in x-coordinate
+    real(8) :: y0                    ! Translation in y-coordinate
+    real(8) :: z0                    ! Translation in z-coordinate
+  end type Earch
+
+  type, extends(Earth) :: Universe
+    integer :: id = 0
+    integer :: type                  ! Type
+    integer :: n_cells               ! # of cells within
+    integer, allocatable :: cells(:) ! List of cells within
+    real(8) :: x0                    ! Translation in x-coordinate
+    real(8) :: y0                    ! Translation in y-coordinate
+    real(8) :: z0                    ! Translation in z-coordinate
+  end type Universe
+
+  type, abstract :: abs_type
+    integer :: a
+    integer, allocatable :: cells(:) ! List of cells within
+  end type abs_type
+
+contains
+
+  pure function add(a, b) bind(C, name="add_c")
+    real(8) :: a
+    real(8) :: b
+  end function add
+
 end module test_bind
