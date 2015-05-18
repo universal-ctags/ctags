@@ -753,6 +753,8 @@ process:
 						c = skipToEndOfString (TRUE);
 						break;
 					}
+					else
+						fileUngetc (next);
 				}
 			enter:
 				Cpp.directive.accept = FALSE;
