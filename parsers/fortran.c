@@ -342,6 +342,7 @@ static void parseUnionStmt (tokenInfo *const token);
 static void parseDerivedTypeDef (tokenInfo *const token);
 static void parseFunctionSubprogram (tokenInfo *const token);
 static void parseSubroutineSubprogram (tokenInfo *const token);
+static void parseQualifierSpecList (tokenInfo *const token);
 static tagType variableTagType (void);
 
 /*
@@ -1219,9 +1220,11 @@ static void parseTypeSpec (tokenInfo *const token)
 
 		case KEYWORD_generic:
 			readToken (token);
+			if (isType (token, TOKEN_COMMA))
+				parseQualifierSpecList (token);
 			if (isType (token, TOKEN_DOUBLE_COLON))
 				readToken (token);
-			makeFortranTag (newTokenFrom(token), variableTagType());
+			makeFortranTag (token, variableTagType());
 			/* skip to => token */
 			skipToToken (token, TOKEN_OPERATOR);
 			break;
