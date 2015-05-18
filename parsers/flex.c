@@ -1992,12 +1992,9 @@ static boolean parseCDATA (tokenInfo *const token)
 		readToken (token);
 		if (isType (token, TOKEN_EXCLAMATION))
 		{
-			/*
-			 * Not sure why I had to comment these out, but I did.
-			 * readToken (token);
-			 * if (isType (token, TOKEN_OPEN_SQUARE))
-			 * {
-			*/
+			readToken (token);
+			if (isType (token, TOKEN_OPEN_SQUARE))
+			{
 				readToken (token);
 				if (isKeyword (token, KEYWORD_cdata))
 				{
@@ -2015,7 +2012,7 @@ static boolean parseCDATA (tokenInfo *const token)
 						}
 					}
 				}
-			/*} Not sure */
+			}
 		}
 	}
 	else
