@@ -741,6 +741,42 @@ process:
 				}
 			} break;
 
+			/* digraphs:
+			 * input:  <:  :>  <%  %>  %:  %:%:
+			 * output: [   ]   {   }   #   ##
+			 */
+			case '<':
+			{
+				int next = fileGetc ();
+				switch (next)
+				{
+					case ':':	c = '['; break;
+					case '%':	c = '{'; break;
+					default: fileUngetc (next);
+				}
+				goto enter;
+			}
+			case ':':
+			{
+				int next = fileGetc ();
+				if (next == '>')
+					c = ']';
+				else
+					fileUngetc (next);
+				goto enter;
+			}
+			case '%':
+			{
+				int next = fileGetc ();
+				switch (next)
+				{
+					case '>':	c = '}'; break;
+					case ':':	c = '#'; goto process;
+					default: fileUngetc (next);
+				}
+				goto enter;
+			}
+
 			default:
 				if (c == '@' && Cpp.hasAtLiteralStrings)
 				{
