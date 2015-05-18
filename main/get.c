@@ -709,8 +709,6 @@ process:
 
 				if (next == NEWLINE)
 					continue;
-				else if (next == '?')
-					cppUngetc (next);
 				else
 					fileUngetc (next);
 				break;
@@ -736,8 +734,8 @@ process:
 						case '-':          c = '~';       break;
 						case '=':          c = '#';       goto process;
 						default:
+							fileUngetc ('?');
 							fileUngetc (next);
-							cppUngetc ('?');
 							break;
 					}
 				}
