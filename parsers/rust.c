@@ -435,7 +435,7 @@ static void deInitLexer (lexerState *lexer)
 
 static void addTag (vString* ident, const char* type, const char* arg_list, int kind, unsigned long line, fpos_t pos, vString *scope, int parent_kind)
 {
-	if (kind == K_NONE)
+	if (kind == K_NONE || ! rustKinds[kind].enabled)
 		return;
 	tagEntryInfo tag;
 	initTagEntry(&tag, ident->buffer);

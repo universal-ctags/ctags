@@ -999,22 +999,31 @@ static void constructorValidation (vString * const ident, ocaToken what)
 		break;
 
 	case OcaKEYWORD_of:	/* OK, it must be a constructor :) */
-		makeTagEntry (&tempTag);
-		vStringClear (tempIdent);
+		if (vStringLength (tempIdent) > 0)
+		{
+			makeTagEntry (&tempTag);
+			vStringClear (tempIdent);
+		}
 		toDoNext = &tillTokenOrFallback;
 		comeAfter = &typeSpecification;
 		waitedToken = Tok_Pipe;
 		break;
 
 	case Tok_Pipe:	/* OK, it was a constructor :)  */
-		makeTagEntry (&tempTag);
-		vStringClear (tempIdent);
+		if (vStringLength (tempIdent) > 0)
+		{
+			makeTagEntry (&tempTag);
+			vStringClear (tempIdent);
+		}
 		toDoNext = &typeSpecification;
 		break;
 
 	default:	/* and mean that we're not facing a module name */
-		makeTagEntry (&tempTag);
-		vStringClear (tempIdent);
+		if (vStringLength (tempIdent) > 0)
+		{
+			makeTagEntry (&tempTag);
+			vStringClear (tempIdent);
+		}
 		toDoNext = &tillTokenOrFallback;
 		comeAfter = &typeSpecification;
 		waitedToken = Tok_Pipe;
@@ -1083,8 +1092,13 @@ static void typeSpecification (vString * const ident, ocaToken what)
 			 * type foo = AnotherModule.bar
 			 * AnotherModule can mistakenly be took
 			 * for a constructor. */
-			vStringCopy (tempIdent, ident);
-			prepareTag (&tempTag, tempIdent, K_CONSTRUCTOR);
+			if (! OcamlKinds[K_CONSTRUCTOR].enabled)
+				vStringClear (tempIdent);
+			else
+			{
+				vStringCopy (tempIdent, ident);
+				prepareTag (&tempTag, tempIdent, K_CONSTRUCTOR);
+			}
 			toDoNext = &constructorValidation;
 		}
 		else

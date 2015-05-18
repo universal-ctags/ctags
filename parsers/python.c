@@ -186,6 +186,10 @@ static void makeFunctionTag (vString *const function,
 	vString *const parent, int is_class_parent, const char *arglist)
 {
 	tagEntryInfo tag;
+
+	if (! PythonKinds[K_FUNCTION].enabled)
+		return;
+
 	initTagEntry (&tag, vStringValue (function));
 
 	tag.kindName = PythonKinds[K_FUNCTION].name;
@@ -221,6 +225,10 @@ static void makeClassTag (vString *const class, vString *const inheritance,
 	vString *const parent, int is_class_parent)
 {
 	tagEntryInfo tag;
+
+	if (! PythonKinds[K_CLASS].enabled)
+		return;
+
 	initTagEntry (&tag, vStringValue (class));
 	tag.kindName = PythonKinds[K_CLASS].name;
 	tag.kind = PythonKinds[K_CLASS].letter;
@@ -247,6 +255,10 @@ static void makeVariableTag (vString *const var, vString *const parent,
 	boolean is_class_parent)
 {
 	tagEntryInfo tag;
+
+	if (! PythonKinds[K_VARIABLE].enabled)
+		return;
+
 	initTagEntry (&tag, vStringValue (var));
 	tag.kindName = PythonKinds[K_VARIABLE].name;
 	tag.kind = PythonKinds[K_VARIABLE].letter;

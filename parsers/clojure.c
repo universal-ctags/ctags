@@ -63,7 +63,7 @@ static void functionName (vString * const name, const char *dbp)
 static int makeNamespaceTag (vString * const name, const char *dbp)
 {
 	functionName (name, dbp);
-	if (vStringLength (name) > 0)
+	if (vStringLength (name) > 0 && ClojureKinds[K_NAMESPACE].enabled)
 	{
 		tagEntryInfo e;
 		initTagEntry (&e, vStringValue (name));
@@ -81,7 +81,7 @@ static int makeNamespaceTag (vString * const name, const char *dbp)
 static void makeFunctionTag (vString * const name, const char *dbp, int scope_index)
 {
 	functionName (name, dbp);
-	if (vStringLength (name) > 0)
+	if (vStringLength (name) > 0 && ClojureKinds[K_FUNCTION].enabled)
 	{
 		tagEntryInfo e;
 		initTagEntry (&e, vStringValue (name));
