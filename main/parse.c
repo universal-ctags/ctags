@@ -81,6 +81,7 @@ extern parserDefinition* parserNew (const char* name)
 {
 	parserDefinition* result = xCalloc (1, parserDefinition);
 	result->name = eStrdup (name);
+	result->fileKind = KIND_FILE_DEFAULT;
 	return result;
 }
 
@@ -95,6 +96,19 @@ extern const char *getLanguageName (const langType language)
 		result = LanguageTable [language]->name;
 	}
 	return result;
+}
+
+extern const char getLanguageFileKind (const langType language)
+{
+	char kind;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+
+	kind = LanguageTable [language]->fileKind;
+
+	Assert (kind != KIND_NULL);
+
+	return kind;
 }
 
 extern langType getNamedLanguage (const char *const name)
@@ -1057,12 +1071,28 @@ extern void enableLanguages (const boolean state)
 		enableLanguage (i, state);
 }
 
+static boolean doesParserUseKind (const parserDefinition *const parser, char letter)
+{
+	int k;
+
+	for (k = 0; k < parser->kindCount; k++)
+		if (parser->kinds [k].letter == letter)
+			return TRUE;
+	return FALSE;
+}
+
 static void initializeParsers (void)
 {
 	unsigned int i;
 	for (i = 0  ;  i < LanguageCount  ;  ++i)
+	{
 		if (LanguageTable [i]->initialize != NULL)
 			(LanguageTable [i]->initialize) ((langType) i);
+
+		Assert (LanguageTable [i]->fileKind != KIND_NULL);
+		Assert (!doesParserUseKind (LanguageTable [i],
+					    LanguageTable [i]->fileKind));
+	}
 }
 
 extern void initializeParsing (void)
@@ -1545,7 +1575,7 @@ static void makeFileTag (const char *const fileName)
 		tag.lineNumberEntry = TRUE;
 		tag.lineNumber      = 1;
 		tag.kindName        = KIND_FILE_DEFAULT_LONG;
-		tag.kind            = KIND_FILE_DEFAULT;
+		tag.kind            = getSourceLanguageFileKind();
 
 		makeTagEntry (&tag);
 	}

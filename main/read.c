@@ -236,7 +236,7 @@ static boolean parseLineDirective (void)
 				tag.lineNumberEntry = TRUE;
 				tag.lineNumber      = 1;
 				tag.kindName        = KIND_FILE_DEFAULT_LONG;
-				tag.kind            = KIND_FILE_DEFAULT;
+				tag.kind            = getSourceLanguageFileKind();
 
 				makeTagEntry (&tag);
 			}

@@ -38,6 +38,7 @@
 #define getSourceFileTagPath()   File.source.tagPath
 #define getSourceLanguage()      File.source.language
 #define getSourceLanguageName()  getLanguageName (File.source.language)
+#define getSourceLanguageFileKind()  getLanguageFileKind (File.source.language)
 #define getSourceLineNumber()    File.source.lineNumber
 #define isLanguage(lang)         (boolean)((lang) == File.source.language)
 #define isHeaderFile()           File.source.isHeader

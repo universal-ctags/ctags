@@ -52,11 +52,16 @@ typedef void (*parserFinalize) (langType language);
 #define KIND_REGEX_DEFAULT_LONG "regex"
 /* We treat ' ' as a ghost kind.
    It will never be listed up in --list-kinds. */
+
+#define KIND_NULL    '\0'
+
 #define KIND_GHOST   ' '
 #define KIND_GHOST_LONG "ghost"
 
 #define KIND_FILE_DEFAULT 'F'
 #define KIND_FILE_DEFAULT_LONG "file"
+
+#define KIND_FILE_ALT '!'
 
 typedef struct sKindOption {
 	boolean enabled;          /* are tags for kind enabled? */
@@ -88,6 +93,7 @@ typedef struct {
 	char* name;                    /* name of language */
 	kindOption* kinds;             /* tag kinds handled by parser */
 	unsigned int kindCount;        /* size of `kinds' list */
+	char fileKind;		           /* override letter for file kind */
 	const char *const *extensions; /* list of default extensions */
 	const char *const *patterns;   /* list of default file name patterns */
 	const char *const *aliases;    /* list of default aliases (alternative names) */
@@ -131,6 +137,7 @@ extern parserDefinitionFunc PARSER_LIST;
 extern void makeSimpleTag (const vString* const name, kindOption* const kinds, const int kind);
 extern parserDefinition* parserNew (const char* name);
 extern const char *getLanguageName (const langType language);
+extern const char getLanguageFileKind (const langType language);
 extern langType getNamedLanguage (const char *const name);
 extern langType getFileLanguage (const char *const fileName);
 extern void installLanguageMapDefault (const langType language);

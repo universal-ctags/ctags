@@ -2398,6 +2398,7 @@ extern parserDefinition* SqlParser (void)
 	parserDefinition* def = parserNew ("SQL");
 	def->kinds		= SqlKinds;
 	def->kindCount	= KIND_COUNT (SqlKinds);
+	def->fileKind = KIND_FILE_ALT;
 	def->extensions = extensions;
 	def->parser		= findSqlTags;
 	def->initialize = initialize;
