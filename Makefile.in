@@ -425,4 +425,14 @@ units: $(CTAGS_TEST)
 clean-units:
 	$(SHELL) misc/units clean Units
 
+#
+# Test main part, not parsers
+#
+tmain: $(CTAGS_TEST)
+	@ \
+	c="misc/units tmain \
+		--ctags=$(CTAGS_TEST) \
+		$(VALGRIND) \
+		$(SHOW_DIFF_OUTPUT)"; \
+	 $(SHELL) $${c} Tmain
 # vi:set tabstop=8:
