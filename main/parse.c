@@ -1335,6 +1335,21 @@ extern boolean processKindOption (
 	return handled;
 }
 
+extern void printLanguageFileKind (const langType language)
+{
+	if (language == LANG_AUTO)
+	{
+		unsigned int i;
+		for (i = 0  ;  i < LanguageCount  ;  ++i)
+		{
+			const parserDefinition* const lang = LanguageTable [i];
+			printf ("%s %c\n", lang->name, lang->fileKind);
+		}
+	}
+	else
+		printf ("%c\n", LanguageTable [language]->fileKind);
+}
+
 static void printLanguageKind (const kindOption* const kind, boolean indent)
 {
 	const char *const indentation = indent ? "    " : "";

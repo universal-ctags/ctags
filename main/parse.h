@@ -166,6 +166,7 @@ extern void freeParserResources (void);
 extern void processLanguageDefineOption (const char *const option, const char *const parameter);
 extern boolean processMapOption (const char *const option, const char *const parameter);
 extern boolean processKindOption (const char *const option, const char *const parameter);
+extern void printLanguageFileKind (const langType language);
 extern void printKindOptions (void);
 extern void printLanguageKinds (const langType language);
 extern boolean processCorpusOption (const char *const option, const char *const parameter);
