@@ -1620,7 +1620,7 @@ tmain_compare()
 
     printf '%-60s' "${aspect}"
     generated=${subdir}/${aspect}-diff.txt
-    if diff ${subdir}/${aspect}-actual.txt ${subdir}/${aspect}-expected.txt > ${generated} 2>&1; then
+    if diff -U 0 --strip-trailing-cr ${subdir}/${aspect}-actual.txt ${subdir}/${aspect}-expected.txt > ${generated} 2>&1; then
 	run_result ok '/dev/null'
 	rm ${generated}
 	return 0
