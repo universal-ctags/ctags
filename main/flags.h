@@ -11,6 +11,9 @@
 #ifndef _FLAGS_H
 #define _FLAGS_H
 
+#define LONG_FLAGS_OPEN  '{'
+#define LONG_FLAGS_CLOSE '}'
+
 typedef struct {
 	char shortChar;
 	const char *longStr;
