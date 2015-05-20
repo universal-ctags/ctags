@@ -1078,6 +1078,14 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	return r;
 }
 
+extern int makeTagEntryMaybe (const tagEntryInfo *const tag)
+{
+	if ( isSourceLanguageKindEnabled (tag->kind) )
+		return makeTagEntry (tag);
+	else
+		return SCOPE_NIL;
+}
+
 extern void initTagEntry (tagEntryInfo *const e, const char *const name)
 {
 	initTagEntryFull(e, name,
