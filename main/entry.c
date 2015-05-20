@@ -1037,7 +1037,7 @@ extern size_t        countEntryInCorkQueue (void)
 
 extern int makeTagEntry (const tagEntryInfo *const tag)
 {
-	int r = -1;
+	int r = SCOPE_NIL;
 	Assert (tag->name != NULL);
 	if (tag->name [0] == '\0')
 		error (WARNING, "ignoring null tag in %s", vStringValue (File.name));

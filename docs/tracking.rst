@@ -87,6 +87,19 @@ subversion
 bugs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+   <364>  Ruby method on self is missing the trailing ? in the generated tag name
+	 * fixed::
+
+	        d9ba5df9f4d54ddaa511bd5440a1a3decaa2dc28
+
+   <363> Invalid C input file causes invalid read / heap overflow
+
+	* it is not reproduced.
+
+	* the test case is imported as parser-c.r/c-heapoverflow-sh-bug-363.d::
+
+   		$ make units UNITS=c-heapoverflow-sh-bug-363 VG=1
+
    <358>  Vim parser: Segmentation fault when reading empty vim file
 	 * directly contributed by the original author of bug report and patch::
 

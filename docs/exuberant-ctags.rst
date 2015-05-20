@@ -63,6 +63,11 @@ Contents
 
    PageBreak oneColumn
 
+.. include:: tmain.rst
+.. raw:: pdf
+
+   PageBreak oneColumn
+
 .. include:: optlib.rst
 .. raw:: pdf
 

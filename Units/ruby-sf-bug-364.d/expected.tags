@@ -1,0 +1,7 @@
+D	input.rb	/^class D$/;"	c
+_a?	input.rb	/^  def self._a?$/;"	F	class:D
+_b!	input.rb	/^  def self._b!$/;"	F	class:D
+_c=	input.rb	/^  def self._c=(a)$/;"	F	class:D
+x?	input.rb	/^  def self.x?$/;"	F	class:D
+y!	input.rb	/^  def self.y!$/;"	F	class:D
+z=	input.rb	/^  def self.z=(a)$/;"	F	class:D
