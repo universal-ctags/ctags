@@ -120,6 +120,8 @@ extern parserDefinition* parserNew (const char* name);
 extern const char *getLanguageName (const langType language);
 extern langType getNamedLanguage (const char *const name);
 extern langType getFileLanguage (const char *const fileName);
+extern boolean isLanguageKindEnabled (const langType language, char kind);
+
 extern void installLanguageMapDefault (const langType language);
 extern void installLanguageMapDefaults (void);
 extern void clearLanguageMap (const langType language);
