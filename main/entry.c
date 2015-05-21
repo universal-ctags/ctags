@@ -677,11 +677,38 @@ static size_t writeCompactSourceLine (FILE *const fp, const char *const line)
 	return length;
 }
 
+static boolean isPosSet(fpos_t pos)
+{
+	char * p = (char *)&pos;
+	boolean r = FALSE;
+	int i;
+
+	for (i = 0; i < sizeof(pos); i++)
+		r |= p[i];
+	return r;
+}
+
+static char *readSourceLineAnyway (vString *const vLine, const tagEntryInfo *const tag,
+				   long *const pSeekValue)
+{
+	char * line;
+
+	if (isPosSet (tag->filePosition) || (tag->pattern == NULL))
+		line = 	readSourceLine (vLine, tag->filePosition, pSeekValue);
+	else
+		line = readSourceLineSlow (vLine, tag->lineNumber, tag->pattern, pSeekValue);
+
+	return line;
+}
 static int writeXrefEntry (const tagEntryInfo *const tag)
 {
-	const char *const line =
-			readSourceLine (TagFile.vLine, tag->filePosition, NULL);
+	const char *line;
 	int length;
+
+	if (tag->isFileEntry)
+		return 0;
+
+	line = readSourceLineAnyway (TagFile.vLine, tag, NULL);
 
 	if (Option.tagFileFormat == 1)
 		length = fprintf (TagFile.fp, "%-16s %4lu %-16s ", tag->name,
@@ -690,7 +717,11 @@ static int writeXrefEntry (const tagEntryInfo *const tag)
 		length = fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s ", tag->name,
 				tag->kindName, tag->lineNumber, tag->sourceFileName);
 
-	length += writeCompactSourceLine (TagFile.fp, line);
+	/* If no associated line for tag is found, we cannot prepare
+	 * parameter to writeCompactSourceLine(). In this case we
+	 * use an empty string as LINE.
+	 */
+	length += writeCompactSourceLine (TagFile.fp, line? line: "");
 	putc (NEWLINE, TagFile.fp);
 	++length;
 
@@ -718,14 +749,16 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 {
 	int length;
 
-	if (tag->isFileEntry || (tag->lineNumberEntry && (tag->lineNumber == 1)))
+	if (tag->isFileEntry)
 		length = fprintf (TagFile.etags.fp, "\177%s\001%lu,0\n",
 				tag->name, tag->lineNumber);
 	else
 	{
 		long seekValue;
 		char *const line =
-				readSourceLine (TagFile.vLine, tag->filePosition, &seekValue);
+				readSourceLineAnyway (TagFile.vLine, tag, &seekValue);
+		if (line == NULL)
+			return 0;
 
 		if (tag->truncateLine)
 			truncateTagLine (line, tag->name, TRUE);
@@ -975,10 +1008,7 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 
 	DebugStatement ( debugEntry (tag); )
 	if (Option.xref)
-	{
-		if (! tag->isFileEntry)
-			length = writeXrefEntry (tag);
-	}
+		length = writeXrefEntry (tag);
 	else if (Option.etags)
 		length = writeEtagsEntry (tag);
 	else

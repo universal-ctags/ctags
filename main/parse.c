@@ -1560,8 +1560,6 @@ static rescanReason createTagsForFile (
 	if (fileOpen (fileName, language))
 	{
 		const parserDefinition* const lang = LanguageTable [language];
-		if (Option.etags)
-			beginEtagsFile ();
 
 		if (LanguageTable [language]->use_cork)
 			corkTagFile();
@@ -1598,9 +1596,6 @@ static rescanReason createTagsForFile (
 		if (LanguageTable [language]->use_cork)
 			uncorkTagFile();
 
-		if (Option.etags)
-			endEtagsFile (getSourceFileTagPath ());
-
 		fileClose ();
 	}
 
@@ -1635,6 +1630,23 @@ static boolean createTagsWithFallback (
 			numTags = TagFile.numTags.added;
 		}
 	}
+	return tagFileResized;
+}
+
+static boolean createTagsWithXcmd (
+		const char *const fileName, const langType language)
+{
+	boolean tagFileResized = FALSE;
+
+	if (fileOpen (fileName, language))
+	{
+		tagFileResized = invokeXcmd (fileName, language);
+
+		/* TODO: File.lineNumber must be adjusted for the case
+		 *  Option.printTotals is non-zero. */
+		fileClose ();
+	}
+
 	return tagFileResized;
 }
 
@@ -1675,12 +1687,16 @@ extern boolean parseFile (const char *const fileName)
 	{
 		if (Option.filter)
 			openTagFile ();
+		if (Option.etags)
+			beginEtagsFile ();
 
 		tagFileResized = createTagsWithFallback (fileName, language);
 #ifdef HAVE_COPROC
-		tagFileResized = invokeXcmd (fileName, language)? TRUE: tagFileResized;
+		tagFileResized = createTagsWithXcmd (fileName, language)? TRUE: tagFileResized;
 #endif
 
+		if (Option.etags)
+			endEtagsFile (fileName);
 		if (Option.filter)
 			closeTagFile (tagFileResized);
 		addTotals (1, 0L, 0L);

@@ -689,11 +689,11 @@ extern void findRegexTags (void)
 }
 
 static regexPattern *addTagRegexInternal (
-		const langType language __unused__,
-		const char* const regex __unused__,
-		const char* const name __unused__,
-		const char* const kinds __unused__,
-		const char* const flags __unused__)
+		const langType language,
+		const char* const regex,
+		const char* const name,
+		const char* const kinds,
+		const char* const flags)
 {
 	regexPattern *rptr = NULL;
 	Assert (regex != NULL);

@@ -1,13 +1,13 @@
-"../f.h"	input.c	/^#include "..\/f.h"$/;"	I
-"b.h"	input.c	/^#include "b.h"$/;"	I
-"h.h"	input.c	/^#include"h.h"$/;"	I
-"j.h"	input.c	/^#include       "j.h"$/;"	I
-"sys/d.h"	input.c	/^#include "sys\/d.h"$/;"	I
-<../e.h>	input.c	/^#include <..\/e.h>$/;"	I
-<a.h>	input.c	/^#include <a.h>$/;"	I
-<g.h>	input.c	/^#include<g.h>$/;"	I
-<i.h>	input.c	/^#include       <i.h>$/;"	I
-<stdio.h>	input.c	/^   #    	include <stdio.h>$/;"	I
-<sys/c.h>	input.c	/^#include <sys\/c.h>$/;"	I
+../e.h	input.c	/^#include <..\/e.h>/;"	h
+../f.h	input.c	/^#include "..\/f.h"/;"	h
 D	input.c	/^#define D /;"	d	file:
 M	input.c	/^M(void)$/;"	f
+a.h	input.c	/^#include <a.h>/;"	h
+b.h	input.c	/^#include "b.h"/;"	h
+g.h	input.c	/^#include<g.h>/;"	h
+h.h	input.c	/^#include"h.h"/;"	h
+i.h	input.c	/^#include       <i.h>/;"	h
+j.h	input.c	/^#include       "j.h"/;"	h
+stdio.h	input.c	/^   #    	include <stdio.h>/;"	h
+sys/c.h	input.c	/^#include <sys\/c.h>/;"	h
+sys/d.h	input.c	/^#include "sys\/d.h"/;"	h
