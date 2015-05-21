@@ -1,0 +1,23 @@
+
+input.f90,736
+module test_bindtest_bind1,0
+  type, bind(c) :: EarchEarch5,35
+    integer :: id id6,60
+    integer :: type type7,82
+    integer :: n_cells n_cells8,126
+    integer, allocatable :: cells(cells9,183
+    real(8) :: x0 x010,243
+    real(8) :: y0 y011,310
+    real(8) :: z0 z012,377
+  type, extends(Earth) :: UniverseUniverse15,462
+    integer :: id id16,497
+    integer :: type type17,519
+    integer :: n_cells n_cells18,563
+    integer, allocatable :: cells(cells19,620
+    real(8) :: x0 x020,680
+    real(8) :: y0 y021,747
+    real(8) :: z0 z022,814
+  type, abstract :: abs_typeabs_type25,902
+    integer :: aa26,931
+    integer, allocatable :: cells(cells27,948
+  pure function add(add32,1039

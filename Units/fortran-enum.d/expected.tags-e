@@ -1,0 +1,47 @@
+
+input.f90,1633
+module constantsconstants1,0
+  real, parameter :: pi pi4,34
+  real, parameter :: E_e E_e5,74
+    enumerator :: red red9,214
+    enumerator :: red =1, blue,blue9,214
+    enumerator :: red =1, blue, black black9,214
+    enumerator yellowyellow10,255
+    enumerator gold,gold11,277
+    enumerator gold, silver,silver11,277
+    enumerator gold, silver, bronzebronze11,277
+    enumerator :: purplepurple12,313
+    enumerator :: pink,pink13,338
+    enumerator :: pink, lavenderlavender13,338
+    enumerator :: aaaa,aaaa17,402
+    enumerator :: aaaa, b,b17,402
+    enumerator :: aaaa, b, cc17,402
+  enum :: Named1Named120,443
+    enumerator :: x1,x121,460
+    enumerator :: x1, y1,y121,460
+    enumerator :: x1, y1, z1z121,460
+  enum Named2Named224,501
+    enumerator :: x2,x225,515
+    enumerator :: x2, y2,y225,515
+    enumerator :: x2, y2, z2z225,515
+  enum(8) Named3Named328,556
+    enumerator :: x3,x329,573
+    enumerator :: x3, y3,y329,573
+    enumerator :: x3, y3, z3z329,573
+  enum*8 Named4Named432,614
+    enumerator :: x4,x433,630
+    enumerator :: x4, y4,y433,630
+    enumerator :: x4, y4, z4z433,630
+  enum(8) :: Named5Named536,671
+    enumerator :: x5,x537,691
+    enumerator :: x5, y5,y537,691
+    enumerator :: x5, y5, z5z537,691
+  enum*8 :: Named6Named640,732
+    enumerator :: x6,x641,751
+    enumerator :: x6, y6,y641,751
+    enumerator :: x6, y6, z6z641,751
+  enum, bind(c) :: Named7Named744,792
+    enumerator :: x7,x745,818
+    enumerator :: x7, y7,y745,818
+    enumerator :: x7, y7, z7z745,818
+  real, parameter :: hc hc48,859

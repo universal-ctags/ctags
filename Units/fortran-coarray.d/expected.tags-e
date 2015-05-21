@@ -1,0 +1,16 @@
+
+input.f90,651
+module squaretestsquaretest1,0
+  type SymmetrySymmetry4,35
+    integer :: matrix(matrix5,51
+    integer :: matrix(3,3), iterationsiterations5,51
+  type(Symmetry), parameter :: symmetries(symmetries10,172
+  integer :: invisibleinvisible14,401
+  real, allocatable :: state(state17,484
+  integer :: invisible_twoinvisible_two18,519
+  real, intent(in), allocatable, dimension(:), codimension[:] :: state_twostate_two22,657
+  integer :: invisible_threeinvisible_three23,732
+  real, allocatable :: assignee[assignee26,823
+  integer :: invisible_fourinvisible_four27,858
+  subroutine execute(execute31,897
+program mainmain37,1010

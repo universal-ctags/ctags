@@ -65,18 +65,24 @@ typedef enum eFortranLineType {
  */
 typedef enum eKeywordId {
 	KEYWORD_NONE = -1,
+	KEYWORD_abstract,
 	KEYWORD_allocatable,
 	KEYWORD_assignment,
+	KEYWORD_associate,
 	KEYWORD_automatic,
+	KEYWORD_bind,
 	KEYWORD_block,
 	KEYWORD_byte,
 	KEYWORD_cexternal,
 	KEYWORD_cglobal,
 	KEYWORD_character,
+	KEYWORD_class,
+	KEYWORD_codimension,
 	KEYWORD_common,
 	KEYWORD_complex,
 	KEYWORD_contains,
 	KEYWORD_data,
+	KEYWORD_deferred,
 	KEYWORD_dimension,
 	KEYWORD_dllexport,
 	KEYWORD_dllimport,
@@ -85,10 +91,16 @@ typedef enum eKeywordId {
 	KEYWORD_elemental,
 	KEYWORD_end,
 	KEYWORD_entry,
+	KEYWORD_enum,
+	KEYWORD_enumerator,
 	KEYWORD_equivalence,
+	KEYWORD_extends,
 	KEYWORD_external,
+	KEYWORD_final,
+	KEYWORD_forall,
 	KEYWORD_format,
 	KEYWORD_function,
+	KEYWORD_generic,
 	KEYWORD_if,
 	KEYWORD_implicit,
 	KEYWORD_include,
@@ -101,16 +113,21 @@ typedef enum eKeywordId {
 	KEYWORD_map,
 	KEYWORD_module,
 	KEYWORD_namelist,
+	KEYWORD_non_overridable,
+	KEYWORD_nopass,
 	KEYWORD_operator,
 	KEYWORD_optional,
 	KEYWORD_parameter,
 	KEYWORD_pascal,
+	KEYWORD_pass,
 	KEYWORD_pexternal,
 	KEYWORD_pglobal,
 	KEYWORD_pointer,
 	KEYWORD_precision,
 	KEYWORD_private,
+	KEYWORD_procedure,
 	KEYWORD_program,
+	KEYWORD_protected,
 	KEYWORD_public,
 	KEYWORD_pure,
 	KEYWORD_real,
@@ -155,6 +172,8 @@ typedef enum eTokenType {
 	TOKEN_PAREN_CLOSE,
 	TOKEN_PAREN_OPEN,
 	TOKEN_PERCENT,
+	TOKEN_SQUARE_OPEN,
+	TOKEN_SQUARE_CLOSE,
 	TOKEN_STATEMENT_END,
 	TOKEN_STRING
 } tokenType;
@@ -175,6 +194,8 @@ typedef enum eTagType {
 	TAG_SUBROUTINE,
 	TAG_DERIVED_TYPE,
 	TAG_VARIABLE,
+	TAG_ENUM,
+	TAG_ENUMERATOR,
 	TAG_COUNT  /* must be last */
 } tagType;
 
@@ -194,11 +215,11 @@ typedef struct sTokenInfo {
 
 static langType Lang_fortran;
 static jmp_buf Exception;
-static int Ungetc;
-static unsigned int Column;
-static boolean FreeSourceForm;
+static int Ungetc = '\0';
+static unsigned int Column = 0;
+static boolean FreeSourceForm = FALSE;
 static boolean ParsingString;
-static tokenInfo *Parent;
+static tokenInfo *Parent = NULL;
 
 /* indexed by tagType */
 static kindOption FortranKinds [] = {
@@ -215,7 +236,9 @@ static kindOption FortranKinds [] = {
 	{ TRUE,  'p', "program",    "programs"},
 	{ TRUE,  's', "subroutine", "subroutines"},
 	{ TRUE,  't', "type",       "derived types and structures"},
-	{ TRUE,  'v', "variable",   "program (global) and module variables"}
+	{ TRUE,  'v', "variable",   "program (global) and module variables"},
+	{ TRUE,  'E', "enum",       "enumerations"},
+	{ TRUE,  'F', "enumerator", "enumeration values"}
 };
 
 /* For efinitions of Fortran 77 with extensions:
@@ -228,74 +251,91 @@ static kindOption FortranKinds [] = {
 
 static const keywordDesc FortranKeywordTable [] = {
 	/* keyword          keyword ID */
-	{ "allocatable",    KEYWORD_allocatable  },
-	{ "assignment",     KEYWORD_assignment   },
-	{ "automatic",      KEYWORD_automatic    },
-	{ "block",          KEYWORD_block        },
-	{ "byte",           KEYWORD_byte         },
-	{ "cexternal",      KEYWORD_cexternal    },
-	{ "cglobal",        KEYWORD_cglobal      },
-	{ "character",      KEYWORD_character    },
-	{ "common",         KEYWORD_common       },
-	{ "complex",        KEYWORD_complex      },
-	{ "contains",       KEYWORD_contains     },
-	{ "data",           KEYWORD_data         },
-	{ "dimension",      KEYWORD_dimension    },
-	{ "dll_export",     KEYWORD_dllexport    },
-	{ "dll_import",     KEYWORD_dllimport    },
-	{ "do",             KEYWORD_do           },
-	{ "double",         KEYWORD_double       },
-	{ "elemental",      KEYWORD_elemental    },
-	{ "end",            KEYWORD_end          },
-	{ "entry",          KEYWORD_entry        },
-	{ "equivalence",    KEYWORD_equivalence  },
-	{ "external",       KEYWORD_external     },
-	{ "format",         KEYWORD_format       },
-	{ "function",       KEYWORD_function     },
-	{ "if",             KEYWORD_if           },
-	{ "implicit",       KEYWORD_implicit     },
-	{ "include",        KEYWORD_include      },
-	{ "inline",         KEYWORD_inline       },
-	{ "integer",        KEYWORD_integer      },
-	{ "intent",         KEYWORD_intent       },
-	{ "interface",      KEYWORD_interface    },
-	{ "intrinsic",      KEYWORD_intrinsic    },
-	{ "logical",        KEYWORD_logical      },
-	{ "map",            KEYWORD_map          },
-	{ "module",         KEYWORD_module       },
-	{ "namelist",       KEYWORD_namelist     },
-	{ "operator",       KEYWORD_operator     },
-	{ "optional",       KEYWORD_optional     },
-	{ "parameter",      KEYWORD_parameter    },
-	{ "pascal",         KEYWORD_pascal       },
-	{ "pexternal",      KEYWORD_pexternal    },
-	{ "pglobal",        KEYWORD_pglobal      },
-	{ "pointer",        KEYWORD_pointer      },
-	{ "precision",      KEYWORD_precision    },
-	{ "private",        KEYWORD_private      },
-	{ "program",        KEYWORD_program      },
-	{ "public",         KEYWORD_public       },
-	{ "pure",           KEYWORD_pure         },
-	{ "real",           KEYWORD_real         },
-	{ "record",         KEYWORD_record       },
-	{ "recursive",      KEYWORD_recursive    },
-	{ "save",           KEYWORD_save         },
-	{ "select",         KEYWORD_select       },
-	{ "sequence",       KEYWORD_sequence     },
-	{ "static",         KEYWORD_static       },
-	{ "stdcall",        KEYWORD_stdcall      },
-	{ "structure",      KEYWORD_structure    },
-	{ "subroutine",     KEYWORD_subroutine   },
-	{ "target",         KEYWORD_target       },
-	{ "then",           KEYWORD_then         },
-	{ "type",           KEYWORD_type         },
-	{ "union",          KEYWORD_union        },
-	{ "use",            KEYWORD_use          },
-	{ "value",          KEYWORD_value        },
-	{ "virtual",        KEYWORD_virtual      },
-	{ "volatile",       KEYWORD_volatile     },
-	{ "where",          KEYWORD_where        },
-	{ "while",          KEYWORD_while        }
+	{ "abstract",        KEYWORD_abstract        },
+	{ "allocatable",     KEYWORD_allocatable     },
+	{ "assignment",      KEYWORD_assignment      },
+	{ "associate",       KEYWORD_associate       },
+	{ "automatic",       KEYWORD_automatic       },
+	{ "bind",            KEYWORD_bind            },
+	{ "block",           KEYWORD_block           },
+	{ "byte",            KEYWORD_byte            },
+	{ "cexternal",       KEYWORD_cexternal       },
+	{ "cglobal",         KEYWORD_cglobal         },
+	{ "character",       KEYWORD_character       },
+	{ "class",           KEYWORD_class           },
+	{ "codimension",     KEYWORD_codimension     },
+	{ "common",          KEYWORD_common          },
+	{ "complex",         KEYWORD_complex         },
+	{ "contains",        KEYWORD_contains        },
+	{ "data",            KEYWORD_data            },
+	{ "deferred",        KEYWORD_deferred        },
+	{ "dimension",       KEYWORD_dimension       },
+	{ "dll_export",      KEYWORD_dllexport       },
+	{ "dll_import",      KEYWORD_dllimport       },
+	{ "do",              KEYWORD_do              },
+	{ "double",          KEYWORD_double          },
+	{ "elemental",       KEYWORD_elemental       },
+	{ "end",             KEYWORD_end             },
+	{ "entry",           KEYWORD_entry           },
+	{ "enum",            KEYWORD_enum            },
+	{ "enumerator",      KEYWORD_enumerator      },
+	{ "equivalence",     KEYWORD_equivalence     },
+	{ "extends",         KEYWORD_extends         },
+	{ "external",        KEYWORD_external        },
+	{ "final",           KEYWORD_final           },
+	{ "forall",          KEYWORD_forall          },
+	{ "format",          KEYWORD_format          },
+	{ "function",        KEYWORD_function        },
+	{ "generic",         KEYWORD_generic         },
+	{ "if",              KEYWORD_if              },
+	{ "implicit",        KEYWORD_implicit        },
+	{ "include",         KEYWORD_include         },
+	{ "inline",          KEYWORD_inline          },
+	{ "integer",         KEYWORD_integer         },
+	{ "intent",          KEYWORD_intent          },
+	{ "interface",       KEYWORD_interface       },
+	{ "intrinsic",       KEYWORD_intrinsic       },
+	{ "logical",         KEYWORD_logical         },
+	{ "map",             KEYWORD_map             },
+	{ "module",          KEYWORD_module          },
+	{ "namelist",        KEYWORD_namelist        },
+	{ "non_overridable", KEYWORD_non_overridable },
+	{ "nopass",          KEYWORD_nopass          },
+	{ "operator",        KEYWORD_operator        },
+	{ "optional",        KEYWORD_optional        },
+	{ "parameter",       KEYWORD_parameter       },
+	{ "pascal",          KEYWORD_pascal          },
+	{ "pass",            KEYWORD_pass            },
+	{ "pexternal",       KEYWORD_pexternal       },
+	{ "pglobal",         KEYWORD_pglobal         },
+	{ "pointer",         KEYWORD_pointer         },
+	{ "precision",       KEYWORD_precision       },
+	{ "private",         KEYWORD_private         },
+	{ "procedure",       KEYWORD_procedure       },
+	{ "program",         KEYWORD_program         },
+	{ "protected",       KEYWORD_protected       },
+	{ "public",          KEYWORD_public          },
+	{ "pure",            KEYWORD_pure            },
+	{ "real",            KEYWORD_real            },
+	{ "record",          KEYWORD_record          },
+	{ "recursive",       KEYWORD_recursive       },
+	{ "save",            KEYWORD_save            },
+	{ "select",          KEYWORD_select          },
+	{ "sequence",        KEYWORD_sequence        },
+	{ "static",          KEYWORD_static          },
+	{ "stdcall",         KEYWORD_stdcall         },
+	{ "structure",       KEYWORD_structure       },
+	{ "subroutine",      KEYWORD_subroutine      },
+	{ "target",          KEYWORD_target          },
+	{ "then",            KEYWORD_then            },
+	{ "type",            KEYWORD_type            },
+	{ "union",           KEYWORD_union           },
+	{ "use",             KEYWORD_use             },
+	{ "value",           KEYWORD_value           },
+	{ "virtual",         KEYWORD_virtual         },
+	{ "volatile",        KEYWORD_volatile        },
+	{ "where",           KEYWORD_where           },
+	{ "while",           KEYWORD_while           }
 };
 
 static struct {
@@ -312,6 +352,9 @@ static void parseUnionStmt (tokenInfo *const token);
 static void parseDerivedTypeDef (tokenInfo *const token);
 static void parseFunctionSubprogram (tokenInfo *const token);
 static void parseSubroutineSubprogram (tokenInfo *const token);
+static void parseQualifierSpecList (tokenInfo *const token);
+static tagType variableTagType (void);
+static void parseEnumBlock (tokenInfo *const token);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -359,7 +402,7 @@ static const tokenInfo* ancestorScope (void)
 	{
 		tokenInfo *const token = Ancestors.list + i - 1;
 		if (token->type == TOKEN_IDENTIFIER &&
-			token->tag != TAG_UNDEFINED  && token->tag != TAG_INTERFACE)
+			token->tag != TAG_UNDEFINED)
 			result = token;
 	}
 	return result;
@@ -455,7 +498,7 @@ static boolean isFileScope (const tagType type)
 static boolean includeTag (const tagType type)
 {
 	boolean include;
-	Assert (type != TAG_UNDEFINED);
+	Assert (type > TAG_UNDEFINED && type < TAG_COUNT);
 	include = FortranKinds [(int) type].enabled;
 	if (include && isFileScope (type))
 		include = Option.include.fileScope;
@@ -491,7 +534,7 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 				e.extensionFields.scope [1] = vStringValue (scope->string);
 			}
 		}
-		if (! insideInterface () || includeTag (TAG_INTERFACE))
+		if (! insideInterface ())
 			makeTagEntry (&e);
 	}
 }
@@ -693,7 +736,7 @@ static int skipToNextLine (void)
 	return c;
 }
 
-static int getFreeFormChar (void)
+static int getFreeFormChar (boolean inComment)
 {
 	static boolean newline = TRUE;
 	boolean advanceLine = FALSE;
@@ -703,7 +746,7 @@ static int getFreeFormChar (void)
 	 * free-format text line is an ampersand then the next non-comment
 	 * line is a continuation line.
 	 */
-	if (c == '&')
+	if (! inComment && c == '&')
 	{
 		do
 			c = fileGetc ();
@@ -752,7 +795,7 @@ static int getChar (void)
 		Ungetc = '\0';
 	}
 	else if (FreeSourceForm)
-		c = getFreeFormChar ();
+		c = getFreeFormChar (FALSE);
 	else
 		c = getFixedFormChar ();
 	return c;
@@ -943,10 +986,12 @@ getNextChar:
 		case EOF:  longjmp (Exception, (int) ExceptionEOF);  break;
 		case ' ':  goto getNextChar;
 		case '\t': goto getNextChar;
-		case ',':  token->type = TOKEN_COMMA;       break;
-		case '(':  token->type = TOKEN_PAREN_OPEN;  break;
-		case ')':  token->type = TOKEN_PAREN_CLOSE; break;
-		case '%':  token->type = TOKEN_PERCENT;     break;
+		case ',':  token->type = TOKEN_COMMA;        break;
+		case '(':  token->type = TOKEN_PAREN_OPEN;   break;
+		case ')':  token->type = TOKEN_PAREN_CLOSE;  break;
+		case '[':  token->type = TOKEN_SQUARE_OPEN;  break;
+		case ']':  token->type = TOKEN_SQUARE_CLOSE; break;
+		case '%':  token->type = TOKEN_PERCENT;      break;
 
 		case '*':
 		case '/':
@@ -971,7 +1016,7 @@ getNextChar:
 			if (FreeSourceForm)
 			{
 				do
-				   c = getChar ();
+					c = getFreeFormChar(TRUE);
 				while (c != '\n' && c != EOF);
 			}
 			else
@@ -1055,8 +1100,10 @@ static void readSubToken (tokenInfo *const token)
 
 static void skipToToken (tokenInfo *const token, tokenType type)
 {
-	while (! isType (token, type) && ! isType (token, TOKEN_STATEMENT_END) &&
-			!(token->secondary != NULL && isType (token->secondary, TOKEN_STATEMENT_END)))
+	while (! isType (token, type) &&
+		   ! isType (token, TOKEN_STATEMENT_END) &&
+			!(token->secondary != NULL &&
+			  isType (token->secondary, TOKEN_STATEMENT_END)))
 		readToken (token);
 }
 
@@ -1095,6 +1142,20 @@ static void skipOverParens (tokenInfo *const token)
 	} while (level > 0);
 }
 
+static void skipOverSquares (tokenInfo *const token)
+{
+	int level = 0;
+	do {
+		if (isType (token, TOKEN_STATEMENT_END))
+			break;
+		else if (isType (token, TOKEN_SQUARE_OPEN))
+			++level;
+		else if (isType (token, TOKEN_SQUARE_CLOSE))
+			--level;
+		readToken (token);
+	} while (level > 0);
+}
+
 static boolean isTypeSpec (tokenInfo *const token)
 {
 	boolean result;
@@ -1109,6 +1170,12 @@ static boolean isTypeSpec (tokenInfo *const token)
 		case KEYWORD_logical:
 		case KEYWORD_record:
 		case KEYWORD_type:
+		case KEYWORD_procedure:
+		case KEYWORD_generic:
+		case KEYWORD_class:
+		case KEYWORD_final:
+		case KEYWORD_enumerator:
+		case KEYWORD_enum:
 			result = TRUE;
 			break;
 		default:
@@ -1144,6 +1211,7 @@ static boolean isSubprogramPrefix (tokenInfo *const token)
  *      or CHARACTER [kind-selector]
  *      or LOGICAL [kind-selector]
  *      or TYPE ( type-name )
+ *      or PROCEDURE [interface-name]
  *
  *  Note that INTEGER and REAL may be followed by "*N" where "N" is an integer
  */
@@ -1165,12 +1233,25 @@ static void parseTypeSpec (tokenInfo *const token)
 				readToken (token);
 			break;
 
-
+		case KEYWORD_generic:
+			readToken (token);
+			if (isType (token, TOKEN_COMMA))
+				parseQualifierSpecList (token);
+			if (isType (token, TOKEN_DOUBLE_COLON))
+				readToken (token);
+			makeFortranTag (token, variableTagType());
+			/* skip to => token */
+			skipToToken (token, TOKEN_OPERATOR);
+			break;
+			
 		case KEYWORD_byte:
 		case KEYWORD_complex:
 		case KEYWORD_integer:
 		case KEYWORD_logical:
 		case KEYWORD_real:
+		case KEYWORD_procedure:
+		case KEYWORD_class:
+		case KEYWORD_final:
 			readToken (token);
 			if (isType (token, TOKEN_PAREN_OPEN))
 				skipOverParens (token);  /* skip kind-selector */
@@ -1210,6 +1291,13 @@ static void parseTypeSpec (tokenInfo *const token)
 				parseDerivedTypeDef (token);
 			break;
 
+		case KEYWORD_enum:
+			parseEnumBlock (token);
+
+		case KEYWORD_enumerator:
+			readToken (token);
+			break;
+
 		default:
 			skipToToken (token, TOKEN_STATEMENT_END);
 			break;
@@ -1244,6 +1332,9 @@ static boolean skipStatementIfKeyword (tokenInfo *const token, keywordId keyword
  *      or POINTER
  *      or SAVE
  *      or TARGET
+ *      or PASS
+ *      or NOPASS
+ *      or DEFERRED
  * 
  *  component-attr-spec
  *      is POINTER
@@ -1266,7 +1357,26 @@ static void parseQualifierSpecList (tokenInfo *const token)
 			case KEYWORD_public:
 			case KEYWORD_save:
 			case KEYWORD_target:
+			case KEYWORD_pass:
+			case KEYWORD_nopass:	
+			case KEYWORD_deferred:
+			case KEYWORD_non_overridable:
+			case KEYWORD_abstract:
+			case KEYWORD_protected:
 				readToken (token);
+				break;
+
+			case KEYWORD_codimension:
+				readToken (token);
+				Assert (isType (token, TOKEN_SQUARE_OPEN));
+				skipOverSquares (token);
+				break;
+
+			case KEYWORD_bind:
+			case KEYWORD_extends:
+				readToken (token);
+				Assert(isType (token, TOKEN_PAREN_OPEN));
+				skipOverParens (token);
 				break;
 
 			case KEYWORD_dimension:
@@ -1290,11 +1400,12 @@ static tagType variableTagType (void)
 		const tokenInfo* const parent = ancestorTop ();
 		switch (parent->tag)
 		{
-			case TAG_MODULE:       result = TAG_VARIABLE;  break;
-			case TAG_DERIVED_TYPE: result = TAG_COMPONENT; break;
-			case TAG_FUNCTION:     result = TAG_LOCAL;     break;
-			case TAG_SUBROUTINE:   result = TAG_LOCAL;     break;
-			default:               result = TAG_VARIABLE;  break;
+			case TAG_MODULE:       result = TAG_VARIABLE;   break;
+			case TAG_DERIVED_TYPE: result = TAG_COMPONENT;  break;
+			case TAG_FUNCTION:     result = TAG_LOCAL;      break;
+			case TAG_SUBROUTINE:   result = TAG_LOCAL;      break;
+			case TAG_ENUM:         result = TAG_ENUMERATOR; break;
+			default:               result = TAG_VARIABLE;   break;
 		}
 	}
 	return result;
@@ -1307,6 +1418,8 @@ static void parseEntityDecl (tokenInfo *const token)
 	readToken (token);
 	if (isType (token, TOKEN_PAREN_OPEN))
 		skipOverParens (token);
+	if (isType (token, TOKEN_SQUARE_OPEN))
+		skipOverSquares (token);
 	if (isType (token, TOKEN_OPERATOR) &&
 			strcmp (vStringValue (token->string), "*") == 0)
 	{
@@ -1323,7 +1436,8 @@ static void parseEntityDecl (tokenInfo *const token)
 			readToken (token);
 			skipPast (token, TOKEN_OPERATOR);
 		}
-		else if (strcmp (vStringValue (token->string), "=") == 0)
+		else if (strcmp (vStringValue (token->string), "=") == 0
+				 || strcmp (vStringValue (token->string), "=>") == 0)
 		{
 			while (! isType (token, TOKEN_COMMA) &&
 					! isType (token, TOKEN_STATEMENT_END))
@@ -1331,6 +1445,8 @@ static void parseEntityDecl (tokenInfo *const token)
 				readToken (token);
 				if (isType (token, TOKEN_PAREN_OPEN))
 					skipOverParens (token);
+				if (isType (token, TOKEN_SQUARE_OPEN))
+					skipOverSquares (token);
 			}
 		}
 	}
@@ -1516,7 +1632,7 @@ static void parseUnionStmt (tokenInfo *const token)
  */
 static void parseStructureStmt (tokenInfo *const token)
 {
-	tokenInfo *name;
+	tokenInfo *name = NULL;
 	Assert (isKeyword (token, KEYWORD_structure));
 	readToken (token);
 	if (isType (token, TOKEN_OPERATOR) &&
@@ -1601,6 +1717,7 @@ static boolean parseSpecificationStmt (tokenInfo *const token)
 		case KEYWORD_public:
 		case KEYWORD_save:
 		case KEYWORD_target:
+		case KEYWORD_protected:
 			skipToNextStatement (token);
 			break;
 
@@ -1736,6 +1853,42 @@ static void parseInterfaceBlock (tokenInfo *const token)
 	skipToNextStatement (token);
 	ancestorPop ();
 	F (name);
+}
+
+static void parseEnumBlock (tokenInfo *const token)
+{
+	Assert (isKeyword (token, KEYWORD_enum));
+	readToken (token);
+	if (isType (token, TOKEN_COMMA))
+		parseQualifierSpecList (token);
+	if (isType (token, TOKEN_PAREN_OPEN))
+		skipOverParens (token);  /* skip kind-selector */
+	if (isType (token, TOKEN_OPERATOR) &&
+		strcmp (vStringValue (token->string), "*") == 0)
+	{
+		readToken (token);
+		if (isType (token, TOKEN_PAREN_OPEN))
+			skipOverParens (token);
+		else
+			readToken (token);
+	}
+	if (isType (token, TOKEN_DOUBLE_COLON))
+		readToken (token);
+	if (isType (token, TOKEN_IDENTIFIER))
+		makeFortranTag (token, TAG_ENUM);
+	ancestorPush (token);
+	skipToNextStatement (token);
+	while (! isKeyword (token, KEYWORD_end))
+	{
+		if (isTypeSpec (token))
+			parseTypeDeclarationStmt (token);
+		else
+			skipToNextStatement (token);
+	}
+	readSubToken (token);
+	/* secondary token should be KEYWORD_enum token */
+	skipToToken (token, TOKEN_STATEMENT_END);
+	ancestorPop ();
 }
 
 /*  entry-stmt is
@@ -2025,10 +2178,13 @@ static boolean parseExecutionPart (tokenInfo *const token)
 
 			case KEYWORD_end:
 				readSubToken (token);
-				if (isSecondaryKeyword (token, KEYWORD_do) ||
+				if (isSecondaryKeyword (token, KEYWORD_associate) ||
+					isSecondaryKeyword (token, KEYWORD_do) ||
 					isSecondaryKeyword (token, KEYWORD_if) ||
 					isSecondaryKeyword (token, KEYWORD_select) ||
-					isSecondaryKeyword (token, KEYWORD_where))
+					isSecondaryKeyword (token, KEYWORD_where) ||
+					isSecondaryKeyword (token, KEYWORD_forall) ||
+					isSecondaryKeyword (token, KEYWORD_enum))
 				{
 					skipToNextStatement (token);
 					result = TRUE;

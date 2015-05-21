@@ -1,0 +1,10 @@
+
+input.f90,305
+module test_procedure_keywordtest_procedure_keyword1,0
+  type :: test_typetest_type3,31
+    integer :: a a4,51
+    procedure, nopass :: suba suba6,83
+    procedure, pass :: subb subb7,121
+  procedure(real(8)) :: getpidgetpid10,179
+  subroutine suba(suba14,221
+  subroutine subb(subb18,281

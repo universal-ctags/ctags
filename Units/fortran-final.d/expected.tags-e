@@ -1,0 +1,7 @@
+
+input.f90,171
+module test_fortran_finaltest_fortran_final1,0
+  type :: test_typetest_type5,44
+    integer, ala6,64
+    final :: clearclear8,108
+  subroutine clear(clear13,159

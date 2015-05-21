@@ -1,0 +1,6 @@
+
+input.f90,112
+module m_testm_test1,0
+  integer, protected :: aa2,14
+  subroutine init(init4,49
+program testtest10,141
