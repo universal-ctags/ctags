@@ -21,6 +21,7 @@
 #include "options.h"
 #include "read.h"
 #include "vstring.h"
+#include "parse.h"
 
 /*
 *   MACROS
@@ -65,6 +66,9 @@ typedef struct sCppState {
 	boolean hasAtLiteralStrings; /* supports @"c:\" strings */
 	boolean hasSingleQuoteLiteralNumbers; /* supports vera number literals:
 						 'h..., 'o..., 'd..., and 'b... */
+	const kindOption  *defineMacroKind;
+	const kindOption  *headerKind;
+
 	struct sDirective {
 		enum eState state;       /* current directive being processed */
 		boolean	accept;          /* is a directive syntactically permitted? */
@@ -87,6 +91,8 @@ static cppState Cpp = {
 	FALSE,       /* resolveRequired */
 	FALSE,       /* hasAtLiteralStrings */
 	FALSE,	     /* hasSingleQuoteLiteralNumbers */
+	NULL,	     /* defineMacroKind */
+	NULL,	     /* headerKind */
 	{
 		DRCTV_NONE,  /* state */
 		FALSE,       /* accept */
@@ -111,7 +117,9 @@ extern unsigned int getDirectiveNestLevel (void)
 }
 
 extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
-		     const boolean hasSingleQuoteLiteralNumbers)
+		     const boolean hasSingleQuoteLiteralNumbers,
+		     const struct sKindOption *defineMacroKind,
+		     const struct sKindOption *headerKind)
 {
 	BraceFormat = state;
 
@@ -120,6 +128,8 @@ extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 	Cpp.resolveRequired = FALSE;
 	Cpp.hasAtLiteralStrings = hasAtLiteralStrings;
 	Cpp.hasSingleQuoteLiteralNumbers = hasSingleQuoteLiteralNumbers;
+	Cpp.defineMacroKind  = defineMacroKind;
+	Cpp.headerKind  = headerKind;
 
 	Cpp.directive.state     = DRCTV_NONE;
 	Cpp.directive.accept    = TRUE;
@@ -215,12 +225,8 @@ static void readFilename (int c, vString *const name)
 	int c_end = (c == '<')? '>': '"';
 
 	vStringClear (name);
-	do
-	{
-		vStringPut (name, c);
-	} while (c = fileGetc (), (c != EOF && c != c_end && c != '\n'));
 
-	if (c == c_end)
+	while (c = fileGetc (), (c != EOF && c != c_end && c != '\n'))
 		vStringPut (name, c);
 
 	vStringTerminate (name);
@@ -320,7 +326,7 @@ static void makeDefineTag (const char *const name)
 {
 	const boolean isFileScope = (boolean) (! isHeaderFile ());
 
-	if (includingDefineTags () &&
+	if (Cpp.defineMacroKind && Cpp.defineMacroKind->enabled &&
 		(! isFileScope  ||  Option.include.fileScope))
 	{
 		tagEntryInfo e;
@@ -328,23 +334,24 @@ static void makeDefineTag (const char *const name)
 		e.lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
 		e.isFileScope  = isFileScope;
 		e.truncateLine = TRUE;
-		e.kindName     = "macro";
-		e.kind         = 'd';
+		e.kindName     = Cpp.defineMacroKind->name;
+		e.kind         = Cpp.defineMacroKind->letter;
 		makeTagEntry (&e);
 	}
 }
 
-static void makeIncludeTag (const  char *const name)
+static void makeIncludeTag (const  char *const name, const char separator)
 {
-	if (includingIncludeTags ())
+	tagEntryInfo e;
+
+	if (Cpp.headerKind && Cpp.headerKind->enabled)
 	{
-		tagEntryInfo e;
 		initTagEntry (&e, name);
 		e.lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
 		e.isFileScope  = FALSE;
 		e.truncateLine = TRUE;
-		e.kindName     = "include";
-		e.kind         = 'I';
+		e.kindName     = Cpp.headerKind->name,
+		e.kind         = Cpp.headerKind->letter;
 		makeTagEntry (&e);
 	}
 }
@@ -412,8 +419,8 @@ static void directiveInclude (const int c)
 	if (c == '<' || c == '"')
 	{
 		readFilename (c, Cpp.directive.name);
-		if (! isIgnore ())
-			makeIncludeTag (vStringValue (Cpp.directive.name));
+		if ((! isIgnore ()) && vStringLength (Cpp.directive.name))
+			makeIncludeTag (vStringValue (Cpp.directive.name), c);
 	}
 	Cpp.directive.state = DRCTV_NONE;
 }

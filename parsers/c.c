@@ -293,9 +293,9 @@ static int AnonymousID = 0;
 typedef enum {
 	CK_UNDEFINED = COMMONK_UNDEFINED,
 	CK_CLASS, CK_DEFINE, CK_ENUMERATOR, CK_FUNCTION,
-	CK_ENUMERATION, CK_LOCAL, CK_MEMBER, CK_NAMESPACE, CK_PROTOTYPE,
+	CK_ENUMERATION, CK_HEADER, CK_LOCAL, CK_MEMBER, CK_NAMESPACE, CK_PROTOTYPE,
 	CK_STRUCT, CK_TYPEDEF, CK_UNION, CK_VARIABLE,
-	CK_EXTERN_VARIABLE, CK_INCLUDE, CK_LABEL
+	CK_EXTERN_VARIABLE, CK_LABEL
 } cKind;
 
 static kindOption CKinds [] = {
@@ -304,6 +304,7 @@ static kindOption CKinds [] = {
 	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)"},
 	{ TRUE,  'f', "function",   "function definitions"},
 	{ TRUE,  'g', "enum",       "enumeration names"},
+	{ FALSE, 'h', "header",     "included header files"},
 	{ FALSE, 'l', "local",      "local variables"},
 	{ TRUE,  'm', "member",     "class, struct, and union members"},
 	{ TRUE,  'n', "namespace",  "namespaces"},
@@ -313,7 +314,6 @@ static kindOption CKinds [] = {
 	{ TRUE,  'u', "union",      "union names"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
 	{ FALSE, 'x', "externvar",  "external and forward variable declarations"},
-	{ FALSE, 'I', "include",    "included file name"},
 	{ FALSE, 'L', "label",      "goto label"},
 };
 
@@ -394,7 +394,7 @@ typedef enum {
 	VK_CLASS, VK_DEFINE, VK_ENUMERATOR, VK_FUNCTION,
 	VK_ENUMERATION, VK_LOCAL, VK_MEMBER, VK_PROGRAM, VK_PROTOTYPE,
 	VK_TASK, VK_TYPEDEF, VK_VARIABLE,
-	VK_EXTERN_VARIABLE
+	VK_EXTERN_VARIABLE, VK_HEADER
 } veraKind;
 
 static kindOption VeraKinds [] = {
@@ -410,7 +410,9 @@ static kindOption VeraKinds [] = {
 	{ TRUE,  't', "task",       "tasks"},
 	{ TRUE,  'T', "typedef",    "typedefs"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
-	{ FALSE, 'x', "externvar",  "external variable declarations"}
+	{ FALSE, 'x', "externvar",  "external variable declarations"},
+	{ FALSE, 'h', "system header",   "included system header file name"},
+	{ FALSE, 'H', "local header",    "included local header file name"}
 };
 
 static const keywordDesc KeywordTable [] = {
@@ -573,16 +575,6 @@ static void createTags (const unsigned int nestLevel, statementInfo *const paren
 /*
 *   FUNCTION DEFINITIONS
 */
-
-extern boolean includingDefineTags (void)
-{
-	return CKinds [CK_DEFINE].enabled;
-}
-
-extern boolean includingIncludeTags (void)
-{
-	return CKinds [CK_INCLUDE].enabled;
-}
 
 /*
 *   Token management
@@ -3140,9 +3132,26 @@ static rescanReason findCTags (const unsigned int passCount)
 {
 	exception_t exception;
 	rescanReason rescan;
+	kindOption *kind_for_define = NULL;
+	kindOption *kind_for_header = NULL;
 
 	Assert (passCount < 3);
-	cppInit ((boolean) (passCount > 1), isLanguage (Lang_csharp), isLanguage(Lang_vera));
+
+	if (isLanguage (Lang_c) || isLanguage (Lang_cpp))
+	{
+		kind_for_define = CKinds+CK_DEFINE;
+		kind_for_header = CKinds+CK_HEADER;
+	}
+	else if (isLanguage (Lang_vera))
+	{
+		kind_for_define = VeraKinds+VK_DEFINE;
+		kind_for_header = VeraKinds+VK_HEADER;
+	}
+
+	cppInit ((boolean) (passCount > 1), isLanguage (Lang_csharp), isLanguage(Lang_vera),
+		 kind_for_define,
+		 kind_for_header);
+
 	Signature = vStringNew ();
 
 	exception = (exception_t) setjmp (Exception);
