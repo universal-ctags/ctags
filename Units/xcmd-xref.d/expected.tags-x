@@ -1,0 +1,7 @@
+Animal           class         3 input.coffee class Animal
+Horse            class        14 input.coffee class Horse extends Animal
+Snake            class         9 input.coffee class Snake extends Animal
+constructor      function      4 input.coffee constructor: (@name) ->
+move             function      6 input.coffee move: (meters) ->
+move             function     10 input.coffee move: ->
+move             function     15 input.coffee move: ->
