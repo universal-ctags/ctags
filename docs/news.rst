@@ -524,6 +524,7 @@ is the same as ::
 The characters ``{`` and ``}`` may not be suitable for command line
 use, but long flags are mostly intended for option libraries.
 
+The notion for the long flag is also introduced in ``--langdef`` option.
 
 Exclusive flag in regex
 ---------------------------------------------------------------------
@@ -699,6 +700,59 @@ Miscellaneous new options
 ``--undef[=yes|no]``
     Allows disabling the generation of macro tags from ``#undef``
     directives.
+
+
+Override the letter for file kind
+---------------------------------------------------------------------
+(See also #317.)
+
+Background
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``F`` is widely used as a kind letter for file kind. The ``F`` was
+hardcoded in ctags internal. However, we found some built-in parsers
+including Ruby uses ``F`` for their own kind. So if you find a tag
+having ``F`` as a kind letter, you cannot say what it is well: a
+file name or something peculiar in a language. Long kind description
+strings may help you but I am not sure all tools utilizing ``tags``
+file refer the long kind description strings.
+
+To fix the issue for letters for the kind
+we modified ctags as follows:
+we let the built-in parsers use ``!`` as a letter for file kind
+instead of ``F``.
+
+This modification breaks the backward-compatibility of meaning of tags
+file. Forcing to use ``F`` for file kinds to the parsers was another
+choice but it also breaks the backward-compatibility. We assumed the
+impact of using ``!`` for the parsers may be weaker than forcing
+t to use ``F``.
+
+For xcmd and regex parsers we prepare the way to override the default
+file kind letter, ``F``. Though using this in regex parser is not
+recommend.  Try not using ``F`` as a kind letter in your regex
+parser. In xcmd parser you may have no choice if the back-end tags file
+generator uses ``F`` for its own purpose.
+
+Usage
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+For overriding add ``fileKind`` long flag ``--langdef=LANG`` option.
+Following is an example to use ``Z`` as a kind letter in a language named
+``foo``:;
+
+	$ ctags --langdef=foo'{fileKind=Z}' ...
+
+Single quote is used here to avoid the expansion and evaluate the breaths
+by shell.
+
+To know the fileKind of languages, use ``--list-file-kind``::
+
+	$ ctags --list-file-kind 
+	Ada F
+	Ant F
+	Asm F
+	...
+	Ruby !
+	...
 
 Build system add possibility to change program name
 ---------------------------------------------------------------------
