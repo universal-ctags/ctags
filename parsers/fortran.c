@@ -127,6 +127,7 @@ typedef enum eKeywordId {
 	KEYWORD_private,
 	KEYWORD_procedure,
 	KEYWORD_program,
+	KEYWORD_protected,
 	KEYWORD_public,
 	KEYWORD_pure,
 	KEYWORD_real,
@@ -312,6 +313,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "private",         KEYWORD_private         },
 	{ "procedure",       KEYWORD_procedure       },
 	{ "program",         KEYWORD_program         },
+	{ "protected",       KEYWORD_protected       },
 	{ "public",          KEYWORD_public          },
 	{ "pure",            KEYWORD_pure            },
 	{ "real",            KEYWORD_real            },
@@ -1360,6 +1362,7 @@ static void parseQualifierSpecList (tokenInfo *const token)
 			case KEYWORD_deferred:
 			case KEYWORD_non_overridable:
 			case KEYWORD_abstract:
+			case KEYWORD_protected:
 				readToken (token);
 				break;
 
@@ -1714,6 +1717,7 @@ static boolean parseSpecificationStmt (tokenInfo *const token)
 		case KEYWORD_public:
 		case KEYWORD_save:
 		case KEYWORD_target:
+		case KEYWORD_protected:
 			skipToNextStatement (token);
 			break;
 
