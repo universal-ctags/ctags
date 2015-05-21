@@ -274,7 +274,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Same as --regex-<LANG>=..."},
 #endif
 #ifdef HAVE_COPROC
- {1,"  --<LANG>-xcmd=parser_command_path|parset_command_name"},
+ {1,"  --<LANG>-xcmd=parser_command_path|parser_command_name"},
  {1,"       Same as --xcmd-<LANG>=..."},
 #endif
  {1,"  --langdef=name"},
@@ -336,7 +336,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --version"},
  {1,"       Print version identifier to standard output."},
 #ifdef HAVE_COPROC
- {1,"  --xcmd-<LANG>=parser_command_path|parset_command_name"},
+ {1,"  --xcmd-<LANG>=parser_command_path|parser_command_name"},
  {1,"       Define external parser command path or name for specific language."},
 #endif
  {1, NULL}
