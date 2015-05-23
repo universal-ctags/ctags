@@ -1,0 +1,4 @@
+a	input.f90	/^  real/;"	v	module:proc_pointer
+my_pointer	input.f90	/^  procedure(sub), pointer :: my_pointer$/;"	v	module:proc_pointer
+proc_pointer	input.f90	/^module proc_pointer$/;"	m
+sub	input.f90	/^  subr/;"	s	module:proc_pointer
