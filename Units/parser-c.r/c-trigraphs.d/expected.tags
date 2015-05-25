@@ -1,0 +1,14 @@
+A	input.c	/^??=define A /;"	d	file:
+B	input.c	/^??=define B /;"	d	file:
+D	input.c	/^??=define D /;"	d	file:
+E	input.c	/^??=define E /;"	d	file:
+F	input.c	/^??=define F /;"	d	file:
+M3_INIT	input.c	/^??=define M3_INIT(/;"	d	file:
+STRINGIFY	input.c	/^??=define STRINGIFY(/;"	d	file:
+STRINGIFY_INTERN	input.c	/^??=define STRINGIFY_INTERN(/;"	d	file:
+buf	input.c	/^  char *buf;$/;"	m	struct:str	file:
+len	input.c	/^  unsigned int len, size;$/;"	m	struct:str	file:
+main	input.c	/^int main(void)$/;"	f
+matrix3	input.c	/^typedef int matrix3??(3??);$/;"	t	file:
+size	input.c	/^  unsigned int len, size;$/;"	m	struct:str	file:
+str	input.c	/^struct str ??<$/;"	s	file:
