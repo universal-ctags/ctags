@@ -1433,7 +1433,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 #endif
 
 
-#ifdef USE_DIRECT_THREADED_VM
+#if USE_DIRECT_THREADED_VM
 #define VM_LOOP JUMP;
 #define VM_LOOP_END
 #define CASE(x) L_##x: sbegin = s; OPCODE_EXEC_HOOK;
@@ -1615,7 +1615,7 @@ static void  *oplabels[] = {
 #define CASE(x) case x:
 #define DEFAULT default:
 #define NEXT break
-#define JUMP continue
+#define JUMP continue; break
 #endif
 
 
@@ -1774,7 +1774,6 @@ static void  *oplabels[] = {
       p++; s++;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_EXACT3)  MOP_IN(OP_EXACT3);
       DATA_ENSURE(3);
@@ -1787,7 +1786,6 @@ static void  *oplabels[] = {
       p++; s++;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_EXACT4)  MOP_IN(OP_EXACT4);
       DATA_ENSURE(4);
@@ -1802,7 +1800,6 @@ static void  *oplabels[] = {
       p++; s++;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_EXACT5)  MOP_IN(OP_EXACT5);
       DATA_ENSURE(5);
@@ -1819,7 +1816,6 @@ static void  *oplabels[] = {
       p++; s++;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_EXACTN)  MOP_IN(OP_EXACTN);
       GET_LENGTH_INC(tlen, p);
@@ -1830,7 +1826,6 @@ static void  *oplabels[] = {
       sprev = s - 1;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_EXACTN_IC)  MOP_IN(OP_EXACTN_IC);
       {
@@ -1858,7 +1853,6 @@ static void  *oplabels[] = {
 
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_EXACTMB2N1)  MOP_IN(OP_EXACTMB2N1);
       DATA_ENSURE(2);
@@ -1882,7 +1876,6 @@ static void  *oplabels[] = {
       p++; s++;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_EXACTMB2N3)  MOP_IN(OP_EXACTMB2N3);
       DATA_ENSURE(6);
@@ -1901,7 +1894,6 @@ static void  *oplabels[] = {
       p++; s++;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_EXACTMB2N)  MOP_IN(OP_EXACTMB2N);
       GET_LENGTH_INC(tlen, p);
@@ -1915,7 +1907,6 @@ static void  *oplabels[] = {
       sprev = s - 2;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_EXACTMB3N)  MOP_IN(OP_EXACTMB3N);
       GET_LENGTH_INC(tlen, p);
@@ -1931,7 +1922,6 @@ static void  *oplabels[] = {
       sprev = s - 3;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_EXACTMBN)  MOP_IN(OP_EXACTMBN);
       GET_LENGTH_INC(tlen,  p);  /* mb-len */
@@ -1945,7 +1935,6 @@ static void  *oplabels[] = {
       sprev = s - tlen;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_CCLASS)  MOP_IN(OP_CCLASS);
       DATA_ENSURE(1);
@@ -2263,7 +2252,6 @@ static void  *oplabels[] = {
       }
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_ASCII_WORD_BOUND)  MOP_IN(OP_ASCII_WORD_BOUND);
       if (ON_STR_BEGIN(s)) {
@@ -2282,7 +2270,6 @@ static void  *oplabels[] = {
       }
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_NOT_WORD_BOUND)  MOP_IN(OP_NOT_WORD_BOUND);
       if (ON_STR_BEGIN(s)) {
@@ -2300,7 +2287,6 @@ static void  *oplabels[] = {
       }
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_NOT_ASCII_WORD_BOUND)  MOP_IN(OP_NOT_ASCII_WORD_BOUND);
       if (ON_STR_BEGIN(s)) {
@@ -2318,7 +2304,6 @@ static void  *oplabels[] = {
       }
       MOP_OUT;
       JUMP;
-      NEXT;
 
 #ifdef USE_WORD_BEGIN_END
     CASE(OP_WORD_BEGIN)  MOP_IN(OP_WORD_BEGIN);
@@ -2368,7 +2353,6 @@ static void  *oplabels[] = {
 
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_END_BUF)  MOP_IN(OP_END_BUF);
       if (! ON_STR_END(s)) goto fail;
@@ -2376,7 +2360,6 @@ static void  *oplabels[] = {
 
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_BEGIN_LINE)  MOP_IN(OP_BEGIN_LINE);
     op_begin_line:
@@ -2454,7 +2437,6 @@ static void  *oplabels[] = {
 
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_BEGIN_POS_OR_LINE)  MOP_IN(OP_BEGIN_POS_OR_LINE);
       if (s != msa->gpos)
@@ -2462,41 +2444,35 @@ static void  *oplabels[] = {
 
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_MEMORY_START_PUSH)  MOP_IN(OP_MEMORY_START_PUSH);
       GET_MEMNUM_INC(mem, p);
       STACK_PUSH_MEM_START(mem, s);
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_MEMORY_START)  MOP_IN(OP_MEMORY_START);
       GET_MEMNUM_INC(mem, p);
       mem_start_stk[mem] = (OnigStackIndex )((void* )s);
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_MEMORY_END_PUSH)  MOP_IN(OP_MEMORY_END_PUSH);
       GET_MEMNUM_INC(mem, p);
       STACK_PUSH_MEM_END(mem, s);
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_MEMORY_END)  MOP_IN(OP_MEMORY_END);
       GET_MEMNUM_INC(mem, p);
       mem_end_stk[mem] = (OnigStackIndex )((void* )s);
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_KEEP)  MOP_IN(OP_KEEP);
       pkeep = s;
       MOP_OUT;
       JUMP;
-      NEXT;
 
 #ifdef USE_SUBEXP_CALL
     CASE(OP_MEMORY_END_PUSH_REC)  MOP_IN(OP_MEMORY_END_PUSH_REC);
@@ -2506,7 +2482,6 @@ static void  *oplabels[] = {
       mem_start_stk[mem] = GET_STACK_INDEX(stkp);
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_MEMORY_END_REC)  MOP_IN(OP_MEMORY_END_REC);
       GET_MEMNUM_INC(mem, p);
@@ -2521,7 +2496,6 @@ static void  *oplabels[] = {
       STACK_PUSH_MEM_END_MARK(mem);
       MOP_OUT;
       JUMP;
-      NEXT;
 #endif
 
     CASE(OP_BACKREF1)  MOP_IN(OP_BACKREF1);
@@ -2565,7 +2539,6 @@ static void  *oplabels[] = {
 	MOP_OUT;
 	JUMP;
       }
-      NEXT;
 
     CASE(OP_BACKREFN_IC)  MOP_IN(OP_BACKREFN_IC);
       GET_MEMNUM_INC(mem, p);
@@ -2675,7 +2648,6 @@ static void  *oplabels[] = {
 	MOP_OUT;
 	JUMP;
       }
-      NEXT;
 
 #ifdef USE_BACKREF_WITH_LEVEL
     CASE(OP_BACKREF_WITH_LEVEL)
@@ -2703,7 +2675,6 @@ static void  *oplabels[] = {
 	JUMP;
       }
 
-    NEXT;
 #endif
 
 #if 0   /* no need: IS_DYNAMIC_OPTION() == 0 */
@@ -2713,13 +2684,11 @@ static void  *oplabels[] = {
       p += SIZE_OP_SET_OPTION + SIZE_OP_FAIL;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_SET_OPTION)  MOP_IN(OP_SET_OPTION);
       GET_OPTION_INC(option, p);
       MOP_OUT;
       JUMP;
-      NEXT;
 #endif
 
     CASE(OP_NULL_CHECK_START)  MOP_IN(OP_NULL_CHECK_START);
@@ -2727,7 +2696,6 @@ static void  *oplabels[] = {
       STACK_PUSH_NULL_CHECK_START(mem, s);
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_NULL_CHECK_END)  MOP_IN(OP_NULL_CHECK_END);
       {
@@ -2761,7 +2729,6 @@ static void  *oplabels[] = {
       }
       MOP_OUT;
       JUMP;
-      NEXT;
 
 #ifdef USE_MONOMANIAC_CHECK_CAPTURES_IN_ENDLESS_REPEAT
     CASE(OP_NULL_CHECK_END_MEMST)  MOP_IN(OP_NULL_CHECK_END_MEMST);
@@ -2781,7 +2748,6 @@ static void  *oplabels[] = {
       }
       MOP_OUT;
       JUMP;
-      NEXT;
 #endif
 
 #ifdef USE_SUBEXP_CALL
@@ -2810,7 +2776,6 @@ static void  *oplabels[] = {
       }
       MOP_OUT;
       JUMP;
-      NEXT;
 #endif
 
     CASE(OP_JUMP)  MOP_IN(OP_JUMP);
@@ -2819,14 +2784,12 @@ static void  *oplabels[] = {
       MOP_OUT;
       CHECK_INTERRUPT_IN_MATCH_AT;
       JUMP;
-      NEXT;
 
     CASE(OP_PUSH)  MOP_IN(OP_PUSH);
       GET_RELADDR_INC(addr, p);
       STACK_PUSH_ALT(p + addr, s, sprev, pkeep);
       MOP_OUT;
       JUMP;
-      NEXT;
 
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
     CASE(OP_STATE_CHECK_PUSH)  MOP_IN(OP_STATE_CHECK_PUSH);
@@ -2838,7 +2801,6 @@ static void  *oplabels[] = {
       STACK_PUSH_ALT_WITH_STATE_CHECK(p + addr, s, sprev, mem, pkeep);
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_STATE_CHECK_PUSH_OR_JUMP)  MOP_IN(OP_STATE_CHECK_PUSH_OR_JUMP);
       GET_STATE_CHECK_NUM_INC(mem, p);
@@ -2852,7 +2814,6 @@ static void  *oplabels[] = {
       }
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_STATE_CHECK)  MOP_IN(OP_STATE_CHECK);
       GET_STATE_CHECK_NUM_INC(mem, p);
@@ -2862,14 +2823,12 @@ static void  *oplabels[] = {
       STACK_PUSH_STATE_CHECK(s, mem);
       MOP_OUT;
       JUMP;
-      NEXT;
 #endif /* USE_COMBINATION_EXPLOSION_CHECK */
 
     CASE(OP_POP)  MOP_IN(OP_POP);
       STACK_POP_ONE;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_PUSH_OR_JUMP_EXACT1)  MOP_IN(OP_PUSH_OR_JUMP_EXACT1);
       GET_RELADDR_INC(addr, p);
@@ -2882,7 +2841,6 @@ static void  *oplabels[] = {
       p += (addr + 1);
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_PUSH_IF_PEEK_NEXT)  MOP_IN(OP_PUSH_IF_PEEK_NEXT);
       GET_RELADDR_INC(addr, p);
@@ -2895,7 +2853,6 @@ static void  *oplabels[] = {
       p++;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_REPEAT)  MOP_IN(OP_REPEAT);
       {
@@ -2912,7 +2869,6 @@ static void  *oplabels[] = {
       }
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_REPEAT_NG)  MOP_IN(OP_REPEAT_NG);
       {
@@ -2930,7 +2886,6 @@ static void  *oplabels[] = {
       }
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_REPEAT_INC)  MOP_IN(OP_REPEAT_INC);
       GET_MEMNUM_INC(mem, p); /* mem: OP_REPEAT ID */
@@ -2953,7 +2908,6 @@ static void  *oplabels[] = {
       MOP_OUT;
       CHECK_INTERRUPT_IN_MATCH_AT;
       JUMP;
-      NEXT;
 
     CASE(OP_REPEAT_INC_SG)  MOP_IN(OP_REPEAT_INC_SG);
       GET_MEMNUM_INC(mem, p); /* mem: OP_REPEAT ID */
@@ -2987,7 +2941,6 @@ static void  *oplabels[] = {
       MOP_OUT;
       CHECK_INTERRUPT_IN_MATCH_AT;
       JUMP;
-      NEXT;
 
     CASE(OP_REPEAT_INC_NG_SG)  MOP_IN(OP_REPEAT_INC_NG_SG);
       GET_MEMNUM_INC(mem, p); /* mem: OP_REPEAT ID */
@@ -3000,7 +2953,6 @@ static void  *oplabels[] = {
       STACK_PUSH_POS(s, sprev, pkeep);
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_POP_POS)  MOP_IN(OP_POP_POS);
       {
@@ -3010,14 +2962,12 @@ static void  *oplabels[] = {
       }
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_PUSH_POS_NOT)  MOP_IN(OP_PUSH_POS_NOT);
       GET_RELADDR_INC(addr, p);
       STACK_PUSH_POS_NOT(p + addr, s, sprev, pkeep);
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_FAIL_POS)  MOP_IN(OP_FAIL_POS);
       STACK_POP_TIL_POS_NOT;
@@ -3028,13 +2978,11 @@ static void  *oplabels[] = {
       STACK_PUSH_STOP_BT;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_POP_STOP_BT)  MOP_IN(OP_POP_STOP_BT);
       STACK_STOP_BT_END;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_LOOK_BEHIND)  MOP_IN(OP_LOOK_BEHIND);
       GET_LENGTH_INC(tlen, p);
@@ -3043,7 +2991,6 @@ static void  *oplabels[] = {
       sprev = (UChar* )onigenc_get_prev_char_head(encode, str, s);
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_PUSH_LOOK_BEHIND_NOT)  MOP_IN(OP_PUSH_LOOK_BEHIND_NOT);
       GET_RELADDR_INC(addr, p);
@@ -3062,7 +3009,6 @@ static void  *oplabels[] = {
       }
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_FAIL_LOOK_BEHIND_NOT)  MOP_IN(OP_FAIL_LOOK_BEHIND_NOT);
       STACK_POP_TIL_LOOK_BEHIND_NOT;
@@ -3076,14 +3022,12 @@ static void  *oplabels[] = {
       p = reg->p + addr;
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_RETURN)  MOP_IN(OP_RETURN);
       STACK_RETURN(p);
       STACK_PUSH_RETURN;
       MOP_OUT;
       JUMP;
-      NEXT;
 #endif
 
     CASE(OP_CONDITION)  MOP_IN(OP_CONDITION);
@@ -3096,7 +3040,6 @@ static void  *oplabels[] = {
       }
       MOP_OUT;
       JUMP;
-      NEXT;
 
     CASE(OP_FINISH)
       goto finish;
@@ -3121,7 +3064,6 @@ static void  *oplabels[] = {
 
       MOP_OUT;
       JUMP;
-      NEXT;
 
     DEFAULT
       goto bytecode_error;
