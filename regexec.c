@@ -1436,7 +1436,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 #ifdef USE_DIRECT_THREADED_VM
 #define VM_LOOP JUMP;
 #define VM_LOOP_END
-#define CASE(x) L_##x: OPCODE_EXEC_HOOK;
+#define CASE(x) L_##x: sbegin = s; OPCODE_EXEC_HOOK;
 #define DEFAULT L_DEFAULT:
 #define NEXT sprev = sbegin; JUMP
 #define JUMP goto *oplabels[*p++]
