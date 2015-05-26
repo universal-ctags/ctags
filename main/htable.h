@@ -19,8 +19,8 @@ typedef boolean      (* hashTableEqualFunc) (void* a, void* b);
 typedef void         (* hashTableFreeFunc)  (void * ptr);
 typedef void         (* hashTableForeachFunc) (void *key, void *value, void* user_data);
 
-unsigned int hash_ptrhash (void * x);
-boolean hash_ptreq (void *a, void *b);
+unsigned int hashPtrhash (void * x);
+boolean hashPtreq (void *a, void *b);
 
 extern hashTable* hashTableNew         (unsigned int size,
 					hashTableHashFunc hashfn,

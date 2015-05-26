@@ -534,7 +534,7 @@ static langType determineTwoGramLanguage(const unsigned char *const t,
 		const tgTableEntry *const i_entry = findTgTableEntry(LanguageTable[candidates[i].lang],
 								     candidates[i].spec);
 
-		r = tg_compare(winner_entry->tg_table, i_entry->tg_table, t);
+		r = tgCompare(winner_entry->tg_table, i_entry->tg_table, t);
 
 		verbose ("tg tournament %s:%s v.s. %s:%s => %d\n",
 			 LanguageTable[candidates[winner].lang]->name, candidates[winner].spec,
@@ -566,14 +566,14 @@ static langType getTwoGramLanguage (FILE* input,
 
 		unsigned char* t;
 
-		t = tg_create();
-		tg_load(t, input);
+		t = tgCreate();
+		tgLoad(t, input);
 
 		result = determineTwoGramLanguage(t, candidates, n_candidates);
 
 		verbose("winner of tg tournament: %s\n", LanguageTable[result]->name);
 
-		tg_destroy(t);
+		tgDestroy(t);
 
 	}
 	return result;
@@ -999,12 +999,12 @@ extern void addCorpusFile (const langType language,
 		error (FATAL,
 		       "failed in open %s as corpus", vStringValue (corpus_file));
 
-	tg_table = tg_create ();
+	tg_table = tgCreate ();
 	if (!tg_table)
 		error (FATAL,
 		       "failed allocating memory for tg entry");
 
-	tg_load (tg_table, input);
+	tgLoad (tg_table, input);
 	fclose (input);
 
 	vspec = pattern_p? vStringNewInit (spec): ext2ptrnNew (spec);

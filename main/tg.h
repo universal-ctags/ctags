@@ -16,13 +16,13 @@
 #include <stdio.h>
 
 
-unsigned char*  tg_create (void);
-void            tg_destroy(unsigned char *mini_table);
-void            tg_load   (unsigned char *mini_table, FILE *fp);
+unsigned char*  tgCreate (void);
+void            tgDestroy(unsigned char *mini_table);
+void            tgLoad   (unsigned char *mini_table, FILE *fp);
 
 /* if t is similar than a, return negative value.
    if t is similar than b, return positive value. */
-int             tg_compare(const unsigned char *a, const unsigned char *b, const unsigned char *t);
+int             tgCompare(const unsigned char *a, const unsigned char *b, const unsigned char *t);
 
 #endif	/* _TG_H */
 

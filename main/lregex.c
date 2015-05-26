@@ -327,8 +327,8 @@ static regexPattern* addCompiledTagCommon (const langType language,
 			Sets [i].patterns = NULL;
 			Sets [i].count = 0;
 			Sets [i].kinds = hashTableNew (11,
-						       hash_ptrhash,
-						       hash_ptreq,
+						       hashPtrhash,
+						       hashPtreq,
 						       NULL,
 						       kindFree);
 		}

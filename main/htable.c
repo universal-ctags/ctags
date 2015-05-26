@@ -204,7 +204,7 @@ extern int        hashTableCountItem   (hashTable *htable)
 	hashTableForeachItem (htable, count, &c);
 	return c;
 }
-unsigned int hash_ptrhash (void * x)
+unsigned int hashPtrhash (void * x)
 {
 	union {
 		void *ptr;
@@ -216,7 +216,7 @@ unsigned int hash_ptrhash (void * x)
 	return v.ui;
 }
 
-boolean hash_ptreq (void *a, void *b)
+boolean hashPtreq (void *a, void *b)
 {
 	return (a == b)? TRUE: FALSE;
 }

@@ -22,8 +22,8 @@ enum pcoproc_error {
 	/* PCOPROC_ERROR_EXECVE  = -4, */
 };
 
-extern enum pcoproc_error pcoproc_open (const char *filename, char *const argv[],
+extern enum pcoproc_error pcoprocOpen (const char *filename, char *const argv[],
 					FILE** readfp, FILE** writefp);
-extern int  pcoproc_close (FILE* fp);
+extern int  pcoprocClose (FILE* fp);
 
 #endif	/* PCOPROC_H */

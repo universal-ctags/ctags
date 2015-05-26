@@ -52,18 +52,18 @@ static void            tg_big_destroy    (unsigned short *a);
 
 
 
-unsigned char*  tg_create (void)
+unsigned char*  tgCreate (void)
 {
 	return xCalloc(256 * 256, unsigned char);
 }
 
-void tg_destroy(unsigned char *mini_table)
+void tgDestroy(unsigned char *mini_table)
 {
 	eFree(mini_table);
 }
 
 
-void tg_load (unsigned char *mini_table, FILE *fp)
+void tgLoad (unsigned char *mini_table, FILE *fp)
 {
 	int dump = 0;
 	tg_load_full(mini_table, fp, tg_nonalnum_get_char, &dump);
@@ -244,7 +244,7 @@ static void tg_big_destroy (unsigned short *big_table)
 	eFree(big_table);
 }
 
-int tg_compare(const unsigned char *a, const unsigned char *b, const unsigned char *t)
+int tgCompare(const unsigned char *a, const unsigned char *b, const unsigned char *t)
 {
 	unsigned long asz, bsz, max;
 	unsigned short *abt, *bbt;
@@ -368,7 +368,7 @@ static void help(const char* const progname, FILE *out)
 		 perror(fname);
 		 return 1;
 	 }
-	 mini_table = tg_create();
+	 mini_table = tgCreate();
 
 	 tg_load_full(mini_table, fp, tg_nonalnum_get_char, (void *)&M_debug);
 	 fclose(fp);
@@ -412,7 +412,7 @@ static int compare_files_main(int argc, char **argv)
 			perror(fname[i]);
 			return 1;
 		}
-		mini_table[i] = tg_create();
+		mini_table[i] = tgCreate();
 		tg_load_full(mini_table[i], fp[i], tg_nonalnum_get_char, (void *)&M_debug);
 		fclose(fp[i]);
 	}
