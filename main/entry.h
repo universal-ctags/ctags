@@ -111,6 +111,10 @@ extern void closeTagFile (const boolean resize);
 extern void beginEtagsFile (void);
 extern void endEtagsFile (const char *const name);
 extern int makeTagEntry (const tagEntryInfo *const tag);
+
+/*This makes a tag entry only if tag->kind is enabled in the current language. */
+extern int makeTagEntryMaybe (const tagEntryInfo *const tag);
+
 extern void initTagEntry (tagEntryInfo *const e, const char *const name);
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,

@@ -41,6 +41,7 @@
 #define getSourceLineNumber()    File.source.lineNumber
 #define isLanguage(lang)         (boolean)((lang) == File.source.language)
 #define isHeaderFile()           File.source.isHeader
+#define isSourceLanguageKindEnabled(c)  isLanguageKindEnabled (File.source.language, c)
 
 /*
 *   DATA DECLARATIONS

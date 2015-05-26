@@ -1199,6 +1199,16 @@ static kindOption *langKindOption (const langType language, const int flag)
 	return result;
 }
 
+extern boolean isLanguageKindEnabled (langType language, char kind)
+{
+	const kindOption *kindOpt;
+
+	Assert (kindOpt  = langKindOption (language, kind));
+
+	return kindOpt->enabled;
+}
+
+
 static void resetLanguageKinds (const langType language, const boolean mode)
 {
 	const parserDefinition* lang;
