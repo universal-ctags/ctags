@@ -102,7 +102,7 @@ Set `TRUE` to `use_cork` like:
 	    return def;
     }
 
-When ctags running a parser with use_cork being `TRUE`, all output
+When ctags running a parser with `use_cork` being `TRUE`, all output
 requested via `makeTagEntry` function calling is stored to an internal
 queue, not to `tags` file.  When parsing an input file is done, the
 tag information stored automatically to the queue are flushed to
