@@ -1,0 +1,1 @@
+ctags: Kind letter 'F' returned from xcmd ./foo.sh of foo language is reserved in ctags main

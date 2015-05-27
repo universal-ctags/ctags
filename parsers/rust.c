@@ -977,6 +977,7 @@ extern parserDefinition *RustParser (void)
 	parserDefinition *def = parserNew ("Rust");
 	def->kinds = rustKinds;
 	def->kindCount = KIND_COUNT (rustKinds);
+	def->fileKind = KIND_FILE_ALT;
 	def->extensions = extensions;
 	def->parser = findRustTags;
 

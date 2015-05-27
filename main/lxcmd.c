@@ -241,6 +241,7 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 	char * argv[3];
 	int status;
 	vString * opt;
+	char file_kind = getLanguageFileKind (language);
 
 	opt = vStringNewInit(XCMD_LIST_KIND_OPTION);
 	vStringCatS (opt, "=");
@@ -278,11 +279,20 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 		while (readLineWithNoSeek (vline, pp))
 		{
 			char* line;
+			char  kind_letter;
 
 			vStringStripNewline (vline);
 			line = vStringValue (vline);
 			if (!loadPathKind (path, line, argv))
 				break;
+
+			kind_letter = path->kinds [path->kount - 1].letter;
+			if (kind_letter == file_kind)
+				error (FATAL,
+				       "Kind letter \'%c\' returned from xcmd %s of %s language is reserved in ctags main",
+				       kind_letter,
+				       vStringValue (path->path),
+				       getLanguageName (language));
 		}
 
 		vStringDelete (vline);

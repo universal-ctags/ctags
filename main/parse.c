@@ -17,6 +17,7 @@
 
 #include "debug.h"
 #include "entry.h"
+#include "flags.h"
 #include "main.h"
 #define OPTION_WRITE
 #include "options.h"
@@ -81,6 +82,7 @@ extern parserDefinition* parserNew (const char* name)
 {
 	parserDefinition* result = xCalloc (1, parserDefinition);
 	result->name = eStrdup (name);
+	result->fileKind = KIND_FILE_DEFAULT;
 	return result;
 }
 
@@ -95,6 +97,19 @@ extern const char *getLanguageName (const langType language)
 		result = LanguageTable [language]->name;
 	}
 	return result;
+}
+
+extern const char getLanguageFileKind (const langType language)
+{
+	char kind;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+
+	kind = LanguageTable [language]->fileKind;
+
+	Assert (kind != KIND_NULL);
+
+	return kind;
 }
 
 extern langType getNamedLanguage (const char *const name)
@@ -1057,12 +1072,28 @@ extern void enableLanguages (const boolean state)
 		enableLanguage (i, state);
 }
 
+static boolean doesParserUseKind (const parserDefinition *const parser, char letter)
+{
+	int k;
+
+	for (k = 0; k < parser->kindCount; k++)
+		if (parser->kinds [k].letter == letter)
+			return TRUE;
+	return FALSE;
+}
+
 static void initializeParsers (void)
 {
 	unsigned int i;
 	for (i = 0  ;  i < LanguageCount  ;  ++i)
+	{
 		if (LanguageTable [i]->initialize != NULL)
 			(LanguageTable [i]->initialize) ((langType) i);
+
+		Assert (LanguageTable [i]->fileKind != KIND_NULL);
+		Assert (!doesParserUseKind (LanguageTable [i],
+					    LanguageTable [i]->fileKind));
+	}
 }
 
 extern void initializeParsing (void)
@@ -1158,6 +1189,28 @@ static void lazyInitialize (langType language)
 /*
 *   Option parsing
 */
+#define COUNT(D) (sizeof(D)/sizeof(D[0]))
+
+static void lang_def_flag_file_kind_long (const char* const optflag, const char* const param, void* data)
+{
+	parserDefinition*  def = data;
+
+	Assert (def);
+	Assert (param);
+	Assert (optflag);
+
+
+	if (param[0] == '\0')
+		error (WARNING, "No letter specified for \"%s\" flag of --langdef option", optflag);
+	else if (param[1] != '\0')
+		error (WARNING, "Specify just a letter for \"%s\" flag of --langdef option", optflag);
+
+	def->fileKind = param[0];
+}
+
+static flagDefinition LangDefFlagDef [] = {
+	{ '\0',  "fileKind", NULL, lang_def_flag_file_kind_long },
+};
 
 extern void processLanguageDefineOption (
 		const char *const option, const char *const parameter __unused__)
@@ -1169,8 +1222,19 @@ extern void processLanguageDefineOption (
 		error (WARNING, "Language \"%s\" already defined", parameter);
 	else
 	{
-		unsigned int i = LanguageCount++;
-		parserDefinition* const def = parserNew (parameter);
+		char *name;
+		char *flags;
+		unsigned int i;
+		parserDefinition*  def;
+
+		flags = strchr (parameter, LONG_FLAGS_OPEN);
+		if (flags)
+			name = eStrndup (parameter, flags - parameter);
+		else
+			name = eStrdup (parameter);
+
+		i = LanguageCount++;
+		def = parserNew (name);
 		def->initialize        = lazyInitialize;
 		def->currentPatterns   = stringListNew ();
 		def->currentExtensions = stringListNew ();
@@ -1179,6 +1243,10 @@ extern void processLanguageDefineOption (
 		def->id                = i;
 		LanguageTable = xRealloc (LanguageTable, i + 1, parserDefinition*);
 		LanguageTable [i] = def;
+
+		flagsEval (flags, LangDefFlagDef, COUNT (LangDefFlagDef), def);
+
+		eFree (name);
 	}
 #else
 	error (WARNING, "regex support not available; required for --%s option",
@@ -1303,6 +1371,21 @@ extern boolean processKindOption (
 		handled = TRUE;
 	}
 	return handled;
+}
+
+extern void printLanguageFileKind (const langType language)
+{
+	if (language == LANG_AUTO)
+	{
+		unsigned int i;
+		for (i = 0  ;  i < LanguageCount  ;  ++i)
+		{
+			const parserDefinition* const lang = LanguageTable [i];
+			printf ("%s %c\n", lang->name, lang->fileKind);
+		}
+	}
+	else
+		printf ("%c\n", LanguageTable [language]->fileKind);
 }
 
 static void printLanguageKind (const kindOption* const kind, boolean indent)
@@ -1544,8 +1627,8 @@ static void makeFileTag (const char *const fileName)
 		tag.isFileEntry     = TRUE;
 		tag.lineNumberEntry = TRUE;
 		tag.lineNumber      = 1;
-		tag.kindName        = "file";
-		tag.kind            = 'F';
+		tag.kindName        = KIND_FILE_DEFAULT_LONG;
+		tag.kind            = getSourceLanguageFileKind();
 
 		makeTagEntry (&tag);
 	}

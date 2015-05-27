@@ -20,9 +20,6 @@
 #include "vstring.h"
 #include "routines.h"
 
-#define LONG_FLAG_OPEN  '{'
-#define LONG_FLAG_CLOSE '}'
-
 void flagsEval (const char* flags, flagDefinition* defs, unsigned int ndefs, void* data)
 {
 	unsigned int i, j;
@@ -34,17 +31,17 @@ void flagsEval (const char* flags, flagDefinition* defs, unsigned int ndefs, voi
 
 	for (i = 0 ; flags [i] != '\0' ; ++i)
 	{
-		if (flags [i] == LONG_FLAG_OPEN)
+		if (flags [i] == LONG_FLAGS_OPEN)
 		{
 			const char* aflag = flags + i + 1;
-			char* needle_close_paren = strchr(aflag, LONG_FLAG_CLOSE);
+			char* needle_close_paren = strchr(aflag, LONG_FLAGS_CLOSE);
 			const char* param;
 			char* needle_eqaul;
 
 			if (needle_close_paren == NULL)
 			{
 				error (WARNING, "long flags specifier opened with `%c' is not closed `%c'",
-				       LONG_FLAG_OPEN, LONG_FLAG_CLOSE);
+				       LONG_FLAGS_OPEN, LONG_FLAGS_CLOSE);
 				break;
 			}
 
@@ -67,7 +64,7 @@ void flagsEval (const char* flags, flagDefinition* defs, unsigned int ndefs, voi
 
 			if (needle_eqaul)
 				*needle_eqaul = '=';
-			*needle_close_paren = LONG_FLAG_CLOSE;
+			*needle_close_paren = LONG_FLAGS_CLOSE;
 
 			i = needle_close_paren - flags;
 		}

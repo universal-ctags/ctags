@@ -35,14 +35,6 @@
 #include "read.h"
 #include "routines.h"
 
-
-#define KIND_DEFAULT 'r'
-#define KIND_DEFAULT_LONG "regex"
-/* We treat ' ' as a ghost kind.
-   It will never be listed up in --list-kinds. */
-#define KIND_GHOST   ' '
-#define KIND_GHOST_LONG "ghost"
-
 static boolean regexAvailable = FALSE;
 
 #if defined (HAVE_REGEX) && !defined (REGCOMP_BROKEN)
@@ -369,7 +361,7 @@ static regexPattern *addCompiledTagPattern (
 	boolean exclusive = FALSE;
 
 	flagsEval (flags, prePtrnFlagDef, COUNT(prePtrnFlagDef), &exclusive);
-	if (*name == '\0' && exclusive && kind == KIND_DEFAULT)
+	if (*name == '\0' && exclusive && kind == KIND_REGEX_DEFAULT)
 	{
 		kind = KIND_GHOST;
 		kindName = KIND_GHOST_LONG;
@@ -479,8 +471,8 @@ static void parseKinds (
 	*description = NULL;
 	if (kinds == NULL  ||  kinds [0] == '\0')
 	{
-		*kind = KIND_DEFAULT;
-		*kindName = eStrdup (KIND_DEFAULT_LONG);
+		*kind = KIND_REGEX_DEFAULT;
+		*kindName = eStrdup (KIND_REGEX_DEFAULT_LONG);
 	}
 	else if (kinds [0] != '\0')
 	{
@@ -488,11 +480,11 @@ static void parseKinds (
 		if (k [0] != ','  &&  (k [1] == ','  ||  k [1] == '\0'))
 			*kind = *k++;
 		else
-			*kind = KIND_DEFAULT;
+			*kind = KIND_REGEX_DEFAULT;
 		if (*k == ',')
 			++k;
 		if (k [0] == '\0')
-			*kindName = eStrdup (KIND_DEFAULT_LONG);
+			*kindName = eStrdup (KIND_REGEX_DEFAULT_LONG);
 		else
 		{
 			const char *const comma = strchr (k, ',');
@@ -706,7 +698,15 @@ static regexPattern *addTagRegexInternal (
 			char kind;
 			char* kindName;
 			char* description;
+
 			parseKinds (kinds, &kind, &kindName, &description);
+			if (kind == getLanguageFileKind (language))
+				error (FATAL,
+				       "Kind letter \'%c\' used in regex definition \"%s\" of %s language is reserved in ctags main",
+				       kind,
+				       regex,
+				       getLanguageName (language));
+
 			rptr = addCompiledTagPattern (language, cp, name,
 						      kind, kindName, description, flags);
 			if (kindName)

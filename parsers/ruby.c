@@ -437,6 +437,7 @@ extern parserDefinition* RubyParser (void)
 	parserDefinition* def = parserNew ("Ruby");
 	def->kinds      = RubyKinds;
 	def->kindCount  = KIND_COUNT (RubyKinds);
+	def->fileKind = KIND_FILE_ALT;
 	def->extensions = extensions;
 	def->parser     = findRubyTags;
 	return def;
