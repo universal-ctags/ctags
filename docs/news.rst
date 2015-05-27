@@ -671,7 +671,7 @@ To write a driver for a tags generator, please read
 -"xcmd protocol and writing a driver".
 
 
-Notice message and --quiet option
+Notice message and ``--quiet`` option
 ---------------------------------------------------------------------
 There were 3 classes of message in ctags:
 
