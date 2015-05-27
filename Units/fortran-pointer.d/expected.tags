@@ -1,0 +1,12 @@
+Main	input.f90	/^program Main$/;"	p
+MyOtherProc	input.f90	/^  MyOtherProc /;"	v	module:Test
+MyProc	input.f90	/^  procedure(ProcOne), pointer :: MyProc /;"	v	module:Test
+ProcOne	input.f90	/^  function ProcOne(/;"	f	module:Test
+ProcPointOne	input.f90	/^  procedure(:), pointer :: ProcPointOne /;"	v	program:Main
+ProcPointTwo	input.f90	/^  => null(), ProcPointTwo /;"	v	program:Main
+ProcTwo	input.f90	/^  function ProcTwo(/;"	f	module:Test
+Test	input.f90	/^module Test$/;"	m
+myparameter	input.f90	/^  real, parameter :: myparameter$/;"	v	module:Test
+variable	input.f90	/^  real :: variable,/;"	v	program:Main
+variable_three	input.f90	/^  integer :: variable_three$/;"	v	program:Main
+variable_two	input.f90	/^  real :: variable, variable_two$/;"	v	program:Main
