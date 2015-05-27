@@ -81,7 +81,7 @@ typedef struct sTagEntryInfo {
 
 		const char* scope [2];    /* value and key */
 #define SCOPE_NIL 0
-		int         scope_index;  /* cork queue entry for upper scope tag.
+		int         scopeIndex;   /* cork queue entry for upper scope tag.
 					     This field is meaningful if the value
 					     is not SCOPE_NIL and scope[0]  and scope[1] are
 					     NULL. */

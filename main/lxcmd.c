@@ -236,7 +236,7 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 
 static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 {
-	enum pcoproc_error r;
+	enum pcoprocError r;
 	FILE* pp = NULL;
 	char * argv[3];
 	int status;
@@ -868,7 +868,7 @@ static boolean makeTagEntryFromTagEntry (tagEntry* entry)
 
 static boolean invokeXcmdPath (const char* const fileName, xcmdPath* path, const langType language)
 {
-	enum pcoproc_error r;
+	enum pcoprocError r;
 	boolean result = FALSE;
 	char* argv[4];
 	FILE* pp = NULL;

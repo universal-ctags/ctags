@@ -803,12 +803,12 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
 					   tag->extensionFields.scope [0],
 					   tag->extensionFields.scope [1]);
-		else if (tag->extensionFields.scope_index != SCOPE_NIL
+		else if (tag->extensionFields.scopeIndex != SCOPE_NIL
 			 && TagFile.corkQueue.count > 0)
 		{
 			const tagEntryInfo * scope;
 
-			scope = getEntryInCorkQueue (tag->extensionFields.scope_index);
+			scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
 			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
 					   scope->kindName, scope->name);
 		}
@@ -1101,7 +1101,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->filePosition    = filePosition;
 	e->sourceFileName  = sourceFileName;
 	e->name            = name;
-	e->extensionFields.scope_index     = SCOPE_NIL;
+	e->extensionFields.scopeIndex     = SCOPE_NIL;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

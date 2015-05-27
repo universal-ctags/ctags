@@ -42,7 +42,7 @@ typedef struct sCookedArgs {
 	boolean isOption;
 	boolean longOption;
 	const char* parameter;
-	TrashBox* trash_box;
+	TrashBox* trashBox;
 	/* public */
 	char* item;
 } cookedArgs;

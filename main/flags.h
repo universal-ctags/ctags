@@ -12,10 +12,10 @@
 #define _FLAGS_H
 
 typedef struct {
-	char short_char;
-	const char *long_str;
-	void (* short_proc) (char c,  void *data);
-	void (* long_proc)  (const char* const s, const char* const param, void *data);
+	char shortChar;
+	const char *longStr;
+	void (* shortProc) (char c,  void *data);
+	void (* longProc)  (const char* const s, const char* const param, void *data);
   /* TODO: handler for help message */
 } flagDefinition;
 

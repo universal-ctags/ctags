@@ -73,7 +73,7 @@ static void pidtable_put (FILE* fp, struct pid_wrapper* pid)
 	hashTablePutItem (pid_table, fp, pid);
 }
 
-static enum pcoproc_error
+static enum pcoprocError
 coproc (const char *filename, char *const argv[], pid_t *pid, int *for_reading_from_coproc, int *for_writing_to_coproc)
 {
 	int wpipe[2];
@@ -162,14 +162,14 @@ coproc (const char *filename, char *const argv[], pid_t *pid, int *for_reading_f
 
 }
 
-extern enum pcoproc_error pcoprocOpen (const char *filename, char *const argv[],
+extern enum pcoprocError pcoprocOpen (const char *filename, char *const argv[],
 					FILE** readfp, FILE** writefp)
 {
 	struct pid_wrapper *value;
 
 	pid_t pid;
 	int for_reading_from_coproc, for_writing_from_coproc;
-	enum pcoproc_error r;
+	enum pcoprocError r;
 
 	r = coproc (filename, argv, &pid,
 		    readfp? &for_reading_from_coproc: NULL,
@@ -243,7 +243,7 @@ extern int  pcoprocClose (FILE* fp)
 	return -2;
 }
 #else
-extern enum pcoproc_error pcoprocOpen (const char *filename, char *const argv[],
+extern enum pcoprocError pcoprocOpen (const char *filename, char *const argv[],
 					FILE** readfp, FILE** writefp)
 {
 	*readfp = NULL;
@@ -268,7 +268,7 @@ main (int argc, char** argv)
 		"A-Z",
 		NULL
 	};
-	enum pcoproc_error r;
+	enum pcoprocError r;
 	r = pcoprocOpen ("/bin/tr", a, &in, &out);
 	switch (r) {
 	case PCOPROC_ERROR_WPIPE:

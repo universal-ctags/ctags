@@ -641,14 +641,14 @@ static void parseLongOption (cookedArgs *const args, const char *item)
 	if (equal == NULL)
 	{
 		args->item = eStrdup (item);
-		trashBoxPut (args->trash_box, args->item, (TrashBoxDestroyItemProc)eFree);
+		trashBoxPut (args->trashBox, args->item, (TrashBoxDestroyItemProc)eFree);
 		args->parameter = "";
 	}
 	else
 	{
 		const size_t length = equal - item;
 		args->item = eStrndup (item, length);
-		trashBoxPut (args->trash_box, args->item, (TrashBoxDestroyItemProc)eFree);
+		trashBoxPut (args->trashBox, args->item, (TrashBoxDestroyItemProc)eFree);
 		args->parameter = equal + 1;
 	}
 	Assert (args->item != NULL);
@@ -695,7 +695,7 @@ extern cookedArgs* cArgNewFromString (const char* string)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromString (string);
-	result->trash_box = trashBoxNew ();
+	result->trashBox = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -705,7 +705,7 @@ extern cookedArgs* cArgNewFromArgv (char* const* const argv)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromArgv (argv);
-	result->trash_box = trashBoxNew ();
+	result->trashBox = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -715,7 +715,7 @@ extern cookedArgs* cArgNewFromFile (FILE* const fp)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromFile (fp);
-	result->trash_box = trashBoxNew ();
+	result->trashBox = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -725,7 +725,7 @@ extern cookedArgs* cArgNewFromLineFile (FILE* const fp)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromLineFile (fp);
-	result->trash_box = trashBoxNew ();
+	result->trashBox = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -734,7 +734,7 @@ extern void cArgDelete (cookedArgs* const current)
 {
 	Assert (current != NULL);
 	argDelete (current->args);
-	trashBoxDelete (current->trash_box);
+	trashBoxDelete (current->trashBox);
 	memset (current, 0, sizeof (cookedArgs));
 	eFree (current);
 }

@@ -90,7 +90,7 @@ static void makeFunctionTag (vString * const name, const char *dbp, int scope_in
 		e.kindName = ClojureKinds[K_FUNCTION].name;
 		e.kind = (char) ClojureKinds[K_FUNCTION].letter;
 
-		e.extensionFields.scope_index =  scope_index;
+		e.extensionFields.scopeIndex =  scope_index;
 		makeTagEntry (&e);
 	}
 }
@@ -148,7 +148,7 @@ extern parserDefinition *ClojureParser (void)
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findClojureTags;
-	def->use_cork = TRUE;
+	def->useCork = TRUE;
 	return def;
 }
 

@@ -14,7 +14,7 @@
 
 #include <stdio.h>
 
-enum pcoproc_error {
+enum pcoprocError {
 	PCOPROC_SUCCESSFUL = 0,
 	PCOPROC_ERROR_WPIPE,
 	PCOPROC_ERROR_RPIPE,
@@ -22,7 +22,7 @@ enum pcoproc_error {
 	/* PCOPROC_ERROR_EXECVE  = -4, */
 };
 
-extern enum pcoproc_error pcoprocOpen (const char *filename, char *const argv[],
+extern enum pcoprocError pcoprocOpen (const char *filename, char *const argv[],
 					FILE** readfp, FILE** writefp);
 extern int  pcoprocClose (FILE* fp);
 

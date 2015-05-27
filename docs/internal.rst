@@ -27,12 +27,12 @@ Output tag stream
 
 Ctags provides `makeTagEntry` to parsers as an entry point for writing
 tag informations to FILE. `makeTagEntry` calls `writeTagEntry` if the
-parser does not set `use_cork` field. `writeTagEntry` calls one of
+parser does not set `useCork` field. `writeTagEntry` calls one of
 three functions, `writeTagsEntry`, `writeXrefEntry` or `writeCtagsEntry`.
 One of them is chosen depending on the arguments passed to ctags.
 
-If `use_cork` is set, the tag informations goes to a queue on memroy.
-The queu is flushed when `use_cork` in unset. See `cork API` for more
+If `useCork` is set, the tag informations goes to a queue on memroy.
+The queu is flushed when `useCork` in unset. See `cork API` for more
 details.
 
 cork API
@@ -79,17 +79,17 @@ cork can be enabled and disabled per parser.
 cork is disabled by default. So there is no impact till you
 enables it in your parser.
 
-`use_cork` field is introduced in `parserDefinition` type:
+`useCork` field is introduced in `parserDefinition` type:
 
 .. code-block:: c
 
 		typedef struct {
 		...
-				boolean use_cork;
+				boolean useCork;
 		...
 		} parserDefinition;
 
-Set `TRUE` to `use_cork` like:
+Set `TRUE` to `useCork` like:
 
 .. code-block:: c
 
@@ -98,11 +98,11 @@ Set `TRUE` to `use_cork` like:
 	    ...
 	    parserDefinition *def = parserNew ("Clojure");
 	    ...
-	    def->use_cork = TRUE;
+	    def->useCork = TRUE;
 	    return def;
     }
 
-When ctags running a parser with `use_cork` being `TRUE`, all output
+When ctags running a parser with `useCork` being `TRUE`, all output
 requested via `makeTagEntry` function calling is stored to an internal
 queue, not to `tags` file.  When parsing an input file is done, the
 tag information stored automatically to the queue are flushed to
@@ -119,18 +119,18 @@ the object after calling.
 		...
 		parent = makeTagEntry (&e);
 
-The handle can be used by setting to a `scope_index`
+The handle can be used by setting to a `scopeIndex`
 field of `current` tag, which is in the scope of `parent`.
 
 .. code-block:: c
 
-		current.extensionFields.scope_index = parent;
+		current.extensionFields.scopeIndex = parent;
 
-When passing `current` to `makeTagEntry`, the `scope_index` is
+When passing `current` to `makeTagEntry`, the `scopeIndex` is
 refereed for emitting the scope information of `current`.
 
-`scope_index` must be set to `SCOPE_NIL` if a tag is not in any scope.
-When using `scope_index` of `current`, `NULL` must be assigned to both
+`scopeIndex` must be set to `SCOPE_NIL` if a tag is not in any scope.
+When using `scopeIndex` of `current`, `NULL` must be assigned to both
 `current.extensionFields.scope[0]` and
 `current.extensionFields.scope[1]`.  `initTagEntry` function does this
 initialization internally, so you generally you don't have to write

@@ -58,8 +58,8 @@ typedef struct stgTableEntry{
 	   This can be used when file extension
 	   is conflicted another parser. */
 	vString* spec;
-	unsigned char* tg_table;
-	vString* corpus_file;
+	unsigned char* tgTable;
+	vString* corpusFile;
 	struct stgTableEntry *next;
 } tgTableEntry;
 
@@ -84,8 +84,8 @@ typedef struct {
 	rescanParser parser2;          /* rescanning parser (unusual case) */
 	rescanParserWithExceptionAndTrash parser_with_gc;          /* rescanning parser (unusual case) */
 	unsigned int method;           /* See PARSE__... definitions above */
-	tgTableEntry *tg_entries;
-	boolean use_cork;
+	tgTableEntry *tgEntries;
+	boolean useCork;
 
 	/* used internally */
 	unsigned int id;               /* id assigned to language */

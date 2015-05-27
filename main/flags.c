@@ -62,8 +62,8 @@ void flagsEval (const char* flags, flagDefinition* defs, unsigned int ndefs, voi
 			}
 
 			for ( j = 0 ; j < ndefs ; ++j )
-				if (defs[j].long_str && (strcmp(aflag, defs[j].long_str) == 0))
-					defs[j].long_proc(aflag, param, data);
+				if (defs[j].longStr && (strcmp(aflag, defs[j].longStr) == 0))
+					defs[j].longProc(aflag, param, data);
 
 			if (needle_eqaul)
 				*needle_eqaul = '=';
@@ -72,7 +72,7 @@ void flagsEval (const char* flags, flagDefinition* defs, unsigned int ndefs, voi
 			i = needle_close_paren - flags;
 		}
 		else for (j = 0 ; j < ndefs ; ++j)
-			if (flags[i] == defs[j].short_char)
-				defs[j].short_proc(flags[i], data);
+			if (flags[i] == defs[j].shortChar)
+				defs[j].shortProc(flags[i], data);
 	}
 }
