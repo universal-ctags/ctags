@@ -72,6 +72,10 @@ static unsigned int CommentLevel = 0;
 static void makeSmlTag (smlKind type, vString *name)
 {
 	tagEntryInfo tag;
+
+	if (! SmlKinds [type].enabled)
+		return;
+
 	initTagEntry (&tag, vStringValue (name));
 	tag.kindName = SmlKinds [type].name;
 	tag.kind = SmlKinds [type].letter;

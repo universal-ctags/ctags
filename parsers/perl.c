@@ -177,6 +177,8 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 {
 	tagEntryInfo entry;
 	const char *b, *e;
+	if (! PerlKinds[K_CONSTANT].enabled)
+		return;
 	for (e = end - 1; e > begin && isspace(*e); --e)
 		;
 	if (e < begin)
@@ -480,6 +482,8 @@ static void findPerlTags (void)
 						vStringClear (name);
 						continue;
 					}
+				} else if (! PerlKinds[kind].enabled) {
+					continue;
 				}
 
 				e.kind     = PerlKinds[kind].letter;

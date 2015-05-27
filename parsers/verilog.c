@@ -321,6 +321,14 @@ static char kindLetter (const verilogKind kind)
 		return VerilogKinds[kind].letter;
 }
 
+static char kindEnabled (const verilogKind kind)
+{
+	if (isLanguage (Lang_systemverilog))
+		return SystemVerilogKinds[kind].enabled;
+	else /* isLanguage (Lang_verilog) */
+		return VerilogKinds[kind].enabled;
+}
+
 static void buildKeywordHash (const langType language, unsigned int idx)
 {
 	size_t i;
@@ -545,8 +553,8 @@ static void createTag (tokenInfo *const token)
 {
 	tagEntryInfo tag;
 
-	/* Do nothing it tag name is empty */
-	if (vStringLength (token->name) == 0)
+	/* Do nothing it tag name is empty or tag kind is disabled */
+	if (vStringLength (token->name) == 0 || ! kindEnabled (token->kind))
 	{
 		return;
 	}
