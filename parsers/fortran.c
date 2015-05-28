@@ -86,6 +86,7 @@ typedef enum eKeywordId {
 	KEYWORD_end,
 	KEYWORD_entry,
 	KEYWORD_equivalence,
+	KEYWORD_extends,
 	KEYWORD_external,
 	KEYWORD_format,
 	KEYWORD_function,
@@ -250,6 +251,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "end",            KEYWORD_end          },
 	{ "entry",          KEYWORD_entry        },
 	{ "equivalence",    KEYWORD_equivalence  },
+	{ "extends",        KEYWORD_extends      },
 	{ "external",       KEYWORD_external     },
 	{ "format",         KEYWORD_format       },
 	{ "function",       KEYWORD_function     },
@@ -1241,6 +1243,7 @@ static boolean skipStatementIfKeyword (tokenInfo *const token, keywordId keyword
  *      or access-spec (is PUBLIC or PRIVATE)
  *      or ALLOCATABLE
  *      or DIMENSION ( array-spec )
+ *      or EXTENDS ( extends-spec )
  *      or EXTERNAL
  *      or INTENT ( intent-spec )
  *      or INTRINSIC
@@ -1275,6 +1278,7 @@ static void parseQualifierSpecList (tokenInfo *const token)
 
 			case KEYWORD_dimension:
 			case KEYWORD_intent:
+			case KEYWORD_extends:
 				readToken (token);
 				skipOverParens (token);
 				break;
