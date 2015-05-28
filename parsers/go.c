@@ -384,7 +384,9 @@ getNextChar:
 
 	if (signature && vStringLength (signature) < MAX_SIGNATURE_LENGTH)
 	{
-		if (token->type == TOKEN_STRING)
+		if (token->type == TOKEN_LEFT_ARROW)
+			vStringCatS(signature, "<-");
+		else if (token->type == TOKEN_STRING)
 		{
 			// only struct member annotations can appear in function prototypes
 			// so only `` type strings are possible
