@@ -10,7 +10,7 @@ func f3(a int) string {
 	return ""
 }
 
-func f4(a, b, c int, d, e, f string) (A, B, C int, D string) {
+func f4(a, b, c <-chan int, d, e, f string) (A, B, C int, D string) {
 	return 1, 2, 3, ""
 }
 
