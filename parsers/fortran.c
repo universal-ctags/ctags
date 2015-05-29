@@ -495,7 +495,7 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 				e.extensionFields.scope [1] = vStringValue (scope->string);
 			}
 		}
-		if (! insideInterface () /*|| includeTag (TAG_INTERFACE)*/)
+		if (! insideInterface ())
 			makeTagEntry (&e);
 	}
 }
