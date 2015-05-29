@@ -409,7 +409,6 @@ extern void openTagFile (void)
 	{
 		boolean fileExists;
 
-		setDefaultTagFileName ();
 		TagFile.name = eStrdup (Option.tagFileName);
 		fileExists = doesFileExist (TagFile.name);
 		if (fileExists  &&  ! isTagFile (TagFile.name))
