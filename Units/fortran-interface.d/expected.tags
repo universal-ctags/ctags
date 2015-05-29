@@ -1,0 +1,5 @@
+a	input.f90	/^  integer :: a$/;"	v	program:main
+b	input.f90	/^  integer :: b$/;"	v	program:main
+main	input.f90	/^program main$/;"	p
+suba	input.f90	/^subroutine suba(/;"	s
+suba_interface	input.f90	/^  interface suba_interface$/;"	i	program:main
