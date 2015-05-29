@@ -1,0 +1,9 @@
+color	input.f90	/^    integer :: color$/;"	k	type:shape
+filled	input.f90	/^    logical :: filled$/;"	k	type:shape
+length	input.f90	/^    integer :: length$/;"	k	type:rectangle
+rectangle	input.f90	/^  type, extends(shape) :: rectangle$/;"	t	module:test_extends
+shape	input.f90	/^  type shape$/;"	t	module:test_extends
+test_extends	input.f90	/^module test_extends$/;"	m
+width	input.f90	/^    integer :: width$/;"	k	type:rectangle
+x	input.f90	/^    integer :: x$/;"	k	type:shape
+y	input.f90	/^    integer :: y$/;"	k	type:shape
