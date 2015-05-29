@@ -60,7 +60,7 @@ static vString* ext2ptrnNew (const char *const ext)
 	return ptrn;
 }
 
-static boolean enabled_p (const langType language)
+static boolean isLanguageEnabled (const langType language)
 {
 	const parserDefinition* const lang = LanguageTable [language];
 	if (!lang->enabled)
@@ -1420,7 +1420,7 @@ extern void printLanguageKinds (const langType language)
 		for (i = 0  ;  i < LanguageCount  ;  ++i)
 		{
 			const parserDefinition* const lang = LanguageTable [i];
-			printf ("%s%s\n", lang->name, enabled_p (i) ? "" : " [disabled]");
+			printf ("%s%s\n", lang->name, isLanguageEnabled (i) ? "" : " [disabled]");
 			printKinds (i, TRUE);
 		}
 	}
@@ -1526,7 +1526,7 @@ extern void printLanguageCorpus (langType language,
 		for (i = 0  ;  i < LanguageCount  ;  ++i)
 		{
 			const parserDefinition* const lang = LanguageTable [i];
-			printf ("%s%s\n", lang->name, enabled_p (i) ? "" : " [disabled]");
+			printf ("%s%s\n", lang->name, isLanguageEnabled (i) ? "" : " [disabled]");
 			printCorpus (i, spec, TRUE);
 		}
 	}
@@ -1603,7 +1603,7 @@ static void printLanguage (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
 	if (lang->kinds != NULL  ||  (lang->method & METHOD_REGEX) || (lang->method & METHOD_XCMD))
-		printf ("%s%s\n", lang->name, enabled_p (language) ? "" : " [disabled]");
+		printf ("%s%s\n", lang->name, isLanguageEnabled (language) ? "" : " [disabled]");
 }
 
 extern void printLanguageList (void)
@@ -1764,7 +1764,7 @@ extern boolean parseFile (const char *const fileName)
 
 	if (language == LANG_IGNORE)
 		verbose ("ignoring %s (unknown language)\n", fileName);
-	else if (! enabled_p (language))
+	else if (! isLanguageEnabled (language))
 		verbose ("ignoring %s (language disabled)\n", fileName);
 	else
 	{
