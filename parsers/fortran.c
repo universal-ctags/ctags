@@ -200,7 +200,6 @@ static int Ungetc;
 static unsigned int Column;
 static boolean FreeSourceForm;
 static boolean ParsingString;
-static tokenInfo *Parent;
 
 /* indexed by tagType */
 static kindOption FortranKinds [] = {
@@ -2163,7 +2162,6 @@ static rescanReason findFortranTags (const unsigned int passCount,
 
 	trash_box = tbox;
 
-	Parent = newToken ();
 	token = newToken ();
 
 	FreeSourceForm = (boolean) (passCount > 1);
@@ -2184,7 +2182,6 @@ static rescanReason findFortranTags (const unsigned int passCount,
 	}
 	ancestorClear ();
 	F (token);
-	F (Parent);
 
 	return rescan;
 }
