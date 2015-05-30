@@ -494,8 +494,18 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 				e.extensionFields.scope [1] = vStringValue (scope->string);
 			}
 		}
+		if (token->secondary != NULL &&
+		    token->secondary->string != NULL &&
+		    vStringLength (token->secondary->string) > 0 &&
+		    token->tag == TAG_DERIVED_TYPE)
+			e.extensionFields.inheritance = vStringValue (token->secondary->string);
 		if (! insideInterface () || includeTag (TAG_INTERFACE))
 			makeTagEntry (&e);
+		if (e.extensionFields.inheritance)
+		{
+			deleteToken (token->secondary);
+			token->secondary = NULL;
+		}
 	}
 }
 
@@ -1241,6 +1251,28 @@ static boolean skipStatementIfKeyword (tokenInfo *const token, keywordId keyword
 	return result;
 }
 
+/* parse extends qualifier, leaving token at first token following close
+ * parenthesis.
+ */
+
+static void make_parent_token (tokenInfo *const token, void *user_data)
+{
+	tokenInfo **parent = user_data;
+
+	*parent = newTokenFrom (token);
+	/* This newly allocated token is in trash. So you don't have to
+	 care aobut memory leaking. */
+}
+
+
+static tokenInfo  *parseExtendsQualifier (tokenInfo *const token)
+{
+	tokenInfo *parent = NULL;
+
+	skipOverParensFull (token, make_parent_token, &parent);
+	return parent;
+}
+
 /* parse a list of qualifying specifiers, leaving `token' at first token
  * following list. Examples of such specifiers are:
  *      [[, attr-spec] ::]
@@ -1264,8 +1296,10 @@ static boolean skipStatementIfKeyword (tokenInfo *const token, keywordId keyword
  *      is POINTER
  *      or DIMENSION ( component-array-spec )
  */
-static void parseQualifierSpecList (tokenInfo *const token)
+static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 {
+	tokenInfo *parent_token = NULL;
+
 	do
 	{
 		readToken (token);  /* should be an attr-spec */
@@ -1286,9 +1320,13 @@ static void parseQualifierSpecList (tokenInfo *const token)
 
 			case KEYWORD_dimension:
 			case KEYWORD_intent:
-			case KEYWORD_extends:
 				readToken (token);
 				skipOverParens (token);
+				break;
+
+			case KEYWORD_extends:
+				readToken (token);
+				parent_token = parseExtendsQualifier (token);
 				break;
 
 			default: skipToToken (token, TOKEN_STATEMENT_END); break;
@@ -1296,6 +1334,8 @@ static void parseQualifierSpecList (tokenInfo *const token)
 	} while (isType (token, TOKEN_COMMA));
 	if (! isType (token, TOKEN_DOUBLE_COLON))
 		skipToToken (token, TOKEN_STATEMENT_END);
+
+	return parent_token;
 }
 
 static tagType variableTagType (void)
@@ -1654,12 +1694,22 @@ static void parseComponentDefStmt (tokenInfo *const token)
  */
 static void parseDerivedTypeDef (tokenInfo *const token)
 {
+	tokenInfo *parent_token = NULL;
+
 	if (isType (token, TOKEN_COMMA))
-		parseQualifierSpecList (token);
+		parent_token = parseQualifierSpecList (token);
 	if (isType (token, TOKEN_DOUBLE_COLON))
 		readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
+	{
+		if (parent_token)
+		{
+			Assert (token->secondary == NULL);
+			token->secondary = parent_token;
+			B (parent_token);
+		}
 		makeFortranTag (token, TAG_DERIVED_TYPE);
+	}
 	ancestorPush (token);
 	skipToNextStatement (token);
 	if (isKeyword (token, KEYWORD_private) ||
