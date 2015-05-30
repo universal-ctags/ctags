@@ -1084,7 +1084,9 @@ static void skipToNextStatement (tokenInfo *const token)
  * opening parenthesis is not found, `token' is moved to the end of the
  * statement.
  */
-static void skipOverParens (tokenInfo *const token)
+static void skipOverParensFull (tokenInfo *const token,
+				void (* token_cb) (tokenInfo *const, void *),
+				void *user_data)
 {
 	int level = 0;
 	do {
@@ -1094,8 +1096,15 @@ static void skipOverParens (tokenInfo *const token)
 			++level;
 		else if (isType (token, TOKEN_PAREN_CLOSE))
 			--level;
+		else if (token_cb)
+			token_cb (token, user_data);
 		readToken (token);
 	} while (level > 0);
+}
+
+static void skipOverParens (tokenInfo *const token)
+{
+	skipOverParensFull (token, NULL, NULL);
 }
 
 static boolean isTypeSpec (tokenInfo *const token)
