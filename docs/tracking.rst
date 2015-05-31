@@ -9,7 +9,7 @@ I consider tracking activities as the first class fruits
 of this project.
 
 
-exuberant-ctags
+universal-ctags
 ----------------------------------------------------------------------
 
 subversion
@@ -28,18 +28,18 @@ subversion
   ::
 
       <svn>
-      => <git: local exuberant repo>
-	 => <git: local exuberant repo>
+      => <git: local universal-ctags repo>
+	 => <git: local universal-ctags repo>
 
 
-  1. prepare your own exuberant repo: a local git repo cloned from github.
+  1. prepare your own universal-ctags repo: a local git repo cloned from github.
      You may know how to do it :)
 
      ::
     
-	$ git clone https://github.com/fishman/ctags.git
+	$ git clone https://github.com/universal-ctags/ctags.git
 
-  2. prepare exuberant SVN repo: a local git repo clone from exuberant svn tree.
+  2. prepare exuberant-ctags SVN repo: a local git repo clone from exuberant-ctags svn tree.
 
     The original clone is already part of exuberant tree.
 
@@ -61,14 +61,14 @@ subversion
 
   4. cherry-pick
 
-     4.1. Make a branch at local exuberant repo and switch to it.
+     4.1. Make a branch at local universal-ctags repo and switch to it.
 
      4.2. Do cherry-pick like::
 
 	 	$ git cherry-pick -s -x c81a8ce
 
      You can find commit id on the another terminal
-     <git: local exuberant repo>::
+     <git: local universal-ctags repo>::
 
 	 	$ git log
 	 
@@ -81,7 +81,7 @@ subversion
 
 	 $ git reset --hard
 
-     <git: local exuberant repo>
+     <git: local universal-ctags repo>
       at the branch for picking.
 
 bugs
@@ -176,29 +176,29 @@ Patches are always there. So it is easy to evaluate the value:)
 
    <67> Objective C language parser
 
-	* This is the implementation is we have in exuberant tree.
+	* This is the implementation we have in universal-ctags tree.
 
    <65> absoluteFilename uses strcpy on overlapping strings
 
-	* Fixed in exuberant tree, however the ticket is still open::
+	* Fixed in universal-ctags tree, however the ticket is still open::
 
    		d2bdf505abb7569deae2b50305ea1edce6208557
 
    <64> Fix strcpy() misuse
 
-	* Fixed in exuberant tree, however the ticket is still open::
+	* Fixed in universal-ctags tree, however the ticket is still open::
 
 		d2bdf505abb7569deae2b50305ea1edce6208557
 
    <51> Ada support
 
-	* Ada support is now available in exuberant tree::
+	* Ada support is now available in universal-ctags tree::
 
 		4b6b4a72f3d2d4ef969d7c650de1829d79f0ea7c
 
    <38> Ada support
 
-	* Ada support is now available in exuberant tree::
+	* Ada support is now available in universal-ctags tree::
 
 		4b6b4a72f3d2d4ef969d7c650de1829d79f0ea7c
 
@@ -269,52 +269,52 @@ http://pkgs.fedoraproject.org/cgit/ctags.git/tree/ctags.spec
 
 <ctags-5.7-destdir.patch>
 
-	This patch was merged in exuberant ctags git tree::
+	This patch was merged in universal-ctags git tree::
 
 		d4b5972427a46cbdcbfb050a944cf62b300676be
 
 <ctags-5.7-segment-fault.patch>
 
-	This patch was merged in exuberant ctags git tree::
+	This patch was merged in universal-ctags git tree::
 
 		8cc2b482f6c7257c5151893a6d02b8c79851fedd
 
 (ctags-5.8-cssparse.patch)
 
-	Not in exuberant tree.
+	Not in universal-ctags tree.
 
 	The reproducer is attached to following page:
 	https://bugzilla.redhat.com/show_bug.cgi?id=852101
 
-	However, exuberant-ctags doesn't reproduce with it.
+	However, universal-ctags doesn't reproduce with it.
 
 	I, Masatake YAMATO, read the patch.  However, I don't
 	understand the patch.  
 
 <ctags-5.8-css.patch>
 
-	This patch was merged in exuberant ctags git tree::
+	This patch was merged in universal-ctags git tree::
 
 		80c1522a36df3ba52b8b7cd7f5c79d5c30437a63
 
 <ctags-5.8-memmove.patch>
 
 	This patch was merged in exuberant ctags svn tree.
-	As the result this patch is in exuberant tree::
+	As the result this patch is in universal-ctags tree::
 
 		d2bdf505abb7569deae2b50305ea1edce6208557
 
 <ctags-5.8-ocaml-crash.patch>
 
 	This patch was merged in exuberant ctags svn tree.
-	As the result this patch is in exuberant tree::
+	As the result this patch is in universal-ctags tree::
 
 		ddb29762b37d60a875252dcc401de0b7479527b1
 
 <ctags-5.8-format-security.patch>
 
 	This patch was merged in exuberant ctags svn tree.
-	As the result this patch is in exuberant tree::
+	As the result this patch is in universal-ctags tree::
 
 		2f7a78ce21e4156ec3e63c821827cf1d5680ace8
 
@@ -327,7 +327,7 @@ http://anonscm.debian.org/cgit/users/cjwatson/exuberant-ctags.git/tree/debian/pa
 
 (python-disable-imports.patch)
 
-	Not in exuberant tree.
+	Not in universal-ctags tree.
 	
 	I don't want to merge this patch. I think ctags should extract
 	as much as possible information from input source code.
@@ -421,12 +421,12 @@ This is a gold mine of xcmd and optlib.
 External command(xcmd)
 ----------------------------------------------------------------------
 
-Near feature exuberant-ctags can invoke external command as a
+Near feature universal-ctags can invoke external command as a
 specialized parser though some glue code or script may be
 needed. Sometimes we may have to hack the external command to adjust
-the interface between the command and exuberant-ctags.
+the interface between the command and universal-ctags.
 
-So let's track external commands maintained out exuberant-ctags. If we
+So let's track external commands maintained out universal-ctags. If we
 prepare glue code or script, mark it with <>, and if not, mark it with
 ().
 

@@ -5,7 +5,7 @@ Introduced changes
 
 ----
 
-Many changes have been introduced in exuberant-ctags. Use git-log to
+Many changes have been introduced in universal-ctags. Use git-log to
 review changes not enumerated here, especially in language parsers.
 
 Importing most of the changes from exuberant-ctags
@@ -159,7 +159,7 @@ Editors like vim and emacs recognize special patterns in files called
 modelines. The line is inserted by a user of the text editor and can
 be used to set the file type (Vim) or mode (emacs).
 
-exuberant-ctags also recognizes these modeline and selects a language parser
+universal-ctags also recognizes these modeline and selects a language parser
 based on it if ``--guess-language-eagerly`` (or ``-G``) option is given.
 
 
@@ -240,11 +240,11 @@ exuberant-ctags provides the way to customize ctags with options like
 written can be loaded with ``--options=OPTION_FILE``.
 
 This feature was extended such that ctags treats option files
-as libraries. Developers of exuberant-ctags can maintain option files
-as part of exuberant-ctags, making part of its release. With ``make
+as libraries. Developers of universal-ctags can maintain option files
+as part of universal-ctags, making part of its release. With ``make
 install`` they are also installed along with ctags command.
 
-exuberant-ctags prepares directories where the option files are installed.
+universal-ctags prepares directories where the option files are installed.
 
 Consider a GNU/Linux distribution.
 The following directories are searched when loading an option file:
@@ -363,7 +363,7 @@ Loading option recursively
 
 The option file loading rules explained in "Option library" is more
 complex. If a directory is specified as parameter for ``--option`` instead
-of a file, exuberant-ctags loads option files under the directory
+of a file, universal-ctags loads option files under the directory
 recursively.
 
 Consider the following command line on a GNU/Linux distribution::
@@ -419,7 +419,7 @@ Following files can be used for this purpose.
 * /etc/ctags.conf
 * /usr/local/etc/ctags.conf
 
-This preloading feature comes from exuberant-ctags. However, two
+This preloading feature comes from universal-ctags. However, two
 weaknesses exist in this implementation.
 
 * The file must be edited when an option library is to be loaded.
@@ -460,7 +460,7 @@ with two restrictions:
   Once a directory is traversed, another directory with the same name is
   not traversed.
 
-  exuberant-ctags prepares */usr/share/ctags/preload/default.ctags*.
+  universal-ctags prepares */usr/share/ctags/preload/default.ctags*.
   If you want ctags not to load it, make an empty file at
   *~/.ctags/default.ctags*. To customize
   */usr/share/ctags/preload/default.ctags*, copy the file to
@@ -498,7 +498,7 @@ maintain them.
 For both users and developers the variety of short flags are just
 nightmares.
 
-So exuberant-ctags now includes an API for defining long flags, which can be
+So universal-ctags now includes an API for defining long flags, which can be
 used as aliases for short flags. The long flags requires more typing
 but are more readable.
 
@@ -665,7 +665,7 @@ directly because ctags requires very specific behaviors (protocol).
 Generally available tags generator like CoffeeTags don't conform with
 the expected protocol. Executables under the built-in search
 path are expected to fill the gap between generally available tags
-generator and exuberant-ctags. This is the reason why the name
+generator and universal-ctags. This is the reason why the name
 *drivers* is used as part of built-in search path.
 
 To write a driver for a tags generator, please read
@@ -758,7 +758,7 @@ Build system add possibility to change program name
 ---------------------------------------------------------------------
 
 As on some systems (e.g. BSD) there is a 'ctags' program in the base
-system it's somewhat inconvenient to have the same name for exuberant ctags
+system it's somewhat inconvenient to have the same name for universal-ctags
 During ``configure`` you can now change the output executable name.
 
 Add a prefix 'ex' which will result in 'ctags' transformed into 'exctags'
