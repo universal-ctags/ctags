@@ -307,7 +307,7 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 			if (status > 0 
 			    && WIFEXITED (status) 
 			    && (WEXITSTATUS (status) == XCMD_NOT_AVAILABLE_STATUS))
-				notice ("xcmd recognizes %s is not available", argv[0]);
+				verbose ("xcmd recognizes %s is not available\n", argv[0]);
 			else
 				error (WARNING, "xcmd exits abnormally status(%d): [%s %s]",
 				       status, argv[0], argv[1]);
