@@ -1,0 +1,1 @@
+ctags: Warning: xcmd exits abnormally status(256): [./foo.sh --list-kinds=foo]

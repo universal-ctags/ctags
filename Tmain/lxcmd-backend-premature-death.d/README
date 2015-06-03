@@ -1,0 +1,3 @@
+Current the content of exit-expected.txt is 0.
+This should be changed so a script running ctags
+can know there is a broken backend.
