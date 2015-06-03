@@ -54,7 +54,7 @@ Building
 
   First time:
 
-    git clone git://github.com/fishman/ctags.git    
+    git clone git://github.com/universal-ctags/ctags.git
     cd ctags
     autoheader
     autoconf
