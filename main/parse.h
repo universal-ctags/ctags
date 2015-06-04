@@ -200,6 +200,8 @@ extern void addLanguageXcmd (const langType language, const char* const path);
 extern void addTagXcmd (const langType language, vString* pathvstr);
 extern void resetXcmdKinds (const langType language, boolean mode);
 extern boolean enableXcmdKind (const langType language, const int kind, const boolean mode);
+extern boolean isXcmdKindEnabled (const langType language, const int kind);
+extern boolean hasXcmdKind (const langType language, const int kind);
 extern void printXcmdKinds (const langType language, boolean indent);
 extern void freeXcmdResources (void);
 extern void useXcmdMethod (const langType language);

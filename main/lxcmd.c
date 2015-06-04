@@ -397,6 +397,64 @@ extern boolean enableXcmdKind (const langType language, const int kind,
 	return kmr.result;
 }
 
+struct kind_and_result
+{
+	int kind;
+	boolean result;
+};
+
+static boolean is_kind_enabled_cb (struct sKind *kind, void *data)
+{
+	boolean r = FALSE;
+	struct kind_and_result *kr = data;
+
+	if (kind->letter == kr->kind)
+	{
+		kr->result = kind->enabled;
+		r = TRUE;
+	}
+
+	return r;
+}
+
+static boolean does_kind_exist_cb (struct sKind *kind, void *data)
+{
+	boolean r = FALSE;
+	struct kind_and_result *kr = data;
+
+	if (kind->letter == kr->kind)
+	{
+		kr->result = TRUE;
+		r = TRUE;
+	}
+
+	return r;
+}
+
+extern boolean isXcmdKindEnabled (const langType language, const int kind)
+{
+	struct kind_and_result d;
+
+	d.kind = kind;
+	d.result = FALSE;
+
+	foreachXcmdKinds (language, is_kind_enabled_cb, &d);
+
+	return d.result;
+}
+
+extern boolean hasXcmdKind (const langType language, const int kind)
+{
+	struct kind_and_result d;
+
+	d.kind = kind;
+	d.result = FALSE;
+
+	foreachXcmdKinds (language, does_kind_exist_cb, &d);
+
+	return d.result;
+}
+
 #ifdef HAVE_COPROC
 static void printXcmdKind (xcmdPath *path, unsigned int i, boolean indent)
 {
