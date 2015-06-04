@@ -811,9 +811,9 @@ extern boolean processRegexOption (const char *const option,
 	return TRUE;
 }
 
-static void foreachRegexKinds (const langType language __unused__,
-			       boolean (*func) (struct sKind *, void *) __unused__,
-			       void *data __unused__)
+static void foreachRegexKinds (const langType language,
+			       boolean (*func) (struct sKind *, void *),
+			       void *data)
 {
 #ifdef HAVE_REGEX
 	if (language <= SetUpper  &&  Sets [language].count > 0)

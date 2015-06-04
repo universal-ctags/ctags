@@ -326,7 +326,10 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 }
 #endif	/* HAVE_COPROC */
 
-extern void resetXcmdKinds (const langType language, boolean mode)
+
+static void foreachXcmdKinds (const langType language,
+			      boolean (*func) (struct sKind *, void *),
+			      void *data)
 {
 #ifdef HAVE_COPROC
 	if (language <= SetUpper  &&  Sets [language].count > 0)
@@ -341,43 +344,57 @@ extern void resetXcmdKinds (const langType language, boolean mode)
 				continue;
 
 			for (k = 0; k < path[i].kount; k++)
-			{
-				struct sKind *const kind = path[i].kinds + k;
-				kind->enabled = mode;
-			}
+				if (func (& (path[i].kinds[k]), data))
+					break;
 		}
 	}
 #endif
 }
 
+static boolean kind_reset_cb (struct sKind *kind, void *data)
+{
+	kind->enabled = *(boolean *)data;
+	return FALSE;		/* continue */
+}
+
+extern void resetXcmdKinds (const langType language, boolean mode)
+{
+	foreachXcmdKinds (language, kind_reset_cb, &mode);
+}
+
+struct kind_and_mode_and_result
+{
+	int kind;
+	boolean mode;
+	boolean result;
+};
+
+static boolean enable_kind_cb (struct sKind *kind, void *data)
+{
+	struct kind_and_mode_and_result *kmr = data;
+	if (kind->letter == kmr->kind)
+	{
+		kind->enabled = kmr->mode;
+		kmr->result = TRUE;
+	}
+	/* conitnue:
+	   There can be more than one paths which deals this kind.
+	   Consider /bin/X and /bin/Y are both parser for a language L.
+	   ctags --langdef=L --xcmd-L=/bin/X --xcmd-L=/bin/Y ... */
+	return FALSE;
+
+}
 extern boolean enableXcmdKind (const langType language, const int kind,
 			       const boolean mode)
 {
-	boolean result = FALSE;
-#ifdef HAVE_COPROC
-	if (language <= SetUpper  &&  Sets [language].count > 0)
-	{
-		pathSet* const set = Sets + language;
-		xcmdPath * path = set->paths;
-		unsigned int i;
-		for (i = 0  ;  i < set->count  ;  ++i)
-		{
-			unsigned int k;
-			if (!path[i].available)
-				continue;
+	struct kind_and_mode_and_result kmr;
 
-			for (k = 0; k < path[i].kount; k++)
-			{
-				if (path[i].kinds[k].letter == kind)
-				{
-					path[i].kinds[k].enabled = mode;
-					result = TRUE;
-				}
-			}
-		}
-	}
-#endif
-	return result;
+	kmr.kind = kind;
+	kmr.mode = mode;
+	kmr.result = FALSE;
+
+	foreachXcmdKinds (language, enable_kind_cb, &kmr);
+	return kmr.result;
 }
 
 #ifdef HAVE_COPROC
