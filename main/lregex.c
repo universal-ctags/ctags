@@ -872,6 +872,64 @@ extern boolean enableRegexKind (const langType language, const int kind, const b
 	return kmr.result;
 }
 
+struct kind_and_result
+{
+	int kind;
+	boolean result;
+};
+
+static boolean is_kind_enabled_cb (struct sKind *kind, void *data)
+{
+	boolean r = FALSE;
+	struct kind_and_result *kr = data;
+
+	if (kind->letter == kr->kind)
+	{
+		kr->result = kind->enabled;
+		r = TRUE;
+	}
+
+	return r;
+}
+
+static boolean does_kind_exist_cb (struct sKind *kind, void *data)
+{
+	boolean r = FALSE;
+	struct kind_and_result *kr = data;
+
+	if (kind->letter == kr->kind)
+	{
+		kr->result = TRUE;
+		r = TRUE;
+	}
+
+	return r;
+}
+
+extern boolean isRegexKindEnabled (const langType language, const int kind)
+{
+	struct kind_and_result d;
+
+	d.kind = kind;
+	d.result = FALSE;
+
+	foreachRegexKinds (language, is_kind_enabled_cb, &d);
+
+	return d.result;
+}
+
+extern boolean hasRegexKind (const langType language, const int kind)
+{
+	struct kind_and_result d;
+
+	d.kind = kind;
+	d.result = FALSE;
+
+	foreachRegexKinds (language, does_kind_exist_cb, &d);
+
+	return d.result;
+}
+
 extern void printRegexKinds (const langType language __unused__, boolean indent __unused__)
 {
 #ifdef HAVE_REGEX
