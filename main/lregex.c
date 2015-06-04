@@ -811,8 +811,9 @@ extern boolean processRegexOption (const char *const option,
 	return TRUE;
 }
 
-extern void resetRegexKinds (const langType language __unused__,
-			     boolean mode)
+static void foreachRegexKinds (const langType language __unused__,
+			       boolean (*func) (struct sKind *, void *) __unused__,
+			       void *data __unused__)
 {
 #ifdef HAVE_REGEX
 	if (language <= SetUpper  &&  Sets [language].count > 0)
@@ -820,32 +821,55 @@ extern void resetRegexKinds (const langType language __unused__,
 		patternSet* const set = Sets + language;
 		unsigned int i;
 		for (i = 0  ;  i < set->count  ;  ++i)
-			if (set->patterns [i].type == PTRN_TAG)
-				set->patterns [i].u.tag.kind->enabled = mode;
+			if ((set->patterns [i].type == PTRN_TAG)
+			    && (func (set->patterns [i].u.tag.kind, data)))
+				break;
 	}
 #endif
 }
 
-extern boolean enableRegexKind (
-		const langType language __unused__,
-		const int kind __unused__, const boolean mode __unused__)
+
+static boolean kind_reset_cb (struct sKind *kind, void *data)
 {
-	boolean result = FALSE;
-#ifdef HAVE_REGEX
-	if (language <= SetUpper  &&  Sets [language].count > 0)
+	kind->enabled = *(boolean *)data;
+	return FALSE;		/* continue */
+}
+
+extern void resetRegexKinds (const langType language, boolean mode)
+{
+	foreachRegexKinds (language, kind_reset_cb, &mode);
+}
+
+struct kind_and_mode_and_result
+{
+	int kind;
+	boolean mode;
+	boolean result;
+};
+
+static boolean enable_kind_cb (struct sKind *kind, void *data)
+{
+	struct kind_and_mode_and_result *kmr = data;
+	if (kind->letter == kmr->kind)
 	{
-		patternSet* const set = Sets + language;
-		unsigned int i;
-		for (i = 0  ;  i < set->count  ;  ++i)
-			if (set->patterns [i].type == PTRN_TAG &&
-				set->patterns [i].u.tag.kind->letter == kind)
-			{
-				set->patterns [i].u.tag.kind->enabled = mode;
-				result = TRUE;
-			}
+		kind->enabled = kmr->mode;
+		kmr->result = TRUE;
 	}
-#endif
-	return result;
+	/* conitnue:
+	   There can be more than one patterns which represents this kind. */
+	return FALSE;
+}
+
+extern boolean enableRegexKind (const langType language, const int kind, const boolean mode)
+{
+	struct kind_and_mode_and_result kmr;
+
+	kmr.kind = kind;
+	kmr.mode = mode;
+	kmr.result = FALSE;
+
+	foreachRegexKinds (language, enable_kind_cb, &kmr);
+	return kmr.result;
 }
 
 extern void printRegexKinds (const langType language __unused__, boolean indent __unused__)
