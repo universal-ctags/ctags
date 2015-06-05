@@ -2306,7 +2306,10 @@ static boolean parseFileOptions (const char* const fileName)
 	const char* const format = "Considering option file %s: %s\n";
 	CheckFile = fileName;
 	if (stringListHasTest (OptionFiles, checkSameFile))
+	{
 		verbose (format, fileName, "already considered");
+		fileFound = TRUE;
+	}
 	else
 	{
 		FILE* const fp = fopen (fileName, "r");
