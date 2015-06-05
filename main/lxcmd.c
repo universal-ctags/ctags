@@ -60,8 +60,6 @@
 
 #include "pcoproc.h"
 
-#ifdef HAVE_COPROC
-
 /*
 *   MACROS
 */
@@ -139,6 +137,8 @@ typedef struct {
 	xcmdPath *paths;
 	unsigned int count;
 } pathSet;
+
+#ifdef HAVE_COPROC
 
 static pathSet* Sets = NULL;
 static int SetUpper = -1;  /* upper language index in list */
