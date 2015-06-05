@@ -185,6 +185,7 @@ typedef struct sTokenInfo {
 	keywordId keyword;
 	tagType tag;
 	vString* string;
+	vString* parentType;
 	struct sTokenInfo *secondary;
 	unsigned long lineNumber;
 	fpos_t filePosition;
@@ -424,6 +425,7 @@ static tokenInfo *newToken (void)
 	token->tag          = TAG_UNDEFINED;
 	token->string       = vStringNew ();
 	token->secondary    = NULL;
+	token->parentType   = NULL;
 	token->lineNumber   = getSourceLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
@@ -436,6 +438,7 @@ static tokenInfo *newTokenFrom (tokenInfo *const token)
 	*result = *token;
 	result->string = vStringNewCopy (token->string);
 	token->secondary = NULL;
+	token->parentType = NULL;
 	return P (result, deleteToken);
 }
 
@@ -444,6 +447,7 @@ static void deleteToken (tokenInfo *const token)
 	if (token != NULL)
 	{
 		vStringDelete (token->string);
+		vStringDelete (token->parentType);
 		deleteToken (token->secondary);
 		token->secondary = NULL;
 		eFree (token);
@@ -494,18 +498,12 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 				e.extensionFields.scope [1] = vStringValue (scope->string);
 			}
 		}
-		if (token->secondary != NULL &&
-		    token->secondary->string != NULL &&
-		    vStringLength (token->secondary->string) > 0 &&
+		if (token->parentType != NULL &&
+		    vStringLength (token->parentType) > 0 &&
 		    token->tag == TAG_DERIVED_TYPE)
-			e.extensionFields.inheritance = vStringValue (token->secondary->string);
+			e.extensionFields.inheritance = vStringValue (token->parentType);
 		if (! insideInterface () || includeTag (TAG_INTERFACE))
 			makeTagEntry (&e);
-		if (e.extensionFields.inheritance)
-		{
-			deleteToken (token->secondary);
-			token->secondary = NULL;
-		}
 	}
 }
 
@@ -944,6 +942,8 @@ static void readToken (tokenInfo *const token)
 	token->keyword     = KEYWORD_NONE;
 	token->secondary   = NULL;
 	vStringClear (token->string);
+	vStringDelete (token->parentType);
+	token->parentType = NULL;
 
 getNextChar:
 	c = getChar ();
@@ -1255,22 +1255,15 @@ static boolean skipStatementIfKeyword (tokenInfo *const token, keywordId keyword
  * parenthesis.
  */
 
-static void make_parent_token (tokenInfo *const token, void *user_data)
+static void makeParentType (tokenInfo *const token, void *userData)
 {
-	tokenInfo **parent = user_data;
-
-	*parent = newTokenFrom (token);
-	/* This newly allocated token is in trash. So you don't have to
-	 care aobut memory leaking. */
+	((tokenInfo *)userData)->parentType = vStringNewCopy (token->string);
 }
 
-
-static tokenInfo  *parseExtendsQualifier (tokenInfo *const token)
+static void parseExtendsQualifier (tokenInfo *const token,
+								   tokenInfo *const qualifierToken)
 {
-	tokenInfo *parent = NULL;
-
-	skipOverParensFull (token, make_parent_token, &parent);
-	return parent;
+	skipOverParensFull (token, makeParentType, qualifierToken);
 }
 
 /* parse a list of qualifying specifiers, leaving `token' at first token
@@ -1298,7 +1291,7 @@ static tokenInfo  *parseExtendsQualifier (tokenInfo *const token)
  */
 static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 {
-	tokenInfo *parent_token = NULL;
+	tokenInfo *qualifierToken = newToken ();
 
 	do
 	{
@@ -1326,7 +1319,7 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 
 			case KEYWORD_extends:
 				readToken (token);
-				parent_token = parseExtendsQualifier (token);
+				parseExtendsQualifier (token, qualifierToken);
 				break;
 
 			default: skipToToken (token, TOKEN_STATEMENT_END); break;
@@ -1335,7 +1328,7 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 	if (! isType (token, TOKEN_DOUBLE_COLON))
 		skipToToken (token, TOKEN_STATEMENT_END);
 
-	return parent_token;
+	return qualifierToken;
 }
 
 static tagType variableTagType (void)
@@ -1694,19 +1687,18 @@ static void parseComponentDefStmt (tokenInfo *const token)
  */
 static void parseDerivedTypeDef (tokenInfo *const token)
 {
-	tokenInfo *parent_token = NULL;
+	tokenInfo *qualifierToken = NULL;
 
 	if (isType (token, TOKEN_COMMA))
-		parent_token = parseQualifierSpecList (token);
+		qualifierToken = parseQualifierSpecList (token);
 	if (isType (token, TOKEN_DOUBLE_COLON))
 		readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		if (parent_token)
+		if (qualifierToken)
 		{
-			Assert (token->secondary == NULL);
-			token->secondary = parent_token;
-			B (parent_token);
+			if (qualifierToken->parentType)
+				token->parentType = vStringNewCopy (qualifierToken->parentType);
 		}
 		makeFortranTag (token, TAG_DERIVED_TYPE);
 	}
