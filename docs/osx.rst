@@ -12,7 +12,7 @@ the OSX packaging of this project.
 Build Prerequisites
 -----------------------------------------------------------------------------
 
-Building ctags on OSX should be no different than building on Linux. The same toolchains are used, and the Mac OS
+Building ctags on OSX should be no different than building on GNU/Linux. The same toolchains are used, and the Mac OS
 packaging scripts use autotools and make (as you'd expect).
 
 You may need to install the xcode command line tools. You can install the entire xcode distribution from the App Store,
@@ -45,14 +45,14 @@ If you'd like to help with the Homebrew formula, you can find the repository her
 https://github.com/universal-ctags/homebrew-universal-ctags
 
 
-Differences between OSX and Linux
+Differences between OSX and GNU/Linux
 -----------------------------------------------------------------------------
 
 There other things where building ctags on OSX differs from building on GNU/Linux.
 
 - Filenames on HFS+ (the Mac OS filesystem) are case-preserving, but not case-sensitive in 99% of configurations. If a
   user manually formats their disk with a case sensitive version of HFS+, then the filesystem will behave like normal
-  Linux systems. Depending on users doing this is not a good thing.
+  GNU/Linux systems. Depending on users doing this is not a good thing.
 
 Contributing
 -----------------------------------------------------------------------------
