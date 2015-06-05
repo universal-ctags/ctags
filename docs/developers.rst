@@ -47,3 +47,12 @@ Vitor Antunes <vitor.hda@gmail.com>
 	Verilog parser such that Vim can get the most out of it
 	in plugins like Tagbar and to support the Omni
 	completion plugin I am writing.
+
+Cameron Eagans <me@cweagans.net>
+
+        I've been a PHP developer for almost 10 years, and have been using Vim
+        almost as long. My goal is to help guide the direction of the PHP
+        parser, as well as maintain the ctags website and help guide new
+        contributors to tasks that they may be able to help with. With time,
+        I may end up contributing directly to ctags development, but my C skills
+        are not so great at the moment.
