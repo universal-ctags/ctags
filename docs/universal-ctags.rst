@@ -93,3 +93,8 @@ Contents
 .. raw:: pdf
 
    PageBreak oneColumn
+
+.. include:: osx.rst
+.. raw:: pdf
+
+   PageBreak oneColumn
