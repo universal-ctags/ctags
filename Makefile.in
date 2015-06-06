@@ -43,7 +43,7 @@ LIBOBJS = @LIBOBJS@
 LIBS	= @LIBS@
 EXEEXT	= @EXEEXT@
 OBJEXT	= @OBJEXT@
-
+TINST_ROOT=tinst-root
 # If you cannot run the "configure" script to set the variables above, then
 # uncomment the defines below and customize them for your environment. If
 # your system does not support symbolic (soft) links, then remove the -s
@@ -435,4 +435,12 @@ tmain: $(CTAGS_TEST)
 		$(VALGRIND) \
 		$(SHOW_DIFF_OUTPUT)"; \
 	 $(SHELL) $${c} Tmain
+
+#
+# Test installation
+#
+tinst:
+	rm -rf $$(pwd)/$(TINST_ROOT)
+	$(SHELL) misc/tinst $$(pwd)/$(TINST_ROOT)
+
 # vi:set tabstop=8:
