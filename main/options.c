@@ -341,6 +341,12 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --xcmd-<LANG>=parser_command_path|parser_command_name"},
  {1,"       Define external parser command path or name for specific language."},
 #endif
+ {1,"  --_echo=msg"},
+ {1,"       Echo MSG to standard error. Useful to debug the chain"},
+ {1,"       of loading option files."},
+ {1,"  --_force-quit=[num]"},
+ {1,"       Quit when the option is processed. Useful to debug the chain"},
+ {1,"       of loading option files."},
  {1, NULL}
 };
 
@@ -1873,6 +1879,22 @@ static void processIgnoreOption (const char *const list)
 		readIgnoreList (list);
 }
 
+static void processEchoOption (const char *const option, const char *const parameter)
+{
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "Something message is needed for \"%s\" option", option);
+	notice ("%s", parameter);
+}
+
+static void processForceQuitOption (const char *const option __unused__,
+				    const char *const parameter)
+{
+	long s = 0;
+	if (parameter != NULL && parameter[0] != '\0')
+		s = strtol (parameter, NULL, 0);
+	exit (s);
+}
+
 static void processVersionOption (
 		const char *const option __unused__,
 		const char *const parameter __unused__)
@@ -2034,6 +2056,8 @@ static parametricOption ParametricOptions [] = {
 	{ "options",                processOptionFile,              FALSE   },
 	{ "sort",                   processSortOption,              TRUE    },
 	{ "version",                processVersionOption,           TRUE    },
+	{ "_echo",                  processEchoOption,              FALSE   },
+	{ "_force-quit",             processForceQuitOption,         TRUE    },
 };
 
 static booleanOption BooleanOptions [] = {
