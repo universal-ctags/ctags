@@ -1257,6 +1257,8 @@ static boolean skipStatementIfKeyword (tokenInfo *const token, keywordId keyword
 
 static void makeParentType (tokenInfo *const token, void *userData)
 {
+	if (((tokenInfo *)userData)->parentType)
+		vStringDelete (((tokenInfo *)userData)->parentType);
 	((tokenInfo *)userData)->parentType = vStringNewCopy (token->string);
 }
 
