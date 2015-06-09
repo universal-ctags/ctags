@@ -228,15 +228,7 @@ static void pushScope (tokenInfo *const token,
 static void popScope (tokenInfo *const token,
 					  const tokenInfo *const parent)
 {
-	char *dot = strrchr (token->scope->buffer, '.');
-
-	if (! dot)
-		vStringClear (token->scope);
-	else
-	{
-		*dot = 0;
-		token->scope->length = dot - token->scope->buffer;
-	}
+	vStringTruncate (token->scope, vStringLength (parent->scope));
 	token->scopeKind = parent->scopeKind;
 }
 
