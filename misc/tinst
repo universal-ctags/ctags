@@ -1,0 +1,161 @@
+#!/bin/sh
+TINST_ROOT=
+
+ERROR ()
+{
+    local status="$1"
+    local msg="$2"
+    shift 2
+    echo "$msg" 1>&2
+    exit $status
+}
+
+MSG_title()
+{
+    printf '%-70s' "${1}"
+}
+
+MSG_passed()
+{
+    echo passed
+}
+
+MSG_failed()
+{
+    echo failed
+}
+
+MSG_done()
+{
+    echo done
+}
+
+
+T_existing()
+{
+    local f=$1
+    shift
+    local op
+    local r=0
+
+    for op in "$@"; do
+	case "$op" in
+	    -d)
+		MSG_title "The existence of $f as a directory"
+		;;	    
+	    -f)
+		MSG_title "The existence of $f as an file"
+		;;
+	    -r)
+		MSG_title "The read mode of $f"
+		;;
+	    -x)
+		MSG_title "The existence of $f as an executable"
+		;;
+	    *)
+		MSG_title "The existence of $f with $op operator"
+		;;
+	esac
+	if [ $op ${TINST_ROOT}/$f ]; then
+	    MSG_passed
+	else
+	    MSG_failed
+	    r=$(( r + 1 ))
+	fi
+    done
+    return ${r}
+}
+
+prepare()
+{
+    local root=$1
+
+
+    MSG_title "Preparing installation tests"
+    
+    if ! [ -e ./configure ]; then
+	ERROR 2 "cannot find configure script"
+    fi
+
+    mkdir -p "$1"
+
+    if ! [ -d "$1" ]; then
+	ERROR 2 "failed in directory creation: $1"
+    fi
+
+    rm Makefile
+
+    if ! ./configure --prefix=$1 > /dev/null; then
+	ERROR 2 "failed in running configure script $1"
+    fi
+
+    if ! [ -e Makefile ]; then
+	ERROR 2 "cannot find Makefile"
+    fi
+
+    if ! make > /dev/null; then
+	ERROR 2 "failed in building ctags"
+    fi
+
+    if ! make install > /dev/null; then
+	ERROR 2 "failed in installing ctags"
+    fi    
+
+    MSG_done
+    return 0
+}
+
+cleanup()
+{
+    MSG_title "Cleanup installation tests"
+    MSG_done
+    return 0
+}
+
+check()
+{
+    T_existing /bin/ctags -f -x
+    T_existing /bin/readtags -f -x
+
+    T_existing /libexec/ctags/drivers/coffeetags -f -x
+    T_existing /etc/ctags/optlib   -d -x -r
+    T_existing /etc/ctags/preload  -d -x -r
+    T_existing /etc/ctags/corpora  -d -x -r
+    
+    T_existing /share/ctags/optlib/m4.ctags -f -r
+    T_existing /share/ctags/optlib/coffee.ctags -f -r
+    T_existing /share/ctags/optlib/ctags.ctags -f -r
+    T_existing /share/ctags/optlib/mib.ctags -f -r
+
+    T_existing /share/ctags/preload/default.ctags -f -r
+    
+    T_existing /share/ctags/corpora/ctags.ctags -f -r
+    T_existing  /share/ctags/corpora/RFC1213-MIB.txt -f -r
+    
+    T_existing /share/man/man1/ctags.1 -f -r
+}
+
+main()
+{
+    local root
+    local status
+
+    if [ $# = 1 ]; then
+	root=$1
+	shift
+    else
+	ERROR 2 "A installation root must be ginve as the first argument"
+    fi
+    
+    prepare "${root}"
+
+    TINST_ROOT=${root}
+    check
+    status=$?
+
+    cleanup "${root}"
+
+    return $status
+}
+
+main "$@"
