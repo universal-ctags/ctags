@@ -1,4 +1,4 @@
-Tips for building ctags
+Tips for hacking ctags
 ============================================================
 
 Fussy syntax checking

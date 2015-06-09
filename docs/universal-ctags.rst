@@ -89,7 +89,7 @@ Contents
 
    PageBreak oneColumn
 
-.. include:: build.rst
+.. include:: tips.rst
 .. raw:: pdf
 
    PageBreak oneColumn
