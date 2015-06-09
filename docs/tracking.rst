@@ -87,8 +87,15 @@ subversion
 bugs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+   <366>  --options=.ctags doesn't work under Windows
+
+	 * fixed in::
+
+	        15cedc6c94e95110cc319b5cdad7807caf3db1f4
+
    <364>  Ruby method on self is missing the trailing ? in the generated tag name
-	 * fixed::
+
+	 * fixed in::
 
 	        d9ba5df9f4d54ddaa511bd5440a1a3decaa2dc28
 
