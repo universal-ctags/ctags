@@ -59,6 +59,11 @@ Contents
 
    PageBreak oneColumn
 
+.. include:: osx.rst
+.. raw:: pdf
+
+   PageBreak oneColumn
+
 .. include:: units.rst
 .. raw:: pdf
 
@@ -94,7 +99,3 @@ Contents
 
    PageBreak oneColumn
 
-.. include:: osx.rst
-.. raw:: pdf
-
-   PageBreak oneColumn
