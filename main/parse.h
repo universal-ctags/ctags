@@ -140,6 +140,8 @@ extern const char *getLanguageName (const langType language);
 extern const char getLanguageFileKind (const langType language);
 extern langType getNamedLanguage (const char *const name);
 extern langType getFileLanguage (const char *const fileName);
+extern boolean isLanguageKindEnabled (const langType language, char kind);
+
 extern void installLanguageMapDefault (const langType language);
 extern void installLanguageMapDefaults (void);
 extern void clearLanguageMap (const langType language);
@@ -187,6 +189,8 @@ extern void addTagRegex (const langType language, const char* const regex, const
 extern void addCallbackRegex (const langType language, const char *const regex, const char *const flags, const regexCallback callback);
 extern void resetRegexKinds (const langType language, boolean mode);
 extern boolean enableRegexKind (const langType language, const int kind, const boolean mode);
+extern boolean isRegexKindEnabled (const langType language, const int kind);
+extern boolean hasRegexKind (const langType language, const int kind);
 extern void printRegexKinds (const langType language, boolean indent);
 extern void freeRegexResources (void);
 extern boolean checkRegex (void);
@@ -200,6 +204,8 @@ extern void addLanguageXcmd (const langType language, const char* const path);
 extern void addTagXcmd (const langType language, vString* pathvstr);
 extern void resetXcmdKinds (const langType language, boolean mode);
 extern boolean enableXcmdKind (const langType language, const int kind, const boolean mode);
+extern boolean isXcmdKindEnabled (const langType language, const int kind);
+extern boolean hasXcmdKind (const langType language, const int kind);
 extern void printXcmdKinds (const langType language, boolean indent);
 extern void freeXcmdResources (void);
 extern void useXcmdMethod (const langType language);

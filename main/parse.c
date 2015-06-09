@@ -1267,6 +1267,21 @@ static kindOption *langKindOption (const langType language, const int flag)
 	return result;
 }
 
+extern boolean isLanguageKindEnabled (langType language, char kind)
+{
+	const kindOption *kindOpt;
+
+	if (hasRegexKind (language, kind))
+		return isRegexKindEnabled (language, kind);
+	else if (hasXcmdKind (language, kind))
+		return isXcmdKindEnabled (language, kind);
+
+	Assert (kindOpt  = langKindOption (language, kind));
+
+	return kindOpt->enabled;
+}
+
+
 static void resetLanguageKinds (const langType language, const boolean mode)
 {
 	const parserDefinition* lang;

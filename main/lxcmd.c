@@ -60,8 +60,6 @@
 
 #include "pcoproc.h"
 
-#ifdef HAVE_COPROC
-
 /*
 *   MACROS
 */
@@ -139,6 +137,8 @@ typedef struct {
 	xcmdPath *paths;
 	unsigned int count;
 } pathSet;
+
+#ifdef HAVE_COPROC
 
 static pathSet* Sets = NULL;
 static int SetUpper = -1;  /* upper language index in list */
@@ -326,7 +326,10 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 }
 #endif	/* HAVE_COPROC */
 
-extern void resetXcmdKinds (const langType language, boolean mode)
+
+static void foreachXcmdKinds (const langType language,
+			      boolean (*func) (struct sKind *, void *),
+			      void *data)
 {
 #ifdef HAVE_COPROC
 	if (language <= SetUpper  &&  Sets [language].count > 0)
@@ -341,43 +344,115 @@ extern void resetXcmdKinds (const langType language, boolean mode)
 				continue;
 
 			for (k = 0; k < path[i].kount; k++)
-			{
-				struct sKind *const kind = path[i].kinds + k;
-				kind->enabled = mode;
-			}
+				if (func (& (path[i].kinds[k]), data))
+					break;
 		}
 	}
 #endif
 }
 
+static boolean kind_reset_cb (struct sKind *kind, void *data)
+{
+	kind->enabled = *(boolean *)data;
+	return FALSE;		/* continue */
+}
+
+extern void resetXcmdKinds (const langType language, boolean mode)
+{
+	foreachXcmdKinds (language, kind_reset_cb, &mode);
+}
+
+struct kind_and_mode_and_result
+{
+	int kind;
+	boolean mode;
+	boolean result;
+};
+
+static boolean enable_kind_cb (struct sKind *kind, void *data)
+{
+	struct kind_and_mode_and_result *kmr = data;
+	if (kind->letter == kmr->kind)
+	{
+		kind->enabled = kmr->mode;
+		kmr->result = TRUE;
+	}
+	/* conitnue:
+	   There can be more than one paths which deals this kind.
+	   Consider /bin/X and /bin/Y are both parser for a language L.
+	   ctags --langdef=L --xcmd-L=/bin/X --xcmd-L=/bin/Y ... */
+	return FALSE;
+
+}
 extern boolean enableXcmdKind (const langType language, const int kind,
 			       const boolean mode)
 {
-	boolean result = FALSE;
-#ifdef HAVE_COPROC
-	if (language <= SetUpper  &&  Sets [language].count > 0)
-	{
-		pathSet* const set = Sets + language;
-		xcmdPath * path = set->paths;
-		unsigned int i;
-		for (i = 0  ;  i < set->count  ;  ++i)
-		{
-			unsigned int k;
-			if (!path[i].available)
-				continue;
+	struct kind_and_mode_and_result kmr;
 
-			for (k = 0; k < path[i].kount; k++)
-			{
-				if (path[i].kinds[k].letter == kind)
-				{
-					path[i].kinds[k].enabled = mode;
-					result = TRUE;
-				}
-			}
-		}
+	kmr.kind = kind;
+	kmr.mode = mode;
+	kmr.result = FALSE;
+
+	foreachXcmdKinds (language, enable_kind_cb, &kmr);
+	return kmr.result;
+}
+
+struct kind_and_result
+{
+	int kind;
+	boolean result;
+};
+
+static boolean is_kind_enabled_cb (struct sKind *kind, void *data)
+{
+	boolean r = FALSE;
+	struct kind_and_result *kr = data;
+
+	if (kind->letter == kr->kind)
+	{
+		kr->result = kind->enabled;
+		r = TRUE;
 	}
-#endif
-	return result;
+
+	return r;
+}
+
+static boolean does_kind_exist_cb (struct sKind *kind, void *data)
+{
+	boolean r = FALSE;
+	struct kind_and_result *kr = data;
+
+	if (kind->letter == kr->kind)
+	{
+		kr->result = TRUE;
+		r = TRUE;
+	}
+
+	return r;
+}
+
+extern boolean isXcmdKindEnabled (const langType language, const int kind)
+{
+	struct kind_and_result d;
+
+	d.kind = kind;
+	d.result = FALSE;
+
+	foreachXcmdKinds (language, is_kind_enabled_cb, &d);
+
+	return d.result;
+}
+
+extern boolean hasXcmdKind (const langType language, const int kind)
+{
+	struct kind_and_result d;
+
+	d.kind = kind;
+	d.result = FALSE;
+
+	foreachXcmdKinds (language, does_kind_exist_cb, &d);
+
+	return d.result;
 }
 
 #ifdef HAVE_COPROC
