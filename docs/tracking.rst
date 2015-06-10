@@ -93,6 +93,14 @@ bugs
 
 	        15cedc6c94e95110cc319b5cdad7807caf3db1f4
 
+   <365>  Selecting Python kinds is broken
+
+	* fixed in::
+
+	         4a95e4a55f67230fc4eee91ffb31c18c422df6d3
+
+	* discussed at #324.
+
    <364>  Ruby method on self is missing the trailing ? in the generated tag name
 
 	 * fixed in::
@@ -108,6 +116,7 @@ bugs
    		$ make units UNITS=c-heapoverflow-sh-bug-363 VG=1
 
    <358>  Vim parser: Segmentation fault when reading empty vim file
+
 	 * directly contributed by the original author of bug report and patch::
 
 	   	e0f854f0100e7a3cb8b959a23d6036e43f6b6c85
@@ -117,16 +126,19 @@ bugs
 	   	5d774f6022a1af71fa5866994699aafce0253085
 
    <355> Error when parsing empty file (OCaml)
+
 	 * fixed::
 
 	   	02ec2066b5be6b129eba49685bd0b17fef4acfa
 
    <341> Introducing ctags.conf.d
+
 	 * merged the improved version::
 
 	   	216880c5287e0421d9c49898d983144db61c83aa
 
    <271> regex callback is broken; <320> [PATCH] fix regex callback match count
+
 	 * merged patch (with updated bug number)::
 
 		a12b3a24b62d6535a968e076675f68bac9ad32ba 
