@@ -2008,7 +2008,7 @@ static void skipStatement (statementInfo *const st)
 	skipToOneOf (";");
 }
 
-static void processAnotation (statementInfo *const st)
+static void processAnnotation (statementInfo *const st)
 {
 	st->declaration = DECL_ANNOTATION;
 }
@@ -2416,7 +2416,7 @@ static void parseJavaAnnotation (statementInfo *const st)
 	if (token->keyword == KEYWORD_INTERFACE)
 	{
 		/* Oops. This was actually "@interface" defining a new annotation. */
-		processAnotation(st);
+		processAnnotation(st);
 	}
 	else
 	{
