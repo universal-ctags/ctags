@@ -1905,15 +1905,15 @@ static void setAccess (statementInfo *const st, const accessType access)
 					break;
 			}
 			st->member.access = access;
-		    cppUngetc (c);
+			cppUngetc (c);
 		}
-        else if (c == ':') {
-            reinitStatement (st, FALSE);
+		else if (c == ':') {
+			reinitStatement (st, FALSE);
 			st->member.accessDefault = access;
-        }
-        else {
-            cppUngetc (c);
-        }
+		}
+		else {
+			cppUngetc (c);
+		}
 	}
 
 	if (isMember (st))
@@ -2362,8 +2362,7 @@ static void analyzePostParens (statementInfo *const st, parenInfo *const info)
 		if (!insideAnnotationBody(st)) {
 			skipJavaThrows (st);
 		}
-	} else
-	{
+	} else {
 		if (! skipPostArgumentStuff (st, info))
 		{
 			verbose (
