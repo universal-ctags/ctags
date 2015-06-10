@@ -35,6 +35,8 @@
 #define isType(token,t)     (boolean) ((token)->type == (t))
 #define insideEnumBody(st)  ((st)->parent == NULL ? FALSE : \
                             (boolean) ((st)->parent->declaration == DECL_ENUM))
+#define insideAnnotationBody(st)  ((st)->parent == NULL ? FALSE : \
+								  (boolean) ((st)->parent->declaration == DECL_ANNOTATION))
 #define isExternCDecl(st,c) (boolean) ((c) == STRING_SYMBOL  && \
                     ! (st)->haveQualifyingName  && (st)->scope == SCOPE_EXTERN)
 
@@ -168,6 +170,7 @@ typedef enum eDeclaration {
 	DECL_UNION,
 	DECL_USING,
 	DECL_VERSION,        /* D conditional compile */
+	DECL_ANNOTATION,     /* Java annotation */
 	DECL_COUNT
 } declType;
 
@@ -256,6 +259,7 @@ typedef enum eTagType {
 	TAG_EXTERN_VAR,  /* external variable declaration */
 	TAG_VERSION, 	 /* conditional template compilation */
 	TAG_LABEL,	 /* goto label */
+	TAG_ANNOTATION,  /* Java annotation definition */
 	TAG_COUNT        /* must be last */
 } tagType;
 
@@ -693,9 +697,10 @@ static const char *scopeString (const tagScope scope)
 static const char *declString (const declType declaration)
 {
 	static const char *const names [] = {
-		"?", "base", "class", "enum", "event", "function", "ignore",
-		"interface", "namespace", "no mangle", "package", "program",
-		"struct", "task", "union", "version"
+		"?", "base", "class", "enum", "event", "function", "function template",
+		"ignore", "interface", "mixin", "namespace", "no mangle", "package",
+		"private", "program", "protected", "public", "struct", "task", "template",
+		"union", "using", "version", "annotation"
 	};
 	Assert (sizeof (names) / sizeof (names [0]) == DECL_COUNT);
 	Assert ((int) declaration < DECL_COUNT);
@@ -796,6 +801,7 @@ static boolean isContextualStatement (const statementInfo *const st)
 		case DECL_STRUCT:
 		case DECL_UNION:
 		case DECL_TEMPLATE:
+		case DECL_ANNOTATION:
 			result = TRUE;
 			break;
 
@@ -848,6 +854,7 @@ static void initMemberInfo (statementInfo *const st)
 		case DECL_INTERFACE:
 		case DECL_STRUCT:
 		case DECL_UNION:
+		case DECL_ANNOTATION:
 			accessDefault = ACCESS_PUBLIC;
 			break;
 
@@ -979,6 +986,10 @@ static javaKind javaTagKindFull (const tagType type, boolean with_assert)
 		case TAG_LOCAL:      result = JK_LOCAL;         break;
 		case TAG_METHOD:     result = JK_METHOD;        break;
 		case TAG_PACKAGE:    result = JK_PACKAGE;       break;
+		/* I'm gonna go ahead and keep considering as interfaces for the output
+		 * since the official syntax reference seems to consider them interfaces too
+		 */
+		case TAG_ANNOTATION: result = JK_INTERFACE;     break;
 
 		default: if (with_assert) Assert ("Bad Java tag type" == NULL); break;
 	}
@@ -1140,6 +1151,7 @@ static tagType declToTagType (const declType declaration)
 		case DECL_STRUCT:       type = TAG_STRUCT;      break;
 		case DECL_UNION:        type = TAG_UNION;       break;
 		case DECL_VERSION: 		type = TAG_VERSION; 	break;
+		case DECL_ANNOTATION:   type = TAG_ANNOTATION;  break;
 
 		default: Assert ("Unexpected declaration" == NULL); break;
 	}
@@ -1194,6 +1206,7 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 		case TAG_TASK:
 		case TAG_TYPEDEF:
 		case TAG_UNION:
+		case TAG_ANNOTATION:
 			if (vStringLength (scope) > 0  &&
 				(isMember (st) || st->parent->declaration == DECL_NAMESPACE))
 			{
@@ -1212,7 +1225,7 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 				}
 			}
 			if ((type == TAG_CLASS  ||  type == TAG_INTERFACE  ||
-				 type == TAG_STRUCT) && vStringLength (st->parentClasses) > 0)
+				 type == TAG_STRUCT || type == TAG_ANNOTATION) && vStringLength (st->parentClasses) > 0)
 			{
 
 				tag->extensionFields.inheritance =
@@ -1385,6 +1398,7 @@ static boolean isValidTypeSpecifier (const declType declaration)
 		case DECL_EVENT:
 		case DECL_STRUCT:
 		case DECL_UNION:
+		case DECL_ANNOTATION:
 			result = TRUE;
 			break;
 
@@ -1455,6 +1469,7 @@ static void qualifyBlockTag (statementInfo *const st,
 {
 	switch (st->declaration)
 	{
+
 		case DECL_CLASS:
 		case DECL_ENUM:
 		case DECL_INTERFACE:
@@ -1464,6 +1479,7 @@ static void qualifyBlockTag (statementInfo *const st,
 		case DECL_UNION:
 		case DECL_TEMPLATE:
 		case DECL_VERSION:
+		case DECL_ANNOTATION:
 			qualifyCompoundTag (st, nameToken);
 			break;
 		default: break;
@@ -1731,7 +1747,7 @@ static void readPackageName (tokenInfo *const token, const int firstChar)
 static void readPackageOrNamespace (statementInfo *const st, const declType declaration)
 {
 	st->declaration = declaration;
-	
+
 	if (declaration == DECL_NAMESPACE && !isLanguage (Lang_csharp))
 	{
 		/* In C++ a namespace is specified one level at a time. */
@@ -1992,6 +2008,11 @@ static void skipStatement (statementInfo *const st)
 	skipToOneOf (";");
 }
 
+static void processAnotation (statementInfo *const st)
+{
+	st->declaration = DECL_ANNOTATION;
+}
+
 static void processInterface (statementInfo *const st)
 {
 	st->declaration = DECL_INTERFACE;
@@ -2062,7 +2083,7 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_NAMESPACE: readPackageOrNamespace (st, DECL_NAMESPACE); break;
 		case KEYWORD_MODULE:
 		case KEYWORD_PACKAGE:   readPackageOrNamespace (st, DECL_PACKAGE);   break;
-		
+
 		case KEYWORD_EVENT:
 			if (isLanguage (Lang_csharp))
 				st->declaration = DECL_EVENT;
@@ -2336,9 +2357,12 @@ static void analyzePostParens (statementInfo *const st, parenInfo *const info)
 	cppUngetc (c);
 	if (isOneOf (c, "{;,="))
 		;
-	else if (isLanguage (Lang_java))
-		skipJavaThrows (st);
-	else
+	else if (isLanguage (Lang_java)) {
+
+		if (!insideAnnotationBody(st)) {
+			skipJavaThrows (st);
+		}
+	} else
 	{
 		if (! skipPostArgumentStuff (st, info))
 		{
@@ -2386,13 +2410,13 @@ static void parseJavaAnnotation (statementInfo *const st)
 	 * But watch out for "@interface"!
 	 */
 	tokenInfo *const token = activeToken (st);
-	
+
 	int c = skipToNonWhite ();
 	readIdentifier (token, c);
 	if (token->keyword == KEYWORD_INTERFACE)
 	{
 		/* Oops. This was actually "@interface" defining a new annotation. */
-		processInterface (st);
+		processAnotation(st);
 	}
 	else
 	{
@@ -2799,9 +2823,10 @@ static void parseIdentifier (statementInfo *const st, const int c)
 static void parseGeneralToken (statementInfo *const st, const int c)
 {
 	const tokenInfo *const prev = prevToken (st, 1);
-	
+
 	if (isident1 (c) || (isLanguage (Lang_java) && isHighChar (c)))
 	{
+
 		parseIdentifier (st, c);
 		if (isType (st->context, TOKEN_NAME) &&
 			isType (activeToken (st), TOKEN_NAME) && isType (prev, TOKEN_NAME))
@@ -2834,6 +2859,8 @@ static void parseGeneralToken (statementInfo *const st, const int c)
 	{
 		st->declaration = DECL_NOMANGLE;
 		st->scope = SCOPE_GLOBAL;
+	} else if (c == STRING_SYMBOL) {
+		setToken(st, TOKEN_NONE);
 	}
 }
 
@@ -2967,6 +2994,7 @@ static void nest (statementInfo *const st, const unsigned int nestLevel)
 		case DECL_PUBLIC:
 		case DECL_STRUCT:
 		case DECL_UNION:
+		case DECL_ANNOTATION:
 			createTags (nestLevel, st);
 			break;
 
@@ -3052,6 +3080,13 @@ static void tagCheck (statementInfo *const st)
 			}
 			else if (isLanguage (Lang_csharp))
 				makeTag (prev, st, FALSE, TAG_PROPERTY);
+			break;
+
+		case TOKEN_KEYWORD:
+
+			if (token->keyword == KEYWORD_DEFAULT && isType(prev, TOKEN_ARGS) && insideAnnotationBody(st)) {
+				qualifyFunctionDeclTag(st, prev2);
+			}
 			break;
 
 		case TOKEN_SEMICOLON:
