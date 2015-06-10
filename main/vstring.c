@@ -54,11 +54,18 @@ extern boolean vStringAutoResize (vString *const string)
 	return ok;
 }
 
+extern void vStringTruncate (vString *const string, const size_t length)
+{
+	Assert (length <= string->length);
+	string->length = length;
+	vStringTerminate (string);
+	DebugStatement ( memset (string->buffer + string->length, 0,
+	                         string->size - string->length); )
+}
+
 extern void vStringClear (vString *const string)
 {
-	string->length = 0;
-	string->buffer [0] = '\0';
-	DebugStatement ( memset (string->buffer, 0, string->size); )
+	vStringTruncate (string, 0);
 }
 
 extern void vStringDelete (vString *const string)
