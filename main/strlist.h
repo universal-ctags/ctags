@@ -43,7 +43,9 @@ extern vString* stringListLast (const stringList *const current);
 extern void stringListDelete (stringList *const current);
 extern boolean stringListHasInsensitive (const stringList *const current, const char *const string);
 extern boolean stringListHas (const stringList *const current, const char *const string);
-extern boolean stringListHasTest (const stringList *const current, boolean (*test)(const char *s));
+extern boolean stringListHasTest (const stringList *const current,
+				  boolean (*test)(const char *s, void *userData),
+				  void *userData);
 extern boolean stringListRemoveExtension (stringList* const current, const char* const extension);
 extern boolean stringListExtensionMatched (const stringList* const list, const char* const extension);
 extern vString* stringListExtensionFinds (const stringList* const list, const char* const extension);

@@ -2318,18 +2318,16 @@ extern void parseOptions (cookedArgs* const args)
 		NonOptionEncountered = TRUE;
 }
 
-static const char *CheckFile;
-static boolean checkSameFile (const char *const fileName)
+static boolean checkSameFile (const char *const fileName, void * userData)
 {
-	return isSameFile (CheckFile, fileName);
+	return isSameFile ((const char* const) userData, fileName);
 }
 
 static boolean parseFileOptions (const char* const fileName)
 {
 	boolean fileFound = FALSE;
 	const char* const format = "Considering option file %s: %s\n";
-	CheckFile = fileName;
-	if (stringListHasTest (OptionFiles, checkSameFile))
+	if (stringListHasTest (OptionFiles, checkSameFile, (void *) fileName))
 	{
 		verbose (format, fileName, "already considered");
 		fileFound = TRUE;

@@ -219,14 +219,15 @@ extern boolean stringListHasInsensitive (
 	return result;
 }
 
-extern boolean stringListHasTest (
-		const stringList *const current, boolean (*test)(const char *s))
+extern boolean stringListHasTest (const stringList *const current,
+				  boolean (*test)(const char *s, void *userData),
+				  void *userData)
 {
 	boolean result = FALSE;
 	unsigned int i;
 	Assert (current != NULL);
 	for (i = 0  ;  ! result  &&  i < current->count  ;  ++i)
-		result = (*test)(vStringValue (current->list [i]));
+		result = (*test)(vStringValue (current->list [i]), userData);
 	return result;
 }
 
