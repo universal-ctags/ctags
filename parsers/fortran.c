@@ -209,7 +209,7 @@ static kindOption FortranKinds [] = {
 	{ TRUE,  'c', "common",     "common blocks"},
 	{ TRUE,  'e', "entry",      "entry points"},
 	{ TRUE,  'f', "function",   "functions"},
-	{ FALSE, 'i', "interface",  "interface contents, generic names, and operators"},
+	{ TRUE,  'i', "interface",  "interface contents, generic names, and operators"},
 	{ TRUE,  'k', "component",  "type and structure components"},
 	{ TRUE,  'l', "label",      "labels"},
 	{ FALSE, 'L', "local",      "local, common block, and namelist variables"},
