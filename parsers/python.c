@@ -535,10 +535,8 @@ static boolean constructParentString(NestingLevels *nls, int indent,
 	return is_class;
 }
 
-/* Check whether parent's indentation level is higher than the current level and
- * if so, remove it.
- */
-static void checkParent(NestingLevels *nls, int indent, vString *parent)
+/* Check indentation level and truncate nesting levels accordingly */
+static void checkIndent(NestingLevels *nls, int indent)
 {
 	int i;
 	NestingLevel *n;
@@ -546,14 +544,10 @@ static void checkParent(NestingLevels *nls, int indent, vString *parent)
 	for (i = 0; i < nls->n; i++)
 	{
 		n = nls->levels + i;
-		/* is there a better way to compare two vStrings? */
-		if (n && strcmp(vStringValue(parent), vStringValue(n->name)) == 0)
+		if (n && indent <= n->indentation)
 		{
-			if (indent <= n->indentation)
-			{
-				/* remove this level by clearing its name */
-				vStringClear(n->name);
-			}
+			/* truncate levels */
+			nls->n = i;
 			break;
 		}
 	}
@@ -820,7 +814,7 @@ static void findPythonTags (void)
 			continue;
 		}
 		
-		checkParent(nesting_levels, indent, parent);
+		checkIndent(nesting_levels, indent);
 
 		/* Find global and class variables */
 		variable = findVariable(line);
