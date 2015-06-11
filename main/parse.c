@@ -99,7 +99,7 @@ extern const char *getLanguageName (const langType language)
 	return result;
 }
 
-extern const char getLanguageFileKind (const langType language)
+extern char getLanguageFileKind (const langType language)
 {
 	char kind;
 
