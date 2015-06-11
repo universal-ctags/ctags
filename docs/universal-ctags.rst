@@ -42,6 +42,11 @@ Contents
 
    PageBreak oneColumn
 
+.. include:: guessing.rst
+.. raw:: pdf
+
+   PageBreak oneColumn
+
 .. include:: building.rst
 .. raw:: pdf
 
