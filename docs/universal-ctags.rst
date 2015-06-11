@@ -1,10 +1,3 @@
-..
-.. you can use rst2pdf or something rst2* to generate a sophisticated
-.. file for reading and printing from rst files.
-..
-.. TODO: Makefile targets for converting are needed.
-..
-
 ========================================================================
 universal-ctags hacking guide
 ========================================================================

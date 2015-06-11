@@ -42,3 +42,5 @@ win32/[Dd]ebug/
 perf.data*
 a.out
 tinst-root
+universal-ctags.pdf
+universal-ctags.html
