@@ -1,2 +1,2 @@
---python-alias=+serpent
+--alias-python=+serpent
 --guess-language-eagerly

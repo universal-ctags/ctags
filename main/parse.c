@@ -1443,9 +1443,8 @@ extern void printLanguageKinds (const langType language)
 		printKinds (language, FALSE);
 }
 
-static void processLangAliasOption (
-		const langType language, const char *const option __unused__,
-		const char *const parameter)
+static void processLangAliasOption (const langType language,
+				    const char *const parameter)
 {
 	const char* alias;
 	const parserDefinition * lang;
@@ -1489,24 +1488,26 @@ static void processLangAliasOption (
 extern boolean processAliasOption (
 		const char *const option, const char *const parameter)
 {
-	const char* const dash = strchr (option, '-');
+	const char *lang;
 	langType language;
-	vString* langName;
-	size_t len;
 
-	if (dash == NULL ||
-	    (strcmp (dash + 1, "alias") != 0))
+#define PREFIX "alias-"
+#define LEN strlen(PREFIX)
+	if (strncmp (option, PREFIX, LEN) != 0)
 		return FALSE;
-	len = dash - option;
-
-	langName = vStringNew ();
-	vStringNCopyS (langName, option, len);
-	language = getNamedLanguage (vStringValue (langName));
+	else
+	{
+		lang = option + LEN;
+		if (lang[0] == '\0')
+			return FALSE;
+	}
+#undef LEN
+#undef PERFIX
+	language = getNamedLanguage (lang);
 	if (language == LANG_IGNORE)
-		error (FATAL, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
-	vStringDelete(langName);
+		error (FATAL, "Unknown language \"%s\" in \"%s\" option", lang, option);
 
-	processLangAliasOption (language, option, parameter);
+	processLangAliasOption (language, parameter);
 	return TRUE;
 }
 
