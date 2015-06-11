@@ -42,12 +42,7 @@ Contents
 
    PageBreak oneColumn
 
-.. include:: windows.rst
-.. raw:: pdf
-
-   PageBreak oneColumn
-
-.. include:: osx.rst
+.. include:: building.rst
 .. raw:: pdf
 
    PageBreak oneColumn
@@ -73,11 +68,6 @@ Contents
    PageBreak oneColumn
 
 .. include:: internal.rst
-.. raw:: pdf
-
-   PageBreak oneColumn
-
-.. include:: tips.rst
 .. raw:: pdf
 
    PageBreak oneColumn
