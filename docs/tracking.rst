@@ -125,9 +125,15 @@ bugs
 
 	   	5d774f6022a1af71fa5866994699aafce0253085
 
+   <355> [python] mistakes module level attribute for class level attribute in module level if
+
+	 * fixed in::
+
+	        ab91e6e1ae84b80870a1e8712fc7f3133e4b5542
+
    <355> Error when parsing empty file (OCaml)
 
-	 * fixed::
+	 * fixed in::
 
 	   	02ec2066b5be6b129eba49685bd0b17fef4acfa
 
