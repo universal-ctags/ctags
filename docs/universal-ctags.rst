@@ -47,12 +47,7 @@ Contents
 
    PageBreak oneColumn
 
-.. include:: units.rst
-.. raw:: pdf
-
-   PageBreak oneColumn
-
-.. include:: tmain.rst
+.. include:: testing.rst
 .. raw:: pdf
 
    PageBreak oneColumn
