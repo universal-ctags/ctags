@@ -9,7 +9,7 @@ I consider tracking activities as the first class fruits
 of this project.
 
 
-universal-ctags
+exuberant-ctags
 ----------------------------------------------------------------------
 
 subversion
