@@ -37,11 +37,6 @@ Contents
 
    PageBreak oneColumn
 
-.. include:: tracking.rst
-.. raw:: pdf
-
-   PageBreak oneColumn
-
 .. include:: news.rst
 .. raw:: pdf
 
@@ -83,6 +78,11 @@ Contents
    PageBreak oneColumn
 
 .. include:: tips.rst
+.. raw:: pdf
+
+   PageBreak oneColumn
+
+.. include:: other-projects.rst
 .. raw:: pdf
 
    PageBreak oneColumn
