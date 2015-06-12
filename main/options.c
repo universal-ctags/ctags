@@ -222,6 +222,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Should tags should be appended to existing tag file [no]?"},
  {1,"  --config-filename=fileName"},
  {1,"      Use 'fileName' instead of 'ctags' in option file names."},
+ {1,"  --corpus-<LANG>=spec:corpusFile"},
+ {1,"      Add two gram data calculated from corpusFile to spec of LANG."},
  {1,"  --data-dir=[+]DIR"},
  {1,"      Add or set DIR to data directory search path."},
  {1,"  --etags-include=file"},
@@ -263,8 +265,6 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Print this option summary."},
  {1,"  --if0=[yes|no]"},
  {1,"       Should code within #if 0 conditional branches be parsed [no]?"},
- {1,"  --<LANG>-corpus=spec:corpusFile"},
- {1,"      Add two gram data calculated from corpusFile to spec of LANG."},
  {1,"  --<LANG>-kinds=[+|-]kinds"},
  {1,"       Enable/disable tag kinds for language <LANG>."},
  {1,"  --<LANG>-map=[+]map"},
@@ -1415,28 +1415,30 @@ static char* skipTillColon (char* p)
 extern boolean processCorpusOption (
 		const char *const option, const char *const parameter)
 {
-	const char* const dash = strchr (option, '-');
+	const char *lang;
 	langType language;
-	vString* langName;
 	char* parm;
 	char* colon;
-	size_t len;
 	const char* file_part;
 	vString* tg_file;
 	char* spec;
 	boolean pattern_p;
 
-	if (dash == NULL ||
-	    (strcmp (dash + 1, "corpus") != 0))
+#define PREFIX "corpus-"
+#define LEN strlen(PREFIX)
+	if (strncmp (option, PREFIX, LEN) != 0)
 		return FALSE;
-	len = dash - option;
-
-	langName = vStringNew ();
-	vStringNCopyS (langName, option, len);
-	language = getNamedLanguage (vStringValue (langName));
+	else
+	{
+		lang = option + LEN;
+		if (lang [0] == '\0')
+			return FALSE;
+	}
+#undef LEN
+#undef PREFIX
+	language = getNamedLanguage (lang);
 	if (language == LANG_IGNORE)
-		error (FATAL, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
-	vStringDelete(langName);
+		error (FATAL, "Unknown language \"%s\" in \"%s\" option", lang, option);
 
 	if (parameter == NULL || parameter [0] == '\0')
 		error (FATAL, "no parameter is given for %s", option);

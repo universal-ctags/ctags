@@ -545,7 +545,7 @@ Assume you prepare *swine.swn* as corpus data for ``Swine``
 language parser.
 
 1. put it to data/corpora/swine.swn, and
-2. add ``--swine-corpus=.swn:swine.swn`` to swine.ctags.
+2. add ``--corpus-swine=.swn:swine.swn`` to swine.ctags.
 
 
 Makefile.in
