@@ -2129,15 +2129,17 @@ static void parseSubprogram (tokenInfo *const token, const tagType tag)
 
 static tagType subprogramTagType (tokenInfo *const token)
 {
-	tagType result;
-	Assert (isKeyword (token, KEYWORD_subroutine) ||
-			isKeyword (token, KEYWORD_function));
+	tagType result = TAG_UNDEFINED;
+
 	if (insideInterface ())
 		result = TAG_PROTOTYPE;
 	else if (isKeyword (token, KEYWORD_subroutine))
 		result = TAG_SUBROUTINE;
 	else if (isKeyword (token, KEYWORD_function))
 		result = TAG_FUNCTION;
+
+	Assert (result != TAG_UNDEFINED);
+
 	return result;
 }
 
