@@ -22,12 +22,12 @@
 #
 #
 --langdef=m4
---m4-map=+.m4
+--map-m4=+.m4
 
 #
 # Support for support macros for SELinux policy definition
 #
---m4-map=+.spt
+--map-m4=+.spt
 
 ##
 ## Ignore comments

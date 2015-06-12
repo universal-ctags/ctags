@@ -267,8 +267,6 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Should code within #if 0 conditional branches be parsed [no]?"},
  {1,"  --<LANG>-kinds=[+|-]kinds"},
  {1,"       Enable/disable tag kinds for language <LANG>."},
- {1,"  --<LANG>-map=[+]map"},
- {1,"       Simplified version of --langmap opton."},
 #ifdef HAVE_REGEX
  {1,"  --<LANG>-regex=/line_pattern/name_pattern/[flags]"},
  {1,"       Same as --regex-<LANG>=..."},
@@ -309,6 +307,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of supported languages."},
  {1,"  --list-maps=[language|all]"},
  {1,"       Output list of language mappings."},
+ {1,"  --map-<LANG>=[+]map"},
+ {1,"       Alternative version of --langmap option."},
  {1,"  --options=file"},
  {1,"       Specify file from which command line options should be read."},
  {0,"  --print-language"},
@@ -1361,25 +1361,27 @@ static void processLanguagesOption (
 extern boolean processMapOption (
 			const char *const option, const char *const parameter)
 {
-	const char* const dash = strchr (option, '-');
+	const char *lang;
 	langType language;
-	vString* langName;
-	size_t len;
 	const char* spec;
 	char* map_parameter;
 	boolean clear = FALSE;
 
-	if (dash == NULL ||
-	    (strcmp (dash + 1, "map") != 0))
+#define	PREFIX "map-"
+#define LEN strlen(PREFIX)
+	if (strncmp (option, PREFIX, LEN) != 0)
 		return FALSE;
-	len = dash - option;
-
-	langName = vStringNew ();
-	vStringNCopyS (langName, option, len);
-	language = getNamedLanguage (vStringValue (langName));
+	else
+	{
+		lang = option + LEN;
+		if (lang [0] == '\0')
+			return FALSE;
+	}
+#undef LEN
+#undef PREFIX
+	language = getNamedLanguage (lang);
 	if (language == LANG_IGNORE)
-		error (FATAL, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
-	vStringDelete(langName);
+		error (FATAL, "Unknown language \"%s\" in \"%s\" option", lang, option);
 
 	if (parameter == NULL || parameter [0] == '\0')
 		error (FATAL, "no parameter is given for %s", option);
