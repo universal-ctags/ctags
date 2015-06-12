@@ -40,6 +40,14 @@ Masatake YAMATO <yamato@redhat.com>
 	introduced optlib and xcmd. I'm working on Fedora. I don't
 	have access to the other platforms.
 
+Qingming He <906459647@qq.com>
+
+	I'm mainly a Fortran developer and I use ctags combined with Emacs to
+	handle my projects. My goal is to improve the Fortran parser to make
+	it support Fortran standards from 77 to 2008 and maybe 2015 to be
+	released in the near future. I'm also interested in improving the lisp
+	parsers (elisp and scheme).
+
 Vitor Antunes <vitor.hda@gmail.com>
 
 	I've been working with Verilog for most of the last 10
