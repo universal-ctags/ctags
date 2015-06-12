@@ -1,3 +1,3 @@
 CTAGS=$1
 
-${CTAGS} --quiet --langdef=foo'{fileKind=c}' --list-file-kind | grep ^foo
+${CTAGS} --quiet --options=NONE --langdef=foo'{fileKind=c}' --list-file-kind | grep ^foo
