@@ -184,7 +184,7 @@ check_features()
 
     while read expected; do
 	    found=no
-	    for f in $( ${CTAGS} --list-features 2> /dev/null | "${_LINE_SPLITER}" ) ; do
+	    for f in $( ${CTAGS} --quiet --options=NONE --list-features 2> /dev/null | "${_LINE_SPLITER}" ) ; do
 		[ "$expected" = "$f" ] && found=yes;
 	    done
 	    if ! [ "$found" = yes ]; then
