@@ -1,0 +1,9 @@
++	input.f90	/^  interface operator(+)/;"	i	module:test_interface
+add	input.f90	/^    type(atype) function add(/;"	P	module:test_interface
+atype	input.f90	/^  type atype$/;"	t	module:test_interface
+get	input.f90	/^  interface get$/;"	i	module:test_interface
+get_1d	input.f90	/^  subroutine get_1d(/;"	s	module:test_interface
+get_2d	input.f90	/^  subroutine get_2d(/;"	s	module:test_interface
+suba	input.f90	/^    subroutine suba(/;"	P	module:test_interface
+subb	input.f90	/^    subroutine subb(/;"	P	module:test_interface
+test_interface	input.f90	/^module test_interface$/;"	m

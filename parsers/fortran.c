@@ -174,6 +174,7 @@ typedef enum eTagType {
 	TAG_MODULE,
 	TAG_NAMELIST,
 	TAG_PROGRAM,
+	TAG_PROTOTYPE,
 	TAG_SUBROUTINE,
 	TAG_DERIVED_TYPE,
 	TAG_VARIABLE,
@@ -208,13 +209,14 @@ static kindOption FortranKinds [] = {
 	{ TRUE,  'c', "common",     "common blocks"},
 	{ TRUE,  'e', "entry",      "entry points"},
 	{ TRUE,  'f', "function",   "functions"},
-	{ FALSE, 'i', "interface",  "interface contents, generic names, and operators"},
+	{ TRUE,  'i', "interface",  "interface contents, generic names, and operators"},
 	{ TRUE,  'k', "component",  "type and structure components"},
 	{ TRUE,  'l', "label",      "labels"},
 	{ FALSE, 'L', "local",      "local, common block, and namelist variables"},
 	{ TRUE,  'm', "module",     "modules"},
 	{ TRUE,  'n', "namelist",   "namelists"},
 	{ TRUE,  'p', "program",    "programs"},
+	{ FALSE, 'P', "prototype",  "subprogram prototypes"},
 	{ TRUE,  's', "subroutine", "subroutines"},
 	{ TRUE,  't', "type",       "derived types and structures"},
 	{ TRUE,  'v', "variable",   "program (global) and module variables"}
@@ -502,8 +504,7 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 		    vStringLength (token->parentType) > 0 &&
 		    token->tag == TAG_DERIVED_TYPE)
 			e.extensionFields.inheritance = vStringValue (token->parentType);
-		if (! insideInterface () || includeTag (TAG_INTERFACE))
-			makeTagEntry (&e);
+		makeTagEntry (&e);
 	}
 }
 
@@ -1345,6 +1346,7 @@ static tagType variableTagType (void)
 			case TAG_DERIVED_TYPE: result = TAG_COMPONENT; break;
 			case TAG_FUNCTION:     result = TAG_LOCAL;     break;
 			case TAG_SUBROUTINE:   result = TAG_LOCAL;     break;
+			case TAG_PROTOTYPE:    result = TAG_LOCAL;     break;
 			default:               result = TAG_VARIABLE;  break;
 		}
 	}
@@ -2125,6 +2127,21 @@ static void parseSubprogram (tokenInfo *const token, const tagType tag)
 	ancestorPop ();
 }
 
+static tagType subprogramTagType (tokenInfo *const token)
+{
+	tagType result = TAG_UNDEFINED;
+
+	if (insideInterface ())
+		result = TAG_PROTOTYPE;
+	else if (isKeyword (token, KEYWORD_subroutine))
+		result = TAG_SUBROUTINE;
+	else if (isKeyword (token, KEYWORD_function))
+		result = TAG_FUNCTION;
+
+	Assert (result != TAG_UNDEFINED);
+
+	return result;
+}
 
 /*  function-subprogram is
  *      function-stmt (is [prefix] FUNCTION function-name etc.)
@@ -2139,7 +2156,7 @@ static void parseSubprogram (tokenInfo *const token, const tagType tag)
  */
 static void parseFunctionSubprogram (tokenInfo *const token)
 {
-	parseSubprogram (token, TAG_FUNCTION);
+	parseSubprogram (token, subprogramTagType (token));
 }
 
 /*  subroutine-subprogram is
@@ -2151,7 +2168,7 @@ static void parseFunctionSubprogram (tokenInfo *const token)
  */
 static void parseSubroutineSubprogram (tokenInfo *const token)
 {
-	parseSubprogram (token, TAG_SUBROUTINE);
+	parseSubprogram (token, subprogramTagType (token));
 }
 
 /*  main-program is
