@@ -163,6 +163,9 @@ extern vString* expandOnCorpusPathList (const char* leaf);
 extern vString* expandOnDriversPathList (const char* leaf);
 /* Return vString must be freed by caller side. */
 
+extern langType getLanguageComponentInOption (const char *const option,
+					      const char *const prefix);
+
 #endif  /* _OPTIONS_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

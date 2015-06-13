@@ -591,6 +591,33 @@ extern void checkOptions (void)
 	}
 }
 
+extern langType getLanguageComponentInOption (const char *const option,
+					      const char *const prefix)
+{
+	size_t len;
+	langType language;
+	const char *lang;
+
+	Assert (prefix && prefix[0]);
+	Assert (option && option[0]);
+
+	len = strlen (prefix);
+	if (strncmp (option, prefix, len) != 0)
+		return LANG_IGNORE;
+	else
+	{
+		lang = option + len;
+		if (lang [0] == '\0')
+			return LANG_IGNORE;
+	}
+
+	language = getNamedLanguage (lang);
+	if (language == LANG_IGNORE)
+		error (FATAL, "Unknown language \"%s\" in \"%s\" option", lang, option);
+
+	return language;
+}
+
 static void setEtagsMode (void)
 {
 	Option.etags = TRUE;
@@ -1361,27 +1388,14 @@ static void processLanguagesOption (
 extern boolean processMapOption (
 			const char *const option, const char *const parameter)
 {
-	const char *lang;
 	langType language;
 	const char* spec;
 	char* map_parameter;
 	boolean clear = FALSE;
 
-#define	PREFIX "map-"
-#define LEN strlen(PREFIX)
-	if (strncmp (option, PREFIX, LEN) != 0)
-		return FALSE;
-	else
-	{
-		lang = option + LEN;
-		if (lang [0] == '\0')
-			return FALSE;
-	}
-#undef LEN
-#undef PREFIX
-	language = getNamedLanguage (lang);
+	language = getLanguageComponentInOption (option, "map-");
 	if (language == LANG_IGNORE)
-		error (FATAL, "Unknown language \"%s\" in \"%s\" option", lang, option);
+		return FALSE;
 
 	if (parameter == NULL || parameter [0] == '\0')
 		error (FATAL, "no parameter is given for %s", option);
@@ -1417,7 +1431,6 @@ static char* skipTillColon (char* p)
 extern boolean processCorpusOption (
 		const char *const option, const char *const parameter)
 {
-	const char *lang;
 	langType language;
 	char* parm;
 	char* colon;
@@ -1426,21 +1439,9 @@ extern boolean processCorpusOption (
 	char* spec;
 	boolean pattern_p;
 
-#define PREFIX "corpus-"
-#define LEN strlen(PREFIX)
-	if (strncmp (option, PREFIX, LEN) != 0)
-		return FALSE;
-	else
-	{
-		lang = option + LEN;
-		if (lang [0] == '\0')
-			return FALSE;
-	}
-#undef LEN
-#undef PREFIX
-	language = getNamedLanguage (lang);
+	language = getLanguageComponentInOption (option, "corpus-");
 	if (language == LANG_IGNORE)
-		error (FATAL, "Unknown language \"%s\" in \"%s\" option", lang, option);
+		return FALSE;
 
 	if (parameter == NULL || parameter [0] == '\0')
 		error (FATAL, "no parameter is given for %s", option);

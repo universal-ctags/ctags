@@ -1488,24 +1488,11 @@ static void processLangAliasOption (const langType language,
 extern boolean processAliasOption (
 		const char *const option, const char *const parameter)
 {
-	const char *lang;
 	langType language;
 
-#define PREFIX "alias-"
-#define LEN strlen(PREFIX)
-	if (strncmp (option, PREFIX, LEN) != 0)
-		return FALSE;
-	else
-	{
-		lang = option + LEN;
-		if (lang[0] == '\0')
-			return FALSE;
-	}
-#undef LEN
-#undef PERFIX
-	language = getNamedLanguage (lang);
+	language = getLanguageComponentInOption (option, "alias-");
 	if (language == LANG_IGNORE)
-		error (FATAL, "Unknown language \"%s\" in \"%s\" option", lang, option);
+		return FALSE;
 
 	processLangAliasOption (language, parameter);
 	return TRUE;
