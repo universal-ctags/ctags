@@ -32,7 +32,7 @@
 ##
 ## Ignore comments
 ##
---m4-regex=/^dnl.*$//{exclusive}
+--regex-m4=/^dnl.*$//{exclusive}
 
 ##
 ## define
@@ -55,7 +55,7 @@
 # define(NAME,...
 # m4_define(NAME,...
 #
---m4-regex=/^[[:space:]]*(m4_)?define\(([[`{]|<<)?([^]'}>,]+)([]'}]|>>)?,/\3/d,definition/{exclusive}
+--regex-m4=/^[[:space:]]*(m4_)?define\(([[`{]|<<)?([^]'}>,]+)([]'}]|>>)?,/\3/d,definition/{exclusive}
 
 ##
 ## undefine
@@ -72,7 +72,7 @@
 # undefine(NAME)
 # m4_undefine(NAME)
 #
---m4-regex=/^[[:space:]]*(m4_)?undefine\([[`]?([^]'),]+)[]']?[),]/\2/u,undefinition/{exclusive}
+--regex-m4=/^[[:space:]]*(m4_)?undefine\([[`]?([^]'),]+)[]']?[),]/\2/u,undefinition/{exclusive}
 
 ##
 ## include, sinclude
@@ -87,4 +87,4 @@
 # include(NAME)
 # m4_include(NAME)
 #
---m4-regex=/^[[:space:]]*(m4_)?s?include\([[`]?([^]')]+)[]']?\)/\2/I,inclusion/{exclusive}{optional}
+--regex-m4=/^[[:space:]]*(m4_)?s?include\([[`]?([^]')]+)[]']?\)/\2/I,inclusion/{exclusive}{optional}
