@@ -1,0 +1,14 @@
+approx	input.f95	/^	MODULE approx$/;"	m
+approx2	input.f95	/^	MODULE approx2$/;"	m
+arcsin	input.f95	/^	recursive function arcsin /;"	P	module:approx
+arcsin1	input.f95	/^	recursive function arcsin1 /;"	P	module:approx
+arcsin2	input.f95	/^	double precision recursive function arcsin2 /;"	P	module:approx
+arcsin3	input.f95	/^	recursive double precision function arcsin3 /;"	P	module:approx
+as	input.f95	/^	double precision recursive function as /;"	P	module:approx2
+as1	input.f95	/^	recursive double precision function as1 /;"	P	module:approx2
+as2	input.f95	/^	recursive function as2 /;"	P	module:approx2
+as3	input.f95	/^	recursive function as3 /;"	P	module:approx2
+parts	input.f95	/^	integer :: parts$/;"	v	module:approx
+parts2	input.f95	/^	integer :: parts2$/;"	v	module:approx2
+y	input.f95	/^	double precision :: y$/;"	v	module:approx
+z	input.f95	/^	double precision :: z$/;"	v	module:approx2
