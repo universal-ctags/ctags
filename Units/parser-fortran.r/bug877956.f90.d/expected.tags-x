@@ -1,0 +1,4 @@
+c2               variable     25 input.f90 INTEGER :: cm1 =-1, c2 = 2
+c2               variable     39 input.f90 INTEGER :: cm1 = -1, c2 = 2
+cm1              variable     25 input.f90 INTEGER :: cm1 =-1, c2 = 2
+cm1              variable     39 input.f90 INTEGER :: cm1 = -1, c2 = 2
