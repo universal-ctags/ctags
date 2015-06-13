@@ -23,4 +23,4 @@
 #
 --langdef=coffee
 --map-coffee=+.coffee
---coffee-xcmd=coffeetags
+--xcmd-coffee=coffeetags

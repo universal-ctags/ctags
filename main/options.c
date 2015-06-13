@@ -267,10 +267,6 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Should code within #if 0 conditional branches be parsed [no]?"},
  {1,"  --<LANG>-kinds=[+|-]kinds"},
  {1,"       Enable/disable tag kinds for language <LANG>."},
-#ifdef HAVE_COPROC
- {1,"  --<LANG>-xcmd=parser_command_path|parser_command_name"},
- {1,"       Same as --xcmd-<LANG>=..."},
-#endif
  {1,"  --langdef=name"},
  {1,"       Define a new language to be parsed with regular expressions."},
  {1,"  --langmap=map(s)"},
