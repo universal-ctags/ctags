@@ -316,8 +316,7 @@ static struct {
 static void parseStructureStmt (tokenInfo *const token);
 static void parseUnionStmt (tokenInfo *const token);
 static void parseDerivedTypeDef (tokenInfo *const token);
-static void parseFunctionSubprogram (tokenInfo *const token);
-static void parseSubroutineSubprogram (tokenInfo *const token);
+static void parseSubprogram (tokenInfo *const token);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -1781,8 +1780,8 @@ static void parseInterfaceBlock (tokenInfo *const token)
 	{
 		switch (token->keyword)
 		{
-			case KEYWORD_function:   parseFunctionSubprogram (token);   break;
-			case KEYWORD_subroutine: parseSubroutineSubprogram (token); break;
+			case KEYWORD_function:
+			case KEYWORD_subroutine: parseSubprogram (token); break;
 
 			default:
 				if (isSubprogramPrefix (token))
@@ -1997,9 +1996,9 @@ static void parseInternalSubprogramPart (tokenInfo *const token)
 	{
 		switch (token->keyword)
 		{
-			case KEYWORD_function:   parseFunctionSubprogram (token);   break;
-			case KEYWORD_subroutine: parseSubroutineSubprogram (token); break;
-			case KEYWORD_end:        done = TRUE;                       break;
+			case KEYWORD_function:
+			case KEYWORD_subroutine: parseSubprogram (token); break;
+			case KEYWORD_end:        done = TRUE;             break;
 
 			default:
 				if (isSubprogramPrefix (token))
@@ -2104,7 +2103,7 @@ static boolean parseExecutionPart (tokenInfo *const token)
 	return result;
 }
 
-static void parseSubprogram (tokenInfo *const token, const tagType tag)
+static void parseSubprogramFull (tokenInfo *const token, const tagType tag)
 {
 	Assert (isKeyword (token, KEYWORD_program) ||
 			isKeyword (token, KEYWORD_function) ||
@@ -2154,11 +2153,6 @@ static tagType subprogramTagType (tokenInfo *const token)
  *      is type-spec [RECURSIVE]
  *      or [RECURSIVE] type-spec
  */
-static void parseFunctionSubprogram (tokenInfo *const token)
-{
-	parseSubprogram (token, subprogramTagType (token));
-}
-
 /*  subroutine-subprogram is
  *      subroutine-stmt (is [RECURSIVE] SUBROUTINE subroutine-name etc.)
  *          [specification-part]
@@ -2166,9 +2160,9 @@ static void parseFunctionSubprogram (tokenInfo *const token)
  *          [internal-subprogram-part]
  *          end-subroutine-stmt (is END [SUBROUTINE [function-name]])
  */
-static void parseSubroutineSubprogram (tokenInfo *const token)
+static void parseSubprogram (tokenInfo *const token)
 {
-	parseSubprogram (token, subprogramTagType (token));
+	parseSubprogramFull (token, subprogramTagType (token));
 }
 
 /*  main-program is
@@ -2180,7 +2174,7 @@ static void parseSubroutineSubprogram (tokenInfo *const token)
  */
 static void parseMainProgram (tokenInfo *const token)
 {
-	parseSubprogram (token, TAG_PROGRAM);
+	parseSubprogramFull (token, TAG_PROGRAM);
 }
 
 /*  program-unit
@@ -2200,10 +2194,10 @@ static void parseProgramUnit (tokenInfo *const token)
 		{
 			case KEYWORD_block:      parseBlockData (token);            break;
 			case KEYWORD_end:        skipToNextStatement (token);       break;
-			case KEYWORD_function:   parseFunctionSubprogram (token);   break;
+			case KEYWORD_function:
+			case KEYWORD_subroutine: parseSubprogram (token);           break;
 			case KEYWORD_module:     parseModule (token);               break;
 			case KEYWORD_program:    parseMainProgram (token);          break;
-			case KEYWORD_subroutine: parseSubroutineSubprogram (token); break;
 
 			default:
 				if (isSubprogramPrefix (token))
