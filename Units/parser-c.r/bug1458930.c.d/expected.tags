@@ -1,0 +1,2 @@
+x	input.c	/^char x();$/;"	p	file:
+y	input.c	/^wchar_t y();$/;"	p	file:

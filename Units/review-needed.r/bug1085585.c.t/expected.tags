@@ -1,1 +1,0 @@
-des_check_key	input.c	/^int des_check_key=0;$/;"	v
