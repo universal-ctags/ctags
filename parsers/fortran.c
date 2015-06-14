@@ -65,6 +65,7 @@ typedef enum eFortranLineType {
  */
 typedef enum eKeywordId {
 	KEYWORD_NONE = -1,
+	KEYWORD_abstract,
 	KEYWORD_allocatable,
 	KEYWORD_assignment,
 	KEYWORD_automatic,
@@ -236,6 +237,7 @@ static kindOption FortranKinds [] = {
 
 static const keywordDesc FortranKeywordTable [] = {
 	/* keyword          keyword ID */
+	{ "abstract",       KEYWORD_abstract     },
 	{ "allocatable",    KEYWORD_allocatable  },
 	{ "assignment",     KEYWORD_assignment   },
 	{ "automatic",      KEYWORD_automatic    },
@@ -1298,6 +1300,7 @@ static void parseExtendsQualifier (tokenInfo *const token,
  *      or NOPASS
  *      or DEFERRED
  *      or NON_OVERRIDABLE
+ *      or ABSTRACT
  * 
  *  component-attr-spec
  *      is POINTER
@@ -1325,6 +1328,7 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 			case KEYWORD_nopass:
 			case KEYWORD_deferred:
 			case KEYWORD_non_overridable:
+			case KEYWORD_abstract:
 				readToken (token);
 				break;
 
