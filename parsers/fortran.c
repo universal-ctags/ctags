@@ -102,6 +102,7 @@ typedef enum eKeywordId {
 	KEYWORD_map,
 	KEYWORD_module,
 	KEYWORD_namelist,
+	KEYWORD_nopass,
 	KEYWORD_operator,
 	KEYWORD_optional,
 	KEYWORD_parameter,
@@ -270,6 +271,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "map",            KEYWORD_map          },
 	{ "module",         KEYWORD_module       },
 	{ "namelist",       KEYWORD_namelist     },
+	{ "nopass",         KEYWORD_nopass       },
 	{ "operator",       KEYWORD_operator     },
 	{ "optional",       KEYWORD_optional     },
 	{ "parameter",      KEYWORD_parameter    },
@@ -1289,6 +1291,7 @@ static void parseExtendsQualifier (tokenInfo *const token,
  *      or SAVE
  *      or TARGET
  *      or PASS
+ *      or NOPASS
  * 
  *  component-attr-spec
  *      is POINTER
@@ -1313,6 +1316,7 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 			case KEYWORD_public:
 			case KEYWORD_save:
 			case KEYWORD_target:
+			case KEYWORD_nopass:
 				readToken (token);
 				break;
 
