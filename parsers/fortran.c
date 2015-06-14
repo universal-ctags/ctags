@@ -106,6 +106,7 @@ typedef enum eKeywordId {
 	KEYWORD_optional,
 	KEYWORD_parameter,
 	KEYWORD_pascal,
+	KEYWORD_pass,
 	KEYWORD_pexternal,
 	KEYWORD_pglobal,
 	KEYWORD_pointer,
@@ -273,6 +274,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "optional",       KEYWORD_optional     },
 	{ "parameter",      KEYWORD_parameter    },
 	{ "pascal",         KEYWORD_pascal       },
+	{ "pass",           KEYWORD_pass         },
 	{ "pexternal",      KEYWORD_pexternal    },
 	{ "pglobal",        KEYWORD_pglobal      },
 	{ "pointer",        KEYWORD_pointer      },
@@ -1286,6 +1288,7 @@ static void parseExtendsQualifier (tokenInfo *const token,
  *      or POINTER
  *      or SAVE
  *      or TARGET
+ *      or PASS
  * 
  *  component-attr-spec
  *      is POINTER
@@ -1322,6 +1325,12 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 			case KEYWORD_extends:
 				readToken (token);
 				parseExtendsQualifier (token, qualifierToken);
+				break;
+
+			case KEYWORD_pass:
+				readToken (token);
+				if (isType (token, TOKEN_PAREN_OPEN))
+					skipOverParens (token);
 				break;
 
 			default: skipToToken (token, TOKEN_STATEMENT_END); break;
