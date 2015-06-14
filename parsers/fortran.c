@@ -77,6 +77,7 @@ typedef enum eKeywordId {
 	KEYWORD_complex,
 	KEYWORD_contains,
 	KEYWORD_data,
+	KEYWORD_deferred,
 	KEYWORD_dimension,
 	KEYWORD_dllexport,
 	KEYWORD_dllimport,
@@ -246,6 +247,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "complex",        KEYWORD_complex      },
 	{ "contains",       KEYWORD_contains     },
 	{ "data",           KEYWORD_data         },
+	{ "deferred",       KEYWORD_deferred     },
 	{ "dimension",      KEYWORD_dimension    },
 	{ "dll_export",     KEYWORD_dllexport    },
 	{ "dll_import",     KEYWORD_dllimport    },
@@ -1292,6 +1294,7 @@ static void parseExtendsQualifier (tokenInfo *const token,
  *      or TARGET
  *      or PASS
  *      or NOPASS
+ *      or DEFERRED
  * 
  *  component-attr-spec
  *      is POINTER
@@ -1317,6 +1320,7 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 			case KEYWORD_save:
 			case KEYWORD_target:
 			case KEYWORD_nopass:
+			case KEYWORD_deferred:
 				readToken (token);
 				break;
 
