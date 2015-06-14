@@ -1,0 +1,2 @@
+list_type	input.f90	/^  type, abstract :: list_type$/;"	t	module:test_implementation	implementation:abstract
+test_implementation	input.f90	/^module test_implementation$/;"	m
