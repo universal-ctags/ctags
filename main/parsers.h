@@ -51,6 +51,7 @@
 	PythonParser, \
 	RexxParser, \
 	RubyParser, \
+	RestParser, \
 	RustParser, \
 	SchemeParser, \
 	ShParser, \
