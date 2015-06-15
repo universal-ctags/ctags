@@ -1,19 +1,18 @@
 Tracking other projects
-======================================================================
+----------------------------------------------------------------------
 
 This is working note for tracking activities other projects,
 especially activity at exuberant-ctags.
 
-I put this as the top of this hacking guide because
-I consider tracking activities as the first class fruits
-of this project.
+I(Masatake YAMATO) consider tracking activities as the first class
+fruits of this project.
 
 
 exuberant-ctags
-----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 subversion
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 
 * status
 
@@ -85,7 +84,7 @@ subversion
       at the branch for picking.
 
 bugs
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 
    <366>  --options=.ctags doesn't work under Windows
 
@@ -296,7 +295,7 @@ devel mailing list (ctags-devel@sourceforge)
 
 
 Fedora
-----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some patches are maintained in ctags package of Fedora.
 Inventory of patches are
@@ -354,7 +353,7 @@ http://pkgs.fedoraproject.org/cgit/ctags.git/tree/ctags.spec
 		2f7a78ce21e4156ec3e63c821827cf1d5680ace8
 
 Debian
-----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some patches are maintained in ctags package of Debian.
 Inventory of patches are
@@ -382,69 +381,24 @@ http://anonscm.debian.org/cgit/users/cjwatson/exuberant-ctags.git/tree/debian/pa
 
 
 Other interesting ctags repositories
-----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 There are several interesting repo's with ctags around. These are
 interesting to integrate in the future.
 
-
-Geany
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Repo
-
-	https://github.com/geany/geany/tree/master/tagmanager/ctags
-
-Geany has created a library out of ctags
-
-  	https://github.com/fishman/ctags/issues/63
-
-Their language parsers have many improvements to various parsers.
-Changes known by devs worth backporting:
-
-* HTML reads <h1><h2><h3> tags
-* Make has support for targets
-* Various fixes for D parser (c.c), but currently the code diverges
-  from ours to some extent.
-
-
-They have these additional language parsers:
-
-* `Abaqus <http://en.wikipedia.org/wiki/Abaqus>`_
-* `ActionScript <http://en.wikipedia.org/wiki/ActionScript>`_
-* `AsciiDoc <http://en.wikipedia.org/wiki/AsciiDoc>`_
-* `DocBook <http://en.wikipedia.org/wiki/DocBook>`_
-* `Ferite (c.c) <http://en.wikipedia.org/wiki/Ferite>`_
-* `GLSL (c.c) <http://en.wikipedia.org/wiki/OpenGL_Shading_Language>`_
-* `Haskell <http://en.wikipedia.org/wiki/Haskell_%28programming_language%29>`_
-* `Haxe <http://en.wikipedia.org/wiki/Haxe>`_
-* `NSIS <http://en.wikipedia.org/wiki/Nullsoft_Scriptable_Install_System>`_
-* `R <http://en.wikipedia.org/wiki/R_%28programming_language%29>`_
-* `reStructuredText (reST) <http://en.wikipedia.org/wiki/ReStructuredText>`_
-* `txt2tags <http://en.wikipedia.org/wiki/Txt2tags>`_ 
-* `Vala (c.c) <http://en.wikipedia.org/wiki/Vala_%28programming_language%29>`_
-
-These changes have been merged:
-
-* Fix regex callback match count - https://github.com/fishman/ctags/pull/104 
-* SQL tags are stored with scopes instead of "tablename.field" - https://github.com/fishman/ctags/pull/100
-* Some fixes for D parser
-* C++11's enum class/struct support
-
-
 `VIM-Japan <https://github.com/vim-jp/ctags/>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 
 VIM-Japan have some interesting things, especially regarding encoding.
 
 `Anjuta <https://git.gnome.org/browse/anjuta/tree/plugins/symbol-db/anjuta-tags>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.......................................................................................
 
 Anjuta is a Gnome IDE. They did not fork Exuberant ctags, but they did
 natively include it in Anjuta. They have made several additions to
 their version of it including fairly extensive Vala language support.
 
 tagbar
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.......................................................................
 
 Wiki
 
@@ -454,7 +408,7 @@ This is a gold mine of xcmd and optlib.
 
 	
 External command(xcmd)
-----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Near feature universal-ctags can invoke external command as a
 specialized parser though some glue code or script may be

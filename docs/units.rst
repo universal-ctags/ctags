@@ -1,19 +1,30 @@
-Using *Units*
-============================================================
+*Units* test facility
+---------------------------------------------------------------------
 
 :Maintainer: Masatake YAMATO <yamato@redhat.com>
 
 ----
 
-Exuberant ctags has a test facility. Main aim of the facility is
-detecting regression. All files under Test directory are given as
-input for old and new version of ctags commands.  The output tags
-files of both versions are compared.
+Exuberant ctags has a test facility. The test casse were *Test*
+directory. So Here I call it *Test*.
 
-The units test facility I describe here takes a different approach. An
-input file and an expected output file are given by a contributor of a
-language parser. The units test facility runs ctags command with the
-input file and compares its output and the expected output file.
+Main aim of the facility is detecting regression. All files under Test
+directory are given as input for old and new version of ctags
+commands.  The output tags files of both versions are compared. If any
+difference is found the check fails. *Test* expects the older ctags
+binary to be correct.
+
+This expectation is not always met. Consider that a parser for a new
+language is added. You may want to add a sample source code for that
+language to *Test*. An older ctags version is unable to generate a
+tags file for that sample code, but the newer ctags version does. At
+this point a difference is found and *Test* reports failure.
+
+The units test facility(*Units*) I describe here takes a different
+approach. An input file and an expected output file are given by a
+contributor of a language parser. The units test facility runs ctags
+command with the input file and compares its output and the expected
+output file. The expected output doesn't depend on ctags.
 
 If a contributor sends a patch which may improve a language parser,
 and if a reviewer is not familiar with that language, s/he cannot
@@ -24,7 +35,7 @@ be able to explain the intent of patch well; and may help the
 reviewer.
 
 How to write a test case
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The test facility recognizes an input file and an expected
 output file by patterns of file name. Each test case should
@@ -90,7 +101,7 @@ have its own directory under Units directory.
 	``--list-languages`` to ctags.
 
 Note for importing a test case from Test directory
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 I think all test cases under Test directory should be converted to
 Units.
@@ -111,12 +122,12 @@ With this name convention we can track which test case is converted or
 not.
 
 Example of files
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 See *Units/c-sample/input.c* and *Units/c-sample/expected*.
 
 How to run unit tests
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *test* make target::
 
@@ -152,12 +163,12 @@ defined.
 	See "Gathering test cases for known bugs".
 
 Example of running
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
 	$ make units
 	Category: ROOT
-	------------------------------------------------------------
+	-------------------------------------------------------------------------
 	Testing 1795612.js as JavaScript                            passed
 	Testing 1850914.js as JavaScript                            passed
 	Testing 1878155.js as JavaScript                            passed
@@ -167,7 +178,7 @@ Example of running
 	...
 
 Running unit tests for specific languages
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can run only the tests for specific languages by setting
 ``LANGUAGES`` to parsers as reported by
@@ -178,7 +189,7 @@ You can run only the tests for specific languages by setting
 Multiple languages can be selected using a comma separated list.
 
 Gathering test cases for known bugs
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When we met a bug, making a small test case that triggers the bug is
 important development activity. Even the bug cannot be fixed in soon,
@@ -221,7 +232,7 @@ but reported the skips::
       ...
 
 Running under valgrind and timeout
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If ``VG=1`` is given, each test cases are run under valgrind.
 If valgrind detects an error, it is reported as::
 
@@ -237,6 +248,12 @@ If valgrind detects an error, it is reported as::
 
 In this case the report of valgrind is recorded to
 ``Units/css-singlequote-in-comment/VALGRIND-CSS.tmp``.
+
+NOTE: ``/bin/bash`` is needed to report the result. You can specify a shell
+running test with SHELL macro like::
+
+    $ make units VG=1 SHELL=/bin/bash
+
 
 If ``TIMEOUT=N`` is given, each test cases are run under timeout
 command. If ctags doesn't stop in ``N`` second, it is stopped
@@ -256,7 +273,7 @@ If ``TIMEOUT=N`` is given, *.i* test cases are run. They will be
 reported as *TIMED-OUT*.
 
 Categories
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 With *.r* suffix, you can put test cases under a sub directory
 of *Units*. ``Units/parser-ada.r`` is an example. If *misc/units*
@@ -265,7 +282,7 @@ is the name category in the above example.
 
 
 Finding minimal bad input
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If ``SHRINK=1`` is given as argument for make, the input causing
 ``FAILED`` result is passed to *misc/units shrink*.  *misc/units
@@ -274,6 +291,6 @@ non-zero status.  The result is reported to
 ``Units/\*/SHRINK-${language}.tmp``.  Maybe useful to debug.
 
 Acknowledgments
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The file name rule is suggested by Maxime Coste <frrrwww@gmail.com>.

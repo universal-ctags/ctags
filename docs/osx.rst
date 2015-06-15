@@ -1,5 +1,5 @@
 Building on Mac OS
-=============================================================================
+-----------------------------------------------------------------------------
 
 :Maintainer: Cameron Eagans <me@cweagans.net>
 
@@ -10,7 +10,7 @@ the OSX packaging of this project.
 
 
 Build Prerequisites
------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Building ctags on OSX should be no different than building on GNU/Linux. The same toolchains are used, and the Mac OS
 packaging scripts use autotools and make (as you'd expect).
@@ -24,12 +24,12 @@ At this point, if you'd like to build from an IDE, you'll have to figure it out.
 process that matches many other projects and most decent IDEs should be able to handle it.
 
 Building Manually (i.e. for development)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.............................................................................
 
 You can simply run the build instructions in README.md.
 
 Building with Homebrew
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.............................................................................
 
 Homebrew (http://brew.sh/) is the preferred method for installing Universal Ctags for end users. Currently, the process
 for installing with Homebrew looks like this::
@@ -46,7 +46,7 @@ https://github.com/universal-ctags/homebrew-universal-ctags
 
 
 Differences between OSX and GNU/Linux
------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There other things where building ctags on OSX differs from building on GNU/Linux.
 
@@ -55,7 +55,7 @@ There other things where building ctags on OSX differs from building on GNU/Linu
   GNU/Linux systems. Depending on users doing this is not a good thing.
 
 Contributing
------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This documentation is very much a work in progress. If you'd like to contribute, submit a PR and mention @cweagans for
 review.

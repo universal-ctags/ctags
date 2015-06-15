@@ -1,10 +1,3 @@
-..
-.. you can use rst2pdf or something rst2* to generate a sophisticated
-.. file for reading and printing from rst files.
-..
-.. TODO: Makefile targets for converting are needed.
-..
-
 ========================================================================
 universal-ctags hacking guide
 ========================================================================
@@ -44,32 +37,22 @@ Contents
 
    PageBreak oneColumn
 
-.. include:: tracking.rst
-.. raw:: pdf
-
-   PageBreak oneColumn
-
 .. include:: news.rst
 .. raw:: pdf
 
    PageBreak oneColumn
 
-.. include:: windows.rst
+.. include:: guessing.rst
 .. raw:: pdf
 
    PageBreak oneColumn
 
-.. include:: osx.rst
+.. include:: building.rst
 .. raw:: pdf
 
    PageBreak oneColumn
 
-.. include:: units.rst
-.. raw:: pdf
-
-   PageBreak oneColumn
-
-.. include:: tmain.rst
+.. include:: testing.rst
 .. raw:: pdf
 
    PageBreak oneColumn
@@ -89,7 +72,7 @@ Contents
 
    PageBreak oneColumn
 
-.. include:: tips.rst
+.. include:: other-projects.rst
 .. raw:: pdf
 
    PageBreak oneColumn

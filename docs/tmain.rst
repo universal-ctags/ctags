@@ -1,5 +1,5 @@
 *Tmain*: a facility for testing main part
-============================================================
+------------------------------------------------------------
 
 :Maintainer: Masatake YAMATO <yamato@redhat.com>
 
@@ -34,11 +34,11 @@ In the example, *Tmain* does:
 3. compare them with `stdout-expected.txt`, `stderr-expected.txt`,
    and `exit-expected.txt`.
 
-See also `tmain_run` and `tmain_compare` in `misc/units`.
+See also `tmain_run` and `tmain_compare` functions in `misc/units`.
 
 
-TODO:
+TODO
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Prepare the way to test the installation.
-* Run under travis.
+* Run under travis
 
