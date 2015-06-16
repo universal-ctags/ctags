@@ -1,9 +1,11 @@
-# Makefile for Win32 using Microsoft Visual C++ compiler
+#
+# Makefile for Win32 using Microsoft Visual Studio 2013
+#
 # To use from the command line:
-# 1. Make sure C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\ is in the PATH
-# 2. Make sure C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\
-# 3. Execute: C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\vcvarsall.bat
-# 4. Execute: nmake -f mk_mvc.mak
+# 1. From the Start Menu "Visual Studio 2013" -> "Visual Studio Tools" -> "VS2013 x86 Native Tools Command Prompt"
+# 2. In the command prompt that opens goto the directory containing the sources
+# 3. Execute: nmake -f mk_mvc.mak
+#
 
 include source.mak
 
