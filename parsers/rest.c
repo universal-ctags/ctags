@@ -158,9 +158,10 @@ static int utf8_strlen(const char *buf, int buf_len)
 static void findRestTags (void)
 {
 	vString *name = vStringNew ();
-	fpos_t filepos = 0;
+	fpos_t filepos;
 	const unsigned char *line;
 
+	memset(&filepos, 0, sizeof(fpos_t));
 	memset(kindchars, 0, sizeof kindchars);
 	nestingLevels = nestingLevelsNew();
 
