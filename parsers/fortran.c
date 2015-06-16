@@ -177,6 +177,7 @@ typedef enum eTagType {
 	TAG_LABEL,
 	TAG_LOCAL,
 	TAG_MODULE,
+	TAG_METHOD,
 	TAG_NAMELIST,
 	TAG_PROGRAM,
 	TAG_PROTOTYPE,
@@ -199,6 +200,7 @@ typedef struct sTokenInfo {
 	vString* string;
 	vString* parentType;
 	impType implementation;
+	boolean isMethod;
 	struct sTokenInfo *secondary;
 	unsigned long lineNumber;
 	fpos_t filePosition;
@@ -226,6 +228,7 @@ static kindOption FortranKinds [] = {
 	{ TRUE,  'l', "label",      "labels"},
 	{ FALSE, 'L', "local",      "local, common block, and namelist variables"},
 	{ TRUE,  'm', "module",     "modules"},
+	{ TRUE,  'M', "method",     "type bound procedures"},
 	{ TRUE,  'n', "namelist",   "namelists"},
 	{ TRUE,  'p', "program",    "programs"},
 	{ FALSE, 'P', "prototype",  "subprogram prototypes"},
@@ -372,6 +375,7 @@ static void ancestorPop (void)
 	Ancestors.list [Ancestors.count].string     = NULL;
 	Ancestors.list [Ancestors.count].lineNumber = 0L;
 	Ancestors.list [Ancestors.count].implementation = IMP_DEFAULT;
+	Ancestors.list [Ancestors.count].isMethod   = FALSE;
 }
 
 static const tokenInfo* ancestorScope (void)
@@ -446,6 +450,7 @@ static tokenInfo *newToken (void)
 	token->secondary    = NULL;
 	token->parentType   = NULL;
 	token->implementation = IMP_DEFAULT;
+	token->isMethod     = FALSE;
 	token->lineNumber   = getSourceLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
@@ -977,6 +982,7 @@ static void readToken (tokenInfo *const token)
 	vStringClear (token->string);
 	vStringDelete (token->parentType);
 	token->parentType = NULL;
+	token->isMethod = FALSE;
 
 getNextChar:
 	c = getChar ();
@@ -1392,7 +1398,7 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 	return qualifierToken;
 }
 
-static tagType variableTagType (void)
+static tagType variableTagType (tokenInfo *const st)
 {
 	tagType result = TAG_VARIABLE;
 	if (ancestorCount () > 0)
@@ -1401,7 +1407,12 @@ static tagType variableTagType (void)
 		switch (parent->tag)
 		{
 			case TAG_MODULE:       result = TAG_VARIABLE;  break;
-			case TAG_DERIVED_TYPE: result = TAG_COMPONENT; break;
+			case TAG_DERIVED_TYPE:
+				if (st && st->isMethod)
+					result = TAG_METHOD;
+				else
+					result = TAG_COMPONENT;
+				break;
 			case TAG_FUNCTION:     result = TAG_LOCAL;     break;
 			case TAG_SUBROUTINE:   result = TAG_LOCAL;     break;
 			case TAG_PROTOTYPE:    result = TAG_LOCAL;     break;
@@ -1411,10 +1422,11 @@ static tagType variableTagType (void)
 	return result;
 }
 
-static void parseEntityDecl (tokenInfo *const token)
+static void parseEntityDecl (tokenInfo *const token,
+							 tokenInfo *const st)
 {
 	Assert (isType (token, TOKEN_IDENTIFIER));
-	makeFortranTag (token, variableTagType ());
+	makeFortranTag (token, variableTagType (st));
 	readToken (token);
 	if (isType (token, TOKEN_PAREN_OPEN))
 		skipOverParens (token);
@@ -1449,7 +1461,8 @@ static void parseEntityDecl (tokenInfo *const token)
 	/* token left at either comma or statement end */
 }
 
-static void parseEntityDeclList (tokenInfo *const token)
+static void parseEntityDeclList (tokenInfo *const token,
+								 tokenInfo *const st)
 {
 	if (isType (token, TOKEN_PERCENT))
 		skipToNextStatement (token);
@@ -1461,7 +1474,7 @@ static void parseEntityDeclList (tokenInfo *const token)
 		/* compilers accept keywoeds as identifiers */
 		if (isType (token, TOKEN_KEYWORD))
 			token->type = TOKEN_IDENTIFIER;
-		parseEntityDecl (token);
+		parseEntityDecl (token, st);
 		if (isType (token, TOKEN_COMMA))
 			readToken (token);
 		else if (isType (token, TOKEN_STATEMENT_END))
@@ -1485,7 +1498,7 @@ static void parseTypeDeclarationStmt (tokenInfo *const token)
 			parseQualifierSpecList (token);
 		if (isType (token, TOKEN_DOUBLE_COLON))
 			readToken (token);
-		parseEntityDeclList (token);
+		parseEntityDeclList (token, NULL);
 	}
 	if (isType (token, TOKEN_STATEMENT_END))
 		skipToNextStatement (token);
@@ -1731,13 +1744,18 @@ static boolean parseSpecificationStmt (tokenInfo *const token)
  */
 static void parseComponentDefStmt (tokenInfo *const token)
 {
+	tokenInfo* st = newToken ();
+
 	Assert (isTypeSpec (token));
+	if (isKeyword (token, KEYWORD_procedure))
+		st->isMethod = TRUE;
 	parseTypeSpec (token);
 	if (isType (token, TOKEN_COMMA))
 		parseQualifierSpecList (token);
 	if (isType (token, TOKEN_DOUBLE_COLON))
 		readToken (token);
-	parseEntityDeclList (token);
+	parseEntityDeclList (token, st);
+	F (st);
 }
 
 /*  derived-type-def is
