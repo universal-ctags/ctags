@@ -1,4 +1,0 @@
-c2	input.f90	/^ INTEGER :: cm1 = -1, c2 /;"	v	program:test
-c2	input.f90	/^ INTEGER :: cm1 =-1, c2 /;"	v	program:test
-cm1	input.f90	/^ INTEGER :: cm1 /;"	v	program:test
-test	input.f90	/^PROGRAM test$/;"	p
