@@ -2720,12 +2720,15 @@ extern void initOptions (void)
 	processExcludeOption (NULL, ".deps");
 	processExcludeOption (NULL, "EIFGEN");
 	processExcludeOption (NULL, ".git");
+	processExcludeOption (NULL, ".gitignore");
 	processExcludeOption (NULL, ".hg");
+	processExcludeOption (NULL, ".hgignore");
 	processExcludeOption (NULL, "PENDING");
 	processExcludeOption (NULL, "RCS");
 	processExcludeOption (NULL, "RESYNC");
 	processExcludeOption (NULL, "SCCS");
 	processExcludeOption (NULL, ".svn");
+	processExcludeOption (NULL, "*~");
 }
 
 extern void freeOptionResources (void)
