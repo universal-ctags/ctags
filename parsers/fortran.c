@@ -65,6 +65,7 @@ typedef enum eFortranLineType {
  */
 typedef enum eKeywordId {
 	KEYWORD_NONE = -1,
+	KEYWORD_abstract,
 	KEYWORD_allocatable,
 	KEYWORD_assignment,
 	KEYWORD_automatic,
@@ -185,12 +186,19 @@ typedef enum eTagType {
 	TAG_COUNT  /* must be last */
 } tagType;
 
+typedef enum eImplementation {
+	IMP_DEFAULT,
+	IMP_ABSTRACT,
+	IMP_COUNT
+} impType;
+
 typedef struct sTokenInfo {
 	tokenType type;
 	keywordId keyword;
 	tagType tag;
 	vString* string;
 	vString* parentType;
+	impType implementation;
 	struct sTokenInfo *secondary;
 	unsigned long lineNumber;
 	fpos_t filePosition;
@@ -236,6 +244,7 @@ static kindOption FortranKinds [] = {
 
 static const keywordDesc FortranKeywordTable [] = {
 	/* keyword          keyword ID */
+	{ "abstract",       KEYWORD_abstract     },
 	{ "allocatable",    KEYWORD_allocatable  },
 	{ "assignment",     KEYWORD_assignment   },
 	{ "automatic",      KEYWORD_automatic    },
@@ -362,6 +371,7 @@ static void ancestorPop (void)
 	Ancestors.list [Ancestors.count].tag        = TAG_UNDEFINED;
 	Ancestors.list [Ancestors.count].string     = NULL;
 	Ancestors.list [Ancestors.count].lineNumber = 0L;
+	Ancestors.list [Ancestors.count].implementation = IMP_DEFAULT;
 }
 
 static const tokenInfo* ancestorScope (void)
@@ -435,6 +445,7 @@ static tokenInfo *newToken (void)
 	token->string       = vStringNew ();
 	token->secondary    = NULL;
 	token->parentType   = NULL;
+	token->implementation = IMP_DEFAULT;
 	token->lineNumber   = getSourceLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
@@ -478,6 +489,16 @@ static boolean includeTag (const tagType type)
 	return include;
 }
 
+static const char *implementationString (const impType imp)
+{
+	static const char *const names [] ={
+		"?", "abstract"
+	};
+	Assert (sizeof (names) / sizeof (names [0]) == IMP_COUNT);
+	Assert ((int) imp < IMP_COUNT);
+	return names [(int) imp];
+}
+
 static void makeFortranTag (tokenInfo *const token, tagType tag)
 {
 	token->tag = tag;
@@ -511,6 +532,9 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 		    vStringLength (token->parentType) > 0 &&
 		    token->tag == TAG_DERIVED_TYPE)
 			e.extensionFields.inheritance = vStringValue (token->parentType);
+		if (token->implementation != IMP_DEFAULT)
+			e.extensionFields.implementation =
+				implementationString (token->implementation);
 		makeTagEntry (&e);
 	}
 }
@@ -949,6 +973,7 @@ static void readToken (tokenInfo *const token)
 	token->tag         = TAG_UNDEFINED;
 	token->keyword     = KEYWORD_NONE;
 	token->secondary   = NULL;
+	token->implementation = IMP_DEFAULT;
 	vStringClear (token->string);
 	vStringDelete (token->parentType);
 	token->parentType = NULL;
@@ -1276,6 +1301,14 @@ static void parseExtendsQualifier (tokenInfo *const token,
 	skipOverParensFull (token, makeParentType, qualifierToken);
 }
 
+static void parseAbstractQualifier (tokenInfo *const token,
+									tokenInfo *const qualifierToken)
+{
+	Assert (isKeyword (token, KEYWORD_abstract));
+	qualifierToken->implementation = IMP_ABSTRACT;
+	readToken (token);
+}
+
 /* parse a list of qualifying specifiers, leaving `token' at first token
  * following list. Examples of such specifiers are:
  *      [[, attr-spec] ::]
@@ -1298,6 +1331,7 @@ static void parseExtendsQualifier (tokenInfo *const token,
  *      or NOPASS
  *      or DEFERRED
  *      or NON_OVERRIDABLE
+ *      or ABSTRACT
  * 
  *  component-attr-spec
  *      is POINTER
@@ -1343,6 +1377,10 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 				readToken (token);
 				if (isType (token, TOKEN_PAREN_OPEN))
 					skipOverParens (token);
+				break;
+
+			case KEYWORD_abstract:
+				parseAbstractQualifier (token, qualifierToken);
 				break;
 
 			default: skipToToken (token, TOKEN_STATEMENT_END); break;
@@ -1723,6 +1761,8 @@ static void parseDerivedTypeDef (tokenInfo *const token)
 		{
 			if (qualifierToken->parentType)
 				token->parentType = vStringNewCopy (qualifierToken->parentType);
+			if (qualifierToken->implementation != IMP_DEFAULT)
+				token->implementation = qualifierToken->implementation;
 		}
 		makeFortranTag (token, TAG_DERIVED_TYPE);
 	}
