@@ -50,8 +50,8 @@
 	PhpParser, \
 	PythonParser, \
 	RexxParser, \
+	RstParser, \
 	RubyParser, \
-	RestParser, \
 	RustParser, \
 	SchemeParser, \
 	ShParser, \

@@ -31,9 +31,9 @@ typedef enum {
 	K_SUBSECTION,
 	K_SUBSUBSECTION,
 	SECTION_COUNT
-} restKind;
+} rstKind;
 
-static kindOption RestKinds[] = {
+static kindOption RstKinds[] = {
 	{ TRUE, 'c', "chapter",       "chapters"},
 	{ TRUE, 's', "section",       "sections" },
 	{ TRUE, 'S', "subsection",    "subsections" },
@@ -63,7 +63,7 @@ static NestingLevel *getNestingLevel(const int kind)
 	return nl;
 }
 
-static void makeRestTag(const vString* const name, const int kind, const fpos_t filepos)
+static void makeRstTag(const vString* const name, const int kind, const fpos_t filepos)
 {
 	const NestingLevel *const nl = getNestingLevel(kind);
 
@@ -73,13 +73,13 @@ static void makeRestTag(const vString* const name, const int kind, const fpos_t 
 		initTagEntry (&e, vStringValue (name));
 
 		e.lineNumber--;	/* we want the line before the '---' underline chars */
-		e.kindName = RestKinds [kind].name;
-		e.kind = RestKinds [kind].letter;
+		e.kindName = RstKinds [kind].name;
+		e.kind = RstKinds [kind].letter;
 		e.filePosition = filepos;
 
 		if (nl && nl->type < kind)
 		{
-			e.extensionFields.scope [0] = RestKinds [nl->type].name;
+			e.extensionFields.scope [0] = RstKinds [nl->type].name;
 			e.extensionFields.scope [1] = vStringValue (nl->name);
 		}
 		makeTagEntry (&e);
@@ -155,7 +155,7 @@ static int utf8_strlen(const char *buf, int buf_len)
 
 
 /* TODO: parse overlining & underlining as distinct sections. */
-static void findRestTags (void)
+static void findRstTags (void)
 {
 	vString *name = vStringNew ();
 	fpos_t filepos;
@@ -184,7 +184,7 @@ static void findRestTags (void)
 
 			if (kind >= 0)
 			{
-				makeRestTag(name, kind, filepos);
+				makeRstTag(name, kind, filepos);
 				continue;
 			}
 		}
@@ -200,18 +200,18 @@ static void findRestTags (void)
 	nestingLevelsFree(nestingLevels);
 }
 
-extern parserDefinition* RestParser (void)
+extern parserDefinition* RstParser (void)
 {
 	static const char *const patterns [] = { "*.rest", "*.reST", "*.rst", NULL };
 	static const char *const extensions [] = { "rest", NULL };
 	parserDefinition* const def = parserNew ("reStructuredText");
 
-	def->kinds = RestKinds;
-	def->kindCount = KIND_COUNT (RestKinds);
+	def->kinds = RstKinds;
+	def->kindCount = KIND_COUNT (RstKinds);
 	def->patterns = patterns;
 	def->extensions = extensions;
-	def->parser = findRestTags;
+	def->parser = findRstTags;
 	return def;
 }
 
-/* vi:set tabstop=8 shiftwidth=4: */
+/* vi:set tabstop=4 shiftwidth=4: */
