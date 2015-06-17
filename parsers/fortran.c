@@ -93,6 +93,7 @@ typedef enum eKeywordId {
 	KEYWORD_final,
 	KEYWORD_format,
 	KEYWORD_function,
+	KEYWORD_generic,
 	KEYWORD_if,
 	KEYWORD_implicit,
 	KEYWORD_include,
@@ -276,6 +277,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "final",          KEYWORD_final        },
 	{ "format",         KEYWORD_format       },
 	{ "function",       KEYWORD_function     },
+	{ "generic",        KEYWORD_generic      },
 	{ "if",             KEYWORD_if           },
 	{ "implicit",       KEYWORD_implicit     },
 	{ "include",        KEYWORD_include      },
@@ -1174,6 +1176,7 @@ static boolean isTypeSpec (tokenInfo *const token)
 		case KEYWORD_type:
 		case KEYWORD_procedure:
 		case KEYWORD_final:
+		case KEYWORD_generic:
 			result = TRUE;
 			break;
 		default:
@@ -1277,6 +1280,7 @@ static void parseTypeSpec (tokenInfo *const token)
 			break;
 
 		case KEYWORD_final:
+		case KEYWORD_generic:
 			readToken (token);
 			break;
 
@@ -1743,6 +1747,32 @@ static boolean parseSpecificationStmt (tokenInfo *const token)
 	return result;
 }
 
+/* Type bound generic procedure is:
+ *   GENERIC [, access-spec ] :: generic-spec => binding-name1 [, binding-name2]...
+ *     access-spec: PUBLIC or PRIVATE
+ *     generic-spec: 1. generic name; 2. OPERATOR(op); 3. ASSIGNMENT(=)
+ *     binding-name: type bound procedure
+ */
+static void parseGenericMethod (tokenInfo *const token)
+{
+	if (isKeyword (token, KEYWORD_assignment) ||
+		isKeyword (token, KEYWORD_operator))
+	{
+		readToken (token);
+		if (isType (token, TOKEN_PAREN_OPEN))
+			readToken (token);
+		if (isType (token, TOKEN_OPERATOR))
+			makeFortranTag (token, TAG_METHOD);
+	}
+	else
+	{
+		if (isType (token, TOKEN_KEYWORD))
+			token->type = TOKEN_IDENTIFIER;
+		makeFortranTag (token, TAG_METHOD);
+	}
+	skipToNextStatement (token);
+}
+
 /*  component-def-stmt is
  *      type-spec [[, component-attr-spec-list] ::] component-decl-list
  *
@@ -1752,17 +1782,24 @@ static boolean parseSpecificationStmt (tokenInfo *const token)
 static void parseComponentDefStmt (tokenInfo *const token)
 {
 	tokenInfo* st = newToken ();
+	boolean isGeneric = FALSE;
 
 	Assert (isTypeSpec (token));
 	if (isKeyword (token, KEYWORD_procedure) ||
-		isKeyword (token, KEYWORD_final))
+		isKeyword (token, KEYWORD_final) ||
+		isKeyword (token, KEYWORD_generic))
 		st->isMethod = TRUE;
+	if (isKeyword (token, KEYWORD_generic))
+		isGeneric = TRUE;
 	parseTypeSpec (token);
 	if (isType (token, TOKEN_COMMA))
 		parseQualifierSpecList (token);
 	if (isType (token, TOKEN_DOUBLE_COLON))
 		readToken (token);
-	parseEntityDeclList (token, st);
+	if (isGeneric)
+		parseGenericMethod (token);
+	else
+		parseEntityDeclList (token, st);
 	F (st);
 }
 
