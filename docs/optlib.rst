@@ -303,7 +303,7 @@ Exclusive flag in regex
 ---------------------------------------------------------------------
 
 A line read from input files was matched with **all** regular expressions
-defined with ``--regex-<LANG>`` (or ``--<LANG>-regex``). Each regular
+defined with ``--regex-<LANG>``. Each regular
 expression matched successfully emits a tag.
 
 In some cases another policy, exclusive-matching, is preferable to the
@@ -336,7 +336,7 @@ pattern. (See "Ghost kind in regex parser".)
 Optional flag in regex
 ---------------------------------------------------------------------
 
-Kinds defined with ``--regex-<LANG>`` (or ``--<LANG>-regex``) was
+Kinds defined with ``--regex-<LANG>`` was
 enabled by default. A kind disabled by default can be defined
 with new flag ``optional`` (long only) like::
 
@@ -362,9 +362,9 @@ Passing parameter for long regex flag
 In the implemented API long-flags can take a parameters.
 Conceptual example::
 
-	--<LANG>-regex=/regexp1/replacement/kind-spec/{transformer=uppercase}
-	--<LANG>-regex=/regexp2/replacement/kind-spec/{transformer=lowercase}
-	--<LANG>-regex=/regexp2/replacement/kind-spec/{transformer=capitalize}
+	--regexー<LANG>=/regexp1/replacement/kind-spec/{transformer=uppercase}
+	--regex-<LANG>=/regexp2/replacement/kind-spec/{transformer=lowercase}
+	--regex-<LANG>=/regexp2/replacement/kind-spec/{transformer=capitalize}
 
 This is not yet used in any user visible place.
 This is implemented for extending ctags in future.
