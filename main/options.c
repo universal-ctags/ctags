@@ -2721,6 +2721,7 @@ extern void initOptions (void)
 	processExcludeOption (NULL, "EIFGEN");
 	processExcludeOption (NULL, ".git");
 	processExcludeOption (NULL, ".gitignore");
+	processExcludeOption (NULL, ".gitattributes");
 	processExcludeOption (NULL, ".hg");
 	processExcludeOption (NULL, ".hgignore");
 	processExcludeOption (NULL, "PENDING");
