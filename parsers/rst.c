@@ -202,13 +202,11 @@ static void findRstTags (void)
 
 extern parserDefinition* RstParser (void)
 {
-	static const char *const patterns [] = { "*.rest", "*.reST", "*.rst", NULL };
-	static const char *const extensions [] = { "rest", NULL };
+	static const char *const extensions [] = { "rest", "reST", "rst", NULL };
 	parserDefinition* const def = parserNew ("reStructuredText");
 
 	def->kinds = RstKinds;
 	def->kindCount = KIND_COUNT (RstKinds);
-	def->patterns = patterns;
 	def->extensions = extensions;
 	def->parser = findRstTags;
 	return def;
