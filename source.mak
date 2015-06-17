@@ -64,8 +64,8 @@ PARSER_SOURCES =				\
 	$(PARSER_DIR)/php.c			\
 	$(PARSER_DIR)/python.c			\
 	$(PARSER_DIR)/rexx.c			\
+	$(PARSER_DIR)/rst.c			\
 	$(PARSER_DIR)/ruby.c			\
-	$(PARSER_DIR)/rest.c			\
 	$(PARSER_DIR)/rust.c			\
 	$(PARSER_DIR)/scheme.c			\
 	$(PARSER_DIR)/sh.c			\

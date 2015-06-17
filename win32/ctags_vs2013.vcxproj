@@ -142,7 +142,7 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
-    <ClCompile Include="..\parsers\rest.c" />
+    <ClCompile Include="..\parsers\rst.c" />
     <ClCompile Include="..\parsers\rexx.c" />
     <ClCompile Include="..\main\routines.c" />
     <ClCompile Include="..\parsers\ruby.c" />

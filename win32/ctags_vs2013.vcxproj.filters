@@ -222,7 +222,7 @@
     <ClCompile Include="..\main\vstring.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\parsers\rest.c">
+    <ClCompile Include="..\parsers\rst.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\main\nestlevel.c">
