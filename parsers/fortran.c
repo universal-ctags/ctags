@@ -192,6 +192,7 @@ typedef enum eTagType {
 typedef enum eImplementation {
 	IMP_DEFAULT,
 	IMP_ABSTRACT,
+	IMP_DEFERRED,
 	IMP_COUNT
 } impType;
 
@@ -501,7 +502,7 @@ static boolean includeTag (const tagType type)
 static const char *implementationString (const impType imp)
 {
 	static const char *const names [] ={
-		"?", "abstract"
+		"?", "abstract", "deferred"
 	};
 	Assert (sizeof (names) / sizeof (names [0]) == IMP_COUNT);
 	Assert ((int) imp < IMP_COUNT);
@@ -1326,6 +1327,14 @@ static void parseAbstractQualifier (tokenInfo *const token,
 	readToken (token);
 }
 
+static void parseDeferredQualifier (tokenInfo *const token,
+									tokenInfo *const qualifierToken)
+{
+	Assert (isKeyword (token, KEYWORD_deferred));
+	qualifierToken->implementation = IMP_DEFERRED;
+	readToken (token);
+}
+
 /* parse a list of qualifying specifiers, leaving `token' at first token
  * following list. Examples of such specifiers are:
  *      [[, attr-spec] ::]
@@ -1374,7 +1383,6 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 			case KEYWORD_save:
 			case KEYWORD_target:
 			case KEYWORD_nopass:
-			case KEYWORD_deferred:
 			case KEYWORD_non_overridable:
 				readToken (token);
 				break;
@@ -1398,6 +1406,10 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 
 			case KEYWORD_abstract:
 				parseAbstractQualifier (token, qualifierToken);
+				break;
+
+			case KEYWORD_deferred:
+				parseDeferredQualifier (token, qualifierToken);
 				break;
 
 			default: skipToToken (token, TOKEN_STATEMENT_END); break;
@@ -1437,6 +1449,8 @@ static void parseEntityDecl (tokenInfo *const token,
 							 tokenInfo *const st)
 {
 	Assert (isType (token, TOKEN_IDENTIFIER));
+	if (st && st->implementation != IMP_DEFAULT)
+		token->implementation = st->implementation;
 	makeFortranTag (token, variableTagType (st));
 	readToken (token);
 	if (isType (token, TOKEN_PAREN_OPEN))
@@ -1782,6 +1796,7 @@ static void parseGenericMethod (tokenInfo *const token)
 static void parseComponentDefStmt (tokenInfo *const token)
 {
 	tokenInfo* st = newToken ();
+	tokenInfo* qt = NULL;
 	boolean isGeneric = FALSE;
 
 	Assert (isTypeSpec (token));
@@ -1793,7 +1808,11 @@ static void parseComponentDefStmt (tokenInfo *const token)
 		isGeneric = TRUE;
 	parseTypeSpec (token);
 	if (isType (token, TOKEN_COMMA))
-		parseQualifierSpecList (token);
+	{
+		qt = parseQualifierSpecList (token);
+		if (qt->implementation != IMP_DEFAULT)
+			st->implementation = qt->implementation;
+	}
 	if (isType (token, TOKEN_DOUBLE_COLON))
 		readToken (token);
 	if (isGeneric)
