@@ -1653,6 +1653,8 @@ tmain_run ()
 
 	test_name=$(basename ${subdir} .d)
 
+	rm -f ${subdir}/*-actual.txt
+
 	echo "Testing ${test_name}"
 	line '-'
 	(
