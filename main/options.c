@@ -265,6 +265,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Print this option summary."},
  {1,"  --if0=[yes|no]"},
  {1,"       Should code within #if 0 conditional branches be parsed [no]?"},
+ {1,"  --kinds-<LANG>=[+|-]kinds, or"},
  {1,"  --<LANG>-kinds=[+|-]kinds"},
  {1,"       Enable/disable tag kinds for language <LANG>."},
  {1,"  --langdef=name"},
