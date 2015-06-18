@@ -1,0 +1,6 @@
+Chapter 1	input.rst	/^Chapter 1$/;"	c
+Chapter 2	input.rst	/^Chapter 2$/;"	c
+Section 1.1	input.rst	/^Section 1.1$/;"	s	chapter:Chapter 1
+Section 2.1	input.rst	/^Section 2.1$/;"	s	chapter:Chapter 2
+Subsection 1.1.1	input.rst	/^Subsection 1.1.1$/;"	S	section:Section 1.1
+Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:Subsection 1.1.1

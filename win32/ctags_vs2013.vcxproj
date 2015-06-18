@@ -93,6 +93,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\main\htable.c" />
+    <ClCompile Include="..\main\nestlevel.c" />
     <ClCompile Include="..\parsers\ada.c" />
     <ClCompile Include="..\parsers\ant.c" />
     <ClCompile Include="..\main\args.c" />
@@ -141,6 +142,7 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
+    <ClCompile Include="..\parsers\rst.c" />
     <ClCompile Include="..\parsers\rexx.c" />
     <ClCompile Include="..\main\routines.c" />
     <ClCompile Include="..\parsers\ruby.c" />
@@ -177,6 +179,7 @@
     <ClInclude Include="..\main\htable.h" />
     <ClInclude Include="..\main\keyword.h" />
     <ClInclude Include="..\main\main.h" />
+    <ClInclude Include="..\main\nestlevel.h" />
     <ClInclude Include="..\main\options.h" />
     <ClInclude Include="..\main\parse.h" />
     <ClInclude Include="..\main\parsers.h" />

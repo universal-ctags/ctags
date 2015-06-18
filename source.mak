@@ -15,6 +15,7 @@ MAIN_HEADERS =				\
 	$(MAIN_DIR)/htable.h		\
 	$(MAIN_DIR)/keyword.h		\
 	$(MAIN_DIR)/main.h		\
+	$(MAIN_DIR)/nestlevel.h		\
 	$(MAIN_DIR)/options.h		\
 	$(MAIN_DIR)/parse.h		\
 	$(MAIN_DIR)/parsers.h		\
@@ -63,6 +64,7 @@ PARSER_SOURCES =				\
 	$(PARSER_DIR)/php.c			\
 	$(PARSER_DIR)/python.c			\
 	$(PARSER_DIR)/rexx.c			\
+	$(PARSER_DIR)/rst.c			\
 	$(PARSER_DIR)/ruby.c			\
 	$(PARSER_DIR)/rust.c			\
 	$(PARSER_DIR)/scheme.c			\
@@ -88,6 +90,7 @@ MAIN_SOURCES =					\
 	$(MAIN_DIR)/lregex.c			\
 	$(MAIN_DIR)/lxcmd.c			\
 	$(MAIN_DIR)/main.c			\
+	$(MAIN_DIR)/nestlevel.c			\
 	$(MAIN_DIR)/options.c			\
 	$(MAIN_DIR)/parse.c			\
 	$(MAIN_DIR)/pcoproc.c			\
@@ -118,3 +121,5 @@ FNMATCH_HEADERS = fnmatch/fnmatch.h
 OBJECTS = \
 	$(SOURCES:.c=.$(OBJEXT)) \
 	$(LIBOBJS)
+
+# vim: ts=8
