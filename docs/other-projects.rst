@@ -68,16 +68,27 @@ GNU global
 	I(Masatke YAMATO) don't inspect this much but GNU global uses
 	ctags internally.
 
-	Person at GNU global project proposed an extension for the tags file
+	A person at GNU global project proposed an extension for the tags file
 	format:
 
 	http://sourceforge.net/p/ctags/mailman/message/30020186/
 
-	
+GNU source highlight
+
+	highlight can generate html files. It can utilize tags file
+	as input for making hyperlinks.
+	http://www.gnu.org/software/src-highlite/source-highlight.html#Generating-References
+
+	I(Masatke YAMATO) have not tried the feature yet.
+
 OpenGrok
 	
 	I(Masatke YAMATO) don't inspect this much but OpenGrok uses
 	ctags internally.
 
-	
+Linux kenrel
+
+	See linux/scripts/tags.sh of Linux kenrel source tree.
+	It utilizes c parser to the utmost limit.
+
 	
