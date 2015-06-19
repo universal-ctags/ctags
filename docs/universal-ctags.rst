@@ -72,6 +72,11 @@ Contents
 
    PageBreak oneColumn
 
+.. include:: tips.rst
+.. raw:: pdf
+
+   PageBreak oneColumn
+
 .. include:: other-projects.rst
 .. raw:: pdf
 
