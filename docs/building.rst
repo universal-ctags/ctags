@@ -1,6 +1,10 @@
 Building ctags
 =============================================================================
 
+.. include:: windows.rst
+
+.. include:: osx.rst
+
 Build system add possibility to change program name
 ---------------------------------------------------------------------
 

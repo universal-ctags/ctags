@@ -15,7 +15,3 @@ but you can change with SPARSEFLAG macro.
 
    $ make SPARSE=1 [SPARSEFLAGS=-Wsparse-all]
 
-.. include:: windows.rst
-
-.. include:: osx.rst
-
