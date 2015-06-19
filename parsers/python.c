@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include "entry.h"
+#include "nestlevel.h"
 #include "options.h"
 #include "read.h"
 #include "main.h"
@@ -25,22 +26,6 @@
 /*
 *   DATA DECLARATIONS
 */
-typedef struct NestingLevel NestingLevel;
-typedef struct NestingLevels NestingLevels;
-
-struct NestingLevel
-{
-	int indentation;
-	vString *name;
-	int type;
-};
-
-struct NestingLevels
-{
-	NestingLevel *levels;
-	int n;					/* number of levels in use */
-	int allocated;
-};
 
 typedef enum {
 	K_CLASS, K_FUNCTION, K_MEMBER, K_VARIABLE, K_IMPORT
@@ -71,61 +56,6 @@ static char const * const doubletriple = "\"\"\"";
 /*
 *   FUNCTION DEFINITIONS
 */
-
-static NestingLevels *nestingLevelsNew (void)
-{
-	NestingLevels *nls = xCalloc (1, NestingLevels);
-	return nls;
-}
-
-static void nestingLevelsFree (NestingLevels *nls)
-{
-	int i;
-	for (i = 0; i < nls->allocated; i++)
-		vStringDelete(nls->levels[i].name);
-	if (nls->levels) eFree(nls->levels);
-	eFree(nls);
-}
-
-static void nestingLevelsPush (NestingLevels *nls,
-	const vString *name, int type)
-{
-	NestingLevel *nl = NULL;
-
-	if (nls->n >= nls->allocated)
-	{
-		nls->allocated++;
-		nls->levels = xRealloc(nls->levels,
-			nls->allocated, NestingLevel);
-		nls->levels[nls->n].name = vStringNew();
-	}
-	nl = &nls->levels[nls->n];
-	nls->n++;
-
-	vStringCopy(nl->name, name);
-	nl->type = type;
-}
-
-#if 0
-static NestingLevel *nestingLevelsGetCurrent (NestingLevels *nls)
-{
-	Assert (nls != NULL);
-
-	if (nls->n < 1)
-		return NULL;
-
-	return &nls->levels[nls->n - 1];
-}
-
-static void nestingLevelsPop (NestingLevels *nls)
-{
-	const NestingLevel *nl = nestingLevelsGetCurrent(nls);
-
-	Assert (nl != NULL);
-	vStringClear(nl->name);
-	nls->n--;
-}
-#endif
 
 static boolean isIdentifierFirstCharacter (int c)
 {
