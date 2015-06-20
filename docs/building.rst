@@ -1,6 +1,8 @@
 Building ctags
 =============================================================================
 
+.. include:: autotools.rst
+
 .. include:: windows.rst
 
 .. include:: osx.rst
