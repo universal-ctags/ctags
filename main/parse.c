@@ -1074,7 +1074,7 @@ extern void enableLanguages (const boolean state)
 
 static boolean doesParserUseKind (const parserDefinition *const parser, char letter)
 {
-	int k;
+	unsigned int k;
 
 	for (k = 0; k < parser->kindCount; k++)
 		if (parser->kinds [k].letter == letter)

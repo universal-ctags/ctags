@@ -622,7 +622,7 @@ extern char *readSourceLineSlow (vString *const vLine,
 	 * Get the line for lineNumber
 	 */
 	{
-		int n;
+		unsigned long n;
 
 		fgetpos (File.fp, &orignalPosition);
 		rewind (File.fp);

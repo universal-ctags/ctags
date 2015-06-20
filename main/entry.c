@@ -680,7 +680,7 @@ static boolean isPosSet(fpos_t pos)
 {
 	char * p = (char *)&pos;
 	boolean r = FALSE;
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < sizeof(pos); i++)
 		r |= p[i];
