@@ -1,0 +1,14 @@
+This one is prepared as part of a bug report,
+sf-bugs:33, http://sourceforge.net/p/ctags/bugs/33/.
+
+Darren Hiebert closed the bug with "closed-wont-fix"
+status with following comment:
+
+    This cannot be handled without preprocessing. Ctags does not
+    do preprocessing for a number of reasons, and so will never
+    handle such a situation. You can do the preprocessing
+    yourself and run ctags on the output with the
+    --line-directives option.
+
+So I(Masatake YAMATO), don't touch this case and put it
+here.

@@ -1,0 +1,13 @@
+This one is prepared as part of a bug report,
+sf-bugs:22, http://sourceforge.net/p/ctags/bugs/22/.
+
+Darren Hiebert closed the bug with "closed-wont-fix"
+status with following comment:
+
+    The use of a macro call in an argument list, as shown in
+    bad_code.c is too problematic to derive a good solution for.
+    Such bizarre used of macros are rare and not worth the risk
+    of breaking more common situations.
+
+So I(Masatake YAMATO), don't touch this case and put it
+here.
