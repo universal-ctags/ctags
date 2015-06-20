@@ -1,0 +1,5 @@
+a	input.f90	/^    real/;"	k	type:atype
+atype	input.f90	/^  type, bind(c) :: atype$/;"	t	module:test_bind_c
+global_flag	input.f90	/^  integer(C_INT), bind(C, name="_MyProject_flags") :: global_flag$/;"	v	module:test_bind_c
+print_c	input.f90	/^    subroutine print_c(/;"	P	module:test_bind_c
+test_bind_c	input.f90	/^module test_bind_c$/;"	m
