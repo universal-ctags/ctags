@@ -1,0 +1,49 @@
+#!/bin/sh
+
+check_include_general_h_first()
+{
+    local f
+    local l
+    local i=0
+
+    for f in $(find $1 -name '*.c'); do
+	if grep -a -q -e '^#[[:space:]]*include' $f; then
+	    l=$()
+	    if ! ( grep -a -e '^#[[:space:]]*include' $f | head -1 | grep -q "general.h" ); then
+		i=$(expr i + 1)
+		echo "$f: general.h should be included FIRST" 2>&1
+	    fi
+	fi
+    done
+
+    return $i
+}
+
+
+main()
+{
+    local i=0
+
+    if ! [ -d ./main ]; then
+	echo "cannot find ./main"
+	return 2
+    fi
+
+    if ! [ -d ./parsers ]; then
+	echo "cannot find ./parsers"
+	return 2
+    fi
+
+    if ! check_include_general_h_first main; then
+	i=$(expr i + 1)
+    fi
+
+    if ! check_include_general_h_first parsers; then
+	i=$(expr i + 1)
+    fi
+
+    return 0
+}
+
+main "$@"
+exit $?
