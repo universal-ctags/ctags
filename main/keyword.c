@@ -20,11 +20,6 @@
 #include "routines.h"
 
 /*
-*   MACROS
-*/
-#define HASH_EXPONENT 7  /* must be less than 17 */
-
-/*
 *   DATA DECLARATIONS
 */
 typedef struct sHashEntry {
@@ -37,7 +32,7 @@ typedef struct sHashEntry {
 /*
 *   DATA DEFINITIONS
 */
-static const unsigned int TableSize = 1 << HASH_EXPONENT;
+static const unsigned int TableSize = 2039;  /* prime */
 static hashEntry **HashTable = NULL;
 
 /*
@@ -73,31 +68,21 @@ static hashEntry *getHashTableEntry (unsigned long hashedValue)
 	return entry;
 }
 
-static unsigned long hashValue (const char *const string)
+static unsigned int hashValue (const char *const string, langType language)
 {
-	unsigned long value = 0;
-	const unsigned char *p;
+	const signed char *p;
+	unsigned int h = 5381;
 
 	Assert (string != NULL);
 
-	/*  We combine the various words of the multiword key using the method
-	 *  described on page 512 of Vol. 3 of "The Art of Computer Programming".
-	 */
-	for (p = (const unsigned char *) string  ;  *p != '\0'  ;  ++p)
-	{
-		value <<= 1;
-		if (value & 0x00000100L)
-			value = (value & 0x000000ffL) + 1L;
-		value ^= *p;
-	}
-	/*  Algorithm from page 509 of Vol. 3 of "The Art of Computer Programming"
-	 *  Treats "value" as a 16-bit integer plus 16-bit fraction.
-	 */
-	value *= 40503L;               /* = 2^16 * 0.6180339887 ("golden ratio") */
-	value &= 0x0000ffffL;          /* keep fractional part */
-	value >>= 16 - HASH_EXPONENT;  /* scale up by hash size and move down */
+	/* "djb" hash as used in g_str_hash() in glib */
+	for (p = (const signed char *)string; *p != '\0'; p++)
+		h = (h << 5) + h + *p;
 
-	return value;
+	/* consider language as an extra "character" and add it to the hash */
+	h = (h << 5) + h + language;
+
+	return h;
 }
 
 static hashEntry *newEntry (
@@ -120,13 +105,13 @@ static hashEntry *newEntry (
  */
 extern void addKeyword (const char *const string, langType language, int value)
 {
-	const unsigned long hashedValue = hashValue (string);
-	hashEntry *entry = getHashTableEntry (hashedValue);
+	const unsigned int index = hashValue (string, language) % TableSize;
+	hashEntry *entry = getHashTableEntry (index);
 
 	if (entry == NULL)
 	{
 		hashEntry **const table = getHashTable ();
-		table [hashedValue] = newEntry (string, language, value);
+		table [index] = newEntry (string, language, value);
 	}
 	else
 	{
@@ -152,8 +137,8 @@ extern void addKeyword (const char *const string, langType language, int value)
 
 extern int lookupKeyword (const char *const string, langType language)
 {
-	const unsigned long hashedValue = hashValue (string);
-	hashEntry *entry = getHashTableEntry (hashedValue);
+	const unsigned int index = hashValue (string, language) % TableSize;
+	hashEntry *entry = getHashTableEntry (index);
 	int result = -1;
 
 	while (entry != NULL)
