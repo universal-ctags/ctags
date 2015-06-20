@@ -193,6 +193,7 @@ typedef enum eImplementation {
 	IMP_DEFAULT,
 	IMP_ABSTRACT,
 	IMP_DEFERRED,
+	IMP_NON_OVERRIDABLE,
 	IMP_COUNT
 } impType;
 
@@ -502,7 +503,7 @@ static boolean includeTag (const tagType type)
 static const char *implementationString (const impType imp)
 {
 	static const char *const names [] ={
-		"?", "abstract", "deferred"
+		"?", "abstract", "deferred", "non_overridable"
 	};
 	Assert (sizeof (names) / sizeof (names [0]) == IMP_COUNT);
 	Assert ((int) imp < IMP_COUNT);
@@ -1335,6 +1336,14 @@ static void parseDeferredQualifier (tokenInfo *const token,
 	readToken (token);
 }
 
+static void parseNonOverridableQualifier (tokenInfo *const token,
+										  tokenInfo *const qualifierToken)
+{
+	Assert (isKeyword (token, KEYWORD_non_overridable));
+	qualifierToken->implementation = IMP_NON_OVERRIDABLE;
+	readToken (token);
+}
+
 /* parse a list of qualifying specifiers, leaving `token' at first token
  * following list. Examples of such specifiers are:
  *      [[, attr-spec] ::]
@@ -1383,7 +1392,6 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 			case KEYWORD_save:
 			case KEYWORD_target:
 			case KEYWORD_nopass:
-			case KEYWORD_non_overridable:
 				readToken (token);
 				break;
 
@@ -1410,6 +1418,10 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 
 			case KEYWORD_deferred:
 				parseDeferredQualifier (token, qualifierToken);
+				break;
+
+			case KEYWORD_non_overridable:
+				parseNonOverridableQualifier (token, qualifierToken);
 				break;
 
 			default: skipToToken (token, TOKEN_STATEMENT_END); break;
