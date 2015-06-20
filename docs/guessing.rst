@@ -13,12 +13,12 @@ Like in ``--language-force`` option, ctags provides some ways to
 choose a parser manually. However, it would be nice if ctags could
 choose a proper parser without manual instruction.
 
-With ``--<LANG>-corpus=spec:corpusFile`` option you can prepare corpus a
+With ``--corpus-<LANG>=spec:corpusFile`` option you can prepare corpus a
 file to make ctags learn lexical tendency of a language. Ctags
 learns it as typical input of ``LANG``. Based on this learning ctags
 tries to solve the parser conflict. See *Data/optlib/mib.ctags*
 and *Data/corpora/RFC1213-MIB.txt* as an example of the usage of
-``--<LANG>-corpus``.
+``--corpus-<LANG>``.
 
 For ``ObjectiveC`` and ``Matlab`` parsers, corpus files are embedded
 within the parser implementations. See *objc.c* and *matlab.c*.

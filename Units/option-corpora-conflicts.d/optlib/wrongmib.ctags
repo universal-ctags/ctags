@@ -1,4 +1,4 @@
 --langdef=wrongmib
 --langmap=wrongmib:(*-MIB*)
 --regex-wrongmib=/^[a-zA-Z][^ \t]+[ \t]+([A-Za-z0-9]+)/\1/n,name/
---wrongmib-corpus=(*-MIB*):wrongmib-MIB.txt
+--corpus-wrongmib=(*-MIB*):wrongmib-MIB.txt

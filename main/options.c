@@ -216,10 +216,14 @@ static optionDescription LongOptionDescription [] = {
  {0,"  -u   Equivalent to --sort=no."},
  {1,"  -V   Equivalent to --verbose."},
  {1,"  -x   Print a tabular cross reference file to standard output."},
+ {1,"  --alias-<LANG>=[+|-]aliasPattern"},
+ {1,"      Add a pattern detecting a name can be used as an alternative name for LANG."},
  {1,"  --append=[yes|no]"},
  {1,"       Should tags should be appended to existing tag file [no]?"},
  {1,"  --config-filename=fileName"},
  {1,"      Use 'fileName' instead of 'ctags' in option file names."},
+ {1,"  --corpus-<LANG>=spec:corpusFile"},
+ {1,"      Add two gram data calculated from corpusFile to spec of LANG."},
  {1,"  --data-dir=[+]DIR"},
  {1,"      Add or set DIR to data directory search path."},
  {1,"  --etags-include=file"},
@@ -261,22 +265,9 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Print this option summary."},
  {1,"  --if0=[yes|no]"},
  {1,"       Should code within #if 0 conditional branches be parsed [no]?"},
- {1,"  --<LANG>-alias=[+|-]aliasPattern"},
- {1,"      Add a pattern detecting a name can be used as an alternative name for LANG."},
- {1,"  --<LANG>-corpus=spec:corpusFile"},
- {1,"      Add two gram data calculated from corpusFile to spec of LANG."},
+ {1,"  --kinds-<LANG>=[+|-]kinds, or"},
  {1,"  --<LANG>-kinds=[+|-]kinds"},
  {1,"       Enable/disable tag kinds for language <LANG>."},
- {1,"  --<LANG>-map=[+]map"},
- {1,"       Simplified version of --langmap opton."},
-#ifdef HAVE_REGEX
- {1,"  --<LANG>-regex=/line_pattern/name_pattern/[flags]"},
- {1,"       Same as --regex-<LANG>=..."},
-#endif
-#ifdef HAVE_COPROC
- {1,"  --<LANG>-xcmd=parser_command_path|parser_command_name"},
- {1,"       Same as --xcmd-<LANG>=..."},
-#endif
  {1,"  --langdef=name"},
  {1,"       Define a new language to be parsed with regular expressions."},
  {1,"  --langmap=map(s)"},
@@ -309,6 +300,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of supported languages."},
  {1,"  --list-maps=[language|all]"},
  {1,"       Output list of language mappings."},
+ {1,"  --map-<LANG>=[+]map"},
+ {1,"       Alternative version of --langmap option."},
  {1,"  --options=file"},
  {1,"       Specify file from which command line options should be read."},
  {0,"  --print-language"},
@@ -589,6 +582,33 @@ extern void checkOptions (void)
 		if (Option.tagFileName != NULL)
 			error (WARNING, "%s ignores output tag file name", notice);
 	}
+}
+
+extern langType getLanguageComponentInOption (const char *const option,
+					      const char *const prefix)
+{
+	size_t len;
+	langType language;
+	const char *lang;
+
+	Assert (prefix && prefix[0]);
+	Assert (option && option[0]);
+
+	len = strlen (prefix);
+	if (strncmp (option, prefix, len) != 0)
+		return LANG_IGNORE;
+	else
+	{
+		lang = option + len;
+		if (lang [0] == '\0')
+			return LANG_IGNORE;
+	}
+
+	language = getNamedLanguage (lang);
+	if (language == LANG_IGNORE)
+		error (FATAL, "Unknown language \"%s\" in \"%s\" option", lang, option);
+
+	return language;
 }
 
 static void setEtagsMode (void)
@@ -1361,25 +1381,14 @@ static void processLanguagesOption (
 extern boolean processMapOption (
 			const char *const option, const char *const parameter)
 {
-	const char* const dash = strchr (option, '-');
 	langType language;
-	vString* langName;
-	size_t len;
 	const char* spec;
 	char* map_parameter;
 	boolean clear = FALSE;
 
-	if (dash == NULL ||
-	    (strcmp (dash + 1, "map") != 0))
-		return FALSE;
-	len = dash - option;
-
-	langName = vStringNew ();
-	vStringNCopyS (langName, option, len);
-	language = getNamedLanguage (vStringValue (langName));
+	language = getLanguageComponentInOption (option, "map-");
 	if (language == LANG_IGNORE)
-		error (FATAL, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
-	vStringDelete(langName);
+		return FALSE;
 
 	if (parameter == NULL || parameter [0] == '\0')
 		error (FATAL, "no parameter is given for %s", option);
@@ -1415,28 +1424,17 @@ static char* skipTillColon (char* p)
 extern boolean processCorpusOption (
 		const char *const option, const char *const parameter)
 {
-	const char* const dash = strchr (option, '-');
 	langType language;
-	vString* langName;
 	char* parm;
 	char* colon;
-	size_t len;
 	const char* file_part;
 	vString* tg_file;
 	char* spec;
 	boolean pattern_p;
 
-	if (dash == NULL ||
-	    (strcmp (dash + 1, "corpus") != 0))
-		return FALSE;
-	len = dash - option;
-
-	langName = vStringNew ();
-	vStringNCopyS (langName, option, len);
-	language = getNamedLanguage (vStringValue (langName));
+	language = getLanguageComponentInOption (option, "corpus-");
 	if (language == LANG_IGNORE)
-		error (FATAL, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
-	vStringDelete(langName);
+		return FALSE;
 
 	if (parameter == NULL || parameter [0] == '\0')
 		error (FATAL, "no parameter is given for %s", option);

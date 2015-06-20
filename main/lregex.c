@@ -31,6 +31,7 @@
 #include "entry.h"
 #include "flags.h"
 #include "htable.h"
+#include "options.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
@@ -779,34 +780,20 @@ extern void addLanguageRegex (
 */
 
 extern boolean processRegexOption (const char *const option,
-								   const char *const parameter __unused__)
+				   const char *const parameter __unused__)
 {
-	const char* const dash = strchr (option, '-');
-	char* lang;
 	langType language;
 
-	if (dash == NULL)
-		return FALSE;
-
-	if (strncmp (option, "regex", dash - option) == 0)
-		lang = eStrdup (dash + 1);
-	else if (strcmp (dash + 1, "regex") == 0)
-		lang = eStrndup (option, dash - option);
-	else
+	language = getLanguageComponentInOption (option, "regex-");
+	if (language == LANG_IGNORE)
 		return FALSE;
 
 #ifdef HAVE_REGEX
-	language = getNamedLanguage (lang);
-	if (language == LANG_IGNORE)
-		error (WARNING, "unknown language \"%s\" in --%s option", lang, option);
-	else
-		processLanguageRegex (language, parameter);
+	processLanguageRegex (language, parameter);
 #else
 	error (WARNING, "regex support not available; required for --%s option",
 	       option);
 #endif
-
-	eFree (lang);
 
 	return TRUE;
 }

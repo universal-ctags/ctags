@@ -65,6 +65,10 @@ code "wildcard"(``*``) in option is introduced.
 
 	Enables all available kinds for ``LANG``.
 
+``--kinds-<LANG>=*``
+
+	Alternative representation of ``--<LANG>-kinds=*``.
+
 ``--*-kinds=SPEC``
 
 	Applies SPEC as kinds to all available language parsers.

@@ -565,35 +565,18 @@ static void processLanguageXcmd (const langType language,
 
 extern boolean processXcmdOption (const char *const option, const char *const parameter)
 {
-	const char* const dash = strchr (option, '-');
-	char* lang;
-
-#ifdef HAVE_COPROC
 	langType language;
-#endif
 
-	if (dash == NULL)
-		return FALSE;
-
-	if (strncmp (option, "xcmd", dash - option) == 0)
-		lang = eStrdup (dash + 1);
-	else if (strcmp (dash + 1, "xcmd") == 0)
-		lang = eStrndup (option, dash - option);
-	else
+	language = getLanguageComponentInOption (option, "xcmd-");
+	if (language == LANG_IGNORE)
 		return FALSE;
 
 #ifdef HAVE_COPROC
-	language = getNamedLanguage (lang);
-	if (language == LANG_IGNORE)
-		error (WARNING, "unknown language \"%s\" in --%s option", lang, option);
-	else
-		processLanguageXcmd (language, parameter);
+	processLanguageXcmd (language, parameter);
 #else
 	error (WARNING, "coproc feature is not available; required for --%s option",
 	       option);
 #endif
-
-	eFree (lang);
 
 	return TRUE;
 }
