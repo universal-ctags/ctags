@@ -9,6 +9,7 @@
 *   Defines hashtable
 */
 
+#include "general.h"
 #include "htable.h"
 
 #ifndef MAIN

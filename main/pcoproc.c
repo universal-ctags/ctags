@@ -8,6 +8,7 @@
 *
 *   replaces popen/pclose
 */
+#include "general.h"
 #include "pcoproc.h"
 
 #ifdef MAIN
@@ -25,7 +26,6 @@
 #define eFree(x) free(x)
 #endif
 #else
-#include "general.h"
 #include "routines.h"
 #endif	/* MAIN */
 

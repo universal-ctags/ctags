@@ -11,7 +11,8 @@
  *
  */
 
-/* Whit this tool you can gene */
+#include "general.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
