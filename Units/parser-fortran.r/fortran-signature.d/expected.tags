@@ -1,0 +1,9 @@
+a	input.f90	/^    integer :: a$/;"	L	subroutine:fnb	file:
+a	input.f90	/^    integer a,/;"	L	subroutine:suba	file:
+arg	input.f90	/^      type(atype) :: arg$/;"	L	prototype:subb	file:
+b	input.f90	/^    integer a, b$/;"	L	subroutine:suba	file:
+fna	input.f90	/^  real function fna(/;"	f	module:test_signature
+fnb	input.f90	/^  subroutine fnb$/;"	s	module:test_signature
+suba	input.f90	/^  subroutine suba /;"	s	module:test_signature	signature:(a, b)
+subb	input.f90	/^    subroutine subb /;"	P	module:test_signature	signature:(arg)
+test_signature	input.f90	/^module test_signature$/;"	m
