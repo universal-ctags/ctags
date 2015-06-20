@@ -1,0 +1,2 @@
+--c-kinds=+p
+-I MACRO2

@@ -1,0 +1,6 @@
+FUNCTION_LIKE	input.c	/^#define FUNCTION_LIKE(/;"	d	file:
+VARIABLE_LIKE	input.c	/^#define VARIABLE_LIKE	/;"	d	file:
+WeakSymbol	input.c	/^#pragma weak WeakSymbol /;"	d	file:
+foo	input.c	/^MACRO1(foo);$/;"	v
+prototype1	input.c	/^void prototype1 __ARGS((int arg1, void *arg2));$/;"	p	file:
+prototype2	input.c	/^void prototype2 __ARGS((int arg1, void *arg2))$/;"	f

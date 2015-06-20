@@ -3,5 +3,11 @@
 #pragma weak WeakSymbol = StrongSymbol
 
 /* handling of spoofing macros */
-MACRO(foo);
-void prototype __ARGS((int arg1, void *arg2));
+MACRO1(foo);
+MACRO2(bar);
+MACRO3(x, y);
+
+void prototype1 __ARGS((int arg1, void *arg2));
+void prototype2 __ARGS((int arg1, void *arg2))
+{
+}
