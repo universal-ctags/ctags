@@ -69,6 +69,7 @@ typedef enum eKeywordId {
 	KEYWORD_allocatable,
 	KEYWORD_assignment,
 	KEYWORD_automatic,
+	KEYWORD_bind,
 	KEYWORD_block,
 	KEYWORD_byte,
 	KEYWORD_cexternal,
@@ -248,6 +249,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "allocatable",    KEYWORD_allocatable  },
 	{ "assignment",     KEYWORD_assignment   },
 	{ "automatic",      KEYWORD_automatic    },
+	{ "bind",           KEYWORD_bind         },
 	{ "block",          KEYWORD_block        },
 	{ "byte",           KEYWORD_byte         },
 	{ "cexternal",      KEYWORD_cexternal    },
@@ -1364,6 +1366,7 @@ static tokenInfo *parseQualifierSpecList (tokenInfo *const token)
 
 			case KEYWORD_dimension:
 			case KEYWORD_intent:
+			case KEYWORD_bind:
 				readToken (token);
 				skipOverParens (token);
 				break;
