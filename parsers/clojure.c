@@ -7,9 +7,9 @@
  *   This module contains code for generating tags for the Clojure language.
  */
 
-#include <string.h>
-
 #include "general.h"
+
+#include <string.h>
 
 #include "parse.h"
 #include "read.h"

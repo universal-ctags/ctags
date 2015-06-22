@@ -443,4 +443,10 @@ tinst:
 	rm -rf $$(pwd)/$(TINST_ROOT)
 	$(SHELL) misc/tinst $$(pwd)/$(TINST_ROOT)
 
+#
+# Checking code in ctags own rules
+#
+codecheck:
+	$(SHELL) misc/codecheck
+
 # vi:set tabstop=8:
