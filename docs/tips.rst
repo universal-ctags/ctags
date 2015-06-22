@@ -15,3 +15,8 @@ but you can change with SPARSEFLAG macro.
 
    $ make SPARSE=1 [SPARSEFLAGS=-Wsparse-all]
 
+
+Finding performance bottleneck
+------------------------------------------------------------
+
+See https://wiki.geany.org/howtos/profiling/gperftools and #383
