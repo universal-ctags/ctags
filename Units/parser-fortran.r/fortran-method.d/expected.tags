@@ -1,0 +1,10 @@
++	input.f90	/^    generic :: operator(+)/;"	M	type:atype
+=	input.f90	/^    generic :: assignment(=)/;"	M	type:atype
+add	input.f90	/^    generic :: add /;"	M	type:atype
+add_1d	input.f90	/^    procedure, deferred :: add_1d,/;"	M	type:atype	implementation:deferred
+add_2d	input.f90	/^    procedure, deferred :: add_1d, add_2d,/;"	M	type:atype	implementation:deferred
+add_3d	input.f90	/^    procedure, deferred :: add_1d, add_2d, add_3d$/;"	M	type:atype	implementation:deferred
+add_4d	input.f90	/^    procedure, non_overridable :: add_4d$/;"	M	type:atype	implementation:non_overridable
+atype	input.f90	/^  type :: atype$/;"	t	module:test_method
+clean	input.f90	/^    final clean$/;"	M	type:atype
+test_method	input.f90	/^module test_method$/;"	m
