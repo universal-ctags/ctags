@@ -204,6 +204,7 @@ typedef struct sTokenInfo {
 	tagType tag;
 	vString* string;
 	vString* parentType;
+	vString* signature;
 	impType implementation;
 	boolean isMethod;
 	struct sTokenInfo *secondary;
@@ -384,6 +385,7 @@ static void ancestorPop (void)
 	Ancestors.list [Ancestors.count].lineNumber = 0L;
 	Ancestors.list [Ancestors.count].implementation = IMP_DEFAULT;
 	Ancestors.list [Ancestors.count].isMethod   = FALSE;
+	Ancestors.list [Ancestors.count].signature  = NULL;
 }
 
 static const tokenInfo* ancestorScope (void)
@@ -457,6 +459,7 @@ static tokenInfo *newToken (void)
 	token->string       = vStringNew ();
 	token->secondary    = NULL;
 	token->parentType   = NULL;
+	token->signature    = NULL;
 	token->implementation = IMP_DEFAULT;
 	token->isMethod     = FALSE;
 	token->lineNumber   = getSourceLineNumber ();
@@ -472,6 +475,7 @@ static tokenInfo *newTokenFrom (tokenInfo *const token)
 	result->string = vStringNewCopy (token->string);
 	token->secondary = NULL;
 	token->parentType = NULL;
+	token->signature = NULL;
 	return P (result, deleteToken);
 }
 
@@ -481,6 +485,7 @@ static void deleteToken (tokenInfo *const token)
 	{
 		vStringDelete (token->string);
 		vStringDelete (token->parentType);
+		vStringDelete (token->signature);
 		deleteToken (token->secondary);
 		token->secondary = NULL;
 		eFree (token);
@@ -548,6 +553,12 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 		if (token->implementation != IMP_DEFAULT)
 			e.extensionFields.implementation =
 				implementationString (token->implementation);
+		if (token->signature &&
+			vStringLength (token->signature) > 0 &&
+			(token->tag == TAG_FUNCTION ||
+			 token->tag == TAG_SUBROUTINE ||
+			 token->tag == TAG_PROTOTYPE))
+			e.extensionFields.signature = vStringValue (token->signature);
 		makeTagEntry (&e);
 	}
 }
@@ -989,8 +1000,10 @@ static void readToken (tokenInfo *const token)
 	token->implementation = IMP_DEFAULT;
 	vStringClear (token->string);
 	vStringDelete (token->parentType);
+	vStringDelete (token->signature);
 	token->parentType = NULL;
 	token->isMethod = FALSE;
+	token->signature = NULL;
 
 getNextChar:
 	c = getChar ();
@@ -2261,15 +2274,52 @@ static boolean parseExecutionPart (tokenInfo *const token)
 	return result;
 }
 
+static void makeSignature (tokenInfo *const token, void* signature)
+{
+	if (isType (token, TOKEN_IDENTIFIER) || isType (token, TOKEN_KEYWORD))
+		vStringCat ((vString *)signature, token->string);
+	else if (isType (token, TOKEN_COMMA))
+		vStringCatS ((vString *)signature, ", ");
+}
+
+static vString* parseSignature (tokenInfo *const token)
+{
+	vString* signature = P (vStringNew (), vStringDelete);
+	int len = -1;
+
+	readToken (token);
+	if (isType (token, TOKEN_PAREN_OPEN))
+	{
+		vStringPut (signature, '(');
+		skipOverParensFull (token, makeSignature, signature);
+		vStringPut (signature, ')');
+	}
+	len = vStringLength (signature);
+	if (len == 0 || len == 2)
+		F (signature);
+	return signature;
+}
+
 static void parseSubprogramFull (tokenInfo *const token, const tagType tag)
 {
+	tokenInfo* name = NULL;
+
 	Assert (isKeyword (token, KEYWORD_program) ||
 			isKeyword (token, KEYWORD_function) ||
 			isKeyword (token, KEYWORD_subroutine));
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
-		makeFortranTag (token, tag);
-	ancestorPush (token);
+	{
+		name = newTokenFrom (token);
+		if (tag == TAG_SUBROUTINE ||
+			tag == TAG_SUBROUTINE ||
+			tag == TAG_PROTOTYPE)
+			name->signature = vStringNewCopy (parseSignature (token));
+		makeFortranTag (name, tag);
+		ancestorPush (name);
+	}
+	else
+		ancestorPush (token);
 	skipToNextStatement (token);
 	parseSpecificationPart (token);
 	parseExecutionPart (token);
@@ -2282,6 +2332,7 @@ static void parseSubprogramFull (tokenInfo *const token, const tagType tag)
 	 */
 	skipToNextStatement (token);
 	ancestorPop ();
+	F (name);
 }
 
 static tagType subprogramTagType (tokenInfo *const token)
