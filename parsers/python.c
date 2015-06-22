@@ -225,8 +225,11 @@ static const char *skipEverything (const char *cp)
 	int match;
 	for (; *cp; cp++)
 	{
+		if (*cp == '#')
+			return strchr(cp, '\0');
+
 		match = 0;
-		if (*cp == '"' || *cp == '\'' || *cp == '#')
+		if (*cp == '"' || *cp == '\'')
 			match = 1;
 
 		/* these checks find unicode, binary (Python 3) and raw strings */
