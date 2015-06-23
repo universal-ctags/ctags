@@ -97,6 +97,7 @@ typedef enum eKeywordId {
 	KEYWORD_generic,
 	KEYWORD_if,
 	KEYWORD_implicit,
+	KEYWORD_import,
 	KEYWORD_include,
 	KEYWORD_inline,
 	KEYWORD_integer,
@@ -284,6 +285,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "generic",        KEYWORD_generic      },
 	{ "if",             KEYWORD_if           },
 	{ "implicit",       KEYWORD_implicit     },
+	{ "import",         KEYWORD_import       },
 	{ "include",        KEYWORD_include      },
 	{ "inline",         KEYWORD_inline       },
 	{ "integer",        KEYWORD_integer      },
@@ -2111,6 +2113,8 @@ static boolean parseSpecificationPart (tokenInfo *const token)
 {
 	boolean result = FALSE;
 	while (skipStatementIfKeyword (token, KEYWORD_use))
+		result = TRUE;
+	while (skipStatementIfKeyword (token, KEYWORD_import))
 		result = TRUE;
 	while (parseImplicitPartStmt (token))
 		result = TRUE;
