@@ -74,6 +74,7 @@ typedef enum eKeywordId {
 	KEYWORD_byte,
 	KEYWORD_cexternal,
 	KEYWORD_cglobal,
+	KEYWORD_class,
 	KEYWORD_character,
 	KEYWORD_common,
 	KEYWORD_complex,
@@ -262,6 +263,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "byte",           KEYWORD_byte         },
 	{ "cexternal",      KEYWORD_cexternal    },
 	{ "cglobal",        KEYWORD_cglobal      },
+	{ "class",          KEYWORD_class        },
 	{ "character",      KEYWORD_character    },
 	{ "common",         KEYWORD_common       },
 	{ "complex",        KEYWORD_complex      },
@@ -1183,6 +1185,7 @@ static boolean isTypeSpec (tokenInfo *const token)
 		case KEYWORD_procedure:
 		case KEYWORD_final:
 		case KEYWORD_generic:
+		case KEYWORD_class:
 			result = TRUE;
 			break;
 		default:
@@ -1246,6 +1249,7 @@ static void parseTypeSpec (tokenInfo *const token)
 		case KEYWORD_logical:
 		case KEYWORD_real:
 		case KEYWORD_procedure:
+		case KEYWORD_class:
 			readToken (token);
 			if (isType (token, TOKEN_PAREN_OPEN))
 				skipOverParens (token);  /* skip kind-selector */
