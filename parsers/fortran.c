@@ -2042,6 +2042,15 @@ static boolean parseDeclarationConstruct (tokenInfo *const token)
 		case KEYWORD_stdcall:   readToken (token);           break;
 		/* derived type handled by parseTypeDeclarationStmt(); */
 
+		case KEYWORD_abstract:
+			readToken (token);
+			if (isKeyword (token, KEYWORD_interface))
+				parseInterfaceBlock (token);
+			else
+				skipToNextStatement (token);
+			result = TRUE;
+			break;
+
 		case KEYWORD_automatic:
 			readToken (token);
 			if (isTypeSpec (token))
