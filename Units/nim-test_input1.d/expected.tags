@@ -1,0 +1,5 @@
+TA	input.nim	/^  TA = object of RootObj$/;"	o	typeref:object:TA
+TB	input.nim	/^  TB = object of TA$/;"	o	typeref:object:TB
+a	input.nim	/^  a: ref TA$/;"	v
+b	input.nim	/^  b: ref TB$/;"	v
+f	input.nim	/^    f: int$/;"	f	object:TB
