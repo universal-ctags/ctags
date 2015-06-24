@@ -82,6 +82,11 @@ Contents
 
    PageBreak oneColumn
 
+.. include:: format.rst
+.. raw:: pdf
+
+   PageBreak oneColumn
+
 .. include:: developers.rst
 .. raw:: pdf
 
