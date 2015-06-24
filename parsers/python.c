@@ -233,20 +233,27 @@ static const char *skipEverything (const char *cp)
 			match = 1;
 
 		/* these checks find unicode, binary (Python 3) and raw strings */
-		if (!match && (
-			!strncasecmp(cp, "u'", 2) || !strncasecmp(cp, "u\"", 2) ||
-			!strncasecmp(cp, "r'", 2) || !strncasecmp(cp, "r\"", 2) ||
-			!strncasecmp(cp, "b'", 2) || !strncasecmp(cp, "b\"", 2)))
+		if (!match)
 		{
-			match = 1;
-			cp += 1;
-		}
-		if (!match && (
-			!strncasecmp(cp, "ur'", 3) || !strncasecmp(cp, "ur\"", 3) ||
-			!strncasecmp(cp, "br'", 3) || !strncasecmp(cp, "br\"", 3)))
-		{
-			match = 1;
-			cp += 2;
+			boolean r_first = (*cp == 'r' || *cp == 'R');
+
+			/* "r" | "R" | "u" | "U" | "b" | "B" */
+			if (r_first || *cp == 'u' || *cp == 'U' ||  *cp == 'b' || *cp == 'B')
+			{
+				unsigned int i = 1;
+
+				/*  r_first -> "rb" | "rB" | "Rb" | "RB"
+				   !r_first -> "ur" | "UR" | "Ur" | "uR" | "br" | "Br" | "bR" | "BR" */
+				if (( r_first && (cp[i] == 'b' || cp[i] == 'B')) ||
+					(!r_first && (cp[i] == 'r' || cp[i] == 'R')))
+					i++;
+
+				if (cp[i] == '\'' || cp[i] == '"')
+				{
+					match = 1;
+					cp += i;
+				}
+			}
 		}
 		if (match)
 		{
