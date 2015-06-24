@@ -244,10 +244,12 @@ A tagfield has a name, a colon, and a value: "name:value".
 
 * The value may be empty.
   It cannot contain a <Tab>.
-  When a value contains a "\t", this stands for a <Tab>.
-  When a value contains a "\r", this stands for a <CR>.
-  When a value contains a "\n", this stands for a <NL>.
-  When a value contains a "\\", this stands for a single '\' character.
+
+  - When a value contains a "\\t", this stands for a <Tab>.
+  - When a value contains a "\\r", this stands for a <CR>.
+  - When a value contains a "\\n", this stands for a <NL>.
+  - When a value contains a "\\\\", this stands for a single '\\' character.
+
   Other use of the backslash character is reserved for future expansion.
   Warning: When a tagfield value holds an MS-DOS file name, the backslashes
   must be doubled!
@@ -380,9 +382,9 @@ compatibility.  However, all known programs that generate tags use a single
 
 There is a problem for using file names with embedded white space in the
 tagfile field.  To work around this, the same special characters could be used
-as in the new fields, for example "\s".  But, unfortunately, in MS-DOS the
+as in the new fields, for example "\\s".  But, unfortunately, in MS-DOS the
 backslash character is used to separate file names.  The file name
-"c:\vim\sap" contains "\s", but this is not a <Space>.  The number of
+"c:\\vim\\sap" contains "\\s", but this is not a <Space>.  The number of
 backslashes could be doubled, but that will add a lot of characters, and make
 parsing the tags file slower and clumsy.
 
