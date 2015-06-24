@@ -200,6 +200,7 @@ at:
    * Make it easier to write a program to produce or parse the file.
 
 3. Don't use special characters, because:
+
    * It should be possible to treat a tags file like any normal text file.
 
 Proposal
@@ -280,7 +281,7 @@ kind		Kind of tag.  The value depends on the language.  For C and
 		d
 			define (from #define XXX)
 
-		e	
+		e
 			enumerator
 
 		f
@@ -410,7 +411,7 @@ of the generator was used).
 
 The names of the tags used in these lines may be suitably chosen to ensure
 that when sorted, they will always be located near the first lines of the tag
-file.  The use of "!_TAG_" is recommended.  Note that a rare tag like "!" 
+file.  The use of "!_TAG_" is recommended.  Note that a rare tag like "!"
 can sort to before these lines.  The program reading the tags file should be
 smart enough to skip over these tags.
 
