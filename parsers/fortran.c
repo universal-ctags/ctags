@@ -2271,7 +2271,8 @@ static boolean parseExecutionPart (tokenInfo *const token)
 					isSecondaryKeyword (token, KEYWORD_select) ||
 					isSecondaryKeyword (token, KEYWORD_where) ||
 					isSecondaryKeyword (token, KEYWORD_forall) ||
-					isSecondaryKeyword (token, KEYWORD_associate))
+					isSecondaryKeyword (token, KEYWORD_associate) ||
+					isSecondaryKeyword (token, KEYWORD_block))
 				{
 					skipToNextStatement (token);
 					result = TRUE;
