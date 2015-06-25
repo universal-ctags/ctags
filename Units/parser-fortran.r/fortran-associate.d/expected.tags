@@ -1,0 +1,4 @@
+a	input.f90	/^  real/;"	v	module:with_associate
+do_other_stuff	input.f90	/^  subroutine do_other_stuff(/;"	s	module:with_associate
+do_stuff	input.f90	/^  function do_stuff(/;"	f	module:with_associate
+with_associate	input.f90	/^module with_associate$/;"	m
