@@ -129,7 +129,6 @@
     <ClCompile Include="..\main\main.c" />
     <ClCompile Include="..\parsers\make.c" />
     <ClCompile Include="..\parsers\matlab.c" />
-    <ClCompile Include="..\parsers\nim.c" />
     <ClCompile Include="..\parsers\objc.c" />
     <ClCompile Include="..\parsers\ocaml.c" />
     <ClCompile Include="..\main\options.c" />

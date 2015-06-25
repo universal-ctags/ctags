@@ -16,7 +16,8 @@ VPATH = . ./main ./parsers
 ctags.exe: OPT = -O4 -Os -fexpensive-optimizations
 ctags.exe: LDFLAGS = -s
 dctags.exe: OPT = -g
-dctags.exe: CFLAGS += -DDEBUG
+dctags.exe: DEBUG = -DDEBUG
+dctags.exe: SOURCES += debug.c
 
 .SUFFIXES: .c.o
 

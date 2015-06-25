@@ -16,8 +16,6 @@ OPT = /O2
 
 ctags: ctags.exe
 
-dctags: dctags.exe
-
 ctags.exe: respmvc
 	cl $(OPT) /Fe$@ @respmvc /link setargv.obj
 
@@ -26,7 +24,7 @@ readtags.exe: readtags.c
 
 # Debug version
 dctags.exe: respmvc
-	cl /Zi -DDEBUG /Fe$@ @respmvc /link setargv.obj
+	cl /Zi -DDEBUG /Fe$@ @respmvc debug.c /link setargv.obj
 
 regex.obj:
 	cl /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) gnu_regex/regex.c
