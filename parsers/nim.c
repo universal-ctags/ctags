@@ -1781,6 +1781,7 @@ static int considerStrongSpaces(nimToken* tok, boolean strongSpaces, int x)
 static int considerAsgn(nimToken* tok, int value)
 {
   int L = vStringLength(tok->literal);
+  if (L == 0) return value;
   return (tok->literal->buffer[L-1] == '=' ? 1 : value);
 }
 
