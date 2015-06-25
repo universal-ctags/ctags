@@ -74,6 +74,7 @@ typedef enum eKeywordId {
 	KEYWORD_byte,
 	KEYWORD_cexternal,
 	KEYWORD_cglobal,
+	KEYWORD_class,
 	KEYWORD_character,
 	KEYWORD_common,
 	KEYWORD_complex,
@@ -97,6 +98,7 @@ typedef enum eKeywordId {
 	KEYWORD_generic,
 	KEYWORD_if,
 	KEYWORD_implicit,
+	KEYWORD_import,
 	KEYWORD_include,
 	KEYWORD_inline,
 	KEYWORD_integer,
@@ -261,6 +263,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "byte",           KEYWORD_byte         },
 	{ "cexternal",      KEYWORD_cexternal    },
 	{ "cglobal",        KEYWORD_cglobal      },
+	{ "class",          KEYWORD_class        },
 	{ "character",      KEYWORD_character    },
 	{ "common",         KEYWORD_common       },
 	{ "complex",        KEYWORD_complex      },
@@ -284,6 +287,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "generic",        KEYWORD_generic      },
 	{ "if",             KEYWORD_if           },
 	{ "implicit",       KEYWORD_implicit     },
+	{ "import",         KEYWORD_import       },
 	{ "include",        KEYWORD_include      },
 	{ "inline",         KEYWORD_inline       },
 	{ "integer",        KEYWORD_integer      },
@@ -1181,6 +1185,7 @@ static boolean isTypeSpec (tokenInfo *const token)
 		case KEYWORD_procedure:
 		case KEYWORD_final:
 		case KEYWORD_generic:
+		case KEYWORD_class:
 			result = TRUE;
 			break;
 		default:
@@ -1244,6 +1249,7 @@ static void parseTypeSpec (tokenInfo *const token)
 		case KEYWORD_logical:
 		case KEYWORD_real:
 		case KEYWORD_procedure:
+		case KEYWORD_class:
 			readToken (token);
 			if (isType (token, TOKEN_PAREN_OPEN))
 				skipOverParens (token);  /* skip kind-selector */
@@ -2042,6 +2048,15 @@ static boolean parseDeclarationConstruct (tokenInfo *const token)
 		case KEYWORD_stdcall:   readToken (token);           break;
 		/* derived type handled by parseTypeDeclarationStmt(); */
 
+		case KEYWORD_abstract:
+			readToken (token);
+			if (isKeyword (token, KEYWORD_interface))
+				parseInterfaceBlock (token);
+			else
+				skipToNextStatement (token);
+			result = TRUE;
+			break;
+
 		case KEYWORD_automatic:
 			readToken (token);
 			if (isTypeSpec (token))
@@ -2102,6 +2117,8 @@ static boolean parseSpecificationPart (tokenInfo *const token)
 {
 	boolean result = FALSE;
 	while (skipStatementIfKeyword (token, KEYWORD_use))
+		result = TRUE;
+	while (skipStatementIfKeyword (token, KEYWORD_import))
 		result = TRUE;
 	while (parseImplicitPartStmt (token))
 		result = TRUE;
