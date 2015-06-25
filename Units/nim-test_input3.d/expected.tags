@@ -1,0 +1,9 @@
+a	input.nim	/^  ttt = tuple[a:string,b:int,c:int,d:float]$/;"	n	tuple:ttt
+b	input.nim	/^  ttt = tuple[a:string,b:int,c:int,d:float]$/;"	n	tuple:ttt
+c	input.nim	/^  ttt = tuple[a:string,b:int,c:int,d:float]$/;"	n	tuple:ttt
+d	input.nim	/^  ttt = tuple[a:string,b:int,c:int,d:float]$/;"	n	tuple:ttt
+ttt	input.nim	/^  ttt = tuple[a:string,b:int,c:int,d:float]$/;"	u	typeref:tuple:ttt
+unpack_type	input.nim	/^proc unpack_type*(s: Stream, val: var StringTableRef)$/;"	p
+unpack_type	input.nim	/^proc unpack_type*(s: Stream, val: var float32)$/;"	p
+unpack_type	input.nim	/^proc unpack_type*[K,V](s: Stream, val: var OrderedTable[K,V])$/;"	p
+unpack_type	input.nim	/^proc unpack_type*[K,V](s: Stream, val: var TableRef[K,V])$/;"	p
