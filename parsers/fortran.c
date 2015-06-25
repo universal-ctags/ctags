@@ -68,6 +68,7 @@ typedef enum eKeywordId {
 	KEYWORD_abstract,
 	KEYWORD_allocatable,
 	KEYWORD_assignment,
+	KEYWORD_associate,
 	KEYWORD_automatic,
 	KEYWORD_bind,
 	KEYWORD_block,
@@ -258,6 +259,7 @@ static const keywordDesc FortranKeywordTable [] = {
 	{ "abstract",       KEYWORD_abstract     },
 	{ "allocatable",    KEYWORD_allocatable  },
 	{ "assignment",     KEYWORD_assignment   },
+	{ "associate",      KEYWORD_associate    },
 	{ "automatic",      KEYWORD_automatic    },
 	{ "bind",           KEYWORD_bind         },
 	{ "block",          KEYWORD_block        },
@@ -2268,7 +2270,8 @@ static boolean parseExecutionPart (tokenInfo *const token)
 					isSecondaryKeyword (token, KEYWORD_if) ||
 					isSecondaryKeyword (token, KEYWORD_select) ||
 					isSecondaryKeyword (token, KEYWORD_where) ||
-					isSecondaryKeyword (token, KEYWORD_forall))
+					isSecondaryKeyword (token, KEYWORD_forall) ||
+					isSecondaryKeyword (token, KEYWORD_associate))
 				{
 					skipToNextStatement (token);
 					result = TRUE;
