@@ -1,0 +1,4 @@
+filename	input.nim	/^var filename = addFileExt(paramStr(1), "html")$/;"	v
+s	input.nim	/^var s = newFileStream(filename, fmRead)$/;"	v
+title	input.nim	/^      var title = ""$/;"	v
+x	input.nim	/^var x: XmlParser$/;"	v

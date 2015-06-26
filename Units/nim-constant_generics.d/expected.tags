@@ -1,0 +1,8 @@
+MACMAP	input.nim	/^  MACMAP = [123,123]$/;"	k
+STDMAP	input.nim	/^  STDMAP* = [$/;"	k
+WINMAP	input.nim	/^  WINMAP = [123,123]$/;"	k
+abc	input.nim	/^proc abc(x,y: tuple[key: int, val: int]) = discard$/;"	p
+col	input.nim	/^var col = initOrderedTable[int, int]();$/;"	v
+pack_type	input.nim	/^proc pack_type*[T: tuple|object](s: int, val: T) = discard$/;"	p
+pack_type	input.nim	/^proc pack_type*[T](y: int, val: ptr T) = discard$/;"	p
+unpack_ext	input.nim	/^proc unpack_ext*(s: int): tuple[exttype:uint8, len: int] = discard$/;"	p

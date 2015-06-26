@@ -1,0 +1,10 @@
+Container	input.nim	/^  Container[T] = concept c$/;"	s
+ObjectContainer	input.nim	/^  ObjectContainer = concept C$/;"	s
+PDict	input.nim	/^  PDict[TK, TV] = ref TDict[TK, TV]$/;"	t
+RNG	input.nim	/^type RNG* = concept var rng$/;"	s
+Sortable	input.nim	/^  Sortable = concept x, y$/;"	s
+TDict	input.nim	/^  TDict[TK, TV] = object$/;"	o	typeref:object:TDict
+TObj	input.nim	/^  TObj = object$/;"	o	typeref:object:TObj
+k	input.nim	/^    k: TK$/;"	f	object:TDict
+v	input.nim	/^    v: TV$/;"	f	object:TDict
+x	input.nim	/^    x: int$/;"	f	object:TObj

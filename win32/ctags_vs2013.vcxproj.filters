@@ -228,6 +228,9 @@
     <ClCompile Include="..\main\nestlevel.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\nim.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\main\e_msoft.h">

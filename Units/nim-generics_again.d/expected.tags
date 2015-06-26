@@ -1,0 +1,12 @@
+Binders	input.nim	/^    Binders: seq[TProperty[T]]$/;"	f	object:TProperty
+EEmitter	input.nim	/^    EEmitter: TEventEmitter$/;"	f	object:TProperty
+Point2	input.nim	/^  Point2[T] = tuple[x, y: T]$/;"	u	typeref:tuple:Point2
+Property	input.nim	/^    Property*: TProperty[T]$/;"	f	object:TValueEventArgs
+TProperty	input.nim	/^  TProperty*[T] = object of TObject$/;"	o	typeref:object:TProperty
+TValueEventArgs	input.nim	/^  TValueEventArgs[T] = object of TEventArgs$/;"	o	typeref:object:TValueEventArgs
+ValueChanged	input.nim	/^    ValueChanged*: TEventHandler$/;"	f	object:TProperty
+getProc	input.nim	/^    getProc: proc(property: TProperty[T]): T {.nimcall.}$/;"	f	object:TProperty
+setProc	input.nim	/^    setProc: proc(property: var TProperty[T], value: T) {.nimcall.}$/;"	f	object:TProperty
+value	input.nim	/^    value: T$/;"	f	object:TProperty
+x	input.nim	/^  Point2[T] = tuple[x, y: T]$/;"	n	tuple:Point2
+y	input.nim	/^  Point2[T] = tuple[x, y: T]$/;"	n	tuple:Point2

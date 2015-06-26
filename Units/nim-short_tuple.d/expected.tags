@@ -1,0 +1,4 @@
+TExport	input.nim	/^  TExport* = enum a, b, c$/;"	e	typeref:enum:TExport
+a	input.nim	/^  TExport* = enum a, b, c$/;"	r	enum:TExport
+b	input.nim	/^  TExport* = enum a, b, c$/;"	r	enum:TExport
+c	input.nim	/^  TExport* = enum a, b, c$/;"	r	enum:TExport

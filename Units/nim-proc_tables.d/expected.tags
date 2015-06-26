@@ -1,0 +1,5 @@
+action1	input.nim	/^proc action1(arg: string) = $/;"	p
+action2	input.nim	/^proc action2(arg: string) = $/;"	p
+action3	input.nim	/^proc action3(arg: string) = $/;"	p
+action4	input.nim	/^proc action4(arg: string) = $/;"	p
+actionTable	input.nim	/^  actionTable = {$/;"	v

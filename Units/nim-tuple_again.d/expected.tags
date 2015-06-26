@@ -1,0 +1,15 @@
+cATup	input.nim	/^var cATup, cBTup: tuple[x: int, ha: Concrete]$/;"	v
+cBTup	input.nim	/^var cATup, cBTup: tuple[x: int, ha: Concrete]$/;"	u	typeref:tuple:cBTup
+cBTup	input.nim	/^var cATup, cBTup: tuple[x: int, ha: Concrete]$/;"	v
+check	input.nim	/^        check    = 0$/;"	v
+count	input.nim	/^        count: seq[int]$/;"	v
+fannkuch	input.nim	/^proc fannkuch (n: int): int =$/;"	p
+ha	input.nim	/^var cATup, cBTup: tuple[x: int, ha: Concrete]$/;"	n	tuple:cBTup
+m	input.nim	/^        m        = n-1$/;"	v
+maxFlips	input.nim	/^        maxFlips = 0$/;"	v
+perm	input.nim	/^        perm:  seq[int]$/;"	v
+perm1	input.nim	/^        perm1: seq[int]$/;"	v
+r	input.nim	/^        r        = n$/;"	v
+ret	input.nim	/^var ret: seq[tuple[name: string, a: TAny]] = @[]$/;"	v
+ugh	input.nim	/^proc ugh: seq[tuple[x: string, c: int]] =$/;"	p
+x	input.nim	/^var cATup, cBTup: tuple[x: int, ha: Concrete]$/;"	n	tuple:cBTup
