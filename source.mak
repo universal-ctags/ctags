@@ -57,7 +57,6 @@ PARSER_SOURCES =				\
 	$(PARSER_DIR)/lua.c			\
 	$(PARSER_DIR)/make.c			\
 	$(PARSER_DIR)/matlab.c			\
-	$(PARSER_DIR)/nim.c			\
 	$(PARSER_DIR)/objc.c			\
 	$(PARSER_DIR)/ocaml.c			\
 	$(PARSER_DIR)/pascal.c			\
