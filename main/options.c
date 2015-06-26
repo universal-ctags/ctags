@@ -2728,6 +2728,7 @@ extern void initOptions (void)
 	processExcludeOption (NULL, "SCCS");
 	processExcludeOption (NULL, ".svn");
 	processExcludeOption (NULL, "*~");
+	processExcludeOption (NULL, ".*.swp");
 }
 
 extern void freeOptionResources (void)
