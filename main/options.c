@@ -669,16 +669,14 @@ static void parseLongOption (cookedArgs *const args, const char *item)
 	if (equal == NULL)
 	{
 		args->item = eStrdup (item);
-		trashBoxPut (args->trashBox, args->item, (TrashBoxDestroyItemProc)eFree);
 		args->parameter = "";
 	}
 	else
 	{
-		const size_t length = equal - item;
-		args->item = eStrndup (item, length);
-		trashBoxPut (args->trashBox, args->item, (TrashBoxDestroyItemProc)eFree);
+		args->item = eStrndup (item, equal - item);
 		args->parameter = equal + 1;
 	}
+	trashBoxPut (args->trashBox, args->item, (TrashBoxDestroyItemProc)eFree);
 	Assert (args->item != NULL);
 	Assert (args->parameter != NULL);
 }
