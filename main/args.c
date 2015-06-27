@@ -191,8 +191,6 @@ extern Arguments* argNewFromString (const char* const string)
 	Arguments* result = xMalloc (1, Arguments);
 	memset (result, 0, sizeof (Arguments));
 	result->type = ARG_STRING;
-	result->u.stringArgs.string = string;
-	result->u.stringArgs.item = string;
 	result->u.stringArgs.next = string;
 	result->item = nextString (result, &result->u.stringArgs.next);
 	return result;
@@ -264,7 +262,6 @@ extern void argForth (Arguments* const current)
 		case ARG_STRING:
 			if (current->item != NULL)
 				eFree (current->item);
-			current->u.stringArgs.item = current->u.stringArgs.next;
 			current->item = nextString (current, &current->u.stringArgs.next);
 			break;
 		case ARG_ARGV:

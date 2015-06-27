@@ -26,9 +26,7 @@ typedef struct sArgs {
 	argType type;
 	union {
 		struct sStringArgs {
-			const char* string;
 			const char* next;
-			const char* item;
 		} stringArgs;
 		struct sArgvArgs {
 			char* const* argv;
