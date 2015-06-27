@@ -18,3 +18,4 @@ foo1	input.c	/^int foo1 (void)$/;"	f
 g	input.c	/^int g;$/;"	v
 p1	input.c	/^int p1;$/;"	v
 with_long_comment	input.c	/^#define with_long_comment /;"	d	file:
+z_this_branch_is_chosen	input.c	/^#define  z_this_branch_is_chosen /;"	d	file:

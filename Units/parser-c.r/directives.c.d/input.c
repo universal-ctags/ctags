@@ -41,6 +41,7 @@ int g;
 #define PATH1
 int foo1 (void)
 {
+#define  z_this_branch_is_chosen 0
 #elif defined (OK)
 #define PATH2
 int foo2 (void)
