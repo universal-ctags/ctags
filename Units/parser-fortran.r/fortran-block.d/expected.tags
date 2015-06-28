@@ -1,0 +1,3 @@
+suba	input.f90	/^  SUBROUTINE suba(/;"	s	module:test_block
+subb	input.f90	/^  subroutine subb$/;"	s	module:test_block
+test_block	input.f90	/^module test_block$/;"	m

@@ -1,0 +1,4 @@
+a	input.f90	/^  real/;"	v	module:with_forall
+sub_with_forall	input.f90	/^  subroutine sub_with_forall(/;"	s	module:with_forall
+two	input.f90	/^  function two(/;"	f	module:with_forall
+with_forall	input.f90	/^module with_forall$/;"	m
