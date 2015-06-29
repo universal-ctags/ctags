@@ -1,0 +1,14 @@
+Symmetry	input.f90	/^  type Symmetry$/;"	t	module:squaretest
+assignee	input.f90	/^  real, allocatable :: assignee[/;"	v	module:squaretest
+execute	input.f90	/^  subroutine execute(/;"	s	module:squaretest
+invisible	input.f90	/^  integer :: invisible$/;"	v	module:squaretest
+invisible_four	input.f90	/^  integer :: invisible_four$/;"	v	module:squaretest
+invisible_three	input.f90	/^  integer :: invisible_three$/;"	v	module:squaretest
+invisible_two	input.f90	/^  integer :: invisible_two$/;"	v	module:squaretest
+iterations	input.f90	/^    integer :: matrix(3,3), iterations$/;"	k	type:Symmetry
+main	input.f90	/^program main$/;"	p
+matrix	input.f90	/^    integer :: matrix(/;"	k	type:Symmetry
+squaretest	input.f90	/^module squaretest$/;"	m
+state	input.f90	/^  real, allocatable :: state(/;"	v	module:squaretest
+state_two	input.f90	/^  real, intent(in), allocatable, dimension(:), codimension[:] :: state_two$/;"	v	module:squaretest
+symmetries	input.f90	/^  type(Symmetry), parameter :: symmetries(/;"	v	module:squaretest
