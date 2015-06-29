@@ -8,5 +8,7 @@ int b;
 # 30 c.c
 int c;
 /* invalid formats */
-# 1 OK
+# 1 OK.zzz
 # 0 Not OK
+int d;
+
