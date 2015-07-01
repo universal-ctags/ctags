@@ -380,6 +380,7 @@ static void ancestorPush (tokenInfo *const token)
 	}
 	Ancestors.list [Ancestors.count] = *token;
 	Ancestors.list [Ancestors.count].string = vStringNewCopy (token->string);
+	Ancestors.list [Ancestors.count].signature = token->signature? vStringNewCopy (token->signature): NULL;
 	Ancestors.count++;
 }
 
@@ -388,6 +389,7 @@ static void ancestorPop (void)
 	Assert (Ancestors.count > 0);
 	--Ancestors.count;
 	vStringDelete (Ancestors.list [Ancestors.count].string);
+	vStringDelete (Ancestors.list [Ancestors.count].signature);
 
 	Ancestors.list [Ancestors.count].type       = TOKEN_UNDEFINED;
 	Ancestors.list [Ancestors.count].keyword    = KEYWORD_NONE;
@@ -397,7 +399,6 @@ static void ancestorPop (void)
 	Ancestors.list [Ancestors.count].lineNumber = 0L;
 	Ancestors.list [Ancestors.count].implementation = IMP_DEFAULT;
 	Ancestors.list [Ancestors.count].isMethod   = FALSE;
-	Ancestors.list [Ancestors.count].signature  = NULL;
 }
 
 static const tokenInfo* ancestorScope (void)
@@ -2351,7 +2352,6 @@ static void makeSignature (tokenInfo *const token, void* signature)
 static vString* parseSignature (tokenInfo *const token)
 {
 	vString* signature = P (vStringNew (), vStringDelete);
-	int len = -1;
 
 	readToken (token);
 	if (isType (token, TOKEN_PAREN_OPEN))
@@ -2360,9 +2360,7 @@ static vString* parseSignature (tokenInfo *const token)
 		skipOverParensFull (token, makeSignature, signature);
 		vStringPut (signature, ')');
 	}
-	len = vStringLength (signature);
-	if (len == 0 || len == 2)
-		F (signature);
+	B(signature);
 	return signature;
 }
 
@@ -2380,7 +2378,7 @@ static void parseSubprogramFull (tokenInfo *const token, const tagType tag)
 		if (tag == TAG_SUBROUTINE ||
 			tag == TAG_SUBROUTINE ||
 			tag == TAG_PROTOTYPE)
-			name->signature = vStringNewCopy (parseSignature (token));
+			name->signature = parseSignature (token);
 		makeFortranTag (name, tag);
 		ancestorPush (name);
 	}
