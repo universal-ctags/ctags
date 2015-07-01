@@ -1,3 +1,2 @@
 #!/bin/sh
-exit 77
-
+exit 127

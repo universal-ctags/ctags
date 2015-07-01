@@ -13,8 +13,6 @@
 *
 */
 
-#define XCMD_NOT_AVAILABLE_STATUS 77
-
 /*
   XCMD PROTOCOL (version 2)
   ==================================================================
@@ -28,7 +26,17 @@
   ^([^ \t])[ \t]+(.+)([ \t]+(\[off\]))?$
   \1 => letter
   \2 => description
-  \4 => \[off\] is optional. */
+  \4 => \[off\] is optional.
+
+
+  exit code
+  ---------
+
+  If xcmd itself recognizes it cannot run, it should exit with
+  XCMD_NOT_AVAILABLE_STATUS exit code. ctags may ignore the xcmd.
+*/
+
+#define XCMD_NOT_AVAILABLE_STATUS 127
 
 /*
 *   INCLUDE FILES

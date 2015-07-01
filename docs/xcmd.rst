@@ -84,7 +84,7 @@ following two tings.
 Availability is detected by the exit status of 
 ``COMMAND`` process; 0 means available.
 If the status is other than 0, the ``LANG`` parser is treated
-as ``disabled`` with warning messages. 77 is a special
+as ``disabled`` with warning messages. 127 is a special
 number; the ``LANG`` parser is treated as disabled without
 warning messages.
 
