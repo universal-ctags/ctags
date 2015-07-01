@@ -2053,7 +2053,7 @@ static parametricOption ParametricOptions [] = {
 	{ "sort",                   processSortOption,              TRUE    },
 	{ "version",                processVersionOption,           TRUE    },
 	{ "_echo",                  processEchoOption,              FALSE   },
-	{ "_force-quit",             processForceQuitOption,         TRUE    },
+	{ "_force-quit",            processForceQuitOption,         FALSE   },
 };
 
 static booleanOption BooleanOptions [] = {
