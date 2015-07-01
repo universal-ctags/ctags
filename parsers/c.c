@@ -3062,8 +3062,18 @@ static void tagCheck (statementInfo *const st)
 					st->declaration == DECL_VERSION ||
 					st->declaration == DECL_PROGRAM)
 			{
-				if (isType (prev, TOKEN_NAME))
-					copyToken (st->blockName, prev);
+				const tokenInfo *name_token = prev;
+
+				/* C++ 11 allows class <name> final { ... } */
+				if (isLanguage (Lang_cpp) && isType (prev, TOKEN_NAME) &&
+					strcmp("final", vStringValue(prev->name)) == 0 &&
+					isType(prev2, TOKEN_NAME))
+				{
+					name_token = prev2;
+				}
+
+				if (isType (name_token, TOKEN_NAME))
+					copyToken (st->blockName, name_token);
 				else
 				{
 					/*  For an anonymous struct or union we use a unique ID
@@ -3075,7 +3085,7 @@ static void tagCheck (statementInfo *const st)
 					st->blockName->type = TOKEN_NAME;
 					st->blockName->keyword = KEYWORD_NONE;
 				}
-				qualifyBlockTag (st, prev);
+				qualifyBlockTag (st, name_token);
 			}
 			else if (isLanguage (Lang_csharp))
 				makeTag (prev, st, FALSE, TAG_PROPERTY);
