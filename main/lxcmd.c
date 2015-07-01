@@ -16,25 +16,19 @@
 #define XCMD_NOT_AVAILABLE_STATUS 77
 
 /*
-  XCMD PROTOCOL
-  =============
+  XCMD PROTOCOL (version 2)
+  ==================================================================
   When invoking xcmd just only with --lint-kinds=LANG option,
   xcmd must write lines matching one of following patterns
   to stdout.
 
   patterns
   --------
-  ([^ \t])
-  ([^ \t])[ \t]+
-  ([^ \t])[ \t]+([^ \t]+)
-  ([^ \t])[ \t]+([^ \t]+)[ \t]+
-  ([^ \t])[ \t]+([^ \t]+)[ \t]+(.+)
 
-  patterns are dealt as follows
+  ^([^ \t])[ \t]+(.+)([ \t]+(\[off\]))?$
   \1 => letter
-  \2 => name (default "xcmd")
-  \3 => description (default: "xcmd" or name if it is available) */
-
+  \2 => description
+  \4 => \[off\] is optional. */
 
 /*
 *   INCLUDE FILES
@@ -180,14 +174,16 @@ static void clearPathSet (const langType language)
 
 static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 {
+	const char* backup = line;
+	char* off;
+	vString *desc;
 	struct sKind *kind;
 
 	if (line[0] == '\0')
 		return FALSE;
-	else if (line[1] != ' ')
+	else if (!isblank(line[1]))
 	{
-		error (WARNING, "unexpected line(%s) from pipe connected to \"%s\"",
-		       line, args[0]);
+		error (WARNING, "[%s] a space after letter is not found in kind desciption line: %s", args[0], backup);
 		return FALSE;
 	}
 
@@ -195,6 +191,8 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 	kind = &path->kinds [path->kount];
 	kind->enabled = TRUE;
 	kind->letter = line[0];
+	kind->name = NULL;
+	kind->description = NULL;
 
 	verbose ("	kind letter: <%c>\n", kind->letter);
 
@@ -203,33 +201,49 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 
 	if (*line == '\0')
 	{
-		kind->name = eStrdup ("xcmd");
-		kind->description = eStrdup ("xcmd");
+		error (WARNING, "[%s] unexpectedly a kind description line is terminated: %s",
+		       args[0], backup);
+		return FALSE;
 	}
-	else
-	{
-		char* name;
 
-		name = line;
-		for (line++; (*line != '\0') && (!isblank(*line)); line++)
-			; /* do nothing */
-		if (*line == '\0')
+	Assert (!isblank (*line));
+
+	off = strrstr(line, "[off]");
+	if (off == line)
+	{
+		error (WARNING, "[%s] [off] is given but no kind description is found: %s",
+		       args[0], backup);
+		return FALSE;
+	}
+	else if (off)
+	{
+		if (!isblank (*(off - 1)))
 		{
-			kind->name = eStrdup (name);
-			kind->description = eStrdup (name);
+			error (WARNING, "[%s] a whitespace must precede [off] flag: %s",
+			       args[0], backup);
+			return FALSE;
 		}
-		else
+		kind->enabled = FALSE;
+		*off = '\0';
+	}
+	desc = vStringNewInit (line);
+	vStringStripTrailing (desc);
+
+	Assert (vStringLength (desc) > 0);
+
+	kind->description = vStringDeleteUnwrap (desc);
+
+	/* TODO: This conversion should be part of protocol. */
+	kind->name = eStrdup (kind->description);
+	{
+		char *c;
+		for (c = kind->name; *c != '\0'; c++)
 		{
-			Assert (isblank (*line));
-			*line = '\0';
-			kind->name = eStrdup (name);
-			*line = ' ';
-			for (line++; isblank(*line); line++)
-				; /* do nothing */
-			Assert (!isblank (*line));
-			kind->description = eStrdup (*line == '\0'? kind->name: line);
+			if (*c == ' ' || *c == '\t')
+				*c = '_';
 		}
 	}
+
 	path->kount += 1;
 	return TRUE;
 }

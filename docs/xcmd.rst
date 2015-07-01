@@ -57,10 +57,13 @@ generator and universal-ctags. This is the reason why the name
 To write a driver for a tags generator, please read
 -"xcmd protocol and writing a driver".
 
-xcmd protocol and writing a driver
+xcmd v2 protocol and writing a driver
 ---------------------------------------------------------------------
 
-Call convention
+This is still experimental.
+The v1 protocol was obsoleted.
+
+list-kinds enumeration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ctags invokes ``COMMAND`` specified with ``--xcmd-<LANG>=COMMAND``
@@ -85,16 +88,10 @@ as ``disabled`` with warning messages. 77 is a special
 number; the ``LANG`` parser is treated as disabled without
 warning messages.
 
-
-
 Standard output contributes to know the lists.
 ctags expects following format when parsing the output::
 
-  ([^ \t])
-  ([^ \t])[ \t]+
-  ([^ \t])[ \t]+([^ \t]+)
-  ([^ \t])[ \t]+([^ \t]+)[ \t]+
-  ([^ \t])[ \t]+([^ \t]+)[ \t]+(.+)
+  ^([^ \t])[ \t]+(.+)([ \t]+(\[off\]))?$
 
 The output lines matched above pattern are recognized as follows::
 
@@ -104,11 +101,10 @@ The output lines matched above pattern are recognized as follows::
 
 ``\2``
 
-	kind name (default ``xcmd``)
+	kind description
 
-``\3``
-
-	kind description (default: ``xcmd`` or kind name if it is given)
+``[off]`` given after a kind description means the kind is disabled by
+default.
 
 Here is the example command line and output of ``coffeetags`` driver::
 
@@ -120,15 +116,21 @@ Here is the example command line and output of ``coffeetags`` driver::
 	p  proto
 	b  block	
 
-In this case ``\3``, kind description, is empty.
 
-Here after ctags calls ``COMMAND`` with one argument, 
-the name of input file::
+Generating tags
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+After getting kinds related information from ``COMMAND``,
+ctags calls ``COMMAND`` with one argument, the name of input file::
 
 	$ COMMAND input-file
 
 ctags expects ``COMMAND`` prints the result to standard output.
 ctags reads them via a pipe connected to the process of ``COMMAND``.
+
+ctags expects ``COMMAND`` generates tags elements with enabling all
+kinds.  Tags elements of disabled kinds are filtered by ctags side
+when generating tags file.
+
 
 Note for tags format
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
