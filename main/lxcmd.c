@@ -733,8 +733,11 @@ static boolean parseExtensionFields (tagEntry *const entry, char *const string, 
 	}
 	return TRUE;
   reject:
-	eFree (entry->fields.list);
-	entry->fields.list = NULL;
+	if (entry->fields.list)
+	{
+		eFree (entry->fields.list);
+		entry->fields.list = NULL;
+	}
 	entry->fields.count = 0;
 	return FALSE;
 }
@@ -849,8 +852,11 @@ static boolean parseXcmdPath (char* line, xcmdPath* path, tagEntry* entry)
 
 static void freeTagEntry (tagEntry* entry)
 {
-	eFree (entry->fields.list);
-	entry->fields.list = NULL;
+	if (entry->fields.list)
+	{
+		eFree (entry->fields.list);
+		entry->fields.list = NULL;
+	}
 	entry->fields.count = 0;
 }
 
