@@ -2366,21 +2366,20 @@ static vString* parseSignature (tokenInfo *const token)
 
 static void parseSubprogramFull (tokenInfo *const token, const tagType tag)
 {
-	tokenInfo* name = NULL;
-
 	Assert (isKeyword (token, KEYWORD_program) ||
 			isKeyword (token, KEYWORD_function) ||
 			isKeyword (token, KEYWORD_subroutine));
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		name = newTokenFrom (token);
+		tokenInfo* name = newTokenFrom (token);
 		if (tag == TAG_SUBROUTINE ||
 			tag == TAG_SUBROUTINE ||
 			tag == TAG_PROTOTYPE)
 			name->signature = parseSignature (token);
 		makeFortranTag (name, tag);
 		ancestorPush (name);
+		F (name);
 	}
 	else
 		ancestorPush (token);
@@ -2396,7 +2395,6 @@ static void parseSubprogramFull (tokenInfo *const token, const tagType tag)
 	 */
 	skipToNextStatement (token);
 	ancestorPop ();
-	F (name);
 }
 
 static tagType subprogramTagType (tokenInfo *const token)
