@@ -447,6 +447,6 @@ tinst:
 # Checking code in ctags own rules
 #
 codecheck:
-	$(SHELL) misc/codecheck
+	$(SHELL) misc/src-check
 
 # vi:set tabstop=8:
