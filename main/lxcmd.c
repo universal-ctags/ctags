@@ -62,6 +62,8 @@
 
 #include "pcoproc.h"
 
+#include "flags.h"
+
 /*
 *   MACROS
 */
@@ -133,6 +135,7 @@ typedef struct {
 	unsigned int n_kinds;
 	boolean available;
 	unsigned int id;	/* not used yet */
+	int not_available_status;
 } xcmdPath;
 
 typedef struct {
@@ -326,9 +329,9 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 		verbose("	status: %d\n", status);
 		if (status != 0)
 		{
-			if (status > 0 
-			    && WIFEXITED (status) 
-			    && (WEXITSTATUS (status) == XCMD_NOT_AVAILABLE_STATUS))
+			if (status > 0
+			    && WIFEXITED (status)
+			    && (WEXITSTATUS (status) == path->not_available_status))
 				verbose ("xcmd: the %s backend is not available\n", argv[0]);
 			else
 				error (WARNING, "xcmd exits abnormally status(%d): [%s %s]",
@@ -522,11 +525,28 @@ extern void freeXcmdResources (void)
 	SetUpper = -1;
 #endif
 }
-extern void addTagXcmd (const langType language, vString* pathvstr)
+
+#ifdef HAVE_COPROC
+static void xcmd_flag_not_avaible_status_long (const char* const s, const char* const v, void* data)
+{
+	xcmdPath *path = data;
+
+	path->not_available_status = strtol ((const char *)v, NULL, 0);
+}
+#endif
+
+extern void addTagXcmd (const langType language, vString* pathvstr, const char* flags)
 {
 #ifdef HAVE_COPROC
 	pathSet* set;
 	xcmdPath *path;
+
+#define COUNT(D) (sizeof(D)/sizeof(D[0]))
+	flagDefinition xcmdFlagDefs[] = {
+		{ '\0', "notAvailableStatus",  NULL,  xcmd_flag_not_avaible_status_long  },
+	};
+
+
 	Assert (pathvstr != NULL);
 
 	if (language > SetUpper)
@@ -548,8 +568,11 @@ extern void addTagXcmd (const langType language, vString* pathvstr)
 	path->kinds = NULL;
 	path->n_kinds = 0;
 	path->id = set->count;
+	path->not_available_status = XCMD_NOT_AVAILABLE_STATUS;
 
 	set->count += 1;
+
+	flagsEval (flags, xcmdFlagDefs, COUNT(xcmdFlagDefs), path);
 
 	path->available = (loadPathKinds (path, language));
 	useXcmdMethod (language);
@@ -561,16 +584,27 @@ extern void addLanguageXcmd (
 	const langType language __unused__, const char* const parameter __unused__)
 {
 #ifdef HAVE_COPROC
+	char *path;
 	vString* vpath;
+	const char* flags;
+
+	flags = strchr (parameter, LONG_FLAGS_OPEN);
+	if (flags)
+		path = eStrndup (parameter, flags - parameter);
+	else
+		path = eStrdup (parameter);
 
 	if (parameter [0] != '/' && parameter [0] != '.')
 	{
-		vpath = expandOnDriversPathList (parameter);
-		vpath = vpath? vpath: vStringNewInit(parameter);
+		vpath = expandOnDriversPathList (path);
+		vpath = vpath? vpath: vStringNewInit(path);
 	}
 	else
-		vpath = vStringNewInit(parameter);
-	addTagXcmd (language, vpath);
+		vpath = vStringNewInit(path);
+
+	eFree (path);
+
+	addTagXcmd (language, vpath, flags);
 #endif
 }
 
