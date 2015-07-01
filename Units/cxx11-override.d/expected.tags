@@ -1,0 +1,8 @@
+Base	input.cpp	/^class Base$/;"	c	file:
+Derived	input.cpp	/^class Derived : public Base$/;"	c	file:
+foo	input.cpp	/^	virtual void foo() = 0;$/;"	p	class:Base	file:	signature:()
+foo	input.cpp	/^	virtual void foo() override;$/;"	p	class:Derived	file:	signature:()
+foo	input.cpp	/^void Base::foo()$/;"	f	class:Base	signature:()
+foo	input.cpp	/^void Derived::foo()$/;"	f	class:Derived	signature:()
+override	input.cpp	/^	virtual void override();$/;"	p	class:Derived	file:	signature:()
+override	input.cpp	/^void Derived::override()$/;"	f	class:Derived	signature:()

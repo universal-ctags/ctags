@@ -2289,7 +2289,13 @@ static boolean skipPostArgumentStuff (
 					break;
 
 				default:
-					if (isType (token, TOKEN_NONE))
+					/* "override" and "final" are only keywords in the declaration of a virtual
+					 * member function, so need to be handled specially, not as keywords */
+					if (isLanguage(Lang_cpp) && isType (token, TOKEN_NAME) &&
+						(strcmp ("override", vStringValue (token->name)) == 0 ||
+						 strcmp ("final", vStringValue (token->name)) == 0))
+						;
+					else if (isType (token, TOKEN_NONE))
 						;
 					else if (info->isKnrParamList  &&  info->parameterCount > 0)
 						++elementCount;

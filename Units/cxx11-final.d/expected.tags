@@ -3,6 +3,6 @@ Derived	input.cpp	/^class Derived final : public Base$/;"	c	file:
 final	input.cpp	/^	virtual void final();$/;"	p	class:Derived	file:	signature:()
 final	input.cpp	/^void Derived::final()$/;"	f	class:Derived	signature:()
 foo	input.cpp	/^	virtual void foo() = 0;$/;"	p	class:Base	file:	signature:()
-foo	input.cpp	/^	virtual void foo();$/;"	p	class:Derived	file:	signature:()
+foo	input.cpp	/^	virtual void foo() final;$/;"	p	class:Derived	file:	signature:()
 foo	input.cpp	/^void Base::foo()$/;"	f	class:Base	signature:()
 foo	input.cpp	/^void Derived::foo()$/;"	f	class:Derived	signature:()

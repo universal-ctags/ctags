@@ -6,7 +6,7 @@ public:
 
 class Derived final : public Base
 {
-	virtual void foo();
+	virtual void foo() final;
 	virtual void final();
 };
 
