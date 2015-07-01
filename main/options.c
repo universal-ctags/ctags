@@ -2061,7 +2061,7 @@ static booleanOption BooleanOptions [] = {
 	{ "file-scope",     &Option.include.fileScope,      FALSE   },
 	{ "file-tags",      &Option.include.fileNames,      FALSE   },
 	{ "filter",         &Option.filter,                 TRUE    },
-	{ "guess-language-eagerly", &Option.guessLanguageEagerly, TRUE },
+	{ "guess-language-eagerly", &Option.guessLanguageEagerly, FALSE },
 	{ "if0",            &Option.if0,                    FALSE   },
 	{ "kind-long",      &Option.kindLong,               TRUE    },
 	{ "line-directives",&Option.lineDirectives,         FALSE   },
