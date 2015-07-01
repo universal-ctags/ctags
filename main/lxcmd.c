@@ -197,7 +197,7 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 	verbose ("	kind letter: <%c>\n", kind->letter);
 
 	for (line++; isblank(*line); line++)
-		; /* do nothing */
+		;		/* do nothing */
 
 	if (*line == '\0')
 	{
