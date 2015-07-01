@@ -2081,10 +2081,10 @@ static booleanOption BooleanOptions [] = {
  *  Generic option parsing
  */
 
-static void checkOptionOrder (const char* const option)
+static void checkOptionOrder (const char* const option, boolean longOption)
 {
 	if (NonOptionEncountered)
-		error (FATAL, "-%s option may not follow a file name", option);
+		error (FATAL, "-%s%s option may not follow a file name", longOption? "-": "", option);
 }
 
 static boolean processParametricOption (
@@ -2101,7 +2101,7 @@ static boolean processParametricOption (
 		{
 			found = TRUE;
 			if (entry->initOnly)
-				checkOptionOrder (option);
+				checkOptionOrder (option, TRUE);
 			(entry->handler) (option, parameter);
 		}
 	}
@@ -2139,7 +2139,7 @@ static boolean processBooleanOption (
 		{
 			found = TRUE;
 			if (entry->initOnly)
-				checkOptionOrder (option);
+				checkOptionOrder (option, TRUE);
 			*entry->pValue = getBooleanOption (option, parameter);
 		}
 	}
@@ -2196,7 +2196,7 @@ static void processShortOption (
 			exit (0);
 			break;
 		case 'a':
-			checkOptionOrder (option);
+			checkOptionOrder (option, FALSE);
 			Option.append = TRUE;
 			break;
 #ifdef DEBUG
@@ -2215,12 +2215,12 @@ static void processShortOption (
 			Option.backward = TRUE;
 			break;
 		case 'e':
-			checkOptionOrder (option);
+			checkOptionOrder (option, FALSE);
 			setEtagsMode ();
 			break;
 		case 'f':
 		case 'o':
-			checkOptionOrder (option);
+			checkOptionOrder (option, FALSE);
 			if (Option.tagFileName != NULL)
 			{
 				error (WARNING,
@@ -2268,7 +2268,7 @@ static void processShortOption (
 #endif
 			break;
 		case 'u':
-			checkOptionOrder (option);
+			checkOptionOrder (option, FALSE);
 			Option.sorted = SO_UNSORTED;
 			break;
 		case 'V':
@@ -2278,7 +2278,7 @@ static void processShortOption (
 			/* silently ignored */
 			break;
 		case 'x':
-			checkOptionOrder (option);
+			checkOptionOrder (option, FALSE);
 			Option.xref = TRUE;
 			break;
 		default:
