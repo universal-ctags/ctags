@@ -1004,8 +1004,9 @@ static void parseRecord (tokenInfo *const token)
 	 */
 	if (!isType (token, TOKEN_OPEN_PAREN))
 		readToken (token);
+	if (!isType (token, TOKEN_OPEN_PAREN))
+		return;
 
-	Assert (isType (token, TOKEN_OPEN_PAREN));
 	do
 	{
 		if (isType (token, TOKEN_COMMA) ||
