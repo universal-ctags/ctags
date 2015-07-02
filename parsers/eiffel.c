@@ -776,7 +776,7 @@ getNextChar:
 			else
 			{
 				token->type = TOKEN_UNDEFINED;
-				Assert (! isType (token, TOKEN_UNDEFINED));
+				longjmp (Exception, (int)ExceptionEOF);
 			}
 			break;
 	}
