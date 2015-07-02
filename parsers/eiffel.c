@@ -764,10 +764,7 @@ getNextChar:
 				token->type = TOKEN_OPERATOR;
 			}
 			else
-			{
 				token->type = TOKEN_UNDEFINED;
-				Assert (! isType (token, TOKEN_UNDEFINED));
-			}
 			break;
 	}
 }
