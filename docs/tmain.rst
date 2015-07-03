@@ -33,6 +33,7 @@ In the example, *Tmain* does:
 2. capture stdout, stderr and exit status, and
 3. compare them with `stdout-expected.txt`, `stderr-expected.txt`,
    and `exit-expected.txt`.
+4. compares it with `tags-expected.txt` if run.sh generates `tags` file.
 
 See also `tmain_run` and `tmain_compare` functions in `misc/units`.
 

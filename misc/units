@@ -1663,7 +1663,11 @@ tmain_run ()
 	) > ${subdir}/stdout-actual.txt 2> ${subdir}/stderr-actual.txt
 	echo $? > ${subdir}/exit-actual.txt
 
-	for aspect in stdout stderr exit; do
+	if [ -f ${subdir}/tags ]; then
+	    mv ${subdir}/tags ${subdir}/tags-actual.txt
+	fi
+
+	for aspect in stdout stderr exit tags; do
 	    if [ -f ${subdir}/${aspect}-expected.txt ]; then
 		engine=compare
 		if tmain_${engine} ${subdir} ${aspect}; then
@@ -1672,10 +1676,11 @@ tmain_run ()
 		    failed="${failed} ${test_name}/${aspect}-${engine}"
 		    status=1
 		fi
-	    else
-		rm ${subdir}/${aspect}-actual.txt
+	    elif [ -f ${subdir}/${aspect}-actual.txt ]; then
+		     rm ${subdir}/${aspect}-actual.txt
 	    fi
 	done
+
 	echo
     done
 
