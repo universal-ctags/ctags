@@ -527,6 +527,9 @@ extern int main (int __unused__ argc, char **argv)
 	freeParserResources ();
 	freeRegexResources ();
 	freeXcmdResources ();
+#ifdef HAVE_ICONV
+	freeEncodingResources ();
+#endif
 
 	if (Option.printLanguage)
 		return (Option.printLanguage == TRUE)? 0: 1;

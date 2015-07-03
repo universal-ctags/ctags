@@ -157,6 +157,10 @@ optionValues Option = {
 	NULL,		/* --config-filename */
 	NULL,       /* --etags-include */
 	DEFAULT_FILE_FORMAT,/* --format */
+#ifdef HAVE_ICONV
+	NULL,		/* --input-encoding */
+	NULL,		/* --output-encoding */
+#endif
 	FALSE,      /* --if0 */
 	TRUE,       /* --undef */
 	FALSE,      /* --kind-long */
@@ -230,6 +234,12 @@ static optionDescription LongOptionDescription [] = {
  {1,"      Include reference to 'file' in Emacs-style tag file (requires -e)."},
  {1,"  --exclude=pattern"},
  {1,"      Exclude files and directories matching 'pattern'."},
+#ifdef HAVE_ICONV
+ {1,"  --input-encoding=encoding"},
+ {1,"      Specify encoding of all of source files."},
+ {1,"  --input-encoding-<LANG>=encoding"},
+ {1,"      Specify encoding of the LANG source files."},
+#endif
  {0,"  --excmd=number|pattern|mix"},
 #ifdef MACROS_USE_PATTERNS
  {0,"       Uses the specified type of EX command to locate tags [pattern]."},
@@ -302,6 +312,11 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of language mappings."},
  {1,"  --map-<LANG>=[+]map"},
  {1,"       Alternative version of --langmap option."},
+#ifdef HAVE_ICONV
+ {1,"  --output-encoding=encoding"},
+ {1,"      The encoding to write the tag file in. Defaults to UTF-8 if --input-encoding"},
+ {1,"      is specified, otherwise no conversion is performed."},
+#endif
  {1,"  --options=file"},
  {1,"       Specify file from which command line options should be read."},
  {0,"  --print-language"},
@@ -380,6 +395,9 @@ static const char *const Features [] = {
 #endif
 #if defined (WIN32) && defined (UNIX_PATH_SEPARATOR)
 	"unix-path-separator",
+#endif
+#ifdef HAVE_ICONV
+	"multibyte",
 #endif
 #ifdef DEBUG
 	"debug",
@@ -1072,6 +1090,29 @@ static void processFormatOption (
 	else
 		error (FATAL, "Unsupported value for \"%s\" option", option);
 }
+
+#ifdef HAVE_ICONV
+static void processInputEncodingOption(const char *const option,
+				const char *const parameter)
+{
+	if (Option.inputEncoding)
+		eFree (Option.inputEncoding);
+	else
+	{
+		if (!Option.outputEncoding)
+			Option.outputEncoding = eStrdup("UTF-8");
+	}
+	Option.inputEncoding = eStrdup(parameter);
+}
+
+static void processOutputEncodingOption(const char *const option,
+				const char *const parameter)
+{
+	if (Option.outputEncoding)
+		eFree (Option.outputEncoding);
+	Option.outputEncoding = eStrdup(parameter);
+}
+#endif
 
 static void printInvocationDescription (void)
 {
@@ -2034,6 +2075,10 @@ static parametricOption ParametricOptions [] = {
 	{ "filter-terminator",      processFilterTerminatorOption,  TRUE    },
 	{ "format",                 processFormatOption,            TRUE    },
 	{ "help",                   processHelpOption,              TRUE    },
+#ifdef HAVE_ICONV
+	{ "input-encoding",         processInputEncodingOption,     FALSE   },
+	{ "output-encoding",        processOutputEncodingOption,    FALSE   },
+#endif
 	{ "lang",                   processLanguageForceOption,     FALSE   },
 	{ "language",               processLanguageForceOption,     FALSE   },
 	{ "language-force",         processLanguageForceOption,     FALSE   },
@@ -2171,6 +2216,10 @@ static void processLongOption (
 		;
 	else if (processMapOption (option, parameter))
 		;
+#ifdef HAVE_ICONV
+	else if (processLanguageEncodingOption (option, parameter))
+		;
+#endif
 #ifndef RECURSE_SUPPORTED
 	else if (strcmp (option, "recurse") == 0)
 		error (WARNING, "%s option not supported on this host", option);

@@ -100,6 +100,10 @@ typedef struct sOptionValues {
 	char* configFilename;   /* --config-filename  use instead of 'ctags' in option file names */
 	stringList* etagsInclude;/* --etags-include  list of TAGS files to include*/
 	unsigned int tagFileFormat;/* --format  tag file format (level) */
+#ifdef HAVE_ICONV
+	char *inputEncoding;	/* --input-encoding	convert text into --output-encoding */
+	char *outputEncoding;	/* --output-encoding	write tags file as this encoding */
+#endif
 	boolean if0;            /* --if0  examine code within "#if 0" branch */
 	boolean undef;          /* --undef  generate a tag from #undef'd macros  */
 	boolean kindLong;       /* --kind-long */
@@ -158,6 +162,9 @@ extern void previewFirstOption (cookedArgs* const cargs);
 extern void readOptionConfiguration (void);
 extern void initOptions (void);
 extern void freeOptionResources (void);
+#ifdef HAVE_ICONV
+extern void freeEncodingResources (void);
+#endif
 
 extern vString* expandOnCorpusPathList (const char* leaf);
 extern vString* expandOnDriversPathList (const char* leaf);
