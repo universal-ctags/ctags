@@ -37,6 +37,8 @@ In the example, *Tmain* does:
 
 See also `tmain_run` and `tmain_compare` functions in `misc/units`.
 
+If run.sh exits with code 77, the test case is skipped.
+
 
 TODO
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
