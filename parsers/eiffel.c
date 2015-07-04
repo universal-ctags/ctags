@@ -19,7 +19,6 @@
 #include <string.h>
 #include <limits.h>
 #include <ctype.h>  /* to define tolower () */
-#include <setjmp.h>
 
 #include "debug.h"
 #include "keyword.h"
@@ -44,8 +43,6 @@
 /*
 *   DATA DECLARATIONS
 */
-
-typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
 
 /*  Used to specify type of keyword.
  */
@@ -79,6 +76,7 @@ typedef struct sKeywordDesc {
 } keywordDesc;
 
 typedef enum eTokenType {
+	TOKEN_EOF,
 	TOKEN_UNDEFINED,
 	TOKEN_BANG,
 	TOKEN_CHARACTER,
@@ -97,10 +95,8 @@ typedef enum eTokenType {
 	TOKEN_OPEN_BRACKET,
 	TOKEN_OPEN_PAREN,
 	TOKEN_OPERATOR,
-	TOKEN_OTHER,
 	TOKEN_QUESTION,
 	TOKEN_SEMICOLON,
-	TOKEN_SEPARATOR,
 	TOKEN_STRING,
 	TOKEN_TILDE
 } tokenType;
@@ -144,8 +140,6 @@ static kindOption EiffelKinds [] = {
 };
 
 #endif
-
-static jmp_buf Exception;
 
 static const keywordDesc EiffelKeywordTable [] = {
 	/* keyword          keyword ID */
@@ -652,7 +646,7 @@ getNextChar:
 
 	switch (c)
 	{
-		case EOF:  longjmp (Exception, (int)ExceptionEOF); break;
+		case EOF:  token->type = TOKEN_EOF;                break;
 		case ';':  token->type = TOKEN_SEMICOLON;          break;
 		case '!':  token->type = TOKEN_BANG;               break;
 		case '}':  token->type = TOKEN_CLOSE_BRACE;        break;
@@ -768,10 +762,7 @@ getNextChar:
 				token->type = TOKEN_OPERATOR;
 			}
 			else
-			{
 				token->type = TOKEN_UNDEFINED;
-				Assert (! isType (token, TOKEN_UNDEFINED));
-			}
 			break;
 	}
 }
@@ -787,16 +778,18 @@ static boolean isIdentifierMatch (
 		strcasecmp (vStringValue (token->string), name) == 0);
 }
 
-static void findToken (tokenInfo *const token, const tokenType type)
+static boolean findToken (tokenInfo *const token, const tokenType type)
 {
-	while (! isType (token, type))
+	while (! isType (token, type) && ! isType (token, TOKEN_EOF))
 		readToken (token);
+	return isType (token, type);
 }
 
-static void findKeyword (tokenInfo *const token, const keywordId keyword)
+static boolean findKeyword (tokenInfo *const token, const keywordId keyword)
 {
-	while (! isKeyword (token, keyword))
+	while (! isKeyword (token, keyword) && ! isType (token, TOKEN_EOF))
 		readToken (token);
+	return isKeyword (token, keyword);
 }
 
 static boolean parseType (tokenInfo *const token);
@@ -847,7 +840,7 @@ static void parseGeneric (tokenInfo *const token, boolean declaration __unused__
 #endif
 		else
 			parseType (token);
-	} while (depth > 0);
+	} while (depth > 0 && ! isType (token, TOKEN_EOF));
 }
 
 static boolean parseType (tokenInfo *const token)
@@ -908,7 +901,8 @@ static void parseLocal (tokenInfo *const token)
 	/*  Check keyword first in case local clause is empty
 	 */
 	while (! isKeyword (token, KEYWORD_do)  &&
-		   ! isKeyword (token, KEYWORD_once))
+		   ! isKeyword (token, KEYWORD_once) &&
+		   ! isType (token, TOKEN_EOF))
 	{
 #ifndef TYPE_REFERENCE_TOOL
 		if (isType (token, TOKEN_IDENTIFIER))
@@ -937,7 +931,7 @@ static void findFeatureEnd (tokenInfo *const token)
 		{
 			int depth = 1;
 
-			while (depth > 0)
+			while (depth > 0 && ! isType (token, TOKEN_EOF))
 			{
 #ifdef TYPE_REFERENCE_TOOL
 				if (isType (token, TOKEN_OPEN_BRACE))
@@ -1016,8 +1010,8 @@ static boolean readFeatureName (tokenInfo *const token)
 static void parseArguments (tokenInfo *const token)
 {
 #ifndef TYPE_REFERENCE_TOOL
-	findToken (token, TOKEN_CLOSE_PAREN);
-	readToken (token);
+	if (findToken (token, TOKEN_CLOSE_PAREN))
+		readToken (token);
 #else
 	Assert (isType (token, TOKEN_OPEN_PAREN));
 	readToken (token);
@@ -1027,7 +1021,8 @@ static void parseArguments (tokenInfo *const token)
 			parseEntityType (token);
 		else
 			readToken (token);
-	} while (! isType (token, TOKEN_CLOSE_PAREN));
+	} while (! isType (token, TOKEN_CLOSE_PAREN) &&
+	         ! isType (token, TOKEN_EOF));
 	readToken (token);
 #endif
 }
@@ -1082,7 +1077,8 @@ static void parseExport (tokenInfo *const token)
 	if (isType (token, TOKEN_OPEN_BRACE))
 	{
 		token->isExported = FALSE;
-		while (! isType (token, TOKEN_CLOSE_BRACE))
+		while (! isType (token, TOKEN_CLOSE_BRACE) &&
+		       ! isType (token, TOKEN_EOF))
 		{
 			if (isType (token, TOKEN_IDENTIFIER))
 				token->isExported |= !isIdentifierMatch (token, "NONE");
@@ -1108,7 +1104,8 @@ static void parseFeatureClauses (tokenInfo *const token)
 		}
 	} while (! isKeyword (token, KEYWORD_end) &&
 			 ! isKeyword (token, KEYWORD_invariant) &&
-			 ! isKeyword (token, KEYWORD_indexing));
+			 ! isKeyword (token, KEYWORD_indexing) &&
+			 ! isType (token, TOKEN_EOF));
 }
 
 static void parseRename (tokenInfo *const token)
@@ -1151,8 +1148,8 @@ static void parseInherit (tokenInfo *const token)
 				case KEYWORD_undefine:
 				case KEYWORD_redefine:
 				case KEYWORD_select:
-					findKeyword (token, KEYWORD_end);
-					readToken (token);
+					if (findKeyword (token, KEYWORD_end))
+						readToken (token);
 					break;
 
 				case KEYWORD_end:
@@ -1177,7 +1174,8 @@ static void parseConvert (tokenInfo *const token)
 			break;
 		else if (isType (token, TOKEN_OPEN_PAREN))
 		{
-			while (! isType (token, TOKEN_CLOSE_PAREN))
+			while (! isType (token, TOKEN_CLOSE_PAREN) &&
+			       ! isType (token, TOKEN_EOF))
 				readToken (token);
 		}
 		else if (isType (token, TOKEN_COLON))
@@ -1224,7 +1222,8 @@ static void parseClass (tokenInfo *const token)
 			case KEYWORD_convert:  parseConvert (token);        break;
 			default:               readToken (token);           break;
 		}
-	} while (! isKeyword (token, KEYWORD_end));
+	} while (! isKeyword (token, KEYWORD_end) &&
+	         ! isType (token, TOKEN_EOF));
 }
 
 static void initialize (const langType language)
@@ -1236,14 +1235,9 @@ static void initialize (const langType language)
 static void findEiffelTags (void)
 {
 	tokenInfo *const token = newToken ();
-	exception_t exception;
 
-	exception = (exception_t) (setjmp (Exception));
-	while (exception == ExceptionNone)
-	{
-		findKeyword (token, KEYWORD_class);
+	while (findKeyword (token, KEYWORD_class))
 		parseClass (token);
-	}
 	deleteToken (token);
 }
 
