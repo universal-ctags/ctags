@@ -30,6 +30,7 @@
 #include "options.h"
 #include "parse.h"
 #include "read.h"
+#include "trashbox.h"
 #endif
 
 /*
@@ -45,6 +46,10 @@
 *   DATA DECLARATIONS
 */
 
+static TrashBox* trash_box;
+#define P(new_object,destructor) trashBoxPut(trash_box, new_object, (TrashBoxDestroyItemProc)destructor)
+#define F(object) trashBoxFree(trash_box, object)
+#define B(object) (trashBoxTakeBack(trash_box, object));
 typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
 
 /*  Used to specify type of keyword.
@@ -612,6 +617,7 @@ static void copyToken (tokenInfo* dst, const tokenInfo *src)
 	vStringCopy (dst->featureName, src->featureName);
 }
 
+static void deleteToken (tokenInfo *const token);
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
@@ -624,7 +630,7 @@ static tokenInfo *newToken (void)
 	token->className = vStringNew ();
 	token->featureName = vStringNew ();
 
-	return token;
+	return P (token, deleteToken);
 }
 
 static void deleteToken (tokenInfo *const token)
@@ -770,7 +776,7 @@ getNextChar:
 			else
 			{
 				token->type = TOKEN_UNDEFINED;
-				Assert (! isType (token, TOKEN_UNDEFINED));
+				longjmp (Exception, (int)ExceptionEOF);
 			}
 			break;
 	}
@@ -886,7 +892,7 @@ static boolean parseType (tokenInfo *const token)
 				readToken (token);  /* read token after number of bits */
 		}
 	}
-	deleteToken (id);
+	F (id);
 	return TRUE;
 }
 
@@ -1233,18 +1239,23 @@ static void initialize (const langType language)
 	buildEiffelKeywordHash ();
 }
 
-static void findEiffelTags (void)
+static rescanReason findEiffelTags (const unsigned int passCount,
+				    jmp_buf *jbuf __unused__,
+				    TrashBox *tbox)
 {
-	tokenInfo *const token = newToken ();
+	tokenInfo *token;
 	exception_t exception;
 
+	trash_box = tbox;
+	token = newToken ();
 	exception = (exception_t) (setjmp (Exception));
 	while (exception == ExceptionNone)
 	{
 		findKeyword (token, KEYWORD_class);
 		parseClass (token);
 	}
-	deleteToken (token);
+	F (token);
+	return RESCAN_NONE;
 }
 
 #ifndef TYPE_REFERENCE_TOOL
@@ -1256,7 +1267,7 @@ extern parserDefinition* EiffelParser (void)
 	def->kinds      = EiffelKinds;
 	def->kindCount  = KIND_COUNT (EiffelKinds);
 	def->extensions = extensions;
-	def->parser     = findEiffelTags;
+	def->parser_with_gc = findEiffelTags;
 	def->initialize = initialize;
 	return def;
 }
