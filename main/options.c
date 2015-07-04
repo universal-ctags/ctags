@@ -101,7 +101,7 @@ typedef const struct {
 *   DATA DEFINITIONS
 */
 
-static boolean NonOptionEncountered;
+static boolean NonOptionEncountered = FALSE;
 static stringList *OptionFiles;
 
 typedef stringList searchPathList;
@@ -2053,7 +2053,7 @@ static parametricOption ParametricOptions [] = {
 	{ "sort",                   processSortOption,              TRUE    },
 	{ "version",                processVersionOption,           TRUE    },
 	{ "_echo",                  processEchoOption,              FALSE   },
-	{ "_force-quit",             processForceQuitOption,         TRUE    },
+	{ "_force-quit",            processForceQuitOption,         FALSE   },
 };
 
 static booleanOption BooleanOptions [] = {
@@ -2061,7 +2061,7 @@ static booleanOption BooleanOptions [] = {
 	{ "file-scope",     &Option.include.fileScope,      FALSE   },
 	{ "file-tags",      &Option.include.fileNames,      FALSE   },
 	{ "filter",         &Option.filter,                 TRUE    },
-	{ "guess-language-eagerly", &Option.guessLanguageEagerly, TRUE },
+	{ "guess-language-eagerly", &Option.guessLanguageEagerly, FALSE },
 	{ "if0",            &Option.if0,                    FALSE   },
 	{ "kind-long",      &Option.kindLong,               TRUE    },
 	{ "line-directives",&Option.lineDirectives,         FALSE   },
@@ -2081,10 +2081,10 @@ static booleanOption BooleanOptions [] = {
  *  Generic option parsing
  */
 
-static void checkOptionOrder (const char* const option)
+static void checkOptionOrder (const char* const option, boolean longOption)
 {
 	if (NonOptionEncountered)
-		error (FATAL, "-%s option may not follow a file name", option);
+		error (FATAL, "-%s%s option may not follow a file name", longOption? "-": "", option);
 }
 
 static boolean processParametricOption (
@@ -2101,7 +2101,7 @@ static boolean processParametricOption (
 		{
 			found = TRUE;
 			if (entry->initOnly)
-				checkOptionOrder (option);
+				checkOptionOrder (option, TRUE);
 			(entry->handler) (option, parameter);
 		}
 	}
@@ -2139,7 +2139,7 @@ static boolean processBooleanOption (
 		{
 			found = TRUE;
 			if (entry->initOnly)
-				checkOptionOrder (option);
+				checkOptionOrder (option, TRUE);
 			*entry->pValue = getBooleanOption (option, parameter);
 		}
 	}
@@ -2196,7 +2196,7 @@ static void processShortOption (
 			exit (0);
 			break;
 		case 'a':
-			checkOptionOrder (option);
+			checkOptionOrder (option, FALSE);
 			Option.append = TRUE;
 			break;
 #ifdef DEBUG
@@ -2215,12 +2215,12 @@ static void processShortOption (
 			Option.backward = TRUE;
 			break;
 		case 'e':
-			checkOptionOrder (option);
+			checkOptionOrder (option, FALSE);
 			setEtagsMode ();
 			break;
 		case 'f':
 		case 'o':
-			checkOptionOrder (option);
+			checkOptionOrder (option, FALSE);
 			if (Option.tagFileName != NULL)
 			{
 				error (WARNING,
@@ -2268,7 +2268,7 @@ static void processShortOption (
 #endif
 			break;
 		case 'u':
-			checkOptionOrder (option);
+			checkOptionOrder (option, FALSE);
 			Option.sorted = SO_UNSORTED;
 			break;
 		case 'V':
@@ -2278,7 +2278,7 @@ static void processShortOption (
 			/* silently ignored */
 			break;
 		case 'x':
-			checkOptionOrder (option);
+			checkOptionOrder (option, FALSE);
 			Option.xref = TRUE;
 			break;
 		default:
@@ -2307,7 +2307,6 @@ extern void parseOption (cookedArgs* const args)
 
 extern void parseOptions (cookedArgs* const args)
 {
-	NonOptionEncountered = FALSE;
 	while (! cArgOff (args)  &&  cArgIsOption (args))
 		parseOption (args);
 	if (! cArgOff (args)  &&  ! cArgIsOption (args))
