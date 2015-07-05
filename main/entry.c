@@ -1073,9 +1073,9 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	if (tag->name [0] == '\0')
 		error (WARNING, "ignoring null tag in %s", vStringValue (File.name));
 	else if (TagFile.cork)
-			r = queueTagEntry (tag);
+		r = queueTagEntry (tag);
 	else
-			writeTagEntry (tag);
+		writeTagEntry (tag);
 	return r;
 }
 
