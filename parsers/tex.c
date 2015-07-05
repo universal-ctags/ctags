@@ -453,8 +453,11 @@ static boolean parseTag (tokenInfo *const token, texKind kind)
 		if (useLongName)
 		{
 			vStringTerminate (fullname);
-			vStringCopy (name->string, fullname);
-			makeTexTag (name, kind);
+			if (vStringLength (fullname) > 0)
+			{
+				vStringCopy (name->string, fullname);
+				makeTexTag (name, kind);
+			}
 		}
 	}
 
