@@ -735,7 +735,8 @@ static void addToScope (tokenInfo* const token, vString* const extra)
  *	 Scanning functions
  */
 
-static boolean findCmdTerm (tokenInfo *const token, boolean include_newlines)
+static boolean findCmdTerm (tokenInfo *const token, boolean include_newlines,
+                            boolean include_commas)
 {
 	/*
 	 * Read until we find either a semicolon or closing brace.
@@ -743,6 +744,7 @@ static boolean findCmdTerm (tokenInfo *const token, boolean include_newlines)
 	 */
 	while (! isType (token, TOKEN_SEMICOLON) &&
 		   ! isType (token, TOKEN_CLOSE_CURLY) &&
+		   ! (include_commas && isType (token, TOKEN_COMMA)) &&
 		   ! isType (token, TOKEN_EOF))
 	{
 		/* Handle nested blocks */
@@ -970,7 +972,7 @@ static boolean parseIf (tokenInfo *const token, tokenInfo *const parent)
 	{
 		/* The next token should only be read if this statement had its own
 		 * terminator */
-		read_next_token = findCmdTerm (token, TRUE);
+		read_next_token = findCmdTerm (token, TRUE, FALSE);
 	}
 	return read_next_token;
 }
@@ -1013,7 +1015,7 @@ static void parseFunction (tokenInfo *const token)
 			makeFunctionTag (name, signature);
 	}
 
-	findCmdTerm (token, FALSE);
+	findCmdTerm (token, FALSE, FALSE);
 
 	vStringDelete (signature);
 	deleteToken (name);
@@ -1228,7 +1230,7 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 		}
 	} while ( isType(token, TOKEN_COMMA) );
 
-	findCmdTerm (token, FALSE);
+	findCmdTerm (token, FALSE, FALSE);
 
 cleanUp:
 	deleteToken (name);
@@ -1299,6 +1301,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 		readToken(token);
 	}
 
+nextVar:
 	if ( isKeyword(token, KEYWORD_this) )
 	{
 		readToken(token);
@@ -1313,6 +1316,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 	while (! isType (token, TOKEN_CLOSE_CURLY) &&
 	       ! isType (token, TOKEN_SEMICOLON)   &&
 	       ! isType (token, TOKEN_EQUAL_SIGN)  &&
+	       ! isType (token, TOKEN_COMMA)       &&
 	       ! isType (token, TOKEN_EOF))
 	{
 		if (isType (token, TOKEN_OPEN_CURLY))
@@ -1430,7 +1434,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 							/*
 							 * Find to the end of the statement
 							 */
-							findCmdTerm (token, FALSE);
+							findCmdTerm (token, FALSE, FALSE);
 							token->ignoreTag = FALSE;
 							is_terminated = TRUE;
 							goto cleanUp;
@@ -1467,7 +1471,8 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 		goto cleanUp;
 	}
 
-	if ( isType (token, TOKEN_SEMICOLON) )
+	if ( isType (token, TOKEN_SEMICOLON) ||
+	     isType (token, TOKEN_COMMA) )
 	{
 		/*
 		 * Only create variables for global scope
@@ -1478,14 +1483,18 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 			 * Handles this syntax:
 			 *	   var g_var2;
 			 */
-			if (isType (token, TOKEN_SEMICOLON))
-				makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
+			makeJsTag (name, is_const ? JSTAG_CONSTANT : JSTAG_VARIABLE, NULL);
 		}
 		/*
 		 * Statement has ended.
 		 * This deals with calls to functions, like:
 		 *     alert(..);
 		 */
+		if (isType (token, TOKEN_COMMA))
+		{
+			readToken (token);
+			goto nextVar;
+		}
 		goto cleanUp;
 	}
 
@@ -1742,7 +1751,13 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 		 *	   return 1;
 		 * }
 		 */
-		is_terminated = findCmdTerm (token, TRUE);
+		is_terminated = findCmdTerm (token, TRUE, TRUE);
+		/* if we're at a comma, try and read a second var */
+		if (isType (token, TOKEN_COMMA))
+		{
+			readToken (token);
+			goto nextVar;
+		}
 	}
 
 cleanUp:
@@ -1839,7 +1854,7 @@ static boolean parseLine (tokenInfo *const token, tokenInfo *const parent, boole
 				parseSwitch (token);
 				break;
 			case KEYWORD_return:
-				is_terminated = findCmdTerm (token, TRUE);
+				is_terminated = findCmdTerm (token, TRUE, FALSE);
 				break;
 			default:
 				is_terminated = parseStatement (token, parent, is_inside_class);

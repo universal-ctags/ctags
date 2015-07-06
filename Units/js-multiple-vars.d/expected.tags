@@ -1,0 +1,23 @@
+A	input.js	/^const A, B;$/;"	C
+B	input.js	/^const A, B;$/;"	C
+C	input.js	/^const C = 1, D = 2;$/;"	C
+D	input.js	/^const C = 1, D = 2;$/;"	C
+a	input.js	/^var a, b;$/;"	v
+b	input.js	/^var a, b;$/;"	v
+c	input.js	/^let c, d;$/;"	v
+d	input.js	/^let c, d;$/;"	v
+e	input.js	/^var e = 2, f = 3;$/;"	v
+f	input.js	/^var e = 2, f = 3;$/;"	v
+func1	input.js	/^var func1=function() { return 1; }, func2=function() { return 2; }$/;"	f
+func2	input.js	/^var func1=function() { return 1; }, func2=function() { return 2; }$/;"	f
+g	input.js	/^let g = 4, h = 5;$/;"	v
+h	input.js	/^let g = 4, h = 5;$/;"	v
+i	input.js	/^var i,$/;"	v
+j	input.js	/^    j,$/;"	v
+k	input.js	/^    k;$/;"	v
+l	input.js	/^var l = 2,$/;"	v
+m	input.js	/^    m = 2,$/;"	v
+n	input.js	/^    n = 2;$/;"	v
+o	input.js	/^var o = 2,$/;"	v
+p	input.js	/^    p = 3$/;"	v
+q	input.js	/^var q = 4$/;"	v
