@@ -16,7 +16,6 @@
 #include <string.h>
 #include <limits.h>
 #include <ctype.h>  /* to define tolower () */
-#include <setjmp.h>
 
 #include "debug.h"
 #include "entry.h"
@@ -45,9 +44,6 @@ static TrashBox* trash_box;
 #define P(new_object,destructor) trashBoxPut(trash_box, new_object, (TrashBoxDestroyItemProc)destructor)
 #define F(object) trashBoxFree(trash_box, object)
 #define B(object) (trashBoxTakeBack(trash_box, object));
-typedef enum eException {
-	ExceptionNone, ExceptionEOF, ExceptionFixedFormat, ExceptionLoop
-} exception_t;
 
 /*  Used to designate type of line read in fixed source form.
  */
@@ -160,6 +156,7 @@ typedef struct sKeywordDesc {
 
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
+	TOKEN_EOF,
 	TOKEN_COMMA,
 	TOKEN_DOUBLE_COLON,
 	TOKEN_IDENTIFIER,
@@ -224,10 +221,10 @@ typedef struct sTokenInfo {
 */
 
 static langType Lang_fortran;
-static jmp_buf Exception;
 static int Ungetc;
 static unsigned int Column;
 static boolean FreeSourceForm;
+static boolean FreeSourceFormFound = FALSE;
 static boolean ParsingString;
 
 /* indexed by tagType */
@@ -708,7 +705,7 @@ static int getFixedFormChar (void)
 		{
 			const int c2 = fileGetc ();
 			if (c2 == '\n')
-				longjmp (Exception, (int) ExceptionFixedFormat);
+				FreeSourceFormFound = TRUE;
 			else
 				fileUngetc (c2);
 		}
@@ -720,8 +717,9 @@ static int getFixedFormChar (void)
 		{
 			case LTYPE_UNDETERMINED:
 			case LTYPE_INVALID:
-				longjmp (Exception, (int) ExceptionFixedFormat);
-				break;
+				FreeSourceFormFound = TRUE;
+				if (! FreeSourceForm)
+				    return EOF;
 
 			case LTYPE_SHORT: break;
 			case LTYPE_COMMENT: skipLine (); break;
@@ -921,10 +919,8 @@ static void parseString (vString *const string, const int delimiter)
 	{
 		verbose ("%s: unterminated character string at line %lu\n",
 				getInputFileName (), inputLineNumber);
-		if (c == EOF)
-			longjmp (Exception, (int) ExceptionEOF);
-		else if (! FreeSourceForm)
-			longjmp (Exception, (int) ExceptionFixedFormat);
+		if (c != EOF && ! FreeSourceForm)
+			FreeSourceFormFound = TRUE;
 	}
 	vStringTerminate (string);
 	ParsingString = FALSE;
@@ -1026,7 +1022,7 @@ getNextChar:
 
 	switch (c)
 	{
-		case EOF:  longjmp (Exception, (int) ExceptionEOF);  break;
+		case EOF:  token->type = TOKEN_EOF;         break;
 		case ' ':  goto getNextChar;
 		case '\t': goto getNextChar;
 		case ',':  token->type = TOKEN_COMMA;       break;
@@ -1144,7 +1140,8 @@ static void readSubToken (tokenInfo *const token)
 static void skipToToken (tokenInfo *const token, tokenType type)
 {
 	while (! isType (token, type) && ! isType (token, TOKEN_STATEMENT_END) &&
-			!(token->secondary != NULL && isType (token->secondary, TOKEN_STATEMENT_END)))
+			!(token->secondary != NULL && isType (token->secondary, TOKEN_STATEMENT_END)) &&
+			! isType (token, TOKEN_EOF))
 		readToken (token);
 }
 
@@ -1184,7 +1181,7 @@ static void skipOverPairsFull (tokenInfo *const token,
 		else if (token_cb)
 			token_cb (token, user_data);
 		readToken (token);
-	} while (level > 0);
+	} while (level > 0 && !isType (token, TOKEN_EOF));
 }
 
 static void skipOverParensFull (tokenInfo *const token,
@@ -1553,7 +1550,8 @@ static void parseEntityDecl (tokenInfo *const token,
 				 strcmp (vStringValue (token->string), "=>") == 0)
 		{
 			while (! isType (token, TOKEN_COMMA) &&
-					! isType (token, TOKEN_STATEMENT_END))
+					! isType (token, TOKEN_STATEMENT_END) &&
+					! isType (token, TOKEN_EOF))
 			{
 				readToken (token);
 				/* another coarray check, for () and [] */
@@ -1649,7 +1647,8 @@ static void parseCommonNamelistStmt (tokenInfo *const token, tagType type)
 			skipOverParens (token);  /* skip explicit-shape-spec-list */
 		if (isType (token, TOKEN_COMMA))
 			readToken (token);
-	} while (! isType (token, TOKEN_STATEMENT_END));
+	} while (! isType (token, TOKEN_STATEMENT_END) &&
+			 ! isType (token, TOKEN_EOF));
 	skipToNextStatement (token);
 }
 
@@ -1669,7 +1668,8 @@ static void parseMap (tokenInfo *const token)
 {
 	Assert (isKeyword (token, KEYWORD_map));
 	skipToNextStatement (token);
-	while (! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_end) &&
+		   ! isType (token, TOKEN_EOF))
 		parseFieldDefinition (token);
 	readSubToken (token);
 	/* should be at KEYWORD_map token */
@@ -1775,7 +1775,8 @@ static void parseStructureStmt (tokenInfo *const token)
 	}
 	skipToNextStatement (token);
 	ancestorPush (name);
-	while (! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_end) &&
+		   ! isType (token, TOKEN_EOF))
 		parseFieldDefinition (token);
 	readSubToken (token);
 	/* secondary token should be KEYWORD_structure token */
@@ -1936,7 +1937,8 @@ static void parseDerivedTypeDef (tokenInfo *const token)
 	{
 		skipToNextStatement (token);
 	}
-	while (! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_end) &&
+		   ! isType (token, TOKEN_EOF))
 	{
 		if (isTypeSpec (token))
 			parseComponentDefStmt (token);
@@ -2000,7 +2002,8 @@ static void parseInterfaceBlock (tokenInfo *const token)
 		name->tag = TAG_INTERFACE;
 	}
 	ancestorPush (name);
-	while (! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_end) &&
+		   ! isType (token, TOKEN_EOF))
 	{
 		switch (token->keyword)
 		{
@@ -2205,7 +2208,8 @@ static void parseBlockData (tokenInfo *const token)
 	ancestorPush (token);
 	skipToNextStatement (token);
 	parseSpecificationPart (token);
-	while (! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_end) &&
+		   ! isType (token, TOKEN_EOF))
 		skipToNextStatement (token);
 	readSubToken (token);
 	/* secondary token should be KEYWORD_NONE or KEYWORD_block token */
@@ -2244,7 +2248,7 @@ static void parseInternalSubprogramPart (tokenInfo *const token)
 					readToken (token);
 				break;
 		}
-	} while (! done);
+	} while (! done && ! isType (token, TOKEN_EOF));
 }
 
 /*  module is
@@ -2273,7 +2277,8 @@ static void parseModule (tokenInfo *const token)
 	parseSpecificationPart (token);
 	if (isKeyword (token, KEYWORD_contains))
 		parseInternalSubprogramPart (token);
-	while (! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_end) &&
+		   ! isType (token, TOKEN_EOF))
 		skipToNextStatement (token);
 	readSubToken (token);
 	/* secondary token should be KEYWORD_NONE or KEYWORD_module token */
@@ -2297,7 +2302,7 @@ static boolean parseExecutionPart (tokenInfo *const token)
 {
 	boolean result = FALSE;
 	boolean done = FALSE;
-	while (! done)
+	while (! done && ! isType (token, TOKEN_EOF))
 	{
 		switch (token->keyword)
 		{
@@ -2482,7 +2487,7 @@ static void parseProgramUnit (tokenInfo *const token)
 				}
 				break;
 		}
-	} while (TRUE);
+	} while (! isType (token, TOKEN_EOF));
 }
 
 static rescanReason findFortranTags (const unsigned int passCount,
@@ -2490,7 +2495,6 @@ static rescanReason findFortranTags (const unsigned int passCount,
 				     TrashBox *tbox)
 {
 	tokenInfo *token;
-	exception_t exception;
 	rescanReason rescan;
 
 	Assert (passCount < 3);
@@ -2501,10 +2505,8 @@ static rescanReason findFortranTags (const unsigned int passCount,
 
 	FreeSourceForm = (boolean) (passCount > 1);
 	Column = 0;
-	exception = (exception_t) setjmp (Exception);
-	if (exception == ExceptionEOF)
-		rescan = RESCAN_NONE;
-	else if (exception == ExceptionFixedFormat  &&  ! FreeSourceForm)
+	parseProgramUnit (token);
+	if (FreeSourceFormFound  &&  ! FreeSourceForm)
 	{
 		verbose ("%s: not fixed source form; retry as free source form\n",
 				getInputFileName ());
@@ -2512,7 +2514,6 @@ static rescanReason findFortranTags (const unsigned int passCount,
 	}
 	else
 	{
-		parseProgramUnit (token);
 		rescan = RESCAN_NONE;
 	}
 	ancestorClear ();
