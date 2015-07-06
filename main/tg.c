@@ -11,7 +11,9 @@
  *
  */
 
+#ifndef TG_MAIN
 #include "general.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
