@@ -644,7 +644,7 @@ static void parseShortOption (cookedArgs *const args)
 {
 	args->simple [0] = *args->shortOptions++;
 	args->simple [1] = '\0';
-	args->item = args->simple;
+	args->item = eStrdup (args->simple);
 	if (! isCompoundOption (*args->simple))
 		args->parameter = "";
 	else if (*args->shortOptions == '\0')
@@ -676,7 +676,6 @@ static void parseLongOption (cookedArgs *const args, const char *item)
 		args->item = eStrndup (item, equal - item);
 		args->parameter = equal + 1;
 	}
-	trashBoxPut (args->trashBox, args->item, (TrashBoxDestroyItemProc)eFree);
 	Assert (args->item != NULL);
 	Assert (args->parameter != NULL);
 }
@@ -710,7 +709,7 @@ static void cArgRead (cookedArgs *const current)
 		{
 			current->isOption = FALSE;
 			current->longOption = FALSE;
-			current->item = item;
+			current->item = eStrdup (item);
 			current->parameter = NULL;
 		}
 	}
@@ -721,7 +720,6 @@ extern cookedArgs* cArgNewFromString (const char* string)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromString (string);
-	result->trashBox = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -731,7 +729,6 @@ extern cookedArgs* cArgNewFromArgv (char* const* const argv)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromArgv (argv);
-	result->trashBox = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -741,7 +738,6 @@ extern cookedArgs* cArgNewFromFile (FILE* const fp)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromFile (fp);
-	result->trashBox = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -751,7 +747,6 @@ extern cookedArgs* cArgNewFromLineFile (FILE* const fp)
 	cookedArgs* const result = xMalloc (1, cookedArgs);
 	memset (result, 0, sizeof (cookedArgs));
 	result->args = argNewFromLineFile (fp);
-	result->trashBox = trashBoxNew ();
 	cArgRead (result);
 	return result;
 }
@@ -760,7 +755,8 @@ extern void cArgDelete (cookedArgs* const current)
 {
 	Assert (current != NULL);
 	argDelete (current->args);
-	trashBoxDelete (current->trashBox);
+	if (current->item != NULL)
+		eFree (current->item);
 	memset (current, 0, sizeof (cookedArgs));
 	eFree (current);
 }
@@ -796,6 +792,8 @@ extern void cArgForth (cookedArgs* const current)
 {
 	Assert (current != NULL);
 	Assert (! cArgOff (current));
+	if (current->item != NULL)
+		eFree (current->item);
 	if (cArgOptionPending (current))
 		parseShortOption (current);
 	else
