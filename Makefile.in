@@ -38,7 +38,7 @@ endif
 DEFS	= @DEFS@
 CPPFLAGS = @CPPFLAGS@
 CFLAGS	= @CFLAGS@
-LDFLAGS	= @LDFLAGS@
+LDFLAGS	= @LDFLAGS@ $(COVERAGE_LDFLAGS)
 LIBOBJS = @LIBOBJS@
 LIBS	= @LIBS@
 EXEEXT	= @EXEEXT@
@@ -59,7 +59,12 @@ TINST_ROOT=tinst-root
 #CFLAGS	= -O
 #LDFLAGS=
 
-ALL_CFLAGS = $(CFLAGS) -Wall
+ifdef COVERAGE
+COVERAGE_CFLAGS=--coverage
+COVERAGE_LDFLAGS=--coverage
+endif
+
+ALL_CFLAGS = $(CFLAGS) -Wall $(COVERAGE_CFLAGS)
 
 DEBUG_CPPFLAGS ?= -DDEBUG
 ALL_CPPFLAGS = $(CPPFLAGS)			\
@@ -336,9 +341,10 @@ tags: $(CTAGS_EXEC)
 TAGS: $(CTAGS_EXEC)
 	./$(CTAGS_EXEC) -e $(srcdir)/*
 
-clean: clean-units
+clean: clean-units clean-gcov
 	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB) 
 	rm -f etyperef$(EXEEXT) etyperef.$(OBJEXT)
+	rm -f $(SOURCES:.c=.gcno)
 
 mostlyclean: clean
 
@@ -376,7 +382,7 @@ ifdef TRAVIS
 SHOW_DIFF_OUTPUT=--show-diff-output
 endif
 
-.PHONY: check units fuzz noise clean-units
+.PHONY: check units fuzz noise clean-units clean-gcov
 check: units
 
 #
@@ -448,5 +454,16 @@ tinst:
 #
 codecheck:
 	$(SHELL) misc/src-check
+
+#
+# Report coverage (usable only if ctags is built with COVERAGE=1.)
+#
+run-gcov:
+	$(CTAGS_TEST) -o - $$(find ./Units -name 'input.*'| grep -v '.*b/.*') > /dev/null
+	gcov $$(find -name '*.gcda')
+
+clean-gcov:
+	rm -f $(SOURCES:.c=.gcda)
+	rm -f $(srcdir)/*.gcov
 
 # vi:set tabstop=8:

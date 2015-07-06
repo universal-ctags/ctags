@@ -2,6 +2,7 @@
 test.*.diff
 *.gcno
 *.gcda
+*.gcov
 *.o
 *.od
 *.obj
