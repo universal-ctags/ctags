@@ -216,9 +216,6 @@
     <ClCompile Include="..\main\tg.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\trashbox.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\main\vstring.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -273,9 +270,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\tg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\main\trashbox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\vstring.h">

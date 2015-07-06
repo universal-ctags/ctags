@@ -1124,7 +1124,7 @@ extern void initializeParsing (void)
 				accepted = TRUE;
 #endif
 			}
-			else if (((!!def->parser) + (!!def->parser2) + (!!def->parser_with_gc)) != 1)
+			else if (((!!def->parser) + (!!def->parser2)) != 1)
 				error (FATAL,
 		"%s parser definition must define one and only one parsing routine\n",
 					   def->name);
@@ -1689,20 +1689,6 @@ static rescanReason createTagsForFile (
 			lang->parser ();
 		else if (lang->parser2 != NULL)
 			rescan = lang->parser2 (passCount);
-		else if (lang->parser_with_gc != NULL)
-		{
-			TrashBox* trash_box = trashBoxNew ();
-			jmp_buf jbuf;
-
-			while (!setjmp (jbuf))
-			{
-				trashBoxDelete (trash_box);
-				trash_box = trashBoxNew ();
-				rescan = lang->parser_with_gc (passCount, &jbuf, trash_box);
-				break;
-			}
-			trashBoxDelete (trash_box);
-		}
 		else if (lang->initialize != NULL)
 		{
 			parserInitialize init = lang->initialize;

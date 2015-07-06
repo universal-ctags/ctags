@@ -15,7 +15,6 @@
 #include "general.h"  /* must always come first */
 #include "parsers.h"  /* contains list of parsers */
 #include "strlist.h"
-#include "trashbox.h"
 
 /* Definitions are in option.h but don't include option.h here to avoid
    recursive inclusion. */
@@ -43,9 +42,6 @@ typedef enum {
 typedef void (*createRegexTag) (const vString* const name);
 typedef void (*simpleParser) (void);
 typedef rescanReason (*rescanParser) (const unsigned int passCount);
-typedef rescanReason (*rescanParserWithExceptionAndTrash) (const unsigned int passCount,
-							   jmp_buf *jbuf,
-							   TrashBox *tbox);
 typedef void (*parserInitialize) (langType language);
 typedef void (*parserFinalize) (langType language);
 
@@ -105,7 +101,6 @@ typedef struct {
 	parserFinalize finalize;       /* finalize routine, if needed */
 	simpleParser parser;           /* simple parser (common case) */
 	rescanParser parser2;          /* rescanning parser (unusual case) */
-	rescanParserWithExceptionAndTrash parser_with_gc;          /* rescanning parser (unusual case) */
 	unsigned int method;           /* See PARSE__... definitions above */
 	tgTableEntry *tgEntries;
 	boolean useCork;
