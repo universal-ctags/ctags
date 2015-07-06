@@ -122,7 +122,7 @@ struct sKind {
 typedef struct {
 	vString *path;
 	struct sKind *kinds;
-	unsigned int kount;
+	unsigned int n_kinds;
 	boolean available;
 	unsigned int id;	/* not used yet */
 } xcmdPath;
@@ -150,7 +150,7 @@ static void clearPathSet (const langType language)
 			vStringDelete (p->path);
 			p->path = NULL;
 			p->available = FALSE;
-			for (k = 0; k < p->kount; k++)
+			for (k = 0; k < p->n_kinds; k++)
 			{
 				struct sKind* kind = &(p->kinds[k]);
 
@@ -187,8 +187,8 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 		return FALSE;
 	}
 
-	path->kinds = xRealloc (path->kinds, path->kount + 1, struct sKind);
-	kind = &path->kinds [path->kount];
+	path->kinds = xRealloc (path->kinds, path->n_kinds + 1, struct sKind);
+	kind = &path->kinds [path->n_kinds];
 	kind->enabled = TRUE;
 	kind->letter = line[0];
 	kind->name = NULL;
@@ -244,7 +244,7 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 		}
 	}
 
-	path->kount += 1;
+	path->n_kinds += 1;
 	return TRUE;
 }
 
@@ -300,7 +300,7 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 			if (!loadPathKind (path, line, argv))
 				break;
 
-			kind_letter = path->kinds [path->kount - 1].letter;
+			kind_letter = path->kinds [path->n_kinds - 1].letter;
 			if (kind_letter == file_kind)
 				error (FATAL,
 				       "Kind letter \'%c\' returned from xcmd %s of %s language is reserved in ctags main",
@@ -357,7 +357,7 @@ static void foreachXcmdKinds (const langType language,
 			if (!path[i].available)
 				continue;
 
-			for (k = 0; k < path[i].kount; k++)
+			for (k = 0; k < path[i].n_kinds; k++)
 				if (func (& (path[i].kinds[k]), data))
 					break;
 		}
@@ -478,7 +478,7 @@ static void printXcmdKind (xcmdPath *path, unsigned int i, boolean indent)
 	if (!path[i].available)
 		return;
 
-	for (k = 0; k < path[i].kount; k++)
+	for (k = 0; k < path[i].n_kinds; k++)
 	{
 		const struct sKind *const kind = path[i].kinds + k;
 		printf ("%s%c  %s %s\n", indentation,
@@ -538,7 +538,7 @@ extern void addTagXcmd (const langType language, vString* pathvstr)
 	path = &set->paths [set->count];
 	path->path = pathvstr;
 	path->kinds = NULL;
-	path->kount = 0;
+	path->n_kinds = 0;
 	path->id = set->count;
 
 	set->count += 1;
@@ -601,7 +601,7 @@ static const char* lookupKindName  (char kind_letter, const xcmdPath* const path
 	unsigned int k;
 	struct sKind *kind;
 
-	for (k = 0; k < path->kount; k++)
+	for (k = 0; k < path->n_kinds; k++)
 	{
 		kind = path->kinds + k;
 		if (kind->letter == kind_letter)
@@ -617,7 +617,7 @@ static const char* lookupKindLetter (const char* const kind_name, const xcmdPath
 	unsigned int k;
 	struct sKind *kind;
 
-	for (k = 0; k < path->kount; k++)
+	for (k = 0; k < path->n_kinds; k++)
 	{
 		kind = path->kinds + k;
 		if (kind->name && (!strcmp(kind->name, kind_name)))
@@ -670,7 +670,7 @@ static boolean isKindEnabled (xcmdPath* path, const char* value)
 	Assert (value);
 	Assert (*value);
 
-	for (k = 0; k < path->kount; k++)
+	for (k = 0; k < path->n_kinds; k++)
 	{
 		kind = path->kinds + k;
 		if (!kind->enabled)
