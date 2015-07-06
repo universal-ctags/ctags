@@ -1472,6 +1472,7 @@ nextVar:
 	}
 
 	if ( isType (token, TOKEN_SEMICOLON) ||
+	     isType (token, TOKEN_EOF) ||
 	     isType (token, TOKEN_COMMA) )
 	{
 		/*
