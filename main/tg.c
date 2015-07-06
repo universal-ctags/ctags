@@ -281,36 +281,6 @@ int tgCompare(const unsigned char *a, const unsigned char *b, const unsigned cha
 #ifdef TG_MAIN
 #include <errno.h>
 
-/*
- *
- *
- * 0. help
- * ----------------------
- *
- *    $ tg help
- *    $ tg --help|-h
- *
- *
- * 1. Generate table
- * -----------------
- *
- *    $ tg [--debug] [--prefix SOMETHING] generate FILE
- *
- *
- *    The output C code must be able to use as tg_field of parser def.
- *
- *
- * 2. Compare files
- * ----------------------
- *
- *    $ tg [--debug] compare A B C
- *
- *
- *    Print A if file A is similar than file C.
- *    Print B if file B is similar than file C.
- *
- *
- */
 static int   M_debug;
 static char* G_prefix = "_";
 
