@@ -1,0 +1,5 @@
+Because the input is invalid as D lagnauge source code.
+For this input parser cannot build proper scope information.
+
+expected.tags in this directory is just placeholder. Nothing is
+expected for invalid input.

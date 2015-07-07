@@ -1278,9 +1278,10 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 	}
 }
 
-static void findScopeHierarchy (vString *const string,
-								const statementInfo *const st)
+static boolean findScopeHierarchy (vString *const string, const statementInfo *const st)
 {
+	boolean found = FALSE;
+
 	vStringClear (string);
 	if (isType (st->context, TOKEN_NAME))
 		vStringCopy (string, st->context->name);
@@ -1300,9 +1301,16 @@ static void findScopeHierarchy (vString *const string,
 					continue;
 				}
 
+				found = TRUE;
 				vStringCopy (temp, string);
 				vStringClear (string);
-				Assert (isType (s->blockName, TOKEN_NAME));
+				if (! isType (s->blockName, TOKEN_NAME))
+				{
+					/* Information for building scope string
+					   is lacking. Maybe input is broken. */
+					found = FALSE;
+					break;
+				}
 				if (isType (s->context, TOKEN_NAME) &&
 					vStringLength (s->context->name) > 0)
 				{
@@ -1317,6 +1325,7 @@ static void findScopeHierarchy (vString *const string,
 		}
 		vStringDelete (temp);
 	}
+	return found;
 }
 
 static void makeExtraTagEntry (const tagType type, tagEntryInfo *const e,
@@ -1364,6 +1373,7 @@ static void makeTag (const tokenInfo *const token,
 		includeTag (type, isFileScope))
 	{
 		vString *scope = vStringNew ();
+		boolean isScopeBuilt;
 		/* Use "typeRef" to store the typename from addOtherFields() until
 		 * it's used in makeTagEntry().
 		 */
@@ -1378,11 +1388,12 @@ static void makeTag (const tokenInfo *const token,
 		e.kindName		= tagName (type);
 		e.kind			= tagLetter (type);
 
-		findScopeHierarchy (scope, st);
+		isScopeBuilt = findScopeHierarchy (scope, st);
 		addOtherFields (&e, type, st, scope, typeRef);
 
 		makeTagEntry (&e);
-		makeExtraTagEntry (type, &e, scope);
+		if (isScopeBuilt)
+			makeExtraTagEntry (type, &e, scope);
 		vStringDelete (scope);
 		vStringDelete (typeRef);
 	}
