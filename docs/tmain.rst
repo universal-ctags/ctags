@@ -29,11 +29,12 @@ the details here.
 To write a test case, see files under `Tmain/tmain-example.d`.
 In the example, *Tmain* does:
 
-1. run `run.sh` with `bash`,
-2. capture stdout, stderr and exit status, and
-3. compare them with `stdout-expected.txt`, `stderr-expected.txt`,
+1. runs new subshell and change the working directory to `Tmain/tmain-example.d`,
+2. runs `run.sh` with `bash`,
+3. captures stdout, stderr and exit status, and
+4. compares them with `stdout-expected.txt`, `stderr-expected.txt`,
    and `exit-expected.txt`.
-4. compares it with `tags-expected.txt` if run.sh generates `tags` file.
+5. compares it with `tags-expected.txt` if run.sh generates `tags` file.
 
 See also `tmain_run` and `tmain_compare` functions in `misc/units`.
 
