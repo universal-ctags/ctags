@@ -13,6 +13,8 @@
 #include "general.h"  /* must always come first */
 
 #include <ctype.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <stdarg.h>
 
 #include "debug.h"
@@ -104,6 +106,23 @@ extern void debugEntry (const tagEntryInfo *const tag)
 		printf ("#>");
 		fflush (stdout);
 	}
+}
+
+extern void debugAssert (const char *assertion, const char *file, unsigned int line, const char *function)
+{
+	fprintf(stderr, "ctags: %s:%u: %s%sAssertion `%s' failed.\n",
+	        file, line,
+	        function ? function : "", function ? ": " : "",
+	        assertion);
+	if (File.name)
+	{
+		fprintf(stderr, "ctags: %s:%u: parsing %s:%lu as %s\n",
+		        file, line,
+		        getSourceFileName(), getSourceLineNumber(),
+		        getSourceLanguageName());
+	}
+	fflush(stderr);
+	abort();
 }
 
 #endif

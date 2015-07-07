@@ -27,7 +27,19 @@
 # define debug(level)      ((Option.debugLevel & (long)(level)) != 0)
 # define DebugStatement(x) x
 # define PrintStatus(x)    if (debug(DEBUG_STATUS)) printf x;
-# define Assert(c)         assert(c)
+# ifdef NDEBUG
+#  define Assert(c)
+# else
+   /* based on glibc's assert.h __ASSERT_FUNCTION */
+#  if defined (__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 4))
+#   define ASSERT_FUNCTION __PRETTY_FUNCTION__
+#  elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
+#   define ASSERT_FUNCTION __func__
+#  else
+#   define ASSERT_FUNCTION ((const char*)0)
+#  endif
+#  define Assert(c) ((c) ? ((void)0) : debugAssert(#c, __FILE__, __LINE__, ASSERT_FUNCTION))
+# endif
 #else
 # define DebugStatement(x)
 # define PrintStatus(x)
@@ -62,6 +74,7 @@ extern void debugParseNest (const boolean increase, const unsigned int level);
 extern void debugCppNest (const boolean begin, const unsigned int level);
 extern void debugCppIgnore (const boolean ignore);
 extern void debugEntry (const tagEntryInfo *const tag);
+extern void debugAssert (const char *assertion, const char *file, unsigned int line, const char *function) attr__noreturn;
 
 #endif  /* _DEBUG_H */
 
