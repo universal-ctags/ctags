@@ -1304,23 +1304,25 @@ static boolean findScopeHierarchy (vString *const string, const statementInfo *c
 				found = TRUE;
 				vStringCopy (temp, string);
 				vStringClear (string);
-				if (! isType (s->blockName, TOKEN_NAME))
+				if (isType (s->blockName, TOKEN_NAME))
+				{
+					if (isType (s->context, TOKEN_NAME) &&
+					    vStringLength (s->context->name) > 0)
+					{
+						vStringCat (string, s->context->name);
+						addContextSeparator (string);
+					}
+					vStringCat (string, s->blockName->name);
+					if (vStringLength (temp) > 0)
+						addContextSeparator (string);
+					vStringCat (string, temp);
+				}
+				else
 				{
 					/* Information for building scope string
 					   is lacking. Maybe input is broken. */
 					found = FALSE;
-					break;
 				}
-				if (isType (s->context, TOKEN_NAME) &&
-					vStringLength (s->context->name) > 0)
-				{
-					vStringCat (string, s->context->name);
-					addContextSeparator (string);
-				}
-				vStringCat (string, s->blockName->name);
-				if (vStringLength (temp) > 0)
-					addContextSeparator (string);
-				vStringCat (string, temp);
 			}
 		}
 		vStringDelete (temp);
