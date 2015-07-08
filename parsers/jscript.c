@@ -93,6 +93,7 @@ typedef enum eTokenType {
 	TOKEN_OPEN_PAREN,
 	TOKEN_IDENTIFIER,
 	TOKEN_STRING,
+	TOKEN_TEMPLATE_STRING,
 	TOKEN_PERIOD,
 	TOKEN_OPEN_CURLY,
 	TOKEN_CLOSE_CURLY,
@@ -171,6 +172,7 @@ static const keywordDesc JsKeywordTable [] = {
  */
 
 /* Recursive functions */
+static void readTokenFull (tokenInfo *const token, boolean include_newlines, vString *const repr);
 static void parseFunction (tokenInfo *const token);
 static boolean parseBlock (tokenInfo *const token, tokenInfo *const orig_parent);
 static boolean parseLine (tokenInfo *const token, tokenInfo *const parent, boolean is_inside_class);
@@ -425,6 +427,50 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	fileUngetc (c);		/* unget non-identifier character */
 }
 
+static void parseTemplateString (vString *const string)
+{
+	int c;
+	do
+	{
+		c = fileGetc ();
+		if (c == '`')
+			break;
+		vStringPut (string, c);
+		if (c == '\\')
+		{
+			c = fileGetc();
+			vStringPut(string, c);
+		}
+		else if (c == '$')
+		{
+			c = fileGetc ();
+			if (c != '{')
+				fileUngetc (c);
+			else
+			{
+				int depth = 1;
+				/* we need to use the real token machinery to handle strings,
+				 * comments, regexes and whatnot */
+				tokenInfo *token = newToken ();
+				LastTokenType = TOKEN_UNDEFINED;
+				vStringPut(string, c);
+				do
+				{
+					readTokenFull (token, FALSE, string);
+					if (isType (token, TOKEN_OPEN_CURLY))
+						depth++;
+					else if (isType (token, TOKEN_CLOSE_CURLY))
+						depth--;
+				}
+				while (! isType (token, TOKEN_EOF) && depth > 0);
+				deleteToken (token);
+			}
+		}
+	}
+	while (c != EOF);
+	vStringTerminate (string);
+}
+
 static void readTokenFull (tokenInfo *const token, boolean include_newlines, vString *const repr)
 {
 	int c;
@@ -540,6 +586,18 @@ getNextChar:
 				  }
 				  break;
 
+		case '`':
+				  token->type = TOKEN_TEMPLATE_STRING;
+				  parseTemplateString (token->string);
+				  token->lineNumber = getSourceLineNumber ();
+				  token->filePosition = getInputFilePosition ();
+				  if (repr)
+				  {
+					  vStringCat (repr, token->string);
+					  vStringPut (repr, c);
+				  }
+				  break;
+
 		case '\\':
 				  c = fileGetc ();
 				  if (c != '\\'  && c != '"'  &&  !isspace (c))
@@ -561,6 +619,7 @@ getNextChar:
 							  case TOKEN_CHARACTER:
 							  case TOKEN_IDENTIFIER:
 							  case TOKEN_STRING:
+							  case TOKEN_TEMPLATE_STRING:
 							  case TOKEN_CLOSE_CURLY:
 							  case TOKEN_CLOSE_PAREN:
 							  case TOKEN_CLOSE_SQUARE:
