@@ -1,0 +1,9 @@
+ctags: Warning: [./foo0.sh] a space after letter is not found in kind desciption line: a
+ctags: Warning: [./foo1.sh] unexpectedly a kind description line is terminated: b 
+ctags: Warning: [./foo2.sh] a space after letter is not found in kind desciption line: cd
+ctags: Warning: [./foo3.sh] a space after letter is not found in kind desciption line: e[off]
+ctags: Warning: [./foo4.sh] [off] is given but no kind description is found: f [off]
+ctags: Warning: [./foo5.sh] [off] is given but no kind description is found: g  [off]
+ctags: Warning: [./foo6.sh] a whitespace must precede [off] flag: h  i[off]
+ctags: Warning: [./foo7.sh] a whitespace must precede [off] flag: j  kl[off]
+ctags: Warning: [./foo8.sh] a space after letter is not found in kind desciption line:  m desc
