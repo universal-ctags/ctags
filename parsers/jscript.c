@@ -97,7 +97,6 @@ typedef enum eTokenType {
 	TOKEN_OPEN_CURLY,
 	TOKEN_CLOSE_CURLY,
 	TOKEN_EQUAL_SIGN,
-	TOKEN_FORWARD_SLASH,
 	TOKEN_OPEN_SQUARE,
 	TOKEN_CLOSE_SQUARE,
 	TOKEN_REGEXP,
@@ -514,7 +513,6 @@ getNextChar:
 				case TOKEN_EQUAL_SIGN:
 				case TOKEN_COLON:
 				case TOKEN_PERIOD:
-				case TOKEN_FORWARD_SLASH:
 				case TOKEN_BINARY_OPERATOR:
 				/* and these already end one, no need to duplicate it */
 				case TOKEN_SEMICOLON:
@@ -566,7 +564,7 @@ getNextChar:
 							  case TOKEN_CLOSE_CURLY:
 							  case TOKEN_CLOSE_PAREN:
 							  case TOKEN_CLOSE_SQUARE:
-								  token->type = TOKEN_FORWARD_SLASH;
+								  token->type = TOKEN_BINARY_OPERATOR;
 								  break;
 
 							  default:
