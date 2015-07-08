@@ -2336,7 +2336,7 @@ static void processShortOption (
 	}
 }
 
-extern void parseOption (cookedArgs* const args)
+static void parseOption (cookedArgs* const args)
 {
 	Assert (! cArgOff (args));
 	if (args->isOption)
