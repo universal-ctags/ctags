@@ -2219,7 +2219,7 @@ static void processLongOption (
 		;
 	else if (processRegexOption (option, parameter))
 		;
-	else if (processXcmdOption (option, parameter))
+	else if (processXcmdOption (option, parameter, Stage))
 		;
 	else if (processMapOption (option, parameter))
 		;

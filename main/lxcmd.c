@@ -577,13 +577,22 @@ static void processLanguageXcmd (const langType language,
 }
 #endif
 
-extern boolean processXcmdOption (const char *const option, const char *const parameter)
+extern boolean processXcmdOption (const char *const option, const char *const parameter,
+				  OptionLoadingStage stage)
 {
 	langType language;
 
 	language = getLanguageComponentInOption (option, "xcmd-");
 	if (language == LANG_IGNORE)
 		return FALSE;
+
+	if (stage == OptionLoadingStageCurrentRecursive)
+	{
+		error (WARNING, "Don't use --xcmd-<LANG> option in ./.ctags nor ./.ctags/*: %s",
+		       option);
+		/* Consume it here. */
+		return TRUE;
+	}
 
 #ifdef HAVE_COPROC
 	processLanguageXcmd (language, parameter);
