@@ -593,6 +593,13 @@ extern boolean processXcmdOption (const char *const option, const char *const pa
 		/* Consume it here. */
 		return TRUE;
 	}
+	else if (stage == OptionLoadingStageHomeRecursive)
+	{
+		error (WARNING, "Don't use --xcmd-<LANG> option in ~/.ctags and/or ~/.ctags/*: %s",
+		       option);
+		/* Consume it here. */
+		return TRUE;
+	}
 
 #ifdef HAVE_COPROC
 	processLanguageXcmd (language, parameter);
