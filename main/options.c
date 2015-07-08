@@ -94,12 +94,14 @@ typedef const struct {
 	const char* name;   /* name of option as specified by user */
 	parametricOptionHandler handler;  /* routine to handle option */
 	boolean initOnly;   /* option must be specified before any files */
+	unsigned long acceptableStages;
 } parametricOption;
 
 typedef const struct {
 	const char* name;   /* name of option as specified by user */
 	boolean* pValue;    /* pointer to option value */
 	boolean initOnly;   /* option must be specified before any files */
+	unsigned long acceptableStages;
 } booleanOption;
 
 /*
@@ -185,6 +187,7 @@ optionValues Option = {
 };
 
 static OptionLoadingStage Stage = OptionLoadingStageNone;
+#define STAGE_ANY ~0UL
 
 /*
 -   Locally used only
@@ -416,6 +419,19 @@ static const char *const Features [] = {
 	"coproc",
 #endif
 	NULL
+};
+
+static const char *const StageDescription [] = {
+	[OptionLoadingStageNone]   = "not initialized",
+	[OptionLoadingStageCustom] = "custom file",
+	[OptionLoadingStageDosCnf] = "DOS .cnf file",
+	[OptionLoadingStageEtc] = "file under /etc (e.g. ctags.conf)",
+	[OptionLoadingStageLocalEtc] = "file under /usr/local/etc (e.g. ctags.conf)",
+	[OptionLoadingStageHomeRecursive] = "file(s) under HOME",
+	[OptionLoadingStageCurrentRecursive] = "file(s) under the current directory",
+	[OptionLoadingStagePreload] = "optlib preload files",
+	[OptionLoadingStageEnvVar] = "environment variable",
+	[OptionLoadingStageCmdline] = "command line",
 };
 
 /*
@@ -2072,61 +2088,61 @@ static void processLibexecDir (const char *const option,
  */
 
 static parametricOption ParametricOptions [] = {
-	{ "config-filename",      	processConfigFilenameOption,  	TRUE    },
-	{ "data-dir",               processDataDir,                 FALSE   },
-	{ "etags-include",          processEtagsInclude,            FALSE   },
-	{ "exclude",                processExcludeOption,           FALSE   },
-	{ "excmd",                  processExcmdOption,             FALSE   },
-	{ "extra",                  processExtraTagsOption,         FALSE   },
-	{ "fields",                 processFieldsOption,            FALSE   },
-	{ "filter-terminator",      processFilterTerminatorOption,  TRUE    },
-	{ "format",                 processFormatOption,            TRUE    },
-	{ "help",                   processHelpOption,              TRUE    },
+	{ "config-filename",      	processConfigFilenameOption,  	TRUE, STAGE_ANY },
+	{ "data-dir",               processDataDir,                 FALSE,  STAGE_ANY },
+	{ "etags-include",          processEtagsInclude,            FALSE,  STAGE_ANY },
+	{ "exclude",                processExcludeOption,           FALSE,  STAGE_ANY },
+	{ "excmd",                  processExcmdOption,             FALSE,  STAGE_ANY },
+	{ "extra",                  processExtraTagsOption,         FALSE,  STAGE_ANY },
+	{ "fields",                 processFieldsOption,            FALSE,  STAGE_ANY },
+	{ "filter-terminator",      processFilterTerminatorOption,  TRUE,   STAGE_ANY },
+	{ "format",                 processFormatOption,            TRUE,   STAGE_ANY },
+	{ "help",                   processHelpOption,              TRUE,   STAGE_ANY },
 #ifdef HAVE_ICONV
-	{ "input-encoding",         processInputEncodingOption,     FALSE   },
-	{ "output-encoding",        processOutputEncodingOption,    FALSE   },
+	{ "input-encoding",         processInputEncodingOption,     FALSE,  STAGE_ANY },
+	{ "output-encoding",        processOutputEncodingOption,    FALSE,  STAGE_ANY },
 #endif
-	{ "lang",                   processLanguageForceOption,     FALSE   },
-	{ "language",               processLanguageForceOption,     FALSE   },
-	{ "language-force",         processLanguageForceOption,     FALSE   },
-	{ "languages",              processLanguagesOption,         FALSE   },
-	{ "langdef",                processLanguageDefineOption,    FALSE   },
-	{ "langmap",                processLanguageMapOption,       FALSE   },
-	{ "libexec-dir",            processLibexecDir,              FALSE   },
-	{ "license",                processLicenseOption,           TRUE    },
-	{ "list-aliases",           processListAliasesOption,       TRUE    },
-	{ "list-corpora",           processListCorporaOption,       TRUE    },
-	{ "list-features",          processListFeaturesOption,      TRUE    },
-	{ "list-file-kind",         processListFileKindOption,      TRUE    },
-	{ "list-kinds",             processListKindsOption,         TRUE    },
-	{ "list-languages",         processListLanguagesOption,     TRUE    },
-	{ "list-maps",              processListMapsOption,          TRUE    },
-	{ "options",                processOptionFile,              FALSE   },
-	{ "sort",                   processSortOption,              TRUE    },
-	{ "version",                processVersionOption,           TRUE    },
-	{ "_echo",                  processEchoOption,              FALSE   },
-	{ "_force-quit",            processForceQuitOption,         FALSE   },
+	{ "lang",                   processLanguageForceOption,     FALSE,  STAGE_ANY },
+	{ "language",               processLanguageForceOption,     FALSE,  STAGE_ANY },
+	{ "language-force",         processLanguageForceOption,     FALSE,  STAGE_ANY },
+	{ "languages",              processLanguagesOption,         FALSE,  STAGE_ANY },
+	{ "langdef",                processLanguageDefineOption,    FALSE,  STAGE_ANY },
+	{ "langmap",                processLanguageMapOption,       FALSE,  STAGE_ANY },
+	{ "libexec-dir",            processLibexecDir,              FALSE,  STAGE_ANY },
+	{ "license",                processLicenseOption,           TRUE,   STAGE_ANY },
+	{ "list-aliases",           processListAliasesOption,       TRUE,   STAGE_ANY },
+	{ "list-corpora",           processListCorporaOption,       TRUE,   STAGE_ANY },
+	{ "list-features",          processListFeaturesOption,      TRUE,   STAGE_ANY },
+	{ "list-file-kind",         processListFileKindOption,      TRUE,   STAGE_ANY },
+	{ "list-kinds",             processListKindsOption,         TRUE,   STAGE_ANY },
+	{ "list-languages",         processListLanguagesOption,     TRUE,   STAGE_ANY },
+	{ "list-maps",              processListMapsOption,          TRUE,   STAGE_ANY },
+	{ "options",                processOptionFile,              FALSE,  STAGE_ANY },
+	{ "sort",                   processSortOption,              TRUE,   STAGE_ANY },
+	{ "version",                processVersionOption,           TRUE,   STAGE_ANY },
+	{ "_echo",                  processEchoOption,              FALSE,  STAGE_ANY },
+	{ "_force-quit",            processForceQuitOption,         FALSE,  STAGE_ANY },
 };
 
 static booleanOption BooleanOptions [] = {
-	{ "append",         &Option.append,                 TRUE    },
-	{ "file-scope",     &Option.include.fileScope,      FALSE   },
-	{ "file-tags",      &Option.include.fileNames,      FALSE   },
-	{ "filter",         &Option.filter,                 TRUE    },
-	{ "guess-language-eagerly", &Option.guessLanguageEagerly, FALSE },
-	{ "if0",            &Option.if0,                    FALSE   },
-	{ "kind-long",      &Option.kindLong,               TRUE    },
-	{ "line-directives",&Option.lineDirectives,         FALSE   },
-	{ "links",          &Option.followLinks,            FALSE   },
-	{ "print-language", &Option.printLanguage,          TRUE    },
-	{ "quiet",          &Option.quiet,                  FALSE   },
+	{ "append",         &Option.append,                 TRUE,  STAGE_ANY },
+	{ "file-scope",     &Option.include.fileScope,      FALSE, STAGE_ANY },
+	{ "file-tags",      &Option.include.fileNames,      FALSE, STAGE_ANY },
+	{ "filter",         &Option.filter,                 TRUE,  STAGE_ANY },
+	{ "guess-language-eagerly", &Option.guessLanguageEagerly, FALSE, STAGE_ANY },
+	{ "if0",            &Option.if0,                    FALSE, STAGE_ANY },
+	{ "kind-long",      &Option.kindLong,               TRUE,  STAGE_ANY },
+	{ "line-directives",&Option.lineDirectives,         FALSE, STAGE_ANY },
+	{ "links",          &Option.followLinks,            FALSE, STAGE_ANY },
+	{ "print-language", &Option.printLanguage,          TRUE,  STAGE_ANY },
+	{ "quiet",          &Option.quiet,                  FALSE, STAGE_ANY },
 #ifdef RECURSE_SUPPORTED
-	{ "recurse",        &Option.recurse,                FALSE   },
+	{ "recurse",        &Option.recurse,                FALSE, STAGE_ANY },
 #endif
-	{ "tag-relative",   &Option.tagRelative,            TRUE    },
-	{ "totals",         &Option.printTotals,            TRUE    },
-	{ "undef",          &Option.undef,                  FALSE   },
-	{ "verbose",        &Option.verbose,                FALSE   },
+	{ "tag-relative",   &Option.tagRelative,            TRUE,  STAGE_ANY },
+	{ "totals",         &Option.printTotals,            TRUE,  STAGE_ANY },
+	{ "undef",          &Option.undef,                  FALSE, STAGE_ANY },
+	{ "verbose",        &Option.verbose,                FALSE, STAGE_ANY },
 };
 
 /*
@@ -2152,6 +2168,12 @@ static boolean processParametricOption (
 		if (strcmp (option, entry->name) == 0)
 		{
 			found = TRUE;
+			if (!(entry->acceptableStages & (1UL << Stage)))
+			{
+				error (WARNING, "Cannot use --%s option in %s",
+				       option, StageDescription[Stage]);
+				break;
+			}
 			if (entry->initOnly)
 				checkOptionOrder (option, TRUE);
 			(entry->handler) (option, parameter);
@@ -2190,6 +2212,12 @@ static boolean processBooleanOption (
 		if (strcmp (option, entry->name) == 0)
 		{
 			found = TRUE;
+			if (!(entry->acceptableStages & (1UL << Stage)))
+			{
+				error (WARNING, "Cannot use --%s option in %s",
+				       option, StageDescription[Stage]);
+				break;
+			}
 			if (entry->initOnly)
 				checkOptionOrder (option, TRUE);
 			*entry->pValue = getBooleanOption (option, parameter);
