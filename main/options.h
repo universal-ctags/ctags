@@ -123,6 +123,19 @@ typedef struct sOptionValues {
 #endif
 } optionValues;
 
+typedef enum eOptionLoadingStage {
+	OptionLoadingStageNone,
+	OptionLoadingStageCustom,
+	OptionLoadingStageDosCnf,
+	OptionLoadingStageEtc,
+	OptionLoadingStageLocalEtc,
+	OptionLoadingStageHomeRecursive,
+	OptionLoadingStageCurrentRecursive,
+	OptionLoadingStagePreload,
+	OptionLoadingStageEnvVar,
+	OptionLoadingStageCmdline,
+} OptionLoadingStage;
+
 /*
 *   GLOBAL VARIABLES
 */

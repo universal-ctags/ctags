@@ -69,6 +69,11 @@
 #define SUBDIR_PRELOAD "preload"
 #define SUBDIR_DRIVERS "drivers"
 
+#define ENTER(STAGE) do {							\
+		Assert (Stage <= OptionLoadingStage##STAGE); \
+		Stage = OptionLoadingStage##STAGE;	\
+	} while (0)
+
 /*
 *   Data declarations
 */
@@ -178,6 +183,8 @@ optionValues Option = {
 	0, 0        /* -D, -b */
 #endif
 };
+
+static OptionLoadingStage Stage = OptionLoadingStageNone;
 
 /*
 -   Locally used only
@@ -2364,6 +2371,7 @@ static void parseOptions (cookedArgs* const args)
 
 extern void parseCmdlineOptions (cookedArgs* const args)
 {
+	ENTER (Cmdline);
 	parseOptions (args);
 }
 
@@ -2561,6 +2569,7 @@ static void parseConfigurationFileOptions (void)
 	const char *filename_body;
 
 #ifdef CUSTOM_CONFIGURATION_FILE
+	ENTER(Custom);
 	parseFileOptions (CUSTOM_CONFIGURATION_FILE);
 #endif
 	filename_body = (Option.configFilename)?Option.configFilename:"ctags";
@@ -2570,6 +2579,7 @@ static void parseConfigurationFileOptions (void)
 	{
 		error (FATAL, "error in asprintf");
 	}
+	ENTER(DosCnf);
 	parseFileOptions (filename);
 	free (filename);
 #endif
@@ -2577,6 +2587,7 @@ static void parseConfigurationFileOptions (void)
 	{
 		error (FATAL, "error in asprintf");
 	}
+	ENTER(Etc);
 	parseFileOptions (filename);
 	free (filename);
 
@@ -2584,18 +2595,22 @@ static void parseConfigurationFileOptions (void)
 	{
 		error (FATAL, "error in asprintf");
 	}
+	ENTER(LocalEtc);
 	parseFileOptions (filename);
 	free (filename);
 
 	home = getHome ();
 	if (home != NULL)
 	{
+		ENTER(HomeRecursive);
 		parseConfigurationFileOptionsInDirectory (vStringValue (home));
 		vStringDelete (home);
 	}
 
+	ENTER(CurrentRecursive);
 	parseConfigurationFileOptionsInDirectory (".");
 
+	ENTER(Preload);
 	preload (PreloadPathList);
 }
 
@@ -2604,6 +2619,7 @@ static void parseEnvironmentOptions (void)
 	const char *envOptions = NULL;
 	const char* var = NULL;
 
+	ENTER(EnvVar);
 	if (Option.etags)
 	{
 		var = ETAGS_ENVIRONMENT;
