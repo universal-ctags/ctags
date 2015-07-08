@@ -26,6 +26,9 @@
 #include "routines.h"
 #include "vstring.h"
 #include "tg.h"
+#ifdef HAVE_ICONV
+# include "mbcs.h"
+#endif
 
 /*
 *   DATA DEFINITIONS
@@ -1781,6 +1784,62 @@ static void printGuessedParser (const char* const fileName, langType language)
 	printf("%s: %s\n", fileName, parserName);
 }
 
+#ifdef HAVE_ICONV
+static char **EncodingMap;
+static unsigned int EncodingMapMax;
+
+static void addLanguageEncoding (const langType language,
+									const char *const encoding)
+{
+	if (language > EncodingMapMax || EncodingMapMax == 0)
+	{
+		int i;
+		int istart = (EncodingMapMax == 0)? 0: EncodingMapMax + 1;
+		EncodingMap = xRealloc (EncodingMap, (language + 1), char*);
+		for (i = istart;  i <= language  ;  ++i)
+		{
+			EncodingMap [i] = NULL;
+		}
+		EncodingMapMax = language;
+	}
+	if (EncodingMap [language])
+		eFree (EncodingMap [language]);
+	EncodingMap [language] = eStrdup(encoding);
+	if (!Option.outputEncoding)
+		Option.outputEncoding = eStrdup("UTF-8");
+}
+
+extern boolean processLanguageEncodingOption (const char *const option, const char *const parameter)
+{
+	langType language;
+
+	language = getLanguageComponentInOption (option, "input-encoding-");
+	if (language == LANG_IGNORE)
+		return FALSE;
+
+	addLanguageEncoding (language, parameter);
+	return TRUE;
+}
+
+extern void freeEncodingResources (void)
+{
+	if (EncodingMap)
+	{
+		int i;
+		for (i = 0  ;  i <= EncodingMapMax  ; ++i)
+		{
+			if (EncodingMap [i])
+				eFree (EncodingMap [i]);
+		}
+		free(EncodingMap);
+	}
+	if (Option.inputEncoding)
+		eFree (Option.inputEncoding);
+	if (Option.outputEncoding)
+		eFree (Option.outputEncoding);
+}
+#endif
+
 extern boolean parseFile (const char *const fileName)
 {
 	boolean tagFileResized = FALSE;
@@ -1803,6 +1862,13 @@ extern boolean parseFile (const char *const fileName)
 	{
 		if (Option.filter)
 			openTagFile ();
+
+#ifdef HAVE_ICONV
+		openConverter (EncodingMap && language <= EncodingMapMax &&
+				EncodingMap [language] ?
+					EncodingMap[language] : Option.inputEncoding, Option.outputEncoding);
+#endif
+
 		if (Option.etags)
 			beginEtagsFile ();
 
@@ -1816,6 +1882,10 @@ extern boolean parseFile (const char *const fileName)
 		if (Option.filter)
 			closeTagFile (tagFileResized);
 		addTotals (1, 0L, 0L);
+
+#ifdef HAVE_ICONV
+		closeConverter ();
+#endif
 
 		return tagFileResized;
 	}

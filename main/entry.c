@@ -182,6 +182,10 @@ static void addPseudoTags (void)
 		writePseudoTag ("TAG_PROGRAM_NAME",    PROGRAM_NAME, "", NULL);
 		writePseudoTag ("TAG_PROGRAM_URL",     PROGRAM_URL,  "official site", NULL);
 		writePseudoTag ("TAG_PROGRAM_VERSION", PROGRAM_VERSION, "", NULL);
+#ifdef HAVE_ICONV
+		if (Option.outputEncoding)
+			writePseudoTag ("TAG_FILE_ENCODING", Option.outputEncoding, "", NULL);
+#endif
 	}
 }
 

@@ -64,6 +64,8 @@ AH_VERBATIM([EXTERNAL_SORT], [
 # undef EXTERNAL_SORT
 #endif
 ])
+AH_TEMPLATE([HAVE_ICONV],
+	[Define this value if support multibyte character encoding.])
 AH_TEMPLATE([TMPDIR],
 	[If you wish to change the directory in which temporary files are stored,
 	define this label to the directory desired.])
@@ -170,6 +172,9 @@ AC_ARG_ENABLE(extended-format,
 AC_ARG_ENABLE(external-sort,
 	[AS_HELP_STRING([--disable-external-sort],
 		[use internal sort algorithm instead of sort program])])
+
+AC_ARG_ENABLE(iconv,
+[  --enable-iconv          support multibyte character encoding])
 
 AC_ARG_ENABLE(custom-config,
 	[AS_HELP_STRING([--enable-custom-config=FILE],
@@ -566,6 +571,24 @@ if test "$have_ftruncate" = yes ; then
 	CHECK_PROTO(ftruncate, unistd.h)
 fi
 
+# Process library configuration options
+# -------------------------------------
+
+if test "$enable_iconv" = yes ; then
+	save_LIBS="$LIBS"
+	LIBS="$LIBS -liconv"
+	AC_MSG_CHECKING(for iconv_open with -liconv)
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([
+			#include <iconv.h>
+		], [iconv_open("fr", "to")])], [
+			AC_MSG_RESULT(yes)
+			AC_DEFINE(HAVE_ICONV)
+		], [LIBS="$save_LIBS"
+			AC_MSG_RESULT(no)
+			AC_CHECK_FUNC(iconv_open, [AC_DEFINE(HAVE_ICONV)],
+				[AC_MSG_ERROR([Could not find libiconv. Please install libiconv and libiconv-devel.])])])
+fi
+
 # Checks for declaration
 # ----------------------
 AC_CHECK_DECLS([__environ], [], [], [
@@ -586,6 +609,7 @@ fi
 # Output files
 # ------------
 
+AC_CHECK_FUNCS([mblen], [], [HAVE_MBLEN=1], [])
 
 rm -f Makefile
 if test "$enable_maintainer_mode" = yes ; then

@@ -12,6 +12,10 @@ OBJEXT = o
 OBJECTS += $(REGEX_SOURCES:%.c=%.o)
 OBJECTS += $(FNMATCH_SOURCES:%.c=%.o)
 VPATH = . ./main ./parsers
+ifeq (yes, $(WITH_ICONV))
+DEFINES += -DHAVE_ICONV
+LIBS += -liconv
+endif
 
 ctags.exe: OPT = -O4 -Os -fexpensive-optimizations
 ctags.exe: LDFLAGS = -s
@@ -28,7 +32,7 @@ ctags: ctags.exe
 dctags: dctags.exe
 
 ctags.exe dctags.exe: $(OBJECTS) $(HEADERS) $(REGEX_HEADERS) $(FNMATCH_HEADERS)
-	$(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(OBJECTS)
+	$(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(OBJECTS) $(LIBS)
 
 readtags.exe: readtags.c
 	$(CC) $(OPT) $(CFLAGS) -DREADTAGS_MAIN $(DEFINES) $(INCLUDES) -o $@ $<

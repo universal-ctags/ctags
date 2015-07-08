@@ -23,6 +23,9 @@
 #include "main.h"
 #include "routines.h"
 #include "options.h"
+#ifdef HAVE_ICONV
+# include "mbcs.h"
+#endif
 
 #ifdef HAVE_REGCOMP
 # include <ctype.h>
@@ -546,6 +549,11 @@ extern char *readLine (vString *const vLine, FILE *const fp)
 				}
 			}
 		} while (reReadLine);
+
+#ifdef HAVE_ICONV
+		if (isConverting ())
+			convertString (vLine);
+#endif
 	}
 	return result;
 }
