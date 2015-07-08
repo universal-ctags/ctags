@@ -85,6 +85,13 @@ subversion
 
 bugs
 ......................................................................
+   <367>  C++11 override makes a C++ member function declaration ignored
+
+	 * fixed in::
+
+	        d4fcbdd
+		#413
+		#405
 
    <366>  --options=.ctags doesn't work under Windows
 
