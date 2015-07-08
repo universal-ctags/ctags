@@ -190,6 +190,12 @@ Patches are always there. So it is easy to evaluate the value:)
 
 ----
 
+   <85> Add --encoding option to make utf-8 encoded tags file
+
+	* contributed by the original author::
+
+	      b3f670c7c4a3c3570b8d2d82756735586aafc0cb
+
    <84> C++11 new using semantics
 
 	* solved by another implementation::
