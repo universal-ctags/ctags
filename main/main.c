@@ -286,7 +286,7 @@ static boolean createTagsForArgs (cookedArgs *const args)
 		resize |= createTagsForEntry (arg);
 #endif
 		cArgForth (args);
-		parseOptions (args);
+		parseCmdlineOptions (args);
 	}
 	return resize;
 }
@@ -299,7 +299,7 @@ static boolean createTagsFromFileInput (FILE *const fp, const boolean filter)
 	if (fp != NULL)
 	{
 		cookedArgs *args = cArgNewFromLineFile (fp);
-		parseOptions (args);
+		parseCmdlineOptions (args);
 		while (! cArgOff (args))
 		{
 			resize |= createTagsForEntry (cArgItem (args));
@@ -310,7 +310,7 @@ static boolean createTagsFromFileInput (FILE *const fp, const boolean filter)
 				fflush (stdout);
 			}
 			cArgForth (args);
-			parseOptions (args);
+			parseCmdlineOptions (args);
 		}
 		cArgDelete (args);
 	}
@@ -511,7 +511,7 @@ extern int main (int __unused__ argc, char **argv)
 	initOptions ();
 	readOptionConfiguration ();
 	verbose ("Reading initial options from command line\n");
-	parseOptions (args);
+	parseCmdlineOptions (args);
 	checkOptions ();
 	unifyLanguageMaps ();
 	makeTags (args);

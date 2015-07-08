@@ -2354,12 +2354,17 @@ static void parseOption (cookedArgs* const args)
 	}
 }
 
-extern void parseOptions (cookedArgs* const args)
+static void parseOptions (cookedArgs* const args)
 {
 	while (! cArgOff (args)  &&  cArgIsOption (args))
 		parseOption (args);
 	if (! cArgOff (args)  &&  ! cArgIsOption (args))
 		NonOptionEncountered = TRUE;
+}
+
+extern void parseCmdlineOptions (cookedArgs* const args)
+{
+	parseOptions (args);
 }
 
 static boolean checkSameFile (const char *const fileName, void * userData)

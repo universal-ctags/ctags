@@ -156,7 +156,7 @@ extern void cArgForth (cookedArgs* const current);
 extern boolean isExcludedFile (const char* const name);
 extern boolean isIncludeFile (const char *const fileName);
 extern boolean isIgnoreToken (const char *const name, boolean *const pIgnoreParens, const char **const replacement);
-extern void parseOptions (cookedArgs* const cargs);
+extern void parseCmdlineOptions (cookedArgs* const cargs);
 extern void previewFirstOption (cookedArgs* const cargs);
 extern void readOptionConfiguration (void);
 extern void initOptions (void);
