@@ -207,7 +207,7 @@ weaknesses exist in this implementation.
   of NFS.
 
 * The configuration defined by the system administrator cannot be
-  overriden.
+  overridden.
 
   A user must accept all configuration including ``--options=``
   in */etc/ctags.conf* and */usr/local/etc/ctags.conf*.

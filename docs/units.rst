@@ -5,7 +5,7 @@
 
 ----
 
-Exuberant ctags has a test facility. The test casse were *Test*
+Exuberant ctags has a test facility. The test case were *Test*
 directory. So Here I call it *Test*.
 
 Main aim of the facility is detecting regression. All files under Test
@@ -59,7 +59,7 @@ have its own directory under Units directory.
 	In such case you don't have write ``-e`` to ``args.ctags``.
 	THe test facility sets ``-e`` automatically.
 
-	If you want to test corss reference output (specified with ``-x`` ),
+	If you want to test cross reference output (specified with ``-x`` ),
 	Use **.tags-x** as suffix instead of **.tags**.
 	In such case you don't have write ``-x`` to ``args.ctags``.
 	THe test facility sets ``-x`` automatically.

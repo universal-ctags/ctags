@@ -684,7 +684,7 @@ specified, it should contain one option per line. If a directory is
 specified(and scandir function is available at build configuration time),
 files suffixed with .ctags or .conf under the directory are read. (On MSDOS
 or MSWindows this directory traverse feature is temporary disable because the
-contributor of this feature has no access to the platfroms.
+contributor of this feature has no access to the platforms.
 Volunters are welcome).
 As a special case, if
 \fB\-\-options\fP=\fINONE\fP is specified as the first option on the command

@@ -156,7 +156,7 @@ Following example is taken from ``CoffeeTags``::
 	!_TAG_PROGRAM_URL	https://github.com/lukaszkorecki/CoffeeTags	/GitHub repository/
 	!_TAG_PROGRAM_VERSION	0.5.0	//
 
-ctags merges the Psuedo-tag lines with ``!LANG`` suffix::
+ctags merges the Pseudo-tag lines with ``!LANG`` suffix::
 
 	$ ./ctags   --language-force=coffee foo.coffee; cat tags | grep '^!'
 	!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
@@ -217,7 +217,7 @@ Here is an example taken from ``data/optlib/coffee.ctags``::
 	--coffee-map=+.coffee
 	--coffee-xcmd=coffeetags
 
-Finnaly you have to add these new two files to ``Makefile.in``.
+Finally you have to add these new two files to ``Makefile.in``.
 Add the name of driver file to ``DRIVERS`` variable like::
 
 	DRIVERS = coffeetags

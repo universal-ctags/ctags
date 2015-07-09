@@ -1,4 +1,4 @@
-# Makefile for Unverisal Ctags under Win32 with MinGW compiler
+# Makefile for Universal Ctags under Win32 with MinGW compiler
 
 include source.mak
 

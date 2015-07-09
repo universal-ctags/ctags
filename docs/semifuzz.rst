@@ -24,7 +24,7 @@ with a non-zero status. The timeout will be reported as following::
 
 This means that if C parser doesn't stop within N seconds when
 *Units/test.vhd.t/input.vhd* is given as an input, timeout will
-interrup ctags. The default duration can be changed using
+interrupt ctags. The default duration can be changed using
 ``TIMEOUT=N`` argument in *make* command. If there is no timeout but
 the exit status is non-zero, the target reports it as following::
 

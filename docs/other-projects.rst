@@ -59,13 +59,13 @@ pygments
 	at names and lines in tags file. scopes and kinds are not
 	used.
 
-	As far as I(Masataake YAMATO) tried, using pygments from ctags
-	is not so useful. There are critical gap betwenn ctags and pygments.
+	As far as I(Masatake YAMATO) tried, using pygments from ctags
+	is not so useful. There are critical gap between ctags and pygments.
 	ctags focuses on identifiers. pygments focuses on keywords.
 
 GNU global
 
-	I(Masatke YAMATO) don't inspect this much but GNU global uses
+	I(Masatake YAMATO) don't inspect this much but GNU global uses
 	ctags internally.
 
 	A person at GNU global project proposed an extension for the tags file
@@ -79,16 +79,16 @@ GNU source highlight
 	as input for making hyperlinks.
 	http://www.gnu.org/software/src-highlite/source-highlight.html#Generating-References
 
-	I(Masatke YAMATO) have not tried the feature yet.
+	I(Masatake YAMATO) have not tried the feature yet.
 
 OpenGrok
 	
-	I(Masatke YAMATO) don't inspect this much but OpenGrok uses
+	I(Masatake YAMATO) don't inspect this much but OpenGrok uses
 	ctags internally.
 
-Linux kenrel
+Linux kernel
 
-	See linux/scripts/tags.sh of Linux kenrel source tree.
+	See linux/scripts/tags.sh of Linux kernel source tree.
 	It utilizes c parser to the utmost limit.
 
 	
