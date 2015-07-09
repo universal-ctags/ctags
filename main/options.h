@@ -117,6 +117,7 @@ typedef struct sOptionValues {
 	boolean printLanguage;  /* --print-language */
 	boolean guessLanguageEagerly; /* --guess-language-eagerly|-G */
 	boolean quiet;		      /* --quiet */
+	boolean allowXcmdInHomeDir;     /* --_allow-xcmd-in-homedir */
 #ifdef DEBUG
 	long debugLevel;        /* -D  debugging output */
 	unsigned long breakLine;/* -b  source line at which to call lineBreak() */

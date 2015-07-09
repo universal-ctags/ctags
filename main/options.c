@@ -73,6 +73,7 @@
 		Assert (Stage <= OptionLoadingStage##STAGE); \
 		Stage = OptionLoadingStage##STAGE;	\
 	} while (0)
+#define ACCEPT(STAGE) (1UL << OptionLoadingStage##STAGE)
 
 /*
 *   Data declarations
@@ -181,6 +182,7 @@ optionValues Option = {
 	FALSE,	    /* --print-language */
 	FALSE,	    /* --guess-language-eagerly(-G) */
 	FALSE,	    /* --quiet */
+	FALSE,	    /* --_allow-xcmd-in-homedir */
 #ifdef DEBUG
 	0, 0        /* -D, -b */
 #endif
@@ -359,6 +361,10 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --xcmd-<LANG>=parser_command_path|parser_command_name"},
  {1,"       Define external parser command path or name for specific language."},
 #endif
+ {1,"  --_allow-xcmd-in-homedir"},
+ {1,"       Allow specifying --xcmd-<LANG> option in ~/.ctags and/or ~/.ctags/*."},
+ {1,"       By default it is not allow. This option itself can be specfied only "},
+ {1,"       in /etc or /usr/local/etc."},
  {1,"  --_echo=msg"},
  {1,"       Echo MSG to standard error. Useful to debug the chain"},
  {1,"       of loading option files."},
@@ -2143,6 +2149,7 @@ static booleanOption BooleanOptions [] = {
 	{ "totals",         &Option.printTotals,            TRUE,  STAGE_ANY },
 	{ "undef",          &Option.undef,                  FALSE, STAGE_ANY },
 	{ "verbose",        &Option.verbose,                FALSE, STAGE_ANY },
+	{ "_allow-xcmd-in-homedir", &Option.allowXcmdInHomeDir, TRUE, ACCEPT(Etc)|ACCEPT(LocalEtc) }
 };
 
 /*
