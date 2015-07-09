@@ -15,6 +15,7 @@ MAIN_HEADERS =				\
 	$(MAIN_DIR)/htable.h		\
 	$(MAIN_DIR)/keyword.h		\
 	$(MAIN_DIR)/main.h		\
+	$(MAIN_DIR)/mbcs.h		\
 	$(MAIN_DIR)/nestlevel.h		\
 	$(MAIN_DIR)/options.h		\
 	$(MAIN_DIR)/parse.h		\
@@ -25,8 +26,7 @@ MAIN_HEADERS =				\
 	$(MAIN_DIR)/sort.h		\
 	$(MAIN_DIR)/strlist.h		\
 	$(MAIN_DIR)/trashbox.h		\
-	$(MAIN_DIR)/vstring.h		\
-	$(MAIN_DIR)/mbcs.h
+	$(MAIN_DIR)/vstring.h
 
 PARSER_HEADERS =
 
@@ -91,6 +91,7 @@ MAIN_SOURCES =					\
 	$(MAIN_DIR)/lregex.c			\
 	$(MAIN_DIR)/lxcmd.c			\
 	$(MAIN_DIR)/main.c			\
+	$(MAIN_DIR)/mbcs.c			\
 	$(MAIN_DIR)/nestlevel.c			\
 	$(MAIN_DIR)/options.c			\
 	$(MAIN_DIR)/parse.c			\
@@ -101,8 +102,7 @@ MAIN_SOURCES =					\
 	$(MAIN_DIR)/strlist.c			\
 	$(MAIN_DIR)/tg.c			\
 	$(MAIN_DIR)/trashbox.c			\
-	$(MAIN_DIR)/vstring.c			\
-	$(MAIN_DIR)/mbcs.c
+	$(MAIN_DIR)/vstring.c
 
 DEBUG_SOURCES = $(MAIN_DIR)/debug.c
 
