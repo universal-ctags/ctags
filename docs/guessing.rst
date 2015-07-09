@@ -111,7 +111,7 @@ If no parser is selected, ``NONE`` is printed as parser name.
 Guessing from keywords
 ---------------------------------------------------------------------
 
-Not implementated.
+Not implemented.
 
 Some parses have keywords table. We can utilize them to guess
 the language of input files.

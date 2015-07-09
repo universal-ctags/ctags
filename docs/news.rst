@@ -54,7 +54,7 @@ Tagging #undef
 Wildcard in options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For the purpose gathering as mach as possible information from source
+For the purpose gathering as much as possible information from source
 code "wildcard"(``*``) in option is introduced.
 
 ``--fields=*``
@@ -83,18 +83,18 @@ There were 3 classes of message in ctags:
 
 *fatal*
 
-	A ciritical error is occured. ctags aborts the execution.
+	A critical error is occurred. ctags aborts the execution.
 
 *warning*
 
-	An error is occured but ctags continues the execution.
+	An error is occurred but ctags continues the execution.
 
 *verbose*
 
-	Mainly for debugging prupose.
+	Mainly for debugging purpose.
 
 
 *notice* is a new class of message. It is less important than warning*
 *but more important for users than *verbose*. Generally the user can
 *ignore *notice*. With ``--quiet`` option can be used to turn off the
-priting the *notice* class messages.
+printing the *notice* class messages.

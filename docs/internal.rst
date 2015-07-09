@@ -31,8 +31,8 @@ parser does not set `useCork` field. `writeTagEntry` calls one of
 three functions, `writeTagsEntry`, `writeXrefEntry` or `writeCtagsEntry`.
 One of them is chosen depending on the arguments passed to ctags.
 
-If `useCork` is set, the tag informations goes to a queue on memroy.
-The queu is flushed when `useCork` in unset. See `cork API` for more
+If `useCork` is set, the tag informations goes to a queue on memory.
+The queue is flushed when `useCork` in unset. See `cork API` for more
 details.
 
 cork API
