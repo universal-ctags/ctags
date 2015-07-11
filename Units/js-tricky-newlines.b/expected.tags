@@ -1,0 +1,6 @@
+a	input.js	/^var a = 1$/;"	v
+b	input.js	/^,   b = 1$/;"	v
+c	input.js	/^,   c = 1$/;"	v
+d	input.js	/^let d$/;"	v
+e	input.js	/^,   e$/;"	v
+f	input.js	/^,   f$/;"	v
