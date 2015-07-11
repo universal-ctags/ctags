@@ -45,9 +45,11 @@
 #  define __unused__ __attribute__((unused))
 # endif
 # define __printf__(s,f)  __attribute__((format (printf, s, f)))
+# define attr__noreturn __attribute__((__noreturn__))
 #else
 # define __unused__
 # define __printf__(s,f)
+# define attr__noreturn
 #endif
 
 /*
