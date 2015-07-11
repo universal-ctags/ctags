@@ -23,12 +23,12 @@ See https://wiki.geany.org/howtos/profiling/gperftools and #383
 
 Checking coverage
 ------------------------------------------------------------
-After doing make clean, you can build coverage measuring ready
-ctags by make COVERAGE=1. At this time *.gcno files are generated
-by the compiler. *.gcno files can be removed with make clean.
+After doing ``make clean``, you can build coverage measuring ready
+ctags by ``make COVERAGE=1``. At this time *\*.gcno* files are generated
+by the compiler. *\*.gcno* files can be removed with ``make clean``.
 
 After building ctags, you can run run-gcov target.  When running
-*.gcda files.  The target runs ctags withh all input files under
-Units/**/input.*; and call gcov. Human readable result is printed. The
-detail can be shown in *.gcov. files. *.gcda files and *.gcov files
-can be removed with make clean-gcov.
+*\*.gcda* files.  The target runs ctags withh all input files under
+*Units/\*\*/input.\**; and call gcov. Human readable result is
+printed. The detail can be shown in *\*.gcov*. files. *\*.gcda* files
+and *\*.gcov* files can be removed with ``make clean-gcov``.
