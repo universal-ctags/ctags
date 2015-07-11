@@ -1,0 +1,3 @@
+Locking	input.h	/^@protocol Locking$/;"	p	protocol:Locking
+lock	input.h	/^- (void)lock;$/;"	m	protocol:Locking
+unlock	input.h	/^- (void)unlock;$/;"	m	protocol:Locking

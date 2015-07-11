@@ -1,6 +1,23 @@
-ANOTHER_MACRO	input.h	/^ # define ANOTHER_MACRO(/;"	d
-A_MACRO_TEST	input.h	/^#define       A_MACRO_TEST$/;"	d
-SampleTypedefObjC	input.h	/^typedef something SampleTypedefObjC;$/;"	t
-aStruct	input.h	/^struct aStruct$/;"	s
-aStructMember	input.h	/^    int aStructMember;$/;"	m	struct:aStruct
-anotherStructMember	input.h	/^    char *anotherStructMember[ NOT_IN_TAG ];$/;"	m	struct:aStruct
+ANOTHER_MACRO	input.h	/^ # define ANOTHER_MACRO( WITH, MOAR ) \\$/;"	kind:macro	line:21	language:ObjectiveC	interface:
+A_MACRO_TEST	input.h	/^#define       A_MACRO_TEST$/;"	kind:macro	line:15	language:ObjectiveC	interface:
+FileTree	input.h	/^@interface FileTree : NSObject {$/;"	kind:interface	line:33	language:ObjectiveC	struct:aStruct
+FolderTree	input.h	/^@interface FolderTree : FileTree {$/;"	kind:interface	line:52	language:ObjectiveC	interface:
+SampleTypedefObjC	input.h	/^typedef something SampleTypedefObjC;$/;"	kind:typedef	line:17	language:ObjectiveC	interface:
+aStruct	input.h	/^struct aStruct$/;"	kind:struct	line:25	language:ObjectiveC	interface:
+aStructMember	input.h	/^    int aStructMember;$/;"	kind:field	line:27	language:ObjectiveC	struct:aStruct
+addChild:	input.h	/^- (FolderTree*)addChild:(FileTree*)subTree;$/;"	kind:method	line:60	language:ObjectiveC	interface:FolderTree
+anotherStructMember	input.h	/^    char *anotherStructMember[ NOT_IN_TAG ];$/;"	kind:field	line:28	language:ObjectiveC	struct:aStruct
+children	input.h	/^    NSMutableArray     *children;$/;"	kind:field	line:53	language:ObjectiveC	interface:FolderTree
+createLayoutTree	input.h	/^- (LayoutTree*)createLayoutTree;$/;"	kind:method	line:49	language:ObjectiveC	interface:FileTree
+createLayoutTree	input.h	/^- (LayoutTree*)createLayoutTree;$/;"	kind:method	line:62	language:ObjectiveC	interface:FolderTree
+dealloc	input.h	/^- (void)dealloc;$/;"	kind:method	line:46	language:ObjectiveC	interface:FileTree
+dealloc	input.h	/^- (void)dealloc;$/;"	kind:method	line:58	language:ObjectiveC	interface:FolderTree
+diskSize	input.h	/^    FileSize    diskSize;$/;"	kind:field	line:37	language:ObjectiveC	interface:FileTree
+getDiskSize	input.h	/^- (FileSize)getDiskSize;$/;"	kind:method	line:48	language:ObjectiveC	interface:FileTree
+initWithName:andSize:atPlace:	input.h	/^           atPlace:(FolderTree*)parentFolder;$/;"	kind:method	line:41	language:ObjectiveC	interface:FileTree
+initWithName:atPlace:	input.h	/^           atPlace:(FolderTree*)parentFolder;$/;"	kind:method	line:44	language:ObjectiveC	interface:FileTree
+initWithName:atPlace:	input.h	/^           atPlace:(FolderTree*)parentFolder;$/;"	kind:method	line:57	language:ObjectiveC	interface:FolderTree
+name	input.h	/^	NSString	*name;$/;"	kind:field	line:34	language:ObjectiveC	interface:FileTree
+parent	input.h	/^    FolderTree  *parent[THISISNOTATAG];$/;"	kind:field	line:36	language:ObjectiveC	interface:FileTree
+populateChildList:	input.h	/^- (void) populateChildList:(NSString*)root;$/;"	kind:method	line:61	language:ObjectiveC	interface:FolderTree
+representation	input.h	/^    LayoutTree  *representation;$/;"	kind:field	line:35	language:ObjectiveC	interface:FileTree

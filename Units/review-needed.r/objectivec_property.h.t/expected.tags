@@ -1,2 +1,6 @@
-personAge	input.h	/^@property(readonly) int personAge;$/;"	v
-personName	input.h	/^@property(copy) NSString *personName;$/;"	v
+Person	input.h	/^@interface Person : NSObject {$/;"	i	interface:
+age	input.h	/^-(id)initWithAge:(int)age;$/;"	p	interface:Person
+m_age	input.h	/^        int m_age;$/;"	F	interface:Person
+m_name	input.h	/^        NSString *m_name;$/;"	F	interface:Person
+personAge	input.h	/^@property(readonly) int personAge;$/;"	p	interface:Person
+personName	input.h	/^@property(copy) NSString *personName;$/;"	p	interface:Person
