@@ -52,7 +52,7 @@ typedef enum {
 static kindOption ObjcKinds[] = {
 	{TRUE, 'i', "interface", "class interface"},
 	{TRUE, 'I', "implementation", "class implementation"},
-	{TRUE, 'p', "protocol", "Protocol"},
+	{TRUE, 'P', "protocol", "Protocol"},
 	{TRUE, 'm', "method", "Object's method"},
 	{TRUE, 'c', "class", "Class' method"},
 	{TRUE, 'v', "var", "Global variable"},
