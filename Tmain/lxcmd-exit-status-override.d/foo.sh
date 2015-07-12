@@ -1,2 +1,2 @@
 #!/bin/sh
-exit 127
+exit 42

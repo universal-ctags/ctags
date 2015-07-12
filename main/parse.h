@@ -206,7 +206,7 @@ extern boolean invokeXcmd (const char* const fileName, const langType language);
 #endif
 extern boolean processXcmdOption (const char *const option, const char *const parameter);
 extern void addLanguageXcmd (const langType language, const char* const path);
-extern void addTagXcmd (const langType language, vString* pathvstr);
+extern void addTagXcmd (const langType language, vString* pathvstr, const char* flaggs);
 extern void resetXcmdKinds (const langType language, boolean mode);
 extern boolean enableXcmdKind (const langType language, const int kind, const boolean mode);
 extern boolean isXcmdKindEnabled (const langType language, const int kind);

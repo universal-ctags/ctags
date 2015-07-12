@@ -84,9 +84,14 @@ following two tings.
 Availability is detected by the exit status of 
 ``COMMAND`` process; 0 means available.
 If the status is other than 0, the ``LANG`` parser is treated
-as ``disabled`` with warning messages. 77 is a special
+as ``disabled`` with warning messages. 127 is a special
 number; the ``LANG`` parser is treated as disabled without
-warning messages.
+warning messages. You can override the code 127 with your
+own value with notAvailableStatus flag like::
+
+  ... \
+  --xcmd-foo=./foo.sh{notAvailableStatus=42}
+  ... \
 
 Standard output contributes to know the lists.
 ctags expects following format when parsing the output::

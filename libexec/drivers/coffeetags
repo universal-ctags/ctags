@@ -28,7 +28,7 @@
 #
 
 {
-    COMMAND_NOT_FOUND=77
+    COMMAND_NOT_FOUND=127
 
     if type rbenv; then
         if ! rbenv which coffeetags; then
