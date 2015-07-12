@@ -1,0 +1,6 @@
+ctags: Notice: No options will be read from files or environment
+
+ctags: Notice: A-begin
+ctags: Notice: A-with-tab
+ctags: Notice: A-with-spaces
+ctags: Notice: B-begin
