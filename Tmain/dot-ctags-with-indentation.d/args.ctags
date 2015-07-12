@@ -1,0 +1,5 @@
+--_echo=A-begin
+	--_echo=A-with-tab
+    --_echo=A-with-spaces
+--_echo=B-begin
+
