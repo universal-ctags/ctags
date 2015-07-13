@@ -115,11 +115,25 @@ typedef struct sOptionValues {
 	boolean printLanguage;  /* --print-language */
 	boolean guessLanguageEagerly; /* --guess-language-eagerly|-G */
 	boolean quiet;		      /* --quiet */
+	boolean allowXcmdInHomeDir;     /* --_allow-xcmd-in-homedir */
 #ifdef DEBUG
 	long debugLevel;        /* -D  debugging output */
 	unsigned long breakLine;/* -b  source line at which to call lineBreak() */
 #endif
 } optionValues;
+
+typedef enum eOptionLoadingStage {
+	OptionLoadingStageNone,
+	OptionLoadingStageCustom,
+	OptionLoadingStageDosCnf,
+	OptionLoadingStageEtc,
+	OptionLoadingStageLocalEtc,
+	OptionLoadingStageHomeRecursive,
+	OptionLoadingStageCurrentRecursive,
+	OptionLoadingStagePreload,
+	OptionLoadingStageEnvVar,
+	OptionLoadingStageCmdline,
+} OptionLoadingStage;
 
 /*
 *   GLOBAL VARIABLES
@@ -154,8 +168,7 @@ extern void cArgForth (cookedArgs* const current);
 extern boolean isExcludedFile (const char* const name);
 extern boolean isIncludeFile (const char *const fileName);
 extern boolean isIgnoreToken (const char *const name, boolean *const pIgnoreParens, const char **const replacement);
-extern void parseOption (cookedArgs* const cargs);
-extern void parseOptions (cookedArgs* const cargs);
+extern void parseCmdlineOptions (cookedArgs* const cargs);
 extern void previewFirstOption (cookedArgs* const cargs);
 extern void readOptionConfiguration (void);
 extern void initOptions (void);

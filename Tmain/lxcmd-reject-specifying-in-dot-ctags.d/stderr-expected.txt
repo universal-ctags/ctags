@@ -1,0 +1,1 @@
+ctags: Warning: Don't use --xcmd-<LANG> option in ./.ctags nor ./.ctags/*: xcmd-foo

@@ -7,6 +7,14 @@ Extending ctags with *xcmd*
 
 *xcmd* means "External parser command".
 
+WARNING: You cannot use ``--xcmd-<LANG>=COMMAND`` option in
+*./.ctags* and *~/.ctags* to avoid run unwanted ``COMMAND``
+unexpectedly. However, it is inconvenient to test and develop a xcmd
+driver described here. For those who understands risk, you can
+use ``--_allow-xcmd-in-homedir``. By putting this option to
+*/etc/ctags.conf* or */usr/local/etc/ctags.conf*, you can
+use ``--xcmd-<LANG>=COMMAND`` in *~/.ctags* or *~/.ctags/\**.
+
 Basic usage
 ---------------------------------------------------------------------
 There are commands generating tags file specialized to a language.

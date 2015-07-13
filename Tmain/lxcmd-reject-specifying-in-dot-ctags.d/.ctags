@@ -1,0 +1,3 @@
+--langdef=foo
+--xcmd-foo=/bin/echo
+

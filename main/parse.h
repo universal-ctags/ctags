@@ -17,6 +17,10 @@
 #include "strlist.h"
 #include "trashbox.h"
 
+/* Definitions are in option.h but don't include option.h here to avoid
+   recursive inclusion. */
+typedef enum eOptionLoadingStage OptionLoadingStage;
+
 /*
 *   MACROS
 */
@@ -204,7 +208,7 @@ extern void useRegexMethod (const langType language);
 #ifdef HAVE_COPROC
 extern boolean invokeXcmd (const char* const fileName, const langType language);
 #endif
-extern boolean processXcmdOption (const char *const option, const char *const parameter);
+extern boolean processXcmdOption (const char *const option, const char *const parameter, OptionLoadingStage stage);
 extern void addLanguageXcmd (const langType language, const char* const path);
 extern void addTagXcmd (const langType language, vString* pathvstr, const char* flaggs);
 extern void resetXcmdKinds (const langType language, boolean mode);
