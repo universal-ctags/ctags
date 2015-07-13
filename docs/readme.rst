@@ -35,60 +35,26 @@ Contents
 
 .. raw:: pdf
 
-   PageBreak oneColumn
 
-.. include:: news.rst
-.. raw:: pdf
+`Introduced changes <news.rst>`_
 
-   PageBreak oneColumn
+`Choosing a proper parser in ctags <guessing.rst>`_
 
-.. include:: guessing.rst
-.. raw:: pdf
+`Building ctags <building.rst>`_
 
-   PageBreak oneColumn
+`Testing ctags <testing.rst>`_
 
-.. include:: building.rst
-.. raw:: pdf
+`Extending ctags with Regex parser (optlib) <optlib.rst>`_
 
-   PageBreak oneColumn
+`Extending ctags with xcmd <xcmd.rst>`_
 
-.. include:: testing.rst
-.. raw:: pdf
+`ctags Internal API <internal.rst>`_
 
-   PageBreak oneColumn
+`Tips for hacking <tips.rst>`_
 
-.. include:: optlib.rst
-.. raw:: pdf
+`Relationship between other projects <other-projects.rst>`_
 
-   PageBreak oneColumn
+`Tag Format <format.rst>`_
 
-.. include:: xcmd.rst
-.. raw:: pdf
-
-   PageBreak oneColumn
-
-.. include:: internal.rst
-.. raw:: pdf
-
-   PageBreak oneColumn
-
-.. include:: tips.rst
-.. raw:: pdf
-
-   PageBreak oneColumn
-
-.. include:: other-projects.rst
-.. raw:: pdf
-
-   PageBreak oneColumn
-
-.. include:: format.rst
-.. raw:: pdf
-
-   PageBreak oneColumn
-
-.. include:: developers.rst
-.. raw:: pdf
-
-   PageBreak oneColumn
+`Who we are <developers.rst>`_
 
