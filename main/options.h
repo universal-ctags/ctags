@@ -25,7 +25,6 @@
 #include "args.h"
 #include "parse.h"
 #include "strlist.h"
-#include "trashbox.h"
 #include "vstring.h"
 
 /*
@@ -42,7 +41,6 @@ typedef struct sCookedArgs {
 	boolean isOption;
 	boolean longOption;
 	const char* parameter;
-	TrashBox* trashBox;
 	/* public */
 	char* item;
 } cookedArgs;
