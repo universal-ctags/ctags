@@ -104,14 +104,14 @@ printing the *notice* class messages.
 
 Japanese programmers sometimes use Japanese language in comments in
 source code. Of course it is not limited to Japanese. People may use
-their own native language in some case. In such case conding becomes
+their own native language in some case. In such case encoding becomes
 an issue.
 
 ctags didn't care it. ctags just reads input as just bytes sequence and
 use them as is when writing tags entries.
 
 In other hand vim cares it. When loading a file, vim converts the file
-content internal format with one of encodings specified in
+content into internal format with one of encodings specified in
 fileencodings variable.
 
 As the result of this difference, vim cannot move the cursor to the
@@ -128,7 +128,7 @@ This patch introduces two type of options (``--input-encoding=IN``
 and ``--output-encoding=OUT``).
 
 As specified encoding with these options ctags converts input from
-``IN`` encoding to ``OUT`` encoding. ctags uses the conveted strings
+``IN`` encoding to ``OUT`` encoding. ctags uses the converted strings
 when writing pattern parts of tags lines. As the result tags output is
 encoded in ``OUT`` encoding.  In addition ``OUT`` is specified in the
 top tags file as value for ``_TAG_FILE_ENCODING`` pseudo tag.  As
