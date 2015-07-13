@@ -111,7 +111,7 @@ ctags didn't care it. ctags just reads input as just bytes sequence and
 use them as is when writing tags entries.
 
 In other hand vim cares it. When loading a file, vim converts the file
-content into internal format with one of encodings specified in
+content into an internal format with one of encodings specified in
 fileencodings variable.
 
 As the result of this difference, vim cannot move the cursor to the
