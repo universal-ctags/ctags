@@ -1,5 +1,5 @@
 Person	input.h	/^@interface Person : NSObject {$/;"	i	interface:
-age	input.h	/^-(id)initWithAge:(int)age;$/;"	p	interface:Person
+initWithAge:	input.h	/^-(id)initWithAge:(int)age;$/;"	m	interface:Person
 m_age	input.h	/^        int m_age;$/;"	F	interface:Person
 m_name	input.h	/^        NSString *m_name;$/;"	F	interface:Person
 personAge	input.h	/^@property(readonly) int personAge;$/;"	p	interface:Person
