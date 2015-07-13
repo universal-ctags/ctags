@@ -1,11 +1,11 @@
 Building ctags
 =============================================================================
 
-.. include:: autotools.rst
+`Building with configure <autotools.rst>`_
 
-.. include:: windows.rst
+`Building/hacking/using on MS-Windows <windows.rst>`_
 
-.. include:: osx.rst
+`Building on Mac OS <osx.rst>`_
 
 Build system add possibility to change program name
 ---------------------------------------------------------------------

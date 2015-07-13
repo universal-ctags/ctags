@@ -47,7 +47,7 @@ These changes have been merged:
 * Some fixes for D parser
 * C++11's enum class/struct support
 
-.. include:: tracking.rst
+`Tracking other projects <tracking.rst>`_
 
 Softwares using ctags
 ----------------------------------------------------------------------
