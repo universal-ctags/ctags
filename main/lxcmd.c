@@ -48,9 +48,12 @@
 #include <ctype.h>
 #include <stdlib.h>   /* for WIFEXITED and WEXITSTATUS */
 #include <string.h>
+#include <sys/types.h>
 #ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h> /* for WIFEXITED and WEXITSTATUS */
 #endif
+#include <unistd.h>
+
 
 #include "debug.h"
 #include "main.h"
@@ -277,6 +280,13 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 	argv[0] = vStringValue (path->path);
 
 	errno = 0;
+
+	if (getuid() == 0 || geteuid() == 0)
+	{
+		verbose ("all xcmd feature is disabled when running ctags in root privilege\n");
+		vStringDelete (opt);
+		return FALSE;
+	}
 
 	verbose ("loading path kinds of %s from [%s %s]\n", getLanguageName(language), argv[0], argv[1]);
 	r = pcoprocOpen (vStringValue (path->path), argv, &pp, NULL);
@@ -1026,6 +1036,7 @@ static boolean invokeXcmdPath (const char* const fileName, xcmdPath* path, const
 	argv[1] = (char * const)fileName;
 	argv[0] = vStringValue (path->path);
 
+	Assert (!(getuid() == 0 || geteuid() == 0));
 	verbose ("getting tags of %s language from [%s %s]\n", getLanguageName(language), argv[0], argv[1]);
 	r = pcoprocOpen (vStringValue (path->path), argv, &pp, NULL);
 	switch (r) {
