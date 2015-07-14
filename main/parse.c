@@ -247,7 +247,7 @@ nominateLanguageCandidatesForPattern(const char *const baseName, parserCandidate
 	return count;
 }
 
-static vString* extracEmacsModeAtFirstLine(FILE* input);
+static vString* extractEmacsModeAtFirstLine(FILE* input);
 
 /*  The name of the language interpreter, either directly or as the argument
  *  to "env".
@@ -286,7 +286,7 @@ static vString* extractInterpreter (FILE* input)
 		   line if the first line specifies an
 		   interpreter.  */
 
-		interpreter = extracEmacsModeAtFirstLine(input);
+		interpreter = extractEmacsModeAtFirstLine(input);
 		if (!interpreter)
 		{
 			const char* const lastSlash = strrchr (line, '/');
@@ -337,7 +337,7 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 
 }
 
-static vString* extracEmacsModeAtFirstLine(FILE* input)
+static vString* extractEmacsModeAtFirstLine(FILE* input)
 {
 	vString* const vLine = vStringNew ();
 	const char* const line = readLine (vLine, input);
@@ -633,7 +633,7 @@ static const struct taster {
 		.msg    = "zsh autoload tag",
 	},
         {
-		.taste  = extracEmacsModeAtFirstLine,
+		.taste  = extractEmacsModeAtFirstLine,
 		.msg    = "emacs mode at the first line",
         },
         {
