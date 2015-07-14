@@ -48,6 +48,7 @@
 #include <ctype.h>
 #include <stdlib.h>   /* for WIFEXITED and WEXITSTATUS */
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h> /* for WIFEXITED and WEXITSTATUS */
@@ -262,6 +263,32 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 	return TRUE;
 }
 
+static boolean isSafeExecutable (const char* path)
+{
+	struct stat buf;
+
+	Assert (path);
+
+	if (stat (path, &buf))
+	{
+		/* The file doesn't exist. So I cannot say
+		   it is unsafe. The caller should
+		   handle this case. */
+		return TRUE;
+	}
+	else if (buf.st_mode & S_ISUID)
+	{
+		error (WARNING, "xcmd doesn't run a setuid executable: %s", path);
+		return FALSE;
+	}
+	else if (buf.st_mode & S_ISGID)
+	{
+		error (WARNING, "xcmd doesn't run a setgid executable: %s", path);
+		return FALSE;
+	}
+	else
+		return TRUE;
+}
 static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 {
 	enum pcoprocError r;
@@ -288,6 +315,11 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 		return FALSE;
 	}
 
+	if (! isSafeExecutable (argv [0]))
+	{
+		vStringDelete (opt);
+		return FALSE;
+	}
 	verbose ("loading path kinds of %s from [%s %s]\n", getLanguageName(language), argv[0], argv[1]);
 	r = pcoprocOpen (vStringValue (path->path), argv, &pp, NULL);
 	switch (r) {
@@ -1037,6 +1069,9 @@ static boolean invokeXcmdPath (const char* const fileName, xcmdPath* path, const
 	argv[0] = vStringValue (path->path);
 
 	Assert (!(getuid() == 0 || geteuid() == 0));
+	if (! isSafeExecutable (argv [0]))
+		return FALSE;
+
 	verbose ("getting tags of %s language from [%s %s]\n", getLanguageName(language), argv[0], argv[1]);
 	r = pcoprocOpen (vStringValue (path->path), argv, &pp, NULL);
 	switch (r) {
