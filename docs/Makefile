@@ -2,6 +2,6 @@ pdf: universal-ctags.pdf
 html: universal-ctags.html
 
 universal-ctags.pdf: *.rst *.svg
-	rst2pdf universal-ctags.rst -e inkscape
+	./generate_docs.sh pdf
 universal-ctags.html: *.rst *.svg
-	rst2html universal-ctags.rst > $@
+	./generate_docs.sh html

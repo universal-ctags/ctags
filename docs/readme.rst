@@ -33,9 +33,6 @@ Contents
 
 .. section-numbering::
 
-.. raw:: pdf
-
-
 `Introduced changes <news.rst>`_
 
 `Choosing a proper parser in ctags <guessing.rst>`_
