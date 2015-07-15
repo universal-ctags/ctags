@@ -383,7 +383,7 @@ SHOW_DIFF_OUTPUT=--show-diff-output
 endif
 
 .PHONY: check units fuzz noise tmain tinst clean-units clean-gcov run-gcov codecheck
-check: units
+check: tmain units
 
 #
 # FUZZ Target
