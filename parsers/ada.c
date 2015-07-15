@@ -381,7 +381,6 @@ static void makeSpec(adaKind *kind)
       break;
 
     default:
-      printf("Warning, non-spec type trying to be 'spec'ified\n");
       *kind = ADA_KIND_UNDEFINED;
       break;
   }
@@ -583,9 +582,6 @@ static void readNewLine(void)
 
       if(eofCount >= 1000)
       {
-        printf("ERROR: Reached EOF %d times in file %s\n", eofCount,
-               getInputFileName());
-
         longjmp(eofError, exception);
       }
       else
