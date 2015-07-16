@@ -1,0 +1,4 @@
+--options=gdbinit
+--languages=+gdbinit
+--kinds-gdbinit=*
+

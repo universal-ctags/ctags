@@ -1,0 +1,4 @@
+ybuffer-contents	input.gdb	/^define ybuffer-contents$/;"	d
+ybuffer-contents	input.gdb	/^document ybuffer-contents$/;"	D
+yfile_buffers_only	input.gdb	/^set $yfile_buffers_only = 0$/;"	t
+yverbose	input.gdb	/^set $yverbose = 1$/;"	t

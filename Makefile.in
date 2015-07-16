@@ -121,6 +121,7 @@ PRELOAD_OPTLIB =				\
 	\
 	coffee.ctags				\
 	ctags.ctags				\
+	gdbinit.ctags				\
 	m4.ctags				\
 	mib.ctags				\
 	\
