@@ -424,6 +424,20 @@ To know the fileKind of languages, use ``--list-file-kind``::
 	...
 
 
+Disabling parser by default
+---------------------------------------------------------------------
+You can define a parser but disabled by default with ``optional``
+long flag. Following is an example to disable ``foo`` parser
+in definition::
+
+	$ ctags --langdef=foo'{optional}'
+
+This is helpful to add a parser for rather minor language.  This
+option is useful in the case you want to add a parser which large parts
+of users may will not use. You can enable it with putting
+``--languages=+foo`` or ``--languages=all``; and can put it
+to your .ctags.
+
 Submitting an optlib to universal-ctags project
 ---------------------------------------------------------------------
 
