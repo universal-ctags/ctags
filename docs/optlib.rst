@@ -406,7 +406,7 @@ Usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 For overriding add ``fileKind`` long flag ``--langdef=LANG`` option.
 Following is an example to use ``Z`` as a kind letter in a language named
-``foo``:;
+``foo``::
 
 	$ ctags --langdef=foo'{fileKind=Z}' ...
 
