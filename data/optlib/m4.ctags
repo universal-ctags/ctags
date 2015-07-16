@@ -21,7 +21,7 @@
 # USA.
 #
 #
---langdef=m4
+--langdef=m4{optional}
 --map-m4=+.m4
 
 #

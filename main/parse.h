@@ -109,10 +109,10 @@ typedef struct {
 	unsigned int method;           /* See PARSE__... definitions above */
 	tgTableEntry *tgEntries;
 	boolean useCork;
+	boolean enabled;               /* currently enabled? */
 
 	/* used internally */
 	unsigned int id;               /* id assigned to language */
-	boolean enabled;               /* currently enabled? */
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
 	stringList* currentAliaes;     /* current list of aliases */
