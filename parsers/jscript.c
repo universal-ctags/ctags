@@ -1233,11 +1233,6 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 		readToken (token);
 		if (isType (token, TOKEN_CLOSE_CURLY))
 		{
-			/*
-			 * This was most likely a variable declaration of a hash table.
-			 * indicate there were no methods and return.
-			 */
-			has_methods = FALSE;
 			goto cleanUp;
 		}
 
