@@ -80,7 +80,8 @@ static vString* stringListToScope (const stringList* list)
 * Returns TRUE if it did, FALSE (and leaves 's' where
 * it was) otherwise.
 */
-static boolean canMatch (const unsigned char** s, const char* literal)
+static boolean canMatch (const unsigned char** s, const char* literal,
+                         boolean (*end_check) (int))
 {
 	const int literal_length = strlen (literal);
 	const int s_length = strlen ((const char *)*s);
@@ -94,12 +95,37 @@ static boolean canMatch (const unsigned char** s, const char* literal)
 	    return FALSE;
 	}
 	/* Additionally check that we're at the end of a token. */
-	if ( ! (next_char == 0 || isspace (next_char) || next_char == '('))
+	if (! end_check (next_char))
 	{
 	    return FALSE;
 	}
 	*s += literal_length;
 	return TRUE;
+}
+
+static boolean notIdentChar (int c)
+{
+	return ! (isalnum (c) || c == '_');
+}
+
+static boolean notOperatorChar (int c)
+{
+	return ! (c == '[' || c == ']' ||
+	          c == '=' || c == '!' || c == '~' ||
+	          c == '+' || c == '-' ||
+	          c == '@' || c == '*' || c == '/' || c == '%' ||
+	          c == '<' || c == '>' ||
+	          c == '&' || c == '^' || c == '|');
+}
+
+static boolean isWhitespace (int c)
+{
+	return c == 0 || isspace (c);
+}
+
+static boolean canMatchKeyword (const unsigned char** s, const char* literal)
+{
+	return canMatch (s, literal, notIdentChar);
 }
 
 /*
@@ -125,7 +151,7 @@ static boolean parseRubyOperator (vString* name, const unsigned char** cp)
 	int i;
 	for (i = 0; RUBY_OPERATORS[i] != NULL; ++i)
 	{
-	    if (canMatch (cp, RUBY_OPERATORS[i]))
+	    if (canMatch (cp, RUBY_OPERATORS[i], notOperatorChar))
 	    {
 	        vStringCatS (name, RUBY_OPERATORS[i]);
 	        return TRUE;
@@ -320,12 +346,12 @@ static void findRubyTags (void)
 	{
 		const unsigned char *cp = line;
 
-		if (canMatch (&cp, "=begin"))
+		if (canMatch (&cp, "=begin", isWhitespace))
 		{
 			inMultiLineComment = TRUE;
 			continue;
 		}
-		if (canMatch (&cp, "=end"))
+		if (canMatch (&cp, "=end", isWhitespace))
 		{
 			inMultiLineComment = FALSE;
 			continue;
@@ -352,9 +378,11 @@ static void findRubyTags (void)
 		*   puts("hello") \
 		*       unless <exp>
 		*/
-		if (canMatch (&cp, "case") || canMatch (&cp, "for") ||
-			canMatch (&cp, "if") || canMatch (&cp, "unless") ||
-			canMatch (&cp, "while"))
+		if (canMatchKeyword (&cp, "case") ||
+		    canMatchKeyword (&cp, "for") ||
+			canMatchKeyword (&cp, "if") ||
+			canMatchKeyword (&cp, "unless") ||
+			canMatchKeyword (&cp, "while"))
 		{
 			enterUnnamedScope ();
 		}
@@ -363,23 +391,23 @@ static void findRubyTags (void)
 		* "module M", "class C" and "def m" should only be at the beginning
 		* of a line.
 		*/
-		if (canMatch (&cp, "module"))
+		if (canMatchKeyword (&cp, "module"))
 		{
 			readAndEmitTag (&cp, K_MODULE);
 		}
-		else if (canMatch (&cp, "class"))
+		else if (canMatchKeyword (&cp, "class"))
 		{
 			readAndEmitTag (&cp, K_CLASS);
 		}
-		else if (canMatch (&cp, "def"))
+		else if (canMatchKeyword (&cp, "def"))
 		{
 			readAndEmitTag (&cp, K_METHOD);
 		}
-		else if (canMatch (&cp, "describe"))
+		else if (canMatchKeyword (&cp, "describe"))
 		{
 			readAndEmitTag (&cp, K_DESCRIBE);
 		}
-		else if (canMatch (&cp, "context"))
+		else if (canMatchKeyword (&cp, "context"))
 		{
 			readAndEmitTag (&cp, K_CONTEXT);
 		}
@@ -403,11 +431,12 @@ static void findRubyTags (void)
 				*/
 				break;
 			}
-			else if (canMatch (&cp, "begin") || canMatch (&cp, "do"))
+			else if (canMatchKeyword (&cp, "begin") ||
+			         canMatchKeyword (&cp, "do"))
 			{
 				enterUnnamedScope ();
 			}
-			else if (canMatch (&cp, "end") && stringListCount (nesting) > 0)
+			else if (canMatchKeyword (&cp, "end") && stringListCount (nesting) > 0)
 			{
 				/* Leave the most recent scope. */
 				vStringDelete (stringListLast (nesting));
