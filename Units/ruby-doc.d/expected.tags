@@ -1,0 +1,4 @@
+f0	input.rb	/^def f0; end$/;"	f
+f1	input.rb	/^def f1; end$/;"	f
+f2	input.rb	/^def f2; end$/;"	f
+f3	input.rb	/^def f3; end$/;"	f

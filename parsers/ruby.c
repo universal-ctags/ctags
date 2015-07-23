@@ -330,6 +330,8 @@ static void findRubyTags (void)
 			inMultiLineComment = FALSE;
 			continue;
 		}
+		if (inMultiLineComment)
+			continue;
 
 		skipWhitespace (&cp);
 
