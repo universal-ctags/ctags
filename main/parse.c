@@ -86,6 +86,7 @@ extern parserDefinition* parserNew (const char* name)
 	parserDefinition* result = xCalloc (1, parserDefinition);
 	result->name = eStrdup (name);
 	result->fileKind = KIND_FILE_DEFAULT;
+	result->enabled = TRUE;
 	return result;
 }
 
@@ -1138,7 +1139,6 @@ extern void initializeParsing (void)
 		}
 	}
 	verbose ("\n");
-	enableLanguages (TRUE);
 	initializeParsers ();
 }
 
@@ -1242,7 +1242,6 @@ extern void processLanguageDefineOption (
 		def->currentPatterns   = stringListNew ();
 		def->currentExtensions = stringListNew ();
 		def->method            = METHOD_NOT_CRAFTED;
-		def->enabled           = TRUE;
 		def->id                = i;
 		LanguageTable = xRealloc (LanguageTable, i + 1, parserDefinition*);
 		LanguageTable [i] = def;
