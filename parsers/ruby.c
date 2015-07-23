@@ -45,6 +45,8 @@ static kindOption RubyKinds [] = {
 
 static stringList* nesting = NULL;
 
+#define SCOPE_SEPARATOR '.'
+
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -68,7 +70,8 @@ static vString* stringListToScope (const stringList* list)
 	    vString* chunk = stringListItem (list, i);
 	    if (vStringLength (chunk) > 0)
 	    {
-	        vStringCatS (result, (chunks_output++ > 0) ? "." : "");
+	        if (chunks_output++ > 0)
+	            vStringPut (result, SCOPE_SEPARATOR);
 	        vStringCatS (result, vStringValue (chunk));
 	    }
 	}
@@ -167,6 +170,8 @@ static void emitRubyTag (vString* name, rubyKind kind)
 {
 	tagEntryInfo tag;
 	vString* scope;
+	const char *unqualified_name;
+	const char *qualified_name;
 
         if (!RubyKinds[kind].enabled) {
             return;
@@ -175,7 +180,23 @@ static void emitRubyTag (vString* name, rubyKind kind)
 	vStringTerminate (name);
 	scope = stringListToScope (nesting);
 
-	initTagEntry (&tag, vStringValue (name));
+	qualified_name = vStringValue (name);
+	unqualified_name = strrchr (qualified_name, SCOPE_SEPARATOR);
+	if (unqualified_name && unqualified_name[1])
+	{
+		if (unqualified_name > qualified_name)
+		{
+			if (vStringLength (scope) > 0)
+				vStringPut (scope, SCOPE_SEPARATOR);
+			vStringNCatS (scope, qualified_name,
+			              unqualified_name - qualified_name);
+		}
+		unqualified_name++;
+	}
+	else
+		unqualified_name = qualified_name;
+
+	initTagEntry (&tag, unqualified_name);
 	if (vStringLength (scope) > 0) {
 	    tag.extensionFields.scope [0] = "class";
 	    tag.extensionFields.scope [1] = vStringValue (scope);
@@ -217,6 +238,7 @@ static rubyKind parseIdentifier (
 	 * point or equals sign. These are all part of the name.
 	 * A method name may also contain a period if it's a singleton method.
 	 */
+	boolean had_sep = FALSE;
 	const char* also_ok;
 	if (kind == K_METHOD)
 	{
@@ -253,11 +275,21 @@ static rubyKind parseIdentifier (
 	}
 
 	/* Copy the identifier into 'name'. */
-	while (**cp != 0 && (isalnum (**cp) || charIsIn (**cp, also_ok)))
+	while (**cp != 0 && (**cp == ':' || isalnum (**cp) || charIsIn (**cp, also_ok)))
 	{
 		char last_char = **cp;
 
-		vStringPut (name, last_char);
+		if (last_char == ':')
+			had_sep = TRUE;
+		else
+		{
+			if (had_sep)
+			{
+				vStringPut (name, SCOPE_SEPARATOR);
+				had_sep = FALSE;
+			}
+			vStringPut (name, last_char);
+		}
 		++*cp;
 
 		if (kind == K_METHOD)
