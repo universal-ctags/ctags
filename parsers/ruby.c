@@ -21,6 +21,7 @@
 
 #include "entry.h"
 #include "parse.h"
+#include "nestlevel.h"
 #include "read.h"
 #include "vstring.h"
 
@@ -43,7 +44,7 @@ static kindOption RubyKinds [] = {
 	{ TRUE, 'C', "context", "contexts" }
 };
 
-static stringList* nesting = NULL;
+static NestingLevels* nesting = NULL;
 
 #define SCOPE_SEPARATOR '.'
 
@@ -54,22 +55,21 @@ static stringList* nesting = NULL;
 static void enterUnnamedScope (void);
 
 /*
-* Returns a string describing the scope in 'list'.
+* Returns a string describing the scope in 'nls'.
 * We record the current scope as a list of entered scopes.
 * Scopes corresponding to 'if' statements and the like are
 * represented by empty strings. Scopes corresponding to
 * modules and classes are represented by the name of the
 * module or class.
 */
-static vString* stringListToScope (const stringList* list)
+static vString* nestingLevelsToScope (const NestingLevels* nls)
 {
-	unsigned int i;
+	int i;
 	unsigned int chunks_output = 0;
 	vString* result = vStringNew ();
-	const unsigned int max = stringListCount (list);
-	for (i = 0; i < max; ++i)
+	for (i = 0; i < nls->n; ++i)
 	{
-	    vString* chunk = stringListItem (list, i);
+	    const vString* chunk = nls->levels[i].name;
 	    if (vStringLength (chunk) > 0)
 	    {
 	        if (chunks_output++ > 0)
@@ -180,7 +180,7 @@ static void emitRubyTag (vString* name, rubyKind kind)
         }
 
 	vStringTerminate (name);
-	scope = stringListToScope (nesting);
+	scope = nestingLevelsToScope (nesting);
 
 	qualified_name = vStringValue (name);
 	unqualified_name = strrchr (qualified_name, SCOPE_SEPARATOR);
@@ -207,7 +207,7 @@ static void emitRubyTag (vString* name, rubyKind kind)
 	tag.kind = RubyKinds [kind].letter;
 	makeTagEntry (&tag);
 
-	stringListAdd (nesting, vStringNewCopy (name));
+	nestingLevelsPush (nesting, name, kind);
 
 	vStringClear (name);
 	vStringDelete (scope);
@@ -357,7 +357,10 @@ static void readAndEmitTag (const unsigned char** cp, rubyKind expected_kind)
 
 static void enterUnnamedScope (void)
 {
-	stringListAdd (nesting, vStringNewInit (""));
+	vString *name = vStringNewInit ("");
+	NestingLevel *parent = nestingLevelsGetCurrent (nesting);
+	nestingLevelsPush (nesting, name, parent ? parent->type : K_UNDEFINED);
+	vStringDelete (name);
 }
 
 static void findRubyTags (void)
@@ -365,7 +368,7 @@ static void findRubyTags (void)
 	const unsigned char *line;
 	boolean inMultiLineComment = FALSE;
 
-	nesting = stringListNew ();
+	nesting = nestingLevelsNew ();
 
 	/* FIXME: this whole scheme is wrong, because Ruby isn't line-based.
 	* You could perfectly well write:
@@ -471,11 +474,10 @@ static void findRubyTags (void)
 			{
 				enterUnnamedScope ();
 			}
-			else if (canMatchKeyword (&cp, "end") && stringListCount (nesting) > 0)
+			else if (canMatchKeyword (&cp, "end") && nesting->n > 0)
 			{
 				/* Leave the most recent scope. */
-				vStringDelete (stringListLast (nesting));
-				stringListRemoveLast (nesting);
+				nestingLevelsPop (nesting);
 			}
 			else if (*cp == '"')
 			{
@@ -494,7 +496,7 @@ static void findRubyTags (void)
 			}
 		}
 	}
-	stringListDelete (nesting);
+	nestingLevelsFree (nesting);
 }
 
 extern parserDefinition* RubyParser (void)
