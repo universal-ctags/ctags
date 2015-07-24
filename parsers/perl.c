@@ -527,7 +527,7 @@ END_MAIN_WHILE:
 
 extern parserDefinition* PerlParser (void)
 {
-	static const char *const extensions [] = { "pl", "pm", "plx", "perl", NULL };
+	static const char *const extensions [] = { "pl", "pm", "ph", "plx", "perl", NULL };
 	parserDefinition* def = parserNew ("Perl");
 	def->kinds      = PerlKinds;
 	def->kindCount  = KIND_COUNT (PerlKinds);
