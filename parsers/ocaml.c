@@ -123,50 +123,50 @@ typedef struct sOcaKeywordDesc {
 typedef ocamlKeyword ocaToken;
 
 static const ocaKeywordDesc OcamlKeywordTable[] = {
-	{ "and"       , OcaKEYWORD_and       },
-	{ "begin"     , OcaKEYWORD_begin     },
-	{ "class"     , OcaKEYWORD_class     },
-	{ "do"        , OcaKEYWORD_do        },
-	{ "done"      , OcaKEYWORD_done      },
-	{ "else"      , OcaKEYWORD_else      },
-	{ "end"       , OcaKEYWORD_end       },
-	{ "exception" , OcaKEYWORD_exception },
-	{ "for"       , OcaKEYWORD_for       },
-	{ "fun"       , OcaKEYWORD_fun       },
-	{ "function"  , OcaKEYWORD_fun       },
-	{ "functor"   , OcaKEYWORD_functor   },
+	{ "and"       , OcaKEYWORD_and       }, 
+	{ "begin"     , OcaKEYWORD_begin     }, 
+	{ "class"     , OcaKEYWORD_class     }, 
+	{ "do"        , OcaKEYWORD_do        }, 
+	{ "done"      , OcaKEYWORD_done      }, 
+	{ "else"      , OcaKEYWORD_else      }, 
+	{ "end"       , OcaKEYWORD_end       }, 
+	{ "exception" , OcaKEYWORD_exception }, 
+	{ "for"       , OcaKEYWORD_for       }, 
+	{ "fun"       , OcaKEYWORD_fun       }, 
+	{ "function"  , OcaKEYWORD_fun       }, 
+	{ "functor"   , OcaKEYWORD_functor   }, 
 	{ "if"        , OcaKEYWORD_if        },
-	{ "in"        , OcaKEYWORD_in        },
-	{ "let"       , OcaKEYWORD_let       },
-	{ "match"     , OcaKEYWORD_match     },
-	{ "method"    , OcaKEYWORD_method    },
-	{ "module"    , OcaKEYWORD_module    },
-	{ "mutable"   , OcaKEYWORD_mutable   },
-	{ "object"    , OcaKEYWORD_object    },
-	{ "of"        , OcaKEYWORD_of        },
-	{ "rec"       , OcaKEYWORD_rec       },
-	{ "sig"       , OcaKEYWORD_sig       },
-	{ "struct"    , OcaKEYWORD_struct    },
-	{ "then"      , OcaKEYWORD_then      },
-	{ "try"       , OcaKEYWORD_try       },
-	{ "type"      , OcaKEYWORD_type      },
-	{ "val"       , OcaKEYWORD_val       },
+	{ "in"        , OcaKEYWORD_in        }, 
+	{ "let"       , OcaKEYWORD_let       }, 
+	{ "match"     , OcaKEYWORD_match     }, 
+	{ "method"    , OcaKEYWORD_method    }, 
+	{ "module"    , OcaKEYWORD_module    }, 
+	{ "mutable"   , OcaKEYWORD_mutable   }, 
+	{ "object"    , OcaKEYWORD_object    }, 
+	{ "of"        , OcaKEYWORD_of        }, 
+	{ "rec"       , OcaKEYWORD_rec       }, 
+	{ "sig"       , OcaKEYWORD_sig       }, 
+	{ "struct"    , OcaKEYWORD_struct    }, 
+	{ "then"      , OcaKEYWORD_then      }, 
+	{ "try"       , OcaKEYWORD_try       }, 
+	{ "type"      , OcaKEYWORD_type      }, 
+	{ "val"       , OcaKEYWORD_val       }, 
 	{ "value"     , OcaKEYWORD_value     }, /* just to handle revised syntax */
-	{ "virtual"   , OcaKEYWORD_virtual   },
-	{ "while"     , OcaKEYWORD_while     },
-	{ "with"      , OcaKEYWORD_with      },
+	{ "virtual"   , OcaKEYWORD_virtual   }, 
+	{ "while"     , OcaKEYWORD_while     }, 
+	{ "with"      , OcaKEYWORD_with      }, 
 
-	{ "or"        , Tok_Op               },
-	{ "mod "      , Tok_Op               },
-	{ "land "     , Tok_Op               },
-	{ "lor "      , Tok_Op               },
-	{ "lxor "     , Tok_Op               },
-	{ "lsl "      , Tok_Op               },
-	{ "lsr "      , Tok_Op               },
-	{ "asr"       , Tok_Op               },
-	{ "->"        , Tok_To               },
+	{ "or"        , Tok_Op               }, 
+	{ "mod "      , Tok_Op               }, 
+	{ "land "     , Tok_Op               }, 
+	{ "lor "      , Tok_Op               }, 
+	{ "lxor "     , Tok_Op               }, 
+	{ "lsl "      , Tok_Op               }, 
+	{ "lsr "      , Tok_Op               }, 
+	{ "asr"       , Tok_Op               }, 
+	{ "->"        , Tok_To               }, 
 	{ ":"         , Tok_Of               },
-	{ "true"      , Tok_Val              },
+	{ "true"      , Tok_Val              }, 
 	{ "false"     , Tok_Val              }
 };
 
@@ -435,9 +435,13 @@ static ocamlKeyword lex (lexingState * st)
 		retType = lookupKeyword (vStringValue (st->name), Lang_Ocaml);
 
 		if (retType == -1)	/* If it's not a keyword */
+		{
 			return OcaIDENTIFIER;
+		}
 		else
+		{
 			return retType;
+		}
 	}
 	else if (isNum (*st->cp))
 		return eatNumber (st);
@@ -591,7 +595,9 @@ static int getLastNamedIndex ( void )
 	for (i = stackIndex - 1; i >= 0; --i)
 	{
 		if (vStringLength (stack[i].contextName) > 0)
+		{
 			return i;
+		}
 	}
 
 	return -1;
@@ -728,7 +734,9 @@ static void popLastNamed ( void )
 static void popSoftContext ( void )
 {
 	if (stackIndex <= 0)
+	{
 		toDoNext = &globalScope;
+	}
 	else
 	{
 		stackIndex--;
@@ -1025,9 +1033,13 @@ static void exceptionDecl (vString * const ident, ocaToken what,
 	ocaToken whatNext)
 {
 	if (what == OcaIDENTIFIER)
+	{
 		addTag (ident, K_EXCEPTION);
+	}
 	else /* probably ill-formed, give back to global scope */
+	{
 		globalScope (ident, what, whatNext);
+	}
 
 	toDoNext = &globalScope;
 }
@@ -1502,7 +1514,7 @@ static void letParam (vString * const ident, ocaToken what,
 			break;
 
 			/* parse something like
-			 * ~varname:type
+			 * ~varname:type 
 			 * or
 			 * ~varname
 			 * or
@@ -1513,7 +1525,7 @@ static void letParam (vString * const ident, ocaToken what,
 			break;
 
 			/* Optional argument with syntax like this :
-			 * ?(bla = value)
+			 * ?(bla = value) 
 			 * or
 			 * ?bla */
 		case '?':
@@ -1737,9 +1749,7 @@ static void globalLet (vString * const ident, ocaToken what, ocaToken whatNext)
 
 	case Tok_Val:
 		if (vStringValue (ident)[0] == '_')
-		{
 			addTag (ident, K_FUNCTION);
-		}
 		pushStrongContext (ident, ContextFunction);
 		requestStrongPoping ();
 		toDoNext = &letParam;
@@ -1889,18 +1899,18 @@ static void localScope (vString * const ident, ocaToken what, ocaToken whatNext)
 		toDoNext = &mayRedeclare;
 		break;
 
-	/* An in keyword signals the end of the previous context and the
-	 * start of a new one. */
+		/* An in keyword signals the end of the previous context and the
+		 * start of a new one. */
 	case OcaKEYWORD_in:
 		popLastNamed ();
 		pushEmptyContext (&localScope);
 		toDoNext = &mayRedeclare;
 		break;
 
-	/* Ok, we got a '{', which is much likely to create
-	 * a record. We cannot treat it like other [ && (,
-	 * because it may contain the 'with' keyword and screw
-	 * everything else. */
+		/* Ok, we got a '{', which is much likely to create
+		 * a record. We cannot treat it like other [ && (,
+		 * because it may contain the 'with' keyword and screw
+		 * everything else. */
 	case Tok_CurlL:
 		toDoNext = &contextualTillToken;
 		waitedToken = Tok_CurlR;
@@ -1908,8 +1918,8 @@ static void localScope (vString * const ident, ocaToken what, ocaToken whatNext)
 		contextualTillToken (ident, what, whatNext);
 		break;
 
-	/* Yeah imperative feature of OCaml,
-	 * a ';' like in C */
+		/* Yeah imperative feature of OCaml,
+		 * a ';' like in C */
 	case Tok_semi:
 		/* ';;' case should end all scopes */
 		if (whatNext == Tok_semi)
@@ -1919,8 +1929,8 @@ static void localScope (vString * const ident, ocaToken what, ocaToken whatNext)
 			break;
 		}	/* else fallthrough */
 
-	/* Every standard operator has very high precendence
-	 * e.g. expr * expr needs no parentheses */
+		/* Every standard operator has very high precendence
+		 * e.g. expr * expr needs no parentheses */
 	case Tok_Op:
 		toDoNext = &mayRedeclare;
 		break;
@@ -2011,9 +2021,7 @@ static void computeModuleName ( void )
 	long fileSize = ftell (file);
 	fclose (file);	// CLOSE!
 	if (fileSize == 0)
-	{
 		return;
-	}
 
 	int beginIndex = 0;
 	int endIndex = strlen (filename) - 1;
