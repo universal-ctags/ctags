@@ -450,7 +450,24 @@ static void findRubyTags (void)
 		}
 		else if (canMatchKeyword (&cp, "def"))
 		{
-			readAndEmitTag (&cp, K_METHOD);
+			rubyKind kind = K_METHOD;
+			NestingLevel *nl = nestingLevelsGetCurrent (nesting);
+
+			/* if the def is inside an unnamed scope at the class level, assume
+			 * it's from a singleton from a construct like this:
+			 *
+			 * class C
+			 *   class << self
+			 *     def singleton
+			 *       ...
+			 *     end
+			 *   end
+			 * end
+			 */
+			if (nl && nl->type == K_CLASS && vStringLength (nl->name) == 0)
+				kind = K_SINGLETON;
+
+			readAndEmitTag (&cp, kind);
 		}
 		else if (canMatchKeyword (&cp, "describe"))
 		{
