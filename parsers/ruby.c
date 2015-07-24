@@ -19,6 +19,7 @@
 
 #include <string.h>
 
+#include "debug.h"
 #include "entry.h"
 #include "parse.h"
 #include "nestlevel.h"
@@ -172,6 +173,8 @@ static void emitRubyTag (vString* name, rubyKind kind)
 {
 	tagEntryInfo tag;
 	vString* scope;
+	rubyKind parent_kind = K_UNDEFINED;
+	NestingLevel *lvl;
 	const char *unqualified_name;
 	const char *qualified_name;
 
@@ -181,6 +184,9 @@ static void emitRubyTag (vString* name, rubyKind kind)
 
 	vStringTerminate (name);
 	scope = nestingLevelsToScope (nesting);
+	lvl = nestingLevelsGetCurrent (nesting);
+	if (lvl)
+		parent_kind = lvl->type;
 
 	qualified_name = vStringValue (name);
 	unqualified_name = strrchr (qualified_name, SCOPE_SEPARATOR);
@@ -192,6 +198,8 @@ static void emitRubyTag (vString* name, rubyKind kind)
 				vStringPut (scope, SCOPE_SEPARATOR);
 			vStringNCatS (scope, qualified_name,
 			              unqualified_name - qualified_name);
+			/* assume module parent type for a lack of a better option */
+			parent_kind = K_MODULE;
 		}
 		unqualified_name++;
 	}
@@ -200,7 +208,10 @@ static void emitRubyTag (vString* name, rubyKind kind)
 
 	initTagEntry (&tag, unqualified_name);
 	if (vStringLength (scope) > 0) {
-	    tag.extensionFields.scope [0] = "class";
+		Assert (0 <= parent_kind &&
+		        (size_t) parent_kind < (sizeof RubyKinds / sizeof RubyKinds[0]));
+
+	    tag.extensionFields.scope [0] = RubyKinds [parent_kind].name;
 	    tag.extensionFields.scope [1] = vStringValue (scope);
 	}
 	tag.kindName = RubyKinds [kind].name;
