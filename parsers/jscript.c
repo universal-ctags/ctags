@@ -91,14 +91,13 @@ typedef enum eTokenType {
 	TOKEN_COMMA,
 	TOKEN_KEYWORD,
 	TOKEN_OPEN_PAREN,
-	TOKEN_OPERATOR,
 	TOKEN_IDENTIFIER,
 	TOKEN_STRING,
+	TOKEN_TEMPLATE_STRING,
 	TOKEN_PERIOD,
 	TOKEN_OPEN_CURLY,
 	TOKEN_CLOSE_CURLY,
 	TOKEN_EQUAL_SIGN,
-	TOKEN_FORWARD_SLASH,
 	TOKEN_OPEN_SQUARE,
 	TOKEN_CLOSE_SQUARE,
 	TOKEN_REGEXP,
@@ -122,6 +121,7 @@ typedef struct sTokenInfo {
  */
 
 static tokenType LastTokenType;
+static tokenInfo *NextToken;
 
 static langType Lang_js;
 
@@ -173,6 +173,7 @@ static const keywordDesc JsKeywordTable [] = {
  */
 
 /* Recursive functions */
+static void readTokenFull (tokenInfo *const token, boolean include_newlines, vString *const repr);
 static void parseFunction (tokenInfo *const token);
 static boolean parseBlock (tokenInfo *const token, tokenInfo *const orig_parent);
 static boolean parseLine (tokenInfo *const token, tokenInfo *const parent, boolean is_inside_class);
@@ -218,6 +219,21 @@ static void deleteToken (tokenInfo *const token)
 	vStringDelete (token->string);
 	vStringDelete (token->scope);
 	eFree (token);
+}
+
+static void copyToken (tokenInfo *const dest, const tokenInfo *const src,
+                       boolean const include_non_read_info)
+{
+	dest->lineNumber = src->lineNumber;
+	dest->filePosition = src->filePosition;
+	dest->type = src->type;
+	dest->keyword = src->keyword;
+	vStringCopy(dest->string, src->string);
+	if (include_non_read_info)
+	{
+		dest->nestLevel = src->nestLevel;
+		vStringCopy(dest->scope, src->scope);
+	}
 }
 
 /*
@@ -427,10 +443,64 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	fileUngetc (c);		/* unget non-identifier character */
 }
 
+static void parseTemplateString (vString *const string)
+{
+	int c;
+	do
+	{
+		c = fileGetc ();
+		if (c == '`')
+			break;
+		vStringPut (string, c);
+		if (c == '\\')
+		{
+			c = fileGetc();
+			vStringPut(string, c);
+		}
+		else if (c == '$')
+		{
+			c = fileGetc ();
+			if (c != '{')
+				fileUngetc (c);
+			else
+			{
+				int depth = 1;
+				/* we need to use the real token machinery to handle strings,
+				 * comments, regexes and whatnot */
+				tokenInfo *token = newToken ();
+				LastTokenType = TOKEN_UNDEFINED;
+				vStringPut(string, c);
+				do
+				{
+					readTokenFull (token, FALSE, string);
+					if (isType (token, TOKEN_OPEN_CURLY))
+						depth++;
+					else if (isType (token, TOKEN_CLOSE_CURLY))
+						depth--;
+				}
+				while (! isType (token, TOKEN_EOF) && depth > 0);
+				deleteToken (token);
+			}
+		}
+	}
+	while (c != EOF);
+	vStringTerminate (string);
+}
+
 static void readTokenFull (tokenInfo *const token, boolean include_newlines, vString *const repr)
 {
 	int c;
 	int i;
+	boolean newline_encountered = FALSE;
+
+	/* if we've got a token held back, emit it */
+	if (NextToken)
+	{
+		copyToken (token, NextToken, FALSE);
+		deleteToken (NextToken);
+		NextToken = NULL;
+		return;
+	}
 
 	token->type			= TOKEN_UNDEFINED;
 	token->keyword		= KEYWORD_NONE;
@@ -441,10 +511,11 @@ getNextChar:
 	do
 	{
 		c = fileGetc ();
+		if (include_newlines && (c == '\r' || c == '\n'))
+			newline_encountered = TRUE;
 		i++;
 	}
-	while (c == '\t'  ||  c == ' ' ||
-		   ((c == '\r' || c == '\n') && ! include_newlines));
+	while (c == '\t' || c == ' ' || c == '\r' || c == '\n');
 
 	token->lineNumber   = getSourceLineNumber ();
 	token->filePosition = getInputFilePosition ();
@@ -496,44 +567,22 @@ getNextChar:
 			token->type = TOKEN_BINARY_OPERATOR;
 			break;
 
-		case '\r':
-		case '\n':
-			/* This isn't strictly correct per the standard, but following the
-			 * real rules means understanding all statements, and that's not
-			 * what the parser currently does.  What we do here is a guess, by
-			 * avoiding inserting semicolons that would make the statement on
-			 * the left invalid.  Hopefully this should not have false negatives
-			 * (e.g. should not miss insertion of a semicolon) but might have
-			 * false positives (e.g. it will wrongfully emit a semicolon for the
-			 * newline in "foo\n+bar").
-			 * This should however be mostly harmless as we only deal with
-			 * newlines in specific situations where we know a false positive
-			 * wouldn't hurt too bad. */
-			switch (LastTokenType)
-			{
-				/* these cannot be the end of a statement, so hold the newline */
-				case TOKEN_EQUAL_SIGN:
-				case TOKEN_COLON:
-				case TOKEN_PERIOD:
-				case TOKEN_FORWARD_SLASH:
-				case TOKEN_BINARY_OPERATOR:
-				/* and these already end one, no need to duplicate it */
-				case TOKEN_SEMICOLON:
-				case TOKEN_COMMA:
-				case TOKEN_CLOSE_CURLY:
-				case TOKEN_OPEN_CURLY:
-					include_newlines = FALSE; /* no need to recheck */
-					goto getNextChar;
-					break;
-				default:
-					token->type = TOKEN_SEMICOLON;
-			}
-			break;
-
 		case '\'':
 		case '"':
 				  token->type = TOKEN_STRING;
 				  parseString (token->string, c);
+				  token->lineNumber = getSourceLineNumber ();
+				  token->filePosition = getInputFilePosition ();
+				  if (repr)
+				  {
+					  vStringCat (repr, token->string);
+					  vStringPut (repr, c);
+				  }
+				  break;
+
+		case '`':
+				  token->type = TOKEN_TEMPLATE_STRING;
+				  parseTemplateString (token->string);
 				  token->lineNumber = getSourceLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  if (repr)
@@ -564,10 +613,11 @@ getNextChar:
 							  case TOKEN_CHARACTER:
 							  case TOKEN_IDENTIFIER:
 							  case TOKEN_STRING:
+							  case TOKEN_TEMPLATE_STRING:
 							  case TOKEN_CLOSE_CURLY:
 							  case TOKEN_CLOSE_PAREN:
 							  case TOKEN_CLOSE_SQUARE:
-								  token->type = TOKEN_FORWARD_SLASH;
+								  token->type = TOKEN_BINARY_OPERATOR;
 								  break;
 
 							  default:
@@ -642,23 +692,63 @@ getNextChar:
 				  break;
 	}
 
+	if (include_newlines && newline_encountered)
+	{
+		/* This isn't strictly correct per the standard, but following the
+		 * real rules means understanding all statements, and that's not
+		 * what the parser currently does.  What we do here is a guess, by
+		 * avoiding inserting semicolons that would make the statement on
+		 * the left or right obviously invalid.  Hopefully this should not
+		 * have false negatives (e.g. should not miss insertion of a semicolon)
+		 * but might have false positives (e.g. it will wrongfully emit a
+		 * semicolon sometimes, i.e. for the newline in "foo\n(bar)").
+		 * This should however be mostly harmless as we only deal with
+		 * newlines in specific situations where we know a false positive
+		 * wouldn't hurt too bad. */
+
+		/* these already end a statement, so no need to duplicate it */
+		#define IS_STMT_SEPARATOR(t) ((t) == TOKEN_SEMICOLON    || \
+		                              (t) == TOKEN_EOF          || \
+		                              (t) == TOKEN_COMMA        || \
+		                              (t) == TOKEN_CLOSE_CURLY  || \
+		                              (t) == TOKEN_OPEN_CURLY)
+		/* these cannot be the start or end of a statement */
+		#define IS_BINARY_OPERATOR(t) ((t) == TOKEN_EQUAL_SIGN      || \
+		                               (t) == TOKEN_COLON           || \
+		                               (t) == TOKEN_PERIOD          || \
+		                               (t) == TOKEN_BINARY_OPERATOR)
+
+		if (! IS_STMT_SEPARATOR(LastTokenType) &&
+		    ! IS_STMT_SEPARATOR(token->type) &&
+		    ! IS_BINARY_OPERATOR(LastTokenType) &&
+		    ! IS_BINARY_OPERATOR(token->type) &&
+		    /* these cannot be followed by a semicolon */
+		    ! (LastTokenType == TOKEN_OPEN_PAREN ||
+		       LastTokenType == TOKEN_OPEN_SQUARE))
+		{
+			/* hold the the token... */
+			Assert (NextToken == NULL);
+			NextToken = newToken ();
+			copyToken (NextToken, token, FALSE);
+
+			/* ...and emit a semicolon instead */
+			token->type		= TOKEN_SEMICOLON;
+			token->keyword	= KEYWORD_NONE;
+			vStringClear (token->string);
+			if (repr)
+				vStringPut (token->string, '\n');
+		}
+
+		#undef IS_STMT_SEPARATOR
+		#undef IS_BINARY_OPERATOR
+	}
+
 	LastTokenType = token->type;
 }
 
 static void readToken (tokenInfo *const token)
 {
 	readTokenFull (token, FALSE, NULL);
-}
-
-static void copyToken (tokenInfo *const dest, tokenInfo *const src)
-{
-	dest->nestLevel = src->nestLevel;
-	dest->lineNumber = src->lineNumber;
-	dest->filePosition = src->filePosition;
-	dest->type = src->type;
-	dest->keyword = src->keyword;
-	vStringCopy(dest->string, src->string);
-	vStringCopy(dest->scope, src->scope);
 }
 
 /*
@@ -1029,7 +1119,7 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 	tokenInfo *const parent = newToken ();
 
 	/* backup the parent token to allow calls like parseBlock(token, token) */
-	copyToken (parent, orig_parent);
+	copyToken (parent, orig_parent, TRUE);
 
 	token->nestLevel++;
 	/*
@@ -1143,17 +1233,12 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 		readToken (token);
 		if (isType (token, TOKEN_CLOSE_CURLY))
 		{
-			/*
-			 * This was most likely a variable declaration of a hash table.
-			 * indicate there were no methods and return.
-			 */
-			has_methods = FALSE;
 			goto cleanUp;
 		}
 
 		if (isType (token, TOKEN_STRING) || isKeyword(token, KEYWORD_NONE))
 		{
-			copyToken(name, token);
+			copyToken(name, token, TRUE);
 
 			readToken (token);
 			if ( isType (token, TOKEN_COLON) )
@@ -1311,7 +1396,7 @@ nextVar:
 		}
 	}
 
-	copyToken(name, token);
+	copyToken(name, token, TRUE);
 
 	while (! isType (token, TOKEN_CLOSE_CURLY) &&
 	       ! isType (token, TOKEN_SEMICOLON)   &&
@@ -1538,7 +1623,7 @@ nextVar:
 				 * we have established this is a valid function we will
 				 * create the secondary reference to it.
 				 */
-				copyToken(secondary_name, token);
+				copyToken(secondary_name, token, TRUE);
 				readToken (token);
 			}
 
@@ -1804,7 +1889,7 @@ static void parseUI5 (tokenInfo *const token)
 
 		if (isType (token, TOKEN_STRING))
 		{
-			copyToken(name, token);
+			copyToken(name, token, TRUE);
 			readToken (token);
 		}
 
@@ -1900,6 +1985,7 @@ static void findJsTags (void)
 {
 	tokenInfo *const token = newToken ();
 
+	NextToken = NULL;
 	ClassNames = stringListNew ();
 	FunctionNames = stringListNew ();
 	LastTokenType = TOKEN_UNDEFINED;
@@ -1911,6 +1997,8 @@ static void findJsTags (void)
 	ClassNames = NULL;
 	FunctionNames = NULL;
 	deleteToken (token);
+
+	Assert (NextToken == NULL);
 }
 
 /* Create parser definition stucture */

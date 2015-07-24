@@ -1,0 +1,5 @@
+one	input.js	/^	var one = {$/;"	c	class:test
+test	input.js	/^function test () {$/;"	f
+two	input.js	/^	var two = {$/;"	c	class:test
+val	input.js	/^		val: 1$/;"	p	class:test.one
+val	input.js	/^		val: 2,$/;"	p	class:test.two
