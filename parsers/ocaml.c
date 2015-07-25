@@ -2016,13 +2016,6 @@ static void computeModuleName ( void )
 	 */
 	const char *filename = getSourceFileName ();
 
-	FILE *file = fopen (filename, "r");
-	fseek (file, 0, SEEK_END);
-	long fileSize = ftell (file);
-	fclose (file);	// CLOSE!
-	if (fileSize == 0)
-		return;
-
 	int beginIndex = 0;
 	int endIndex = strlen (filename) - 1;
 	vString *moduleName = vStringNew ();
@@ -2082,7 +2075,6 @@ static void findOcamlTags (void)
 
 	initStack ();
 
-	computeModuleName ();
 	tempIdent = vStringNew ();
 	lastModule = vStringNew ();
 	lastClass = vStringNew ();
@@ -2094,6 +2086,9 @@ static void findOcamlTags (void)
 	nextSt.cp = fileReadLine ();
 	toDoNext = &globalScope;
 	nextTok = lex (&nextSt);
+
+	if (nextTok != Tok_EOF)
+		computeModuleName ();
 
 	/* prime the lookahead token */
 	st = nextSt;	// preserve the old state for our first token
