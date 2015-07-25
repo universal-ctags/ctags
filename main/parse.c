@@ -1269,7 +1269,7 @@ static kindOption *langKindOption (const langType language, const int flag)
 	return result;
 }
 
-extern boolean isLanguageKindEnabled (langType language, char kind)
+extern boolean isLanguageKindEnabled (const langType language, char kind)
 {
 	const kindOption *kindOpt;
 

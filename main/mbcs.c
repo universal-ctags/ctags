@@ -12,7 +12,9 @@
 /*
 *   INCLUDE FILES
 */
-#define __USE_GNU
+#ifndef __USE_GNU
+# define __USE_GNU
+#endif
 #include "general.h"  /* must always come first */
 
 #ifdef HAVE_ICONV
