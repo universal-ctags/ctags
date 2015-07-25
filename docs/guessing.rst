@@ -94,8 +94,8 @@ name for template files.  Well-known one is *config.h.in* used in GNU
 autotools.
 
 ctags used suffix here *\*.in* for choosing a parser. *.in* shows
-nothing about the language used in the input file. When fishman-ctags
-finds *.in* as suffix, fishman-ctags checks the next suffix, here *.c*.
+nothing about the language used in the input file. When universal-ctags
+finds *.in* as suffix, universal-ctags checks the next suffix, here *.c*.
 
 Dry running
 ---------------------------------------------------------------------
