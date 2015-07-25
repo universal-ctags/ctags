@@ -1163,7 +1163,7 @@ The default tag file created by \fB@etags_name_executable@\fP.
 The official Universal Ctags web site at:
 
 .RS
-https://github.com/universal-ctags/ctags
+https://ctags.io/
 .RE
 
 Also \fBex\fP(1), \fBvi\fP(1), \fBelvis\fP, or, better yet, \fBvim\fP, the

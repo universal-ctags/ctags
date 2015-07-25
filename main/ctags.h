@@ -16,7 +16,7 @@
 # define PROGRAM_VERSION "Development"
 #endif
 #define PROGRAM_NAME      "Universal Ctags"
-#define PROGRAM_URL       "https://github.com/universal-ctags/ctags"
+#define PROGRAM_URL       "https://ctags.io/"
 #define PROGRAM_COPYRIGHT "Copyright (C) 1996-2009"
 #define AUTHOR_NAME       "Darren Hiebert"
 #define AUTHOR_EMAIL      "dhiebert@users.sourceforge.net"
