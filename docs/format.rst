@@ -1,6 +1,6 @@
 The contents of next section is a copy of FORMAT file in exuberant
 ctags source code in its subversion repository at sourceforge.net.
-I(Masatake YAMATO) is changed only its format in the most of all
+I(Masatake YAMATO) changed only its format in the most of all
 parts.  I added a subsection for showing the position of universal
 ctags.
 

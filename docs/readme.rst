@@ -6,7 +6,7 @@ universal-ctags hacking guide
 
 :Version: Draft
 :Authors: universal-ctags developers
-:Web Page: https://github.com/universal-ctags/ctags
+:Web Page: https://ctags.io/
 
 Introduction
 ======================================================================

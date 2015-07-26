@@ -1,4 +1,4 @@
-.TH CTAGS 1 "Version @VERSION@" "Darren Hiebert" "Exuberant Ctags"
+.TH CTAGS 1 "Version @VERSION@" "Darren Hiebert" "Universal Ctags"
 
 
 .SH "NAME"
@@ -1160,10 +1160,10 @@ The default tag file created by \fB@ctags_name_executable@\fP.
 The default tag file created by \fB@etags_name_executable@\fP.
 
 .SH "SEE ALSO"
-The official Exuberant Ctags web site at:
+The official Universal Ctags web site at:
 
 .RS
-http://ctags.sourceforge.net
+https://ctags.io/
 .RE
 
 Also \fBex\fP(1), \fBvi\fP(1), \fBelvis\fP, or, better yet, \fBvim\fP, the
