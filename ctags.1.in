@@ -809,7 +809,7 @@ are read from these sources. The default is \fIno\fP.
 .TP 5
 \fB\-\-version\fP
 Prints a version identifier for \fB@ctags_name_executable@\fP to standard output, and then
-exits. This is guaranteed to always contain the string "Exuberant Ctags".
+exits. This is guaranteed to always contain the string "Universal Ctags".
 
 
 .SH "OPERATIONAL DETAILS"
