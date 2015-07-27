@@ -3,7 +3,7 @@
 !_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
 !_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
 !_TAG_PROGRAM_NAME	Universal Ctags	//
-!_TAG_PROGRAM_URL	https://github.com/universal-ctags/ctags	/official site/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
 !_TAG_PROGRAM_VERSION	Development	//
 Foo	input.java	/^	public Foo() { \/\/ コンストラクタ$/;"	m	class:Foo
 Foo	input.java	/^class Foo { \/\/ Fooクラス$/;"	c
