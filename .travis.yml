@@ -8,9 +8,14 @@ env:
         - CFLAGS=--coverage CONFOPT=
         - CFLAGS=--coverage CONFOPT=--enable-multithread
 
+sudo: false
+
+addons:
+        apt:
+                packages:
+                        - lcov
+
 before_install:
-        - sudo apt-get update -qq
-        - sudo apt-get install -qq lcov rubygems
         - gem install lcoveralls
 
 before_script:
