@@ -184,6 +184,8 @@ extern vString* expandOnDriversPathList (const char* leaf);
 extern langType getLanguageComponentInOption (const char *const option,
 					      const char *const prefix);
 
+extern boolean processXcmdOption (const char *const option, const char *const parameter, OptionLoadingStage stage);
+
 #endif  /* _OPTIONS_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */
