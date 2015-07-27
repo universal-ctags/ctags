@@ -16,7 +16,6 @@
 #include <string.h>
 #include <limits.h>
 #include <ctype.h>  /* to define tolower () */
-#include <setjmp.h>
 
 #include "debug.h"
 #include "entry.h"
@@ -25,7 +24,6 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
-#include "trashbox.h"
 #include "vstring.h"
 
 /*
@@ -41,14 +39,6 @@
 /*
 *   DATA DECLARATIONS
 */
-static TrashBox* trash_box;
-#define P(new_object,destructor) trashBoxPut(trash_box, new_object, (TrashBoxDestroyItemProc)destructor)
-#define F(object) trashBoxFree(trash_box, object)
-#define B(object) (trashBoxTakeBack(trash_box, object));
-typedef enum eException {
-	ExceptionNone, ExceptionEOF, ExceptionFixedFormat, ExceptionLoop
-} exception_t;
-
 /*  Used to designate type of line read in fixed source form.
  */
 typedef enum eFortranLineType {
@@ -160,6 +150,7 @@ typedef struct sKeywordDesc {
 
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
+	TOKEN_EOF,
 	TOKEN_COMMA,
 	TOKEN_DOUBLE_COLON,
 	TOKEN_IDENTIFIER,
@@ -224,10 +215,10 @@ typedef struct sTokenInfo {
 */
 
 static langType Lang_fortran;
-static jmp_buf Exception;
 static int Ungetc;
 static unsigned int Column;
 static boolean FreeSourceForm;
+static boolean FreeSourceFormFound = FALSE;
 static boolean ParsingString;
 
 /* indexed by tagType */
@@ -461,7 +452,6 @@ static void buildFortranKeywordHash (void)
 /*
 *   Tag generation functions
 */
-static void deleteToken (tokenInfo *const token);
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
@@ -478,7 +468,7 @@ static tokenInfo *newToken (void)
 	token->lineNumber   = getSourceLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
-	return P (token, deleteToken);
+	return token;
 }
 
 static tokenInfo *newTokenFrom (tokenInfo *const token)
@@ -489,7 +479,7 @@ static tokenInfo *newTokenFrom (tokenInfo *const token)
 	token->secondary = NULL;
 	token->parentType = NULL;
 	token->signature = NULL;
-	return P (result, deleteToken);
+	return result;
 }
 
 static void deleteToken (tokenInfo *const token)
@@ -597,12 +587,12 @@ static void makeLabelTag (vString *const label)
 	token->type  = TOKEN_LABEL;
 	vStringCopy (token->string, label);
 	makeFortranTag (token, TAG_LABEL);
-	F (token);
+	deleteToken (token);
 }
 
 static lineType getLineType (void)
 {
-	vString *label = P (vStringNew (), vStringDelete);
+	vString *label = vStringNew ();
 	int column = 0;
 	lineType type = LTYPE_UNDETERMINED;
 
@@ -670,7 +660,7 @@ static lineType getLineType (void)
 		vStringTerminate (label);
 		makeLabelTag (label);
 	}
-	F (label);
+	vStringDelete (label);
 	return type;
 }
 
@@ -708,7 +698,7 @@ static int getFixedFormChar (void)
 		{
 			const int c2 = fileGetc ();
 			if (c2 == '\n')
-				longjmp (Exception, (int) ExceptionFixedFormat);
+				FreeSourceFormFound = TRUE;
 			else
 				fileUngetc (c2);
 		}
@@ -720,8 +710,9 @@ static int getFixedFormChar (void)
 		{
 			case LTYPE_UNDETERMINED:
 			case LTYPE_INVALID:
-				longjmp (Exception, (int) ExceptionFixedFormat);
-				break;
+				FreeSourceFormFound = TRUE;
+				if (! FreeSourceForm)
+				    return EOF;
 
 			case LTYPE_SHORT: break;
 			case LTYPE_COMMENT: skipLine (); break;
@@ -848,7 +839,7 @@ static void ungetChar (const int c)
  */
 static vString *parseInteger (int c)
 {
-	vString *string = P (vStringNew (), vStringDelete);
+	vString *string = vStringNew ();
 
 	if (c == '-')
 	{
@@ -877,10 +868,10 @@ static vString *parseInteger (int c)
 
 static vString *parseNumeric (int c)
 {
-	vString *string = P (vStringNew (), vStringDelete);
+	vString *string = vStringNew ();
 	vString *integer = parseInteger (c);
 	vStringCopy (string, integer);
-	F (integer);
+	vStringDelete (integer);
 
 	c = getChar ();
 	if (c == '.')
@@ -888,7 +879,7 @@ static vString *parseNumeric (int c)
 		integer = parseInteger ('\0');
 		vStringPut (string, c);
 		vStringCat (string, integer);
-		F (integer);
+		vStringDelete (integer);
 		c = getChar ();
 	}
 	if (tolower (c) == 'e')
@@ -896,7 +887,7 @@ static vString *parseNumeric (int c)
 		integer = parseInteger ('\0');
 		vStringPut (string, c);
 		vStringCat (string, integer);
-		F (integer);
+		vStringDelete (integer);
 	}
 	else
 		ungetChar (c);
@@ -921,10 +912,8 @@ static void parseString (vString *const string, const int delimiter)
 	{
 		verbose ("%s: unterminated character string at line %lu\n",
 				getInputFileName (), inputLineNumber);
-		if (c == EOF)
-			longjmp (Exception, (int) ExceptionEOF);
-		else if (! FreeSourceForm)
-			longjmp (Exception, (int) ExceptionFixedFormat);
+		if (c != EOF && ! FreeSourceForm)
+			FreeSourceFormFound = TRUE;
 	}
 	vStringTerminate (string);
 	ParsingString = FALSE;
@@ -970,7 +959,7 @@ static void checkForLabel (void)
 	{
 		vStringTerminate (token->string);
 		makeFortranTag (token, TAG_LABEL);
-		F (token);
+		deleteToken (token);
 	}
 	ungetChar (c);
 }
@@ -986,13 +975,12 @@ static void readIdentifier (tokenInfo *const token, const int c)
 		token->type = TOKEN_IDENTIFIER;
 		if (strncmp (vStringValue (token->string), "end", 3) == 0)
 		{
-			vString *const sub = P (vStringNewInit (vStringValue (token->string) + 3), vStringDelete);
+			vString *const sub = vStringNewInit (vStringValue (token->string) + 3);
 			const keywordId kw = analyzeToken (sub, Lang_fortran);
-			F (sub);
+			vStringDelete (sub);
 			if (kw != KEYWORD_NONE)
 			{
 				token->secondary = newToken ();
-				B (token->secondary);
 				token->secondary->type = TOKEN_KEYWORD;
 				token->secondary->keyword = kw;
 				token->keyword = KEYWORD_end;
@@ -1026,7 +1014,7 @@ getNextChar:
 
 	switch (c)
 	{
-		case EOF:  longjmp (Exception, (int) ExceptionEOF);  break;
+		case EOF:  token->type = TOKEN_EOF;         break;
 		case ' ':  goto getNextChar;
 		case '\t': goto getNextChar;
 		case ',':  token->type = TOKEN_COMMA;       break;
@@ -1118,7 +1106,7 @@ getNextChar:
 			{
 				vString *numeric = parseNumeric (c);
 				vStringCat (token->string, numeric);
-				F (numeric);
+				vStringDelete (numeric);
 				token->type = TOKEN_NUMERIC;
 			}
 			else
@@ -1132,7 +1120,6 @@ static void readSubToken (tokenInfo *const token)
 	if (token->secondary == NULL)
 	{
 		token->secondary = newToken ();
-		B (token->secondary);
 		readToken (token->secondary);
 	}
 }
@@ -1144,7 +1131,8 @@ static void readSubToken (tokenInfo *const token)
 static void skipToToken (tokenInfo *const token, tokenType type)
 {
 	while (! isType (token, type) && ! isType (token, TOKEN_STATEMENT_END) &&
-			!(token->secondary != NULL && isType (token->secondary, TOKEN_STATEMENT_END)))
+			!(token->secondary != NULL && isType (token->secondary, TOKEN_STATEMENT_END)) &&
+			! isType (token, TOKEN_EOF))
 		readToken (token);
 }
 
@@ -1184,7 +1172,7 @@ static void skipOverPairsFull (tokenInfo *const token,
 		else if (token_cb)
 			token_cb (token, user_data);
 		readToken (token);
-	} while (level > 0);
+	} while (level > 0 && !isType (token, TOKEN_EOF));
 }
 
 static void skipOverParensFull (tokenInfo *const token,
@@ -1553,7 +1541,8 @@ static void parseEntityDecl (tokenInfo *const token,
 				 strcmp (vStringValue (token->string), "=>") == 0)
 		{
 			while (! isType (token, TOKEN_COMMA) &&
-					! isType (token, TOKEN_STATEMENT_END))
+					! isType (token, TOKEN_STATEMENT_END) &&
+					! isType (token, TOKEN_EOF))
 			{
 				readToken (token);
 				/* another coarray check, for () and [] */
@@ -1601,7 +1590,10 @@ static void parseTypeDeclarationStmt (tokenInfo *const token)
 	if (!isType (token, TOKEN_STATEMENT_END))  /* if not end of derived type... */
 	{
 		if (isType (token, TOKEN_COMMA))
-			parseQualifierSpecList (token);
+		{
+			tokenInfo* qualifierToken = parseQualifierSpecList (token);
+			deleteToken (qualifierToken);
+		}
 		if (isType (token, TOKEN_DOUBLE_COLON))
 			readToken (token);
 		parseEntityDeclList (token, NULL);
@@ -1649,7 +1641,8 @@ static void parseCommonNamelistStmt (tokenInfo *const token, tagType type)
 			skipOverParens (token);  /* skip explicit-shape-spec-list */
 		if (isType (token, TOKEN_COMMA))
 			readToken (token);
-	} while (! isType (token, TOKEN_STATEMENT_END));
+	} while (! isType (token, TOKEN_STATEMENT_END) &&
+			 ! isType (token, TOKEN_EOF));
 	skipToNextStatement (token);
 }
 
@@ -1669,7 +1662,8 @@ static void parseMap (tokenInfo *const token)
 {
 	Assert (isKeyword (token, KEYWORD_map));
 	skipToNextStatement (token);
-	while (! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_end) &&
+		   ! isType (token, TOKEN_EOF))
 		parseFieldDefinition (token);
 	readSubToken (token);
 	/* should be at KEYWORD_map token */
@@ -1775,13 +1769,14 @@ static void parseStructureStmt (tokenInfo *const token)
 	}
 	skipToNextStatement (token);
 	ancestorPush (name);
-	while (! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_end) &&
+		   ! isType (token, TOKEN_EOF))
 		parseFieldDefinition (token);
 	readSubToken (token);
 	/* secondary token should be KEYWORD_structure token */
 	skipToNextStatement (token);
 	ancestorPop ();
-	F (name);
+	deleteToken (name);
 }
 
 /*  specification-stmt
@@ -1893,6 +1888,7 @@ static void parseComponentDefStmt (tokenInfo *const token)
 		qt = parseQualifierSpecList (token);
 		if (qt->implementation != IMP_DEFAULT)
 			st->implementation = qt->implementation;
+		deleteToken (qt);
 	}
 	if (isType (token, TOKEN_DOUBLE_COLON))
 		readToken (token);
@@ -1900,7 +1896,7 @@ static void parseComponentDefStmt (tokenInfo *const token)
 		parseGenericMethod (token);
 	else
 		parseEntityDeclList (token, st);
-	F (st);
+	deleteToken (st);
 }
 
 /*  derived-type-def is
@@ -1929,6 +1925,7 @@ static void parseDerivedTypeDef (tokenInfo *const token)
 		}
 		makeFortranTag (token, TAG_DERIVED_TYPE);
 	}
+	deleteToken (qualifierToken);
 	ancestorPush (token);
 	skipToNextStatement (token);
 	if (isKeyword (token, KEYWORD_private) ||
@@ -1936,7 +1933,8 @@ static void parseDerivedTypeDef (tokenInfo *const token)
 	{
 		skipToNextStatement (token);
 	}
-	while (! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_end) &&
+		   ! isType (token, TOKEN_EOF))
 	{
 		if (isTypeSpec (token))
 			parseComponentDefStmt (token);
@@ -2000,7 +1998,8 @@ static void parseInterfaceBlock (tokenInfo *const token)
 		name->tag = TAG_INTERFACE;
 	}
 	ancestorPush (name);
-	while (! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_end) &&
+		   ! isType (token, TOKEN_EOF))
 	{
 		switch (token->keyword)
 		{
@@ -2021,7 +2020,7 @@ static void parseInterfaceBlock (tokenInfo *const token)
 	/* secondary token should be KEYWORD_interface token */
 	skipToNextStatement (token);
 	ancestorPop ();
-	F (name);
+	deleteToken (name);
 }
 
 /*  entry-stmt is
@@ -2205,7 +2204,8 @@ static void parseBlockData (tokenInfo *const token)
 	ancestorPush (token);
 	skipToNextStatement (token);
 	parseSpecificationPart (token);
-	while (! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_end) &&
+		   ! isType (token, TOKEN_EOF))
 		skipToNextStatement (token);
 	readSubToken (token);
 	/* secondary token should be KEYWORD_NONE or KEYWORD_block token */
@@ -2244,7 +2244,7 @@ static void parseInternalSubprogramPart (tokenInfo *const token)
 					readToken (token);
 				break;
 		}
-	} while (! done);
+	} while (! done && ! isType (token, TOKEN_EOF));
 }
 
 /*  module is
@@ -2273,7 +2273,8 @@ static void parseModule (tokenInfo *const token)
 	parseSpecificationPart (token);
 	if (isKeyword (token, KEYWORD_contains))
 		parseInternalSubprogramPart (token);
-	while (! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_end) &&
+		   ! isType (token, TOKEN_EOF))
 		skipToNextStatement (token);
 	readSubToken (token);
 	/* secondary token should be KEYWORD_NONE or KEYWORD_module token */
@@ -2297,7 +2298,7 @@ static boolean parseExecutionPart (tokenInfo *const token)
 {
 	boolean result = FALSE;
 	boolean done = FALSE;
-	while (! done)
+	while (! done && ! isType (token, TOKEN_EOF))
 	{
 		switch (token->keyword)
 		{
@@ -2351,7 +2352,7 @@ static void makeSignature (tokenInfo *const token, void* signature)
 
 static vString* parseSignature (tokenInfo *const token)
 {
-	vString* signature = P (vStringNew (), vStringDelete);
+	vString* signature = vStringNew ();
 
 	readToken (token);
 	if (isType (token, TOKEN_PAREN_OPEN))
@@ -2360,7 +2361,6 @@ static vString* parseSignature (tokenInfo *const token)
 		skipOverParensFull (token, makeSignature, signature);
 		vStringPut (signature, ')');
 	}
-	B(signature);
 	return signature;
 }
 
@@ -2379,7 +2379,7 @@ static void parseSubprogramFull (tokenInfo *const token, const tagType tag)
 			name->signature = parseSignature (token);
 		makeFortranTag (name, tag);
 		ancestorPush (name);
-		F (name);
+		deleteToken (name);
 	}
 	else
 		ancestorPush (token);
@@ -2482,29 +2482,21 @@ static void parseProgramUnit (tokenInfo *const token)
 				}
 				break;
 		}
-	} while (TRUE);
+	} while (! isType (token, TOKEN_EOF));
 }
 
-static rescanReason findFortranTags (const unsigned int passCount,
-				     jmp_buf *jbuf __unused__,
-				     TrashBox *tbox)
+static rescanReason findFortranTags (const unsigned int passCount)
 {
 	tokenInfo *token;
-	exception_t exception;
 	rescanReason rescan;
 
 	Assert (passCount < 3);
-
-	trash_box = tbox;
-
 	token = newToken ();
 
 	FreeSourceForm = (boolean) (passCount > 1);
 	Column = 0;
-	exception = (exception_t) setjmp (Exception);
-	if (exception == ExceptionEOF)
-		rescan = RESCAN_NONE;
-	else if (exception == ExceptionFixedFormat  &&  ! FreeSourceForm)
+	parseProgramUnit (token);
+	if (FreeSourceFormFound  &&  ! FreeSourceForm)
 	{
 		verbose ("%s: not fixed source form; retry as free source form\n",
 				getInputFileName ());
@@ -2512,11 +2504,10 @@ static rescanReason findFortranTags (const unsigned int passCount,
 	}
 	else
 	{
-		parseProgramUnit (token);
 		rescan = RESCAN_NONE;
 	}
 	ancestorClear ();
-	F (token);
+	deleteToken (token);
 
 	return rescan;
 }
@@ -2540,7 +2531,7 @@ extern parserDefinition* FortranParser (void)
 	def->kinds      = FortranKinds;
 	def->kindCount  = KIND_COUNT (FortranKinds);
 	def->extensions = extensions;
-	def->parser_with_gc = findFortranTags;
+	def->parser2    = findFortranTags;
 	def->initialize = initialize;
 	return def;
 }

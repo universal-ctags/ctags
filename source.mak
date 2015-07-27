@@ -25,7 +25,6 @@ MAIN_HEADERS =				\
 	$(MAIN_DIR)/routines.h		\
 	$(MAIN_DIR)/sort.h		\
 	$(MAIN_DIR)/strlist.h		\
-	$(MAIN_DIR)/trashbox.h		\
 	$(MAIN_DIR)/vstring.h
 
 PARSER_HEADERS =
@@ -101,7 +100,6 @@ MAIN_SOURCES =					\
 	$(MAIN_DIR)/sort.c			\
 	$(MAIN_DIR)/strlist.c			\
 	$(MAIN_DIR)/tg.c			\
-	$(MAIN_DIR)/trashbox.c			\
 	$(MAIN_DIR)/vstring.c
 
 DEBUG_SOURCES = $(MAIN_DIR)/debug.c

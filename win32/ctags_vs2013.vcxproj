@@ -157,7 +157,6 @@
     <ClCompile Include="..\parsers\tcl.c" />
     <ClCompile Include="..\parsers\tex.c" />
     <ClCompile Include="..\main\tg.c" />
-    <ClCompile Include="..\main\trashbox.c" />
     <ClCompile Include="..\parsers\verilog.c" />
     <ClCompile Include="..\parsers\vhdl.c" />
     <ClCompile Include="..\parsers\vim.c" />
