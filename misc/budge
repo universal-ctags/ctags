@@ -1,0 +1,75 @@
+#!/bin/sh
+# ----------------------------------------------------------------------------------------
+# Show the ratio of the number of files handled by ctags to the number of all files of ctags source directory.
+# -----------------------------------------------------------------------------------------
+: ${CTAGS_TEST:=./ctags}
+
+#
+# Report all unsupported files
+#
+VERBOSE=0
+
+print_help()
+{
+    echo "Usage:"
+    echo "	$0 -h|--help"
+    echo "	$0 [-v|--verbose [-v|--verbose]]"
+    exit $1
+}
+
+while [ $# -gt 0 ]; do
+    case $1 in
+	-h|--help)
+	    print_help 0
+	    ;;
+	-v|--verbose)
+	    VERBOSE=`expr $VERBOSE + 1`
+	    ;;
+	-*)
+	    echo "unknown option: $1"
+	    print_help 1
+	    ;;
+	*)
+	    echo "unknown expected argument: $1"
+	    print_help 1
+	    ;;
+    esac
+    shift
+done
+
+CMDLINE="${CTAGS_TEST} --quiet --options=NONE -G --options=./.ctags --data-dir=+./data --languages=all --options=misc/budge.ctags -R --print-language"
+ALL_FILES=$(git ls-files)
+
+TOTAL=0
+HAS_PARSER=0
+member()
+{
+    local input=$1
+    local f
+    for f in $ALL_FILES; do
+	if [ "$f" = "$input" ]; then
+	    return 0
+	fi
+    done
+    return 1
+}
+
+INPUT=
+LANG=
+${CMDLINE} | { while IFS=': 	' read INPUT LANG; do
+		   if member "$INPUT"; then
+		       if [ "$LANG" != NONE ]; then
+			   if [ "$VERBOSE" -gt 1 ]; then
+			       printf "%-60s %s\n" $INPUT $LANG
+			   fi
+			   HAS_PARSER=$(( HAS_PARSER + 1 ))
+		       else
+			   if [ "${VERBOSE}" -gt 0 ]; then
+			       printf "%-60s %s\n" $INPUT NONE
+			   fi
+		       fi
+		       TOTAL=$(( TOTAL + 1 ))
+		   fi
+	       done
+	       echo "[ctags|$(expr 100 '*' $HAS_PARSER  / $TOTAL)%]"
+}
