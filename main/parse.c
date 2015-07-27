@@ -1278,7 +1278,8 @@ extern boolean isLanguageKindEnabled (langType language, char kind)
 	else if (hasXcmdKind (language, kind))
 		return isXcmdKindEnabled (language, kind);
 
-	Assert (kindOpt  = langKindOption (language, kind));
+	kindOpt  = langKindOption (language, kind)
+	Assert (kindOpt);
 
 	return kindOpt->enabled;
 }
