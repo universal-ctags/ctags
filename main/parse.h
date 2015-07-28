@@ -160,21 +160,15 @@ extern void enableLanguages (const boolean state);
 extern void enableLanguage (const langType language, const boolean state);
 extern void initializeParsing (void);
 extern void freeParserResources (void);
-extern void processLanguageDefineOption (const char *const option, const char *const parameter);
-extern boolean processMapOption (const char *const option, const char *const parameter);
-extern boolean processKindOption (const char *const option, const char *const parameter);
 extern void printLanguageFileKind (const langType language);
 extern void printKindOptions (void);
 extern void printLanguageKinds (const langType language);
-extern boolean processCorpusOption (const char *const option, const char *const parameter);
 extern void printLanguageCorpus (langType language, const char *const spec);
-extern boolean processAliasOption (const char *const option, const char *const parameter);
 extern void printLanguageAliases (const langType language);
 extern void printLanguageList (void);
 extern boolean parseFile (const char *const fileName);
 
 #ifdef HAVE_ICONV
-extern boolean processLanguageEncodingOption (const char *const option, const char *const parameter);
 extern void freeEncodingResources (void);
 #endif
 
@@ -183,7 +177,6 @@ extern void freeEncodingResources (void);
 extern void findRegexTags (void);
 extern boolean matchRegex (const vString* const line, const langType language);
 #endif
-extern boolean processRegexOption (const char *const option, const char *const parameter);
 extern void addLanguageRegex (const langType language, const char* const regex);
 extern void addTagRegex (const langType language, const char* const regex, const char* const name, const char* const kinds, const char* const flags);
 extern void addCallbackRegex (const langType language, const char *const regex, const char *const flags, const regexCallback callback);
