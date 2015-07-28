@@ -1,0 +1,33 @@
+a0	input.scm	/^(define a0 1)$/;"	f
+a1	input.scm	/^(define a1 "a")$/;"	f
+a2	input.scm	/^(define a2 '(a))$/;"	f
+a3	input.scm	/^(define a3 '(a b))$/;"	f
+a4	input.scm	/^(define a4 '(a . b))$/;"	f
+a5	input.scm	/^(define a5 '(a b c))$/;"	f
+a6	input.scm	/^(define a6 '(a b . c))$/;"	f
+a7	input.scm	/^(define a7 '(a$/;"	f
+a8	input.scm	/^(define a8$/;"	f
+a9	input.scm	/^  a9 '(a b . c))$/;"	f
+aa	input.scm	/^  aa$/;"	f
+b0	input.scm	/^(define (b0) 1)$/;"	f
+b1	input.scm	/^(define (b1 a) 1)$/;"	f
+b2	input.scm	/^(define (b2 a b) 1)$/;"	f
+b3	input.scm	/^(define (b3 a . b) 1)$/;"	f
+b4	input.scm	/^(define (b4 a$/;"	f
+b5	input.scm	/^(define (b5$/;"	f
+b6	input.scm	/^(define (b6$/;"	f
+b7	input.scm	/^(define (b7$/;"	f
+b8	input.scm	/^	 b8$/;"	f
+b9	input.scm	/^   b9$/;"	f
+ba	input.scm	/^  (ba$/;"	f
+c0	input.scm	/^(define ((c0)) 1)$/;"	f
+c1	input.scm	/^(define ((c1) a) 1)$/;"	f
+c2	input.scm	/^(define ((c2) a b) 1)$/;"	f
+c3	input.scm	/^(define ((c3) a . b) 1)$/;"	f
+c4	input.scm	/^(define ((c4) a$/;"	f
+c5	input.scm	/^(define ((c5)$/;"	f
+c6	input.scm	/^(define ((c6)$/;"	f
+c7	input.scm	/^(define ((c7)$/;"	f
+c8	input.scm	/^	  c8)$/;"	f
+c9	input.scm	/^	  c9)$/;"	f
+ca	input.scm	/^    ca)$/;"	f
