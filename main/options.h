@@ -184,6 +184,17 @@ extern vString* expandOnDriversPathList (const char* leaf);
 extern langType getLanguageComponentInOption (const char *const option,
 					      const char *const prefix);
 
+extern void processLanguageDefineOption (const char *const option, const char *const parameter);
+extern boolean processMapOption (const char *const option, const char *const parameter);
+extern boolean processKindOption (const char *const option, const char *const parameter);
+extern boolean processCorpusOption (const char *const option, const char *const parameter);
+extern boolean processAliasOption (const char *const option, const char *const parameter);
+#ifdef HAVE_ICONV
+extern boolean processLanguageEncodingOption (const char *const option, const char *const parameter);
+#endif
+extern boolean processRegexOption (const char *const option, const char *const parameter);
+extern boolean processXcmdOption (const char *const option, const char *const parameter, OptionLoadingStage stage);
+
 #endif  /* _OPTIONS_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */
