@@ -41,7 +41,9 @@
 
 # define HAVE__FINDFIRST 1
 # define HAVE_DIRECT_H 1
-# define snprintf _snprintf
+# if _MSC_VER < 1900
+#  define snprintf _snprintf
+# endif
 # define findfirst_t intptr_t
 
 # ifndef _CRT_SECURE_NO_DEPRECATE

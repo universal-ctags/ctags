@@ -15,7 +15,8 @@ INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch
 OPT = /O2
 !if "$(WITH_ICONV)" == "yes"
 DEFINES = $(DEFINES) -DHAVE_ICONV
-LIBS = $(LIBS) -liconv
+LIBS = $(LIBS) /libpath:$(ICONV_DIR)/lib iconv.lib
+INCLUDES = $(INCLUDES) -I$(ICONV_DIR)/include
 !endif
 
 ctags: ctags.exe

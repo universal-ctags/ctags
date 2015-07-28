@@ -53,7 +53,9 @@
 #ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h> /* for WIFEXITED and WEXITSTATUS */
 #endif
-#include <unistd.h>
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
+#endif
 
 
 #include "debug.h"
