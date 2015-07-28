@@ -161,7 +161,6 @@ extern void enableLanguage (const langType language, const boolean state);
 extern void initializeParsing (void);
 extern void freeParserResources (void);
 extern void printLanguageFileKind (const langType language);
-extern void printKindOptions (void);
 extern void printLanguageKinds (const langType language);
 extern void printLanguageCorpus (langType language, const char *const spec);
 extern void printLanguageAliases (const langType language);
