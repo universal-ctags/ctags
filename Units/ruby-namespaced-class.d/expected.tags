@@ -1,0 +1,3 @@
+A	input.rb	/^module A$/;"	m
+B	input.rb	/^  module B$/;"	m	module:A
+C	input.rb	/^class A::B::C; end$/;"	c	module:A.B

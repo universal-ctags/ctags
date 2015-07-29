@@ -1,0 +1,2 @@
+C	input.rb	/^class C$/;"	c
+foo	input.rb	/^    def foo() end$/;"	F	class:C
