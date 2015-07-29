@@ -2829,6 +2829,38 @@ extern void initOptions (void)
 	processExcludeOption (NULL, ".svn");
 	processExcludeOption (NULL, "*~");
 	processExcludeOption (NULL, ".*.swp");
+
+	/* Exclude binary files
+	 * -----------------------------------------------
+	 *
+	 * TODO
+	 *
+	 * It will be interesting if ctags can extract
+	 * symbols from these binaries.
+	 *
+	 * --langdef=nm --regex-nm=...
+	 * --langdef=elf --pre-processor-elf=/bin/nm ...
+	 *
+	 * vim/emacs users never wants the cursor to jump to
+	 * a binary file but may wants to utilize the symbol
+	 * information for completion.
+	 *
+	 * https://bitbucket.org/haypo/hachoir3 can be
+	 * used the alternative for /bin/nm
+	 */
+	processExcludeOption (NULL, "*.o");
+	processExcludeOption (NULL, "*.a");
+	processExcludeOption (NULL, "*.so");
+
+	processExcludeOption (NULL, "*.obj");
+	processExcludeOption (NULL, "*.lib");
+	processExcludeOption (NULL, "*.dll");
+	processExcludeOption (NULL, "*.exe");
+
+	processExcludeOption (NULL, "*.gcno");
+	processExcludeOption (NULL, "*.gcda");
+
+	processExcludeOption (NULL, "*.class");
 }
 
 extern void freeOptionResources (void)
