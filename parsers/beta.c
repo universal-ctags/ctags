@@ -1,5 +1,5 @@
 /*
-*   Copyright (c) 1999-2000, Mjølner Informatics
+*   Copyright (c) 1999-2000, MjÃ¸lner Informatics
 *
 *   Written by Erik Corry <corry@mjolner.dk>
 *
