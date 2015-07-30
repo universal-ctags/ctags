@@ -33,7 +33,7 @@ static void installHtmlRegex (const langType language)
 		"\\1", "f,function,JavaScript functions", NULL);
 }
 
-/* Create parser definition stucture */
+/* Create parser definition structure */
 extern parserDefinition* HtmlParser (void)
 {
 	static const char *const extensions [] = { "htm", "html", NULL };

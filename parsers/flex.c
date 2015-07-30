@@ -2401,7 +2401,7 @@ static void findFlexTags (void)
 	deleteToken (token);
 }
 
-/* Create parser definition stucture */
+/* Create parser definition structure */
 extern parserDefinition* FlexParser (void)
 {
 	static const char *const extensions [] = { "as", "mxml", NULL };

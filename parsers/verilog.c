@@ -746,7 +746,7 @@ static void processFunction (tokenInfo *const token)
 	{
 		verbose ("Found function: %s\n", vStringValue (token->name));
 
-		/* Creat tag */
+		/* Create tag */
 		createTag (token);
 
 		/* Get port list from function */

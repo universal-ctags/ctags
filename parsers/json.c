@@ -378,7 +378,7 @@ static void initialize (const langType language)
 	addKeyword ("null", language, KEYWORD_null);
 }
 
-/* Create parser definition stucture */
+/* Create parser definition structure */
 extern parserDefinition* JsonParser (void)
 {
 	static const char *const extensions [] = { "json", NULL };

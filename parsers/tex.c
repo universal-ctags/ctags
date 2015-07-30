@@ -584,7 +584,7 @@ static void findTexTags (void)
 	deleteToken (token);
 }
 
-/* Create parser definition stucture */
+/* Create parser definition structure */
 extern parserDefinition* TexParser (void)
 {
 	static const char *const extensions [] = { "tex", NULL };
