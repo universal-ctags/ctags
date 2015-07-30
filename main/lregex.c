@@ -6,7 +6,7 @@
 *
 *   This module contains functions for applying regular expression matching.
 *
-*   The code for utlizing the Gnu regex package with regards to processing the
+*   The code for utilizing the Gnu regex package with regards to processing the
 *   regex option and checking for regex matches was adapted from routines in
 *   Gnu etags.
 */
@@ -136,7 +136,7 @@ static void clearPatternSet (const langType language)
 }
 
 /*
-*   Regex psuedo-parser
+*   Regex pseudo-parser
 */
 
 static void makeRegexTag (
@@ -842,7 +842,7 @@ static boolean enable_kind_cb (struct sKind *kind, void *data)
 		kind->enabled = kmr->mode;
 		kmr->result = TRUE;
 	}
-	/* conitnue:
+	/* continue:
 	   There can be more than one patterns which represents this kind. */
 	return FALSE;
 }

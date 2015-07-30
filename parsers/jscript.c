@@ -726,7 +726,7 @@ getNextChar:
 		    ! (LastTokenType == TOKEN_OPEN_PAREN ||
 		       LastTokenType == TOKEN_OPEN_SQUARE))
 		{
-			/* hold the the token... */
+			/* hold the token... */
 			Assert (NextToken == NULL);
 			NextToken = newToken ();
 			copyToken (NextToken, token, FALSE);
@@ -1717,7 +1717,7 @@ nextVar:
 			if (isType (token, TOKEN_CLOSE_CURLY))
 			{
 				/*
-				 * Assume the closing parantheses terminates
+				 * Assume the closing parentheses terminates
 				 * this statements.
 				 */
 				is_terminated = TRUE;
@@ -2001,7 +2001,7 @@ static void findJsTags (void)
 	Assert (NextToken == NULL);
 }
 
-/* Create parser definition stucture */
+/* Create parser definition structure */
 extern parserDefinition* JavaScriptParser (void)
 {
 	static const char *const extensions [] = { "js", NULL };

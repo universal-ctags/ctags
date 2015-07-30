@@ -22,7 +22,7 @@
 #include <stdio.h>  /* to declare tempnam(), and SEEK_SET (hopefully) */
 
 #ifdef HAVE_FCNTL_H
-# include <fcntl.h>  /* to declar O_RDWR, O_CREAT, O_EXCL */
+# include <fcntl.h>  /* to declare O_RDWR, O_CREAT, O_EXCL */
 #endif
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>  /* to declare mkstemp () */
@@ -123,7 +123,7 @@
 # define S_ISUID 0
 #endif
 
-/*  Hack for rediculous practice of Microsoft Visual C++.
+/*  Hack for ridiculous practice of Microsoft Visual C++.
  */
 #if defined (WIN32)
 # if defined (_MSC_VER)

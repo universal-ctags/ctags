@@ -58,7 +58,7 @@ struct sTagFile {
 			char *name;
 				/* length of name for partial matches */
 			size_t nameLength;
-				/* peforming partial match */
+				/* performing partial match */
 			short partial;
 				/* ignoring case */
 			short ignorecase;
