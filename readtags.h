@@ -10,7 +10,7 @@
 *   support to a software tool. The tag lookups provided are sufficiently fast
 *   enough to permit opening a sorted tag file, searching for a matching tag,
 *   then closing the tag file each time a tag is looked up (search times are
-*   on the order of hundreths of a second, even for huge tag files). This is
+*   on the order of hundredths of a second, even for huge tag files). This is
 *   the recommended use of this library for most tool applications. Adhering
 *   to this approach permits a user to regenerate a tag file at will without
 *   the tool needing to detect and resynchronize with changes to the tag file.
@@ -213,11 +213,11 @@ extern const char *tagsField (const tagEntry *const entry, const char *const key
 *        Only tags whose full lengths match `name' will qualify.
 *
 *    TAG_IGNORECASE
-*        Matching will be performed in a case-insenstive manner. Note that
+*        Matching will be performed in a case-insensitive manner. Note that
 *        this disables binary searches of the tag file.
 *
 *    TAG_OBSERVECASE
-*        Matching will be performed in a case-senstive manner. Note that
+*        Matching will be performed in a case-sensitive manner. Note that
 *        this enables binary searches of the tag file.
 *
 *  The function will return TagSuccess if a tag matching the name is found, or
