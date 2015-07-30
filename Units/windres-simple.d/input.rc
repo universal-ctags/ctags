@@ -125,3 +125,26 @@ IDB_JUMP_TO_TAG  	BITMAP	DISCARDABLE		"Res/MainToolbar_JumpToTag.bmp"
 // Icons
 
 IDI_TAGS			ICON	DISCARDABLE		"Res/NppTags.ico"
+
+/* Testing an Accelerator and multi line comments */
+
+IDR_MAINFRAME ACCELERATORS PRELOAD MOVEABLE PURE 
+BEGIN
+    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SAVE_AS,        VIRTKEY, CONTROL, NOINVERT
+    "U",            ID_EDIT_COPYURL,        VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+    VK_F1,          ID_HELP,                VIRTKEY, NOINVERT
+    VK_F1,          ID_CONTEXT_HELP,        VIRTKEY, SHIFT, NOINVERT
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT, NOINVERT
+    VK_RETURN,      ID_FILE_PROPERTIES,     VIRTKEY, ALT, NOINVERT
+END
+
+/////////////////////////////////////////////////////////////////////////////
+// And put a CURSOR in it as well
+
+IDC_LINK_CURSOR		CURSOR  DISCARDABLE     "res\\link_cur.cur"
+
+/* And don't forget a font file */
+
+IDF_CM_ROMAN		FONT	"cmroman.fnt"
