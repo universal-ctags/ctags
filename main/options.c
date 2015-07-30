@@ -297,7 +297,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --language-force=language"},
  {1,"       Force all files to be interpreted using specified language."},
  {1,"  --languages=[+|-]list"},
- {1,"       Restrict files scanned for tags to those mapped to langauges"},
+ {1,"       Restrict files scanned for tags to those mapped to languages"},
  {1,"       specified in the comma-separated 'list'. The list can contain any"},
  {1,"       built-in or user-defined language [all]."},
  {1,"  --libexec-dir=[+]DIR"},
@@ -363,7 +363,7 @@ static optionDescription LongOptionDescription [] = {
 #endif
  {1,"  --_allow-xcmd-in-homedir"},
  {1,"       Allow specifying --xcmd-<LANG> option in ~/.ctags and/or ~/.ctags/*."},
- {1,"       By default it is not allow. This option itself can be specfied only "},
+ {1,"       By default it is not allow. This option itself can be specified only "},
  {1,"       in /etc or /usr/local/etc."},
  {1,"  --_echo=msg"},
  {1,"       Echo MSG to standard error. Useful to debug the chain"},

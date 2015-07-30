@@ -46,7 +46,7 @@ extern boolean openConverter (char* inputEncoding, char* outputEncoding)
 	if (iconv_fd == (iconv_t) -1)
 	{
 		error (FATAL,
-					"failed openning encoding from '%s' to '%s'", inputEncoding, outputEncoding);
+					"failed opening encoding from '%s' to '%s'", inputEncoding, outputEncoding);
 		return FALSE;
 	}
 	return TRUE;

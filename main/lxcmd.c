@@ -200,7 +200,7 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 		return FALSE;
 	else if (!isblank(line[1]))
 	{
-		error (WARNING, "[%s] a space after letter is not found in kind desciption line: %s", args[0], backup);
+		error (WARNING, "[%s] a space after letter is not found in kind description line: %s", args[0], backup);
 		return FALSE;
 	}
 
