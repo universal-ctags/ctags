@@ -34,7 +34,7 @@ This additional functionality is desired:
    class name).
 4. Future extension.
    When even more additional functionality is desired, it must be possible to
-   add this later, whithout breaking programs that don't support it.
+   add this later, without breaking programs that don't support it.
 
 
 From proposal to standard
