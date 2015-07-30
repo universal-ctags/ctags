@@ -1,1 +1,1 @@
-ctags: failed openning encoding from 'invalid' to 'UTF-8'
+ctags: failed opening encoding from 'invalid' to 'UTF-8'
