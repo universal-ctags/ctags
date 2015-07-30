@@ -573,7 +573,7 @@ extern char *readSourceLine (
 		*pSeekValue = ftell (File.fp);
 	result = readLine (vLine, File.fp);
 	fsetpos (File.fp, &orignalPosition);
-	/* If the file is empty, we cannt get the line
+	/* If the file is empty, we can't get the line
 	   for location 0. readSourceLine doesn't know
 	   what itself should do; just report it to the caller. */
 	return result;

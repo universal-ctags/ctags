@@ -61,7 +61,7 @@
 # define USE_REPLACEMENT_TRUNCATE
 #endif
 
-/*  Hack for rediculous practice of Microsoft Visual C++.
+/*  Hack for ridiculous practice of Microsoft Visual C++.
  */
 #if defined (WIN32) && defined (_MSC_VER)
 # define chsize         _chsize
@@ -312,7 +312,7 @@ static boolean isCtagsLine (const char *const line)
 		/*  There must be exactly five fields: two tab fields containing
 		 *  exactly one tab each, the tag must not begin with "#", and the
 		 *  file name should not end with ";", and the excmd must be
-		 *  accceptable.
+		 *  acceptable.
 		 *
 		 *  These conditions will reject tag-looking lines like:
 		 *      int a;        <C-comment>

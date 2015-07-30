@@ -7,7 +7,7 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License.
 *
-*   This module contains functions for invoking external comand.
+*   This module contains functions for invoking external command.
 *   Half of codes are derived from lregex.c.
 *   Core data structure is taken from readtags.h.
 *
