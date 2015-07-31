@@ -1,0 +1,45 @@
+Constants	input.f90	/^module Constants$/;"	m
+E_e	input.f90	/^  real, parameter :: E_e /;"	v	module:Constants
+Named1	input.f90	/^  enum :: Named1$/;"	E	module:Constants
+Named2	input.f90	/^  enum Named2$/;"	E	module:Constants
+Named3	input.f90	/^  enum(8) Named3$/;"	E	module:Constants
+Named4	input.f90	/^  enum*8 Named4$/;"	E	module:Constants
+Named5	input.f90	/^  enum(8) :: Named5$/;"	E	module:Constants
+Named6	input.f90	/^  enum*8 :: Named6$/;"	E	module:Constants
+Named7	input.f90	/^  enum, bind(c) :: Named7$/;"	E	module:Constants
+a	input.f90	/^    enumerat/;"	N	module:Constants
+b	input.f90	/^    enumerator :: a, b,/;"	N	module:Constants
+black	input.f90	/^    enumerator :: red =1, blue, black /;"	N	module:Constants
+blue	input.f90	/^    enumerator :: red =1, blue,/;"	N	module:Constants
+bronze	input.f90	/^    enumerator gold, silver, bronze$/;"	N	module:Constants
+c	input.f90	/^    enumerator :: a, b, c$/;"	N	module:Constants
+gold	input.f90	/^    enumerator gold,/;"	N	module:Constants
+hc	input.f90	/^  real, parameter :: hc /;"	v	module:Constants
+lavender	input.f90	/^    enumerator :: pink, lavender$/;"	N	module:Constants
+pi	input.f90	/^  real, parameter :: pi /;"	v	module:Constants
+pink	input.f90	/^    enumerator :: pink,/;"	N	module:Constants
+purple	input.f90	/^    enumerator :: purple$/;"	N	module:Constants
+red	input.f90	/^    enumerator :: red /;"	N	module:Constants
+silver	input.f90	/^    enumerator gold, silver,/;"	N	module:Constants
+x1	input.f90	/^    enumerator :: x1,/;"	N	module:Constants
+x2	input.f90	/^    enumerator :: x2,/;"	N	module:Constants
+x3	input.f90	/^    enumerator :: x3,/;"	N	module:Constants
+x4	input.f90	/^    enumerator :: x4,/;"	N	module:Constants
+x5	input.f90	/^    enumerator :: x5,/;"	N	module:Constants
+x6	input.f90	/^    enumerator :: x6,/;"	N	module:Constants
+x7	input.f90	/^    enumerator :: x7,/;"	N	module:Constants
+y1	input.f90	/^    enumerator :: x1, y1,/;"	N	module:Constants
+y2	input.f90	/^    enumerator :: x2, y2,/;"	N	module:Constants
+y3	input.f90	/^    enumerator :: x3, y3,/;"	N	module:Constants
+y4	input.f90	/^    enumerator :: x4, y4,/;"	N	module:Constants
+y5	input.f90	/^    enumerator :: x5, y5,/;"	N	module:Constants
+y6	input.f90	/^    enumerator :: x6, y6,/;"	N	module:Constants
+y7	input.f90	/^    enumerator :: x7, y7,/;"	N	module:Constants
+yellow	input.f90	/^    enumerator yellow$/;"	N	module:Constants
+z1	input.f90	/^    enumerator :: x1, y1, z1$/;"	N	module:Constants
+z2	input.f90	/^    enumerator :: x2, y2, z2$/;"	N	module:Constants
+z3	input.f90	/^    enumerator :: x3, y3, z3$/;"	N	module:Constants
+z4	input.f90	/^    enumerator :: x4, y4, z4$/;"	N	module:Constants
+z5	input.f90	/^    enumerator :: x5, y5, z5$/;"	N	module:Constants
+z6	input.f90	/^    enumerator :: x6, y6, z6$/;"	N	module:Constants
+z7	input.f90	/^    enumerator :: x7, y7, z7$/;"	N	module:Constants
