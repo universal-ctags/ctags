@@ -17,9 +17,8 @@
 #endif
 #define PROGRAM_NAME      "Universal Ctags"
 #define PROGRAM_URL       "https://ctags.io/"
-#define PROGRAM_COPYRIGHT "Copyright (C) 1996-2009"
-#define AUTHOR_NAME       "Darren Hiebert"
-#define AUTHOR_EMAIL      "dhiebert@users.sourceforge.net"
+#define PROGRAM_COPYRIGHT "Copyright (C) 2015"
+#define AUTHOR_NAME       "Universal Ctags Team"
 
 #endif	/* _CTAGS_H */
 
