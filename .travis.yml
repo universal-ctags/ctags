@@ -29,10 +29,18 @@ env:
     build_command:   "make -j 4"
     branch_pattern: master
 
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - lcov
+      - binutils-mingw-w64-i686
+      - gcc-mingw-w64-i686
+
 # Only with gcc get the mingw-w64 cross compilers
 before_install:
-  - if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then sudo apt-get update -qq; sudo apt-get install -y binutils-mingw-w64-i686 gcc-mingw-w64-i686; fi
-  - if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then sudo apt-get install -qq lcov rubygems; gem install lcoveralls; fi
+  - if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then gem install lcoveralls; fi
 # Build and run tests. Only with gcc cross compile
 script:
   - if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then make -f mk_mingw.mak CC=i686-w64-mingw32-gcc; fi
