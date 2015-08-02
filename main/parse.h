@@ -40,6 +40,7 @@ typedef void (*simpleParser) (void);
 typedef rescanReason (*rescanParser) (const unsigned int passCount);
 typedef void (*parserInitialize) (langType language);
 typedef void (*parserFinalize) (langType language);
+typedef langType (*specialiedLanguageSelector) (FILE *);
 
 /*
  * Predefined kinds
@@ -97,6 +98,8 @@ typedef struct {
 	parserFinalize finalize;       /* finalize routine, if needed */
 	simpleParser parser;           /* simple parser (common case) */
 	rescanParser parser2;          /* rescanning parser (unusual case) */
+    specialiedLanguageSelector
+        selectLanguage;            /* may be used to resolve conflicts */
 	unsigned int method;           /* See PARSE__... definitions above */
 	tgTableEntry *tgEntries;
 	boolean useCork;
@@ -201,6 +204,7 @@ extern void printXcmdKinds (const langType language, boolean indent);
 extern void freeXcmdResources (void);
 extern void useXcmdMethod (const langType language);
 extern void notifyAvailabilityXcmdMethod (const langType language);
+extern langType pickPerlVersion (FILE *);
 
 #endif  /* _PARSE_H */
 

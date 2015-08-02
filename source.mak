@@ -61,6 +61,7 @@ PARSER_SOURCES =				\
 	$(PARSER_DIR)/ocaml.c			\
 	$(PARSER_DIR)/pascal.c			\
 	$(PARSER_DIR)/perl.c			\
+	$(PARSER_DIR)/perl6.c			\
 	$(PARSER_DIR)/php.c			\
 	$(PARSER_DIR)/python.c			\
 	$(PARSER_DIR)/rexx.c			\

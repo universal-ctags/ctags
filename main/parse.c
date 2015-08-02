@@ -41,6 +41,97 @@ static unsigned int LanguageCount = 0;
 *   FUNCTION DEFINITIONS
 */
 
+/* Returns "Perl" or "Perl6" or NULL if it does not taste like anything */
+static const char *
+tastePerlLine (const char *line)
+{
+	while (isspace(*line))
+		++line;
+#define TR_UNKNOWN NULL
+#define TR_PERL5   "Perl"
+#define TR_PERL6   "Perl6"
+#define STRLEN(s) (sizeof(s) - 1)
+/* Assume the first character has been checked: */
+#define CHECK_PART(line, s) (	\
+	0 == strncmp((line) + 1, (s) + 1, STRLEN(s) - 1) && \
+	!isalnum((line)[STRLEN(s)]))
+	switch (line[0]) {
+		case '#':       /* TODO: taste modeline */
+		case '\0':
+			return TR_UNKNOWN;
+        case '=':
+            if (CHECK_PART(line, "=head1"))
+                return TR_PERL5;
+            if (CHECK_PART(line, "=head2"))
+                return TR_PERL5;
+            break;
+		case 'c':
+			if (CHECK_PART(line, "class"))
+				return TR_PERL6;
+			break;
+        case 'g':
+			if (CHECK_PART(line, "grammar"))
+				return TR_PERL6;
+			break;
+		case 'm':
+            /* TODO: my may be many things: class, role, etc. */
+			if (CHECK_PART(line, "my class"))
+				return TR_PERL6;
+			if (CHECK_PART(line, "method"))
+				return TR_PERL6;
+			if (CHECK_PART(line, "multi"))
+				return TR_PERL6;
+			break;
+        case 'n':
+			if (CHECK_PART(line, "need"))
+				return TR_PERL6;
+            break;
+		case 'p':
+			if (CHECK_PART(line, "package"))
+				return TR_PERL5;
+			break;
+		case 'r':
+			if (CHECK_PART(line, "role"))
+				return TR_PERL6;
+			if (CHECK_PART(line, "require 5"))
+				return TR_PERL5;
+			break;
+		case 'u':
+			if (CHECK_PART(line, "unit"))
+				return TR_PERL6;
+			if (CHECK_PART(line, "use v6"))
+				return TR_PERL6;
+			if (CHECK_PART(line, "use nqp"))
+				return TR_PERL5;
+			if (CHECK_PART(line, "use warnings"))
+				return TR_PERL5;
+			break;
+	}
+#undef CHECK_PART
+	return TR_UNKNOWN;
+}
+
+extern langType
+pickPerlVersion (FILE *input)
+{
+    int i;
+    char line[0x800];
+    const char *lang;
+    while (!feof(input)) {
+        fgets(line, sizeof(line), input);
+        lang = tastePerlLine(line);
+        if (lang)
+            goto select;
+    }
+    lang = "Perl";              /* Default to Perl 5 */
+select:
+    for (i = 0; i < LanguageCount; ++i)
+        if (0 == strcmp(LanguageTable[i]->name, lang))
+            return i;
+    Assert(0);
+    return LANG_AUTO;
+}
+
 extern void makeSimpleTag (
 		const vString* const name, kindOption* const kinds, const int kind)
 {
@@ -672,6 +763,22 @@ static langType arbitrateByTastingAndTwoGram (struct getLangCtx *glc, parserCand
 	return language;
 }
 
+/* If all the candidates have the same specialized language selector, return
+ * it.  Otherwise, return NULL.
+ */
+static specialiedLanguageSelector
+commonSelector (const parserCandidate *candidates, int n_candidates)
+{
+    Assert (n_candidates > 1);
+    specialiedLanguageSelector selector =
+        LanguageTable[ candidates[0].lang ]->selectLanguage;
+    int i;
+    for (i = 1; i < n_candidates; ++i)
+        if (LanguageTable[ candidates[i].lang ]->selectLanguage != selector)
+            return NULL;
+    return selector;        /* This, too, may be NULL */
+}
+
 static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx *glc,
 				       unsigned int nominate (const char *const, parserCandidate**),
 				       langType arbitrate (struct getLangCtx *, parserCandidate  *,
@@ -691,7 +798,12 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 	else if (n_candidates > 1)
 	{
 		GLC_FOPEN_IF_NECESSARY(glc, fopen_error);
-		language = arbitrate (glc, candidates, n_candidates);
+        specialiedLanguageSelector selector =
+            commonSelector(candidates, n_candidates);
+        if (selector)
+		    language = selector (glc->input);
+        else
+            language = arbitrate (glc, candidates, n_candidates);
 		/* At this point we are guaranteed that a language has been
 		 * selected:
 		 */
