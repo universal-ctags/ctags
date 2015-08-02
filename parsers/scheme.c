@@ -66,11 +66,19 @@ static void findSchemeTags (void)
 			(cp [2] == 'E' || cp [2] == 'e') &&
 			(cp [3] == 'F' || cp [3] == 'f'))
 		{
-			while (!isspace (*cp))
+			while (*cp != '\0'  &&  !isspace (*cp))
 				cp++;
 			/* Skip over open parens and white space */
-			while (*cp != '\0' && (isspace (*cp) || *cp == '('))
-				cp++;
+			do {
+				while (*cp != '\0' && (isspace (*cp) || *cp == '('))
+					cp++;
+				if (*cp == '\0')
+					cp = line = fileReadLine ();
+				else
+					break;
+			} while (line);
+			if (line == NULL)
+				break;
 			readIdentifier (name, cp);
 			makeSimpleTag (name, SchemeKinds, K_FUNCTION);
 		}
@@ -79,13 +87,20 @@ static void findSchemeTags (void)
 			(cp [2] == 'E' || cp [2] == 'e') &&
 			(cp [3] == 'T' || cp [3] == 't') &&
 			(cp [4] == '!' || cp [4] == '!') &&
-			(isspace (cp [5])))
+			(isspace (cp [5]) || cp[5] == '\0'))
 		{
-			while (*cp != '\0'  &&  !isspace (*cp))
-				cp++;
+			cp += 5;
 			/* Skip over white space */
-			while (isspace (*cp))
-				cp++;
+			do {
+				while (*cp != '\0' && isspace (*cp))
+					cp++;
+				if (*cp == '\0')
+					cp = line = fileReadLine ();
+				else
+					break;
+			} while (line);
+			if (line == NULL)
+				break;
 			readIdentifier (name, cp);
 			makeSimpleTag (name, SchemeKinds, K_SET);
 		}
