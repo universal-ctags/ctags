@@ -533,6 +533,7 @@ extern parserDefinition* PerlParser (void)
 	def->kindCount  = KIND_COUNT (PerlKinds);
 	def->extensions = extensions;
 	def->parser     = findPerlTags;
+	def->selectLanguage = pickPerlVersion;
 	return def;
 }
 
