@@ -97,6 +97,18 @@ ctags used suffix here *\*.in* for choosing a parser. *.in* shows
 nothing about the language used in the input file. When universal-ctags
 finds *.in* as suffix, universal-ctags checks the next suffix, here *.c*.
 
+Specialized language selectors
+---------------------------------------------------------------------
+
+In some cases, a special function may be used to figure out which parser
+to choose.  (For example, Perl 6 files may have extension .pm, just like
+Perl files do.)  To implement such selector, set ``selectLanguage`` in
+each of the possibly conflicting parsers to the same selection function
+(which you are to implement).  By convention, the function should begin
+with "selectBy".  Then, if there are more than one parser candidates for
+a file and they all have ``selectLanguage`` set to the same selector
+function, this function will be called to pick the language.
+
 Dry running
 ---------------------------------------------------------------------
 With ``--print-language`` option, you can test the parser selector of

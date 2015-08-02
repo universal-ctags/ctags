@@ -1,0 +1,89 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Universal Ctags	//
+!_TAG_PROGRAM_URL	https://github.com/universal-ctags/ctags	/official site/
+!_TAG_PROGRAM_VERSION	Development	//
+BUILD	input.pm	/^        submethod BUILD(:&!setup) { }$/;"	b
+Channel	input.pm	/^    method Channel(Supply:D:) {$/;"	m
+OnSupply	input.pm	/^    my class OnSupply does Supply {$/;"	c
+Promise	input.pm	/^    method Promise(Supply:D:) {$/;"	m
+Supply	input.pm	/^    method Supply(Supply:) { self }$/;"	m
+Supply	input.pm	/^my role Supply {$/;"	r
+SupplyOperations	input.pm	/^my class SupplyOperations is repr('Uninstantiable') { ... }$/;"	c
+Tap	input.pm	/^my class Tap {$/;"	c
+X::Supply::Combinator	input.pm	/^my class X::Supply::Combinator is Exception {$/;"	c
+X::Supply::On::BadSetup	input.pm	/^my class X::Supply::On::BadSetup is Exception {$/;"	c
+X::Supply::On::NoEmit	input.pm	/^my class X::Supply::On::NoEmit is Exception {$/;"	c
+act	input.pm	/^    method act(Supply:D: &actor) {$/;"	m
+add	input.pm	/^            sub add ($source, $what, $index?) {$/;"	s
+add_source	input.pm	/^        method !add_source($/;"	m
+batch	input.pm	/^    method batch(Supply:D $self: :$elems, :$seconds ) {$/;"	m
+categorize	input.pm	/^    multi method categorize(Supply:D: %mapper )  {$/;"	m
+categorize	input.pm	/^    multi method categorize(Supply:D: &mapper )  {$/;"	m
+categorize	input.pm	/^    multi method categorize(Supply:D: @mapper )  {$/;"	m
+categorize	input.pm	/^    proto method categorize (|) { * }$/;"	m
+classify	input.pm	/^    multi method classify(Supply:D: %mapper )  {$/;"	m
+classify	input.pm	/^    multi method classify(Supply:D: &mapper )  {$/;"	m
+classify	input.pm	/^    multi method classify(Supply:D: @mapper )  {$/;"	m
+close	input.pm	/^    method close (Tap:D:) { $!supply.close(self) }$/;"	m
+close	input.pm	/^    multi method close(Supply:D: Tap $t) {$/;"	m
+close	input.pm	/^    multi method close(Supply:D:) { self.close($_) for self.tappers }$/;"	m
+close	input.pm	/^    proto method close(|) { * }$/;"	m
+delay	input.pm	/^    method delay(Supply:D: $time, :$scheduler = $*SCHEDULER) {$/;"	m
+delayed	input.pm	/^    method delayed(Supply:D: $time, :$scheduler = $*SCHEDULER) {$/;"	m
+do	input.pm	/^    method do(Supply:D $self: &side_effect) {$/;"	m
+done	input.pm	/^        method done() {$/;"	m
+done	input.pm	/^    method done(Supply:D:) {$/;"	m
+elems	input.pm	/^    method elems(Supply:D $self: $seconds? ) {$/;"	m
+emit	input.pm	/^        method emit(\\msg) {$/;"	m
+emit	input.pm	/^    method emit(Supply:D: \\msg) {$/;"	m
+flat	input.pm	/^    method flat(Supply:D: )              { SupplyOperations.flat(self) }$/;"	m
+flush	input.pm	/^                sub flush {$/;"	s
+flush	input.pm	/^                sub flush() {$/;"	s
+for	input.pm	/^    method for(Supply:U: |c) {$/;"	m
+from-list	input.pm	/^    method from-list(Supply:U: |c)       { SupplyOperations.from-list(|c) }$/;"	m
+grab	input.pm	/^    method grab(Supply:D $self: &when_done) {$/;"	m
+grep	input.pm	/^    method grep(Supply:D: Mu $test)      { SupplyOperations.grep(self, $test) }$/;"	m
+interval	input.pm	/^    method interval(Supply:U: |c)        { SupplyOperations.interval(|c) }$/;"	m
+last	input.pm	/^    method last(Supply:D $self: Int $number = 1) {  # should be Natural$/;"	m
+lines	input.pm	/^    method lines(Supply:D $self: :$chomp = True ) {$/;"	m
+list	input.pm	/^    method list(Supply:D:) {$/;"	m
+live	input.pm	/^        method live { $!live }$/;"	m
+live	input.pm	/^    method live(Supply:D:) { True };$/;"	m
+map	input.pm	/^    method map(Supply:D: &mapper)        { SupplyOperations.map(self, &mapper) }$/;"	m
+max	input.pm	/^    method max(Supply:D $self: &by = &infix:<cmp>) {$/;"	m
+merge	input.pm	/^    method merge(*@s) {$/;"	m
+message	input.pm	/^    method message() { "Can only use $!combinator to combine defined Supply objects" }$/;"	m
+message	input.pm	/^    method message() {$/;"	m
+migrate	input.pm	/^    method migrate(Supply:D: )           { SupplyOperations.migrate(self) }$/;"	m
+min	input.pm	/^    method min(Supply:D $self: &by = &infix:<cmp>) {$/;"	m
+minmax	input.pm	/^    method minmax(Supply:D $self: &by = &infix:<cmp>) {$/;"	m
+more	input.pm	/^    method more(Supply:D: \\msg) {$/;"	m
+next-batch	input.pm	/^                sub next-batch() {$/;"	s
+on	input.pm	/^sub on(&setup) {$/;"	s
+on-demand	input.pm	/^    method on-demand(Supply:U: |c)       { SupplyOperations.on-demand(|c) }$/;"	m
+on_demand	input.pm	/^    method on_demand(Supply:U: |c)       {$/;"	m
+quit	input.pm	/^        method quit($ex) {$/;"	m
+quit	input.pm	/^    method quit(Supply:D: $ex) {$/;"	m
+reduce	input.pm	/^    method reduce(Supply:D $self: &with) {$/;"	m
+reverse	input.pm	/^    method reverse(Supply:D:)                 { self.grab( {.reverse} ) }$/;"	m
+rotor	input.pm	/^    multi method rotor(Supply:D $self: *@cycle, :$partial) {$/;"	m
+rotor	input.pm	/^    multi method rotor(Supply:D:) {$/;"	m
+rotor	input.pm	/^    proto method rotor(|) {*}$/;"	m
+schedule-on	input.pm	/^    method schedule-on(Supply:D: Scheduler $scheduler) {$/;"	m
+schedule_on	input.pm	/^    method schedule_on(Supply:D: Scheduler $scheduler) {$/;"	m
+sort	input.pm	/^    method sort(Supply:D: &by = &infix:<cmp>) { self.grab( {.sort(&by)} ) }$/;"	m
+squish	input.pm	/^    method squish(Supply:D $self: :&as, :&with is copy) {$/;"	m
+stable	input.pm	/^    method stable(Supply:D: $time, :$scheduler = $*SCHEDULER) {$/;"	m
+start	input.pm	/^    method start(Supply:D: &startee)     { SupplyOperations.start(self, &startee) }$/;"	m
+tap	input.pm	/^        method tap(|c) {$/;"	m
+tap	input.pm	/^    method tap(Supply:D: &emit = -> $ { }, :&done,:&quit={die $_},:&closing) {$/;"	m
+tappers	input.pm	/^    method tappers(Supply:D:) {$/;"	m
+taps	input.pm	/^    method taps(Supply:D:) { +@!tappers }$/;"	m
+uniq	input.pm	/^    method uniq(Supply:D: |c) {$/;"	m
+unique	input.pm	/^    method unique(Supply:D $self: :&as, :&with, :$expires) {$/;"	m
+wait	input.pm	/^    method wait(Supply:D:) {$/;"	m
+words	input.pm	/^    method words(Supply:D $self:) {$/;"	m
+zip	input.pm	/^    method zip(*@s, :&with is copy = &[,]) {$/;"	m
+zip-latest	input.pm	/^    method zip-latest(*@s, :&with is copy = &[,], :$initial ) {$/;"	m
