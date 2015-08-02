@@ -655,10 +655,7 @@ static langType arbitrateByTwoGram (struct getLangCtx *glc, parserCandidate  *ca
 	langType language;
 
 	rewind (glc->input);
-	language = getTwoGramLanguage (glc->input, candidates, n_candidates);
-	if (language == LANG_IGNORE)
-		language = candidates[0].lang;
-	return language;
+	return getTwoGramLanguage (glc->input, candidates, n_candidates);
 }
 
 static langType arbitrateByTastingAndTwoGram (struct getLangCtx *glc, parserCandidate  *candidates,
@@ -767,10 +764,10 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 		if (language == LANG_IGNORE)
 			language = arbitrate (glc, candidates, n_candidates);
 
-		/* At this point we are guaranteed that a language has been
-		 * selected:
-		 */
-		Assert(language != LANG_IGNORE && language != LANG_AUTO);
+		Assert(language != LANG_AUTO);
+
+		if (language == LANG_IGNORE)
+			language = candidates[0].lang;
 	}
 	else
 	{
