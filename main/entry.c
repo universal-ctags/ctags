@@ -178,8 +178,8 @@ static void addPseudoTags (void)
 			(Option.sorted == SO_SORTED ? "1" : "0"),
 			"0=unsorted, 1=sorted, 2=foldcase",
 			NULL);
-		writePseudoTag ("TAG_PROGRAM_AUTHOR",  AUTHOR_NAME,  AUTHOR_EMAIL, NULL);
-		writePseudoTag ("TAG_PROGRAM_NAME",    PROGRAM_NAME, "", NULL);
+		writePseudoTag ("TAG_PROGRAM_AUTHOR",  AUTHOR_NAME,  "", NULL);
+		writePseudoTag ("TAG_PROGRAM_NAME",    PROGRAM_NAME, "Derived from Exuberant Ctags", NULL);
 		writePseudoTag ("TAG_PROGRAM_URL",     PROGRAM_URL,  "official site", NULL);
 		writePseudoTag ("TAG_PROGRAM_VERSION", PROGRAM_VERSION, "", NULL);
 #ifdef HAVE_ICONV

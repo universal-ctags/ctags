@@ -1194,8 +1194,12 @@ static void printProgramIdentification (void)
 	printf ("%s %s, %s %s\n",
 	        PROGRAM_NAME, PROGRAM_VERSION,
 	        PROGRAM_COPYRIGHT, AUTHOR_NAME);
+	printf ("Universal Ctags is derived from Exuberant Ctags.\n");
+	printf ("Exuberant Ctags 5.8, Copyright (C) 1996-2009 Darren Hiebert\n");
+
 	printf ("  Compiled: %s, %s\n", __DATE__, __TIME__);
-	printf ("  Addresses: <%s>, %s\n", AUTHOR_EMAIL, PROGRAM_URL);
+	printf ("  URL: %s\n", PROGRAM_URL);
+
 	printFeatureList ();
 }
 
