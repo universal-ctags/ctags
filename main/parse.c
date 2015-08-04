@@ -695,16 +695,10 @@ static int
 pickLanguageBySelection (selectLanguage selector, FILE *input)
 {
     const char *lang = selector(input);
-    if (lang) {
-        int i;
-        for (i = 0; i < LanguageCount; ++i)
-            if (0 == strcmp(LanguageTable[i]->name, lang))
-                return i;
-        Assert(!"parser for language not found");
-    } else {
-        Assert(!"selector did not return language string");
-    }
-    return LANG_AUTO;
+    if (lang)
+        return getNamedLanguage(lang);
+    else
+        return LANG_IGNORE;
 }
 
 static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx *glc,
@@ -729,7 +723,7 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 		selectLanguage selector = commonSelector(candidates, n_candidates);
 		if (selector) {
 			language = pickLanguageBySelection(selector, glc->input);
-			if (LANG_AUTO == language)
+			if (LANG_IGNORE == language)
 				language = arbitrate (glc, candidates, n_candidates);
 		} else {
 			language = arbitrate (glc, candidates, n_candidates);

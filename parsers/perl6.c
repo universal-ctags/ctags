@@ -12,10 +12,11 @@
  * the GNU General Public License.
  */
 
+#include "general.h"    /* must always come first */
+
 #include <stdio.h>
 #include <string.h>
 
-#include "general.h"
 #include "debug.h"
 #include "entry.h"
 #include "options.h"
@@ -152,7 +153,7 @@ matchToken (const char *s, int len)
     return -1;
 }
 
-static int validPerl6Identifier[0x100] = {
+static const int validPerl6Identifier[0x100] = {
 /* r!perl -e "print qq([(int)'\$_'] = 1,\n)for a..z,A..Z,0..9,':','-','_'"|fmt
  */
     [(int)'a'] = 1, [(int)'b'] = 1, [(int)'c'] = 1, [(int)'d'] = 1,
@@ -174,7 +175,7 @@ static int validPerl6Identifier[0x100] = {
     [(int)'_'] = 1,
 };
 
-static int validMethodPrefix[0x100] = {
+static const int validMethodPrefix[0x100] = {
     [(int)'!'] = 1, [(int)'^'] = 1,
 };
 
