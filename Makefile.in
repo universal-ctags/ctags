@@ -369,6 +369,7 @@ REV := $(shell git rev-parse --short HEAD 2>/dev/null || echo 0)
 ALL_CPPFLAGS += -DCTAGS_COMMIT_ID=0x$(REV)
 
 options.$(OBJEXT): commit-stamp
+entry.$(OBJEXT): commit-stamp
 
 commit-stamp: FORCE
 	echo "$(REV)" > $@.tmp
