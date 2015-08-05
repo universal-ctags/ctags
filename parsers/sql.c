@@ -659,7 +659,7 @@ getNextChar:
 }
 
 /*
- * reads an indentifier, possibly quoted:
+ * reads an identifier, possibly quoted:
  * 		identifier
  * 		"identifier"
  * 		[identifier]
@@ -672,7 +672,7 @@ static void readIdentifier (tokenInfo *const token)
 		tokenInfo *const close_square = newToken ();
 
 		readToken (token);
-		/* eat close swuare */
+		/* eat close square */
 		readToken (close_square);
 		deleteToken (close_square);
 	}
@@ -804,7 +804,7 @@ static void skipArgumentList (tokenInfo *const token)
 	 * Other databases can have arguments with fully declared
 	 * datatypes:
 	 *	 (	name varchar(30), text binary(10)  )
-	 * So we must check for nested open and closing parantheses
+	 * So we must check for nested open and closing parentheses
 	 */
 
 	if (isType (token, TOKEN_OPEN_PAREN))	/* arguments? */
@@ -914,7 +914,7 @@ static void parseSubProgram (tokenInfo *const token)
 			/*
 			 * Read token after which could be the
 			 * command terminator if a prototype
-			 * or an open parantheses
+			 * or an open parenthesis
 			 */
 			readToken (token);
 			if (isType (token, TOKEN_OPEN_PAREN))
@@ -1697,7 +1697,7 @@ static void parseTable (tokenInfo *const token)
 	/*
 	 * This deals with these formats:
 	 *	   create table t1 (c1 int);
-	 *	   create global tempoary table t2 (c1 int);
+	 *	   create global temporary table t2 (c1 int);
 	 *	   create table "t3" (c1 int);
 	 *	   create table bob.t4 (c1 int);
 	 *	   create table bob."t5" (c1 int);

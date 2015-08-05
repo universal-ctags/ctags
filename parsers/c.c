@@ -2159,7 +2159,7 @@ static void restartStatement (statementInfo *const st)
 	processToken (token, st);
 }
 
-/*  Skips over a the mem-initializer-list of a ctor-initializer, defined as:
+/*  Skips over a mem-initializer-list of a ctor-initializer, defined as:
  *
  *  mem-initializer-list:
  *    mem-initializer, mem-initializer-list

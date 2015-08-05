@@ -521,7 +521,7 @@ static parseNext toDoNext;
  * job is finished. */
 static parseNext comeAfter;
 
-/* If a token put an end to current delcaration/
+/* If a token put an end to current declaration/
  * statement */
 static ocaToken terminatingToken;
 
@@ -727,7 +727,7 @@ static void popSoftContext ( void )
  * - module
  * - class definition
  * - the initial global space
- * - a _global_ delcaration (let at global scope or in a module).
+ * - a _global_ declaration (let at global scope or in a module).
  * Created to exit quickly deeply nested context */
 static contextType popStrongContext ( void )
 {
@@ -838,7 +838,7 @@ static void ignoreToken (vString * const UNUSED (ident), ocaToken UNUSED (what))
 }
 
 /********** Grammar */
-/* the purpose of each function is detailled near their
+/* the purpose of each function is detailed near their
  * implementation */
 
 static void killCurrentState ( void )
