@@ -20,6 +20,7 @@
 #include "options.h"
 #include "read.h"
 #include "routines.h"
+#include "selectors.h"
 #include "vstring.h"
 
 #define TRACE_PERL_C 0
@@ -533,6 +534,7 @@ extern parserDefinition* PerlParser (void)
 	def->kindCount  = KIND_COUNT (PerlKinds);
 	def->extensions = extensions;
 	def->parser     = findPerlTags;
+	def->selectLanguage = selectByPickingPerlVersion;
 	return def;
 }
 

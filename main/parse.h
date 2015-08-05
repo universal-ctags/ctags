@@ -40,6 +40,7 @@ typedef void (*simpleParser) (void);
 typedef rescanReason (*rescanParser) (const unsigned int passCount);
 typedef void (*parserInitialize) (langType language);
 typedef void (*parserFinalize) (langType language);
+typedef const char * (*selectLanguage) (FILE *);
 
 /*
  * Predefined kinds
@@ -97,6 +98,7 @@ typedef struct {
 	parserFinalize finalize;       /* finalize routine, if needed */
 	simpleParser parser;           /* simple parser (common case) */
 	rescanParser parser2;          /* rescanning parser (unusual case) */
+	selectLanguage selectLanguage; /* may be used to resolve conflicts */
 	unsigned int method;           /* See PARSE__... definitions above */
 	tgTableEntry *tgEntries;
 	boolean useCork;
