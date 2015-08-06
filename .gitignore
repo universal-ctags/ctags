@@ -1,5 +1,8 @@
 *~
 test.*.diff
+*.func.html
+*.func-sort-c.html
+*.gcov.html
 *.gcno
 *.gcda
 *.gcov
