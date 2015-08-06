@@ -1689,7 +1689,7 @@ extern void printLanguageList (void)
 *   File parsing
 */
 
-static void makeFileTag (const char *const fileName)
+extern void makeFileTag (const char *const fileName)
 {
 	if (Option.include.fileNames)
 	{
