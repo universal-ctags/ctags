@@ -615,7 +615,7 @@ static lineType getLineType (void)
 		 * an asterisk in column 1 may contain any character capable  of
 		 * representation in the processor in columns 2 through 72.
 		 */
-		/*  EXCEPTION! Some compilers permit '!' as a commment character here.
+		/*  EXCEPTION! Some compilers permit '!' as a comment character here.
 		 *
 		 *  Treat # and $ in column 1 as comment to permit preprocessor directives.
 		 *  Treat D and d in column 1 as comment for HP debug statements.
@@ -1586,7 +1586,7 @@ static void parseEntityDeclList (tokenInfo *const token,
 				 !isKeyword (token, KEYWORD_function) &&
 				 !isKeyword (token, KEYWORD_subroutine)))
 	{
-		/* compilers accept keywoeds as identifiers */
+		/* compilers accept keywords as identifiers */
 		if (isType (token, TOKEN_KEYWORD))
 			token->type = TOKEN_IDENTIFIER;
 		parseEntityDecl (token, st);
@@ -1808,7 +1808,7 @@ static void parseStructureStmt (tokenInfo *const token)
  *      or equivalence-stmt (is EQUIVALENCE equivalence-set-list)
  *      or external-stmt    (is EXTERNAL etc.)
  *      or intent-stmt      (is INTENT ( intent-spec ) [::] etc.)
- *      or instrinsic-stmt  (is INTRINSIC etc.)
+ *      or intrinsic-stmt   (is INTRINSIC etc.)
  *      or namelist-stmt    (is NAMELIST / namelist-group-name / etc.)
  *      or optional-stmt    (is OPTIONAL [::] etc.)
  *      or pointer-stmt     (is POINTER [::] object-name etc.)
@@ -2354,7 +2354,7 @@ static void parseModule (tokenInfo *const token)
 /*  execution-part
  *      executable-construct
  *
- *  executable-contstruct is
+ *  executable-construct is
  *      execution-part-construct [execution-part-construct]
  *
  *  execution-part-construct
