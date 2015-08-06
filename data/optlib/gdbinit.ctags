@@ -39,7 +39,8 @@
 ##
 ## document
 ##
---regex-gdbinit=/^document[[:space:]]+([^[:space:]]+)$/\1/D,document/{optional}
+--regex-gdbinit=/^document[[:space:]]+([^[:space:]]+)$/\1/D,document/
+--kinds-gdbinit=-D
 
 ##
 ## set $...
@@ -49,4 +50,5 @@
 ##
 ## __...set $...
 ##
---regex-gdbinit=/^[[:space:]]+set[[:space:]]+\$([a-zA-Z0-9_]+)[[:space:]]*=/\1/l,local-variable/{optional}
+--regex-gdbinit=/^[[:space:]]+set[[:space:]]+\$([a-zA-Z0-9_]+)[[:space:]]*=/\1/l,local-variable/
+--kinds-gdbinit=-l
