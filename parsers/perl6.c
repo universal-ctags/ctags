@@ -31,6 +31,7 @@ enum perl6Kind {
     K_GRAMMAR,
     K_METHOD,
     K_MODULE,
+    K_PACKAGE,
     K_ROLE,
     K_RULE,
     K_SUBMETHOD,
@@ -43,6 +44,7 @@ static kindOption perl6Kinds[] = {
     [K_GRAMMAR]     = { TRUE,  'g', "grammar",    "grammars" },
     [K_METHOD]      = { TRUE,  'm', "method",     "methods" },
     [K_MODULE]      = { TRUE,  'o', "module",     "modules" },
+    [K_PACKAGE]     = { TRUE,  'p', "package",    "packages" },
     [K_ROLE]        = { TRUE,  'r', "role",       "roles" },
     [K_RULE]        = { TRUE,  'u', "rule",       "rules" },
     [K_SUBMETHOD]   = { TRUE,  'b', "submethod",  "submethods" },
@@ -58,6 +60,7 @@ enum token {
     T_MULTI,
     T_MY,
     T_OUR,
+    T_PACKAGE,
     T_PROTO,
     T_ROLE,
     T_RULE,
@@ -75,6 +78,7 @@ static const enum perl6Kind token2kind[] = {
     [T_MULTI]       = K_SUBROUTINE,
     [T_MY]          = K_NONE,
     [T_OUR]         = K_NONE,
+    [T_PACKAGE]     = K_PACKAGE,
     [T_PROTO]       = K_NONE,
     [T_ROLE]        = K_ROLE,
     [T_RULE]        = K_RULE,
@@ -144,7 +148,14 @@ matchToken (const char *s, int len)
             }
             break;
         case 7:
-            if (STREQN(s, "grammar"))           return T_GRAMMAR;
+            switch (s[0]) {
+                case 'g':
+                    if (STREQN(s, "grammar"))   return T_GRAMMAR;
+                    break;
+                case 'p':
+                    if (STREQN(s, "package"))   return T_PACKAGE;
+                    break;
+            }
             break;
         case 9:
             if (STREQN(s, "submethod"))         return T_SUBMETHOD;
