@@ -1264,7 +1264,6 @@ static char* extractMapFromParameter (const langType language,
 		if (*p == '\0')
 		{
 			result = eStrdup (parameter);
-			verbose (" .%s", result);
 			*tail = parameter + strlen (parameter);
 			return result;
 		}
@@ -1273,7 +1272,6 @@ static char* extractMapFromParameter (const langType language,
 			tmp = *p;
 			*p = '\0';
 			result = eStrdup (parameter);
-			verbose (" .%s", result);
 			*p = tmp;
 			*tail = p;
 			return result;
@@ -1297,7 +1295,6 @@ static char* extractMapFromParameter (const langType language,
 			tmp = *p;
 			*p = '\0';
 			result = eStrdup (parameter);
-			verbose (" (%s)", result);
 			*p = tmp;
 			*tail = p + 1;
 			return result;
