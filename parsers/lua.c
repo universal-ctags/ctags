@@ -109,7 +109,10 @@ static void findLuaTags (void)
 			p = p + 9;  /* skip the `function' word */
 			q = strchr ((const char*) p, '(');
 			extract_name (p, q, name);
-		} else if (*(q+1) != '=') { /* ignore `if type(v) == "function" then ...' */
+		} else if (
+			   (*(q+1) != '=') /* ignore `if type(v) == "function" then ...' */
+			   && (q < p)	   /* ignore "function" ~=  */
+			   ) {
 			p = (const char*) &line[0];
 			extract_name (p, q, name);
 		}
