@@ -6,6 +6,10 @@ function test.me_12a(one, two)
 	print"me_12a"
 end
 
+function test.me_12b (one, two)
+	print"me_12b"
+end
+
 
  test.i_123 = function  (x)
 	print"i_123"
