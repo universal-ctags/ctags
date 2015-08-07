@@ -379,7 +379,7 @@ static void findPerlTags (void)
 		else if (strncmp((const char*) cp, "package", (size_t) 7) == 0 &&
 				 ('\0' == cp[7] || isspace(cp[7])))
 		{
-			cp += 8;
+			cp += 7;
 			while (isspace (*cp))
 				cp++;
 			while (!*cp || '#' == *cp) {
