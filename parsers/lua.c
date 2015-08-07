@@ -34,14 +34,6 @@ static kindOption LuaKinds [] = {
 *   FUNCTION DEFINITIONS
 */
 
-/* for debugging purposes */
-static void __unused__ print_string (char *p, char *q)
-{
-	for ( ; p != q; p++)
-		fprintf (errout, "%c", *p);
-	fprintf (errout, "\n");
-}
-
 /*
  * Helper function.
  * Returns 1 if line looks like a line of Lua code.
