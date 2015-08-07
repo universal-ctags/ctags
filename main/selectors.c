@@ -2,11 +2,26 @@
  * selectors.c -- routines for selecting a language
  */
 
+#include "general.h"
+
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "selectors.h"
+
+static const char *selectByLines (FILE *input,
+				  const char* (* lineTaster) (const char *),
+				  const char* defaultLang)
+{
+    char line[0x800];
+    while (fgets(line, sizeof(line), input)) {
+	const char *lang = lineTaster (line);
+	if (lang)
+	    return lang;
+    }
+    return defaultLang;
+}
 
 /* Returns "Perl" or "Perl6" or NULL if it does not taste like anything */
 static const char *
@@ -81,11 +96,6 @@ tastePerlLine (const char *line)
 const char *
 selectByPickingPerlVersion (FILE *input)
 {
-    char line[0x800];
-    while (fgets(line, sizeof(line), input)) {
-        const char *lang = tastePerlLine(line);
-        if (lang)
-            return lang;
-    }
-    return TR_PERL5;                /* Default to Perl 5 */
+    /* Default to Perl 5 */
+    return selectByLines (input, tastePerlLine, TR_PERL5);
 }
