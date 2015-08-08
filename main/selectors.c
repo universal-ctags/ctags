@@ -17,10 +17,8 @@ static const char *TR_PERL6   = "Perl6";
 static const char *TR_OBJC    = "ObjectiveC";
 static const char *TR_MATLAB  = "MatLab";
 
-static boolean startsWith (const char *line, const char* prefix)
-{
-    return strncmp(line, prefix, strlen(prefix)) == 0? TRUE: FALSE;
-}
+#define startsWith(line,prefix) \
+  (strncmp(line, prefix, strlen(prefix)) == 0? TRUE: FALSE)
 
 static const char *selectByLines (FILE *input,
 				  const char* (* lineTaster) (const char *),
