@@ -328,11 +328,13 @@ parserDefinition *
 Perl6Parser (void)
 {
     static const char *const extensions[] = { "p6", "pm6", "pm", "pl6", NULL };
+    static selectLanguage selectors [] = { selectByPickingPerlVersion,
+					   NULL };
     parserDefinition* def = parserNew("Perl6");
     def->kinds      = perl6Kinds;
     def->kindCount  = KIND_COUNT(perl6Kinds);
     def->extensions = extensions;
     def->parser     = findPerl6Tags;
-    def->selectLanguage = selectByPickingPerlVersion;
+    def->selectLanguage = selectors;
     return def;
 }

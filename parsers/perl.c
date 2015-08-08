@@ -529,12 +529,14 @@ END_MAIN_WHILE:
 extern parserDefinition* PerlParser (void)
 {
 	static const char *const extensions [] = { "pl", "pm", "ph", "plx", "perl", NULL };
+	static selectLanguage selectors [] = { selectByPickingPerlVersion,
+					       NULL };
 	parserDefinition* def = parserNew ("Perl");
 	def->kinds      = PerlKinds;
 	def->kindCount  = KIND_COUNT (PerlKinds);
 	def->extensions = extensions;
 	def->parser     = findPerlTags;
-	def->selectLanguage = selectByPickingPerlVersion;
+	def->selectLanguage = selectors;
 	return def;
 }
 

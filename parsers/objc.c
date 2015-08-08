@@ -1158,6 +1158,8 @@ extern parserDefinition *ObjcParser (void)
 						  NULL };
 	static const char *const aliases[] = { "objc", "objective-c",
 					       NULL };
+	static selectLanguage selectors[] = { selectByObjectiveCAndMatLabKeywords,
+					      NULL };
 	parserDefinition *def = parserNew ("ObjectiveC");
 	def->kinds = ObjcKinds;
 	def->kindCount = KIND_COUNT (ObjcKinds);
@@ -1167,6 +1169,6 @@ extern parserDefinition *ObjcParser (void)
 	def->parser = findObjcTags;
 	def->initialize = objcInitialize;
 	def->finalize = objcFinalize;
-	def->selectLanguage = selectByObjectiveCAndMatLabKeywords;
+	def->selectLanguage = selectors;
 	return def;
 }

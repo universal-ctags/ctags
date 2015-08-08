@@ -33,11 +33,13 @@ static void installMatLabRegex (const langType language)
 extern parserDefinition* MatLabParser (void)
 {
 	static const char *const extensions [] = { "m", NULL };
+	static selectLanguage selectors [] = { selectByObjectiveCAndMatLabKeywords,
+					       NULL };
 	parserDefinition* const def = parserNew ("MatLab");
 	def->extensions = extensions;
 	def->initialize = installMatLabRegex;
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
-	def->selectLanguage = selectByObjectiveCAndMatLabKeywords;
+	def->selectLanguage = selectors;
 	return def;
 }
 

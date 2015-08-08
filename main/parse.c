@@ -675,18 +675,47 @@ static langType arbitrateByTastingAndTwoGram (struct getLangCtx *glc, parserCand
 /* If all the candidates have the same specialized language selector, return
  * it.  Otherwise, return NULL.
  */
+static boolean
+hasTheSameSelector (langType lang, selectLanguage candidate_selector)
+{
+	selectLanguage *selector;
+
+	selector = LanguageTable[ lang ]->selectLanguage;
+	if (selector == NULL)
+		return FALSE;
+
+	while (*selector)
+	{
+		if (*selector == candidate_selector)
+			return TRUE;
+		selector++;
+	}
+	return FALSE;
+}
+
 static selectLanguage
 commonSelector (const parserCandidate *candidates, int n_candidates)
 {
     Assert (n_candidates > 1);
-    selectLanguage selector =
-        LanguageTable[ candidates[0].lang ]->selectLanguage;
+    selectLanguage *selector;
     int i;
-    for (i = 1; i < n_candidates; ++i)
-        if (LanguageTable[ candidates[i].lang ]->selectLanguage != selector)
-            return NULL;
-    return selector;        /* This, too, may be NULL */
+
+    selector = LanguageTable[ candidates[0].lang ]->selectLanguage;
+    if (selector == NULL)
+	    return NULL;
+
+    while (*selector)
+    {
+	    for (i = 1; i < n_candidates; ++i)
+		    if (! hasTheSameSelector (candidates[i].lang, *selector))
+			    break;
+	    if (i == n_candidates)
+		    return *selector;
+	    selector++;
+    }
+    return NULL;
 }
+
 
 /* Calls the selector and returns the integer value of the parser for the
  * language associated with the string returned by the selector.
