@@ -696,9 +696,15 @@ pickLanguageBySelection (selectLanguage selector, FILE *input)
 {
     const char *lang = selector(input);
     if (lang)
+    {
+        verbose ("	selection: %s\n", lang);
         return getNamedLanguage(lang);
+    }
     else
+    {
+	verbose ("	no selection");
         return LANG_IGNORE;
+    }
 }
 
 static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx *glc,
@@ -722,10 +728,12 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 		GLC_FOPEN_IF_NECESSARY(glc, fopen_error);
 		selectLanguage selector = commonSelector(candidates, n_candidates);
 		if (selector) {
+			verbose ("Selector: %p\n", selector);
 			language = pickLanguageBySelection(selector, glc->input);
 			if (LANG_IGNORE == language)
 				language = arbitrate (glc, candidates, n_candidates);
 		} else {
+			verbose ("Selector: NONE\n");
 			language = arbitrate (glc, candidates, n_candidates);
 		}
 		/* At this point we are guaranteed that a language has been
