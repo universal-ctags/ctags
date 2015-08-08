@@ -323,7 +323,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --list-maps=[language|all]"},
  {1,"       Output list of language mappings."},
  {1,"  --map-<LANG>=[+]map"},
- {1,"       Alternative version of --langmap option."},
+ {1,"       Set or add(+) a map for <LANG>."},
+ {1,"       Unlike --langmap a pattern or an extension can be specified at once."},
  {1,"  --options=file"},
  {1,"       Specify file from which command line options should be read."},
 #ifdef HAVE_ICONV
