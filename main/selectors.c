@@ -10,6 +10,11 @@
 
 #include "selectors.h"
 
+static boolean startsWith (const char *line, const char* prefix)
+{
+    return strncmp(line, prefix, strlen(prefix)) == 0? TRUE: FALSE;
+}
+
 static const char *selectByLines (FILE *input,
 				  const char* (* lineTaster) (const char *),
 				  const char* defaultLang)
@@ -98,4 +103,46 @@ selectByPickingPerlVersion (FILE *input)
 {
     /* Default to Perl 5 */
     return selectByLines (input, tastePerlLine, TR_PERL5);
+}
+
+static const char *
+tasteObjectiveCOrMatLabLines (const char *line)
+{
+#define TR_OBJC "ObjectiveC"
+#define TR_MATLAB "MatLab"
+    if (startsWith (line, "% ")
+	|| startsWith (line, "%{"))
+	return TR_MATLAB;
+    else if (startsWith (line, "// ")
+	     || startsWith (line, "/* "))
+	return TR_OBJC;
+    else if (startsWith (line, "#include")
+	     || startsWith (line, "#import")
+	     || startsWith (line, "#define ")
+	     || startsWith (line, "#ifdef "))
+	return TR_OBJC;
+    else if (startsWith (line, "@interface ")
+	     || startsWith (line, "@implementation ")
+	     || startsWith (line, "@protocol "))
+	return TR_OBJC;
+    else if (startsWith (line, "struct ")
+	     || startsWith (line, "union ")
+	     || startsWith (line, "typedef "))
+	return TR_OBJC;
+    else {
+	if (startsWith (line, "function ")) {
+	    const char *p = line + strlen ("function ");
+	    while (isspace(*p))
+		p++;
+	    if (*p != '\0' && *p != '(')
+		return TR_MATLAB;
+	}
+    }
+    return NULL;
+}
+
+const char *
+selectByObjectiveCAndMatLabKeywords (FILE * input)
+{
+    return selectByLines (input, tasteObjectiveCOrMatLabLines, NULL);
 }

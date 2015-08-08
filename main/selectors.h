@@ -8,4 +8,7 @@
 const char *
 selectByPickingPerlVersion (FILE *);
 
+const char *
+selectByObjectiveCAndMatLabKeywords (FILE *);
+
 #endif
