@@ -1315,7 +1315,7 @@ static char* addLanguageMap (const langType language, char* map_parameter, boole
 	if (map && pattern_p == FALSE)
 		addLanguageExtensionMap (language, map, exclusive);
 	else if (map && pattern_p == TRUE)
-		addLanguagePatternMap (language, map);
+		addLanguagePatternMap (language, map, exclusive);
 	else
 		error (FATAL, "Badly formed language map for %s language",
 				getLanguageName (language));
