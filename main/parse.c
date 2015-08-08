@@ -1003,11 +1003,12 @@ extern boolean removeLanguageExtensionMap (const char *const extension)
 }
 
 extern void addLanguageExtensionMap (
-		const langType language, const char* extension)
+		const langType language, const char* extension, boolean exclusive)
 {
 	vString* const str = vStringNewInit (extension);
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	removeLanguageExtensionMap (extension);
+	if (exclusive)
+		removeLanguageExtensionMap (extension);
 	stringListAdd (LanguageTable [language]->currentExtensions, str);
 }
 

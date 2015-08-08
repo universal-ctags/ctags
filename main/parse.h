@@ -143,7 +143,7 @@ extern void installLanguageMapDefault (const langType language);
 extern void installLanguageMapDefaults (void);
 extern void clearLanguageMap (const langType language);
 extern boolean removeLanguageExtensionMap (const char *const extension);
-extern void addLanguageExtensionMap (const langType language, const char* extension);
+extern void addLanguageExtensionMap (const langType language, const char* extension, boolean exclusive);
 extern void addLanguagePatternMap (const langType language, const char* ptrn);
 
 extern void installLanguageAliasesDefault (const langType language);
