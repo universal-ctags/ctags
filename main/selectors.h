@@ -11,4 +11,7 @@ selectByPickingPerlVersion (FILE *);
 const char *
 selectByObjectiveCAndMatLabKeywords (FILE *);
 
+const char *
+selectByObjectiveCKeywords(FILE *);
+
 #endif

@@ -17,6 +17,9 @@ static const char *TR_PERL6   = "Perl6";
 static const char *TR_OBJC    = "ObjectiveC";
 static const char *TR_MATLAB  = "MatLab";
 
+static const char *TR_CPP     = "C++";
+
+
 #define startsWith(line,prefix) \
   (strncmp(line, prefix, strlen(prefix)) == 0? TRUE: FALSE)
 
@@ -145,4 +148,21 @@ const char *
 selectByObjectiveCAndMatLabKeywords (FILE * input)
 {
     return selectByLines (input, tasteObjectiveCOrMatLabLines, NULL);
+}
+
+static const char *
+tasteObjectiveC (const char *line)
+{
+    if (startsWith (line, "#import")
+	|| startsWith (line, "@interface ")
+	|| startsWith (line, "@implementation ")
+	|| startsWith (line, "@protocol "))
+	return TR_OBJC;
+    return NULL;
+}
+
+const char *
+selectByObjectiveCKeywords (FILE * input)
+{
+    return selectByLines (input, tasteObjectiveC, TR_CPP);
 }

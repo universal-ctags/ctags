@@ -24,6 +24,7 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+#include "selectors.h"
 
 /*
 *   MACROS
@@ -3320,12 +3321,16 @@ extern parserDefinition* CppParser (void)
 #endif
 		NULL
 	};
+	static selectLanguage selectors[] = { selectByObjectiveCKeywords,
+					      NULL };
+
 	parserDefinition* def = parserNew ("C++");
 	def->kinds      = CKinds;
 	def->kindCount  = KIND_COUNT (CKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeCppParser;
+	def->selectLanguage = selectors;
 	return def;
 }
 
