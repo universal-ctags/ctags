@@ -1182,19 +1182,31 @@ extern void clearLanguageAliases (const langType language)
 	stringListClear (LanguageTable [language]->currentAliaes);
 }
 
-static boolean removeLanguagePatternMap (const char *const pattern)
+static boolean removeLanguagePatternMap1(const langType language, const char *const pattern)
 {
 	boolean result = FALSE;
-	unsigned int i;
-	for (i = 0  ;  i < LanguageCount  &&  ! result ;  ++i)
+	stringList* const ptrn = LanguageTable [language]->currentPatterns;
+
+	if (ptrn != NULL && stringListDeleteItemExtension (ptrn, pattern))
 	{
-		stringList* const ptrn = LanguageTable [i]->currentPatterns;
-		if (ptrn != NULL && stringListDeleteItemExtension (ptrn, pattern))
-		{
-			verbose (" (removed from %s)", getLanguageName (i));
-			result = TRUE;
-		}
+		verbose (" (removed from %s)", getLanguageName (language));
+		result = TRUE;
 	}
+	return result;
+}
+
+extern boolean removeLanguagePatternMap (const langType language, const char *const pattern)
+{
+	boolean result = FALSE;
+
+	if (language == LANG_AUTO)
+	{
+		unsigned int i;
+		for (i = 0  ;  i < LanguageCount  &&  ! result ;  ++i)
+			result = removeLanguagePatternMap1 (i, pattern) || result;
+	}
+	else
+		result = removeLanguagePatternMap1 (language, pattern);
 	return result;
 }
 
@@ -1210,19 +1222,31 @@ extern void addLanguagePatternMap (const langType language, const char* ptrn,
 	stringListAdd (lang->currentPatterns, str);
 }
 
-extern boolean removeLanguageExtensionMap (const char *const extension)
+static boolean removeLanguageExtensionMap1 (const langType language, const char *const extension)
 {
 	boolean result = FALSE;
-	unsigned int i;
-	for (i = 0  ;  i < LanguageCount  &&  ! result ;  ++i)
+	stringList* const exts = LanguageTable [language]->currentExtensions;
+
+	if (exts != NULL  &&  stringListDeleteItemExtension (exts, extension))
 	{
-		stringList* const exts = LanguageTable [i]->currentExtensions;
-		if (exts != NULL && stringListDeleteItemExtension (exts, extension))
-		{
-			verbose (" (removed from %s)", getLanguageName (i));
-			result = TRUE;
-		}
+		verbose (" (removed from %s)", getLanguageName (language));
+		result = TRUE;
 	}
+	return result;
+}
+
+extern boolean removeLanguageExtensionMap (const langType language, const char *const extension)
+{
+	boolean result = FALSE;
+
+	if (language == LANG_AUTO)
+	{
+		unsigned int i;
+		for (i = 0  ;  i < LanguageCount ;  ++i)
+			result = removeLanguageExtensionMap1 (i, extension) || result;
+	}
+	else
+		result = removeLanguageExtensionMap1 (language, extension);
 	return result;
 }
 
