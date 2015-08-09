@@ -174,7 +174,8 @@ AC_ARG_ENABLE(external-sort,
 		[use internal sort algorithm instead of sort program])])
 
 AC_ARG_ENABLE(iconv,
-[  --enable-iconv          support multibyte character encoding])
+	[AS_HELP_STRING([--enable-iconv],
+		[support multibyte character encoding])])
 
 AC_ARG_ENABLE(custom-config,
 	[AS_HELP_STRING([--enable-custom-config=FILE],
