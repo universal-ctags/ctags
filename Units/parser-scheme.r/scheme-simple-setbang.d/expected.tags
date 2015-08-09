@@ -1,0 +1,16 @@
+a0	input.scm	/^(set! a0 1)$/;"	s
+a1	input.scm	/^(set! a1 #f)$/;"	s
+a2	input.scm	/^(set! a2 "a")$/;"	s
+a3	input.scm	/^(set! a3 '(1))$/;"	s
+a4	input.scm	/^(set! a4 '(1 2))$/;"	s
+a5	input.scm	/^(set! a5 '(1 2 . 3)$/;"	s
+a5	input.scm	/^(set! a5 '(1 2 . 3))$/;"	s
+a6	input.scm	/^(set! a6 '(1 2 . 3$/;"	s
+a7	input.scm	/^(set! a7 '(1 2 .$/;"	s
+a7	input.scm	/^(set! a7 '(1 2$/;"	s
+a8	input.scm	/^(set! a8 '(1$/;"	s
+a9	input.scm	/^(set! a9 '($/;"	s
+aa	input.scm	/^(set! aa '$/;"	s
+ab	input.scm	/^(set! ab $/;"	s
+ac	input.scm	/^   ac '(1 2 . 3))$/;"	s
+ad	input.scm	/^   ad$/;"	s
