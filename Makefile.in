@@ -394,24 +394,28 @@ check: tmain units
 fuzz: TIMEOUT := $(shell timeout --version > /dev/null 2>&1 && echo 1 || echo 0)
 fuzz: $(CTAGS_TEST)
 	@ \
-	c="misc/units fuzz \
+	c="$(srcdir)/misc/units fuzz \
 		--ctags=$(CTAGS_TEST) \
 		--languages=$(LANGUAGES) \
+		--datadir=$(srcdir)/data \
+		--libexecdir=$(srcdir)/libexec \
 		$(VALGRIND) $(RUN_SHRINK) \
 		--with-timeout=$(TIMEOUT)"; \
-	$(SHELL) $${c} Units
+	$(SHELL) $${c} $(srcdir)/Units
 
 #
 # NOISE Target
 #
 noise: $(CTAGS_TEST)
 	@ \
-	c="misc/units noise \
+	c="$(srcdir)/misc/units noise \
 		--ctags=$(CTAGS_TEST) \
 		--languages=$(LANGUAGES) \
+		--datadir=$(srcdir)/data \
+		--libexecdir=$(srcdir)/libexec \
 		$(VALGRIND) $(RUN_SHRINK) \
 		--with-timeout=$(TIMEOUT)"; \
-	$(SHELL) $${c} Units
+	$(SHELL) $${c} $(srcdir)/Units
 
 #
 # UNITS Target
@@ -419,29 +423,33 @@ noise: $(CTAGS_TEST)
 units: TIMEOUT := $(shell timeout --version > /dev/null 2>&1 && echo 5 || echo 0)
 units: $(CTAGS_TEST)
 	@ \
-	c="misc/units run \
+	c="$(srcdir)/misc/units run \
 		--ctags=$(CTAGS_TEST) \
 		--languages=$(LANGUAGES) \
 		--categories=$(CATEGORIES) \
 		--units=$(UNITS) \
+		--datadir=$(srcdir)/data \
+		--libexecdir=$(srcdir)/libexec \
 		$(VALGRIND) $(RUN_SHRINK) \
 		--with-timeout=$(TIMEOUT) \
 		$(SHOW_DIFF_OUTPUT)"; \
-	 $(SHELL) $${c} Units
+	 $(SHELL) $${c} $(srcdir)/Units
 
 clean-units:
-	$(SHELL) misc/units clean Units
+	$(SHELL) $(srcdir)/misc/units clean $(srcdir)/Units
 
 #
 # Test main part, not parsers
 #
 tmain: $(CTAGS_TEST)
 	@ \
-	c="misc/units tmain \
+	c="$(srcdir)/misc/units tmain \
 		--ctags=$(CTAGS_TEST) \
+		--datadir=$(srcdir)/data \
+		--libexecdir=$(srcdir)/libexec \
 		$(VALGRIND) \
 		$(SHOW_DIFF_OUTPUT)"; \
-	 $(SHELL) $${c} Tmain
+	 $(SHELL) $${c} $(srcdir)/Tmain
 
 #
 # Test installation
