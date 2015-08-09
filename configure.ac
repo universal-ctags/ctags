@@ -17,6 +17,9 @@ if ! test -e "${srcdir}/config.h.in"; then
    exit 1
 fi
 
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
+
 AH_TEMPLATE([PACKAGE], [Package name.])
 AH_TEMPLATE([VERSION], [Package version.])
 AH_TEMPLATE([clock_t],
@@ -116,6 +119,8 @@ AH_TEMPLATE([NEED_PROTO_FTRUNCATE],
 	[If you receive error or warning messages indicating that you are missing
 	a prototype for, or a type mismatch using, the following function, define
 	this label and remake.])
+AH_TEMPLATE([MSDOS_STYLE_PATH],
+	[Define to 1 if your system uses MS-DOS style path.])
 
 
 
@@ -408,6 +413,13 @@ AC_MSG_RESULT($have_st_ino)
 if test yes = "$have_st_ino"; then
 	AC_DEFINE(HAVE_STAT_ST_INO)
 fi
+
+# Check for host type
+case "$host" in
+  i?86-*-mingw* | x86_64-*-mingw*)
+	AC_DEFINE(MSDOS_STYLE_PATH)
+	;;
+esac
 
 
 # Checks for library functions
