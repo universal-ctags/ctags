@@ -333,20 +333,6 @@ is imperfect approach for ignoring text insides comments but it may
 be better than nothing. Ghost kind is assigned to the empty name
 pattern. (See "Ghost kind in regex parser".)
 
-Optional flag in regex
----------------------------------------------------------------------
-
-Kinds defined with ``--regex-<LANG>`` was
-enabled by default. A kind disabled by default can be defined
-with new flag ``optional`` (long only) like::
-
-	--m4-regex=/[[:space:]]include\(`([^']+)'/\1/I,inclusion/x{optional}
-
-A user can turn on this pattern with::
-
-       --m4-kinds=+I
-
-
 Ghost kind in regex parser
 ---------------------------------------------------------------------
 

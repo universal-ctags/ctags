@@ -260,18 +260,8 @@ static void pre_ptrn_flag_exclusive_long (const char* const s __unused__, const 
 	pre_ptrn_flag_exclusive_short ('x', data);
 }
 
-static void ptrn_flag_optional_long (const char* const s, const char* const unused __unused__, void* data)
-{
-	regexPattern *ptrn = data;
-	ptrn->u.tag.kind->enabled = FALSE;
-}
-
 static flagDefinition prePtrnFlagDef[] = {
 	{ 'x',  "exclusive", pre_ptrn_flag_exclusive_short, pre_ptrn_flag_exclusive_long },
-};
-
-static flagDefinition ptrnFlagDef[] = {
-	{ '\0', "optional",  NULL, ptrn_flag_optional_long  },
 };
 
 static struct sKind *kindNew ()
@@ -379,7 +369,6 @@ static regexPattern *addCompiledTagPattern (
 		ptrn->u.tag.kind->name    = kindName? eStrdup (kindName): NULL;
 		ptrn->u.tag.kind->description = description? eStrdup (description): NULL;
 	}
-	flagsEval (flags, ptrnFlagDef, COUNT(ptrnFlagDef), ptrn);
 
 	return ptrn;
 }
@@ -395,7 +384,6 @@ static void addCompiledCallbackPattern (
 	ptrn->type    = PTRN_CALLBACK;
 	ptrn->u.callback.function = callback;
 	ptrn->exclusive = exclusive;
-	flagsEval (flags, ptrnFlagDef, COUNT(ptrnFlagDef), ptrn);
 }
 
 

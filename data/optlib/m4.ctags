@@ -88,4 +88,5 @@
 # include(NAME)
 # m4_include(NAME)
 #
---regex-m4=/^[[:space:]]*(m4_)?s?include\([[`]?([^]')]+)[]']?\)/\2/I,inclusion/{exclusive}{optional}
+--regex-m4=/^[[:space:]]*(m4_)?s?include\([[`]?([^]')]+)[]']?\)/\2/I,inclusion/{exclusive}
+--kinds-m4=-I
