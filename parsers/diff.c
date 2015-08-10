@@ -16,6 +16,7 @@
 #include <ctype.h>
 #include <string.h>
 
+#include "entry.h"
 #include "parse.h"
 #include "read.h"
 #include "vstring.h"
@@ -26,12 +27,15 @@
 typedef enum {
 	K_MODIFIED_FILE,
 	K_NEW_FILE,
+	K_DELETED_FILE,
 	K_HUNK,
 } diffKind;
 
 static kindOption DiffKinds [] = {
 	{ TRUE, 'm', "modified file", "modified files"},
 	{ TRUE, 'n', "new file",      "newly created files"},
+	{ TRUE, 'd', "deleted file",  "deleted files"},
+	{ TRUE, 'h', "hunk",          "hunks"},
 };
 
 enum {
@@ -42,6 +46,11 @@ enum {
 static const char *DiffDelims[2] = {
 	"--- ",
 	"+++ "
+};
+
+static const char *HunkDelim[2] = {
+	"@@ ",
+	" @@",
 };
 
 /*
@@ -78,12 +87,59 @@ static const unsigned char *stripAbsolute (const unsigned char *filename)
 	return tmp;
 }
 
+static int parseHunk (const unsigned char* cp, vString *hunk, int scope_index)
+{
+	/*
+	   example input: @@ -0,0 +1,134 @@
+	   expected output: -0,0 +1,134
+	*/
+
+	const char *next_delim;
+	const char *start, *end;
+	const char *c;
+	int i = SCOPE_NIL;
+
+	cp += 3;
+	start = (const char*)cp;
+
+	if (*start != '-')
+		return i;
+
+	next_delim = strstr ((const char*)cp, HunkDelim[1]);
+	if ((next_delim == NULL)
+	    || (! (start < next_delim )))
+		return i;
+	end = next_delim;
+	if (! ( '0' <= *( end - 1 ) && *( end - 1 ) <= '9'))
+		return i;
+	for (c = start; c < end; c++)
+		if (*c == '\t')
+			return i;
+	vStringNCopyS (hunk, start, end - start);
+	i = makeSimpleTag (hunk, DiffKinds, K_HUNK);
+	if (i > SCOPE_NIL && scope_index > SCOPE_NIL)
+	{
+		tagEntryInfo *e =  getEntryInCorkQueue (i);
+		e->extensionFields.scopeIndex = scope_index;
+	}
+	return i;
+}
+
+static void markTheLastTagAsDeletedFile (int scope_index)
+{
+	tagEntryInfo *e =  getEntryInCorkQueue (scope_index);
+	e->kindName = DiffKinds [K_DELETED_FILE].name;
+	e->kind = DiffKinds [K_DELETED_FILE].letter;
+}
+
 static void findDiffTags (void)
 {
 	vString *filename = vStringNew ();
+	vString *hunk = vStringNew ();
 	const unsigned char *line, *tmp;
 	int delim = DIFF_DELIM_MINUS;
 	diffKind kind;
+	int scope_index = SCOPE_NIL;
 
 	while ((line = fileReadLine ()) != NULL)
 	{
@@ -91,6 +147,7 @@ static void findDiffTags (void)
 
 		if (strncmp ((const char*) cp, DiffDelims[delim], 4u) == 0)
 		{
+			scope_index = SCOPE_NIL;
 			cp += 4;
 			if (isspace ((int) *cp)) continue;
 			/* when original filename is /dev/null use the new one instead */
@@ -117,14 +174,30 @@ static void findDiffTags (void)
 					kind = K_NEW_FILE;
 				else
 					kind = K_MODIFIED_FILE;
-				makeSimpleTag (filename, DiffKinds, kind);
+				scope_index = makeSimpleTag (filename, DiffKinds, kind);
 				vStringClear (filename);
 			}
 
 			/* restore default delim */
 			delim = DIFF_DELIM_MINUS;
 		}
+		else if ((scope_index > SCOPE_NIL)
+			 && (strncmp ((const char*) cp, DiffDelims[1], 4u) == 0))
+		{
+			cp += 4;
+			if (isspace ((int) *cp)) continue;
+			/* when modified filename is /dev/null, the original name is deleted. */
+			if (strncmp ((const char*) cp, "/dev/null", 9u) == 0 &&
+			    (cp[9] == 0 || isspace (cp[9])))
+				markTheLastTagAsDeletedFile (scope_index);
+		}
+		else if (strncmp ((const char*) cp, HunkDelim[0], 3u) == 0)
+		{
+			if (parseHunk (cp, hunk, scope_index) != SCOPE_NIL)
+				vStringClear (hunk);
+		}
 	}
+	vStringDelete (hunk);
 	vStringDelete (filename);
 }
 
@@ -136,6 +209,7 @@ extern parserDefinition* DiffParser (void)
 	def->kindCount  = KIND_COUNT (DiffKinds);
 	def->extensions = extensions;
 	def->parser     = findDiffTags;
+	def->useCork    = TRUE;
 	return def;
 }
 

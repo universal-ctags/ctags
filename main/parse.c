@@ -41,9 +41,11 @@ static unsigned int LanguageCount = 0;
 *   FUNCTION DEFINITIONS
 */
 
-extern void makeSimpleTag (
+extern int makeSimpleTag (
 		const vString* const name, kindOption* const kinds, const int kind)
 {
+	int r = SCOPE_NIL;
+
 	if (kinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
 	{
 	    tagEntryInfo e;
@@ -52,8 +54,9 @@ extern void makeSimpleTag (
 	    e.kindName = kinds [kind].name;
 	    e.kind     = kinds [kind].letter;
 
-	    makeTagEntry (&e);
+	    r = makeTagEntry (&e);
 	}
+	return r;
 }
 
 static vString* ext2ptrnNew (const char *const ext)

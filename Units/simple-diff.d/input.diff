@@ -162,3 +162,9 @@ index 2550028..eaa9154 100644
  	$(PARSER_DIR)/dosbatch.c		\
  	$(PARSER_DIR)/eiffel.c			\
  	$(PARSER_DIR)/erlang.c			\
+
+--- a/Units/review-needed.r/simple.ksh.t/expected.tags
++++ /dev/null
+@@ -1,2 +0,0 @@
+-f1     input.ksh       /^f1() {$/;"    f
+-f2     input.ksh       /^function f2 {$/;"     f
