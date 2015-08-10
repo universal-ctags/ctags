@@ -1139,11 +1139,11 @@ static boolean invokeXcmdPath (const char* const fileName, xcmdPath* path, const
 
 #endif
 
+#ifdef HAVE_COPROC
 extern boolean invokeXcmd (const char* const fileName, const langType language)
 {
 	boolean result = FALSE;
 
-#ifdef HAVE_COPROC
 	if (language != LANG_IGNORE  &&  language <= SetUpper  &&
 		Sets [language].count > 0)
 	{
@@ -1158,6 +1158,6 @@ extern boolean invokeXcmd (const char* const fileName, const langType language)
 		}
 
 	}
-#endif
 	return result;
 }
+#endif

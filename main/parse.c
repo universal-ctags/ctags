@@ -1774,6 +1774,7 @@ static boolean createTagsWithFallback (
 	return tagFileResized;
 }
 
+#ifdef HAVE_COPROC
 static boolean createTagsWithXcmd (
 		const char *const fileName, const langType language)
 {
@@ -1790,6 +1791,7 @@ static boolean createTagsWithXcmd (
 
 	return tagFileResized;
 }
+#endif
 
 static void printGuessedParser (const char* const fileName, langType language)
 {
