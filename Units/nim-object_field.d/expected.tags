@@ -1,0 +1,24 @@
+Animal	input.nim	/^  Animal = ref object of RootObj$/;"	o	typeref:object:Animal
+Apple	input.nim	/^    Apple, Banana, Lemon, Durian, Rambutan$/;"	r	enum:Fruits
+Banana	input.nim	/^    Apple, Banana, Lemon, Durian, Rambutan$/;"	r	enum:Fruits
+Durian	input.nim	/^    Apple, Banana, Lemon, Durian, Rambutan$/;"	r	enum:Fruits
+Fruits	input.nim	/^  Fruits = enum$/;"	e	typeref:enum:Fruits
+Gradient	input.nim	/^  Gradient* = ref object$/;"	o	typeref:object:Gradient
+ID	input.nim	/^      ID*, objID*: int$/;"	f	object:Gradient
+Lemon	input.nim	/^    Apple, Banana, Lemon, Durian, Rambutan$/;"	r	enum:Fruits
+Rambutan	input.nim	/^    Apple, Banana, Lemon, Durian, Rambutan$/;"	r	enum:Fruits
+Vehicle	input.nim	/^  Vehicle = object$/;"	o	typeref:object:Vehicle
+a	input.nim	/^      a*, b*: RGBColor$/;"	f	object:Gradient
+anotherint	input.nim	/^  anotherint = int$/;"	t
+axis	input.nim	/^        axis* : Coord$/;"	f	object:Gradient
+b	input.nim	/^      a*, b*: RGBColor$/;"	f	object:Gradient
+brand	input.nim	/^    brand: string$/;"	f	object:Vehicle
+inttoo	input.nim	/^  inttoo = distinct int$/;"	t
+isOperator	input.nim	/^proc isOperator*(tok: TToken, Kilo: var int): bool$/;"	p
+name	input.nim	/^    name: string$/;"	f	object:Animal
+objID	input.nim	/^      ID*, objID*: int$/;"	f	object:Gradient
+parseAll	input.nim	/^proc parseAll*(p: var TParser, tonne: int): PNode$/;"	p
+radCoord	input.nim	/^        radCoord*: CoordRadial$/;"	f	object:Gradient
+speed	input.nim	/^    speed: int$/;"	f	object:Animal
+speed	input.nim	/^    wheel, speed: int$/;"	f	object:Vehicle
+wheel	input.nim	/^    wheel, speed: int$/;"	f	object:Vehicle

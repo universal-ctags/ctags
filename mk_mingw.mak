@@ -20,8 +20,7 @@ endif
 ctags.exe: OPT = -O4 -Os -fexpensive-optimizations
 ctags.exe: LDFLAGS = -s
 dctags.exe: OPT = -g
-dctags.exe: DEBUG = -DDEBUG
-dctags.exe: SOURCES += debug.c
+dctags.exe: CFLAGS += -DDEBUG
 
 .SUFFIXES: .c.o
 

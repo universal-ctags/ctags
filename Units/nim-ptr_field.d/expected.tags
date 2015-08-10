@@ -1,0 +1,8 @@
+TClassOfTCustomObject	input.nim	/^  TClassOfTCustomObject {.pure, inheritable.} = object$/;"	o	typeref:object:TClassOfTCustomObject
+TClassOfTobj	input.nim	/^  TClassOfTobj = object of TClassOfTCustomObject$/;"	o	typeref:object:TClassOfTobj
+TCustomObject	input.nim	/^  TCustomObject = ref object {.inheritable.}$/;"	o	typeref:object:TCustomObject
+TObj	input.nim	/^  TObj = ref object of TCustomObject$/;"	o	typeref:object:TObj
+base	input.nim	/^    base* : ptr TClassOfTCustomObject$/;"	f	object:TClassOfTCustomObject
+class	input.nim	/^    class* : ptr TClassOfTCustomObject$/;"	f	object:TCustomObject
+className	input.nim	/^    className* : string$/;"	f	object:TClassOfTCustomObject
+data	input.nim	/^    data: int/;"	f	object:TObj

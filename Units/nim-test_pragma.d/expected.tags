@@ -1,0 +1,4 @@
+TColor	input.nim	/^  TColor {.final, header: irr, importc: "SColor".} = object$/;"	o	typeref:object:TColor
+TDimension2d	input.nim	/^  TDimension2d {.final, header: irr, importc: "dimension2d".} = object$/;"	o	typeref:object:TDimension2d
+Tvector3df	input.nim	/^  Tvector3df {.final, header: irr, importc: "vector3df".} = object$/;"	o	typeref:object:Tvector3df
+irr	input.nim	/^  irr = "<irrlicht\/irrlicht.h>"$/;"	k
