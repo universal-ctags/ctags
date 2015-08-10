@@ -145,7 +145,7 @@ main()
 	root=$1
 	shift
     else
-	ERROR 2 "A installation root must be ginve as the first argument"
+	ERROR 2 "A installation root must be given as the first argument"
     fi
     
     prepare "${root}"

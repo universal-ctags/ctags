@@ -66,7 +66,7 @@ L_FAILED_BY_TIMEED_OUT=
 # TODO
 #
 #  * write new class 'r' (category directory) to units.rst.
-#  * write new class 'v' (skip the checkin by valgrind) to units.rst.
+#  * write new class 'v' (skip the checking by valgrind) to units.rst.
 #
 action_help ()
 {
@@ -343,7 +343,7 @@ run_tcase ()
     #
     # tags-e if for etags output(-e). TAGS is good
     # suffix but foo.tags and foo.TAGS may be the same on Windows.
-    # tags-x is for corss reference output(-x).
+    # tags-x is for cross reference output(-x).
     #
     # fexpected must be set even if none of
     # expected.{tags,tags-e,xref} exits.
@@ -444,7 +444,7 @@ run_tcase ()
 
     {
 	#
-	# When a lauched process is exited abnormally, the parent shell reports it
+	# When a launched process is exited abnormally, the parent shell reports it
 	# to stderr: See j_strsignal function call in wait_for in bash-4.2/nojobs.c.
 	# This becomes noise; close the stderr of subshell.
 	#
