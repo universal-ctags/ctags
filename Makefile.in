@@ -342,7 +342,7 @@ tags: $(CTAGS_EXEC)
 TAGS: $(CTAGS_EXEC)
 	./$(CTAGS_EXEC) -e $(srcdir)/*
 
-clean: clean-units clean-gcov
+clean: clean-units clean-gcov clean-tmain
 	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB) 
 	rm -f etyperef$(EXEEXT) etyperef.$(OBJEXT)
 	rm -f $(SOURCES:.c=.gcno)
@@ -393,7 +393,7 @@ ifdef TRAVIS
 SHOW_DIFF_OUTPUT=--show-diff-output
 endif
 
-.PHONY: check units fuzz noise tmain tinst clean-units clean-gcov run-gcov codecheck
+.PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck
 check: tmain units
 
 #
@@ -452,6 +452,9 @@ tmain: $(CTAGS_TEST)
 		$(VALGRIND) \
 		$(SHOW_DIFF_OUTPUT)"; \
 	 $(SHELL) $${c} Tmain
+
+clean-tmain:
+	$(SHELL) misc/units clean-tmain Tmain
 
 #
 # Test installation

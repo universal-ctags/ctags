@@ -85,6 +85,8 @@ Usage:
 	$(help_noise)
 
 	$(help_tmain)
+
+	$(help_clean_tmain)
 EOF
 }
 
@@ -872,7 +874,7 @@ help_clean ()
 cat <<EOF
 $0 clean UNITS-DIR
 
-	   Clean all files created during testing
+	   Clean all files created during units testing
 EOF
 
 }
@@ -1818,6 +1820,47 @@ $0 tmain [OPTIONS] TMAIN-DIR
 EOF
 }
 
+action_clean_tmain()
+{
+    local action="$1"
+    shift
+
+    local tmain_dir=$1
+    shift
+
+    if [ $# -gt 0 ]; then
+	ERROR 1 "too many arguments for ${action} action: $*"
+    elif [ -z "$tmain_dir" ]; then
+	ERROR 1 "TMAIN_DIR parameter is not given in ${action} action"
+    fi
+
+    if ! [ -d "$tmain_dir" ]; then
+	ERROR 1 "No such directory: ${tmain_dir}"
+    fi
+
+    check_availability find
+    check_availability rm
+
+    local object
+    local type
+    for object in stdout stderr exit tags; do
+	for type in actual diff; do
+	    rm -f $(find "$tmain_dir" -name ${object}-${type}.txt)
+	done
+    done
+    return 0
+}
+
+help_clean_tmain ()
+{
+cat <<EOF
+$0 clean_tmain TMAIN-DIR
+
+	   Clean all files created during tmain testing
+EOF
+
+}
+
 # Avoid issues between sed and the locale settings by overriding it using
 # LC_ALL, which takes precedence over all other locale configurations:
 # https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
@@ -1856,6 +1899,10 @@ main ()
 	    ;;
 	tmain)
 	    action_tmain "$@"
+	    return $?
+	    ;;
+	clean-tmain)
+	    action_clean_tmain "$@"
 	    return $?
 	    ;;
 	shrink)
