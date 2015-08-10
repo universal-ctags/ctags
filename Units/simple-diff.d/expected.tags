@@ -1,3 +1,3 @@
 a/main/parsers.h	input.diff	/^--- a\/main\/parsers.h$/;"	m
 a/source.mak	input.diff	/^--- a\/source.mak$/;"	m
-b/parsers/diff.c	input.diff	/^+++ b\/parsers\/diff.c$/;"	m
+b/parsers/diff.c	input.diff	/^+++ b\/parsers\/diff.c$/;"	n

@@ -31,6 +31,7 @@ typedef enum {
 
 static kindOption DiffKinds [] = {
 	{ TRUE, 'm', "modified file", "modified files"},
+	{ TRUE, 'n', "new file",      "newly created files"},
 };
 
 enum {
@@ -82,6 +83,7 @@ static void findDiffTags (void)
 	vString *filename = vStringNew ();
 	const unsigned char *line, *tmp;
 	int delim = DIFF_DELIM_MINUS;
+	diffKind kind;
 
 	while ((line = fileReadLine ()) != NULL)
 	{
@@ -111,7 +113,11 @@ static void findDiffTags (void)
 				}
 
 				vStringTerminate(filename);
-				makeSimpleTag (filename, DiffKinds, K_MODIFIED_FILE);
+				if (delim == DIFF_DELIM_PLUS)
+					kind = K_NEW_FILE;
+				else
+					kind = K_MODIFIED_FILE;
+				makeSimpleTag (filename, DiffKinds, kind);
 				vStringClear (filename);
 			}
 
