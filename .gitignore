@@ -12,6 +12,7 @@
 a.out
 autom4te.cache
 badinput
+commit-stamp
 config.h
 config.h.in
 config.log

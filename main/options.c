@@ -1191,9 +1191,15 @@ static void processListFeaturesOption(const char *const option __unused__,
 
 static void printProgramIdentification (void)
 {
-	printf ("%s %s, %s %s\n",
+	printf (
+#if defined(CTAGS_COMMIT_ID) && CTAGS_COMMIT_ID != 0
+		"%s %s(%.7x), %s %s\n",
+		PROGRAM_NAME, PROGRAM_VERSION, CTAGS_COMMIT_ID,
+#else
+		"%s %s, %s %s\n",
 	        PROGRAM_NAME, PROGRAM_VERSION,
-	        PROGRAM_COPYRIGHT, AUTHOR_NAME);
+#endif
+		PROGRAM_COPYRIGHT, AUTHOR_NAME);
 	printf ("Universal Ctags is derived from Exuberant Ctags.\n");
 	printf ("Exuberant Ctags 5.8, Copyright (C) 1996-2009 Darren Hiebert\n");
 
