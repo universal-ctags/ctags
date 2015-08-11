@@ -453,16 +453,21 @@ clean-units:
 #
 tmain: $(CTAGS_TEST)
 	@ \
+	\
+	builddir=$$(pwd); \
+	mkdir -p $${builddir}/Tmain && \
+	\
 	c="$(srcdir)/misc/units tmain \
 		--ctags=$(CTAGS_TEST) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
 		$(VALGRIND) \
 		$(SHOW_DIFF_OUTPUT)"; \
-	 $(SHELL) $${c} $(srcdir)/Tmain
+	 $(SHELL) $${c} $(srcdir)/Tmain $${builddir}/Tmain
 
 clean-tmain:
-	$(SHELL) $(srcdir)/misc/units clean-tmain $(srcdir)/Tmain
+	builddir=$$(pwd); \
+	$(SHELL) $(srcdir)/misc/units clean-tmain $${builddir}/Tmain
 
 #
 # Test installation

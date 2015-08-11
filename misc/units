@@ -1617,12 +1617,16 @@ EOF
 tmain_compare()
 {
     local subdir=$1
-    local aspect=$2
+    local build_subdir=$2
+    local aspect=$3
     local generated
 
     printf '%-60s' "${aspect}"
-    generated=${subdir}/${aspect}-diff.txt
-    if diff -U 0 --strip-trailing-cr ${subdir}/${aspect}-actual.txt ${subdir}/${aspect}-expected.txt > ${generated} 2>&1; then
+    generated=${build_subdir}/${aspect}-diff.txt
+    if diff -U 0 --strip-trailing-cr \
+	    ${build_subdir}/${aspect}-actual.txt \
+	    ${subdir}/${aspect}-expected.txt \
+	    > ${generated} 2>&1; then
 	run_result ok '/dev/null'
 	rm ${generated}
 	return 0
@@ -1636,6 +1640,7 @@ CODE_FOR_IGNORING_THIS_TMAIN_TEST=77
 tmain_run ()
 {
     local topdir=$1
+    local build_topdir=$2
     local subdir
     local basedir
 
@@ -1656,24 +1661,28 @@ tmain_run ()
 	    return 1
 	fi
 
+	build_subdir=${build_topdir}/$(basename ${subdir})
+	if ! mkdir -p ${build_subdir}; then
+	    return 1
+	fi
 	test_name=$(basename ${subdir} .d)
 
-	rm -f ${subdir}/*-actual.txt
+	rm -f ${build_subdir}/*-actual.txt
 
 	echo "Testing ${test_name}"
 	line '-'
 	(
 	    cd ${subdir}
-	    ${SHELL} run.sh ${basedir}/${CTAGS} ${basedir}/${DATADIR} ${basedir}/${LIBEXECDIR}
-	) > ${subdir}/stdout-actual.txt 2> ${subdir}/stderr-actual.txt
+	    ${SHELL} run.sh ${basedir}/${CTAGS} ${basedir}/${DATADIR} ${basedir}/${LIBEXECDIR} ${build_subdir}
+	) > ${build_subdir}/stdout-actual.txt 2> ${build_subdir}/stderr-actual.txt
 	r=$?
-	echo $r > ${subdir}/exit-actual.txt
+	echo $r > ${build_subdir}/exit-actual.txt
 
-	sed -i -e 's|^ctags.exe|ctags|' ${subdir}/stderr-actual.txt
+	sed -i -e 's|^ctags.exe|ctags|' ${build_subdir}/stderr-actual.txt
 
 	if [ $r = $CODE_FOR_IGNORING_THIS_TMAIN_TEST ]; then
-	    run_result skip '/dev/null' "$(cat ${subdir}/stdout-actual.txt)"
-	    for a in ${subdir}/*-actual.txt; do
+	    run_result skip '/dev/null' "$(cat ${build_subdir}/stdout-actual.txt)"
+	    for a in ${build_subdir}/*-actual.txt; do
 		if [ -f "$a" ]; then
 		    rm $a
 		fi
@@ -1682,21 +1691,21 @@ tmain_run ()
 	    continue
 	fi
 
-	if [ -f ${subdir}/tags ]; then
-	    mv ${subdir}/tags ${subdir}/tags-actual.txt
+	if [ -f ${build_subdir}/tags ]; then
+	    mv ${build_subdir}/tags ${build_subdir}/tags-actual.txt
 	fi
 
 	for aspect in stdout stderr exit tags; do
 	    if [ -f ${subdir}/${aspect}-expected.txt ]; then
 		engine=compare
-		if tmain_${engine} ${subdir} ${aspect}; then
-		    rm ${subdir}/${aspect}-actual.txt
+		if tmain_${engine} ${subdir} ${build_subdir} ${aspect}; then
+		    rm ${build_subdir}/${aspect}-actual.txt
 		else
 		    failed="${failed} ${test_name}/${aspect}-${engine}"
 		    status=1
 		fi
-	    elif [ -f ${subdir}/${aspect}-actual.txt ]; then
-		     rm ${subdir}/${aspect}-actual.txt
+	    elif [ -f ${build_subdir}/${aspect}-actual.txt ]; then
+		     rm ${build_subdir}/${aspect}-actual.txt
 	    fi
 	done
 
@@ -1721,6 +1730,7 @@ action_tmain ()
     local action="$1"
     shift
     local tmain_dir
+    local build_dir
 
     while [ $# -gt 0 ]; do
 	case $1 in
@@ -1774,6 +1784,8 @@ action_tmain ()
 	    *)
 		tmain_dir="$1"
 		shift
+		build_dir=${1:-${tmain_dir}}
+		shift
 		break
 		;;
 	esac
@@ -1786,7 +1798,14 @@ action_tmain ()
     fi
 
     if ! [ -d "$tmain_dir" ]; then
-	ERROR 1 "No such directory: ${tmain_dir}"
+	ERROR 1 "No such directory(tmain_dir): ${tmain_dir}"
+    fi
+
+    if ! [ $(expr substr ${build_dir} 1 1) = '/' ]; then
+	build_dir=$(pwd)/${build_dir}
+    fi
+    if ! [ -d "$build_dir" ]; then
+	ERROR 1 "No such directory(build_dir): ${build_dir}"
     fi
 
     if ! [ -f "${CTAGS}" ]; then
@@ -1802,14 +1821,14 @@ action_tmain ()
     [ -d "${DATADIR}" ] || ERROR 1 "no such directory: ${DATADIR}"
     [ -d "${LIBEXECDIR}" ] || ERROR 1 "no such directory: ${LIBEXECDIR}"
 
-    tmain_run ${tmain_dir}
+    tmain_run ${tmain_dir} ${build_dir}
     return $?
 }
 
 help_tmain ()
 {
     cat <<EOF
-$0 tmain [OPTIONS] TMAIN-DIR
+$0 tmain [OPTIONS] TMAIN-DIR [BUILD-DIR]
 
 	Run tests for main part of ctags.
 
@@ -1819,6 +1838,8 @@ $0 tmain [OPTIONS] TMAIN-DIR
 	--colorized-output yes|no: print the result in color.
 	--with-valgrind: (not implemented) run a test case under valgrind
 	--show-diff-output: (not implemented)show diff output for failed test cases in the summary.
+
+	If BUILD-DIR is not given, TMAIN-DIR is reused as BUILD-DIR.
 EOF
 }
 
