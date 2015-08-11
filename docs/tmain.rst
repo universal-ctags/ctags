@@ -39,10 +39,12 @@ In the example, *Tmain* does:
 See also `tmain_run` and `tmain_compare` functions in `misc/units`.
 
 If run.sh exits with code 77, the test case is skipped.
-
+The output to stdout is captured and printed as the reason
+of skipping.
 
 TODO
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Run under travis
+* Run under valgrind
+
 
