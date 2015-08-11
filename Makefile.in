@@ -462,7 +462,7 @@ tmain: $(CTAGS_TEST)
 	 $(SHELL) $${c} $(srcdir)/Tmain
 
 clean-tmain:
-	$(SHELL) misc/units clean-tmain Tmain
+	$(SHELL) $(srcdir)/misc/units clean-tmain $(srcdir)/Tmain
 
 #
 # Test installation
