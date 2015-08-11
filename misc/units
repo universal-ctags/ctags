@@ -1669,6 +1669,8 @@ tmain_run ()
 	r=$?
 	echo $r > ${subdir}/exit-actual.txt
 
+	sed -i -e 's|^ctags.exe|ctags|' ${subdir}/stderr-actual.txt
+
 	if [ $r = $CODE_FOR_IGNORING_THIS_TMAIN_TEST ]; then
 	    run_result skip '/dev/null' "$(cat ${subdir}/stdout-actual.txt)"
 	    for a in ${subdir}/*-actual.txt; do
