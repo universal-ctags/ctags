@@ -190,7 +190,6 @@
     <ClInclude Include="..\main\sort.h" />
     <ClInclude Include="..\main\strlist.h" />
     <ClInclude Include="..\main\tg.h" />
-    <ClInclude Include="..\main\trashbox.h" />
     <ClInclude Include="..\main\vstring.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

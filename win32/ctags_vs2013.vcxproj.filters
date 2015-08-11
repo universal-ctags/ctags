@@ -302,9 +302,6 @@
     <ClInclude Include="..\main\nestlevel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\trashbox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\main\selectors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
