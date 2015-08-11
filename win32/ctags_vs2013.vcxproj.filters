@@ -225,6 +225,12 @@
     <ClCompile Include="..\main\nestlevel.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\perl6.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\selectors.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\main\e_msoft.h">
@@ -294,6 +300,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\nestlevel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\trashbox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\selectors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -94,6 +94,7 @@
   <ItemGroup>
     <ClCompile Include="..\main\htable.c" />
     <ClCompile Include="..\main\nestlevel.c" />
+    <ClCompile Include="..\main\selectors.c" />
     <ClCompile Include="..\parsers\ada.c" />
     <ClCompile Include="..\parsers\ant.c" />
     <ClCompile Include="..\main\args.c" />
@@ -135,6 +136,7 @@
     <ClCompile Include="..\main\parse.c" />
     <ClCompile Include="..\parsers\pascal.c" />
     <ClCompile Include="..\parsers\perl.c" />
+    <ClCompile Include="..\parsers\perl6.c" />
     <ClCompile Include="..\parsers\php.c" />
     <ClCompile Include="..\parsers\python.c" />
     <ClCompile Include="..\main\read.c" />
@@ -184,6 +186,7 @@
     <ClInclude Include="..\main\parsers.h" />
     <ClInclude Include="..\main\read.h" />
     <ClInclude Include="..\main\routines.h" />
+    <ClInclude Include="..\main\selectors.h" />
     <ClInclude Include="..\main\sort.h" />
     <ClInclude Include="..\main\strlist.h" />
     <ClInclude Include="..\main\tg.h" />
