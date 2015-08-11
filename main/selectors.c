@@ -10,6 +10,13 @@
 
 #include "selectors.h"
 
+static const char *TR_UNKNOWN = NULL;
+static const char *TR_PERL5   = "Perl";
+static const char *TR_PERL6   = "Perl6";
+
+static const char *TR_OBJC    = "ObjectiveC";
+static const char *TR_MATLAB  = "MatLab";
+
 static boolean startsWith (const char *line, const char* prefix)
 {
     return strncmp(line, prefix, strlen(prefix)) == 0? TRUE: FALSE;
@@ -34,9 +41,6 @@ tastePerlLine (const char *line)
 {
     while (isspace(*line))
         ++line;
-#define TR_UNKNOWN NULL
-#define TR_PERL5   "Perl"
-#define TR_PERL6   "Perl6"
 #define STRLEN(s) (sizeof(s) - 1)
 /* Assume the first character has been checked: */
 #define CHECK_PART(line, s) (    \
@@ -108,8 +112,6 @@ selectByPickingPerlVersion (FILE *input)
 static const char *
 tasteObjectiveCOrMatLabLines (const char *line)
 {
-#define TR_OBJC "ObjectiveC"
-#define TR_MATLAB "MatLab"
     if (startsWith (line, "% ")
 	|| startsWith (line, "%{"))
 	return TR_MATLAB;
