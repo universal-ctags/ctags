@@ -108,6 +108,7 @@
     <ClCompile Include="..\parsers\cobol.c" />
     <ClCompile Include="..\parsers\css.c" />
     <ClCompile Include="..\main\debug.c" />
+    <ClCompile Include="..\parsers\diff.c" />
     <ClCompile Include="..\parsers\dosbatch.c" />
     <ClCompile Include="..\parsers\eiffel.c" />
     <ClCompile Include="..\main\entry.c" />
