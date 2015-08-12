@@ -142,8 +142,16 @@ member_p ()
 clean_tcase ()
 {
     local d="$1"
+    local bundles="$2"
+    local b
 
     if [ -d "$d" ]; then
+	if [ -f "${bundles}" ]; then
+	    while read b; do
+		rm -rf "${b}"
+	    done < "${bundles}"
+	    rm ${bundles}
+	fi
 	rm -f "$d"/*.tmp "$d"/*.TMP
     fi
 }
@@ -327,6 +335,57 @@ run_record_cmdline ()
 	> "${ocmdline}"
 }
 
+#
+# All files and directories other than input.*, expected.tags,
+# args.ctags, README*, features, languages, and filters under srcdir
+# are copied to builddir. These copied files are called bundles.
+#
+prepare_bundles ()
+{
+    local from=$1
+    local to=$2
+    local obundles=$3
+    local src
+    local dist
+
+    for src in ${from}/*; do
+	if [ "${from}"'/*' = "${src}" ]; then
+	    break
+	fi
+	case $(basename "$src") in
+	    input.*)
+		continue
+		;;
+	    expected.tags*)
+		continue
+		;;
+	    README*)
+		continue
+		;;
+	    features|languages|filters)
+		continue
+		;;
+	    args.ctags)
+		continue
+		;;
+	    *)
+		dist="${to}/$(basename ${src})"
+		if ! cp -ar "${src}" "${to}"; then
+		    ERROR 1 "failure in copying bundle file \"${src}\" to \"${to}\""
+		else
+		    echo ${dist} >> ${obundles}
+		fi
+		;;
+	esac
+    done
+}
+
+direq ()
+{
+    [ "$(cd ${1} && pwd)" = "$(cd ${2} && pwd)" ]
+    return $?
+}
+
 run_tcase ()
 {
     local input="$1"
@@ -334,8 +393,11 @@ run_tcase ()
     local name="$3"
     local class="$4"
     local category="$5"
-    shift 5
+    local build_t="$6"
+    shift 6
 
+    # I violate the naming convention of build_* to reduce typing
+    local o=${build_t}
 
     local fargs="$t/args.ctags"
     local ffeatures="$t/features"
@@ -373,14 +435,15 @@ run_tcase ()
     #
     # All generated file must have suffix ".tmp".
     #
-    local ostderr="$t/STDERR.tmp"
-    local orawout="$t/RAWOUT.tmp"
-    local ofiltered="$t/FILTERED.tmp"
-    local odiff="$t/${_DIFF_OUTPUT_NAME}"
-    local ocmdline="$t/CMDLINE.tmp"
-    local ovalgrind="$t/VALGRIND.tmp"
-    local oresult="$t/RESULT.tmp"
-    local oshrink_template="$t/SHRINK-%s.tmp"
+    local ostderr="$o/STDERR.tmp"
+    local orawout="$o/RAWOUT.tmp"
+    local ofiltered="$o/FILTERED.tmp"
+    local odiff="$o/${_DIFF_OUTPUT_NAME}"
+    local ocmdline="$o/CMDLINE.tmp"
+    local ovalgrind="$o/VALGRIND.tmp"
+    local oresult="$o/RESULT.tmp"
+    local oshrink_template="$o/SHRINK-%s.tmp"
+    local obundles="$o/BUNDLES"
     local oshrink
 
     local guessed_lang
@@ -413,7 +476,12 @@ run_tcase ()
     guessed_lang_no_slash=$(echo "${guessed_lang}" | tr '/' '-')
     oshrink=$(printf "${oshrink_template}" "${guessed_lang_no_slash}")
 
-    clean_tcase "${t}"
+    clean_tcase "${o}" "${obundles}"
+    mkdir -p "${o}"
+    if ! direq "${o}" "${t}"; then
+	prepare_bundles ${t} ${o} "${obundles}"
+    fi
+
 
     printf '%-60s' "Testing ${name} as ${guessed_lang}${output_label}"
 
@@ -484,7 +552,7 @@ run_tcase ()
     fi
 
     if ! [ -f "${fexpected}" ]; then
-	clean_tcase "${t}"
+	clean_tcase "${o}" "${obundles}"
 	if [ "$class" = 'b' ]; then
 	    L_FIXED="$L_FIXED ${category}/${name}"
 	elif [ "$class" = 'i' ]; then
@@ -502,7 +570,7 @@ run_tcase ()
 	tmp="$?"
     }
     if [ "${tmp}" = 0 ]; then
-	clean_tcase "${t}"
+	clean_tcase "${o}" "${obundles}"
 	if [ "${class}" = 'b' ]; then
 	    L_FIXED="$L_FIXED ${category}/${name}"
 	elif ! [ "$WITH_TIMEOUT" = 0 ] && [ "${class}" = 'i' ]; then
@@ -532,9 +600,11 @@ run_dir ()
 {
     local category="$1"
     local base_dir="$2"
-    shift 2
+    local build_base_dir="$3"
+    shift 3
 
     local tcase_dir
+    local build_tcase_dir
     local input
     local name
     local class
@@ -558,10 +628,11 @@ run_dir ()
 	fi
 
 	tcase_dir="${input%/input.*}"
+	build_tcase_dir="${build_base_dir}/${tcase_dir#${base_dir}/}"
 	name="${tcase_dir%.[dbtiv]}"
 	name="${name##*/}"
 	class="${tcase_dir#*${name}.}"
-	run_tcase "${input}" "${tcase_dir}" "${name}" "${class}" "${category}"
+	run_tcase "${input}" "${tcase_dir}" "${name}" "${class}" "${category}" "${build_tcase_dir}"
     done
 
     return 0
@@ -580,7 +651,7 @@ run_show_diff_output ()
 
 run_summary ()
 {
-    local units_dir="${1}"
+    local build_dir="${1}"
     local t
 
     echo
@@ -607,7 +678,7 @@ run_summary ()
     for t in $L_FAILED_BY_DIFF; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
 	if [ "${SHOW_DIFF_OUTPUT}" = yes ]; then
-	    run_show_diff_output "${units_dir}" "${t#${_DEFAULT_CATEGORY}/}"
+	    run_show_diff_output "${build_dir}" "${t#${_DEFAULT_CATEGORY}/}"
 	fi
     done
 
@@ -660,7 +731,9 @@ action_run ()
     shift
 
     local units_dir
+    local build_dir
     local d
+    local build_d
     local category
 
     while [ $# -gt 0 ]; do
@@ -755,6 +828,8 @@ action_run ()
 	    *)
 		units_dir="$1"
 		shift
+		build_dir="${1:-${units_dir}}"
+		shift
 		break
 		;;
 	esac
@@ -768,6 +843,15 @@ action_run ()
 
     if ! [ -d "$units_dir" ]; then
 	ERROR 1 "No such directory: ${units_dir}"
+    fi
+
+    case "${build_dir}" in
+	/*) ;;
+	*) build_dir=$(pwd)/${build_dir} ;;
+    esac
+
+    if ! [ -d "$build_dir" ]; then
+	ERROR 1 "No such directory(build_dir): ${build_dir}"
     fi
 
     if ! [ -f "${CTAGS}" ]; then
@@ -792,17 +876,18 @@ action_run ()
     category="${_DEFAULT_CATEGORY}"
     if [ -z "$CATEGORIES" ] \
 	|| ( [ -n "$CATEGORIES" ] && member_p "${category}" $CATEGORIES ); then
-	run_dir "${category}" "${units_dir}"
+	run_dir "${category}" "${units_dir}" "${build_dir}"
     fi
 
     for d in ${units_dir}/*.r; do
 	[ -d "$d" ] || continue
 	category="${d##*/}"
+	build_d=${build_dir}/$d
 	category="${category%.r}"
-	run_dir "${category}" "$d"
+	run_dir "${category}" "$d" "${build_d}"
     done
 
-    run_summary "${units_dir}"
+    run_summary "${build_dir}"
 
     if [ -n "${L_FAILED_BY_STATUS}" ] || [ -n "${L_FAILED_BY_DIFF}" ] || [ -n "${L_FAILED_BY_TIMEED_OUT}" ]; then
 	return 1
@@ -1801,9 +1886,10 @@ action_tmain ()
 	ERROR 1 "No such directory(tmain_dir): ${tmain_dir}"
     fi
 
-    if ! [ $(expr substr ${build_dir} 1 1) = '/' ]; then
-	build_dir=$(pwd)/${build_dir}
-    fi
+    case "${build_dir}" in
+	/*) ;;
+	*) build_dir=$(pwd)/${build_dir} ;;
+    esac
     if ! [ -d "$build_dir" ]; then
 	ERROR 1 "No such directory(build_dir): ${build_dir}"
     fi
