@@ -1,4 +1,8 @@
 CTAGS=$1
+
+source ../utils.sh
+exit_if_no_coproc ${CTAGS}
+
 X=BACKENDCMD.tmp
 touch ${X}
 chmod u+xs ${X} 
