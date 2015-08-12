@@ -479,7 +479,7 @@ static vString* getHome (void)
 	}
 }
 
-#if defined(_WIN32)
+#if defined(_WIN32) && !defined(__USE_MINGW_ANSI_STDIO)
 
 /* Some versions of MinGW are missing _vscprintf's declaration, although they
  * still provide the symbol in the import library.
