@@ -936,6 +936,9 @@ action_clean ()
     local units_dir=$1
     shift
 
+    local bundles
+    local b
+
     if [ $# -gt 0 ]; then
 	ERROR 1 "too many arguments for ${action} action: $*"
     elif [ -z "$units_dir" ]; then
@@ -948,6 +951,13 @@ action_clean ()
 
     check_availability find
     check_availability rm
+
+    for bundles in $(find "$units_dir" -name "BUNDLES"); do
+	while read b; do
+	    rm -rf "${b}"
+	done < ${bundles}
+	rm ${bundles}
+    done
 
     rm -f $(find "$units_dir" -name '*.tmp')
     rm -f $(find "$units_dir" -name '*.TMP')
