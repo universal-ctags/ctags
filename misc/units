@@ -297,7 +297,7 @@ run_shrink ()
 }
 
 # filters out the directory prefix in a ctags input
-ctags_basename_filter_regex='s%\(^[^	]\{1,\}	\)\([^/	]\{1,\}/\)*%\1%'
+ctags_basename_filter_regex='s%\(^[^	]\{1,\}	\)\(/\{0,1\}\([^/	]\{1,\}/\)*\)%\1%'
 ctags_basename_filter()
 {
     sed "${ctags_basename_filter_regex}"
