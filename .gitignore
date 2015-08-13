@@ -8,6 +8,7 @@
 *.obj
 *.od
 *.TMP
+*.tmp
 *~
 a.out
 autom4te.cache
