@@ -977,14 +977,30 @@ extern void clearLanguageAliases (const langType language)
 	stringListClear (LanguageTable [language]->currentAliaes);
 }
 
-extern void addLanguagePatternMap (const langType language, const char* ptrn)
+static boolean removeLanguagePatternMap (const char *const pattern)
+{
+	boolean result = FALSE;
+	unsigned int i;
+	for (i = 0  ;  i < LanguageCount  &&  ! result ;  ++i)
+	{
+		stringList* const ptrn = LanguageTable [i]->currentPatterns;
+		if (ptrn != NULL  &&  stringListRemoveExtension (ptrn, pattern))
+		{
+			verbose (" (removed from %s)", getLanguageName (i));
+			result = TRUE;
+		}
+	}
+	return result;
+}
+
+extern void addLanguagePatternMap (const langType language, const char* ptrn, boolean exclusive)
 {
 	vString* const str = vStringNewInit (ptrn);
 	parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
-	if (lang->currentPatterns == NULL)
-		lang->currentPatterns = stringListNew ();
+	if (exclusive)
+		removeLanguagePatternMap (ptrn);
 	stringListAdd (lang->currentPatterns, str);
 }
 
@@ -1005,11 +1021,12 @@ extern boolean removeLanguageExtensionMap (const char *const extension)
 }
 
 extern void addLanguageExtensionMap (
-		const langType language, const char* extension)
+		const langType language, const char* extension, boolean exclusive)
 {
 	vString* const str = vStringNewInit (extension);
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	removeLanguageExtensionMap (extension);
+	if (exclusive)
+		removeLanguageExtensionMap (extension);
 	stringListAdd (LanguageTable [language]->currentExtensions, str);
 }
 
@@ -1930,7 +1947,7 @@ static void unifyMaps (const langType language)
 		const char* const ext = vStringValue (
 			stringListItem (lang->currentExtensions, i));
 		vString *const ptrn = ext2ptrnNew (ext);
-		addLanguagePatternMap (language, vStringValue (ptrn));
+		addLanguagePatternMap (language, vStringValue (ptrn), FALSE);
 		vStringDelete (ptrn);
 	}
 }

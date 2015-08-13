@@ -323,7 +323,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --list-maps=[language|all]"},
  {1,"       Output list of language mappings."},
  {1,"  --map-<LANG>=[+]map"},
- {1,"       Alternative version of --langmap option."},
+ {1,"       Set or add(+) a map for <LANG>."},
+ {1,"       Unlike --langmap a pattern or an extension can be specified at once."},
  {1,"  --options=file"},
  {1,"       Specify file from which command line options should be read."},
 #ifdef HAVE_ICONV
@@ -1270,7 +1271,6 @@ static char* extractMapFromParameter (const langType language,
 		if (*p == '\0')
 		{
 			result = eStrdup (parameter);
-			verbose (" .%s", result);
 			*tail = parameter + strlen (parameter);
 			return result;
 		}
@@ -1279,7 +1279,6 @@ static char* extractMapFromParameter (const langType language,
 			tmp = *p;
 			*p = '\0';
 			result = eStrdup (parameter);
-			verbose (" .%s", result);
 			*p = tmp;
 			*tail = p;
 			return result;
@@ -1303,7 +1302,6 @@ static char* extractMapFromParameter (const langType language,
 			tmp = *p;
 			*p = '\0';
 			result = eStrdup (parameter);
-			verbose (" (%s)", result);
 			*p = tmp;
 			*tail = p + 1;
 			return result;
@@ -1313,7 +1311,7 @@ static char* extractMapFromParameter (const langType language,
 	return NULL;
 }
 
-static char* addLanguageMap (const langType language, char* map_parameter)
+static char* addLanguageMap (const langType language, char* map_parameter, boolean exclusive)
 {
 	char* p = NULL;
 	boolean pattern_p;
@@ -1321,9 +1319,9 @@ static char* addLanguageMap (const langType language, char* map_parameter)
 
 	map = extractMapFromParameter (language, map_parameter, &p, &pattern_p, skipPastMap);
 	if (map && pattern_p == FALSE)
-		addLanguageExtensionMap (language, map);
+		addLanguageExtensionMap (language, map, exclusive);
 	else if (map && pattern_p == TRUE)
-		addLanguagePatternMap (language, map);
+		addLanguagePatternMap (language, map, exclusive);
 	else
 		error (FATAL, "Badly formed language map for %s language",
 				getLanguageName (language));
@@ -1370,7 +1368,7 @@ static char* processLanguageMap (char* map)
 				else
 					verbose ("    Adding to %s language map:", getLanguageName (language));
 				while (list != NULL  &&  *list != '\0'  &&  *list != ',')
-					list = addLanguageMap (language, list);
+					list = addLanguageMap (language, list, TRUE);
 				verbose ("\n");
 			}
 			if (list != NULL  &&  *list == ',')
@@ -1483,7 +1481,7 @@ extern boolean processMapOption (
 	else
 		verbose ("    Adding to %s language map:", getLanguageName (language));
 	map_parameter = eStrdup (spec);
-	addLanguageMap (language, map_parameter);
+	addLanguageMap (language, map_parameter, FALSE);
 	eFree (map_parameter);
 	verbose ("\n");
 

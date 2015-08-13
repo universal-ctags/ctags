@@ -2,11 +2,38 @@
  * selectors.c -- routines for selecting a language
  */
 
+#include "general.h"
+
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "selectors.h"
+
+static const char *TR_UNKNOWN = NULL;
+static const char *TR_PERL5   = "Perl";
+static const char *TR_PERL6   = "Perl6";
+
+static const char *TR_OBJC    = "ObjectiveC";
+static const char *TR_MATLAB  = "MatLab";
+
+static boolean startsWith (const char *line, const char* prefix)
+{
+    return strncmp(line, prefix, strlen(prefix)) == 0? TRUE: FALSE;
+}
+
+static const char *selectByLines (FILE *input,
+				  const char* (* lineTaster) (const char *),
+				  const char* defaultLang)
+{
+    char line[0x800];
+    while (fgets(line, sizeof(line), input)) {
+	const char *lang = lineTaster (line);
+	if (lang)
+	    return lang;
+    }
+    return defaultLang;
+}
 
 /* Returns "Perl" or "Perl6" or NULL if it does not taste like anything */
 static const char *
@@ -14,9 +41,6 @@ tastePerlLine (const char *line)
 {
     while (isspace(*line))
         ++line;
-#define TR_UNKNOWN NULL
-#define TR_PERL5   "Perl"
-#define TR_PERL6   "Perl6"
 #define STRLEN(s) (sizeof(s) - 1)
 /* Assume the first character has been checked: */
 #define CHECK_PART(line, s) (    \
@@ -81,11 +105,46 @@ tastePerlLine (const char *line)
 const char *
 selectByPickingPerlVersion (FILE *input)
 {
-    char line[0x800];
-    while (fgets(line, sizeof(line), input)) {
-        const char *lang = tastePerlLine(line);
-        if (lang)
-            return lang;
+    /* Default to Perl 5 */
+    return selectByLines (input, tastePerlLine, TR_PERL5);
+}
+
+static const char *
+tasteObjectiveCOrMatLabLines (const char *line)
+{
+    if (startsWith (line, "% ")
+	|| startsWith (line, "%{"))
+	return TR_MATLAB;
+    else if (startsWith (line, "// ")
+	     || startsWith (line, "/* "))
+	return TR_OBJC;
+    else if (startsWith (line, "#include")
+	     || startsWith (line, "#import")
+	     || startsWith (line, "#define ")
+	     || startsWith (line, "#ifdef "))
+	return TR_OBJC;
+    else if (startsWith (line, "@interface ")
+	     || startsWith (line, "@implementation ")
+	     || startsWith (line, "@protocol "))
+	return TR_OBJC;
+    else if (startsWith (line, "struct ")
+	     || startsWith (line, "union ")
+	     || startsWith (line, "typedef "))
+	return TR_OBJC;
+    else {
+	if (startsWith (line, "function ")) {
+	    const char *p = line + strlen ("function ");
+	    while (isspace(*p))
+		p++;
+	    if (*p != '\0' && *p != '(')
+		return TR_MATLAB;
+	}
     }
-    return TR_PERL5;                /* Default to Perl 5 */
+    return NULL;
+}
+
+const char *
+selectByObjectiveCAndMatLabKeywords (FILE * input)
+{
+    return selectByLines (input, tasteObjectiveCOrMatLabLines, NULL);
 }

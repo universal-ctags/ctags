@@ -1,0 +1,6 @@
+1.
+Ruby    
+2.
+foo      *.rb
+3.
+foo      *.html
