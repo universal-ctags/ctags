@@ -72,6 +72,9 @@ typedef struct {
 		/* Is file (pointed to) setuid? */
 	boolean isSetuid;
 
+		/* Is file (pointed to) setgid? */
+	boolean isSetgid;
+
 		/* Size of file (pointed to) */
 	unsigned long size;
 } fileStatus; 
