@@ -1,0 +1,8 @@
+a	input.lua	/^function  a(x)$/;"	f
+b	input.lua	/^  function  b(x)$/;"	f
+c	input.lua	/^  function  c  (x)$/;"	f
+d	input.lua	/^function  d  (x)$/;"	f
+e	input.lua	/^e=function  (x)$/;"	f
+f	input.lua	/^f  =function  (x)$/;"	f
+g	input.lua	/^g  =  function  (x)$/;"	f
+h	input.lua	/^h=  function  (x)$/;"	f

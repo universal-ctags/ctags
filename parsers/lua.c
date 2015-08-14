@@ -34,14 +34,6 @@ static kindOption LuaKinds [] = {
 *   FUNCTION DEFINITIONS
 */
 
-/* for debugging purposes */
-static void __unused__ print_string (char *p, char *q)
-{
-	for ( ; p != q; p++)
-		fprintf (errout, "%c", *p);
-	fprintf (errout, "\n");
-}
-
 /*
  * Helper function.
  * Returns 1 if line looks like a line of Lua code.
@@ -65,25 +57,71 @@ static boolean is_a_code_line (const unsigned char *line)
 	return result;
 }
 
-static void extract_name (const char *begin, const char *end, vString *name)
+static boolean isLuaIdentifier (char c)
 {
-	if (begin != NULL  &&  end != NULL  &&  begin < end)
+	return (boolean) !(isspace(c)  || c == '(' || c == ')' || c == '=');
+}
+
+static void extract_next_token (const char *begin, const char *end_sentinel, vString *name)
+{
+	boolean found;
+
+	if (begin == NULL || end_sentinel == NULL)
+		return;
+
+	if (! (begin < end_sentinel))
+		return;
+
+	while (isspace ((int) *begin))
 	{
-		const char *cp;
+		begin++;
+		if (! (begin < end_sentinel))
+			return;
+	}
 
-		while (isspace ((int) *begin))
-			begin++;
-		while (isspace ((int) *end))
-			end--;
-		if (begin < end)
-		{
-			for (cp = begin ; cp != end; cp++)
-				vStringPut (name, (int) *cp);
-			vStringTerminate (name);
+	found = FALSE;
+	while (begin != end_sentinel && isLuaIdentifier (*begin))
+	{
+		vStringPut (name, (int) *begin);
+		begin++;
+		found = TRUE;
+	}
 
-			makeSimpleTag (name, LuaKinds, K_FUNCTION);
-			vStringClear (name);
-		}
+	if (found)
+	{
+		vStringTerminate (name);
+		makeSimpleTag (name, LuaKinds, K_FUNCTION);
+		vStringClear (name);
+	}
+
+}
+
+static void extract_prev_token (const char *end, const char *begin_sentinel, vString *name)
+{
+	const char *begin;
+
+	if (end == NULL || begin_sentinel == NULL)
+		return;
+
+	if (! (begin_sentinel <= end))
+		return;
+
+	while (isspace ((int) *end))
+	{
+		end--;
+		if (! (begin_sentinel <= end))
+			return;
+	}
+
+	begin = end;
+	while (begin_sentinel <= begin && isLuaIdentifier (*begin))
+		begin--;
+
+	if (end - begin)
+	{
+		vStringNCatS (name, begin + 1, end - begin);
+		makeSimpleTag (name, LuaKinds, K_FUNCTION);
+		vStringClear (name);
 	}
 }
 
@@ -108,10 +146,15 @@ static void findLuaTags (void)
 		if (q == NULL) {
 			p = p + 9;  /* skip the `function' word */
 			q = strchr ((const char*) p, '(');
-			extract_name (p, q, name);
-		} else {
+			if (q)
+				extract_next_token (p, q, name);
+		} else if (
+			   (*(q+1) != '=') /* ignore `if type(v) == "function" then ...' */
+			   && (q < p)	   /* ignore "function" ~=  */
+			   ) {
 			p = (const char*) &line[0];
-			extract_name (p, q, name);
+			if (p < q)
+				extract_prev_token (q - 1, p, name);
 		}
 	}
 	vStringDelete (name);

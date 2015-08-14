@@ -1,0 +1,3 @@
+test.i_123	input.lua	/^ test.i_123 = function  (x)$/;"	f
+test.me_12a	input.lua	/^function test.me_12a(one, two)$/;"	f
+test.me_12b	input.lua	/^function test.me_12b (one, two)$/;"	f
