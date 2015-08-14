@@ -2655,7 +2655,7 @@ static void analyzeParens (statementInfo *const st)
 				 ! st->gotParenName  &&
 				 (! info.isParamList || ! st->haveQualifyingName  ||
 				  c == '('  ||
-				  (c == '='  &&  st->implementation != IMP_VIRTUAL) ||
+				  (c == '='  &&  st->implementation != IMP_VIRTUAL && !isLanguage (Lang_cpp)) ||
 				  (st->declaration == DECL_NONE  &&  isOneOf (c, ",;"))))
 		{
 			token->type = TOKEN_NAME;
