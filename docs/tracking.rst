@@ -153,6 +153,12 @@ bugs
 
 	   	02ec2066b5be6b129eba49685bd0b17fef4acfa
 
+   <341> Lua: "function f ()" whitespace
+
+	 * fixed in::
+
+	   	8590bbef5fcf70f6747d509808c29bf84342cd0d
+
    <341> Introducing ctags.conf.d
 
 	 * merged the improved version::
@@ -163,8 +169,13 @@ bugs
 
 	 * merged patch (with updated bug number)::
 
-		a12b3a24b62d6535a968e076675f68bac9ad32ba 
+		a12b3a24b62d6535a968e076675f68bac9ad32ba
 
+   <177> Lua: "function" results in function tag (includes patch)
+
+	 * fixed in::
+
+	   	5606f3f711afeac74587a249650a5f7b416f19be
 
 `patches <https://sourceforge.net/p/ctags/patches/%d>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
