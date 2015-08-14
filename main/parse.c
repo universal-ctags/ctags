@@ -63,7 +63,7 @@ static vString* ext2ptrnNew (const char *const ext)
 	return ptrn;
 }
 
-static boolean isLanguageEnabled (const langType language)
+extern boolean isLanguageEnabled (const langType language)
 {
 	const parserDefinition* const lang = LanguageTable [language];
 	if (!lang->enabled)

@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "debug.h"
+#include "parse.h"
 #include "selectors.h"
 
 static const char *TR_UNKNOWN = NULL;
@@ -164,5 +166,25 @@ tasteObjectiveC (const char *line)
 const char *
 selectByObjectiveCKeywords (FILE * input)
 {
+    /* TODO: Ideally opening input should be delayed til
+       enable/disable based selection is done. */
+
+    static langType objc = LANG_IGNORE;
+    static langType cpp = LANG_IGNORE;
+
+    if (objc == LANG_IGNORE)
+	objc = getNamedLanguage (TR_OBJC);
+
+    if (cpp == LANG_IGNORE)
+	cpp = getNamedLanguage (TR_CPP);
+
+    Assert (0 <= objc);
+    Assert (0 <= cpp);
+
+    if (! isLanguageEnabled (objc))
+	return TR_CPP;
+    else if (! isLanguageEnabled (cpp))
+	return TR_OBJC;
+
     return selectByLines (input, tasteObjectiveC, TR_CPP);
 }
