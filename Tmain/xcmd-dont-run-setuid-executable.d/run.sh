@@ -1,6 +1,6 @@
 CTAGS=$1
 
-source ../utils.sh
+. ../utils.sh
 exit_if_no_coproc ${CTAGS}
 
 X=BACKENDCMD.tmp

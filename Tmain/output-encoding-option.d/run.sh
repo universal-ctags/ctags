@@ -2,7 +2,7 @@
 CTAGS=$1
 BUILDDIR=$4
 
-source ../utils.sh
+. ../utils.sh
 
 if ${CTAGS} --quiet --options=NONE --list-features | grep -q multibyte ; then
   if ${CTAGS}  --quiet --options=NONE \
