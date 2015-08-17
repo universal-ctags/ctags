@@ -414,7 +414,9 @@ extern void openTagFile (void)
 	/*  Open the tags file.
 	 */
 	if (TagsToStdout)
-		TagFile.fp = tempFile ("w", &TagFile.name);
+		/* Open a tempfile with read and write mode. Read mode is used when
+		 * write the result to stdout. */
+		TagFile.fp = tempFile ("w+", &TagFile.name);
 	else
 	{
 		boolean fileExists;
@@ -494,10 +496,8 @@ static void sortTagFile (void)
 #endif
 		}
 		else if (TagsToStdout)
-			catFile (tagFileName ());
+			catFile (TagFile.fp);
 	}
-	if (TagsToStdout)
-		remove (tagFileName ());  /* remove temporary file */
 }
 
 static void resizeTagFile (const long newSize)
@@ -550,12 +550,15 @@ extern void closeTagFile (const boolean resize)
 
 	if (Option.etags)
 		writeEtagsIncludes (TagFile.fp);
+	fflush (TagFile.fp);
 	abort_if_ferror (TagFile.fp);
 	desiredSize = ftell (TagFile.fp);
 	fseek (TagFile.fp, 0L, SEEK_END);
 	size = ftell (TagFile.fp);
-	if (fclose (TagFile.fp) != 0)
-		error (FATAL | PERROR, "cannot close tag file");
+	if (! TagsToStdout)
+		/* The tag file should be closed before resizing. */
+		if (fclose (TagFile.fp) != 0)
+			error (FATAL | PERROR, "cannot close tag file");
 
 	if (resize  &&  desiredSize < size)
 	{
@@ -565,6 +568,12 @@ extern void closeTagFile (const boolean resize)
 		resizeTagFile (desiredSize);
 	}
 	sortTagFile ();
+	if (TagsToStdout)
+	{
+		if (fclose (TagFile.fp) != 0)
+			error (FATAL | PERROR, "cannot close tag file");
+		remove (tagFileName ());  /* remove temporary file */
+	}
 	eFree (TagFile.name);
 	TagFile.name = NULL;
 }
