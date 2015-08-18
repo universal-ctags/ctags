@@ -1,1 +1,1 @@
-find_heading	input.py	/^		heading=Heading, connect_with_document=True):$/;"	f
+find_heading	input.py	/^def find_heading(self, position=0, direction=Direction.FORWARD, \\$/;"	f

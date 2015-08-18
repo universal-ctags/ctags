@@ -6,6 +6,7 @@ TREEID	input.py	/^TREEID = 0x02$/;"	v
 VERSION	input.py	/^VERSION = '1.2.0'$/;"	v
 __init__	input.py	/^    def __init__(self, filename, pathsep='', treegap=64):$/;"	m	class:one
 __private_function__	input.py	/^    def __private_function__(self, key, data):$/;"	m	class:one
+_pack	input.py	/^    def _pack(self, i, s): '''this is''' """a""" '''string$/;"	m	class:one
 _test	input.py	/^def _test(test, code, outcome, exception):$/;"	f
 btopen	input.py	/^from bsddb import btopen$/;"	i
 deeply_nested	input.py	/^            class deeply_nested():$/;"	c	function:_test.ignored_function.more_nesting	file:
@@ -20,7 +21,7 @@ so_is_this	input.py	/^    class so_is_this:$/;"	c	class:one
 this	input.py	/^                        @bleh def this also? good!$/;"	m	class:_test.ignored_function.more_nesting.deeply_nested.even_more.this
 this	input.py	/^                    @blah class this is seen???$/;"	c	function:_test.ignored_function.more_nesting.deeply_nested.even_more	file:
 this_is_ignored	input.py	/^        class this_is_ignored:$/;"	c	function:one.public_function	file:
-three	input.py	/^C):$/;"	c
+three	input.py	/^three\\$/;"	c
 two	input.py	/^class two (one):$/;"	c
 x	input.py	/^    x = lambda x: x$/;"	m	class:one
 y	input.py	/^    y = 0$/;"	v	class:one
