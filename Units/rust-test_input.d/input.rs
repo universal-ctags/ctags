@@ -30,6 +30,23 @@ pub struct B
 	bar: isize
 }
 
+pub struct C<T> where T: Send
+{
+	a: T
+}
+
+pub trait D<T> where T: Send
+{
+}
+
+impl<T> D<T> for C<T> where T: Send
+{
+}
+
+pub fn where_foo<T>(a: T) where T: Send
+{
+}
+
 /*
  * fn ignored_in_comment() {}
  */

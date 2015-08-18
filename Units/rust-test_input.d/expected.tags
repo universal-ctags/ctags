@@ -3,6 +3,9 @@ Animal	input.rs	/^enum Animal {$/;"	g
 B	input.rs	/^pub struct B$/;"	s
 Bar	input.rs	/^struct Bar(isize);$/;"	s
 Baz	input.rs	/^struct Baz(isize);$/;"	s
+C	input.rs	/^impl<T> D<T> for C<T> where T: Send$/;"	c
+C	input.rs	/^pub struct C<T> where T: Send$/;"	s
+D	input.rs	/^pub trait D<T> where T: Send$/;"	i
 DoZ	input.rs	/^trait DoZ {$/;"	i
 Foo	input.rs	/^impl DoZ for Foo {$/;"	c
 Foo	input.rs	/^impl Foo {$/;"	c
@@ -16,6 +19,7 @@ SuperTraitTest	input.rs	/^trait SuperTraitTest:Testable+DoZ {$/;"	i
 Testable	input.rs	/^trait Testable $/;"	i
 TraitedStructTest	input.rs	/^impl<T: Clone> ParametrizedTrait<T> for TraitedStructTest<T> {$/;"	c
 TraitedStructTest	input.rs	/^struct TraitedStructTest<X> {$/;"	s
+a	input.rs	/^	a: T$/;"	m	struct:C
 a_anteater	input.rs	/^	a_anteater(isize),$/;"	e	enum:Animal
 a_bear	input.rs	/^	a_bear(isize),$/;"	e	enum:Animal
 a_cat	input.rs	/^	a_cat(isize),$/;"	e	enum:Animal
@@ -48,6 +52,7 @@ test2	input.rs	/^	fn test2(&self) {$/;"	F	implementation:Foo	signature:(&self)
 test2	input.rs	/^	fn test2(&self);$/;"	F	interface:Testable	signature:(&self)
 test_input2	input.rs	/^mod test_input2$/;"	n
 test_macro	input.rs	/^macro_rules! test_macro$/;"	M
+where_foo	input.rs	/^pub fn where_foo<T>(a: T) where T: Send$/;"	f	signature:<T>(a: T) where T: Send
 x	input.rs	/^		x:isize,$/;"	m	struct:Foo2
 x	input.rs	/^	x:X$/;"	m	struct:TraitedStructTest
 y	input.rs	/^		y:isize$/;"	m	struct:Foo2
