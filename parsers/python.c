@@ -27,10 +27,14 @@
 typedef enum {
 	KEYWORD_NONE = -1,
 	KEYWORD_as,
+	KEYWORD_cdef,
 	KEYWORD_class,
+	KEYWORD_cpdef,
 	KEYWORD_def,
+	KEYWORD_extern,
 	KEYWORD_from,
 	KEYWORD_import,
+	KEYWORD_inline,
 	KEYWORD_lambda,
 	KEYWORD_pass,
 	KEYWORD_return,
@@ -74,10 +78,15 @@ typedef struct {
 static const keywordDesc PythonKeywordTable[] = {
 	/* keyword			keyword ID */
 	{ "as",				KEYWORD_as				},
+	{ "cdef",			KEYWORD_cdef			},
+	{ "cimport",		KEYWORD_import			},
 	{ "class",			KEYWORD_class			},
+	{ "cpdef",			KEYWORD_cpdef			},
 	{ "def",			KEYWORD_def				},
+	{ "extern",			KEYWORD_extern			},
 	{ "from",			KEYWORD_from			},
 	{ "import",			KEYWORD_import			},
+	{ "inline",			KEYWORD_inline			},
 	{ "lambda",			KEYWORD_lambda			},
 	{ "pass",			KEYWORD_pass			},
 	{ "return",			KEYWORD_return			},
@@ -105,6 +114,7 @@ typedef struct {
 } tokenInfo;
 
 static langType Lang_python;
+static tokenInfo *NextToken = NULL;
 static NestingLevels *PythonNestingLevels = NULL;
 
 
@@ -348,10 +358,26 @@ static void readIdentifier (vString *const string, const int firstChar)
 	vStringTerminate (string);
 }
 
+static void ungetToken (tokenInfo *const token)
+{
+	Assert (NextToken == NULL);
+	NextToken = newToken ();
+	copyToken (NextToken, token);
+}
+
 static void readTokenFull (tokenInfo *const token, boolean inclWhitespaces)
 {
 	int c;
 	int n;
+
+	/* if we've got a token held back, emit it */
+	if (NextToken)
+	{
+		copyToken (token, NextToken);
+		deleteToken (NextToken);
+		NextToken = NULL;
+		return;
+	}
 
 	token->type		= TOKEN_UNDEFINED;
 	token->keyword	= KEYWORD_NONE;
@@ -599,14 +625,88 @@ static boolean skipQualifiedName (tokenInfo *const token)
 	return FALSE;
 }
 
-static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind)
+static boolean readCDefName (tokenInfo *const token, pythonKind *kind)
+{
+	readToken (token);
+
+	if (token->keyword == KEYWORD_extern ||
+	    token->keyword == KEYWORD_import)
+	{
+		readToken (token);
+		if (token->keyword == KEYWORD_from)
+			return FALSE;
+	}
+
+	if (token->keyword == KEYWORD_class)
+	{
+		*kind = K_CLASS;
+		readToken (token);
+	}
+	else
+	{ /* skip type declaration */
+		if (token->keyword == KEYWORD_inline)
+			readToken (token);
+		else
+		{ /* otherwise, skip the optional type -- everything on the same line
+		   * until an identifier followed by "(". */
+			tokenInfo *candidate = newToken ();
+
+			while (token->type != TOKEN_EOF &&
+			       token->type != TOKEN_INDENT &&
+			       token->type != '=' &&
+			       token->type != ',' &&
+			       token->type != ':')
+			{
+				if (token->type == '[')
+				{
+					if (skipOverPair (token, '[', ']', NULL))
+						readToken (token);
+				}
+				else if (token->type == '(')
+				{
+					if (skipOverPair (token, '(', ')', NULL))
+						readToken (token);
+				}
+				else if (token->type == TOKEN_IDENTIFIER)
+				{
+					copyToken (candidate, token);
+					readToken (token);
+					if (token->type == '(')
+					{ /* okay, we really found a function, use this */
+						*kind = K_FUNCTION;
+						ungetToken (token);
+						copyToken (token, candidate);
+						break;
+					}
+				}
+				else
+					readToken (token);
+			}
+
+			deleteToken (candidate);
+		}
+	}
+
+	return token->type == TOKEN_IDENTIFIER;
+}
+
+static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind,
+                                boolean isCDef)
 {
 	vString *arglist = NULL;
 	tokenInfo *name = NULL;
 
-	readToken (token);
-	if (token->type != TOKEN_IDENTIFIER)
-		return FALSE;
+	if (isCDef)
+	{
+		if (! readCDefName (token, &kind))
+			return FALSE;
+	}
+	else
+	{
+		readToken (token);
+		if (token->type != TOKEN_IDENTIFIER)
+			return FALSE;
+	}
 
 	name = newToken ();
 	copyToken (name, token);
@@ -649,6 +749,7 @@ static void findPythonTags (void)
 	tokenInfo *const token = newToken ();
 	boolean atLineStart = TRUE;
 
+	NextToken = NULL;
 	PythonNestingLevels = nestingLevelsNew ();
 
 	readToken (token);
@@ -663,7 +764,12 @@ static void findPythonTags (void)
 		{
 			pythonKind kind = token->keyword == KEYWORD_class ? K_CLASS : K_FUNCTION;
 
-			readNext = parseClassOrDef (token, kind);
+			readNext = parseClassOrDef (token, kind, FALSE);
+		}
+		else if (token->keyword == KEYWORD_cdef ||
+		         token->keyword == KEYWORD_cpdef)
+		{
+			readNext = parseClassOrDef (token, K_FUNCTION, TRUE);
 		}
 		else if (token->keyword == KEYWORD_import)
 		{
@@ -756,6 +862,7 @@ static void findPythonTags (void)
 
 	nestingLevelsFree (PythonNestingLevels);
 	deleteToken (token);
+	Assert (NextToken == NULL);
 }
 
 static void initialize (const langType language)
