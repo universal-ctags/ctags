@@ -2,16 +2,16 @@
 #![feature(globs)]
 #![feature(macro_rules)]
 use std::*;
-use std::io::stdio::println;
-use test_input2::*;
-mod test_input2;
+mod test_input2
+{
+	pub struct SomeStruct;
+}
 
-fn lifetime_and_char<'lifetime>(_: &'lifetime int)
+fn lifetime_and_char<'lifetime>(_: &'lifetime isize)
 {
 	let s = '"';
 	let s = '}';
 	let s = '\'';
-	let s = '\uffff';
 	fn not_hidden_by_char() {}
 }
 
@@ -19,15 +19,15 @@ fn preserve_string_delims(_bar: extern r#"C"# fn()) {}
 
 pub struct A
 {
-	foo: fn() -> int,
-	bar: int
+	foo: fn() -> isize,
+	bar: isize
 }
 
 pub struct B
 {
 	#[cfg(test)]
-	foo: int,
-	bar: int
+	foo: isize,
+	bar: isize
 }
 
 /*
@@ -41,11 +41,11 @@ pub struct B
  fn ignored_in_nested_comment() {}
  */
 
-static size: uint = 1;
+static size: usize = 1;
 
 #[cfg(test)]
 struct S1 {
-	priv only_field: [int, ..size]
+	only_field: [isize; size]
 }
 
 macro_rules! test_macro
@@ -53,28 +53,27 @@ macro_rules! test_macro
 	() => {1}
 }
 
-macro_rules! ignore (($($x:tt)*) => (()))
+macro_rules! ignore {($($x:tt)*) => (())}
 
-fn yada(a:int,c:Foo,b:test_input2::fruit::SomeStruct) -> String {
+fn yada(a:isize, c:Foo, b:test_input2::SomeStruct) -> String {
 	a.to_string()
 }
 
 fn main() {	
-	use test_input2::fruit::*;	
-	io::println(foo_bar_test_func(SomeStruct{red_value:1,green_value:2,blue_value:3},(4,5)).to_string().as_slice());
+	use test_input2::*;
 	let a=Foo{foo_field_1:2};
 	a.my_method(1);
-	let c=a_cat(3);
+	let c=Animal::a_cat(3);
 	let d=Foo{foo_field_1:a.foo_field_1+2}; a.test();
-	println(a.foo_field_1.to_string().as_slice());
+	println!("{}", a.foo_field_1.to_string());
 	ignore!
 	(
 		fn ignored_inside_macro() {}
-	)
+	);
 	ignore!
 	[
 		fn ignored_inside_macro() {}
-	]
+	];
 	ignore!
 	{
 		fn ignored_inside_macro() {}
@@ -88,26 +87,26 @@ fn main() {
 	fn nested() {}
 }
 
-struct Bar(int);
+struct Bar(isize);
 
-struct Baz(int);
+struct Baz(isize);
 
-struct Foo{foo_field_1:int}
+struct Foo{foo_field_1:isize}
 
 struct Foo2 {
-		x:int,
-		y:int
+		x:isize,
+		y:isize
 }
 
 impl Foo {
-	fn my_method(&self,_:int){ println("my_method of foo");}
+	fn my_method(&self,_:isize){ println!("{}", "my_method of foo");}
 }
 
 enum Animal {
-	a_anteater(int),
-	a_bear(int),
-	a_cat(int),
-	a_dog(int),
+	a_anteater(isize),
+	a_bear(isize),
+	a_cat(isize),
+	a_dog(isize),
 }
 
 trait Testable 
@@ -122,21 +121,21 @@ trait DoZ {
 
 impl Testable for Foo {
 	fn test(&self) {
-		println(self.foo_field_1.to_string().as_slice());
+		println!("{}", self.foo_field_1.to_string());
 	}
 
 	fn test1(&self) {
-		println(self.foo_field_1.to_string().as_slice());
+		println!("{}", self.foo_field_1.to_string());
 	}
 
 	fn test2(&self) {
-		println(self.foo_field_1.to_string().as_slice());
+		println!("{}", self.foo_field_1.to_string());
 	}
 }
 
 impl DoZ for Foo {
 	fn do_z(&self) {
-		println(self.foo_field_1.to_string().as_slice());
+		println!("{}", self.foo_field_1.to_string());
 	}
 }
 
@@ -144,10 +143,10 @@ trait SuperTraitTest:Testable+DoZ {
 }
 
 fn gfunc<X:Testable+DoZ>(x:&X) {
-	let a1=a_anteater(1);
-	let a2=a_bear(1);
-	let a3=a_cat(1);
-	let a4=a_dog(1);
+	let a1=Animal::a_anteater(1);
+	let a2=Animal::a_bear(1);
+	let a3=Animal::a_cat(1);
+	let a4=Animal::a_dog(1);
 	x.test();
 	x.do_z();
 }
@@ -167,8 +166,7 @@ impl<T: Clone> ParametrizedTrait<T> for TraitedStructTest<T> {
 
 fn some2(a:Animal) {
 	match a {
-		a_cat(x)=> println("cat"),
-		_ => println("not a cat")
+		Animal::a_cat(x)=> println!("{}", "cat"),
+		_ => println!("{}", "not a cat")
 	}
-
 }
