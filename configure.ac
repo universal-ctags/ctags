@@ -402,25 +402,30 @@ AC_C_CONST
 AC_OBJEXT
 AC_EXEEXT
 
-AC_MSG_CHECKING(if struct stat contains st_ino)
-AC_TRY_COMPILE([#include <sys/stat.h>
-				#include <stdlib.h>], [
-	struct stat st;
-	stat(".", &st);
-	if (st.st_ino > 0)
-		exit(0);
-], have_st_ino=yes, have_st_ino=no)
-AC_MSG_RESULT($have_st_ino)
-if test yes = "$have_st_ino"; then
-	AC_DEFINE(HAVE_STAT_ST_INO)
-fi
-
 # Check for host type
 case "$host" in
   i?86-*-mingw* | x86_64-*-mingw*)
+	host_mingw=yes
 	AC_DEFINE(MSDOS_STYLE_PATH)
 	;;
 esac
+
+# Check if struct stat contains st_ino.
+# MinGW has st_ino, but it doesn't work.
+if test yes != "$host_mingw"; then
+	AC_MSG_CHECKING(if struct stat contains st_ino)
+	AC_TRY_COMPILE([#include <sys/stat.h>
+					#include <stdlib.h>], [
+		struct stat st;
+		stat(".", &st);
+		if (st.st_ino > 0)
+			exit(0);
+	], have_st_ino=yes, have_st_ino=no)
+	AC_MSG_RESULT($have_st_ino)
+	if test yes = "$have_st_ino"; then
+		AC_DEFINE(HAVE_STAT_ST_INO)
+	fi
+fi
 
 
 # Checks for library functions
