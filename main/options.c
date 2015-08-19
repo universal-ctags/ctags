@@ -505,7 +505,7 @@ int asprintf(char **strp, const char *fmt, ...)
 	va_copy(args_copy, args);
 
 #ifdef _WIN32
-	/* We need to use _vcsprintf to calculate the length as vsnprintf returns -1
+	/* We need to use _vscprintf to calculate the length as vsnprintf returns -1
 	 * if the number of characters to write is greater than count.
 	 */
 	length = _vscprintf(fmt, args_copy);
