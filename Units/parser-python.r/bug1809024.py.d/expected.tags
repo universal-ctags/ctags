@@ -1,0 +1,1 @@
+detach	input.py	/^def detach (self):$/;"	f

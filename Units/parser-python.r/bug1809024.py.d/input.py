@@ -1,4 +1,4 @@
-   def detach (self):
+def detach (self):
 
         model = self.view.props.model
         sort_id, sort_order = tree_sortable_get_sort_column_id (model)
