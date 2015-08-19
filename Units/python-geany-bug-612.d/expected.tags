@@ -1,0 +1,6 @@
+DeviceSchema	input.py	/^class DeviceSchema(colander.MappingSchema):$/;"	c
+colander	input.py	/^import colander$/;"	i
+identifier	input.py	/^    identifier = colander.SchemaNode($/;"	v	class:DeviceSchema
+manufacturer	input.py	/^    manufacturer = colander.SchemaNode($/;"	v	class:DeviceSchema
+resourceType	input.py	/^    resourceType = colander.SchemaNode($/;"	v	class:DeviceSchema
+type	input.py	/^    type = colander.SchemaNode($/;"	v	class:DeviceSchema

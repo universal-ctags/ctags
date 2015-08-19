@@ -800,6 +800,10 @@ static void findPythonTags (void)
 			while (token->type == ',');
 			readNext = FALSE;
 		}
+		else if (token->type == '(')
+		{ /* skip parentheses to avoid finding stuff inside them */
+			readNext = skipOverPair (token, '(', ')', NULL);
+		}
 		else if (token->type == TOKEN_IDENTIFIER && atLineStart)
 		{
 			NestingLevel *lv = nestingLevelsGetCurrent (PythonNestingLevels);
