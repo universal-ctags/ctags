@@ -98,7 +98,7 @@ typedef struct {
 	parserFinalize finalize;       /* finalize routine, if needed */
 	simpleParser parser;           /* simple parser (common case) */
 	rescanParser parser2;          /* rescanning parser (unusual case) */
-	selectLanguage selectLanguage; /* may be used to resolve conflicts */
+	selectLanguage* selectLanguage; /* may be used to resolve conflicts */
 	unsigned int method;           /* See PARSE__... definitions above */
 	tgTableEntry *tgEntries;
 	boolean useCork;
@@ -138,6 +138,7 @@ extern const char *getLanguageName (const langType language);
 extern char getLanguageFileKind (const langType language);
 extern langType getNamedLanguage (const char *const name);
 extern langType getFileLanguage (const char *const fileName);
+extern boolean isLanguageEnabled (const langType language);
 extern boolean isLanguageKindEnabled (const langType language, char kind);
 
 extern void installLanguageMapDefault (const langType language);

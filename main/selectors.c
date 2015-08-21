@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "debug.h"
+#include "parse.h"
 #include "selectors.h"
 
 static const char *TR_UNKNOWN = NULL;
@@ -17,10 +19,11 @@ static const char *TR_PERL6   = "Perl6";
 static const char *TR_OBJC    = "ObjectiveC";
 static const char *TR_MATLAB  = "MatLab";
 
-static boolean startsWith (const char *line, const char* prefix)
-{
-    return strncmp(line, prefix, strlen(prefix)) == 0? TRUE: FALSE;
-}
+static const char *TR_CPP     = "C++";
+
+
+#define startsWith(line,prefix) \
+  (strncmp(line, prefix, strlen(prefix)) == 0? TRUE: FALSE)
 
 static const char *selectByLines (FILE *input,
 				  const char* (* lineTaster) (const char *),
@@ -147,4 +150,41 @@ const char *
 selectByObjectiveCAndMatLabKeywords (FILE * input)
 {
     return selectByLines (input, tasteObjectiveCOrMatLabLines, NULL);
+}
+
+static const char *
+tasteObjectiveC (const char *line)
+{
+    if (startsWith (line, "#import")
+	|| startsWith (line, "@interface ")
+	|| startsWith (line, "@implementation ")
+	|| startsWith (line, "@protocol "))
+	return TR_OBJC;
+    return NULL;
+}
+
+const char *
+selectByObjectiveCKeywords (FILE * input)
+{
+    /* TODO: Ideally opening input should be delayed til
+       enable/disable based selection is done. */
+
+    static langType objc = LANG_IGNORE;
+    static langType cpp = LANG_IGNORE;
+
+    if (objc == LANG_IGNORE)
+	objc = getNamedLanguage (TR_OBJC);
+
+    if (cpp == LANG_IGNORE)
+	cpp = getNamedLanguage (TR_CPP);
+
+    Assert (0 <= objc);
+    Assert (0 <= cpp);
+
+    if (! isLanguageEnabled (objc))
+	return TR_CPP;
+    else if (! isLanguageEnabled (cpp))
+	return TR_OBJC;
+
+    return selectByLines (input, tasteObjectiveC, TR_CPP);
 }
