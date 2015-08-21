@@ -877,15 +877,12 @@ static vString *parseInteger (int c)
 
 static vString *parseNumeric (int c)
 {
-	vString *string = vStringNew ();
-	vString *integer = parseInteger (c);
-	vStringCopy (string, integer);
-	vStringDelete (integer);
+	vString *string = parseInteger (c);
 
 	c = getChar ();
 	if (c == '.')
 	{
-		integer = parseInteger ('\0');
+		vString *integer = parseInteger ('\0');
 		vStringPut (string, c);
 		vStringCat (string, integer);
 		vStringDelete (integer);
@@ -893,7 +890,7 @@ static vString *parseNumeric (int c)
 	}
 	if (tolower (c) == 'e')
 	{
-		integer = parseInteger ('\0');
+		vString *integer = parseInteger ('\0');
 		vStringPut (string, c);
 		vStringCat (string, integer);
 		vStringDelete (integer);
