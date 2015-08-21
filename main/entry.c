@@ -1081,7 +1081,7 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	Assert (getSourceLanguageFileKind() == tag->kind || isSourceLanguageKindEnabled (tag->kind));
 
 	if (tag->name [0] == '\0')
-		error (WARNING, "ignoring null tag in %s", vStringValue (File.name));
+		error (WARNING, "ignoring null tag in %s(line: %lu)", vStringValue (File.name), tag->lineNumber);
 	else if (TagFile.cork)
 		r = queueTagEntry (tag);
 	else

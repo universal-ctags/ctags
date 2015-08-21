@@ -249,7 +249,7 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const
 		const char *p;
 		tagEntryInfo e;
 
-		if ( (p = strrchr (name, '.')) != NULL )
+		if (kind != JSTAG_PROPERTY &&  (p = strrchr (name, '.')) != NULL )
 		{
 			if (vStringLength (fullscope) > 0)
 				vStringPut (fullscope, '.');
@@ -1079,6 +1079,12 @@ static void parseFunction (tokenInfo *const token)
 	 */
 
 	readToken (name);
+	if (!isType (name, TOKEN_IDENTIFIER))
+	{
+		deleteToken (name);
+		return;
+	}
+
 	/* Add scope in case this is an INNER function */
 	addToScope(name, token->scope);
 
