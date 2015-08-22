@@ -433,6 +433,9 @@ noise: $(CTAGS_TEST)
 units: TIMEOUT := $(shell timeout --version > /dev/null 2>&1 && echo 5 || echo 0)
 units: $(CTAGS_TEST)
 	@ \
+	builddir=$$(pwd); \
+	mkdir -p $${builddir}/Units && \
+	\
 	c="$(srcdir)/misc/units run \
 		--ctags=$(CTAGS_TEST) \
 		--languages=$(LANGUAGES) \
@@ -443,26 +446,32 @@ units: $(CTAGS_TEST)
 		$(VALGRIND) $(RUN_SHRINK) \
 		--with-timeout=$(TIMEOUT) \
 		$(SHOW_DIFF_OUTPUT)"; \
-	 $(SHELL) $${c} $(srcdir)/Units
+	 $(SHELL) $${c} $(srcdir)/Units $${builddir}/Units
 
 clean-units:
-	$(SHELL) $(srcdir)/misc/units clean $(srcdir)/Units
+	builddir=$$(pwd); \
+	$(SHELL) $(srcdir)/misc/units clean $${builddir}/Units
 
 #
 # Test main part, not parsers
 #
 tmain: $(CTAGS_TEST)
 	@ \
+	\
+	builddir=$$(pwd); \
+	mkdir -p $${builddir}/Tmain && \
+	\
 	c="$(srcdir)/misc/units tmain \
 		--ctags=$(CTAGS_TEST) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
 		$(VALGRIND) \
 		$(SHOW_DIFF_OUTPUT)"; \
-	 $(SHELL) $${c} $(srcdir)/Tmain
+	 $(SHELL) $${c} $(srcdir)/Tmain $${builddir}/Tmain
 
 clean-tmain:
-	$(SHELL) $(srcdir)/misc/units clean-tmain $(srcdir)/Tmain
+	builddir=$$(pwd); \
+	$(SHELL) $(srcdir)/misc/units clean-tmain $${builddir}/Tmain
 
 #
 # Test installation
