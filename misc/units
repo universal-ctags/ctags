@@ -784,7 +784,7 @@ action_run ()
     [ -d "${LIBEXECDIR}" ] || ERROR 1 "no such directory: ${LIBEXECDIR}"
     : ${WITH_TIMEOUT:=0}
     [ "$WITH_TIMEOUT" = 0 ] || check_availability timeout
-    [ "WITH_VALGRIND" = 'yes' ]  && check_availability valgrind
+    [ "$WITH_VALGRIND" = 'yes' ] && check_availability valgrind
     check_availability grep
     check_availability diff
 
@@ -1334,7 +1334,7 @@ action_fuzz_common ()
     [ -d "${LIBEXECDIR}" ] || ERROR 1 "no such directory: ${LIBEXECDIR}"
     : ${WITH_TIMEOUT:=2}
     [ "$WITH_TIMEOUT" = 0 ] || check_availability timeout
-    [ "WITH_VALGRIND" = 'yes' ]  && check_availability valgrind
+    [ "$WITH_VALGRIND" = 'yes' ] && check_availability valgrind
     check_availability find
 
     cmdline="${CTAGS} --options=NONE --\*-kinds=\* --fields=\* --libexec-dir=${LIBEXECDIR} --data-dir=${DATADIR}"
