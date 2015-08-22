@@ -183,6 +183,7 @@ optionValues Option = {
 	FALSE,	    /* --guess-language-eagerly(-G) */
 	FALSE,	    /* --quiet */
 	FALSE,	    /* --_allow-xcmd-in-homedir */
+	FALSE,	    /* --_fatal-warnings */
 #ifdef DEBUG
 	0, 0        /* -D, -b */
 #endif
@@ -369,6 +370,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --_echo=msg"},
  {1,"       Echo MSG to standard error. Useful to debug the chain"},
  {1,"       of loading option files."},
+ {1,"  --_fatal-warnings"},
+ {1,"       Make all warnings fatal."},
  {1,"  --_force-quit=[num]"},
  {1,"       Quit when the option is processed. Useful to debug the chain"},
  {1,"       of loading option files."},
@@ -2155,7 +2158,8 @@ static booleanOption BooleanOptions [] = {
 	{ "totals",         &Option.printTotals,            TRUE,  STAGE_ANY },
 	{ "undef",          &Option.undef,                  FALSE, STAGE_ANY },
 	{ "verbose",        &Option.verbose,                FALSE, STAGE_ANY },
-	{ "_allow-xcmd-in-homedir", &Option.allowXcmdInHomeDir, TRUE, ACCEPT(Etc)|ACCEPT(LocalEtc) }
+	{ "_allow-xcmd-in-homedir", &Option.allowXcmdInHomeDir, TRUE, ACCEPT(Etc)|ACCEPT(LocalEtc) },
+	{ "_fatal-warnings",&Option.fatalWarnings,          FALSE, STAGE_ANY },
 };
 
 /*
