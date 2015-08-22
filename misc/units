@@ -785,6 +785,7 @@ action_run ()
     : ${WITH_TIMEOUT:=0}
     [ "$WITH_TIMEOUT" = 0 ] || check_availability timeout
     [ "$WITH_VALGRIND" = 'yes' ] && check_availability valgrind
+    [ "$MSYSTEM" != '' ] && check_availability dos2unix
     check_availability grep
     check_availability diff
 
