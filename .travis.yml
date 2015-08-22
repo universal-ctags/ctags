@@ -38,16 +38,27 @@ addons:
       - binutils-mingw-w64-i686
       - gcc-mingw-w64-i686
 
+env:
+  - TARGET=Unix
+  - TARGET=Mingw32
+
 # Only with gcc get the mingw-w64 cross compilers
 before_install:
   - if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then gem install lcoveralls; fi
 # Build and run tests. Only with gcc cross compile
 script:
-  - if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then make -f mk_mingw.mak CC=i686-w64-mingw32-gcc; fi
-  - autoreconf -f -i -v
-  - ./configure --enable-iconv
-  - if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then make clean; fi
-  - if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then make -j2 COVERAGE=1; else make -j2; fi
-  - make check TRAVIS=1
+  - ./misc/travis-check.sh
 after_success:
   - if [ $CC = 'gcc' ] && [ $TRAVIS_OS_NAME = 'linux' ]; then lcov -c -b . -d . -o coverage.info && lcoveralls --root . --retry-count 5 coverage.info; fi
+
+# Build Matrix configuration
+# By default Travis CI runs all possible environment/target combinations.
+# This setting allows the exclusion of undesired combination.
+# For more information:
+# http://docs.travis-ci.com/user/customizing-the-build/#Build-Matrix
+matrix:
+  exclude:
+    - compiler: clang
+      env: TARGET=Mingw32
+    - os: osx
+      env: TARGET=Mingw32
