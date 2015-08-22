@@ -1459,6 +1459,17 @@ nextVar:
 					 *     }
 					 *
 					 */
+					if (! ( isType (name, TOKEN_IDENTIFIER)
+						|| isType (name, TOKEN_STRING) ) )
+						/*
+						 * Unexpected input. Try to reset the parsing.
+						 *
+						 * TOKEN_STRING is acceptable. e.g.:
+						 * -----------------------------------
+						 * "a".prototype = function( mode ) {}
+						 */
+						goto cleanUp;
+
 					makeClassTag (name, NULL);
 					is_class = TRUE;
 

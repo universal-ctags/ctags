@@ -1,0 +1,7 @@
+This one never causes a "null tag" warning.
+(input.js is valid javascript code.)
+
+However, the fix for js-null-tag-for-broken-input2.d
+had possibility to introduce another bug.
+To avoid the introduction I add this extra test
+case here.
