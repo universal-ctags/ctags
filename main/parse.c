@@ -759,12 +759,14 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 		if (selector) {
 			verbose ("Selector: %p\n", selector);
 			language = pickLanguageBySelection(selector, glc->input);
-			if (LANG_IGNORE == language)
-				language = arbitrate (glc, candidates, n_candidates);
 		} else {
 			verbose ("Selector: NONE\n");
-			language = arbitrate (glc, candidates, n_candidates);
+			language = LANG_IGNORE;
 		}
+
+		if (language == LANG_IGNORE)
+			language = arbitrate (glc, candidates, n_candidates);
+
 		/* At this point we are guaranteed that a language has been
 		 * selected:
 		 */
