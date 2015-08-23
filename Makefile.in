@@ -469,8 +469,12 @@ clean-tmain:
 # Test installation
 #
 tinst:
-	rm -rf $$(pwd)/$(TINST_ROOT)
-	$(SHELL) misc/tinst $$(pwd)/$(TINST_ROOT)
+	@ \
+	\
+	builddir=$$(pwd); \
+	rm -rf $$builddir/$(TINST_ROOT); \
+	\
+	$(SHELL) $(srcdir)/misc/tinst $(srcdir) $$builddir/$(TINST_ROOT)
 
 #
 # Checking code in ctags own rules
