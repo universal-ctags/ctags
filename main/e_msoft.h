@@ -34,6 +34,7 @@
 #define HAVE_TEMPNAM 1
 #define HAVE_FNMATCH 1
 #define HAVE_FNMATCH_H 1
+#define HAVE_PUTENV 1
 #define tempnam(dir,pfx) _tempnam(dir,pfx)
 #define TMPDIR "\\"
 

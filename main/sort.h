@@ -17,7 +17,7 @@
 /*
 *   FUNCTION PROTOTYPES
 */
-extern void catFile (const char *const name);
+extern void catFile (FILE *fp);
 
 #ifdef EXTERNAL_SORT
 extern void externalSortTags (const boolean toStdout);

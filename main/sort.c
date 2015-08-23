@@ -12,8 +12,14 @@
 */
 #include "general.h"  /* must always come first */
 
+#if defined (HAVE_IO_H)
+# include <io.h>
+#endif
 #if defined (HAVE_STDLIB_H)
 # include <stdlib.h>  /* to declare malloc () */
+#endif
+#if defined (HAVE_UNISTD_H)
+# include <unistd.h>
 #endif
 #include <string.h>
 #include <stdio.h>
@@ -29,17 +35,15 @@
 *   FUNCTION DEFINITIONS
 */
 
-extern void catFile (const char *const name)
+extern void catFile (FILE *fp)
 {
-	FILE *const fp = fopen (name, "r");
-
 	if (fp != NULL)
 	{
 		int c;
+		fseek (fp, 0, SEEK_SET);
 		while ((c = getc (fp)) != EOF)
 			putchar (c);
 		fflush (stdout);
-		fclose (fp);
 	}
 }
 
@@ -53,8 +57,8 @@ extern void catFile (const char *const name)
 
 extern void externalSortTags (const boolean toStdout)
 {
-	const char *const sortNormalCommand = "sort -u -o";
-	const char *const sortFoldedCommand = "sort -u -f -o";
+	const char *const sortNormalCommand = "sort -u";
+	const char *const sortFoldedCommand = "sort -u -f";
 	const char *sortCommand =
 		Option.sorted == SO_FOLDSORTED ? sortFoldedCommand : sortNormalCommand;
 	PE_CONST char *const sortOrder1 = "LC_COLLATE=C";
@@ -68,29 +72,51 @@ extern void externalSortTags (const boolean toStdout)
 	{
 		/*  Ensure ASCII value sort order.
 		 */
-#ifdef HAVE_SETENV
+#if defined (HAVE_SETENV) || defined (HAVE_PUTENV)
+# ifdef HAVE_SETENV
 		setenv ("LC_COLLATE", "C", 1);
 		setenv ("LC_ALL", "C", 1);
-		sprintf (cmd, "%s %s %s", sortCommand, tagFileName (), tagFileName ());
-#else
-# ifdef HAVE_PUTENV
+# else
 		putenv (sortOrder1);
 		putenv (sortOrder2);
-		sprintf (cmd, "%s %s %s", sortCommand, tagFileName (), tagFileName ());
-# else
-		sprintf (cmd, "%s %s %s %s %s", sortOrder1, sortOrder2, sortCommand,
-				tagFileName (), tagFileName ());
 # endif
+		if (toStdout)
+			sprintf (cmd, "%s", sortCommand);
+		else
+			sprintf (cmd, "%s -o %s %s", sortCommand,
+					tagFileName (), tagFileName ());
+#else
+		if (toStdout)
+			sprintf (cmd, "%s %s %s", sortOrder1, sortOrder2, sortCommand);
+		else
+			sprintf (cmd, "%s %s %s -o %s %s", sortOrder1, sortOrder2,
+					sortCommand, tagFileName (), tagFileName ());
 #endif
 		verbose ("system (\"%s\")\n", cmd);
-		ret = system (cmd);
+		if (toStdout)
+		{
+			const int fdstdin = 0;
+			int fdsave;
+
+			fdsave = dup (fdstdin);
+			if (fdsave < 0)
+				error (FATAL | PERROR, "cannot save stdin fd");
+			if (dup2 (fileno (TagFile.fp), fdstdin) < 0)
+				error (FATAL | PERROR, "cannot redirect stdin");
+			if (lseek (fdstdin, 0, SEEK_SET) != 0)
+				error (FATAL | PERROR, "cannot rewind tag file");
+			ret = system (cmd);
+			if (dup2 (fdsave, fdstdin) < 0)
+				error (FATAL | PERROR, "cannot restore stdin fd");
+			close (fdsave);
+		}
+		else
+			ret = system (cmd);
 		free (cmd);
 
 	}
 	if (ret != 0)
 		error (FATAL | PERROR, "cannot sort tag file");
-	else if (toStdout)
-		catFile (tagFileName ());
 }
 
 #else
@@ -181,9 +207,17 @@ extern void internalSortTags (const boolean toStdout)
 
 	/*  Open the tag file and place its lines into allocated buffers.
 	 */
-	fp = fopen (tagFileName (), "r");
-	if (fp == NULL)
-		failedSort (fp, NULL);
+	if (toStdout)
+	{
+		fp = TagFile.fp;
+		fseek (fp, 0, SEEK_SET);
+	}
+	else
+	{
+		fp = fopen (tagFileName (), "r");
+		if (fp == NULL)
+			failedSort (fp, NULL);
+	}
 	for (i = 0  ;  i < numTags  &&  ! feof (fp)  ;  )
 	{
 		line = readLine (vLine, fp);
@@ -208,7 +242,8 @@ extern void internalSortTags (const boolean toStdout)
 		}
 	}
 	numTags = i;
-	fclose (fp);
+	if (! toStdout)
+		fclose (fp);
 	vStringDelete (vLine);
 
 	/*  Sort the lines.
