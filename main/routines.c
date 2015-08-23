@@ -829,8 +829,12 @@ extern FILE *tempFile (const char *const mode, char **const pName)
 	const char *const pattern = "tags.XXXXXX";
 	const char *tmpdir = NULL;
 	fileStatus *file = eStat (ExecutableProgram);
+# ifdef WIN32
+	tmpdir = getenv ("TMP");
+# else
 	if (! file->isSetuid)
 		tmpdir = getenv ("TMPDIR");
+# endif
 	if (tmpdir == NULL)
 		tmpdir = TMPDIR;
 	name = xMalloc (strlen (tmpdir) + 1 + strlen (pattern) + 1, char);
@@ -838,7 +842,13 @@ extern FILE *tempFile (const char *const mode, char **const pName)
 	fd = mkstemp (name);
 	eStatFree (file);
 #elif defined(HAVE_TEMPNAM)
-	name = tempnam (TMPDIR, "tags");
+	const char *tmpdir = NULL;
+# ifdef WIN32
+	tmpdir = getenv ("TMP");
+# endif
+	if (tmpdir == NULL)
+		tmpdir = TMPDIR;
+	name = tempnam (tmpdir, "tags");
 	if (name == NULL)
 		error (FATAL | PERROR, "cannot allocate temporary file name");
 	fd = open (name, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
