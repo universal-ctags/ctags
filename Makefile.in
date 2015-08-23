@@ -167,13 +167,6 @@ $(CTAGS_EXEC): $(OBJECTS)
 $(READ_CMD): readtags.c readtags.h
 	$(CC) -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(srcdir)/readtags.c
 
-ETYPEREF_OBJS = etyperef.o keyword.o routines.o strlist.o vstring.o
-etyperef$(EXEEXT): $(ETYPEREF_OBJS)
-	$(CC) $(LDFLAGS) -o $@ $(ETYPEREF_OBJS)
-
-etyperef.o: eiffel.c
-	$(CC) -DTYPE_REFERENCE_TOOL -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -o $@ -c $(srcdir)/eiffel.c
-
 $(OBJECTS): $(HEADERS) config.h Makefile
 
 # Regenerate the Makefile whenever this file (it's source) changed.  Any target
@@ -344,7 +337,6 @@ TAGS: $(CTAGS_EXEC)
 
 clean: clean-units clean-gcov clean-tmain
 	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB) 
-	rm -f etyperef$(EXEEXT) etyperef.$(OBJEXT)
 	rm -f $(SOURCES:.c=.gcno)
 
 mostlyclean: clean
