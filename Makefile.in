@@ -236,7 +236,7 @@ install-cman: $(DEST_CMAN)
 install-eman: $(DEST_EMAN)
 
 $(DEST_CMAN): $(DESTDIR)$(man1dir) $(MANPAGE) FORCE
-	- $(INSTALL_DATA) $(srcdir)/$(MANPAGE) $(DESTDIR)$@  &&  chmod 644 $(DESTDIR)$@
+	- $(INSTALL_DATA) $(MANPAGE) $(DESTDIR)$@  &&  chmod 644 $(DESTDIR)$@
 
 $(DEST_EMAN):
 	- if [ -f $(DESTDIR)$(DEST_CMAN) ]; then \
