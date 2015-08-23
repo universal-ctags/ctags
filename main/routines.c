@@ -509,12 +509,12 @@ static boolean isPathSeparator (const int c)
 
 static void canonicalizePath (char *const path __unused__)
 {
-#if defined (MSDOS_STYLE_PATH)
+# if defined (MSDOS_STYLE_PATH)
 	char *p;
 	for (p = path  ;  *p != '\0'  ;  ++p)
 		if (isPathSeparator (*p)  &&  *p != ':')
 			*p = PATH_SEPARATOR;
-#endif
+# endif
 }
 
 #endif
@@ -535,9 +535,9 @@ extern boolean isSameFile (const char *const name1, const char *const name2)
 		canonicalizePath (n2);
 # if defined (CASE_INSENSITIVE_FILENAMES)
 		result = (boolean) (strcasecmp (n1, n2) == 0);
-#else
+# else
 		result = (boolean) (strcmp (n1, n2) == 0);
-#endif
+# endif
 		free (n1);
 		free (n2);
 	}
@@ -555,7 +555,7 @@ extern const char *baseFilename (const char *const filePath)
 	 */
 	for (i = 0  ;  i < strlen (PathDelimiters)  ;  ++i)
 	{
-#ifdef HAVE_MBLEN
+# ifdef HAVE_MBLEN
 		const char *p;
 		int ml;
 
@@ -569,12 +569,12 @@ extern const char *baseFilename (const char *const filePath)
 			else if (*p == PathDelimiters [i] && p > tail)
 				tail = p;
 		}
-#else
+# else
 		const char *sep = strrchr (filePath, PathDelimiters [i]);
 
 		if (sep > tail)
 			tail = sep;
-#endif
+# endif
 	}
 #else
 	const char *tail = strrchr (filePath, PATH_SEPARATOR);
