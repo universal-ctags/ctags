@@ -154,6 +154,19 @@ static cssKind classifySelector (const vString *const selector)
 	return K_SELECTOR;
 }
 
+/* replaces all characters that would be invalid as a tag name */
+static void sanitizeSelector (vString *const selector)
+{
+	size_t i;
+
+	for (i = 0; i < selector->length; i++)
+	{
+		/* replace everything below space */
+		if (selector->buffer[i] > 0 && selector->buffer[i] < 0x20)
+			selector->buffer[i] = ' ';
+	}
+}
+
 static void findCssTags (void)
 {
 	boolean readNextToken = TRUE;
@@ -227,6 +240,7 @@ static void findCssTags (void)
 			if (CssKinds[kind].enabled)
 			{
 				tagEntryInfo e;
+				sanitizeSelector (selector);
 				initTagEntry (&e, vStringValue (selector));
 
 				e.lineNumber	= lineNumber;
