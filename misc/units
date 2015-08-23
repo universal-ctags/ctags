@@ -885,7 +885,7 @@ action_run ()
     for d in ${units_dir}/*.r; do
 	[ -d "$d" ] || continue
 	category="${d##*/}"
-	build_d=${build_dir}/$d
+	build_d=${build_dir}/${category}
 	category="${category%.r}"
 	run_dir "${category}" "$d" "${build_d}"
     done
