@@ -95,7 +95,7 @@ READ_INC = readtags.h
 MANPAGE	= ctags.1
 
 AUTO_GEN   = configure config.h.in
-CONFIG_GEN = config.cache config.log config.status config.run config.h Makefile
+CONFIG_GEN = config.cache config.log config.status config.run config.h ctags.1 Makefile
 
 #
 # names for installed man pages
