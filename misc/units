@@ -41,6 +41,7 @@ SHOW_DIFF_OUTPUT=
 #
 _CMDLINE=
 _CMDLINE_FOR_SHRINKING=
+_PREPERE_ENV=
 readonly _DEFAULT_CATEGORY=ROOT
 readonly _TIMEOUT_EXIT=124
 readonly _VG_TIMEOUT_FACTOR=10
@@ -328,7 +329,8 @@ run_record_cmdline ()
     local ffilter="$1"
     local ocmdline="$2"
 
-    printf "%s \\\\\n| %s \\\\\n| %s\n"  \
+    printf "%s\n%s \\\\\n| %s \\\\\n| %s\n"  \
+	"${_PREPERE_ENV}" \
 	"${_CMDLINE}" \
 	"sed '${tags_basename_filter_regex}'" \
 	"${ffilter}" \
@@ -1981,12 +1983,20 @@ EOF
 
 }
 
-# Avoid issues between sed and the locale settings by overriding it using
-# LC_ALL, which takes precedence over all other locale configurations:
-# https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
+# * Avoid issues between sed and the locale settings by overriding it using
+#   LC_ALL, which takes precedence over all other locale configurations:
+#   https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
+#
+# * Avoid unexpected pathname conversion on MSYS2.
+#   http://sourceforge.net/p/msys2/wiki/Porting/#filesystem-namespaces
 prepare_environment ()
 {
-    LC_ALL="C"; export LC_ALL
+    _PREPERE_ENV=$(cat <<'EOF'
+LC_ALL="C"; export LC_ALL
+MSYS2_ARG_CONV_EXCL=--regex-; export MSYS2_ARG_CONV_EXCL
+EOF
+)
+    eval ${_PREPERE_ENV}
 }
 
 main ()
