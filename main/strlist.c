@@ -231,8 +231,8 @@ extern boolean stringListHasTest (const stringList *const current,
 	return result;
 }
 
-extern boolean stringListRemoveExtension (
-		stringList* const current, const char* const extension)
+extern boolean stringListDeleteItemExtension (stringList* const current, const char* const extension)
+
 {
 	boolean result = FALSE;
 	int where;
@@ -243,6 +243,7 @@ extern boolean stringListRemoveExtension (
 #endif
 	if (where != -1)
 	{
+		vStringDelete (current->list [where]);
 		memmove (current->list + where, current->list + where + 1,
 				(current->count - where) * sizeof (*current->list));
 		current->list [current->count - 1] = NULL;
