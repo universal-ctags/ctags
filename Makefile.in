@@ -190,7 +190,7 @@ config.h: config.h.in config.status
 config.status: configure
 	./config.status --recheck
 configure: configure.ac
-	autoreconf -vi
+	cd $(srcdir) && autoreconf -vi
 
 #
 # generic install rules
