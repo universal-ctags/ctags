@@ -1080,10 +1080,7 @@ static void parseFunction (tokenInfo *const token)
 
 	readToken (name);
 	if (!isType (name, TOKEN_IDENTIFIER))
-	{
-		deleteToken (name);
-		return;
-	}
+		goto cleanUp;
 
 	/* Add scope in case this is an INNER function */
 	addToScope(name, token->scope);
@@ -1113,6 +1110,7 @@ static void parseFunction (tokenInfo *const token)
 
 	findCmdTerm (token, FALSE, FALSE);
 
+ cleanUp:
 	vStringDelete (signature);
 	deleteToken (name);
 }
