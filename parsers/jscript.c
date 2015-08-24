@@ -1664,6 +1664,14 @@ nextVar:
 				}
 				else
 				{
+					if (! ( isType (name, TOKEN_IDENTIFIER)
+						|| isType (name, TOKEN_STRING) ) )
+					{
+                                                /* Unexpected input. Try to reset the parsing. */
+						vStringDelete (signature);
+						goto cleanUp;
+					}
+
 					is_class = parseBlock (token, name);
 					if ( is_class )
 						makeClassTag (name, signature);
