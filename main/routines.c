@@ -123,6 +123,10 @@
 # define S_ISUID 0
 #endif
 
+#ifndef S_ISGID
+# define S_ISGID 0
+#endif
+
 /*  Hack for ridiculous practice of Microsoft Visual C++.
  */
 #if defined (WIN32)
@@ -417,6 +421,7 @@ extern fileStatus *eStat (const char *const fileName)
 				file.isExecutable = (boolean) ((status.st_mode &
 					(S_IXUSR | S_IXGRP | S_IXOTH)) != 0);
 				file.isSetuid = (boolean) ((status.st_mode & S_ISUID) != 0);
+				file.isSetgid = (boolean) ((status.st_mode & S_ISGID) != 0);
 				file.size = status.st_size;
 			}
 		}

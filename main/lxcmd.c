@@ -48,7 +48,6 @@
 #include <ctype.h>
 #include <stdlib.h>   /* for WIFEXITED and WEXITSTATUS */
 #include <string.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 #ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h> /* for WIFEXITED and WEXITSTATUS */
@@ -267,30 +266,36 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 
 static boolean isSafeExecutable (const char* path)
 {
-	struct stat buf;
+	fileStatus *file;
+	boolean r;
 
 	Assert (path);
+	file =  eStat (path);
 
-	if (stat (path, &buf))
+	if (!file->exists)
 	{
 		/* The file doesn't exist. So I cannot say
 		   it is unsafe. The caller should
 		   handle this case. */
-		return TRUE;
+		r = TRUE;
 	}
-	else if (buf.st_mode & S_ISUID)
+	else if (file->isSetuid)
 	{
 		error (WARNING, "xcmd doesn't run a setuid executable: %s", path);
-		return FALSE;
+		r = FALSE;
 	}
-	else if (buf.st_mode & S_ISGID)
+	else if (file->isSetgid)
 	{
 		error (WARNING, "xcmd doesn't run a setgid executable: %s", path);
-		return FALSE;
+		r = FALSE;
 	}
 	else
-		return TRUE;
+		r = TRUE;
+
+	eStatFree (file);
+	return r;
 }
+
 static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 {
 	enum pcoprocError r;
