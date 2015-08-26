@@ -95,7 +95,7 @@ READ_INC = readtags.h
 MANPAGE	= ctags.1
 
 AUTO_GEN   = configure config.h.in
-CONFIG_GEN = config.cache config.log config.status config.run config.h Makefile
+CONFIG_GEN = config.cache config.log config.status config.run config.h ctags.1 Makefile
 
 #
 # names for installed man pages
@@ -166,13 +166,6 @@ $(CTAGS_EXEC): $(OBJECTS)
 
 $(READ_CMD): readtags.c readtags.h
 	$(CC) -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(srcdir)/readtags.c
-
-ETYPEREF_OBJS = etyperef.o keyword.o routines.o strlist.o vstring.o
-etyperef$(EXEEXT): $(ETYPEREF_OBJS)
-	$(CC) $(LDFLAGS) -o $@ $(ETYPEREF_OBJS)
-
-etyperef.o: eiffel.c
-	$(CC) -DTYPE_REFERENCE_TOOL -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -o $@ -c $(srcdir)/eiffel.c
 
 $(OBJECTS): $(HEADERS) config.h Makefile
 
@@ -344,7 +337,6 @@ TAGS: $(CTAGS_EXEC)
 
 clean: clean-units clean-gcov clean-tmain
 	rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB) 
-	rm -f etyperef$(EXEEXT) etyperef.$(OBJEXT)
 	rm -f $(SOURCES:.c=.gcno)
 
 mostlyclean: clean
@@ -477,8 +469,12 @@ clean-tmain:
 # Test installation
 #
 tinst:
-	rm -rf $$(pwd)/$(TINST_ROOT)
-	$(SHELL) misc/tinst $$(pwd)/$(TINST_ROOT)
+	@ \
+	\
+	builddir=$$(pwd); \
+	rm -rf $$builddir/$(TINST_ROOT); \
+	\
+	$(SHELL) $(srcdir)/misc/tinst $(srcdir) $$builddir/$(TINST_ROOT)
 
 #
 # Checking code in ctags own rules

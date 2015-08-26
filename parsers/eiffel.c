@@ -13,9 +13,6 @@
 */
 #include "general.h"  /* must always come first */
 
-#ifdef TYPE_REFERENCE_TOOL
-#include <stdio.h>
-#endif
 #include <string.h>
 #include <limits.h>
 #include <ctype.h>  /* to define tolower () */
@@ -24,12 +21,10 @@
 #include "keyword.h"
 #include "routines.h"
 #include "vstring.h"
-#ifndef TYPE_REFERENCE_TOOL
 #include "entry.h"
 #include "options.h"
 #include "parse.h"
 #include "read.h"
-#endif
 
 /*
 *   MACROS
@@ -116,19 +111,6 @@ typedef struct sTokenInfo {
 
 static langType Lang_eiffel;
 
-#ifdef TYPE_REFERENCE_TOOL
-
-static const char *FileName;
-static FILE *File;
-static int PrintClass;
-static int PrintReferences;
-static int SelfReferences;
-static int Debug;
-static stringList *GenericNames;
-static stringList *ReferencedTypes;
-
-#else
-
 typedef enum {
 	EKIND_CLASS, EKIND_FEATURE, EKIND_LOCAL, EKIND_QUALIFIED_TAGS
 } eiffelKind;
@@ -138,8 +120,6 @@ static kindOption EiffelKinds [] = {
 	{ TRUE,  'f', "feature", "features"},
 	{ FALSE, 'l', "local",   "local entities"}
 };
-
-#endif
 
 static const keywordDesc EiffelKeywordTable [] = {
 	/* keyword          keyword ID */
@@ -222,62 +202,6 @@ static void buildEiffelKeywordHash (void)
 	}
 }
 
-#ifdef TYPE_REFERENCE_TOOL
-
-static void addGenericName (tokenInfo *const token)
-{
-	vStringUpper (token->string);
-	if (vStringLength (token->string) > 0)
-		stringListAdd (GenericNames, vStringNewCopy (token->string));
-}
-
-static boolean isGeneric (tokenInfo *const token)
-{
-	return (boolean) stringListHas (GenericNames, vStringValue (token->string));
-}
-
-static void reportType (tokenInfo *const token)
-{
-	vStringUpper (token->string);
-	if (vStringLength (token->string) > 0  && ! isGeneric (token)  &&
-		(SelfReferences || strcmp (vStringValue (
-			token->string), vStringValue (token->className)) != 0) &&
-		! stringListHas (ReferencedTypes, vStringValue (token->string)))
-	{
-		printf ("%s\n", vStringValue (token->string));
-		stringListAdd (ReferencedTypes, vStringNewCopy (token->string));
-	}
-}
-
-static int fileGetc (void)
-{
-	int c = getc (File);
-	if (c == '\r')
-	{
-		c = getc (File);
-		if (c != '\n')
-		{
-			ungetc (c, File);
-			c = '\n';
-		}
-	}
-	if (Debug > 0  &&  c != EOF)
-		putc (c, errout);
-	return c;
-}
-
-static int fileUngetc (c)
-{
-	return ungetc (c, File);
-}
-
-extern char *readLine (vString *const vLine, FILE *const fp)
-{
-	return NULL;
-}
-
-#else
-
 /*
 *   Tag generation functions
 */
@@ -355,8 +279,6 @@ static void makeEiffelLocalTag (tokenInfo *const token)
 		vStringDelete (scope);
 	}
 }
-
-#endif
 
 /*
 *   Parsing functions
@@ -797,9 +719,7 @@ static boolean parseType (tokenInfo *const token);
 static void parseGeneric (tokenInfo *const token, boolean declaration __unused__)
 {
 	unsigned int depth = 0;
-#ifdef TYPE_REFERENCE_TOOL
-	boolean constraint = FALSE;
-#endif
+
 	Assert (isType (token, TOKEN_OPEN_BRACKET));
 	do
 	{
@@ -813,31 +733,6 @@ static void parseGeneric (tokenInfo *const token, boolean declaration __unused__
 			--depth;
 			readToken (token);
 		}
-#ifdef TYPE_REFERENCE_TOOL
-		else if (declaration)
-		{
-			boolean advanced = FALSE;
-			if (depth == 1)
-			{
-				if (isType (token, TOKEN_CONSTRAINT))
-					constraint = TRUE;
-				else if (isKeyword (token, KEYWORD_create))
-					findKeyword (token, KEYWORD_end);
-				else if (isType (token, TOKEN_IDENTIFIER))
-				{
-					if (constraint)
-						advanced = parseType (token);
-					else
-						addGenericName (token);
-					constraint = FALSE;
-				}
-			}
-			else if (isType (token, TOKEN_IDENTIFIER))
-				advanced = parseType (token);
-			if (! advanced)
-				readToken (token);
-		}
-#endif
 		else
 			parseType (token);
 	} while (depth > 0 && ! isType (token, TOKEN_EOF));
@@ -870,9 +765,6 @@ static boolean parseType (tokenInfo *const token)
 		}
 		if (isType (id, TOKEN_IDENTIFIER))
 		{
-#ifdef TYPE_REFERENCE_TOOL
-			reportType (id);
-#endif
 			if (isType (token, TOKEN_OPEN_BRACKET))
 				parseGeneric (token, FALSE);
 			else if ((strcmp ("BIT", vStringValue (id->string)) == 0))
@@ -904,10 +796,8 @@ static void parseLocal (tokenInfo *const token)
 		   ! isKeyword (token, KEYWORD_once) &&
 		   ! isType (token, TOKEN_EOF))
 	{
-#ifndef TYPE_REFERENCE_TOOL
 		if (isType (token, TOKEN_IDENTIFIER))
 			makeEiffelLocalTag (token);
-#endif
 		readToken (token);
 		if (isType (token, TOKEN_COLON))
 			parseEntityType (token);
@@ -933,23 +823,6 @@ static void findFeatureEnd (tokenInfo *const token)
 
 			while (depth > 0 && ! isType (token, TOKEN_EOF))
 			{
-#ifdef TYPE_REFERENCE_TOOL
-				if (isType (token, TOKEN_OPEN_BRACE))
-				{
-					readToken (token);
-					if (isType (token, TOKEN_IDENTIFIER))
-						parseType (token);
-				}
-				else if (isType (token, TOKEN_BANG))
-				{
-					readToken (token);
-					if (isType (token, TOKEN_IDENTIFIER))
-						parseType (token);
-					if (isType (token, TOKEN_BANG))
-						readToken (token);
-				}
-				else
-#endif
 				switch (token->keyword)
 				{
 					case KEYWORD_check:
@@ -1009,22 +882,8 @@ static boolean readFeatureName (tokenInfo *const token)
 
 static void parseArguments (tokenInfo *const token)
 {
-#ifndef TYPE_REFERENCE_TOOL
 	if (findToken (token, TOKEN_CLOSE_PAREN))
 		readToken (token);
-#else
-	Assert (isType (token, TOKEN_OPEN_PAREN));
-	readToken (token);
-	do
-	{
-		if (isType (token, TOKEN_COLON))
-			parseEntityType (token);
-		else
-			readToken (token);
-	} while (! isType (token, TOKEN_CLOSE_PAREN) &&
-	         ! isType (token, TOKEN_EOF));
-	readToken (token);
-#endif
 }
 
 static boolean parseFeature (tokenInfo *const token)
@@ -1033,9 +892,7 @@ static boolean parseFeature (tokenInfo *const token)
 	while (readFeatureName (token))
 	{
 		found = TRUE;
-#ifndef TYPE_REFERENCE_TOOL
 		makeEiffelFeatureTag (token);
-#endif
 		readToken (token);
 		if (isType (token, TOKEN_COMMA))
 			readToken (token);
@@ -1044,10 +901,8 @@ static boolean parseFeature (tokenInfo *const token)
 	{
 		if (isKeyword (token, KEYWORD_alias)) {
 			readToken (token);
-#ifndef TYPE_REFERENCE_TOOL
 			if (isType (token, TOKEN_STRING))
 				makeEiffelFeatureTag (token);
-#endif
 			readToken (token);
 		}
 		if (isType (token, TOKEN_OPEN_PAREN))  /* arguments? */
@@ -1121,9 +976,7 @@ static void parseRename (tokenInfo *const token)
 				readToken (token);
 				if (readFeatureName (token))
 				{
-#ifndef TYPE_REFERENCE_TOOL
 					makeEiffelFeatureTag (token);  /* renamed feature */
-#endif
 					readToken (token);
 				}
 			}
@@ -1195,18 +1048,8 @@ static void parseClass (tokenInfo *const token)
 	readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-#ifndef TYPE_REFERENCE_TOOL
 		makeEiffelClassTag (token);
 		readToken (token);
-#else
-		vStringCopy (token->className, token->string);
-		vStringUpper (token->className);
-		if (PrintClass)
-			puts (vStringValue (token->className));
-		if (! PrintReferences)
-			exit (0);
-		readToken (token);
-#endif
 	}
 
 	do
@@ -1241,8 +1084,6 @@ static void findEiffelTags (void)
 	deleteToken (token);
 }
 
-#ifndef TYPE_REFERENCE_TOOL
-
 extern parserDefinition* EiffelParser (void)
 {
 	static const char *const extensions [] = { "e", NULL };
@@ -1254,93 +1095,5 @@ extern parserDefinition* EiffelParser (void)
 	def->initialize = initialize;
 	return def;
 }
-
-#else
-
-static void findReferences (void)
-{
-	ReferencedTypes = stringListNew ();
-	GenericNames = stringListNew ();
-	initialize (0);
-
-	findEiffelTags ();
-
-	stringListDelete (GenericNames);
-	GenericNames = NULL;
-	stringListDelete (ReferencedTypes);
-	ReferencedTypes = NULL;
-}
-
-static const char *const Usage =
-	"Prints names of types referenced by an Eiffel language file.\n"
-	"\n"
-	"Usage: %s [-cdrs] [file_name | -]\n"
-	"\n"
-	"Options:\n"
-	"    -c    Print class name of current file (on first line of output).\n"
-	"    -d    Enable debug output.\n"
-	"    -r    Print types referenced by current file (default unless -c).\n"
-	"    -s    Include self-references.\n"
-	"\n";
-
-extern int main (int argc, char** argv)
-{
-	int i;
-	for (i = 1  ;  argv [i] != NULL  ;  ++i)
-	{
-		const char *const arg = argv [i];
-		if (arg [0] == '-')
-		{
-			int j;
-			if (arg [1] == '\0')
-			{
-					File = stdin;
-					FileName = "stdin";
-			}
-			else for (j = 1  ;  arg [j] != '\0'  ;  ++j) switch (arg [j])
-			{
-				case 'c':  PrintClass      = 1;  break;
-				case 'r':  PrintReferences = 1;  break;
-				case 's':  SelfReferences  = 1;  break;
-				case 'd':  Debug           = 1;  break;
-				default:
-					fprintf (errout, "%s: unknown option: %c\n", argv [0], arg [1]);
-					fprintf (errout, Usage, argv [0]);
-					exit (1);
-					break;
-			}
-		}
-		else if (File != NULL)
-		{
-			fprintf (errout, Usage, argv [0]);
-			exit (1);
-		}
-		else
-		{
-			FileName = arg;
-			File = fopen (FileName, "r");
-			if (File == NULL)
-			{
-				perror (argv [0]);
-				exit (1);
-			}
-		}
-	}
-	if (! PrintClass)
-		PrintReferences = 1;
-	if (File == NULL)
-	{
-		fprintf (errout, Usage, argv [0]);
-		exit (1);
-	}
-	else
-	{
-		findReferences ();
-		fclose (File);
-	}
-	return 0;
-}
-
-#endif
 
 /* vi:set tabstop=4 shiftwidth=4: */
