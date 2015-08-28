@@ -78,11 +78,11 @@ typedef struct stgTableEntry{
 	struct stgTableEntry *next;
 } tgTableEntry;
 
-typedef enum  {
-  METHOD_NOT_CRAFTED    = 1 << 0,
-  METHOD_REGEX          = 1 << 1,
-  METHOD_XCMD           = 1 << 2,
-  METHOD_XCMD_AVAILABLE = 1 << 3,
+typedef enum {
+	METHOD_NOT_CRAFTED    = 1 << 0,
+	METHOD_REGEX          = 1 << 1,
+	METHOD_XCMD           = 1 << 2,
+	METHOD_XCMD_AVAILABLE = 1 << 3,
 } parsingMethod;
 
 typedef struct {
