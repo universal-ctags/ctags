@@ -14,6 +14,7 @@ MAIN_HEADERS =				\
 	$(MAIN_DIR)/get.h		\
 	$(MAIN_DIR)/htable.h		\
 	$(MAIN_DIR)/keyword.h		\
+	$(MAIN_DIR)/kind.h		\
 	$(MAIN_DIR)/main.h		\
 	$(MAIN_DIR)/mbcs.h		\
 	$(MAIN_DIR)/nestlevel.h		\
