@@ -1,0 +1,16 @@
+c	class	classes	on
+d	macro	macro definitions	on
+e	enumerator	enumerators (values inside an enumeration)	on
+f	function	function definitions	on
+g	enum	enumeration names	on
+h	header	included header files	off
+l	local	local variables	off
+m	member	class, struct, and union members	on
+n	namespace	namespaces	on
+p	prototype	function prototypes	off
+s	struct	structure names	on
+t	typedef	typedefs	on
+u	union	union names	on
+v	variable	variable definitions	on
+x	externvar	external and forward variable declarations	off
+L	label	goto label	off
