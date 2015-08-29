@@ -22,7 +22,7 @@
 #include "read.h"
 #include "vstring.h"
 
-/*#define R_REGEX*/
+#define R_REGEX
 
 #define SKIPSPACE(ch) while (isspace((int)*ch)) \
   ch++
@@ -51,12 +51,22 @@ static void installRRegex (const langType language)
 	 * }
 	 */
 	addTagRegex (language,
-		"^[ \t]*([.a-zA-Z0-9_]+)([ \t]*)<-([ \t]*)function", "\\1",
-		"f,function", NULL);
+		"^[ \t]*\"?([.a-zA-Z][.a-zA-Z0-9_]+)\"?[ \t]*<-[ \t]*function[ \t]*\\(", "\\1",
+		"f,function,functions", NULL);
+	/* Global variables */
+	addTagRegex (language,
+		"^\"?([.a-zA-Z][.a-zA-Z0-9_]*)\"?[ \t]*<-[ \t][^\(]+$", "\\1",
+		"g,globalVar,global variables", NULL);
+	/* Function local variable
+	 * Assumes that code in functions is indented
+	 */
+	addTagRegex (language,
+		"[ \t]\"?([.A-Za-z][.A-Za-z0-9_]*)\"?[ \t]*<-[ \t][^\(]+$", "\\1",
+		"v,functionVar,function variables", NULL);
 	/* This loads someting, e.g. a library, simply: library(libname) */
 	addTagRegex (language,
 		"^[ \t]*(library|source|load|data)[\\(]([a-zA-Z0-9_]+)[\\)]", "\\2",
-		"s,other", NULL);
+		"s,other,library/source/load/data", NULL);
 }
 #else
 static void makeRTag (const vString * const name, rKind kind)
@@ -215,7 +225,7 @@ extern parserDefinition *RParser (void)
 	def->parser = createRTags;
 #else
 	def->initialize = installRRegex;
-	def->regex = TRUE;
+	def->method = METHOD_NOT_CRAFTED | METHOD_REGEX;
 #endif
 	return def;
 }

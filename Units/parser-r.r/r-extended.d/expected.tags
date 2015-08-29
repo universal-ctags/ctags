@@ -1,0 +1,2 @@
+.First	input.r	/^.First <- function() {$/;"	f
+MASS	input.r	/^  library(MASS)                         # attach a package$/;"	s
