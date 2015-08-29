@@ -492,29 +492,59 @@ static void parseKinds (
 	}
 }
 
-static void printRegexKind (char kind_letter, struct sKind *kind, boolean indent)
+struct printRegexKindCBData{
+	const char* const langName;
+	boolean allKindFields;
+	boolean indent;
+};
+
+static void printRegexKind (char kind_letter, struct sKind *kind,
+			    boolean allKindFields,
+			    boolean indent)
 {
-	const char *const indentation = indent ? "    " : "";
-	printf ("%s%c  %s %s\n", indentation,
-		kind_letter != '\0' ? kind_letter : '?',
-		kind->description != NULL ? kind->description : kind->name,
-		kind->enabled ? "" : " [off]");
+	if (allKindFields)
+	{
+		printf ("%s%c\t%s\t%s\t%s\n", indent ? "\t"           : "",
+			kind_letter,
+			kind->name        != NULL ? kind->name        : "",
+			kind->description != NULL ? kind->description : "",
+			kind->enabled             ? "on"              : "off");
+	}
+	else
+	{
+		/* 2 spaces before [off] comes from exuberant ctags. */
+		printf ("%s%c  %s %s\n", indent ? "    " : "", kind_letter,
+			kind->description != NULL ? kind->description :
+			(kind->name != NULL ? kind->name : ""),
+			kind->enabled ? "" : " [off]");
+	}
 }
 
 static void printRegexKindCB (void *key, void *value, void* user_data)
 {
 	union cptr c;
-	boolean *indent;
+	struct printRegexKindCBData *data = user_data;
 	c.p = key;
-	indent = user_data;
 
 	if (c.c != KIND_GHOST)
-		printRegexKind(c.c, value, *indent);
+	{
+		if (data->allKindFields && data->indent)
+			printf ("%s", data->langName);
+		printRegexKind(c.c, value, data->allKindFields, data->indent);
+	}
 }
 
-static void printRegexKindsInPatternSet (patternSet* const set, boolean indent)
+static void printRegexKindsInPatternSet (patternSet* const set,
+					 const char* const langName,
+					 boolean allKindFields,
+					 boolean indent)
 {
-	hashTableForeachItem (set->kinds, printRegexKindCB, &indent);
+	struct printRegexKindCBData data = {
+		.langName      = langName,
+		.allKindFields = allKindFields,
+		.indent        = indent,
+	};
+	hashTableForeachItem (set->kinds, printRegexKindCB, &data);
 }
 
 static void processLanguageRegex (const langType language,
@@ -905,13 +935,16 @@ extern boolean hasRegexKind (const langType language, const int kind)
 	return d.result;
 }
 
-extern void printRegexKinds (const langType language __unused__, boolean indent __unused__)
+extern void printRegexKinds (const langType language __unused__,
+			     boolean allKindFields __unused__,
+			     boolean indent __unused__)
 {
 #ifdef HAVE_REGEX
 	if (language <= SetUpper  &&  Sets [language].count > 0)
 	{
 		patternSet* const set = Sets + language;
-		printRegexKindsInPatternSet (set, indent);
+		const char* const langName = getLanguageName (language);
+		printRegexKindsInPatternSet (set, langName, allKindFields, indent);
 	}
 #endif
 }

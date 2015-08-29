@@ -1526,16 +1526,26 @@ extern void printLanguageFileKind (const langType language)
 		printf ("%c\n", LanguageTable [language]->fileKind);
 }
 
-static void printLanguageKind (const kindOption* const kind, boolean indent)
+static void printLanguageKind (const kindOption* const kind, boolean allKindFields, boolean indent)
 {
-	const char *const indentation = indent ? "    " : "";
-	printf ("%s%c  %s%s\n", indentation, kind->letter,
-		kind->description != NULL ? kind->description :
+	if (allKindFields)
+	{
+		printf ("%s%c\t%s\t%s\t%s\n", indent ? "\t"           : "",
+			kind->letter,
+			kind->name        != NULL ? kind->name        : "",
+			kind->description != NULL ? kind->description : "",
+			kind->enabled             ? "on"              : "off");
+	}
+	else
+	{
+		printf ("%s%c  %s%s\n", indent ? "    " : "", kind->letter,
+			kind->description != NULL ? kind->description :
 			(kind->name != NULL ? kind->name : ""),
-		kind->enabled ? "" : " [off]");
+			kind->enabled ? "" : " [off]");
+	}
 }
 
-static void printKinds (langType language, boolean indent)
+static void printKinds (langType language, boolean allKindFields, boolean indent)
 {
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
@@ -1544,13 +1554,17 @@ static void printKinds (langType language, boolean indent)
 	{
 		unsigned int i;
 		for (i = 0  ;  i < lang->kindCount  ;  ++i)
-			printLanguageKind (lang->kinds + i, indent);
+		{
+			if (allKindFields && indent)
+				printf ("%s", lang->name);
+			printLanguageKind (lang->kinds + i, allKindFields, indent);
+		}
 	}
-	printRegexKinds (language, indent);
-	printXcmdKinds (language, indent);
+	printRegexKinds (language, allKindFields, indent);
+	printXcmdKinds (language, allKindFields, indent);
 }
 
-extern void printLanguageKinds (const langType language)
+extern void printLanguageKinds (const langType language, boolean allKindFields)
 {
 	if (language == LANG_AUTO)
 	{
@@ -1558,12 +1572,14 @@ extern void printLanguageKinds (const langType language)
 		for (i = 0  ;  i < LanguageCount  ;  ++i)
 		{
 			const parserDefinition* const lang = LanguageTable [i];
-			printf ("%s%s\n", lang->name, isLanguageEnabled (i) ? "" : " [disabled]");
-			printKinds (i, TRUE);
+
+			if (!allKindFields)
+				printf ("%s%s\n", lang->name, isLanguageEnabled (i) ? "" : " [disabled]");
+			printKinds (i, allKindFields, TRUE);
 		}
 	}
 	else
-		printKinds (language, FALSE);
+		printKinds (language, allKindFields, FALSE);
 }
 
 static void processLangAliasOption (const langType language,

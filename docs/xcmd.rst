@@ -65,7 +65,7 @@ generator and universal-ctags. This is the reason why the name
 To write a driver for a tags generator, please read
 -"xcmd protocol and writing a driver".
 
-xcmd v2 protocol and writing a driver
+xcmd v2.1 protocol and writing a driver
 ---------------------------------------------------------------------
 
 This is still experimental.
@@ -104,7 +104,7 @@ own value with notAvailableStatus flag like::
 Standard output contributes to know the lists.
 ctags expects following format when parsing the output::
 
-  ^([^ \t])[ \t]+(.+)([ \t]+(\[off\]))?$
+  ^([^ \t])[ \t]+([^\t]+)([ \t]+(\[off\]))?$
 
 The output lines matched above pattern are recognized as follows::
 
@@ -114,9 +114,9 @@ The output lines matched above pattern are recognized as follows::
 
 ``\2``
 
-	kind description
+	kind name
 
-``[off]`` given after a kind description means the kind is disabled by
+``[off]`` given after a kind name means the kind is disabled by
 default.
 
 Here is the example command line and output of ``coffeetags`` driver::
