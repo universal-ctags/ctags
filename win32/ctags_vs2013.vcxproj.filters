@@ -114,6 +114,9 @@
     <ClCompile Include="..\parsers\python.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\r.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\rexx.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>

@@ -51,6 +51,7 @@
 	Perl6Parser, \
 	PhpParser, \
 	PythonParser, \
+	RParser, \
 	RexxParser, \
 	RstParser, \
 	RubyParser, \
