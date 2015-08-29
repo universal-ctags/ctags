@@ -54,6 +54,9 @@
     <ClCompile Include="..\parsers\css.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\diff.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\dosbatch.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>

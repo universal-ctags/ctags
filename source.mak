@@ -44,6 +44,7 @@ PARSER_SOURCES =				\
 	$(PARSER_DIR)/clojure.c			\
 	$(PARSER_DIR)/css.c			\
 	$(PARSER_DIR)/cobol.c			\
+	$(PARSER_DIR)/diff.c			\
 	$(PARSER_DIR)/dosbatch.c		\
 	$(PARSER_DIR)/eiffel.c			\
 	$(PARSER_DIR)/erlang.c			\
