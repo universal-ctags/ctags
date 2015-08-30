@@ -296,7 +296,7 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 	char * argv[3];
 	int status;
 	vString * opt;
-	char file_kind = getLanguageFileKind (language);
+	char file_kind = getLanguageFileKind (language)->letter;
 
 	opt = vStringNewInit(XCMD_LIST_KIND_OPTION);
 	vStringCatS (opt, "=");

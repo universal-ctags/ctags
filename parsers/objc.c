@@ -1161,10 +1161,9 @@ extern parserDefinition *ObjcParser (void)
 	static selectLanguage selectors[] = { selectByObjectiveCAndMatLabKeywords,
 					      selectByObjectiveCKeywords,
 					      NULL };
-	parserDefinition *def = parserNew ("ObjectiveC");
+	parserDefinition *def = parserNewFull ("ObjectiveC", KIND_FILE_ALT);
 	def->kinds = ObjcKinds;
 	def->kindCount = KIND_COUNT (ObjcKinds);
-	def->fileKind  = KIND_FILE_ALT;
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findObjcTags;

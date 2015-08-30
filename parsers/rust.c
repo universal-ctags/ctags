@@ -975,10 +975,9 @@ static void findRustTags (void)
 extern parserDefinition *RustParser (void)
 {
 	static const char *const extensions[] = { "rs", NULL };
-	parserDefinition *def = parserNew ("Rust");
+	parserDefinition *def = parserNewFull ("Rust", KIND_FILE_ALT);
 	def->kinds = rustKinds;
 	def->kindCount = KIND_COUNT (rustKinds);
-	def->fileKind = KIND_FILE_ALT;
 	def->extensions = extensions;
 	def->parser = findRustTags;
 
