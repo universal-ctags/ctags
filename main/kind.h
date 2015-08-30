@@ -28,9 +28,9 @@
 
 typedef struct sKindOption {
 	boolean enabled;          /* are tags for kind enabled? */
-	int letter;               /* kind letter */
-	const char* name;         /* kind name */
-	const char* description;  /* displayed in --help output */
+	char  letter;               /* kind letter */
+	char* name;		  /* kind name */
+	char* description;	  /* displayed in --help output */
 } kindOption;
 
 #endif	/* _KIND_H */

@@ -127,16 +127,9 @@ typedef struct {
 
 } tagEntry;
 
-struct sKind {
-	boolean enabled;
-	char letter;
-	char* name;
-	char* description;
-};
-
 typedef struct {
 	vString *path;
-	struct sKind *kinds;
+	kindOption *kinds;
 	unsigned int n_kinds;
 	boolean available;
 	unsigned int id;	/* not used yet */
@@ -168,7 +161,7 @@ static void clearPathSet (const langType language)
 			p->available = FALSE;
 			for (k = 0; k < p->n_kinds; k++)
 			{
-				struct sKind* kind = &(p->kinds[k]);
+				kindOption* kind = &(p->kinds[k]);
 
 				eFree (kind->name);
 				kind->name = NULL;
@@ -193,7 +186,7 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 	const char* backup = line;
 	char* off;
 	vString *desc;
-	struct sKind *kind;
+	kindOption *kind;
 
 	if (line[0] == '\0')
 		return FALSE;
@@ -203,7 +196,7 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 		return FALSE;
 	}
 
-	path->kinds = xRealloc (path->kinds, path->n_kinds + 1, struct sKind);
+	path->kinds = xRealloc (path->kinds, path->n_kinds + 1, kindOption);
 	kind = &path->kinds [path->n_kinds];
 	kind->enabled = TRUE;
 	kind->letter = line[0];
@@ -402,7 +395,7 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 
 
 static void foreachXcmdKinds (const langType language,
-			      boolean (*func) (struct sKind *, void *),
+			      boolean (*func) (kindOption *, void *),
 			      void *data)
 {
 #ifdef HAVE_COPROC
@@ -425,7 +418,7 @@ static void foreachXcmdKinds (const langType language,
 #endif
 }
 
-static boolean kind_reset_cb (struct sKind *kind, void *data)
+static boolean kind_reset_cb (kindOption *kind, void *data)
 {
 	kind->enabled = *(boolean *)data;
 	return FALSE;		/* continue */
@@ -443,7 +436,7 @@ struct kind_and_mode_and_result
 	boolean result;
 };
 
-static boolean enable_kind_cb (struct sKind *kind, void *data)
+static boolean enable_kind_cb (kindOption *kind, void *data)
 {
 	struct kind_and_mode_and_result *kmr = data;
 	if (kind->letter == kmr->kind)
@@ -477,7 +470,7 @@ struct kind_and_result
 	boolean result;
 };
 
-static boolean is_kind_enabled_cb (struct sKind *kind, void *data)
+static boolean is_kind_enabled_cb (kindOption *kind, void *data)
 {
 	boolean r = FALSE;
 	struct kind_and_result *kr = data;
@@ -491,7 +484,7 @@ static boolean is_kind_enabled_cb (struct sKind *kind, void *data)
 	return r;
 }
 
-static boolean does_kind_exist_cb (struct sKind *kind, void *data)
+static boolean does_kind_exist_cb (kindOption *kind, void *data)
 {
 	boolean r = FALSE;
 	struct kind_and_result *kr = data;
@@ -540,7 +533,7 @@ static void printXcmdKind (xcmdPath *path, unsigned int i,
 
 	for (k = 0; k < path[i].n_kinds; k++)
 	{
-		const struct sKind *const kind = path[i].kinds + k;
+		const kindOption *const kind = path[i].kinds + k;
 
 		if (allKindFields)
 		{
@@ -723,7 +716,7 @@ extern boolean processXcmdOption (const char *const option, const char *const pa
 static const char* lookupKindName  (char kind_letter, const xcmdPath* const path)
 {
 	unsigned int k;
-	struct sKind *kind;
+	kindOption *kind;
 
 	for (k = 0; k < path->n_kinds; k++)
 	{
@@ -739,7 +732,7 @@ static const char* lookupKindName  (char kind_letter, const xcmdPath* const path
 static const char* lookupKindLetter (const char* const kind_name, const xcmdPath *const path)
 {
 	unsigned int k;
-	struct sKind *kind;
+	kindOption *kind;
 
 	for (k = 0; k < path->n_kinds; k++)
 	{
@@ -788,7 +781,7 @@ static const char* entryGetAnyUnpulledField (tagEntry *const entry, const char *
 static boolean isKindEnabled (xcmdPath* path, const char* value)
 {
 	unsigned int k;
-	struct sKind *kind;
+	kindOption *kind;
 
 	Assert (path->kinds);
 	Assert (value);
