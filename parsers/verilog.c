@@ -566,8 +566,8 @@ static void createTag (tokenInfo *const token)
 	{
 		verbose (" to context %s\n", vStringValue (currentContext->name));
 		currentContext->lastKind = token->kind;
-		tag.extensionFields.scope [0] = kindFromKind (currentContext->kind)->name;
-		tag.extensionFields.scope [1] = vStringValue (currentContext->name);
+		tag.extensionFields.scopeKind = kindFromKind (currentContext->kind);
+		tag.extensionFields.scopeName = vStringValue (currentContext->name);
 	}
 	verbose ("\n");
 	if (vStringLength (token->inheritance) > 0)

@@ -1005,7 +1005,7 @@ static boolean makePseudoTagEntryFromTagEntry (tagEntry* entry)
 	return FALSE;
 }
 
-static boolean makeTagEntryFromTagEntry (tagEntry* entry)
+static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 {
 	tagEntryInfo tag;
 	fpos_t      filePosition;
@@ -1050,9 +1050,11 @@ static boolean makeTagEntryFromTagEntry (tagEntry* entry)
 			tag.extensionFields.typeRef[1] = tmp + 1;
 		}
 	}
-	tag.extensionFields.scope[1] = entryGetAnyUnpulledField (entry,
-								 &tag.extensionFields.scope[0],
-								 TRUE);
+
+	const char *kindName = NULL;
+	tag.extensionFields.scopeName = entryGetAnyUnpulledField (entry, &kindName, TRUE);
+	if (tag.extensionFields.scopeName && kindName)
+		tag.extensionFields.scopeKind = lookupKindFromName (path, kindName);
 
 	makeTagEntry (&tag);
 	return TRUE;
@@ -1113,7 +1115,7 @@ static boolean invokeXcmdPath (const char* const fileName, xcmdPath* path, const
 			if (parseXcmdPath (line, path, &entry) )
 			{
 				entryAddField (&entry, "language", getLanguageName (language));
-				if (makeTagEntryFromTagEntry (&entry))
+				if (makeTagEntryFromTagEntry (path, &entry))
 					result = TRUE;
 				freeTagEntry (&entry);
 			}

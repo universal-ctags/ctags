@@ -548,8 +548,8 @@ static void makeTag (tokenInfo *const token, const goKind kind,
 
 	if (parent_kind != GOTAG_UNDEFINED && parent_token != NULL)
 	{
-		e.extensionFields.scope[0] = GoKinds[parent_kind].name;
-		e.extensionFields.scope[1] = vStringValue (parent_token->string);
+		e.extensionFields.scopeKind = &(GoKinds[parent_kind]);
+		e.extensionFields.scopeName = vStringValue (parent_token->string);
 	}
 	makeTagEntry (&e);
 

@@ -216,8 +216,8 @@ static void emitRubyTag (vString* name, rubyKind kind)
 		Assert (0 <= parent_kind &&
 		        (size_t) parent_kind < (sizeof RubyKinds / sizeof RubyKinds[0]));
 
-	    tag.extensionFields.scope [0] = RubyKinds [parent_kind].name;
-	    tag.extensionFields.scope [1] = vStringValue (scope);
+		tag.extensionFields.scopeKind = &(RubyKinds [parent_kind]);
+		tag.extensionFields.scopeName = vStringValue (scope);
 	}
 	tag.kind = &(RubyKinds [kind]);
 	makeTagEntry (&tag);

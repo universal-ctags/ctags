@@ -153,6 +153,8 @@ typedef enum eAdaKinds
   ADA_KIND_COUNT            /* must be last */
 } adaKind;
 
+static kindOption AdaSeparateKind = { TRUE, 'S', "separate", "something separately declared/defined" };
+
 static kindOption AdaKinds[] =
 {
   { TRUE,  'P', "packspec",    "package specifications" },
@@ -2068,15 +2070,13 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
       if(token->parent->kind > ADA_KIND_UNDEFINED &&
          token->parent->kind < ADA_KIND_COUNT)
       {
-        token->tag.extensionFields.scope[0] =
-          AdaKinds[token->parent->kind].name;
-        token->tag.extensionFields.scope[1] = token->parent->name;
+        token->tag.extensionFields.scopeKind = &(AdaKinds[token->parent->kind]);
+        token->tag.extensionFields.scopeName = token->parent->name;
       }
       else if(token->parent->kind == ADA_KIND_SEPARATE)
       {
-        token->tag.extensionFields.scope[0] =
-          AdaKeywords[ADA_KEYWORD_SEPARATE];
-        token->tag.extensionFields.scope[1] = token->parent->name;
+        token->tag.extensionFields.scopeKind = &(AdaSeparateKind);
+        token->tag.extensionFields.scopeName = token->parent->name;
       }
     } /* else if(token->parent->kind == ADA_KIND_ANONYMOUS) */
   } /* if(token->parent != NULL) */

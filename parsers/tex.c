@@ -22,6 +22,7 @@
 #ifdef DEBUG
 #include <stdio.h>
 #endif
+#include <string.h>
 
 #include "debug.h"
 #include "entry.h"
@@ -251,6 +252,17 @@ static void getScopeInfo(texKind kind, vString *const parentKind,
 /*
  *	 Tag generation functions
  */
+static kindOption *kindFromName (const char *kind_name)
+{
+	int i;
+
+	for (i = 0; i < TEXTAG_COUNT; i++)
+	{
+		if ( strcmp (kind_name, TexKinds[i].name) == 0)
+			return &(TexKinds[i]);
+	}
+	return NULL;
+}
 
 static void makeTexTag (tokenInfo *const token, texKind kind)
 {
@@ -268,8 +280,8 @@ static void makeTexTag (tokenInfo *const token, texKind kind)
 
 		getScopeInfo(kind, parentKind, parentName);
 		if (vStringLength(parentKind) > 0) {
-			e.extensionFields.scope [0] = vStringValue(parentKind);
-			e.extensionFields.scope [1] = vStringValue(parentName);
+			e.extensionFields.scopeKind = kindFromName (vStringValue(parentKind));
+			e.extensionFields.scopeName = vStringValue(parentName);
 		}
 
 		makeTagEntry (&e);

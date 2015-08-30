@@ -455,8 +455,8 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 		if (vStringLength (token->scope) > 0)
 		{
 			Assert (token->scopeKind < SQLTAG_COUNT);
-			e.extensionFields.scope[0] = SqlKinds [token->scopeKind].name;
-			e.extensionFields.scope[1] = vStringValue (token->scope);
+			e.extensionFields.scopeKind = &(SqlKinds [token->scopeKind]);
+			e.extensionFields.scopeName = vStringValue (token->scope);
 		}
 
 		makeTagEntry (&e);

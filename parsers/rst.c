@@ -78,8 +78,8 @@ static void makeRstTag(const vString* const name, const int kind, const fpos_t f
 
 		if (nl && nl->type < kind)
 		{
-			e.extensionFields.scope [0] = RstKinds [nl->type].name;
-			e.extensionFields.scope [1] = vStringValue (nl->name);
+			e.extensionFields.scopeKind = &(RstKinds [nl->type]);
+			e.extensionFields.scopeName = vStringValue (nl->name);
 		}
 		makeTagEntry (&e);
 	}

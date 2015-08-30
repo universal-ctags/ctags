@@ -816,11 +816,11 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 
 	if (Option.extensionFields.scope)
 	{
-		if (tag->extensionFields.scope [0] != NULL  &&
-		    tag->extensionFields.scope [1] != NULL)
+		if (tag->extensionFields.scopeKind != NULL  &&
+		    tag->extensionFields.scopeName != NULL)
 			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-					   tag->extensionFields.scope [0],
-					   tag->extensionFields.scope [1]);
+					   tag->extensionFields.scopeKind->name,
+					   tag->extensionFields.scopeName);
 		else if (tag->extensionFields.scopeIndex != SCOPE_NIL
 			 && TagFile.corkQueue.count > 0)
 		{
@@ -952,10 +952,10 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 		slot->extensionFields.implementation = eStrdup (slot->extensionFields.implementation);
 	if (slot->extensionFields.inheritance)
 		slot->extensionFields.inheritance = eStrdup (slot->extensionFields.inheritance);
-	if (slot->extensionFields.scope[0])
-		slot->extensionFields.scope[0] = eStrdup (slot->extensionFields.scope[0]);
-	if (slot->extensionFields.scope[1])
-		slot->extensionFields.scope[1] = eStrdup (slot->extensionFields.scope[1]);
+	if (slot->extensionFields.scopeKind)
+		slot->extensionFields.scopeKind = slot->extensionFields.scopeKind;
+	if (slot->extensionFields.scopeName)
+		slot->extensionFields.scopeName = eStrdup (slot->extensionFields.scopeName);
 	if (slot->extensionFields.signature)
 		slot->extensionFields.signature = eStrdup (slot->extensionFields.signature);
 	if (slot->extensionFields.typeRef[0])
@@ -979,10 +979,10 @@ static void clearTagEntryInQueue (tagEntryInfo* slot)
 		eFree ((char *)slot->extensionFields.implementation);
 	if (slot->extensionFields.inheritance)
 		eFree ((char *)slot->extensionFields.inheritance);
-	if (slot->extensionFields.scope[0])
-		eFree ((char *)slot->extensionFields.scope[0]);
-	if (slot->extensionFields.scope[1])
-		eFree ((char *)slot->extensionFields.scope[1]);
+	if (slot->extensionFields.scopeKind)
+		slot->extensionFields.scopeKind = NULL;
+	if (slot->extensionFields.scopeName)
+		eFree ((char *)slot->extensionFields.scopeName);
 	if (slot->extensionFields.signature)
 		eFree ((char *)slot->extensionFields.signature);
 	if (slot->extensionFields.typeRef[0])

@@ -1215,14 +1215,14 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 
 				if (isType (st->context, TOKEN_NAME))
 				{
-					tag->extensionFields.scope [0] = tagName (TAG_CLASS);
-					tag->extensionFields.scope [1] = vStringValue (scope);
+					tag->extensionFields.scopeKind = kindForType (TAG_CLASS);
+					tag->extensionFields.scopeName = vStringValue (scope);
 				}
 				else if ((ptype = declToTagType (parentDecl (st))) &&
 					 includeTag (ptype, Option.include.fileScope))
 				{
-					tag->extensionFields.scope [0] = tagName (ptype);
-					tag->extensionFields.scope [1] = vStringValue (scope);
+					tag->extensionFields.scopeKind = kindForType (ptype);
+					tag->extensionFields.scopeName = vStringValue (scope);
 				}
 			}
 			if ((type == TAG_CLASS  ||  type == TAG_INTERFACE  ||

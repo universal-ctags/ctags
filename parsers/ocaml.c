@@ -42,7 +42,9 @@ typedef enum {
 	K_FUNCTION,
 	K_CONSTRUCTOR,  /* Constructor of a sum type */
 	K_RECORDFIELD,
-	K_EXCEPTION
+	K_EXCEPTION,
+	K_VALUE,		/* ??? */
+	K_BEGIN_END,		/* ??? */
 } ocamlKind;
 
 static kindOption OcamlKinds[] = {
@@ -54,7 +56,9 @@ static kindOption OcamlKinds[] = {
 	{TRUE, 'f', "function", "A function"},
 	{TRUE, 'C', "Constructor", "A constructor"},
 	{TRUE, 'r', "Record field", "A 'structure' field"},
-	{TRUE, 'e', "Exception", "An exception"}
+	{TRUE, 'e', "Exception", "An exception"},
+	{TRUE, 'V', "value", "A value ???"},
+	{TRUE, 'B', "begin end", "A begin end ???"},
 };
 
 typedef enum {
@@ -583,24 +587,24 @@ static int getLastNamedIndex ( void )
 	return -1;
 }
 
-static const char *contextDescription (contextType t)
+static const kindOption* contextDescription (contextType t)
 {
 	switch (t)
 	{
 	case ContextFunction:
-		return "function";
+		return &(OcamlKinds[K_FUNCTION]);
 	case ContextMethod:
-		return "method";
+		return &(OcamlKinds[K_METHOD]);
 	case ContextValue:
-		return "value";
+		return &(OcamlKinds[K_VALUE]);
 	case ContextModule:
-		return "module";
+		return &(OcamlKinds[K_MODULE]);
 	case ContextType:
-		return "type";
+		return &(OcamlKinds[K_TYPE]);
 	case ContextClass:
-		return "class";
+		return &(OcamlKinds[K_CLASS]);
 	case ContextBlock:
-		return "begin/end";
+		return &(OcamlKinds[K_BEGIN_END]);
 	}
 
 	return NULL;
@@ -892,9 +896,9 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, ocamlKind kind)
 	parentIndex = getLastNamedIndex ();
 	if (parentIndex >= 0)
 	{
-		tag->extensionFields.scope[0] =
+		tag->extensionFields.scopeKind =
 			contextDescription (stack[parentIndex].type);
-		tag->extensionFields.scope[1] =
+		tag->extensionFields.scopeName =
 			vStringValue (stack[parentIndex].contextName);
 	}
 }

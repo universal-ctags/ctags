@@ -462,8 +462,8 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, objcKind kind)
 
 	if (parentName != NULL)
 	{
-		tag->extensionFields.scope[0] = ObjcKinds[parentType].name;
-		tag->extensionFields.scope[1] = vStringValue (parentName);
+		tag->extensionFields.scopeKind = &(ObjcKinds[parentType]);
+		tag->extensionFields.scopeName = vStringValue (parentName);
 	}
 }
 

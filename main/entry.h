@@ -79,7 +79,8 @@ typedef struct sTagEntryInfo {
 		const char* implementation;
 		const char* inheritance;
 
-		const char* scope [2];    /* value and key */
+		const kindOption* scopeKind;
+		const char* scopeName;
 #define SCOPE_NIL 0
 		int         scopeIndex;   /* cork queue entry for upper scope tag.
 					     This field is meaningful if the value
