@@ -594,7 +594,7 @@ static const char *contextDescription (contextType t)
 	case ContextValue:
 		return "value";
 	case ContextModule:
-		return "Module";
+		return "module";
 	case ContextType:
 		return "type";
 	case ContextClass:
