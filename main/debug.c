@@ -74,7 +74,7 @@ extern void debugEntry (const tagEntryInfo *const tag)
 
 	if (debug (DEBUG_PARSE))
 	{
-		printf ("<#%s%s:%s", scope, tag->kindName, tag->name);
+		printf ("<#%s%s:%s", scope, tag->kind->name, tag->name);
 
 		if (tag->extensionFields.scope [0] != NULL  &&
 				tag->extensionFields.scope [1] != NULL)

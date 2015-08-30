@@ -262,8 +262,7 @@ static void makeConstTag (tokenInfo *const token, const flexKind kind)
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
-		e.kindName	   = FlexKinds [kind].name;
-		e.kind		   = FlexKinds [kind].letter;
+		e.kind	       = &(FlexKinds [kind]);
 
 		makeTagEntry (&e);
 	}

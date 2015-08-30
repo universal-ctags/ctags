@@ -231,8 +231,7 @@ static void findCssTags (void)
 
 				e.lineNumber	= lineNumber;
 				e.filePosition	= filePosition;
-				e.kindName		= CssKinds[kind].name;
-				e.kind			= (char) CssKinds[kind].letter;
+				e.kind		= &(CssKinds[kind]);
 
 				makeTagEntry (&e);
 			}

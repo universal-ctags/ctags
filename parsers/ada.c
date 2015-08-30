@@ -435,13 +435,11 @@ static adaTokenInfo *newAdaToken(const char *name, int len, adaKind kind,
    * them blank because they get filled in later. */
   if(kind > ADA_KIND_UNDEFINED)
   {
-    token->tag.kindName = AdaKinds[kind].name;
-    token->tag.kind = AdaKinds[kind].letter;
+    token->tag.kind = &(AdaKinds[kind]);
   }
   else
   {
-    token->tag.kindName = "";
-    token->tag.kind = '\0';
+    token->tag.kind = NULL;
   }
 
   /* setup the parent and children pointers */
@@ -2060,8 +2058,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
 
       if(token->kind != ADA_KIND_UNDEFINED)
       {
-        token->tag.kindName = AdaKinds[token->kind].name;
-        token->tag.kind = AdaKinds[token->kind].letter;
+        token->tag.kind = &(AdaKinds[token->kind]);
       }
     }
 

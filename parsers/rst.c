@@ -73,8 +73,7 @@ static void makeRstTag(const vString* const name, const int kind, const fpos_t f
 		initTagEntry (&e, vStringValue (name));
 
 		e.lineNumber--;	/* we want the line before the '---' underline chars */
-		e.kindName = RstKinds [kind].name;
-		e.kind = RstKinds [kind].letter;
+		e.kind = &(RstKinds [kind]);
 		e.filePosition = filepos;
 
 		if (nl && nl->type < kind)

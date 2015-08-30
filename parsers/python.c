@@ -122,16 +122,14 @@ static void makeFunctionTag (vString *const function,
 
 	initTagEntry (&tag, vStringValue (function));
 
-	tag.kindName = PythonKinds[K_FUNCTION].name;
-	tag.kind = PythonKinds[K_FUNCTION].letter;
+	tag.kind = &(PythonKinds[K_FUNCTION]);
 	tag.extensionFields.signature = arglist;
 
 	if (vStringLength (parent) > 0)
 	{
 		if (is_class_parent)
 		{
-			tag.kindName = PythonKinds[K_MEMBER].name;
-			tag.kind = PythonKinds[K_MEMBER].letter;
+			tag.kind = &(PythonKinds[K_MEMBER]);
 			tag.extensionFields.scope [0] = PythonKinds[K_CLASS].name;
 			tag.extensionFields.scope [1] = vStringValue (parent);
 		}
@@ -160,8 +158,7 @@ static void makeClassTag (vString *const class, vString *const inheritance,
 		return;
 
 	initTagEntry (&tag, vStringValue (class));
-	tag.kindName = PythonKinds[K_CLASS].name;
-	tag.kind = PythonKinds[K_CLASS].letter;
+	tag.kind = &(PythonKinds[K_CLASS]);
 	if (vStringLength (parent) > 0)
 	{
 		if (is_class_parent)
@@ -190,8 +187,7 @@ static void makeVariableTag (vString *const var, vString *const parent,
 		return;
 
 	initTagEntry (&tag, vStringValue (var));
-	tag.kindName = PythonKinds[K_VARIABLE].name;
-	tag.kind = PythonKinds[K_VARIABLE].letter;
+	tag.kind = &(PythonKinds[K_VARIABLE]);
 	if (vStringLength (parent) > 0)
 	{
 		tag.extensionFields.scope [0] = PythonKinds[K_CLASS].name;

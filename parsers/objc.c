@@ -458,8 +458,7 @@ static objcKind parentType = K_INTERFACE;
 static void prepareTag (tagEntryInfo * tag, vString const *name, objcKind kind)
 {
 	initTagEntry (tag, vStringValue (name));
-	tag->kindName = ObjcKinds[kind].name;
-	tag->kind = ObjcKinds[kind].letter;
+	tag->kind = &(ObjcKinds[kind]);
 
 	if (parentName != NULL)
 	{

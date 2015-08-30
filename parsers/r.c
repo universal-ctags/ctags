@@ -49,8 +49,7 @@ static void makeRTag (const vString * const name, rKind kind)
 
 	Assert (kind < KIND_COUNT);
 
-	e.kindName = RKinds[kind].name;
-	e.kind = RKinds[kind].letter;
+	e.kind = &(RKinds[kind]);
 
 	makeTagEntry (&e);
 }

@@ -231,8 +231,7 @@ makeTag (struct p6Ctx *ctx, int kind, const char *name, int len)
     tagEntryInfo entry;
     vStringNCopyS(ctx->name, name, len);
     initTagEntry(&entry, vStringValue(ctx->name));
-    entry.kind     = perl6Kinds[kind].letter;
-    entry.kindName = perl6Kinds[kind].name;
+    entry.kind     = &(perl6Kinds[kind]);
     makeTagEntry(&entry);
 }
 

@@ -110,8 +110,8 @@ typedef struct {
 		unsigned long lineNumber;
 	} address;
 
-		/* kind of tag (may by name, character, or NULL if not known) */
-	const char *kind;
+
+	const kindOption* kind;
 
 		/* is tag of file-limited scope? */
 	short fileScope;
@@ -693,7 +693,7 @@ extern boolean processXcmdOption (const char *const option, const char *const pa
 }
 
 #ifdef HAVE_COPROC
-static const char* lookupKindName  (char kind_letter, const xcmdPath* const path)
+static const kindOption* lookupKindFromLetter (const xcmdPath* const path, char kind_letter)
 {
 	unsigned int k;
 	kindOption *kind;
@@ -702,14 +702,13 @@ static const char* lookupKindName  (char kind_letter, const xcmdPath* const path
 	{
 		kind = path->kinds + k;
 		if (kind->letter == kind_letter)
-			if (kind->name)
-				return kind->name;
+			return kind;
 	}
 	return NULL;
 
 }
 
-static const char* lookupKindLetter (const char* const kind_name, const xcmdPath *const path)
+static const kindOption* lookupKindFromName (const xcmdPath* const path, const char* const kind_name)
 {
 	unsigned int k;
 	kindOption *kind;
@@ -718,7 +717,7 @@ static const char* lookupKindLetter (const char* const kind_name, const xcmdPath
 	{
 		kind = path->kinds + k;
 		if (kind->name && (!strcmp(kind->name, kind_name)))
-			return &kind->letter;
+			return kind;
 
 	}
 	return NULL;
@@ -813,7 +812,24 @@ static boolean parseExtensionFields (tagEntry *const entry, char *const string, 
 			if (colon == NULL)
 			{
 				if (isKindEnabled (path, field))
-					entry->kind = field;
+				{
+					if (entry->kind == NULL)
+					{
+						entry->kind = lookupKindFromLetter (path, field[0]);
+						if (entry->kind == NULL)
+						{
+							kindOption *fileKind = getSourceLanguageFileKind ();
+							if (fileKind && fileKind->letter == field[0])
+								/* ctags will make a tag for file. */
+								goto reject;
+
+						}
+					}
+					else
+						; /* TODO: warning */
+					Assert (entry->kind);
+
+				}
 				else
 					goto reject;
 			}
@@ -827,7 +843,24 @@ static boolean parseExtensionFields (tagEntry *const entry, char *const string, 
 					if (*value == '\0')
 						goto reject;
 					else if (isKindEnabled (path, value))
-						entryAddField(entry, key, value);
+					{
+						if (entry->kind == NULL)
+						{
+							entry->kind = lookupKindFromName (path, value);
+							if (entry->kind == NULL)
+							{
+								kindOption *fileKind = getSourceLanguageFileKind ();
+								if (fileKind && (strcmp(fileKind->name, value) == 0))
+									/* ctags will make a tag for file. */
+									goto reject;
+
+							}
+						}
+
+						else
+							; /* TODO: warning */
+						Assert (entry->kind);
+					}
 					else
 						goto reject;
 				}
@@ -850,30 +883,6 @@ static boolean parseExtensionFields (tagEntry *const entry, char *const string, 
 		entry->fields.list = NULL;
 	}
 	entry->fields.count = 0;
-	return FALSE;
-}
-
-static boolean fillEntry (const xcmdPath* path, tagEntry* entry)
-{
-	if (entry->kind)
-	{
-		const char* name = lookupKindName (entry->kind[0], path);
-		if (name)
-		{
-			entryAddField(entry, "kind", name);
-			return TRUE;
-		}
-	}
-	else
-	{
-		const char* kind = entryLookupField (entry, "kind", FALSE);
-		if (kind)
-		{
-			entry->kind = lookupKindLetter (kind, path);
-			if (entry->kind)
-				return TRUE;
-		}
-	}
 	return FALSE;
 }
 
@@ -953,8 +962,7 @@ static boolean parseXcmdPath (char* line, xcmdPath* path, tagEntry* entry)
 			 {
 				 if (!parseExtensionFields (entry, p + 2, path))
 					 return FALSE;
-				 if (fillEntry (path, entry))
-					 return TRUE;
+				 return TRUE;
 			 }
 		}
 	}
@@ -1023,8 +1031,7 @@ static boolean makeTagEntryFromTagEntry (tagEntry* entry)
 			  filePosition,
 			  entry->file);
 
-	tag.kind = entry->kind[0];
-	tag.kindName = entryLookupField(entry, "kind", TRUE);
+	tag.kind = entry->kind;
 	tag.pattern = entry->address.pattern;
 
 	tag.isFileScope = (boolean)entry->fileScope;

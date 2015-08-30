@@ -142,8 +142,7 @@ static void makeRegexTag (
 		Assert (name != NULL  &&  vStringLength (name) > 0);
 		Assert (kind != NULL);
 		initTagEntry (&e, vStringValue (name));
-		e.kind     = kind->letter;
-		e.kindName = kind->name;
+		e.kind     = kind;
 		makeTagEntry (&e);
 	}
 }

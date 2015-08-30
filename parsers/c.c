@@ -1052,6 +1052,22 @@ static veraKind veraTagKindFull (const tagType type, boolean with_assert) {
 	return result;
 }
 
+static const kindOption *kindForType (const tagType type)
+{
+	const kindOption * result;
+	if (isLanguage (Lang_csharp))
+		result = &(CsharpKinds [csharpTagKind (type)]);
+	else if (isLanguage (Lang_java))
+		result = &(JavaKinds [javaTagKind (type)]);
+	else if (isLanguage (Lang_d))
+		result = &(DKinds [dTagKind (type)]);
+	else if (isLanguage (Lang_vera))
+		result = &(VeraKinds [veraTagKind (type)]);
+	else
+		result = &(CKinds [cTagKind (type)]);
+	return result;
+}
+
 static const char *tagName (const tagType type)
 {
 	const char* result;
@@ -1065,22 +1081,6 @@ static const char *tagName (const tagType type)
 		result = VeraKinds [veraTagKind (type)].name;
 	else
 		result = CKinds [cTagKind (type)].name;
-	return result;
-}
-
-static int tagLetter (const tagType type)
-{
-	int result;
-	if (isLanguage (Lang_csharp))
-		result = CsharpKinds [csharpTagKind (type)].letter;
-	else if (isLanguage (Lang_java))
-		result = JavaKinds [javaTagKind (type)].letter;
-	else if (isLanguage (Lang_d))
-		result = DKinds [dTagKind (type)].letter;
-	else if (isLanguage (Lang_vera))
-		result = VeraKinds [veraTagKind (type)].letter;
-	else
-		result = CKinds [cTagKind (type)].letter;
 	return result;
 }
 
@@ -1387,8 +1387,8 @@ static void makeTag (const tokenInfo *const token,
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
 		e.isFileScope	= isFileScope;
-		e.kindName		= tagName (type);
-		e.kind			= tagLetter (type);
+
+		e.kind          = kindForType (type);
 
 		isScopeBuilt = findScopeHierarchy (scope, st);
 		addOtherFields (&e, type, st, scope, typeRef);

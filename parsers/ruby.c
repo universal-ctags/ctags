@@ -219,8 +219,7 @@ static void emitRubyTag (vString* name, rubyKind kind)
 	    tag.extensionFields.scope [0] = RubyKinds [parent_kind].name;
 	    tag.extensionFields.scope [1] = vStringValue (scope);
 	}
-	tag.kindName = RubyKinds [kind].name;
-	tag.kind = RubyKinds [kind].letter;
+	tag.kind = &(RubyKinds [kind]);
 	makeTagEntry (&tag);
 
 	nestingLevelsPush (nesting, name, kind);

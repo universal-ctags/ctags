@@ -539,8 +539,7 @@ static void makeConstTag (tokenInfo * const token, const vhdlKind kind)
 		initTagEntry (&e, name);
 		e.lineNumber = token->lineNumber;
 		e.filePosition = token->filePosition;
-		e.kindName = VhdlKinds[kind].name;
-		e.kind = VhdlKinds[kind].letter;
+		e.kind = &(VhdlKinds[kind]);
 		makeTagEntry (&e);
 	}
 }

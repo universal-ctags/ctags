@@ -450,8 +450,7 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
-		e.kindName	   = SqlKinds [kind].name;
-		e.kind		   = SqlKinds [kind].letter;
+		e.kind	       = &(SqlKinds [kind]);
 
 		if (vStringLength (token->scope) > 0)
 		{

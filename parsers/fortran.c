@@ -545,8 +545,7 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
 		e.isFileScope	= isFileScope (token->tag);
-		e.kindName		= FortranKinds [token->tag].name;
-		e.kind			= FortranKinds [token->tag].letter;
+		e.kind		= &(FortranKinds [token->tag]);
 		e.truncateLine	= (boolean) (token->tag != TAG_LABEL);
 
 		if (ancestorCount () > 0)

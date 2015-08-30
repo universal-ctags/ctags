@@ -264,8 +264,7 @@ static void makeTexTag (tokenInfo *const token, texKind kind)
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
-		e.kindName	   = TexKinds [kind].name;
-		e.kind		   = TexKinds [kind].letter;
+		e.kind	       = &(TexKinds [kind]);
 
 		getScopeInfo(kind, parentKind, parentName);
 		if (vStringLength(parentKind) > 0) {

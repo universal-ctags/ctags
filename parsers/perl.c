@@ -197,16 +197,14 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 	vStringClear(name);
 	vStringNCatS(name, b, e - b + 1);
 	initTagEntry(&entry, vStringValue(name));
-	entry.kind = PerlKinds[K_CONSTANT].letter;
-	entry.kindName = PerlKinds[K_CONSTANT].name;
+	entry.kind = &(PerlKinds[K_CONSTANT]);
 	makeTagEntry(&entry);
 	if (Option.include.qualifiedTags && package && vStringLength(package)) {
 		vStringClear(name);
 		vStringCopy(name, package);
 		vStringNCatS(name, b, e - b + 1);
 		initTagEntry(&entry, vStringValue(name));
-		entry.kind = PerlKinds[K_CONSTANT].letter;
-		entry.kindName = PerlKinds[K_CONSTANT].name;
+		entry.kind = &(PerlKinds[K_CONSTANT]);
 		makeTagEntry(&entry);
 	}
 }
@@ -487,8 +485,7 @@ static void findPerlTags (void)
 					continue;
 				}
 
-				e.kind     = PerlKinds[kind].letter;
-				e.kindName = PerlKinds[kind].name;
+				e.kind     = &(PerlKinds[kind]);
 
 				makeTagEntry(&e);
 

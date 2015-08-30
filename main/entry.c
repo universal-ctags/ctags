@@ -733,7 +733,7 @@ static int writeXrefEntry (const tagEntryInfo *const tag)
 				tag->lineNumber, tag->sourceFileName);
 	else
 		length = fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s ", tag->name,
-				tag->kindName, tag->lineNumber, tag->sourceFileName);
+				  tag->kind->name, tag->lineNumber, tag->sourceFileName);
 
 	/* If no associated line for tag is found, we cannot prepare
 	 * parameter to writeCompactSourceLine(). In this case we
@@ -801,12 +801,12 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 /* "sep" returns a value only the first time it is evaluated */
 #define sep (first ? (first = FALSE, separator) : empty)
 
-	if (tag->kindName != NULL && (Option.extensionFields.kindLong  ||
+	if (tag->kind->name != NULL && (Option.extensionFields.kindLong  ||
 		 (Option.extensionFields.kind  && tag->kind == '\0')))
-		length += fprintf (TagFile.fp,"%s\t%s%s", sep, kindKey, tag->kindName);
+		length += fprintf (TagFile.fp,"%s\t%s%s", sep, kindKey, tag->kind->name);
 	else if (tag->kind != '\0'  && (Option.extensionFields.kind  ||
-			(Option.extensionFields.kindLong  &&  tag->kindName == NULL)))
-		length += fprintf (TagFile.fp, "%s\t%s%c", sep, kindKey, tag->kind);
+			(Option.extensionFields.kindLong  &&  tag->kind->name == NULL)))
+		length += fprintf (TagFile.fp, "%s\t%s%c", sep, kindKey, tag->kind->letter);
 
 	if (Option.extensionFields.lineNumber)
 		length += fprintf (TagFile.fp, "%s\tline:%ld", sep, tag->lineNumber);
@@ -828,7 +828,7 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 
 			scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
 			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-					   scope->kindName, scope->name);
+					   scope->kind->name, scope->name);
 		}
 	}
 
@@ -1087,7 +1087,7 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 {
 	int r = SCOPE_NIL;
 	Assert (tag->name != NULL && strchr (tag->name, '\t') == NULL);
-	Assert (getSourceLanguageFileKind()->letter == tag->kind || isSourceLanguageKindEnabled (tag->kind));
+	Assert (getSourceLanguageFileKind() == tag->kind || isSourceLanguageKindEnabled (tag->kind->letter));
 
 	if (tag->name [0] == '\0')
 		error (WARNING, "ignoring null tag in %s(line: %lu)", vStringValue (File.name), tag->lineNumber);

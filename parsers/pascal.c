@@ -42,8 +42,7 @@ static void createPascalTag (
 	if (PascalKinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
 	{
 	    initTagEntry (tag, vStringValue (name));
-	    tag->kindName = PascalKinds [kind].name;
-	    tag->kind     = PascalKinds [kind].letter;
+	    tag->kind = &(PascalKinds [kind]);
 	}
 	else
 	    initTagEntry (tag, NULL);

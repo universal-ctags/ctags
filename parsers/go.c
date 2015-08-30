@@ -542,8 +542,7 @@ static void makeTag (tokenInfo *const token, const goKind kind,
 
 	e.lineNumber = token->lineNumber;
 	e.filePosition = token->filePosition;
-	e.kindName = GoKinds [kind].name;
-	e.kind = GoKinds [kind].letter;
+	e.kind = &(GoKinds [kind]);
 	if (argList)
 		e.extensionFields.signature = argList;
 

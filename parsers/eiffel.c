@@ -215,8 +215,7 @@ static void makeEiffelClassTag (tokenInfo *const token)
 
 		initTagEntry (&e, name);
 
-		e.kindName = EiffelKinds [EKIND_CLASS].name;
-		e.kind     = EiffelKinds [EKIND_CLASS].letter;
+		e.kind = &(EiffelKinds [EKIND_CLASS]);
 
 		makeTagEntry (&e);
 	}
@@ -234,8 +233,7 @@ static void makeEiffelFeatureTag (tokenInfo *const token)
 		initTagEntry (&e, name);
 
 		e.isFileScope = (boolean) (! token->isExported);
-		e.kindName    = EiffelKinds [EKIND_FEATURE].name;
-		e.kind        = EiffelKinds [EKIND_FEATURE].letter;
+		e.kind        = &(EiffelKinds [EKIND_FEATURE]);
 		e.extensionFields.scope [0] = EiffelKinds [EKIND_CLASS].name;
 		e.extensionFields.scope [1] = vStringValue (token->className);
 
@@ -265,8 +263,7 @@ static void makeEiffelLocalTag (tokenInfo *const token)
 		initTagEntry (&e, name);
 
 		e.isFileScope = TRUE;
-		e.kindName    = EiffelKinds [EKIND_LOCAL].name;
-		e.kind        = EiffelKinds [EKIND_LOCAL].letter;
+		e.kind        = &(EiffelKinds [EKIND_LOCAL]);
 
 		vStringCopy (scope, token->className);
 		vStringPut (scope, '.');

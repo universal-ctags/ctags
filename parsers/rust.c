@@ -444,8 +444,7 @@ static void addTag (vString* ident, const char* arg_list, int kind, unsigned lon
 	tag.filePosition = pos;
 	tag.sourceFileName = getSourceFileName();
 
-	tag.kindName = rustKinds[kind].name;
-	tag.kind = rustKinds[kind].letter;
+	tag.kind = &(rustKinds[kind]);
 
 	tag.extensionFields.signature = arg_list;
 	/*tag.extensionFields.varType = type;*/ /* FIXME: map to typeRef[1]? */

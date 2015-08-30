@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 
+#include "kind.h"
 #include "vstring.h"
 
 /*
@@ -71,8 +72,7 @@ typedef struct sTagEntryInfo {
 	boolean     truncateLine;     /* truncate tag line at end of tag name? */
 	const char *sourceFileName;   /* name of source file */
 	const char *name;             /* name of the tag */
-	const char *kindName;         /* kind of tag */
-	char        kind;             /* single character representation of kind */
+	const kindOption *kind;	      /* kind descriptor */
 	struct {
 		const char* access;
 		const char* fileScope;

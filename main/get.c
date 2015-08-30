@@ -334,8 +334,7 @@ static void makeDefineTag (const char *const name)
 		e.lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
 		e.isFileScope  = isFileScope;
 		e.truncateLine = TRUE;
-		e.kindName     = Cpp.defineMacroKind->name;
-		e.kind         = Cpp.defineMacroKind->letter;
+		e.kind         = Cpp.defineMacroKind;
 		makeTagEntry (&e);
 	}
 }
@@ -350,8 +349,7 @@ static void makeIncludeTag (const  char *const name)
 		e.lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
 		e.isFileScope  = FALSE;
 		e.truncateLine = TRUE;
-		e.kindName     = Cpp.headerKind->name,
-		e.kind         = Cpp.headerKind->letter;
+		e.kind         = Cpp.headerKind,
 		makeTagEntry (&e);
 	}
 }

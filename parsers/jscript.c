@@ -261,8 +261,7 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
-		e.kindName	   = JsKinds [kind].name;
-		e.kind		   = JsKinds [kind].letter;
+		e.kind	       = &(JsKinds [kind]);
 
 		if ( vStringLength(fullscope) > 0 )
 		{

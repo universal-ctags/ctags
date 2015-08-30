@@ -80,8 +80,7 @@ static void makeSmlTag (smlKind type, vString *name)
 		return;
 
 	initTagEntry (&tag, vStringValue (name));
-	tag.kindName = SmlKinds [type].name;
-	tag.kind = SmlKinds [type].letter;
+	tag.kind = &(SmlKinds [type]);
 	makeTagEntry (&tag);
 }
 

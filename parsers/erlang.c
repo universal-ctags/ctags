@@ -80,8 +80,7 @@ static void makeMemberTag (
 	{
 		tagEntryInfo tag;
 		initTagEntry (&tag, vStringValue (identifier));
-		tag.kindName = ErlangKinds[kind].name;
-		tag.kind = ErlangKinds[kind].letter;
+		tag.kind = & (ErlangKinds[kind]);
 
 		if (module != NULL  &&  vStringLength (module) > 0)
 		{
