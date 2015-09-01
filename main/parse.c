@@ -655,8 +655,6 @@ static langType tasteLanguage (struct getLangCtx *glc, const struct taster *cons
 static langType arbitrateByTwoGram (struct getLangCtx *glc, parserCandidate  *candidates,
 					      unsigned int n_candidates)
 {
-	langType language;
-
 	rewind (glc->input);
 	return getTwoGramLanguage (glc->input, candidates, n_candidates);
 }

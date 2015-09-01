@@ -340,7 +340,7 @@ static void makeDefineTag (const char *const name)
 	}
 }
 
-static void makeIncludeTag (const  char *const name, const char separator)
+static void makeIncludeTag (const  char *const name)
 {
 	tagEntryInfo e;
 
@@ -420,7 +420,7 @@ static void directiveInclude (const int c)
 	{
 		readFilename (c, Cpp.directive.name);
 		if ((! isIgnore ()) && vStringLength (Cpp.directive.name))
-			makeIncludeTag (vStringValue (Cpp.directive.name), c);
+			makeIncludeTag (vStringValue (Cpp.directive.name));
 	}
 	Cpp.directive.state = DRCTV_NONE;
 }

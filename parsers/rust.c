@@ -433,7 +433,7 @@ static void deInitLexer (lexerState *lexer)
 	lexer->token_str = NULL;
 }
 
-static void addTag (vString* ident, const char* type, const char* arg_list, int kind, unsigned long line, fpos_t pos, vString *scope, int parent_kind)
+static void addTag (vString* ident, const char* arg_list, int kind, unsigned long line, fpos_t pos, vString *scope, int parent_kind)
 {
 	if (kind == K_NONE || ! rustKinds[kind].enabled)
 		return;
@@ -585,7 +585,7 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
 	if (valid_signature)
 	{
 		vStringStripTrailing(arg_list);
-		addTag(name, NULL, arg_list->buffer, kind, line, pos, scope, parent_kind);
+		addTag(name, arg_list->buffer, kind, line, pos, scope, parent_kind);
 		addToScope(scope, name);
 		parseBlock(lexer, TRUE, kind, scope);
 	}
@@ -603,7 +603,7 @@ static void parseMod (lexerState *lexer, vString *scope, int parent_kind)
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
-	addTag(lexer->token_str, NULL, NULL, K_MOD, lexer->line, lexer->pos, scope, parent_kind);
+	addTag(lexer->token_str, NULL, K_MOD, lexer->line, lexer->pos, scope, parent_kind);
 	addToScope(scope, lexer->token_str);
 
 	advanceToken(lexer, TRUE);
@@ -622,7 +622,7 @@ static void parseTrait (lexerState *lexer, vString *scope, int parent_kind)
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
-	addTag(lexer->token_str, NULL, NULL, K_TRAIT, lexer->line, lexer->pos, scope, parent_kind);
+	addTag(lexer->token_str, NULL, K_TRAIT, lexer->line, lexer->pos, scope, parent_kind);
 	addToScope(scope, lexer->token_str);
 
 	advanceToken(lexer, TRUE);
@@ -691,7 +691,7 @@ static void parseImpl (lexerState *lexer, vString *scope, int parent_kind)
 		parseQualifiedType(lexer, name);
 	}
 
-	addTag(name, NULL, NULL, K_IMPL, line, pos, scope, parent_kind);
+	addTag(name, NULL, K_IMPL, line, pos, scope, parent_kind);
 	addToScope(scope, name);
 
 	parseBlock(lexer, TRUE, K_IMPL, scope);
@@ -714,7 +714,7 @@ static void parseStatic (lexerState *lexer, vString *scope, int parent_kind)
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
-	addTag(lexer->token_str, NULL, NULL, K_STATIC, lexer->line, lexer->pos, scope, parent_kind);
+	addTag(lexer->token_str, NULL, K_STATIC, lexer->line, lexer->pos, scope, parent_kind);
 }
 
 /* Type format:
@@ -726,7 +726,7 @@ static void parseType (lexerState *lexer, vString *scope, int parent_kind)
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
-	addTag(lexer->token_str, NULL, NULL, K_TYPE, lexer->line, lexer->pos, scope, parent_kind);
+	addTag(lexer->token_str, NULL, K_TYPE, lexer->line, lexer->pos, scope, parent_kind);
 }
 
 /* Structs and enums are very similar syntax-wise.
@@ -748,7 +748,7 @@ static void parseStructOrEnum (lexerState *lexer, vString *scope, int parent_kin
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
-	addTag(lexer->token_str, NULL, NULL, kind, lexer->line, lexer->pos, scope, parent_kind);
+	addTag(lexer->token_str, NULL, kind, lexer->line, lexer->pos, scope, parent_kind);
 	addToScope(scope, lexer->token_str);
 
 	skipUntil(lexer, goal_tokens1, 2);
@@ -795,7 +795,7 @@ static void parseStructOrEnum (lexerState *lexer, vString *scope, int parent_kin
 
 				vStringClear(field_name);
 				vStringCat(field_name, lexer->token_str);
-				addTag(field_name, NULL, NULL, field_kind, lexer->line, lexer->pos, scope, kind);
+				addTag(field_name, NULL, field_kind, lexer->line, lexer->pos, scope, kind);
 				skipUntil(lexer, goal_tokens2, 2);
 			}
 			if (lexer->cur_token == '}')
@@ -866,7 +866,7 @@ static void parseMacroRules (lexerState *lexer, vString *scope, int parent_kind)
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
-	addTag(lexer->token_str, NULL, NULL, K_MACRO, lexer->line, lexer->pos, scope, parent_kind);
+	addTag(lexer->token_str, NULL, K_MACRO, lexer->line, lexer->pos, scope, parent_kind);
 
 	skipMacro(lexer);
 }
