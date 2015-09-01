@@ -22,53 +22,26 @@
 #include "read.h"
 #include "vstring.h"
 
-#define R_REGEX
-
 #define SKIPSPACE(ch) while (isspace((int)*ch)) \
   ch++
 
-#ifndef R_REGEX
 typedef enum {
 	K_FUNCTION,
 	K_LIBRARY,
 	K_SOURCE,
+	K_GLOBALVAR,
+	K_FUNCVAR,
 	KIND_COUNT
 } rKind;
 
 static kindOption RKinds[KIND_COUNT] = {
 	{TRUE, 'f', "function", "functions"},
-	{TRUE, 's', "other", "libraries"},
-	{TRUE, 's', "other", "sources"},
+	{TRUE, 'l', "library", "libraries"},
+	{TRUE, 's', "source", "sources"},
+	{TRUE, 'g', "globalVar", "global variables"},
+	{TRUE, 'v', "functionVar", "function variables"},
 };
-#endif
 
-#ifdef R_REGEX
-static void installRRegex (const langType language)
-{
-	/* This is a function, looks as follows:
-	 * itent <- function(arg1, arg2) {
-	 *   do_something;
-	 * }
-	 */
-	addTagRegex (language,
-		"^[ \t]*\"?([.a-zA-Z][.a-zA-Z0-9_]+)\"?[ \t]*<-[ \t]*function[ \t]*\\(", "\\1",
-		"f,function,functions", NULL);
-	/* Global variables */
-	addTagRegex (language,
-		"^\"?([.a-zA-Z][.a-zA-Z0-9_]*)\"?[ \t]*<-[ \t][^\(]+$", "\\1",
-		"g,globalVar,global variables", NULL);
-	/* Function local variable
-	 * Assumes that code in functions is indented
-	 */
-	addTagRegex (language,
-		"[ \t]\"?([.A-Za-z][.A-Za-z0-9_]*)\"?[ \t]*<-[ \t][^\(]+$", "\\1",
-		"v,functionVar,function variables", NULL);
-	/* This loads someting, e.g. a library, simply: library(libname) */
-	addTagRegex (language,
-		"^[ \t]*(library|source|load|data)[\\(]([a-zA-Z0-9_]+)[\\)]", "\\2",
-		"s,other,library/source/load/data", NULL);
-}
-#else
 static void makeRTag (const vString * const name, rKind kind)
 {
 	tagEntryInfo e;
@@ -189,6 +162,23 @@ static void createRTags (void)
 						vStringClear (name);
 						break;
 					}
+					else
+					{
+						/* it's a variable: ident <- value */
+						vStringTerminate (name);
+						/* if the string really exists, make a tag of it */
+						if (vStringLength (name) > 0)
+						{
+							if (line[0] == ' ' || line[0] == '\t')
+								makeRTag (name, K_FUNCVAR);
+							else
+								makeRTag (name, K_GLOBALVAR);
+						}
+
+						/* prepare for the next iteration */
+						vStringClear (name);
+						break;
+					}
 				}
 			case ' ':
 			case '\x009':
@@ -207,7 +197,6 @@ static void createRTags (void)
 	vStringDelete (name);
 	vStringDelete (vLine);
 }
-#endif
 
 extern parserDefinition *RParser (void)
 {
@@ -216,17 +205,10 @@ extern parserDefinition *RParser (void)
 	 */
 	static const char *const extensions[] = { "r", "s", "q", NULL };
 	parserDefinition *const def = parserNew ("R");
-#ifndef R_REGEX
-	def->kinds = RKinds;
-	def->kindCount = 4;
-#endif
 	def->extensions = extensions;
-#ifndef R_REGEX
+	def->kinds = RKinds;
+	def->kindCount = KIND_COUNT;
 	def->parser = createRTags;
-#else
-	def->initialize = installRRegex;
-	def->method = METHOD_NOT_CRAFTED | METHOD_REGEX;
-#endif
 	return def;
 }
 
