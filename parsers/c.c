@@ -416,8 +416,7 @@ static kindOption VeraKinds [] = {
 	{ TRUE,  'T', "typedef",    "typedefs"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
 	{ FALSE, 'x', "externvar",  "external variable declarations"},
-	{ FALSE, 'h', "system header",   "included system header file name"},
-	{ FALSE, 'H', "local header",    "included local header file name"}
+	{ FALSE, 'h', "header",     "included header files"},
 };
 
 static const keywordDesc KeywordTable [] = {

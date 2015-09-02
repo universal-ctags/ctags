@@ -375,6 +375,13 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --_force-quit=[num]"},
  {1,"       Quit when the option is processed. Useful to debug the chain"},
  {1,"       of loading option files."},
+ {1,"  --_list-kinds-full=[language|all]"},
+ {1,"       Output a list of quadruplet of all tag kinds for specified language or all."},
+ {1,"       The elements of a quadruplet are \"letter\", \"name\", \"description\" and \"disabled\"."},
+ {1,"       Elements are separated with tab characters. "},
+ {1,"       If a kind is disabled, its \"disabled\" element is printed as \"off\"."},
+ {1,"       If it is enabled, \"on\" is printed."},
+ {1,"       For each line, associated language name is printed when \"all\" is specified as language."},
  {1, NULL}
 };
 
@@ -946,10 +953,10 @@ extern boolean isIncludeFile (const char *const fileName)
  */
 
  static void processConfigFilenameOption (
- 		const char *const option __unused__, const char *const parameter)
+		const char *const option __unused__, const char *const parameter)
  {
- 	freeString (&Option.configFilename);
- 	Option.configFilename = stringCopy (parameter);
+	freeString (&Option.configFilename);
+	Option.configFilename = stringCopy (parameter);
  }
 
 static void processEtagsInclude (
@@ -1201,7 +1208,7 @@ static void printProgramIdentification (void)
 		PROGRAM_NAME, PROGRAM_VERSION, CTAGS_COMMIT_ID,
 #else
 		"%s %s, %s %s\n",
-	        PROGRAM_NAME, PROGRAM_VERSION,
+		PROGRAM_NAME, PROGRAM_VERSION,
 #endif
 		PROGRAM_COPYRIGHT, AUTHOR_NAME);
 	printf ("Universal Ctags is derived from Exuberant Ctags.\n");
@@ -1594,15 +1601,17 @@ static void processListFileKindOption (
 static void processListKindsOption (
 		const char *const option, const char *const parameter)
 {
+	boolean print_all = (strcmp (option, "_list-kinds-full") == 0)? TRUE: FALSE;
+
 	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
-	    printLanguageKinds (LANG_AUTO);
+		printLanguageKinds (LANG_AUTO, print_all);
 	else
 	{
 		langType language = getNamedLanguage (parameter);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
-			printLanguageKinds (language);
+			printLanguageKinds (language, print_all);
 	}
 	exit (0);
 }
@@ -2103,7 +2112,7 @@ static void processLibexecDir (const char *const option,
  */
 
 static parametricOption ParametricOptions [] = {
-	{ "config-filename",      	processConfigFilenameOption,  	TRUE, STAGE_ANY },
+	{ "config-filename",		processConfigFilenameOption,	TRUE, STAGE_ANY },
 	{ "data-dir",               processDataDir,                 FALSE,  STAGE_ANY },
 	{ "etags-include",          processEtagsInclude,            FALSE,  STAGE_ANY },
 	{ "exclude",                processExcludeOption,           FALSE,  STAGE_ANY },
@@ -2130,6 +2139,7 @@ static parametricOption ParametricOptions [] = {
 	{ "list-features",          processListFeaturesOption,      TRUE,   STAGE_ANY },
 	{ "list-file-kind",         processListFileKindOption,      TRUE,   STAGE_ANY },
 	{ "list-kinds",             processListKindsOption,         TRUE,   STAGE_ANY },
+	{ "_list-kinds-full",       processListKindsOption,         TRUE,   STAGE_ANY },
 	{ "list-languages",         processListLanguagesOption,     TRUE,   STAGE_ANY },
 	{ "list-maps",              processListMapsOption,          TRUE,   STAGE_ANY },
 	{ "options",                processOptionFile,              FALSE,  STAGE_ANY },
@@ -2556,7 +2566,7 @@ static boolean parseAllConfigurationFilesOptionsInDirectory (const char* const d
 	n = scandir (dirName, &dents, ignore_dot_file, alphasort);
 	if (n < 0)
 		return FALSE;
-	
+
 	for (i = 0; i < n; i++)
 	{
 		char* path;

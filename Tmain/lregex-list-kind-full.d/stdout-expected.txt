@@ -1,0 +1,4 @@
+c	regex		off
+d	regex		on
+a	x y	x y z	on
+b	regex		off

@@ -14,7 +14,7 @@
 */
 
 /*
-  XCMD PROTOCOL (version 2)
+  XCMD PROTOCOL (version 2.1)
   ==================================================================
   When invoking xcmd just only with --lint-kinds=LANG option,
   xcmd must write lines matching one of following patterns
@@ -23,9 +23,9 @@
   patterns
   --------
 
-  ^([^ \t])[ \t]+(.+)([ \t]+(\[off\]))?$
+  ^([^ \t])[ \t]+([^\t]+)([ \t]+(\[off\]))?$
   \1 => letter
-  \2 => description
+  \2 => name
   \4 => \[off\] is optional.
 
 
@@ -530,10 +530,10 @@ extern boolean hasXcmdKind (const langType language, const int kind)
 }
 
 #ifdef HAVE_COPROC
-static void printXcmdKind (xcmdPath *path, unsigned int i, boolean indent)
+static void printXcmdKind (xcmdPath *path, unsigned int i,
+			   const char* const langName, boolean allKindFields, boolean indent)
 {
 	unsigned int k;
-	const char *const indentation = indent ? "    " : "";
 
 	if (!path[i].available)
 		return;
@@ -541,23 +541,40 @@ static void printXcmdKind (xcmdPath *path, unsigned int i, boolean indent)
 	for (k = 0; k < path[i].n_kinds; k++)
 	{
 		const struct sKind *const kind = path[i].kinds + k;
-		printf ("%s%c  %s %s\n", indentation,
-			kind->letter != '\0' ? kind->letter : '?',
-			kind->description != NULL ? kind->description : kind->name,
-			kind->enabled ? "" : " [off]");
+
+		if (allKindFields)
+		{
+			if (indent)
+				printf ("%s", langName);
+			printf ("%s%c\t%s\t%s\t%s\n", indent ? "\t"           : "",
+				kind->letter != '\0'         ? kind->letter   : '?',
+				kind->name        != NULL ? kind->name        : "",
+				kind->description != NULL ? kind->description : "",
+				kind->enabled             ? "on"              : "off");
+		}
+		else
+		{
+			printf ("%s%c  %s %s\n", indent ? "    " : "",
+				kind->letter != '\0' ? kind->letter : '?',
+				kind->description != NULL ? kind->description : kind->name,
+				kind->enabled ? "" : " [off]");
+		}
 	}
 }
 #endif
 
-extern void printXcmdKinds (const langType language __unused__, boolean indent __unused__)
+extern void printXcmdKinds (const langType language __unused__,
+			    boolean allKindFields __unused__,
+			    boolean indent __unused__)
 {
 #ifdef HAVE_COPROC
 	if (language <= SetUpper  &&  Sets [language].count > 0)
 	{
 		pathSet* const set = Sets + language;
+		const char* const langName = getLanguageName (language);
 		unsigned int i;
 		for (i = 0  ;  i < set->count  ;  ++i)
-			printXcmdKind (set->paths, i, indent);
+			printXcmdKind (set->paths, i, langName, allKindFields, indent);
 	}
 #endif
 }

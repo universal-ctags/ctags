@@ -78,11 +78,11 @@ typedef struct stgTableEntry{
 	struct stgTableEntry *next;
 } tgTableEntry;
 
-typedef enum  {
-  METHOD_NOT_CRAFTED    = 1 << 0,
-  METHOD_REGEX          = 1 << 1,
-  METHOD_XCMD           = 1 << 2,
-  METHOD_XCMD_AVAILABLE = 1 << 3,
+typedef enum {
+	METHOD_NOT_CRAFTED    = 1 << 0,
+	METHOD_REGEX          = 1 << 1,
+	METHOD_XCMD           = 1 << 2,
+	METHOD_XCMD_AVAILABLE = 1 << 3,
 } parsingMethod;
 
 typedef struct {
@@ -165,7 +165,7 @@ extern void enableLanguage (const langType language, const boolean state);
 extern void initializeParsing (void);
 extern void freeParserResources (void);
 extern void printLanguageFileKind (const langType language);
-extern void printLanguageKinds (const langType language);
+extern void printLanguageKinds (const langType language, boolean allKindFields);
 extern void printLanguageCorpus (langType language, const char *const spec);
 extern void printLanguageAliases (const langType language);
 extern void printLanguageList (void);
@@ -187,7 +187,7 @@ extern void resetRegexKinds (const langType language, boolean mode);
 extern boolean enableRegexKind (const langType language, const int kind, const boolean mode);
 extern boolean isRegexKindEnabled (const langType language, const int kind);
 extern boolean hasRegexKind (const langType language, const int kind);
-extern void printRegexKinds (const langType language, boolean indent);
+extern void printRegexKinds (const langType language, boolean allKindFields, boolean indent);
 extern void freeRegexResources (void);
 extern boolean checkRegex (void);
 extern void useRegexMethod (const langType language);
@@ -201,7 +201,7 @@ extern void resetXcmdKinds (const langType language, boolean mode);
 extern boolean enableXcmdKind (const langType language, const int kind, const boolean mode);
 extern boolean isXcmdKindEnabled (const langType language, const int kind);
 extern boolean hasXcmdKind (const langType language, const int kind);
-extern void printXcmdKinds (const langType language, boolean indent);
+extern void printXcmdKinds (const langType language, boolean allKindFields, boolean indent);
 extern void freeXcmdResources (void);
 extern void useXcmdMethod (const langType language);
 extern void notifyAvailabilityXcmdMethod (const langType language);
