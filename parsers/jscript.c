@@ -1080,10 +1080,7 @@ static void parseFunction (tokenInfo *const token)
 
 	readToken (name);
 	if (!isType (name, TOKEN_IDENTIFIER))
-	{
-		deleteToken (name);
-		return;
-	}
+		goto cleanUp;
 
 	/* Add scope in case this is an INNER function */
 	addToScope(name, token->scope);
@@ -1113,6 +1110,7 @@ static void parseFunction (tokenInfo *const token)
 
 	findCmdTerm (token, FALSE, FALSE);
 
+ cleanUp:
 	vStringDelete (signature);
 	deleteToken (name);
 }
@@ -1459,6 +1457,17 @@ nextVar:
 					 *     }
 					 *
 					 */
+					if (! ( isType (name, TOKEN_IDENTIFIER)
+						|| isType (name, TOKEN_STRING) ) )
+						/*
+						 * Unexpected input. Try to reset the parsing.
+						 *
+						 * TOKEN_STRING is acceptable. e.g.:
+						 * -----------------------------------
+						 * "a".prototype = function( mode ) {}
+						 */
+						goto cleanUp;
+
 					makeClassTag (name, NULL);
 					is_class = TRUE;
 
@@ -1653,6 +1662,14 @@ nextVar:
 				}
 				else
 				{
+					if (! ( isType (name, TOKEN_IDENTIFIER)
+						|| isType (name, TOKEN_STRING) ) )
+					{
+                                                /* Unexpected input. Try to reset the parsing. */
+						vStringDelete (signature);
+						goto cleanUp;
+					}
+
 					is_class = parseBlock (token, name);
 					if ( is_class )
 						makeClassTag (name, signature);

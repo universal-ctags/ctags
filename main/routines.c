@@ -67,6 +67,8 @@
 # include "mbcs.h"
 #endif
 
+#include "options.h"
+
 /*
 *   MACROS
 */
@@ -217,7 +219,7 @@ extern void error (
 #endif
 	fputs ("\n", errout);
 	va_end (ap);
-	if (selected (selection, FATAL))
+	if (selected (selection, FATAL) || Option.fatalWarnings)
 		exit (1);
 }
 
