@@ -1,0 +1,5 @@
+/dts-v1/;
+
+label: test {
+    phandle = <0x00>    
+}

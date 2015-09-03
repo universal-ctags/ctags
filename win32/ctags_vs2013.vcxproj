@@ -110,6 +110,7 @@
     <ClCompile Include="..\main\debug.c" />
     <ClCompile Include="..\parsers\diff.c" />
     <ClCompile Include="..\parsers\dosbatch.c" />
+    <ClCompile Include="..\parsers\dts.c" />
     <ClCompile Include="..\parsers\eiffel.c" />
     <ClCompile Include="..\main\entry.c" />
     <ClCompile Include="..\parsers\erlang.c" />

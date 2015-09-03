@@ -29,6 +29,7 @@
 	CobolParser, \
 	DParser, \
 	DiffParser, \
+	DTSParser, \
 	DosBatchParser, \
 	EiffelParser, \
 	ErlangParser, \
