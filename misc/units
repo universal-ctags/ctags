@@ -565,7 +565,7 @@ run_tcase ()
 	    L_FIXED="$L_FIXED ${category}/${name}"
 	fi
 	L_PASSED="$L_PASSED ${category}/${name}"
-	run_result ok '/dev/null'
+	run_result ok '/dev/null' "\"expected.tags*\" not found"
 	return 0
     fi
 
