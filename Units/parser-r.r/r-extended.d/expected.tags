@@ -1,0 +1,3 @@
+.First	input.r	/^.First <- function() {$/;"	f
+MASS	input.r	/^  library(MASS)                         # attach a package$/;"	l
+file.path(Sys.getenv("HOME"	input.r	/^  source(file.path(Sys.getenv("HOME"), "R", "mystuff.R"))$/;"	s
