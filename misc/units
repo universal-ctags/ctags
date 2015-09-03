@@ -285,7 +285,11 @@ run_result_error ()
 
 run_result_ok ()
 {
-    printf '%b\n' $(decorate 32 "passed")
+    if [ ! -n "$1" ]; then
+	printf '%b\n' $(decorate 32 "passed")
+    else
+	printf '%b\n' $(decorate 32 "passed")" ($1)"
+    fi
 }
 
 run_result_known_error ()
@@ -561,7 +565,7 @@ run_tcase ()
 	    L_FIXED="$L_FIXED ${category}/${name}"
 	fi
 	L_PASSED="$L_PASSED ${category}/${name}"
-	run_result ok '/dev/null'
+	run_result ok '/dev/null' "\"expected.tags*\" not found"
 	return 0
     fi
 
