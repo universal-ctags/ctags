@@ -1,0 +1,25 @@
+version: 1.0.{build}
+
+environment:
+  global:
+    MSYS2_BASEVER: 20150512
+
+  matrix:
+    - compiler: msbuild
+      CONFIGURATION: Release
+    - compiler: msvc
+      ARCH: x64
+    - compiler: msvc
+      ARCH: x86
+    - compiler: mingw
+    - compiler: msys2
+      MSYS2_ARCH: x86_64
+      MSYS2_DIR: msys64
+      MSYSTEM: MINGW64
+    - compiler: cygwin
+
+build_script:
+  - '%APPVEYOR_BUILD_FOLDER%\win32\appveyor.bat'
+
+test_script:
+  - '%APPVEYOR_BUILD_FOLDER%\win32\appveyor.bat test'
