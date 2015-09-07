@@ -136,6 +136,7 @@ goto :eof
 :: ----------------------------------------------------------------------
 :: Using Cygwin, iconv enabled
 @echo on
+c:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com -l C:/cygwin/var/cache/setup -P dos2unix
 PATH c:\cygwin\bin;%PATH%
 set CHERE_INVOKING=yes
 bash -lc ""
