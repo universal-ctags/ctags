@@ -28,7 +28,27 @@
  *  C++ allows '~' in destructors.
  *  VMS allows '$' in identifiers.
  */
-#define isident1(c)  (isalpha(c) || (c) == '_' || (c) == '~' || (c) == '$')
+#define isident1(c)  ( ((c >= 0) && (c < 0x80) && isalpha(c)) \
+		       || (c) == '_' || (c) == '~' || (c) == '$')
+/* NOTE about isident1 profitability
+
+   Doing the same as isascii before passing value to isalpha
+   ----------------------------------------------------------
+   cppGetc() can return the value out of range of char.
+   cppGetc calls skipToEndOfString and skipToEndOfString can
+   return STRING_SYMBOL(== 338).
+
+   Depending on the platform, isalpha(338) returns different value .
+   As far as Fedora22, it returns 0. On Windows 2010, it returns 1.
+
+   man page on Fedora 22 says:
+
+       These functions check whether c, which must have the value of an
+       unsigned char or EOF, falls into a certain character class
+       according to the specified locale.
+
+   isascii is for suitable to verify the range of input. However, it
+   is not portable enough. */
 
 /*
 *   FUNCTION PROTOTYPES
