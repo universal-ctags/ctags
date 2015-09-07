@@ -46,6 +46,7 @@ PARSER_SOURCES =				\
 	$(PARSER_DIR)/cobol.c			\
 	$(PARSER_DIR)/diff.c			\
 	$(PARSER_DIR)/dosbatch.c		\
+	$(PARSER_DIR)/dts.c			\
 	$(PARSER_DIR)/eiffel.c			\
 	$(PARSER_DIR)/erlang.c			\
 	$(PARSER_DIR)/falcon.c			\

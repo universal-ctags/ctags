@@ -60,6 +60,9 @@
     <ClCompile Include="..\parsers\dosbatch.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\dts.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\eiffel.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
