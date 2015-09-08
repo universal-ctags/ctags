@@ -1,5 +1,8 @@
 /dts-v1/;
 
+#include "foo.dtsi"
+#define bar 98
+
 label: test {
     phandle = <0x00>    
 }
