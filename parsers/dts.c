@@ -11,11 +11,21 @@
 *   INCLUDE FILES
 */
 #include "general.h"
+#include "get.h"
 #include "parse.h"
 
 /*
 *   FUNCTION DEFINITIONS
 */
+
+typedef enum {
+	DTS_MACRO, DTS_HEADER,
+} dtsKind;
+
+static kindOption DTSKinds [] = {
+	{ TRUE,  'd', "macro",      "macro definitions"},
+	{ FALSE, 'h', "header",     "included header files"},
+};
 
 static void installDTSRegex (const langType language)
 {
@@ -28,13 +38,28 @@ static void installDTSRegex (const langType language)
 		"^[ \t]*([a-zA-Z][a-zA-Z0-9_]*)[ \t]*:", "\\1", "l,label,labels", NULL);
 }
 
+static void runCppGetc (void)
+{
+	cppInit (0, FALSE, FALSE,
+		 DTSKinds + DTS_MACRO,
+		 DTSKinds + DTS_HEADER);
+
+	while ( cppGetc() != EOF )
+		;		/* Do nothing, just read. */
+
+	cppTerminate ();
+}
+
 extern parserDefinition* DTSParser (void)
 {
 	static const char *const extensions [] = { "dts", "dtsi", NULL };
 	parserDefinition* const def = parserNew ("DTS");
+	def->kinds      = DTSKinds;
+	def->kindCount  = KIND_COUNT (DTSKinds);
 	def->extensions = extensions;
+	def->parser     = runCppGetc;
 	def->initialize = installDTSRegex;
-	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->method     = METHOD_REGEX;
 	return def;
 }
 
