@@ -200,10 +200,10 @@ static void createRTags (void)
 
 extern parserDefinition *RParser (void)
 {
-	/* *.r: R files
+	/* *.r;*.R: R files
 	 * *.s;*.q: S files
 	 */
-	static const char *const extensions[] = { "r", "s", "q", NULL };
+	static const char *const extensions[] = { "r", "R", "s", "q", NULL };
 	parserDefinition *const def = parserNew ("R");
 	def->extensions = extensions;
 	def->kinds = RKinds;
