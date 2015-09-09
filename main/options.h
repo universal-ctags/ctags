@@ -61,6 +61,8 @@ struct sInclude {
 	boolean fileNames;      /* include tags for source file names */
 	boolean qualifiedTags;  /* include tags for qualified class members */
 	boolean fileScope;      /* include tags of file scope only */
+	boolean fileNamesWithTotalLines; /* `fileNames' with
+					    total lines of the files */
 };
 
 struct sExtFields {  /* extension field content control */

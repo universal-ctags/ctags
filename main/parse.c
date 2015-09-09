@@ -1757,8 +1757,11 @@ extern void printLanguageList (void)
 
 extern void makeFileTag (const char *const fileName)
 {
-	if (Option.include.fileNames)
-	{
+	boolean via_line_directive = (strcmp (fileName, getInputFileName()) != 0);
+	if (Option.include.fileNames
+	    && (via_line_directive
+		|| ( ! Option.include.fileNamesWithTotalLines )))
+	  {
 		tagEntryInfo tag;
 		initTagEntry (&tag, baseFilename (fileName));
 
@@ -1772,6 +1775,26 @@ extern void makeFileTag (const char *const fileName)
 	}
 }
 
+static void makeEOFTag (const char *const fileName)
+{				/* TODO:xcmd */
+	if (Option.include.fileNamesWithTotalLines)
+	{
+		tagEntryInfo tag;
+
+		while (fileReadLine () != NULL)
+			;		/* Do nothing */
+
+		initTagEntry (&tag, baseFilename (fileName));
+		tag.isFileEntry     = TRUE;
+		tag.lineNumberEntry = TRUE;
+		tag.lineNumber      = getInputLineNumber ();
+		tag.filePosition    = getInputFilePosition ();
+		tag.kindName        = KIND_FILE_DEFAULT_LONG;
+		tag.kind            = getSourceLanguageFileKind();
+
+		makeTagEntry (&tag);
+	}
+}
 static rescanReason createTagsForFile (
 		const char *const fileName, const langType language,
 		const unsigned int passCount)
@@ -1799,6 +1822,8 @@ static rescanReason createTagsForFile (
 			Assert (lang->parser || lang->parser2);
 			goto retry;
 		}
+
+		makeEOFTag (fileName);
 
 		if (LanguageTable [language]->useCork)
 			uncorkTagFile();
