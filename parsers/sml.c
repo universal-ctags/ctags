@@ -14,6 +14,7 @@
 
 #include <string.h>
 
+#include "debug.h"
 #include "entry.h"
 #include "parse.h"
 #include "read.h"
@@ -31,7 +32,8 @@ typedef enum {
 	K_SIGNATURE,
 	K_STRUCTURE,
 	K_TYPE,
-	K_VAL
+	K_VAL,
+	K_COUNT			/* must be last */
 } smlKind;
 
 /*
@@ -73,6 +75,7 @@ static void makeSmlTag (smlKind type, vString *name)
 {
 	tagEntryInfo tag;
 
+	Assert (0 <= type && type < K_COUNT);
 	if (! SmlKinds [type].enabled)
 		return;
 
@@ -181,7 +184,10 @@ static void findSmlTags (void)
 				cp = skipSpace (cp);
 				cp = parseIdentifier (cp, identifier);
 				if (foundTag == K_AND)
-					makeSmlTag (lastTag, identifier);
+				{
+					if (lastTag != K_NONE)
+						makeSmlTag (lastTag, identifier);
+				}
 				else
 				{
 					makeSmlTag (foundTag, identifier);
