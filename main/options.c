@@ -131,6 +131,7 @@ optionValues Option = {
 		FALSE,  /* --extra=f */
 		FALSE,  /* --extra=q */
 		TRUE,   /* --file-scope */
+		FALSE,	/* --extra=. */
 	},
 	{
 		FALSE,  /* -fields=a */
@@ -254,7 +255,7 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Uses the specified type of EX command to locate tags [mix]."},
 #endif
  {1,"  --extra=[+|-]flags"},
- {1,"      Include extra tag entries for selected information (flags: \"fq\")."},
+ {1,"      Include extra tag entries for selected information (flags: \"fq.\")."},
  {1,"  --fields=[+|-]flags"},
  {1,"      Include selected extension fields (flags: \"afmikKlnsStz\") [fks]."},
  {1,"  --file-scope=[yes|no]"},
@@ -617,10 +618,11 @@ extern void checkOptions (void)
 	if (Option.xref)
 	{
 		notice = "xref output";
-		if (Option.include.fileNames)
+		if (Option.include.fileNames || Option.include.fileNamesWithTotalLines)
 		{
 			error (WARNING, "%s disables file name tags", notice);
 			Option.include.fileNames = FALSE;
+			Option.include.fileNamesWithTotalLines = FALSE;
 		}
 	}
 	if (Option.append)
@@ -1043,6 +1045,7 @@ static void processExtraTagsOption (
 #if 0
 		inc->fileScope     = FALSE;
 #endif
+		inc->fileNamesWithTotalLines = FALSE;
 	}
 	while ((c = *p++) != '\0') switch (c)
 	{
@@ -1054,6 +1057,7 @@ static void processExtraTagsOption (
 #if 0
 		case 'F': inc->fileScope     = mode;  break;
 #endif
+		case '.': inc->fileNamesWithTotalLines = mode; break;
 
 		default: error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
 					   c, option);
