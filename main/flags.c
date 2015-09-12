@@ -73,3 +73,32 @@ void flagsEval (const char* flags, flagDefinition* defs, unsigned int ndefs, voi
 				defs[j].shortProc(flags[i], data);
 	}
 }
+
+void  flagPrintHelp (flagDefinition* def, unsigned int ndefs)
+{
+
+	unsigned int i;
+	const char *longStr;
+	const char *description;
+	const char *paramName;
+	char shortChar[3];
+	for ( i = 0; i < ndefs; ++i )
+	{
+		longStr = def[i].longStr? def[i].longStr: "";
+		description = def[i].description? def[i].description: "";
+		paramName = def[i].paramName;
+
+		if (def[i].shortChar == '\0')
+			strcpy (shortChar, "\\0");
+		else
+		{
+			shortChar[0] = def[i].shortChar;
+			shortChar[1] = '\0';
+		}
+
+		if (paramName)
+			printf ("%s\t%s=%s\t%s\n", shortChar, longStr, paramName, description);
+		else
+			printf ("%s\t%s\t%s\n", shortChar, longStr, description);
+	}
+}

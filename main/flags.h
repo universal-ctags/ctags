@@ -19,9 +19,11 @@ typedef struct {
 	const char *longStr;
 	void (* shortProc) (char c,  void *data);
 	void (* longProc)  (const char* const s, const char* const param, void *data);
-  /* TODO: handler for help message */
+	const char *paramName;
+	const char *description;
 } flagDefinition;
 
 extern void flagsEval (const char* flags, flagDefinition* defs, unsigned int ndefs, void* data);
+extern void flagPrintHelp (flagDefinition* def, unsigned int ndefs);
 
 #endif	/* _FLAGS_H */

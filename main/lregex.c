@@ -253,7 +253,8 @@ static void pre_ptrn_flag_exclusive_long (const char* const s __unused__, const 
 }
 
 static flagDefinition prePtrnFlagDef[] = {
-	{ 'x',  "exclusive", pre_ptrn_flag_exclusive_short, pre_ptrn_flag_exclusive_long },
+	{ 'x',  "exclusive", pre_ptrn_flag_exclusive_short, pre_ptrn_flag_exclusive_long ,
+	  NULL, "skip testing the other patterns if a line is matched to this pattern"},
 };
 
 static kindOption *kindNew ()
@@ -412,17 +413,21 @@ static void regex_flag_icase_long (const char* s __unused__, const char* const u
 }
 
 
+static flagDefinition regexFlagDefs[] = {
+	{ 'b', "basic",  regex_flag_basic_short,  regex_flag_basic_long,
+	  NULL, "interpreted as a Posix basic regular expression."},
+	{ 'e', "extend", regex_flag_extend_short, regex_flag_extend_long,
+	  NULL, "interpreted as a Posix extended regular expression (default)"},
+	{ 'i', "icase",  regex_flag_icase_short,  regex_flag_icase_long,
+	  NULL, "applied in a case-insensitive manner"},
+};
+
 static regex_t* compileRegex (const char* const regexp, const char* const flags)
 {
 	int cflags = REG_EXTENDED | REG_NEWLINE;
 	regex_t *result = NULL;
 	int errcode;
 
-	flagDefinition regexFlagDefs[] = {
-		{ 'b', "basic",  regex_flag_basic_short,  regex_flag_basic_long  },
-		{ 'e', "extend", regex_flag_extend_short, regex_flag_extend_long },
-		{ 'i', "icase",  regex_flag_icase_short,  regex_flag_icase_long  },
-	};
 	flagsEval (flags,
 		   regexFlagDefs,
 		   COUNT(regexFlagDefs),
@@ -916,6 +921,14 @@ extern void printRegexKinds (const langType language __unused__,
 		const char* const langName = getLanguageName (language);
 		printRegexKindsInPatternSet (set, langName, allKindFields, indent);
 	}
+#endif
+}
+
+extern void printRegexFlags (void)
+{
+#ifdef HAVE_REGEX
+	flagPrintHelp (regexFlagDefs,  COUNT (regexFlagDefs));
+	flagPrintHelp (prePtrnFlagDef, COUNT (prePtrnFlagDef));
 #endif
 }
 
