@@ -1075,7 +1075,10 @@ extern void uncorkTagFile(void)
 
 extern tagEntryInfo *getEntryInCorkQueue   (unsigned int n)
 {
-	return TagFile.corkQueue.queue + n;
+	if ((SCOPE_NIL < n) && (n < TagFile.corkQueue.count))
+		return TagFile.corkQueue.queue + n;
+	else
+		return NULL;
 }
 
 extern size_t        countEntryInCorkQueue (void)
