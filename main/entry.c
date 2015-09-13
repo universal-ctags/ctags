@@ -1024,6 +1024,9 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 {
 	int length = 0;
 
+	if (tag->placeholder)
+		return;
+
 	DebugStatement ( debugEntry (tag); )
 	if (Option.xref)
 		length = writeXrefEntry (tag);

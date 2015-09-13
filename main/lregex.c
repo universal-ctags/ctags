@@ -68,6 +68,7 @@ enum scopeAction {
 	SCOPE_POP     = 1UL << 1,
 	SCOPE_PUSH    = 1UL << 2,
 	SCOPE_CLEAR   = 1UL << 3,
+	SCOPE_PLACEHOLDER = 1UL << 4,
 };
 
 typedef struct {
@@ -143,7 +144,7 @@ static void clearPatternSet (const langType language)
 */
 
 static int makeRegexTag (
-		const vString* const name, const kindOption* const kind, int scopeIndex)
+		const vString* const name, const kindOption* const kind, int scopeIndex, int placeholder)
 {
 	if (kind->enabled)
 	{
@@ -152,6 +153,7 @@ static int makeRegexTag (
 		Assert (kind != NULL);
 		initTagEntry (&e, vStringValue (name), kind);
 		e.extensionFields.scopeIndex = scopeIndex;
+		e.placeholder = (boolean)!!placeholder;
 		return makeTagEntry (&e);
 	}
 	else
@@ -288,9 +290,18 @@ static void scope_ptrn_flag_eval (const char* const f  __unused__,
 		error (FATAL, "Unexpected value for scope flag in regex definition: scope=%s", v);
 }
 
+static void placeholder_ptrn_flag_eval (const char* const f  __unused__,
+				     const char* const v  __unused__, void* data)
+{
+	unsigned long *bfields = data;
+	*bfields |= SCOPE_PLACEHOLDER;
+}
+
 static flagDefinition scopePtrnFlagDef[] = {
 	{ '\0', "scope",     NULL, scope_ptrn_flag_eval,
 	  "ACTION", "use scope stack: ACTION = ref|push|pop|clear|set"},
+	{ '\0', "placeholder",  NULL, placeholder_ptrn_flag_eval,
+	  NULL, "don't put this tag to tags file."},
 };
 
 static kindOption *kindNew ()
@@ -623,37 +634,53 @@ static void matchTagPattern (const vString* const line,
 {
 	vString *const name = substitute (vStringValue (line),
 			patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch);
+	boolean placeholder = !!((patbuf->scopeActions & SCOPE_PLACEHOLDER) == SCOPE_PLACEHOLDER);
+	unsigned long scope = SCOPE_NIL;
+	int n;
+
 	vStringStripLeading (name);
 	vStringStripTrailing (name);
-	if (vStringLength (name) > 0)
-	{
-		unsigned long scope = SCOPE_NIL;
-		int n;
 
-		if (patbuf->scopeActions & SCOPE_REF)
-			scope = currentScope;
-		if (patbuf->scopeActions & SCOPE_CLEAR)
-			currentScope = SCOPE_NIL;
-		if (patbuf->scopeActions & SCOPE_POP)
-		{
-			tagEntryInfo *entry = getEntryInCorkQueue (currentScope);
-			currentScope = entry? entry->extensionFields.scopeIndex: SCOPE_NIL;
-		}
-		n = makeRegexTag (name, patbuf->u.tag.kind, scope);
-		if (patbuf->scopeActions & SCOPE_PUSH)
-			currentScope = n;
+	if (patbuf->scopeActions & SCOPE_REF)
+	{
+		tagEntryInfo *entry;
+
+		scope = currentScope;
+		while ((entry = getEntryInCorkQueue (scope)) && entry->placeholder)
+			/* Look at parent */
+			scope = entry->extensionFields.scopeIndex;
 	}
-	else if (!accept_null)
-		error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
-			getInputFileName (), getInputLineNumber (),
-			patbuf->u.tag.name_pattern);
-	else if (patbuf->scopeActions & SCOPE_CLEAR)
+	if (patbuf->scopeActions & SCOPE_CLEAR)
 		currentScope = SCOPE_NIL;
-	else if (patbuf->scopeActions & SCOPE_POP)
+	if (patbuf->scopeActions & SCOPE_POP)
 	{
 		tagEntryInfo *entry = getEntryInCorkQueue (currentScope);
 		currentScope = entry? entry->extensionFields.scopeIndex: SCOPE_NIL;
 	}
+
+	if (vStringLength (name) == 0)
+	{
+		if (accept_null)
+		{
+			if (placeholder)
+				n = makeRegexTag (name, patbuf->u.tag.kind, scope, placeholder);
+			else
+				n = SCOPE_NIL;
+
+		}
+		else
+		{
+			error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
+			       getInputFileName (), getInputLineNumber (),
+			       patbuf->u.tag.name_pattern);
+			n = SCOPE_NIL;
+		}
+	}
+	else
+		n = makeRegexTag (name, patbuf->u.tag.kind, scope, placeholder);
+
+	if (patbuf->scopeActions & SCOPE_PUSH)
+		currentScope = n;
 
 	vStringDelete (name);
 }
