@@ -65,7 +65,7 @@ do_subst = sed                                          \
       -e 's,[@]includedir[@],$(includedir),g'
 
 oniguruma.pc: $(srcdir)/oniguruma.pc.in Makefile
-	$(do_subst) < $(<) > $(@)
+	$(do_subst) < $(srcdir)/oniguruma.pc.in > $(@)
 
 pkgconfigdir   = $(libdir)/pkgconfig
 pkgconfig_DATA = oniguruma.pc
