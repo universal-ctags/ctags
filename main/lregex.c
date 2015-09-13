@@ -38,6 +38,7 @@
 #include "routines.h"
 
 static boolean regexAvailable = FALSE;
+static unsigned long currentScope = SCOPE_NIL;
 
 #if defined (HAVE_REGEX) && !defined (REGCOMP_BROKEN)
 
@@ -62,6 +63,13 @@ union cptr {
 
 enum pType { PTRN_TAG, PTRN_CALLBACK };
 
+enum scopeAction {
+	SCOPE_REF     = 1UL << 0,
+	SCOPE_POP     = 1UL << 1,
+	SCOPE_PUSH    = 1UL << 2,
+	SCOPE_CLEAR   = 1UL << 3,
+};
+
 typedef struct {
 	regex_t *pattern;
 	enum pType type;
@@ -76,6 +84,7 @@ typedef struct {
 			regexCallback function;
 		} callback;
 	} u;
+	unsigned int scopeActions;
 } regexPattern;
 
 
@@ -133,8 +142,8 @@ static void clearPatternSet (const langType language)
 *   Regex pseudo-parser
 */
 
-static void makeRegexTag (
-		const vString* const name, const kindOption* const kind)
+static int makeRegexTag (
+		const vString* const name, const kindOption* const kind, int scopeIndex)
 {
 	if (kind->enabled)
 	{
@@ -142,8 +151,11 @@ static void makeRegexTag (
 		Assert (name != NULL  &&  vStringLength (name) > 0);
 		Assert (kind != NULL);
 		initTagEntry (&e, vStringValue (name), kind);
-		makeTagEntry (&e);
+		e.extensionFields.scopeIndex = scopeIndex;
+		return makeTagEntry (&e);
 	}
+	else
+		return SCOPE_NIL;
 }
 
 /*
@@ -257,6 +269,30 @@ static flagDefinition prePtrnFlagDef[] = {
 	  NULL, "skip testing the other patterns if a line is matched to this pattern"},
 };
 
+static void scope_ptrn_flag_eval (const char* const f  __unused__,
+				  const char* const v, void* data)
+{
+	unsigned long *bfields = data;
+
+	if (strcmp (v, "ref") == 0)
+		*bfields |= SCOPE_REF;
+	else if (strcmp (v, "push") == 0)
+		*bfields |= (SCOPE_PUSH | SCOPE_REF);
+	else if (strcmp (v, "pop") == 0)
+		*bfields |= SCOPE_POP;
+	else if (strcmp (v, "clear") == 0)
+		*bfields |= SCOPE_CLEAR;
+	else if (strcmp (v, "set") == 0)
+		*bfields |= (SCOPE_CLEAR | SCOPE_PUSH);
+	else
+		error (FATAL, "Unexpected value for scope flag in regex definition: scope=%s", v);
+}
+
+static flagDefinition scopePtrnFlagDef[] = {
+	{ '\0', "scope",     NULL, scope_ptrn_flag_eval,
+	  "ACTION", "use scope stack: ACTION = ref|push|pop|clear|set"},
+};
+
 static kindOption *kindNew ()
 {
 	kindOption *kind = xMalloc (1, kindOption);
@@ -343,8 +379,10 @@ static regexPattern *addCompiledTagPattern (
 {
 	regexPattern * ptrn;
 	boolean exclusive = FALSE;
+	unsigned long scopeActions = 0UL;
 
 	flagsEval (flags, prePtrnFlagDef, COUNT(prePtrnFlagDef), &exclusive);
+	flagsEval (flags, scopePtrnFlagDef, COUNT(scopePtrnFlagDef), &scopeActions);
 	if (*name == '\0' && exclusive && kind == KIND_REGEX_DEFAULT)
 	{
 		kind = KIND_GHOST;
@@ -354,6 +392,7 @@ static regexPattern *addCompiledTagPattern (
 	ptrn->type    = PTRN_TAG;
 	ptrn->u.tag.name_pattern = eStrdup (name);
 	ptrn->exclusive = exclusive;
+	ptrn->scopeActions = scopeActions;
 	if (ptrn->u.tag.kind->letter == '\0')
 	{
 		/* This is a newly registered kind. */
@@ -587,11 +626,35 @@ static void matchTagPattern (const vString* const line,
 	vStringStripLeading (name);
 	vStringStripTrailing (name);
 	if (vStringLength (name) > 0)
-		makeRegexTag (name, patbuf->u.tag.kind);
+	{
+		unsigned long scope = SCOPE_NIL;
+		int n;
+
+		if (patbuf->scopeActions & SCOPE_REF)
+			scope = currentScope;
+		if (patbuf->scopeActions & SCOPE_CLEAR)
+			currentScope = SCOPE_NIL;
+		if (patbuf->scopeActions & SCOPE_POP)
+		{
+			tagEntryInfo *entry = getEntryInCorkQueue (currentScope);
+			currentScope = entry? entry->extensionFields.scopeIndex: SCOPE_NIL;
+		}
+		n = makeRegexTag (name, patbuf->u.tag.kind, scope);
+		if (patbuf->scopeActions & SCOPE_PUSH)
+			currentScope = n;
+	}
 	else if (!accept_null)
 		error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
 			getInputFileName (), getInputLineNumber (),
 			patbuf->u.tag.name_pattern);
+	else if (patbuf->scopeActions & SCOPE_CLEAR)
+		currentScope = SCOPE_NIL;
+	else if (patbuf->scopeActions & SCOPE_POP)
+	{
+		tagEntryInfo *entry = getEntryInCorkQueue (currentScope);
+		currentScope = entry? entry->extensionFields.scopeIndex: SCOPE_NIL;
+	}
+
 	vStringDelete (name);
 }
 
@@ -669,9 +732,24 @@ extern boolean matchRegex (const vString* const line, const langType language)
 
 extern void findRegexTags (void)
 {
+	currentScope = SCOPE_NIL;
 	/* merely read all lines of the file */
 	while (fileReadLine () != NULL)
 		;
+}
+
+extern boolean hasScopeActionInRegex (const langType language)
+{
+	boolean r = FALSE;
+#ifdef HAVE_REGEX
+	unsigned int i;
+
+	if (language <= SetUpper  &&  Sets [language].count > 0)
+		for (i = 0; i < Sets [language].count; i++)
+			if (Sets[language].patterns[i].scopeActions)
+				r= TRUE;
+#endif
+	return r;
 }
 
 static regexPattern *addTagRegexInternal (
@@ -930,6 +1008,7 @@ extern void printRegexFlags (void)
 #ifdef HAVE_REGEX
 	flagPrintHelp (regexFlagDefs,  COUNT (regexFlagDefs));
 	flagPrintHelp (prePtrnFlagDef, COUNT (prePtrnFlagDef));
+	flagPrintHelp (scopePtrnFlagDef, COUNT (scopePtrnFlagDef));
 #endif
 }
 

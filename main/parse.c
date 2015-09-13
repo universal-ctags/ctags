@@ -1204,6 +1204,8 @@ static void initializeParser (parserDefinition *const parser, langType lang)
 	{
 		parser->initialize (lang);
 		parser->initialize = NULL;
+		if (hasScopeActionInRegex (lang))
+			parser->useCork = TRUE;
 	}
 
 	Assert (parser->fileKind != KIND_NULL);
@@ -1307,7 +1309,11 @@ static void lazyInitialize (langType language)
 	lang->parser = doNothing;
 
 	if (lang->method & (METHOD_NOT_CRAFTED|METHOD_REGEX))
+	{
+		if (hasScopeActionInRegex (language))
+			lang->useCork = TRUE;
 		lang->parser = findRegexTags;
+	}
 
 }
 #endif
