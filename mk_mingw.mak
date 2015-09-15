@@ -37,21 +37,21 @@ SILENT_0 = @
 SILENT_1 =
 
 V_CC	 = $(V_CC_$(V))
-V_CC_0	 = @echo [CC] $@; $(CC)
-V_CC_1	 = $(CC)
+V_CC_0	 = @echo [CC] $@;
+V_CC_1	 =
 
 
 .c.o:
-	$(V_CC) -c $(OPT) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
+	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
 
 ctags: ctags.exe
 dctags: dctags.exe
 
 ctags.exe dctags.exe: $(OBJECTS) $(HEADERS) $(REGEX_HEADERS) $(FNMATCH_HEADERS)
-	$(V_CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(OBJECTS) $(LIBS)
+	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(OBJECTS) $(LIBS)
 
 readtags.exe: readtags.c
-	$(V_CC) $(OPT) $(CFLAGS) -DREADTAGS_MAIN $(DEFINES) $(INCLUDES) -o $@ $<
+	$(V_CC) $(CC) $(OPT) $(CFLAGS) -DREADTAGS_MAIN $(DEFINES) $(INCLUDES) -o $@ $<
 
 clean:
 	$(SILENT) echo Cleaning

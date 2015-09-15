@@ -168,8 +168,8 @@ SILENT_0 = @
 SILENT_1 =
 
 V_CC	 = $(V_CC_$(V))
-V_CC_0	 = @echo [CC] $@; $(CC)
-V_CC_1	 = $(CC)
+V_CC_0	 = @echo [CC] $@;
+V_CC_1	 =
 
 #
 # primary rules
@@ -177,10 +177,10 @@ V_CC_1	 = $(CC)
 all: $(CTAGS_EXEC) $(READ_LIB) $(READ_CMD)
 
 $(CTAGS_EXEC): $(OBJECTS)
-	$(V_CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
+	$(V_CC) $(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 $(READ_CMD): readtags.c readtags.h
-	$(V_CC) -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(srcdir)/readtags.c
+	$(V_CC) $(CC) -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(srcdir)/readtags.c
 
 $(OBJECTS): $(HEADERS) config.h Makefile
 
@@ -369,7 +369,7 @@ maintainerclean: distclean
 #
 .c.$(OBJEXT):
 	$(SILENT) dir="$$(dirname $@)"; [ -d "$$dir" ] || $(MKDIR_P) "$$dir"
-	$(V_CC) -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -o $@ -c $<
+	$(V_CC) $(CC) -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -o $@ -c $<
 $(addsuffix .$(OBJEXT),$(basename $(notdir $(REGEX_SOURCES)))): ALL_CPPFLAGS += \
 	-D_GNU_SOURCE -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1
 
