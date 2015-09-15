@@ -55,9 +55,7 @@ extern int makeSimpleTag (
 	if (kinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
 	{
 	    tagEntryInfo e;
-	    initTagEntry (&e, vStringValue (name));
-
-	    e.kind     = & (kinds [kind]);
+	    initTagEntry (&e, vStringValue (name), & kinds [kind]);
 
 	    r = makeTagEntry (&e);
 	}
@@ -1795,16 +1793,17 @@ extern void makeFileTag (const char *const fileName)
 		tagEntryInfo tag;
 		kindOption  *kind;
 
-		initTagEntry (&tag, baseFilename (fileName));
+		kind = getSourceLanguageFileKind();
+		Assert (kind);
+		kind->enabled = Option.include.fileNames;
+
+		/* TODO: you can return here if enabled == FALSE. */
+
+		initTagEntry (&tag, baseFilename (fileName), kind);
 
 		tag.isFileEntry     = TRUE;
 		tag.lineNumberEntry = TRUE;
 
-		kind = getSourceLanguageFileKind();
-		Assert (kind);
-		kind->enabled = Option.include.fileNames;
-		/* TODO: you can return here if enabled == FALSE. */
-	        tag.kind            = kind;
 		if (via_line_directive || Option.include.fileNames)
 		{
 			tag.lineNumber = 1;

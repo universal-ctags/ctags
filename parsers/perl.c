@@ -196,15 +196,13 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 	Assert(e - b + 1 > 0);
 	vStringClear(name);
 	vStringNCatS(name, b, e - b + 1);
-	initTagEntry(&entry, vStringValue(name));
-	entry.kind = &(PerlKinds[K_CONSTANT]);
+	initTagEntry(&entry, vStringValue(name), &(PerlKinds[K_CONSTANT]));
 	makeTagEntry(&entry);
 	if (Option.include.qualifiedTags && package && vStringLength(package)) {
 		vStringClear(name);
 		vStringCopy(name, package);
 		vStringNCatS(name, b, e - b + 1);
-		initTagEntry(&entry, vStringValue(name));
-		entry.kind = &(PerlKinds[K_CONSTANT]);
+		initTagEntry(&entry, vStringValue(name), &(PerlKinds[K_CONSTANT]));
 		makeTagEntry(&entry);
 	}
 }
@@ -472,7 +470,7 @@ static void findPerlTags (void)
 				 * isSubroutineDeclaration() may consume several lines.  So
 				 * we record line positions.
 				 */
-				initTagEntry(&e, vStringValue(name));
+				initTagEntry(&e, vStringValue(name), NULL);
 
 				if (TRUE == isSubroutineDeclaration(cp)) {
 					if (TRUE == PerlKinds[K_SUBROUTINE_DECLARATION].enabled) {

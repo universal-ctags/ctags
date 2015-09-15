@@ -79,8 +79,7 @@ static void makeSmlTag (smlKind type, vString *name)
 	if (! SmlKinds [type].enabled)
 		return;
 
-	initTagEntry (&tag, vStringValue (name));
-	tag.kind = &(SmlKinds [type]);
+	initTagEntry (&tag, vStringValue (name), &(SmlKinds [type]));
 	makeTagEntry (&tag);
 }
 

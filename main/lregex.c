@@ -141,8 +141,7 @@ static void makeRegexTag (
 		tagEntryInfo e;
 		Assert (name != NULL  &&  vStringLength (name) > 0);
 		Assert (kind != NULL);
-		initTagEntry (&e, vStringValue (name));
-		e.kind     = kind;
+		initTagEntry (&e, vStringValue (name), kind);
 		makeTagEntry (&e);
 	}
 }

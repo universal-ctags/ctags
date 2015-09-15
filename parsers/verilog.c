@@ -558,9 +558,9 @@ static void createTag (tokenInfo *const token)
 			token->lineNumber,
 			getSourceLanguageName (),
 			token->filePosition,
-			getSourceFileTagPath ()
+			getSourceFileTagPath (),
+			kindFromKind (token->kind)
 			);
-	tag.kind        = kindFromKind (token->kind);
 	verbose ("Adding tag %s (kind %d)", vStringValue (token->name), token->kind);
 	if (currentContext->kind != K_UNDEFINED)
 	{

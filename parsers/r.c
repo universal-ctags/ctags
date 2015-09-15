@@ -45,11 +45,10 @@ static kindOption RKinds[KIND_COUNT] = {
 static void makeRTag (const vString * const name, rKind kind)
 {
 	tagEntryInfo e;
-	initTagEntry (&e, vStringValue (name));
 
 	Assert (kind < KIND_COUNT);
 
-	e.kind = &(RKinds[kind]);
+	initTagEntry (&e, vStringValue (name), &(RKinds[kind]));
 
 	makeTagEntry (&e);
 }

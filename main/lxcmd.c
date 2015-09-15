@@ -1029,9 +1029,9 @@ static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 			  entry->address.lineNumber,
 			  entryLookupField(entry, "language", TRUE),
 			  filePosition,
-			  entry->file);
+			  entry->file,
+			  entry->kind);
 
-	tag.kind = entry->kind;
 	tag.pattern = entry->address.pattern;
 
 	tag.isFileScope = (boolean)entry->fileScope;

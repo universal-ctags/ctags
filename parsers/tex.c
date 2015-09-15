@@ -272,11 +272,10 @@ static void makeTexTag (tokenInfo *const token, texKind kind)
 		vString *parentKind = vStringNew();
 		vString *parentName = vStringNew();
 		tagEntryInfo e;
-		initTagEntry (&e, name);
+		initTagEntry (&e, name, &(TexKinds [kind]));
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
-		e.kind	       = &(TexKinds [kind]);
 
 		getScopeInfo(kind, parentKind, parentName);
 		if (vStringLength(parentKind) > 0) {

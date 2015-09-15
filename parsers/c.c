@@ -1382,13 +1382,11 @@ static void makeTag (const tokenInfo *const token,
 		vString *typeRef = vStringNew ();
 		tagEntryInfo e;
 
-		initTagEntry (&e, vStringValue (token->name));
+		initTagEntry (&e, vStringValue (token->name), kindForType (type));
 
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
 		e.isFileScope	= isFileScope;
-
-		e.kind          = kindForType (type);
 
 		isScopeBuilt = findScopeHierarchy (scope, st);
 		addOtherFields (&e, type, st, scope, typeRef);

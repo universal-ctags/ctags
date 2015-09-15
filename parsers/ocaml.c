@@ -885,8 +885,7 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, ocamlKind kind)
 {
 	int parentIndex;
 
-	initTagEntry (tag, vStringValue (name));
-	tag->kind = &(OcamlKinds[kind]);
+	initTagEntry (tag, vStringValue (name), &(OcamlKinds[kind]));
 
 	if (kind == K_MODULE)
 	{

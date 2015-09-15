@@ -112,12 +112,14 @@ extern void closeTagFile (const boolean resize);
 extern void beginEtagsFile (void);
 extern void endEtagsFile (const char *const name);
 extern int makeTagEntry (const tagEntryInfo *const tag);
-extern void initTagEntry (tagEntryInfo *const e, const char *const name);
+extern void initTagEntry (tagEntryInfo *const e, const char *const name,
+			  const kindOption *kind);
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
 			      const char* language,
 			      fpos_t      filePosition,
-			      const char *sourceFileName);
+			      const char *sourceFileName,
+			      const kindOption *kind);
 
 /* language is optional: can be NULL. */
 extern void writePseudoTag (const char *const tagName,

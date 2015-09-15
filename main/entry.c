@@ -1098,20 +1098,23 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	return r;
 }
 
-extern void initTagEntry (tagEntryInfo *const e, const char *const name)
+extern void initTagEntry (tagEntryInfo *const e, const char *const name,
+			  const kindOption *kind)
 {
 	initTagEntryFull(e, name,
 			 getSourceLineNumber (),
 			 getSourceLanguageName (),
 			 getInputFilePosition (),
-			 getSourceFileTagPath ());
+			 getSourceFileTagPath (),
+			 kind);
 }
 
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
 			      const char* language,
 			      fpos_t      filePosition,
-			      const char *sourceFileName)
+			      const char *sourceFileName,
+			      const kindOption *kind)
 {
 	Assert (File.source.name != NULL);
 	Assert (name == NULL || strchr (name, '\t') == NULL);
@@ -1124,6 +1127,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->sourceFileName  = sourceFileName;
 	e->name            = name;
 	e->extensionFields.scopeIndex     = SCOPE_NIL;
+	e->kind = kind;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

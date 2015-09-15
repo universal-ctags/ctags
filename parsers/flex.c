@@ -258,11 +258,10 @@ static void makeConstTag (tokenInfo *const token, const flexKind kind)
 	{
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
-		initTagEntry (&e, name);
+		initTagEntry (&e, name, &(FlexKinds [kind]));
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
-		e.kind	       = &(FlexKinds [kind]);
 
 		makeTagEntry (&e);
 	}

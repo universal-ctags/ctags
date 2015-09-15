@@ -211,7 +211,7 @@ static void emitRubyTag (vString* name, rubyKind kind)
 	else
 		unqualified_name = qualified_name;
 
-	initTagEntry (&tag, unqualified_name);
+	initTagEntry (&tag, unqualified_name, &(RubyKinds [kind]));
 	if (vStringLength (scope) > 0) {
 		Assert (0 <= parent_kind &&
 		        (size_t) parent_kind < (sizeof RubyKinds / sizeof RubyKinds[0]));
@@ -219,7 +219,6 @@ static void emitRubyTag (vString* name, rubyKind kind)
 		tag.extensionFields.scopeKind = &(RubyKinds [parent_kind]);
 		tag.extensionFields.scopeName = vStringValue (scope);
 	}
-	tag.kind = &(RubyKinds [kind]);
 	makeTagEntry (&tag);
 
 	nestingLevelsPush (nesting, name, kind);

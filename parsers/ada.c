@@ -404,7 +404,7 @@ static adaTokenInfo *newAdaToken(const char *name, int len, adaKind kind,
   }
 
   /* init the tag */
-  initTagEntry(&token->tag, tmpName);
+  initTagEntry(&token->tag, tmpName, NULL);
 
   token->kind = kind;
   token->isSpec = isSpec;

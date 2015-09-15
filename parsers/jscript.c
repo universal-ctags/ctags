@@ -257,11 +257,10 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const
 			name = p + 1;
 		}
 
-		initTagEntry (&e, name);
+		initTagEntry (&e, name, &(JsKinds [kind]));
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
-		e.kind	       = &(JsKinds [kind]);
 
 		if ( vStringLength(fullscope) > 0 )
 		{

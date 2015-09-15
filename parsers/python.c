@@ -120,9 +120,8 @@ static void makeFunctionTag (vString *const function,
 	if (! PythonKinds[K_FUNCTION].enabled)
 		return;
 
-	initTagEntry (&tag, vStringValue (function));
+	initTagEntry (&tag, vStringValue (function), &(PythonKinds[K_FUNCTION]));
 
-	tag.kind = &(PythonKinds[K_FUNCTION]);
 	tag.extensionFields.signature = arglist;
 
 	if (vStringLength (parent) > 0)
@@ -157,8 +156,7 @@ static void makeClassTag (vString *const class, vString *const inheritance,
 	if (! PythonKinds[K_CLASS].enabled)
 		return;
 
-	initTagEntry (&tag, vStringValue (class));
-	tag.kind = &(PythonKinds[K_CLASS]);
+	initTagEntry (&tag, vStringValue (class), &(PythonKinds[K_CLASS]));
 	if (vStringLength (parent) > 0)
 	{
 		if (is_class_parent)
@@ -186,8 +184,7 @@ static void makeVariableTag (vString *const var, vString *const parent,
 	if (! PythonKinds[K_VARIABLE].enabled)
 		return;
 
-	initTagEntry (&tag, vStringValue (var));
-	tag.kind = &(PythonKinds[K_VARIABLE]);
+	initTagEntry (&tag, vStringValue (var), &(PythonKinds[K_VARIABLE]));
 	if (vStringLength (parent) > 0)
 	{
 		tag.extensionFields.scopeKind = &(PythonKinds[K_CLASS]);
