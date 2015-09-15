@@ -709,6 +709,15 @@ static regexPattern *addTagRegexInternal (
 				eFree (description);
 		}
 	}
+
+	if (*name == '\0')
+	{
+		if (rptr->exclusive)
+			rptr->ignore = TRUE;
+		else
+			error (WARNING, "%s: regexp missing name pattern", regex);
+	}
+
 	return rptr;
 }
 
@@ -753,15 +762,7 @@ extern void addLanguageRegex (
 		char *name, *kinds, *flags;
 		if (parseTagRegex (regex_pat, &name, &kinds, &flags))
 		{
-			regexPattern * r;
-			r = addTagRegexInternal (language, regex_pat, name, kinds, flags);
-			if (*name == '\0')
-			{
-				if (r->exclusive)
-					r->ignore = TRUE;
-				else
-					error (WARNING, "%s: regexp missing name pattern", regex);
-			}
+			addTagRegexInternal (language, regex_pat, name, kinds, flags);
 			eFree (regex_pat);
 		}
 	}
