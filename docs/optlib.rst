@@ -348,7 +348,7 @@ Passing parameter for long regex flag
 In the implemented API long-flags can take a parameters.
 Conceptual example::
 
-	--regexー<LANG>=/regexp1/replacement/kind-spec/{transformer=uppercase}
+	--regex-<LANG>=/regexp1/replacement/kind-spec/{transformer=uppercase}
 	--regex-<LANG>=/regexp2/replacement/kind-spec/{transformer=lowercase}
 	--regex-<LANG>=/regexp2/replacement/kind-spec/{transformer=capitalize}
 
