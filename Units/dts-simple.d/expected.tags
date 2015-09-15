@@ -1,4 +1,4 @@
-0x00	input.dts	/^    phandle = <0x00>    $/;"	p
+0x00	input.dts	/^    phandle = <0x00>    $/;"	p	label:label
 bar	input.dts	/^#define bar /;"	d	file:
 foo.dtsi	input.dts	/^#include "foo.dtsi"/;"	h
 label	input.dts	/^label: test {$/;"	l
