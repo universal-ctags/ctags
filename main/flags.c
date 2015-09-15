@@ -20,15 +20,17 @@
 #include "vstring.h"
 #include "routines.h"
 
-void flagsEval (const char* flags, flagDefinition* defs, unsigned int ndefs, void* data)
+void flagsEval (const char* flags_original, flagDefinition* defs, unsigned int ndefs, void* data)
 {
 	unsigned int i, j;
+	char *flags;
 
-	if (!flags)
+	if (!flags_original)
 		return;
 	if (!defs)
 		return;
 
+	flags = eStrdup (flags_original);
 	for (i = 0 ; flags [i] != '\0' ; ++i)
 	{
 		if (flags [i] == LONG_FLAGS_OPEN)
@@ -72,6 +74,7 @@ void flagsEval (const char* flags, flagDefinition* defs, unsigned int ndefs, voi
 			if (flags[i] == defs[j].shortChar)
 				defs[j].shortProc(flags[i], data);
 	}
+	eFree (flags);
 }
 
 void  flagPrintHelp (flagDefinition* def, unsigned int ndefs)
