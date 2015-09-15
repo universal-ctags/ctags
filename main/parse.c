@@ -1527,7 +1527,7 @@ extern void printLanguageFileKind (const langType language)
 		printf ("%c\n", LanguageTable [language]->fileKind);
 }
 
-static void printLanguageKind (const kindOption* const kind, boolean allKindFields, boolean indent)
+extern void printKind (const kindOption* const kind, boolean allKindFields, boolean indent)
 {
 	if (allKindFields)
 	{
@@ -1558,7 +1558,7 @@ static void printKinds (langType language, boolean allKindFields, boolean indent
 		{
 			if (allKindFields && indent)
 				printf ("%s", lang->name);
-			printLanguageKind (lang->kinds + i, allKindFields, indent);
+			printKind (lang->kinds + i, allKindFields, indent);
 		}
 	}
 	printRegexKinds (language, allKindFields, indent);

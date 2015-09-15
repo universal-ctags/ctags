@@ -492,28 +492,6 @@ struct printRegexKindCBData{
 	boolean indent;
 };
 
-static void printRegexKind (char kind_letter, kindOption *kind,
-			    boolean allKindFields,
-			    boolean indent)
-{
-	if (allKindFields)
-	{
-		printf ("%s%c\t%s\t%s\t%s\n", indent ? "\t"           : "",
-			kind_letter,
-			kind->name        != NULL ? kind->name        : "",
-			kind->description != NULL ? kind->description : "",
-			kind->enabled             ? "on"              : "off");
-	}
-	else
-	{
-		/* 2 spaces before [off] comes from exuberant ctags. */
-		printf ("%s%c  %s %s\n", indent ? "    " : "", kind_letter,
-			kind->description != NULL ? kind->description :
-			(kind->name != NULL ? kind->name : ""),
-			kind->enabled ? "" : " [off]");
-	}
-}
-
 static void printRegexKindCB (void *key, void *value, void* user_data)
 {
 	union cptr c;
@@ -524,7 +502,7 @@ static void printRegexKindCB (void *key, void *value, void* user_data)
 	{
 		if (data->allKindFields && data->indent)
 			printf ("%s", data->langName);
-		printRegexKind(c.c, value, data->allKindFields, data->indent);
+		printKind (value, data->allKindFields, data->indent);
 	}
 }
 

@@ -33,4 +33,5 @@ typedef struct sKindOption {
 	char* description;	  /* displayed in --help output */
 } kindOption;
 
+extern void printKind (const kindOption* const kind, boolean allKindFields, boolean indent);
 #endif	/* _KIND_H */

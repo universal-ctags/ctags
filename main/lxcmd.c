@@ -532,27 +532,7 @@ static void printXcmdKind (xcmdPath *path, unsigned int i,
 		return;
 
 	for (k = 0; k < path[i].n_kinds; k++)
-	{
-		const kindOption *const kind = path[i].kinds + k;
-
-		if (allKindFields)
-		{
-			if (indent)
-				printf ("%s", langName);
-			printf ("%s%c\t%s\t%s\t%s\n", indent ? "\t"           : "",
-				kind->letter != '\0'         ? kind->letter   : '?',
-				kind->name        != NULL ? kind->name        : "",
-				kind->description != NULL ? kind->description : "",
-				kind->enabled             ? "on"              : "off");
-		}
-		else
-		{
-			printf ("%s%c  %s %s\n", indent ? "    " : "",
-				kind->letter != '\0' ? kind->letter : '?',
-				kind->description != NULL ? kind->description : kind->name,
-				kind->enabled ? "" : " [off]");
-		}
-	}
+		printKind (path[i].kinds + k, allKindFields, indent);
 }
 #endif
 
