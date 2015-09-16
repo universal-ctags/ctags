@@ -209,7 +209,7 @@ AC_ARG_PROGRAM
 # -----------------------------
 
 if test "$enable_maintainer_mode" = yes ; then
-	AC_MSG_RESULT(enabling maintainer mode)
+	AC_MSG_NOTICE(enabling maintainer mode)
 fi
 
 install_targets="install-ctags install-data install-libexec"
@@ -236,7 +236,7 @@ else
 fi
 AC_SUBST(install_targets)
 
-dnl AC_MSG_RESULT(Change with $program_transform_name)
+dnl AC_MSG_NOTICE(Change with $program_transform_name)
 ctags_name_executable=`echo ctags | sed "$program_transform_name"`
 AC_SUBST(ctags_name_executable)
 etags_name_executable=`echo etags | sed "$program_transform_name"`
@@ -245,15 +245,15 @@ AC_SUBST(etags_name_executable)
 AC_DEFINE_UNQUOTED(ETAGS, "$etags_name_executable")
 
 if test "$enable_custom_config" = no -o "$enable_custom_config" = yes ; then
-	AC_MSG_RESULT(no name supplied for custom configuration file)
+	AC_MSG_NOTICE(no name supplied for custom configuration file)
 elif test -n "$enable_custom_config" ; then
 	AC_DEFINE_UNQUOTED(CUSTOM_CONFIGURATION_FILE, "$enable_custom_config")
-	AC_MSG_RESULT($enable_custom_config will be used as custom configuration file)
+	AC_MSG_NOTICE($enable_custom_config will be used as custom configuration file)
 fi
 
 if test "$enable_macro_patterns" = yes ; then
 	AC_DEFINE(MACROS_USE_PATTERNS)
-	AC_MSG_RESULT(tag file will use patterns for macros by default)
+	AC_MSG_NOTICE(tag file will use patterns for macros by default)
 fi
 
 # Checks for programs
@@ -348,7 +348,7 @@ else
     fi
 fi
 if test "$enable_external_sort" != yes ; then
-	AC_MSG_RESULT(using internal sort algorithm as fallback)
+	AC_MSG_NOTICE(using internal sort algorithm as fallback)
 fi
 
 
@@ -454,7 +454,7 @@ fi
 if test "$have_mkstemp" != yes -a "$have_tempnam" != yes; then
 	AC_CHECK_FUNCS(chmod)
 	if test "$tmpdir_specified" = yes ; then
-		AC_MSG_RESULT(use of tmpnam overrides temporary directory selection)
+		AC_MSG_NOTICE(use of tmpnam overrides temporary directory selection)
 	fi
 fi
 
@@ -557,14 +557,14 @@ AC_SUBST(install_libexec_targets)
 
 # Checks for missing prototypes
 # -----------------------------
-AC_CHECKING(for new missing prototypes)
+AC_MSG_NOTICE(checking for new missing prototypes)
 
 AC_DEFUN([CHECK_PROTO], [
 	AC_EGREP_HEADER([[^A-Za-z0-9_]$1([ 	]+[A-Za-z0-9_]*)?[	 ]*\(],
 	$2,
 	,
 	[
-		AC_MSG_RESULT([adding prototype for $1])
+		AC_MSG_NOTICE([adding prototype for $1])
 		AC_DEFINE(patsubst([NEED_PROTO_NAME], [NAME], translit([$1], [[a-z]], [[A-Z]])))
 	])])
 
@@ -615,11 +615,11 @@ AC_CHECK_DECLS([_NSGetEnviron],[],[],[
 ])
 
 if test "$ctags_name_executable" != ctags ; then
-	AC_MSG_RESULT(Changing name of 'ctags' for $ctags_name_executable)
+	AC_MSG_NOTICE(Changing name of 'ctags' for $ctags_name_executable)
 fi
 
 if test "$etags_name_executable" != etags ; then
-	AC_MSG_RESULT(Changing name of 'etags' for $etags_name_executable)
+	AC_MSG_NOTICE(Changing name of 'etags' for $etags_name_executable)
 fi
 
 # Output files
@@ -629,7 +629,7 @@ AC_CHECK_FUNCS([mblen], [], [HAVE_MBLEN=1], [])
 
 rm -f Makefile
 if test "$enable_maintainer_mode" = yes ; then
-	AC_MSG_RESULT(creating maintainer Makefile)
+	AC_MSG_NOTICE(creating maintainer Makefile)
 	ln -s maintainer.mak Makefile
 else
 	AC_CONFIG_FILES(Makefile ctags.1)
