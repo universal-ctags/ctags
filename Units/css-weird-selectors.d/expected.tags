@@ -1,0 +1,32 @@
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:1
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:2
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:3
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:4
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:5
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:6
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:7
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:8
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/	"] {}$/;"	s	line:9
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:12
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:13
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:15
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:31
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:16
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:17
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:18
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:19
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:20
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:21
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:22
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:23
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:24
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:25
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:26
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:27
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:28
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:29
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:30
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/"] {}$/;"	s	line:32
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/ "] {}$/;"	s	line:33
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/$/;"	s	line:10
+a[href^="http:// "]	input.css	/^a[href^="http:\/\/$/;"	s	line:14
