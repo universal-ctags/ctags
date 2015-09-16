@@ -1,0 +1,6 @@
+ctags: Notice: No options will be read from files or environment
+
+ctags: Notice: Unexpected character (0 < *c && *c < 0x20) included in a tagEntryInfo: one
+ofbroken	name
+ctags: Notice: File: input.cst, Line: 1, Lang: CTagsSelfTest, Kind: b
+ctags: Aborting
