@@ -299,8 +299,6 @@ if test -n "$enable_tmpdir"; then
 	tmpdir="$enable_tmpdir"
 elif test -n "$TMPDIR"; then
 	tmpdir="$TMPDIR"
-elif test -n "$TMPDIR"; then
-	tmpdir="$TMPDIR"
 elif test -n "$TMP"; then
 	tmpdir="$TMP"
 elif test -n "$TEMP"; then
