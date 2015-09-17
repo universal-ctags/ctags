@@ -412,8 +412,10 @@ esac
 # MinGW has st_ino, but it doesn't work.
 if test yes != "$host_mingw"; then
 	AC_MSG_CHECKING(if struct stat contains st_ino)
-	AC_TRY_COMPILE([#include <sys/stat.h>
-					#include <stdlib.h>], [
+	AC_TRY_COMPILE([
+		#include <sys/stat.h>
+		#include <stdlib.h>
+		], [
 		struct stat st;
 		stat(".", &st);
 		if (st.st_ino > 0)
@@ -514,7 +516,8 @@ AC_TRY_RUN([
 int main(void) {
 	regex_t patbuf;
 	return (regcomp (&patbuf, "/hello/", 0) != 0);
-}],regcomp_works=yes,regcomp_works=no,AC_DEFINE(CHECK_REGCOMP))
+}
+],regcomp_works=yes,regcomp_works=no,AC_DEFINE(CHECK_REGCOMP))
 AC_MSG_RESULT($regcomp_works)
 if test yes != "$regcomp_works"; then
 	AC_DEFINE(REGCOMP_BROKEN)
