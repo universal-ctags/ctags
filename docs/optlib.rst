@@ -352,10 +352,91 @@ Conceptual example::
 	--regex-<LANG>=/regexp2/replacement/kind-spec/{transformer=lowercase}
 	--regex-<LANG>=/regexp2/replacement/kind-spec/{transformer=capitalize}
 
-This is not yet used in any user visible place.
-This is implemented for extending ctags in future.
+Currently scope long flag taking such parameter.
 
-.. TBW
+Scope tracking in a regex parser
+---------------------------------------------------------------------
+
+With scope long flag, you can record/track scope context.
+A stack is used for tracking the scope context.
+
+`{scope=push}`
+
+	Push the tag captured with a regex pattern to the top of the stack.
+	If you don't want to record this tag but just push, use
+	`placeholder` long option together.
+
+`{scope=ref}`
+
+	Refer the thing of top of the stack as a scope where
+	the tag captured with a regex pattern is.
+	The stack is not modified with this specification.
+	If the stack is empty, this flag is just ignored.
+
+`{scope=pop}`
+
+	Pop the thing of top of the stack.
+	If the stack is empty, this flag is just ignored.
+
+`{scope=clear}`
+
+	Make the stack empty.
+
+`{scope=set}`
+
+	Clear then push.
+
+`{placeholder}`
+
+	Don't print a tag captured with a regex pattern
+	to a tag file.
+	This is useful when you need to push non-named context
+	information to the stack.  Well known non-named scope in C
+	language is established with `{`. non-named scope is never
+	appeared in tags file as name or scope name.  However, pushing
+	it is important to balance `push` and `pop`.
+
+Example 1::
+
+    $ cat /tmp/input.foo
+    class foo:
+	def bar(baz):
+	    print(baz)
+    class goo:
+	def gar(gaz):
+	    print(gaz)
+
+    $ cat /tmp/foo.ctags
+    --langdef=foo
+	    --map-foo=+.foo
+	    --regex-foo=/^class[[:blank:]]+([[:alpha:]]+):/\1/c,class/{scope=set}
+	    --regex-foo=/^[[:blank:]]+def[[:blank:]]+([[:alpha:]]+).*:/\1/d,definition/{scope=ref}
+
+    $ ~/var/ctags/ctags --options=/tmp/foo.ctags -o - /tmp/input.foo
+    bar	/tmp/input.foo	/^    def bar(baz):$/;"	d	class:foo
+    foo	/tmp/input.foo	/^class foo:$/;"	c
+    gar	/tmp/input.foo	/^    def gar(gaz):$/;"	d	class:goo
+    goo	/tmp/input.foo	/^class goo:$/;"	c
+
+
+Example 2::
+
+    $ cat /tmp/input.pp
+    class foo {
+	include bar
+    }
+
+    $ cat /tmp/pp.ctags
+    --langdef=pp
+	    --map-pp=+.pp
+	    --regex-pp=/^class[[:blank:]]*([[:alnum:]]+)[[[:blank:]]]*\{/\1/c,class,classes/{scope=push}
+	    --regex-pp=/^[[:blank:]]*include[[:blank:]]*([[:alnum:]]+).*/\1/i,include,includes/{scope=ref}
+	    --regex-pp=/^[[:blank:]]*\}.*//{scope=pop}{exclusive}
+
+    $ ~/var/ctags/ctags --options=/tmp/pp.ctags -o - /tmp/input.pp
+    bar	/tmp/input.pp	/^    include bar$/;"	i	class:foo
+    foo	/tmp/input.pp	/^class foo {$/;"	c
+
 
 Override the letter for file kind
 ---------------------------------------------------------------------
