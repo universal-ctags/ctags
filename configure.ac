@@ -136,11 +136,11 @@ uname -mrsv 2>/dev/null
 # CHECK_HEADER_DEFINE(LABEL, HEADER [,ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ] ])
 AC_DEFUN([CHECK_HEADER_DEFINE], [
 	AC_MSG_CHECKING([if $1 is defined in $2])
-	AC_EGREP_CPP([yes],
+	AC_EGREP_CPP([$2:$1],
 [
 #include <$2>
 #ifdef $1
-  yes
+const char *result_yes = "$2:$1";
 #endif
 ], [
 	AC_MSG_RESULT(yes)
