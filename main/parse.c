@@ -213,7 +213,7 @@ static unsigned int nominateLanguageCandidates (const char *const key, parserCan
 {
 	unsigned int count;
 	langType i;
-	const char* spec;
+	const char* spec = NULL;
 
 	*candidates = parserCandidateNew(LanguageCount);
 
