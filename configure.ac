@@ -136,8 +136,9 @@ uname -mrsv 2>/dev/null
 # CHECK_HEADER_DEFINE(LABEL, HEADER [,ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ] ])
 AC_DEFUN([CHECK_HEADER_DEFINE], [
 	AC_MSG_CHECKING([if $1 is defined in $2])
-	AC_EGREP_CPP(yes,
-[#include <$2>
+	AC_EGREP_CPP([yes],
+[
+#include <$2>
 #ifdef $1
   yes
 #endif
