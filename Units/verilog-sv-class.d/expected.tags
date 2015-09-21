@@ -1,5 +1,7 @@
 BASE	input.sv	/^  type BASE=supertest #(test)$/;"	c	class:paramtest2
 BASE	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	c	class:paramtest
+BASE	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
+BASE2	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
 DEFINE	input.sv	/^`define DEFINE$/;"	c
 DEF_VALUE	input.sv	/^`define DEF_VALUE   1'd100$/;"	c
 DEF_WITH_EQ	input.sv	/^`define DEF_WITH_EQ = 1'd100$/;"	c
@@ -7,18 +9,27 @@ a	input.sv	/^    extern virtual function void extern_func (input bit a, input b)
 a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
 a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
 a	input.sv	/^    reg a;$/;"	r	class:test
+a	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
 b	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
 b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
 b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
 b	input.sv	/^    logic b;$/;"	r	class:test
+b	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
 c	input.sv	/^    logic c;$/;"	r	class:supertest
 extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	Q	class:test
 mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:supertest
 mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:test
-paramtest	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	C	inherits:BASE
+myfunc	input.sv	/^virtual function myfunc (a, b);$/;"	f	class:paramtest3
+paramtest	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	C
 paramtest.BASE	input.sv	/^class paramtest #(type BASE=supertest #(test)) extends BASE;$/;"	c	class:paramtest
 paramtest2	input.sv	/^class paramtest2 #($/;"	C
 paramtest2.BASE	input.sv	/^  type BASE=supertest #(test)$/;"	c	class:paramtest2
+paramtest3	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	C
+paramtest3.BASE	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
+paramtest3.BASE2	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
+paramtest3.myfunc	input.sv	/^virtual function myfunc (a, b);$/;"	f	class:paramtest3
+paramtest3.myfunc.a	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
+paramtest3.myfunc.b	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
 supertest	input.sv	/^class supertest extends test;$/;"	C	inherits:test
 supertest.c	input.sv	/^    logic c;$/;"	r	class:supertest
 supertest.mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:supertest

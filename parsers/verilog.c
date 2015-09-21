@@ -862,10 +862,9 @@ static void processClass (tokenInfo *const token)
 					}
 				}
 			} while (c != ')' && c != EOF);
-			c = vGetc ();
+			c = skipWhite (vGetc ());
 			parameters = popToken (parameters);
 		}
-		c = skipWhite (vGetc ());
 	}
 
 	/* Search for inheritance information */

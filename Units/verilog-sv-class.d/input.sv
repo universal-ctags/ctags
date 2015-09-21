@@ -30,3 +30,10 @@ class paramtest2 #(
   type BASE=supertest #(test)
 ) extends BASE;
 endclass : paramtest2
+
+class paramtest3 #(type BASE=supertest, type BASE2=paramtest);
+
+virtual function myfunc (a, b);
+endfunction
+
+endclass : paramtest3
