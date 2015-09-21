@@ -25,20 +25,37 @@ dctags.exe: SOURCES += debug.c
 
 .SUFFIXES: .c.o
 
+#
+# Silent/verbose commands
+#
+# when V is not set the output of commands is ommited or simplified
+#
+V	 ?= 0
+
+SILENT   = $(SILENT_$(V))
+SILENT_0 = @
+SILENT_1 =
+
+V_CC	 = $(V_CC_$(V))
+V_CC_0	 = @echo [CC] $@;
+V_CC_1	 =
+
+
 .c.o:
-	$(CC) -c $(OPT) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
+	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
 
 ctags: ctags.exe
 dctags: dctags.exe
 
 ctags.exe dctags.exe: $(OBJECTS) $(HEADERS) $(REGEX_HEADERS) $(FNMATCH_HEADERS)
-	$(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(OBJECTS) $(LIBS)
+	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(OBJECTS) $(LIBS)
 
 readtags.exe: readtags.c
-	$(CC) $(OPT) $(CFLAGS) -DREADTAGS_MAIN $(DEFINES) $(INCLUDES) -o $@ $<
+	$(V_CC) $(CC) $(OPT) $(CFLAGS) -DREADTAGS_MAIN $(DEFINES) $(INCLUDES) -o $@ $<
 
 clean:
-	- rm -f ctags.exe
-	- rm -f dctags.exe
-	- rm -f tags
-	- rm -f main/*.o parsers/*.o gnu_regex/*.o fnmatch/*.o
+	$(SILENT) echo Cleaning
+	$(SILENT) rm -f ctags.exe
+	$(SILENT) rm -f dctags.exe
+	$(SILENT) rm -f tags
+	$(SILENT) rm -f main/*.o parsers/*.o gnu_regex/*.o fnmatch/*.o
