@@ -1,15 +1,15 @@
 +-	input.ml	/^let (+-) a b =$/;"	f
 ConstructorBar	input.ml	/^        | ConstructorBar of int * char list$/;"	C	type:ModuleFoo/foobar
 ConstructorFoo	input.ml	/^          ConstructorFoo$/;"	C	type:ModuleFoo/foobar
-Input	input.ml	1;"	M
-ModuleFoo	input.ml	1;"	M
+Input	input.ml	/^module ModuleFoo = struct$/;"	M
+ModuleFoo	input.ml	/^module ModuleFoo = struct$/;"	M
 barfield	input.ml	/^     barfield : int;$/;"	r	type:foorecord
 fooClass	input.ml	/^class  fooClass =$/;"	c
 fooMethod	input.ml	/^    method fooMethod = x$/;"	m	class:fooClass
-foo_function	input.ml	/^let foo_function a b = (a, b)$/;"	v
-foobar	input.ml	/^    type foobar =$/;"	t	Module:ModuleFoo
+foo_function	input.ml	/^let foo_function a b = (a, b)$/;"	f
+foobar	input.ml	/^    type foobar =$/;"	t	module:ModuleFoo
 foobarfield	input.ml	/^     mutable foobarfield : list char -> int -> unit }$/;"	r	type:foorecord
 foofield	input.ml	/^    { foofield : 'a;$/;"	r	type:foorecord
 foorecord	input.ml	/^type 'a foorecord =$/;"	t
-shall_appear	input.ml	/^let shall_appear () =$/;"	v
-x	input.ml	/^    val x = ()$/;"	v	class:fooClass
+shall_appear	input.ml	/^let shall_appear () =$/;"	f
+x	input.ml	/^    val x = ()$/;"	p	class:fooClass
