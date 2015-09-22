@@ -102,7 +102,11 @@ static void findSchemeTags (void)
 			if (line == NULL)
 				break;
 			readIdentifier (name, cp);
+#ifdef GTAGS
+			makeSimpleReferenceTag (name, SchemeKinds, K_SET);
+#else
 			makeSimpleTag (name, SchemeKinds, K_SET);
+#endif
 		}
 	}
 	vStringDelete (name);

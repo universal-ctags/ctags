@@ -721,18 +721,22 @@ static char *readSourceLineAnyway (vString *const vLine, const tagEntryInfo *con
 static int writeXrefEntry (const tagEntryInfo *const tag)
 {
 	const char *line;
-	int length;
+	int length = 0;
 
 	if (tag->isFileEntry)
 		return 0;
 
 	line = readSourceLineAnyway (TagFile.vLine, tag, NULL);
 
+#ifdef GTAGS
+	if (Option.gtags == 1)
+		length += fprintf(TagFile.fp, "%c ", tag->type);
+#endif
 	if (Option.tagFileFormat == 1)
-		length = fprintf (TagFile.fp, "%-16s %4lu %-16s ", tag->name,
+		length += fprintf (TagFile.fp, "%-16s %4lu %-16s ", tag->name,
 				tag->lineNumber, tag->sourceFileName);
 	else
-		length = fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s ", tag->name,
+		length += fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s ", tag->name,
 				tag->kindName, tag->lineNumber, tag->sourceFileName);
 
 	/* If no associated line for tag is found, we cannot prepare
@@ -1089,6 +1093,12 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	Assert (tag->name != NULL && strchr (tag->name, '\t') == NULL);
 	Assert (getSourceLanguageFileKind() == tag->kind || isSourceLanguageKindEnabled (tag->kind));
 
+#ifdef GTAGS
+	/* For compatibility, don't put reference tags without --gtags option. */
+	if (Option.gtags == 0 && tag->type == GTAGS_REFERENCE)
+		return r;
+#endif
+
 	if (tag->name [0] == '\0')
 		error (WARNING, "ignoring null tag in %s(line: %lu)", vStringValue (File.name), tag->lineNumber);
 	else if (TagFile.cork)
@@ -1123,6 +1133,9 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->filePosition    = filePosition;
 	e->sourceFileName  = sourceFileName;
 	e->name            = name;
+#ifdef GTAGS
+	e->type            = GTAGS_DEFINITION;
+#endif
 	e->extensionFields.scopeIndex     = SCOPE_NIL;
 }
 

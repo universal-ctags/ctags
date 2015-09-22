@@ -22,6 +22,10 @@
 *   MACROS
 */
 #define WHOLE_FILE  -1L
+#ifdef GTAGS
+#define GTAGS_DEFINITION   'D'
+#define GTAGS_REFERENCE    'R'
+#endif
 
 /*
 *   DATA DECLARATIONS
@@ -73,6 +77,9 @@ typedef struct sTagEntryInfo {
 	const char *name;             /* name of the tag */
 	const char *kindName;         /* kind of tag */
 	char        kind;             /* single character representation of kind */
+#ifdef GTAGS
+	char        type;             /* single character representation of type for gtags */
+#endif
 	struct {
 		const char* access;
 		const char* fileScope;

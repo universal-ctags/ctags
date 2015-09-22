@@ -180,6 +180,9 @@ optionValues Option = {
 	FALSE,      /* --tag-relative */
 	FALSE,      /* --totals */
 	FALSE,      /* --line-directives */
+#ifdef GTAGS
+	FALSE,      /* --gtags */
+#endif
 	FALSE,	    /* --print-language */
 	FALSE,	    /* --guess-language-eagerly(-G) */
 	FALSE,	    /* --quiet */
@@ -279,6 +282,11 @@ static optionDescription LongOptionDescription [] = {
  {1,"       o shebang even the input file is not executable,"},
  {1,"       o emacs mode specification at the beginning and end of input file, and"},
  {1,"       o vim syntax specification at the end of input file."},
+#ifdef GTAGS
+ {1,"  --gtags"},
+ {1,"       Print a type string for gtags at the head of each tag."},
+ {1,"       This option is valid only with the -x option."},
+#endif
  {1,"  --help"},
  {1,"       Print this option summary."},
  {1,"  --if0=[yes|no]"},
@@ -2159,6 +2167,9 @@ static booleanOption BooleanOptions [] = {
 	{ "file-tags",      &Option.include.fileNames,      FALSE, STAGE_ANY },
 	{ "filter",         &Option.filter,                 TRUE,  STAGE_ANY },
 	{ "guess-language-eagerly", &Option.guessLanguageEagerly, FALSE, STAGE_ANY },
+#ifdef GTAGS
+	{ "gtags",          &Option.gtags,                  FALSE, STAGE_ANY },
+#endif
 	{ "if0",            &Option.if0,                    FALSE, STAGE_ANY },
 	{ "kind-long",      &Option.kindLong,               TRUE,  STAGE_ANY },
 	{ "line-directives",&Option.lineDirectives,         FALSE, STAGE_ANY },
