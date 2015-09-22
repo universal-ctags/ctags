@@ -59,6 +59,27 @@ extern int makeSimpleTag (
 	return r;
 }
 
+#ifdef GTAGS
+extern int makeSimpleReferenceTag (
+		const vString* const name, kindOption* const kinds, const int kind)
+{
+	int r = SCOPE_NIL;
+
+	if (kinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
+	{
+	    tagEntryInfo e;
+	    initTagEntry (&e, vStringValue (name));
+
+	    e.kindName = kinds [kind].name;
+	    e.kind     = kinds [kind].letter;
+	    e.type     = GTAGS_REFERENCE;
+
+	    r = makeTagEntry (&e);
+	}
+	return r;
+}
+#endif
+
 static vString* ext2ptrnNew (const char *const ext)
 {
 	vString * ptrn = vStringNewInit ("*.");

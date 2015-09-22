@@ -46,6 +46,8 @@ AH_TEMPLATE([CUSTOM_CONFIGURATION_FILE],
 	so only define one here if you need a file somewhere else.])
 AH_TEMPLATE([ETAGS],
 	[Define the string to check (in executable name) for etags mode])
+AH_TEMPLATE([GTAGS],
+	[Define this label if you want to use ctags as a plug-in parser of gtags])
 AH_TEMPLATE([MACROS_USE_PATTERNS],
 	[Define this label if you want macro tags (defined lables) to use patterns
 	in the EX command by default (original ctags behavior is to use line
@@ -169,6 +171,10 @@ AC_ARG_ENABLE(etags,
 	[AS_HELP_STRING([--enable-etags],
 		[enable the installation of links for etags])])
 
+AC_ARG_ENABLE(gtags,
+	[AS_HELP_STRING([--enable-gtags],
+		[enable the --gtags option])])
+
 AC_ARG_ENABLE(extended-format,
 	[AS_HELP_STRING([--disable-extended-format],
 		[disable extension flags; use original ctags file format only])],
@@ -217,6 +223,13 @@ AC_MSG_CHECKING(whether to install link to etags)
 if test yes = "$enable_etags"; then
 	AC_MSG_RESULT(yes)
 	install_targets="$install_targets install-etags"
+else
+	AC_MSG_RESULT(no)
+fi
+AC_MSG_CHECKING(whether to use --gtags option)
+if test "$enable_gtags" = yes ; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(GTAGS)
 else
 	AC_MSG_RESULT(no)
 fi

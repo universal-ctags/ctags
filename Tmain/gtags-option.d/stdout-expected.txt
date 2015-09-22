@@ -1,0 +1,6 @@
+# ctags--quiet --options=NONE -x --format=1 input.scm
+name                1 input.scm        (define name "name1")
+# ctags --quiet --options=NONE -x --format=1 --gtags input.scm
+D name                1 input.scm        (define name "name1")
+R name                2 input.scm        (set! name "name2")
+R unknown             3 input.scm        (set! unknown "name3")

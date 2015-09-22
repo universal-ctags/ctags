@@ -515,6 +515,11 @@ format and level 2 specifies a new extended format containing extension fields
 before the first file name. [Ignored in etags mode]
 
 .TP 5
+.B \-\-gtags
+Print a type string at the head of each tag record of cross reference file.
+This option is used to integrate this program into GNU GLOBAL.
+
+.TP 5
 .B \-\-help
 Prints to standard output a detailed usage description, and then exits.
 

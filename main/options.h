@@ -114,6 +114,9 @@ typedef struct sOptionValues {
 	boolean tagRelative;    /* --tag-relative file paths relative to tag file */
 	boolean printTotals;    /* --totals  print cumulative statistics */
 	boolean lineDirectives; /* --linedirectives  process #line directives */
+#ifdef GTAGS
+	boolean gtags;          /* --gtags print a type string for gtags */
+#endif
 	boolean printLanguage;  /* --print-language */
 	boolean guessLanguageEagerly; /* --guess-language-eagerly|-G */
 	boolean quiet;		      /* --quiet */
