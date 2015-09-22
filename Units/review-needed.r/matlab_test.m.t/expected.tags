@@ -1,3 +1,5 @@
+A	input.m	/^A = magic(4);$/;"	v
+R	input.m	/^R = randn(3,4,5);$/;"	v
 func1	input.m	/^function [x,y,z] = func1 $/;"	f
 func2	input.m	/^function x = func2 $/;"	f
 func3	input.m	/^function func3 $/;"	f
