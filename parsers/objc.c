@@ -457,14 +457,12 @@ static objcKind parentType = K_INTERFACE;
  * add additional information to the tag. */
 static void prepareTag (tagEntryInfo * tag, vString const *name, objcKind kind)
 {
-	initTagEntry (tag, vStringValue (name));
-	tag->kindName = ObjcKinds[kind].name;
-	tag->kind = ObjcKinds[kind].letter;
+	initTagEntry (tag, vStringValue (name), &(ObjcKinds[kind]));
 
 	if (parentName != NULL)
 	{
-		tag->extensionFields.scope[0] = ObjcKinds[parentType].name;
-		tag->extensionFields.scope[1] = vStringValue (parentName);
+		tag->extensionFields.scopeKind = &(ObjcKinds[parentType]);
+		tag->extensionFields.scopeName = vStringValue (parentName);
 	}
 }
 
@@ -1161,10 +1159,9 @@ extern parserDefinition *ObjcParser (void)
 	static selectLanguage selectors[] = { selectByObjectiveCAndMatLabKeywords,
 					      selectByObjectiveCKeywords,
 					      NULL };
-	parserDefinition *def = parserNew ("ObjectiveC");
+	parserDefinition *def = parserNewFull ("ObjectiveC", KIND_FILE_ALT);
 	def->kinds = ObjcKinds;
 	def->kindCount = KIND_COUNT (ObjcKinds);
-	def->fileKind  = KIND_FILE_ALT;
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findObjcTags;

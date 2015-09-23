@@ -535,22 +535,20 @@ static void makeTag (tokenInfo *const token, const goKind kind,
 	const char *const name = vStringValue (token->string);
 
 	tagEntryInfo e;
-	initTagEntry (&e, name);
+	initTagEntry (&e, name, &(GoKinds [kind]));
 
 	if (!GoKinds [kind].enabled)
 		return;
 
 	e.lineNumber = token->lineNumber;
 	e.filePosition = token->filePosition;
-	e.kindName = GoKinds [kind].name;
-	e.kind = GoKinds [kind].letter;
 	if (argList)
 		e.extensionFields.signature = argList;
 
 	if (parent_kind != GOTAG_UNDEFINED && parent_token != NULL)
 	{
-		e.extensionFields.scope[0] = GoKinds[parent_kind].name;
-		e.extensionFields.scope[1] = vStringValue (parent_token->string);
+		e.extensionFields.scopeKind = &(GoKinds[parent_kind]);
+		e.extensionFields.scopeName = vStringValue (parent_token->string);
 	}
 	makeTagEntry (&e);
 

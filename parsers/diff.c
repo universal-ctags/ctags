@@ -128,8 +128,7 @@ static int parseHunk (const unsigned char* cp, vString *hunk, int scope_index)
 static void markTheLastTagAsDeletedFile (int scope_index)
 {
 	tagEntryInfo *e =  getEntryInCorkQueue (scope_index);
-	e->kindName = DiffKinds [K_DELETED_FILE].name;
-	e->kind = DiffKinds [K_DELETED_FILE].letter;
+	e->kind = &(DiffKinds [K_DELETED_FILE]);
 }
 
 static void findDiffTags (void)

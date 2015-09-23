@@ -70,9 +70,7 @@ static void makeBetaTag (const char* const name, const betaKind kind)
 	if (BetaKinds [kind].enabled)
 	{
 		tagEntryInfo e;
-		initTagEntry (&e, name);
-		e.kindName = BetaKinds [kind].name;
-		e.kind     = BetaKinds [kind].letter;
+		initTagEntry (&e, name, & (BetaKinds [kind]));
 		makeTagEntry (&e);
 	}
 }

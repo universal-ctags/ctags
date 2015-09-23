@@ -13,6 +13,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+#include "kind.h"
 #include "parsers.h"  /* contains list of parsers */
 #include "strlist.h"
 
@@ -42,31 +43,6 @@ typedef void (*parserInitialize) (langType language);
 typedef void (*parserFinalize) (langType language);
 typedef const char * (*selectLanguage) (FILE *);
 
-/*
- * Predefined kinds
- */
-#define KIND_REGEX_DEFAULT 'r'
-#define KIND_REGEX_DEFAULT_LONG "regex"
-/* We treat ' ' as a ghost kind.
-   It will never be listed up in --list-kinds. */
-
-#define KIND_NULL    '\0'
-
-#define KIND_GHOST   ' '
-#define KIND_GHOST_LONG "ghost"
-
-#define KIND_FILE_DEFAULT 'F'
-#define KIND_FILE_DEFAULT_LONG "file"
-
-#define KIND_FILE_ALT '!'
-
-typedef struct sKindOption {
-	boolean enabled;          /* are tags for kind enabled? */
-	int letter;               /* kind letter */
-	const char* name;         /* kind name */
-	const char* description;  /* displayed in --help output */
-} kindOption;
-
 typedef struct stgTableEntry{
 	/* two gram table which represents the
 	   characteristic of its language.
@@ -90,7 +66,7 @@ typedef struct {
 	char* name;                    /* name of language */
 	kindOption* kinds;             /* tag kinds handled by parser */
 	unsigned int kindCount;        /* size of `kinds' list */
-	char fileKind;		           /* override letter for file kind */
+	kindOption* fileKind;          /* kind for overriding the default fileKind */
 	const char *const *extensions; /* list of default extensions */
 	const char *const *patterns;   /* list of default file name patterns */
 	const char *const *aliases;    /* list of default aliases (alternative names) */
@@ -134,8 +110,9 @@ extern parserDefinitionFunc PARSER_LIST;
 extern int makeSimpleTag (const vString* const name, kindOption* const kinds, const int kind);
 extern void makeFileTag (const char *const fileName);
 extern parserDefinition* parserNew (const char* name);
+extern parserDefinition* parserNewFull (const char* name, char fileKind);
 extern const char *getLanguageName (const langType language);
-extern char getLanguageFileKind (const langType language);
+extern kindOption* getLanguageFileKind (const langType language);
 extern langType getNamedLanguage (const char *const name);
 extern langType getFileLanguage (const char *const fileName);
 extern boolean isLanguageEnabled (const langType language);

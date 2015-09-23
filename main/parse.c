@@ -36,6 +36,12 @@
 static parserDefinitionFunc* BuiltInParsers[] = { PARSER_LIST };
 static parserDefinition** LanguageTable = NULL;
 static unsigned int LanguageCount = 0;
+static kindOption defaultFileKind = {
+	.enabled     = FALSE,
+	.letter      = KIND_FILE_DEFAULT,
+	.name        = KIND_FILE_DEFAULT_LONG,
+	.description = KIND_FILE_DEFAULT_LONG,
+};
 
 /*
 *   FUNCTION DEFINITIONS
@@ -49,10 +55,7 @@ extern int makeSimpleTag (
 	if (kinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
 	{
 	    tagEntryInfo e;
-	    initTagEntry (&e, vStringValue (name));
-
-	    e.kindName = kinds [kind].name;
-	    e.kind     = kinds [kind].letter;
+	    initTagEntry (&e, vStringValue (name), & kinds [kind]);
 
 	    r = makeTagEntry (&e);
 	}
@@ -86,9 +89,28 @@ extern boolean isLanguageEnabled (const langType language)
 
 extern parserDefinition* parserNew (const char* name)
 {
+	return parserNewFull (name, 0);
+}
+
+static kindOption* fileKindNew (char letter)
+{
+	kindOption *fileKind;
+
+	fileKind = xMalloc (1, kindOption);
+	*(fileKind) = defaultFileKind;
+	fileKind->letter = letter;
+	return fileKind;
+}
+
+extern parserDefinition* parserNewFull (const char* name, char fileKind)
+{
 	parserDefinition* result = xCalloc (1, parserDefinition);
 	result->name = eStrdup (name);
-	result->fileKind = KIND_FILE_DEFAULT;
+
+	if (fileKind)
+		result->fileKind = fileKindNew(fileKind);
+	else
+		result->fileKind = &defaultFileKind;
 	result->enabled = TRUE;
 	return result;
 }
@@ -106,9 +128,9 @@ extern const char *getLanguageName (const langType language)
 	return result;
 }
 
-extern char getLanguageFileKind (const langType language)
+extern kindOption* getLanguageFileKind (const langType language)
 {
-	char kind;
+	kindOption* kind;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
@@ -1184,9 +1206,9 @@ static void initializeParsers (void)
 		if (LanguageTable [i]->initialize != NULL)
 			(LanguageTable [i]->initialize) ((langType) i);
 
-		Assert (LanguageTable [i]->fileKind != KIND_NULL);
+		Assert (LanguageTable [i]->fileKind != NULL);
 		Assert (!doesParserUseKind (LanguageTable [i],
-					    LanguageTable [i]->fileKind));
+					    LanguageTable [i]->fileKind->letter));
 	}
 }
 
@@ -1242,6 +1264,11 @@ extern void freeParserResources (void)
 
 		if (lang->finalize)
 			(lang->finalize)((langType)i);
+		if (lang->fileKind != &defaultFileKind)
+		{
+			eFree (lang->fileKind);
+			lang->fileKind = NULL;
+		}
 
 		freeList (&lang->currentPatterns);
 		freeList (&lang->currentExtensions);
@@ -1299,7 +1326,10 @@ static void lang_def_flag_file_kind_long (const char* const optflag, const char*
 	else if (param[1] != '\0')
 		error (WARNING, "Specify just a letter for \"%s\" flag of --langdef option", optflag);
 
-	def->fileKind = param[0];
+	if (def->fileKind != &defaultFileKind)
+		eFree (def->fileKind);
+
+	def->fileKind = fileKindNew (param[0]);
 }
 
 static flagDefinition LangDefFlagDef [] = {
@@ -1520,14 +1550,14 @@ extern void printLanguageFileKind (const langType language)
 		for (i = 0  ;  i < LanguageCount  ;  ++i)
 		{
 			const parserDefinition* const lang = LanguageTable [i];
-			printf ("%s %c\n", lang->name, lang->fileKind);
+			printf ("%s %c\n", lang->name, lang->fileKind->letter);
 		}
 	}
 	else
-		printf ("%c\n", LanguageTable [language]->fileKind);
+		printf ("%c\n", LanguageTable [language]->fileKind->letter);
 }
 
-static void printLanguageKind (const kindOption* const kind, boolean allKindFields, boolean indent)
+extern void printKind (const kindOption* const kind, boolean allKindFields, boolean indent)
 {
 	if (allKindFields)
 	{
@@ -1558,7 +1588,7 @@ static void printKinds (langType language, boolean allKindFields, boolean indent
 		{
 			if (allKindFields && indent)
 				printf ("%s", lang->name);
-			printLanguageKind (lang->kinds + i, allKindFields, indent);
+			printKind (lang->kinds + i, allKindFields, indent);
 		}
 	}
 	printRegexKinds (language, allKindFields, indent);
@@ -1761,12 +1791,19 @@ extern void makeFileTag (const char *const fileName)
 	if (Option.include.fileNames || Option.include.fileNamesWithTotalLines)
 	{
 		tagEntryInfo tag;
-		initTagEntry (&tag, baseFilename (fileName));
+		kindOption  *kind;
+
+		kind = getSourceLanguageFileKind();
+		Assert (kind);
+		kind->enabled = Option.include.fileNames;
+
+		/* TODO: you can return here if enabled == FALSE. */
+
+		initTagEntry (&tag, baseFilename (fileName), kind);
 
 		tag.isFileEntry     = TRUE;
 		tag.lineNumberEntry = TRUE;
-		tag.kindName        = KIND_FILE_DEFAULT_LONG;
-		tag.kind            = getSourceLanguageFileKind();
+
 		if (via_line_directive || Option.include.fileNames)
 		{
 			tag.lineNumber = 1;

@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 
+#include "kind.h"
 #include "vstring.h"
 
 /*
@@ -71,15 +72,15 @@ typedef struct sTagEntryInfo {
 	boolean     truncateLine;     /* truncate tag line at end of tag name? */
 	const char *sourceFileName;   /* name of source file */
 	const char *name;             /* name of the tag */
-	const char *kindName;         /* kind of tag */
-	char        kind;             /* single character representation of kind */
+	const kindOption *kind;	      /* kind descriptor */
 	struct {
 		const char* access;
 		const char* fileScope;
 		const char* implementation;
 		const char* inheritance;
 
-		const char* scope [2];    /* value and key */
+		const kindOption* scopeKind;
+		const char* scopeName;
 #define SCOPE_NIL 0
 		int         scopeIndex;   /* cork queue entry for upper scope tag.
 					     This field is meaningful if the value
@@ -111,12 +112,14 @@ extern void closeTagFile (const boolean resize);
 extern void beginEtagsFile (void);
 extern void endEtagsFile (const char *const name);
 extern int makeTagEntry (const tagEntryInfo *const tag);
-extern void initTagEntry (tagEntryInfo *const e, const char *const name);
+extern void initTagEntry (tagEntryInfo *const e, const char *const name,
+			  const kindOption *kind);
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
 			      const char* language,
 			      fpos_t      filePosition,
-			      const char *sourceFileName);
+			      const char *sourceFileName,
+			      const kindOption *kind);
 
 /* language is optional: can be NULL. */
 extern void writePseudoTag (const char *const tagName,

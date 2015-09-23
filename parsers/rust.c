@@ -438,21 +438,18 @@ static void addTag (vString* ident, const char* arg_list, int kind, unsigned lon
 	if (kind == K_NONE || ! rustKinds[kind].enabled)
 		return;
 	tagEntryInfo tag;
-	initTagEntry(&tag, ident->buffer);
+	initTagEntry(&tag, ident->buffer, &(rustKinds[kind]));
 
 	tag.lineNumber = line;
 	tag.filePosition = pos;
 	tag.sourceFileName = getSourceFileName();
 
-	tag.kindName = rustKinds[kind].name;
-	tag.kind = rustKinds[kind].letter;
-
 	tag.extensionFields.signature = arg_list;
 	/*tag.extensionFields.varType = type;*/ /* FIXME: map to typeRef[1]? */
 	if (parent_kind != K_NONE)
 	{
-		tag.extensionFields.scope[0] = rustKinds[parent_kind].name;
-		tag.extensionFields.scope[1] = scope->buffer;
+		tag.extensionFields.scopeKind = &(rustKinds[parent_kind]);
+		tag.extensionFields.scopeName = scope->buffer;
 	}
 	makeTagEntry(&tag);
 }
@@ -975,10 +972,9 @@ static void findRustTags (void)
 extern parserDefinition *RustParser (void)
 {
 	static const char *const extensions[] = { "rs", NULL };
-	parserDefinition *def = parserNew ("Rust");
+	parserDefinition *def = parserNewFull ("Rust", KIND_FILE_ALT);
 	def->kinds = rustKinds;
 	def->kindCount = KIND_COUNT (rustKinds);
-	def->fileKind = KIND_FILE_ALT;
 	def->extensions = extensions;
 	def->parser = findRustTags;
 

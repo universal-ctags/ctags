@@ -79,14 +79,12 @@ static void makeMemberTag (
 	if (ErlangKinds [kind].enabled  &&  vStringLength (identifier) > 0)
 	{
 		tagEntryInfo tag;
-		initTagEntry (&tag, vStringValue (identifier));
-		tag.kindName = ErlangKinds[kind].name;
-		tag.kind = ErlangKinds[kind].letter;
+		initTagEntry (&tag, vStringValue (identifier), & (ErlangKinds[kind]));
 
 		if (module != NULL  &&  vStringLength (module) > 0)
 		{
-			tag.extensionFields.scope [0] = "module";
-			tag.extensionFields.scope [1] = vStringValue (module);
+			tag.extensionFields.scopeKind = &(ErlangKinds [K_MODULE]);
+			tag.extensionFields.scopeName = vStringValue (module);
 		}
 		makeTagEntry (&tag);
 	}

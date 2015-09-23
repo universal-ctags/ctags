@@ -213,10 +213,7 @@ static void makeEiffelClassTag (tokenInfo *const token)
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
 
-		initTagEntry (&e, name);
-
-		e.kindName = EiffelKinds [EKIND_CLASS].name;
-		e.kind     = EiffelKinds [EKIND_CLASS].letter;
+		initTagEntry (&e, name, &(EiffelKinds [EKIND_CLASS]));
 
 		makeTagEntry (&e);
 	}
@@ -231,13 +228,11 @@ static void makeEiffelFeatureTag (tokenInfo *const token)
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
 
-		initTagEntry (&e, name);
+		initTagEntry (&e, name, &(EiffelKinds [EKIND_FEATURE]));
 
 		e.isFileScope = (boolean) (! token->isExported);
-		e.kindName    = EiffelKinds [EKIND_FEATURE].name;
-		e.kind        = EiffelKinds [EKIND_FEATURE].letter;
-		e.extensionFields.scope [0] = EiffelKinds [EKIND_CLASS].name;
-		e.extensionFields.scope [1] = vStringValue (token->className);
+		e.extensionFields.scopeKind = &(EiffelKinds [EKIND_CLASS]);
+		e.extensionFields.scopeName = vStringValue (token->className);
 
 		makeTagEntry (&e);
 
@@ -262,18 +257,16 @@ static void makeEiffelLocalTag (tokenInfo *const token)
 		vString* scope = vStringNew ();
 		tagEntryInfo e;
 
-		initTagEntry (&e, name);
+		initTagEntry (&e, name, &(EiffelKinds [EKIND_LOCAL]));
 
 		e.isFileScope = TRUE;
-		e.kindName    = EiffelKinds [EKIND_LOCAL].name;
-		e.kind        = EiffelKinds [EKIND_LOCAL].letter;
 
 		vStringCopy (scope, token->className);
 		vStringPut (scope, '.');
 		vStringCat (scope, token->featureName);
 
-		e.extensionFields.scope [0] = EiffelKinds [EKIND_FEATURE].name;
-		e.extensionFields.scope [1] = vStringValue (scope);
+		e.extensionFields.scopeKind = &(EiffelKinds [EKIND_FEATURE]);
+		e.extensionFields.scopeName = vStringValue (scope);
 
 		makeTagEntry (&e);
 		vStringDelete (scope);

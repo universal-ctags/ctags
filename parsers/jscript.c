@@ -257,12 +257,10 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const
 			name = p + 1;
 		}
 
-		initTagEntry (&e, name);
+		initTagEntry (&e, name, &(JsKinds [kind]));
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
-		e.kindName	   = JsKinds [kind].name;
-		e.kind		   = JsKinds [kind].letter;
 
 		if ( vStringLength(fullscope) > 0 )
 		{
@@ -275,8 +273,8 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const
 			if (kind == JSTAG_FUNCTION)
 				parent_kind = JSTAG_FUNCTION;
 
-			e.extensionFields.scope[0] = JsKinds [parent_kind].name;
-			e.extensionFields.scope[1] = vStringValue (fullscope);
+			e.extensionFields.scopeKind = &(JsKinds [parent_kind]);
+			e.extensionFields.scopeName = vStringValue (fullscope);
 		}
 
 		if (signature && vStringLength(signature))

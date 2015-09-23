@@ -153,6 +153,8 @@ typedef enum eAdaKinds
   ADA_KIND_COUNT            /* must be last */
 } adaKind;
 
+static kindOption AdaSeparateKind = { TRUE, 'S', "separate", "something separately declared/defined" };
+
 static kindOption AdaKinds[] =
 {
   { TRUE,  'P', "packspec",    "package specifications" },
@@ -402,7 +404,7 @@ static adaTokenInfo *newAdaToken(const char *name, int len, adaKind kind,
   }
 
   /* init the tag */
-  initTagEntry(&token->tag, tmpName);
+  initTagEntry(&token->tag, tmpName, NULL);
 
   token->kind = kind;
   token->isSpec = isSpec;
@@ -435,13 +437,11 @@ static adaTokenInfo *newAdaToken(const char *name, int len, adaKind kind,
    * them blank because they get filled in later. */
   if(kind > ADA_KIND_UNDEFINED)
   {
-    token->tag.kindName = AdaKinds[kind].name;
-    token->tag.kind = AdaKinds[kind].letter;
+    token->tag.kind = &(AdaKinds[kind]);
   }
   else
   {
-    token->tag.kindName = "";
-    token->tag.kind = '\0';
+    token->tag.kind = NULL;
   }
 
   /* setup the parent and children pointers */
@@ -2060,8 +2060,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
 
       if(token->kind != ADA_KIND_UNDEFINED)
       {
-        token->tag.kindName = AdaKinds[token->kind].name;
-        token->tag.kind = AdaKinds[token->kind].letter;
+        token->tag.kind = &(AdaKinds[token->kind]);
       }
     }
 
@@ -2071,15 +2070,13 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
       if(token->parent->kind > ADA_KIND_UNDEFINED &&
          token->parent->kind < ADA_KIND_COUNT)
       {
-        token->tag.extensionFields.scope[0] =
-          AdaKinds[token->parent->kind].name;
-        token->tag.extensionFields.scope[1] = token->parent->name;
+        token->tag.extensionFields.scopeKind = &(AdaKinds[token->parent->kind]);
+        token->tag.extensionFields.scopeName = token->parent->name;
       }
       else if(token->parent->kind == ADA_KIND_SEPARATE)
       {
-        token->tag.extensionFields.scope[0] =
-          AdaKeywords[ADA_KEYWORD_SEPARATE];
-        token->tag.extensionFields.scope[1] = token->parent->name;
+        token->tag.extensionFields.scopeKind = &(AdaSeparateKind);
+        token->tag.extensionFields.scopeName = token->parent->name;
       }
     } /* else if(token->parent->kind == ADA_KIND_ANONYMOUS) */
   } /* if(token->parent != NULL) */

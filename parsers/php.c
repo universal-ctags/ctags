@@ -295,12 +295,10 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 		parentKind = K_NAMESPACE;
 	}
 
-	initTagEntry (e, vStringValue (token->string));
+	initTagEntry (e, vStringValue (token->string), &(PhpKinds[kind]));
 
 	e->lineNumber	= token->lineNumber;
 	e->filePosition	= token->filePosition;
-	e->kindName		= PhpKinds[kind].name;
-	e->kind			= (char) PhpKinds[kind].letter;
 
 	if (access != ACCESS_UNDEFINED)
 		e->extensionFields.access = accessToString (access);
@@ -316,8 +314,8 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 		Assert (parentKind >= 0);
 
 		vStringTerminate (FullScope);
-		e->extensionFields.scope[0] = PhpKinds[parentKind].name;
-		e->extensionFields.scope[1] = vStringValue (FullScope);
+		e->extensionFields.scopeKind = &(PhpKinds[parentKind]);
+		e->extensionFields.scopeName = vStringValue (FullScope);
 	}
 }
 
@@ -339,12 +337,10 @@ static void makeNamespacePhpTag (const tokenInfo *const token, const vString *co
 	{
 		tagEntryInfo e;
 
-		initTagEntry (&e, vStringValue (name));
+		initTagEntry (&e, vStringValue (name), &(PhpKinds[K_NAMESPACE]));
 
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
-		e.kindName		= PhpKinds[K_NAMESPACE].name;
-		e.kind			= (char) PhpKinds[K_NAMESPACE].letter;
 
 		makeTagEntry (&e);
 	}

@@ -116,19 +116,17 @@ static void makeJsonTag (tokenInfo *const token, const jsonKind kind)
 	if (! JsonKinds[kind].enabled)
 		return;
 
-	initTagEntry (&e, vStringValue (token->string));
+	initTagEntry (&e, vStringValue (token->string), &(JsonKinds[kind]));
 
 	e.lineNumber	= token->lineNumber;
 	e.filePosition	= token->filePosition;
-	e.kindName		= JsonKinds[kind].name;
-	e.kind			= JsonKinds[kind].letter;
 
 	if (vStringLength (token->scope) > 0)
 	{
 		Assert (token->scopeKind > TAG_NONE && token->scopeKind < TAG_COUNT);
 
-		e.extensionFields.scope[0] = JsonKinds[token->scopeKind].name;
-		e.extensionFields.scope[1] = vStringValue (token->scope);
+		e.extensionFields.scopeKind = &(JsonKinds[token->scopeKind]);
+		e.extensionFields.scopeName = vStringValue (token->scope);
 	}
 
 	makeTagEntry (&e);

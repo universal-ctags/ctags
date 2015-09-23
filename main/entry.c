@@ -733,7 +733,7 @@ static int writeXrefEntry (const tagEntryInfo *const tag)
 				tag->lineNumber, tag->sourceFileName);
 	else
 		length = fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s ", tag->name,
-				tag->kindName, tag->lineNumber, tag->sourceFileName);
+				  tag->kind->name, tag->lineNumber, tag->sourceFileName);
 
 	/* If no associated line for tag is found, we cannot prepare
 	 * parameter to writeCompactSourceLine(). In this case we
@@ -801,12 +801,12 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 /* "sep" returns a value only the first time it is evaluated */
 #define sep (first ? (first = FALSE, separator) : empty)
 
-	if (tag->kindName != NULL && (Option.extensionFields.kindLong  ||
+	if (tag->kind->name != NULL && (Option.extensionFields.kindLong  ||
 		 (Option.extensionFields.kind  && tag->kind == '\0')))
-		length += fprintf (TagFile.fp,"%s\t%s%s", sep, kindKey, tag->kindName);
+		length += fprintf (TagFile.fp,"%s\t%s%s", sep, kindKey, tag->kind->name);
 	else if (tag->kind != '\0'  && (Option.extensionFields.kind  ||
-			(Option.extensionFields.kindLong  &&  tag->kindName == NULL)))
-		length += fprintf (TagFile.fp, "%s\t%s%c", sep, kindKey, tag->kind);
+			(Option.extensionFields.kindLong  &&  tag->kind->name == NULL)))
+		length += fprintf (TagFile.fp, "%s\t%s%c", sep, kindKey, tag->kind->letter);
 
 	if (Option.extensionFields.lineNumber)
 		length += fprintf (TagFile.fp, "%s\tline:%ld", sep, tag->lineNumber);
@@ -816,11 +816,11 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 
 	if (Option.extensionFields.scope)
 	{
-		if (tag->extensionFields.scope [0] != NULL  &&
-		    tag->extensionFields.scope [1] != NULL)
+		if (tag->extensionFields.scopeKind != NULL  &&
+		    tag->extensionFields.scopeName != NULL)
 			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-					   tag->extensionFields.scope [0],
-					   tag->extensionFields.scope [1]);
+					   tag->extensionFields.scopeKind->name,
+					   tag->extensionFields.scopeName);
 		else if (tag->extensionFields.scopeIndex != SCOPE_NIL
 			 && TagFile.corkQueue.count > 0)
 		{
@@ -828,7 +828,7 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 
 			scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
 			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-					   scope->kindName, scope->name);
+					   scope->kind->name, scope->name);
 		}
 	}
 
@@ -952,10 +952,10 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 		slot->extensionFields.implementation = eStrdup (slot->extensionFields.implementation);
 	if (slot->extensionFields.inheritance)
 		slot->extensionFields.inheritance = eStrdup (slot->extensionFields.inheritance);
-	if (slot->extensionFields.scope[0])
-		slot->extensionFields.scope[0] = eStrdup (slot->extensionFields.scope[0]);
-	if (slot->extensionFields.scope[1])
-		slot->extensionFields.scope[1] = eStrdup (slot->extensionFields.scope[1]);
+	if (slot->extensionFields.scopeKind)
+		slot->extensionFields.scopeKind = slot->extensionFields.scopeKind;
+	if (slot->extensionFields.scopeName)
+		slot->extensionFields.scopeName = eStrdup (slot->extensionFields.scopeName);
 	if (slot->extensionFields.signature)
 		slot->extensionFields.signature = eStrdup (slot->extensionFields.signature);
 	if (slot->extensionFields.typeRef[0])
@@ -979,10 +979,10 @@ static void clearTagEntryInQueue (tagEntryInfo* slot)
 		eFree ((char *)slot->extensionFields.implementation);
 	if (slot->extensionFields.inheritance)
 		eFree ((char *)slot->extensionFields.inheritance);
-	if (slot->extensionFields.scope[0])
-		eFree ((char *)slot->extensionFields.scope[0]);
-	if (slot->extensionFields.scope[1])
-		eFree ((char *)slot->extensionFields.scope[1]);
+	if (slot->extensionFields.scopeKind)
+		slot->extensionFields.scopeKind = NULL;
+	if (slot->extensionFields.scopeName)
+		eFree ((char *)slot->extensionFields.scopeName);
 	if (slot->extensionFields.signature)
 		eFree ((char *)slot->extensionFields.signature);
 	if (slot->extensionFields.typeRef[0])
@@ -1087,7 +1087,7 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 {
 	int r = SCOPE_NIL;
 	Assert (tag->name != NULL && strchr (tag->name, '\t') == NULL);
-	Assert (getSourceLanguageFileKind() == tag->kind || isSourceLanguageKindEnabled (tag->kind));
+	Assert (getSourceLanguageFileKind() == tag->kind || isSourceLanguageKindEnabled (tag->kind->letter));
 
 	if (tag->name [0] == '\0')
 		error (WARNING, "ignoring null tag in %s(line: %lu)", vStringValue (File.name), tag->lineNumber);
@@ -1098,20 +1098,23 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	return r;
 }
 
-extern void initTagEntry (tagEntryInfo *const e, const char *const name)
+extern void initTagEntry (tagEntryInfo *const e, const char *const name,
+			  const kindOption *kind)
 {
 	initTagEntryFull(e, name,
 			 getSourceLineNumber (),
 			 getSourceLanguageName (),
 			 getInputFilePosition (),
-			 getSourceFileTagPath ());
+			 getSourceFileTagPath (),
+			 kind);
 }
 
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
 			      const char* language,
 			      fpos_t      filePosition,
-			      const char *sourceFileName)
+			      const char *sourceFileName,
+			      const kindOption *kind)
 {
 	Assert (File.source.name != NULL);
 	Assert (name == NULL || strchr (name, '\t') == NULL);
@@ -1124,6 +1127,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->sourceFileName  = sourceFileName;
 	e->name            = name;
 	e->extensionFields.scopeIndex     = SCOPE_NIL;
+	e->kind = kind;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

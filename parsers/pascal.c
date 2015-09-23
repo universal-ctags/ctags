@@ -40,13 +40,10 @@ static void createPascalTag (
 		tagEntryInfo* const tag, const vString* const name, const int kind)
 {
 	if (PascalKinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
-	{
-	    initTagEntry (tag, vStringValue (name));
-	    tag->kindName = PascalKinds [kind].name;
-	    tag->kind     = PascalKinds [kind].letter;
-	}
+		initTagEntry (tag, vStringValue (name), &(PascalKinds [kind]));
 	else
-	    initTagEntry (tag, NULL);
+		/* TODO: Passing NULL as name makes an assertion behind initTagEntry failure */
+		initTagEntry (tag, NULL, NULL);
 }
 
 static void makePascalTag (const tagEntryInfo* const tag)

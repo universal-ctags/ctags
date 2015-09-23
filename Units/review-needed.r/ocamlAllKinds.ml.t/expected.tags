@@ -7,7 +7,7 @@ barfield	input.ml	/^     barfield : int;$/;"	r	type:foorecord
 fooClass	input.ml	/^class  fooClass =$/;"	c
 fooMethod	input.ml	/^    method fooMethod = x$/;"	m	class:fooClass
 foo_function	input.ml	/^let foo_function a b = (a, b)$/;"	v
-foobar	input.ml	/^    type foobar =$/;"	t	Module:ModuleFoo
+foobar	input.ml	/^    type foobar =$/;"	t	module:ModuleFoo
 foobarfield	input.ml	/^     mutable foobarfield : list char -> int -> unit }$/;"	r	type:foorecord
 foofield	input.ml	/^    { foofield : 'a;$/;"	r	type:foorecord
 foorecord	input.ml	/^type 'a foorecord =$/;"	t

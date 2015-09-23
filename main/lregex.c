@@ -31,6 +31,7 @@
 #include "entry.h"
 #include "flags.h"
 #include "htable.h"
+#include "kind.h"
 #include "options.h"
 #include "parse.h"
 #include "read.h"
@@ -54,13 +55,6 @@ static boolean regexAvailable = FALSE;
 *   DATA DECLARATIONS
 */
 
-struct sKind {
-	boolean enabled;
-	char letter;
-	char* name;
-	char* description;
-};
-
 union cptr {
 	char c;
 	void *p;
@@ -76,7 +70,7 @@ typedef struct {
 	union {
 		struct {
 			char *name_pattern;
-			struct sKind *kind;
+			kindOption *kind;
 		} tag;
 		struct {
 			regexCallback function;
@@ -140,16 +134,14 @@ static void clearPatternSet (const langType language)
 */
 
 static void makeRegexTag (
-		const vString* const name, const struct sKind* const kind)
+		const vString* const name, const kindOption* const kind)
 {
 	if (kind->enabled)
 	{
 		tagEntryInfo e;
 		Assert (name != NULL  &&  vStringLength (name) > 0);
 		Assert (kind != NULL);
-		initTagEntry (&e, vStringValue (name));
-		e.kind     = kind->letter;
-		e.kindName = kind->name;
+		initTagEntry (&e, vStringValue (name), kind);
 		makeTagEntry (&e);
 	}
 }
@@ -264,9 +256,9 @@ static flagDefinition prePtrnFlagDef[] = {
 	{ 'x',  "exclusive", pre_ptrn_flag_exclusive_short, pre_ptrn_flag_exclusive_long },
 };
 
-static struct sKind *kindNew ()
+static kindOption *kindNew ()
 {
-	struct sKind *kind = xMalloc (1, struct sKind);
+	kindOption *kind = xMalloc (1, kindOption);
 	kind->letter        = '\0';
 	kind->name = NULL;
 	kind->description = NULL;
@@ -276,7 +268,7 @@ static struct sKind *kindNew ()
 
 static void kindFree (void *data)
 {
-	struct sKind *kind = data;
+	kindOption *kind = data;
 	kind->letter = '\0';
 	if (kind->name)
 	{
@@ -299,7 +291,7 @@ static regexPattern* addCompiledTagCommon (const langType language,
 {
 	patternSet* set;
 	regexPattern *ptrn;
-	struct sKind *kind = NULL;
+	kindOption *kind = NULL;
 
 	if (language > SetUpper)
 	{
@@ -498,28 +490,6 @@ struct printRegexKindCBData{
 	boolean indent;
 };
 
-static void printRegexKind (char kind_letter, struct sKind *kind,
-			    boolean allKindFields,
-			    boolean indent)
-{
-	if (allKindFields)
-	{
-		printf ("%s%c\t%s\t%s\t%s\n", indent ? "\t"           : "",
-			kind_letter,
-			kind->name        != NULL ? kind->name        : "",
-			kind->description != NULL ? kind->description : "",
-			kind->enabled             ? "on"              : "off");
-	}
-	else
-	{
-		/* 2 spaces before [off] comes from exuberant ctags. */
-		printf ("%s%c  %s %s\n", indent ? "    " : "", kind_letter,
-			kind->description != NULL ? kind->description :
-			(kind->name != NULL ? kind->name : ""),
-			kind->enabled ? "" : " [off]");
-	}
-}
-
 static void printRegexKindCB (void *key, void *value, void* user_data)
 {
 	union cptr c;
@@ -530,7 +500,7 @@ static void printRegexKindCB (void *key, void *value, void* user_data)
 	{
 		if (data->allKindFields && data->indent)
 			printf ("%s", data->langName);
-		printRegexKind(c.c, value, data->allKindFields, data->indent);
+		printKind (value, data->allKindFields, data->indent);
 	}
 }
 
@@ -719,7 +689,7 @@ static regexPattern *addTagRegexInternal (
 			char* description;
 
 			parseKinds (kinds, &kind, &kindName, &description);
-			if (kind == getLanguageFileKind (language))
+			if (kind == getLanguageFileKind (language)->letter)
 				error (FATAL,
 				       "Kind letter \'%c\' used in regex definition \"%s\" of %s language is reserved in ctags main",
 				       kind,
@@ -817,7 +787,7 @@ extern boolean processRegexOption (const char *const option,
 }
 
 static void foreachRegexKinds (const langType language,
-			       boolean (*func) (struct sKind *, void *),
+			       boolean (*func) (kindOption *, void *),
 			       void *data)
 {
 #ifdef HAVE_REGEX
@@ -834,7 +804,7 @@ static void foreachRegexKinds (const langType language,
 }
 
 
-static boolean kind_reset_cb (struct sKind *kind, void *data)
+static boolean kind_reset_cb (kindOption *kind, void *data)
 {
 	kind->enabled = *(boolean *)data;
 	return FALSE;		/* continue */
@@ -852,7 +822,7 @@ struct kind_and_mode_and_result
 	boolean result;
 };
 
-static boolean enable_kind_cb (struct sKind *kind, void *data)
+static boolean enable_kind_cb (kindOption *kind, void *data)
 {
 	struct kind_and_mode_and_result *kmr = data;
 	if (kind->letter == kmr->kind)
@@ -883,7 +853,7 @@ struct kind_and_result
 	boolean result;
 };
 
-static boolean is_kind_enabled_cb (struct sKind *kind, void *data)
+static boolean is_kind_enabled_cb (kindOption *kind, void *data)
 {
 	boolean r = FALSE;
 	struct kind_and_result *kr = data;
@@ -897,7 +867,7 @@ static boolean is_kind_enabled_cb (struct sKind *kind, void *data)
 	return r;
 }
 
-static boolean does_kind_exist_cb (struct sKind *kind, void *data)
+static boolean does_kind_exist_cb (kindOption *kind, void *data)
 {
 	boolean r = FALSE;
 	struct kind_and_result *kr = data;

@@ -182,6 +182,7 @@
     <ClInclude Include="..\gnu_regex\regex.h" />
     <ClInclude Include="..\main\htable.h" />
     <ClInclude Include="..\main\keyword.h" />
+    <ClInclude Include="..\main\kind.h" />
     <ClInclude Include="..\main\main.h" />
     <ClInclude Include="..\main\nestlevel.h" />
     <ClInclude Include="..\main\options.h" />

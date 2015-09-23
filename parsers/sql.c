@@ -446,18 +446,16 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 	{
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
-		initTagEntry (&e, name);
+		initTagEntry (&e, name, &(SqlKinds [kind]));
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
-		e.kindName	   = SqlKinds [kind].name;
-		e.kind		   = SqlKinds [kind].letter;
 
 		if (vStringLength (token->scope) > 0)
 		{
 			Assert (token->scopeKind < SQLTAG_COUNT);
-			e.extensionFields.scope[0] = SqlKinds [token->scopeKind].name;
-			e.extensionFields.scope[1] = vStringValue (token->scope);
+			e.extensionFields.scopeKind = &(SqlKinds [token->scopeKind]);
+			e.extensionFields.scopeName = vStringValue (token->scope);
 		}
 
 		makeTagEntry (&e);
@@ -2396,10 +2394,9 @@ static void findSqlTags (void)
 extern parserDefinition* SqlParser (void)
 {
 	static const char *const extensions [] = { "sql", NULL };
-	parserDefinition* def = parserNew ("SQL");
+	parserDefinition* def = parserNewFull ("SQL", KIND_FILE_ALT);
 	def->kinds		= SqlKinds;
 	def->kindCount	= KIND_COUNT (SqlKinds);
-	def->fileKind = KIND_FILE_ALT;
 	def->extensions = extensions;
 	def->parser		= findSqlTags;
 	def->initialize = initialize;

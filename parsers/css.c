@@ -227,12 +227,10 @@ static void findCssTags (void)
 			if (CssKinds[kind].enabled)
 			{
 				tagEntryInfo e;
-				initTagEntry (&e, vStringValue (selector));
+				initTagEntry (&e, vStringValue (selector), &(CssKinds[kind]));
 
 				e.lineNumber	= lineNumber;
 				e.filePosition	= filePosition;
-				e.kindName		= CssKinds[kind].name;
-				e.kind			= (char) CssKinds[kind].letter;
 
 				makeTagEntry (&e);
 			}

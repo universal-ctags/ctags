@@ -1052,6 +1052,22 @@ static veraKind veraTagKindFull (const tagType type, boolean with_assert) {
 	return result;
 }
 
+static const kindOption *kindForType (const tagType type)
+{
+	const kindOption * result;
+	if (isLanguage (Lang_csharp))
+		result = &(CsharpKinds [csharpTagKind (type)]);
+	else if (isLanguage (Lang_java))
+		result = &(JavaKinds [javaTagKind (type)]);
+	else if (isLanguage (Lang_d))
+		result = &(DKinds [dTagKind (type)]);
+	else if (isLanguage (Lang_vera))
+		result = &(VeraKinds [veraTagKind (type)]);
+	else
+		result = &(CKinds [cTagKind (type)]);
+	return result;
+}
+
 static const char *tagName (const tagType type)
 {
 	const char* result;
@@ -1065,22 +1081,6 @@ static const char *tagName (const tagType type)
 		result = VeraKinds [veraTagKind (type)].name;
 	else
 		result = CKinds [cTagKind (type)].name;
-	return result;
-}
-
-static int tagLetter (const tagType type)
-{
-	int result;
-	if (isLanguage (Lang_csharp))
-		result = CsharpKinds [csharpTagKind (type)].letter;
-	else if (isLanguage (Lang_java))
-		result = JavaKinds [javaTagKind (type)].letter;
-	else if (isLanguage (Lang_d))
-		result = DKinds [dTagKind (type)].letter;
-	else if (isLanguage (Lang_vera))
-		result = VeraKinds [veraTagKind (type)].letter;
-	else
-		result = CKinds [cTagKind (type)].letter;
 	return result;
 }
 
@@ -1215,14 +1215,14 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 
 				if (isType (st->context, TOKEN_NAME))
 				{
-					tag->extensionFields.scope [0] = tagName (TAG_CLASS);
-					tag->extensionFields.scope [1] = vStringValue (scope);
+					tag->extensionFields.scopeKind = kindForType (TAG_CLASS);
+					tag->extensionFields.scopeName = vStringValue (scope);
 				}
 				else if ((ptype = declToTagType (parentDecl (st))) &&
 					 includeTag (ptype, Option.include.fileScope))
 				{
-					tag->extensionFields.scope [0] = tagName (ptype);
-					tag->extensionFields.scope [1] = vStringValue (scope);
+					tag->extensionFields.scopeKind = kindForType (ptype);
+					tag->extensionFields.scopeName = vStringValue (scope);
 				}
 			}
 			if ((type == TAG_CLASS  ||  type == TAG_INTERFACE  ||
@@ -1382,13 +1382,11 @@ static void makeTag (const tokenInfo *const token,
 		vString *typeRef = vStringNew ();
 		tagEntryInfo e;
 
-		initTagEntry (&e, vStringValue (token->name));
+		initTagEntry (&e, vStringValue (token->name), kindForType (type));
 
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
 		e.isFileScope	= isFileScope;
-		e.kindName		= tagName (type);
-		e.kind			= tagLetter (type);
 
 		isScopeBuilt = findScopeHierarchy (scope, st);
 		addOtherFields (&e, type, st, scope, typeRef);

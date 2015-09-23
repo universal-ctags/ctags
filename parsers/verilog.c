@@ -305,20 +305,12 @@ static void pruneTokens (tokenInfo * token)
 	while ((token = popToken (token)));
 }
 
-static const char *kindName (const verilogKind kind)
+static const kindOption *kindFromKind (const verilogKind kind)
 {
 	if (isLanguage (Lang_systemverilog))
-		return SystemVerilogKinds[kind].name;
+		return &(SystemVerilogKinds[kind]);
 	else /* isLanguage (Lang_verilog) */
-		return VerilogKinds[kind].name;
-}
-
-static char kindLetter (const verilogKind kind)
-{
-	if (isLanguage (Lang_systemverilog))
-		return SystemVerilogKinds[kind].letter;
-	else /* isLanguage (Lang_verilog) */
-		return VerilogKinds[kind].letter;
+		return &(VerilogKinds[kind]);
 }
 
 static char kindEnabled (const verilogKind kind)
@@ -538,7 +530,7 @@ static void dropContext (tokenInfo *const token)
 	}
 	else
 	{
-		vStringCatS (endTokenName, kindName (currentContext->kind));
+		vStringCatS (endTokenName, kindFromKind (currentContext->kind)->name);
 		if (strcmp (vStringValue (token->name), vStringValue (endTokenName)) == 0)
 		{
 			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
@@ -566,17 +558,16 @@ static void createTag (tokenInfo *const token)
 			token->lineNumber,
 			getSourceLanguageName (),
 			token->filePosition,
-			getSourceFileTagPath ()
+			getSourceFileTagPath (),
+			kindFromKind (token->kind)
 			);
-	tag.kindName    = kindName (token->kind);
-	tag.kind        = kindLetter (token->kind);
 	verbose ("Adding tag %s (kind %d)", vStringValue (token->name), token->kind);
 	if (currentContext->kind != K_UNDEFINED)
 	{
 		verbose (" to context %s\n", vStringValue (currentContext->name));
 		currentContext->lastKind = token->kind;
-		tag.extensionFields.scope [0] = kindName (currentContext->kind);
-		tag.extensionFields.scope [1] = vStringValue (currentContext->name);
+		tag.extensionFields.scopeKind = kindFromKind (currentContext->kind);
+		tag.extensionFields.scopeName = vStringValue (currentContext->name);
 	}
 	verbose ("\n");
 	if (vStringLength (token->inheritance) > 0)
