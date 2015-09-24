@@ -412,13 +412,15 @@ esac
 # MinGW has st_ino, but it doesn't work.
 if test yes != "$host_mingw"; then
 	AC_MSG_CHECKING(if struct stat contains st_ino)
-	AC_TRY_COMPILE([#include <sys/stat.h>
-					#include <stdlib.h>], [
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+		#include <sys/stat.h>
+		#include <stdlib.h>
+		], [
 		struct stat st;
 		stat(".", &st);
 		if (st.st_ino > 0)
 			exit(0);
-	], have_st_ino=yes, have_st_ino=no)
+	])],[have_st_ino=yes],[have_st_ino=no])
 	AC_MSG_RESULT($have_st_ino)
 	if test yes = "$have_st_ino"; then
 		AC_DEFINE(HAVE_STAT_ST_INO)
@@ -508,13 +510,14 @@ dnl
 dnl
 AC_CHECK_FUNCS(regcomp,[
 AC_MSG_CHECKING(if regcomp works)
-AC_TRY_RUN([
+AC_RUN_IFELSE([AC_LANG_SOURCE([
 #include <sys/types.h>
 #include <regex.h>
 int main(void) {
 	regex_t patbuf;
 	return (regcomp (&patbuf, "/hello/", 0) != 0);
-}],regcomp_works=yes,regcomp_works=no,AC_DEFINE(CHECK_REGCOMP))
+}
+])],[regcomp_works=yes],[regcomp_works=no],[AC_DEFINE(CHECK_REGCOMP)])
 AC_MSG_RESULT($regcomp_works)
 if test yes != "$regcomp_works"; then
 	AC_DEFINE(REGCOMP_BROKEN)
