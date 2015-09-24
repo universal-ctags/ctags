@@ -81,23 +81,23 @@ extern void debugEntry (const tagEntryInfo *const tag)
 			printf (" [%s:%s]", tag->extensionFields.scopeKind->name,
 					tag->extensionFields.scopeName);
 
-		if (Option.extensionFields.inheritance  &&
+		if (Option.extensionFields[FIELD_INHERITANCE] &&
 				tag->extensionFields.inheritance != NULL)
 			printf (" [inherits:%s]", tag->extensionFields.inheritance);
 
-		if (Option.extensionFields.fileScope &&
+		if (Option.extensionFields[FIELD_FILE_SCOPE] &&
 				tag->isFileScope && ! isHeaderFile ())
 			printf (" [file:]");
 
-		if (Option.extensionFields.access  &&
+		if (Option.extensionFields[FIELD_ACCESS] &&
 				tag->extensionFields.access != NULL)
 			printf (" [access:%s]", tag->extensionFields.access);
 
-		if (Option.extensionFields.implementation  &&
+		if (Option.extensionFields[FIELD_IMPLEMENTATION] &&
 				tag->extensionFields.implementation != NULL)
 			printf (" [imp:%s]", tag->extensionFields.implementation);
 
-		if (Option.extensionFields.typeRef  &&
+		if (Option.extensionFields[FIELD_TYPE_REF] &&
 				tag->extensionFields.typeRef [0] != NULL  &&
 				tag->extensionFields.typeRef [1] != NULL)
 			printf (" [%s:%s]", tag->extensionFields.typeRef [0],

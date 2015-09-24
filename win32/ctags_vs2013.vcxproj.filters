@@ -177,6 +177,9 @@
     <ClCompile Include="..\main\entry.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\field.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\flags.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -249,6 +252,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\entry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\field.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\flags.h">

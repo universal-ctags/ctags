@@ -23,6 +23,7 @@
 #include <stdarg.h>
 
 #include "args.h"
+#include "field.h"
 #include "parse.h"
 #include "strlist.h"
 #include "vstring.h"
@@ -65,26 +66,11 @@ struct sInclude {
 					    total lines of the files */
 };
 
-struct sExtFields {  /* extension field content control */
-	boolean access;
-	boolean fileScope;
-	boolean implementation;
-	boolean inheritance;
-	boolean kind;
-	boolean kindKey;
-	boolean kindLong;
-	boolean language;
-	boolean lineNumber;
-	boolean scope;
-	boolean signature;
-	boolean typeRef;
-};
-
 /*  This stores the command line options.
  */
 typedef struct sOptionValues {
 	struct sInclude include;/* --extra  extra tag inclusion */
-	struct sExtFields extensionFields;/* --fields  extension field control */
+	boolean extensionFields [FIELD_COUNT];/* --fields  extension field control */
 	stringList* ignore;     /* -I  name of file containing tokens to ignore */
 	boolean append;         /* -a  append to "tags" file */
 	boolean backward;       /* -B  regexp patterns search backwards */

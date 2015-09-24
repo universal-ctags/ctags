@@ -9,6 +9,7 @@ MAIN_HEADERS =				\
 	$(MAIN_DIR)/args.h		\
 	$(MAIN_DIR)/ctags.h		\
 	$(MAIN_DIR)/entry.h		\
+	$(MAIN_DIR)/field.h		\
 	$(MAIN_DIR)/flags.h		\
 	$(MAIN_DIR)/general.h		\
 	$(MAIN_DIR)/get.h		\
@@ -90,6 +91,7 @@ PARSER_SOURCES =				\
 MAIN_SOURCES =					\
 	$(MAIN_DIR)/args.c			\
 	$(MAIN_DIR)/entry.c			\
+	$(MAIN_DIR)/field.c			\
 	$(MAIN_DIR)/flags.c			\
 	$(MAIN_DIR)/get.c			\
 	$(MAIN_DIR)/htable.c			\
