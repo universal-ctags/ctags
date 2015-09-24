@@ -27,6 +27,7 @@ MAIN_HEADERS =				\
 	$(MAIN_DIR)/selectors.h		\
 	$(MAIN_DIR)/sort.h		\
 	$(MAIN_DIR)/strlist.h		\
+	$(MAIN_DIR)/tg.h		\
 	$(MAIN_DIR)/vstring.h
 
 PARSER_HEADERS =
