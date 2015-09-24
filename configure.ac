@@ -5,7 +5,7 @@
 
 #	Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.61])
+AC_PREREQ([2.59])
 AC_INIT([ctags],[universal])
 AC_CONFIG_HEADERS([config.h])
 if ! test -e "${srcdir}/config.h.in"; then
@@ -355,9 +355,9 @@ fi
 # Checks for header files
 # -----------------------
 
-AC_CHECK_HEADERS_ONCE([dirent.h fcntl.h io.h stat.h stdlib.h string.h])
-AC_CHECK_HEADERS_ONCE([time.h types.h unistd.h])
-AC_CHECK_HEADERS_ONCE([sys/dir.h sys/stat.h sys/times.h sys/types.h sys/wait.h])
+AC_CHECK_HEADERS([dirent.h fcntl.h io.h stat.h stdlib.h string.h])
+AC_CHECK_HEADERS([time.h types.h unistd.h])
+AC_CHECK_HEADERS([sys/dir.h sys/stat.h sys/times.h sys/types.h sys/wait.h])
 
 
 # Checks for header file macros
