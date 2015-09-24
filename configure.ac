@@ -286,7 +286,6 @@ case `uname` in
 esac
 
 AC_PROG_LN_S
-AC_PROG_MKDIR_P
 AC_CHECK_PROG(STRIP, strip, strip, :)
 AC_SYS_LARGEFILE
 

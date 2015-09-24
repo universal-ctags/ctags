@@ -27,7 +27,6 @@ pkgconfdir=@sysconfdir@/@PACKAGE_NAME@
 libexecdir=@libexecdir@
 pkglibexecdir=@libexecdir@/@PACKAGE_NAME@
 SLINK	= @LN_S@
-MKDIR_P = @MKDIR_P@
 STRIP	= @STRIP@
 ifdef SPARSE
 SPARSEFLAGS=-Wsparse-all
@@ -368,7 +367,7 @@ maintainerclean: distclean
 # implicit rules
 #
 .c.$(OBJEXT):
-	$(SILENT) dir="$$(dirname $@)"; [ -d "$$dir" ] || $(MKDIR_P) "$$dir"
+	$(SILENT) dir="$$(dirname $@)"; mkdir -p "$$dir"
 	$(V_CC) $(CC) -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -o $@ -c $<
 $(addsuffix .$(OBJEXT),$(basename $(notdir $(REGEX_SOURCES)))): ALL_CPPFLAGS += \
 	-D_GNU_SOURCE -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1
