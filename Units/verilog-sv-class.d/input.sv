@@ -36,4 +36,9 @@ class paramtest3 #(type BASE=supertest, type BASE2=paramtest);
 virtual function myfunc (a, b);
 endfunction
 
+extern virtual function test ext_func (c, d);
+
 endclass : paramtest3
+
+function test paramtest3::ext_func (c, d);
+endfunction

@@ -81,6 +81,7 @@ typedef struct sTokenInfo {
 	vString*            blockName;     /* Current block name */
 	vString*            inheritance;   /* Class inheritance */
 	boolean             prototype;     /* Is only a prototype */
+	boolean             classScope;    /* Context is local to the current sub-context */
 } tokenInfo;
 
 /*
@@ -272,6 +273,7 @@ static tokenInfo *newToken (void)
 	token->blockName = vStringNew ();
 	token->inheritance = vStringNew ();
 	token->prototype = FALSE;
+	token->classScope = FALSE;
 	return token;
 }
 
@@ -506,7 +508,6 @@ static void createContext (tokenInfo *const scope)
 	{
 		vString *contextName = vStringNew ();
 
-		verbose ("Creating new context %s\n", vStringValue (scope->name));
 		/* Determine full context name */
 		if (currentContext->kind != K_UNDEFINED)
 		{
@@ -518,6 +519,7 @@ static void createContext (tokenInfo *const scope)
 		currentContext = pushToken (currentContext, scope);
 		vStringCopy (currentContext->name, contextName);
 		vStringDelete (contextName);
+		verbose ("Created new context %s (kind %d)\n", vStringValue (currentContext->name), currentContext->kind);
 	}
 }
 
@@ -539,6 +541,11 @@ static void dropContext (tokenInfo *const token)
 		{
 			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
 			currentContext = popToken (currentContext);
+			if (currentContext->classScope)
+			{
+				verbose ("Dropping local context %s\n", vStringValue (currentContext->name));
+				currentContext = popToken (currentContext);
+			}
 		}
 	}
 	vStringDelete(endTokenName);
@@ -738,6 +745,7 @@ static void processPortList (int c)
 static void processFunction (tokenInfo *const token)
 {
 	int c;
+	tokenInfo *classType;
 
 	/* Search for function name
 	 * Last identifier found before a '(' or a ';' is the function name */
@@ -746,6 +754,24 @@ static void processFunction (tokenInfo *const token)
 	{
 		readIdentifier (token, c);
 		c = skipWhite (vGetc ());
+		/* Identify class type prefixes and create respective context*/
+		if (c == ':')
+		{
+			c = vGetc ();
+			if (c == ':')
+			{
+				verbose ("Found function declaration with class type %s\n", vStringValue (token->name));
+				classType = newToken ();
+				vStringCopy (classType->name, token->name);
+				classType->kind = K_CLASS;
+				createContext (classType);
+				currentContext->classScope = TRUE;
+			}
+			else
+			{
+				vUngetc (c);
+			}
+		}
 	} while (c != '(' && c != ';' && c != EOF);
 
 	if ( vStringLength (token->name) > 0 )

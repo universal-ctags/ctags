@@ -16,6 +16,12 @@ b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
 b	input.sv	/^    logic b;$/;"	r	class:test
 b	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
 c	input.sv	/^    logic c;$/;"	r	class:supertest
+c	input.sv	/^extern virtual function test ext_func (c, d);$/;"	p	prototype:paramtest3.ext_func
+c	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	p	function:paramtest3.ext_func
+d	input.sv	/^extern virtual function test ext_func (c, d);$/;"	p	prototype:paramtest3.ext_func
+d	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	p	function:paramtest3.ext_func
+ext_func	input.sv	/^extern virtual function test ext_func (c, d);$/;"	Q	class:paramtest3
+ext_func	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	f	class:paramtest3
 extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	Q	class:test
 mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:supertest
 mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:test
@@ -27,6 +33,12 @@ paramtest2.BASE	input.sv	/^  type BASE=supertest #(test)$/;"	c	class:paramtest2
 paramtest3	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	C
 paramtest3.BASE	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
 paramtest3.BASE2	input.sv	/^class paramtest3 #(type BASE=supertest, type BASE2=paramtest);$/;"	c	class:paramtest3
+paramtest3.ext_func	input.sv	/^extern virtual function test ext_func (c, d);$/;"	Q	class:paramtest3
+paramtest3.ext_func	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	f	class:paramtest3
+paramtest3.ext_func.c	input.sv	/^extern virtual function test ext_func (c, d);$/;"	p	prototype:paramtest3.ext_func
+paramtest3.ext_func.c	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	p	function:paramtest3.ext_func
+paramtest3.ext_func.d	input.sv	/^extern virtual function test ext_func (c, d);$/;"	p	prototype:paramtest3.ext_func
+paramtest3.ext_func.d	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	p	function:paramtest3.ext_func
 paramtest3.myfunc	input.sv	/^virtual function myfunc (a, b);$/;"	f	class:paramtest3
 paramtest3.myfunc.a	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
 paramtest3.myfunc.b	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
