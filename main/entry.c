@@ -791,6 +791,40 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 	return length;
 }
 
+static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_scope)
+{
+
+	const tagEntryInfo *scope = inner_scope;
+	stringList *queue = stringListNew ();
+	vString *v;
+	vString *n;
+	unsigned int c;
+
+	while (scope)
+	{
+		if (!scope->placeholder)
+		{
+			v = vStringNewInit ((char *)scope->name);
+			stringListAdd (queue, v);
+		}
+		scope =  getEntryInCorkQueue (scope->extensionFields.scopeIndex);
+	}
+
+	n = vStringNew ();
+	while ((c = stringListCount (queue)) > 0)
+	{
+		v = stringListLast (queue);
+		vStringCat (n, v);
+		vStringDelete (v);
+		stringListRemoveLast (queue);
+		if (c != 1)
+			vStringPut (n, '.');
+	}
+	stringListDelete (queue);
+
+	return vStringDeleteUnwrap (n);
+}
+
 static int addExtensionFields (const tagEntryInfo *const tag)
 {
 	const char* const kindKey = Option.extensionFields.kindKey ? "kind:" : "";
@@ -825,10 +859,14 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 			 && TagFile.corkQueue.count > 0)
 		{
 			const tagEntryInfo * scope;
+			char *full_qualified_scope_name;
 
 			scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
+			full_qualified_scope_name = getFullQualifiedScopeNameFromCorkQueue(scope);
+			Assert (full_qualified_scope_name);
 			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-					   scope->kind->name, scope->name);
+					   scope->kind->name, full_qualified_scope_name);
+			eFree (full_qualified_scope_name);
 		}
 	}
 
