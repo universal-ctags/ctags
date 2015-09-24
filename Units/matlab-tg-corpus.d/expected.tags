@@ -1,4 +1,14 @@
 backtrack	input.m	/^function [xn,fn,fcall] = backtrack(xc,d,fc,fnc,DDfnc,c,gamma,eps)$/;"	f
+cDDfnc	input.m	/^        cDDfnc  =  gamma*cDDfnc;$/;"	v
+cDDfnc	input.m	/^cDDfnc  =   c*DDfnc;$/;"	v
+d	input.m	/^        d       =  gamma*d;$/;"	v
+fcall	input.m	/^        fcall   =  fcall+1;$/;"	v
+fcall	input.m	/^fcall   =   1 ;$/;"	v
+fn	input.m	/^        fn      =  feval(fnc,xn);$/;"	v
+fn	input.m	/^fn      =   feval(fnc,xn);$/;"	v
 func1	input.m	/^function [x,y,z] = func1 $/;"	f
 func2	input.m	/^function x = func2 $/;"	f
 func3	input.m	/^function func3 $/;"	f
+xn	input.m	/^                        xn  =  xc;$/;"	v
+xn	input.m	/^        xn      =  xc+d;$/;"	v
+xn	input.m	/^xn      =   xc+d;$/;"	v

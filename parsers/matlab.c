@@ -28,6 +28,8 @@ static void installMatLabRegex (const langType language)
     addTagRegex (language, "^function[ \t]*[a-zA-Z0-9_]+[ \t]*=[ \t]*([a-zA-Z0-9_]+)", "\\1", "f,function", NULL);
     /* function asdf */
     addTagRegex (language, "^function[ \t]*([a-zA-Z0-9_]+)[^=]*$", "\\1", "f,function", NULL);
+    /* variables */
+    addTagRegex (language, "^[ \t]*([a-zA-Z0-9_]+)[ \t]*=[ \t]", "\\1", "v,variable", NULL);
 }
 
 extern parserDefinition* MatLabParser (void)
