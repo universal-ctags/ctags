@@ -22,10 +22,10 @@ libdir	= @libdir@
 incdir	= @includedir@
 mandir	= @mandir@
 datadir = @datarootdir@/@PACKAGE_NAME@
-sysconfdir=@sysconfdir@
-pkgconfdir=@sysconfdir@/@PACKAGE_NAME@
-libexecdir=@libexecdir@
-pkglibexecdir=@libexecdir@/@PACKAGE_NAME@
+sysconfdir = @sysconfdir@
+pkgconfdir = @sysconfdir@/@PACKAGE_NAME@
+libexecdir = @libexecdir@
+pkglibexecdir = @libexecdir@/@PACKAGE_NAME@
 SLINK	= @LN_S@
 STRIP	= @STRIP@
 ifdef SPARSE
