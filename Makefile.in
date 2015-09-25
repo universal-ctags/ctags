@@ -21,7 +21,8 @@ srcdir	= @srcdir@
 libdir	= @libdir@
 incdir	= @includedir@
 mandir	= @mandir@
-datadir = @datarootdir@/@PACKAGE_NAME@
+datadir = @datadir@
+pkgdatadir = @datadir@/@PACKAGE_NAME@
 sysconfdir = @sysconfdir@
 pkgconfdir = @sysconfdir@/@PACKAGE_NAME@
 libexecdir = @libexecdir@
@@ -68,7 +69,7 @@ ALL_CFLAGS = $(CFLAGS) --std=gnu99 -Wall $(COVERAGE_CFLAGS)
 DEBUG_CPPFLAGS ?= -DDEBUG
 ALL_CPPFLAGS = $(CPPFLAGS)			\
 	$(DEBUG_CPPFLAGS)			\
-	-DDATADIR=\"$(datadir)\"		\
+	-DDATADIR=\"$(pkgdatadir)\"		\
 	-DPKGCONFDIR=\"$(pkgconfdir)\"		\
 	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\"
 
@@ -107,14 +108,14 @@ EMAN	= $(ETAGS_PROG).$(manext)
 #
 # corpora files
 #
-corporadir = $(datadir)/corpora
+corporadir = $(pkgdatadir)/corpora
 pkgconf_corporadir = $(pkgconfdir)/corpora
 CORPORA    = ctags.ctags RFC1213-MIB.txt
 
 #
 # preload
 #
-preloaddir = $(datadir)/preload
+preloaddir = $(pkgdatadir)/preload
 pkgconf_preloaddir = $(pkgconfdir)/preload
 PRELOAD_OPTLIB =				\
 	\
@@ -130,7 +131,7 @@ DEFAULT_PRELOAD_FILE=default.ctags
 #
 # config files
 #
-optlibdir = $(datadir)/optlib
+optlibdir = $(pkgdatadir)/optlib
 pkgconf_optlibdir = $(pkgconfdir)/optlib
 OPTLIB    = $(PRELOAD_OPTLIB)
 
@@ -317,7 +318,7 @@ uninstall-etags:
 	- rm -f $(DEST_ETAGS) $(DEST_EMAN)
 
 uninstall-data: uninstall-corpora uninstall-optlib uninstall-preload
-	- rmdir $(datadir)
+	- rmdir $(pkgdatadir)
 	- rmdir $(pkgconfdir)
 
 uninstall-corpora:
