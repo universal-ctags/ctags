@@ -1,4 +1,10 @@
 /*
+ * Copyright (c) 2015, Masatake Yamato
+ *               2015, Dmitri Tikhonov
+ *
+ * This source code is released for free distribution under the terms of the
+ * GNU General Public License version 2.
+ *
  * selectors.h
  */
 

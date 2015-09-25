@@ -4,7 +4,7 @@
 *   Copyright (c) 2015, vim-jp
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2.
 *
 *   This module contains functions for checking multibyte character set.
 */

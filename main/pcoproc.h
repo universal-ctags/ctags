@@ -4,7 +4,7 @@
 *   Copyright (c) 2014, Masatake YAMATO
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2.
 *
 *   replaces popen/pclose
 */

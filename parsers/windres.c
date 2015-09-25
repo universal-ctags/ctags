@@ -4,7 +4,7 @@
  *	Copyright (c) 2013, Frank Fesevur <ffes(at)users.sourceforge.net>
  *
  *	This source code is released for free distribution under the terms of the
- *	GNU General Public License.
+ *	GNU General Public License version 2.
  *
  *	This module contains functions for generating tags for Windows Resource files.
  */

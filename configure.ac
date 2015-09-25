@@ -1,7 +1,7 @@
 #	Copyright (c) 2009, Darren Hiebert
 #
 #	This source code is released for free distribution under the terms
-#	of the GNU General Public License.
+#	of the GNU General Public License version 2.
 
 #	Process this file with autoconf to produce a configure script.
 

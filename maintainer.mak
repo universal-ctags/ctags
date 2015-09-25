@@ -1,5 +1,8 @@
 #	Copyright (c) 1996-2009, Darren Hiebert
 #
+#	This source code is released for free distribution under the terms
+#	of the GNU General Public License version 2.
+#
 #	Development makefile for Universal Ctags. Also used to build releases.
 #	Requires GNU make.
 

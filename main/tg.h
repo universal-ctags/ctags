@@ -6,7 +6,7 @@
  *  Author: Masatake YAMATO <yamato@redhat.com>
  *
  *  This source code is released for free distribution under the terms of the
- *  GNU General Public License. It is provided on an as-is basis and no
+ *  GNU General Public License version 2. It is provided on an as-is basis and no
  *  responsibility is accepted for its failure to perform as expected.
  *
  */

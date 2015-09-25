@@ -2,7 +2,7 @@
 *   Copyright (c) 1999-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2.
 *
 *   Defines external interface to resizable string lists.
 */

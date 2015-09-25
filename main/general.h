@@ -2,7 +2,7 @@
 *   Copyright (c) 1998-2003, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2.
 *
 *   Provides the general (non-ctags-specific) environment assumed by all.
 */
