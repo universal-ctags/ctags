@@ -1,7 +1,6 @@
 #!/bin/sh
 
-# Copyright: 2015 Masatake YAMATO
-#            2015 Yasuhiro MATSUMOTO
+# Copyright: 2015 Yasuhiro MATSUMOTO
 # License: GPL-2
 
 CTAGS=$1
