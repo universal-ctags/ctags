@@ -1757,6 +1757,12 @@ tmain_run ()
     local a
     local status=0
 
+    local need_rearrange
+
+    if ! [ $(basename "${CTAGS}") = 'ctags' ]; then
+	need_rearrange=yes
+    fi
+
     basedir=$(pwd)
     for subdir in ${topdir}/*.d; do
 	if [ "${subdir}" = ${topdir}/'*.d' ]; then
@@ -1780,7 +1786,9 @@ tmain_run ()
 	r=$?
 	echo $r > ${build_subdir}/exit-actual.txt
 
-	sed -i -e 's|^ctags.exe|ctags|' ${build_subdir}/stderr-actual.txt
+	if [ -n "${need_rearrange}" ]; then
+	    sed -i -e 's|^'$(basename "${CTAGS}")':|ctags:|' ${build_subdir}/stderr-actual.txt
+	fi
 
 	if [ $r = $CODE_FOR_IGNORING_THIS_TMAIN_TEST ]; then
 	    run_result skip '/dev/null' "$(cat ${build_subdir}/stdout-actual.txt)"
