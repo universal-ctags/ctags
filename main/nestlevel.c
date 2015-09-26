@@ -3,7 +3,7 @@
 *   Copyright 2009-2011 Nick Treleaven <nick(dot)treleaven(at)btinternet(dot)com>
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License version 2.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   Defines external interface to scope nesting levels for tags.
 */

@@ -1,6 +1,6 @@
 /*
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License version 2.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   INCLUDE FILES
 */

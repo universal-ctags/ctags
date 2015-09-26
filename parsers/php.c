@@ -2,7 +2,7 @@
 *   Copyright (c) 2013, Colomban Wendling <ban@herbesfolles.org>
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License version 2.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains code for generating tags for the PHP scripting
 *   language.
