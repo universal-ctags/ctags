@@ -191,10 +191,6 @@ AC_ARG_ENABLE(macro-patterns,
 	[AS_HELP_STRING([--enable-macro-patterns],
 		[use patterns as default method to locate macros instead of line numbers])])
 
-AC_ARG_ENABLE(maintainer-mode,
-	[AS_HELP_STRING([--enable-maintainer-mode],
-		[use maintainer makefile])])
-
 AC_ARG_ENABLE(shell-globbing,
 	[AS_HELP_STRING([--enable-shell-globbing=DIR],
 		[does shell expand wildcards (yes|no)? [yes]])])
@@ -208,10 +204,6 @@ AC_ARG_PROGRAM
 
 # Process configuration options
 # -----------------------------
-
-if test "$enable_maintainer_mode" = yes ; then
-	AC_MSG_NOTICE(enabling maintainer mode)
-fi
 
 install_targets="install-ctags install-data install-libexec"
 AC_MSG_CHECKING(whether to install link to etags)
@@ -631,13 +623,8 @@ fi
 
 AC_CHECK_FUNCS([mblen], [], [HAVE_MBLEN=1], [])
 
-rm -f Makefile
-if test "$enable_maintainer_mode" = yes ; then
-	AC_MSG_NOTICE(creating maintainer Makefile)
-	ln -s maintainer.mak Makefile
-else
-	AC_CONFIG_FILES(Makefile ctags.1)
-fi
+AC_CONFIG_FILES([Makefile
+		 ctags.1])
 
 AC_OUTPUT
 
