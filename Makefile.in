@@ -21,11 +21,12 @@ srcdir	= @srcdir@
 libdir	= @libdir@
 incdir	= @includedir@
 mandir	= @mandir@
-datadir = @datarootdir@/@PACKAGE_NAME@
-sysconfdir=@sysconfdir@
-pkgconfdir=@sysconfdir@/@PACKAGE_NAME@
-libexecdir=@libexecdir@
-pkglibexecdir=@libexecdir@/@PACKAGE_NAME@
+datadir = @datadir@
+pkgdatadir = @datadir@/@PACKAGE_NAME@
+sysconfdir = @sysconfdir@
+pkgsysconfdir = @sysconfdir@/@PACKAGE_NAME@
+libexecdir = @libexecdir@
+pkglibexecdir = @libexecdir@/@PACKAGE_NAME@
 SLINK	= @LN_S@
 STRIP	= @STRIP@
 ifdef SPARSE
@@ -68,8 +69,8 @@ ALL_CFLAGS = $(CFLAGS) --std=gnu99 -Wall $(COVERAGE_CFLAGS)
 DEBUG_CPPFLAGS ?= -DDEBUG
 ALL_CPPFLAGS = $(CPPFLAGS)			\
 	$(DEBUG_CPPFLAGS)			\
-	-DDATADIR=\"$(datadir)\"		\
-	-DPKGCONFDIR=\"$(pkgconfdir)\"		\
+	-DDATADIR=\"$(pkgdatadir)\"		\
+	-DPKGCONFDIR=\"$(pkgsysconfdir)\"	\
 	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\"
 
 include $(srcdir)/source.mak
@@ -107,15 +108,15 @@ EMAN	= $(ETAGS_PROG).$(manext)
 #
 # corpora files
 #
-corporadir = $(datadir)/corpora
-pkgconf_corporadir = $(pkgconfdir)/corpora
+corporadir = $(pkgdatadir)/corpora
+pkgconf_corporadir = $(pkgsysconfdir)/corpora
 CORPORA    = ctags.ctags RFC1213-MIB.txt
 
 #
 # preload
 #
-preloaddir = $(datadir)/preload
-pkgconf_preloaddir = $(pkgconfdir)/preload
+preloaddir = $(pkgdatadir)/preload
+pkgconf_preloaddir = $(pkgsysconfdir)/preload
 PRELOAD_OPTLIB =				\
 	\
 	coffee.ctags				\
@@ -130,8 +131,8 @@ DEFAULT_PRELOAD_FILE=default.ctags
 #
 # config files
 #
-optlibdir = $(datadir)/optlib
-pkgconf_optlibdir = $(pkgconfdir)/optlib
+optlibdir = $(pkgdatadir)/optlib
+pkgconf_optlibdir = $(pkgsysconfdir)/optlib
 OPTLIB    = $(PRELOAD_OPTLIB)
 
 #
@@ -317,8 +318,8 @@ uninstall-etags:
 	- rm -f $(DEST_ETAGS) $(DEST_EMAN)
 
 uninstall-data: uninstall-corpora uninstall-optlib uninstall-preload
-	- rmdir $(datadir)
-	- rmdir $(pkgconfdir)
+	- rmdir $(pkgdatadir)
+	- rmdir $(pkgsysconfdir)
 
 uninstall-corpora:
 	- rm -f $(addprefix $(corporadir)/,$(CORPORA))
