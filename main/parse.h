@@ -168,6 +168,8 @@ extern void printRegexKinds (const langType language, boolean allKindFields, boo
 extern void freeRegexResources (void);
 extern boolean checkRegex (void);
 extern void useRegexMethod (const langType language);
+extern void printRegexFlags (void);
+extern boolean hasScopeActionInRegex (const langType language);
 
 #ifdef HAVE_COPROC
 extern boolean invokeXcmd (const char* const fileName, const langType language);

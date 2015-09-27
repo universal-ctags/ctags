@@ -38,6 +38,7 @@
 #include "routines.h"
 
 static boolean regexAvailable = FALSE;
+static unsigned long currentScope = SCOPE_NIL;
 
 #if defined (HAVE_REGEX) && !defined (REGCOMP_BROKEN)
 
@@ -62,6 +63,14 @@ union cptr {
 
 enum pType { PTRN_TAG, PTRN_CALLBACK };
 
+enum scopeAction {
+	SCOPE_REF     = 1UL << 0,
+	SCOPE_POP     = 1UL << 1,
+	SCOPE_PUSH    = 1UL << 2,
+	SCOPE_CLEAR   = 1UL << 3,
+	SCOPE_PLACEHOLDER = 1UL << 4,
+};
+
 typedef struct {
 	regex_t *pattern;
 	enum pType type;
@@ -76,6 +85,7 @@ typedef struct {
 			regexCallback function;
 		} callback;
 	} u;
+	unsigned int scopeActions;
 } regexPattern;
 
 
@@ -133,8 +143,8 @@ static void clearPatternSet (const langType language)
 *   Regex pseudo-parser
 */
 
-static void makeRegexTag (
-		const vString* const name, const kindOption* const kind)
+static int makeRegexTag (
+		const vString* const name, const kindOption* const kind, int scopeIndex, int placeholder)
 {
 	if (kind->enabled)
 	{
@@ -142,8 +152,12 @@ static void makeRegexTag (
 		Assert (name != NULL  &&  vStringLength (name) > 0);
 		Assert (kind != NULL);
 		initTagEntry (&e, vStringValue (name), kind);
-		makeTagEntry (&e);
+		e.extensionFields.scopeIndex = scopeIndex;
+		e.placeholder = (boolean)!!placeholder;
+		return makeTagEntry (&e);
 	}
+	else
+		return SCOPE_NIL;
 }
 
 /*
@@ -253,7 +267,41 @@ static void pre_ptrn_flag_exclusive_long (const char* const s __unused__, const 
 }
 
 static flagDefinition prePtrnFlagDef[] = {
-	{ 'x',  "exclusive", pre_ptrn_flag_exclusive_short, pre_ptrn_flag_exclusive_long },
+	{ 'x',  "exclusive", pre_ptrn_flag_exclusive_short, pre_ptrn_flag_exclusive_long ,
+	  NULL, "skip testing the other patterns if a line is matched to this pattern"},
+};
+
+static void scope_ptrn_flag_eval (const char* const f  __unused__,
+				  const char* const v, void* data)
+{
+	unsigned long *bfields = data;
+
+	if (strcmp (v, "ref") == 0)
+		*bfields |= SCOPE_REF;
+	else if (strcmp (v, "push") == 0)
+		*bfields |= (SCOPE_PUSH | SCOPE_REF);
+	else if (strcmp (v, "pop") == 0)
+		*bfields |= SCOPE_POP;
+	else if (strcmp (v, "clear") == 0)
+		*bfields |= SCOPE_CLEAR;
+	else if (strcmp (v, "set") == 0)
+		*bfields |= (SCOPE_CLEAR | SCOPE_PUSH);
+	else
+		error (FATAL, "Unexpected value for scope flag in regex definition: scope=%s", v);
+}
+
+static void placeholder_ptrn_flag_eval (const char* const f  __unused__,
+				     const char* const v  __unused__, void* data)
+{
+	unsigned long *bfields = data;
+	*bfields |= SCOPE_PLACEHOLDER;
+}
+
+static flagDefinition scopePtrnFlagDef[] = {
+	{ '\0', "scope",     NULL, scope_ptrn_flag_eval,
+	  "ACTION", "use scope stack: ACTION = ref|push|pop|clear|set"},
+	{ '\0', "placeholder",  NULL, placeholder_ptrn_flag_eval,
+	  NULL, "don't put this tag to tags file."},
 };
 
 static kindOption *kindNew ()
@@ -342,8 +390,10 @@ static regexPattern *addCompiledTagPattern (
 {
 	regexPattern * ptrn;
 	boolean exclusive = FALSE;
+	unsigned long scopeActions = 0UL;
 
 	flagsEval (flags, prePtrnFlagDef, COUNT(prePtrnFlagDef), &exclusive);
+	flagsEval (flags, scopePtrnFlagDef, COUNT(scopePtrnFlagDef), &scopeActions);
 	if (*name == '\0' && exclusive && kind == KIND_REGEX_DEFAULT)
 	{
 		kind = KIND_GHOST;
@@ -353,6 +403,7 @@ static regexPattern *addCompiledTagPattern (
 	ptrn->type    = PTRN_TAG;
 	ptrn->u.tag.name_pattern = eStrdup (name);
 	ptrn->exclusive = exclusive;
+	ptrn->scopeActions = scopeActions;
 	if (ptrn->u.tag.kind->letter == '\0')
 	{
 		/* This is a newly registered kind. */
@@ -412,17 +463,21 @@ static void regex_flag_icase_long (const char* s __unused__, const char* const u
 }
 
 
+static flagDefinition regexFlagDefs[] = {
+	{ 'b', "basic",  regex_flag_basic_short,  regex_flag_basic_long,
+	  NULL, "interpreted as a Posix basic regular expression."},
+	{ 'e', "extend", regex_flag_extend_short, regex_flag_extend_long,
+	  NULL, "interpreted as a Posix extended regular expression (default)"},
+	{ 'i', "icase",  regex_flag_icase_short,  regex_flag_icase_long,
+	  NULL, "applied in a case-insensitive manner"},
+};
+
 static regex_t* compileRegex (const char* const regexp, const char* const flags)
 {
 	int cflags = REG_EXTENDED | REG_NEWLINE;
 	regex_t *result = NULL;
 	int errcode;
 
-	flagDefinition regexFlagDefs[] = {
-		{ 'b', "basic",  regex_flag_basic_short,  regex_flag_basic_long  },
-		{ 'e', "extend", regex_flag_extend_short, regex_flag_extend_long },
-		{ 'i', "icase",  regex_flag_icase_short,  regex_flag_icase_long  },
-	};
 	flagsEval (flags,
 		   regexFlagDefs,
 		   COUNT(regexFlagDefs),
@@ -579,14 +634,54 @@ static void matchTagPattern (const vString* const line,
 {
 	vString *const name = substitute (vStringValue (line),
 			patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch);
+	boolean placeholder = !!((patbuf->scopeActions & SCOPE_PLACEHOLDER) == SCOPE_PLACEHOLDER);
+	unsigned long scope = SCOPE_NIL;
+	int n;
+
 	vStringStripLeading (name);
 	vStringStripTrailing (name);
-	if (vStringLength (name) > 0)
-		makeRegexTag (name, patbuf->u.tag.kind);
-	else if (!accept_null)
-		error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
-			getInputFileName (), getInputLineNumber (),
-			patbuf->u.tag.name_pattern);
+
+	if (patbuf->scopeActions & SCOPE_REF)
+	{
+		tagEntryInfo *entry;
+
+		scope = currentScope;
+		while ((entry = getEntryInCorkQueue (scope)) && entry->placeholder)
+			/* Look at parent */
+			scope = entry->extensionFields.scopeIndex;
+	}
+	if (patbuf->scopeActions & SCOPE_CLEAR)
+		currentScope = SCOPE_NIL;
+	if (patbuf->scopeActions & SCOPE_POP)
+	{
+		tagEntryInfo *entry = getEntryInCorkQueue (currentScope);
+		currentScope = entry? entry->extensionFields.scopeIndex: SCOPE_NIL;
+	}
+
+	if (vStringLength (name) == 0)
+	{
+		if (accept_null)
+		{
+			if (placeholder)
+				n = makeRegexTag (name, patbuf->u.tag.kind, scope, placeholder);
+			else
+				n = SCOPE_NIL;
+
+		}
+		else
+		{
+			error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
+			       getInputFileName (), getInputLineNumber (),
+			       patbuf->u.tag.name_pattern);
+			n = SCOPE_NIL;
+		}
+	}
+	else
+		n = makeRegexTag (name, patbuf->u.tag.kind, scope, placeholder);
+
+	if (patbuf->scopeActions & SCOPE_PUSH)
+		currentScope = n;
+
 	vStringDelete (name);
 }
 
@@ -664,9 +759,24 @@ extern boolean matchRegex (const vString* const line, const langType language)
 
 extern void findRegexTags (void)
 {
+	currentScope = SCOPE_NIL;
 	/* merely read all lines of the file */
 	while (fileReadLine () != NULL)
 		;
+}
+
+extern boolean hasScopeActionInRegex (const langType language)
+{
+	boolean r = FALSE;
+#ifdef HAVE_REGEX
+	unsigned int i;
+
+	if (language <= SetUpper  &&  Sets [language].count > 0)
+		for (i = 0; i < Sets [language].count; i++)
+			if (Sets[language].patterns[i].scopeActions)
+				r= TRUE;
+#endif
+	return r;
 }
 
 static regexPattern *addTagRegexInternal (
@@ -704,6 +814,15 @@ static regexPattern *addTagRegexInternal (
 				eFree (description);
 		}
 	}
+
+	if (*name == '\0')
+	{
+		if (rptr->exclusive)
+			rptr->ignore = TRUE;
+		else
+			error (WARNING, "%s: regexp missing name pattern", regex);
+	}
+
 	return rptr;
 }
 
@@ -748,15 +867,7 @@ extern void addLanguageRegex (
 		char *name, *kinds, *flags;
 		if (parseTagRegex (regex_pat, &name, &kinds, &flags))
 		{
-			regexPattern * r;
-			r = addTagRegexInternal (language, regex_pat, name, kinds, flags);
-			if (*name == '\0')
-			{
-				if (r->exclusive)
-					r->ignore = TRUE;
-				else
-					error (WARNING, "%s: regexp missing name pattern", regex);
-			}
+			addTagRegexInternal (language, regex_pat, name, kinds, flags);
 			eFree (regex_pat);
 		}
 	}
@@ -916,6 +1027,15 @@ extern void printRegexKinds (const langType language __unused__,
 		const char* const langName = getLanguageName (language);
 		printRegexKindsInPatternSet (set, langName, allKindFields, indent);
 	}
+#endif
+}
+
+extern void printRegexFlags (void)
+{
+#ifdef HAVE_REGEX
+	flagPrintHelp (regexFlagDefs,  COUNT (regexFlagDefs));
+	flagPrintHelp (prePtrnFlagDef, COUNT (prePtrnFlagDef));
+	flagPrintHelp (scopePtrnFlagDef, COUNT (scopePtrnFlagDef));
 #endif
 }
 

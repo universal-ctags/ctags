@@ -93,6 +93,10 @@ typedef struct sTagEntryInfo {
 		const char* typeRef [2];  /* e.g., "struct" and struct name */
 
 	} extensionFields;  /* list of extension fields*/
+
+	boolean placeholder;	/* This is just a part of scope context.
+				   Put this entry to cork queue but
+				   don't print it to tags file. */
 } tagEntryInfo;
 
 /*
