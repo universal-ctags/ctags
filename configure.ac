@@ -568,7 +568,7 @@ AC_DEFUN([CHECK_PROTO], [
 	[],
 	[
 		AC_MSG_NOTICE([adding prototype for $1])
-		AC_DEFINE(patsubst([NEED_PROTO_NAME], [NAME], translit([$1], [[a-z]], [[A-Z]])))
+		AC_DEFINE(m4_bpatsubst([NEED_PROTO_NAME], [NAME], m4_translit([$1], [[a-z]], [[A-Z]])))
 	])
 ])
 
