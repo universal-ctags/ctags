@@ -5,8 +5,9 @@
 *           http://ctags.sourceforge.net
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License. It is provided on an as-is basis and no
-*   responsibility is accepted for its failure to perform as expected.
+*   GNU General Public License version 2 or (at your option) any later version.
+*   It is provided on an as-is basis and no responsibility is accepted for its
+*   failure to perform as expected.
 *
 *   This is a reimplementation of the ctags (1) program. It is an attempt to
 *   provide a fully featured ctags program which is free of the limitations

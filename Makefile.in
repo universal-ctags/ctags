@@ -1,3 +1,7 @@
+#	This source code is released for free distribution under the terms
+#	of the GNU General Public License version 2 or (at your option) any
+#	later version.
+#
 # Makefile for UNIX-like platforms.
 
 # These are the names of the installed programs, in case you wish to change

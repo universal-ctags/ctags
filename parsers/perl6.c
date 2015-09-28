@@ -9,7 +9,7 @@
  *   - generate fully-qualified tags.
  *
  * This source code is released for free distribution under the terms of
- * the GNU General Public License.
+ * the GNU General Public License version 2 or (at your option) any later version.
  */
 
 #include "general.h"    /* must always come first */

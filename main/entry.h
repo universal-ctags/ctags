@@ -2,7 +2,7 @@
 *   Copyright (c) 1998-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   External interface to entry.c
 */

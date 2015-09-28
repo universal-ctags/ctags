@@ -1,8 +1,9 @@
 #! /bin/sh
 # mkinstalldirs --- make directory hierarchy
+#
 # Author: Noah Friedman <friedman@prep.ai.mit.edu>
 # Created: 1993-05-16
-# Public domain
+# License: Public domain
 
 errstatus=0
 
