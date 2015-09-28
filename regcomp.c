@@ -3397,13 +3397,9 @@ update_string_node_case_fold(regex_t* reg, Node *node)
   }
 
   r = onig_node_str_set(node, sbuf, sp);
-  if (r != 0) {
-    xfree(sbuf);
-    return r;
-  }
 
   xfree(sbuf);
-  return 0;
+  return r;
 }
 
 static int
