@@ -1,3 +1,6 @@
+# Copyright: 2015 Masatake YAMATO
+# License: GPL-2
+
 CTAGS=$1
 DATADIR=$2
 LIBEXECDIR=$3

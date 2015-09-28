@@ -3,6 +3,7 @@
  * Version:       0.6
  * Date:          October 26, 2006
  * Author:        A. Aaron Cornelius (ADotAaronDotCorneliusAtgmailDotcom)
+ * License:       GPL-2
  *
  * Installation:
  * You must have the Exuberant Ctags source to install this parser.  Once you

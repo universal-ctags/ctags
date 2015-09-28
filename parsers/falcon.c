@@ -2,7 +2,7 @@
  * Copyright (c) 2011, 2012 Steven Oliver <oliver.steven@gmail.com>
  * 
  * This source code is released for free distribution under the terms of the
- * GNU General Public License.
+ * GNU General Public License version 2 or (at your option) any later version.
  * 
  * This module contains functions for generating tags for Falcon language
  * files.

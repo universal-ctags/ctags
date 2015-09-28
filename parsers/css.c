@@ -2,6 +2,7 @@
  * css.c
  * Token-based parser for CSS definitions
  * Author - Colomban Wendling <colomban@geany.org>
+ * License GPL-2
  **************************************************************************/
 #include "general.h"
 
