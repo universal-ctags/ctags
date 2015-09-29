@@ -161,7 +161,6 @@
     <ClCompile Include="..\main\strlist.c" />
     <ClCompile Include="..\parsers\tcl.c" />
     <ClCompile Include="..\parsers\tex.c" />
-    <ClCompile Include="..\main\tg.c" />
     <ClCompile Include="..\parsers\verilog.c" />
     <ClCompile Include="..\parsers\vhdl.c" />
     <ClCompile Include="..\parsers\vim.c" />
@@ -193,7 +192,6 @@
     <ClInclude Include="..\main\selectors.h" />
     <ClInclude Include="..\main\sort.h" />
     <ClInclude Include="..\main\strlist.h" />
-    <ClInclude Include="..\main\tg.h" />
     <ClInclude Include="..\main\vstring.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

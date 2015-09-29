@@ -596,32 +596,11 @@ test case own *args.ctags*.
 Assume your test name is *swine-simile.d*. Put ``--option=swine`` in
 *Units/swine-simile.d/args.ctags*.
 
-
-Corpus data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Corpus data is helpful for ctags to choose a proper language parser.
-READ "Automatic parser selection based on corpora" subsection how 
-Corpus data are used in ctags.
-
-What you need is not so difficult. Prepare lexically typical source
-file written in Swine language. ctags learns the lexical
-characteristic of Swine from the source file.
-
-Assume you prepare *swine.swn* as corpus data for ``Swine`` 
-language parser.
-
-1. put it to data/corpora/swine.swn, and
-2. add ``--corpus-swine=.swn:swine.swn`` to swine.ctags.
-
-
 Makefile.in
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Add your option library file and associative corpus file to 
+Add your optlib file, *swine.ctags* to ``PRELOAD_OPTLIB`` variable of
 *Makefile.in*.
 
-1. add your optlib file, *swine.ctags* to ``PRELOAD_OPTLIB`` variable of *Makefile.in*, and
-2. add your corpus file, *swine.swn* to ``CORPORA`` variable of *Makefile.in*.
 
 If you don't want your optlib loaded automatically when ctags starting up,
 put your optlib file to ``OPTLIB`` of *Makefile.in* instead of 

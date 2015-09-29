@@ -137,7 +137,6 @@ check()
     T_existing /libexec/ctags/drivers/coffeetags -f -x
     T_existing /etc/ctags/optlib   -d -x -r
     T_existing /etc/ctags/preload  -d -x -r
-    T_existing /etc/ctags/corpora  -d -x -r
     
     T_existing /share/ctags/optlib/m4.ctags -f -r
     T_existing /share/ctags/optlib/coffee.ctags -f -r
@@ -146,9 +145,6 @@ check()
     T_existing /share/ctags/optlib/mib.ctags -f -r
 
     T_existing /share/ctags/preload/default.ctags -f -r
-    
-    T_existing /share/ctags/corpora/ctags.ctags -f -r
-    T_existing  /share/ctags/corpora/RFC1213-MIB.txt -f -r
     
     T_existing /share/man/man1/ctags.1 -f -r
 }

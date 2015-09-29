@@ -222,9 +222,6 @@
     <ClCompile Include="..\main\strlist.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\tg.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\main\vstring.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -285,9 +282,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\strlist.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\main\tg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\vstring.h">

@@ -65,7 +65,6 @@
 #define isCompoundOption(c)  (boolean) (strchr ("fohiILpDb", (c)) != NULL)
 
 #define SUBDIR_OPTLIB "optlib"
-#define SUBDIR_CORPORA "corpora"
 #define SUBDIR_PRELOAD "preload"
 #define SUBDIR_DRIVERS "drivers"
 
@@ -114,7 +113,6 @@ static stringList *OptionFiles;
 
 typedef stringList searchPathList;
 static searchPathList *OptlibPathList;
-static searchPathList *CorpusPathList;
 static searchPathList *PreloadPathList;
 static searchPathList *DriversPathList;
 
@@ -240,8 +238,6 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Should tags should be appended to existing tag file [no]?"},
  {1,"  --config-filename=fileName"},
  {1,"      Use 'fileName' instead of 'ctags' in option file names."},
- {1,"  --corpus-<LANG>=spec:corpusFile"},
- {1,"      Add two gram data calculated from corpusFile to spec of LANG."},
  {1,"  --data-dir=[+]DIR"},
  {1,"      Add or set DIR to data directory search path."},
  {1,"  --etags-include=file"},
@@ -312,8 +308,6 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Indicate whether symbolic links should be followed [yes]."},
  {1,"  --list-aliases=[language|all]"},
  {1,"       Output list of alias patterns."},
- {1,"  --list-corpora=[language[:spec]|all]"},
- {1,"       Output list of language corpora."},
  {1,"  --list-features"},
  {1,"       Output list of features."},
  {1,"  --list-file-kind"},
@@ -1504,63 +1498,6 @@ extern boolean processMapOption (
 	return TRUE;
 }
 
-static char* skipTillColon (char* p)
-{
-	while (*p != ':'  && *p != '\0')
-		++p;
-	return p;
-}
-
-extern boolean processCorpusOption (
-		const char *const option, const char *const parameter)
-{
-	langType language;
-	char* parm;
-	char* colon;
-	const char* file_part;
-	vString* tg_file;
-	char* spec;
-	boolean pattern_p;
-
-	language = getLanguageComponentInOption (option, "corpus-");
-	if (language == LANG_IGNORE)
-		return FALSE;
-
-	if (parameter == NULL || parameter [0] == '\0')
-		error (FATAL, "no parameter is given for %s", option);
-
-	parm = eStrdup (parameter);
-	spec = extractMapFromParameter (language, parm, &colon, &pattern_p, skipTillColon);
-	if (spec == NULL)
-		error (FATAL, "Badly formed language map specification for loading colon for %s language",
-		       getLanguageName (language));
-	else if (pattern_p && (*colon != ':'))
-		error (FATAL,
-		       "no colon(:) separator is found in parameter of %s: %s", option, parameter);
-	else if ((!pattern_p) && *colon == '\0')
-		error (FATAL,
-		       "no colon(:) separator is found in parameter of %s: %s", option, parameter);
-
-	file_part = colon + 1;
-	if (file_part[0] == '\0')
-		error (FATAL,
-		       "file part after colon it not given %s: %s", option, parameter);
-
-	if (file_part[0] != '/' && file_part[0] != '.')
-	{
-		tg_file = expandOnCorpusPathList (file_part);
-		tg_file = tg_file? tg_file: vStringNewInit (file_part);
-	}
-	else
-		tg_file = vStringNewInit (file_part);
-
-	addCorpusFile (language, spec, tg_file, pattern_p);
-
-	eFree (spec);
-	eFree (parm);
-	return TRUE;
-}
-
 static void processLicenseOption (
 		const char *const option __unused__,
 		const char *const parameter __unused__)
@@ -1635,33 +1572,6 @@ static void processListMapsOption (
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
 			printLanguageMaps (language);
-	}
-	exit (0);
-}
-
-static void processListCorporaOption (const char *const __unused__ option ,
-				      const char *const parameter)
-{
-	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
-		printLanguageCorpus (LANG_AUTO, NULL);
-	else
-	{
-		char* const colon = strrchr (parameter, ':');
-		const char* spec  = NULL;
-		langType language;
-
-		if (colon)
-		{
-			*colon = '\0';
-			spec = colon + 1;
-		}
-
-		language = getNamedLanguage (parameter);
-
-		if (language == LANG_IGNORE)
-			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
-		else
-			printLanguageCorpus (language, spec);
 	}
 	exit (0);
 }
@@ -1766,11 +1676,6 @@ static vString* expandOnOptlibPathList (const char* leaf)
 	vStringDelete (leaf_with_suffix);
 
 	return r;
-}
-
-extern vString* expandOnCorpusPathList (const char* leaf)
-{
-  return expandOnSearchPathList (CorpusPathList, leaf, doesFileExist);
 }
 
 extern vString* expandOnDriversPathList (const char* leaf)
@@ -2011,7 +1916,6 @@ static void resetPathList (searchPathList** pathList, const char *const varname)
 static void resetDataPathList (void)
 {
 	resetPathList (&OptlibPathList, "OptlibPathList");
-	resetPathList (&CorpusPathList, "CorpusPathList");
 }
 
 static void resetLibexecPathList (void)
@@ -2043,8 +1947,6 @@ static void appendToDataPathList (const char *const dir, boolean from_cmdline)
 {
 	appendToPathList (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
 			       from_cmdline, from_cmdline? "Append": NULL);
-	appendToPathList (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
-			       from_cmdline, from_cmdline? "Append": NULL);
 
 	if (!from_cmdline)
 		appendToPathList (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
@@ -2061,9 +1963,6 @@ static void prependToDataPathList (const char *const dir, boolean from_cmdline)
 {
 	prependToPathList (dir, SUBDIR_OPTLIB, OptlibPathList, "OptlibPathList",
 				from_cmdline, from_cmdline? "Prepend": NULL);
-	prependToPathList (dir, SUBDIR_CORPORA, CorpusPathList, "CorpusPathList",
-				from_cmdline, from_cmdline? "Prepend": NULL);
-
 	if (!from_cmdline)
 		prependToPathList (dir, SUBDIR_PRELOAD, PreloadPathList, "PreloadPathList",
 					FALSE, NULL);
@@ -2149,7 +2048,6 @@ static parametricOption ParametricOptions [] = {
 	{ "libexec-dir",            processLibexecDir,              FALSE,  STAGE_ANY },
 	{ "license",                processLicenseOption,           TRUE,   STAGE_ANY },
 	{ "list-aliases",           processListAliasesOption,       TRUE,   STAGE_ANY },
-	{ "list-corpora",           processListCorporaOption,       TRUE,   STAGE_ANY },
 	{ "list-features",          processListFeaturesOption,      TRUE,   STAGE_ANY },
 	{ "list-file-kind",         processListFileKindOption,      TRUE,   STAGE_ANY },
 	{ "list-kinds",             processListKindsOption,         TRUE,   STAGE_ANY },
@@ -2282,8 +2180,6 @@ static void processLongOption (
 	else if (processParametricOption (option, parameter))
 		;
 	else if (processKindOption (option, parameter))
-		;
-	else if (processCorpusOption (option, parameter))
 		;
 	else if (processAliasOption (option, parameter))
 		;
@@ -2725,7 +2621,6 @@ static void installDataPathList (void)
 	char* dataPath = getenv (CTAGS_DATA_PATH_ENVIRONMENT);
 
 	OptlibPathList = stringListNew ();
-	CorpusPathList = stringListNew ();
 	PreloadPathList = stringListNew ();
 
 	if (dataPath)
@@ -2829,7 +2724,6 @@ extern void initOptions (void)
 	installDataPathList ();
 	installLibexecPathList ();
 	verboseSearchPathList (OptlibPathList,  "OptlibPathList");
-	verboseSearchPathList (CorpusPathList,  "CorpusPathList");
 	verboseSearchPathList (PreloadPathList, "PreloadPathList");
 	verboseSearchPathList (DriversPathList, "DriversPathList");
 
@@ -2911,7 +2805,6 @@ extern void freeOptionResources (void)
 	freeList (&Option.headerExt);
 	freeList (&Option.etagsInclude);
 
-	freeSearchPathList (&CorpusPathList);
 	freeSearchPathList (&OptlibPathList);
 	freeSearchPathList (&PreloadPathList);
 	freeSearchPathList (&DriversPathList);
