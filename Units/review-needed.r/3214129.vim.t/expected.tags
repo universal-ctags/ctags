@@ -78,7 +78,7 @@ HGVimDiff	input.vim	/^function! s:HGVimDiff(...)$/;"	f
 HGVimDiffRestore	input.vim	/^augroup HGVimDiffRestore$/;"	a
 HGVimDiffRestore	input.vim	/^function! s:HGVimDiffRestore(vimDiffBuff)$/;"	f
 HGWipeoutCommandBuffers	input.vim	/^function! s:HGWipeoutCommandBuffers(originalBuffer, hgCommand)$/;"	f
-\add	input.vim	/^      nmap \\add <Plug>HGAdd$/;"	m
+\\add	input.vim	/^      nmap \\add <Plug>HGAdd$/;"	m
 buffer	input.vim	/^                        command buffer.  The HGCommand buffer variables may be $/;"	c
 g:HGCommandDeleteOnHide	input.vim	/^    let g:HGCommandDeleteOnHide=1$/;"	v
 g:HGCommandEnableBufferSetup	input.vim	/^  let g:HGCommandEnableBufferSetup=0$/;"	v
