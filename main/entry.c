@@ -1175,7 +1175,7 @@ extern size_t        countEntryInCorkQueue (void)
 extern int makeTagEntry (const tagEntryInfo *const tag)
 {
 	int r = SCOPE_NIL;
-	Assert (tag->name != NULL && strchr (tag->name, '\t') == NULL);
+	Assert (tag->name != NULL);
 	Assert (getSourceLanguageFileKind() == tag->kind || isSourceLanguageKindEnabled (tag->kind->letter));
 
 	if (tag->name [0] == '\0' && (!tag->placeholder))
@@ -1213,7 +1213,6 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      const kindOption *kind)
 {
 	Assert (File.source.name != NULL);
-	Assert (name == NULL || strchr (name, '\t') == NULL);
 
 	memset (e, 0, sizeof (tagEntryInfo));
 	e->lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
