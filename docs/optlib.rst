@@ -30,16 +30,16 @@ The name of an option file must have .conf or .ctags as suffix.
 
 If ctags is invoked with following command line::
 
-	$ ctags --options=mib ...
+	$ ctags --options=m4 ...
 
-Following files are searched with following order for finding ``mib``:
+Following files are searched with following order for finding ``m4``:
 
-#.  *~/.ctags.d/optlib/mib.conf*
-#.  *~/.ctags.d/optlib/mib.ctags*
-#.  */etc/ctags/optlib/mib.conf*
-#.  */etc/ctags/optlib/mib.ctags*
-#.  */usr/share/ctags/optlib/mib.conf*
-#.  */usr/share/ctags/optlib/mib.ctags*
+#.  *~/.ctags.d/optlib/m4.conf*
+#.  *~/.ctags.d/optlib/m4.ctags*
+#.  */etc/ctags/optlib/m4.conf*
+#.  */etc/ctags/optlib/m4.ctags*
+#.  */usr/share/ctags/optlib/m4.conf*
+#.  */usr/share/ctags/optlib/m4.ctags*
 
 These are called built-in search paths.
 
@@ -47,8 +47,8 @@ If these search paths are not desired, the full path of the option
 file can be directly specified with ``--options``. The parameter must
 start with */* (absolute path) or *./* (relative path) like::
 
-	$ ctags --option=/home/user/test/mib.cf
-	$ ctags --option=./test/mib.cf
+	$ ctags --option=/home/user/test/m4.cf
+	$ ctags --option=./test/m4.cf
 
 Here the suffix restriction doesn't exist.
 
@@ -57,49 +57,49 @@ On GNU/Linux more directories can be added with the environment variable
 
 ::
 
-	$ CTAGS_DATA_PATH=A:B ctags --options=mib ...
+	$ CTAGS_DATA_PATH=A:B ctags --options=m4 ...
 
-The files are searched with the order described below for finding *mib*:
+The files are searched with the order described below for finding *m4*:
 
-#. *A/optlib/mib.conf*
-#. *A/optlib/mib.ctags*
-#. *B/optlib/mib.conf*
-#. *B/optlib/mib.ctags*
-#. *~/.ctags.d/optlib/mib.conf*
+#. *A/optlib/m4.conf*
+#. *A/optlib/m4.ctags*
+#. *B/optlib/m4.conf*
+#. *B/optlib/m4.ctags*
+#. *~/.ctags.d/optlib/m4.conf*
 #.  ...
 
 Further more ``--data-path=[+]PATH`` can be used for adding more
 directories with environment variable::
 
-	$ CTAGS_DATA_PATH=A:B ctags --data-path=+C --options=mib ...
+	$ CTAGS_DATA_PATH=A:B ctags --data-path=+C --options=m4 ...
 
 In this case files are searched with the following order to find
-*mib*:
+*m4*:
 
-#. *C/optlib/mib.conf*
-#. *C/optlib/mib.ctags*
-#. *A/optlib/mib.conf*
-#. *A/optlib/mib.ctags*
-#. *B/optlib/mib.conf*
-#. *B/optlib/mib.ctags*
-#. *~/.ctags.d/optlib/mib.conf*
+#. *C/optlib/m4.conf*
+#. *C/optlib/m4.ctags*
+#. *A/optlib/m4.conf*
+#. *A/optlib/m4.ctags*
+#. *B/optlib/m4.conf*
+#. *B/optlib/m4.ctags*
+#. *~/.ctags.d/optlib/m4.conf*
 #. ...
 
 If *+* is omitted, the directory is set instead of added::
 
-	$ CTAGS_DATA_PATH=A:B ctags --data-path=C --options=mib ...
+	$ CTAGS_DATA_PATH=A:B ctags --data-path=C --options=m4 ...
 
 In this case files are searched with the following order to find
-*mib*:
+*m4*:
 
-#. *C/config/mib.conf*
-#. *C/config/mib.ctags*
+#. *C/config/m4.conf*
+#. *C/config/m4.ctags*
 
 The directory list can be emptied using the reserved file name ``NONE``::
 
-	$ CTAGS_DATA_PATH=A:B ctags --data-path=NONE --options=mib ...
+	$ CTAGS_DATA_PATH=A:B ctags --data-path=NONE --options=m4 ...
 
-In this case ctags only tries to load *./mib*.
+In this case ctags only tries to load *./m4*.
 
 See also "Loading option recursively".
 
@@ -312,16 +312,11 @@ expressions are not tried if one of regular expressions is matched
 successfully,
 
 For specifying exclusive-matching the flags ``exclusive`` (long) and
-``x`` (short) were introduced. It is used in *data/optlib/mib.ctags*::
+``x`` (short) were introduced. It is used in *data/optlib/m4.ctags*
+for ignoring a line::
 
-
-	--mib-regex=/^([^ \t]+)[ \t]+DEFINITIONS ::= BEGIN/\1/d,definitions/{exclusive}
-	--mib-regex=/^([a-zA-Z][^ \t]+)[ \t]+[A-Za-z]/\1/n,name/
-
-Another use case for this flag is for ignoring a line::
-
-	--m4-regex=/#.*(define|undefine|s?include)\>//x
-	--m4-regex=/\<dnl.*(define|undefine|s?include)\>//x
+	--regex-m4=/#.*(define|undefine|s?include)\>//x
+	--regex-m4=/\<dnl.*(define|undefine|s?include)\>//x
 
 Comments are started from ``#`` or ``dnl`` in many use case of m4 language.
 With above options ctags can ignore ``define`` in comments.
@@ -585,10 +580,10 @@ to know about the intent of the contributor.
 * *Units/sh-quotes.d*
 * *Units/sh-statements.d*
 
-are good example of small test cases.n
+are good example of small test cases.
 Big test cases are good if smaller test cases exist.
 
-See also *mib-simple.d* especially *mib-simple.d/args.ctags*.
+See also *parser-m4.r/m4-simple.d* especially *parser-m4.r/m4-simple.d/args.ctags*.
 Your test cases need ctags having already loaded your option
 library, swine.ctags. You must specify loading it in the 
 test case own *args.ctags*.

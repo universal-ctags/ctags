@@ -120,7 +120,6 @@ PRELOAD_OPTLIB =				\
 	ctags.ctags				\
 	gdbinit.ctags				\
 	m4.ctags				\
-	mib.ctags				\
 	\
 	$(NULL)
 DEFAULT_PRELOAD_FILE=default.ctags

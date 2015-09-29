@@ -142,7 +142,6 @@ check()
     T_existing /share/ctags/optlib/coffee.ctags -f -r
     T_existing /share/ctags/optlib/ctags.ctags -f -r
     T_existing /share/ctags/optlib/gdbinit.ctags -f -r
-    T_existing /share/ctags/optlib/mib.ctags -f -r
 
     T_existing /share/ctags/preload/default.ctags -f -r
     
