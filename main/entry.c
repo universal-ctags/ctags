@@ -827,7 +827,7 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 	{
 		if (!scope->placeholder)
 		{
-			v = vStringNewInit ((char *)scope->name);
+			v = vStringNewInit (escapeName (scope->name, scope, FIELD_SCOPE));
 			stringListAdd (queue, v);
 		}
 		scope =  getEntryInCorkQueue (scope->extensionFields.scopeIndex);
@@ -889,7 +889,7 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 		    tag->extensionFields.scopeName != NULL)
 			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
 					   tag->extensionFields.scopeKind->name,
-					   tag->extensionFields.scopeName);
+					   escapeName (tag->extensionFields.scopeName, tag, FIELD_SCOPE));
 		else if (tag->extensionFields.scopeIndex != SCOPE_NIL
 			 && TagFile.corkQueue.count > 0)
 		{
@@ -901,6 +901,8 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 			Assert (full_qualified_scope_name);
 			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
 					   scope->kind->name, full_qualified_scope_name);
+
+			/* TODO: Make the value pointed by full_qualified_scope_name reusable. */
 			eFree (full_qualified_scope_name);
 		}
 	}

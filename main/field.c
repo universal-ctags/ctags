@@ -81,9 +81,9 @@ static fieldDesc fieldDescs [] = {
 	DEFINE_FIELD ('S', "signature",	     FALSE,
 		      "Signature of routine (e.g. prototype or parameter list)",
 		      renderEscapedString),
-	DEFINE_FIELD ('s', NULL,             TRUE,/* needs sanitizing */
+	DEFINE_FIELD ('s', NULL,             TRUE,
 		      "Scope of tag definition",
-		      NULL),
+		      renderEscapedName),
 	DEFINE_FIELD ('t', "typeref",        TRUE,
 		      "Type and name of a variable or typedef",
 		      renderEscapedName),

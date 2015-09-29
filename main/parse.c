@@ -1959,6 +1959,8 @@ static void createCTSTTags (void)
 				{
 					case K_BROKEN:
 						initTagEntry (&e, "one\nof\rbroken\tname", &CTST_Kinds[i]);
+						e.extensionFields.scopeKind = & (CTST_Kinds [K_BROKEN]);
+						e.extensionFields.scopeName = "\\Broken\tContext";
 						makeTagEntry (&e);
 						break;
 				}
