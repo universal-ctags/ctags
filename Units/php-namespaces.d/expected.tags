@@ -1,5 +1,5 @@
 B	input.php	/^	class B {$/;"	c	namespace:Bar\Baz
-Bar\Baz	input.php	/^namespace Bar\\Baz {$/;"	n
+Bar\\Baz	input.php	/^namespace Bar\\Baz {$/;"	n
 C	input.php	/^	class C {$/;"	c	namespace:Foo
 Foo	input.php	/^namespace Foo {$/;"	n
 __construct	input.php	/^		function __construct() {$/;"	f	class:Bar\Baz::B
