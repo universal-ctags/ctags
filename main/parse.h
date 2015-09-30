@@ -78,6 +78,7 @@ typedef struct {
 	unsigned int method;           /* See PARSE__... definitions above */
 	tgTableEntry *tgEntries;
 	boolean useCork;
+	boolean allowNullTag;
 
 	/* used internally */
 	unsigned int id;               /* id assigned to language */
@@ -111,6 +112,7 @@ extern int makeSimpleTag (const vString* const name, kindOption* const kinds, co
 extern void makeFileTag (const char *const fileName);
 extern parserDefinition* parserNew (const char* name);
 extern parserDefinition* parserNewFull (const char* name, char fileKind);
+extern boolean getLanguageAllowNullTag (const langType language);
 extern const char *getLanguageName (const langType language);
 extern kindOption* getLanguageFileKind (const langType language);
 extern langType getNamedLanguage (const char *const name);

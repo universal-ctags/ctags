@@ -1133,12 +1133,17 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	Assert (tag->name != NULL && strchr (tag->name, '\t') == NULL);
 	Assert (getSourceLanguageFileKind() == tag->kind || isSourceLanguageKindEnabled (tag->kind->letter));
 
-	if (tag->name [0] == '\0')
+	if (tag->name [0] == '\0' && (!getSourceLanguageAllowNullTag()))
+	{
 		error (WARNING, "ignoring null tag in %s(line: %lu)", vStringValue (File.name), tag->lineNumber);
-	else if (TagFile.cork)
+		goto out;
+	}
+
+	if (TagFile.cork)
 		r = queueTagEntry (tag);
 	else
 		writeTagEntry (tag);
+out:
 	return r;
 }
 
