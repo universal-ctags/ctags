@@ -84,42 +84,6 @@ AH_TEMPLATE([__USE_FIXED_PROTOTYPES__],
 AH_TEMPLATE([NON_CONST_PUTENV_PROTOTYPE],
 	[Define this is you have a prototype for putenv() in <stdlib.h>, but
 	doesn't declare its argument as "const char *".])
-AH_TEMPLATE([NEED_PROTO_REMOVE],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_UNLINK],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_MALLOC],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_GETENV],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_FGETPOS],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_STAT],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_LSTAT],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_TRUNCATE],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_FTRUNCATE],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
 AH_TEMPLATE([MSDOS_STYLE_PATH],
 	[Define to 1 if your system uses MS-DOS style path.])
 
@@ -158,6 +122,8 @@ AC_DEFUN([CHECK_PROTO], [
 	[],
 	[
 		AC_MSG_NOTICE([adding prototype for $1])
+		AH_TEMPLATE(AS_TR_CPP([NEED_PROTO_$1]),
+			    [If you receive error or warning messages indicating that you are missing a prototype for, or a type mismatch using, the following function, define this label and remake.])
 		AC_DEFINE(AS_TR_CPP([NEED_PROTO_$1]))
 	])
 ])
