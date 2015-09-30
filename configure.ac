@@ -151,6 +151,16 @@ const char *result_yes = "$2:$1";
 	[$4]
 ]) ])
 
+AC_DEFUN([CHECK_PROTO], [
+	AC_EGREP_HEADER([[^A-Za-z0-9_]$1([ 	]+[A-Za-z0-9_]*)?[	 ]*\(],
+	[$2],
+	[],
+	[
+		AC_MSG_NOTICE([adding prototype for $1])
+		AC_DEFINE(AS_TR_CPP([NEED_PROTO_$1]))
+	])
+])
+
 # Checks for configuration options
 # --------------------------------
 
@@ -554,16 +564,6 @@ AC_SUBST(install_libexec_targets)
 # Checks for missing prototypes
 # -----------------------------
 AC_MSG_NOTICE(checking for new missing prototypes)
-
-AC_DEFUN([CHECK_PROTO], [
-	AC_EGREP_HEADER([[^A-Za-z0-9_]$1([ 	]+[A-Za-z0-9_]*)?[	 ]*\(],
-	[$2],
-	[],
-	[
-		AC_MSG_NOTICE([adding prototype for $1])
-		AC_DEFINE(AS_TR_CPP([NEED_PROTO_$1]))
-	])
-])
 
 if test "$have_remove" = yes ; then
 	CHECK_PROTO(remove, stdio.h)
