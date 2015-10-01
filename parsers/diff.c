@@ -32,9 +32,9 @@ typedef enum {
 } diffKind;
 
 static kindOption DiffKinds [] = {
-	{ TRUE, 'm', "modified file", "modified files"},
-	{ TRUE, 'n', "new file",      "newly created files"},
-	{ TRUE, 'd', "deleted file",  "deleted files"},
+	{ TRUE, 'm', "modifiedFile",  "modified files"},
+	{ TRUE, 'n', "newFile",       "newly created files"},
+	{ TRUE, 'd', "deletedFile",   "deleted files"},
 	{ TRUE, 'h', "hunk",          "hunks"},
 };
 
