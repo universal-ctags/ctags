@@ -144,6 +144,10 @@ AC_DEFUN([PRETTY_ARG_VAR], [
 # Checks for configuration options
 # --------------------------------
 
+AC_ARG_WITH([sparse-cgcc],
+	[AS_HELP_STRING([--with-sparse-cgcc],
+		[use Sparse 'compiler wrapper' cgcc as C compiler [no]])])
+
 AC_ARG_ENABLE([coverage-gcov],
 	[AS_HELP_STRING([--enable-coverage-gcov],
 		[enable 'gcov' coverage testing tool [no]])])
@@ -313,6 +317,17 @@ case `uname` in
 		fi
 		;;
 esac
+
+if test "${with_sparse_cgcc}" = "yes"; then
+	REAL_CC="${CC}"
+	CC="cgcc"
+	AC_SUBST([REAL_CC])
+
+	PRETTY_ARG_VAR([CGCC_CFLAGS], [cgcc specific flags],
+		       [-Wsparse-all])
+else
+	CGCC_CFLAGS=""
+fi
 
 if test "${enable_coverage_gcov}" = "yes"; then
 	COVERAGE_CFLAGS="--coverage"
