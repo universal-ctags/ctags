@@ -128,6 +128,19 @@ AC_DEFUN([CHECK_PROTO], [
 	])
 ])
 
+# PRETTY_ARG_VAR(VARIABLE, DESCRIPTION, DEFAULT)
+# ----------------------------------------------
+# Call AC_ARG_VAR with DEFAULT value.
+AC_DEFUN([PRETTY_ARG_VAR], [
+	AC_ARG_VAR([$1], [$2 [$3]])
+
+	if test "${ac_env_$1_set}" = "set"; then
+		$1="${ac_env_$1_value}"
+	else
+		$1="$3"
+	fi
+])
+
 # Checks for configuration options
 # --------------------------------
 
