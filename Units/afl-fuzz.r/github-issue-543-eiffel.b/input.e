@@ -1,0 +1,1 @@
+class feature d alias"	
