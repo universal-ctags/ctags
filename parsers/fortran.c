@@ -227,7 +227,7 @@ static boolean ParsingString;
 
 /* indexed by tagType */
 static kindOption FortranKinds [] = {
-	{ TRUE,  'b', "block data", "block data"},
+	{ TRUE,  'b', "blockData",  "block data"},
 	{ TRUE,  'c', "common",     "common blocks"},
 	{ TRUE,  'e', "entry",      "entry points"},
 	{ TRUE,  'E', "enum",       "enumerations"},
