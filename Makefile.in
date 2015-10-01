@@ -175,7 +175,7 @@ $(CTAGS_EXEC): $(OBJECTS)
 	$(V_CC) $(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 $(READ_CMD): readtags.c readtags.h
-	$(V_CC) $(CC) -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(srcdir)/readtags.c
+	$(V_CC) $(CC) -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(srcdir)/readtags.c
 
 $(OBJECTS): $(HEADERS) config.h Makefile
 
