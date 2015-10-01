@@ -2272,6 +2272,8 @@ static void processLongOption (
 		const char *const option, const char *const parameter)
 {
 	Assert (parameter != NULL);
+	Assert (option != NULL);
+
 	if (parameter [0] == '\0')
 		verbose ("  Option: --%s\n", option);
 	else
