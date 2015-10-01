@@ -1716,6 +1716,21 @@ EOF
 }
 
 
+tmain_compare_result()
+{
+    local build_topdir=$1
+    local f
+
+    for f in ${build_topdir}/*/*-diff.txt; do
+	if [ -f "$f" ]; then
+	    echo "$f"
+	    echo
+	    cat "$f" | sed -e 's|.*|	\0|'
+	    echo
+	fi
+    done
+}
+
 tmain_compare()
 {
     local subdir=$1
@@ -1830,6 +1845,13 @@ tmain_run ()
 	    echo $f
 	done
 	echo
+
+	if [ "${SHOW_DIFF_OUTPUT}" = yes ]; then
+	    engine=compare
+	    echo Detail "[$engine]"
+	    line '-'
+	    tmain_${engine}_result ${build_topdir}
+	fi
     fi
 
     return $status
