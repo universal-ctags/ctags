@@ -14,7 +14,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 autoreconf -f -i -v
-./configure --enable-iconv
+./configure --enable-iconv --enable-coverage-gcov
 
 if [ "$TARGET" = "Unix" ]; then
     if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CC" = "gcc" ]; then
