@@ -68,6 +68,7 @@ CGCC_CFLAGS = @CGCC_CFLAGS@
 
 ALL_CFLAGS = $(CFLAGS) $(EXTRA_CFLAGS) $(WARNING_CFLAGS) $(COVERAGE_CFLAGS) $(CGCC_CFLAGS)
 
+EXTRA_CPPFLAGS = @EXTRA_CPPFLAGS@
 DEBUG_CPPFLAGS ?= @DEBUG_CPPFLAGS@
 ALL_CPPFLAGS = $(CPPFLAGS)			\
 	$(DEBUG_CPPFLAGS)			\
@@ -358,7 +359,7 @@ maintainerclean: distclean
 	$(SILENT) dir="$$(dirname $@)"; mkdir -p "$$dir"
 	$(V_CC) $(CC) -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -o $@ -c $<
 $(addsuffix .$(OBJEXT),$(basename $(notdir $(REGEX_SOURCES)))): ALL_CPPFLAGS += \
-	-D_GNU_SOURCE -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1
+	$(EXTRA_CPPFLAGS) -Dbool=int -Dfalse=0 -Dtrue=1
 
 REV := $(shell git rev-parse --short HEAD 2>/dev/null || echo 0)
 ALL_CPPFLAGS += -DCTAGS_COMMIT_ID=0x$(REV)
