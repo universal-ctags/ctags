@@ -454,6 +454,8 @@ fi
 
 PRETTY_ARG_VAR([EXTRA_CFLAGS], [extra C compiler flags],
 	       [-std=gnu99])
+PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
+	       [-Wall])
 
 # Checks for library functions
 # ----------------------------
