@@ -452,6 +452,8 @@ if test yes != "$host_mingw"; then
 	fi
 fi
 
+PRETTY_ARG_VAR([EXTRA_CFLAGS], [extra C compiler flags],
+	       [-std=gnu99])
 
 # Checks for library functions
 # ----------------------------
