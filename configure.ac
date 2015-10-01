@@ -144,6 +144,10 @@ AC_DEFUN([PRETTY_ARG_VAR], [
 # Checks for configuration options
 # --------------------------------
 
+AC_ARG_ENABLE([coverage-gcov],
+	[AS_HELP_STRING([--enable-coverage-gcov],
+		[enable 'gcov' coverage testing tool [no]])])
+
 AC_ARG_ENABLE(readlib,
 	[AS_HELP_STRING([--enable-readlib],
 		[include readtags library object during install])])
@@ -309,6 +313,13 @@ case `uname` in
 		fi
 		;;
 esac
+
+if test "${enable_coverage_gcov}" = "yes"; then
+	COVERAGE_CFLAGS="--coverage"
+	COVERAGE_LDFLAGS="--coverage"
+fi
+AC_SUBST([COVERAGE_CFLAGS])
+AC_SUBST([COVERAGE_LDFLAGS])
 
 AC_PROG_LN_S
 AC_CHECK_PROG(STRIP, strip, strip, :)
