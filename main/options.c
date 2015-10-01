@@ -654,7 +654,7 @@ extern langType getLanguageComponentInOption (const char *const option,
 	const char *lang;
 
 	Assert (prefix && prefix[0]);
-	Assert (option && option[0]);
+	Assert (option);
 
 	len = strlen (prefix);
 	if (strncmp (option, prefix, len) != 0)
