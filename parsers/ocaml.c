@@ -55,10 +55,10 @@ static kindOption OcamlKinds[] = {
 	{TRUE, 't', "type", "Type name"},
 	{TRUE, 'f', "function", "A function"},
 	{TRUE, 'C', "Constructor", "A constructor"},
-	{TRUE, 'r', "Record field", "A 'structure' field"},
+	{TRUE, 'r', "RecordField", "A 'structure' field"},
 	{TRUE, 'e', "Exception", "An exception"},
 	{TRUE, 'V', "value", "A value ???"},
-	{TRUE, 'B', "begin end", "A begin end ???"},
+	{TRUE, 'B', "beginEnd", "A begin end ???"},
 };
 
 typedef enum {
