@@ -747,12 +747,22 @@ extern boolean matchRegex (const vString* const line, const langType language)
 	return result;
 }
 
-extern void findRegexTags (void)
+extern void findRegexTagsMainloop (int (* driver)(void))
 {
 	currentScope = SCOPE_NIL;
 	/* merely read all lines of the file */
-	while (fileReadLine () != NULL)
+	while (driver () != EOF)
 		;
+}
+
+static int fileReadLineDriver(void)
+{
+	return (fileReadLine () == NULL)? EOF: 1;
+}
+
+extern void findRegexTags (void)
+{
+	findRegexTagsMainloop (fileReadLineDriver);
 }
 
 extern boolean hasScopeActionInRegex (const langType language)

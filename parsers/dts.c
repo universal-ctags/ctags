@@ -58,8 +58,7 @@ static void runCppGetc (void)
 		 DTSKinds + DTS_MACRO,
 		 DTSKinds + DTS_HEADER);
 
-	while ( cppGetc() != EOF )
-		;		/* Do nothing, just read. */
+	findRegexTagsMainloop (cppGetc);
 
 	cppTerminate ();
 }
