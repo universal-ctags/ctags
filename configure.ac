@@ -141,6 +141,13 @@ AC_DEFUN([PRETTY_ARG_VAR], [
 	fi
 ])
 
+# PRETTY_VAR_EXPAND(VARIABLE)
+# ---------------------------
+# Expand nested variable.
+# e.g. "\$\{prefix\}/bin" to "/usr/local/bin"
+AC_DEFUN([PRETTY_VAR_EXPAND],
+	 [$(eval "$as_echo_n" $(eval "$as_echo_n" "${$1}"))])
+
 # Checks for configuration options
 # --------------------------------
 
