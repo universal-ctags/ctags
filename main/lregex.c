@@ -149,11 +149,11 @@ static int makeRegexTag (
 	if (kind->enabled)
 	{
 		tagEntryInfo e;
-		Assert (name != NULL  &&  vStringLength (name) > 0);
+		Assert (name != NULL  &&  ((vStringLength (name) > 0) || placeholder));
 		Assert (kind != NULL);
 		initTagEntry (&e, vStringValue (name), kind);
 		e.extensionFields.scopeIndex = scopeIndex;
-		e.placeholder = (boolean)!!placeholder;
+		e.placeholder = !!placeholder;
 		return makeTagEntry (&e);
 	}
 	else
