@@ -163,9 +163,9 @@ static void clearPathSet (const langType language)
 			{
 				kindOption* kind = &(p->kinds[k]);
 
-				eFree (kind->name);
+				eFree ((void *)kind->name);
 				kind->name = NULL;
-				eFree (kind->description);
+				eFree ((void *)kind->description);
 				kind->description = NULL;
 			}
 			if (p->kinds)
@@ -243,14 +243,15 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 	kind->description = vStringDeleteUnwrap (desc);
 
 	/* TODO: This conversion should be part of protocol. */
-	kind->name = eStrdup (kind->description);
 	{
-		char *c;
-		for (c = kind->name; *c != '\0'; c++)
-		{
-			if (*c == ' ' || *c == '\t')
-				*c = '_';
-		}
+	  char *tmp = eStrdup (kind->description);
+	  char *c;
+	  for (c = tmp; *c != '\0'; c++)
+	    {
+	      if (*c == ' ' || *c == '\t')
+		*c = '_';
+	    }
+	  kind->name = tmp;
 	}
 
 	path->n_kinds += 1;

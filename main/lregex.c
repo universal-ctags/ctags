@@ -320,12 +320,12 @@ static void kindFree (void *data)
 	kind->letter = '\0';
 	if (kind->name)
 	{
-		eFree (kind->name);
+		eFree ((void *)kind->name);
 		kind->name = NULL;
 	}
 	if (kind->description)
 	{
-		eFree (kind->description);
+		eFree ((void *)kind->description);
 		kind->description = NULL;
 	}
 	eFree (kind);
