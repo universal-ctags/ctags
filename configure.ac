@@ -441,6 +441,23 @@ AC_EGREP_HEADER(clock_t, time.h, AC_MSG_RESULT(yes),
 	AC_DEFINE(clock_t, long)
 ])
 
+AC_CHECK_HEADERS([stdbool.h],
+[
+	AH_TEMPLATE([USE_STDBOOL_H], [whether or not to use <stdbool.h>.])
+	AC_DEFINE([USE_STDBOOL_H])
+],
+[
+	AH_TEMPLATE([bool],  [type for 'bool' if <stdbool.h> is missing or broken.])
+	AH_TEMPLATE([true],  [value of 'true' if <stdbool.h> is missing or broken.])
+	AH_TEMPLATE([false], [value of 'false' if <stdbool.h> is missing or broken.])
+
+	AC_CHECK_TYPES([_Bool],
+		       [AC_DEFINE([bool], [_Bool])],
+		       [AC_DEFINE([bool], [int])])
+	AC_DEFINE([true],  [1])
+	AC_DEFINE([false], [0])
+])
+
 
 # Checks for compiler characteristics
 # -----------------------------------

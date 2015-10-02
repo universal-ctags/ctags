@@ -359,7 +359,7 @@ maintainerclean: distclean
 	$(SILENT) dir="$$(dirname $@)"; mkdir -p "$$dir"
 	$(V_CC) $(CC) -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -o $@ -c $<
 $(addsuffix .$(OBJEXT),$(basename $(notdir $(REGEX_SOURCES)))): ALL_CPPFLAGS += \
-	$(EXTRA_CPPFLAGS) -Dbool=int -Dfalse=0 -Dtrue=1
+	$(EXTRA_CPPFLAGS)
 
 REV := $(shell git rev-parse --short HEAD 2>/dev/null || echo 0)
 ALL_CPPFLAGS += -DCTAGS_COMMIT_ID=0x$(REV)
