@@ -386,6 +386,7 @@ extern parserDefinition* JsonParser (void)
 	def->kindCount	= KIND_COUNT (JsonKinds);
 	def->parser		= findJsonTags;
 	def->initialize = initialize;
+	def->allowNullTag = TRUE;
 
 	return def;
 }
