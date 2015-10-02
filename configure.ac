@@ -252,17 +252,17 @@ AC_SUBST([pkgdatadir])
 AC_SUBST([pkgsysconfdir])
 AC_SUBST([pkglibexecdir])
 
-AH_TEMPLATE([DATADIR],	     [installation directory of 'universal-ctags'-specific read-only architecture-independent data.])
-AH_TEMPLATE([PKGCONFDIR],    [installation directory of 'universal-ctags'-specific read-only single-machine data.])
+AH_TEMPLATE([PKGDATADIR],    [installation directory of 'universal-ctags'-specific read-only architecture-independent data.])
+AH_TEMPLATE([PKGSYSCONFDIR], [installation directory of 'universal-ctags'-specific read-only single-machine data.])
 AH_TEMPLATE([PKGLIBEXECDIR], [installation directory of 'universal-ctags'-specific program executables.])
 
 AC_CONFIG_COMMANDS_PRE([
-	DATADIR="PRETTY_VAR_EXPAND([pkgdatadir])"
-	PKGCONFDIR="PRETTY_VAR_EXPAND([pkgsysconfdir])"
+	PKGDATADIR="PRETTY_VAR_EXPAND([pkgdatadir])"
+	PKGSYSCONFDIR="PRETTY_VAR_EXPAND([pkgsysconfdir])"
 	PKGLIBEXECDIR="PRETTY_VAR_EXPAND([pkglibexecdir])"
 
-	AC_DEFINE_UNQUOTED([DATADIR],	    ["${DATADIR}"])
-	AC_DEFINE_UNQUOTED([PKGCONFDIR],    ["${PKGCONFDIR}"])
+	AC_DEFINE_UNQUOTED([PKGDATADIR],    ["${PKGDATADIR}"])
+	AC_DEFINE_UNQUOTED([PKGSYSCONFDIR], ["${PKGSYSCONFDIR}"])
 	AC_DEFINE_UNQUOTED([PKGLIBEXECDIR], ["${PKGLIBEXECDIR}"])
 ])
 

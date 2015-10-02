@@ -2658,12 +2658,12 @@ static void installDataPathList (void)
 			vStringDelete (home);
 		}
 	}
-#ifdef PKGCONFDIR
-	appendToDataPathList (PKGCONFDIR, FALSE);
+#ifdef PKGSYSCONFDIR
+	appendToDataPathList (PKGSYSCONFDIR, FALSE);
 #endif
 
-#ifdef DATADIR
-	appendToDataPathList (DATADIR, FALSE);
+#ifdef PKGDATADIR
+	appendToDataPathList (PKGDATADIR, FALSE);
 #endif
 }
 
