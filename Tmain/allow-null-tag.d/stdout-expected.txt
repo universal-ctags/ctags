@@ -1,2 +1,1 @@
-	input.json	/^[{"":1}]$/;"	n	object:0
 0	input.json	/^[{"":1}]$/;"	o
