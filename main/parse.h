@@ -43,17 +43,6 @@ typedef void (*parserInitialize) (langType language);
 typedef void (*parserFinalize) (langType language);
 typedef const char * (*selectLanguage) (FILE *);
 
-typedef struct stgTableEntry{
-	/* two gram table which represents the
-	   characteristic of its language.
-	   This can be used when file extension
-	   is conflicted another parser. */
-	vString* spec;
-	unsigned char* tgTable;
-	vString* corpusFile;
-	struct stgTableEntry *next;
-} tgTableEntry;
-
 typedef enum {
 	METHOD_NOT_CRAFTED    = 1 << 0,
 	METHOD_REGEX          = 1 << 1,
@@ -76,7 +65,6 @@ typedef struct {
 	rescanParser parser2;          /* rescanning parser (unusual case) */
 	selectLanguage* selectLanguage; /* may be used to resolve conflicts */
 	unsigned int method;           /* See PARSE__... definitions above */
-	tgTableEntry *tgEntries;
 	boolean useCork;
 	boolean allowNullTag;
 
@@ -132,10 +120,6 @@ extern void installLanguageAliasesDefaults (void);
 extern void clearLanguageAliases (const langType language);
 extern void addLanguageAlias (const langType language, const char* alias);
 
-extern void addCorpusFile (const langType language, const char* const spec, vString* const corpus_file, boolean pattern_p);
-extern void addTgEntryForExtension (const langType language, const char* const ext, unsigned char* const tg_table);
-extern void addTgEntryForPattern (const langType language, const char* const pattern, unsigned char* const tg_table);
-
 extern void printLanguageMap (const langType language, FILE *fp);
 extern void printLanguageMaps (const langType language);
 extern void unifyLanguageMaps (void);
@@ -145,7 +129,6 @@ extern void initializeParsing (void);
 extern void freeParserResources (void);
 extern void printLanguageFileKind (const langType language);
 extern void printLanguageKinds (const langType language, boolean allKindFields);
-extern void printLanguageCorpus (langType language, const char *const spec);
 extern void printLanguageAliases (const langType language);
 extern void printLanguageList (void);
 extern boolean parseFile (const char *const fileName);

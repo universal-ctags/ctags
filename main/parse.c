@@ -25,7 +25,6 @@
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
-#include "tg.h"
 #ifdef HAVE_ICONV
 # include "mbcs.h"
 #endif
@@ -559,76 +558,6 @@ static vString* extractZshAutoloadTag(FILE* input)
 	return mode;
 }
 
-static const tgTableEntry* findTgTableEntry(const parserDefinition* const lang, const char* const spec)
-{
-	const tgTableEntry *entry;
-
-	for (entry = lang->tgEntries;
-	     entry != NULL;
-	     entry = entry->next)
-		if (strcmp (vStringValue (entry->spec), spec) == 0)
-			break;
-	return entry;
-}
-
-static langType determineTwoGramLanguage(const unsigned char *const t,
-					 const parserCandidate * const candidates, unsigned int n_candidates)
-{
-	unsigned int i, winner;
-
-	for (winner = 0, i = 1; i < n_candidates; i++)
-	{
-		int r;
-		const tgTableEntry *const winner_entry = findTgTableEntry(LanguageTable[candidates[winner].lang],
-									 candidates[winner].spec);
-		const tgTableEntry *const i_entry = findTgTableEntry(LanguageTable[candidates[i].lang],
-								     candidates[i].spec);
-
-		r = tgCompare(winner_entry->tgTable, i_entry->tgTable, t);
-
-		verbose ("tg tournament %s:%s v.s. %s:%s => %d\n",
-			 LanguageTable[candidates[winner].lang]->name, candidates[winner].spec,
-			 LanguageTable[candidates[i].lang]->name, candidates[i].spec,
-			 r);
-
-		if (r > 0)
-			winner = i;
-	}
-	return candidates[winner].lang;
-}
-
-static langType getTwoGramLanguage (FILE* input,
-				    const parserCandidate  *const candidates, unsigned int n_candidates)
-{
-	langType result;
-	unsigned int i;
-
-	for (result = LANG_AUTO, i = 0; candidates[i].lang != LANG_IGNORE; i++)
-		if (LanguageTable [candidates[i].lang]->tgEntries == NULL
-		    || findTgTableEntry(LanguageTable [candidates[i].lang], candidates[i].spec) == NULL)
-		{
-			result = LANG_IGNORE;
-			break;
-		}
-
-	if (result == LANG_AUTO)
-	{
-
-		unsigned char* t;
-
-		t = tgCreate();
-		tgLoad(t, input);
-
-		result = determineTwoGramLanguage(t, candidates, n_candidates);
-
-		verbose("winner of tg tournament: %s\n", LanguageTable[result]->name);
-
-		tgDestroy(t);
-
-	}
-	return result;
-}
-
 struct getLangCtx {
     const char *fileName;
     FILE       *input;
@@ -678,25 +607,6 @@ static const struct taster {
         },
 };
 static langType tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n_tasters);
-
-
-static langType arbitrateByTwoGram (struct getLangCtx *glc, parserCandidate  *candidates,
-					      unsigned int n_candidates)
-{
-	rewind (glc->input);
-	return getTwoGramLanguage (glc->input, candidates, n_candidates);
-}
-
-static langType arbitrateByTastingAndTwoGram (struct getLangCtx *glc, parserCandidate  *candidates,
-					      unsigned int n_candidates)
-{
-	langType language = tasteLanguage (glc,
-					   eager_tasters,
-					   ARRAY_SIZE(eager_tasters));
-	if (language == LANG_IGNORE)
-		language = arbitrateByTwoGram (glc, candidates, n_candidates);
-	return language;
-}
 
 /* If all the candidates have the same specialized language selector, return
  * it.  Otherwise, return NULL.
@@ -763,9 +673,7 @@ pickLanguageBySelection (selectLanguage selector, FILE *input)
 }
 
 static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx *glc,
-				       unsigned int nominate (const char *const, parserCandidate**),
-				       langType arbitrate (struct getLangCtx *, parserCandidate  *,
-							   unsigned int))
+				       unsigned int nominate (const char *const, parserCandidate**))
 {
 	langType language;
 	parserCandidate  *candidates;
@@ -790,9 +698,6 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 			language = LANG_IGNORE;
 		}
 
-		if (language == LANG_IGNORE)
-			language = arbitrate (glc, candidates, n_candidates);
-
 		Assert(language != LANG_AUTO);
 
 		if (language == LANG_IGNORE)
@@ -813,16 +718,14 @@ fopen_error:
 static langType getSpecLanguage (const char *const spec,
                                  struct getLangCtx *glc)
 {
-	return getSpecLanguageCommon(spec, glc, nominateLanguageCandidates,
-				     arbitrateByTwoGram);
+	return getSpecLanguageCommon(spec, glc, nominateLanguageCandidates);
 }
 
 static langType getPatternLanguage (const char *const baseName,
                                     struct getLangCtx *glc)
 {
 	return getSpecLanguageCommon(baseName, glc,
-				     nominateLanguageCandidatesForPattern,
-				     arbitrateByTastingAndTwoGram);
+				     nominateLanguageCandidatesForPattern);
 }
 
 /* This function tries to figure out language contained in a file by
@@ -1105,81 +1008,6 @@ extern void addLanguageAlias (const langType language, const char* alias)
 		lang->currentAliaes = stringListNew ();
 	stringListAdd (lang->currentAliaes, str);
 }
-static void addTgEntryFull (const langType language, vString* const spec, unsigned char* const tg_table,
-			    vString* corpus_file)
-{
-	tgTableEntry *entry;
-
-	entry = xMalloc (1, tgTableEntry);
-	entry->spec = spec;
-	entry->tgTable = tg_table;
-	entry->corpusFile = corpus_file;
-	entry->next = LanguageTable [language]->tgEntries;
-	LanguageTable [language]->tgEntries = entry;
-
-	if (corpus_file)
-		verbose ("Compile corpus %s for %s of %s\n",
-			 vStringValue (corpus_file), vStringValue (spec), LanguageTable [language]->name);
-	else
-		verbose ("Install tg for %s of %s\n", vStringValue (spec), LanguageTable [language]->name);
-}
-
-extern void addCorpusFile (const langType language,
-			   const char* const spec, vString* const corpus_file, boolean pattern_p)
-{
-	FILE *input;
-	unsigned char* tg_table;
-	vString* vspec;
-
-	input = fopen (vStringValue (corpus_file), "rb");
-	if (input == NULL)
-		error (FATAL,
-		       "failed in open %s as corpus", vStringValue (corpus_file));
-
-	tg_table = tgCreate ();
-	if (!tg_table)
-		error (FATAL,
-		       "failed allocating memory for tg entry");
-
-	tgLoad (tg_table, input);
-	fclose (input);
-
-	vspec = pattern_p? vStringNewInit (spec): ext2ptrnNew (spec);
-	addTgEntryFull (language, vspec, tg_table, corpus_file);
-}
-
-extern void addTgEntryForPattern (const langType language, const char* const ptrn, unsigned char* const tg_table)
-{
-	addTgEntryFull (language, vStringNewInit (ptrn), tg_table, NULL);
-}
-
-extern void addTgEntryForExtension (const langType language, const char* const ext, unsigned char* const tg_table)
-{
-	vString *const ptrn = ext2ptrnNew (ext);
-	addTgEntryFull (language, ptrn, tg_table, NULL);
-}
-
-static tgTableEntry* freeTgEntry(tgTableEntry *entry)
-{
-	tgTableEntry* r;
-
-	if (entry->corpusFile)
-	{
-		eFree (entry->tgTable);
-		entry->tgTable = NULL;
-		vStringDelete (entry->corpusFile);
-		entry->corpusFile = NULL;
-	}
-
-	vStringDelete (entry->spec);
-	entry->spec = NULL;
-
-	r = entry->next;
-	entry->next = NULL;
-	eFree(entry);
-
-	return r;
-}
 
 extern void enableLanguage (const langType language, const boolean state)
 {
@@ -1286,9 +1114,6 @@ extern void freeParserResources (void)
 		freeList (&lang->currentPatterns);
 		freeList (&lang->currentExtensions);
 		freeList (&lang->currentAliaes);
-
-		while (lang->tgEntries)
-			lang->tgEntries = freeTgEntry(lang->tgEntries);
 
 		eFree (lang->name);
 		lang->name = NULL;
@@ -1679,45 +1504,6 @@ extern boolean processAliasOption (
 
 	processLangAliasOption (language, parameter);
 	return TRUE;
-}
-
-static void printCorpus (langType language, const char* const spec, boolean indent)
-{
-	const parserDefinition* lang;
-	const tgTableEntry* entry;
-	const char *const indentation = indent ? "    " : "";
-
-	Assert (0 <= language  &&  language < (int) LanguageCount);
-	lang = LanguageTable [language];
-
-	for (entry = lang->tgEntries;
-	     entry != NULL;
-	     entry = entry->next)
-	{
-		const char* corpus_file = entry->corpusFile? vStringValue (entry->corpusFile): "ctags";
-
-		if (spec == NULL)
-			printf("%s%s: %s\n", indentation, vStringValue (entry->spec), corpus_file);
-		else if (strcmp (vStringValue (entry->spec), spec) == 0)
-			printf("%s%s: %s\n", indentation, vStringValue (entry->spec), corpus_file);
-	}
-}
-
-extern void printLanguageCorpus (langType language,
-				 const char *const spec)
-{
-	if (language == LANG_AUTO)
-	{
-		unsigned int i;
-		for (i = 0  ;  i < LanguageCount  ;  ++i)
-		{
-			const parserDefinition* const lang = LanguageTable [i];
-			printf ("%s%s\n", lang->name, isLanguageEnabled (i) ? "" : " [disabled]");
-			printCorpus (i, spec, TRUE);
-		}
-	}
-	else
-		printCorpus (language, spec, FALSE);
 }
 
 static void printMaps (const langType language)

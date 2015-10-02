@@ -25,4 +25,3 @@
 --map-ctags=+.ctags
 --regex-ctags=/^--langdef=([^ \t]+)$/\1/l,langdef/
 --regex-ctags=/^--regex-[^=]+=.*\/.,(.+)\/.*/\1/k,kind/
---corpus-ctags=.ctags:ctags.ctags

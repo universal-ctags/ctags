@@ -3,29 +3,6 @@ Choosing a proper parser in ctags
 
 Universal ctags has multiple way to guess the language of input files.
 
-Automatic parser selection based on corpora
----------------------------------------------------------------------
-Ctags has two built-in parsers for suffix *.m*: ``ObjectiveC`` and
-``Matlab``. The decision on which parser ctags should use is called
-"parser conflict".
-
-Like in ``--language-force`` option, ctags provides some ways to
-choose a parser manually. However, it would be nice if ctags could
-choose a proper parser without manual instruction.
-
-With ``--corpus-<LANG>=spec:corpusFile`` option you can prepare corpus a
-file to make ctags learn lexical tendency of a language. Ctags
-learns it as typical input of ``LANG``. Based on this learning ctags
-tries to solve the parser conflict. See *Data/optlib/mib.ctags*
-and *Data/corpora/RFC1213-MIB.txt* as an example of the usage of
-``--corpus-<LANG>``.
-
-For ``ObjectiveC`` and ``Matlab`` parsers, corpus files are embedded
-within the parser implementations. See *objc.c* and *matlab.c*.
-
-.. TODO More documentation is needed.
-
-
 Modeline based parser selection
 ---------------------------------------------------------------------
 exuberant-ctags has the ability to choose a proper parser based on shebang

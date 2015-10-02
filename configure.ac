@@ -519,9 +519,7 @@ AC_DEFINE(HAVE_REGCOMP)
 # 		have_regex=yes
 # 	fi
 # fi
-
-install_data_targets="install-data-corpora"
-AC_CHECK_FUNCS(scandir,[install_data_targets="$install_data_targets install-data-optlib install-data-preload"])
+AC_CHECK_FUNCS(scandir,[install_data_targets="install-data-optlib install-data-preload"])
 AC_SUBST(install_data_targets)
 
 install_libexec_targets=

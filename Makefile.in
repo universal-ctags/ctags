@@ -86,7 +86,7 @@ include $(srcdir)/source.mak
 .SUFFIXES:
 .SUFFIXES: .c .$(OBJEXT)
 
-VPATH	= $(srcdir) $(srcdir)/data/corpora \
+VPATH	= $(srcdir) \
 	$(srcdir)/data/optlib $(srcdir)/gnu_regex $(srcdir)/fnmatch
 
 INSTALL		= cp -p
@@ -110,13 +110,6 @@ CMAN	= $(CTAGS_PROG).$(manext)
 EMAN	= $(ETAGS_PROG).$(manext)
 
 #
-# corpora files
-#
-corporadir = $(pkgdatadir)/corpora
-pkgconf_corporadir = $(pkgsysconfdir)/corpora
-CORPORA    = ctags.ctags RFC1213-MIB.txt
-
-#
 # preload
 #
 preloaddir = $(pkgdatadir)/preload
@@ -127,7 +120,6 @@ PRELOAD_OPTLIB =				\
 	ctags.ctags				\
 	gdbinit.ctags				\
 	m4.ctags				\
-	mib.ctags				\
 	\
 	$(NULL)
 DEFAULT_PRELOAD_FILE=default.ctags
@@ -215,8 +207,8 @@ install-ctags: install-cbin install-cman
 install-etags: install-ebin install-eman
 
 INSTALLDIRS = $(bindir) $(man1dir) $(libdir) $(incdir) \
-	$(corporadir) $(optlibdir) $(preloaddir) $(driversdir) \
-	$(pkgconf_corporadir) $(pkgconf_optlibdir) $(pkgconf_preloaddir)
+	$(optlibdir) $(preloaddir) $(driversdir) \
+	$(pkgconf_optlibdir) $(pkgconf_preloaddir)
 
 $(addprefix $(DESTDIR),$(INSTALLDIRS)):
 	$(srcdir)/mkinstalldirs $@
@@ -274,10 +266,7 @@ $(DEST_READ_CMD): $(READ_CMD) $(DESTDIR)$(bindir) FORCE
 # install data
 #
 install-data: @install_data_targets@
-install-data-corpora: $(addprefix data/corpora/,$(CORPORA)) $(DESTDIR)$(corporadir) $(DESTDIR)$(pkgconf_corporadir) FORCE
-	for c in $(CORPORA); do \
-		$(INSTALL_DATA) $(srcdir)/data/corpora/$$c $(DESTDIR)$(corporadir)/$$c && chmod 644 $(DESTDIR)$(corporadir)/$$c; \
-	done
+
 install-data-optlib: $(addprefix data/optlib/,$(OPTLIB))  $(DESTDIR)$(optlibdir) $(DESTDIR)$(pkgconf_optlibdir) FORCE
 	for c in $(OPTLIB); do \
 		$(INSTALL_DATA) $(srcdir)/data/optlib/$$c $(DESTDIR)$(optlibdir)/$$c && chmod 644 $(DESTDIR)$(optlibdir)/$$c; \
@@ -321,14 +310,10 @@ uninstall-ctags:
 uninstall-etags:
 	- rm -f $(DEST_ETAGS) $(DEST_EMAN)
 
-uninstall-data: uninstall-corpora uninstall-optlib uninstall-preload
+uninstall-data: uninstall-optlib uninstall-preload
 	- rmdir $(pkgdatadir)
 	- rmdir $(pkgsysconfdir)
 
-uninstall-corpora:
-	- rm -f $(addprefix $(corporadir)/,$(CORPORA))
-	- rmdir $(corporadir)
-	- rmdir $(pkgconf_corporadir)
 uninstall-optlib:
 	- rm -f $(addprefix $(optlibdir)/,$(OPTLIB))
 	- rmdir $(optlibdir)
