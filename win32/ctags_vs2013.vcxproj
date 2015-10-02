@@ -115,6 +115,7 @@
     <ClCompile Include="..\main\entry.c" />
     <ClCompile Include="..\parsers\erlang.c" />
     <ClCompile Include="..\parsers\falcon.c" />
+    <ClCompile Include="..\main\field.c" />
     <ClCompile Include="..\main\flags.c" />
     <ClCompile Include="..\parsers\flex.c" />
     <ClCompile Include="..\fnmatch\fnmatch.c" />
@@ -175,6 +176,7 @@
     <ClInclude Include="..\main\debug.h" />
     <ClInclude Include="..\main\entry.h" />
     <ClInclude Include="..\main\e_msoft.h" />
+    <ClInclude Include="..\main\field.h" />
     <ClInclude Include="..\main\flags.h" />
     <ClInclude Include="..\main\general.h" />
     <ClInclude Include="..\main\get.h" />

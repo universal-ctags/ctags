@@ -24,6 +24,7 @@
 
 #include "ctags.h"
 #include "debug.h"
+#include "field.h"
 #include "main.h"
 #define OPTION_WRITE
 #include "options.h"
@@ -132,18 +133,18 @@ optionValues Option = {
 		FALSE,	/* --extra=. */
 	},
 	{
-		FALSE,  /* -fields=a */
-		TRUE,   /* -fields=f */
-		FALSE,  /* -fields=m */
-		FALSE,  /* -fields=i */
-		TRUE,   /* -fields=k */
-		FALSE,  /* -fields=z */
-		FALSE,  /* -fields=K */
-		FALSE,  /* -fields=l */
-		FALSE,  /* -fields=n */
-		TRUE,   /* -fields=s */
-		FALSE,  /* -fields=S */
-		TRUE    /* -fields=t */
+		[FIELD_ACCESS]         = FALSE,
+		[FIELD_FILE_SCOPE]     = TRUE,
+		[FIELD_IMPLEMENTATION] = FALSE,
+		[FIELD_INHERITANCE]    = FALSE,
+		[FIELD_KIND]           = TRUE,
+		[FIELD_KIND_KEY]       = FALSE,
+		[FIELD_KIND_LONG]      = FALSE,
+		[FIELD_LANGUAGE]       = FALSE,
+		[FIELD_LINE_NUMBER]    = FALSE,
+		[FIELD_SCOPE]          = TRUE,
+		[FIELD_SIGNATURE]      = FALSE,
+		[FIELD_TYPE_REF]       = TRUE,
 	},
 	NULL,       /* -I */
 	FALSE,      /* -a */
@@ -309,6 +310,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of alias patterns."},
  {1,"  --list-features"},
  {1,"       Output list of features."},
+ {1,"  --list-fields"},
+ {1,"       Output list of fiedls."},
  {1,"  --list-file-kind"},
  {1,"       List kind letter for file."},
  {1,"  --list-kinds=[language|all]"},
@@ -1061,19 +1064,19 @@ static void processExtraTagsOption (
 }
 
 static void resetFieldsOption (
-		struct sExtFields *field, boolean mode)
+		boolean field[], boolean mode)
 {
-	memset(field, mode? ~0: 0, sizeof(*field));
+	memset(field, mode? ~0: 0, sizeof(*field) * FIELD_COUNT);
 }
 
 static void processFieldsOption (
 		const char *const option, const char *const parameter)
 {
-	struct sExtFields *field = &Option.extensionFields;
+	boolean *field = Option.extensionFields;
 	const char *p = parameter;
 	boolean mode = TRUE;
 	int c;
-
+	fieldType t;
 
 	if (*p == '*')
 	{
@@ -1088,22 +1091,11 @@ static void processFieldsOption (
 	{
 		case '+': mode = TRUE;                  break;
 		case '-': mode = FALSE;                 break;
-
-		case 'a': field->access         = mode; break;
-		case 'f': field->fileScope      = mode; break;
-		case 'm': field->implementation = mode; break;
-		case 'i': field->inheritance    = mode; break;
-		case 'k': field->kind           = mode; break;
-		case 'K': field->kindLong       = mode; break;
-		case 'l': field->language       = mode; break;
-		case 'n': field->lineNumber     = mode; break;
-		case 's': field->scope          = mode; break;
-		case 'S': field->signature      = mode; break;
-		case 'z': field->kindKey        = mode; break;
-		case 't': field->typeRef        = mode; break;
-
-		default: error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
-					c, option);
+		default : t = getFieldTypeForOption (c);
+			if (t == FIELD_UNKNOWN)
+				error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
+				      c, option);
+			field [t] = mode;
 			break;
 	}
 }
@@ -1196,6 +1188,13 @@ static void processListFeaturesOption(const char *const option __unused__,
 			printf ("%s\n", Features [i]);
 	if (i == 0)
 		putchar ('\n');
+	exit (0);
+}
+
+static void processListFieldsOption(const char *const option __unused__,
+				    const char *const parameter __unused__)
+{
+	printFields ();
 	exit (0);
 }
 
@@ -2048,6 +2047,7 @@ static parametricOption ParametricOptions [] = {
 	{ "license",                processLicenseOption,           TRUE,   STAGE_ANY },
 	{ "list-aliases",           processListAliasesOption,       TRUE,   STAGE_ANY },
 	{ "list-features",          processListFeaturesOption,      TRUE,   STAGE_ANY },
+	{ "list-fields",            processListFieldsOption,        TRUE,   STAGE_ANY },
 	{ "list-file-kind",         processListFileKindOption,      TRUE,   STAGE_ANY },
 	{ "list-kinds",             processListKindsOption,         TRUE,   STAGE_ANY },
 	{ "_list-kinds-full",       processListKindsOption,         TRUE,   STAGE_ANY },

@@ -1,0 +1,66 @@
+a	access	Access (or export) of class members	off
+f	file	File-restricted scoping	on
+i	inherits	Inheritance information	off
+K	NONE	Kind of tag as full name	off
+k	NONE	Kind of tag as a single letter	on
+l	language	Language of source file containing tag	off
+m	implementation	Implementation information	off
+n	line	Line number of tag definition	off
+S	signature	Signature of routine (e.g. prototype or parameter list)	off
+s	NONE	Scope of tag definition	on
+t	typeref	Type and name of a variable or typedef	on
+z	kind	Include the "kind:" key in kind field(use k or K)	off
+#
+Foo	input.java	/^abstract public class Foo extends Bar$/
+x	input.java	/^    public int x;$/
+#a
+Foo	input.java	/^abstract public class Foo extends Bar$/
+x	input.java	/^    public int x;$/;"	access:public
+#i
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	inherits:Bar
+x	input.java	/^    public int x;$/
+#kz
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	kind:c
+x	input.java	/^    public int x;$/;"	kind:f
+#Kz
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	kind:class
+x	input.java	/^    public int x;$/;"	kind:field
+#k
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	c
+x	input.java	/^    public int x;$/;"	f
+#K
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	class
+x	input.java	/^    public int x;$/;"	field
+#l
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	language:Java
+x	input.java	/^    public int x;$/;"	language:Java
+#m
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	implementation:abstract
+x	input.java	/^    public int x;$/
+#n
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	line:1
+x	input.java	/^    public int x;$/;"	line:3
+#s
+Foo	input.java	/^abstract public class Foo extends Bar$/
+x	input.java	/^    public int x;$/;"	class:Foo
+#f
+X	input.c	/^struct X {$/;"	file:
+Y	input.c	/^struct Y {$/;"	file:
+i	input.c	/^  int i;$/;"	file:
+j	input.c	/^  int j;$/;"	file:
+main	input.c	/^int main(void)$/
+x	input.c	/^  struct X x;$/;"	file:
+#S
+X	input.c	/^struct X {$/
+Y	input.c	/^struct Y {$/
+i	input.c	/^  int i;$/
+j	input.c	/^  int j;$/
+main	input.c	/^int main(void)$/;"	signature:(void)
+x	input.c	/^  struct X x;$/
+#t
+X	input.c	/^struct X {$/
+Y	input.c	/^struct Y {$/
+i	input.c	/^  int i;$/
+j	input.c	/^  int j;$/
+main	input.c	/^int main(void)$/
+x	input.c	/^  struct X x;$/;"	typeref:struct:Y::X
