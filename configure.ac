@@ -340,6 +340,13 @@ AC_PROG_LN_S
 AC_CHECK_PROG(STRIP, strip, strip, :)
 AC_SYS_LARGEFILE
 
+AC_CHECK_PROGS([GIT], [git])
+if test "${GIT+set}" = "set"; then
+	AH_TEMPLATE([CTAGS_COMMIT_ID], [Git short commit ID at the moment configure runs.])
+	git_rev=`${GIT} rev-parse --verify --short HEAD`
+	AC_DEFINE_UNQUOTED([CTAGS_COMMIT_ID], [0x${git_rev}])
+fi
+
 
 # Checks for operating environment
 # --------------------------------
