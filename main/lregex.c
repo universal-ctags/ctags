@@ -817,7 +817,7 @@ static regexPattern *addTagRegexInternal (
 
 	if (*name == '\0')
 	{
-		if (rptr->exclusive)
+		if (rptr->exclusive || rptr->scopeActions & SCOPE_PLACEHOLDER)
 			rptr->ignore = TRUE;
 		else
 			error (WARNING, "%s: regexp missing name pattern", regex);
