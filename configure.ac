@@ -252,6 +252,20 @@ AC_SUBST([pkgdatadir])
 AC_SUBST([pkgsysconfdir])
 AC_SUBST([pkglibexecdir])
 
+AH_TEMPLATE([DATADIR],	     [installation directory of 'universal-ctags'-specific read-only architecture-independent data.])
+AH_TEMPLATE([PKGCONFDIR],    [installation directory of 'universal-ctags'-specific read-only single-machine data.])
+AH_TEMPLATE([PKGLIBEXECDIR], [installation directory of 'universal-ctags'-specific program executables.])
+
+AC_CONFIG_COMMANDS_PRE([
+	DATADIR="PRETTY_VAR_EXPAND([pkgdatadir])"
+	PKGCONFDIR="PRETTY_VAR_EXPAND([pkgsysconfdir])"
+	PKGLIBEXECDIR="PRETTY_VAR_EXPAND([pkglibexecdir])"
+
+	AC_DEFINE_UNQUOTED([DATADIR],	    ["${DATADIR}"])
+	AC_DEFINE_UNQUOTED([PKGCONFDIR],    ["${PKGCONFDIR}"])
+	AC_DEFINE_UNQUOTED([PKGLIBEXECDIR], ["${PKGLIBEXECDIR}"])
+])
+
 
 install_targets="install-ctags install-data install-libexec"
 AC_MSG_CHECKING(whether to install link to etags)

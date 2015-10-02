@@ -71,10 +71,7 @@ ALL_CFLAGS = $(CFLAGS) $(EXTRA_CFLAGS) $(WARNING_CFLAGS) $(COVERAGE_CFLAGS) $(CG
 EXTRA_CPPFLAGS = @EXTRA_CPPFLAGS@
 DEBUG_CPPFLAGS ?= @DEBUG_CPPFLAGS@
 ALL_CPPFLAGS = $(CPPFLAGS)			\
-	$(DEBUG_CPPFLAGS)			\
-	-DDATADIR=\"$(pkgdatadir)\"		\
-	-DPKGCONFDIR=\"$(pkgsysconfdir)\"	\
-	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\"
+	$(DEBUG_CPPFLAGS)
 
 include $(srcdir)/source.mak
 
