@@ -658,23 +658,13 @@ static void matchTagPattern (const vString* const line,
 		currentScope = entry? entry->extensionFields.scopeIndex: SCOPE_NIL;
 	}
 
-	if (vStringLength (name) == 0)
+	if (vStringLength (name) == 0 && (placeholder == FALSE))
 	{
-		if (accept_null)
-		{
-			if (placeholder)
-				n = makeRegexTag (name, patbuf->u.tag.kind, scope, placeholder);
-			else
-				n = SCOPE_NIL;
-
-		}
-		else
-		{
+		if (accept_null == FALSE)
 			error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
 			       getInputFileName (), getInputLineNumber (),
 			       patbuf->u.tag.name_pattern);
-			n = SCOPE_NIL;
-		}
+		n = SCOPE_NIL;
 	}
 	else
 		n = makeRegexTag (name, patbuf->u.tag.kind, scope, placeholder);
