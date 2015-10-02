@@ -170,7 +170,6 @@ optionValues Option = {
 #endif
 	FALSE,      /* --if0 */
 	TRUE,       /* --undef */
-	FALSE,      /* --kind-long */
 	LANG_AUTO,  /* --lang */
 	TRUE,       /* --links */
 	FALSE,      /* --filter */
@@ -2069,7 +2068,6 @@ static booleanOption BooleanOptions [] = {
 	{ "filter",         &Option.filter,                 TRUE,  STAGE_ANY },
 	{ "guess-language-eagerly", &Option.guessLanguageEagerly, FALSE, STAGE_ANY },
 	{ "if0",            &Option.if0,                    FALSE, STAGE_ANY },
-	{ "kind-long",      &Option.kindLong,               TRUE,  STAGE_ANY },
 	{ "line-directives",&Option.lineDirectives,         FALSE, STAGE_ANY },
 	{ "links",          &Option.followLinks,            FALSE, STAGE_ANY },
 	{ "print-language", &Option.printLanguage,          TRUE,  STAGE_ANY },
