@@ -1152,7 +1152,7 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	Assert (tag->name != NULL && strchr (tag->name, '\t') == NULL);
 	Assert (getSourceLanguageFileKind() == tag->kind || isSourceLanguageKindEnabled (tag->kind->letter));
 
-	if (tag->name [0] == '\0' && (!getSourceLanguageAllowNullTag()))
+	if (tag->name [0] == '\0' && (!getSourceLanguageAllowNullTag()) && (!tag->placeholder))
 	{
 		error (WARNING, "ignoring null tag in %s(line: %lu)", vStringValue (File.name), tag->lineNumber);
 		goto out;
