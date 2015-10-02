@@ -40,7 +40,7 @@ static kindOption RubyKinds [] = {
 	{ TRUE, 'c', "class",  "classes" },
 	{ TRUE, 'f', "method", "methods" },
 	{ TRUE, 'm', "module", "modules" },
-	{ TRUE, 'F', "singleton method", "singleton methods" },
+	{ TRUE, 'F', "singletonMethod", "singleton methods" },
 	{ TRUE, 'd', "describe", "describes" },
 	{ TRUE, 'C', "context", "contexts" }
 };

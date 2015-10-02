@@ -45,10 +45,10 @@
 ##
 ## set $...
 ##
---regex-gdbinit=/^set[[:space:]]+\$([a-zA-Z0-9_]+)[[:space:]]*=/\1/t,toplevel-variable/
+--regex-gdbinit=/^set[[:space:]]+\$([a-zA-Z0-9_]+)[[:space:]]*=/\1/t,toplevelVariable/
 
 ##
 ## __...set $...
 ##
---regex-gdbinit=/^[[:space:]]+set[[:space:]]+\$([a-zA-Z0-9_]+)[[:space:]]*=/\1/l,local-variable/
+--regex-gdbinit=/^[[:space:]]+set[[:space:]]+\$([a-zA-Z0-9_]+)[[:space:]]*=/\1/l,localVariable/
 --kinds-gdbinit=-l

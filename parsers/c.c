@@ -384,7 +384,7 @@ typedef enum {
 
 static kindOption JavaKinds [] = {
 	{ TRUE,  'c', "class",         "classes"},
-	{ TRUE,  'e', "enum constant", "enum constants"},
+	{ TRUE,  'e', "enumConstant",  "enum constants"},
 	{ TRUE,  'f', "field",         "fields"},
 	{ TRUE,  'g', "enum",          "enum types"},
 	{ TRUE,  'i', "interface",     "interfaces"},

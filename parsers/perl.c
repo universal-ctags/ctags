@@ -45,7 +45,7 @@ static kindOption PerlKinds [] = {
 	{ TRUE,  'l', "label",                  "labels" },
 	{ TRUE,  'p', "package",                "packages" },
 	{ TRUE,  's', "subroutine",             "subroutines" },
-	{ FALSE, 'd', "subroutine declaration", "subroutine declarations" },
+	{ FALSE, 'd', "subroutineDeclaration",  "subroutine declarations" },
 };
 
 /*
