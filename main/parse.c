@@ -1139,7 +1139,7 @@ static void lazyInitialize (langType language)
 
 	lang->parser = doNothing;
 
-	if (lang->method & (METHOD_NOT_CRAFTED|METHOD_REGEX))
+	if (lang->method & METHOD_REGEX)
 	{
 		if (hasScopeActionInRegex (language))
 			lang->useCork = TRUE;
