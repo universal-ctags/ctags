@@ -654,7 +654,7 @@ extern langType getLanguageComponentInOption (const char *const option,
 	const char *lang;
 
 	Assert (prefix && prefix[0]);
-	Assert (option && option[0]);
+	Assert (option);
 
 	len = strlen (prefix);
 	if (strncmp (option, prefix, len) != 0)
@@ -2272,7 +2272,9 @@ static void processLongOption (
 		const char *const option, const char *const parameter)
 {
 	Assert (parameter != NULL);
-	if (parameter == NULL  &&  parameter [0] == '\0')
+	Assert (option != NULL);
+
+	if (parameter [0] == '\0')
 		verbose ("  Option: --%s\n", option);
 	else
 		verbose ("  Option: --%s=%s\n", option, parameter);
