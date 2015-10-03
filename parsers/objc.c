@@ -112,7 +112,7 @@ typedef enum {
 
 typedef objcKeyword objcToken;
 
-static keywordTable objcKeywordTable[] = {
+static const keywordTable const objcKeywordTable[] = {
 	{"typedef", ObjcTYPEDEF},
 	{"struct", ObjcSTRUCT},
 	{"enum", ObjcENUM},

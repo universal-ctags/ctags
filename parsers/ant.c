@@ -15,7 +15,7 @@
 #include <string.h>
 #include "parse.h"
 
-static tagRegexTable antTagRegexTable [] = {
+static const tagRegexTable const antTagRegexTable [] = {
 	{"^[ \t]*<[ \t]*project[^>]+name=\"([^\"]+)\".*", "\\1",
 	 "p,project,projects", NULL},
 	{"^[ \t]*<[ \t]*target[^>]+name=\"([^\"]+)\".*", "\\1",

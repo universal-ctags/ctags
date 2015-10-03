@@ -224,7 +224,7 @@ static kindOption SqlKinds [] = {
 	{ TRUE,  'z', "mlprop",		  "MobiLink Properties "   }
 };
 
-static keywordTable SqlKeywordTable [] = {
+static const keywordTable const SqlKeywordTable [] = {
 	/* keyword		keyword ID */
 	{ "as",								KEYWORD_is				      },
 	{ "is",								KEYWORD_is				      },

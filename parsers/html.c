@@ -14,7 +14,7 @@
 #include "general.h"  /* must always come first */
 #include "parse.h"
 
-static tagRegexTable htmlTagRegexTable [] = {
+static const tagRegexTable const htmlTagRegexTable [] = {
 #define POSSIBLE_ATTRIBUTES "([ \t]+[a-z]+=\"?[^>\"]*\"?)*"
 	{"<a"
 	 POSSIBLE_ATTRIBUTES "[ \t]+name=\"?([^>\"]+)\"?" POSSIBLE_ATTRIBUTES

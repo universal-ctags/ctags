@@ -78,7 +78,7 @@ static kindOption JsonKinds [] = {
 	{ TRUE,  'z', "null",		"nulls"		}
 };
 
-static keywordTable JsonKeywordTable [] = {
+static const keywordTable const JsonKeywordTable [] = {
 	{"true",  KEYWORD_true },
 	{"false", KEYWORD_false},
 	{"null", KEYWORD_null },

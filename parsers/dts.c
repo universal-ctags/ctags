@@ -23,7 +23,7 @@ static kindOption DTSKinds [] = {
 	{ FALSE, 'h', "header",     "included header files"},
 };
 
-static tagRegexTable dtsTagRegexTable [] = {
+static const tagRegexTable const dtsTagRegexTable [] = {
 	/* phandle = <0x00> */
 	{"^[ \t]*phandle[ \t]+=[ \t]+<(0x[a-fA-F0-9]+)>", "\\1",
 	 "p,phandler,phandlers", "{scope=ref}"},

@@ -113,7 +113,7 @@ static kindOption EiffelKinds [] = {
 	{ FALSE, 'l', "local",   "local entities"}
 };
 
-static keywordTable EiffelKeywordTable [] = {
+static const keywordTable const EiffelKeywordTable [] = {
 	/* keyword          keyword ID */
 	{ "alias",          KEYWORD_alias      },
 	{ "all",            KEYWORD_all        },

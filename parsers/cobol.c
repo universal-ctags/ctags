@@ -14,7 +14,7 @@
 #include "general.h"	/* must always come first */
 #include "parse.h"
 
-static tagRegexTable cobolTagRegexTable[] = {
+static const tagRegexTable const cobolTagRegexTable[] = {
 	{"^[ \t]*[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)[ \t]+("
 	 "BLANK|OCCURS|IS|JUST|PIC|REDEFINES|RENAMES|SIGN|SYNC|USAGE|VALUE"
 	 ")", "\\1",

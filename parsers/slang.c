@@ -15,7 +15,7 @@
 #include "general.h"  /* must always come first */
 #include "parse.h"
 
-static tagRegexTable slangTagRegexTable [] = {
+static const tagRegexTable const slangTagRegexTable [] = {
 	{"^.*define[ \t]+([A-Z_][A-Z0-9_]*)[^;]*$", "\\1",
 	 "f,function,functions", "i"},
 	{"^[ \t]*implements[ \t]+\\([ \t]*\"([^\"]*)\"[ \t]*\\)[ \t]*;", "\\1",

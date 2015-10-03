@@ -15,7 +15,7 @@
 #include <string.h>
 #include "parse.h"
 
-static tagRegexTable dosTagRegexTable [] = {
+static const tagRegexTable const dosTagRegexTable [] = {
 	{"^:([A-Za-z_0-9]+)", "\\1",
 	 "l,label,labels", NULL},
 	{"set[ \t]+([A-Za-z_0-9]+)[ \t]*=", "\\1",

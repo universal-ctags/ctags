@@ -14,7 +14,7 @@
 #include "general.h"  /* always include first */
 #include "parse.h"    /* always include */
 
-static tagRegexTable rexxTagRegexTable [] = {
+static const tagRegexTable const rexxTagRegexTable [] = {
 	{"^([A-Za-z0-9@#$\\.!?_]+)[ \t]*:", "\\1",
 	 "s,subroutine,subroutines", NULL},
 };

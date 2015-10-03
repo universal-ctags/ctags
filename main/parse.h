@@ -59,7 +59,7 @@ typedef struct {
 
 typedef struct {
 	const char *name;
-	int id;
+	const int id;
 } keywordTable;
 
 typedef struct {
@@ -79,9 +79,9 @@ typedef struct {
 	unsigned int method;           /* See PARSE__... definitions above */
 	boolean useCork;
 	boolean allowNullTag;
-	tagRegexTable *tagRegexTable;
+	const tagRegexTable *tagRegexTable;
 	unsigned int tagRegexCount;
-	keywordTable *keywordTable;
+	const keywordTable *keywordTable;
 	unsigned int keywordCount;
 
 	/* used internally */

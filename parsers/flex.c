@@ -157,7 +157,7 @@ static kindOption FlexKinds [] = {
 /*	Used to determine whether keyword is valid for the token language and
  *	what its ID is.
  */
-static keywordTable FlexKeywordTable [] = {
+static const keywordTable const FlexKeywordTable [] = {
 	/* keyword		keyword ID */
 	{ "function",	KEYWORD_function			},
 	{ "Function",	KEYWORD_capital_function	},

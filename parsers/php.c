@@ -124,7 +124,7 @@ static kindOption PhpKinds[COUNT_KIND] = {
 	{ TRUE, 'v', "variable",	"variables" }
 };
 
-static keywordTable PhpKeywordTable[] = {
+static const keywordTable const PhpKeywordTable[] = {
 	/* keyword			keyword ID */
 	{ "abstract",		KEYWORD_abstract		},
 	{ "and",			KEYWORD_and				},
