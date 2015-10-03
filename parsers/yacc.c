@@ -19,19 +19,19 @@
 *   FUNCTION DEFINITIONS
 */
 
-static void installYaccRegex (const langType language)
-{
-	addTagRegex (language,
-		"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1", "l,label,labels", NULL);
-}
+static tagRegexTable  yaccTagRegexTable [] = {
+	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
+	 "l,label,labels", NULL},
+};
 
 extern parserDefinition* YaccParser (void)
 {
 	static const char *const extensions [] = { "y", NULL };
 	parserDefinition* const def = parserNew ("YACC");
 	def->extensions = extensions;
-	def->initialize = installYaccRegex;
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->tagRegexTable = yaccTagRegexTable;
+	def->tagRegexCount = COUNT_ARRAY (yaccTagRegexTable);
 	return def;
 }
 

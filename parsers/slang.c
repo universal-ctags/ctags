@@ -15,25 +15,24 @@
 #include "general.h"  /* must always come first */
 #include "parse.h"
 
+static tagRegexTable slangTagRegexTable [] = {
+	{"^.*define[ \t]+([A-Z_][A-Z0-9_]*)[^;]*$", "\\1",
+	 "f,function,functions", "i"},
+	{"^[ \t]*implements[ \t]+\\([ \t]*\"([^\"]*)\"[ \t]*\\)[ \t]*;", "\\1",
+	 "n,namespace,namespaces", NULL},
+};
+
 /*
  *   FUNCTION DEFINITIONS
  */
-static void installSlangRegex (const langType language)
-{
-	addTagRegex (language,
-		"^.*define[ \t]+([A-Z_][A-Z0-9_]*)[^;]*$",
-		"\\1", "f,function,functions", "i");
-	addTagRegex (language,
-		"^[ \t]*implements[ \t]+\\([ \t]*\"([^\"]*)\"[ \t]*\\)[ \t]*;",
-		"\\1", "n,namespace,namespaces", NULL);
-}
 
 extern parserDefinition* SlangParser (void)
 {
 	static const char *const extensions [] = { "sl", NULL };
 	parserDefinition* const def = parserNew ("SLang");
 	def->extensions = extensions;
-	def->initialize = installSlangRegex;
+	def->tagRegexTable = slangTagRegexTable;
+	def->tagRegexCount = COUNT_ARRAY (slangTagRegexTable);
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }

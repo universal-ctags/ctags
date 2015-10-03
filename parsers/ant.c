@@ -15,21 +15,20 @@
 #include <string.h>
 #include "parse.h"
 
+static tagRegexTable antTagRegexTable [] = {
+	{"^[ \t]*<[ \t]*project[^>]+name=\"([^\"]+)\".*", "\\1",
+	 "p,project,projects", NULL},
+	{"^[ \t]*<[ \t]*target[^>]+name=\"([^\"]+)\".*", "\\1",
+	 "t,target,targets", NULL},
+	{"^[ \t]*<[ \t]*property[^>]+name=\"([^\"]+)\".*", "\\1",
+	 "P,property,property", NULL},
+	{"^[ \t]*<[ \t]*import[^>]+file=\"([^\"]+)\".*", "\\1",
+	 "i,import,imports", NULL}
+};
+
 /*
 *   FUNCTION DEFINITIONS
 */
-
-static void installAntRegex (const langType language)
-{
-	addTagRegex (language,
-		"^[ \t]*<[ \t]*project[^>]+name=\"([^\"]+)\".*", "\\1", "p,project,projects", NULL);
-	addTagRegex (language,
-		"^[ \t]*<[ \t]*target[^>]+name=\"([^\"]+)\".*", "\\1", "t,target,targets", NULL);
-	addTagRegex (language,
-		"^[ \t]*<[ \t]*property[^>]+name=\"([^\"]+)\".*", "\\1", "P,property,property", NULL);
-	addTagRegex (language,
-		"^[ \t]*<[ \t]*import[^>]+file=\"([^\"]+)\".*", "\\1", "i,import,imports", NULL);
-}
 
 extern parserDefinition* AntParser (void)
 {
@@ -38,7 +37,8 @@ extern parserDefinition* AntParser (void)
 	parserDefinition* const def = parserNew ("Ant");
 	def->extensions = extensions;
 	def->patterns = patterns;
-	def->initialize = installAntRegex;
+	def->tagRegexTable = antTagRegexTable;
+	def->tagRegexCount = COUNT_ARRAY (antTagRegexTable);
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }

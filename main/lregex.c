@@ -1014,10 +1014,11 @@ extern boolean hasRegexKind (const langType language, const int kind)
 	return d.result;
 }
 
-extern void printRegexKinds (const langType language __unused__,
+extern void printRegexKinds (const langType language,
 			     boolean allKindFields __unused__,
 			     boolean indent __unused__)
 {
+	installTagRegexTable (language);
 #ifdef HAVE_REGEX
 	if (language <= SetUpper  &&  Sets [language].count > 0)
 	{

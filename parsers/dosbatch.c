@@ -15,24 +15,24 @@
 #include <string.h>
 #include "parse.h"
 
+static tagRegexTable dosTagRegexTable [] = {
+	{"^:([A-Za-z_0-9]+)", "\\1",
+	 "l,label,labels", NULL},
+	{"set[ \t]+([A-Za-z_0-9]+)[ \t]*=", "\\1",
+	 "v,variable,variables", NULL},
+};
+
 /*
 *   FUNCTION DEFINITIONS
 */
-
-static void installDosBatchRegex (const langType language)
-{
-	addTagRegex (language,
-		"^:([A-Za-z_0-9]+)", "\\1", "l,label,labels", NULL);
-	addTagRegex (language,
-		"set[ \t]+([A-Za-z_0-9]+)[ \t]*=", "\\1", "v,variable,variables", NULL);
-}
 
 extern parserDefinition* DosBatchParser (void)
 {
 	static const char *const extensions [] = { "bat", "cmd", NULL };
 	parserDefinition* const def = parserNew ("DosBatch");
 	def->extensions = extensions;
-	def->initialize = installDosBatchRegex;
+	def->tagRegexTable = dosTagRegexTable;
+	def->tagRegexCount = COUNT_ARRAY (dosTagRegexTable);
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }

@@ -1032,25 +1032,35 @@ static boolean doesParserUseKind (const parserDefinition *const parser, char let
 	return FALSE;
 }
 
-static void initializeParser (parserDefinition *const parser, langType lang)
+static void initializeParserTopHalf (parserDefinition *const parser, langType lang)
 {
 	if (parser->initialize != NULL)
 	{
 		parser->initialize (lang);
 		parser->initialize = NULL;
-		if (hasScopeActionInRegex (lang))
-			parser->useCork = TRUE;
 	}
 
 	Assert (parser->fileKind != KIND_NULL);
 	Assert (!doesParserUseKind (parser, parser->fileKind->letter));
 }
 
-static void initializeParsers (void)
+static void initializeParserBottomHalf (parserDefinition *const parser, langType lang)
+{
+	installTagRegexTable (lang);
+
+	if (hasScopeActionInRegex (lang))
+		parser->useCork = TRUE;
+
+	Assert (parser->fileKind != KIND_NULL);
+	Assert (!doesParserUseKind (parser, parser->fileKind->letter));
+}
+
+
+static void initializeParsersTopHalf (void)
 {
 	unsigned int i;
 	for (i = 0  ;  i < LanguageCount  ;  ++i)
-		initializeParser (LanguageTable [i], i);
+		initializeParserTopHalf (LanguageTable [i], i);
 }
 
 extern void initializeParsing (void)
@@ -1093,7 +1103,13 @@ extern void initializeParsing (void)
 		}
 	}
 	verbose ("\n");
-	initializeParsers ();
+	initializeParsersTopHalf ();
+}
+
+static void initializeParser (parserDefinition *const parser, langType lang)
+{
+	initializeParserTopHalf (parser, lang);
+	initializeParserBottomHalf (parser, lang);
 }
 
 extern void freeParserResources (void)
@@ -1130,7 +1146,7 @@ static void doNothing (void)
 {
 }
 
-static void lazyInitialize (langType language)
+static void lazyInitializeTopHalf (langType language)
 {
 	parserDefinition* lang;
 
@@ -1140,12 +1156,7 @@ static void lazyInitialize (langType language)
 	lang->parser = doNothing;
 
 	if (lang->method & METHOD_REGEX)
-	{
-		if (hasScopeActionInRegex (language))
-			lang->useCork = TRUE;
 		lang->parser = findRegexTags;
-	}
-
 }
 #endif
 
@@ -1199,7 +1210,7 @@ extern void processLanguageDefineOption (
 
 		i = LanguageCount++;
 		def = parserNew (name);
-		def->initialize        = lazyInitialize;
+		def->initialize        = lazyInitializeTopHalf;
 		def->currentPatterns   = stringListNew ();
 		def->currentExtensions = stringListNew ();
 		def->method            = METHOD_NOT_CRAFTED;
@@ -1877,6 +1888,26 @@ extern void notifyAvailabilityXcmdMethod (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
 	lang->method |= METHOD_XCMD_AVAILABLE;
+}
+
+extern void installTagRegexTable (const langType language)
+{
+	parserDefinition* lang;
+	unsigned int i;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+
+	if (lang->tagRegexTable == NULL)
+		return;
+
+	for (i = 0; i < lang->tagRegexCount; ++i)
+		addTagRegex (language,
+			     lang->tagRegexTable [i].regex,
+			     lang->tagRegexTable [i].name,
+			     lang->tagRegexTable [i].kinds,
+			     lang->tagRegexTable [i].flags);
+	lang->tagRegexTable = NULL;
 }
 
 /* vi:set tabstop=4 shiftwidth=4 nowrap: */

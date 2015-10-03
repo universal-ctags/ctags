@@ -14,10 +14,6 @@
 #include "get.h"
 #include "parse.h"
 
-/*
-*   FUNCTION DEFINITIONS
-*/
-
 typedef enum {
 	DTS_MACRO, DTS_HEADER,
 } dtsKind;
@@ -27,31 +23,25 @@ static kindOption DTSKinds [] = {
 	{ FALSE, 'h', "header",     "included header files"},
 };
 
-static void installDTSRegex (const langType language)
-{
+static tagRegexTable dtsTagRegexTable [] = {
 	/* phandle = <0x00> */
-	addTagRegex (language,
-		     "^[ \t]*phandle[ \t]+=[ \t]+<(0x[a-fA-F0-9]+)>", "\\1",
-		     "p,phandler,phandlers",
-		     "{scope=ref}");
+	{"^[ \t]*phandle[ \t]+=[ \t]+<(0x[a-fA-F0-9]+)>", "\\1",
+	 "p,phandler,phandlers", "{scope=ref}"},
 
 	/* label: */
-	addTagRegex (language,
-		     "^[ \t]*([a-zA-Z][a-zA-Z0-9_]*)[ \t]*:", "\\1",
-		     "l,label,labels",
-		     "{scope=push}");
+	{"^[ \t]*([a-zA-Z][a-zA-Z0-9_]*)[ \t]*:", "\\1",
+	 "l,label,labels", "{scope=push}"},
 
 	/* extras for tracking scopes  */
-	addTagRegex (language,
-		     "^[ \t]*([a-zA-Z][a-zA-Z0-9_]*)[ \t]*\\{", "",
-		     "",
-		     "{scope=push}{placeholder}");
-	addTagRegex (language,
-		     "\\};", "",
-		     "",
-		     "{scope=pop}{exclusive}");
-}
+	{"^[ \t]*([a-zA-Z][a-zA-Z0-9_]*)[ \t]*\\{", "",
+	 "", "{scope=push}{placeholder}"},
+	{"\\};", "",
+	 "", "{scope=pop}{exclusive}"},
+};
 
+/*
+*   FUNCTION DEFINITIONS
+*/
 static void runCppGetc (void)
 {
 	cppInit (0, FALSE, FALSE,
@@ -71,7 +61,8 @@ extern parserDefinition* DTSParser (void)
 	def->kindCount  = COUNT_ARRAY (DTSKinds);
 	def->extensions = extensions;
 	def->parser     = runCppGetc;
-	def->initialize = installDTSRegex;
+	def->tagRegexTable = dtsTagRegexTable;
+	def->tagRegexCount = COUNT_ARRAY (dtsTagRegexTable);
 	def->method     = METHOD_REGEX;
 	return def;
 }
