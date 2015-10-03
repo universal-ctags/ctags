@@ -39,15 +39,15 @@ static void installDTSRegex (const langType language)
 	addTagRegex (language,
 		     "^[ \t]*([a-zA-Z][a-zA-Z0-9_]*)[ \t]*:", "\\1",
 		     "l,label,labels",
-		     "{scope=push}{exclusive}");
+		     "{scope=push}");
 
 	/* extras for tracking scopes  */
 	addTagRegex (language,
 		     "^[ \t]*([a-zA-Z][a-zA-Z0-9_]*)[ \t]*\\{", "",
 		     "",
-		     "{scope=push}{placeholder}{exclusive}");
+		     "{scope=push}{placeholder}");
 	addTagRegex (language,
-		     "^[ \t]*\\};", "",
+		     "\\};", "",
 		     "",
 		     "{scope=pop}{exclusive}");
 }
@@ -58,8 +58,7 @@ static void runCppGetc (void)
 		 DTSKinds + DTS_MACRO,
 		 DTSKinds + DTS_HEADER);
 
-	while ( cppGetc() != EOF )
-		;		/* Do nothing, just read. */
+	findRegexTagsMainloop (cppGetc);
 
 	cppTerminate ();
 }

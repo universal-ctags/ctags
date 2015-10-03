@@ -140,6 +140,7 @@ extern void freeEncodingResources (void);
 /* Regex interface */
 #ifdef HAVE_REGEX
 extern void findRegexTags (void);
+extern void findRegexTagsMainloop (int (* driver)(void));
 extern boolean matchRegex (const vString* const line, const langType language);
 #endif
 extern void addLanguageRegex (const langType language, const char* const regex);

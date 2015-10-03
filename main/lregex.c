@@ -658,23 +658,13 @@ static void matchTagPattern (const vString* const line,
 		currentScope = entry? entry->extensionFields.scopeIndex: SCOPE_NIL;
 	}
 
-	if (vStringLength (name) == 0)
+	if (vStringLength (name) == 0 && (placeholder == FALSE))
 	{
-		if (accept_null)
-		{
-			if (placeholder)
-				n = makeRegexTag (name, patbuf->u.tag.kind, scope, placeholder);
-			else
-				n = SCOPE_NIL;
-
-		}
-		else
-		{
+		if (accept_null == FALSE)
 			error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
 			       getInputFileName (), getInputLineNumber (),
 			       patbuf->u.tag.name_pattern);
-			n = SCOPE_NIL;
-		}
+		n = SCOPE_NIL;
 	}
 	else
 		n = makeRegexTag (name, patbuf->u.tag.kind, scope, placeholder);
@@ -757,12 +747,22 @@ extern boolean matchRegex (const vString* const line, const langType language)
 	return result;
 }
 
-extern void findRegexTags (void)
+extern void findRegexTagsMainloop (int (* driver)(void))
 {
 	currentScope = SCOPE_NIL;
 	/* merely read all lines of the file */
-	while (fileReadLine () != NULL)
+	while (driver () != EOF)
 		;
+}
+
+static int fileReadLineDriver(void)
+{
+	return (fileReadLine () == NULL)? EOF: 1;
+}
+
+extern void findRegexTags (void)
+{
+	findRegexTagsMainloop (fileReadLineDriver);
 }
 
 extern boolean hasScopeActionInRegex (const langType language)
@@ -817,7 +817,7 @@ static regexPattern *addTagRegexInternal (
 
 	if (*name == '\0')
 	{
-		if (rptr->exclusive)
+		if (rptr->exclusive || rptr->scopeActions & SCOPE_PLACEHOLDER)
 			rptr->ignore = TRUE;
 		else
 			error (WARNING, "%s: regexp missing name pattern", regex);
