@@ -78,6 +78,12 @@ static kindOption JsonKinds [] = {
 	{ TRUE,  'z', "null",		"nulls"		}
 };
 
+static keywordTable JsonKeywordTable [] = {
+	{"true",  KEYWORD_true },
+	{"false", KEYWORD_false},
+	{"null", KEYWORD_null },
+};
+
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
@@ -371,9 +377,6 @@ static void findJsonTags (void)
 static void initialize (const langType language)
 {
 	Lang_json = language;
-	addKeyword ("true", language, KEYWORD_true);
-	addKeyword ("false", language, KEYWORD_false);
-	addKeyword ("null", language, KEYWORD_null);
 }
 
 /* Create parser definition structure */
@@ -386,6 +389,8 @@ extern parserDefinition* JsonParser (void)
 	def->kindCount	= COUNT_ARRAY (JsonKinds);
 	def->parser		= findJsonTags;
 	def->initialize = initialize;
+	def->keywordTable = JsonKeywordTable;
+	def->keywordCount = COUNT_ARRAY (JsonKeywordTable);
 	def->allowNullTag = TRUE;
 
 	return def;

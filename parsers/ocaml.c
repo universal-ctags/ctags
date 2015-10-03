@@ -122,7 +122,7 @@ typedef struct sOcaKeywordDesc {
 
 typedef ocamlKeyword ocaToken;
 
-static const ocaKeywordDesc OcamlKeywordTable[] = {
+static keywordTable OcamlKeywordTable[] = {
 	{ "and"       , OcaKEYWORD_and       }, 
 	{ "begin"     , OcaKEYWORD_begin     }, 
 	{ "class"     , OcaKEYWORD_class     }, 
@@ -181,18 +181,6 @@ typedef struct _lexingState {
 
 /* array of the size of all possible value for a char */
 static boolean isOperator[1 << (8 * sizeof (char))] = { FALSE };
-
-static void initKeywordHash ( void )
-{
-	const size_t count = sizeof (OcamlKeywordTable) / sizeof (ocaKeywordDesc);
-	size_t i;
-
-	for (i = 0; i < count; ++i)
-	{
-		addKeyword (OcamlKeywordTable[i].name, Lang_Ocaml,
-			(int) OcamlKeywordTable[i].id);
-	}
-}
 
 /* definition of all the operator in OCaml,
  * /!\ certain operator get special treatment
@@ -1898,7 +1886,6 @@ static void ocamlInitialize (const langType language)
 	Lang_Ocaml = language;
 
 	initOperatorTable ();
-	initKeywordHash ();
 }
 
 extern parserDefinition *OcamlParser (void)
@@ -1914,6 +1901,7 @@ extern parserDefinition *OcamlParser (void)
 	def->aliases = aliases;
 	def->parser = findOcamlTags;
 	def->initialize = ocamlInitialize;
-
+	def->keywordTable = OcamlKeywordTable;
+	def->keywordCount = COUNT_ARRAY (OcamlKeywordTable);
 	return def;
 }

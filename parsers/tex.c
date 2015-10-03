@@ -60,14 +60,6 @@ typedef enum eKeywordId {
 	KEYWORD_include
 } keywordId;
 
-/*	Used to determine whether keyword is valid for the token language and
- *	what its ID is.
- */
-typedef struct sKeywordDesc {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
 	TOKEN_CHARACTER,
@@ -133,7 +125,7 @@ static kindOption TexKinds [] = {
 	{ TRUE,  'i', "include",	  	  "includes"		   }
 };
 
-static const keywordDesc TexKeywordTable [] = {
+static keywordTable TexKeywordTable [] = {
 	/* keyword			keyword ID */
 	{ "part",			KEYWORD_part				},
 	{ "chapter",		KEYWORD_chapter				},
@@ -155,18 +147,6 @@ static boolean isIdentChar (const int c)
 	return (boolean)
 		(isalpha (c) || isdigit (c) || c == '$' ||
 		  c == '_' || c == '#' || c == '-' || c == '.' || c == ':');
-}
-
-static void buildTexKeywordHash (void)
-{
-	const size_t count = sizeof (TexKeywordTable) /
-		sizeof (TexKeywordTable [0]);
-	size_t i;
-	for (i = 0	;  i < count  ;  ++i)
-	{
-		const keywordDesc* const p = &TexKeywordTable [i];
-		addKeyword (p->name, Lang_js, (int) p->id);
-	}
 }
 
 static tokenInfo *newToken (void)
@@ -559,7 +539,6 @@ static void initialize (const langType language)
 {
 	Assert (sizeof (TexKinds) / sizeof (TexKinds [0]) == TEXTAG_COUNT);
 	Lang_js = language;
-	buildTexKeywordHash ();
 
 	lastPart    = vStringNew();
 	lastChapter = vStringNew();
@@ -608,7 +587,8 @@ extern parserDefinition* TexParser (void)
 	def->parser		= findTexTags;
 	def->initialize = initialize;
 	def->finalize   = finalize;
-
+	def->keywordTable =  TexKeywordTable;
+	def->keywordCount = COUNT_ARRAY (TexKeywordTable);
 	return def;
 }
 /* vi:set tabstop=4 shiftwidth=4 noexpandtab: */

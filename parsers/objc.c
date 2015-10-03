@@ -112,13 +112,7 @@ typedef enum {
 
 typedef objcKeyword objcToken;
 
-typedef struct sOBjcKeywordDesc {
-	const char *name;
-	objcKeyword id;
-} objcKeywordDesc;
-
-
-static const objcKeywordDesc objcKeywordTable[] = {
+static keywordTable objcKeywordTable[] = {
 	{"typedef", ObjcTYPEDEF},
 	{"struct", ObjcSTRUCT},
 	{"enum", ObjcENUM},
@@ -150,18 +144,6 @@ typedef struct _lexingState {
 	vString *name;	/* current parsed identifier/operator */
 	const unsigned char *cp;	/* position in stream */
 } lexingState;
-
-static void initKeywordHash (void)
-{
-	const size_t count = sizeof (objcKeywordTable) / sizeof (objcKeywordDesc);
-	size_t i;
-
-	for (i = 0; i < count; ++i)
-	{
-		addKeyword (objcKeywordTable[i].name, Lang_ObjectiveC,
-			(int) objcKeywordTable[i].id);
-	}
-}
 
 /*//////////////////////////////////////////////////////////////////////
 //// Lexing                                     */
@@ -1138,8 +1120,6 @@ static void findObjcTags (void)
 static void objcInitialize (const langType language)
 {
 	Lang_ObjectiveC = language;
-
-	initKeywordHash ();
 }
 
 static void objcFinalize (const langType language __unused__)
@@ -1168,5 +1148,7 @@ extern parserDefinition *ObjcParser (void)
 	def->initialize = objcInitialize;
 	def->finalize = objcFinalize;
 	def->selectLanguage = selectors;
+	def->keywordTable = objcKeywordTable;
+	def->keywordCount = COUNT_ARRAY (objcKeywordTable);
 	return def;
 }

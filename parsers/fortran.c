@@ -142,14 +142,6 @@ typedef enum eKeywordId {
 	KEYWORD_while
 } keywordId;
 
-/*  Used to determine whether keyword is valid for the token language and
- *  what its ID is.
- */
-typedef struct sKeywordDesc {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
 	TOKEN_EOF,
@@ -255,7 +247,7 @@ static kindOption FortranKinds [] = {
  * http://h18009.www1.hp.com/fortran/docs/lrm/dflrm.htm
  */
 
-static const keywordDesc FortranKeywordTable [] = {
+static keywordTable FortranKeywordTable [] = {
 	/* keyword          keyword ID */
 	{ "abstract",       KEYWORD_abstract     },
 	{ "allocatable",    KEYWORD_allocatable  },
@@ -444,18 +436,6 @@ static boolean insideInterface (void)
 			result = TRUE;
 	}
 	return result;
-}
-
-static void buildFortranKeywordHash (void)
-{
-	const size_t count =
-			sizeof (FortranKeywordTable) / sizeof (FortranKeywordTable [0]);
-	size_t i;
-	for (i = 0  ;  i < count  ;  ++i)
-	{
-		const keywordDesc* const p = &FortranKeywordTable [i];
-		addKeyword (p->name, Lang_fortran, (int) p->id);
-	}
 }
 
 /*
@@ -2580,7 +2560,6 @@ static rescanReason findFortranTags (const unsigned int passCount)
 static void initialize (const langType language)
 {
 	Lang_fortran = language;
-	buildFortranKeywordHash ();
 }
 
 extern parserDefinition* FortranParser (void)
@@ -2598,6 +2577,8 @@ extern parserDefinition* FortranParser (void)
 	def->extensions = extensions;
 	def->parser2    = findFortranTags;
 	def->initialize = initialize;
+	def->keywordTable = FortranKeywordTable;
+	def->keywordCount = COUNT_ARRAY (FortranKeywordTable);
 	return def;
 }
 

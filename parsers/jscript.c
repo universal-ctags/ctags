@@ -73,14 +73,6 @@ typedef enum eKeywordId {
 	KEYWORD_return
 } keywordId;
 
-/*	Used to determine whether keyword is valid for the token language and
- *	what its ID is.
- */
-typedef struct sKeywordDesc {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
 	TOKEN_EOF,
@@ -144,7 +136,7 @@ static kindOption JsKinds [] = {
 	{ TRUE,  'v', "variable",	  "global variables"   }
 };
 
-static const keywordDesc JsKeywordTable [] = {
+static keywordTable JsKeywordTable [] = {
 	/* keyword		keyword ID */
 	{ "function",	KEYWORD_function			},
 	{ "Function",	KEYWORD_capital_function	},
@@ -184,18 +176,6 @@ static boolean isIdentChar (const int c)
 	return (boolean)
 		(isalpha (c) || isdigit (c) || c == '$' ||
 		 c == '@' || c == '_' || c == '#');
-}
-
-static void buildJsKeywordHash (void)
-{
-	const size_t count = sizeof (JsKeywordTable) /
-		sizeof (JsKeywordTable [0]);
-	size_t i;
-	for (i = 0	;  i < count  ;  ++i)
-	{
-		const keywordDesc* const p = &JsKeywordTable [i];
-		addKeyword (p->name, Lang_js, (int) p->id);
-	}
 }
 
 static tokenInfo *newToken (void)
@@ -1999,7 +1979,6 @@ static void initialize (const langType language)
 {
 	Assert (sizeof (JsKinds) / sizeof (JsKinds [0]) == JSTAG_COUNT);
 	Lang_js = language;
-	buildJsKeywordHash ();
 }
 
 static void findJsTags (void)
@@ -2038,6 +2017,8 @@ extern parserDefinition* JavaScriptParser (void)
 	def->kindCount	= COUNT_ARRAY (JsKinds);
 	def->parser		= findJsTags;
 	def->initialize = initialize;
+	def->keywordTable = JsKeywordTable;
+	def->keywordCount = COUNT_ARRAY (JsKeywordTable);
 
 	return def;
 }

@@ -58,6 +58,11 @@ typedef struct {
 } tagRegexTable;
 
 typedef struct {
+	const char *name;
+	int id;
+} keywordTable;
+
+typedef struct {
 	/* defined by parser */
 	char* name;                    /* name of language */
 	kindOption* kinds;             /* tag kinds handled by parser */
@@ -76,6 +81,8 @@ typedef struct {
 	boolean allowNullTag;
 	tagRegexTable *tagRegexTable;
 	unsigned int tagRegexCount;
+	keywordTable *keywordTable;
+	unsigned int keywordCount;
 
 	/* used internally */
 	unsigned int id;               /* id assigned to language */
@@ -145,6 +152,8 @@ extern boolean parseFile (const char *const fileName);
 #ifdef HAVE_ICONV
 extern void freeEncodingResources (void);
 #endif
+
+extern void installKeywordTable (const langType language);
 
 /* Regex interface */
 #ifdef HAVE_REGEX

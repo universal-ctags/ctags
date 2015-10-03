@@ -18,6 +18,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "flags.h"
+#include "keyword.h"
 #include "main.h"
 #define OPTION_WRITE
 #include "options.h"
@@ -1046,6 +1047,7 @@ static void initializeParserTopHalf (parserDefinition *const parser, langType la
 
 static void initializeParserBottomHalf (parserDefinition *const parser, langType lang)
 {
+	installKeywordTable (lang);
 	installTagRegexTable (lang);
 
 	if (hasScopeActionInRegex (lang))
@@ -1910,4 +1912,21 @@ extern void installTagRegexTable (const langType language)
 	lang->tagRegexTable = NULL;
 }
 
+extern void installKeywordTable (const langType language)
+{
+	parserDefinition* lang;
+	unsigned int i;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+
+	if (lang->keywordTable == NULL)
+		return;
+
+	for (i = 0; i < lang->keywordCount; ++i)
+		addKeyword (lang->keywordTable [i].name,
+			    language,
+			    lang->keywordTable [i].id);
+	lang->keywordTable = NULL;
+}
 /* vi:set tabstop=4 shiftwidth=4 nowrap: */

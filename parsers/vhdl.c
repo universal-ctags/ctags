@@ -137,14 +137,6 @@ typedef enum eKeywordId {
 	KEYWORD_XOR
 } keywordId;
 
-/*  Used to determine whether keyword is valid for the current language and
- *  what its ID is.
- */
-typedef struct sKeywordDesc {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
 typedef enum eTokenType {
 	TOKEN_NONE,		/* none */
 	TOKEN_EOF,		/* end-of-file */
@@ -203,7 +195,7 @@ static kindOption VhdlKinds[] = {
 	{FALSE, 'l', "local", "local definitions"}
 };
 
-static keywordDesc VhdlKeywordTable[] = {
+static keywordTable VhdlKeywordTable[] = {
 	{"abs", KEYWORD_ABS},
 	{"access", KEYWORD_ACCESS},
 	{"after", KEYWORD_AFTER},
@@ -567,15 +559,7 @@ static void makeVhdlTag (tokenInfo * const token, const vhdlKind kind)
 
 static void initialize (const langType language)
 {
-	size_t i;
-	const size_t count =
-		sizeof (VhdlKeywordTable) / sizeof (VhdlKeywordTable[0]);
 	Lang_vhdl = language;
-	for (i = 0; i < count; ++i)
-	{
-		const keywordDesc *const p = &VhdlKeywordTable[i];
-		addKeyword (p->name, language, (int) p->id);
-	}
 }
 
 static void parsePackage (tokenInfo * const token)
@@ -839,6 +823,8 @@ extern parserDefinition *VhdlParser (void)
 	def->extensions = extensions;
 	def->parser = findVhdlTags;
 	def->initialize = initialize;
+	def->keywordTable = VhdlKeywordTable;
+	def->keywordCount = COUNT_ARRAY (VhdlKeywordTable);
 	return def;
 }
 
