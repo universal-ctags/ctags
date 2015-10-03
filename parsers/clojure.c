@@ -140,7 +140,7 @@ extern parserDefinition *ClojureParser (void)
 
 	parserDefinition *def = parserNew ("Clojure");
 	def->kinds = ClojureKinds;
-	def->kindCount = KIND_COUNT (ClojureKinds);
+	def->kindCount = COUNT_ARRAY (ClojureKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findClojureTags;

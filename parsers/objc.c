@@ -1161,7 +1161,7 @@ extern parserDefinition *ObjcParser (void)
 					      NULL };
 	parserDefinition *def = parserNewFull ("ObjectiveC", KIND_FILE_ALT);
 	def->kinds = ObjcKinds;
-	def->kindCount = KIND_COUNT (ObjcKinds);
+	def->kindCount = COUNT_ARRAY (ObjcKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findObjcTags;

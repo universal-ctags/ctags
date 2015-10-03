@@ -308,7 +308,7 @@ extern parserDefinition* BetaParser (void)
 	static const char *const extensions [] = { "bet", NULL };
 	parserDefinition* def = parserNew ("BETA");
 	def->kinds      = BetaKinds;
-	def->kindCount  = KIND_COUNT (BetaKinds);
+	def->kindCount  = COUNT_ARRAY (BetaKinds);
 	def->extensions = extensions;
 	def->parser     = findBetaTags;
 	return def;

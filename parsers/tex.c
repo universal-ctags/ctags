@@ -604,7 +604,7 @@ extern parserDefinition* TexParser (void)
 	 * New definitions for parsing instead of regex
 	 */
 	def->kinds		= TexKinds;
-	def->kindCount	= KIND_COUNT (TexKinds);
+	def->kindCount	= COUNT_ARRAY (TexKinds);
 	def->parser		= findTexTags;
 	def->initialize = initialize;
 	def->finalize   = finalize;

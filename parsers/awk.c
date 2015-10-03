@@ -70,7 +70,7 @@ extern parserDefinition* AwkParser (void)
 	static const char *const extensions [] = { "awk", "gawk", "mawk", NULL };
 	parserDefinition* def = parserNew ("Awk");
 	def->kinds      = AwkKinds;
-	def->kindCount  = KIND_COUNT (AwkKinds);
+	def->kindCount  = COUNT_ARRAY (AwkKinds);
 	def->extensions = extensions;
 	def->parser     = findAwkTags;
 	return def;

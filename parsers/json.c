@@ -383,7 +383,7 @@ extern parserDefinition* JsonParser (void)
 	parserDefinition *const def = parserNew ("JSON");
 	def->extensions = extensions;
 	def->kinds		= JsonKinds;
-	def->kindCount	= KIND_COUNT (JsonKinds);
+	def->kindCount	= COUNT_ARRAY (JsonKinds);
 	def->parser		= findJsonTags;
 	def->initialize = initialize;
 	def->allowNullTag = TRUE;

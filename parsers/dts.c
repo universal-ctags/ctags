@@ -68,7 +68,7 @@ extern parserDefinition* DTSParser (void)
 	static const char *const extensions [] = { "dts", "dtsi", NULL };
 	parserDefinition* const def = parserNew ("DTS");
 	def->kinds      = DTSKinds;
-	def->kindCount  = KIND_COUNT (DTSKinds);
+	def->kindCount  = COUNT_ARRAY (DTSKinds);
 	def->extensions = extensions;
 	def->parser     = runCppGetc;
 	def->initialize = installDTSRegex;

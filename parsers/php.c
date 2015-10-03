@@ -1487,7 +1487,7 @@ extern parserDefinition* PhpParser (void)
 	static const char *const extensions [] = { "php", "php3", "php4", "php5", "phtml", NULL };
 	parserDefinition* def = parserNew ("PHP");
 	def->kinds      = PhpKinds;
-	def->kindCount  = KIND_COUNT (PhpKinds);
+	def->kindCount  = COUNT_ARRAY (PhpKinds);
 	def->extensions = extensions;
 	def->parser     = findPhpTags;
 	def->initialize = initializePhpParser;
@@ -1499,7 +1499,7 @@ extern parserDefinition* ZephirParser (void)
 	static const char *const extensions [] = { "zep", NULL };
 	parserDefinition* def = parserNew ("Zephir");
 	def->kinds      = PhpKinds;
-	def->kindCount  = KIND_COUNT (PhpKinds);
+	def->kindCount  = COUNT_ARRAY (PhpKinds);
 	def->extensions = extensions;
 	def->parser     = findZephirTags;
 	def->initialize = initializeZephirParser;

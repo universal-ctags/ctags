@@ -835,7 +835,7 @@ extern parserDefinition *VhdlParser (void)
 	static const char *const extensions[] = { "vhdl", "vhd", NULL };
 	parserDefinition *def = parserNew ("VHDL");
 	def->kinds = VhdlKinds;
-	def->kindCount = KIND_COUNT (VhdlKinds);
+	def->kindCount = COUNT_ARRAY (VhdlKinds);
 	def->extensions = extensions;
 	def->parser = findVhdlTags;
 	def->initialize = initialize;

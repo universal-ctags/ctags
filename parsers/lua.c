@@ -165,7 +165,7 @@ extern parserDefinition* LuaParser (void)
 	static const char* const extensions [] = { "lua", NULL };
 	parserDefinition* def = parserNew ("Lua");
 	def->kinds      = LuaKinds;
-	def->kindCount  = KIND_COUNT (LuaKinds);
+	def->kindCount  = COUNT_ARRAY (LuaKinds);
 	def->extensions = extensions;
 	def->parser     = findLuaTags;
 	return def;

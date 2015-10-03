@@ -528,7 +528,7 @@ extern parserDefinition* PerlParser (void)
 					       NULL };
 	parserDefinition* def = parserNew ("Perl");
 	def->kinds      = PerlKinds;
-	def->kindCount  = KIND_COUNT (PerlKinds);
+	def->kindCount  = COUNT_ARRAY (PerlKinds);
 	def->extensions = extensions;
 	def->parser     = findPerlTags;
 	def->selectLanguage = selectors;

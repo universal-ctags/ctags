@@ -1152,8 +1152,6 @@ static void lazyInitialize (langType language)
 /*
 *   Option parsing
 */
-#define COUNT(D) (sizeof(D)/sizeof(D[0]))
-
 static void lang_def_flag_file_kind_long (const char* const optflag, const char* const param, void* data)
 {
 	parserDefinition*  def = data;
@@ -1209,7 +1207,7 @@ extern void processLanguageDefineOption (
 		LanguageTable = xRealloc (LanguageTable, i + 1, parserDefinition*);
 		LanguageTable [i] = def;
 
-		flagsEval (flags, LangDefFlagDef, COUNT (LangDefFlagDef), def);
+		flagsEval (flags, LangDefFlagDef, COUNT_ARRAY (LangDefFlagDef), def);
 
 		eFree (name);
 	}

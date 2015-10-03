@@ -316,7 +316,7 @@ extern parserDefinition* AspParser (void)
 	static const char *const extensions [] = { "asp", "asa", NULL };
 	parserDefinition* def = parserNew ("Asp");
 	def->kinds      = AspKinds;
-	def->kindCount  = KIND_COUNT (AspKinds);
+	def->kindCount  = COUNT_ARRAY (AspKinds);
 	def->extensions = extensions;
 	def->parser     = findAspTags;
 	return def;

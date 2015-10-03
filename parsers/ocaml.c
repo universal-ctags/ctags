@@ -1909,7 +1909,7 @@ extern parserDefinition *OcamlParser (void)
 					       NULL };
 	parserDefinition *def = parserNew ("OCaml");
 	def->kinds = OcamlKinds;
-	def->kindCount = KIND_COUNT (OcamlKinds);
+	def->kindCount = COUNT_ARRAY (OcamlKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findOcamlTags;

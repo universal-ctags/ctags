@@ -2594,7 +2594,7 @@ extern parserDefinition* FortranParser (void)
 	};
 	parserDefinition* def = parserNew ("Fortran");
 	def->kinds      = FortranKinds;
-	def->kindCount  = KIND_COUNT (FortranKinds);
+	def->kindCount  = COUNT_ARRAY (FortranKinds);
 	def->extensions = extensions;
 	def->parser2    = findFortranTags;
 	def->initialize = initialize;

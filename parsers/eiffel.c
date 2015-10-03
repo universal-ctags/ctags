@@ -1082,7 +1082,7 @@ extern parserDefinition* EiffelParser (void)
 	static const char *const extensions [] = { "e", NULL };
 	parserDefinition* def = parserNew ("Eiffel");
 	def->kinds      = EiffelKinds;
-	def->kindCount  = KIND_COUNT (EiffelKinds);
+	def->kindCount  = COUNT_ARRAY (EiffelKinds);
 	def->extensions = extensions;
 	def->parser     = findEiffelTags;
 	def->initialize = initialize;

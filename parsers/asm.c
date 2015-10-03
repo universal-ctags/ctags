@@ -374,7 +374,7 @@ extern parserDefinition* AsmParser (void)
 	};
 	parserDefinition* def = parserNew ("Asm");
 	def->kinds      = AsmKinds;
-	def->kindCount  = KIND_COUNT (AsmKinds);
+	def->kindCount  = COUNT_ARRAY (AsmKinds);
 	def->extensions = extensions;
 	def->patterns   = patterns;
 	def->parser     = findAsmTags;
