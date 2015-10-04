@@ -18,6 +18,7 @@ endclass : test
 
 class supertest extends test;
     logic c;
+    extern virtual function bit fwrd_ref;
     function mult (a, input b = 0);
         return a * b * 2;
     endfunction : mult

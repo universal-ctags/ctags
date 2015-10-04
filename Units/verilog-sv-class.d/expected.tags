@@ -23,6 +23,7 @@ d	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	p	function:paramtest
 ext_func	input.sv	/^extern virtual function test ext_func (c, d);$/;"	Q	class:paramtest3
 ext_func	input.sv	/^function test paramtest3::ext_func (c, d);$/;"	f	class:paramtest3
 extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	Q	class:test
+fwrd_ref	input.sv	/^    extern virtual function bit fwrd_ref;$/;"	Q	class:supertest
 mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:supertest
 mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:test
 myfunc	input.sv	/^virtual function myfunc (a, b);$/;"	f	class:paramtest3
@@ -44,6 +45,7 @@ paramtest3.myfunc.a	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:pa
 paramtest3.myfunc.b	input.sv	/^virtual function myfunc (a, b);$/;"	p	function:paramtest3.myfunc
 supertest	input.sv	/^class supertest extends test;$/;"	C	inherits:test
 supertest.c	input.sv	/^    logic c;$/;"	r	class:supertest
+supertest.fwrd_ref	input.sv	/^    extern virtual function bit fwrd_ref;$/;"	Q	class:supertest
 supertest.mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:supertest
 supertest.mult.a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult
 supertest.mult.b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:supertest.mult

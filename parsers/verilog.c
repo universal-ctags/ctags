@@ -740,6 +740,10 @@ static void processPortList (int c)
 
 		deleteToken (token);
 	}
+	else
+	{
+		vUngetc (c);
+	}
 }
 
 static void processFunction (tokenInfo *const token)
