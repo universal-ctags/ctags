@@ -478,6 +478,9 @@ if test yes != "$host_mingw"; then
 	fi
 fi
 
+PRETTY_ARG_VAR([DEBUG_CPPFLAGS], [(Objective) C/C++ preprocessor debug flags],
+	       [-DDEBUG])
+
 PRETTY_ARG_VAR([EXTRA_CFLAGS], [extra C compiler flags],
 	       [-std=gnu99])
 PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
