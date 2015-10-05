@@ -985,6 +985,12 @@ static void tagNameList (tokenInfo* token, int c)
 		if (c == '=')
 		{
 			c = skipWhite (vGetc ());
+			if (c == '\'')
+			{
+				c = skipWhite (vGetc ());
+				if (c != '{')
+					vUngetc (c);
+			}
 			if (c == '{')
 				skipPastMatch ("{}");
 			else

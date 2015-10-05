@@ -22,6 +22,7 @@ b	input.sv	/^    extern virtual function void extern_func (input bit a, input b)
 b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
 b	input.sv	/^    logic b;$/;"	r	class:test
 c	input.sv	/^    b,c,$/;"	p	module:mod
+c	input.sv	/^    bit [1:0] c[3] = '{0, 0, 0};$/;"	r	class:test
 d	input.sv	/^    d ,$/;"	p	module:mod
 e	input.sv	/^    output wire e ,$/;"	p	module:mod
 extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	Q	class:test
@@ -72,6 +73,7 @@ temp	input.sv	/^    reg temp;$/;"	r	function:mod.mult
 test	input.sv	/^class test;$/;"	C
 test.a	input.sv	/^    reg a;$/;"	r	class:test
 test.b	input.sv	/^    logic b;$/;"	r	class:test
+test.c	input.sv	/^    bit [1:0] c[3] = '{0, 0, 0};$/;"	r	class:test
 test.extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	Q	class:test
 test.extern_func.a	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
 test.extern_func.b	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func

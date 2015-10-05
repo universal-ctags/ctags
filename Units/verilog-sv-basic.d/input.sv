@@ -8,6 +8,8 @@
 class test;
     reg a;
     logic b;
+    bit [1:0] c[3] = '{0, 0, 0};
+
     function mult (a, input b = 0);
         return a * b;
     endfunction : mult
