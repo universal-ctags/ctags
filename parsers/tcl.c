@@ -105,7 +105,7 @@ extern parserDefinition* TclParser (void)
 	static const char *const extensions [] = { "tcl", "tk", "wish", "itcl", NULL };
 	parserDefinition* def = parserNew ("Tcl");
 	def->kinds      = TclKinds;
-	def->kindCount  = KIND_COUNT (TclKinds);
+	def->kindCount  = COUNT_ARRAY (TclKinds);
 	def->extensions = extensions;
 	def->parser     = findTclTags;
 	return def;

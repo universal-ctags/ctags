@@ -124,12 +124,7 @@ static kindOption PhpKinds[COUNT_KIND] = {
 	{ TRUE, 'v', "variable",	"variables" }
 };
 
-typedef struct {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
-static const keywordDesc PhpKeywordTable[] = {
+static const keywordTable const PhpKeywordTable[] = {
 	/* keyword			keyword ID */
 	{ "abstract",		KEYWORD_abstract		},
 	{ "and",			KEYWORD_and				},
@@ -244,17 +239,6 @@ static vString *CurrentNamesapce;
  * of initPhpEntry()'s scope. */
 static vString *FullScope;
 
-
-static void buildPhpKeywordHash (const langType language)
-{
-	const size_t count = sizeof (PhpKeywordTable) / sizeof (PhpKeywordTable[0]);
-	size_t i;
-	for (i = 0; i < count ; i++)
-	{
-		const keywordDesc* const p = &PhpKeywordTable[i];
-		addKeyword (p->name, language, (int) p->id);
-	}
-}
 
 static const char *accessToString (const accessType access)
 {
@@ -1473,13 +1457,11 @@ static void findZephirTags (void)
 static void initializePhpParser (const langType language)
 {
 	Lang_php = language;
-	buildPhpKeywordHash (language);
 }
 
 static void initializeZephirParser (const langType language)
 {
 	Lang_zephir = language;
-	buildPhpKeywordHash (language);
 }
 
 extern parserDefinition* PhpParser (void)
@@ -1487,10 +1469,12 @@ extern parserDefinition* PhpParser (void)
 	static const char *const extensions [] = { "php", "php3", "php4", "php5", "phtml", NULL };
 	parserDefinition* def = parserNew ("PHP");
 	def->kinds      = PhpKinds;
-	def->kindCount  = KIND_COUNT (PhpKinds);
+	def->kindCount  = COUNT_ARRAY (PhpKinds);
 	def->extensions = extensions;
 	def->parser     = findPhpTags;
 	def->initialize = initializePhpParser;
+	def->keywordTable = PhpKeywordTable;
+	def->keywordCount = COUNT_ARRAY (PhpKeywordTable);
 	return def;
 }
 
@@ -1499,10 +1483,12 @@ extern parserDefinition* ZephirParser (void)
 	static const char *const extensions [] = { "zep", NULL };
 	parserDefinition* def = parserNew ("Zephir");
 	def->kinds      = PhpKinds;
-	def->kindCount  = KIND_COUNT (PhpKinds);
+	def->kindCount  = COUNT_ARRAY (PhpKinds);
 	def->extensions = extensions;
 	def->parser     = findZephirTags;
 	def->initialize = initializeZephirParser;
+	def->keywordTable = PhpKeywordTable;
+	def->keywordCount = COUNT_ARRAY (PhpKeywordTable);
 	return def;
 }
 

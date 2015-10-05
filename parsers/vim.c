@@ -711,7 +711,7 @@ extern parserDefinition* VimParser (void)
 		"[._]gvimrc", NULL };
 	parserDefinition* def = parserNew ("Vim");
 	def->kinds		= VimKinds;
-	def->kindCount	= KIND_COUNT (VimKinds);
+	def->kindCount	= COUNT_ARRAY (VimKinds);
 	def->extensions = extensions;
 	def->patterns   = patterns;
 	def->parser		= findVimTags;

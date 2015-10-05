@@ -347,7 +347,7 @@ extern parserDefinition* SwineParser (void)
     static const char *const extensions [] = { "swn", NULL };
     parserDefinition* def = parserNew ("Swine");
     def-&gt;kinds      = SwineKinds;
-    def-&gt;kindCount  = KIND_COUNT (SwineKinds);
+    def-&gt;kindCount  = COUNT_ARRAY (SwineKinds);
     def-&gt;extensions = extensions;
     def-&gt;parser     = findSwineTags;
     def-&gt;initialize = installSwine;

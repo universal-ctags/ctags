@@ -86,14 +86,6 @@ typedef enum eKeywordId {
 	KEYWORD_override
 } keywordId;
 
-/*	Used to determine whether keyword is valid for the token language and
- *	what its ID is.
- */
-typedef struct sKeywordDesc {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
 	TOKEN_CHARACTER,
@@ -162,7 +154,10 @@ static kindOption FlexKinds [] = {
 	{ TRUE,  'x', "mxtag",		  "mxtags" 			   }
 };
 
-static const keywordDesc FlexKeywordTable [] = {
+/*	Used to determine whether keyword is valid for the token language and
+ *	what its ID is.
+ */
+static const keywordTable const FlexKeywordTable [] = {
 	/* keyword		keyword ID */
 	{ "function",	KEYWORD_function			},
 	{ "Function",	KEYWORD_capital_function	},
@@ -210,18 +205,6 @@ static boolean isIdentChar (const int c)
 	return (boolean)
 		(isalpha (c) || isdigit (c) || c == '$' || 
 		 c == '@' || c == '_' || c == '#');
-}
-
-static void buildFlexKeywordHash (void)
-{
-	const size_t count = sizeof (FlexKeywordTable) /
-		sizeof (FlexKeywordTable [0]);
-	size_t i;
-	for (i = 0	;  i < count  ;  ++i)
-	{
-		const keywordDesc* const p = &FlexKeywordTable [i];
-		addKeyword (p->name, Lang_js, (int) p->id);
-	}
 }
 
 static tokenInfo *newToken (void)
@@ -2377,7 +2360,6 @@ static void initialize (const langType language)
 {
 	Assert (sizeof (FlexKinds) / sizeof (FlexKinds [0]) == FLEXTAG_COUNT);
 	Lang_js = language;
-	buildFlexKeywordHash ();
 }
 
 static void findFlexTags (void)
@@ -2409,9 +2391,11 @@ extern parserDefinition* FlexParser (void)
 	 * New definitions for parsing instead of regex
 	 */
 	def->kinds		= FlexKinds;
-	def->kindCount	= KIND_COUNT (FlexKinds);
+	def->kindCount	= COUNT_ARRAY (FlexKinds);
 	def->parser		= findFlexTags;
 	def->initialize = initialize;
+	def->keywordTable = FlexKeywordTable;
+	def->keywordCount = COUNT_ARRAY (FlexKeywordTable);
 
 	return def;
 }

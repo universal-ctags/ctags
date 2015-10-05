@@ -40,14 +40,6 @@ typedef enum eKeywordId {
 	KEYWORD_chan
 } keywordId;
 
-/*  Used to determine whether keyword is valid for the current language and
- *  what its ID is.
- */
-typedef struct sKeywordDesc {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
 typedef enum eTokenType {
 	TOKEN_NONE = -1,
 	// Token not important for top-level Go parsing
@@ -108,7 +100,7 @@ static kindOption GoKinds[] = {
 	{TRUE, 'm', "member", "struct members"}
 };
 
-static keywordDesc GoKeywordTable[] = {
+static const keywordTable const GoKeywordTable[] = {
 	{"package", KEYWORD_package},
 	{"import", KEYWORD_import},
 	{"const", KEYWORD_const},
@@ -140,15 +132,7 @@ static boolean isIdentChar (const int c)
 
 static void initialize (const langType language)
 {
-	size_t i;
-	const size_t count =
-		sizeof (GoKeywordTable) / sizeof (GoKeywordTable[0]);
 	Lang_go = language;
-	for (i = 0; i < count; ++i)
-	{
-		const keywordDesc *const p = &GoKeywordTable[i];
-		addKeyword (p->name, language, (int) p->id);
-	}
 }
 
 static tokenInfo *newToken (void)
@@ -825,9 +809,11 @@ extern parserDefinition *GoParser (void)
 	static const char *const extensions[] = { "go", NULL };
 	parserDefinition *def = parserNew ("Go");
 	def->kinds = GoKinds;
-	def->kindCount = KIND_COUNT (GoKinds);
+	def->kindCount = COUNT_ARRAY (GoKinds);
 	def->extensions = extensions;
 	def->parser = findGoTags;
 	def->initialize = initialize;
+	def->keywordTable = GoKeywordTable;
+	def->keywordCount = COUNT_ARRAY (GoKeywordTable);
 	return def;
 }

@@ -62,14 +62,6 @@ typedef enum eKeywordId {
 	KEYWORD_variant, KEYWORD_when, KEYWORD_xor
 } keywordId;
 
-/*  Used to determine whether keyword is valid for the token language and
- *  what its ID is.
- */
-typedef struct sKeywordDesc {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
 typedef enum eTokenType {
 	TOKEN_EOF,
 	TOKEN_UNDEFINED,
@@ -121,7 +113,7 @@ static kindOption EiffelKinds [] = {
 	{ FALSE, 'l', "local",   "local entities"}
 };
 
-static const keywordDesc EiffelKeywordTable [] = {
+static const keywordTable const EiffelKeywordTable [] = {
 	/* keyword          keyword ID */
 	{ "alias",          KEYWORD_alias      },
 	{ "all",            KEYWORD_all        },
@@ -189,18 +181,6 @@ static const keywordDesc EiffelKeywordTable [] = {
 /*
 *   FUNCTION DEFINITIONS
 */
-
-static void buildEiffelKeywordHash (void)
-{
-	const size_t count = sizeof (EiffelKeywordTable) /
-						 sizeof (EiffelKeywordTable [0]);
-	size_t i;
-	for (i = 0  ;  i < count  ;  ++i)
-	{
-		const keywordDesc* const p = &EiffelKeywordTable [i];
-		addKeyword (p->name, Lang_eiffel, (int) p->id);
-	}
-}
 
 /*
 *   Tag generation functions
@@ -1065,7 +1045,6 @@ static void parseClass (tokenInfo *const token)
 static void initialize (const langType language)
 {
 	Lang_eiffel = language;
-	buildEiffelKeywordHash ();
 }
 
 static void findEiffelTags (void)
@@ -1082,10 +1061,12 @@ extern parserDefinition* EiffelParser (void)
 	static const char *const extensions [] = { "e", NULL };
 	parserDefinition* def = parserNew ("Eiffel");
 	def->kinds      = EiffelKinds;
-	def->kindCount  = KIND_COUNT (EiffelKinds);
+	def->kindCount  = COUNT_ARRAY (EiffelKinds);
 	def->extensions = extensions;
 	def->parser     = findEiffelTags;
 	def->initialize = initialize;
+	def->keywordTable = EiffelKeywordTable;
+	def->keywordCount = COUNT_ARRAY (EiffelKeywordTable);
 	return def;
 }
 

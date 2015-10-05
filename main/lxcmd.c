@@ -581,7 +581,6 @@ extern void addTagXcmd (const langType language, vString* pathvstr, const char* 
 	pathSet* set;
 	xcmdPath *path;
 
-#define COUNT(D) (sizeof(D)/sizeof(D[0]))
 	flagDefinition xcmdFlagDefs[] = {
 		{ '\0', "notAvailableStatus",  NULL,  xcmd_flag_not_avaible_status_long  },
 	};
@@ -612,7 +611,7 @@ extern void addTagXcmd (const langType language, vString* pathvstr, const char* 
 
 	set->count += 1;
 
-	flagsEval (flags, xcmdFlagDefs, COUNT(xcmdFlagDefs), path);
+	flagsEval (flags, xcmdFlagDefs, COUNT_ARRAY(xcmdFlagDefs), path);
 
 	path->available = (loadPathKinds (path, language));
 	useXcmdMethod (language);

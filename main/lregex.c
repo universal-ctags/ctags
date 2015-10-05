@@ -95,8 +95,6 @@ typedef struct {
 	hashTable   *kinds;
 } patternSet;
 
-#define COUNT(D) (sizeof(D)/sizeof(D[0]))
-
 /*
 *   DATA DEFINITIONS
 */
@@ -392,8 +390,8 @@ static regexPattern *addCompiledTagPattern (
 	boolean exclusive = FALSE;
 	unsigned long scopeActions = 0UL;
 
-	flagsEval (flags, prePtrnFlagDef, COUNT(prePtrnFlagDef), &exclusive);
-	flagsEval (flags, scopePtrnFlagDef, COUNT(scopePtrnFlagDef), &scopeActions);
+	flagsEval (flags, prePtrnFlagDef, COUNT_ARRAY(prePtrnFlagDef), &exclusive);
+	flagsEval (flags, scopePtrnFlagDef, COUNT_ARRAY(scopePtrnFlagDef), &scopeActions);
 	if (*name == '\0' && exclusive && kind == KIND_REGEX_DEFAULT)
 	{
 		kind = KIND_GHOST;
@@ -422,7 +420,7 @@ static void addCompiledCallbackPattern (
 {
 	regexPattern * ptrn;
 	boolean exclusive = FALSE;
-	flagsEval (flags, prePtrnFlagDef, COUNT(prePtrnFlagDef), &exclusive);
+	flagsEval (flags, prePtrnFlagDef, COUNT_ARRAY(prePtrnFlagDef), &exclusive);
 	ptrn  = addCompiledTagCommon(language, pattern, '\0');
 	ptrn->type    = PTRN_CALLBACK;
 	ptrn->u.callback.function = callback;
@@ -480,7 +478,7 @@ static regex_t* compileRegex (const char* const regexp, const char* const flags)
 
 	flagsEval (flags,
 		   regexFlagDefs,
-		   COUNT(regexFlagDefs),
+		   COUNT_ARRAY(regexFlagDefs),
 		   &cflags);
 
 	result = xMalloc (1, regex_t);
@@ -1016,10 +1014,11 @@ extern boolean hasRegexKind (const langType language, const int kind)
 	return d.result;
 }
 
-extern void printRegexKinds (const langType language __unused__,
+extern void printRegexKinds (const langType language,
 			     boolean allKindFields __unused__,
 			     boolean indent __unused__)
 {
+	installTagRegexTable (language);
 #ifdef HAVE_REGEX
 	if (language <= SetUpper  &&  Sets [language].count > 0)
 	{
@@ -1033,9 +1032,9 @@ extern void printRegexKinds (const langType language __unused__,
 extern void printRegexFlags (void)
 {
 #ifdef HAVE_REGEX
-	flagPrintHelp (regexFlagDefs,  COUNT (regexFlagDefs));
-	flagPrintHelp (prePtrnFlagDef, COUNT (prePtrnFlagDef));
-	flagPrintHelp (scopePtrnFlagDef, COUNT (scopePtrnFlagDef));
+	flagPrintHelp (regexFlagDefs,  COUNT_ARRAY (regexFlagDefs));
+	flagPrintHelp (prePtrnFlagDef, COUNT_ARRAY (prePtrnFlagDef));
+	flagPrintHelp (scopePtrnFlagDef, COUNT_ARRAY (scopePtrnFlagDef));
 #endif
 }
 

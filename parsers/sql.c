@@ -128,15 +128,6 @@ typedef enum eKeywordId {
 	KEYWORD_go
 } keywordId;
 
-/*
- * Used to determine whether keyword is valid for the token language and
- *	what its ID is.
- */
-typedef struct sKeywordDesc {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
 	TOKEN_EOF,
@@ -233,7 +224,7 @@ static kindOption SqlKinds [] = {
 	{ TRUE,  'z', "mlprop",		  "MobiLink Properties "   }
 };
 
-static const keywordDesc SqlKeywordTable [] = {
+static const keywordTable const SqlKeywordTable [] = {
 	/* keyword		keyword ID */
 	{ "as",								KEYWORD_is				      },
 	{ "is",								KEYWORD_is				      },
@@ -399,18 +390,6 @@ static boolean isMatchedEnd(tokenInfo *const token, int nest_lvl)
 	}
 
 	return terminated;
-}
-
-static void buildSqlKeywordHash (void)
-{
-	const size_t count = sizeof (SqlKeywordTable) /
-		sizeof (SqlKeywordTable [0]);
-	size_t i;
-	for (i = 0	;  i < count  ;  ++i)
-	{
-		const keywordDesc* const p = &SqlKeywordTable [i];
-		addKeyword (p->name, Lang_sql, (int) p->id);
-	}
 }
 
 static tokenInfo *newToken (void)
@@ -2379,7 +2358,6 @@ static void initialize (const langType language)
 {
 	Assert (sizeof (SqlKinds) / sizeof (SqlKinds [0]) == SQLTAG_COUNT);
 	Lang_sql = language;
-	buildSqlKeywordHash ();
 }
 
 static void findSqlTags (void)
@@ -2396,10 +2374,12 @@ extern parserDefinition* SqlParser (void)
 	static const char *const extensions [] = { "sql", NULL };
 	parserDefinition* def = parserNewFull ("SQL", KIND_FILE_ALT);
 	def->kinds		= SqlKinds;
-	def->kindCount	= KIND_COUNT (SqlKinds);
+	def->kindCount	= COUNT_ARRAY (SqlKinds);
 	def->extensions = extensions;
 	def->parser		= findSqlTags;
 	def->initialize = initialize;
+	def->keywordTable = SqlKeywordTable;
+	def->keywordCount = COUNT_ARRAY (SqlKeywordTable);
 	return def;
 }
 

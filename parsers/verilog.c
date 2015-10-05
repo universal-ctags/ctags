@@ -1088,7 +1088,7 @@ extern parserDefinition* VerilogParser (void)
 	static const char *const extensions [] = { "v", NULL };
 	parserDefinition* def = parserNew ("Verilog");
 	def->kinds      = VerilogKinds;
-	def->kindCount  = KIND_COUNT (VerilogKinds);
+	def->kindCount  = COUNT_ARRAY (VerilogKinds);
 	def->extensions = extensions;
 	def->parser     = findVerilogTags;
 	def->initialize = initializeVerilog;
@@ -1100,7 +1100,7 @@ extern parserDefinition* SystemVerilogParser (void)
 	static const char *const extensions [] = { "sv", "svh", "svi", NULL };
 	parserDefinition* def = parserNew ("SystemVerilog");
 	def->kinds      = SystemVerilogKinds;
-	def->kindCount  = KIND_COUNT (SystemVerilogKinds);
+	def->kindCount  = COUNT_ARRAY (SystemVerilogKinds);
 	def->extensions = extensions;
 	def->parser     = findVerilogTags;
 	def->initialize = initializeSystemVerilog;

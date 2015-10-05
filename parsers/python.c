@@ -859,7 +859,7 @@ extern parserDefinition *PythonParser (void)
 					      NULL };
 	parserDefinition *def = parserNew ("Python");
 	def->kinds = PythonKinds;
-	def->kindCount = KIND_COUNT (PythonKinds);
+	def->kindCount = COUNT_ARRAY (PythonKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findPythonTags;

@@ -132,7 +132,7 @@ extern parserDefinition* LispParser (void)
 
 	parserDefinition* def = parserNew ("Lisp");
 	def->kinds      = LispKinds;
-	def->kindCount  = KIND_COUNT (LispKinds);
+	def->kindCount  = COUNT_ARRAY (LispKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser     = findLispTags;

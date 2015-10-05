@@ -20,7 +20,7 @@
 /*
 *   MACROS
 */
-#define KIND_COUNT(kindTable) (sizeof(kindTable)/sizeof(kindOption))
+#define COUNT_ARRAY(ARRAY_VAR) (sizeof(ARRAY_VAR)/sizeof(ARRAY_VAR[0]))
 
 #define LANG_AUTO   (-1)
 #define LANG_IGNORE (-2)
@@ -51,6 +51,18 @@ typedef enum {
 } parsingMethod;
 
 typedef struct {
+	const char *const regex;
+	const char* const name;
+	const char* const kinds;
+	const char *const flags;
+} tagRegexTable;
+
+typedef struct {
+	const char *name;
+	const int id;
+} keywordTable;
+
+typedef struct {
 	/* defined by parser */
 	char* name;                    /* name of language */
 	kindOption* kinds;             /* tag kinds handled by parser */
@@ -67,6 +79,10 @@ typedef struct {
 	unsigned int method;           /* See PARSE__... definitions above */
 	boolean useCork;
 	boolean allowNullTag;
+	const tagRegexTable *tagRegexTable;
+	unsigned int tagRegexCount;
+	const keywordTable *keywordTable;
+	unsigned int keywordCount;
 
 	/* used internally */
 	unsigned int id;               /* id assigned to language */
@@ -137,6 +153,8 @@ extern boolean parseFile (const char *const fileName);
 extern void freeEncodingResources (void);
 #endif
 
+extern void installKeywordTable (const langType language);
+
 /* Regex interface */
 #ifdef HAVE_REGEX
 extern void findRegexTags (void);
@@ -144,8 +162,9 @@ extern void findRegexTagsMainloop (int (* driver)(void));
 extern boolean matchRegex (const vString* const line, const langType language);
 #endif
 extern void addLanguageRegex (const langType language, const char* const regex);
+extern void installTagRegexTable (const langType language);
 extern void addTagRegex (const langType language, const char* const regex, const char* const name, const char* const kinds, const char* const flags);
-extern void addCallbackRegex (const langType language, const char *const regex, const char *const flags, const regexCallback callback);
+extern void addCallbackRegex (const langType language, const char *const regexo, const char *const flags, const regexCallback callback);
 extern void resetRegexKinds (const langType language, boolean mode);
 extern boolean enableRegexKind (const langType language, const int kind, const boolean mode);
 extern boolean isRegexKindEnabled (const langType language, const int kind);
