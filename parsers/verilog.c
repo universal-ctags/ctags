@@ -59,6 +59,7 @@ typedef enum {
 	K_MODPORT,
 	K_PACKAGE,
 	K_PROGRAM,
+	K_PROTOTYPE,
 	K_PROPERTY,
 	K_TYPEDEF
 } verilogKind;
@@ -79,7 +80,8 @@ typedef struct sTokenInfo {
 	verilogKind         lastKind;      /* Kind of last found tag */
 	vString*            blockName;     /* Current block name */
 	vString*            inheritance;   /* Class inheritance */
-	boolean             singleStat;    /* Single statement (ends at next semi-colon) */
+	boolean             prototype;     /* Is only a prototype */
+	boolean             classScope;    /* Context is local to the current sub-context */
 } tokenInfo;
 
 /*
@@ -118,6 +120,7 @@ static kindOption SystemVerilogKinds [] = {
  { TRUE, 'M', "modport",   "modports" },
  { TRUE, 'K', "package",   "packages" },
  { TRUE, 'P', "program",   "programs" },
+ { FALSE,'Q', "prototype", "prototypes" },
  { TRUE, 'R', "property",  "properties" },
  { TRUE, 'T', "typedef",   "type declarations" }
 };
@@ -176,6 +179,8 @@ static const keywordAssoc KeywordTable [] = {
 	{ "package",   K_PACKAGE,   { 1, 0 } },
 	{ "program",   K_PROGRAM,   { 1, 0 } },
 	{ "property",  K_PROPERTY,  { 1, 0 } },
+	{ "pure",      K_IGNORE,    { 1, 0 } },
+	{ "ref",       K_PORT,      { 1, 0 } },
 	{ "shortint",  K_REGISTER,  { 1, 0 } },
 	{ "shortreal", K_REGISTER,  { 1, 0 } },
 	{ "static",    K_IGNORE,    { 1, 0 } },
@@ -244,10 +249,10 @@ static short hasSimplePortList (tokenInfo const* token)
 	}
 }
 
-static short isSingleStatement (tokenInfo const* token)
+static short isPrototype (tokenInfo const* token)
 {
 	if (strcmp (vStringValue (token->name), "extern")  == 0 ||
-        strcmp (vStringValue (token->name), "virtual") == 0 )
+        strcmp (vStringValue (token->name), "pure") == 0 )
 	{
 		return TRUE;
 	} else {
@@ -267,7 +272,8 @@ static tokenInfo *newToken (void)
 	token->lastKind = K_UNDEFINED;
 	token->blockName = vStringNew ();
 	token->inheritance = vStringNew ();
-	token->singleStat = FALSE;
+	token->prototype = FALSE;
+	token->classScope = FALSE;
 	return token;
 }
 
@@ -502,7 +508,6 @@ static void createContext (tokenInfo *const scope)
 	{
 		vString *contextName = vStringNew ();
 
-		verbose ("Creating new context %s\n", vStringValue (scope->name));
 		/* Determine full context name */
 		if (currentContext->kind != K_UNDEFINED)
 		{
@@ -514,6 +519,7 @@ static void createContext (tokenInfo *const scope)
 		currentContext = pushToken (currentContext, scope);
 		vStringCopy (currentContext->name, contextName);
 		vStringDelete (contextName);
+		verbose ("Created new context %s (kind %d)\n", vStringValue (currentContext->name), currentContext->kind);
 	}
 }
 
@@ -535,6 +541,11 @@ static void dropContext (tokenInfo *const token)
 		{
 			verbose ("Dropping context %s\n", vStringValue (currentContext->name));
 			currentContext = popToken (currentContext);
+			if (currentContext->classScope)
+			{
+				verbose ("Dropping local context %s\n", vStringValue (currentContext->name));
+				currentContext = popToken (currentContext);
+			}
 		}
 	}
 	vStringDelete(endTokenName);
@@ -544,9 +555,20 @@ static void dropContext (tokenInfo *const token)
 static void createTag (tokenInfo *const token)
 {
 	tagEntryInfo tag;
+	verilogKind kind;
+
+	/* Determine if kind is prototype */
+	if (currentContext->prototype)
+	{
+		kind = K_PROTOTYPE;
+	}
+	else
+	{
+		kind = token->kind;
+	}
 
 	/* Do nothing it tag name is empty or tag kind is disabled */
-	if (vStringLength (token->name) == 0 || ! kindEnabled (token->kind))
+	if (vStringLength (token->name) == 0 || ! kindEnabled (kind))
 	{
 		return;
 	}
@@ -559,13 +581,13 @@ static void createTag (tokenInfo *const token)
 			getSourceLanguageName (),
 			token->filePosition,
 			getSourceFileTagPath (),
-			kindFromKind (token->kind)
+			kindFromKind (kind)
 			);
-	verbose ("Adding tag %s (kind %d)", vStringValue (token->name), token->kind);
+	verbose ("Adding tag %s (kind %d)", vStringValue (token->name), kind);
 	if (currentContext->kind != K_UNDEFINED)
 	{
 		verbose (" to context %s\n", vStringValue (currentContext->name));
-		currentContext->lastKind = token->kind;
+		currentContext->lastKind = kind;
 		tag.extensionFields.scopeKind = kindFromKind (currentContext->kind);
 		tag.extensionFields.scopeName = vStringValue (currentContext->name);
 	}
@@ -596,7 +618,7 @@ static void createTag (tokenInfo *const token)
 		tokenInfo *newScope = newToken ();
 
 		vStringCopy (newScope->name, token->name);
-		newScope->kind = token->kind;
+		newScope->kind = kind;
 		createContext (newScope);
 	}
 
@@ -718,11 +740,16 @@ static void processPortList (int c)
 
 		deleteToken (token);
 	}
+	else
+	{
+		vUngetc (c);
+	}
 }
 
 static void processFunction (tokenInfo *const token)
 {
 	int c;
+	tokenInfo *classType;
 
 	/* Search for function name
 	 * Last identifier found before a '(' or a ';' is the function name */
@@ -731,6 +758,24 @@ static void processFunction (tokenInfo *const token)
 	{
 		readIdentifier (token, c);
 		c = skipWhite (vGetc ());
+		/* Identify class type prefixes and create respective context*/
+		if (c == ':')
+		{
+			c = vGetc ();
+			if (c == ':')
+			{
+				verbose ("Found function declaration with class type %s\n", vStringValue (token->name));
+				classType = newToken ();
+				vStringCopy (classType->name, token->name);
+				classType->kind = K_CLASS;
+				createContext (classType);
+				currentContext->classScope = TRUE;
+			}
+			else
+			{
+				vUngetc (c);
+			}
+		}
 	} while (c != '(' && c != ';' && c != EOF);
 
 	if ( vStringLength (token->name) > 0 )
@@ -750,7 +795,19 @@ static void processTypedef (tokenInfo *const token)
 	/*Note: At the moment, only identifies typedef name and not its contents */
 	int c;
 
-	/* Get identifiers */
+	/* Get typedef type */
+	c = skipWhite (vGetc ());
+	if (isIdentifierCharacter (c))
+	{
+		readIdentifier (token, c);
+		/* A typedef class is just a prototype */
+		if (strcmp (vStringValue (token->name), "class") == 0)
+		{
+			currentContext->prototype = TRUE;
+		}
+	}
+
+	/* Skip remaining identifiers */
 	c = skipWhite (vGetc ());
 	while (isIdentifierCharacter (c))
 	{
@@ -779,16 +836,19 @@ static void processTypedef (tokenInfo *const token)
 		if (c == '(')
 		{
 			skipPastMatch ("()");
+			c = skipWhite (vGetc ());
 		}
-		c = skipWhite (vGetc ());
 	}
 
-	/* Read new typedef identifier */
+	/* Read typedef name */
 	if (isIdentifierCharacter (c))
 	{
 		readIdentifier (token, c);
 	}
-
+	else
+	{
+		vUngetc (c);
+	}
 	/* Use last identifier to create tag */
 	createTag (token);
 }
@@ -832,10 +892,9 @@ static void processClass (tokenInfo *const token)
 					}
 				}
 			} while (c != ')' && c != EOF);
-			c = vGetc ();
+			c = skipWhite (vGetc ());
 			parameters = popToken (parameters);
 		}
-		c = skipWhite (vGetc ());
 	}
 
 	/* Search for inheritance information */
@@ -926,6 +985,12 @@ static void tagNameList (tokenInfo* token, int c)
 		if (c == '=')
 		{
 			c = skipWhite (vGetc ());
+			if (c == '\'')
+			{
+				c = skipWhite (vGetc ());
+				if (c != '{')
+					vUngetc (c);
+			}
 			if (c == '{')
 				skipPastMatch ("{}");
 			else
@@ -947,6 +1012,8 @@ static void tagNameList (tokenInfo* token, int c)
 
 static void findTag (tokenInfo *const token)
 {
+	verbose ("Checking token %s of kind %d\n", vStringValue (token->name), token->kind);
+
 	if (currentContext->kind != K_UNDEFINED)
 	{
 		/* Drop context, but only if an end token is found */
@@ -995,9 +1062,9 @@ static void findTag (tokenInfo *const token)
 	{
 		processClass (token);
 	}
-	else if (token->kind == K_IGNORE && isSingleStatement (token))
+	else if (token->kind == K_IGNORE && isPrototype (token))
 	{
-		currentContext->singleStat = TRUE;
+		currentContext->prototype = TRUE;
 	}
 	else if (isVariable (token))
 	{
@@ -1058,14 +1125,19 @@ static void findVerilogTags (void)
 					skipPastMatch ("()");
 				}
 				break;
-			/* Drop context on single statements, which don't have an end
+			/* Drop context on prototypes because they don't have an end
 			 * statement */
 			case ';':
-				if (currentContext->scope && currentContext->scope->singleStat)
+				if (currentContext->scope && currentContext->scope->prototype)
 				{
 					verbose ("Dropping context %s\n", vStringValue (currentContext->name));
 					currentContext = popToken (currentContext);
-					currentContext->singleStat = FALSE;
+					currentContext->prototype = FALSE;
+				}
+				/* Prototypes end at the end of statement */
+				if (currentContext->prototype)
+				{
+					currentContext->prototype = FALSE;
 				}
 				break;
 			default :
