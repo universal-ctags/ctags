@@ -128,8 +128,29 @@ AC_DEFUN([CHECK_PROTO], [
 	])
 ])
 
+# PRETTY_ARG_VAR(VARIABLE, DESCRIPTION, DEFAULT)
+# ----------------------------------------------
+# Call AC_ARG_VAR with DEFAULT value.
+AC_DEFUN([PRETTY_ARG_VAR], [
+	AC_ARG_VAR([$1], [$2 [$3]])
+
+	if test "${ac_env_$1_set}" = "set"; then
+		$1="${ac_env_$1_value}"
+	else
+		$1="$3"
+	fi
+])
+
 # Checks for configuration options
 # --------------------------------
+
+AC_ARG_WITH([sparse-cgcc],
+	[AS_HELP_STRING([--with-sparse-cgcc],
+		[use Sparse 'compiler wrapper' cgcc as C compiler [no]])])
+
+AC_ARG_ENABLE([coverage-gcov],
+	[AS_HELP_STRING([--enable-coverage-gcov],
+		[enable 'gcov' coverage testing tool [no]])])
 
 AC_ARG_ENABLE(readlib,
 	[AS_HELP_STRING([--enable-readlib],
@@ -297,6 +318,24 @@ case `uname` in
 		;;
 esac
 
+if test "${with_sparse_cgcc}" = "yes"; then
+	REAL_CC="${CC}"
+	CC="cgcc"
+	AC_SUBST([REAL_CC])
+
+	PRETTY_ARG_VAR([CGCC_CFLAGS], [cgcc specific flags],
+		       [-Wsparse-all])
+else
+	CGCC_CFLAGS=""
+fi
+
+if test "${enable_coverage_gcov}" = "yes"; then
+	COVERAGE_CFLAGS="--coverage"
+	COVERAGE_LDFLAGS="--coverage"
+fi
+AC_SUBST([COVERAGE_CFLAGS])
+AC_SUBST([COVERAGE_LDFLAGS])
+
 AC_PROG_LN_S
 AC_CHECK_PROG(STRIP, strip, strip, :)
 AC_SYS_LARGEFILE
@@ -439,6 +478,10 @@ if test yes != "$host_mingw"; then
 	fi
 fi
 
+PRETTY_ARG_VAR([EXTRA_CFLAGS], [extra C compiler flags],
+	       [-std=gnu99])
+PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
+	       [-Wall])
 
 # Checks for library functions
 # ----------------------------
