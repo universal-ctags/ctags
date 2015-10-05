@@ -21,7 +21,7 @@
 #
 # Global Parameters
 #
-SHELL=${SHELL:-/bin/bash}
+SHELL=/bin/sh
 CTAGS=./ctags
 DATADIR=./data
 LIBEXECDIR=./libexec
