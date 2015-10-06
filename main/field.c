@@ -50,7 +50,7 @@ static fieldDesc fieldDescs [] = {
 		      "Access (or export) of class members"),
 	DEFINE_FIELD ('f', "file",           TRUE,
 		      "File-restricted scoping"),
-	DEFINE_FIELD ('i', "inherits",       FALSE,/* needs sanitizing */
+	DEFINE_FIELD ('i', "inherits",       FALSE,
 		      "Inheritance information"),
 	DEFINE_FIELD ('K', NULL,             FALSE,
 		      "Kind of tag as full name"),
@@ -62,11 +62,11 @@ static fieldDesc fieldDescs [] = {
 			"Implementation information"),
 	DEFINE_FIELD ('n', "line",           FALSE,
 		      "Line number of tag definition"),
-	DEFINE_FIELD ('S', "signature",	     FALSE,/* needs sanitizing */
+	DEFINE_FIELD ('S', "signature",	     FALSE,
 		      "Signature of routine (e.g. prototype or parameter list)"),
 	DEFINE_FIELD ('s', NULL,             TRUE,/* needs sanitizing */
 		      "Scope of tag definition"),
-	DEFINE_FIELD ('t', "typeref",        TRUE,/* needs sanitizing */
+	DEFINE_FIELD ('t', "typeref",        TRUE,
 		      "Type and name of a variable or typedef"),
 	DEFINE_FIELD ('z', "kind",           FALSE,
 		      "Include the \"kind:\" key in kind field(use k or K)"),
