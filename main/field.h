@@ -32,13 +32,13 @@ typedef enum eFieldType { /* extension field content control */
 } fieldType ;
 
 typedef struct sFieldDesc {
+	boolean enabled;
 	unsigned char letter;
 	const char* name;         /* kind name */
 	const char* description;  /* displayed in --help output */
 } fieldDesc;
 
-extern fieldDesc fieldDescs [];
-
+extern fieldDesc* getFieldDesc(fieldType type);
 extern fieldType getFieldTypeForOption (char letter);
 extern void printFields (void);
 

@@ -22,39 +22,45 @@
 #include "options.h"
 #include "routines.h"
 
-#define DEFINE_FIELD(L,N,H) {					\
+#define DEFINE_FIELD(L,N, V, H) {				\
+		.enabled       = V,				\
 		.letter        = L,				\
 		.name          = N,				\
 		.description   = H,				\
 	}
 
-fieldDesc fieldDescs [] = {
-	DEFINE_FIELD ('a', "access",
+static fieldDesc fieldDescs [] = {
+	DEFINE_FIELD ('a', "access",         FALSE,
 		      "Access (or export) of class members"),
-	DEFINE_FIELD ('f', "file",
+	DEFINE_FIELD ('f', "file",           TRUE,
 		      "File-restricted scoping"),
-	DEFINE_FIELD ('i', "inherits", /* needs sanitizing */
+	DEFINE_FIELD ('i', "inherits",       FALSE,/* needs sanitizing */
 		      "Inheritance information"),
-	DEFINE_FIELD ('K', NULL,
+	DEFINE_FIELD ('K', NULL,             FALSE,
 		      "Kind of tag as full name"),
-	DEFINE_FIELD ('k', NULL,
+	DEFINE_FIELD ('k', NULL,             TRUE,
 		      "Kind of tag as a single letter"),
-	DEFINE_FIELD ('l', "language",
+	DEFINE_FIELD ('l', "language",       FALSE,
 			"Language of source file containing tag"),
-	DEFINE_FIELD ('m', "implementation",
+	DEFINE_FIELD ('m', "implementation", FALSE,
 			"Implementation information"),
-	DEFINE_FIELD ('n', "line",
+	DEFINE_FIELD ('n', "line",           FALSE,
 		      "Line number of tag definition"),
-	DEFINE_FIELD ('S', "signature",	/* needs sanitizing */
+	DEFINE_FIELD ('S', "signature",	     FALSE,/* needs sanitizing */
 		      "Signature of routine (e.g. prototype or parameter list)"),
-	DEFINE_FIELD ('s', NULL,/* needs sanitizing */
+	DEFINE_FIELD ('s', NULL,             TRUE,/* needs sanitizing */
 		      "Scope of tag definition"),
-	DEFINE_FIELD ('t', "typeref",/* needs sanitizing */
+	DEFINE_FIELD ('t', "typeref",        TRUE,/* needs sanitizing */
 		      "Type and name of a variable or typedef"),
-	DEFINE_FIELD ('z', "kind",
+	DEFINE_FIELD ('z', "kind",           FALSE,
 		      "Include the \"kind:\" key in kind field(use k or K)"),
 };
 
+extern fieldDesc* getFieldDesc(fieldType type)
+{
+	Assert ((0 <= type) && (type < FIELD_COUNT));
+	return fieldDescs + type;
+}
 extern fieldType getFieldTypeForOption (char letter)
 {
 	int i;
@@ -73,7 +79,7 @@ static void printField (fieldType i)
 	       fieldDescs[i].letter,
 	       fieldDescs[i].name? fieldDescs[i].name: "NONE",
 	       fieldDescs[i].description? fieldDescs[i].description: "NONE",
-	       Option.extensionFields[i]? "on": "off");
+	       getFieldDesc (i)->enabled? "on": "off");
 }
 
 extern void printFields (void)

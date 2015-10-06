@@ -828,10 +828,10 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 
 static int addExtensionFields (const tagEntryInfo *const tag)
 {
-	const char* const kindKey = Option.extensionFields[FIELD_KIND_KEY]
-		?fieldDescs[FIELD_KIND_KEY].name
+	const char* const kindKey = getFieldDesc (FIELD_KIND_KEY)->enabled
+		?getFieldDesc (FIELD_KIND_KEY)->name
 		:"";
-	const char* const kindFmt = Option.extensionFields[FIELD_KIND_KEY]
+	const char* const kindFmt = getFieldDesc (FIELD_KIND_KEY)->enabled
 		?"%s\t%s:%s"
 		:"%s\t%s%s";
 	boolean first = TRUE;
@@ -841,27 +841,27 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 /* "sep" returns a value only the first time it is evaluated */
 #define sep (first ? (first = FALSE, separator) : empty)
 
-	if (tag->kind->name != NULL && (Option.extensionFields[FIELD_KIND_LONG]  ||
-		 (Option.extensionFields[FIELD_KIND]  && tag->kind == '\0')))
+	if (tag->kind->name != NULL && (getFieldDesc (FIELD_KIND_LONG)->enabled  ||
+		 (getFieldDesc (FIELD_KIND)->enabled  && tag->kind == '\0')))
 		length += fprintf (TagFile.fp,kindFmt, sep, kindKey, tag->kind->name);
-	else if (tag->kind != '\0'  && (Option.extensionFields[FIELD_KIND] ||
-			(Option.extensionFields[FIELD_KIND_LONG] &&  tag->kind->name == NULL)))
+	else if (tag->kind != '\0'  && (getFieldDesc (FIELD_KIND)->enabled ||
+			(getFieldDesc (FIELD_KIND_LONG)->enabled &&  tag->kind->name == NULL)))
 	{
 		char str[2] = {tag->kind->letter, '\0'};
 		length += fprintf (TagFile.fp, kindFmt, sep, kindKey, str);
 	}
 
-	if (Option.extensionFields[FIELD_LINE_NUMBER])
+	if (getFieldDesc (FIELD_LINE_NUMBER)->enabled)
 		length += fprintf (TagFile.fp, "%s\t%s:%ld", sep,
-				   fieldDescs[FIELD_LINE_NUMBER].name,
+				   getFieldDesc (FIELD_LINE_NUMBER)->name,
 				   tag->lineNumber);
 
-	if (Option.extensionFields[FIELD_LANGUAGE]  &&  tag->language != NULL)
+	if (getFieldDesc (FIELD_LANGUAGE)->enabled  &&  tag->language != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   fieldDescs[FIELD_LANGUAGE].name,
+				   getFieldDesc (FIELD_LANGUAGE)->name,
 				   tag->language);
 
-	if (Option.extensionFields[FIELD_SCOPE])
+	if (getFieldDesc (FIELD_SCOPE)->enabled)
 	{
 		if (tag->extensionFields.scopeKind != NULL  &&
 		    tag->extensionFields.scopeName != NULL)
@@ -883,39 +883,39 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 		}
 	}
 
-	if (Option.extensionFields[FIELD_TYPE_REF] &&
+	if (getFieldDesc (FIELD_TYPE_REF)->enabled &&
 			tag->extensionFields.typeRef [0] != NULL  &&
 			tag->extensionFields.typeRef [1] != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s:%s", sep,
-				   fieldDescs[FIELD_TYPE_REF].name,
+				   getFieldDesc (FIELD_TYPE_REF)->name,
 				   tag->extensionFields.typeRef [0],
 				   tag->extensionFields.typeRef [1]);
 
-	if (Option.extensionFields[FIELD_FILE_SCOPE] &&  tag->isFileScope)
+	if (getFieldDesc (FIELD_FILE_SCOPE)->enabled &&  tag->isFileScope)
 		length += fprintf (TagFile.fp, "%s\t%s:", sep,
-				   fieldDescs[FIELD_FILE_SCOPE].name);
+				   getFieldDesc (FIELD_FILE_SCOPE)->name);
 
-	if (Option.extensionFields[FIELD_INHERITANCE] &&
+	if (getFieldDesc (FIELD_INHERITANCE)->enabled &&
 			tag->extensionFields.inheritance != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   fieldDescs[FIELD_INHERITANCE].name,
+				   getFieldDesc (FIELD_INHERITANCE)->name,
 				   tag->extensionFields.inheritance);
 
-	if (Option.extensionFields[FIELD_ACCESS] &&  tag->extensionFields.access != NULL)
+	if (getFieldDesc (FIELD_ACCESS)->enabled &&  tag->extensionFields.access != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   fieldDescs[FIELD_ACCESS].name,
+				   getFieldDesc (FIELD_ACCESS)->name,
 				   tag->extensionFields.access);
 
-	if (Option.extensionFields[FIELD_IMPLEMENTATION] &&
+	if (getFieldDesc (FIELD_IMPLEMENTATION)->enabled &&
 			tag->extensionFields.implementation != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   fieldDescs[FIELD_IMPLEMENTATION].name,
+				   getFieldDesc (FIELD_IMPLEMENTATION)->name,
 				   tag->extensionFields.implementation);
 
-	if (Option.extensionFields[FIELD_SIGNATURE] &&
+	if (getFieldDesc (FIELD_SIGNATURE)->enabled &&
 			tag->extensionFields.signature != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   fieldDescs[FIELD_SIGNATURE].name,
+				   getFieldDesc (FIELD_SIGNATURE)->name,
 				   tag->extensionFields.signature);
 
 	return length;
