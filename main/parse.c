@@ -1035,11 +1035,12 @@ static boolean doesParserUseKind (const parserDefinition *const parser, char let
 
 static void initializeParserTopHalf (parserDefinition *const parser, langType lang)
 {
-	if (parser->initialize != NULL)
+	if ((parser->initialize != NULL) && (parser->initialized == FALSE))
 	{
 		parser->initialize (lang);
-		parser->initialize = NULL;
+		parser->initialized = TRUE;
 	}
+
 
 	Assert (parser->fileKind != KIND_NULL);
 	Assert (!doesParserUseKind (parser, parser->fileKind->letter));
@@ -1122,7 +1123,7 @@ extern void freeParserResources (void)
 		parserDefinition* const lang = LanguageTable [i];
 
 		if (lang->finalize)
-			(lang->finalize)((langType)i);
+			(lang->finalize)((langType)i, (boolean)lang->initialized);
 		if (lang->fileKind != &defaultFileKind)
 		{
 			eFree (lang->fileKind);

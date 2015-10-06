@@ -547,18 +547,22 @@ static void initialize (const langType language)
 	lastSubSubS = vStringNew();
 }
 
-static void finalize (const langType language __unused__)
+static void finalize (const langType language __unused__,
+		      boolean initialized)
 {
-	vStringDelete(lastPart);
-	lastPart = NULL;
-	vStringDelete(lastChapter);
-	lastChapter = NULL;
-	vStringDelete(lastSection);
-	lastSection = NULL;
-	vStringDelete(lastSubS);
-	lastSubS = NULL;
-	vStringDelete(lastSubSubS);
-	lastSubSubS = NULL;
+	if (initialized)
+	{
+		vStringDelete(lastPart);
+		lastPart = NULL;
+		vStringDelete(lastChapter);
+		lastChapter = NULL;
+		vStringDelete(lastSection);
+		lastSection = NULL;
+		vStringDelete(lastSubS);
+		lastSubS = NULL;
+		vStringDelete(lastSubSubS);
+		lastSubSubS = NULL;
+	}
 }
 
 static void findTexTags (void)
