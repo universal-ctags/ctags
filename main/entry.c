@@ -748,11 +748,15 @@ static int writeXrefEntry (const tagEntryInfo *const tag)
 	line = readSourceLineAnyway (TagFile.vLine, tag, NULL);
 
 	if (Option.tagFileFormat == 1)
-		length = fprintf (TagFile.fp, "%-16s %4lu %-16s ", tag->name,
-				tag->lineNumber, tag->sourceFileName);
+		length = fprintf (TagFile.fp, "%-16s %4lu %-16s ",
+				  escapeName (tag->name, tag, FIELD_NAME),
+				  tag->lineNumber,
+				  escapeName (tag->sourceFileName, tag, FIELD_SOURCE_FILE));
 	else
-		length = fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s ", tag->name,
-				  tag->kind->name, tag->lineNumber, tag->sourceFileName);
+		length = fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s ",
+				  escapeName (tag->name, tag, FIELD_NAME),
+				  tag->kind->name, tag->lineNumber,
+				  escapeName (tag->sourceFileName, tag, FIELD_SOURCE_FILE));
 
 	/* If no associated line for tag is found, we cannot prepare
 	 * parameter to writeCompactSourceLine(). In this case we
@@ -907,7 +911,8 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 		length += fprintf (TagFile.fp, "%s\t%s:%s:%s", sep,
 				   getFieldDesc (FIELD_TYPE_REF)->name,
 				   tag->extensionFields.typeRef [0],
-				   tag->extensionFields.typeRef [1]);
+				   escapeName (tag->extensionFields.typeRef [1], tag,
+					       FIELD_TYPE_REF));
 
 	if (getFieldDesc (FIELD_FILE_SCOPE)->enabled &&  tag->isFileScope)
 		length += fprintf (TagFile.fp, "%s\t%s:", sep,
@@ -917,7 +922,8 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 			tag->extensionFields.inheritance != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldDesc (FIELD_INHERITANCE)->name,
-				   tag->extensionFields.inheritance);
+				   escapeName (tag->extensionFields.inheritance, tag,
+					       FIELD_INHERITANCE));
 
 	if (getFieldDesc (FIELD_ACCESS)->enabled &&  tag->extensionFields.access != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
@@ -934,7 +940,8 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 			tag->extensionFields.signature != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldDesc (FIELD_SIGNATURE)->name,
-				   tag->extensionFields.signature);
+				   escapeName (tag->extensionFields.signature, tag,
+					       FIELD_SIGNATURE));
 
 	return length;
 #undef sep
@@ -991,7 +998,8 @@ static int writeLineNumberEntry (const tagEntryInfo *const tag)
 static int writeCtagsEntry (const tagEntryInfo *const tag)
 {
 	int length = fprintf (TagFile.fp, "%s\t%s\t",
-		tag->name, tag->sourceFileName);
+			      escapeName (tag->name, tag, FIELD_NAME),
+			      escapeName (tag->sourceFileName, tag, FIELD_SOURCE_FILE));
 
 	if (tag->lineNumberEntry)
 		length += writeLineNumberEntry (tag);
