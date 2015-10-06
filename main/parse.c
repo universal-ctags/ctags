@@ -1901,16 +1901,17 @@ extern void installTagRegexTable (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
 
-	if (lang->tagRegexTable == NULL)
-		return;
 
-	for (i = 0; i < lang->tagRegexCount; ++i)
-		addTagRegex (language,
+	if ((lang->tagRegexTable != NULL) && (lang->tagRegexInstalled == FALSE))
+	{
+	    for (i = 0; i < lang->tagRegexCount; ++i)
+		    addTagRegex (language,
 			     lang->tagRegexTable [i].regex,
 			     lang->tagRegexTable [i].name,
 			     lang->tagRegexTable [i].kinds,
 			     lang->tagRegexTable [i].flags);
-	lang->tagRegexTable = NULL;
+	    lang->tagRegexInstalled = TRUE;
+	}
 }
 
 extern void installKeywordTable (const langType language)
