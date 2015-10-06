@@ -1033,7 +1033,7 @@ static boolean doesParserUseKind (const parserDefinition *const parser, char let
 	return FALSE;
 }
 
-static void initializeParserBottomHalf (parserDefinition *const parser, langType lang)
+static void initializeParser (parserDefinition *const parser, langType lang)
 {
 	if ((parser->initialize != NULL) && (parser->initialized == FALSE))
 	{
@@ -1094,11 +1094,6 @@ extern void initializeParsing (void)
 	verbose ("\n");
 }
 
-static void initializeParser (parserDefinition *const parser, langType lang)
-{
-	initializeParserBottomHalf (parser, lang);
-}
-
 extern void freeParserResources (void)
 {
 	unsigned int i;
@@ -1133,7 +1128,7 @@ static void doNothing (void)
 {
 }
 
-static void lazyInitializeBottomHalf (langType language)
+static void lazyInitialize (langType language)
 {
 	parserDefinition* lang;
 
@@ -1197,7 +1192,7 @@ extern void processLanguageDefineOption (
 
 		i = LanguageCount++;
 		def = parserNew (name);
-		def->initialize        = lazyInitializeBottomHalf;
+		def->initialize        = lazyInitialize;
 		def->currentPatterns   = stringListNew ();
 		def->currentExtensions = stringListNew ();
 		def->method            = METHOD_NOT_CRAFTED;
