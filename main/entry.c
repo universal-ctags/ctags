@@ -719,6 +719,24 @@ static char *readSourceLineAnyway (vString *const vLine, const tagEntryInfo *con
 
 	return line;
 }
+
+static const char* escapeName (const char* strval, const tagEntryInfo *const tag, fieldType ftype)
+{
+	fieldDesc *fdesc = getFieldDesc (ftype);
+
+	if (fdesc->renderEscaped)
+	{
+		if (fdesc->buffer == NULL)
+			fdesc->buffer = vStringNew ();
+		else
+			vStringClear (fdesc->buffer);
+
+		return fdesc->renderEscaped (strval, tag, fdesc->buffer);
+	}
+	else
+		return strval;
+}
+
 static int writeXrefEntry (const tagEntryInfo *const tag)
 {
 	const char *line;

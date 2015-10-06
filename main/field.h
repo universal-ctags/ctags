@@ -13,6 +13,7 @@
 #define _FIELD_H
 
 #include "general.h"
+#include "entry.h"
 
 typedef enum eFieldType { /* extension field content control */
 	FIELD_UNKNOWN = -1,
@@ -44,6 +45,8 @@ typedef struct sFieldDesc {
 	unsigned char letter;
 	const char* name;         /* kind name */
 	const char* description;  /* displayed in --help output */
+	renderEscaped renderEscaped;
+	vString *buffer;
 } fieldDesc;
 
 extern fieldDesc* getFieldDesc(fieldType type);
