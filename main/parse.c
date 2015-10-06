@@ -1033,10 +1033,6 @@ static boolean doesParserUseKind (const parserDefinition *const parser, char let
 	return FALSE;
 }
 
-static void initializeParserTopHalf (parserDefinition *const parser, langType lang)
-{
-}
-
 static void initializeParserBottomHalf (parserDefinition *const parser, langType lang)
 {
 	if ((parser->initialize != NULL) && (parser->initialized == FALSE))
@@ -1055,13 +1051,6 @@ static void initializeParserBottomHalf (parserDefinition *const parser, langType
 		parser->useCork = TRUE;
 }
 
-
-static void initializeParsersTopHalf (void)
-{
-	unsigned int i;
-	for (i = 0  ;  i < LanguageCount  ;  ++i)
-		initializeParserTopHalf (LanguageTable [i], i);
-}
 
 extern void initializeParsing (void)
 {
@@ -1103,12 +1092,10 @@ extern void initializeParsing (void)
 		}
 	}
 	verbose ("\n");
-	initializeParsersTopHalf ();
 }
 
 static void initializeParser (parserDefinition *const parser, langType lang)
 {
-	initializeParserTopHalf (parser, lang);
 	initializeParserBottomHalf (parser, lang);
 }
 
@@ -1146,7 +1133,7 @@ static void doNothing (void)
 {
 }
 
-static void lazyInitializeTopHalf (langType language)
+static void lazyInitializeBottomHalf (langType language)
 {
 	parserDefinition* lang;
 
@@ -1210,7 +1197,7 @@ extern void processLanguageDefineOption (
 
 		i = LanguageCount++;
 		def = parserNew (name);
-		def->initialize        = lazyInitializeTopHalf;
+		def->initialize        = lazyInitializeBottomHalf;
 		def->currentPatterns   = stringListNew ();
 		def->currentExtensions = stringListNew ();
 		def->method            = METHOD_NOT_CRAFTED;
