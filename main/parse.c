@@ -1922,13 +1922,13 @@ extern void installKeywordTable (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
 
-	if (lang->keywordTable == NULL)
-		return;
-
-	for (i = 0; i < lang->keywordCount; ++i)
-		addKeyword (lang->keywordTable [i].name,
-			    language,
-			    lang->keywordTable [i].id);
-	lang->keywordTable = NULL;
+	if ((lang->keywordTable != NULL) && (lang->keywordInstalled == FALSE))
+	{
+		for (i = 0; i < lang->keywordCount; ++i)
+			addKeyword (lang->keywordTable [i].name,
+				    language,
+				    lang->keywordTable [i].id);
+		lang->keywordInstalled = TRUE;
+	}
 }
 /* vi:set tabstop=4 shiftwidth=4 nowrap: */

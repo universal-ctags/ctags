@@ -99,6 +99,8 @@ typedef struct {
 	unsigned int id;               /* id assigned to language */
 	unsigned int enabled:1;	       /* currently enabled? */
 	unsigned int initialized:1;    /* initialize() is called or not */
+	unsigned int tagRegexInstalled:1; /* tagRegexTable is installed or not. */
+	unsigned int keywordInstalled:1;  /* keywordTable is installed or not. */
 
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
