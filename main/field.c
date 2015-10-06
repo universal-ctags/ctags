@@ -22,14 +22,30 @@
 #include "options.h"
 #include "routines.h"
 
-#define DEFINE_FIELD(L,N, V, H) {				\
+#define DEFINE_FIELD_FULL(L,N, V, H, B) {			\
 		.enabled       = V,				\
+		.basic         = B,				\
 		.letter        = L,				\
 		.name          = N,				\
 		.description   = H,				\
 	}
 
+#define DEFINE_BASIC_FIELD(L,N,V,H) \
+    DEFINE_FIELD_FULL(L,N,V,H,TRUE)
+
+#define DEFINE_FIELD(L,N,V,H) \
+    DEFINE_FIELD_FULL(L,N,V,H,FALSE)
+
 static fieldDesc fieldDescs [] = {
+        /* BASIC FIELDS */
+	DEFINE_BASIC_FIELD ('N', "name",     TRUE,
+		      "tag name(fixed field)"),
+	DEFINE_BASIC_FIELD ('F', "source",   TRUE,
+		      "source file(fixed field)"),
+	DEFINE_BASIC_FIELD ('P', "pattern",  TRUE,
+		      "pattern(fixed field)"),
+
+	/* EXTENSION FIELDS */
 	DEFINE_FIELD ('a', "access",         FALSE,
 		      "Access (or export) of class members"),
 	DEFINE_FIELD ('f', "file",           TRUE,

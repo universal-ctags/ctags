@@ -1053,7 +1053,8 @@ static void resetFieldsOption (boolean mode)
 {
 	int i;
 	for (i = 0; i < FIELD_COUNT; ++i)
-		getFieldDesc (i)->enabled = mode;
+		if (!getFieldDesc (i)->basic)
+			getFieldDesc (i)->enabled = mode;
 }
 
 static void processFieldsOption (
@@ -1081,7 +1082,11 @@ static void processFieldsOption (
 			if (t == FIELD_UNKNOWN)
 				error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
 				      c, option);
-			getFieldDesc (t)->enabled = mode;
+			else if (getFieldDesc (t)->basic && (mode == FALSE))
+				error(WARNING, "Cannot disable basic field: '%c'(%s) for \"%s\" option",
+				      c, getFieldDesc (t)->name, option);
+			else
+				getFieldDesc (t)->enabled = mode;
 			break;
 	}
 }

@@ -16,6 +16,13 @@
 
 typedef enum eFieldType { /* extension field content control */
 	FIELD_UNKNOWN = -1,
+
+	/* BASIC FIELDS */
+	FIELD_NAME,
+	FIELD_SOURCE_FILE,
+	FIELD_PATTERN,
+
+	/* EXTENSION FIELDS */
 	FIELD_ACCESS,
 	FIELD_FILE_SCOPE,
 	FIELD_INHERITANCE,
@@ -28,11 +35,12 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_SCOPE,
 	FIELD_TYPE_REF,
 	FIELD_KIND_KEY,
-	FIELD_COUNT,
+	FIELD_COUNT
 } fieldType ;
 
 typedef struct sFieldDesc {
-	boolean enabled;
+	unsigned int enabled: 1;
+	unsigned int basic:   1;
 	unsigned char letter;
 	const char* name;         /* kind name */
 	const char* description;  /* displayed in --help output */
