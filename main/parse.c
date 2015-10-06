@@ -1035,27 +1035,24 @@ static boolean doesParserUseKind (const parserDefinition *const parser, char let
 
 static void initializeParserTopHalf (parserDefinition *const parser, langType lang)
 {
+}
+
+static void initializeParserBottomHalf (parserDefinition *const parser, langType lang)
+{
 	if ((parser->initialize != NULL) && (parser->initialized == FALSE))
 	{
 		parser->initialize (lang);
 		parser->initialized = TRUE;
 	}
 
-
 	Assert (parser->fileKind != KIND_NULL);
 	Assert (!doesParserUseKind (parser, parser->fileKind->letter));
-}
 
-static void initializeParserBottomHalf (parserDefinition *const parser, langType lang)
-{
 	installKeywordTable (lang);
 	installTagRegexTable (lang);
 
 	if (hasScopeActionInRegex (lang))
 		parser->useCork = TRUE;
-
-	Assert (parser->fileKind != KIND_NULL);
-	Assert (!doesParserUseKind (parser, parser->fileKind->letter));
 }
 
 
