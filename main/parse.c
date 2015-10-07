@@ -1033,8 +1033,10 @@ static boolean doesParserUseKind (const parserDefinition *const parser, char let
 	return FALSE;
 }
 
-static void initializeParser (parserDefinition *const parser, langType lang)
+static void initializeParser (langType lang)
 {
+	parserDefinition *const parser = LanguageTable [lang];
+
 	installKeywordTable (lang);
 	installTagRegexTable (lang);
 
@@ -1623,8 +1625,6 @@ static rescanReason createTagsForFile (
 	{
 		parserDefinition *const lang = LanguageTable [language];
 
-		initializeParser (lang, language);
-
 		Assert (lang->parser || lang->parser2);
 
 		if (LanguageTable [language]->useCork)
@@ -1787,6 +1787,8 @@ extern boolean parseFile (const char *const fileName)
 		verbose ("ignoring %s (language disabled)\n", fileName);
 	else
 	{
+		initializeParser (language);
+
 		if (Option.filter)
 			openTagFile ();
 
