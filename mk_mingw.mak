@@ -23,7 +23,7 @@ dctags.exe: OPT = -g
 dctags.exe: DEBUG = -DDEBUG
 dctags.exe: SOURCES += debug.c
 
-.SUFFIXES: .c.o
+.SUFFIXES: .c .o
 
 #
 # Silent/verbose commands
