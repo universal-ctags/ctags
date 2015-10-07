@@ -1035,6 +1035,12 @@ static boolean doesParserUseKind (const parserDefinition *const parser, char let
 
 static void initializeParser (parserDefinition *const parser, langType lang)
 {
+	installKeywordTable (lang);
+	installTagRegexTable (lang);
+
+	if (hasScopeActionInRegex (lang))
+		parser->useCork = TRUE;
+
 	if ((parser->initialize != NULL) && (parser->initialized == FALSE))
 	{
 		parser->initialize (lang);
@@ -1043,12 +1049,6 @@ static void initializeParser (parserDefinition *const parser, langType lang)
 
 	Assert (parser->fileKind != KIND_NULL);
 	Assert (!doesParserUseKind (parser, parser->fileKind->letter));
-
-	installKeywordTable (lang);
-	installTagRegexTable (lang);
-
-	if (hasScopeActionInRegex (lang))
-		parser->useCork = TRUE;
 }
 
 
