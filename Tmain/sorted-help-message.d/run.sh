@@ -32,13 +32,13 @@ extract_short_options()
 extract_long_options()
 {
     sed -n '/Usage:/,$p'  | \
-    sed -n 's/\(^  --[[:alnum:]_-<>]\).*/\1/p'
+    sed -n 's/\(^  --[:alnum:][<>[:alnum:]_-]*\).*/\1/p'
 }
 
 extract_debug_options()
 {
     sed -n '/Usage:/,$p'  | \
-    sed -n 's/\(^  --_[[:alnum:]_-<>]\).*/\1/p'
+    sed -n 's/\(^  --_[<>[:alnum:]_-]*\).*/\1/p'
 }
 
 
