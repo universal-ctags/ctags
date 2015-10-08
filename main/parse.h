@@ -40,7 +40,18 @@ typedef void (*createRegexTag) (const vString* const name);
 typedef void (*simpleParser) (void);
 typedef rescanReason (*rescanParser) (const unsigned int passCount);
 typedef void (*parserInitialize) (langType language);
-typedef void (*parserFinalize) (langType language);
+
+/* Per language finalizer is called anytime when ctags exits.
+   (Exceptions are a kind of options are given when invoked. Here
+   options are: --version, --help, --list-*, and so on.)
+
+   The finalizer is called even when the initializer of the
+   same parser is called or not. However, the finalizer can know
+   whether the assoicated initializer is invoked or not with the
+   second parameter: INITIALIZED. If it is true, the initializer
+   is called. */
+typedef void (*parserFinalize) (langType language, boolean initialized);
+
 typedef const char * (*selectLanguage) (FILE *);
 
 typedef enum {
@@ -86,7 +97,11 @@ typedef struct {
 
 	/* used internally */
 	unsigned int id;               /* id assigned to language */
-	boolean enabled;               /* currently enabled? */
+	unsigned int enabled:1;	       /* currently enabled? */
+	unsigned int initialized:1;    /* initialize() is called or not */
+	unsigned int tagRegexInstalled:1; /* tagRegexTable is installed or not. */
+	unsigned int keywordInstalled:1;  /* keywordTable is installed or not. */
+
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
 	stringList* currentAliaes;     /* current list of aliases */

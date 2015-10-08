@@ -1033,37 +1033,26 @@ static boolean doesParserUseKind (const parserDefinition *const parser, char let
 	return FALSE;
 }
 
-static void initializeParserTopHalf (parserDefinition *const parser, langType lang)
+static void initializeParser (langType lang)
 {
-	if (parser->initialize != NULL)
-	{
-		parser->initialize (lang);
-		parser->initialize = NULL;
-	}
+	parserDefinition *const parser = LanguageTable [lang];
 
-	Assert (parser->fileKind != KIND_NULL);
-	Assert (!doesParserUseKind (parser, parser->fileKind->letter));
-}
-
-static void initializeParserBottomHalf (parserDefinition *const parser, langType lang)
-{
 	installKeywordTable (lang);
 	installTagRegexTable (lang);
 
 	if (hasScopeActionInRegex (lang))
 		parser->useCork = TRUE;
 
+	if ((parser->initialize != NULL) && (parser->initialized == FALSE))
+	{
+		parser->initialize (lang);
+		parser->initialized = TRUE;
+	}
+
 	Assert (parser->fileKind != KIND_NULL);
 	Assert (!doesParserUseKind (parser, parser->fileKind->letter));
 }
 
-
-static void initializeParsersTopHalf (void)
-{
-	unsigned int i;
-	for (i = 0  ;  i < LanguageCount  ;  ++i)
-		initializeParserTopHalf (LanguageTable [i], i);
-}
 
 extern void initializeParsing (void)
 {
@@ -1105,13 +1094,6 @@ extern void initializeParsing (void)
 		}
 	}
 	verbose ("\n");
-	initializeParsersTopHalf ();
-}
-
-static void initializeParser (parserDefinition *const parser, langType lang)
-{
-	initializeParserTopHalf (parser, lang);
-	initializeParserBottomHalf (parser, lang);
 }
 
 extern void freeParserResources (void)
@@ -1122,7 +1104,7 @@ extern void freeParserResources (void)
 		parserDefinition* const lang = LanguageTable [i];
 
 		if (lang->finalize)
-			(lang->finalize)((langType)i);
+			(lang->finalize)((langType)i, (boolean)lang->initialized);
 		if (lang->fileKind != &defaultFileKind)
 		{
 			eFree (lang->fileKind);
@@ -1148,7 +1130,7 @@ static void doNothing (void)
 {
 }
 
-static void lazyInitializeTopHalf (langType language)
+static void lazyInitialize (langType language)
 {
 	parserDefinition* lang;
 
@@ -1212,7 +1194,7 @@ extern void processLanguageDefineOption (
 
 		i = LanguageCount++;
 		def = parserNew (name);
-		def->initialize        = lazyInitializeTopHalf;
+		def->initialize        = lazyInitialize;
 		def->currentPatterns   = stringListNew ();
 		def->currentExtensions = stringListNew ();
 		def->method            = METHOD_NOT_CRAFTED;
@@ -1643,8 +1625,6 @@ static rescanReason createTagsForFile (
 	{
 		parserDefinition *const lang = LanguageTable [language];
 
-		initializeParser (lang, language);
-
 		Assert (lang->parser || lang->parser2);
 
 		if (LanguageTable [language]->useCork)
@@ -1807,6 +1787,8 @@ extern boolean parseFile (const char *const fileName)
 		verbose ("ignoring %s (language disabled)\n", fileName);
 	else
 	{
+		initializeParser (language);
+
 		if (Option.filter)
 			openTagFile ();
 
@@ -1900,16 +1882,17 @@ extern void installTagRegexTable (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
 
-	if (lang->tagRegexTable == NULL)
-		return;
 
-	for (i = 0; i < lang->tagRegexCount; ++i)
-		addTagRegex (language,
+	if ((lang->tagRegexTable != NULL) && (lang->tagRegexInstalled == FALSE))
+	{
+	    for (i = 0; i < lang->tagRegexCount; ++i)
+		    addTagRegex (language,
 			     lang->tagRegexTable [i].regex,
 			     lang->tagRegexTable [i].name,
 			     lang->tagRegexTable [i].kinds,
 			     lang->tagRegexTable [i].flags);
-	lang->tagRegexTable = NULL;
+	    lang->tagRegexInstalled = TRUE;
+	}
 }
 
 extern void installKeywordTable (const langType language)
@@ -1920,13 +1903,13 @@ extern void installKeywordTable (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
 
-	if (lang->keywordTable == NULL)
-		return;
-
-	for (i = 0; i < lang->keywordCount; ++i)
-		addKeyword (lang->keywordTable [i].name,
-			    language,
-			    lang->keywordTable [i].id);
-	lang->keywordTable = NULL;
+	if ((lang->keywordTable != NULL) && (lang->keywordInstalled == FALSE))
+	{
+		for (i = 0; i < lang->keywordCount; ++i)
+			addKeyword (lang->keywordTable [i].name,
+				    language,
+				    lang->keywordTable [i].id);
+		lang->keywordInstalled = TRUE;
+	}
 }
 /* vi:set tabstop=4 shiftwidth=4 nowrap: */

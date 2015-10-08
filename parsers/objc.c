@@ -1122,14 +1122,6 @@ static void objcInitialize (const langType language)
 	Lang_ObjectiveC = language;
 }
 
-static void objcFinalize (const langType language __unused__)
-{
-	vStringDelete (parentName);
-	vStringDelete (tempName);
-	vStringDelete (fullMethodName);
-	vStringDelete (prevIdent);
-}
-
 extern parserDefinition *ObjcParser (void)
 {
 	static const char *const extensions[] = { "mm", "m", "h",
@@ -1146,7 +1138,6 @@ extern parserDefinition *ObjcParser (void)
 	def->aliases = aliases;
 	def->parser = findObjcTags;
 	def->initialize = objcInitialize;
-	def->finalize = objcFinalize;
 	def->selectLanguage = selectors;
 	def->keywordTable = objcKeywordTable;
 	def->keywordCount = COUNT_ARRAY (objcKeywordTable);
