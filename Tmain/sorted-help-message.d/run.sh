@@ -3,11 +3,6 @@
 
 CTAGS=$1
 
-if ! [ "$(basename $SHELL)" = "bash" ]; then
-    echo "bash is needed to run this test case"
-    exit 77
-fi
-
 if ! sort --help | grep --quiet GNU; then
     echo "GNU sort is needed to run this test case"
     exit 77
@@ -32,27 +27,27 @@ extract_short_options()
 extract_long_options()
 {
     sed -n '/Usage:/,$p'  | \
-    sed -n 's/\(^  --[[:alnum:]_-<>]\).*/\1/p'
+    sed -n 's/\(^  --[:alnum:][<>[:alnum:]_-]*\).*/\1/p'
 }
 
 extract_debug_options()
 {
     sed -n '/Usage:/,$p'  | \
-    sed -n 's/\(^  --_[[:alnum:]_-<>]\).*/\1/p'
+    sed -n 's/\(^  --_[<>[:alnum:]_-]*\).*/\1/p'
 }
 
 
+gdiff()
+{
+    print_help | extract_$1_options > ./$1.tmp
+    print_help | extract_$1_options | opt_sort > ./sorted-$1.tmp
 
-diff \
-    <(print_help | extract_short_options) \
-    <(print_help | extract_short_options | opt_sort) &&
+    diff -ruN ./$1.tmp ./sorted-$1.tmp
+    r=$?
+    rm ./$1.tmp ./sorted-$1.tmp
 
-diff \
-    <(print_help | extract_long_options) \
-    <(print_help | extract_long_options | opt_sort) &&
+    return $r
+}
 
-diff \
-    <(print_help | extract_debug_options) \
-    <(print_help | extract_debug_options | opt_sort) &&
-
+gdiff short && gdiff long  && gdiff debug
 exit $?
