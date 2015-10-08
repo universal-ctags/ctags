@@ -4,7 +4,7 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
-*   This module contains functions for generating tags for YACC language files.
+*   This module contains functions for generating tags for DTS language files.
 */
 
 /*
@@ -35,7 +35,7 @@ static const tagRegexTable const dtsTagRegexTable [] = {
 	/* extras for tracking scopes  */
 	{"^[ \t]*([a-zA-Z][a-zA-Z0-9_]*)[ \t]*\\{", "",
 	 "", "{scope=push}{placeholder}"},
-	{"\\};", "",
+	{"\\}[ \t]*;", "",
 	 "", "{scope=pop}{exclusive}"},
 };
 

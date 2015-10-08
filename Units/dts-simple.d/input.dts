@@ -5,7 +5,7 @@
 
 label: test {
        dummy {
-	     label2: chosen { };
+	     label2: chosen { } ;
 	     phandle = <0x00>;
        };
 };
