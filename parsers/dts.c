@@ -35,7 +35,7 @@ static const tagRegexTable const dtsTagRegexTable [] = {
 	/* extras for tracking scopes  */
 	{"^[ \t]*([a-zA-Z][a-zA-Z0-9_]*)[ \t]*\\{", "",
 	 "", "{scope=push}{placeholder}"},
-	{"\\};", "",
+	{"\\}[ \t]*;", "",
 	 "", "{scope=pop}{exclusive}"},
 };
 
