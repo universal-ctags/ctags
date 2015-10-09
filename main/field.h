@@ -39,6 +39,8 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_COUNT
 } fieldType ;
 
+typedef const char* (* renderEscaped) (const tagEntryInfo *const tag, vString * buffer);
+
 typedef struct sFieldDesc {
 	unsigned int enabled: 1;
 	unsigned int basic:   1;
@@ -51,6 +53,7 @@ typedef struct sFieldDesc {
 
 extern fieldDesc* getFieldDesc(fieldType type);
 extern fieldType getFieldTypeForOption (char letter);
+extern const char* renderFieldEscaped (fieldDesc *fdesc, const tagEntryInfo *tag);
 extern void printFields (void);
 
 #endif	/* _FIELD_H */

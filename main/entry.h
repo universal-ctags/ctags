@@ -99,8 +99,6 @@ typedef struct sTagEntryInfo {
 	} extensionFields;  /* list of extension fields*/
 } tagEntryInfo;
 
-typedef const char* (* renderEscaped) (const char *strval, const tagEntryInfo *const tag, vString * buffer);
-
 /*
 *   GLOBAL VARIABLES
 */

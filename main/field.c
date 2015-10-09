@@ -22,8 +22,12 @@
 #include "options.h"
 #include "routines.h"
 
-static const char *renderEscapedString (const char* strval, const tagEntryInfo *const tag, vString* b);
-static const char *renderEscapedName   (const char* strval, const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldName (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldSource (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldSignature (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldScope (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldTyperef (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldInherits (const tagEntryInfo *const tag, vString* b);
 
 #define DEFINE_FIELD_FULL(L,N, V, H, B, F) {			\
 		.enabled       = V,				\
@@ -45,10 +49,10 @@ static fieldDesc fieldDescs [] = {
         /* BASIC FIELDS */
 	DEFINE_BASIC_FIELD ('N', "name",     TRUE,
 			    "tag name(fixed field)",
-			    renderEscapedName),
+			    renderFieldName),
 	DEFINE_BASIC_FIELD ('F', "source",   TRUE,
 			    "source file(fixed field)",
-			    renderEscapedString),
+			    renderFieldSource),
 	DEFINE_BASIC_FIELD ('P', "pattern",  TRUE,
 			    "pattern(fixed field)",
 			    NULL),
@@ -62,7 +66,7 @@ static fieldDesc fieldDescs [] = {
 		      NULL),
 	DEFINE_FIELD ('i', "inherits",       FALSE,
 		      "Inheritance information",
-		      renderEscapedName),
+		      renderFieldInherits),
 	DEFINE_FIELD ('K', NULL,             FALSE,
 		      "Kind of tag as full name",
 		      NULL),
@@ -80,13 +84,13 @@ static fieldDesc fieldDescs [] = {
 		      NULL),
 	DEFINE_FIELD ('S', "signature",	     FALSE,
 		      "Signature of routine (e.g. prototype or parameter list)",
-		      renderEscapedString),
+		      renderFieldSignature),
 	DEFINE_FIELD ('s', NULL,             TRUE,
 		      "Scope of tag definition",
-		      renderEscapedName),
+		      renderFieldScope),
 	DEFINE_FIELD ('t', "typeref",        TRUE,
 		      "Type and name of a variable or typedef",
-		      renderEscapedName),
+		      renderFieldTyperef),
 	DEFINE_FIELD ('z', "kind",           FALSE,
 		      "Include the \"kind:\" key in kind field(use k or K)",
 		      NULL),
@@ -213,3 +217,51 @@ static const char *renderEscapedName (const char* s,
 
 	return renderEscapedString (s, tag, b);
 }
+
+static const char *renderFieldName (const tagEntryInfo *const tag, vString* b)
+{
+	return renderEscapedName (tag->name, tag, b);
+}
+
+static const char *renderFieldSource (const tagEntryInfo *const tag, vString* b)
+{
+	return renderEscapedString (tag->sourceFileName, tag, b);
+}
+
+static const char *renderFieldSignature (const tagEntryInfo *const tag, vString* b)
+{
+	return renderEscapedString (tag->extensionFields.signature, tag, b);
+}
+
+static const char *renderFieldScope (const tagEntryInfo *const tag, vString* b)
+{
+	return renderEscapedName (tag->extensionFields.scopeName, tag, b);
+}
+
+static const char *renderFieldInherits (const tagEntryInfo *const tag, vString* b)
+{
+	return renderEscapedName (tag->extensionFields.inheritance, tag, b);
+}
+
+static const char *renderFieldTyperef (const tagEntryInfo *const tag, vString* b)
+{
+	return renderEscapedName (tag->extensionFields.typeRef [1], tag, b);
+}
+
+
+extern const char* renderFieldEscaped (fieldDesc *fdesc,
+				       const tagEntryInfo *tag)
+{
+	Assert (fdesc);
+	Assert (tag);
+	Assert (fdesc->renderEscaped);
+
+	if (fdesc->buffer == NULL)
+		fdesc->buffer = vStringNew ();
+	else
+		vStringClear (fdesc->buffer);
+
+	return fdesc->renderEscaped (tag, fdesc->buffer);
+}
+
+/* vi:set tabstop=4 shiftwidth=4: */

@@ -720,21 +720,10 @@ static char *readSourceLineAnyway (vString *const vLine, const tagEntryInfo *con
 	return line;
 }
 
-static const char* escapeName (const char* strval, const tagEntryInfo *const tag, fieldType ftype)
+static const char* escapeName (const tagEntryInfo * tag, fieldType ftype)
 {
 	fieldDesc *fdesc = getFieldDesc (ftype);
-
-	if (fdesc->renderEscaped)
-	{
-		if (fdesc->buffer == NULL)
-			fdesc->buffer = vStringNew ();
-		else
-			vStringClear (fdesc->buffer);
-
-		return fdesc->renderEscaped (strval, tag, fdesc->buffer);
-	}
-	else
-		return strval;
+	return renderFieldEscaped (fdesc, tag);
 }
 
 static int writeXrefEntry (const tagEntryInfo *const tag)
@@ -749,14 +738,14 @@ static int writeXrefEntry (const tagEntryInfo *const tag)
 
 	if (Option.tagFileFormat == 1)
 		length = fprintf (TagFile.fp, "%-16s %4lu %-16s ",
-				  escapeName (tag->name, tag, FIELD_NAME),
+				  escapeName (tag, FIELD_NAME),
 				  tag->lineNumber,
-				  escapeName (tag->sourceFileName, tag, FIELD_SOURCE_FILE));
+				  escapeName (tag, FIELD_SOURCE_FILE));
 	else
 		length = fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s ",
-				  escapeName (tag->name, tag, FIELD_NAME),
+				  escapeName (tag, FIELD_NAME),
 				  tag->kind->name, tag->lineNumber,
-				  escapeName (tag->sourceFileName, tag, FIELD_SOURCE_FILE));
+				  escapeName (tag, FIELD_SOURCE_FILE));
 
 	/* If no associated line for tag is found, we cannot prepare
 	 * parameter to writeCompactSourceLine(). In this case we
@@ -827,7 +816,7 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 	{
 		if (!scope->placeholder)
 		{
-			v = vStringNewInit (escapeName (scope->name, scope, FIELD_SCOPE));
+			v = vStringNewInit (escapeName (scope, FIELD_NAME));
 			stringListAdd (queue, v);
 		}
 		scope =  getEntryInCorkQueue (scope->extensionFields.scopeIndex);
@@ -889,7 +878,7 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 		    tag->extensionFields.scopeName != NULL)
 			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
 					   tag->extensionFields.scopeKind->name,
-					   escapeName (tag->extensionFields.scopeName, tag, FIELD_SCOPE));
+					   escapeName (tag, FIELD_SCOPE));
 		else if (tag->extensionFields.scopeIndex != SCOPE_NIL
 			 && TagFile.corkQueue.count > 0)
 		{
@@ -913,8 +902,7 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 		length += fprintf (TagFile.fp, "%s\t%s:%s:%s", sep,
 				   getFieldDesc (FIELD_TYPE_REF)->name,
 				   tag->extensionFields.typeRef [0],
-				   escapeName (tag->extensionFields.typeRef [1], tag,
-					       FIELD_TYPE_REF));
+				   escapeName (tag, FIELD_TYPE_REF));
 
 	if (getFieldDesc (FIELD_FILE_SCOPE)->enabled &&  tag->isFileScope)
 		length += fprintf (TagFile.fp, "%s\t%s:", sep,
@@ -924,8 +912,7 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 			tag->extensionFields.inheritance != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldDesc (FIELD_INHERITANCE)->name,
-				   escapeName (tag->extensionFields.inheritance, tag,
-					       FIELD_INHERITANCE));
+				   escapeName (tag, FIELD_INHERITANCE));
 
 	if (getFieldDesc (FIELD_ACCESS)->enabled &&  tag->extensionFields.access != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
@@ -942,8 +929,7 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 			tag->extensionFields.signature != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldDesc (FIELD_SIGNATURE)->name,
-				   escapeName (tag->extensionFields.signature, tag,
-					       FIELD_SIGNATURE));
+				   escapeName (tag, FIELD_SIGNATURE));
 
 	return length;
 #undef sep
@@ -1000,8 +986,8 @@ static int writeLineNumberEntry (const tagEntryInfo *const tag)
 static int writeCtagsEntry (const tagEntryInfo *const tag)
 {
 	int length = fprintf (TagFile.fp, "%s\t%s\t",
-			      escapeName (tag->name, tag, FIELD_NAME),
-			      escapeName (tag->sourceFileName, tag, FIELD_SOURCE_FILE));
+			      escapeName (tag, FIELD_NAME),
+			      escapeName (tag, FIELD_SOURCE_FILE));
 
 	if (tag->lineNumberEntry)
 		length += writeLineNumberEntry (tag);
