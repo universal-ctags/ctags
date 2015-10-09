@@ -132,20 +132,6 @@ optionValues Option = {
 		TRUE,   /* --file-scope */
 		FALSE,	/* --extra=. */
 	},
-	{
-		[FIELD_ACCESS]         = FALSE,
-		[FIELD_FILE_SCOPE]     = TRUE,
-		[FIELD_IMPLEMENTATION] = FALSE,
-		[FIELD_INHERITANCE]    = FALSE,
-		[FIELD_KIND]           = TRUE,
-		[FIELD_KIND_KEY]       = FALSE,
-		[FIELD_KIND_LONG]      = FALSE,
-		[FIELD_LANGUAGE]       = FALSE,
-		[FIELD_LINE_NUMBER]    = FALSE,
-		[FIELD_SCOPE]          = TRUE,
-		[FIELD_SIGNATURE]      = FALSE,
-		[FIELD_TYPE_REF]       = TRUE,
-	},
 	NULL,       /* -I */
 	FALSE,      /* -a */
 	FALSE,      /* -B */
@@ -1063,16 +1049,17 @@ static void processExtraTagsOption (
 	}
 }
 
-static void resetFieldsOption (
-		boolean field[], boolean mode)
+static void resetFieldsOption (boolean mode)
 {
-	memset(field, mode? ~0: 0, sizeof(*field) * FIELD_COUNT);
+	int i;
+	for (i = 0; i < FIELD_COUNT; ++i)
+		if (!getFieldDesc (i)->basic)
+			getFieldDesc (i)->enabled = mode;
 }
 
 static void processFieldsOption (
 		const char *const option, const char *const parameter)
 {
-	boolean *field = Option.extensionFields;
 	const char *p = parameter;
 	boolean mode = TRUE;
 	int c;
@@ -1080,11 +1067,11 @@ static void processFieldsOption (
 
 	if (*p == '*')
 	{
-		resetFieldsOption(field, TRUE);
+		resetFieldsOption (TRUE);
 		p++;
 	}
 	else if (*p != '+'  &&  *p != '-')
-		resetFieldsOption(field, FALSE);
+		resetFieldsOption (FALSE);
 
 
 	while ((c = *p++) != '\0') switch (c)
@@ -1095,7 +1082,11 @@ static void processFieldsOption (
 			if (t == FIELD_UNKNOWN)
 				error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
 				      c, option);
-			field [t] = mode;
+			else if (getFieldDesc (t)->basic && (mode == FALSE))
+				error(WARNING, "Cannot disable basic field: '%c'(%s) for \"%s\" option",
+				      c, getFieldDesc (t)->name, option);
+			else
+				getFieldDesc (t)->enabled = mode;
 			break;
 	}
 }

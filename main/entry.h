@@ -61,15 +61,19 @@ typedef struct sTagFields {
 /*  Information about the current tag candidate.
  */
 typedef struct sTagEntryInfo {
-	boolean     lineNumberEntry;  /* pattern or line number entry */
+	unsigned int lineNumberEntry:1;  /* pattern or line number entry */
+	unsigned int isFileScope    :1;  /* is tag visible only within source file? */
+	unsigned int isFileEntry    :1;  /* is this just an entry for a file name? */
+	unsigned int truncateLine   :1;  /* truncate tag line at end of tag name? */
+	unsigned int placeholder    :1;	 /* This is just a part of scope context.
+					    Put this entry to cork queue but
+					    don't print it to tags file. */
+
 	unsigned long lineNumber;     /* line number of tag */
 	const char* pattern;	      /* pattern for locating source line
 				       * (may be NULL if not present) *//*  */
 	fpos_t      filePosition;     /* file position of line containing tag */
 	const char* language;         /* language of source file */
-	boolean     isFileScope;      /* is tag visible only within source file? */
-	boolean     isFileEntry;      /* is this just an entry for a file name? */
-	boolean     truncateLine;     /* truncate tag line at end of tag name? */
 	const char *sourceFileName;   /* name of source file */
 	const char *name;             /* name of the tag */
 	const kindOption *kind;	      /* kind descriptor */
@@ -93,10 +97,6 @@ typedef struct sTagEntryInfo {
 		const char* typeRef [2];  /* e.g., "struct" and struct name */
 
 	} extensionFields;  /* list of extension fields*/
-
-	boolean placeholder;	/* This is just a part of scope context.
-				   Put this entry to cork queue but
-				   don't print it to tags file. */
 } tagEntryInfo;
 
 /*

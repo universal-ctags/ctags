@@ -1912,4 +1912,55 @@ extern void installKeywordTable (const langType language)
 		lang->keywordInstalled = TRUE;
 	}
 }
+
+/*
+ * A parser for CTagsSelfTest (CTST)
+ */
+typedef enum {
+	K_BROKEN,
+	KIND_COUNT
+} CTST_Kind;
+
+static kindOption CTST_Kinds[KIND_COUNT] = {
+	{TRUE, 'b', "broken tag", "name with unwanted characters"},
+};
+
+static void createCTSTTags (void)
+{
+	int i;
+	const unsigned char *line;
+	tagEntryInfo e;
+
+	while ((line = fileReadLine ()) != NULL)
+	{
+		int c = line[0];
+
+		for (i = 0; i < KIND_COUNT; i++)
+			if (c == CTST_Kinds[i].letter)
+			{
+				switch (i)
+				{
+					case K_BROKEN:
+						initTagEntry (&e, "one\nof\rbroken\tname", &CTST_Kinds[i]);
+						e.extensionFields.scopeKind = & (CTST_Kinds [K_BROKEN]);
+						e.extensionFields.scopeName = "\\Broken\tContext";
+						makeTagEntry (&e);
+						break;
+				}
+			}
+	}
+
+}
+
+extern parserDefinition *CTagsSelfTestParser (void)
+{
+	static const char *const extensions[] = { NULL };
+	parserDefinition *const def = parserNew ("CTagsSelfTest");
+	def->extensions = extensions;
+	def->kinds = CTST_Kinds;
+	def->kindCount = KIND_COUNT;
+	def->parser = createCTSTTags;
+	return def;
+}
+
 /* vi:set tabstop=4 shiftwidth=4 nowrap: */

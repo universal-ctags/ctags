@@ -719,6 +719,13 @@ static char *readSourceLineAnyway (vString *const vLine, const tagEntryInfo *con
 
 	return line;
 }
+
+static const char* escapeName (const tagEntryInfo * tag, fieldType ftype)
+{
+	fieldDesc *fdesc = getFieldDesc (ftype);
+	return renderFieldEscaped (fdesc, tag);
+}
+
 static int writeXrefEntry (const tagEntryInfo *const tag)
 {
 	const char *line;
@@ -730,11 +737,15 @@ static int writeXrefEntry (const tagEntryInfo *const tag)
 	line = readSourceLineAnyway (TagFile.vLine, tag, NULL);
 
 	if (Option.tagFileFormat == 1)
-		length = fprintf (TagFile.fp, "%-16s %4lu %-16s ", tag->name,
-				tag->lineNumber, tag->sourceFileName);
+		length = fprintf (TagFile.fp, "%-16s %4lu %-16s ",
+				  escapeName (tag, FIELD_NAME),
+				  tag->lineNumber,
+				  escapeName (tag, FIELD_SOURCE_FILE));
 	else
-		length = fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s ", tag->name,
-				  tag->kind->name, tag->lineNumber, tag->sourceFileName);
+		length = fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s ",
+				  escapeName (tag, FIELD_NAME),
+				  tag->kind->name, tag->lineNumber,
+				  escapeName (tag, FIELD_SOURCE_FILE));
 
 	/* If no associated line for tag is found, we cannot prepare
 	 * parameter to writeCompactSourceLine(). In this case we
@@ -805,7 +816,7 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 	{
 		if (!scope->placeholder)
 		{
-			v = vStringNewInit ((char *)scope->name);
+			v = vStringNewInit (escapeName (scope, FIELD_NAME));
 			stringListAdd (queue, v);
 		}
 		scope =  getEntryInCorkQueue (scope->extensionFields.scopeIndex);
@@ -828,10 +839,10 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 
 static int addExtensionFields (const tagEntryInfo *const tag)
 {
-	const char* const kindKey = Option.extensionFields[FIELD_KIND_KEY]
-		?fieldDescs[FIELD_KIND_KEY].name
+	const char* const kindKey = getFieldDesc (FIELD_KIND_KEY)->enabled
+		?getFieldDesc (FIELD_KIND_KEY)->name
 		:"";
-	const char* const kindFmt = Option.extensionFields[FIELD_KIND_KEY]
+	const char* const kindFmt = getFieldDesc (FIELD_KIND_KEY)->enabled
 		?"%s\t%s:%s"
 		:"%s\t%s%s";
 	boolean first = TRUE;
@@ -841,33 +852,33 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 /* "sep" returns a value only the first time it is evaluated */
 #define sep (first ? (first = FALSE, separator) : empty)
 
-	if (tag->kind->name != NULL && (Option.extensionFields[FIELD_KIND_LONG]  ||
-		 (Option.extensionFields[FIELD_KIND]  && tag->kind == '\0')))
+	if (tag->kind->name != NULL && (getFieldDesc (FIELD_KIND_LONG)->enabled  ||
+		 (getFieldDesc (FIELD_KIND)->enabled  && tag->kind == '\0')))
 		length += fprintf (TagFile.fp,kindFmt, sep, kindKey, tag->kind->name);
-	else if (tag->kind != '\0'  && (Option.extensionFields[FIELD_KIND] ||
-			(Option.extensionFields[FIELD_KIND_LONG] &&  tag->kind->name == NULL)))
+	else if (tag->kind != '\0'  && (getFieldDesc (FIELD_KIND)->enabled ||
+			(getFieldDesc (FIELD_KIND_LONG)->enabled &&  tag->kind->name == NULL)))
 	{
 		char str[2] = {tag->kind->letter, '\0'};
 		length += fprintf (TagFile.fp, kindFmt, sep, kindKey, str);
 	}
 
-	if (Option.extensionFields[FIELD_LINE_NUMBER])
+	if (getFieldDesc (FIELD_LINE_NUMBER)->enabled)
 		length += fprintf (TagFile.fp, "%s\t%s:%ld", sep,
-				   fieldDescs[FIELD_LINE_NUMBER].name,
+				   getFieldDesc (FIELD_LINE_NUMBER)->name,
 				   tag->lineNumber);
 
-	if (Option.extensionFields[FIELD_LANGUAGE]  &&  tag->language != NULL)
+	if (getFieldDesc (FIELD_LANGUAGE)->enabled  &&  tag->language != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   fieldDescs[FIELD_LANGUAGE].name,
+				   getFieldDesc (FIELD_LANGUAGE)->name,
 				   tag->language);
 
-	if (Option.extensionFields[FIELD_SCOPE])
+	if (getFieldDesc (FIELD_SCOPE)->enabled)
 	{
 		if (tag->extensionFields.scopeKind != NULL  &&
 		    tag->extensionFields.scopeName != NULL)
 			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
 					   tag->extensionFields.scopeKind->name,
-					   tag->extensionFields.scopeName);
+					   escapeName (tag, FIELD_SCOPE));
 		else if (tag->extensionFields.scopeIndex != SCOPE_NIL
 			 && TagFile.corkQueue.count > 0)
 		{
@@ -879,44 +890,46 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 			Assert (full_qualified_scope_name);
 			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
 					   scope->kind->name, full_qualified_scope_name);
+
+			/* TODO: Make the value pointed by full_qualified_scope_name reusable. */
 			eFree (full_qualified_scope_name);
 		}
 	}
 
-	if (Option.extensionFields[FIELD_TYPE_REF] &&
+	if (getFieldDesc (FIELD_TYPE_REF)->enabled &&
 			tag->extensionFields.typeRef [0] != NULL  &&
 			tag->extensionFields.typeRef [1] != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s:%s", sep,
-				   fieldDescs[FIELD_TYPE_REF].name,
+				   getFieldDesc (FIELD_TYPE_REF)->name,
 				   tag->extensionFields.typeRef [0],
-				   tag->extensionFields.typeRef [1]);
+				   escapeName (tag, FIELD_TYPE_REF));
 
-	if (Option.extensionFields[FIELD_FILE_SCOPE] &&  tag->isFileScope)
+	if (getFieldDesc (FIELD_FILE_SCOPE)->enabled &&  tag->isFileScope)
 		length += fprintf (TagFile.fp, "%s\t%s:", sep,
-				   fieldDescs[FIELD_FILE_SCOPE].name);
+				   getFieldDesc (FIELD_FILE_SCOPE)->name);
 
-	if (Option.extensionFields[FIELD_INHERITANCE] &&
+	if (getFieldDesc (FIELD_INHERITANCE)->enabled &&
 			tag->extensionFields.inheritance != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   fieldDescs[FIELD_INHERITANCE].name,
-				   tag->extensionFields.inheritance);
+				   getFieldDesc (FIELD_INHERITANCE)->name,
+				   escapeName (tag, FIELD_INHERITANCE));
 
-	if (Option.extensionFields[FIELD_ACCESS] &&  tag->extensionFields.access != NULL)
+	if (getFieldDesc (FIELD_ACCESS)->enabled &&  tag->extensionFields.access != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   fieldDescs[FIELD_ACCESS].name,
+				   getFieldDesc (FIELD_ACCESS)->name,
 				   tag->extensionFields.access);
 
-	if (Option.extensionFields[FIELD_IMPLEMENTATION] &&
+	if (getFieldDesc (FIELD_IMPLEMENTATION)->enabled &&
 			tag->extensionFields.implementation != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   fieldDescs[FIELD_IMPLEMENTATION].name,
+				   getFieldDesc (FIELD_IMPLEMENTATION)->name,
 				   tag->extensionFields.implementation);
 
-	if (Option.extensionFields[FIELD_SIGNATURE] &&
+	if (getFieldDesc (FIELD_SIGNATURE)->enabled &&
 			tag->extensionFields.signature != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   fieldDescs[FIELD_SIGNATURE].name,
-				   tag->extensionFields.signature);
+				   getFieldDesc (FIELD_SIGNATURE)->name,
+				   escapeName (tag, FIELD_SIGNATURE));
 
 	return length;
 #undef sep
@@ -973,7 +986,8 @@ static int writeLineNumberEntry (const tagEntryInfo *const tag)
 static int writeCtagsEntry (const tagEntryInfo *const tag)
 {
 	int length = fprintf (TagFile.fp, "%s\t%s\t",
-		tag->name, tag->sourceFileName);
+			      escapeName (tag, FIELD_NAME),
+			      escapeName (tag, FIELD_SOURCE_FILE));
 
 	if (tag->lineNumberEntry)
 		length += writeLineNumberEntry (tag);
@@ -1149,7 +1163,7 @@ extern size_t        countEntryInCorkQueue (void)
 extern int makeTagEntry (const tagEntryInfo *const tag)
 {
 	int r = SCOPE_NIL;
-	Assert (tag->name != NULL && strchr (tag->name, '\t') == NULL);
+	Assert (tag->name != NULL);
 	Assert (getSourceLanguageFileKind() == tag->kind || isSourceLanguageKindEnabled (tag->kind->letter));
 
 	if (tag->name [0] == '\0' && (!tag->placeholder))
@@ -1187,7 +1201,6 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      const kindOption *kind)
 {
 	Assert (File.source.name != NULL);
-	Assert (name == NULL || strchr (name, '\t') == NULL);
 
 	memset (e, 0, sizeof (tagEntryInfo));
 	e->lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);

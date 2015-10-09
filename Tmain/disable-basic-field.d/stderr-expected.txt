@@ -1,0 +1,3 @@
+ctags: Warning: Cannot disable basic field: 'N'(name) for "fields" option
+ctags: Warning: Cannot disable basic field: 'F'(source) for "fields" option
+ctags: Warning: Cannot disable basic field: 'P'(pattern) for "fields" option

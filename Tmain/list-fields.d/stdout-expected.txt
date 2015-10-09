@@ -1,3 +1,6 @@
+N	name	tag name(fixed field)	on
+F	source	source file(fixed field)	on
+P	pattern	pattern(fixed field)	on
 a	access	Access (or export) of class members	off
 f	file	File-restricted scoping	on
 i	inherits	Inheritance information	off

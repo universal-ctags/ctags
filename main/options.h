@@ -70,7 +70,6 @@ struct sInclude {
  */
 typedef struct sOptionValues {
 	struct sInclude include;/* --extra  extra tag inclusion */
-	boolean extensionFields [FIELD_COUNT];/* --fields  extension field control */
 	stringList* ignore;     /* -I  name of file containing tokens to ignore */
 	boolean append;         /* -a  append to "tags" file */
 	boolean backward;       /* -B  regexp patterns search backwards */
