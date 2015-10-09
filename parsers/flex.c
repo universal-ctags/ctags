@@ -1526,15 +1526,15 @@ static boolean parseStatement (tokenInfo *const token)
 				break;
 			case KEYWORD_class:
 				parseClass (token); 
-				return is_terminated;
+				goto cleanUp;
 				break;
 			case KEYWORD_function:
 				parseFunction (token); 
-				return is_terminated;
+				goto cleanUp;
 				break;
 			case KEYWORD_var:
 				parseVar (token, is_public); 
-				return is_terminated;
+				goto cleanUp;
 				break;
 			default:
 				readToken(token);
