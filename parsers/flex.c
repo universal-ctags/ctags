@@ -1192,7 +1192,6 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 	boolean read_next_token = TRUE;
 	vString * saveScope = vStringNew ();
 
-	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
 	token->nestLevel++;
 	DebugStatement ( 
@@ -1339,7 +1338,6 @@ static boolean parseVar (tokenInfo *const token, boolean is_public)
 	vString * saveScope = vStringNew ();
 	boolean is_terminated = TRUE;
 
-	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
 	/*
 	 * Variables are defined as:
@@ -1399,7 +1397,6 @@ static boolean parseClass (tokenInfo *const token)
 	vString * saveScope = vStringNew ();
 	boolean saveIsClass = token->isClass;
 
-	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
 	/*
 	 * Variables are defined as:
@@ -1461,7 +1458,6 @@ static boolean parseStatement (tokenInfo *const token)
 	/* boolean is_prototype = FALSE; */
 	vString *	fulltag;
 
-	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
 	DebugStatement ( 
 			debugPrintf (DEBUG_PARSE
