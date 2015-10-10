@@ -1249,6 +1249,7 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 			 && (! isEOF (token) ) );
 	}
 
+	vStringCopy(token->scope, saveScope);
 	vStringDelete(saveScope);
 	token->nestLevel--;
 
