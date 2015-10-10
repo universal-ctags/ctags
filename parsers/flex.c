@@ -2322,6 +2322,7 @@ static boolean parseActionScript (tokenInfo *const token)
 			}
 		}
 	} while (!isEOF (token));
+	return TRUE;
 }
 
 static void parseFlexFile (tokenInfo *const token)
