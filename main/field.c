@@ -94,6 +94,9 @@ static fieldDesc fieldDescs [] = {
 	DEFINE_FIELD ('z', "kind",           FALSE,
 		      "Include the \"kind:\" key in kind field(use k or K)",
 		      NULL),
+	DEFINE_FIELD ('Z', "scope",          FALSE,
+		      "Include the \"scope:\" key in scope field(use s)",
+		      NULL),
 };
 
 extern fieldDesc* getFieldDesc(fieldType type)
