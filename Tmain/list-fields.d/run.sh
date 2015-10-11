@@ -25,6 +25,7 @@ with_field()
     with_field m  java &&
     with_field n  java &&
     with_field s  java &&
+    with_field sZ java &&
     with_field f  c &&
     with_field S  c &&
     with_field t  c

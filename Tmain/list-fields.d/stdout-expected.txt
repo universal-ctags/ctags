@@ -13,6 +13,7 @@ S	signature	Signature of routine (e.g. prototype or parameter list)	off
 s	NONE	Scope of tag definition	on
 t	typeref	Type and name of a variable or typedef	on
 z	kind	Include the "kind:" key in kind field(use k or K)	off
+Z	scope	Include the "scope:" key in scope field(use s)	off
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/
 x	input.java	/^    public int x;$/
@@ -46,6 +47,9 @@ x	input.java	/^    public int x;$/;"	line:3
 #s
 Foo	input.java	/^abstract public class Foo extends Bar$/
 x	input.java	/^    public int x;$/;"	class:Foo
+#sZ
+Foo	input.java	/^abstract public class Foo extends Bar$/
+x	input.java	/^    public int x;$/;"	scope:class:Foo
 #f
 X	input.c	/^struct X {$/;"	file:
 Y	input.c	/^struct Y {$/;"	file:
