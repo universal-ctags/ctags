@@ -51,7 +51,7 @@ ctags.exe dctags.exe: $(OBJECTS) $(HEADERS) $(REGEX_HEADERS) $(FNMATCH_HEADERS)
 	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(OBJECTS) $(LIBS)
 
 readtags.exe: readtags.c
-	$(V_CC) $(CC) $(OPT) $(CFLAGS) -DREADTAGS_MAIN $(DEFINES) $(INCLUDES) -o $@ $<
+	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
 
 clean:
 	$(SILENT) echo Cleaning

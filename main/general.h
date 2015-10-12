@@ -75,6 +75,10 @@
 *   DATA DECLARATIONS
 */
 
+#ifdef USE_STDBOOL_H
+# include <stdbool.h>
+#endif
+
 #undef FALSE
 #undef TRUE
 #ifdef __cplusplus

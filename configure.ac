@@ -141,6 +141,13 @@ AC_DEFUN([PRETTY_ARG_VAR], [
 	fi
 ])
 
+# PRETTY_VAR_EXPAND(VARIABLE)
+# ---------------------------
+# Expand nested variable.
+# e.g. "\$\{prefix\}/bin" to "/usr/local/bin"
+AC_DEFUN([PRETTY_VAR_EXPAND],
+	 [$(eval "$as_echo_n" $(eval "$as_echo_n" "${$1}"))])
+
 # Checks for configuration options
 # --------------------------------
 
@@ -245,6 +252,20 @@ AC_SUBST([pkgdatadir])
 AC_SUBST([pkgsysconfdir])
 AC_SUBST([pkglibexecdir])
 
+AH_TEMPLATE([PKGDATADIR],    [installation directory of 'universal-ctags'-specific read-only architecture-independent data.])
+AH_TEMPLATE([PKGSYSCONFDIR], [installation directory of 'universal-ctags'-specific read-only single-machine data.])
+AH_TEMPLATE([PKGLIBEXECDIR], [installation directory of 'universal-ctags'-specific program executables.])
+
+AC_CONFIG_COMMANDS_PRE([
+	PKGDATADIR="PRETTY_VAR_EXPAND([pkgdatadir])"
+	PKGSYSCONFDIR="PRETTY_VAR_EXPAND([pkgsysconfdir])"
+	PKGLIBEXECDIR="PRETTY_VAR_EXPAND([pkglibexecdir])"
+
+	AC_DEFINE_UNQUOTED([PKGDATADIR],    ["${PKGDATADIR}"])
+	AC_DEFINE_UNQUOTED([PKGSYSCONFDIR], ["${PKGSYSCONFDIR}"])
+	AC_DEFINE_UNQUOTED([PKGLIBEXECDIR], ["${PKGLIBEXECDIR}"])
+])
+
 
 install_targets="install-ctags install-data install-libexec"
 AC_MSG_CHECKING(whether to install link to etags)
@@ -339,6 +360,13 @@ AC_SUBST([COVERAGE_LDFLAGS])
 AC_PROG_LN_S
 AC_CHECK_PROG(STRIP, strip, strip, :)
 AC_SYS_LARGEFILE
+
+AC_CHECK_PROGS([GIT], [git])
+if test "${GIT+set}" = "set"; then
+	AH_TEMPLATE([CTAGS_COMMIT_ID], [Git short commit ID at the moment configure runs.])
+	git_rev=`${GIT} rev-parse --verify --short HEAD`
+	AC_DEFINE_UNQUOTED([CTAGS_COMMIT_ID], [0x${git_rev}])
+fi
 
 
 # Checks for operating environment
@@ -441,6 +469,23 @@ AC_EGREP_HEADER(clock_t, time.h, AC_MSG_RESULT(yes),
 	AC_DEFINE(clock_t, long)
 ])
 
+AC_CHECK_HEADERS([stdbool.h],
+[
+	AH_TEMPLATE([USE_STDBOOL_H], [whether or not to use <stdbool.h>.])
+	AC_DEFINE([USE_STDBOOL_H])
+],
+[
+	AH_TEMPLATE([bool],  [type for 'bool' if <stdbool.h> is missing or broken.])
+	AH_TEMPLATE([true],  [value of 'true' if <stdbool.h> is missing or broken.])
+	AH_TEMPLATE([false], [value of 'false' if <stdbool.h> is missing or broken.])
+
+	AC_CHECK_TYPES([_Bool],
+		       [AC_DEFINE([bool], [_Bool])],
+		       [AC_DEFINE([bool], [int])])
+	AC_DEFINE([true],  [1])
+	AC_DEFINE([false], [0])
+])
+
 
 # Checks for compiler characteristics
 # -----------------------------------
@@ -477,6 +522,11 @@ if test yes != "$host_mingw"; then
 		AC_DEFINE(HAVE_STAT_ST_INO)
 	fi
 fi
+
+PRETTY_ARG_VAR([EXTRA_CPPFLAGS], [extra (Objective) C/C++ preprocessor flags],
+	       [-D_GNU_SOURCE -D__USE_GNU])
+PRETTY_ARG_VAR([DEBUG_CPPFLAGS], [(Objective) C/C++ preprocessor debug flags],
+	       [-DDEBUG])
 
 PRETTY_ARG_VAR([EXTRA_CFLAGS], [extra C compiler flags],
 	       [-std=gnu99])

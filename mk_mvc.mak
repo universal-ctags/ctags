@@ -25,7 +25,7 @@ ctags.exe: respmvc
 	cl $(OPT) /Fe$@ @respmvc /link setargv.obj $(LIBS)
 
 readtags.exe: readtags.c
-	cl /clr $(OPT) /Fe$@ $(DEFINES) -DREADTAGS_MAIN readtags.c /link setargv.obj
+	cl /clr $(OPT) /Fe$@ $(DEFINES) readtags.c /link setargv.obj
 
 # Debug version
 dctags.exe: respmvc

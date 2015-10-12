@@ -68,12 +68,10 @@ CGCC_CFLAGS = @CGCC_CFLAGS@
 
 ALL_CFLAGS = $(CFLAGS) $(EXTRA_CFLAGS) $(WARNING_CFLAGS) $(COVERAGE_CFLAGS) $(CGCC_CFLAGS)
 
-DEBUG_CPPFLAGS ?= -DDEBUG
+EXTRA_CPPFLAGS = @EXTRA_CPPFLAGS@
+DEBUG_CPPFLAGS ?= @DEBUG_CPPFLAGS@
 ALL_CPPFLAGS = $(CPPFLAGS)			\
-	$(DEBUG_CPPFLAGS)			\
-	-DDATADIR=\"$(pkgdatadir)\"		\
-	-DPKGCONFDIR=\"$(pkgsysconfdir)\"	\
-	-DPKGLIBEXECDIR=\"$(pkglibexecdir)\"
+	$(DEBUG_CPPFLAGS)
 
 include $(srcdir)/source.mak
 
@@ -174,7 +172,7 @@ $(CTAGS_EXEC): $(OBJECTS)
 	$(V_CC) $(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 $(READ_CMD): readtags.c readtags.h
-	$(V_CC) $(CC) -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(srcdir)/readtags.c
+	$(V_CC) $(CC) -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(srcdir)/readtags.c
 
 $(OBJECTS): $(HEADERS) config.h Makefile
 
@@ -358,17 +356,7 @@ maintainerclean: distclean
 	$(SILENT) dir="$$(dirname $@)"; mkdir -p "$$dir"
 	$(V_CC) $(CC) -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS) $(ALL_CFLAGS) -o $@ -c $<
 $(addsuffix .$(OBJEXT),$(basename $(notdir $(REGEX_SOURCES)))): ALL_CPPFLAGS += \
-	-D_GNU_SOURCE -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1
-
-REV := $(shell git rev-parse --short HEAD 2>/dev/null || echo 0)
-ALL_CPPFLAGS += -DCTAGS_COMMIT_ID=0x$(REV)
-
-options.$(OBJEXT): commit-stamp
-entry.$(OBJEXT): commit-stamp
-
-commit-stamp: FORCE
-	echo "$(REV)" > $@.tmp
-	if diff -q $@ $@.tmp; then rm -f $@.tmp; else mv -f $@.tmp $@; fi
+	$(EXTRA_CPPFLAGS)
 
 #
 # check
