@@ -782,7 +782,6 @@ extern tagResult tagsClose (tagFile *const file)
 *  TEST FRAMEWORK
 */
 
-#define READTAGS_MAIN
 #ifdef READTAGS_MAIN
 
 static const char *TagFileName = "tags";
