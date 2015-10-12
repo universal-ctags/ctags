@@ -845,6 +845,13 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 	const char* const kindFmt = getFieldDesc (FIELD_KIND_KEY)->enabled
 		?"%s\t%s:%s"
 		:"%s\t%s%s";
+	const char* const scopeKey = getFieldDesc (FIELD_SCOPE_KEY)->enabled
+		?getFieldDesc (FIELD_SCOPE_KEY)->name
+		:"";
+	const char* const scopeFmt = getFieldDesc (FIELD_SCOPE_KEY)->enabled
+		?"%s\t%s:%s:%s"
+		:"%s\t%s%s:%s";
+
 	boolean first = TRUE;
 	const char* separator = ";\"";
 	const char* const empty = "";
@@ -854,7 +861,7 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 
 	if (tag->kind->name != NULL && (getFieldDesc (FIELD_KIND_LONG)->enabled  ||
 		 (getFieldDesc (FIELD_KIND)->enabled  && tag->kind == '\0')))
-		length += fprintf (TagFile.fp,kindFmt, sep, kindKey, tag->kind->name);
+		length += fprintf (TagFile.fp, kindFmt, sep, kindKey, tag->kind->name);
 	else if (tag->kind != '\0'  && (getFieldDesc (FIELD_KIND)->enabled ||
 			(getFieldDesc (FIELD_KIND_LONG)->enabled &&  tag->kind->name == NULL)))
 	{
@@ -876,7 +883,8 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 	{
 		if (tag->extensionFields.scopeKind != NULL  &&
 		    tag->extensionFields.scopeName != NULL)
-			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
+			length += fprintf (TagFile.fp, scopeFmt, sep,
+					   scopeKey,
 					   tag->extensionFields.scopeKind->name,
 					   escapeName (tag, FIELD_SCOPE));
 		else if (tag->extensionFields.scopeIndex != SCOPE_NIL
@@ -888,7 +896,8 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 			scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
 			full_qualified_scope_name = getFullQualifiedScopeNameFromCorkQueue(scope);
 			Assert (full_qualified_scope_name);
-			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
+			length += fprintf (TagFile.fp, scopeFmt, sep,
+					   scopeKey,
 					   scope->kind->name, full_qualified_scope_name);
 
 			/* TODO: Make the value pointed by full_qualified_scope_name reusable. */

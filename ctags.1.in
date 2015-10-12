@@ -461,6 +461,9 @@ Type and name of a variable or typedef as "typeref:" field [enabled]
 .TP 4
 .I z
 Include the "kind:" key in kind field
+.TP 4
+.I Z
+Include the "scope:" key in scope field
 .PD 1
 .RE
 
