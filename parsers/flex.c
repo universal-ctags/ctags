@@ -21,7 +21,6 @@
  */
 #include "general.h"	/* must always come first */
 #include <ctype.h>	/* to define isalpha () */
-#include <setjmp.h>
 #ifdef DEBUG
 #include <stdio.h>
 #endif
@@ -43,8 +42,6 @@
 /*
  *	 DATA DECLARATIONS
  */
-
-typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
 
 /*
  * Tracks class and function names already created
@@ -88,6 +85,7 @@ typedef enum eKeywordId {
 
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
+	TOKEN_EOF,
 	TOKEN_CHARACTER,
 	TOKEN_CLOSE_PAREN,
 	TOKEN_SEMICOLON,
@@ -132,8 +130,6 @@ typedef struct sTokenInfo {
  */
 
 static langType Lang_js;
-
-static jmp_buf Exception;
 
 typedef enum {
 	FLEXTAG_FUNCTION,
@@ -199,6 +195,11 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent);
 static boolean parseLine (tokenInfo *const token);
 static boolean parseActionScript (tokenInfo *const token);
 static boolean parseMXML (tokenInfo *const token);
+
+static boolean isEOF (tokenInfo *const token)
+{
+	return isType (token, TOKEN_EOF);
+}
 
 static boolean isIdentChar (const int c)
 {
@@ -424,7 +425,7 @@ getNextChar:
 
 	switch (c)
 	{
-		case EOF: longjmp (Exception, (int)ExceptionEOF);	break;
+		case EOF: token->type = TOKEN_EOF;				break;
 		case '(': token->type = TOKEN_OPEN_PAREN;			break;
 		case ')': token->type = TOKEN_CLOSE_PAREN;			break;
 		case ';': token->type = TOKEN_SEMICOLON;			break;
@@ -756,7 +757,8 @@ static void skipArgumentList (tokenInfo *const token)
 	if (isType (token, TOKEN_OPEN_PAREN))	/* arguments? */
 	{
 		nest_level++;
-		while (! (isType (token, TOKEN_CLOSE_PAREN) && (nest_level == 0)))
+		while (! ((isType (token, TOKEN_CLOSE_PAREN) && (nest_level == 0))
+			  || (isType (token, TOKEN_EOF))))
 		{
 			readToken (token);
 			if (isType (token, TOKEN_OPEN_PAREN))
@@ -788,7 +790,8 @@ static void skipArrayList (tokenInfo *const token)
 	if (isType (token, TOKEN_OPEN_SQUARE))	/* arguments? */
 	{
 		nest_level++;
-		while (! (isType (token, TOKEN_CLOSE_SQUARE) && (nest_level == 0)))
+		while (! ((isType (token, TOKEN_CLOSE_SQUARE) && (nest_level == 0))
+			  || isEOF (token)) )
 		{
 			readToken (token);
 			if (isType (token, TOKEN_OPEN_SQUARE))
@@ -838,7 +841,8 @@ static void findCmdTerm (tokenInfo *const token)
 	 * Any nested braces will be handled within.
 	 */
 	while (! ( isType (token, TOKEN_SEMICOLON) ||
-				isType (token, TOKEN_CLOSE_CURLY) ) )
+		   isType (token, TOKEN_CLOSE_CURLY) ||
+		   isEOF  (token) ))
 	{
 		/* Handle nested blocks */
 		if ( isType (token, TOKEN_OPEN_CURLY))
@@ -882,10 +886,11 @@ static void parseSwitch (tokenInfo *const token)
 		do
 		{
 			readToken (token);
-		} while (! (isType (token, TOKEN_CLOSE_SGML) || 
-					isType (token, TOKEN_CLOSE_MXML) ||
-					isType (token, TOKEN_CLOSE_CURLY) ||
-					isType (token, TOKEN_GREATER_THAN)) ); 
+		} while (! (isType (token, TOKEN_CLOSE_SGML) ||
+			    isType (token, TOKEN_CLOSE_MXML) ||
+			    isType (token, TOKEN_CLOSE_CURLY) ||
+			    isType (token, TOKEN_GREATER_THAN) ||
+			    isEOF (token)) );
 	}
 
 }
@@ -1187,7 +1192,6 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 	boolean read_next_token = TRUE;
 	vString * saveScope = vStringNew ();
 
-	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
 	token->nestLevel++;
 	DebugStatement ( 
@@ -1241,9 +1245,11 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 			 * If we find a statement without a terminator consider the 
 			 * block finished, otherwise the stack will be off by one.
 			 */
-		} while (! isType (token, TOKEN_CLOSE_CURLY) && read_next_token );
+		} while ((! isType (token, TOKEN_CLOSE_CURLY) && read_next_token )
+			 && (! isEOF (token) ) );
 	}
 
+	vStringCopy(token->scope, saveScope);
 	vStringDelete(saveScope);
 	token->nestLevel--;
 
@@ -1315,10 +1321,14 @@ static void parseMethods (tokenInfo *const token, tokenInfo *const class)
 				}
 			}
 		}
-	} while ( isType(token, TOKEN_COMMA) );
+
+		if (isEOF (token))
+			goto cleanUp;
+	} while ( isType(token, TOKEN_COMMA));
 
 	findCmdTerm (token);
 
+cleanUp:
 	deleteToken (name);
 }
 
@@ -1329,7 +1339,6 @@ static boolean parseVar (tokenInfo *const token, boolean is_public)
 	vString * saveScope = vStringNew ();
 	boolean is_terminated = TRUE;
 
-	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
 	/*
 	 * Variables are defined as:
@@ -1356,7 +1365,8 @@ static boolean parseVar (tokenInfo *const token, boolean is_public)
 		readToken (token);
 	}
 
-	while (! isType (token, TOKEN_SEMICOLON) )
+	while (! (isType (token, TOKEN_SEMICOLON) ||
+		  isEOF (token)))
 	{
 		readToken (token);
 	}
@@ -1388,7 +1398,6 @@ static boolean parseClass (tokenInfo *const token)
 	vString * saveScope = vStringNew ();
 	boolean saveIsClass = token->isClass;
 
-	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
 	/*
 	 * Variables are defined as:
@@ -1450,7 +1459,6 @@ static boolean parseStatement (tokenInfo *const token)
 	/* boolean is_prototype = FALSE; */
 	vString *	fulltag;
 
-	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
 	DebugStatement ( 
 			debugPrintf (DEBUG_PARSE
@@ -1526,15 +1534,15 @@ static boolean parseStatement (tokenInfo *const token)
 				break;
 			case KEYWORD_class:
 				parseClass (token); 
-				return is_terminated;
+				goto cleanUp;
 				break;
 			case KEYWORD_function:
 				parseFunction (token); 
-				return is_terminated;
+				goto cleanUp;
 				break;
 			case KEYWORD_var:
 				parseVar (token, is_public); 
-				return is_terminated;
+				goto cleanUp;
 				break;
 			default:
 				readToken(token);
@@ -1546,7 +1554,8 @@ static boolean parseStatement (tokenInfo *const token)
 
 	while (! isType (token, TOKEN_CLOSE_CURLY) &&
 	       ! isType (token, TOKEN_SEMICOLON)   &&
-	       ! isType (token, TOKEN_EQUAL_SIGN)  )
+	       ! isType (token, TOKEN_EQUAL_SIGN)  &&
+	       ! isEOF  (token) )
 	{
 		/* Potentially the name of the function */
 		readToken (token);
@@ -1655,7 +1664,8 @@ static boolean parseStatement (tokenInfo *const token)
 					}
 				}
 				readToken (token);
-			} while (isType (token, TOKEN_PERIOD));
+			} while (isType (token, TOKEN_PERIOD) &&
+				 ! isEOF (token));
 		}
 
 		if ( isType (token, TOKEN_OPEN_PAREN) )
@@ -2068,8 +2078,9 @@ static boolean parseNamespace (tokenInfo *const token)
 		{
 			readToken (token);
 		}
-	} while (! (isType (token, TOKEN_CLOSE_SGML) || isType (token, TOKEN_CLOSE_MXML)) ); 
-
+	} while (! (isType (token, TOKEN_CLOSE_SGML) ||
+		    isType (token, TOKEN_CLOSE_MXML) ||
+		    isEOF (token)) );
 	return TRUE;
 }
 
@@ -2099,9 +2110,10 @@ static boolean parseMXML (tokenInfo *const token)
 		do
 		{
 			readToken (token);
-		} while (! (isType (token, TOKEN_CLOSE_SGML) || 
-					isType (token, TOKEN_CLOSE_MXML) ||
-					isType (token, TOKEN_GREATER_THAN)) ); 
+		} while (! (isType (token, TOKEN_CLOSE_SGML)   ||
+			    isType (token, TOKEN_CLOSE_MXML)   ||
+			    isType (token, TOKEN_GREATER_THAN) ||
+			    isEOF (token)) );
 
 		if (isType (token, TOKEN_CLOSE_MXML))
 		{
@@ -2189,7 +2201,9 @@ static boolean parseMXML (tokenInfo *const token)
 		{
 			readToken (token);
 		}
-	} while (! (isType (token, TOKEN_CLOSE_SGML) || isType (token, TOKEN_CLOSE_MXML)) ); 
+	} while (! (isType (token, TOKEN_CLOSE_SGML) ||
+		    isType (token, TOKEN_CLOSE_MXML) ||
+		    isEOF (token)) );
 
 	if (isType (token, TOKEN_CLOSE_MXML))
 	{
@@ -2307,7 +2321,8 @@ static boolean parseActionScript (tokenInfo *const token)
 				parseLine (token); 
 			}
 		}
-	} while (TRUE);
+	} while (!isEOF (token));
+	return TRUE;
 }
 
 static void parseFlexFile (tokenInfo *const token)
@@ -2329,7 +2344,7 @@ static void parseFlexFile (tokenInfo *const token)
 				 * <?xml version="1.0" encoding="utf-8"?>
 				 */
 				readToken (token);
-				while (! isType (token, TOKEN_QUESTION_MARK) )
+				while (! (isType (token, TOKEN_QUESTION_MARK) || isEOF (token)))
 				{
 					readToken (token);
 				} 
@@ -2343,7 +2358,7 @@ static void parseFlexFile (tokenInfo *const token)
 				 * </something>
 				 */
 				readToken (token);
-				while (! isType (token, TOKEN_GREATER_THAN) )
+				while (! (isType (token, TOKEN_GREATER_THAN) || isEOF (token)))
 				{
 					readToken (token);
 				} 
@@ -2353,7 +2368,7 @@ static void parseFlexFile (tokenInfo *const token)
 		{
 			parseActionScript (token);
 		}
-	} while (TRUE);
+	} while (!isEOF (token));
 }
 
 static void initialize (const langType language)
@@ -2365,14 +2380,11 @@ static void initialize (const langType language)
 static void findFlexTags (void)
 {
 	tokenInfo *const token = newToken ();
-	exception_t exception;
 	
 	ClassNames = stringListNew ();
 	FunctionNames = stringListNew ();
-	
-	exception = (exception_t) (setjmp (Exception));
-	while (exception == ExceptionNone)
-		parseFlexFile (token);
+
+	parseFlexFile (token);
 
 	stringListDelete (ClassNames);
 	stringListDelete (FunctionNames);
