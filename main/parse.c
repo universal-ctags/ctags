@@ -1328,7 +1328,7 @@ static void processLangKindOption (
 		case '-': mode = FALSE; break;
 		default:
 			if (! enableLanguageKind (language, c, mode))
-				error (WARNING, "Unsupported parameter '%c' for --%s option",
+				error (WARNING, "Unsupported kind: '%c' for --%s option",
 					c, option);
 			break;
 	}
