@@ -525,12 +525,15 @@ extern boolean hasXcmdKind (const langType language, const int kind)
 
 #ifdef HAVE_COPROC
 static void printXcmdKind (xcmdPath *path, unsigned int i,
-			   const char* const langName, boolean allKindFields, boolean indent)
+                           const char* const langName, boolean allKindFields, boolean indent)
 {
 	unsigned int k;
 
 	if (!path[i].available)
 		return;
+
+        if (allKindFields && indent)
+            printf ("%s", langName);
 
 	for (k = 0; k < path[i].n_kinds; k++)
 		printKind (path[i].kinds + k, allKindFields, indent);
@@ -545,7 +548,7 @@ extern void printXcmdKinds (const langType language __unused__,
 	if (language <= SetUpper  &&  Sets [language].count > 0)
 	{
 		pathSet* const set = Sets + language;
-		const char* const langName = getLanguageName (language);
+                const char* const langName = getLanguageName(language);
 		unsigned int i;
 		for (i = 0  ;  i < set->count  ;  ++i)
 			printXcmdKind (set->paths, i, langName, allKindFields, indent);
@@ -567,7 +570,7 @@ extern void freeXcmdResources (void)
 }
 
 #ifdef HAVE_COPROC
-static void xcmd_flag_not_avaible_status_long (const char* const s, const char* const v, void* data)
+static void xcmd_flag_not_avaible_status_long (const char* const s __unused__, const char* const v, void* data)
 {
 	xcmdPath *path = data;
 
@@ -582,9 +585,8 @@ extern void addTagXcmd (const langType language, vString* pathvstr, const char* 
 	xcmdPath *path;
 
 	flagDefinition xcmdFlagDefs[] = {
-		{ '\0', "notAvailableStatus",  NULL,  xcmd_flag_not_avaible_status_long  },
+		{ '\0', "notAvailableStatus", NULL, xcmd_flag_not_avaible_status_long },
 	};
-
 
 	Assert (pathvstr != NULL);
 
@@ -825,8 +827,9 @@ static boolean parseExtensionFields (tagEntry *const entry, char *const string, 
 
 						}
 					}
-					else
-						; /* TODO: warning */
+					else {
+                                            ; /* TODO Handle warning */
+                                        }
 					Assert (entry->kind);
 
 				}
@@ -857,8 +860,9 @@ static boolean parseExtensionFields (tagEntry *const entry, char *const string, 
 							}
 						}
 
-						else
-							; /* TODO: warning */
+						else {
+                                                    ; /*TODO Handle warning*/
+                                                }
 						Assert (entry->kind);
 					}
 					else
