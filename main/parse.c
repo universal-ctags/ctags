@@ -1291,13 +1291,14 @@ static void resetLanguageKinds (const langType language, const boolean mode)
 static boolean enableLanguageKind (
 		const langType language, const int kind, const boolean mode)
 {
-	boolean result = enableRegexKind (language, kind, mode);
+	boolean result = FALSE;
 	kindOption* const opt = langKindOption (language, kind);
 	if (opt != NULL)
 	{
 		opt->enabled = mode;
 		result = TRUE;
 	}
+	result = enableRegexKind (language, kind, mode)? TRUE: result;
 	result = enableXcmdKind (language, kind, mode)? TRUE: result;
 	return result;
 }
