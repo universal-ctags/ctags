@@ -759,7 +759,7 @@ static void processFunction (tokenInfo *const token)
 		readIdentifier (token, c);
 		c = skipWhite (vGetc ());
 		/* Identify class type prefixes and create respective context*/
-		if (c == ':')
+		if (isLanguage (Lang_systemverilog) && c == ':')
 		{
 			c = vGetc ();
 			if (c == ':')
