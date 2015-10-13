@@ -2052,7 +2052,8 @@ static void parseEnumBlock (tokenInfo *const token)
 		makeFortranTag (name, TAG_ENUM);
 	skipToNextStatement (token);
 	ancestorPush (name);
-	while (! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_end) &&
+		   ! isType(token, TOKEN_EOF))
 	{
 		if (isTypeSpec (token))
 			parseTypeDeclarationStmt (token);
