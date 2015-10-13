@@ -144,6 +144,8 @@ static void createRTags (void)
 							cp = (const unsigned char *) line;
 							SKIPSPACE (cp);
 						}
+						else
+							break;
 					}
 
 					if (strncasecmp ((const char *) cp, "function",
