@@ -4,7 +4,7 @@ $env_var	input.vim	/^let $env_var = 'something'$/;"	v
 <F8>	input.vim	/^nnoremap <silent> <F8> :Tlist<CR>$/;"	m
 <Leader>scdt	input.vim	/^map! <unique> <Leader>scdt <Plug>GetColumnDataType$/;"	m
 Bar	input.vim	/^fu Bar(arg)$/;"	f
-DBSetOption	input.vim	/^command! -nargs=* -complete=customlist,<SID>DB_settingsComplete DBSetOption :call s:DB_setMultipleOptions(<q-args>)$/;"	c
+DBSetOption	input.vim	/^command! -nargs=* -complete=customlist,<SID>DB_settingsComplete DBSetOption :call s:DB_setMultip/;"	c
 E	input.vim	/^function E$/;"	f
 ExtraLines	input.vim	/^            \\ ExtraLines edit<bang> <args>$/;"	c
 Foo	input.vim	/^function! Foo(arg)$/;"	f

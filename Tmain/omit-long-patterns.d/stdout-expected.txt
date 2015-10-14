@@ -1,0 +1,3 @@
+func95	./input.sh	/^                                                                                               f/;"	f
+func96	./input.sh	/^                                                                                                /;"	f
+func97	./input.sh	/^                                                                                                /;"	f
