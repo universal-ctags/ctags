@@ -193,7 +193,8 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 		++b;
 	else if (b != begin)
 		return;
-	Assert(e - b + 1 > 0);
+	if (e - b + 1 <= 0)
+		return;			/* Left side of => has an invalid identifier. */
 	vStringClear(name);
 	vStringNCatS(name, b, e - b + 1);
 	initTagEntry(&entry, vStringValue(name));
