@@ -1,0 +1,1 @@
+test_enumeration	input.c	/^enum test_enumeration /;"	E
