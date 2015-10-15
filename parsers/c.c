@@ -416,7 +416,7 @@ static kindOption VeraKinds [] = {
 	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)"},
 	{ TRUE,  'f', "function",   "function definitions"},
 	{ TRUE,  'g', "enum",       "enumeration names"},
-	{ TRUE,  'I', "interface",  "interfaces"},
+	{ TRUE,  'i', "interface",  "interfaces"},
 	{ FALSE, 'l', "local",      "local variables"},
 	{ TRUE,  'm', "member",     "class, struct, and union members"},
 	{ TRUE,  'p', "program",    "programs"},
@@ -1221,6 +1221,7 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 		case TAG_MEMBER:
 		case TAG_NAMESPACE:
 		case TAG_PROPERTY:
+		case TAG_SIGNAL:
 		case TAG_STRUCT:
 		case TAG_TASK:
 		case TAG_TYPEDEF:
