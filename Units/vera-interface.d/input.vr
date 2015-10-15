@@ -1,0 +1,14 @@
+// Taken from:
+// http://www.asic-world.com/vera/hdl1.html#Interface_Declaration
+interface sample_if {
+  // Other signals are sampled with respect to this
+  input clock          CLOCK;
+  output reset         PHOLD#1;
+  output enable        PHOLD#1;
+  input [7:0] cout     PSAMPLE #-1;
+  inout data           PSAMPLE PHOLD NSAMPLE#-1 NHOLD #1;
+  input ddr_data_in    PSAMPLE NSAMPLE;
+  input data_in        PSAMPLE #-1 hdl_node "sample_if_verilog.data";
+  input [7:0] count    PSAMPLE #-1 hdl_node "sample_if_verilog.counter";
+  output  nenable      PHOLD   #1 hdl_node "sample_if_verilog.counter_en";
+}

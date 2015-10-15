@@ -38,6 +38,11 @@
                             (boolean) ((st)->parent->declaration == DECL_ENUM))
 #define insideAnnotationBody(st)  ((st)->parent == NULL ? FALSE : \
 								  (boolean) ((st)->parent->declaration == DECL_ANNOTATION))
+#define insideInterfaceBody(st) ((st)->parent == NULL ? FALSE : \
+                            (boolean) ((st)->parent->declaration == DECL_INTERFACE))
+#define isSignalDirection(token) (boolean)(( (token)->keyword == KEYWORD_INPUT  ) ||\
+					   ( (token)->keyword == KEYWORD_OUTPUT ) ||\
+					   ( (token)->keyword == KEYWORD_INOUT  )  )
 #define isExternCDecl(st,c) (boolean) ((c) == STRING_SYMBOL  && \
                     ! (st)->haveQualifyingName  && (st)->scope == SCOPE_EXTERN)
 
@@ -64,7 +69,7 @@ typedef enum eKeywordId {
 	KEYWORD_ALIAS, KEYWORD_ATTRIBUTE, KEYWORD_ABSTRACT,
 	KEYWORD_BOOLEAN, KEYWORD_BYTE, KEYWORD_BAD_STATE, KEYWORD_BAD_TRANS,
 	KEYWORD_BIND, KEYWORD_BIND_VAR, KEYWORD_BIT,
-	KEYWORD_CASE, KEYWORD_CATCH, KEYWORD_CHAR, KEYWORD_CLASS, KEYWORD_CONST,
+	KEYWORD_CASE, KEYWORD_CATCH, KEYWORD_CHAR, KEYWORD_CLASS, KEYWORD_CLOCK, KEYWORD_CONST,
 	KEYWORD_CONSTRAINT, KEYWORD_COVERAGE_BLOCK, KEYWORD_COVERAGE_DEF,
 	KEYWORD_DEFAULT, KEYWORD_DELEGATE, KEYWORD_DELETE, KEYWORD_DO,
 	KEYWORD_DOUBLE,
@@ -73,16 +78,18 @@ typedef enum eKeywordId {
 	KEYWORD_FINAL, KEYWORD_FLOAT, KEYWORD_FOR, KEYWORD_FOREACH,
 	KEYWORD_FRIEND, KEYWORD_FUNCTION,
 	KEYWORD_GOTO,
+	KEYWORD_HDL_NODE,
 	KEYWORD_IF, KEYWORD_IMPLEMENTS, KEYWORD_IMPORT, KEYWORD_INLINE, KEYWORD_INT,
 	KEYWORD_INOUT, KEYWORD_INPUT, KEYWORD_INTEGER, KEYWORD_INTERFACE,
 	KEYWORD_INTERNAL,
 	KEYWORD_LOCAL, KEYWORD_LONG,
 	KEYWORD_M_BAD_STATE, KEYWORD_M_BAD_TRANS, KEYWORD_M_STATE, KEYWORD_M_TRANS,
 	KEYWORD_MUTABLE,
-	KEYWORD_NAMESPACE, KEYWORD_NEW, KEYWORD_NEWCOV, KEYWORD_NATIVE, KEYWORD_NOEXCEPT,
+	KEYWORD_NAMESPACE, KEYWORD_NEW, KEYWORD_NEWCOV, KEYWORD_NATIVE,
+	KEYWORD_NHOLD, KEYWORD_NOEXCEPT, KEYWORD_NSAMPLE,
 	KEYWORD_OPERATOR, KEYWORD_OUTPUT, KEYWORD_OVERLOAD, KEYWORD_OVERRIDE,
-	KEYWORD_PACKED, KEYWORD_PORT, KEYWORD_PACKAGE, KEYWORD_PRIVATE,
-	KEYWORD_PROGRAM, KEYWORD_PROTECTED, KEYWORD_PUBLIC,
+	KEYWORD_PACKED, KEYWORD_PORT, KEYWORD_PACKAGE, KEYWORD_PHOLD, KEYWORD_PRIVATE,
+	KEYWORD_PROGRAM, KEYWORD_PROTECTED, KEYWORD_PSAMPLE, KEYWORD_PUBLIC,
 	KEYWORD_REGISTER, KEYWORD_RETURN,
 	KEYWORD_SHADOW, KEYWORD_STATE,
 	KEYWORD_SHORT, KEYWORD_SIGNED, KEYWORD_STATIC, KEYWORD_STRING,
@@ -251,6 +258,7 @@ typedef enum eTagType {
 	TAG_PROGRAM,     /* program name */
 	TAG_PROPERTY,    /* property name */
 	TAG_PROTOTYPE,   /* function prototype or declaration */
+	TAG_SIGNAL,	 /* VERA signal name */
 	TAG_STRUCT,      /* structure name */
 	TAG_TASK,        /* task name */
 	TAG_TYPEDEF,     /* typedef name / D alias name */
@@ -397,8 +405,8 @@ static kindOption JavaKinds [] = {
 typedef enum {
 	VK_UNDEFINED = COMMONK_UNDEFINED,
 	VK_CLASS, VK_DEFINE, VK_ENUMERATOR, VK_FUNCTION,
-	VK_ENUMERATION, VK_LOCAL, VK_MEMBER, VK_PROGRAM, VK_PROTOTYPE,
-	VK_TASK, VK_TYPEDEF, VK_VARIABLE,
+	VK_ENUMERATION, VK_INTERFACE, VK_LOCAL, VK_MEMBER, VK_PROGRAM, VK_PROTOTYPE,
+	VK_SIGNAL, VK_TASK, VK_TYPEDEF, VK_VARIABLE,
 	VK_EXTERN_VARIABLE, VK_HEADER
 } veraKind;
 
@@ -408,10 +416,12 @@ static kindOption VeraKinds [] = {
 	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)"},
 	{ TRUE,  'f', "function",   "function definitions"},
 	{ TRUE,  'g', "enum",       "enumeration names"},
+	{ TRUE,  'i', "interface",  "interfaces"},
 	{ FALSE, 'l', "local",      "local variables"},
 	{ TRUE,  'm', "member",     "class, struct, and union members"},
 	{ TRUE,  'p', "program",    "programs"},
 	{ FALSE, 'P', "prototype",  "function prototypes"},
+	{ TRUE,  's', "signal",     "signals"},
 	{ TRUE,  't', "task",       "tasks"},
 	{ TRUE,  'T', "typedef",    "typedefs"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
@@ -449,6 +459,7 @@ static const keywordDesc KeywordTable [] = {
      { "cfloat",          KEYWORD_CFLOAT,          { 0, 0, 0, 1, 0, 0 } },
      { "char",            KEYWORD_CHAR,            { 1, 1, 1, 1, 1, 0 } },
      { "class",           KEYWORD_CLASS,           { 0, 1, 1, 1, 1, 1 } },
+     { "CLOCK",           KEYWORD_CLOCK,           { 0, 0, 0, 0, 0, 1 } },
      { "const",           KEYWORD_CONST,           { 1, 1, 1, 1, 1, 0 } },
      { "constraint",      KEYWORD_CONSTRAINT,      { 0, 0, 0, 0, 0, 1 } },
      { "continue",        KEYWORD_CONTINUE,        { 0, 0, 0, 1, 0, 0 } },
@@ -480,6 +491,7 @@ static const keywordDesc KeywordTable [] = {
      { "friend",          KEYWORD_FRIEND,          { 0, 1, 0, 1, 0, 0 } },
      { "function",        KEYWORD_FUNCTION,        { 0, 0, 0, 1, 0, 1 } },
      { "goto",            KEYWORD_GOTO,            { 1, 1, 1, 1, 1, 0 } },
+     { "hdl_node",        KEYWORD_HDL_NODE,        { 0, 0, 0, 0, 0, 1 } },
      { "idouble",         KEYWORD_IDOUBLE,         { 0, 0, 0, 1, 0, 0 } },
      { "if",              KEYWORD_IF,              { 1, 1, 1, 1, 1, 0 } },
      { "ifloat",          KEYWORD_IFLOAT,          { 0, 0, 0, 1, 0, 0 } },
@@ -510,7 +522,9 @@ static const keywordDesc KeywordTable [] = {
      { "native",          KEYWORD_NATIVE,          { 0, 0, 0, 0, 1, 0 } },
      { "new",             KEYWORD_NEW,             { 0, 1, 1, 1, 1, 0 } },
      { "newcov",          KEYWORD_NEWCOV,          { 0, 0, 0, 0, 0, 1 } },
+     { "NHOLD",           KEYWORD_NHOLD,           { 0, 0, 0, 0, 0, 1 } },
      { "noexcept",        KEYWORD_NOEXCEPT,        { 0, 1, 0, 0, 0, 0 } },
+     { "NSAMPLE",         KEYWORD_NSAMPLE,         { 0, 0, 0, 0, 0, 1 } },
      { "null",            KEYWORD_NULL,            { 0, 0, 0, 1, 0, 0 } },
      { "operator",        KEYWORD_OPERATOR,        { 0, 1, 1, 1, 0, 0 } },
      { "out",             KEYWORD_OUT,             { 0, 0, 0, 1, 0, 0 } },
@@ -519,11 +533,13 @@ static const keywordDesc KeywordTable [] = {
      { "override",        KEYWORD_OVERRIDE,        { 0, 0, 1, 1, 0, 0 } },
      { "package",         KEYWORD_PACKAGE,         { 0, 0, 0, 1, 1, 0 } },
      { "packed",          KEYWORD_PACKED,          { 0, 0, 0, 0, 0, 1 } },
+     { "PHOLD",           KEYWORD_PHOLD,           { 0, 0, 0, 0, 0, 1 } },
      { "port",            KEYWORD_PORT,            { 0, 0, 0, 0, 0, 1 } },
      { "pragma",          KEYWORD_PRAGMA,          { 0, 0, 0, 1, 0, 0 } },
      { "private",         KEYWORD_PRIVATE,         { 0, 1, 1, 1, 1, 0 } },
      { "program",         KEYWORD_PROGRAM,         { 0, 0, 0, 0, 0, 1 } },
      { "protected",       KEYWORD_PROTECTED,       { 0, 1, 1, 1, 1, 1 } },
+     { "PSAMPLE",         KEYWORD_PSAMPLE,         { 0, 0, 0, 0, 0, 1 } },
      { "public",          KEYWORD_PUBLIC,          { 0, 1, 1, 1, 1, 1 } },
      { "real",            KEYWORD_REAL,            { 0, 0, 0, 1, 0, 0 } },
      { "register",        KEYWORD_REGISTER,        { 1, 1, 0, 1, 0, 0 } },
@@ -1038,10 +1054,12 @@ static veraKind veraTagKindFull (const tagType type, boolean with_assert) {
 		case TAG_ENUM:       result = VK_ENUMERATION;     break;
 		case TAG_ENUMERATOR: result = VK_ENUMERATOR;      break;
 		case TAG_FUNCTION:   result = VK_FUNCTION;        break;
+		case TAG_INTERFACE:  result = VK_INTERFACE;       break;
 		case TAG_LOCAL:      result = VK_LOCAL;           break;
 		case TAG_MEMBER:     result = VK_MEMBER;          break;
 		case TAG_PROGRAM:    result = VK_PROGRAM;         break;
 		case TAG_PROTOTYPE:  result = VK_PROTOTYPE;       break;
+		case TAG_SIGNAL:     result = VK_SIGNAL;          break;
 		case TAG_TASK:       result = VK_TASK;            break;
 		case TAG_TYPEDEF:    result = VK_TYPEDEF;         break;
 		case TAG_VARIABLE:   result = VK_VARIABLE;        break;
@@ -1203,6 +1221,7 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 		case TAG_MEMBER:
 		case TAG_NAMESPACE:
 		case TAG_PROPERTY:
+		case TAG_SIGNAL:
 		case TAG_STRUCT:
 		case TAG_TASK:
 		case TAG_TYPEDEF:
@@ -3043,6 +3062,47 @@ static void tagCheck (statementInfo *const st)
 				qualifyEnumeratorTag (st, token);
 			if (st->declaration == DECL_MIXIN)
 				makeTag (token, st, FALSE, TAG_MIXIN);
+			if (isLanguage (Lang_vera) && insideInterfaceBody (st))
+			{
+				/* Quoted from
+				   http://www.asic-world.com/vera/hdl1.html#Interface_Declaration
+				   ------------------------------------------------
+				   interface interface_name
+				   {
+				   signal_direction [signal_width] signal_name signal_type
+				   [skew] [depth value][vca q_value][force][hdl_node "hdl_path"];
+				   }
+				   Where
+				   signal_direction : This can be one of the following
+				        input : ...
+				        output : ...
+				        inout : ...
+				   signal_width : The signal_width is a range specifying the width of
+				                  a vector signal. It must be in the form [msb:lsb].
+						  Interface signals can have any integer lsb value,
+						  even a negative value. The default width is 1.
+				   signal_name : The signal_name identifies the signal being defined.
+				                 It is the Vera name for the HDL signal being connected.
+				   signal_type : There are many signals types, most commonly used one are
+					NHOLD : ...
+					PHOLD : ...
+					PHOLD NHOLD : ...
+					NSAMPLE : ...
+					PSAMPLE : ...
+					PSAMPLE NSAMPLE : ...
+					CLOCK : ...
+					PSAMPLE PHOLD : ...
+					NSAMPLE NHOLD : ...
+					PSAMPLE PHOLD NSAMPLE NHOLD : ...
+				   ------------------------------------------------
+				   We want to capture "signal_name" here.
+				*/
+				if (( isType (prev, TOKEN_KEYWORD)
+				      && isSignalDirection(prev) ) ||
+				    ( isType (prev2, TOKEN_KEYWORD)
+				      && isSignalDirection(prev) ))
+					makeTag (token, st, FALSE, TAG_SIGNAL);
+			}
 			break;
 #if 0
 		case TOKEN_PACKAGE:
