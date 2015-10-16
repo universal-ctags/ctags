@@ -3137,7 +3137,6 @@ static void tagCheck (statementInfo *const st)
 				}
 			}
 			else if (isContextualStatement (st) ||
-					st->declaration == DECL_NAMESPACE ||
 					st->declaration == DECL_VERSION ||
 					st->declaration == DECL_PROGRAM)
 			{
