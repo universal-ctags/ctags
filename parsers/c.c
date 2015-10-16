@@ -2771,7 +2771,8 @@ static void processColon (statementInfo *const st)
 			}
 			else if (st->parent != NULL)
 			{
-				makeTag (prev, st, FALSE, TAG_LABEL);
+				if (prevToken (st->parent, 1)->keyword != KEYWORD_SWITCH)
+					makeTag (prev, st, FALSE, TAG_LABEL);
 				reinitStatement (st, FALSE);
 			}
 		}
