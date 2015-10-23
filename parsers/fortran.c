@@ -2420,7 +2420,6 @@ static void parseSubprogramFull (tokenInfo *const token, const tagType tag)
 	{
 		tokenInfo* name = newTokenFrom (token);
 		if (tag == TAG_SUBROUTINE ||
-			tag == TAG_SUBROUTINE ||
 			tag == TAG_PROTOTYPE)
 			name->signature = parseSignature (token);
 		makeFortranTag (name, tag);
