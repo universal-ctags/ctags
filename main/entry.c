@@ -1032,8 +1032,6 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 		slot->extensionFields.implementation = eStrdup (slot->extensionFields.implementation);
 	if (slot->extensionFields.inheritance)
 		slot->extensionFields.inheritance = eStrdup (slot->extensionFields.inheritance);
-	if (slot->extensionFields.scopeKind)
-		slot->extensionFields.scopeKind = slot->extensionFields.scopeKind;
 	if (slot->extensionFields.scopeName)
 		slot->extensionFields.scopeName = eStrdup (slot->extensionFields.scopeName);
 	if (slot->extensionFields.signature)
