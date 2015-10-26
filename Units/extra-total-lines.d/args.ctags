@@ -1,3 +1,4 @@
---extra=+.
+# `f' is optional
+# There was a bug that `.' was disabled when `f' was specified together.
+--extra=+.f
 --excmd=number
-
