@@ -34,3 +34,9 @@ pure virtual static task pure_virt_static_task (x);
 pure virtual protected task pure_virt_protected_task (x);
 
 pure virtual local task pure_virt_local_task (x);
+
+function automatic auto_function (x);
+endfunction : auto_function
+
+function static auto_static (x);
+endfunction : auto_static
