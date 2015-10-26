@@ -20,10 +20,12 @@
 #include "entry.h"
 #include "field.h"
 #include "options.h"
+#include "read.h"
 #include "routines.h"
 
 static const char *renderFieldName (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldSource (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldCompactSourceLine (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldSignature (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldScope (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldTyperef (const tagEntryInfo *const tag, vString* b);
@@ -56,6 +58,9 @@ static fieldDesc fieldDescs [] = {
 	DEFINE_BASIC_FIELD ('P', "pattern",  TRUE,
 			    "pattern(fixed field)",
 			    NULL),
+	DEFINE_FIELD ('C', "compact", FALSE,
+		      "compact source line(fixed field, only used in -x option)",
+		      renderFieldCompactSourceLine),
 
 	/* EXTENSION FIELDS */
 	DEFINE_FIELD ('a', "access",         FALSE,
@@ -265,6 +270,58 @@ extern const char* renderFieldEscaped (fieldDesc *fdesc,
 		vStringClear (fdesc->buffer);
 
 	return fdesc->renderEscaped (tag, fdesc->buffer);
+}
+
+/*  Writes "line", stripping leading and duplicate white space.
+ */
+static const char* renderCompactSourceLine (vString *b,  const char *const line)
+{
+	boolean lineStarted = FALSE;
+	const char *p;
+	int c;
+
+	/*  Write everything up to, but not including, the newline.
+	 */
+	for (p = line, c = *p  ;  c != NEWLINE  &&  c != '\0'  ;  c = *++p)
+	{
+		if (lineStarted  || ! isspace (c))  /* ignore leading spaces */
+		{
+			lineStarted = TRUE;
+			if (isspace (c))
+			{
+				int next;
+
+				/*  Consume repeating white space.
+				 */
+				while (next = *(p+1) , isspace (next)  &&  next != NEWLINE)
+					++p;
+				c = ' ';  /* force space character for any white space */
+			}
+			if (c != CRETURN  ||  *(p + 1) != NEWLINE)
+				vStringPut (b, c);
+		}
+	}
+	return vStringValue (b);
+}
+
+static const char *renderFieldCompactSourceLine (const tagEntryInfo *const tag,
+						 vString* b)
+{
+	const char *line;
+
+	line = readSourceLineAnyway (TagFile.vLine, tag, NULL);
+	if (line)
+		renderCompactSourceLine (b, line);
+	else
+	{
+		/* If no associated line for tag is found, we cannot prepare
+		 * parameter to writeCompactSourceLine(). In this case we
+		 * use an empty string as LINE.
+		 */
+		vStringClear (b);
+	}
+
+	return vStringValue (b);
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

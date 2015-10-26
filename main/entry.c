@@ -679,42 +679,6 @@ static int file_puts (const char* s, void *data)
 	return fputs (s, fp);
 }
 
-/*  Writes "line", stripping leading and duplicate white space.
- */
-static size_t writeCompactSourceLine (FILE *const fp, const char *const line)
-{
-	boolean lineStarted = FALSE;
-	size_t  length = 0;
-	const char *p;
-	int c;
-
-	/*  Write everything up to, but not including, the newline.
-	 */
-	for (p = line, c = *p  ;  c != NEWLINE  &&  c != '\0'  ;  c = *++p)
-	{
-		if (lineStarted  || ! isspace (c))  /* ignore leading spaces */
-		{
-			lineStarted = TRUE;
-			if (isspace (c))
-			{
-				int next;
-
-				/*  Consume repeating white space.
-				 */
-				while (next = *(p+1) , isspace (next)  &&  next != NEWLINE)
-					++p;
-				c = ' ';  /* force space character for any white space */
-			}
-			if (c != CRETURN  ||  *(p + 1) != NEWLINE)
-			{
-				putc (c, fp);
-				++length;
-			}
-		}
-	}
-	return length;
-}
-
 static boolean isPosSet(fpos_t pos)
 {
 	char * p = (char *)&pos;
@@ -726,7 +690,7 @@ static boolean isPosSet(fpos_t pos)
 	return r;
 }
 
-static char *readSourceLineAnyway (vString *const vLine, const tagEntryInfo *const tag,
+extern char *readSourceLineAnyway (vString *const vLine, const tagEntryInfo *const tag,
 				   long *const pSeekValue)
 {
 	char * line;
@@ -747,32 +711,23 @@ static const char* escapeName (const tagEntryInfo * tag, fieldType ftype)
 
 static int writeXrefEntry (const tagEntryInfo *const tag)
 {
-	const char *line;
 	int length;
 
 	if (tag->isFileEntry)
 		return 0;
 
-	line = readSourceLineAnyway (TagFile.vLine, tag, NULL);
-
 	if (Option.tagFileFormat == 1)
-		length = fprintf (TagFile.fp, "%-16s %4lu %-16s ",
+		length = fprintf (TagFile.fp, "%-16s %4lu %-16s %s\n",
 				  escapeName (tag, FIELD_NAME),
 				  tag->lineNumber,
-				  escapeName (tag, FIELD_SOURCE_FILE));
+				  escapeName (tag, FIELD_SOURCE_FILE),
+				  escapeName (tag, FIELD_COMPACT_SOURCE_LINE));
 	else
-		length = fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s ",
+		length = fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s %s\n",
 				  escapeName (tag, FIELD_NAME),
 				  tag->kind->name, tag->lineNumber,
-				  escapeName (tag, FIELD_SOURCE_FILE));
-
-	/* If no associated line for tag is found, we cannot prepare
-	 * parameter to writeCompactSourceLine(). In this case we
-	 * use an empty string as LINE.
-	 */
-	length += writeCompactSourceLine (TagFile.fp, line? line: "");
-	putc (NEWLINE, TagFile.fp);
-	++length;
+				  escapeName (tag, FIELD_SOURCE_FILE),
+				  escapeName (tag, FIELD_COMPACT_SOURCE_LINE));
 
 	return length;
 }
