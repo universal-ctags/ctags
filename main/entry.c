@@ -717,15 +717,16 @@ static int writeXrefEntry (const tagEntryInfo *const tag)
 		return 0;
 
 	if (Option.tagFileFormat == 1)
-		length = fprintf (TagFile.fp, "%-16s %4lu %-16s %s\n",
+		length = fprintf (TagFile.fp, "%-16s %4s %-16s %s\n",
 				  escapeName (tag, FIELD_NAME),
-				  tag->lineNumber,
+				  escapeName (tag, FIELD_LINE_NUMBER),
 				  escapeName (tag, FIELD_SOURCE_FILE),
 				  escapeName (tag, FIELD_COMPACT_SOURCE_LINE));
 	else
-		length = fprintf (TagFile.fp, "%-16s %-10s %4lu %-16s %s\n",
+		length = fprintf (TagFile.fp, "%-16s %-10s %4s %-16s %s\n",
 				  escapeName (tag, FIELD_NAME),
-				  tag->kind->name, tag->lineNumber,
+				  escapeName (tag, FIELD_KIND_LONG),
+				  escapeName (tag, FIELD_LINE_NUMBER),
 				  escapeName (tag, FIELD_SOURCE_FILE),
 				  escapeName (tag, FIELD_COMPACT_SOURCE_LINE));
 
@@ -851,7 +852,7 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 	if (getFieldDesc (FIELD_LANGUAGE)->enabled  &&  tag->language != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldDesc (FIELD_LANGUAGE)->name,
-				   tag->language);
+				   escapeName (tag, FIELD_LANGUAGE));
 
 	if (getFieldDesc (FIELD_SCOPE)->enabled)
 	{

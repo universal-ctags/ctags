@@ -30,6 +30,12 @@ static const char *renderFieldSignature (const tagEntryInfo *const tag, vString*
 static const char *renderFieldScope (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldTyperef (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldInherits (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldKindName (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldLineNumber (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldLanguage (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldAccess (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldKindLetter (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldImplementation (const tagEntryInfo *const tag, vString* b);
 
 #define DEFINE_FIELD_FULL(L,N, V, H, B, F) {			\
 		.enabled       = V,				\
@@ -46,6 +52,8 @@ static const char *renderFieldInherits (const tagEntryInfo *const tag, vString* 
 
 #define DEFINE_FIELD(L,N,V,H, F)		\
 	DEFINE_FIELD_FULL(L,N,V,H,FALSE, F)
+
+#define WITH_DEFUALT_VALUE(str) ((str)?(str):"-")
 
 static fieldDesc fieldDescs [] = {
         /* BASIC FIELDS */
@@ -65,7 +73,7 @@ static fieldDesc fieldDescs [] = {
 	/* EXTENSION FIELDS */
 	DEFINE_FIELD ('a', "access",         FALSE,
 		      "Access (or export) of class members",
-		      NULL),
+		      renderFieldAccess),
 	DEFINE_FIELD ('f', "file",           TRUE,
 		      "File-restricted scoping",
 		      NULL),
@@ -74,19 +82,19 @@ static fieldDesc fieldDescs [] = {
 		      renderFieldInherits),
 	DEFINE_FIELD ('K', NULL,             FALSE,
 		      "Kind of tag as full name",
-		      NULL),
+		      renderFieldKindName),
 	DEFINE_FIELD ('k', NULL,             TRUE,
 		      "Kind of tag as a single letter",
-		      NULL),
+		      renderFieldKindLetter),
 	DEFINE_FIELD ('l', "language",       FALSE,
 		      "Language of source file containing tag",
-		      NULL),
+		      renderFieldLanguage),
 	DEFINE_FIELD ('m', "implementation", FALSE,
 		      "Implementation information",
-		      NULL),
+		      renderFieldImplementation),
 	DEFINE_FIELD ('n', "line",           FALSE,
 		      "Line number of tag definition",
-		      NULL),
+		      renderFieldLineNumber),
 	DEFINE_FIELD ('S', "signature",	     FALSE,
 		      "Signature of routine (e.g. prototype or parameter list)",
 		      renderFieldSignature),
@@ -146,6 +154,11 @@ static char valueToXDigit (int v)
 		return 'A' + (v - 0xA);
 	else
 		return '0' + v;
+}
+
+static const char *renderAsIs (vString* b, const char *s)
+{
+	return s;
 }
 
 static const char *renderEscapedString (const char *s,
@@ -238,22 +251,24 @@ static const char *renderFieldSource (const tagEntryInfo *const tag, vString* b)
 
 static const char *renderFieldSignature (const tagEntryInfo *const tag, vString* b)
 {
-	return renderEscapedString (tag->extensionFields.signature, tag, b);
+	return renderEscapedString (WITH_DEFUALT_VALUE (tag->extensionFields.signature),
+				    tag, b);
 }
 
 static const char *renderFieldScope (const tagEntryInfo *const tag, vString* b)
 {
-	return renderEscapedName (tag->extensionFields.scopeName, tag, b);
+	return renderEscapedName (WITH_DEFUALT_VALUE(tag->extensionFields.scopeName), tag, b);
 }
 
 static const char *renderFieldInherits (const tagEntryInfo *const tag, vString* b)
 {
-	return renderEscapedName (tag->extensionFields.inheritance, tag, b);
+	return renderEscapedString (WITH_DEFUALT_VALUE (tag->extensionFields.inheritance),
+				    tag, b);
 }
 
 static const char *renderFieldTyperef (const tagEntryInfo *const tag, vString* b)
 {
-	return renderEscapedName (tag->extensionFields.typeRef [1], tag, b);
+	return renderEscapedName (WITH_DEFUALT_VALUE (tag->extensionFields.typeRef [1]), tag, b);
 }
 
 
@@ -304,6 +319,11 @@ static const char* renderCompactSourceLine (vString *b,  const char *const line)
 	return vStringValue (b);
 }
 
+static const char *renderFieldKindName (const tagEntryInfo *const tag, vString* b)
+{
+	return renderAsIs (b, tag->kind->name);
+}
+
 static const char *renderFieldCompactSourceLine (const tagEntryInfo *const tag,
 						 vString* b)
 {
@@ -322,6 +342,38 @@ static const char *renderFieldCompactSourceLine (const tagEntryInfo *const tag,
 	}
 
 	return vStringValue (b);
+}
+
+static const char *renderFieldLineNumber (const tagEntryInfo *const tag, vString* b)
+{
+	char buf[32] = {[0] = '\0'};
+	snprintf (buf, sizeof(buf), "%ld", tag->lineNumber);
+	vStringCatS (b, buf);
+	return vStringValue (b);
+}
+
+static const char *renderFieldLanguage (const tagEntryInfo *const tag, vString* b)
+{
+	return renderAsIs (b, WITH_DEFUALT_VALUE(tag->language));
+}
+
+static const char *renderFieldAccess (const tagEntryInfo *const tag, vString* b)
+{
+	return renderAsIs (b, WITH_DEFUALT_VALUE (tag->extensionFields.access));
+}
+
+static const char *renderFieldKindLetter (const tagEntryInfo *const tag, vString* b)
+{
+	static char c[2] = { [1] = '\0' };
+
+	c [0] = tag->kind->letter;
+
+	return renderAsIs (b, c);
+}
+
+static const char *renderFieldImplementation (const tagEntryInfo *const tag, vString* b)
+{
+	return renderAsIs (b, WITH_DEFUALT_VALUE (tag->extensionFields.implementation));
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */
