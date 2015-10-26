@@ -1600,7 +1600,7 @@ extern void makeFileTag (const char *const fileName)
 		tag.isFileEntry     = TRUE;
 		tag.lineNumberEntry = TRUE;
 
-		if (via_line_directive || Option.include.fileNames)
+		if (via_line_directive || (!Option.include.fileNamesWithTotalLines))
 		{
 			tag.lineNumber = 1;
 		}
