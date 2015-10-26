@@ -101,7 +101,7 @@ static fieldDesc fieldDescs [] = {
 		      "Signature of routine (e.g. prototype or parameter list)",
 		      renderFieldSignature),
 	DEFINE_FIELD ('s', NULL,             TRUE,
-		      "Scope of tag definition",
+		      "Scope of tag definition(WARNING: this doesn't work well as a format letter)",
 		      renderFieldScope),
 	DEFINE_FIELD ('t', "typeref",        TRUE,
 		      "Type and name of a variable or typedef",
@@ -133,10 +133,11 @@ extern fieldType getFieldTypeForOption (char letter)
 
 static void printField (fieldType i)
 {
-	printf("%c\t%s\t%s\t%s\n",
+	printf("%c\t%s\t%s\t%s\t%s\n",
 	       fieldDescs[i].letter,
 	       fieldDescs[i].name? fieldDescs[i].name: "NONE",
 	       fieldDescs[i].description? fieldDescs[i].description: "NONE",
+	       getFieldDesc (i)->renderEscaped? "format-char": "NONE",
 	       getFieldDesc (i)->enabled? "on": "off");
 }
 

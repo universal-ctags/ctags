@@ -118,6 +118,7 @@
     <ClCompile Include="..\main\field.c" />
     <ClCompile Include="..\main\flags.c" />
     <ClCompile Include="..\parsers\flex.c" />
+    <ClCompile Include="..\main\fmt.c" />
     <ClCompile Include="..\fnmatch\fnmatch.c" />
     <ClCompile Include="..\parsers\fortran.c" />
     <ClCompile Include="..\main\get.c" />
@@ -178,6 +179,7 @@
     <ClInclude Include="..\main\e_msoft.h" />
     <ClInclude Include="..\main\field.h" />
     <ClInclude Include="..\main\flags.h" />
+    <ClInclude Include="..\main\fmt.h" />
     <ClInclude Include="..\main\general.h" />
     <ClInclude Include="..\main\get.h" />
     <ClInclude Include="..\gnu_regex\regex.h" />

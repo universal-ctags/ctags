@@ -1,20 +1,20 @@
-N	name	tag name(fixed field)	on
-F	source	source file(fixed field)	on
-P	pattern	pattern(fixed field)	on
-C	compact	compact source line(fixed field, only used in -x option)	off
-a	access	Access (or export) of class members	off
-f	file	File-restricted scoping	on
-i	inherits	Inheritance information	off
-K	NONE	Kind of tag as full name	off
-k	NONE	Kind of tag as a single letter	on
-l	language	Language of source file containing tag	off
-m	implementation	Implementation information	off
-n	line	Line number of tag definition	off
-S	signature	Signature of routine (e.g. prototype or parameter list)	off
-s	NONE	Scope of tag definition	on
-t	typeref	Type and name of a variable or typedef	on
-z	kind	Include the "kind:" key in kind field(use k or K)	off
-Z	scope	Include the "scope:" key in scope field(use s)	off
+N	name	tag name(fixed field)	format-char	on
+F	source	source file(fixed field)	format-char	on
+P	pattern	pattern(fixed field)	format-char	on
+C	compact	compact source line(fixed field, only used in -x option)	format-char	off
+a	access	Access (or export) of class members	format-char	off
+f	file	File-restricted scoping	format-char	on
+i	inherits	Inheritance information	format-char	off
+K	NONE	Kind of tag as full name	format-char	off
+k	NONE	Kind of tag as a single letter	format-char	on
+l	language	Language of source file containing tag	format-char	off
+m	implementation	Implementation information	format-char	off
+n	line	Line number of tag definition	format-char	off
+S	signature	Signature of routine (e.g. prototype or parameter list)	format-char	off
+s	NONE	Scope of tag definition(WARNING: this doesn't work well as a format letter)	format-char	on
+t	typeref	Type and name of a variable or typedef	format-char	on
+z	kind	Include the "kind:" key in kind field(use k or K)	NONE	off
+Z	scope	Include the "scope:" key in scope field(use s)	NONE	off
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/
 x	input.java	/^    public int x;$/

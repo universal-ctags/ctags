@@ -145,6 +145,7 @@ optionValues Option = {
 	SO_SORTED,  /* -u, --sort */
 	FALSE,      /* -V */
 	FALSE,      /* -x */
+	.customXfmt = NULL,
 	NULL,       /* -L */
 	NULL,       /* -o */
 	NULL,       /* -h */
@@ -368,6 +369,10 @@ static optionDescription LongOptionDescription [] = {
  {1,"       If a kind is disabled, its \"disabled\" element is printed as \"off\"."},
  {1,"       If it is enabled, \"on\" is printed."},
  {1,"       For each line, associated language name is printed when \"all\" is specified as language."},
+ {1,"  --_xformat=field_format"},
+ {1,"       Specify custom format for tabular cross reference (-x)."},
+ {1,"       Fields can be specified with letter listed in --list-fields."},
+ {1,"       e.g. --_xformat=%10N %10l:%K @ %-20F:%-20n"},
  {1, NULL}
 };
 
@@ -1896,6 +1901,15 @@ static void processVersionOption (
 	exit (0);
 }
 
+static void processXformatOption (const char *const option __unused__,
+				  const char *const parameter)
+{
+	if (Option.customXfmt)
+		fmtDelete (Option.customXfmt);
+
+	Option.customXfmt = fmtNew (parameter);
+}
+
 static void resetPathList (searchPathList** pathList, const char *const varname)
 {
 	freeSearchPathList (pathList);
@@ -2051,6 +2065,7 @@ static parametricOption ParametricOptions [] = {
 	{ "version",                processVersionOption,           TRUE,   STAGE_ANY },
 	{ "_echo",                  processEchoOption,              FALSE,  STAGE_ANY },
 	{ "_force-quit",            processForceQuitOption,         FALSE,  STAGE_ANY },
+	{ "_xformat",                processXformatOption,           FALSE,  STAGE_ANY },
 };
 
 static booleanOption BooleanOptions [] = {

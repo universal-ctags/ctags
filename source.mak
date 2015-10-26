@@ -11,6 +11,7 @@ MAIN_HEADERS =				\
 	$(MAIN_DIR)/entry.h		\
 	$(MAIN_DIR)/field.h		\
 	$(MAIN_DIR)/flags.h		\
+	$(MAIN_DIR)/fmt.h		\
 	$(MAIN_DIR)/general.h		\
 	$(MAIN_DIR)/get.h		\
 	$(MAIN_DIR)/htable.h		\
@@ -92,6 +93,7 @@ MAIN_SOURCES =					\
 	$(MAIN_DIR)/entry.c			\
 	$(MAIN_DIR)/field.c			\
 	$(MAIN_DIR)/flags.c			\
+	$(MAIN_DIR)/fmt.c			\
 	$(MAIN_DIR)/get.c			\
 	$(MAIN_DIR)/htable.c			\
 	$(MAIN_DIR)/keyword.c			\
