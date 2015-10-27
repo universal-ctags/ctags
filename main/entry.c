@@ -609,7 +609,12 @@ extern void endEtagsFile (const char *const name)
  *  Tag entry management
  */
 
-static size_t appendSourceLine (void putc_func (char , void *), const char *const line, void * data, boolean *omitted)
+/*  This function copies the current line out to a specified file. It has no
+ *  effect on the fileGetc () function.  During copying, any '\' characters
+ *  are doubled and a leading '^' or trailing '$' is also quoted. End of line
+ *  characters (line feed or carriage return) are dropped.
+ */
+static size_t appendSourceLine (int putc_func (char , void *), const char *const line, void * data, boolean *omitted)
 {
 	size_t length = 0;
 	const char *p;
@@ -645,26 +650,32 @@ static size_t appendSourceLine (void putc_func (char , void *), const char *cons
 	return length;
 }
 
-static void vstring_putc (char c, void *data)
+static int vstring_putc (char c, void *data)
 {
 	vString *str = data;
 	vStringPut (str, c);
+	return 1;
 }
 
-static void file_putc (char c, void *data)
+static int vstring_puts (const char* s, void *data)
+{
+	vString *str = data;
+	int len = vStringLength (str);
+	vStringCatS (str, s);
+	return vStringLength (str) - len;
+}
+
+static int file_putc (char c, void *data)
 {
 	FILE *fp = data;
 	putc (c, fp);
+	return 1;
 }
 
-/*  This function copies the current line out to a specified file. It has no
- *  effect on the fileGetc () function.  During copying, any '\' characters
- *  are doubled and a leading '^' or trailing '$' is also quoted. End of line
- *  characters (line feed or carriage return) are dropped.
- */
-static size_t writeSourceLine (FILE *const fp, const char *const line, boolean *omitted)
+static int file_puts (const char* s, void *data)
 {
-	return appendSourceLine (file_putc, line, fp, omitted);
+	FILE *fp = data;
+	return fputs (s, fp);
 }
 
 /*  Writes "line", stripping leading and duplicate white space.
@@ -951,49 +962,48 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 #undef sep
 }
 
-static char* makePatternString (const tagEntryInfo *const tag)
+static int   makePatternStringCommon (const tagEntryInfo *const tag,
+				      int putc_func (char , void *),
+				      int puts_func (const char* , void *),
+				      void *output)
 {
-	char *const line = readSourceLine (TagFile.vLine, tag->filePosition, NULL);
-	const int searchChar = Option.backward ? '?' : '/';
-	boolean newlineTerminated;
-	vString* pattern;
-	boolean omitted;
+	int length = 0;
 
-	pattern = vStringNew ();
+	char *line;
+	int searchChar;
+	const char *terminator;
+	boolean  omitted;
+	size_t line_len;
+
+	line = readSourceLine (TagFile.vLine, tag->filePosition, NULL);
 	if (line == NULL)
 		error (FATAL, "bad tag in %s", vStringValue (File.name));
 	if (tag->truncateLine)
 		truncateTagLine (line, tag->name, FALSE);
-	newlineTerminated = (boolean) (line [strlen (line) - 1] == '\n');
 
-	vStringPut (pattern, searchChar);
-	vStringPut (pattern, '^');
-	appendSourceLine (vstring_putc, line, pattern, &omitted);
-	vStringCatS (pattern, (newlineTerminated && (!omitted)) ? "$":"");
-	vStringPut (pattern, searchChar);
+	line_len = strlen (line);
+	searchChar = Option.backward ? '?' : '/';
+	terminator = (boolean) (line [line_len - 1] == '\n') ? "$": "";
 
+	length += putc_func(searchChar, output);
+	length += putc_func('^', output);
+	length += appendSourceLine (putc_func, line, output, &omitted);
+	length += puts_func (omitted? "": terminator, output);
+	length += putc_func (searchChar, output);
+
+	return length;
+}
+
+static char* makePatternString (const tagEntryInfo *const tag)
+{
+	vString* pattern = vStringNew ();
+	makePatternStringCommon (tag, vstring_putc, vstring_puts, pattern);
 	return vStringDeleteUnwrap (pattern);
 }
 
 static int writePatternEntry (const tagEntryInfo *const tag)
 {
-	char *const line = readSourceLine (TagFile.vLine, tag->filePosition, NULL);
-	const int searchChar = Option.backward ? '?' : '/';
-	boolean newlineTerminated;
-	int length = 0;
-	boolean omitted;
-
-	if (line == NULL)
-		error (FATAL, "bad tag in %s", vStringValue (File.name));
-	if (tag->truncateLine)
-		truncateTagLine (line, tag->name, FALSE);
-	newlineTerminated = (boolean) (line [strlen (line) - 1] == '\n');
-
-	length += fprintf (TagFile.fp, "%c^", searchChar);
-	length += writeSourceLine (TagFile.fp, line, &omitted);
-	length += fprintf (TagFile.fp, "%s%c", (newlineTerminated && (!omitted)) ? "$":"", searchChar);
-
-	return length;
+	return makePatternStringCommon (tag, file_putc, file_puts, TagFile.fp);
 }
 
 static int writeLineNumberEntry (const tagEntryInfo *const tag)
