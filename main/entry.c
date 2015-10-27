@@ -609,13 +609,14 @@ extern void endEtagsFile (const char *const name)
  *  Tag entry management
  */
 
-static size_t appendSourceLine ( void putc_func (char , void *), const char *const line, void * data)
+static size_t appendSourceLine ( void putc_func (char , void *), const char *const line, void * data, boolean *omitted)
 {
 	size_t length = 0;
 	const char *p;
 
 	/*  Write everything up to, but not including, a line end character.
 	 */
+	*omitted = FALSE;
 	for (p = line  ;  *p != '\0'  ;  ++p)
 	{
 		const int next = *(p + 1);
@@ -624,6 +625,11 @@ static size_t appendSourceLine ( void putc_func (char , void *), const char *con
 		if (c == CRETURN  ||  c == NEWLINE)
 			break;
 
+		if (length >= Option.patternLengthLimit)
+		{
+			*omitted = TRUE;
+			break;
+		}
 		/*  If character is '\', or a terminal '$', then quote it.
 		 */
 		if (c == BACKSLASH  ||  c == (Option.backward ? '?' : '/')  ||
@@ -635,6 +641,7 @@ static size_t appendSourceLine ( void putc_func (char , void *), const char *con
 		putc_func (c, data);
 		++length;
 	}
+
 	return length;
 }
 
@@ -655,9 +662,9 @@ static void file_putc (char c, void *data)
  *  are doubled and a leading '^' or trailing '$' is also quoted. End of line
  *  characters (line feed or carriage return) are dropped.
  */
-static size_t writeSourceLine (FILE *const fp, const char *const line)
+static size_t writeSourceLine (FILE *const fp, const char *const line, boolean *omitted)
 {
-	return appendSourceLine (file_putc, line, fp);
+	return appendSourceLine (file_putc, line, fp, omitted);
 }
 
 /*  Writes "line", stripping leading and duplicate white space.
@@ -950,6 +957,7 @@ static char* makePatternString (const tagEntryInfo *const tag)
 	const int searchChar = Option.backward ? '?' : '/';
 	boolean newlineTerminated;
 	vString* pattern;
+	boolean omitted;
 
 	pattern = vStringNew ();
 	if (line == NULL)
@@ -960,8 +968,8 @@ static char* makePatternString (const tagEntryInfo *const tag)
 
 	vStringPut (pattern, searchChar);
 	vStringPut (pattern, '^');
-	appendSourceLine (vstring_putc, line, pattern);
-	vStringCatS (pattern, newlineTerminated ? "$":"");
+	appendSourceLine (vstring_putc, line, pattern, &omitted);
+	vStringCatS (pattern, (newlineTerminated && (!omitted)) ? "$":"");
 	vStringPut (pattern, searchChar);
 
 	return vStringDeleteUnwrap (pattern);
@@ -973,6 +981,7 @@ static int writePatternEntry (const tagEntryInfo *const tag)
 	const int searchChar = Option.backward ? '?' : '/';
 	boolean newlineTerminated;
 	int length = 0;
+	boolean omitted;
 
 	if (line == NULL)
 		error (FATAL, "bad tag in %s", vStringValue (File.name));
@@ -981,8 +990,8 @@ static int writePatternEntry (const tagEntryInfo *const tag)
 	newlineTerminated = (boolean) (line [strlen (line) - 1] == '\n');
 
 	length += fprintf (TagFile.fp, "%c^", searchChar);
-	length += writeSourceLine (TagFile.fp, line);
-	length += fprintf (TagFile.fp, "%s%c", newlineTerminated ? "$":"", searchChar);
+	length += writeSourceLine (TagFile.fp, line, &omitted);
+	length += fprintf (TagFile.fp, "%s%c", (newlineTerminated && (!omitted)) ? "$":"", searchChar);
 
 	return length;
 }

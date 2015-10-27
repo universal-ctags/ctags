@@ -169,6 +169,7 @@ optionValues Option = {
 	FALSE,	    /* --quiet */
 	FALSE,	    /* --_allow-xcmd-in-homedir */
 	FALSE,	    /* --_fatal-warnings */
+	.patternLengthLimit = 96,
 #ifdef DEBUG
 	0, 0        /* -D, -b */
 #endif

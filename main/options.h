@@ -103,6 +103,7 @@ typedef struct sOptionValues {
 	boolean quiet;		      /* --quiet */
 	boolean allowXcmdInHomeDir;     /* --_allow-xcmd-in-homedir */
 	boolean fatalWarnings;	/* --_fatal-warnings */
+	unsigned int patternLengthLimit; /* Not implemented yet: --patern-length-limit=N */
 #ifdef DEBUG
 	long debugLevel;        /* -D  debugging output */
 	unsigned long breakLine;/* -b  source line at which to call lineBreak() */

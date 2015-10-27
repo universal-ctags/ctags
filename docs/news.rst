@@ -151,3 +151,12 @@ To enable the option, libiconv is needed in your platform. In addition
 On windows mingw32, you must specify ``WITH_ICONV=yes`` like below::
 
 	C:\dev\ctags>mingw32-make -f mk_mingw.mak WITH_ICONV=yes
+
+Omitting the pattern for too long input line
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+No to make too large tags file, a pattern filed of tags file is omitted
+when its size goes beyond 96 bytes.
+
+An input source file with single long line causes too large tags file.
+Such input files are popular in javascript: tools for size optimizing
+generate them.
