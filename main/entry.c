@@ -609,7 +609,7 @@ extern void endEtagsFile (const char *const name)
  *  Tag entry management
  */
 
-static size_t appendSourceLine ( void putc_func (char , void *), const char *const line, void * data, boolean *omitted)
+static size_t appendSourceLine (void putc_func (char , void *), const char *const line, void * data, boolean *omitted)
 {
 	size_t length = 0;
 	const char *p;
