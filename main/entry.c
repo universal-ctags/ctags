@@ -88,7 +88,8 @@ tagFile TagFile = {
 	    .queue = NULL,
 	    .length = 0,
 	    .count  = 0
-    }
+    },
+    .patternCacheValid = FALSE,
 };
 
 static boolean TagsToStdout = FALSE;
@@ -975,6 +976,17 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 	boolean  omitted;
 	size_t line_len;
 
+	boolean making_cache = FALSE;
+	int (* puts_o_func)(const char* , void *);
+	void * o_output;
+
+	static vString *cached_pattern;
+	static fpos_t   cached_location;
+	if (TagFile.patternCacheValid
+	    && (! tag->truncateLine)
+	    && (memcmp (&tag->filePosition, &cached_location, sizeof(fpos_t)) == 0))
+		return puts_func (vStringValue (cached_pattern), output);
+
 	line = readSourceLine (TagFile.vLine, tag->filePosition, NULL);
 	if (line == NULL)
 		error (FATAL, "bad tag in %s", vStringValue (File.name));
@@ -985,11 +997,33 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 	searchChar = Option.backward ? '?' : '/';
 	terminator = (boolean) (line [line_len - 1] == '\n') ? "$": "";
 
+	if (!tag->truncateLine)
+	{
+		making_cache = TRUE;
+		if (cached_pattern == NULL)
+			cached_pattern = vStringNew();
+		else
+			vStringClear (cached_pattern);
+
+		puts_o_func = puts_func;
+		o_output    = output;
+		putc_func   = vstring_putc;
+		puts_func   = vstring_puts;
+		output      = cached_pattern;
+	}
+
 	length += putc_func(searchChar, output);
 	length += putc_func('^', output);
 	length += appendSourceLine (putc_func, line, output, &omitted);
 	length += puts_func (omitted? "": terminator, output);
 	length += putc_func (searchChar, output);
+
+	if (making_cache)
+	{
+		puts_o_func (vStringValue (cached_pattern), o_output);
+		cached_location = tag->filePosition;
+		TagFile.patternCacheValid = TRUE;
+	}
 
 	return length;
 }

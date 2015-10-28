@@ -50,6 +50,8 @@ typedef struct eTagFile {
 		unsigned int length;
 		unsigned int count;
 	} corkQueue;
+
+	boolean patternCacheValid;
 } tagFile;
 
 typedef struct sTagFields {

@@ -259,6 +259,10 @@ extern boolean fileOpen (const char *const fileName, const langType language)
 		File.fp = NULL;
 	}
 
+	/* File postion is used as key for checking the availability of
+	   pattern cache in entry.h. If an input file is changed, the
+	   key is meaningless. So notifying the changing here. */
+	TagFile.patternCacheValid = FALSE;
 	File.fp = fopen (fileName, openMode);
 	if (File.fp == NULL)
 		error (WARNING | PERROR, "cannot open \"%s\"", fileName);
