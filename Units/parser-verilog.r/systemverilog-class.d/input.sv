@@ -43,3 +43,15 @@ endclass : paramtest3
 
 function test paramtest3::ext_func (c, d);
 endfunction
+
+class test_attributes;
+  static logic          static_logic;
+  protected logic       protected_logic;
+  local logic           local_logic;
+  const static logic    const_static_logic;
+  const protected logic const_protected_logic;
+  const local logic     const_local_logic;
+  rand logic            rand_logic;
+  randc logic           randc_logic;
+  const logic           const_logic;
+endclass : test_attributes
