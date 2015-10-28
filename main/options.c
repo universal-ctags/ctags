@@ -605,7 +605,7 @@ extern boolean filesRequired (void)
 extern void checkOptions (void)
 {
 	const char* notice;
-	if (Option.xref)
+	if (Option.xref && (Option.customXfmt == NULL))
 	{
 		notice = "xref output";
 		if (Option.include.fileNames || Option.include.fileNamesWithTotalLines)
