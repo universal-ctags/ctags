@@ -36,6 +36,7 @@ static const char *renderFieldLanguage (const tagEntryInfo *const tag, vString* 
 static const char *renderFieldAccess (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldKindLetter (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldImplementation (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldFile (const tagEntryInfo *const tag, vString* b);
 
 #define DEFINE_FIELD_FULL(L,N, V, H, B, F) {			\
 		.enabled       = V,				\
@@ -76,7 +77,7 @@ static fieldDesc fieldDescs [] = {
 		      renderFieldAccess),
 	DEFINE_FIELD ('f', "file",           TRUE,
 		      "File-restricted scoping",
-		      NULL),
+		      renderFieldFile),
 	DEFINE_FIELD ('i', "inherits",       FALSE,
 		      "Inheritance information",
 		      renderFieldInherits),
@@ -374,6 +375,11 @@ static const char *renderFieldKindLetter (const tagEntryInfo *const tag, vString
 static const char *renderFieldImplementation (const tagEntryInfo *const tag, vString* b)
 {
 	return renderAsIs (b, WITH_DEFUALT_VALUE (tag->extensionFields.implementation));
+}
+
+static const char *renderFieldFile (const tagEntryInfo *const tag, vString* b)
+{
+	return renderAsIs (b, tag->isFileScope? "file": "-");
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */
