@@ -984,7 +984,7 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 	return length;
 }
 
-static char* makePatternString (const tagEntryInfo *const tag)
+extern char* makePatternString (const tagEntryInfo *const tag)
 {
 	vString* pattern = vStringNew ();
 	makePatternStringCommon (tag, vstring_putc, vstring_puts, pattern);

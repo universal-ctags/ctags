@@ -131,6 +131,9 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 extern char *readSourceLineAnyway (vString *const vLine, const tagEntryInfo *const tag,
 				   long *const pSeekValue);
 
+/* Generating pattern associated tag, caller must do eFree for the returned value. */
+extern char* makePatternString (const tagEntryInfo *const tag);
+
 
 /* language is optional: can be NULL. */
 extern void writePseudoTag (const char *const tagName,

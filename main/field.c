@@ -37,6 +37,7 @@ static const char *renderFieldAccess (const tagEntryInfo *const tag, vString* b)
 static const char *renderFieldKindLetter (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldImplementation (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldFile (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldPattern (const tagEntryInfo *const tag, vString* b);
 
 #define DEFINE_FIELD_FULL(L,N, V, H, B, F) {			\
 		.enabled       = V,				\
@@ -66,7 +67,7 @@ static fieldDesc fieldDescs [] = {
 			    renderFieldSource),
 	DEFINE_BASIC_FIELD ('P', "pattern",  TRUE,
 			    "pattern(fixed field)",
-			    NULL),
+			    renderFieldPattern),
 	DEFINE_FIELD ('C', "compact", FALSE,
 		      "compact source line(fixed field, only used in -x option)",
 		      renderFieldCompactSourceLine),
@@ -380,6 +381,14 @@ static const char *renderFieldImplementation (const tagEntryInfo *const tag, vSt
 static const char *renderFieldFile (const tagEntryInfo *const tag, vString* b)
 {
 	return renderAsIs (b, tag->isFileScope? "file": "-");
+}
+
+static const char *renderFieldPattern (const tagEntryInfo *const tag, vString* b)
+{
+	char* tmp = makePatternString (tag);
+	vStringCatS (b, tmp);
+	eFree (tmp);
+	return vStringValue (b);
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */
