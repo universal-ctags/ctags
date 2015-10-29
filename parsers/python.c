@@ -117,8 +117,16 @@ static void makeFunctionTag (vString *const function,
 {
 	tagEntryInfo tag;
 
-	if (! PythonKinds[K_FUNCTION].enabled)
-		return;
+	if (is_class_parent)
+	{
+		if (!PythonKinds[K_MEMBER].enabled)
+			return;
+	}
+	else
+	{
+		if (!PythonKinds[K_FUNCTION].enabled)
+			return;
+	}
 
 	initTagEntry (&tag, vStringValue (function), &(PythonKinds[K_FUNCTION]));
 
