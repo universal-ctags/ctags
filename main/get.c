@@ -335,7 +335,8 @@ static boolean popConditional (void)
 	return isIgnore ();
 }
 
-static void makeDefineTag (const char *const name, boolean undef)
+
+static void makeDefineTag (const char *const name, const char* const signature, boolean undef)
 {
 	const boolean isFileScope = (boolean) (! isInputHeaderFile ());
 
@@ -360,6 +361,7 @@ static void makeDefineTag (const char *const name, boolean undef)
 		e.lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
 		e.isFileScope  = isFileScope;
 		e.truncateLine = TRUE;
+		e.extensionFields.signature = signature;
 		makeTagEntry (&e);
 	}
 }
@@ -380,14 +382,44 @@ static void makeIncludeTag (const  char *const name, boolean systemHeader)
 	}
 }
 
+static vString *signature;
 static void directiveDefine (const int c, boolean undef)
 {
 	if (isident1 (c))
 	{
 		readIdentifier (c, Cpp.directive.name);
 		if (! isIgnore ())
-			makeDefineTag (vStringValue (Cpp.directive.name),
-				       undef);
+		{
+			int p;
+
+			p = getcFromInputFile ();
+			if (p == '(')
+			{
+				if (! signature)
+					signature = vStringNew ();
+				else
+					vStringClear (signature);
+				do {
+					if (!isspacetab(p))
+						vStringPut (signature, p);
+					/* TODO: Macro parameters can be captured here. */
+					p = getcFromInputFile ();
+				} while (p != ')' && p != EOF);
+
+				if (p == ')')
+				{
+					vStringPut (signature, p);
+					makeDefineTag (vStringValue (Cpp.directive.name), vStringValue (signature), undef);
+				}
+				else
+					makeDefineTag (vStringValue (Cpp.directive.name), NULL, undef);
+			}
+			else
+			{
+				ungetcToInputFile (p);
+				makeDefineTag (vStringValue (Cpp.directive.name), NULL, undef);
+			}
+		}
 	}
 	Cpp.directive.state = DRCTV_NONE;
 }
@@ -419,7 +451,7 @@ static void directivePragma (int c)
 			if (isident1 (c))
 			{
 				readIdentifier (c, Cpp.directive.name);
-				makeDefineTag (vStringValue (Cpp.directive.name), FALSE);
+				makeDefineTag (vStringValue (Cpp.directive.name), NULL, FALSE);
 			}
 		}
 	}
