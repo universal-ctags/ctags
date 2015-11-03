@@ -38,8 +38,8 @@ static kindOption PythonKinds[] = {
 	{TRUE, 'c', "class",    "classes"},
 	{TRUE, 'f', "function", "functions"},
 	{TRUE, 'm', "member",   "class members"},
-    {TRUE, 'v', "variable", "variables"},
-    {TRUE, 'i', "namespace", "imports"}
+	{TRUE, 'v', "variable", "variables"},
+	{TRUE, 'i', "namespace", "imports"}
 };
 
 typedef enum {
