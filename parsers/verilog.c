@@ -740,7 +740,7 @@ static void processPortList (int c)
 
 		deleteToken (token);
 	}
-	else
+	else if (c != EOF)
 	{
 		vUngetc (c);
 	}
