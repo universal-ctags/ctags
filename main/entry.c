@@ -929,6 +929,10 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldDesc (FIELD_SIGNATURE)->name,
 				   escapeName (tag, FIELD_SIGNATURE));
+	if (getFieldDesc (FIELD_ROLE)->enabled && tag->extensionFields.role)
+		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
+				   getFieldDesc (FIELD_ROLE)->name,
+				   escapeName (tag, FIELD_ROLE));
 
 	return length;
 #undef sep
