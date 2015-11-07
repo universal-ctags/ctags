@@ -10,6 +10,8 @@ ctags in limited resources.
 `Semi fuzz(Fuzz) testing <semifuzz.rst>`_
 
 `Noise testing <noise.rst>`_
+
+`Chop testing <chop.rst>`_
 	     
 `Tmain: a facility for testing main part <tmain.rst>`_
 

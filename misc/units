@@ -87,6 +87,8 @@ Usage:
 
 	$(help_tmain)
 
+	$(help_chop)
+
 	$(help_clean_tmain)
 EOF
 }
@@ -2017,6 +2019,161 @@ EOF
 
 }
 
+help_chop ()
+{
+cat <<EOF
+$0 noise [OPTIONS] UNITS-DIR
+	   OPTIONS:
+		--ctags CTAGS: ctags exectuable file for testing
+		--datadir DATADIR: data directory
+		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
+		--libexecdir LIBEXECDIR: libexec directory
+		--quiet: don't print dots as passed test cases.
+		--with-timeout DURATION: run a test case under timeout
+					 command with SECOND.
+					 0 means no timeout.
+					 default is 1.
+		--with-valgrind: run a test case under valgrind
+			       If this option given, DURATION is changed to
+			       DURATION := DURATION * ${_VG_TIMEOUT_FACTOR}
+EOF
+}
+
+action_chop ()
+{
+    action_fuzz_common chop_lang "$@"
+}
+
+chop_lang ()
+{
+    local lang="$1"
+    local dir="$2"
+    shift 2
+    local f
+    local r
+    printf '%-60s\n' "Fuzzing by chopping input (${lang})"
+    line '-'
+
+    r=0
+    for f in $(find "${dir}" -type f -name 'input.*'); do
+	if ! chop_lang_file "${lang}" "${f}"; then
+	    r=1
+	    break
+	fi
+    done
+    echo
+    return $r
+}
+
+chop_lang_file ()
+{
+    local lang="$1"
+    local input="$2"
+    shift 2
+
+    local r
+    local cmdline
+    local cmdline_for_shirking
+    local len=$(stat -c %s "${input}")
+
+    local guessed_lang
+    guessed_lang=$( ${_CMDLINE_FOR_SHRINKING} --print-language "${input}" 2>/dev/null | sed -n 's/^.*: //p')
+    if [ "${lang}" !=  "${guessed_lang}" ]; then
+	return 0
+    fi
+
+    i=0
+    echo "Testing cases derived from: ${input}"
+    line '.' --no-newline
+
+    r=0
+    while [ "$i" -lt "$len" ]; do
+	if chop_lang_file_chopspec "${input}" "${len}" "$i" "${lang}"; then
+	    i=$(( i + 1 ))
+	else
+	    r=1
+	    break
+	fi
+    done
+    echo
+    return $r
+}
+
+chop()
+{
+    local input=$1
+    local pos=$2
+
+    dd if=$input bs=1 count=$pos
+}
+
+chop_lang_file_chopspec()
+{
+    local input="$1"
+    local len="$2"
+    local pos="$3"
+    local lang="$4"
+    shift 4
+
+    local dir="${input%/*}"
+    local ochopped=$(printf "%s/CHOP-INPUT-%s.tmp" "${dir}" "$pos")
+    local ocmdline=$(printf "%s/CHOP-CMDLINE-%s.tmp" "${dir}" "$pos")
+    local ovalgrind=$(printf "%s/CHOP-VALGRIND-%s.tmp" "${dir}" "$pos")
+    local oshrink=$(printf "%s/CHOP-SHRINK-%s.tmp" "${dir}" "$pos")
+
+    local cmdline
+    local cmdline_for_shirking
+    local progress_offset
+    local r
+
+    rm -f "${ocmdline}" "${ovalgrind}" "${ochopped}" "${oshrink}"
+
+    if [ "${WITH_VALGRIND}" = 'yes' ]; then
+	cmdline=$( printf "${_CMDLINE} --language-force=${lang} ${ochopped}" "${ovalgrind}" )
+    else
+	cmdline="${_CMDLINE} --language-force=${lang} ${ochopped}"
+    fi
+    cmdline_for_shirking="${_CMDLINE_FOR_SHRINKING} --language-force=${lang} %s"
+
+    chop "${input}" "${pos}" > "$ochopped"  2> /dev/null
+
+    progress_offset=$(( pos % _NOISE_REPORT_MAX_COLUMN ))
+    if [ "${progress_offset}" -eq 0 ]; then
+	[ $pos -gt 0 ] && printf " %d/%d" "$pos" "${len}"
+	echo
+    fi
+
+    echo "${cmdline}" > "${ocmdline}"
+    ( exec 2>&-; ${cmdline} 2> /dev/null > /dev/null )
+    r=$?
+    case $r in
+	0)
+	    printf 'o'
+	    noise_report_line "${pos}" "${len}" "${r}" ""
+	    rm "${ochopped}"
+	    rm -f "${ovalgrind}" "${ocmdline}"
+	    ;;
+	${_TIMEOUT_EXIT})
+	    printf "T"
+	    noise_report_line "${pos}" "${len}" "${r}" ""
+	    printf '\n%-20s\n' "[timeout $lang]" "$ochopped"
+	    [ "${RUN_SHRINK}" = 'yes' ] && fuzz_shrink "${cmdline_for_shirking}" "${ochopped}" "${oshrink}" "${lang}"
+	    ;;
+	${_VALGRIND_EXIT})
+	    printf "V"
+	    noise_report_line "${pos}" "${len}" "${r}" ""
+	    printf '\n%-20s %s\n' "[valgrind-error $lang]" "$ochopped"
+	    ;;
+	*)
+	    printf "!"
+	    noise_report_line "${pos}" "${len}" "${r}" ""
+	    printf '\n%-20s %s\n' "[unexpected-status($r) $lang]" "$ochopped"
+	    [ "${RUN_SHRINK}" = 'yes' ] && fuzz_shrink "${cmdline_for_shirking}" "${ochopped}" "${oshrink}" "${lang}"
+	    ;;
+    esac
+    return $r
+}
+
 # * Avoid issues between sed and the locale settings by overriding it using
 #   LC_ALL, which takes precedence over all other locale configurations:
 #   https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
@@ -2071,6 +2228,10 @@ main ()
 	    ;;
 	shrink)
 	    action_shrink "$@"
+	    return $?
+	    ;;
+	chop)
+	    action_chop "$@"
 	    return $?
 	    ;;
 	*)
