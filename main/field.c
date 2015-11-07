@@ -20,14 +20,24 @@
 #include "entry.h"
 #include "field.h"
 #include "options.h"
+#include "read.h"
 #include "routines.h"
 
 static const char *renderFieldName (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldSource (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldCompactSourceLine (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldSignature (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldScope (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldTyperef (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldInherits (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldKindName (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldLineNumber (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldLanguage (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldAccess (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldKindLetter (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldImplementation (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldFile (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldPattern (const tagEntryInfo *const tag, vString* b);
 
 #define DEFINE_FIELD_FULL(L,N, V, H, B, F) {			\
 		.enabled       = V,				\
@@ -45,6 +55,8 @@ static const char *renderFieldInherits (const tagEntryInfo *const tag, vString* 
 #define DEFINE_FIELD(L,N,V,H, F)		\
 	DEFINE_FIELD_FULL(L,N,V,H,FALSE, F)
 
+#define WITH_DEFUALT_VALUE(str) ((str)?(str):"-")
+
 static fieldDesc fieldDescs [] = {
         /* BASIC FIELDS */
 	DEFINE_BASIC_FIELD ('N', "name",     TRUE,
@@ -55,38 +67,41 @@ static fieldDesc fieldDescs [] = {
 			    renderFieldSource),
 	DEFINE_BASIC_FIELD ('P', "pattern",  TRUE,
 			    "pattern(fixed field)",
-			    NULL),
+			    renderFieldPattern),
+	DEFINE_FIELD ('C', "compact", FALSE,
+		      "compact source line(fixed field, only used in -x option)",
+		      renderFieldCompactSourceLine),
 
 	/* EXTENSION FIELDS */
 	DEFINE_FIELD ('a', "access",         FALSE,
 		      "Access (or export) of class members",
-		      NULL),
+		      renderFieldAccess),
 	DEFINE_FIELD ('f', "file",           TRUE,
 		      "File-restricted scoping",
-		      NULL),
+		      renderFieldFile),
 	DEFINE_FIELD ('i', "inherits",       FALSE,
 		      "Inheritance information",
 		      renderFieldInherits),
 	DEFINE_FIELD ('K', NULL,             FALSE,
 		      "Kind of tag as full name",
-		      NULL),
+		      renderFieldKindName),
 	DEFINE_FIELD ('k', NULL,             TRUE,
 		      "Kind of tag as a single letter",
-		      NULL),
+		      renderFieldKindLetter),
 	DEFINE_FIELD ('l', "language",       FALSE,
 		      "Language of source file containing tag",
-		      NULL),
+		      renderFieldLanguage),
 	DEFINE_FIELD ('m', "implementation", FALSE,
 		      "Implementation information",
-		      NULL),
+		      renderFieldImplementation),
 	DEFINE_FIELD ('n', "line",           FALSE,
 		      "Line number of tag definition",
-		      NULL),
+		      renderFieldLineNumber),
 	DEFINE_FIELD ('S', "signature",	     FALSE,
 		      "Signature of routine (e.g. prototype or parameter list)",
 		      renderFieldSignature),
 	DEFINE_FIELD ('s', NULL,             TRUE,
-		      "Scope of tag definition",
+		      "Scope of tag definition(WARNING: this doesn't work well as a format letter)",
 		      renderFieldScope),
 	DEFINE_FIELD ('t', "typeref",        TRUE,
 		      "Type and name of a variable or typedef",
@@ -118,10 +133,11 @@ extern fieldType getFieldTypeForOption (char letter)
 
 static void printField (fieldType i)
 {
-	printf("%c\t%s\t%s\t%s\n",
+	printf("%c\t%s\t%s\t%s\t%s\n",
 	       fieldDescs[i].letter,
 	       fieldDescs[i].name? fieldDescs[i].name: "NONE",
 	       fieldDescs[i].description? fieldDescs[i].description: "NONE",
+	       getFieldDesc (i)->renderEscaped? "format-char": "NONE",
 	       getFieldDesc (i)->enabled? "on": "off");
 }
 
@@ -141,6 +157,11 @@ static char valueToXDigit (int v)
 		return 'A' + (v - 0xA);
 	else
 		return '0' + v;
+}
+
+static const char *renderAsIs (vString* b, const char *s)
+{
+	return s;
 }
 
 static const char *renderEscapedString (const char *s,
@@ -233,22 +254,24 @@ static const char *renderFieldSource (const tagEntryInfo *const tag, vString* b)
 
 static const char *renderFieldSignature (const tagEntryInfo *const tag, vString* b)
 {
-	return renderEscapedString (tag->extensionFields.signature, tag, b);
+	return renderEscapedString (WITH_DEFUALT_VALUE (tag->extensionFields.signature),
+				    tag, b);
 }
 
 static const char *renderFieldScope (const tagEntryInfo *const tag, vString* b)
 {
-	return renderEscapedName (tag->extensionFields.scopeName, tag, b);
+	return renderEscapedName (WITH_DEFUALT_VALUE(tag->extensionFields.scopeName), tag, b);
 }
 
 static const char *renderFieldInherits (const tagEntryInfo *const tag, vString* b)
 {
-	return renderEscapedName (tag->extensionFields.inheritance, tag, b);
+	return renderEscapedString (WITH_DEFUALT_VALUE (tag->extensionFields.inheritance),
+				    tag, b);
 }
 
 static const char *renderFieldTyperef (const tagEntryInfo *const tag, vString* b)
 {
-	return renderEscapedName (tag->extensionFields.typeRef [1], tag, b);
+	return renderEscapedName (WITH_DEFUALT_VALUE (tag->extensionFields.typeRef [1]), tag, b);
 }
 
 
@@ -265,6 +288,108 @@ extern const char* renderFieldEscaped (fieldDesc *fdesc,
 		vStringClear (fdesc->buffer);
 
 	return fdesc->renderEscaped (tag, fdesc->buffer);
+}
+
+/*  Writes "line", stripping leading and duplicate white space.
+ */
+static const char* renderCompactSourceLine (vString *b,  const char *const line)
+{
+	boolean lineStarted = FALSE;
+	const char *p;
+	int c;
+
+	/*  Write everything up to, but not including, the newline.
+	 */
+	for (p = line, c = *p  ;  c != NEWLINE  &&  c != '\0'  ;  c = *++p)
+	{
+		if (lineStarted  || ! isspace (c))  /* ignore leading spaces */
+		{
+			lineStarted = TRUE;
+			if (isspace (c))
+			{
+				int next;
+
+				/*  Consume repeating white space.
+				 */
+				while (next = *(p+1) , isspace (next)  &&  next != NEWLINE)
+					++p;
+				c = ' ';  /* force space character for any white space */
+			}
+			if (c != CRETURN  ||  *(p + 1) != NEWLINE)
+				vStringPut (b, c);
+		}
+	}
+	return vStringValue (b);
+}
+
+static const char *renderFieldKindName (const tagEntryInfo *const tag, vString* b)
+{
+	return renderAsIs (b, tag->kind->name);
+}
+
+static const char *renderFieldCompactSourceLine (const tagEntryInfo *const tag,
+						 vString* b)
+{
+	const char *line;
+
+	line = readSourceLineAnyway (TagFile.vLine, tag, NULL);
+	if (line)
+		renderCompactSourceLine (b, line);
+	else
+	{
+		/* If no associated line for tag is found, we cannot prepare
+		 * parameter to writeCompactSourceLine(). In this case we
+		 * use an empty string as LINE.
+		 */
+		vStringClear (b);
+	}
+
+	return vStringValue (b);
+}
+
+static const char *renderFieldLineNumber (const tagEntryInfo *const tag, vString* b)
+{
+	char buf[32] = {[0] = '\0'};
+	snprintf (buf, sizeof(buf), "%ld", tag->lineNumber);
+	vStringCatS (b, buf);
+	return vStringValue (b);
+}
+
+static const char *renderFieldLanguage (const tagEntryInfo *const tag, vString* b)
+{
+	return renderAsIs (b, WITH_DEFUALT_VALUE(tag->language));
+}
+
+static const char *renderFieldAccess (const tagEntryInfo *const tag, vString* b)
+{
+	return renderAsIs (b, WITH_DEFUALT_VALUE (tag->extensionFields.access));
+}
+
+static const char *renderFieldKindLetter (const tagEntryInfo *const tag, vString* b)
+{
+	static char c[2] = { [1] = '\0' };
+
+	c [0] = tag->kind->letter;
+
+	return renderAsIs (b, c);
+}
+
+static const char *renderFieldImplementation (const tagEntryInfo *const tag, vString* b)
+{
+	return renderAsIs (b, WITH_DEFUALT_VALUE (tag->extensionFields.implementation));
+}
+
+static const char *renderFieldFile (const tagEntryInfo *const tag, vString* b)
+{
+	return renderAsIs (b, tag->isFileScope? "file": "-");
+}
+
+static const char *renderFieldPattern (const tagEntryInfo *const tag, vString* b)
+{
+	char* tmp = makePatternString (tag);
+	vStringCatS (b, tmp);
+	eFree (tmp);
+	return vStringValue (b);
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

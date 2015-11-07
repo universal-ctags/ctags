@@ -24,6 +24,7 @@
 
 #include "args.h"
 #include "field.h"
+#include "fmt.h"
 #include "parse.h"
 #include "strlist.h"
 #include "vstring.h"
@@ -79,6 +80,7 @@ typedef struct sOptionValues {
 	sortType sorted;        /* -u,--sort  sort tags */
 	boolean verbose;        /* -V  verbose */
 	boolean xref;           /* -x  generate xref output instead */
+	fmtElement *customXfmt;	/* compiled code for --xformat=XFMT */
 	char *fileList;         /* -L  name of file containing names of files */
 	char *tagFileName;      /* -o  name of tags file */
 	stringList* headerExt;  /* -h  header extensions */

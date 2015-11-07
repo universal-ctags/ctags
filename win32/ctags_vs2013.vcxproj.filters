@@ -183,6 +183,9 @@
     <ClCompile Include="..\main\flags.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\fmt.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\fnmatch\fnmatch.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -255,6 +258,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\flags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\fmt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\get.h">
