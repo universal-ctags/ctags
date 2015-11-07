@@ -1657,7 +1657,7 @@ noise_lang_file ()
 	done
     done
     echo
-    return 0;
+    return 0
 }
 
 noise_lang ()
