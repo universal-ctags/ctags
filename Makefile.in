@@ -375,9 +375,6 @@ CTAGS_TEST = ./$(CTAGS_EXEC)
 ifdef VG
 VALGRIND=--with-valgrind
 endif
-ifdef SHRINK
-RUN_SHRINK=--run-shrink
-endif
 TIMEOUT=
 LANGUAGES=
 CATEGORIES=
@@ -402,7 +399,7 @@ fuzz: $(CTAGS_TEST)
 		--languages=$(LANGUAGES) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) $(RUN_SHRINK) \
+		$(VALGRIND) --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
 
@@ -416,7 +413,7 @@ noise: $(CTAGS_TEST)
 		--languages=$(LANGUAGES) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) $(RUN_SHRINK) \
+		$(VALGRIND) --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
 
@@ -436,7 +433,7 @@ units: $(CTAGS_TEST)
 		--units=$(UNITS) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) $(RUN_SHRINK) \
+		$(VALGRIND) --run-shrink \
 		--with-timeout=$(TIMEOUT) \
 		$(SHOW_DIFF_OUTPUT)"; \
 	 $(SHELL) $${c} $(srcdir)/Units $${builddir}/Units
