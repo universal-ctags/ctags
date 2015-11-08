@@ -15,6 +15,8 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+CTAGS=./ctags
+
 line()
 {
     local i
@@ -52,6 +54,24 @@ check_include_general_h_first()
     return $i
 }
 
+check_name_cpp_macro()
+{
+    local dir=$1
+    local r=0
+    local n
+
+    header "Check whether '_' is not used as ctags own macro name"
+    for f in $(find $dir -name '*.[ch]'); do
+	if ${CTAGS} --language-force=C -x --_xformat='%F:%N' --kinds-C=d -o - $f | grep -q '.*:_.*H'; then
+	    for n in $(${CTAGS} --language-force=C -x --_xformat='%N' --kinds-C=d -o - $f | grep  '^_.*H'); do
+		echo "#" $n
+		echo sed -i \""s|$n|CTAGS_$(echo $dir | tr a-z A-Z)_${n#_}|g\"" $f
+	    done
+	   r=1
+	fi
+    done
+    return $r
+}
 
 main()
 {
@@ -72,6 +92,10 @@ main()
     fi
 
     if ! check_include_general_h_first parsers; then
+	i=$(expr $i + 1)
+    fi
+
+    if ! check_name_cpp_macro main; then
 	i=$(expr $i + 1)
     fi
 
