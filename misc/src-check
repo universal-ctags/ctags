@@ -15,12 +15,30 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+line()
+{
+    local i
+    for i in $(seq 72); do
+	echo -n -e -
+    done
+    echo
+}
+
+header()
+{
+    echo
+    echo "$1"
+    line
+
+}
+
 check_include_general_h_first()
 {
     local f
     local l
     local i=0
 
+    header "Check whether general.h is included first: $1"
     for f in $(find $1 -name '*.c'); do
 	if grep -a -q -e '^#[[:space:]]*include' $f; then
 	    l=$()
