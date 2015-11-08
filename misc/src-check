@@ -50,11 +50,11 @@ main()
     fi
 
     if ! check_include_general_h_first main; then
-	i=$(expr i + 1)
+	i=$(expr $i + 1)
     fi
 
     if ! check_include_general_h_first parsers; then
-	i=$(expr i + 1)
+	i=$(expr $i + 1)
     fi
 
     return 0
