@@ -8,8 +8,8 @@
 *
 *   Defines hashtable
 */
-#ifndef _HTABLE_H
-#define _HTABLE_H
+#ifndef CTAGS_MAIN_HTABLE_H
+#define CTAGS_MAIN_HTABLE_H
 
 #include "general.h"
 
@@ -35,6 +35,6 @@ extern boolean    hashTableDeleteItem  (hashTable *htable, void *key);
 extern void       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data);
 extern int        hashTableCountItem   (hashTable *htable);
 
-#endif	/* _HTABLE_H */
+#endif	/* CTAGS_MAIN_HTABLE_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

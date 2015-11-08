@@ -7,8 +7,8 @@
  * selectors.h
  */
 
-#ifndef _SELECTORS_H
-#define _SELECTORS_H
+#ifndef CTAGS_MAIN_SELECTORS_H
+#define CTAGS_MAIN_SELECTORS_H
 
 const char *
 selectByPickingPerlVersion (FILE *);

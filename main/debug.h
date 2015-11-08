@@ -6,8 +6,8 @@
 *
 *   External interface to debug.c
 */
-#ifndef _DEBUG_H
-#define _DEBUG_H
+#ifndef CTAGS_MAIN_DEBUG_H
+#define CTAGS_MAIN_DEBUG_H
 
 /*
 *   Include files
@@ -76,6 +76,6 @@ extern void debugCppIgnore (const boolean ignore);
 extern void debugEntry (const tagEntryInfo *const tag);
 extern void debugAssert (const char *assertion, const char *file, unsigned int line, const char *function) attr__noreturn;
 
-#endif  /* _DEBUG_H */
+#endif  /* CTAGS_MAIN_DEBUG_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

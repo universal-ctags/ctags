@@ -6,8 +6,8 @@
 *
 *   External interface to get.c
 */
-#ifndef _GET_H
-#define _GET_H
+#ifndef CTAGS_MAIN_GET_H
+#define CTAGS_MAIN_GET_H
 
 /*
 *   INCLUDE FILES
@@ -69,6 +69,6 @@ extern void cppUngetc (const int c);
 extern int cppGetc (void);
 extern int skipOverCComment (void);
 
-#endif  /* _GET_H */
+#endif  /* CTAGS_MAIN_GET_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

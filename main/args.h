@@ -6,8 +6,8 @@
 *
 *   Defines external interface to command line argument reading.
 */
-#ifndef _ARGS_H
-#define _ARGS_H
+#ifndef CTAGS_MAIN_ARGS_H
+#define CTAGS_MAIN_ARGS_H
 
 /*
 *   INCLUDE FILES
@@ -54,6 +54,6 @@ extern void argSetLineMode (Arguments* const current);
 extern void argForth (Arguments* const current);
 extern void argDelete (Arguments* const current);
 
-#endif  /* _ARGS_H */
+#endif  /* CTAGS_MAIN_ARGS_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

@@ -6,8 +6,8 @@
 *
 *   Program definitions
 */
-#ifndef _CTAGS_H
-#define _CTAGS_H
+#ifndef CTAGS_MAIN_CTAGS_H
+#define CTAGS_MAIN_CTAGS_H
 
 /*
 *   MACROS
@@ -20,6 +20,6 @@
 #define PROGRAM_COPYRIGHT "Copyright (C) 2015"
 #define AUTHOR_NAME       "Universal Ctags Team"
 
-#endif	/* _CTAGS_H */
+#endif	/* CTAGS_MAIN_CTAGS_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

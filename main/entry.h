@@ -6,8 +6,8 @@
 *
 *   External interface to entry.c
 */
-#ifndef _ENTRY_H
-#define _ENTRY_H
+#ifndef CTAGS_MAIN_ENTRY_H
+#define CTAGS_MAIN_ENTRY_H
 
 /*
 *   INCLUDE FILES
@@ -147,6 +147,6 @@ tagEntryInfo *getEntryInCorkQueue   (unsigned int n);
 size_t        countEntryInCorkQueue (void);
 
 
-#endif  /* _ENTRY_H */
+#endif  /* CTAGS_MAIN_ENTRY_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */
