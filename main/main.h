@@ -6,8 +6,8 @@
 *
 *   External interface to main.c
 */
-#ifndef _MAIN_H
-#define _MAIN_H
+#ifndef CTAGS_MAIN_MAIN_H
+#define CTAGS_MAIN_MAIN_H
 
 /*
 *   INCLUDE FILES
@@ -25,6 +25,6 @@ extern void addTotals (const unsigned int files, const long unsigned int lines, 
 extern boolean isDestinationStdout (void);
 extern int main (int argc, char **argv);
 
-#endif  /* _MAIN_H */
+#endif  /* CTAGS_MAIN_MAIN_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

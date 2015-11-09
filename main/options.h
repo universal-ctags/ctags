@@ -6,8 +6,8 @@
 *
 *   Defines external interface to option processing.
 */
-#ifndef _OPTIONS_H
-#define _OPTIONS_H
+#ifndef CTAGS_MAIN_OPTIONS_H
+#define CTAGS_MAIN_OPTIONS_H
 
 #if defined(OPTION_WRITE)
 # define CONST_OPTION
@@ -185,6 +185,6 @@ extern boolean processLanguageEncodingOption (const char *const option, const ch
 extern boolean processRegexOption (const char *const option, const char *const parameter);
 extern boolean processXcmdOption (const char *const option, const char *const parameter, OptionLoadingStage stage);
 
-#endif  /* _OPTIONS_H */
+#endif  /* CTAGS_MAIN_OPTIONS_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

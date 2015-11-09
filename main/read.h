@@ -6,8 +6,8 @@
 *
 *   External interface to read.c
 */
-#ifndef _READ_H
-#define _READ_H
+#ifndef CTAGS_MAIN_READ_H
+#define CTAGS_MAIN_READ_H
 
 #if defined(FILE_WRITE)
 # define CONST_FILE
@@ -117,6 +117,6 @@ extern char *readSourceLine (vString *const vLine, fpos_t location, long *const 
 extern char *readSourceLineSlow (vString *const vLine, unsigned long lineNumber, const char *pattern, long *const pSeekValue);
 extern char* readLineWithNoSeek (vString *const vline, FILE *const pp);
 
-#endif  /* _READ_H */
+#endif  /* CTAGS_MAIN_READ_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

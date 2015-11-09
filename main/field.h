@@ -9,8 +9,8 @@
  *   GNU General Public License version 2 or (at your option) any later version.
  *
  */
-#ifndef _FIELD_H
-#define _FIELD_H
+#ifndef CTAGS_MAIN_FIELD_H
+#define CTAGS_MAIN_FIELD_H
 
 #include "general.h"
 #include "entry.h"
@@ -58,4 +58,4 @@ extern fieldType getFieldTypeForOption (char letter);
 extern const char* renderFieldEscaped (fieldDesc *fdesc, const tagEntryInfo *tag);
 extern void printFields (void);
 
-#endif	/* _FIELD_H */
+#endif	/* CTAGS_MAIN_FIELD_H */

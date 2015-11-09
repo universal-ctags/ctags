@@ -8,8 +8,8 @@
 *
 *   Defines external interface to option processing.
 */
-#ifndef _FLAGS_H
-#define _FLAGS_H
+#ifndef CTAGS_MAIN_FLAGS_H
+#define CTAGS_MAIN_FLAGS_H
 
 #define LONG_FLAGS_OPEN  '{'
 #define LONG_FLAGS_CLOSE '}'
@@ -26,4 +26,4 @@ typedef struct {
 extern void flagsEval (const char* flags, flagDefinition* defs, unsigned int ndefs, void* data);
 extern void flagPrintHelp (flagDefinition* def, unsigned int ndefs);
 
-#endif	/* _FLAGS_H */
+#endif	/* CTAGS_MAIN_FLAGS_H */

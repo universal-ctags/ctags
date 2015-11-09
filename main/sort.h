@@ -6,8 +6,8 @@
 *
 *   External interface to sort.c
 */
-#ifndef _SORT_H
-#define _SORT_H
+#ifndef CTAGS_MAIN_SORT_H
+#define CTAGS_MAIN_SORT_H
 
 /*
 *   INCLUDE FILES
@@ -25,6 +25,6 @@ extern void externalSortTags (const boolean toStdout);
 extern void internalSortTags (const boolean toStdout);
 #endif
 
-#endif  /* _SORT_H */
+#endif  /* CTAGS_MAIN_SORT_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

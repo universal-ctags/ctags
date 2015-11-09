@@ -6,8 +6,8 @@
 *
 *   Private definitions for parsing support.
 */
-#ifndef _PARSE_H
-#define _PARSE_H
+#ifndef CTAGS_MAIN_PARSE_H
+#define CTAGS_MAIN_PARSE_H
 
 /*
 *   INCLUDE FILES
@@ -205,6 +205,6 @@ extern void freeXcmdResources (void);
 extern void useXcmdMethod (const langType language);
 extern void notifyAvailabilityXcmdMethod (const langType language);
 
-#endif  /* _PARSE_H */
+#endif  /* CTAGS_MAIN_PARSE_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

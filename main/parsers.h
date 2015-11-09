@@ -9,8 +9,8 @@
 *   To add a new language parser, you need only modify this single source
 *   file to add the name of the parser definition function.
 */
-#ifndef _PARSERS_H
-#define _PARSERS_H
+#ifndef CTAGS_MAIN_PARSERS_H
+#define CTAGS_MAIN_PARSERS_H
 
 /* Add the name of any new parser definition function here */
 #define PARSER_LIST \
@@ -75,6 +75,6 @@
 	  \
 	CTagsSelfTestParser
 
-#endif  /* _PARSERS_H */
+#endif  /* CTAGS_MAIN_PARSERS_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

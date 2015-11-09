@@ -5,8 +5,8 @@
 *   GNU General Public License version 2 or (at your option) any later version.
 *
 */
-#ifndef _KIND_H
-#define _KIND_H
+#ifndef CTAGS_MAIN_KIND_H
+#define CTAGS_MAIN_KIND_H
 
 /*
  * Predefined kinds
@@ -34,4 +34,4 @@ typedef struct sKindOption {
 } kindOption;
 
 extern void printKind (const kindOption* const kind, boolean allKindFields, boolean indent);
-#endif	/* _KIND_H */
+#endif	/* CTAGS_MAIN_KIND_H */

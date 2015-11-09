@@ -6,8 +6,8 @@
 *
 *   Provides the general (non-ctags-specific) environment assumed by all.
 */
-#ifndef _GENERAL_H
-#define _GENERAL_H
+#ifndef CTAGS_MAIN_GENERAL_H
+#define CTAGS_MAIN_GENERAL_H
 
 /*
 *   INCLUDE FILES
@@ -109,6 +109,6 @@ extern void *unlink (const char *);
 extern char *getenv (const char *);
 #endif
 
-#endif  /* _GENERAL_H */
+#endif  /* CTAGS_MAIN_GENERAL_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

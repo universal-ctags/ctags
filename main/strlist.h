@@ -6,8 +6,8 @@
 *
 *   Defines external interface to resizable string lists.
 */
-#ifndef _STRLIST_H
-#define _STRLIST_H
+#ifndef CTAGS_MAIN_STRLIST_H
+#define CTAGS_MAIN_STRLIST_H
 
 /*
 *   INCLUDE FILES
@@ -54,6 +54,6 @@ extern vString* stringListFileFinds (const stringList* const list, const char* c
 extern void stringListPrint (const stringList *const current, FILE *fp);
 extern void stringListReverse (const stringList *const current);
 
-#endif  /* _STRLIST_H */
+#endif  /* CTAGS_MAIN_STRLIST_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

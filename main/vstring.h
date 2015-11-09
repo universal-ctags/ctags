@@ -6,8 +6,8 @@
 *
 *   Provides the external interface for resizeable strings.
 */
-#ifndef _VSTRING_H
-#define _VSTRING_H
+#ifndef CTAGS_MAIN_VSTRING_H
+#define CTAGS_MAIN_VSTRING_H
 
 /*
 *   INCLUDE FILES
@@ -82,6 +82,6 @@ extern void vStringTruncate (vString *const string, const size_t length);
 extern vString *vStringNewOwn (char *s);
 extern char    *vStringDeleteUnwrap (vString *const string);
 
-#endif  /* _VSTRING_H */
+#endif  /* CTAGS_MAIN_VSTRING_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */
