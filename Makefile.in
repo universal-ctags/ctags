@@ -375,9 +375,6 @@ CTAGS_TEST = ./$(CTAGS_EXEC)
 ifdef VG
 VALGRIND=--with-valgrind
 endif
-ifdef SHRINK
-RUN_SHRINK=--run-shrink
-endif
 TIMEOUT=
 LANGUAGES=
 CATEGORIES=
@@ -402,7 +399,7 @@ fuzz: $(CTAGS_TEST)
 		--languages=$(LANGUAGES) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) $(RUN_SHRINK) \
+		$(VALGRIND) --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
 
@@ -416,7 +413,21 @@ noise: $(CTAGS_TEST)
 		--languages=$(LANGUAGES) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) $(RUN_SHRINK) \
+		$(VALGRIND) --run-shrink \
+		--with-timeout=$(TIMEOUT)"; \
+	$(SHELL) $${c} $(srcdir)/Units
+
+#
+# CHOP Target
+#
+chop: $(CTAGS_TEST)
+	@ \
+	c="$(srcdir)/misc/units chop \
+		--ctags=$(CTAGS_TEST) \
+		--languages=$(LANGUAGES) \
+		--datadir=$(srcdir)/data \
+		--libexecdir=$(srcdir)/libexec \
+		$(VALGRIND) --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
 
@@ -436,7 +447,7 @@ units: $(CTAGS_TEST)
 		--units=$(UNITS) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) $(RUN_SHRINK) \
+		$(VALGRIND) --run-shrink \
 		--with-timeout=$(TIMEOUT) \
 		$(SHOW_DIFF_OUTPUT)"; \
 	 $(SHELL) $${c} $(srcdir)/Units $${builddir}/Units
@@ -513,7 +524,8 @@ help:
 	@echo "make units                        - Run parser unit test cases"
 	@echo "make tmain                        - Run ctags main functionality test cases"
 	@echo "make fuzz                         - Verify that all parsers are able to properly process each available test unit"
-	@echo "make noise                        - TODO"
+	@echo "make noise                        - Veirfy the behavior of parsers for broken input: a character injected or removed randomly"
+	@echo "make chop                         - Veirfy the behavior of parsers for broken input: randomly truncated"
 	@echo
 	@echo "Arguments that can be used in testing targets:"
 	@echo "VG=1                              - Run test cases with Valgrind memory profiler"

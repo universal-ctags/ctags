@@ -50,12 +50,6 @@ following parameters:
 		The valgrind report is recorded at
 		``Units/\*/VALGRIND-${language}.tmp``.
 
-	``SHRINK=1``
-
-		If exit status is non-zero, run ``units shrink`` to
-		minimize the bad input. Using bisection algorithm,
-		*misc/units shrink* tries to make the shortest input
-		which makes ctags exit with non-zero status.
-		The result is reported to ``Units/\*/SHRINK-${language}.tmp``.
-		This is very useful for debugging.
-
+As the same as units target, this semi-fuzz test target also calls
+*misc/units shrink* when an test case is failed. See "*Units* test facility"
+about the shrinked result.

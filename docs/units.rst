@@ -284,11 +284,11 @@ is the name category in the above example.
 Finding minimal bad input
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If ``SHRINK=1`` is given as argument for make, the input causing
-``FAILED`` result is passed to *misc/units shrink*.  *misc/units
-shrink* tries to make the shortest input which makes ctags exits with
-non-zero status.  The result is reported to
-``Units/\*/SHRINK-${language}.tmp``.  Maybe useful to debug.
+When a test case is failed, the input causing ``FAILED`` result is
+passed to *misc/units shrink*.  *misc/units shrink* tries to make the
+shortest input which makes ctags exits with non-zero status.  The
+result is reported to ``Units/\*/SHRINK-${language}.tmp``.  Maybe
+useful to debug.
 
 Acknowledgments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
