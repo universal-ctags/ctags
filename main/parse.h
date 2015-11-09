@@ -94,6 +94,7 @@ typedef struct {
 	unsigned int tagRegexCount;
 	const keywordTable *keywordTable;
 	unsigned int keywordCount;
+	boolean invisible;
 
 	/* used internally */
 	unsigned int id;               /* id assigned to language */
