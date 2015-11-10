@@ -408,7 +408,7 @@ Perl, it is in the form "class::member"; for Eiffel and Java, it is in the
 form "class.member". This may allow easier location of a specific tags when
 multiple occurrences of a tag name occur in the tag file. Note, however,
 that this could potentially more than double the size of the tag file.
-.IP 4
+.TP 4
 .I .
 Similar to the \fIf\fP extra flag but the entry addresses the end line of
 the file.
