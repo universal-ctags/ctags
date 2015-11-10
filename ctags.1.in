@@ -403,6 +403,10 @@ This option is on by default.
 Include an entry for the base file name of every source file (e.g.
 "example.c"), which addresses the first line of the file.
 .TP 4
+.I p
+Include pseudo tags. Enabled by default unless the tag file is written
+to standard output.
+.TP 4
 .I q
 Include an extra class-qualified tag entry for each tag which is a member
 of a class (for languages for which this information is extracted; currently
