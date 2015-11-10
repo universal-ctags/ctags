@@ -394,6 +394,10 @@ flags replace any current settings. The meaning of each flag is as follows:
 .PP
 .RS 8
 .TP 4
+.I F
+Equivalent to \fB\-\-file\-scope\fP.
+This option is on by default.
+.TP 4
 .I f
 Include an entry for the base file name of every source file (e.g.
 "example.c"), which addresses the first line of the file.

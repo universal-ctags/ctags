@@ -239,7 +239,7 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Uses the specified type of EX command to locate tags [mix]."},
 #endif
  {1,"  --extra=[+|-]flags"},
- {1,"      Include extra tag entries for selected information (flags: \"fq.\")."},
+ {1,"      Include extra tag entries for selected information (flags: \"Ffq.\") [F]."},
  {1,"  --fields=[+|-]flags"},
  {1,"      Include selected extension fields (flags: \"afmikKlnsStzZ\") [fks]."},
  {1,"  --file-scope=[yes|no]"},
@@ -1032,9 +1032,7 @@ static void processExtraTagsOption (
 	{
 		inc->fileNames     = FALSE;
 		inc->qualifiedTags = FALSE;
-#if 0
 		inc->fileScope     = FALSE;
-#endif
 		inc->fileNamesWithTotalLines = FALSE;
 	}
 	while ((c = *p++) != '\0') switch (c)
@@ -1044,9 +1042,7 @@ static void processExtraTagsOption (
 
 		case 'f': inc->fileNames     = mode;  break;
 		case 'q': inc->qualifiedTags = mode;  break;
-#if 0
 		case 'F': inc->fileScope     = mode;  break;
-#endif
 		case '.': inc->fileNamesWithTotalLines = mode; break;
 
 		default: error(WARNING, "Unsupported parameter '%c' for \"%s\" option",

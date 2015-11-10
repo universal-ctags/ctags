@@ -155,6 +155,13 @@ On windows mingw32, you must specify ``WITH_ICONV=yes`` like below::
 
 	C:\dev\ctags>mingw32-make -f mk_mingw.mak WITH_ICONV=yes
 
+Extra tag entries (``--extra``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``F``
+
+	Equivalent to --file-scope.
+
 Changes in tags file format
 ---------------------------------------------------------------------
 
