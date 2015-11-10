@@ -12,13 +12,22 @@
 
 #include "general.h"  /* must always come first */
 #include "debug.h"
+#include "main.h"
 #include "xtag.h"
+
+static boolean isPseudoTagsEnabled (xtagDesc *pdesc)
+{
+	return ! isDestinationStdout ();
+}
 
 static xtagDesc xtagDescs [] = {
 	{ TRUE, 'F',
 	  "Include tags of file scope" },
 	{ FALSE, 'f',
 	  "Include an entry for the base file name of every source file"},
+	{ FALSE, 'p',
+	  "Include pseudo tags",
+	  isPseudoTagsEnabled},
 	{ FALSE, 'q',
 	  "Include an extra class-qualified tag entry for each tag"},
 	{ FALSE, '.',

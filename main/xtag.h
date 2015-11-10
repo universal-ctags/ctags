@@ -19,6 +19,7 @@ typedef enum eXtagType { /* extra tag content control */
 
 	XTAG_FILE_SCOPE,
 	XTAG_FILE_NAMES,
+	XTAG_PSEUDO_TAGS,
 	XTAG_QUALIFIED_TAGS,
 	XTAG_FILE_NAMES_WITH_TOTAL_LINES,
 
