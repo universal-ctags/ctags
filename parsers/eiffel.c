@@ -25,6 +25,7 @@
 #include "options.h"
 #include "parse.h"
 #include "read.h"
+#include "xtag.h"
 
 /*
 *   MACROS
@@ -203,7 +204,7 @@ static void makeEiffelClassTag (tokenInfo *const token)
 static void makeEiffelFeatureTag (tokenInfo *const token)
 {
 	if (EiffelKinds [EKIND_FEATURE].enabled  &&
-		(token->isExported  ||  Option.include.fileScope))
+		(token->isExported  ||  isXtagEnabled(XTAG_FILE_SCOPE)))
 	{
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
@@ -216,7 +217,7 @@ static void makeEiffelFeatureTag (tokenInfo *const token)
 
 		makeTagEntry (&e);
 
-		if (Option.include.qualifiedTags)
+		if (isXtagEnabled(XTAG_QUALIFIED_TAGS))
 		{
 			vString* qualified = vStringNewInit (vStringValue (token->className));
 			vStringPut (qualified, '.');
@@ -231,7 +232,7 @@ static void makeEiffelFeatureTag (tokenInfo *const token)
 
 static void makeEiffelLocalTag (tokenInfo *const token)
 {
-	if (EiffelKinds [EKIND_LOCAL].enabled && Option.include.fileScope)
+	if (EiffelKinds [EKIND_LOCAL].enabled && isXtagEnabled(XTAG_FILE_SCOPE))
 	{
 		const char *const name = vStringValue (token->string);
 		vString* scope = vStringNew ();

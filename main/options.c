@@ -30,6 +30,7 @@
 #include "options.h"
 #include "parse.h"
 #include "routines.h"
+#include "xtag.h"
 
 /*
 *   MACROS
@@ -98,11 +99,12 @@ typedef const struct {
 	unsigned long acceptableStages;
 } parametricOption;
 
-typedef const struct {
+typedef const struct sBooleanOption {
 	const char* name;   /* name of option as specified by user */
 	boolean* pValue;    /* pointer to option value */
 	boolean initOnly;   /* option must be specified before any files */
 	unsigned long acceptableStages;
+	boolean* (* redirect) (const struct sBooleanOption *const option);
 } booleanOption;
 
 /*
@@ -126,12 +128,6 @@ static const char *const HeaderExtensions [] = {
 };
 
 optionValues Option = {
-	{
-		FALSE,  /* --extra=f */
-		FALSE,  /* --extra=q */
-		TRUE,   /* --file-scope */
-		FALSE,	/* --extra=. */
-	},
 	NULL,       /* -I */
 	FALSE,      /* -a */
 	FALSE,      /* -B */
@@ -608,11 +604,11 @@ extern void checkOptions (void)
 	if (Option.xref && (Option.customXfmt == NULL))
 	{
 		notice = "xref output";
-		if (Option.include.fileNames || Option.include.fileNamesWithTotalLines)
+		if (isXtagEnabled(XTAG_FILE_NAMES) || isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES))
 		{
 			error (WARNING, "%s disables file name tags", notice);
-			Option.include.fileNames = FALSE;
-			Option.include.fileNamesWithTotalLines = FALSE;
+			enableXtag (XTAG_FILE_NAMES, FALSE);
+			enableXtag (XTAG_FILE_NAMES_WITH_TOTAL_LINES, FALSE);
 		}
 	}
 	if (Option.append)
@@ -1023,30 +1019,28 @@ static void processExcmdOption (
 static void processExtraTagsOption (
 		const char *const option, const char *const parameter)
 {
-	struct sInclude *const inc = &Option.include;
+	xtagType t;
 	const char *p = parameter;
 	boolean mode = TRUE;
 	int c;
 
 	if (*p != '+'  &&  *p != '-')
 	{
-		inc->fileNames     = FALSE;
-		inc->qualifiedTags = FALSE;
-		inc->fileScope     = FALSE;
-		inc->fileNamesWithTotalLines = FALSE;
+		int i;
+		for (i = 0; i < XTAG_COUNT; i++)
+			enableXtag (i, FALSE);
 	}
 	while ((c = *p++) != '\0') switch (c)
 	{
 		case '+': mode = TRUE;                break;
 		case '-': mode = FALSE;               break;
-
-		case 'f': inc->fileNames     = mode;  break;
-		case 'q': inc->qualifiedTags = mode;  break;
-		case 'F': inc->fileScope     = mode;  break;
-		case '.': inc->fileNamesWithTotalLines = mode; break;
-
-		default: error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
-					   c, option);
+		default:
+			t = getXtagTypeForOption (c);
+			if (t == XTAG_UNKNOWN)
+				error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
+				      c, option);
+			else
+				enableXtag (t, mode);
 			break;
 	}
 }
@@ -2020,6 +2014,17 @@ static void processLibexecDir (const char *const option,
 	}
 }
 
+static boolean* redirectToXtag(const booleanOption *const option)
+{
+	/* WARNING/TODO: This function breaks capsulization. */
+	xtagType t = (xtagType)option->pValue;
+	boolean default_value = isXtagEnabled (t);
+
+	enableXtag (t, default_value);
+
+	return &(getXtagDesc (t)->enabled);
+}
+
 /*
  *  Option tables
  */
@@ -2066,8 +2071,8 @@ static parametricOption ParametricOptions [] = {
 
 static booleanOption BooleanOptions [] = {
 	{ "append",         &Option.append,                 TRUE,  STAGE_ANY },
-	{ "file-scope",     &Option.include.fileScope,      FALSE, STAGE_ANY },
-	{ "file-tags",      &Option.include.fileNames,      FALSE, STAGE_ANY },
+	{ "file-scope",     ((boolean *)XTAG_FILE_SCOPE),   FALSE, STAGE_ANY, redirectToXtag },
+	{ "file-tags",      ((boolean *)XTAG_FILE_NAMES),   FALSE, STAGE_ANY, redirectToXtag },
 	{ "filter",         &Option.filter,                 TRUE,  STAGE_ANY },
 	{ "guess-language-eagerly", &Option.guessLanguageEagerly, FALSE, STAGE_ANY },
 	{ "if0",            &Option.if0,                    FALSE, STAGE_ANY },
@@ -2150,6 +2155,7 @@ static boolean processBooleanOption (
 	for (i = 0  ;  i < count  &&  ! found  ;  ++i)
 	{
 		booleanOption* const entry = &BooleanOptions [i];
+		boolean *slot;
 		if (strcmp (option, entry->name) == 0)
 		{
 			found = TRUE;
@@ -2161,7 +2167,11 @@ static boolean processBooleanOption (
 			}
 			if (entry->initOnly)
 				checkOptionOrder (option, TRUE);
-			*entry->pValue = getBooleanOption (option, parameter);
+			if (entry->redirect)
+				slot = entry->redirect (entry);
+			else
+				slot = entry->pValue;
+			*slot = getBooleanOption (option, parameter);
 		}
 	}
 	return found;

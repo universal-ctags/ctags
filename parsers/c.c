@@ -25,6 +25,7 @@
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"
+#include "xtag.h"
 
 /*
 *   MACROS
@@ -1108,7 +1109,7 @@ static boolean includeTag (const tagType type, const boolean isFileScope)
 	int k;
 	kindOption* kopt = NULL;
 
-	if (isFileScope  &&  ! Option.include.fileScope)
+	if (isFileScope  &&  ! isXtagEnabled(XTAG_FILE_SCOPE))
 		result = FALSE;
 	else if (isLanguage (Lang_csharp))
 	{
@@ -1238,7 +1239,7 @@ static void addOtherFields (tagEntryInfo* const tag, const tagType type,
 					tag->extensionFields.scopeName = vStringValue (scope);
 				}
 				else if ((ptype = declToTagType (parentDecl (st))) &&
-					 includeTag (ptype, Option.include.fileScope))
+					 includeTag (ptype, isXtagEnabled(XTAG_FILE_SCOPE)))
 				{
 					tag->extensionFields.scopeKind = kindForType (ptype);
 					tag->extensionFields.scopeName = vStringValue (scope);
@@ -1352,7 +1353,7 @@ static boolean findScopeHierarchy (vString *const string, const statementInfo *c
 static void makeExtraTagEntry (const tagType type, tagEntryInfo *const e,
 							   vString *const scope)
 {
-	if (Option.include.qualifiedTags  &&
+	if (isXtagEnabled(XTAG_QUALIFIED_TAGS)  &&
 		scope != NULL  &&  vStringLength (scope) > 0)
 	{
 		vString *const scopedName = vStringNew ();

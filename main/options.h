@@ -59,18 +59,9 @@ typedef enum sortType {
 	SO_FOLDSORTED
 } sortType;
 
-struct sInclude {
-	boolean fileNames;      /* include tags for source file names */
-	boolean qualifiedTags;  /* include tags for qualified class members */
-	boolean fileScope;      /* include tags of file scope only */
-	boolean fileNamesWithTotalLines; /* `fileNames' with
-					    total lines of the files */
-};
-
 /*  This stores the command line options.
  */
 typedef struct sOptionValues {
-	struct sInclude include;/* --extra  extra tag inclusion */
 	stringList* ignore;     /* -I  name of file containing tokens to ignore */
 	boolean append;         /* -a  append to "tags" file */
 	boolean backward;       /* -B  regexp patterns search backwards */

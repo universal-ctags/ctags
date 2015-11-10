@@ -22,6 +22,7 @@
 #include "routines.h"
 #include "selectors.h"
 #include "vstring.h"
+#include "xtag.h"
 
 #define TRACE_PERL_C 0
 #define TRACE if (TRACE_PERL_C) printf("perl.c:%d: ", __LINE__), printf
@@ -199,7 +200,7 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 	vStringNCatS(name, b, e - b + 1);
 	initTagEntry(&entry, vStringValue(name), &(PerlKinds[K_CONSTANT]));
 	makeTagEntry(&entry);
-	if (Option.include.qualifiedTags && package && vStringLength(package)) {
+	if (isXtagEnabled (XTAG_QUALIFIED_TAGS) && package && vStringLength(package)) {
 		vStringClear(name);
 		vStringCopy(name, package);
 		vStringNCatS(name, b, e - b + 1);
@@ -488,7 +489,7 @@ static void findPerlTags (void)
 
 				makeTagEntry(&e);
 
-				if (Option.include.qualifiedTags && qualified &&
+				if (isXtagEnabled (XTAG_QUALIFIED_TAGS) && qualified &&
 					package != NULL  && vStringLength (package) > 0)
 				{
 					vString *const qualifiedName = vStringNew ();
@@ -501,7 +502,7 @@ static void findPerlTags (void)
 			} else if (vStringLength (name) > 0)
 			{
 				makeSimpleTag (name, PerlKinds, kind);
-				if (Option.include.qualifiedTags && qualified &&
+				if (isXtagEnabled(XTAG_QUALIFIED_TAGS) && qualified &&
 					K_PACKAGE != kind &&
 					package != NULL  && vStringLength (package) > 0)
 				{

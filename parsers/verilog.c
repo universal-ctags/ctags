@@ -29,6 +29,7 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+#include "xtag.h"
 
 /*
 *   MACROS
@@ -598,7 +599,7 @@ static void createTag (tokenInfo *const token)
 		verbose ("Class %s extends %s\n", vStringValue (token->name), tag.extensionFields.inheritance);
 	}
 	makeTagEntry (&tag);
-	if (Option.include.qualifiedTags && currentContext->kind != K_UNDEFINED)
+	if (isXtagEnabled(XTAG_QUALIFIED_TAGS) && currentContext->kind != K_UNDEFINED)
 	{
 		vString *const scopedName = vStringNew ();
 
