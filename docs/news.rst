@@ -157,10 +157,16 @@ On windows mingw32, you must specify ``WITH_ICONV=yes`` like below::
 
 Extra tag entries (``--extra``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Following extra tag entries are newly introduced.
 
 ``F``
 
 	Equivalent to --file-scope.
+
+``.``
+
+	Do the similar to the ``f`` extra flag but the entry addresses the end line.
+
 
 Changes in tags file format
 ---------------------------------------------------------------------
