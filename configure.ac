@@ -73,8 +73,6 @@ AH_TEMPLATE([HAVE_ICONV],
 AH_TEMPLATE([TMPDIR],
 	[If you wish to change the directory in which temporary files are stored,
 	define this label to the directory desired.])
-AH_TEMPLATE([REGCOMP_BROKEN],
-	[Define this label if regcomp() is broken.])
 AH_TEMPLATE([CHECK_REGCOMP],
 	[Define this label if you wish to check the regcomp() function at run time
 	for correct behavior. This function is currently broken on Cygwin.])
@@ -595,7 +593,7 @@ dnl
 dnl
 dnl Check regcomp
 dnl
-dnl If it is found but broken, define REGCOMP_BROKEN.
+dnl If it is found but broken, abort with a message.
 dnl If it is found but cannot be test brokenness, define CHECK_REGCOMP.
 dnl If it is not found, use bundled implementation.
 dnl
@@ -618,7 +616,7 @@ int main(void) {
 ])],[regcomp_works=yes],[regcomp_works=no],[AC_DEFINE(CHECK_REGCOMP)])
 AC_MSG_RESULT($regcomp_works)
 if test yes != "$regcomp_works"; then
-	AC_DEFINE(REGCOMP_BROKEN)
+	AC_MSG_ERROR([regcomp() on this system is broken.])
 fi
 ],[
 dnl Using bundled regex implementation

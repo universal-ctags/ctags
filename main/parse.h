@@ -171,11 +171,9 @@ extern void freeEncodingResources (void);
 extern void installKeywordTable (const langType language);
 
 /* Regex interface */
-#ifdef HAVE_REGEX
 extern void findRegexTags (void);
 extern void findRegexTagsMainloop (int (* driver)(void));
 extern boolean matchRegex (const vString* const line, const langType language);
-#endif
 extern void addLanguageRegex (const langType language, const char* const regex);
 extern void installTagRegexTable (const langType language);
 extern void addTagRegex (const langType language, const char* const regex, const char* const name, const char* const kinds, const char* const flags);

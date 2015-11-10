@@ -27,14 +27,12 @@
 # include "mbcs.h"
 #endif
 
-#ifdef HAVE_REGCOMP
-# include <ctype.h>
-# include <stddef.h>
-# ifdef HAVE_SYS_TYPES_H
-#  include <sys/types.h>  /* declare off_t (not known to regex.h on FreeBSD) */
-# endif
-# include <regex.h>
+#include <ctype.h>
+#include <stddef.h>
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>  /* declare off_t (not known to regex.h on FreeBSD) */
 #endif
+#include <regex.h>
 
 /*
 *   DATA DEFINITIONS
@@ -405,10 +403,10 @@ static vString *iFileGetLine (void)
 		if (c == '\n'  ||  (c == EOF  &&  vStringLength (File.line) > 0))
 		{
 			vStringTerminate (File.line);
-#ifdef HAVE_REGEX
+
 			if (vStringLength (File.line) > 0)
 				matchRegex (File.line, File.source.language);
-#endif
+
 			result = File.line;
 			break;
 		}
@@ -572,7 +570,6 @@ extern char *readSourceLine (
 	return result;
 }
 
-#ifdef HAVE_REGEX
 /* If a xcmd parser is used, ctags cannot know the location for a tag.
  * In the other hand, etags output and cross reference output require the
  * line after the location.
@@ -672,15 +669,6 @@ out:
 	fsetpos (File.fp, &orignalPosition);
 	return result;
 }
-#else
-extern char *readSourceLineSlow (vString *const vLine,
-				 unsigned long lineNumber,
-				 const char *pattern,
-				 long *const pSeekValue)
-{
-	return NULL;
-}
-#endif
 
 /*
  *   Similar to readLine but this doesn't use fgetpos/fsetpos.
