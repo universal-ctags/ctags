@@ -60,6 +60,10 @@ Wildcard in options
 For the purpose gathering as much as possible information from source
 code "wildcard"(``*``) in option is introduced.
 
+``--extras=*``
+
+	Enables all extra tags.
+
 ``--fields=*``
 
 	Enables all available fields.

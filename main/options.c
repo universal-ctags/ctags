@@ -1025,6 +1025,7 @@ static void processExtraTagsOption (
 	const char *p = parameter;
 	boolean mode = TRUE;
 	int c;
+	int i;
 
 	if (*p != '+'  &&  *p != '-')
 	{
@@ -1036,6 +1037,10 @@ static void processExtraTagsOption (
 	{
 		case '+': mode = TRUE;                break;
 		case '-': mode = FALSE;               break;
+		case '*':
+			for (i = 0; i < XTAG_COUNT; ++i)
+				enableXtag (i, TRUE);
+			break;
 		default:
 			t = getXtagTypeForOption (c);
 			if (t == XTAG_UNKNOWN)
