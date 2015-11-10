@@ -168,6 +168,12 @@ Following extra tag entries are newly introduced.
 	Do the similar to the ``f`` extra flag but the entry addresses the end line.
 
 
+``--list-...`` options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``--list-extras``, ``--list-features`` and ``--list-fields`` are added.
+
+
+
 Changes in tags file format
 ---------------------------------------------------------------------
 

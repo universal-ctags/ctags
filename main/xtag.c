@@ -43,6 +43,22 @@ extern xtagType  getXtagTypeForOption (char letter)
 	return XTAG_UNKNOWN;
 }
 
+static void printXtag (xtagType i)
+{
+	printf("%c\t%s\t%s\n",
+	       xtagDescs[i].letter,
+	       xtagDescs[i].description? xtagDescs[i].description: "NONE",
+	       getXtagDesc (i)->enabled? "on": "off");
+}
+
+extern void printXtags (void)
+{
+	int i;
+
+	for (i = 0; i < sizeof (xtagDescs) / sizeof (xtagDescs [0]); i++)
+		printXtag (i);
+}
+
 extern boolean isXtagEnabled (xtagType type)
 {
 	xtagDesc* desc = getXtagDesc (type);
@@ -68,4 +84,3 @@ extern boolean enableXtag (xtagType type, boolean state)
 
 	return old;
 }
-

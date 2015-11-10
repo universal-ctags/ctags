@@ -292,6 +292,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Indicate whether symbolic links should be followed [yes]."},
  {1,"  --list-aliases=[language|all]"},
  {1,"       Output list of alias patterns."},
+ {1,"  --list-extras"},
+ {1,"       Output list of extra tag flags."},
  {1,"  --list-features"},
  {1,"       Output list of features."},
  {1,"  --list-fields"},
@@ -1510,6 +1512,13 @@ static void processListAliasesOption (
 	exit (0);
 }
 
+static void processListExtrasOption (
+		const char *const option, const char *const parameter)
+{
+	printXtags ();
+	exit (0);
+}
+
 static void processListFileKindOption (
 		const char *const option, const char *const parameter)
 {
@@ -2053,6 +2062,7 @@ static parametricOption ParametricOptions [] = {
 	{ "libexec-dir",            processLibexecDir,              FALSE,  STAGE_ANY },
 	{ "license",                processLicenseOption,           TRUE,   STAGE_ANY },
 	{ "list-aliases",           processListAliasesOption,       TRUE,   STAGE_ANY },
+	{ "list-extras",            processListExtrasOption,        TRUE,   STAGE_ANY },
 	{ "list-features",          processListFeaturesOption,      TRUE,   STAGE_ANY },
 	{ "list-fields",            processListFieldsOption,        TRUE,   STAGE_ANY },
 	{ "list-file-kind",         processListFileKindOption,      TRUE,   STAGE_ANY },
