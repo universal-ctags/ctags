@@ -397,9 +397,7 @@ static const char *const Features [] = {
 #ifdef WIN32
 	"win32",
 #endif
-#ifdef HAVE_FNMATCH
-	"wildcards",
-#endif
+	"wildcards",		/* Always available on universal ctags */
 	"regex",		/* Always available on universal ctags */
 #ifndef EXTERNAL_SORT
 	"internal-sort",

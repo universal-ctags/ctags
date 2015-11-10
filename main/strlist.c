@@ -13,9 +13,7 @@
 #include "general.h"  /* must always come first */
 
 #include <string.h>
-#ifdef HAVE_FNMATCH_H
-# include <fnmatch.h>
-#endif
+#include <fnmatch.h>
 
 #include "debug.h"
 #include "read.h"
@@ -277,13 +275,7 @@ static boolean fileNameMatched (
 		const vString* const vpattern, const char* const fileName)
 {
 	const char* const pattern = vStringValue (vpattern);
-#if defined (HAVE_FNMATCH)
 	return (boolean) (fnmatch (pattern, fileName, 0) == 0);
-#elif defined (CASE_INSENSITIVE_FILENAMES)
-	return (boolean) (strcasecmp (pattern, fileName) == 0);
-#else
-	return (boolean) (strcmp (pattern, fileName) == 0);
-#endif
 }
 
 extern boolean stringListFileMatched (
