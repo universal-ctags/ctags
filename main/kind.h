@@ -42,6 +42,9 @@ extern const char *renderRole (const roleDesc* const role, const tagEntryInfo *c
 
 #define KIND_FILE_ALT '!'
 
+#define KIND_GENERIC_REFERENCE '@'
+#define KIND_GENERIC_REFERENCE_DEFAULT_LONG "reference"
+
 typedef struct sKindOption {
 	boolean enabled;          /* are tags for kind enabled? */
 	char  letter;               /* kind letter */
