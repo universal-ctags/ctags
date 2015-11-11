@@ -1,1 +1,2 @@
---sh-kinds=+s
+--extra=+r
+--fields=+r
