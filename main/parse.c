@@ -1567,6 +1567,10 @@ static void printLanguage (const langType language)
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
+
+	if (lang->invisible)
+		return;
+
 	if (lang->kinds != NULL  ||  (lang->method & METHOD_REGEX) || (lang->method & METHOD_XCMD))
 		printf ("%s%s\n", lang->name, isLanguageEnabled (language) ? "" : " [disabled]");
 }
@@ -1960,6 +1964,7 @@ extern parserDefinition *CTagsSelfTestParser (void)
 	def->kinds = CTST_Kinds;
 	def->kindCount = KIND_COUNT;
 	def->parser = createCTSTTags;
+	def->invisible = TRUE;
 	return def;
 }
 
