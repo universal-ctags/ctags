@@ -1,5 +1,5 @@
 c	class	classes	on	referenceOnly:FALSE	nRoles:0
-d	macro	macro definitions	on	referenceOnly:FALSE	nRoles:0
+d	macro	macro definitions	on	referenceOnly:FALSE	nRoles:1
 e	enumerator	enumerators (values inside an enumeration)	on	referenceOnly:FALSE	nRoles:0
 f	function	function definitions	on	referenceOnly:FALSE	nRoles:0
 g	enum	enumeration names	on	referenceOnly:FALSE	nRoles:0

@@ -50,6 +50,8 @@
    isascii is for suitable to verify the range of input. However, it
    is not portable enough. */
 
+#define RoleTemplateUndef { TRUE, "undef", "undefined" }
+
 /*
 *   FUNCTION PROTOTYPES
 */
@@ -61,6 +63,7 @@ extern void cppInit (const boolean state,
 		     const boolean hasAtLiteralStrings,
 		     const boolean hasSingleQuoteLiteralNumbers,
 		     const struct sKindOption *defineMacroKind,
+		     int macroUndefRoleIndex,
 		     const struct sKindOption *headerKind);
 extern void cppTerminate (void);
 extern void cppBeginStatement (void);

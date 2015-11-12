@@ -12,16 +12,25 @@
 */
 #include "general.h"
 #include "get.h"
+#include "kind.h"
 #include "parse.h"
 #include "routines.h"
-#include "routines.h"
+
+typedef enum {
+	DTS_MACRO_KIND_UNDEF_ROLE,
+} dtsMacroRole;
+
+static roleDesc DTSMacroRoles [] = {
+	RoleTemplateUndef,
+};
 
 typedef enum {
 	DTS_MACRO, DTS_HEADER,
 } dtsKind;
 
 static kindOption DTSKinds [] = {
-	{ TRUE,  'd', "macro",      "macro definitions"},
+	{ TRUE,  'd', "macro",      "macro definitions",
+	  .referenceOnly = FALSE, ATTACH_ROLES(DTSMacroRoles)},
 	{ FALSE, 'h', "header",     "included header files"},
 };
 
@@ -47,7 +56,7 @@ static const tagRegexTable const dtsTagRegexTable [] = {
 static void runCppGetc (void)
 {
 	cppInit (0, FALSE, FALSE,
-		 DTSKinds + DTS_MACRO,
+		 DTSKinds + DTS_MACRO, DTS_MACRO_KIND_UNDEF_ROLE,
 		 DTSKinds + DTS_HEADER);
 
 	findRegexTagsMainloop (cppGetc);

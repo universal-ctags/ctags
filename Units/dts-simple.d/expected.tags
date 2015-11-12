@@ -1,5 +1,6 @@
 0x00	input.dts	/^	     phandle = <0x00>;$/;"	p	scope:label:label
 bar	input.dts	/^#define bar /;"	d	file:
+bar	input.dts	/^#undef bar$/;"	d	file:	role:undef
 foo.dtsi	input.dts	/^#include "foo.dtsi"/;"	h
 label	input.dts	/^label: test {$/;"	l
 label2	input.dts	/^	     label2: chosen { } ;$/;"	l	scope:label:label

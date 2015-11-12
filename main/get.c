@@ -18,6 +18,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "get.h"
+#include "kind.h"
 #include "options.h"
 #include "read.h"
 #include "vstring.h"
@@ -68,6 +69,7 @@ typedef struct sCppState {
 	boolean hasSingleQuoteLiteralNumbers; /* supports vera number literals:
 						 'h..., 'o..., 'd..., and 'b... */
 	const kindOption  *defineMacroKind;
+	int macroGenericRoleIndex, macroUndefRoleIndex;
 	const kindOption  *headerKind;
 
 	struct sDirective {
@@ -93,6 +95,7 @@ static cppState Cpp = {
 	FALSE,       /* hasAtLiteralStrings */
 	FALSE,	     /* hasSingleQuoteLiteralNumbers */
 	NULL,	     /* defineMacroKind */
+	.macroUndefRoleIndex   = ROLE_INDEX_DEFINITION,
 	NULL,	     /* headerKind */
 	{
 		DRCTV_NONE,  /* state */
@@ -120,6 +123,7 @@ extern unsigned int getDirectiveNestLevel (void)
 extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 		     const boolean hasSingleQuoteLiteralNumbers,
 		     const struct sKindOption *defineMacroKind,
+		     int macroUndefRoleIndex,
 		     const struct sKindOption *headerKind)
 {
 	BraceFormat = state;
@@ -130,6 +134,7 @@ extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 	Cpp.hasAtLiteralStrings = hasAtLiteralStrings;
 	Cpp.hasSingleQuoteLiteralNumbers = hasSingleQuoteLiteralNumbers;
 	Cpp.defineMacroKind  = defineMacroKind;
+	Cpp.macroUndefRoleIndex = macroUndefRoleIndex;
 	Cpp.headerKind  = headerKind;
 
 	Cpp.directive.state     = DRCTV_NONE;
@@ -323,15 +328,28 @@ static boolean popConditional (void)
 	return isIgnore ();
 }
 
-static void makeDefineTag (const char *const name)
+static void makeDefineTag (const char *const name, boolean undef)
 {
 	const boolean isFileScope = (boolean) (! isHeaderFile ());
 
-	if (Cpp.defineMacroKind && Cpp.defineMacroKind->enabled &&
-		(! isFileScope  ||  isXtagEnabled(XTAG_FILE_SCOPE)))
+	if (!Cpp.defineMacroKind)
+		return;
+	if (isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
+		return;
+
+	if ( /* condition for definition tag */
+		((!undef) && Cpp.defineMacroKind->enabled)
+		|| /* condition for reference tag */
+		(undef && isXtagEnabled(XTAG_REFERENCE_TAGS) &&
+		 Cpp.defineMacroKind->roles [ Cpp.macroUndefRoleIndex ].enabled))
 	{
 		tagEntryInfo e;
-		initTagEntry (&e, name, Cpp.defineMacroKind);
+
+		if (undef)
+			initRefTagEntry (&e, name, Cpp.defineMacroKind,
+					 Cpp.macroUndefRoleIndex);
+		else
+			initTagEntry (&e, name, Cpp.defineMacroKind);
 		e.lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
 		e.isFileScope  = isFileScope;
 		e.truncateLine = TRUE;
@@ -353,13 +371,14 @@ static void makeIncludeTag (const  char *const name)
 	}
 }
 
-static void directiveDefine (const int c)
+static void directiveDefine (const int c, boolean undef)
 {
 	if (isident1 (c))
 	{
 		readIdentifier (c, Cpp.directive.name);
 		if (! isIgnore ())
-			makeDefineTag (vStringValue (Cpp.directive.name));
+			makeDefineTag (vStringValue (Cpp.directive.name),
+				       undef);
 	}
 	Cpp.directive.state = DRCTV_NONE;
 }
@@ -368,7 +387,7 @@ static void directiveUndef (const int c)
 {
 	if (Option.undef)
 	{
-		directiveDefine (c);
+		directiveDefine (c, TRUE);
 	}
 	else
 	{
@@ -391,7 +410,7 @@ static void directivePragma (int c)
 			if (isident1 (c))
 			{
 				readIdentifier (c, Cpp.directive.name);
-				makeDefineTag (vStringValue (Cpp.directive.name));
+				makeDefineTag (vStringValue (Cpp.directive.name), FALSE);
 			}
 		}
 	}
@@ -470,7 +489,7 @@ static boolean handleDirective (const int c)
 	switch (Cpp.directive.state)
 	{
 		case DRCTV_NONE:    ignore = isIgnore ();        break;
-		case DRCTV_DEFINE:  directiveDefine (c);         break;
+		case DRCTV_DEFINE:  directiveDefine (c, FALSE);  break;
 		case DRCTV_HASH:    ignore = directiveHash (c);  break;
 		case DRCTV_IF:      ignore = directiveIf (c);    break;
 		case DRCTV_PRAGMA:  directivePragma (c);         break;

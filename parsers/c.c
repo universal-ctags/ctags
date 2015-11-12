@@ -303,7 +303,16 @@ static int AnonymousID = 0;
 
 #define COMMONK_UNDEFINED -1
 
+
 /* Used to index into the CKinds table. */
+typedef enum {
+	CR_MACRO_UNDEF,
+} cMacroRole;
+
+static roleDesc CMacroRoles [] = {
+	RoleTemplateUndef,
+};
+
 typedef enum {
 	CK_UNDEFINED = COMMONK_UNDEFINED,
 	CK_CLASS, CK_DEFINE, CK_ENUMERATOR, CK_FUNCTION,
@@ -314,7 +323,8 @@ typedef enum {
 
 static kindOption CKinds [] = {
 	{ TRUE,  'c', "class",      "classes"},
-	{ TRUE,  'd', "macro",      "macro definitions"},
+	{ TRUE,  'd', "macro",      "macro definitions",
+	  .referenceOnly = FALSE, ATTACH_ROLES(CMacroRoles)},
 	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)"},
 	{ TRUE,  'f', "function",   "function definitions"},
 	{ TRUE,  'g', "enum",       "enumeration names"},
@@ -404,6 +414,14 @@ static kindOption JavaKinds [] = {
 
 /* Used to index into the VeraKinds table. */
 typedef enum {
+	VR_MACRO_UNDEF,
+} veraMacroRole;
+
+static roleDesc VeraMacroRoles [] = {
+	RoleTemplateUndef,
+};
+
+typedef enum {
 	VK_UNDEFINED = COMMONK_UNDEFINED,
 	VK_CLASS, VK_DEFINE, VK_ENUMERATOR, VK_FUNCTION,
 	VK_ENUMERATION, VK_INTERFACE, VK_LOCAL, VK_MEMBER, VK_PROGRAM, VK_PROTOTYPE,
@@ -413,7 +431,8 @@ typedef enum {
 
 static kindOption VeraKinds [] = {
 	{ TRUE,  'c', "class",      "classes"},
-	{ TRUE,  'd', "macro",      "macro definitions"},
+	{ TRUE,  'd', "macro",      "macro definitions",
+	  .referenceOnly = FALSE, ATTACH_ROLES(VeraMacroRoles)},
 	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)"},
 	{ TRUE,  'f', "function",   "function definitions"},
 	{ TRUE,  'g', "enum",       "enumeration names"},
@@ -3258,6 +3277,7 @@ static rescanReason findCTags (const unsigned int passCount)
 	rescanReason rescan;
 	kindOption *kind_for_define = NULL;
 	kindOption *kind_for_header = NULL;
+	int role_for_macro_undef   = ROLE_INDEX_DEFINITION;
 
 	Assert (passCount < 3);
 
@@ -3265,15 +3285,17 @@ static rescanReason findCTags (const unsigned int passCount)
 	{
 		kind_for_define = CKinds+CK_DEFINE;
 		kind_for_header = CKinds+CK_HEADER;
+		role_for_macro_undef = CR_MACRO_UNDEF;
 	}
 	else if (isLanguage (Lang_vera))
 	{
 		kind_for_define = VeraKinds+VK_DEFINE;
 		kind_for_header = VeraKinds+VK_HEADER;
+		role_for_macro_undef = VR_MACRO_UNDEF;
 	}
 
 	cppInit ((boolean) (passCount > 1), isLanguage (Lang_csharp), isLanguage(Lang_vera),
-		 kind_for_define,
+		 kind_for_define, role_for_macro_undef,
 		 kind_for_header);
 
 	Signature = vStringNew ();

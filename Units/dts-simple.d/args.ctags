@@ -1,2 +1,3 @@
 --kinds-DTS=+h
---fields=+Z
+--fields=+Zr
+--extra=+r
