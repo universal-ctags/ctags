@@ -1,8 +1,8 @@
+.. Universal Ctag documentation master file
+
 ========================================================================
 universal-ctags hacking guide
 ========================================================================
-
-
 
 :Version: Draft
 :Authors: universal-ctags developers
@@ -11,10 +11,10 @@ universal-ctags hacking guide
 Introduction
 ======================================================================
 universal-ctags has the objective of continuing the
-development from what existed in the Sourceforge area. Github
+development from what existed in the `Sourceforge`_ area. GitHub
 exuberant-ctags repository was started by Reza Jelveh
-<reza.jelveh@gmail.com> and was later moved to the universal-ctags
-organization.
+<reza.jelveh@gmail.com> and was later moved to the `universal-ctags
+organization`_.
 
 The goal of the project is preparing and maintaining common/unified
 space where people interested in making ctags better can work
@@ -26,32 +26,40 @@ development.
 
 Proofreading and pull-requests are welcome!
 
+
+.. _Sourceforge: http://ctags.sourceforge.net/
+.. _universal-ctags organization: https://github.com/universal-ctags
+
+
 Contents
 ======================================================================
 
-.. contents::
+.. toctree::
+	:maxdepth: 2
 
-.. section-numbering::
 
-`Introduced changes <news.rst>`_
+	news.rst
+	guessing.rst
+	building.rst
+	testing.rst
+	optlib.rst
+	xcmd.rst
+	internal.rst
+	tips.rst
+	other-projects.rst
+	format.rst
+	developers.rst
 
-`Choosing a proper parser in ctags <guessing.rst>`_
+.. toctree::
+	:hidden:
 
-`Building ctags <building.rst>`_
-
-`Testing ctags <testing.rst>`_
-
-`Extending ctags with Regex parser (optlib) <optlib.rst>`_
-
-`Extending ctags with xcmd <xcmd.rst>`_
-
-`ctags Internal API <internal.rst>`_
-
-`Tips for hacking <tips.rst>`_
-
-`Relationship between other projects <other-projects.rst>`_
-
-`Tag Format <format.rst>`_
-
-`Who we are <developers.rst>`_
-
+	windows.rst
+	osx.rst
+	autotools.rst
+	chop.rst
+	noise.rst
+	semifuzz.rst
+	tinst.rst
+	tmain.rst
+	tracking.rst
+	units.rst

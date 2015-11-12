@@ -13,6 +13,7 @@
 a.out
 autom4te.cache
 badinput
+_build
 commit-stamp
 config.h
 config.h.in
@@ -40,8 +41,6 @@ tags.test
 test.*.diff
 tg
 tinst-root
-universal-ctags.html
-universal-ctags.pdf
 win32/*.opensdf
 win32/*.sdf
 win32/*.suo

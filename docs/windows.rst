@@ -50,7 +50,9 @@ GCC
 **General**
 
 All the GCC's come with installers or with zipped archives. Install or extract them in a directory without spaces.
+
 GNU Make builds for Win32 are available as well, and sometimes are included with the compilers. Make sure it is in your path, for instance by copying the make.exe in the bin directory of your compiler.
+
 Native win32 version of the GNU/Linux command cp, rm and mv can be useful. rm is almost always used in by the ``clean`` target of a makefile.
 
 
@@ -77,11 +79,12 @@ It is easy to build a Cygwin version of ctags using the normal GNU/Linux build s
 Cygwin has packages with a recent version of MinGW-w64 as well. This way it is easy to cross-compile a native Windows application with ``make -f mk_mingw.mak  CC=i686-w64-mingw32-gcc``.
 
 You can also build a native Windows version using Autotools.
-```bash
-autoreconf -vfi
-./configure --host=i686-w64-mingw32 --disable-external-sort
-make
-```
+
+.. code-block:: bash
+
+	autoreconf -vfi
+	./configure --host=i686-w64-mingw32 --disable-external-sort
+	make
 
 If you use Autotools you can also do the Units testing with `make units`. Some tests fail, that needs to be investigated.
 

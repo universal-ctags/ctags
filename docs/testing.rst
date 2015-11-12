@@ -5,15 +5,15 @@ It it difficult for us to know syntax of all languages supported in
 ctags. Test facility and test cases are quite import for maintaining
 ctags in limited resources.
 
-`Units test facility <units.rst>`_
+:ref:`units`
 
-`Semi fuzz(Fuzz) testing <semifuzz.rst>`_
+:ref:`semifuzz`
 
-`Noise testing <noise.rst>`_
+:ref:`noise`
 
-`Chop testing <chop.rst>`_
-	     
-`Tmain: a facility for testing main part <tmain.rst>`_
+:ref:`chop`
 
-`Tinst installation test <tinst.rst>`_
+:ref:`tmain`
+
+:ref:`tinst`
 
