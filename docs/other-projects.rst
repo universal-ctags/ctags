@@ -13,7 +13,7 @@ Repo
 
 Geany has created a library out of ctags
 
-  	https://github.com/fishman/ctags/issues/63
+  	https://github.com/universal-ctags/ctags/issues/63
 
 Their language parsers have many improvements to various parsers.
 Changes known by devs worth backporting:
@@ -37,19 +37,19 @@ They have these additional language parsers:
 * `NSIS <http://en.wikipedia.org/wiki/Nullsoft_Scriptable_Install_System>`_
 * `R <http://en.wikipedia.org/wiki/R_%28programming_language%29>`_
 * `reStructuredText (reST) <http://en.wikipedia.org/wiki/ReStructuredText>`_
-* `txt2tags <http://en.wikipedia.org/wiki/Txt2tags>`_ 
+* `txt2tags <http://en.wikipedia.org/wiki/Txt2tags>`_
 * `Vala (c.c) <http://en.wikipedia.org/wiki/Vala_%28programming_language%29>`_
 
 These changes have been merged:
 
-* Fix regex callback match count - https://github.com/fishman/ctags/pull/104 
-* SQL tags are stored with scopes instead of "tablename.field" - https://github.com/fishman/ctags/pull/100
+* Fix regex callback match count - https://github.com/universal-ctags/ctags/pull/104
+* SQL tags are stored with scopes instead of "tablename.field" - https://github.com/universal-ctags/ctags/pull/100
 * Some fixes for D parser
 * C++11's enum class/struct support
 
-`Tracking other projects <tracking.rst>`_
+.. include:: tracking.rst
 
-Softwares using ctags
+Software using ctags
 ----------------------------------------------------------------------
 
 pygments
@@ -82,7 +82,7 @@ GNU source highlight
 	I(Masatake YAMATO) have not tried the feature yet.
 
 OpenGrok
-	
+
 	I(Masatake YAMATO) don't inspect this much but OpenGrok uses
 	ctags internally.
 
@@ -91,4 +91,4 @@ Linux kernel
 	See linux/scripts/tags.sh of Linux kernel source tree.
 	It utilizes c parser to the utmost limit.
 
-	
+
