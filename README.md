@@ -17,5 +17,6 @@ Pull-requests are welcome!
 ## How to build and install ##
 
 To build with Autotools, see `docs/autotools.rst` for more information.
+(To build on GNU/Linux, Autotools is your choice.)
 To build on Windows, see `docs/windows.rst` for more information.
 To build on OSX, see `docs/osx.rst` for more information.
