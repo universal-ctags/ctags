@@ -1,22 +1,22 @@
-$(1)	input.mk	/^include $(1) $* Z0 $(shell) $(wildcard *.h) $(SHELL)$/;"	I
-$(2)	input.mk	/^sinclude $(2)$/;"	I
-$(3)	input.mk	/^-include $(3)$/;"	I
-$(SHELL)	input.mk	/^include $(1) $* Z0 $(shell) $(wildcard *.h) $(SHELL)$/;"	I
-$(shell)	input.mk	/^include $(1) $* Z0 $(shell) $(wildcard *.h) $(SHELL)$/;"	I
-$(wildcard *.h)	input.mk	/^include $(1) $* Z0 $(shell) $(wildcard *.h) $(SHELL)$/;"	I
-A	input.mk	/^include A$/;"	I
-B	input.mk	/^sinclude B$/;"	I
-C	input.mk	/^-include C$/;"	I
+$(1)	input.mk	/^include $(1) $* Z0 $(shell) $(wildcard *.h) $(SHELL)$/;"	I	role:generic
+$(2)	input.mk	/^sinclude $(2)$/;"	I	role:optional
+$(3)	input.mk	/^-include $(3)$/;"	I	role:optional
+$(SHELL)	input.mk	/^include $(1) $* Z0 $(shell) $(wildcard *.h) $(SHELL)$/;"	I	role:generic
+$(shell)	input.mk	/^include $(1) $* Z0 $(shell) $(wildcard *.h) $(SHELL)$/;"	I	role:generic
+$(wildcard *.h)	input.mk	/^include $(1) $* Z0 $(shell) $(wildcard *.h) $(SHELL)$/;"	I	role:generic
+A	input.mk	/^include A$/;"	I	role:generic
+B	input.mk	/^sinclude B$/;"	I	role:optional
+C	input.mk	/^-include C$/;"	I	role:optional
 D	input.mk	/^define D$/;"	m
-F	input.mk	/^include F G H$/;"	I
-G	input.mk	/^include F G H$/;"	I
-H	input.mk	/^include F G H$/;"	I
-I	input.mk	/^sinclude I J K$/;"	I
-J	input.mk	/^sinclude I J K$/;"	I
-K	input.mk	/^sinclude I J K$/;"	I
-L	input.mk	/^-include L M N$/;"	I
-M	input.mk	/^-include L M N$/;"	I
-N	input.mk	/^-include L M N$/;"	I
-Z0	input.mk	/^include $(1) $* Z0 $(shell) $(wildcard *.h) $(SHELL)$/;"	I
-a/b	input.mk	/^include $@ $* $< &AND a\/b a_b.mak #ABC$/;"	I
-a_b.mak	input.mk	/^include $@ $* $< &AND a\/b a_b.mak #ABC$/;"	I
+F	input.mk	/^include F G H$/;"	I	role:generic
+G	input.mk	/^include F G H$/;"	I	role:generic
+H	input.mk	/^include F G H$/;"	I	role:generic
+I	input.mk	/^sinclude I J K$/;"	I	role:optional
+J	input.mk	/^sinclude I J K$/;"	I	role:optional
+K	input.mk	/^sinclude I J K$/;"	I	role:optional
+L	input.mk	/^-include L M N$/;"	I	role:optional
+M	input.mk	/^-include L M N$/;"	I	role:optional
+N	input.mk	/^-include L M N$/;"	I	role:optional
+Z0	input.mk	/^include $(1) $* Z0 $(shell) $(wildcard *.h) $(SHELL)$/;"	I	role:generic
+a/b	input.mk	/^include $@ $* $< &AND a\/b a_b.mak #ABC$/;"	I	role:generic
+a_b.mak	input.mk	/^include $@ $* $< &AND a\/b a_b.mak #ABC$/;"	I	role:generic
