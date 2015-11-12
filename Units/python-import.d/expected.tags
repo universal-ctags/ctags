@@ -1,0 +1,48 @@
+a	input.py	/^import a$/;"	module	role:imported
+c	input.py	/^import c, d$/;"	module	role:imported
+d	input.py	/^import c, d$/;"	module	role:imported
+e	input.py	/^from e import f$/;"	module	role:namespace
+f	input.py	/^from e import f$/;"	unknown	role:imported
+e.f	input.py	/^from e import f$/;"	unknown	role:imported
+g	input.py	/^from g import h, i$/;"	module	role:namespace
+h	input.py	/^from g import h, i$/;"	unknown	role:imported
+g.h	input.py	/^from g import h, i$/;"	unknown	role:imported
+i	input.py	/^from g import h, i$/;"	unknown	role:imported
+g.i	input.py	/^from g import h, i$/;"	unknown	role:imported
+j	input.py	/^from j import *$/;"	module	role:namespace
+k	input.py	/^from k import l as m$/;"	module	role:namespace
+l	input.py	/^from k import l as m$/;"	unknown	role:indirectly-imported
+k.l	input.py	/^from k import l as m$/;"	unknown	role:indirectly-imported
+m	input.py	/^from k import l as m$/;"	unknown
+n	input.py	/^import n as o$/;"	module	role:indirectly-imported
+o	input.py	/^import n as o$/;"	namespace
+a1	input.py	/^import a1, a2 as a3, a4, a5$/;"	module	role:imported
+a2	input.py	/^import a1, a2 as a3, a4, a5$/;"	module	role:indirectly-imported
+a3	input.py	/^import a1, a2 as a3, a4, a5$/;"	namespace
+a4	input.py	/^import a1, a2 as a3, a4, a5$/;"	module	role:imported
+a5	input.py	/^import a1, a2 as a3, a4, a5$/;"	module	role:imported
+p	input.py	/^from p import b1, b2 as b3, b4, b5$/;"	module	role:namespace
+b1	input.py	/^from p import b1, b2 as b3, b4, b5$/;"	unknown	role:imported
+p.b1	input.py	/^from p import b1, b2 as b3, b4, b5$/;"	unknown	role:imported
+b2	input.py	/^from p import b1, b2 as b3, b4, b5$/;"	unknown	role:indirectly-imported
+p.b2	input.py	/^from p import b1, b2 as b3, b4, b5$/;"	unknown	role:indirectly-imported
+b3	input.py	/^from p import b1, b2 as b3, b4, b5$/;"	unknown
+b4	input.py	/^from p import b1, b2 as b3, b4, b5$/;"	unknown	role:imported
+p.b4	input.py	/^from p import b1, b2 as b3, b4, b5$/;"	unknown	role:imported
+b5	input.py	/^from p import b1, b2 as b3, b4, b5$/;"	unknown	role:imported
+p.b5	input.py	/^from p import b1, b2 as b3, b4, b5$/;"	unknown	role:imported
+x	input.py	/^from x import (y as z1, z2,$/;"	module	role:namespace
+y	input.py	/^from x import (y as z1, z2,$/;"	unknown	role:indirectly-imported
+x.y	input.py	/^from x import (y as z1, z2,$/;"	unknown	role:indirectly-imported
+z1	input.py	/^from x import (y as z1, z2,$/;"	unknown
+z2	input.py	/^from x import (y as z1, z2,$/;"	unknown	role:imported
+x.z2	input.py	/^from x import (y as z1, z2,$/;"	unknown	role:imported
+z3	input.py	/^                        z3, z4)$/;"	unknown	role:imported
+x.z3	input.py	/^                        z3, z4)$/;"	unknown	role:imported
+z4	input.py	/^                        z3, z4)$/;"	unknown	role:imported
+x.z4	input.py	/^                        z3, z4)$/;"	unknown	role:imported
+X	input.py	/^import X as$/;"	module	role:indirectly-imported
+Y	input.py	/^import Y,$/;"	module	role:imported
+Z	input.py	/^from Z import ( A$/;"	module	role:namespace
+A	input.py	/^from Z import ( A$/;"	unknown	role:imported
+Z.A	input.py	/^from Z import ( A$/;"	unknown	role:imported

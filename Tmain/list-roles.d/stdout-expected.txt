@@ -14,6 +14,11 @@ DTS	h	local	local header	on
 Java	p	imported	imported package	on
 Make	I	included	included	on
 Make	I	optional	optionally included	on
+Python	i	imported	imported modules	on
+Python	i	namespace	namespace from where classes/variables/functions are imported	on
+Python	i	indirectly-imported	module imported in alternative name	on
+Python	x	imported	imported from the other module	on
+Python	x	indirectly-imported	classes/variables/functions/modules imported in alternative name	on
 Sh	s	loaded	loaded	on
 Vera	d	undef	undefined	on
 Vera	h	system	system header	on
@@ -34,6 +39,11 @@ DTS	h	local	local header	on
 Java	p	imported	imported package	on
 Make	I	included	included	on
 Make	I	optional	optionally included	on
+Python	i	imported	imported modules	on
+Python	i	namespace	namespace from where classes/variables/functions are imported	on
+Python	i	indirectly-imported	module imported in alternative name	on
+Python	x	imported	imported from the other module	on
+Python	x	indirectly-imported	classes/variables/functions/modules imported in alternative name	on
 Sh	s	loaded	loaded	on
 Vera	d	undef	undefined	on
 Vera	h	system	system header	on

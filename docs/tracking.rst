@@ -383,15 +383,13 @@ Some patches are maintained in ctags package of Debian.
 Inventory of patches are
 http://anonscm.debian.org/cgit/users/cjwatson/exuberant-ctags.git/tree/debian/patches/series
 
-(python-disable-imports.patch)
+<python-disable-imports.patch>
 
-	Not in universal-ctags tree.
+	universal-ctags tags Y in `import X as Y` and Z in `from X import Y as Z`
+	as definition tags. They are turned on by default.
+	The others are tagged as reference tags. reference tags are recorded only
+	when "r" extra tags are enabled. e.g. `--extra=+r`.
 	
-	I don't want to merge this patch. I think ctags should extract
-	as much as possible information from input source code.
-	The user has responsibility to filter out the noise.
-	The definition of noise is up to the user.
-
 <vim-command-loop.patch>
 
 	This patch was merged as an alternative for 

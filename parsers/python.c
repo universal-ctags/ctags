@@ -13,6 +13,7 @@
 #include "general.h"  /* must always come first */
 
 #include <string.h>
+#include <stdio.h>
 
 #include "entry.h"
 #include "nestlevel.h"
@@ -22,24 +23,74 @@
 #include "vstring.h"
 #include "routines.h"
 #include "debug.h"
+#include "xtag.h"
 
 /*
 *   DATA DECLARATIONS
 */
 
 typedef enum {
-	K_CLASS, K_FUNCTION, K_MEMBER, K_VARIABLE, K_IMPORT
+	K_CLASS, K_FUNCTION, K_MEMBER, K_VARIABLE, K_NAMESPACE, K_MODULE, K_UNKNOWN,
 } pythonKind;
+
+typedef enum {
+	PYTHON_MODULE_IMPORTED,
+	PYTHON_MODULE_NAMESPACE,
+	PYTHON_MODULE_INDIRECTLY_IMPORTED,
+} pythonModuleRole;
+
+typedef enum {
+	PYTHON_UNKNOWN_IMPORTED,
+	PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
+} pythonUnknownRole;
 
 /*
 *   DATA DEFINITIONS
 */
+
+/* Roles releated to `import'
+ * ==========================
+ * import X              X = (kind:module, role:imported)
+ *
+ * import X as Y         X = (kind:module, role:indirectly-imported),
+ *                       Y = (kind:namespace, [nameref:X])
+ *                       ------------------------------------------------
+ *                       Don't confuse with namespace role of module kind.
+ *
+ * from X import *       X = (kind:module,  role:namespace)
+ *
+ * from X import Y       X = (kind:module,  role:namespace),
+ *                       Y = (kind:unknown, role:imported, [scope:X])
+ *
+ * from X import Y as Z  X = (kind:module,  role:namespace),
+ *                       Y = (kind:unknown, role:indirectly-imported, [scope:X])
+ *                       Z = (kind:unknown, [nameref:X.Y]) */
+
+static roleDesc PythonModuleRoles [] = {
+	{ TRUE, "imported",
+	  "imported modules" },
+	{ TRUE, "namespace",
+	  "namespace from where classes/variables/functions are imported" },
+	{ TRUE, "indirectly-imported",
+	  "module imported in alternative name" },
+};
+
+static roleDesc PythonUnknownRoles [] = {
+	{ TRUE, "imported",   "imported from the other module" },
+	{ TRUE, "indirectly-imported",
+	  "classes/variables/functions imported in alternative name" },
+};
+
 static kindOption PythonKinds[] = {
 	{TRUE, 'c', "class",    "classes"},
 	{TRUE, 'f', "function", "functions"},
 	{TRUE, 'm', "member",   "class members"},
 	{TRUE, 'v', "variable", "variables"},
-	{TRUE, 'i', "namespace", "imports"}
+	{TRUE, 'I', "namespace", "name referring a module defined in other file"},
+	{TRUE, 'i', "module",    "modules",
+	 .referenceOnly = TRUE,  ATTACH_ROLES(PythonModuleRoles)},
+	{TRUE, 'x', "unknown",   "name referring a classe/variable/function defined in other module",
+	 .referenceOnly = FALSE, ATTACH_ROLES(PythonUnknownRoles)},
 };
 
 typedef enum {
@@ -341,17 +392,191 @@ static void parseClass (const char *cp, vString *const class,
 	vStringDelete (inheritance);
 }
 
-static void parseImports (const char *cp)
+static void parseImports (const char *cp, const char* from_module)
 {
-	const char *pos;
-	vString *name, *name_next;
+	const char* cp_next;
+	vString *name, *name_next, *fq;
+	boolean maybe_multiline = FALSE;
+	boolean found_multiline_end = FALSE;
+
+	name = vStringNew ();
+	name_next = vStringNew ();
+	fq = vStringNew ();
+
+	cp = skipSpace (cp);
+	if (from_module && *cp == '(')
+	{
+		maybe_multiline = TRUE;
+		++cp;
+	}
+
+	cp = skipEverything (cp);
+nextLine:
+	while (*cp)
+	{
+		cp = parseIdentifier (cp, name);
+		cp = skipSpace (cp);
+		if (*cp == ')')
+			found_multiline_end = TRUE;
+		cp = skipEverything (cp);
+		cp_next = parseIdentifier (cp, name_next);
+
+		if (strcmp (vStringValue (name_next), "as") == 0)
+		{
+			cp = skipEverything (cp_next);
+			cp = parseIdentifier (cp, name_next);
+			if (from_module)
+			{
+				/* from x import Y as Z
+				   ----------------------------
+				   x = (kind:module,  role:namespace),
+				   Y = (kind:unknown, role:indirectly-imported),
+				   Z = (kind:unknown) */
+
+				/* Y */
+				makeSimpleRefTag (name, PythonKinds, K_UNKNOWN,
+						  PYTHON_UNKNOWN_INDIRECTLY_IMPORTED);
+				/* x.Y */
+				if (isXtagEnabled(XTAG_QUALIFIED_TAGS))
+				{
+					vStringCatS (fq, from_module);
+					vStringPut (fq, '.');
+					vStringCat (fq, name);
+					makeSimpleRefTag (fq, PythonKinds, K_UNKNOWN,
+							  PYTHON_UNKNOWN_INDIRECTLY_IMPORTED);
+					vStringClear(fq);
+				}
+				/* Z */
+				makeSimpleTag (name_next, PythonKinds, K_UNKNOWN);
+			}
+			else
+			{
+				/* import x as Y
+				   ----------------------------
+				   X = (kind:module, role:indirectly-imported)
+				   Y = (kind:namespace)*/
+				/* X */
+				makeSimpleRefTag (name, PythonKinds, K_MODULE,
+						  PYTHON_MODULE_INDIRECTLY_IMPORTED);
+				/* Y */
+				makeSimpleTag (name_next, PythonKinds, K_NAMESPACE);
+			}
+
+			cp = skipSpace (cp);
+			if (*cp == ')')
+			{
+				found_multiline_end = TRUE;
+				cp++;
+			}
+			cp = skipEverything (cp);
+		}
+		else
+		{
+			if (from_module)
+			{
+				/* from x import Y
+				   --------------
+				   x = (kind:module,  role:namespace),
+				   Y = (kind:unknown, role:imported) */
+				/* Y */
+				makeSimpleRefTag (name, PythonKinds, K_UNKNOWN,
+						  PYTHON_MODULE_IMPORTED);
+				/* x.Y */
+				if (isXtagEnabled(XTAG_QUALIFIED_TAGS))
+				{
+					vStringCatS (fq, from_module);
+					vStringPut (fq, '.');
+					vStringCat (fq, name);
+					makeSimpleRefTag (fq, PythonKinds, K_UNKNOWN,
+							  PYTHON_MODULE_IMPORTED);
+					vStringClear(fq);
+				}
+			}
+			else
+			{
+				/* import X
+				   --------------
+				   X = (kind:module, role:imported) */
+				makeSimpleRefTag (name, PythonKinds, K_MODULE,
+						  PYTHON_MODULE_IMPORTED);
+			}
+			/* Don't update cp. Start from the position of name_next. */
+		}
+	}
+
+	if (maybe_multiline && (!found_multiline_end))
+	{
+		if ((cp = (const char *) readLineFromInputFile ()) != NULL)
+		{
+			cp = skipSpace (cp);
+			if (*cp == ')')
+			{
+				cp++;
+				found_multiline_end = TRUE;
+			}
+			else
+				goto nextLine;
+		}
+	}
+
+	vStringDelete (fq);
+	vStringDelete (name);
+	vStringDelete (name_next);
+}
+
+static void parseFromModule (const char *cp, const char* dummy __unused__)
+{
+	vString *from_module;
+	vString *import_keyword;
+
+	/* from X import ...
+	   --------------------
+	   X = (kind:module, role:namespace) */
+
+	from_module = vStringNew ();
+	import_keyword = vStringNew ();
+
+	cp = skipEverything (cp);
+	cp = parseIdentifier (cp, from_module);
+	cp = skipEverything (cp);
+	cp = parseIdentifier (cp, import_keyword);
+
+	if (strcmp (vStringValue (import_keyword), "import") == 0
+	    || strcmp (vStringValue (import_keyword), "cimport") == 0)
+	{
+		makeSimpleRefTag (from_module, PythonKinds, K_MODULE,
+				  PYTHON_MODULE_NAMESPACE);
+		parseImports (cp, vStringValue (from_module));
+	}
+
+	vStringDelete (import_keyword);
+	vStringDelete (from_module);
+}
+
+
+static void parseNamespace (const char *cp)
+{
+	void (* parse_sub) (const char *, const char *);
 
 	cp = skipEverything (cp);
 
-	if ((pos = strstr (cp, "import")) == NULL)
+	if (strncmp (cp, "import", 6) == 0)
+	{
+		cp += 6;
+		parse_sub = parseImports;
+	}
+	else if (strncmp (cp, "cimport", 7) == 0)
+	{
+		cp += 7;
+		parse_sub = parseImports;
+	}
+	else if (strncmp (cp, "from", 4) == 0)
+	{
+		cp += 4;
+		parse_sub = parseFromModule;
+	}
+	else
 		return;
-
-	cp = pos + 6;
 
 	/* continue only if there is some space between the keyword and the identifier */
 	if (! isspace (*cp))
@@ -360,28 +585,7 @@ static void parseImports (const char *cp)
 	cp++;
 	cp = skipSpace (cp);
 
-	name = vStringNew ();
-	name_next = vStringNew ();
-
-	cp = skipEverything (cp);
-	while (*cp)
-	{
-		cp = parseIdentifier (cp, name);
-
-		cp = skipEverything (cp);
-		/* we parse the next possible import statement as well to be able to ignore 'foo' in
-		 * 'import foo as bar' */
-		parseIdentifier (cp, name_next);
-
-		/* take the current tag only if the next one is not "as" */
-		if (strcmp (vStringValue (name_next), "as") != 0 &&
-			strcmp (vStringValue (name), "as") != 0)
-		{
-			makeSimpleTag (name, PythonKinds, K_IMPORT);
-		}
-	}
-	vStringDelete (name);
-	vStringDelete (name_next);
+	parse_sub (cp, NULL);
 }
 
 /* modified from get.c getArglistFromStr().
@@ -849,8 +1053,8 @@ static void findPythonTags (void)
 				addNestingLevel(nesting_levels, indent, name, is_class);
 			}
 		}
-		/* Find and parse imports */
-		parseImports(line);
+		/* Find and parse namespace releated elements */
+		parseNamespace(line);
 	}
 	/* Clean up all memory we allocated. */
 	vStringDelete (parent);
