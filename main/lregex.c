@@ -18,14 +18,12 @@
 
 #include <string.h>
 
-#ifdef HAVE_REGCOMP
-# include <ctype.h>
-# include <stddef.h>
-# ifdef HAVE_SYS_TYPES_H
-#  include <sys/types.h>  /* declare off_t (not known to regex.h on FreeBSD) */
-# endif
-# include <regex.h>
+#include <ctype.h>
+#include <stddef.h>
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>  /* declare off_t (not known to regex.h on FreeBSD) */
 #endif
+#include <regex.h>
 
 #include "debug.h"
 #include "entry.h"
@@ -39,8 +37,6 @@
 
 static boolean regexAvailable = FALSE;
 static unsigned long currentScope = SCOPE_NIL;
-
-#if defined (HAVE_REGEX) && !defined (REGCOMP_BROKEN)
 
 /*
 *   MACROS
@@ -766,14 +762,13 @@ extern void findRegexTags (void)
 extern boolean hasScopeActionInRegex (const langType language)
 {
 	boolean r = FALSE;
-#ifdef HAVE_REGEX
 	unsigned int i;
 
 	if (language <= SetUpper  &&  Sets [language].count > 0)
 		for (i = 0; i < Sets [language].count; i++)
 			if (Sets[language].patterns[i].scopeActions)
 				r= TRUE;
-#endif
+
 	return r;
 }
 
@@ -824,8 +819,6 @@ static regexPattern *addTagRegexInternal (
 	return rptr;
 }
 
-#endif  /* HAVE_REGEX */
-
 extern void addTagRegex (
 		const langType language __unused__,
 		const char* const regex __unused__,
@@ -833,9 +826,7 @@ extern void addTagRegex (
 		const char* const kinds __unused__,
 		const char* const flags __unused__)
 {
-#ifdef HAVE_REGEX
 	addTagRegexInternal (language, regex, name, kinds, flags);
-#endif
 }
 
 extern void addCallbackRegex (
@@ -844,7 +835,6 @@ extern void addCallbackRegex (
 		const char* const flags __unused__,
 		const regexCallback callback __unused__)
 {
-#ifdef HAVE_REGEX
 	Assert (regex != NULL);
 	if (regexAvailable)
 	{
@@ -852,13 +842,11 @@ extern void addCallbackRegex (
 		if (cp != NULL)
 			addCompiledCallbackPattern (language, cp, callback, flags);
 	}
-#endif
 }
 
 extern void addLanguageRegex (
 		const langType language __unused__, const char* const regex __unused__)
 {
-#ifdef HAVE_REGEX
 	if (regexAvailable)
 	{
 		char *const regex_pat = eStrdup (regex);
@@ -869,7 +857,6 @@ extern void addLanguageRegex (
 			eFree (regex_pat);
 		}
 	}
-#endif
 }
 
 /*
@@ -885,12 +872,7 @@ extern boolean processRegexOption (const char *const option,
 	if (language == LANG_IGNORE)
 		return FALSE;
 
-#ifdef HAVE_REGEX
 	processLanguageRegex (language, parameter);
-#else
-	error (WARNING, "regex support not available; required for --%s option",
-	       option);
-#endif
 
 	return TRUE;
 }
@@ -899,7 +881,6 @@ static void foreachRegexKinds (const langType language,
 			       boolean (*func) (kindOption *, void *),
 			       void *data)
 {
-#ifdef HAVE_REGEX
 	if (language <= SetUpper  &&  Sets [language].count > 0)
 	{
 		patternSet* const set = Sets + language;
@@ -909,7 +890,6 @@ static void foreachRegexKinds (const langType language,
 			    && (func (set->patterns [i].u.tag.kind, data)))
 				break;
 	}
-#endif
 }
 
 
@@ -1019,28 +999,24 @@ extern void printRegexKinds (const langType language,
 			     boolean indent __unused__)
 {
 	installTagRegexTable (language);
-#ifdef HAVE_REGEX
+
 	if (language <= SetUpper  &&  Sets [language].count > 0)
 	{
 		patternSet* const set = Sets + language;
 		const char* const langName = getLanguageName (language);
 		printRegexKindsInPatternSet (set, langName, allKindFields, indent);
 	}
-#endif
 }
 
 extern void printRegexFlags (void)
 {
-#ifdef HAVE_REGEX
 	flagPrintHelp (regexFlagDefs,  COUNT_ARRAY (regexFlagDefs));
 	flagPrintHelp (prePtrnFlagDef, COUNT_ARRAY (prePtrnFlagDef));
 	flagPrintHelp (scopePtrnFlagDef, COUNT_ARRAY (scopePtrnFlagDef));
-#endif
 }
 
 extern void freeRegexResources (void)
 {
-#ifdef HAVE_REGEX
 	int i;
 	for (i = 0  ;  i <= SetUpper  ;  ++i)
 		clearPatternSet (i);
@@ -1048,15 +1024,12 @@ extern void freeRegexResources (void)
 		eFree (Sets);
 	Sets = NULL;
 	SetUpper = -1;
-#endif
 }
 
 /* Return TRUE if available. */
 extern boolean checkRegex (void)
 {
-#if ! defined (HAVE_REGEX)
-	regexAvailable = FALSE;
-#elif defined (CHECK_REGCOMP)
+#if defined (CHECK_REGCOMP)
 	{
 		/* Check for broken regcomp() on Cygwin */
 		regex_t patbuf;

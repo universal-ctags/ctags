@@ -32,11 +32,6 @@
 # define errout	stderr
 #endif
 
-/* Define regex if supported */
-#if (defined (HAVE_REGCOMP) && !defined (REGCOMP_BROKEN))
-# define HAVE_REGEX 1
-#endif
-
 /*  Prevent warnings about unused variables in GCC. */
 #if defined (__GNUC__) && !defined (__GNUG__)
 # ifdef __MINGW32__

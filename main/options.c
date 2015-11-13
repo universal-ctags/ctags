@@ -328,10 +328,8 @@ static optionDescription LongOptionDescription [] = {
 #else
  {1,"       Not supported on this platform."},
 #endif
-#ifdef HAVE_REGEX
  {1,"  --regex-<LANG>=/line_pattern/name_pattern/[flags]"},
  {1,"       Define regular expression for locating tags in specific language."},
-#endif
  {0,"  --sort=[yes|no|foldcase]"},
  {0,"       Should tags be sorted (optionally ignoring case) [yes]?."},
  {0,"  --tag-relative=[yes|no]"},
@@ -397,12 +395,8 @@ static const char *const Features [] = {
 #ifdef WIN32
 	"win32",
 #endif
-#ifdef HAVE_FNMATCH
-	"wildcards",
-#endif
-#ifdef HAVE_REGEX
-	"regex",
-#endif
+	"wildcards",		/* Always available on universal ctags */
+	"regex",		/* Always available on universal ctags */
 #ifndef EXTERNAL_SORT
 	"internal-sort",
 #endif
