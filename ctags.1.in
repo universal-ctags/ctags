@@ -383,20 +383,29 @@ pattern searches useless for finding all matches.
 .RE
 
 .TP 5
-\fB\-\-extra\fP=\fI[+|\-]flags\fP
+\fB\-\-extra\fP=\fI[+|\-]flags\fP|\fi*\fP
 Specifies whether to include extra tag entries for certain kinds of
 information. The parameter \fIflags\fP is a set of one-letter flags, each
 representing one kind of extra tag entry to include in the tag file. If
 \fIflags\fP is preceded by either the '+' or '\-' character, the effect of
 each flag is added to, or removed from, those currently enabled; otherwise the
-flags replace any current settings. The meaning of each flag is as follows:
+flags replace any current settings. All entries are included if '*'
+is given. The meaning of each flag is as follows:
 
 .PP
 .RS 8
 .TP 4
+.I F
+Equivalent to \fB\-\-file\-scope\fP.
+This option is on by default.
+.TP 4
 .I f
 Include an entry for the base file name of every source file (e.g.
 "example.c"), which addresses the first line of the file.
+.TP 4
+.I p
+Include pseudo tags. Enabled by default unless the tag file is written
+to standard output.
 .TP 4
 .I q
 Include an extra class-qualified tag entry for each tag which is a member

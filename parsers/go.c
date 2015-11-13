@@ -14,6 +14,7 @@
 #include "routines.h"
 #include "vstring.h"
 #include "options.h"
+#include "xtag.h"
 
 /*
  *	 MACROS
@@ -539,7 +540,7 @@ static void makeTag (tokenInfo *const token, const goKind kind,
 	}
 	makeTagEntry (&e);
 
-	if (scope && Option.include.qualifiedTags)
+	if (scope && isXtagEnabled(XTAG_QUALIFIED_TAGS))
 	{
 		vString *qualifiedName = vStringNew ();
 		vStringCopy (qualifiedName, scope);
@@ -557,7 +558,7 @@ static void parsePackage (tokenInfo *const token)
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
 		makeTag (token, GOTAG_PACKAGE, NULL, GOTAG_UNDEFINED, NULL);
-		if (!scope && Option.include.qualifiedTags)
+		if (!scope && isXtagEnabled(XTAG_QUALIFIED_TAGS))
 		{
 			scope = vStringNew ();
 			vStringCopy (scope, token->string);

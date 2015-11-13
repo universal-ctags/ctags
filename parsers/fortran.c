@@ -25,6 +25,7 @@
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
+#include "xtag.h"
 
 /*
 *   MACROS
@@ -495,7 +496,7 @@ static boolean includeTag (const tagType type)
 	Assert (type != TAG_UNDEFINED);
 	include = FortranKinds [(int) type].enabled;
 	if (include && isFileScope (type))
-		include = Option.include.fileScope;
+		include = isXtagEnabled(XTAG_FILE_SCOPE);
 	return include;
 }
 

@@ -29,7 +29,8 @@ MAIN_HEADERS =				\
 	$(MAIN_DIR)/selectors.h		\
 	$(MAIN_DIR)/sort.h		\
 	$(MAIN_DIR)/strlist.h		\
-	$(MAIN_DIR)/vstring.h
+	$(MAIN_DIR)/vstring.h		\
+	$(MAIN_DIR)/xtag.h
 
 PARSER_HEADERS =
 
@@ -110,7 +111,8 @@ MAIN_SOURCES =					\
 	$(MAIN_DIR)/selectors.c			\
 	$(MAIN_DIR)/sort.c			\
 	$(MAIN_DIR)/strlist.c			\
-	$(MAIN_DIR)/vstring.c
+	$(MAIN_DIR)/vstring.c			\
+	$(MAIN_DIR)/xtag.c
 
 DEBUG_SOURCES = $(MAIN_DIR)/debug.c
 

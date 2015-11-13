@@ -47,6 +47,7 @@
 #include "routines.h"
 #include "sort.h"
 #include "strlist.h"
+#include "xtag.h"
 
 /*
 *   MACROS
@@ -417,9 +418,13 @@ extern void openTagFile (void)
 	/*  Open the tags file.
 	 */
 	if (TagsToStdout)
+	{
 		/* Open a tempfile with read and write mode. Read mode is used when
 		 * write the result to stdout. */
 		TagFile.fp = tempFile ("w+", &TagFile.name);
+		if (isXtagEnabled (XTAG_PSEUDO_TAGS))
+			addPseudoTags ();
+	}
 	else
 	{
 		boolean fileExists;
@@ -453,7 +458,7 @@ extern void openTagFile (void)
 			else
 			{
 				TagFile.fp = fopen (TagFile.name, "w");
-				if (TagFile.fp != NULL)
+				if (TagFile.fp != NULL && isXtagEnabled (XTAG_PSEUDO_TAGS))
 					addPseudoTags ();
 			}
 		}

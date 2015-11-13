@@ -60,6 +60,10 @@ Wildcard in options
 For the purpose gathering as much as possible information from source
 code "wildcard"(``*``) in option is introduced.
 
+``--extras=*``
+
+	Enables all extra tags.
+
 ``--fields=*``
 
 	Enables all available fields.
@@ -154,6 +158,29 @@ To enable the option, libiconv is needed in your platform. In addition
 On windows mingw32, you must specify ``WITH_ICONV=yes`` like below::
 
 	C:\dev\ctags>mingw32-make -f mk_mingw.mak WITH_ICONV=yes
+
+Extra tag entries (``--extra``)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Following extra tag entries are newly introduced.
+
+``F``
+
+	Equivalent to --file-scope.
+
+``.``
+
+	Do the similar to the ``f`` extra flag but the entry addresses the end line.
+
+``p``
+
+	Include pseudo tags.
+
+
+``--list-...`` options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``--list-extras``, ``--list-features`` and ``--list-fields`` are added.
+
+
 
 Changes in tags file format
 ---------------------------------------------------------------------

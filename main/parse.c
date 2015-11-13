@@ -29,6 +29,7 @@
 #ifdef HAVE_ICONV
 # include "mbcs.h"
 #endif
+#include "xtag.h"
 
 /*
 *   DATA DEFINITIONS
@@ -1588,14 +1589,15 @@ extern void printLanguageList (void)
 extern void makeFileTag (const char *const fileName)
 {
 	boolean via_line_directive = (strcmp (fileName, getInputFileName()) != 0);
-	if (Option.include.fileNames || Option.include.fileNamesWithTotalLines)
+	if (isXtagEnabled(XTAG_FILE_NAMES)
+	    || isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES))
 	{
 		tagEntryInfo tag;
 		kindOption  *kind;
 
 		kind = getSourceLanguageFileKind();
 		Assert (kind);
-		kind->enabled = Option.include.fileNames;
+		kind->enabled = isXtagEnabled(XTAG_FILE_NAMES);
 
 		/* TODO: you can return here if enabled == FALSE. */
 
@@ -1604,7 +1606,7 @@ extern void makeFileTag (const char *const fileName)
 		tag.isFileEntry     = TRUE;
 		tag.lineNumberEntry = TRUE;
 
-		if (via_line_directive || (!Option.include.fileNamesWithTotalLines))
+		if (via_line_directive || (!isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES)))
 		{
 			tag.lineNumber = 1;
 		}

@@ -1,0 +1,5 @@
+F	Include tags of file scope	on
+f	Include an entry for the base file name of every source file	on
+p	Include pseudo tags	on
+q	Include an extra class-qualified tag entry for each tag	on
+.	Do the similar to the f extra flag but the entry addresses the end line	on

@@ -22,6 +22,7 @@
 #include "read.h"
 #include "vstring.h"
 #include "parse.h"
+#include "xtag.h"
 
 /*
 *   MACROS
@@ -327,7 +328,7 @@ static void makeDefineTag (const char *const name)
 	const boolean isFileScope = (boolean) (! isHeaderFile ());
 
 	if (Cpp.defineMacroKind && Cpp.defineMacroKind->enabled &&
-		(! isFileScope  ||  Option.include.fileScope))
+		(! isFileScope  ||  isXtagEnabled(XTAG_FILE_SCOPE)))
 	{
 		tagEntryInfo e;
 		initTagEntry (&e, name, Cpp.defineMacroKind);

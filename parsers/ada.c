@@ -103,6 +103,7 @@
 #include "routines.h"   /* for generic malloc/realloc/free routines */
 #include "options.h"    /* for the Option structure */
 #include "debug.h"      /* for Assert */
+#include "xtag.h"
 
 typedef enum eAdaException
 {
@@ -2098,8 +2099,8 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
      (token->name != NULL) &&
      ((token->kind == ADA_KIND_ANONYMOUS && token->children.head != NULL) ||
       token->kind != ADA_KIND_ANONYMOUS) &&
-     ((Option.include.fileScope == TRUE) ||
-      ((Option.include.fileScope == FALSE) &&
+     ((isXtagEnabled(XTAG_FILE_SCOPE) == TRUE) ||
+      ((isXtagEnabled(XTAG_FILE_SCOPE) == FALSE) &&
        (token->tag.isFileScope == FALSE))))
   {
     makeTagEntry(&token->tag);
@@ -2108,7 +2109,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
      * an extra entry which is the full parent.tag name.  But only do this if 
      * the parentScope flag is not NULL, and this token is not of a limited 
      * scope type such as a record component, enum literal, label, etc. */
-    if((Option.include.qualifiedTags == TRUE) &&
+    if((isXtagEnabled(XTAG_QUALIFIED_TAGS) == TRUE) &&
        (token->kind != ADA_KIND_RECORD_COMPONENT) &&
        (token->kind != ADA_KIND_ENUM_LITERAL) &&
        (token->kind != ADA_KIND_FORMAL) &&
@@ -2140,7 +2141,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
          * no extra entry. */
         currentScope = token->name;
       }
-    } /* if((Option.include.qualifiedTags == TRUE) && ... */
+    } /* if((isXtagsEnabled(XTAG_QUALIFIED_TAGS) == TRUE) && ... */
   } /* if((token->kind > ADA_KIND_UNDEFINED) && ... */
 
   /* now make the child tags */
