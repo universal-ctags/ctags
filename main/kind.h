@@ -45,6 +45,9 @@ extern const char *renderRole (const roleDesc* const role, const tagEntryInfo *c
 #define KIND_GENERIC_REFERENCE '@'
 #define KIND_GENERIC_REFERENCE_DEFAULT_LONG "reference"
 
+/* Don't use in your parser. */
+#define KIND_WILDCARD '*'
+
 typedef struct sKindOption {
 	boolean enabled;          /* are tags for kind enabled? */
 	char  letter;               /* kind letter */
