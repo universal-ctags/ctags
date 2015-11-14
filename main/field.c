@@ -19,6 +19,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "field.h"
+#include "kind.h"
 #include "options.h"
 #include "read.h"
 #include "routines.h"
@@ -38,6 +39,7 @@ static const char *renderFieldKindLetter (const tagEntryInfo *const tag, vString
 static const char *renderFieldImplementation (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldFile (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldPattern (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldRole (const tagEntryInfo *const tag, vString* b);
 
 #define DEFINE_FIELD_FULL(L,N, V, H, B, F) {			\
 		.enabled       = V,				\
@@ -99,7 +101,7 @@ static fieldDesc fieldDescs [] = {
 		      renderFieldLineNumber),
 	DEFINE_FIELD ('r', "role",	     FALSE,
 		      "role",
-		      NULL),
+		      renderFieldRole),
 	DEFINE_FIELD ('S', "signature",	     FALSE,
 		      "Signature of routine (e.g. prototype or parameter list)",
 		      renderFieldSignature),
@@ -355,6 +357,23 @@ static const char *renderFieldLineNumber (const tagEntryInfo *const tag, vString
 	char buf[32] = {[0] = '\0'};
 	snprintf (buf, sizeof(buf), "%ld", tag->lineNumber);
 	vStringCatS (b, buf);
+	return vStringValue (b);
+}
+
+static const char *renderFieldRole (const tagEntryInfo *const tag, vString* b)
+{
+	int rindex = tag->extensionFields.roleIndex;
+	const roleDesc * role;
+
+	if (rindex == ROLE_INDEX_DEFINITION)
+		vStringClear (b);
+	else
+	{
+		Assert (rindex < tag->kind->nRoles);
+		role  = & (tag->kind->roles [rindex]);
+		return renderRole (role, tag, b);
+	}
+
 	return vStringValue (b);
 }
 

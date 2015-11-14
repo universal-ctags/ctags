@@ -15,6 +15,19 @@
 #include <stdio.h>
 #include "kind.h"
 
+extern void printRole (const roleDesc* const role)
+{
+	if (role)
+		printf ("%s\t%s\t%s\n", role->name, role->description, role->enabled? "on": "off");
+}
+
+extern const char *renderRole (const roleDesc* const role,
+			       const tagEntryInfo *const tag __unused__, vString* b)
+{
+	vStringCatS (b, role->name);
+	return vStringValue (b);
+}
+
 extern void printKind (const kindOption* const kind, boolean allKindFields, boolean indent)
 {
 	if (allKindFields)

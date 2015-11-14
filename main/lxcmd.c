@@ -1034,7 +1034,8 @@ static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 			  entryLookupField(entry, "language", TRUE),
 			  filePosition,
 			  entry->file,
-			  entry->kind);
+			  entry->kind,
+			  ROLE_INDEX_DEFINITION);
 
 	tag.pattern = entry->address.pattern;
 
@@ -1059,6 +1060,8 @@ static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 	tag.extensionFields.scopeName = entryGetAnyUnpulledField (entry, &kindName, TRUE);
 	if (tag.extensionFields.scopeName && kindName)
 		tag.extensionFields.scopeKind = lookupKindFromName (path, kindName);
+
+	/* TODO: role */
 
 	makeTagEntry (&tag);
 	return TRUE;

@@ -582,8 +582,8 @@ static void createTag (tokenInfo *const token)
 			getSourceLanguageName (),
 			token->filePosition,
 			getSourceFileTagPath (),
-			kindFromKind (kind)
-			);
+			kindFromKind (kind),
+		        ROLE_INDEX_DEFINITION);
 	verbose ("Adding tag %s (kind %d)", vStringValue (token->name), kind);
 	if (currentContext->kind != K_UNDEFINED)
 	{

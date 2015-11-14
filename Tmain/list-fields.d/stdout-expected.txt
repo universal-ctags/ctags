@@ -10,7 +10,7 @@ k	NONE	Kind of tag as a single letter	format-char	on
 l	language	Language of source file containing tag	format-char	off
 m	implementation	Implementation information	format-char	off
 n	line	Line number of tag definition	format-char	off
-r	role	role	NONE	off
+r	role	role	format-char	off
 S	signature	Signature of routine (e.g. prototype or parameter list)	format-char	off
 s	NONE	Scope of tag definition(WARNING: this doesn't work well as a format letter)	format-char	on
 t	typeref	Type and name of a variable or typedef	format-char	on

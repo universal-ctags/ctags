@@ -98,7 +98,8 @@ typedef struct sTagEntryInfo {
 		/* type (union/struct/etc.) and name for a variable or typedef. */
 		const char* typeRef [2];  /* e.g., "struct" and struct name */
 
-		void *role;
+#define ROLE_INDEX_DEFINITION -1
+		int roleIndex; /* for role of reference tag */
 	} extensionFields;  /* list of extension fields*/
 } tagEntryInfo;
 
@@ -121,12 +122,15 @@ extern void endEtagsFile (const char *const name);
 extern int makeTagEntry (const tagEntryInfo *const tag);
 extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 			  const kindOption *kind);
+extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
+			     const kindOption *kind, int roleIndex);
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
 			      const char* language,
 			      fpos_t      filePosition,
 			      const char *sourceFileName,
-			      const kindOption *kind);
+			      const kindOption *kind,
+			      int roleIndex);
 
 /* Getting line associated with tag */
 extern char *readSourceLineAnyway (vString *const vLine, const tagEntryInfo *const tag,
