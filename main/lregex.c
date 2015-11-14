@@ -305,6 +305,9 @@ static kindOption *kindNew ()
 	kind->name = NULL;
 	kind->description = NULL;
 	kind->enabled = FALSE;
+	kind->referenceOnly = FALSE;
+	kind->nRoles = 0;
+	kind->roles = NULL;
 	return kind;
 }
 

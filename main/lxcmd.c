@@ -202,6 +202,9 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 	kind->letter = line[0];
 	kind->name = NULL;
 	kind->description = NULL;
+	kind->referenceOnly = FALSE;
+	kind->nRoles = 0;
+	kind->roles = NULL;
 
 	verbose ("	kind letter: <%c>\n", kind->letter);
 

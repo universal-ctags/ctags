@@ -1,16 +1,16 @@
-c	class	classes	on
-d	macro	macro definitions	on
-e	enumerator	enumerators (values inside an enumeration)	on
-f	function	function definitions	on
-g	enum	enumeration names	on
-h	header	included header files	off
-l	local	local variables	off
-m	member	class, struct, and union members	on
-n	namespace	namespaces	on
-p	prototype	function prototypes	off
-s	struct	structure names	on
-t	typedef	typedefs	on
-u	union	union names	on
-v	variable	variable definitions	on
-x	externvar	external and forward variable declarations	off
-L	label	goto label	off
+c	class	classes	on	referenceOnly:FALSE	nRoles:0
+d	macro	macro definitions	on	referenceOnly:FALSE	nRoles:0
+e	enumerator	enumerators (values inside an enumeration)	on	referenceOnly:FALSE	nRoles:0
+f	function	function definitions	on	referenceOnly:FALSE	nRoles:0
+g	enum	enumeration names	on	referenceOnly:FALSE	nRoles:0
+h	header	included header files	off	referenceOnly:FALSE	nRoles:0
+l	local	local variables	off	referenceOnly:FALSE	nRoles:0
+m	member	class, struct, and union members	on	referenceOnly:FALSE	nRoles:0
+n	namespace	namespaces	on	referenceOnly:FALSE	nRoles:0
+p	prototype	function prototypes	off	referenceOnly:FALSE	nRoles:0
+s	struct	structure names	on	referenceOnly:FALSE	nRoles:0
+t	typedef	typedefs	on	referenceOnly:FALSE	nRoles:0
+u	union	union names	on	referenceOnly:FALSE	nRoles:0
+v	variable	variable definitions	on	referenceOnly:FALSE	nRoles:0
+x	externvar	external and forward variable declarations	off	referenceOnly:FALSE	nRoles:0
+L	label	goto label	off	referenceOnly:FALSE	nRoles:0

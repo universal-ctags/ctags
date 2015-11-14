@@ -1,3 +1,3 @@
-a	aa	aa	on
-b	bb	bb	off
-c	a_b_c	a b c	on
+a	aa	aa	on	referenceOnly:FALSE	nRoles:0
+b	bb	bb	off	referenceOnly:FALSE	nRoles:0
+c	a_b_c	a b c	on	referenceOnly:FALSE	nRoles:0

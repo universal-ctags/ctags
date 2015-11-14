@@ -32,11 +32,13 @@ extern void printKind (const kindOption* const kind, boolean allKindFields, bool
 {
 	if (allKindFields)
 	{
-		printf ("%s%c\t%s\t%s\t%s\n", indent ? "\t"           : "",
+		printf ("%s%c\t%s\t%s\t%s\treferenceOnly:%s\tnRoles:%d\n", indent ? "\t"           : "",
 			kind->letter,
 			kind->name        != NULL ? kind->name        : "",
 			kind->description != NULL ? kind->description : "",
-			kind->enabled             ? "on"              : "off");
+			kind->enabled             ? "on"              : "off",
+			kind->referenceOnly       ? "TRUE"            : "FALSE",
+			kind->nRoles);
 	}
 	else
 	{
