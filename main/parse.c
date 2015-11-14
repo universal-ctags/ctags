@@ -63,6 +63,23 @@ extern int makeSimpleTag (
 	return r;
 }
 
+extern int makeSimpleRefTag (const vString* const name, kindOption* const kinds, const int kind,
+			     int roleIndex)
+{
+	int r = SCOPE_NIL;
+
+	Assert (roleIndex < kinds[kind].nRoles);
+
+	if (kinds[kind].roles[roleIndex].enabled)
+	{
+	    tagEntryInfo e;
+	    initRefTagEntry (&e, vStringValue (name), & kinds [kind], roleIndex);
+
+	    r = makeTagEntry (&e);
+	}
+	return r;
+}
+
 static vString* ext2ptrnNew (const char *const ext)
 {
 	vString * ptrn = vStringNewInit ("*.");
