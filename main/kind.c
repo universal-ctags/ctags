@@ -40,7 +40,7 @@ extern void printKind (const kindOption* const kind, boolean allKindFields, bool
 			kind->referenceOnly       ? "TRUE"            : "FALSE",
 			kind->nRoles);
 	}
-	else
+	else if (!kind->referenceOnly)
 	{
 		printf ("%s%c  %s%s\n", indent ? "    " : "", kind->letter,
 			kind->description != NULL ? kind->description :
