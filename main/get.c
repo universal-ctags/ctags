@@ -69,8 +69,10 @@ typedef struct sCppState {
 	boolean hasSingleQuoteLiteralNumbers; /* supports vera number literals:
 						 'h..., 'o..., 'd..., and 'b... */
 	const kindOption  *defineMacroKind;
-	int macroGenericRoleIndex, macroUndefRoleIndex;
+	int macroUndefRoleIndex;
 	const kindOption  *headerKind;
+	int headerSystemRoleIndex;
+	int headerLocalRoleIndex;
 
 	struct sDirective {
 		enum eState state;       /* current directive being processed */
@@ -97,6 +99,8 @@ static cppState Cpp = {
 	NULL,	     /* defineMacroKind */
 	.macroUndefRoleIndex   = ROLE_INDEX_DEFINITION,
 	NULL,	     /* headerKind */
+	.headerSystemRoleIndex = ROLE_INDEX_DEFINITION,
+	.headerLocalRoleIndex = ROLE_INDEX_DEFINITION,
 	{
 		DRCTV_NONE,  /* state */
 		FALSE,       /* accept */
@@ -124,7 +128,8 @@ extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 		     const boolean hasSingleQuoteLiteralNumbers,
 		     const struct sKindOption *defineMacroKind,
 		     int macroUndefRoleIndex,
-		     const struct sKindOption *headerKind)
+		     const struct sKindOption *headerKind,
+		     int headerSystemRoleIndex, int headerLocalRoleIndex)
 {
 	BraceFormat = state;
 
@@ -136,6 +141,8 @@ extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 	Cpp.defineMacroKind  = defineMacroKind;
 	Cpp.macroUndefRoleIndex = macroUndefRoleIndex;
 	Cpp.headerKind  = headerKind;
+	Cpp.headerSystemRoleIndex = headerSystemRoleIndex;
+	Cpp.headerLocalRoleIndex = headerLocalRoleIndex;
 
 	Cpp.directive.state     = DRCTV_NONE;
 	Cpp.directive.accept    = TRUE;
@@ -357,13 +364,15 @@ static void makeDefineTag (const char *const name, boolean undef)
 	}
 }
 
-static void makeIncludeTag (const  char *const name)
+static void makeIncludeTag (const  char *const name, boolean systemHeader)
 {
 	tagEntryInfo e;
+	int role_index = systemHeader? Cpp.headerSystemRoleIndex: Cpp.headerLocalRoleIndex;
 
-	if (Cpp.headerKind && Cpp.headerKind->enabled)
+	if (Cpp.headerKind && isXtagEnabled (XTAG_REFERENCE_TAGS)
+	    && Cpp.headerKind->roles [ role_index ].enabled)
 	{
-		initTagEntry (&e, name, Cpp.headerKind);
+		initRefTagEntry (&e, name, Cpp.headerKind, role_index);
 		e.lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
 		e.isFileScope  = FALSE;
 		e.truncateLine = TRUE;
@@ -436,7 +445,8 @@ static void directiveInclude (const int c)
 	{
 		readFilename (c, Cpp.directive.name);
 		if ((! isIgnore ()) && vStringLength (Cpp.directive.name))
-			makeIncludeTag (vStringValue (Cpp.directive.name));
+			makeIncludeTag (vStringValue (Cpp.directive.name),
+					c == '<');
 	}
 	Cpp.directive.state = DRCTV_NONE;
 }

@@ -3,7 +3,7 @@ d	macro	macro definitions	on	referenceOnly:FALSE	nRoles:1
 e	enumerator	enumerators (values inside an enumeration)	on	referenceOnly:FALSE	nRoles:0
 f	function	function definitions	on	referenceOnly:FALSE	nRoles:0
 g	enum	enumeration names	on	referenceOnly:FALSE	nRoles:0
-h	header	included header files	off	referenceOnly:FALSE	nRoles:0
+h	header	included header files	off	referenceOnly:TRUE	nRoles:2
 l	local	local variables	off	referenceOnly:FALSE	nRoles:0
 m	member	class, struct, and union members	on	referenceOnly:FALSE	nRoles:0
 n	namespace	namespaces	on	referenceOnly:FALSE	nRoles:0

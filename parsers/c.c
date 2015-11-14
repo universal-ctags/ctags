@@ -314,6 +314,16 @@ static roleDesc CMacroRoles [] = {
 };
 
 typedef enum {
+	CR_HEADER_SYSTEM,
+	CR_HEADER_LOCAL,
+} cHeaderRole;
+
+static roleDesc CHeaderRoles [] = {
+	RoleTemplateSystem,
+	RoleTemplateLocal,
+};
+
+typedef enum {
 	CK_UNDEFINED = COMMONK_UNDEFINED,
 	CK_CLASS, CK_DEFINE, CK_ENUMERATOR, CK_FUNCTION,
 	CK_ENUMERATION, CK_HEADER, CK_LOCAL, CK_MEMBER, CK_NAMESPACE, CK_PROTOTYPE,
@@ -328,7 +338,8 @@ static kindOption CKinds [] = {
 	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)"},
 	{ TRUE,  'f', "function",   "function definitions"},
 	{ TRUE,  'g', "enum",       "enumeration names"},
-	{ FALSE, 'h', "header",     "included header files"},
+	{ FALSE, 'h', "header",     "included header files",
+	  .referenceOnly = TRUE,  ATTACH_ROLES(CHeaderRoles)},
 	{ FALSE, 'l', "local",      "local variables"},
 	{ TRUE,  'm', "member",     "class, struct, and union members"},
 	{ TRUE,  'n', "namespace",  "namespaces"},
@@ -421,6 +432,17 @@ static roleDesc VeraMacroRoles [] = {
 	RoleTemplateUndef,
 };
 
+
+typedef enum {
+	VR_HEADER_SYSTEM,
+	VR_HEADER_LOCAL,
+} veraHeaderRole;
+
+static roleDesc VeraHeaderRoles [] = {
+	RoleTemplateSystem,
+	RoleTemplateLocal,
+};
+
 typedef enum {
 	VK_UNDEFINED = COMMONK_UNDEFINED,
 	VK_CLASS, VK_DEFINE, VK_ENUMERATOR, VK_FUNCTION,
@@ -446,7 +468,8 @@ static kindOption VeraKinds [] = {
 	{ TRUE,  'T', "typedef",    "typedefs"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
 	{ FALSE, 'x', "externvar",  "external variable declarations"},
-	{ FALSE, 'h', "header",     "included header files"},
+	{ FALSE, 'h', "header",     "included header files",
+	  .referenceOnly = FALSE, ATTACH_ROLES(VeraHeaderRoles)},
 };
 
 static const keywordDesc KeywordTable [] = {
@@ -3278,6 +3301,8 @@ static rescanReason findCTags (const unsigned int passCount)
 	kindOption *kind_for_define = NULL;
 	kindOption *kind_for_header = NULL;
 	int role_for_macro_undef   = ROLE_INDEX_DEFINITION;
+	int role_for_header_system   = ROLE_INDEX_DEFINITION;
+	int role_for_header_local   = ROLE_INDEX_DEFINITION;
 
 	Assert (passCount < 3);
 
@@ -3286,17 +3311,21 @@ static rescanReason findCTags (const unsigned int passCount)
 		kind_for_define = CKinds+CK_DEFINE;
 		kind_for_header = CKinds+CK_HEADER;
 		role_for_macro_undef = CR_MACRO_UNDEF;
+		role_for_header_system = CR_HEADER_SYSTEM;
+		role_for_header_local = CR_HEADER_LOCAL;
 	}
 	else if (isLanguage (Lang_vera))
 	{
 		kind_for_define = VeraKinds+VK_DEFINE;
 		kind_for_header = VeraKinds+VK_HEADER;
 		role_for_macro_undef = VR_MACRO_UNDEF;
+		role_for_header_system = VR_HEADER_SYSTEM;
+		role_for_header_local = VR_HEADER_LOCAL;
 	}
 
 	cppInit ((boolean) (passCount > 1), isLanguage (Lang_csharp), isLanguage(Lang_vera),
 		 kind_for_define, role_for_macro_undef,
-		 kind_for_header);
+		 kind_for_header, role_for_header_system, role_for_header_local);
 
 	Signature = vStringNew ();
 

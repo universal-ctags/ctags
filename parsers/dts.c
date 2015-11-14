@@ -24,6 +24,18 @@ static roleDesc DTSMacroRoles [] = {
 	RoleTemplateUndef,
 };
 
+
+typedef enum {
+	DTS_HEADER_KIND_SYSTEM_ROLE,
+	DTS_HEADER_KIND_LOCAL_ROLE,
+} dtsHeaderRole;
+
+static roleDesc DTSHeaderRoles [] = {
+	RoleTemplateSystem,
+	RoleTemplateLocal,
+};
+
+
 typedef enum {
 	DTS_MACRO, DTS_HEADER,
 } dtsKind;
@@ -31,7 +43,8 @@ typedef enum {
 static kindOption DTSKinds [] = {
 	{ TRUE,  'd', "macro",      "macro definitions",
 	  .referenceOnly = FALSE, ATTACH_ROLES(DTSMacroRoles)},
-	{ FALSE, 'h', "header",     "included header files"},
+	{ FALSE, 'h', "header",     "included header files",
+	  .referenceOnly = FALSE, ATTACH_ROLES(DTSHeaderRoles)},
 };
 
 static const tagRegexTable const dtsTagRegexTable [] = {
@@ -57,7 +70,7 @@ static void runCppGetc (void)
 {
 	cppInit (0, FALSE, FALSE,
 		 DTSKinds + DTS_MACRO, DTS_MACRO_KIND_UNDEF_ROLE,
-		 DTSKinds + DTS_HEADER);
+		 DTSKinds + DTS_HEADER, DTS_HEADER_KIND_SYSTEM_ROLE, DTS_HEADER_KIND_LOCAL_ROLE);
 
 	findRegexTagsMainloop (cppGetc);
 
