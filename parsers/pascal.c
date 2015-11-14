@@ -18,6 +18,7 @@
 #include "entry.h"
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -254,7 +255,7 @@ extern parserDefinition* PascalParser (void)
 	parserDefinition* def = parserNew ("Pascal");
 	def->extensions = extensions;
 	def->kinds      = PascalKinds;
-	def->kindCount  = COUNT_ARRAY (PascalKinds);
+	def->kindCount  = ARRAY_SIZE (PascalKinds);
 	def->parser     = findPascalTags;
 	return def;
 }

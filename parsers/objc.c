@@ -1133,13 +1133,13 @@ extern parserDefinition *ObjcParser (void)
 					      NULL };
 	parserDefinition *def = parserNewFull ("ObjectiveC", KIND_FILE_ALT);
 	def->kinds = ObjcKinds;
-	def->kindCount = COUNT_ARRAY (ObjcKinds);
+	def->kindCount = ARRAY_SIZE (ObjcKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findObjcTags;
 	def->initialize = objcInitialize;
 	def->selectLanguage = selectors;
 	def->keywordTable = objcKeywordTable;
-	def->keywordCount = COUNT_ARRAY (objcKeywordTable);
+	def->keywordCount = ARRAY_SIZE (objcKeywordTable);
 	return def;
 }

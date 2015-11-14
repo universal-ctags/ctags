@@ -21,6 +21,7 @@
 #include "vstring.h"
 #include "nestlevel.h"
 #include "entry.h"
+#include "routines.h"
 
 /*
 *   DATA DEFINITIONS
@@ -204,7 +205,7 @@ extern parserDefinition* RstParser (void)
 	parserDefinition* const def = parserNew ("reStructuredText");
 
 	def->kinds = RstKinds;
-	def->kindCount = COUNT_ARRAY (RstKinds);
+	def->kindCount = ARRAY_SIZE (RstKinds);
 	def->extensions = extensions;
 	def->parser = findRstTags;
 	return def;

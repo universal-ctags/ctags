@@ -3350,7 +3350,7 @@ extern parserDefinition* CParser (void)
 	static const char *const extensions [] = { "c", NULL };
 	parserDefinition* def = parserNew ("C");
 	def->kinds      = CKinds;
-	def->kindCount  = COUNT_ARRAY (CKinds);
+	def->kindCount  = ARRAY_SIZE (CKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeCParser;
@@ -3362,7 +3362,7 @@ extern parserDefinition* DParser (void)
 	static const char *const extensions [] = { "d", "di", NULL };
 	parserDefinition* def = parserNew ("D");
 	def->kinds      = DKinds;
-	def->kindCount  = COUNT_ARRAY (DKinds);
+	def->kindCount  = ARRAY_SIZE (DKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeDParser;
@@ -3384,7 +3384,7 @@ extern parserDefinition* CppParser (void)
 
 	parserDefinition* def = parserNew ("C++");
 	def->kinds      = CKinds;
-	def->kindCount  = COUNT_ARRAY (CKinds);
+	def->kindCount  = ARRAY_SIZE (CKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeCppParser;
@@ -3398,7 +3398,7 @@ extern parserDefinition* CsharpParser (void)
 	static const char *const aliases [] = { "csharp", NULL };
 	parserDefinition* def = parserNew ("C#");
 	def->kinds      = CsharpKinds;
-	def->kindCount  = COUNT_ARRAY (CsharpKinds);
+	def->kindCount  = ARRAY_SIZE (CsharpKinds);
 	def->extensions = extensions;
 	def->aliases    = aliases;
 	def->parser2    = findCTags;
@@ -3411,7 +3411,7 @@ extern parserDefinition* JavaParser (void)
 	static const char *const extensions [] = { "java", NULL };
 	parserDefinition* def = parserNew ("Java");
 	def->kinds      = JavaKinds;
-	def->kindCount  = COUNT_ARRAY (JavaKinds);
+	def->kindCount  = ARRAY_SIZE (JavaKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeJavaParser;
@@ -3423,7 +3423,7 @@ extern parserDefinition* VeraParser (void)
 	static const char *const extensions [] = { "vr", "vri", "vrh", NULL };
 	parserDefinition* def = parserNew ("Vera");
 	def->kinds      = VeraKinds;
-	def->kindCount  = COUNT_ARRAY (VeraKinds);
+	def->kindCount  = ARRAY_SIZE (VeraKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeVeraParser;

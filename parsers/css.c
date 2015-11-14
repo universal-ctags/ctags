@@ -12,7 +12,7 @@
 #include "entry.h"
 #include "parse.h" 
 #include "read.h" 
-
+#include "routines.h"
 
 typedef enum eCssKinds {
 	K_CLASS, K_SELECTOR, K_ID
@@ -261,7 +261,7 @@ extern parserDefinition* CssParser (void)
     static const char *const extensions [] = { "css", NULL };
     parserDefinition* def = parserNew ("CSS");
     def->kinds      = CssKinds;
-    def->kindCount  = COUNT_ARRAY (CssKinds);
+    def->kindCount  = ARRAY_SIZE (CssKinds);
     def->extensions = extensions;
     def->parser     = findCssTags;
     return def;

@@ -613,7 +613,7 @@ extern void addTagXcmd (const langType language, vString* pathvstr, const char* 
 
 	set->count += 1;
 
-	flagsEval (flags, xcmdFlagDefs, COUNT_ARRAY(xcmdFlagDefs), path);
+	flagsEval (flags, xcmdFlagDefs, ARRAY_SIZE(xcmdFlagDefs), path);
 
 	path->available = (loadPathKinds (path, language));
 	useXcmdMethod (language);

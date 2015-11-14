@@ -18,6 +18,7 @@
 
 #include "entry.h"
 #include "parse.h"
+#include "routines.h"
 #include "read.h"
 #include "vstring.h"
 
@@ -205,7 +206,7 @@ extern parserDefinition* DiffParser (void)
 	static const char *const extensions [] = { "diff", "patch", NULL };
 	parserDefinition* const def = parserNew ("Diff");
 	def->kinds      = DiffKinds;
-	def->kindCount  = COUNT_ARRAY (DiffKinds);
+	def->kindCount  = ARRAY_SIZE (DiffKinds);
 	def->extensions = extensions;
 	def->parser     = findDiffTags;
 	def->useCork    = TRUE;

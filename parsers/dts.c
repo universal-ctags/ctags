@@ -13,6 +13,8 @@
 #include "general.h"
 #include "get.h"
 #include "parse.h"
+#include "routines.h"
+#include "routines.h"
 
 typedef enum {
 	DTS_MACRO, DTS_HEADER,
@@ -58,11 +60,11 @@ extern parserDefinition* DTSParser (void)
 	static const char *const extensions [] = { "dts", "dtsi", NULL };
 	parserDefinition* const def = parserNew ("DTS");
 	def->kinds      = DTSKinds;
-	def->kindCount  = COUNT_ARRAY (DTSKinds);
+	def->kindCount  = ARRAY_SIZE (DTSKinds);
 	def->extensions = extensions;
 	def->parser     = runCppGetc;
 	def->tagRegexTable = dtsTagRegexTable;
-	def->tagRegexCount = COUNT_ARRAY (dtsTagRegexTable);
+	def->tagRegexCount = ARRAY_SIZE (dtsTagRegexTable);
 	def->method     = METHOD_REGEX;
 	return def;
 }

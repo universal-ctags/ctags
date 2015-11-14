@@ -386,8 +386,8 @@ static regexPattern *addCompiledTagPattern (
 	boolean exclusive = FALSE;
 	unsigned long scopeActions = 0UL;
 
-	flagsEval (flags, prePtrnFlagDef, COUNT_ARRAY(prePtrnFlagDef), &exclusive);
-	flagsEval (flags, scopePtrnFlagDef, COUNT_ARRAY(scopePtrnFlagDef), &scopeActions);
+	flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &exclusive);
+	flagsEval (flags, scopePtrnFlagDef, ARRAY_SIZE(scopePtrnFlagDef), &scopeActions);
 	if (*name == '\0' && exclusive && kind == KIND_REGEX_DEFAULT)
 	{
 		kind = KIND_GHOST;
@@ -416,7 +416,7 @@ static void addCompiledCallbackPattern (
 {
 	regexPattern * ptrn;
 	boolean exclusive = FALSE;
-	flagsEval (flags, prePtrnFlagDef, COUNT_ARRAY(prePtrnFlagDef), &exclusive);
+	flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &exclusive);
 	ptrn  = addCompiledTagCommon(language, pattern, '\0');
 	ptrn->type    = PTRN_CALLBACK;
 	ptrn->u.callback.function = callback;
@@ -474,7 +474,7 @@ static regex_t* compileRegex (const char* const regexp, const char* const flags)
 
 	flagsEval (flags,
 		   regexFlagDefs,
-		   COUNT_ARRAY(regexFlagDefs),
+		   ARRAY_SIZE(regexFlagDefs),
 		   &cflags);
 
 	result = xMalloc (1, regex_t);
@@ -1010,9 +1010,9 @@ extern void printRegexKinds (const langType language,
 
 extern void printRegexFlags (void)
 {
-	flagPrintHelp (regexFlagDefs,  COUNT_ARRAY (regexFlagDefs));
-	flagPrintHelp (prePtrnFlagDef, COUNT_ARRAY (prePtrnFlagDef));
-	flagPrintHelp (scopePtrnFlagDef, COUNT_ARRAY (scopePtrnFlagDef));
+	flagPrintHelp (regexFlagDefs,  ARRAY_SIZE (regexFlagDefs));
+	flagPrintHelp (prePtrnFlagDef, ARRAY_SIZE (prePtrnFlagDef));
+	flagPrintHelp (scopePtrnFlagDef, ARRAY_SIZE (scopePtrnFlagDef));
 }
 
 extern void freeRegexResources (void)

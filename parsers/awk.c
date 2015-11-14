@@ -16,6 +16,7 @@
 
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -70,7 +71,7 @@ extern parserDefinition* AwkParser (void)
 	static const char *const extensions [] = { "awk", "gawk", "mawk", NULL };
 	parserDefinition* def = parserNew ("Awk");
 	def->kinds      = AwkKinds;
-	def->kindCount  = COUNT_ARRAY (AwkKinds);
+	def->kindCount  = ARRAY_SIZE (AwkKinds);
 	def->extensions = extensions;
 	def->parser     = findAwkTags;
 	return def;

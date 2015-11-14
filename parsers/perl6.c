@@ -330,7 +330,7 @@ Perl6Parser (void)
 					   NULL };
     parserDefinition* def = parserNew("Perl6");
     def->kinds      = perl6Kinds;
-    def->kindCount  = COUNT_ARRAY(perl6Kinds);
+    def->kindCount  = ARRAY_SIZE(perl6Kinds);
     def->extensions = extensions;
     def->parser     = findPerl6Tags;
     def->selectLanguage = selectors;

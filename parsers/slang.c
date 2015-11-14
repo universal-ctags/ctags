@@ -14,6 +14,7 @@
  */
 #include "general.h"  /* must always come first */
 #include "parse.h"
+#include "routines.h"
 
 static const tagRegexTable const slangTagRegexTable [] = {
 	{"^.*define[ \t]+([A-Z_][A-Z0-9_]*)[^;]*$", "\\1",
@@ -32,7 +33,7 @@ extern parserDefinition* SlangParser (void)
 	parserDefinition* const def = parserNew ("SLang");
 	def->extensions = extensions;
 	def->tagRegexTable = slangTagRegexTable;
-	def->tagRegexCount = COUNT_ARRAY (slangTagRegexTable);
+	def->tagRegexCount = ARRAY_SIZE (slangTagRegexTable);
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }

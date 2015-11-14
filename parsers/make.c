@@ -18,6 +18,7 @@
 #include "options.h"
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -267,7 +268,7 @@ extern parserDefinition* MakefileParser (void)
 	static const char *const extensions [] = { "mak", "mk", NULL };
 	parserDefinition* const def = parserNew ("Make");
 	def->kinds      = MakeKinds;
-	def->kindCount  = COUNT_ARRAY (MakeKinds);
+	def->kindCount  = ARRAY_SIZE (MakeKinds);
 	def->patterns   = patterns;
 	def->extensions = extensions;
 	def->parser     = findMakeTags;

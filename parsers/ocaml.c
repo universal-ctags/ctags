@@ -1896,12 +1896,12 @@ extern parserDefinition *OcamlParser (void)
 					       NULL };
 	parserDefinition *def = parserNew ("OCaml");
 	def->kinds = OcamlKinds;
-	def->kindCount = COUNT_ARRAY (OcamlKinds);
+	def->kindCount = ARRAY_SIZE (OcamlKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findOcamlTags;
 	def->initialize = ocamlInitialize;
 	def->keywordTable = OcamlKeywordTable;
-	def->keywordCount = COUNT_ARRAY (OcamlKeywordTable);
+	def->keywordCount = ARRAY_SIZE (OcamlKeywordTable);
 	return def;
 }

@@ -17,6 +17,7 @@
 
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -118,7 +119,7 @@ extern parserDefinition* SchemeParser (void)
 	};
 	parserDefinition* def = parserNew ("Scheme");
 	def->kinds      = SchemeKinds;
-	def->kindCount  = COUNT_ARRAY (SchemeKinds);
+	def->kindCount  = ARRAY_SIZE (SchemeKinds);
 	def->extensions = extensions;
 	def->aliases    = aliases;
 	def->parser     = findSchemeTags;

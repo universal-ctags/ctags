@@ -20,8 +20,6 @@
 /*
 *   MACROS
 */
-#define COUNT_ARRAY(ARRAY_VAR) (sizeof(ARRAY_VAR)/sizeof(ARRAY_VAR[0]))
-
 #define LANG_AUTO   (-1)
 #define LANG_IGNORE (-2)
 

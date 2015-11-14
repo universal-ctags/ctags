@@ -1198,7 +1198,7 @@ extern void processLanguageDefineOption (
 		LanguageTable = xRealloc (LanguageTable, i + 1, parserDefinition*);
 		LanguageTable [i] = def;
 
-		flagsEval (flags, LangDefFlagDef, COUNT_ARRAY (LangDefFlagDef), def);
+		flagsEval (flags, LangDefFlagDef, ARRAY_SIZE (LangDefFlagDef), def);
 
 		eFree (name);
 	}

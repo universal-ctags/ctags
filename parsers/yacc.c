@@ -14,6 +14,7 @@
 
 #include <string.h>
 #include "parse.h"
+#include "routines.h"
 
 /*
 *   FUNCTION DEFINITIONS
@@ -31,7 +32,7 @@ extern parserDefinition* YaccParser (void)
 	def->extensions = extensions;
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	def->tagRegexTable = yaccTagRegexTable;
-	def->tagRegexCount = COUNT_ARRAY (yaccTagRegexTable);
+	def->tagRegexCount = ARRAY_SIZE (yaccTagRegexTable);
 	return def;
 }
 

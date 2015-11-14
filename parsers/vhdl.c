@@ -819,12 +819,12 @@ extern parserDefinition *VhdlParser (void)
 	static const char *const extensions[] = { "vhdl", "vhd", NULL };
 	parserDefinition *def = parserNew ("VHDL");
 	def->kinds = VhdlKinds;
-	def->kindCount = COUNT_ARRAY (VhdlKinds);
+	def->kindCount = ARRAY_SIZE (VhdlKinds);
 	def->extensions = extensions;
 	def->parser = findVhdlTags;
 	def->initialize = initialize;
 	def->keywordTable = VhdlKeywordTable;
-	def->keywordCount = COUNT_ARRAY (VhdlKeywordTable);
+	def->keywordCount = ARRAY_SIZE (VhdlKeywordTable);
 	return def;
 }
 

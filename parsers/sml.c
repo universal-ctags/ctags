@@ -18,6 +18,7 @@
 #include "entry.h"
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -209,7 +210,7 @@ extern parserDefinition *SmlParser (void)
 	static const char *const extensions[] = { "sml", "sig", NULL };
 	parserDefinition *def = parserNew ("SML");
 	def->kinds = SmlKinds;
-	def->kindCount = COUNT_ARRAY (SmlKinds);
+	def->kindCount = ARRAY_SIZE (SmlKinds);
 	def->extensions = extensions;
 	def->parser = findSmlTags;
 	return def;
