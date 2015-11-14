@@ -28,32 +28,6 @@
 *   DATA DECLARATIONS
 */
 
-/*  Maintains the state of the tag file.
- */
-struct sTagEntryInfo;
-typedef struct eTagFile {
-	char *name;
-	char *directory;
-	FILE *fp;
-	struct sNumTags { unsigned long added, prev; } numTags;
-	struct sMax { size_t line, tag, file; } max;
-	struct sEtags {
-		char *name;
-		FILE *fp;
-		size_t byteCount;
-	} etags;
-	vString *vLine;
-
-	unsigned int cork;
-	struct sCorkQueue {
-		struct sTagEntryInfo* queue;
-		unsigned int length;
-		unsigned int count;
-	} corkQueue;
-
-	boolean patternCacheValid;
-} tagFile;
-
 typedef struct sTagFields {
 	unsigned int count;        /* number of additional extension flags */
 	const char *const *label;  /* list of labels for extension flags */
@@ -102,6 +76,31 @@ typedef struct sTagEntryInfo {
 		int roleIndex; /* for role of reference tag */
 	} extensionFields;  /* list of extension fields*/
 } tagEntryInfo;
+
+/*  Maintains the state of the tag file.
+ */
+typedef struct eTagFile {
+	char *name;
+	char *directory;
+	FILE *fp;
+	struct sNumTags { unsigned long added, prev; } numTags;
+	struct sMax { size_t line, tag, file; } max;
+	struct sEtags {
+		char *name;
+		FILE *fp;
+		size_t byteCount;
+	} etags;
+	vString *vLine;
+
+	unsigned int cork;
+	struct sCorkQueue {
+		struct sTagEntryInfo* queue;
+		unsigned int length;
+		unsigned int count;
+	} corkQueue;
+
+	boolean patternCacheValid;
+} tagFile;
 
 /*
 *   GLOBAL VARIABLES
