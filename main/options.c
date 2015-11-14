@@ -643,7 +643,7 @@ extern langType getLanguageComponentInOption (const char *const option,
 			return LANG_IGNORE;
 	}
 
-	language = getNamedLanguage (lang);
+	language = getNamedLanguage (lang, 0);
 	if (language == LANG_IGNORE)
 		error (FATAL, "Unknown language \"%s\" in \"%s\" option", lang, option);
 
@@ -1222,7 +1222,7 @@ static void processLanguageForceOption (
 	if (strcasecmp (parameter, "auto") == 0)
 		language = LANG_AUTO;
 	else
-		language = getNamedLanguage (parameter);
+		language = getNamedLanguage (parameter, 0);
 
 	if (strcmp (option, "lang") == 0  ||  strcmp (option, "language") == 0)
 		error (WARNING,
@@ -1334,7 +1334,7 @@ static char* processLanguageMap (char* map)
 		char *list = separator + 1;
 		boolean clear = FALSE;
 		*separator = '\0';
-		language = getNamedLanguage (map);
+		language = getNamedLanguage (map, 0);
 		if (language != LANG_IGNORE)
 		{
 			const char *const deflt = "default";
@@ -1427,7 +1427,7 @@ static void processLanguagesOption (
 				enableLanguages ((boolean) (mode != Remove));
 			else
 			{
-				const langType language = getNamedLanguage (lang);
+				const langType language = getNamedLanguage (lang, 0);
 				if (language == LANG_IGNORE)
 					error (WARNING, "Unknown language \"%s\" in \"%s\" option", lang, option);
 				else
@@ -1499,7 +1499,7 @@ static void processListAliasesOption (
 		printLanguageAliases (LANG_AUTO);
 	else
 	{
-		langType language = getNamedLanguage (parameter);
+		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
@@ -1522,7 +1522,7 @@ static void processListFileKindOption (
 		printLanguageFileKind (LANG_AUTO);
 	else
 	{
-		langType language = getNamedLanguage (parameter);
+		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
@@ -1540,7 +1540,7 @@ static void processListKindsOption (
 		printLanguageKinds (LANG_AUTO, print_all);
 	else
 	{
-		langType language = getNamedLanguage (parameter);
+		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
@@ -1557,7 +1557,7 @@ static void processListMapsOption (
 	    printLanguageMaps (LANG_AUTO);
 	else
 	{
-		langType language = getNamedLanguage (parameter);
+		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else

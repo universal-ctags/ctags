@@ -165,17 +165,32 @@ extern kindOption* getLanguageFileKind (const langType language)
 	return kind;
 }
 
-extern langType getNamedLanguage (const char *const name)
+extern langType getNamedLanguage (const char *const name, size_t len)
 {
 	langType result = LANG_IGNORE;
 	unsigned int i;
 	Assert (name != NULL);
+
 	for (i = 0  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
 	{
 		const parserDefinition* const lang = LanguageTable [i];
 		if (lang->name != NULL)
-			if (strcasecmp (name, lang->name) == 0)
-				result = i;
+		{
+			if (len == 0)
+			{
+				if (strcasecmp (name, lang->name) == 0)
+					result = i;
+			}
+			else
+			{
+				vString* vstr = vStringNewInit (name);
+				vStringTruncate (vstr, len);
+
+				if (strcasecmp (vStringValue (vstr), lang->name) == 0)
+					result = i;
+				vStringDelete (vstr);
+			}
+		}
 	}
 	return result;
 }
@@ -682,7 +697,7 @@ pickLanguageBySelection (selectLanguage selector, FILE *input)
     if (lang)
     {
         verbose ("	selection: %s\n", lang);
-        return getNamedLanguage(lang);
+        return getNamedLanguage(lang, 0);
     }
     else
     {
@@ -1190,7 +1205,7 @@ extern void processLanguageDefineOption (
 {
 	if (parameter [0] == '\0')
 		error (WARNING, "No language specified for \"%s\" option", option);
-	else if (getNamedLanguage (parameter) != LANG_IGNORE)
+	else if (getNamedLanguage (parameter, 0) != LANG_IGNORE)
 		error (WARNING, "Language \"%s\" already defined", parameter);
 	else
 	{
@@ -1345,7 +1360,7 @@ extern boolean processKindOption (
 		{
 			vString* langName = vStringNew ();
 			vStringNCopyS (langName, option, len);
-			language = getNamedLanguage (vStringValue (langName));
+			language = getNamedLanguage (vStringValue (langName), 0);
 			if (language == LANG_IGNORE)
 				error (WARNING, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
 			else
@@ -1370,7 +1385,7 @@ extern boolean processKindOption (
 		}
 		else
 		{
-			language = getNamedLanguage (lang);
+			language = getNamedLanguage (lang, 0);
 			if (language == LANG_IGNORE)
 				error (WARNING, "Unknown language \"%s\" in \"%s\" option", lang, option);
 			else

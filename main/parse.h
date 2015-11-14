@@ -135,7 +135,7 @@ extern parserDefinition* parserNewFull (const char* name, char fileKind);
 extern boolean getLanguageAllowNullTag (const langType language);
 extern const char *getLanguageName (const langType language);
 extern kindOption* getLanguageFileKind (const langType language);
-extern langType getNamedLanguage (const char *const name);
+extern langType getNamedLanguage (const char *const name, size_t len);
 extern langType getFileLanguage (const char *const fileName);
 extern boolean isLanguageEnabled (const langType language);
 extern boolean isLanguageKindEnabled (const langType language, char kind);
