@@ -47,3 +47,15 @@ win32/*.suo
 win32/*.user
 win32/[Dd]ebug/
 win32/[Rr]elease/
+Makefile.in
+config.guess
+config.sub
+mkinstalldirs
+aclocal.m4
+compile
+ctags-universal*
+depcomp
+missing
+.deps
+.dirstamp
+stamp-h1
