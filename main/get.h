@@ -13,8 +13,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
-
-#include "ctags.h"  /* to define langType */
+#include "kind.h"
 
 /*
 *   MACROS
@@ -61,7 +60,6 @@
 extern boolean isBraceFormat (void);
 extern unsigned int getDirectiveNestLevel (void);
 
-struct sKindOption;
 extern void cppInit (const boolean state,
 		     const boolean hasAtLiteralStrings,
 		     const boolean hasSingleQuoteLiteralNumbers,
