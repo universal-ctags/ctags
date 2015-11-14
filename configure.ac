@@ -8,6 +8,7 @@
 
 AC_PREREQ([2.59])
 AC_INIT([ctags],[universal])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_HEADERS([config.h])
 if ! test -e "${srcdir}/config.h.in"; then
    echo "---"
@@ -238,30 +239,9 @@ AC_CONFIG_COMMANDS_PRE([
 	AC_DEFINE_UNQUOTED([PKGLIBEXECDIR], ["${PKGLIBEXECDIR}"])
 ])
 
-
-install_targets="install-ctags install-libexec"
-AC_MSG_CHECKING(whether to install link to etags)
-if test yes = "$enable_etags"; then
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-etags"
-else
-	AC_MSG_RESULT(no)
-fi
-AC_MSG_CHECKING(whether to install readtags object file)
-if test yes = "$enable_readlib"; then
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-lib"
-else
-	AC_MSG_RESULT(no)
-fi
-AC_MSG_CHECKING(whether to install readtags command)
-if test no = "$enable_readcmd"; then
-	AC_MSG_RESULT(no)
-else
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-cmd"
-fi
-AC_SUBST(install_targets)
+AM_CONDITIONAL(INSTALL_LIB, [test "x$enable_readlib" = "xyes"])
+AM_CONDITIONAL(INSTALL_ETAGS, [test "x$enable_etags" = "xyes"])
+AM_CONDITIONAL(USE_READCMD, [test "x$enable_readcmd" = "xyes"])
 
 dnl AC_MSG_NOTICE(Change with $program_transform_name)
 ctags_name_executable=`echo ctags | sed "$program_transform_name"`
@@ -577,9 +557,8 @@ AC_SUBST([REGCOMP_CPPFLAGS])
 
 AC_CHECK_FUNCS(scandir)
 
-install_libexec_targets=
-AC_CHECK_FUNCS(fork waitpid execv pipe,[install_libexec_targets="$install_libexec_targets install-libexec-drivers"])
-AC_SUBST(install_libexec_targets)
+AC_CHECK_FUNCS(fork waitpid execv pipe,[enable_xcmd=yes],[enable_xcmd=no])
+AM_CONDITIONAL([ENABLE_XCMD], [test "xyes" = "x$enable_xcmd"])
 
 # Checks for missing prototypes
 # -----------------------------
