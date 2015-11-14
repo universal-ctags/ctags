@@ -1384,25 +1384,6 @@ extern void printLanguageFileKind (const langType language)
 		printf ("%c\n", LanguageTable [language]->fileKind->letter);
 }
 
-extern void printKind (const kindOption* const kind, boolean allKindFields, boolean indent)
-{
-	if (allKindFields)
-	{
-		printf ("%s%c\t%s\t%s\t%s\n", indent ? "\t"           : "",
-			kind->letter,
-			kind->name        != NULL ? kind->name        : "",
-			kind->description != NULL ? kind->description : "",
-			kind->enabled             ? "on"              : "off");
-	}
-	else
-	{
-		printf ("%s%c  %s%s\n", indent ? "    " : "", kind->letter,
-			kind->description != NULL ? kind->description :
-			(kind->name != NULL ? kind->name : ""),
-			kind->enabled ? "" : " [off]");
-	}
-}
-
 static void printKinds (langType language, boolean allKindFields, boolean indent)
 {
 	const parserDefinition* lang;
