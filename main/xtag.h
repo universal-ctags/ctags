@@ -31,7 +31,14 @@ typedef struct sXtagDesc {
 	unsigned char letter;
 	const char* description;  /* displayed in --list-extras output */
 
-	/* If the default vlalue for  */
+	/* If the value for "enabled" is given dynamically,
+	   use this field.
+
+	   "enabled" field of Pseudo extra tag depends on where
+	   the output stream is connected to. If it is connected
+	   to standared output, the tag is disabled by default.
+	   If it is connected to a regular file, the tag is enabled
+	   by default. */
 	boolean (* isEnabled) (struct sXtagDesc *desc);
 } xtagDesc;
 
