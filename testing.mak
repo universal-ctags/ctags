@@ -1,13 +1,5 @@
 .PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck help
 
-.ifdef VG
-VALGRIND=--with-valgrind
-.endif
-
-.ifdef TRAVIS
-SHOW_DIFF_OUTPUT=--show-diff-output
-.endif
-
 CTAGS_TEST = ./ctags$(EXEEXT)
 TIMEOUT=
 LANGUAGES=
@@ -27,7 +19,7 @@ fuzz: $(CTAGS_TEST)
 		--languages=$(LANGUAGES) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) --run-shrink \
+		@VALGRIND@ --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
 
@@ -41,7 +33,7 @@ noise: $(CTAGS_TEST)
 		--languages=$(LANGUAGES) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) --run-shrink \
+		@VALGRIND@ --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
 
@@ -55,7 +47,7 @@ chop: $(CTAGS_TEST)
 		--languages=$(LANGUAGES) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) --run-shrink \
+		@VALGRIND@ --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
 
@@ -75,9 +67,9 @@ units: $(CTAGS_TEST)
 		--units=$(UNITS) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) --run-shrink \
+		@VALGRIND@ --run-shrink \
 		--with-timeout=$(TIMEOUT) \
-		$(SHOW_DIFF_OUTPUT)"; \
+		@SHOW_DIFF_OUTPUT@"; \
 	 $(SHELL) $${c} $(srcdir)/Units $${builddir}/Units
 
 clean-units:
@@ -98,8 +90,8 @@ tmain: $(CTAGS_TEST)
 		--ctags=$(CTAGS_TEST) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) \
-		$(SHOW_DIFF_OUTPUT)"; \
+		@VALGRIND@ \
+		@SHOW_DIFF_OUTPUT@"; \
 	 $(SHELL) $${c} $(srcdir)/Tmain $${builddir}/Tmain
 
 clean-tmain:

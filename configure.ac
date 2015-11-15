@@ -217,6 +217,22 @@ AC_ARG_WITH([ctags-libexecdir],
 	[AS_HELP_STRING([--with-ctags-libexecdir=DIR],
 		['universal-ctags'-specific program executables [LIBEXECDIR/ctags]])])
 
+AC_ARG_ENABLE(travis,
+    [AS_HELP_STRING([--enable-travis],
+        [prepare for a build on Travis CI])])
+AM_CONDITIONAL([TRAVIS], [test "x$travis" = "xtrue"])
+AM_COND_IF([TRAVIS],
+    [AC_SUBST([SHOW_DIFF_OUTPUT], [--show-diff-output])],
+    [AC_SUBST([SHOW_DIFF_OUTPUT], []):])
+
+AC_ARG_ENABLE(valgrind,
+    [AS_HELP_STRING([--enable-valgrind],
+        [enable Valgrind reporting])])
+AM_CONDITIONAL([VALGRIND], [test "x$valgrind" = "xtrue"])
+AM_COND_IF([VALGRIND],
+    [AC_SUBST([VALGRIND], [--with-valgrind])],
+    [AC_SUBST([VALGRIND], []):])
+
 AC_ARG_PROGRAM
 
 # Process configuration options

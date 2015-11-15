@@ -14,7 +14,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 autoreconf -f -i -v
-./configure --enable-iconv --enable-coverage-gcov
+./configure --enable-iconv --enable-coverage-gcov --enable-travis
 
 if [ "$TARGET" = "Unix" ]; then
     if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CC" = "gcc" ]; then
@@ -22,7 +22,7 @@ if [ "$TARGET" = "Unix" ]; then
     else
         make -j2
     fi
-    make -j2 check TRAVIS=1
+    make -j2 check
 elif [ "$TARGET" = "Mingw32" ]; then
     make -j2 CC=i686-w64-mingw32-gcc -f mk_mingw.mak
     # Don't run test units in Mingw32 target

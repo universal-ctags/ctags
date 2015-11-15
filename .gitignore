@@ -59,3 +59,5 @@ missing
 .deps
 .dirstamp
 stamp-h1
+*-actual.txt
+*-diff.txt
