@@ -8,6 +8,8 @@
 #ifndef CTAGS_MAIN_KIND_H
 #define CTAGS_MAIN_KIND_H
 
+#include "general.h"
+
 /*
  * Predefined kinds
  */
