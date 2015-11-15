@@ -47,7 +47,7 @@ V_CC_1	 =
 ctags: ctags.exe
 dctags: dctags.exe
 
-ctags.exe dctags.exe: $(OBJECTS) $(HEADERS) $(REGEX_HEADERS) $(FNMATCH_HEADERS)
+ctags.exe dctags.exe: $(OBJECTS) $(HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS)
 	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(OBJECTS) $(LIBS)
 
 readtags.exe: readtags.c

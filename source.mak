@@ -31,6 +31,8 @@ MAIN_HEADS =			\
 
 PARSER_HEADS =
 
+HEADS = $(MAIN_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS)
+
 PARSER_SOURCES =			\
 	parsers/ada.c			\
 	parsers/ant.c			\
@@ -116,6 +118,15 @@ SOURCES =	\
 		$(MAIN_SOURCES) $(MAIN_HEADS)		\
 		$(PARSER_SOURCES) $(PARSER_HEADS)	\
 		$(DEBUG_SOURCES) $(DEBUG_HEADS)
+
+ENVIRONMENT_HEADS = e_msoft.h
+ENVIRONMENT_SOURCES =
+
+REGEX_HEADS = gnu_regex/regex.h
+REGEX_SOURCES = gnu_regex/regex.c
+
+FNMATCH_HEADS = fnmatch/fnmatch.h
+FNMATCH_SOURCES = fnmatch/fnmatch.c
 
 OBJECTS = \
 	$(SOURCES:.c=.$(OBJEXT)) \
