@@ -1401,6 +1401,52 @@ extern boolean processKindOption (
 #undef PREFIX_LEN
 }
 
+static void printRoles (const langType language, const char* letters, boolean allowMissingKind)
+{
+	const parserDefinition* const lang = LanguageTable [language];
+	const char *c;
+
+	for (c = letters; *c != '\0'; c++)
+	{
+		int i;
+		const kindOption *k;
+
+		for (i = 0; i < lang->kindCount; ++i)
+		{
+			k = lang->kinds + i;
+			if (*c == KIND_WILDCARD || k->letter == *c)
+			{
+				int j;
+				const roleDesc *r;
+
+				for (j = 0; j < k->nRoles; j++)
+				{
+					r = k->roles + j;
+					printf ("%s\t%c\t", lang->name, k->letter);
+					printRole (r);
+				}
+				if (*c != KIND_WILDCARD)
+					break;
+			}
+		}
+		if ((i == lang->kindCount) && (*c != KIND_WILDCARD) && (!allowMissingKind))
+			error (FATAL, "No such letter kind in %s: %c\n", lang->name, *c);
+	}
+}
+
+extern void printLanguageRoles (const langType language, const char* letters)
+{
+	if (language == LANG_AUTO)
+	{
+		unsigned int i;
+		for (i = 0  ;  i < LanguageCount  ;  ++i)
+			printRoles (i, letters, TRUE);
+	}
+	else
+		printRoles (language, letters, FALSE);
+
+}
+
 extern void printLanguageFileKind (const langType language)
 {
 	if (language == LANG_AUTO)
