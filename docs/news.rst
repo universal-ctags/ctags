@@ -60,13 +60,6 @@ Heavily improved language parsers
 New options
 ---------------------------------------------------------------------
 
-Tagging #undef
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-``--undef[=yes|no]``
-    Allows disabling the generation of macro tags from ``#undef``
-    directives.
-
 Wildcard in options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -385,7 +385,7 @@ static void directiveDefine (const int c, boolean undef)
 
 static void directiveUndef (const int c)
 {
-	if (Option.undef)
+	if (isXtagEnabled (XTAG_REFERENCE_TAGS))
 	{
 		directiveDefine (c, TRUE);
 	}

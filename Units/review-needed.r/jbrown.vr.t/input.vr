@@ -1,6 +1,7 @@
 // Sample taken from:
 // http://groups.google.com/groups?q=vera+group:comp.*&hl=en&lr=&ie=UTF-8&oe=UTF-8&selm=39BD28D2.40737022%40us.ibm.com.remove.this.spam.filter&rnum=6
 #include <vera_defines.vrh>
+#include "mine.vrh"
 
 typedef class Transaction;
 

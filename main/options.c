@@ -153,7 +153,6 @@ optionValues Option = {
 	NULL,		/* --output-encoding */
 #endif
 	FALSE,      /* --if0 */
-	TRUE,       /* --undef */
 	LANG_AUTO,  /* --lang */
 	TRUE,       /* --links */
 	FALSE,      /* --filter */
@@ -336,8 +335,6 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Should paths be relative to location of tag file [no; yes when -e]?"},
  {1,"  --totals=[yes|no]"},
  {1,"       Print statistics about source and tag files [no]."},
- {1,"  --undef=[yes|no]"},
- {1,"       Should #undef directives generate a macro tag [yes]?"},
  {1,"  --verbose=[yes|no]"},
  {1,"       Enable verbose messages describing actions on each source file."},
  {1,"  --version"},
@@ -2094,7 +2091,6 @@ static booleanOption BooleanOptions [] = {
 #endif
 	{ "tag-relative",   &Option.tagRelative,            TRUE,  STAGE_ANY },
 	{ "totals",         &Option.printTotals,            TRUE,  STAGE_ANY },
-	{ "undef",          &Option.undef,                  FALSE, STAGE_ANY },
 	{ "verbose",        &Option.verbose,                FALSE, STAGE_ANY },
 	{ "_allow-xcmd-in-homedir", &Option.allowXcmdInHomeDir, TRUE, ACCEPT(Etc)|ACCEPT(LocalEtc) },
 	{ "_fatal-warnings",&Option.fatalWarnings,          FALSE, STAGE_ANY },

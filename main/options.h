@@ -83,7 +83,6 @@ typedef struct sOptionValues {
 	char *outputEncoding;	/* --output-encoding	write tags file as this encoding */
 #endif
 	boolean if0;            /* --if0  examine code within "#if 0" branch */
-	boolean undef;          /* --undef  generate a tag from #undef'd macros  */
 	langType language;      /* --lang specified language override */
 	boolean followLinks;    /* --link  follow symbolic links? */
 	boolean filter;         /* --filter  behave as filter: files in, tags out */
