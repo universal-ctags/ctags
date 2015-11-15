@@ -13,6 +13,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+#include <stdio.h>
 
 /*
 *   FUNCTION PROTOTYPES
