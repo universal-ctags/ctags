@@ -1,3 +1,6 @@
+.. _optlib:
+
+
 Extending ctags with Regex parser(*optlib*)
 ======================================================================
 
