@@ -2,7 +2,7 @@
 
 For easy reading of this documentation go to http://ctags.readthedocs.org
 
-To build the documentation local you need it have [Python Sphinx](http://sphinx-doc.org/)
+To build the documentation local you need to have [Python Sphinx](http://sphinx-doc.org/)
 installed. There is a `Makefile` in the `docs` subdirectory to build
 various output formats.
 
