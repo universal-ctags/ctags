@@ -20,23 +20,36 @@ New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:
 
-* ada
-* clojure
-* coffee *xcmd*
-* css
-* d
-* ctags option library *optlib*
-* falcon
-* go
-* json
-* m4 *optlib*
-* mib *optlib*
-* rust
-* windres
+* Ada
+* Clojure
+* CSS
+* D
+* Diff
+* DTS
+* Falcon
+* Go
+* JSON
+* ObjectiveC
+* Perl6
+* R
+* reStructuredText
+* Rust
 * SystemVerilog
+* WindRes
+* Zephir
+* coffee *xcmd*
+* ctags option library *optlib*
+* m4 *optlib*
 
 See "Option library" about  *optlib*.
 See "External parser command" about *xcmd*.
+
+TIPS: you can list newly introduced parsers if you have
+exuberant-ctags with following command line:
+
+.. code-block:: console
+
+		$ diff -ruN <(universal-ctags --list-languages) <(exuberant-ctags --list-languages)  | grep '^[-+]'
 
 
 Heavily improved language parsers
