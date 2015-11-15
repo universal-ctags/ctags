@@ -35,8 +35,6 @@ They have these additional language parsers:
 * `Haskell <http://en.wikipedia.org/wiki/Haskell_%28programming_language%29>`_
 * `Haxe <http://en.wikipedia.org/wiki/Haxe>`_
 * `NSIS <http://en.wikipedia.org/wiki/Nullsoft_Scriptable_Install_System>`_
-* `R <http://en.wikipedia.org/wiki/R_%28programming_language%29>`_
-* `reStructuredText (reST) <http://en.wikipedia.org/wiki/ReStructuredText>`_
 * `txt2tags <http://en.wikipedia.org/wiki/Txt2tags>`_
 * `Vala (c.c) <http://en.wikipedia.org/wiki/Vala_%28programming_language%29>`_
 
