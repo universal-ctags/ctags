@@ -1,7 +1,6 @@
 #!/bin/sh
 
-echo "Run autoreconf instead."
-echo "Example: "
-echo "	$ autoreconf -f -i -v"
+misc/dist-test-cases test-cases.mak && \
+  autoreconf -vfi
 
-exit 64
+exit $?

@@ -13,7 +13,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-autoreconf -f -i -v
+./autogen.sh
 ./configure --enable-iconv --enable-coverage-gcov --enable-travis
 
 if [ "$TARGET" = "Unix" ]; then

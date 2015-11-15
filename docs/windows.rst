@@ -82,7 +82,7 @@ You can also build a native Windows version using Autotools.
 
 .. code-block:: bash
 
-	autoreconf -vfi
+	./autogen.sh
 	./configure --host=i686-w64-mingw32 --disable-external-sort
 	make
 

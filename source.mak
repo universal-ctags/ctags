@@ -33,7 +33,7 @@ PARSER_HEADS =
 
 HEADS = $(MAIN_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS)
 
-PARSER_SOURCES =			\
+PARSER_SRCS =				\
 	parsers/ada.c			\
 	parsers/ant.c			\
 	parsers/asm.c			\
@@ -86,7 +86,7 @@ PARSER_SOURCES =			\
 	parsers/windres.c		\
 	parsers/yacc.c
 
-MAIN_SOURCES =				\
+MAIN_SRCS =				\
 	main/args.c			\
 	main/entry.c			\
 	main/field.c			\
@@ -112,21 +112,21 @@ MAIN_SOURCES =				\
 	main/vstring.c			\
 	main/xtag.c
 
-DEBUG_SOURCES = main/debug.c
+DEBUG_SRCS = main/debug.c
 
 SOURCES =	\
-		$(MAIN_SOURCES) $(MAIN_HEADS)		\
-		$(PARSER_SOURCES) $(PARSER_HEADS)	\
-		$(DEBUG_SOURCES) $(DEBUG_HEADS)
+		$(MAIN_SRCS) $(MAIN_HEADS)		\
+		$(PARSER_SRCS) $(PARSER_HEADS)	\
+		$(DEBUG_SRCS) $(DEBUG_HEADS)
 
 ENVIRONMENT_HEADS = e_msoft.h
-ENVIRONMENT_SOURCES =
+ENVIRONMENT_SRCS =
 
 REGEX_HEADS = gnu_regex/regex.h
-REGEX_SOURCES = gnu_regex/regex.c
+REGEX_SRCS = gnu_regex/regex.c
 
 FNMATCH_HEADS = fnmatch/fnmatch.h
-FNMATCH_SOURCES = fnmatch/fnmatch.c
+FNMATCH_SRCS = fnmatch/fnmatch.c
 
 OBJECTS = \
 	$(SOURCES:.c=.$(OBJEXT)) \

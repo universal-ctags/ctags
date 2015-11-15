@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "EXTRA_DIST = misc/units \\" > "$1"
+find Tmain Units -type f | sed -e 's/$/\\/' >> "$1"
+echo '$(NULL)' >> "$1"

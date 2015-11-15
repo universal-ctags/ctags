@@ -2,7 +2,7 @@ Building with configure (\*nix including GNU/Linux)
 ---------------------------------------------------------------------
 Like most Autotools-based projects, you need to do::
 
-    $ autoreconf -vfi
+    $ ./autogen.sh
     $ ./configure --prefix=/where/you/want # defaults to /usr/local
     $ make
     $ make install # may require extra privileges depending on where to install

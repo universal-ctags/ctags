@@ -37,12 +37,12 @@ regex.obj:
 fnmatch.obj:
 	cl /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) fnmatch/fnmatch.c
 
-respmvc: $(SOURCES) $(REGEX_SOURCES) $(FNMATCH_SOURCES) $(HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS) mk_mvc.mak
+respmvc: $(SOURCES) $(REGEX_SRCS) $(FNMATCH_SRCS) $(HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS) mk_mvc.mak
 	echo $(DEFINES) > $@
 	echo $(INCLUDES) >> $@
 	echo $(SOURCES) >> $@
-	echo $(REGEX_SOURCES) >> $@
-	echo $(FNMATCH_SOURCES) >> $@
+	echo $(REGEX_SRCS) >> $@
+	echo $(FNMATCH_SRCS) >> $@
 
 mostlyclean:
 	- del *.obj
