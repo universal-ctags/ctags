@@ -42,9 +42,7 @@ Contents
 	guessing.rst
 	building.rst
 	testing.rst
-	optlib.rst
-	xcmd.rst
-	internal.rst
+	extending.rst
 	tips.rst
 	other-projects.rst
 	format.rst
@@ -63,3 +61,6 @@ Contents
 	tmain.rst
 	tracking.rst
 	units.rst
+	optlib.rst
+	xcmd.rst
+	internal.rst
