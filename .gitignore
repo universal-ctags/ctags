@@ -50,6 +50,7 @@ win32/[Rr]elease/
 Makefile.in
 config.guess
 config.sub
+config.cache
 mkinstalldirs
 aclocal.m4
 compile

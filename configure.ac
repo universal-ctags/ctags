@@ -196,10 +196,6 @@ AC_ARG_ENABLE(macro-patterns,
 	[AS_HELP_STRING([--enable-macro-patterns],
 		[use patterns as default method to locate macros instead of line numbers])])
 
-AC_ARG_ENABLE(shell-globbing,
-	[AS_HELP_STRING([--enable-shell-globbing=DIR],
-		[does shell expand wildcards (yes|no)? [yes]])])
-
 AC_ARG_ENABLE(tmpdir,
 	[AS_HELP_STRING([--enable-tmpdir=DIR],
 		[default directory for temporary files [ARG=/tmp]])],
@@ -281,30 +277,9 @@ AC_CONFIG_COMMANDS_PRE([
 	AC_DEFINE_UNQUOTED([PKGLIBEXECDIR], ["${PKGLIBEXECDIR}"])
 ])
 
-
-install_targets="install-ctags install-data install-libexec"
-AC_MSG_CHECKING(whether to install link to etags)
-if test yes = "$enable_etags"; then
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-etags"
-else
-	AC_MSG_RESULT(no)
-fi
-AC_MSG_CHECKING(whether to install readtags object file)
-if test yes = "$enable_readlib"; then
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-lib"
-else
-	AC_MSG_RESULT(no)
-fi
-AC_MSG_CHECKING(whether to install readtags command)
-if test no = "$enable_readcmd"; then
-	AC_MSG_RESULT(no)
-else
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-cmd"
-fi
-AC_SUBST(install_targets)
+AM_CONDITIONAL(INSTALL_LIB, test $enable_readlib = yes)
+AM_CONDITIONAL(INSTALL_ETAGS, test $enable_etags = yes)
+AM_CONDITIONAL(USE_READCMD, test $enable_readcmd = yes)
 
 dnl AC_MSG_NOTICE(Change with $program_transform_name)
 ctags_name_executable=`echo ctags | sed "$program_transform_name"`
