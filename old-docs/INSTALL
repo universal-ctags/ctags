@@ -57,11 +57,8 @@ The configure script in this package supports the following custom options:
                                 changed at run time by setting the environment
                                 variable TMPDIR.
 
-If you wish to change the name of the installed files, edit the makefile
-produced by the configure script ("Makefile") before performing the "make
-install" step. There are two lines at the top of the file where the names of
-the installed files may be customized.
-
+  --program-suffix=SUFFIX       Add SUFFIX to the end of the installed
+                                programs.
 
 Basic Installation
 ==================
@@ -212,4 +209,3 @@ operates.
      script, and exit.
 
 `configure' also accepts some other, not widely useful, options.
-
