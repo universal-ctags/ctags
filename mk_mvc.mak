@@ -37,7 +37,7 @@ regex.obj:
 fnmatch.obj:
 	cl /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) fnmatch/fnmatch.c
 
-respmvc: $(SOURCES) $(REGEX_SRCS) $(FNMATCH_SRCS) $(HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS) mk_mvc.mak
+respmvc: $(SOURCES) $(REGEX_SRCS) $(FNMATCH_SRCS) $(HEADERS_ALL) $(HEADERS_REGEX) $(HEADERS_FNMATCH) mk_mvc.mak
 	echo $(DEFINES) > $@
 	echo $(INCLUDES) >> $@
 	echo $(SOURCES) >> $@

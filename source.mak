@@ -1,8 +1,8 @@
 # Shared macros
 
-DEBUG_HEADS = main/debug.h
+HEADERS_DEBUG = main/debug.h
 
-MAIN_HEADS =			\
+HEADERS_MAIN =			\
 	main/args.h		\
 	main/ctags.h		\
 	main/entry.h		\
@@ -29,9 +29,9 @@ MAIN_HEADS =			\
 	main/vstring.h		\
 	main/xtag.h
 
-PARSER_HEADS =
+HEADERS_PARSER =
 
-HEADS = $(MAIN_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS)
+HEADERS_ALL = $(HEADERS_MAIN) $(HEADERS_PARSER) $(HEADERS_DEBUG)
 
 PARSER_SRCS =				\
 	parsers/ada.c			\
@@ -115,17 +115,17 @@ MAIN_SRCS =				\
 DEBUG_SRCS = main/debug.c
 
 SOURCES =	\
-		$(MAIN_SRCS) $(MAIN_HEADS)		\
-		$(PARSER_SRCS) $(PARSER_HEADS)	\
-		$(DEBUG_SRCS) $(DEBUG_HEADS)
+		$(MAIN_SRCS) $(HEADERS_MAIN)		\
+		$(PARSER_SRCS) $(HEADERS_PARSER)	\
+		$(DEBUG_SRCS) $(HEADERS_DEBUG)
 
-ENVIRONMENT_HEADS = e_msoft.h
+HEADERS_ENVIRONMENT = e_msoft.h
 ENVIRONMENT_SRCS =
 
-REGEX_HEADS = gnu_regex/regex.h
+HEADERS_REGEX = gnu_regex/regex.h
 REGEX_SRCS = gnu_regex/regex.c
 
-FNMATCH_HEADS = fnmatch/fnmatch.h
+HEADERS_FNMATCH = fnmatch/fnmatch.h
 FNMATCH_SRCS = fnmatch/fnmatch.c
 
 OBJECTS = \
