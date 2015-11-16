@@ -2,6 +2,7 @@
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/4355/badge.svg)](https://scan.coverity.com/projects/4355)
 [![Coverage Status](https://coveralls.io/repos/universal-ctags/ctags/badge.svg?branch=master&service=github)](https://coveralls.io/github/universal-ctags/ctags?branch=master)
 [![Build status](https://ci.appveyor.com/api/projects/status/1c4wwswe8yd99la2/branch/master?svg=true)](https://ci.appveyor.com/project/masatake/ctags/branch/master)
+[![RTD build status](https://readthedocs.org/projects/ctags/badge)](http://docs.ctags.io)
 
 universal-ctags has the objective of continuing the development from
 what existed in the Sourceforge area. Github exuberant-ctags
