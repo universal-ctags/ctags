@@ -42,11 +42,11 @@ fi
 
 for tags in $(find "$UNITS" -name expected.tags); do
     for t in $(sed -e 's/^\([^\t]*\)\t.*/\1/' "$tags"); do
-	if r=$( "${READTAGS}" -t "$tags" "$t" 2>/dev/null ); then
+	if r=$( "${READTAGS}" -t "$tags" - "$t" 2>/dev/null ); then
 	    :
 	else
 	    printf "FAILED[%3d]: " $?
-	    echo "${READTAGS}" -t "$tags" "$t"
+	    echo "${READTAGS}" -t "$tags" - "$t"
 	    s=1
 	fi
     done 
