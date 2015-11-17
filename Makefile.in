@@ -372,6 +372,7 @@ commit-stamp: FORCE
 # check
 #
 CTAGS_TEST = ./$(CTAGS_EXEC)
+READ_TEST = ./$(READ_CMD)
 ifdef VG
 VALGRIND=--with-valgrind
 endif
@@ -383,7 +384,7 @@ ifdef TRAVIS
 SHOW_DIFF_OUTPUT=--show-diff-output
 endif
 
-.PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck help
+.PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck roundtrip help
 check: tmain units
 
 #
@@ -491,6 +492,16 @@ tinst:
 	$(SHELL) $(srcdir)/misc/tinst $(srcdir) $$builddir/$(TINST_ROOT)
 
 #
+# Test readtags
+#
+roundtrip: $(READ_TEST)
+	@ \
+	\
+	builddir=$$(pwd); \
+	\
+	$(SHELL) $(srcdir)/misc/roundtrip $(READ_TEST) $${builddir}/Units
+
+#
 # Checking code in ctags own rules
 #
 codecheck:
@@ -526,6 +537,7 @@ help:
 	@echo "make fuzz                         - Verify that all parsers are able to properly process each available test unit"
 	@echo "make noise                        - Veirfy the behavior of parsers for broken input: a character injected or removed randomly"
 	@echo "make chop                         - Veirfy the behavior of parsers for broken input: randomly truncated"
+	@echo "make roundtrip                    - Veirfy the behavior of readtags command"
 	@echo
 	@echo "Arguments that can be used in testing targets:"
 	@echo "VG=1                              - Run test cases with Valgrind memory profiler"
