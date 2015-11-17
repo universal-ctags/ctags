@@ -287,6 +287,26 @@ static void parseExtensionFields (tagFile *const file, tagEntry *const entry,
 	}
 }
 
+static int isOdd (unsigned int i)
+{
+	return  (i % 2);
+}
+
+static unsigned int countContinuousBackslashesBackward(const char *from,
+						     const char *till)
+{
+	unsigned int counter = 0;
+
+	for (; from > till; from--)
+	{
+		if (*from == '\\')
+			counter++;
+		else
+			break;
+	}
+	return counter;
+}
+
 static void parseTagLine (tagFile *file, tagEntry *const entry)
 {
 	int i;
@@ -319,7 +339,10 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 				do
 				{
 					p = strchr (p + 1, delimiter);
-				} while (p != NULL  &&  *(p - 1) == '\\');
+				} while (p != NULL
+					 &&  isOdd (countContinuousBackslashesBackward (p - 1,
+											entry->address.pattern)));
+
 				if (p == NULL)
 				{
 					/* invalid pattern */
