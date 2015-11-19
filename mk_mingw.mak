@@ -21,7 +21,7 @@ ctags.exe: OPT = -O4 -Os -fexpensive-optimizations
 ctags.exe: LDFLAGS = -s
 dctags.exe: OPT = -g
 dctags.exe: DEBUG = -DDEBUG
-dctags.exe: SOURCES += debug.c
+dctags.exe: ALL_SRCS += debug.c
 
 .SUFFIXES: .c .o
 
