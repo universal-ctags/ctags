@@ -109,7 +109,7 @@ set CHERE_INVOKING=yes
 rem bash -lc "for i in {1..3}; do update-core && break || sleep 15; done"
 rem bash -lc "for i in {1..3}; do pacman --noconfirm -Su mingw-w64-%MSYS2_ARCH%-{gcc,libiconv} automake autoconf make dos2unix && break || sleep 15; done"
 
-bash -lc "autoreconf -vfi"
+bash -lc "./autogen.sh"
 :: Patching configure.
 :: Workaround for "./configure: line 557: 0: Bad file descriptor"
 perl -i".bak" -pe "s/^test -n \".DJDIR\"/#$&/" configure
@@ -139,7 +139,7 @@ c:\cygwin\setup-x86.exe -qnNdO -R C:/cygwin -s http://cygwin.mirror.constant.com
 PATH c:\cygwin\bin;%PATH%
 set CHERE_INVOKING=yes
 bash -lc ""
-bash -lc "autoreconf -vfi"
+bash -lc "./autogen.sh"
 :: Patching configure.
 :: Workaround for "./configure: line 557: 0: Bad file descriptor"
 perl -i".bak" -pe "s/^test -n \".DJDIR\"/#$&/" configure
