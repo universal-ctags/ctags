@@ -13,6 +13,7 @@
 */
 #include "general.h"  /* always include first */
 #include "parse.h"    /* always include */
+#include "routines.h"
 
 static const tagRegexTable const rexxTagRegexTable [] = {
 	{"^([A-Za-z0-9@#$\\.!?_]+)[ \t]*:", "\\1",
@@ -29,7 +30,7 @@ extern parserDefinition* RexxParser (void)
 	parserDefinition* const def = parserNew ("REXX");
 	def->extensions = extensions;
 	def->tagRegexTable = rexxTagRegexTable;
-	def->tagRegexCount = COUNT_ARRAY (rexxTagRegexTable);
+	def->tagRegexCount = ARRAY_SIZE (rexxTagRegexTable);
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }

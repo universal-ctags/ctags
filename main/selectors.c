@@ -178,10 +178,10 @@ selectByObjectiveCKeywords (FILE * input)
     static langType cpp = LANG_IGNORE;
 
     if (objc == LANG_IGNORE)
-	objc = getNamedLanguage (TR_OBJC);
+	objc = getNamedLanguage (TR_OBJC, 0);
 
     if (cpp == LANG_IGNORE)
-	cpp = getNamedLanguage (TR_CPP);
+	cpp = getNamedLanguage (TR_CPP, 0);
 
     Assert (0 <= objc);
     Assert (0 <= cpp);

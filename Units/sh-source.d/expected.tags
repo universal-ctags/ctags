@@ -1,8 +1,8 @@
-../a	input.sh	/^. ..\/a$/;"	s
-../x	input.sh	/^source ..\/x$/;"	s
-0.sh	input.sh	/^source 0.sh$/;"	s
-1.sh	input.sh	/^. 1.sh$/;"	s
-a	input.sh	/^. a$/;"	s
-a/b	input.sh	/^. a\/b$/;"	s
-x	input.sh	/^source x$/;"	s
-x/y	input.sh	/^source x\/y$/;"	s
+../a	input.sh	/^. ..\/a$/;"	s	role:generic
+../x	input.sh	/^source ..\/x$/;"	s	role:generic
+0.sh	input.sh	/^source 0.sh$/;"	s	role:generic
+1.sh	input.sh	/^. 1.sh$/;"	s	role:generic
+a	input.sh	/^. a$/;"	s	role:generic
+a/b	input.sh	/^. a\/b$/;"	s	role:generic
+x	input.sh	/^source x$/;"	s	role:generic
+x/y	input.sh	/^source x\/y$/;"	s	role:generic

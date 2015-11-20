@@ -1,6 +1,6 @@
 FUNCTION_LIKE	input.c	/^#define FUNCTION_LIKE(/;"	d	file:
 MACRO_TO_SEE1	input.c	/^# define MACRO_TO_SEE1 /;"	d	file:
-MACRO_TO_SEE1	input.c	/^#undef MACRO_TO_SEE1$/;"	d	file:
+MACRO_TO_SEE1	input.c	/^#undef MACRO_TO_SEE1$/;"	d	file:	role:undef
 MACRO_TO_SEE2	input.c	/^# define MACRO_TO_SEE2 /;"	d	file:
 MACRO_TO_SEE3	input.c	/^# define MACRO_TO_SEE3 /;"	d	file:
 MACRO_TO_SEE4	input.c	/^# define MACRO_TO_SEE4 /;"	d	file:

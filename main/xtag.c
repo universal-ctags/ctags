@@ -30,6 +30,8 @@ static xtagDesc xtagDescs [] = {
 	  isPseudoTagsEnabled},
 	{ FALSE, 'q',
 	  "Include an extra class-qualified tag entry for each tag"},
+	{ FALSE, 'r',
+	  "Include reference tags"},
 	{ FALSE, '.',
 	  "Do the similar to the f extra flag but the entry addresses the end line"},
 };

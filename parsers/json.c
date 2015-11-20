@@ -386,11 +386,11 @@ extern parserDefinition* JsonParser (void)
 	parserDefinition *const def = parserNew ("JSON");
 	def->extensions = extensions;
 	def->kinds		= JsonKinds;
-	def->kindCount	= COUNT_ARRAY (JsonKinds);
+	def->kindCount	= ARRAY_SIZE (JsonKinds);
 	def->parser		= findJsonTags;
 	def->initialize = initialize;
 	def->keywordTable = JsonKeywordTable;
-	def->keywordCount = COUNT_ARRAY (JsonKeywordTable);
+	def->keywordCount = ARRAY_SIZE (JsonKeywordTable);
 	def->allowNullTag = TRUE;
 
 	return def;

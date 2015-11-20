@@ -13,6 +13,7 @@
 */
 #include "general.h"  /* must always come first */
 #include "parse.h"
+#include "routines.h"
 
 static const tagRegexTable const htmlTagRegexTable [] = {
 #define POSSIBLE_ATTRIBUTES "([ \t]+[a-z]+=\"?[^>\"]*\"?)*"
@@ -35,7 +36,7 @@ extern parserDefinition* HtmlParser (void)
 	parserDefinition *const def = parserNew ("HTML");
 	def->extensions = extensions;
 	def->tagRegexTable = htmlTagRegexTable;
-	def->tagRegexCount = COUNT_ARRAY (htmlTagRegexTable);
+	def->tagRegexCount = ARRAY_SIZE (htmlTagRegexTable);
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }

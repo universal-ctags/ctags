@@ -153,7 +153,6 @@ optionValues Option = {
 	NULL,		/* --output-encoding */
 #endif
 	FALSE,      /* --if0 */
-	TRUE,       /* --undef */
 	LANG_AUTO,  /* --lang */
 	TRUE,       /* --links */
 	FALSE,      /* --filter */
@@ -336,8 +335,6 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Should paths be relative to location of tag file [no; yes when -e]?"},
  {1,"  --totals=[yes|no]"},
  {1,"       Print statistics about source and tag files [no]."},
- {1,"  --undef=[yes|no]"},
- {1,"       Should #undef directives generate a macro tag [yes]?"},
  {1,"  --verbose=[yes|no]"},
  {1,"       Enable verbose messages describing actions on each source file."},
  {1,"  --version"},
@@ -365,6 +362,9 @@ static optionDescription LongOptionDescription [] = {
  {1,"       If a kind is disabled, its \"disabled\" element is printed as \"off\"."},
  {1,"       If it is enabled, \"on\" is printed."},
  {1,"       For each line, associated language name is printed when \"all\" is specified as language."},
+ {1,"  --_list-roles=[[language|all]:[kindletters|*]]"},
+ {1,"       Output list of all roles of tag kind(s) specified for language(s)."},
+ {1,"       e.g. --_list-roles=Make:I"},
  {1,"  --_xformat=field_format"},
  {1,"       Specify custom format for tabular cross reference (-x)."},
  {1,"       Fields can be specified with letter listed in --list-fields."},
@@ -646,7 +646,7 @@ extern langType getLanguageComponentInOption (const char *const option,
 			return LANG_IGNORE;
 	}
 
-	language = getNamedLanguage (lang);
+	language = getNamedLanguage (lang, 0);
 	if (language == LANG_IGNORE)
 		error (FATAL, "Unknown language \"%s\" in \"%s\" option", lang, option);
 
@@ -1225,7 +1225,7 @@ static void processLanguageForceOption (
 	if (strcasecmp (parameter, "auto") == 0)
 		language = LANG_AUTO;
 	else
-		language = getNamedLanguage (parameter);
+		language = getNamedLanguage (parameter, 0);
 
 	if (strcmp (option, "lang") == 0  ||  strcmp (option, "language") == 0)
 		error (WARNING,
@@ -1337,7 +1337,7 @@ static char* processLanguageMap (char* map)
 		char *list = separator + 1;
 		boolean clear = FALSE;
 		*separator = '\0';
-		language = getNamedLanguage (map);
+		language = getNamedLanguage (map, 0);
 		if (language != LANG_IGNORE)
 		{
 			const char *const deflt = "default";
@@ -1430,7 +1430,7 @@ static void processLanguagesOption (
 				enableLanguages ((boolean) (mode != Remove));
 			else
 			{
-				const langType language = getNamedLanguage (lang);
+				const langType language = getNamedLanguage (lang, 0);
 				if (language == LANG_IGNORE)
 					error (WARNING, "Unknown language \"%s\" in \"%s\" option", lang, option);
 				else
@@ -1502,7 +1502,7 @@ static void processListAliasesOption (
 		printLanguageAliases (LANG_AUTO);
 	else
 	{
-		langType language = getNamedLanguage (parameter);
+		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
@@ -1525,7 +1525,7 @@ static void processListFileKindOption (
 		printLanguageFileKind (LANG_AUTO);
 	else
 	{
-		langType language = getNamedLanguage (parameter);
+		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
@@ -1543,7 +1543,7 @@ static void processListKindsOption (
 		printLanguageKinds (LANG_AUTO, print_all);
 	else
 	{
-		langType language = getNamedLanguage (parameter);
+		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
@@ -1560,7 +1560,7 @@ static void processListMapsOption (
 	    printLanguageMaps (LANG_AUTO);
 	else
 	{
-		langType language = getNamedLanguage (parameter);
+		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
@@ -1585,7 +1585,44 @@ static void processListRegexFlagsOptions (
 	exit (0);
 }
 
+static void processListRolesOptions (const char *const option __unused__,
+				     const char *const parameter)
+{
+	const char* sep;
+	const char *kindletters;
+	langType lang;
 
+
+	if (parameter == NULL || parameter[0] == '\0')
+	{
+		printLanguageRoles (LANG_AUTO, "*");
+		exit (0);
+	}
+
+	sep = strchr (parameter, ':');
+
+	if (sep == NULL || sep [1] == '\0')
+	{
+		vString* vstr = vStringNewInit (parameter);
+		vStringCatS (vstr, (sep? "*": ":*"));
+		processListRolesOptions (option, vStringValue (vstr));
+		/* The control should never reache here. */
+	}
+
+	kindletters = sep + 1;
+	if (strncmp (parameter, "all:", 4) == 0
+	    || strncmp (parameter, "*:", 1) == 0
+	    || strncmp (parameter, ":", 1) == 0)
+		lang = LANG_AUTO;
+	else
+	{
+		lang = getNamedLanguage (parameter, sep - parameter);
+		if (lang == LANG_IGNORE)
+			error (FATAL, "Unknown language \"%s\" in \"%s\"", parameter, option);
+	}
+	printLanguageRoles (lang, kindletters);
+	exit (0);
+}
 static void freeSearchPathList (searchPathList** pathList)
 {
 	stringListClear (*pathList);
@@ -2070,6 +2107,7 @@ static parametricOption ParametricOptions [] = {
 	{ "list-languages",         processListLanguagesOption,     TRUE,   STAGE_ANY },
 	{ "list-maps",              processListMapsOption,          TRUE,   STAGE_ANY },
 	{ "list-regex-flags",       processListRegexFlagsOptions,   TRUE,   STAGE_ANY },
+	{ "_list-roles",            processListRolesOptions,        TRUE,   STAGE_ANY },
 	{ "options",                processOptionFile,              FALSE,  STAGE_ANY },
 	{ "sort",                   processSortOption,              TRUE,   STAGE_ANY },
 	{ "version",                processVersionOption,           TRUE,   STAGE_ANY },
@@ -2094,7 +2132,6 @@ static booleanOption BooleanOptions [] = {
 #endif
 	{ "tag-relative",   &Option.tagRelative,            TRUE,  STAGE_ANY },
 	{ "totals",         &Option.printTotals,            TRUE,  STAGE_ANY },
-	{ "undef",          &Option.undef,                  FALSE, STAGE_ANY },
 	{ "verbose",        &Option.verbose,                FALSE, STAGE_ANY },
 	{ "_allow-xcmd-in-homedir", &Option.allowXcmdInHomeDir, TRUE, ACCEPT(Etc)|ACCEPT(LocalEtc) },
 	{ "_fatal-warnings",&Option.fatalWarnings,          FALSE, STAGE_ANY },

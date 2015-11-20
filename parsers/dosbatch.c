@@ -14,6 +14,7 @@
 
 #include <string.h>
 #include "parse.h"
+#include "routines.h"
 
 static const tagRegexTable const dosTagRegexTable [] = {
 	{"^:([A-Za-z_0-9]+)", "\\1",
@@ -32,7 +33,7 @@ extern parserDefinition* DosBatchParser (void)
 	parserDefinition* const def = parserNew ("DosBatch");
 	def->extensions = extensions;
 	def->tagRegexTable = dosTagRegexTable;
-	def->tagRegexCount = COUNT_ARRAY (dosTagRegexTable);
+	def->tagRegexCount = ARRAY_SIZE (dosTagRegexTable);
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }

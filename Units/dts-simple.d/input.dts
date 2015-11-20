@@ -9,3 +9,4 @@ label: test {
 	     phandle = <0x00>;
        };
 };
+#undef bar

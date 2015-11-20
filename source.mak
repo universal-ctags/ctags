@@ -98,6 +98,7 @@ MAIN_SOURCES =					\
 	$(MAIN_DIR)/get.c			\
 	$(MAIN_DIR)/htable.c			\
 	$(MAIN_DIR)/keyword.c			\
+	$(MAIN_DIR)/kind.c			\
 	$(MAIN_DIR)/lregex.c			\
 	$(MAIN_DIR)/lxcmd.c			\
 	$(MAIN_DIR)/main.c			\

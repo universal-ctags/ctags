@@ -9,7 +9,7 @@ with_field()
     local lang=$2
     : &&
 	echo "#$field" &&
-	$CTAGS --quiet --options=NONE --fields=$field -o - input.$lang
+	$CTAGS --quiet --options=NONE $3 --fields=$field -o - input.$lang
 }
 
 : &&
@@ -28,4 +28,6 @@ with_field()
     with_field sZ java &&
     with_field f  c &&
     with_field S  c &&
-    with_field t  c
+    with_field t  c &&
+    with_field r  sh --extra=+r &&
+    with_field r  sh "--extra=+r -x --_xformat=%R/%r"

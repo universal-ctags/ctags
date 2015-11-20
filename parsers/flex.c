@@ -2403,11 +2403,11 @@ extern parserDefinition* FlexParser (void)
 	 * New definitions for parsing instead of regex
 	 */
 	def->kinds		= FlexKinds;
-	def->kindCount	= COUNT_ARRAY (FlexKinds);
+	def->kindCount	= ARRAY_SIZE (FlexKinds);
 	def->parser		= findFlexTags;
 	def->initialize = initialize;
 	def->keywordTable = FlexKeywordTable;
-	def->keywordCount = COUNT_ARRAY (FlexKeywordTable);
+	def->keywordCount = ARRAY_SIZE (FlexKeywordTable);
 
 	return def;
 }

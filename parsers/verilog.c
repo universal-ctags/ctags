@@ -582,8 +582,8 @@ static void createTag (tokenInfo *const token)
 			getSourceLanguageName (),
 			token->filePosition,
 			getSourceFileTagPath (),
-			kindFromKind (kind)
-			);
+			kindFromKind (kind),
+		        ROLE_INDEX_DEFINITION);
 	verbose ("Adding tag %s (kind %d)", vStringValue (token->name), kind);
 	if (currentContext->kind != K_UNDEFINED)
 	{
@@ -1161,7 +1161,7 @@ extern parserDefinition* VerilogParser (void)
 	static const char *const extensions [] = { "v", NULL };
 	parserDefinition* def = parserNew ("Verilog");
 	def->kinds      = VerilogKinds;
-	def->kindCount  = COUNT_ARRAY (VerilogKinds);
+	def->kindCount  = ARRAY_SIZE (VerilogKinds);
 	def->extensions = extensions;
 	def->parser     = findVerilogTags;
 	def->initialize = initializeVerilog;
@@ -1173,7 +1173,7 @@ extern parserDefinition* SystemVerilogParser (void)
 	static const char *const extensions [] = { "sv", "svh", "svi", NULL };
 	parserDefinition* def = parserNew ("SystemVerilog");
 	def->kinds      = SystemVerilogKinds;
-	def->kindCount  = COUNT_ARRAY (SystemVerilogKinds);
+	def->kindCount  = ARRAY_SIZE (SystemVerilogKinds);
 	def->extensions = extensions;
 	def->parser     = findVerilogTags;
 	def->initialize = initializeSystemVerilog;

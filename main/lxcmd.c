@@ -202,6 +202,9 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 	kind->letter = line[0];
 	kind->name = NULL;
 	kind->description = NULL;
+	kind->referenceOnly = FALSE;
+	kind->nRoles = 0;
+	kind->roles = NULL;
 
 	verbose ("	kind letter: <%c>\n", kind->letter);
 
@@ -613,7 +616,7 @@ extern void addTagXcmd (const langType language, vString* pathvstr, const char* 
 
 	set->count += 1;
 
-	flagsEval (flags, xcmdFlagDefs, COUNT_ARRAY(xcmdFlagDefs), path);
+	flagsEval (flags, xcmdFlagDefs, ARRAY_SIZE(xcmdFlagDefs), path);
 
 	path->available = (loadPathKinds (path, language));
 	useXcmdMethod (language);
@@ -1034,7 +1037,8 @@ static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 			  entryLookupField(entry, "language", TRUE),
 			  filePosition,
 			  entry->file,
-			  entry->kind);
+			  entry->kind,
+			  ROLE_INDEX_DEFINITION);
 
 	tag.pattern = entry->address.pattern;
 
@@ -1059,6 +1063,8 @@ static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 	tag.extensionFields.scopeName = entryGetAnyUnpulledField (entry, &kindName, TRUE);
 	if (tag.extensionFields.scopeName && kindName)
 		tag.extensionFields.scopeKind = lookupKindFromName (path, kindName);
+
+	/* TODO: role */
 
 	makeTagEntry (&tag);
 	return TRUE;

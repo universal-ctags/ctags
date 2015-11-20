@@ -13,6 +13,7 @@
 
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 #include "entry.h"
 
@@ -140,7 +141,7 @@ extern parserDefinition *ClojureParser (void)
 
 	parserDefinition *def = parserNew ("Clojure");
 	def->kinds = ClojureKinds;
-	def->kindCount = COUNT_ARRAY (ClojureKinds);
+	def->kindCount = ARRAY_SIZE (ClojureKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findClojureTags;

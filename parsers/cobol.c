@@ -13,6 +13,7 @@
 */
 #include "general.h"	/* must always come first */
 #include "parse.h"
+#include "routines.h"
 
 static const tagRegexTable const cobolTagRegexTable[] = {
 	{"^[ \t]*[0-9]+[ \t]+([A-Z0-9][A-Z0-9-]*)[ \t]+("
@@ -42,7 +43,7 @@ extern parserDefinition* CobolParser (void)
 	parserDefinition* def = parserNew ("Cobol");
 	def->extensions = extensions;
 	def->tagRegexTable = cobolTagRegexTable;
-	def->tagRegexCount = COUNT_ARRAY (cobolTagRegexTable);
+	def->tagRegexCount = ARRAY_SIZE (cobolTagRegexTable);
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }

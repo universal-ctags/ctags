@@ -41,6 +41,7 @@
 #include "entry.h"
 #include "field.h"
 #include "fmt.h"
+#include "kind.h"
 #include "main.h"
 #include "options.h"
 #include "read.h"
@@ -929,6 +930,10 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldDesc (FIELD_SIGNATURE)->name,
 				   escapeName (tag, FIELD_SIGNATURE));
+	if (getFieldDesc (FIELD_ROLE)->enabled && tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
+		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
+				   getFieldDesc (FIELD_ROLE)->name,
+				   escapeName (tag, FIELD_ROLE));
 
 	return length;
 #undef sep
@@ -1195,7 +1200,11 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 {
 	int r = SCOPE_NIL;
 	Assert (tag->name != NULL);
-	Assert (getSourceLanguageFileKind() == tag->kind || isSourceLanguageKindEnabled (tag->kind->letter));
+	Assert (getSourceLanguageFileKind() == tag->kind
+		|| ( isSourceLanguageKindEnabled (tag->kind->letter)
+                    && (tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION ))
+		|| (tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION
+		    && tag->kind->roles[tag->extensionFields.roleIndex].enabled ));
 
 	if (tag->name [0] == '\0' && (!tag->placeholder))
 	{
@@ -1221,7 +1230,20 @@ extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 			 getSourceLanguageName (),
 			 getInputFilePosition (),
 			 getSourceFileTagPath (),
-			 kind);
+			 kind,
+			 ROLE_INDEX_DEFINITION);
+}
+
+extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
+			     const kindOption *kind, int roleIndex)
+{
+	initTagEntryFull(e, name,
+			 getSourceLineNumber (),
+			 getSourceLanguageName (),
+			 getInputFilePosition (),
+			 getSourceFileTagPath (),
+			 kind,
+			 roleIndex);
 }
 
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
@@ -1229,7 +1251,8 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      const char* language,
 			      fpos_t      filePosition,
 			      const char *sourceFileName,
-			      const kindOption *kind)
+			      const kindOption *kind,
+			      int roleIndex)
 {
 	Assert (File.source.name != NULL);
 
@@ -1242,6 +1265,10 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->name            = name;
 	e->extensionFields.scopeIndex     = SCOPE_NIL;
 	e->kind = kind;
+
+	Assert (roleIndex >= ROLE_INDEX_DEFINITION);
+	Assert (kind == NULL || roleIndex < kind->nRoles);
+	e->extensionFields.roleIndex = roleIndex;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

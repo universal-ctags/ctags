@@ -14,6 +14,7 @@
 
 #include <string.h>
 #include "parse.h"
+#include "routines.h"
 
 static const tagRegexTable const antTagRegexTable [] = {
 	{"^[ \t]*<[ \t]*project[^>]+name=\"([^\"]+)\".*", "\\1",
@@ -38,7 +39,7 @@ extern parserDefinition* AntParser (void)
 	def->extensions = extensions;
 	def->patterns = patterns;
 	def->tagRegexTable = antTagRegexTable;
-	def->tagRegexCount = COUNT_ARRAY (antTagRegexTable);
+	def->tagRegexCount = ARRAY_SIZE (antTagRegexTable);
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	return def;
 }

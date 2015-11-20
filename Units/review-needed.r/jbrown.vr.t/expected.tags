@@ -1,7 +1,8 @@
 Transaction	input.vr	/^class Transaction {$/;"	c
 address	input.vr	/^   rand bit[31:0] address;           \/\/ allow for address to be random$/;"	m	class:Transaction	file:
 data	input.vr	/^   rand bit[31:0] data;              \/\/ allow for data to be random$/;"	m	class:Transaction	file:
+mine.vrh	input.vr	/^#include "mine.vrh"/;"	h	role:local
 myProgram	input.vr	/^program myProgram {$/;"	p
 new	input.vr	/^   task new( (bit[31:0] address = -1), (bit[31:0] data = -1)) {$/;"	t	class:Transaction	file:
-vera_defines.vrh	input.vr	/^#include <vera_defines.vrh>/;"	h
+vera_defines.vrh	input.vr	/^#include <vera_defines.vrh>/;"	h	role:system
 writeBus	input.vr	/^   task writeBus() {$/;"	t	class:Transaction	file:

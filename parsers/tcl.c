@@ -16,6 +16,7 @@
 
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -105,7 +106,7 @@ extern parserDefinition* TclParser (void)
 	static const char *const extensions [] = { "tcl", "tk", "wish", "itcl", NULL };
 	parserDefinition* def = parserNew ("Tcl");
 	def->kinds      = TclKinds;
-	def->kindCount  = COUNT_ARRAY (TclKinds);
+	def->kindCount  = ARRAY_SIZE (TclKinds);
 	def->extensions = extensions;
 	def->parser     = findTclTags;
 	return def;

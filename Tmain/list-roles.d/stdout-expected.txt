@@ -1,0 +1,62 @@
+
+#
+#
+#
+C	d	undef	undefined	on
+C	h	system	system header	on
+C	h	local	local header	on
+C++	d	undef	undefined	on
+C++	h	system	system header	on
+C++	h	local	local header	on
+DTS	d	undef	undefined	on
+DTS	h	system	system header	on
+DTS	h	local	local header	on
+Make	I	generic	non-categorized generic role	on
+Make	I	optional	included as an optional makefile	on
+Sh	s	generic	non-categorized generic role	on
+Vera	d	undef	undefined	on
+Vera	h	system	system header	on
+Vera	h	local	local header	on
+
+#
+# all:*
+#
+C	d	undef	undefined	on
+C	h	system	system header	on
+C	h	local	local header	on
+C++	d	undef	undefined	on
+C++	h	system	system header	on
+C++	h	local	local header	on
+DTS	d	undef	undefined	on
+DTS	h	system	system header	on
+DTS	h	local	local header	on
+Make	I	generic	non-categorized generic role	on
+Make	I	optional	included as an optional makefile	on
+Sh	s	generic	non-categorized generic role	on
+Vera	d	undef	undefined	on
+Vera	h	system	system header	on
+Vera	h	local	local header	on
+
+#
+# C:*
+#
+C	d	undef	undefined	on
+C	h	system	system header	on
+C	h	local	local header	on
+
+#
+# all:h
+#
+C	h	system	system header	on
+C	h	local	local header	on
+C++	h	system	system header	on
+C++	h	local	local header	on
+DTS	h	system	system header	on
+DTS	h	local	local header	on
+Vera	h	system	system header	on
+Vera	h	local	local header	on
+
+#
+# Sh:s
+#
+Sh	s	generic	non-categorized generic role	on

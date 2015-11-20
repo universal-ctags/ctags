@@ -127,6 +127,7 @@
     <ClCompile Include="..\parsers\jscript.c" />
     <ClCompile Include="..\parsers\json.c" />
     <ClCompile Include="..\main\keyword.c" />
+    <ClCompile Include="..\main\kind.c" />
     <ClCompile Include="..\parsers\lisp.c" />
     <ClCompile Include="..\main\lregex.c" />
     <ClCompile Include="..\main\lxcmd.c" />

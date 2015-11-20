@@ -2014,11 +2014,11 @@ extern parserDefinition* JavaScriptParser (void)
 	 * New definitions for parsing instead of regex
 	 */
 	def->kinds		= JsKinds;
-	def->kindCount	= COUNT_ARRAY (JsKinds);
+	def->kindCount	= ARRAY_SIZE (JsKinds);
 	def->parser		= findJsTags;
 	def->initialize = initialize;
 	def->keywordTable = JsKeywordTable;
-	def->keywordCount = COUNT_ARRAY (JsKeywordTable);
+	def->keywordCount = ARRAY_SIZE (JsKeywordTable);
 
 	return def;
 }

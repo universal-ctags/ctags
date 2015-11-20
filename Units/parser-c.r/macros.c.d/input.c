@@ -11,3 +11,5 @@ void prototype1 __ARGS((int arg1, void *arg2));
 void prototype2 __ARGS((int arg1, void *arg2))
 {
 }
+#undef FUNCTION_LIKE
+#undef VARIABLE_LIKE

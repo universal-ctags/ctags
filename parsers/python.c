@@ -38,8 +38,8 @@ static kindOption PythonKinds[] = {
 	{TRUE, 'c', "class",    "classes"},
 	{TRUE, 'f', "function", "functions"},
 	{TRUE, 'm', "member",   "class members"},
-    {TRUE, 'v', "variable", "variables"},
-    {TRUE, 'i', "namespace", "imports"}
+	{TRUE, 'v', "variable", "variables"},
+	{TRUE, 'i', "namespace", "imports"}
 };
 
 typedef enum {
@@ -867,7 +867,7 @@ extern parserDefinition *PythonParser (void)
 					      NULL };
 	parserDefinition *def = parserNew ("Python");
 	def->kinds = PythonKinds;
-	def->kindCount = COUNT_ARRAY (PythonKinds);
+	def->kindCount = ARRAY_SIZE (PythonKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findPythonTags;

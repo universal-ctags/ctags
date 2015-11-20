@@ -20,8 +20,6 @@
 /*
 *   MACROS
 */
-#define COUNT_ARRAY(ARRAY_VAR) (sizeof(ARRAY_VAR)/sizeof(ARRAY_VAR[0]))
-
 #define LANG_AUTO   (-1)
 #define LANG_IGNORE (-2)
 
@@ -129,13 +127,15 @@ extern parserDefinitionFunc PARSER_LIST;
 
 /* Language processing and parsing */
 extern int makeSimpleTag (const vString* const name, kindOption* const kinds, const int kind);
+extern int makeSimpleRefTag (const vString* const name, kindOption* const kinds, const int kind,
+			     int roleIndex);
 extern void makeFileTag (const char *const fileName);
 extern parserDefinition* parserNew (const char* name);
 extern parserDefinition* parserNewFull (const char* name, char fileKind);
 extern boolean getLanguageAllowNullTag (const langType language);
 extern const char *getLanguageName (const langType language);
 extern kindOption* getLanguageFileKind (const langType language);
-extern langType getNamedLanguage (const char *const name);
+extern langType getNamedLanguage (const char *const name, size_t len);
 extern langType getFileLanguage (const char *const fileName);
 extern boolean isLanguageEnabled (const langType language);
 extern boolean isLanguageKindEnabled (const langType language, char kind);
@@ -161,6 +161,7 @@ extern void initializeParsing (void);
 extern void freeParserResources (void);
 extern void printLanguageFileKind (const langType language);
 extern void printLanguageKinds (const langType language, boolean allKindFields);
+extern void printLanguageRoles (const langType language, const char* letters);
 extern void printLanguageAliases (const langType language);
 extern void printLanguageList (void);
 extern boolean parseFile (const char *const fileName);

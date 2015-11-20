@@ -303,7 +303,26 @@ static int AnonymousID = 0;
 
 #define COMMONK_UNDEFINED -1
 
+
 /* Used to index into the CKinds table. */
+typedef enum {
+	CR_MACRO_UNDEF,
+} cMacroRole;
+
+static roleDesc CMacroRoles [] = {
+	RoleTemplateUndef,
+};
+
+typedef enum {
+	CR_HEADER_SYSTEM,
+	CR_HEADER_LOCAL,
+} cHeaderRole;
+
+static roleDesc CHeaderRoles [] = {
+	RoleTemplateSystem,
+	RoleTemplateLocal,
+};
+
 typedef enum {
 	CK_UNDEFINED = COMMONK_UNDEFINED,
 	CK_CLASS, CK_DEFINE, CK_ENUMERATOR, CK_FUNCTION,
@@ -314,11 +333,13 @@ typedef enum {
 
 static kindOption CKinds [] = {
 	{ TRUE,  'c', "class",      "classes"},
-	{ TRUE,  'd', "macro",      "macro definitions"},
+	{ TRUE,  'd', "macro",      "macro definitions",
+	  .referenceOnly = FALSE, ATTACH_ROLES(CMacroRoles)},
 	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)"},
 	{ TRUE,  'f', "function",   "function definitions"},
 	{ TRUE,  'g', "enum",       "enumeration names"},
-	{ FALSE, 'h', "header",     "included header files"},
+	{ FALSE, 'h', "header",     "included header files",
+	  .referenceOnly = TRUE,  ATTACH_ROLES(CHeaderRoles)},
 	{ FALSE, 'l', "local",      "local variables"},
 	{ TRUE,  'm', "member",     "class, struct, and union members"},
 	{ TRUE,  'n', "namespace",  "namespaces"},
@@ -404,6 +425,25 @@ static kindOption JavaKinds [] = {
 
 /* Used to index into the VeraKinds table. */
 typedef enum {
+	VR_MACRO_UNDEF,
+} veraMacroRole;
+
+static roleDesc VeraMacroRoles [] = {
+	RoleTemplateUndef,
+};
+
+
+typedef enum {
+	VR_HEADER_SYSTEM,
+	VR_HEADER_LOCAL,
+} veraHeaderRole;
+
+static roleDesc VeraHeaderRoles [] = {
+	RoleTemplateSystem,
+	RoleTemplateLocal,
+};
+
+typedef enum {
 	VK_UNDEFINED = COMMONK_UNDEFINED,
 	VK_CLASS, VK_DEFINE, VK_ENUMERATOR, VK_FUNCTION,
 	VK_ENUMERATION, VK_INTERFACE, VK_LOCAL, VK_MEMBER, VK_PROGRAM, VK_PROTOTYPE,
@@ -413,7 +453,8 @@ typedef enum {
 
 static kindOption VeraKinds [] = {
 	{ TRUE,  'c', "class",      "classes"},
-	{ TRUE,  'd', "macro",      "macro definitions"},
+	{ TRUE,  'd', "macro",      "macro definitions",
+	  .referenceOnly = FALSE, ATTACH_ROLES(VeraMacroRoles)},
 	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)"},
 	{ TRUE,  'f', "function",   "function definitions"},
 	{ TRUE,  'g', "enum",       "enumeration names"},
@@ -427,7 +468,8 @@ static kindOption VeraKinds [] = {
 	{ TRUE,  'T', "typedef",    "typedefs"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
 	{ FALSE, 'x', "externvar",  "external variable declarations"},
-	{ FALSE, 'h', "header",     "included header files"},
+	{ FALSE, 'h', "header",     "included header files",
+	  .referenceOnly = FALSE, ATTACH_ROLES(VeraHeaderRoles)},
 };
 
 static const keywordDesc KeywordTable [] = {
@@ -3258,6 +3300,9 @@ static rescanReason findCTags (const unsigned int passCount)
 	rescanReason rescan;
 	kindOption *kind_for_define = NULL;
 	kindOption *kind_for_header = NULL;
+	int role_for_macro_undef   = ROLE_INDEX_DEFINITION;
+	int role_for_header_system   = ROLE_INDEX_DEFINITION;
+	int role_for_header_local   = ROLE_INDEX_DEFINITION;
 
 	Assert (passCount < 3);
 
@@ -3265,16 +3310,22 @@ static rescanReason findCTags (const unsigned int passCount)
 	{
 		kind_for_define = CKinds+CK_DEFINE;
 		kind_for_header = CKinds+CK_HEADER;
+		role_for_macro_undef = CR_MACRO_UNDEF;
+		role_for_header_system = CR_HEADER_SYSTEM;
+		role_for_header_local = CR_HEADER_LOCAL;
 	}
 	else if (isLanguage (Lang_vera))
 	{
 		kind_for_define = VeraKinds+VK_DEFINE;
 		kind_for_header = VeraKinds+VK_HEADER;
+		role_for_macro_undef = VR_MACRO_UNDEF;
+		role_for_header_system = VR_HEADER_SYSTEM;
+		role_for_header_local = VR_HEADER_LOCAL;
 	}
 
 	cppInit ((boolean) (passCount > 1), isLanguage (Lang_csharp), isLanguage(Lang_vera),
-		 kind_for_define,
-		 kind_for_header);
+		 kind_for_define, role_for_macro_undef,
+		 kind_for_header, role_for_header_system, role_for_header_local);
 
 	Signature = vStringNew ();
 
@@ -3350,7 +3401,7 @@ extern parserDefinition* CParser (void)
 	static const char *const extensions [] = { "c", NULL };
 	parserDefinition* def = parserNew ("C");
 	def->kinds      = CKinds;
-	def->kindCount  = COUNT_ARRAY (CKinds);
+	def->kindCount  = ARRAY_SIZE (CKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeCParser;
@@ -3362,7 +3413,7 @@ extern parserDefinition* DParser (void)
 	static const char *const extensions [] = { "d", "di", NULL };
 	parserDefinition* def = parserNew ("D");
 	def->kinds      = DKinds;
-	def->kindCount  = COUNT_ARRAY (DKinds);
+	def->kindCount  = ARRAY_SIZE (DKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeDParser;
@@ -3384,7 +3435,7 @@ extern parserDefinition* CppParser (void)
 
 	parserDefinition* def = parserNew ("C++");
 	def->kinds      = CKinds;
-	def->kindCount  = COUNT_ARRAY (CKinds);
+	def->kindCount  = ARRAY_SIZE (CKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeCppParser;
@@ -3398,7 +3449,7 @@ extern parserDefinition* CsharpParser (void)
 	static const char *const aliases [] = { "csharp", NULL };
 	parserDefinition* def = parserNew ("C#");
 	def->kinds      = CsharpKinds;
-	def->kindCount  = COUNT_ARRAY (CsharpKinds);
+	def->kindCount  = ARRAY_SIZE (CsharpKinds);
 	def->extensions = extensions;
 	def->aliases    = aliases;
 	def->parser2    = findCTags;
@@ -3411,7 +3462,7 @@ extern parserDefinition* JavaParser (void)
 	static const char *const extensions [] = { "java", NULL };
 	parserDefinition* def = parserNew ("Java");
 	def->kinds      = JavaKinds;
-	def->kindCount  = COUNT_ARRAY (JavaKinds);
+	def->kindCount  = ARRAY_SIZE (JavaKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeJavaParser;
@@ -3423,7 +3474,7 @@ extern parserDefinition* VeraParser (void)
 	static const char *const extensions [] = { "vr", "vri", "vrh", NULL };
 	parserDefinition* def = parserNew ("Vera");
 	def->kinds      = VeraKinds;
-	def->kindCount  = COUNT_ARRAY (VeraKinds);
+	def->kindCount  = ARRAY_SIZE (VeraKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeVeraParser;

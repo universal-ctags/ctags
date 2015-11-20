@@ -15,10 +15,12 @@
 
 #include <string.h>
 
+#include "kind.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
+#include "xtag.h"
 
 /*
 *   DATA DEFINITIONS
@@ -30,10 +32,19 @@ typedef enum {
 	K_SOURCE,
 } shKind;
 
+typedef enum {
+	R_SOURCE_GENERIC,
+} shSourceRole;
+
+static roleDesc ShSourceRoles [] = {
+	RoleTemplateGeneric,
+};
+
 static kindOption ShKinds [] = {
 	{ TRUE, 'a', "alias", "aliases"},
 	{ TRUE, 'f', "function", "functions"},
-	{ FALSE, 's', "source", "read files"}
+	{ TRUE, 's', "source", "read files",
+	  .referenceOnly = TRUE, ATTACH_ROLES (ShSourceRoles) },
 };
 
 /*
@@ -187,20 +198,22 @@ static void findShTags (void)
 				found_kind = K_ALIAS;
 				cp += 5;
 			}
-
-			else if (cp [0] == '.'
-				 && isspace((int) cp [1]))
+			else if (isXtagEnabled (XTAG_REFERENCE_TAGS)
+				 && ShKinds [K_SOURCE].enabled)
 			{
-				found_kind = K_SOURCE;
-				++cp;
+				if (cp [0] == '.'
+				    && isspace((int) cp [1]))
+				{
+					found_kind = K_SOURCE;
+					++cp;
+				}
+				else if (strncmp ((const char*) cp, "source", (size_t) 6) == 0
+					 && isspace((int) cp [6]))
+				{
+					found_kind = K_SOURCE;
+					cp += 6;
+				}
 			}
-			else if (strncmp ((const char*) cp, "source", (size_t) 6) == 0
-				 && isspace((int) cp [6]))
-			{
-				found_kind = K_SOURCE;
-				cp += 6;
-			}
-
 			if (found_kind != K_NOTHING)
 				while (isspace ((int) *cp))
 					++cp;
@@ -239,9 +252,13 @@ static void findShTags (void)
 					++cp;
 				}
 			}
+
 			if (found_kind != K_NOTHING)
 			{
-				makeSimpleTag (name, ShKinds, found_kind);
+				if (found_kind == K_SOURCE)
+					makeSimpleRefTag (name, ShKinds, K_SOURCE, R_SOURCE_GENERIC);
+				else
+					makeSimpleTag (name, ShKinds, found_kind);
 				found_kind = K_NOTHING;
 			}
 			vStringClear (name);
@@ -265,7 +282,7 @@ extern parserDefinition* ShParser (void)
 	};
 	parserDefinition* def = parserNew ("Sh");
 	def->kinds      = ShKinds;
-	def->kindCount  = COUNT_ARRAY (ShKinds);
+	def->kindCount  = ARRAY_SIZE (ShKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser     = findShTags;

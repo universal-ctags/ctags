@@ -41,3 +41,5 @@ This case tests multiple behavior of C parser.
 
        Any name immediately preceding the "((" will be automatically
        ignored and the previous name will be used.
+
+4. #undef

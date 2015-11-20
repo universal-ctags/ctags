@@ -587,12 +587,12 @@ extern parserDefinition* TexParser (void)
 	 * New definitions for parsing instead of regex
 	 */
 	def->kinds		= TexKinds;
-	def->kindCount	= COUNT_ARRAY (TexKinds);
+	def->kindCount	= ARRAY_SIZE (TexKinds);
 	def->parser		= findTexTags;
 	def->initialize = initialize;
 	def->finalize   = finalize;
 	def->keywordTable =  TexKeywordTable;
-	def->keywordCount = COUNT_ARRAY (TexKeywordTable);
+	def->keywordCount = ARRAY_SIZE (TexKeywordTable);
 	return def;
 }
 /* vi:set tabstop=4 shiftwidth=4 noexpandtab: */

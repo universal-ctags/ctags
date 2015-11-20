@@ -63,6 +63,23 @@ extern int makeSimpleTag (
 	return r;
 }
 
+extern int makeSimpleRefTag (const vString* const name, kindOption* const kinds, const int kind,
+			     int roleIndex)
+{
+	int r = SCOPE_NIL;
+
+	Assert (roleIndex < kinds[kind].nRoles);
+
+	if (kinds[kind].roles[roleIndex].enabled)
+	{
+	    tagEntryInfo e;
+	    initRefTagEntry (&e, vStringValue (name), & kinds [kind], roleIndex);
+
+	    r = makeTagEntry (&e);
+	}
+	return r;
+}
+
 static vString* ext2ptrnNew (const char *const ext)
 {
 	vString * ptrn = vStringNewInit ("*.");
@@ -148,17 +165,32 @@ extern kindOption* getLanguageFileKind (const langType language)
 	return kind;
 }
 
-extern langType getNamedLanguage (const char *const name)
+extern langType getNamedLanguage (const char *const name, size_t len)
 {
 	langType result = LANG_IGNORE;
 	unsigned int i;
 	Assert (name != NULL);
+
 	for (i = 0  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
 	{
 		const parserDefinition* const lang = LanguageTable [i];
 		if (lang->name != NULL)
-			if (strcasecmp (name, lang->name) == 0)
-				result = i;
+		{
+			if (len == 0)
+			{
+				if (strcasecmp (name, lang->name) == 0)
+					result = i;
+			}
+			else
+			{
+				vString* vstr = vStringNewInit (name);
+				vStringTruncate (vstr, len);
+
+				if (strcasecmp (vStringValue (vstr), lang->name) == 0)
+					result = i;
+				vStringDelete (vstr);
+			}
+		}
 	}
 	return result;
 }
@@ -665,7 +697,7 @@ pickLanguageBySelection (selectLanguage selector, FILE *input)
     if (lang)
     {
         verbose ("	selection: %s\n", lang);
-        return getNamedLanguage(lang);
+        return getNamedLanguage(lang, 0);
     }
     else
     {
@@ -1173,7 +1205,7 @@ extern void processLanguageDefineOption (
 {
 	if (parameter [0] == '\0')
 		error (WARNING, "No language specified for \"%s\" option", option);
-	else if (getNamedLanguage (parameter) != LANG_IGNORE)
+	else if (getNamedLanguage (parameter, 0) != LANG_IGNORE)
 		error (WARNING, "Language \"%s\" already defined", parameter);
 	else
 	{
@@ -1198,7 +1230,7 @@ extern void processLanguageDefineOption (
 		LanguageTable = xRealloc (LanguageTable, i + 1, parserDefinition*);
 		LanguageTable [i] = def;
 
-		flagsEval (flags, LangDefFlagDef, COUNT_ARRAY (LangDefFlagDef), def);
+		flagsEval (flags, LangDefFlagDef, ARRAY_SIZE (LangDefFlagDef), def);
 
 		eFree (name);
 	}
@@ -1328,7 +1360,7 @@ extern boolean processKindOption (
 		{
 			vString* langName = vStringNew ();
 			vStringNCopyS (langName, option, len);
-			language = getNamedLanguage (vStringValue (langName));
+			language = getNamedLanguage (vStringValue (langName), 0);
 			if (language == LANG_IGNORE)
 				error (WARNING, "Unknown language \"%s\" in \"%s\" option", vStringValue (langName), option);
 			else
@@ -1353,7 +1385,7 @@ extern boolean processKindOption (
 		}
 		else
 		{
-			language = getNamedLanguage (lang);
+			language = getNamedLanguage (lang, 0);
 			if (language == LANG_IGNORE)
 				error (WARNING, "Unknown language \"%s\" in \"%s\" option", lang, option);
 			else
@@ -1369,6 +1401,52 @@ extern boolean processKindOption (
 #undef PREFIX_LEN
 }
 
+static void printRoles (const langType language, const char* letters, boolean allowMissingKind)
+{
+	const parserDefinition* const lang = LanguageTable [language];
+	const char *c;
+
+	for (c = letters; *c != '\0'; c++)
+	{
+		int i;
+		const kindOption *k;
+
+		for (i = 0; i < lang->kindCount; ++i)
+		{
+			k = lang->kinds + i;
+			if (*c == KIND_WILDCARD || k->letter == *c)
+			{
+				int j;
+				const roleDesc *r;
+
+				for (j = 0; j < k->nRoles; j++)
+				{
+					r = k->roles + j;
+					printf ("%s\t%c\t", lang->name, k->letter);
+					printRole (r);
+				}
+				if (*c != KIND_WILDCARD)
+					break;
+			}
+		}
+		if ((i == lang->kindCount) && (*c != KIND_WILDCARD) && (!allowMissingKind))
+			error (FATAL, "No such letter kind in %s: %c\n", lang->name, *c);
+	}
+}
+
+extern void printLanguageRoles (const langType language, const char* letters)
+{
+	if (language == LANG_AUTO)
+	{
+		unsigned int i;
+		for (i = 0  ;  i < LanguageCount  ;  ++i)
+			printRoles (i, letters, TRUE);
+	}
+	else
+		printRoles (language, letters, FALSE);
+
+}
+
 extern void printLanguageFileKind (const langType language)
 {
 	if (language == LANG_AUTO)
@@ -1382,25 +1460,6 @@ extern void printLanguageFileKind (const langType language)
 	}
 	else
 		printf ("%c\n", LanguageTable [language]->fileKind->letter);
-}
-
-extern void printKind (const kindOption* const kind, boolean allKindFields, boolean indent)
-{
-	if (allKindFields)
-	{
-		printf ("%s%c\t%s\t%s\t%s\n", indent ? "\t"           : "",
-			kind->letter,
-			kind->name        != NULL ? kind->name        : "",
-			kind->description != NULL ? kind->description : "",
-			kind->enabled             ? "on"              : "off");
-	}
-	else
-	{
-		printf ("%s%c  %s%s\n", indent ? "    " : "", kind->letter,
-			kind->description != NULL ? kind->description :
-			(kind->name != NULL ? kind->name : ""),
-			kind->enabled ? "" : " [off]");
-	}
 }
 
 static void printKinds (langType language, boolean allKindFields, boolean indent)

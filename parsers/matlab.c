@@ -14,6 +14,7 @@
 
 #include <string.h>
 #include "parse.h"
+#include "routines.h"
 #include "selectors.h"
 
 static const tagRegexTable const matlabTagRegexTable [] = {
@@ -42,7 +43,7 @@ extern parserDefinition* MatLabParser (void)
 	parserDefinition* const def = parserNew ("MatLab");
 	def->extensions = extensions;
 	def->tagRegexTable = matlabTagRegexTable;
-	def->tagRegexCount = COUNT_ARRAY (matlabTagRegexTable);
+	def->tagRegexCount = ARRAY_SIZE (matlabTagRegexTable);
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
 	def->selectLanguage = selectors;
 	return def;
