@@ -277,9 +277,9 @@ AC_CONFIG_COMMANDS_PRE([
 	AC_DEFINE_UNQUOTED([PKGLIBEXECDIR], ["${PKGLIBEXECDIR}"])
 ])
 
-AM_CONDITIONAL(INSTALL_LIB, test $enable_readlib = yes)
-AM_CONDITIONAL(INSTALL_ETAGS, test $enable_etags = yes)
-AM_CONDITIONAL(USE_READCMD, test $enable_readcmd = yes)
+AM_CONDITIONAL(INSTALL_LIB, [test "x$enable_readlib" = "xyes"])
+AM_CONDITIONAL(INSTALL_ETAGS, [test "x$enable_etags" = "xyes"])
+AM_CONDITIONAL(USE_READCMD, [test "x$enable_readcmd" = "xyes"])
 
 dnl AC_MSG_NOTICE(Change with $program_transform_name)
 ctags_name_executable=`echo ctags | sed "$program_transform_name"`
@@ -518,12 +518,16 @@ PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 
 # Checks for library functions
 # ----------------------------
-AC_CHECK_FUNCS(fnmatch,[],[
+AC_CHECK_FUNCS(fnmatch,[have_fnmatch=yes],[
 AC_LIBOBJ([fnmatch])
-CPPFLAGS="$CPPFLAGS -I${srcdir}/fnmatch"
-AC_DEFINE(HAVE_FNMATCH)
-])
+have_fnmatch=no])
 AC_CHECK_HEADERS(fnmatch.h)
+
+AM_CONDITIONAL([HAVE_FNMATCH], [test "x$have_fnmatch" = "xyes"])
+if test "xno" = "x$have_fnmatch"; then
+    CPPFLAGS="$CPPFLAGS -I${srcdir}/fnmatch"
+    AC_DEFINE(HAVE_FNMATCH)
+fi
 
 AC_CHECK_FUNCS(strstr)
 AC_CHECK_FUNCS(strcasecmp stricmp, break)
@@ -610,12 +614,15 @@ AC_MSG_RESULT($regcomp_works)
 if test yes != "$regcomp_works"; then
 	AC_MSG_ERROR([regcomp() on this system is broken.])
 fi
+have_regcomp=yes
 ],[
 dnl Using bundled regex implementation
 AC_LIBOBJ([regex])
 CPPFLAGS="$CPPFLAGS -I${srcdir}/gnu_regex"
 AC_DEFINE(HAVE_REGCOMP)
+have_regcomp=no
 ])
+AM_CONDITIONAL([HAVE_REGCOMP], [test "xyes" = "x$have_regcomp"])
 # if test yes = "$with_perl_regex"; then
 # 	AC_MSG_CHECKING(for Perl regex library)
 # 	pcre_candidates="$with_perl_regex $HOME/local/lib* /usr*/local/lib* /usr/lib*"
