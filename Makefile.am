@@ -11,6 +11,16 @@ readtags_CPPFLAGS = -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main
 dist_readtags_SOURCES = readtags.c readtags.h
 endif
 
+if !HAVE_FNMATCH
+MAIN_SRCS += $(FNMATCH_SRCS)
+HEADERS_MAIN += $(HEADERS_FNMATCH)
+endif
+
+if !HAVE_REGCOMP
+MAIN_SRCS += $(REGEX_SRCS)
+HEADERS_MAIN += $(HEADERS_REGEX)
+endif
+
 REV != git rev-parse --short HEAD || echo 0
 ctags_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -DCTAGS_COMMIT_ID=0x$(REV)
 dist_ctags_SOURCES = $(SOURCES)
