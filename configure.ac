@@ -618,7 +618,7 @@ have_regcomp=yes
 ],[
 dnl Using bundled regex implementation
 AC_LIBOBJ([regex])
-CPPFLAGS="$CPPFLAGS -I${srcdir}/gnu_regex"
+CPPFLAGS="$CPPFLAGS -I${srcdir}/gnu_regex -D__USE_GNU"
 AC_DEFINE(HAVE_REGCOMP)
 have_regcomp=no
 ])
