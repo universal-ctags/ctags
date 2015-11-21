@@ -39,10 +39,10 @@ be obtained with following command line
 
 	$ ./ctags --list-languages
 
-Besides ``LANGUAGES`` and ``TIMEOUT``, fuzz target also takes the
-following parameters:
+Besides ``LANGUAGES`` and ``TIMEOUT``, the fuzz target is modified by
+these ``configure`` arguments:
 
-	``VG=1``
+	``--enable-valgrind``
 
 		Run ctags under valgrind. If valgrind finds a memory
 		error it is reported as::

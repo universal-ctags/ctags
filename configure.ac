@@ -8,12 +8,13 @@
 
 AC_PREREQ([2.59])
 AC_INIT([ctags],[universal])
+AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_HEADERS([config.h])
 if ! test -e "${srcdir}/config.h.in"; then
    echo "---"
    echo "--- ${srcdir}/config.h.in WAS NOT FOUND." 1>&2
    echo "--- YOU MIGHT HAVE RUN autoconf ONLY" 1>&2
-   echo "--- BUT YOU MAY HAVE TO RUN autoreconf." 1>&2
+   echo "--- BUT YOU MAY HAVE TO RUN autogen.sh." 1>&2
    echo "---"
    exit 1
 fi
@@ -195,10 +196,6 @@ AC_ARG_ENABLE(macro-patterns,
 	[AS_HELP_STRING([--enable-macro-patterns],
 		[use patterns as default method to locate macros instead of line numbers])])
 
-AC_ARG_ENABLE(shell-globbing,
-	[AS_HELP_STRING([--enable-shell-globbing=DIR],
-		[does shell expand wildcards (yes|no)? [yes]])])
-
 AC_ARG_ENABLE(tmpdir,
 	[AS_HELP_STRING([--enable-tmpdir=DIR],
 		[default directory for temporary files [ARG=/tmp]])],
@@ -215,6 +212,22 @@ AC_ARG_WITH([ctags-sysconfdir],
 AC_ARG_WITH([ctags-libexecdir],
 	[AS_HELP_STRING([--with-ctags-libexecdir=DIR],
 		['universal-ctags'-specific program executables [LIBEXECDIR/ctags]])])
+
+AC_ARG_ENABLE(travis,
+    [AS_HELP_STRING([--enable-travis],
+        [prepare for a build on Travis CI])])
+AM_CONDITIONAL([TRAVIS], [test "x$travis" = "xtrue"])
+AM_COND_IF([TRAVIS],
+    [AC_SUBST([SHOW_DIFF_OUTPUT], [--show-diff-output])],
+    [AC_SUBST([SHOW_DIFF_OUTPUT], []):])
+
+AC_ARG_ENABLE(valgrind,
+    [AS_HELP_STRING([--enable-valgrind],
+        [enable Valgrind reporting])])
+AM_CONDITIONAL([VALGRIND], [test "x$valgrind" = "xtrue"])
+AM_COND_IF([VALGRIND],
+    [AC_SUBST([VALGRIND], [--with-valgrind])],
+    [AC_SUBST([VALGRIND], []):])
 
 AC_ARG_PROGRAM
 
@@ -264,30 +277,9 @@ AC_CONFIG_COMMANDS_PRE([
 	AC_DEFINE_UNQUOTED([PKGLIBEXECDIR], ["${PKGLIBEXECDIR}"])
 ])
 
-
-install_targets="install-ctags install-data install-libexec"
-AC_MSG_CHECKING(whether to install link to etags)
-if test yes = "$enable_etags"; then
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-etags"
-else
-	AC_MSG_RESULT(no)
-fi
-AC_MSG_CHECKING(whether to install readtags object file)
-if test yes = "$enable_readlib"; then
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-lib"
-else
-	AC_MSG_RESULT(no)
-fi
-AC_MSG_CHECKING(whether to install readtags command)
-if test no = "$enable_readcmd"; then
-	AC_MSG_RESULT(no)
-else
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-cmd"
-fi
-AC_SUBST(install_targets)
+AM_CONDITIONAL(INSTALL_LIB, [test "x$enable_readlib" = "xyes"])
+AM_CONDITIONAL(INSTALL_ETAGS, [test "x$enable_etags" = "xyes"])
+AM_CONDITIONAL(USE_READCMD, [test "x$enable_readcmd" = "xyes"])
 
 dnl AC_MSG_NOTICE(Change with $program_transform_name)
 ctags_name_executable=`echo ctags | sed "$program_transform_name"`
@@ -526,12 +518,16 @@ PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 
 # Checks for library functions
 # ----------------------------
-AC_CHECK_FUNCS(fnmatch,[],[
+AC_CHECK_FUNCS(fnmatch,[have_fnmatch=yes],[
 AC_LIBOBJ([fnmatch])
-CPPFLAGS="$CPPFLAGS -I${srcdir}/fnmatch"
-AC_DEFINE(HAVE_FNMATCH)
-])
+have_fnmatch=no])
 AC_CHECK_HEADERS(fnmatch.h)
+
+AM_CONDITIONAL([HAVE_FNMATCH], [test "x$have_fnmatch" = "xyes"])
+if test "xno" = "x$have_fnmatch"; then
+    CPPFLAGS="$CPPFLAGS -I${srcdir}/fnmatch"
+    AC_DEFINE(HAVE_FNMATCH)
+fi
 
 AC_CHECK_FUNCS(strstr)
 AC_CHECK_FUNCS(strcasecmp stricmp, break)
@@ -618,12 +614,15 @@ AC_MSG_RESULT($regcomp_works)
 if test yes != "$regcomp_works"; then
 	AC_MSG_ERROR([regcomp() on this system is broken.])
 fi
+have_regcomp=yes
 ],[
 dnl Using bundled regex implementation
 AC_LIBOBJ([regex])
-CPPFLAGS="$CPPFLAGS -I${srcdir}/gnu_regex"
+CPPFLAGS="$CPPFLAGS -I${srcdir}/gnu_regex -D__USE_GNU"
 AC_DEFINE(HAVE_REGCOMP)
+have_regcomp=no
 ])
+AM_CONDITIONAL([HAVE_REGCOMP], [test "xyes" = "x$have_regcomp"])
 # if test yes = "$with_perl_regex"; then
 # 	AC_MSG_CHECKING(for Perl regex library)
 # 	pcre_candidates="$with_perl_regex $HOME/local/lib* /usr*/local/lib* /usr/lib*"
@@ -715,8 +714,7 @@ fi
 
 AC_CHECK_FUNCS([mblen], [], [HAVE_MBLEN=1], [])
 
-AC_CONFIG_FILES([Makefile
-		 ctags.1])
+AC_CONFIG_FILES([Makefile ctags.1])
 
 AC_OUTPUT
 

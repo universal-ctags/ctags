@@ -119,7 +119,8 @@ bugs
 
 	* the test case is imported as parser-c.r/c-heapoverflow-sh-bug-363.d::
 
-   		$ make units UNITS=c-heapoverflow-sh-bug-363 VG=1
+                $ ./configure --enable-valgrind
+   		$ make units UNITS=c-heapoverflow-sh-bug-363
 
    <361> Invalid C input file causes invalid read / heap overflow
 

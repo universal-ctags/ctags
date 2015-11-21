@@ -236,10 +236,11 @@ but reported the skips::
 
 Running under valgrind and timeout
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If ``VG=1`` is given, each test cases are run under valgrind.
+If ``--enable-valgrind`` is given, each test cases are run under valgrind.
 If valgrind detects an error, it is reported as::
 
-    $ make units VG=1
+    $ ./configure --enable-valgrind
+    $ make units
     Testing css-singlequote-in-comment as CSS             failed (valgrind-error)
     ...
     Summary (see CMDLINE.tmp to reproduce without test harness)
@@ -255,7 +256,7 @@ In this case the report of valgrind is recorded to
 NOTE: ``/bin/bash`` is needed to report the result. You can specify a shell
 running test with SHELL macro like::
 
-    $ make units VG=1 SHELL=/bin/bash
+    $ make units SHELL=/bin/bash
 
 
 If ``TIMEOUT=N`` is given, each test cases are run under timeout
