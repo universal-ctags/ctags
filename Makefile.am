@@ -11,6 +11,16 @@ readtags_CPPFLAGS = -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main
 dist_readtags_SOURCES = readtags.c readtags.h
 endif
 
+if !HAVE_FNMATCH
+MAIN_SRCS += $(FNMATCH_SRCS)
+MAIN_HEADS += $(FNMATCH_HEADS)
+endif
+
+if !HAVE_REGCOMP
+MAIN_SRCS += $(REGEX_SRCS)
+MAIN_HEADS += $(REGEX_HEADS)
+endif
+
 ctags_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main
 ctags_CPPFLAGS+= $(DEBUG_CPPFLAGS)
 ctags_CPPFLAGS+= $(FNMATCH_CPPFLAGS)

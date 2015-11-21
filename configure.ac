@@ -461,13 +461,14 @@ PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 
 # Checks for library functions
 # ----------------------------
-AC_CHECK_FUNCS(fnmatch,[],[
+AC_CHECK_FUNCS(fnmatch,[have_fnmatch=yes],[
 AC_LIBOBJ([fnmatch])
 FNMATCH_CPPFLAGS="-I${srcdir}/fnmatch"
 AC_DEFINE(HAVE_FNMATCH)
-])
+have_fnmatch=no])
 AC_SUBST([FNMATCH_CPPFLAGS])
 AC_CHECK_HEADERS(fnmatch.h)
+AM_CONDITIONAL([HAVE_FNMATCH], [test "x$have_fnmatch" = "xyes"])
 
 AC_CHECK_FUNCS(strstr)
 AC_CHECK_FUNCS(strcasecmp stricmp, break)
@@ -547,13 +548,15 @@ AC_MSG_RESULT($regcomp_works)
 if test yes != "$regcomp_works"; then
 	AC_MSG_ERROR([regcomp() on this system is broken.])
 fi
+have_regcomp=yes
 ],[
 dnl Using bundled regex implementation
 AC_LIBOBJ([regex])
 REGCOMP_CPPFLAGS="-I${srcdir}/gnu_regex"
 AC_DEFINE(HAVE_REGCOMP)
-])
+have_regcomp=no])
 AC_SUBST([REGCOMP_CPPFLAGS])
+AM_CONDITIONAL([HAVE_REGCOMP], [test "xyes" = "x$have_regcomp"])
 
 AC_CHECK_FUNCS(scandir)
 
