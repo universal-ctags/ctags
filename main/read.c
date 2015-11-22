@@ -44,18 +44,28 @@ static fpos_t StartOfLine;  /* holds deferred position of start of line */
 *   FUNCTION DEFINITIONS
 */
 
+static void freeInputFileInfo (inputFileInfo *finfo)
+{
+	if (finfo->name)
+	{
+		vStringDelete (finfo->name);
+		finfo->name = NULL;
+	}
+	if (finfo->tagPath)
+	{
+		eFree (finfo->tagPath);
+		finfo->tagPath = NULL;
+	}
+}
+
 extern void freeSourceFileResources (void)
 {
-	if (File.name != NULL)
-		vStringDelete (File.name);
 	if (File.path != NULL)
 		vStringDelete (File.path);
-	if (File.source.name != NULL)
-		vStringDelete (File.source.name);
-	if (File.source.tagPath != NULL)
-		eFree (File.source.tagPath);
 	if (File.line != NULL)
 		vStringDelete (File.line);
+	freeInputFileInfo (&File.input);
+	freeInputFileInfo (&File.source);
 }
 
 /*
@@ -67,9 +77,9 @@ static void setInputFileName (const char *const fileName)
 	const char *const head = fileName;
 	const char *const tail = baseFilename (head);
 
-	if (File.name != NULL)
-		vStringDelete (File.name);
-	File.name = vStringNewInit (fileName);
+	if (File.input.name != NULL)
+		vStringDelete (File.input.name);
+	File.input.name = vStringNewInit (fileName);
 
 	if (File.path != NULL)
 		vStringDelete (File.path);
@@ -272,7 +282,7 @@ extern boolean fileOpen (const char *const fileName, const langType language)
 		fgetpos (File.fp, &StartOfLine);
 		fgetpos (File.fp, &File.filePosition);
 		File.currentLine  = NULL;
-		File.lineNumber   = 0L;
+		File.input.lineNumber = 0L;
 		File.eof          = FALSE;
 		File.newLine      = TRUE;
 
@@ -298,8 +308,8 @@ extern void fileClose (void)
 		 */
 		if (Option.printTotals)
 		{
-			fileStatus *status = eStat (vStringValue (File.name));
-			addTotals (0, File.lineNumber - 1L, status->size);
+			fileStatus *status = eStat (vStringValue (File.input.name));
+			addTotals (0, File.input.lineNumber - 1L, status->size);
 		}
 		fclose (File.fp);
 		File.fp = NULL;
@@ -317,10 +327,10 @@ static void fileNewline (void)
 {
 	File.filePosition = StartOfLine;
 	File.newLine = FALSE;
-	File.lineNumber++;
+	File.input.lineNumber++;
 	File.source.lineNumber++;
-	DebugStatement ( if (Option.breakLine == File.lineNumber) lineBreak (); )
-	DebugStatement ( debugPrintf (DEBUG_RAW, "%6ld: ", File.lineNumber); )
+	DebugStatement ( if (Option.breakLine == File.input.lineNumber) lineBreak (); )
+	DebugStatement ( debugPrintf (DEBUG_RAW, "%6ld: ", File.input.lineNumber); )
 }
 
 /*  This function reads a single character from the stream, performing newline

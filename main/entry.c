@@ -965,7 +965,7 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 
 	line = readSourceLine (TagFile.vLine, tag->filePosition, NULL);
 	if (line == NULL)
-		error (FATAL, "bad tag in %s", vStringValue (File.name));
+		error (FATAL, "bad tag in %s", vStringValue (File.input.name));
 	if (tag->truncateLine)
 		truncateTagLine (line, tag->name, FALSE);
 
@@ -1210,7 +1210,7 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	{
 		if (!getSourceLanguageAllowNullTag())
 			error (WARNING, "ignoring null tag in %s(line: %lu)",
-			       vStringValue (File.name), tag->lineNumber);
+			       vStringValue (File.input.name), tag->lineNumber);
 		goto out;
 	}
 
