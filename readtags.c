@@ -287,6 +287,26 @@ static void parseExtensionFields (tagFile *const file, tagEntry *const entry,
 	}
 }
 
+static int isOdd (unsigned int i)
+{
+	return  (i % 2);
+}
+
+static unsigned int countContinuousBackslashesBackward(const char *from,
+						     const char *till)
+{
+	unsigned int counter = 0;
+
+	for (; from > till; from--)
+	{
+		if (*from == '\\')
+			counter++;
+		else
+			break;
+	}
+	return counter;
+}
+
 static void parseTagLine (tagFile *file, tagEntry *const entry)
 {
 	int i;
@@ -319,7 +339,10 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 				do
 				{
 					p = strchr (p + 1, delimiter);
-				} while (p != NULL  &&  *(p - 1) == '\\');
+				} while (p != NULL
+					 &&  isOdd (countContinuousBackslashesBackward (p - 1,
+											entry->address.pattern)));
+
 				if (p == NULL)
 				{
 					/* invalid pattern */
@@ -867,7 +890,7 @@ static const char *const Usage =
 	"Find tag file entries matching specified names.\n\n"
 	"Usage: \n"
 	"    %s -h\n"
-	"    %s [-ilp] [-s[0|1]] [-t file] [name(s)]\n\n"
+	"    %s [-ilp] [-s[0|1]] [-t file] [-] [name(s)]\n\n"
 	"Options:\n"
 	"    -e           Include extension fields in output.\n"
 	"    -h           Print this help message.\n"
@@ -876,6 +899,7 @@ static const char *const Usage =
 	"    -p           Perform partial matching.\n"
 	"    -s[0|1|2]    Override sort detection of tag file.\n"
 	"    -t file      Use specified tag file (default: \"tags\").\n"
+	"    -            Treat arguments after this as NAME even if they start with -.\n"
 	"Note that options are acted upon as encountered, so order is significant.\n";
 
 static void printUsage(FILE* stream, int exitCode)
@@ -889,17 +913,21 @@ extern int main (int argc, char **argv)
 	int options = 0;
 	int actionSupplied = 0;
 	int i;
+	int ignore_prefix = 0;
+
 	ProgramName = argv [0];
 	if (argc == 1)
 		printUsage(stderr, 1);
 	for (i = 1  ;  i < argc  ;  ++i)
 	{
 		const char *const arg = argv [i];
-		if (arg [0] != '-')
+		if (ignore_prefix || arg [0] != '-')
 		{
 			findTag (arg, options);
 			actionSupplied = 1;
 		}
+		else if (arg [0] == '-' && arg [1] == '\0')
+			ignore_prefix = 1;
 		else
 		{
 			size_t j;
