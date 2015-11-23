@@ -419,7 +419,7 @@ static vString *iFileGetLine (void)
 			vStringTerminate (File.line);
 
 			if (vStringLength (File.line) > 0)
-				matchRegex (File.line, File.source.language);
+				matchRegex (File.line, File.input.language);
 
 			result = File.line;
 			break;
