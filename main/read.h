@@ -38,6 +38,7 @@
 #define getInputLanguageName()   getLanguageName (File.input.language)
 #define getInputFileTagPath()    File.input.tagPath
 #define isInputLanguage(lang)         (boolean)((lang) == File.input.language)
+#define isInputHeaderFile()           File.input.isHeader
 #define getSourceFileName()      vStringValue (File.source.name)
 #define getSourceFileTagPath()   File.source.tagPath
 #define getSourceLanguage()      File.source.language
@@ -45,7 +46,6 @@
 #define getSourceLanguageFileKind()  getLanguageFileKind (File.source.language)
 #define getSourceLanguageAllowNullTag() getLanguageAllowNullTag (File.source.language)
 #define getSourceLineNumber()    File.source.lineNumber
-#define isHeaderFile()           File.source.isHeader
 #define isSourceLanguageKindEnabled(c)  isLanguageKindEnabled (File.source.language, c)
 
 /*

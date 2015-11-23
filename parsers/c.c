@@ -1431,7 +1431,7 @@ static void makeTag (const tokenInfo *const token,
 {
 	/*  Nothing is really of file scope when it appears in a header file.
 	 */
-	isFileScope = (boolean) (isFileScope && ! isHeaderFile ());
+	isFileScope = (boolean) (isFileScope && ! isInputHeaderFile ());
 
 	if (isType (token, TOKEN_NAME)  &&  vStringLength (token->name) > 0  &&
 		includeTag (type, isFileScope))

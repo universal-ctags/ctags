@@ -86,7 +86,7 @@ extern void debugEntry (const tagEntryInfo *const tag)
 			printf (" [inherits:%s]", tag->extensionFields.inheritance);
 
 		if (getFieldDesc (FIELD_FILE_SCOPE)->enabled &&
-				tag->isFileScope && ! isHeaderFile ())
+				tag->isFileScope && ! isInputHeaderFile ())
 			printf (" [file:]");
 
 		if (getFieldDesc (FIELD_ACCESS)->enabled &&

@@ -337,7 +337,7 @@ static boolean popConditional (void)
 
 static void makeDefineTag (const char *const name, boolean undef)
 {
-	const boolean isFileScope = (boolean) (! isHeaderFile ());
+	const boolean isFileScope = (boolean) (! isInputHeaderFile ());
 
 	if (!Cpp.defineMacroKind)
 		return;
