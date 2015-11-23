@@ -443,7 +443,6 @@ static void addTag (vString* ident, const char* arg_list, int kind, unsigned lon
 
 	tag.lineNumber = line;
 	tag.filePosition = pos;
-	tag.sourceFileName = getSourceFileName();
 
 	tag.extensionFields.signature = arg_list;
 	/*tag.extensionFields.varType = type;*/ /* FIXME: map to typeRef[1]? */
