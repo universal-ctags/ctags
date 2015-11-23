@@ -648,7 +648,7 @@ static void initToken (tokenInfo* const token)
 {
 	token->type			= TOKEN_NONE;
 	token->keyword		= KEYWORD_NONE;
-	token->lineNumber	= getSourceLineNumber ();
+	token->lineNumber	= getInputLineNumber ();
 	token->filePosition	= getInputFilePosition ();
 	vStringClear (token->name);
 }
@@ -1733,7 +1733,7 @@ static void skipBraces (void)
 
 static keywordId analyzeKeyword (const char *const name)
 {
-	const keywordId id = (keywordId) lookupKeyword (name, getSourceLanguage ());
+	const keywordId id = (keywordId) lookupKeyword (name, getInputLanguage ());
 	return id;
 }
 

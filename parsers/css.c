@@ -197,7 +197,7 @@ static void findCssTags (void)
 				vStringCat (selector, token.string);
 
 				kind = classifySelector (token.string);
-				lineNumber = getSourceLineNumber ();
+				lineNumber = getInputLineNumber ();
 				filePosition = getInputFilePosition ();
 
 				readToken (&token);

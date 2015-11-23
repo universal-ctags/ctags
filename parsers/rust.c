@@ -346,7 +346,7 @@ static void scanCharacterOrLifetime (lexerState *lexer)
 static int advanceToken (lexerState *lexer, boolean skip_whitspace)
 {
 	boolean have_whitespace = FALSE;
-	lexer->line = getSourceLineNumber();
+	lexer->line = getInputLineNumber();
 	lexer->pos = getInputFilePosition();
 	while (lexer->cur_c != EOF)
 	{
@@ -367,7 +367,7 @@ static int advanceToken (lexerState *lexer, boolean skip_whitspace)
 			break;
 		}
 	}
-	lexer->line = getSourceLineNumber();
+	lexer->line = getInputLineNumber();
 	lexer->pos = getInputFilePosition();
 	while (lexer->cur_c != EOF)
 	{

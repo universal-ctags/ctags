@@ -1801,7 +1801,7 @@ static void computeModuleName ( void )
 	/* in Ocaml the file name define a module.
 	 * so we define a module =)
 	 */
-	const char *filename = getSourceFileName ();
+	const char *filename = getInputFileName ();
 	int beginIndex = 0;
 	int endIndex = strlen (filename) - 1;
 	vString *moduleName = vStringNew ();

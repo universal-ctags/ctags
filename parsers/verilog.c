@@ -266,7 +266,7 @@ static tokenInfo *newToken (void)
 	tokenInfo *const token = xMalloc (1, tokenInfo);
 	token->kind = K_UNDEFINED;
 	token->name = vStringNew ();
-	token->lineNumber = getSourceLineNumber ();
+	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	token->scope = NULL;
 	token->nestLevel = 0;
@@ -450,7 +450,7 @@ static boolean readIdentifier (tokenInfo *const token, int c)
 		}
 		vUngetc (c);
 		vStringTerminate (token->name);
-		token->lineNumber = getSourceLineNumber ();
+		token->lineNumber = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 	}
 	return (boolean)(vStringLength (token->name) > 0);
@@ -495,7 +495,7 @@ static int skipMacro (int c)
 
 static verilogKind getKind (tokenInfo *const token)
 {
-	return (verilogKind) lookupKeyword (vStringValue (token->name), getSourceLanguage () );
+	return (verilogKind) lookupKeyword (vStringValue (token->name), getInputLanguage () );
 }
 
 static void updateKind (tokenInfo *const token)
@@ -579,9 +579,9 @@ static void createTag (tokenInfo *const token)
 			&tag,
 			vStringValue (token->name),
 			token->lineNumber,
-			getSourceLanguageName (),
+			getInputLanguageName (),
 			token->filePosition,
-			getSourceFileTagPath (),
+			getInputFileTagPath (),
 			kindFromKind (kind),
 		        ROLE_INDEX_DEFINITION);
 	verbose ("Adding tag %s (kind %d)", vStringValue (token->name), kind);

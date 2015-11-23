@@ -455,7 +455,7 @@ static tokenInfo *newToken (void)
 	token->signature    = NULL;
 	token->implementation = IMP_DEFAULT;
 	token->isMethod     = FALSE;
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	return token;
@@ -994,7 +994,7 @@ static void readToken (tokenInfo *const token)
 getNextChar:
 	c = getChar ();
 
-	token->lineNumber	= getSourceLineNumber ();
+	token->lineNumber	= getInputLineNumber ();
 	token->filePosition	= getInputFilePosition ();
 
 	switch (c)

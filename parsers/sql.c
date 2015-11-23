@@ -402,7 +402,7 @@ static tokenInfo *newToken (void)
 	token->scope              = vStringNew ();
 	token->scopeKind          = SQLTAG_COUNT;
 	token->begin_end_nest_lvl = 0;
-	token->lineNumber         = getSourceLineNumber ();
+	token->lineNumber         = getInputLineNumber ();
 	token->filePosition       = getInputFilePosition ();
 
 	return token;
@@ -496,7 +496,7 @@ getNextChar:
 	do
 	{
 		c = fileGetc ();
-		token->lineNumber   = getSourceLineNumber ();
+		token->lineNumber   = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 		/* 
 		 * Added " to the list of ignores, not sure what this 
@@ -530,7 +530,7 @@ getNextChar:
 		case '"':
 				  token->type = TOKEN_STRING;
 				  parseString (token->string, c);
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
@@ -574,7 +574,7 @@ getNextChar:
 				  if (c != '\\'  && c != '"'  && c != '\''  &&  !isspace (c))
 					  fileUngetc (c);
 				  token->type = TOKEN_CHARACTER;
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
@@ -617,7 +617,7 @@ getNextChar:
 				  else
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getSourceLineNumber ();
+					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->keyword = analyzeToken (token->string, Lang_sql);
 					  if (isKeyword (token, KEYWORD_rem))

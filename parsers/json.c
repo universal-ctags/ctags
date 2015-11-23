@@ -92,7 +92,7 @@ static tokenInfo *newToken (void)
 	token->scopeKind	= TAG_NONE;
 	token->string		= vStringNew ();
 	token->scope		= vStringNew ();
-	token->lineNumber	= getSourceLineNumber ();
+	token->lineNumber	= getInputLineNumber ();
 	token->filePosition	= getInputFilePosition ();
 
 	return token;
@@ -155,7 +155,7 @@ static void readTokenFull (tokenInfo *const token,
 		c = fileGetc ();
 	while (c == '\t' || c == ' ' || c == '\r' || c == '\n');
 
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	switch (c)

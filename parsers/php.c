@@ -375,7 +375,7 @@ static tokenInfo *newToken (void)
 	token->keyword		= KEYWORD_NONE;
 	token->string		= vStringNew ();
 	token->scope		= vStringNew ();
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	token->parentKind	= -1;
 
@@ -782,7 +782,7 @@ getNextChar:
 
 	c = skipWhitespaces (c);
 
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	switch (c)
@@ -817,7 +817,7 @@ getNextChar:
 		case '"':
 			token->type = TOKEN_STRING;
 			parseString (token->string, c);
-			token->lineNumber = getSourceLineNumber ();
+			token->lineNumber = getInputLineNumber ();
 			token->filePosition = getInputFilePosition ();
 			break;
 
@@ -945,7 +945,7 @@ getNextChar:
 			else
 			{
 				parseIdentifier (token->string, c);
-				token->keyword = analyzeToken (token->string, getSourceLanguage ());
+				token->keyword = analyzeToken (token->string, getInputLanguage ());
 				if (token->keyword == KEYWORD_NONE)
 					token->type = TOKEN_IDENTIFIER;
 				else
@@ -1158,7 +1158,7 @@ static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 	}
 
 	/* if parsing Zephir, skip function return type hint */
-	if (getSourceLanguage () == Lang_zephir && token->type == TOKEN_OPERATOR)
+	if (getInputLanguage () == Lang_zephir && token->type == TOKEN_OPERATOR)
 	{
 		do
 			readToken (token);

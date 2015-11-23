@@ -118,8 +118,8 @@ extern void debugAssert (const char *assertion, const char *file, unsigned int l
 	{
 		fprintf(stderr, "ctags: %s:%u: parsing %s:%lu as %s\n",
 		        file, line,
-		        getSourceFileName(), getSourceLineNumber(),
-		        getSourceLanguageName());
+		        getInputFileName(), getInputLineNumber(),
+		        getInputLanguageName());
 	}
 	fflush(stderr);
 	abort();

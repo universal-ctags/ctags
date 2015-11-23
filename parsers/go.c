@@ -142,7 +142,7 @@ static tokenInfo *newToken (void)
 	token->type = TOKEN_NONE;
 	token->keyword = KEYWORD_NONE;
 	token->string = vStringNew ();
-	token->lineNumber = getSourceLineNumber ();
+	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	return token;
 }
@@ -221,7 +221,7 @@ getNextChar:
 	do
 	{
 		c = fileGetc ();
-		token->lineNumber = getSourceLineNumber ();
+		token->lineNumber = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 		if (c == '\n' && (lastTokenType == TOKEN_IDENTIFIER ||
 						  lastTokenType == TOKEN_STRING ||
@@ -300,7 +300,7 @@ getNextChar:
 		case '`':
 			token->type = TOKEN_STRING;
 			parseString (token->string, c);
-			token->lineNumber = getSourceLineNumber ();
+			token->lineNumber = getInputLineNumber ();
 			token->filePosition = getInputFilePosition ();
 			break;
 
@@ -357,7 +357,7 @@ getNextChar:
 			if (isStartIdentChar (c))
 			{
 				parseIdentifier (token->string, c);
-				token->lineNumber = getSourceLineNumber ();
+				token->lineNumber = getInputLineNumber ();
 				token->filePosition = getInputFilePosition ();
 				token->keyword = lookupKeyword (vStringValue (token->string), Lang_go);
 				if (isKeyword (token, KEYWORD_NONE))

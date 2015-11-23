@@ -670,7 +670,7 @@ static boolean adaCmp(const char *match)
   /* if we match, increment the position pointer */
   if(status == TRUE && match != NULL)
   {
-    matchLineNum = getSourceLineNumber();
+    matchLineNum = getInputLineNumber();
     matchFilePos = getInputFilePosition();
 
     movePos((strlen(match)));
@@ -696,7 +696,7 @@ static boolean adaKeywordCmp(adaKeyword keyword)
   /* if we match, increment the position pointer */
   if(status == TRUE)
   {
-    matchLineNum = getSourceLineNumber();
+    matchLineNum = getInputLineNumber();
     matchFilePos = getInputFilePosition();
 
     movePos((strlen(AdaKeywords[keyword])));
@@ -1189,7 +1189,7 @@ static adaTokenInfo *adaParseVariables(adaTokenInfo *parent, adaKind kind)
   /* before we start reading input save the current line number and file
    * position, so we can reconstruct the correct line & file position for any
    * tags we create */
-  lineNum = getSourceLineNumber();
+  lineNum = getInputLineNumber();
   filePos[filePosIndex] = getInputFilePosition();
 
   /* setup local buffer... Since we may have to read a few lines to verify

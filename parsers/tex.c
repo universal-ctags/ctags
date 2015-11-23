@@ -157,7 +157,7 @@ static tokenInfo *newToken (void)
 	token->keyword		= KEYWORD_NONE;
 	token->string		= vStringNew ();
 	token->scope		= vStringNew ();
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	return token;
@@ -304,7 +304,7 @@ getNextChar:
 	do
 	{
 		c = fileGetc ();
-		token->lineNumber   = getSourceLineNumber ();
+		token->lineNumber   = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\n');
@@ -333,7 +333,7 @@ getNextChar:
 				  else
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getSourceLineNumber ();
+					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->keyword = analyzeToken (token->string, Lang_js);
 					  if (isKeyword (token, KEYWORD_NONE))
@@ -354,7 +354,7 @@ getNextChar:
 				  else
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getSourceLineNumber ();
+					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->type = TOKEN_IDENTIFIER;
 				  }

@@ -219,7 +219,7 @@ static tokenInfo *newToken (void)
 	token->nestLevel	= 0;
 	token->isClass		= FALSE;
 	token->ignoreTag	= FALSE;
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	return token;
@@ -418,7 +418,7 @@ getNextChar:
 	do
 	{
 		c = fileGetc ();
-		token->lineNumber   = getSourceLineNumber ();
+		token->lineNumber   = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\n');
@@ -443,7 +443,7 @@ getNextChar:
 		case '"':
 				  token->type = TOKEN_STRING;
 				  parseString (token->string, c);
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
@@ -452,7 +452,7 @@ getNextChar:
 				  if (c != '\\'  && c != '"'  &&  !isspace (c))
 					  fileUngetc (c);
 				  token->type = TOKEN_CHARACTER;
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
@@ -465,7 +465,7 @@ getNextChar:
 					  {
 						  fileUngetc (d);
 						  token->type = TOKEN_FORWARD_SLASH;
-						  token->lineNumber = getSourceLineNumber ();
+						  token->lineNumber = getInputLineNumber ();
 						  token->filePosition = getInputFilePosition ();
 					  }
 					  else
@@ -491,7 +491,7 @@ getNextChar:
 						  else if (d == '>')	/* is this the start of a comment?  */
 						  {
 							  token->type = TOKEN_CLOSE_SGML;
-							  token->lineNumber = getSourceLineNumber ();
+							  token->lineNumber = getInputLineNumber ();
 							  token->filePosition = getInputFilePosition ();
 						  }
 					  }
@@ -514,7 +514,7 @@ getNextChar:
 					  {
 						  fileUngetc (d);
 						  token->type = TOKEN_LESS_THAN;
-						  token->lineNumber = getSourceLineNumber ();
+						  token->lineNumber = getInputLineNumber ();
 						  token->filePosition = getInputFilePosition ();
 						  break;						
 					  }
@@ -528,7 +528,7 @@ getNextChar:
 								  fileUngetc (e);
 								  fileUngetc (d);
 								  token->type = TOKEN_LESS_THAN;
-								  token->lineNumber = getSourceLineNumber ();
+								  token->lineNumber = getInputLineNumber ();
 								  token->filePosition = getInputFilePosition ();
 							  }
 							  else
@@ -542,7 +542,7 @@ getNextChar:
 										  fileUngetc (e);
 										  fileUngetc (d);
 										  token->type = TOKEN_LESS_THAN;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 									  }
 									  else
@@ -582,7 +582,7 @@ getNextChar:
 								  fileUngetc (e);
 								  fileUngetc (d);
 								  token->type = TOKEN_LESS_THAN;
-								  token->lineNumber = getSourceLineNumber ();
+								  token->lineNumber = getInputLineNumber ();
 								  token->filePosition = getInputFilePosition ();
 								  break;
 							  }
@@ -597,14 +597,14 @@ getNextChar:
 										  fileUngetc (e);
 										  fileUngetc (d);
 										  token->type = TOKEN_LESS_THAN;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 										  break;
 									  }
 									  else
 									  {
 										  token->type = TOKEN_OPEN_MXML;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 										  break;
 									  }
@@ -612,7 +612,7 @@ getNextChar:
 								  if ( d == 's' && e == ':')    /* continuing a spark tag */
 								  {
 									  token->type = TOKEN_OPEN_MXML;
-									  token->lineNumber = getSourceLineNumber ();
+									  token->lineNumber = getInputLineNumber ();
 									  token->filePosition = getInputFilePosition ();
 									  break;
 								  }
@@ -621,7 +621,7 @@ getNextChar:
 									  fileUngetc (e);
 									  fileUngetc (d);
 									  token->type = TOKEN_LESS_THAN;
-									  token->lineNumber = getSourceLineNumber ();
+									  token->lineNumber = getInputLineNumber ();
 									  token->filePosition = getInputFilePosition ();
 									  break;
 								  }
@@ -635,7 +635,7 @@ getNextChar:
 								  fileUngetc (e);
 								  fileUngetc (d);
 								  token->type = TOKEN_LESS_THAN;
-								  token->lineNumber = getSourceLineNumber ();
+								  token->lineNumber = getInputLineNumber ();
 								  token->filePosition = getInputFilePosition ();
 								  break;
 							  }
@@ -647,7 +647,7 @@ getNextChar:
 									  fileUngetc (f);
 									  fileUngetc (e);
 									  token->type = TOKEN_LESS_THAN;
-									  token->lineNumber = getSourceLineNumber ();
+									  token->lineNumber = getInputLineNumber ();
 									  token->filePosition = getInputFilePosition ();
 									  break;
 								  }
@@ -662,14 +662,14 @@ getNextChar:
 											  fileUngetc (f);
 											  fileUngetc (e);
 											  token->type = TOKEN_LESS_THAN;
-											  token->lineNumber = getSourceLineNumber ();
+											  token->lineNumber = getInputLineNumber ();
 											  token->filePosition = getInputFilePosition ();
 											  break;
 										  }
 										  else
 										  {
 											  token->type = TOKEN_CLOSE_MXML;
-											  token->lineNumber = getSourceLineNumber ();
+											  token->lineNumber = getInputLineNumber ();
 											  token->filePosition = getInputFilePosition ();
 											  break;
 										  }
@@ -677,7 +677,7 @@ getNextChar:
 									  if ( e == 's' && f == ':')    /* continuing a spark tag */
 									  {
 										  token->type = TOKEN_CLOSE_MXML;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 										  break;
 									  }
@@ -686,7 +686,7 @@ getNextChar:
 										  fileUngetc (f);
 										  fileUngetc (e);
 										  token->type = TOKEN_LESS_THAN;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 										  break;
 									  }
@@ -699,13 +699,13 @@ getNextChar:
 
 		case '>':
 				  token->type = TOKEN_GREATER_THAN;
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
 		case '!': 
 				  token->type = TOKEN_EXCLAMATION;			
-				  /*token->lineNumber = getSourceLineNumber ();
+				  /*token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();*/
 				  break;
 
@@ -715,7 +715,7 @@ getNextChar:
 				  else
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getSourceLineNumber ();
+					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->keyword = analyzeToken (token->string, Lang_js);
 					  if (isKeyword (token, KEYWORD_NONE))

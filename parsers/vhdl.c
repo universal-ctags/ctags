@@ -335,7 +335,7 @@ static tokenInfo *newToken (void)
 	token->keyword = KEYWORD_NONE;
 	token->string = vStringNew ();
 	token->scope = vStringNew ();
-	token->lineNumber = getSourceLineNumber ();
+	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	return token;
 }
@@ -403,7 +403,7 @@ static void readToken (tokenInfo * const token)
 	do
 	{
 		c = fileGetc ();
-		token->lineNumber = getSourceLineNumber ();
+		token->lineNumber = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 	}
 	while (c == '\t' || c == ' ' || c == '\n');
@@ -433,7 +433,7 @@ static void readToken (tokenInfo * const token)
 	case '"':
 		token->type = TOKEN_STRING;
 		parseString (token->string, c);
-		token->lineNumber = getSourceLineNumber ();
+		token->lineNumber = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 		break;
 	case '-':
@@ -456,7 +456,7 @@ static void readToken (tokenInfo * const token)
 		else
 		{
 			parseIdentifier (token->string, c);
-			token->lineNumber = getSourceLineNumber ();
+			token->lineNumber = getInputLineNumber ();
 			token->filePosition = getInputFilePosition ();
 			token->keyword = analyzeToken (token->string, Lang_vhdl);
 			if (isKeyword (token, KEYWORD_NONE))
