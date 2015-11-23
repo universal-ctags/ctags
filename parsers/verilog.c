@@ -314,17 +314,17 @@ static void pruneTokens (tokenInfo * token)
 
 static const kindOption *kindFromKind (const verilogKind kind)
 {
-	if (isLanguage (Lang_systemverilog))
+	if (isInputLanguage (Lang_systemverilog))
 		return &(SystemVerilogKinds[kind]);
-	else /* isLanguage (Lang_verilog) */
+	else /* isInputLanguage (Lang_verilog) */
 		return &(VerilogKinds[kind]);
 }
 
 static char kindEnabled (const verilogKind kind)
 {
-	if (isLanguage (Lang_systemverilog))
+	if (isInputLanguage (Lang_systemverilog))
 		return SystemVerilogKinds[kind].enabled;
-	else /* isLanguage (Lang_verilog) */
+	else /* isInputLanguage (Lang_verilog) */
 		return VerilogKinds[kind].enabled;
 }
 
@@ -760,7 +760,7 @@ static void processFunction (tokenInfo *const token)
 		readIdentifier (token, c);
 		c = skipWhite (vGetc ());
 		/* Identify class type prefixes and create respective context*/
-		if (isLanguage (Lang_systemverilog) && c == ':')
+		if (isInputLanguage (Lang_systemverilog) && c == ':')
 		{
 			c = vGetc ();
 			if (c == ':')
