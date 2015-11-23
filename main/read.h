@@ -34,6 +34,9 @@
 #define getInputLineNumber()     File.input.lineNumber
 #define getInputFileName()       vStringValue (File.input.name)
 #define getInputFilePosition()   File.filePosition
+#define getInputLanguage()       File.input.language
+#define getInputLanguageName()   getLanguageName (File.input.language)
+#define getInputFileTagPath()    File.input.tagPath
 #define getSourceFileName()      vStringValue (File.source.name)
 #define getSourceFileTagPath()   File.source.tagPath
 #define getSourceLanguage()      File.source.language
