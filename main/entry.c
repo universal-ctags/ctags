@@ -1254,7 +1254,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      const kindOption *kind,
 			      int roleIndex)
 {
-	Assert (File.source.name != NULL);
+	Assert (File.input.name != NULL);
 
 	memset (e, 0, sizeof (tagEntryInfo));
 	e->lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
