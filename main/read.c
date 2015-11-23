@@ -72,14 +72,10 @@ extern void freeSourceFileResources (void)
  *   Source file access functions
  */
 
-static void setInputFileName (const char *const fileName)
+static void setOwnerDirectoryOfInputFile (const char *const fileName)
 {
 	const char *const head = fileName;
 	const char *const tail = baseFilename (head);
-
-	if (File.input.name != NULL)
-		vStringDelete (File.input.name);
-	File.input.name = vStringNewInit (fileName);
 
 	if (File.path != NULL)
 		vStringDelete (File.path);
@@ -93,22 +89,32 @@ static void setInputFileName (const char *const fileName)
 	}
 }
 
-static void setSourceFileParameters (vString *const fileName, const langType language)
+static void setInputFileParametersCommon (inputFileInfo *finfo, vString *const fileName, const langType language)
 {
-	if (File.source.name != NULL)
-		vStringDelete (File.source.name);
-	File.source.name = fileName;
+	if (finfo->name != NULL)
+		vStringDelete (finfo->name);
+	finfo->name = fileName;
 
-	if (File.source.tagPath != NULL)
-		eFree (File.source.tagPath);
+	if (finfo->tagPath != NULL)
+		eFree (finfo->tagPath);
 	if (! Option.tagRelative || isAbsolutePath (vStringValue (fileName)))
-		File.source.tagPath = eStrdup (vStringValue (fileName));
+		finfo->tagPath = eStrdup (vStringValue (fileName));
 	else
-		File.source.tagPath =
+		finfo->tagPath =
 				relativeFilename (vStringValue (fileName), TagFile.directory);
 
-	File.source.isHeader = isIncludeFile (vStringValue (fileName));
-	File.source.language = language;
+	finfo->isHeader = isIncludeFile (vStringValue (fileName));
+	finfo->language = language;
+}
+
+static void setInputFileParameters (vString *const fileName, const langType language)
+{
+	setInputFileParametersCommon (&File.input, fileName, language);
+}
+
+static void setSourceFileParameters (vString *const fileName, const langType language)
+{
+	setInputFileParametersCommon (&File.source, fileName, language);
 }
 
 static boolean setSourceFileName (vString *const fileName)
@@ -275,23 +281,24 @@ extern boolean fileOpen (const char *const fileName, const langType language)
 	{
 		opened = TRUE;
 
-		setInputFileName (fileName);
+		setOwnerDirectoryOfInputFile (fileName);
 		fgetpos (File.fp, &StartOfLine);
 		fgetpos (File.fp, &File.filePosition);
 		File.currentLine  = NULL;
-		File.input.lineNumber = 0L;
 		File.eof          = FALSE;
 		File.newLine      = TRUE;
 
 		if (File.line != NULL)
 			vStringClear (File.line);
 
+		setInputFileParameters  (vStringNewInit (fileName), language);
+		File.input.lineNumber = 0L;
 		setSourceFileParameters (vStringNewInit (fileName), language);
 		File.source.lineNumber = 0L;
 
 		verbose ("OPENING %s as %s language %sfile\n", fileName,
 				getLanguageName (language),
-				File.source.isHeader ? "include " : "");
+				File.input.isHeader ? "include " : "");
 	}
 	return opened;
 }
