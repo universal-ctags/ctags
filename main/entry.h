@@ -84,7 +84,7 @@ typedef struct eTagFile {
 	char *directory;
 	FILE *fp;
 	struct sNumTags { unsigned long added, prev; } numTags;
-	struct sMax { size_t line, tag, file; } max;
+	struct sMax { size_t line, tag; } max;
 	struct sEtags {
 		char *name;
 		FILE *fp;

@@ -83,7 +83,7 @@ tagFile TagFile = {
     NULL,               /* tag file directory (absolute) */
     NULL,               /* file pointer */
     { 0, 0 },           /* numTags */
-    { 0, 0, 0 },        /* max */
+    { 0, 0 },        /* max */
     { NULL, NULL, 0 },  /* etags */
     NULL,                /* vLine */
     .cork = FALSE,
