@@ -369,7 +369,7 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 
 	const char* p = strstr(line, "-*-");
 	if (p == NULL)
-		return mode;
+		goto out;
 	p += strlen("-*-");
 
 	for ( ;  isspace ((int) *p)  ;  ++p)
@@ -388,7 +388,12 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 	else
 	{
 		/* -*- MODE -*- */
-		for ( ;  *p != '\0'  &&  (isalnum ((int) *p) || *p == '-')  ;  ++p)
+		const char* end = strstr (p, "-*-");
+
+		if (end == NULL)
+			goto out;
+
+		for ( ;  p < end &&  (isalnum ((int) *p) || *p == '-')  ;  ++p)
 			vStringPut (mode, (int) *p);
 		vStringTerminate (mode);
 
@@ -398,6 +403,9 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 			vStringClear (mode);
 	}
 
+	vStringLower (mode);
+
+out:
 	return mode;
 
 }
