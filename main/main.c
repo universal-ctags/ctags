@@ -522,7 +522,7 @@ extern int main (int __unused__ argc, char **argv)
 	cArgDelete (args);
 	freeKeywordTable ();
 	freeRoutineResources ();
-	freeSourceFileResources ();
+	freeInputFileResources ();
 	freeTagFileResources ();
 	freeOptionResources ();
 	freeParserResources ();

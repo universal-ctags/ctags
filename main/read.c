@@ -58,7 +58,7 @@ static void freeInputFileInfo (inputFileInfo *finfo)
 	}
 }
 
-extern void freeSourceFileResources (void)
+extern void freeInputFileResources (void)
 {
 	if (File.path != NULL)
 		vStringDelete (File.path);
