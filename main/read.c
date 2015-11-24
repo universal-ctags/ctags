@@ -303,7 +303,7 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 	return opened;
 }
 
-extern void fileClose (void)
+extern void closeInputFile (void)
 {
 	if (File.fp != NULL)
 	{

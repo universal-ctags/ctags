@@ -1704,7 +1704,7 @@ static rescanReason createTagsForFile (
 		if (LanguageTable [language]->useCork)
 			uncorkTagFile();
 
-		fileClose ();
+		closeInputFile ();
 	}
 
 	return rescan;
@@ -1753,7 +1753,7 @@ static boolean createTagsWithXcmd (
 
 		/* TODO: File.lineNumber must be adjusted for the case
 		 *  Option.printTotals is non-zero. */
-		fileClose ();
+		closeInputFile ();
 	}
 
 	return tagFileResized;
