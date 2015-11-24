@@ -40,7 +40,6 @@
 #define isInputLanguage(lang)         (boolean)((lang) == File.input.language)
 #define isInputHeaderFile()           File.input.isHeader
 #define isInputLanguageKindEnabled(c)  isLanguageKindEnabled (File.input.language, c)
-
 #define getSourceFileName()      vStringValue (File.source.name)
 #define getSourceFileTagPath()   File.source.tagPath
 #define getSourceLanguage()      File.source.language
@@ -110,13 +109,14 @@ extern CONST_FILE inputFile File;
 *   FUNCTION PROTOTYPES
 */
 extern void freeInputFileResources (void);
-extern boolean fileOpen (const char *const fileName, const langType language);
+extern boolean openInputFile (const char *const fileName, const langType language);
 extern boolean fileEOF (void);
 extern void fileClose (void);
 extern int fileGetc (void);
 extern int fileSkipToCharacter (int c);
 extern void fileUngetc (int c);
 extern const unsigned char *fileReadLine (void);
+
 extern char *readLine (vString *const vLine, FILE *const fp);
 extern char *readSourceLine (vString *const vLine, fpos_t location, long *const pSeekValue);
 extern char *readSourceLineSlow (vString *const vLine, unsigned long lineNumber, const char *pattern, long *const pSeekValue);

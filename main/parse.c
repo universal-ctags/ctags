@@ -1685,7 +1685,7 @@ static rescanReason createTagsForFile (
 {
 	rescanReason rescan = RESCAN_NONE;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	if (fileOpen (fileName, language))
+	if (openInputFile (fileName, language))
 	{
 		parserDefinition *const lang = LanguageTable [language];
 
@@ -1747,7 +1747,7 @@ static boolean createTagsWithXcmd (
 {
 	boolean tagFileResized = FALSE;
 
-	if (fileOpen (fileName, language))
+	if (openInputFile (fileName, language))
 	{
 		tagFileResized = invokeXcmd (fileName, language);
 

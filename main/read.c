@@ -257,7 +257,7 @@ static boolean parseLineDirective (void)
 /*  This function opens a source file, and resets the line counter.  If it
  *  fails, it will display an error message and leave the File.fp set to NULL.
  */
-extern boolean fileOpen (const char *const fileName, const langType language)
+extern boolean openInputFile (const char *const fileName, const langType language)
 {
 	const char *const openMode = "rb";
 	boolean opened = FALSE;
