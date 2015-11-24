@@ -320,11 +320,6 @@ extern void fileClose (void)
 	}
 }
 
-extern boolean fileEOF (void)
-{
-	return File.eof;
-}
-
 /*  Action to take for each encountered source newline.
  */
 static void fileNewline (void)

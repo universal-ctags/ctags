@@ -110,7 +110,6 @@ extern CONST_FILE inputFile File;
 */
 extern void freeInputFileResources (void);
 extern boolean openInputFile (const char *const fileName, const langType language);
-extern boolean fileEOF (void);
 extern void fileClose (void);
 extern int fileGetc (void);
 extern int fileSkipToCharacter (int c);
