@@ -336,7 +336,7 @@ static vString* determineInterpreter (const char* const cmd)
 static vString* extractInterpreter (FILE* input)
 {
 	vString* const vLine = vStringNew ();
-	const char* const line = readLine (vLine, input);
+	const char* const line = readLineRaw (vLine, input);
 	vString* interpreter = NULL;
 
 	if (line != NULL  &&  line [0] == '#'  &&  line [1] == '!')
@@ -413,7 +413,7 @@ out:
 static vString* extractEmacsModeAtFirstLine(FILE* input)
 {
 	vString* const vLine = vStringNew ();
-	const char* const line = readLine (vLine, input);
+	const char* const line = readLineRaw (vLine, input);
 	vString* mode = NULL;
 	if (line != NULL)
 		mode = determineEmacsModeAtFirstLine (line);
@@ -435,7 +435,7 @@ static vString* determineEmacsModeAtEOF (FILE* const fp)
 	const char* p;
 	vString* mode = vStringNew ();
 
-	while ((line = readLine (vLine, fp)) != NULL)
+	while ((line = readLineRaw (vLine, fp)) != NULL)
 	{
 		if (headerFound && ((p = strstr (line, "mode:")) != NULL))
 		{
@@ -533,7 +533,7 @@ static vString* extractVimFileType(FILE* input)
 		ring[i] = vStringNew ();
 
 	i = 0;
-	while ((readLine (ring[i++], input)) != NULL)
+	while ((readLineRaw (ring[i++], input)) != NULL)
 		if (i == RING_SIZE)
 			i = 0;
 
@@ -590,7 +590,7 @@ static vString* determineZshAutoloadTag (const char *const modeline)
 static vString* extractZshAutoloadTag(FILE* input)
 {
 	vString* const vLine = vStringNew ();
-	const char* const line = readLine (vLine, input);
+	const char* const line = readLineRaw (vLine, input);
 	vString* mode = NULL;
 
 	if (line)

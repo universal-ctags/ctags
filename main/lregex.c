@@ -587,7 +587,7 @@ static void processLanguageRegex (const langType language,
 		else
 		{
 			vString* const regex = vStringNew ();
-			while (readLine (regex, fp))
+			while (readLineRaw (regex, fp))
 				addLanguageRegex (language, vStringValue (regex));
 			fclose (fp);
 			vStringDelete (regex);

@@ -109,7 +109,7 @@ extern CONST_FILE inputFile File;
 *   FUNCTION PROTOTYPES
 */
 
-/* InputFile: reading from fp in  inputFile with updating fields in input fields */
+/* InputFile: reading from fp in inputFile with updating fields in input fields */
 extern void                 freeInputFileResources (void);
 extern boolean              openInputFile (const char *const fileName, const langType language);
 extern void                 closeInputFile (void);
@@ -118,10 +118,13 @@ extern int                  skipToCharacterInInputFile (int c);
 extern void                 ungetcToInputFile (int c);
 extern const unsigned char *readLineFromInputFile (void);
 
-extern char *readLine (vString *const vLine, FILE *const fp);
+/* Raw: reading from given a parameter, fp */
+extern char *readLineRaw           (vString *const vLine, FILE *const fp);
+extern char* readLineRawWithNoSeek (vString *const vline, FILE *const pp);
+
 extern char *readSourceLine (vString *const vLine, fpos_t location, long *const pSeekValue);
 extern char *readSourceLineSlow (vString *const vLine, unsigned long lineNumber, const char *pattern, long *const pSeekValue);
-extern char* readLineWithNoSeek (vString *const vline, FILE *const pp);
+
 
 #endif  /* CTAGS_MAIN_READ_H */
 

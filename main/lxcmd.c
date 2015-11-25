@@ -347,7 +347,7 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 	{
 		vString* vline = vStringNew();
 
-		while (readLineWithNoSeek (vline, pp))
+		while (readLineRawWithNoSeek (vline, pp))
 		{
 			char* line;
 			char  kind_letter;
@@ -1112,7 +1112,7 @@ static boolean invokeXcmdPath (const char* const fileName, xcmdPath* path, const
 		vString* vline = vStringNew();
 		int status;
 
-		while (readLineWithNoSeek (vline, pp))
+		while (readLineRawWithNoSeek (vline, pp))
 		{
 			char* line;
 			tagEntry entry;

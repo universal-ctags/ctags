@@ -493,7 +493,7 @@ extern const unsigned char *readLineFromInputFile (void)
 /*
  *   Source file line reading with automatic buffer sizing
  */
-extern char *readLine (vString *const vLine, FILE *const fp)
+extern char *readLineRaw (vString *const vLine, FILE *const fp)
 {
 	char *result = NULL;
 
@@ -571,7 +571,7 @@ extern char *readSourceLine (
 	fsetpos (File.fp, &location);
 	if (pSeekValue != NULL)
 		*pSeekValue = ftell (File.fp);
-	result = readLine (vLine, File.fp);
+	result = readLineRaw (vLine, File.fp);
 	fsetpos (File.fp, &orignalPosition);
 	/* If the file is empty, we can't get the line
 	   for location 0. readSourceLine doesn't know
@@ -638,7 +638,7 @@ extern char *readSourceLineSlow (vString *const vLine,
 		for (n = 0; n < lineNumber; n++)
 		{
 			pos = ftell (File.fp);
-			line = readLine (vLine, File.fp);
+			line = readLineRaw (vLine, File.fp);
 			if (line == NULL)
 				break;
 		}
@@ -680,11 +680,11 @@ out:
 }
 
 /*
- *   Similar to readLine but this doesn't use fgetpos/fsetpos.
+ *   Similar to readLineRaw but this doesn't use fgetpos/fsetpos.
  *   Useful for reading from pipe.
  */
 
-char* readLineWithNoSeek (vString* const vline, FILE *const pp)
+char* readLineRawWithNoSeek (vString* const vline, FILE *const pp)
 {
 	int c;
 	boolean nlcr;

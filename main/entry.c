@@ -255,7 +255,7 @@ static long unsigned int updatePseudoTags (FILE *const fp)
 	Assert (entryLength < maxEntryLength);
 
 	fgetpos (fp, &startOfLine);
-	line = readLine (TagFile.vLine, fp);
+	line = readLineRaw (TagFile.vLine, fp);
 	while (line != NULL  &&  line [0] == entry [0])
 	{
 		++linesRead;
@@ -271,12 +271,12 @@ static long unsigned int updatePseudoTags (FILE *const fp)
 			}
 			fgetpos (fp, &startOfLine);
 		}
-		line = readLine (TagFile.vLine, fp);
+		line = readLineRaw (TagFile.vLine, fp);
 	}
 	while (line != NULL)  /* skip to end of file */
 	{
 		++linesRead;
-		line = readLine (TagFile.vLine, fp);
+		line = readLineRaw (TagFile.vLine, fp);
 	}
 	return linesRead;
 }
@@ -359,7 +359,7 @@ static boolean isTagFile (const char *const filename)
 		ok = TRUE;
 	else if (fp != NULL)
 	{
-		const char *line = readLine (TagFile.vLine, fp);
+		const char *line = readLineRaw (TagFile.vLine, fp);
 
 		if (line == NULL)
 			ok = TRUE;
@@ -603,7 +603,7 @@ extern void endEtagsFile (const char *const filename)
 	if (TagFile.etags.fp != NULL)
 	{
 		rewind (TagFile.etags.fp);
-		while ((line = readLine (TagFile.vLine, TagFile.etags.fp)) != NULL)
+		while ((line = readLineRaw (TagFile.vLine, TagFile.etags.fp)) != NULL)
 			fputs (line, TagFile.fp);
 		fclose (TagFile.etags.fp);
 		remove (TagFile.etags.name);
