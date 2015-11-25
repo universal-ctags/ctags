@@ -53,7 +53,7 @@ static void freeInputFileInfo (inputFileInfo *finfo)
 	}
 	if (finfo->tagPath)
 	{
-		eFree (finfo->tagPath);
+		vStringDelete (finfo->tagPath);
 		finfo->tagPath = NULL;
 	}
 }
@@ -96,12 +96,12 @@ static void setInputFileParametersCommon (inputFileInfo *finfo, vString *const f
 	finfo->name = fileName;
 
 	if (finfo->tagPath != NULL)
-		eFree (finfo->tagPath);
+		vStringDelete (finfo->tagPath);
 	if (! Option.tagRelative || isAbsolutePath (vStringValue (fileName)))
-		finfo->tagPath = eStrdup (vStringValue (fileName));
+		finfo->tagPath = vStringNewCopy (fileName);
 	else
 		finfo->tagPath =
-				relativeFilename (vStringValue (fileName), TagFile.directory);
+				vStringNewOwn (relativeFilename (vStringValue (fileName), TagFile.directory));
 
 	finfo->isHeader = isIncludeFile (vStringValue (fileName));
 	finfo->language = language;

@@ -36,7 +36,7 @@
 #define getInputFilePosition()   File.filePosition
 #define getInputLanguage()       File.input.language
 #define getInputLanguageName()   getLanguageName (File.input.language)
-#define getInputFileTagPath()    File.input.tagPath
+#define getInputFileTagPath()    vStringValue (File.input.tagPath)
 #define isInputLanguage(lang)         (boolean)((lang) == File.input.language)
 #define isInputHeaderFile()           File.input.isHeader
 #define isInputLanguageKindEnabled(c)  isLanguageKindEnabled (File.input.language, c)
@@ -44,7 +44,7 @@
 #define getInputLanguageFileKind()  getLanguageFileKind (File.input.language)
 
 #define getSourceFileName()      vStringValue (File.source.name)
-#define getSourceFileTagPath()   File.source.tagPath
+#define getSourceFileTagPath()   vStringValue (File.source.tagPath)
 #define getSourceLanguage()      File.source.language
 #define getSourceLanguageName()  getLanguageName (File.source.language)
 #define getSourceLineNumber()    File.source.lineNumber
@@ -76,7 +76,7 @@ enum eCharacters {
  */
 typedef struct sInputFileInfo {
 	vString *name;           /* name to report for input file */
-	char    *tagPath;        /* path of input file relative to tag file */
+	vString *tagPath;        /* path of input file relative to tag file */
 	unsigned long lineNumber;/* line number in the input file */
 	boolean  isHeader;       /* is input file a header file? */
 	langType language;       /* language of input file */
