@@ -491,7 +491,7 @@ extern const unsigned char *readLineFromInputFile (void)
 }
 
 /*
- *   Source file line reading with automatic buffer sizing
+ *   Raw file line reading with automatic buffer sizing
  */
 extern char *readLineRaw (vString *const vLine, FILE *const fp)
 {
