@@ -231,7 +231,7 @@ static const char *renderEscapedName (const char* s,
 		{
 			notice("Unexpected character (0 < *c && *c < 0x20) included in a tagEntryInfo: %s", base);
 			notice("File: %s, Line: %lu, Lang: %s, Kind: %c",
-			       tag->sourceFileName, tag->lineNumber, tag->language, tag->kind->letter);
+			       tag->inputFileName, tag->lineNumber, tag->language, tag->kind->letter);
 			if (Option.fatalWarnings)
 				error (FATAL, "Aborting");
 			notice("Escape the character");
@@ -258,7 +258,7 @@ static const char *renderFieldName (const tagEntryInfo *const tag, vString* b)
 
 static const char *renderFieldSource (const tagEntryInfo *const tag, vString* b)
 {
-	return renderEscapedString (tag->sourceFileName, tag, b);
+	return renderEscapedString (tag->inputFileName, tag, b);
 }
 
 static const char *renderFieldSignature (const tagEntryInfo *const tag, vString* b)

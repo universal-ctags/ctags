@@ -20,9 +20,9 @@ typedef enum eFieldType { /* extension field content control */
 
 	/* BASIC FIELDS */
 	FIELD_NAME,
-	FIELD_SOURCE_FILE,
+	FIELD_INPUT_FILE,
 	FIELD_PATTERN,
-	FIELD_COMPACT_SOURCE_LINE,
+	FIELD_COMPACT_INPUT_LINE,
 
 	/* EXTENSION FIELDS */
 	FIELD_ACCESS,

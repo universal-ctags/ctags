@@ -1025,7 +1025,7 @@ static int writeCtagsEntry (const tagEntryInfo *const tag)
 {
 	int length = fprintf (TagFile.fp, "%s\t%s\t",
 			      escapeName (tag, FIELD_NAME),
-			      escapeName (tag, FIELD_SOURCE_FILE));
+			      escapeName (tag, FIELD_INPUT_FILE));
 
 	if (tag->lineNumberEntry)
 		length += writeLineNumberEntry (tag);
@@ -1051,7 +1051,7 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 	else if (!slot->lineNumberEntry)
 		slot->pattern = makePatternString (slot);
 
-	slot->sourceFileName = eStrdup (slot->sourceFileName);
+	slot->inputFileName = eStrdup (slot->inputFileName);
 	slot->name = eStrdup (slot->name);
 	if (slot->extensionFields.access)
 		slot->extensionFields.access = eStrdup (slot->extensionFields.access);
@@ -1075,7 +1075,7 @@ static void clearTagEntryInQueue (tagEntryInfo* slot)
 {
 	if (slot->pattern)
 		eFree ((char *)slot->pattern);
-	eFree ((char *)slot->sourceFileName);
+	eFree ((char *)slot->inputFileName);
 	eFree ((char *)slot->name);
 
 	if (slot->extensionFields.access)
@@ -1250,7 +1250,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
 			      const char* language,
 			      fpos_t      filePosition,
-			      const char *sourceFileName,
+			      const char *inputFileName,
 			      const kindOption *kind,
 			      int roleIndex)
 {
@@ -1261,7 +1261,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->lineNumber      = lineNumber;
 	e->language        = language;
 	e->filePosition    = filePosition;
-	e->sourceFileName  = sourceFileName;
+	e->inputFileName   = inputFileName;
 	e->name            = name;
 	e->extensionFields.scopeIndex     = SCOPE_NIL;
 	e->kind = kind;

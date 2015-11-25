@@ -72,14 +72,14 @@ enum eCharacters {
 	CHAR_SYMBOL   = ('C' + 0xff)
 };
 
-/*  Maintains the state of the current source file.
+/*  Maintains the state of the current input file.
  */
 typedef struct sInputFileInfo {
-	vString *name;           /* name to report for source file */
-	char    *tagPath;        /* path of source file relative to tag file */
-	unsigned long lineNumber;/* line number in the source file */
-	boolean  isHeader;       /* is source file a header file? */
-	langType language;       /* language of source file */
+	vString *name;           /* name to report for input file */
+	char    *tagPath;        /* path of input file relative to tag file */
+	unsigned long lineNumber;/* line number in the input file */
+	boolean  isHeader;       /* is input file a header file? */
+	langType language;       /* language of input file */
 } inputFileInfo;
 
 typedef struct sInputFile {
