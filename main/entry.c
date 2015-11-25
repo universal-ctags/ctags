@@ -697,15 +697,15 @@ static boolean isPosSet(fpos_t pos)
 	return r;
 }
 
-extern char *readSourceLineAnyway (vString *const vLine, const tagEntryInfo *const tag,
+extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo *const tag,
 				   long *const pSeekValue)
 {
 	char * line;
 
 	if (isPosSet (tag->filePosition) || (tag->pattern == NULL))
-		line = 	readSourceLine (vLine, tag->filePosition, pSeekValue);
+		line = 	readLineFromBypass (vLine, tag->filePosition, pSeekValue);
 	else
-		line = readSourceLineSlow (vLine, tag->lineNumber, tag->pattern, pSeekValue);
+		line = readLineFromBypassSlow (vLine, tag->lineNumber, tag->pattern, pSeekValue);
 
 	return line;
 }
@@ -777,7 +777,7 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 	{
 		long seekValue;
 		char *const line =
-				readSourceLineAnyway (TagFile.vLine, tag, &seekValue);
+				readLineFromBypassAnyway (TagFile.vLine, tag, &seekValue);
 		if (line == NULL)
 			return 0;
 
@@ -963,7 +963,7 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 	    && (memcmp (&tag->filePosition, &cached_location, sizeof(fpos_t)) == 0))
 		return puts_func (vStringValue (cached_pattern), output);
 
-	line = readSourceLine (TagFile.vLine, tag->filePosition, NULL);
+	line = readLineFromBypass (TagFile.vLine, tag->filePosition, NULL);
 	if (line == NULL)
 		error (FATAL, "bad tag in %s", getInputFileName ());
 	if (tag->truncateLine)

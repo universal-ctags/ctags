@@ -341,7 +341,7 @@ static const char *renderFieldCompactSourceLine (const tagEntryInfo *const tag,
 {
 	const char *line;
 
-	line = readSourceLineAnyway (TagFile.vLine, tag, NULL);
+	line = readLineFromBypassAnyway (TagFile.vLine, tag, NULL);
 	if (line)
 		renderCompactSourceLine (b, line);
 	else

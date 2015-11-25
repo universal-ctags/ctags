@@ -122,8 +122,10 @@ extern const unsigned char *readLineFromInputFile (void);
 extern char *readLineRaw           (vString *const vLine, FILE *const fp);
 extern char* readLineRawWithNoSeek (vString *const vline, FILE *const pp);
 
-extern char *readSourceLine (vString *const vLine, fpos_t location, long *const pSeekValue);
-extern char *readSourceLineSlow (vString *const vLine, unsigned long lineNumber, const char *pattern, long *const pSeekValue);
+/* Bypass: reading from fp in inputFile WITHOUT updating fields in input fields */
+extern char *readLineFromBypass (vString *const vLine, fpos_t location, long *const pSeekValue);
+extern char *readLineFromBypassSlow (vString *const vLine, unsigned long lineNumber,
+				     const char *pattern, long *const pSeekValue);
 
 
 #endif  /* CTAGS_MAIN_READ_H */

@@ -132,7 +132,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      int roleIndex);
 
 /* Getting line associated with tag */
-extern char *readSourceLineAnyway (vString *const vLine, const tagEntryInfo *const tag,
+extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo *const tag,
 				   long *const pSeekValue);
 
 /* Generating pattern associated tag, caller must do eFree for the returned value. */

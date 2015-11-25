@@ -561,7 +561,7 @@ extern char *readLineRaw (vString *const vLine, FILE *const fp)
 /*  Places into the line buffer the contents of the line referenced by
  *  "location".
  */
-extern char *readSourceLine (
+extern char *readLineFromBypass (
 		vString *const vLine, fpos_t location, long *const pSeekValue)
 {
 	fpos_t orignalPosition;
@@ -574,7 +574,7 @@ extern char *readSourceLine (
 	result = readLineRaw (vLine, File.fp);
 	fsetpos (File.fp, &orignalPosition);
 	/* If the file is empty, we can't get the line
-	   for location 0. readSourceLine doesn't know
+	   for location 0. readLineFromBypass doesn't know
 	   what itself should do; just report it to the caller. */
 	return result;
 }
@@ -583,10 +583,10 @@ extern char *readSourceLine (
  * In the other hand, etags output and cross reference output require the
  * line after the location.
  *
- * readSourceLineSlow retrieves the line for (lineNumber and pattern of a tag).
+ * readLineFromBypassSlow retrieves the line for (lineNumber and pattern of a tag).
  */
 
-extern char *readSourceLineSlow (vString *const vLine,
+extern char *readLineFromBypassSlow (vString *const vLine,
 				 unsigned long lineNumber,
 				 const char *pattern,
 				 long *const pSeekValue)
@@ -619,7 +619,7 @@ extern char *readSourceLineSlow (vString *const vLine,
 		if (errcode != 0)
 		{
 			regerror (errcode, &patbuf, errmsg, 256);
-			error (WARNING, "regcomp %s in readSourceLineSlow: %s", pattern, errmsg);
+			error (WARNING, "regcomp %s in readLineFromBypassSlow: %s", pattern, errmsg);
 			regfree (&patbuf);
 			return NULL;
 		}
