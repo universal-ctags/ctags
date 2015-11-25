@@ -133,7 +133,7 @@ extern parserDefinition* parserNewFull (const char* name, char fileKind)
 	return result;
 }
 
-extern boolean getLanguageAllowNullTag (const langType language)
+extern boolean doesLanguageAllowNullTag (const langType language)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	return LanguageTable [language]->allowNullTag;
