@@ -1226,10 +1226,10 @@ extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 			  const kindOption *kind)
 {
 	initTagEntryFull(e, name,
-			 getSourceLineNumber (),
-			 getSourceLanguageName (),
+			 getInputLineNumber (),
+			 getInputLanguageName (),
 			 getInputFilePosition (),
-			 getSourceFileTagPath (),
+			 getInputFileTagPath (),
 			 kind,
 			 ROLE_INDEX_DEFINITION);
 }
@@ -1238,10 +1238,10 @@ extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
 			     const kindOption *kind, int roleIndex)
 {
 	initTagEntryFull(e, name,
-			 getSourceLineNumber (),
-			 getSourceLanguageName (),
+			 getInputLineNumber (),
+			 getInputLanguageName (),
 			 getInputFilePosition (),
-			 getSourceFileTagPath (),
+			 getInputFileTagPath (),
 			 kind,
 			 roleIndex);
 }
