@@ -114,7 +114,7 @@ extern void closeInputFile (void);
 extern int getcFromInputFile (void);
 extern int skipToCharacterInInputFile (int c);
 extern void ungetcToInputFile (int c);
-extern const unsigned char *fileReadLine (void);
+extern const unsigned char *readLineFromInputFile (void);
 
 extern char *readLine (vString *const vLine, FILE *const fp);
 extern char *readSourceLine (vString *const vLine, fpos_t location, long *const pSeekValue);

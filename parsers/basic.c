@@ -165,7 +165,7 @@ static void findBasicTags (void)
 	else
 		keywords = freebasic_keywords;
 
-	while ((line = (const char *) fileReadLine ()) != NULL)
+	while ((line = (const char *) readLineFromInputFile ()) != NULL)
 	{
 		const char *p = line;
 		KeyWord const *kw;

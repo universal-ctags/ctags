@@ -106,7 +106,7 @@ static void findClojureTags (void)
 	const char *p;
 	int scope_index = SCOPE_NIL;
 
-	while ((p = (char *)fileReadLine ()) != NULL)
+	while ((p = (char *)readLineFromInputFile ()) != NULL)
 	{
 		vStringClear (name);
 

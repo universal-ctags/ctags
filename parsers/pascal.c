@@ -99,14 +99,14 @@ static void findPascalTags (void)
 		 * real tag
 		 */
 
-	dbp = fileReadLine ();
+	dbp = readLineFromInputFile ();
 	while (dbp != NULL)
 	{
 		int c = *dbp++;
 
 		if (c == '\0')  /* if end of line */
 		{
-			dbp = fileReadLine ();
+			dbp = readLineFromInputFile ();
 			if (dbp == NULL  ||  *dbp == '\0')
 				continue;
 			if (!((found_tag && verify_tag) || get_tagname))

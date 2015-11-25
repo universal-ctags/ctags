@@ -94,7 +94,7 @@ static void findShTags (void)
 	boolean hereDocIndented = FALSE;
 	boolean (* check_char)(int);
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char* cp = line;
 		shKind found_kind = K_NOTHING;

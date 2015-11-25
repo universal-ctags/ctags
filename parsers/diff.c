@@ -141,7 +141,7 @@ static void findDiffTags (void)
 	diffKind kind;
 	int scope_index = SCOPE_NIL;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char* cp = line;
 

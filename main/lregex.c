@@ -754,7 +754,7 @@ extern void findRegexTagsMainloop (int (* driver)(void))
 
 static int fileReadLineDriver(void)
 {
-	return (fileReadLine () == NULL)? EOF: 1;
+	return (readLineFromInputFile () == NULL)? EOF: 1;
 }
 
 extern void findRegexTags (void)

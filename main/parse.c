@@ -1670,7 +1670,7 @@ extern void makeFileTag (const char *const fileName)
 		}
 		else
 		{
-			while (fileReadLine () != NULL)
+			while (readLineFromInputFile () != NULL)
 				;		/* Do nothing */
 			tag.lineNumber = getInputLineNumber ();
 		}
@@ -1995,7 +1995,7 @@ static void createCTSTTags (void)
 	const unsigned char *line;
 	tagEntryInfo e;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		int c = line[0];
 

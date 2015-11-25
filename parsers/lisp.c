@@ -82,7 +82,7 @@ static void findLispTags (void)
 	const unsigned char* p;
 
 
-	while ((p = fileReadLine ()) != NULL)
+	while ((p = readLineFromInputFile ()) != NULL)
 	{
 		if (*p == '(')
 		{

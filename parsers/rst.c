@@ -164,7 +164,7 @@ static void findRstTags (void)
 	memset(kindchars, 0, sizeof kindchars);
 	nestingLevels = nestingLevelsNew();
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		int line_len = strlen((const char*) line);
 		int name_len_bytes = vStringLength(name);

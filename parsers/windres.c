@@ -134,7 +134,7 @@ static ResParserState parseResDefinition(const unsigned char *line)
 
 static ResParserState parseResLine(const unsigned char *line, ResParserState state)
 {
-	while (*line != '\0')	/* fileReadLine returns NULL terminated strings */
+	while (*line != '\0')	/* readLineFromInputFile returns NULL terminated strings */
 	{
 		while (isspace((int) *line))
 			line++;
@@ -215,7 +215,7 @@ static void findResTags(void)
 	ResParserState state = P_STATE_NONE;
 	_blockDepth = 0;
 
-	while ((line = fileReadLine()) != NULL)
+	while ((line = readLineFromInputFile()) != NULL)
 	{
 		state = parseResLine(line, state);
 		if (state == P_STATE_AT_END)
