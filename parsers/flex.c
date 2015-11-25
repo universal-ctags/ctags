@@ -403,7 +403,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	} while (isIdentChar (c));
 	vStringTerminate (string);
 	if (!isspace (c))
-		fileUngetc (c);		/* unget non-identifier character */
+		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
 static void readToken (tokenInfo *const token)
@@ -450,7 +450,7 @@ getNextChar:
 		case '\\':
 				  c = getcFromInputFile ();
 				  if (c != '\\'  && c != '"'  &&  !isspace (c))
-					  fileUngetc (c);
+					  ungetcToInputFile (c);
 				  token->type = TOKEN_CHARACTER;
 				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
@@ -463,7 +463,7 @@ getNextChar:
 							  (d != '/') &&		/* is a one line comment? */
 							  (d != '>') )		/* is this a close XML tag? */
 					  {
-						  fileUngetc (d);
+						  ungetcToInputFile (d);
 						  token->type = TOKEN_FORWARD_SLASH;
 						  token->lineNumber = getInputLineNumber ();
 						  token->filePosition = getInputFilePosition ();
@@ -479,7 +479,7 @@ getNextChar:
 								  if (c == '/')
 									  break;
 								  else
-									  fileUngetc (c);
+									  ungetcToInputFile (c);
 							  } while (c != EOF && c != '\0');
 							  goto getNextChar;
 						  }
@@ -512,7 +512,7 @@ getNextChar:
 					       (d != 'f' )  &&  	/* is this the start of a fx tag */
 					       (d != 's' )    ) 	/* is this the start of a spark tag */
 					  {
-						  fileUngetc (d);
+						  ungetcToInputFile (d);
 						  token->type = TOKEN_LESS_THAN;
 						  token->lineNumber = getInputLineNumber ();
 						  token->filePosition = getInputFilePosition ();
@@ -525,8 +525,8 @@ getNextChar:
 							  int e = getcFromInputFile ();
 							  if ( e != '-' ) 		/* is this the start of a comment? */
 							  {
-								  fileUngetc (e);
-								  fileUngetc (d);
+								  ungetcToInputFile (e);
+								  ungetcToInputFile (d);
 								  token->type = TOKEN_LESS_THAN;
 								  token->lineNumber = getInputLineNumber ();
 								  token->filePosition = getInputFilePosition ();
@@ -538,9 +538,9 @@ getNextChar:
 									  int f = getcFromInputFile ();
 									  if ( f != '-' ) 		/* is this the start of a comment? */
 									  {
-										  fileUngetc (f);
-										  fileUngetc (e);
-										  fileUngetc (d);
+										  ungetcToInputFile (f);
+										  ungetcToInputFile (e);
+										  ungetcToInputFile (d);
 										  token->type = TOKEN_LESS_THAN;
 										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
@@ -560,13 +560,13 @@ getNextChar:
 														  break;
 													  else
 													  {
-														  fileUngetc (d);
-														  fileUngetc (c);
+														  ungetcToInputFile (d);
+														  ungetcToInputFile (c);
 													  }
 													  break;
 												  }
 												  else
-													  fileUngetc (c);
+													  ungetcToInputFile (c);
 											  } while (c != EOF && c != '\0');
 											  goto getNextChar;
 										  }
@@ -579,8 +579,8 @@ getNextChar:
 							  int e = getcFromInputFile ();
 							  if ( (d == 'm' || d == 'f') && e != 'x' ) 		/* continuing an mx or fx tag */
 							  {
-								  fileUngetc (e);
-								  fileUngetc (d);
+								  ungetcToInputFile (e);
+								  ungetcToInputFile (d);
 								  token->type = TOKEN_LESS_THAN;
 								  token->lineNumber = getInputLineNumber ();
 								  token->filePosition = getInputFilePosition ();
@@ -593,9 +593,9 @@ getNextChar:
 									  int f = getcFromInputFile ();
 									  if ( f != ':' ) 		/* start of the tag */
 									  {
-										  fileUngetc (f);
-										  fileUngetc (e);
-										  fileUngetc (d);
+										  ungetcToInputFile (f);
+										  ungetcToInputFile (e);
+										  ungetcToInputFile (d);
 										  token->type = TOKEN_LESS_THAN;
 										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
@@ -618,8 +618,8 @@ getNextChar:
 								  }
 								  else
 								  {
-									  fileUngetc (e);
-									  fileUngetc (d);
+									  ungetcToInputFile (e);
+									  ungetcToInputFile (d);
 									  token->type = TOKEN_LESS_THAN;
 									  token->lineNumber = getInputLineNumber ();
 									  token->filePosition = getInputFilePosition ();
@@ -632,8 +632,8 @@ getNextChar:
 							  int e = getcFromInputFile ();
 							  if ( !(e == 'm' || e == 'f' || e == 's' ))
 							  {
-								  fileUngetc (e);
-								  fileUngetc (d);
+								  ungetcToInputFile (e);
+								  ungetcToInputFile (d);
 								  token->type = TOKEN_LESS_THAN;
 								  token->lineNumber = getInputLineNumber ();
 								  token->filePosition = getInputFilePosition ();
@@ -644,8 +644,8 @@ getNextChar:
 								  int f = getcFromInputFile ();
 								  if ( (e == 'm' || e == 'f') && f != 'x' ) 		/* continuing an mx or fx tag */
 								  {
-									  fileUngetc (f);
-									  fileUngetc (e);
+									  ungetcToInputFile (f);
+									  ungetcToInputFile (e);
 									  token->type = TOKEN_LESS_THAN;
 									  token->lineNumber = getInputLineNumber ();
 									  token->filePosition = getInputFilePosition ();
@@ -658,9 +658,9 @@ getNextChar:
 										  int g = getcFromInputFile ();
 										  if ( g != ':' ) 		/* is this the start of a comment? */
 										  {
-											  fileUngetc (g);
-											  fileUngetc (f);
-											  fileUngetc (e);
+											  ungetcToInputFile (g);
+											  ungetcToInputFile (f);
+											  ungetcToInputFile (e);
 											  token->type = TOKEN_LESS_THAN;
 											  token->lineNumber = getInputLineNumber ();
 											  token->filePosition = getInputFilePosition ();
@@ -683,8 +683,8 @@ getNextChar:
 									  }
 									  else
 									  {
-										  fileUngetc (f);
-										  fileUngetc (e);
+										  ungetcToInputFile (f);
+										  ungetcToInputFile (e);
 										  token->type = TOKEN_LESS_THAN;
 										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();

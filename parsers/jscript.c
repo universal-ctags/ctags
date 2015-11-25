@@ -360,7 +360,7 @@ static void parseString (vString *const string, const int delimiter)
 			{
 				c = getcFromInputFile();
 				if (c != '\n')
-					fileUngetc (c);
+					ungetcToInputFile (c);
 			}
 		}
 		else if (c == delimiter)
@@ -371,7 +371,7 @@ static void parseString (vString *const string, const int delimiter)
 			end = TRUE;
 			/* we don't want to eat the newline itself to let the automatic
 			 * semicolon insertion code kick in */
-			fileUngetc (c);
+			ungetcToInputFile (c);
 		}
 		else
 			vStringPut (string, c);
@@ -393,7 +393,7 @@ static void parseRegExp (void)
 			{
 				c = getcFromInputFile ();
 			} while (isalpha (c));
-			fileUngetc (c);
+			ungetcToInputFile (c);
 			break;
 		}
 		else if (c == '\\')
@@ -418,7 +418,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
-	fileUngetc (c);		/* unget non-identifier character */
+	ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
 static void parseTemplateString (vString *const string)
@@ -439,7 +439,7 @@ static void parseTemplateString (vString *const string)
 		{
 			c = getcFromInputFile ();
 			if (c != '{')
-				fileUngetc (c);
+				ungetcToInputFile (c);
 			else
 			{
 				int depth = 1;
@@ -528,7 +528,7 @@ getNextChar:
 					token->type = TOKEN_POSTFIX_OPERATOR;
 				else
 				{
-					fileUngetc (d);
+					ungetcToInputFile (d);
 					token->type = TOKEN_BINARY_OPERATOR;
 				}
 				break;
@@ -573,7 +573,7 @@ getNextChar:
 		case '\\':
 				  c = getcFromInputFile ();
 				  if (c != '\\'  && c != '"'  &&  !isspace (c))
-					  fileUngetc (c);
+					  ungetcToInputFile (c);
 				  token->type = TOKEN_CHARACTER;
 				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
@@ -585,7 +585,7 @@ getNextChar:
 					  if ( (d != '*') &&		/* is this the start of a comment? */
 							  (d != '/') )		/* is a one line comment? */
 					  {
-						  fileUngetc (d);
+						  ungetcToInputFile (d);
 						  switch (LastTokenType)
 						  {
 							  case TOKEN_CHARACTER:
@@ -619,7 +619,7 @@ getNextChar:
 								  if (c == '/')
 									  break;
 								  else
-									  fileUngetc (c);
+									  ungetcToInputFile (c);
 							  } while (c != EOF && c != '\0');
 							  goto getNextChar;
 						  }
@@ -628,7 +628,7 @@ getNextChar:
 							  skipToCharacterInInputFile ('\n');
 							  /* if we care about newlines, put it back so it is seen */
 							  if (include_newlines)
-								  fileUngetc ('\n');
+								  ungetcToInputFile ('\n');
 							  goto getNextChar;
 						  }
 					  }
@@ -641,7 +641,7 @@ getNextChar:
 					  token->type = TOKEN_UNDEFINED;
 				  else if ((c = getcFromInputFile ()) != '!')
 				  {
-					  fileUngetc (c);
+					  ungetcToInputFile (c);
 					  token->type = TOKEN_UNDEFINED;
 				  }
 				  else

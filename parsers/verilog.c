@@ -386,7 +386,7 @@ static int vGetc (void)
 		}
 		else
 		{
-			fileUngetc (c2);
+			ungetcToInputFile (c2);
 		}
 	}
 	else if (c == '"')  /* strip string contents */

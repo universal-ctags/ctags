@@ -203,7 +203,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
-	fileUngetc (c);		/* always unget, LF might add a semicolon */
+	ungetcToInputFile (c);		/* always unget, LF might add a semicolon */
 }
 
 static void readToken (tokenInfo *const token)
@@ -264,7 +264,7 @@ getNextChar:
 						 * continue through the next
 						 * newline. A line comment acts
 						 * like a newline.  */
-						fileUngetc ('\n');
+						ungetcToInputFile ('\n');
 						goto getNextChar;
 					case '*':
 						do
@@ -282,14 +282,14 @@ getNextChar:
 							if (c == '/')
 								break;
 							else
-								fileUngetc (c);
+								ungetcToInputFile (c);
 						} while (c != EOF && c != '\0');
 
-						fileUngetc (hasNewline ? '\n' : ' ');
+						ungetcToInputFile (hasNewline ? '\n' : ' ');
 						goto getNextChar;
 					default:
 						token->type = TOKEN_OTHER;
-						fileUngetc (d);
+						ungetcToInputFile (d);
 						break;
 				}
 			}
@@ -311,7 +311,7 @@ getNextChar:
 					token->type = TOKEN_LEFT_ARROW;
 				else
 				{
-					fileUngetc (d);
+					ungetcToInputFile (d);
 					token->type = TOKEN_OTHER;
 				}
 			}

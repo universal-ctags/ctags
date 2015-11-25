@@ -289,7 +289,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 
 	vStringTerminate (string);
 	if (!isspace (c))
-		fileUngetc (c);		/* unget non-identifier character */
+		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
 static void readToken (tokenInfo *const token)
@@ -329,7 +329,7 @@ getNextChar:
 				   */
 				  c = getcFromInputFile ();
 				  if (! isalpha (c))
-					  fileUngetc (c);
+					  ungetcToInputFile (c);
 				  else
 				  {
 					  parseIdentifier (token->string, c);

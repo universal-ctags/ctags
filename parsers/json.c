@@ -203,7 +203,7 @@ static void readTokenFull (tokenInfo *const token,
 				}
 				while (c != EOF && isIdentChar (c));
 				vStringTerminate (token->string);
-				fileUngetc (c);
+				ungetcToInputFile (c);
 				switch (lookupKeyword (vStringValue (token->string), Lang_json))
 				{
 					case KEYWORD_true:	token->type = TOKEN_TRUE;	break;

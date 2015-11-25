@@ -292,7 +292,7 @@ static vString *parseInteger (int c)
 		c = getcFromInputFile ();
 	}
 	vStringTerminate (string);
-	fileUngetc (c);
+	ungetcToInputFile (c);
 
 	return string;
 }
@@ -321,7 +321,7 @@ static vString *parseNumeric (int c)
 		vStringDelete (integer);
 	}
 	else if (!isspace (c))
-		fileUngetc (c);
+		ungetcToInputFile (c);
 
 	vStringTerminate (string);
 
@@ -473,7 +473,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 
 	vStringTerminate (string);
 	if (!isspace (c))
-		fileUngetc (c);  /* unget non-identifier character */
+		ungetcToInputFile (c);  /* unget non-identifier character */
 }
 
 static void parseFreeOperator (vString *const string, const int firstChar)
@@ -488,7 +488,7 @@ static void parseFreeOperator (vString *const string, const int firstChar)
 
 	vStringTerminate (string);
 	if (!isspace (c))
-		fileUngetc (c);  /* unget non-identifier character */
+		ungetcToInputFile (c);  /* unget non-identifier character */
 }
 
 static void copyToken (tokenInfo* dst, const tokenInfo *src)
@@ -574,7 +574,7 @@ getNextChar:
 			else
 			{
 				if (!isspace (c))
-					fileUngetc (c);
+					ungetcToInputFile (c);
 				token->type = TOKEN_OPERATOR;
 			}
 			break;
@@ -588,7 +588,7 @@ getNextChar:
 			else
 			{
 				if (!isspace (c2))
-					fileUngetc (c2);
+					ungetcToInputFile (c2);
 				if (c == ':')
 					token->type = TOKEN_COLON;
 				else
@@ -600,28 +600,28 @@ getNextChar:
 		case '<':
 			c = getcFromInputFile ();
 			if (c != '='  &&  c != '>'  &&  !isspace (c))
-				fileUngetc (c);
+				ungetcToInputFile (c);
 			token->type = TOKEN_OPERATOR;
 			break;
 
 		case '>':
 			c = getcFromInputFile ();
 			if (c != '='  &&  c != '>'  &&  !isspace (c))
-				fileUngetc (c);
+				ungetcToInputFile (c);
 			token->type = TOKEN_OPERATOR;
 			break;
 
 		case '/':
 			c = getcFromInputFile ();
 			if (c != '/'  &&  c != '='  &&  !isspace (c))
-				fileUngetc (c);
+				ungetcToInputFile (c);
 			token->type = TOKEN_OPERATOR;
 			break;
 
 		case '\\':
 			c = getcFromInputFile ();
 			if (c != '\\'  &&  !isspace (c))
-				fileUngetc (c);
+				ungetcToInputFile (c);
 			token->type = TOKEN_OPERATOR;
 			break;
 

@@ -208,7 +208,7 @@ static boolean readDirective (int c, char *const name, unsigned int maxLength)
 			c = getcFromInputFile ();
 			if (c == EOF  ||  ! isalpha (c))
 			{
-				fileUngetc (c);
+				ungetcToInputFile (c);
 				break;
 			}
 		}
@@ -229,7 +229,7 @@ static void readIdentifier (int c, vString *const name)
 	{
 		vStringPut (name, c);
 	} while (c = getcFromInputFile (), (c != EOF  &&  isident (c)));
-	fileUngetc (c);
+	ungetcToInputFile (c);
 	vStringTerminate (name);
 }
 
@@ -525,7 +525,7 @@ static Comment isComment (void)
 		comment = COMMENT_D;
 	else
 	{
-		fileUngetc (next);
+		ungetcToInputFile (next);
 		comment = COMMENT_NONE;
 	}
 	return comment;
@@ -636,7 +636,7 @@ static int skipToEndOfChar (void)
 			break;
 		else if (c == NEWLINE)
 		{
-			fileUngetc (c);
+			ungetcToInputFile (c);
 			break;
 		}
 		else if (Cpp.hasSingleQuoteLiteralNumbers)
@@ -645,7 +645,7 @@ static int skipToEndOfChar (void)
 				veraBase = c;
 			else if (veraBase != '\0'  &&  ! isalnum (c))
 			{
-				fileUngetc (c);
+				ungetcToInputFile (c);
 				break;
 			}
 		}
@@ -727,7 +727,7 @@ process:
 				{
 					c = skipOverCplusComment ();
 					if (c == NEWLINE)
-						fileUngetc (c);
+						ungetcToInputFile (c);
 				}
 				else if (comment == COMMENT_D)
 					c = skipOverDComment ();
@@ -743,7 +743,7 @@ process:
 				if (next == NEWLINE)
 					continue;
 				else
-					fileUngetc (next);
+					ungetcToInputFile (next);
 				break;
 			}
 
@@ -751,7 +751,7 @@ process:
 			{
 				int next = getcFromInputFile ();
 				if (next != '?')
-					fileUngetc (next);
+					ungetcToInputFile (next);
 				else
 				{
 					next = getcFromInputFile ();
@@ -767,8 +767,8 @@ process:
 						case '-':          c = '~';       break;
 						case '=':          c = '#';       goto process;
 						default:
-							fileUngetc ('?');
-							fileUngetc (next);
+							ungetcToInputFile ('?');
+							ungetcToInputFile (next);
 							break;
 					}
 				}
@@ -785,7 +785,7 @@ process:
 				{
 					case ':':	c = '['; break;
 					case '%':	c = '{'; break;
-					default: fileUngetc (next);
+					default: ungetcToInputFile (next);
 				}
 				goto enter;
 			}
@@ -795,7 +795,7 @@ process:
 				if (next == '>')
 					c = ']';
 				else
-					fileUngetc (next);
+					ungetcToInputFile (next);
 				goto enter;
 			}
 			case '%':
@@ -805,7 +805,7 @@ process:
 				{
 					case '>':	c = '}'; break;
 					case ':':	c = '#'; goto process;
-					default: fileUngetc (next);
+					default: ungetcToInputFile (next);
 				}
 				goto enter;
 			}
@@ -821,7 +821,7 @@ process:
 						break;
 					}
 					else
-						fileUngetc (next);
+						ungetcToInputFile (next);
 				}
 			enter:
 				Cpp.directive.accept = FALSE;

@@ -388,7 +388,7 @@ static void parseIdentifier (vString * const string, const int firstChar)
 	} while (isIdentChar (c));
 	vStringTerminate (string);
 	if (!isspace (c))
-		fileUngetc (c);	/* unget non-identifier character */
+		ungetcToInputFile (c);	/* unget non-identifier character */
 }
 
 static void readToken (tokenInfo * const token)
@@ -446,7 +446,7 @@ static void readToken (tokenInfo * const token)
 		else
 		{
 			if (!isspace (c))
-				fileUngetc (c);
+				ungetcToInputFile (c);
 			token->type = TOKEN_OPERATOR;
 		}
 		break;

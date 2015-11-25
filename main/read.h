@@ -113,8 +113,7 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 extern void closeInputFile (void);
 extern int getcFromInputFile (void);
 extern int skipToCharacterInInputFile (int c);
-
-extern void fileUngetc (int c);
+extern void ungetcToInputFile (int c);
 extern const unsigned char *fileReadLine (void);
 
 extern char *readLine (vString *const vLine, FILE *const fp);

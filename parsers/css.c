@@ -62,7 +62,7 @@ static void parseSelector (vString *const string, const int firstChar)
 		vStringPut (string, (char) c);
 		c = getcFromInputFile ();
 	} while (isSelectorChar (c));
-	fileUngetc (c);
+	ungetcToInputFile (c);
 	vStringTerminate (string);
 }
 
@@ -106,7 +106,7 @@ getNextChar:
 			int d = getcFromInputFile ();
 			if (d != '*')
 			{
-				fileUngetc (d);
+				ungetcToInputFile (d);
 				vStringPut (token->string, c);
 				token->type = c;
 			}

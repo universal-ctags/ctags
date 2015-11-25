@@ -387,7 +387,7 @@ readnext:
 	return c;
 }
 
-extern void fileUngetc (int c)
+extern void ungetcToInputFile (int c)
 {
 	const size_t len = sizeof File.ungetchBuf / sizeof File.ungetchBuf[0];
 

@@ -688,7 +688,7 @@ static int getFixedFormChar (void)
 			if (c2 == '\n')
 				FreeSourceFormFound = TRUE;
 			else
-				fileUngetc (c2);
+				ungetcToInputFile (c2);
 		}
 	}
 	while (Column == 0)
@@ -732,7 +732,7 @@ static int getFixedFormChar (void)
 					Column = 0;
 				else if (Column > 6)
 				{
-					fileUngetc (c);
+					ungetcToInputFile (c);
 					c = ' ';
 				}
 				break;
@@ -776,7 +776,7 @@ static int getFreeFormChar (void)
 			advanceLine = TRUE;
 		else
 		{
-			fileUngetc (c);
+			ungetcToInputFile (c);
 			c = '&';
 		}
 	}
