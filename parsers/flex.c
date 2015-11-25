@@ -474,7 +474,7 @@ getNextChar:
 						  {
 							  do
 							  {
-								  fileSkipToCharacter ('*');
+								  skipToCharacterInInputFile ('*');
 								  c = getcFromInputFile ();
 								  if (c == '/')
 									  break;
@@ -485,7 +485,7 @@ getNextChar:
 						  }
 						  else if (d == '/')	/* is this the start of a comment?  */
 						  {
-							  fileSkipToCharacter ('\n');
+							  skipToCharacterInInputFile ('\n');
 							  goto getNextChar;
 						  }
 						  else if (d == '>')	/* is this the start of a comment?  */
@@ -551,7 +551,7 @@ getNextChar:
 										  {
 											  do
 											  {
-												  fileSkipToCharacter ('-');
+												  skipToCharacterInInputFile ('-');
 												  c = getcFromInputFile ();
 												  if (c == '-') 
 												  {

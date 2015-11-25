@@ -112,7 +112,8 @@ extern void freeInputFileResources (void);
 extern boolean openInputFile (const char *const fileName, const langType language);
 extern void closeInputFile (void);
 extern int getcFromInputFile (void);
-extern int fileSkipToCharacter (int c);
+extern int skipToCharacterInInputFile (int c);
+
 extern void fileUngetc (int c);
 extern const unsigned char *fileReadLine (void);
 

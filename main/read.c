@@ -462,7 +462,7 @@ extern int getcFromInputFile (void)
 	return c;
 }
 
-extern int fileSkipToCharacter (int c)
+extern int skipToCharacterInInputFile (int c)
 {
 	int d;
 	do

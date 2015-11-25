@@ -344,7 +344,7 @@ getNextChar:
 				  break;
 
 		case '%':
-				  fileSkipToCharacter ('\n'); /* % are single line comments */
+				  skipToCharacterInInputFile ('\n'); /* % are single line comments */
 				  goto getNextChar;
 				  break;
 

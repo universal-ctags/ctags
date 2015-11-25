@@ -614,7 +614,7 @@ getNextChar:
 						  {
 							  do
 							  {
-								  fileSkipToCharacter ('*');
+								  skipToCharacterInInputFile ('*');
 								  c = getcFromInputFile ();
 								  if (c == '/')
 									  break;
@@ -625,7 +625,7 @@ getNextChar:
 						  }
 						  else if (d == '/')	/* is this the start of a comment?  */
 						  {
-							  fileSkipToCharacter ('\n');
+							  skipToCharacterInInputFile ('\n');
 							  /* if we care about newlines, put it back so it is seen */
 							  if (include_newlines)
 								  fileUngetc ('\n');
@@ -646,7 +646,7 @@ getNextChar:
 				  }
 				  else
 				  {
-					  fileSkipToCharacter ('\n');
+					  skipToCharacterInInputFile ('\n');
 					  goto getNextChar;
 				  }
 				  break;

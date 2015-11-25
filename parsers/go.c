@@ -258,7 +258,7 @@ getNextChar:
 				switch (d)
 				{
 					case '/':
-						fileSkipToCharacter ('\n');
+						skipToCharacterInInputFile ('\n');
 						/* Line comments start with the
 						 * character sequence // and
 						 * continue through the next

@@ -538,7 +538,7 @@ getNextChar:
 				  c = getcFromInputFile ();
 				  if (c == '-')		/* -- is this the start of a comment? */
 				  {
-					  fileSkipToCharacter ('\n');
+					  skipToCharacterInInputFile ('\n');
 					  goto getNextChar;
 				  }
 				  else
@@ -593,7 +593,7 @@ getNextChar:
 						  {
 							  do
 							  {
-								  fileSkipToCharacter ('*');
+								  skipToCharacterInInputFile ('*');
 								  c = getcFromInputFile ();
 								  if (c == '/')
 									  break;
@@ -604,7 +604,7 @@ getNextChar:
 						  }
 						  else if (d == '/')	/* is this the start of a comment?  */
 						  {
-							  fileSkipToCharacter ('\n');
+							  skipToCharacterInInputFile ('\n');
 							  goto getNextChar;
 						  }
 					  }
@@ -623,7 +623,7 @@ getNextChar:
 					  if (isKeyword (token, KEYWORD_rem))
 					  {
 						  vStringClear (token->string);
-						  fileSkipToCharacter ('\n');
+						  skipToCharacterInInputFile ('\n');
 						  goto getNextChar;
 					  }
 					  else if (isKeyword (token, KEYWORD_NONE))

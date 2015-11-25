@@ -440,7 +440,7 @@ static void readToken (tokenInfo * const token)
 		c = getcFromInputFile ();
 		if (c == '-')	/* start of a comment */
 		{
-			fileSkipToCharacter ('\n');
+			skipToCharacterInInputFile ('\n');
 			goto getNextChar;
 		}
 		else
@@ -591,7 +591,7 @@ static void parseModule (tokenInfo * const token)
 	{
 		makeVhdlTag (name, VHDLTAG_COMPONENT);
 		skipToKeyword (KEYWORD_END);
-		fileSkipToCharacter (';');
+		skipToCharacterInInputFile (';');
 	}
 	else
 	{
@@ -600,7 +600,7 @@ static void parseModule (tokenInfo * const token)
 		{
 			makeVhdlTag (name, VHDLTAG_ENTITY);
 			skipToKeyword (KEYWORD_END);
-			fileSkipToCharacter (';');
+			skipToCharacterInInputFile (';');
 		}
 	}
 	deleteToken (name);
@@ -614,12 +614,12 @@ static void parseRecord (tokenInfo * const token)
 	do
 	{
 		readToken (token);	/* should be a colon */
-		fileSkipToCharacter (';');
+		skipToCharacterInInputFile (';');
 		makeVhdlTag (name, VHDLTAG_RECORD);
 		readToken (name);
 	}
 	while (!isKeyword (name, KEYWORD_END) && !isType (name, TOKEN_EOF));
-	fileSkipToCharacter (';');
+	skipToCharacterInInputFile (';');
 	deleteToken (name);
 }
 
@@ -661,7 +661,7 @@ static void parseConstant (boolean local)
 	{
 		makeVhdlTag (name, VHDLTAG_CONSTANT);
 	}
-	fileSkipToCharacter (';');
+	skipToCharacterInInputFile (';');
 	deleteToken (name);
 }
 
@@ -712,7 +712,7 @@ static void parseSubProgram (tokenInfo * const token)
 					readToken (token);
 					endSubProgram = isKeywordOrIdent (token,
 						KEYWORD_FUNCTION, name->string);
-					fileSkipToCharacter (';');
+					skipToCharacterInInputFile (';');
 				}
 				else
 				{
@@ -738,7 +738,7 @@ static void parseSubProgram (tokenInfo * const token)
 					readToken (token);
 					endSubProgram = isKeywordOrIdent (token,
 						KEYWORD_PROCEDURE, name->string);
-					fileSkipToCharacter (';');
+					skipToCharacterInInputFile (';');
 				}
 				else
 				{
@@ -764,7 +764,7 @@ static void parseKeywords (tokenInfo * const token, boolean local)
 	switch (token->keyword)
 	{
 	case KEYWORD_END:
-		fileSkipToCharacter (';');
+		skipToCharacterInInputFile (';');
 		break;
 	case KEYWORD_CONSTANT:
 		parseConstant (local);
