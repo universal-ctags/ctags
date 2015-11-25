@@ -575,15 +575,12 @@ static void createTag (tokenInfo *const token)
 	}
 
 	/* Create tag */
-	initTagEntryFull(
-			&tag,
-			vStringValue (token->name),
-			token->lineNumber,
-			getInputLanguageName (),
-			token->filePosition,
-			getInputFileTagPath (),
-			kindFromKind (kind),
-		        ROLE_INDEX_DEFINITION);
+	initTagEntry (&tag,
+		      vStringValue (token->name),
+		      kindFromKind (kind));
+	tag.lineNumber = token->lineNumber;
+	tag.filePosition = token->filePosition;
+
 	verbose ("Adding tag %s (kind %d)", vStringValue (token->name), kind);
 	if (currentContext->kind != K_UNDEFINED)
 	{
