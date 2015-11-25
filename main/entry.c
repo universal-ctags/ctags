@@ -1200,7 +1200,7 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 {
 	int r = SCOPE_NIL;
 	Assert (tag->name != NULL);
-	Assert (getSourceLanguageFileKind() == tag->kind
+	Assert (getInputLanguageFileKind() == tag->kind
 		|| ( isInputLanguageKindEnabled (tag->kind->letter)
                     && (tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION ))
 		|| (tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION

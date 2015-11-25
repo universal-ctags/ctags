@@ -823,7 +823,7 @@ static boolean parseExtensionFields (tagEntry *const entry, char *const string, 
 						entry->kind = lookupKindFromLetter (path, field[0]);
 						if (entry->kind == NULL)
 						{
-							kindOption *fileKind = getSourceLanguageFileKind ();
+							kindOption *fileKind = getInputLanguageFileKind ();
 							if (fileKind && fileKind->letter == field[0])
 								/* ctags will make a tag for file. */
 								goto reject;
@@ -855,7 +855,7 @@ static boolean parseExtensionFields (tagEntry *const entry, char *const string, 
 							entry->kind = lookupKindFromName (path, value);
 							if (entry->kind == NULL)
 							{
-								kindOption *fileKind = getSourceLanguageFileKind ();
+								kindOption *fileKind = getInputLanguageFileKind ();
 								if (fileKind && (strcmp(fileKind->name, value) == 0))
 									/* ctags will make a tag for file. */
 									goto reject;

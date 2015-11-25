@@ -1653,7 +1653,7 @@ extern void makeFileTag (const char *const fileName)
 		tagEntryInfo tag;
 		kindOption  *kind;
 
-		kind = getSourceLanguageFileKind();
+		kind = getInputLanguageFileKind();
 		Assert (kind);
 		kind->enabled = isXtagEnabled(XTAG_FILE_NAMES);
 
