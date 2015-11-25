@@ -99,6 +99,14 @@ typedef struct sInputFile {
 	 */
 	inputFileInfo input; /* name, lineNumber */
 	inputFileInfo source;
+
+	/* sourceTagPathHolder is a kind of trash box.
+	   The buffer pointed by tagPath field of source field can
+	   be referred from tagsEntryInfo instances. sourceTagPathHolder
+	   is used keeping the buffer till all processing about the current
+	   input file is done. After all processing is done, the buffers
+	   in sourceTagPathHolder are destroied. */
+	stringList  * sourceTagPathHolder;
 } inputFile;
 
 /*

@@ -89,14 +89,20 @@ static void setOwnerDirectoryOfInputFile (const char *const fileName)
 	}
 }
 
-static void setInputFileParametersCommon (inputFileInfo *finfo, vString *const fileName, const langType language)
+static void setInputFileParametersCommon (inputFileInfo *finfo, vString *const fileName,
+					  const langType language, stringList *holder)
 {
 	if (finfo->name != NULL)
 		vStringDelete (finfo->name);
 	finfo->name = fileName;
 
 	if (finfo->tagPath != NULL)
-		vStringDelete (finfo->tagPath);
+	{
+		if (holder)
+			stringListAdd (holder, finfo->tagPath);
+		else
+			vStringDelete (finfo->tagPath);
+	}
 	if (! Option.tagRelative || isAbsolutePath (vStringValue (fileName)))
 		finfo->tagPath = vStringNewCopy (fileName);
 	else
@@ -109,12 +115,12 @@ static void setInputFileParametersCommon (inputFileInfo *finfo, vString *const f
 
 static void setInputFileParameters (vString *const fileName, const langType language)
 {
-	setInputFileParametersCommon (&File.input, fileName, language);
+	setInputFileParametersCommon (&File.input, fileName, language, NULL);
 }
 
 static void setSourceFileParameters (vString *const fileName, const langType language)
 {
-	setInputFileParametersCommon (&File.source, fileName, language);
+	setInputFileParametersCommon (&File.source, fileName, language, File.sourceTagPathHolder);
 }
 
 static boolean setSourceFileName (vString *const fileName)
@@ -274,6 +280,11 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 	   pattern cache in entry.h. If an input file is changed, the
 	   key is meaningless. So notifying the changing here. */
 	TagFile.patternCacheValid = FALSE;
+
+	if (File.sourceTagPathHolder == NULL)
+		File.sourceTagPathHolder = stringListNew ();
+	stringListClear (File.sourceTagPathHolder);
+
 	File.fp = fopen (fileName, openMode);
 	if (File.fp == NULL)
 		error (WARNING | PERROR, "cannot open \"%s\"", fileName);
