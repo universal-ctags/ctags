@@ -4,7 +4,7 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
-*   This module contains functions for managing source languages and
+*   This module contains functions for managing input languages and
 *   dispatching files to the appropriate language parser.
 */
 

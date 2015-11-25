@@ -4,7 +4,7 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
-*   This module contains the high level source read functions (preprocessor
+*   This module contains the high level input read functions (preprocessor
 *   directives are handled within this level).
 */
 
@@ -185,7 +185,7 @@ extern void cppEndStatement (void)
 *   directives and may emit a tag for #define directives.
 */
 
-/*  This puts a character back into the input queue for the source File.
+/*  This puts a character back into the input queue for the input File.
  *  Up to two characters may be ungotten.
  */
 extern void cppUngetc (const int c)

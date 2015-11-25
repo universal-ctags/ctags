@@ -4,8 +4,8 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
-*   This module contains low level source and tag file read functions (newline
-*   conversion for source files are performed at this level).
+*   This module contains low level input and tag file read functions (newline
+*   conversion for input files are performed at this level).
 */
 
 /*
@@ -69,7 +69,7 @@ extern void freeInputFileResources (void)
 }
 
 /*
- *   Source file access functions
+ *   Input file access functions
  */
 
 static void setOwnerDirectoryOfInputFile (const char *const fileName)
@@ -251,10 +251,10 @@ static boolean parseLineDirective (void)
 }
 
 /*
- *   Source file I/O operations
+ *   Input file I/O operations
  */
 
-/*  This function opens a source file, and resets the line counter.  If it
+/*  This function opens an input file, and resets the line counter.  If it
  *  fails, it will display an error message and leave the File.fp set to NULL.
  */
 extern boolean openInputFile (const char *const fileName, const langType language)
@@ -266,7 +266,7 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 	 */
 	if (File.fp != NULL)
 	{
-		fclose (File.fp);  /* close any open source file */
+		fclose (File.fp);  /* close any open input file */
 		File.fp = NULL;
 	}
 
@@ -320,7 +320,7 @@ extern void closeInputFile (void)
 	}
 }
 
-/*  Action to take for each encountered source newline.
+/*  Action to take for each encountered input newline.
  */
 static void fileNewline (void)
 {
