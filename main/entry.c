@@ -622,7 +622,7 @@ extern void endEtagsFile (const char *const filename)
  *  are doubled and a leading '^' or trailing '$' is also quoted. End of line
  *  characters (line feed or carriage return) are dropped.
  */
-static size_t appendSourceLine (int putc_func (char , void *), const char *const line, void * data, boolean *omitted)
+static size_t appendInputLine (int putc_func (char , void *), const char *const line, void * data, boolean *omitted)
 {
 	size_t length = 0;
 	const char *p;
@@ -990,7 +990,7 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 
 	length += putc_func(searchChar, output);
 	length += putc_func('^', output);
-	length += appendSourceLine (putc_func, line, output, &omitted);
+	length += appendInputLine (putc_func, line, output, &omitted);
 	length += puts_func (omitted? "": terminator, output);
 	length += putc_func (searchChar, output);
 

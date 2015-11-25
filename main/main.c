@@ -233,7 +233,7 @@ static boolean createTagsForEntry (const char *const entryName)
 	else if (status->isSymbolicLink  &&  ! Option.followLinks)
 		verbose ("ignoring \"%s\" (symbolic link)\n", entryName);
 	else if (! status->exists)
-		error (WARNING | PERROR, "cannot open source file \"%s\"", entryName);
+		error (WARNING | PERROR, "cannot open input file \"%s\"", entryName);
 	else if (status->isDirectory)
 		resize = recurseIntoDirectory (entryName);
 	else if (! status->isNormalFile)

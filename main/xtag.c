@@ -24,7 +24,7 @@ static xtagDesc xtagDescs [] = {
 	{ TRUE, 'F',
 	  "Include tags of file scope" },
 	{ FALSE, 'f',
-	  "Include an entry for the base file name of every source file"},
+	  "Include an entry for the base file name of every input file"},
 	{ FALSE, 'p',
 	  "Include pseudo tags",
 	  isPseudoTagsEnabled},
