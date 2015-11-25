@@ -108,12 +108,14 @@ extern CONST_FILE inputFile File;
 /*
 *   FUNCTION PROTOTYPES
 */
-extern void freeInputFileResources (void);
-extern boolean openInputFile (const char *const fileName, const langType language);
-extern void closeInputFile (void);
-extern int getcFromInputFile (void);
-extern int skipToCharacterInInputFile (int c);
-extern void ungetcToInputFile (int c);
+
+/* InputFile: reading from fp in  inputFile with updating fields in input fields */
+extern void                 freeInputFileResources (void);
+extern boolean              openInputFile (const char *const fileName, const langType language);
+extern void                 closeInputFile (void);
+extern int                  getcFromInputFile (void);
+extern int                  skipToCharacterInInputFile (int c);
+extern void                 ungetcToInputFile (int c);
 extern const unsigned char *readLineFromInputFile (void);
 
 extern char *readLine (vString *const vLine, FILE *const fp);
