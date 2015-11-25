@@ -359,12 +359,12 @@ static void parseString (vString * const string, const int delimiter)
 	boolean end = FALSE;
 	while (!end)
 	{
-		int c = fileGetc ();
+		int c = getcFromInputFile ();
 		if (c == EOF)
 			end = TRUE;
 		else if (c == '\\')
 		{
-			c = fileGetc ();	/* This maybe a ' or ". */
+			c = getcFromInputFile ();	/* This maybe a ' or ". */
 			vStringPut (string, c);
 		}
 		else if (c == delimiter)
@@ -384,7 +384,7 @@ static void parseIdentifier (vString * const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
 	if (!isspace (c))
@@ -402,7 +402,7 @@ static void readToken (tokenInfo * const token)
   getNextChar:
 	do
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		token->lineNumber = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 	}
@@ -437,7 +437,7 @@ static void readToken (tokenInfo * const token)
 		token->filePosition = getInputFilePosition ();
 		break;
 	case '-':
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		if (c == '-')	/* start of a comment */
 		{
 			fileSkipToCharacter ('\n');

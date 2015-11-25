@@ -60,7 +60,7 @@ static void parseSelector (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, (char) c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isSelectorChar (c));
 	fileUngetc (c);
 	vStringTerminate (string);
@@ -74,9 +74,9 @@ static void readToken (tokenInfo *const token)
 
 getNextChar:
 
-	c = fileGetc ();
+	c = getcFromInputFile ();
 	while (isspace (c))
-		c = fileGetc ();
+		c = getcFromInputFile ();
 
 	token->type = c;
 	switch (c)
@@ -90,9 +90,9 @@ getNextChar:
 			do
 			{
 				vStringPut (token->string, c);
-				c = fileGetc ();
+				c = getcFromInputFile ();
 				if (c == '\\')
-					c = fileGetc ();
+					c = getcFromInputFile ();
 			}
 			while (c != EOF && c != delimiter);
 			if (c != EOF)
@@ -103,7 +103,7 @@ getNextChar:
 
 		case '/': /* maybe comment start */
 		{
-			int d = fileGetc ();
+			int d = getcFromInputFile ();
 			if (d != '*')
 			{
 				fileUngetc (d);
@@ -112,11 +112,11 @@ getNextChar:
 			}
 			else
 			{
-				d = fileGetc ();
+				d = getcFromInputFile ();
 				do
 				{
 					c = d;
-					d = fileGetc ();
+					d = getcFromInputFile ();
 				}
 				while (d != EOF && ! (c == '*' && d == '/'));
 				goto getNextChar;

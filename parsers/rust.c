@@ -141,7 +141,7 @@ static void writeCurTokenToStr (lexerState *lexer, vString *out_str)
 static void advanceChar (lexerState *lexer)
 {
 	lexer->cur_c = lexer->next_c;
-	lexer->next_c = fileGetc();
+	lexer->next_c = getcFromInputFile();
 }
 
 /* Reads N characters from the file */

@@ -373,12 +373,12 @@ static void parseString (vString *const string, const int delimiter)
 	boolean end = FALSE;
 	while (! end)
 	{
-		int c = fileGetc ();
+		int c = getcFromInputFile ();
 		if (c == EOF)
 			end = TRUE;
 		else if (c == '\\')
 		{
-			c = fileGetc(); /* This maybe a ' or ". */
+			c = getcFromInputFile(); /* This maybe a ' or ". */
 			vStringPut(string, c);
 		}
 		else if (c == delimiter)
@@ -399,7 +399,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
 	if (!isspace (c))
@@ -417,7 +417,7 @@ static void readToken (tokenInfo *const token)
 getNextChar:
 	do
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		token->lineNumber   = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 	}
@@ -448,7 +448,7 @@ getNextChar:
 				  break;
 
 		case '\\':
-				  c = fileGetc ();
+				  c = getcFromInputFile ();
 				  if (c != '\\'  && c != '"'  &&  !isspace (c))
 					  fileUngetc (c);
 				  token->type = TOKEN_CHARACTER;
@@ -458,7 +458,7 @@ getNextChar:
 
 		case '/':
 				  {
-					  int d = fileGetc ();
+					  int d = getcFromInputFile ();
 					  if ( (d != '*') &&		/* is this the start of a comment? */
 							  (d != '/') &&		/* is a one line comment? */
 							  (d != '>') )		/* is this a close XML tag? */
@@ -475,7 +475,7 @@ getNextChar:
 							  do
 							  {
 								  fileSkipToCharacter ('*');
-								  c = fileGetc ();
+								  c = getcFromInputFile ();
 								  if (c == '/')
 									  break;
 								  else
@@ -504,7 +504,7 @@ getNextChar:
 					   * An XML comment looks like this 
 					   *   <!-- anything over multiple lines -->
 					   */
-					  int d = fileGetc ();
+					  int d = getcFromInputFile ();
 
 					  if ( (d != '!' )  && 		/* is this the start of a comment? */
 					       (d != '/' )  &&	 	/* is this the start of a closing mx tag */
@@ -522,7 +522,7 @@ getNextChar:
 					  {
 						  if (d == '!')
 						  {
-							  int e = fileGetc ();
+							  int e = getcFromInputFile ();
 							  if ( e != '-' ) 		/* is this the start of a comment? */
 							  {
 								  fileUngetc (e);
@@ -535,7 +535,7 @@ getNextChar:
 							  {
 								  if (e == '-')
 								  {
-									  int f = fileGetc ();
+									  int f = getcFromInputFile ();
 									  if ( f != '-' ) 		/* is this the start of a comment? */
 									  {
 										  fileUngetc (f);
@@ -552,10 +552,10 @@ getNextChar:
 											  do
 											  {
 												  fileSkipToCharacter ('-');
-												  c = fileGetc ();
+												  c = getcFromInputFile ();
 												  if (c == '-') 
 												  {
-													  d = fileGetc ();
+													  d = getcFromInputFile ();
 													  if (d == '>')
 														  break;
 													  else
@@ -576,7 +576,7 @@ getNextChar:
 						  }
 						  else if (d == 'm' || d == 'f' || d == 's' )
 						  {
-							  int e = fileGetc ();
+							  int e = getcFromInputFile ();
 							  if ( (d == 'm' || d == 'f') && e != 'x' ) 		/* continuing an mx or fx tag */
 							  {
 								  fileUngetc (e);
@@ -590,7 +590,7 @@ getNextChar:
 							  {
 								  if ( (d == 'm' || d == 'f') && e == 'x' )
 								  {
-									  int f = fileGetc ();
+									  int f = getcFromInputFile ();
 									  if ( f != ':' ) 		/* start of the tag */
 									  {
 										  fileUngetc (f);
@@ -629,7 +629,7 @@ getNextChar:
 						  }
 						  else if (d == '/')
 						  {
-							  int e = fileGetc ();
+							  int e = getcFromInputFile ();
 							  if ( !(e == 'm' || e == 'f' || e == 's' ))
 							  {
 								  fileUngetc (e);
@@ -641,7 +641,7 @@ getNextChar:
 							  }
 							  else
 							  {
-								  int f = fileGetc ();
+								  int f = getcFromInputFile ();
 								  if ( (e == 'm' || e == 'f') && f != 'x' ) 		/* continuing an mx or fx tag */
 								  {
 									  fileUngetc (f);
@@ -655,7 +655,7 @@ getNextChar:
 								  {
 									  if (f == 'x')
 									  {
-										  int g = fileGetc ();
+										  int g = getcFromInputFile ();
 										  if ( g != ':' ) 		/* is this the start of a comment? */
 										  {
 											  fileUngetc (g);

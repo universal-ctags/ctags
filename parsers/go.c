@@ -176,12 +176,12 @@ static void parseString (vString *const string, const int delimiter)
 	boolean end = FALSE;
 	while (!end)
 	{
-		int c = fileGetc ();
+		int c = getcFromInputFile ();
 		if (c == EOF)
 			end = TRUE;
 		else if (c == '\\' && delimiter != '`')
 		{
-			c = fileGetc ();
+			c = getcFromInputFile ();
 			if (c != '\'' && c != '\"')
 				vStringPut (string, '\\');
 			vStringPut (string, c);
@@ -200,7 +200,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
 	fileUngetc (c);		/* always unget, LF might add a semicolon */
@@ -220,7 +220,7 @@ static void readToken (tokenInfo *const token)
 getNextChar:
 	do
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		token->lineNumber = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 		if (c == '\n' && (lastTokenType == TOKEN_IDENTIFIER ||
@@ -254,7 +254,7 @@ getNextChar:
 		case '/':
 			{
 				boolean hasNewline = FALSE;
-				int d = fileGetc ();
+				int d = getcFromInputFile ();
 				switch (d)
 				{
 					case '/':
@@ -271,14 +271,14 @@ getNextChar:
 						{
 							do
 							{
-								d = fileGetc ();
+								d = getcFromInputFile ();
 								if (d == '\n')
 								{
 									hasNewline = TRUE;
 								}
 							} while (d != EOF && d != '*');
 
-							c = fileGetc ();
+							c = getcFromInputFile ();
 							if (c == '/')
 								break;
 							else
@@ -306,7 +306,7 @@ getNextChar:
 
 		case '<':
 			{
-				int d = fileGetc ();
+				int d = getcFromInputFile ();
 				if (d == '-')
 					token->type = TOKEN_LEFT_ARROW;
 				else

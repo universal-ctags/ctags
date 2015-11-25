@@ -563,7 +563,7 @@ static int skipLine (void)
 	int c;
 
 	do
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	while (c != EOF  &&  c != '\n');
 
 	return c;
@@ -586,7 +586,7 @@ static lineType getLineType (void)
 
 	do  /* read in first 6 "margin" characters */
 	{
-		int c = fileGetc ();
+		int c = getcFromInputFile ();
 
 		/* 3.2.1  Comment_Line.  A comment line is any line that contains
 		 * a C or an asterisk in column 1, or contains only blank characters
@@ -668,7 +668,7 @@ static int getFixedFormChar (void)
 		else
 #endif
 		{
-			c = fileGetc ();
+			c = getcFromInputFile ();
 			++Column;
 		}
 		if (c == '\n')
@@ -684,7 +684,7 @@ static int getFixedFormChar (void)
 		}
 		else if (c == '&')  /* check for free source form */
 		{
-			const int c2 = fileGetc ();
+			const int c2 = getcFromInputFile ();
 			if (c2 == '\n')
 				FreeSourceFormFound = TRUE;
 			else
@@ -725,7 +725,7 @@ static int getFixedFormChar (void)
 				Column = 5;
 				do
 				{
-					c = fileGetc ();
+					c = getcFromInputFile ();
 					++Column;
 				} while (isBlank (c));
 				if (c == '\n')
@@ -748,7 +748,7 @@ static int skipToNextLine (void)
 {
 	int c = skipLine ();
 	if (c != EOF)
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	return c;
 }
 
@@ -756,7 +756,7 @@ static int getFreeFormChar (void)
 {
 	static boolean newline = TRUE;
 	boolean advanceLine = FALSE;
-	int c = fileGetc ();
+	int c = getcFromInputFile ();
 
 	/* If the last nonblank, non-comment character of a FORTRAN 90
 	 * free-format text line is an ampersand then the next non-comment
@@ -765,7 +765,7 @@ static int getFreeFormChar (void)
 	if (c == '&')
 	{
 		do
-			c = fileGetc ();
+			c = getcFromInputFile ();
 		while (isspace (c)  &&  c != '\n');
 		if (c == '\n')
 		{
@@ -785,7 +785,7 @@ static int getFreeFormChar (void)
 	while (advanceLine)
 	{
 		while (isspace (c))
-			c = fileGetc ();
+			c = getcFromInputFile ();
 		if (c == '!' || (newline && c == '#'))
 		{
 			c = skipToNextLine ();
@@ -793,7 +793,7 @@ static int getFreeFormChar (void)
 			continue;
 		}
 		if (c == '&')
-			c = fileGetc ();
+			c = getcFromInputFile ();
 		else
 			advanceLine = FALSE;
 	}

@@ -284,7 +284,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 
 	vStringTerminate (string);
@@ -303,7 +303,7 @@ static void readToken (tokenInfo *const token)
 getNextChar:
 	do
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		token->lineNumber   = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 	}
@@ -327,7 +327,7 @@ getNextChar:
 				   * Check if the next character is an alpha character
 				   * else it is not a potential tex tag.
 				   */
-				  c = fileGetc ();
+				  c = getcFromInputFile ();
 				  if (! isalpha (c))
 					  fileUngetc (c);
 				  else

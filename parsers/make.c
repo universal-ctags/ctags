@@ -53,10 +53,10 @@ static kindOption MakeKinds [] = {
 
 static int nextChar (void)
 {
-	int c = fileGetc ();
+	int c = getcFromInputFile ();
 	if (c == '\\')
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		if (c == '\n')
 			c = nextChar ();
 	}

@@ -450,13 +450,13 @@ static void parseString (vString *const string, const int delimiter)
 	boolean end = FALSE;
 	while (! end)
 	{
-		int c = fileGetc ();
+		int c = getcFromInputFile ();
 		if (c == EOF)
 			end = TRUE;
 		/*
 		else if (c == '\\')
 		{
-			c = fileGetc(); // This maybe a ' or ". //
+			c = getcFromInputFile(); // This maybe a ' or ". //
 			vStringPut(string, c);
 		}
 		*/
@@ -477,7 +477,7 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
 	if (!isspace (c))
@@ -495,7 +495,7 @@ static void readToken (tokenInfo *const token)
 getNextChar:
 	do
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		token->lineNumber   = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 		/* 
@@ -535,7 +535,7 @@ getNextChar:
 				  break;
 
 		case '-':
-				  c = fileGetc ();
+				  c = getcFromInputFile ();
 				  if (c == '-')		/* -- is this the start of a comment? */
 				  {
 					  fileSkipToCharacter ('\n');
@@ -553,7 +553,7 @@ getNextChar:
 		case '>':
 				  {
 					  const int initial = c;
-					  int d = fileGetc ();
+					  int d = getcFromInputFile ();
 					  if (d == initial)
 					  {
 						  if (initial == '<')
@@ -570,7 +570,7 @@ getNextChar:
 				  }
 
 		case '\\':
-				  c = fileGetc ();
+				  c = getcFromInputFile ();
 				  if (c != '\\'  && c != '"'  && c != '\''  &&  !isspace (c))
 					  fileUngetc (c);
 				  token->type = TOKEN_CHARACTER;
@@ -580,7 +580,7 @@ getNextChar:
 
 		case '/':
 				  {
-					  int d = fileGetc ();
+					  int d = getcFromInputFile ();
 					  if ((d != '*') &&		/* is this the start of a comment? */
 						  (d != '/'))		/* is a one line comment? */
 					  {
@@ -594,7 +594,7 @@ getNextChar:
 							  do
 							  {
 								  fileSkipToCharacter ('*');
-								  c = fileGetc ();
+								  c = getcFromInputFile ();
 								  if (c == '/')
 									  break;
 								  else

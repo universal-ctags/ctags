@@ -93,7 +93,7 @@ static void findBetaTags (void)
 
 		vStringClear (line);
 
-		while ((c = fileGetc ()) != EOF && c != '\n' && c != '\r')
+		while ((c = getcFromInputFile ()) != EOF && c != '\n' && c != '\r')
 			vStringPut (line, c);
 
 		vStringTerminate (line);
