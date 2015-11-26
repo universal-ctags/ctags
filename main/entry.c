@@ -593,11 +593,11 @@ extern void beginEtagsFile (void)
 	TagFile.etags.byteCount = 0;
 }
 
-extern void endEtagsFile (const char *const name)
+extern void endEtagsFile (const char *const filename)
 {
 	const char *line;
 
-	fprintf (TagFile.fp, "\f\n%s,%ld\n", name, (long) TagFile.etags.byteCount);
+	fprintf (TagFile.fp, "\f\n%s,%ld\n", filename, (long) TagFile.etags.byteCount);
 	abort_if_ferror (TagFile.fp);
 
 	if (TagFile.etags.fp != NULL)
