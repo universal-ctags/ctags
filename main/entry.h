@@ -75,6 +75,12 @@ typedef struct sTagEntryInfo {
 #define ROLE_INDEX_DEFINITION -1
 		int roleIndex; /* for role of reference tag */
 	} extensionFields;  /* list of extension fields*/
+
+	/* Following source* fields are used only when #line is found
+	   in input and --line-directive is given in ctags command line. */
+	const char* sourceLanguage;
+	const char *sourceFileName;
+	unsigned long sourceLineNumberDifference;
 } tagEntryInfo;
 
 /*  Maintains the state of the tag file.
@@ -129,7 +135,10 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      fpos_t      filePosition,
 			      const char *inputFileName,
 			      const kindOption *kind,
-			      int roleIndex);
+			      int roleIndex,
+			      const char *sourceFileName,
+			      const char* sourceLanguage,
+			      long sourceLineNumberDifference);
 
 /* Getting line associated with tag */
 extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo *const tag,

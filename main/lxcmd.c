@@ -1038,7 +1038,10 @@ static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 			  filePosition,
 			  entry->file,
 			  entry->kind,
-			  ROLE_INDEX_DEFINITION);
+			  ROLE_INDEX_DEFINITION,
+			  NULL,
+			  NULL,
+			  0);
 
 	tag.pattern = entry->address.pattern;
 

@@ -1069,6 +1069,11 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 		slot->extensionFields.typeRef[0] = eStrdup (slot->extensionFields.typeRef[0]);
 	if (slot->extensionFields.typeRef[1])
 		slot->extensionFields.typeRef[1] = eStrdup (slot->extensionFields.typeRef[1]);
+
+	if (slot->sourceLanguage)
+		slot->sourceLanguage = eStrdup (slot->sourceLanguage);
+	if (slot->sourceFileName)
+		slot->sourceFileName = eStrdup (slot->sourceFileName);
 }
 
 static void clearTagEntryInQueue (tagEntryInfo* slot)
@@ -1096,6 +1101,11 @@ static void clearTagEntryInQueue (tagEntryInfo* slot)
 		eFree ((char *)slot->extensionFields.typeRef[0]);
 	if (slot->extensionFields.typeRef[1])
 		eFree ((char *)slot->extensionFields.typeRef[1]);
+
+	if (slot->sourceLanguage)
+		eFree ((char *)slot->sourceLanguage);
+	if (slot->sourceFileName)
+		eFree ((char *)slot->sourceFileName);
 }
 
 
@@ -1231,7 +1241,10 @@ extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 			 getInputFilePosition (),
 			 getInputFileTagPath (),
 			 kind,
-			 ROLE_INDEX_DEFINITION);
+			 ROLE_INDEX_DEFINITION,
+			 getSourceFileTagPath(),
+			 getSourceLanguageName(),
+			 getSourceLineNumber() - getInputLineNumber ());
 }
 
 extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
@@ -1243,7 +1256,10 @@ extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
 			 getInputFilePosition (),
 			 getInputFileTagPath (),
 			 kind,
-			 roleIndex);
+			 roleIndex,
+			 getSourceFileTagPath(),
+			 getSourceLanguageName(),
+			 getSourceLineNumber() - getInputLineNumber ());
 }
 
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
@@ -1252,7 +1268,10 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      fpos_t      filePosition,
 			      const char *inputFileName,
 			      const kindOption *kind,
-			      int roleIndex)
+			      int roleIndex,
+			      const char *sourceFileName,
+			      const char* sourceLanguage,
+			      long sourceLineNumberDifference)
 {
 	Assert (File.input.name != NULL);
 
@@ -1269,6 +1288,10 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	Assert (roleIndex >= ROLE_INDEX_DEFINITION);
 	Assert (kind == NULL || roleIndex < kind->nRoles);
 	e->extensionFields.roleIndex = roleIndex;
+
+	e->sourceLanguage = sourceLanguage;
+	e->sourceFileName = sourceFileName;
+	e->sourceLineNumberDifference = sourceLineNumberDifference;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */
