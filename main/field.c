@@ -258,7 +258,11 @@ static const char *renderFieldName (const tagEntryInfo *const tag, vString* b)
 
 static const char *renderFieldInput (const tagEntryInfo *const tag, vString* b)
 {
-	return renderEscapedString (tag->inputFileName, tag, b);
+	const char *f = tag->inputFileName;
+
+	if (Option.lineDirectives && tag->sourceFileName)
+		f = tag->sourceFileName;
+	return renderEscapedString (f, tag, b);
 }
 
 static const char *renderFieldSignature (const tagEntryInfo *const tag, vString* b)
@@ -358,8 +362,12 @@ static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
 
 static const char *renderFieldLineNumber (const tagEntryInfo *const tag, vString* b)
 {
+	long ln = tag->lineNumber;
 	char buf[32] = {[0] = '\0'};
-	snprintf (buf, sizeof(buf), "%ld", tag->lineNumber);
+
+	if (Option.lineDirectives && (tag->sourceLineNumberDifference != 0))
+		ln += tag->sourceLineNumberDifference;
+	snprintf (buf, sizeof(buf), "%ld", ln);
 	vStringCatS (b, buf);
 	return vStringValue (b);
 }
@@ -383,7 +391,12 @@ static const char *renderFieldRole (const tagEntryInfo *const tag, vString* b)
 
 static const char *renderFieldLanguage (const tagEntryInfo *const tag, vString* b)
 {
-	return renderAsIs (b, WITH_DEFUALT_VALUE(tag->language));
+	const char *l = tag->language;
+
+	if (Option.lineDirectives && tag->sourceLanguage)
+		l = tag->sourceLanguage;
+
+	return renderAsIs (b, WITH_DEFUALT_VALUE(l));
 }
 
 static const char *renderFieldAccess (const tagEntryInfo *const tag, vString* b)

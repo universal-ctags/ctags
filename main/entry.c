@@ -1018,7 +1018,10 @@ static int writePatternEntry (const tagEntryInfo *const tag)
 
 static int writeLineNumberEntry (const tagEntryInfo *const tag)
 {
-	return fprintf (TagFile.fp, "%lu", tag->lineNumber);
+	if (Option.lineDirectives)
+		return fprintf (TagFile.fp, "%s", escapeName (tag, FIELD_LINE_NUMBER));
+	else
+		return fprintf (TagFile.fp, "%lu", tag->lineNumber);
 }
 
 static int writeCtagsEntry (const tagEntryInfo *const tag)

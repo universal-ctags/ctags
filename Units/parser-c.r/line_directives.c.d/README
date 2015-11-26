@@ -1,3 +1,7 @@
+Universal ctags also reports NEWLANG as the language for input.c.
+
+================== THE ORIGINAL DOCUMENT ==================
+
 Currently this test case made an assertion failure.
 See also #402.
 
@@ -37,7 +41,7 @@ to exuberant ctags when --fields=+l option is given to ctags.
 ```
 [exuberant]$ ctags -o - --fields='+l' \
              --langdef=NEWLANG --langmap=NEWLANG:+.zzz --line-directives --excmd=number \
-             Units/review-needed.r/line_directives.c.d/input.c 
+             Units/review-needed.r/line_directives.c.d/input.c
 ctags: Warning: Ignoring non-option in ./.ctags
 
 a	Units/review-needed.r/line_directives.c.d/a.c	10;"	v	language:C
@@ -47,7 +51,7 @@ d	Units/review-needed.r/line_directives.c.d/OK.zzz	2;"	v	language:NEWLANG
 
 [universal]$ ./ctags -o - --fields='+l' \
              --langdef=NEWLANG --langmap=NEWLANG:+.zzz --line-directives --excmd=number \
-             Units/review-needed.r/line_directives.c.d/input.c 
+             Units/review-needed.r/line_directives.c.d/input.c
 
 a	Units/review-needed.r/line_directives.c.d/a.c	10;"	v	language:C
 b	Units/review-needed.r/line_directives.c.d/b.c	20;"	v	language:C
