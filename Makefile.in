@@ -383,6 +383,9 @@ UNITS=
 ifdef TRAVIS
 SHOW_DIFF_OUTPUT=--show-diff-output
 endif
+ifdef APPVEYOR
+SHOW_DIFF_OUTPUT=--show-diff-output
+endif
 
 .PHONY: check units fuzz noise tmain tinst clean-units clean-tmain clean-gcov run-gcov codecheck roundtrip help
 check: tmain units
