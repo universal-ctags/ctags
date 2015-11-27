@@ -31,7 +31,7 @@
 *   DATA DECLARATIONS
 */
 typedef enum {
-	K_UNDEFINED = -1, K_CLASS, K_METHOD, K_MODULE, K_SINGLETON, K_DESCRIBE, K_CONTEXT
+	K_UNDEFINED = -1, K_CLASS, K_METHOD, K_MODULE, K_SINGLETON,
 } rubyKind;
 
 /*
@@ -42,8 +42,11 @@ static kindOption RubyKinds [] = {
 	{ TRUE, 'f', "method", "methods" },
 	{ TRUE, 'm', "module", "modules" },
 	{ TRUE, 'F', "singletonMethod", "singleton methods" },
-	{ TRUE, 'd', "describe", "describes" },
-	{ TRUE, 'C', "context", "contexts" }
+#if 0
+	/* Following two kinds are reserved. */
+	{ TRUE, 'd', "describe", "describes and contexts for Rspec" },
+	{ TRUE, 'C', "constant", "constants" },
+#endif
 };
 
 static NestingLevels* nesting = NULL;
@@ -265,10 +268,6 @@ static rubyKind parseIdentifier (
 	{
 		also_ok = "?!=";
 	}
-	else if (kind == K_DESCRIBE || kind == K_CONTEXT)
-	{
-		also_ok = " ,\".#?!='/-";
-	}
 	else
 	{
 		also_ok = "";
@@ -472,14 +471,6 @@ static void findRubyTags (void)
 				kind = K_SINGLETON;
 
 			readAndEmitTag (&cp, kind);
-		}
-		else if (canMatchKeyword (&cp, "describe"))
-		{
-			readAndEmitTag (&cp, K_DESCRIBE);
-		}
-		else if (canMatchKeyword (&cp, "context"))
-		{
-			readAndEmitTag (&cp, K_CONTEXT);
 		}
 		while (*cp != '\0')
 		{
