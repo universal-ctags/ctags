@@ -1345,8 +1345,13 @@ static boolean findScopeHierarchy (vString *const string, const statementInfo *c
 	boolean found = FALSE;
 
 	vStringClear (string);
+
 	if (isType (st->context, TOKEN_NAME))
+	{
 		vStringCopy (string, st->context->name);
+		found = TRUE;
+	}
+
 	if (st->parent != NULL)
 	{
 		vString *temp = vStringNew ();

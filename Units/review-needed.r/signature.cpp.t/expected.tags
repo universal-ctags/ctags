@@ -1,4 +1,0 @@
-a	input.cpp	/^int bar (a, b) int a; char b; {}$/;"	v
-b	input.cpp	/^int bar (a, b) int a; char b; {}$/;"	v
-bar	input.cpp	/^char *BAR::bar (char *c, double d[]) const {}$/;"	f	class:BAR
-foo	input.cpp	/^void foo (int a, char b) {}$/;"	f
