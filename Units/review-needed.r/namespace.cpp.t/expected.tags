@@ -1,5 +1,0 @@
-a	input.cpp	/^namespace a {$/;"	n	file:
-a_b_f	input.cpp	/^		void a_b_f() { }$/;"	f	namespace:a::b
-a_f	input.cpp	/^	void a_f() { }$/;"	f	namespace:a
-anon_f	input.cpp	/^	void anon_f() { }$/;"	f	namespace:__anon1
-b	input.cpp	/^	namespace b {$/;"	n	namespace:a	file:
