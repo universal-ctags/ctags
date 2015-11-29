@@ -13,7 +13,6 @@
 a.out
 autom4te.cache
 badinput
-_build
 commit-stamp
 config.h
 config.h.in
@@ -47,3 +46,4 @@ win32/*.suo
 win32/*.user
 win32/[Dd]ebug/
 win32/[Rr]elease/
+_build
