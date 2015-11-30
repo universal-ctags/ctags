@@ -505,7 +505,7 @@ static const char *implementationString (const impType imp)
 	static const char *const names [] ={
 		"?", "abstract", "deferred", "non_overridable"
 	};
-	Assert (sizeof (names) / sizeof (names [0]) == IMP_COUNT);
+	Assert (ARRAY_SIZE (names) == IMP_COUNT);
 	Assert ((int) imp < IMP_COUNT);
 	return names [(int) imp];
 }

@@ -218,7 +218,7 @@ static void emitRubyTag (vString* name, rubyKind kind)
 	initTagEntry (&tag, unqualified_name, &(RubyKinds [kind]));
 	if (vStringLength (scope) > 0) {
 		Assert (0 <= parent_kind &&
-		        (size_t) parent_kind < (sizeof RubyKinds / sizeof RubyKinds[0]));
+		        (size_t) parent_kind < (ARRAY_SIZE (RubyKinds)));
 
 		tag.extensionFields.scopeKind = &(RubyKinds [parent_kind]);
 		tag.extensionFields.scopeName = vStringValue (scope);

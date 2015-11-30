@@ -537,7 +537,7 @@ static void parseTexFile (tokenInfo *const token)
 
 static void initialize (const langType language)
 {
-	Assert (sizeof (TexKinds) / sizeof (TexKinds [0]) == TEXTAG_COUNT);
+	Assert (ARRAY_SIZE (TexKinds) == TEXTAG_COUNT);
 	Lang_js = language;
 
 	lastPart    = vStringNew();

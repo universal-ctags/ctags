@@ -448,7 +448,7 @@ static void printToken (const tokenInfo *const token)
 
 		case TOKEN_KEYWORD:
 		{
-			size_t n = sizeof PhpKeywordTable / sizeof PhpKeywordTable[0];
+			size_t n = ARRAY_SIZE (PhpKeywordTable);
 			size_t i;
 
 			fprintf (stderr, "\tkeyword:\t");
@@ -547,7 +547,7 @@ static void parseHeredoc (vString *const string)
 		quote = c;
 		c = fileGetc ();
 	}
-	for (len = 0; len < (sizeof delimiter / sizeof delimiter[0]) - 1; len++)
+	for (len = 0; len < ARRAY_SIZE (delimiter) - 1; len++)
 	{
 		if (! isIdentChar (c))
 			break;

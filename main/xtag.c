@@ -13,6 +13,7 @@
 #include "general.h"  /* must always come first */
 #include "debug.h"
 #include "main.h"
+#include "routines.h"
 #include "xtag.h"
 
 static boolean isPseudoTagsEnabled (xtagDesc *pdesc)
@@ -66,7 +67,7 @@ extern void printXtags (void)
 {
 	int i;
 
-	for (i = 0; i < sizeof (xtagDescs) / sizeof (xtagDescs [0]); i++)
+	for (i = 0; i < ARRAY_SIZE (xtagDescs); i++)
 		printXtag (i);
 }
 

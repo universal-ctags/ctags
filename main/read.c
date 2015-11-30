@@ -380,7 +380,7 @@ readnext:
 
 extern void fileUngetc (int c)
 {
-	const size_t len = sizeof File.ungetchBuf / sizeof File.ungetchBuf[0];
+	const size_t len = ARRAY_SIZE (File.ungetchBuf);
 
 	Assert (File.ungetchIdx < len);
 	/* we cannot rely on the assertion that might be disabled in non-debug mode */
