@@ -195,10 +195,6 @@ AC_ARG_ENABLE(macro-patterns,
 	[AS_HELP_STRING([--enable-macro-patterns],
 		[use patterns as default method to locate macros instead of line numbers])])
 
-AC_ARG_ENABLE(shell-globbing,
-	[AS_HELP_STRING([--enable-shell-globbing=DIR],
-		[does shell expand wildcards (yes|no)? [yes]])])
-
 AC_ARG_ENABLE(tmpdir,
 	[AS_HELP_STRING([--enable-tmpdir=DIR],
 		[default directory for temporary files [ARG=/tmp]])],
