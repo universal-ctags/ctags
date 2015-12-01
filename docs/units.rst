@@ -280,7 +280,7 @@ Categories
 
 With *.r* suffix, you can put test cases under a sub directory
 of *Units*. ``Units/parser-ada.r`` is an example. If *misc/units*
-test harness, the sub directory is called a category. ``parser-ada``
+test harness, the sub directory is called a category. ``parser-ada.r``
 is the name category in the above example.
 
 

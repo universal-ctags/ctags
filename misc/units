@@ -892,7 +892,6 @@ action_run ()
 	[ -d "$d" ] || continue
 	category="${d##*/}"
 	build_d=${build_dir}/${category}
-	category="${category%.r}"
 	run_dir "${category}" "$d" "${build_d}"
     done
 
