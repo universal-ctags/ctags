@@ -35,9 +35,6 @@ AH_TEMPLATE([HAVE_STAT_ST_INO],
 	<sys/stat.h>.])
 AH_TEMPLATE([remove],
 	[Define remove to unlink if you have unlink(), but not remove().])
-AH_TEMPLATE([SEEK_SET],
-	[Define this value used by fseek() appropriately if <stdio.h>
-	(or <unistd.h> on SunOS 4.1.x) does not define them.])
 AH_TEMPLATE([INT_MAX],
 	[Define as the maximum integer on your system if not defined <limits.h>.])
 AH_TEMPLATE([CUSTOM_CONFIGURATION_FILE],
@@ -76,9 +73,6 @@ AH_TEMPLATE([TMPDIR],
 AH_TEMPLATE([CHECK_REGCOMP],
 	[Define this label if you wish to check the regcomp() function at run time
 	for correct behavior. This function is currently broken on Cygwin.])
-AH_TEMPLATE([__USE_FIXED_PROTOTYPES__],
-	[This corrects the problem of missing prototypes for certain functions
-	in some GNU installations (e.g. SunOS 4.1.x).])
 AH_TEMPLATE([NON_CONST_PUTENV_PROTOTYPE],
 	[Define this is you have a prototype for putenv() in <stdlib.h>, but
 	doesn't declare its argument as "const char *".])
@@ -320,17 +314,6 @@ case `uname` in
 			AC_MSG_RESULT(no)
 		fi
 		;;
-	SunOS)
-		if uname -r | grep '5\.' >/dev/null 2>&1; then
-			AC_MSG_CHECKING(Solaris native compiler)
-			if test "$CC" = "cc" -a "`which cc`" = "/usr/ucb/cc"; then
-				AC_MSG_RESULT(yes; adding compiler option for ANSI support)
-				CC="$CC -Xa"
-			else
-				AC_MSG_RESULT(no)
-			fi
-		fi
-		;;
 esac
 
 if test "${with_sparse_cgcc}" = "yes"; then
@@ -533,13 +516,6 @@ AC_CHECK_FUNCS(strstr)
 AC_CHECK_FUNCS(strcasecmp stricmp, break)
 AC_CHECK_FUNCS(strncasecmp strnicmp, break)
 AC_CHECK_FUNCS(fgetpos, have_fgetpos=yes)
-
-# SEEK_SET should be in stdio.h, but may be in unistd.h on SunOS 4.1.x
-if test "$have_fgetpos" != yes ; then
-	CHECK_HEADER_DEFINE(SEEK_SET, stdio.h,,
-		CHECK_HEADER_DEFINE(SEEK_SET, unistd.h,,
-			AC_DEFINE(SEEK_SET, 0)))
-fi
 
 AC_CHECK_FUNCS(mkstemp, have_mkstemp=yes)
 if test "$have_mkstemp" != yes ; then
