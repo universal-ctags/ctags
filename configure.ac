@@ -304,18 +304,6 @@ fi
 
 AC_PROG_CC
 
-case `uname` in
-	HP-UX)
-		AC_MSG_CHECKING(HP-UX native compiler)
-		if test "$CC" = "cc"; then
-			AC_MSG_RESULT(yes; adding compiler options for ANSI support)
-			CFLAGS="$CFLAGS -Aa -D_HPUX_SOURCE"
-		else
-			AC_MSG_RESULT(no)
-		fi
-		;;
-esac
-
 if test "${with_sparse_cgcc}" = "yes"; then
 	REAL_CC="${CC}"
 	CC="cgcc"
