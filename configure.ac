@@ -9,6 +9,7 @@
 AC_PREREQ([2.59])
 AC_INIT([ctags],[universal])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
+AM_SILENT_RULES([yes])
 AC_CONFIG_HEADERS([config.h])
 if ! test -e "${srcdir}/config.h.in"; then
    echo "---"
