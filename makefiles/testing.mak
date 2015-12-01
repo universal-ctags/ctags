@@ -2,16 +2,6 @@
 
 check: tmain units
 
-ifdef VG
-VALGRIND=--with-valgrind
-endif
-ifdef TRAVIS
-SHOW_DIFF_OUTPUT=--show-diff-output
-endif
-ifdef APPVEYOR
-SHOW_DIFF_OUTPUT=--show-diff-output
-endif
-
 CTAGS_TEST = ./ctags$(EXEEXT)
 READ_TEST = ./$(READ_CMD)
 TIMEOUT=
@@ -27,12 +17,15 @@ UNITS=
 fuzz: TIMEOUT := $(shell timeout --version > /dev/null 2>&1 && echo 1 || echo 0)
 fuzz: $(CTAGS_TEST)
 	@ \
+	if test x$(VG) = x1; then		\
+		VALGRIND=--with-valgrind;	\
+	fi;					\
 	c="$(srcdir)/misc/units fuzz \
 		--ctags=$(CTAGS_TEST) \
 		--languages=$(LANGUAGES) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) --run-shrink \
+		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
 
@@ -41,12 +34,15 @@ fuzz: $(CTAGS_TEST)
 #
 noise: $(CTAGS_TEST)
 	@ \
+	if test x$(VG) = x1; then		\
+		VALGRIND=--with-valgrind;	\
+	fi;					\
 	c="$(srcdir)/misc/units noise \
 		--ctags=$(CTAGS_TEST) \
 		--languages=$(LANGUAGES) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) --run-shrink \
+		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
 
@@ -55,12 +51,15 @@ noise: $(CTAGS_TEST)
 #
 chop: $(CTAGS_TEST)
 	@ \
+	if test x$(VG) = x1; then		\
+		VALGRIND=--with-valgrind;	\
+	fi;					\
 	c="$(srcdir)/misc/units chop \
 		--ctags=$(CTAGS_TEST) \
 		--languages=$(LANGUAGES) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) --run-shrink \
+		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
 	$(SHELL) $${c} $(srcdir)/Units
 
@@ -70,6 +69,12 @@ chop: $(CTAGS_TEST)
 units: TIMEOUT := $(shell timeout --version > /dev/null 2>&1 && echo 5 || echo 0)
 units: $(CTAGS_TEST)
 	@ \
+	if test x$(VG) = x1; then		\
+		VALGRIND=--with-valgrind;	\
+	fi;					\
+	if test x$(TRAVIS) = x1 || test x$(APPVEYOR) = x1; then	\
+		SHOW_DIFF_OUTPUT=--show-diff-output;		\
+	fi;							\
 	builddir=$$(pwd); \
 	mkdir -p $${builddir}/Units && \
 	\
@@ -80,9 +85,9 @@ units: $(CTAGS_TEST)
 		--units=$(UNITS) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) --run-shrink \
+		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT) \
-		$(SHOW_DIFF_OUTPUT)"; \
+		$${SHOW_DIFF_OUTPUT}"; \
 	 $(SHELL) $${c} $(srcdir)/Units $${builddir}/Units
 
 clean-units:
@@ -96,6 +101,12 @@ clean-units:
 tmain: $(CTAGS_TEST)
 	@ \
 	\
+	if test x$(VG) = x1; then		\
+		VALGRIND=--with-valgrind;	\
+	fi;					\
+	if test x$(TRAVIS) = x1 || test x$(APPVEYOR) = x1; then	\
+		SHOW_DIFF_OUTPUT=--show-diff-output;		\
+	fi;							\
 	builddir=$$(pwd); \
 	mkdir -p $${builddir}/Tmain && \
 	\
@@ -103,8 +114,8 @@ tmain: $(CTAGS_TEST)
 		--ctags=$(CTAGS_TEST) \
 		--datadir=$(srcdir)/data \
 		--libexecdir=$(srcdir)/libexec \
-		$(VALGRIND) \
-		$(SHOW_DIFF_OUTPUT)"; \
+		$${VALGRIND} \
+		$${SHOW_DIFF_OUTPUT}"; \
 	 $(SHELL) $${c} $(srcdir)/Tmain $${builddir}/Tmain
 
 clean-tmain:
