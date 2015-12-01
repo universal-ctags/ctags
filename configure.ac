@@ -587,27 +587,6 @@ AC_DEFINE(HAVE_REGCOMP)
 ])
 AC_SUBST([REGCOMP_CPPFLAGS])
 
-# if test yes = "$with_perl_regex"; then
-# 	AC_MSG_CHECKING(for Perl regex library)
-# 	pcre_candidates="$with_perl_regex $HOME/local/lib* /usr*/local/lib* /usr/lib*"
-# 	for lib in $pcre_candidates; do
-# 		if test -f $lib/libpcreposix.so; then
-# 			pcre_lib="-L$lib -lpcreposix"
-# 			break
-# 		elif test -f $lib/libpcreposix.a; then
-# 			pcre_lib="$lib/libpcreposix.a"
-# 			break
-# 		fi
-# 	done
-# 	if test -z "$pcre_lib"; then
-# 		AC_MSG_RESULT(not found)
-# 	else
-# 		AC_MSG_RESULT($lib)
-# 		AC_DEFINE(HAVE_REGCOMP)
-# 		LDFLAGS="$LDFLAGS $pcre_lib"
-# 		have_regex=yes
-# 	fi
-# fi
 AC_CHECK_FUNCS(scandir,[install_data_targets="install-data-optlib install-data-preload"])
 AC_SUBST(install_data_targets)
 
