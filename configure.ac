@@ -495,9 +495,10 @@ PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 # ----------------------------
 AC_CHECK_FUNCS(fnmatch,[],[
 AC_LIBOBJ([fnmatch])
-CPPFLAGS="$CPPFLAGS -I${srcdir}/fnmatch"
+FNMATCH_CPPFLAGS="-I${srcdir}/fnmatch"
 AC_DEFINE(HAVE_FNMATCH)
 ])
+AC_SUBST([FNMATCH_CPPFLAGS])
 AC_CHECK_HEADERS(fnmatch.h)
 
 AC_CHECK_FUNCS(strstr)
@@ -581,9 +582,11 @@ fi
 ],[
 dnl Using bundled regex implementation
 AC_LIBOBJ([regex])
-CPPFLAGS="$CPPFLAGS -I${srcdir}/gnu_regex"
+REGCOMP_CPPFLAGS="-I${srcdir}/gnu_regex"
 AC_DEFINE(HAVE_REGCOMP)
 ])
+AC_SUBST([REGCOMP_CPPFLAGS])
+
 # if test yes = "$with_perl_regex"; then
 # 	AC_MSG_CHECKING(for Perl regex library)
 # 	pcre_candidates="$with_perl_regex $HOME/local/lib* /usr*/local/lib* /usr/lib*"
