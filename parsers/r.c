@@ -60,7 +60,7 @@ static void createRTags (void)
 	int ikind;
 	const unsigned char *line;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char *cp = (const unsigned char *) line;
 
@@ -139,7 +139,7 @@ static void createRTags (void)
 						 * I don't know if there is a reason to write the function keyword
 						 * in a new line
 						 */
-						if ((line = fileReadLine ()) != NULL)
+						if ((line = readLineFromInputFile ()) != NULL)
 						{
 							cp = (const unsigned char *) line;
 							SKIPSPACE (cp);

@@ -31,19 +31,21 @@
 /*
 *   MACROS
 */
-#define getInputLineNumber()     File.lineNumber
-#define getInputFileName()       vStringValue (File.name)
+#define getInputLineNumber()     File.input.lineNumber
+#define getInputFileName()       vStringValue (File.input.name)
 #define getInputFilePosition()   File.filePosition
-#define getSourceFileName()      vStringValue (File.source.name)
-#define getSourceFileTagPath()   File.source.tagPath
-#define getSourceLanguage()      File.source.language
+#define getInputLanguage()       File.input.language
+#define getInputLanguageName()   getLanguageName (File.input.language)
+#define getInputFileTagPath()    vStringValue (File.input.tagPath)
+#define isInputLanguage(lang)         (boolean)((lang) == File.input.language)
+#define isInputHeaderFile()           File.input.isHeader
+#define isInputLanguageKindEnabled(c)  isLanguageKindEnabled (File.input.language, c)
+#define doesInputLanguageAllowNullTag() doesLanguageAllowNullTag (File.input.language)
+#define getInputLanguageFileKind()  getLanguageFileKind (File.input.language)
+
+#define getSourceFileTagPath()   vStringValue (File.source.tagPath)
 #define getSourceLanguageName()  getLanguageName (File.source.language)
-#define getSourceLanguageFileKind()  getLanguageFileKind (File.source.language)
-#define getSourceLanguageAllowNullTag() getLanguageAllowNullTag (File.source.language)
 #define getSourceLineNumber()    File.source.lineNumber
-#define isLanguage(lang)         (boolean)((lang) == File.source.language)
-#define isHeaderFile()           File.source.isHeader
-#define isSourceLanguageKindEnabled(c)  isLanguageKindEnabled (File.source.language, c)
 
 /*
 *   DATA DECLARATIONS
@@ -68,32 +70,41 @@ enum eCharacters {
 	CHAR_SYMBOL   = ('C' + 0xff)
 };
 
-/*  Maintains the state of the current source file.
+/*  Maintains the state of the current input file.
  */
+typedef struct sInputFileInfo {
+	vString *name;           /* name to report for input file */
+	vString *tagPath;        /* path of input file relative to tag file */
+	unsigned long lineNumber;/* line number in the input file */
+	boolean  isHeader;       /* is input file a header file? */
+	langType language;       /* language of input file */
+} inputFileInfo;
+
 typedef struct sInputFile {
-	vString    *name;          /* name of input file */
 	vString    *path;          /* path of input file (if any) */
 	vString    *line;          /* last line read from file */
 	const unsigned char* currentLine;  /* current line being worked on */
 	FILE       *fp;            /* stream used for reading the file */
-	unsigned long lineNumber;  /* line number in the input file */
 	fpos_t      filePosition;  /* file position of current line */
 	unsigned int ungetchIdx;
 	int         ungetchBuf[3]; /* characters that were ungotten */
 	boolean     eof;           /* have we reached the end of file? */
 	boolean     newLine;       /* will the next character begin a new line? */
 
-	/*  Contains data pertaining to the original source file in which the tag
-	 *  was defined. This may be different from the input file when #line
+	/*  Contains data pertaining to the original `source' file in which the tag
+	 *  was defined. This may be different from the `input' file when #line
 	 *  directives are processed (i.e. the input file is preprocessor output).
 	 */
-	struct sSource {
-		vString *name;           /* name to report for source file */
-		char    *tagPath;        /* path of source file relative to tag file */
-		unsigned long lineNumber;/* line number in the source file */
-		boolean  isHeader;       /* is source file a header file? */
-		langType language;       /* language of source file */
-	} source;
+	inputFileInfo input; /* name, lineNumber */
+	inputFileInfo source;
+
+	/* sourceTagPathHolder is a kind of trash box.
+	   The buffer pointed by tagPath field of source field can
+	   be referred from tagsEntryInfo instances. sourceTagPathHolder
+	   is used keeping the buffer till all processing about the current
+	   input file is done. After all processing is done, the buffers
+	   in sourceTagPathHolder are destroied. */
+	stringList  * sourceTagPathHolder;
 } inputFile;
 
 /*
@@ -104,18 +115,25 @@ extern CONST_FILE inputFile File;
 /*
 *   FUNCTION PROTOTYPES
 */
-extern void freeSourceFileResources (void);
-extern boolean fileOpen (const char *const fileName, const langType language);
-extern boolean fileEOF (void);
-extern void fileClose (void);
-extern int fileGetc (void);
-extern int fileSkipToCharacter (int c);
-extern void fileUngetc (int c);
-extern const unsigned char *fileReadLine (void);
-extern char *readLine (vString *const vLine, FILE *const fp);
-extern char *readSourceLine (vString *const vLine, fpos_t location, long *const pSeekValue);
-extern char *readSourceLineSlow (vString *const vLine, unsigned long lineNumber, const char *pattern, long *const pSeekValue);
-extern char* readLineWithNoSeek (vString *const vline, FILE *const pp);
+
+/* InputFile: reading from fp in inputFile with updating fields in input fields */
+extern void                 freeInputFileResources (void);
+extern boolean              openInputFile (const char *const fileName, const langType language);
+extern void                 closeInputFile (void);
+extern int                  getcFromInputFile (void);
+extern int                  skipToCharacterInInputFile (int c);
+extern void                 ungetcToInputFile (int c);
+extern const unsigned char *readLineFromInputFile (void);
+
+/* Raw: reading from given a parameter, fp */
+extern char *readLineRaw           (vString *const vLine, FILE *const fp);
+extern char* readLineRawWithNoSeek (vString *const vline, FILE *const pp);
+
+/* Bypass: reading from fp in inputFile WITHOUT updating fields in input fields */
+extern char *readLineFromBypass (vString *const vLine, fpos_t location, long *const pSeekValue);
+extern char *readLineFromBypassSlow (vString *const vLine, unsigned long lineNumber,
+				     const char *pattern, long *const pSeekValue);
+
 
 #endif  /* CTAGS_MAIN_READ_H */
 

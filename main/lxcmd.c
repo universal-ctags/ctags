@@ -96,16 +96,16 @@ typedef struct {
 		/* name of tag */
 	const char *name;
 
-		/* path of source file containing definition of tag */
+		/* path of input file containing definition of tag */
 	const char *file;
 
-		/* address for locating tag in source file */
+		/* address for locating tag in input file */
 	struct {
-			/* pattern for locating source line
+			/* pattern for locating input line
 			 * (may be NULL if not present) */
 		const char *pattern;
 
-			/* line number in source file of tag definition
+			/* line number in input file of tag definition
 			 * (may be zero if not known) */
 		unsigned long lineNumber;
 	} address;
@@ -347,7 +347,7 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 	{
 		vString* vline = vStringNew();
 
-		while (readLineWithNoSeek (vline, pp))
+		while (readLineRawWithNoSeek (vline, pp))
 		{
 			char* line;
 			char  kind_letter;
@@ -823,7 +823,7 @@ static boolean parseExtensionFields (tagEntry *const entry, char *const string, 
 						entry->kind = lookupKindFromLetter (path, field[0]);
 						if (entry->kind == NULL)
 						{
-							kindOption *fileKind = getSourceLanguageFileKind ();
+							kindOption *fileKind = getInputLanguageFileKind ();
 							if (fileKind && fileKind->letter == field[0])
 								/* ctags will make a tag for file. */
 								goto reject;
@@ -855,7 +855,7 @@ static boolean parseExtensionFields (tagEntry *const entry, char *const string, 
 							entry->kind = lookupKindFromName (path, value);
 							if (entry->kind == NULL)
 							{
-								kindOption *fileKind = getSourceLanguageFileKind ();
+								kindOption *fileKind = getInputLanguageFileKind ();
 								if (fileKind && (strcmp(fileKind->name, value) == 0))
 									/* ctags will make a tag for file. */
 									goto reject;
@@ -1038,7 +1038,10 @@ static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 			  filePosition,
 			  entry->file,
 			  entry->kind,
-			  ROLE_INDEX_DEFINITION);
+			  ROLE_INDEX_DEFINITION,
+			  NULL,
+			  NULL,
+			  0);
 
 	tag.pattern = entry->address.pattern;
 
@@ -1112,7 +1115,7 @@ static boolean invokeXcmdPath (const char* const fileName, xcmdPath* path, const
 		vString* vline = vStringNew();
 		int status;
 
-		while (readLineWithNoSeek (vline, pp))
+		while (readLineRawWithNoSeek (vline, pp))
 		{
 			char* line;
 			tagEntry entry;

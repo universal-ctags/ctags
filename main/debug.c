@@ -86,7 +86,7 @@ extern void debugEntry (const tagEntryInfo *const tag)
 			printf (" [inherits:%s]", tag->extensionFields.inheritance);
 
 		if (getFieldDesc (FIELD_FILE_SCOPE)->enabled &&
-				tag->isFileScope && ! isHeaderFile ())
+				tag->isFileScope && ! isInputHeaderFile ())
 			printf (" [file:]");
 
 		if (getFieldDesc (FIELD_ACCESS)->enabled &&
@@ -114,12 +114,12 @@ extern void debugAssert (const char *assertion, const char *file, unsigned int l
 	        file, line,
 	        function ? function : "", function ? ": " : "",
 	        assertion);
-	if (File.name)
+	if (File.input.name)
 	{
 		fprintf(stderr, "ctags: %s:%u: parsing %s:%lu as %s\n",
 		        file, line,
-		        getSourceFileName(), getSourceLineNumber(),
-		        getSourceLanguageName());
+		        getInputFileName(), getInputLineNumber(),
+		        getInputLanguageName());
 	}
 	fflush(stderr);
 	abort();

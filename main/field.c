@@ -25,8 +25,8 @@
 #include "routines.h"
 
 static const char *renderFieldName (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldSource (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldCompactSourceLine (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldInput (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldSignature (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldScope (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldTyperef (const tagEntryInfo *const tag, vString* b);
@@ -65,15 +65,15 @@ static fieldDesc fieldDescs [] = {
 	DEFINE_BASIC_FIELD ('N', "name",     TRUE,
 			    "tag name(fixed field)",
 			    renderFieldName),
-	DEFINE_BASIC_FIELD ('F', "source",   TRUE,
-			    "source file(fixed field)",
-			    renderFieldSource),
+	DEFINE_BASIC_FIELD ('F', "input",   TRUE,
+			    "input file(fixed field)",
+			    renderFieldInput),
 	DEFINE_BASIC_FIELD ('P', "pattern",  TRUE,
 			    "pattern(fixed field)",
 			    renderFieldPattern),
 	DEFINE_FIELD ('C', "compact", FALSE,
-		      "compact source line(fixed field, only used in -x option)",
-		      renderFieldCompactSourceLine),
+		      "compact input line(fixed field, only used in -x option)",
+		      renderFieldCompactInputLine),
 
 	/* EXTENSION FIELDS */
 	DEFINE_FIELD ('a', "access",         FALSE,
@@ -92,7 +92,7 @@ static fieldDesc fieldDescs [] = {
 		      "Kind of tag as a single letter",
 		      renderFieldKindLetter),
 	DEFINE_FIELD ('l', "language",       FALSE,
-		      "Language of source file containing tag",
+		      "Language of input file containing tag",
 		      renderFieldLanguage),
 	DEFINE_FIELD ('m', "implementation", FALSE,
 		      "Implementation information",
@@ -231,7 +231,7 @@ static const char *renderEscapedName (const char* s,
 		{
 			notice("Unexpected character (0 < *c && *c < 0x20) included in a tagEntryInfo: %s", base);
 			notice("File: %s, Line: %lu, Lang: %s, Kind: %c",
-			       tag->sourceFileName, tag->lineNumber, tag->language, tag->kind->letter);
+			       tag->inputFileName, tag->lineNumber, tag->language, tag->kind->letter);
 			if (Option.fatalWarnings)
 				error (FATAL, "Aborting");
 			notice("Escape the character");
@@ -256,9 +256,13 @@ static const char *renderFieldName (const tagEntryInfo *const tag, vString* b)
 	return renderEscapedName (tag->name, tag, b);
 }
 
-static const char *renderFieldSource (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldInput (const tagEntryInfo *const tag, vString* b)
 {
-	return renderEscapedString (tag->sourceFileName, tag, b);
+	const char *f = tag->inputFileName;
+
+	if (Option.lineDirectives && tag->sourceFileName)
+		f = tag->sourceFileName;
+	return renderEscapedString (f, tag, b);
 }
 
 static const char *renderFieldSignature (const tagEntryInfo *const tag, vString* b)
@@ -301,7 +305,7 @@ extern const char* renderFieldEscaped (fieldDesc *fdesc,
 
 /*  Writes "line", stripping leading and duplicate white space.
  */
-static const char* renderCompactSourceLine (vString *b,  const char *const line)
+static const char* renderCompactInputLine (vString *b,  const char *const line)
 {
 	boolean lineStarted = FALSE;
 	const char *p;
@@ -336,18 +340,18 @@ static const char *renderFieldKindName (const tagEntryInfo *const tag, vString* 
 	return renderAsIs (b, tag->kind->name);
 }
 
-static const char *renderFieldCompactSourceLine (const tagEntryInfo *const tag,
+static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
 						 vString* b)
 {
 	const char *line;
 
-	line = readSourceLineAnyway (TagFile.vLine, tag, NULL);
+	line = readLineFromBypassAnyway (TagFile.vLine, tag, NULL);
 	if (line)
-		renderCompactSourceLine (b, line);
+		renderCompactInputLine (b, line);
 	else
 	{
 		/* If no associated line for tag is found, we cannot prepare
-		 * parameter to writeCompactSourceLine(). In this case we
+		 * parameter to writeCompactInputLine(). In this case we
 		 * use an empty string as LINE.
 		 */
 		vStringClear (b);
@@ -358,8 +362,12 @@ static const char *renderFieldCompactSourceLine (const tagEntryInfo *const tag,
 
 static const char *renderFieldLineNumber (const tagEntryInfo *const tag, vString* b)
 {
+	long ln = tag->lineNumber;
 	char buf[32] = {[0] = '\0'};
-	snprintf (buf, sizeof(buf), "%ld", tag->lineNumber);
+
+	if (Option.lineDirectives && (tag->sourceLineNumberDifference != 0))
+		ln += tag->sourceLineNumberDifference;
+	snprintf (buf, sizeof(buf), "%ld", ln);
 	vStringCatS (b, buf);
 	return vStringValue (b);
 }
@@ -383,7 +391,12 @@ static const char *renderFieldRole (const tagEntryInfo *const tag, vString* b)
 
 static const char *renderFieldLanguage (const tagEntryInfo *const tag, vString* b)
 {
-	return renderAsIs (b, WITH_DEFUALT_VALUE(tag->language));
+	const char *l = tag->language;
+
+	if (Option.lineDirectives && tag->sourceLanguage)
+		l = tag->sourceLanguage;
+
+	return renderAsIs (b, WITH_DEFUALT_VALUE(l));
 }
 
 static const char *renderFieldAccess (const tagEntryInfo *const tag, vString* b)

@@ -160,7 +160,7 @@ static void findSmlTags (void)
 	const unsigned char *line;
 	smlKind lastTag = K_NONE;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char *cp = skipSpace (line);
 		do

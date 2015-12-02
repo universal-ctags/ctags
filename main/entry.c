@@ -83,7 +83,7 @@ tagFile TagFile = {
     NULL,               /* tag file directory (absolute) */
     NULL,               /* file pointer */
     { 0, 0 },           /* numTags */
-    { 0, 0, 0 },        /* max */
+    { 0, 0 },        /* max */
     { NULL, NULL, 0 },  /* etags */
     NULL,                /* vLine */
     .cork = FALSE,
@@ -255,7 +255,7 @@ static long unsigned int updatePseudoTags (FILE *const fp)
 	Assert (entryLength < maxEntryLength);
 
 	fgetpos (fp, &startOfLine);
-	line = readLine (TagFile.vLine, fp);
+	line = readLineRaw (TagFile.vLine, fp);
 	while (line != NULL  &&  line [0] == entry [0])
 	{
 		++linesRead;
@@ -271,12 +271,12 @@ static long unsigned int updatePseudoTags (FILE *const fp)
 			}
 			fgetpos (fp, &startOfLine);
 		}
-		line = readLine (TagFile.vLine, fp);
+		line = readLineRaw (TagFile.vLine, fp);
 	}
 	while (line != NULL)  /* skip to end of file */
 	{
 		++linesRead;
-		line = readLine (TagFile.vLine, fp);
+		line = readLineRaw (TagFile.vLine, fp);
 	}
 	return linesRead;
 }
@@ -359,7 +359,7 @@ static boolean isTagFile (const char *const filename)
 		ok = TRUE;
 	else if (fp != NULL)
 	{
-		const char *line = readLine (TagFile.vLine, fp);
+		const char *line = readLineRaw (TagFile.vLine, fp);
 
 		if (line == NULL)
 			ok = TRUE;
@@ -593,17 +593,17 @@ extern void beginEtagsFile (void)
 	TagFile.etags.byteCount = 0;
 }
 
-extern void endEtagsFile (const char *const name)
+extern void endEtagsFile (const char *const filename)
 {
 	const char *line;
 
-	fprintf (TagFile.fp, "\f\n%s,%ld\n", name, (long) TagFile.etags.byteCount);
+	fprintf (TagFile.fp, "\f\n%s,%ld\n", filename, (long) TagFile.etags.byteCount);
 	abort_if_ferror (TagFile.fp);
 
 	if (TagFile.etags.fp != NULL)
 	{
 		rewind (TagFile.etags.fp);
-		while ((line = readLine (TagFile.vLine, TagFile.etags.fp)) != NULL)
+		while ((line = readLineRaw (TagFile.vLine, TagFile.etags.fp)) != NULL)
 			fputs (line, TagFile.fp);
 		fclose (TagFile.etags.fp);
 		remove (TagFile.etags.name);
@@ -622,7 +622,7 @@ extern void endEtagsFile (const char *const name)
  *  are doubled and a leading '^' or trailing '$' is also quoted. End of line
  *  characters (line feed or carriage return) are dropped.
  */
-static size_t appendSourceLine (int putc_func (char , void *), const char *const line, void * data, boolean *omitted)
+static size_t appendInputLine (int putc_func (char , void *), const char *const line, void * data, boolean *omitted)
 {
 	size_t length = 0;
 	const char *p;
@@ -697,15 +697,15 @@ static boolean isPosSet(fpos_t pos)
 	return r;
 }
 
-extern char *readSourceLineAnyway (vString *const vLine, const tagEntryInfo *const tag,
+extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo *const tag,
 				   long *const pSeekValue)
 {
 	char * line;
 
 	if (isPosSet (tag->filePosition) || (tag->pattern == NULL))
-		line = 	readSourceLine (vLine, tag->filePosition, pSeekValue);
+		line = 	readLineFromBypass (vLine, tag->filePosition, pSeekValue);
 	else
-		line = readSourceLineSlow (vLine, tag->lineNumber, tag->pattern, pSeekValue);
+		line = readLineFromBypassSlow (vLine, tag->lineNumber, tag->pattern, pSeekValue);
 
 	return line;
 }
@@ -777,7 +777,7 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 	{
 		long seekValue;
 		char *const line =
-				readSourceLineAnyway (TagFile.vLine, tag, &seekValue);
+				readLineFromBypassAnyway (TagFile.vLine, tag, &seekValue);
 		if (line == NULL)
 			return 0;
 
@@ -963,9 +963,9 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 	    && (memcmp (&tag->filePosition, &cached_location, sizeof(fpos_t)) == 0))
 		return puts_func (vStringValue (cached_pattern), output);
 
-	line = readSourceLine (TagFile.vLine, tag->filePosition, NULL);
+	line = readLineFromBypass (TagFile.vLine, tag->filePosition, NULL);
 	if (line == NULL)
-		error (FATAL, "bad tag in %s", vStringValue (File.name));
+		error (FATAL, "bad tag in %s", getInputFileName ());
 	if (tag->truncateLine)
 		truncateTagLine (line, tag->name, FALSE);
 
@@ -990,7 +990,7 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 
 	length += putc_func(searchChar, output);
 	length += putc_func('^', output);
-	length += appendSourceLine (putc_func, line, output, &omitted);
+	length += appendInputLine (putc_func, line, output, &omitted);
 	length += puts_func (omitted? "": terminator, output);
 	length += putc_func (searchChar, output);
 
@@ -1018,14 +1018,17 @@ static int writePatternEntry (const tagEntryInfo *const tag)
 
 static int writeLineNumberEntry (const tagEntryInfo *const tag)
 {
-	return fprintf (TagFile.fp, "%lu", tag->lineNumber);
+	if (Option.lineDirectives)
+		return fprintf (TagFile.fp, "%s", escapeName (tag, FIELD_LINE_NUMBER));
+	else
+		return fprintf (TagFile.fp, "%lu", tag->lineNumber);
 }
 
 static int writeCtagsEntry (const tagEntryInfo *const tag)
 {
 	int length = fprintf (TagFile.fp, "%s\t%s\t",
 			      escapeName (tag, FIELD_NAME),
-			      escapeName (tag, FIELD_SOURCE_FILE));
+			      escapeName (tag, FIELD_INPUT_FILE));
 
 	if (tag->lineNumberEntry)
 		length += writeLineNumberEntry (tag);
@@ -1051,7 +1054,7 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 	else if (!slot->lineNumberEntry)
 		slot->pattern = makePatternString (slot);
 
-	slot->sourceFileName = eStrdup (slot->sourceFileName);
+	slot->inputFileName = eStrdup (slot->inputFileName);
 	slot->name = eStrdup (slot->name);
 	if (slot->extensionFields.access)
 		slot->extensionFields.access = eStrdup (slot->extensionFields.access);
@@ -1069,13 +1072,18 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 		slot->extensionFields.typeRef[0] = eStrdup (slot->extensionFields.typeRef[0]);
 	if (slot->extensionFields.typeRef[1])
 		slot->extensionFields.typeRef[1] = eStrdup (slot->extensionFields.typeRef[1]);
+
+	if (slot->sourceLanguage)
+		slot->sourceLanguage = eStrdup (slot->sourceLanguage);
+	if (slot->sourceFileName)
+		slot->sourceFileName = eStrdup (slot->sourceFileName);
 }
 
 static void clearTagEntryInQueue (tagEntryInfo* slot)
 {
 	if (slot->pattern)
 		eFree ((char *)slot->pattern);
-	eFree ((char *)slot->sourceFileName);
+	eFree ((char *)slot->inputFileName);
 	eFree ((char *)slot->name);
 
 	if (slot->extensionFields.access)
@@ -1096,6 +1104,11 @@ static void clearTagEntryInQueue (tagEntryInfo* slot)
 		eFree ((char *)slot->extensionFields.typeRef[0]);
 	if (slot->extensionFields.typeRef[1])
 		eFree ((char *)slot->extensionFields.typeRef[1]);
+
+	if (slot->sourceLanguage)
+		eFree ((char *)slot->sourceLanguage);
+	if (slot->sourceFileName)
+		eFree ((char *)slot->sourceFileName);
 }
 
 
@@ -1200,17 +1213,17 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 {
 	int r = SCOPE_NIL;
 	Assert (tag->name != NULL);
-	Assert (getSourceLanguageFileKind() == tag->kind
-		|| ( isSourceLanguageKindEnabled (tag->kind->letter)
+	Assert (getInputLanguageFileKind() == tag->kind
+		|| ( isInputLanguageKindEnabled (tag->kind->letter)
                     && (tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION ))
 		|| (tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION
 		    && tag->kind->roles[tag->extensionFields.roleIndex].enabled ));
 
 	if (tag->name [0] == '\0' && (!tag->placeholder))
 	{
-		if (!getSourceLanguageAllowNullTag())
+		if (!doesInputLanguageAllowNullTag())
 			error (WARNING, "ignoring null tag in %s(line: %lu)",
-			       vStringValue (File.name), tag->lineNumber);
+			       getInputFileName (), tag->lineNumber);
 		goto out;
 	}
 
@@ -1226,42 +1239,51 @@ extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 			  const kindOption *kind)
 {
 	initTagEntryFull(e, name,
-			 getSourceLineNumber (),
-			 getSourceLanguageName (),
+			 getInputLineNumber (),
+			 getInputLanguageName (),
 			 getInputFilePosition (),
-			 getSourceFileTagPath (),
+			 getInputFileTagPath (),
 			 kind,
-			 ROLE_INDEX_DEFINITION);
+			 ROLE_INDEX_DEFINITION,
+			 getSourceFileTagPath(),
+			 getSourceLanguageName(),
+			 getSourceLineNumber() - getInputLineNumber ());
 }
 
 extern void initRefTagEntry (tagEntryInfo *const e, const char *const name,
 			     const kindOption *kind, int roleIndex)
 {
 	initTagEntryFull(e, name,
-			 getSourceLineNumber (),
-			 getSourceLanguageName (),
+			 getInputLineNumber (),
+			 getInputLanguageName (),
 			 getInputFilePosition (),
-			 getSourceFileTagPath (),
+			 getInputFileTagPath (),
 			 kind,
-			 roleIndex);
+			 roleIndex,
+			 getSourceFileTagPath(),
+			 getSourceLanguageName(),
+			 getSourceLineNumber() - getInputLineNumber ());
 }
 
 extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
 			      const char* language,
 			      fpos_t      filePosition,
-			      const char *sourceFileName,
+			      const char *inputFileName,
 			      const kindOption *kind,
-			      int roleIndex)
+			      int roleIndex,
+			      const char *sourceFileName,
+			      const char* sourceLanguage,
+			      long sourceLineNumberDifference)
 {
-	Assert (File.source.name != NULL);
+	Assert (File.input.name != NULL);
 
 	memset (e, 0, sizeof (tagEntryInfo));
 	e->lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
 	e->lineNumber      = lineNumber;
 	e->language        = language;
 	e->filePosition    = filePosition;
-	e->sourceFileName  = sourceFileName;
+	e->inputFileName   = inputFileName;
 	e->name            = name;
 	e->extensionFields.scopeIndex     = SCOPE_NIL;
 	e->kind = kind;
@@ -1269,6 +1291,10 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	Assert (roleIndex >= ROLE_INDEX_DEFINITION);
 	Assert (kind == NULL || roleIndex < kind->nRoles);
 	e->extensionFields.roleIndex = roleIndex;
+
+	e->sourceLanguage = sourceLanguage;
+	e->sourceFileName = sourceFileName;
+	e->sourceLineNumberDifference = sourceLineNumberDifference;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

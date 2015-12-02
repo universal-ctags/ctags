@@ -587,7 +587,7 @@ static void processLanguageRegex (const langType language,
 		else
 		{
 			vString* const regex = vStringNew ();
-			while (readLine (regex, fp))
+			while (readLineRaw (regex, fp))
 				addLanguageRegex (language, vStringValue (regex));
 			fclose (fp);
 			vStringDelete (regex);
@@ -754,7 +754,7 @@ extern void findRegexTagsMainloop (int (* driver)(void))
 
 static int fileReadLineDriver(void)
 {
-	return (fileReadLine () == NULL)? EOF: 1;
+	return (readLineFromInputFile () == NULL)? EOF: 1;
 }
 
 extern void findRegexTags (void)

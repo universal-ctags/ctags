@@ -394,7 +394,7 @@ static void findRubyTags (void)
 	*
 	* if you wished, and this function would fail to recognize anything.
 	*/
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char *cp = line;
 

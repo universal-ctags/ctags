@@ -38,7 +38,7 @@ typedef struct sTagFields {
  */
 typedef struct sTagEntryInfo {
 	unsigned int lineNumberEntry:1;  /* pattern or line number entry */
-	unsigned int isFileScope    :1;  /* is tag visible only within source file? */
+	unsigned int isFileScope    :1;  /* is tag visible only within input file? */
 	unsigned int isFileEntry    :1;  /* is this just an entry for a file name? */
 	unsigned int truncateLine   :1;  /* truncate tag line at end of tag name? */
 	unsigned int placeholder    :1;	 /* This is just a part of scope context.
@@ -46,11 +46,11 @@ typedef struct sTagEntryInfo {
 					    don't print it to tags file. */
 
 	unsigned long lineNumber;     /* line number of tag */
-	const char* pattern;	      /* pattern for locating source line
+	const char* pattern;	      /* pattern for locating input line
 				       * (may be NULL if not present) *//*  */
 	fpos_t      filePosition;     /* file position of line containing tag */
-	const char* language;         /* language of source file */
-	const char *sourceFileName;   /* name of source file */
+	const char* language;         /* language of input file */
+	const char *inputFileName;   /* name of input file */
 	const char *name;             /* name of the tag */
 	const kindOption *kind;	      /* kind descriptor */
 	struct {
@@ -75,6 +75,12 @@ typedef struct sTagEntryInfo {
 #define ROLE_INDEX_DEFINITION -1
 		int roleIndex; /* for role of reference tag */
 	} extensionFields;  /* list of extension fields*/
+
+	/* Following source* fields are used only when #line is found
+	   in input and --line-directive is given in ctags command line. */
+	const char* sourceLanguage;
+	const char *sourceFileName;
+	unsigned long sourceLineNumberDifference;
 } tagEntryInfo;
 
 /*  Maintains the state of the tag file.
@@ -84,7 +90,7 @@ typedef struct eTagFile {
 	char *directory;
 	FILE *fp;
 	struct sNumTags { unsigned long added, prev; } numTags;
-	struct sMax { size_t line, tag, file; } max;
+	struct sMax { size_t line, tag; } max;
 	struct sEtags {
 		char *name;
 		FILE *fp;
@@ -127,12 +133,15 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      unsigned long lineNumber,
 			      const char* language,
 			      fpos_t      filePosition,
-			      const char *sourceFileName,
+			      const char *inputFileName,
 			      const kindOption *kind,
-			      int roleIndex);
+			      int roleIndex,
+			      const char *sourceFileName,
+			      const char* sourceLanguage,
+			      long sourceLineNumberDifference);
 
 /* Getting line associated with tag */
-extern char *readSourceLineAnyway (vString *const vLine, const tagEntryInfo *const tag,
+extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo *const tag,
 				   long *const pSeekValue);
 
 /* Generating pattern associated tag, caller must do eFree for the returned value. */

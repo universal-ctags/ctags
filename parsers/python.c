@@ -327,7 +327,7 @@ static void parseClass (const char *cp, vString *const class,
 			if (*cp == '\0')
 			{
 				/* Closing parenthesis can be in follow up line. */
-				cp = (const char *) fileReadLine ();
+				cp = (const char *) readLineFromInputFile ();
 				if (!cp) break;
 				vStringPut (inheritance, ' ');
 				continue;
@@ -716,7 +716,7 @@ static void findPythonTags (void)
 	int line_skip = 0;
 	char const *longStringLiteral = NULL;
 
-	while ((line = (const char *) fileReadLine ()) != NULL)
+	while ((line = (const char *) readLineFromInputFile ()) != NULL)
 	{
 		const char *cp = line, *candidate;
 		char const *longstring;

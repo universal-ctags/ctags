@@ -4,7 +4,7 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
-*   This module contains functions for managing source languages and
+*   This module contains functions for managing input languages and
 *   dispatching files to the appropriate language parser.
 */
 
@@ -133,7 +133,7 @@ extern parserDefinition* parserNewFull (const char* name, char fileKind)
 	return result;
 }
 
-extern boolean getLanguageAllowNullTag (const langType language)
+extern boolean doesLanguageAllowNullTag (const langType language)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	return LanguageTable [language]->allowNullTag;
@@ -336,7 +336,7 @@ static vString* determineInterpreter (const char* const cmd)
 static vString* extractInterpreter (FILE* input)
 {
 	vString* const vLine = vStringNew ();
-	const char* const line = readLine (vLine, input);
+	const char* const line = readLineRaw (vLine, input);
 	vString* interpreter = NULL;
 
 	if (line != NULL  &&  line [0] == '#'  &&  line [1] == '!')
@@ -413,7 +413,7 @@ out:
 static vString* extractEmacsModeAtFirstLine(FILE* input)
 {
 	vString* const vLine = vStringNew ();
-	const char* const line = readLine (vLine, input);
+	const char* const line = readLineRaw (vLine, input);
 	vString* mode = NULL;
 	if (line != NULL)
 		mode = determineEmacsModeAtFirstLine (line);
@@ -435,7 +435,7 @@ static vString* determineEmacsModeAtEOF (FILE* const fp)
 	const char* p;
 	vString* mode = vStringNew ();
 
-	while ((line = readLine (vLine, fp)) != NULL)
+	while ((line = readLineRaw (vLine, fp)) != NULL)
 	{
 		if (headerFound && ((p = strstr (line, "mode:")) != NULL))
 		{
@@ -533,7 +533,7 @@ static vString* extractVimFileType(FILE* input)
 		ring[i] = vStringNew ();
 
 	i = 0;
-	while ((readLine (ring[i++], input)) != NULL)
+	while ((readLineRaw (ring[i++], input)) != NULL)
 		if (i == RING_SIZE)
 			i = 0;
 
@@ -590,7 +590,7 @@ static vString* determineZshAutoloadTag (const char *const modeline)
 static vString* extractZshAutoloadTag(FILE* input)
 {
 	vString* const vLine = vStringNew ();
-	const char* const line = readLine (vLine, input);
+	const char* const line = readLineRaw (vLine, input);
 	vString* mode = NULL;
 
 	if (line)
@@ -1653,7 +1653,7 @@ extern void makeFileTag (const char *const fileName)
 		tagEntryInfo tag;
 		kindOption  *kind;
 
-		kind = getSourceLanguageFileKind();
+		kind = getInputLanguageFileKind();
 		Assert (kind);
 		kind->enabled = isXtagEnabled(XTAG_FILE_NAMES);
 
@@ -1670,7 +1670,7 @@ extern void makeFileTag (const char *const fileName)
 		}
 		else
 		{
-			while (fileReadLine () != NULL)
+			while (readLineFromInputFile () != NULL)
 				;		/* Do nothing */
 			tag.lineNumber = getInputLineNumber ();
 		}
@@ -1685,7 +1685,7 @@ static rescanReason createTagsForFile (
 {
 	rescanReason rescan = RESCAN_NONE;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	if (fileOpen (fileName, language))
+	if (openInputFile (fileName, language))
 	{
 		parserDefinition *const lang = LanguageTable [language];
 
@@ -1704,7 +1704,7 @@ static rescanReason createTagsForFile (
 		if (LanguageTable [language]->useCork)
 			uncorkTagFile();
 
-		fileClose ();
+		closeInputFile ();
 	}
 
 	return rescan;
@@ -1747,13 +1747,13 @@ static boolean createTagsWithXcmd (
 {
 	boolean tagFileResized = FALSE;
 
-	if (fileOpen (fileName, language))
+	if (openInputFile (fileName, language))
 	{
 		tagFileResized = invokeXcmd (fileName, language);
 
 		/* TODO: File.lineNumber must be adjusted for the case
 		 *  Option.printTotals is non-zero. */
-		fileClose ();
+		closeInputFile ();
 	}
 
 	return tagFileResized;
@@ -1995,7 +1995,7 @@ static void createCTSTTags (void)
 	const unsigned char *line;
 	tagEntryInfo e;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		int c = line[0];
 

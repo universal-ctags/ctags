@@ -335,7 +335,7 @@ static tokenInfo *newToken (void)
 	token->keyword = KEYWORD_NONE;
 	token->string = vStringNew ();
 	token->scope = vStringNew ();
-	token->lineNumber = getSourceLineNumber ();
+	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	return token;
 }
@@ -359,12 +359,12 @@ static void parseString (vString * const string, const int delimiter)
 	boolean end = FALSE;
 	while (!end)
 	{
-		int c = fileGetc ();
+		int c = getcFromInputFile ();
 		if (c == EOF)
 			end = TRUE;
 		else if (c == '\\')
 		{
-			c = fileGetc ();	/* This maybe a ' or ". */
+			c = getcFromInputFile ();	/* This maybe a ' or ". */
 			vStringPut (string, c);
 		}
 		else if (c == delimiter)
@@ -384,11 +384,11 @@ static void parseIdentifier (vString * const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
 	if (!isspace (c))
-		fileUngetc (c);	/* unget non-identifier character */
+		ungetcToInputFile (c);	/* unget non-identifier character */
 }
 
 static void readToken (tokenInfo * const token)
@@ -402,8 +402,8 @@ static void readToken (tokenInfo * const token)
   getNextChar:
 	do
 	{
-		c = fileGetc ();
-		token->lineNumber = getSourceLineNumber ();
+		c = getcFromInputFile ();
+		token->lineNumber = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 	}
 	while (c == '\t' || c == ' ' || c == '\n');
@@ -433,20 +433,20 @@ static void readToken (tokenInfo * const token)
 	case '"':
 		token->type = TOKEN_STRING;
 		parseString (token->string, c);
-		token->lineNumber = getSourceLineNumber ();
+		token->lineNumber = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 		break;
 	case '-':
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		if (c == '-')	/* start of a comment */
 		{
-			fileSkipToCharacter ('\n');
+			skipToCharacterInInputFile ('\n');
 			goto getNextChar;
 		}
 		else
 		{
 			if (!isspace (c))
-				fileUngetc (c);
+				ungetcToInputFile (c);
 			token->type = TOKEN_OPERATOR;
 		}
 		break;
@@ -456,7 +456,7 @@ static void readToken (tokenInfo * const token)
 		else
 		{
 			parseIdentifier (token->string, c);
-			token->lineNumber = getSourceLineNumber ();
+			token->lineNumber = getInputLineNumber ();
 			token->filePosition = getInputFilePosition ();
 			token->keyword = analyzeToken (token->string, Lang_vhdl);
 			if (isKeyword (token, KEYWORD_NONE))
@@ -591,7 +591,7 @@ static void parseModule (tokenInfo * const token)
 	{
 		makeVhdlTag (name, VHDLTAG_COMPONENT);
 		skipToKeyword (KEYWORD_END);
-		fileSkipToCharacter (';');
+		skipToCharacterInInputFile (';');
 	}
 	else
 	{
@@ -600,7 +600,7 @@ static void parseModule (tokenInfo * const token)
 		{
 			makeVhdlTag (name, VHDLTAG_ENTITY);
 			skipToKeyword (KEYWORD_END);
-			fileSkipToCharacter (';');
+			skipToCharacterInInputFile (';');
 		}
 	}
 	deleteToken (name);
@@ -614,12 +614,12 @@ static void parseRecord (tokenInfo * const token)
 	do
 	{
 		readToken (token);	/* should be a colon */
-		fileSkipToCharacter (';');
+		skipToCharacterInInputFile (';');
 		makeVhdlTag (name, VHDLTAG_RECORD);
 		readToken (name);
 	}
 	while (!isKeyword (name, KEYWORD_END) && !isType (name, TOKEN_EOF));
-	fileSkipToCharacter (';');
+	skipToCharacterInInputFile (';');
 	deleteToken (name);
 }
 
@@ -661,7 +661,7 @@ static void parseConstant (boolean local)
 	{
 		makeVhdlTag (name, VHDLTAG_CONSTANT);
 	}
-	fileSkipToCharacter (';');
+	skipToCharacterInInputFile (';');
 	deleteToken (name);
 }
 
@@ -712,7 +712,7 @@ static void parseSubProgram (tokenInfo * const token)
 					readToken (token);
 					endSubProgram = isKeywordOrIdent (token,
 						KEYWORD_FUNCTION, name->string);
-					fileSkipToCharacter (';');
+					skipToCharacterInInputFile (';');
 				}
 				else
 				{
@@ -738,7 +738,7 @@ static void parseSubProgram (tokenInfo * const token)
 					readToken (token);
 					endSubProgram = isKeywordOrIdent (token,
 						KEYWORD_PROCEDURE, name->string);
-					fileSkipToCharacter (';');
+					skipToCharacterInInputFile (';');
 				}
 				else
 				{
@@ -764,7 +764,7 @@ static void parseKeywords (tokenInfo * const token, boolean local)
 	switch (token->keyword)
 	{
 	case KEYWORD_END:
-		fileSkipToCharacter (';');
+		skipToCharacterInInputFile (';');
 		break;
 	case KEYWORD_CONSTANT:
 		parseConstant (local);

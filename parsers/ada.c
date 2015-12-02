@@ -98,7 +98,7 @@
 #include <setjmp.h>
 
 #include "parse.h"      /* always include */
-#include "read.h"       /* to define file fileReadLine() */
+#include "read.h"       /* to define file readLineFromInputFile() */
 #include "entry.h"      /* for the tag entry manipulation */
 #include "routines.h"   /* for generic malloc/realloc/free routines */
 #include "options.h"    /* for the Option structure */
@@ -573,7 +573,7 @@ static void readNewLine(void)
 {
   while(TRUE)
   {
-    line = (const char *) fileReadLine();
+    line = (const char *) readLineFromInputFile();
     pos = 0;
 
     if(line == NULL)
@@ -670,7 +670,7 @@ static boolean adaCmp(const char *match)
   /* if we match, increment the position pointer */
   if(status == TRUE && match != NULL)
   {
-    matchLineNum = getSourceLineNumber();
+    matchLineNum = getInputLineNumber();
     matchFilePos = getInputFilePosition();
 
     movePos((strlen(match)));
@@ -696,7 +696,7 @@ static boolean adaKeywordCmp(adaKeyword keyword)
   /* if we match, increment the position pointer */
   if(status == TRUE)
   {
-    matchLineNum = getSourceLineNumber();
+    matchLineNum = getInputLineNumber();
     matchFilePos = getInputFilePosition();
 
     movePos((strlen(AdaKeywords[keyword])));
@@ -724,7 +724,7 @@ static void skipUntilWhiteSpace(void)
      * immediately */
     if(pos >= lineLen)
     {
-      line = (const char *) fileReadLine();
+      line = (const char *) readLineFromInputFile();
       pos = 0;
 
       if(line == NULL)
@@ -835,7 +835,7 @@ static void skipPastWord(void)
      * immediately */
     if(pos >= lineLen)
     {
-      line = (const char *) fileReadLine();
+      line = (const char *) readLineFromInputFile();
       pos = 0;
 
       if(line == NULL)
@@ -1189,7 +1189,7 @@ static adaTokenInfo *adaParseVariables(adaTokenInfo *parent, adaKind kind)
   /* before we start reading input save the current line number and file
    * position, so we can reconstruct the correct line & file position for any
    * tags we create */
-  lineNum = getSourceLineNumber();
+  lineNum = getInputLineNumber();
   filePos[filePosIndex] = getInputFilePosition();
 
   /* setup local buffer... Since we may have to read a few lines to verify

@@ -68,7 +68,7 @@ static int makeNamespaceTag (vString * const name, const char *dbp)
 	{
 		tagEntryInfo e;
 		initTagEntry (&e, vStringValue (name), &(ClojureKinds[K_NAMESPACE]));
-		e.lineNumber = getSourceLineNumber ();
+		e.lineNumber = getInputLineNumber ();
 		e.filePosition = getInputFilePosition ();
 
 		return makeTagEntry (&e);
@@ -84,7 +84,7 @@ static void makeFunctionTag (vString * const name, const char *dbp, int scope_in
 	{
 		tagEntryInfo e;
 		initTagEntry (&e, vStringValue (name), &(ClojureKinds[K_FUNCTION]));
-		e.lineNumber = getSourceLineNumber ();
+		e.lineNumber = getInputLineNumber ();
 		e.filePosition = getInputFilePosition ();
 
 		e.extensionFields.scopeIndex =  scope_index;
@@ -106,7 +106,7 @@ static void findClojureTags (void)
 	const char *p;
 	int scope_index = SCOPE_NIL;
 
-	while ((p = (char *)fileReadLine ()) != NULL)
+	while ((p = (char *)readLineFromInputFile ()) != NULL)
 	{
 		vStringClear (name);
 

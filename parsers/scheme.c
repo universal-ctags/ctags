@@ -58,7 +58,7 @@ static void findSchemeTags (void)
 	vString *name = vStringNew ();
 	const unsigned char *line;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char *cp = line;
 
@@ -74,7 +74,7 @@ static void findSchemeTags (void)
 				while (*cp != '\0' && (isspace (*cp) || *cp == '('))
 					cp++;
 				if (*cp == '\0')
-					cp = line = fileReadLine ();
+					cp = line = readLineFromInputFile ();
 				else
 					break;
 			} while (line);
@@ -96,7 +96,7 @@ static void findSchemeTags (void)
 				while (*cp != '\0' && isspace (*cp))
 					cp++;
 				if (*cp == '\0')
-					cp = line = fileReadLine ();
+					cp = line = readLineFromInputFile ();
 				else
 					break;
 			} while (line);

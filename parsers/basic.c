@@ -155,7 +155,7 @@ static void match_dot_label (char const *p)
 static void findBasicTags (void)
 {
 	const char *line;
-	const char *extension = fileExtension (vStringValue (File.name));
+	const char *extension = fileExtension (getInputFileName ());
 	KeyWord *keywords;
 
 	if (strcmp (extension, "bb") == 0)
@@ -165,7 +165,7 @@ static void findBasicTags (void)
 	else
 		keywords = freebasic_keywords;
 
-	while ((line = (const char *) fileReadLine ()) != NULL)
+	while ((line = (const char *) readLineFromInputFile ()) != NULL)
 	{
 		const char *p = line;
 		KeyWord const *kw;

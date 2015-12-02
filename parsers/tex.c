@@ -157,7 +157,7 @@ static tokenInfo *newToken (void)
 	token->keyword		= KEYWORD_NONE;
 	token->string		= vStringNew ();
 	token->scope		= vStringNew ();
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	return token;
@@ -284,12 +284,12 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 
 	vStringTerminate (string);
 	if (!isspace (c))
-		fileUngetc (c);		/* unget non-identifier character */
+		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
 static void readToken (tokenInfo *const token)
@@ -303,8 +303,8 @@ static void readToken (tokenInfo *const token)
 getNextChar:
 	do
 	{
-		c = fileGetc ();
-		token->lineNumber   = getSourceLineNumber ();
+		c = getcFromInputFile ();
+		token->lineNumber   = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\n');
@@ -327,13 +327,13 @@ getNextChar:
 				   * Check if the next character is an alpha character
 				   * else it is not a potential tex tag.
 				   */
-				  c = fileGetc ();
+				  c = getcFromInputFile ();
 				  if (! isalpha (c))
-					  fileUngetc (c);
+					  ungetcToInputFile (c);
 				  else
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getSourceLineNumber ();
+					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->keyword = analyzeToken (token->string, Lang_js);
 					  if (isKeyword (token, KEYWORD_NONE))
@@ -344,7 +344,7 @@ getNextChar:
 				  break;
 
 		case '%':
-				  fileSkipToCharacter ('\n'); /* % are single line comments */
+				  skipToCharacterInInputFile ('\n'); /* % are single line comments */
 				  goto getNextChar;
 				  break;
 
@@ -354,7 +354,7 @@ getNextChar:
 				  else
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getSourceLineNumber ();
+					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->type = TOKEN_IDENTIFIER;
 				  }

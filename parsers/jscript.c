@@ -188,7 +188,7 @@ static tokenInfo *newToken (void)
 	token->scope		= vStringNew ();
 	token->nestLevel	= 0;
 	token->ignoreTag	= FALSE;
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	return token;
@@ -342,7 +342,7 @@ static void parseString (vString *const string, const int delimiter)
 	boolean end = FALSE;
 	while (! end)
 	{
-		int c = fileGetc ();
+		int c = getcFromInputFile ();
 		if (c == EOF)
 			end = TRUE;
 		else if (c == '\\')
@@ -353,14 +353,14 @@ static void parseString (vString *const string, const int delimiter)
 			 * Also, handle the fact that <LineContinuation> produces an empty
 			 * sequence.
 			 * See ECMA-262 7.8.4 */
-			c = fileGetc();
+			c = getcFromInputFile ();
 			if (c != '\r' && c != '\n')
 				vStringPut(string, c);
 			else if (c == '\r')
 			{
-				c = fileGetc();
+				c = getcFromInputFile();
 				if (c != '\n')
-					fileUngetc (c);
+					ungetcToInputFile (c);
 			}
 		}
 		else if (c == delimiter)
@@ -371,7 +371,7 @@ static void parseString (vString *const string, const int delimiter)
 			end = TRUE;
 			/* we don't want to eat the newline itself to let the automatic
 			 * semicolon insertion code kick in */
-			fileUngetc (c);
+			ungetcToInputFile (c);
 		}
 		else
 			vStringPut (string, c);
@@ -386,18 +386,18 @@ static void parseRegExp (void)
 
 	do
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		if (! in_range && c == '/')
 		{
 			do /* skip flags */
 			{
-				c = fileGetc ();
+				c = getcFromInputFile ();
 			} while (isalpha (c));
-			fileUngetc (c);
+			ungetcToInputFile (c);
 			break;
 		}
 		else if (c == '\\')
-			c = fileGetc (); /* skip next character */
+			c = getcFromInputFile (); /* skip next character */
 		else if (c == '[')
 			in_range = TRUE;
 		else if (c == ']')
@@ -415,10 +415,10 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
-	fileUngetc (c);		/* unget non-identifier character */
+	ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
 static void parseTemplateString (vString *const string)
@@ -426,20 +426,20 @@ static void parseTemplateString (vString *const string)
 	int c;
 	do
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		if (c == '`')
 			break;
 		vStringPut (string, c);
 		if (c == '\\')
 		{
-			c = fileGetc();
+			c = getcFromInputFile();
 			vStringPut(string, c);
 		}
 		else if (c == '$')
 		{
-			c = fileGetc ();
+			c = getcFromInputFile ();
 			if (c != '{')
-				fileUngetc (c);
+				ungetcToInputFile (c);
 			else
 			{
 				int depth = 1;
@@ -488,14 +488,14 @@ getNextChar:
 	i = 0;
 	do
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		if (include_newlines && (c == '\r' || c == '\n'))
 			newline_encountered = TRUE;
 		i++;
 	}
 	while (c == '\t' || c == ' ' || c == '\r' || c == '\n');
 
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	if (repr)
@@ -523,12 +523,12 @@ getNextChar:
 		case '+':
 		case '-':
 			{
-				int d = fileGetc ();
+				int d = getcFromInputFile ();
 				if (d == c) /* ++ or -- */
 					token->type = TOKEN_POSTFIX_OPERATOR;
 				else
 				{
-					fileUngetc (d);
+					ungetcToInputFile (d);
 					token->type = TOKEN_BINARY_OPERATOR;
 				}
 				break;
@@ -549,7 +549,7 @@ getNextChar:
 		case '"':
 				  token->type = TOKEN_STRING;
 				  parseString (token->string, c);
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  if (repr)
 				  {
@@ -561,7 +561,7 @@ getNextChar:
 		case '`':
 				  token->type = TOKEN_TEMPLATE_STRING;
 				  parseTemplateString (token->string);
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  if (repr)
 				  {
@@ -571,21 +571,21 @@ getNextChar:
 				  break;
 
 		case '\\':
-				  c = fileGetc ();
+				  c = getcFromInputFile ();
 				  if (c != '\\'  && c != '"'  &&  !isspace (c))
-					  fileUngetc (c);
+					  ungetcToInputFile (c);
 				  token->type = TOKEN_CHARACTER;
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
 		case '/':
 				  {
-					  int d = fileGetc ();
+					  int d = getcFromInputFile ();
 					  if ( (d != '*') &&		/* is this the start of a comment? */
 							  (d != '/') )		/* is a one line comment? */
 					  {
-						  fileUngetc (d);
+						  ungetcToInputFile (d);
 						  switch (LastTokenType)
 						  {
 							  case TOKEN_CHARACTER:
@@ -601,7 +601,7 @@ getNextChar:
 							  default:
 								  token->type = TOKEN_REGEXP;
 								  parseRegExp ();
-								  token->lineNumber = getSourceLineNumber ();
+								  token->lineNumber = getInputLineNumber ();
 								  token->filePosition = getInputFilePosition ();
 								  break;
 						  }
@@ -614,21 +614,21 @@ getNextChar:
 						  {
 							  do
 							  {
-								  fileSkipToCharacter ('*');
-								  c = fileGetc ();
+								  skipToCharacterInInputFile ('*');
+								  c = getcFromInputFile ();
 								  if (c == '/')
 									  break;
 								  else
-									  fileUngetc (c);
+									  ungetcToInputFile (c);
 							  } while (c != EOF && c != '\0');
 							  goto getNextChar;
 						  }
 						  else if (d == '/')	/* is this the start of a comment?  */
 						  {
-							  fileSkipToCharacter ('\n');
+							  skipToCharacterInInputFile ('\n');
 							  /* if we care about newlines, put it back so it is seen */
 							  if (include_newlines)
-								  fileUngetc ('\n');
+								  ungetcToInputFile ('\n');
 							  goto getNextChar;
 						  }
 					  }
@@ -639,14 +639,14 @@ getNextChar:
 				  /* skip shebang in case of e.g. Node.js scripts */
 				  if (token->lineNumber > 1)
 					  token->type = TOKEN_UNDEFINED;
-				  else if ((c = fileGetc ()) != '!')
+				  else if ((c = getcFromInputFile ()) != '!')
 				  {
-					  fileUngetc (c);
+					  ungetcToInputFile (c);
 					  token->type = TOKEN_UNDEFINED;
 				  }
 				  else
 				  {
-					  fileSkipToCharacter ('\n');
+					  skipToCharacterInInputFile ('\n');
 					  goto getNextChar;
 				  }
 				  break;
@@ -657,7 +657,7 @@ getNextChar:
 				  else
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getSourceLineNumber ();
+					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->keyword = analyzeToken (token->string, Lang_js);
 					  if (isKeyword (token, KEYWORD_NONE))

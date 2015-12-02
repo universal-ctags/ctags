@@ -4,7 +4,7 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
-*   This module contains the high level source read functions (preprocessor
+*   This module contains the high level input read functions (preprocessor
 *   directives are handled within this level).
 */
 
@@ -185,7 +185,7 @@ extern void cppEndStatement (void)
 *   directives and may emit a tag for #define directives.
 */
 
-/*  This puts a character back into the input queue for the source File.
+/*  This puts a character back into the input queue for the input File.
  *  Up to two characters may be ungotten.
  */
 extern void cppUngetc (const int c)
@@ -205,10 +205,10 @@ static boolean readDirective (int c, char *const name, unsigned int maxLength)
 	{
 		if (i > 0)
 		{
-			c = fileGetc ();
+			c = getcFromInputFile ();
 			if (c == EOF  ||  ! isalpha (c))
 			{
-				fileUngetc (c);
+				ungetcToInputFile (c);
 				break;
 			}
 		}
@@ -228,8 +228,8 @@ static void readIdentifier (int c, vString *const name)
 	do
 	{
 		vStringPut (name, c);
-	} while (c = fileGetc (), (c != EOF  &&  isident (c)));
-	fileUngetc (c);
+	} while (c = getcFromInputFile (), (c != EOF  &&  isident (c)));
+	ungetcToInputFile (c);
 	vStringTerminate (name);
 }
 
@@ -239,7 +239,7 @@ static void readFilename (int c, vString *const name)
 
 	vStringClear (name);
 
-	while (c = fileGetc (), (c != EOF && c != c_end && c != '\n'))
+	while (c = getcFromInputFile (), (c != EOF && c != c_end && c != '\n'))
 		vStringPut (name, c);
 
 	vStringTerminate (name);
@@ -337,7 +337,7 @@ static boolean popConditional (void)
 
 static void makeDefineTag (const char *const name, boolean undef)
 {
-	const boolean isFileScope = (boolean) (! isHeaderFile ());
+	const boolean isFileScope = (boolean) (! isInputHeaderFile ());
 
 	if (!Cpp.defineMacroKind)
 		return;
@@ -414,7 +414,7 @@ static void directivePragma (int c)
 			/* generate macro tag for weak name */
 			do
 			{
-				c = fileGetc ();
+				c = getcFromInputFile ();
 			} while (c == SPACE);
 			if (isident1 (c))
 			{
@@ -515,7 +515,7 @@ static boolean handleDirective (const int c)
 static Comment isComment (void)
 {
 	Comment comment;
-	const int next = fileGetc ();
+	const int next = getcFromInputFile ();
 
 	if (next == '*')
 		comment = COMMENT_C;
@@ -525,7 +525,7 @@ static Comment isComment (void)
 		comment = COMMENT_D;
 	else
 	{
-		fileUngetc (next);
+		ungetcToInputFile (next);
 		comment = COMMENT_NONE;
 	}
 	return comment;
@@ -536,15 +536,15 @@ static Comment isComment (void)
  */
 int skipOverCComment (void)
 {
-	int c = fileGetc ();
+	int c = getcFromInputFile ();
 
 	while (c != EOF)
 	{
 		if (c != '*')
-			c = fileGetc ();
+			c = getcFromInputFile ();
 		else
 		{
-			const int next = fileGetc ();
+			const int next = getcFromInputFile ();
 
 			if (next != '/')
 				c = next;
@@ -564,10 +564,10 @@ static int skipOverCplusComment (void)
 {
 	int c;
 
-	while ((c = fileGetc ()) != EOF)
+	while ((c = getcFromInputFile ()) != EOF)
 	{
 		if (c == BACKSLASH)
-			fileGetc ();  /* throw away next character, too */
+			getcFromInputFile ();  /* throw away next character, too */
 		else if (c == NEWLINE)
 			break;
 	}
@@ -579,15 +579,15 @@ static int skipOverCplusComment (void)
  */
 static int skipOverDComment (void)
 {
-	int c = fileGetc ();
+	int c = getcFromInputFile ();
 
 	while (c != EOF)
 	{
 		if (c != '+')
-			c = fileGetc ();
+			c = getcFromInputFile ();
 		else
 		{
-			const int next = fileGetc ();
+			const int next = getcFromInputFile ();
 
 			if (next != '/')
 				c = next;
@@ -608,10 +608,10 @@ static int skipToEndOfString (boolean ignoreBackslash)
 {
 	int c;
 
-	while ((c = fileGetc ()) != EOF)
+	while ((c = getcFromInputFile ()) != EOF)
 	{
 		if (c == BACKSLASH && ! ignoreBackslash)
-			fileGetc ();  /* throw away next character, too */
+			getcFromInputFile ();  /* throw away next character, too */
 		else if (c == DOUBLE_QUOTE)
 			break;
 	}
@@ -627,16 +627,16 @@ static int skipToEndOfChar (void)
 	int c;
 	int count = 0, veraBase = '\0';
 
-	while ((c = fileGetc ()) != EOF)
+	while ((c = getcFromInputFile ()) != EOF)
 	{
 	    ++count;
 		if (c == BACKSLASH)
-			fileGetc ();  /* throw away next character, too */
+			getcFromInputFile ();  /* throw away next character, too */
 		else if (c == SINGLE_QUOTE)
 			break;
 		else if (c == NEWLINE)
 		{
-			fileUngetc (c);
+			ungetcToInputFile (c);
 			break;
 		}
 		else if (Cpp.hasSingleQuoteLiteralNumbers)
@@ -645,7 +645,7 @@ static int skipToEndOfChar (void)
 				veraBase = c;
 			else if (veraBase != '\0'  &&  ! isalnum (c))
 			{
-				fileUngetc (c);
+				ungetcToInputFile (c);
 				break;
 			}
 		}
@@ -673,7 +673,7 @@ extern int cppGetc (void)
 	}
 	else do
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 process:
 		switch (c)
 		{
@@ -727,7 +727,7 @@ process:
 				{
 					c = skipOverCplusComment ();
 					if (c == NEWLINE)
-						fileUngetc (c);
+						ungetcToInputFile (c);
 				}
 				else if (comment == COMMENT_D)
 					c = skipOverDComment ();
@@ -738,23 +738,23 @@ process:
 
 			case BACKSLASH:
 			{
-				int next = fileGetc ();
+				int next = getcFromInputFile ();
 
 				if (next == NEWLINE)
 					continue;
 				else
-					fileUngetc (next);
+					ungetcToInputFile (next);
 				break;
 			}
 
 			case '?':
 			{
-				int next = fileGetc ();
+				int next = getcFromInputFile ();
 				if (next != '?')
-					fileUngetc (next);
+					ungetcToInputFile (next);
 				else
 				{
-					next = fileGetc ();
+					next = getcFromInputFile ();
 					switch (next)
 					{
 						case '(':          c = '[';       break;
@@ -767,8 +767,8 @@ process:
 						case '-':          c = '~';       break;
 						case '=':          c = '#';       goto process;
 						default:
-							fileUngetc ('?');
-							fileUngetc (next);
+							ungetcToInputFile ('?');
+							ungetcToInputFile (next);
 							break;
 					}
 				}
@@ -780,32 +780,32 @@ process:
 			 */
 			case '<':
 			{
-				int next = fileGetc ();
+				int next = getcFromInputFile ();
 				switch (next)
 				{
 					case ':':	c = '['; break;
 					case '%':	c = '{'; break;
-					default: fileUngetc (next);
+					default: ungetcToInputFile (next);
 				}
 				goto enter;
 			}
 			case ':':
 			{
-				int next = fileGetc ();
+				int next = getcFromInputFile ();
 				if (next == '>')
 					c = ']';
 				else
-					fileUngetc (next);
+					ungetcToInputFile (next);
 				goto enter;
 			}
 			case '%':
 			{
-				int next = fileGetc ();
+				int next = getcFromInputFile ();
 				switch (next)
 				{
 					case '>':	c = '}'; break;
 					case ':':	c = '#'; goto process;
-					default: fileUngetc (next);
+					default: ungetcToInputFile (next);
 				}
 				goto enter;
 			}
@@ -813,7 +813,7 @@ process:
 			default:
 				if (c == '@' && Cpp.hasAtLiteralStrings)
 				{
-					int next = fileGetc ();
+					int next = getcFromInputFile ();
 					if (next == DOUBLE_QUOTE)
 					{
 						Cpp.directive.accept = FALSE;
@@ -821,7 +821,7 @@ process:
 						break;
 					}
 					else
-						fileUngetc (next);
+						ungetcToInputFile (next);
 				}
 			enter:
 				Cpp.directive.accept = FALSE;

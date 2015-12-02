@@ -83,17 +83,17 @@ static void findBetaTags (void)
 	boolean dovirtuals = BetaKinds [K_VIRTUAL].enabled;
 	boolean dopatterns = BetaKinds [K_PATTERN].enabled;
 
+	int c;
 	do
 	{
 		boolean foundfragmenthere = FALSE;
 		/* find fragment definition (line that starts and ends with --) */
 		int last;
 		int first;
-		int c;
 
 		vStringClear (line);
 
-		while ((c = fileGetc ()) != EOF && c != '\n' && c != '\r')
+		while ((c = getcFromInputFile ()) != EOF && c != '\n' && c != '\r')
 			vStringPut (line, c);
 
 		vStringTerminate (line);
@@ -299,7 +299,7 @@ static void findBetaTags (void)
 		}
 		endofline:
 		inquote = FALSE;  /* This shouldn't really make a difference */
-	} while (!feof (File.fp));
+	} while (c != EOF);
 	vStringDelete (line);
 }
 

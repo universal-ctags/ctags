@@ -259,7 +259,7 @@ static void findAsmTags (void)
 	const unsigned char *line;
 	boolean inCComment = FALSE;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char *cp = line;
 		boolean labelCandidate = (boolean) (! isspace ((int) *cp));

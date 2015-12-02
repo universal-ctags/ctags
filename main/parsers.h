@@ -6,7 +6,7 @@
 *
 *   External interface to all language parsing modules.
 *
-*   To add a new language parser, you need only modify this single source
+*   To add a new language parser, you need only modify this single input
 *   file to add the name of the parser definition function.
 */
 #ifndef CTAGS_MAIN_PARSERS_H

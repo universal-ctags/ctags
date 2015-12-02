@@ -12,3 +12,5 @@ int c;
 # 0 Not OK
 int d;
 
+# 100 OK.y
+int e;

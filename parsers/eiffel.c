@@ -264,7 +264,7 @@ static int skipToCharacter (const int c)
 
 	do
 	{
-		d = fileGetc ();
+		d = getcFromInputFile ();
 	} while (d != EOF  &&  d != c);
 
 	return d;
@@ -278,21 +278,21 @@ static vString *parseInteger (int c)
 	vString *string = vStringNew ();
 
 	if (c == '\0')
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	if (c == '-')
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	}
 	else if (! isdigit (c))
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	while (c != EOF  &&  (isdigit (c)  ||  c == '_'))
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	}
 	vStringTerminate (string);
-	fileUngetc (c);
+	ungetcToInputFile (c);
 
 	return string;
 }
@@ -304,14 +304,14 @@ static vString *parseNumeric (int c)
 	vStringCopy (string, integer);
 	vStringDelete (integer);
 
-	c = fileGetc ();
+	c = getcFromInputFile ();
 	if (c == '.')
 	{
 		integer = parseInteger ('\0');
 		vStringPut (string, c);
 		vStringCat (string, integer);
 		vStringDelete (integer);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	}
 	if (tolower (c) == 'e')
 	{
@@ -321,7 +321,7 @@ static vString *parseNumeric (int c)
 		vStringDelete (integer);
 	}
 	else if (!isspace (c))
-		fileUngetc (c);
+		ungetcToInputFile (c);
 
 	vStringTerminate (string);
 
@@ -331,7 +331,7 @@ static vString *parseNumeric (int c)
 static int parseEscapedCharacter (void)
 {
 	int d = '\0';
-	int c = fileGetc ();
+	int c = getcFromInputFile ();
 
 	switch (c)
 	{
@@ -366,7 +366,7 @@ static int parseEscapedCharacter (void)
 			const unsigned long ascii = atol (value);
 			vStringDelete (string);
 
-			c = fileGetc ();
+			c = getcFromInputFile ();
 			if (c == '/'  &&  ascii < 256)
 				d = ascii;
 			break;
@@ -379,13 +379,13 @@ static int parseEscapedCharacter (void)
 
 static int parseCharacter (void)
 {
-	int c = fileGetc ();
+	int c = getcFromInputFile ();
 	int result = c;
 
 	if (c == '%')
 		result = parseEscapedCharacter ();
 
-	c = fileGetc ();
+	c = getcFromInputFile ();
 	if (c != '\'')
 		skipToCharacter ('\n');
 
@@ -404,7 +404,7 @@ static void parseString (vString *const string)
 
 	while (! end)
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		if (c == EOF)
 			end = TRUE;
 		else if (c == '"')
@@ -437,7 +437,7 @@ static void parseString (vString *const string)
 			if (verbatim && align)
 			{
 				do
-					c = fileGetc ();
+					c = getcFromInputFile ();
 				while (isspace (c));
 			}
 		}
@@ -468,12 +468,12 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isident (c));
 
 	vStringTerminate (string);
 	if (!isspace (c))
-		fileUngetc (c);  /* unget non-identifier character */
+		ungetcToInputFile (c);  /* unget non-identifier character */
 }
 
 static void parseFreeOperator (vString *const string, const int firstChar)
@@ -483,12 +483,12 @@ static void parseFreeOperator (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (c > ' ');
 
 	vStringTerminate (string);
 	if (!isspace (c))
-		fileUngetc (c);  /* unget non-identifier character */
+		ungetcToInputFile (c);  /* unget non-identifier character */
 }
 
 static void copyToken (tokenInfo* dst, const tokenInfo *src)
@@ -537,7 +537,7 @@ static void readToken (tokenInfo *const token)
 getNextChar:
 
 	do
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	while (c == '\t'  ||  c == ' '  ||  c == '\n');
 
 	switch (c)
@@ -563,7 +563,7 @@ getNextChar:
 		case '=':  token->type = TOKEN_OPERATOR;           break;
 
 		case '-':
-			c = fileGetc ();
+			c = getcFromInputFile ();
 			if (c == '>')
 				token->type = TOKEN_CONSTRAINT;
 			else if (c == '-')  /* is this the start of a comment? */
@@ -574,7 +574,7 @@ getNextChar:
 			else
 			{
 				if (!isspace (c))
-					fileUngetc (c);
+					ungetcToInputFile (c);
 				token->type = TOKEN_OPERATOR;
 			}
 			break;
@@ -582,13 +582,13 @@ getNextChar:
 		case '?':
 		case ':':
 		{
-			int c2 = fileGetc ();
+			int c2 = getcFromInputFile ();
 			if (c2 == '=')
 				token->type = TOKEN_OPERATOR;
 			else
 			{
 				if (!isspace (c2))
-					fileUngetc (c2);
+					ungetcToInputFile (c2);
 				if (c == ':')
 					token->type = TOKEN_COLON;
 				else
@@ -598,30 +598,30 @@ getNextChar:
 		}
 
 		case '<':
-			c = fileGetc ();
+			c = getcFromInputFile ();
 			if (c != '='  &&  c != '>'  &&  !isspace (c))
-				fileUngetc (c);
+				ungetcToInputFile (c);
 			token->type = TOKEN_OPERATOR;
 			break;
 
 		case '>':
-			c = fileGetc ();
+			c = getcFromInputFile ();
 			if (c != '='  &&  c != '>'  &&  !isspace (c))
-				fileUngetc (c);
+				ungetcToInputFile (c);
 			token->type = TOKEN_OPERATOR;
 			break;
 
 		case '/':
-			c = fileGetc ();
+			c = getcFromInputFile ();
 			if (c != '/'  &&  c != '='  &&  !isspace (c))
-				fileUngetc (c);
+				ungetcToInputFile (c);
 			token->type = TOKEN_OPERATOR;
 			break;
 
 		case '\\':
-			c = fileGetc ();
+			c = getcFromInputFile ();
 			if (c != '\\'  &&  !isspace (c))
-				fileUngetc (c);
+				ungetcToInputFile (c);
 			token->type = TOKEN_OPERATOR;
 			break;
 

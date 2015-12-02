@@ -95,7 +95,7 @@ extern stringList* stringListNewFromFile (const char* const fileName)
 		while (! feof (fp))
 		{
 			vString* const str = vStringNew ();
-			readLine (str, fp);
+			readLineRaw (str, fp);
 			vStringStripTrailing (str);
 			if (vStringLength (str) > 0)
 				stringListAdd (result, str);

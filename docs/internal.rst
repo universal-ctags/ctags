@@ -7,6 +7,70 @@ ctags Internal API
 Input text stream
 ------------------------------------------------------------
 
+.. figure:: input-text-stream.svg
+	    :scale: 80%
+
+Macro definitions and function prototypes for handling Input text
+stream are in main/read.h. The file exists in exuberant ctags, too.
+However, the names of macros and functions are changed when
+overhauling ``--line-directive`` option.
+
+Ctags has 3 groups of functions for handling input: input, bypass, and
+raw. Parser developers should use input group. The rest of two
+are for ctags main part.
+
+
+`inputFile` type and the functions of input group
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`inputFile` is the type for representing the input file and stream for
+a parser. Ctags uses a global variable `File` having type `inputFile`
+for maintaining the input file and stream.
+
+`fp` and `line` are the essential fields of `File`. `fp` having type
+well known `FILE` of stdio. By calling functions of input group
+(`getcFromInputFile` and `readLineFromInputFile`), a parser gets input
+text from `fp`.
+
+The functions of input group updates fields `input` and `source` of `File`
+These two fields has type `inputFileInfo`. These two fields are for mainly
+tracking the name of file and the current line number. Usually ctags uses
+only `input` field. `source` is used only when `#line` directive is found
+in the current input text stream.
+
+A case when a tool generates the input file from another file, a tool
+can record the original source file to the generated file with using
+the `#line` directive. `source` is used for tracking/recording the
+informations appeared on #line directives.
+
+Regex pattern matching are also done behind calling the functions of
+this group.
+
+
+The functions of bypass group
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The functions of bypass group (`readLineFromBypass` and
+`readLineFromBypassSlow`) are used for reading text from `fp` field of
+`File` global variable without updating `input` and `source` fields of
+`File`.
+
+
+Parsers may not need the functions of this group.  The functions are
+used in ctags main part. The functions are used to make pattern
+fields of tags file, for example.
+
+
+The functions of raw group
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The functions of this group(`readLineRaw` and `readLineRawWithNoSeek`)
+take a parameter having type `FILE *`; and don't touch `File` global
+variable.
+
+Parsers may not need the functions of this group.  The functions are
+used in ctags main part. The functions are used to load option files,
+for example.
+
+
 Automatic parser guessing
 ------------------------------------------------------------
 

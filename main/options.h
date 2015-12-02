@@ -98,7 +98,7 @@ typedef struct sOptionValues {
 	unsigned int patternLengthLimit; /* Not implemented yet: --patern-length-limit=N */
 #ifdef DEBUG
 	long debugLevel;        /* -D  debugging output */
-	unsigned long breakLine;/* -b  source line at which to call lineBreak() */
+	unsigned long breakLine;/* -b  input line at which to call lineBreak() */
 #endif
 } optionValues;
 

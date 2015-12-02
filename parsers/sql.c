@@ -402,7 +402,7 @@ static tokenInfo *newToken (void)
 	token->scope              = vStringNew ();
 	token->scopeKind          = SQLTAG_COUNT;
 	token->begin_end_nest_lvl = 0;
-	token->lineNumber         = getSourceLineNumber ();
+	token->lineNumber         = getInputLineNumber ();
 	token->filePosition       = getInputFilePosition ();
 
 	return token;
@@ -450,13 +450,13 @@ static void parseString (vString *const string, const int delimiter)
 	boolean end = FALSE;
 	while (! end)
 	{
-		int c = fileGetc ();
+		int c = getcFromInputFile ();
 		if (c == EOF)
 			end = TRUE;
 		/*
 		else if (c == '\\')
 		{
-			c = fileGetc(); // This maybe a ' or ". //
+			c = getcFromInputFile(); // This maybe a ' or ". //
 			vStringPut(string, c);
 		}
 		*/
@@ -477,11 +477,11 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
 	if (!isspace (c))
-		fileUngetc (c);		/* unget non-identifier character */
+		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
 static void readToken (tokenInfo *const token)
@@ -495,8 +495,8 @@ static void readToken (tokenInfo *const token)
 getNextChar:
 	do
 	{
-		c = fileGetc ();
-		token->lineNumber   = getSourceLineNumber ();
+		c = getcFromInputFile ();
+		token->lineNumber   = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 		/* 
 		 * Added " to the list of ignores, not sure what this 
@@ -530,21 +530,21 @@ getNextChar:
 		case '"':
 				  token->type = TOKEN_STRING;
 				  parseString (token->string, c);
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
 		case '-':
-				  c = fileGetc ();
+				  c = getcFromInputFile ();
 				  if (c == '-')		/* -- is this the start of a comment? */
 				  {
-					  fileSkipToCharacter ('\n');
+					  skipToCharacterInInputFile ('\n');
 					  goto getNextChar;
 				  }
 				  else
 				  {
 					  if (!isspace (c))
-						  fileUngetc (c);
+						  ungetcToInputFile (c);
 					  token->type = TOKEN_OPERATOR;
 				  }
 				  break;
@@ -553,7 +553,7 @@ getNextChar:
 		case '>':
 				  {
 					  const int initial = c;
-					  int d = fileGetc ();
+					  int d = getcFromInputFile ();
 					  if (d == initial)
 					  {
 						  if (initial == '<')
@@ -563,29 +563,29 @@ getNextChar:
 					  }
 					  else
 					  {
-						  fileUngetc (d);
+						  ungetcToInputFile (d);
 						  token->type = TOKEN_UNDEFINED;
 					  }
 					  break;
 				  }
 
 		case '\\':
-				  c = fileGetc ();
+				  c = getcFromInputFile ();
 				  if (c != '\\'  && c != '"'  && c != '\''  &&  !isspace (c))
-					  fileUngetc (c);
+					  ungetcToInputFile (c);
 				  token->type = TOKEN_CHARACTER;
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
 		case '/':
 				  {
-					  int d = fileGetc ();
+					  int d = getcFromInputFile ();
 					  if ((d != '*') &&		/* is this the start of a comment? */
 						  (d != '/'))		/* is a one line comment? */
 					  {
 						  token->type = TOKEN_FORWARD_SLASH;
-						  fileUngetc (d);
+						  ungetcToInputFile (d);
 					  }
 					  else
 					  {
@@ -593,18 +593,18 @@ getNextChar:
 						  {
 							  do
 							  {
-								  fileSkipToCharacter ('*');
-								  c = fileGetc ();
+								  skipToCharacterInInputFile ('*');
+								  c = getcFromInputFile ();
 								  if (c == '/')
 									  break;
 								  else
-									  fileUngetc (c);
+									  ungetcToInputFile (c);
 							  } while (c != EOF && c != '\0');
 							  goto getNextChar;
 						  }
 						  else if (d == '/')	/* is this the start of a comment?  */
 						  {
-							  fileSkipToCharacter ('\n');
+							  skipToCharacterInInputFile ('\n');
 							  goto getNextChar;
 						  }
 					  }
@@ -617,13 +617,13 @@ getNextChar:
 				  else
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getSourceLineNumber ();
+					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->keyword = analyzeToken (token->string, Lang_sql);
 					  if (isKeyword (token, KEYWORD_rem))
 					  {
 						  vStringClear (token->string);
-						  fileSkipToCharacter ('\n');
+						  skipToCharacterInInputFile ('\n');
 						  goto getNextChar;
 					  }
 					  else if (isKeyword (token, KEYWORD_NONE))

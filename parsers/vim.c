@@ -199,7 +199,7 @@ static const unsigned char * readVimLine (void)
 {
 	const unsigned char *line;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		while (isspace ((int) *line))
 			++line;
@@ -217,7 +217,7 @@ static const unsigned char * readVimballLine (void)
 {
 	const unsigned char *line;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		break;
 	}

@@ -166,7 +166,7 @@ SUB_DECL_SWITCH:
 					}
 			}
 		}
-	} while (NULL != (cp = fileReadLine ()));
+	} while (NULL != (cp = readLineFromInputFile ()));
 
 	return FALSE;
 }
@@ -251,7 +251,7 @@ static int parseConstantsFromHashRef (const unsigned char *cp,
 			parseConstantsFromLine((const char *) cp, name, package);
 		switch (state) {
 			case CONST_STATE_NEXT_LINE:
-				cp = fileReadLine();
+				cp = readLineFromInputFile();
 				if (cp)
 					break;
 				else
@@ -285,7 +285,7 @@ static void findPerlTags (void)
 		RESPECT_DATA	= (1 << 1),
 	} respect_token = RESPECT_END | RESPECT_DATA;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		boolean spaceRequired = FALSE;
 		boolean qualified = FALSE;
@@ -356,7 +356,7 @@ static void findPerlTags (void)
 			while (isspace(*cp))
 				cp++;
 			while (!*cp || '#' == *cp) {
-				cp = fileReadLine ();
+				cp = readLineFromInputFile ();
 				if (!cp)
 					goto END_MAIN_WHILE;
 				while (isspace (*cp))
@@ -381,7 +381,7 @@ static void findPerlTags (void)
 			while (isspace (*cp))
 				cp++;
 			while (!*cp || '#' == *cp) {
-				cp = fileReadLine ();
+				cp = readLineFromInputFile ();
 				if (!cp)
 					goto END_MAIN_WHILE;
 				while (isspace (*cp))
@@ -436,7 +436,7 @@ static void findPerlTags (void)
 
 			while (!*cp || '#' == *cp) { /* Gobble up empty lines
 				                            and comments */
-				cp = fileReadLine ();
+				cp = readLineFromInputFile ();
 				if (!cp)
 					goto END_MAIN_WHILE;
 				while (isspace (*cp))

@@ -92,7 +92,7 @@ static tokenInfo *newToken (void)
 	token->scopeKind	= TAG_NONE;
 	token->string		= vStringNew ();
 	token->scope		= vStringNew ();
-	token->lineNumber	= getSourceLineNumber ();
+	token->lineNumber	= getInputLineNumber ();
 	token->filePosition	= getInputFilePosition ();
 
 	return token;
@@ -152,10 +152,10 @@ static void readTokenFull (tokenInfo *const token,
 	vStringClear (token->string);
 
 	do
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	while (c == '\t' || c == ' ' || c == '\r' || c == '\n');
 
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	switch (c)
@@ -174,7 +174,7 @@ static void readTokenFull (tokenInfo *const token,
 			token->type = TOKEN_STRING;
 			while (TRUE)
 			{
-				c = fileGetc ();
+				c = getcFromInputFile ();
 				/* we don't handle unicode escapes but they are safe */
 				if (escaped)
 					escaped = FALSE;
@@ -199,11 +199,11 @@ static void readTokenFull (tokenInfo *const token,
 				do
 				{
 					vStringPut (token->string, c);
-					c = fileGetc ();
+					c = getcFromInputFile ();
 				}
 				while (c != EOF && isIdentChar (c));
 				vStringTerminate (token->string);
-				fileUngetc (c);
+				ungetcToInputFile (c);
 				switch (lookupKeyword (vStringValue (token->string), Lang_json))
 				{
 					case KEYWORD_true:	token->type = TOKEN_TRUE;	break;

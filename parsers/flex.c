@@ -219,7 +219,7 @@ static tokenInfo *newToken (void)
 	token->nestLevel	= 0;
 	token->isClass		= FALSE;
 	token->ignoreTag	= FALSE;
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	return token;
@@ -373,12 +373,12 @@ static void parseString (vString *const string, const int delimiter)
 	boolean end = FALSE;
 	while (! end)
 	{
-		int c = fileGetc ();
+		int c = getcFromInputFile ();
 		if (c == EOF)
 			end = TRUE;
 		else if (c == '\\')
 		{
-			c = fileGetc(); /* This maybe a ' or ". */
+			c = getcFromInputFile(); /* This maybe a ' or ". */
 			vStringPut(string, c);
 		}
 		else if (c == delimiter)
@@ -399,11 +399,11 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
 	if (!isspace (c))
-		fileUngetc (c);		/* unget non-identifier character */
+		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
 static void readToken (tokenInfo *const token)
@@ -417,8 +417,8 @@ static void readToken (tokenInfo *const token)
 getNextChar:
 	do
 	{
-		c = fileGetc ();
-		token->lineNumber   = getSourceLineNumber ();
+		c = getcFromInputFile ();
+		token->lineNumber   = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\n');
@@ -443,29 +443,29 @@ getNextChar:
 		case '"':
 				  token->type = TOKEN_STRING;
 				  parseString (token->string, c);
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
 		case '\\':
-				  c = fileGetc ();
+				  c = getcFromInputFile ();
 				  if (c != '\\'  && c != '"'  &&  !isspace (c))
-					  fileUngetc (c);
+					  ungetcToInputFile (c);
 				  token->type = TOKEN_CHARACTER;
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
 		case '/':
 				  {
-					  int d = fileGetc ();
+					  int d = getcFromInputFile ();
 					  if ( (d != '*') &&		/* is this the start of a comment? */
 							  (d != '/') &&		/* is a one line comment? */
 							  (d != '>') )		/* is this a close XML tag? */
 					  {
-						  fileUngetc (d);
+						  ungetcToInputFile (d);
 						  token->type = TOKEN_FORWARD_SLASH;
-						  token->lineNumber = getSourceLineNumber ();
+						  token->lineNumber = getInputLineNumber ();
 						  token->filePosition = getInputFilePosition ();
 					  }
 					  else
@@ -474,24 +474,24 @@ getNextChar:
 						  {
 							  do
 							  {
-								  fileSkipToCharacter ('*');
-								  c = fileGetc ();
+								  skipToCharacterInInputFile ('*');
+								  c = getcFromInputFile ();
 								  if (c == '/')
 									  break;
 								  else
-									  fileUngetc (c);
+									  ungetcToInputFile (c);
 							  } while (c != EOF && c != '\0');
 							  goto getNextChar;
 						  }
 						  else if (d == '/')	/* is this the start of a comment?  */
 						  {
-							  fileSkipToCharacter ('\n');
+							  skipToCharacterInInputFile ('\n');
 							  goto getNextChar;
 						  }
 						  else if (d == '>')	/* is this the start of a comment?  */
 						  {
 							  token->type = TOKEN_CLOSE_SGML;
-							  token->lineNumber = getSourceLineNumber ();
+							  token->lineNumber = getInputLineNumber ();
 							  token->filePosition = getInputFilePosition ();
 						  }
 					  }
@@ -504,7 +504,7 @@ getNextChar:
 					   * An XML comment looks like this 
 					   *   <!-- anything over multiple lines -->
 					   */
-					  int d = fileGetc ();
+					  int d = getcFromInputFile ();
 
 					  if ( (d != '!' )  && 		/* is this the start of a comment? */
 					       (d != '/' )  &&	 	/* is this the start of a closing mx tag */
@@ -512,9 +512,9 @@ getNextChar:
 					       (d != 'f' )  &&  	/* is this the start of a fx tag */
 					       (d != 's' )    ) 	/* is this the start of a spark tag */
 					  {
-						  fileUngetc (d);
+						  ungetcToInputFile (d);
 						  token->type = TOKEN_LESS_THAN;
-						  token->lineNumber = getSourceLineNumber ();
+						  token->lineNumber = getInputLineNumber ();
 						  token->filePosition = getInputFilePosition ();
 						  break;						
 					  }
@@ -522,27 +522,27 @@ getNextChar:
 					  {
 						  if (d == '!')
 						  {
-							  int e = fileGetc ();
+							  int e = getcFromInputFile ();
 							  if ( e != '-' ) 		/* is this the start of a comment? */
 							  {
-								  fileUngetc (e);
-								  fileUngetc (d);
+								  ungetcToInputFile (e);
+								  ungetcToInputFile (d);
 								  token->type = TOKEN_LESS_THAN;
-								  token->lineNumber = getSourceLineNumber ();
+								  token->lineNumber = getInputLineNumber ();
 								  token->filePosition = getInputFilePosition ();
 							  }
 							  else
 							  {
 								  if (e == '-')
 								  {
-									  int f = fileGetc ();
+									  int f = getcFromInputFile ();
 									  if ( f != '-' ) 		/* is this the start of a comment? */
 									  {
-										  fileUngetc (f);
-										  fileUngetc (e);
-										  fileUngetc (d);
+										  ungetcToInputFile (f);
+										  ungetcToInputFile (e);
+										  ungetcToInputFile (d);
 										  token->type = TOKEN_LESS_THAN;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 									  }
 									  else
@@ -551,22 +551,22 @@ getNextChar:
 										  {
 											  do
 											  {
-												  fileSkipToCharacter ('-');
-												  c = fileGetc ();
+												  skipToCharacterInInputFile ('-');
+												  c = getcFromInputFile ();
 												  if (c == '-') 
 												  {
-													  d = fileGetc ();
+													  d = getcFromInputFile ();
 													  if (d == '>')
 														  break;
 													  else
 													  {
-														  fileUngetc (d);
-														  fileUngetc (c);
+														  ungetcToInputFile (d);
+														  ungetcToInputFile (c);
 													  }
 													  break;
 												  }
 												  else
-													  fileUngetc (c);
+													  ungetcToInputFile (c);
 											  } while (c != EOF && c != '\0');
 											  goto getNextChar;
 										  }
@@ -576,13 +576,13 @@ getNextChar:
 						  }
 						  else if (d == 'm' || d == 'f' || d == 's' )
 						  {
-							  int e = fileGetc ();
+							  int e = getcFromInputFile ();
 							  if ( (d == 'm' || d == 'f') && e != 'x' ) 		/* continuing an mx or fx tag */
 							  {
-								  fileUngetc (e);
-								  fileUngetc (d);
+								  ungetcToInputFile (e);
+								  ungetcToInputFile (d);
 								  token->type = TOKEN_LESS_THAN;
-								  token->lineNumber = getSourceLineNumber ();
+								  token->lineNumber = getInputLineNumber ();
 								  token->filePosition = getInputFilePosition ();
 								  break;
 							  }
@@ -590,21 +590,21 @@ getNextChar:
 							  {
 								  if ( (d == 'm' || d == 'f') && e == 'x' )
 								  {
-									  int f = fileGetc ();
+									  int f = getcFromInputFile ();
 									  if ( f != ':' ) 		/* start of the tag */
 									  {
-										  fileUngetc (f);
-										  fileUngetc (e);
-										  fileUngetc (d);
+										  ungetcToInputFile (f);
+										  ungetcToInputFile (e);
+										  ungetcToInputFile (d);
 										  token->type = TOKEN_LESS_THAN;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 										  break;
 									  }
 									  else
 									  {
 										  token->type = TOKEN_OPEN_MXML;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 										  break;
 									  }
@@ -612,16 +612,16 @@ getNextChar:
 								  if ( d == 's' && e == ':')    /* continuing a spark tag */
 								  {
 									  token->type = TOKEN_OPEN_MXML;
-									  token->lineNumber = getSourceLineNumber ();
+									  token->lineNumber = getInputLineNumber ();
 									  token->filePosition = getInputFilePosition ();
 									  break;
 								  }
 								  else
 								  {
-									  fileUngetc (e);
-									  fileUngetc (d);
+									  ungetcToInputFile (e);
+									  ungetcToInputFile (d);
 									  token->type = TOKEN_LESS_THAN;
-									  token->lineNumber = getSourceLineNumber ();
+									  token->lineNumber = getInputLineNumber ();
 									  token->filePosition = getInputFilePosition ();
 									  break;
 								  }
@@ -629,25 +629,25 @@ getNextChar:
 						  }
 						  else if (d == '/')
 						  {
-							  int e = fileGetc ();
+							  int e = getcFromInputFile ();
 							  if ( !(e == 'm' || e == 'f' || e == 's' ))
 							  {
-								  fileUngetc (e);
-								  fileUngetc (d);
+								  ungetcToInputFile (e);
+								  ungetcToInputFile (d);
 								  token->type = TOKEN_LESS_THAN;
-								  token->lineNumber = getSourceLineNumber ();
+								  token->lineNumber = getInputLineNumber ();
 								  token->filePosition = getInputFilePosition ();
 								  break;
 							  }
 							  else
 							  {
-								  int f = fileGetc ();
+								  int f = getcFromInputFile ();
 								  if ( (e == 'm' || e == 'f') && f != 'x' ) 		/* continuing an mx or fx tag */
 								  {
-									  fileUngetc (f);
-									  fileUngetc (e);
+									  ungetcToInputFile (f);
+									  ungetcToInputFile (e);
 									  token->type = TOKEN_LESS_THAN;
-									  token->lineNumber = getSourceLineNumber ();
+									  token->lineNumber = getInputLineNumber ();
 									  token->filePosition = getInputFilePosition ();
 									  break;
 								  }
@@ -655,21 +655,21 @@ getNextChar:
 								  {
 									  if (f == 'x')
 									  {
-										  int g = fileGetc ();
+										  int g = getcFromInputFile ();
 										  if ( g != ':' ) 		/* is this the start of a comment? */
 										  {
-											  fileUngetc (g);
-											  fileUngetc (f);
-											  fileUngetc (e);
+											  ungetcToInputFile (g);
+											  ungetcToInputFile (f);
+											  ungetcToInputFile (e);
 											  token->type = TOKEN_LESS_THAN;
-											  token->lineNumber = getSourceLineNumber ();
+											  token->lineNumber = getInputLineNumber ();
 											  token->filePosition = getInputFilePosition ();
 											  break;
 										  }
 										  else
 										  {
 											  token->type = TOKEN_CLOSE_MXML;
-											  token->lineNumber = getSourceLineNumber ();
+											  token->lineNumber = getInputLineNumber ();
 											  token->filePosition = getInputFilePosition ();
 											  break;
 										  }
@@ -677,16 +677,16 @@ getNextChar:
 									  if ( e == 's' && f == ':')    /* continuing a spark tag */
 									  {
 										  token->type = TOKEN_CLOSE_MXML;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 										  break;
 									  }
 									  else
 									  {
-										  fileUngetc (f);
-										  fileUngetc (e);
+										  ungetcToInputFile (f);
+										  ungetcToInputFile (e);
 										  token->type = TOKEN_LESS_THAN;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 										  break;
 									  }
@@ -699,13 +699,13 @@ getNextChar:
 
 		case '>':
 				  token->type = TOKEN_GREATER_THAN;
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
 		case '!': 
 				  token->type = TOKEN_EXCLAMATION;			
-				  /*token->lineNumber = getSourceLineNumber ();
+				  /*token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();*/
 				  break;
 
@@ -715,7 +715,7 @@ getNextChar:
 				  else
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getSourceLineNumber ();
+					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->keyword = analyzeToken (token->string, Lang_js);
 					  if (isKeyword (token, KEYWORD_NONE))
