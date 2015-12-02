@@ -2356,7 +2356,7 @@ static tokenType parseSqlFile (tokenInfo *const token)
 
 static void initialize (const langType language)
 {
-	Assert (sizeof (SqlKinds) / sizeof (SqlKinds [0]) == SQLTAG_COUNT);
+	Assert (ARRAY_SIZE (SqlKinds) == SQLTAG_COUNT);
 	Lang_sql = language;
 }
 

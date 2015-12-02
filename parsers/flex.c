@@ -2373,7 +2373,7 @@ static void parseFlexFile (tokenInfo *const token)
 
 static void initialize (const langType language)
 {
-	Assert (sizeof (FlexKinds) / sizeof (FlexKinds [0]) == FLEXTAG_COUNT);
+	Assert (ARRAY_SIZE (FlexKinds) == FLEXTAG_COUNT);
 	Lang_js = language;
 }
 

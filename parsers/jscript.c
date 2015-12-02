@@ -1977,7 +1977,7 @@ static void parseJsFile (tokenInfo *const token)
 
 static void initialize (const langType language)
 {
-	Assert (sizeof (JsKinds) / sizeof (JsKinds [0]) == JSTAG_COUNT);
+	Assert (ARRAY_SIZE (JsKinds) == JSTAG_COUNT);
 	Lang_js = language;
 }
 

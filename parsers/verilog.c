@@ -331,8 +331,7 @@ static char kindEnabled (const verilogKind kind)
 static void buildKeywordHash (const langType language, unsigned int idx)
 {
 	size_t i;
-	const size_t count = 
-			sizeof (KeywordTable) / sizeof (KeywordTable [0]);
+	const size_t count = ARRAY_SIZE (KeywordTable);
 	for (i = 0  ;  i < count  ;  ++i)
 	{
 		const keywordAssoc *p = &KeywordTable [i];

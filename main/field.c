@@ -154,7 +154,7 @@ extern void printFields (void)
 {
 	int i;
 
-	for (i = 0; i < sizeof (fieldDescs) / sizeof (fieldDescs [0]); i++)
+	for (i = 0; i < ARRAY_SIZE (fieldDescs); i++)
 		printField (i);
 }
 
