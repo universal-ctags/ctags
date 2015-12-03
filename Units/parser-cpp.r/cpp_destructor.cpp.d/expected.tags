@@ -1,0 +1,10 @@
+~A	input.cpp	/^A::~A() { }$/;"	f	class:A
+~B	input.cpp	/^B:: ~B () { }$/;"	f	class:B
+~C	input.cpp	/^C:: ~ C () { }$/;"	f	class:C
+~D	input.cpp	/^D:: ~D() { }$/;"	f	class:D
+~E	input.cpp	/^E:: ~ E() { }$/;"	f	class:E
+~F	input.cpp	/^F::~F(){ }$/;"	f	class:F
+~G	input.cpp	/^G:: ~G (){ }$/;"	f	class:G
+~H	input.cpp	/^H:: ~ H (){ }$/;"	f	class:H
+~I	input.cpp	/^I:: ~I(){ }$/;"	f	class:I
+~J	input.cpp	/^J:: ~ J(){ }$/;"	f	class:J

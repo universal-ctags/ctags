@@ -801,22 +801,26 @@ static void __unused__ pt (tokenInfo *const token)
 
 static void __unused__ ps (statementInfo *const st)
 {
+#define P	"[%-7u]"
+	static unsigned int id = 0;
 	unsigned int i;
-	printf ("scope: %s   decl: %s   gotName: %s   gotParenName: %s\n",
+	printf (P"scope: %s   decl: %s   gotName: %s   gotParenName: %s\n", id,
 		scopeString (st->scope), declString (st->declaration),
 		boolString (st->gotName), boolString (st->gotParenName));
-	printf ("haveQualifyingName: %s\n", boolString (st->haveQualifyingName));
-	printf ("access: %s   default: %s\n", accessString (st->member.access),
+	printf (P"haveQualifyingName: %s\n", id, boolString (st->haveQualifyingName));
+	printf (P"access: %s   default: %s\n", id, accessString (st->member.access),
 		accessString (st->member.accessDefault));
-	printf ("token  : ");
+	printf (P"token  : ", id);
 	pt (activeToken (st));
 	for (i = 1  ;  i < (unsigned int) NumTokens  ;  ++i)
 	{
-		printf ("prev %u : ", i);
+		printf (P"prev %u : ", id, i);
 		pt (prevToken (st, i));
 	}
-	printf ("context: ");
+	printf (P"context: ", id);
 	pt (st->context);
+	id++;
+#undef P
 }
 
 #endif
@@ -1345,8 +1349,13 @@ static boolean findScopeHierarchy (vString *const string, const statementInfo *c
 	boolean found = FALSE;
 
 	vStringClear (string);
+
 	if (isType (st->context, TOKEN_NAME))
+	{
 		vStringCopy (string, st->context->name);
+		found = TRUE;
+	}
+
 	if (st->parent != NULL)
 	{
 		vString *temp = vStringNew ();

@@ -1,0 +1,5 @@
+
+	int bar (a, b) int a; char b; {}
+
+I wonder how we should do with a, b.
+

@@ -1,0 +1,3 @@
+--fields=+S
+--extra=+q
+--kinds-C++=+p
