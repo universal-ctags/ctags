@@ -525,6 +525,7 @@ clean-gcov:
 #
 # Help
 #
+.PHONY: help
 help:
 	@echo "Compilation targets:"
 	@echo ""
