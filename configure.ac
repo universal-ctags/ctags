@@ -13,7 +13,7 @@ if ! test -e "${srcdir}/config.h.in"; then
    echo "---"
    echo "--- ${srcdir}/config.h.in WAS NOT FOUND." 1>&2
    echo "--- YOU MIGHT HAVE RUN autoconf ONLY" 1>&2
-   echo "--- BUT YOU MAY HAVE TO RUN autoreconf." 1>&2
+   echo "--- BUT YOU MAY HAVE TO RUN autogen.sh." 1>&2
    echo "---"
    exit 1
 fi
