@@ -1,138 +1,131 @@
 # Shared macros
 
-PARSER_DIR=parsers
-MAIN_DIR=main
+MAIN_HEADS =			\
+	main/args.h		\
+	main/ctags.h		\
+	main/entry.h		\
+	main/field.h		\
+	main/flags.h		\
+	main/fmt.h		\
+	main/general.h		\
+	main/get.h		\
+	main/htable.h		\
+	main/keyword.h		\
+	main/kind.h		\
+	main/main.h		\
+	main/mbcs.h		\
+	main/nestlevel.h	\
+	main/options.h		\
+	main/parse.h		\
+	main/parsers.h		\
+	main/pcoproc.h		\
+	main/read.h		\
+	main/routines.h		\
+	main/selectors.h	\
+	main/sort.h		\
+	main/strlist.h		\
+	main/vstring.h		\
+	main/xtag.h
 
-DEBUG_HEADERS = $(MAIN_DIR)/debug.h
+MAIN_SRCS =				\
+	main/args.c			\
+	main/entry.c			\
+	main/field.c			\
+	main/flags.c			\
+	main/fmt.c			\
+	main/get.c			\
+	main/htable.c			\
+	main/keyword.c			\
+	main/kind.c			\
+	main/lregex.c			\
+	main/lxcmd.c			\
+	main/main.c			\
+	main/mbcs.c			\
+	main/nestlevel.c		\
+	main/options.c			\
+	main/parse.c			\
+	main/pcoproc.c			\
+	main/read.c			\
+	main/routines.c			\
+	main/selectors.c		\
+	main/sort.c			\
+	main/strlist.c			\
+	main/vstring.c			\
+	main/xtag.c
 
-MAIN_HEADERS =				\
-	$(MAIN_DIR)/args.h		\
-	$(MAIN_DIR)/ctags.h		\
-	$(MAIN_DIR)/entry.h		\
-	$(MAIN_DIR)/field.h		\
-	$(MAIN_DIR)/flags.h		\
-	$(MAIN_DIR)/fmt.h		\
-	$(MAIN_DIR)/general.h		\
-	$(MAIN_DIR)/get.h		\
-	$(MAIN_DIR)/htable.h		\
-	$(MAIN_DIR)/keyword.h		\
-	$(MAIN_DIR)/kind.h		\
-	$(MAIN_DIR)/main.h		\
-	$(MAIN_DIR)/mbcs.h		\
-	$(MAIN_DIR)/nestlevel.h		\
-	$(MAIN_DIR)/options.h		\
-	$(MAIN_DIR)/parse.h		\
-	$(MAIN_DIR)/parsers.h		\
-	$(MAIN_DIR)/pcoproc.h		\
-	$(MAIN_DIR)/read.h		\
-	$(MAIN_DIR)/routines.h		\
-	$(MAIN_DIR)/selectors.h		\
-	$(MAIN_DIR)/sort.h		\
-	$(MAIN_DIR)/strlist.h		\
-	$(MAIN_DIR)/vstring.h		\
-	$(MAIN_DIR)/xtag.h
+PARSER_HEADS =
+PARSER_SRCS =				\
+	parsers/ada.c			\
+	parsers/ant.c			\
+	parsers/asm.c			\
+	parsers/asp.c			\
+	parsers/awk.c			\
+	parsers/basic.c			\
+	parsers/beta.c			\
+	parsers/c.c			\
+	parsers/clojure.c		\
+	parsers/css.c			\
+	parsers/cobol.c			\
+	parsers/diff.c			\
+	parsers/dosbatch.c		\
+	parsers/dts.c			\
+	parsers/eiffel.c		\
+	parsers/erlang.c		\
+	parsers/falcon.c		\
+	parsers/flex.c			\
+	parsers/fortran.c		\
+	parsers/go.c			\
+	parsers/html.c			\
+	parsers/jscript.c		\
+	parsers/json.c			\
+	parsers/lisp.c			\
+	parsers/lua.c			\
+	parsers/make.c			\
+	parsers/matlab.c		\
+	parsers/objc.c			\
+	parsers/ocaml.c			\
+	parsers/pascal.c		\
+	parsers/perl.c			\
+	parsers/perl6.c			\
+	parsers/php.c			\
+	parsers/python.c		\
+	parsers/r.c			\
+	parsers/rexx.c			\
+	parsers/rst.c			\
+	parsers/ruby.c			\
+	parsers/rust.c			\
+	parsers/scheme.c		\
+	parsers/sh.c			\
+	parsers/slang.c			\
+	parsers/sml.c			\
+	parsers/sql.c			\
+	parsers/tcl.c			\
+	parsers/tex.c			\
+	parsers/verilog.c		\
+	parsers/vhdl.c			\
+	parsers/vim.c			\
+	parsers/windres.c		\
+	parsers/yacc.c
 
-PARSER_HEADERS =
+DEBUG_HEADS = main/debug.h
+DEBUG_SRCS = main/debug.c
 
-HEADERS = $(MAIN_HEADERS) $(PARSER_HEADERS) $(DEBUG_HEADERS)
+ALL_HEADS = $(MAIN_HEADS) $(PARSER_HEADS) $(DEBUG_HEADS)
+ALL_SRCS = $(MAIN_SRCS) $(PARSER_SRCS) $(DEBUG_SRCS)
 
-PARSER_SOURCES =				\
-	$(PARSER_DIR)/ada.c			\
-	$(PARSER_DIR)/ant.c			\
-	$(PARSER_DIR)/asm.c			\
-	$(PARSER_DIR)/asp.c			\
-	$(PARSER_DIR)/awk.c			\
-	$(PARSER_DIR)/basic.c			\
-	$(PARSER_DIR)/beta.c			\
-	$(PARSER_DIR)/c.c			\
-	$(PARSER_DIR)/clojure.c			\
-	$(PARSER_DIR)/css.c			\
-	$(PARSER_DIR)/cobol.c			\
-	$(PARSER_DIR)/diff.c			\
-	$(PARSER_DIR)/dosbatch.c		\
-	$(PARSER_DIR)/dts.c			\
-	$(PARSER_DIR)/eiffel.c			\
-	$(PARSER_DIR)/erlang.c			\
-	$(PARSER_DIR)/falcon.c			\
-	$(PARSER_DIR)/flex.c			\
-	$(PARSER_DIR)/fortran.c			\
-	$(PARSER_DIR)/go.c			\
-	$(PARSER_DIR)/html.c			\
-	$(PARSER_DIR)/jscript.c			\
-	$(PARSER_DIR)/json.c			\
-	$(PARSER_DIR)/lisp.c			\
-	$(PARSER_DIR)/lua.c			\
-	$(PARSER_DIR)/make.c			\
-	$(PARSER_DIR)/matlab.c			\
-	$(PARSER_DIR)/objc.c			\
-	$(PARSER_DIR)/ocaml.c			\
-	$(PARSER_DIR)/pascal.c			\
-	$(PARSER_DIR)/perl.c			\
-	$(PARSER_DIR)/perl6.c			\
-	$(PARSER_DIR)/php.c			\
-	$(PARSER_DIR)/python.c			\
-	$(PARSER_DIR)/r.c			\
-	$(PARSER_DIR)/rexx.c			\
-	$(PARSER_DIR)/rst.c			\
-	$(PARSER_DIR)/ruby.c			\
-	$(PARSER_DIR)/rust.c			\
-	$(PARSER_DIR)/scheme.c			\
-	$(PARSER_DIR)/sh.c			\
-	$(PARSER_DIR)/slang.c			\
-	$(PARSER_DIR)/sml.c			\
-	$(PARSER_DIR)/sql.c			\
-	$(PARSER_DIR)/tcl.c			\
-	$(PARSER_DIR)/tex.c			\
-	$(PARSER_DIR)/verilog.c			\
-	$(PARSER_DIR)/vhdl.c			\
-	$(PARSER_DIR)/vim.c			\
-	$(PARSER_DIR)/windres.c			\
-	$(PARSER_DIR)/yacc.c
+SOURCES = $(ALL_SRCS) $(ALL_HEADS)
 
-MAIN_SOURCES =					\
-	$(MAIN_DIR)/args.c			\
-	$(MAIN_DIR)/entry.c			\
-	$(MAIN_DIR)/field.c			\
-	$(MAIN_DIR)/flags.c			\
-	$(MAIN_DIR)/fmt.c			\
-	$(MAIN_DIR)/get.c			\
-	$(MAIN_DIR)/htable.c			\
-	$(MAIN_DIR)/keyword.c			\
-	$(MAIN_DIR)/kind.c			\
-	$(MAIN_DIR)/lregex.c			\
-	$(MAIN_DIR)/lxcmd.c			\
-	$(MAIN_DIR)/main.c			\
-	$(MAIN_DIR)/mbcs.c			\
-	$(MAIN_DIR)/nestlevel.c			\
-	$(MAIN_DIR)/options.c			\
-	$(MAIN_DIR)/parse.c			\
-	$(MAIN_DIR)/pcoproc.c			\
-	$(MAIN_DIR)/read.c			\
-	$(MAIN_DIR)/routines.c			\
-	$(MAIN_DIR)/selectors.c			\
-	$(MAIN_DIR)/sort.c			\
-	$(MAIN_DIR)/strlist.c			\
-	$(MAIN_DIR)/vstring.c			\
-	$(MAIN_DIR)/xtag.c
+ENVIRONMENT_HEADS = e_msoft.h
+ENVIRONMENT_SRCS =
 
-DEBUG_SOURCES = $(MAIN_DIR)/debug.c
+REGEX_HEADS = gnu_regex/regex.h
+REGEX_SRCS = gnu_regex/regex.c
 
-SOURCES = $(MAIN_SOURCES) $(PARSER_SOURCES) $(DEBUG_SOURCES)
-
-ENVIRONMENT_HEADERS = e_msoft.h
-
-ENVIRONMENT_SOURCES = 
-
-REGEX_SOURCES = gnu_regex/regex.c
-
-REGEX_HEADERS = gnu_regex/regex.h
-
-FNMATCH_SOURCES = fnmatch/fnmatch.c
-
-FNMATCH_HEADERS = fnmatch/fnmatch.h
+FNMATCH_HEADS = fnmatch/fnmatch.h
+FNMATCH_SRCS = fnmatch/fnmatch.c
 
 OBJECTS = \
-	$(SOURCES:.c=.$(OBJEXT)) \
+	$(ALL_SRCS:.c=.$(OBJEXT)) \
 	$(LIBOBJS)
 
 # vim: ts=8
