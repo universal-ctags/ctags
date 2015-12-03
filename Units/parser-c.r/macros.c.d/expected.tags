@@ -1,8 +1,8 @@
-FUNCTION_LIKE	input.c	/^#define FUNCTION_LIKE(/;"	d	file:
+FUNCTION_LIKE	input.c	/^#define FUNCTION_LIKE(/;"	d	file:	signature:(a,b)
 FUNCTION_LIKE	input.c	/^#undef FUNCTION_LIKE$/;"	d	file:	role:undef
 VARIABLE_LIKE	input.c	/^#define VARIABLE_LIKE	/;"	d	file:
 VARIABLE_LIKE	input.c	/^#undef VARIABLE_LIKE$/;"	d	file:	role:undef
 WeakSymbol	input.c	/^#pragma weak WeakSymbol /;"	d	file:
 foo	input.c	/^MACRO1(foo);$/;"	v
-prototype1	input.c	/^void prototype1 __ARGS((int arg1, void *arg2));$/;"	p	file:
-prototype2	input.c	/^void prototype2 __ARGS((int arg1, void *arg2))$/;"	f
+prototype1	input.c	/^void prototype1 __ARGS((int arg1, void *arg2));$/;"	p	file:	signature:(int arg1, void *arg2)
+prototype2	input.c	/^void prototype2 __ARGS((int arg1, void *arg2))$/;"	f	signature:(int arg1, void *arg2)
