@@ -9,8 +9,8 @@ DEFINES = -DWIN32 $(REGEX_DEFINES)
 INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch
 CC = gcc
 OBJEXT = o
-OBJECTS += $(REGEX_SRCS:%.c=%.o)
-OBJECTS += $(FNMATCH_SRCS:%.c=%.o)
+OBJECTS += $(REGEX_OBJS)
+OBJECTS += $(FNMATCH_OBJS)
 VPATH = . ./main ./parsers
 ifeq (yes, $(WITH_ICONV))
 DEFINES += -DHAVE_ICONV

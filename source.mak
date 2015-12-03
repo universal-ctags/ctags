@@ -120,9 +120,11 @@ ENVIRONMENT_SRCS =
 
 REGEX_HEADS = gnu_regex/regex.h
 REGEX_SRCS = gnu_regex/regex.c
+REGEX_OBJS = $(REGEX_SRCS:.c=.$(OBJEXT))
 
 FNMATCH_HEADS = fnmatch/fnmatch.h
 FNMATCH_SRCS = fnmatch/fnmatch.c
+FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.$(OBJEXT))
 
 OBJECTS = \
 	$(ALL_SRCS:.c=.$(OBJEXT)) \
