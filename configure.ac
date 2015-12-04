@@ -13,7 +13,7 @@ if ! test -e "${srcdir}/config.h.in"; then
    echo "---"
    echo "--- ${srcdir}/config.h.in WAS NOT FOUND." 1>&2
    echo "--- YOU MIGHT HAVE RUN autoconf ONLY" 1>&2
-   echo "--- BUT YOU MAY HAVE TO RUN autoreconf." 1>&2
+   echo "--- BUT YOU MAY HAVE TO RUN autogen.sh." 1>&2
    echo "---"
    exit 1
 fi
@@ -35,9 +35,6 @@ AH_TEMPLATE([HAVE_STAT_ST_INO],
 	<sys/stat.h>.])
 AH_TEMPLATE([remove],
 	[Define remove to unlink if you have unlink(), but not remove().])
-AH_TEMPLATE([SEEK_SET],
-	[Define this value used by fseek() appropriately if <stdio.h>
-	(or <unistd.h> on SunOS 4.1.x) does not define them.])
 AH_TEMPLATE([INT_MAX],
 	[Define as the maximum integer on your system if not defined <limits.h>.])
 AH_TEMPLATE([CUSTOM_CONFIGURATION_FILE],
@@ -76,9 +73,6 @@ AH_TEMPLATE([TMPDIR],
 AH_TEMPLATE([CHECK_REGCOMP],
 	[Define this label if you wish to check the regcomp() function at run time
 	for correct behavior. This function is currently broken on Cygwin.])
-AH_TEMPLATE([__USE_FIXED_PROTOTYPES__],
-	[This corrects the problem of missing prototypes for certain functions
-	in some GNU installations (e.g. SunOS 4.1.x).])
 AH_TEMPLATE([NON_CONST_PUTENV_PROTOTYPE],
 	[Define this is you have a prototype for putenv() in <stdlib.h>, but
 	doesn't declare its argument as "const char *".])
@@ -195,10 +189,6 @@ AC_ARG_ENABLE(macro-patterns,
 	[AS_HELP_STRING([--enable-macro-patterns],
 		[use patterns as default method to locate macros instead of line numbers])])
 
-AC_ARG_ENABLE(shell-globbing,
-	[AS_HELP_STRING([--enable-shell-globbing=DIR],
-		[does shell expand wildcards (yes|no)? [yes]])])
-
 AC_ARG_ENABLE(tmpdir,
 	[AS_HELP_STRING([--enable-tmpdir=DIR],
 		[default directory for temporary files [ARG=/tmp]])],
@@ -313,29 +303,6 @@ fi
 # -------------------
 
 AC_PROG_CC
-
-case `uname` in
-	HP-UX)
-		AC_MSG_CHECKING(HP-UX native compiler)
-		if test "$CC" = "cc"; then
-			AC_MSG_RESULT(yes; adding compiler options for ANSI support)
-			CFLAGS="$CFLAGS -Aa -D_HPUX_SOURCE"
-		else
-			AC_MSG_RESULT(no)
-		fi
-		;;
-	SunOS)
-		if uname -r | grep '5\.' >/dev/null 2>&1; then
-			AC_MSG_CHECKING(Solaris native compiler)
-			if test "$CC" = "cc" -a "`which cc`" = "/usr/ucb/cc"; then
-				AC_MSG_RESULT(yes; adding compiler option for ANSI support)
-				CC="$CC -Xa"
-			else
-				AC_MSG_RESULT(no)
-			fi
-		fi
-		;;
-esac
 
 if test "${with_sparse_cgcc}" = "yes"; then
 	REAL_CC="${CC}"
@@ -528,22 +495,16 @@ PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 # ----------------------------
 AC_CHECK_FUNCS(fnmatch,[],[
 AC_LIBOBJ([fnmatch])
-CPPFLAGS="$CPPFLAGS -I${srcdir}/fnmatch"
+FNMATCH_CPPFLAGS="-I${srcdir}/fnmatch"
 AC_DEFINE(HAVE_FNMATCH)
 ])
+AC_SUBST([FNMATCH_CPPFLAGS])
 AC_CHECK_HEADERS(fnmatch.h)
 
 AC_CHECK_FUNCS(strstr)
 AC_CHECK_FUNCS(strcasecmp stricmp, break)
 AC_CHECK_FUNCS(strncasecmp strnicmp, break)
 AC_CHECK_FUNCS(fgetpos, have_fgetpos=yes)
-
-# SEEK_SET should be in stdio.h, but may be in unistd.h on SunOS 4.1.x
-if test "$have_fgetpos" != yes ; then
-	CHECK_HEADER_DEFINE(SEEK_SET, stdio.h,,
-		CHECK_HEADER_DEFINE(SEEK_SET, unistd.h,,
-			AC_DEFINE(SEEK_SET, 0)))
-fi
 
 AC_CHECK_FUNCS(mkstemp, have_mkstemp=yes)
 if test "$have_mkstemp" != yes ; then
@@ -621,30 +582,11 @@ fi
 ],[
 dnl Using bundled regex implementation
 AC_LIBOBJ([regex])
-CPPFLAGS="$CPPFLAGS -I${srcdir}/gnu_regex"
+REGCOMP_CPPFLAGS="-I${srcdir}/gnu_regex"
 AC_DEFINE(HAVE_REGCOMP)
 ])
-# if test yes = "$with_perl_regex"; then
-# 	AC_MSG_CHECKING(for Perl regex library)
-# 	pcre_candidates="$with_perl_regex $HOME/local/lib* /usr*/local/lib* /usr/lib*"
-# 	for lib in $pcre_candidates; do
-# 		if test -f $lib/libpcreposix.so; then
-# 			pcre_lib="-L$lib -lpcreposix"
-# 			break
-# 		elif test -f $lib/libpcreposix.a; then
-# 			pcre_lib="$lib/libpcreposix.a"
-# 			break
-# 		fi
-# 	done
-# 	if test -z "$pcre_lib"; then
-# 		AC_MSG_RESULT(not found)
-# 	else
-# 		AC_MSG_RESULT($lib)
-# 		AC_DEFINE(HAVE_REGCOMP)
-# 		LDFLAGS="$LDFLAGS $pcre_lib"
-# 		have_regex=yes
-# 	fi
-# fi
+AC_SUBST([REGCOMP_CPPFLAGS])
+
 AC_CHECK_FUNCS(scandir,[install_data_targets="install-data-optlib install-data-preload"])
 AC_SUBST(install_data_targets)
 

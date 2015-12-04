@@ -9,6 +9,7 @@
 
 include source.mak
 
+OBJEXT = obj
 REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrcasecmp=stricmp
 DEFINES = -DWIN32 $(REGEX_DEFINES)
 INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch
@@ -31,18 +32,18 @@ readtags.exe: readtags.c
 dctags.exe: respmvc
 	cl /Zi -DDEBUG /Fe$@ @respmvc debug.c /link setargv.obj
 
-regex.obj:
-	cl /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) gnu_regex/regex.c
+$(REGEX_OBJS): $(REGEX_SRCS)
+	cl /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(REGEX_SRCS)
 
-fnmatch.obj:
-	cl /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) fnmatch/fnmatch.c
+$(FNMATCH_OBJS): $(FNMATCH_SRCS)
+	cl /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(FNMATCH_SRCS)
 
-respmvc: $(SOURCES) $(REGEX_SOURCES) $(FNMATCH_SOURCES) $(HEADERS) $(REGEX_HEADERS) $(FNMATCH_HEADERS) mk_mvc.mak
+respmvc: $(REGEX_OBJS) $(FNMATCH_OBJS) $(ALL_SRCS) $(REGEX_SRCS) $(FNMATCH_SRCS) $(ALL_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS) mk_mvc.mak
 	echo $(DEFINES) > $@
 	echo $(INCLUDES) >> $@
-	echo $(SOURCES) >> $@
-	echo $(REGEX_SOURCES) >> $@
-	echo $(FNMATCH_SOURCES) >> $@
+	echo $(ALL_SRCS) >> $@
+	echo $(REGEX_SRCS) >> $@
+	echo $(FNMATCH_SRCS) >> $@
 
 mostlyclean:
 	- del *.obj

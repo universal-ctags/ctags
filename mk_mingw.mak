@@ -9,8 +9,8 @@ DEFINES = -DWIN32 $(REGEX_DEFINES)
 INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch
 CC = gcc
 OBJEXT = o
-OBJECTS += $(REGEX_SOURCES:%.c=%.o)
-OBJECTS += $(FNMATCH_SOURCES:%.c=%.o)
+OBJECTS += $(REGEX_OBJS)
+OBJECTS += $(FNMATCH_OBJS)
 VPATH = . ./main ./parsers
 ifeq (yes, $(WITH_ICONV))
 DEFINES += -DHAVE_ICONV
@@ -21,7 +21,7 @@ ctags.exe: OPT = -O4 -Os -fexpensive-optimizations
 ctags.exe: LDFLAGS = -s
 dctags.exe: OPT = -g
 dctags.exe: DEBUG = -DDEBUG
-dctags.exe: SOURCES += debug.c
+dctags.exe: ALL_SRCS += debug.c
 
 .SUFFIXES: .c .o
 
@@ -47,7 +47,7 @@ V_CC_1	 =
 ctags: ctags.exe
 dctags: dctags.exe
 
-ctags.exe dctags.exe: $(OBJECTS) $(HEADERS) $(REGEX_HEADERS) $(FNMATCH_HEADERS)
+ctags.exe dctags.exe: $(OBJECTS) $(ALL_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS)
 	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(OBJECTS) $(LIBS)
 
 readtags.exe: readtags.c
