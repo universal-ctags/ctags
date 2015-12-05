@@ -71,9 +71,7 @@
 	VimParser, \
 	WindResParser, \
 	YaccParser, \
-	ZephirParser, \
-	  \
-	CTagsSelfTestParser
+	ZephirParser
 
 #endif  /* CTAGS_MAIN_PARSERS_H */
 

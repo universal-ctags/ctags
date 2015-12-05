@@ -34,7 +34,11 @@
 /*
 *   DATA DEFINITIONS
 */
-static parserDefinitionFunc* BuiltInParsers[] = { PARSER_LIST };
+static parserDefinition *CTagsSelfTestParser (void);
+static parserDefinitionFunc* BuiltInParsers[] = {
+	CTagsSelfTestParser,
+	PARSER_LIST
+};
 static parserDefinition** LanguageTable = NULL;
 static unsigned int LanguageCount = 0;
 static kindOption defaultFileKind = {
@@ -2020,7 +2024,7 @@ static void createCTSTTags (void)
 
 }
 
-extern parserDefinition *CTagsSelfTestParser (void)
+static parserDefinition *CTagsSelfTestParser (void)
 {
 	static const char *const extensions[] = { NULL };
 	parserDefinition *const def = parserNew ("CTagsSelfTest");
