@@ -1,0 +1,690 @@
+#!/bin/bash
+#
+# optlib2c - a tool translating ctags option file to C
+#
+# Copyright (C) 2015 Masatake YAMATO
+# Copyright (C) 2015 Red Hat Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+declare CTAGS_LANG
+declare CTAGS_LANG_IN_C
+
+declare -a CTAGS_EXTENSIONS
+declare -a CTAGS_PATTERNS
+declare -a CTAGS_ALIASES
+
+declare -a CTAGS_REGEX_REGEX
+declare -a CTAGS_REGEX_NAME
+declare -a CTAGS_REGEX_KIND
+declare -a CTAGS_REGEX_FLAG
+
+declare -a CTAGS_XCMD_PATH
+declare -a CTAGS_XCMD_FLAGS
+
+declare -a CTAGS_DISABLED_KINDS
+
+declare CTAGS_DISABLE
+
+error()
+{
+	echo "[ERROR] " $1 1>&2
+	exit 1
+}
+
+warn()
+{
+	echo "[WARN] " $1 1>&2
+}
+
+parse_optlib()
+{
+	local line
+	local optlib=$1
+
+	if [[ ! -e "$optlib" ]]; then
+		error "No such directory entry: $optlib"
+	elif [[ ! -f "$optlib" ]]; then
+		error "No such file: $optlib"
+	elif [[ ! -r "$optlib" ]]; then
+		error "file not readable: $optlib"
+	fi
+
+	while read -r line; do
+		if [[ -n "$line" ]]; then
+			case "$line" in
+				(\#*)
+					:
+					;;
+				(*)
+					if ! parse_line "$line"; then
+						return 1
+					fi
+					;;
+			esac
+		fi
+	done < "$optlib"
+	return 0
+}
+
+print_help()
+{
+	local status=$1
+
+	echo "Usage:"
+
+	echo "	$0 --help"
+	echo "	$0 FILE.ctags > FILE.c"
+
+	exit $status
+}
+
+parse_regex()
+{
+	local original=$1
+	local rest=$1
+
+	local escape
+
+	local regexp
+	local name
+	local kind
+	local flags
+	local tmp
+
+	if ! [[ "${rest:0:1}" = "/" ]]; then
+		error "Wrong regexp syntax: $rest"
+	fi
+
+	rest=${rest:1}
+	while [[ -n "$rest" ]]; do
+		case "${rest:0:1}" in
+			(/)
+				if [[ -n "$escape" ]]; then
+					regexp="${regexp}${rest:0:1}"
+					escape=
+				else
+					break
+				fi
+				;;
+			(\\)
+				regexp="${regexp}${rest:0:1}${rest:0:1}"
+				if [[ -n "$escape" ]]; then
+					escape=
+				else
+					escape=1
+				fi
+				;;
+			(*)
+				escape=
+				regexp="${regexp}${rest:0:1}"
+				;;
+		esac
+		rest=${rest:1}
+	done
+
+	if ! [[ "${rest:0:1}" = "/" ]]; then
+		error "Wrong name syntax: $rest"
+	fi
+
+	rest=${rest:1}
+	while [[ -n "$rest" ]]; do
+		case "${rest:0:1}" in
+			(/)
+				if [[ -n "$escape" ]]; then
+					name="${name}${rest:0:1}"
+					escape=
+				else
+					break
+				fi
+				;;
+			(\\)
+				name="${name}${rest:0:1}${rest:0:1}"
+				if [[ -n "$escape" ]]; then
+					escape=
+				else
+					escape=1
+				fi
+				;;
+			(*)
+				escape=
+				name="${name}${rest:0:1}"
+				;;
+
+		esac
+		rest=${rest:1}
+	done
+
+	if ! [[ "${rest:0:1}" = "/" ]]; then
+		error "Wrong kind/flags syntax: $rest"
+	fi
+
+	rest=${rest:1}
+	while [[ -n "$rest" ]]; do
+		case "${rest:0:1}" in
+			(/)
+				if [[ -n "$escape" ]]; then
+					tmp="${tmp}${rest:0:1}"
+					escape=
+				else
+					break
+				fi
+				;;
+			(\\)
+				tmp="${tmp}${rest:0:1}${rest:0:1}"
+				if [[ -n "$escape" ]]; then
+					escape=
+				else
+					escape=1
+				fi
+				;;
+			(*)
+				escape=
+				tmp="${tmp}${rest:0:1}"
+				;;
+
+		esac
+		rest=${rest:1}
+	done
+
+
+	if [[ -z "${rest}" ]]; then
+		flags=$tmp
+	else
+		kind=$tmp
+	fi
+
+	if [[ "${rest:0:1}" = "/" ]]; then
+		rest=${rest:1}
+		while [[ -n "$rest" ]]; do
+			case "${rest:0:1}" in
+				(/)
+					if [[ -n "$escape" ]]; then
+						flags="${flags}${rest:0:1}"
+						escape=
+					else
+						break
+					fi
+					;;
+				(\\)
+					flags="${flags}${rest:0:1}${rest:0:1}"
+					if [[ -n "$escape" ]]; then
+						escape=
+					else
+						escape=1
+					fi
+					;;
+				(*)
+					escape=
+					flags="${flags}${rest:0:1}"
+					;;
+
+			esac
+			rest=${rest:1}
+		done
+
+	fi
+
+	#    echo regexp: "${regexp}"
+	#    echo name:  "${name}"
+	#    echo kind:  "${kind}"
+	#    echo flags:  "${flags}"
+
+	CTAGS_REGEX_REGEX+=( "${regexp}" )
+	CTAGS_REGEX_NAME+=( "${name}" )
+	CTAGS_REGEX_KIND+=( "${kind}" )
+	CTAGS_REGEX_FLAG+=( "${flags}" )
+}
+
+disable_kinds()
+{
+	local kinds=$1
+	local c
+
+	while true; do
+		c=${kinds:0:1}
+		kinds=${kinds:1}
+		if [[ -z "${c}" ]]; then
+			break
+		else
+			CTAGS_DISABLED_KINDS+=( "${c}" )
+		fi
+	done
+}
+
+parse_line()
+{
+	local line=$1
+	local opt
+	local pat
+	local ext
+	local ali
+	local rgx
+	local tmp
+	local xcmd_path
+	local xcmd_flags
+
+	case "$line" in
+		(-h|--help)
+			print_help 0
+			;;
+		(--options=*)
+			opt=${1/--options=/}
+			if ! parse_optlib "$opt"; then
+				return 1
+			fi
+			;;
+		(--langdef=*)
+			if [[ -n "$CTAGS_LANG" ]]; then
+				error "LANG is already defined as $CTAGS_LANG: $line"
+			fi
+			CTAGS_LANG=${1/--langdef=/}
+			CTAGS_LANG_IN_C=$(echo "$(tr a-z A-Z <<<${CTAGS_LANG:0:1})${CTAGS_LANG:1}")
+			;;
+		(--languages=-${CTAGS_LANG})
+			CTAGS_DISABLE=1
+			;;
+		(--languages=-*)
+			if [[ -z "${CTAGS_LANG}" ]]; then
+				error "Don't use --languages=- option before defining a language: $line"
+			else
+				error "Only language you do --langdef can be disabled: $line"
+			fi
+			;;
+		(--languages=*)
+			error "--languages can be used only for disable a language you defined with --langdef: $line"
+			;;
+		#
+		# --map-<LANG>
+		#
+		(--map-${CTAGS_LANG}=+\(*\))
+			pat=${1/--map-${CTAGS_LANG}=+\(/}; pat=${pat%%\)}
+			CTAGS_PATTERNS+=( $pat )
+			;;
+		(--map-${CTAGS_LANG}=+.*)
+			ext=${1/--map-${CTAGS_LANG}=+./}
+			CTAGS_EXTENSIONS+=( $ext )
+			;;
+		(--map-${CTAGS_LANG}=*)
+			error "Other than the notation for appending(--map-<LANG>=+...) is not supported"
+			;;
+		(--map-*=*)
+			if [[ -z "${CTAGS_LANG}" ]]; then
+				error "Don't use --map-<LANG>= option before defining a language: $line"
+			else
+				tmp=${1/--map-/}
+				tmp=${tmp/=*/}
+				error "The language is not defined: ${tmp}"
+			fi
+			;;
+		#
+		# --alias-<LANG>=+*
+		#
+		(--alias-${CTAGS_LANG}=+*)
+			ali=${1/--alias-${CTAGS_LANG}=+/}
+			CTAGS_ALIASES+=( $ali )
+			;;
+		(--alias-${CTAGS_LANG}=*)
+			error "Other than the notation for appending(--alias-<LANG>=+...) is not supported"
+			;;
+		(--alias-*=*)
+			if [[ -z "${CTAGS_LANG}" ]]; then
+				error "Don't use --alias-<LANG>= option before defining a language: $line"
+			else
+				tmp=${1/--alias-/}
+				tmp=${tmp/=*/}
+				error "The language is not defined: ${tmp}"
+			fi
+			;;
+		#
+		# --regex=
+		#
+		(--regex-${CTAGS_LANG}=*)
+			if [[ -z "${CTAGS_LANG}" ]]; then
+				error "Don't use --regex-<LANG>= option before defining a language: $line"
+			fi
+			rgx=${1/--regex-${CTAGS_LANG}=}
+			parse_regex "$rgx"
+			;;
+		(--regex-*=*)
+			if [[ -z "${CTAGS_LANG}" ]]; then
+				error "Don't use --regex-<LANG>= option before defining a language: $line"
+			else
+				tmp=${1/--regex-/}
+				tmp=${tmp/=*/}
+				error "The language is not defined: ${tmp}"
+			fi
+			;;
+		#
+		# --kinds=
+		#
+		(--kinds-${CTAGS_LANG}=*)
+			if [[ -z "${CTAGS_LANG}" ]]; then
+				error "Don't use --kinds-<LANG>= option before defining a language: $line"
+			fi
+			kinds=${1/--kinds-${CTAGS_LANG}=}
+			if [[ ${kinds:0:1} = - ]]; then
+				disable_kinds "${kinds:1}"
+			elif [[ ${kinds:0:1} = + ]]; then
+				error "Don't use --kinds-<LANG>=+ option: defined kinds in the file is enabled by default"
+			else
+				error "Don't use --kinds-<LANG>= option: use --kinds-<LANG>=- for disabling kinds"
+			fi
+			;;
+		(--kinds-*=*)
+			if [[ -z "${CTAGS_LANG}" ]]; then
+				error "Don't use --kinds-<LANG>= option before defining a language: $line"
+			else
+				tmp=${1/--kinds-/}
+				tmp=${tmp/=*/}
+				error "The language is not defined: ${tmp}"
+			fi
+			;;
+		#
+		# --xcmd-<LANG>=
+		#
+		(--xcmd-${CTAGS_LANG}=*)
+			tmp=${1/--xcmd-${CTAGS_LANG}=/}
+			xcmd_path=${tmp%%\{*}
+			if [[ -z "${xcmd_path}" ]]; then
+				error "The path part for --xcmd-${CTAGS_LANG} is empty: ${1}"
+			fi
+
+			xcmd_flags=${tmp#*\{}
+			if [[ "${xcmd_flags}" = "${tmp}" ]]; then
+				xcmd_flags=""
+			elif [[ -n "${xcmd_flags}" ]]; then
+				xcmd_flags="{""${xcmd_flags}"
+			fi
+			CTAGS_XCMD_PATH+=( ${xcmd_path} )
+			CTAGS_XCMD_FLAGS+=( ${xcmd_flags} )
+			;;
+		(--xcmd-*=*)
+			if [[ -z "${CTAGS_LANG}" ]]; then
+				error "Don't use --xcmd-<LANG>= option before defining a language: $line"
+			else
+				tmp=${1/--xcmd-/}
+				tmp=${tmp/=*/}
+				error "The language is not defined: ${tmp}"
+			fi
+			;;
+		#
+		#  TODO --input-encoding-<LANG>=encoding
+		#
+		#
+		# rest
+		#
+		(--langmap=*)
+			error "Use --map-<LANG> option instead of --langmap=: $line"
+			;;
+		(-*)
+			error "Unhandled option: $line"
+			;;
+		(*)
+			error "Unhandled arugment: $line"
+			;;
+	esac
+
+	return 0
+}
+
+emit_header()
+{
+	local input=$1
+	cat <<EOF
+/*
+ * Generated by $0 from ${input}, Don't edit this manually.
+ */
+#include "general.h"
+#include "parse.h"
+#include "routines.h"
+
+EOF
+	echo
+}
+
+emit_initializer()
+{
+	local c
+
+	cat <<EOF
+static void initialize${CTAGS_LANG_IN_C}Parser (const langType language)
+{
+EOF
+	local i
+	local p
+	local f
+	for i in $(seq 0 $(( ${#CTAGS_XCMD_PATH[@]} - 1))); do
+		p=${CTAGS_XCMD_PATH[$i]}
+		f=${CTAGS_XCMD_flags[$i]}
+		cat<<EOF
+	addLanguageXcmd (language, "$p$f");
+EOF
+	done
+	for c in ${CTAGS_DISABLED_KINDS[@]}; do
+		cat<<EOF
+	enableRegexKind (language, '$c', FALSE);
+EOF
+	done
+	cat<<EOF
+}
+EOF
+	echo
+}
+
+emit_extensions()
+{
+	local elt
+
+	cat <<EOF
+	static const char *const extensions [] = {
+EOF
+
+	for elt in ${CTAGS_EXTENSIONS[@]}; do
+		echo "		\"$elt\","
+	done
+	cat <<EOF
+		NULL
+	};
+EOF
+	echo
+}
+
+emit_aliases()
+{
+	local elt
+
+	cat<<EOF
+	static const char *const aliases [] = {
+EOF
+	for elt in ${CTAGS_ALIASES[@]}; do
+		echo "		\"$elt\","
+	done
+	cat <<EOF
+		NULL
+	};
+EOF
+	echo
+}
+
+emit_patterns()
+{
+	local elt
+
+	cat <<EOF
+	static const char *const patterns [] = {
+EOF
+	for elt in ${CTAGS_PATTERNS[@]}; do
+		echo "		\"$elt\","
+	done
+	cat <<EOF
+		NULL
+	};
+EOF
+	echo
+}
+
+emit_tag_regex_table()
+{
+	local i
+
+	local count
+	local regex
+	local name
+	local kind
+	local flags
+
+	count=${#CTAGS_REGEX_REGEX[@]}
+	if (( count == 0 )); then
+		return
+	fi
+
+	cat <<EOF
+	static const tagRegexTable const ${CTAGS_LANG_IN_C}TagRegexTable [] = {
+EOF
+	for i in $(seq 0 $(( $count - 1 ))); do
+
+		regex=\""${CTAGS_REGEX_REGEX[$i]}"\"
+		name=\""${CTAGS_REGEX_NAME[$i]}"\"
+		kind=\""${CTAGS_REGEX_KIND[$i]}"\"
+		if [[ -z "${CTAGS_REGEX_FLAG[$i]}" ]]; then
+			flags=NULL
+		else
+			flags=\""${CTAGS_REGEX_FLAG[$i]}"\"
+		fi
+		cat <<EOF
+		{$regex, $name,
+		$kind, $flags},
+EOF
+	done
+	cat<<EOF
+	};
+EOF
+	echo
+
+}
+
+emit_field_initialization()
+{
+	local enabled
+	local method
+
+	if [[ -n "${CTAGS_DISABLE}" ]]; then
+		enabled=FALSE
+	else
+		enabled=TRUE
+	fi
+
+	method=METHOD_NOT_CRAFTED
+	if (( ${#CTAGS_REGEX_REGEX[@]} > 0 )); then
+		method="${method}|METHOD_REGEX"
+	fi
+
+	if (( ${#CTAGS_XCMD_PATH[@]} > 0 )); then
+		method="${method}|METHOD_XCMD"
+	fi
+
+	cat<<EOF
+	def->enabled       = ${enabled};
+EOF
+	cat<<EOF
+	def->extensions    = extensions;
+	def->patterns      = patterns;
+	def->aliases       = aliases;
+	def->method        = ${method};
+EOF
+
+	if (( ${#CTAGS_REGEX_REGEX[@]} != 0 )); then
+		cat<<EOF
+	def->tagRegexTable = ${CTAGS_LANG_IN_C}TagRegexTable;
+	def->tagRegexCount = ARRAY_SIZE(${CTAGS_LANG_IN_C}TagRegexTable);
+EOF
+	fi
+
+	cat<<EOF
+	def->initialize    = initialize${CTAGS_LANG_IN_C}Parser;
+EOF
+	echo
+}
+
+emit()
+{
+	local input=$1
+	emit_header "${input}"
+	emit_initializer
+
+	cat <<EOF
+extern parserDefinition* ${CTAGS_LANG_IN_C}Parser (void)
+{
+EOF
+	{
+		emit_extensions
+		emit_aliases
+		emit_patterns
+		emit_tag_regex_table
+		echo
+	}
+
+	cat<<EOF
+	parserDefinition* const def = parserNew ("${CTAGS_LANG}");
+EOF
+	echo
+	emit_field_initialization
+	cat<<EOF
+	return def;
+}
+EOF
+	cat<<EOF
+
+/*
+ * Editor modelines  -  https://www.wireshark.org/tools/modelines.html
+ *
+ * Local variables:
+ * c-basic-offset: 4
+ * tab-width: 4
+ * End:
+ *
+ * vi: set shiftwidth=4 tabstop=4:
+ * :indentSize=4:tabSize=4:
+ */
+EOF
+}
+
+main()
+{
+	local optlib
+
+	case $1 in
+		(-h|--help)
+			print_help 0
+			;;
+		(-*)
+			error "unrecongnized option: $1"
+			;;
+		(*)
+			optlib=$1
+			shift
+			;;
+	esac
+
+	if (( $# > 0 )); then
+		error "Too many argument: $@"
+	fi
+
+	parse_optlib "$optlib" && emit "$optlib"
+	exit $?
+}
+
+main "$@"
