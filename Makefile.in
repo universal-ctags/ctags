@@ -172,13 +172,13 @@ V_CC_1	 =
 #
 all: $(CTAGS_EXEC) $(READ_LIB) $(READ_CMD)
 
-$(CTAGS_EXEC): $(OBJECTS)
-	$(V_CC) $(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
+$(CTAGS_EXEC): $(ALL_OBJS)
+	$(V_CC) $(CC) $(LDFLAGS) -o $@ $(ALL_OBJS) $(LIBS)
 
 $(READ_CMD): readtags.c readtags.h
 	$(V_CC) $(CC) -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(srcdir)/readtags.c
 
-$(OBJECTS): $(ALL_HEADS) config.h Makefile
+$(ALL_OBJS): $(ALL_HEADS) config.h Makefile
 
 # Regenerate the Makefile whenever this file (it's source) changed.  Any target
 # should trigger this as it may affect their rules.  This implementation only
@@ -341,7 +341,7 @@ TAGS: $(CTAGS_EXEC)
 
 clean: clean-units clean-gcov clean-tmain
 	$(SILENT) echo Cleaning top level
-	$(SILENT) rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB)
+	$(SILENT) rm -f $(ALL_OBJS) $(CTAGS_EXEC) tags TAGS $(READ_LIB)
 	$(SILENT) rm -f $(ALL_SRCS:.c=.gcno)
 
 mostlyclean: clean

@@ -124,7 +124,7 @@ FNMATCH_HEADS = fnmatch/fnmatch.h
 FNMATCH_SRCS = fnmatch/fnmatch.c
 FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.$(OBJEXT))
 
-OBJECTS = \
+ALL_OBJS = \
 	$(ALL_SRCS:.c=.$(OBJEXT)) \
 	$(LIBOBJS)
 
