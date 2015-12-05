@@ -19,10 +19,8 @@ typedef struct sRoleDesc {
 	const char* description;	  /* displayed in --help output */
 } roleDesc;
 
-struct sTagEntryInfo;
-typedef struct sTagEntryInfo tagEntryInfo;
 extern void printRole (const roleDesc* const role); /* for --help */
-extern const char *renderRole (const roleDesc* const role, const tagEntryInfo *const tag, vString* b);
+extern const char *renderRole (const roleDesc* const role, vString* b);
 
 /*
  * Predefined kinds

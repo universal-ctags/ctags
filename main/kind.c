@@ -21,8 +21,7 @@ extern void printRole (const roleDesc* const role)
 		printf ("%s\t%s\t%s\n", role->name, role->description, role->enabled? "on": "off");
 }
 
-extern const char *renderRole (const roleDesc* const role,
-			       const tagEntryInfo *const tag __unused__, vString* b)
+extern const char *renderRole (const roleDesc* const role, vString* b)
 {
 	vStringCatS (b, role->name);
 	return vStringValue (b);
