@@ -457,6 +457,22 @@ static void makeTags (cookedArgs *args)
 #undef timeStamp
 }
 
+static boolean isSafeVar (const char* var)
+{
+	char *safe_vars[] = {
+		"BASH_FUNC_module()=",
+		"BASH_FUNC_scl()=",
+		NULL
+	};
+	char *sv;
+
+	for (sv = safe_vars[0]; sv != NULL; sv++)
+		if (strncmp(var, sv, strlen (sv)) == 0)
+			return TRUE;
+
+	return FALSE;
+}
+
 static void sanitizeEnviron (void)
 {
 	char **e = NULL;
@@ -486,6 +502,8 @@ static void sanitizeEnviron (void)
 		value++;
 		if (!strncmp (value, "() {", 4))
 		{
+			if (isSafeVar (e [i]))
+				continue;
 			error (WARNING, "reset environment: %s", e [i]);
 			value [0] = '\0';
 		}
