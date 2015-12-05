@@ -342,7 +342,7 @@ TAGS: $(CTAGS_EXEC)
 clean: clean-units clean-gcov clean-tmain
 	$(SILENT) echo Cleaning top level
 	$(SILENT) rm -f $(OBJECTS) $(CTAGS_EXEC) tags TAGS $(READ_LIB)
-	$(SILENT) rm -f $(SOURCES:.c=.gcno)
+	$(SILENT) rm -f $(ALL_SRCS:.c=.gcno)
 
 mostlyclean: clean
 
