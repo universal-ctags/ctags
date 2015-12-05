@@ -178,7 +178,7 @@ $(CTAGS_EXEC): $(OBJECTS)
 $(READ_CMD): readtags.c readtags.h
 	$(V_CC) $(CC) -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(srcdir)/readtags.c
 
-$(OBJECTS): $(HEADERS) config.h Makefile
+$(OBJECTS): $(ALL_HEADS) config.h Makefile
 
 # Regenerate the Makefile whenever this file (it's source) changed.  Any target
 # should trigger this as it may affect their rules.  This implementation only
