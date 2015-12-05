@@ -159,5 +159,5 @@ run-gcov:
 
 clean-gcov:
 	$(SILENT) echo Cleaning coverage reports
-	$(SILENT) rm -f $(SOURCES:.c=.gcda)
+	$(SILENT) rm -f $(ALL_SRCS:.c=.gcda)
 	$(SILENT) rm -f $(srcdir)/*.gcov
