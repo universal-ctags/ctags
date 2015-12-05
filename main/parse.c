@@ -1312,6 +1312,7 @@ static void processLangKindOption (
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
+	initializeParser (language);
 	if (*p == '*')
 	{
 		resetLanguageKinds (language, TRUE);
@@ -1474,6 +1475,8 @@ static void printKinds (langType language, boolean allKindFields, boolean indent
 {
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
+
+	initializeParser (language);
 	lang = LanguageTable [language];
 	if (lang->kinds != NULL)
 	{
