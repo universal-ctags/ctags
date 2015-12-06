@@ -2,4 +2,4 @@
 # License: GPL-2
 
 CTAGS=$1
-${CTAGS} -o - ./input.sh
+${CTAGS} --options=NONE -o - ./input.sh

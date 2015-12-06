@@ -3,6 +3,6 @@
 
 CTAGS=$1
 
-${CTAGS} --fields=-N --_force-quit
-${CTAGS} --fields=-F --_force-quit
-${CTAGS} --fields=-P --_force-quit
+${CTAGS} --options=NONE --fields=-N --_force-quit
+${CTAGS} --options=NONE --fields=-F --_force-quit
+${CTAGS} --options=NONE --fields=-P --_force-quit

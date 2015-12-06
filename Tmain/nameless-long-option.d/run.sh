@@ -3,5 +3,5 @@
 
 CTAGS=$1
 
-${CTAGS} --
+${CTAGS} --options=NONE --
 exit $?
