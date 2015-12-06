@@ -26,6 +26,7 @@
 	CppParser, \
 	CssParser, \
 	CsharpParser, \
+	CtagsParser, \
 	CobolParser, \
 	DParser, \
 	DiffParser, \
@@ -36,6 +37,7 @@
 	FalconParser, \
 	FlexParser, \
 	FortranParser, \
+	GdbinitParser, \
 	GoParser, \
 	HtmlParser, \
 	JavaParser, \
@@ -43,6 +45,7 @@
 	JsonParser, \
 	LispParser, \
 	LuaParser, \
+	M4Parser, \
 	MakefileParser, \
 	MatLabParser, \
 	ObjcParser, \

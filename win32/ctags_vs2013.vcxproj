@@ -107,6 +107,7 @@
     <ClCompile Include="..\parsers\clojure.c" />
     <ClCompile Include="..\parsers\cobol.c" />
     <ClCompile Include="..\parsers\css.c" />
+    <ClCompile Include="..\optlib\ctags-optlib.c" />
     <ClCompile Include="..\main\debug.c" />
     <ClCompile Include="..\parsers\diff.c" />
     <ClCompile Include="..\parsers\dosbatch.c" />
@@ -121,6 +122,7 @@
     <ClCompile Include="..\main\fmt.c" />
     <ClCompile Include="..\fnmatch\fnmatch.c" />
     <ClCompile Include="..\parsers\fortran.c" />
+    <ClCompile Include="..\optlib\gdbinit.c" />
     <ClCompile Include="..\main\get.c" />
     <ClCompile Include="..\parsers\go.c" />
     <ClCompile Include="..\parsers\html.c" />
@@ -132,6 +134,7 @@
     <ClCompile Include="..\main\lregex.c" />
     <ClCompile Include="..\main\lxcmd.c" />
     <ClCompile Include="..\parsers\lua.c" />
+    <ClCompile Include="..\optlib\m4.c" />
     <ClCompile Include="..\main\main.c" />
     <ClCompile Include="..\parsers\make.c" />
     <ClCompile Include="..\parsers\matlab.c" />

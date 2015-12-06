@@ -54,6 +54,9 @@
     <ClCompile Include="..\parsers\css.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\ctags-optlib.c">
+      <Filter>Source Files\Optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\diff.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
@@ -78,6 +81,9 @@
     <ClCompile Include="..\parsers\fortran.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\gdbinit.c">
+      <Filter>Source Files\Optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\go.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
@@ -95,6 +101,9 @@
     </ClCompile>
     <ClCompile Include="..\parsers\lua.c">
       <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\optlib\m4.c">
+      <Filter>Source Files\Optlib</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\make.c">
       <Filter>Source Files\Parsers</Filter>
