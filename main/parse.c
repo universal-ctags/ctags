@@ -1506,6 +1506,9 @@ extern void printLanguageKinds (const langType language, boolean allKindFields)
 		{
 			const parserDefinition* const lang = LanguageTable [i];
 
+			if (lang->invisible)
+				continue;
+
 			if (!allKindFields)
 				printf ("%s%s\n", lang->name, isLanguageEnabled (i) ? "" : " [disabled]");
 			printKinds (i, allKindFields, TRUE);
