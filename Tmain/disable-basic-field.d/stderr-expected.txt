@@ -1,3 +1,6 @@
+ctags: Notice: No options will be read from files or environment
 ctags: Warning: Cannot disable basic field: 'N'(name) for "fields" option
+ctags: Notice: No options will be read from files or environment
 ctags: Warning: Cannot disable basic field: 'F'(input) for "fields" option
+ctags: Notice: No options will be read from files or environment
 ctags: Warning: Cannot disable basic field: 'P'(pattern) for "fields" option

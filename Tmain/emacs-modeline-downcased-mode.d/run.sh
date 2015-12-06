@@ -2,5 +2,5 @@
 # License: GPL-2
 
 CTAGS=$1
-$CTAGS --quiet -G --print-language ./functions
+$CTAGS --options=NONE --quiet -G --print-language ./functions
 
