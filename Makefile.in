@@ -14,6 +14,10 @@ ETAGS_PROG = @etags_name_executable@
 #
 SHELL = /bin/sh
 
+# The translator needs bash
+#
+OPTLIB2C = $(srcdir)/misc/optlib2c
+
 # GNU Autoconf variables. These are set by the "configure" script when it
 # runs.
 #
@@ -84,7 +88,7 @@ include $(srcdir)/source.mak
 #
 
 .SUFFIXES:
-.SUFFIXES: .c .$(OBJEXT)
+.SUFFIXES: .c .$(OBJEXT) .ctags
 
 VPATH	= $(srcdir) \
 	$(srcdir)/data/optlib $(srcdir)/gnu_regex $(srcdir)/fnmatch
@@ -167,6 +171,10 @@ V_CC	 = $(V_CC_$(V))
 V_CC_0	 = @echo [CC] $@;
 V_CC_1	 =
 
+V_OPTLIB2C   = $(V_OPTLIB2C_$(V))
+V_OPTLIB2C_0 = @echo [OPTLIB2C] $@;
+V_OPTLIB2C_1 =
+
 #
 # primary rules
 #
@@ -179,6 +187,10 @@ $(READ_CMD): readtags.c readtags.h
 	$(V_CC) $(CC) -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main $(DEFS) $(ALL_CPPFLAGS)  $(ALL_CFLAGS) $(LDFLAGS) -o $@ $(srcdir)/readtags.c
 
 $(ALL_OBJS): $(ALL_HEADS) config.h Makefile
+
+.ctags.c: $(OPTLIB2C)
+	$(SILENT) dir="$$(dirname $@)"; mkdir -p "$$dir"
+	$(V_OPTLIB2C) $(OPTLIB2C) $< > $@
 
 # Regenerate the Makefile whenever this file (it's source) changed.  Any target
 # should trigger this as it may affect their rules.  This implementation only
