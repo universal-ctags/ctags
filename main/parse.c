@@ -32,6 +32,11 @@
 #include "xtag.h"
 
 /*
+ * FUNCTION PROTOTYPES
+ */
+static void initializeParser (langType lang);
+
+/*
 *   DATA DEFINITIONS
 */
 static parserDefinition *CTagsSelfTestParser (void);
@@ -94,9 +99,14 @@ static vString* ext2ptrnNew (const char *const ext)
 extern boolean isLanguageEnabled (const langType language)
 {
 	const parserDefinition* const lang = LanguageTable [language];
+
 	if (!lang->enabled)
 		return FALSE;
-	else if ((lang->method & METHOD_XCMD) &&
+
+	if (lang->method & METHOD_XCMD)
+		initializeParser (language);
+
+	if ((lang->method & METHOD_XCMD) &&
 		 (!(lang->method & METHOD_XCMD_AVAILABLE)) &&
 		 (lang->kinds == NULL) &&
 		 (!(lang->method & METHOD_REGEX)))
@@ -1509,6 +1519,9 @@ extern void printLanguageKinds (const langType language, boolean allKindFields)
 			if (lang->invisible)
 				continue;
 
+			if (lang->method & METHOD_XCMD)
+				initializeParser (i);
+
 			if (!allKindFields)
 				printf ("%s%s\n", lang->name, isLanguageEnabled (i) ? "" : " [disabled]");
 			printKinds (i, allKindFields, TRUE);
@@ -1640,6 +1653,9 @@ static void printLanguage (const langType language)
 
 	if (lang->invisible)
 		return;
+
+	if (lang->method & METHOD_XCMD)
+		initializeParser (language);
 
 	if (lang->kinds != NULL  ||  (lang->method & METHOD_REGEX) || (lang->method & METHOD_XCMD))
 		printf ("%s%s\n", lang->name, isLanguageEnabled (language) ? "" : " [disabled]");
