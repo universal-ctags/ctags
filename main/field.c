@@ -383,7 +383,7 @@ static const char *renderFieldRole (const tagEntryInfo *const tag, vString* b)
 	{
 		Assert (rindex < tag->kind->nRoles);
 		role  = & (tag->kind->roles [rindex]);
-		return renderRole (role, tag, b);
+		return renderRole (role, b);
 	}
 
 	return vStringValue (b);
