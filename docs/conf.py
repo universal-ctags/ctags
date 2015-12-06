@@ -14,6 +14,9 @@
 import sys
 import os
 
+# Check if we run on RTD or locally
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -107,6 +110,16 @@ html_theme = 'default'
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
 
+# See if the RTD theme is installed locally
+# Based on RTD FAQ and the RTD-theme install instruction
+# http://read-the-docs.readthedocs.org/en/latest/faq.html
+# https://github.com/snide/sphinx_rtd_theme
+
+if not on_rtd:
+	if os.path.exists('_themes/sphinx_rtd_theme'):
+		html_theme_path = [ '_themes', ]
+		html_theme = 'sphinx_rtd_theme'
+
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
 #html_title = None
@@ -126,7 +139,7 @@ html_theme = 'default'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
