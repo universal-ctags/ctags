@@ -2449,7 +2449,7 @@ extern void previewFirstOption (cookedArgs* const args)
 		else if (strcmp (args->item, "options") == 0  &&
 				strcmp (args->parameter, "NONE") == 0)
 		{
-			notice ("No options will be read from files or environment\n");
+			notice ("No options will be read from files or environment");
 			SkipConfiguration = TRUE;
 			cArgForth (args);
 		}
