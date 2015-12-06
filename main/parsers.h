@@ -22,6 +22,7 @@
 	BasicParser, \
 	BetaParser, \
 	ClojureParser, \
+	CoffeeScriptParser, \
 	CParser, \
 	CppParser, \
 	CssParser, \

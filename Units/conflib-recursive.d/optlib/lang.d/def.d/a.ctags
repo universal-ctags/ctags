@@ -1,4 +1,4 @@
 #
 # Taken from https://github.com/fishman/dot_files/blob/master/ctags/.ctags
 #
---langdef=coffee
+--langdef=Cof

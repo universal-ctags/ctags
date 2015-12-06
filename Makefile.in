@@ -120,8 +120,6 @@ preloaddir = $(pkgdatadir)/preload
 pkgconf_preloaddir = $(pkgsysconfdir)/preload
 PRELOAD_OPTLIB =				\
 	\
-	coffee.ctags				\
-	\
 	$(NULL)
 DEFAULT_PRELOAD_FILE=default.ctags
 

@@ -42,6 +42,9 @@
     <ClCompile Include="..\parsers\beta.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\CoffeeScript.c">
+      <Filter>Source Files\Optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\c.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
