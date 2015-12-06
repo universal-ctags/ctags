@@ -1124,10 +1124,9 @@ extern void initializeParsing (void)
 		if (def != NULL)
 		{
 			boolean accepted = FALSE;
-			const unsigned int regex_only = ( METHOD_REGEX | METHOD_NOT_CRAFTED );
 			if (def->name == NULL  ||  def->name[0] == '\0')
 				error (FATAL, "parser definition must contain name\n");
-			else if ((def->method & regex_only) == regex_only)
+			else if (def->method & METHOD_NOT_CRAFTED)
 			{
 				def->parser = findRegexTags;
 				accepted = TRUE;
