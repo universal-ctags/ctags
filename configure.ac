@@ -194,10 +194,6 @@ AC_ARG_ENABLE(tmpdir,
 		[default directory for temporary files [ARG=/tmp]])],
 	tmpdir_specified=yes)
 
-AC_ARG_WITH([ctags-datadir],
-	[AS_HELP_STRING([--with-ctags-datadir=DIR],
-		['universal-ctags'-specific read-only architecture-independent data [DATADIR/ctags]])])
-
 AC_ARG_WITH([ctags-sysconfdir],
 	[AS_HELP_STRING([--with-ctags-sysconfdir=DIR],
 		['universal-ctags'-specific read-only single-machine data [SYSCONFDIR/ctags]])])
@@ -210,13 +206,6 @@ AC_ARG_PROGRAM
 
 # Process configuration options
 # -----------------------------
-
-case "${with_ctags_datadir+set}"-"$with_ctags_datadir" in #(
-"set"-"yes") ctags_datadir="${datadir}/ctags"	   ;; #(
-"set"-"no")  ctags_datadir="${datadir}"		   ;; #(
-"set"-*)     ctags_datadir="${with_ctags_datadir}" ;; #(
-*)	     ctags_datadir="${datadir}/ctags"	   ;;
-esac
 
 case "${with_ctags_sysconfdir+set}"-"$with_ctags_sysconfdir" in #(
 "set"-"yes") ctags_sysconfdir="${sysconfdir}/ctags"	 ;; #(
@@ -232,30 +221,25 @@ case "${with_ctags_libexecdir+set}"-"$with_ctags_libexecdir" in #(
 *)	     ctags_libexecdir="${libexecdir}/ctags"	 ;;
 esac
 
-pkgdatadir="${ctags_datadir}"
 pkgsysconfdir="${ctags_sysconfdir}"
 pkglibexecdir="${ctags_libexecdir}"
 
-AC_SUBST([pkgdatadir])
 AC_SUBST([pkgsysconfdir])
 AC_SUBST([pkglibexecdir])
 
-AH_TEMPLATE([PKGDATADIR],    [installation directory of 'universal-ctags'-specific read-only architecture-independent data.])
 AH_TEMPLATE([PKGSYSCONFDIR], [installation directory of 'universal-ctags'-specific read-only single-machine data.])
 AH_TEMPLATE([PKGLIBEXECDIR], [installation directory of 'universal-ctags'-specific program executables.])
 
 AC_CONFIG_COMMANDS_PRE([
-	PKGDATADIR="PRETTY_VAR_EXPAND([pkgdatadir])"
 	PKGSYSCONFDIR="PRETTY_VAR_EXPAND([pkgsysconfdir])"
 	PKGLIBEXECDIR="PRETTY_VAR_EXPAND([pkglibexecdir])"
 
-	AC_DEFINE_UNQUOTED([PKGDATADIR],    ["${PKGDATADIR}"])
 	AC_DEFINE_UNQUOTED([PKGSYSCONFDIR], ["${PKGSYSCONFDIR}"])
 	AC_DEFINE_UNQUOTED([PKGLIBEXECDIR], ["${PKGLIBEXECDIR}"])
 ])
 
 
-install_targets="install-ctags install-data install-libexec"
+install_targets="install-ctags install-libexec"
 AC_MSG_CHECKING(whether to install link to etags)
 if test yes = "$enable_etags"; then
 	AC_MSG_RESULT(yes)
@@ -591,8 +575,7 @@ AC_DEFINE(HAVE_REGCOMP)
 ])
 AC_SUBST([REGCOMP_CPPFLAGS])
 
-AC_CHECK_FUNCS(scandir,[install_data_targets="install-data-optlib install-data-preload"])
-AC_SUBST(install_data_targets)
+AC_CHECK_FUNCS(scandir)
 
 install_libexec_targets=
 AC_CHECK_FUNCS(fork waitpid execv pipe,[install_libexec_targets="$install_libexec_targets install-libexec-drivers"])

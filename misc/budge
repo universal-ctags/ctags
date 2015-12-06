@@ -53,7 +53,7 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-CMDLINE="${CTAGS_TEST} --quiet --options=NONE -G --options=./.ctags --data-dir=+./data --languages=all --options=misc/budge.ctags -R --print-language"
+CMDLINE="${CTAGS_TEST} --quiet --options=NONE -G --options=./.ctags --languages=all --options=misc/budge.ctags -R --print-language"
 ALL_FILES=$(git ls-files)
 
 TOTAL=0

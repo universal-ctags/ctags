@@ -29,8 +29,6 @@ srcdir	= @srcdir@
 libdir	= @libdir@
 incdir	= @includedir@
 mandir	= @mandir@
-datadir = @datadir@
-pkgdatadir = @pkgdatadir@
 sysconfdir = @sysconfdir@
 pkgsysconfdir = @pkgsysconfdir@
 libexecdir = @libexecdir@
@@ -90,8 +88,7 @@ include $(srcdir)/source.mak
 .SUFFIXES:
 .SUFFIXES: .c .$(OBJEXT) .ctags
 
-VPATH	= $(srcdir) \
-	$(srcdir)/data/optlib $(srcdir)/gnu_regex $(srcdir)/fnmatch
+VPATH	= $(srcdir) $(srcdir)/gnu_regex $(srcdir)/fnmatch
 
 INSTALL		= cp -p
 INSTALL_PROG	= $(INSTALL)
@@ -114,21 +111,10 @@ CMAN	= $(CTAGS_PROG).$(manext)
 EMAN	= $(ETAGS_PROG).$(manext)
 
 #
-# preload
+# optlib related (stub): make install doesn't do mkdir these directories.
 #
-preloaddir = $(pkgdatadir)/preload
 pkgconf_preloaddir = $(pkgsysconfdir)/preload
-PRELOAD_OPTLIB =				\
-	\
-	$(NULL)
-DEFAULT_PRELOAD_FILE=default.ctags
-
-#
-# config files
-#
-optlibdir = $(pkgdatadir)/optlib
 pkgconf_optlibdir = $(pkgsysconfdir)/optlib
-OPTLIB    = $(PRELOAD_OPTLIB)
 
 #
 # drivers
@@ -214,8 +200,7 @@ install-ctags: install-cbin install-cman
 install-etags: install-ebin install-eman
 
 INSTALLDIRS = $(bindir) $(man1dir) $(libdir) $(incdir) \
-	$(optlibdir) $(preloaddir) $(driversdir) \
-	$(pkgconf_optlibdir) $(pkgconf_preloaddir)
+	$(driversdir)
 
 $(addprefix $(DESTDIR),$(INSTALLDIRS)):
 	$(srcdir)/mkinstalldirs $@
@@ -270,22 +255,6 @@ $(DEST_READ_CMD): $(READ_CMD) $(DESTDIR)$(bindir) FORCE
 	$(INSTALL_PROG) $(READ_CMD) $(DESTDIR)$@  &&  chmod 755 $(DESTDIR)$@
 
 #
-# install data
-#
-install-data: @install_data_targets@
-
-install-data-optlib: $(addprefix data/optlib/,$(OPTLIB))  $(DESTDIR)$(optlibdir) $(DESTDIR)$(pkgconf_optlibdir) FORCE
-	for c in $(OPTLIB); do \
-		$(INSTALL_DATA) $(srcdir)/data/optlib/$$c $(DESTDIR)$(optlibdir)/$$c && chmod 644 $(DESTDIR)$(optlibdir)/$$c; \
-	done
-install-data-preload: $(DESTDIR)$(preloaddir) $(DESTDIR)$(pkgconf_preloaddir) FORCE
-	echo > $(DESTDIR)$(preloaddir)/$(DEFAULT_PRELOAD_FILE)
-	for c in $(PRELOAD_OPTLIB); do \
-		echo "--options=$$(basename $$c .ctags)" >> $(DESTDIR)$(preloaddir)/$(DEFAULT_PRELOAD_FILE); \
-	done
-	chmod 644 $(DESTDIR)$(preloaddir)/$(DEFAULT_PRELOAD_FILE)
-
-#
 # install libexec
 #
 install-libexec: @install_libexec_targets@
@@ -297,7 +266,7 @@ install-libexec-drivers: $(addprefix libexec/drivers/,$(DRIVERS)) $(DESTDIR)$(dr
 #
 # rules for uninstalling
 #
-uninstall: uninstall-bin uninstall-lib uninstall-cmd uninstall-man uninstall-data uninstall-libexec
+uninstall: uninstall-bin uninstall-lib uninstall-cmd uninstall-man uninstall-libexec
 
 uninstall-bin:
 	- rm -f $(DEST_CTAGS) $(DEST_ETAGS)
@@ -316,19 +285,6 @@ uninstall-ctags:
 
 uninstall-etags:
 	- rm -f $(DEST_ETAGS) $(DEST_EMAN)
-
-uninstall-data: uninstall-optlib uninstall-preload
-	- rmdir $(pkgdatadir)
-	- rmdir $(pkgsysconfdir)
-
-uninstall-optlib:
-	- rm -f $(addprefix $(optlibdir)/,$(OPTLIB))
-	- rmdir $(optlibdir)
-	- rmdir $(pkgconf_optlibdir)
-uninstall-preload:
-	- rm -f $(preloaddir)/$(DEFAULT_PRELOAD_FILE)
-	- rmdir $(preloaddir)
-	- rmdir $(pkgconf_preloaddir)
 
 uninstall-libexec: uninstall-drivers
 	- rmdir $(pkglibexecdir)

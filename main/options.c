@@ -2720,10 +2720,6 @@ static void installDataPathList (void)
 #ifdef PKGSYSCONFDIR
 	appendToDataPathList (PKGSYSCONFDIR, FALSE);
 #endif
-
-#ifdef PKGDATADIR
-	appendToDataPathList (PKGDATADIR, FALSE);
-#endif
 }
 
 static void installLibexecPathList (void)
