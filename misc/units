@@ -47,6 +47,7 @@ readonly _TIMEOUT_EXIT=124
 readonly _VG_TIMEOUT_FACTOR=10
 readonly _VALGRIND_EXIT=58
 readonly _LINE_SPLITER=$(if type dos2unix > /dev/null 2>&1; then echo "dos2unix"; else echo "cat"; fi)
+readonly _STDERR_OUTPUT_NAME="STDERR.tmp"
 readonly _DIFF_OUTPUT_NAME="DIFF.tmp"
 readonly _NOISE_REPORT_MAX_COLUMN=50
 
@@ -443,7 +444,7 @@ run_tcase ()
     #
     # All generated file must have suffix ".tmp".
     #
-    local ostderr="$o/STDERR.tmp"
+    local ostderr="$o/${_STDERR_OUTPUT_NAME}"
     local orawout="$o/RAWOUT.tmp"
     local ofiltered="$o/FILTERED.tmp"
     local odiff="$o/${_DIFF_OUTPUT_NAME}"
@@ -657,6 +658,17 @@ run_show_diff_output ()
     echo
 }
 
+run_show_stderr_output ()
+{
+    local units_dir="$1"
+    local t="$2"
+
+    printf "	"
+    line .
+    sed -e 's/^.*$/	\0/' ${units_dir}/${t}.*/${_STDERR_OUTPUT_NAME} | tail -50
+    echo
+}
+
 run_summary ()
 {
     local build_dir="${1}"
@@ -679,6 +691,9 @@ run_summary ()
     count_list $L_FAILED_BY_STATUS
     for t in $L_FAILED_BY_STATUS; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
+	if [ "${SHOW_DIFF_OUTPUT}" = yes ]; then
+	    run_show_stderr_output "${build_dir}" "${t#${_DEFAULT_CATEGORY}/}"
+	fi
     done
 
     printf '  %-40s' "#FAILED (unexpected-output):"
