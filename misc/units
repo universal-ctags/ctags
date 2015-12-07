@@ -653,7 +653,7 @@ run_show_diff_output ()
 
     printf "	"
     line .
-    sed -e 's/./	\0/' ${units_dir}/${t}.*/${_DIFF_OUTPUT_NAME}
+    sed -e 's/^.*$/	\0/' ${units_dir}/${t}.*/${_DIFF_OUTPUT_NAME}
     echo
 }
 
