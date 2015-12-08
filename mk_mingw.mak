@@ -12,16 +12,19 @@ OBJEXT = o
 ALL_OBJS += $(REGEX_OBJS)
 ALL_OBJS += $(FNMATCH_OBJS)
 VPATH = . ./main ./parsers
+
 ifeq (yes, $(WITH_ICONV))
 DEFINES += -DHAVE_ICONV
 LIBS += -liconv
 endif
 
-ctags.exe: OPT = -O4 -Os -fexpensive-optimizations
-ctags.exe: LDFLAGS = -s
-dctags.exe: OPT = -g
-dctags.exe: DEBUG = -DDEBUG
-dctags.exe: ALL_SRCS += debug.c
+ifdef DEBUG
+DEFINES += -DDEBUG
+OPT = -g
+else
+OPT = -O4 -Os -fexpensive-optimizations
+LDFLAGS = -s
+endif
 
 .SUFFIXES: .c .o
 
@@ -45,9 +48,8 @@ V_CC_1	 =
 	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
 
 ctags: ctags.exe
-dctags: dctags.exe
 
-ctags.exe dctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS)
+ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS)
 	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(ALL_OBJS) $(LIBS)
 
 readtags.exe: readtags.c
@@ -56,6 +58,5 @@ readtags.exe: readtags.c
 clean:
 	$(SILENT) echo Cleaning
 	$(SILENT) rm -f ctags.exe
-	$(SILENT) rm -f dctags.exe
 	$(SILENT) rm -f tags
 	$(SILENT) rm -f main/*.o parsers/*.o gnu_regex/*.o fnmatch/*.o

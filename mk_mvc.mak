@@ -14,10 +14,16 @@ REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrca
 DEFINES = -DWIN32 $(REGEX_DEFINES)
 INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch
 OPT = /O2
+
 !if "$(WITH_ICONV)" == "yes"
 DEFINES = $(DEFINES) -DHAVE_ICONV
 LIBS = $(LIBS) /libpath:$(ICONV_DIR)/lib iconv.lib
 INCLUDES = $(INCLUDES) -I$(ICONV_DIR)/include
+!endif
+
+!ifdef DEBUG
+DEFINES = $(DEFINES) -DDEBUG
+OPT = $(OPT) /Zi
 !endif
 
 ctags: ctags.exe
@@ -27,10 +33,6 @@ ctags.exe: respmvc
 
 readtags.exe: readtags.c
 	cl /clr $(OPT) /Fe$@ $(DEFINES) -DREADTAGS_MAIN readtags.c /link setargv.obj
-
-# Debug version
-dctags.exe: respmvc
-	cl /Zi -DDEBUG /Fe$@ @respmvc debug.c /link setargv.obj
 
 $(REGEX_OBJS): $(REGEX_SRCS)
 	cl /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(REGEX_SRCS)
@@ -45,11 +47,8 @@ respmvc: $(REGEX_OBJS) $(FNMATCH_OBJS) $(ALL_SRCS) $(REGEX_SRCS) $(FNMATCH_SRCS)
 	echo $(REGEX_SRCS) >> $@
 	echo $(FNMATCH_SRCS) >> $@
 
-mostlyclean:
+clean:
 	- del *.obj
-	- del dctags.exe
+	- del ctags.exe
 	- del respmvc
 	- del tags
-
-clean: mostlyclean
-	- del ctags.exe
