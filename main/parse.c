@@ -720,10 +720,17 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 	langType language;
 	parserCandidate  *candidates;
 	unsigned int n_candidates;
-
+	unsigned int i;
 	n_candidates = (*nominate)(spec, &candidates);
 
 	verbose ("		#candidates: %u\n", n_candidates);
+	if (n_candidates > 1)
+		for (i = 0; i < n_candidates; i++)
+			verbose ("			%u: %s (%s)\n",
+				 i,
+				 LanguageTable[candidates[i].lang]->name, candidates[i].spec);
+
+
 	if (n_candidates == 1)
 	{
 		language = candidates[0].lang;
