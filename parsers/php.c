@@ -1053,11 +1053,13 @@ static boolean parseTrait (tokenInfo *const token)
  * if @name is NULL, parses a normal function
  * 	function myfunc($foo, $bar) {}
  * 	function &myfunc($foo, $bar) {}
+ * 	function myfunc($foo, $bar) : type {}
  *
  * if @name is not NULL, parses an anonymous function with name @name
  * 	$foo = function($foo, $bar) {}
  * 	$foo = function&($foo, $bar) {}
- * 	$foo = function($foo, $bar) use ($x, &$y) {} */
+ * 	$foo = function($foo, $bar) use ($x, &$y) {}
+ * 	$foo = function($foo, $bar) use ($x, &$y) : type {} */
 static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 {
 	boolean readNext = TRUE;
@@ -1157,17 +1159,6 @@ static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 		readToken (token); /* normally it's an open brace or "use" keyword */
 	}
 
-	/* if parsing Zephir, skip function return type hint */
-	if (getInputLanguage () == Lang_zephir && token->type == TOKEN_OPERATOR)
-	{
-		do
-			readToken (token);
-		while (token->type != TOKEN_EOF &&
-			   token->type != TOKEN_OPEN_CURLY &&
-			   token->type != TOKEN_CLOSE_CURLY &&
-			   token->type != TOKEN_SEMICOLON);
-	}
-
 	/* skip use(...) */
 	if (token->type == TOKEN_KEYWORD && token->keyword == KEYWORD_use)
 	{
@@ -1190,6 +1181,19 @@ static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 
 			readToken (token);
 		}
+	}
+
+	/* PHP7 return type declaration or if parsing Zephir, skip function return
+	 * type hint */
+	if ((getInputLanguage () == Lang_php && token->type == TOKEN_COLON) ||
+	    (getInputLanguage () == Lang_zephir && token->type == TOKEN_OPERATOR))
+	{
+		do
+			readToken (token);
+		while (token->type != TOKEN_EOF &&
+			   token->type != TOKEN_OPEN_CURLY &&
+			   token->type != TOKEN_CLOSE_CURLY &&
+			   token->type != TOKEN_SEMICOLON);
 	}
 
 	if (token->type == TOKEN_OPEN_CURLY)
