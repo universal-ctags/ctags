@@ -38,14 +38,12 @@ In the example, *Tmain* does:
    and `exit-expected.txt`.
 5. compares it with `tags-expected.txt` if run.sh generates `tags` file.
 
-`run.sh` is run with following 4 arguments:
+`run.sh` is run with following 3 arguments:
 
 1. the path for the target ctags
-2. the path for `data` directory
-3. the path for `libexec` directory
-4. the path for `builddir` directory
+2. the path for `libexec` directory
+3. the path for `builddir` directory
 
-The `data` directory is for testing the handling of optlib.
 The `libexec` directory is for testing the handling of xcmd.
 
 When comparing `tags` file with `tags-expected.txt`, you
