@@ -1074,7 +1074,7 @@ static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 
 	if (! name)
 	{
-		if (token->type != TOKEN_IDENTIFIER)
+		if (token->type != TOKEN_IDENTIFIER && token->type != TOKEN_KEYWORD)
 			return FALSE;
 
 		name = nameFree = newToken ();
@@ -1214,7 +1214,7 @@ static boolean parseConstant (tokenInfo *const token)
 	tokenInfo *name;
 
 	readToken (token); /* skip const keyword */
-	if (token->type != TOKEN_IDENTIFIER)
+	if (token->type != TOKEN_IDENTIFIER && token->type != TOKEN_KEYWORD)
 		return FALSE;
 
 	name = newToken ();

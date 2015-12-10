@@ -1,0 +1,15 @@
+C	input.php	/^class C {$/;"	c
+abstract	input.php	/^    public function abstract() {}$/;"	f	class:C
+c	input.php	/^$c = C::new();$/;"	v
+call_c_function	input.php	/^function call_c_function($c) {$/;"	f
+class	input.php	/^    public function class() {}$/;"	f	class:C
+const	input.php	/^    const const = 1;$/;"	d	class:C
+for	input.php	/^    public function for() {}$/;"	f	class:C
+function	input.php	/^    public function function() {}$/;"	f	class:C
+new	input.php	/^    public static function new() { return new self; }$/;"	f	class:C
+private	input.php	/^    private function private() {}$/;"	f	class:C
+protected	input.php	/^    protected function protected() {}$/;"	f	class:C
+public	input.php	/^    public function public() {}$/;"	f	class:C
+something	input.php	/^function something() {}$/;"	f
+static	input.php	/^    const static = 2;$/;"	d	class:C
+while	input.php	/^    public function while() {}$/;"	f	class:C
