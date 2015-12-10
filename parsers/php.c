@@ -868,7 +868,7 @@ getNextChar:
 		case '%':
 		{
 			int d = getcFromInputFile ();
-			if (d != '=')
+			if (d != '=' && ! (c == '-' && d == '>'))
 				ungetcToInputFile (d);
 			token->type = TOKEN_OPERATOR;
 			break;
