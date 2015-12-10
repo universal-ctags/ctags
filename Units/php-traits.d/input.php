@@ -16,6 +16,10 @@ functions:
 	stuff [tFoo]
 	stuff [tBar]
 
+variables:
+	prop1 [tBar]
+	prop2 [tBar]
+
 <?php
 
 trait tFoo {
@@ -33,6 +37,9 @@ class A {
 }
 
 trait tBar {
+	protected $prop1 = 0;
+	protected $prop2;
+
 	protected function stuff($arg1, $arg2) {
 		// ...
 	}

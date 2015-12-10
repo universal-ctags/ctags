@@ -1333,7 +1333,9 @@ static boolean parseVariable (tokenInfo *const token)
 		 * 		protected $foo;
 		 * 	}
 		 * but don't get fooled by stuff like $foo = $bar; */
-		if (token->parentKind == K_CLASS || token->parentKind == K_INTERFACE)
+		if (token->parentKind == K_CLASS ||
+		    token->parentKind == K_INTERFACE ||
+		    token->parentKind == K_TRAIT)
 			makeSimplePhpTag (name, K_VARIABLE, access);
 	}
 	else
