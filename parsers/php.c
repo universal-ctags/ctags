@@ -1050,7 +1050,7 @@ static boolean parseClassOrIface (tokenInfo *const token, const phpKind kind,
 	makeClassOrIfaceTag (kind, name, inheritance, impl);
 
 	if (token->type == TOKEN_OPEN_CURLY)
-		enterScope (token, name->string, K_CLASS);
+		enterScope (token, name->string, kind);
 	else
 		readNext = FALSE;
 
