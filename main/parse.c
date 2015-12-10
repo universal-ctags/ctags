@@ -32,9 +32,18 @@
 #include "xtag.h"
 
 /*
+ * FUNCTION PROTOTYPES
+ */
+static void initializeParser (langType lang);
+
+/*
 *   DATA DEFINITIONS
 */
-static parserDefinitionFunc* BuiltInParsers[] = { PARSER_LIST };
+static parserDefinition *CTagsSelfTestParser (void);
+static parserDefinitionFunc* BuiltInParsers[] = {
+	CTagsSelfTestParser,
+	PARSER_LIST
+};
 static parserDefinition** LanguageTable = NULL;
 static unsigned int LanguageCount = 0;
 static kindOption defaultFileKind = {
@@ -90,9 +99,14 @@ static vString* ext2ptrnNew (const char *const ext)
 extern boolean isLanguageEnabled (const langType language)
 {
 	const parserDefinition* const lang = LanguageTable [language];
+
 	if (!lang->enabled)
 		return FALSE;
-	else if ((lang->method & METHOD_XCMD) &&
+
+	if (lang->method & METHOD_XCMD)
+		initializeParser (language);
+
+	if ((lang->method & METHOD_XCMD) &&
 		 (!(lang->method & METHOD_XCMD_AVAILABLE)) &&
 		 (lang->kinds == NULL) &&
 		 (!(lang->method & METHOD_REGEX)))
@@ -1110,10 +1124,9 @@ extern void initializeParsing (void)
 		if (def != NULL)
 		{
 			boolean accepted = FALSE;
-			const unsigned int regex_only = ( METHOD_REGEX | METHOD_NOT_CRAFTED );
 			if (def->name == NULL  ||  def->name[0] == '\0')
 				error (FATAL, "parser definition must contain name\n");
-			else if ((def->method & regex_only) == regex_only)
+			else if (def->method & METHOD_NOT_CRAFTED)
 			{
 				def->parser = findRegexTags;
 				accepted = TRUE;
@@ -1291,13 +1304,14 @@ static void resetLanguageKinds (const langType language, const boolean mode)
 static boolean enableLanguageKind (
 		const langType language, const int kind, const boolean mode)
 {
-	boolean result = enableRegexKind (language, kind, mode);
+	boolean result = FALSE;
 	kindOption* const opt = langKindOption (language, kind);
 	if (opt != NULL)
 	{
 		opt->enabled = mode;
 		result = TRUE;
 	}
+	result = enableRegexKind (language, kind, mode)? TRUE: result;
 	result = enableXcmdKind (language, kind, mode)? TRUE: result;
 	return result;
 }
@@ -1312,6 +1326,7 @@ static void processLangKindOption (
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
+	initializeParser (language);
 	if (*p == '*')
 	{
 		resetLanguageKinds (language, TRUE);
@@ -1326,7 +1341,7 @@ static void processLangKindOption (
 		case '-': mode = FALSE; break;
 		default:
 			if (! enableLanguageKind (language, c, mode))
-				error (WARNING, "Unsupported parameter '%c' for --%s option",
+				error (WARNING, "Unsupported kind: '%c' for --%s option",
 					c, option);
 			break;
 	}
@@ -1474,6 +1489,8 @@ static void printKinds (langType language, boolean allKindFields, boolean indent
 {
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
+
+	initializeParser (language);
 	lang = LanguageTable [language];
 	if (lang->kinds != NULL)
 	{
@@ -1497,6 +1514,12 @@ extern void printLanguageKinds (const langType language, boolean allKindFields)
 		for (i = 0  ;  i < LanguageCount  ;  ++i)
 		{
 			const parserDefinition* const lang = LanguageTable [i];
+
+			if (lang->invisible)
+				continue;
+
+			if (lang->method & METHOD_XCMD)
+				initializeParser (i);
 
 			if (!allKindFields)
 				printf ("%s%s\n", lang->name, isLanguageEnabled (i) ? "" : " [disabled]");
@@ -1629,6 +1652,9 @@ static void printLanguage (const langType language)
 
 	if (lang->invisible)
 		return;
+
+	if (lang->method & METHOD_XCMD)
+		initializeParser (language);
 
 	if (lang->kinds != NULL  ||  (lang->method & METHOD_REGEX) || (lang->method & METHOD_XCMD))
 		printf ("%s%s\n", lang->name, isLanguageEnabled (language) ? "" : " [disabled]");
@@ -2016,7 +2042,7 @@ static void createCTSTTags (void)
 
 }
 
-extern parserDefinition *CTagsSelfTestParser (void)
+static parserDefinition *CTagsSelfTestParser (void)
 {
 	static const char *const extensions[] = { NULL };
 	parserDefinition *const def = parserNew ("CTagsSelfTest");

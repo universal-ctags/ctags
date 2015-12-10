@@ -135,16 +135,6 @@ check()
     T_existing /bin/readtags -f -x
 
     T_existing /libexec/ctags/drivers/coffeetags -f -x
-    T_existing /etc/ctags/optlib   -d -x -r
-    T_existing /etc/ctags/preload  -d -x -r
-    
-    T_existing /share/ctags/optlib/m4.ctags -f -r
-    T_existing /share/ctags/optlib/coffee.ctags -f -r
-    T_existing /share/ctags/optlib/ctags.ctags -f -r
-    T_existing /share/ctags/optlib/gdbinit.ctags -f -r
-
-    T_existing /share/ctags/preload/default.ctags -f -r
-    
     T_existing /share/man/man1/ctags.1 -f -r
 }
 

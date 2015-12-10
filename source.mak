@@ -53,6 +53,9 @@ MAIN_SRCS =				\
 	main/vstring.c			\
 	main/xtag.c
 
+include makefiles/translator_input.mak
+TRANSLATED_SRCS = $(TRANSLATOR_INPUT:.ctags=.c)
+
 PARSER_HEADS =
 PARSER_SRCS =				\
 	parsers/ada.c			\
@@ -105,7 +108,11 @@ PARSER_SRCS =				\
 	parsers/vhdl.c			\
 	parsers/vim.c			\
 	parsers/windres.c		\
-	parsers/yacc.c
+	parsers/yacc.c			\
+	\
+	$(TRANSLATED_SRCS)		\
+	\
+	$(NULL)
 
 DEBUG_HEADS = main/debug.h
 DEBUG_SRCS = main/debug.c

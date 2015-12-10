@@ -8,10 +8,11 @@ CFLAGS = -Wall
 DEFINES = -DWIN32 $(REGEX_DEFINES)
 INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch
 CC = gcc
+OPTLIB2C = ./misc/optlib2c
 OBJEXT = o
 ALL_OBJS += $(REGEX_OBJS)
 ALL_OBJS += $(FNMATCH_OBJS)
-VPATH = . ./main ./parsers
+VPATH = . ./main ./parsers ./optlib
 
 ifeq (yes, $(WITH_ICONV))
 DEFINES += -DHAVE_ICONV
@@ -26,7 +27,7 @@ OPT = -O4 -Os -fexpensive-optimizations
 LDFLAGS = -s
 endif
 
-.SUFFIXES: .c .o
+.SUFFIXES: .c .o .ctags
 
 #
 # Silent/verbose commands
@@ -43,9 +44,16 @@ V_CC	 = $(V_CC_$(V))
 V_CC_0	 = @echo [CC] $@;
 V_CC_1	 =
 
+V_OPTLIB2C   = $(V_OPTLIB2C_$(V))
+V_OPTLIB2C_0 = @echo [OPTLIB2C] $@;
+V_OPTLIB2C_1 =
+
 
 .c.o:
 	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) $(DEFINES) $(INCLUDES) -o $@ $<
+
+.ctags.c: $(OPTLIB2C)
+	$(V_OPTLIB2C) $(OPTLIB2C) $< > $@
 
 ctags: ctags.exe
 

@@ -21,6 +21,6 @@
 # USA.
 #
 #
---langdef=coffee
---map-coffee=+.coffee
---xcmd-coffee=coffeetags
+--langdef=CoffeeScript
+--map-CoffeeScript=+.coffee
+--xcmd-CoffeeScript=coffeetags

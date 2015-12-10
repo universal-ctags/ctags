@@ -1,4 +1,4 @@
 #
 # Taken from https://github.com/fishman/dot_files/blob/master/ctags/.ctags
 #
---regex-coffee=/^[ \t]*class ([a-zA-Z_$][0-9a-zA-Z_.$]*).*$/\1/c,class/
+--regex-Cof=/^[ \t]*class ([a-zA-Z_$][0-9a-zA-Z_.$]*).*$/\1/c,class/

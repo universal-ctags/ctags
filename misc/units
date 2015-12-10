@@ -23,7 +23,6 @@
 #
 SHELL=/bin/sh
 CTAGS=./ctags
-DATADIR=./data
 LIBEXECDIR=./libexec
 WITH_TIMEOUT=
 WITH_VALGRIND=
@@ -47,6 +46,7 @@ readonly _TIMEOUT_EXIT=124
 readonly _VG_TIMEOUT_FACTOR=10
 readonly _VALGRIND_EXIT=58
 readonly _LINE_SPLITER=$(if type dos2unix > /dev/null 2>&1; then echo "dos2unix"; else echo "cat"; fi)
+readonly _STDERR_OUTPUT_NAME="STDERR.tmp"
 readonly _DIFF_OUTPUT_NAME="DIFF.tmp"
 readonly _NOISE_REPORT_MAX_COLUMN=50
 
@@ -443,7 +443,7 @@ run_tcase ()
     #
     # All generated file must have suffix ".tmp".
     #
-    local ostderr="$o/STDERR.tmp"
+    local ostderr="$o/${_STDERR_OUTPUT_NAME}"
     local orawout="$o/RAWOUT.tmp"
     local ofiltered="$o/FILTERED.tmp"
     local odiff="$o/${_DIFF_OUTPUT_NAME}"
@@ -471,7 +471,7 @@ run_tcase ()
     #
     # Build _CMDLINE
     #
-    _CMDLINE="${CTAGS} --verbose --options=NONE --libexec-dir=${LIBEXECDIR} --libexec-dir=+$t --data-dir=${DATADIR} --data-dir=+$t -o -"
+    _CMDLINE="${CTAGS} --verbose --options=NONE --libexec-dir=${LIBEXECDIR} --libexec-dir=+$t --data-dir=+$t -o -"
     [ -f "${fargs}" ] && _CMDLINE="${_CMDLINE} --options=${fargs}"
 
     #
@@ -653,7 +653,18 @@ run_show_diff_output ()
 
     printf "	"
     line .
-    sed -e 's/./	\0/' ${units_dir}/${t}.*/${_DIFF_OUTPUT_NAME}
+    sed -e 's/^.*$/	\0/' ${units_dir}/${t}.*/${_DIFF_OUTPUT_NAME}
+    echo
+}
+
+run_show_stderr_output ()
+{
+    local units_dir="$1"
+    local t="$2"
+
+    printf "	"
+    line .
+    sed -e 's/^.*$/	\0/' ${units_dir}/${t}.*/${_STDERR_OUTPUT_NAME} | tail -50
     echo
 }
 
@@ -679,6 +690,9 @@ run_summary ()
     count_list $L_FAILED_BY_STATUS
     for t in $L_FAILED_BY_STATUS; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
+	if [ "${SHOW_DIFF_OUTPUT}" = yes ]; then
+	    run_show_stderr_output "${build_dir}" "${t#${_DEFAULT_CATEGORY}/}"
+	fi
     done
 
     printf '  %-40s' "#FAILED (unexpected-output):"
@@ -753,15 +767,6 @@ action_run ()
 		;;
 	    --ctags=*)
 		CTAGS="${1#--ctags=}"
-		shift
-		;;
-	    --datadir)
-		shift
-		DATADIR="$1"
-		shift
-		;;
-	    --datadir=*)
-		DATADIR="${1#--datadir=}"
 		shift
 		;;
 	    --libexecdir)
@@ -872,7 +877,6 @@ action_run ()
 	ERROR 1 "unexpected option argument for --colorized-output: ${COLORIZED_OUTPUT}"
     fi
 
-    [ -d "${DATADIR}" ] || ERROR 1 "no such directory: ${DATADIR}"
     [ -d "${LIBEXECDIR}" ] || ERROR 1 "no such directory: ${LIBEXECDIR}"
     : ${WITH_TIMEOUT:=0}
     [ "$WITH_TIMEOUT" = 0 ] || check_availability timeout
@@ -913,7 +917,6 @@ $0 run [OPTIONS] UNITS-DIR
 
 	   OPTIONS:
 		--ctags CTAGS: ctags exectuable file for testing
-		--datadir DATADIR: data directory
 		--categories CATEGORY1[,CATEGORY2,...]: run only CATEGORY* related cases.
 							Category selection is done in upper
 							layer than unit selection. This
@@ -1345,15 +1348,6 @@ action_fuzz_common ()
 		CTAGS="${1#--ctags=}"
 		shift
 		;;
-	    --datadir)
-		shift
-		DATADIR="$1"
-		shift
-		;;
-	    --datadir=*)
-		DATADIR="${1#--datadir=}"
-		shift
-		;;
 	    --languages)
 		shift
 		LANGUAGES=$(echo "${1}" | tr ',' ' ')
@@ -1433,14 +1427,13 @@ action_fuzz_common ()
 	ERROR 1 "unexpected option argument for --colorized-output: ${COLORIZED_OUTPUT}"
     fi
 
-    [ -d "${DATADIR}" ] || ERROR 1 "no such directory: ${DATADIR}"
     [ -d "${LIBEXECDIR}" ] || ERROR 1 "no such directory: ${LIBEXECDIR}"
     : ${WITH_TIMEOUT:=2}
     [ "$WITH_TIMEOUT" = 0 ] || check_availability timeout
     [ "$WITH_VALGRIND" = 'yes' ] && check_availability valgrind
     check_availability find
 
-    cmdline="${CTAGS} --options=NONE --\*-kinds=\* --fields=\* --libexec-dir=${LIBEXECDIR} --data-dir=${DATADIR}"
+    cmdline="${CTAGS} --options=NONE --\*-kinds=\* --fields=\* --libexec-dir=${LIBEXECDIR}"
     _CMDLINE="${cmdline} -G -o - "
     _CMDLINE_FOR_SHRINKING="${_CMDLINE}"
     if [ "$WITH_VALGRIND" = yes ]; then
@@ -1473,7 +1466,6 @@ $0 fuzz [OPTIONS] UNITS-DIR
 
 	   OPTIONS:
 		--ctags CTAGS: ctags exectuable file for testing
-		--datadir DATADIR: data directory
 		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
 		--libexecdir LIBEXECDIR: libexec directory
 		--quiet: don't print dots as passed test cases.
@@ -1702,7 +1694,6 @@ $0 noise [OPTIONS] UNITS-DIR
 
 	   OPTIONS:
 		--ctags CTAGS: ctags exectuable file for testing
-		--datadir DATADIR: data directory
 		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
 		--libexecdir LIBEXECDIR: libexec directory
 		--quiet: don't print dots as passed test cases.
@@ -1797,7 +1788,7 @@ tmain_run ()
 	line '-'
 	(
 	    cd ${subdir}
-	    ${SHELL} run.sh ${basedir}/${CTAGS} ${basedir}/${DATADIR} ${basedir}/${LIBEXECDIR} ${build_subdir}
+	    ${SHELL} run.sh ${basedir}/${CTAGS} ${basedir}/${LIBEXECDIR} ${build_subdir}
 	) > ${build_subdir}/stdout-actual.txt 2> ${build_subdir}/stderr-actual.txt
 	r=$?
 	echo $r > ${build_subdir}/exit-actual.txt
@@ -1876,15 +1867,6 @@ action_tmain ()
 		CTAGS="${1#--ctags=}"
 		shift
 		;;
-	    --datadir)
-		shift
-		DATADIR="$1"
-		shift
-		;;
-	    --datadir=*)
-		DATADIR="${1#--datadir=}"
-		shift
-		;;
 	    --libexecdir)
 		shift
 		LIBEXECDIR="$1"
@@ -1952,7 +1934,6 @@ action_tmain ()
 	ERROR 1 "unexpected option argument for --colorized-output: ${COLORIZED_OUTPUT}"
     fi
 
-    [ -d "${DATADIR}" ] || ERROR 1 "no such directory: ${DATADIR}"
     [ -d "${LIBEXECDIR}" ] || ERROR 1 "no such directory: ${LIBEXECDIR}"
 
     tmain_run ${tmain_dir} ${build_dir}
@@ -1967,7 +1948,6 @@ $0 tmain [OPTIONS] TMAIN-DIR [BUILD-DIR]
 	Run tests for main part of ctags.
 
 	--ctags CTAGS: ctags exectuable file for testing
-	--datadir DATADIR: data directory
 	--libexecdir LIBEXECDIR: libexec directory
 	--colorized-output yes|no: print the result in color.
 	--with-valgrind: (not implemented) run a test case under valgrind
@@ -2024,7 +2004,6 @@ cat <<EOF
 $0 noise [OPTIONS] UNITS-DIR
 	   OPTIONS:
 		--ctags CTAGS: ctags exectuable file for testing
-		--datadir DATADIR: data directory
 		--languages PARSER1[,PARSER2,...]: run only PARSER* related cases
 		--libexecdir LIBEXECDIR: libexec directory
 		--quiet: don't print dots as passed test cases.

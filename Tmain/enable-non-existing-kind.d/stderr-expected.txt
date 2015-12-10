@@ -1,0 +1,1 @@
+ctags: Warning: Unsupported kind: 'Z' for --kinds-C option

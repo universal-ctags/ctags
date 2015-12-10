@@ -22,10 +22,12 @@
 	BasicParser, \
 	BetaParser, \
 	ClojureParser, \
+	CoffeeScriptParser, \
 	CParser, \
 	CppParser, \
 	CssParser, \
 	CsharpParser, \
+	CtagsParser, \
 	CobolParser, \
 	DParser, \
 	DiffParser, \
@@ -36,6 +38,7 @@
 	FalconParser, \
 	FlexParser, \
 	FortranParser, \
+	GdbinitParser, \
 	GoParser, \
 	HtmlParser, \
 	JavaParser, \
@@ -43,6 +46,7 @@
 	JsonParser, \
 	LispParser, \
 	LuaParser, \
+	M4Parser, \
 	MakefileParser, \
 	MatLabParser, \
 	ObjcParser, \
@@ -71,9 +75,7 @@
 	VimParser, \
 	WindResParser, \
 	YaccParser, \
-	ZephirParser, \
-	  \
-	CTagsSelfTestParser
+	ZephirParser
 
 #endif  /* CTAGS_MAIN_PARSERS_H */
 
