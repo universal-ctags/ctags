@@ -209,7 +209,8 @@ typedef enum eTokenType {
 	TOKEN_OPEN_SQUARE,
 	TOKEN_CLOSE_SQUARE,
 	TOKEN_VARIABLE,
-	TOKEN_AMPERSAND
+	TOKEN_AMPERSAND,
+	TOKEN_BACKSLASH
 } tokenType;
 
 typedef struct {
@@ -801,6 +802,7 @@ getNextChar:
 		case '[': token->type = TOKEN_OPEN_SQUARE;			break;
 		case ']': token->type = TOKEN_CLOSE_SQUARE;			break;
 		case '&': token->type = TOKEN_AMPERSAND;			break;
+		case '\\': token->type = TOKEN_BACKSLASH;			break;
 
 		case '=':
 		{
@@ -1154,6 +1156,7 @@ static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 				case TOKEN_OPEN_SQUARE:		vStringPut (arglist, '[');		break;
 				case TOKEN_PERIOD:			vStringPut (arglist, '.');		break;
 				case TOKEN_SEMICOLON:		vStringPut (arglist, ';');		break;
+				case TOKEN_BACKSLASH:		vStringPut (arglist, '\\');		break;
 				case TOKEN_STRING:
 				{
 					vStringCatS (arglist, "'");	
@@ -1174,6 +1177,7 @@ static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 						case '(':
 						case '[':
 						case '.':
+						case '\\':
 							/* no need for a space between those and the identifier */
 							break;
 
@@ -1214,10 +1218,8 @@ static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 	{
 		do
 			readToken (token);
-		while (token->type != TOKEN_EOF &&
-			   token->type != TOKEN_OPEN_CURLY &&
-			   token->type != TOKEN_CLOSE_CURLY &&
-			   token->type != TOKEN_SEMICOLON);
+		while (token->type == TOKEN_IDENTIFIER ||
+		       token->type == TOKEN_BACKSLASH);
 	}
 
 	if (token->type == TOKEN_OPEN_CURLY)

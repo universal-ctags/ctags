@@ -41,6 +41,11 @@ namespace
         {
             return $this->fourth();
         }
+
+        public function &sixth(\A\T &$t) : \A\T
+        {
+            return $t;
+        }
     }
 
     /* runtime test */
@@ -49,4 +54,6 @@ namespace
     var_dump(($t->second()->first("hello"))());
     var_dump($s->fourth());
     var_dump($s->fifth());
+    $at = $s->fourth();
+    var_dump($s->sixth($at));
 }
