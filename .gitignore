@@ -46,6 +46,7 @@ mkinstalldirs
 perf.data*
 readtags
 readtags.exe
+repoinfo.h
 respmvc
 stamp-h1
 STDERR.*

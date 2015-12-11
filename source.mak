@@ -1,5 +1,13 @@
 # Shared macros
 
+# REPOINFO_HEADS is included from REPOINFO_SRCS
+# only when the building environment has ability
+# to generate the header file.
+# REPOINFO_OBJS is always linked to ctags executable.
+REPOINFO_HEADS = main/repoinfo.h
+REPOINFO_SRCS  = main/repoinfo.c
+REPOINFO_OBJS  = $(REPOINFO_SRCS:.c=.$(OBJEXT))
+
 MAIN_HEADS =			\
 	main/args.h		\
 	main/ctags.h		\
@@ -51,7 +59,11 @@ MAIN_SRCS =				\
 	main/sort.c			\
 	main/strlist.c			\
 	main/vstring.c			\
-	main/xtag.c
+	main/xtag.c			\
+	\
+	$(REPOINFO_SRCS) \
+	\
+	$(NULL)
 
 include makefiles/translator_input.mak
 TRANSLATED_SRCS = $(TRANSLATOR_INPUT:.ctags=.c)

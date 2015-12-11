@@ -153,6 +153,7 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
+    <ClCompile Include="..\main\repoinfo.c" />
     <ClCompile Include="..\parsers\rst.c" />
     <ClCompile Include="..\parsers\r.c" />
     <ClCompile Include="..\parsers\rexx.c" />

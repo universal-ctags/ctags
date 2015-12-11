@@ -168,7 +168,7 @@ static void addPseudoTags (void)
 	{
 		char format [11];
 		const char *formatComment = "unknown format";
-		char commit_id [8] = "";
+		const char* repoinfo;
 
 		sprintf (format, "%u", Option.tagFileFormat);
 
@@ -187,11 +187,8 @@ static void addPseudoTags (void)
 		writePseudoTag ("TAG_PROGRAM_AUTHOR",  AUTHOR_NAME,  "", NULL);
 		writePseudoTag ("TAG_PROGRAM_NAME",    PROGRAM_NAME, "Derived from Exuberant Ctags", NULL);
 		writePseudoTag ("TAG_PROGRAM_URL",     PROGRAM_URL,  "official site", NULL);
-
-#if defined(CTAGS_COMMIT_ID) && CTAGS_COMMIT_ID != 0
-			snprintf (commit_id, sizeof (commit_id), "%.7x", CTAGS_COMMIT_ID);
-#endif
-		writePseudoTag ("TAG_PROGRAM_VERSION", PROGRAM_VERSION, commit_id, NULL);
+		repoinfo = ctags_repoinfo? ctags_repoinfo: "";
+		writePseudoTag ("TAG_PROGRAM_VERSION", PROGRAM_VERSION, repoinfo, NULL);
 
 #ifdef HAVE_ICONV
 		if (Option.outputEncoding)

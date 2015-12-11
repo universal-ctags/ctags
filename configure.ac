@@ -298,6 +298,19 @@ fi
 
 # Checks for operating environment
 # --------------------------------
+in_git_repo=no
+AC_MSG_CHECKING(building in a git repository)
+if test -f "${srcdir}/.git/HEAD"; then
+	in_git_repo=yes
+fi
+AC_MSG_RESULT(${in_git_repo})
+
+AC_CHECK_PROGS([GIT], [git])
+if ! test "${GIT+set}" = "set"; then
+	in_git_repo=no
+fi
+AM_CONDITIONAL([BUILD_IN_GIT_REPO], [test "x${in_git_repo}" = "xyes"])
+
 
 # Check for temporary directory
 AC_MSG_CHECKING(directory to use for temporary files)

@@ -20,6 +20,11 @@
 #define PROGRAM_COPYRIGHT "Copyright (C) 2015"
 #define AUTHOR_NAME       "Universal Ctags Team"
 
+/*
+ * Constant
+ */
+extern const char* ctags_repoinfo;
+
 #endif	/* CTAGS_MAIN_CTAGS_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */
