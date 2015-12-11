@@ -32,7 +32,7 @@ ctags.exe: respmvc
 	cl $(OPT) /Fe$@ @respmvc /link setargv.obj $(LIBS)
 
 readtags.exe: readtags.c
-	cl /clr $(OPT) /Fe$@ $(DEFINES) -DREADTAGS_MAIN readtags.c /link setargv.obj
+	cl $(OPT) /Fe$@ $(DEFINES) -DREADTAGS_MAIN readtags.c /link setargv.obj
 
 $(REGEX_OBJS): $(REGEX_SRCS)
 	cl /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(REGEX_SRCS)
