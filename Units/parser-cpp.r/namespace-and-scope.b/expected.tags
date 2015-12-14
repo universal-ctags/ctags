@@ -1,0 +1,3 @@
+X	input.cpp	/^namespace X {$/;"	namespace	file:
+f	input.cpp	/^	void f (void);$/;"	prototype	namespace:X	file:
+f	input.cpp	/^void X::f (void) {}$/;"	function	namespace:X
