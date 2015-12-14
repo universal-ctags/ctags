@@ -828,13 +828,13 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 static int addExtensionFields (const tagEntryInfo *const tag)
 {
 	const char* const kindKey = getFieldDesc (FIELD_KIND_KEY)->enabled
-		?getFieldDesc (FIELD_KIND_KEY)->name
+		?getFieldName (FIELD_KIND_KEY)
 		:"";
 	const char* const kindFmt = getFieldDesc (FIELD_KIND_KEY)->enabled
 		?"%s\t%s:%s"
 		:"%s\t%s%s";
 	const char* const scopeKey = getFieldDesc (FIELD_SCOPE_KEY)->enabled
-		?getFieldDesc (FIELD_SCOPE_KEY)->name
+		?getFieldName (FIELD_SCOPE_KEY)
 		:"";
 	const char* const scopeFmt = getFieldDesc (FIELD_SCOPE_KEY)->enabled
 		?"%s\t%s:%s:%s"
@@ -859,12 +859,12 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 
 	if (getFieldDesc (FIELD_LINE_NUMBER)->enabled)
 		length += fprintf (TagFile.fp, "%s\t%s:%ld", sep,
-				   getFieldDesc (FIELD_LINE_NUMBER)->name,
+				   getFieldName (FIELD_LINE_NUMBER),
 				   tag->lineNumber);
 
 	if (getFieldDesc (FIELD_LANGUAGE)->enabled  &&  tag->language != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   getFieldDesc (FIELD_LANGUAGE)->name,
+				   getFieldName (FIELD_LANGUAGE),
 				   escapeName (tag, FIELD_LANGUAGE));
 
 	if (getFieldDesc (FIELD_SCOPE)->enabled)
@@ -897,39 +897,39 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 			tag->extensionFields.typeRef [0] != NULL  &&
 			tag->extensionFields.typeRef [1] != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s:%s", sep,
-				   getFieldDesc (FIELD_TYPE_REF)->name,
+				   getFieldName (FIELD_TYPE_REF),
 				   tag->extensionFields.typeRef [0],
 				   escapeName (tag, FIELD_TYPE_REF));
 
 	if (getFieldDesc (FIELD_FILE_SCOPE)->enabled &&  tag->isFileScope)
 		length += fprintf (TagFile.fp, "%s\t%s:", sep,
-				   getFieldDesc (FIELD_FILE_SCOPE)->name);
+				   getFieldName (FIELD_FILE_SCOPE));
 
 	if (getFieldDesc (FIELD_INHERITANCE)->enabled &&
 			tag->extensionFields.inheritance != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   getFieldDesc (FIELD_INHERITANCE)->name,
+				   getFieldName (FIELD_INHERITANCE),
 				   escapeName (tag, FIELD_INHERITANCE));
 
 	if (getFieldDesc (FIELD_ACCESS)->enabled &&  tag->extensionFields.access != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   getFieldDesc (FIELD_ACCESS)->name,
+				   getFieldName (FIELD_ACCESS),
 				   tag->extensionFields.access);
 
 	if (getFieldDesc (FIELD_IMPLEMENTATION)->enabled &&
 			tag->extensionFields.implementation != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   getFieldDesc (FIELD_IMPLEMENTATION)->name,
+				   getFieldName (FIELD_IMPLEMENTATION),
 				   tag->extensionFields.implementation);
 
 	if (getFieldDesc (FIELD_SIGNATURE)->enabled &&
 			tag->extensionFields.signature != NULL)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   getFieldDesc (FIELD_SIGNATURE)->name,
+				   getFieldName (FIELD_SIGNATURE),
 				   escapeName (tag, FIELD_SIGNATURE));
 	if (getFieldDesc (FIELD_ROLE)->enabled && tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
 		length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
-				   getFieldDesc (FIELD_ROLE)->name,
+				   getFieldName (FIELD_ROLE),
 				   escapeName (tag, FIELD_ROLE));
 
 	return length;

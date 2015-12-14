@@ -28,6 +28,8 @@
  * Constant
  */
 extern const char* ctags_repoinfo;
+#define CTAGS_FIELD_PREFIX "UCTAGS"
+
 
 #endif	/* CTAGS_MAIN_CTAGS_H */
 

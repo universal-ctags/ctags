@@ -186,6 +186,28 @@ Following extra tag entries are newly introduced.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ``--list-extras``, ``--list-features`` and ``--list-fields`` are added.
 
+``--put-field-prefix`` options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some fields are newly introduced in universal-ctags. We will introduce more
+in the future. Other tags generators may also introduce for their own fields.
+
+In such situation there is concern about confliction of field names;
+mixing tags files generated from multiple tags generator including
+universal-ctags is difficult. ``--put-field-prefix`` provides a
+workaround for the use case. When ``--put-field-prefix`` is given,
+ctags puts "UCTAGS" as prefix for newly introduced field.
+
+.. code-block:: console
+
+    $ cat /tmp/foo.h
+    #include <stdio.h>
+    $ ./ctags -o - --extra=+r --fields=+r /tmp/foo.h
+    stdio.h	/tmp/foo.h	/^#include <stdio.h>/;"	h	role:system
+    $ ./ctags --put-field-prefix -o - --extra=+r --fields=+r /tmp/foo.h
+    stdio.h	/tmp/foo.h	/^#include <stdio.h>/;"	h	UCTAGSrole:system
+
+In this example, ``role`` is prefixed.
 
 
 Changes in tags file format

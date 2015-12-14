@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ctags.h"
 #include "debug.h"
 #include "entry.h"
 #include "field.h"
@@ -42,7 +43,7 @@ static const char *renderFieldPattern (const tagEntryInfo *const tag, vString* b
 static const char *renderFieldRole (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldRefMarker (const tagEntryInfo *const tag, vString* b);
 
-#define DEFINE_FIELD_FULL(L,N, V, H, B, F) {			\
+#define DEFINE_FIELD_FULL(L,N, V, H, B, F, NWP) {		\
 		.enabled       = V,				\
 		.basic         = B,				\
 		.letter        = L,				\
@@ -50,13 +51,19 @@ static const char *renderFieldRefMarker (const tagEntryInfo *const tag, vString*
 		.description   = H,				\
 		.renderEscaped = F,				\
 		.buffer        = NULL,  			\
+		.nameWithPrefix = NWP,				\
 	}
 
 #define DEFINE_BASIC_FIELD(L,N,V,H,F)		\
-	DEFINE_FIELD_FULL(L,N,V,H,TRUE, F)
+	DEFINE_FIELD_FULL(L,N,V,H,TRUE, F, N)
 
 #define DEFINE_FIELD(L,N,V,H, F)		\
-	DEFINE_FIELD_FULL(L,N,V,H,FALSE, F)
+	DEFINE_FIELD_FULL(L,N,V,H,FALSE, F, N)
+
+#define DEFINE_FIELD_UCTAGS(L,N,V,H,F)		\
+	DEFINE_FIELD_FULL(L,N,V,H,FALSE, F, (CTAGS_FIELD_PREFIX N))
+#define DEFINE_FIELD_UCTAGS_NONAME(L,V,H,F)		\
+	DEFINE_FIELD_FULL(L,NULL ,V,H,FALSE, F, NULL)
 
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):"-")
 
@@ -100,12 +107,12 @@ static fieldDesc fieldDescs [] = {
 	DEFINE_FIELD ('n', "line",           FALSE,
 		      "Line number of tag definition",
 		      renderFieldLineNumber),
-	DEFINE_FIELD ('r', "role",	     FALSE,
-		      "role",
-		      renderFieldRole),
-	DEFINE_FIELD ('R', NULL,	     FALSE,
-		      "Marker(R or D) representing whether tag is definition or reference",
-		      renderFieldRefMarker),
+	DEFINE_FIELD_UCTAGS ('r', "role",    FALSE,
+		     "role",
+		     renderFieldRole),
+	DEFINE_FIELD_UCTAGS_NONAME ('R',     FALSE,
+		     "Marker(R or D) representing whether tag is definition or reference",
+		     renderFieldRefMarker),
 	DEFINE_FIELD ('S', "signature",	     FALSE,
 		      "Signature of routine (e.g. prototype or parameter list)",
 		      renderFieldSignature),
@@ -118,7 +125,7 @@ static fieldDesc fieldDescs [] = {
 	DEFINE_FIELD ('z', "kind",           FALSE,
 		      "Include the \"kind:\" key in kind field(use k or K)",
 		      NULL),
-	DEFINE_FIELD ('Z', "scope",          FALSE,
+	DEFINE_FIELD_UCTAGS ('Z', "scope",   FALSE,
 		      "Include the \"scope:\" key in scope field(use s)",
 		      NULL),
 };
@@ -140,11 +147,22 @@ extern fieldType getFieldTypeForOption (char letter)
 	return FIELD_UNKNOWN;
 }
 
+extern const char* getFieldName(fieldType type)
+{
+	fieldDesc* fdesc;
+
+	fdesc = getFieldDesc (type);
+	if (Option.putFieldPrefix)
+		return fdesc->nameWithPrefix;
+	else
+		return fdesc->name;
+}
+
 static void printField (fieldType i)
 {
 	printf("%c\t%s\t%s\t%s\t%s\n",
 	       fieldDescs[i].letter,
-	       fieldDescs[i].name? fieldDescs[i].name: "NONE",
+	       (fieldDescs[i].name? getFieldName (i): "NONE"),
 	       fieldDescs[i].description? fieldDescs[i].description: "NONE",
 	       getFieldDesc (i)->renderEscaped? "format-char": "NONE",
 	       getFieldDesc (i)->enabled? "on": "off");
