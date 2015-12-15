@@ -9,11 +9,15 @@
 #ifndef CTAGS_MAIN_CTAGS_H
 #define CTAGS_MAIN_CTAGS_H
 
+#include "general.h"
+
 /*
 *   MACROS
 */
-#ifndef PROGRAM_VERSION
-# define PROGRAM_VERSION "Development"
+#if defined (HAVE_CONFIG_H)
+# define PROGRAM_VERSION PACKAGE_VERSION
+#else
+# define PROGRAM_VERSION "0.0.0"
 #endif
 #define PROGRAM_NAME      "Universal Ctags"
 #define PROGRAM_URL       "https://ctags.io/"
