@@ -55,6 +55,8 @@ V_OPTLIB2C_1 =
 .ctags.c: $(OPTLIB2C)
 	$(V_OPTLIB2C) $(OPTLIB2C) $< > $@
 
+all: ctags.exe readtags.exe
+
 ctags: ctags.exe
 
 ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS)
@@ -65,6 +67,6 @@ readtags.exe: readtags.c
 
 clean:
 	$(SILENT) echo Cleaning
-	$(SILENT) rm -f ctags.exe
+	$(SILENT) rm -f ctags.exe readtags.exe
 	$(SILENT) rm -f tags
 	$(SILENT) rm -f main/*.o parsers/*.o gnu_regex/*.o fnmatch/*.o

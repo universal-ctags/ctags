@@ -26,6 +26,8 @@ DEFINES = $(DEFINES) -DDEBUG
 OPT = $(OPT) /Zi
 !endif
 
+all: ctags.exe readtags.exe
+
 ctags: ctags.exe
 
 ctags.exe: respmvc
@@ -49,6 +51,6 @@ respmvc: $(REGEX_OBJS) $(FNMATCH_OBJS) $(ALL_SRCS) $(REGEX_SRCS) $(FNMATCH_SRCS)
 
 clean:
 	- del *.obj
-	- del ctags.exe
+	- del ctags.exe readtags.exe
 	- del respmvc
 	- del tags
