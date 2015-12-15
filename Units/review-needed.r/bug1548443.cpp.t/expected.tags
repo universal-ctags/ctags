@@ -1,4 +1,0 @@
-TestStruct	input.cpp	/^struct TestStruct$/;"	s	file:
-TestUnion	input.cpp	/^union TestUnion$/;"	u	file:
-_number	input.cpp	/^int _number;$/;"	m	struct:TestStruct	file:
-_number	input.cpp	/^int _number;$/;"	m	union:TestUnion	file:
