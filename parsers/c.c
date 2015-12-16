@@ -3315,6 +3315,8 @@ static rescanReason findCTags (const unsigned int passCount)
 
 	Assert (passCount < 3);
 
+	AnonymousID = 0;
+
 	if (isInputLanguage (Lang_c) || isInputLanguage (Lang_cpp))
 	{
 		kind_for_define = CKinds+CK_DEFINE;
