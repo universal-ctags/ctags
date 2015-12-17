@@ -39,7 +39,7 @@ CLEANFILES = $(REPOINFO_HEADS)
 $(REPOINFO_OBJS): $(REPOINFO_SRCS) $(REPOINFO_HEADS)
 if BUILD_IN_GIT_REPO
 GEN_REPOINFO = $(srcdir)/misc/gen-repoinfo
-$(REPOINFO_HEADS): $(srcdir)/.git/*
+$(REPOINFO_HEADS): $(GEN_REPOINFO) $(srcdir)/.git/*
 	$(GEN_REPOINFO) > $@
 endif
 if !BUILD_IN_GIT_REPO
