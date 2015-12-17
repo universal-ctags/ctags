@@ -41,8 +41,7 @@ if BUILD_IN_GIT_REPO
 GEN_REPOINFO = $(srcdir)/misc/gen-repoinfo
 $(REPOINFO_HEADS): $(GEN_REPOINFO) $(srcdir)/.git/*
 	$(GEN_REPOINFO) > $@
-endif
-if !BUILD_IN_GIT_REPO
+else
 $(REPOINFO_HEADS):
 	echo 0 > $@
 endif
