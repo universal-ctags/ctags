@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# dist-test-cases --- listing files and directories under Units and Tmain
+#
+# COPYRIGHT NOTICE SHOULD BE HERE
+#
+
+echo "EXTRA_DIST += misc/units \\" &&
+git ls-files | grep 'Units\|Tmain' | sed -e 's/$/\\/' -e 's/^/    /' &&
+echo '$(NULL)' &&
+
+exit $?

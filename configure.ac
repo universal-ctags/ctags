@@ -7,7 +7,9 @@
 #	Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.59])
-AC_INIT([ctags],[universal])
+AC_INIT([universal-ctags],[0.0.0])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
+AM_SILENT_RULES([yes])
 AC_CONFIG_HEADERS([config.h])
 if ! test -e "${srcdir}/config.h.in"; then
    echo "---"
@@ -238,30 +240,9 @@ AC_CONFIG_COMMANDS_PRE([
 	AC_DEFINE_UNQUOTED([PKGLIBEXECDIR], ["${PKGLIBEXECDIR}"])
 ])
 
-
-install_targets="install-ctags install-libexec"
-AC_MSG_CHECKING(whether to install link to etags)
-if test yes = "$enable_etags"; then
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-etags"
-else
-	AC_MSG_RESULT(no)
-fi
-AC_MSG_CHECKING(whether to install readtags object file)
-if test yes = "$enable_readlib"; then
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-lib"
-else
-	AC_MSG_RESULT(no)
-fi
-AC_MSG_CHECKING(whether to install readtags command)
-if test no = "$enable_readcmd"; then
-	AC_MSG_RESULT(no)
-else
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-cmd"
-fi
-AC_SUBST(install_targets)
+AM_CONDITIONAL(INSTALL_LIB, [test "x$enable_readlib" = "xyes"])
+AM_CONDITIONAL(INSTALL_ETAGS, [test "x$enable_etags" = "xyes"])
+AM_CONDITIONAL(USE_READCMD, [test "x$enable_readcmd" = "xyes"])
 
 dnl AC_MSG_NOTICE(Change with $program_transform_name)
 ctags_name_executable=`echo ctags | sed "$program_transform_name"`
@@ -317,6 +298,19 @@ fi
 
 # Checks for operating environment
 # --------------------------------
+in_git_repo=no
+AC_MSG_CHECKING(building in a git repository)
+if test -f "${srcdir}/.git/HEAD"; then
+	in_git_repo=yes
+fi
+AC_MSG_RESULT(${in_git_repo})
+
+AC_CHECK_PROGS([GIT], [git])
+if ! test "${GIT+set}" = "set"; then
+	in_git_repo=no
+fi
+AM_CONDITIONAL([BUILD_IN_GIT_REPO], [test "x${in_git_repo}" = "xyes"])
+
 
 # Check for temporary directory
 AC_MSG_CHECKING(directory to use for temporary files)
@@ -481,13 +475,14 @@ PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
 
 # Checks for library functions
 # ----------------------------
-AC_CHECK_FUNCS(fnmatch,[],[
+AC_CHECK_FUNCS(fnmatch,[have_fnmatch=yes],[
 AC_LIBOBJ([fnmatch])
 FNMATCH_CPPFLAGS="-I${srcdir}/fnmatch"
 AC_DEFINE(HAVE_FNMATCH)
-])
+have_fnmatch=no])
 AC_SUBST([FNMATCH_CPPFLAGS])
 AC_CHECK_HEADERS(fnmatch.h)
+AM_CONDITIONAL([HAVE_FNMATCH], [test "x$have_fnmatch" = "xyes"])
 
 AC_CHECK_FUNCS(strstr)
 AC_CHECK_FUNCS(strcasecmp stricmp, break)
@@ -567,19 +562,20 @@ AC_MSG_RESULT($regcomp_works)
 if test yes != "$regcomp_works"; then
 	AC_MSG_ERROR([regcomp() on this system is broken.])
 fi
+have_regcomp=yes
 ],[
 dnl Using bundled regex implementation
 AC_LIBOBJ([regex])
-REGCOMP_CPPFLAGS="-I${srcdir}/gnu_regex"
+REGCOMP_CPPFLAGS="-I${srcdir}/gnu_regex -D__USE_GNU"
 AC_DEFINE(HAVE_REGCOMP)
-])
+have_regcomp=no])
 AC_SUBST([REGCOMP_CPPFLAGS])
+AM_CONDITIONAL([HAVE_REGCOMP], [test "xyes" = "x$have_regcomp"])
 
 AC_CHECK_FUNCS(scandir)
 
-install_libexec_targets=
-AC_CHECK_FUNCS(fork waitpid execv pipe,[install_libexec_targets="$install_libexec_targets install-libexec-drivers"])
-AC_SUBST(install_libexec_targets)
+AC_CHECK_FUNCS(fork waitpid execv pipe,[enable_xcmd=yes],[enable_xcmd=no])
+AM_CONDITIONAL([ENABLE_XCMD], [test "xyes" = "x$enable_xcmd"])
 
 # Checks for missing prototypes
 # -----------------------------
