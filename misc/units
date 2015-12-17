@@ -17,6 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+if test -n "${ZSH_VERSION+set}"; then
+    set -o SH_WORD_SPLIT
+    set +o NOMATCH
+fi
 
 #
 # Global Parameters
@@ -100,11 +104,11 @@ help_help()
 
 ERROR ()
 {
-    local status="$1"
+    local status_="$1"
     local msg="$2"
     shift 2
     echo "$msg" 1>&2
-    exit $status
+    exit $status_
 }
 
 line()
@@ -1507,14 +1511,14 @@ noise_report_line ()
 {
     local pos="$1"
     local len="$2"
-    local status="$3"
+    local status_="$3"
     local how="$4"
 
     local progress_offset=$(( pos % _NOISE_REPORT_MAX_COLUMN ))
     local nspace
 
 
-    if [ $((pos + 1)) -eq "${len}" ] || [ $status -gt 0 ]; then
+    if [ $((pos + 1)) -eq "${len}" ] || [ $status_ -gt 0 ]; then
 	nspace=0
 	while [ $nspace -lt $(( _NOISE_REPORT_MAX_COLUMN - progress_offset - 1)) ]; do
 	    printf ' '
@@ -1762,7 +1766,7 @@ tmain_run ()
 
     local r
     local a
-    local status=0
+    local status_=0
 
     local need_rearrange
 
@@ -1819,7 +1823,7 @@ tmain_run ()
 		    rm ${build_subdir}/${aspect}-actual.txt
 		else
 		    failed="${failed} ${test_name}/${aspect}-${engine}"
-		    status=1
+		    status_=1
 		fi
 	    elif [ -f ${build_subdir}/${aspect}-actual.txt ]; then
 		     rm ${build_subdir}/${aspect}-actual.txt
@@ -1846,7 +1850,7 @@ tmain_run ()
 	fi
     fi
 
-    return $status
+    return $status_
 }
 
 action_tmain ()
