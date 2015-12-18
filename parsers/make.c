@@ -119,9 +119,8 @@ static void newMacro (vString *const name)
 
 static void newInclude (vString *const name, boolean optional)
 {
-	if (isXtagEnabled (XTAG_REFERENCE_TAGS))
-		makeSimpleRefTag (name, MakeKinds, K_INCLUDE,
-				  optional? R_INCLUDE_OPTIONAL: R_INCLUDE_GENERIC);
+	makeSimpleRefTag (name, MakeKinds, K_INCLUDE,
+			  optional? R_INCLUDE_OPTIONAL: R_INCLUDE_GENERIC);
 }
 
 static boolean isAcceptableAsInclude (vString *const name)

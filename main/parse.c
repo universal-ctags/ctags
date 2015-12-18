@@ -77,6 +77,9 @@ extern int makeSimpleRefTag (const vString* const name, kindOption* const kinds,
 {
 	int r = SCOPE_NIL;
 
+	if (! isXtagEnabled (XTAG_REFERENCE_TAGS))
+		return r;
+
 	Assert (roleIndex < kinds[kind].nRoles);
 
 	if (kinds[kind].roles[roleIndex].enabled)
