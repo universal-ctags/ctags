@@ -17,6 +17,7 @@ UNITS=
 fuzz: TIMEOUT := $(shell timeout --version > /dev/null 2>&1 && echo 1 || echo 0)
 fuzz: $(CTAGS_TEST)
 	@ \
+	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
 	fi;					\
@@ -33,6 +34,7 @@ fuzz: $(CTAGS_TEST)
 #
 noise: $(CTAGS_TEST)
 	@ \
+	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
 	fi;					\
@@ -49,6 +51,7 @@ noise: $(CTAGS_TEST)
 #
 chop: $(CTAGS_TEST)
 	@ \
+	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
 	fi;					\
@@ -66,6 +69,7 @@ chop: $(CTAGS_TEST)
 units: TIMEOUT := $(shell timeout --version > /dev/null 2>&1 && echo 5 || echo 0)
 units: $(CTAGS_TEST)
 	@ \
+	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
 	fi;					\
@@ -97,6 +101,7 @@ clean-units:
 tmain: $(CTAGS_TEST)
 	@ \
 	\
+	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
 	if test x$(VG) = x1; then		\
 		VALGRIND=--with-valgrind;	\
 	fi;					\
