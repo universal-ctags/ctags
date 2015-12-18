@@ -44,7 +44,7 @@ $(REPOINFO_HEADS): $(srcdir)/.git/*
 endif
 if !BUILD_IN_GIT_REPO
 $(REPOINFO_HEADS):
-	echo 0 > $@
+	echo > $@
 endif
 
 OPTLIB2C = $(srcdir)/misc/optlib2c
