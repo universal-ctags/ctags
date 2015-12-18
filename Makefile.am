@@ -27,7 +27,7 @@ ctags_CPPFLAGS+= $(FNMATCH_CPPFLAGS)
 ctags_CPPFLAGS+= $(REGCOMP_CPPFLAGS)
 ctags_CPPFLAGS+= -DHAVE_REPOINFO_H
 
-ctags_CFLAGS   = -g -O2
+ctags_CFLAGS   =
 ctags_CFLAGS  += $(EXTRA_CFLAGS)
 ctags_CFLAGS  += $(WARNING_CFLAGS)
 ctags_CFLAGS  += $(COVERAGE_CFLAGS)
@@ -39,10 +39,9 @@ CLEANFILES = $(REPOINFO_HEADS)
 $(REPOINFO_OBJS): $(REPOINFO_SRCS) $(REPOINFO_HEADS)
 if BUILD_IN_GIT_REPO
 GEN_REPOINFO = $(srcdir)/misc/gen-repoinfo
-$(REPOINFO_HEADS): $(srcdir)/.git/*
+$(REPOINFO_HEADS): $(GEN_REPOINFO) $(srcdir)/.git/*
 	$(GEN_REPOINFO) > $@
-endif
-if !BUILD_IN_GIT_REPO
+else
 $(REPOINFO_HEADS):
 	echo 0 > $@
 endif
