@@ -43,7 +43,7 @@ $(REPOINFO_HEADS): $(GEN_REPOINFO) $(srcdir)/.git/*
 	$(GEN_REPOINFO) > $@
 else
 $(REPOINFO_HEADS):
-	echo 0 > $@
+	echo > $@
 endif
 
 OPTLIB2C = $(srcdir)/misc/optlib2c
