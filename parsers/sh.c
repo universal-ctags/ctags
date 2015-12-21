@@ -66,6 +66,19 @@ static boolean isIdentChar (int c)
 	return (isalnum (c) || c == '_' || c == '-');
 }
 
+/* bash allows all kinds of crazy stuff as the identifier after 'function' */
+static boolean isBashFunctionChar (int c)
+{
+	return (c > 1 /* NUL and SOH are disallowed */ && c != 0x7f &&
+	        /* blanks are disallowed, but VT and FF (and CR to some extent, but
+	         * let's not fall into the pit of craziness) */
+	        c != ' ' && c != '\t' && c != '\n' && c != '\r' &&
+	        c != '"' && c != '\'' && c != '$' && c != '`' && c != '\\' &&
+	        c != '&' && c != ';' &&
+	        c != '(' && c != ')' &&
+	        c != '<' && c != '>');
+}
+
 static const unsigned char *skipDoubleString (const unsigned char *cp)
 {
 	const unsigned char* prev = cp;
@@ -185,13 +198,15 @@ static void findShTags (void)
 				}
 			}
 
+			check_char = isIdentChar;
+
 			if (strncmp ((const char*) cp, "function", (size_t) 8) == 0  &&
 				isspace ((int) cp [8]))
 			{
+				check_char = isBashFunctionChar;
 				found_kind = K_FUNCTION;
 				cp += 8;
 			}
-
 			else if (strncmp ((const char*) cp, "alias", (size_t) 5) == 0  &&
 				isspace ((int) cp [5]))
 			{
@@ -213,16 +228,14 @@ static void findShTags (void)
 					found_kind = K_SOURCE;
 					cp += 6;
 				}
+				if (found_kind == K_SOURCE)
+					check_char = isFileChar;
 			}
 			if (found_kind != K_NOTHING)
 				while (isspace ((int) *cp))
 					++cp;
 
 			// Get the name of the function, alias or file to be read by source
-			check_char = isIdentChar;
-			if (found_kind == K_SOURCE)
-				check_char = isFileChar;
-
 			if (! check_char ((int) *cp))
 			{
 				found_kind = K_NOTHING;
