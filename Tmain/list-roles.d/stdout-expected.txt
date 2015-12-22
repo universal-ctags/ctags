@@ -12,8 +12,8 @@ DTS	d	undef	undefined	on
 DTS	h	system	system header	on
 DTS	h	local	local header	on
 Java	p	imported	imported package	on
-Make	I	generic	non-categorized generic role	on
-Make	I	optional	included as an optional makefile	on
+Make	I	included	included	on
+Make	I	optional	optionally included	on
 Sh	s	generic	non-categorized generic role	on
 Vera	d	undef	undefined	on
 Vera	h	system	system header	on
@@ -32,8 +32,8 @@ DTS	d	undef	undefined	on
 DTS	h	system	system header	on
 DTS	h	local	local header	on
 Java	p	imported	imported package	on
-Make	I	generic	non-categorized generic role	on
-Make	I	optional	included as an optional makefile	on
+Make	I	included	included	on
+Make	I	optional	optionally included	on
 Sh	s	generic	non-categorized generic role	on
 Vera	d	undef	undefined	on
 Vera	h	system	system header	on
