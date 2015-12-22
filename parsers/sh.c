@@ -34,17 +34,17 @@ typedef enum {
 
 typedef enum {
 	R_SOURCE_GENERIC,
-} shSourceRole;
+} shScriptRole;
 
-static roleDesc ShSourceRoles [] = {
-	RoleTemplateGeneric,
+static roleDesc ShScriptRoles [] = {
+	{ TRUE, "loaded", "loaded" },
 };
 
 static kindOption ShKinds [] = {
 	{ TRUE, 'a', "alias", "aliases"},
 	{ TRUE, 'f', "function", "functions"},
-	{ TRUE, 's', "source", "read files",
-	  .referenceOnly = TRUE, ATTACH_ROLES (ShSourceRoles) },
+	{ TRUE, 's', "script", "script files",
+	  .referenceOnly = TRUE, ATTACH_ROLES (ShScriptRoles) },
 };
 
 /*

@@ -75,8 +75,8 @@ j	input.c	/^  int j;$/
 main	input.c	/^int main(void)$/
 x	input.c	/^  struct X x;$/;"	typeref:struct:Y::X
 #r
-x	input.sh	/^source x$/;"	role:generic
+x	input.sh	/^source x$/;"	role:loaded
 y	input.sh	/^function y()$/
 #r
 D/
-R/generic
+R/loaded
