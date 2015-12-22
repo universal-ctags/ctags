@@ -169,6 +169,7 @@ typedef enum eDeclaration {
 	DECL_NAMESPACE,
 	DECL_NOMANGLE,       /* C++ name demangling block */
 	DECL_PACKAGE,
+	DECL_PACKAGEREF,
 	DECL_PRIVATE,
 	DECL_PROGRAM,        /* Vera program */
 	DECL_PROTECTED,
@@ -256,6 +257,7 @@ typedef enum eTagType {
 	TAG_MIXIN, 		 /* D mixin */
 	TAG_NAMESPACE,   /* namespace name */
 	TAG_PACKAGE,     /* package name / D module name */
+	TAG_PACKAGEREF,	 /* referenced package name */
 	TAG_PROGRAM,     /* program name */
 	TAG_PROPERTY,    /* property name */
 	TAG_PROTOTYPE,   /* function prototype or declaration */
@@ -407,6 +409,14 @@ static kindOption DKinds [] = {
 
 /* Used to index into the JavaKinds table. */
 typedef enum {
+	JAVAR_PACKAGE_IMPORTED,
+} javaPackageRole;
+
+static roleDesc JavaPackageRoles [] = {
+	{ TRUE, "imported", "imported package"},
+};
+
+typedef enum {
 	JK_UNDEFINED = COMMONK_UNDEFINED,
 	JK_CLASS, JK_ENUM_CONSTANT, JK_FIELD, JK_ENUM, JK_INTERFACE,
 	JK_LOCAL, JK_METHOD, JK_PACKAGE, JK_ACCESS, JK_CLASS_PREFIX
@@ -420,7 +430,8 @@ static kindOption JavaKinds [] = {
 	{ TRUE,  'i', "interface",     "interfaces"},
 	{ FALSE, 'l', "local",         "local variables"},
 	{ TRUE,  'm', "method",        "methods"},
-	{ TRUE,  'p', "package",       "packages"},
+	{ TRUE,  'p', "package",       "packages",
+	  .referenceOnly = FALSE, ATTACH_ROLES(JavaPackageRoles)},
 };
 
 /* Used to index into the VeraKinds table. */
@@ -1049,7 +1060,8 @@ static javaKind javaTagKindFull (const tagType type, boolean with_assert)
 		case TAG_INTERFACE:  result = JK_INTERFACE;     break;
 		case TAG_LOCAL:      result = JK_LOCAL;         break;
 		case TAG_METHOD:     result = JK_METHOD;        break;
-		case TAG_PACKAGE:    result = JK_PACKAGE;       break;
+		case TAG_PACKAGE:    /* Fall through */
+		case TAG_PACKAGEREF: result = JK_PACKAGE;       break;
 		/* I'm gonna go ahead and keep considering as interfaces for the output
 		 * since the official syntax reference seems to consider them interfaces too
 		 */
@@ -1130,6 +1142,20 @@ static const kindOption *kindForType (const tagType type)
 		result = &(VeraKinds [veraTagKind (type)]);
 	else
 		result = &(CKinds [cTagKind (type)]);
+	return result;
+}
+
+static int roleForType (const tagType type)
+{
+	int result;
+
+	result = ROLE_INDEX_DEFINITION;
+	if (isInputLanguage (Lang_java))
+	{
+		if (type == TAG_PACKAGEREF)
+			result = JAVAR_PACKAGE_IMPORTED;
+	}
+
 	return result;
 }
 
@@ -1445,15 +1471,28 @@ static void makeTag (const tokenInfo *const token,
 	if (isType (token, TOKEN_NAME)  &&  vStringLength (token->name) > 0  &&
 		includeTag (type, isFileScope))
 	{
-		vString *scope = vStringNew ();
+		vString *scope;
+		vString *typeRef;
 		boolean isScopeBuilt;
 		/* Use "typeRef" to store the typename from addOtherFields() until
 		 * it's used in makeTagEntry().
 		 */
-		vString *typeRef = vStringNew ();
 		tagEntryInfo e;
+		const kindOption *kind;
+		int role;
 
-		initTagEntry (&e, vStringValue (token->name), kindForType (type));
+		role = roleForType (type);
+		if (! (role == ROLE_INDEX_DEFINITION || isXtagEnabled (XTAG_REFERENCE_TAGS)))
+			return;
+
+		scope  = vStringNew ();
+		typeRef = vStringNew ();
+
+		kind  = kindForType (type);
+		if (role == ROLE_INDEX_DEFINITION)
+			initTagEntry (&e, vStringValue (token->name), kind);
+		else
+			initRefTagEntry (&e, vStringValue (token->name), kind, role);
 
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
@@ -1585,6 +1624,8 @@ static void qualifyVariableTag (const statementInfo *const st,
 				TAG_EVENT);
 	else if (st->declaration == DECL_PACKAGE)
 		makeTag (nameToken, st, FALSE, TAG_PACKAGE);
+	else if (st->declaration == DECL_PACKAGEREF)
+		makeTag (nameToken, st, FALSE, TAG_PACKAGEREF);
 	else if (st->declaration == DECL_USING && st->assignment)
 		makeTag (nameToken, st, TRUE, TAG_TYPEDEF);
 	else if (isValidTypeSpecifier (st->declaration))
@@ -1811,14 +1852,14 @@ static void readIdentifier (tokenInfo *const token, const int firstChar)
 	analyzeIdentifier (token);
 }
 
-static void readPackageName (tokenInfo *const token, const int firstChar)
+static void readPackageName (tokenInfo *const token, const int firstChar, boolean allowWildCard)
 {
 	vString *const name = token->name;
 	int c = firstChar;
 
 	initToken (token);
 
-	while (isident (c)  ||  c == '.')
+	while (isident (c)  || (allowWildCard && (c == '*')) ||  c == '.')
 	{
 		vStringPut (name, c);
 		c = cppGetc ();
@@ -1827,7 +1868,7 @@ static void readPackageName (tokenInfo *const token, const int firstChar)
 	cppUngetc (c);        /* unget non-package character */
 }
 
-static void readPackageOrNamespace (statementInfo *const st, const declType declaration)
+static void readPackageOrNamespace (statementInfo *const st, const declType declaration, boolean allowWildCard)
 {
 	st->declaration = declaration;
 
@@ -1841,7 +1882,7 @@ static void readPackageOrNamespace (statementInfo *const st, const declType decl
 		/* In C#, a namespace can also be specified like a Java package name. */
 		tokenInfo *const token = activeToken (st);
 		Assert (isType (token, TOKEN_KEYWORD));
-		readPackageName (token, skipToNonWhite ());
+		readPackageName (token, skipToNonWhite (), allowWildCard);
 		token->type = TOKEN_NAME;
 		st->gotName = TRUE;
 		st->haveQualifyingName = TRUE;
@@ -2132,7 +2173,12 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 		case KEYWORD_GOTO:      skipStatement (st);                     break;
 		case KEYWORD_IMPLEMENTS:readParents (st, '.');
 		                        setToken (st, TOKEN_NONE);              break;
-		case KEYWORD_IMPORT:    skipStatement (st);                     break;
+		case KEYWORD_IMPORT:
+			if (isInputLanguage (Lang_java))
+				readPackageOrNamespace (st, DECL_PACKAGEREF, TRUE);
+			else
+				skipStatement (st);
+			break;
 		case KEYWORD_INT:       st->declaration = DECL_BASE;            break;
 		case KEYWORD_INTEGER:   st->declaration = DECL_BASE;            break;
 		case KEYWORD_INTERFACE: processInterface (st);                  break;
@@ -2163,9 +2209,9 @@ static void processToken (tokenInfo *const token, statementInfo *const st)
 			if (isInputLanguage (Lang_d))
 				st->declaration = DECL_TEMPLATE;
 			break;
-		case KEYWORD_NAMESPACE: readPackageOrNamespace (st, DECL_NAMESPACE); break;
+		case KEYWORD_NAMESPACE: readPackageOrNamespace (st, DECL_NAMESPACE, FALSE); break;
 		case KEYWORD_MODULE:
-		case KEYWORD_PACKAGE:   readPackageOrNamespace (st, DECL_PACKAGE);   break;
+		case KEYWORD_PACKAGE:   readPackageOrNamespace (st, DECL_PACKAGE, FALSE);   break;
 
 		case KEYWORD_EVENT:
 			if (isInputLanguage (Lang_csharp))
