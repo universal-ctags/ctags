@@ -1930,7 +1930,7 @@ static void processEchoOption (const char *const option, const char *const param
 {
 	if (parameter == NULL || parameter[0] == '\0')
 		error (FATAL, "Something message is needed for \"%s\" option", option);
-	notice ("%s", parameter);
+	notice ("%s\n", parameter);
 }
 
 static void processForceQuitOption (const char *const option __unused__,
@@ -2476,7 +2476,7 @@ extern void previewFirstOption (cookedArgs* const args)
 		else if (strcmp (args->item, "options") == 0  &&
 				strcmp (args->parameter, "NONE") == 0)
 		{
-			notice ("No options will be read from files or environment");
+			notice ("No options will be read from files or environment\n");
 			SkipConfiguration = TRUE;
 			cArgForth (args);
 		}
