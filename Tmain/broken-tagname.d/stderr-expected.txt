@@ -5,6 +5,5 @@ Unexpected character (0 < *c && *c < 0x20) included in a tagEntryInfo: one
 ofbroken	name
 File: input.cst, Line: 1, Lang: CTagsSelfTest, Kind: b
 Escape the character
-OPENING input.cst as CTagsSelfTest language file
 sorting tag file
 system ("sort -u")
