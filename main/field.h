@@ -53,11 +53,13 @@ typedef struct sFieldDesc {
 	const char* description;  /* displayed in --help output */
 	renderEscaped renderEscaped;
 	vString *buffer;
+	const char* nameWithPrefix;
 } fieldDesc;
 
 extern fieldDesc* getFieldDesc(fieldType type);
 extern fieldType getFieldTypeForOption (char letter);
 extern const char* renderFieldEscaped (fieldDesc *fdesc, const tagEntryInfo *tag);
+extern const char* getFieldName(fieldType type);
 extern void printFields (void);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

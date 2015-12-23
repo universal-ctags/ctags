@@ -166,6 +166,7 @@ optionValues Option = {
 	FALSE,	    /* --_allow-xcmd-in-homedir */
 	FALSE,	    /* --_fatal-warnings */
 	.patternLengthLimit = 96,
+	.putFieldPrefix = FALSE,
 #ifdef DEBUG
 	0, 0        /* -D, -b */
 #endif
@@ -319,6 +320,8 @@ static optionDescription LongOptionDescription [] = {
 #endif
  {0,"  --print-language"},
  {0,"       Don't make tags file but just print the guessed language name for input file."},
+ {0,"  --put-field-prefix"},
+ {0,"       Put \"" CTAGS_FIELD_PREFIX "\" as prefix for the name of fields newly introduced in universal-ctags."},
  {1,"  --quiet=[yes|no]"},
  {0,"       Don't print NOTICE class messages [no]."},
  {1,"  --recurse=[yes|no]"},
@@ -2125,6 +2128,7 @@ static booleanOption BooleanOptions [] = {
 	{ "if0",            &Option.if0,                    FALSE, STAGE_ANY },
 	{ "line-directives",&Option.lineDirectives,         FALSE, STAGE_ANY },
 	{ "links",          &Option.followLinks,            FALSE, STAGE_ANY },
+	{ "put-field-prefix", &Option.putFieldPrefix,       FALSE, STAGE_ANY },
 	{ "print-language", &Option.printLanguage,          TRUE,  STAGE_ANY },
 	{ "quiet",          &Option.quiet,                  FALSE, STAGE_ANY },
 #ifdef RECURSE_SUPPORTED
