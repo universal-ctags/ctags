@@ -1034,8 +1034,9 @@ static boolean parseClassOrIface (tokenInfo *const token, const phpKind kind,
 	}
 
 	inheritance = vStringNew ();
-	/* skip until the open bracket and assume every identifier (not keyword)
-	 * is an inheritance (like in "class Foo extends Bar implements iA, iB") */
+	/* read every identifiers, keywords and commas, and assume each
+	 *  identifier (not keyword) is an inheritance
+	 * (like in "class Foo extends Bar implements iA, iB") */
 	while (token->type == TOKEN_IDENTIFIER ||
 	       token->type == TOKEN_KEYWORD ||
 	       token->type == TOKEN_COMMA)
