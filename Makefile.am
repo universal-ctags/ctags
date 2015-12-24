@@ -22,7 +22,9 @@ MAIN_HEADS += $(REGEX_HEADS)
 endif
 
 ctags_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main
+if ENABLE_DEBUGGING
 ctags_CPPFLAGS+= $(DEBUG_CPPFLAGS)
+endif
 ctags_CPPFLAGS+= $(FNMATCH_CPPFLAGS)
 ctags_CPPFLAGS+= $(REGCOMP_CPPFLAGS)
 ctags_CPPFLAGS+= -DHAVE_REPOINFO_H
