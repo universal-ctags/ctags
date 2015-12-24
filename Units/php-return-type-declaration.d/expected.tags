@@ -1,0 +1,14 @@
+A	input.php	/^namespace A {$/;"	n
+SubTest	input.php	/^    class SubTest extends Test$/;"	c	inherits:Test
+T	input.php	/^    class T {}$/;"	c	namespace:A
+Test	input.php	/^    class Test$/;"	c
+at	input.php	/^    $at = $s->fourth();$/;"	v
+fifth	input.php	/^        public function fifth() : \\ A \\ T$/;"	f	class:SubTest	access:public	signature:()
+first	input.php	/^        public function first(string $str) : Closure$/;"	f	class:Test	access:public	signature:(string $str)
+fourth	input.php	/^        public function fourth() : \\A\\T$/;"	f	class:SubTest	access:public	signature:()
+s	input.php	/^    $s = new SubTest;$/;"	v
+second	input.php	/^        public function second() : self$/;"	f	class:Test	access:public	signature:()
+sixth	input.php	/^        public function &sixth(\\A\\T &$t) : \\A\\T$/;"	f	class:SubTest	access:public	signature:(\\A\\T& $t)
+t	input.php	/^    $t = $s->third();$/;"	v
+third	input.php	/^        public function third() : parent$/;"	f	class:SubTest	access:public	signature:()
+tmp	input.php	/^            $tmp = function() use ($str) : int {$/;"	f	function:Test::first	signature:()

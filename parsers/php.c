@@ -209,7 +209,8 @@ typedef enum eTokenType {
 	TOKEN_OPEN_SQUARE,
 	TOKEN_CLOSE_SQUARE,
 	TOKEN_VARIABLE,
-	TOKEN_AMPERSAND
+	TOKEN_AMPERSAND,
+	TOKEN_BACKSLASH
 } tokenType;
 
 typedef struct {
@@ -238,6 +239,8 @@ static vString *CurrentNamesapce;
 /* Cache variable to build the tag's scope.  It has no real meaning outside
  * of initPhpEntry()'s scope. */
 static vString *FullScope;
+/* Anonymous symbol count to generate file-unique names */
+static unsigned int AnonymousID;
 
 
 static const char *accessToString (const accessType access)
@@ -799,6 +802,7 @@ getNextChar:
 		case '[': token->type = TOKEN_OPEN_SQUARE;			break;
 		case ']': token->type = TOKEN_CLOSE_SQUARE;			break;
 		case '&': token->type = TOKEN_AMPERSAND;			break;
+		case '\\': token->type = TOKEN_BACKSLASH;			break;
 
 		case '=':
 		{
@@ -868,7 +872,7 @@ getNextChar:
 		case '%':
 		{
 			int d = getcFromInputFile ();
-			if (d != '=')
+			if (d != '=' && ! (c == '-' && d == '>'))
 				ungetcToInputFile (d);
 			token->type = TOKEN_OPERATOR;
 			break;
@@ -971,51 +975,90 @@ static void enterScope (tokenInfo *const parentToken,
 						const vString *const extraScope,
 						const int parentKind);
 
+static void skipOverParens (tokenInfo *token)
+{
+	if (token->type == TOKEN_OPEN_PAREN)
+	{
+		int depth = 1;
+
+		do
+		{
+			readToken (token);
+			switch (token->type)
+			{
+				case TOKEN_OPEN_PAREN:  depth++; break;
+				case TOKEN_CLOSE_PAREN: depth--; break;
+				default: break;
+			}
+		}
+		while (token->type != TOKEN_EOF && depth > 0);
+
+		readToken (token);
+	}
+}
+
 /* parses a class or an interface:
  * 	class Foo {}
  * 	class Foo extends Bar {}
  * 	class Foo extends Bar implements iFoo, iBar {}
  * 	interface iFoo {}
- * 	interface iBar extends iFoo {} */
-static boolean parseClassOrIface (tokenInfo *const token, const phpKind kind)
+ * 	interface iBar extends iFoo {}
+ *
+ * if @name is not NULL, parses an anonymous class with name @name
+ * 	new class {}
+ * 	new class(1, 2) {}
+ * 	new class(1, 2) extends Foo implements iFoo, iBar {} */
+static boolean parseClassOrIface (tokenInfo *const token, const phpKind kind,
+                                  const tokenInfo *name)
 {
 	boolean readNext = TRUE;
 	implType impl = CurrentStatement.impl;
-	tokenInfo *name;
+	tokenInfo *nameFree = NULL;
 	vString *inheritance = NULL;
 
 	readToken (token);
-	if (token->type != TOKEN_IDENTIFIER)
-		return FALSE;
+	if (name) /* anonymous class */
+	{
+		/* skip possible construction arguments */
+		skipOverParens (token);
+	}
+	else /* normal, named class */
+	{
+		if (token->type != TOKEN_IDENTIFIER)
+			return FALSE;
 
-	name = newToken ();
-	copyToken (name, token, TRUE);
+		name = nameFree = newToken ();
+		copyToken (nameFree, token, TRUE);
+
+		readToken (token);
+	}
 
 	inheritance = vStringNew ();
 	/* skip until the open bracket and assume every identifier (not keyword)
 	 * is an inheritance (like in "class Foo extends Bar implements iA, iB") */
-	do
+	while (token->type == TOKEN_IDENTIFIER ||
+	       token->type == TOKEN_KEYWORD ||
+	       token->type == TOKEN_COMMA)
 	{
-		readToken (token);
-
 		if (token->type == TOKEN_IDENTIFIER)
 		{
 			if (vStringLength (inheritance) > 0)
 				vStringPut (inheritance, ',');
 			vStringCat (inheritance, token->string);
 		}
+
+		readToken (token);
 	}
-	while (token->type != TOKEN_EOF &&
-		   token->type != TOKEN_OPEN_CURLY);
 
 	makeClassOrIfaceTag (kind, name, inheritance, impl);
 
 	if (token->type == TOKEN_OPEN_CURLY)
-		enterScope (token, name->string, K_CLASS);
+		enterScope (token, name->string, kind);
 	else
 		readNext = FALSE;
 
-	deleteToken (name);
+	if (nameFree)
+		deleteToken (nameFree);
 	vStringDelete (inheritance);
 
 	return readNext;
@@ -1053,11 +1096,13 @@ static boolean parseTrait (tokenInfo *const token)
  * if @name is NULL, parses a normal function
  * 	function myfunc($foo, $bar) {}
  * 	function &myfunc($foo, $bar) {}
+ * 	function myfunc($foo, $bar) : type {}
  *
  * if @name is not NULL, parses an anonymous function with name @name
  * 	$foo = function($foo, $bar) {}
  * 	$foo = function&($foo, $bar) {}
- * 	$foo = function($foo, $bar) use ($x, &$y) {} */
+ * 	$foo = function($foo, $bar) use ($x, &$y) {}
+ * 	$foo = function($foo, $bar) use ($x, &$y) : type {} */
 static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 {
 	boolean readNext = TRUE;
@@ -1072,7 +1117,7 @@ static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 
 	if (! name)
 	{
-		if (token->type != TOKEN_IDENTIFIER)
+		if (token->type != TOKEN_IDENTIFIER && token->type != TOKEN_KEYWORD)
 			return FALSE;
 
 		name = nameFree = newToken ();
@@ -1111,6 +1156,7 @@ static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 				case TOKEN_OPEN_SQUARE:		vStringPut (arglist, '[');		break;
 				case TOKEN_PERIOD:			vStringPut (arglist, '.');		break;
 				case TOKEN_SEMICOLON:		vStringPut (arglist, ';');		break;
+				case TOKEN_BACKSLASH:		vStringPut (arglist, '\\');		break;
 				case TOKEN_STRING:
 				{
 					vStringCatS (arglist, "'");	
@@ -1131,6 +1177,7 @@ static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 						case '(':
 						case '[':
 						case '.':
+						case '\\':
 							/* no need for a space between those and the identifier */
 							break;
 
@@ -1157,39 +1204,22 @@ static boolean parseFunction (tokenInfo *const token, const tokenInfo *name)
 		readToken (token); /* normally it's an open brace or "use" keyword */
 	}
 
-	/* if parsing Zephir, skip function return type hint */
-	if (getInputLanguage () == Lang_zephir && token->type == TOKEN_OPERATOR)
-	{
-		do
-			readToken (token);
-		while (token->type != TOKEN_EOF &&
-			   token->type != TOKEN_OPEN_CURLY &&
-			   token->type != TOKEN_CLOSE_CURLY &&
-			   token->type != TOKEN_SEMICOLON);
-	}
-
 	/* skip use(...) */
 	if (token->type == TOKEN_KEYWORD && token->keyword == KEYWORD_use)
 	{
 		readToken (token);
-		if (token->type == TOKEN_OPEN_PAREN)
-		{
-			int depth = 1;
+		skipOverParens (token);
+	}
 
-			do
-			{
-				readToken (token);
-				switch (token->type)
-				{
-					case TOKEN_OPEN_PAREN:  depth++; break;
-					case TOKEN_CLOSE_PAREN: depth--; break;
-					default: break;
-				}
-			}
-			while (token->type != TOKEN_EOF && depth > 0);
-
+	/* PHP7 return type declaration or if parsing Zephir, skip function return
+	 * type hint */
+	if ((getInputLanguage () == Lang_php && token->type == TOKEN_COLON) ||
+	    (getInputLanguage () == Lang_zephir && token->type == TOKEN_OPERATOR))
+	{
+		do
 			readToken (token);
-		}
+		while (token->type == TOKEN_IDENTIFIER ||
+		       token->type == TOKEN_BACKSLASH);
 	}
 
 	if (token->type == TOKEN_OPEN_CURLY)
@@ -1210,7 +1240,7 @@ static boolean parseConstant (tokenInfo *const token)
 	tokenInfo *name;
 
 	readToken (token); /* skip const keyword */
-	if (token->type != TOKEN_IDENTIFIER)
+	if (token->type != TOKEN_IDENTIFIER && token->type != TOKEN_KEYWORD)
 		return FALSE;
 
 	name = newToken ();
@@ -1306,7 +1336,9 @@ static boolean parseVariable (tokenInfo *const token)
 		 * 		protected $foo;
 		 * 	}
 		 * but don't get fooled by stuff like $foo = $bar; */
-		if (token->parentKind == K_CLASS || token->parentKind == K_INTERFACE)
+		if (token->parentKind == K_CLASS ||
+		    token->parentKind == K_INTERFACE ||
+		    token->parentKind == K_TRAIT)
 			makeSimplePhpTag (name, K_VARIABLE, access);
 	}
 	else
@@ -1387,12 +1419,30 @@ static void enterScope (tokenInfo *const parentToken,
 			case TOKEN_KEYWORD:
 				switch (token->keyword)
 				{
-					case KEYWORD_class:		readNext = parseClassOrIface (token, K_CLASS);		break;
-					case KEYWORD_interface:	readNext = parseClassOrIface (token, K_INTERFACE);	break;
-					case KEYWORD_trait:		readNext = parseTrait (token);						break;
-					case KEYWORD_function:	readNext = parseFunction (token, NULL);				break;
-					case KEYWORD_const:		readNext = parseConstant (token);					break;
-					case KEYWORD_define:	readNext = parseDefine (token);						break;
+					/* handle anonymous classes */
+					case KEYWORD_new:
+						readToken (token);
+						if (token->keyword != KEYWORD_class)
+							readNext = FALSE;
+						else
+						{
+							char buf[32];
+							tokenInfo *name = newToken ();
+
+							copyToken (name, token, TRUE);
+							snprintf (buf, sizeof buf, "AnonymousClass%u", ++AnonymousID);
+							vStringCopyS (name->string, buf);
+							readNext = parseClassOrIface (token, K_CLASS, name);
+							deleteToken (name);
+						}
+						break;
+
+					case KEYWORD_class:		readNext = parseClassOrIface (token, K_CLASS, NULL);		break;
+					case KEYWORD_interface:	readNext = parseClassOrIface (token, K_INTERFACE, NULL);	break;
+					case KEYWORD_trait:		readNext = parseTrait (token);								break;
+					case KEYWORD_function:	readNext = parseFunction (token, NULL);						break;
+					case KEYWORD_const:		readNext = parseConstant (token);							break;
+					case KEYWORD_define:	readNext = parseDefine (token);								break;
 
 					case KEYWORD_namespace:	readNext = parseNamespace (token);	break;
 
@@ -1432,6 +1482,7 @@ static void findTags (boolean startsInPhpMode)
 	CurrentStatement.impl = IMPL_UNDEFINED;
 	CurrentNamesapce = vStringNew ();
 	FullScope = vStringNew ();
+	AnonymousID = 0;
 
 	do
 	{
@@ -1466,7 +1517,7 @@ static void initializeZephirParser (const langType language)
 
 extern parserDefinition* PhpParser (void)
 {
-	static const char *const extensions [] = { "php", "php3", "php4", "php5", "phtml", NULL };
+	static const char *const extensions [] = { "php", "php3", "php4", "php5", "php7", "phtml", NULL };
 	parserDefinition* def = parserNew ("PHP");
 	def->kinds      = PhpKinds;
 	def->kindCount  = ARRAY_SIZE (PhpKinds);
