@@ -639,7 +639,7 @@ static const char *skipTypeDecl (const char *cp, boolean *is_class)
 		}
 		if (!*ptr || *ptr == '=') return NULL;
 		if (*ptr == '(') {
-		    return lastStart; /* if we stopped on a '(' we are done */
+			return lastStart; /* if we stopped on a '(' we are done */
 		}
 		ptr = skipSpace(ptr);
 		lastStart = ptr;
@@ -754,7 +754,7 @@ static void findPythonTags (void)
 			find_triple_end(cp, &longStringLiteral);
 			continue;
 		}
-		
+
 		checkIndent(nesting_levels, indent);
 
 		/* Find global and class variables */
@@ -815,24 +815,24 @@ static void findPythonTags (void)
 				is_class = TRUE;
 			}
 			else if (matchKeyword ("cdef", keyword, &cp))
-		    {
-		        candidate = skipTypeDecl (cp, &is_class);
-		        if (candidate)
-		        {
-		    		found = TRUE;
-		    		cp = candidate;
-		        }
+			{
+				candidate = skipTypeDecl (cp, &is_class);
+				if (candidate)
+				{
+					found = TRUE;
+					cp = candidate;
+				}
 
-		    }
-    		else if (matchKeyword ("cpdef", keyword, &cp))
-		    {
-		        candidate = skipTypeDecl (cp, &is_class);
-		        if (candidate)
-		        {
-		    		found = TRUE;
-		    		cp = candidate;
-		        }
-		    }
+			}
+			else if (matchKeyword ("cpdef", keyword, &cp))
+			{
+				candidate = skipTypeDecl (cp, &is_class);
+				if (candidate)
+				{
+					found = TRUE;
+					cp = candidate;
+				}
+			}
 
 			if (found)
 			{
@@ -861,10 +861,10 @@ static void findPythonTags (void)
 
 extern parserDefinition *PythonParser (void)
 {
-        static const char *const extensions[] = { "py", "pyx", "pxd", "pxi" ,"scons",
-					      NULL };
+	static const char *const extensions[] = { "py", "pyx", "pxd", "pxi" ,"scons",
+											  NULL };
 	static const char *const aliases[] = { "python[23]*", "scons",
-					      NULL };
+										   NULL };
 	parserDefinition *def = parserNew ("Python");
 	def->kinds = PythonKinds;
 	def->kindCount = ARRAY_SIZE (PythonKinds);
