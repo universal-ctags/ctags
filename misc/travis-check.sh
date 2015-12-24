@@ -17,7 +17,7 @@ make --version
 
 ./autogen.sh
 
-./configure --enable-iconv --enable-coverage-gcov
+./configure --enable-debugging --enable-iconv --enable-coverage-gcov
 
 if [ "$TARGET" = "Unix" ]; then
     if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CC" = "gcc" ]; then
