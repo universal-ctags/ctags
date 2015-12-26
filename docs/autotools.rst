@@ -9,7 +9,7 @@ Like most Autotools-based projects, you need to do::
 
 After installing the `ctags` executable will be in `$prefix/bin/`.
 
+`autogen.sh` runs `autoreconf` internally.
 If you use (binary oriented) GNU/Linux distribution, `autoreconf` may
 be part of `autoconf` package. In additional you may have to install
-`automake`, too. Though ctags doesn't use `automake` command in
-build-time, it uses `aclocal.m4` bundled as part of the package.
+`automake`, too.
