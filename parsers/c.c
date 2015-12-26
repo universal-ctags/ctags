@@ -769,10 +769,11 @@ static const char *declString (const declType declaration)
 {
 	static const char *const names [] = {
 		"?", "base", "class", "enum", "event", "function", "function template",
-		"ignore", "interface", "mixin", "namespace", "no mangle", "package",
+		"ignore", "interface", "mixin", "namespace", "no mangle", "package", "package ref",
 		"private", "program", "protected", "public", "struct", "task", "template",
 		"union", "using", "version", "annotation"
 	};
+
 	Assert (ARRAY_SIZE (names) == DECL_COUNT);
 	Assert ((int) declaration < DECL_COUNT);
 	return names [(int) declaration];
@@ -2751,9 +2752,17 @@ static void initParenInfo (parenInfo *const info)
 static void analyzeParens (statementInfo *const st)
 {
 	tokenInfo *const prev = prevToken (st, 1);
+	const tokenInfo *const prev2 = prevToken (st, 2);
+ 
+	if (
+			st->inFunction &&
+			!st->assignment &&
+			!(isInputLanguage(Lang_cpp) && isType(prev,TOKEN_NAME) && isType(prev2,TOKEN_NAME)) /* C++: Type var(...); */
+		)
+	{
+ 		st->notVariable = TRUE;
+	}
 
-	if (st->inFunction  &&  ! st->assignment)
-		st->notVariable = TRUE;
 	if (! isType (prev, TOKEN_NONE))  /* in case of ignored enclosing macros */
 	{
 		tokenInfo *const token = activeToken (st);
@@ -2765,6 +2774,7 @@ static void analyzeParens (statementInfo *const st)
 		c = skipToNonWhite ();
 		cppUngetc (c);
 		if (info.invalidContents)
+			/* FIXME: This breaks parsing of variable instantiations that have constants as parameters QString var(0) */
 			reinitStatement (st, FALSE);
 		else if (info.isNameCandidate  &&  isType (token, TOKEN_PAREN_NAME)  &&
 				 ! st->gotParenName  &&
@@ -3227,6 +3237,8 @@ static void tagCheck (statementInfo *const st)
 						(st->declaration == DECL_CLASS || st->declaration == DECL_STRUCT ||
 						st->declaration == DECL_INTERFACE || st->declaration == DECL_UNION))
 						qualifyBlockTag (st, prev2);
+					else if(isInputLanguage (Lang_cpp) && st->inFunction)
+						; /* no nested functions in C++ */
 					else
 					{
 						if (! isInputLanguage (Lang_vera))
@@ -3288,7 +3300,8 @@ static void tagCheck (statementInfo *const st)
 			}
 			else if (isType (prev, TOKEN_ARGS)  &&  isType (prev2, TOKEN_NAME))
 			{
-				if (st->isPointer)
+				/* if it looks like a pointer or we are in function then this is likely to be a variable declaration */
+				if (st->isPointer || st->inFunction)
 					qualifyVariableTag (st, prev2);
 				else
 					qualifyFunctionDeclTag (st, prev2);
