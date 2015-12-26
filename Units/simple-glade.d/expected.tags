@@ -1,0 +1,7 @@
+http://glade.gnome.org/glade-2.0.dtd	input.glade	/^<!DOCTYPE glade-interface SYSTEM "http:\/\/glade.gnome.org\/glade-2.0.dtd">$/;"	DOCTYPE	line:2
+window1	input.glade	/^<widget class="GtkWindow" id="window1">$/;"	id	line:6
+button1	input.glade	/^    <widget class="GtkButton" id="button1">$/;"	id	line:23
+GtkWindow	input.glade	/^<widget class="GtkWindow" id="window1">$/;"	class	line:6	role:widget
+GtkButton	input.glade	/^    <widget class="GtkButton" id="button1">$/;"	class	line:23	role:widget
+on_button1_clicked	input.glade	/^      <signal name="clicked" handler="on_button1_clicked" last_modification_time="Sat, 26 Dec 20/;"	handler	line:30	role:handler
+input.glade	input.glade	1;"	file	line:1

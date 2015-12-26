@@ -13,7 +13,8 @@
 #define CTAGS_MAIN_PARSERS_H
 
 #ifdef HAVE_LIBXML
-#define XML_PARSER_LIST
+#define XML_PARSER_LIST \
+	GladeParser
 #else
 #define XML_PARSER_LIST
 #endif
