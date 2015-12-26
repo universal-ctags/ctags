@@ -69,6 +69,41 @@ extern void freeInputFileResources (void)
 }
 
 /*
+ * inputLineFposMap related functions
+ */
+static void freeLineFposMap (inputLineFposMap *lineFposMap)
+{
+	if (lineFposMap->pos)
+	{
+		free (lineFposMap->pos);
+		lineFposMap->pos = NULL;
+		lineFposMap->count = 0;
+		lineFposMap->size = 0;
+	}
+}
+
+static void allocLineFposMap (inputLineFposMap *lineFposMap)
+{
+#define INITIAL_lineFposMap_LEN 256
+	lineFposMap->pos = xCalloc (INITIAL_lineFposMap_LEN, fpos_t);
+	lineFposMap->size = INITIAL_lineFposMap_LEN;
+	lineFposMap->count = 0;
+}
+
+static void appendLineFposMap (inputLineFposMap *lineFposMap, fpos_t pos)
+{
+	if (lineFposMap->size == lineFposMap->count)
+	{
+		lineFposMap->size *= 2;
+		lineFposMap->pos = xRealloc (lineFposMap->pos,
+					     lineFposMap->size,
+					     fpos_t);
+	}
+	lineFposMap->pos [lineFposMap->count] = pos;
+	lineFposMap->count++;
+}
+
+/*
  *   Input file access functions
  */
 
@@ -306,6 +341,7 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 		File.input.lineNumber = 0L;
 		setSourceFileParameters (vStringNewInit (fileName), language);
 		File.source.lineNumber = 0L;
+		allocLineFposMap (&File.lineFposMap);
 
 		verbose ("OPENING %s as %s language %sfile\n", fileName,
 				getLanguageName (language),
@@ -328,6 +364,7 @@ extern void closeInputFile (void)
 		}
 		fclose (File.fp);
 		File.fp = NULL;
+		freeLineFposMap (&File.lineFposMap);
 	}
 }
 
@@ -336,6 +373,7 @@ extern void closeInputFile (void)
 static void fileNewline (void)
 {
 	File.filePosition = StartOfLine;
+	appendLineFposMap (&File.lineFposMap, File.filePosition);
 	File.newLine = FALSE;
 	File.input.lineNumber++;
 	File.source.lineNumber++;

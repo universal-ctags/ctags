@@ -80,6 +80,12 @@ typedef struct sInputFileInfo {
 	langType language;       /* language of input file */
 } inputFileInfo;
 
+typedef struct sInputLineFposMap {
+	fpos_t *pos;
+	unsigned int count;
+	unsigned int size;
+} inputLineFposMap;
+
 typedef struct sInputFile {
 	vString    *path;          /* path of input file (if any) */
 	vString    *line;          /* last line read from file */
@@ -105,6 +111,7 @@ typedef struct sInputFile {
 	   input file is done. After all processing is done, the buffers
 	   in sourceTagPathHolder are destroied. */
 	stringList  * sourceTagPathHolder;
+	inputLineFposMap lineFposMap;
 } inputFile;
 
 /*
