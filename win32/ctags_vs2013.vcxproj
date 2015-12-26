@@ -134,6 +134,7 @@
     <ClCompile Include="..\parsers\lisp.c" />
     <ClCompile Include="..\main\lregex.c" />
     <ClCompile Include="..\main\lxcmd.c" />
+    <ClCompile Include="..\main\lxpath.c" />
     <ClCompile Include="..\parsers\lua.c" />
     <ClCompile Include="..\optlib\m4.c" />
     <ClCompile Include="..\main\main.c" />

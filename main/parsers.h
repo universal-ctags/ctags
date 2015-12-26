@@ -12,6 +12,12 @@
 #ifndef CTAGS_MAIN_PARSERS_H
 #define CTAGS_MAIN_PARSERS_H
 
+#ifdef HAVE_LIBXML
+#define XML_PARSER_LIST
+#else
+#define XML_PARSER_LIST
+#endif
+
 /* Add the name of any new parser definition function here */
 #define PARSER_LIST \
 	AdaParser, \

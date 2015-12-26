@@ -34,6 +34,10 @@
 #define getInputLineNumber()     File.input.lineNumber
 #define getInputFileName()       vStringValue (File.input.name)
 #define getInputFilePosition()   File.filePosition
+#define getInputFilePositionForLine(line) \
+	File.lineFposMap.pos[(((File.lineFposMap.count > (line - 1)) \
+			       && (File.lineFposMap.count >= 0)      \
+			       && (line > 0))? (line - 1): 0)]
 #define getInputLanguage()       File.input.language
 #define getInputLanguageName()   getLanguageName (File.input.language)
 #define getInputFileTagPath()    vStringValue (File.input.tagPath)

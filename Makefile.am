@@ -21,6 +21,11 @@ MAIN_SRCS += $(REGEX_SRCS)
 MAIN_HEADS += $(REGEX_HEADS)
 endif
 
+if HAVE_LIBXML
+PARSER_SRCS += $(XML_SRCS)
+PARSER_HEADS += $(XML_HEADS)
+endif
+
 ctags_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main
 if ENABLE_DEBUGGING
 ctags_CPPFLAGS+= $(DEBUG_CPPFLAGS)
@@ -34,6 +39,10 @@ ctags_CFLAGS  += $(EXTRA_CFLAGS)
 ctags_CFLAGS  += $(WARNING_CFLAGS)
 ctags_CFLAGS  += $(COVERAGE_CFLAGS)
 ctags_CFLAGS  += $(CGCC_CFLAGS)
+ctags_CFLAGS  += $(LIBXML_CFLAGS)
+
+ctags_LDADD  =
+ctags_LDADD += $(LIBXML_LIBS)
 
 nodist_ctags_SOURCES = $(REPOINFO_HEADS)
 BUILT_SOURCES = $(REPOINFO_HEADS)

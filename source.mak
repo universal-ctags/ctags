@@ -47,6 +47,7 @@ MAIN_SRCS =				\
 	main/kind.c			\
 	main/lregex.c			\
 	main/lxcmd.c			\
+	main/lxpath.c			\
 	main/main.c			\
 	main/mbcs.c			\
 	main/nestlevel.c		\
@@ -125,6 +126,11 @@ PARSER_SRCS =				\
 	$(TRANSLATED_SRCS)		\
 	\
 	$(NULL)
+
+XML_HEADS =
+XML_SRCS = \
+	 \
+	 $(NULL)
 
 DEBUG_HEADS = main/debug.h
 DEBUG_SRCS = main/debug.c
