@@ -204,6 +204,10 @@ AC_ARG_WITH([ctags-libexecdir],
 	[AS_HELP_STRING([--with-ctags-libexecdir=DIR],
 		['universal-ctags'-specific program executables [LIBEXECDIR/ctags]])])
 
+AC_ARG_ENABLE([debugging],
+	[AS_HELP_STRING([--enable-debugging],
+		[enable debugging features])])
+
 AC_ARG_PROGRAM
 
 # Process configuration options
@@ -263,6 +267,9 @@ if test "$enable_macro_patterns" = yes ; then
 	AC_DEFINE(MACROS_USE_PATTERNS)
 	AC_MSG_NOTICE(tag file will use patterns for macros by default)
 fi
+
+AM_CONDITIONAL(ENABLE_DEBUGGING, [test "x$enable_debugging" = "xyes"])
+
 
 # Checks for programs
 # -------------------
