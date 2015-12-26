@@ -769,7 +769,7 @@ static const char *declString (const declType declaration)
 {
 	static const char *const names [] = {
 		"?", "base", "class", "enum", "event", "function", "function template",
-		"ignore", "interface", "mixin", "namespace", "no mangle", "package",
+		"ignore", "interface", "mixin", "namespace", "no mangle", "package", "package ref",
 		"private", "program", "protected", "public", "struct", "task", "template",
 		"union", "using", "version", "annotation"
 	};
