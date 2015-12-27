@@ -51,7 +51,7 @@ must specify the path of `tags` explicitly with -o option
 in ctags command line like::
 
 	CTAGS=$1
-	BUILDDIR=$4
+	BUILDDIR=$3
 	${CTAGS} ... -o $BUILDDIR/tags ...
 
 This makes it possible to keep the original source directory clean.
