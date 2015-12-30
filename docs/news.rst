@@ -209,6 +209,12 @@ ctags puts "UCTAGS" as prefix for newly introduced field.
 
 In this example, ``role`` is prefixed.
 
+``--maxdepth`` option
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``--maxdepth`` limits the depth of directory recursion enabled with ``-R``
+option.
+
 
 Changes in tags file format
 ---------------------------------------------------------------------
