@@ -227,9 +227,9 @@ static boolean recurseIntoDirectory (const char *const dirName)
 		}
 #endif
 	}
-	
+
 	recursionDepth--;
-	
+
 	return resize;
 }
 
