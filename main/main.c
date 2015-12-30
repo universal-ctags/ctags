@@ -196,13 +196,21 @@ static boolean createTagsForWildcardUsingFindfirst (const char *const pattern)
 
 #endif
 
+
 static boolean recurseIntoDirectory (const char *const dirName)
 {
+	static unsigned int recursionDepth = 0;
+
+	recursionDepth++;
+
 	boolean resize = FALSE;
 	if (isRecursiveLink (dirName))
 		verbose ("ignoring \"%s\" (recursive link)\n", dirName);
 	else if (! Option.recurse)
 		verbose ("ignoring \"%s\" (directory)\n", dirName);
+	else if(recursionDepth > Option.maxRecursionDepth)
+		verbose ("not descending in directory \"%s\" (depth %u > %u)\n",
+				dirName, recursionDepth, Option.maxRecursionDepth);
 	else
 	{
 		verbose ("RECURSING into directory \"%s\"\n", dirName);
@@ -219,6 +227,9 @@ static boolean recurseIntoDirectory (const char *const dirName)
 		}
 #endif
 	}
+
+	recursionDepth--;
+
 	return resize;
 }
 

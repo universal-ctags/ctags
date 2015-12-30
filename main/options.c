@@ -167,6 +167,7 @@ optionValues Option = {
 	FALSE,	    /* --_fatal-warnings */
 	.patternLengthLimit = 96,
 	.putFieldPrefix = FALSE,
+	.maxRecursionDepth = 0xffffffff,
 #ifdef DEBUG
 	0, 0        /* -D, -b */
 #endif
@@ -311,6 +312,12 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --map-<LANG>=[+]map"},
  {1,"       Set or add(+) a map for <LANG>."},
  {1,"       Unlike --langmap a pattern or an extension can be specified at once."},
+ {1,"  --maxdepth=N"},
+#ifdef RECURSE_SUPPORTED
+ {1,"       Specify maximum recursion depth."},
+#else
+ {1,"       Not supported on this platform."},
+#endif
  {1,"  --options=file"},
  {1,"       Specify file from which command line options should be read."},
 #ifdef HAVE_ICONV
@@ -2062,6 +2069,17 @@ static void processLibexecDir (const char *const option,
 	}
 }
 
+static void processMaxRecursionDepthOption (const char *const option, const char *const parameter)
+{
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "A parameter is needed after \"%s\" option", option);
+
+	if (atol (parameter) < 1)
+		error (FATAL, "-%s: Invalid maximum recursion depth", option);
+
+	Option.maxRecursionDepth = atol(parameter);
+}
+
 static boolean* redirectToXtag(const booleanOption *const option)
 {
 	/* WARNING/TODO: This function breaks capsulization. */
@@ -2111,12 +2129,13 @@ static parametricOption ParametricOptions [] = {
 	{ "list-maps",              processListMapsOption,          TRUE,   STAGE_ANY },
 	{ "list-regex-flags",       processListRegexFlagsOptions,   TRUE,   STAGE_ANY },
 	{ "_list-roles",            processListRolesOptions,        TRUE,   STAGE_ANY },
+	{ "maxdepth",               processMaxRecursionDepthOption, TRUE,   STAGE_ANY },
 	{ "options",                processOptionFile,              FALSE,  STAGE_ANY },
 	{ "sort",                   processSortOption,              TRUE,   STAGE_ANY },
 	{ "version",                processVersionOption,           TRUE,   STAGE_ANY },
 	{ "_echo",                  processEchoOption,              FALSE,  STAGE_ANY },
 	{ "_force-quit",            processForceQuitOption,         FALSE,  STAGE_ANY },
-	{ "_xformat",                processXformatOption,           FALSE,  STAGE_ANY },
+	{ "_xformat",               processXformatOption,           FALSE,  STAGE_ANY },
 };
 
 static booleanOption BooleanOptions [] = {
