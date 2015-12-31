@@ -78,7 +78,7 @@ static roleDesc PythonModuleRoles [] = {
 static roleDesc PythonUnknownRoles [] = {
 	{ TRUE, "imported",   "imported from the other module" },
 	{ TRUE, "indirectly-imported",
-	  "classes/variables/functions imported in alternative name" },
+	  "classes/variables/functions/modules imported in alternative name" },
 };
 
 static kindOption PythonKinds[] = {
@@ -89,7 +89,7 @@ static kindOption PythonKinds[] = {
 	{TRUE, 'I', "namespace", "name referring a module defined in other file"},
 	{TRUE, 'i', "module",    "modules",
 	 .referenceOnly = TRUE,  ATTACH_ROLES(PythonModuleRoles)},
-	{TRUE, 'x', "unknown",   "name referring a classe/variable/function defined in other module",
+	{TRUE, 'x', "unknown",   "name referring a classe/variable/function/module defined in other module",
 	 .referenceOnly = FALSE, ATTACH_ROLES(PythonUnknownRoles)},
 };
 
