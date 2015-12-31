@@ -11,8 +11,6 @@
 #include "general.h"
 #include "vstring.h"
 
-#define RoleTemplateGeneric { TRUE, "generic", "non-categorized generic role" }
-
 typedef struct sRoleDesc {
 	boolean enabled;
 	const char* name;		  /* role name */
