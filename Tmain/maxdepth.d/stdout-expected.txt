@@ -1,0 +1,5 @@
+# DEPTH=1
+a	./src/a.c	/^int a (void)$/;"	f
+# DEPTH=2
+a	./src/a.c	/^int a (void)$/;"	f
+b	./src/subdir/b.c	/^int b(void)$/;"	f

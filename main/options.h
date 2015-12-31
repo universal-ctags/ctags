@@ -97,6 +97,7 @@ typedef struct sOptionValues {
 	boolean fatalWarnings;	/* --_fatal-warnings */
 	unsigned int patternLengthLimit; /* Not implemented yet: --patern-length-limit=N */
 	boolean putFieldPrefix;		 /* --put-field-prefix */
+	unsigned int maxRecursionDepth; /* --maxdepth=<max-recursion-depth> */
 #ifdef DEBUG
 	long debugLevel;        /* -D  debugging output */
 	unsigned long breakLine;/* -b  input line at which to call lineBreak() */
