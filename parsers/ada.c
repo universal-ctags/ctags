@@ -159,7 +159,7 @@ static kindOption AdaSeparateKind = { TRUE, 'S', "separate", "something separate
 
 static kindOption AdaKinds[] =
 {
-  { TRUE,  'P', "packspec",    "package specifications" },
+  { TRUE,   'P', "packspec",    "package specifications" },
   { TRUE,   'p', "package",     "packages" },
   { FALSE,  'T', "typespec",    "type specifications" },
   { TRUE,   't', "type",        "types" },
@@ -172,18 +172,18 @@ static kindOption AdaKinds[] =
   { TRUE,   'f', "formal",      "generic formal parameters" },
   { TRUE,   'n', "constant",    "constants" },
   { TRUE,   'x', "exception",   "user defined exceptions" },
-  { TRUE,  'R', "subprogspec", "subprogram specifications" },
+  { TRUE,   'R', "subprogspec", "subprogram specifications" },
   { TRUE,   'r', "subprogram",  "subprograms" },
-  { TRUE,  'K', "taskspec",    "task specifications" },
+  { TRUE,   'K', "taskspec",    "task specifications" },
   { TRUE,   'k', "task",        "tasks" },
-  { TRUE,  'O', "protectspec", "protected data specifications" },
+  { TRUE,   'O', "protectspec", "protected data specifications" },
   { TRUE,   'o', "protected",   "protected data" },
   { FALSE,  'E', "entryspec",   "task/protected data entry specifications" },
   { TRUE,   'e', "entry",       "task/protected data entries" },
   { TRUE,   'b', "label",       "labels" },
   { TRUE,   'i', "identifier",  "loop/declare identifiers"},
   { FALSE,  'a', "autovar",     "automatic variables" },
-  { FALSE,  'y', "annon",       "loops and blocks with no identifier" }
+  { FALSE,  'y', "anon",        "loops and blocks with no identifier" }
 };
 
 typedef struct sAdaTokenList
