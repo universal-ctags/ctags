@@ -34,7 +34,7 @@ static xtagDesc xtagDescs [] = {
 	{ FALSE, 'r',
 	  "Include reference tags"},
 	{ FALSE, '.',
-	  "Do the similar to the f extra flag but the entry addresses the end line"},
+	  "Similar to the f extra flag but the entry addresses the end line"},
 };
 
 extern xtagDesc* getXtagDesc (xtagType type)
