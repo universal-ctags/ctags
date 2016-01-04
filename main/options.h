@@ -128,7 +128,7 @@ extern CONST_OPTION optionValues		Option;
 extern void notice (const char *const format, ...) __printf__ (1, 2);
 extern void verbose (const char *const format, ...) __printf__ (1, 2);
 #define BEGIN_VERBOSE(VFP) do { if (Option.verbose) { \
-                                FILE* VFP = errout
+                                FILE* VFP = stderr
 #define END_VERBOSE()      } } while (0)
 
 extern void freeList (stringList** const pString);
