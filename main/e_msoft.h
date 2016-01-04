@@ -9,11 +9,6 @@
 #ifndef E_MSOFT_H
 #define E_MSOFT_H
 
-/*  MS-DOS/Windows doesn't allow manipulation of standard error,
- *  so we send it to stdout instead.
- */
-#define errout  stdout
-
 #define CASE_INSENSITIVE_FILENAMES 1
 #define MANUAL_GLOBBING 1
 #define MSDOS_STYLE_PATH 1
