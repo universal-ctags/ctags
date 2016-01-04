@@ -757,9 +757,11 @@ static int fileReadLineDriver(void)
 	return (readLineFromInputFile () == NULL)? EOF: 1;
 }
 
-extern void findRegexTags (void)
+extern rescanReason findRegexTags (parserDefinition *parser __unused__,
+				   const unsigned int passCount __unused__)
 {
 	findRegexTagsMainloop (fileReadLineDriver);
+	return RESCAN_NONE;
 }
 
 extern boolean hasScopeActionInRegex (const langType language)

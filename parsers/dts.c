@@ -66,7 +66,8 @@ static const tagRegexTable const dtsTagRegexTable [] = {
 /*
 *   FUNCTION DEFINITIONS
 */
-static void runCppGetc (void)
+static rescanReason runCppGetc (parserDefinition *parser __unused__,
+				const unsigned int passCount __unused__)
 {
 	cppInit (0, FALSE, FALSE,
 		 DTSKinds + DTS_MACRO, DTS_MACRO_KIND_UNDEF_ROLE,
@@ -75,6 +76,7 @@ static void runCppGetc (void)
 	findRegexTagsMainloop (cppGetc);
 
 	cppTerminate ();
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* DTSParser (void)

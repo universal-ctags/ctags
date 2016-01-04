@@ -154,7 +154,8 @@ static smlKind findNextIdentifier (const unsigned char **cp)
 	return result;
 }
 
-static void findSmlTags (void)
+static rescanReason findSmlTags (parserDefinition *parser __unused__,
+				 const unsigned int passCount __unused__)
 {
 	vString *const identifier = vStringNew ();
 	const unsigned char *line;
@@ -203,6 +204,8 @@ static void findSmlTags (void)
 		} while (cp != NULL  &&  strcmp ((const char *) cp, "") != 0);
 	}
 	vStringDelete (identifier);
+
+	return RESCAN_NONE;
 }
 
 extern parserDefinition *SmlParser (void)

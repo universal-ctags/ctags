@@ -345,7 +345,8 @@ static adaTokenInfo *adaParse(adaParseMode mode, adaTokenInfo *parent);
 
 /* prototypes of the functions used by ctags */
 static void storeAdaTags(adaTokenInfo *token, const char *parentScope);
-static void findAdaTags(void);
+static rescanReason findAdaTags(parserDefinition *parser,
+				const unsigned int passCount);
 extern parserDefinition* AdaParser(void);
 
 static void makeSpec(adaKind *kind)
@@ -2170,7 +2171,8 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
 } /* static void storeAdaTags(adaTokenInfo *token, const char *parentScope) */
 
 /* main parse function */
-static void findAdaTags(void)
+static rescanReason findAdaTags(parserDefinition *parser __unused__,
+				const unsigned int passCount __unused__)
 {
   adaTokenInfo root;
   adaTokenInfo *tmp;
@@ -2214,6 +2216,7 @@ static void findAdaTags(void)
  out:
   /* clean up tokens */
   freeAdaTokenList(&root.children);
+  return RESCAN_NONE;
 } /* static void findAdaTags(void) */
 
 /* parser definition function */

@@ -3376,7 +3376,8 @@ static void createTags (const unsigned int nestLevel,
 	DebugStatement ( if (nestLevel > 0) debugParseNest (FALSE, nestLevel - 1); )
 }
 
-static rescanReason findCTags (const unsigned int passCount)
+static rescanReason findCTags (parserDefinition *parser __unused__,
+			       const unsigned int passCount)
 {
 	exception_t exception;
 	rescanReason rescan;
@@ -3487,7 +3488,7 @@ extern parserDefinition* CParser (void)
 	def->kinds      = CKinds;
 	def->kindCount  = ARRAY_SIZE (CKinds);
 	def->extensions = extensions;
-	def->parser2    = findCTags;
+	def->parser     = findCTags;
 	def->initialize = initializeCParser;
 	return def;
 }
@@ -3499,7 +3500,7 @@ extern parserDefinition* DParser (void)
 	def->kinds      = DKinds;
 	def->kindCount  = ARRAY_SIZE (DKinds);
 	def->extensions = extensions;
-	def->parser2    = findCTags;
+	def->parser     = findCTags;
 	def->initialize = initializeDParser;
 	return def;
 }
@@ -3521,7 +3522,7 @@ extern parserDefinition* CppParser (void)
 	def->kinds      = CKinds;
 	def->kindCount  = ARRAY_SIZE (CKinds);
 	def->extensions = extensions;
-	def->parser2    = findCTags;
+	def->parser     = findCTags;
 	def->initialize = initializeCppParser;
 	def->selectLanguage = selectors;
 	return def;
@@ -3536,7 +3537,7 @@ extern parserDefinition* CsharpParser (void)
 	def->kindCount  = ARRAY_SIZE (CsharpKinds);
 	def->extensions = extensions;
 	def->aliases    = aliases;
-	def->parser2    = findCTags;
+	def->parser     = findCTags;
 	def->initialize = initializeCsharpParser;
 	return def;
 }
@@ -3548,7 +3549,7 @@ extern parserDefinition* JavaParser (void)
 	def->kinds      = JavaKinds;
 	def->kindCount  = ARRAY_SIZE (JavaKinds);
 	def->extensions = extensions;
-	def->parser2    = findCTags;
+	def->parser     = findCTags;
 	def->initialize = initializeJavaParser;
 	return def;
 }
@@ -3560,7 +3561,7 @@ extern parserDefinition* VeraParser (void)
 	def->kinds      = VeraKinds;
 	def->kindCount  = ARRAY_SIZE (VeraKinds);
 	def->extensions = extensions;
-	def->parser2    = findCTags;
+	def->parser     = findCTags;
 	def->initialize = initializeVeraParser;
 	return def;
 }

@@ -266,7 +266,9 @@ static int parseConstantsFromHashRef (const unsigned char *cp,
  * Perl support by Bart Robinson <lomew@cs.utah.edu>
  * Perl sub names: look for /^ [ \t\n]sub [ \t\n]+ [^ \t\n{ (]+/
  */
-static void findPerlTags (void)
+
+static rescanReason findPerlTags (parserDefinition *parser __unused__,
+				  const unsigned int passCount __unused__)
 {
 	vString *name = vStringNew ();
 	vString *package = NULL;
@@ -521,6 +523,7 @@ END_MAIN_WHILE:
 	vStringDelete (name);
 	if (package != NULL)
 		vStringDelete (package);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* PerlParser (void)

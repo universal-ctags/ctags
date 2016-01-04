@@ -1848,7 +1848,8 @@ static void clearStack ( void )
 		vStringDelete (stack[i].contextName);
 }
 
-static void findOcamlTags (void)
+static rescanReason findOcamlTags (parserDefinition *parser __unused__,
+				   const unsigned int passCount __unused__)
 {
 	vString *name = vStringNew ();
 	lexingState st;
@@ -1879,6 +1880,8 @@ static void findOcamlTags (void)
 	vStringDelete (lastModule);
 	vStringDelete (lastClass);
 	clearStack ();
+
+	return RESCAN_NONE;
 }
 
 static void ocamlInitialize (const langType language)

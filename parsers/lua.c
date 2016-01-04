@@ -126,7 +126,8 @@ static void extract_prev_token (const char *end, const char *begin_sentinel, vSt
 	}
 }
 
-static void findLuaTags (void)
+static rescanReason findLuaTags (parserDefinition *parser __unused__,
+				 const unsigned int passCount __unused__)
 {
 	vString *name = vStringNew ();
 	const unsigned char *line;
@@ -159,6 +160,7 @@ static void findLuaTags (void)
 		}
 	}
 	vStringDelete (name);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* LuaParser (void)

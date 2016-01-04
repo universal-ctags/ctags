@@ -57,7 +57,8 @@ static boolean match (const unsigned char *line, const char *word)
 	return (boolean) (strncmp ((const char*) line, word, strlen (word)) == 0);
 }
 
-static void findTclTags (void)
+static rescanReason findTclTags (parserDefinition *parser __unused__,
+				 const unsigned int passCount __unused__)
 {
 	vString *name = vStringNew ();
 	const unsigned char *line;
@@ -99,6 +100,8 @@ static void findTclTags (void)
 		}
 	}
 	vStringDelete (name);
+
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* TclParser (void)

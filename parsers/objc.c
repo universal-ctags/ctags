@@ -1073,7 +1073,8 @@ static void globalScope (vString * const ident, objcToken what)
 /*////////////////////////////////////////////////////////////////
 //// Deal with the system                                       */
 
-static void findObjcTags (void)
+static rescanReason findObjcTags (parserDefinition *parser __unused__,
+				  const unsigned int passCount __unused__)
 {
 	vString *name = vStringNew ();
 	lexingState st;
@@ -1115,6 +1116,8 @@ static void findObjcTags (void)
 	tempName = NULL;
 	prevIdent = NULL;
 	fullMethodName = NULL;
+
+	return RESCAN_NONE;
 }
 
 static void objcInitialize (const langType language)

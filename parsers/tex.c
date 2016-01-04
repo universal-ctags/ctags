@@ -565,7 +565,8 @@ static void finalize (const langType language __unused__,
 	}
 }
 
-static void findTexTags (void)
+static rescanReason findTexTags (parserDefinition *parser __unused__,
+				 const unsigned int passCount __unused__)
 {
 	tokenInfo *const token = newToken ();
 	exception_t exception;
@@ -575,6 +576,8 @@ static void findTexTags (void)
 		parseTexFile (token);
 
 	deleteToken (token);
+
+	return RESCAN_NONE;
 }
 
 /* Create parser definition structure */
@@ -588,7 +591,7 @@ extern parserDefinition* TexParser (void)
 	 */
 	def->kinds		= TexKinds;
 	def->kindCount	= ARRAY_SIZE (TexKinds);
-	def->parser		= findTexTags;
+	def->parser	= findTexTags;
 	def->initialize = initialize;
 	def->finalize   = finalize;
 	def->keywordTable =  TexKeywordTable;

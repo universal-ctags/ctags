@@ -357,7 +357,8 @@ static void parseValue (tokenInfo *const token)
 	}
 }
 
-static void findJsonTags (void)
+static rescanReason findJsonTags (parserDefinition *parser __unused__,
+				  const unsigned int passCount __unused__)
 {
 	tokenInfo *const token = newToken ();
 
@@ -372,6 +373,7 @@ static void findJsonTags (void)
 	while (token->type != TOKEN_EOF);
 
 	deleteToken (token);
+	return RESCAN_NONE;
 }
 
 static void initialize (const langType language)

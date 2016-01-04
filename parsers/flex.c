@@ -2377,7 +2377,8 @@ static void initialize (const langType language)
 	Lang_js = language;
 }
 
-static void findFlexTags (void)
+static rescanReason findFlexTags(parserDefinition *parser __unused__,
+				 const unsigned int passCount __unused__)
 {
 	tokenInfo *const token = newToken ();
 	
@@ -2391,6 +2392,7 @@ static void findFlexTags (void)
 	ClassNames = NULL;
 	FunctionNames = NULL;
 	deleteToken (token);
+	return RESCAN_NONE;
 }
 
 /* Create parser definition structure */

@@ -1090,6 +1090,7 @@ extern void enableLanguages (const boolean state)
 		enableLanguage (i, state);
 }
 
+#ifdef DEBUG
 static boolean doesParserUseKind (const parserDefinition *const parser, char letter)
 {
 	unsigned int k;
@@ -1099,6 +1100,7 @@ static boolean doesParserUseKind (const parserDefinition *const parser, char let
 			return TRUE;
 	return FALSE;
 }
+#endif
 
 static void initializeParser (langType lang)
 {
@@ -1144,10 +1146,8 @@ extern void initializeParsing (void)
 				def->parser = findRegexTags;
 				accepted = TRUE;
 			}
-			else if (((!!def->parser) + (!!def->parser2)) != 1)
-				error (FATAL,
-		"%s parser definition must define one and only one parsing routine\n",
-					   def->name);
+			else if (! def->parser)
+				error (FATAL, "No parser definition: %s\n", def->name);
 			else
 				accepted = TRUE;
 			if (accepted)
@@ -1190,8 +1190,10 @@ extern void freeParserResources (void)
 	LanguageCount = 0;
 }
 
-static void doNothing (void)
+static rescanReason doNothing (parserDefinition *parser __unused__,
+			       const unsigned int passCount __unused__)
 {
+	return RESCAN_NONE;
 }
 
 static void lazyInitialize (langType language)
@@ -1742,16 +1744,12 @@ static rescanReason createTagsForFile (
 	{
 		parserDefinition *const lang = LanguageTable [language];
 
-		Assert (lang->parser || lang->parser2);
+		Assert (lang->parser);
 
 		if (LanguageTable [language]->useCork)
 			corkTagFile();
 
-		if (lang->parser != NULL)
-			lang->parser ();
-		else if (lang->parser2 != NULL)
-			rescan = lang->parser2 (passCount);
-
+		rescan = lang->parser (lang, passCount);
 		makeFileTag (fileName);
 
 		if (LanguageTable [language]->useCork)
@@ -2069,7 +2067,8 @@ static kindOption CTST_Kinds[KIND_COUNT] = {
 	{TRUE, 'b', "broken tag", "name with unwanted characters"},
 };
 
-static void createCTSTTags (void)
+static rescanReason createCTSTTags (parserDefinition *parser __unused__,
+				    const unsigned int passCount __unused__)
 {
 	int i;
 	const unsigned char *line;
@@ -2093,7 +2092,7 @@ static void createCTSTTags (void)
 				}
 			}
 	}
-
+	return RESCAN_NONE;
 }
 
 static parserDefinition *CTagsSelfTestParser (void)

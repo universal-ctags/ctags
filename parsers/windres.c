@@ -209,7 +209,8 @@ static ResParserState parseResLine(const unsigned char *line, ResParserState sta
 	return state;
 }
 
-static void findResTags(void)
+static rescanReason findResTags (parserDefinition *parser __unused__,
+				 const unsigned int passCount __unused__)
 {
 	const unsigned char *line;
 	ResParserState state = P_STATE_NONE;
@@ -219,8 +220,10 @@ static void findResTags(void)
 	{
 		state = parseResLine(line, state);
 		if (state == P_STATE_AT_END)
-			return;
+			return RESCAN_NONE;
 	}
+
+	return RESCAN_NONE;
 }
 
 /* parser definition */
@@ -231,7 +234,7 @@ extern parserDefinition* WindResParser(void)
 	def->kinds		= ResKinds;
 	def->kindCount	= ARRAY_SIZE(ResKinds);
 	def->extensions	= extensions;
-	def->parser		= findResTags;
+	def->parser	= findResTags;
 	return def;
 }
 /* vi:set tabstop=4 shiftwidth=4 noexpandtab: */

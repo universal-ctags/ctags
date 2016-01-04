@@ -76,7 +76,8 @@ static void L_getit (vString *const name, const unsigned char *dbp)
 
 /* Algorithm adapted from from GNU etags.
  */
-static void findLispTags (void)
+static rescanReason findLispTags (parserDefinition *parser __unused__,
+				  const unsigned int passCount __unused__)
 {
 	vString *name = vStringNew ();
 	const unsigned char* p;
@@ -120,6 +121,7 @@ static void findLispTags (void)
 		}
 	}
 	vStringDelete (name);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* LispParser (void)
@@ -136,7 +138,7 @@ extern parserDefinition* LispParser (void)
 	def->kindCount  = ARRAY_SIZE (LispKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
-	def->parser     = findLispTags;
+	def->parser    = findLispTags;
 	return def;
 }
 

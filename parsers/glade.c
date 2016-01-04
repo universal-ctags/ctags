@@ -73,10 +73,11 @@ static tagXpathTableTable gladeXpathTableTable[] = {
 	[TABLE_MAIN] = { ARRAY_AND_SIZE(gladeXpathMainTable) },
 };
 
-static void
-findGladeTags (void)
+static rescanReason
+findGladeTags (parserDefinition *parser, unsigned int passCount)
 {
-	findXMLTags (NULL, NULL, gladeXpathTableTable + TABLE_MAIN, GladeKinds, NULL);
+	return findXMLTags (parser, NULL, NULL, gladeXpathTableTable + TABLE_MAIN, GladeKinds,
+			    passCount, NULL);
 }
 
 extern parserDefinition*

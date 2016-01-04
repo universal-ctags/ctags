@@ -132,7 +132,8 @@ static void markTheLastTagAsDeletedFile (int scope_index)
 	e->kind = &(DiffKinds [K_DELETED_FILE]);
 }
 
-static void findDiffTags (void)
+static rescanReason findDiffTags (parserDefinition *parser __unused__,
+				  const unsigned int passCount __unused__)
 {
 	vString *filename = vStringNew ();
 	vString *hunk = vStringNew ();
@@ -199,6 +200,7 @@ static void findDiffTags (void)
 	}
 	vStringDelete (hunk);
 	vStringDelete (filename);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* DiffParser (void)

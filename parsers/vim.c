@@ -683,17 +683,18 @@ static void parseVimBallFile (const unsigned char *line)
 	vStringDelete (fname);
 }
 
-static void findVimTags (void)
+static rescanReason findVimTags (parserDefinition *parser __unused__,
+				 const unsigned int passCount __unused__)
 {
 	const unsigned char *line;
 	/* TODO - change this into a structure */
 
 	line = readVimLine();
 
-    if (line == NULL)
-    {
-            return;
-    }
+	if (line == NULL)
+	{
+		return RESCAN_NONE;
+	}
 
 	if ( strncmp ((const char*) line, "UseVimball", (size_t) 10) == 0 )
 	{
@@ -703,6 +704,8 @@ static void findVimTags (void)
 	{
 		parseVimFile (line);
 	}
+
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* VimParser (void)
@@ -715,7 +718,7 @@ extern parserDefinition* VimParser (void)
 	def->kindCount	= ARRAY_SIZE (VimKinds);
 	def->extensions = extensions;
 	def->patterns   = patterns;
-	def->parser		= findVimTags;
+	def->parser	= findVimTags;
 	return def;
 }
 

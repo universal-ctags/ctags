@@ -99,7 +99,8 @@ static const unsigned char *skipSingleString (const unsigned char *cp)
 	return cp;
 }
 
-static void findShTags (void)
+static rescanReason findShTags (parserDefinition *parser __unused__,
+				const unsigned int passCount __unused__)
 {
 	vString *name = vStringNew ();
 	const unsigned char *line;
@@ -280,6 +281,7 @@ static void findShTags (void)
 	vStringDelete (name);
 	if (hereDocDelimiter)
 		vStringDelete (hereDocDelimiter);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* ShParser (void)

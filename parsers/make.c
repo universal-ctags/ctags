@@ -148,7 +148,8 @@ static void readIdentifier (const int first, vString *const id)
 	vStringTerminate (id);
 }
 
-static void findMakeTags (void)
+static rescanReason findMakeTags (parserDefinition *parser __unused__,
+				  const unsigned int passCount __unused__)
 {
 	stringList *identifiers = stringListNew ();
 	boolean newline = TRUE;
@@ -275,6 +276,7 @@ static void findMakeTags (void)
 			variable_possible = FALSE;
 	}
 	stringListDelete (identifiers);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* MakefileParser (void)

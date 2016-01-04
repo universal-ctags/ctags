@@ -153,7 +153,8 @@ static void parseDirective (const unsigned char *cp, vString *const module)
 	vStringDelete (directive);
 }
 
-static void findErlangTags (void)
+static rescanReason findErlangTags (parserDefinition *parser __unused__,
+				    const unsigned int passCount __unused__)
 {
 	vString *const module = vStringNew ();
 	const unsigned char *line;
@@ -176,6 +177,7 @@ static void findErlangTags (void)
 			parseFunctionTag (cp, module);
 	}
 	vStringDelete (module);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition *ErlangParser (void)
@@ -185,7 +187,7 @@ extern parserDefinition *ErlangParser (void)
 	def->kinds = ErlangKinds;
 	def->kindCount = ARRAY_SIZE (ErlangKinds);
 	def->extensions = extensions;
-	def->parser = findErlangTags;
+	def->parser  = findErlangTags;
 	return def;
 }
 

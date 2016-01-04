@@ -25,25 +25,35 @@
 /*
 *   FUNCTION PROTOTYPES
 */
-static void antFindTagsUnderProject (xmlNode *node,
+static void antFindTagsUnderProject (parserDefinition * parser,
+				     xmlNode *node,
 				     const struct sTagXpathRecurSpec *spec,
 				     xmlXPathContext *ctx,
+				     const unsigned int passCount,
 				     void *userData);
-static void antFindTagsUnderTask (xmlNode *node,
+static void antFindTagsUnderTask (parserDefinition * parser,
+				  xmlNode *node,
 				  const struct sTagXpathRecurSpec *spec,
 				  xmlXPathContext *ctx,
+				  const unsigned int passCount,
 				  void *userData);
-static void makeTagForProjectName (xmlNode *node,
+static void makeTagForProjectName (parserDefinition * parser,
+				   xmlNode *node,
 				   const struct sTagXpathMakeTagSpec *spec,
 				   struct sTagEntryInfo *tag,
+				   const unsigned int passCount,
 				   void *userData);
-static void makeTagForTargetName (xmlNode *node,
+static void makeTagForTargetName (parserDefinition * parser,
+				  xmlNode *node,
 				  const struct sTagXpathMakeTagSpec *spec,
 				  struct sTagEntryInfo *tag,
+				  const unsigned int passCount,
 				  void *userData);
-static void makeTagWithScope (xmlNode *node,
+static void makeTagWithScope (parserDefinition * parser,
+			      xmlNode *node,
 			      const struct sTagXpathMakeTagSpec *spec,
 			      struct sTagEntryInfo *tag,
+			      const unsigned int passCount,
 			      void *userData);
 #endif
 
@@ -148,39 +158,48 @@ static const tagRegexTable const antTagRegexTable [] = {
 #ifdef HAVE_LIBXML
 
 static void
-antFindTagsUnderProject (xmlNode *node,
+antFindTagsUnderProject (parserDefinition * parser,
+			 xmlNode *node,
 			 const struct sTagXpathRecurSpec *spec,
 			 xmlXPathContext *ctx,
+			 const unsigned int passCount,
 			 void *userData)
 {
 	int corkIndex = SCOPE_NIL;
 
-	findXMLTags (ctx, node,
+	findXMLTags (parser, ctx, node,
 		     antXpathTableTable + TABLE_MAIN_NAME,
 		     AntKinds,
+		     passCount,
 		     &corkIndex);
-	findXMLTags (ctx, node,
+	findXMLTags (parser, ctx, node,
 		     antXpathTableTable + TABLE_PROJECT,
 		     AntKinds,
+		     passCount,
 		     &corkIndex);
 }
 
-static void antFindTagsUnderTask (xmlNode *node,
+static void antFindTagsUnderTask (parserDefinition * parser,
+				  xmlNode *node,
 				  const struct sTagXpathRecurSpec *spec,
 				  xmlXPathContext *ctx,
+				  const unsigned int passCount,
 				  void *userData)
 {
 	int corkIndex = *(int *)userData;
 
-	findXMLTags (ctx, node,
+	findXMLTags (parser, ctx, node,
 		     antXpathTableTable + TABLE_TARGET_NAME,
 		     AntKinds,
+		     passCount,
 		     &corkIndex);
 }
 
-static void makeTagForProjectName (xmlNode *node,
+static void makeTagForProjectName (parserDefinition * parser,
+				   xmlNode *node,
 				   const struct sTagXpathMakeTagSpec *spec,
 				   struct sTagEntryInfo *tag,
+				   const unsigned int passCount,
 				   void *userData)
 {
 	int *corkIndex = userData;
@@ -188,9 +207,11 @@ static void makeTagForProjectName (xmlNode *node,
 	*corkIndex = makeTagEntry (tag);
 }
 
-static void makeTagForTargetName (xmlNode *node,
+static void makeTagForTargetName (parserDefinition * parser,
+				  xmlNode *node,
 				  const struct sTagXpathMakeTagSpec *spec,
 				  struct sTagEntryInfo *tag,
+				  const unsigned int passCount,
 				  void *userData)
 {
 	int *corkIndex = (int *)userData;
@@ -203,9 +224,11 @@ static void makeTagForTargetName (xmlNode *node,
 	*corkIndex = makeTagEntry (tag);
 }
 
-static void makeTagWithScope (xmlNode *node,
+static void makeTagWithScope (parserDefinition * parser,
+			      xmlNode *node,
 			      const struct sTagXpathMakeTagSpec *spec,
 			      struct sTagEntryInfo *tag,
+			      const unsigned int passCount,
 			      void *userData)
 {
 	tag->extensionFields.scopeKind  = NULL;
@@ -215,12 +238,13 @@ static void makeTagWithScope (xmlNode *node,
 	makeTagEntry (tag);
 }
 
-static void
-findAntTags (void)
+static rescanReason
+findAntTags (parserDefinition * parser, const unsigned int passCount)
 {
-	findXMLTags (NULL, NULL, antXpathTableTable + TABLE_MAIN,
-		     AntKinds,
-		     NULL);
+	return findXMLTags (parser, NULL, NULL, antXpathTableTable + TABLE_MAIN,
+			    AntKinds,
+			    passCount,
+			    NULL);
 }
 #endif
 

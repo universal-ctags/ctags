@@ -1097,7 +1097,8 @@ static void findTag (tokenInfo *const token)
 	}
 }
 
-static void findVerilogTags (void)
+static rescanReason findVerilogTags (parserDefinition *parser __unused__,
+				     const unsigned int passCount __unused__)
 {
 	tokenInfo *const token = newToken ();
 	int c = '\0';
@@ -1150,6 +1151,8 @@ static void findVerilogTags (void)
 	deleteToken (token);
 	pruneTokens (currentContext);
 	currentContext = NULL;
+
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* VerilogParser (void)

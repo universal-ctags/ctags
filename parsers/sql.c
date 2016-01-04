@@ -2360,13 +2360,16 @@ static void initialize (const langType language)
 	Lang_sql = language;
 }
 
-static void findSqlTags (void)
+static rescanReason findSqlTags (parserDefinition *parser __unused__,
+				  const unsigned int passCount __unused__)
 {
 	tokenInfo *const token = newToken ();
 
 	while (parseSqlFile (token) != TOKEN_EOF);
 
 	deleteToken (token);
+
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* SqlParser (void)
@@ -2376,7 +2379,7 @@ extern parserDefinition* SqlParser (void)
 	def->kinds		= SqlKinds;
 	def->kindCount	= ARRAY_SIZE (SqlKinds);
 	def->extensions = extensions;
-	def->parser		= findSqlTags;
+	def->parser	= findSqlTags;
 	def->initialize = initialize;
 	def->keywordTable = SqlKeywordTable;
 	def->keywordCount = ARRAY_SIZE (SqlKeywordTable);

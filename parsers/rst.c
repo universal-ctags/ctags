@@ -154,7 +154,8 @@ static int utf8_strlen(const char *buf, int buf_len)
 
 
 /* TODO: parse overlining & underlining as distinct sections. */
-static void findRstTags (void)
+static rescanReason findRstTags (parserDefinition *parser __unused__,
+				 const unsigned int passCount __unused__)
 {
 	vString *name = vStringNew ();
 	fpos_t filepos;
@@ -197,6 +198,7 @@ static void findRstTags (void)
 	}
 	vStringDelete (name);
 	nestingLevelsFree(nestingLevels);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* RstParser (void)
