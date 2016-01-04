@@ -2752,7 +2752,7 @@ static void analyzeParens (statementInfo *const st)
 {
 	tokenInfo *const prev = prevToken (st, 1);
 	const tokenInfo *const prev2 = prevToken (st, 2);
- 
+
 	if (
 			st->inFunction &&
 			!st->assignment &&
@@ -2761,10 +2761,10 @@ static void analyzeParens (statementInfo *const st)
 				isInputLanguage(Lang_cpp) &&
 				isType(prev,TOKEN_NAME) &&
 				isType(prev2,TOKEN_NAME)
-			) 
+			)
 		)
 	{
- 		st->notVariable = TRUE;
+		st->notVariable = TRUE;
 	}
 
 	if (! isType (prev, TOKEN_NONE))  /* in case of ignored enclosing macros */
@@ -2782,7 +2782,8 @@ static void analyzeParens (statementInfo *const st)
 			/* FIXME: This breaks parsing of variable instantiations that have
 			   constants as parameters: Type var(0) or Type var("..."). */
 			reinitStatement (st, FALSE);
-		} else if (info.isNameCandidate  &&  isType (token, TOKEN_PAREN_NAME)  &&
+		}
+		else if (info.isNameCandidate  &&  isType (token, TOKEN_PAREN_NAME)  &&
 				 ! st->gotParenName  &&
 				 (! info.isParamList || ! st->haveQualifyingName  ||
 				  c == '('  ||
@@ -3248,7 +3249,9 @@ static void tagCheck (statementInfo *const st)
 						/* Ignore. C/C++ allows nested function prototypes but
 						   this code actually catches far too many of them.
 						   Better some missing tags than a lot of false positives. */
-					} else {
+					}
+					else
+					{
 						if (! isInputLanguage (Lang_vera))
 							st->declaration = DECL_FUNCTION;
 						qualifyFunctionTag (st, prev2);
@@ -3313,7 +3316,8 @@ static void tagCheck (statementInfo *const st)
 					/* If it looks like a pointer or we are in a function body then
 					   it's far more likely to be a variable. */
 					qualifyVariableTag (st, prev2);
-				} else
+				}
+				else
 					qualifyFunctionDeclTag (st, prev2);
 			}
 			if (isInputLanguage (Lang_java) && token->type == TOKEN_SEMICOLON && insideEnumBody (st))
