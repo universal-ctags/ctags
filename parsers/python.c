@@ -404,53 +404,97 @@ static void parseImports (const char *cp)
 /* modified from get.c getArglistFromStr().
  * warning: terminates rest of string past arglist!
  * note: does not ignore brackets inside strings! */
-static char *parseArglist(const char *buf)
+struct argParsingState
 {
-	char *start, *end;
+	vString *arglist;
 	int level;
-	char *arglist, *from, *to;
-	int len;
-	if (NULL == buf)
-		return NULL;
-	if (NULL == (start = strchr(buf, '(')))
-		return NULL;
-	for (level = 1, end = start + 1; level > 0; ++end)
-	{
-		if ('\0' == *end)
-			break;
-		else if ('(' == *end)
-			++ level;
-		else if (')' == *end)
-			-- level;
-	}
-	*end = '\0';
+};
 
-	len = strlen(start) + 1;
-	arglist = eMalloc(len);
-	from = start;
-	to = arglist;
-	while (*from != '\0') {
-		if (*from == '\t')
-			; /* tabs are illegal in field values */
-		else
-			*to++ = *from;
-		++from;
+static boolean gatherArglistCB (int c, void *arglist)
+{
+	if (arglist)
+	{
+		if ('\t' == c)
+			c = ' ';
+
+		if (vStringLast ((vString *)arglist) != ' '
+		    || c != ' ')
+			vStringPut ((vString *)arglist, c);
 	}
-	*to = '\0';
-	return arglist;
+
+	if (c == '(' || c == ')')
+		return TRUE;
+	else
+		return FALSE;
+}
+
+static boolean parseArglist(const char* buf, struct argParsingState *state)
+{
+	const char *start, *current;
+
+	start = buf;
+	if (state->level == 0)
+	{
+		if (NULL == (start = strchr(buf, '(')))
+			return FALSE;
+		else
+		{
+			if (state->arglist)
+				vStringPut (state->arglist, *start);
+			state->level = 1;
+			start += 1;
+		}
+	}
+
+	current = skipUntil (start, gatherArglistCB, state->arglist);
+	switch (*current)
+	{
+	case '\0':
+		break;
+	case '(':
+		++ state->level;
+		break;
+	case ')':
+		-- state->level;
+		break;
+	}
+	return TRUE;
+}
+
+static void captureArguments (const char *start, vString *arglist)
+{
+	struct argParsingState state;
+
+	state.level = 0;
+	state.arglist = arglist;
+
+	while (start)
+	{
+		if (parseArglist (start, &state) == FALSE)
+			/* No '(' is found: broken input */
+			break;
+		else if (state.level == 0)
+			break;
+		else
+			start = (const char *) readLineFromInputFile ();
+	}
 }
 
 static void parseFunction (const char *cp, vString *const def,
 	vString *const parent, int is_class_parent)
 {
-	char *arglist;
+	tagEntryInfo tag;
+	static vString *arglist;
 
 	cp = parseIdentifier (cp, def);
-	arglist = parseArglist (cp);
-	makeFunctionTag (def, parent, is_class_parent, arglist);
-	if (arglist != NULL) {
-		eFree (arglist);
-	}
+	initTagEntry (&tag, vStringValue (def), &(PythonKinds[K_FUNCTION]));
+
+	if (arglist)
+	  vStringClear (arglist);
+	else
+	  arglist = vStringNew ();
+	captureArguments (cp, arglist);
+	makeFunctionTagFull (&tag, def, parent, is_class_parent, vStringValue (arglist));
 }
 
 /* Get the combined name of a nested symbol. Classes are separated with ".",
