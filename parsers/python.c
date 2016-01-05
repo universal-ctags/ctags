@@ -117,11 +117,9 @@ static void addAccessFields (tagEntryInfo *const entry,
 /* Given a string with the contents of a line directly after the "def" keyword,
  * extract all relevant information and create a tag.
  */
-static void makeFunctionTag (vString *const function,
-	vString *const parent, int is_class_parent, const char *arglist)
+static void makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
+				 vString *const parent, int is_class_parent, const char *arglist)
 {
-	tagEntryInfo tag;
-
 	if (is_class_parent)
 	{
 		if (!PythonKinds[K_MEMBER].enabled)
@@ -133,29 +131,36 @@ static void makeFunctionTag (vString *const function,
 			return;
 	}
 
-	initTagEntry (&tag, vStringValue (function), &(PythonKinds[K_FUNCTION]));
-
-	tag.extensionFields.signature = arglist;
+	tag->extensionFields.signature = arglist;
 
 	if (vStringLength (parent) > 0)
 	{
 		if (is_class_parent)
 		{
-			tag.kind = &(PythonKinds[K_MEMBER]);
-			tag.extensionFields.scopeKind = &(PythonKinds[K_CLASS]);
-			tag.extensionFields.scopeName = vStringValue (parent);
+			tag->kind = &(PythonKinds[K_MEMBER]);
+			tag->extensionFields.scopeKind = &(PythonKinds[K_CLASS]);
+			tag->extensionFields.scopeName = vStringValue (parent);
 		}
 		else
 		{
-			tag.extensionFields.scopeKind = &(PythonKinds[K_FUNCTION]);
-			tag.extensionFields.scopeName = vStringValue (parent);
+			tag->extensionFields.scopeKind = &(PythonKinds[K_FUNCTION]);
+			tag->extensionFields.scopeName = vStringValue (parent);
 		}
 	}
 
-	addAccessFields (&tag, function, is_class_parent ? K_MEMBER : K_FUNCTION,
+	addAccessFields (tag, function, is_class_parent ? K_MEMBER : K_FUNCTION,
 		vStringLength (parent) > 0, is_class_parent);
 
-	makeTagEntry (&tag);
+	makeTagEntry (tag);
+}
+
+static void makeFunctionTag (vString *const function,
+	vString *const parent, int is_class_parent, const char *arglist)
+{
+	tagEntryInfo tag;
+
+	initTagEntry (&tag, vStringValue (function), &(PythonKinds[K_FUNCTION]));
+	makeFunctionTagFull (&tag, function, parent, is_class_parent, arglist);
 }
 
 /* Given a string with the contents of the line directly after the "class"
