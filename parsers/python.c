@@ -62,6 +62,11 @@ static boolean isIdentifierFirstCharacter (int c)
 	return (boolean) (isalpha (c) || c == '_');
 }
 
+static boolean isIdentifierFirstCharacterCB (int c, void *dummy __unused__)
+{
+	return isIdentifierFirstCharacter (c);
+}
+
 static boolean isIdentifierCharacter (int c)
 {
 	return (boolean) (isalnum (c) || c == '_');
@@ -220,8 +225,9 @@ static const char *skipString (const char *cp)
 	return cp;
 }
 
-/* Skip everything up to an identifier start. */
-static const char *skipEverything (const char *cp)
+static const char *skipUntil (const char *cp,
+			      boolean (* isAcceptable) (int, void*),
+			      void *user_data)
 {
 	int match;
 	for (; *cp; cp++)
@@ -261,12 +267,18 @@ static const char *skipEverything (const char *cp)
 			cp = skipString(cp);
 			if (!*cp) break;
 		}
-		if (isIdentifierFirstCharacter ((int) *cp))
+		if (isAcceptable ((int) *cp, user_data))
 			return cp;
 		if (match)
 			cp--; /* avoid jumping over the character after a skipped string */
 	}
 	return cp;
+}
+
+/* Skip everything up to an identifier start. */
+static const char *skipEverything (const char *cp)
+{
+	return skipUntil (cp, isIdentifierFirstCharacterCB, NULL);
 }
 
 /* Skip an identifier. */
