@@ -208,16 +208,16 @@ extern void error (
 	va_list ap;
 
 	va_start (ap, format);
-	fprintf (errout, "%s: %s", getExecutableName (),
+	fprintf (stderr, "%s: %s", getExecutableName (),
 			selected (selection, WARNING) ? "Warning: " : "");
-	vfprintf (errout, format, ap);
+	vfprintf (stderr, format, ap);
 	if (selected (selection, PERROR))
 #ifdef HAVE_STRERROR
-		fprintf (errout, " : %s", strerror (errno));
+		fprintf (stderr, " : %s", strerror (errno));
 #else
 		perror (" ");
 #endif
-	fputs ("\n", errout);
+	fputs ("\n", stderr);
 	va_end (ap);
 	if (selected (selection, FATAL) || Option.fatalWarnings)
 		exit (1);

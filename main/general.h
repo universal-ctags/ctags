@@ -26,12 +26,6 @@
 *   MACROS
 */
 
-/* Define standard error destination
- */
-#ifndef errout
-# define errout	stderr
-#endif
-
 /*  Prevent warnings about unused variables in GCC. */
 #if defined (__GNUC__) && !defined (__GNUG__)
 # ifdef __MINGW32__
