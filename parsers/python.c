@@ -480,6 +480,11 @@ static void captureArguments (const char *start, vString *arglist)
 	}
 }
 
+static void skipParens (const char *start)
+{
+	captureArguments (start, NULL);
+}
+
 static void parseFunction (const char *cp, vString *const def,
 	vString *const parent, int is_class_parent)
 {
@@ -631,7 +636,7 @@ static void find_triple_end(char const *string, char const **which)
 	}
 }
 
-static const char *findVariable(const char *line)
+static const char *findVariable(const char *line, const char** lineContinuation)
 {
 	/* Parse global and class variable names (C.x) from assignment statements.
 	 * Object attributes (obj.x) are ignored.
@@ -651,6 +656,9 @@ static const char *findVariable(const char *line)
 			break;	/* allow 'x = func(b=2,y=2,' lines and comments at the end of line */
 		eq++;
 	}
+
+	if (*eq == '(')
+		*lineContinuation = eq;
 
 	/* go backwards to the start of the line, checking we have valid chars */
 	start = cp - 1;
@@ -779,6 +787,7 @@ static void findPythonTags (void)
 
 	while ((line = (const char *) readLineFromInputFile ()) != NULL)
 	{
+		const char *variableLineContinuation = NULL;
 		const char *cp = line, *candidate;
 		char const *longstring;
 		char const *keyword, *variable;
@@ -819,7 +828,7 @@ static void findPythonTags (void)
 		checkIndent(nesting_levels, indent);
 
 		/* Find global and class variables */
-		variable = findVariable(line);
+		variable = findVariable(line, &variableLineContinuation);
 		if (variable)
 		{
 			const char *start = variable;
@@ -848,6 +857,9 @@ static void findPythonTags (void)
 				if (parent_is_class || vStringLength(parent) == 0)
 					makeVariableTag (name, parent, parent_is_class);
 			}
+
+			if (variableLineContinuation)
+				skipParens (variableLineContinuation);
 		}
 
 		/* Deal with multiline string start. */
