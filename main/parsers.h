@@ -14,6 +14,7 @@
 
 #ifdef HAVE_LIBXML
 #define XML_PARSER_LIST \
+	DbusIntrospectParser, \
 	GladeParser
 #else
 #define XML_PARSER_LIST

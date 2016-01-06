@@ -129,6 +129,7 @@ PARSER_SRCS =				\
 
 XML_HEADS =
 XML_SRCS = \
+	 parsers/dbusintrospect.c	\
 	 parsers/glade.c		\
 	 \
 	 $(NULL)
