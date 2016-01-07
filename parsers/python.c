@@ -113,6 +113,11 @@ static boolean isIdentifierFirstCharacter (int c)
 	return (boolean) (isalpha (c) || c == '_');
 }
 
+static boolean isIdentifierFirstCharacterCB (int c, void *dummy __unused__)
+{
+	return isIdentifierFirstCharacter (c);
+}
+
 static boolean isIdentifierCharacter (int c)
 {
 	return (boolean) (isalnum (c) || c == '_');
@@ -163,11 +168,9 @@ static void addAccessFields (tagEntryInfo *const entry,
 /* Given a string with the contents of a line directly after the "def" keyword,
  * extract all relevant information and create a tag.
  */
-static void makeFunctionTag (vString *const function,
-	vString *const parent, int is_class_parent, const char *arglist)
+static void makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
+				 vString *const parent, int is_class_parent, const char *arglist)
 {
-	tagEntryInfo tag;
-
 	if (is_class_parent)
 	{
 		if (!PythonKinds[K_MEMBER].enabled)
@@ -179,29 +182,36 @@ static void makeFunctionTag (vString *const function,
 			return;
 	}
 
-	initTagEntry (&tag, vStringValue (function), &(PythonKinds[K_FUNCTION]));
-
-	tag.extensionFields.signature = arglist;
+	tag->extensionFields.signature = arglist;
 
 	if (vStringLength (parent) > 0)
 	{
 		if (is_class_parent)
 		{
-			tag.kind = &(PythonKinds[K_MEMBER]);
-			tag.extensionFields.scopeKind = &(PythonKinds[K_CLASS]);
-			tag.extensionFields.scopeName = vStringValue (parent);
+			tag->kind = &(PythonKinds[K_MEMBER]);
+			tag->extensionFields.scopeKind = &(PythonKinds[K_CLASS]);
+			tag->extensionFields.scopeName = vStringValue (parent);
 		}
 		else
 		{
-			tag.extensionFields.scopeKind = &(PythonKinds[K_FUNCTION]);
-			tag.extensionFields.scopeName = vStringValue (parent);
+			tag->extensionFields.scopeKind = &(PythonKinds[K_FUNCTION]);
+			tag->extensionFields.scopeName = vStringValue (parent);
 		}
 	}
 
-	addAccessFields (&tag, function, is_class_parent ? K_MEMBER : K_FUNCTION,
+	addAccessFields (tag, function, is_class_parent ? K_MEMBER : K_FUNCTION,
 		vStringLength (parent) > 0, is_class_parent);
 
-	makeTagEntry (&tag);
+	makeTagEntry (tag);
+}
+
+static void makeFunctionTag (vString *const function,
+	vString *const parent, int is_class_parent, const char *arglist)
+{
+	tagEntryInfo tag;
+
+	initTagEntry (&tag, vStringValue (function), &(PythonKinds[K_FUNCTION]));
+	makeFunctionTagFull (&tag, function, parent, is_class_parent, arglist);
 }
 
 /* Given a string with the contents of the line directly after the "class"
@@ -271,8 +281,9 @@ static const char *skipString (const char *cp)
 	return cp;
 }
 
-/* Skip everything up to an identifier start. */
-static const char *skipEverything (const char *cp)
+static const char *skipUntil (const char *cp,
+			      boolean (* isAcceptable) (int, void*),
+			      void *user_data)
 {
 	int match;
 	for (; *cp; cp++)
@@ -312,12 +323,18 @@ static const char *skipEverything (const char *cp)
 			cp = skipString(cp);
 			if (!*cp) break;
 		}
-		if (isIdentifierFirstCharacter ((int) *cp))
+		if (isAcceptable ((int) *cp, user_data))
 			return cp;
 		if (match)
 			cp--; /* avoid jumping over the character after a skipped string */
 	}
 	return cp;
+}
+
+/* Skip everything up to an identifier start. */
+static const char *skipEverything (const char *cp)
+{
+	return skipUntil (cp, isIdentifierFirstCharacterCB, NULL);
 }
 
 /* Skip an identifier. */
@@ -591,53 +608,102 @@ static void parseNamespace (const char *cp)
 /* modified from get.c getArglistFromStr().
  * warning: terminates rest of string past arglist!
  * note: does not ignore brackets inside strings! */
-static char *parseArglist(const char *buf)
+struct argParsingState
 {
-	char *start, *end;
+	vString *arglist;
 	int level;
-	char *arglist, *from, *to;
-	int len;
-	if (NULL == buf)
-		return NULL;
-	if (NULL == (start = strchr(buf, '(')))
-		return NULL;
-	for (level = 1, end = start + 1; level > 0; ++end)
-	{
-		if ('\0' == *end)
-			break;
-		else if ('(' == *end)
-			++ level;
-		else if (')' == *end)
-			-- level;
-	}
-	*end = '\0';
+};
 
-	len = strlen(start) + 1;
-	arglist = eMalloc(len);
-	from = start;
-	to = arglist;
-	while (*from != '\0') {
-		if (*from == '\t')
-			; /* tabs are illegal in field values */
-		else
-			*to++ = *from;
-		++from;
+static boolean gatherArglistCB (int c, void *arglist)
+{
+	if (arglist)
+	{
+		if ('\t' == c)
+			c = ' ';
+
+		if (vStringLast ((vString *)arglist) != ' '
+		    || c != ' ')
+			vStringPut ((vString *)arglist, c);
 	}
-	*to = '\0';
-	return arglist;
+
+	if (c == '(' || c == ')')
+		return TRUE;
+	else
+		return FALSE;
+}
+
+static boolean parseArglist(const char* buf, struct argParsingState *state)
+{
+	const char *start, *current;
+
+	start = buf;
+	if (state->level == 0)
+	{
+		if (NULL == (start = strchr(buf, '(')))
+			return FALSE;
+		else
+		{
+			if (state->arglist)
+				vStringPut (state->arglist, *start);
+			state->level = 1;
+			start += 1;
+		}
+	}
+
+	current = skipUntil (start, gatherArglistCB, state->arglist);
+	switch (*current)
+	{
+	case '\0':
+		break;
+	case '(':
+		++ state->level;
+		break;
+	case ')':
+		-- state->level;
+		break;
+	}
+	return TRUE;
+}
+
+static void captureArguments (const char *start, vString *arglist)
+{
+	struct argParsingState state;
+
+	state.level = 0;
+	state.arglist = arglist;
+
+	while (start)
+	{
+		if (parseArglist (start, &state) == FALSE)
+			/* No '(' is found: broken input */
+			break;
+		else if (state.level == 0)
+			break;
+		else
+			start = (const char *) readLineFromInputFile ();
+	}
+}
+
+static void skipParens (const char *start)
+{
+	captureArguments (start, NULL);
 }
 
 static void parseFunction (const char *cp, vString *const def,
 	vString *const parent, int is_class_parent)
 {
-	char *arglist;
+	tagEntryInfo tag;
+	static vString *arglist;
 
 	cp = parseIdentifier (cp, def);
-	arglist = parseArglist (cp);
-	makeFunctionTag (def, parent, is_class_parent, arglist);
-	if (arglist != NULL) {
-		eFree (arglist);
-	}
+	initTagEntry (&tag, vStringValue (def), &(PythonKinds[K_FUNCTION]));
+
+	if (arglist)
+	  vStringClear (arglist);
+	else
+	  arglist = vStringNew ();
+	captureArguments (cp, arglist);
+	makeFunctionTagFull (&tag, def, parent, is_class_parent, vStringValue (arglist));
 }
 
 /* Get the combined name of a nested symbol. Classes are separated with ".",
@@ -774,7 +840,7 @@ static void find_triple_end(char const *string, char const **which)
 	}
 }
 
-static const char *findVariable(const char *line)
+static const char *findVariable(const char *line, const char** lineContinuation)
 {
 	/* Parse global and class variable names (C.x) from assignment statements.
 	 * Object attributes (obj.x) are ignored.
@@ -794,6 +860,9 @@ static const char *findVariable(const char *line)
 			break;	/* allow 'x = func(b=2,y=2,' lines and comments at the end of line */
 		eq++;
 	}
+
+	if (*eq == '(')
+		*lineContinuation = eq;
 
 	/* go backwards to the start of the line, checking we have valid chars */
 	start = cp - 1;
@@ -922,6 +991,7 @@ static void findPythonTags (void)
 
 	while ((line = (const char *) readLineFromInputFile ()) != NULL)
 	{
+		const char *variableLineContinuation = NULL;
 		const char *cp = line, *candidate;
 		char const *longstring;
 		char const *keyword, *variable;
@@ -962,7 +1032,7 @@ static void findPythonTags (void)
 		checkIndent(nesting_levels, indent);
 
 		/* Find global and class variables */
-		variable = findVariable(line);
+		variable = findVariable(line, &variableLineContinuation);
 		if (variable)
 		{
 			const char *start = variable;
@@ -991,6 +1061,9 @@ static void findPythonTags (void)
 				if (parent_is_class || vStringLength(parent) == 0)
 					makeVariableTag (name, parent, parent_is_class);
 			}
+
+			if (variableLineContinuation)
+				skipParens (variableLineContinuation);
 		}
 
 		/* Deal with multiline string start. */

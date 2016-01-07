@@ -1,0 +1,8 @@
+f	input.py	/^def f ($/;"	f	signature:( a)
+g	input.py	/^def g ($/;"	f	signature:( a = 3)
+x	input.py	/^x = {$/;"	v
+z	input.py	/^z = [$/;"	v
+Foo	input.py	/^class Foo(object):$/;"	c
+bar	input.py	/^    def bar(self,$/;"	m	class:Foo	signature:(self, default=None)
+baz	input.py	/^    baz = dict($/;"	v	class:Foo
+variable	input.py	/^variable = dict($/;"	v
