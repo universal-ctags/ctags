@@ -466,13 +466,15 @@ EOF
 	local i
 	local p
 	local f
-	for i in $(seq 0 $(( ${#CTAGS_XCMD_PATH[@]} - 1))); do
-		p=${CTAGS_XCMD_PATH[$i]}
-		f=${CTAGS_XCMD_flags[$i]}
-		cat<<EOF
+	if [ ${#CTAGS_XCMD_PATH[@]} -gt 0 ]; then
+		for i in $(seq 0 $(( ${#CTAGS_XCMD_PATH[@]} - 1))); do
+			p=${CTAGS_XCMD_PATH[$i]}
+			f=${CTAGS_XCMD_flags[$i]}
+			cat<<EOF
 	addLanguageXcmd (language, "$p$f");
 EOF
-	done
+		done
+	fi
 	for c in ${CTAGS_DISABLED_KINDS[@]}; do
 		cat<<EOF
 	enableRegexKind (language, '$c', FALSE);
