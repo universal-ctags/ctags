@@ -2371,10 +2371,10 @@ static void parseFlexFile (tokenInfo *const token)
 	} while (!isEOF (token));
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
 	Assert (ARRAY_SIZE (FlexKinds) == FLEXTAG_COUNT);
-	Lang_js = language;
+	Lang_js = parser->id;
 }
 
 static rescanReason findFlexTags(parserDefinition *parser __unused__,

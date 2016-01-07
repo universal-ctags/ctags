@@ -2354,10 +2354,10 @@ static tokenType parseSqlFile (tokenInfo *const token)
 	return token->type;
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
 	Assert (ARRAY_SIZE (SqlKinds) == SQLTAG_COUNT);
-	Lang_sql = language;
+	Lang_sql = parser->id;
 }
 
 static rescanReason findSqlTags (parserDefinition *parser __unused__,

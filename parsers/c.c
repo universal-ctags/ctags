@@ -3445,40 +3445,40 @@ static void buildKeywordHash (const langType language, unsigned int idx)
 	}
 }
 
-static void initializeCParser (const langType language)
+static void initializeCParser (parserDefinition* parser)
 {
-	Lang_c = language;
-	buildKeywordHash (language, 0);
+	Lang_c = parser->id;
+	buildKeywordHash (parser->id, 0);
 }
-static void initializeCppParser (const langType language)
+static void initializeCppParser (parserDefinition* parser)
 {
-	Lang_cpp = language;
-	buildKeywordHash (language, 1);
-}
-
-static void initializeCsharpParser (const langType language)
-{
-	Lang_csharp = language;
-	buildKeywordHash (language, 2);
+	Lang_cpp = parser->id;
+	buildKeywordHash (parser->id, 1);
 }
 
-static void initializeDParser (const langType language)
+static void initializeCsharpParser (parserDefinition* parser)
 {
-	Lang_d = language;
-	buildKeywordHash (language, 3);
+	Lang_csharp = parser->id;
+	buildKeywordHash (parser->id, 2);
+}
+
+static void initializeDParser (parserDefinition* parser)
+{
+	Lang_d = parser->id;
+	buildKeywordHash (parser->id, 3);
 }
 
 
-static void initializeJavaParser (const langType language)
+static void initializeJavaParser (parserDefinition* parser)
 {
-	Lang_java = language;
-	buildKeywordHash (language, 4);
+	Lang_java = parser->id;
+	buildKeywordHash (parser->id, 4);
 }
 
-static void initializeVeraParser (const langType language)
+static void initializeVeraParser (parserDefinition* parser)
 {
-	Lang_vera = language;
-	buildKeywordHash (language, 5);
+	Lang_vera = parser->id;
+	buildKeywordHash (parser->id, 5);
 }
 
 extern parserDefinition* CParser (void)

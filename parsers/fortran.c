@@ -2559,9 +2559,9 @@ static rescanReason findFortranTags (parserDefinition *parser __unused__,
 	return rescan;
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
-	Lang_fortran = language;
+	Lang_fortran = parser->id;
 }
 
 extern parserDefinition* FortranParser (void)

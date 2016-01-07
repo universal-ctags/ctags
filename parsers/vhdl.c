@@ -557,9 +557,9 @@ static void makeVhdlTag (tokenInfo * const token, const vhdlKind kind)
 	}
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
-	Lang_vhdl = language;
+	Lang_vhdl = parser->id;
 }
 
 static void parsePackage (tokenInfo * const token)

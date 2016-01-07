@@ -1884,9 +1884,9 @@ static rescanReason findOcamlTags (parserDefinition *parser __unused__,
 	return RESCAN_NONE;
 }
 
-static void ocamlInitialize (const langType language)
+static void ocamlInitialize (parserDefinition *parser)
 {
-	Lang_Ocaml = language;
+	Lang_Ocaml = parser->id;
 
 	initOperatorTable ();
 }

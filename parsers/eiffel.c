@@ -1043,9 +1043,9 @@ static void parseClass (tokenInfo *const token)
 	         ! isType (token, TOKEN_EOF));
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition* parser)
 {
-	Lang_eiffel = language;
+	Lang_eiffel = parser->id;
 }
 
 static rescanReason findEiffelTags(parserDefinition *parser __unused__,

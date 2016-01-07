@@ -1120,9 +1120,9 @@ static rescanReason findObjcTags (parserDefinition *parser __unused__,
 	return RESCAN_NONE;
 }
 
-static void objcInitialize (const langType language)
+static void objcInitialize (parserDefinition *parser)
 {
-	Lang_ObjectiveC = language;
+	Lang_ObjectiveC = parser->id;
 }
 
 extern parserDefinition *ObjcParser (void)

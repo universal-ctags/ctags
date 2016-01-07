@@ -535,10 +535,10 @@ static void parseTexFile (tokenInfo *const token)
 	} while (TRUE);
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
 	Assert (ARRAY_SIZE (TexKinds) == TEXTAG_COUNT);
-	Lang_js = language;
+	Lang_js = parser->id;
 
 	lastPart    = vStringNew();
 	lastChapter = vStringNew();

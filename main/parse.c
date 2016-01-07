@@ -1115,7 +1115,7 @@ static void initializeParser (langType lang)
 
 	if ((parser->initialize != NULL) && (parser->initialized == FALSE))
 	{
-		parser->initialize (lang);
+		parser->initialize (parser);
 		parser->initialized = TRUE;
 	}
 
@@ -1196,17 +1196,14 @@ static rescanReason doNothing (parserDefinition *parser __unused__,
 	return RESCAN_NONE;
 }
 
-static void lazyInitialize (langType language)
+static void lazyInitialize (parserDefinition* parser)
 {
-	parserDefinition* lang;
+	Assert (0 <= parser->language  &&  parser->language < (int) LanguageCount);
 
-	Assert (0 <= language  &&  language < (int) LanguageCount);
-	lang = LanguageTable [language];
+	parser->parser = doNothing;
 
-	lang->parser = doNothing;
-
-	if (lang->method & METHOD_REGEX)
-		lang->parser = findRegexTags;
+	if (parser->method & METHOD_REGEX)
+		parser->parser = findRegexTags;
 }
 
 /*

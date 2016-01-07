@@ -340,16 +340,16 @@ static void buildKeywordHash (const langType language, unsigned int idx)
 	}
 }
 
-static void initializeVerilog (const langType language)
+static void initializeVerilog (parserDefinition *parser)
 {
-	Lang_verilog = language;
-	buildKeywordHash (language, IDX_VERILOG);
+	Lang_verilog = parser->id;
+	buildKeywordHash (parser->id, IDX_VERILOG);
 }
 
-static void initializeSystemVerilog (const langType language)
+static void initializeSystemVerilog (parserDefinition *parser)
 {
-	Lang_systemverilog = language;
-	buildKeywordHash (language, IDX_SYSTEMVERILOG);
+	Lang_systemverilog = parser->id;
+	buildKeywordHash (parser->id, IDX_SYSTEMVERILOG);
 }
 
 static void vUngetc (int c)

@@ -376,9 +376,9 @@ static rescanReason findJsonTags (parserDefinition *parser __unused__,
 	return RESCAN_NONE;
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
-	Lang_json = language;
+	Lang_json = parser->id;
 }
 
 /* Create parser definition structure */

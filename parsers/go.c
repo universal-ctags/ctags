@@ -131,9 +131,9 @@ static boolean isIdentChar (const int c)
 		(isStartIdentChar (c) || isdigit (c));
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
-	Lang_go = language;
+	Lang_go = parser->id;
 }
 
 static tokenInfo *newToken (void)

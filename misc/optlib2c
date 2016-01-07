@@ -486,7 +486,7 @@ emit_initializer()
 	local c
 
 	cat <<EOF
-static void initialize${CTAGS_LANG_IN_C}Parser (const langType language)
+static void initialize${CTAGS_LANG_IN_C}Parser (parserDefinition *parser)
 {
 EOF
 	local i
@@ -500,13 +500,13 @@ EOF
 			fi
 			f=${CTAGS_XCMD_flags[$i]}
 			cat<<EOF
-	addLanguageXcmd (language, "$p$f");
+	addLanguageXcmd (parser->id, "$p$f");
 EOF
 		done
 	fi
 	for c in ${CTAGS_DISABLED_KINDS[@]}; do
 		cat<<EOF
-	enableRegexKind (language, '$c', FALSE);
+	enableRegexKind (parser->id, '$c', FALSE);
 EOF
 	done
 	cat<<EOF

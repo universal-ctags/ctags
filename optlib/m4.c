@@ -6,9 +6,9 @@
 #include "routines.h"
 
 
-static void initializeM4Parser (const langType language)
+static void initializeM4Parser (parserDefinition *parser)
 {
-	enableRegexKind (language, 'I', FALSE);
+	enableRegexKind (parser->id, 'I', FALSE);
 }
 
 extern parserDefinition* M4Parser (void)

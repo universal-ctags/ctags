@@ -1511,14 +1511,14 @@ static rescanReason findZephirTags (parserDefinition *parser __unused__,
 	return RESCAN_NONE;
 }
 
-static void initializePhpParser (const langType language)
+static void initializePhpParser (parserDefinition *parser)
 {
-	Lang_php = language;
+	Lang_php = parser->id;
 }
 
-static void initializeZephirParser (const langType language)
+static void initializeZephirParser (parserDefinition *parser)
 {
-	Lang_zephir = language;
+	Lang_zephir = parser->id;
 }
 
 extern parserDefinition* PhpParser (void)

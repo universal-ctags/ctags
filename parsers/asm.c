@@ -340,9 +340,9 @@ static rescanReason findAsmTags(parserDefinition *parser __unused__,
 	return RESCAN_NONE;
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
-	Lang_asm = language;
+	Lang_asm = parser->id;
 }
 
 extern parserDefinition* AsmParser (void)
