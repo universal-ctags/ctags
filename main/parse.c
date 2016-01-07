@@ -1169,7 +1169,7 @@ extern void freeParserResources (void)
 		parserDefinition* const lang = LanguageTable [i];
 
 		if (lang->finalize)
-			(lang->finalize)((langType)i, (boolean)lang->initialized);
+			(lang->finalize)(lang, (boolean)lang->initialized);
 		if (lang->fileKind != &defaultFileKind)
 		{
 			eFree (lang->fileKind);
@@ -1198,7 +1198,7 @@ static rescanReason doNothing (parserDefinition *parser __unused__,
 
 static void lazyInitialize (parserDefinition* parser)
 {
-	Assert (0 <= parser->language  &&  parser->language < (int) LanguageCount);
+	Assert (0 <= parser->id  &&  parser->id < (int) LanguageCount);
 
 	parser->parser = doNothing;
 

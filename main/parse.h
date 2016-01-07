@@ -58,7 +58,7 @@ typedef void (*parserInitialize) (parserDefinition *parser);
    whether the assoiciated initializer is invoked or not with the
    second parameter: INITIALIZED. If it is true, the initializer
    is called. */
-typedef void (*parserFinalize) (langType language, boolean initialized);
+typedef void (*parserFinalize) (parserDefinition *parser, boolean initialized);
 
 typedef const char * (*selectLanguage) (FILE *);
 

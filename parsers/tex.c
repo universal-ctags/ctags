@@ -547,7 +547,7 @@ static void initialize (parserDefinition *parser)
 	lastSubSubS = vStringNew();
 }
 
-static void finalize (const langType language __unused__,
+static void finalize (parserDefinition *parser __unused__,
 		      boolean initialized)
 {
 	if (initialized)
