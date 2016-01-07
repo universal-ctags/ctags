@@ -23,6 +23,7 @@
 #define xRealloc(p,n,Type) (Type *)eRealloc((p), (n) * sizeof (Type))
 
 #define ARRAY_SIZE(X)      (sizeof (X) / sizeof (X[0]))
+#define ARRAY_AND_SIZE(X)  (X), ARRAY_SIZE(X)
 
 /*
  *  Portability macros
