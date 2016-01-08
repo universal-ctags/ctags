@@ -30,27 +30,27 @@ OPT = $(OPT) /Zi
 !endif
 
 {main}.c{main}.obj::
-	cl $(OPT) $(DEFINES) $(INCLUDES) /Fomain\ /c $<
+	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fomain\ /c $<
 {optlib}.c{optlib}.obj::
-	cl $(OPT) $(DEFINES) $(INCLUDES) /Fooptlib\ /c $<
+	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fooptlib\ /c $<
 {parsers}.c{parsers}.obj::
-	cl $(OPT) $(DEFINES) $(INCLUDES) /Foparsers\ /c $<
+	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparsers\ /c $<
 
 all: ctags.exe readtags.exe
 
 ctags: ctags.exe
 
 ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS)
-	cl $(OPT) /Fe$@ $(ALL_OBJS) /link setargv.obj $(LIBS)
+	$(CC) $(OPT) /Fe$@ $(ALL_OBJS) /link setargv.obj $(LIBS)
 
 readtags.exe: readtags.c
-	cl $(OPT) /Fe$@ $(DEFINES) -DREADTAGS_MAIN readtags.c /link setargv.obj
+	$(CC) $(OPT) /Fe$@ $(DEFINES) -DREADTAGS_MAIN readtags.c /link setargv.obj
 
 $(REGEX_OBJS): $(REGEX_SRCS)
-	cl /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(REGEX_SRCS)
+	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(REGEX_SRCS)
 
 $(FNMATCH_OBJS): $(FNMATCH_SRCS)
-	cl /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(FNMATCH_SRCS)
+	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(FNMATCH_SRCS)
 
 
 clean:
