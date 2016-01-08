@@ -1351,7 +1351,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 	if ( is_inside_class )
 		is_class = TRUE;
 	/*
-	 * var can preceed an inner function
+	 * var can precede an inner function
 	 */
 	if ( isKeyword(token, KEYWORD_var) ||
 		 isKeyword(token, KEYWORD_let) ||

@@ -23,7 +23,7 @@ START   	MOVEA.L #PROMPT1,A1             Pointer to start of prompt text
         
 *       	Get firstname
 *		=============
-        	MOVEA.L #F_NAME,A1              Pointer to store teh sentance
+        	MOVEA.L #F_NAME,A1              Pointer to store the sentence
         	MOVE.B  #READSTR,D0             Set up readstring function
         	TRAP    #15                     Get string from KB
         	MOVE.W  D1,D4                   Save length of input string to d4
@@ -38,7 +38,7 @@ START   	MOVEA.L #PROMPT1,A1             Pointer to start of prompt text
       	MOVEA.L #F_NAME,A0              Move the first char to A0
        	JSR     CHECK2                  Check if uppercase
         
-        	CMPI.B  #1,D5                   See if all the sentance is CAPS
+        	CMPI.B  #1,D5                   See if all the sentence is CAPS
         	BCS     START                   if it is'nt then re-enter                          
 
 
@@ -46,12 +46,12 @@ START   	MOVEA.L #PROMPT1,A1             Pointer to start of prompt text
 *		=======================================
 SURNAME 	MOVEA.L #PROMPT2,A1             Pointer to start of prompt text
         	MOVE.B  #PRTSTR,D0              Set up print string function
-        	MOVE.W  #(F_NAME-PROMPT2),D1    The prompt string lenght
+        	MOVE.W  #(F_NAME-PROMPT2),D1    The prompt string length
         	TRAP    #15                     Print Prompt
         
 *       	Get surname
 *		===========
-        	MOVEA.L #S_NAME,A1              Pointer to store the sentance
+        	MOVEA.L #S_NAME,A1              Pointer to store the sentence
         	MOVE.B  #READSTR,D0             Set up readstring function
         	TRAP    #15                     Get string from KB
         	MOVE.W  D1,D4                   Save length on input string
@@ -66,7 +66,7 @@ SURNAME 	MOVEA.L #PROMPT2,A1             Pointer to start of prompt text
         	MOVEA.L #S_NAME,A0              Move the first char to A0  
         	JSR     CHECK2                  Check if uppercase        
         
-        	CMPI.B  #1,D5                   See if all the sentance is CAPS
+        	CMPI.B  #1,D5                   See if all the sentence is CAPS
         	BCS     SURNAME                 if it is'nt then re-enter     
 
 *       	Move the first char for fname and prints it (Initial Bit)
@@ -78,7 +78,7 @@ INITIAL 	MOVEA.L #F_NAME,A1              Move the first char to A1
 
 PRNSURNAME	MOVEA.L #S_NAME,A1              Pointer to start of prompt text
         	MOVE.B  #0,D0                   Set up print string function
-        	MOVE.W  D3,D1                   The prompt string lenght
+        	MOVE.W  D3,D1                   The prompt string length
         	TRAP    #15                     Print Prompt
 
 QUIT    	STOP    #$2700                  Stop the prorgam
@@ -94,7 +94,7 @@ CHECK2  	CMPI.B  #'A',(A0)               Is Char > A ?
         	CMP.B   #('Z'+1),(A0)+          Check if char is < Z
         	BCC     RETURNFALSE             If it is then it must be a cap
         	SUBI.B  #1,D4                   Decrease s_name / f_name Length
-        	BNE     CHECK2                  jump if the sentance is not = 0
+        	BNE     CHECK2                  jump if the sentence is not = 0
 
 RETURNTRUE  MOVE.B  #1,D5			  Moves a one to D5 to make CAPS ture
             RTS					  Jump back to the main program

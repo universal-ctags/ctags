@@ -276,7 +276,7 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 		File.fp = NULL;
 	}
 
-	/* File postion is used as key for checking the availability of
+	/* File position is used as key for checking the availability of
 	   pattern cache in entry.h. If an input file is changed, the
 	   key is meaningless. So notifying the changing here. */
 	TagFile.patternCacheValid = FALSE;
