@@ -1654,27 +1654,41 @@ extern void printLanguageAliases (const langType language)
 	}
 }
 
-static void printLanguage (const langType language)
+static void printLanguage (const langType language, parserDefinition** ltable)
 {
 	const parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	lang = LanguageTable [language];
+	lang = ltable [language];
 
 	if (lang->invisible)
 		return;
 
 	if (lang->method & METHOD_XCMD)
-		initializeParser (language);
+		initializeParser (lang->id);
 
 	if (lang->kinds != NULL  ||  (lang->method & METHOD_REGEX) || (lang->method & METHOD_XCMD))
-		printf ("%s%s\n", lang->name, isLanguageEnabled (language) ? "" : " [disabled]");
+		printf ("%s%s\n", lang->name, isLanguageEnabled (lang->id) ? "" : " [disabled]");
+}
+
+static int compareParsersByName (const void *a, const void* b)
+{
+	parserDefinition *const *la = a, *const *lb = b;
+	return strcasecmp ((*la)->name, (*lb)->name);
 }
 
 extern void printLanguageList (void)
 {
 	unsigned int i;
+	parserDefinition **ltable;
+
+	ltable = xMalloc (LanguageCount, parserDefinition*);
+	memcpy (ltable, LanguageTable, sizeof (parserDefinition*) * LanguageCount);
+	qsort (ltable, LanguageCount, sizeof (parserDefinition*), compareParsersByName);
+
 	for (i = 0  ;  i < LanguageCount  ;  ++i)
-		printLanguage (i);
+		printLanguage (i, ltable);
+
+	eFree (ltable);
 }
 
 /*
