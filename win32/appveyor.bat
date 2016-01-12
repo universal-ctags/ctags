@@ -71,6 +71,7 @@ goto :eof
 @echo on
 :: Check filetype
 c:\cygwin\bin\file ctags.exe
+c:\cygwin\bin\file readtags.exe
 :: Check if it works
 .\ctags --version || exit 1
 
@@ -92,6 +93,7 @@ goto :eof
 @echo on
 :: Check filetype
 c:\cygwin\bin\file ctags.exe
+c:\cygwin\bin\file readtags.exe
 :: Check if it works
 .\ctags --version || exit 1
 
@@ -122,6 +124,7 @@ goto :eof
 @echo on
 :: Check filetype
 c:\cygwin\bin\file ctags.exe
+c:\cygwin\bin\file readtags.exe
 :: Check if it works
 .\ctags --version || exit 1
 :: Run tests
@@ -152,6 +155,7 @@ goto :eof
 @echo on
 :: Check filetype
 c:\cygwin\bin\file ctags.exe
+c:\cygwin\bin\file readtags.exe
 :: Check if it works
 .\ctags --version || exit 1
 :: Run tests
