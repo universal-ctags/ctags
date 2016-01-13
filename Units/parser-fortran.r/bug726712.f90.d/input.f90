@@ -67,6 +67,6 @@
 ! end
 ! 
 ! The following subroutine is listed but cannot be selected
-! (that is, the cursor wont go there)
+! (that is, the cursor won't go there)
 ! 
 ! ----------------------------------------------------------------------

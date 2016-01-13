@@ -307,9 +307,9 @@ static boolean parseCommand (const unsigned char *line)
 	/* 
 	 * Found a user-defined command 
 	 *
-	 * They can have many options preceeded by a dash
+	 * They can have many options preceded by a dash
 	 * command! -nargs=+ -complete Select  :call s:DB_execSql("select " . <q-args>)
-	 * The name of the command should be the first word not preceeded by a dash
+	 * The name of the command should be the first word not preceded by a dash
 	 *
 	 */
 	const unsigned char *cp = line;
@@ -370,7 +370,7 @@ static boolean parseCommand (const unsigned char *line)
 
 	/*
 	 * Strip off any spaces and options which are part of the command.
-	 * These should preceed the command name.
+	 * These should precede the command name.
 	 */
 	do
 	{

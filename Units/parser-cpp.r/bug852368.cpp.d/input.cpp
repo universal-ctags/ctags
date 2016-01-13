@@ -16,8 +16,8 @@ Summary: c/c++ unabalanced template brackets in signature
 Initial Comment:
 hi,
 
-ctags 5.5x generates unbalanced tempalte brackets in 
-the  method/function signature if a funtion parameter 
+ctags 5.5x generates unbalanced template brackets in 
+the  method/function signature if a function parameter 
 is a template.
 
 i.e.

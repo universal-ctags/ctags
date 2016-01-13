@@ -122,7 +122,7 @@ var multiply=D5("*");           // created "multiply" function
 
 // test the functions
 alert("result of add="+add(10,2));            // result is 12
-alert("result of substract="+subtract(10,2)); // result is 8
+alert("result of subtract="+subtract(10,2));  // result is 8
 alert("result of multiply="+multiply(10,2));  // result is 20
 alert(add);
 

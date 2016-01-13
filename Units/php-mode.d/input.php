@@ -94,7 +94,7 @@ function g() {}
 function bug7() {}
 
 <?php
-// this WONT leave PHP mode, it's in a comment  </script>
+// this WON'T leave PHP mode, it's in a comment  </script>
 function h() {}
 ?>
 
