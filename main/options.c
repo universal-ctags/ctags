@@ -313,9 +313,11 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Output list of pseudo tags."},
  {1,"  --list-regex-flags"},
  {1,"       Output list of flags which can be used in a regex parser definition."},
- {1,"  --map-<LANG>=[+]map"},
+ {1,"  --map-<LANG>=[+]pattern|extension"},
  {1,"       Set or add(+) a map for <LANG>."},
- {1,"       Unlike --langmap a pattern or an extension can be specified at once."},
+ {1,"       Unlike --langmap, only one pattern or one extension can be specified"},
+ {1,"       at once. Unlike, --langmap adding one affects the map of LANG; it does't"},
+ {1,"       affect maps of the other languages."},
  {1,"  --maxdepth=N"},
 #ifdef RECURSE_SUPPORTED
  {1,"       Specify maximum recursion depth."},

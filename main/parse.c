@@ -32,6 +32,26 @@
 #include "xtag.h"
 
 /*
+ * DATA TYPES
+ */
+enum specType {
+	SPEC_NONE,
+	SPEC_NAME,
+	SPEC_ALIAS = SPEC_NAME,
+	SPEC_EXTENSION,
+	SPEC_PATTERN,
+};
+const char *specTypeName [] = {
+	"none", "name", "extension", "pattern"
+};
+
+typedef struct {
+	langType lang;
+	const char* spec;
+	enum specType specType;
+}  parserCandidate;
+
+/*
  * FUNCTION PROTOTYPES
  */
 static void initializeParser (langType lang);
@@ -91,13 +111,6 @@ extern int makeSimpleRefTag (const vString* const name, kindOption* const kinds,
 	    r = makeTagEntry (&e);
 	}
 	return r;
-}
-
-static vString* ext2ptrnNew (const char *const ext)
-{
-	vString * ptrn = vStringNewInit ("*.");
-	vStringCatS (ptrn, ext);
-	return ptrn;
 }
 
 extern boolean isLanguageEnabled (const langType language)
@@ -214,7 +227,8 @@ extern langType getNamedLanguage (const char *const name, size_t len)
 	return result;
 }
 
-static langType getNameOrAliasesLanguageAndSpec (const char *const key, langType start_index, const char **const spec)
+static langType getNameOrAliasesLanguageAndSpec (const char *const key, langType start_index,
+						 const char **const spec, enum specType *specType)
 {
 	langType result = LANG_IGNORE;
 	unsigned int i;
@@ -235,17 +249,20 @@ static langType getNameOrAliasesLanguageAndSpec (const char *const key, langType
 		{
 			result = i;
 			*spec = lang->name;
+			*specType = SPEC_NAME;
 		}
 		else if (aliases != NULL  &&  (tmp = stringListFileFinds (aliases, key)))
 		{
 			result = i;
 			*spec = vStringValue(tmp);
+			*specType = SPEC_ALIAS;
 		}
 	}
 	return result;
 }
 
-static langType getPatternLanguageAndSpec (const char *const baseName, langType start_index, const char **const spec)
+static langType getPatternLanguageAndSpec (const char *const baseName, langType start_index,
+					   const char **const spec, enum specType *specType)
 {
 	langType result = LANG_IGNORE;
 	unsigned int i;
@@ -265,15 +282,29 @@ static langType getPatternLanguageAndSpec (const char *const baseName, langType 
 		{
 			result = i;
 			*spec = vStringValue(tmp);
+			*specType = SPEC_PATTERN;
+			goto found;
 		}
 	}
+
+	for (i = start_index  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
+	{
+		stringList* const exts = LanguageTable [i]->currentExtensions;
+		vString* tmp;
+
+		if (exts != NULL && (tmp = stringListExtensionFinds (exts,
+								     fileExtension (baseName))))
+		{
+			result = i;
+			*spec = vStringValue(tmp);
+			*specType = SPEC_EXTENSION;
+			goto found;
+		}
+	}
+found:
 	return result;
 }
 
-typedef struct {
-	langType lang;
-	const char* spec;
-}  parserCandidate;
 static parserCandidate* parserCandidateNew(unsigned int count __unused__)
 {
 	parserCandidate* candidates;
@@ -284,6 +315,7 @@ static parserCandidate* parserCandidateNew(unsigned int count __unused__)
 	{
 		candidates[i].lang = LANG_IGNORE;
 		candidates[i].spec = NULL;
+		candidates[i].specType = SPEC_NONE;
 	}
 	return candidates;
 }
@@ -294,16 +326,18 @@ static unsigned int nominateLanguageCandidates (const char *const key, parserCan
 	unsigned int count;
 	langType i;
 	const char* spec = NULL;
+	enum specType specType = SPEC_NONE;
 
 	*candidates = parserCandidateNew(LanguageCount);
 
 	for (count = 0, i = LANG_AUTO; i != LANG_IGNORE; )
 	{
-		i = getNameOrAliasesLanguageAndSpec (key, i, &spec);
+		i = getNameOrAliasesLanguageAndSpec (key, i, &spec, &specType);
 		if (i != LANG_IGNORE)
 		{
 			(*candidates)[count].lang = i++;
-			(*candidates)[count++].spec = spec;
+			(*candidates)[count].spec = spec;
+			(*candidates)[count++].specType = specType;
 		}
 	}
 
@@ -316,16 +350,18 @@ nominateLanguageCandidatesForPattern(const char *const baseName, parserCandidate
 	unsigned int count;
 	langType i;
 	const char* spec;
+	enum specType specType = SPEC_NONE;
 
 	*candidates = parserCandidateNew(LanguageCount);
 
 	for (count = 0, i = LANG_AUTO; i != LANG_IGNORE; )
 	{
-		i = getPatternLanguageAndSpec (baseName, i, &spec);
+		i = getPatternLanguageAndSpec (baseName, i, &spec, &specType);
 		if (i != LANG_IGNORE)
 		{
-			(*candidates)[count].lang   = i++;
-			(*candidates)[count++].spec = spec;
+			(*candidates)[count].lang = i++;
+			(*candidates)[count].spec = spec;
+			(*candidates)[count++].specType = specType;
 		}
 	}
 	return count;
@@ -733,22 +769,68 @@ pickLanguageBySelection (selectLanguage selector, FILE *input)
     }
 }
 
+static int sortParserCandidatesBySpecType (const void *a, const void *b)
+{
+	const parserCandidate *ap = a, *bp = b;
+	if (ap->specType > bp->specType)
+		return -1;
+	else if (ap->specType == bp->specType)
+		return 0;
+	else
+		return 1;
+}
+
+static unsigned int sortAndFilterParserCandidates (parserCandidate  *candidates,
+						   unsigned int n_candidates)
+{
+	enum specType highestSpecType;
+	int i;
+	unsigned int r;
+
+	if (n_candidates < 2)
+		return n_candidates;
+
+	qsort (candidates, n_candidates, sizeof(*candidates),
+	       sortParserCandidatesBySpecType);
+
+	highestSpecType = candidates [0].specType;
+	r = 1;
+	for (i = 1; i < n_candidates; i++)
+	{
+		if (candidates[i].specType == highestSpecType)
+			r++;
+	}
+	return r;
+}
+
+static void verboseReportCandidate (const char *header,
+				    parserCandidate  *candidates,
+				    unsigned int n_candidates)
+{
+	int i;
+	verbose ("		#%s: %u\n", header, n_candidates);
+	for (i = 0; i < n_candidates; i++)
+		verbose ("			%u: %s (%s: \"%s\")\n",
+			 i,
+			 LanguageTable[candidates[i].lang]->name,
+			 specTypeName [candidates[i].specType],
+			 candidates[i].spec);
+}
+
 static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx *glc,
 				       unsigned int nominate (const char *const, parserCandidate**))
 {
 	langType language;
 	parserCandidate  *candidates;
 	unsigned int n_candidates;
-	unsigned int i;
+
 	n_candidates = (*nominate)(spec, &candidates);
+	verboseReportCandidate ("candidates",
+				candidates, n_candidates);
 
-	verbose ("		#candidates: %u\n", n_candidates);
-	if (n_candidates > 1)
-		for (i = 0; i < n_candidates; i++)
-			verbose ("			%u: %s (%s)\n",
-				 i,
-				 LanguageTable[candidates[i].lang]->name, candidates[i].spec);
-
+	n_candidates = sortAndFilterParserCandidates (candidates, n_candidates);
+	verboseReportCandidate ("candidates after sorting and filtering",
+				candidates, n_candidates);
 
 	if (n_candidates == 1)
 	{
@@ -1905,32 +1987,6 @@ extern boolean parseFile (const char *const fileName)
 		return tagFileResized;
 	}
 	return tagFileResized;
-}
-
-static void unifyMaps (const langType language)
-{
-	const parserDefinition* lang;
-	unsigned int i;
-	Assert (0 <= language  &&  language < (int) LanguageCount);
-	lang = LanguageTable [language];
-	if (!lang->currentExtensions)
-		return;
-
-	for (i = 0 ; i < stringListCount (lang->currentExtensions)  ;  ++i)
-	{
-		const char* const ext = vStringValue (
-			stringListItem (lang->currentExtensions, i));
-		vString *const ptrn = ext2ptrnNew (ext);
-		addLanguagePatternMap (language, vStringValue (ptrn), FALSE);
-		vStringDelete (ptrn);
-	}
-}
-
-extern void unifyLanguageMaps (void)
-{
-	unsigned int i;
-	for (i = 0; i < LanguageCount  ;  ++i)
-		unifyMaps (i);
 }
 
 extern void useRegexMethod (const langType language)

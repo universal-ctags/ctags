@@ -204,7 +204,6 @@ extern void addLanguageAlias (const langType language, const char* alias);
 
 extern void printLanguageMap (const langType language, FILE *fp);
 extern void printLanguageMaps (const langType language);
-extern void unifyLanguageMaps (void);
 extern void enableLanguages (const boolean state);
 extern void enableLanguage (const langType language, const boolean state);
 extern void initializeParsing (void);
