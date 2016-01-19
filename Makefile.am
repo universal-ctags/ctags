@@ -49,7 +49,7 @@ $(REPOINFO_HEADS):
 endif
 
 OPTLIB2C = $(srcdir)/misc/optlib2c
-.ctags.c: $(OPTLIB2C)
+%.c: %.ctags $(OPTLIB2C)
 	$(OPTLIB2C) $< > $@
 dist_ctags_SOURCES = $(ALL_HEADS) $(ALL_SRCS)
 
