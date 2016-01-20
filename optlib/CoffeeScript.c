@@ -8,7 +8,7 @@
 
 static void initializeCoffeeScriptParser (const langType language)
 {
-	addLanguageXcmd (language, "coffeetags");
+	addLanguageXcmd (language, "excoffeetags");
 }
 
 extern parserDefinition* CoffeeScriptParser (void)

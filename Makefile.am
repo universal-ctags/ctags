@@ -49,8 +49,8 @@ $(REPOINFO_HEADS):
 endif
 
 OPTLIB2C = $(srcdir)/misc/optlib2c
-%.c: %.ctags $(OPTLIB2C)
-	$(OPTLIB2C) $< > $@
+%.c: %.ctags $(OPTLIB2C) Makefile
+	$(OPTLIB2C) --transform-xcmd="$(program_transform_name)" $< > $@
 dist_ctags_SOURCES = $(ALL_HEADS) $(ALL_SRCS)
 
 man_MANS = ctags.1
