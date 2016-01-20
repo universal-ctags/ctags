@@ -23,8 +23,6 @@ static const tagRegexTable const antTagRegexTable [] = {
 	 "t,target,targets", NULL},
 	{"^[ \t]*<[ \t]*property[^>]+name=\"([^\"]+)\".*", "\\1",
 	 "P,property,property", NULL},
-	{"^[ \t]*<[ \t]*import[^>]+file=\"([^\"]+)\".*", "\\1",
-	 "i,import,imports", NULL}
 };
 
 /*
