@@ -2,6 +2,7 @@
 #
 #
 #
+Ant	i	imported	imported	on
 C	d	undef	undefined	on
 C	h	system	system header	on
 C	h	local	local header	on
@@ -27,6 +28,7 @@ Vera	h	local	local header	on
 #
 # all:*
 #
+Ant	i	imported	imported	on
 C	d	undef	undefined	on
 C	h	system	system header	on
 C	h	local	local header	on

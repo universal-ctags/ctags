@@ -238,6 +238,12 @@ selectParserForXmlDoc (xmlDocPtr doc)
 		   <node ... */
 		return "DBusIntrospect";
 	}
+	else if (doc->children
+		 && doc->children->name
+		 && (strcmp ((const char*)doc->children->name, "project") == 0))
+	{
+		return "Ant";
+	}
 
 	return NULL;
 }
