@@ -196,15 +196,21 @@ check_features()
 
     local f
     local found
+    local found_unexpectedly
     local expected;
 
 
     while read expected; do
 	    found=no
+	    found_unexpectedly=no
 	    for f in $( ${CTAGS} --quiet --options=NONE --list-features 2> /dev/null | "${_LINE_SPLITER}" ) ; do
-		[ "$expected" = "$f" ] && found=yes;
+		[ "$expected" = "$f" ] && found=yes
+		[ "$expected" = '!'"$f" ] && found_unexpectedly=yes
 	    done
-	    if ! [ "$found" = yes ]; then
+	    if [ "${found_unexpectedly}" = yes ]; then
+		echo "$expected"
+		return 1
+	    elif ! [ "$found" = yes ]; then
 		echo "$expected"
 		return 1
 	    fi
@@ -499,7 +505,11 @@ run_tcase ()
 
     if [ -f "${ffeatures}" ] && ! tmp=$(check_features "${ffeatures}"); then
 	L_SKIPPED_BY_FEATURES="$L_SKIPPED_BY_FEATURES ${category}/${name}"
-	run_result skip "${oresult}" "required feature \"$tmp\" is not available"
+	if [ "${tmp:0:1}" = '!' ]; then
+	    run_result skip "${oresult}" "unwated feature \"${tmp:1}\" is available"
+	else
+	    run_result skip "${oresult}" "required feature \"$tmp\" is not available"
+	fi
 	return 1
     elif [ -f "${flanguages}" ] && ! tmp=$(check_languages "${flanguages}"); then
 	L_SKIPPED_BY_LANGUAGES="$L_SKIPPED_BY_LANGUAGES ${category}/${name}"
