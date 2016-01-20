@@ -726,7 +726,7 @@ pickLanguageBySelection (selectLanguage selector, FILE *input)
     }
     else
     {
-	verbose ("	no selection");
+	verbose ("	no selection\n");
         return LANG_IGNORE;
     }
 }
