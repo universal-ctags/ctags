@@ -222,6 +222,12 @@ In this example, ``role`` is prefixed.
 option.
 
 
+Guessing parser from file contents (``-G`` option)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+See "Choosing a proper parser in ctags" section.
+
+
 Changes in tags file format
 ---------------------------------------------------------------------
 
@@ -345,3 +351,29 @@ The fourth column shows description of the role.
 The first column shows whether the role is enabled or not.
 Currently ctags doesn't provide the way for disabling a
 specified role.
+
+Automatic parser selection
+---------------------------------------------------------------------
+
+See "Choosing a proper parser in ctags" section.
+
+
+Incompatible change about file name patterns and file extensions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When guessing a proper parser for a given input file, exuberant-ctags
+tests file name patterns AFTER file
+extensions(e-order). universal-ctags does different; it tests file
+name patterns BEFORE file extensions(u-order).
+
+This incompatible change is introduced to deal following situation:
+"build.xml" is an input file. Ant parser declares it handles
+a file name pattern "build.xml". Foo, another parser declares it handles a
+file extension "xml".
+
+Which parser does a user want to use for parsing the input?  The user
+may want to use Ant parser because the pattern it declares is more
+specific than the extension Foo declares.
+
+However, in e-order, the other parser is chosen. So universal-ctags
+uses the u-order though it introduces incompatibility.
