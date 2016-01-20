@@ -19,6 +19,7 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+#include "selectors.h"
 
 
 typedef enum {
@@ -153,6 +154,7 @@ DbusIntrospectParser (void)
 {
 	static const char *const extensions [] = { "xml", NULL };
 	parserDefinition* const def = parserNew ("DBusIntrospect");
+	static selectLanguage selectors[] = { selectByDTD, NULL };
 
 	def->kinds         = DbusIntrospectKinds;
 	def->kindCount     = ARRAY_SIZE (DbusIntrospectKinds);
@@ -161,6 +163,7 @@ DbusIntrospectParser (void)
 	def->tagXpathTableTable = dbusIntrospectXpathTableTable;
 	def->tagXpathTableCount = ARRAY_SIZE (dbusIntrospectXpathTableTable);
 	def->useCork = TRUE;
+	def->selectLanguage = selectors;
 	return def;
 }
 
