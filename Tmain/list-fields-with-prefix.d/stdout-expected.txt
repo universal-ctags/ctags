@@ -1,2 +1,2 @@
-r	UCTAGSrole	role	format-char	off
-Z	UCTAGSscope	Include the "scope:" key in scope field(use s)	NONE	off
+r	UCTAGSrole	Role	format-char	off
+Z	UCTAGSscope	Include the "scope:" key in scope field (use s)	NONE	off
