@@ -571,7 +571,7 @@ static void parseFromModule (const char *cp, const char* dummy __unused__)
 }
 
 
-static void parseNamespace (const char *cp)
+static boolean parseNamespace (const char *cp)
 {
 	void (* parse_sub) (const char *, const char *);
 
@@ -593,16 +593,17 @@ static void parseNamespace (const char *cp)
 		parse_sub = parseFromModule;
 	}
 	else
-		return;
+		return FALSE;
 
 	/* continue only if there is some space between the keyword and the identifier */
 	if (! isspace (*cp))
-		return;
+		return FALSE;
 
 	cp++;
 	cp = skipSpace (cp);
 
 	parse_sub (cp, NULL);
+	return TRUE;
 }
 
 /* modified from get.c getArglistFromStr().
@@ -1074,6 +1075,7 @@ static void findPythonTags (void)
 
 			if (variableLineContinuation)
 				skipParens (variableLineContinuation);
+			continue;
 		}
 
 		/* Deal with multiline string start. */
@@ -1135,9 +1137,19 @@ static void findPythonTags (void)
 
 				addNestingLevel(nesting_levels, indent, name, is_class);
 			}
+			continue;
 		}
 		/* Find and parse namespace releated elements */
-		parseNamespace(line);
+		if (parseNamespace(line))
+			continue;
+
+		/* If the current line contains
+		   an open parenthesis skip lines till its associated
+		   close parenthesis:
+
+		   foo (...
+		   ... ) */
+		skipParens (line);
 	}
 	/* Clean up all memory we allocated. */
 	vStringDelete (parent);
