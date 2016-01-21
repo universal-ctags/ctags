@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+declare OPTLIB2C_TRANSFORM_XCMD
 
 declare CTAGS_LANG
 declare CTAGS_LANG_IN_C
@@ -86,7 +87,7 @@ print_help()
 	echo "Usage:"
 
 	echo "	$0 --help"
-	echo "	$0 FILE.ctags > FILE.c"
+	echo "	$0 [--transform-xcmd=PROGRAM_TRANSFORM_NAME] FILE.ctags > FILE.c"
 
 	exit $status
 }
@@ -455,6 +456,31 @@ EOF
 	echo
 }
 
+transform_xcmd()
+{
+	local p=$1
+	local transform=$2
+
+	local pd
+	local pb
+	local pb_transformed
+
+	pd=$(dirname "$p")
+	pb=$(basename "$p")
+	pb_transformed=$(sed -e "${transform}" <<< "${pb}")
+
+	# If no directory component is given in $p,
+	# dirname command prints '.'. This '.' should not be
+	# in ${p_transformed}.
+	if [[ "${p:0:1}" != '.' ]] && [[ ${pd} == '.' ]]; then
+		pd=
+	else
+		pd="${pd}"/
+	fi
+
+	echo "${pd}${pb_transformed}"
+}
+
 emit_initializer()
 {
 	local c
@@ -469,6 +495,9 @@ EOF
 	if [ ${#CTAGS_XCMD_PATH[@]} -gt 0 ]; then
 		for i in $(seq 0 $(( ${#CTAGS_XCMD_PATH[@]} - 1))); do
 			p=${CTAGS_XCMD_PATH[$i]}
+			if [[ -n "${OPTLIB2C_TRANSFORM_XCMD}" ]]; then
+				p=$(transform_xcmd "$p" "${OPTLIB2C_TRANSFORM_XCMD}")
+			fi
 			f=${CTAGS_XCMD_flags[$i]}
 			cat<<EOF
 	addLanguageXcmd (language, "$p$f");
@@ -668,18 +697,25 @@ main()
 {
 	local optlib
 
-	case $1 in
-		(-h|--help)
-			print_help 0
-			;;
-		(-*)
-			error "unrecongnized option: $1"
-			;;
-		(*)
-			optlib=$1
-			shift
-			;;
-	esac
+	while (( $# > 0 )); do
+		case $1 in
+			(-h|--help)
+				print_help 0
+				;;
+			(--transform-xcmd=*)
+				OPTLIB2C_TRANSFORM_XCMD=${1/--transform-xcmd=/}
+				shift
+				;;
+			(-*)
+				error "unrecongnized option: $1"
+				;;
+			(*)
+				optlib=$1
+				shift
+				break
+				;;
+		esac
+	done
 
 	if (( $# > 0 )); then
 		error "Too many argument: $@"
