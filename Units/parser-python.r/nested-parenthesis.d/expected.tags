@@ -1,0 +1,5 @@
+foo	input.py	/^def foo():$/;"	f	signature:()
+bar	input.py	/^def bar():$/;"	f	signature:()
+baz	input.py	/^def baz(arg1, arg2=({()})):$/;"	f	signature:(arg1, arg2=({()}))
+gvar	input.py	/^gvar = test(())$/;"	v
+tagme	input.py	/^def tagme():$/;"	f	signature:()

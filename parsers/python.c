@@ -650,18 +650,28 @@ static boolean parseArglist(const char* buf, struct argParsingState *state)
 		}
 	}
 
-	current = skipUntil (start, gatherArglistCB, state->arglist);
-	switch (*current)
-	{
-	case '\0':
-		break;
-	case '(':
-		++ state->level;
-		break;
-	case ')':
-		-- state->level;
-		break;
-	}
+
+	do {
+		current = skipUntil (start, gatherArglistCB, state->arglist);
+		switch (*current)
+		{
+		case '\0':
+			break;
+		case '(':
+			++ state->level;
+			break;
+		case ')':
+			-- state->level;
+			break;
+		}
+		start = current + 1;
+	} while (
+		/* Still be in parenthesis */
+		state->level > 0
+		/* the input string is continued. */
+		&& *current && *start
+		);
+
 	return TRUE;
 }
 
