@@ -24,6 +24,7 @@ The following parsers have been added:
 * Clojure
 * CSS
 * D
+* DBusIntrospect *libxml*
 * Diff
 * DTS
 * Falcon
@@ -56,6 +57,7 @@ exuberant-ctags with following command line:
 
 Heavily improved language parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* ant *libxml*
 * php
 * verilog
 
