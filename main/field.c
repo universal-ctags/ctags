@@ -247,12 +247,10 @@ static const char *renderEscapedName (const char* s,
 		int c = *s;
 		if ((c > 0x00 && c <= 0x1F) || c == 0x7F)
 		{
-			notice("Unexpected character (0 < *c && *c < 0x20) included in a tagEntryInfo: %s", base);
-			notice("File: %s, Line: %lu, Lang: %s, Kind: %c",
-			       tag->inputFileName, tag->lineNumber, tag->language, tag->kind->letter);
-			if (Option.fatalWarnings)
-				error (FATAL, "Aborting");
-			notice("Escape the character");
+			verbose ("Unexpected character (0 < *c && *c < 0x20) included in a tagEntryInfo: %s\n", base);
+			verbose ("File: %s, Line: %lu, Lang: %s, Kind: %c\n",
+				 tag->inputFileName, tag->lineNumber, tag->language, tag->kind->letter);
+			verbose ("Escape the character\n");
 			break;
 		}
 		else if (c == '\\')

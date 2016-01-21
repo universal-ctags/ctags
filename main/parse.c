@@ -1917,7 +1917,8 @@ extern boolean parseFile (const char *const fileName)
 
 		tagFileResized = createTagsWithFallback (fileName, language);
 #ifdef HAVE_COPROC
-		tagFileResized = createTagsWithXcmd (fileName, language)? TRUE: tagFileResized;
+		if (LanguageTable [language]->method & METHOD_XCMD_AVAILABLE)
+			tagFileResized = createTagsWithXcmd (fileName, language)? TRUE: tagFileResized;
 #endif
 
 		if (Option.etags)

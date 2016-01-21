@@ -5,6 +5,6 @@
 
 CTAGS=$1
 
-${CTAGS} --options=NONE -o - --language-force=CTagsSelfTest input.cst
+${CTAGS} --options=NONE -o - --language-force=CTagsSelfTest --verbose input.cst
 
 exit $?
