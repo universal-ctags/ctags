@@ -13,6 +13,7 @@
 #include "general.h"
 
 #include <stdio.h>
+#include "debug.h"
 #include "kind.h"
 
 extern void printRole (const roleDesc* const role)
@@ -46,4 +47,22 @@ extern void printKind (const kindOption* const kind, boolean allKindFields, bool
 			(kind->name != NULL ? kind->name : ""),
 			kind->enabled ? "" : " [off]");
 	}
+}
+
+const char *scopeSeparatorFor (const kindOption *kind, char parentLetter)
+{
+	scopeSeparator *table;
+	Assert (kind);
+	table = kind->separators;
+	if (table == NULL)
+		return ".";
+
+	while (table - kind->separators < kind->separatorCount)
+	{
+		if (table->parentLetter == '*'
+		    || table->parentLetter == parentLetter)
+			return table->separator;
+		table++;
+	}
+	return ".";
 }

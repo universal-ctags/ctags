@@ -772,18 +772,27 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_scope)
 {
 
+	const kindOption *kind = NULL;
 	const tagEntryInfo *scope = inner_scope;
 	stringList *queue = stringListNew ();
 	vString *v;
 	vString *n;
 	unsigned int c;
+	const char *sep;
 
 	while (scope)
 	{
 		if (!scope->placeholder)
 		{
+			if (kind)
+			{
+				sep = scopeSeparatorFor (kind, scope->kind->letter);
+				v = vStringNewInit (sep);
+				stringListAdd (queue, v);
+			}
 			v = vStringNewInit (escapeName (scope, FIELD_NAME));
 			stringListAdd (queue, v);
+			kind = scope->kind;
 		}
 		scope =  getEntryInCorkQueue (scope->extensionFields.scopeIndex);
 	}
@@ -795,8 +804,6 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 		vStringCat (n, v);
 		vStringDelete (v);
 		stringListRemoveLast (queue);
-		if (c != 1)
-			vStringPut (n, '.');
 	}
 	stringListDelete (queue);
 
