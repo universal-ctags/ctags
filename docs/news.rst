@@ -24,9 +24,11 @@ The following parsers have been added:
 * Clojure
 * CSS
 * D
+* DBusIntrospect *libxml*
 * Diff
 * DTS
 * Falcon
+* Glade *libxml*
 * Go
 * JSON
 * ObjectiveC
@@ -43,6 +45,7 @@ The following parsers have been added:
 
 See "Option library" about  *optlib*.
 See "External parser command" about *xcmd*.
+Libxml2 is needed to use the parser(s) marked with *libxml*.
 
 TIPS: you can list newly introduced parsers if you have
 exuberant-ctags with following command line:
@@ -54,6 +57,7 @@ exuberant-ctags with following command line:
 
 Heavily improved language parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* ant *libxml*
 * php
 * verilog
 

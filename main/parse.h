@@ -17,6 +17,15 @@
 #include "parsers.h"  /* contains list of parsers */
 #include "strlist.h"
 
+#ifdef HAVE_LIBXML
+#include <libxml/xpath.h>
+#include <libxml/tree.h>
+#else
+#define xmlNode void
+#define xmlXPathCompExpr void
+#define xmlXPathContext void
+#endif
+
 /*
 *   MACROS
 */
@@ -57,6 +66,7 @@ typedef enum {
 	METHOD_REGEX          = 1 << 1,
 	METHOD_XCMD           = 1 << 2,
 	METHOD_XCMD_AVAILABLE = 1 << 3,
+	METHOD_XPATH          = 1 << 4,
 } parsingMethod;
 
 typedef struct {
@@ -65,6 +75,41 @@ typedef struct {
 	const char* const kinds;
 	const char *const flags;
 } tagRegexTable;
+
+struct sTagEntryInfo;
+typedef struct sTagXpathMakeTagSpec {
+	int   kind;
+	int   role;
+	/* If make is NULL, just makeTagEntry is used instead. */
+	void (*make) (xmlNode *node,
+		      const struct sTagXpathMakeTagSpec *spec,
+		      struct sTagEntryInfo *tag,
+		      void *userData);
+} tagXpathMakeTagSpec;
+
+typedef struct sTagXpathRecurSpec {
+	void (*enter) (xmlNode *node,
+		       const struct sTagXpathRecurSpec *spec,
+		       xmlXPathContext *ctx,
+		       void *userData);
+} tagXpathRecurSpec;
+
+typedef struct sTagXpathTable
+{
+	const char *const xpath;
+	enum  { LXPATH_TABLE_DO_MAKE, LXPATH_TABLE_DO_RECUR } specType;
+	union {
+		tagXpathMakeTagSpec makeTagSpec;
+		tagXpathRecurSpec   recurSpec;
+	};
+	xmlXPathCompExpr* xpathCompiled;
+} tagXpathTable;
+
+typedef struct sTagXpathTableTable {
+	tagXpathTable *table;
+	unsigned int   count;
+} tagXpathTableTable;
+
 
 typedef struct {
 	const char *name;
@@ -92,6 +137,8 @@ typedef struct {
 	unsigned int tagRegexCount;
 	const keywordTable *keywordTable;
 	unsigned int keywordCount;
+	tagXpathTableTable *tagXpathTableTable;
+	unsigned int tagXpathTableCount;
 	boolean invisible;
 
 	/* used internally */
@@ -100,6 +147,7 @@ typedef struct {
 	unsigned int initialized:1;    /* initialize() is called or not */
 	unsigned int tagRegexInstalled:1; /* tagRegexTable is installed or not. */
 	unsigned int keywordInstalled:1;  /* keywordTable is installed or not. */
+	unsigned int tagXpathInstalled:1;  /* tagXpathTable is installed or not. */
 
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
@@ -124,6 +172,9 @@ typedef void (*regexCallback) (const char *line, const regexMatch *matches, unsi
  * at minimum, set the `parser' field.
  */
 extern parserDefinitionFunc PARSER_LIST;
+#ifdef HAVE_LIBXML
+extern parserDefinitionFunc XML_PARSER_LIST;
+#endif
 
 /* Language processing and parsing */
 extern int makeSimpleTag (const vString* const name, kindOption* const kinds, const int kind);
@@ -204,6 +255,13 @@ extern void printXcmdKinds (const langType language, boolean allKindFields, bool
 extern void freeXcmdResources (void);
 extern void useXcmdMethod (const langType language);
 extern void notifyAvailabilityXcmdMethod (const langType language);
+
+/* Xpath interface */
+extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
+			 const tagXpathTableTable *xpathTableTable,
+			 const kindOption* const kinds, void *userData);
+extern void installTagXpathTable (const langType language);
+extern void addTagXpath (const langType language, tagXpathTable *xpathTable);
 
 #endif  /* CTAGS_MAIN_PARSE_H */
 

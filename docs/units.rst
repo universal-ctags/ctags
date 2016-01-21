@@ -91,6 +91,10 @@ have its own directory under Units directory.
 	enumerate them in this file line by line. If a target ctags
 	doesn't have one of the features, the test is skipped.
 
+	If a file line is started with ``!``, the effect is inverted;
+	if a target ctags has the feature specified with ``!``, the
+	test is skipped.
+
 	All features built-in can be listed with passing
 	``--list-features`` to ctags.
 

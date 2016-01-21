@@ -220,6 +220,9 @@
     <ClCompile Include="..\main\lxcmd.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\lxpath.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\main.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>

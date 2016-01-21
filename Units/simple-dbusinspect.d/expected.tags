@@ -1,0 +1,4 @@
+ClientAdded	input.xml	/^    <signal name="ClientAdded">$/;"	s	interface:org.gnome.SessionManager
+SessionName	input.xml	/^    <property name="SessionName" type="s" access="read">$/;"	p	interface:org.gnome.SessionManager
+Setenv	input.xml	/^    <method name="Setenv">$/;"	m	interface:org.gnome.SessionManager
+org.gnome.SessionManager	input.xml	/^  <interface name="org.gnome.SessionManager">$/;"	i

@@ -34,6 +34,10 @@
 #define getInputLineNumber()     File.input.lineNumber
 #define getInputFileName()       vStringValue (File.input.name)
 #define getInputFilePosition()   File.filePosition
+#define getInputFilePositionForLine(line) \
+	File.lineFposMap.pos[(((File.lineFposMap.count > (line - 1)) \
+			       && (File.lineFposMap.count >= 0)      \
+			       && (line > 0))? (line - 1): 0)]
 #define getInputLanguage()       File.input.language
 #define getInputLanguageName()   getLanguageName (File.input.language)
 #define getInputFileTagPath()    vStringValue (File.input.tagPath)
@@ -80,6 +84,12 @@ typedef struct sInputFileInfo {
 	langType language;       /* language of input file */
 } inputFileInfo;
 
+typedef struct sInputLineFposMap {
+	fpos_t *pos;
+	unsigned int count;
+	unsigned int size;
+} inputLineFposMap;
+
 typedef struct sInputFile {
 	vString    *path;          /* path of input file (if any) */
 	vString    *line;          /* last line read from file */
@@ -105,6 +115,7 @@ typedef struct sInputFile {
 	   input file is done. After all processing is done, the buffers
 	   in sourceTagPathHolder are destroied. */
 	stringList  * sourceTagPathHolder;
+	inputLineFposMap lineFposMap;
 } inputFile;
 
 /*

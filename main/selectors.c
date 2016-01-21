@@ -16,6 +16,7 @@
 #include "debug.h"
 #include "parse.h"
 #include "selectors.h"
+#include "vstring.h"
 
 static const char *TR_UNKNOWN = NULL;
 static const char *TR_PERL5   = "Perl";
@@ -193,3 +194,74 @@ selectByObjectiveCKeywords (FILE * input)
 
     return selectByLines (input, tasteObjectiveC, TR_CPP);
 }
+
+#ifdef HAVE_LIBXML
+
+#include <libxml/xpath.h>
+#include <libxml/tree.h>
+
+
+static xmlDocPtr
+xmlParseFILE (FILE *input)
+{
+	vString *buf;
+	xmlDocPtr doc;
+
+	buf = vStringNewFile (input);
+	if (!buf)
+		return NULL;
+
+	doc = xmlParseMemory(vStringValue(buf), vStringLength (buf));
+
+	vStringDelete (buf);
+
+	return doc;
+}
+
+static const char *
+selectParserForXmlDoc (xmlDocPtr doc)
+{
+	/* These conditions should be part of parsers. */
+	if (doc->children
+	    && doc->intSubset
+	    && doc->children->name && doc->intSubset->name
+	    && (strcmp ((const char *)doc->children->name, (const char *)doc->intSubset->name) == 0)
+	    && doc->intSubset->ExternalID
+	    && (strcmp ((const char *)doc->intSubset->ExternalID,
+			"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN") == 0)
+	    && doc->intSubset->SystemID
+	    && (strcmp ((const char *)doc->intSubset->SystemID,
+			"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd") == 0))
+	{
+		/* <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+		   "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+		   <node ... */
+		return "DBusIntrospect";
+	}
+	else if (doc->children
+		 && doc->children->name
+		 && (strcmp ((const char*)doc->children->name, "project") == 0))
+	{
+		return "Ant";
+	}
+
+	return NULL;
+}
+
+const char *
+selectByDTD (FILE *input)
+{
+	xmlDocPtr doc;
+	const char *r = NULL;
+
+	doc = xmlParseFILE (input);
+	if (doc == NULL)
+		return NULL;
+
+	r = selectParserForXmlDoc (doc);
+
+	xmlFreeDoc (doc);
+
+	return r;
+}
+#endif

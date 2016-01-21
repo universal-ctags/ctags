@@ -42,7 +42,8 @@ static void initializeParser (langType lang);
 static parserDefinition *CTagsSelfTestParser (void);
 static parserDefinitionFunc* BuiltInParsers[] = {
 	CTagsSelfTestParser,
-	PARSER_LIST
+	PARSER_LIST,
+	XML_PARSER_LIST
 };
 static parserDefinition** LanguageTable = NULL;
 static unsigned int LanguageCount = 0;
@@ -112,7 +113,8 @@ extern boolean isLanguageEnabled (const langType language)
 	if ((lang->method & METHOD_XCMD) &&
 		 (!(lang->method & METHOD_XCMD_AVAILABLE)) &&
 		 (lang->kinds == NULL) &&
-		 (!(lang->method & METHOD_REGEX)))
+		 (!(lang->method & METHOD_REGEX)) &&
+	         (!(lang->method & METHOD_XPATH)))
 		return FALSE;
 	else
 		return TRUE;
@@ -726,7 +728,7 @@ pickLanguageBySelection (selectLanguage selector, FILE *input)
     }
     else
     {
-	verbose ("	no selection");
+	verbose ("	no selection\n");
         return LANG_IGNORE;
     }
 }
@@ -1104,6 +1106,7 @@ static void initializeParser (langType lang)
 
 	installKeywordTable (lang);
 	installTagRegexTable (lang);
+	installTagXpathTable (lang);
 
 	if (hasScopeActionInRegex (lang))
 		parser->useCork = TRUE;
@@ -1980,6 +1983,15 @@ extern void useXcmdMethod (const langType language)
 	lang->method |= METHOD_XCMD;
 }
 
+extern void useXpathMethod (const langType language)
+{
+	parserDefinition* lang;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+	lang->method |= METHOD_XPATH;
+}
+
 extern void notifyAvailabilityXcmdMethod (const langType language)
 {
 	parserDefinition* lang;
@@ -2025,6 +2037,23 @@ extern void installKeywordTable (const langType language)
 				    language,
 				    lang->keywordTable [i].id);
 		lang->keywordInstalled = TRUE;
+	}
+}
+
+extern void installTagXpathTable (const langType language)
+{
+	parserDefinition* lang;
+	unsigned int i, j;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+
+	if ((lang->tagXpathTableTable != NULL) && (lang->tagXpathInstalled == FALSE))
+	{
+		for (i = 0; i < lang->tagXpathTableCount; ++i)
+			for (j = 0; j < lang->tagXpathTableTable[i].count; ++j)
+				addTagXpath (language, lang->tagXpathTableTable[i].table + j);
+		lang->tagXpathInstalled = TRUE;
 	}
 }
 

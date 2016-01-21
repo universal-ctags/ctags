@@ -432,6 +432,9 @@ static const char *const Features [] = {
 #ifdef HAVE_COPROC
 	"coproc",
 #endif
+#ifdef HAVE_LIBXML
+	"xpath",
+#endif
 	NULL
 };
 

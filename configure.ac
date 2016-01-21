@@ -584,6 +584,15 @@ AC_CHECK_FUNCS(scandir)
 AC_CHECK_FUNCS(fork waitpid execv pipe,[enable_xcmd=yes],[enable_xcmd=no])
 AM_CONDITIONAL([ENABLE_XCMD], [test "xyes" = "x$enable_xcmd"])
 
+AH_TEMPLATE([HAVE_LIBXML],
+	[Define this value if libxml is available.])
+PKG_CHECK_MODULES(LIBXML, libxml-2.0,
+		       [have_libxml=yes
+		       AC_DEFINE(HAVE_LIBXML)],
+		       [have_libxml=no])
+AM_CONDITIONAL(HAVE_LIBXML, test "x$have_libxml" = xyes)
+
+
 # Checks for missing prototypes
 # -----------------------------
 AC_MSG_NOTICE(checking for new missing prototypes)

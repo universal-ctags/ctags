@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+  <interface name="org.gnome.SessionManager">
+
+    <!-- Initialization phase interfaces -->
+
+    <method name="Setenv">
+      <arg name="variable" type="s" direction="in">
+        <doc:doc>
+          <doc:summary>The variable name</doc:summary>
+        </doc:doc>
+      </arg>
+      <arg name="value" type="s" direction="in">
+        <doc:doc>
+          <doc:summary>The value</doc:summary>
+        </doc:doc>
+      </arg>
+      <doc:doc>
+        <doc:description>
+          <doc:para>Adds the variable name to the application launch environment with the specified value.  May only be used during the Session Manager initialization phase.</doc:para>
+        </doc:description>
+      </doc:doc>
+    </method>
+
+    <!-- Signals -->
+
+    <signal name="ClientAdded">
+      <arg name="id" type="o">
+        <doc:doc>
+          <doc:summary>The object path for the added client</doc:summary>
+        </doc:doc>
+      </arg>
+      <doc:doc>
+        <doc:description>
+          <doc:para>Emitted when a client has been added to the session manager.
+          </doc:para>
+        </doc:description>
+      </doc:doc>
+    </signal>
+
+    <!-- Properties -->
+
+    <property name="SessionName" type="s" access="read">
+      <doc:doc>
+        <doc:description>
+          <doc:para>The name of the session that has been loaded.</doc:para>
+        </doc:description>
+      </doc:doc>
+    </property>
+
+
+  </interface>
+</node>

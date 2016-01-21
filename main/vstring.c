@@ -263,6 +263,27 @@ extern char    *vStringDeleteUnwrap       (vString *const string)
 	return buffer;
 }
 
+extern vString *vStringNewFile (FILE *input)
+{
+	char tmp [1024];
+	vString *buf;
+	size_t r = sizeof (tmp);
 
+	buf = vStringNew ();
+	while (1)
+	{
+		if (r < sizeof (tmp)
+		    && (feof (input) || ferror (input)))
+			break;
+
+		r = fread (tmp, 1, sizeof (tmp), input);
+
+		if (r > 0)
+			vStringNCatS (buf, tmp, r);
+	}
+	vStringTerminate (buf);
+
+	return buf;
+}
 
 /* vi:set tabstop=4 shiftwidth=4: */
