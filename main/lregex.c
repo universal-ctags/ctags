@@ -71,7 +71,7 @@ typedef struct {
 	regex_t *pattern;
 	enum pType type;
 	boolean exclusive;
-	boolean ignore;
+	boolean accept_empty_name;
 	union {
 		struct {
 			char *name_pattern;
@@ -372,7 +372,7 @@ static regexPattern* addCompiledTagCommon (const langType language,
 	ptrn = &set->patterns [set->count];
 	ptrn->pattern = pattern;
 	ptrn->exclusive = FALSE;
-	ptrn->ignore = FALSE;
+	ptrn->accept_empty_name = FALSE;
 	if (kind_letter)
 		ptrn->u.tag.kind = kind;
 	set->count += 1;
@@ -593,8 +593,7 @@ static vString* substitute (
 
 static void matchTagPattern (const vString* const line,
 		const regexPattern* const patbuf,
-		const regmatch_t* const pmatch,
-		boolean accept_null)
+		const regmatch_t* const pmatch)
 {
 	vString *const name = substitute (vStringValue (line),
 			patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch);
@@ -624,7 +623,7 @@ static void matchTagPattern (const vString* const line,
 
 	if (vStringLength (name) == 0 && (placeholder == FALSE))
 	{
-		if (accept_null == FALSE)
+		if (patbuf->accept_empty_name == FALSE)
 			error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
 			       getInputFileName (), getInputLineNumber (),
 			       patbuf->u.tag.name_pattern);
@@ -671,7 +670,7 @@ static boolean matchRegexPattern (const vString* const line,
 	{
 		result = TRUE;
 		if (patbuf->type == PTRN_TAG)
-			matchTagPattern (line, patbuf, pmatch, patbuf->ignore);
+			matchTagPattern (line, patbuf, pmatch);
 		else if (patbuf->type == PTRN_CALLBACK)
 			matchCallbackPattern (line, patbuf, pmatch);
 		else
@@ -781,7 +780,7 @@ static regexPattern *addTagRegexInternal (
 	if (*name == '\0')
 	{
 		if (rptr->exclusive || rptr->scopeActions & SCOPE_PLACEHOLDER)
-			rptr->ignore = TRUE;
+			rptr->accept_empty_name = TRUE;
 		else
 			error (WARNING, "%s: regexp missing name pattern", regex);
 	}
