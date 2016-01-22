@@ -214,6 +214,7 @@
     <ClCompile Include="..\parsers\protobuf.c" />
     <ClCompile Include="..\parsers\systemdunit.c" />
     <ClCompile Include="..\parsers\yumrepo.c" />
+    <ClCompile Include="..\parsers\pythonloggingconfig.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\fnmatch\fnmatch.h" />

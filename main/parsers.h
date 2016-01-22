@@ -78,6 +78,7 @@
 	PodParser, \
 	ProtobufParser, \
 	PythonParser, \
+	PythonLoggingConfigParser, \
 	RParser, \
 	RexxParser, \
 	RpmSpecParser, \

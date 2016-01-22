@@ -163,6 +163,7 @@ PARSER_SRCS =				\
 	parsers/php.c			\
 	parsers/protobuf.c		\
 	parsers/python.c		\
+	parsers/pythonloggingconfig.c	\
 	parsers/r.c			\
 	parsers/rexx.c			\
 	parsers/rpmspec.c		\

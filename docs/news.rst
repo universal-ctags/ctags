@@ -53,6 +53,7 @@ The following parsers have been added:
 * Pod *optlib*
 * PropertiyList(plist) *libxml*
 * Protobuf
+* PythonLoggingConfig
 * R
 * RelaxNG *libxml*
 * reStructuredText

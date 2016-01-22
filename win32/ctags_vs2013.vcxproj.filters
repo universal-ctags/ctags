@@ -141,6 +141,9 @@
     <ClCompile Include="..\parsers\python.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\pythonloggingconfig.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\r.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
