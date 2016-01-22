@@ -79,6 +79,7 @@ typedef struct {
 		} tag;
 		struct {
 			regexCallback function;
+			void *userData;
 		} callback;
 	} u;
 	unsigned int scopeActions;
@@ -413,9 +414,9 @@ static regexPattern *addCompiledTagPattern (
 	return ptrn;
 }
 
-static void addCompiledCallbackPattern (
-		const langType language, regex_t* const pattern,
-		const regexCallback callback, const char* flags)
+static void addCompiledCallbackPattern (const langType language, regex_t* const pattern,
+					const regexCallback callback, const char* flags,
+					void *userData)
 {
 	regexPattern * ptrn;
 	boolean exclusive = FALSE;
@@ -423,6 +424,7 @@ static void addCompiledCallbackPattern (
 	ptrn  = addCompiledTagCommon(language, pattern, '\0');
 	ptrn->type    = PTRN_CALLBACK;
 	ptrn->u.callback.function = callback;
+	ptrn->u.callback.userData = userData;
 	ptrn->exclusive = exclusive;
 }
 
@@ -656,7 +658,8 @@ static void matchCallbackPattern (
 		if (pmatch [i].rm_so != -1)
 			count = i + 1;
 	}
-	patbuf->u.callback.function (vStringValue (line), matches, count);
+	patbuf->u.callback.function (vStringValue (line), matches, count,
+				     patbuf->u.callback.userData);
 }
 
 static boolean matchRegexPattern (const vString* const line,
@@ -798,18 +801,18 @@ extern void addTagRegex (
 	addTagRegexInternal (language, regex, name, kinds, flags);
 }
 
-extern void addCallbackRegex (
-		const langType language __unused__,
-		const char* const regex __unused__,
-		const char* const flags __unused__,
-		const regexCallback callback __unused__)
+extern void addCallbackRegex (const langType language __unused__,
+			      const char* const regex __unused__,
+			      const char* const flags __unused__,
+			      const regexCallback callback __unused__,
+			      void * userData)
 {
 	Assert (regex != NULL);
 	if (regexAvailable)
 	{
 		regex_t* const cp = compileRegex (regex, flags);
 		if (cp != NULL)
-			addCompiledCallbackPattern (language, cp, callback, flags);
+		  addCompiledCallbackPattern (language, cp, callback, flags, userData);
 	}
 }
 
