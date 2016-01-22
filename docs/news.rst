@@ -65,6 +65,7 @@ The following parsers have been added:
 * WindRes
 * XSLT v1.0 *libxml*
 * Yacc
+* YumRepo
 * Zephir
 * CoffeeScript *xcmd*
 * ctags option library *optlib*

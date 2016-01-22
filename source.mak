@@ -183,6 +183,7 @@ PARSER_SRCS =				\
 	parsers/vim.c			\
 	parsers/windres.c		\
 	parsers/yacc.c			\
+	parsers/yumrepo.c		\
 	\
 	$(TRANSLATED_SRCS)		\
 	\

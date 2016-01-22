@@ -195,6 +195,9 @@
     <ClCompile Include="..\parsers\yacc.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\yumrepo.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\php.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>

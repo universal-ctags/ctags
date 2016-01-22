@@ -100,6 +100,7 @@
 	VimParser, \
 	WindResParser, \
 	YaccParser, \
+	YumRepoParser, \
 	ZephirParser
 
 #endif  /* CTAGS_MAIN_PARSERS_H */
