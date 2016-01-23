@@ -15,7 +15,7 @@
 #include "parse.h"
 #include "routines.h"
 
-static const tagRegexTable htmlTagRegexTable [] = {
+static tagRegexTable htmlTagRegexTable [] = {
 #define POSSIBLE_ATTRIBUTES "([ \t]+[a-z]+=\"?[^>\"]*\"?)*"
 	{"<a"
 	 POSSIBLE_ATTRIBUTES "[ \t]+name=\"?([^>\"]+)\"?" POSSIBLE_ATTRIBUTES

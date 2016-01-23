@@ -27,7 +27,7 @@ extern parserDefinition* M4Parser (void)
 		NULL
 	};
 
-	static const tagRegexTable M4TagRegexTable [] = {
+	static tagRegexTable M4TagRegexTable [] = {
 		{"^dnl.*$", "",
 		"", "{exclusive}"},
 		{"^[[:space:]]*(m4_)?define\\(([[`{]|<<)?([^]'}>,]+)([]'}]|>>)?,", "\\3",

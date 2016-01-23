@@ -139,7 +139,7 @@ typedef struct {
 	boolean useCork;
 	boolean allowNullTag;
 	boolean requestAutomaticFQTag;
-	const tagRegexTable *tagRegexTable;
+	tagRegexTable *tagRegexTable;
 	unsigned int tagRegexCount;
 	const keywordTable *keywordTable;
 	unsigned int keywordCount;

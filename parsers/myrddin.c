@@ -14,7 +14,7 @@
 #include "general.h"  /* must always come first */
 #include "parse.h"
 
-static const tagRegexTable myrddinTagRegexTable [] = {
+static tagRegexTable myrddinTagRegexTable [] = {
 	/* const foo = {; function literal } */
 	{"^([ \t]*extern)?[ \t]*const[ \t]+([a-zA-Z_][a-zA-Z0-9_]*)[ \t]*=[ \t]\\{",
 		"\\2", "f,function,functions", NULL},
