@@ -472,12 +472,12 @@ static void makeTags (cookedArgs *args)
 
 static boolean isSafeVar (const char* var)
 {
-	char *safe_vars[] = {
+	const char *safe_vars[] = {
 		"BASH_FUNC_module()=",
 		"BASH_FUNC_scl()=",
 		NULL
 	};
-	char *sv;
+	const char *sv;
 
 	for (sv = safe_vars[0]; sv != NULL; sv++)
 		if (strncmp(var, sv, strlen (sv)) == 0)
