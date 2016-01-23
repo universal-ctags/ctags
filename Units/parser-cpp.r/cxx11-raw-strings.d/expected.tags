@@ -1,0 +1,10 @@
+FOUR	input.cpp	/^#define FOUR /;"	d	file:
+memb1	input.cpp	/^struct typ1 { int memb1; };$/;"	m	struct:typ1	file:
+memb2	input.cpp	/^struct typ2 { int memb2; };$/;"	m	struct:typ2	file:
+memb3	input.cpp	/^struct typ3 { int memb3; };$/;"	m	struct:typ3	file:
+str1	input.cpp	/^static const char* str1 = R"blah($/;"	v	file:
+str2	input.cpp	/^static const char* str2 = R"blah($/;"	v	file:
+str3	input.cpp	/^static const char* str3 = FOUR"f(iv)e";$/;"	v	file:
+typ1	input.cpp	/^struct typ1 { int memb1; };$/;"	s	file:
+typ2	input.cpp	/^struct typ2 { int memb2; };$/;"	s	file:
+typ3	input.cpp	/^struct typ3 { int memb3; };$/;"	s	file:
