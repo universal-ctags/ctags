@@ -516,9 +516,10 @@ extern int getcFromInputFile (void)
 extern int getNthPrevCFromInputFile (unsigned int nth, int def)
 {
 	const unsigned char *base = (unsigned char *) vStringValue (File.line);
+	const unsigned int offset = File.ungetchIdx + 1 + nth;
 
-	if (File.currentLine - File.ungetchIdx - 1 - nth >= base)
-		return (int) *(File.currentLine - File.ungetchIdx - 1 - nth);
+	if (File.currentLine != NULL && File.currentLine >= base + offset)
+		return (int) *(File.currentLine - offset);
 	else
 		return def;
 }
