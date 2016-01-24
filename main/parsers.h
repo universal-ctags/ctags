@@ -17,6 +17,7 @@
 	DbusIntrospectParser, \
 	GladeParser,  \
 	Maven2Parser, \
+	PlistXMLParser, \
 	SvgParser
 #else
 #define XML_PARSER_LIST

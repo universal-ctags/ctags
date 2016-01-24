@@ -1,0 +1,7 @@
+A	input.plist	/^	<key>A<\/key>$/;"	k	xpath:/plist/dict/key[1]/text()
+B	input.plist	/^	<key>B<\/key>$/;"	k	xpath:/plist/dict/key[2]/text()
+C	input.plist	/^		<key>C<\/key>$/;"	k	key:B	xpath:/plist/dict/dict/key/text()
+D	input.plist	/^	<key>D<\/key>$/;"	k	xpath:/plist/dict/key[3]/text()
+E	input.plist	/^	    <key>E<\/key>$/;"	k	key:D	xpath:/plist/dict/array/dict/key[1]/text()
+F	input.plist	/^	    <key>F<\/key>$/;"	k	key:D	xpath:/plist/dict/array/dict/key[2]/text()
+G	input.plist	/^		<key>G<\/key>$/;"	k	key:D.F	xpath:/plist/dict/array/dict/array/dict/key/text()

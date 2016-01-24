@@ -168,6 +168,7 @@ XML_SRCS = \
 	 parsers/dbusintrospect.c	\
 	 parsers/glade.c		\
 	 parsers/svg.c			\
+	 parsers/plist.c		\
 	 \
 	 $(NULL)
 
