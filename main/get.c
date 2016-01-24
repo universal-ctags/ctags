@@ -928,10 +928,7 @@ process:
 					 * 	"xxx(raw)xxx";
 					 *
 					 * which is perfectly valid (yet probably very unlikely). */
-					const unsigned char *base = (unsigned char *) vStringValue (File.line);
-					int prev = '\n';
-					if (File.currentLine - File.ungetchIdx - 2 >= base)
-						prev = (int) *(File.currentLine - File.ungetchIdx - 2);
+					int prev = getNthPrevCFromInputFile (1, 0);
 
 					if (! isident (prev))
 					{
