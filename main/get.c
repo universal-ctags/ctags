@@ -928,9 +928,9 @@ process:
 					 * 	"xxx(raw)xxx";
 					 *
 					 * which is perfectly valid (yet probably very unlikely). */
-					int prev = getNthPrevCFromInputFile (1, 0);
-					int prev2 = getNthPrevCFromInputFile (2, 0);
-					int prev3 = getNthPrevCFromInputFile (3, 0);
+					int prev = getNthPrevCFromInputFile (1, '\0');
+					int prev2 = getNthPrevCFromInputFile (2, '\0');
+					int prev3 = getNthPrevCFromInputFile (3, '\0');
 
 					if (! isident (prev) ||
 					    (! isident (prev2) && (prev == 'L' || prev == 'u' || prev == 'U')) ||
