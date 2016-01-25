@@ -1761,6 +1761,54 @@ static void skipToMatch (const char *const pair)
 	}
 }
 
+static void skipCppTemplateParameterList (void)
+{
+	const unsigned long inputLineNumber = getInputLineNumber ();
+	int angleBracketsLevel = 1;
+	int c = '\0';
+
+	int roundBracketsLevel = 0;
+	boolean defaultValueExpected = FALSE;
+
+	while (angleBracketsLevel > 0  &&  (c = skipToNonWhite ()) != EOF)
+	{
+		if (CollectingSignature)
+			vStringPut (Signature, c);
+
+		if (c == '<')
+		{
+			if (roundBracketsLevel == 0)
+			{
+				if (defaultValueExpected == FALSE)
+					++angleBracketsLevel;
+			}
+		}
+		else if (c == '>')
+		{
+			if (roundBracketsLevel == 0)
+			{
+				--angleBracketsLevel;
+				defaultValueExpected = FALSE;
+			}
+		}
+		else if (c == '(')
+			roundBracketsLevel ++;
+		else if (c == ')')
+			roundBracketsLevel --;
+		else if (c == '=' && (roundBracketsLevel == 0))
+			defaultValueExpected = TRUE;
+		else if (c == ',' && (roundBracketsLevel == 0))
+			defaultValueExpected = FALSE;
+	}
+
+	if (c == EOF)
+	{
+		verbose ("%s: failed to find match for '%c' at line %lu\n",
+				getInputFileName (), '<', inputLineNumber);
+		longjmp (Exception, (int) ExceptionFormattingError);
+	}
+}
+
 static void skipParens (void)
 {
 	const int c = skipToNonWhite ();
@@ -2523,7 +2571,10 @@ static void processAngleBracket (void)
 	} else if (languageSupportsGenerics () && c != '<' && c != '=') {
 		/* this is a template */
 		cppUngetc (c);
-		skipToMatch ("<>");
+		if (isInputLanguage (Lang_cpp))
+			skipCppTemplateParameterList ();
+		else
+			skipToMatch ("<>");
 	} else if (c == '<') {
 		/* skip "<<" or "<<=". */
 		c = cppGetc ();

@@ -1,0 +1,13 @@
+f0	input.cpp	/^template<char i, bool B = (i>0)>     void f0(void) { }$/;"	f
+f1	input.cpp	/^template<char i, bool B = i < 10>    void f1(void) { }$/;"	f
+f2	input.cpp	/^template<char i, long j = (i << 10)> void f2(void) { }$/;"	f
+f3	input.cpp	/^template<char i, long j = i << 10>   void f3(void) { }$/;"	f
+f4	input.cpp	/^template<char i, long j = (i >> 10)> void f4(void) { }$/;"	f
+f5	input.cpp	/^template<char i, long j = (i > 10)>  void f5(void) { }$/;"	f
+f6	input.cpp	/^template<char i, bool B = (i <= 10)> void f6(void) { }$/;"	f
+f7	input.cpp	/^template<char i, bool B = (i >= 10)> void f7(void) { }$/;"	f
+f8	input.cpp	/^template<char i, char j, bool B = i < 10 && (30 > j)> void f8(void) { }$/;"	f
+f9	input.cpp	/^template<char i, char j, bool B = i < (10 && 30 > j)> void f9(void) { }$/;"	f
+f10	input.cpp	/^template<char i, char j, bool B = (i < 10 && 30 > j)> void f10(void) { }$/;"	f
+f11	input.cpp	/^template<bool b = 0 < 2 && 2 < 4> void f11(void) { }$/;"	f
+main	input.cpp	/^int main(void) { return 0; }$/;"	f
