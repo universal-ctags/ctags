@@ -204,6 +204,7 @@ extern void clearLanguageMap (const langType language);
 extern boolean removeLanguageExtensionMap (const langType language, const char *const extension);
 extern void addLanguageExtensionMap (const langType language, const char* extension,
 				     boolean exclusiveInAllLanguages);
+extern boolean removeLanguagePatternMap (const langType language, const char *const pattern);
 extern void addLanguagePatternMap (const langType language, const char* ptrn,
 				   boolean exclusiveInAllLanguages);
 
