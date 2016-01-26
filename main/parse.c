@@ -1198,14 +1198,15 @@ static boolean removeLanguagePatternMap (const char *const pattern)
 	return result;
 }
 
-extern void addLanguagePatternMap (const langType language, const char* ptrn, boolean exclusive)
+extern void addLanguagePatternMap (const langType language, const char* ptrn,
+				   boolean exclusiveInAllLanguages)
 {
 	vString* const str = vStringNewInit (ptrn);
 	parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
-	if (exclusive)
-		removeLanguagePatternMap (ptrn);
+	if (exclusiveInAllLanguages)
+		removeLanguagePatternMap (LANG_AUTO, ptrn);
 	stringListAdd (lang->currentPatterns, str);
 }
 
@@ -1226,12 +1227,13 @@ extern boolean removeLanguageExtensionMap (const char *const extension)
 }
 
 extern void addLanguageExtensionMap (
-		const langType language, const char* extension, boolean exclusive)
+		const langType language, const char* extension,
+		boolean exclusiveInAllLanguages)
 {
 	vString* const str = vStringNewInit (extension);
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	if (exclusive)
-		removeLanguageExtensionMap (extension);
+	if (exclusiveInAllLanguages)
+		removeLanguageExtensionMap (LANG_AUTO, extension);
 	stringListAdd (LanguageTable [language]->currentExtensions, str);
 }
 

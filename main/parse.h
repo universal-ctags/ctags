@@ -201,9 +201,11 @@ extern boolean isLanguageKindEnabled (const langType language, char kind);
 extern void installLanguageMapDefault (const langType language);
 extern void installLanguageMapDefaults (void);
 extern void clearLanguageMap (const langType language);
-extern boolean removeLanguageExtensionMap (const char *const extension);
-extern void addLanguageExtensionMap (const langType language, const char* extension, boolean exclusive);
-extern void addLanguagePatternMap (const langType language, const char* ptrn, boolean exclusive);
+extern boolean removeLanguageExtensionMap (const langType language, const char *const extension);
+extern void addLanguageExtensionMap (const langType language, const char* extension,
+				     boolean exclusiveInAllLanguages);
+extern void addLanguagePatternMap (const langType language, const char* ptrn,
+				   boolean exclusiveInAllLanguages);
 
 extern void installLanguageAliasesDefault (const langType language);
 extern void installLanguageAliasesDefaults (void);

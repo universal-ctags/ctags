@@ -1337,7 +1337,8 @@ static char* extractMapFromParameter (const langType language,
 	return NULL;
 }
 
-static char* addLanguageMap (const langType language, char* map_parameter, boolean exclusive)
+static char* addLanguageMap (const langType language, char* map_parameter,
+			     boolean exclusiveInAllLanguages)
 {
 	char* p = NULL;
 	boolean pattern_p;
@@ -1345,9 +1346,9 @@ static char* addLanguageMap (const langType language, char* map_parameter, boole
 
 	map = extractMapFromParameter (language, map_parameter, &p, &pattern_p, skipPastMap);
 	if (map && pattern_p == FALSE)
-		addLanguageExtensionMap (language, map, exclusive);
+		addLanguageExtensionMap (language, map, exclusiveInAllLanguages);
 	else if (map && pattern_p == TRUE)
-		addLanguagePatternMap (language, map, exclusive);
+		addLanguagePatternMap (language, map, exclusiveInAllLanguages);
 	else
 		error (FATAL, "Badly formed language map for %s language",
 				getLanguageName (language));
