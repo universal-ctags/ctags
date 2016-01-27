@@ -35,12 +35,13 @@ static const char *TR_ASM     = "Asm";
   (strncmp(line, prefix, strlen(prefix)) == 0? TRUE: FALSE)
 
 static const char *selectByLines (FILE *input,
-				  const char* (* lineTaster) (const char *),
-				  const char* defaultLang)
+				  const char* (* lineTaster) (const char *, void *),
+				  const char* defaultLang,
+				  void *userData)
 {
     char line[0x800];
     while (fgets(line, sizeof(line), input)) {
-	const char *lang = lineTaster (line);
+	const char *lang = lineTaster (line, userData);
 	if (lang)
 	    return lang;
     }
@@ -49,7 +50,7 @@ static const char *selectByLines (FILE *input,
 
 /* Returns "Perl" or "Perl6" or NULL if it does not taste like anything */
 static const char *
-tastePerlLine (const char *line)
+tastePerlLine (const char *line, void *data __unused__)
 {
     while (isspace(*line))
         ++line;
@@ -118,11 +119,11 @@ const char *
 selectByPickingPerlVersion (FILE *input)
 {
     /* Default to Perl 5 */
-    return selectByLines (input, tastePerlLine, TR_PERL5);
+    return selectByLines (input, tastePerlLine, TR_PERL5, NULL);
 }
 
 static const char *
-tasteObjectiveCOrMatLabLines (const char *line)
+tasteObjectiveCOrMatLabLines (const char *line, void *data __unused__)
 {
     if (startsWith (line, "% ")
 	|| startsWith (line, "%{"))
@@ -158,11 +159,12 @@ tasteObjectiveCOrMatLabLines (const char *line)
 const char *
 selectByObjectiveCAndMatLabKeywords (FILE * input)
 {
-    return selectByLines (input, tasteObjectiveCOrMatLabLines, NULL);
+    return selectByLines (input, tasteObjectiveCOrMatLabLines,
+			  NULL, NULL);
 }
 
 static const char *
-tasteObjectiveC (const char *line)
+tasteObjectiveC (const char *line, void *data __unused__)
 {
     if (startsWith (line, "#import")
 	|| startsWith (line, "@interface ")
@@ -195,11 +197,12 @@ selectByObjectiveCKeywords (FILE * input)
     else if (! isLanguageEnabled (cpp))
 	return TR_OBJC;
 
-    return selectByLines (input, tasteObjectiveC, TR_CPP);
+    return selectByLines (input, tasteObjectiveC, TR_CPP,
+			  NULL);
 }
 
 static const char *
-tasteR (const char *line)
+tasteR (const char *line, void *data __unused__)
 {
 	/* As far as reading test cases in GNU assembler,
 	   assembly language for d10v and d30v processors
@@ -234,7 +237,8 @@ selectByArrowOfR (FILE *input)
     else if (! isLanguageEnabled (Asm))
 	    return TR_R;
 
-    return selectByLines (input, tasteR, NULL);
+    return selectByLines (input, tasteR, NULL,
+			  NULL);
 }
 
 #ifdef HAVE_LIBXML
