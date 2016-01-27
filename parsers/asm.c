@@ -252,7 +252,8 @@ static const unsigned char *readOperator (
 	return cp;
 }
 
-static void findAsmTags (void)
+static rescanReason findAsmTags(parserDefinition *parser __unused__,
+				const unsigned int passCount __unused__)
 {
 	vString *name = vStringNew ();
 	vString *operator = vStringNew ();
@@ -336,11 +337,12 @@ static void findAsmTags (void)
 	}
 	vStringDelete (name);
 	vStringDelete (operator);
+	return RESCAN_NONE;
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
-	Lang_asm = language;
+	Lang_asm = parser->id;
 }
 
 extern parserDefinition* AsmParser (void)

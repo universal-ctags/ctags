@@ -25,9 +25,11 @@
 #include <libxml/xpath.h>
 #include <libxml/tree.h>
 
-static void simpleXpathMakeTag (xmlNode *node,
+static void simpleXpathMakeTag (parserDefinition * parser,
+				xmlNode *node,
 				const tagXpathMakeTagSpec *spec,
 				const kindOption* const kinds,
+				const unsigned int passCount,
 				void *userData)
 {
 	tagEntryInfo tag;
@@ -54,7 +56,7 @@ static void simpleXpathMakeTag (xmlNode *node,
 	tag.filePosition = getInputFilePositionForLine (tag.lineNumber);
 
 	if (spec->make)
-		spec->make (node, spec, &tag, userData);
+		spec->make (parser, node, spec, &tag, passCount, userData);
 	else
 		makeTagEntry (&tag);
 
@@ -73,9 +75,12 @@ extern void addTagXpath (const langType language, tagXpathTable *xpathTable)
 		error (WARNING, "Failed to compile the Xpath expression: %s", xpathTable->xpath);
 }
 
-static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
+static void findXMLTagsCore (parserDefinition * parser,
+			     xmlXPathContext *ctx, xmlNode *root,
 			     const tagXpathTableTable *xpathTableTable,
-			     const kindOption* const kinds,void *userData)
+			     const kindOption* const kinds,
+			     const unsigned int passCount,
+			     void *userData)
 {
 	unsigned int i, j;
 	xmlNode * node;
@@ -115,18 +120,23 @@ static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
 			{
 				node = set->nodeTab[j];
 				if (elt->specType == LXPATH_TABLE_DO_MAKE)
-					simpleXpathMakeTag (node, &(elt->makeTagSpec), kinds, userData);
+					simpleXpathMakeTag (parser, node, &(elt->makeTagSpec), kinds,
+							    passCount, userData);
 				else
-					elt->recurSpec.enter (node, &(elt->recurSpec), ctx, userData);
+					elt->recurSpec.enter (parser, node, &(elt->recurSpec), ctx,
+							      passCount, userData);
 			}
 		}
 		xmlXPathFreeObject (object);
 	}
 }
 
-extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
-			 const tagXpathTableTable *xpathTableTable,
-			 const kindOption* const kinds,void *userData)
+extern rescanReason findXMLTags (parserDefinition *parser,
+				 xmlXPathContext *ctx, xmlNode *root,
+				 const tagXpathTableTable *xpathTableTable,
+				 const kindOption* const kinds,
+				 const unsigned int passCount,
+				 void *userData)
 {
 	boolean usedAsEnterPoint = FALSE;
 	xmlDocPtr doc = NULL;
@@ -135,12 +145,12 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 	{
 		usedAsEnterPoint = TRUE;
 
-		findRegexTags ();
+		findRegexTags (parser, passCount);
 		doc = xmlParseFile(getInputFileName());
 		if (doc == NULL)
 		{
 			verbose ("could not parse %s as a XML file\n", getInputFileName());
-			return;
+			return RESCAN_NONE;
 		}
 
 		ctx = xmlXPathNewContext (doc);
@@ -155,7 +165,7 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 		}
 	}
 
-	findXMLTagsCore (ctx, root, xpathTableTable, kinds, userData);
+	findXMLTagsCore (parser, ctx, root, xpathTableTable, kinds, passCount, userData);
 
 out:
 	if (usedAsEnterPoint)
@@ -163,6 +173,8 @@ out:
 		xmlXPathFreeContext (ctx);
 		xmlFreeDoc (doc);
 	}
+
+	return RESCAN_NONE;
 }
 
 #else
@@ -172,10 +184,14 @@ extern void addTagXpath (const langType language, tagXpathTable *xpathTable)
 	xpathTable->xpathCompiled = NULL;
 }
 
-extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
-			 const tagXpathTableTable *xpathTableTable,
-			 const kindOption* const kinds, void *userData)
+extern rescanReason findXMLTags (parserDefinition *parser,
+				 xmlXPathContext *ctx, xmlNode *root,
+				 const tagXpathTableTable *xpathTableTable,
+				 const kindOption* const kinds,
+				 const unsigned int passCount,
+				 void *userData)
 {
+	return RESCAN_NONE;
 }
 
 #endif

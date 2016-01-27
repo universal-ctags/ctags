@@ -557,9 +557,9 @@ static void makeVhdlTag (tokenInfo * const token, const vhdlKind kind)
 	}
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
-	Lang_vhdl = language;
+	Lang_vhdl = parser->id;
 }
 
 static void parsePackage (tokenInfo * const token)
@@ -805,13 +805,16 @@ static tokenType parseVhdlFile (tokenInfo * const token)
 	return token->type;
 }
 
-static void findVhdlTags (void)
+static rescanReason findVhdlTags (parserDefinition *parser __unused__,
+				  const unsigned int passCount __unused__)
 {
 	tokenInfo *const token = newToken ();
 
 	while (parseVhdlFile (token) != TOKEN_EOF);
 
 	deleteToken (token);
+
+	return RESCAN_NONE;
 }
 
 extern parserDefinition *VhdlParser (void)

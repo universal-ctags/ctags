@@ -152,7 +152,8 @@ static void match_dot_label (char const *p)
 	}
 }
 
-static void findBasicTags (void)
+static rescanReason findBasicTags (parserDefinition *parser __unused__,
+				   const unsigned int passCount __unused__)
 {
 	const char *line;
 	const char *extension = fileExtension (getInputFileName ());
@@ -187,6 +188,7 @@ static void findBasicTags (void)
 		else
 			match_colon_label (p);
 	}
+	return RESCAN_NONE;
 }
 
 parserDefinition *BasicParser (void)
@@ -196,7 +198,7 @@ parserDefinition *BasicParser (void)
 	def->kinds = BasicKinds;
 	def->kindCount = ARRAY_SIZE (BasicKinds);
 	def->extensions = extensions;
-	def->parser = findBasicTags;
+	def->parser  = findBasicTags;
 	return def;
 }
 

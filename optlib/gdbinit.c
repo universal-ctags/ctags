@@ -6,10 +6,10 @@
 #include "routines.h"
 
 
-static void initializeGdbinitParser (const langType language)
+static void initializeGdbinitParser (parserDefinition *parser)
 {
-	enableRegexKind (language, 'D', FALSE);
-	enableRegexKind (language, 'l', FALSE);
+	enableRegexKind (parser->id, 'D', FALSE);
+	enableRegexKind (parser->id, 'l', FALSE);
 }
 
 extern parserDefinition* GdbinitParser (void)

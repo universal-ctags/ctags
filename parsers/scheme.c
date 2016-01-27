@@ -53,7 +53,8 @@ static void readIdentifier (vString *const name, const unsigned char *cp)
 	vStringTerminate (name);
 }
 
-static void findSchemeTags (void)
+static rescanReason findSchemeTags (parserDefinition *parser __unused__,
+				    const unsigned int passCount __unused__)
 {
 	vString *name = vStringNew ();
 	const unsigned char *line;
@@ -107,6 +108,7 @@ static void findSchemeTags (void)
 		}
 	}
 	vStringDelete (name);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* SchemeParser (void)

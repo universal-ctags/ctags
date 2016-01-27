@@ -2371,13 +2371,14 @@ static void parseFlexFile (tokenInfo *const token)
 	} while (!isEOF (token));
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
 	Assert (ARRAY_SIZE (FlexKinds) == FLEXTAG_COUNT);
-	Lang_js = language;
+	Lang_js = parser->id;
 }
 
-static void findFlexTags (void)
+static rescanReason findFlexTags(parserDefinition *parser __unused__,
+				 const unsigned int passCount __unused__)
 {
 	tokenInfo *const token = newToken ();
 	
@@ -2391,6 +2392,7 @@ static void findFlexTags (void)
 	ClassNames = NULL;
 	FunctionNames = NULL;
 	deleteToken (token);
+	return RESCAN_NONE;
 }
 
 /* Create parser definition structure */

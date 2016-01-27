@@ -6,9 +6,9 @@
 #include "routines.h"
 
 
-static void initializeCoffeeScriptParser (const langType language)
+static void initializeCoffeeScriptParser (parserDefinition *parser)
 {
-	addLanguageXcmd (language, "coffeetags");
+	addLanguageXcmd (parser->id, "coffeetags");
 }
 
 extern parserDefinition* CoffeeScriptParser (void)

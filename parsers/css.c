@@ -155,7 +155,8 @@ static cssKind classifySelector (const vString *const selector)
 	return K_SELECTOR;
 }
 
-static void findCssTags (void)
+static rescanReason findCssTags(parserDefinition *parser __unused__,
+				const unsigned int passCount __unused__)
 {
 	boolean readNextToken = TRUE;
 	tokenInfo token;
@@ -253,6 +254,7 @@ static void findCssTags (void)
 	while (token.type != TOKEN_EOF);
 
 	vStringDelete (token.string);
+	return RESCAN_NONE;
 }
 
 /* parser definition */

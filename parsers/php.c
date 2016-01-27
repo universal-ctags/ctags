@@ -1496,24 +1496,29 @@ static void findTags (boolean startsInPhpMode)
 	deleteToken (token);
 }
 
-static void findPhpTags (void)
+
+static rescanReason findPhpTags (parserDefinition *parser __unused__,
+				 const unsigned int passCount __unused__)
 {
 	findTags (FALSE);
+	return RESCAN_NONE;
 }
 
-static void findZephirTags (void)
+static rescanReason findZephirTags (parserDefinition *parser __unused__,
+				    const unsigned int passCount __unused__)
 {
 	findTags (TRUE);
+	return RESCAN_NONE;
 }
 
-static void initializePhpParser (const langType language)
+static void initializePhpParser (parserDefinition *parser)
 {
-	Lang_php = language;
+	Lang_php = parser->id;
 }
 
-static void initializeZephirParser (const langType language)
+static void initializeZephirParser (parserDefinition *parser)
 {
-	Lang_zephir = language;
+	Lang_zephir = parser->id;
 }
 
 extern parserDefinition* PhpParser (void)

@@ -34,7 +34,8 @@ static kindOption AwkKinds [] = {
 *   FUNCTION DEFINITIONS
 */
 
-static void findAwkTags (void)
+static rescanReason findAwkTags (parserDefinition *parser __unused__,
+				 const unsigned int passCount __unused__)
 {
 	vString *name = vStringNew ();
 	const unsigned char *line;
@@ -64,6 +65,7 @@ static void findAwkTags (void)
 		}
 	}
 	vStringDelete (name);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* AwkParser (void)

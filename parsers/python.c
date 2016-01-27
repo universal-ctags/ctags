@@ -987,7 +987,8 @@ static boolean matchKeyword (const char *keyword, const char *cp, const char **c
 	return FALSE;
 }
 
-static void findPythonTags (void)
+static rescanReason findPythonTags (parserDefinition *parser __unused__,
+				    const unsigned int passCount __unused__)
 {
 	vString *const continuation = vStringNew ();
 	vString *const name = vStringNew ();
@@ -1144,6 +1145,7 @@ static void findPythonTags (void)
 	vStringDelete (name);
 	vStringDelete (continuation);
 	nestingLevelsFree (nesting_levels);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition *PythonParser (void)

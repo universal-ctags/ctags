@@ -36,6 +36,7 @@
 *   DATA DECLARATIONS
 */
 typedef int langType;
+typedef struct sParserDefinition parserDefinition;
 
 typedef enum {
 	RESCAN_NONE,   /* No rescan needed */
@@ -44,9 +45,9 @@ typedef enum {
 } rescanReason;
 
 typedef void (*createRegexTag) (const vString* const name);
-typedef void (*simpleParser) (void);
-typedef rescanReason (*rescanParser) (const unsigned int passCount);
-typedef void (*parserInitialize) (langType language);
+typedef rescanReason (* parseFunc) (parserDefinition *parser,
+				    const unsigned int passCount);
+typedef void (*parserInitialize) (parserDefinition *parser);
 
 /* Per language finalizer is called anytime when ctags exits.
    (Exceptions are a kind of options are given when invoked. Here
@@ -57,7 +58,7 @@ typedef void (*parserInitialize) (langType language);
    whether the assoiciated initializer is invoked or not with the
    second parameter: INITIALIZED. If it is true, the initializer
    is called. */
-typedef void (*parserFinalize) (langType language, boolean initialized);
+typedef void (*parserFinalize) (parserDefinition *parser, boolean initialized);
 
 typedef const char * (*selectLanguage) (FILE *);
 
@@ -81,16 +82,20 @@ typedef struct sTagXpathMakeTagSpec {
 	int   kind;
 	int   role;
 	/* If make is NULL, just makeTagEntry is used instead. */
-	void (*make) (xmlNode *node,
+	void (*make) (parserDefinition * parser,
+		      xmlNode *node,
 		      const struct sTagXpathMakeTagSpec *spec,
 		      struct sTagEntryInfo *tag,
+		      const unsigned int passCount,
 		      void *userData);
 } tagXpathMakeTagSpec;
 
 typedef struct sTagXpathRecurSpec {
-	void (*enter) (xmlNode *node,
+	void (*enter) (parserDefinition * parser,
+		       xmlNode *node,
 		       const struct sTagXpathRecurSpec *spec,
 		       xmlXPathContext *ctx,
+		       const unsigned int passCount,
 		       void *userData);
 } tagXpathRecurSpec;
 
@@ -116,7 +121,7 @@ typedef struct {
 	const int id;
 } keywordTable;
 
-typedef struct {
+struct sParserDefinition {
 	/* defined by parser */
 	char* name;                    /* name of language */
 	kindOption* kinds;             /* tag kinds handled by parser */
@@ -127,8 +132,7 @@ typedef struct {
 	const char *const *aliases;    /* list of default aliases (alternative names) */
 	parserInitialize initialize;   /* initialization routine, if needed */
 	parserFinalize finalize;       /* finalize routine, if needed */
-	simpleParser parser;           /* simple parser (common case) */
-	rescanParser parser2;          /* rescanning parser (unusual case) */
+	parseFunc parser;
 	selectLanguage* selectLanguage; /* may be used to resolve conflicts */
 	unsigned int method;           /* See PARSE__... definitions above */
 	boolean useCork;
@@ -152,7 +156,7 @@ typedef struct {
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
 	stringList* currentAliaes;     /* current list of aliases */
-} parserDefinition;
+};
 
 typedef parserDefinition* (parserDefinitionFunc) (void);
 
@@ -224,7 +228,8 @@ extern void freeEncodingResources (void);
 extern void installKeywordTable (const langType language);
 
 /* Regex interface */
-extern void findRegexTags (void);
+extern rescanReason findRegexTags (parserDefinition *parser,
+				   const unsigned int passCount);
 extern void findRegexTagsMainloop (int (* driver)(void));
 extern boolean matchRegex (const vString* const line, const langType language);
 extern void addLanguageRegex (const langType language, const char* const regex);
@@ -257,9 +262,12 @@ extern void useXcmdMethod (const langType language);
 extern void notifyAvailabilityXcmdMethod (const langType language);
 
 /* Xpath interface */
-extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
-			 const tagXpathTableTable *xpathTableTable,
-			 const kindOption* const kinds, void *userData);
+extern rescanReason findXMLTags (parserDefinition *parser,
+				 xmlXPathContext *ctx, xmlNode *root,
+				 const tagXpathTableTable *xpathTableTable,
+				 const kindOption* const kinds,
+				 const unsigned int passCount,
+				 void *userData);
 extern void installTagXpathTable (const langType language);
 extern void addTagXpath (const langType language, tagXpathTable *xpathTable);
 

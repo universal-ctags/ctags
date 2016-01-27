@@ -287,8 +287,9 @@ next_line:
         goto next_line;
 }
 
-static void
-findPerl6Tags (void)
+static rescanReason
+findPerl6Tags (parserDefinition *parser __unused__,
+	       const unsigned int passCount __unused__)
 {
     struct p6Ctx ctx;
 
@@ -320,6 +321,7 @@ findPerl6Tags (void)
     }
 
     deinitP6Ctx(&ctx);
+    return RESCAN_NONE;
 }
 
 parserDefinition *

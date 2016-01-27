@@ -100,7 +100,8 @@ static void skipToSymbol (const char **p)
 		*p = *p + 1;
 }
 
-static void findClojureTags (void)
+static rescanReason findClojureTags (parserDefinition *parser __unused__,
+				     const unsigned int passCount __unused__)
 {
 	vString *name = vStringNew ();
 	const char *p;
@@ -128,6 +129,7 @@ static void findClojureTags (void)
 		}
 	}
 	vStringDelete (name);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition *ClojureParser (void)
@@ -144,7 +146,7 @@ extern parserDefinition *ClojureParser (void)
 	def->kindCount = ARRAY_SIZE (ClojureKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
-	def->parser = findClojureTags;
+	def->parser  = findClojureTags;
 	def->useCork = TRUE;
 	return def;
 }

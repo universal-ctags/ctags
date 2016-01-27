@@ -1043,18 +1043,20 @@ static void parseClass (tokenInfo *const token)
 	         ! isType (token, TOKEN_EOF));
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition* parser)
 {
-	Lang_eiffel = language;
+	Lang_eiffel = parser->id;
 }
 
-static void findEiffelTags (void)
+static rescanReason findEiffelTags(parserDefinition *parser __unused__,
+				   const unsigned int passCount __unused__)
 {
 	tokenInfo *const token = newToken ();
 
 	while (findKeyword (token, KEYWORD_class))
 		parseClass (token);
 	deleteToken (token);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* EiffelParser (void)

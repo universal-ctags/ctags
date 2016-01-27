@@ -53,7 +53,8 @@ static void makeRTag (const vString * const name, rKind kind)
 	makeTagEntry (&e);
 }
 
-static void createRTags (void)
+static rescanReason createRTags (parserDefinition *parser __unused__,
+				 const unsigned int passCount __unused__)
 {
 	vString *vLine = vStringNew ();
 	vString *name = vStringNew ();
@@ -196,6 +197,8 @@ static void createRTags (void)
 
 	vStringDelete (name);
 	vStringDelete (vLine);
+
+	return RESCAN_NONE;
 }
 
 extern parserDefinition *RParser (void)

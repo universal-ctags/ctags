@@ -340,16 +340,16 @@ static void buildKeywordHash (const langType language, unsigned int idx)
 	}
 }
 
-static void initializeVerilog (const langType language)
+static void initializeVerilog (parserDefinition *parser)
 {
-	Lang_verilog = language;
-	buildKeywordHash (language, IDX_VERILOG);
+	Lang_verilog = parser->id;
+	buildKeywordHash (parser->id, IDX_VERILOG);
 }
 
-static void initializeSystemVerilog (const langType language)
+static void initializeSystemVerilog (parserDefinition *parser)
 {
-	Lang_systemverilog = language;
-	buildKeywordHash (language, IDX_SYSTEMVERILOG);
+	Lang_systemverilog = parser->id;
+	buildKeywordHash (parser->id, IDX_SYSTEMVERILOG);
 }
 
 static void vUngetc (int c)
@@ -1097,7 +1097,8 @@ static void findTag (tokenInfo *const token)
 	}
 }
 
-static void findVerilogTags (void)
+static rescanReason findVerilogTags (parserDefinition *parser __unused__,
+				     const unsigned int passCount __unused__)
 {
 	tokenInfo *const token = newToken ();
 	int c = '\0';
@@ -1150,6 +1151,8 @@ static void findVerilogTags (void)
 	deleteToken (token);
 	pruneTokens (currentContext);
 	currentContext = NULL;
+
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* VerilogParser (void)

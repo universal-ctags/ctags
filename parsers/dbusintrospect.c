@@ -33,17 +33,23 @@ static kindOption DbusIntrospectKinds [] = {
 	{ TRUE,  'p', "property",  "properties" },
 };
 
-static void dbusIntrospectFindTagsUnderInterface (xmlNode *node,
+static void dbusIntrospectFindTagsUnderInterface (parserDefinition *parser,
+						  xmlNode *node,
 						  const struct sTagXpathRecurSpec *spec,
 						  xmlXPathContext *ctx,
+						  unsigned int passCount,
 						  void *userData);
-static void makeTagForInterfaceName (xmlNode *node,
+static void makeTagForInterfaceName (parserDefinition *parser,
+xmlNode *node,
 				     const struct sTagXpathMakeTagSpec *spec,
 				     struct sTagEntryInfo *tag,
+				     unsigned int passCount,
 				     void *userData);
-static void makeTagWithScope (xmlNode *node,
+static void makeTagWithScope (parserDefinition *parser,
+			      xmlNode *node,
 			      const struct sTagXpathMakeTagSpec *spec,
 			      struct sTagEntryInfo *tag,
+			      unsigned int passCount,
 			      void *userData);
 
 
@@ -101,26 +107,32 @@ static tagXpathTableTable dbusIntrospectXpathTableTable[] = {
 	[TABLE_MAIN_NAME] = { ARRAY_AND_SIZE (dbusIntrospectXpathMainNameTable) },
 };
 
-static void dbusIntrospectFindTagsUnderInterface (xmlNode *node,
+static void dbusIntrospectFindTagsUnderInterface (parserDefinition *parser,
+						  xmlNode *node,
 						  const struct sTagXpathRecurSpec *spec,
 						  xmlXPathContext *ctx,
+						  unsigned int passCount,
 						  void *userData)
 {
 	int corkIndex = SCOPE_NIL;
 
-	findXMLTags (ctx, node,
+	findXMLTags (parser, ctx, node,
 		     dbusIntrospectXpathTableTable + TABLE_MAIN_NAME,
 		     DbusIntrospectKinds,
+		     passCount,
 		     &corkIndex);
-	findXMLTags (ctx, node,
+	findXMLTags (parser, ctx, node,
 		     dbusIntrospectXpathTableTable + TABLE_INTERFACE,
 		     DbusIntrospectKinds,
+		     passCount,
 		     &corkIndex);
 }
 
-static void makeTagWithScope (xmlNode *node,
+static void makeTagWithScope (parserDefinition *parser,
+			      xmlNode *node,
 			      const struct sTagXpathMakeTagSpec *spec,
 			      struct sTagEntryInfo *tag,
+			      unsigned int passCount,
 			      void *userData)
 {
 	tag->extensionFields.scopeKind  = NULL;
@@ -130,9 +142,11 @@ static void makeTagWithScope (xmlNode *node,
 	makeTagEntry (tag);
 }
 
-static void makeTagForInterfaceName (xmlNode *node,
+static void makeTagForInterfaceName (parserDefinition *parser,
+				     xmlNode *node,
 				     const struct sTagXpathMakeTagSpec *spec,
 				     struct sTagEntryInfo *tag,
+				     unsigned int passCount,
 				     void *userData)
 {
 	int *corkIndex = userData;
@@ -140,13 +154,14 @@ static void makeTagForInterfaceName (xmlNode *node,
 	*corkIndex = makeTagEntry (tag);
 }
 
-static void
-findDbusIntrospectTags (void)
+static rescanReason
+findDbusIntrospectTags (parserDefinition *parser, unsigned int passCount)
 {
-	findXMLTags (NULL, NULL,
-		     dbusIntrospectXpathTableTable + TABLE_MAIN,
-		     DbusIntrospectKinds,
-		     NULL);
+	return findXMLTags (parser, NULL, NULL,
+			    dbusIntrospectXpathTableTable + TABLE_MAIN,
+			    DbusIntrospectKinds,
+			    passCount,
+			    NULL);
 }
 
 extern parserDefinition*

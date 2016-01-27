@@ -2531,7 +2531,8 @@ static void parseProgramUnit (tokenInfo *const token)
 	} while (! isType (token, TOKEN_EOF));
 }
 
-static rescanReason findFortranTags (const unsigned int passCount)
+static rescanReason findFortranTags (parserDefinition *parser __unused__,
+				     const unsigned int passCount)
 {
 	tokenInfo *token;
 	rescanReason rescan;
@@ -2558,9 +2559,9 @@ static rescanReason findFortranTags (const unsigned int passCount)
 	return rescan;
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
-	Lang_fortran = language;
+	Lang_fortran = parser->id;
 }
 
 extern parserDefinition* FortranParser (void)
@@ -2576,7 +2577,7 @@ extern parserDefinition* FortranParser (void)
 	def->kinds      = FortranKinds;
 	def->kindCount  = ARRAY_SIZE (FortranKinds);
 	def->extensions = extensions;
-	def->parser2    = findFortranTags;
+	def->parser     = findFortranTags;
 	def->initialize = initialize;
 	def->keywordTable = FortranKeywordTable;
 	def->keywordCount = ARRAY_SIZE (FortranKeywordTable);

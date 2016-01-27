@@ -131,9 +131,9 @@ static boolean isIdentChar (const int c)
 		(isStartIdentChar (c) || isdigit (c));
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
-	Lang_go = language;
+	Lang_go = parser->id;
 }
 
 static tokenInfo *newToken (void)
@@ -794,7 +794,8 @@ static void parseGoFile (tokenInfo *const token)
 	} while (token->type != TOKEN_EOF);
 }
 
-static void findGoTags (void)
+static rescanReason findGoTags (parserDefinition *parser __unused__,
+				const unsigned int passCount __unused__)
 {
 	tokenInfo *const token = newToken ();
 
@@ -803,6 +804,7 @@ static void findGoTags (void)
 	deleteToken (token);
 	vStringDelete (scope);
 	scope = NULL;
+	return RESCAN_NONE;
 }
 
 extern parserDefinition *GoParser (void)

@@ -535,10 +535,10 @@ static void parseTexFile (tokenInfo *const token)
 	} while (TRUE);
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
 	Assert (ARRAY_SIZE (TexKinds) == TEXTAG_COUNT);
-	Lang_js = language;
+	Lang_js = parser->id;
 
 	lastPart    = vStringNew();
 	lastChapter = vStringNew();
@@ -547,7 +547,7 @@ static void initialize (const langType language)
 	lastSubSubS = vStringNew();
 }
 
-static void finalize (const langType language __unused__,
+static void finalize (parserDefinition *parser __unused__,
 		      boolean initialized)
 {
 	if (initialized)
@@ -565,7 +565,8 @@ static void finalize (const langType language __unused__,
 	}
 }
 
-static void findTexTags (void)
+static rescanReason findTexTags (parserDefinition *parser __unused__,
+				 const unsigned int passCount __unused__)
 {
 	tokenInfo *const token = newToken ();
 	exception_t exception;
@@ -575,6 +576,8 @@ static void findTexTags (void)
 		parseTexFile (token);
 
 	deleteToken (token);
+
+	return RESCAN_NONE;
 }
 
 /* Create parser definition structure */
@@ -588,7 +591,7 @@ extern parserDefinition* TexParser (void)
 	 */
 	def->kinds		= TexKinds;
 	def->kindCount	= ARRAY_SIZE (TexKinds);
-	def->parser		= findTexTags;
+	def->parser	= findTexTags;
 	def->initialize = initialize;
 	def->finalize   = finalize;
 	def->keywordTable =  TexKeywordTable;

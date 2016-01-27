@@ -39,7 +39,8 @@ static kindOption AspKinds [] = {
 *   FUNCTION DEFINITIONS
 */
 
-static void findAspTags (void)
+static rescanReason findAspTags (parserDefinition *parser __unused__,
+				 const unsigned int passCount __unused__)
 {
 	vString *name = vStringNew ();
 	const unsigned char *line;
@@ -310,6 +311,7 @@ static void findAspTags (void)
 		}
 	}
 	vStringDelete (name);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* AspParser (void)

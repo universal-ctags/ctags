@@ -80,7 +80,8 @@ static boolean tail (const char *cp)
  * immediately following the procedure statement; if found, the tag is
  * skipped.
  */
-static void findPascalTags (void)
+static rescanReason findPascalTags (parserDefinition *parser __unused__,
+				    const unsigned int passCount __unused__)
 {
 	vString *name = vStringNew ();
 	tagEntryInfo tag;
@@ -247,6 +248,8 @@ static void findPascalTags (void)
 		}  /* while not eof */
 	}
 	vStringDelete (name);
+
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* PascalParser (void)

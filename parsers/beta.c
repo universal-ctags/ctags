@@ -75,7 +75,8 @@ static void makeBetaTag (const char* const name, const betaKind kind)
 	}
 }
 
-static void findBetaTags (void)
+static rescanReason findBetaTags (parserDefinition *parser __unused__,
+				  const unsigned int passCount __unused__)
 {
 	vString *line = vStringNew ();
 	boolean incomment = FALSE;
@@ -301,6 +302,7 @@ static void findBetaTags (void)
 		inquote = FALSE;  /* This shouldn't really make a difference */
 	} while (c != EOF);
 	vStringDelete (line);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* BetaParser (void)

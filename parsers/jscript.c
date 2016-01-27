@@ -1975,13 +1975,14 @@ static void parseJsFile (tokenInfo *const token)
 	} while (! isType (token, TOKEN_EOF));
 }
 
-static void initialize (const langType language)
+static void initialize (parserDefinition *parser)
 {
 	Assert (ARRAY_SIZE (JsKinds) == JSTAG_COUNT);
-	Lang_js = language;
+	Lang_js = parser->id;
 }
 
-static void findJsTags (void)
+static rescanReason findJsTags (parserDefinition *parser __unused__,
+				const unsigned int passCount __unused__)
 {
 	tokenInfo *const token = newToken ();
 
@@ -1999,6 +2000,7 @@ static void findJsTags (void)
 	deleteToken (token);
 
 	Assert (NextToken == NULL);
+	return RESCAN_NONE;
 }
 
 /* Create parser definition structure */

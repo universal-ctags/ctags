@@ -377,7 +377,8 @@ static void enterUnnamedScope (void)
 	vStringDelete (name);
 }
 
-static void findRubyTags (void)
+static rescanReason findRubyTags (parserDefinition *parser __unused__,
+				  const unsigned int passCount __unused__)
 {
 	const unsigned char *line;
 	boolean inMultiLineComment = FALSE;
@@ -520,6 +521,8 @@ static void findRubyTags (void)
 		}
 	}
 	nestingLevelsFree (nesting);
+
+	return RESCAN_NONE;
 }
 
 extern parserDefinition* RubyParser (void)

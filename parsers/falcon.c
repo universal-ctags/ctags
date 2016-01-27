@@ -60,7 +60,8 @@ static const unsigned char *skipSpace (const unsigned char *cp)
  * Main parsing function
  */
 
-static void findFalconTags (void)
+static rescanReason findFalconTags (parserDefinition *parser __unused__,
+				    const unsigned int passCount __unused__)
 {
     vString *name = vStringNew ();
     const unsigned char *line;
@@ -132,6 +133,7 @@ static void findFalconTags (void)
         }
     }
     vStringDelete (name);
+    return RESCAN_NONE;
 }
 
 /* 

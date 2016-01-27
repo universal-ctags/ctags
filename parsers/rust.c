@@ -957,7 +957,8 @@ static void parseBlock (lexerState *lexer, boolean delim, int kind, vString *sco
 	}
 }
 
-static void findRustTags (void)
+static rescanReason findRustTags (parserDefinition *parser __unused__,
+				  const unsigned int passCount __unused__)
 {
 	lexerState lexer;
 	vString* scope = vStringNew();
@@ -967,6 +968,7 @@ static void findRustTags (void)
 	vStringDelete(scope);
 
 	deInitLexer(&lexer);
+	return RESCAN_NONE;
 }
 
 extern parserDefinition *RustParser (void)
