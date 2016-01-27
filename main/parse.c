@@ -704,7 +704,8 @@ static const struct taster {
 		.msg    = "vim modeline",
         },
 };
-static langType tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n_tasters);
+static langType tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n_tasters,
+			      langType *fallback);
 
 /* If all the candidates have the same specialized language selector, return
  * it.  Otherwise, return NULL.
@@ -833,11 +834,15 @@ static void verboseReportCandidate (const char *header,
 }
 
 static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx *glc,
-				       unsigned int nominate (const char *const, parserCandidate**))
+				       unsigned int nominate (const char *const, parserCandidate**),
+				       langType *fallback)
 {
 	langType language;
 	parserCandidate  *candidates;
 	unsigned int n_candidates;
+
+	if (fallback)
+		*fallback = LANG_IGNORE;
 
 	n_candidates = (*nominate)(spec, &candidates);
 	verboseReportCandidate ("candidates",
@@ -864,9 +869,8 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 		}
 
 		Assert(language != LANG_AUTO);
-
-		if (language == LANG_IGNORE)
-			language = candidates[0].lang;
+		if (fallback)
+			*fallback = candidates[0].lang;
 	}
 	else
 	{
@@ -881,26 +885,33 @@ fopen_error:
 }
 
 static langType getSpecLanguage (const char *const spec,
-                                 struct getLangCtx *glc)
+                                 struct getLangCtx *glc,
+				 langType *fallback)
 {
-	return getSpecLanguageCommon(spec, glc, nominateLanguageCandidates);
+	return getSpecLanguageCommon(spec, glc, nominateLanguageCandidates,
+				     fallback);
 }
 
 static langType getPatternLanguage (const char *const baseName,
-                                    struct getLangCtx *glc)
+                                    struct getLangCtx *glc,
+				    langType *fallback)
 {
 	return getSpecLanguageCommon(baseName, glc,
-				     nominateLanguageCandidatesForPattern);
+				     nominateLanguageCandidatesForPattern,
+				     fallback);
 }
 
 /* This function tries to figure out language contained in a file by
  * running a series of tests, trying to find some clues in the file.
  */
 static langType
-tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n_tasters)
+tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n_tasters,
+	      langType *fallback)
 {
     int i;
 
+    if (fallback)
+	    *fallback = LANG_IGNORE;
     for (i = 0; i < n_tasters; ++i) {
         langType language;
         vString* spec;
@@ -910,7 +921,8 @@ tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n
 
         if (NULL != spec) {
             verbose ("	%s: %s\n", tasters[i].msg, vStringValue (spec));
-            language = getSpecLanguage (vStringValue (spec), glc);
+            language = getSpecLanguage (vStringValue (spec), glc,
+					(fallback && (*fallback == LANG_IGNORE))? fallback: NULL);
             vStringDelete (spec);
             if (language != LANG_IGNORE)
                 return language;
@@ -924,6 +936,36 @@ static langType
 getFileLanguageInternal (const char *const fileName)
 {
     langType language;
+
+    /* ctags tries variety ways(HINTS) to choose a proper language
+       for given fileName. If multiple candidates are chosen in one of
+       the hint, a SELECTOR common between the candidate languages
+       is called.
+
+       "selection failure" means a selector common between the
+       candidates doesn't exist or the common selector returns NULL.
+
+       "hint failure" means the hint finds no candidate or
+       "selection failure" occurs though the hint finds multiple
+       candidates.
+
+       If a hint chooses multiple candidates, and selection failure is
+       occured, the hint records one of the candidates as FALLBACK for
+       the hint. (The candidates are stored in an array. The first
+       element of the array is recorded. However, there is no
+       specification about the order of elements in the array.)
+
+       If all hints are failed, FALLBACKs of the hints are examined.
+       Which fallbacks should be chosen?  `enum hint' defines the order. */
+    enum hint {
+	    HINT_INTERP,
+	    HINT_OTHER,
+	    HINT_FILENAME,
+	    HINT_TEMPLATE,
+	    N_HINTS,
+    };
+    langType fallback[N_HINTS];
+    int i;
     struct getLangCtx glc = {
         .fileName = fileName,
         .input    = NULL,
@@ -933,10 +975,14 @@ getFileLanguageInternal (const char *const fileName)
     char *templateBaseName = NULL;
     fileStatus *fstatus = NULL;
 
+    for (i = 0; i < N_HINTS; i++)
+	fallback [i] = LANG_IGNORE;
+
     verbose ("Get file language for %s\n", fileName);
 
     verbose ("	pattern: %s\n", baseName);
-    language = getPatternLanguage (baseName, &glc);
+    language = getPatternLanguage (baseName, &glc,
+				   fallback + HINT_FILENAME);
     if (language != LANG_IGNORE || glc.err)
         goto cleanup;
 
@@ -948,7 +994,8 @@ getFileLanguageInternal (const char *const fileName)
             verbose ("	pattern + template(%s): %s\n", tExt, templateBaseName);
             GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
             rewind(glc.input);
-            language = getPatternLanguage(templateBaseName, &glc);
+            language = getPatternLanguage(templateBaseName, &glc,
+					  fallback + HINT_TEMPLATE);
             if (language != LANG_IGNORE)
                 goto cleanup;
         }
@@ -960,7 +1007,8 @@ getFileLanguageInternal (const char *const fileName)
 	    if (fstatus->isExecutable || Option.guessLanguageEagerly)
 	    {
 		    GLC_FOPEN_IF_NECESSARY (&glc, cleanup);
-		    language = tasteLanguage(&glc, eager_tasters, 1);
+		    language = tasteLanguage(&glc, eager_tasters, 1,
+					    fallback + HINT_INTERP);
 	    }
 	    if (language != LANG_IGNORE)
 		    goto cleanup;
@@ -970,7 +1018,8 @@ getFileLanguageInternal (const char *const fileName)
 		    GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
 		    language = tasteLanguage(&glc, 
 					     eager_tasters + 1,
-					     ARRAY_SIZE(eager_tasters) - 1);
+					     ARRAY_SIZE(eager_tasters) - 1,
+					     fallback + HINT_OTHER);
 	    }
     }
 
@@ -981,6 +1030,16 @@ getFileLanguageInternal (const char *const fileName)
 	    eStatFree (fstatus);
     if (templateBaseName)
         eFree (templateBaseName);
+
+    for (i = 0;
+	 language == LANG_IGNORE && i < N_HINTS;
+	 i++)
+    {
+        language = fallback [i];
+	if (language != LANG_IGNORE)
+        verbose ("	fallback[hint = %d]: %s\n", i, getLanguageName (language));
+    }
+
     return language;
 }
 
