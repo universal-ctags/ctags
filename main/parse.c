@@ -904,8 +904,11 @@ tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n
     for (i = 0; i < n_tasters; ++i) {
         langType language;
         vString* spec;
+
         rewind(glc->input);
-        if (NULL != (spec = tasters[i].taste(glc->input))) {
+	spec = tasters[i].taste(glc->input);
+
+        if (NULL != spec) {
             verbose ("	%s: %s\n", tasters[i].msg, vStringValue (spec));
             language = getSpecLanguage (vStringValue (spec), glc);
             vStringDelete (spec);
