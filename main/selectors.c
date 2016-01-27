@@ -31,6 +31,9 @@ static const char *TR_CPP     = "C++";
 static const char *TR_R       = "R";
 static const char *TR_ASM     = "Asm";
 
+static const char *TR_REXX     = "REXX";
+static const char *TR_DOSBATCH = "DosBatch";
+
 #define startsWith(line,prefix) \
   (strncmp(line, prefix, strlen(prefix)) == 0? TRUE: FALSE)
 
@@ -239,6 +242,53 @@ selectByArrowOfR (FILE *input)
 
     return selectByLines (input, tasteR, NULL,
 			  NULL);
+}
+
+static const char *
+tasteREXXOrDosBatch (const char *line, void *data)
+{
+	boolean * in_rexx_comment = data;
+
+	if (startsWith (line, ":"))
+		return TR_DOSBATCH;
+	else if (*in_rexx_comment
+		 && strstr (line, "*/"))
+		return TR_REXX;
+	else if (strstr (line, "/*"))
+	{
+		*in_rexx_comment = TRUE;
+		return NULL;
+	}
+	else
+		return NULL;
+}
+
+const char *
+selectByRexxCommentAndDosbatchLabelPrefix (FILE *input)
+{
+    /* TODO: Ideally opening input should be delayed till
+       enable/disable based selection is done. */
+
+    static langType rexx     = LANG_IGNORE;
+    static langType dosbatch = LANG_IGNORE;
+    boolean in_rexx_comment = FALSE;
+
+    if (rexx == LANG_IGNORE)
+	    rexx = getNamedLanguage (TR_R, 0);
+
+    if (dosbatch == LANG_IGNORE)
+	    dosbatch = getNamedLanguage (TR_DOSBATCH, 0);
+
+    Assert (0 <= rexx);
+    Assert (0 <= dosbatch);
+
+    if (! isLanguageEnabled (rexx))
+	    return TR_DOSBATCH;
+    else if (! isLanguageEnabled (dosbatch))
+	    return TR_REXX;
+
+    return selectByLines (input, tasteREXXOrDosBatch,
+			  NULL, &in_rexx_comment);
 }
 
 #ifdef HAVE_LIBXML
