@@ -28,6 +28,8 @@ static const char *TR_MATLAB  = "MatLab";
 
 static const char *TR_CPP     = "C++";
 
+static const char *TR_R       = "R";
+static const char *TR_ASM     = "Asm";
 
 #define startsWith(line,prefix) \
   (strncmp(line, prefix, strlen(prefix)) == 0? TRUE: FALSE)
@@ -194,6 +196,45 @@ selectByObjectiveCKeywords (FILE * input)
 	return TR_OBJC;
 
     return selectByLines (input, tasteObjectiveC, TR_CPP);
+}
+
+static const char *
+tasteR (const char *line)
+{
+	/* As far as reading test cases in GNU assembler,
+	   assembly language for d10v and d30v processors
+	   uses "<-" as part its syntax. I cannot find better
+	   hint for distinguishing between the assembly
+	   language and R.
+	   ----
+	   binutils-2.15.92.0.2/gas/testsuite/gas/d30v/mul.s */
+	return strstr (line, "<-")? TR_R: NULL;
+}
+
+const char *
+selectByArrowOfR (FILE *input)
+{
+    /* TODO: Ideally opening input should be delayed till
+       enable/disable based selection is done. */
+
+    static langType R   = LANG_IGNORE;
+    static langType Asm = LANG_IGNORE;
+
+    if (R == LANG_IGNORE)
+	    R = getNamedLanguage (TR_R, 0);
+
+    if (Asm == LANG_IGNORE)
+	    Asm = getNamedLanguage (TR_ASM, 0);
+
+    Assert (0 <= R);
+    Assert (0 <= Asm);
+
+    if (! isLanguageEnabled (R))
+	    return TR_ASM;
+    else if (! isLanguageEnabled (Asm))
+	    return TR_R;
+
+    return selectByLines (input, tasteR, NULL);
 }
 
 #ifdef HAVE_LIBXML
