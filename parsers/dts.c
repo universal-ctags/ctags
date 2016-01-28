@@ -68,7 +68,7 @@ static const tagRegexTable const dtsTagRegexTable [] = {
 */
 static void runCppGetc (void)
 {
-	cppInit (0, FALSE, FALSE,
+	cppInit (0, FALSE, FALSE, FALSE,
 		 DTSKinds + DTS_MACRO, DTS_MACRO_KIND_UNDEF_ROLE,
 		 DTSKinds + DTS_HEADER, DTS_HEADER_KIND_SYSTEM_ROLE, DTS_HEADER_KIND_LOCAL_ROLE);
 

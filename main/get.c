@@ -66,6 +66,7 @@ typedef struct sCppState {
 	int		ungetch, ungetch2;   /* ungotten characters, if any */
 	boolean resolveRequired;     /* must resolve if/else/elif/endif branch */
 	boolean hasAtLiteralStrings; /* supports @"c:\" strings */
+	boolean hasCxxRawLiteralStrings; /* supports R"xxx(...)xxx" strings */
 	boolean hasSingleQuoteLiteralNumbers; /* supports vera number literals:
 						 'h..., 'o..., 'd..., and 'b... */
 	const kindOption  *defineMacroKind;
@@ -95,6 +96,7 @@ static cppState Cpp = {
 	'\0', '\0',  /* ungetch characters */
 	FALSE,       /* resolveRequired */
 	FALSE,       /* hasAtLiteralStrings */
+	FALSE,       /* hasCxxRawLiteralStrings */
 	FALSE,	     /* hasSingleQuoteLiteralNumbers */
 	NULL,	     /* defineMacroKind */
 	.macroUndefRoleIndex   = ROLE_INDEX_DEFINITION,
@@ -125,6 +127,7 @@ extern unsigned int getDirectiveNestLevel (void)
 }
 
 extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
+		     const boolean hasCxxRawLiteralStrings,
 		     const boolean hasSingleQuoteLiteralNumbers,
 		     const struct sKindOption *defineMacroKind,
 		     int macroUndefRoleIndex,
@@ -137,6 +140,7 @@ extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 	Cpp.ungetch2        = '\0';
 	Cpp.resolveRequired = FALSE;
 	Cpp.hasAtLiteralStrings = hasAtLiteralStrings;
+	Cpp.hasCxxRawLiteralStrings = hasCxxRawLiteralStrings;
 	Cpp.hasSingleQuoteLiteralNumbers = hasSingleQuoteLiteralNumbers;
 	Cpp.defineMacroKind  = defineMacroKind;
 	Cpp.macroUndefRoleIndex = macroUndefRoleIndex;
@@ -650,6 +654,56 @@ static int skipToEndOfString (boolean ignoreBackslash)
 	return STRING_SYMBOL;  /* symbolic representation of string */
 }
 
+
+static int isCxxRawLiteralDelimiterChar (int c)
+{
+	return (c != ' ' && c != '\f' && c != '\n' && c != '\r' && c != '\t' && c != '\v' &&
+	        c != '(' && c != ')' && c != '\\');
+}
+
+static int skipToEndOfCxxRawLiteralString (void)
+{
+	int c = getcFromInputFile ();
+
+	if (c != '(' && ! isCxxRawLiteralDelimiterChar (c))
+	{
+		ungetcToInputFile (c);
+		c = skipToEndOfString (FALSE);
+	}
+	else
+	{
+		char delim[16];
+		unsigned int delimLen = 0;
+		boolean collectDelim = TRUE;
+
+		do
+		{
+			if (collectDelim)
+			{
+				if (isCxxRawLiteralDelimiterChar (c) &&
+				    delimLen < (sizeof delim / sizeof *delim))
+					delim[delimLen++] = c;
+				else
+					collectDelim = FALSE;
+			}
+			else if (c == ')')
+			{
+				unsigned int i = 0;
+
+				while ((c = getcFromInputFile ()) != EOF && i < delimLen && delim[i] == c)
+					i++;
+				if (i == delimLen && c == DOUBLE_QUOTE)
+					break;
+				else
+					ungetcToInputFile (c);
+			}
+		}
+		while ((c = getcFromInputFile ()) != EOF);
+		c = STRING_SYMBOL;
+	}
+	return c;
+}
+
 /*  Skips to the end of the three (possibly four) 'c' sequence, returning a
  *  special character to symbolically represent a generic character.
  *  Also detects Vera numbers that include a base specifier (ie. 'b1010).
@@ -854,6 +908,44 @@ process:
 					}
 					else
 						ungetcToInputFile (next);
+				}
+				else if (c == 'R' && Cpp.hasCxxRawLiteralStrings)
+				{
+					/* OMG!11 HACK!!11  Get the previous character.
+					 *
+					 * We need to know whether the previous character was an identifier or not,
+					 * because "R" has to be on its own, not part of an identifier.  This allows
+					 * for constructs like:
+					 *
+					 * 	#define FOUR "4"
+					 * 	const char *p = FOUR"5";
+					 *
+					 * which is not a raw literal, but a preprocessor concatenation.
+					 *
+					 * FIXME: handle
+					 *
+					 * 	const char *p = R\
+					 * 	"xxx(raw)xxx";
+					 *
+					 * which is perfectly valid (yet probably very unlikely). */
+					int prev = getNthPrevCFromInputFile (1, '\0');
+					int prev2 = getNthPrevCFromInputFile (2, '\0');
+					int prev3 = getNthPrevCFromInputFile (3, '\0');
+
+					if (! isident (prev) ||
+					    (! isident (prev2) && (prev == 'L' || prev == 'u' || prev == 'U')) ||
+					    (! isident (prev3) && (prev2 == 'u' && prev == '8')))
+					{
+						int next = getcFromInputFile ();
+						if (next != DOUBLE_QUOTE)
+							ungetcToInputFile (next);
+						else
+						{
+							Cpp.directive.accept = FALSE;
+							c = skipToEndOfCxxRawLiteralString ();
+							break;
+						}
+					}
 				}
 			enter:
 				Cpp.directive.accept = FALSE;
