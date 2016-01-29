@@ -332,7 +332,7 @@ static const char *skipUntil (const char *cp,
 }
 
 /* Skip everything up to an identifier start. */
-static const char *skipEverything (const char *cp)
+static const char *skipToNextIdentifier (const char *cp)
 {
 	return skipUntil (cp, isIdentifierFirstCharacterCB, NULL);
 }
@@ -349,7 +349,7 @@ static const char *findDefinitionOrClass (const char *cp)
 {
 	while (*cp)
 	{
-		cp = skipEverything (cp);
+		cp = skipToNextIdentifier (cp);
 		if (!strncmp(cp, "def", 3) || !strncmp(cp, "class", 5) ||
 			!strncmp(cp, "cdef", 4) || !strncmp(cp, "cpdef", 5))
 		{
@@ -427,7 +427,7 @@ static void parseImports (const char *cp, const char* from_module)
 		++cp;
 	}
 
-	cp = skipEverything (cp);
+	cp = skipToNextIdentifier (cp);
 nextLine:
 	while (*cp)
 	{
@@ -435,12 +435,12 @@ nextLine:
 		cp = skipSpace (cp);
 		if (*cp == ')')
 			found_multiline_end = TRUE;
-		cp = skipEverything (cp);
+		cp = skipToNextIdentifier (cp);
 		cp_next = parseIdentifier (cp, name_next);
 
 		if (strcmp (vStringValue (name_next), "as") == 0)
 		{
-			cp = skipEverything (cp_next);
+			cp = skipToNextIdentifier (cp_next);
 			cp = parseIdentifier (cp, name_next);
 			if (from_module)
 			{
@@ -485,7 +485,7 @@ nextLine:
 				found_multiline_end = TRUE;
 				cp++;
 			}
-			cp = skipEverything (cp);
+			cp = skipToNextIdentifier (cp);
 		}
 		else
 		{
@@ -553,9 +553,9 @@ static void parseFromModule (const char *cp, const char* dummy __unused__)
 	from_module = vStringNew ();
 	import_keyword = vStringNew ();
 
-	cp = skipEverything (cp);
+	cp = skipToNextIdentifier (cp);
 	cp = parseIdentifier (cp, from_module);
-	cp = skipEverything (cp);
+	cp = skipToNextIdentifier (cp);
 	cp = parseIdentifier (cp, import_keyword);
 
 	if (strcmp (vStringValue (import_keyword), "import") == 0
@@ -575,7 +575,7 @@ static boolean parseNamespace (const char *cp)
 {
 	void (* parse_sub) (const char *, const char *);
 
-	cp = skipEverything (cp);
+	cp = skipToNextIdentifier (cp);
 
 	if (strncmp (cp, "import", 6) == 0)
 	{
