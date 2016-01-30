@@ -1090,6 +1090,7 @@ extern void enableLanguages (const boolean state)
 		enableLanguage (i, state);
 }
 
+#ifdef DEBUG
 static boolean doesParserUseKind (const parserDefinition *const parser, char letter)
 {
 	unsigned int k;
@@ -1099,6 +1100,7 @@ static boolean doesParserUseKind (const parserDefinition *const parser, char let
 			return TRUE;
 	return FALSE;
 }
+#endif
 
 static void initializeParser (langType lang)
 {
