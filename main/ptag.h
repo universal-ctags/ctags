@@ -42,6 +42,9 @@ struct ptagXcmdData {
 };
 
 extern boolean makePtagIfEnabled (ptagType type, void *data);
+extern ptagDesc* getPtagDesc (ptagType type);
+extern ptagType  getPtagTypeForName (const char *name);
+extern void printPtag (ptagType type);
 extern boolean isPtagEnabled (ptagType type);
 extern boolean enablePtag (ptagType type, boolean state);
 

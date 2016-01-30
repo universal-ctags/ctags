@@ -17,6 +17,8 @@
 #include "debug.h"
 #include "options.h"
 #include "ptag.h"
+#include <string.h>
+
 
 static void writePseudoTagForXcmdData (ptagDesc *desc,
 				       struct ptagXcmdData *pdata)
@@ -166,4 +168,32 @@ extern boolean enablePtag (ptagType type, boolean state)
 	oldstate = desc->enabled;
 	desc->enabled = state;
 	return oldstate;
+}
+
+extern ptagDesc* getPtagDesc (ptagType type)
+{
+	if (type == PTAG_UNKNOWN
+	    || type >= PTAG_COUNT)
+		return NULL;
+
+	return ptagDescs + type;
+}
+
+extern ptagType getPtagTypeForName (const char *name)
+{
+	int i;
+
+	Assert (name);
+	for (i = 0; i < PTAG_COUNT; i++)
+		if (strcmp (ptagDescs [i].name, name) == 0)
+			return i;
+	return PTAG_UNKNOWN;
+}
+
+extern void printPtag (ptagType type)
+{
+	printf("%s\t%s\t%s\n",
+	       ptagDescs[type].name,
+	       ptagDescs[type].description? ptagDescs[type].description: "NONE",
+	       ptagDescs[type].enabled? "on": "off");
 }
