@@ -246,6 +246,12 @@ static langType getNameOrAliasesLanguageAndSpec (const char *const key, langType
 		stringList* const aliases = lang->currentAliaes;
 		vString* tmp;
 
+		/* isLanguageEnabled is not used here.
+		   It calls initializeParser which takes
+		   cost. */
+		if (! lang->enabled)
+			continue;
+
 		if (lang->name != NULL && strcasecmp (key, lang->name) == 0)
 		{
 			result = i;
@@ -279,6 +285,12 @@ static langType getPatternLanguageAndSpec (const char *const baseName, langType 
 		stringList* const ptrns = LanguageTable [i]->currentPatterns;
 		vString* tmp;
 
+		/* isLanguageEnabled is not used here.
+		   It calls initializeParser which takes
+		   cost. */
+		if (! LanguageTable [i]->enabled)
+			continue;
+
 		if (ptrns != NULL && (tmp = stringListFileFinds (ptrns, baseName)))
 		{
 			result = i;
@@ -292,6 +304,12 @@ static langType getPatternLanguageAndSpec (const char *const baseName, langType 
 	{
 		stringList* const exts = LanguageTable [i]->currentExtensions;
 		vString* tmp;
+
+		/* isLanguageEnabled is not used here.
+		   It calls initializeParser which takes
+		   cost. */
+		if (! LanguageTable [i]->enabled)
+			continue;
 
 		if (exts != NULL && (tmp = stringListExtensionFinds (exts,
 								     fileExtension (baseName))))
@@ -2066,9 +2084,18 @@ extern boolean parseFile (const char *const fileName)
 	}
 
 	if (language == LANG_IGNORE)
-		verbose ("ignoring %s (unknown language)\n", fileName);
+		verbose ("ignoring %s (unknown language/language disabled)\n",
+			 fileName);
 	else if (! isLanguageEnabled (language))
+	{
+		/* This block is needed. In the parser choosing stage, each
+		   parser is not initialized for making ctags starting up faster.
+		   So the chooser can choose a XCMD based parser.
+		   However, at the stage the chooser cannot know whether
+		   the XCMD is available or not. This isLanguageEnabled
+		   invocation verify the availability. */
 		verbose ("ignoring %s (language disabled)\n", fileName);
+	}
 	else
 	{
 		initializeParser (language);
