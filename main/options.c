@@ -1531,7 +1531,9 @@ static void processListAliasesOption (
 static void processListExtrasOption (
 		const char *const option, const char *const parameter)
 {
-	printXtags ();
+	int i;
+	for (i = 0; i < XTAG_COUNT; i++)
+		printXtag (i);
 	exit (0);
 }
 
