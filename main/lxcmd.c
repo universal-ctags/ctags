@@ -68,6 +68,7 @@
 #include "pcoproc.h"
 
 #include "flags.h"
+#include "xtag.h"
 
 /*
 *   MACROS
@@ -1019,14 +1020,11 @@ static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 
 	if (hasPseudoTagPrefix (entry->name))
 	{
-		if  (isDestinationStdout())
+		if  ((! isXtagEnabled (XTAG_PSEUDO_TAGS))
+		     || (Option.xref)
+		     || (Option.etags))
 			return FALSE;
-		else if (Option.xref)
-			return FALSE;
-		else if (Option.etags)
-			return FALSE;
-		else
-			return makePseudoTagEntryFromTagEntry (entry);
+		return makePseudoTagEntryFromTagEntry (entry);
 	}
 
 	memset(&filePosition, 0, sizeof(filePosition));
