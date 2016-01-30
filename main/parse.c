@@ -1678,18 +1678,18 @@ extern boolean processAliasOption (
 	return TRUE;
 }
 
-static void printMaps (const langType language)
+static void printMaps (const langType language, langmapType type)
 {
 	const parserDefinition* lang;
 	unsigned int i;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
 	printf ("%-8s", lang->name);
-	if (lang->currentExtensions != NULL)
+	if (lang->currentExtensions != NULL && (type & LMAP_EXTENSION))
 		for (i = 0  ;  i < stringListCount (lang->currentExtensions)  ;  ++i)
 			printf (" *.%s", vStringValue (
 						stringListItem (lang->currentExtensions, i)));
-	if (lang->currentPatterns != NULL)
+	if (lang->currentPatterns != NULL && (type & LMAP_PATTERN))
 		for (i = 0  ;  i < stringListCount (lang->currentPatterns)  ;  ++i)
 			printf (" %s", vStringValue (
 						stringListItem (lang->currentPatterns, i)));
@@ -1709,16 +1709,16 @@ static void printAliases (const langType language, FILE *fp)
 					stringListItem (lang->currentAliaes, i)));
 }
 
-extern void printLanguageMaps (const langType language)
+extern void printLanguageMaps (const langType language, langmapType type)
 {
 	if (language == LANG_AUTO)
 	{
 		unsigned int i;
 		for (i = 0  ;  i < LanguageCount  ;  ++i)
-			printMaps (i);
+			printMaps (i, type);
 	}
 	else
-		printMaps (language);
+		printMaps (language, type);
 }
 
 extern void printLanguageAliases (const langType language)
