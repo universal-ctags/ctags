@@ -149,7 +149,8 @@ extern char* makePatternString (const tagEntryInfo *const tag);
 
 
 /* language is optional: can be NULL. */
-extern void writePseudoTag (const char *const tagName,
+struct sPtagDesc;
+extern void writePseudoTag (const struct sPtagDesc *pdesc,
 			    const char *const fileName,
 			    const char *const pattern,
 			    const char *const language);

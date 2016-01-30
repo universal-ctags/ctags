@@ -268,6 +268,9 @@
     <ClCompile Include="..\main\repoinfo.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\ptag.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\main\e_msoft.h">
@@ -349,6 +352,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
    <ClInclude Include="..\main\xtag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\main\ptag.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -61,6 +61,7 @@
 #include "main.h"
 #include "options.h"
 #include "parse.h"
+#include "ptag.h"
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
@@ -69,6 +70,7 @@
 
 #include "flags.h"
 #include "xtag.h"
+#include "ptag.h"
 
 /*
 *   MACROS
@@ -991,6 +993,7 @@ static boolean makePseudoTagEntryFromTagEntry (tagEntry* entry)
 {
 	const char *tagName, *fileName, *pattern;
 	const size_t prefixLength = strlen (PseudoTagPrefix);
+	ptagType t = PTAG_UNKNOWN;
 
 	tagName = entry->name + prefixLength;
 	fileName = entry->file;
@@ -1000,17 +1003,28 @@ static boolean makePseudoTagEntryFromTagEntry (tagEntry* entry)
 		return FALSE;
 	else if (strcmp (tagName, "TAG_FILE_FORMAT") == 0)
 		return FALSE;	/* ??? */
-	else if ((strcmp (tagName, "TAG_PROGRAM_AUTHOR") == 0)
-		 || (strcmp (tagName, "TAG_PROGRAM_NAME") == 0)
-		 || (strcmp (tagName, "TAG_PROGRAM_URL") == 0)
-		 || (strcmp (tagName, "TAG_PROGRAM_VERSION") == 0))
-	{
-		writePseudoTag (tagName, fileName, pattern,
-				entryLookupField(entry, "language", FALSE));
-		return TRUE;
-	}
+	else if (strcmp (tagName, "TAG_PROGRAM_AUTHOR") == 0)
+		t = PTAG_PROGRAM_AUTHOR;
+	else if (strcmp (tagName, "TAG_PROGRAM_NAME") == 0)
+		t = PTAG_PROGRAM_NAME;
+	else if (strcmp (tagName, "TAG_PROGRAM_URL") == 0)
+		t = PTAG_PROGRAM_URL;
+	else if (strcmp (tagName, "TAG_PROGRAM_VERSION") == 0)
+		t = PTAG_PROGRAM_VERSION;
 
-	return FALSE;
+	if (t == PTAG_UNKNOWN)
+		return FALSE;
+	else
+	{
+		struct ptagXcmdData data = {
+			.fileName = fileName,
+			.pattern  = pattern,
+			.language = entryLookupField(entry,
+						     "language",
+						     FALSE),
+		};
+		return makePtagIfEnabled (t, &data);
+	}
 }
 
 static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)

@@ -148,6 +148,7 @@
     <ClCompile Include="..\parsers\perl.c" />
     <ClCompile Include="..\parsers\perl6.c" />
     <ClCompile Include="..\parsers\php.c" />
+    <ClCompile Include="..\main\ptag.c" />
     <ClCompile Include="..\parsers\python.c" />
     <ClCompile Include="..\main\read.c" />
     <ClCompile Include="..\gnu_regex\regex.c">
@@ -199,6 +200,7 @@
     <ClInclude Include="..\main\options.h" />
     <ClInclude Include="..\main\parse.h" />
     <ClInclude Include="..\main\parsers.h" />
+    <ClInclude Include="..\main\ptag.h" />
     <ClInclude Include="..\main\read.h" />
     <ClInclude Include="..\main\routines.h" />
     <ClInclude Include="..\main\selectors.h" />
