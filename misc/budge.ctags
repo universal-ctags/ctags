@@ -1,6 +1,3 @@
 #
 # In the future these should be preload'ed
 #
---options=ctags
---options=m4
---options=gdbinit
