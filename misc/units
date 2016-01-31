@@ -714,6 +714,7 @@ run_summary ()
     for t in $L_FAILED_BY_DIFF; do
 	echo "	${t#${_DEFAULT_CATEGORY}/}"
 	if [ "${SHOW_DIFF_OUTPUT}" = yes ]; then
+	    run_show_stderr_output "${build_dir}" "${t#${_DEFAULT_CATEGORY}/}"
 	    run_show_diff_output "${build_dir}" "${t#${_DEFAULT_CATEGORY}/}"
 	fi
     done
