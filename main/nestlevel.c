@@ -57,6 +57,19 @@ extern NestingLevel * nestingLevelsPush(NestingLevels *nls,
 	return nl;
 }
 
+extern NestingLevel *nestingLevelsTruncate(NestingLevels *nls, int depth,
+					   const vString *name, int kindIndex)
+{
+	NestingLevel *nl;
+
+	nls->n = depth;
+	nl = nestingLevelsGetCurrent(nls);
+	vStringCopy(nl->name, name);
+	nl->kindIndex = kindIndex;
+	return nl;
+}
+
+
 extern void nestingLevelsPop(NestingLevels *nls)
 {
 	const NestingLevel *nl = nestingLevelsGetCurrent(nls);

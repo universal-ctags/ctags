@@ -810,6 +810,7 @@ static void addNestingLevel(NestingLevels *nls, int indentation,
 {
 	int i;
 	NestingLevel *nl = NULL;
+	int kindIndex = is_class ? K_CLASS : K_FUNCTION;
 
 	for (i = 0; i < nls->n; i++)
 	{
@@ -817,17 +818,12 @@ static void addNestingLevel(NestingLevels *nls, int indentation,
 		if (indentation <= nl->indentation) break;
 	}
 	if (i == nls->n)
-	{
-		nestingLevelsPush(nls, name, K_UNDEFINED);
-		nl = nls->levels + i;
-	}
+		nl = nestingLevelsPush(nls, name, kindIndex);
 	else
-	{	/* reuse existing slot */
-		nls->n = i + 1;
-		vStringCopy(nl->name, name);
-	}
+		/* reuse existing slot */
+		nl = nestingLevelsTruncate (nls, i + 1, name, kindIndex);
+
 	nl->indentation = indentation;
-	nl->kindIndex = is_class ? K_CLASS : K_FUNCTION;
 }
 
 /* Return a pointer to the start of the next triple string, or NULL. Store
