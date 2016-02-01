@@ -38,7 +38,7 @@ extern void nestingLevelsFree(NestingLevels *nls)
 }
 
 extern void nestingLevelsPush(NestingLevels *nls,
-	const vString *name, int type)
+	const vString *name, int kindIndex)
 {
 	NestingLevel *nl = NULL;
 
@@ -53,7 +53,7 @@ extern void nestingLevelsPush(NestingLevels *nls,
 	nls->n++;
 
 	vStringCopy(nl->name, name);
-	nl->type = type;
+	nl->kindIndex = kindIndex;
 }
 
 extern void nestingLevelsPop(NestingLevels *nls)

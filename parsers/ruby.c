@@ -195,7 +195,7 @@ static void emitRubyTag (vString* name, rubyKind kind)
 	scope = nestingLevelsToScope (nesting);
 	lvl = nestingLevelsGetCurrent (nesting);
 	if (lvl)
-		parent_kind = lvl->type;
+		parent_kind = lvl->kindIndex;
 
 	qualified_name = vStringValue (name);
 	unqualified_name = strrchr (qualified_name, SCOPE_SEPARATOR);
@@ -373,7 +373,7 @@ static void enterUnnamedScope (void)
 {
 	vString *name = vStringNewInit ("");
 	NestingLevel *parent = nestingLevelsGetCurrent (nesting);
-	nestingLevelsPush (nesting, name, parent ? parent->type : K_UNDEFINED);
+	nestingLevelsPush (nesting, name, parent ? parent->kindIndex : K_UNDEFINED);
 	vStringDelete (name);
 }
 
@@ -467,7 +467,7 @@ static void findRubyTags (void)
 			 *   end
 			 * end
 			 */
-			if (nl && nl->type == K_CLASS && vStringLength (nl->name) == 0)
+			if (nl && nl->kindIndex == K_CLASS && vStringLength (nl->name) == 0)
 				kind = K_SINGLETON;
 
 			readAndEmitTag (&cp, kind);

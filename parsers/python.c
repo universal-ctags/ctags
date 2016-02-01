@@ -773,14 +773,14 @@ static boolean constructParentString(NestingLevels *nls, int indent,
 		{
 			vStringCatS(result, ".");	/* make Geany symbol list grouping work properly */
 /*
-			if (prev->type == K_CLASS)
+			if (prev->kindIndex == K_CLASS)
 				vStringCatS(result, ".");
 			else
 				vStringCatS(result, "/");
 */
 		}
 		vStringCat(result, nl->name);
-		is_class = (nl->type == K_CLASS);
+		is_class = (nl->kindIndex == K_CLASS);
 		prev = nl;
 	}
 	return is_class;
@@ -826,7 +826,7 @@ static void addNestingLevel(NestingLevels *nls, int indentation,
 		vStringCopy(nl->name, name);
 	}
 	nl->indentation = indentation;
-	nl->type = is_class ? K_CLASS : K_FUNCTION;
+	nl->kindIndex = is_class ? K_CLASS : K_FUNCTION;
 }
 
 /* Return a pointer to the start of the next triple string, or NULL. Store
