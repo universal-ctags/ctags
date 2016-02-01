@@ -30,6 +30,7 @@
 */
 
 typedef enum {
+	K_UNDEFINED = -1,
 	K_CLASS, K_FUNCTION, K_MEMBER, K_VARIABLE, K_NAMESPACE, K_MODULE, K_UNKNOWN,
 } pythonKind;
 
@@ -817,7 +818,7 @@ static void addNestingLevel(NestingLevels *nls, int indentation,
 	}
 	if (i == nls->n)
 	{
-		nestingLevelsPush(nls, name, 0);
+		nestingLevelsPush(nls, name, K_UNDEFINED);
 		nl = nls->levels + i;
 	}
 	else
