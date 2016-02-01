@@ -769,13 +769,27 @@ pickLanguageBySelection (selectLanguage selector, FILE *input)
     }
 }
 
+static int compareParsersByName (const void *a, const void* b)
+{
+	parserDefinition *const *la = a, *const *lb = b;
+	return strcasecmp ((*la)->name, (*lb)->name);
+}
+
 static int sortParserCandidatesBySpecType (const void *a, const void *b)
 {
 	const parserCandidate *ap = a, *bp = b;
 	if (ap->specType > bp->specType)
 		return -1;
 	else if (ap->specType == bp->specType)
-		return 0;
+	{
+		/* qsort, the function calling this function,
+		   doesn't do "stable sort". To make the result of
+		   sorting predictable, compare the names of parsers
+		   when their specType is the same. */
+		parserDefinition *la = LanguageTable [ap->lang];
+		parserDefinition *lb = LanguageTable [bp->lang];
+		return compareParsersByName (&la, &lb);
+	}
 	else
 		return 1;
 }
@@ -1755,12 +1769,6 @@ static void printLanguage (const langType language, parserDefinition** ltable)
 
 	if (lang->kinds != NULL  ||  (lang->method & METHOD_REGEX) || (lang->method & METHOD_XCMD))
 		printf ("%s%s\n", lang->name, isLanguageEnabled (lang->id) ? "" : " [disabled]");
-}
-
-static int compareParsersByName (const void *a, const void* b)
-{
-	parserDefinition *const *la = a, *const *lb = b;
-	return strcasecmp ((*la)->name, (*lb)->name);
 }
 
 extern void printLanguageList (void)
