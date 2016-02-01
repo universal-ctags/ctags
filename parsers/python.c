@@ -826,7 +826,7 @@ static void addNestingLevel(NestingLevels *nls, int indentation,
 		vStringCopy(nl->name, name);
 	}
 	nl->indentation = indentation;
-	nl->type = is_class ? K_CLASS : !K_CLASS;
+	nl->type = is_class ? K_CLASS : K_FUNCTION;
 }
 
 /* Return a pointer to the start of the next triple string, or NULL. Store
