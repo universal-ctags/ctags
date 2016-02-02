@@ -124,6 +124,10 @@ static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
 	}
 }
 
+static void suppressWarning (void *ctx, const char *msg, ...)
+{
+}
+
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 			 const tagXpathTableTable *xpathTableTable,
 			 const kindOption* const kinds,void *userData)
@@ -136,6 +140,8 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 		usedAsEnterPoint = TRUE;
 
 		findRegexTags ();
+
+		xmlSetGenericErrorFunc (NULL, suppressWarning);
 		doc = xmlParseFile(getInputFileName());
 		if (doc == NULL)
 		{

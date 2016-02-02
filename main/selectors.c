@@ -200,6 +200,9 @@ selectByObjectiveCKeywords (FILE * input)
 #include <libxml/xpath.h>
 #include <libxml/tree.h>
 
+static void suppressWarning (void *ctx, const char *msg, ...)
+{
+}
 
 static xmlDocPtr
 xmlParseFILE (FILE *input)
@@ -211,6 +214,7 @@ xmlParseFILE (FILE *input)
 	if (!buf)
 		return NULL;
 
+	xmlSetGenericErrorFunc (NULL, suppressWarning);
 	doc = xmlParseMemory(vStringValue(buf), vStringLength (buf));
 
 	vStringDelete (buf);
