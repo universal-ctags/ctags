@@ -15,6 +15,7 @@
 
 #include "debug.h"
 #include "parse.h"
+#include "options.h"
 #include "selectors.h"
 #include "vstring.h"
 
@@ -225,6 +226,15 @@ xmlParseFILE (FILE *input)
 static const char *
 selectParserForXmlDoc (xmlDocPtr doc)
 {
+	if (doc && doc->children && doc->children->name)
+		verbose ("		Xml[root name]: %s\n", doc->children->name);
+	if (doc && doc->intSubset && doc->intSubset->ExternalID)
+		verbose ("		Xml[ExternalID]: %s\n", doc->intSubset->ExternalID);
+	if (doc && doc->intSubset && doc->intSubset->SystemID)
+		verbose ("		Xml[SystemID]: %s\n", doc->intSubset->SystemID);
+	if (doc && doc->children && doc->children->ns && doc->children->ns->href)
+		verbose ("		Xml[NS]: %s\n", doc->children->ns->href);
+
 	/* These conditions should be part of parsers. */
 	if (doc->children
 	    && doc->intSubset
