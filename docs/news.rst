@@ -31,6 +31,7 @@ The following parsers have been added:
 * Glade *libxml*
 * Go
 * JSON
+* Maven2 *libxml*
 * ObjectiveC
 * Perl6
 * R
