@@ -141,12 +141,15 @@ How to run unit tests
 	 $ make units
 
 The result of unit tests is reported by lines. You can specify
-test cases with ``UNITS=``. Consider you want to run a test under
-*vim-command.d* only. You can do it with following command line::
+test cases with ``UNITS=``.
+
+An example to run *vim-command.d* only::
 
 	$ make units UNITS=vim-command
 
-You can list more than two test cases with comma separator to UNITS.
+Another example to run *vim-command.d* and *parser-python.r/bug1856363.py.d*::
+
+	$ make units UNITS=vim-command,bug1856363.py
 
 During testing *OUTPUT.tmp*, *EXPECTED.tmp* and *DIFF.tmp* files are
 generated for each test case directory. These are removed when the
