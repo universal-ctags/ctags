@@ -37,13 +37,13 @@
 #endif
 
 #include "debug.h"
-#include "ctags.h"
 #include "entry.h"
 #include "field.h"
 #include "fmt.h"
 #include "kind.h"
 #include "main.h"
 #include "options.h"
+#include "ptag.h"
 #include "read.h"
 #include "routines.h"
 #include "sort.h"
@@ -143,58 +143,36 @@ static void rememberMaxLengths (const size_t nameLength, const size_t lineLength
 		TagFile.max.line = lineLength;
 }
 
-extern void writePseudoTag (
-		const char *const tagName,
-		const char *const fileName,
-		const char *const pattern,
-		const char *const language)
+extern void writePseudoTag (const struct sPtagDesc *desc,
+			    const char *const fileName,
+			    const char *const pattern,
+			    const char *const language)
 {
 	const int length = language
+
+#define OPT(X) ((X)?(X):"")
 	  ? fprintf (TagFile.fp, "%s%s%s%s\t%s\t%s\n",
-		     PSEUDO_TAG_PREFIX, tagName,
-		     PSEUDO_TAG_SEPARATOR, language, fileName, pattern)
+		     PSEUDO_TAG_PREFIX, desc->name, PSEUDO_TAG_SEPARATOR, language,
+		     OPT(fileName), OPT(pattern))
 	  : fprintf (TagFile.fp, "%s%s\t%s\t/%s/\n",
-		     PSEUDO_TAG_PREFIX, tagName, fileName, pattern);
+		     PSEUDO_TAG_PREFIX, desc->name,
+		     OPT(fileName), OPT(pattern));
+#undef OPT
 
 	abort_if_ferror (TagFile.fp);
 
 	++TagFile.numTags.added;
-	rememberMaxLengths (strlen (tagName), (size_t) length);
+	rememberMaxLengths (strlen (desc->name), (size_t) length);
 }
 
 static void addPseudoTags (void)
 {
-	if (! Option.xref)
-	{
-		char format [11];
-		const char *formatComment = "unknown format";
-		const char* repoinfo;
+	int i;
+	if (Option.xref)
+		return;
 
-		sprintf (format, "%u", Option.tagFileFormat);
-
-		if (Option.tagFileFormat == 1)
-			formatComment = "original ctags format";
-		else if (Option.tagFileFormat == 2)
-			formatComment =
-				"extended format; --format=1 will not append ;\" to lines";
-
-		writePseudoTag ("TAG_FILE_FORMAT", format, formatComment, NULL);
-		writePseudoTag ("TAG_FILE_SORTED",
-			Option.sorted == SO_FOLDSORTED ? "2" :
-			(Option.sorted == SO_SORTED ? "1" : "0"),
-			"0=unsorted, 1=sorted, 2=foldcase",
-			NULL);
-		writePseudoTag ("TAG_PROGRAM_AUTHOR",  AUTHOR_NAME,  "", NULL);
-		writePseudoTag ("TAG_PROGRAM_NAME",    PROGRAM_NAME, "Derived from Exuberant Ctags", NULL);
-		writePseudoTag ("TAG_PROGRAM_URL",     PROGRAM_URL,  "official site", NULL);
-		repoinfo = ctags_repoinfo? ctags_repoinfo: "";
-		writePseudoTag ("TAG_PROGRAM_VERSION", PROGRAM_VERSION, repoinfo, NULL);
-
-#ifdef HAVE_ICONV
-		if (Option.outputEncoding)
-			writePseudoTag ("TAG_FILE_ENCODING", Option.outputEncoding, "", NULL);
-#endif
-	}
+	for (i = 0; i < PTAG_COUNT; i++)
+		makePtagIfEnabled (i, NULL);
 }
 
 static void updateSortedFlag (

@@ -1,0 +1,2 @@
+#!/bin/sh
+grep -v '!_TAG_PROGRAM_VERSION'

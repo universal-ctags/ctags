@@ -188,7 +188,8 @@ Following extra tag entries are newly introduced.
 
 ``--list-...`` options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-``--list-extras``, ``--list-features`` and ``--list-fields`` are added.
+``--list-extras``, ``--list-features``, ``--list-fields``, and
+``--list-pseudo-tags`` are added.
 
 ``--put-field-prefix`` options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

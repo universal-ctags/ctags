@@ -29,6 +29,7 @@
 #define OPTION_WRITE
 #include "options.h"
 #include "parse.h"
+#include "ptag.h"
 #include "routines.h"
 #include "xtag.h"
 
@@ -308,6 +309,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of supported languages."},
  {1,"  --list-maps=[language|all]"},
  {1,"       Output list of language mappings."},
+ {0,"  --list-pseudo-tags"},
+ {0,"       Output list of pseudo tags."},
  {1,"  --list-regex-flags"},
  {1,"       Output list of flags which can be used in a regex parser definition."},
  {1,"  --map-<LANG>=[+]map"},
@@ -1531,7 +1534,9 @@ static void processListAliasesOption (
 static void processListExtrasOption (
 		const char *const option, const char *const parameter)
 {
-	printXtags ();
+	int i;
+	for (i = 0; i < XTAG_COUNT; i++)
+		printXtag (i);
 	exit (0);
 }
 
@@ -1591,6 +1596,16 @@ static void processListLanguagesOption (
 		const char *const parameter __unused__)
 {
 	printLanguageList ();
+	exit (0);
+}
+
+static void processListPseudoTagsOptions (
+		const char *const option __unused__,
+		const char *const parameter __unused__)
+{
+	int i;
+	for (i = 0; i < PTAG_COUNT; i++)
+		printPtag (i);
 	exit (0);
 }
 
@@ -2134,6 +2149,7 @@ static parametricOption ParametricOptions [] = {
 	{ "_list-kinds-full",       processListKindsOption,         TRUE,   STAGE_ANY },
 	{ "list-languages",         processListLanguagesOption,     TRUE,   STAGE_ANY },
 	{ "list-maps",              processListMapsOption,          TRUE,   STAGE_ANY },
+	{ "list-pseudo-tags",       processListPseudoTagsOptions,   TRUE,   STAGE_ANY },
 	{ "list-regex-flags",       processListRegexFlagsOptions,   TRUE,   STAGE_ANY },
 	{ "_list-roles",            processListRolesOptions,        TRUE,   STAGE_ANY },
 	{ "maxdepth",               processMaxRecursionDepthOption, TRUE,   STAGE_ANY },
