@@ -15,6 +15,7 @@
 
 #include "debug.h"
 #include "parse.h"
+#include "options.h"
 #include "selectors.h"
 #include "vstring.h"
 
@@ -200,6 +201,9 @@ selectByObjectiveCKeywords (FILE * input)
 #include <libxml/xpath.h>
 #include <libxml/tree.h>
 
+static void suppressWarning (void *ctx, const char *msg, ...)
+{
+}
 
 static xmlDocPtr
 xmlParseFILE (FILE *input)
@@ -211,6 +215,7 @@ xmlParseFILE (FILE *input)
 	if (!buf)
 		return NULL;
 
+	xmlSetGenericErrorFunc (NULL, suppressWarning);
 	doc = xmlParseMemory(vStringValue(buf), vStringLength (buf));
 
 	vStringDelete (buf);
@@ -221,6 +226,15 @@ xmlParseFILE (FILE *input)
 static const char *
 selectParserForXmlDoc (xmlDocPtr doc)
 {
+	if (doc && doc->children && doc->children->name)
+		verbose ("		Xml[root name]: %s\n", doc->children->name);
+	if (doc && doc->intSubset && doc->intSubset->ExternalID)
+		verbose ("		Xml[ExternalID]: %s\n", doc->intSubset->ExternalID);
+	if (doc && doc->intSubset && doc->intSubset->SystemID)
+		verbose ("		Xml[SystemID]: %s\n", doc->intSubset->SystemID);
+	if (doc && doc->children && doc->children->ns && doc->children->ns->href)
+		verbose ("		Xml[NS]: %s\n", doc->children->ns->href);
+
 	/* These conditions should be part of parsers. */
 	if (doc->children
 	    && doc->intSubset
