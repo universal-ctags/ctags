@@ -1252,6 +1252,44 @@ out:
 	return r;
 }
 
+extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
+{
+	int r = SCOPE_NIL;
+	tagEntryInfo x;
+	char xk;
+	const char *sep;
+	static vString *fqn;
+
+	if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
+	{
+		x = *e;
+
+		if (fqn == NULL)
+			fqn = vStringNew ();
+		else
+			vStringClear (fqn);
+
+		if (e->extensionFields.scopeName)
+		{
+			vStringCatS (fqn, e->extensionFields.scopeName);
+			xk = e->extensionFields.scopeKind->letter;
+			sep = scopeSeparatorFor (e->kind, xk);
+			vStringCatS (fqn, sep);
+		}
+		vStringCatS (fqn, e->name);
+
+		x.name = vStringValue (fqn);
+		/* makeExtraTagEntry of c.c doesn't clear scope
+		   releated fields. */
+#if 0
+		x.extensionFields.scopeKind = NULL;
+		x.extensionFields.scopeName = NULL;
+#endif
+		r = makeTagEntry (&x);
+	}
+	return r;
+}
+
 extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 			  const kindOption *kind)
 {
