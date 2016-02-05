@@ -165,7 +165,7 @@ extern void writePseudoTag (const struct sPtagDesc *desc,
 	rememberMaxLengths (strlen (desc->name), (size_t) length);
 }
 
-static void addPseudoTags (void)
+static void addCommonPseudoTags (void)
 {
 	int i;
 	if (Option.xref)
@@ -399,7 +399,7 @@ extern void openTagFile (void)
 		 * write the result to stdout. */
 		TagFile.fp = tempFile ("w+", &TagFile.name);
 		if (isXtagEnabled (XTAG_PSEUDO_TAGS))
-			addPseudoTags ();
+			addCommonPseudoTags ();
 	}
 	else
 	{
@@ -435,7 +435,7 @@ extern void openTagFile (void)
 			{
 				TagFile.fp = fopen (TagFile.name, "w");
 				if (TagFile.fp != NULL && isXtagEnabled (XTAG_PSEUDO_TAGS))
-					addPseudoTags ();
+					addCommonPseudoTags ();
 			}
 		}
 		if (TagFile.fp == NULL)
