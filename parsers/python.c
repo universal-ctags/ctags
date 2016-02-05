@@ -182,6 +182,8 @@ static void addAccessFields (tagEntryInfo *const entry,
 static void makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
 				 vString *const parent, int is_class_parent, const char *arglist)
 {
+	char scope_kind_letter = KIND_NULL;
+
 	if (is_class_parent)
 	{
 		if (!PythonKinds[K_MEMBER].enabled)
@@ -202,6 +204,7 @@ static void makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
 			tag->kind = &(PythonKinds[K_MEMBER]);
 			tag->extensionFields.scopeKind = &(PythonKinds[K_CLASS]);
 			tag->extensionFields.scopeName = vStringValue (parent);
+			scope_kind_letter = PythonKinds[K_CLASS].letter;
 		}
 		else
 		{
@@ -214,6 +217,10 @@ static void makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
 		vStringLength (parent) > 0, is_class_parent);
 
 	makeTagEntry (tag);
+
+	if ((scope_kind_letter != KIND_NULL)
+	    && tag->extensionFields.scopeName)
+		makeQualifiedTagEntry (tag);
 }
 
 static void makeFunctionTag (vString *const function,
