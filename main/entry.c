@@ -175,6 +175,41 @@ static void addCommonPseudoTags (void)
 		makePtagIfEnabled (i, NULL);
 }
 
+extern void makeFileTag (const char *const fileName)
+{
+	boolean via_line_directive = (strcmp (fileName, getInputFileName()) != 0);
+	if (isXtagEnabled(XTAG_FILE_NAMES)
+	    || isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES))
+	{
+		tagEntryInfo tag;
+		kindOption  *kind;
+
+		kind = getInputLanguageFileKind();
+		Assert (kind);
+		kind->enabled = isXtagEnabled(XTAG_FILE_NAMES);
+
+		/* TODO: you can return here if enabled == FALSE. */
+
+		initTagEntry (&tag, baseFilename (fileName), kind);
+
+		tag.isFileEntry     = TRUE;
+		tag.lineNumberEntry = TRUE;
+
+		if (via_line_directive || (!isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES)))
+		{
+			tag.lineNumber = 1;
+		}
+		else
+		{
+			while (readLineFromInputFile () != NULL)
+				;		/* Do nothing */
+			tag.lineNumber = getInputLineNumber ();
+		}
+
+		makeTagEntry (&tag);
+	}
+}
+
 static void updateSortedFlag (
 		const char *const line, FILE *const fp, fpos_t startOfLine)
 {

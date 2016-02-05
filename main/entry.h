@@ -160,6 +160,7 @@ void          uncorkTagFile(void);
 tagEntryInfo *getEntryInCorkQueue   (unsigned int n);
 size_t        countEntryInCorkQueue (void);
 
+extern void makeFileTag (const char *const fileName);
 
 #endif  /* CTAGS_MAIN_ENTRY_H */
 

@@ -180,7 +180,6 @@ extern parserDefinitionFunc XML_PARSER_LIST;
 extern int makeSimpleTag (const vString* const name, kindOption* const kinds, const int kind);
 extern int makeSimpleRefTag (const vString* const name, kindOption* const kinds, const int kind,
 			     int roleIndex);
-extern void makeFileTag (const char *const fileName);
 extern parserDefinition* parserNew (const char* name);
 extern parserDefinition* parserNewFull (const char* name, char fileKind);
 extern boolean doesLanguageAllowNullTag (const langType language);
