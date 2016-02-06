@@ -18,6 +18,10 @@
 
 #include "readtags.h"
 
+#ifdef QUALIFIER
+#include "dsl/qualifier.h"
+#endif
+
 /*
 *   MACROS
 */
@@ -813,6 +817,10 @@ static int extensionFields;
 static int SortOverride;
 static sortType SortMethod;
 static int allowPrintLineNumber;
+#ifdef QUALIFIER
+#include "dsl/qualifier.h"
+static QCode *Qualifier;
+#endif
 
 static void printTag (const tagEntry *entry)
 {
@@ -871,6 +879,19 @@ static void findTag (const char *const name, const int options)
 		{
 			do
 			{
+#ifdef QUALIFIER
+				if (Qualifier)
+				{
+					int i = q_is_acceptable (Qualifier, &entry);
+					switch (i)
+					{
+					case Q_REJECT:
+						continue;
+					case Q_ERROR:
+						exit (1);
+					}
+				}
+#endif
 				printTag (&entry);
 			} while (tagsFindNext (file, &entry) == TagSuccess);
 		}
@@ -892,7 +913,22 @@ static void listTags (void)
 	else
 	{
 		while (tagsNext (file, &entry) == TagSuccess)
+		{
+#ifdef QUALIFIER
+			if (Qualifier)
+			{
+				int i = q_is_acceptable (Qualifier, &entry);
+				switch (i)
+				{
+				case Q_REJECT:
+					continue;
+				case Q_ERROR:
+					exit (1);
+				}
+			}
+#endif
 			printTag (&entry);
+		}
 		tagsClose (file);
 	}
 }
@@ -901,14 +937,21 @@ static const char *const Usage =
 	"Find tag file entries matching specified names.\n\n"
 	"Usage: \n"
 	"    %s -h\n"
-	"    %s [-ilpn] [-s[0|1]] [-t file] [-] [name(s)]\n\n"
+	"    %s [-ilp] [-n] "
+#ifdef QUALIFIER
+	"[-Q EXP] "
+#endif
+	"[-s[0|1]] [-t file] [-] [name(s)]\n\n"
 	"Options:\n"
 	"    -e           Include extension fields in output.\n"
 	"    -h           Print this help message.\n"
 	"    -i           Perform case-insensitive matching.\n"
 	"    -l           List all tags.\n"
-	"    -n           Allow print line numbers.\n"
+	"    -n           Allow print line numbers if -e option is given.\n"
 	"    -p           Perform partial matching.\n"
+#ifdef QUALIFIER
+	"    -Q EXP      Fileter the result with EXP.\n"
+#endif
 	"    -s[0|1|2]    Override sort detection of tag file.\n"
 	"    -t file      Use specified tag file (default: \"tags\").\n"
 	"    -            Treat arguments after this as NAME even if they start with -.\n"
@@ -917,9 +960,39 @@ static const char *const Usage =
 static void printUsage(FILE* stream, int exitCode)
 {
 	fprintf (stream, Usage, ProgramName, ProgramName);
+#ifdef QUALIFIER
+	fprintf (stream, "\nFilter expression: \n");
+	q_help (stream);
+#endif
 	exit (exitCode);
 }
 
+#ifdef QUALIFIER
+static QCode *convertToQualifier(const char* exp)
+{
+	EsObject *sexp = es_read_from_string (exp, NULL);
+	QCode *qcode;
+
+	if (es_error_p (sexp))
+	{
+		fprintf (stderr,
+			 "Failed to read the expression of qualifier: %s\n", exp);
+		fprintf (stderr,
+			 "Reason: %s\n", es_error_name (sexp));
+		exit (1);
+	}
+
+	qcode = q_compile (sexp);
+	if (qcode == NULL)
+	{
+		fprintf (stderr,
+			 "Failed to compile the expression of qualifier: %s\n", exp);
+		exit (1);
+	}
+	es_object_unref (sexp);
+	return qcode;
+}
+#endif
 extern int main (int argc, char **argv)
 {
 	int options = 0;
@@ -974,6 +1047,13 @@ extern int main (int argc, char **argv)
 						else
 							printUsage(stderr, 1);
 						break;
+#ifdef QUALIFIER
+					case 'Q':
+						if (i + 1 == argc)
+							printUsage(stderr, 1);
+						Qualifier = convertToQualifier (argv[++i]);
+						break;
+#endif
 					default:
 						fprintf (stderr, "%s: unknown option: %c\n",
 									ProgramName, arg[j]);

@@ -154,6 +154,12 @@ FNMATCH_HEADS = fnmatch/fnmatch.h
 FNMATCH_SRCS = fnmatch/fnmatch.c
 FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.$(OBJEXT))
 
+QUALIFIER_HEAD = dsl/es-lang-c-stdc99.h \
+		 dsl/qualifier.h
+QUALIFIER_SRCS = dsl/es-lang-c-stdc99.c \
+		 dsl/qualifier.c
+QUALIFIER_OBJS = $(QUALIFIER_SRCS:.c=.$(OBJEXT))
+
 ALL_OBJS = \
 	$(ALL_SRCS:.c=.$(OBJEXT)) \
 	$(LIBOBJS)

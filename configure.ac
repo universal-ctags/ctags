@@ -80,7 +80,8 @@ AH_TEMPLATE([NON_CONST_PUTENV_PROTOTYPE],
 	doesn't declare its argument as "const char *".])
 AH_TEMPLATE([MSDOS_STYLE_PATH],
 	[Define to 1 if your system uses MS-DOS style path.])
-
+AH_TEMPLATE([HAVE_FMEMOPEN],
+	[Define this value if your system has fmemopen.])
 
 
 # Report system info
@@ -591,6 +592,9 @@ PKG_CHECK_MODULES(LIBXML, libxml-2.0,
 		       AC_DEFINE(HAVE_LIBXML)],
 		       [have_libxml=no])
 AM_CONDITIONAL(HAVE_LIBXML, test "x$have_libxml" = xyes)
+
+AC_CHECK_FUNCS(fmemopen,[have_fmemopen=yes],[have_fmemopen=no])
+AM_CONDITIONAL(HAVE_FMEMOPEN, test "x$have_fmemopen" = xyes)
 
 
 # Checks for missing prototypes
