@@ -299,6 +299,16 @@ static const char *skipString (const char *cp)
 	return cp;
 }
 
+static char const *find_triple_start0(char const *string)
+{
+	if (strncmp(string, doubletriple, 3) == 0)
+		return doubletriple;
+	else if (strncmp(string, singletriple, 3) == 0)
+		return singletriple;
+	else
+		return NULL;
+}
+
 static const char *skipUntil (const char *cp,
 			      boolean (* isAcceptable) (int, void*),
 			      void *user_data)
@@ -853,16 +863,9 @@ static char const *find_triple_start(char const *string, char const **which)
 			break;
 		if (*cp == '"' || *cp == '\'')
 		{
-			if (strncmp(cp, doubletriple, 3) == 0)
-			{
-				*which = doubletriple;
+			*which = find_triple_start0 (cp);
+			if (*which)
 				return cp;
-			}
-			if (strncmp(cp, singletriple, 3) == 0)
-			{
-				*which = singletriple;
-				return cp;
-			}
 			cp = skipString(cp);
 			if (!*cp) break;
 			cp--; /* avoid jumping over the character after a skipped string */
