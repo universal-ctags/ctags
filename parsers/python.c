@@ -1114,8 +1114,10 @@ static void findPythonTags (void)
 			}
 
 			if (variableLineContinuation)
+			{
 				skipParens (variableLineContinuation);
-			continue;
+				continue;
+			}
 		}
 
 		/* Deal with multiline string start. */
