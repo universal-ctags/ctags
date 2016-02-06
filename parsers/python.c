@@ -877,21 +877,38 @@ static char const *find_triple_start(char const *string, char const **which)
 /* Find the end of a triple string as pointed to by "which", and update "which"
  * with any other triple strings following in the given string.
  */
-static void find_triple_end(char const *string, char const **which)
+static char const *find_triple_end(char const *string, char const **which,
+				   boolean dontRepeat)
 {
 	char const *s = string;
 	while (1)
 	{
+		char const *last;
+
 		/* Check if the string ends in the same line. */
+		last = s;
 		s = strstr (s, *which);
-		if (!s) break;
+		if (!s)
+		{
+			s = last;
+			break;
+		}
 		s += 3;
 		*which = NULL;
+
+		if (dontRepeat)
+			break;
 		/* If yes, check if another one starts in the same line. */
+		last = s;
 		s = find_triple_start(s, which);
-		if (!s) break;
+		if (!s)
+		{
+			s = last;
+			break;
+		}
 		s += 3;
 	}
+	return s;
 }
 
 static const char *findVariable(const char *line, const char** lineContinuation)
@@ -1079,7 +1096,7 @@ static void findPythonTags (void)
 		/* Deal with multiline string ending. */
 		if (longStringLiteral)
 		{
-			find_triple_end(cp, &longStringLiteral);
+			find_triple_end(cp, &longStringLiteral, FALSE);
 			continue;
 		}
 
@@ -1128,7 +1145,7 @@ static void findPythonTags (void)
 		if (longstring)
 		{
 			longstring += 3;
-			find_triple_end(longstring, &longStringLiteral);
+			find_triple_end(longstring, &longStringLiteral, FALSE);
 			/* We don't parse for any tags in the rest of the line. */
 			continue;
 		}
