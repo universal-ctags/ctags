@@ -310,6 +310,7 @@ static char const *find_triple_start0(char const *string)
 }
 
 static const char *skipUntil (const char *cp,
+			      const char **longStringLiteral,
 			      boolean (* isAcceptable) (int, void*),
 			      void *user_data)
 {
@@ -321,7 +322,15 @@ static const char *skipUntil (const char *cp,
 
 		match = 0;
 		if (*cp == '"' || *cp == '\'')
+		{
+			if (longStringLiteral)
+			{
+				*longStringLiteral = find_triple_start0 (cp);
+				if (*longStringLiteral)
+					return strchr(cp, '\0');
+			}
 			match = 1;
+		}
 
 		/* these checks find unicode, binary (Python 3) and raw strings */
 		if (!match)
@@ -362,13 +371,13 @@ static const char *skipUntil (const char *cp,
 /* Skip everything up to an identifier start. */
 static const char *skipToNextIdentifier (const char *cp)
 {
-	return skipUntil (cp, isIdentifierFirstCharacterCB, NULL);
+	return skipUntil (cp, NULL, isIdentifierFirstCharacterCB, NULL);
 }
 
 /* Skip everything up to a module start. */
 static const char *skipToNextModule (const char *cp)
 {
-	return skipUntil (cp, isModuleFirstCharacterCB, NULL);
+	return skipUntil (cp, NULL, isModuleFirstCharacterCB, NULL);
 }
 
 
@@ -667,6 +676,7 @@ struct argParsingState
 {
 	vString *arglist;
 	int level;
+	char const *longStringLiteral;
 };
 
 static boolean gatherArglistCB (int c, void *arglist)
@@ -707,7 +717,8 @@ static boolean parseArglist(const char* buf, struct argParsingState *state)
 
 
 	do {
-		current = skipUntil (start, gatherArglistCB, state->arglist);
+		current = skipUntil (start, &state->longStringLiteral,
+				     gatherArglistCB, state->arglist);
 		switch (*current)
 		{
 		case '\0':
@@ -730,15 +741,29 @@ static boolean parseArglist(const char* buf, struct argParsingState *state)
 	return TRUE;
 }
 
+static char const *find_triple_end(char const *string, char const **which,
+				   boolean dontRepeat);
 static void captureArguments (const char *start, vString *arglist)
 {
 	struct argParsingState state;
 
 	state.level = 0;
 	state.arglist = arglist;
+	state.longStringLiteral = NULL;
 
 	while (start)
 	{
+		if (arglist == NULL && state.longStringLiteral)
+		{
+			start = find_triple_end(start, &state.longStringLiteral,
+						TRUE);
+			if (arglist == NULL && state.longStringLiteral)
+			{
+				start = (const char *) readLineFromInputFile ();
+				continue;
+			}
+		}
+
 		if (parseArglist (start, &state) == FALSE)
 			/* No '(' is found: broken input */
 			break;
