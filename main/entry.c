@@ -542,7 +542,7 @@ static void sortTagFile (void)
 		{
 			verbose ("sorting tag file\n");
 #ifdef EXTERNAL_SORT
-			externalSortTags (TagsToStdout);
+			externalSortTags (TagsToStdout, TagFile.fp);
 #else
 			internalSortTagFile ();
 #endif

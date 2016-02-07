@@ -55,7 +55,7 @@ extern void catFile (FILE *fp)
 # define PE_CONST const
 #endif
 
-extern void externalSortTags (const boolean toStdout)
+extern void externalSortTags (const boolean toStdout, FILE *tagFile)
 {
 	const char *const sortNormalCommand = "sort -u";
 	const char *const sortFoldedCommand = "sort -u -f";
@@ -101,7 +101,7 @@ extern void externalSortTags (const boolean toStdout)
 			fdsave = dup (fdstdin);
 			if (fdsave < 0)
 				error (FATAL | PERROR, "cannot save stdin fd");
-			if (dup2 (fileno (TagFile.fp), fdstdin) < 0)
+			if (dup2 (fileno (tagFile), fdstdin) < 0)
 				error (FATAL | PERROR, "cannot redirect stdin");
 			if (lseek (fdstdin, 0, SEEK_SET) != 0)
 				error (FATAL | PERROR, "cannot rewind tag file");
