@@ -1437,4 +1437,14 @@ extern boolean isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extr
 	return !! ((tag->extra [ index ]) & (1 << offset));
 }
 
+extern unsigned long numTagsAdded(void)
+{
+	return TagFile.numTags.added;
+}
+
+extern unsigned long numTagsTotal(void)
+{
+	return TagFile.numTags.added + TagFile.numTags.prev;
+}
+
 /* vi:set tabstop=4 shiftwidth=4: */
