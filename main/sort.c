@@ -206,17 +206,10 @@ extern void internalSortTags (const boolean toStdout, size_t numTags)
 
 	/*  Open the tag file and place its lines into allocated buffers.
 	 */
-	if (toStdout)
-	{
-		fp = TagFile.fp;
-		fseek (fp, 0, SEEK_SET);
-	}
-	else
-	{
-		fp = fopen (tagFileName (), "r");
-		if (fp == NULL)
-			failedSort (fp, NULL);
-	}
+	fp = fopen (tagFileName (), "r");
+	if (fp == NULL)
+		failedSort (fp, NULL);
+
 	for (i = 0  ;  i < numTags  &&  ! feof (fp)  ;  )
 	{
 		line = readLineRaw (vLine, fp);
