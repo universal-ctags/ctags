@@ -1452,4 +1452,9 @@ extern unsigned long maxTagsLine (void)
 	return (unsigned long)TagFile.max.line;
 }
 
+extern void invalidatePatternCache(void)
+{
+	TagFile.patternCacheValid = FALSE;
+}
+
 /* vi:set tabstop=4 shiftwidth=4: */

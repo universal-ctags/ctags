@@ -145,6 +145,7 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e);
 extern unsigned long numTagsAdded(void);
 extern unsigned long numTagsTotal(void);
 extern unsigned long maxTagsLine(void);
+extern void invalidatePatternCache(void);
 
 /* Getting line associated with tag */
 extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo *const tag,
