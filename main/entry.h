@@ -138,6 +138,9 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      const char* sourceLanguage,
 			      long sourceLineNumberDifference);
 
+extern unsigned long numTagsAdded(void);
+extern unsigned long numTagsTotal(void);
+
 /* Getting line associated with tag */
 extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo *const tag,
 				   long *const pSeekValue);

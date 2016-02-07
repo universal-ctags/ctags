@@ -1273,4 +1273,14 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->sourceLineNumberDifference = sourceLineNumberDifference;
 }
 
+extern unsigned long numTagsAdded(void)
+{
+	return TagFile.numTags.added;
+}
+
+extern unsigned long numTagsTotal(void)
+{
+	return TagFile.numTags.added + TagFile.numTags.prev;
+}
+
 /* vi:set tabstop=4 shiftwidth=4: */
