@@ -121,8 +121,6 @@ extern tagFile TagFile;
 */
 extern void freeTagFileResources (void);
 extern const char *tagFileName (void);
-extern void copyBytes (FILE* const fromFp, FILE* const toFp, const long size);
-extern void copyFile (const char *const from, const char *const to, const long size);
 extern void openTagFile (void);
 extern void closeTagFile (const boolean resize);
 extern void beginEtagsFile (void);
