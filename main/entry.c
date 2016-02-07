@@ -345,44 +345,6 @@ static boolean isTagFile (const char *const filename)
 	return ok;
 }
 
-extern void copyBytes (FILE* const fromFp, FILE* const toFp, const long size)
-{
-	enum { BufferSize = 1000 };
-	long toRead, numRead;
-	char* buffer = xMalloc (BufferSize, char);
-	long remaining = size;
-	do
-	{
-		toRead = (0 < remaining && remaining < BufferSize) ?
-					remaining : (long) BufferSize;
-		numRead = fread (buffer, (size_t) 1, (size_t) toRead, fromFp);
-		if (fwrite (buffer, (size_t)1, (size_t)numRead, toFp) < (size_t)numRead)
-			error (FATAL | PERROR, "cannot complete write");
-		if (remaining > 0)
-			remaining -= numRead;
-	} while (numRead == toRead  &&  remaining != 0);
-	eFree (buffer);
-}
-
-extern void copyFile (const char *const from, const char *const to, const long size)
-{
-	FILE* const fromFp = fopen (from, "rb");
-	if (fromFp == NULL)
-		error (FATAL | PERROR, "cannot open file to copy");
-	else
-	{
-		FILE* const toFp = fopen (to, "wb");
-		if (toFp == NULL)
-			error (FATAL | PERROR, "cannot open copy destination");
-		else
-		{
-			copyBytes (fromFp, toFp, size);
-			fclose (toFp);
-		}
-		fclose (fromFp);
-	}
-}
-
 extern void openTagFile (void)
 {
 	setDefaultTagFileName ();
@@ -448,6 +410,44 @@ extern void openTagFile (void)
 }
 
 #ifdef USE_REPLACEMENT_TRUNCATE
+
+static void copyBytes (FILE* const fromFp, FILE* const toFp, const long size)
+{
+	enum { BufferSize = 1000 };
+	long toRead, numRead;
+	char* buffer = xMalloc (BufferSize, char);
+	long remaining = size;
+	do
+	{
+		toRead = (0 < remaining && remaining < BufferSize) ?
+					remaining : (long) BufferSize;
+		numRead = fread (buffer, (size_t) 1, (size_t) toRead, fromFp);
+		if (fwrite (buffer, (size_t)1, (size_t)numRead, toFp) < (size_t)numRead)
+			error (FATAL | PERROR, "cannot complete write");
+		if (remaining > 0)
+			remaining -= numRead;
+	} while (numRead == toRead  &&  remaining != 0);
+	eFree (buffer);
+}
+
+static void copyFile (const char *const from, const char *const to, const long size)
+{
+	FILE* const fromFp = fopen (from, "rb");
+	if (fromFp == NULL)
+		error (FATAL | PERROR, "cannot open file to copy");
+	else
+	{
+		FILE* const toFp = fopen (to, "wb");
+		if (toFp == NULL)
+			error (FATAL | PERROR, "cannot open copy destination");
+		else
+		{
+			copyBytes (fromFp, toFp, size);
+			fclose (toFp);
+		}
+		fclose (fromFp);
+	}
+}
 
 /*  Replacement for missing library function.
  */
