@@ -516,7 +516,8 @@ static void sortTagFile (void)
 #ifdef EXTERNAL_SORT
 			externalSortTags (TagsToStdout);
 #else
-			internalSortTags (TagsToStdout);
+			internalSortTags (TagsToStdout,
+				TagFile.numTags.added + TagFile.numTags.prev);
 #endif
 		}
 		else if (TagsToStdout)

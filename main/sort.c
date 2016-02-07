@@ -185,7 +185,7 @@ static void writeSortedTags (
 		fclose (fp);
 }
 
-extern void internalSortTags (const boolean toStdout)
+extern void internalSortTags (const boolean toStdout, size_t numTags)
 {
 	vString *vLine = vStringNew ();
 	FILE *fp = NULL;
@@ -195,7 +195,6 @@ extern void internalSortTags (const boolean toStdout)
 
 	/*  Allocate a table of line pointers to be sorted.
 	 */
-	size_t numTags = TagFile.numTags.added + TagFile.numTags.prev;
 	const size_t tableSize = numTags * sizeof (char *);
 	char **const table = (char **) malloc (tableSize);  /* line pointers */
 	DebugStatement ( size_t mallocSize = tableSize; )  /* cumulative total */
