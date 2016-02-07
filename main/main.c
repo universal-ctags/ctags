@@ -404,11 +404,6 @@ static void printTotals (const clock_t *const timeStamps)
 #endif
 		fputc ('\n', stderr);
 	}
-
-#ifdef DEBUG
-	fprintf (stderr, "longest tag line = %lu\n",
-			(unsigned long) TagFile.max.line);
-#endif
 }
 
 static boolean etagsInclude (void)
