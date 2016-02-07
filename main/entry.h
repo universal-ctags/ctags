@@ -140,6 +140,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 
 extern unsigned long numTagsAdded(void);
 extern unsigned long numTagsTotal(void);
+extern void invalidatePatternCache(void);
 
 /* Getting line associated with tag */
 extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo *const tag,

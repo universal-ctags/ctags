@@ -1283,4 +1283,9 @@ extern unsigned long numTagsTotal(void)
 	return TagFile.numTags.added + TagFile.numTags.prev;
 }
 
+extern void invalidatePatternCache(void)
+{
+	TagFile.patternCacheValid = FALSE;
+}
+
 /* vi:set tabstop=4 shiftwidth=4: */
