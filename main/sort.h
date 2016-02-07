@@ -21,7 +21,7 @@
 extern void catFile (FILE *fp);
 
 #ifdef EXTERNAL_SORT
-extern void externalSortTags (const boolean toStdout);
+extern void externalSortTags (const boolean toStdout, FILE *tagFile);
 #else
 extern void internalSortTags (const boolean toStdout, size_t numTags);
 #endif
