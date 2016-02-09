@@ -139,6 +139,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      const char *sourceFileName,
 			      const char* sourceLanguage,
 			      long sourceLineNumberDifference);
+extern int makeQualifiedTagEntry (const tagEntryInfo *const e);
 
 /* Getting line associated with tag */
 extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo *const tag,
@@ -160,6 +161,7 @@ void          uncorkTagFile(void);
 tagEntryInfo *getEntryInCorkQueue   (unsigned int n);
 size_t        countEntryInCorkQueue (void);
 
+extern void makeFileTag (const char *const fileName);
 
 #endif  /* CTAGS_MAIN_ENTRY_H */
 

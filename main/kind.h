@@ -44,6 +44,11 @@ extern const char *renderRole (const roleDesc* const role, vString* b);
 /* Don't use in your parser. */
 #define KIND_WILDCARD '*'
 
+typedef struct sScopeSeparator {
+	char  parentLetter;
+	const char *separator;
+} scopeSeparator;
+
 typedef struct sKindOption {
 	boolean enabled;          /* are tags for kind enabled? */
 	char  letter;               /* kind letter */
@@ -52,8 +57,12 @@ typedef struct sKindOption {
 	boolean referenceOnly;
 	int nRoles;		/* The number of role elements. */
 	roleDesc *roles;
+	scopeSeparator *separators;
+	unsigned int separatorCount;
 } kindOption;
 
 #define ATTACH_ROLES(RS) .nRoles = ARRAY_SIZE(RS), .roles = RS
 extern void printKind (const kindOption* const kind, boolean allKindFields, boolean indent);
+const char *scopeSeparatorFor (const kindOption *kind, char parentLetter);
+
 #endif	/* CTAGS_MAIN_KIND_H */

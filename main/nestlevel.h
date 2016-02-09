@@ -27,7 +27,7 @@ struct NestingLevel
 {
 	int indentation;
 	vString *name;
-	int type;
+	int kindIndex;
 };
 
 struct NestingLevels
@@ -42,8 +42,10 @@ struct NestingLevels
 */
 extern NestingLevels *nestingLevelsNew(void);
 extern void nestingLevelsFree(NestingLevels *nls);
-extern void nestingLevelsPush(NestingLevels *nls,
-	const vString *name, int type);
+extern NestingLevel *nestingLevelsPush(NestingLevels *nls,
+				       const vString *name, int kindIndex);
+extern NestingLevel * nestingLevelsTruncate(NestingLevels *nls, int depth,
+					    const vString *name, int kindIndex);
 extern void nestingLevelsPop(NestingLevels *nls);
 extern NestingLevel *nestingLevelsGetCurrent(NestingLevels *nls);
 

@@ -30,6 +30,7 @@
 */
 
 typedef enum {
+	K_UNDEFINED = -1,
 	K_CLASS, K_FUNCTION, K_MEMBER, K_VARIABLE, K_NAMESPACE, K_MODULE, K_UNKNOWN,
 } pythonKind;
 
@@ -181,6 +182,8 @@ static void addAccessFields (tagEntryInfo *const entry,
 static void makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
 				 vString *const parent, int is_class_parent, const char *arglist)
 {
+	char scope_kind_letter = KIND_NULL;
+
 	if (is_class_parent)
 	{
 		if (!PythonKinds[K_MEMBER].enabled)
@@ -201,6 +204,7 @@ static void makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
 			tag->kind = &(PythonKinds[K_MEMBER]);
 			tag->extensionFields.scopeKind = &(PythonKinds[K_CLASS]);
 			tag->extensionFields.scopeName = vStringValue (parent);
+			scope_kind_letter = PythonKinds[K_CLASS].letter;
 		}
 		else
 		{
@@ -213,6 +217,10 @@ static void makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
 		vStringLength (parent) > 0, is_class_parent);
 
 	makeTagEntry (tag);
+
+	if ((scope_kind_letter != KIND_NULL)
+	    && tag->extensionFields.scopeName)
+		makeQualifiedTagEntry (tag);
 }
 
 static void makeFunctionTag (vString *const function,
@@ -773,14 +781,14 @@ static boolean constructParentString(NestingLevels *nls, int indent,
 		{
 			vStringCatS(result, ".");	/* make Geany symbol list grouping work properly */
 /*
-			if (prev->type == K_CLASS)
+			if (prev->kindIndex == K_CLASS)
 				vStringCatS(result, ".");
 			else
 				vStringCatS(result, "/");
 */
 		}
 		vStringCat(result, nl->name);
-		is_class = (nl->type == K_CLASS);
+		is_class = (nl->kindIndex == K_CLASS);
 		prev = nl;
 	}
 	return is_class;
@@ -809,6 +817,7 @@ static void addNestingLevel(NestingLevels *nls, int indentation,
 {
 	int i;
 	NestingLevel *nl = NULL;
+	int kindIndex = is_class ? K_CLASS : K_FUNCTION;
 
 	for (i = 0; i < nls->n; i++)
 	{
@@ -816,17 +825,12 @@ static void addNestingLevel(NestingLevels *nls, int indentation,
 		if (indentation <= nl->indentation) break;
 	}
 	if (i == nls->n)
-	{
-		nestingLevelsPush(nls, name, 0);
-		nl = nls->levels + i;
-	}
+		nl = nestingLevelsPush(nls, name, kindIndex);
 	else
-	{	/* reuse existing slot */
-		nls->n = i + 1;
-		vStringCopy(nl->name, name);
-	}
+		/* reuse existing slot */
+		nl = nestingLevelsTruncate (nls, i + 1, name, kindIndex);
+
 	nl->indentation = indentation;
-	nl->type = is_class ? K_CLASS : !K_CLASS;
 }
 
 /* Return a pointer to the start of the next triple string, or NULL. Store

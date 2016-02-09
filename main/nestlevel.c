@@ -37,8 +37,8 @@ extern void nestingLevelsFree(NestingLevels *nls)
 	eFree(nls);
 }
 
-extern void nestingLevelsPush(NestingLevels *nls,
-	const vString *name, int type)
+extern NestingLevel * nestingLevelsPush(NestingLevels *nls,
+	const vString *name, int kindIndex)
 {
 	NestingLevel *nl = NULL;
 
@@ -53,8 +53,22 @@ extern void nestingLevelsPush(NestingLevels *nls,
 	nls->n++;
 
 	vStringCopy(nl->name, name);
-	nl->type = type;
+	nl->kindIndex = kindIndex;
+	return nl;
 }
+
+extern NestingLevel *nestingLevelsTruncate(NestingLevels *nls, int depth,
+					   const vString *name, int kindIndex)
+{
+	NestingLevel *nl;
+
+	nls->n = depth;
+	nl = nestingLevelsGetCurrent(nls);
+	vStringCopy(nl->name, name);
+	nl->kindIndex = kindIndex;
+	return nl;
+}
+
 
 extern void nestingLevelsPop(NestingLevels *nls)
 {

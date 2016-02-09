@@ -165,7 +165,7 @@ extern void writePseudoTag (const struct sPtagDesc *desc,
 	rememberMaxLengths (strlen (desc->name), (size_t) length);
 }
 
-static void addPseudoTags (void)
+static void addCommonPseudoTags (void)
 {
 	int i;
 	if (Option.xref)
@@ -173,6 +173,41 @@ static void addPseudoTags (void)
 
 	for (i = 0; i < PTAG_COUNT; i++)
 		makePtagIfEnabled (i, NULL);
+}
+
+extern void makeFileTag (const char *const fileName)
+{
+	boolean via_line_directive = (strcmp (fileName, getInputFileName()) != 0);
+	if (isXtagEnabled(XTAG_FILE_NAMES)
+	    || isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES))
+	{
+		tagEntryInfo tag;
+		kindOption  *kind;
+
+		kind = getInputLanguageFileKind();
+		Assert (kind);
+		kind->enabled = isXtagEnabled(XTAG_FILE_NAMES);
+
+		/* TODO: you can return here if enabled == FALSE. */
+
+		initTagEntry (&tag, baseFilename (fileName), kind);
+
+		tag.isFileEntry     = TRUE;
+		tag.lineNumberEntry = TRUE;
+
+		if (via_line_directive || (!isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES)))
+		{
+			tag.lineNumber = 1;
+		}
+		else
+		{
+			while (readLineFromInputFile () != NULL)
+				;		/* Do nothing */
+			tag.lineNumber = getInputLineNumber ();
+		}
+
+		makeTagEntry (&tag);
+	}
 }
 
 static void updateSortedFlag (
@@ -399,7 +434,7 @@ extern void openTagFile (void)
 		 * write the result to stdout. */
 		TagFile.fp = tempFile ("w+", &TagFile.name);
 		if (isXtagEnabled (XTAG_PSEUDO_TAGS))
-			addPseudoTags ();
+			addCommonPseudoTags ();
 	}
 	else
 	{
@@ -435,7 +470,7 @@ extern void openTagFile (void)
 			{
 				TagFile.fp = fopen (TagFile.name, "w");
 				if (TagFile.fp != NULL && isXtagEnabled (XTAG_PSEUDO_TAGS))
-					addPseudoTags ();
+					addCommonPseudoTags ();
 			}
 		}
 		if (TagFile.fp == NULL)
@@ -772,18 +807,27 @@ static int writeEtagsEntry (const tagEntryInfo *const tag)
 static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_scope)
 {
 
+	const kindOption *kind = NULL;
 	const tagEntryInfo *scope = inner_scope;
 	stringList *queue = stringListNew ();
 	vString *v;
 	vString *n;
 	unsigned int c;
+	const char *sep;
 
 	while (scope)
 	{
 		if (!scope->placeholder)
 		{
+			if (kind)
+			{
+				sep = scopeSeparatorFor (kind, scope->kind->letter);
+				v = vStringNewInit (sep);
+				stringListAdd (queue, v);
+			}
 			v = vStringNewInit (escapeName (scope, FIELD_NAME));
 			stringListAdd (queue, v);
+			kind = scope->kind;
 		}
 		scope =  getEntryInCorkQueue (scope->extensionFields.scopeIndex);
 	}
@@ -795,8 +839,6 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 		vStringCat (n, v);
 		vStringDelete (v);
 		stringListRemoveLast (queue);
-		if (c != 1)
-			vStringPut (n, '.');
 	}
 	stringListDelete (queue);
 
@@ -1207,6 +1249,44 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 	else
 		writeTagEntry (tag);
 out:
+	return r;
+}
+
+extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
+{
+	int r = SCOPE_NIL;
+	tagEntryInfo x;
+	char xk;
+	const char *sep;
+	static vString *fqn;
+
+	if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
+	{
+		x = *e;
+
+		if (fqn == NULL)
+			fqn = vStringNew ();
+		else
+			vStringClear (fqn);
+
+		if (e->extensionFields.scopeName)
+		{
+			vStringCatS (fqn, e->extensionFields.scopeName);
+			xk = e->extensionFields.scopeKind->letter;
+			sep = scopeSeparatorFor (e->kind, xk);
+			vStringCatS (fqn, sep);
+		}
+		vStringCatS (fqn, e->name);
+
+		x.name = vStringValue (fqn);
+		/* makeExtraTagEntry of c.c doesn't clear scope
+		   releated fields. */
+#if 0
+		x.extensionFields.scopeKind = NULL;
+		x.extensionFields.scopeName = NULL;
+#endif
+		r = makeTagEntry (&x);
+	}
 	return r;
 }
 

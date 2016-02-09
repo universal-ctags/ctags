@@ -56,7 +56,7 @@ static NestingLevel *getNestingLevel(const int kind)
 	while (1)
 	{
 		nl = nestingLevelsGetCurrent(nestingLevels);
-		if (nl && nl->type >= kind)
+		if (nl && nl->kindIndex >= kind)
 			nestingLevelsPop(nestingLevels);
 		else
 			break;
@@ -76,9 +76,9 @@ static void makeRstTag(const vString* const name, const int kind, const fpos_t f
 		e.lineNumber--;	/* we want the line before the '---' underline chars */
 		e.filePosition = filepos;
 
-		if (nl && nl->type < kind)
+		if (nl && nl->kindIndex < kind)
 		{
-			e.extensionFields.scopeKind = &(RstKinds [nl->type]);
+			e.extensionFields.scopeKind = &(RstKinds [nl->kindIndex]);
 			e.extensionFields.scopeName = vStringValue (nl->name);
 		}
 		makeTagEntry (&e);
