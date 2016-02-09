@@ -812,6 +812,7 @@ static const char *ProgramName;
 static int extensionFields;
 static int SortOverride;
 static sortType SortMethod;
+static int allowPrintLineNumber;
 
 static void printTag (const tagEntry *entry)
 {
@@ -826,16 +827,26 @@ static void printTag (const tagEntry *entry)
 	if (extensionFields)
 	{
 		if (entry->kind != NULL  &&  entry->kind [0] != '\0')
-			printf ("%s\tkind:%s", sep, entry->kind);
+		{
+			  printf ("%s\tkind:%s", sep, entry->kind);
+			  first = 0;
+		}
 		if (entry->fileScope)
+		{
 			printf ("%s\tfile:", sep);
-#if 0
-		if (entry->address.lineNumber > 0)
+			first = 0;
+		}
+		if (allowPrintLineNumber && entry->address.lineNumber > 0)
+		{
 			printf ("%s\tline:%lu", sep, entry->address.lineNumber);
-#endif
+			first = 0;
+		}
 		for (i = 0  ;  i < entry->fields.count  ;  ++i)
+		{
 			printf ("%s\t%s:%s", sep, entry->fields.list [i].key,
 				entry->fields.list [i].value);
+			first = 0;
+		}
 	}
 	putchar ('\n');
 #undef sep
@@ -890,12 +901,13 @@ static const char *const Usage =
 	"Find tag file entries matching specified names.\n\n"
 	"Usage: \n"
 	"    %s -h\n"
-	"    %s [-ilp] [-s[0|1]] [-t file] [-] [name(s)]\n\n"
+	"    %s [-ilpn] [-s[0|1]] [-t file] [-] [name(s)]\n\n"
 	"Options:\n"
 	"    -e           Include extension fields in output.\n"
 	"    -h           Print this help message.\n"
 	"    -i           Perform case-insensitive matching.\n"
 	"    -l           List all tags.\n"
+	"    -n           Allow print line numbers.\n"
 	"    -p           Perform partial matching.\n"
 	"    -s[0|1|2]    Override sort detection of tag file.\n"
 	"    -t file      Use specified tag file (default: \"tags\").\n"
@@ -940,7 +952,7 @@ extern int main (int argc, char **argv)
 					case 'i': options |= TAG_IGNORECASE;   break;
 					case 'p': options |= TAG_PARTIALMATCH; break;
 					case 'l': listTags (); actionSupplied = 1; break;
-
+					case 'n': allowPrintLineNumber = 1; break;
 					case 't':
 						if (arg [j+1] != '\0')
 						{
