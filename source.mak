@@ -131,6 +131,7 @@ PARSER_SRCS =				\
 
 XML_HEADS =
 XML_SRCS = \
+	 parsers/maven2.c		\
 	 parsers/dbusintrospect.c	\
 	 parsers/glade.c		\
 	 \

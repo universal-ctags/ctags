@@ -13,7 +13,7 @@ title()
 
 ignore_xml()
 {
-    grep -v 'Glade\|Ant'
+    grep -v 'Glade\|Ant\|Maven2'
 }
 
 title ''

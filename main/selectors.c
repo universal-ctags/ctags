@@ -256,7 +256,13 @@ selectParserForXmlDoc (xmlDocPtr doc)
 		 && doc->children->name
 		 && (strcmp ((const char*)doc->children->name, "project") == 0))
 	{
-		return "Ant";
+		if ((doc->children->ns != NULL)
+		    && doc->children->ns->href != NULL
+		    && (strcmp ((const char *)doc->children->ns->href,
+				"http://maven.apache.org/POM/4.0.0") == 0))
+			return "Maven2";
+		else
+			return "Ant";
 	}
 
 	return NULL;
