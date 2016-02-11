@@ -295,6 +295,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Indicate whether symbolic links should be followed [yes]."},
  {1,"  --list-aliases=[language|all]"},
  {1,"       Output list of alias patterns."},
+ {1,"  --list-extensions=[language|all]"},
+ {1,"       Output list of language extensions in mapping."},
  {1,"  --list-extras"},
  {1,"       Output list of extra tag flags."},
  {1,"  --list-features"},
@@ -308,14 +310,18 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --list-languages"},
  {1,"       Output list of supported languages."},
  {1,"  --list-maps=[language|all]"},
- {1,"       Output list of language mappings."},
+ {1,"       Output list of language mappings(both extensions and patterns)."},
+ {1,"  --list-patterns=[language|all]"},
+ {1,"       Output list of language patterns in mapping."},
  {0,"  --list-pseudo-tags"},
  {0,"       Output list of pseudo tags."},
  {1,"  --list-regex-flags"},
  {1,"       Output list of flags which can be used in a regex parser definition."},
- {1,"  --map-<LANG>=[+]map"},
+ {1,"  --map-<LANG>=[+]pattern|extension"},
  {1,"       Set or add(+) a map for <LANG>."},
- {1,"       Unlike --langmap a pattern or an extension can be specified at once."},
+ {1,"       Unlike --langmap, only one pattern or one extension can be specified"},
+ {1,"       at once. Unlike, --langmap adding one affects the map of LANG; it does't"},
+ {1,"       affect maps of the other languages."},
  {1,"  --maxdepth=N"},
 #ifdef RECURSE_SUPPORTED
  {1,"       Specify maximum recursion depth."},
@@ -1574,21 +1580,40 @@ static void processListKindsOption (
 	exit (0);
 }
 
-static void processListMapsOption (
-		const char *const __unused__ option,
-		const char *const __unused__ parameter)
+static void processListMapsOptionForType (const char *const __unused__ option,
+					  const char *const  parameter,
+					  langmapType type)
 {
 	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
-	    printLanguageMaps (LANG_AUTO);
+		printLanguageMaps (LANG_AUTO, type);
 	else
 	{
 		langType language = getNamedLanguage (parameter, 0);
 		if (language == LANG_IGNORE)
 			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
 		else
-			printLanguageMaps (language);
+			printLanguageMaps (language, type);
 	}
 	exit (0);
+}
+
+static void processListExtensionsOption (const char *const option,
+					 const char *const parameter)
+{
+	processListMapsOptionForType (option, parameter, LMAP_EXTENSION);
+}
+
+static void processListPatternsOption (const char *const option,
+				       const char *const parameter)
+{
+	processListMapsOptionForType (option, parameter, LMAP_PATTERN);
+}
+
+static void processListMapsOption (
+		const char *const __unused__ option,
+		const char *const __unused__ parameter)
+{
+	processListMapsOptionForType (option, parameter, LMAP_ALL);
 }
 
 static void processListLanguagesOption (
@@ -2141,6 +2166,7 @@ static parametricOption ParametricOptions [] = {
 	{ "libexec-dir",            processLibexecDir,              FALSE,  STAGE_ANY },
 	{ "license",                processLicenseOption,           TRUE,   STAGE_ANY },
 	{ "list-aliases",           processListAliasesOption,       TRUE,   STAGE_ANY },
+	{ "list-extensions",        processListExtensionsOption,    TRUE,   STAGE_ANY },
 	{ "list-extras",            processListExtrasOption,        TRUE,   STAGE_ANY },
 	{ "list-features",          processListFeaturesOption,      TRUE,   STAGE_ANY },
 	{ "list-fields",            processListFieldsOption,        TRUE,   STAGE_ANY },
@@ -2149,6 +2175,7 @@ static parametricOption ParametricOptions [] = {
 	{ "_list-kinds-full",       processListKindsOption,         TRUE,   STAGE_ANY },
 	{ "list-languages",         processListLanguagesOption,     TRUE,   STAGE_ANY },
 	{ "list-maps",              processListMapsOption,          TRUE,   STAGE_ANY },
+	{ "list-patterns",          processListPatternsOption,      TRUE,   STAGE_ANY },
 	{ "list-pseudo-tags",       processListPseudoTagsOptions,   TRUE,   STAGE_ANY },
 	{ "list-regex-flags",       processListRegexFlagsOptions,   TRUE,   STAGE_ANY },
 	{ "_list-roles",            processListRolesOptions,        TRUE,   STAGE_ANY },

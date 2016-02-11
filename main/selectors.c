@@ -28,17 +28,23 @@ static const char *TR_MATLAB  = "MatLab";
 
 static const char *TR_CPP     = "C++";
 
+static const char *TR_R       = "R";
+static const char *TR_ASM     = "Asm";
+
+static const char *TR_REXX     = "REXX";
+static const char *TR_DOSBATCH = "DosBatch";
 
 #define startsWith(line,prefix) \
   (strncmp(line, prefix, strlen(prefix)) == 0? TRUE: FALSE)
 
 static const char *selectByLines (FILE *input,
-				  const char* (* lineTaster) (const char *),
-				  const char* defaultLang)
+				  const char* (* lineTaster) (const char *, void *),
+				  const char* defaultLang,
+				  void *userData)
 {
     char line[0x800];
     while (fgets(line, sizeof(line), input)) {
-	const char *lang = lineTaster (line);
+	const char *lang = lineTaster (line, userData);
 	if (lang)
 	    return lang;
     }
@@ -47,7 +53,7 @@ static const char *selectByLines (FILE *input,
 
 /* Returns "Perl" or "Perl6" or NULL if it does not taste like anything */
 static const char *
-tastePerlLine (const char *line)
+tastePerlLine (const char *line, void *data __unused__)
 {
     while (isspace(*line))
         ++line;
@@ -116,11 +122,11 @@ const char *
 selectByPickingPerlVersion (FILE *input)
 {
     /* Default to Perl 5 */
-    return selectByLines (input, tastePerlLine, TR_PERL5);
+    return selectByLines (input, tastePerlLine, TR_PERL5, NULL);
 }
 
 static const char *
-tasteObjectiveCOrMatLabLines (const char *line)
+tasteObjectiveCOrMatLabLines (const char *line, void *data __unused__)
 {
     if (startsWith (line, "% ")
 	|| startsWith (line, "%{"))
@@ -156,11 +162,12 @@ tasteObjectiveCOrMatLabLines (const char *line)
 const char *
 selectByObjectiveCAndMatLabKeywords (FILE * input)
 {
-    return selectByLines (input, tasteObjectiveCOrMatLabLines, NULL);
+    return selectByLines (input, tasteObjectiveCOrMatLabLines,
+			  NULL, NULL);
 }
 
 static const char *
-tasteObjectiveC (const char *line)
+tasteObjectiveC (const char *line, void *data __unused__)
 {
     if (startsWith (line, "#import")
 	|| startsWith (line, "@interface ")
@@ -193,7 +200,95 @@ selectByObjectiveCKeywords (FILE * input)
     else if (! isLanguageEnabled (cpp))
 	return TR_OBJC;
 
-    return selectByLines (input, tasteObjectiveC, TR_CPP);
+    return selectByLines (input, tasteObjectiveC, TR_CPP,
+			  NULL);
+}
+
+static const char *
+tasteR (const char *line, void *data __unused__)
+{
+	/* As far as reading test cases in GNU assembler,
+	   assembly language for d10v and d30v processors
+	   uses "<-" as part its syntax. I cannot find better
+	   hint for distinguishing between the assembly
+	   language and R.
+	   ----
+	   binutils-2.15.92.0.2/gas/testsuite/gas/d30v/mul.s */
+	return strstr (line, "<-")? TR_R: NULL;
+}
+
+const char *
+selectByArrowOfR (FILE *input)
+{
+    /* TODO: Ideally opening input should be delayed till
+       enable/disable based selection is done. */
+
+    static langType R   = LANG_IGNORE;
+    static langType Asm = LANG_IGNORE;
+
+    if (R == LANG_IGNORE)
+	    R = getNamedLanguage (TR_R, 0);
+
+    if (Asm == LANG_IGNORE)
+	    Asm = getNamedLanguage (TR_ASM, 0);
+
+    Assert (0 <= R);
+    Assert (0 <= Asm);
+
+    if (! isLanguageEnabled (R))
+	    return TR_ASM;
+    else if (! isLanguageEnabled (Asm))
+	    return TR_R;
+
+    return selectByLines (input, tasteR, NULL,
+			  NULL);
+}
+
+static const char *
+tasteREXXOrDosBatch (const char *line, void *data)
+{
+	boolean * in_rexx_comment = data;
+
+	if (startsWith (line, ":"))
+		return TR_DOSBATCH;
+	else if (*in_rexx_comment
+		 && strstr (line, "*/"))
+		return TR_REXX;
+	else if (strstr (line, "/*"))
+	{
+		*in_rexx_comment = TRUE;
+		return NULL;
+	}
+	else
+		return NULL;
+}
+
+const char *
+selectByRexxCommentAndDosbatchLabelPrefix (FILE *input)
+{
+    /* TODO: Ideally opening input should be delayed till
+       enable/disable based selection is done. */
+
+    static langType rexx     = LANG_IGNORE;
+    static langType dosbatch = LANG_IGNORE;
+    boolean in_rexx_comment = FALSE;
+
+    if (rexx == LANG_IGNORE)
+	    rexx = getNamedLanguage (TR_R, 0);
+
+    if (dosbatch == LANG_IGNORE)
+	    dosbatch = getNamedLanguage (TR_DOSBATCH, 0);
+
+    Assert (0 <= rexx);
+    Assert (0 <= dosbatch);
+
+    if (! isLanguageEnabled (rexx))
+	    return TR_DOSBATCH;
+    else if (! isLanguageEnabled (dosbatch))
+	    return TR_REXX;
+
+    return selectByLines (input, tasteREXXOrDosBatch,
+			  NULL, &in_rexx_comment);
 }
 
 #ifdef HAVE_LIBXML

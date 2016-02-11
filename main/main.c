@@ -543,7 +543,6 @@ extern int main (int __unused__ argc, char **argv)
 	verbose ("Reading initial options from command line\n");
 	parseCmdlineOptions (args);
 	checkOptions ();
-	unifyLanguageMaps ();
 	makeTags (args);
 
 	/*  Clean up.

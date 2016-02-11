@@ -163,6 +163,12 @@ typedef struct {
 
 typedef void (*regexCallback) (const char *line, const regexMatch *matches, unsigned int count);
 
+typedef enum {
+	LMAP_PATTERN   = 1 << 0,
+	LMAP_EXTENSION = 1 << 1,
+	LMAP_ALL       = LMAP_PATTERN | LMAP_EXTENSION,
+} langmapType;
+
 /*
 *   FUNCTION PROTOTYPES
 */
@@ -203,8 +209,7 @@ extern void clearLanguageAliases (const langType language);
 extern void addLanguageAlias (const langType language, const char* alias);
 
 extern void printLanguageMap (const langType language, FILE *fp);
-extern void printLanguageMaps (const langType language);
-extern void unifyLanguageMaps (void);
+extern void printLanguageMaps (const langType language, langmapType type);
 extern void enableLanguages (const boolean state);
 extern void enableLanguage (const langType language, const boolean state);
 extern void initializeParsing (void);

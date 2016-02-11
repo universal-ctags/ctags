@@ -21,6 +21,12 @@ selectByObjectiveCAndMatLabKeywords (FILE *);
 const char *
 selectByObjectiveCKeywords(FILE *);
 
+const char *
+selectByArrowOfR (FILE *);
+
+const char *
+selectByRexxCommentAndDosbatchLabelPrefix (FILE *);
+
 #ifdef HAVE_LIBXML
 const char *
 selectByDTD (FILE *input);

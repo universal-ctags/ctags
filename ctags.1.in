@@ -608,8 +608,9 @@ language), specify an empty extension list (e.g.
 "\fB\-\-langmap\fP=\fIfortran:\fP"). To restore the default language mappings
 for all a particular language, supply the keyword "default" for the mapping.
 To specify restore the default language mappings for all languages, specify
-"\fB\-\-langmap\fP=\fIdefault\fP". Note that file extensions are tested before
-file name patterns when inferring the language of a file.
+"\fB\-\-langmap\fP=\fIdefault\fP". Note that file name patterns are tested before
+file extensions when inferring the language of a file. This order of universal-ctags
+is different from exuberant-ctags.
 
 .TP 5
 \fB\-\-language\-force\fP=\fIlanguage\fP

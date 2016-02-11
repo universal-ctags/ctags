@@ -20,6 +20,7 @@
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
+#include "selectors.h"
 #include "vstring.h"
 
 /*
@@ -355,6 +356,9 @@ extern parserDefinition* AsmParser (void)
 		"*.[xX][68][68]",
 		NULL
 	};
+	static selectLanguage selectors[] = { selectByArrowOfR,
+					      NULL };
+
 	parserDefinition* def = parserNew ("Asm");
 	def->kinds      = AsmKinds;
 	def->kindCount  = ARRAY_SIZE (AsmKinds);
@@ -364,6 +368,7 @@ extern parserDefinition* AsmParser (void)
 	def->initialize = initialize;
 	def->keywordTable = AsmKeywords;
 	def->keywordCount = ARRAY_SIZE (AsmKeywords);
+	def->selectLanguage = selectors;
 	return def;
 }
 

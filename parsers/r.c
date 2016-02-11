@@ -20,6 +20,7 @@
 #include "debug.h"
 #include "entry.h"
 #include "read.h"
+#include "selectors.h"
 #include "vstring.h"
 
 #define SKIPSPACE(ch) while (isspace((int)*ch)) \
@@ -205,10 +206,13 @@ extern parserDefinition *RParser (void)
 	 */
 	static const char *const extensions[] = { "r", "R", "s", "q", NULL };
 	parserDefinition *const def = parserNew ("R");
+	static selectLanguage selectors[] = { selectByArrowOfR,
+					      NULL };
 	def->extensions = extensions;
 	def->kinds = RKinds;
 	def->kindCount = KIND_COUNT;
 	def->parser = createRTags;
+	def->selectLanguage = selectors;
 	return def;
 }
 
