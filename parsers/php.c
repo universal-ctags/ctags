@@ -337,6 +337,11 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 	}
 }
 
+static void  makePhpTagEntry  (tagEntryInfo *const e)
+{
+	makeTagEntry (e);
+	makeQualifiedTagEntry (e);
+}
 static void makeSimplePhpTag (const tokenInfo *const token, const phpKind kind,
 							  const accessType access)
 {
@@ -345,7 +350,7 @@ static void makeSimplePhpTag (const tokenInfo *const token, const phpKind kind,
 		tagEntryInfo e;
 
 		initPhpEntry (&e, token, kind, access);
-		makeTagEntry (&e);
+		makePhpTagEntry (&e);
 	}
 }
 
@@ -360,7 +365,7 @@ static void makeNamespacePhpTag (const tokenInfo *const token, const vString *co
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
 
-		makeTagEntry (&e);
+		makePhpTagEntry (&e);
 	}
 }
 
@@ -378,7 +383,7 @@ static void makeClassOrIfaceTag (const phpKind kind, const tokenInfo *const toke
 		if (vStringLength (inheritance) > 0)
 			e.extensionFields.inheritance = vStringValue (inheritance);
 
-		makeTagEntry (&e);
+		makePhpTagEntry (&e);
 	}
 }
 
@@ -397,7 +402,7 @@ static void makeFunctionTag (const tokenInfo *const token,
 		if (arglist)
 			e.extensionFields.signature = vStringValue (arglist);
 
-		makeTagEntry (&e);
+		makePhpTagEntry (&e);
 	}
 }
 
