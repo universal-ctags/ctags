@@ -1,0 +1,27 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/bbd8fc2/
+A	base.py	/^    class A:$/;"	kind:class	line:11	language:Python	scope:class:Foo	inherits:	access:public
+B	base.py	/^    class B:$/;"	kind:class	line:18	language:Python	scope:class:Bar	inherits:	access:public
+Bar	base.py	/^class Bar (Foo):$/;"	kind:class	line:13	language:Python	inherits:Foo	access:public
+Bar.bq	base.py	/^    def bq ():$/;"	kind:member	line:14	language:Python	scope:class:Bar	access:public	signature:()
+Bar.bw	base.py	/^    def bw ():$/;"	kind:member	line:16	language:Python	scope:class:Bar	access:public	signature:()
+Baz	base.py	/^class Baz (Foo): $/;"	kind:class	line:21	language:Python	inherits:Foo	access:public
+Baz.bq	base.py	/^    def bq ():$/;"	kind:member	line:22	language:Python	scope:class:Baz	access:public	signature:()
+Baz.bw	base.py	/^    def bw ():$/;"	kind:member	line:24	language:Python	scope:class:Baz	access:public	signature:()
+C	base.py	/^    class C:$/;"	kind:class	line:26	language:Python	scope:class:Baz	inherits:	access:public
+Foo	base.py	/^class Foo:$/;"	kind:class	line:4	language:Python	inherits:	access:public
+Foo.ae	base.py	/^    def ae ():$/;"	kind:member	line:9	language:Python	scope:class:Foo	access:public	signature:()
+Foo.aq	base.py	/^    def aq ():$/;"	kind:member	line:5	language:Python	scope:class:Foo	access:public	signature:()
+Foo.aw	base.py	/^    def aw ():$/;"	kind:member	line:7	language:Python	scope:class:Foo	access:public	signature:()
+ae	base.py	/^    def ae ():$/;"	kind:member	line:9	language:Python	scope:class:Foo	access:public	signature:()
+aq	base.py	/^    def aq ():$/;"	kind:member	line:5	language:Python	scope:class:Foo	access:public	signature:()
+aw	base.py	/^    def aw ():$/;"	kind:member	line:7	language:Python	scope:class:Foo	access:public	signature:()
+base.py	base.py	28;"	kind:file	line:28	language:Python
+bq	base.py	/^    def bq ():$/;"	kind:member	line:14	language:Python	scope:class:Bar	access:public	signature:()
+bq	base.py	/^    def bq ():$/;"	kind:member	line:22	language:Python	scope:class:Baz	access:public	signature:()
+bw	base.py	/^    def bw ():$/;"	kind:member	line:16	language:Python	scope:class:Bar	access:public	signature:()
+bw	base.py	/^    def bw ():$/;"	kind:member	line:24	language:Python	scope:class:Baz	access:public	signature:()
