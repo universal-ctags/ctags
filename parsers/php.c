@@ -476,7 +476,7 @@ static void addToScope (tokenInfo *const token, const vString *const extra)
 {
 	if (vStringLength (token->scope) > 0)
 		vStringCatS (token->scope, SCOPE_SEPARATOR);
-	vStringCatS (token->scope, vStringValue (extra));
+	vStringCat (token->scope, extra);
 	vStringTerminate(token->scope);
 }
 
