@@ -983,10 +983,20 @@ getFileLanguageInternal (const char *const fileName)
 
 extern langType getFileLanguage (const char *const fileName)
 {
-    if (LANG_AUTO == Option.language)
-        return getFileLanguageInternal(fileName);
-    else
-        return Option.language;
+	langType l = Option.language;
+
+	if (l == LANG_AUTO)
+		return getFileLanguageInternal(fileName);
+	else if (! isLanguageEnabled (l))
+	{
+		error (FATAL,
+		       "%s parser specified with --language-force is disabled or not available(xcmd)",
+		       getLanguageName (l));
+		/* For suppressing warnings. */
+		return LANG_AUTO;
+	}
+	else
+		return Option.language;
 }
 
 typedef void (*languageCallback)  (langType language, void* user_data);
@@ -1955,9 +1965,10 @@ static void addParserPseudoTags (langType language)
 extern boolean parseFile (const char *const fileName)
 {
 	boolean tagFileResized = FALSE;
-	langType language = Option.language;
-	if (Option.language == LANG_AUTO)
-		language = getFileLanguage (fileName);
+	langType language;
+
+
+	language = getFileLanguage (fileName);
 	Assert (language != LANG_AUTO);
 
 	if (Option.printLanguage)
