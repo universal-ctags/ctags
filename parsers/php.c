@@ -21,9 +21,6 @@
 #include "debug.h"
 
 
-#define SCOPE_SEPARATOR "::"
-
-
 typedef enum {
 	KEYWORD_NONE = -1,
 	KEYWORD_abstract,
@@ -113,15 +110,31 @@ typedef enum {
 	COUNT_KIND
 } phpKind;
 
+#define NAMESPACE_SEPARATOR "\\"
+#define PHP_ROOT_SEPARATOR  NAMESPACE_SEPARATOR
+static scopeSeparator PhpGenericSeparators [] = {
+	{ 'n'          , NAMESPACE_SEPARATOR },
+	{ KIND_WILDCARD, "::" },
+
+};
+
 static kindOption PhpKinds[COUNT_KIND] = {
-	{ TRUE, 'c', "class",		"classes" },
-	{ TRUE, 'd', "define",		"constant definitions" },
-	{ TRUE, 'f', "function",	"functions" },
-	{ TRUE, 'i', "interface",	"interfaces" },
-	{ FALSE, 'l', "local",		"local variables" },
-	{ TRUE, 'n', "namespace",	"namespaces" },
-	{ TRUE, 't', "trait",		"traits" },
-	{ TRUE, 'v', "variable",	"variables" }
+	{ TRUE, 'c', "class",		"classes",
+	  ATTACH_SEPARATORS(PhpGenericSeparators) },
+	{ TRUE, 'd', "define",		"constant definitions",
+	  ATTACH_SEPARATORS(PhpGenericSeparators)},
+	{ TRUE, 'f', "function",	"functions",
+	  ATTACH_SEPARATORS(PhpGenericSeparators)},
+	{ TRUE, 'i', "interface",	"interfaces",
+	  ATTACH_SEPARATORS(PhpGenericSeparators)},
+	{ FALSE, 'l', "local",		"local variables",
+	  ATTACH_SEPARATORS(PhpGenericSeparators)},
+	{ TRUE, 'n', "namespace",	"namespaces",
+	  ATTACH_SEPARATORS(PhpGenericSeparators)},
+	{ TRUE, 't', "trait",		"traits",
+	  ATTACH_SEPARATORS(PhpGenericSeparators)},
+	{ TRUE, 'v', "variable",	"variables",
+	  ATTACH_SEPARATORS(PhpGenericSeparators)},
 };
 
 static const keywordTable const PhpKeywordTable[] = {
@@ -242,6 +255,14 @@ static vString *FullScope;
 /* Anonymous symbol count to generate file-unique names */
 static unsigned int AnonymousID;
 
+static const char *phpScopeSeparatorFor (int phpKind,
+					 int phpUpperScopeKind)
+{
+	char letter;
+
+	letter = PhpKinds[phpUpperScopeKind].letter;
+	return scopeSeparatorFor (&(PhpKinds[phpKind]), letter);
+}
 
 static const char *accessToString (const accessType access)
 {
@@ -278,7 +299,8 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 
 	if (vStringLength (CurrentNamesapce) > 0)
 	{
-		vStringCopy (FullScope, CurrentNamesapce);
+		vStringCatS (FullScope, PHP_ROOT_SEPARATOR);
+		vStringCat (FullScope, CurrentNamesapce);
 		parentKind = K_NAMESPACE;
 	}
 
@@ -292,8 +314,17 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 	if (vStringLength (token->scope) > 0)
 	{
 		parentKind = token->parentKind;
+
 		if (vStringLength (FullScope) > 0)
-			vStringCatS (FullScope, SCOPE_SEPARATOR);
+		{
+			const char* sep;
+
+			sep = phpScopeSeparatorFor (parentKind,
+						    K_NAMESPACE);
+			vStringCatS (FullScope, sep);
+		}
+		else
+			vStringCatS (FullScope, PHP_ROOT_SEPARATOR);
 		vStringCat (FullScope, token->scope);
 	}
 	if (vStringLength (FullScope) > 0)
@@ -472,10 +503,17 @@ static void printToken (const tokenInfo *const token)
 }
 #endif
 
-static void addToScope (tokenInfo *const token, const vString *const extra)
+static void addToScope (tokenInfo *const token, const vString *const extra,
+			int kindOfUpperScope)
 {
 	if (vStringLength (token->scope) > 0)
-		vStringCatS (token->scope, SCOPE_SEPARATOR);
+	{
+		const char* sep;
+
+		sep = phpScopeSeparatorFor(token->parentKind,
+					   kindOfUpperScope);
+		vStringCatS (token->scope, sep);
+	}
 	vStringCat (token->scope, extra);
 	vStringTerminate(token->scope);
 }
@@ -1370,7 +1408,13 @@ static boolean parseNamespace (tokenInfo *const token)
 		if (token->type == TOKEN_IDENTIFIER)
 		{
 			if (vStringLength (CurrentNamesapce) > 0)
-				vStringPut (CurrentNamesapce, '\\');
+			{
+				const char *sep;
+
+				sep = phpScopeSeparatorFor(K_NAMESPACE,
+							   K_NAMESPACE);
+				vStringCatS (CurrentNamesapce, sep);
+			}
 			vStringCat (CurrentNamesapce, token->string);
 		}
 	}
@@ -1401,8 +1445,8 @@ static void enterScope (tokenInfo *const parentToken,
 
 	if (extraScope)
 	{
-		addToScope (token, extraScope);
 		token->parentKind = parentKind;
+		addToScope (token, extraScope, origParentKind);
 	}
 
 	readToken (token);
