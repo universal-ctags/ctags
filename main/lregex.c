@@ -300,7 +300,7 @@ static flagDefinition scopePtrnFlagDef[] = {
 
 static kindOption *kindNew ()
 {
-	kindOption *kind = xMalloc (1, kindOption);
+	kindOption *kind = xCalloc (1, kindOption);
 	kind->letter        = '\0';
 	kind->name = NULL;
 	kind->description = NULL;
