@@ -201,6 +201,7 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 
 	path->kinds = xRealloc (path->kinds, path->n_kinds + 1, kindOption);
 	kind = &path->kinds [path->n_kinds];
+	memset (kind, 0, sizeof (*kind));
 	kind->enabled = TRUE;
 	kind->letter = line[0];
 	kind->name = NULL;
