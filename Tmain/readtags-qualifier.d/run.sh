@@ -26,4 +26,6 @@ echo ';; (and (eq? $kind "member") (substr? $name "."))' &&
 ${V} ${READTAGS} -e -t output.tags -Q '(and (eq? $kind "member") (substr? $name "."))' -l &&
 echo ';; (and (member "Foo" $inherits) (eq? $kind "class"))' &&
 ${V} ${READTAGS}  -e -t output.tags -Q '(and (member "Foo" $inherits) (eq? $kind "class"))' -l &&
+echo ';; (not ($ "signature"))' &&
+${V} ${READTAGS}  -e -t output.tags -Q '(not ($ "signature"))' -l &&
 :

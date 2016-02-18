@@ -436,6 +436,7 @@ rejection: readtags doesn't print it.
 		suffix?
 		substr?
 		 member
+		      $
 		  $name
 		 $input
 		$access
@@ -469,6 +470,12 @@ language; see the other documents.
 prefix?, suffix?, and substr? may be only available in this
 implementation. All of them takes two strings. The first one
 is called target.
+
+The exception in above name convention is `$` operator.
+`$` is generic accessor for accessing to extension fields.
+`$` takes one argument: the name of an extension field.
+It returns the value of field as a string if a value
+is given, or `#f`.
 
 ::
 
