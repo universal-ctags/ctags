@@ -9,6 +9,10 @@ if USE_READCMD
 bin_PROGRAMS+= readtags
 readtags_CPPFLAGS = -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main
 dist_readtags_SOURCES = readtags.c readtags.h
+if HAVE_FMEMOPEN
+readtags_CPPFLAGS += -DQUALIFIER
+dist_readtags_SOURCES += $(QUALIFIER_SRCS) $(QUALIFIER_HEAD)
+endif
 endif
 
 if !HAVE_FNMATCH
