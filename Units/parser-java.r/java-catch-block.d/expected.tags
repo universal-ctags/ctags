@@ -1,0 +1,2 @@
+C	input.java	/^class C {$/;"	class
+m	input.java	/^   public void m(String a[]) {$/;"	method	class:C

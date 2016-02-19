@@ -507,7 +507,7 @@ static const keywordDesc KeywordTable [] = {
      { "byte",            KEYWORD_BYTE,            { 0, 0, 0, 1, 1, 0 } },
      { "case",            KEYWORD_CASE,            { 1, 1, 1, 1, 1, 0 } },
      { "cast",            KEYWORD_CAST,            { 0, 0, 0, 1, 0, 0 } },
-     { "catch",           KEYWORD_CATCH,           { 0, 1, 1, 1, 0, 0 } },
+     { "catch",           KEYWORD_CATCH,           { 0, 1, 1, 1, 1, 0 } },
      { "cdouble",         KEYWORD_CDOUBLE,         { 0, 0, 0, 1, 0, 0 } },
      { "cent",            KEYWORD_CENT,            { 0, 0, 0, 1, 0, 0 } },
      { "cfloat",          KEYWORD_CFLOAT,          { 0, 0, 0, 1, 0, 0 } },
