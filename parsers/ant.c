@@ -75,52 +75,58 @@ enum antXpathTable {
 static tagXpathTable antXpathMainTable [] = {
 	{ "///project",
 	  LXPATH_TABLE_DO_RECUR,
-	  .recurSpec = {
+      { .recurSpec= {
 			antFindTagsUnderProject
-		}
+        }
+      }
 	},
 };
 
 static tagXpathTable antXpathProjectTable [] = {
 	{ "target",
 	  LXPATH_TABLE_DO_RECUR,
-	  .recurSpec = {
+      { .recurSpec= {
 			antFindTagsUnderTask
 		}
+      }
 	},
 	{ "property/@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_PROPERTY, ROLE_INDEX_DEFINITION,
 			makeTagWithScope,
 		}
+      }
 	},
 	{ "import/@file",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_IMPORT, R_IMPORT_GENERIC,
 			makeTagWithScope,
 		}
+      }
 	},
 };
 
 static tagXpathTable antXpathMainNameTable [] = {
 	{ "@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_PROJECT, ROLE_INDEX_DEFINITION,
 			makeTagForProjectName,
 		}
+      }
 	},
 };
 
 static tagXpathTable antXpathTargetNameTable [] = {
 	{ "@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_TARGET, ROLE_INDEX_DEFINITION,
 			makeTagForTargetName,
 		}
+      }
 	},
 };
 

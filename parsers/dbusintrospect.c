@@ -50,24 +50,27 @@ static void makeTagWithScope (xmlNode *node,
 static tagXpathTable dbusIntrospectXpathInterfaceTable [] = {
 	{ "//method/@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_METHOD,    ROLE_INDEX_DEFINITION,
 			makeTagWithScope,
 		}
+      }
 	},
 	{ "//signal/@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_SIGNAL,    ROLE_INDEX_DEFINITION,
 			makeTagWithScope,
 		}
+      }
 	},
 	{ "//property/@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_PROPERTY,  ROLE_INDEX_DEFINITION,
 			makeTagWithScope
 		}
+      }
 	},
 
 };
@@ -75,19 +78,21 @@ static tagXpathTable dbusIntrospectXpathInterfaceTable [] = {
 static tagXpathTable dbusIntrospectXpathMainTable [] = {
 	{ "///interface",
 	  LXPATH_TABLE_DO_RECUR,
-	  .recurSpec = {
+      { .recurSpec = {
 			dbusIntrospectFindTagsUnderInterface
 		}
+      }
 	},
 };
 
 static tagXpathTable dbusIntrospectXpathMainNameTable [] = {
 	{ "@name",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_INTERFACE, ROLE_INDEX_DEFINITION,
 			makeTagForInterfaceName,
 		}
+      }
 	},
 };
 
