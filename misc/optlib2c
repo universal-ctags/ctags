@@ -1,9 +1,9 @@
-#!/usr/bin/env bash
+#!/usr/bin/env perl
 #
 # optlib2c - a tool translating ctags option file to C
 #
-# Copyright (C) 2015 Masatake YAMATO
-# Copyright (C) 2015 Red Hat Inc.
+# Copyright (C) 2016 Masatake YAMATO
+# Copyright (C) 2016 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,666 +18,363 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-declare OPTLIB2C_TRANSFORM_XCMD
 
-declare CTAGS_LANG
-declare CTAGS_LANG_IN_C
+use strict;
+use warnings;
 
-declare -a CTAGS_EXTENSIONS
-declare -a CTAGS_PATTERNS
-declare -a CTAGS_ALIASES
-
-declare -a CTAGS_REGEX_REGEX
-declare -a CTAGS_REGEX_NAME
-declare -a CTAGS_REGEX_KIND
-declare -a CTAGS_REGEX_FLAG
-
-declare -a CTAGS_XCMD_PATH
-declare -a CTAGS_XCMD_FLAGS
-
-declare -a CTAGS_DISABLED_KINDS
-
-declare CTAGS_DISABLE
-
-error()
-{
-	echo "[ERROR] " $1 1>&2
-	exit 1
+sub show_help {
+    print<<EOF;
+Usage:
+	$0 --help
+	$0 [--transform-xcmd=PROGRAM_TRANSFORM_NAME] FILE.ctags > FILE.c
+EOF
 }
 
-warn()
-{
-	echo "[WARN] " $1 1>&2
+
+########################################################################
+#
+# PARSE
+#
+########################################################################
+sub parse_regex;
+sub parse_kinds;
+sub parse_optlib;
+
+my $options =
+    [
+     [ qr/^--options=(.*)/, sub {
+	   parse_optlib ($1, $_[0]);
+       } ],
+     [ qr/^--langdef=(.*)/, sub {
+	   die "LANG is alrady defined as $_[0]->{'langdef'}: $1"
+	       if (defined $_[0]->{'langdef'});
+	   $_[0]->{'langdef'} = $1;
+       } ],
+     [ qr/^--languages=-(.*)/, sub {
+	   die "Don't use --languages=- optoin before defining a language"
+	       if (! defined $_[0]->{'langdef'});
+	   die "Only language specified with --langdef can be disabled: $1"
+	       unless ($_[0]->{'langdef'} eq $1);
+	   $_[0]->{'disabled'} = 1
+       } ],
+     [ qr/^--language=(.*)/, sub {
+	   die "--languages can be used only for disabling a language defined with --langdef: $1";
+       } ],
+     [ qr/^--map-([^=]*)=\+(.*)/, sub {
+	   die "Don't use --map-<LANG>=+ optoin before defining a language"
+	       if (! defined $_[0]->{'langdef'});
+	   die "Adding a map is allowed only to the language specified with --langdef: $1"
+	       unless ($_[0]->{'langdef'} eq $1);
+	   my $spec = $2;
+	   if ($spec =~ /\((.*)\)/) {
+	       push @{$_[0]->{'patterns'}}, $1;
+	   } elsif ($spec =~ /\.(.*)/) {
+	       push @{$_[0]->{'extensions'}}, $1;
+	   } else {
+	       die "Unexpected notation is used in the argument for --map-$1= option";
+	   }
+       } ],
+     [ qr/^--map-([^=]*)=[^+].*/, sub {
+	   die "map manipulation other than the appending(--map-<LANG>=+...) is not supported";
+       } ],
+     [ qr /^--alias-([^=]*)=\+(.*)/, sub {
+	   die "Don't use --alias-<LANG>=+ optoin before defining a language"
+	       if (! defined $_[0]->{'langdef'});
+	   die "Adding an alias is allowed only to the language specified with --langdef: $1"
+	       unless ($_[0]->{'langdef'} eq $1);
+	   push @{$_[0]->{'aliases'}}, $2;
+       } ],
+     [ qr/^--alias-([^=]*)=[^+].*/, sub {
+	   die "alias manipulation other than the appending(--alias-<LANG>=+...) is not supported";
+       } ],
+     [ qr/^--regex-([^=]*)=(.*)/, sub {
+	   die "Don't use --regex-<LANG>= optoin before defining a language"
+	       if (! defined $_[0]->{'langdef'});
+	   die "Adding a regex is allowed only to the language specified with --langdef: $1"
+	       unless ($_[0]->{'langdef'} eq $1);
+	   parse_regex ($2, $_[0]);
+       } ],
+     [ qr/^--kinds-([^=]*)=-(.*)/, sub {
+	   die "Don't use --kind-<LANG>= optoin before defining a language"
+	       if (! defined $_[0]->{'langdef'});
+	   parse_kinds ($2, $_[0]);
+       } ],
+     [ qr/^--kinds-([^=]*)=(.*)/, sub {
+	   die "--kinds-<LANG>= can be used only for disabling a kind: $1";
+       } ],
+     [ qr/^--xcmd-([^=]*)=([^{]*)({.*)?/, sub {
+	   die "Don't use --xcmd-<LANG>= optoin before defining a language"
+	       if (! defined $_[0]->{'langdef'});
+	   die "Adding a xcmd is allowed only to the language specified with --langdef: $1"
+	       unless ($_[0]->{'langdef'} eq $1);
+	   push @{$_[0]->{'xcmds'}}, { xcmd => $2, flags => $3 };
+       } ],
+     [ qr/^--langmap=.*/, sub {
+	   die "Use --map-<LANG> option instead of --langmap";
+       } ],
+     [ qr/^-.*/, sub {
+	   die "Unhandled option: $&";
+       } ],
+     [ qr/.*/, sub {
+	   die "Unhandled argument: $&";
+       } ],
+    ];
+
+sub parse_line {
+    my ($line, $opts) = @_;
+    my $r = 0;
+
+    for (@{$options}) {
+	my ($pat, $action) = @{$_};
+	if ($line =~ $pat) {
+	    $action -> ($opts);
+	    $r = 1;
+	    last;
+	}
+    }
+    $r;
 }
 
-parse_optlib()
-{
-	local line
-	local optlib=$1
+sub gather_chars {
+    my $input = shift;
+    my $output = "";
 
-	if [[ ! -e "$optlib" ]]; then
-		error "No such directory entry: $optlib"
-	elif [[ ! -f "$optlib" ]]; then
-		error "No such file: $optlib"
-	elif [[ ! -r "$optlib" ]]; then
-		error "file not readable: $optlib"
-	fi
+    my $escape = 0;
+    my $c;
 
-	while read -r line; do
-		if [[ -n "$line" ]]; then
-			case "$line" in
-				(\#*)
-					:
-					;;
-				(*)
-					if ! parse_line "$line"; then
-						return 1
-					fi
-					;;
-			esac
-		fi
-	done < "$optlib"
-	return 0
+    while (defined ($c = shift @{$input})) {
+	if ($c eq '/') {
+	    if ($escape) {
+		$output = $output . $c;
+		$escape = 0;
+	    } else {
+		last;
+	    }
+	} elsif ($c eq '\\') {
+	    $output = $output . $c . $c;
+	    $escape = $escape? 0: 1;
+	} else {
+	    $output = $output . $c;
+	    $escape = 0;
+	}
+    }
+
+    return ($output, (defined $c)? $c: "");
 }
 
-print_help()
-{
-	local status=$1
+sub parse_regex {
+    my ($regspec, $opts) = @_;
 
-	echo "Usage:"
+    my @chars = split //, $regspec;
 
-	echo "	$0 --help"
-	echo "	$0 [--transform-xcmd=PROGRAM_TRANSFORM_NAME] FILE.ctags > FILE.c"
+    if (! ($chars[0] eq '/')) {
+	die "--regex-<LANG>= option is not started from /: $regspec";
+    }
 
-	exit $status
+    shift @chars;
+    my $last_char;
+
+    my $regex;
+    ($regex, $last_char) = gather_chars (\@chars);
+    if (! ($last_char eq '/')) {
+	die "The pattern in --regex-<LANG>= option is not ended with /: $regspec";
+    }
+
+    my $name;
+    ($name, $last_char) = gather_chars (\@chars);
+    if (! ($last_char eq '/')) {
+	die "Wrong kind/flags syntax: $regspec";
+    }
+
+    my $tmp;
+    ($tmp, $last_char) = gather_chars (\@chars);
+    my $kind = "";
+    my $flags;
+
+    if ( (! @chars) && (! ($last_char eq '/'))) {
+	$flags = $tmp;
+
+    } else {
+	$kind = $tmp;
+    }
+
+    if ($last_char eq '/') {
+	($flags, $last_char) = gather_chars (\@chars);
+    }
+
+    push @{$opts->{'regexs'}}, { 'regex' => $regex,
+				 'name'  => $name,
+				 'kind'  => $kind,
+				 'flags' => $flags,
+			       };
 }
 
-parse_regex()
-{
-	local original=$1
-	local rest=$1
-
-	local escape
-
-	local regexp
-	local name
-	local kind
-	local flags
-	local tmp
-
-	if ! [[ "${rest:0:1}" = "/" ]]; then
-		error "Wrong regexp syntax: $rest"
-	fi
-
-	rest=${rest:1}
-	while [[ -n "$rest" ]]; do
-		case "${rest:0:1}" in
-			(/)
-				if [[ -n "$escape" ]]; then
-					regexp="${regexp}${rest:0:1}"
-					escape=
-				else
-					break
-				fi
-				;;
-			(\\)
-				regexp="${regexp}${rest:0:1}${rest:0:1}"
-				if [[ -n "$escape" ]]; then
-					escape=
-				else
-					escape=1
-				fi
-				;;
-			(*)
-				escape=
-				regexp="${regexp}${rest:0:1}"
-				;;
-		esac
-		rest=${rest:1}
-	done
-
-	if ! [[ "${rest:0:1}" = "/" ]]; then
-		error "Wrong name syntax: $rest"
-	fi
-
-	rest=${rest:1}
-	while [[ -n "$rest" ]]; do
-		case "${rest:0:1}" in
-			(/)
-				if [[ -n "$escape" ]]; then
-					name="${name}${rest:0:1}"
-					escape=
-				else
-					break
-				fi
-				;;
-			(\\)
-				name="${name}${rest:0:1}${rest:0:1}"
-				if [[ -n "$escape" ]]; then
-					escape=
-				else
-					escape=1
-				fi
-				;;
-			(*)
-				escape=
-				name="${name}${rest:0:1}"
-				;;
-
-		esac
-		rest=${rest:1}
-	done
-
-	if ! [[ "${rest:0:1}" = "/" ]]; then
-		error "Wrong kind/flags syntax: $rest"
-	fi
-
-	rest=${rest:1}
-	while [[ -n "$rest" ]]; do
-		case "${rest:0:1}" in
-			(/)
-				if [[ -n "$escape" ]]; then
-					tmp="${tmp}${rest:0:1}"
-					escape=
-				else
-					break
-				fi
-				;;
-			(\\)
-				tmp="${tmp}${rest:0:1}${rest:0:1}"
-				if [[ -n "$escape" ]]; then
-					escape=
-				else
-					escape=1
-				fi
-				;;
-			(*)
-				escape=
-				tmp="${tmp}${rest:0:1}"
-				;;
-
-		esac
-		rest=${rest:1}
-	done
-
-
-	if [[ -z "${rest}" ]]; then
-		flags=$tmp
-	else
-		kind=$tmp
-	fi
-
-	if [[ "${rest:0:1}" = "/" ]]; then
-		rest=${rest:1}
-		while [[ -n "$rest" ]]; do
-			case "${rest:0:1}" in
-				(/)
-					if [[ -n "$escape" ]]; then
-						flags="${flags}${rest:0:1}"
-						escape=
-					else
-						break
-					fi
-					;;
-				(\\)
-					flags="${flags}${rest:0:1}${rest:0:1}"
-					if [[ -n "$escape" ]]; then
-						escape=
-					else
-						escape=1
-					fi
-					;;
-				(*)
-					escape=
-					flags="${flags}${rest:0:1}"
-					;;
-
-			esac
-			rest=${rest:1}
-		done
-
-	fi
-
-	#    echo regexp: "${regexp}"
-	#    echo name:  "${name}"
-	#    echo kind:  "${kind}"
-	#    echo flags:  "${flags}"
-
-	CTAGS_REGEX_REGEX+=( "${regexp}" )
-	CTAGS_REGEX_NAME+=( "${name}" )
-	CTAGS_REGEX_KIND+=( "${kind}" )
-	CTAGS_REGEX_FLAG+=( "${flags}" )
+sub parse_kinds {
+    my ($kinds, $opts) = @_;
+    for (split //, $kinds) {
+	push @{$opts->{'disabledKinds'}}, $_;
+    }
 }
 
-disable_kinds()
-{
-	local kinds=$1
-	local c
+sub parse_optlib {
+    my ($optlib, $opts) = @_;
 
-	while true; do
-		c=${kinds:0:1}
-		kinds=${kinds:1}
-		if [[ -z "${c}" ]]; then
-			break
-		else
-			CTAGS_DISABLED_KINDS+=( "${c}" )
-		fi
-	done
+    open(my $optlibfh, "<", $optlib)
+	or die "cannot open the optlib file: \"$optlib\"";
+
+    while (<$optlibfh>) {
+	chomp;
+	if ( /^#.*/ ) {
+	    next;
+	} else {
+	    s/^\s*//;
+	    next if ( /^\s*$/ );
+	    if (! parse_line ($_, $opts)) {
+		return undef;
+	    }
+	}
+    }
+    return $opts;
 }
 
-parse_line()
-{
-	local line=$1
-	local opt
-	local pat
-	local ext
-	local ali
-	local rgx
-	local tmp
-	local xcmd_path
-	local xcmd_flags
+sub emit_header {
+    my ($optlib) = @_;
 
-	case "$line" in
-		(-h|--help)
-			print_help 0
-			;;
-		(--options=*)
-			opt=${1/--options=/}
-			if ! parse_optlib "$opt"; then
-				return 1
-			fi
-			;;
-		(--langdef=*)
-			if [[ -n "$CTAGS_LANG" ]]; then
-				error "LANG is already defined as $CTAGS_LANG: $line"
-			fi
-			CTAGS_LANG=${1/--langdef=/}
-			CTAGS_LANG_IN_C=$(echo "$(tr a-z A-Z <<<${CTAGS_LANG:0:1})${CTAGS_LANG:1}")
-			;;
-		(--languages=-${CTAGS_LANG})
-			CTAGS_DISABLE=1
-			;;
-		(--languages=-*)
-			if [[ -z "${CTAGS_LANG}" ]]; then
-				error "Don't use --languages=- option before defining a language: $line"
-			else
-				error "Only language you do --langdef can be disabled: $line"
-			fi
-			;;
-		(--languages=*)
-			error "--languages can be used only for disable a language you defined with --langdef: $line"
-			;;
-		#
-		# --map-<LANG>
-		#
-		(--map-${CTAGS_LANG}=+\(*\))
-			pat=${1/--map-${CTAGS_LANG}=+\(/}; pat=${pat%%\)}
-			CTAGS_PATTERNS+=( $pat )
-			;;
-		(--map-${CTAGS_LANG}=+.*)
-			ext=${1/--map-${CTAGS_LANG}=+./}
-			CTAGS_EXTENSIONS+=( $ext )
-			;;
-		(--map-${CTAGS_LANG}=*)
-			error "Other than the notation for appending(--map-<LANG>=+...) is not supported"
-			;;
-		(--map-*=*)
-			if [[ -z "${CTAGS_LANG}" ]]; then
-				error "Don't use --map-<LANG>= option before defining a language: $line"
-			else
-				tmp=${1/--map-/}
-				tmp=${tmp/=*/}
-				error "The language is not defined: ${tmp}"
-			fi
-			;;
-		#
-		# --alias-<LANG>=+*
-		#
-		(--alias-${CTAGS_LANG}=+*)
-			ali=${1/--alias-${CTAGS_LANG}=+/}
-			CTAGS_ALIASES+=( $ali )
-			;;
-		(--alias-${CTAGS_LANG}=*)
-			error "Other than the notation for appending(--alias-<LANG>=+...) is not supported"
-			;;
-		(--alias-*=*)
-			if [[ -z "${CTAGS_LANG}" ]]; then
-				error "Don't use --alias-<LANG>= option before defining a language: $line"
-			else
-				tmp=${1/--alias-/}
-				tmp=${tmp/=*/}
-				error "The language is not defined: ${tmp}"
-			fi
-			;;
-		#
-		# --regex=
-		#
-		(--regex-${CTAGS_LANG}=*)
-			if [[ -z "${CTAGS_LANG}" ]]; then
-				error "Don't use --regex-<LANG>= option before defining a language: $line"
-			fi
-			rgx=${1/--regex-${CTAGS_LANG}=}
-			parse_regex "$rgx"
-			;;
-		(--regex-*=*)
-			if [[ -z "${CTAGS_LANG}" ]]; then
-				error "Don't use --regex-<LANG>= option before defining a language: $line"
-			else
-				tmp=${1/--regex-/}
-				tmp=${tmp/=*/}
-				error "The language is not defined: ${tmp}"
-			fi
-			;;
-		#
-		# --kinds=
-		#
-		(--kinds-${CTAGS_LANG}=*)
-			if [[ -z "${CTAGS_LANG}" ]]; then
-				error "Don't use --kinds-<LANG>= option before defining a language: $line"
-			fi
-			kinds=${1/--kinds-${CTAGS_LANG}=}
-			if [[ ${kinds:0:1} = - ]]; then
-				disable_kinds "${kinds:1}"
-			elif [[ ${kinds:0:1} = + ]]; then
-				error "Don't use --kinds-<LANG>=+ option: defined kinds in the file is enabled by default"
-			else
-				error "Don't use --kinds-<LANG>= option: use --kinds-<LANG>=- for disabling kinds"
-			fi
-			;;
-		(--kinds-*=*)
-			if [[ -z "${CTAGS_LANG}" ]]; then
-				error "Don't use --kinds-<LANG>= option before defining a language: $line"
-			else
-				tmp=${1/--kinds-/}
-				tmp=${tmp/=*/}
-				error "The language is not defined: ${tmp}"
-			fi
-			;;
-		#
-		# --xcmd-<LANG>=
-		#
-		(--xcmd-${CTAGS_LANG}=*)
-			tmp=${1/--xcmd-${CTAGS_LANG}=/}
-			xcmd_path=${tmp%%\{*}
-			if [[ -z "${xcmd_path}" ]]; then
-				error "The path part for --xcmd-${CTAGS_LANG} is empty: ${1}"
-			fi
-
-			xcmd_flags=${tmp#*\{}
-			if [[ "${xcmd_flags}" = "${tmp}" ]]; then
-				xcmd_flags=""
-			elif [[ -n "${xcmd_flags}" ]]; then
-				xcmd_flags="{""${xcmd_flags}"
-			fi
-			CTAGS_XCMD_PATH+=( ${xcmd_path} )
-			CTAGS_XCMD_FLAGS+=( ${xcmd_flags} )
-			;;
-		(--xcmd-*=*)
-			if [[ -z "${CTAGS_LANG}" ]]; then
-				error "Don't use --xcmd-<LANG>= option before defining a language: $line"
-			else
-				tmp=${1/--xcmd-/}
-				tmp=${tmp/=*/}
-				error "The language is not defined: ${tmp}"
-			fi
-			;;
-		#
-		#  TODO --input-encoding-<LANG>=encoding
-		#
-		#
-		# rest
-		#
-		(--langmap=*)
-			error "Use --map-<LANG> option instead of --langmap=: $line"
-			;;
-		(-*)
-			error "Unhandled option: $line"
-			;;
-		(*)
-			error "Unhandled arugment: $line"
-			;;
-	esac
-
-	return 0
-}
-
-emit_header()
-{
-	local input=$1
-	cat <<EOF
+    print <<EOF;
 /*
- * Generated by $0 from ${input}, Don't edit this manually.
+ * Generated by $0 from ${optlib}, Don't edit this manually.
  */
 #include "general.h"
 #include "parse.h"
 #include "routines.h"
 
+
 EOF
-	echo
 }
 
-transform_xcmd()
-{
-	local p=$1
-	local transform=$2
 
-	local pd
-	local pb
-	local pb_transformed
+########################################################################
+#
+# EMIT
+#
+########################################################################
 
-	pd=$(dirname "$p")
-	pb=$(basename "$p")
-	pb_transformed=$(sed -e "${transform}" <<< "${pb}")
+sub emit_initializer {
+    my $opts = shift;
 
-	# If no directory component is given in $p,
-	# dirname command prints '.'. This '.' should not be
-	# in ${p_transformed}.
-	if [[ "${p:0:1}" != '.' ]] && [[ ${pd} == '.' ]]; then
-		pd=
-	else
-		pd="${pd}"/
-	fi
-
-	echo "${pd}${pb_transformed}"
-}
-
-emit_initializer()
-{
-	local c
-
-	cat <<EOF
-static void initialize${CTAGS_LANG_IN_C}Parser (const langType language)
+    print <<EOF;
+static void initialize$opts->{'Clangdef'}Parser (const langType language)
 {
 EOF
-	local i
-	local p
-	local f
-	if [ ${#CTAGS_XCMD_PATH[@]} -gt 0 ]; then
-		for i in $(seq 0 $(( ${#CTAGS_XCMD_PATH[@]} - 1))); do
-			p=${CTAGS_XCMD_PATH[$i]}
-			if [[ -n "${OPTLIB2C_TRANSFORM_XCMD}" ]]; then
-				p=$(transform_xcmd "$p" "${OPTLIB2C_TRANSFORM_XCMD}")
-			fi
-			f=${CTAGS_XCMD_flags[$i]}
-			cat<<EOF
+    for (@{$opts->{'xcmds'}}) {
+	my ($p, $f) = ($_ -> {'xcmd'}, $_ -> {'flags'});
+	$f = defined ($f) ? $f: "";
+
+	print <<EOF;
 	addLanguageXcmd (language, "$p$f");
 EOF
-		done
-	fi
-	for c in ${CTAGS_DISABLED_KINDS[@]}; do
-		cat<<EOF
-	enableRegexKind (language, '$c', FALSE);
+    }
+    for (@{$opts->{'disabledKinds'}}) {
+	print <<EOF;
+	enableRegexKind (language, '$_', FALSE);
 EOF
-	done
-	cat<<EOF
-}
-EOF
-	echo
+    }
+    print <<EOF;
 }
 
-emit_extensions()
-{
-	local elt
-
-	cat <<EOF
-	static const char *const extensions [] = {
 EOF
+    0;
+}
 
-	for elt in ${CTAGS_EXTENSIONS[@]}; do
-		echo "		\"$elt\","
-	done
-	cat <<EOF
+sub emit_list {
+    my ($opts, $key) = @_;
+
+    print <<EOF;
+	static const char *const $key [] = {
+EOF
+    for (@{$opts->{$key}}) {
+	print <<EOF;
+		\"$_\",
+EOF
+    }
+
+    print <<EOF;
 		NULL
 	};
+
 EOF
-	echo
 }
 
-emit_aliases()
-{
-	local elt
+sub emit_aliases {
+    emit_list $_[0], "aliases";
+}
 
-	cat<<EOF
-	static const char *const aliases [] = {
+sub emit_extensions {
+    emit_list $_[0], "extensions";
+}
+
+sub emit_patterns {
+    emit_list $_[0], "patterns";
+}
+
+sub emit_regexs {
+    my $opts = shift;
+
+    return if (! @{$opts->{'regexs'}});
+
+    print <<EOF;
+	static const tagRegexTable const $opts->{'Clangdef'}TagRegexTable [] = {
 EOF
-	for elt in ${CTAGS_ALIASES[@]}; do
-		echo "		\"$elt\","
-	done
-	cat <<EOF
-		NULL
+    for (@{$opts->{'regexs'}}) {
+	my $flags = $_-> {'flags'}? '"' . $_-> {'flags'} . '"': "NULL";
+	print <<EOF;
+		{"$_->{'regex'}", "$_->{'name'}",
+		"$_->{'kind'}", $flags},
+EOF
+    }
+
+    print <<EOF;
 	};
+
 EOF
-	echo
 }
 
-emit_patterns()
-{
-	local elt
+sub emit_fields_initialization {
+    my $opts = shift;
+    my $enabled = $opts->{"disabled"} ? "FALSE": "TRUE";
+    my $method;
 
-	cat <<EOF
-	static const char *const patterns [] = {
-EOF
-	for elt in ${CTAGS_PATTERNS[@]}; do
-		echo "		\"$elt\","
-	done
-	cat <<EOF
-		NULL
-	};
-EOF
-	echo
-}
+    $method  = "METHOD_NOT_CRAFTED";
+    if (@{$opts->{"regexs"}}) {
+	$method = "${method}|METHOD_REGEX";
+    }
+    if (@{$opts->{"xcmds"}}) {
+	$method = "${method}|METHOD_XCMD";
+    }
 
-emit_tag_regex_table()
-{
-	local i
-
-	local count
-	local regex
-	local name
-	local kind
-	local flags
-
-	count=${#CTAGS_REGEX_REGEX[@]}
-	if (( count == 0 )); then
-		return
-	fi
-
-	cat <<EOF
-	static const tagRegexTable const ${CTAGS_LANG_IN_C}TagRegexTable [] = {
-EOF
-	for i in $(seq 0 $(( $count - 1 ))); do
-
-		regex=\""${CTAGS_REGEX_REGEX[$i]}"\"
-		name=\""${CTAGS_REGEX_NAME[$i]}"\"
-		kind=\""${CTAGS_REGEX_KIND[$i]}"\"
-		if [[ -z "${CTAGS_REGEX_FLAG[$i]}" ]]; then
-			flags=NULL
-		else
-			flags=\""${CTAGS_REGEX_FLAG[$i]}"\"
-		fi
-		cat <<EOF
-		{$regex, $name,
-		$kind, $flags},
-EOF
-	done
-	cat<<EOF
-	};
-EOF
-	echo
-
-}
-
-emit_field_initialization()
-{
-	local enabled
-	local method
-
-	if [[ -n "${CTAGS_DISABLE}" ]]; then
-		enabled=FALSE
-	else
-		enabled=TRUE
-	fi
-
-	method=METHOD_NOT_CRAFTED
-	if (( ${#CTAGS_REGEX_REGEX[@]} > 0 )); then
-		method="${method}|METHOD_REGEX"
-	fi
-
-	if (( ${#CTAGS_XCMD_PATH[@]} > 0 )); then
-		method="${method}|METHOD_XCMD"
-	fi
-
-	cat<<EOF
+    print <<EOF;
 	def->enabled       = ${enabled};
-EOF
-	cat<<EOF
 	def->extensions    = extensions;
 	def->patterns      = patterns;
 	def->aliases       = aliases;
 	def->method        = ${method};
 EOF
 
-	if (( ${#CTAGS_REGEX_REGEX[@]} != 0 )); then
-		cat<<EOF
-	def->tagRegexTable = ${CTAGS_LANG_IN_C}TagRegexTable;
-	def->tagRegexCount = ARRAY_SIZE(${CTAGS_LANG_IN_C}TagRegexTable);
+    if (@{$opts->{'regexs'}}) {
+	print <<EOF;
+	def->tagRegexTable = $opts->{'Clangdef'}TagRegexTable;
+	def->tagRegexCount = ARRAY_SIZE($opts->{'Clangdef'}TagRegexTable);
 EOF
-	fi
+    }
 
-	cat<<EOF
-	def->initialize    = initialize${CTAGS_LANG_IN_C}Parser;
+    print <<EOF;
+	def->initialize    = initialize$opts->{'Clangdef'}Parser;
+
 EOF
-	echo
 }
 
-emit()
-{
-	local input=$1
-	emit_header "${input}"
-	emit_initializer
-
-	cat <<EOF
-extern parserDefinition* ${CTAGS_LANG_IN_C}Parser (void)
-{
-EOF
-	{
-		emit_extensions
-		emit_aliases
-		emit_patterns
-		emit_tag_regex_table
-		echo
-	}
-
-	cat<<EOF
-	parserDefinition* const def = parserNew ("${CTAGS_LANG}");
-EOF
-	echo
-	emit_field_initialization
-	cat<<EOF
-	return def;
-}
-EOF
-	cat<<EOF
+sub emit_footer {
+    print <<EOF;
 
 /*
  * Editor modelines  -  https://www.wireshark.org/tools/modelines.html
@@ -693,36 +390,122 @@ EOF
 EOF
 }
 
-main()
+sub emit {
+    my ($optlib, $opts) = @_;
+
+    emit_header $optlib;
+    emit_initializer $opts;
+
+    print <<EOF;
+extern parserDefinition* $opts->{'Clangdef'}Parser (void)
 {
-	local optlib
+EOF
 
-	while (( $# > 0 )); do
-		case $1 in
-			(-h|--help)
-				print_help 0
-				;;
-			(--transform-xcmd=*)
-				OPTLIB2C_TRANSFORM_XCMD=${1/--transform-xcmd=/}
-				shift
-				;;
-			(-*)
-				error "unrecongnized option: $1"
-				;;
-			(*)
-				optlib=$1
-				shift
-				break
-				;;
-		esac
-	done
+    emit_extensions      $opts;
+    emit_aliases         $opts;
+    emit_patterns        $opts;
+    emit_regexs          $opts;
 
-	if (( $# > 0 )); then
-		error "Too many argument: $@"
-	fi
+    print "\n";
 
-	parse_optlib "$optlib" && emit "$optlib"
-	exit $?
+    print <<EOF;
+	parserDefinition* const def = parserNew ("$opts->{'langdef'}");
+
+EOF
+
+    emit_fields_initialization $opts;
+
+    print <<EOF;
+	return def;
+}
+EOF
+    emit_footer;
 }
 
-main "$@"
+########################################################################
+#
+# REARRANGE
+#
+########################################################################
+
+sub  transform_xcmd {
+    my ($xcmd, $trxcmd) = @_;
+
+    $xcmd->{'xcmd'} =  `echo $xcmd->{'xcmd'} | sed -e '${trxcmd}'`;
+    chomp $xcmd->{'xcmd'};
+}
+
+sub rearrange {
+    my ($trxcmd, $opts) = @_;
+    my $langdef = $opts -> {'langdef'};
+    my $c = substr ($langdef, 0, 1);
+
+    $c =~ tr/a-z/A-Z/;
+
+    $opts -> {'Clangdef'} = $c . substr ($langdef, 1);
+
+    if ($trxcmd) {
+	for (@{$opts->{'xcmds'}}) {
+	    transform_xcmd $_, $trxcmd;
+	}
+    }
+}
+
+
+########################################################################
+#
+# MAIN
+#
+########################################################################
+
+sub main {
+    my $trxcmd;
+    my $optlib;
+    my %opts = (langdef  => undef,
+		Clangdef => undef,
+		disabled => 0,
+		patterns => [],
+		extensions => [],
+		aliases => [],
+		disabledKinds => [],
+		regexs => [# { regex => "", name => "", kind => "", flags => "" },
+			  ],
+		xcmds => [# { xcmd => "", flags => "" },
+			 ],
+	       );
+
+    for (@_) {
+	if ( ($_ eq '-h') || ($_ eq '--help') ) {
+	    show_help;
+	    exit 0;
+	} elsif ( s/^--transform-xcmd=// ) {
+	    $trxcmd=$_;
+	} elsif ( /^-.*/ ) {
+	    die "unrecongnized option: $_";
+	} else {
+	    if ($optlib) {
+		die "Too man input files: @_";
+	    }
+	    $optlib=$_;
+	}
+    }
+
+    if (! $optlib) {
+	die "No optlib file name is given";
+    }
+
+    if (! parse_optlib ($optlib, \%opts)) {
+	exit 1;
+    }
+
+    rearrange ($trxcmd, \%opts);
+
+    if (! emit ($optlib, \%opts) ) {
+	exit 1;
+    }
+    0;
+}
+
+main @ARGV;
+
+# optlib2c ends here.

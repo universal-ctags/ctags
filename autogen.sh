@@ -3,8 +3,7 @@
 verify_optlib2c_requirements()
 {
     : &&
-	which bash > /dev/null &&
-	which seq  > /dev/null
+	which perl > /dev/null
 }
 
 ctags_files=`make -f makefiles/list-translator-input.mak`
