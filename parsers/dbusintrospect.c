@@ -50,49 +50,33 @@ static void makeTagWithScope (xmlNode *node,
 static tagXpathTable dbusIntrospectXpathInterfaceTable [] = {
 	{ "//method/@name",
 	  LXPATH_TABLE_DO_MAKE,
-      { .makeTagSpec = {
-			K_METHOD,    ROLE_INDEX_DEFINITION,
-			makeTagWithScope,
-		}
-      }
+	  { .makeTagSpec = {K_METHOD, ROLE_INDEX_DEFINITION,
+			    makeTagWithScope } }
 	},
 	{ "//signal/@name",
 	  LXPATH_TABLE_DO_MAKE,
-      { .makeTagSpec = {
-			K_SIGNAL,    ROLE_INDEX_DEFINITION,
-			makeTagWithScope,
-		}
-      }
+	  { .makeTagSpec = { K_SIGNAL, ROLE_INDEX_DEFINITION,
+			     makeTagWithScope } }
 	},
 	{ "//property/@name",
 	  LXPATH_TABLE_DO_MAKE,
-      { .makeTagSpec = {
-			K_PROPERTY,  ROLE_INDEX_DEFINITION,
-			makeTagWithScope
-		}
-      }
+	  { .makeTagSpec = { K_PROPERTY, ROLE_INDEX_DEFINITION,
+			     makeTagWithScope } }
 	},
-
 };
 
 static tagXpathTable dbusIntrospectXpathMainTable [] = {
 	{ "///interface",
 	  LXPATH_TABLE_DO_RECUR,
-      { .recurSpec = {
-			dbusIntrospectFindTagsUnderInterface
-		}
-      }
+	  { .recurSpec = { dbusIntrospectFindTagsUnderInterface } }
 	},
 };
 
 static tagXpathTable dbusIntrospectXpathMainNameTable [] = {
 	{ "@name",
 	  LXPATH_TABLE_DO_MAKE,
-      { .makeTagSpec = {
-			K_INTERFACE, ROLE_INDEX_DEFINITION,
-			makeTagForInterfaceName,
-		}
-      }
+	  { .makeTagSpec = { K_INTERFACE, ROLE_INDEX_DEFINITION,
+			     makeTagForInterfaceName } }
 	},
 };
 
