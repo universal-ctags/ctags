@@ -36,10 +36,6 @@ EOF
 # PARSE
 #
 ########################################################################
-sub parse_regex;
-sub parse_kinds;
-sub parse_optlib;
-
 my $options =
     [
      [ qr/^--options=(.*)/, sub {
