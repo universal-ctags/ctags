@@ -77,37 +77,42 @@ static void makeTagForProperties (xmlNode *node,
 static tagXpathTable maven2XpathMainTable[] = {
 	{ "/*[local-name()='project']/*[local-name()='groupId']",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_GROUP_ID,  ROLE_INDEX_DEFINITION,
 			makeTagWithScope
 		}
+      }
 	},
 	{ "/*[local-name()='project']/*[local-name()='parent']/*[local-name()='groupId']",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_GROUP_ID,  R_GROUP_ID_PARENT,
 			makeTagWithScope
 		}
+      }
 	},
 	{ "/*[local-name()='project']/*[local-name()='artifactId']",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_ARTIFACT_ID,  ROLE_INDEX_DEFINITION,
 			makeTagWithScope
 		}
+      }
 	},
 	{ "/*[local-name()='project']/*[local-name()='parent']/*[local-name()='artifactId']",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_ARTIFACT_ID,  R_ARTIFACT_ID_PARENT,
 			makeTagWithScope
 		}
+      }
 	},
 	{ "/*[local-name()='project']/*[local-name()='properties']/*",
 	  LXPATH_TABLE_DO_RECUR,
-	  .recurSpec = {
+      { .recurSpec = {
 			makeTagForProperties
 		}
+      }
 	},
 };
 

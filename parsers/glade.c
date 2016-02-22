@@ -50,18 +50,21 @@ static kindOption GladeKinds [] = {
 static tagXpathTable gladeXpathMainTable[] = {
 	{ "///glade-interface//widget//@id",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_ID,    ROLE_INDEX_DEFINITION }
+      }
 	},
 	{ "///glade-interface//widget//@class",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_CLASS, R_CLASS_WIDGET }
+      }
 	},
 	{ "///glade-interface//signal//@handler",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
+      { .makeTagSpec = {
 			K_HANDLER, R_HANDLER_HANDLER }
+      }
 	},
 };
 
