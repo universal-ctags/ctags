@@ -299,10 +299,11 @@ AC_PROG_LN_S
 AC_CHECK_PROG(STRIP, strip, strip, :)
 AC_SYS_LARGEFILE
 
-AC_CHECK_PROGS([BASH], [bash])
-if ! test "${BASH+set}" = "set"; then
-   AC_MSG_ERROR([bash is needed to run optlib2c translator])
-fi
+AC_CHECK_PROG([bash_found], [bash], [yes], [no])
+AC_CHECK_PROG([seq_found],  [seq],  [yes], [no])
+AM_CONDITIONAL([RUN_OPTLIB2C],
+	 [test "${bash_found}" = "yes" -a "${seq_found}" = "yes"])
+
 
 # Checks for operating environment
 # --------------------------------
