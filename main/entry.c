@@ -53,9 +53,6 @@
 /*
 *   MACROS
 */
-#define PSEUDO_TAG_PREFIX       "!_"
-#define PSEUDO_TAG_SEPARATOR    "!"
-
 #define includeExtensionFlags()         (Option.tagFileFormat > 1)
 
 /*

@@ -897,11 +897,10 @@ static boolean parseExtensionFields (tagEntry *const entry, char *const string, 
 	return FALSE;
 }
 
-static const char *const PseudoTagPrefix = "!_";
 static boolean hasPseudoTagPrefix (const char* const name)
 {
-	const size_t prefixLength = strlen (PseudoTagPrefix);
-	return !strncmp (name, PseudoTagPrefix, prefixLength);
+	const size_t prefixLength = strlen (PSEUDO_TAG_PREFIX);
+	return !strncmp (name, PSEUDO_TAG_PREFIX, prefixLength);
 }
 
 static boolean parseXcmdPath (char* line, xcmdPath* path, tagEntry* entry)
@@ -993,7 +992,7 @@ static void freeTagEntry (tagEntry* entry)
 static boolean makePseudoTagEntryFromTagEntry (tagEntry* entry)
 {
 	const char *tagName, *fileName, *pattern;
-	const size_t prefixLength = strlen (PseudoTagPrefix);
+	const size_t prefixLength = strlen (PSEUDO_TAG_PREFIX);
 	ptagType t = PTAG_UNKNOWN;
 
 	tagName = entry->name + prefixLength;

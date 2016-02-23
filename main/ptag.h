@@ -14,6 +14,9 @@
 
 #include "general.h"
 
+#define PSEUDO_TAG_PREFIX       "!_"
+#define PSEUDO_TAG_SEPARATOR    "!"
+
 typedef enum ePtagType { /* pseudo tag content control */
 	PTAG_UNKNOWN = -1,
 	PTAG_FILE_FORMAT,
