@@ -154,7 +154,7 @@ struct sPtagDesc;
 extern void writePseudoTag (const struct sPtagDesc *pdesc,
 			    const char *const fileName,
 			    const char *const pattern,
-			    const char *const language);
+			    const char *const parserName);
 
 void          corkTagFile(void);
 void          uncorkTagFile(void);
