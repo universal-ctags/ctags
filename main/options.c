@@ -338,6 +338,10 @@ static optionDescription LongOptionDescription [] = {
  {0,"  --print-language"},
  {0,"       Don't make tags file but just print the guessed language name for"},
  {0,"       input file."},
+ {0,"  --pseudo-tags=[+|-]ptag"},
+ {0,"  --pseudo-tags=*"},
+ {0,"       Enable/disable emitting pseudo tag named ptag."},
+ {0,"       if * is given, enable emitting all pseudo tags."},
  {0,"  --put-field-prefix"},
  {0,"       Put \"" CTAGS_FIELD_PREFIX "\" as prefix for the name of fields newly introduced in"},
  {0,"       universal-ctags."},
@@ -1809,6 +1813,40 @@ static void processOptionFile (
 		vStringDelete (vpath);
 }
 
+static void processPseudoTags (const char *const option,
+			       const char *const parameter)
+{
+	const char *p = parameter;
+	boolean s;
+
+	if (*p == '*')
+	{
+		int i;
+		for (i = 0; i < PTAG_COUNT; i++)
+			enablePtag (i, TRUE);
+		return;
+	}
+
+	if (*p != '+'  &&  *p != '-')
+	{
+		int i;
+		for (i = 0; i < PTAG_COUNT; i++)
+			enablePtag (i, FALSE);
+	}
+	else
+	{
+		ptagType t;
+
+		s = (*p == '+')? TRUE: FALSE;
+		p++;
+		t = getPtagTypeForName (p);
+		if (t == PTAG_UNKNOWN)
+			error (FATAL, "Unknown pseudo tag name: %s", p);
+
+		enablePtag (t, s);
+	}
+}
+
 static void processSortOption (
 		const char *const option, const char *const parameter)
 {
@@ -2181,6 +2219,7 @@ static parametricOption ParametricOptions [] = {
 	{ "_list-roles",            processListRolesOptions,        TRUE,   STAGE_ANY },
 	{ "maxdepth",               processMaxRecursionDepthOption, TRUE,   STAGE_ANY },
 	{ "options",                processOptionFile,              FALSE,  STAGE_ANY },
+	{ "pseudo-tags",            processPseudoTags,              FALSE,  STAGE_ANY },
 	{ "sort",                   processSortOption,              TRUE,   STAGE_ANY },
 	{ "version",                processVersionOption,           TRUE,   STAGE_ANY },
 	{ "_echo",                  processEchoOption,              FALSE,  STAGE_ANY },
