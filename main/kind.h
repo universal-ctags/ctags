@@ -63,6 +63,6 @@ typedef struct sKindOption {
 
 #define ATTACH_ROLES(RS) .nRoles = ARRAY_SIZE(RS), .roles = RS
 extern void printKind (const kindOption* const kind, boolean allKindFields, boolean indent);
-const char *scopeSeparatorFor (const kindOption *kind, char parentLetter);
+extern const char *scopeSeparatorFor (const kindOption *kind, char parentLetter);
 
 #endif	/* CTAGS_MAIN_KIND_H */
