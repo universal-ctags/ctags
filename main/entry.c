@@ -165,8 +165,6 @@ extern void writePseudoTag (const struct sPtagDesc *desc,
 static void addCommonPseudoTags (void)
 {
 	int i;
-	if (Option.xref)
-		return;
 
 	for (i = 0; i < PTAG_COUNT; i++)
 	{
