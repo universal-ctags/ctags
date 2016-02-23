@@ -177,6 +177,12 @@ extern boolean doesLanguageAllowNullTag (const langType language)
 	return LanguageTable [language]->allowNullTag;
 }
 
+extern boolean doesLanguageRequestAutomaticFQTag (const langType language)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	return LanguageTable [language]->requestAutomaticFQTag;
+}
+
 extern const char *getLanguageName (const langType language)
 {
 	const char* result;
@@ -1391,7 +1397,8 @@ extern void initializeParser (langType lang)
 	installTagXpathTable (lang);
 	installFieldSpec     (lang);
 
-	if (hasScopeActionInRegex (lang))
+	if (hasScopeActionInRegex (lang)
+	    || parser->requestAutomaticFQTag)
 		parser->useCork = TRUE;
 
 	if ((parser->initialize != NULL) && (parser->initialized == FALSE))
