@@ -970,8 +970,15 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 					   scopeKey,
 					   scope->kind->name, full_qualified_scope_name);
 
-			/* TODO: Make the value pointed by full_qualified_scope_name reusable. */
-			eFree (full_qualified_scope_name);
+			if (doesInputLanguageRequestAutomaticFQTag ()
+			    && isXtagEnabled (XTAG_QUALIFIED_TAGS))
+			{
+				/* Make the information reusable to generate full qualified entry.  */
+				((tagEntryInfo *const)tag)->extensionFields.scopeKind = scope->kind;
+				((tagEntryInfo *const)tag)->extensionFields.scopeName = full_qualified_scope_name;
+			}
+			else
+				eFree (full_qualified_scope_name);
 		}
 	}
 
@@ -1372,7 +1379,16 @@ extern void uncorkTagFile(void)
 		return ;
 
 	for (i = 1; i < TagFile.corkQueue.count; i++)
-		writeTagEntry (TagFile.corkQueue.queue + i);
+	{
+		tagEntryInfo *tag = TagFile.corkQueue.queue + i;
+		writeTagEntry (tag);
+		if (doesInputLanguageRequestAutomaticFQTag ()
+		    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
+		    && tag->extensionFields.scopeKind
+		    && tag->extensionFields.scopeName
+		    && tag->extensionFields.scopeIndex)
+			makeQualifiedTagEntry (tag);
+	}
 	for (i = 1; i < TagFile.corkQueue.count; i++)
 		clearTagEntryInQueue (TagFile.corkQueue.queue + i);
 

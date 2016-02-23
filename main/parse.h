@@ -138,6 +138,7 @@ typedef struct {
 	unsigned int method;           /* See PARSE__... definitions above */
 	boolean useCork;
 	boolean allowNullTag;
+	boolean requestAutomaticFQTag;
 	const tagRegexTable *tagRegexTable;
 	unsigned int tagRegexCount;
 	const keywordTable *keywordTable;
@@ -199,6 +200,7 @@ extern int makeSimpleRefTag (const vString* const name, kindOption* const kinds,
 extern parserDefinition* parserNew (const char* name);
 extern parserDefinition* parserNewFull (const char* name, char fileKind);
 extern boolean doesLanguageAllowNullTag (const langType language);
+extern boolean doesLanguageRequestAutomaticFQTag (const langType language);
 extern const char *getLanguageName (const langType language);
 extern kindOption* getLanguageFileKind (const langType language);
 extern langType getNamedLanguage (const char *const name, size_t len);
