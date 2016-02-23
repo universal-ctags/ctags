@@ -1,16 +1,9 @@
 #!/bin/sh
 
-verify_optlib2c_requirements()
-{
-    : &&
-	which bash > /dev/null &&
-	which seq  > /dev/null
-}
-
 ctags_files=`make -f makefiles/list-translator-input.mak`
 misc/dist-test-cases > makefiles/test-cases.mak && \
     if autoreconf -vfi; then
-	if can_run_optlib2c; then
+	if which perl > /dev/null; then
 	    for i in ${ctags_files}; do
 		o=${i%.ctags}.c
 		echo "optlib2c: translating $i to $o"
