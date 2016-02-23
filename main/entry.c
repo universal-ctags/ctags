@@ -169,7 +169,10 @@ static void addCommonPseudoTags (void)
 		return;
 
 	for (i = 0; i < PTAG_COUNT; i++)
-		makePtagIfEnabled (i, NULL);
+	{
+		if (isPtagCommon (i))
+			makePtagIfEnabled (i, NULL);
+	}
 }
 
 extern void makeFileTag (const char *const fileName)

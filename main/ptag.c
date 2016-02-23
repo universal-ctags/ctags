@@ -110,26 +110,33 @@ static boolean ptagMakeFileEncoding (ptagDesc *desc, void *data __unused__)
 static ptagDesc ptagDescs [] = {
 	{ TRUE, "TAG_FILE_FORMAT",
 	  "the version of tags file format",
-	  ptagMakeFormat },
+	  ptagMakeFormat,
+	  TRUE },
 	{ TRUE, "TAG_FILE_SORTED",
 	  "how tags are sorted",
-	  ptagMakeHowSorted },
+	  ptagMakeHowSorted,
+	  TRUE },
 	{ TRUE, "TAG_PROGRAM_AUTHOR",
 	  "the author of this ctags implementation",
-	  ptagMakeAuthor },
+	  ptagMakeAuthor,
+	  TRUE },
 	{ TRUE, "TAG_PROGRAM_NAME",
 	  "the name of this ctags implementation",
-	  ptagMakeProgName },
+	  ptagMakeProgName,
+	  TRUE },
 	{ TRUE, "TAG_PROGRAM_URL",
 	  "the official site URL of this ctags implementation",
-	  ptagMakeProgURL },
+	  ptagMakeProgURL,
+	  TRUE },
 	{ TRUE, "TAG_PROGRAM_VERSION",
 	  "the version of this ctags implementation",
-	  ptagMakeProgVersion },
+	  ptagMakeProgVersion,
+	  TRUE },
 #ifdef HAVE_ICONV
 	{ TRUE, "TAG_FILE_ENCODING",
 	  "the encoding used in output tags file",
-	  ptagMakeFileEncoding },
+	  ptagMakeFileEncoding,
+	  TRUE },
 #endif
 };
 
@@ -188,6 +195,12 @@ extern ptagType getPtagTypeForName (const char *name)
 		if (strcmp (ptagDescs [i].name, name) == 0)
 			return i;
 	return PTAG_UNKNOWN;
+}
+
+extern boolean isPtagCommon  (ptagType type)
+{
+	ptagDesc* pdesc = getPtagDesc (type);
+	return pdesc->common;
 }
 
 extern void printPtag (ptagType type)
