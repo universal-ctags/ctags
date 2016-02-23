@@ -148,6 +148,8 @@ typedef struct {
 	unsigned int tagRegexInstalled:1; /* tagRegexTable is installed or not. */
 	unsigned int keywordInstalled:1;  /* keywordTable is installed or not. */
 	unsigned int tagXpathInstalled:1;  /* tagXpathTable is installed or not. */
+	unsigned int pseudoTagPrinted:1;   /* pseudo tags about this parser
+					      is emitted or not. */
 
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
@@ -266,6 +268,10 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 			 const kindOption* const kinds, void *userData);
 extern void installTagXpathTable (const langType language);
 extern void addTagXpath (const langType language, tagXpathTable *xpathTable);
+
+struct sPtagDesc;
+extern void makeKindSeparatorsPseudoTags (const langType language,
+					  const struct sPtagDesc *pdesc);
 
 #endif  /* CTAGS_MAIN_PARSE_H */
 

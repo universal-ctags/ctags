@@ -16,6 +16,7 @@
 #include "ctags.h"
 #include "debug.h"
 #include "options.h"
+#include "parse.h"
 #include "ptag.h"
 #include <string.h>
 
@@ -107,6 +108,13 @@ static boolean ptagMakeFileEncoding (ptagDesc *desc, void *data __unused__)
 }
 #endif
 
+static boolean ptagMakeKindSeparators (ptagDesc *desc, void *data)
+{
+	langType *language = data;
+	makeKindSeparatorsPseudoTags (*language, desc);
+	return TRUE;
+}
+
 static ptagDesc ptagDescs [] = {
 	{ TRUE, "TAG_FILE_FORMAT",
 	  "the version of tags file format",
@@ -138,6 +146,10 @@ static ptagDesc ptagDescs [] = {
 	  ptagMakeFileEncoding,
 	  TRUE },
 #endif
+	{ FALSE, "TAG_KIND_SEPARATOR",
+	  "the separators used in kinds",
+	  ptagMakeKindSeparators,
+	  FALSE },
 };
 
 extern boolean makePtagIfEnabled (ptagType type, void *data)
