@@ -1787,6 +1787,8 @@ static void skipCppTemplateParameterList (void)
 						++angleBracketsLevel;
 				}
 			}
+			else if(CollectingSignature)
+				vStringPut (Signature, c);
 		}
 		else if (c == '>')
 		{
@@ -1800,6 +1802,8 @@ static void skipCppTemplateParameterList (void)
 					defaultValueExpected = FALSE;
 				}
 			}
+			else if(CollectingSignature)
+				vStringPut (Signature, c);
 		}
 		else if (c == '(')
 			roundBracketsLevel ++;
