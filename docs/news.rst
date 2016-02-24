@@ -406,6 +406,75 @@ However, in e-order, the other parser is chosen. So universal-ctags
 uses the u-order though it introduces incompatibility.
 
 
+Pseudo tags
+---------------------------------------------------------------------
+
+pseudo tags are meta data of tags file. Universal-ctags will utilize
+pseudo tags aggressively.
+
+Universal-ctags is not mature yet; there is possibility that
+incompatible changes are introduced. As the result tools reading tags
+will not work as expected.
+
+To avoid such cases, we try making tags file more self-descriptive.
+The pseudo tags are used for the self description.  We hope some of
+incompatibilities can be overcome in upper layer tools with the pseudo
+tags.
+
+
+``TAG_KIND_SEPARATOR``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is a newly introduced pseudo tag. It is not emitted by default.
+It is emitted only when ``--pseudo-tags=+TAG_KIND_SEPARATOR`` option
+is given.
+
+This is for describing separators placed between two kinds in a language.
+
+Tag entries including the separators are emitted when ``--extra=+q``
+is given; full qualified tags contain the separators. The separators
+are used in scope information, too.
+
+ctags emits ``TAG_KIND_SEPARATOR`` with following format::
+
+	!_TAG_KIND_SEPARATOR!{parser}	{sep}	/{upper}{lower}/
+
+Here {parser} is the name of language. e.g. PHP.
+{lower} is the letter representing kind of lower item.
+{upper} is the letter representing kind of upper item.
+{sep} is the separator placed between the upper item and
+the lower item.
+
+`*` given as {upper} is a fallback wild card; if it is given, the
+{sep} is used in combination of any upper item and the item specified
+with {lower}.
+
+Each backslash characters used in ${sep} is escaped with
+an extra backslash character.
+
+Example output:
+
+.. code-block:: console
+
+    $ ./ctags -o - --extra=+p --pseudo-tags=  --pseudo-tags=+TAG_KIND_SEPARATOR input.php
+    !_TAG_KIND_SEPARATOR!PHP	::	/*c/
+    !_TAG_KIND_SEPARATOR!PHP	::	/*d/
+    !_TAG_KIND_SEPARATOR!PHP	::	/*f/
+    !_TAG_KIND_SEPARATOR!PHP	::	/*i/
+    !_TAG_KIND_SEPARATOR!PHP	::	/*l/
+    !_TAG_KIND_SEPARATOR!PHP	::	/*n/
+    !_TAG_KIND_SEPARATOR!PHP	::	/*t/
+    !_TAG_KIND_SEPARATOR!PHP	::	/*v/
+    !_TAG_KIND_SEPARATOR!PHP	\\	/nc/
+    !_TAG_KIND_SEPARATOR!PHP	\\	/nd/
+    !_TAG_KIND_SEPARATOR!PHP	\\	/nf/
+    !_TAG_KIND_SEPARATOR!PHP	\\	/ni/
+    !_TAG_KIND_SEPARATOR!PHP	\\	/nl/
+    !_TAG_KIND_SEPARATOR!PHP	\\	/nn/
+    !_TAG_KIND_SEPARATOR!PHP	\\	/nt/
+    !_TAG_KIND_SEPARATOR!PHP	\\	/nv/
+
+
 Readtags
 ---------------------------------------------------------------------
 
