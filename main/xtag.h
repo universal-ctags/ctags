@@ -30,7 +30,7 @@ typedef enum eXtagType { /* extra tag content control */
 typedef struct sXtagDesc {
 	boolean enabled;
 	unsigned char letter;
-	const char* description;  /* displayed in --list-extras output */
+	const char* description;  /* displayed in --list-extra output */
 
 	/* If the value for "enabled" is given dynamically,
 	   use this field.
