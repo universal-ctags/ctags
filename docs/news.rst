@@ -230,6 +230,30 @@ Guessing parser from file contents (``-G`` option)
 See "Choosing a proper parser in ctags" section.
 
 
+Enabling/disabling pseudo tags (``--pseudo-tags`` option)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Each pseudo tag can be endabled/disabled with ``--pseudo-tags`` option.
+::
+
+	--pseudo-tags=+ptag
+	--pseudo-tags=-ptag
+
+With prefixed with `+`, the pseudo tag specified as ``ptag`` is enabled.
+With prefixed with `-`, the pseudo tag specified as ``ptag`` is disabled.
+``--list-pseudo-tags`` option shows all specifiable ptag names.
+
+All pseudo tags are enabled if `*` is given as the name of ptag like::
+
+	--pseudo-tags=*
+
+All pseudo tags are disabled if no option value is given to
+``--pseudo-tags` option like::
+
+	--pseudo-tags=
+
+
+
 Changes in tags file format
 ---------------------------------------------------------------------
 
