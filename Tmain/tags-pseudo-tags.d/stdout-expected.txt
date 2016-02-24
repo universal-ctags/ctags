@@ -8,6 +8,12 @@
 !_TAG_KIND_SEPARATOR!PHP	::	/*n/
 !_TAG_KIND_SEPARATOR!PHP	::	/*t/
 !_TAG_KIND_SEPARATOR!PHP	::	/*v/
+!_TAG_KIND_SEPARATOR!PHP	\\	/c/
+!_TAG_KIND_SEPARATOR!PHP	\\	/d/
+!_TAG_KIND_SEPARATOR!PHP	\\	/f/
+!_TAG_KIND_SEPARATOR!PHP	\\	/i/
+!_TAG_KIND_SEPARATOR!PHP	\\	/l/
+!_TAG_KIND_SEPARATOR!PHP	\\	/n/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nc/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nd/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nf/
@@ -16,6 +22,8 @@
 !_TAG_KIND_SEPARATOR!PHP	\\	/nn/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nt/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nv/
+!_TAG_KIND_SEPARATOR!PHP	\\	/t/
+!_TAG_KIND_SEPARATOR!PHP	\\	/v/
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/

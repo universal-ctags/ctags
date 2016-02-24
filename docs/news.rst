@@ -439,11 +439,19 @@ ctags emits ``TAG_KIND_SEPARATOR`` with following format::
 
 	!_TAG_KIND_SEPARATOR!{parser}	{sep}	/{upper}{lower}/
 
+or
+::
+
+	!_TAG_KIND_SEPARATOR!{parser}	{sep}	/{lower}/
+
 Here {parser} is the name of language. e.g. PHP.
 {lower} is the letter representing kind of lower item.
 {upper} is the letter representing kind of upper item.
 {sep} is the separator placed between the upper item and
 the lower item.
+
+The format without {upper} is for representing a root separator.  The
+root separator is used as prefix for an item which has no upper scope.
 
 `*` given as {upper} is a fallback wild card; if it is given, the
 {sep} is used in combination of any upper item and the item specified
@@ -458,21 +466,19 @@ Example output:
 
     $ ./ctags -o - --extra=+p --pseudo-tags=  --pseudo-tags=+TAG_KIND_SEPARATOR input.php
     !_TAG_KIND_SEPARATOR!PHP	::	/*c/
-    !_TAG_KIND_SEPARATOR!PHP	::	/*d/
-    !_TAG_KIND_SEPARATOR!PHP	::	/*f/
-    !_TAG_KIND_SEPARATOR!PHP	::	/*i/
-    !_TAG_KIND_SEPARATOR!PHP	::	/*l/
-    !_TAG_KIND_SEPARATOR!PHP	::	/*n/
-    !_TAG_KIND_SEPARATOR!PHP	::	/*t/
-    !_TAG_KIND_SEPARATOR!PHP	::	/*v/
+    ...
+    !_TAG_KIND_SEPARATOR!PHP	\\	/c/
+    ...
     !_TAG_KIND_SEPARATOR!PHP	\\	/nc/
-    !_TAG_KIND_SEPARATOR!PHP	\\	/nd/
-    !_TAG_KIND_SEPARATOR!PHP	\\	/nf/
-    !_TAG_KIND_SEPARATOR!PHP	\\	/ni/
-    !_TAG_KIND_SEPARATOR!PHP	\\	/nl/
-    !_TAG_KIND_SEPARATOR!PHP	\\	/nn/
-    !_TAG_KIND_SEPARATOR!PHP	\\	/nt/
-    !_TAG_KIND_SEPARATOR!PHP	\\	/nv/
+    ...
+
+The first line means `::` is used when combining something with an
+item of class kind. The second line means `\` is used when a class
+item is at the top level, no upper item for it. The third line
+means `\` is used when for combining a namespace item(upper) and a
+class item(lower). Of course, ctags uses more specific one when
+choosing a separator; the third one has higher priority than the
+first.
 
 
 Readtags

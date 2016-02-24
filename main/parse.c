@@ -2133,7 +2133,17 @@ extern void makeKindSeparatorsPseudoTags (const langType language,
 			sep = kinds[i].separators + j;
 
 			if (sep->parentLetter == KIND_WILDCARD)
+			{
 				name[1] = KIND_WILDCARD;
+				name[2] = kinds[i].letter;
+			}
+			else if (sep->parentLetter == KIND_NULL)
+			{
+				/* This is root separator: no upper item is here. */
+				name[1] = kinds[i].letter;
+				name[2] = name[3];
+				name[3] = '\0';
+			}
 			else
 			{
 				upperKind = langKindOption (language,
@@ -2142,8 +2152,9 @@ extern void makeKindSeparatorsPseudoTags (const langType language,
 					continue;
 
 				name[1] = upperKind->letter;
+				name[2] = kinds[i].letter;
 			}
-			name[2] = kinds[i].letter;
+
 
 			vStringClear (sepval);
 			vStringCatSWithEscaping (sepval, sep->separator);

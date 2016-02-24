@@ -111,11 +111,10 @@ typedef enum {
 } phpKind;
 
 #define NAMESPACE_SEPARATOR "\\"
-#define PHP_ROOT_SEPARATOR  NAMESPACE_SEPARATOR
 static scopeSeparator PhpGenericSeparators [] = {
 	{ 'n'          , NAMESPACE_SEPARATOR },
+	{ '\0'	       , NAMESPACE_SEPARATOR }, /* root separator */
 	{ KIND_WILDCARD, "::" },
-
 };
 
 static kindOption PhpKinds[COUNT_KIND] = {
@@ -294,14 +293,18 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 						  const phpKind kind, const accessType access)
 {
 	int parentKind = -1;
+	const char *rootsep;
 
 	vStringClear (FullScope);
 
 	if (vStringLength (CurrentNamesapce) > 0)
 	{
-		vStringCatS (FullScope, PHP_ROOT_SEPARATOR);
-		vStringCat (FullScope, CurrentNamesapce);
 		parentKind = K_NAMESPACE;
+		rootsep = scopeSeparatorFor (PhpKinds + parentKind,
+					     KIND_NULL);
+		vStringCatS (FullScope, rootsep);
+		vStringCat (FullScope, CurrentNamesapce);
+
 	}
 
 	initTagEntry (e, vStringValue (token->string), &(PhpKinds[kind]));
@@ -324,7 +327,11 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 			vStringCatS (FullScope, sep);
 		}
 		else
-			vStringCatS (FullScope, PHP_ROOT_SEPARATOR);
+		{
+			rootsep = scopeSeparatorFor (PhpKinds + parentKind,
+						     KIND_NULL);
+			vStringCatS (FullScope, rootsep);
+		}
 		vStringCat (FullScope, token->scope);
 	}
 	if (vStringLength (FullScope) > 0)
