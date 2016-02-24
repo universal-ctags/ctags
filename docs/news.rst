@@ -137,9 +137,9 @@ definition of a tag as users expect with pattern matching. ctags
 writes patterns in tags file.
 
 Good news is that there is a way to notify vim the encoding used in a
-tags file with ``_TAG_FILE_ENCODING`` pseudo tag in the tag file.
+tags file with ``TAG_FILE_ENCODING`` pseudo tag in the tag file.
 
-This feature solves this issue utilizing ``_TAG_FILE_ENCODING``
+This feature solves this issue utilizing ``TAG_FILE_ENCODING``
 pseudo tag.
 
 This patch introduces two type of options (``--input-encoding=IN``
@@ -149,7 +149,7 @@ As specified encoding with these options ctags converts input from
 ``IN`` encoding to ``OUT`` encoding. ctags uses the converted strings
 when writing pattern parts of tags lines. As the result tags output is
 encoded in ``OUT`` encoding.  In addition ``OUT`` is specified in the
-top tags file as value for ``_TAG_FILE_ENCODING`` pseudo tag.  As
+top tags file as value for ``TAG_FILE_ENCODING`` pseudo tag.  As
 ``OUT`` utf-8 is as default.
 
 NOTE: Converted input is NOT passed to language parsers.
