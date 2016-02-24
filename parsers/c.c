@@ -1777,18 +1777,28 @@ static void skipCppTemplateParameterList (void)
 
 		if (c == '<')
 		{
-			if (roundBracketsLevel == 0)
+			int x = cppGetc ();
+			if(x != '<') 
 			{
-				if (defaultValueExpected == FALSE)
-					++angleBracketsLevel;
+				cppUngetc (x);
+				if (roundBracketsLevel == 0)
+				{
+					if (defaultValueExpected == FALSE)
+						++angleBracketsLevel;
+				}
 			}
 		}
 		else if (c == '>')
 		{
-			if (roundBracketsLevel == 0)
+			int x = cppGetc ();
+			if( x != '>') 
 			{
-				--angleBracketsLevel;
-				defaultValueExpected = FALSE;
+				cppUngetc (x);
+				if (roundBracketsLevel == 0)
+				{
+					--angleBracketsLevel;
+					defaultValueExpected = FALSE;
+				}
 			}
 		}
 		else if (c == '(')
