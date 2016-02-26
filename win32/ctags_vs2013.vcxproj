@@ -171,6 +171,7 @@
     <ClCompile Include="..\main\strlist.c" />
     <ClCompile Include="..\parsers\tcl.c" />
     <ClCompile Include="..\parsers\tex.c" />
+    <ClCompile Include="..\parsers\ttcn.c" />
     <ClCompile Include="..\parsers\verilog.c" />
     <ClCompile Include="..\parsers\vhdl.c" />
     <ClCompile Include="..\parsers\vim.c" />

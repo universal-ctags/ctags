@@ -1,0 +1,2 @@
+f	input.ttcn	/^var integer f := 64\/2$/;"	v
+g	input.ttcn	/^var integer g := 64 \/ 2$/;"	v

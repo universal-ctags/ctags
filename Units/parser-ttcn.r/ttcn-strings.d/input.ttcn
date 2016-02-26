@@ -1,0 +1,15 @@
+var charstring myCharstring := "qwerty"
+var universal charstring myCharstring := "asdfgh"
+var universal charstring myCharstring2 := "a's'd"
+var universal charstring myCharstring3 := "a'sd"
+var universal charstring myCharstring5 := "\"asd\""
+var universal charstring myCharstring6 := "a\"s\"d"
+var universal charstring myCharstring7 := "a\"s\"d"
+var universal charstring myCharstring8 := """asd"""
+var universal charstring myIntAsCharstring1 := "156"
+var universal charstring myIntAsCharstring2 := "-156"
+var universal charstring myFloatAsCharstring1 := "1.56"
+var universal charstring myFloatAsCharstring2 := "-1.56"
+var bitstring myBitstring := '100100101101'B
+var hexstring myHexstring := '09A8B'H
+var octetstring myOctetstring := '09A8B8'O

@@ -1,0 +1,21 @@
+
+
+// var integer a := 2 
+
+/* var integer b := 4 */
+
+/*
+   var integer c := 8
+*/
+
+/*
+ * var indeger d := 16
+ */
+
+/**
+* var integer e := 32
+*/
+
+var integer f := 64/2
+var integer g := 64 / 2
+

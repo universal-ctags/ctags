@@ -1,0 +1,2 @@
+MySignature	input.ttcn	/^signature MySignature(in integer par1, in integer par2)$/;"	s
+mySign	input.ttcn	/^template MySignature mySign$/;"	d

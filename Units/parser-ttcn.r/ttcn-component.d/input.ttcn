@@ -1,0 +1,22 @@
+module CoffeeMachine
+{
+
+   type port IntegerInputPortType message { in integer }
+   type port CharstringOutputPortType message { out charstring }
+
+   type component CoffeeMachineComponentType
+   {
+      port IntegerInputPortType InputPort;
+      port CharstringOutputPortType OutputPort;
+   }
+
+   var CoffeeMachineComponentType machine
+   machine := CoffeeMachineComponentType.create()
+   machine := CoffeeMachineComponentType.create("start")
+   machine := CoffeeMachineComponentType.create() alive
+   machine := CoffeeMachineComponentType.create(2) alive
+   machine.start(doSomeCoffee("late")) 
+   machine.done
+
+}
+

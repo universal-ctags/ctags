@@ -1,0 +1,6 @@
+
+type enumerated CoffeeTemperature 
+{
+    e_cold, e_warm, e_hot
+}
+

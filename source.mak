@@ -119,6 +119,7 @@ PARSER_SRCS =				\
 	parsers/sql.c			\
 	parsers/tcl.c			\
 	parsers/tex.c			\
+	parsers/ttcn.c			\
 	parsers/verilog.c		\
 	parsers/vhdl.c			\
 	parsers/vim.c			\

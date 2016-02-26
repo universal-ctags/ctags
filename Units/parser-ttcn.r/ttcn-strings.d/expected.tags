@@ -1,0 +1,15 @@
+myCharstring	input.ttcn	/^var charstring myCharstring := "qwerty"$/;"	v
+myCharstring	input.ttcn	/^var universal charstring myCharstring := "asdfgh"$/;"	v
+myCharstring2	input.ttcn	/^var universal charstring myCharstring2 := "a's'd"$/;"	v
+myCharstring3	input.ttcn	/^var universal charstring myCharstring3 := "a'sd"$/;"	v
+myCharstring5	input.ttcn	/^var universal charstring myCharstring5 := "\\"asd\\""$/;"	v
+myCharstring6	input.ttcn	/^var universal charstring myCharstring6 := "a\\"s\\"d"$/;"	v
+myCharstring7	input.ttcn	/^var universal charstring myCharstring7 := "a\\"s\\"d"$/;"	v
+myCharstring8	input.ttcn	/^var universal charstring myCharstring8 := """asd"""$/;"	v
+myIntAsCharstring1	input.ttcn	/^var universal charstring myIntAsCharstring1 := "156"$/;"	v
+myIntAsCharstring2	input.ttcn	/^var universal charstring myIntAsCharstring2 := "-156"$/;"	v
+myFloatAsCharstring1	input.ttcn	/^var universal charstring myFloatAsCharstring1 := "1.56"$/;"	v
+myFloatAsCharstring2	input.ttcn	/^var universal charstring myFloatAsCharstring2 := "-1.56"$/;"	v
+myBitstring	input.ttcn	/^var bitstring myBitstring := '100100101101'B$/;"	v
+myHexstring	input.ttcn	/^var hexstring myHexstring := '09A8B'H$/;"	v
+myOctetstring	input.ttcn	/^var octetstring myOctetstring := '09A8B8'O$/;"	v

@@ -1,0 +1,22 @@
+CoffeeTypes	input.ttcn	/^module CoffeeTypes$/;"	M
+Coffee	input.ttcn	/^type record Coffee$/;"	t
+id	input.ttcn	/^    integer id,$/;"	m
+description	input.ttcn	/^    charstring description$/;"	m
+CoffeeList	input.ttcn	/^type record of Coffee CoffeeList$/;"	t
+RangedCoffeeList	input.ttcn	/^type record length (1..2) of Coffee RangedCoffeeList$/;"	t
+Tee	input.ttcn	/^type record Tee$/;"	t
+nestedIntegersRecord	input.ttcn	/^    record of integer nestedIntegersRecord,$/;"	m
+nestedRangedIntegersRecord	input.ttcn	/^    record length (0..5) of integer nestedRangedIntegersRecord,$/;"	m
+nestedIntegersSet	input.ttcn	/^    set of integer nestedIntegersSet,$/;"	m
+nestedRangerdIntegersSet	input.ttcn	/^    set length (2..4) of integer nestedRangerdIntegersSet,$/;"	m
+e_type1	input.ttcn	/^    enumerated {e_type1, e_type2} nestedEnum,$/;"	e
+e_type2	input.ttcn	/^    enumerated {e_type1, e_type2} nestedEnum,$/;"	e
+nestedEnum	input.ttcn	/^    enumerated {e_type1, e_type2} nestedEnum,$/;"	m
+t1	input.ttcn	/^    union {Type1 t1, Type2 t2} nestedUnion$/;"	m
+t2	input.ttcn	/^    union {Type1 t1, Type2 t2} nestedUnion$/;"	m
+nestedUnion	input.ttcn	/^    union {Type1 t1, Type2 t2} nestedUnion$/;"	m
+TeeSet	input.ttcn	/^type set of Tee TeeSet$/;"	t
+RangedTeeSet	input.ttcn	/^type set length (0 .. 2) of Tee RangedTeeSet$/;"	t
+Drink	input.ttcn	/^type union Drink$/;"	t
+tee	input.ttcn	/^    Tee tee,$/;"	m
+coffee	input.ttcn	/^    Coffee coffee,$/;"	m

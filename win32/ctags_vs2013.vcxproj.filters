@@ -162,6 +162,9 @@
     <ClCompile Include="..\parsers\tex.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\ttcn.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\verilog.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
