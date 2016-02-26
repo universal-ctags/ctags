@@ -656,7 +656,7 @@ extern char *readLineFromBypassSlow (vString *const vLine,
 	char *result = NULL;
 
 
-	fpos_t orignalPosition;
+	fpos_t originalPosition;
 	char *line;
 	size_t len;
 	long pos;
@@ -693,7 +693,7 @@ extern char *readLineFromBypassSlow (vString *const vLine,
 	{
 		unsigned long n;
 
-		fgetpos (File.fp, &orignalPosition);
+		fgetpos (File.fp, &originalPosition);
 		rewind (File.fp);
 		line = NULL;
 		pos = 0;
@@ -737,7 +737,7 @@ extern char *readLineFromBypassSlow (vString *const vLine,
 
 out:
 	regfree (&patbuf);
-	fsetpos (File.fp, &orignalPosition);
+	fsetpos (File.fp, &originalPosition);
 	return result;
 }
 
