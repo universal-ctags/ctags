@@ -1,4 +1,4 @@
-aVar	input.cpp	/^c< 1<<8 > aVar;"	v
-bVar	input.cpp	/^c< 8 > bVar;$/;"	v
 c	input.cpp	/^template <int P> class c {};$/;"	c	file:
-func    input.cpp	/^template<int X> func( c< 1<<X> & aVar) {$/;"  f	signature:( c< 1<<X> & aVar)
+bVar	input.cpp	/^c< 8 > bVar;$/;"	v
+aVar	input.cpp	/^c< 1<<8 > aVar;$/;"	v
+f12	input.cpp	/^template<int X> f12( c< 1<<X> & aVar) { };$/;"	f	signature:( c< 1<<X> & aVar)
