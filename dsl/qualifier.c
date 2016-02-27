@@ -56,6 +56,7 @@ static EsObject* builtin_prefix (EsObject *args, tagEntry *entry);
 static EsObject* builtin_suffix (EsObject *args, tagEntry *entry);
 static EsObject* builtin_substr (EsObject *args, tagEntry *entry);
 static EsObject* builtin_member (EsObject *args, tagEntry *entry);
+static EsObject* builtin_entry_ref (EsObject *args, tagEntry *entry);
 
 
 static EsObject* value_name (EsObject *args, tagEntry *entry);
@@ -98,6 +99,8 @@ struct sCode {
 	  .helpstr = "(substr? TARGET<string> SUBSTR<string>) -> <boolean>" },
 	{ "member",  builtin_member, NULL, CHECK_ARITY, 2,
 	  .helpstr = "(member ELEMENT LIST) -> #f|<list>'" },
+	{ "$",       builtin_entry_ref, NULL, CHECK_ARITY, 1,
+	  .helpstr = "($ NAME) -> #f|<string>'" },
 
 	{ "$name",           value_name,           NULL, MEMORABLE, 0UL,},
 	{ "$input",          value_input,          NULL, MEMORABLE, 0UL,
@@ -460,6 +463,20 @@ static EsObject* entry_xget_string (tagEntry *entry, const char* name)
 	else
 		return es_false;
 }
+
+static EsObject* builtin_entry_ref (EsObject *args, tagEntry *entry)
+{
+	EsObject *key = es_car(args);
+
+	if (es_error_p (key))
+		return key;
+	else if (! es_string_p (key))
+		throw (WRONG_TYPE_ARGUMENT,
+		       es_symbol_intern ("$"));
+	else
+		return entry_xget_string (entry, es_string_get (key));
+}
+
 
 static EsObject* value_name (EsObject *args, tagEntry *entry)
 {

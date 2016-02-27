@@ -21,3 +21,11 @@ Foo.aw	base.py	/^    def aw ():$/;"	kind:member	language:Python	scope:class:Foo	
 ;; (and (member "Foo" $inherits) (eq? $kind "class"))
 Bar	base.py	/^class Bar (Foo):$/;"	kind:class	language:Python	inherits:Foo	access:public
 Baz	base.py	/^class Baz (Foo): $/;"	kind:class	language:Python	inherits:Foo	access:public
+;; (not ($ "signature"))
+A	base.py	/^    class A:$/;"	kind:class	language:Python	scope:class:Foo	inherits:	access:public
+B	base.py	/^    class B:$/;"	kind:class	language:Python	scope:class:Bar	inherits:	access:public
+Bar	base.py	/^class Bar (Foo):$/;"	kind:class	language:Python	inherits:Foo	access:public
+Baz	base.py	/^class Baz (Foo): $/;"	kind:class	language:Python	inherits:Foo	access:public
+C	base.py	/^    class C:$/;"	kind:class	language:Python	scope:class:Baz	inherits:	access:public
+Foo	base.py	/^class Foo:$/;"	kind:class	language:Python	inherits:	access:public
+base.py	base.py	28;"	kind:file	language:Python
