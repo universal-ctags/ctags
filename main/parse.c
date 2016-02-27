@@ -23,6 +23,7 @@
 #define OPTION_WRITE
 #include "options.h"
 #include "parsers.h"
+#include "ptag.h"
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
@@ -1942,6 +1943,15 @@ extern void freeEncodingResources (void)
 }
 #endif
 
+static void addParserPseudoTags (langType language)
+{
+	if (!LanguageTable[language]->pseudoTagPrinted)
+	{
+		makePtagIfEnabled (PTAG_KIND_SEPARATOR, &language);
+		LanguageTable[language]->pseudoTagPrinted = 1;
+	}
+}
+
 extern boolean parseFile (const char *const fileName)
 {
 	boolean tagFileResized = FALSE;
@@ -1975,6 +1985,8 @@ extern boolean parseFile (const char *const fileName)
 
 		if (Option.etags)
 			beginEtagsFile ();
+
+		addParserPseudoTags (language);
 
 		tagFileResized = createTagsWithFallback (fileName, language);
 #ifdef HAVE_COPROC
@@ -2086,6 +2098,70 @@ extern void installTagXpathTable (const langType language)
 			for (j = 0; j < lang->tagXpathTableTable[i].count; ++j)
 				addTagXpath (language, lang->tagXpathTableTable[i].table + j);
 		lang->tagXpathInstalled = TRUE;
+	}
+}
+
+extern void makeKindSeparatorsPseudoTags (const langType language,
+					  const struct sPtagDesc *pdesc)
+{
+	parserDefinition* lang;
+	kindOption *kinds;
+	unsigned int kindCount;
+	int i, j;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+	kinds = lang->kinds;
+	kindCount = lang->kindCount;
+
+	if (kinds == NULL)
+		return;
+
+	for (i = 0; i < kindCount; ++i)
+	{
+		static vString *sepval;
+
+		if (!sepval)
+			sepval = vStringNew ();
+
+		for (j = 0; j < kinds[i].separatorCount; ++j)
+		{
+			char name[5] = {[0] = '/', [3] = '/', [4] = '\0'};
+			const kindOption *upperKind;
+			const scopeSeparator *sep;
+
+			sep = kinds[i].separators + j;
+
+			if (sep->parentLetter == KIND_WILDCARD)
+			{
+				name[1] = KIND_WILDCARD;
+				name[2] = kinds[i].letter;
+			}
+			else if (sep->parentLetter == KIND_NULL)
+			{
+				/* This is root separator: no upper item is here. */
+				name[1] = kinds[i].letter;
+				name[2] = name[3];
+				name[3] = '\0';
+			}
+			else
+			{
+				upperKind = langKindOption (language,
+							    sep->parentLetter);
+				if (!upperKind)
+					continue;
+
+				name[1] = upperKind->letter;
+				name[2] = kinds[i].letter;
+			}
+
+
+			vStringClear (sepval);
+			vStringCatSWithEscaping (sepval, sep->separator);
+
+			writePseudoTag (pdesc, vStringValue (sepval),
+					name, lang->name);
+		}
 	}
 }
 

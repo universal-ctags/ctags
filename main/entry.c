@@ -53,9 +53,6 @@
 /*
 *   MACROS
 */
-#define PSEUDO_TAG_PREFIX       "!_"
-#define PSEUDO_TAG_SEPARATOR    "!"
-
 #define includeExtensionFlags()         (Option.tagFileFormat > 1)
 
 /*
@@ -146,13 +143,13 @@ static void rememberMaxLengths (const size_t nameLength, const size_t lineLength
 extern void writePseudoTag (const struct sPtagDesc *desc,
 			    const char *const fileName,
 			    const char *const pattern,
-			    const char *const language)
+			    const char *const parserName)
 {
-	const int length = language
+	const int length = parserName
 
 #define OPT(X) ((X)?(X):"")
 	  ? fprintf (TagFile.fp, "%s%s%s%s\t%s\t%s\n",
-		     PSEUDO_TAG_PREFIX, desc->name, PSEUDO_TAG_SEPARATOR, language,
+		     PSEUDO_TAG_PREFIX, desc->name, PSEUDO_TAG_SEPARATOR, parserName,
 		     OPT(fileName), OPT(pattern))
 	  : fprintf (TagFile.fp, "%s%s\t%s\t/%s/\n",
 		     PSEUDO_TAG_PREFIX, desc->name,
@@ -168,11 +165,12 @@ extern void writePseudoTag (const struct sPtagDesc *desc,
 static void addCommonPseudoTags (void)
 {
 	int i;
-	if (Option.xref)
-		return;
 
 	for (i = 0; i < PTAG_COUNT; i++)
-		makePtagIfEnabled (i, NULL);
+	{
+		if (isPtagCommon (i))
+			makePtagIfEnabled (i, NULL);
+	}
 }
 
 extern void makeFileTag (const char *const fileName)

@@ -14,6 +14,9 @@
 
 #include "general.h"
 
+#define PSEUDO_TAG_PREFIX       "!_"
+#define PSEUDO_TAG_SEPARATOR    "!"
+
 typedef enum ePtagType { /* pseudo tag content control */
 	PTAG_UNKNOWN = -1,
 	PTAG_FILE_FORMAT,
@@ -25,6 +28,7 @@ typedef enum ePtagType { /* pseudo tag content control */
 #ifdef HAVE_ICONV
 	PTAG_FILE_ENCODING,
 #endif
+	PTAG_KIND_SEPARATOR,
 	PTAG_COUNT
 } ptagType;
 
@@ -33,6 +37,7 @@ typedef struct sPtagDesc {
 	const char* name;
 	const char* description;  /* displayed in --list-pseudo-tags output */
 	boolean (* makeTag) (struct sPtagDesc *, void *);
+	boolean common;
 } ptagDesc;
 
 struct ptagXcmdData {
@@ -46,6 +51,7 @@ extern ptagDesc* getPtagDesc (ptagType type);
 extern ptagType  getPtagTypeForName (const char *name);
 extern void printPtag (ptagType type);
 extern boolean isPtagEnabled (ptagType type);
+extern boolean isPtagCommon  (ptagType type);
 extern boolean enablePtag (ptagType type, boolean state);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

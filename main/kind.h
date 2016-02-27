@@ -41,7 +41,6 @@ extern const char *renderRole (const roleDesc* const role, vString* b);
 #define KIND_GENERIC_REFERENCE '@'
 #define KIND_GENERIC_REFERENCE_DEFAULT_LONG "reference"
 
-/* Don't use in your parser. */
 #define KIND_WILDCARD '*'
 
 typedef struct sScopeSeparator {
@@ -62,7 +61,8 @@ typedef struct sKindOption {
 } kindOption;
 
 #define ATTACH_ROLES(RS) .nRoles = ARRAY_SIZE(RS), .roles = RS
+#define ATTACH_SEPARATORS(S) .separators = S, .separatorCount = ARRAY_SIZE(S)
 extern void printKind (const kindOption* const kind, boolean allKindFields, boolean indent);
-const char *scopeSeparatorFor (const kindOption *kind, char parentLetter);
+extern const char *scopeSeparatorFor (const kindOption *kind, char parentLetter);
 
 #endif	/* CTAGS_MAIN_KIND_H */

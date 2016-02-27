@@ -286,4 +286,55 @@ extern vString *vStringNewFile (FILE *input)
 	return buf;
 }
 
+static char valueToXDigit (int v)
+{
+	Assert (v >= 0 && v <= 0xF);
+
+	if (v >= 0xA)
+		return 'A' + (v - 0xA);
+	else
+		return '0' + v;
+}
+
+extern void vStringCatSWithEscaping (vString* b, const char *s)
+{
+	for(; *s; s++)
+	{
+		int c = *s;
+
+		/* escape control characters (incl. \t) */
+		if ((c > 0x00 && c <= 0x1F) || c == 0x7F || c == '\\')
+		{
+			vStringPut (b, '\\');
+
+			switch (c)
+			{
+				/* use a short form for known escapes */
+			case '\a':
+				c = 'a'; break;
+			case '\b':
+				c = 'b'; break;
+			case '\t':
+				c = 't'; break;
+			case '\n':
+				c = 'n'; break;
+			case '\v':
+				c = 'v'; break;
+			case '\f':
+				c = 'f'; break;
+			case '\r':
+				c = 'r'; break;
+			case '\\':
+				c = '\\'; break;
+			default:
+				vStringPut (b, 'x');
+				vStringPut (b, valueToXDigit ((c & 0xF0) >> 4));
+				vStringPut (b, valueToXDigit (c & 0x0F));
+				continue;
+			}
+		}
+		vStringPut (b, c);
+	}
+}
+
 /* vi:set tabstop=4 shiftwidth=4: */

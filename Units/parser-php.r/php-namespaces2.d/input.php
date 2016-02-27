@@ -11,13 +11,13 @@ classes:
 	C [Foo]
 
 functions:
-	__construct [Foo::C]
-	__construct [Bar\Baz::B]
+	__construct [Foo\C]
+	__construct [Bar\Baz\B]
 	a [Foo]
 	a [Bar\Baz]
 	b [Foo]
-	c [Bar\Baz::B]
-	d [Foo::C]
+	c [Bar\Baz\B]
+	d [Foo\C]
 
 <?php
 

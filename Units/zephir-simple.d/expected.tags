@@ -1,4 +1,4 @@
-MyClass	input.zep	/^class MyClass$/;"	c	namespace:Test
+MyClass	input.zep	/^class MyClass$/;"	c	namespace:\\Test
 Test	input.zep	/^namespace Test;$/;"	n
-someMethod1	input.zep	/^    public function someMethod1()$/;"	f	class:Test::MyClass	access:public	signature:()
-someMethod2	input.zep	/^    public function someMethod2()$/;"	f	class:Test::MyClass	access:public	signature:()
+someMethod1	input.zep	/^    public function someMethod1()$/;"	f	class:\\Test\\MyClass	access:public	signature:()
+someMethod2	input.zep	/^    public function someMethod2()$/;"	f	class:\\Test\\MyClass	access:public	signature:()

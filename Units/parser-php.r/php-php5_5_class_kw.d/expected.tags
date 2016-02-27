@@ -1,4 +1,4 @@
 A	input.php	/^class A {$/;"	c
 B	input.php	/^class B {$/;"	c
 C	input.php	/^class C {$/;"	c
-__construct	input.php	/^  public function __construct () {$/;"	f	class:B
+__construct	input.php	/^  public function __construct () {$/;"	f	class:\\B

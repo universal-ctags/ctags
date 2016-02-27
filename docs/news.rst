@@ -137,9 +137,9 @@ definition of a tag as users expect with pattern matching. ctags
 writes patterns in tags file.
 
 Good news is that there is a way to notify vim the encoding used in a
-tags file with ``_TAG_FILE_ENCODING`` pseudo tag in the tag file.
+tags file with ``TAG_FILE_ENCODING`` pseudo tag in the tag file.
 
-This feature solves this issue utilizing ``_TAG_FILE_ENCODING``
+This feature solves this issue utilizing ``TAG_FILE_ENCODING``
 pseudo tag.
 
 This patch introduces two type of options (``--input-encoding=IN``
@@ -149,7 +149,7 @@ As specified encoding with these options ctags converts input from
 ``IN`` encoding to ``OUT`` encoding. ctags uses the converted strings
 when writing pattern parts of tags lines. As the result tags output is
 encoded in ``OUT`` encoding.  In addition ``OUT`` is specified in the
-top tags file as value for ``_TAG_FILE_ENCODING`` pseudo tag.  As
+top tags file as value for ``TAG_FILE_ENCODING`` pseudo tag.  As
 ``OUT`` utf-8 is as default.
 
 NOTE: Converted input is NOT passed to language parsers.
@@ -228,6 +228,30 @@ Guessing parser from file contents (``-G`` option)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 See "Choosing a proper parser in ctags" section.
+
+
+Enabling/disabling pseudo tags (``--pseudo-tags`` option)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Each pseudo tag can be endabled/disabled with ``--pseudo-tags`` option.
+::
+
+	--pseudo-tags=+ptag
+	--pseudo-tags=-ptag
+
+With prefixed with `+`, the pseudo tag specified as ``ptag`` is enabled.
+With prefixed with `-`, the pseudo tag specified as ``ptag`` is disabled.
+``--list-pseudo-tags`` option shows all specifiable ptag names.
+
+All pseudo tags are enabled if `*` is given as the name of ptag like::
+
+	--pseudo-tags=*
+
+All pseudo tags are disabled if no option value is given to
+``--pseudo-tags` option like::
+
+	--pseudo-tags=
+
 
 
 Changes in tags file format
@@ -380,6 +404,81 @@ specific than the extension Foo declares.
 
 However, in e-order, the other parser is chosen. So universal-ctags
 uses the u-order though it introduces incompatibility.
+
+
+Pseudo tags
+---------------------------------------------------------------------
+
+pseudo tags are meta data of tags file. Universal-ctags will utilize
+pseudo tags aggressively.
+
+Universal-ctags is not mature yet; there is possibility that
+incompatible changes are introduced. As the result tools reading tags
+will not work as expected.
+
+To avoid such cases, we try making tags file more self-descriptive.
+The pseudo tags are used for the self description.  We hope some of
+incompatibilities can be overcome in upper layer tools with the pseudo
+tags.
+
+
+``TAG_KIND_SEPARATOR``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is a newly introduced pseudo tag. It is not emitted by default.
+It is emitted only when ``--pseudo-tags=+TAG_KIND_SEPARATOR`` option
+is given.
+
+This is for describing separators placed between two kinds in a language.
+
+Tag entries including the separators are emitted when ``--extra=+q``
+is given; full qualified tags contain the separators. The separators
+are used in scope information, too.
+
+ctags emits ``TAG_KIND_SEPARATOR`` with following format::
+
+	!_TAG_KIND_SEPARATOR!{parser}	{sep}	/{upper}{lower}/
+
+or
+::
+
+	!_TAG_KIND_SEPARATOR!{parser}	{sep}	/{lower}/
+
+Here {parser} is the name of language. e.g. PHP.
+{lower} is the letter representing kind of lower item.
+{upper} is the letter representing kind of upper item.
+{sep} is the separator placed between the upper item and
+the lower item.
+
+The format without {upper} is for representing a root separator.  The
+root separator is used as prefix for an item which has no upper scope.
+
+`*` given as {upper} is a fallback wild card; if it is given, the
+{sep} is used in combination of any upper item and the item specified
+with {lower}.
+
+Each backslash characters used in ${sep} is escaped with
+an extra backslash character.
+
+Example output:
+
+.. code-block:: console
+
+    $ ./ctags -o - --extra=+p --pseudo-tags=  --pseudo-tags=+TAG_KIND_SEPARATOR input.php
+    !_TAG_KIND_SEPARATOR!PHP	::	/*c/
+    ...
+    !_TAG_KIND_SEPARATOR!PHP	\\	/c/
+    ...
+    !_TAG_KIND_SEPARATOR!PHP	\\	/nc/
+    ...
+
+The first line means `::` is used when combining something with an
+item of class kind. The second line means `\` is used when a class
+item is at the top level, no upper item for it. The third line
+means `\` is used when for combining a namespace item(upper) and a
+class item(lower). Of course, ctags uses more specific one when
+choosing a separator; the third one has higher priority than the
+first.
 
 
 Readtags

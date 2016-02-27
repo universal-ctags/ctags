@@ -16,6 +16,7 @@
 #include "ctags.h"
 #include "debug.h"
 #include "options.h"
+#include "parse.h"
 #include "ptag.h"
 #include <string.h>
 
@@ -107,30 +108,48 @@ static boolean ptagMakeFileEncoding (ptagDesc *desc, void *data __unused__)
 }
 #endif
 
+static boolean ptagMakeKindSeparators (ptagDesc *desc, void *data)
+{
+	langType *language = data;
+	makeKindSeparatorsPseudoTags (*language, desc);
+	return TRUE;
+}
+
 static ptagDesc ptagDescs [] = {
 	{ TRUE, "TAG_FILE_FORMAT",
 	  "the version of tags file format",
-	  ptagMakeFormat },
+	  ptagMakeFormat,
+	  TRUE },
 	{ TRUE, "TAG_FILE_SORTED",
 	  "how tags are sorted",
-	  ptagMakeHowSorted },
+	  ptagMakeHowSorted,
+	  TRUE },
 	{ TRUE, "TAG_PROGRAM_AUTHOR",
 	  "the author of this ctags implementation",
-	  ptagMakeAuthor },
+	  ptagMakeAuthor,
+	  TRUE },
 	{ TRUE, "TAG_PROGRAM_NAME",
 	  "the name of this ctags implementation",
-	  ptagMakeProgName },
+	  ptagMakeProgName,
+	  TRUE },
 	{ TRUE, "TAG_PROGRAM_URL",
 	  "the official site URL of this ctags implementation",
-	  ptagMakeProgURL },
+	  ptagMakeProgURL,
+	  TRUE },
 	{ TRUE, "TAG_PROGRAM_VERSION",
 	  "the version of this ctags implementation",
-	  ptagMakeProgVersion },
+	  ptagMakeProgVersion,
+	  TRUE },
 #ifdef HAVE_ICONV
 	{ TRUE, "TAG_FILE_ENCODING",
 	  "the encoding used in output tags file",
-	  ptagMakeFileEncoding },
+	  ptagMakeFileEncoding,
+	  TRUE },
 #endif
+	{ FALSE, "TAG_KIND_SEPARATOR",
+	  "the separators used in kinds",
+	  ptagMakeKindSeparators,
+	  FALSE },
 };
 
 extern boolean makePtagIfEnabled (ptagType type, void *data)
@@ -140,7 +159,7 @@ extern boolean makePtagIfEnabled (ptagType type, void *data)
 	Assert (0 <= type && type < PTAG_COUNT);
 
 	desc = ptagDescs + type;
-	if (desc->enabled)
+	if ((!Option.etags) && (!Option.xref) && desc->enabled)
 		return desc->makeTag (desc, data);
 	else
 		return FALSE;
@@ -188,6 +207,12 @@ extern ptagType getPtagTypeForName (const char *name)
 		if (strcmp (ptagDescs [i].name, name) == 0)
 			return i;
 	return PTAG_UNKNOWN;
+}
+
+extern boolean isPtagCommon  (ptagType type)
+{
+	ptagDesc* pdesc = getPtagDesc (type);
+	return pdesc->common;
 }
 
 extern void printPtag (ptagType type)
