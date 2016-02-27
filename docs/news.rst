@@ -117,7 +117,7 @@ There were 3 classes of message in ctags:
 *ignore *notice*. With ``--quiet`` option can be used to turn off the
 printing the *notice* class messages.
 
-``--input-endocing=ENCODING`` and ``--output-endocing=ENCODING`` options
+``--input-encoding=ENCODING`` and ``--output-encoding=ENCODING`` options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Japanese programmers sometimes use Japanese language in comments in
