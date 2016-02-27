@@ -190,7 +190,7 @@ Following extra tag entries are newly introduced.
 ``--list-...`` options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``--list-extensions``,  ``--list-extras``, ``--list-features``,
+``--list-extensions``,  ``--list-extra``, ``--list-features``,
 ``--list-fields``, ``--list-patterns``, and ``--list-pseudo-tags`` are added.
 
 
@@ -304,7 +304,7 @@ Output with enabling ``r`` extra tag:
 
 .. code-block:: console
 
-    $ ./ctags --list-extras | grep ^r
+    $ ./ctags --list-extra | grep ^r
     r	Include reference tags	off
     $ ./ctags -o - --extra=+r reftag.c
     TYPE	reftag.c	/^#define TYPE /;"	d	file:

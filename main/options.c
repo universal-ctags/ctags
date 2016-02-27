@@ -297,7 +297,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of alias patterns."},
  {1,"  --list-extensions=[language|all]"},
  {1,"       Output list of language extensions in mapping."},
- {1,"  --list-extras"},
+ {1,"  --list-extra"},
  {1,"       Output list of extra tag flags."},
  {1,"  --list-features"},
  {1,"       Output list of features."},
@@ -1541,7 +1541,7 @@ static void processListAliasesOption (
 	exit (0);
 }
 
-static void processListExtrasOption (
+static void processListExtraOption (
 		const char *const option, const char *const parameter)
 {
 	int i;
@@ -2205,7 +2205,7 @@ static parametricOption ParametricOptions [] = {
 	{ "license",                processLicenseOption,           TRUE,   STAGE_ANY },
 	{ "list-aliases",           processListAliasesOption,       TRUE,   STAGE_ANY },
 	{ "list-extensions",        processListExtensionsOption,    TRUE,   STAGE_ANY },
-	{ "list-extras",            processListExtrasOption,        TRUE,   STAGE_ANY },
+	{ "list-extra",             processListExtraOption,        TRUE,   STAGE_ANY },
 	{ "list-features",          processListFeaturesOption,      TRUE,   STAGE_ANY },
 	{ "list-fields",            processListFieldsOption,        TRUE,   STAGE_ANY },
 	{ "list-file-kind",         processListFileKindOption,      TRUE,   STAGE_ANY },
