@@ -54,8 +54,18 @@ const char *scopeSeparatorFor (const kindOption *kind, char parentLetter)
 	scopeSeparator *table;
 	Assert (kind);
 	table = kind->separators;
+
+	/* If no table is given, use the default generic separator ".".
+	   The exception is if a root separator is looked up. In this case,
+	   return NULL to notify there is no root separator to the caller. */
+
 	if (table == NULL)
-		return ".";
+	{
+		if (parentLetter == KIND_NULL)
+			return NULL;
+		else
+			return ".";
+	}
 
 	while (table - kind->separators < kind->separatorCount)
 	{
@@ -64,5 +74,8 @@ const char *scopeSeparatorFor (const kindOption *kind, char parentLetter)
 			return table->separator;
 		table++;
 	}
-	return ".";
+	if (parentLetter == KIND_NULL)
+		return NULL;
+	else
+		return ".";
 }
