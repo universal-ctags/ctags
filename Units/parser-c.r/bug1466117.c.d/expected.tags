@@ -1,3 +1,4 @@
+__anon1	input.c	/^typedef struct {$/;"	s	file:
 a	input.c	/^	int a;$/;"	m	struct:__anon1	file:
 a	input.c	/^	int a;$/;"	m	struct:mystruct	file:
 b	input.c	/^	int b;$/;"	m	struct:__anon1	file:

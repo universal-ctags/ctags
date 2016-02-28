@@ -1,3 +1,4 @@
+__anon1	input.cpp	/^namespace {$/;"	n	file:
 anon_f	input.cpp	/^	void anon_f() { }$/;"	f	namespace:__anon1
 __anon1::anon_f	input.cpp	/^	void anon_f() { }$/;"	f	namespace:__anon1
 a	input.cpp	/^namespace a {$/;"	n	file:

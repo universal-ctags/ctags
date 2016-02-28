@@ -1,0 +1,13 @@
+__anon1	input.cpp	/^	{$/;"	function	function:test	file:
+__anon2	input.cpp	/^	[=]() -> int {$/;"	function	function:test	file:
+__anon3	input.cpp	/^		{$/;"	function	function:test::__anon2	file:
+__anon4	input.cpp	/^	call(10,[lambda1](int a,int b) -> int { return -1; });$/;"	function	function:test	file:
+a	input.cpp	/^	auto lambda1 = [](auto a,auto && b)$/;"	parameter	function:test::__anon1	file:
+a	input.cpp	/^	call(10,[lambda1](int a,int b) -> int { return -1; });$/;"	parameter	function:test::__anon4	file:
+b	input.cpp	/^	auto lambda1 = [](auto a,auto && b)$/;"	parameter	function:test::__anon1	file:
+b	input.cpp	/^	call(10,[lambda1](int a,int b) -> int { return -1; });$/;"	parameter	function:test::__anon4	file:
+c	input.cpp	/^		return [a,b](int c)$/;"	parameter	function:test::__anon2::__anon3	file:
+lambda1	input.cpp	/^	auto lambda1 = [](auto a,auto && b)$/;"	local	function:test	file:
+test	input.cpp	/^int test()$/;"	function	signature:()
+x	input.cpp	/^		int x = 10;$/;"	local	function:test::__anon1	file:
+y	input.cpp	/^			int y = 0;$/;"	local	function:test::__anon2::__anon3	file:

@@ -3546,7 +3546,7 @@ static void initializeVeraParser (const langType language)
 	buildKeywordHash (language, 5);
 }
 
-extern parserDefinition* CParser (void)
+extern parserDefinition* OldCParser (void)
 {
 	static const char *const extensions [] = { "c", NULL };
 	parserDefinition* def = parserNew ("C");
@@ -3570,7 +3570,7 @@ extern parserDefinition* DParser (void)
 	return def;
 }
 
-extern parserDefinition* CppParser (void)
+extern parserDefinition* OldCppParser (void)
 {
 	static const char *const extensions [] = {
 		"c++", "cc", "cp", "cpp", "cxx",

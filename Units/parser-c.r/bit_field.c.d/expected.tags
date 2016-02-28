@@ -1,3 +1,6 @@
+__anon1	input.c	/^struct {$/;"	s	file:
+__anon2	input.c	/^{$/;"	s	file:
+__anon3	input.c	/^{$/;"	s	file:
 a	input.c	/^    unsigned int a: 1;$/;"	m	struct:bit_fields	file:
 b	input.c	/^    unsigned int b: 1;$/;"	m	struct:bit_fields	file:
 bad2	input.c	/^    BYTE 	bad2: 1;$/;"	m	struct:__anon2	file:

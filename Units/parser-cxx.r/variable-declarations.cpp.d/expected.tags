@@ -1,0 +1,34 @@
+l01	input.cpp	/^	unsigned short int l01;$/;"	l	function:main	file:
+l02	input.cpp	/^	unsigned long long int * const l02 = NULL, * l03 = NULL;$/;"	l	function:main	file:
+l03	input.cpp	/^	unsigned long long int * const l02 = NULL, * l03 = NULL;$/;"	l	function:main	file:
+l04	input.cpp	/^	register int ** l04 = 0;$/;"	l	function:main	file:
+l05	input.cpp	/^	std::string l05;$/;"	l	function:main	file:
+l06	input.cpp	/^	std::string l06("test");$/;"	l	function:main	file:
+l07	input.cpp	/^	std::string l07 = "test";$/;"	l	function:main	file:
+l08	input.cpp	/^	const std::string & l08 = l07, l09 = l07;$/;"	l	function:main	file:
+l09	input.cpp	/^	const std::string & l08 = l07, l09 = l07;$/;"	l	function:main	file:
+l10	input.cpp	/^	const void * (*l10)() = NULL;$/;"	l	function:main	file:
+l11	input.cpp	/^	unsigned long int & (*l11)(void *);$/;"	l	function:main	file:
+l12	input.cpp	/^	std::string & (*l12)(void);$/;"	l	function:main	file:
+l13	input.cpp	/^	std::string ** (*l13)(int a,int b);$/;"	l	function:main	file:
+l14	input.cpp	/^	std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t> > l14;$/;"	l	function:main	file:
+l15	input.cpp	/^	struct Struct1 l15;$/;"	l	function:main	file:
+l16	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	file:
+l17	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	file:
+l18	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	file:
+l19	input.cpp	/^	Struct1 l19 = {};$/;"	l	function:main	file:
+m01	input.cpp	/^	unsigned int m01;$/;"	m	struct:Struct1	file:
+m02	input.cpp	/^	std::string m02;$/;"	m	struct:Struct1	file:
+m03	input.cpp	/^	std::string ** m03, m04;$/;"	m	struct:Struct1	file:
+m04	input.cpp	/^	std::string ** m03, m04;$/;"	m	struct:Struct1	file:
+m05	input.cpp	/^	std::string & (*m05)(int a,int b);$/;"	m	struct:Struct1	file:
+m06	input.cpp	/^	std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t> > m06[10];$/;"	m	struct:Struct1	file:
+v01	input.cpp	/^} v01, v02[10];$/;"	v
+v02	input.cpp	/^} v01, v02[10];$/;"	v
+v03	input.cpp	/^} v03, * v04;$/;"	v
+v04	input.cpp	/^} v03, * v04;$/;"	v
+v05	input.cpp	/^struct Struct1 v05, * v06 = NULL;$/;"	v
+v06	input.cpp	/^struct Struct1 v05, * v06 = NULL;$/;"	v
+v07	input.cpp	/^std::string v07("test"), v08("test");$/;"	v
+v08	input.cpp	/^std::string v07("test"), v08("test");$/;"	v
+v09	input.cpp	/^std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t> > ** v09;$/;"	v

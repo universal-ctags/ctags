@@ -17,4 +17,5 @@ INDX_S3	input.c	/^  INDX_S3,$/;"	e	enum:__anon1	file:
 INDX_S4	input.c	/^  INDX_S4,$/;"	e	enum:__anon1	file:
 INDX_T	input.c	/^  INDX_T,$/;"	e	enum:__anon1	file:
 INDX_T2	input.c	/^  INDX_T2,$/;"	e	enum:__anon1	file:
+__anon1	input.c	/^typedef enum{$/;"	g	file:
 task_indx_type	input.c	/^} task_indx_type;$/;"	t	typeref:enum:__anon1	file:

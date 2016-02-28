@@ -71,7 +71,16 @@ MAIN_SRCS =				\
 include makefiles/translator_input.mak
 TRANSLATED_SRCS = $(TRANSLATOR_INPUT:.ctags=.c)
 
-PARSER_HEADS =
+PARSER_HEADS = \
+	parsers/cxx/cxx_debug.h \
+	parsers/cxx/cxx_keyword.h \
+	parsers/cxx/cxx_parser_internal.h \
+	parsers/cxx/cxx_parser.h \
+	parsers/cxx/cxx_scope.h \
+	parsers/cxx/cxx_tag.h \
+	parsers/cxx/cxx_token.h \
+	parsers/cxx/cxx_token_chain.h
+	
 PARSER_SRCS =				\
 	parsers/ada.c			\
 	parsers/ant.c			\
@@ -84,6 +93,22 @@ PARSER_SRCS =				\
 	parsers/clojure.c		\
 	parsers/css.c			\
 	parsers/cobol.c			\
+	parsers/cxx/cxx.c		\
+	parsers/cxx/cxx_debug.c		\
+	parsers/cxx/cxx_keyword.c		\
+	parsers/cxx/cxx_parser.c		\
+	parsers/cxx/cxx_parser_block.c		\
+	parsers/cxx/cxx_parser_function.c		\
+	parsers/cxx/cxx_parser_lambda.c		\
+	parsers/cxx/cxx_parser_namespace.c		\
+	parsers/cxx/cxx_parser_template.c		\
+	parsers/cxx/cxx_parser_tokenizer.c		\
+	parsers/cxx/cxx_parser_using.c		\
+	parsers/cxx/cxx_parser_variable.c		\
+	parsers/cxx/cxx_scope.c		\
+	parsers/cxx/cxx_tag.c		\
+	parsers/cxx/cxx_token.c		\
+	parsers/cxx/cxx_token_chain.c		\
 	parsers/diff.c			\
 	parsers/dosbatch.c		\
 	parsers/dts.c			\
