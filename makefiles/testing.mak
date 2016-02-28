@@ -66,7 +66,7 @@ chop: $(CTAGS_TEST)
 #
 # UNITS Target
 #
-units: TIMEOUT := $(shell timeout --version > /dev/null 2>&1 && echo 5 || echo 0)
+units: TIMEOUT := $(shell timeout --version > /dev/null 2>&1 && echo 10 || echo 0)
 units: $(CTAGS_TEST)
 	@ \
 	if test -n "$${ZSH_VERSION+set}"; then set -o SH_WORD_SPLIT; fi; \
