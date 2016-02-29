@@ -742,13 +742,39 @@ boolean cxxParserTokenChainLooksLikeFunctionParameterList(CXXTokenChain * tc,CXX
 			CXXTokenTypeSingleColon \
 		)
 
+try_again:
 		t = cxxTokenChainNextTokenOfType(
 				t,
-				CXXTokenTypeClosingParenthesis | CXXTokenTypeComma | CXXTokenTypeAssignment | CXXTokenTypeSmallerThanSign |
+				CXXTokenTypeClosingParenthesis | CXXTokenTypeComma | CXXTokenTypeAssignment |
+				CXXTokenTypeSmallerThanSign | CXXTokenTypeParenthesisChain |
 				TOKENS_THAT_SHOULD_NOT_APPEAR_IN_SIGNATURE_BEFORE_ASSIGNMENT
 			);
 
 		CXX_DEBUG_ASSERT(t,"We should have found the closing parenthesis here");
+
+		if(t->eType == CXXTokenTypeParenthesisChain)
+		{
+			CXX_DEBUG_PRINT("Found parenthesis chain");
+			// Either part of function pointer declaration or a very ugly variable decl
+			// Something like type (*name)(args) or type (*name)
+			if(
+				(
+					// first parenthesis
+					//t->pNext && <-- this breaks a test
+					//t->pNext->eType == CXXTokenTypeParenthesisChain && <-- this breaks a test :/
+					cxxTokenChainFirstTokenOfType(t->pChain,CXXTokenTypeStar) // part of (*name) <-- this breaks tests :(
+				) || (
+					// second parenthesis
+					//t->pPrev &&
+					//(t->pPrev->eType == CXXTokenTypeParenthesisChain) &&
+					cxxParserTokenChainLooksLikeFunctionParameterList(t->pChain,NULL) // args
+				)
+			)
+				goto try_again;
+
+			CXX_DEBUG_LEAVE_TEXT("Found a parenthesis chain that doesn't belong to a function parameters list");
+			return FALSE;
+		}
 
 		if(t->eType == CXXTokenTypeSmallerThanSign)
 		{
@@ -762,13 +788,7 @@ boolean cxxParserTokenChainLooksLikeFunctionParameterList(CXXTokenChain * tc,CXX
 				return FALSE;
 			}
 
-			t = cxxTokenChainNextTokenOfType(
-					t,
-					CXXTokenTypeClosingParenthesis | CXXTokenTypeComma | CXXTokenTypeAssignment |
-					TOKENS_THAT_SHOULD_NOT_APPEAR_IN_SIGNATURE_BEFORE_ASSIGNMENT
-				);
-	
-			CXX_DEBUG_ASSERT(t,"We should have found the closing parenthesis here");
+			goto try_again;
 		}
 
 		if(t->eType & TOKENS_THAT_SHOULD_NOT_APPEAR_IN_SIGNATURE_BEFORE_ASSIGNMENT)

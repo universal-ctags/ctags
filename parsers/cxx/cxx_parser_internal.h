@@ -34,7 +34,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis);
 boolean cxxParserParseBlock(boolean bExpectClosingBracket);
 
 // cxx_parser_variable.c
-void cxxParserExtractVariableDeclarations(CXXTokenChain * pChain);
+boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain);
 
 // cxx_parser_function.c
 

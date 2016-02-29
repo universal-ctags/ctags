@@ -687,40 +687,47 @@ void cxxParserAnalyzeOtherStatement()
 
 	enum CXXTagKind eScopeKind = cxxScopeGetKind();
 
-	int mayBeFunction; // 0 = no, 1 = maybe, 2 = only possibility
+	CXXFunctionSignatureInfo oInfo;
 
 	// kinda looks like a function or variable instantiation... maybe
 	if(eScopeKind == CXXTagKindFUNCTION)
 	{
-		// certainly not a function, maybe variable declarations or instantiations (or just other statement)
-		mayBeFunction = 0;
-	} else {
-		if(
-			g_cxx.uKeywordState &
-			(CXXParserKeywordStateSeenInline | CXXParserKeywordStateSeenExplicit |
-			CXXParserKeywordStateSeenOperator | CXXParserKeywordStateSeenVirtual)
-		)
-			mayBeFunction = 2; // must be function
-		else
-			mayBeFunction = 1; // might be function but also anything else
+		// prefer variable declarations.
+		// if none found then try function prototype
+		if(cxxParserExtractVariableDeclarations(g_cxx.pTokenChain))
+		{
+			CXX_DEBUG_LEAVE_TEXT("Found variable declarations");
+			return;
+		}
+
+		// FIXME: This *COULD* work but we should first rule out the possibility of simple function calls
+		// like func(a). The function signature search should be far stricter here.
+		//if(cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,NULL))
+		//	cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,0);
+
+		CXX_DEBUG_LEAVE();
+		return;
 	}
 
-	CXXFunctionSignatureInfo oInfo;
-
-	if(mayBeFunction)
+	// prefer function.
+	if(cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,NULL))
 	{
-		if(cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,NULL))
-		{
-			cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,0);
-			CXX_DEBUG_LEAVE_TEXT("Found function prototype");
-			return;
-		}
-		
-		if(mayBeFunction == 2)
-		{
-			CXX_DEBUG_LEAVE_TEXT("WARNING: Was expecting to find a function prototype but did not find one");
-			return;
-		}
+		cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,0);
+		CXX_DEBUG_LEAVE_TEXT("Found function prototypes");
+		return;
+	}
+
+	if(
+		g_cxx.uKeywordState &
+		(
+			CXXParserKeywordStateSeenInline | CXXParserKeywordStateSeenExplicit |
+			CXXParserKeywordStateSeenOperator | CXXParserKeywordStateSeenVirtual
+		)
+	)
+	{
+		// must be function!
+		CXX_DEBUG_LEAVE_TEXT("WARNING: Was expecting to find a function prototype but did not find one");
+		return;
 	}
 
 	cxxParserExtractVariableDeclarations(g_cxx.pTokenChain);
