@@ -65,15 +65,8 @@ CXXToken * cxxTokenChainLastTokenNotOfType(CXXTokenChain * tc,unsigned int uToke
 // Note that the function stops at the ending > and not past it.
 CXXToken * cxxTokenChainSkipToEndOfAngleBracket(CXXToken * t);
 
-inline CXXToken * cxxTokenChainFirst(CXXTokenChain * tc)
-{
-	return tc ? tc->pHead : NULL;
-}
-
-inline CXXToken * cxxTokenChainLast(CXXTokenChain * tc)
-{
-	return tc ? tc->pTail : NULL;
-}
+#define cxxTokenChainFirst(tc) (tc ? tc->pHead : NULL)
+#define cxxTokenChainLast(tc) (tc ? tc->pTail : NULL)
 
 CXXToken * cxxTokenChainAt(CXXTokenChain * tc,int index);
 
@@ -83,25 +76,10 @@ CXXToken * cxxTokenChainTakeAt(CXXTokenChain * tc,int index);
 void cxxTokenChainTake(CXXTokenChain * tc,CXXToken * t);
 
 // Destroy the last token
-inline void cxxTokenChainDestroyLast(CXXTokenChain * tc)
-{
-	if(!tc)
-		return;
-	if(tc->iCount < 1)
-		return;
-	cxxTokenDestroy(cxxTokenChainTakeLast(tc));
-}
+#define cxxTokenChainDestroyLast(tc) cxxTokenDestroy(cxxTokenChainTakeLast(tc))
 
 // Destroy the first token
-inline void cxxTokenChainDestroyFirst(CXXTokenChain * tc)
-{
-	if(!tc)
-		return;
-	if(tc->iCount < 1)
-		return;
-	cxxTokenDestroy(cxxTokenChainTakeFirst(tc));
-}
-
+#define cxxTokenChainDestroyFirst(tc) cxxTokenDestroy(cxxTokenChainTakeFirst(tc))
 
 
 void cxxTokenChainAppend(CXXTokenChain * tc,CXXToken * t);
