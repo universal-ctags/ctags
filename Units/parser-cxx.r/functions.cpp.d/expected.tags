@@ -1,13 +1,25 @@
-f01	input.cpp	/^int f01(int f01p01,int f01p02)$/;"	f
-f01p01	input.cpp	/^int f01(int f01p01,int f01p02)$/;"	z	function:f01	file:
-f01p02	input.cpp	/^int f01(int f01p01,int f01p02)$/;"	z	function:f01	file:
-f02	input.cpp	/^unsigned short int * f02(unsigned int & f02p01,...)$/;"	f
-f02p01	input.cpp	/^unsigned short int * f02(unsigned int & f02p01,...)$/;"	z	function:f02	file:
-f03	input.cpp	/^auto f03(const int & f03p01,void * f03p02) -> const int &$/;"	f
-f03p01	input.cpp	/^auto f03(const int & f03p01,void * f03p02) -> const int &$/;"	z	function:f03	file:
-f03p02	input.cpp	/^auto f03(const int & f03p01,void * f03p02) -> const int &$/;"	z	function:f03	file:
+f01	input.cpp	/^int f01(int f01a01,int f01a02)$/;"	f
+f01a01	input.cpp	/^int f01(int f01a01,int f01a02)$/;"	z	function:f01	file:
+f01a02	input.cpp	/^int f01(int f01a01,int f01a02)$/;"	z	function:f01	file:
+f02	input.cpp	/^unsigned short int * f02(unsigned int & f02a01,...)$/;"	f
+f02a01	input.cpp	/^unsigned short int * f02(unsigned int & f02a01,...)$/;"	z	function:f02	file:
+f03	input.cpp	/^auto f03(const int & f03a01,void * f03a02) -> const int &$/;"	f
+f03a01	input.cpp	/^auto f03(const int & f03a01,void * f03a02) -> const int &$/;"	z	function:f03	file:
+f03a02	input.cpp	/^auto f03(const int & f03a01,void * f03a02) -> const int &$/;"	z	function:f03	file:
 f04	input.cpp	/^auto f04() -> int (*)(int)$/;"	f
-p01	input.cpp	/^int p01(int p01p01,int p01p02);$/;"	p
-p02	input.cpp	/^unsigned short int * p02(unsigned int & p02p01,...);$/;"	p
-p03	input.cpp	/^auto p03(const int & p03p01,void * p03p02) -> const int &;$/;"	p
+f05	input.cpp	/^static inline std::string f05(const int *** f05a01)$/;"	f	file:
+f05a01	input.cpp	/^static inline std::string f05(const int *** f05a01)$/;"	z	function:f05	file:
+f06	input.cpp	/^		auto f06(n01::c01 && f06a01) -> type01 *;$/;"	p	namespace:n01::n02
+f06	input.cpp	/^auto n01::n02::f06(n01::c01 && f06a01) -> n01::n02::type01 *$/;"	f	class:n01::n02
+f06a01	input.cpp	/^auto n01::n02::f06(n01::c01 && f06a01) -> n01::n02::type01 *$/;"	z	function:n01::n02::f06	file:
+p01	input.cpp	/^int p01(int p01a01,int p01a02);$/;"	p
+p02	input.cpp	/^unsigned short int * p02(unsigned int & p02a01,...);$/;"	p
+p03	input.cpp	/^auto p03(const int & p03a01,void * p03a02) -> const int &;$/;"	p
 p04	input.cpp	/^auto p04() -> int (*)(int);$/;"	p
+p05	input.cpp	/^static std::string p05(const int *** p05a01);$/;"	p	file:
+p06	input.cpp	/^		auto p06(n01::c01 && p06a01) -> type01 *;$/;"	p	namespace:n01::n02
+p06	input.cpp	/^auto n01::n02::p06(n01::c01 && p06a01) -> n01::n02::type01 *;$/;"	p
+t01	input.cpp	/^template <typename T> std::unique_ptr<T> t01(T && t01a01)$/;"	f
+t01a01	input.cpp	/^template <typename T> std::unique_ptr<T> t01(T && t01a01)$/;"	z	function:t01	file:
+t02	input.cpp	/^template <typename T> auto t02(T && t02a01) -> std::unique_ptr<T>$/;"	f
+t02a01	input.cpp	/^template <typename T> auto t02(T && t02a01) -> std::unique_ptr<T>$/;"	z	function:t02	file:

@@ -141,7 +141,7 @@ static CXXCharTypeData g_aCharTable[128] =
 	// 037 (0x25) '%'
 	{ CXXCharTypeOperator, 0 ,0 },
 	// 038 (0x26) '&'
-	{ CXXCharTypeNamedSingleCharToken, CXXTokenTypeAnd, 0 },
+	{ CXXCharTypeNamedSingleOrRepeatedCharToken, CXXTokenTypeAnd, CXXTokenTypeMultipleAnds },
 	// 039 (0x27) '''
 	{ 0, 0, 0 },
 	// 040 (0x28) '('

@@ -34,27 +34,28 @@ enum CXXTokenType
 	CXXTokenTypeStringConstant = (1 << 13),
 	CXXTokenTypeStar = (1 << 14), // *
 	CXXTokenTypeAnd = (1 << 15), // &
-	CXXTokenTypeCharacterConstant = (1 << 16),
-	CXXTokenTypeMultipleDots = (1 << 17), // ...
+	CXXTokenTypeMultipleAnds = (1 << 16), // &&
+	CXXTokenTypeCharacterConstant = (1 << 17),
+	CXXTokenTypeMultipleDots = (1 << 18), // ...
 
 	// These must come in pairs. Note that the opening
 	// tokens can be shifted by 4 to get the matching closing
 	// tokens and by 8 to get the matching subchain marker below
-	CXXTokenTypeOpeningBracket = (1 << 18), // {
-	CXXTokenTypeOpeningParenthesis = (1 << 19), // (
-	CXXTokenTypeOpeningSquareParenthesis = (1 << 20), // [
-	CXXTokenTypeSmallerThanSign = (1 << 21), // <
+	CXXTokenTypeOpeningBracket = (1 << 19), // {
+	CXXTokenTypeOpeningParenthesis = (1 << 20), // (
+	CXXTokenTypeOpeningSquareParenthesis = (1 << 21), // [
+	CXXTokenTypeSmallerThanSign = (1 << 22), // <
 	
-	CXXTokenTypeClosingBracket = (1 << 22), // }
-	CXXTokenTypeClosingParenthesis = (1 << 23), // )
-	CXXTokenTypeClosingSquareParenthesis = (1 << 24), // ]
-	CXXTokenTypeGreaterThanSign = (1 << 25), // >
+	CXXTokenTypeClosingBracket = (1 << 23), // }
+	CXXTokenTypeClosingParenthesis = (1 << 24), // )
+	CXXTokenTypeClosingSquareParenthesis = (1 << 25), // ]
+	CXXTokenTypeGreaterThanSign = (1 << 26), // >
 	
 	// Subchains (caution: read the comment above about CXXTokenTypeOpeningBracket
-	CXXTokenTypeBracketChain = (1 << 26), // {...}
-	CXXTokenTypeParenthesisChain = (1 << 27), // (...)
-	CXXTokenTypeSquareParenthesisChain = (1 << 28), // [...]
-	CXXTokenTypeAngleBracketChain = (1 << 29), // <...>
+	CXXTokenTypeBracketChain = (1 << 27), // {...}
+	CXXTokenTypeParenthesisChain = (1 << 28), // (...)
+	CXXTokenTypeSquareParenthesisChain = (1 << 29), // [...]
+	CXXTokenTypeAngleBracketChain = (1 << 30), // <...>
 };
 
 // Forward decl

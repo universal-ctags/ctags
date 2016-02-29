@@ -27,7 +27,7 @@
 //   preprocessor is close to impossible in the general case. Also ctags is not a compiler.
 //   This means that our parser must be a "guessing" parser. It's hopeless
 //   to try to decode the syntax of the language down to the last bit.
-// 
+//
 // - The input may contain syntax errors. This is because we don't have a full preprocessor
 //   and also because ctags is often used "online" in editors, while the user is typing.
 //   ctags should be tolerant and try to do its best even with syntax errors but:
@@ -36,6 +36,8 @@
 //     unless the hierarchy itself is ignored by the ctags user).
 //   - CTags should try to avoid emitting tags which involve syntax errors
 //
+// - There will always be pathologic cases. Don't cry, live with it.
+// 
 // -----------------------------------------------------------------------------------------
 // TODO LIST
 // -----------------------------------------------------------------------------------------

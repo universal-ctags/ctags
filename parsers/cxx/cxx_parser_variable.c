@@ -110,8 +110,8 @@ void cxxParserExtractVariableDeclarations(CXXTokenChain * pChain)
 			}
 	
 			if(t->eType & (
-						CXXTokenTypeOperator | CXXTokenTypePointerOperator | CXXTokenTypeBracketChain |
-						CXXTokenTypeStringConstant | CXXTokenTypeAngleBracketChain |
+						CXXTokenTypeOperator | CXXTokenTypeMultipleAnds | CXXTokenTypePointerOperator |
+						CXXTokenTypeBracketChain | CXXTokenTypeStringConstant | CXXTokenTypeAngleBracketChain |
 						CXXTokenTypeCharacterConstant | CXXTokenTypeMultipleDots |
 						CXXTokenTypeClosingBracket | CXXTokenTypeClosingParenthesis |
 						CXXTokenTypeClosingSquareParenthesis | CXXTokenTypeSmallerThanSign

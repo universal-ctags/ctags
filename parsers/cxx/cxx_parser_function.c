@@ -268,7 +268,7 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 	CXXToken * pIdentifierEnd = NULL;
 	CXXToken * pTopLevelParenthesis = NULL;
 
-	boolean bGotOperator = FALSE;
+	boolean bStopScanning = FALSE;
 
 	while(pToken)
 	{
@@ -314,7 +314,7 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 
 			pIdentifierEnd = pToken->pPrev;
 			
-			bGotOperator = TRUE;
+			bStopScanning = TRUE;
 
 		} else if(pToken->eType == CXXTokenTypeSmallerThanSign)
 		{
@@ -329,6 +329,7 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 		} else if(pToken->eType & (CXXTokenTypeOpeningBracket | CXXTokenTypeSemicolon | CXXTokenTypeEOF))
 		{
 			// reached end
+			bStopScanning = TRUE;
 			break;
 		} else if(
 					cxxParserCurrentLanguageIsCPP() &&
@@ -338,6 +339,7 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 			// With a single colon it might be a constructor.
 			// With assignment it might be virtual type func(..) = 0;
 			// With a pointer operator it might be trailing return type
+			bStopScanning = TRUE;
 			break;
 		} else if(pToken->eType & (
 					CXXTokenTypeOperator | CXXTokenTypeSingleColon | CXXTokenTypeAssignment |
@@ -405,7 +407,7 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 			pInfo->pParenthesis = pToken;
 		}
 
-		if(bGotOperator)
+		if(bStopScanning)
 			break; // no more possibilities
 
 next_token:
