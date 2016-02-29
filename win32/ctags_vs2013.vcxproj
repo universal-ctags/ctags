@@ -56,7 +56,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../main;../gnu_regex;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../main;../gnu_regex;../parsers;../parsers/cxx;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;;HAVE_REGCOMP;__USE_GNU;bool=int;true=1;false=0;strcasecmp=stricmp;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -75,7 +75,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../main;../gnu_regex;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../main;../gnu_regex;../parsers;../parsers/cxx;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;HAVE_REGCOMP;__USE_GNU;bool=int;true=1;false=0;strcasecmp=stricmp;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -151,6 +151,22 @@
     <ClCompile Include="..\main\ptag.c" />
     <ClCompile Include="..\parsers\python.c" />
     <ClCompile Include="..\main\read.c" />
+    <ClCompile Include="..\parsers\cxx\cxx.c">
+    <ClCompile Include="..\parsers\cxx\cxx_debug.c">
+    <ClCompile Include="..\parsers\cxx\cxx_keyword.c">
+    <ClCompile Include="..\parsers\cxx\cxx_parser.c">
+    <ClCompile Include="..\parsers\cxx\cxx_parse_block.c">
+    <ClCompile Include="..\parsers\cxx\cxx_parse_function.c">
+    <ClCompile Include="..\parsers\cxx\cxx_parse_lambda.c">
+    <ClCompile Include="..\parsers\cxx\cxx_parse_namespace.c">
+    <ClCompile Include="..\parsers\cxx\cxx_parse_template.c">
+    <ClCompile Include="..\parsers\cxx\cxx_parse_tokenizer.c">
+    <ClCompile Include="..\parsers\cxx\cxx_parse_using.c">
+    <ClCompile Include="..\parsers\cxx\cxx_parse_variable.c">
+    <ClCompile Include="..\parsers\cxx\cxx_scope.c">
+    <ClCompile Include="..\parsers\cxx\cxx_tag.c">
+    <ClCompile Include="..\parsers\cxx\cxx_token.c">
+    <ClCompile Include="..\parsers\cxx\cxx_token_chain.c">
     <ClCompile Include="..\gnu_regex\regex.c">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
@@ -208,6 +224,14 @@
     <ClInclude Include="..\main\strlist.h" />
     <ClInclude Include="..\main\vstring.h" />
     <ClInclude Include="..\main\xtag.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_debug.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_keyword.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_parser.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_parser_internal.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_scope.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_tag.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_token.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_token_chain.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
