@@ -13,4 +13,7 @@ t	typedef	typedefs	on	referenceOnly:FALSE	nRoles:0
 u	union	union names	on	referenceOnly:FALSE	nRoles:0
 v	variable	variable definitions	on	referenceOnly:FALSE	nRoles:0
 x	externvar	external and forward variable declarations	off	referenceOnly:FALSE	nRoles:0
-L	label	goto label	off	referenceOnly:FALSE	nRoles:0
+L	label	goto labels	off	referenceOnly:FALSE	nRoles:0
+U	using	using statements	off	referenceOnly:FALSE	nRoles:0
+z	parameter	function parameters inside function definitions	off	referenceOnly:FALSE	nRoles:0
+A	NONE	make anonymous structure names depend on file name	off	referenceOnly:FALSE	nRoles:0

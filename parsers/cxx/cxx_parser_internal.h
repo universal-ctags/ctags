@@ -14,6 +14,7 @@
 #include "parse.h"
 
 #include "cxx_tag.h"
+#include "cxx_keyword.h"
 #include "cxx_token.h"
 #include "cxx_token_chain.h"
 
@@ -100,7 +101,7 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo);
 void cxxParserNewStatement();
 boolean cxxParserParseNamespace();
 boolean cxxParserParseEnum();
-boolean cxxParserParseClassStructOrUnion(enum CXXTagKind eTagKind);
+boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKind eTagKind);
 boolean cxxParserParseTemplatePrefix();
 boolean cxxParserParseAndCondenseCurrentSubchain(unsigned int uInitialSubchainMarkerTypes,boolean bAcceptEOF);
 boolean cxxParserParseUpToOneOf(unsigned int uTokenTypes);

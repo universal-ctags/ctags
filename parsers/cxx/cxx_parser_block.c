@@ -177,21 +177,21 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 						}
 					break;
 					case CXXKeywordCLASS:
-						if(!cxxParserParseClassStructOrUnion(CXXTagKindCLASS))
+						if(!cxxParserParseClassStructOrUnion(CXXKeywordCLASS,CXXTagKindCLASS))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 							return FALSE;
 						}
 					break;
 					case CXXKeywordSTRUCT:
-						if(!cxxParserParseClassStructOrUnion(CXXTagKindSTRUCT))
+						if(!cxxParserParseClassStructOrUnion(CXXKeywordSTRUCT,CXXTagKindSTRUCT))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 							return FALSE;
 						}
 					break;
 					case CXXKeywordUNION:
-						if(!cxxParserParseClassStructOrUnion(CXXTagKindUNION))
+						if(!cxxParserParseClassStructOrUnion(CXXKeywordUNION,CXXTagKindUNION))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 							return FALSE;

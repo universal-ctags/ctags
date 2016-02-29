@@ -73,7 +73,7 @@ Y	input.c	/^struct Y {$/
 i	input.c	/^  int i;$/
 j	input.c	/^  int j;$/
 main	input.c	/^int main(void)$/
-x	input.c	/^  struct X x;$/;"	typeref:struct:Y::X
+x	input.c	/^  struct X x;$/;"	typeref:struct:X
 #r
 x	input.sh	/^source x$/;"	role:loaded
 y	input.sh	/^function y()$/

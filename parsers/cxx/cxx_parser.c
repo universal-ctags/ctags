@@ -201,7 +201,7 @@ boolean cxxParserParseUpToOneOf(unsigned int uTokenTypes)
 //
 // This is called after a full enum/struct/class/union declaration that ends with a closing bracket.
 //
-static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(boolean bParsingTypedef,enum CXXTagKind eTagKind,const char * szTypeName)
+static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(boolean bParsingTypedef,enum CXXKeyword eTagKeyword,enum CXXTagKind eTagKind,const char * szTypeName)
 {
 	CXX_DEBUG_ENTER();
 
@@ -228,39 +228,6 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(boolea
 		return TRUE;
 	}
 
-	if(bParsingTypedef)
-	{
-		cxxTokenChainDestroyLast(g_cxx.pTokenChain);
-
-		CXXToken * pLast = cxxTokenChainLast(g_cxx.pTokenChain);
-		if(pLast && (pLast->eType == CXXTokenTypeIdentifier))
-		{
-			tagEntryInfo * tag = cxxTagBegin(
-					vStringValue(pLast->pszWord),
-					CXXTagKindTYPEDEF,
-					pLast
-				);
-			
-			if(tag)
-			{
-				
-				if(szTypeName)
-				{
-					tag->extensionFields.typeRef[0] = cxxTagGetKindOptions()[eTagKind].name;
-					tag->extensionFields.typeRef[1] = szTypeName;
-				}
-	
-				// FIXME: This is quite debatable.
-				tag->isFileScope = !isInputHeaderFile();
-	
-				cxxTagCommit();
-			}
-		}
-		
-		CXX_DEBUG_LEAVE_TEXT("Parsed typedef");
-		return TRUE;
-	}
-
 	// fake the initial two tokens
 	CXXToken * pIdentifier = cxxTokenCreate();
 	pIdentifier->eType = CXXTokenTypeIdentifier;
@@ -270,11 +237,15 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(boolea
 	
 	CXXToken * pKeyword = cxxTokenCreate();
 	pKeyword->eType = CXXTokenTypeKeyword;
+	pKeyword->eKeyword = eTagKeyword;
 	pKeyword->bFollowedBySpace = TRUE;
 	vStringCatS(pKeyword->pszWord,cxxTagGetKindOptions()[eTagKind].name);
 	cxxTokenChainPrepend(g_cxx.pTokenChain,pKeyword);
 
-	cxxParserExtractVariableDeclarations(g_cxx.pTokenChain);
+	if(bParsingTypedef)
+		cxxParserHandleGenericTypedef();
+	else
+		cxxParserExtractVariableDeclarations(g_cxx.pTokenChain);
 
 	CXX_DEBUG_LEAVE();
 	return TRUE;
@@ -284,7 +255,9 @@ boolean cxxParserParseEnum()
 {
 	CXX_DEBUG_ENTER();
 
-	cxxTokenChainClear(g_cxx.pTokenChain);
+	//cxxTokenChainClear(g_cxx.pTokenChain);
+
+	boolean bParsingTypedef = (g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef); // may be cleared below
 
 	/*
 		Spec is:
@@ -427,7 +400,7 @@ boolean cxxParserParseEnum()
 		iPushedScopes--;
 	}
 
-	boolean bRet = cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer((g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef),CXXTagKindENUM,vStringValue(pScopeName));
+	boolean bRet = cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(bParsingTypedef,CXXKeywordENUM,CXXTagKindENUM,vStringValue(pScopeName));
 
 	if(pScopeName)
 		vStringDelete(pScopeName);
@@ -438,7 +411,7 @@ boolean cxxParserParseEnum()
 };
 
 
-boolean cxxParserParseClassStructOrUnion(enum CXXTagKind eTagKind)
+boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKind eTagKind)
 {
 	CXX_DEBUG_ENTER();
 
@@ -639,7 +612,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXTagKind eTagKind)
 		iPushedScopes--;
 	}
 
-	bRet = cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(bParsingTypedef,eTagKind,vStringValue(pScopeName));
+	bRet = cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(bParsingTypedef,eKeyword,eTagKind,vStringValue(pScopeName));
 
 	if(pScopeName)
 		vStringDelete(pScopeName);
