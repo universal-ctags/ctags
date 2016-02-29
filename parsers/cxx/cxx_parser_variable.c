@@ -269,6 +269,29 @@ next_token:
 
 		if(tag)
 		{
+			// handle very simple typerefs
+			//   struct X y;
+			if(
+				pTypeEnd &&
+				(pChain->iCount == 4) &&
+				(pTypeEnd->eType == CXXTokenTypeIdentifier) &&
+				pTypeEnd->pPrev &&
+				(pTypeEnd->pPrev->eType == CXXTokenTypeKeyword) &&
+				(
+					(pTypeEnd->pPrev->eKeyword == CXXKeywordSTRUCT) ||
+					(pTypeEnd->pPrev->eKeyword == CXXKeywordUNION) ||
+					(pTypeEnd->pPrev->eKeyword == CXXKeywordCLASS) ||
+					(pTypeEnd->pPrev->eKeyword == CXXKeywordENUM)
+				)
+			)
+			{
+				tag->extensionFields.typeRef[0] = vStringValue(pTypeEnd->pPrev->pszWord);
+				tag->extensionFields.typeRef[1] = vStringValue(pTypeEnd->pszWord);
+				CXX_DEBUG_PRINT("Typeref is %s:%s",tag->extensionFields.typeRef[0],tag->extensionFields.typeRef[1]);
+			} else {
+				CXX_DEBUG_PRINT("No typeref found");
+			}
+		
 			tag->isFileScope = ((eScopeKind == CXXTagKindNAMESPACE) && (g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) && !isInputHeaderFile()) ||
 								(eScopeKind == CXXTagKindFUNCTION) || // locals are always hidden
 								((eScopeKind != CXXTagKindNAMESPACE) && (eScopeKind != CXXTagKindFUNCTION) && (!isInputHeaderFile()));

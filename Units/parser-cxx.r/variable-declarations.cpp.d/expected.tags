@@ -12,7 +12,7 @@ l11	input.cpp	/^	unsigned long int & (*l11)(void *);$/;"	l	function:main	file:
 l12	input.cpp	/^	std::string & (*l12)(void);$/;"	l	function:main	file:
 l13	input.cpp	/^	std::string ** (*l13)(int a,int b);$/;"	l	function:main	file:
 l14	input.cpp	/^	std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t> > l14;$/;"	l	function:main	file:
-l15	input.cpp	/^	struct Struct1 l15;$/;"	l	function:main	file:
+l15	input.cpp	/^	struct Struct1 l15;$/;"	l	function:main	typeref:struct:Struct1	file:
 l16	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	file:
 l17	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	file:
 l18	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	file:

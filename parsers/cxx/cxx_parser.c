@@ -315,23 +315,7 @@ boolean cxxParserParseEnum()
 		{
 			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
 			{
-				if(g_cxx.pToken->pPrev->eType == CXXTokenTypeIdentifier)
-				{
-					// assume typedef.
-					// FIXME: Typeref!
-					tagEntryInfo * tag = cxxTagBegin(
-							vStringValue(g_cxx.pToken->pPrev->pszWord),
-							CXXTagKindTYPEDEF,
-							g_cxx.pToken->pPrev
-						);
-		
-					if(tag)
-					{
-						tag->isFileScope = !isInputHeaderFile();
-					
-						cxxTagCommit();
-					}
-				}
+				cxxParserHandleGenericTypedef();
 			} else {
 				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain);
 			}
@@ -536,23 +520,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXTagKind eTagKind)
 		{
 			if(bParsingTypedef)
 			{
-				if(g_cxx.pToken->pPrev->eType == CXXTokenTypeIdentifier)
-				{
-					// assume typedef.
-					// FIXME: Typeref!
-					tagEntryInfo * tag = cxxTagBegin(
-							vStringValue(g_cxx.pToken->pPrev->pszWord),
-							CXXTagKindTYPEDEF,
-							g_cxx.pToken->pPrev
-						);
-		
-					if(tag)
-					{
-						tag->isFileScope = !isInputHeaderFile();
-					
-						cxxTagCommit();
-					}
-				}
+				cxxParserHandleGenericTypedef();
 			} else {
 				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain);
 			}
@@ -866,23 +834,49 @@ boolean cxxParserParseGenericTypedef()
 		)
 		{
 			CXX_DEBUG_LEAVE_TEXT("Found a terminating keyword inside typedef");
-			return TRUE; // treat as semicolon
+			return TRUE; // treat as semicolon but don't dare to emit a tag
 		}
 
 	}
 
+	cxxParserHandleGenericTypedef();
+	CXX_DEBUG_LEAVE();
+	return TRUE;
+}
+
+void cxxParserHandleGenericTypedef()
+{
+	// FIXME: Make this function take a generic token chain
+	CXX_DEBUG_ENTER();
+
 	// find the last identifier
-	CXXToken * t = cxxTokenChainLastTokenOfType(g_cxx.pTokenChain,CXXTokenTypeIdentifier);
+	CXXToken * t;
+
+	// check for special case of function pointer definition
+	if(
+		g_cxx.pToken->pPrev &&
+		(g_cxx.pToken->pPrev->eType == CXXTokenTypeParenthesisChain) &&
+		g_cxx.pToken->pPrev->pPrev &&
+		(g_cxx.pToken->pPrev->pPrev->eType == CXXTokenTypeParenthesisChain) &&
+		g_cxx.pToken->pPrev->pPrev->pPrev &&
+		(t = cxxTokenChainLastTokenOfType(g_cxx.pToken->pPrev->pPrev->pChain,CXXTokenTypeIdentifier))
+	)
+	{
+		CXX_DEBUG_PRINT("Found function pointer typedef");
+	} else {
+		t = cxxTokenChainLastTokenOfType(g_cxx.pTokenChain,CXXTokenTypeIdentifier);
+	}
+	
 	if(!t)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Didn't find an identifier");
-		return TRUE; // EOF
+		return; // EOF
 	}
 	
 	if(!t->pPrev)
 	{
 		CXX_DEBUG_LEAVE_TEXT("No type before the typedef'd identifier");
-		return TRUE; // EOF
+		return; // EOF
 	}
 
 	// FIXME: typeref here?
@@ -894,14 +888,34 @@ boolean cxxParserParseGenericTypedef()
 
 	if(tag)
 	{
-		// This is debatable
+		// check for simple typerefs (this is to emulate what old ctags did!)
+		if(
+			(t->pPrev->eType == CXXTokenTypeIdentifier) &&
+			t->pPrev->pPrev &&
+			(!t->pPrev->pPrev->pPrev) &&
+			(t->pPrev->pPrev->eType == CXXTokenTypeKeyword) &&
+			(
+				(t->pPrev->pPrev->eKeyword == CXXKeywordSTRUCT) ||
+				(t->pPrev->pPrev->eKeyword == CXXKeywordUNION) ||
+				(t->pPrev->pPrev->eKeyword == CXXKeywordCLASS) ||
+				(t->pPrev->pPrev->eKeyword == CXXKeywordENUM)
+			)
+		)
+		{
+			tag->extensionFields.typeRef[0] = vStringValue(t->pPrev->pPrev->pszWord);
+			tag->extensionFields.typeRef[1] = vStringValue(t->pPrev->pszWord);
+			CXX_DEBUG_PRINT("Typeref is %s:%s",tag->extensionFields.typeRef[0],tag->extensionFields.typeRef[1]);
+		} else {
+			CXX_DEBUG_PRINT("No typeref found");
+		}
+
 		tag->isFileScope = !isInputHeaderFile();
 	
 		cxxTagCommit();
 	}
 
 	CXX_DEBUG_LEAVE();
-	return TRUE;
+	return;
 }
 
 boolean cxxParserParseIfForWhileSwitch()

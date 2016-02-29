@@ -106,6 +106,7 @@ boolean cxxParserParseAndCondenseCurrentSubchain(unsigned int uInitialSubchainMa
 boolean cxxParserParseUpToOneOf(unsigned int uTokenTypes);
 boolean cxxParserParseIfForWhileSwitch();
 boolean cxxParserParseGenericTypedef();
+void cxxParserHandleGenericTypedef();
 boolean cxxParserParseTemplatePrefix();
 boolean cxxParserParseUsingClause();
 boolean cxxParserParseAccessSpecifier();
