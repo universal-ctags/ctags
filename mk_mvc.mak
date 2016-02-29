@@ -35,6 +35,8 @@ OPT = $(OPT) /Zi
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fooptlib\ /c $<
 {parsers}.c{parsers}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparsers\ /c $<
+{parsers/cxx}.c{parsers/cxx}.obj::
+	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparserscxx\ /c $<
 
 all: ctags.exe readtags.exe
 
@@ -54,6 +56,6 @@ $(FNMATCH_OBJS): $(FNMATCH_SRCS)
 
 
 clean:
-	- del *.obj main\*.obj optlib\*.obj parsers\*.obj gnu_regex\*.obj fnmatch\*.obj
+	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj
 	- del ctags.exe readtags.exe
 	- del tags

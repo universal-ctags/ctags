@@ -326,12 +326,22 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 			}
 			goto next_token;
 
-		} else if(pToken->eType & (CXXTokenTypeSingleColon | CXXTokenTypeAssignment))
+		} else if(pToken->eType & (CXXTokenTypeOpeningBracket | CXXTokenTypeSemicolon | CXXTokenTypeEOF))
 		{
-			// With a single colon it might be a constructor. With assignment it might be virtual type func(..) = 0;
+			// reached end
+			break;
+		} else if(
+					cxxParserCurrentLanguageIsCPP() &&
+					(pToken->eType & (CXXTokenTypeSingleColon | CXXTokenTypeAssignment | CXXTokenTypePointerOperator))
+			)
+		{
+			// With a single colon it might be a constructor.
+			// With assignment it might be virtual type func(..) = 0;
+			// With a pointer operator it might be trailing return type
 			break;
 		} else if(pToken->eType & (
-					CXXTokenTypeOperator | CXXTokenTypePointerOperator | CXXTokenTypeBracketChain |
+					CXXTokenTypeOperator | CXXTokenTypeSingleColon | CXXTokenTypeAssignment |
+					CXXTokenTypePointerOperator | CXXTokenTypeBracketChain |
 					CXXTokenTypeStringConstant | CXXTokenTypeAngleBracketChain |
 					CXXTokenTypeAssignment | CXXTokenTypeCharacterConstant | CXXTokenTypeMultipleDots |
 					CXXTokenTypeClosingBracket | CXXTokenTypeClosingParenthesis |

@@ -1,0 +1,13 @@
+f01	input.cpp	/^int f01(int f01p01,int f01p02)$/;"	f
+f01p01	input.cpp	/^int f01(int f01p01,int f01p02)$/;"	z	function:f01	file:
+f01p02	input.cpp	/^int f01(int f01p01,int f01p02)$/;"	z	function:f01	file:
+f02	input.cpp	/^unsigned short int * f02(unsigned int & f02p01,...)$/;"	f
+f02p01	input.cpp	/^unsigned short int * f02(unsigned int & f02p01,...)$/;"	z	function:f02	file:
+f03	input.cpp	/^auto f03(const int & f03p01,void * f03p02) -> const int &$/;"	f
+f03p01	input.cpp	/^auto f03(const int & f03p01,void * f03p02) -> const int &$/;"	z	function:f03	file:
+f03p02	input.cpp	/^auto f03(const int & f03p01,void * f03p02) -> const int &$/;"	z	function:f03	file:
+f04	input.cpp	/^auto f04() -> int (*)(int)$/;"	f
+p01	input.cpp	/^int p01(int p01p01,int p01p02);$/;"	p
+p02	input.cpp	/^unsigned short int * p02(unsigned int & p02p01,...);$/;"	p
+p03	input.cpp	/^auto p03(const int & p03p01,void * p03p02) -> const int &;$/;"	p
+p04	input.cpp	/^auto p04() -> int (*)(int);$/;"	p
