@@ -118,6 +118,9 @@ tagEntryInfo * cxxTagBegin(
 
 void cxxTagCommit()
 {
+	if(g_oCXXTag.isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
+		return;
+
 	CXX_DEBUG_PRINT("Emitting tag for symbol '%s', kind '%s', line %d",g_oCXXTag.name,g_oCXXTag.kind->name,g_oCXXTag.lineNumber);
 	if(g_oCXXTag.extensionFields.typeRef[0] && g_oCXXTag.extensionFields.typeRef[1])
 		CXX_DEBUG_PRINT("Tag has typeref %s %s",g_oCXXTag.extensionFields.typeRef[0],g_oCXXTag.extensionFields.typeRef[1]);

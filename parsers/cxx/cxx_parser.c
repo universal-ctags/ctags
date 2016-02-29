@@ -837,16 +837,38 @@ boolean cxxParserParseAccessSpecifier()
 boolean cxxParserParseGenericTypedef()
 {
 	CXX_DEBUG_ENTER();
-	if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF | CXXTokenTypeClosingBracket))
+	
+	for(;;)
 	{
-		CXX_DEBUG_LEAVE_TEXT("Failed to parse fast statement");
-		return FALSE;
-	}
+		if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF | CXXTokenTypeClosingBracket | CXXTokenTypeKeyword))
+		{
+			CXX_DEBUG_LEAVE_TEXT("Failed to parse fast statement");
+			return FALSE;
+		}
+		
+		// This fixes bug reported by Emil Rojas in 2002.
+		// Though it's quite debatable if we really *should* do this.
+		if(g_cxx.pToken->eType != CXXTokenTypeKeyword)
+		{
+			if(g_cxx.pToken->eType != CXXTokenTypeSemicolon)
+			{
+				CXX_DEBUG_LEAVE_TEXT("Found EOF/closing bracket at typedef");
+				return TRUE; // EOF
+			}
+			
+			break;
+		}
 
-	if(g_cxx.pToken->eType != CXXTokenTypeSemicolon)
-	{
-		CXX_DEBUG_LEAVE_TEXT("Found EOF/closing bracket at typedef");
-		return TRUE; // EOF
+		if(
+			(g_cxx.pToken->eKeyword == CXXKeywordEXTERN) ||
+			(g_cxx.pToken->eKeyword == CXXKeywordTYPEDEF) ||
+			(g_cxx.pToken->eKeyword == CXXKeywordSTATIC)
+		)
+		{
+			CXX_DEBUG_LEAVE_TEXT("Found a terminating keyword inside typedef");
+			return TRUE; // treat as semicolon
+		}
+
 	}
 
 	// find the last identifier

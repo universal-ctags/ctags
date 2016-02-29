@@ -1,2 +1,3 @@
 Namespace1	input.h	/^namespace Namespace1$/;"	n
+__anon1	input.h	/^enum {anon2=1000};$/;"	g
 anon2	input.h	/^enum {anon2=1000};$/;"	e	enum:__anon1
