@@ -118,6 +118,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain)
 	//   type var = ...;
 	//   type (*ident)();
 	//   type var:bits;
+	//   type var: range declaration <-- (FIXME: this is only inside for!)
 	//   very complex type with modifiers() namespace::namespace::var = ...;
 	//   type<with template> namespace::var[] = {
 	//   ...

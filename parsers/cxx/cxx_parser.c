@@ -916,7 +916,22 @@ boolean cxxParserParseIfForWhileSwitch()
 	
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain))
 	{
-		// FIXME: Extract variable declarations from the parenthesis chain!
+		// Extract variables from the parenthesis chain
+		// We handle only simple cases.
+		CXXTokenChain * pChain = g_cxx.pToken->pChain;
+
+		CXX_DEBUG_ASSERT(pChain->iCount >= 2,"The parenthesis chain must have initial and final parenthesis");
+
+		// Kill the initial parenthesis
+		cxxTokenChainDestroyFirst(pChain);
+		// Fake the final semicolon
+		CXXToken * t = cxxTokenChainLast(pChain);
+		t->eType = CXXTokenTypeSemicolon;
+		vStringClear(t->pszWord);
+		vStringPut(t->pszWord,';');
+
+		// and extract variable declarations if possible
+		cxxParserExtractVariableDeclarations(pChain);
 
 		CXX_DEBUG_LEAVE_TEXT("Found if/for/while/switch parenthesis chain");
 		return TRUE;
