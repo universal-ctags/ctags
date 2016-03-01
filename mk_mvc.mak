@@ -35,7 +35,7 @@ OPT = $(OPT) /Zi
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fooptlib\ /c $<
 {parsers}.c{parsers}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparsers\ /c $<
-{parsers/cxx}.c{parsers/cxx}.obj::
+{parsers\cxx}.c{parsers\cxx}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparserscxx\ /c $<
 
 all: ctags.exe readtags.exe

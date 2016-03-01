@@ -39,7 +39,7 @@ CXXToken * cxxParserOpeningBracketIsLambda()
 	CXXToken * t = g_cxx.pToken->pPrev;
 
 	if(!t)
-		return FALSE; // not a lambda
+		return NULL; // not a lambda
 	
 	// Check simple cases first
 	
