@@ -47,7 +47,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition()
 	
 	CXX_DEBUG_ASSERT(g_cxx.eLanguage == g_cxx.eCLanguage,"Should be called only when parsing C");
 	CXX_DEBUG_ASSERT(cxxTokenChainLast(g_cxx.pTokenChain),"At least one token should be there");
-	CXX_DEBUG_ASSERT(cxxTokenChainLast(g_cxx.pTokenChain)->eType == CXXTokenTypeSemicolon,"Only upon encountering a semicolon");
+	CXX_DEBUG_ASSERT(cxxTokenTypeIs(cxxTokenChainLast(g_cxx.pTokenChain),CXXTokenTypeSemicolon),"Only upon encountering a semicolon");
 
 	// The minimum possible case is:
 	//
@@ -67,7 +67,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition()
 	CXXToken * pIdentifier = pParenthesis->pPrev;
 	if(!pIdentifier)
 		return 0;
-	if(pIdentifier->eType != CXXTokenTypeIdentifier)
+	if(!cxxTokenTypeIs(pIdentifier,CXXTokenTypeIdentifier))
 		return 0;
 
 	// And least three tokens after it
@@ -92,7 +92,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition()
 	if(!x)
 		return 0;
 	
-	if(x->eType != CXXTokenTypeSemicolon)
+	if(!cxxTokenTypeIs(x,CXXTokenTypeSemicolon))
 		return 0; // does not look like a variable declaration.
 
 	x = cxxTokenChainPreviousTokenNotOfType(
@@ -104,7 +104,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition()
 	if(!x)
 		return 0;
 	
-	if(x->eType != CXXTokenTypeIdentifier)
+	if(!cxxTokenTypeIs(x,CXXTokenTypeIdentifier))
 		return 0; // does not look like a variable declaration.
 
 	CXX_DEBUG_ASSERT(pParenthesis->pChain,"The parenthesis should be condensed here!");
@@ -114,9 +114,9 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition()
 	// Special case inside special case. Check if we're at something like func __ARGS(())
 	if(
 			(pParenthesis->pChain->iCount == 3) &&
-			(cxxTokenChainAt(pParenthesis->pChain,1)->eType == CXXTokenTypeParenthesisChain) &&
+			cxxTokenTypeIs(cxxTokenChainAt(pParenthesis->pChain,1),CXXTokenTypeParenthesisChain) &&
 			(pIdentifier->pPrev) &&
-			(pIdentifier->pPrev->eType == CXXTokenTypeIdentifier)
+			cxxTokenTypeIs(pIdentifier->pPrev,CXXTokenTypeIdentifier)
 		)
 	{
 		// Looks exactly like our special case.
@@ -139,20 +139,20 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition()
 
 	for(;;)
 	{
-		if(x->eType == CXXTokenTypeIdentifier)
+		if(cxxTokenTypeIs(x,CXXTokenTypeIdentifier))
 			iParameterCount++;
-		else if(x->eType == CXXTokenTypeMultipleDots)
+		else if(cxxTokenTypeIs(x,CXXTokenTypeMultipleDots))
 			bGotMultipleDots = TRUE;
 		else
 			return 0; // not valid (note that (void) is not allowed here since we wouln't have a following variable declaration)
 			
 		x = x->pNext;
 		CXX_DEBUG_ASSERT(x,"We should have found at least the closing parenthesis here");
-		if(x->eType == CXXTokenTypeClosingParenthesis)
+		if(cxxTokenTypeIs(x,CXXTokenTypeClosingParenthesis))
 			break;
 		if(bGotMultipleDots)
 			return 0; // not valid
-		if(x->eType != CXXTokenTypeComma)
+		if(!cxxTokenTypeIs(x,CXXTokenTypeComma))
 			return 0;
 		x = x->pNext;
 		CXX_DEBUG_ASSERT(x,"We should have found at least the closing parenthesis here");
@@ -180,9 +180,9 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition()
 			return FALSE;
 		}
 
-		if(g_cxx.pToken->eType == CXXTokenTypeEOF)
+		if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 			return TRUE; // tolerate syntax error
-		if(g_cxx.pToken->eType == CXXTokenTypeOpeningBracket)
+		if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
 			break; // gotcha
 		iParameterCount--;
 		
@@ -190,7 +190,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition()
 		cxxParserNewStatement();
 	}
 	
-	if(g_cxx.pToken->eType != CXXTokenTypeOpeningBracket)
+	if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
 		return 0; // didn't find an opening bracket. This probably wasn't a K&R style function declaration after all.
 
 	tagEntryInfo * tag = cxxTagBegin(
@@ -201,7 +201,6 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition()
 
 	if(tag)
 	{
-	
 		if(pParenthesis->pChain->pTail)
 			pParenthesis->pChain->pTail->bFollowedBySpace = false; // make sure we don't emit the trailing space
 	
@@ -272,7 +271,7 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 
 	while(pToken)
 	{
-		if((pToken->eType == CXXTokenTypeKeyword) && (pToken->eKeyword == CXXKeywordOPERATOR))
+		if(cxxTokenTypeIs(pToken,CXXTokenTypeKeyword) && (pToken->eKeyword == CXXKeywordOPERATOR))
 		{
 			// Special case for operator <something> ()
 
@@ -284,16 +283,17 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 				if(pToken->eType == CXXTokenTypeParenthesisChain)
 				{
 					// check for operator ()()
-					if(pToken->pNext && (pToken->pNext->eType == CXXTokenTypeParenthesisChain))
+					if(pToken->pNext && cxxTokenTypeIs(pToken->pNext,CXXTokenTypeParenthesisChain))
 						pToken = pToken->pNext;
 					break;
 				}
 				
-				if(!(pToken->eType &
-						(CXXTokenTypeAnd | CXXTokenTypeAssignment | CXXTokenTypeComma |
+				if(!cxxTokenTypeIsOneOf(
+						pToken,
+						CXXTokenTypeAnd | CXXTokenTypeAssignment | CXXTokenTypeComma |
 						CXXTokenTypeDotOperator | CXXTokenTypeGreaterThanSign | CXXTokenTypeOperator |
 						CXXTokenTypePointerOperator | CXXTokenTypeSingleColon | CXXTokenTypeSmallerThanSign |
-						CXXTokenTypeSquareParenthesisChain | CXXTokenTypeStar)
+						CXXTokenTypeSquareParenthesisChain | CXXTokenTypeStar
 					)
 				)
 				{
@@ -310,13 +310,13 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 				return FALSE;
 			}
 			
-			CXX_DEBUG_ASSERT(pToken->eType == CXXTokenTypeParenthesisChain,"Must have found a parenthesis chain here");
+			CXX_DEBUG_ASSERT(cxxTokenTypeIs(pToken,CXXTokenTypeParenthesisChain),"Must have found a parenthesis chain here");
 
 			pIdentifierEnd = pToken->pPrev;
 			
 			bStopScanning = TRUE;
 
-		} else if(pToken->eType == CXXTokenTypeSmallerThanSign)
+		} else if(cxxTokenTypeIs(pToken,CXXTokenTypeSmallerThanSign))
 		{
 			pToken = cxxTokenChainSkipToEndOfAngleBracket(pToken);
 			if(!pToken)
@@ -326,14 +326,14 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 			}
 			goto next_token;
 
-		} else if(pToken->eType & (CXXTokenTypeOpeningBracket | CXXTokenTypeSemicolon | CXXTokenTypeEOF))
+		} else if(cxxTokenTypeIsOneOf(pToken,CXXTokenTypeOpeningBracket | CXXTokenTypeSemicolon | CXXTokenTypeEOF))
 		{
 			// reached end
 			bStopScanning = TRUE;
 			break;
 		} else if(
 					cxxParserCurrentLanguageIsCPP() &&
-					(pToken->eType & (CXXTokenTypeSingleColon | CXXTokenTypeAssignment | CXXTokenTypePointerOperator))
+					cxxTokenTypeIsOneOf(pToken,CXXTokenTypeSingleColon | CXXTokenTypeAssignment | CXXTokenTypePointerOperator)
 			)
 		{
 			// With a single colon it might be a constructor.
@@ -341,7 +341,8 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 			// With a pointer operator it might be trailing return type
 			bStopScanning = TRUE;
 			break;
-		} else if(pToken->eType & (
+		} else if(cxxTokenTypeIsOneOf(
+					pToken,
 					CXXTokenTypeOperator | CXXTokenTypeSingleColon | CXXTokenTypeAssignment |
 					CXXTokenTypePointerOperator | CXXTokenTypeBracketChain |
 					CXXTokenTypeStringConstant | CXXTokenTypeAngleBracketChain |
@@ -356,7 +357,7 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 		} else {
 
 			// must be parenthesis chain
-			if(pToken->eType != CXXTokenTypeParenthesisChain)
+			if(!cxxTokenTypeIs(pToken,CXXTokenTypeParenthesisChain))
 				goto next_token; 
 	
 			// parentheses at position 0 are meaningless
@@ -366,7 +367,7 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 			// parentheses at position 1 they are very likely to be macro invocations... but we still handle them in case we find nothing else
 	
 			// must have an identifier before (this excludes things like __attribute__ and declspec which are marked as keywords)
-			if(pToken->pPrev->eType == CXXTokenTypeIdentifier)
+			if(cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeIdentifier))
 			{
 				// identifier before
 				pIdentifierStart = pToken->pPrev;
@@ -385,11 +386,11 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 		if(
 				// nested parentheses
 				(pToken->pChain->iCount == 3) &&
-				(pInner->eType == CXXTokenTypeParenthesisChain) &&
-				(pIdentifierEnd->eType == CXXTokenTypeIdentifier) && // FIXME: This actually excludes operator!
+				cxxTokenTypeIs(pInner,CXXTokenTypeParenthesisChain) &&
+				cxxTokenTypeIs(pIdentifierEnd,CXXTokenTypeIdentifier) && // FIXME: This actually excludes operator!
 				// an identifier right before the identifier we found
 				pIdentifierEnd->pPrev &&
-				(pIdentifierEnd->pPrev->eType == CXXTokenTypeIdentifier) &&
+				cxxTokenTypeIs(pIdentifierEnd->pPrev,CXXTokenTypeIdentifier) &&
 				cxxParserTokenChainLooksLikeFunctionParameterList(pInner->pChain,pParamInfo)
 			)
 		{
@@ -446,15 +447,15 @@ next_token:
 	
 		while(pToken)
 		{
-			if(pToken->eType != CXXTokenTypeMultipleColons)
+			if(!cxxTokenTypeIs(pToken,CXXTokenTypeMultipleColons))
 				break;
 			pToken = pToken->pPrev;
 			if(!pToken)
 				break;
-			if(pToken->eType != CXXTokenTypeIdentifier)
+			if(!cxxTokenTypeIs(pToken,CXXTokenTypeIdentifier))
 			{
 				// check for template specialization
-				if(pToken->eType == CXXTokenTypeGreaterThanSign)
+				if(cxxTokenTypeIs(pToken,CXXTokenTypeGreaterThanSign))
 				{
 					// might be something like type X<TemplateArg>::func() (explicit specialization of template<A> class X).
 					CXXToken * pSmallerThan = cxxTokenChainPreviousTokenOfType(pToken,CXXTokenTypeSmallerThanSign);
@@ -462,7 +463,7 @@ next_token:
 						break; // nope
 					if(!pSmallerThan->pPrev)
 						break; // nope
-					if(pSmallerThan->pPrev->eType != CXXTokenTypeIdentifier)
+					if(!cxxTokenTypeIs(pSmallerThan->pPrev,CXXTokenTypeIdentifier))
 						break; // nope
 					// hmm.. probably a template specialisation
 					pToken = pSmallerThan->pPrev;
@@ -471,7 +472,7 @@ next_token:
 					// same as above, but already condensed
 					if(!pToken->pPrev)
 						break; // nope
-					if(pToken->pPrev->eType != CXXTokenTypeIdentifier)
+					if(!cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeIdentifier))
 						break; // nope
 					// hmm.. probably a template specialisation
 					pToken = pToken->pPrev;
@@ -490,7 +491,7 @@ next_token:
 		
 		if(
 				pTopLevelParenthesis->pNext &&
-				(pTopLevelParenthesis->pNext->eType == CXXTokenTypeKeyword) &&
+				cxxTokenTypeIs(pTopLevelParenthesis->pNext,CXXTokenTypeKeyword) &&
 				(pTopLevelParenthesis->pNext->eKeyword == CXXKeywordCONST)
 		)
 			pInfo->pSignatureConst = pTopLevelParenthesis->pNext;
@@ -724,7 +725,7 @@ boolean cxxParserTokenChainLooksLikeFunctionParameterList(CXXTokenChain * tc,CXX
 		CXXToken * pStart = t;
 	
 		// First token must be identifier/keyword or ...
-		if(!(t->eType & (CXXTokenTypeIdentifier | CXXTokenTypeKeyword | CXXTokenTypeMultipleDots)))
+		if(!cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier | CXXTokenTypeKeyword | CXXTokenTypeMultipleDots))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Token '%s' is something that is not a identifier, keyword or ...",vStringValue(t->pszWord));
 			return FALSE;
@@ -752,7 +753,7 @@ try_again:
 
 		CXX_DEBUG_ASSERT(t,"We should have found the closing parenthesis here");
 
-		if(t->eType == CXXTokenTypeParenthesisChain)
+		if(cxxTokenTypeIs(t,CXXTokenTypeParenthesisChain))
 		{
 			CXX_DEBUG_PRINT("Found parenthesis chain");
 			// Either part of function pointer declaration or a very ugly variable decl
@@ -776,7 +777,7 @@ try_again:
 			return FALSE;
 		}
 
-		if(t->eType == CXXTokenTypeSmallerThanSign)
+		if(cxxTokenTypeIs(t,CXXTokenTypeSmallerThanSign))
 		{
 			CXX_DEBUG_PRINT("Maybe template?");
 
@@ -791,7 +792,7 @@ try_again:
 			goto try_again;
 		}
 
-		if(t->eType & TOKENS_THAT_SHOULD_NOT_APPEAR_IN_SIGNATURE_BEFORE_ASSIGNMENT)
+		if(cxxTokenTypeIsOneOf(t,TOKENS_THAT_SHOULD_NOT_APPEAR_IN_SIGNATURE_BEFORE_ASSIGNMENT))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Token '%s' is something that doesn't belong to a function parameter list",vStringValue(t->pszWord));
 			return FALSE;
@@ -808,29 +809,29 @@ try_again:
 
 				CXXToken * pIdentifier = NULL;
 
-				if(t->pPrev->eType == CXXTokenTypeIdentifier)
+				if(cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier))
 				{
 					// type var
 					pIdentifier = t->pPrev;
 				} else if(t->pPrev->pPrev)
 				{
 					if(
-						(t->pPrev->eType == CXXTokenTypeSquareParenthesisChain) &&
-						(t->pPrev->pPrev->eType == CXXTokenTypeIdentifier)
+						cxxTokenTypeIs(t->pPrev,CXXTokenTypeSquareParenthesisChain) &&
+						cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeIdentifier)
 					)
 					{
 						// type var[]
 						pIdentifier = t->pPrev->pPrev;
 					} else if(
-						(t->pPrev->eType == CXXTokenTypeNumber) &&
-						(t->pPrev->pPrev->eType == CXXTokenTypeIdentifier)
+						cxxTokenTypeIs(t->pPrev,CXXTokenTypeNumber) &&
+						cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeIdentifier)
 					)
 					{
 						// type var:bits
 						pIdentifier = t->pPrev->pPrev;
 					} else if(
-						(t->pPrev->eType == CXXTokenTypeParenthesisChain) &&
-						(t->pPrev->pPrev->eType == CXXTokenTypeParenthesisChain) &&
+						cxxTokenTypeIs(t->pPrev,CXXTokenTypeParenthesisChain) &&
+						cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeParenthesisChain) &&
 						(pIdentifier = cxxTokenChainLastPossiblyNestedTokenOfType(t->pPrev->pPrev->pChain,CXXTokenTypeIdentifier))
 					)
 					{
@@ -858,13 +859,13 @@ try_again:
 			}
 		}
 
-		if(t->eType == CXXTokenTypeClosingParenthesis)
+		if(cxxTokenTypeIs(t,CXXTokenTypeClosingParenthesis))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Found closing parenthesis, it's OK");
 			return TRUE;
 		}
 		
-		if(t->eType == CXXTokenTypeComma)
+		if(cxxTokenTypeIs(t,CXXTokenTypeComma))
 		{
 			// ok, go ahead
 			CXX_DEBUG_PRINT("Found comma");
@@ -885,7 +886,7 @@ try_again:
 		
 		CXX_DEBUG_ASSERT(t,"We should have found the closing parenthesis here");
 
-		if(t->eType == CXXTokenTypeClosingParenthesis)
+		if(cxxTokenTypeIs(t,CXXTokenTypeClosingParenthesis))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Found closing parenthesis, it's OK");
 			return TRUE;

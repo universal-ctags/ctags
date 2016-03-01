@@ -78,7 +78,7 @@ evaluate_current_token:
 
 					CXX_DEBUG_PRINT("Got token '%s' of type 0x%02x",vStringValue(g_cxx.pToken->pszWord),g_cxx.pToken->eType);
 
-					if(g_cxx.pToken->eType == CXXTokenTypeSmallerThanSign)
+					if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSmallerThanSign))
 					{
 						// assume it's an operator
 						CXX_DEBUG_PRINT("Treating < as shift-left operator");
@@ -86,7 +86,7 @@ evaluate_current_token:
 						CXX_DEBUG_PRINT("Increasing template level");
 						iTemplateLevel++;
 
-						if(g_cxx.pToken->eType & (CXXTokenTypeOpeningParenthesis | CXXTokenTypeOpeningSquareParenthesis))
+						if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeOpeningParenthesis | CXXTokenTypeOpeningSquareParenthesis))
 						{
 							CXX_DEBUG_PRINT("Condensing subchain");
 							// hmmm.. must condense as subchain
@@ -95,7 +95,7 @@ evaluate_current_token:
 								CXX_DEBUG_LEAVE_TEXT("Failed to condense current subchain");
 								return TRUE;
 							}
-							if(g_cxx.pToken->eType == CXXTokenTypeEOF)
+							if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 							{
 								CXX_DEBUG_LEAVE_TEXT("Found EOF, syntax error but we tolerate it");
 								return TRUE;
@@ -128,7 +128,7 @@ evaluate_current_token:
 
 				CXX_DEBUG_PRINT("Got token '%s' of type 0x%02x",vStringValue(g_cxx.pToken->pszWord),g_cxx.pToken->eType);
 
-				if(g_cxx.pToken->eType == CXXTokenTypeGreaterThanSign)
+				if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeGreaterThanSign))
 				{
 					// assume it's an operator
 					CXX_DEBUG_PRINT("Treating > as shift-right operator");
@@ -136,7 +136,7 @@ evaluate_current_token:
 					CXX_DEBUG_PRINT("Decreasing template level");
 					iTemplateLevel--;
 
-					if(g_cxx.pToken->eType & (CXXTokenTypeOpeningParenthesis | CXXTokenTypeOpeningSquareParenthesis))
+					if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeOpeningParenthesis | CXXTokenTypeOpeningSquareParenthesis))
 					{
 						CXX_DEBUG_PRINT("Condensing subchain");
 						// hmmm.. must condense as subchain
@@ -145,7 +145,7 @@ evaluate_current_token:
 							CXX_DEBUG_LEAVE_TEXT("Failed to condense current subchain");
 							return TRUE;
 						}
-						if(g_cxx.pToken->eType == CXXTokenTypeEOF)
+						if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Found EOF, syntax error but we tolerate it");
 							return TRUE;
@@ -220,7 +220,7 @@ boolean cxxParserParseTemplatePrefix()
 		return FALSE;
 	}
 
-	if(g_cxx.pToken->eType == CXXTokenTypeEOF)
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Found EOF");
 		g_cxx.bParsingTemplateAngleBrackets = FALSE;

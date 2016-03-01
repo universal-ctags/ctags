@@ -41,7 +41,7 @@ boolean cxxParserParseUsingClause()
 		return FALSE;
 	}
 
-	if(g_cxx.pToken->eType != CXXTokenTypeSemicolon)
+	if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSemicolon))
 	{
 		CXX_DEBUG_LEAVE_TEXT("This is a syntax error but we tolerate it");
 		return TRUE;

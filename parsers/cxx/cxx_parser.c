@@ -113,20 +113,20 @@ boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
 	{
 		//CXX_DEBUG_PRINT("Current token is '%s' 0x%x",vStringValue(g_cxx.pToken->pszWord),g_cxx.pToken->eType);
 
-		if(g_cxx.pToken->eType & uTokenTypes)
+		if(cxxTokenTypeIsOneOf(g_cxx.pToken,uTokenTypes))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Got terminator token '%s' 0x%x",vStringValue(g_cxx.pToken->pszWord),g_cxx.pToken->eType);
 			return TRUE;
 		}
 		
-		if(g_cxx.pToken->eType & uInitialSubchainMarkerTypes)
+		if(cxxTokenTypeIsOneOf(g_cxx.pToken,uInitialSubchainMarkerTypes))
 		{
 			// subchain
 			CXX_DEBUG_PRINT("Got subchain start token '%s' 0x%x",vStringValue(g_cxx.pToken->pszWord),g_cxx.pToken->eType);
 			CXXToken * pParenthesis;
 
 			if(
-				(g_cxx.pToken->eType & CXXTokenTypeOpeningBracket) &&
+				cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket) &&
 				cxxParserCurrentLanguageIsCPP() &&
 				(pParenthesis = cxxParserOpeningBracketIsLambda())
 			)
@@ -144,7 +144,7 @@ boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
 				}
 			}
 
-			if(g_cxx.pToken->eType & uTokenTypes)
+			if(cxxTokenTypeIsOneOf(g_cxx.pToken,uTokenTypes))
 			{
 				// was looking for a subchain
 				CXX_DEBUG_LEAVE_TEXT("Got terminator subchain token 0x%x",g_cxx.pToken->eType);
@@ -162,7 +162,7 @@ boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
 
 		// Check for mismatched brackets/parenthis
 		// Note that if we were looking for one of [({ then we would have matched it at the top of the for
-		if(g_cxx.pToken->eType & uFinalSubchainMarkerTypes)
+		if(cxxTokenTypeIsOneOf(g_cxx.pToken,uFinalSubchainMarkerTypes))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Got mismatched subchain terminator 0x%x",g_cxx.pToken->eType);
 			return FALSE; // unmatched: syntax error
@@ -215,7 +215,7 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(boolea
 		return FALSE;
 	}
 
-	if(g_cxx.pToken->eType & CXXTokenTypeEOF)
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 	{
 		// It's a syntax error, but we can be tolerant here.
 		CXX_DEBUG_LEAVE_TEXT("Got EOF after enum/class/struct/union block");
@@ -272,7 +272,7 @@ boolean cxxParserParseEnum()
 		return FALSE;
 	}
 
-	if(g_cxx.pToken->eType == CXXTokenTypeParenthesisChain)
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain))
 	{
 		// probably a function declaration/prototype
 		// something like enum x func()....
@@ -282,7 +282,7 @@ boolean cxxParserParseEnum()
 	}
 
 	// FIXME: This block is duplicated in struct/union/class
-	if(g_cxx.pToken->eType == CXXTokenTypeSemicolon)
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSemicolon))
 	{
 		if(g_cxx.pTokenChain->iCount > 3) // [typedef] struct X Y; <-- typedef has been removed!
 		{
@@ -299,7 +299,7 @@ boolean cxxParserParseEnum()
 		return TRUE;
 	}
 	
-	if(g_cxx.pToken->eType == CXXTokenTypeEOF)
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 	{
 		// tolerate EOF, treat as forward declaration
 		cxxParserNewStatement();
@@ -322,12 +322,12 @@ boolean cxxParserParseEnum()
 		CXXToken * pPrev = pEnumName->pPrev;
 		while(pPrev)
 		{
-			if(pPrev->eType != CXXTokenTypeMultipleColons)
+			if(!cxxTokenTypeIs(pPrev,CXXTokenTypeMultipleColons))
 				break;
 			pPrev = pPrev->pPrev;
 			if(!pPrev)
 				break;
-			if(pPrev->eType != CXXTokenTypeIdentifier)
+			if(!cxxTokenTypeIs(pPrev,CXXTokenTypeIdentifier))
 				break;
 			pNamespaceBegin = pPrev;
 			pPrev = pPrev->pPrev;
@@ -380,7 +380,7 @@ boolean cxxParserParseEnum()
 		CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
 
 		// enumerator.
-		if((g_cxx.pTokenChain->iCount > 1) && (pFirst->eType == CXXTokenTypeIdentifier))
+		if((g_cxx.pTokenChain->iCount > 1) && cxxTokenTypeIs(pFirst,CXXTokenTypeIdentifier))
 		{
 			tag = cxxTagBegin(vStringValue(pFirst->pszWord),CXXTagKindENUMERATOR,pFirst);
 			if(tag)
@@ -390,7 +390,7 @@ boolean cxxParserParseEnum()
 			}
 		}
 
-		if(g_cxx.pToken->eType & (CXXTokenTypeEOF | CXXTokenTypeClosingBracket))
+		if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeEOF | CXXTokenTypeClosingBracket))
 			break;
 	}
 
@@ -451,7 +451,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 			return FALSE;
 		}
 
-		if(g_cxx.pToken->eType != CXXTokenTypeSmallerThanSign)
+		if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSmallerThanSign))
 			break;
 
 		// Probably a template specialisation
@@ -477,7 +477,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 
 	g_cxx.bParsingClassStructOrUnionDeclaration = FALSE;
 
-	if(g_cxx.pToken->eType == CXXTokenTypeParenthesisChain)
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain))
 	{
 		// probably a function declaration/prototype
 		// something like struct x * func()....
@@ -487,16 +487,14 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 	}
 
 	// FIXME: This block is duplicated in enum
-	if(g_cxx.pToken->eType == CXXTokenTypeSemicolon)
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSemicolon))
 	{
 		if(g_cxx.pTokenChain->iCount > 3) // [typedef] struct X Y; <-- typedef has been removed!
 		{
 			if(bParsingTypedef)
-			{
 				cxxParserHandleGenericTypedef();
-			} else {
+			else
 				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain);
-			}
 		}
 
 		cxxParserNewStatement();
@@ -504,7 +502,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 		return TRUE;
 	}
 	
-	if(g_cxx.pToken->eType == CXXTokenTypeEOF)
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 	{
 		// tolerate EOF, just ignore this
 		cxxParserNewStatement();
@@ -527,12 +525,12 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 		CXXToken * pPrev = pClassName->pPrev;
 		while(pPrev)
 		{
-			if(pPrev->eType != CXXTokenTypeMultipleColons)
+			if(!cxxTokenTypeIs(pPrev,CXXTokenTypeMultipleColons))
 				break;
 			pPrev = pPrev->pPrev;
 			if(!pPrev)
 				break;
-			if(pPrev->eType != CXXTokenTypeIdentifier)
+			if(!cxxTokenTypeIs(pPrev,CXXTokenTypeIdentifier))
 				break;
 			pNamespaceBegin = pPrev;
 			pPrev = pPrev->pPrev;
@@ -556,7 +554,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 
 	cxxTokenChainClear(g_cxx.pTokenChain);
 
-	if(g_cxx.pToken->eType == CXXTokenTypeSingleColon)
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSingleColon))
 	{
 		// check for base classes
 	
@@ -567,7 +565,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 			return FALSE;
 		}
 	
-		if(g_cxx.pToken->eType & (CXXTokenTypeSemicolon | CXXTokenTypeEOF))
+		if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeSemicolon | CXXTokenTypeEOF))
 		{
 			cxxTokenDestroy(pClassName);
 			cxxParserNewStatement();
@@ -679,7 +677,7 @@ void cxxParserAnalyzeOtherStatement()
 	
 	CXXToken * t = cxxTokenChainFirst(g_cxx.pTokenChain);
 	
-	if(!(t->eType & (CXXTokenTypeIdentifier | CXXTokenTypeKeyword)))
+	if(!cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier | CXXTokenTypeKeyword))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Statement does not start with an identifier or keyword");
 		return;
@@ -796,17 +794,20 @@ boolean cxxParserParseGenericTypedef()
 		
 		// This fixes bug reported by Emil Rojas in 2002.
 		// Though it's quite debatable if we really *should* do this.
-		if(g_cxx.pToken->eType != CXXTokenTypeKeyword)
+		if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeKeyword))
 		{
-			if(g_cxx.pToken->eType != CXXTokenTypeSemicolon)
+			// not a keyword
+			if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSemicolon))
 			{
+				// not semicolon
 				CXX_DEBUG_LEAVE_TEXT("Found EOF/closing bracket at typedef");
 				return TRUE; // EOF
 			}
-			
+			// semicolon: exit
 			break;
 		}
 
+		// keyword
 		if(
 			(g_cxx.pToken->eKeyword == CXXKeywordEXTERN) ||
 			(g_cxx.pToken->eKeyword == CXXKeywordTYPEDEF) ||
@@ -816,7 +817,6 @@ boolean cxxParserParseGenericTypedef()
 			CXX_DEBUG_LEAVE_TEXT("Found a terminating keyword inside typedef");
 			return TRUE; // treat as semicolon but don't dare to emit a tag
 		}
-
 	}
 
 	cxxParserHandleGenericTypedef();
@@ -835,9 +835,9 @@ void cxxParserHandleGenericTypedef()
 	// check for special case of function pointer definition
 	if(
 		g_cxx.pToken->pPrev &&
-		(g_cxx.pToken->pPrev->eType == CXXTokenTypeParenthesisChain) &&
+		cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeParenthesisChain) &&
 		g_cxx.pToken->pPrev->pPrev &&
-		(g_cxx.pToken->pPrev->pPrev->eType == CXXTokenTypeParenthesisChain) &&
+		cxxTokenTypeIs(g_cxx.pToken->pPrev->pPrev,CXXTokenTypeParenthesisChain) &&
 		g_cxx.pToken->pPrev->pPrev->pPrev &&
 		(t = cxxTokenChainLastTokenOfType(g_cxx.pToken->pPrev->pPrev->pChain,CXXTokenTypeIdentifier))
 	)
@@ -870,10 +870,10 @@ void cxxParserHandleGenericTypedef()
 	{
 		// check for simple typerefs (this is to emulate what old ctags did!)
 		if(
-			(t->pPrev->eType == CXXTokenTypeIdentifier) &&
+			cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier) &&
 			t->pPrev->pPrev &&
 			(!t->pPrev->pPrev->pPrev) &&
-			(t->pPrev->pPrev->eType == CXXTokenTypeKeyword) &&
+			cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeKeyword) &&
 			(
 				(t->pPrev->pPrev->eKeyword == CXXKeywordSTRUCT) ||
 				(t->pPrev->pPrev->eKeyword == CXXKeywordUNION) ||
@@ -908,13 +908,13 @@ boolean cxxParserParseIfForWhileSwitch()
 		return FALSE;
 	}
 	
-	if(g_cxx.pToken->eType & (CXXTokenTypeEOF | CXXTokenTypeSemicolon))
+	if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeEOF | CXXTokenTypeSemicolon))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Found EOF/semicolon while parsing if/for/while/switch");
 		return TRUE;
 	}
 	
-	if(g_cxx.pToken->eType == CXXTokenTypeParenthesisChain)
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain))
 	{
 		// FIXME: Extract variable declarations from the parenthesis chain!
 

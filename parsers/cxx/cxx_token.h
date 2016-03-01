@@ -88,6 +88,9 @@ CXXToken * cxxTokenCreate();
 void cxxTokenDestroy(CXXToken * t);
 CXXToken * cxxTokenCreateAnonymousIdentifier();
 
+#define cxxTokenTypeIsOneOf(_pToken,_uTypes) (_pToken->eType & (_uTypes))
+#define cxxTokenTypeIs(_pToken,_eType) (_pToken->eType == _eType)
+
 // FIXME: Bad argument order
 void cxxTokenAppendToString(vString * s,CXXToken * t);
 

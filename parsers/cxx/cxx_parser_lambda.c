@@ -44,20 +44,20 @@ CXXToken * cxxParserOpeningBracketIsLambda()
 	// Check simple cases first
 	
 	// case 4
-	if(t->eType == CXXTokenTypeSquareParenthesisChain)
+	if(cxxTokenTypeIs(t,CXXTokenTypeSquareParenthesisChain))
 	{
 		// very likely parameterless lambda
 		return t;
 	}
 
 	// case 3
-	if(t->eType == CXXTokenTypeParenthesisChain)
+	if(cxxTokenTypeIs(t,CXXTokenTypeParenthesisChain))
 	{
 		t = t->pPrev;
 		if(!t)
 			return NULL; // can't be
 
-		if(t->eType == CXXTokenTypeSquareParenthesisChain)
+		if(cxxTokenTypeIs(t,CXXTokenTypeSquareParenthesisChain))
 			return t->pNext;
 
 		return NULL;
@@ -69,7 +69,7 @@ CXXToken * cxxParserOpeningBracketIsLambda()
 
 	t = t->pNext;
 
-	if(t->eType == CXXTokenTypeParenthesisChain)
+	if(cxxTokenTypeIs(t,CXXTokenTypeParenthesisChain))
 		return t;
 
 	return NULL;

@@ -34,7 +34,7 @@ boolean cxxParserParseBlockHandleOpeningBracket()
 
 	if(
 			(g_cxx.pToken->pPrev) &&
-			(g_cxx.pToken->pPrev->eType == CXXTokenTypeAssignment) &&
+			cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeAssignment) &&
 			(
 				(eScopeKind == CXXTagKindFUNCTION) ||
 				(eScopeKind == CXXTagKindNAMESPACE)
@@ -364,7 +364,7 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 			case CXXTokenTypeSingleColon:
 			{
 				// label ?
-				if((g_cxx.pTokenChain->iCount == 2) && (cxxTokenChainFirst(g_cxx.pTokenChain)->eType == CXXTokenTypeIdentifier))
+				if((g_cxx.pTokenChain->iCount == 2) && cxxTokenTypeIs(cxxTokenChainFirst(g_cxx.pTokenChain),CXXTokenTypeIdentifier))
 				{
 					CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
 					// assume it's label

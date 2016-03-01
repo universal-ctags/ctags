@@ -120,12 +120,12 @@ boolean cxxParserParseNamespace()
 					iScopeCount--;
 				}
 
-				if(g_cxx.pToken->eType == CXXTokenTypeClosingBracket)
+				if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeClosingBracket))
 				{
 					CXX_DEBUG_LEAVE_TEXT("Got closing bracket after scope");
 					return TRUE;
 				}
-				if(g_cxx.pToken->eType == CXXTokenTypeEOF)
+				if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 				{
 					CXX_DEBUG_LEAVE_TEXT("Got EOF after scope");
 					return TRUE;
