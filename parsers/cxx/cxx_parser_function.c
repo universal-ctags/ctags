@@ -341,7 +341,7 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 						CXXTokenTypeAnd | CXXTokenTypeAssignment | CXXTokenTypeComma |
 						CXXTokenTypeDotOperator | CXXTokenTypeGreaterThanSign | CXXTokenTypeOperator |
 						CXXTokenTypePointerOperator | CXXTokenTypeSingleColon | CXXTokenTypeSmallerThanSign |
-						CXXTokenTypeSquareParenthesisChain | CXXTokenTypeStar
+						CXXTokenTypeSquareParenthesisChain | CXXTokenTypeStar | CXXTokenTypeMultipleAnds
 					)
 				)
 				{
