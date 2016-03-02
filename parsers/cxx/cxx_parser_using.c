@@ -19,7 +19,7 @@
 #include "vstring.h"
 #include "read.h"
 
-boolean cxxParserParseUsingClause()
+boolean cxxParserParseUsingClause(void)
 {
 	CXX_DEBUG_ENTER();
 	

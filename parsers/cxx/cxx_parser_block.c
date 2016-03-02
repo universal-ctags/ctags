@@ -24,7 +24,7 @@
 
 #include <string.h>
 
-boolean cxxParserParseBlockHandleOpeningBracket()
+boolean cxxParserParseBlockHandleOpeningBracket(void)
 {
 	CXX_DEBUG_ENTER();
 

@@ -31,7 +31,7 @@
 void cxxDebugEnter(const char * szFunction,const char * szFormat,...);
 void cxxDebugLeave(const char * szFunction,const char * szFormat,...);
 void cxxDebugPrint(const char * szFunction,const char * szFormat,...);
-void cxxDebugInit();
+void cxxDebugInit(void);
 
 #define CXX_DEBUG_ENTER() cxxDebugEnter(__PRETTY_FUNCTION__,"")
 #define CXX_DEBUG_LEAVE() cxxDebugLeave(__PRETTY_FUNCTION__,"")

@@ -39,7 +39,7 @@ boolean g_bFirstRun = TRUE;
 // - Clear the token chain
 // - Reset "seen" keywords
 //
-void cxxParserNewStatement()
+void cxxParserNewStatement(void)
 {
 	cxxTokenChainClear(g_cxx.pTokenChain);
 	if(g_cxx.pTemplateTokenChain)
@@ -251,7 +251,7 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(boolea
 	return TRUE;
 }
 
-boolean cxxParserParseEnum()
+boolean cxxParserParseEnum(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -647,7 +647,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 //
 // Yes, it's complex: it's because C/C++ is complex.
 //
-void cxxParserAnalyzeOtherStatement()
+void cxxParserAnalyzeOtherStatement(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -735,7 +735,7 @@ void cxxParserAnalyzeOtherStatement()
 
 // This is called when we encounter a "public", "protected" or "private" keyword
 // that is NOT in the class declaration header line.
-boolean cxxParserParseAccessSpecifier()
+boolean cxxParserParseAccessSpecifier(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -780,7 +780,7 @@ boolean cxxParserParseAccessSpecifier()
 //
 // This is used to handle non struct/class/union/enum typedefs.
 //
-boolean cxxParserParseGenericTypedef()
+boolean cxxParserParseGenericTypedef(void)
 {
 	CXX_DEBUG_ENTER();
 	
@@ -824,7 +824,7 @@ boolean cxxParserParseGenericTypedef()
 	return TRUE;
 }
 
-void cxxParserHandleGenericTypedef()
+void cxxParserHandleGenericTypedef(void)
 {
 	// FIXME: Make this function take a generic token chain
 	CXX_DEBUG_ENTER();
@@ -898,7 +898,7 @@ void cxxParserHandleGenericTypedef()
 	return;
 }
 
-boolean cxxParserParseIfForWhileSwitch()
+boolean cxxParserParseIfForWhileSwitch(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -1031,7 +1031,7 @@ void cxxCParserInitialize(const langType language)
 	cxxBuildKeywordHash(language,FALSE);
 }
 
-void cxxParserCleanup()
+void cxxParserCleanup(void)
 {
 	if(g_bFirstRun)
 		return; // didn't run at all

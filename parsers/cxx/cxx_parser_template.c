@@ -29,7 +29,7 @@
 // Parses the <parameters> part of the template prefix.
 // Here we are pointing at the initial < (but the token chain has been emptied by cxxParserParseTemplatePrefix())
 //
-static boolean cxxParserParseTemplatePrefixAngleBrackets()
+static boolean cxxParserParseTemplatePrefixAngleBrackets(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -206,7 +206,7 @@ evaluate_current_token:
 // Parses a template<anything> prefix.
 // The parsed template parameter definition is stored in a separate token chain.
 //
-boolean cxxParserParseTemplatePrefix()
+boolean cxxParserParseTemplatePrefix(void)
 {
 	CXX_DEBUG_ENTER();
 
