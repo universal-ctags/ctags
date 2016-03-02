@@ -1,0 +1,2 @@
+X	input.sql	/^CREATE FUNCTION X RETURNS void AS $\$$/;"	f
+Y	input.sql	/^CREATE OR REPLACE FUNCTION Y(i integer) RETURNS integer AS $\$$/;"	f

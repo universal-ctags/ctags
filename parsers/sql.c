@@ -686,6 +686,29 @@ static void addToScope (tokenInfo* const token, vString* const extra, sqlKind ki
  *	 Scanning functions
  */
 
+static boolean isOneOfKeyword (tokenInfo *const token, const keywordId *const keywords, unsigned int count)
+{
+	unsigned int i;
+	for (i = 0; i < count; i++)
+	{
+		if (isKeyword (token, keywords[i]))
+			return TRUE;
+	}
+	return FALSE;
+}
+
+static void findTokenOrKeywords (tokenInfo *const token, const tokenType type,
+				 const keywordId *const keywords,
+				 unsigned int kcount)
+{
+	while (! isType (token, type) &&
+	       ! (isType (token, TOKEN_KEYWORD) && isOneOfKeyword (token, keywords, kcount)) &&
+	       ! isType (token, TOKEN_EOF))
+	{
+		readToken (token);
+	}
+}
+
 static void findToken (tokenInfo *const token, const tokenType type)
 {
 	while (! isType (token, type) &&
@@ -1129,6 +1152,11 @@ static void parseDeclare (tokenInfo *const token, const boolean local)
 		   ! isKeyword (token, KEYWORD_end) &&
 		   ! isType (token, TOKEN_EOF))
 	{
+		keywordId stoppers [] = {
+			KEYWORD_begin,
+			KEYWORD_end,
+		};
+
 		switch (token->keyword)
 		{
 			case KEYWORD_cursor:	parseSimple (token, SQLTAG_CURSOR); break;
@@ -1152,8 +1180,9 @@ static void parseDeclare (tokenInfo *const token, const boolean local)
 				}
 				break;
 		}
-		findToken (token, TOKEN_SEMICOLON);
-		readToken (token);
+		findTokenOrKeywords (token, TOKEN_SEMICOLON, stoppers, ARRAY_SIZE (stoppers));
+		if (isType (token, TOKEN_SEMICOLON))
+			readToken (token);
 	}
 }
 
