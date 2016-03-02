@@ -144,7 +144,7 @@ CXXToken * cxxTokenCreateAnonymousIdentifier(void)
 		sprintf(szNum,"%d",g_uNextAnonumousIdentiferId);
 	}
 	vStringCatS(t->pszWord,szNum);
-	t->bFollowedBySpace = true;
+	t->bFollowedBySpace = TRUE;
 	t->iLineNumber = getInputLineNumber();
 	t->oFilePosition = getInputFilePosition();
 

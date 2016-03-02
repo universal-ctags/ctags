@@ -202,7 +202,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 	if(tag)
 	{
 		if(pParenthesis->pChain->pTail)
-			pParenthesis->pChain->pTail->bFollowedBySpace = false; // make sure we don't emit the trailing space
+			pParenthesis->pChain->pTail->bFollowedBySpace = FALSE; // make sure we don't emit the trailing space
 	
 		tag->isFileScope = (g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) && !isInputHeaderFile();
 	
@@ -566,7 +566,7 @@ int cxxParserEmitFunctionTags(
 	if(tag)
 	{
 		if(pInfo->pParenthesis->pChain->pTail)
-			pInfo->pParenthesis->pChain->pTail->bFollowedBySpace = false; // make sure we don't emit the trailing space
+			pInfo->pParenthesis->pChain->pTail->bFollowedBySpace = FALSE; // make sure we don't emit the trailing space
 
 		if(eOuterScopeKind == CXXTagKindNAMESPACE)
 		{

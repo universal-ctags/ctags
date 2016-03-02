@@ -470,7 +470,7 @@ boolean cxxParserParseNextToken(void)
 			g_cxx.iChar = cppGetc();
 			if(g_cxx.iChar == EOF)
 			{
-				t->bFollowedBySpace = false;
+				t->bFollowedBySpace = FALSE;
 				return TRUE;
 			}
 			if(g_cxx.iChar == '\\')
@@ -479,7 +479,7 @@ boolean cxxParserParseNextToken(void)
 				g_cxx.iChar = cppGetc();
 				if(g_cxx.iChar == EOF)
 				{
-					t->bFollowedBySpace = false;
+					t->bFollowedBySpace = FALSE;
 					return TRUE;
 				}
 			} else if(g_cxx.iChar == '"')

@@ -190,7 +190,7 @@ evaluate_current_token:
 				return TRUE;
 			break;
 			default:
-				CXX_DEBUG_ASSERT(false,"Should not end up here");
+				CXX_DEBUG_ASSERT(FALSE,"Should not end up here");
 				CXX_DEBUG_LEAVE_TEXT("Found unexpected token type 0x%02x",g_cxx.pToken->eType);
 				return FALSE;
 			break;

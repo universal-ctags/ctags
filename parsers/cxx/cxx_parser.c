@@ -760,7 +760,7 @@ boolean cxxParserParseAccessSpecifier(void)
 			cxxScopeSetAccess(CXXScopeAccessProtected);
 		break;
 		default:
-			CXX_DEBUG_ASSERT(false,"Bad keyword in cxxParserParseAccessSpecifier!");
+			CXX_DEBUG_ASSERT(FALSE,"Bad keyword in cxxParserParseAccessSpecifier!");
 		break;
 	}
 	
