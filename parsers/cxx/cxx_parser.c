@@ -140,7 +140,7 @@ boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
 				if(!cxxParserParseAndCondenseCurrentSubchain(uInitialSubchainMarkerTypes,(uTokenTypes & CXXTokenTypeEOF)))
 				{
 					CXX_DEBUG_LEAVE_TEXT("Failed to parse subchain of type 0x%x",g_cxx.pToken->eType);
-					return false;
+					return FALSE;
 				}
 			}
 
@@ -768,7 +768,7 @@ boolean cxxParserParseAccessSpecifier()
 	if(!cxxParserParseUpToOneOf(CXXTokenTypeSingleColon | CXXTokenTypeSemicolon | CXXTokenTypeClosingBracket | CXXTokenTypeEOF))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to the next ;");
-		return false;
+		return FALSE;
 	}
 
 	cxxTokenChainClear(g_cxx.pTokenChain);
