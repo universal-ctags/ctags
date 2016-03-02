@@ -1,13 +1,19 @@
-__anon1	input.cpp	/^	{$/;"	function	function:test	file:
-__anon2	input.cpp	/^	[=]() -> int {$/;"	function	function:test	file:
-__anon3	input.cpp	/^		{$/;"	function	function:test::__anon2	file:
-__anon4	input.cpp	/^	call(10,[lambda1](int a,int b) -> int { return -1; });$/;"	function	function:test	file:
-a	input.cpp	/^	auto lambda1 = [](auto a,auto && b)$/;"	parameter	function:test::__anon1	file:
-a	input.cpp	/^	call(10,[lambda1](int a,int b) -> int { return -1; });$/;"	parameter	function:test::__anon4	file:
-b	input.cpp	/^	auto lambda1 = [](auto a,auto && b)$/;"	parameter	function:test::__anon1	file:
-b	input.cpp	/^	call(10,[lambda1](int a,int b) -> int { return -1; });$/;"	parameter	function:test::__anon4	file:
-c	input.cpp	/^		return [a,b](int c)$/;"	parameter	function:test::__anon2::__anon3	file:
-lambda1	input.cpp	/^	auto lambda1 = [](auto a,auto && b)$/;"	local	function:test	file:
+call	input.cpp	/^template<typename T> void call(T x)$/;"	function	signature:(T x)
+x	input.cpp	/^template<typename T> void call(T x)$/;"	parameter	function:call	file:
 test	input.cpp	/^int test()$/;"	function	signature:()
-x	input.cpp	/^		int x = 10;$/;"	local	function:test::__anon1	file:
-y	input.cpp	/^			int y = 0;$/;"	local	function:test::__anon2::__anon3	file:
+__anon1	input.cpp	/^	auto l1 = [] { return 0; };$/;"	function	function:test	file:
+l1	input.cpp	/^	auto l1 = [] { return 0; };$/;"	local	function:test	file:
+__anon2	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	function	function:test	file:
+a	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	parameter	function:test::__anon2	file:
+b	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	parameter	function:test::__anon2	file:
+l2	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	local	function:test	file:
+__anon3	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	function	function:test	file:
+a	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	parameter	function:test::__anon3	file:
+b	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	parameter	function:test::__anon3	file:
+__anon4	input.cpp	/^		auto l4 = [a,b](int c){ return a+b+c; };$/;"	function	function:test::__anon3	file:
+c	input.cpp	/^		auto l4 = [a,b](int c){ return a+b+c; };$/;"	parameter	function:test::__anon3::__anon4	file:
+l4	input.cpp	/^		auto l4 = [a,b](int c){ return a+b+c; };$/;"	local	function:test::__anon3	file:
+l3	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	local	function:test	file:
+__anon5	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	function	function:test	file:
+a	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	parameter	function:test::__anon5	file:
+b	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	parameter	function:test::__anon5	file:
