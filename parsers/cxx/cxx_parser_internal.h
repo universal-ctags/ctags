@@ -24,10 +24,10 @@
 //
 
 // cxx_parser_tokenizer.c
-boolean cxxParserParseNextToken();
+boolean cxxParserParseNextToken(void);
 
 // cxx_parser_lambda.c
-CXXToken * cxxParserOpeningBracketIsLambda();
+CXXToken * cxxParserOpeningBracketIsLambda(void);
 boolean cxxParserHandleLambda(CXXToken * pParenthesis);
 
 // cxx_parser_block.c
@@ -60,8 +60,8 @@ typedef struct _CXXFunctionSignatureInfo
 
 } CXXFunctionSignatureInfo;
 
-int cxxParserMaybeExtractKnRStyleFunctionDefinition();
-int cxxParserExtractFunctionSignatureBeforeOpeningBracket();
+int cxxParserMaybeExtractKnRStyleFunctionDefinition(void);
+int cxxParserExtractFunctionSignatureBeforeOpeningBracket(void);
 
 #define CXX_MAX_EXTRACTED_PARAMETERS 24
 
@@ -98,20 +98,19 @@ int cxxParserEmitFunctionTags(
 void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo);
 
 // cxx_parser.c
-void cxxParserNewStatement();
-boolean cxxParserParseNamespace();
-boolean cxxParserParseEnum();
+void cxxParserNewStatement(void);
+boolean cxxParserParseNamespace(void);
+boolean cxxParserParseEnum(void);
 boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKind eTagKind);
-boolean cxxParserParseTemplatePrefix();
 boolean cxxParserParseAndCondenseCurrentSubchain(unsigned int uInitialSubchainMarkerTypes,boolean bAcceptEOF);
 boolean cxxParserParseUpToOneOf(unsigned int uTokenTypes);
-boolean cxxParserParseIfForWhileSwitch();
-boolean cxxParserParseGenericTypedef();
-void cxxParserHandleGenericTypedef();
-boolean cxxParserParseTemplatePrefix();
-boolean cxxParserParseUsingClause();
-boolean cxxParserParseAccessSpecifier();
-void cxxParserAnalyzeOtherStatement();
+boolean cxxParserParseIfForWhileSwitch(void);
+boolean cxxParserParseGenericTypedef(void);
+void cxxParserHandleGenericTypedef(void);
+boolean cxxParserParseTemplatePrefix(void);
+boolean cxxParserParseUsingClause(void);
+boolean cxxParserParseAccessSpecifier(void);
+void cxxParserAnalyzeOtherStatement(void);
 boolean cxxParserParseAndCondenseSubchainsUpToOneOf(unsigned int uTokenTypes,unsigned int uInitialSubchainMarkerTypes);
 
 typedef enum _CXXParserKeywordState

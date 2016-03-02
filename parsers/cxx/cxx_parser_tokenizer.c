@@ -23,7 +23,7 @@
 #include "options.h"
 
 
-static void cxxParserSkipToNonWhiteSpace()
+static void cxxParserSkipToNonWhiteSpace(void)
 {
 	if(!isspace(g_cxx.iChar))
 		return;
@@ -322,7 +322,7 @@ static CXXCharTypeData g_aCharTable[128] =
 	{ 0, 0, 0 }
 };
 
-boolean cxxParserParseNextToken()
+boolean cxxParserParseNextToken(void)
 {
 	CXXToken * t = cxxTokenCreate();
 		
@@ -473,7 +473,7 @@ boolean cxxParserParseNextToken()
 			g_cxx.iChar = cppGetc();
 			if(g_cxx.iChar == EOF)
 			{
-				t->bFollowedBySpace = false;
+				t->bFollowedBySpace = FALSE;
 				return TRUE;
 			}
 			if(g_cxx.iChar == '\\')
@@ -482,7 +482,7 @@ boolean cxxParserParseNextToken()
 				g_cxx.iChar = cppGetc();
 				if(g_cxx.iChar == EOF)
 				{
-					t->bFollowedBySpace = false;
+					t->bFollowedBySpace = FALSE;
 					return TRUE;
 				}
 			} else if(g_cxx.iChar == '"')

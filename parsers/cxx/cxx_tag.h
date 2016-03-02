@@ -39,8 +39,8 @@ enum CXXTagKind
 	CXXTagKindOptionAnonymousStructureNamesDependOnFileName
 };
 
-kindOption * cxxTagGetKindOptions();
-int cxxTagGetKindOptionCount();
+kindOption * cxxTagGetKindOptions(void);
+int cxxTagGetKindOptionCount(void);
 boolean cxxTagKindEnabled(enum CXXTagKind eKindId);
 
 // Begin composing a tag. 
@@ -55,7 +55,7 @@ tagEntryInfo * cxxTagBegin(
 	);
 
 // Commit the composed tag. Must follow a succesfull cxxTagBegin() call.
-void cxxTagCommit();
+void cxxTagCommit(void);
 
 // Same as cxxTagBegin() eventually followed by cxxTagCommit()
 void cxxTag(

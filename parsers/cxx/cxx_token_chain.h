@@ -22,7 +22,7 @@ typedef struct _CXXTokenChain
 } CXXTokenChain;
 
 
-CXXTokenChain * cxxTokenChainCreate();
+CXXTokenChain * cxxTokenChainCreate(void);
 void cxxTokenChainDestroy(CXXTokenChain * tc);
 
 // Note: you don't need to call this after cxxTokenChainCreate().

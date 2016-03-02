@@ -29,7 +29,7 @@
 // Parses the <parameters> part of the template prefix.
 // Here we are pointing at the initial < (but the token chain has been emptied by cxxParserParseTemplatePrefix())
 //
-static boolean cxxParserParseTemplatePrefixAngleBrackets()
+static boolean cxxParserParseTemplatePrefixAngleBrackets(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -190,7 +190,7 @@ evaluate_current_token:
 				return TRUE;
 			break;
 			default:
-				CXX_DEBUG_ASSERT(false,"Should not end up here");
+				CXX_DEBUG_ASSERT(FALSE,"Should not end up here");
 				CXX_DEBUG_LEAVE_TEXT("Found unexpected token type 0x%02x",g_cxx.pToken->eType);
 				return FALSE;
 			break;
@@ -206,7 +206,7 @@ evaluate_current_token:
 // Parses a template<anything> prefix.
 // The parsed template parameter definition is stored in a separate token chain.
 //
-boolean cxxParserParseTemplatePrefix()
+boolean cxxParserParseTemplatePrefix(void)
 {
 	CXX_DEBUG_ENTER();
 

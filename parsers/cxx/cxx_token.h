@@ -84,9 +84,9 @@ typedef struct _CXXToken
 	unsigned char uInternalScopeAccess;
 } CXXToken;
 
-CXXToken * cxxTokenCreate();
+CXXToken * cxxTokenCreate(void);
 void cxxTokenDestroy(CXXToken * t);
-CXXToken * cxxTokenCreateAnonymousIdentifier();
+CXXToken * cxxTokenCreateAnonymousIdentifier(void);
 
 #define cxxTokenTypeIsOneOf(_pToken,_uTypes) (_pToken->eType & (_uTypes))
 #define cxxTokenTypeIs(_pToken,_eType) (_pToken->eType == _eType)
@@ -94,9 +94,9 @@ CXXToken * cxxTokenCreateAnonymousIdentifier();
 // FIXME: Bad argument order
 void cxxTokenAppendToString(vString * s,CXXToken * t);
 
-void cxxTokenAPIInit();
-void cxxTokenAPINewFile();
-void cxxTokenAPIDone();
+void cxxTokenAPIInit(void);
+void cxxTokenAPINewFile(void);
+void cxxTokenAPIDone(void);
 
 
 #endif //!_cxx_token_h_

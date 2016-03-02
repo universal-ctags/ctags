@@ -29,7 +29,7 @@
 // Returns NULL if it does not look to be a lambda invocation.
 // Returns the lambda parameter parenthesis chain token if it DOES look like a lambda invocation.
 //
-CXXToken * cxxParserOpeningBracketIsLambda()
+CXXToken * cxxParserOpeningBracketIsLambda(void)
 {
 	// [ capture-list ] ( params ) mutable(optional) exception attribute -> ret { body }	(1)	
 	// [ capture-list ] ( params ) -> ret { body }	(2)	

@@ -55,12 +55,12 @@ static const char * g_aCXXAccessStrings [] = {
 	"private"
 };
 
-kindOption * cxxTagGetKindOptions()
+kindOption * cxxTagGetKindOptions(void)
 {
 	return g_aCXXKinds;
 }
 
-int cxxTagGetKindOptionCount()
+int cxxTagGetKindOptionCount(void)
 {
 	return sizeof(g_aCXXKinds) / sizeof(kindOption);
 }
@@ -116,7 +116,7 @@ tagEntryInfo * cxxTagBegin(
 	return &g_oCXXTag;
 }
 
-void cxxTagCommit()
+void cxxTagCommit(void)
 {
 	if(g_oCXXTag.isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
 		return;

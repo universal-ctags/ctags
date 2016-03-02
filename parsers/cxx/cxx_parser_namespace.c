@@ -24,7 +24,7 @@
 
 
 
-boolean cxxParserParseNamespace()
+boolean cxxParserParseNamespace(void)
 {
 	CXX_DEBUG_ENTER();
 

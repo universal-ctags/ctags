@@ -18,7 +18,7 @@
 
 static int g_iCXXDebugScopeLevel = 0;
 
-void cxxDebugInit()
+void cxxDebugInit(void)
 {
 	g_iCXXDebugScopeLevel = 0;
 }

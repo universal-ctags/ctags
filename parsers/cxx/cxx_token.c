@@ -24,17 +24,17 @@ static unsigned int g_uNextAnonumousIdentiferId = 0;
 
 void cxxTokenForceDestroy(CXXToken * t);
 
-void cxxTokenAPIInit()
+void cxxTokenAPIInit(void)
 {
 	g_pTokenPool = cxxTokenChainCreate();
 }
 
-void cxxTokenAPINewFile()
+void cxxTokenAPINewFile(void)
 {
 	g_uNextAnonumousIdentiferId = 0;
 }
 
-void cxxTokenAPIDone()
+void cxxTokenAPIDone(void)
 {
 	CXXToken * t;
 	
@@ -44,7 +44,7 @@ void cxxTokenAPIDone()
 	cxxTokenChainDestroy(g_pTokenPool);
 }
 
-CXXToken * cxxTokenCreate()
+CXXToken * cxxTokenCreate(void)
 {
 	CXXToken * t;
 	
@@ -120,7 +120,7 @@ static unsigned int hash(const unsigned char *str)
 }
 
 
-CXXToken * cxxTokenCreateAnonymousIdentifier()
+CXXToken * cxxTokenCreateAnonymousIdentifier(void)
 {
 	g_uNextAnonumousIdentiferId++;
 
@@ -144,7 +144,7 @@ CXXToken * cxxTokenCreateAnonymousIdentifier()
 		sprintf(szNum,"%d",g_uNextAnonumousIdentiferId);
 	}
 	vStringCatS(t->pszWord,szNum);
-	t->bFollowedBySpace = true;
+	t->bFollowedBySpace = TRUE;
 	t->iLineNumber = getInputLineNumber();
 	t->oFilePosition = getInputFilePosition();
 

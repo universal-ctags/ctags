@@ -20,12 +20,12 @@ static CXXTokenChain * g_pScope = NULL;
 static vString * g_szScopeName = NULL;
 static boolean g_bScopeNameDirty = TRUE;
 
-void cxxScopeInit()
+void cxxScopeInit(void)
 {
 	g_pScope = cxxTokenChainCreate();
 }
 
-void cxxScopeDone()
+void cxxScopeDone(void)
 {
 	cxxTokenChainDestroy(g_pScope);
 	if(g_szScopeName)
@@ -35,7 +35,7 @@ void cxxScopeDone()
 	}
 }
 
-void cxxScopeClear()
+void cxxScopeClear(void)
 {
 	if(g_pScope)
 		cxxTokenChainClear(g_pScope);
@@ -46,12 +46,12 @@ void cxxScopeClear()
 	}
 }
 
-boolean cxxScopeIsGlobal()
+boolean cxxScopeIsGlobal(void)
 {
 	return (g_pScope->iCount < 1);
 }
 
-enum CXXTagKind cxxScopeGetVariableKind()
+enum CXXTagKind cxxScopeGetVariableKind(void)
 {
 	switch(cxxScopeGetKind())
 	{
@@ -71,33 +71,33 @@ enum CXXTagKind cxxScopeGetVariableKind()
 	return CXXTagKindVARIABLE;
 }
 
-enum CXXTagKind cxxScopeGetKind()
+enum CXXTagKind cxxScopeGetKind(void)
 {
 	if(g_pScope->iCount < 1)
 		return CXXTagKindNAMESPACE;
 	return (enum CXXTagKind)g_pScope->pTail->uInternalScopeKind;
 }
 
-enum CXXScopeAccess cxxScopeGetAccess()
+enum CXXScopeAccess cxxScopeGetAccess(void)
 {
 	if(g_pScope->iCount < 1)
 		return CXXScopeAccessUnknown;
 	return (enum CXXScopeAccess)g_pScope->pTail->uInternalScopeAccess;
 }
 
-const char * cxxScopeGetName()
+const char * cxxScopeGetName(void)
 {
 	if(g_pScope->iCount < 1)
 		return NULL;
 	return vStringValue(g_pScope->pTail->pszWord);
 }
 
-int cxxScopeGetSize()
+int cxxScopeGetSize(void)
 {
 	return g_pScope->iCount;
 }
 
-const char * cxxScopeGetFullName()
+const char * cxxScopeGetFullName(void)
 {
 	if(!g_bScopeNameDirty)
 		return g_szScopeName ? g_szScopeName->buffer : NULL;
@@ -119,7 +119,7 @@ const char * cxxScopeGetFullName()
 	return g_szScopeName->buffer;
 }
 
-vString * cxxScopeGetFullNameAsString()
+vString * cxxScopeGetFullNameAsString(void)
 {
 	vString * ret;
 
@@ -146,7 +146,7 @@ vString * cxxScopeGetFullNameAsString()
 	return ret;
 }
 
-vString * cxxScopeGetFullNameExceptLastComponentAsString()
+vString * cxxScopeGetFullNameExceptLastComponentAsString(void)
 {
 	if(g_pScope->iCount < 2)
 		return NULL;
@@ -178,7 +178,7 @@ void cxxScopePush(CXXToken * t,enum CXXTagKind eScopeKind,enum CXXScopeAccess eI
 #endif
 }
 
-void cxxScopePop()
+void cxxScopePop(void)
 {
 	CXX_DEBUG_ASSERT(g_pScope->iCount > 0,"When popping as scope there must be a scope to pop");
 

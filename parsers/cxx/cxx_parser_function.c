@@ -31,7 +31,7 @@
 // Returns -1 in case of error, 1 if a K&R style function declaration has been
 // found and parsed, 0 if no K&R style function declaration has been found.
 // 
-int cxxParserMaybeExtractKnRStyleFunctionDefinition()
+int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 {
 #ifdef CXX_DO_DEBUGGING
 	vString * pChain = cxxTokenChainJoin(g_cxx.pTokenChain,NULL,0);
@@ -202,7 +202,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition()
 	if(tag)
 	{
 		if(pParenthesis->pChain->pTail)
-			pParenthesis->pChain->pTail->bFollowedBySpace = false; // make sure we don't emit the trailing space
+			pParenthesis->pChain->pTail->bFollowedBySpace = FALSE; // make sure we don't emit the trailing space
 	
 		tag->isFileScope = (g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) && !isInputHeaderFile();
 	
@@ -566,7 +566,7 @@ int cxxParserEmitFunctionTags(
 	if(tag)
 	{
 		if(pInfo->pParenthesis->pChain->pTail)
-			pInfo->pParenthesis->pChain->pTail->bFollowedBySpace = false; // make sure we don't emit the trailing space
+			pInfo->pParenthesis->pChain->pTail->bFollowedBySpace = FALSE; // make sure we don't emit the trailing space
 
 		if(eOuterScopeKind == CXXTagKindNAMESPACE)
 		{
@@ -620,7 +620,7 @@ int cxxParserEmitFunctionTags(
 // This function attempts to extract the function name, emit it as a tag and push all the necessary
 // scopes for the next block. It returns the number of scopes pushed.
 //
-int cxxParserExtractFunctionSignatureBeforeOpeningBracket()
+int cxxParserExtractFunctionSignatureBeforeOpeningBracket(void)
 {
 	CXX_DEBUG_ENTER();
 	
