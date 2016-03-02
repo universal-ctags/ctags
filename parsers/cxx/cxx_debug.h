@@ -16,7 +16,7 @@
 // Uncomment this to enable extensive debugging to stderr in cxx code.
 // Currently cxx-specific debugging is supported only on gcc (because of variadic macros and __PRETTY_FUNC__)
 //
-#define CXX_DEBUGGING_ENABLED 1
+//#define CXX_DEBUGGING_ENABLED 1
 
 #if defined (__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 4))
 	#define CXX_DEBUGGING_SUPPORTED

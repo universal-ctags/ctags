@@ -56,6 +56,7 @@
 //   - Do not emit tags until the end of the file, if scopes do not match we either screwed up
 //     something or the programmer did
 //     Maybe the cork api can be used for this?
+//   - Extract parameter definitions in K&R style functions
 //
 // Handle variable declarations inside things like while() foreach() FOR() etc..
 //

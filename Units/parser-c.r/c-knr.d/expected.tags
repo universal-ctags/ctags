@@ -1,0 +1,3 @@
+fn1	input.c	/^int fn1()$/;"	f
+fn2	input.c	/^int fn2(a,b)$/;"	f
+fn3	input.c	/^int fn3(void)$/;"	f
