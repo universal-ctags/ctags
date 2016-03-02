@@ -81,7 +81,6 @@ void cxxTokenChainTake(CXXTokenChain * tc,CXXToken * t);
 // Destroy the first token
 #define cxxTokenChainDestroyFirst(tc) cxxTokenDestroy(cxxTokenChainTakeFirst(tc))
 
-
 void cxxTokenChainAppend(CXXTokenChain * tc,CXXToken * t);
 void cxxTokenChainPrepend(CXXTokenChain * tc,CXXToken * t);
 

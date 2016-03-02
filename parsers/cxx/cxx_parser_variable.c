@@ -93,7 +93,7 @@ static boolean cxxParserTokenChainLooksLikeConstructorParameterSet(CXXTokenChain
 //
 // Returns true if at least one variable was extracted.
 //
-boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain)
+boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uFlags)
 {
 	CXX_DEBUG_ENTER();
 
@@ -333,10 +333,14 @@ next_token:
 		
 		bGotVariable = TRUE;
 
+		boolean bKnRStyleParameters = (uFlags & CXXExtractVariableDeclarationsKnRStyleParameters);
+
 		// FIXME: Typeref?
 		tagEntryInfo * tag = cxxTagBegin(
 				vStringValue(pIdentifier->pszWord),
-				(g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern) ? CXXTagKindEXTERNVAR : cxxScopeGetVariableKind(),
+				bKnRStyleParameters ?
+					CXXTagKindPARAMETER :
+					((g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern) ? CXXTagKindEXTERNVAR : cxxScopeGetVariableKind()),
 				pIdentifier
 			);
 
@@ -365,9 +369,13 @@ next_token:
 				CXX_DEBUG_PRINT("No typeref found");
 			}
 		
-			tag->isFileScope = ((eScopeKind == CXXTagKindNAMESPACE) && (g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) && !isInputHeaderFile()) ||
+			tag->isFileScope = bKnRStyleParameters ?
+							TRUE : 
+							(
+								((eScopeKind == CXXTagKindNAMESPACE) && (g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) && !isInputHeaderFile()) ||
 								(eScopeKind == CXXTagKindFUNCTION) || // locals are always hidden
-								((eScopeKind != CXXTagKindNAMESPACE) && (eScopeKind != CXXTagKindFUNCTION) && (!isInputHeaderFile()));
+								((eScopeKind != CXXTagKindNAMESPACE) && (eScopeKind != CXXTagKindFUNCTION) && (!isInputHeaderFile()))
+							);
 
 			cxxTagCommit();
 		}

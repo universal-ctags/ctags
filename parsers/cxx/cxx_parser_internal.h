@@ -33,8 +33,14 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis);
 // cxx_parser_block.c
 boolean cxxParserParseBlock(boolean bExpectClosingBracket);
 
+enum CXXExtractVariableDeclarationsFlags
+{
+	// We are parsing K&R style parameter declarations.
+	CXXExtractVariableDeclarationsKnRStyleParameters = 1
+};
+
 // cxx_parser_variable.c
-boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain);
+boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uFlags);
 
 // cxx_parser_function.c
 

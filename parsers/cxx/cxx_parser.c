@@ -245,7 +245,7 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(boolea
 	if(bParsingTypedef)
 		cxxParserHandleGenericTypedef();
 	else
-		cxxParserExtractVariableDeclarations(g_cxx.pTokenChain);
+		cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 
 	CXX_DEBUG_LEAVE();
 	return TRUE;
@@ -290,7 +290,7 @@ boolean cxxParserParseEnum(void)
 			{
 				cxxParserHandleGenericTypedef();
 			} else {
-				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain);
+				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 			}
 		}
 
@@ -494,7 +494,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 			if(bParsingTypedef)
 				cxxParserHandleGenericTypedef();
 			else
-				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain);
+				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 		}
 
 		cxxParserNewStatement();
@@ -692,7 +692,7 @@ void cxxParserAnalyzeOtherStatement(void)
 	{
 		// prefer variable declarations.
 		// if none found then try function prototype
-		if(cxxParserExtractVariableDeclarations(g_cxx.pTokenChain))
+		if(cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Found variable declarations");
 			return;
@@ -728,7 +728,7 @@ void cxxParserAnalyzeOtherStatement(void)
 		return;
 	}
 
-	cxxParserExtractVariableDeclarations(g_cxx.pTokenChain);
+	cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 	CXX_DEBUG_LEAVE_TEXT("Nothing else");
 }
 
@@ -931,7 +931,7 @@ boolean cxxParserParseIfForWhileSwitch(void)
 		vStringPut(t->pszWord,';');
 
 		// and extract variable declarations if possible
-		cxxParserExtractVariableDeclarations(pChain);
+		cxxParserExtractVariableDeclarations(pChain,0);
 
 		CXX_DEBUG_LEAVE_TEXT("Found if/for/while/switch parenthesis chain");
 		return TRUE;

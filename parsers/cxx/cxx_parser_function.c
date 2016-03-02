@@ -111,6 +111,8 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 
 	CXXTokenChain * pParenthesisTokenChain = g_cxx.pTokenChain;
 
+	CXXToken * pFirstArgumentToken = pParenthesis->pNext;
+
 	// Special case inside special case. Check if we're at something like func __ARGS(())
 	if(
 			(pParenthesis->pChain->iCount == 3) &&
@@ -121,8 +123,8 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 	{
 		// Looks exactly like our special case.
 		pIdentifier = pIdentifier->pPrev;
-		pParenthesis = cxxTokenChainAt(pParenthesis->pChain,1);
 		pParenthesisTokenChain = pParenthesis->pChain;
+		pParenthesis = cxxTokenChainAt(pParenthesis->pChain,1);
 	}
 
 	// Now check if the contents of the parenthesis chain look like a K&R signature
@@ -163,9 +165,20 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 
 	cxxTokenChainTake(g_cxx.pTokenChain,pIdentifier);
 	cxxTokenChainTake(pParenthesisTokenChain,pParenthesis);
+	
+	// remove the whole signature from the chain
+	while(g_cxx.pTokenChain->pHead != pFirstArgumentToken)
+		cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
 
-	// FIXME: Should keep the statement to extract parameters out of it!
-	cxxParserNewStatement();
+	CXX_DEBUG_ASSERT(g_cxx.pTokenChain->pHead,"We should have the variable declaration in the chain now!");
+
+	// There is exactly one statement in chain now.
+
+	// Extra here means "following the first"
+#define MAX_EXTRA_KNR_PARAMETERS 10
+
+	CXXToken * aExtraParameterStarts[MAX_EXTRA_KNR_PARAMETERS];
+	int iExtraStatementsInChain = 0;
 
 	// Now we should have no more than iParameterCount-1 parameters before an opening bracket.
 	// There may be less declarations as each one may declare multiple variables and C89 supports
@@ -173,25 +186,41 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 	// Note that we parse up to iParameterCount statements (which will be lost if we can't find an opening bracket).
 	while(iParameterCount > 0)
 	{
+		CXXToken * pCurrentTail = g_cxx.pTokenChain->pTail;
+	
 		if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket | CXXTokenTypeEOF))
 		{
 			cxxTokenDestroy(pIdentifier);
 			cxxTokenDestroy(pParenthesis);
-			return FALSE;
+			return -1;
 		}
 
 		if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
-			return TRUE; // tolerate syntax error
+		{
+			cxxTokenDestroy(pIdentifier);
+			cxxTokenDestroy(pParenthesis);
+			return 0; // tolerate syntax error
+		}
+
+		if(iExtraStatementsInChain < MAX_EXTRA_KNR_PARAMETERS)
+		{
+			CXX_DEBUG_ASSERT(pCurrentTail->pNext,"We should have parsed an additional statement here");
+			aExtraParameterStarts[iExtraStatementsInChain] = pCurrentTail->pNext;
+			iExtraStatementsInChain++;
+		}
+
 		if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
 			break; // gotcha
+
 		iParameterCount--;
-		
-		// FIXME: Should keep the statement to extract parameters out of it!
-		cxxParserNewStatement();
 	}
 	
 	if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
+	{
+		cxxTokenDestroy(pIdentifier);
+		cxxTokenDestroy(pParenthesis);
 		return 0; // didn't find an opening bracket. This probably wasn't a K&R style function declaration after all.
+	}
 
 	tagEntryInfo * tag = cxxTagBegin(
 			vStringValue(pIdentifier->pszWord),
@@ -221,6 +250,25 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 	CXX_DEBUG_PRINT("Found K&R-style function '%s'",vStringValue(pIdentifier->pszWord));
 
 	cxxScopePush(pIdentifier,CXXTagKindFUNCTION,CXXScopeAccessUnknown);
+
+	// emit parameters
+	if(cxxTagKindEnabled(CXXTagKindPARAMETER))
+	{
+		// Remeber that the chain contains 1 + iExtraStatementsInChain statements now
+		int iIdx = 0;
+		for(;;)
+		{
+			cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,CXXExtractVariableDeclarationsKnRStyleParameters);
+			if(iIdx >= iExtraStatementsInChain)
+				break;
+
+			// kill everything up to the next start
+			while(g_cxx.pTokenChain->pHead != aExtraParameterStarts[iIdx])
+				cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
+
+			iIdx++;
+		}
+	}
 
 	return 1;
 }
