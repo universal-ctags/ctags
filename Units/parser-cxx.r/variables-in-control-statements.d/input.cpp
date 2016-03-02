@@ -91,5 +91,4 @@ void test()
 	while(unsigned short int w01 = getUShort())
 	{
 	}
-
 }

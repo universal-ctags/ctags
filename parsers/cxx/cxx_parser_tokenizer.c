@@ -458,6 +458,9 @@ boolean cxxParserParseNextToken()
 		return TRUE;
 	}
 	
+#if 0
+	// As long as we use cppGetc() we don't need this
+	
 	if(g_cxx.iChar == '"')
 	{
 		// special case for strings
@@ -491,7 +494,20 @@ boolean cxxParserParseNextToken()
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
 		return TRUE;
 	}
+#else
+	if(g_cxx.iChar == STRING_SYMBOL)
+	{
+		t->eType = CXXTokenTypeStringConstant;
+		vStringPut(t->pszWord,'"');
+		vStringPut(t->pszWord,'"');
+		g_cxx.iChar = cppGetc();
+		t->bFollowedBySpace = isspace(g_cxx.iChar);
+		return TRUE;
+	}
+#endif
 
+#if 0
+	// As long as we use cppGetc() we don't need this
 	if(g_cxx.iChar == '\'')
 	{
 		// special case for strings
@@ -524,6 +540,17 @@ boolean cxxParserParseNextToken()
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
 		return TRUE;
 	}
+#else
+	if(g_cxx.iChar == CHAR_SYMBOL)
+	{
+		t->eType = CXXTokenTypeCharacterConstant;
+		vStringPut(t->pszWord,'\'');
+		vStringPut(t->pszWord,'\'');
+		g_cxx.iChar = cppGetc();
+		t->bFollowedBySpace = isspace(g_cxx.iChar);
+		return TRUE;
+	}
+#endif
 
 	if(uInfo & CXXCharTypeDecimalDigit)
 	{
