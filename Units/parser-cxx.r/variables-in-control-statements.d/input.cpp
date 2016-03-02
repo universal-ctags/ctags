@@ -60,6 +60,10 @@ void test()
 	{
 	}
 
+	for(auto f12 : { 't','e','s','t' })
+	{
+	}
+
 	// Non valid variable declarations inside for
 	for(;;)
 	{

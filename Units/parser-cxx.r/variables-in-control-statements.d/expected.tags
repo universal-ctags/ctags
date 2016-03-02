@@ -9,5 +9,6 @@ f08	input.cpp	/^	for(int f08 : { 1,2,3,4,5 })$/;"	l	function:test	file:
 f09	input.cpp	/^	for(std::unique_ptr<int> f09 = 0;;)$/;"	l	function:test	file:
 f10	input.cpp	/^	for(std::unique_ptr<int> f10(getPointer());;)$/;"	l	function:test	file:
 f11	input.cpp	/^	for(std::pair<int,int> f11;;)$/;"	l	function:test	file:
+f12	input.cpp	/^	for(auto f12 : { 't','e','s','t' })$/;"	l	function:test	file:
 i01	input.cpp	/^	if(int i01 = 10 + 20)$/;"	l	function:test	file:
 w01	input.cpp	/^	while(unsigned short int w01 = getUShort())$/;"	l	function:test	file:
