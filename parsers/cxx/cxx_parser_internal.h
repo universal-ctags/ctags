@@ -102,7 +102,6 @@ void cxxParserNewStatement(void);
 boolean cxxParserParseNamespace(void);
 boolean cxxParserParseEnum(void);
 boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKind eTagKind);
-boolean cxxParserParseTemplatePrefix(void);
 boolean cxxParserParseAndCondenseCurrentSubchain(unsigned int uInitialSubchainMarkerTypes,boolean bAcceptEOF);
 boolean cxxParserParseUpToOneOf(unsigned int uTokenTypes);
 boolean cxxParserParseIfForWhileSwitch(void);
