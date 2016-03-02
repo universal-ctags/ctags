@@ -426,7 +426,7 @@ next_token:
 		// operator case
 		pInfo->pIdentifierStart->bFollowedBySpace = TRUE; // force proper spacing
 		CXXToken * t = pInfo->pIdentifierStart->pNext;
-		while(t != pInfo->pIdentifierEnd);
+		while(t != pInfo->pIdentifierEnd)
 		{
 			t->bFollowedBySpace = FALSE;
 			t = t->pNext;
