@@ -409,7 +409,7 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 					return FALSE;
 				}
 
-				if(g_cxx.pToken->eType == CXXTokenTypeEOF)
+				if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 				{
 					if(bExpectClosingBracket)
 					{
