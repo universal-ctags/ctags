@@ -1274,6 +1274,22 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 			sep = scopeSeparatorFor (e->kind, xk);
 			vStringCatS (fqn, sep);
 		}
+		else
+		{
+			/* This is an top level item. prepend a root separator
+			   if the kind of the item has. */
+			sep = scopeSeparatorFor (e->kind, KIND_NULL);
+			if (sep == NULL)
+			{
+				/* No root separator. The name of the
+				   oritinal tag and that of full qualified tag
+				   are the same; recording the full qualified tag
+				   is meaningless. */
+				return r;
+			}
+			else
+				vStringCatS (fqn, sep);
+		}
 		vStringCatS (fqn, e->name);
 
 		x.name = vStringValue (fqn);
