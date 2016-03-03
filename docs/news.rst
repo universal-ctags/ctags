@@ -38,6 +38,7 @@ The following parsers have been added:
 * reStructuredText
 * Rust
 * SystemVerilog
+* TTCN
 * WindRes
 * Zephir
 * coffee *xcmd*
