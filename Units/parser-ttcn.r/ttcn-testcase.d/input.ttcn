@@ -1,0 +1,13 @@
+import from CoffeeMachine all;
+
+module CoffeeSuite
+{
+    testcase OneCoffeesPlease () runs on EmptyComponentType
+    {
+    }
+
+    testcase TwoCoffeesPlease ()
+        runs on EmptyComponentType
+    {
+    }
+}

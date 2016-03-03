@@ -77,6 +77,7 @@
 	SqlParser, \
 	TclParser, \
 	TexParser, \
+	TTCNParser, \
 	VeraParser, \
 	VerilogParser, \
 	SystemVerilogParser, \

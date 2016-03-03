@@ -1,0 +1,5 @@
+CoffeeConstants	input.ttcn	/^module CoffeeConstants$/;"	M
+c_espressoId	input.ttcn	/^const integer c_espressoId := 1$/;"	c
+c_espresso	input.ttcn	/^const charstring c_espresso := "small little one"$/;"	c
+c_latteId	input.ttcn	/^const integer c_latteId := 2$/;"	c
+c_latte	input.ttcn	/^const charstring c_latte := "big one with a lot of milk"$/;"	c

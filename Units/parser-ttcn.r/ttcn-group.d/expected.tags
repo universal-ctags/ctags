@@ -1,0 +1,3 @@
+dataBroadcast	input.ttcn	/^group dataBroadcast$/;"	G
+DataReq	input.ttcn	/^  type record DataReq {}$/;"	t
+DataRsp	input.ttcn	/^  type record DataRsp {}$/;"	t

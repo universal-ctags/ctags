@@ -1,0 +1,16 @@
+import from OtherModuleAll all
+import from OtherModuleNotAll { onlySome }
+
+module Example
+{
+    modulepar 
+    {
+        integer Par_One, Par_Two;
+        boolean Par_Three := true
+    }
+}
+
+module Example2
+{
+    modulepar charstring moduleName := "CoffeeMachine"
+}

@@ -1,0 +1,18 @@
+timer guardTimer;
+var float maxDuration;
+
+guardTimer.start( maxDuration )
+
+alt
+{
+    [] myPort.receive( anyResp )
+    {
+    }
+    [] guardTimer.timeout 
+    {
+        setverdict( fail )
+    }
+}
+
+guardTimer.stop;
+

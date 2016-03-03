@@ -1,0 +1,3 @@
+signature MySignature(in integer par1, in integer par2)
+template MySignature mySign
+    := ({ par1 := 1, par2 := 2 }, { par1 := 2, par2 := 1 })

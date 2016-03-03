@@ -1,0 +1,9 @@
+module CoffeeConstants
+{
+
+const integer c_espressoId := 1
+const charstring c_espresso := "small little one"
+const integer c_latteId := 2
+const charstring c_latte := "big one with a lot of milk"
+
+}

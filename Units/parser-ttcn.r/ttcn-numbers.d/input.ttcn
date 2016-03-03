@@ -1,0 +1,13 @@
+template integer emptyIntegerTemplate := omit
+var integer myPositiveInteger := 42
+var integer myNegativeInteger := -5
+var float myPositiveFloat := 3.14
+var float myNegativeFloat := -0.5
+var integer myBigExponentialNotation1 := 6.022E23
+var integer myBigExponentialNotation2 := 6.022E20.35
+var integer myBigExponentialNotation3 := -6.022E23
+var integer myBigExponentialNotation4 := 6.022E-23
+var integer myBigExponentialNotation5 := 6.022E-20.35
+var integer myBigExponentialNotation6 := -6.022E-23
+var integer mySmallExponentialNotation := 6.022e23
+
