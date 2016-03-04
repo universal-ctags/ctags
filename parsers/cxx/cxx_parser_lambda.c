@@ -116,6 +116,8 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 
 	cxxScopePop();
 
+	pNew = g_cxx.pTokenChain; // May have been destroyed and re-created
+
 	g_cxx.pTokenChain = pSave;
 	g_cxx.pToken = pSave->pTail;
 	
