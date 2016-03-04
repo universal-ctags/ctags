@@ -16,4 +16,3 @@ x	externvar	external and forward variable declarations	off	referenceOnly:FALSE	n
 L	label	goto labels	off	referenceOnly:FALSE	nRoles:0
 U	using	using statements	off	referenceOnly:FALSE	nRoles:0
 z	parameter	function parameters inside function definitions	off	referenceOnly:FALSE	nRoles:0
-A	NONE	make anonymous structure names depend on file name	off	referenceOnly:FALSE	nRoles:0

@@ -131,18 +131,14 @@ CXXToken * cxxTokenCreateAnonymousIdentifier(void)
 
 	t->eType = CXXTokenTypeIdentifier;
 	t->pszWord = vStringNewInit("__anon");
-	if(cxxTagKindEnabled(CXXTagKindOptionAnonymousStructureNamesDependOnFileName))
-	{
-		// The names of anonymous structures depend on the name of the file being processed
-		// so the identifiers won't collide across multiple ctags runs with different file sets.
 
-		unsigned int uHash = hash((const unsigned char *)getInputFileName());
+	// The names of anonymous structures depend on the name of the file being processed
+	// so the identifiers won't collide across multiple ctags runs with different file sets.
 
-		sprintf(szNum,"%08x%02x",uHash,g_uNextAnonumousIdentiferId);
-	} else {
-		// backward compatible anonymous structure names
-		sprintf(szNum,"%d",g_uNextAnonumousIdentiferId);
-	}
+	unsigned int uHash = hash((const unsigned char *)getInputFileName());
+
+	sprintf(szNum,"%08x%02x",uHash,g_uNextAnonumousIdentiferId);
+
 	vStringCatS(t->pszWord,szNum);
 	t->bFollowedBySpace = TRUE;
 	t->iLineNumber = getInputLineNumber();

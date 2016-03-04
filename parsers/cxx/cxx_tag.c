@@ -44,9 +44,7 @@ static kindOption g_aCXXKinds [] = {
 	{ FALSE, 'x', "externvar",  "external and forward variable declarations" },
 	{ FALSE, 'L', "label",      "goto labels" },
 	{ FALSE, 'U', "using",      "using statements" },
-	{ FALSE, 'z', "parameter",  "function parameters inside function definitions" },
-	// FIXME: This is actually an option, but there seems to be no other way
-	{ FALSE, 'A', "NONE",       "make anonymous structure names depend on file name" }
+	{ FALSE, 'z', "parameter",  "function parameters inside function definitions" }
 };
 
 static const char * g_aCXXAccessStrings [] = {

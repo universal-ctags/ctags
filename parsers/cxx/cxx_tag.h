@@ -35,8 +35,7 @@ enum CXXTagKind
 	CXXTagKindEXTERNVAR,
 	CXXTagKindLABEL,
 	CXXTagKindUSING,
-	CXXTagKindPARAMETER,
-	CXXTagKindOptionAnonymousStructureNamesDependOnFileName
+	CXXTagKindPARAMETER
 };
 
 kindOption * cxxTagGetKindOptions(void);
