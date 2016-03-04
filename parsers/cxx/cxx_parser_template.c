@@ -210,29 +210,37 @@ boolean cxxParserParseTemplatePrefix(void)
 {
 	CXX_DEBUG_ENTER();
 
+	CXX_DEBUG_ASSERT(cxxTokenTypeIs(cxxTokenChainLast(g_cxx.pTokenChain),CXXTokenTypeKeyword),"We should be pointing at the template keyword here");
+
+	cxxTokenChainDestroyLast(g_cxx.pTokenChain); // kill the template keyword
+
 	// Enable specialized tokenisation: both < and > are parsed as single tokens.
 	g_cxx.bParsingTemplateAngleBrackets = TRUE;
 
-	if(!cxxParserParseUpToOneOf(CXXTokenTypeSmallerThanSign | CXXTokenTypeEOF))
+	if(!cxxParserParseUpToOneOf(CXXTokenTypeSmallerThanSign | CXXTokenTypeEOF | CXXTokenTypeSemicolon))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to the < sign");
 		g_cxx.bParsingTemplateAngleBrackets = FALSE;
 		return FALSE;
 	}
 
-	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
+	if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeEOF | CXXTokenTypeSemicolon))
 	{
-		CXX_DEBUG_LEAVE_TEXT("Found EOF");
+		CXX_DEBUG_LEAVE_TEXT("Found EOF or semicolon: assuming this is unparseable");
+		cxxParserNewStatement();
 		g_cxx.bParsingTemplateAngleBrackets = FALSE;
 		return TRUE; // tolerate syntax error
 	}
 	
-	cxxTokenChainClear(g_cxx.pTokenChain);
+	CXXTokenChain * pSave = g_cxx.pTokenChain;
+	g_cxx.pTokenChain = cxxTokenChainCreate();
+	cxxTokenChainAppend(g_cxx.pTokenChain,cxxTokenChainTakeLast(pSave));
 
 	if(!cxxParserParseTemplatePrefixAngleBrackets())
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse angle brackets");
 		g_cxx.bParsingTemplateAngleBrackets = FALSE;
+		cxxTokenChainDestroy(pSave);
 		return FALSE;
 	}
 
@@ -242,8 +250,7 @@ boolean cxxParserParseTemplatePrefix(void)
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);
 
 	g_cxx.pTemplateTokenChain = g_cxx.pTokenChain;
-
-	g_cxx.pTokenChain = cxxTokenChainCreate();
+	g_cxx.pTokenChain = pSave;
 
 	CXX_DEBUG_LEAVE();
 	return TRUE;
