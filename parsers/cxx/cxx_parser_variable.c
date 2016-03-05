@@ -146,6 +146,19 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 		return FALSE;
 	}
 
+	// Handle the special case of delete/new keywords at the beginning
+	if(
+			cxxTokenTypeIs(t,CXXTokenTypeKeyword) &&
+			(
+				(t->eKeyword == CXXKeywordDELETE) ||
+				(t->eKeyword == CXXKeywordNEW)
+			)
+		)
+	{
+		CXX_DEBUG_LEAVE_TEXT("Statement looks like a delete or new call");
+		return FALSE;
+	}
+
 	CXXToken * pTypeEnd = NULL;
 
 	boolean bGotVariable = FALSE;
