@@ -161,6 +161,7 @@
     <ClCompile Include="..\parsers\cxx\cxx_parser_namespace.c" />
     <ClCompile Include="..\parsers\cxx\cxx_parser_template.c" />
     <ClCompile Include="..\parsers\cxx\cxx_parser_tokenizer.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_parser_typedef.c" />
     <ClCompile Include="..\parsers\cxx\cxx_parser_using.c" />
     <ClCompile Include="..\parsers\cxx\cxx_parser_variable.c" />
     <ClCompile Include="..\parsers\cxx\cxx_scope.c" />

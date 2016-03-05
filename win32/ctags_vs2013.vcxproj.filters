@@ -301,6 +301,9 @@
     <ClCompile Include="..\parsers\cxx\cxx_parser_tokenizer.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_typedef.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\cxx\cxx_parser_using.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
