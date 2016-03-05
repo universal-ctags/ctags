@@ -584,8 +584,36 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 	{
 		if(g_cxx.pTokenChain->iCount > 0)
 		{
-			cxxTokenChainCondense(g_cxx.pTokenChain,0);
-			tag->extensionFields.inheritance = vStringValue(g_cxx.pTokenChain->pHead->pszWord);
+			// Strip inheritance type information
+			// FIXME: This could be optional!
+			
+			CXXToken * t = cxxTokenChainFirst(g_cxx.pTokenChain);
+			while(t)
+			{
+				if(
+					cxxTokenTypeIs(t,CXXTokenTypeKeyword) &&
+					(
+						(t->eKeyword == CXXKeywordPUBLIC) ||
+						(t->eKeyword == CXXKeywordPROTECTED) ||
+						(t->eKeyword == CXXKeywordPRIVATE) ||
+						(t->eKeyword == CXXKeywordVIRTUAL)
+					)
+				)
+				{
+					CXXToken * pNext = t->pNext;
+					cxxTokenChainTake(g_cxx.pTokenChain,t);
+					cxxTokenDestroy(t);
+					t = pNext;
+				} else {
+					t = t->pNext;
+				}
+			}
+			
+			if(g_cxx.pTokenChain->iCount > 0)
+			{
+				cxxTokenChainCondense(g_cxx.pTokenChain,CXXTokenChainCondenseNoTrailingSpaces);
+				tag->extensionFields.inheritance = vStringValue(g_cxx.pTokenChain->pHead->pszWord);
+			}
 		}
 		
 		tag->isFileScope = !isInputHeaderFile();
