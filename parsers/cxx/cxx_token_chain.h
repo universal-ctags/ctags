@@ -74,6 +74,7 @@ CXXToken * cxxTokenChainTakeFirst(CXXTokenChain * tc);
 CXXToken * cxxTokenChainTakeLast(CXXTokenChain * tc);
 CXXToken * cxxTokenChainTakeAt(CXXTokenChain * tc,int index);
 void cxxTokenChainTake(CXXTokenChain * tc,CXXToken * t);
+boolean cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t);
 
 // Destroy the last token
 #define cxxTokenChainDestroyLast(tc) cxxTokenDestroy(cxxTokenChainTakeLast(tc))
@@ -85,6 +86,7 @@ void cxxTokenChainAppend(CXXTokenChain * tc,CXXToken * t);
 void cxxTokenChainPrepend(CXXTokenChain * tc,CXXToken * t);
 
 void cxxTokenChainMoveEntries(CXXTokenChain * src,CXXTokenChain * dest);
+void cxxTokenChainMoveEntryRange(CXXTokenChain * src,CXXToken * start,CXXToken * end,CXXTokenChain * dest);
 
 enum CXXTokenChainJoinFlags
 {

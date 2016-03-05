@@ -146,6 +146,32 @@ void cxxTokenChainTake(CXXTokenChain * tc,CXXToken * t)
 	Assert(tc->iCount > 1);
 }
 
+boolean cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t)
+{
+	if(!tc)
+		return FALSE;
+	
+	CXXToken * aux = tc->pHead;
+	while(aux)
+	{
+		if(t == aux)
+		{
+			cxxTokenChainTake(tc,aux);
+			return TRUE;
+		}
+
+		if(cxxTokenTypeIsOneOf(aux,CXXTokenTypeParenthesisChain | CXXTokenTypeAngleBracketChain | CXXTokenTypeSquareParenthesisChain | CXXTokenTypeBracketChain))
+		{
+			if(cxxTokenChainTakeRecursive(aux->pChain,t))
+				return TRUE;
+		}
+	
+		aux = aux->pNext;
+	}
+
+	return FALSE;
+}
+
 CXXToken * cxxTokenChainTakeAt(CXXTokenChain * tc,int index)
 {
 	if(!tc)
@@ -315,6 +341,31 @@ void cxxTokenChainMoveEntries(CXXTokenChain * src,CXXTokenChain * dest)
 	src->pHead = NULL;
 	src->pTail = NULL;
 }
+
+void cxxTokenChainMoveEntryRange(CXXTokenChain * src,CXXToken * start,CXXToken * end,CXXTokenChain * dest)
+{
+	if(!src || !dest || !start || !end)
+		return;
+		
+	CXX_DEBUG_ASSERT(cxxTokenChainFindToken(src,start) >= 0,"The start token must be in the source chain!");
+	CXX_DEBUG_ASSERT(cxxTokenChainFindToken(src,end) >= 0,"The end token must be in the source chain!");
+	CXX_DEBUG_ASSERT(cxxTokenChainFindToken(src,start) <= cxxTokenChainFindToken(src,end),"The start token must come before the end token");
+
+	CXXToken * t = start;
+	for(;;)
+	{
+		CXXToken * next = t->pNext;
+
+		cxxTokenChainTake(src,t);
+		cxxTokenChainAppend(dest,t);
+
+		if(t == end)
+			break;
+
+		t = next;
+	}
+}
+
 
 void cxxTokenChainCondense(CXXTokenChain * tc,unsigned int uFlags)
 {

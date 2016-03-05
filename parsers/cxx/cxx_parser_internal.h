@@ -77,7 +77,7 @@ typedef struct _CXXFunctionParameterInfo
 	unsigned int uParameterCount;
 	
 	// All the tokens are references to the source chain (do not delete)
-	
+	CXXTokenChain * pChain;
 	// The initial tokens of the declaration
 	CXXToken * aDeclarationStarts[CXX_MAX_EXTRACTED_PARAMETERS];
 	// The final tokens of the declaration

@@ -10,7 +10,7 @@
 */
 
 #include "general.h"
-
+#include "debug.h"
 
 //
 // Uncomment this to enable extensive debugging to stderr in cxx code.
@@ -43,7 +43,14 @@ void cxxDebugInit(void);
 
 #define CXX_DEBUG_INIT() cxxDebugInit()
 
-#define CXX_DEBUG_ASSERT(_condition,_szFormat,...) if(!(_condition))cxxDebugPrint(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__)
+#define CXX_DEBUG_ASSERT(_condition,_szFormat,...) \
+		do { \
+			if(!(_condition)) \
+			{ \
+				cxxDebugPrint(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__); \
+				Assert(FALSE); \
+			} \
+		} while(0)
 
 #else //!CXX_DO_DEBUGGING
 

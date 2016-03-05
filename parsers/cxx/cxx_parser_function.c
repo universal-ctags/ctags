@@ -704,9 +704,13 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(void)
 	return iScopesPushed;
 }
 
+// This function *may* change the token chain
 void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 {
 	// emit parameters
+
+	CXXTokenChain * tc = cxxTokenChainCreate();
+	
 	unsigned int i = 0;
 	while(i < pInfo->uParameterCount)
 	{
@@ -718,14 +722,38 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 
 		if(tag)
 		{
-			// FIXME: We have the type here!
-			//cxxTokenChainExtractRangeOmitToken(oParamInfo.aDeclarationStarts[i],oParamInfo.aDeclarationEnds[i],oParamInfo.aIdentifiers[i]);
-			
+			boolean bDestroyIdentifier = FALSE;
+		
+			if(pInfo->aDeclarationStarts[i] && pInfo->aDeclarationEnds[i])
+			{
+				cxxTokenChainClear(tc);
+				cxxTokenChainMoveEntryRange(pInfo->pChain,pInfo->aDeclarationStarts[i],pInfo->aDeclarationEnds[i],tc);
+#ifdef CXX_DO_DEBUGGING
+				CXXToken * pDecl = cxxTokenChainExtractRange(pInfo->aDeclarationStarts[i],pInfo->aDeclarationEnds[i],0);
+				CXX_DEBUG_PRINT("Type for parameter '%s' is in '%s'",vStringValue(pInfo->aIdentifiers[i]->pszWord),vStringValue(pDecl->pszWord));
+				cxxTokenDestroy(pDecl);
+#endif
+				cxxTokenChainTakeRecursive(tc,pInfo->aIdentifiers[i]);
+				bDestroyIdentifier = TRUE;
+				cxxTokenChainNormalizeTypeNameSpacing(tc);
+				cxxTokenChainCondense(tc,0);
+				
+				// "typename" is debatable since it's not really allowed by C++ for unqualified types.
+				// However I haven't been able to come up with something better... so "typename" it is for now.
+				tag->extensionFields.typeRef[0] = "typename";
+				tag->extensionFields.typeRef[1] = vStringValue(cxxTokenChainFirst(tc)->pszWord);
+			}
+
 			tag->isFileScope = TRUE;
 			cxxTagCommit();
+			
+			if(bDestroyIdentifier)
+				cxxTokenDestroy(pInfo->aIdentifiers[i]);
 		}
 		i++;
 	}
+	
+	cxxTokenChainDestroy(tc);
 }
 
 
@@ -743,7 +771,10 @@ boolean cxxParserTokenChainLooksLikeFunctionParameterList(CXXTokenChain * tc,CXX
 	CXX_DEBUG_ASSERT(tc->iCount >= 2,"At least linitial and final parenthesis should be there");
 
 	if(pParamInfo)
+	{
 		pParamInfo->uParameterCount = 0;
+		pParamInfo->pChain = tc;
+	}
 
 	if(tc->iCount == 2)
 	{
@@ -900,6 +931,8 @@ try_again:
 					CXXToken * pDecl = cxxTokenChainExtractRange(pStart,t->pPrev,0);
 					CXX_DEBUG_PRINT("Found parameter '%s' in '%s'",vStringValue(pIdentifier->pszWord),vStringValue(pDecl->pszWord));
 					cxxTokenDestroy(pDecl);
+					CXX_DEBUG_ASSERT(cxxTokenChainFindToken(pParamInfo->pChain,pStart) >= 0,"The start token must be in the chain");
+					CXX_DEBUG_ASSERT(cxxTokenChainFindToken(pParamInfo->pChain,t->pPrev) >= 0,"The end token must be in the chain");
 #endif
 				}
 			} else {
