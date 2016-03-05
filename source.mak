@@ -103,6 +103,7 @@ PARSER_SRCS =				\
 	parsers/cxx/cxx_parser_namespace.c		\
 	parsers/cxx/cxx_parser_template.c		\
 	parsers/cxx/cxx_parser_tokenizer.c		\
+	parsers/cxx/cxx_parser_typedef.c		\
 	parsers/cxx/cxx_parser_using.c		\
 	parsers/cxx/cxx_parser_variable.c		\
 	parsers/cxx/cxx_scope.c		\

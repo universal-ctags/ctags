@@ -103,6 +103,11 @@ int cxxParserEmitFunctionTags(
 
 void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo);
 
+// cxx_parser_typedef.c
+boolean cxxParserParseGenericTypedef(void);
+void cxxParserExtractTypedef(CXXTokenChain * pChain);
+
+
 // cxx_parser.c
 void cxxParserNewStatement(void);
 boolean cxxParserParseNamespace(void);
@@ -111,8 +116,6 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 boolean cxxParserParseAndCondenseCurrentSubchain(unsigned int uInitialSubchainMarkerTypes,boolean bAcceptEOF);
 boolean cxxParserParseUpToOneOf(unsigned int uTokenTypes);
 boolean cxxParserParseIfForWhileSwitch(void);
-boolean cxxParserParseGenericTypedef(void);
-void cxxParserHandleGenericTypedef(void);
 boolean cxxParserParseTemplatePrefix(void);
 boolean cxxParserParseUsingClause(void);
 boolean cxxParserParseAccessSpecifier(void);

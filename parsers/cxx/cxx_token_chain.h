@@ -119,4 +119,7 @@ CXXToken * cxxTokenChainPreviousKeyword(CXXToken * from,enum CXXKeyword eKeyword
 
 int cxxTokenChainFirstKeywordIndex(CXXTokenChain * tc,enum CXXKeyword eKeyword);
 
+// Assuming that pChain contains a type name, attempt to normalize the spacing within the whole chain.
+void cxxTokenChainNormalizeTypeNameSpacing(CXXTokenChain * pChain);
+
 #endif //!_cxx_token_chain_h_

@@ -655,3 +655,91 @@ CXXToken * cxxTokenChainExtractIndexRange(CXXTokenChain * tc,int iFirstIndex,int
 	
 	return pRet;
 }
+
+void cxxTokenChainNormalizeTypeNameSpacing(CXXTokenChain * pChain)
+{
+	if(!pChain)
+		return;
+
+	if(pChain->iCount < 1)
+		return;
+
+	// () and [] are:
+	//  - normalized internaly
+	//  - not preceeded by space (with the exception of () NOT preceeded by a ())
+	//  - never followed by space
+	CXXToken * pAux = cxxTokenChainFirstTokenOfType(pChain,CXXTokenTypeParenthesisChain | CXXTokenTypeSquareParenthesisChain);
+	while(pAux)
+	{
+		cxxTokenChainNormalizeTypeNameSpacing(pAux->pChain);
+
+		pAux->bFollowedBySpace = FALSE;
+		if(pAux->pPrev)
+		{
+			if(cxxTokenTypeIs(pAux,CXXTokenTypeParenthesisChain))
+				pAux->pPrev->bFollowedBySpace = !cxxTokenTypeIsOneOf(pAux->pPrev,CXXTokenTypeParenthesisChain | CXXTokenTypeSquareParenthesisChain);
+			else
+				pAux->pPrev->bFollowedBySpace = FALSE;
+		}
+		cxxTokenChainFirst(pAux->pChain)->bFollowedBySpace = FALSE;
+		cxxTokenChainLast(pAux->pChain)->bFollowedBySpace = FALSE;
+		cxxTokenChainLast(pAux->pChain)->pPrev->bFollowedBySpace = FALSE;
+		pAux = cxxTokenChainNextTokenOfType(pAux,CXXTokenTypeParenthesisChain | CXXTokenTypeSquareParenthesisChain);
+	}
+	
+	// < > and , have no spaces around (NOTE: we're assuming that there is no >> problem with typenames... is this correct?)
+	pAux = cxxTokenChainFirstTokenOfType(
+			pChain,
+			CXXTokenTypeGreaterThanSign | CXXTokenTypeSmallerThanSign | CXXTokenTypeComma
+		);
+	while(pAux)
+	{
+		if(pAux->pPrev)
+			pAux->pPrev->bFollowedBySpace = FALSE;
+
+		pAux->bFollowedBySpace = pAux->pNext && 
+				(
+					!cxxTokenTypeIsOneOf(
+							pAux->pNext,
+							CXXTokenTypeGreaterThanSign | CXXTokenTypeSmallerThanSign | CXXTokenTypeComma | CXXTokenTypeKeyword | CXXTokenTypeIdentifier
+						)
+				);
+
+		pAux = cxxTokenChainNextTokenOfType(
+				pAux,
+				CXXTokenTypeGreaterThanSign | CXXTokenTypeSmallerThanSign | CXXTokenTypeComma
+			);
+	}
+	
+	// *, & and operators:
+	//  - a space before iff followed by something that is not *, & or operator
+	//  - a space after iff followed by something that is not *, & or operator
+	pAux = cxxTokenChainFirstTokenOfType(pChain,CXXTokenTypeStar | CXXTokenTypeAnd | CXXTokenTypeMultipleAnds | CXXTokenTypeOperator);
+	while(pAux)
+	{
+		if(pAux->pPrev)
+			pAux->pPrev->bFollowedBySpace = !cxxTokenTypeIsOneOf(pAux->pPrev,CXXTokenTypeStar | CXXTokenTypeAnd | CXXTokenTypeMultipleAnds | CXXTokenTypeOperator);
+
+		pAux->bFollowedBySpace = pAux->pNext && 
+				(
+					!cxxTokenTypeIsOneOf(
+							pAux->pNext,
+							CXXTokenTypeStar | CXXTokenTypeAnd | CXXTokenTypeMultipleAnds | CXXTokenTypeOperator | CXXTokenTypeComma
+						)
+				);
+		pAux = cxxTokenChainNextTokenOfType(pAux,CXXTokenTypeStar | CXXTokenTypeAnd | CXXTokenTypeMultipleAnds | CXXTokenTypeOperator);
+	}
+
+	// :: has no trailing spaces and if preceeded by an identifier it has no leading spaces
+	pAux = cxxTokenChainFirstTokenOfType(pChain,CXXTokenTypeMultipleColons);
+	while(pAux)
+	{
+		pAux->bFollowedBySpace = FALSE;
+		if(pAux->pPrev && cxxTokenTypeIs(pAux,CXXTokenTypeIdentifier))
+			pAux->pPrev->bFollowedBySpace = FALSE;
+		pAux = cxxTokenChainNextTokenOfType(pAux,CXXTokenTypeMultipleColons);
+	}
+
+	// Finally the chain has no space at end
+	cxxTokenChainLast(pChain)->bFollowedBySpace = FALSE;
+}
