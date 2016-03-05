@@ -946,19 +946,11 @@ boolean cxxParserParseIfForWhileSwitch(void)
 	return bRet;
 }
 
-rescanReason cxxParserMain(const unsigned int passCount)
+static rescanReason cxxParserMain(const unsigned int passCount)
 {
-	if(g_bFirstRun)
+	if(!g_bFirstRun)
 	{
-		cxxTokenAPIInit();
-
-		g_cxx.pTokenChain = cxxTokenChainCreate();
-
-		cxxScopeInit();
-		
-		g_bFirstRun = FALSE;
-	} else {
-		// Only clean state
+		// Cleanup state
 		cxxScopeClear();
 		cxxTokenAPINewFile();
 		cxxParserNewStatement();
@@ -1003,17 +995,44 @@ rescanReason cxxParserMain(const unsigned int passCount)
 	return RESCAN_NONE;
 }
 
+rescanReason cxxCParserMain(const unsigned int passCount)
+{
+	g_cxx.eLanguage = g_cxx.eCLanguage;
+	return cxxParserMain(passCount);
+}
+
+rescanReason cxxCppParserMain(const unsigned int passCount)
+{
+	g_cxx.eLanguage = g_cxx.eCPPLanguage;
+	return cxxParserMain(passCount);
+}
+
+static void cxxParserFirstInit()
+{
+	memset(&g_cxx,0,sizeof(CXXParserState));
+
+	g_cxx.eCLanguage = -1;
+	g_cxx.eCPPLanguage = -1;
+
+	cxxTokenAPIInit();
+
+	g_cxx.pTokenChain = cxxTokenChainCreate();
+
+	cxxScopeInit();
+
+	g_bFirstRun = FALSE;
+}
+
 void cxxCppParserInitialize(const langType language)
 {
 	CXX_DEBUG_INIT();
 
 	CXX_DEBUG_PRINT("Parser initialize for language C++");
 	if(g_bFirstRun)
-		memset(&g_cxx,0,sizeof(CXXParserState));
+		cxxParserFirstInit();
 
-	g_cxx.eLanguage = language;
 	g_cxx.eCPPLanguage = language;
-	g_cxx.eCLanguage = -1;
+
 	cxxBuildKeywordHash(language,TRUE);
 }
 
@@ -1023,11 +1042,10 @@ void cxxCParserInitialize(const langType language)
 
 	CXX_DEBUG_PRINT("Parser initialize for language C");
 	if(g_bFirstRun)
-		memset(&g_cxx,0,sizeof(CXXParserState));
+		cxxParserFirstInit();
 
-	g_cxx.eLanguage = language;
 	g_cxx.eCLanguage = language;
-	g_cxx.eCPPLanguage = -1;
+
 	cxxBuildKeywordHash(language,FALSE);
 }
 

@@ -83,7 +83,7 @@ parserDefinition * CParser (void)
 	def->kinds      = cxxTagGetKindOptions();
 	def->kindCount  = cxxTagGetKindOptionCount();
 	def->extensions = extensions;
-	def->parser2    = cxxParserMain;
+	def->parser2    = cxxCParserMain;
 	def->initialize = cxxCParserInitialize;
 	def->selectLanguage = selectors;
 	def->useCork = TRUE; // We use corking to block output until the end of the file
@@ -110,7 +110,7 @@ parserDefinition * CppParser (void)
 	def->kinds      = cxxTagGetKindOptions();
 	def->kindCount  = cxxTagGetKindOptionCount();
 	def->extensions = extensions;
-	def->parser2    = cxxParserMain;
+	def->parser2    = cxxCppParserMain;
 	def->initialize = cxxCppParserInitialize;
 	def->selectLanguage = selectors;
 	def->useCork = TRUE; // We use corking to block output until the end of the file

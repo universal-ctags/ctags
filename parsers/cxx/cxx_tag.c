@@ -79,7 +79,10 @@ tagEntryInfo * cxxTagBegin(
 	)
 {
 	if(!g_aCXXKinds[eKindId].enabled)
+	{
+		//CXX_DEBUG_PRINT("Tag kind %s is not enabled",g_aCXXKinds[eKindId].name);
 		return NULL;
+	}
 
 	initTagEntry(&g_oCXXTag,szName,&(g_aCXXKinds[eKindId]));
 	
