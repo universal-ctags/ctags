@@ -415,7 +415,9 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 {
 	CXX_DEBUG_ENTER();
 
-	//cxxTokenChainClear(g_cxx.pTokenChain);
+	// make sure that there is only the class/struct/union keyword in the token chain
+	while(g_cxx.pTokenChain->iCount > 1)
+		cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
 	
 	boolean bParsingTypedef = (g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef); // may be cleared below
 
@@ -948,13 +950,9 @@ boolean cxxParserParseIfForWhileSwitch(void)
 
 static rescanReason cxxParserMain(const unsigned int passCount)
 {
-	if(!g_bFirstRun)
-	{
-		// Cleanup state
-		cxxScopeClear();
-		cxxTokenAPINewFile();
-		cxxParserNewStatement();
-	}
+	cxxScopeClear();
+	cxxTokenAPINewFile();
+	cxxParserNewStatement();
 
 	kindOption * kind_for_define = cxxTagGetKindOptions() + CXXTagKindMACRO;
 	kindOption * kind_for_header = cxxTagGetKindOptions() + CXXTagKindINCLUDE;
@@ -997,14 +995,20 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 
 rescanReason cxxCParserMain(const unsigned int passCount)
 {
+	CXX_DEBUG_ENTER();
 	g_cxx.eLanguage = g_cxx.eCLanguage;
-	return cxxParserMain(passCount);
+	rescanReason r = cxxParserMain(passCount);
+	CXX_DEBUG_LEAVE();
+	return r;
 }
 
 rescanReason cxxCppParserMain(const unsigned int passCount)
 {
+	CXX_DEBUG_ENTER();
 	g_cxx.eLanguage = g_cxx.eCPPLanguage;
-	return cxxParserMain(passCount);
+	rescanReason r = cxxParserMain(passCount);
+	CXX_DEBUG_LEAVE();
+	return r;
 }
 
 static void cxxParserFirstInit()
