@@ -326,7 +326,6 @@ void cxxTokenChainCondense(CXXTokenChain * tc,unsigned int uFlags)
 	CXXToken * pCondensed = cxxTokenCreate();
 
 	pCondensed->eType = CXXTokenTypeUnknown;
-	pCondensed->pszWord = vStringNew();
 	pCondensed->iLineNumber = tc->pHead->iLineNumber;
 	pCondensed->oFilePosition = tc->pHead->oFilePosition;
 
@@ -591,7 +590,6 @@ CXXToken * cxxTokenChainExtractRange(CXXToken * from,CXXToken * to,unsigned int 
 	CXXToken * pToken = from;
 	
 	CXXToken * pRet = cxxTokenCreate();
-	pRet->pszWord = vStringNew();
 	pRet->iLineNumber = pToken->iLineNumber;
 	pRet->oFilePosition = pToken->oFilePosition;
 
@@ -635,7 +633,6 @@ CXXToken * cxxTokenChainExtractIndexRange(CXXTokenChain * tc,int iFirstIndex,int
 		return NULL;
 	
 	CXXToken * pRet = cxxTokenCreate();
-	pRet->pszWord = vStringNew();
 	pRet->iLineNumber = pToken->iLineNumber;
 	pRet->oFilePosition = pToken->oFilePosition;
 
