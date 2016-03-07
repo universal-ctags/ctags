@@ -568,11 +568,10 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 		CXX_DEBUG_PRINT("Class/struct/union name is %s (anonymous)",vStringValue(pClassName->pszWord));
 	}
 
-	cxxTokenChainClear(g_cxx.pTokenChain);
-
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSingleColon))
 	{
 		// check for base classes
+		cxxTokenChainClear(g_cxx.pTokenChain);
 	
 		if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket))
 		{
@@ -590,6 +589,8 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 		}
 		
 		cxxTokenChainDestroyLast(g_cxx.pTokenChain); // remove the {
+	} else {
+		cxxTokenChainClear(g_cxx.pTokenChain);
 	}
 
 	tagEntryInfo * tag = cxxTagBegin(pClassName->pszWord->buffer,eTagKind,pClassName);
