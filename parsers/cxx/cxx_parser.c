@@ -68,13 +68,20 @@ boolean cxxParserParseAndCondenseCurrentSubchain(
 	)
 {
 	CXXTokenChain * pCurrentChain = g_cxx.pTokenChain;
+
 	g_cxx.pTokenChain = cxxTokenChainCreate();
+
 	CXXToken * pInitial = cxxTokenChainTakeLast(pCurrentChain);
 	cxxTokenChainAppend(g_cxx.pTokenChain,pInitial);
+
 	CXXToken * pChainToken = cxxTokenCreate();
+
+	pChainToken->iLineNumber = pInitial->iLineNumber;
+	pChainToken->oFilePosition = pInitial->oFilePosition;
 	pChainToken->eType = (enum CXXTokenType)(g_cxx.pToken->eType << 8); // see the declaration of CXXTokenType enum. Shifting by 8 gives the corresponding chain marker
 	pChainToken->pChain = g_cxx.pTokenChain;
 	cxxTokenChainAppend(pCurrentChain,pChainToken);
+	
 	unsigned int uTokenTypes = g_cxx.pToken->eType << 4; // see the declaration of CXXTokenType enum. Shifting by 4 gives the corresponding closing token type
 	if(bAcceptEOF)
 		uTokenTypes |= CXXTokenTypeEOF;
@@ -209,6 +216,9 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(boolea
 	
 	CXX_DEBUG_PRINT("Parse enum/struct/class/union trailer, typename is '%s'",szTypeName);
 
+	fpos_t oFilePosition = getInputFilePosition();
+	int iFileLine = getInputLineNumber();
+
 	if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to EOF/semicolon");
@@ -230,12 +240,16 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(boolea
 
 	// fake the initial two tokens
 	CXXToken * pIdentifier = cxxTokenCreate();
+	pIdentifier->oFilePosition = oFilePosition;
+	pIdentifier->iLineNumber = iFileLine;
 	pIdentifier->eType = CXXTokenTypeIdentifier;
 	pIdentifier->bFollowedBySpace = TRUE;
 	vStringCatS(pIdentifier->pszWord,szTypeName);
 	cxxTokenChainPrepend(g_cxx.pTokenChain,pIdentifier);
 	
 	CXXToken * pKeyword = cxxTokenCreate();
+	pKeyword->oFilePosition = oFilePosition;
+	pKeyword->iLineNumber = iFileLine;
 	pKeyword->eType = CXXTokenTypeKeyword;
 	pKeyword->eKeyword = eTagKeyword;
 	pKeyword->bFollowedBySpace = TRUE;
