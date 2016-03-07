@@ -130,7 +130,7 @@ CXXToken * cxxTokenCreateAnonymousIdentifier(void)
 
 
 	t->eType = CXXTokenTypeIdentifier;
-	t->pszWord = vStringNewInit("__anon");
+	vStringCopyS(t->pszWord, "__anon");
 
 	// The names of anonymous structures depend on the name of the file being processed
 	// so the identifiers won't collide across multiple ctags runs with different file sets.
