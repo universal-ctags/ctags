@@ -1,5 +1,5 @@
-#ifndef _cxx_parser_internal_h_
-#define _cxx_parser_internal_h_
+#ifndef ctags_cxx_parser_internal_h_
+#define ctags_cxx_parser_internal_h_
 /*
 *   Copyright (c) 2016, Szymon Tomasz Stefanek
 *
@@ -191,4 +191,4 @@ extern CXXParserState g_cxx;
 #define cxxParserCurrentLanguageIsC() \
 	(g_cxx.eLanguage == g_cxx.eCLanguage)
 
-#endif //!_cxx_parser_internal_h_
+#endif //!ctags_cxx_parser_internal_h_

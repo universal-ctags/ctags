@@ -1,5 +1,5 @@
-#ifndef _cxx_keyword_h_
-#define _cxx_keyword_h_
+#ifndef ctags_cxx_keyword_h_
+#define ctags_cxx_keyword_h_
 /*
 *   Copyright (c) 2016, Szymon Tomasz Stefanek
 *
@@ -114,4 +114,4 @@ enum CXXKeyword
 void cxxBuildKeywordHash(const langType language,boolean bCXX);
 
 
-#endif //!_cxx_keyword_h_
+#endif //!ctags_cxx_keyword_h_

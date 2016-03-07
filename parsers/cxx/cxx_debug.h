@@ -1,5 +1,5 @@
-#ifndef _cxx_debug_h_
-#define _cxx_debug_h_
+#ifndef ctags_cxx_debug_h_
+#define ctags_cxx_debug_h_
 /*
 *   Copyright (c) 2016, Szymon Tomasz Stefanek
 *
@@ -70,4 +70,4 @@ void cxxDebugInit(void);
 #endif //!CXX_DO_DEBUGGING
 
 
-#endif //!_cxx_debug_h_
+#endif //!ctags_cxx_debug_h_

@@ -1,5 +1,5 @@
-#ifndef _cxx_parser_h_
-#define _cxx_parser_h_
+#ifndef ctags_cxx_parser_h_
+#define ctags_cxx_parser_h_
 /*
 *   Copyright (c) 2016, Szymon Tomasz Stefanek
 *
@@ -19,4 +19,4 @@ rescanReason cxxCppParserMain(const unsigned int passCount);
 void cxxCppParserInitialize(const langType language);
 void cxxCParserInitialize(const langType language);
 
-#endif //!_cxx_parser_h_
+#endif //!ctags_cxx_parser_h_

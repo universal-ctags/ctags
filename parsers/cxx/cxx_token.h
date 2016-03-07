@@ -1,5 +1,5 @@
-#ifndef _cxx_token_h_
-#define _cxx_token_h_
+#ifndef ctags_cxx_token_h_
+#define ctags_cxx_token_h_
 /*
 *   Copyright (c) 2016, Szymon Tomasz Stefanek
 *
@@ -99,4 +99,4 @@ void cxxTokenAPINewFile(void);
 void cxxTokenAPIDone(void);
 
 
-#endif //!_cxx_token_h_
+#endif //!ctags_cxx_token_h_

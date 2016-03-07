@@ -1,5 +1,5 @@
-#ifndef _cxx_scope_h_
-#define _cxx_scope_h_
+#ifndef ctags_cxx_scope_h_
+#define ctags_cxx_scope_h_
 /*
 *   Copyright (c) 2016, Szymon Tomasz Stefanek
 *
@@ -59,4 +59,4 @@ void cxxScopePop(void);
 
 
 
-#endif //!_cxx_scope_h_
+#endif //!ctags_cxx_scope_h_

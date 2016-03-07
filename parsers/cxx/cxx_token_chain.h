@@ -1,5 +1,5 @@
-#ifndef _cxx_token_chain_h_
-#define _cxx_token_chain_h_
+#ifndef ctags_cxx_token_chain_h_
+#define ctags_cxx_token_chain_h_
 /*
 *   Copyright (c) 2016, Szymon Tomasz Stefanek
 *
@@ -124,4 +124,4 @@ int cxxTokenChainFirstKeywordIndex(CXXTokenChain * tc,enum CXXKeyword eKeyword);
 // Assuming that pChain contains a type name, attempt to normalize the spacing within the whole chain.
 void cxxTokenChainNormalizeTypeNameSpacing(CXXTokenChain * pChain);
 
-#endif //!_cxx_token_chain_h_
+#endif //!ctags_cxx_token_chain_h_
