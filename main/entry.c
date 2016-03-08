@@ -176,8 +176,14 @@ static void addCommonPseudoTags (void)
 extern void makeFileTag (const char *const fileName)
 {
 	boolean via_line_directive = (strcmp (fileName, getInputFileName()) != 0);
-	if (isXtagEnabled(XTAG_FILE_NAMES)
-	    || isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES))
+	xtagType     xtag = XTAG_UNKNOWN;
+
+	if (isXtagEnabled(XTAG_FILE_NAMES))
+		xtag = XTAG_FILE_NAMES;
+	if (isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES))
+		xtag = XTAG_FILE_NAMES_WITH_TOTAL_LINES;
+
+	if (xtag != XTAG_UNKNOWN)
 	{
 		tagEntryInfo tag;
 		kindOption  *kind;
@@ -192,6 +198,7 @@ extern void makeFileTag (const char *const fileName)
 
 		tag.isFileEntry     = TRUE;
 		tag.lineNumberEntry = TRUE;
+		markTagExtraBit (&tag, xtag);
 
 		if (via_line_directive || (!isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES)))
 		{
