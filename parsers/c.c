@@ -1454,6 +1454,7 @@ static void makeExtraTagEntry (const tagType type, tagEntryInfo *const e,
 			addContextSeparator (scopedName);
 			vStringCatS (scopedName, e->name);
 			e->name = vStringValue (scopedName);
+			markTagExtraBit (e, XTAG_QUALIFIED_TAGS);
 			makeTagEntry (e);
 		}
 		vStringDelete (scopedName);

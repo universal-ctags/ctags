@@ -1277,6 +1277,7 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 	if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
 	{
 		x = *e;
+		markTagExtraBit (&x, XTAG_QUALIFIED_TAGS);
 
 		if (fqn == NULL)
 			fqn = vStringNew ();

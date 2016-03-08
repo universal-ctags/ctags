@@ -225,6 +225,7 @@ static void makeEiffelFeatureTag (tokenInfo *const token)
 			vStringPut (qualified, '.');
 			vStringCat (qualified, token->string);
 			e.name = vStringValue (qualified);
+			markTagExtraBit (&e, XTAG_QUALIFIED_TAGS);
 			makeTagEntry (&e);
 			vStringDelete (qualified);
 		}
