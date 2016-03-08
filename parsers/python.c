@@ -881,11 +881,15 @@ static void findPythonTags (void)
 									/* x.Y */
 									if (isXtagEnabled(XTAG_QUALIFIED_TAGS))
 									{
+										tagEntryInfo fqe;
 										vString *fq = vStringNewCopy (from_module);
 										vStringPut (fq, '.');
 										vStringCat (fq, name->string);
-										makeSimpleRefTag (fq, PythonKinds, K_UNKNOWN,
-										                  PYTHON_UNKNOWN_INDIRECTLY_IMPORTED);
+										initRefTagEntry (&fqe, vStringValue (fq),
+										                 &(PythonKinds[K_UNKNOWN]),
+										                 PYTHON_UNKNOWN_INDIRECTLY_IMPORTED);
+										markTagExtraBit (&fqe, XTAG_QUALIFIED_TAGS);
+										makeTagEntry (&fqe);
 										vStringDelete (fq);
 									}
 									/* Z */
@@ -922,11 +926,15 @@ static void findPythonTags (void)
 								/* x.Y */
 								if (isXtagEnabled(XTAG_QUALIFIED_TAGS))
 								{
+									tagEntryInfo fqe;
 									vString *fq = vStringNewCopy (from_module);
 									vStringPut (fq, '.');
 									vStringCat (fq, name->string);
-									makeSimpleRefTag (fq, PythonKinds, K_UNKNOWN,
-									                  PYTHON_MODULE_IMPORTED);
+									initRefTagEntry (&fqe, vStringValue (fq),
+									                 &(PythonKinds[K_UNKNOWN]),
+									                 PYTHON_MODULE_IMPORTED);
+									markTagExtraBit (&fqe, XTAG_QUALIFIED_TAGS);
+									makeTagEntry (&fqe);
 									vStringDelete (fq);
 								}
 							}
