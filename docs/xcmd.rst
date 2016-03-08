@@ -229,8 +229,8 @@ Here is an example taken from ``data/optlib/coffee.ctags``::
 	<<... copyright notices are snipped ...>>
 	#
 	--langdef=coffee
-	--coffee-map=+.coffee
-	--coffee-xcmd=coffeetags
+	--map-coffee=+.coffee
+	--xcmd-coffee=coffeetags
 
 Finally you have to add these new two files to ``Makefile.in``.
 Add the name of driver file to ``DRIVERS`` variable like::
