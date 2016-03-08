@@ -92,29 +92,23 @@ boolean cxxParserParseUsingClause(void)
 			CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
 			CXX_DEBUG_ASSERT(pFirst,"Condensation of a non empty chain should produce a token!");
 			
-			tagEntryInfo * tag;
-			
-			if(bUsingNamespace)
-			{
-				CXX_DEBUG_PRINT("Found usingns clause '%s'",vStringValue(pFirst->pszWord));
-	
-				tag = cxxTagBegin(
+			tagEntryInfo * tag = cxxTagBegin(
 						vStringValue(pFirst->pszWord),
-						CXXTagKindUSINGNS,
+						CXXTagKindUSING,
 						pFirst
 					);
-			} else {
-				CXX_DEBUG_PRINT("Found usingsym clause '%s'",vStringValue(pFirst->pszWord));
-	
-				tag = cxxTagBegin(
-						vStringValue(pFirst->pszWord),
-						CXXTagKindUSINGSYM,
-						pFirst
-					);
-			}
-	
+
 			if(tag)
 			{
+				if(bUsingNamespace)
+				{
+					CXX_DEBUG_PRINT("Found using clause '%s' which extends scope",vStringValue(pFirst->pszWord));
+					tag->extensionFields.roleIndex = CXXUsingRoleExtendingScope;
+				} else {
+					CXX_DEBUG_PRINT("Found using clause '%s' which imports a name",vStringValue(pFirst->pszWord));
+					tag->extensionFields.roleIndex = CXXUsingRoleImportingName;
+				}
+	
 				tag->isFileScope = (cxxScopeGetKind() == CXXTagKindNAMESPACE) && !isInputHeaderFile();
 				cxxTagCommit();
 			}

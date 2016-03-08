@@ -26,13 +26,22 @@ static roleDesc CHeaderRoles [] = {
 	RoleTemplateLocal,
 };
 
+static roleDesc CXXUsingRoles [] = {
+	{ TRUE, "extending-scope", "... (for using namespace a::b)" },
+    { TRUE, "importing-name", "... (for using a::b)" }
+};
+
 static kindOption g_aCXXKinds [] = {
 	{ TRUE,  'c', "class",      "classes" },
-	{ TRUE,  'd', "macro",      "macro definitions", .referenceOnly = FALSE, ATTACH_ROLES(CMacroRoles)},
+	{ TRUE,  'd', "macro",      "macro definitions",
+			.referenceOnly = FALSE, ATTACH_ROLES(CMacroRoles)
+	},
 	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)" },
 	{ TRUE,  'f', "function",   "function definitions" },
 	{ TRUE,  'g', "enum",       "enumeration names" },
-	{ FALSE, 'h', "header",     "included header files", .referenceOnly = TRUE,  ATTACH_ROLES(CHeaderRoles)},
+	{ FALSE, 'h', "header",     "included header files",
+			.referenceOnly = TRUE,  ATTACH_ROLES(CHeaderRoles)
+	},
 	{ FALSE, 'l', "local",      "local variables" },
 	{ TRUE,  'm', "member",     "class, struct, and union members" },
 	{ TRUE,  'n', "namespace",  "namespaces" },
@@ -44,8 +53,9 @@ static kindOption g_aCXXKinds [] = {
 	{ FALSE, 'x', "externvar",  "external and forward variable declarations" },
 	{ FALSE, 'z', "parameter",  "function parameters inside function definitions" },
 	{ FALSE, 'L', "label",      "goto labels" },
-	{ FALSE, 'N', "usingns",    "using namespace statements", .referenceOnly = TRUE },
-	{ FALSE, 'S', "usingsym",   "using non-namespace symbol statements", .referenceOnly = TRUE }
+	{ FALSE, 'U', "using",      "using namespace statements",
+			.referenceOnly = TRUE, ATTACH_ROLES(CXXUsingRoles)
+	}
 };
 
 static const char * g_aCXXAccessStrings [] = {

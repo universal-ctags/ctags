@@ -1,2 +1,3 @@
---fields=+SK
---kinds-C++=+pNS
+--fields=+SKr
+--kinds-C++=+pU
+--extra=+r

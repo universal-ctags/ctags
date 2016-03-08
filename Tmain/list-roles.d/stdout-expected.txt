@@ -5,9 +5,13 @@
 C	d	undef	undefined	on
 C	h	system	system header	on
 C	h	local	local header	on
+C	U	extending-scope	... (for using namespace a::b)	on
+C	U	importing-name	... (for using a::b)	on
 C++	d	undef	undefined	on
 C++	h	system	system header	on
 C++	h	local	local header	on
+C++	U	extending-scope	... (for using namespace a::b)	on
+C++	U	importing-name	... (for using a::b)	on
 DTS	d	undef	undefined	on
 DTS	h	system	system header	on
 DTS	h	local	local header	on
@@ -30,9 +34,13 @@ Vera	h	local	local header	on
 C	d	undef	undefined	on
 C	h	system	system header	on
 C	h	local	local header	on
+C	U	extending-scope	... (for using namespace a::b)	on
+C	U	importing-name	... (for using a::b)	on
 C++	d	undef	undefined	on
 C++	h	system	system header	on
 C++	h	local	local header	on
+C++	U	extending-scope	... (for using namespace a::b)	on
+C++	U	importing-name	... (for using a::b)	on
 DTS	d	undef	undefined	on
 DTS	h	system	system header	on
 DTS	h	local	local header	on
@@ -55,6 +63,8 @@ Vera	h	local	local header	on
 C	d	undef	undefined	on
 C	h	system	system header	on
 C	h	local	local header	on
+C	U	extending-scope	... (for using namespace a::b)	on
+C	U	importing-name	... (for using a::b)	on
 
 #
 # all:h

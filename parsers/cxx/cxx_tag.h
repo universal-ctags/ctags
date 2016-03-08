@@ -35,9 +35,13 @@ enum CXXTagKind
 	CXXTagKindEXTERNVAR,
 	CXXTagKindPARAMETER,
 	CXXTagKindLABEL,
-	CXXTagKindUSINGNS,
-	CXXTagKindUSINGSYM
+	CXXTagKindUSING
 };
+
+typedef enum {
+	CXXUsingRoleExtendingScope,
+	CXXUsingRoleImportingName
+} CXXUsingRole;
 
 kindOption * cxxTagGetKindOptions(void);
 int cxxTagGetKindOptionCount(void);
