@@ -42,9 +42,10 @@ static kindOption g_aCXXKinds [] = {
 	{ TRUE,  'u', "union",      "union names" },
 	{ TRUE,  'v', "variable",   "variable definitions" },
 	{ FALSE, 'x', "externvar",  "external and forward variable declarations" },
+	{ FALSE, 'z', "parameter",  "function parameters inside function definitions" },
 	{ FALSE, 'L', "label",      "goto labels" },
-	{ FALSE, 'U', "using",      "using statements" },
-	{ FALSE, 'z', "parameter",  "function parameters inside function definitions" }
+	{ FALSE, 'N', "usingns",    "using namespace statements", .referenceOnly = TRUE },
+	{ FALSE, 'S', "usingsym",   "using non-namespace symbol statements", .referenceOnly = TRUE }
 };
 
 static const char * g_aCXXAccessStrings [] = {

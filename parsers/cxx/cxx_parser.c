@@ -257,7 +257,7 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(boolea
 	cxxTokenChainPrepend(g_cxx.pTokenChain,pKeyword);
 
 	if(bParsingTypedef)
-		cxxParserExtractTypedef(g_cxx.pTokenChain);
+		cxxParserExtractTypedef(g_cxx.pTokenChain,TRUE);
 	else
 		cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 
@@ -302,7 +302,7 @@ boolean cxxParserParseEnum(void)
 		{
 			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
 			{
-				cxxParserExtractTypedef(g_cxx.pTokenChain);
+				cxxParserExtractTypedef(g_cxx.pTokenChain,TRUE);
 			} else {
 				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 			}
@@ -508,7 +508,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 		if(g_cxx.pTokenChain->iCount > 3) // [typedef] struct X Y; <-- typedef has been removed!
 		{
 			if(bParsingTypedef)
-				cxxParserExtractTypedef(g_cxx.pTokenChain);
+				cxxParserExtractTypedef(g_cxx.pTokenChain,TRUE);
 			else
 				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 		}

@@ -63,16 +63,16 @@ boolean cxxParserParseGenericTypedef(void)
 		}
 	}
 
-	cxxParserExtractTypedef(g_cxx.pTokenChain);
+	cxxParserExtractTypedef(g_cxx.pTokenChain,TRUE);
 	CXX_DEBUG_LEAVE();
 	return TRUE;
 }
 
 // This function attempts to extract a typedef from the specified chain.
 // The typedef keyword should already have been removed (!)
-// The function expects a terminator to be present at the end.
+// The function expects a terminator to be present at the end unless bExpectTerminatorAtEnd is set to FALSE
 // The token chain may be condensed/destroyed upon exit.
-void cxxParserExtractTypedef(CXXTokenChain * pChain)
+void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtEnd)
 {
 	CXX_DEBUG_ENTER();
 
@@ -82,36 +82,42 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain)
 	vStringDelete(pX);
 #endif
 
-
 	// Atleast something like
 	//   a b;
 
-	if(pChain->iCount < 3)
+	if(pChain->iCount < (bExpectTerminatorAtEnd ? 3 : 2))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Not enough tokens for a type definition");
 		return;
 	}
 
-	// find the last identifier
-	CXXToken * t = cxxTokenChainLast(pChain);
+	CXXToken * t;
+
+	if(bExpectTerminatorAtEnd)
+	{
+		t = cxxTokenChainLast(pChain);
+		CXX_DEBUG_ASSERT(cxxTokenTypeIs(t,CXXTokenTypeSemicolon),"The terminator should be present here");
+		cxxTokenChainDestroyLast(pChain);
+	}
+
+	t = cxxTokenChainLast(pChain);
+	CXX_DEBUG_ASSERT(t,"We should have a last token here!");
+
 	CXXTokenChain * pTParentChain;
-	
-	CXX_DEBUG_ASSERT(cxxTokenTypeIs(t,CXXTokenTypeSemicolon),"The terminator should be present here");
 
 	CXXToken * pAux;
 
 	// check for special case of function pointer definition
 	if(
+		cxxTokenTypeIs(t,CXXTokenTypeParenthesisChain) &&
 		t->pPrev &&
 		cxxTokenTypeIs(t->pPrev,CXXTokenTypeParenthesisChain) &&
 		t->pPrev->pPrev &&
-		cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeParenthesisChain) &&
-		t->pPrev->pPrev->pPrev &&
-		(pAux = cxxTokenChainLastTokenOfType(t->pPrev->pPrev->pChain,CXXTokenTypeIdentifier))
+		(pAux = cxxTokenChainLastTokenOfType(t->pPrev->pChain,CXXTokenTypeIdentifier))
 	)
 	{
 		CXX_DEBUG_PRINT("Found function pointer typedef");
-		pTParentChain = t->pPrev->pPrev->pChain;
+		pTParentChain = t->pPrev->pChain;
 		t = pAux;
 	} else {
 		t = cxxTokenChainLastTokenOfType(pChain,CXXTokenTypeIdentifier);
@@ -138,22 +144,24 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain)
 
 	if(tag)
 	{
+		pAux = t->pPrev;
+	
 		// check for simple typerefs (this is to emulate what old ctags did!)
 		if(
-			cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier) &&
-			t->pPrev->pPrev &&
-			(!t->pPrev->pPrev->pPrev) &&
-			cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeKeyword) &&
+			cxxTokenTypeIs(pAux,CXXTokenTypeIdentifier) &&
+			pAux->pPrev &&
+			(!pAux->pPrev->pPrev) &&
+			cxxTokenTypeIs(pAux->pPrev,CXXTokenTypeKeyword) &&
 			(
-				(t->pPrev->pPrev->eKeyword == CXXKeywordSTRUCT) ||
-				(t->pPrev->pPrev->eKeyword == CXXKeywordUNION) ||
-				(t->pPrev->pPrev->eKeyword == CXXKeywordCLASS) ||
-				(t->pPrev->pPrev->eKeyword == CXXKeywordENUM)
+				(pAux->pPrev->eKeyword == CXXKeywordSTRUCT) ||
+				(pAux->pPrev->eKeyword == CXXKeywordUNION) ||
+				(pAux->pPrev->eKeyword == CXXKeywordCLASS) ||
+				(pAux->pPrev->eKeyword == CXXKeywordENUM)
 			)
 		)
 		{
-			tag->extensionFields.typeRef[0] = vStringValue(t->pPrev->pPrev->pszWord);
-			tag->extensionFields.typeRef[1] = vStringValue(t->pPrev->pszWord);
+			tag->extensionFields.typeRef[0] = vStringValue(pAux->pPrev->pszWord);
+			tag->extensionFields.typeRef[1] = vStringValue(pAux->pszWord);
 
 			// remove identifier as it will be destroyed separately
 			cxxTokenChainTake(pTParentChain,t);
@@ -169,8 +177,6 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain)
 			
 			// kill identifier
 			cxxTokenChainTake(pTParentChain,t);
-			// kill terminator
-			cxxTokenChainDestroyLast(pChain);
 			
 			pAux = cxxTokenChainFirst(pChain);
 			CXX_DEBUG_ASSERT(pAux,"There should be at least another token here!");

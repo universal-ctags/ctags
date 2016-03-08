@@ -105,7 +105,7 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo);
 
 // cxx_parser_typedef.c
 boolean cxxParserParseGenericTypedef(void);
-void cxxParserExtractTypedef(CXXTokenChain * pChain);
+void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtEnd);
 
 
 // cxx_parser.c

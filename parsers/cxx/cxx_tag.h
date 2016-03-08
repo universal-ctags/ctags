@@ -33,9 +33,10 @@ enum CXXTagKind
 	CXXTagKindUNION,
 	CXXTagKindVARIABLE,
 	CXXTagKindEXTERNVAR,
+	CXXTagKindPARAMETER,
 	CXXTagKindLABEL,
-	CXXTagKindUSING,
-	CXXTagKindPARAMETER
+	CXXTagKindUSINGNS,
+	CXXTagKindUSINGSYM
 };
 
 kindOption * cxxTagGetKindOptions(void);

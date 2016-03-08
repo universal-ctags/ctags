@@ -46,7 +46,7 @@ boolean cxxParserParseUsingClause(void)
 		CXX_DEBUG_LEAVE_TEXT("This is a syntax error but we tolerate it");
 		return TRUE;
 	}
-	
+
 	cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 
 	if(g_cxx.pTokenChain->iCount < 1)
@@ -55,43 +55,69 @@ boolean cxxParserParseUsingClause(void)
 		return TRUE;
 	}
 	
-	if(cxxTokenChainFirstTokenOfType(g_cxx.pTokenChain,CXXTokenTypeAssignment))
+	CXXToken * pAssignment = cxxTokenChainFirstTokenOfType(g_cxx.pTokenChain,CXXTokenTypeAssignment);
+	
+	if(pAssignment)
 	{
-		if(cxxTokenChainFirst(g_cxx.pTokenChain)->eType == CXXTokenTypeIdentifier)
+		CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
+
+		if(cxxTokenTypeIs(pFirst,CXXTokenTypeIdentifier))
 		{
-			// typedef
-			CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
+			// It's a typedef. Reorder the tokens in the chain so it really looks like a typedef
+			// and pass it to the specialized extraction routine
+			cxxTokenChainTake(g_cxx.pTokenChain,pFirst);
 
-			// FIXME: Typeref!
-			tagEntryInfo * tag = cxxTagBegin(
-					vStringValue(pFirst->pszWord),
-					CXXTagKindTYPEDEF,
-					pFirst
-				);
+			while(cxxTokenChainFirst(g_cxx.pTokenChain) != pAssignment)
+				cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
+			cxxTokenChainDestroyFirst(g_cxx.pTokenChain); // kill assignment itself
 
-			if(tag)
-			{
-				tag->isFileScope = !isInputHeaderFile();
-				cxxTagCommit();
-			}
+			cxxTokenChainAppend(g_cxx.pTokenChain,pFirst); // in typedefs it's at the end
+
+			cxxParserExtractTypedef(g_cxx.pTokenChain,FALSE);
 		}
 	} else {
-		cxxTokenChainCondense(g_cxx.pTokenChain,0);
-
-		CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
-		CXX_DEBUG_ASSERT(pFirst,"Condensation of a non empty chain should produce a token!");
-		CXX_DEBUG_PRINT("Found using clause '%s'",vStringValue(pFirst->pszWord));
-
-		tagEntryInfo * tag = cxxTagBegin(
-				vStringValue(pFirst->pszWord),
-				CXXTagKindUSING,
-				pFirst
-			);
-
-		if(tag)
+		CXX_DEBUG_ASSERT(g_cxx.pTokenChain->iCount > 0,"The token chain should be non empty at this point");
+	
+		CXXToken * t = cxxTokenChainFirst(g_cxx.pTokenChain);
+	
+		boolean bUsingNamespace = cxxTokenTypeIs(t,CXXTokenTypeKeyword) && (t->eKeyword == CXXKeywordNAMESPACE);
+	
+		if(bUsingNamespace)
+			cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
+	
+		if(g_cxx.pTokenChain->iCount > 0)
 		{
-			tag->isFileScope = (cxxScopeGetKind() == CXXTagKindNAMESPACE) && !isInputHeaderFile();
-			cxxTagCommit();
+			cxxTokenChainCondense(g_cxx.pTokenChain,0);
+	
+			CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
+			CXX_DEBUG_ASSERT(pFirst,"Condensation of a non empty chain should produce a token!");
+			
+			tagEntryInfo * tag;
+			
+			if(bUsingNamespace)
+			{
+				CXX_DEBUG_PRINT("Found usingns clause '%s'",vStringValue(pFirst->pszWord));
+	
+				tag = cxxTagBegin(
+						vStringValue(pFirst->pszWord),
+						CXXTagKindUSINGNS,
+						pFirst
+					);
+			} else {
+				CXX_DEBUG_PRINT("Found usingsym clause '%s'",vStringValue(pFirst->pszWord));
+	
+				tag = cxxTagBegin(
+						vStringValue(pFirst->pszWord),
+						CXXTagKindUSINGSYM,
+						pFirst
+					);
+			}
+	
+			if(tag)
+			{
+				tag->isFileScope = (cxxScopeGetKind() == CXXTagKindNAMESPACE) && !isInputHeaderFile();
+				cxxTagCommit();
+			}
 		}
 	}
 
