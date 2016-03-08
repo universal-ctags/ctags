@@ -1366,4 +1366,28 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->sourceLineNumberDifference = sourceLineNumberDifference;
 }
 
+extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra)
+{
+	unsigned int index;
+	unsigned int offset;
+
+	Assert (extra < XTAG_COUNT);
+	Assert (extra != XTAG_UNKNOWN);
+
+	index = (extra / 8);
+	offset = (extra % 8);
+	tag->extra [ index ] |= (1 << offset);
+}
+
+extern boolean isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
+{
+	unsigned int index = (extra / 8);
+	unsigned int offset = (extra % 8);
+
+	Assert (extra < XTAG_COUNT);
+	Assert (extra != XTAG_UNKNOWN);
+
+	return !! ((tag->extra [ index ]) & (1 << offset));
+}
+
 /* vi:set tabstop=4 shiftwidth=4: */
