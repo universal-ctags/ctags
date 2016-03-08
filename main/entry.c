@@ -1376,6 +1376,8 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	Assert (roleIndex >= ROLE_INDEX_DEFINITION);
 	Assert (kind == NULL || roleIndex < kind->nRoles);
 	e->extensionFields.roleIndex = roleIndex;
+	if (roleIndex > ROLE_INDEX_DEFINITION)
+		markTagExtraBit (e, XTAG_REFERENCE_TAGS);
 
 	e->sourceLanguage = sourceLanguage;
 	e->sourceFileName = sourceFileName;
