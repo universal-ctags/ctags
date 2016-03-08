@@ -950,6 +950,15 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 				   getFieldName (FIELD_ROLE),
 				   escapeName (tag, FIELD_ROLE));
 
+	if (getFieldDesc (FIELD_EXTRA)->enabled)
+	{
+		const char *value = escapeName (tag, FIELD_EXTRA);
+		if (value)
+			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
+					   getFieldName (FIELD_EXTRA),
+					   escapeName (tag, FIELD_EXTRA));
+	}
+
 	return length;
 #undef sep
 }
