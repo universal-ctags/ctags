@@ -22,18 +22,18 @@ static boolean isPseudoTagsEnabled (xtagDesc *pdesc __unused__)
 }
 
 static xtagDesc xtagDescs [] = {
-	{ TRUE, 'F',
+	{ TRUE, 'F',  "fileScope",
 	  "Include tags of file scope" },
-	{ FALSE, 'f',
+	{ FALSE, 'f', "inputFile",
 	  "Include an entry for the base file name of every input file"},
-	{ FALSE, 'p',
+	{ FALSE, 'p', "pseudo",
 	  "Include pseudo tags",
 	  isPseudoTagsEnabled},
-	{ FALSE, 'q',
+	{ FALSE, 'q', "qualified",
 	  "Include an extra class-qualified tag entry for each tag"},
-	{ FALSE, 'r',
+	{ FALSE, 'r', "reference",
 	  "Include reference tags"},
-	{ FALSE, '.',
+	{ FALSE, '.', "inputFileWithEndline",
 	  "Similar to the f extra flag but the entry addresses the end line"},
 };
 
@@ -57,8 +57,9 @@ extern xtagType  getXtagTypeForOption (char letter)
 
 void printXtag (xtagType i)
 {
-	printf("%c\t%s\t%s\n",
+	printf("%c\t%s\t%s\t%s\n",
 	       xtagDescs[i].letter,
+	       xtagDescs[i].name,
 	       xtagDescs[i].description? xtagDescs[i].description: "NONE",
 	       getXtagDesc (i)->enabled? "on": "off");
 }
@@ -87,4 +88,13 @@ extern boolean enableXtag (xtagType type, boolean state)
 	desc->isEnabled = NULL;;
 
 	return old;
+}
+
+const char* getXtagName (xtagType type)
+{
+	xtagDesc* desc = getXtagDesc (type);
+	if (desc)
+		return desc->name;
+	else
+		return NULL;
 }
