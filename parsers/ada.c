@@ -432,6 +432,7 @@ static adaTokenInfo *newAdaToken(const char *name, int len, adaKind kind,
   }
   else
   {
+    markTagExtraBit (&token->tag, XTAG_FILE_SCOPE);
     token->tag.isFileScope = TRUE;
   }
 

@@ -1497,6 +1497,8 @@ static void makeTag (const tokenInfo *const token,
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
 		e.isFileScope	= isFileScope;
+		if (e.isFileScope)
+			markTagExtraBit (&e, XTAG_FILE_SCOPE);
 
 		isScopeBuilt = findScopeHierarchy (scope, st);
 		addOtherFields (&e, type, st, scope, typeRef);
