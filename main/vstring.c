@@ -139,7 +139,7 @@ extern void vStringNCatS (
 	const char *p = s;
 	size_t remain = length;
 
-	while (*p != '\0'  &&  remain > 0)
+	while (remain > 0 && *p != '\0')
 	{
 		vStringPut (string, *p);
 		--remain;
