@@ -170,7 +170,7 @@ static void printField (fieldType i)
 
 extern void printFields (void)
 {
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < ARRAY_SIZE (fieldDescs); i++)
 		printField (i);

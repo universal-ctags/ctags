@@ -77,7 +77,8 @@ static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
 			     const tagXpathTableTable *xpathTableTable,
 			     const kindOption* const kinds,void *userData)
 {
-	unsigned int i, j;
+	unsigned int i;
+	int j;
 	xmlNode * node;
 
 	Assert (root);
