@@ -137,9 +137,9 @@ static const tagRegexTable const antTagRegexTable [] = {
 
 static void
 antFindTagsUnderProject (xmlNode *node,
-			 const struct sTagXpathRecurSpec *spec,
+			 const struct sTagXpathRecurSpec *spec __unused__,
 			 xmlXPathContext *ctx,
-			 void *userData)
+			 void *userData __unused__)
 {
 	int corkIndex = SCOPE_NIL;
 
@@ -154,7 +154,7 @@ antFindTagsUnderProject (xmlNode *node,
 }
 
 static void antFindTagsUnderTask (xmlNode *node,
-				  const struct sTagXpathRecurSpec *spec,
+				  const struct sTagXpathRecurSpec *spec __unused__,
 				  xmlXPathContext *ctx,
 				  void *userData)
 {
@@ -166,8 +166,8 @@ static void antFindTagsUnderTask (xmlNode *node,
 		     &corkIndex);
 }
 
-static void makeTagForProjectName (xmlNode *node,
-				   const struct sTagXpathMakeTagSpec *spec,
+static void makeTagForProjectName (xmlNode *node __unused__,
+				   const struct sTagXpathMakeTagSpec *spec __unused__,
 				   struct sTagEntryInfo *tag,
 				   void *userData)
 {
@@ -176,8 +176,8 @@ static void makeTagForProjectName (xmlNode *node,
 	*corkIndex = makeTagEntry (tag);
 }
 
-static void makeTagForTargetName (xmlNode *node,
-				  const struct sTagXpathMakeTagSpec *spec,
+static void makeTagForTargetName (xmlNode *node __unused__,
+				  const struct sTagXpathMakeTagSpec *spec __unused__,
 				  struct sTagEntryInfo *tag,
 				  void *userData)
 {
@@ -191,8 +191,8 @@ static void makeTagForTargetName (xmlNode *node,
 	*corkIndex = makeTagEntry (tag);
 }
 
-static void makeTagWithScope (xmlNode *node,
-			      const struct sTagXpathMakeTagSpec *spec,
+static void makeTagWithScope (xmlNode *node __unused__,
+			      const struct sTagXpathMakeTagSpec *spec __unused__,
 			      struct sTagEntryInfo *tag,
 			      void *userData)
 {

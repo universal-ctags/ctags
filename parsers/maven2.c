@@ -55,8 +55,8 @@ static void makeTagWithScope (xmlNode *node,
 
 
 static void makeTagForProperties (xmlNode *node,
-				  const struct sTagXpathRecurSpec *spec,
-				  xmlXPathContext *ctx,
+				  const struct sTagXpathRecurSpec *spec __unused__,
+				  xmlXPathContext *ctx __unused__,
 				  void *userData)
 {
 	const xmlChar* str;
@@ -109,7 +109,7 @@ static tagXpathTableTable maven2XpathTableTable[] = {
 	[TABLE_MAIN] = { ARRAY_AND_SIZE(maven2XpathMainTable) },
 };
 
-static void makeTagWithScope (xmlNode *node,
+static void makeTagWithScope (xmlNode *node __unused__,
 			      const struct sTagXpathMakeTagSpec *spec,
 			      struct sTagEntryInfo *tag,
 			      void *userData)

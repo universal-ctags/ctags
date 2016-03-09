@@ -1542,7 +1542,7 @@ static void processListAliasesOption (
 }
 
 static void processListExtraOption (
-		const char *const option, const char *const parameter)
+		const char *const option __unused__, const char *const parameter __unused__)
 {
 	int i;
 	for (i = 0; i < XTAG_COUNT; i++)
@@ -1813,7 +1813,7 @@ static void processOptionFile (
 		vStringDelete (vpath);
 }
 
-static void processPseudoTags (const char *const option,
+static void processPseudoTags (const char *const option __unused__,
 			       const char *const parameter)
 {
 	const char *p = parameter;

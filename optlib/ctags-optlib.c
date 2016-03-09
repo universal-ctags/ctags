@@ -6,7 +6,7 @@
 #include "routines.h"
 
 
-static void initializeCtagsParser (const langType language)
+static void initializeCtagsParser (const langType language __unused__)
 {
 }
 

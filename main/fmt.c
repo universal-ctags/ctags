@@ -31,7 +31,7 @@ struct sFmtElement {
 	struct sFmtElement *next;
 };
 
-static int printLiteral (fmtSpec* fspec, FILE* fp, const tagEntryInfo * tag)
+static int printLiteral (fmtSpec* fspec, FILE* fp, const tagEntryInfo * tag __unused__)
 {
 	return fputs (fspec->const_str, fp);
 }
