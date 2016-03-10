@@ -68,7 +68,7 @@ evaluate_current_token:
 		switch(g_cxx.pToken->eType)
 		{
 			case CXXTokenTypeSmallerThanSign:
-				if(g_cxx.pToken->pPrev && (g_cxx.pToken->pPrev->eType == CXXTokenTypeIdentifier))
+				if(g_cxx.pToken->pPrev && cxxTokenTypeIsOneOf(g_cxx.pToken->pPrev,CXXTokenTypeIdentifier | CXXTokenTypeKeyword))
 				{
 					if(!cxxParserParseNextToken())
 					{
