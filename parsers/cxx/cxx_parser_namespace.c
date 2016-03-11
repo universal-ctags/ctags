@@ -97,7 +97,7 @@ boolean cxxParserParseNamespace(void)
 				if(iScopeCount == 0)
 				{
 					// anonymous namespace!
-					CXXToken * t = cxxTokenCreateAnonymousIdentifier();
+					CXXToken * t = cxxTokenCreateAnonymousIdentifier(CXXTagKindNAMESPACE);
 					tagEntryInfo * tag = cxxTagBegin(t->pszWord->buffer,CXXTagKindNAMESPACE,t);
 					if(tag)
 					{

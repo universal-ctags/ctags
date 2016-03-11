@@ -359,7 +359,7 @@ boolean cxxParserParseEnum(void)
 		CXX_DEBUG_PRINT("Enum name is %s",vStringValue(pEnumName->pszWord));
 		cxxTokenChainTake(g_cxx.pTokenChain,pEnumName);
 	} else {
-		pEnumName = cxxTokenCreateAnonymousIdentifier();
+		pEnumName = cxxTokenCreateAnonymousIdentifier(CXXTagKindENUM);
 		CXX_DEBUG_PRINT("Enum name is %s (anonymous)",vStringValue(pEnumName->pszWord));
 	}
 
@@ -564,7 +564,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 		CXX_DEBUG_PRINT("Class/struct/union name is %s",vStringValue(pClassName->pszWord));
 		cxxTokenChainTake(g_cxx.pTokenChain,pClassName);
 	} else {
-		pClassName = cxxTokenCreateAnonymousIdentifier();
+		pClassName = cxxTokenCreateAnonymousIdentifier(eTagKind);
 		CXX_DEBUG_PRINT("Class/struct/union name is %s (anonymous)",vStringValue(pClassName->pszWord));
 	}
 

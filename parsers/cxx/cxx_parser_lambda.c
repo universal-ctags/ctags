@@ -79,7 +79,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 {
 	CXX_DEBUG_ENTER();
 
-	CXXToken * pIdentifier = cxxTokenCreateAnonymousIdentifier();
+	CXXToken * pIdentifier = cxxTokenCreateAnonymousIdentifier(CXXTagKindFUNCTION);
 
 	CXXTokenChain * pSave = g_cxx.pTokenChain;
 	CXXTokenChain * pNew = cxxTokenChainCreate();

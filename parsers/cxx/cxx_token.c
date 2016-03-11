@@ -120,7 +120,7 @@ static unsigned int hash(const unsigned char *str)
 }
 
 
-CXXToken * cxxTokenCreateAnonymousIdentifier(void)
+CXXToken * cxxTokenCreateAnonymousIdentifier(enum CXXTagKind k)
 {
 	g_uNextAnonumousIdentiferId++;
 
@@ -137,7 +137,7 @@ CXXToken * cxxTokenCreateAnonymousIdentifier(void)
 
 	unsigned int uHash = hash((const unsigned char *)getInputFileName());
 
-	sprintf(szNum,"%08x%02x",uHash,g_uNextAnonumousIdentiferId);
+	sprintf(szNum,"%08x%02x%02x",uHash,g_uNextAnonumousIdentiferId, k);
 
 	vStringCatS(t->pszWord,szNum);
 	t->bFollowedBySpace = TRUE;
