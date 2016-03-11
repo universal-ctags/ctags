@@ -13,6 +13,18 @@ The goal of the project is preparing and maintaining common/unified working
 space where people interested in making ctags better can work
 together.
 
+## The latest build and package ##
+
+If you want to try the latest universal-ctags without building it yourself...
+
+### Windows
+- Go to https://ci.appveyor.com/project/kozo2/ctags
+  - Click the ```compiler=msvc, ARCH=x64``` (or ```compiler=msvc, ARCH=x86```) build.
+  - View the *Artifacts* tab and download ```ctags.exe```.
+  - Add the binary folder to your PATH.
+
+### Mac
+See [Homebrew Tap for Universal Ctags](https://github.com/universal-ctags/homebrew-universal-ctags)
 
 ## How to build and install ##
 
