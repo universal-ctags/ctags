@@ -1,0 +1,4 @@
+makeArrayRef	input.cpp	/^makeArrayRef(ValueType (&p_data)[N], SizeType& p_size)$/;"	f
+p_data	input.cpp	/^makeArrayRef(ValueType (&p_data)[N], SizeType& p_size)$/;"	z	function:makeArrayRef	typeref:typename:ValueType (&)[N]	file:
+p_size	input.cpp	/^makeArrayRef(ValueType (&p_data)[N], SizeType& p_size)$/;"	z	function:makeArrayRef	typeref:typename:SizeType &	file:
+foo	input.cpp	/^void foo()$/;"	f

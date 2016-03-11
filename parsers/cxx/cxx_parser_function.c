@@ -836,17 +836,19 @@ try_again:
 		{
 			CXX_DEBUG_PRINT("Found parenthesis chain");
 			// Either part of function pointer declaration or a very ugly variable decl
-			// Something like type (*name)(args) or type (*name)
+			// Examples are:
+			//    type (*name)(args)
+			//    type (*name)
+			//    type (&name)
+			//    type (&name)[something]
+			//    ...
+			//
+			// FIXME: This check should be stricter (?)
 			if(
 				(
-					// first parenthesis
-					//t->pNext && <-- this breaks a test
-					//t->pNext->eType == CXXTokenTypeParenthesisChain && <-- this breaks a test :/
-					cxxTokenChainFirstTokenOfType(t->pChain,CXXTokenTypeStar) // part of (*name) <-- this breaks tests :(
-				) || (
-					// second parenthesis
-					//t->pPrev &&
-					//(t->pPrev->eType == CXXTokenTypeParenthesisChain) &&
+					!cxxTokenChainFirstTokenOfType(t->pChain,TOKENS_THAT_SHOULD_NOT_APPEAR_IN_SIGNATURE_BEFORE_ASSIGNMENT)
+				) && (
+					cxxTokenChainFirstTokenOfType(t->pChain,CXXTokenTypeStar | CXXTokenTypeAnd) || // part of (*name) or (&name)
 					cxxParserTokenChainLooksLikeFunctionParameterList(t->pChain,NULL) // args
 				)
 			)
@@ -894,13 +896,22 @@ try_again:
 					pIdentifier = t->pPrev;
 				} else if(t->pPrev->pPrev)
 				{
+					boolean bPrevIsSquareParenthesis = cxxTokenTypeIs(t->pPrev,CXXTokenTypeSquareParenthesisChain);
+				
 					if(
-						cxxTokenTypeIs(t->pPrev,CXXTokenTypeSquareParenthesisChain) &&
+						bPrevIsSquareParenthesis &&
 						cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeIdentifier)
 					)
 					{
 						// type var[]
 						pIdentifier = t->pPrev->pPrev;
+					} else if(
+						bPrevIsSquareParenthesis &&
+						cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeParenthesisChain) &&
+						(pIdentifier = cxxTokenChainFirstTokenOfType(t->pPrev->pPrev->pChain,CXXTokenTypeIdentifier))
+					)
+					{
+						// type (...var)[]
 					} else if(
 						cxxTokenTypeIs(t->pPrev,CXXTokenTypeNumber) &&
 						cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeIdentifier)
@@ -910,8 +921,20 @@ try_again:
 						pIdentifier = t->pPrev->pPrev;
 					} else if(
 						cxxTokenTypeIs(t->pPrev,CXXTokenTypeParenthesisChain) &&
-						cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeParenthesisChain) &&
-						(pIdentifier = cxxTokenChainLastPossiblyNestedTokenOfType(t->pPrev->pPrev->pChain,CXXTokenTypeIdentifier))
+						(
+							(
+								// type (*name)(args)
+								cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeParenthesisChain) &&
+								(pIdentifier = cxxTokenChainLastPossiblyNestedTokenOfType(t->pPrev->pPrev->pChain,CXXTokenTypeIdentifier)) &&
+								pIdentifier->pPrev &&
+								cxxTokenTypeIs(pIdentifier->pPrev,CXXTokenTypeStar)
+							) || (
+								// type (*&name)
+								(pIdentifier = cxxTokenChainLastPossiblyNestedTokenOfType(t->pPrev->pChain,CXXTokenTypeIdentifier)) &&
+								pIdentifier->pPrev &&
+								cxxTokenTypeIsOneOf(pIdentifier->pPrev,CXXTokenTypeStar | CXXTokenTypeAnd)
+							)
+						)
 					)
 					{
 						// type (*ptr)(args)
