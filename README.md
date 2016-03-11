@@ -18,7 +18,7 @@ together.
 If you want to try the latest universal-ctags without building it yourself...
 
 ### Windows
-- Go to https://ci.appveyor.com/project/kozo2/ctags
+- Go to https://ci.appveyor.com/project/masatake/ctags
   - Click the ```compiler=msvc, ARCH=x64``` (or ```compiler=msvc, ARCH=x86```) build.
   - View the *Artifacts* tab and download ```ctags.exe```.
   - Add the binary folder to your PATH.
