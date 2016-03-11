@@ -1,15 +1,14 @@
 .. _optlib:
 
-
 Extending ctags with Regex parser(*optlib*)
-======================================================================
+---------------------------------------------------------------------
 
 :Maintainer: Masatake YAMATO <yamato@redhat.com>
 
 ----
 
 Writing regex parser and using it as option library(*optlib*)
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 exuberant-ctags provides the way to customize ctags with options like
 ``--langdef=<LANG>`` and ``--regex-<LANG>``. An option file where options are
@@ -135,7 +134,7 @@ suffix rules and other conventions may change.
 See "Contributing an optlib" if you have a good optlib.
 
 Loading option recursively
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The option file loading rules explained in "Option library" is more
 complex. If a directory is specified as parameter for ``--option`` instead
@@ -182,7 +181,7 @@ in the supported features::
 
 
 Directories for preloading
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As written in "Option library", option libraries can be loaded with
 ``--options`` option. However, loading them without explicitly
@@ -259,7 +258,7 @@ This feature is heavily inspired by systemd.
 
 
 Long regex flag
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Regex parser is made more useful by adding more kinds of flags
 to ``--regex-<LANG>`` expression. As explained in
@@ -303,7 +302,7 @@ use, but long flags are mostly intended for option libraries.
 The notion for the long flag is also introduced in ``--langdef`` option.
 
 Exclusive flag in regex
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A line read from input files was matched with **all** regular expressions
 defined with ``--regex-<LANG>``. Each regular
@@ -332,7 +331,7 @@ be better than nothing. Ghost kind is assigned to the empty name
 pattern. (See "Ghost kind in regex parser".)
 
 Ghost kind in regex parser
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If a whitespace is used as a kind letter, it is never printed when
 ctags is called with ``--list-kinds`` option.  This kind is
@@ -341,7 +340,7 @@ automatically assigned to an empty name pattern.
 Normally you don't need to know this.
 
 Passing parameter for long regex flag
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In the implemented API long-flags can take a parameters.
 Conceptual example::
@@ -353,7 +352,7 @@ Conceptual example::
 Currently scope long flag taking such parameter.
 
 Scope tracking in a regex parser
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 With scope long flag, you can record/track scope context.
 A stack is used for tracking the scope context.
@@ -437,11 +436,11 @@ Example 2::
 
 
 Override the letter for file kind
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 (See also #317.)
 
 Background
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 ``F`` is widely used as a kind letter for file kind. The ``F`` was
 hardcoded in ctags internal. However, we found some built-in parsers
 including Ruby uses ``F`` for their own kind. So if you find a tag
@@ -468,7 +467,7 @@ parser. In xcmd parser you may have no choice if the back-end tags file
 generator uses ``F`` for its own purpose.
 
 Usage
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 For overriding add ``fileKind`` long flag ``--langdef=LANG`` option.
 Following is an example to use ``Z`` as a kind letter in a language named
 ``foo``::
@@ -490,7 +489,7 @@ To know the fileKind of languages, use ``--list-file-kind``::
 
 
 Submitting an optlib to universal-ctags project
----------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You are welcome.
 
@@ -512,7 +511,7 @@ deals with. Assume source files written in Swine language have a suffix
 
 
 Changes in options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 universal-ctags prepares aliases for options.
 
 ========================= ====================
@@ -528,7 +527,7 @@ more language/parser centric. I'm not sure this idea is good
 or not.
 
 Copyright notice, contact mail address and license term
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 
 Put these information at the header of *swine.ctags*.
 
@@ -566,7 +565,7 @@ which generates *.c* file from a given option file. As the result the
 or later version" may be required.
 
 *Units* test cases
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 
 We, universal-ctags developers don't have enough time to learn all
 languages supported by ctags. In other word, we cannot review the
@@ -595,7 +594,7 @@ Assume your test name is *swine-simile.d*. Put ``--option=swine`` in
 *Units/swine-simile.d/args.ctags*.
 
 Makefile.in
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 Add your optlib file, *swine.ctags* to ``PRELOAD_OPTLIB`` variable of
 *Makefile.in*.
 
@@ -605,7 +604,7 @@ put your optlib file to ``OPTLIB`` of *Makefile.in* instead of
 ``PRELOAD_OPTLIB``.
 
 Verification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 
 Let's verify all your work here.
 
@@ -623,7 +622,7 @@ Let's verify all your work here.
 
 
 Pull-request
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 
 Remember your *.ctags* is treasure and can be shared as a first class
 software component in universal-ctags.  Again, pull-requests are welcome.

@@ -1,14 +1,20 @@
-The contents of next section is a copy of FORMAT file in exuberant
-ctags source code in its subversion repository at sourceforge.net.
-I(Masatake YAMATO) changed only its format in the most of all
-parts.  I added a subsection for showing the position of universal
-ctags.
-
-----
-
-
+===================================================================
 Proposal for extended Vi tags file format
 ===================================================================
+
+.. note::
+
+    The contents of next section is a copy of FORMAT file in exuberant
+    ctags source code in its subversion repository at sourceforge.net.
+    I(Masatake YAMATO) changed only its format in the most of all
+    parts.  I added a subsection for showing the position of universal
+    ctags.
+
+.. contents:: `Table of contents`
+	:depth: 3
+	:local:
+
+----
 
 :Version: 0.06 DRAFT
 :Date: 1998 Feb 8

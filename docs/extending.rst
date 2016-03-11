@@ -1,3 +1,4 @@
+=============================================================================
 Extending ctags
 =============================================================================
 
@@ -17,11 +18,10 @@ parser definition with other.
 Above new feature is very experimental, especially the directory layout
 for `optlib <optlib>` will be changed in the future.
 
-.. 
-	revised version of EXTENDING.html should be here.
+.. toctree::
+	:maxdepth: 2
 
-:ref:`xcmd`
-     
-:ref:`optlib`
+	xcmd.rst
+	optlib.rst
+	internal.rst
 
-:ref:`internal`
