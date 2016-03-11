@@ -1,5 +1,10 @@
+=============================================================================
 Choosing a proper parser in ctags
 =============================================================================
+
+.. contents:: `Table of contents`
+	:depth: 3
+	:local:
 
 Universal ctags has multiple way to guess the language of input files.
 

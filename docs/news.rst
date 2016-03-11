@@ -1,7 +1,12 @@
+======================================================================
 Introduced changes
 ======================================================================
 
 :Maintainer: Masatake YAMATO <yamato@redhat.com>
+
+.. contents:: `Table of contents`
+	:depth: 3
+	:local:
 
 ----
 
@@ -249,7 +254,7 @@ All pseudo tags are enabled if `*` is given as the name of ptag like::
 	--pseudo-tags=*
 
 All pseudo tags are disabled if no option value is given to
-``--pseudo-tags` option like::
+``--pseudo-tags`` option like::
 
 	--pseudo-tags=
 
@@ -440,8 +445,7 @@ ctags emits ``TAG_KIND_SEPARATOR`` with following format::
 
 	!_TAG_KIND_SEPARATOR!{parser}	{sep}	/{upper}{lower}/
 
-or
-::
+or ::
 
 	!_TAG_KIND_SEPARATOR!{parser}	{sep}	/{lower}/
 
@@ -474,9 +478,9 @@ Example output:
     ...
 
 The first line means `::` is used when combining something with an
-item of class kind. The second line means `\` is used when a class
+item of class kind. The second line means `\\` is used when a class
 item is at the top level, no upper item for it. The third line
-means `\` is used when for combining a namespace item(upper) and a
+means `\\` is used when for combining a namespace item(upper) and a
 class item(lower). Of course, ctags uses more specific one when
 choosing a separator; the third one has higher priority than the
 first.

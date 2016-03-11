@@ -1,15 +1,13 @@
 .. Universal Ctag documentation master file
 
-========================================================================
+#####################################################################
 universal-ctags hacking guide
-========================================================================
+#####################################################################
 
 :Version: Draft
 :Authors: universal-ctags developers
 :Web Page: https://ctags.io/
 
-Introduction
-======================================================================
 universal-ctags has the objective of continuing the
 development from what existed in the `Sourceforge`_ area. GitHub
 exuberant-ctags repository was started by Reza Jelveh
@@ -31,12 +29,8 @@ Proofreading and pull-requests are welcome!
 .. _universal-ctags organization: https://github.com/universal-ctags
 
 
-Contents
-======================================================================
-
 .. toctree::
 	:maxdepth: 2
-
 
 	news.rst
 	guessing.rst
@@ -47,20 +41,3 @@ Contents
 	other-projects.rst
 	format.rst
 	developers.rst
-
-.. toctree::
-	:hidden:
-
-	windows.rst
-	osx.rst
-	autotools.rst
-	chop.rst
-	noise.rst
-	semifuzz.rst
-	tinst.rst
-	tmain.rst
-	tracking.rst
-	units.rst
-	optlib.rst
-	xcmd.rst
-	internal.rst

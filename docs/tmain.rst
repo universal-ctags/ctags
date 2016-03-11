@@ -1,5 +1,3 @@
-.. _tmain:
-
 *Tmain*: a facility for testing main part
 ------------------------------------------------------------
 

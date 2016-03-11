@@ -1,11 +1,8 @@
-.. _internal:
-
-
 ctags Internal API
-============================================================
+---------------------------------------------------------------------
 
 Input text stream
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. figure:: input-text-stream.svg
 	    :scale: 80%
@@ -21,7 +18,7 @@ are for ctags main part.
 
 
 `inputFile` type and the functions of input group
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 
 `inputFile` is the type for representing the input file and stream for
 a parser. Ctags uses a global variable `File` having type `inputFile`
@@ -48,7 +45,7 @@ this group.
 
 
 The functions of bypass group
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 The functions of bypass group (`readLineFromBypass` and
 `readLineFromBypassSlow`) are used for reading text from `fp` field of
 `File` global variable without updating `input` and `source` fields of
@@ -61,7 +58,7 @@ fields of tags file, for example.
 
 
 The functions of raw group
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 The functions of this group(`readLineRaw` and `readLineRawWithNoSeek`)
 take a parameter having type `FILE *`; and don't touch `File` global
 variable.
@@ -72,22 +69,22 @@ for example.
 
 
 Automatic parser guessing
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Managing regular expression parsers
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Parser combination
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Parser written in C
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Tag entfry info
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Output tag stream
-------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. figure:: output-tag-stream.svg
 	    :scale: 80%
@@ -103,10 +100,10 @@ The queue is flushed when `useCork` in unset. See `cork API` for more
 details.
 
 cork API
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+......................................................................
 
 Background and Idea
-......................................................................
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 cork API is introduced for recording scope information easier.
 
 Before introducing cork, a scope information must be recorded as
@@ -137,7 +134,7 @@ freed after recording.  In cork API, it is not freed after recording;
 a parser can reused it as scope information.
 
 How to use
-......................................................................
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 See a commit titled with "clojure: use cork". I applied cork
 API to the clojure parser.
