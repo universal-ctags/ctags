@@ -242,6 +242,7 @@ extern boolean enableRegexKind (const langType language, const int kind, const b
 extern boolean isRegexKindEnabled (const langType language, const int kind);
 extern boolean hasRegexKind (const langType language, const int kind);
 extern void printRegexKinds (const langType language, boolean allKindFields, boolean indent);
+extern void foreachRegexKinds (const langType language, boolean (* func) (kindOption*, void*), void *data);
 extern void freeRegexResources (void);
 extern boolean checkRegex (void);
 extern void useRegexMethod (const langType language);
