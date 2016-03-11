@@ -229,6 +229,64 @@ In this example, ``role`` is prefixed.
 ``--maxdepth`` limits the depth of directory recursion enabled with ``-R``
 option.
 
+``--map-<LANG>`` option
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To control langmap in finer grained than ``--langmap`` option,
+``--map-<LANG>`` is introduced.
+
+An entry of langmap is defined with a pair of an file extension(or a pattern)
+and the name of language. Here we use "spec" as a generic term representing
+file extension and pattern.
+
+``--langmap`` option manipulates exclusive way::
+
+  $ ./ctags --langdef=FOO --langmap=FOO:+.ABC \
+	    --langdef=BAR --langmap=BAR:+.ABC  \
+	    --list-maps | grep '\*.ABC$'
+  BAR      *.ABC
+
+Though `FOO` is added before adding `BAR`,
+only `BAR` are remained as a handler for the spec `*.ABC`.
+
+Universal ctags allows adding multiple parsers for a spec.
+One of them can be chosen for an input file by variety parser
+guessing rules inside ctags(See "Choosing a proper parser in ctags").
+
+For getting the benefits from the parser guessing rules, non-exclusive way
+for manipulating the langmap is needed. ``--map-<LANG>`` option is for the
+purpose.
+
+Let's see how it manipulates non-exclusive way::
+
+    % ./ctags --langdef=FOO --map-FOO=+.ABC \
+	      --langdef=BAR --map-BAR=+.ABC \
+	      --list-maps | grep '\*.ABC$'
+    FOO      *.ABC
+    BAR      *.ABC
+
+Both `FOO` and `BAR` are registered. ``--map-<LANG>`` can be used
+not only for adding a langmap entry but also for removing it.::
+
+    $ ./ctags --langdef=FOO --map-FOO=+.ABC \
+	      --langdef=BAR --map-BAR=+.ABC \
+	      --map-FOO=-.ABC --list-maps | grep '\*.ABC$'
+    BAR      *.ABC
+
+    $ ./ctags --langdef=FOO --map-FOO=+.ABC \
+	      --langdef=BAR --map-BAR=+.ABC \
+	      --map-BAR=-.ABC --list-maps | grep '\*.ABC$'
+    FOO      *.ABC
+
+    $./ctags --langdef=FOO --map-FOO=+.ABC \
+	     --langdef=BAR --map-BAR=+.ABC \
+	     --map-BAR=-.ABC --map-FOO=-.ABC  --list-maps | grep '\*.ABC$'
+    (NOTHING)
+
+``--langmap`` option provides the way to manipulate langmap in spec
+centrist form. ``--map-<LANG>`` option provides the way to manipulate
+langmap in parser centrist form.
+
 
 Guessing parser from file contents (``-G`` option)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -699,5 +757,3 @@ Examples of filter expressions
 	$ ./readtags  -e -t foo.tags -Q '(and (member "Foo" $inherits) (eq? $kind "class"))' -l
 	Bar	foo.py	/^class Bar (Foo):$/;"	kind:class	language:Python	inherits:Foo	access:public
 	Baz	foo.py	/^class Baz (Foo): $/;"	kind:class	language:Python	inherits:Foo	access:public
-
-
