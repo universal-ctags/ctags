@@ -799,7 +799,7 @@ static unsigned int sortAndFilterParserCandidates (parserCandidate  *candidates,
 						   unsigned int n_candidates)
 {
 	enum specType highestSpecType;
-	int i;
+	unsigned int i;
 	unsigned int r;
 
 	if (n_candidates < 2)
@@ -822,7 +822,7 @@ static void verboseReportCandidate (const char *header,
 				    parserCandidate  *candidates,
 				    unsigned int n_candidates)
 {
-	int i;
+	unsigned int i;
 	verbose ("		#%s: %u\n", header, n_candidates);
 	for (i = 0; i < n_candidates; i++)
 		verbose ("			%u: %s (%s: \"%s\")\n",
@@ -1543,7 +1543,7 @@ static void printRoles (const langType language, const char* letters, boolean al
 
 	for (c = letters; *c != '\0'; c++)
 	{
-		int i;
+		unsigned int i;
 		const kindOption *k;
 
 		for (i = 0; i < lang->kindCount; ++i)
@@ -2107,7 +2107,7 @@ extern void makeKindSeparatorsPseudoTags (const langType language,
 	parserDefinition* lang;
 	kindOption *kinds;
 	unsigned int kindCount;
-	int i, j;
+	unsigned int i, j;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];

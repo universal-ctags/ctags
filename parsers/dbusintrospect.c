@@ -91,9 +91,9 @@ static tagXpathTableTable dbusIntrospectXpathTableTable[] = {
 };
 
 static void dbusIntrospectFindTagsUnderInterface (xmlNode *node,
-						  const struct sTagXpathRecurSpec *spec,
+						  const struct sTagXpathRecurSpec *spec __unused__,
 						  xmlXPathContext *ctx,
-						  void *userData)
+						  void *userData __unused__)
 {
 	int corkIndex = SCOPE_NIL;
 
@@ -107,8 +107,8 @@ static void dbusIntrospectFindTagsUnderInterface (xmlNode *node,
 		     &corkIndex);
 }
 
-static void makeTagWithScope (xmlNode *node,
-			      const struct sTagXpathMakeTagSpec *spec,
+static void makeTagWithScope (xmlNode *node __unused__,
+			      const struct sTagXpathMakeTagSpec *spec __unused__,
 			      struct sTagEntryInfo *tag,
 			      void *userData)
 {
@@ -119,8 +119,8 @@ static void makeTagWithScope (xmlNode *node,
 	makeTagEntry (tag);
 }
 
-static void makeTagForInterfaceName (xmlNode *node,
-				     const struct sTagXpathMakeTagSpec *spec,
+static void makeTagForInterfaceName (xmlNode *node __unused__,
+				     const struct sTagXpathMakeTagSpec *spec __unused__,
 				     struct sTagEntryInfo *tag,
 				     void *userData)
 {

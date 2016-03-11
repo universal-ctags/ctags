@@ -220,7 +220,7 @@ trimIdentifier (enum perl6Kind kind, const char **ps, int len)
 
 struct p6Ctx {
     enum token  tokens[128 /* unlikely to need more than this */];
-    int         n_tokens;
+    unsigned int n_tokens;
     vString    *name;
     const char *line;      /* Saved from readLineFromInputFile() */
 };

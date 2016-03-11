@@ -257,9 +257,10 @@ EOF
 
 sub emit_initializer {
     my $opts = shift;
+    my $may_unused = (@{$opts->{'xcmds'}} || @{$opts->{'disabledKinds'}}) ? "": " __unused__";
 
     print <<EOF;
-static void initialize$opts->{'Clangdef'}Parser (const langType language)
+static void initialize$opts->{'Clangdef'}Parser (const langType language$may_unused)
 {
 EOF
     for (@{$opts->{'xcmds'}}) {

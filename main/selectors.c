@@ -296,7 +296,7 @@ selectByRexxCommentAndDosbatchLabelPrefix (FILE *input)
 #include <libxml/xpath.h>
 #include <libxml/tree.h>
 
-static void suppressWarning (void *ctx, const char *msg, ...)
+static void suppressWarning (void *ctx __unused__, const char *msg __unused__, ...)
 {
 }
 

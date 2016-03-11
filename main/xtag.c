@@ -16,7 +16,7 @@
 #include "routines.h"
 #include "xtag.h"
 
-static boolean isPseudoTagsEnabled (xtagDesc *pdesc)
+static boolean isPseudoTagsEnabled (xtagDesc *pdesc __unused__)
 {
 	return ! isDestinationStdout ();
 }

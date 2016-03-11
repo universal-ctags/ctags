@@ -62,7 +62,7 @@ out:
 	xmlFree (str);
 }
 
-extern void addTagXpath (const langType language, tagXpathTable *xpathTable)
+extern void addTagXpath (const langType language __unused__, tagXpathTable *xpathTable)
 {
 	Assert (xpathTable->xpath);
 	Assert (!xpathTable->xpathCompiled);
@@ -77,7 +77,8 @@ static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
 			     const tagXpathTableTable *xpathTableTable,
 			     const kindOption* const kinds,void *userData)
 {
-	unsigned int i, j;
+	unsigned int i;
+	int j;
 	xmlNode * node;
 
 	Assert (root);
@@ -124,7 +125,7 @@ static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
 	}
 }
 
-static void suppressWarning (void *ctx, const char *msg, ...)
+static void suppressWarning (void *ctx __unused__, const char *msg __unused__, ...)
 {
 }
 

@@ -170,19 +170,19 @@ static void printField (fieldType i)
 
 extern void printFields (void)
 {
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < ARRAY_SIZE (fieldDescs); i++)
 		printField (i);
 }
 
-static const char *renderAsIs (vString* b, const char *s)
+static const char *renderAsIs (vString* b __unused__, const char *s)
 {
 	return s;
 }
 
 static const char *renderEscapedString (const char *s,
-					const tagEntryInfo *const tag,
+					const tagEntryInfo *const tag __unused__,
 					vString* b)
 {
 	vStringCatSWithEscaping (b, s);
