@@ -86,7 +86,9 @@ typedef struct _CXXToken
 
 CXXToken * cxxTokenCreate(void);
 void cxxTokenDestroy(CXXToken * t);
-CXXToken * cxxTokenCreateAnonymousIdentifier(void);
+
+enum CXXTagKind;
+CXXToken * cxxTokenCreateAnonymousIdentifier(enum CXXTagKind k);
 
 #define cxxTokenTypeIsOneOf(_pToken,_uTypes) (_pToken->eType & (_uTypes))
 #define cxxTokenTypeIs(_pToken,_eType) (_pToken->eType == _eType)
