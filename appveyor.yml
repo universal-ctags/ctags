@@ -20,3 +20,6 @@ build_script:
 
 test_script:
   - '%APPVEYOR_BUILD_FOLDER%\win32\appveyor.bat test'
+
+artifacts:
+  - path: ctags.exe
