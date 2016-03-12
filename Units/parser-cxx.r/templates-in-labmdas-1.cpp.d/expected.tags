@@ -5,6 +5,6 @@ b	input.cpp	/^    Bar<int> b;$/;"	local	function:f1	file:
 t	input.cpp	/^    auto t = b.template foo<int>();$/;"	local	function:f1	file:
 f2	input.cpp	/^int f2()$/;"	function	signature:()
 b	input.cpp	/^    Bar<int> b;$/;"	local	function:f2	file:
-__anon1763e78501	input.cpp	/^    auto l = [](auto & p){ return p.template foo<int>();};$/;"	function	function:f2	file:
+__anon1763e7850103	input.cpp	/^    auto l = [](auto & p){ return p.template foo<int>();};$/;"	function	function:f2	file:
 l	input.cpp	/^    auto l = [](auto & p){ return p.template foo<int>();};$/;"	local	function:f2	file:
 main	input.cpp	/^int main()$/;"	function	signature:()

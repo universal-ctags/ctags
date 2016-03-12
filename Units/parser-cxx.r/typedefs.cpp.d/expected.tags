@@ -2,9 +2,9 @@ T01	input.cpp	/^typedef struct AStruct T01;$/;"	t	typeref:struct:AStruct	file:
 T02	input.cpp	/^typedef class AClass T02;$/;"	t	typeref:class:AClass	file:
 T03	input.cpp	/^typedef union AUnion T03;$/;"	t	typeref:union:AUnion	file:
 T04	input.cpp	/^typedef enum AEnum T04;$/;"	t	typeref:enum:AEnum	file:
-T11	input.cpp	/^typedef struct { int a; } T11;$/;"	t	typeref:struct:__anon0e56f33701	file:
-T12	input.cpp	/^typedef union { int a; int b; } T12;$/;"	t	typeref:union:__anon0e56f33702	file:
-T13	input.cpp	/^typedef enum { E2 } T13;$/;"	t	typeref:enum:__anon0e56f33703	file:
+T11	input.cpp	/^typedef struct { int a; } T11;$/;"	t	typeref:struct:__anon0e56f337010a	file:
+T12	input.cpp	/^typedef union { int a; int b; } T12;$/;"	t	typeref:union:__anon0e56f337020c	file:
+T13	input.cpp	/^typedef enum { E2 } T13;$/;"	t	typeref:enum:__anon0e56f3370304	file:
 T21	input.cpp	/^typedef int* T21;$/;"	t	typeref:typename:int *	file:
 T22	input.cpp	/^typedef const AClass* *  T22;$/;"	t	typeref:typename:const AClass **	file:
 T31	input.cpp	/^typedef int (*T31) (int &,int , AUnion *);$/;"	t	typeref:typename:int (*)(int &,int,AUnion *)	file:

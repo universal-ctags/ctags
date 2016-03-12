@@ -1,25 +1,25 @@
-__anon1719c4a501	input.c	/^struct {$/;"	s	file:
-__anon1719c4a502	input.c	/^{$/;"	s	file:
-__anon1719c4a503	input.c	/^{$/;"	s	file:
+__anon1719c4a5010a	input.c	/^struct {$/;"	s	file:
+__anon1719c4a5020a	input.c	/^{$/;"	s	file:
+__anon1719c4a5030a	input.c	/^{$/;"	s	file:
 a	input.c	/^    unsigned int a: 1;$/;"	m	struct:bit_fields	file:
 b	input.c	/^    unsigned int b: 1;$/;"	m	struct:bit_fields	file:
-bad2	input.c	/^    BYTE 	bad2: 1;$/;"	m	struct:__anon1719c4a502	file:
+bad2	input.c	/^    BYTE 	bad2: 1;$/;"	m	struct:__anon1719c4a5020a	file:
 bit_fields	input.c	/^struct bit_fields {$/;"	s	file:
-bitfield_flags	input.c	/^} bitfield_flags;$/;"	t	typeref:struct:__anon1719c4a502	file:
+bitfield_flags	input.c	/^} bitfield_flags;$/;"	t	typeref:struct:__anon1719c4a5020a	file:
 c	input.c	/^    unsigned int c: 2;$/;"	m	struct:bit_fields	file:
-exp	input.c	/^    unsigned exp   : _FP_EXPBITS_D;$/;"	m	struct:__anon1719c4a501	file:
-frac0	input.c	/^    unsigned frac0 : _FP_W_TYPE_SIZE;$/;"	m	struct:__anon1719c4a501	file:
-frac1	input.c	/^    unsigned frac1 : _FP_FRACBITS_D - (_FP_IMPLBIT_D != 0) - _FP_W_TYPE_SIZE;$/;"	m	struct:__anon1719c4a501	file:
-group	input.c	/^    BYTE 	group: 1;$/;"	m	struct:__anon1719c4a502	file:
+exp	input.c	/^    unsigned exp   : _FP_EXPBITS_D;$/;"	m	struct:__anon1719c4a5010a	file:
+frac0	input.c	/^    unsigned frac0 : _FP_W_TYPE_SIZE;$/;"	m	struct:__anon1719c4a5010a	file:
+frac1	input.c	/^    unsigned frac1 : _FP_FRACBITS_D - (_FP_IMPLBIT_D != 0) - _FP_W_TYPE_SIZE;$/;"	m	struct:__anon1719c4a5010a	file:
+group	input.c	/^    BYTE 	group: 1;$/;"	m	struct:__anon1719c4a5020a	file:
 lower	input.c	/^	unsigned char lower:1,$/;"	m	struct:shortname_info	file:
-mystruct	input.c	/^} mystruct;$/;"	t	typeref:struct:__anon1719c4a503	file:
-personal	input.c	/^    BYTE 	personal: 1;$/;"	m	struct:__anon1719c4a502	file:
-private	input.c	/^    BYTE	private;$/;"	m	struct:__anon1719c4a503	file:
-public	input.c	/^    BYTE	public;$/;"	m	struct:__anon1719c4a503	file:
-public	input.c	/^    BYTE 	public: 1;$/;"	m	struct:__anon1719c4a502	file:
+mystruct	input.c	/^} mystruct;$/;"	t	typeref:struct:__anon1719c4a5030a	file:
+personal	input.c	/^    BYTE 	personal: 1;$/;"	m	struct:__anon1719c4a5020a	file:
+private	input.c	/^    BYTE	private;$/;"	m	struct:__anon1719c4a5030a	file:
+public	input.c	/^    BYTE	public;$/;"	m	struct:__anon1719c4a5030a	file:
+public	input.c	/^    BYTE 	public: 1;$/;"	m	struct:__anon1719c4a5020a	file:
 shortname_info	input.c	/^struct shortname_info {$/;"	s	file:
-sign	input.c	/^    unsigned sign  : 1;$/;"	m	struct:__anon1719c4a501	file:
-that	input.c	/^    BYTE	that;$/;"	m	struct:__anon1719c4a503	file:
-this	input.c	/^    BYTE	this;$/;"	m	struct:__anon1719c4a503	file:
+sign	input.c	/^    unsigned sign  : 1;$/;"	m	struct:__anon1719c4a5010a	file:
+that	input.c	/^    BYTE	that;$/;"	m	struct:__anon1719c4a5030a	file:
+this	input.c	/^    BYTE	this;$/;"	m	struct:__anon1719c4a5030a	file:
 upper	input.c	/^		      upper:1,$/;"	m	struct:shortname_info	file:
 valid	input.c	/^		      valid:1;$/;"	m	struct:shortname_info	file:

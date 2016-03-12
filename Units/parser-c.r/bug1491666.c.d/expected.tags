@@ -1,7 +1,7 @@
-__anon329ddd9201	input.c	/^typedef struct {$/;"	s	file:
+__anon329ddd92010a	input.c	/^typedef struct {$/;"	s	file:
 main	input.c	/^void main (void) {$/;"	f
-my_struct	input.c	/^} my_struct;$/;"	t	typeref:struct:__anon329ddd9201	file:
+my_struct	input.c	/^} my_struct;$/;"	t	typeref:struct:__anon329ddd92010a	file:
 var1	input.c	/^	my_struct var1;$/;"	l	function:main	file:
 var2	input.c	/^		var2;$/;"	l	function:main	file:
-x	input.c	/^		x;$/;"	m	struct:__anon329ddd9201	file:
-y	input.c	/^		y;$/;"	m	struct:__anon329ddd9201	file:
+x	input.c	/^		x;$/;"	m	struct:__anon329ddd92010a	file:
+y	input.c	/^		y;$/;"	m	struct:__anon329ddd92010a	file:
