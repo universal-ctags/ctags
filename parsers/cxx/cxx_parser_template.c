@@ -214,13 +214,9 @@ boolean cxxParserParseTemplatePrefix(void)
 
 	cxxTokenChainDestroyLast(g_cxx.pTokenChain); // kill the template keyword
 
-	// Enable specialized tokenisation: both < and > are parsed as single tokens.
-	g_cxx.bParsingTemplateAngleBrackets = TRUE;
-
 	if(!cxxParserParseUpToOneOf(CXXTokenTypeSmallerThanSign | CXXTokenTypeEOF | CXXTokenTypeSemicolon))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to the < sign");
-		g_cxx.bParsingTemplateAngleBrackets = FALSE;
 		return FALSE;
 	}
 
@@ -228,7 +224,6 @@ boolean cxxParserParseTemplatePrefix(void)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Found EOF or semicolon: assuming this is unparseable");
 		cxxParserNewStatement();
-		g_cxx.bParsingTemplateAngleBrackets = FALSE;
 		return TRUE; // tolerate syntax error
 	}
 	
@@ -239,12 +234,9 @@ boolean cxxParserParseTemplatePrefix(void)
 	if(!cxxParserParseTemplatePrefixAngleBrackets())
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse angle brackets");
-		g_cxx.bParsingTemplateAngleBrackets = FALSE;
 		cxxTokenChainDestroy(pSave);
 		return FALSE;
 	}
-
-	g_cxx.bParsingTemplateAngleBrackets = FALSE;
 
 	if(g_cxx.pTemplateTokenChain)
 		cxxTokenChainDestroy(g_cxx.pTemplateTokenChain);

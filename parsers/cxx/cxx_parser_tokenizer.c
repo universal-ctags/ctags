@@ -188,8 +188,8 @@ static CXXCharTypeData g_aCharTable[128] =
 	{ CXXCharTypeNamedSingleOrOperatorToken, CXXTokenTypeSmallerThanSign, 0 },
 	// 061 (0x3d) '='
 	{ CXXCharTypeOperator | CXXCharTypeNamedSingleOrRepeatedCharToken, CXXTokenTypeAssignment, CXXTokenTypeOperator },
-	// 062 (0x3e) '>'
-	{ CXXCharTypeNamedSingleOrOperatorToken, CXXTokenTypeGreaterThanSign, 0 },
+	// 062 (0x3e) '>' // We never merge two >>
+	{ CXXCharTypeNamedSingleCharToken /*CXXCharTypeNamedSingleOrOperatorToken*/, CXXTokenTypeGreaterThanSign, 0 },
 	// 063 (0x3f) '?'
 	{ CXXCharTypeOperator, 0 ,0 },
 	// 064 (0x40) '@'
@@ -592,27 +592,21 @@ boolean cxxParserParseNextToken(void)
 
 	if(uInfo & CXXCharTypeNamedSingleOrOperatorToken)
 	{
-		if(g_cxx.bParsingTemplateAngleBrackets && ((g_cxx.iChar == '>') || (g_cxx.iChar == '<')))
+		t->eType = g_aCharTable[g_cxx.iChar].uSingleTokenType;
+		vStringPut(t->pszWord,g_cxx.iChar);
+		g_cxx.iChar = cppGetc();
+		uInfo = (g_cxx.iChar < 0x80) ? g_aCharTable[g_cxx.iChar].uType : 0;
+		if(uInfo & (CXXCharTypeOperator | CXXCharTypeNamedSingleOrOperatorToken))
 		{
-			// treat as single char tokens below
-			uInfo |= CXXCharTypeNamedSingleCharToken;
-		} else {
-			t->eType = g_aCharTable[g_cxx.iChar].uSingleTokenType;
-			vStringPut(t->pszWord,g_cxx.iChar);
-			g_cxx.iChar = cppGetc();
-			uInfo = (g_cxx.iChar < 0x80) ? g_aCharTable[g_cxx.iChar].uType : 0;
-			if(uInfo & (CXXCharTypeOperator | CXXCharTypeNamedSingleOrOperatorToken))
-			{
-				t->eType = CXXTokenTypeOperator;
-				do {
-					vStringPut(t->pszWord,g_cxx.iChar);
-					g_cxx.iChar = cppGetc();
-					uInfo = (g_cxx.iChar < 0x80) ? g_aCharTable[g_cxx.iChar].uType : 0;
-				} while(uInfo & (CXXCharTypeOperator | CXXCharTypeNamedSingleOrOperatorToken));
-			}
-			t->bFollowedBySpace = isspace(g_cxx.iChar);
-			return TRUE;
+			t->eType = CXXTokenTypeOperator;
+			do {
+				vStringPut(t->pszWord,g_cxx.iChar);
+				g_cxx.iChar = cppGetc();
+				uInfo = (g_cxx.iChar < 0x80) ? g_aCharTable[g_cxx.iChar].uType : 0;
+			} while(uInfo & (CXXCharTypeOperator | CXXCharTypeNamedSingleOrOperatorToken));
 		}
+		t->bFollowedBySpace = isspace(g_cxx.iChar);
+		return TRUE;
 	}
 
 	if(uInfo & CXXCharTypeNamedSingleCharToken)

@@ -181,7 +181,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 	
 			if(t->eType == CXXTokenTypeSmallerThanSign)
 			{
-				t = cxxTokenChainSkipToEndOfAngleBracket(t);
+				t = cxxTokenChainSkipToEndOfTemplateAngleBracket(t);
 				if(!t)
 				{
 					CXX_DEBUG_LEAVE_TEXT("Failed to skip past angle bracket chain");

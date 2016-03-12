@@ -15,6 +15,8 @@
 #include "debug.h"
 #include "routines.h"
 
+#include <string.h>
+
 void cxxTokenChainInit(CXXTokenChain * tc)
 {
 	Assert(tc);
@@ -414,7 +416,7 @@ CXXToken * cxxTokenChainAt(CXXTokenChain * tc,int index)
 	return pToken;
 }
 
-CXXToken * cxxTokenChainSkipToEndOfAngleBracket(CXXToken * t)
+CXXToken * cxxTokenChainSkipToEndOfTemplateAngleBracket(CXXToken * t)
 {
 	if(!t)
 		return NULL;
@@ -423,10 +425,10 @@ CXXToken * cxxTokenChainSkipToEndOfAngleBracket(CXXToken * t)
 	t = t->pNext;
 	while(t)
 	{
-		if(t->eType == CXXTokenTypeSmallerThanSign)
+		if(cxxTokenTypeIs(t,CXXTokenTypeSmallerThanSign))
 		{
 			iLevel++;
-		} if(t->eType == CXXTokenTypeGreaterThanSign)
+		} else if(cxxTokenTypeIs(t,CXXTokenTypeGreaterThanSign))
 		{
 			if(iLevel == 1)
 				return t;

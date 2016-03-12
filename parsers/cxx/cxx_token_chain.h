@@ -63,7 +63,7 @@ CXXToken * cxxTokenChainLastTokenNotOfType(CXXTokenChain * tc,unsigned int uToke
 // Specialized function to skip from a < to the matching > (used for templates). Nested <> pairs are skipped properly.
 // Parenthesis chains are assumed to be condensed.
 // Note that the function stops at the ending > and not past it.
-CXXToken * cxxTokenChainSkipToEndOfAngleBracket(CXXToken * t);
+CXXToken * cxxTokenChainSkipToEndOfTemplateAngleBracket(CXXToken * t);
 
 #define cxxTokenChainFirst(tc) (tc ? tc->pHead : NULL)
 #define cxxTokenChainLast(tc) (tc ? tc->pTail : NULL)

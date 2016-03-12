@@ -362,7 +362,7 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 
 		} else if(cxxTokenTypeIs(pToken,CXXTokenTypeSmallerThanSign))
 		{
-			pToken = cxxTokenChainSkipToEndOfAngleBracket(pToken);
+			pToken = cxxTokenChainSkipToEndOfTemplateAngleBracket(pToken);
 			if(!pToken)
 			{
 				CXX_DEBUG_LEAVE_TEXT("Couln't skip past angle bracket chain");
@@ -850,7 +850,7 @@ try_again:
 		{
 			CXX_DEBUG_PRINT("Maybe template?");
 
-			t = cxxTokenChainSkipToEndOfAngleBracket(t);
+			t = cxxTokenChainSkipToEndOfTemplateAngleBracket(t);
 
 			if(!t)
 			{

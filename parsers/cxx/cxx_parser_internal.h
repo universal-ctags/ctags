@@ -168,12 +168,7 @@ typedef struct _CXXParserState
 	// Toplevel keyword state. A combination of CXXParserKeywordState flags.
 	// Please note that the keywords appearing inside a () subchain are NOT marked.
 	unsigned int uKeywordState;
-	
-	// This is used to handle the special case of template angle brackets.
-	// The less than and greater than signs must be always treated as single characters
-	// and not joined in multiple groups.
-	boolean bParsingTemplateAngleBrackets;
-	
+
 	// This is used to handle the special case of "final" which is a keyword
 	// in class/struct/union declarations but not anywhere else
 	boolean bParsingClassStructOrUnionDeclaration;
