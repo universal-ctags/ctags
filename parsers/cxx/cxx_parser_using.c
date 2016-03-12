@@ -82,10 +82,19 @@ boolean cxxParserParseUsingClause(void)
 	
 		CXXToken * t = cxxTokenChainFirst(g_cxx.pTokenChain);
 	
-		boolean bUsingNamespace = cxxTokenTypeIs(t,CXXTokenTypeKeyword) && (t->eKeyword == CXXKeywordNAMESPACE);
-	
-		if(bUsingNamespace)
-			cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
+		boolean bUsingNamespace = FALSE;
+		
+		if(cxxTokenTypeIs(t,CXXTokenTypeKeyword))
+		{
+			if(t->eKeyword == CXXKeywordNAMESPACE)
+			{
+				bUsingNamespace = TRUE;
+				cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
+			} else if(t->eKeyword == CXXKeywordTYPENAME)
+			{
+				cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
+			}
+		}
 	
 		if(g_cxx.pTokenChain->iCount > 0)
 		{
