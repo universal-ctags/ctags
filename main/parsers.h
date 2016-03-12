@@ -59,8 +59,8 @@
 	MakefileParser, \
 	MatLabParser, \
 	ObjcParser, \
-	OldCppParser, \
-	OldCParser, \
+	/*OldCppParser,*/ \
+	/*OldCParser,*/ \
 	OcamlParser, \
 	PascalParser, \
 	PerlParser, \
