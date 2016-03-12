@@ -3549,12 +3549,13 @@ static void initializeVeraParser (const langType language)
 extern parserDefinition* OldCParser (void)
 {
 	static const char *const extensions [] = { "c", NULL };
-	parserDefinition* def = parserNew ("C");
+	parserDefinition* def = parserNew ("OldC");
 	def->kinds      = CKinds;
 	def->kindCount  = ARRAY_SIZE (CKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeCParser;
+	def->enabled = 0;
 	return def;
 }
 
@@ -3583,13 +3584,14 @@ extern parserDefinition* OldCppParser (void)
 	static selectLanguage selectors[] = { selectByObjectiveCKeywords,
 					      NULL };
 
-	parserDefinition* def = parserNew ("C++");
+	parserDefinition* def = parserNew ("OldC++");
 	def->kinds      = CKinds;
 	def->kindCount  = ARRAY_SIZE (CKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeCppParser;
 	def->selectLanguage = selectors;
+	def->enabled = 0;
 	return def;
 }
 
