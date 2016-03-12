@@ -1,1 +1,1 @@
-foo	input.cpp	/^void foo(std::vector<float> &);$/;"	p	signature:(std::vector<float> &)
+foo	input.cpp	/^void foo(std::vector<float> &);$/;"	p	file:	signature:(std::vector<float> &)

@@ -608,13 +608,19 @@ int cxxParserEmitFunctionTags(
 		if(pInfo->pParenthesis->pChain->pTail)
 			pInfo->pParenthesis->pChain->pTail->bFollowedBySpace = FALSE; // make sure we don't emit the trailing space
 
-		if(eOuterScopeKind == CXXTagKindNAMESPACE)
+		if(eTagKind == CXXTagKindPROTOTYPE)
 		{
-			// in a namespace only static stuff declared in cpp files is file scoped
-			tag->isFileScope = (g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) && !isInputHeaderFile();
-		} else {
-			// in a class/struct/union file scope stuff is only in cpp files
 			tag->isFileScope = !isInputHeaderFile();
+		} else {
+			// function definitions
+			if(eOuterScopeKind == CXXTagKindNAMESPACE)
+			{
+				// in a namespace only static stuff declared in cpp files is file scoped
+				tag->isFileScope = (g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) && !isInputHeaderFile();
+			} else {
+				// in a class/struct/union file scope stuff is only in cpp files
+				tag->isFileScope = !isInputHeaderFile();
+			}
 		}
 
 		vString * pszSignature = cxxTokenChainJoin(pInfo->pParenthesis->pChain,NULL,0);
