@@ -368,16 +368,11 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 				{
 					CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
 					// assume it's label
-					tagEntryInfo * tag = cxxTagBegin(
-							vStringValue(pFirst->pszWord),
-							CXXTagKindLABEL,
-							pFirst
-						);
+					tagEntryInfo * tag = cxxTagBegin(CXXTagKindLABEL,pFirst);
 					
 					if(tag)
 					{
 						tag->isFileScope = TRUE;
-	
 						cxxTagCommit();
 					}
 				} else {

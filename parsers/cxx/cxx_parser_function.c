@@ -222,11 +222,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 		return 0; // didn't find an opening bracket. This probably wasn't a K&R style function declaration after all.
 	}
 
-	tagEntryInfo * tag = cxxTagBegin(
-			vStringValue(pIdentifier->pszWord),
-			CXXTagKindFUNCTION,
-			pIdentifier
-		);
+	tagEntryInfo * tag = cxxTagBegin(CXXTagKindFUNCTION,pIdentifier);
 
 	if(tag)
 	{
@@ -605,11 +601,7 @@ int cxxParserEmitFunctionTags(
 	
 	CXX_DEBUG_PRINT("Identifier is '%s'",vStringValue(pIdentifier->pszWord));
 	
-	tagEntryInfo * tag = cxxTagBegin(
-			vStringValue(pIdentifier->pszWord),
-			eTagKind,
-			pIdentifier
-		);
+	tagEntryInfo * tag = cxxTagBegin(eTagKind,pIdentifier);
 
 	if(tag)
 	{
@@ -714,11 +706,7 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 	unsigned int i = 0;
 	while(i < pInfo->uParameterCount)
 	{
-		tagEntryInfo * tag = cxxTagBegin(
-				vStringValue(pInfo->aIdentifiers[i]->pszWord),
-				CXXTagKindPARAMETER,
-				pInfo->aIdentifiers[i]
-			);
+		tagEntryInfo * tag = cxxTagBegin(CXXTagKindPARAMETER,pInfo->aIdentifiers[i]);
 
 		if(tag)
 		{

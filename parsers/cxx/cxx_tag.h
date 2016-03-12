@@ -47,22 +47,14 @@ boolean cxxTagKindEnabled(enum CXXTagKind eKindId);
 // Returns NULL if the tag should *not* be included in the output
 // or the tag entry info that can be filled up with extension fields.
 // Must be followed by cxxTagCommit() if it returns a non-NULL value.
-// The pRefCXXToken ownership is NOT transferred.
-tagEntryInfo * cxxTagBegin(
-		const char * szName,
-		enum CXXTagKind eKindId,
-		CXXToken * pRefCXXToken
-	);
+// The pToken ownership is NOT transferred.
+tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken);
 
 // Commit the composed tag. Must follow a succesfull cxxTagBegin() call.
 void cxxTagCommit(void);
 
 // Same as cxxTagBegin() eventually followed by cxxTagCommit()
-void cxxTag(
-		const char * szName,
-		enum CXXTagKind eKindId,
-		CXXToken * pRefCXXToken
-	);
+void cxxTag(enum CXXTagKind eKindId,CXXToken * pToken);
 
 typedef enum {
 	CR_MACRO_UNDEF,

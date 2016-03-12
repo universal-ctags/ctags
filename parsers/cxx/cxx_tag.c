@@ -77,12 +77,7 @@ boolean cxxTagKindEnabled(enum CXXTagKind eKindId)
 static tagEntryInfo g_oCXXTag;
 
 
-// FIXME: szName is always vStringValue(pRefCXXToken->pszWord) (?)
-tagEntryInfo * cxxTagBegin(
-		const char * szName,
-		enum CXXTagKind eKindId,
-		CXXToken * pRefCXXToken
-	)
+tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
 {
 	if(!g_aCXXKinds[eKindId].enabled)
 	{
@@ -90,10 +85,10 @@ tagEntryInfo * cxxTagBegin(
 		return NULL;
 	}
 
-	initTagEntry(&g_oCXXTag,szName,&(g_aCXXKinds[eKindId]));
+	initTagEntry(&g_oCXXTag,vStringValue(pToken->pszWord),&(g_aCXXKinds[eKindId]));
 	
-	g_oCXXTag.lineNumber = pRefCXXToken->iLineNumber;
-	g_oCXXTag.filePosition = pRefCXXToken->oFilePosition;
+	g_oCXXTag.lineNumber = pToken->iLineNumber;
+	g_oCXXTag.filePosition = pToken->oFilePosition;
 	g_oCXXTag.isFileScope = FALSE;
 
 	if(!cxxScopeIsGlobal())
@@ -176,13 +171,9 @@ void cxxTagCommit(void)
 	vStringDelete(x);
 }
 
-void cxxTag(
-		const char * szName,
-		enum CXXTagKind eKindId,
-		CXXToken * pRefCXXToken
-	)
+void cxxTag(enum CXXTagKind eKindId,CXXToken * pToken)
 {
-	if(cxxTagBegin(szName,eKindId,pRefCXXToken) != NULL)
+	if(cxxTagBegin(eKindId,pToken) != NULL)
 		cxxTagCommit();
 }
 

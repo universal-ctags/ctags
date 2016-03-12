@@ -66,7 +66,7 @@ boolean cxxParserParseNamespace(void)
 		{
 			case CXXTokenTypeIdentifier:
 				CXX_DEBUG_PRINT("Got identifier %s",g_cxx.pToken->pszWord->buffer);
-				tagEntryInfo * tag = cxxTagBegin(g_cxx.pToken->pszWord->buffer,CXXTagKindNAMESPACE,g_cxx.pToken);
+				tagEntryInfo * tag = cxxTagBegin(CXXTagKindNAMESPACE,g_cxx.pToken);
 				if(tag)
 				{
 					// This is highly questionable but well.. it's how old ctags did, so we do.
@@ -98,7 +98,7 @@ boolean cxxParserParseNamespace(void)
 				{
 					// anonymous namespace!
 					CXXToken * t = cxxTokenCreateAnonymousIdentifier(CXXTagKindNAMESPACE);
-					tagEntryInfo * tag = cxxTagBegin(t->pszWord->buffer,CXXTagKindNAMESPACE,t);
+					tagEntryInfo * tag = cxxTagBegin(CXXTagKindNAMESPACE,t);
 					if(tag)
 					{
 						tag->isFileScope = !isInputHeaderFile();

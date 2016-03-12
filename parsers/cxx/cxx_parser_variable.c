@@ -350,7 +350,6 @@ next_token:
 
 		// FIXME: Typeref?
 		tagEntryInfo * tag = cxxTagBegin(
-				vStringValue(pIdentifier->pszWord),
 				bKnRStyleParameters ?
 					CXXTagKindPARAMETER :
 					((g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern) ? CXXTagKindEXTERNVAR : cxxScopeGetVariableKind()),

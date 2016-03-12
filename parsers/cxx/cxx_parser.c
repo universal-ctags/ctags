@@ -363,7 +363,7 @@ boolean cxxParserParseEnum(void)
 		CXX_DEBUG_PRINT("Enum name is %s (anonymous)",vStringValue(pEnumName->pszWord));
 	}
 
-	tagEntryInfo * tag = cxxTagBegin(pEnumName->pszWord->buffer,CXXTagKindENUM,pEnumName);
+	tagEntryInfo * tag = cxxTagBegin(CXXTagKindENUM,pEnumName);
 	
 	if(tag)
 	{
@@ -396,7 +396,7 @@ boolean cxxParserParseEnum(void)
 		// enumerator.
 		if((g_cxx.pTokenChain->iCount > 1) && cxxTokenTypeIs(pFirst,CXXTokenTypeIdentifier))
 		{
-			tag = cxxTagBegin(vStringValue(pFirst->pszWord),CXXTagKindENUMERATOR,pFirst);
+			tag = cxxTagBegin(CXXTagKindENUMERATOR,pFirst);
 			if(tag)
 			{
 				tag->isFileScope = !isInputHeaderFile();
@@ -593,7 +593,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 		cxxTokenChainClear(g_cxx.pTokenChain);
 	}
 
-	tagEntryInfo * tag = cxxTagBegin(pClassName->pszWord->buffer,eTagKind,pClassName);
+	tagEntryInfo * tag = cxxTagBegin(eTagKind,pClassName);
 
 	if(tag)
 	{

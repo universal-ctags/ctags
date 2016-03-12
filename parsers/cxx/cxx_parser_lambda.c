@@ -85,11 +85,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 	CXXTokenChain * pNew = cxxTokenChainCreate();
 	g_cxx.pTokenChain = pNew;
 
-	tagEntryInfo * tag = cxxTagBegin(
-			vStringValue(pIdentifier->pszWord),
-			CXXTagKindFUNCTION,
-			pIdentifier
-		);
+	tagEntryInfo * tag = cxxTagBegin(CXXTagKindFUNCTION,pIdentifier);
 
 	if(tag)
 	{

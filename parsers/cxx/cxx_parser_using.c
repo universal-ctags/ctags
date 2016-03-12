@@ -100,21 +100,13 @@ boolean cxxParserParseUsingClause(void)
 	
 
 				CXX_DEBUG_PRINT("Found using clause '%s' which extends scope",vStringValue(t->pszWord));
-				tag = cxxTagBegin(
-						vStringValue(t->pszWord),
-						CXXTagKindUSING,
-						t
-					);
+				tag = cxxTagBegin(CXXTagKindUSING,t);
 			} else {
 
 				t = cxxTokenChainLast(g_cxx.pTokenChain);
 
 				CXX_DEBUG_PRINT("Found using clause '%s' which imports a name",vStringValue(t->pszWord));
-				tag = cxxTagBegin(
-						vStringValue(t->pszWord),
-						CXXTagKindNAME,
-						t
-					);
+				tag = cxxTagBegin(CXXTagKindNAME,t);
 				
 				// FIXME: We need something like "nameref:<condensed>" here!
 			}

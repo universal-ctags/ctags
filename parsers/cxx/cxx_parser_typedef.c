@@ -136,11 +136,7 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtE
 		return; // EOF
 	}
 
-	tagEntryInfo * tag = cxxTagBegin(
-			vStringValue(t->pszWord),
-			CXXTagKindTYPEDEF,
-			t
-		);
+	tagEntryInfo * tag = cxxTagBegin(CXXTagKindTYPEDEF,t);
 
 	if(tag)
 	{
