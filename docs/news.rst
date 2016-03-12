@@ -258,6 +258,9 @@ All pseudo tags are disabled if no option value is given to
 
 	--pseudo-tags=
 
+For specifying only one pseudo tag, specify it without sign:
+
+	--pseudo-tags=ptag
 
 
 Changes in tags file format
