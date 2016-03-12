@@ -15,4 +15,5 @@ v	variable	variable definitions	on	referenceOnly:FALSE	nRoles:0
 x	externvar	external and forward variable declarations	off	referenceOnly:FALSE	nRoles:0
 z	parameter	function parameters inside function definitions	off	referenceOnly:FALSE	nRoles:0
 L	label	goto labels	off	referenceOnly:FALSE	nRoles:0
-U	using	using namespace statements	off	referenceOnly:TRUE	nRoles:2
+N	name	names imported via using scope::symbol	off	referenceOnly:FALSE	nRoles:0
+U	using	using namespace statements	off	referenceOnly:TRUE	nRoles:0

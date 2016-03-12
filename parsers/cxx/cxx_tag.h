@@ -35,13 +35,9 @@ enum CXXTagKind
 	CXXTagKindEXTERNVAR,
 	CXXTagKindPARAMETER,
 	CXXTagKindLABEL,
+	CXXTagKindNAME,
 	CXXTagKindUSING
 };
-
-typedef enum {
-	CXXUsingRoleExtendingScope,
-	CXXUsingRoleImportingName
-} CXXUsingRole;
 
 kindOption * cxxTagGetKindOptions(void);
 int cxxTagGetKindOptionCount(void);
@@ -68,7 +64,6 @@ void cxxTag(
 		CXXToken * pRefCXXToken
 	);
 
-// FIXME: What is this stuff exactly?
 typedef enum {
 	CR_MACRO_UNDEF,
 } cMacroRole;

@@ -63,6 +63,8 @@ boolean cxxParserParseUsingClause(void)
 
 		if(cxxTokenTypeIs(pFirst,CXXTokenTypeIdentifier))
 		{
+			CXX_DEBUG_PRINT("Found using clause '%s' which defines a type",vStringValue(pFirst->pszWord));
+
 			// It's a typedef. Reorder the tokens in the chain so it really looks like a typedef
 			// and pass it to the specialized extraction routine
 			cxxTokenChainTake(g_cxx.pTokenChain,pFirst);
@@ -87,28 +89,38 @@ boolean cxxParserParseUsingClause(void)
 	
 		if(g_cxx.pTokenChain->iCount > 0)
 		{
-			cxxTokenChainCondense(g_cxx.pTokenChain,0);
+			tagEntryInfo * tag;
+
+			if(bUsingNamespace)
+			{
+				cxxTokenChainCondense(g_cxx.pTokenChain,0);
+		
+				t = cxxTokenChainFirst(g_cxx.pTokenChain);
+				CXX_DEBUG_ASSERT(t,"Condensation of a non empty chain should produce a token!");
 	
-			CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
-			CXX_DEBUG_ASSERT(pFirst,"Condensation of a non empty chain should produce a token!");
-			
-			tagEntryInfo * tag = cxxTagBegin(
-						vStringValue(pFirst->pszWord),
+
+				CXX_DEBUG_PRINT("Found using clause '%s' which extends scope",vStringValue(t->pszWord));
+				tag = cxxTagBegin(
+						vStringValue(t->pszWord),
 						CXXTagKindUSING,
-						pFirst
+						t
 					);
+			} else {
+
+				t = cxxTokenChainLast(g_cxx.pTokenChain);
+
+				CXX_DEBUG_PRINT("Found using clause '%s' which imports a name",vStringValue(t->pszWord));
+				tag = cxxTagBegin(
+						vStringValue(t->pszWord),
+						CXXTagKindNAME,
+						t
+					);
+				
+				// FIXME: We need something like "nameref:<condensed>" here!
+			}
 
 			if(tag)
 			{
-				if(bUsingNamespace)
-				{
-					CXX_DEBUG_PRINT("Found using clause '%s' which extends scope",vStringValue(pFirst->pszWord));
-					tag->extensionFields.roleIndex = CXXUsingRoleExtendingScope;
-				} else {
-					CXX_DEBUG_PRINT("Found using clause '%s' which imports a name",vStringValue(pFirst->pszWord));
-					tag->extensionFields.roleIndex = CXXUsingRoleImportingName;
-				}
-	
 				tag->isFileScope = (cxxScopeGetKind() == CXXTagKindNAMESPACE) && !isInputHeaderFile();
 				cxxTagCommit();
 			}

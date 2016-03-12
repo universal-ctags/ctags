@@ -26,11 +26,6 @@ static roleDesc CHeaderRoles [] = {
 	RoleTemplateLocal,
 };
 
-static roleDesc CXXUsingRoles [] = {
-	{ TRUE, "extending-scope", "... (for using namespace a::b)" },
-    { TRUE, "importing-name", "... (for using a::b)" }
-};
-
 static kindOption g_aCXXKinds [] = {
 	{ TRUE,  'c', "class",      "classes" },
 	{ TRUE,  'd', "macro",      "macro definitions",
@@ -53,9 +48,9 @@ static kindOption g_aCXXKinds [] = {
 	{ FALSE, 'x', "externvar",  "external and forward variable declarations" },
 	{ FALSE, 'z', "parameter",  "function parameters inside function definitions" },
 	{ FALSE, 'L', "label",      "goto labels" },
-	{ FALSE, 'U', "using",      "using namespace statements",
-			.referenceOnly = TRUE, ATTACH_ROLES(CXXUsingRoles)
-	}
+	// FIXME: not sure about referenceOnly: if this is referenceOnly then so is externvar and probably also prototype.
+	{ FALSE, 'N', "name",       "names imported via using scope::symbol" /*, .referenceOnly = TRUE*/ },
+	{ FALSE, 'U', "using",      "using namespace statements", .referenceOnly = TRUE },
 };
 
 static const char * g_aCXXAccessStrings [] = {
