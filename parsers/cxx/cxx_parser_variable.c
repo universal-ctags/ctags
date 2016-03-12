@@ -310,10 +310,30 @@ next_token:
 		if(!pTypeEnd)
 		{
 			// now pTokenBefore should be part of the type
-			if(!cxxTokenTypeIsOneOf(pTokenBefore,CXXTokenTypeIdentifier | CXXTokenTypeKeyword | CXXTokenTypeGreaterThanSign | CXXTokenTypeStar | CXXTokenTypeAnd))
+			if(!cxxTokenTypeIsOneOf(pTokenBefore,CXXTokenTypeIdentifier | CXXTokenTypeKeyword | CXXTokenTypeStar | CXXTokenTypeAnd))
 			{
-				CXX_DEBUG_LEAVE_TEXT("Token '%s' of type 0x%02x does not seem to be part of type name",vStringValue(pTokenBefore->pszWord),pTokenBefore->eType);
-				return bGotVariable;
+				if(cxxTokenTypeIs(pTokenBefore,CXXTokenTypeGreaterThanSign))
+				{
+					// the < > must be balanced
+					CXXToken * t = pTokenBefore->pPrev;
+					int iLevel = 1;
+					while(t)
+					{
+						if(cxxTokenTypeIs(t,CXXTokenTypeGreaterThanSign))
+							iLevel++;
+						else if(cxxTokenTypeIs(t,CXXTokenTypeSmallerThanSign))
+							iLevel--;
+						t = t->pPrev;
+					}
+					if(iLevel != 0)
+					{
+						CXX_DEBUG_LEAVE_TEXT("The > token is unbalanced and does not seem to be part of type name");
+						return bGotVariable;
+					}
+				} else {
+					CXX_DEBUG_LEAVE_TEXT("Token '%s' of type 0x%02x does not seem to be part of type name",vStringValue(pTokenBefore->pszWord),pTokenBefore->eType);
+					return bGotVariable;
+				}
 			}
 			
 			CXX_DEBUG_PRINT("Type name seems to end at '%s' of type 0x%02x",vStringValue(pTokenBefore->pszWord),pTokenBefore->eType);
