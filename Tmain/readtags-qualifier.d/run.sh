@@ -28,4 +28,6 @@ echo ';; (and (member "Foo" $inherits) (eq? $kind "class"))' &&
 ${V} ${READTAGS}  -e -t output.tags -Q '(and (member "Foo" $inherits) (eq? $kind "class"))' -l &&
 echo ';; (not ($ "signature"))' &&
 ${V} ${READTAGS}  -e -t output.tags -Q '(not ($ "signature"))' -l &&
+echo ';; (< 1 2)' &&
+${V} ${READTAGS}  -e -t output.tags -Q '(< 1 2)' -l &&
 :
