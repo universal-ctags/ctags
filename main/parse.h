@@ -259,6 +259,7 @@ extern boolean enableXcmdKind (const langType language, const int kind, const bo
 extern boolean isXcmdKindEnabled (const langType language, const int kind);
 extern boolean hasXcmdKind (const langType language, const int kind);
 extern void printXcmdKinds (const langType language, boolean allKindFields, boolean indent);
+extern void foreachXcmdKinds (const langType language, boolean (* func) (kindOption*, void*), void *data);
 extern void freeXcmdResources (void);
 extern void useXcmdMethod (const langType language);
 extern void notifyAvailabilityXcmdMethod (const langType language);
