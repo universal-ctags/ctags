@@ -61,6 +61,8 @@ Heavily improved language parsers
 * ant *libxml*
 * php
 * verilog
+* c (fully rewritten, see cxx.rst)
+* c++ (fully rewritten, see cxx.rst)
 
 New options
 ---------------------------------------------------------------------
