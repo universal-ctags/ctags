@@ -1947,7 +1947,9 @@ static void addParserPseudoTags (langType language)
 {
 	if (!LanguageTable[language]->pseudoTagPrinted)
 	{
+		makePtagIfEnabled (PTAG_KIND_DESCRIPTION, &language);
 		makePtagIfEnabled (PTAG_KIND_SEPARATOR, &language);
+
 		LanguageTable[language]->pseudoTagPrinted = 1;
 	}
 }
@@ -2163,6 +2165,63 @@ extern void makeKindSeparatorsPseudoTags (const langType language,
 					name, lang->name);
 		}
 	}
+}
+
+struct makeKindDescriptionPseudoTagData {
+	const char* langName;
+	const struct sPtagDesc *pdesc;
+};
+
+static boolean makeKindDescriptionPseudoTag (kindOption *kind,
+					     void *user_data)
+{
+	struct makeKindDescriptionPseudoTagData *data = user_data;
+	vString *letter_and_name;
+	vString *description;
+
+	letter_and_name = vStringNew ();
+	description = vStringNew ();
+
+	vStringPut (letter_and_name, kind -> letter);
+	vStringPut (letter_and_name, ',');
+	vStringCatS (letter_and_name, kind -> name);
+
+	vStringPut (description, '/');
+	vStringCatSWithEscapingAsPattern (description,
+					  kind -> description);
+	vStringPut (description, '/');
+	writePseudoTag (data->pdesc, vStringValue (letter_and_name),
+			vStringValue (description),
+			data->langName);
+
+	vStringDelete (description);
+	vStringDelete (letter_and_name);
+
+	return FALSE;
+}
+
+extern void makeKindDescriptionsPseudoTags (const langType language,
+					    const struct sPtagDesc *pdesc)
+{
+
+	parserDefinition* lang;
+	kindOption *kinds;
+	unsigned int kindCount, i;
+	struct makeKindDescriptionPseudoTagData data;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+	kinds = lang->kinds;
+	kindCount = lang->kindCount;
+
+	data.langName = lang->name;
+	data.pdesc = pdesc;
+
+	for (i = 0; i < kindCount; ++i)
+		makeKindDescriptionPseudoTag (kinds + i, &data);
+
+	foreachRegexKinds (language, makeKindDescriptionPseudoTag, &data);
+	foreachXcmdKinds (language, makeKindDescriptionPseudoTag, &data);
 }
 
 /*

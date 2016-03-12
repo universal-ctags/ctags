@@ -274,6 +274,8 @@ extern void addTagXpath (const langType language, tagXpathTable *xpathTable);
 struct sPtagDesc;
 extern void makeKindSeparatorsPseudoTags (const langType language,
 					  const struct sPtagDesc *pdesc);
+extern void makeKindDescriptionsPseudoTags (const langType language,
+					    const struct sPtagDesc *pdesc);
 
 #endif  /* CTAGS_MAIN_PARSE_H */
 

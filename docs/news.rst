@@ -430,6 +430,47 @@ The pseudo tags are used for the self description.  We hope some of
 incompatibilities can be overcome in upper layer tools with the pseudo
 tags.
 
+Example output:
+
+.. code-block:: console
+
+    $ ./ctags -o - --extra=p --pseudo-tags='TAG_KIND_DESCRIPTION' foo.c
+    !_TAG_KIND_DESCRIPTION!C	L,label	/goto label/
+    !_TAG_KIND_DESCRIPTION!C	c,class	/classes/
+    !_TAG_KIND_DESCRIPTION!C	d,macro	/macro definitions/
+    !_TAG_KIND_DESCRIPTION!C	e,enumerator	/enumerators (values inside an enumeration)/
+    !_TAG_KIND_DESCRIPTION!C	f,function	/function definitions/
+    !_TAG_KIND_DESCRIPTION!C	g,enum	/enumeration names/
+    !_TAG_KIND_DESCRIPTION!C	h,header	/included header files/
+    !_TAG_KIND_DESCRIPTION!C	l,local	/local variables/
+    !_TAG_KIND_DESCRIPTION!C	m,member	/class, struct, and union members/
+    !_TAG_KIND_DESCRIPTION!C	n,namespace	/namespaces/
+    !_TAG_KIND_DESCRIPTION!C	p,prototype	/function prototypes/
+    !_TAG_KIND_DESCRIPTION!C	s,struct	/structure names/
+    !_TAG_KIND_DESCRIPTION!C	t,typedef	/typedefs/
+    !_TAG_KIND_DESCRIPTION!C	u,union	/union names/
+    !_TAG_KIND_DESCRIPTION!C	v,variable	/variable definitions/
+    !_TAG_KIND_DESCRIPTION!C	x,externvar	/external and forward variable declarations/
+    foo	foo.c	/^foo (int i, int j)$/;"	f
+    main	foo.c	/^main (void)$/;"	f
+
+
+``TAG_KIND_DESCRIPTION``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is a newly introduced pseudo tag. It is not emitted by default.
+It is emitted only when ``--pseudo-tags=+TAG_KIND_DESCRIPTION`` option
+is given.
+
+This is for describing kinds; their letter, name, and description are
+enumerated in the pseudo tags.
+
+ctags emits ``TAG_KIND_DESCRIPTION`` with following format::
+
+	!_TAG_KIND_SEPARATOR!{parser}	{letter},{name}	/{description}/
+
+A backslash and a slash in {description} is escaped with a backslash.
+
 
 ``TAG_KIND_SEPARATOR``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
