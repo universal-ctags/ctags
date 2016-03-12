@@ -326,10 +326,10 @@ static EsObject* builtin_not  (EsObject *args, tagEntry *entry)
 	{								\
 		EsObject *a, *b;					\
 									\
-		if (!C (a)) throw(E, O);				\
-		if (!C (b)) throw(E, O);				\
 		a = es_car (args);					\
 		b = es_car (es_cdr (args));				\
+		if (!C (a)) throw(E, O);				\
+		if (!C (b)) throw(E, O);				\
 		if (X)							\
 			return es_true;					\
 		else							\
