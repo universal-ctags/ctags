@@ -22,16 +22,16 @@
 boolean cxxParserParseUsingClause(void)
 {
 	CXX_DEBUG_ENTER();
-	
+
 	// using-directives for namespaces and using-declarations for namespace members
 	// using-declarations for class members
 	// type alias and alias template declaration (since C++11)
-	
+
 	// using namespace ns_name;	(5)	// whole namespace
 	// using ns_name::name;	(6)	 // only symbol name
 	// using B::g; // inside class, using method g from base class B
 	// using identifier attr(optional) = type-id ; <-- this is equivalent to a typedef!
-	
+
 	cxxTokenChainClear(g_cxx.pTokenChain);
 
 	// skip to the next ; without leaving scope.
@@ -54,9 +54,9 @@ boolean cxxParserParseUsingClause(void)
 		CXX_DEBUG_LEAVE_TEXT("This is a syntax error but we tolerate it");
 		return TRUE;
 	}
-	
+
 	CXXToken * pAssignment = cxxTokenChainFirstTokenOfType(g_cxx.pTokenChain,CXXTokenTypeAssignment);
-	
+
 	if(pAssignment)
 	{
 		CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
@@ -79,11 +79,11 @@ boolean cxxParserParseUsingClause(void)
 		}
 	} else {
 		CXX_DEBUG_ASSERT(g_cxx.pTokenChain->iCount > 0,"The token chain should be non empty at this point");
-	
+
 		CXXToken * t = cxxTokenChainFirst(g_cxx.pTokenChain);
-	
+
 		boolean bUsingNamespace = FALSE;
-		
+
 		if(cxxTokenTypeIs(t,CXXTokenTypeKeyword))
 		{
 			if(t->eKeyword == CXXKeywordNAMESPACE)
@@ -95,7 +95,7 @@ boolean cxxParserParseUsingClause(void)
 				cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
 			}
 		}
-	
+
 		if(g_cxx.pTokenChain->iCount > 0)
 		{
 			tagEntryInfo * tag;
@@ -103,10 +103,10 @@ boolean cxxParserParseUsingClause(void)
 			if(bUsingNamespace)
 			{
 				cxxTokenChainCondense(g_cxx.pTokenChain,0);
-		
+
 				t = cxxTokenChainFirst(g_cxx.pTokenChain);
 				CXX_DEBUG_ASSERT(t,"Condensation of a non empty chain should produce a token!");
-	
+
 
 				CXX_DEBUG_PRINT("Found using clause '%s' which extends scope",vStringValue(t->pszWord));
 				tag = cxxTagBegin(CXXTagKindUSING,t);
@@ -116,7 +116,7 @@ boolean cxxParserParseUsingClause(void)
 
 				CXX_DEBUG_PRINT("Found using clause '%s' which imports a name",vStringValue(t->pszWord));
 				tag = cxxTagBegin(CXXTagKindNAME,t);
-				
+
 				// FIXME: We need something like "nameref:<condensed>" here!
 			}
 

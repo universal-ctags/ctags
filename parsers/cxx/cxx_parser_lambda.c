@@ -31,18 +31,18 @@
 //
 CXXToken * cxxParserOpeningBracketIsLambda(void)
 {
-	// [ capture-list ] ( params ) mutable(optional) exception attribute -> ret { body }	(1)	
-	// [ capture-list ] ( params ) -> ret { body }	(2)	
-	// [ capture-list ] ( params ) { body }	(3)	
-	// [ capture-list ] { body }	(4)	
+	// [ capture-list ] ( params ) mutable(optional) exception attribute -> ret { body }	(1)
+	// [ capture-list ] ( params ) -> ret { body }	(2)
+	// [ capture-list ] ( params ) { body }	(3)
+	// [ capture-list ] { body }	(4)
 
 	CXXToken * t = g_cxx.pToken->pPrev;
 
 	if(!t)
 		return NULL; // not a lambda
-	
+
 	// Check simple cases first
-	
+
 	// case 4
 	if(cxxTokenTypeIs(t,CXXTokenTypeSquareParenthesisChain))
 	{
@@ -116,13 +116,13 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 
 	g_cxx.pTokenChain = pSave;
 	g_cxx.pToken = pSave->pTail;
-	
+
 	// change the type of token so following parsing code is not confused too much
 	g_cxx.pToken->eType = CXXTokenTypeAngleBracketChain;
 	g_cxx.pToken->pChain = pNew;
 
 	cxxTokenChainClear(pNew);
-	
+
 	CXXToken * t = cxxTokenCreate();
 	t->eType = CXXTokenTypeOpeningBracket;
 	vStringCatS(t->pszWord,"{");

@@ -86,7 +86,7 @@ tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
 	}
 
 	initTagEntry(&g_oCXXTag,vStringValue(pToken->pszWord),&(g_aCXXKinds[eKindId]));
-	
+
 	g_oCXXTag.lineNumber = pToken->iLineNumber;
 	g_oCXXTag.filePosition = pToken->oFilePosition;
 	g_oCXXTag.isFileScope = FALSE;
@@ -96,7 +96,7 @@ tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
 		g_oCXXTag.extensionFields.scopeKind = &g_aCXXKinds[cxxScopeGetKind()];
 		g_oCXXTag.extensionFields.scopeName = cxxScopeGetFullName();
 	}
-	
+
 	// FIXME: meaning of "is file scope" is quite debatable...
 
 	switch(cxxScopeGetAccess())
@@ -128,21 +128,21 @@ void cxxTagCommit(void)
 		CXX_DEBUG_PRINT("Tag has typeref %s %s",g_oCXXTag.extensionFields.typeRef[0],g_oCXXTag.extensionFields.typeRef[1]);
 
 	makeTagEntry(&g_oCXXTag);
-	
+
 	// Handle --extra=+q
 	if(!isXtagEnabled(XTAG_QUALIFIED_TAGS))
 		return;
-	
+
 	if(!g_oCXXTag.extensionFields.scopeName)
 		return;
-	
+
 	// WARNING: The following code assumes that the scope didn't change between cxxTagBegin() and cxxTagCommit().
 
 	enum CXXTagKind eScopeKind = cxxScopeGetKind();
 
 	if(eScopeKind == CXXTagKindFUNCTION)
 		return; // old ctags didn't do this, and --extra=+q is mainly for backward compatibility so...
-	
+
 	// Same tag. Only the name changes.
 
 	vString * x;
@@ -152,7 +152,7 @@ void cxxTagCommit(void)
 		// If the scope kind is enumeration then we need to remove the last scope part. This is what old ctags did.
 		if(cxxScopeGetSize() < 2)
 			return; // toplevel enum
-		
+
 		x = cxxScopeGetFullNameExceptLastComponentAsString();
 		CXX_DEBUG_ASSERT(x,"Scope with size >= 2 should have returned a value here");
 	} else {
@@ -167,7 +167,7 @@ void cxxTagCommit(void)
 	CXX_DEBUG_PRINT("Emitting extra tag for symbol '%s', kind '%s', line %d",g_oCXXTag.name,g_oCXXTag.kind->name,g_oCXXTag.lineNumber);
 
 	makeTagEntry(&g_oCXXTag);
-	
+
 	vStringDelete(x);
 }
 
@@ -176,4 +176,3 @@ void cxxTag(enum CXXTagKind eKindId,CXXToken * pToken)
 	if(cxxTagBegin(eKindId,pToken) != NULL)
 		cxxTagCommit();
 }
-

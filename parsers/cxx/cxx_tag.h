@@ -43,7 +43,7 @@ kindOption * cxxTagGetKindOptions(void);
 int cxxTagGetKindOptionCount(void);
 boolean cxxTagKindEnabled(enum CXXTagKind eKindId);
 
-// Begin composing a tag. 
+// Begin composing a tag.
 // Returns NULL if the tag should *not* be included in the output
 // or the tag entry info that can be filled up with extension fields.
 // Must be followed by cxxTagCommit() if it returns a non-NULL value.

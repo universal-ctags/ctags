@@ -81,7 +81,7 @@ reflect the most common usages. The policy is the following:
 
 - Function definitions appearing inside a class/struct/union declaration
   are in file scope only if declared static inside a .cpp file
-  
+
 - Function parameters are always in file scope
 
 - Local variables are always in file scope
@@ -107,5 +107,3 @@ template<typename A> class B : public C<A>
 
 the old parser reported "C" as base class while the new one reports
 "C<A>".
-
-

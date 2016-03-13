@@ -81,7 +81,7 @@ boolean cxxParserParseAndCondenseCurrentSubchain(
 	pChainToken->eType = (enum CXXTokenType)(g_cxx.pToken->eType << 8); // see the declaration of CXXTokenType enum. Shifting by 8 gives the corresponding chain marker
 	pChainToken->pChain = g_cxx.pTokenChain;
 	cxxTokenChainAppend(pCurrentChain,pChainToken);
-	
+
 	unsigned int uTokenTypes = g_cxx.pToken->eType << 4; // see the declaration of CXXTokenType enum. Shifting by 4 gives the corresponding closing token type
 	if(bAcceptEOF)
 		uTokenTypes |= CXXTokenTypeEOF;
@@ -98,7 +98,7 @@ boolean cxxParserParseAndCondenseCurrentSubchain(
 // This function parses input until one of the specified tokens appears.
 // The algorithm will also build subchains of matching pairs ([...],(...),<...>,{...}): within the subchain
 // analysis of uTokenTypes is completly disabled. Subchains do nest.
-// 
+//
 // Returns true if it stops before EOF or it stops at EOF and CXXTokenTypeEOF is present in uTokenTypes.
 // Returns false in all the other stop conditions and when an unmatched subchain character pair is found (syntax error).
 //
@@ -125,7 +125,7 @@ boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
 			CXX_DEBUG_LEAVE_TEXT("Got terminator token '%s' 0x%x",vStringValue(g_cxx.pToken->pszWord),g_cxx.pToken->eType);
 			return TRUE;
 		}
-		
+
 		if(cxxTokenTypeIsOneOf(g_cxx.pToken,uInitialSubchainMarkerTypes))
 		{
 			// subchain
@@ -213,7 +213,7 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(boolea
 	CXX_DEBUG_ENTER();
 
 	cxxTokenChainClear(g_cxx.pTokenChain);
-	
+
 	CXX_DEBUG_PRINT("Parse enum/struct/class/union trailer, typename is '%s'",szTypeName);
 
 	fpos_t oFilePosition = getInputFilePosition();
@@ -246,7 +246,7 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(boolea
 	pIdentifier->bFollowedBySpace = TRUE;
 	vStringCatS(pIdentifier->pszWord,szTypeName);
 	cxxTokenChainPrepend(g_cxx.pTokenChain,pIdentifier);
-	
+
 	CXXToken * pKeyword = cxxTokenCreate();
 	pKeyword->oFilePosition = oFilePosition;
 	pKeyword->iLineNumber = iFileLine;
@@ -275,7 +275,7 @@ boolean cxxParserParseEnum(void)
 
 	/*
 		Spec is:
-			enum-key attr(optional) identifier(optional) enum-base(optional) { enumerator-list(optional) }	(1)	
+			enum-key attr(optional) identifier(optional) enum-base(optional) { enumerator-list(optional) }	(1)
 			enum-key attr(optional) identifier enum-base(optional) ;	(2)	(since C++11)
 	*/
 
@@ -312,7 +312,7 @@ boolean cxxParserParseEnum(void)
 		CXX_DEBUG_LEAVE();
 		return TRUE;
 	}
-	
+
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 	{
 		// tolerate EOF, treat as forward declaration
@@ -325,9 +325,9 @@ boolean cxxParserParseEnum(void)
 
 	// check if we can extract a class name identifier
 	CXXToken * pEnumName = cxxTokenChainLastTokenOfType(g_cxx.pTokenChain,CXXTokenTypeIdentifier);
-	
+
 	int iPushedScopes = 0;
-	
+
 	if(pEnumName)
 	{
 		// good.
@@ -346,7 +346,7 @@ boolean cxxParserParseEnum(void)
 			pNamespaceBegin = pPrev;
 			pPrev = pPrev->pPrev;
 		}
-		
+
 		while(pNamespaceBegin != pEnumName)
 		{
 			CXXToken * pNext = pNamespaceBegin->pNext;
@@ -355,7 +355,7 @@ boolean cxxParserParseEnum(void)
 			iPushedScopes++;
 			pNamespaceBegin = pNext->pNext;
 		}
-		
+
 		CXX_DEBUG_PRINT("Enum name is %s",vStringValue(pEnumName->pszWord));
 		cxxTokenChainTake(g_cxx.pTokenChain,pEnumName);
 	} else {
@@ -364,12 +364,12 @@ boolean cxxParserParseEnum(void)
 	}
 
 	tagEntryInfo * tag = cxxTagBegin(CXXTagKindENUM,pEnumName);
-	
+
 	if(tag)
 	{
 		// FIXME: this is debatable
 		tag->isFileScope = !isInputHeaderFile();
-	
+
 		cxxTagCommit();
 	}
 
@@ -382,7 +382,7 @@ boolean cxxParserParseEnum(void)
 	for(;;)
 	{
 		cxxTokenChainClear(g_cxx.pTokenChain);
-	
+
 		if(!cxxParserParseUpToOneOf(CXXTokenTypeComma | CXXTokenTypeClosingBracket | CXXTokenTypeEOF))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Failed to parse enum contents");
@@ -432,12 +432,12 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 	// make sure that there is only the class/struct/union keyword in the token chain
 	while(g_cxx.pTokenChain->iCount > 1)
 		cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
-	
+
 	boolean bParsingTypedef = (g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef); // may be cleared below
 
 	/*
 		Spec is:
-			class-key attr class-head-name base-clause { member-specification }		
+			class-key attr class-head-name base-clause { member-specification }
 
 			class-key	-	one of class or struct. The keywords are identical except for the default member access and the default base class access.
 			attr(C++11)	-	optional sequence of any number of attributes, may include alignas specifier
@@ -471,11 +471,11 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 			break;
 
 		// Probably a template specialisation
-		
+
 		// template<typename T> struct X<int>
 		// {
 		// }
-		
+
 		// FIXME: Should we add the specialisation arguments somewhere? Maye as a separate field?
 
 		bRet = cxxParserParseAndCondenseCurrentSubchain(
@@ -517,7 +517,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 		CXX_DEBUG_LEAVE();
 		return TRUE;
 	}
-	
+
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 	{
 		// tolerate EOF, just ignore this
@@ -530,9 +530,9 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 
 	// check if we can extract a class name identifier
 	CXXToken * pClassName = cxxTokenChainLastTokenOfType(g_cxx.pTokenChain,CXXTokenTypeIdentifier);
-	
+
 	int iPushedScopes = 0;
-	
+
 	if(pClassName)
 	{
 		// good.
@@ -551,7 +551,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 			pNamespaceBegin = pPrev;
 			pPrev = pPrev->pPrev;
 		}
-		
+
 		while(pNamespaceBegin != pClassName)
 		{
 			CXXToken * pNext = pNamespaceBegin->pNext;
@@ -560,7 +560,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 			iPushedScopes++;
 			pNamespaceBegin = pNext->pNext;
 		}
-		
+
 		CXX_DEBUG_PRINT("Class/struct/union name is %s",vStringValue(pClassName->pszWord));
 		cxxTokenChainTake(g_cxx.pTokenChain,pClassName);
 	} else {
@@ -572,14 +572,14 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 	{
 		// check for base classes
 		cxxTokenChainClear(g_cxx.pTokenChain);
-	
+
 		if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket))
 		{
 			cxxTokenDestroy(pClassName);
 			CXX_DEBUG_LEAVE_TEXT("Failed to parse base class part");
 			return FALSE;
 		}
-	
+
 		if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeSemicolon | CXXTokenTypeEOF))
 		{
 			cxxTokenDestroy(pClassName);
@@ -587,7 +587,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 			CXX_DEBUG_LEAVE_TEXT("Syntax error: ignoring");
 			return TRUE;
 		}
-		
+
 		cxxTokenChainDestroyLast(g_cxx.pTokenChain); // remove the {
 	} else {
 		cxxTokenChainClear(g_cxx.pTokenChain);
@@ -601,7 +601,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 		{
 			// Strip inheritance type information
 			// FIXME: This could be optional!
-			
+
 			CXXToken * t = cxxTokenChainFirst(g_cxx.pTokenChain);
 			while(t)
 			{
@@ -623,16 +623,16 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 					t = t->pNext;
 				}
 			}
-			
+
 			if(g_cxx.pTokenChain->iCount > 0)
 			{
 				cxxTokenChainCondense(g_cxx.pTokenChain,CXXTokenChainCondenseNoTrailingSpaces);
 				tag->extensionFields.inheritance = vStringValue(g_cxx.pTokenChain->pHead->pszWord);
 			}
 		}
-		
+
 		tag->isFileScope = !isInputHeaderFile();
-		
+
 		cxxTagCommit();
 	}
 
@@ -682,7 +682,7 @@ boolean cxxParserParseClassStructOrUnion(enum CXXKeyword eKeyword,enum CXXTagKin
 //
 //                int __attribute__() function();
 //                                  |          |
-//                             ("whatever")  (int var1,type var2) 
+//                             ("whatever")  (int var1,type var2)
 //
 //                const char * strings[] = {}
 //                                    |     |
@@ -709,7 +709,7 @@ void cxxParserAnalyzeOtherStatement(void)
 		CXX_DEBUG_LEAVE_TEXT("Empty statement");
 		return;
 	}
-	
+
 	if(g_cxx.uKeywordState & CXXParserKeywordStateSeenReturn)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Statement after a return is not interesting");
@@ -719,9 +719,9 @@ void cxxParserAnalyzeOtherStatement(void)
 	// Everything we can make sense of starts with an identifier or keyword. This is usually a type name
 	// (eventually decorated by some attributes and modifiers) with the notable exception of constructor/destructor declarations
 	// (which are still identifiers tho).
-	
+
 	CXXToken * t = cxxTokenChainFirst(g_cxx.pTokenChain);
-	
+
 	if(!cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier | CXXTokenTypeKeyword))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Statement does not start with an identifier or keyword");
@@ -792,7 +792,7 @@ boolean cxxParserParseAccessSpecifier(void)
 		CXX_DEBUG_LEAVE_TEXT("Access specified in wrong context (%d): bailing out to avoid reporting broken structure",eScopeKind);
 		return FALSE;
 	}
-	
+
 	switch(g_cxx.pToken->eKeyword)
 	{
 		case CXXKeywordPUBLIC:
@@ -808,7 +808,7 @@ boolean cxxParserParseAccessSpecifier(void)
 			CXX_DEBUG_ASSERT(FALSE,"Bad keyword in cxxParserParseAccessSpecifier!");
 		break;
 	}
-	
+
 	// skip to the next :, without leaving scope.
 	if(!cxxParserParseUpToOneOf(CXXTokenTypeSingleColon | CXXTokenTypeSemicolon | CXXTokenTypeClosingBracket | CXXTokenTypeEOF))
 	{
@@ -830,13 +830,13 @@ boolean cxxParserParseIfForWhileSwitch(void)
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse if/for/while/switch up to parenthesis");
 		return FALSE;
 	}
-	
+
 	if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeEOF | CXXTokenTypeSemicolon))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Found EOF/semicolon while parsing if/for/while/switch");
 		return TRUE;
 	}
-	
+
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain))
 	{
 		// Extract variables from the parenthesis chain
@@ -904,13 +904,13 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 	cxxTokenChainClear(g_cxx.pTokenChain);
 	if(g_cxx.pTemplateTokenChain)
 		cxxTokenChainClear(g_cxx.pTemplateTokenChain);
-	
+
 	if(!bRet && (passCount == 1))
 	{
 		CXX_DEBUG_PRINT("Processing failed: trying to rescan");
 		return RESCAN_FAILED;
 	}
-	
+
 	return RESCAN_NONE;
 }
 

@@ -325,7 +325,7 @@ static CXXCharTypeData g_aCharTable[128] =
 boolean cxxParserParseNextToken(void)
 {
 	CXXToken * t = cxxTokenCreate();
-		
+
 	cxxTokenChainAppend(g_cxx.pTokenChain,t);
 
 	// More than 256 tokens is something like a big table, we don't need it (for now).
@@ -333,10 +333,10 @@ boolean cxxParserParseNextToken(void)
 		cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
 
 	g_cxx.pToken = t;
-	
+
 	cxxParserSkipToNonWhiteSpace();
 
- 	cppBeginStatement(); // FIXME: this cpp handling is broken: it works only because the moon is in the correct phase.
+	cppBeginStatement(); // FIXME: this cpp handling is broken: it works only because the moon is in the correct phase.
 
 	// This must be done after getting char from input
 	t->iLineNumber = getInputLineNumber();
@@ -350,7 +350,7 @@ boolean cxxParserParseNextToken(void)
 	}
 
 	unsigned int uInfo = (g_cxx.iChar < 0x80) ? g_aCharTable[g_cxx.iChar].uType : 0;
-	
+
 	//printf("Char %c %02x info %u\n",g_cxx.iChar,g_cxx.iChar,uInfo);
 
 	if(uInfo & CXXCharTypeStartOfIdentifier)
@@ -402,7 +402,7 @@ boolean cxxParserParseNextToken(void)
 			g_cxx.iChar = cppGetc();
 		}
 
-		int iCXXKeyword = lookupKeyword(t->pszWord->buffer,g_cxx.eLanguage); 
+		int iCXXKeyword = lookupKeyword(t->pszWord->buffer,g_cxx.eLanguage);
 		if(iCXXKeyword >= 0)
 		{
 			if((iCXXKeyword == CXXKeywordFINAL) && (!g_cxx.bParsingClassStructOrUnionDeclaration))
@@ -435,10 +435,10 @@ boolean cxxParserParseNextToken(void)
 
 		return TRUE;
 	}
-	
+
 	if(g_cxx.iChar == '-')
 	{
-		// special case for pointer 
+		// special case for pointer
 		vStringPut(t->pszWord,g_cxx.iChar);
 		g_cxx.iChar = cppGetc();
 		if(g_cxx.iChar == '>')
@@ -457,10 +457,10 @@ boolean cxxParserParseNextToken(void)
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
 		return TRUE;
 	}
-	
+
 #if 0
 	// As long as we use cppGetc() we don't need this
-	
+
 	if(g_cxx.iChar == '"')
 	{
 		// special case for strings
@@ -641,4 +641,3 @@ boolean cxxParserParseNextToken(void)
 
 	return TRUE;
 }
-

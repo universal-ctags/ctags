@@ -56,7 +56,7 @@ typedef struct _CXXFunctionSignatureInfo
 	// or multiple tokens starting with the "operator" keyword. Spacing of the tokens is adjusted.
 	CXXToken * pIdentifierStart;
 	CXXToken * pIdentifierEnd;
-	
+
 	// Non-NULL if the signature is followed by the "const" keyword
 	CXXToken * pSignatureConst;
 
@@ -75,7 +75,7 @@ typedef struct _CXXFunctionParameterInfo
 {
 	// The number of parameters found
 	unsigned int uParameterCount;
-	
+
 	// All the tokens are references to the source chain (do not delete)
 	CXXTokenChain * pChain;
 	// The initial tokens of the declaration
@@ -147,7 +147,7 @@ typedef struct _CXXParserState
 {
 	// The current language
 	langType eLanguage;
-	
+
 	// The identifier of the CPP language, as indicated by ctags core
 	langType eCPPLanguage;
 	// The identifier of the C language, as indicated by ctags core
@@ -158,13 +158,13 @@ typedef struct _CXXParserState
 
 	// The last template we found
 	CXXTokenChain * pTemplateTokenChain;
-	
+
 	// The last token we have extracted. This is always pushed to the token chain tail (which will take care of deletion)
 	CXXToken * pToken; // the token chain tail
 
 	// The last char we have extracted from input
 	int iChar;
-	
+
 	// Toplevel keyword state. A combination of CXXParserKeywordState flags.
 	// Please note that the keywords appearing inside a () subchain are NOT marked.
 	unsigned int uKeywordState;
@@ -172,7 +172,7 @@ typedef struct _CXXParserState
 	// This is used to handle the special case of "final" which is a keyword
 	// in class/struct/union declarations but not anywhere else
 	boolean bParsingClassStructOrUnionDeclaration;
-	
+
 } CXXParserState;
 
 

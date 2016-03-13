@@ -30,7 +30,7 @@
 // Try to handle the special case of C K&R style function declarations.
 // Returns -1 in case of error, 1 if a K&R style function declaration has been
 // found and parsed, 0 if no K&R style function declaration has been found.
-// 
+//
 int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 {
 #ifdef CXX_DO_DEBUGGING
@@ -44,7 +44,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 	//   type1 function(arg1,arg2,...) type2 arg1; type3 arg2; {
 	//                                           ^
 	//                                       we're here
-	
+
 	CXX_DEBUG_ASSERT(g_cxx.eLanguage == g_cxx.eCLanguage,"Should be called only when parsing C");
 	CXX_DEBUG_ASSERT(cxxTokenChainLast(g_cxx.pTokenChain),"At least one token should be there");
 	CXX_DEBUG_ASSERT(cxxTokenTypeIs(cxxTokenChainLast(g_cxx.pTokenChain),CXXTokenTypeSemicolon),"Only upon encountering a semicolon");
@@ -91,7 +91,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 	CXX_DEBUG_ASSERT(x,"There should be at least the terminator here!");
 	if(!x)
 		return 0;
-	
+
 	if(!cxxTokenTypeIs(x,CXXTokenTypeSemicolon))
 		return 0; // does not look like a variable declaration.
 
@@ -99,11 +99,11 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 			x,
 			CXXTokenTypeSquareParenthesisChain | CXXTokenTypeSingleColon | CXXTokenTypeNumber
 		);
-	
+
 	CXX_DEBUG_ASSERT(x,"We should have found an identifier here");
 	if(!x)
 		return 0;
-	
+
 	if(!cxxTokenTypeIs(x,CXXTokenTypeIdentifier))
 		return 0; // does not look like a variable declaration.
 
@@ -128,7 +128,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 	}
 
 	// Now check if the contents of the parenthesis chain look like a K&R signature
-	
+
 	// This is something like identifier,identifier,identifier,...
 	if(pParenthesis->pChain->iCount < 3)
 		return 0; // no way
@@ -147,7 +147,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 			bGotMultipleDots = TRUE;
 		else
 			return 0; // not valid (note that (void) is not allowed here since we wouln't have a following variable declaration)
-			
+
 		x = x->pNext;
 		CXX_DEBUG_ASSERT(x,"We should have found at least the closing parenthesis here");
 		if(cxxTokenTypeIs(x,CXXTokenTypeClosingParenthesis))
@@ -165,7 +165,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 
 	cxxTokenChainTake(g_cxx.pTokenChain,pIdentifier);
 	cxxTokenChainTake(pParenthesisTokenChain,pParenthesis);
-	
+
 	// remove the whole signature from the chain
 	while(g_cxx.pTokenChain->pHead != pFirstArgumentToken)
 		cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
@@ -187,7 +187,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 	while(iParameterCount > 0)
 	{
 		CXXToken * pCurrentTail = g_cxx.pTokenChain->pTail;
-	
+
 		if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket | CXXTokenTypeEOF))
 		{
 			cxxTokenDestroy(pIdentifier);
@@ -214,7 +214,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 
 		iParameterCount--;
 	}
-	
+
 	if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
 	{
 		cxxTokenDestroy(pIdentifier);
@@ -228,11 +228,11 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 	{
 		if(pParenthesis->pChain->pTail)
 			pParenthesis->pChain->pTail->bFollowedBySpace = FALSE; // make sure we don't emit the trailing space
-	
+
 		tag->isFileScope = (g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) && !isInputHeaderFile();
-	
+
 		vString * pszSignature = cxxTokenChainJoin(pParenthesis->pChain,NULL,0);
-	
+
 		if(pszSignature)
 			tag->extensionFields.signature = vStringValue(pszSignature);
 		cxxTagCommit();
@@ -242,7 +242,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 	}
 
 	cxxTokenDestroy(pParenthesis);
-	
+
 	CXX_DEBUG_PRINT("Found K&R-style function '%s'",vStringValue(pIdentifier->pszWord));
 
 	cxxScopePush(pIdentifier,CXXTagKindFUNCTION,CXXScopeAccessUnknown);
@@ -276,7 +276,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 //
 // If a proper function signature is found then also standardize the spacing of the identifier
 // so we always get it as "operator ()" and never as "operator() or operator ( ) ".
-// 
+//
 // Note that this function does NOT handle the special case of K&R-style declarations.
 //
 // If pParamInfo is not null, it is passed to cxxParserTokenChainLooksLikeFunctionParameterList()
@@ -304,7 +304,7 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 	CXX_DEBUG_ASSERT(pChain,"Null chain");
 
 	CXXToken * pToken = cxxTokenChainFirst(pChain);
-	
+
 	pInfo->pParenthesis = NULL;
 
 	CXXToken * pIdentifierStart = NULL;
@@ -331,7 +331,7 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 						pToken = pToken->pNext;
 					break;
 				}
-				
+
 				if(!cxxTokenTypeIsOneOf(
 						pToken,
 						CXXTokenTypeAnd | CXXTokenTypeAssignment | CXXTokenTypeComma |
@@ -344,20 +344,20 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 					CXX_DEBUG_LEAVE_TEXT("Unexpected token after the operator keyword");
 					return FALSE;
 				}
-				
+
 				pToken = pToken->pNext;
 			}
-			
+
 			if(!pToken)
 			{
 				CXX_DEBUG_LEAVE_TEXT("Didn't find a parenthesis subchain after operator keyword");
 				return FALSE;
 			}
-			
+
 			CXX_DEBUG_ASSERT(cxxTokenTypeIs(pToken,CXXTokenTypeParenthesisChain),"Must have found a parenthesis chain here");
 
 			pIdentifierEnd = pToken->pPrev;
-			
+
 			bStopScanning = TRUE;
 
 		} else if(cxxTokenTypeIs(pToken,CXXTokenTypeSmallerThanSign))
@@ -402,14 +402,14 @@ boolean cxxParserLookForFunctionSignature(CXXTokenChain * pChain,CXXFunctionSign
 
 			// must be parenthesis chain
 			if(!cxxTokenTypeIs(pToken,CXXTokenTypeParenthesisChain))
-				goto next_token; 
-	
+				goto next_token;
+
 			// parentheses at position 0 are meaningless
 			if(!pToken->pPrev)
 				goto next_token;
-	
+
 			// parentheses at position 1 they are very likely to be macro invocations... but we still handle them in case we find nothing else
-	
+
 			// must have an identifier before (this excludes things like __attribute__ and declspec which are marked as keywords)
 			if(cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeIdentifier))
 			{
@@ -474,7 +474,7 @@ next_token:
 		{
 			t->bFollowedBySpace = FALSE;
 			t = t->pNext;
-		} 
+		}
 	} else {
 		// non operator
 		pInfo->pIdentifierStart->bFollowedBySpace = FALSE; // force proper spacing
@@ -488,7 +488,7 @@ next_token:
 	{
 		// Look for scope prefix
 		pToken = pInfo->pIdentifierStart->pPrev;
-	
+
 		while(pToken)
 		{
 			if(!cxxTokenTypeIs(pToken,CXXTokenTypeMultipleColons))
@@ -525,14 +525,14 @@ next_token:
 					break;
 				}
 			}
-	
+
 			pInfo->pScopeStart = pToken;
-	
+
 			pToken = pToken->pPrev;
 		}
-		
+
 		// Look for trailing const.
-		
+
 		if(
 				pTopLevelParenthesis->pNext &&
 				cxxTokenTypeIs(pTopLevelParenthesis->pNext,CXXTokenTypeKeyword) &&
@@ -544,7 +544,7 @@ next_token:
 	} else {
 		pInfo->pSignatureConst = NULL;
 	}
-	
+
 	CXX_DEBUG_LEAVE_TEXT("Found function signature");
 	return TRUE;
 }
@@ -598,9 +598,9 @@ int cxxParserEmitFunctionTags(
 
 	CXX_DEBUG_ASSERT(pIdentifier,"The identifier should have been non null since the indices point inside this chain");
 	pIdentifier->eType = CXXTokenTypeIdentifier; // force it
-	
+
 	CXX_DEBUG_PRINT("Identifier is '%s'",vStringValue(pIdentifier->pszWord));
-	
+
 	tagEntryInfo * tag = cxxTagBegin(eTagKind,pIdentifier);
 
 	if(tag)
@@ -630,7 +630,7 @@ int cxxParserEmitFunctionTags(
 			cxxTokenAppendToString(pszSignature,pInfo->pSignatureConst);
 		}
 		// FIXME: Here we also know the return type (or whatever it is coming before the function name/scope)
-	
+
 		if(pszSignature)
 			tag->extensionFields.signature = vStringValue(pszSignature);
 
@@ -654,7 +654,7 @@ int cxxParserEmitFunctionTags(
 	} else {
 		cxxTokenDestroy(pIdentifier);
 	}
-	
+
 	CXX_DEBUG_LEAVE();
 	return iScopesPushed;
 }
@@ -669,7 +669,7 @@ int cxxParserEmitFunctionTags(
 int cxxParserExtractFunctionSignatureBeforeOpeningBracket(void)
 {
 	CXX_DEBUG_ENTER();
-	
+
 #ifdef CXX_DO_DEBUGGING
 	vString * pChain = cxxTokenChainJoin(g_cxx.pTokenChain,NULL,0);
 	CXX_DEBUG_PRINT("Looking for function in '%s'",vStringValue(pChain));
@@ -677,7 +677,7 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(void)
 #endif
 
 	// Note that the token chain ALWAYS contains the final delimiter here.
-	
+
 	CXX_DEBUG_ASSERT(g_cxx.pTokenChain->iCount > 0,"There should be at least the terminator here!");
 	CXX_DEBUG_ASSERT(cxxTokenChainLast(g_cxx.pTokenChain)->eType == CXXTokenTypeOpeningBracket,"We should have been called when pointing on an opening bracket!");
 
@@ -708,7 +708,7 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 	// emit parameters
 
 	CXXTokenChain * tc = cxxTokenChainCreate();
-	
+
 	unsigned int i = 0;
 	while(i < pInfo->uParameterCount)
 	{
@@ -717,7 +717,7 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 		if(tag)
 		{
 			boolean bDestroyIdentifier = FALSE;
-		
+
 			if(pInfo->aDeclarationStarts[i] && pInfo->aDeclarationEnds[i])
 			{
 				cxxTokenChainClear(tc);
@@ -731,7 +731,7 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 				bDestroyIdentifier = TRUE;
 				cxxTokenChainNormalizeTypeNameSpacing(tc);
 				cxxTokenChainCondense(tc,0);
-				
+
 				// "typename" is debatable since it's not really allowed by C++ for unqualified types.
 				// However I haven't been able to come up with something better... so "typename" it is for now.
 				tag->extensionFields.typeRef[0] = "typename";
@@ -740,13 +740,13 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 
 			tag->isFileScope = TRUE;
 			cxxTagCommit();
-			
+
 			if(bDestroyIdentifier)
 				cxxTokenDestroy(pInfo->aIdentifiers[i]);
 		}
 		i++;
 	}
-	
+
 	cxxTokenChainDestroy(tc);
 }
 
@@ -775,7 +775,7 @@ boolean cxxParserTokenChainLooksLikeFunctionParameterList(CXXTokenChain * tc,CXX
 		CXX_DEBUG_LEAVE_TEXT("Empty signature is valid for a function");
 		return TRUE;
 	}
-	
+
 	CXXToken * t = cxxTokenChainAt(tc,1);
 
 	boolean bIsC = cxxParserCurrentLanguageIsC();
@@ -791,12 +791,12 @@ boolean cxxParserTokenChainLooksLikeFunctionParameterList(CXXTokenChain * tc,CXX
 		//    type variable[..]
 		//    type variable:bits
 		//    type (*variable)(args)
-		//    <anything of the above> = default <-- C++ only   
+		//    <anything of the above> = default <-- C++ only
 		//    ... <-- vararg
 		//
-		
+
 		CXXToken * pStart = t;
-	
+
 		// First token must be identifier/keyword or ...
 		if(!cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier | CXXTokenTypeKeyword | CXXTokenTypeMultipleDots))
 		{
@@ -891,7 +891,7 @@ try_again:
 				} else if(t->pPrev->pPrev)
 				{
 					boolean bPrevIsSquareParenthesis = cxxTokenTypeIs(t->pPrev,CXXTokenTypeSquareParenthesisChain);
-				
+
 					if(
 						bPrevIsSquareParenthesis &&
 						cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeIdentifier)
@@ -936,14 +936,14 @@ try_again:
 						// FIXME: Check this better?
 					}
 				}
-				
+
 				if(pIdentifier)
 				{
 					pParamInfo->aDeclarationStarts[pParamInfo->uParameterCount] = pStart;
 					pParamInfo->aDeclarationEnds[pParamInfo->uParameterCount] = t->pPrev;
 					pParamInfo->aIdentifiers[pParamInfo->uParameterCount] = pIdentifier;
 					pParamInfo->uParameterCount++;
-					
+
 #ifdef CXX_DO_DEBUGGING
 					CXXToken * pDecl = cxxTokenChainExtractRange(pStart,t->pPrev,0);
 					CXX_DEBUG_PRINT("Found parameter '%s' in '%s'",vStringValue(pIdentifier->pszWord),vStringValue(pDecl->pszWord));
@@ -962,7 +962,7 @@ try_again:
 			CXX_DEBUG_LEAVE_TEXT("Found closing parenthesis, it's OK");
 			return TRUE;
 		}
-		
+
 		if(cxxTokenTypeIs(t,CXXTokenTypeComma))
 		{
 			// ok, go ahead
@@ -979,9 +979,9 @@ try_again:
 		}
 
 		CXX_DEBUG_PRINT("Found assignment");
-		
+
 		t = cxxTokenChainNextTokenOfType(t,CXXTokenTypeClosingParenthesis | CXXTokenTypeComma);
-		
+
 		CXX_DEBUG_ASSERT(t,"We should have found the closing parenthesis here");
 
 		if(cxxTokenTypeIs(t,CXXTokenTypeClosingParenthesis))
@@ -998,4 +998,3 @@ try_again:
 	CXX_DEBUG_LEAVE();
 	return TRUE;
 }
-

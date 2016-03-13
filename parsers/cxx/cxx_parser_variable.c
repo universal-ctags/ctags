@@ -33,7 +33,7 @@ static boolean cxxParserTokenChainLooksLikeConstructorParameterSet(CXXTokenChain
 
 	CXXToken * t = pChain->pHead;
 	CXXToken * pLast = pChain->pTail;
-	
+
 	CXX_DEBUG_ASSERT(cxxTokenTypeIs(t,CXXTokenTypeOpeningParenthesis),"The token chain should start with an opening parenthesis");
 	CXX_DEBUG_ASSERT(cxxTokenTypeIs(pLast,CXXTokenTypeOpeningParenthesis),"The token chain should end with an opening parenthesis");
 
@@ -87,7 +87,7 @@ static boolean cxxParserTokenChainLooksLikeConstructorParameterSet(CXXTokenChain
 
 
 //
-// Assumptions: 
+// Assumptions:
 //  - this function assumes that a function definition or prototype has been already excluded by other means.
 //  - there is a terminator at the end: one of ; = {
 //
@@ -139,7 +139,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 	enum CXXTagKind eScopeKind = cxxScopeGetKind();
 
 	CXX_DEBUG_ASSERT(t,"There should be an initial token here");
-	
+
 	if(!cxxTokenTypeIsOneOf(t,CXXTokenTypeIdentifier | CXXTokenTypeKeyword))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Statement does not start with identifier or keyword");
@@ -178,7 +178,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 				// possibly a variable ?
 				break;
 			}
-	
+
 			if(t->eType == CXXTokenTypeSmallerThanSign)
 			{
 				t = cxxTokenChainSkipToEndOfTemplateAngleBracket(t);
@@ -189,7 +189,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 				}
 				goto next_token;
 			}
-	
+
 			if(
 				cxxTokenTypeIsOneOf(
 						t,
@@ -208,7 +208,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 next_token:
 			t = t->pNext;
 		}
-	
+
 		if(!t)
 		{
 			CXX_DEBUG_LEAVE_TEXT("Nothing interesting here");
@@ -269,7 +269,7 @@ next_token:
 			pIdentifier = t->pPrev;
 			pTokenBefore = pIdentifier->pPrev;
 		}
-		
+
 		CXX_DEBUG_ASSERT(pIdentifier,"We should have found an identifier here");
 
 		if(!pTokenBefore)
@@ -290,15 +290,15 @@ next_token:
 				CXX_DEBUG_LEAVE_TEXT("Identifier preceeded by multiple colons but not preceeded by a type");
 				return bGotVariable;
 			}
-			
+
 			if(!cxxTokenTypeIs(pTokenBefore,CXXTokenTypeIdentifier))
 			{
 				CXX_DEBUG_LEAVE_TEXT("Identifier preceeded by multiple colons with probable syntax error");
 				return bGotVariable;
 			}
-			
+
 			pScopeStart = pTokenBefore;
-			
+
 			pTokenBefore = pTokenBefore->pPrev;
 			if(!pTokenBefore)
 			{
@@ -335,7 +335,7 @@ next_token:
 					return bGotVariable;
 				}
 			}
-			
+
 			CXX_DEBUG_PRINT("Type name seems to end at '%s' of type 0x%02x",vStringValue(pTokenBefore->pszWord),pTokenBefore->eType);
 			pTypeEnd = pTokenBefore;
 		}
@@ -352,9 +352,9 @@ next_token:
 				pScopeStart = cxxTokenChainNextTokenOfType(pScopeStart,CXXTokenTypeMultipleColons);
 				CXX_DEBUG_ASSERT(pScopeStart,"We should have found multiple colons here!");
 				pScopeStart = pScopeStart->pNext;
-	
+
 				cxxTokenChainTake(pChain,pScopeId);
-	
+
 				cxxScopePush(
 						pScopeId,
 						CXXTagKindCLASS,
@@ -363,7 +363,7 @@ next_token:
 				iScopesPushed++;
 			}
 		}
-		
+
 		bGotVariable = TRUE;
 
 		boolean bKnRStyleParameters = (uFlags & CXXExtractVariableDeclarationsKnRStyleParameters);
@@ -400,9 +400,9 @@ next_token:
 			} else {
 				CXX_DEBUG_PRINT("No typeref found");
 			}
-		
+
 			tag->isFileScope = bKnRStyleParameters ?
-							TRUE : 
+							TRUE :
 							(
 								((eScopeKind == CXXTagKindNAMESPACE) && (g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) && !isInputHeaderFile()) ||
 								(eScopeKind == CXXTagKindFUNCTION) || // locals are always hidden

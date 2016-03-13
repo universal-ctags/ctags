@@ -37,7 +37,7 @@ void cxxTokenAPINewFile(void)
 void cxxTokenAPIDone(void)
 {
 	CXXToken * t;
-	
+
 	while((t = cxxTokenChainTakeFirst(g_pTokenPool)))
 		cxxTokenForceDestroy(t);
 
@@ -47,7 +47,7 @@ void cxxTokenAPIDone(void)
 CXXToken * cxxTokenCreate(void)
 {
 	CXXToken * t;
-	
+
 	if(g_pTokenPool->iCount > 0)
 	{
 		t = cxxTokenChainTakeFirst(g_pTokenPool);
@@ -78,7 +78,7 @@ void cxxTokenDestroy(CXXToken * t)
 	}
 
 	CXX_DEBUG_ASSERT(t->pszWord,"There should be a word here");
-	
+
 	if(g_pTokenPool->iCount < CXX_TOKEN_POOL_MAXIMUM_SIZE)
 	{
 		vStringClear(t->pszWord); // this won't actually release memory (but we're taking care to do not create very large strings)
@@ -101,7 +101,7 @@ void cxxTokenForceDestroy(CXXToken * t)
 	}
 
 	CXX_DEBUG_ASSERT(t->pszWord,"There should be a word here");
-	
+
 	vStringDelete(t->pszWord);
 
 	eFree(t);

@@ -45,12 +45,12 @@ enum CXXTokenType
 	CXXTokenTypeOpeningParenthesis = (1 << 20), // (
 	CXXTokenTypeOpeningSquareParenthesis = (1 << 21), // [
 	CXXTokenTypeSmallerThanSign = (1 << 22), // <
-	
+
 	CXXTokenTypeClosingBracket = (1 << 23), // }
 	CXXTokenTypeClosingParenthesis = (1 << 24), // )
 	CXXTokenTypeClosingSquareParenthesis = (1 << 25), // ]
 	CXXTokenTypeGreaterThanSign = (1 << 26), // >
-	
+
 	// Subchains (caution: read the comment above about CXXTokenTypeOpeningBracket
 	CXXTokenTypeBracketChain = (1 << 27), // {...}
 	CXXTokenTypeParenthesisChain = (1 << 28), // (...)
@@ -76,7 +76,7 @@ typedef struct _CXXToken
 
 	struct _CXXToken * pNext;
 	struct _CXXToken * pPrev;
-	
+
 	// These members are used by the scope management functions to store the scope informations.
 	// Only cxxScope* functions can make sense of it. In other contexts these are simply left
 	// uninitialized and must be treated as undefined.

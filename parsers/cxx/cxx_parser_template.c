@@ -35,10 +35,10 @@ static boolean cxxParserParseTemplatePrefixAngleBrackets(void)
 
 	// Here we have the big prolem of <> characters which may be
 	// template argument delimiters, less than/greater than operators, shift left/right operators.
-	// 
+	//
 	// A well written code will have parentheses around all the ambiguous cases. We handle that
 	// and we permit any kind of syntax inside a parenthesis.
-	// 
+	//
 	// Without parentheses we still try to handle the << and >> shift operator cases:
 	// - << is always recognized as shift operator
 	// - >> is recognized as shift unless it's non-nested. This is what C++11 spec says
@@ -226,7 +226,7 @@ boolean cxxParserParseTemplatePrefix(void)
 		cxxParserNewStatement();
 		return TRUE; // tolerate syntax error
 	}
-	
+
 	CXXTokenChain * pSave = g_cxx.pTokenChain;
 	g_cxx.pTokenChain = cxxTokenChainCreate();
 	cxxTokenChainAppend(g_cxx.pTokenChain,cxxTokenChainTakeLast(pSave));
@@ -247,4 +247,3 @@ boolean cxxParserParseTemplatePrefix(void)
 	CXX_DEBUG_LEAVE();
 	return TRUE;
 }
-

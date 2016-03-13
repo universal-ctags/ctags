@@ -37,7 +37,7 @@
 //   - CTags should try to avoid emitting tags which involve syntax errors
 //
 // - There will always be pathologic cases. Don't cry, live with it.
-// 
+//
 // -----------------------------------------------------------------------------------------
 // TODO LIST
 // -----------------------------------------------------------------------------------------

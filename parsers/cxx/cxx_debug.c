@@ -29,7 +29,7 @@ void cxxDebugEnter(const char * szFunction,const char * szFormat,...)
 		fprintf(stderr,"    ");
 
 	fprintf(stderr,"[>> %s][at %lu] ",szFunction,getInputLineNumber());
-	
+
 	va_list va;
 	va_start(va,szFormat);
 	vfprintf(stderr,szFormat,va);
@@ -64,7 +64,7 @@ void cxxDebugPrint(const char * szFunction,const char * szFormat,...)
 		fprintf(stderr,"    ");
 
 	fprintf(stderr,"[%s][at %lu] ",szFunction,getInputLineNumber());
-	
+
 	va_list va;
 	va_start(va,szFormat);
 	vfprintf(stderr,szFormat,va);

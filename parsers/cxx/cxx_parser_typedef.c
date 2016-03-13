@@ -27,7 +27,7 @@
 boolean cxxParserParseGenericTypedef(void)
 {
 	CXX_DEBUG_ENTER();
-	
+
 	for(;;)
 	{
 		if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF | CXXTokenTypeClosingBracket | CXXTokenTypeKeyword))
@@ -35,7 +35,7 @@ boolean cxxParserParseGenericTypedef(void)
 			CXX_DEBUG_LEAVE_TEXT("Failed to parse fast statement");
 			return FALSE;
 		}
-		
+
 		// This fixes bug reported by Emil Rojas in 2002.
 		// Though it's quite debatable if we really *should* do this.
 		if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeKeyword))
@@ -123,13 +123,13 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtE
 		t = cxxTokenChainLastTokenOfType(pChain,CXXTokenTypeIdentifier);
 		pTParentChain = pChain;
 	}
-	
+
 	if(!t)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Didn't find an identifier");
 		return; // EOF
 	}
-	
+
 	if(!t->pPrev)
 	{
 		CXX_DEBUG_LEAVE_TEXT("No type before the typedef'd identifier");
@@ -141,7 +141,7 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtE
 	if(tag)
 	{
 		pAux = t->pPrev;
-	
+
 		// check for simple typerefs (this is to emulate what old ctags did!)
 		if(
 			cxxTokenTypeIs(pAux,CXXTokenTypeIdentifier) &&
@@ -170,10 +170,10 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtE
 			cxxTokenChainTake(pTParentChain,t);
 		} else {
 			// other kind of typeref, use typename here.
-			
+
 			// kill identifier
 			cxxTokenChainTake(pTParentChain,t);
-			
+
 			pAux = cxxTokenChainFirst(pChain);
 			CXX_DEBUG_ASSERT(pAux,"There should be at least another token here!");
 
@@ -192,7 +192,7 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtE
 			cxxTokenChainNormalizeTypeNameSpacing(pChain);
 
 			cxxTokenChainCondense(pChain,0);
-			
+
 			// "typename" is debatable since it's not really allowed by C++ for unqualified types.
 			// However I haven't been able to come up with something better... so "typename" it is for now.
 			tag->extensionFields.typeRef[0] = "typename";
@@ -202,7 +202,7 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtE
 		CXX_DEBUG_PRINT("Typeref is %s:%s",tag->extensionFields.typeRef[0],tag->extensionFields.typeRef[1]);
 
 		tag->isFileScope = !isInputHeaderFile();
-	
+
 		cxxTagCommit();
 		cxxTokenDestroy(t);
 	}
@@ -210,4 +210,3 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtE
 	CXX_DEBUG_LEAVE();
 	return;
 }
-

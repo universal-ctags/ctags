@@ -64,7 +64,7 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 
 		// check for lambdas
 		CXXToken * pParenthesis;
-		
+
 		if(
 			cxxParserCurrentLanguageIsCPP() &&
 			(pParenthesis = cxxParserOpeningBracketIsLambda())
@@ -111,7 +111,7 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 	//CXX_DEBUG_PRINT("Scope name is '%s'",szScopeName ? szScopeName : "");
 
 	cxxParserNewStatement();
-	
+
 	if(bExpectClosingBracket)
 		cppBeginStatement(); // FIXME: this cpp handling is broken: it works only because the moon is in the correct phase.
 
@@ -329,7 +329,7 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 				{
 					// Special handling of K&R style function declarations.
 					// We might be in the following situation:
-					//  
+					//
 					//  type whatever fname(par1,par2) int par1; int par2; {
 					//                                        ^
 					//
@@ -369,7 +369,7 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 					CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
 					// assume it's label
 					tagEntryInfo * tag = cxxTagBegin(CXXTagKindLABEL,pFirst);
-					
+
 					if(tag)
 					{
 						tag->isFileScope = TRUE;
@@ -431,7 +431,7 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 			break;
 		}
 	}
-	
+
 	CXX_DEBUG_LEAVE_TEXT("WARNING: Not reached");
 	return TRUE;
 }

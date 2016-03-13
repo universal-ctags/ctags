@@ -34,14 +34,14 @@ boolean cxxParserParseNamespace(void)
 
 	/*
 		Spec is:
-	
-			namespace ns_name { declarations }	(1)	
+
+			namespace ns_name { declarations }	(1)
 			inline namespace ns_name { declarations }	(2)	(since C++11)
-			namespace { declarations }	(3)	
-			ns_name::name	(4)	
-			using namespace ns_name;	(5)	
-			using ns_name::name;	(6)	
-			namespace name = qualified-namespace ;	(7)	
+			namespace { declarations }	(3)
+			ns_name::name	(4)
+			using namespace ns_name;	(5)
+			using ns_name::name;	(6)
+			namespace name = qualified-namespace ;	(7)
 			namespace ns_name::name	(8)	(since C++17)
 	*/
 
@@ -93,7 +93,7 @@ boolean cxxParserParseNamespace(void)
 			break;
 			case CXXTokenTypeOpeningBracket:
 				CXX_DEBUG_PRINT("Got opening bracket!");
-				
+
 				if(iScopeCount == 0)
 				{
 					// anonymous namespace!
@@ -107,13 +107,13 @@ boolean cxxParserParseNamespace(void)
 					cxxScopePush(t,CXXTagKindNAMESPACE,CXXScopeAccessUnknown);
 					iScopeCount++;
 				}
-				
+
 				if(!cxxParserParseBlock(TRUE))
 				{
 					CXX_DEBUG_LEAVE_TEXT("Failed to parse scope");
 					return FALSE;
 				}
-				
+
 				while(iScopeCount > 0)
 				{
 					cxxScopePop();
@@ -138,8 +138,7 @@ boolean cxxParserParseNamespace(void)
 			break;
 		}
 	}
-	
+
 	CXX_DEBUG_LEAVE_TEXT("WARNING: Not reached");
 	return TRUE;
 }
-

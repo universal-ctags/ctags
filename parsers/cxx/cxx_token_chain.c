@@ -39,7 +39,7 @@ void cxxTokenChainDestroy(CXXTokenChain * tc)
 
 	if(!tc)
 		return;
-	
+
 	t = tc->pHead;
 	while(t)
 	{
@@ -59,7 +59,7 @@ CXXToken * cxxTokenChainTakeFirst(CXXTokenChain * tc)
 		return NULL;
 	if(!tc->pHead)
 		return NULL;
-	
+
 	t = tc->pHead;
 	if(t == tc->pTail)
 	{
@@ -87,7 +87,7 @@ CXXToken * cxxTokenChainTakeLast(CXXTokenChain * tc)
 		return NULL;
 	if(!tc->pTail)
 		return NULL;
-	
+
 	t = tc->pTail;
 	if(t == tc->pHead)
 	{
@@ -112,29 +112,29 @@ void cxxTokenChainTake(CXXTokenChain * tc,CXXToken * t)
 		return;
 	if(!tc->pHead)
 		return;
-	
+
 	/*
 	Debug with this:
-	
+
 	CXXToken * t2 = tc->pHead;
 	while(t2 && (t2 != t))
 		t2 = t2->pNext;
 
 	Assert(t2);
 	*/
-	
+
 	if(t == tc->pHead)
 	{
 		cxxTokenChainTakeFirst(tc);
 		return;
 	}
-	
+
 	if(t == tc->pTail)
 	{
 		cxxTokenChainTakeLast(tc);
 		return;
 	}
-	
+
 	// in the middle
 
 	CXXToken * n = t->pNext;
@@ -142,7 +142,7 @@ void cxxTokenChainTake(CXXTokenChain * tc,CXXToken * t)
 
 	n->pPrev = p;
 	p->pNext = n;
-	
+
 	tc->iCount--;
 
 	Assert(tc->iCount > 1);
@@ -152,7 +152,7 @@ boolean cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t)
 {
 	if(!tc)
 		return FALSE;
-	
+
 	CXXToken * aux = tc->pHead;
 	while(aux)
 	{
@@ -167,7 +167,7 @@ boolean cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t)
 			if(cxxTokenChainTakeRecursive(aux->pChain,t))
 				return TRUE;
 		}
-	
+
 		aux = aux->pNext;
 	}
 
@@ -197,8 +197,8 @@ void cxxTokenChainClear(CXXTokenChain * tc)
 
 	while((t = cxxTokenChainTakeFirst(tc)))
 		cxxTokenDestroy(t);
-	
-	
+
+
 	Assert(tc->iCount == 0);
 	Assert(tc->pHead == NULL);
 	Assert(tc->pTail == NULL);
@@ -250,7 +250,7 @@ void cxxTokenChainJoinRangeInString(CXXToken * from,CXXToken * to,vString * s,co
 		return;
 
 	CXXToken * t = from;
-	
+
 	cxxTokenAppendToString(s,t);
 
 	if((!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) && t->bFollowedBySpace)
@@ -264,7 +264,7 @@ void cxxTokenChainJoinRangeInString(CXXToken * from,CXXToken * to,vString * s,co
 
 		if(szSeparator)
 			vStringCatS(s,szSeparator);
-		
+
 		cxxTokenAppendToString(s,t);
 
 		if((!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) && t->bFollowedBySpace)
@@ -293,18 +293,18 @@ void cxxTokenChainJoinInString(CXXTokenChain * tc,vString * s,const char * szSep
 		return;
 
 	CXXToken * t = tc->pHead;
-	
+
 	cxxTokenAppendToString(s,t);
 
 	if((!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) && t->bFollowedBySpace)
 		vStringCatS(s," ");
-		
+
 	t = t->pNext;
 	while(t)
 	{
 		if(szSeparator)
 			vStringCatS(s,szSeparator);
-		
+
 		cxxTokenAppendToString(s,t);
 
 		if((!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) && t->bFollowedBySpace)
@@ -334,7 +334,7 @@ void cxxTokenChainMoveEntries(CXXTokenChain * src,CXXTokenChain * dest)
 {
 	if(dest->iCount > 0)
 		cxxTokenChainClear(dest);
-	
+
 	dest->iCount = src->iCount;
 	dest->pHead = src->pHead;
 	dest->pTail = src->pTail;
@@ -348,7 +348,7 @@ void cxxTokenChainMoveEntryRange(CXXTokenChain * src,CXXToken * start,CXXToken *
 {
 	if(!src || !dest || !start || !end)
 		return;
-		
+
 	CXX_DEBUG_ASSERT(cxxTokenChainFindToken(src,start) >= 0,"The start token must be in the source chain!");
 	CXX_DEBUG_ASSERT(cxxTokenChainFindToken(src,end) >= 0,"The end token must be in the source chain!");
 	CXX_DEBUG_ASSERT(cxxTokenChainFindToken(src,start) <= cxxTokenChainFindToken(src,end),"The start token must come before the end token");
@@ -375,7 +375,7 @@ void cxxTokenChainCondense(CXXTokenChain * tc,unsigned int uFlags)
 		return;
 	if(tc->iCount <= 1)
 		return;
-	
+
 	CXXToken * pCondensed = cxxTokenCreate();
 
 	pCondensed->eType = CXXTokenTypeUnknown;
@@ -394,7 +394,7 @@ void cxxTokenChainCondense(CXXTokenChain * tc,unsigned int uFlags)
 		pCondensed->bFollowedBySpace = t->bFollowedBySpace;
 		cxxTokenDestroy(t);
 	}
-	
+
 	cxxTokenChainAppend(tc,pCondensed);
 }
 
@@ -412,7 +412,7 @@ CXXToken * cxxTokenChainAt(CXXTokenChain * tc,int index)
 		index--;
 		pToken = pToken->pNext;
 	}
-	
+
 	return pToken;
 }
 
@@ -599,7 +599,7 @@ CXXToken * cxxTokenChainPreviousKeyword(CXXToken * from,enum CXXKeyword eKeyword
 {
 	if(!from)
 		return NULL;
-	
+
 	CXXToken * t = from->pPrev;
 	while(t)
 	{
@@ -607,7 +607,7 @@ CXXToken * cxxTokenChainPreviousKeyword(CXXToken * from,enum CXXKeyword eKeyword
 			return t;
 		t = t->pPrev;
 	}
-	
+
 	return NULL;
 }
 
@@ -641,7 +641,7 @@ CXXToken * cxxTokenChainExtractRange(CXXToken * from,CXXToken * to,unsigned int 
 		return NULL;
 
 	CXXToken * pToken = from;
-	
+
 	CXXToken * pRet = cxxTokenCreate();
 	pRet->iLineNumber = pToken->iLineNumber;
 	pRet->oFilePosition = pToken->oFilePosition;
@@ -661,7 +661,7 @@ CXXToken * cxxTokenChainExtractRange(CXXToken * from,CXXToken * to,unsigned int 
 			vStringCatS(pRet->pszWord," ");
 		pRet->bFollowedBySpace = pToken->bFollowedBySpace;
 	}
-	
+
 	return pRet;
 }
 
@@ -684,7 +684,7 @@ CXXToken * cxxTokenChainExtractIndexRange(CXXTokenChain * tc,int iFirstIndex,int
 
 	if(!pToken)
 		return NULL;
-	
+
 	CXXToken * pRet = cxxTokenCreate();
 	pRet->iLineNumber = pToken->iLineNumber;
 	pRet->oFilePosition = pToken->oFilePosition;
@@ -705,7 +705,7 @@ CXXToken * cxxTokenChainExtractIndexRange(CXXTokenChain * tc,int iFirstIndex,int
 		pRet->bFollowedBySpace = pToken->bFollowedBySpace;
 		idx++;
 	}
-	
+
 	return pRet;
 }
 
@@ -718,7 +718,7 @@ void cxxTokenChainNormalizeTypeNameSpacing(CXXTokenChain * pChain)
 		return;
 
 	// Goals:
-	
+
 	// int
 	// unsigned short int
 	// int *
@@ -739,7 +739,7 @@ void cxxTokenChainNormalizeTypeNameSpacing(CXXTokenChain * pChain)
 			cxxTokenChainNormalizeTypeNameSpacing(t->pChain);
 			t->bFollowedBySpace = FALSE;
 		} else if(cxxTokenTypeIsOneOf(t,
-					CXXTokenTypeIdentifier | CXXTokenTypeKeyword | CXXTokenTypeGreaterThanSign | 
+					CXXTokenTypeIdentifier | CXXTokenTypeKeyword | CXXTokenTypeGreaterThanSign |
 					CXXTokenTypeAnd | CXXTokenTypeMultipleAnds
 				))
 		{
@@ -759,7 +759,7 @@ void cxxTokenChainNormalizeTypeNameSpacing(CXXTokenChain * pChain)
 		} else {
 			t->bFollowedBySpace = FALSE;
 		}
-		
+
 		t = t->pNext;
 	}
 
