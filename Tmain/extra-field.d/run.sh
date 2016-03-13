@@ -3,5 +3,5 @@
 
 CTAGS=$1
 
-${CTAGS} --fields=+Er --extra=+qr. -o - input.cpp | sed -e 's|[^\t]*\(input.cpp\)|\1|'
+${CTAGS} --fields=+Er --extra=+qr. -o - input.cpp | sed -e 's|[^	]*\(input.cpp\)|\1|'
 
