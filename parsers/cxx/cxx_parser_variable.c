@@ -43,28 +43,54 @@ static boolean cxxParserTokenChainLooksLikeConstructorParameterSet(CXXTokenChain
 	{
 		if(cxxTokenTypeIsOneOf(t,
 				CXXTokenTypeNumber | CXXTokenTypeStringConstant | CXXTokenTypeCharacterConstant |
-				CXXTokenTypePointerOperator | CXXTokenTypeDotOperator | CXXTokenTypeOperator
+				CXXTokenTypePointerOperator | CXXTokenTypeDotOperator | CXXTokenTypeOperator | CXXTokenTypeMultipleDots
 			))
-			return TRUE; // not allowed in a function prototype at this point
+			return TRUE; // not allowed in a constructor parameter set at this point
 
 		if(cxxTokenTypeIs(t,CXXTokenTypeKeyword))
 		{
-			if(cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeKeyword | CXXTokenTypeStar | CXXTokenTypeAnd | CXXTokenTypeMultipleAnds | CXXTokenTypeIdentifier))
+			if(
+					cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeKeyword | CXXTokenTypeStar | CXXTokenTypeAnd | CXXTokenTypeMultipleAnds | CXXTokenTypeIdentifier) ||
+					(pChain->iCount == 3) // (double)
+				)
 			{
 				// this is something like:
 				// (int a...
 				// (void *...
 				// (unsigned int...
+				// (double)
 				return FALSE;
 			}
+			
+			if(cxxKeywordMayBePartOfTypeName(t->eKeyword))
+			{
+				// parts of type name (not inside a parenthesis which is assumed to be condensed)
+				return FALSE;
+			}
+			
 		} else if(cxxTokenTypeIs(t,CXXTokenTypeIdentifier))
 		{
 			if(cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeKeyword | CXXTokenTypeIdentifier))
 			{
 				// this is something like:
-				// (int a...
-				// (void *...
-				// (unsigned int...
+				// (type a...
+				return FALSE;
+			}
+		} else if(cxxTokenTypeIs(t,CXXTokenTypeGreaterThanSign))
+		{
+			if(cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeAnd | CXXTokenTypeStar | CXXTokenTypeMultipleAnds | CXXTokenTypeComma))
+			{
+				// > &
+				// > *
+				// > &&
+				// >,
+				return FALSE;
+			}
+			
+			if(cxxTokenTypeIsOneOf(t->pPrev,CXXTokenTypeKeyword))
+			{
+				// int>
+				// 
 				return FALSE;
 			}
 		}

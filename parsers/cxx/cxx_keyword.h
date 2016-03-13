@@ -111,6 +111,8 @@ enum CXXKeyword
 	// WARNING: There is a table in cxx_keyword.c that must match the order in this enumeration
 };
 
+boolean cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId);
+
 void cxxBuildKeywordHash(const langType language,boolean bCXX);
 
 

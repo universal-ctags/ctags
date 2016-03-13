@@ -820,7 +820,7 @@ try_again:
 		t = cxxTokenChainNextTokenOfType(
 				t,
 				CXXTokenTypeClosingParenthesis | CXXTokenTypeComma | CXXTokenTypeAssignment |
-				CXXTokenTypeSmallerThanSign | CXXTokenTypeParenthesisChain |
+				CXXTokenTypeSmallerThanSign | CXXTokenTypeGreaterThanSign | CXXTokenTypeParenthesisChain |
 				TOKENS_THAT_SHOULD_NOT_APPEAR_IN_SIGNATURE_BEFORE_ASSIGNMENT
 			);
 
@@ -865,6 +865,12 @@ try_again:
 			}
 
 			goto try_again;
+		}
+		
+		if(cxxTokenTypeIs(t,CXXTokenTypeGreaterThanSign))
+		{
+			CXX_DEBUG_LEAVE_TEXT("Unbalanced > (a < should have been found before)");
+			return FALSE;
 		}
 
 		if(cxxTokenTypeIsOneOf(t,TOKENS_THAT_SHOULD_NOT_APPEAR_IN_SIGNATURE_BEFORE_ASSIGNMENT))

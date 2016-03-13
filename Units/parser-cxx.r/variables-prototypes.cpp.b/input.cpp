@@ -44,7 +44,7 @@ int  main( int  argc, char ** argv )
     int c3( std::map<int>( 9 ) );           //variable
     int c4( std::map<int> a );              //prototype
     int c5( map<int>  & a );                //prototype
-    int c6( ooo & a );                      //prototype
+    int c6( ooo & a );                      //prototype (ambiguous)
     int c7( int & a );                      //prototype
     int c8( map<int> a );                   //prototype
     int c9( int a );                        //prototype
@@ -118,7 +118,7 @@ int C2( int * h );                      //prototype
 int C3( std::map<int>( 9 ) );           //variable
 int C4( std::map<int> a );              //prototype
 int C5( map<int>  & a );                //prototype
-int C6( ooo & a );                      //prototype
+int C6( ooo & a );                      //prototype (ambiguous)
 int C7( int & a );                      //prototype
 int C8( map<int> a );                   //prototype
 int C9( int a );                        //prototype
@@ -135,10 +135,10 @@ char H3( double );                      //prototype
 int H4( h u );                          //prototype
 int (*P1)( int o );                     //variable
 int V4( iii( 'o' ) );                   //variable
-int V5( iii( o ) );                     //variable
+int V5( iii( o ) );                     //variable (ambiguous)
 int V6( int (*p)( int ) );              //prototype
 int V7( 89 );                           //variable
-int V8( ooo );                          //variable
+int V8( ooo );                          //variable (ambiguous)
 int W1 __ARGS (( int a )){}             //function
 int W2 (( a - 5 ) / 6 );                //variable
 int X1( a.b );                          //variable
@@ -149,4 +149,4 @@ int X5( a ^ 6 );                        //variable
 int X6( a | b );                        //variable
 //int X7( a & b & c );                  //variable
 int X8( a & b & 2 );                    //variable
-int X9( a && b );                       //variable
+int X9( a && b );                       //variable (ambiguous in C++)
