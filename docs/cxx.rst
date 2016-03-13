@@ -1,5 +1,8 @@
+.. _cxx:
+
+======================================================================
 The new C/C++ parser
-=====================================================================
+======================================================================
 
 :Maintainer: Szymon Tomasz Stefanek <s.stefanek@gmail.com>
 
@@ -14,6 +17,7 @@ rewritten from scratch.
 
 In the first release several outstanding bugs were fixed and some new
 features have been added. Among them:
+
 - Tagging of "using namespace" declarations
 - Tagging of function parameters
 - Extraction of function parameter types
@@ -53,7 +57,7 @@ File scope
 
 The file scope information is not 100% reliable. It never was.
 There are several cases in that compiler, linker or even source code
-tricks can "unhide" file scope symbols (for instance *.c files can be
+tricks can "unhide" file scope symbols (for instance \*.c files can be
 included into each other) and several other cases in that the limitation
 of the scope of a symbol to a single file simply cannot be determined
 with a single pass or without looking at a program as a whole.
