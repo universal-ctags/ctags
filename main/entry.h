@@ -118,8 +118,6 @@ extern tagFile TagFile;
 */
 extern void freeTagFileResources (void);
 extern const char *tagFileName (void);
-extern void copyBytes (FILE* const fromFp, FILE* const toFp, const long size);
-extern void copyFile (const char *const from, const char *const to, const long size);
 extern void openTagFile (void);
 extern void closeTagFile (const boolean resize);
 extern void beginEtagsFile (void);
@@ -140,6 +138,10 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      const char* sourceLanguage,
 			      long sourceLineNumberDifference);
 extern int makeQualifiedTagEntry (const tagEntryInfo *const e);
+
+extern unsigned long numTagsAdded(void);
+extern unsigned long numTagsTotal(void);
+extern void invalidatePatternCache(void);
 
 /* Getting line associated with tag */
 extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo *const tag,
