@@ -3546,15 +3546,16 @@ static void initializeVeraParser (const langType language)
 	buildKeywordHash (language, 5);
 }
 
-extern parserDefinition* CParser (void)
+extern parserDefinition* OldCParser (void)
 {
 	static const char *const extensions [] = { "c", NULL };
-	parserDefinition* def = parserNew ("C");
+	parserDefinition* def = parserNew ("OldC");
 	def->kinds      = CKinds;
 	def->kindCount  = ARRAY_SIZE (CKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeCParser;
+	def->enabled = 0;
 	return def;
 }
 
@@ -3570,7 +3571,7 @@ extern parserDefinition* DParser (void)
 	return def;
 }
 
-extern parserDefinition* CppParser (void)
+extern parserDefinition* OldCppParser (void)
 {
 	static const char *const extensions [] = {
 		"c++", "cc", "cp", "cpp", "cxx",
@@ -3583,13 +3584,14 @@ extern parserDefinition* CppParser (void)
 	static selectLanguage selectors[] = { selectByObjectiveCKeywords,
 					      NULL };
 
-	parserDefinition* def = parserNew ("C++");
+	parserDefinition* def = parserNew ("OldC++");
 	def->kinds      = CKinds;
 	def->kindCount  = ARRAY_SIZE (CKinds);
 	def->extensions = extensions;
 	def->parser2    = findCTags;
 	def->initialize = initializeCppParser;
 	def->selectLanguage = selectors;
+	def->enabled = 0;
 	return def;
 }
 

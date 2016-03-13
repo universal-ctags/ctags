@@ -6,7 +6,7 @@ REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrca
 
 CFLAGS = -Wall
 DEFINES = -DWIN32 $(REGEX_DEFINES)
-INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch
+INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers
 CC = gcc
 OPTLIB2C = ./misc/optlib2c
 OBJEXT = o

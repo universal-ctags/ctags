@@ -3,9 +3,9 @@
 #pragma weak WeakSymbol = StrongSymbol
 
 /* handling of spoofing macros */
-MACRO1(foo);
+DECL1(foo); /* gcc will accept this as function prototype (with some warnings) */
 MACRO2(bar);
-MACRO3(x, y);
+DECL3(x, y); /* gcc will accept this as function prototype (with some warnings) */
 
 void prototype1 __ARGS((int arg1, void *arg2));
 void prototype2 __ARGS((int arg1, void *arg2))

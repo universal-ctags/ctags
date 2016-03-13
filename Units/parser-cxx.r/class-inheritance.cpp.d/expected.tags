@@ -1,0 +1,10 @@
+A	input.cpp	/^class A$/
+B	input.cpp	/^class B$/
+C	input.cpp	/^template<typename X,typename Y> class C$/
+D	input.cpp	/^class D : public A$/;"	inherits:A
+E	input.cpp	/^class E : public A, public B$/;"	inherits:A,B
+F	input.cpp	/^class F : private A, public B$/;"	inherits:A,B
+G	input.cpp	/^class G : virtual D$/;"	inherits:D
+H	input.cpp	/^class H : public A, virtual B$/;"	inherits:A,B
+I	input.cpp	/^class I : public C<A,B>$/;"	inherits:C<A,B>
+J	input.cpp	/^class J : private A, public C<A,B>$/;"	inherits:A,C<A,B>

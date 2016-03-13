@@ -1,7 +1,6 @@
 ../e.h	input.c	/^#include <..\/e.h>/;"	h	role:system
 ../f.h	input.c	/^#include "..\/f.h"/;"	h	role:local
 D	input.c	/^#define D /;"	d	file:
-M	input.c	/^M(void)$/;"	f
 a.h	input.c	/^#include <a.h>/;"	h	role:system
 b.h	input.c	/^#include "b.h"/;"	h	role:local
 g.h	input.c	/^#include<g.h>/;"	h	role:system

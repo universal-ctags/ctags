@@ -1,5 +1,5 @@
 Base	input.cpp	/^struct Base {$/;"	s	file:
 Foo	input.cpp	/^struct Foo final : public Base {$/;"	s	file:
-bar	input.cpp	/^  static constexpr auto bar() noexcept { return 1; }$/;"	f	struct:Foo	signature:()
+bar	input.cpp	/^  static constexpr auto bar() noexcept { return 1; }$/;"	f	struct:Foo	file:	signature:()
 baz	input.cpp	/^  virtual void baz() const throw() = 0;$/;"	p	struct:Base	file:	signature:() const
 baz	input.cpp	/^  virtual void baz() const throw() final override;$/;"	p	struct:Foo	file:	signature:() const

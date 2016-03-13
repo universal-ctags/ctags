@@ -1,20 +1,21 @@
-A	input.c	/^  A = INDX_T2$/;"	e	enum:__anon1	file:
-INDX_C1	input.c	/^  INDX_C1,$/;"	e	enum:__anon1	file:
-INDX_C2	input.c	/^  INDX_C2,$/;"	e	enum:__anon1	file:
-INDX_IM1	input.c	/^  INDX_IM1,$/;"	e	enum:__anon1	file:
-INDX_IM2	input.c	/^  INDX_IM2,$/;"	e	enum:__anon1	file:
-INDX_L	input.c	/^  INDX_L,$/;"	e	enum:__anon1	file:
-INDX_L2	input.c	/^  INDX_L2,$/;"	e	enum:__anon1	file:
-INDX_M	input.c	/^  INDX_M,$/;"	e	enum:__anon1	file:
-INDX_NIL	input.c	/^  INDX_NIL =   0x00,$/;"	e	enum:__anon1	file:
-INDX_P	input.c	/^  INDX_P,$/;"	e	enum:__anon1	file:
-INDX_R	input.c	/^  INDX_R,$/;"	e	enum:__anon1	file:
-INDX_R2	input.c	/^  INDX_R2,$/;"	e	enum:__anon1	file:
-INDX_S	input.c	/^  INDX_S,$/;"	e	enum:__anon1	file:
-INDX_S1	input.c	/^  INDX_S1,$/;"	e	enum:__anon1	file:
-INDX_S2	input.c	/^  INDX_S2,$/;"	e	enum:__anon1	file:
-INDX_S3	input.c	/^  INDX_S3,$/;"	e	enum:__anon1	file:
-INDX_S4	input.c	/^  INDX_S4,$/;"	e	enum:__anon1	file:
-INDX_T	input.c	/^  INDX_T,$/;"	e	enum:__anon1	file:
-INDX_T2	input.c	/^  INDX_T2,$/;"	e	enum:__anon1	file:
-task_indx_type	input.c	/^} task_indx_type;$/;"	t	typeref:enum:__anon1	file:
+A	input.c	/^  A = INDX_T2$/;"	e	enum:__anone0aee1a10104	file:
+INDX_C1	input.c	/^  INDX_C1,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_C2	input.c	/^  INDX_C2,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_IM1	input.c	/^  INDX_IM1,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_IM2	input.c	/^  INDX_IM2,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_L	input.c	/^  INDX_L,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_L2	input.c	/^  INDX_L2,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_M	input.c	/^  INDX_M,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_NIL	input.c	/^  INDX_NIL =   0x00,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_P	input.c	/^  INDX_P,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_R	input.c	/^  INDX_R,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_R2	input.c	/^  INDX_R2,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_S	input.c	/^  INDX_S,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_S1	input.c	/^  INDX_S1,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_S2	input.c	/^  INDX_S2,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_S3	input.c	/^  INDX_S3,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_S4	input.c	/^  INDX_S4,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_T	input.c	/^  INDX_T,$/;"	e	enum:__anone0aee1a10104	file:
+INDX_T2	input.c	/^  INDX_T2,$/;"	e	enum:__anone0aee1a10104	file:
+__anone0aee1a10104	input.c	/^typedef enum{$/;"	g	file:
+task_indx_type	input.c	/^} task_indx_type;$/;"	t	typeref:enum:__anone0aee1a10104	file:

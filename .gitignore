@@ -9,6 +9,7 @@
 *.o
 *.obj
 *.od
+*.ssexwsp
 *.TMP
 *.tmp
 *~

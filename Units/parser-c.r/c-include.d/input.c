@@ -4,10 +4,12 @@
 #include <sys/c.h>
 #include "sys/d.h"
 
+/* this is actually a syntax error */
 "
 #include       <K.h>
 #include       \"L.h\"
 "
+
 #include <../e.h>
 #include "../f.h"
 

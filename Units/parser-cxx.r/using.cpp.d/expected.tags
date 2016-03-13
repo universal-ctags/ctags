@@ -1,0 +1,9 @@
+A	input.cpp	/^class A$/;"	class	file:
+B	input.cpp	/^class B : public A$/;"	class	file:
+std	input.cpp	/^using namespace std;$/;"	using	file:
+string	input.cpp	/^#include <string>/;"	header	role:system
+string	input.cpp	/^using std::string;$/;"	name	file:
+test	input.cpp	/^	using A::test;$/;"	name	class:B
+test	input.cpp	/^	void test();$/;"	prototype	class:A	file:	signature:()
+test	input.cpp	/^	void test(x t);$/;"	prototype	class:B	file:	signature:(x t)
+x	input.cpp	/^using x = std::string;$/;"	typedef	typeref:typename:std::string	file:

@@ -1,2 +1,2 @@
 main	input.c	/^main(int argc)$/;"	f
-out	input.c	/^   out:$/;"	L
+out	input.c	/^   out:$/;"	L	function:main	file:

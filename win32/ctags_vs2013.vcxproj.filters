@@ -274,6 +274,54 @@
     <ClCompile Include="..\main\ptag.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_debug.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_keyword.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_block.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_function.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_lambda.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_namespace.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_template.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_tokenizer.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_typedef.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_using.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_scope.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_tag.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_token.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_token_chain.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\main\e_msoft.h">
@@ -358,6 +406,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
    <ClInclude Include="..\main\ptag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_keyword.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_parser_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_scope.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_tag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_token.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_token_chain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
