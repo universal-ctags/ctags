@@ -14,6 +14,12 @@ DTS	h	local	local header	on
 Java	p	imported	imported package	on
 Make	I	included	included	on
 Make	I	optional	optionally included	on
+OldC++	d	undef	undefined	on
+OldC++	h	system	system header	on
+OldC++	h	local	local header	on
+OldC	d	undef	undefined	on
+OldC	h	system	system header	on
+OldC	h	local	local header	on
 Python	i	imported	imported modules	on
 Python	i	namespace	namespace from where classes/variables/functions are imported	on
 Python	i	indirectly-imported	module imported in alternative name	on
@@ -39,6 +45,12 @@ DTS	h	local	local header	on
 Java	p	imported	imported package	on
 Make	I	included	included	on
 Make	I	optional	optionally included	on
+OldC++	d	undef	undefined	on
+OldC++	h	system	system header	on
+OldC++	h	local	local header	on
+OldC	d	undef	undefined	on
+OldC	h	system	system header	on
+OldC	h	local	local header	on
 Python	i	imported	imported modules	on
 Python	i	namespace	namespace from where classes/variables/functions are imported	on
 Python	i	indirectly-imported	module imported in alternative name	on
@@ -65,6 +77,10 @@ C++	h	system	system header	on
 C++	h	local	local header	on
 DTS	h	system	system header	on
 DTS	h	local	local header	on
+OldC++	h	system	system header	on
+OldC++	h	local	local header	on
+OldC	h	system	system header	on
+OldC	h	local	local header	on
 Vera	h	system	system header	on
 Vera	h	local	local header	on
 

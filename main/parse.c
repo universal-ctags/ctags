@@ -835,7 +835,7 @@ static void verboseReportCandidate (const char *header,
 static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx *glc,
 				       unsigned int nominate (const char *const, parserCandidate**))
 {
-	langType language;
+	langType language = LANG_IGNORE;
 	parserCandidate  *candidates;
 	unsigned int n_candidates;
 
@@ -865,12 +865,12 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 
 		Assert(language != LANG_AUTO);
 
+fopen_error:
 		if (language == LANG_IGNORE)
 			language = candidates[0].lang;
 	}
 	else
 	{
-fopen_error:
 		language = LANG_IGNORE;
 	}
 
