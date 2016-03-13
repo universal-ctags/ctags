@@ -5,14 +5,14 @@
 
 CTAGS=$1
 BUILD_SUBDIR=$3
-stderr=${BUILD_SUBDIR}/stderr-actual.txt
+stderr_tmp=${BUILD_SUBDIR}/stderr-actual.txt.tmp
 
-${CTAGS} --options=NONE -o - --language-force=CTagsSelfTest --verbose input.cst
+${CTAGS} --options=NONE -o - --language-force=CTagsSelfTest --verbose input.cst \
+	 2> ${stderr_tmp}
 
 # externalSortTags invokes sort command, and it is logged to stderr.
 # Delete the line for the comparison.
-if [ -w "${stderr}" ]; then
-   sed -i -e '/^system ("sort -u")$/d' "${stderr}"
-fi
+sed -e '/^system ("sort -u")$/d' < ${stderr_tmp} 1>&2
+rm ${stderr_tmp}
 
 exit $?
