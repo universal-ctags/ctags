@@ -66,6 +66,7 @@
 
 
 #include "debug.h"
+#include "entry.h"
 #include "keyword.h"
 #include "main.h"
 #include "options.h"
@@ -407,7 +408,7 @@ static void printTotals (const clock_t *const timeStamps)
 
 #ifdef DEBUG
 	fprintf (stderr, "longest tag line = %lu\n",
-			(unsigned long) TagFile.max.line);
+		 (unsigned long) maxTagsLine ());
 #endif
 }
 

@@ -1447,4 +1447,9 @@ extern unsigned long numTagsTotal(void)
 	return TagFile.numTags.added + TagFile.numTags.prev;
 }
 
+extern unsigned long maxTagsLine (void)
+{
+	return (unsigned long)TagFile.max.line;
+}
+
 /* vi:set tabstop=4 shiftwidth=4: */
