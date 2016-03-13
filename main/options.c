@@ -317,11 +317,11 @@ static optionDescription LongOptionDescription [] = {
  {0,"       Output list of pseudo tags."},
  {1,"  --list-regex-flags"},
  {1,"       Output list of flags which can be used in a regex parser definition."},
- {1,"  --map-<LANG>=[+]pattern|extension"},
+ {1,"  --map-<LANG>=[+|-]pattern|extension"},
  {1,"       Set or add(+) a map for <LANG>."},
  {1,"       Unlike --langmap, only one pattern or one extension can be specified"},
- {1,"       at once. Unlike, --langmap adding one affects the map of LANG; it does't"},
- {1,"       affect maps of the other languages."},
+ {1,"       at once. Unlike, --langmap adding one affects the map of LANG; it does"},
+ {1,"       not affect the maps of the other languages."},
  {1,"  --maxdepth=N"},
 #ifdef RECURSE_SUPPORTED
  {1,"       Specify maximum recursion depth."},
@@ -1337,7 +1337,8 @@ static char* extractMapFromParameter (const langType language,
 	return NULL;
 }
 
-static char* addLanguageMap (const langType language, char* map_parameter, boolean exclusive)
+static char* addLanguageMap (const langType language, char* map_parameter,
+			     boolean exclusiveInAllLanguages)
 {
 	char* p = NULL;
 	boolean pattern_p;
@@ -1345,12 +1346,32 @@ static char* addLanguageMap (const langType language, char* map_parameter, boole
 
 	map = extractMapFromParameter (language, map_parameter, &p, &pattern_p, skipPastMap);
 	if (map && pattern_p == FALSE)
-		addLanguageExtensionMap (language, map, exclusive);
+		addLanguageExtensionMap (language, map, exclusiveInAllLanguages);
 	else if (map && pattern_p == TRUE)
-		addLanguagePatternMap (language, map, exclusive);
+		addLanguagePatternMap (language, map, exclusiveInAllLanguages);
 	else
 		error (FATAL, "Badly formed language map for %s language",
 				getLanguageName (language));
+
+	if (map)
+		eFree (map);
+	return p;
+}
+
+static char* removeLanguageMap (const langType language, char* map_parameter)
+{
+	char* p = NULL;
+	boolean pattern_p;
+	char* map;
+
+	map = extractMapFromParameter (language, map_parameter, &p, &pattern_p, skipPastMap);
+	if (map && pattern_p == FALSE)
+		removeLanguageExtensionMap (language, map);
+	else if (map && pattern_p == TRUE)
+		removeLanguagePatternMap (language, map);
+	else
+		error (FATAL, "Badly formed language map for %s language",
+		       getLanguageName (language));
 
 	if (map)
 		eFree (map);
@@ -1485,6 +1506,7 @@ extern boolean processMapOption (
 	const char* spec;
 	char* map_parameter;
 	boolean clear = FALSE;
+	char op;
 
 	language = getLanguageComponentInOption (option, "map-");
 	if (language == LANG_IGNORE)
@@ -1494,20 +1516,38 @@ extern boolean processMapOption (
 		error (FATAL, "no parameter is given for %s", option);
 
 	spec = parameter;
-	if (*spec == '+')
+	if (*spec == '+' || *spec == '-')
+	{
+		op = *spec;
 		spec++;
+	}
 	else
+	{
+		op = '\0';
 		clear = TRUE;
+	}
 
 	if (clear)
 	{
 		verbose ("    Setting %s language map:", getLanguageName (language));
 		clearLanguageMap (language);
+		op = '+';
 	}
 	else
-		verbose ("    Adding to %s language map:", getLanguageName (language));
+		verbose ("    %s %s %s %s language map:",
+			 op == '+'? "Adding": "Removing",
+			 spec,
+			 op == '+'? "to": "from",
+			 getLanguageName (language));
 	map_parameter = eStrdup (spec);
-	addLanguageMap (language, map_parameter, FALSE);
+
+	if (op == '+')
+		addLanguageMap (language, map_parameter, FALSE);
+	else if (op == '-')
+		removeLanguageMap (language, map_parameter);
+	else
+		Assert ("Should not reach here" == NULL);
+
 	eFree (map_parameter);
 	verbose ("\n");
 

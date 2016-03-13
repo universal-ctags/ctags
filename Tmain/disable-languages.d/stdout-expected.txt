@@ -1,0 +1,18 @@
+# FILE NAME ONLY
+input.m: MatLab
+input.m: ObjectiveC
+input.m: MatLab
+input.m: NONE
+input.m: NONE
+# EMACS MODE: MATLAB
+input-matlab.m: MatLab
+input-matlab.m: ObjectiveC
+input-matlab.m: MatLab
+input-matlab.m: NONE
+input-matlab.m: NONE
+# EMACS MODE: OBJC
+input-objc.m: ObjectiveC
+input-objc.m: ObjectiveC
+input-objc.m: MatLab
+input-objc.m: NONE
+input-objc.m: NONE

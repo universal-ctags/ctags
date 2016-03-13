@@ -246,6 +246,12 @@ static langType getNameOrAliasesLanguageAndSpec (const char *const key, langType
 		stringList* const aliases = lang->currentAliaes;
 		vString* tmp;
 
+		/* isLanguageEnabled is not used here.
+		   It calls initializeParser which takes
+		   cost. */
+		if (! lang->enabled)
+			continue;
+
 		if (lang->name != NULL && strcasecmp (key, lang->name) == 0)
 		{
 			result = i;
@@ -279,6 +285,12 @@ static langType getPatternLanguageAndSpec (const char *const baseName, langType 
 		stringList* const ptrns = LanguageTable [i]->currentPatterns;
 		vString* tmp;
 
+		/* isLanguageEnabled is not used here.
+		   It calls initializeParser which takes
+		   cost. */
+		if (! LanguageTable [i]->enabled)
+			continue;
+
 		if (ptrns != NULL && (tmp = stringListFileFinds (ptrns, baseName)))
 		{
 			result = i;
@@ -292,6 +304,12 @@ static langType getPatternLanguageAndSpec (const char *const baseName, langType 
 	{
 		stringList* const exts = LanguageTable [i]->currentExtensions;
 		vString* tmp;
+
+		/* isLanguageEnabled is not used here.
+		   It calls initializeParser which takes
+		   cost. */
+		if (! LanguageTable [i]->enabled)
+			continue;
 
 		if (exts != NULL && (tmp = stringListExtensionFinds (exts,
 								     fileExtension (baseName))))
@@ -704,7 +722,8 @@ static const struct taster {
 		.msg    = "vim modeline",
         },
 };
-static langType tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n_tasters);
+static langType tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n_tasters,
+			      langType *fallback);
 
 /* If all the candidates have the same specialized language selector, return
  * it.  Otherwise, return NULL.
@@ -760,12 +779,12 @@ pickLanguageBySelection (selectLanguage selector, FILE *input)
     const char *lang = selector(input);
     if (lang)
     {
-        verbose ("	selection: %s\n", lang);
+        verbose ("		selection: %s\n", lang);
         return getNamedLanguage(lang, 0);
     }
     else
     {
-	verbose ("	no selection\n");
+	verbose ("		no selection\n");
         return LANG_IGNORE;
     }
 }
@@ -833,11 +852,15 @@ static void verboseReportCandidate (const char *header,
 }
 
 static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx *glc,
-				       unsigned int nominate (const char *const, parserCandidate**))
+				       unsigned int nominate (const char *const, parserCandidate**),
+				       langType *fallback)
 {
 	langType language;
 	parserCandidate  *candidates;
 	unsigned int n_candidates;
+
+	if (fallback)
+		*fallback = LANG_IGNORE;
 
 	n_candidates = (*nominate)(spec, &candidates);
 	verboseReportCandidate ("candidates",
@@ -856,17 +879,16 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 		GLC_FOPEN_IF_NECESSARY(glc, fopen_error);
 		selectLanguage selector = commonSelector(candidates, n_candidates);
 		if (selector) {
-			verbose ("Selector: %p\n", selector);
+			verbose ("	selector: %p\n", selector);
 			language = pickLanguageBySelection(selector, glc->input);
 		} else {
-			verbose ("Selector: NONE\n");
+			verbose ("	selector: NONE\n");
 			language = LANG_IGNORE;
 		}
 
 		Assert(language != LANG_AUTO);
-
-		if (language == LANG_IGNORE)
-			language = candidates[0].lang;
+		if (fallback)
+			*fallback = candidates[0].lang;
 	}
 	else
 	{
@@ -881,33 +903,44 @@ fopen_error:
 }
 
 static langType getSpecLanguage (const char *const spec,
-                                 struct getLangCtx *glc)
+                                 struct getLangCtx *glc,
+				 langType *fallback)
 {
-	return getSpecLanguageCommon(spec, glc, nominateLanguageCandidates);
+	return getSpecLanguageCommon(spec, glc, nominateLanguageCandidates,
+				     fallback);
 }
 
 static langType getPatternLanguage (const char *const baseName,
-                                    struct getLangCtx *glc)
+                                    struct getLangCtx *glc,
+				    langType *fallback)
 {
 	return getSpecLanguageCommon(baseName, glc,
-				     nominateLanguageCandidatesForPattern);
+				     nominateLanguageCandidatesForPattern,
+				     fallback);
 }
 
 /* This function tries to figure out language contained in a file by
  * running a series of tests, trying to find some clues in the file.
  */
 static langType
-tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n_tasters)
+tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n_tasters,
+	      langType *fallback)
 {
     int i;
 
+    if (fallback)
+	    *fallback = LANG_IGNORE;
     for (i = 0; i < n_tasters; ++i) {
         langType language;
         vString* spec;
+
         rewind(glc->input);
-        if (NULL != (spec = tasters[i].taste(glc->input))) {
+	spec = tasters[i].taste(glc->input);
+
+        if (NULL != spec) {
             verbose ("	%s: %s\n", tasters[i].msg, vStringValue (spec));
-            language = getSpecLanguage (vStringValue (spec), glc);
+            language = getSpecLanguage (vStringValue (spec), glc,
+					(fallback && (*fallback == LANG_IGNORE))? fallback: NULL);
             vStringDelete (spec);
             if (language != LANG_IGNORE)
                 return language;
@@ -921,6 +954,36 @@ static langType
 getFileLanguageInternal (const char *const fileName)
 {
     langType language;
+
+    /* ctags tries variety ways(HINTS) to choose a proper language
+       for given fileName. If multiple candidates are chosen in one of
+       the hint, a SELECTOR common between the candidate languages
+       is called.
+
+       "selection failure" means a selector common between the
+       candidates doesn't exist or the common selector returns NULL.
+
+       "hint failure" means the hint finds no candidate or
+       "selection failure" occurs though the hint finds multiple
+       candidates.
+
+       If a hint chooses multiple candidates, and selection failure is
+       occured, the hint records one of the candidates as FALLBACK for
+       the hint. (The candidates are stored in an array. The first
+       element of the array is recorded. However, there is no
+       specification about the order of elements in the array.)
+
+       If all hints are failed, FALLBACKs of the hints are examined.
+       Which fallbacks should be chosen?  `enum hint' defines the order. */
+    enum hint {
+	    HINT_INTERP,
+	    HINT_OTHER,
+	    HINT_FILENAME,
+	    HINT_TEMPLATE,
+	    N_HINTS,
+    };
+    langType fallback[N_HINTS];
+    int i;
     struct getLangCtx glc = {
         .fileName = fileName,
         .input    = NULL,
@@ -930,10 +993,14 @@ getFileLanguageInternal (const char *const fileName)
     char *templateBaseName = NULL;
     fileStatus *fstatus = NULL;
 
+    for (i = 0; i < N_HINTS; i++)
+	fallback [i] = LANG_IGNORE;
+
     verbose ("Get file language for %s\n", fileName);
 
     verbose ("	pattern: %s\n", baseName);
-    language = getPatternLanguage (baseName, &glc);
+    language = getPatternLanguage (baseName, &glc,
+				   fallback + HINT_FILENAME);
     if (language != LANG_IGNORE || glc.err)
         goto cleanup;
 
@@ -945,7 +1012,8 @@ getFileLanguageInternal (const char *const fileName)
             verbose ("	pattern + template(%s): %s\n", tExt, templateBaseName);
             GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
             rewind(glc.input);
-            language = getPatternLanguage(templateBaseName, &glc);
+            language = getPatternLanguage(templateBaseName, &glc,
+					  fallback + HINT_TEMPLATE);
             if (language != LANG_IGNORE)
                 goto cleanup;
         }
@@ -957,7 +1025,8 @@ getFileLanguageInternal (const char *const fileName)
 	    if (fstatus->isExecutable || Option.guessLanguageEagerly)
 	    {
 		    GLC_FOPEN_IF_NECESSARY (&glc, cleanup);
-		    language = tasteLanguage(&glc, eager_tasters, 1);
+		    language = tasteLanguage(&glc, eager_tasters, 1,
+					    fallback + HINT_INTERP);
 	    }
 	    if (language != LANG_IGNORE)
 		    goto cleanup;
@@ -967,7 +1036,8 @@ getFileLanguageInternal (const char *const fileName)
 		    GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
 		    language = tasteLanguage(&glc, 
 					     eager_tasters + 1,
-					     ARRAY_SIZE(eager_tasters) - 1);
+					     ARRAY_SIZE(eager_tasters) - 1,
+					     fallback + HINT_OTHER);
 	    }
     }
 
@@ -978,15 +1048,35 @@ getFileLanguageInternal (const char *const fileName)
 	    eStatFree (fstatus);
     if (templateBaseName)
         eFree (templateBaseName);
+
+    for (i = 0;
+	 language == LANG_IGNORE && i < N_HINTS;
+	 i++)
+    {
+        language = fallback [i];
+	if (language != LANG_IGNORE)
+        verbose ("	fallback[hint = %d]: %s\n", i, getLanguageName (language));
+    }
+
     return language;
 }
 
 extern langType getFileLanguage (const char *const fileName)
 {
-    if (LANG_AUTO == Option.language)
-        return getFileLanguageInternal(fileName);
-    else
-        return Option.language;
+	langType l = Option.language;
+
+	if (l == LANG_AUTO)
+		return getFileLanguageInternal(fileName);
+	else if (! isLanguageEnabled (l))
+	{
+		error (FATAL,
+		       "%s parser specified with --language-force is disabled or not available(xcmd)",
+		       getLanguageName (l));
+		/* For suppressing warnings. */
+		return LANG_AUTO;
+	}
+	else
+		return Option.language;
 }
 
 typedef void (*languageCallback)  (langType language, void* user_data);
@@ -1110,56 +1200,82 @@ extern void clearLanguageAliases (const langType language)
 	stringListClear (LanguageTable [language]->currentAliaes);
 }
 
-static boolean removeLanguagePatternMap (const char *const pattern)
+static boolean removeLanguagePatternMap1(const langType language, const char *const pattern)
 {
 	boolean result = FALSE;
-	unsigned int i;
-	for (i = 0  ;  i < LanguageCount  &&  ! result ;  ++i)
+	stringList* const ptrn = LanguageTable [language]->currentPatterns;
+
+	if (ptrn != NULL && stringListDeleteItemExtension (ptrn, pattern))
 	{
-		stringList* const ptrn = LanguageTable [i]->currentPatterns;
-		if (ptrn != NULL && stringListDeleteItemExtension (ptrn, pattern))
-		{
-			verbose (" (removed from %s)", getLanguageName (i));
-			result = TRUE;
-		}
+		verbose (" (removed from %s)", getLanguageName (language));
+		result = TRUE;
 	}
 	return result;
 }
 
-extern void addLanguagePatternMap (const langType language, const char* ptrn, boolean exclusive)
+extern boolean removeLanguagePatternMap (const langType language, const char *const pattern)
+{
+	boolean result = FALSE;
+
+	if (language == LANG_AUTO)
+	{
+		unsigned int i;
+		for (i = 0  ;  i < LanguageCount  &&  ! result ;  ++i)
+			result = removeLanguagePatternMap1 (i, pattern) || result;
+	}
+	else
+		result = removeLanguagePatternMap1 (language, pattern);
+	return result;
+}
+
+extern void addLanguagePatternMap (const langType language, const char* ptrn,
+				   boolean exclusiveInAllLanguages)
 {
 	vString* const str = vStringNewInit (ptrn);
 	parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
-	if (exclusive)
-		removeLanguagePatternMap (ptrn);
+	if (exclusiveInAllLanguages)
+		removeLanguagePatternMap (LANG_AUTO, ptrn);
 	stringListAdd (lang->currentPatterns, str);
 }
 
-extern boolean removeLanguageExtensionMap (const char *const extension)
+static boolean removeLanguageExtensionMap1 (const langType language, const char *const extension)
 {
 	boolean result = FALSE;
-	unsigned int i;
-	for (i = 0  ;  i < LanguageCount  &&  ! result ;  ++i)
+	stringList* const exts = LanguageTable [language]->currentExtensions;
+
+	if (exts != NULL  &&  stringListDeleteItemExtension (exts, extension))
 	{
-		stringList* const exts = LanguageTable [i]->currentExtensions;
-		if (exts != NULL && stringListDeleteItemExtension (exts, extension))
-		{
-			verbose (" (removed from %s)", getLanguageName (i));
-			result = TRUE;
-		}
+		verbose (" (removed from %s)", getLanguageName (language));
+		result = TRUE;
 	}
 	return result;
 }
 
+extern boolean removeLanguageExtensionMap (const langType language, const char *const extension)
+{
+	boolean result = FALSE;
+
+	if (language == LANG_AUTO)
+	{
+		unsigned int i;
+		for (i = 0  ;  i < LanguageCount ;  ++i)
+			result = removeLanguageExtensionMap1 (i, extension) || result;
+	}
+	else
+		result = removeLanguageExtensionMap1 (language, extension);
+	return result;
+}
+
 extern void addLanguageExtensionMap (
-		const langType language, const char* extension, boolean exclusive)
+		const langType language, const char* extension,
+		boolean exclusiveInAllLanguages)
 {
 	vString* const str = vStringNewInit (extension);
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	if (exclusive)
-		removeLanguageExtensionMap (extension);
+	if (exclusiveInAllLanguages)
+		removeLanguageExtensionMap (LANG_AUTO, extension);
 	stringListAdd (LanguageTable [language]->currentExtensions, str);
 }
 
@@ -1955,9 +2071,10 @@ static void addParserPseudoTags (langType language)
 extern boolean parseFile (const char *const fileName)
 {
 	boolean tagFileResized = FALSE;
-	langType language = Option.language;
-	if (Option.language == LANG_AUTO)
-		language = getFileLanguage (fileName);
+	langType language;
+
+
+	language = getFileLanguage (fileName);
 	Assert (language != LANG_AUTO);
 
 	if (Option.printLanguage)
@@ -1967,9 +2084,18 @@ extern boolean parseFile (const char *const fileName)
 	}
 
 	if (language == LANG_IGNORE)
-		verbose ("ignoring %s (unknown language)\n", fileName);
+		verbose ("ignoring %s (unknown language/language disabled)\n",
+			 fileName);
 	else if (! isLanguageEnabled (language))
+	{
+		/* This block is needed. In the parser choosing stage, each
+		   parser is not initialized for making ctags starting up faster.
+		   So the chooser can choose a XCMD based parser.
+		   However, at the stage the chooser cannot know whether
+		   the XCMD is available or not. This isLanguageEnabled
+		   invocation verify the availability. */
 		verbose ("ignoring %s (language disabled)\n", fileName);
+	}
 	else
 	{
 		initializeParser (language);

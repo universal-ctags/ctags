@@ -510,22 +510,6 @@ deals with. Assume source files written in Swine language have a suffix
 *.swn*. The file name of option library is *swine.ctags*.
 
 
-Changes in options
-......................................................................
-universal-ctags prepares aliases for options.
-
-========================= ====================
-Exuberant                 New aliases
-========================= ====================
-``--langmap-swine:.swn``  ``--swine-map=.swn``
-``--regex-swine=...``     ``--swine-regex=...``
-========================= ====================
-
-These are jst aliases. So the original options can be used.
-The reason I introduced these aliases, I want option syntax
-more language/parser centric. I'm not sure this idea is good
-or not.
-
 Copyright notice, contact mail address and license term
 ......................................................................
 
