@@ -1,2 +1,2 @@
-ENTSEQNO	input.c	/^FUNCSTS func1(ENTSEQNO(seq)) {}$/;"	f
-MEMTXT	input.c	/^FUNCSTS func2 (MEMTXT(form_msg), MEMTXT (text), MEMTXT (mail)) {}$/;"	f
+func1	input.c	/^FUNCSTS func1(ENTSEQNO(seq)) {}$/;"	f
+func2	input.c	/^FUNCSTS func2 (MEMTXT(form_msg), MEMTXT (text), MEMTXT (mail)) {}$/;"	f

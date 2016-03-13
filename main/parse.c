@@ -883,16 +883,17 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 			language = pickLanguageBySelection(selector, glc->input);
 		} else {
 			verbose ("	selector: NONE\n");
+		fopen_error:
 			language = LANG_IGNORE;
 		}
 
 		Assert(language != LANG_AUTO);
+
 		if (fallback)
 			*fallback = candidates[0].lang;
 	}
 	else
 	{
-fopen_error:
 		language = LANG_IGNORE;
 	}
 

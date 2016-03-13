@@ -1,0 +1,3 @@
+main	input.cpp	/^int main() {$/;"	f
+std	input.cpp	/^using namespace std;$/;"	U	function:main
+m	input.cpp	/^int m;$/;"	l	function:main	file:

@@ -980,7 +980,7 @@ static int   makePatternStringCommon (const tagEntryInfo *const tag,
 
 	line = readLineFromBypass (TagFile.vLine, tag->filePosition, NULL);
 	if (line == NULL)
-		error (FATAL, "bad tag in %s", getInputFileName ());
+		error (FATAL, "could not read tag line from %s at line %lu", getInputFileName (),tag->lineNumber);
 	if (tag->truncateLine)
 		truncateTagLine (line, tag->name, FALSE);
 

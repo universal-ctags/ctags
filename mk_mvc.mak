@@ -12,7 +12,7 @@ include source.mak
 OBJEXT = obj
 REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrcasecmp=stricmp
 DEFINES = -DWIN32 $(REGEX_DEFINES)
-INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch
+INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers
 OPT = /O2
 REGEX_OBJS = $(REGEX_SRCS:.c=.obj)
 FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.obj)
@@ -35,6 +35,8 @@ OPT = $(OPT) /Zi
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fooptlib\ /c $<
 {parsers}.c{parsers}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparsers\ /c $<
+{parsers\cxx}.c{parsers\cxx}.obj::
+	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparsers\cxx\ /c $<
 
 all: ctags.exe readtags.exe
 
@@ -54,6 +56,6 @@ $(FNMATCH_OBJS): $(FNMATCH_SRCS)
 
 
 clean:
-	- del *.obj main\*.obj optlib\*.obj parsers\*.obj gnu_regex\*.obj fnmatch\*.obj
+	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj
 	- del ctags.exe readtags.exe
 	- del tags

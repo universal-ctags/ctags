@@ -1,6 +1,4 @@
 BAR::bar	input.cpp	/^char *BAR::bar (char *c, double d[]) const {}$/;"	f	class:BAR	signature:(char *c, double d[]) const
-a	input.cpp	/^int bar (a, b) int a; char b; {}$/;"	v
-b	input.cpp	/^int bar (a, b) int a; char b; {}$/;"	v
 bar	input.cpp	/^char *BAR::bar (char *c, double d[]) const {}$/;"	f	class:BAR	signature:(char *c, double d[]) const
 foo	input.cpp	/^void foo (int a, char b) {}$/;"	f	signature:(int a, char b)
 foobar	input.cpp	/^void foobar __ARGS ((int a, char b));$/;"	p	file:	signature:(int a, char b)

@@ -21,6 +21,11 @@ importing. Some changes in Fedora and Debian are also imported.
 Parsers related changes
 ---------------------------------------------------------------------
 
+Fully rewritten parsers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* c (see :ref:`The new C/C++ parser <cxx>`)
+* c++ (see :ref:`The new C/C++ parser <cxx>`)
+
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The following parsers have been added:
