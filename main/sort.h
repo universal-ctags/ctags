@@ -23,8 +23,13 @@ extern void catFile (FILE *fp);
 #ifdef EXTERNAL_SORT
 extern void externalSortTags (const boolean toStdout);
 #else
-extern void internalSortTags (const boolean toStdout, size_t numTags);
+extern void internalSortTags (const boolean toStdout,
+			      FILE *fp,
+			      size_t numTags);
 #endif
+
+/* fp is closed in this function. */
+extern void failedSort (FILE *const fp, const char* msg);
 
 #endif  /* CTAGS_MAIN_SORT_H */
 

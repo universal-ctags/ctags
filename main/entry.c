@@ -506,6 +506,34 @@ static int replacementTruncate (const char *const name, const long size)
 
 #endif
 
+#ifndef EXTERNAL_SORT
+static void internalSortTagFile (void)
+{
+	FILE *fp;
+
+	/*  Open/Prepare the tag file and place its lines into allocated buffers.
+	 */
+	if (TagsToStdout)
+	{
+		fp = TagFile.fp;
+		fseek (fp, 0, SEEK_SET);
+	}
+	else
+	{
+		fp = fopen (tagFileName (), "r");
+		if (fp == NULL)
+			failedSort (fp, NULL);
+	}
+
+	internalSortTags (TagsToStdout,
+			  fp,
+			  TagFile.numTags.added + TagFile.numTags.prev);
+
+	if (! TagsToStdout)
+		fclose (fp);
+}
+#endif
+
 static void sortTagFile (void)
 {
 	if (TagFile.numTags.added > 0L)
@@ -516,8 +544,7 @@ static void sortTagFile (void)
 #ifdef EXTERNAL_SORT
 			externalSortTags (TagsToStdout);
 #else
-			internalSortTags (TagsToStdout,
-				TagFile.numTags.added + TagFile.numTags.prev);
+			internalSortTagFile ();
 #endif
 		}
 		else if (TagsToStdout)

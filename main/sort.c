@@ -127,7 +127,7 @@ extern void externalSortTags (const boolean toStdout)
  *  so have lots of memory if you have large tag files.
  */
 
-static void failedSort (FILE *const fp, const char* msg)
+extern void failedSort (FILE *const fp, const char* msg)
 {
 	const char* const cannotSort = "cannot sort tag file";
 	if (fp != NULL)
@@ -185,10 +185,9 @@ static void writeSortedTags (
 		fclose (fp);
 }
 
-extern void internalSortTags (const boolean toStdout, size_t numTags)
+extern void internalSortTags (const boolean toStdout, FILE* fp, size_t numTags)
 {
 	vString *vLine = vStringNew ();
-	FILE *fp = NULL;
 	const char *line;
 	size_t i;
 	int (*cmpFunc)(const void *, const void *);
@@ -204,19 +203,6 @@ extern void internalSortTags (const boolean toStdout, size_t numTags)
 	if (table == NULL)
 		failedSort (fp, "out of memory");
 
-	/*  Open the tag file and place its lines into allocated buffers.
-	 */
-	if (toStdout)
-	{
-		fp = TagFile.fp;
-		fseek (fp, 0, SEEK_SET);
-	}
-	else
-	{
-		fp = fopen (tagFileName (), "r");
-		if (fp == NULL)
-			failedSort (fp, NULL);
-	}
 	for (i = 0  ;  i < numTags  &&  ! feof (fp)  ;  )
 	{
 		line = readLineRaw (vLine, fp);
@@ -241,8 +227,6 @@ extern void internalSortTags (const boolean toStdout, size_t numTags)
 		}
 	}
 	numTags = i;
-	if (! toStdout)
-		fclose (fp);
 	vStringDelete (vLine);
 
 	/*  Sort the lines.

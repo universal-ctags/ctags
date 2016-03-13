@@ -6,4 +6,3 @@ ofbroken	name
 File: input.cst, Line: 1, Lang: CTagsSelfTest, Kind: b
 Escape the character
 sorting tag file
-system ("sort -u")
