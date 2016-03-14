@@ -329,12 +329,7 @@ next_token:
 				cxxTokenTypeIs(pTypeEnd,CXXTokenTypeIdentifier) &&
 				pTypeEnd->pPrev &&
 				cxxTokenTypeIs(pTypeEnd->pPrev,CXXTokenTypeKeyword) &&
-				(
-					(pTypeEnd->pPrev->eKeyword == CXXKeywordSTRUCT) ||
-					(pTypeEnd->pPrev->eKeyword == CXXKeywordUNION) ||
-					(pTypeEnd->pPrev->eKeyword == CXXKeywordCLASS) ||
-					(pTypeEnd->pPrev->eKeyword == CXXKeywordENUM)
-				)
+				cxxKeywordIsTypeRefMarker(pTypeEnd->pPrev->eKeyword)
 			)
 			{
 				tag->extensionFields.typeRef[0] = vStringValue(pTypeEnd->pPrev->pszWord);

@@ -112,6 +112,8 @@ enum CXXKeyword
 };
 
 boolean cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId);
+boolean cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId);
+
 
 void cxxBuildKeywordHash(const langType language,boolean bCXX);
 

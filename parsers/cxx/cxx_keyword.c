@@ -11,12 +11,22 @@
 
 #include "keyword.h"
 
+enum CXXKeywordFlag
+{
+	// int, void, const, float, stuff like that
+	CXXKeywordFlagMayBePartOfTypeName = 1,
+	// struct, class, union, enum, typename
+	CXXKeywordIsTypeRefMarker = 2
+};
+
 typedef struct _CXXKeywordDescriptor
 {
 	unsigned char bValidC;
 	const char * szName;
-	char bMayBePartOfTypeName;
+	unsigned int uFlags;
 } CXXKeywordDescriptor;
+
+
 
 // This array is indexed by the CXXKeywordType enum
 static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
@@ -30,20 +40,20 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	//{ 1, "and", 0 },
 	//{ 1, "and_eq", 0 },
 	{ 1, "asm", 0 },
-	{ 0, "auto", 1 },
+	{ 0, "auto", CXXKeywordFlagMayBePartOfTypeName },
 	//{ 1, "bitand", 0 },
 	//{ 1, "bitor", 0 },
-	{ 1, "bool", 1 },
+	{ 1, "bool", CXXKeywordFlagMayBePartOfTypeName },
 	{ 1, "break", 0 },
 	{ 1, "case", 0 },
 	{ 0, "catch", 0 },
-	{ 1, "char", 1 },
-	{ 0, "char16_t", 1 },
-	{ 0, "char32_t", 1 },
-	{ 0, "class", 1 },
+	{ 1, "char", CXXKeywordFlagMayBePartOfTypeName },
+	{ 0, "char16_t", CXXKeywordFlagMayBePartOfTypeName },
+	{ 0, "char32_t", CXXKeywordFlagMayBePartOfTypeName },
+	{ 0, "class", CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker },
 	//{ 0, "compl", 0 },
 	{ 0, "concept", 0 },
-	{ 1, "const", 1 },
+	{ 1, "const", CXXKeywordFlagMayBePartOfTypeName },
 	{ 0, "constexpr", 0 },
 	{ 0, "const_cast", 0 },
 	{ 1, "continue", 0 },
@@ -54,20 +64,20 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{ 1, "double", 0 },
 	{ 0, "dynamic_cast", 0 },
 	{ 1, "else", 0 },
-	{ 1, "enum", 1 },
+	{ 1, "enum", CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker },
 	{ 0, "explicit", 0 },
 	{ 0, "export", 0 },
 	{ 1, "extern", 0 },
 	{ 1, "false", 0 },
 	{ 0, "final", 0 }, // this is a keyword only in special contexts (we have a switch to enable/disable it)
-	{ 1, "float", 1 },
+	{ 1, "float", CXXKeywordFlagMayBePartOfTypeName },
 	{ 1, "for", 0 },
 	{ 0, "friend", 0 },
 	{ 1, "goto", 0 },
 	{ 1, "if", 0 },
 	{ 1, "inline", 0 },
-	{ 1, "int", 1 },
-	{ 1, "long", 1 },
+	{ 1, "int", CXXKeywordFlagMayBePartOfTypeName },
+	{ 1, "long", CXXKeywordFlagMayBePartOfTypeName },
 	{ 1, "mutable", 0 },
 	{ 0, "namespace", 0 },
 	{ 0, "new", 0 },
@@ -86,13 +96,13 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{ 0, "reinterpret_cast", 0 },
 	{ 0, "requires", 0 },
 	{ 1, "return", 0 },
-	{ 1, "short", 1 },
-	{ 1, "signed", 1 },
+	{ 1, "short", CXXKeywordFlagMayBePartOfTypeName },
+	{ 1, "signed", CXXKeywordFlagMayBePartOfTypeName },
 	{ 1, "sizeof", 0 },
 	{ 1, "static", 0 },
 	{ 0, "static_assert", 0 },
 	{ 0, "static_cast", 0 },
-	{ 1, "struct", 1 },
+	{ 1, "struct", CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker },
 	{ 1, "switch", 0 },
 	{ 0, "template", 0 },
 	{ 0, "this", 0 },
@@ -102,14 +112,14 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{ 0, "try", 0 },
 	{ 1, "typedef", 0 },
 	{ 0, "typeid", 0 },
-	{ 0, "typename", 1 },
-	{ 1, "union", 1 },
-	{ 1, "unsigned", 1 },
+	{ 0, "typename", CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker },
+	{ 1, "union", CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker },
+	{ 1, "unsigned", CXXKeywordFlagMayBePartOfTypeName },
 	{ 0, "using", 0 },
 	{ 0, "virtual", 0 },
-	{ 1, "void", 1 },
+	{ 1, "void", CXXKeywordFlagMayBePartOfTypeName },
 	{ 1, "volatile", 0 },
-	{ 0, "wchar_t", 1 },
+	{ 0, "wchar_t", CXXKeywordFlagMayBePartOfTypeName },
 	{ 1, "while", 0 },
 	//{ 0, "xor", 0 },
 	//{ 0, 1, "xor_eq", 0 }
@@ -117,7 +127,12 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 
 boolean cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId)
 {
-	return g_aCXXKeywordTable[eKeywordId].bMayBePartOfTypeName != 0;
+	return g_aCXXKeywordTable[eKeywordId].uFlags & CXXKeywordFlagMayBePartOfTypeName;
+}
+
+boolean cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId)
+{
+	return g_aCXXKeywordTable[eKeywordId].uFlags & CXXKeywordIsTypeRefMarker;
 }
 
 void cxxBuildKeywordHash(const langType language,boolean bCXX)
