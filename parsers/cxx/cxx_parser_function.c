@@ -269,7 +269,117 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 	return 1;
 }
 
-// FIXME: Extract return type?
+
+boolean cxxParserTokenChainLooksLikeFunctionCallParameterSet(CXXTokenChain * pChain)
+{
+	CXXToken * t = pChain->pHead;
+	CXXToken * pLast = pChain->pTail;
+
+	CXX_DEBUG_ASSERT(cxxTokenTypeIs(t,CXXTokenTypeOpeningParenthesis),"The token chain should start with an opening parenthesis");
+	CXX_DEBUG_ASSERT(cxxTokenTypeIs(pLast,CXXTokenTypeOpeningParenthesis),"The token chain should end with an opening parenthesis");
+
+	t = t->pNext;
+
+	while(t != pLast)
+	{
+		if(cxxTokenTypeIsOneOf(t,
+				CXXTokenTypeNumber | CXXTokenTypeStringConstant | CXXTokenTypeCharacterConstant |
+				CXXTokenTypePointerOperator | CXXTokenTypeDotOperator | CXXTokenTypeOperator | CXXTokenTypeMultipleDots
+			))
+			return TRUE; // not allowed in a function signature: assume this looks like a function call
+
+		if(cxxTokenTypeIs(t,CXXTokenTypeKeyword))
+		{
+			if(
+					cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeKeyword | CXXTokenTypeStar | CXXTokenTypeAnd | CXXTokenTypeMultipleAnds | CXXTokenTypeIdentifier) ||
+					(pChain->iCount == 3) // (double)
+				)
+			{
+				// this is something like:
+				// (int a...
+				// (void *...
+				// (unsigned int...
+				// (double)
+				return FALSE;
+			}
+			
+			if(cxxKeywordMayBePartOfTypeName(t->eKeyword))
+			{
+				// parts of type name (not inside a parenthesis which is assumed to be condensed)
+				return FALSE;
+			}
+			
+		} else if(cxxTokenTypeIs(t,CXXTokenTypeIdentifier))
+		{
+			if(cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeKeyword | CXXTokenTypeIdentifier))
+			{
+				// this is something like:
+				// (type a...
+				return FALSE;
+			}
+		} else if(cxxTokenTypeIs(t,CXXTokenTypeGreaterThanSign))
+		{
+			if(cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeAnd | CXXTokenTypeStar | CXXTokenTypeMultipleAnds | CXXTokenTypeComma))
+			{
+				// > &
+				// > *
+				// > &&
+				// >,
+				return FALSE;
+			}
+			
+			if(cxxTokenTypeIsOneOf(t->pPrev,CXXTokenTypeKeyword))
+			{
+				// int>
+				// 
+				return FALSE;
+			}
+		} else if(
+				cxxTokenTypeIs(t,CXXTokenTypeParenthesisChain) &&
+				cxxTokenTypeIsOneOf(t->pPrev,CXXTokenTypeIdentifier | CXXTokenTypeKeyword | CXXTokenTypeStar | CXXTokenTypeAnd | CXXTokenTypeGreaterThanSign) &&
+				cxxTokenTypeIs(t->pNext,CXXTokenTypeParenthesisChain) &&
+				cxxTokenTypeIs(cxxTokenChainAt(t->pChain,1),CXXTokenTypeStar) &&
+				cxxParserTokenChainLooksLikeFunctionParameterList(t->pNext->pChain,NULL)
+			)
+		{
+			// looks like a function pointer
+			//   someType (*p)(int)
+			return FALSE;
+		}
+		
+		if(cxxTokenTypeIs(t,CXXTokenTypeAssignment))
+		{
+			// after an assignment prototypes and constructor declarations may look the same, skip to next comma or end
+			t = cxxTokenChainNextTokenOfType(t,CXXTokenTypeClosingParenthesis | CXXTokenTypeComma);
+			CXX_DEBUG_ASSERT(t,"We should have found the closing parenthesis here!");
+			if(cxxTokenTypeIs(t,CXXTokenTypeComma))
+				t = t->pNext;
+		} else {
+			t = t->pNext;
+		}
+	}
+
+	// We must assume that it might be...
+	return TRUE;
+}
+
+//
+// Try to tell if the specified token chain is valid as a parameter list for a constructor.
+// It's used to check if something like type name(args) belongs to a variable declaration.
+//
+// This is more of a guess for now: tries to exclude trivial cases.
+//
+boolean cxxParserTokenChainLooksLikeConstructorParameterSet(CXXTokenChain * pChain)
+{
+	// We assume that the chain has a starting parenthesis and an ending parenthesis.
+
+	if(pChain->iCount < 3)
+		return FALSE; // type var() is NOT valid C++
+
+	return cxxParserTokenChainLooksLikeFunctionCallParameterSet(pChain);
+}
+
+
 
 //
 // Look for a function signature in the specified chain.
