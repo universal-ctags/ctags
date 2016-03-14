@@ -28,7 +28,10 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 {
 	CXX_DEBUG_ENTER();
 
-	CXX_DEBUG_ASSERT(g_cxx.pToken->eType == CXXTokenTypeOpeningBracket,"This must be called when pointing at an opening bracket!");
+	CXX_DEBUG_ASSERT(
+			g_cxx.pToken->eType == CXXTokenTypeOpeningBracket,
+			"This must be called when pointing at an opening bracket!"
+		);
 
 	enum CXXTagKind eScopeKind = cxxScopeGetKind();
 
@@ -43,7 +46,8 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 	{
 		// array or C++11-list-like initialisation
 		boolean bRet = cxxParserParseAndCondenseCurrentSubchain(
-				CXXTokenTypeOpeningBracket | CXXTokenTypeOpeningParenthesis | CXXTokenTypeOpeningSquareParenthesis,
+				CXXTokenTypeOpeningBracket | CXXTokenTypeOpeningParenthesis |
+					CXXTokenTypeOpeningSquareParenthesis,
 				FALSE
 			);
 
@@ -113,7 +117,11 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 	cxxParserNewStatement();
 
 	if(bExpectClosingBracket)
-		cppBeginStatement(); // FIXME: this cpp handling is broken: it works only because the moon is in the correct phase.
+	{
+		// FIXME: this cpp handling is kind of broken:
+		//        it works only because the moon is in the correct phase.
+		cppBeginStatement();
+	}
 
 	for(;;)
 	{
@@ -121,14 +129,21 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 		{
 			if(bExpectClosingBracket)
 			{
-				CXX_DEBUG_LEAVE_TEXT("Syntax error: found EOF in block but a closing bracket was expected!");
+				CXX_DEBUG_LEAVE_TEXT(
+						"Syntax error: found EOF in block but a closing " \
+							"bracket was expected!"
+					);
 				return FALSE;
 			}
 			CXX_DEBUG_LEAVE_TEXT("EOF in main block");
 			return TRUE; // EOF
 		}
 
-		CXX_DEBUG_PRINT("Token '%s' of type 0x%02x",vStringValue(g_cxx.pToken->pszWord),g_cxx.pToken->eType);
+		CXX_DEBUG_PRINT(
+				"Token '%s' of type 0x%02x",
+				vStringValue(g_cxx.pToken->pszWord),
+				g_cxx.pToken->eType
+			);
 
 		switch(g_cxx.pToken->eType)
 		{
@@ -149,7 +164,9 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 							}
 						} else {
 							// hm... syntax error?
-							CXX_DEBUG_LEAVE_TEXT("Found namespace in a wrong place: we're probably out of sync");
+							CXX_DEBUG_LEAVE_TEXT(
+								"Found namespace in a wrong place: we're probably out of sync"
+							);
 							return FALSE;
 						}
 
@@ -200,7 +217,8 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 					case CXXKeywordPUBLIC:
 					case CXXKeywordPROTECTED:
 					case CXXKeywordPRIVATE:
-						// Note that the class keyword has its own handler so the only possibility here is an access specifier
+						// Note that the class keyword has its own handler
+						// so the only possibility here is an access specifier
 						if(!cxxParserParseAccessSpecifier())
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse access specifier");
@@ -274,7 +292,9 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 					break;
 					case CXXKeywordCASE:
 						// ignore
-						if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF | CXXTokenTypeSingleColon))
+						if(!cxxParserParseUpToOneOf(
+								CXXTokenTypeSemicolon | CXXTokenTypeEOF | CXXTokenTypeSingleColon
+							))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse case keyword");
 							return FALSE;
@@ -364,7 +384,13 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 			case CXXTokenTypeSingleColon:
 			{
 				// label ?
-				if((g_cxx.pTokenChain->iCount == 2) && cxxTokenTypeIs(cxxTokenChainFirst(g_cxx.pTokenChain),CXXTokenTypeIdentifier))
+				if(
+						(g_cxx.pTokenChain->iCount == 2) &&
+						cxxTokenTypeIs(
+								cxxTokenChainFirst(g_cxx.pTokenChain),
+								CXXTokenTypeIdentifier
+							)
+					)
 				{
 					CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
 					// assume it's label
@@ -396,7 +422,8 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 			case CXXTokenTypeOpeningParenthesis:
 			case CXXTokenTypeOpeningSquareParenthesis:
 				if(!cxxParserParseAndCondenseCurrentSubchain(
-						CXXTokenTypeOpeningBracket | CXXTokenTypeOpeningParenthesis | CXXTokenTypeOpeningSquareParenthesis,
+						CXXTokenTypeOpeningBracket | CXXTokenTypeOpeningParenthesis |
+							CXXTokenTypeOpeningSquareParenthesis,
 						TRUE
 					))
 				{
@@ -408,7 +435,9 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 				{
 					if(bExpectClosingBracket)
 					{
-						CXX_DEBUG_LEAVE_TEXT("Syntax error: found EOF in block but a closing bracket was expected!");
+						CXX_DEBUG_LEAVE_TEXT(
+								"Syntax error: found EOF in block but a closing bracket was expected!"
+							);
 						return FALSE;
 					}
 					return TRUE; // EOF

@@ -48,9 +48,12 @@ static kindOption g_aCXXKinds [] = {
 	{ FALSE, 'x', "externvar",  "external and forward variable declarations" },
 	{ FALSE, 'z', "parameter",  "function parameters inside function definitions" },
 	{ FALSE, 'L', "label",      "goto labels" },
-	// FIXME: not sure about referenceOnly: if this is referenceOnly then so is externvar and probably also prototype.
-	{ FALSE, 'N', "name",       "names imported via using scope::symbol" /*, .referenceOnly = TRUE*/ },
-	{ FALSE, 'U', "using",      "using namespace statements", .referenceOnly = TRUE },
+	// FIXME: not sure about referenceOnly: if this is referenceOnly then
+	// so is externvar and probably also prototype.
+	{ FALSE, 'N', "name",       "names imported via using scope::symbol"
+			/*, .referenceOnly = TRUE*/ },
+	{ FALSE, 'U', "using",      "using namespace statements",
+			.referenceOnly = TRUE },
 };
 
 static const char * g_aCXXAccessStrings [] = {
@@ -85,7 +88,11 @@ tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
 		return NULL;
 	}
 
-	initTagEntry(&g_oCXXTag,vStringValue(pToken->pszWord),&(g_aCXXKinds[eKindId]));
+	initTagEntry(
+			&g_oCXXTag,
+			vStringValue(pToken->pszWord),
+			&(g_aCXXKinds[eKindId])
+		);
 
 	g_oCXXTag.lineNumber = pToken->iLineNumber;
 	g_oCXXTag.filePosition = pToken->oFilePosition;
@@ -123,9 +130,21 @@ void cxxTagCommit(void)
 	if(g_oCXXTag.isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
 		return;
 
-	CXX_DEBUG_PRINT("Emitting tag for symbol '%s', kind '%s', line %d",g_oCXXTag.name,g_oCXXTag.kind->name,g_oCXXTag.lineNumber);
-	if(g_oCXXTag.extensionFields.typeRef[0] && g_oCXXTag.extensionFields.typeRef[1])
-		CXX_DEBUG_PRINT("Tag has typeref %s %s",g_oCXXTag.extensionFields.typeRef[0],g_oCXXTag.extensionFields.typeRef[1]);
+	CXX_DEBUG_PRINT(
+			"Emitting tag for symbol '%s', kind '%s', line %d",
+			g_oCXXTag.name,
+			g_oCXXTag.kind->name,
+			g_oCXXTag.lineNumber
+		);
+	if(
+			g_oCXXTag.extensionFields.typeRef[0] &&
+			g_oCXXTag.extensionFields.typeRef[1]
+		)
+		CXX_DEBUG_PRINT(
+				"Tag has typeref %s %s",
+				g_oCXXTag.extensionFields.typeRef[0],
+				g_oCXXTag.extensionFields.typeRef[1]
+			);
 
 	makeTagEntry(&g_oCXXTag);
 
@@ -136,12 +155,17 @@ void cxxTagCommit(void)
 	if(!g_oCXXTag.extensionFields.scopeName)
 		return;
 
-	// WARNING: The following code assumes that the scope didn't change between cxxTagBegin() and cxxTagCommit().
+	// WARNING: The following code assumes that the scope
+	// didn't change between cxxTagBegin() and cxxTagCommit().
 
 	enum CXXTagKind eScopeKind = cxxScopeGetKind();
 
 	if(eScopeKind == CXXTagKindFUNCTION)
-		return; // old ctags didn't do this, and --extra=+q is mainly for backward compatibility so...
+	{
+		// old ctags didn't do this, and --extra=+q is mainly
+		// for backward compatibility so...
+		return;
+	}
 
 	// Same tag. Only the name changes.
 
@@ -149,7 +173,8 @@ void cxxTagCommit(void)
 
 	if(eScopeKind == CXXTagKindENUM)
 	{
-		// If the scope kind is enumeration then we need to remove the last scope part. This is what old ctags did.
+		// If the scope kind is enumeration then we need to remove the
+		// last scope part. This is what old ctags did.
 		if(cxxScopeGetSize() < 2)
 			return; // toplevel enum
 
@@ -164,7 +189,12 @@ void cxxTagCommit(void)
 
 	g_oCXXTag.name = vStringValue(x);
 
-	CXX_DEBUG_PRINT("Emitting extra tag for symbol '%s', kind '%s', line %d",g_oCXXTag.name,g_oCXXTag.kind->name,g_oCXXTag.lineNumber);
+	CXX_DEBUG_PRINT(
+			"Emitting extra tag for symbol '%s', kind '%s', line %d",
+			g_oCXXTag.name,
+			g_oCXXTag.kind->name,
+			g_oCXXTag.lineNumber
+		);
 
 	makeTagEntry(&g_oCXXTag);
 

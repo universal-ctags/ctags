@@ -14,7 +14,8 @@
 
 //
 // Uncomment this to enable extensive debugging to stderr in cxx code.
-// Currently cxx-specific debugging is supported only on gcc (because of variadic macros and __PRETTY_FUNC__)
+// Currently cxx-specific debugging is supported only on gcc (because of
+// variadic macros and __PRETTY_FUNC__)
 //
 //#define CXX_DEBUGGING_ENABLED 1
 
@@ -36,21 +37,25 @@ void cxxDebugInit(void);
 #define CXX_DEBUG_ENTER() cxxDebugEnter(__PRETTY_FUNCTION__,"")
 #define CXX_DEBUG_LEAVE() cxxDebugLeave(__PRETTY_FUNCTION__,"")
 
-#define CXX_DEBUG_ENTER_TEXT(_szFormat,...) cxxDebugEnter(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__)
-#define CXX_DEBUG_LEAVE_TEXT(_szFormat,...) cxxDebugLeave(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__)
+#define CXX_DEBUG_ENTER_TEXT(_szFormat,...) \
+	cxxDebugEnter(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__)
 
-#define CXX_DEBUG_PRINT(_szFormat,...) cxxDebugPrint(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__)
+#define CXX_DEBUG_LEAVE_TEXT(_szFormat,...) \
+	cxxDebugLeave(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__)
+
+#define CXX_DEBUG_PRINT(_szFormat,...) \
+	cxxDebugPrint(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__)
 
 #define CXX_DEBUG_INIT() cxxDebugInit()
 
 #define CXX_DEBUG_ASSERT(_condition,_szFormat,...) \
-		do { \
-			if(!(_condition)) \
-			{ \
-				cxxDebugPrint(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__); \
-				Assert(FALSE); \
-			} \
-		} while(0)
+	do { \
+		if(!(_condition)) \
+		{ \
+			cxxDebugPrint(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__); \
+			Assert(FALSE); \
+		} \
+	} while(0)
 
 #else //!CXX_DO_DEBUGGING
 

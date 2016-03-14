@@ -19,28 +19,31 @@
 #include "selectors.h"
 
 //
-// -----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // Assumptions.
-// -----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
-// - Parsing C/C++ is hard. Parsing C/C++ correctly without includes and without a complete
-//   preprocessor is close to impossible in the general case. Also ctags is not a compiler.
-//   This means that our parser must be a "guessing" parser. It's hopeless
-//   to try to decode the syntax of the language down to the last bit.
+// - Parsing C/C++ is hard. Parsing C/C++ correctly without includes and
+//   without a complete preprocessor is close to impossible in the general
+//   case. Also ctags is not a compiler. This means that our parser must be
+//   a "guessing" parser. It's hopeless to try to decode the syntax of the
+//   language down to the last bit.
 //
-// - The input may contain syntax errors. This is because we don't have a full preprocessor
-//   and also because ctags is often used "online" in editors, while the user is typing.
-//   ctags should be tolerant and try to do its best even with syntax errors but:
-//   - Syntax errors that break the scope hierarchy should be detected and tag emission
-//     should probably be stopped. Correct tags in a broken hierarchy are useless (well,
-//     unless the hierarchy itself is ignored by the ctags user).
+// - The input may contain syntax errors. This is because we don't have a full
+//   preprocessor and also because ctags is often used "online" in editors,
+//   while the user is typing. ctags should be tolerant and try to do its best
+//   even with syntax errors but:
+//   - Syntax errors that break the scope hierarchy should be detected and tag
+//     emission should probably be stopped. Correct tags in a broken hierarchy
+//     are useless (well, unless the hierarchy itself is ignored by the ctags
+//     user).
 //   - CTags should try to avoid emitting tags which involve syntax errors
 //
 // - There will always be pathologic cases. Don't cry, live with it.
 //
-// -----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // TODO LIST
-// -----------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 //
 // - In case of simple syntax error try to recover:
 //       Skip to the next ; without entering or exiting scopes.
@@ -48,13 +51,15 @@
 // - Extension of each block/scope.
 // - Unnamed blocks/scopes?
 // - Handle syntax errors:
-//   - If a special switch is used then stop on detecting a syntax error (this is useful
-//     for code editors that frequently update tags for single files)
-//   - If the switch is not used then do NOT emit tags for a file on a syntax error [but do
-//     not stop execution of the whole program and continue on other files]
+//   - If a special switch is used then stop on detecting a syntax error
+//     (this is useful for code editors that frequently update tags for
+//     single files)
+//   - If the switch is not used then do NOT emit tags for a file on a syntax
+//     error [but do not stop execution of the whole program and continue on
+//     other files]
 //   For this purpose:
-//   - Do not emit tags until the end of the file, if scopes do not match we either screwed up
-//     something or the programmer did
+//   - Do not emit tags until the end of the file, if scopes do not match we
+//     either screwed up something or the programmer did
 //     Maybe the cork api can be used for this?
 //
 // Handle variable declarations inside things like while() foreach() FOR() etc..
@@ -86,7 +91,7 @@ parserDefinition * CParser (void)
 	def->parser2    = cxxCParserMain;
 	def->initialize = cxxCParserInitialize;
 	def->selectLanguage = selectors;
-	def->useCork = TRUE; // We use corking to block output until the end of the file
+	def->useCork = TRUE; // We use corking to block output until the end of file
 
 	return def;
 }
@@ -113,7 +118,7 @@ parserDefinition * CppParser (void)
 	def->parser2    = cxxCppParserMain;
 	def->initialize = cxxCppParserInitialize;
 	def->selectLanguage = selectors;
-	def->useCork = TRUE; // We use corking to block output until the end of the file
+	def->useCork = TRUE; // We use corking to block output until the end of file
 
 	return def;
 }

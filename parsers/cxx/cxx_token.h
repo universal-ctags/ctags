@@ -51,7 +51,7 @@ enum CXXTokenType
 	CXXTokenTypeClosingSquareParenthesis = (1 << 25), // ]
 	CXXTokenTypeGreaterThanSign = (1 << 26), // >
 
-	// Subchains (caution: read the comment above about CXXTokenTypeOpeningBracket
+	// Subchains (caution: read the comment above about CXXTokenTypeOpeningBracket)
 	CXXTokenTypeBracketChain = (1 << 27), // {...}
 	CXXTokenTypeParenthesisChain = (1 << 28), // (...)
 	CXXTokenTypeSquareParenthesisChain = (1 << 29), // [...]
@@ -77,8 +77,9 @@ typedef struct _CXXToken
 	struct _CXXToken * pNext;
 	struct _CXXToken * pPrev;
 
-	// These members are used by the scope management functions to store the scope informations.
-	// Only cxxScope* functions can make sense of it. In other contexts these are simply left
+	// These members are used by the scope management functions to store
+	// scope information. Only cxxScope* functions can make sense of it.
+	// In other contexts these are simply left
 	// uninitialized and must be treated as undefined.
 	unsigned char uInternalScopeKind;
 	unsigned char uInternalScopeAccess;
@@ -88,6 +89,7 @@ CXXToken * cxxTokenCreate(void);
 void cxxTokenDestroy(CXXToken * t);
 
 enum CXXTagKind;
+
 CXXToken * cxxTokenCreateAnonymousIdentifier(enum CXXTagKind k);
 
 #define cxxTokenTypeIsOneOf(_pToken,_uTypes) (_pToken->eType & (_uTypes))

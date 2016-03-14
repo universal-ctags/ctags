@@ -113,7 +113,12 @@ const char * cxxScopeGetFullName(void)
 	else
 		g_szScopeName = vStringNew();
 
-	cxxTokenChainJoinInString(g_pScope,g_szScopeName,"::",CXXTokenChainJoinNoTrailingSpaces);
+	cxxTokenChainJoinInString(
+			g_pScope,
+			g_szScopeName,
+			"::",
+			CXXTokenChainJoinNoTrailingSpaces
+		);
 
 	g_bScopeNameDirty = FALSE;
 	return g_szScopeName->buffer;
@@ -139,7 +144,12 @@ vString * cxxScopeGetFullNameAsString(void)
 	else
 		g_szScopeName = vStringNew();
 
-	cxxTokenChainJoinInString(g_pScope,g_szScopeName,"::",CXXTokenChainJoinNoTrailingSpaces);
+	cxxTokenChainJoinInString(
+			g_pScope,
+			g_szScopeName,
+			"::",
+			CXXTokenChainJoinNoTrailingSpaces
+		);
 
 	ret = g_szScopeName;
 	g_szScopeName = NULL;
@@ -151,7 +161,12 @@ vString * cxxScopeGetFullNameExceptLastComponentAsString(void)
 	if(g_pScope->iCount < 2)
 		return NULL;
 
-	return cxxTokenChainJoinRange(g_pScope->pHead,g_pScope->pTail->pPrev,"::",CXXTokenChainJoinNoTrailingSpaces);
+	return cxxTokenChainJoinRange(
+			g_pScope->pHead,
+			g_pScope->pTail->pPrev,
+			"::",
+			CXXTokenChainJoinNoTrailingSpaces
+		);
 }
 
 
@@ -162,10 +177,20 @@ void cxxScopeSetAccess(enum CXXScopeAccess eAccess)
 	g_pScope->pTail->uInternalScopeAccess = (unsigned char)eAccess;
 }
 
-void cxxScopePush(CXXToken * t,enum CXXTagKind eScopeKind,enum CXXScopeAccess eInitialAccess)
+void cxxScopePush(
+		CXXToken * t,
+		enum CXXTagKind eScopeKind,
+		enum CXXScopeAccess eInitialAccess
+	)
 {
-	CXX_DEBUG_ASSERT(t->eType == CXXTokenTypeIdentifier,"The scope name must be an identifer");
-	CXX_DEBUG_ASSERT(t->pszWord,"The scope name should have a text");
+	CXX_DEBUG_ASSERT(
+			t->eType == CXXTokenTypeIdentifier,
+			"The scope name must be an identifer"
+		);
+	CXX_DEBUG_ASSERT(
+			t->pszWord,
+			"The scope name should have a text"
+		);
 	cxxTokenChainAppend(g_pScope,t);
 	t->uInternalScopeKind = (unsigned char)eScopeKind;
 	t->uInternalScopeAccess = (unsigned char)eInitialAccess;
@@ -180,7 +205,10 @@ void cxxScopePush(CXXToken * t,enum CXXTagKind eScopeKind,enum CXXScopeAccess eI
 
 void cxxScopePop(void)
 {
-	CXX_DEBUG_ASSERT(g_pScope->iCount > 0,"When popping as scope there must be a scope to pop");
+	CXX_DEBUG_ASSERT(
+			g_pScope->iCount > 0,
+			"When popping as scope there must be a scope to pop"
+		);
 
 	cxxTokenDestroy(cxxTokenChainTakeLast(g_pScope));
 	g_bScopeNameDirty = TRUE;

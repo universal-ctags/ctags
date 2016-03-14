@@ -830,7 +830,6 @@ process:
 				int next = getcFromInputFile ();
 
 				if (next == NEWLINE)
-					// continue; <-- this may exit returning the backslash, which si wrong.
 					goto start_loop;
 				else
 					ungetcToInputFile (next);

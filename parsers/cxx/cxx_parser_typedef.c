@@ -30,7 +30,10 @@ boolean cxxParserParseGenericTypedef(void)
 
 	for(;;)
 	{
-		if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF | CXXTokenTypeClosingBracket | CXXTokenTypeKeyword))
+		if(!cxxParserParseUpToOneOf(
+				CXXTokenTypeSemicolon | CXXTokenTypeEOF |
+				CXXTokenTypeClosingBracket | CXXTokenTypeKeyword
+			))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Failed to parse fast statement");
 			return FALSE;
@@ -68,11 +71,16 @@ boolean cxxParserParseGenericTypedef(void)
 	return TRUE;
 }
 
-// This function attempts to extract a typedef from the specified chain.
+// This function attempts to extract a typedef from the
+// specified chain.
 // The typedef keyword should already have been removed (!)
-// The function expects a terminator to be present at the end unless bExpectTerminatorAtEnd is set to FALSE
+// The function expects a terminator to be present at the end
+// unless bExpectTerminatorAtEnd is set to FALSE
 // The token chain may be condensed/destroyed upon exit.
-void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtEnd)
+void cxxParserExtractTypedef(
+		CXXTokenChain * pChain,
+		boolean bExpectTerminatorAtEnd
+	)
 {
 	CXX_DEBUG_ENTER();
 
@@ -96,7 +104,10 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtE
 	if(bExpectTerminatorAtEnd)
 	{
 		t = cxxTokenChainLast(pChain);
-		CXX_DEBUG_ASSERT(cxxTokenTypeIs(t,CXXTokenTypeSemicolon),"The terminator should be present here");
+		CXX_DEBUG_ASSERT(
+				cxxTokenTypeIs(t,CXXTokenTypeSemicolon),
+				"The terminator should be present here"
+			);
 		cxxTokenChainDestroyLast(pChain);
 	}
 
@@ -113,7 +124,10 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtE
 		t->pPrev &&
 		cxxTokenTypeIs(t->pPrev,CXXTokenTypeParenthesisChain) &&
 		t->pPrev->pPrev &&
-		(pAux = cxxTokenChainLastTokenOfType(t->pPrev->pChain,CXXTokenTypeIdentifier))
+		(pAux = cxxTokenChainLastTokenOfType(
+				t->pPrev->pChain,
+				CXXTokenTypeIdentifier
+			))
 	)
 	{
 		CXX_DEBUG_PRINT("Found function pointer typedef");
@@ -161,7 +175,9 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtE
 				cxxTokenChainFirstTokenOfType(pChain,CXXTokenTypeParenthesisChain)
 			)
 		{
-			CXX_DEBUG_LEAVE_TEXT("Wild parenthesis in type definition: not emitting typeref");
+			CXX_DEBUG_LEAVE_TEXT(
+					"Wild parenthesis in type definition: not emitting typeref"
+				);
 			cxxTokenChainTake(pTParentChain,t);
 		} else {
 			// other kind of typeref, use typename here.
@@ -188,13 +204,21 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtE
 
 			cxxTokenChainCondense(pChain,0);
 
-			// "typename" is debatable since it's not really allowed by C++ for unqualified types.
-			// However I haven't been able to come up with something better... so "typename" it is for now.
+			// "typename" is debatable since it's not really
+			// allowed by C++ for unqualified types.
+			// However I haven't been able to come up with something better...
+			// so "typename" it is for now.
 			tag->extensionFields.typeRef[0] = "typename";
-			tag->extensionFields.typeRef[1] = vStringValue(cxxTokenChainFirst(pChain)->pszWord);
+			tag->extensionFields.typeRef[1] = vStringValue(
+					cxxTokenChainFirst(pChain)->pszWord
+				);
 		}
 
-		CXX_DEBUG_PRINT("Typeref is %s:%s",tag->extensionFields.typeRef[0],tag->extensionFields.typeRef[1]);
+		CXX_DEBUG_PRINT(
+				"Typeref is %s:%s",
+				tag->extensionFields.typeRef[0],
+				tag->extensionFields.typeRef[1]
+			);
 
 		tag->isFileScope = !isInputHeaderFile();
 
