@@ -148,12 +148,7 @@ void cxxParserExtractTypedef(CXXTokenChain * pChain,boolean bExpectTerminatorAtE
 			pAux->pPrev &&
 			(!pAux->pPrev->pPrev) &&
 			cxxTokenTypeIs(pAux->pPrev,CXXTokenTypeKeyword) &&
-			(
-				(pAux->pPrev->eKeyword == CXXKeywordSTRUCT) ||
-				(pAux->pPrev->eKeyword == CXXKeywordUNION) ||
-				(pAux->pPrev->eKeyword == CXXKeywordCLASS) ||
-				(pAux->pPrev->eKeyword == CXXKeywordENUM)
-			)
+			cxxKeywordIsTypeRefMarker(pAux->pPrev->eKeyword)
 		)
 		{
 			tag->extensionFields.typeRef[0] = vStringValue(pAux->pPrev->pszWord);
