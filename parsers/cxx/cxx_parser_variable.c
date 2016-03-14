@@ -18,98 +18,6 @@
 #include "vstring.h"
 #include "read.h"
 
-//
-// Try to tell if the specified token chain is valid as a parameter list for a constructor.
-// It's used to check if something like type name(args) belongs to a variable declaration.
-//
-// This is more of a guess for now: tries to exclude trivial cases.
-//
-static boolean cxxParserTokenChainLooksLikeConstructorParameterSet(CXXTokenChain * pChain)
-{
-	// We assume that the chain has a starting parenthesis and an ending parenthesis.
-
-	if(pChain->iCount < 3)
-		return FALSE; // type var() is NOT valid C++
-
-	CXXToken * t = pChain->pHead;
-	CXXToken * pLast = pChain->pTail;
-
-	CXX_DEBUG_ASSERT(cxxTokenTypeIs(t,CXXTokenTypeOpeningParenthesis),"The token chain should start with an opening parenthesis");
-	CXX_DEBUG_ASSERT(cxxTokenTypeIs(pLast,CXXTokenTypeOpeningParenthesis),"The token chain should end with an opening parenthesis");
-
-	t = t->pNext;
-
-	while(t != pLast)
-	{
-		if(cxxTokenTypeIsOneOf(t,
-				CXXTokenTypeNumber | CXXTokenTypeStringConstant | CXXTokenTypeCharacterConstant |
-				CXXTokenTypePointerOperator | CXXTokenTypeDotOperator | CXXTokenTypeOperator | CXXTokenTypeMultipleDots
-			))
-			return TRUE; // not allowed in a constructor parameter set at this point
-
-		if(cxxTokenTypeIs(t,CXXTokenTypeKeyword))
-		{
-			if(
-					cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeKeyword | CXXTokenTypeStar | CXXTokenTypeAnd | CXXTokenTypeMultipleAnds | CXXTokenTypeIdentifier) ||
-					(pChain->iCount == 3) // (double)
-				)
-			{
-				// this is something like:
-				// (int a...
-				// (void *...
-				// (unsigned int...
-				// (double)
-				return FALSE;
-			}
-			
-			if(cxxKeywordMayBePartOfTypeName(t->eKeyword))
-			{
-				// parts of type name (not inside a parenthesis which is assumed to be condensed)
-				return FALSE;
-			}
-			
-		} else if(cxxTokenTypeIs(t,CXXTokenTypeIdentifier))
-		{
-			if(cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeKeyword | CXXTokenTypeIdentifier))
-			{
-				// this is something like:
-				// (type a...
-				return FALSE;
-			}
-		} else if(cxxTokenTypeIs(t,CXXTokenTypeGreaterThanSign))
-		{
-			if(cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeAnd | CXXTokenTypeStar | CXXTokenTypeMultipleAnds | CXXTokenTypeComma))
-			{
-				// > &
-				// > *
-				// > &&
-				// >,
-				return FALSE;
-			}
-			
-			if(cxxTokenTypeIsOneOf(t->pPrev,CXXTokenTypeKeyword))
-			{
-				// int>
-				// 
-				return FALSE;
-			}
-		}
-
-		if(cxxTokenTypeIs(t,CXXTokenTypeAssignment))
-		{
-			// after an assignment prototypes and constructor declarations may look the same, skip to next comma or end
-			t = cxxTokenChainNextTokenOfType(t,CXXTokenTypeClosingParenthesis | CXXTokenTypeComma);
-			CXX_DEBUG_ASSERT(t,"We should have found the closing parenthesis here!");
-			if(cxxTokenTypeIs(t,CXXTokenTypeComma))
-				t = t->pNext;
-		} else {
-			t = t->pNext;
-		}
-	}
-
-	// We must assume that it might be...
-	return TRUE;
-}
 
 
 //
@@ -268,6 +176,15 @@ next_token:
 				pTokenBefore = t->pPrev;
 				t = t->pNext;
 			} else if(
+					(t->pChain->iCount == 3) &&
+					cxxTokenTypeIs(cxxTokenChainAt(t->pChain,1),CXXTokenTypeParenthesisChain) &&
+					cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier) && // we're in a parenthesis chain so there is a previous token here (at least the open paren)
+					cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeIdentifier) // if the one above succeeded there is yet another previous token
+				)
+			{
+				CXX_DEBUG_LEAVE_TEXT("Parenthesis seems to define an __ARGS style prototype");
+				return bGotVariable;
+			} else if(
 					cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier) &&
 					(
 						(eScopeKind == CXXTagKindNAMESPACE) ||
@@ -288,7 +205,7 @@ next_token:
 		} else {
 			if(t->pPrev->eType != CXXTokenTypeIdentifier)
 			{
-				CXX_DEBUG_LEAVE_TEXT("No identifier before the n otable token");
+				CXX_DEBUG_LEAVE_TEXT("No identifier before the notable token");
 				return bGotVariable;
 			}
 

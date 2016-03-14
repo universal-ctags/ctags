@@ -44,6 +44,9 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 
 // cxx_parser_function.c
 
+boolean cxxParserTokenChainLooksLikeFunctionCallParameterSet(CXXTokenChain * pChain);
+boolean cxxParserTokenChainLooksLikeConstructorParameterSet(CXXTokenChain * pChain);
+
 //
 // Description of a function signature.
 //
