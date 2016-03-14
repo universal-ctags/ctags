@@ -948,20 +948,9 @@ int cxxParserEmitFunctionTags(
 		CXXToken * pTypeName;
 
 		if(pInfo->pTypeStart)
-		{
-			cxxTokenChainNormalizeTypeNameSpacingInRange(pInfo->pTypeStart,pInfo->pTypeEnd);
-			pTypeName = cxxTokenChainExtractRange(pInfo->pTypeStart,pInfo->pTypeEnd,0);
-			
-			CXX_DEBUG_PRINT("Type name is '%s'",vStringValue(pTypeName->pszWord));
-			
-			// FIXME: Maybe should exclude also class/struct/union/enum?
-			static const char * szTypename = "typename";
-			
-			tag->extensionFields.typeRef[0] = szTypename;
-			tag->extensionFields.typeRef[1] = vStringValue(pTypeName->pszWord);
-		} else {
+			pTypeName = cxxTagSetTypeField(tag,pInfo->pTypeStart,pInfo->pTypeEnd);
+		else
 			pTypeName = NULL;
-		}
 
 		if(pszSignature)
 			tag->extensionFields.signature = vStringValue(pszSignature);
@@ -1042,6 +1031,15 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(void)
 			CXXEmitFunctionTagsPushScopes
 		);
 
+#ifdef CXX_DO_DEBUGGING
+	vString * pJoinedChain = cxxTokenChainJoin(g_cxx.pTokenChain,NULL,0);
+	CXX_DEBUG_PRINT(
+			"Might be emitting parameters from chain %s",
+			vStringValue(pJoinedChain)
+		);
+	vStringDelete(pJoinedChain);
+#endif
+
 	if(cxxTagKindEnabled(CXXTagKindPARAMETER))
 		cxxParserEmitFunctionParameterTags(&oParamInfo);
 
@@ -1054,8 +1052,6 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 {
 	// emit parameters
 
-	CXXTokenChain * tc = cxxTokenChainCreate();
-
 	unsigned int i = 0;
 	while(i < pInfo->uParameterCount)
 	{
@@ -1064,56 +1060,58 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 				pInfo->aIdentifiers[i]
 			);
 
-		if(tag)
+		if(!tag)
+			return;
+
+		CXXToken * pTypeName;
+
+		if(pInfo->aDeclarationStarts[i] && pInfo->aDeclarationEnds[i])
 		{
-			boolean bDestroyIdentifier = FALSE;
-
-			if(pInfo->aDeclarationStarts[i] && pInfo->aDeclarationEnds[i])
+			// This is tricky.
+			// We know that the declaration contains the identifier.
+			// We don't want the identifier to appear in the type name.
+			// So we have to remove it from the chain (eventually recursively if there
+			// are nested parentheses).
+			// However the declaration might start or end with the identifier
+			// and in that case we would be effectively breaking the type chain.
+			// Work around it.
+			
+			CXXToken * pTypeStart = pInfo->aDeclarationStarts[i];
+			CXXToken * pTypeEnd = pInfo->aDeclarationEnds[i];
+			
+			if(pTypeStart != pTypeEnd)
 			{
-				cxxTokenChainClear(tc);
-				cxxTokenChainMoveEntryRange(
-						pInfo->pChain,
-						pInfo->aDeclarationStarts[i],
-						pInfo->aDeclarationEnds[i],
-						tc)
-					;
-#ifdef CXX_DO_DEBUGGING
-				CXXToken * pDecl = cxxTokenChainExtractRange(
-						pInfo->aDeclarationStarts[i],
-						pInfo->aDeclarationEnds[i],
-						0
+				if(pTypeStart == pInfo->aIdentifiers[i])
+					pTypeStart = pTypeStart->pNext;
+				else if(pTypeEnd == pInfo->aIdentifiers[i])
+					pTypeEnd = pTypeEnd->pPrev;
+	
+				cxxTokenChainTakeRecursive(pInfo->pChain,pInfo->aIdentifiers[i]);
+	
+				pTypeName = cxxTagSetTypeField(
+						tag,
+						pTypeStart,
+						pTypeEnd
 					);
-				CXX_DEBUG_PRINT(
-						"Type for parameter '%s' is in '%s'",
-						vStringValue(pInfo->aIdentifiers[i]->pszWord),
-						vStringValue(pDecl->pszWord)
-					);
-				cxxTokenDestroy(pDecl);
-#endif
-				cxxTokenChainTakeRecursive(tc,pInfo->aIdentifiers[i]);
-				bDestroyIdentifier = TRUE;
-				cxxTokenChainNormalizeTypeNameSpacing(tc);
-				cxxTokenChainCondense(tc,0);
-
-				// "typename" is debatable since it's not really
-				// allowed by C++ for unqualified types. However I haven't been able
-				// to come up with something better... so "typename" it is for now.
-				tag->extensionFields.typeRef[0] = "typename";
-				tag->extensionFields.typeRef[1] = vStringValue(
-						cxxTokenChainFirst(tc)->pszWord
-					);
+			} else {
+				// The declaration contains only the identifier!
+				pTypeName = NULL;
 			}
-
-			tag->isFileScope = TRUE;
-			cxxTagCommit();
-
-			if(bDestroyIdentifier)
-				cxxTokenDestroy(pInfo->aIdentifiers[i]);
+		} else {
+			pTypeName = NULL;
 		}
+
+		tag->isFileScope = TRUE;
+		cxxTagCommit();
+
+		if(pTypeName)
+		{
+			cxxTokenDestroy(pInfo->aIdentifiers[i]);
+			cxxTokenDestroy(pTypeName);
+		}
+
 		i++;
 	}
-
-	cxxTokenChainDestroy(tc);
 }
 
 

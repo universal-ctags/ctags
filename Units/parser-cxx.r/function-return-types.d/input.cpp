@@ -1,6 +1,22 @@
 #include <string>
 #include <vector>
 
+struct Struct
+{
+};
+
+enum Enum
+{
+};
+
+class Class
+{
+};
+
+union Union
+{
+};
+
 void p00();
 int p01();
 unsigned int p02();
@@ -13,6 +29,14 @@ std::vector<std::string> * p08();
 auto p09() -> std::vector<std::string> ***;
 auto p10() -> std::string;
 auto p11() -> int (*)(int);
+struct Struct p12();
+Struct p13();
+union Union p14();
+Union p15();
+class Class * p15();
+Class & p16();
+const enum Enum p17();
+Enum p18();
 
 void f00()
 {

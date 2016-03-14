@@ -129,6 +129,11 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	//{ 0, 1, "xor_eq", 0 }
 };
 
+const char * cxxKeywordName(enum CXXKeyword eKeywordId)
+{
+	return g_aCXXKeywordTable[eKeywordId].szName;
+}
+
 boolean cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
