@@ -54,7 +54,9 @@ CXXToken * cxxTokenCreate(void)
 		CXX_DEBUG_ASSERT(t->pszWord,"The string shouldn't have been destroyed");
 	} else {
 		t = xMalloc(sizeof(CXXToken),CXXToken);
-		t->pszWord = vStringNew(); // we almost always want a string, and since this token is being reused..well.. we always want it
+		// we almost always want a string, and since this token
+		// is being reused..well.. we always want it
+		t->pszWord = vStringNew();
 	}
 
 	t->bFollowedBySpace = FALSE;
@@ -81,7 +83,9 @@ void cxxTokenDestroy(CXXToken * t)
 
 	if(g_pTokenPool->iCount < CXX_TOKEN_POOL_MAXIMUM_SIZE)
 	{
-		vStringClear(t->pszWord); // this won't actually release memory (but we're taking care to do not create very large strings)
+		// this won't actually release memory (but we're taking care
+		// to do not create very large strings)
+		vStringClear(t->pszWord);
 		cxxTokenChainAppend(g_pTokenPool,t);
 	} else {
 		vStringDelete(t->pszWord);
@@ -132,8 +136,9 @@ CXXToken * cxxTokenCreateAnonymousIdentifier(enum CXXTagKind k)
 	t->eType = CXXTokenTypeIdentifier;
 	vStringCopyS(t->pszWord, "__anon");
 
-	// The names of anonymous structures depend on the name of the file being processed
-	// so the identifiers won't collide across multiple ctags runs with different file sets.
+	// The names of anonymous structures depend on the name of
+	// the file being processed so the identifiers won't collide across
+	// multiple ctags runs with different file sets.
 
 	unsigned int uHash = hash((const unsigned char *)getInputFileName());
 

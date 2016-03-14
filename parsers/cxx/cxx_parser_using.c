@@ -23,19 +23,22 @@ boolean cxxParserParseUsingClause(void)
 {
 	CXX_DEBUG_ENTER();
 
-	// using-directives for namespaces and using-declarations for namespace members
+	// using-directives for namespaces and using-declarations
+	// for namespace members 
 	// using-declarations for class members
 	// type alias and alias template declaration (since C++11)
 
 	// using namespace ns_name;	(5)	// whole namespace
 	// using ns_name::name;	(6)	 // only symbol name
 	// using B::g; // inside class, using method g from base class B
-	// using identifier attr(optional) = type-id ; <-- this is equivalent to a typedef!
+	// using identifier attr(optional) = type-id ; <-- equivalent to a typedef!
 
 	cxxTokenChainClear(g_cxx.pTokenChain);
 
 	// skip to the next ; without leaving scope.
-	if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeClosingBracket | CXXTokenTypeEOF))
+	if(!cxxParserParseUpToOneOf(
+			CXXTokenTypeSemicolon | CXXTokenTypeClosingBracket | CXXTokenTypeEOF
+		))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to the next ;");
 		return FALSE;
@@ -55,7 +58,10 @@ boolean cxxParserParseUsingClause(void)
 		return TRUE;
 	}
 
-	CXXToken * pAssignment = cxxTokenChainFirstTokenOfType(g_cxx.pTokenChain,CXXTokenTypeAssignment);
+	CXXToken * pAssignment = cxxTokenChainFirstTokenOfType(
+			g_cxx.pTokenChain,
+			CXXTokenTypeAssignment
+		);
 
 	if(pAssignment)
 	{
@@ -63,22 +69,31 @@ boolean cxxParserParseUsingClause(void)
 
 		if(cxxTokenTypeIs(pFirst,CXXTokenTypeIdentifier))
 		{
-			CXX_DEBUG_PRINT("Found using clause '%s' which defines a type",vStringValue(pFirst->pszWord));
+			CXX_DEBUG_PRINT(
+					"Found using clause '%s' which defines a type",
+					vStringValue(pFirst->pszWord)
+				);
 
-			// It's a typedef. Reorder the tokens in the chain so it really looks like a typedef
+			// It's a typedef. Reorder the tokens in the chain
+			// so it really looks like a typedef
 			// and pass it to the specialized extraction routine
 			cxxTokenChainTake(g_cxx.pTokenChain,pFirst);
 
 			while(cxxTokenChainFirst(g_cxx.pTokenChain) != pAssignment)
 				cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
-			cxxTokenChainDestroyFirst(g_cxx.pTokenChain); // kill assignment itself
+			// kill assignment itself
+			cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
 
-			cxxTokenChainAppend(g_cxx.pTokenChain,pFirst); // in typedefs it's at the end
+			// in typedefs it's at the end
+			cxxTokenChainAppend(g_cxx.pTokenChain,pFirst);
 
 			cxxParserExtractTypedef(g_cxx.pTokenChain,FALSE);
 		}
 	} else {
-		CXX_DEBUG_ASSERT(g_cxx.pTokenChain->iCount > 0,"The token chain should be non empty at this point");
+		CXX_DEBUG_ASSERT(
+				g_cxx.pTokenChain->iCount > 0,
+				"The token chain should be non empty at this point"
+			);
 
 		CXXToken * t = cxxTokenChainFirst(g_cxx.pTokenChain);
 
@@ -105,16 +120,25 @@ boolean cxxParserParseUsingClause(void)
 				cxxTokenChainCondense(g_cxx.pTokenChain,0);
 
 				t = cxxTokenChainFirst(g_cxx.pTokenChain);
-				CXX_DEBUG_ASSERT(t,"Condensation of a non empty chain should produce a token!");
+				CXX_DEBUG_ASSERT(
+						t,
+						"Condensation of a non empty chain should produce a token!"
+					);
 
 
-				CXX_DEBUG_PRINT("Found using clause '%s' which extends scope",vStringValue(t->pszWord));
+				CXX_DEBUG_PRINT(
+						"Found using clause '%s' which extends scope",
+						vStringValue(t->pszWord)
+					);
 				tag = cxxTagBegin(CXXTagKindUSING,t);
 			} else {
 
 				t = cxxTokenChainLast(g_cxx.pTokenChain);
 
-				CXX_DEBUG_PRINT("Found using clause '%s' which imports a name",vStringValue(t->pszWord));
+				CXX_DEBUG_PRINT(
+						"Found using clause '%s' which imports a name",
+						vStringValue(t->pszWord)
+					);
 				tag = cxxTagBegin(CXXTagKindNAME,t);
 
 				// FIXME: We need something like "nameref:<condensed>" here!
@@ -122,7 +146,8 @@ boolean cxxParserParseUsingClause(void)
 
 			if(tag)
 			{
-				tag->isFileScope = (cxxScopeGetKind() == CXXTagKindNAMESPACE) && !isInputHeaderFile();
+				tag->isFileScope = (cxxScopeGetKind() == CXXTagKindNAMESPACE) &&
+							(!isInputHeaderFile());
 				cxxTagCommit();
 			}
 		}

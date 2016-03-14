@@ -162,7 +162,11 @@ boolean cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t)
 			return TRUE;
 		}
 
-		if(cxxTokenTypeIsOneOf(aux,CXXTokenTypeParenthesisChain | CXXTokenTypeAngleBracketChain | CXXTokenTypeSquareParenthesisChain | CXXTokenTypeBracketChain))
+		if(cxxTokenTypeIsOneOf(
+				aux,
+				CXXTokenTypeParenthesisChain | CXXTokenTypeAngleBracketChain |
+					CXXTokenTypeSquareParenthesisChain | CXXTokenTypeBracketChain
+			))
 		{
 			if(cxxTokenChainTakeRecursive(aux->pChain,t))
 				return TRUE;
@@ -244,7 +248,13 @@ void cxxTokenChainPrepend(CXXTokenChain * tc,CXXToken * t)
 	tc->pHead = t;
 }
 
-void cxxTokenChainJoinRangeInString(CXXToken * from,CXXToken * to,vString * s,const char * szSeparator,unsigned int uFlags)
+void cxxTokenChainJoinRangeInString(
+		CXXToken * from,
+		CXXToken * to,
+		vString * s,
+		const char * szSeparator,
+		unsigned int uFlags
+	)
 {
 	if(!from)
 		return;
@@ -267,12 +277,20 @@ void cxxTokenChainJoinRangeInString(CXXToken * from,CXXToken * to,vString * s,co
 
 		cxxTokenAppendToString(s,t);
 
-		if((!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) && t->bFollowedBySpace)
+		if(
+				(!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) &&
+				t->bFollowedBySpace
+			)
 			vStringCatS(s," ");
 	}
 }
 
-vString * cxxTokenChainJoinRange(CXXToken * from,CXXToken * to,const char * szSeparator,unsigned int uFlags)
+vString * cxxTokenChainJoinRange(
+		CXXToken * from,
+		CXXToken * to,
+		const char * szSeparator,
+		unsigned int uFlags
+	)
 {
 	if(!from)
 		return NULL;
@@ -284,7 +302,12 @@ vString * cxxTokenChainJoinRange(CXXToken * from,CXXToken * to,const char * szSe
 	return s;
 }
 
-void cxxTokenChainJoinInString(CXXTokenChain * tc,vString * s,const char * szSeparator,unsigned int uFlags)
+void cxxTokenChainJoinInString(
+		CXXTokenChain * tc,
+		vString * s,
+		const char * szSeparator,
+		unsigned int uFlags
+	)
 {
 	if(!tc)
 		return;
@@ -296,7 +319,10 @@ void cxxTokenChainJoinInString(CXXTokenChain * tc,vString * s,const char * szSep
 
 	cxxTokenAppendToString(s,t);
 
-	if((!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) && t->bFollowedBySpace)
+	if(
+			(!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) &&
+			t->bFollowedBySpace
+		)
 		vStringCatS(s," ");
 
 	t = t->pNext;
@@ -307,7 +333,10 @@ void cxxTokenChainJoinInString(CXXTokenChain * tc,vString * s,const char * szSep
 
 		cxxTokenAppendToString(s,t);
 
-		if((!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) && t->bFollowedBySpace)
+		if(
+				(!(uFlags & CXXTokenChainJoinNoTrailingSpaces)) &&
+				t->bFollowedBySpace
+			)
 			vStringCatS(s," ");
 
 		t = t->pNext;
@@ -315,7 +344,11 @@ void cxxTokenChainJoinInString(CXXTokenChain * tc,vString * s,const char * szSep
 }
 
 
-vString * cxxTokenChainJoin(CXXTokenChain * tc,const char * szSeparator,unsigned int uFlags)
+vString * cxxTokenChainJoin(
+		CXXTokenChain * tc,
+		const char * szSeparator,
+		unsigned int uFlags
+	)
 {
 	if(!tc)
 		return NULL;
@@ -344,14 +377,28 @@ void cxxTokenChainMoveEntries(CXXTokenChain * src,CXXTokenChain * dest)
 	src->pTail = NULL;
 }
 
-void cxxTokenChainMoveEntryRange(CXXTokenChain * src,CXXToken * start,CXXToken * end,CXXTokenChain * dest)
+void cxxTokenChainMoveEntryRange(
+		CXXTokenChain * src,
+		CXXToken * start,
+		CXXToken * end,
+		CXXTokenChain * dest
+	)
 {
 	if(!src || !dest || !start || !end)
 		return;
 
-	CXX_DEBUG_ASSERT(cxxTokenChainFindToken(src,start) >= 0,"The start token must be in the source chain!");
-	CXX_DEBUG_ASSERT(cxxTokenChainFindToken(src,end) >= 0,"The end token must be in the source chain!");
-	CXX_DEBUG_ASSERT(cxxTokenChainFindToken(src,start) <= cxxTokenChainFindToken(src,end),"The start token must come before the end token");
+	CXX_DEBUG_ASSERT(
+			cxxTokenChainFindToken(src,start) >= 0,
+			"The start token must be in the source chain!"
+		);
+	CXX_DEBUG_ASSERT(
+			cxxTokenChainFindToken(src,end) >= 0,
+			"The end token must be in the source chain!"
+		);
+	CXX_DEBUG_ASSERT(
+			cxxTokenChainFindToken(src,start) <= cxxTokenChainFindToken(src,end),
+			"The start token must come before the end token"
+		);
 
 	CXXToken * t = start;
 	for(;;)
@@ -388,7 +435,10 @@ void cxxTokenChainCondense(CXXTokenChain * tc,unsigned int uFlags)
 
 		cxxTokenAppendToString(pCondensed->pszWord,t);
 
-		if((!(uFlags & CXXTokenChainCondenseNoTrailingSpaces)) && t->bFollowedBySpace)
+		if(
+				(!(uFlags & CXXTokenChainCondenseNoTrailingSpaces)) &&
+				t->bFollowedBySpace
+			)
 			vStringCatS(pCondensed->pszWord," ");
 
 		pCondensed->bFollowedBySpace = t->bFollowedBySpace;
@@ -420,7 +470,10 @@ CXXToken * cxxTokenChainSkipToEndOfTemplateAngleBracket(CXXToken * t)
 {
 	if(!t)
 		return NULL;
-	CXX_DEBUG_ASSERT(t->eType == CXXTokenTypeSmallerThanSign,"This function must be called when pointing to a <");
+	CXX_DEBUG_ASSERT(
+			t->eType == CXXTokenTypeSmallerThanSign,
+			"This function must be called when pointing to a <"
+		);
 	int iLevel = 1;
 	t = t->pNext;
 	while(t)
@@ -440,7 +493,10 @@ CXXToken * cxxTokenChainSkipToEndOfTemplateAngleBracket(CXXToken * t)
 	return NULL;
 }
 
-CXXToken * cxxTokenChainFirstTokenOfType(CXXTokenChain * tc,unsigned int uTokenTypes)
+CXXToken * cxxTokenChainFirstTokenOfType(
+		CXXTokenChain * tc,
+		unsigned int uTokenTypes
+	)
 {
 	if(!tc)
 		return NULL;
@@ -454,7 +510,10 @@ CXXToken * cxxTokenChainFirstTokenOfType(CXXTokenChain * tc,unsigned int uTokenT
 	return NULL;
 }
 
-CXXToken * cxxTokenChainNextTokenOfType(CXXToken * t,unsigned int uTokenTypes)
+CXXToken * cxxTokenChainNextTokenOfType(
+		CXXToken * t,
+		unsigned int uTokenTypes
+	)
 {
 	if(!t)
 		return NULL;
@@ -468,7 +527,10 @@ CXXToken * cxxTokenChainNextTokenOfType(CXXToken * t,unsigned int uTokenTypes)
 	return NULL;
 }
 
-CXXToken * cxxTokenChainPreviousTokenOfType(CXXToken * t,unsigned int uTokenTypes)
+CXXToken * cxxTokenChainPreviousTokenOfType(
+		CXXToken * t,
+		unsigned int uTokenTypes
+	)
 {
 	if(!t)
 		return NULL;
@@ -482,7 +544,10 @@ CXXToken * cxxTokenChainPreviousTokenOfType(CXXToken * t,unsigned int uTokenType
 	return NULL;
 }
 
-CXXToken * cxxTokenChainPreviousTokenNotOfType(CXXToken * t,unsigned int uTokenTypes)
+CXXToken * cxxTokenChainPreviousTokenNotOfType(
+		CXXToken * t,
+		unsigned int uTokenTypes
+	)
 {
 	if(!t)
 		return NULL;
@@ -496,7 +561,10 @@ CXXToken * cxxTokenChainPreviousTokenNotOfType(CXXToken * t,unsigned int uTokenT
 	return NULL;
 }
 
-CXXToken * cxxTokenChainLastTokenOfType(CXXTokenChain * tc,unsigned int uTokenTypes)
+CXXToken * cxxTokenChainLastTokenOfType(
+		CXXTokenChain * tc,
+		unsigned int uTokenTypes
+	)
 {
 	if(!tc)
 		return NULL;
@@ -510,7 +578,10 @@ CXXToken * cxxTokenChainLastTokenOfType(CXXTokenChain * tc,unsigned int uTokenTy
 	return NULL;
 }
 
-CXXToken * cxxTokenChainLastPossiblyNestedTokenOfType(CXXTokenChain * tc,unsigned int uTokenTypes)
+CXXToken * cxxTokenChainLastPossiblyNestedTokenOfType(
+		CXXTokenChain * tc,
+		unsigned int uTokenTypes
+	)
 {
 	if(!tc)
 		return NULL;
@@ -521,7 +592,10 @@ CXXToken * cxxTokenChainLastPossiblyNestedTokenOfType(CXXTokenChain * tc,unsigne
 			return t;
 		if(t->eType == CXXTokenTypeParenthesisChain)
 		{
-			CXXToken * tmp = cxxTokenChainLastPossiblyNestedTokenOfType(t->pChain,uTokenTypes);
+			CXXToken * tmp = cxxTokenChainLastPossiblyNestedTokenOfType(
+					t->pChain,
+					uTokenTypes
+				);
 			if(tmp)
 				return tmp;
 		}
@@ -532,7 +606,10 @@ CXXToken * cxxTokenChainLastPossiblyNestedTokenOfType(CXXTokenChain * tc,unsigne
 }
 
 
-CXXToken * cxxTokenChainFirstTokenNotOfType(CXXTokenChain * tc,unsigned int uTokenTypes)
+CXXToken * cxxTokenChainFirstTokenNotOfType(
+		CXXTokenChain * tc,
+		unsigned int uTokenTypes
+	)
 {
 	if(!tc)
 		return NULL;
@@ -546,7 +623,10 @@ CXXToken * cxxTokenChainFirstTokenNotOfType(CXXTokenChain * tc,unsigned int uTok
 	return NULL;
 }
 
-CXXToken * cxxTokenChainNextTokenNotOfType(CXXToken * t,unsigned int uTokenTypes)
+CXXToken * cxxTokenChainNextTokenNotOfType(
+		CXXToken * t,
+		unsigned int uTokenTypes
+	)
 {
 	if(!t)
 		return NULL;
@@ -560,7 +640,10 @@ CXXToken * cxxTokenChainNextTokenNotOfType(CXXToken * t,unsigned int uTokenTypes
 	return NULL;
 }
 
-CXXToken * cxxTokenChainLastTokenNotOfType(CXXTokenChain * tc,unsigned int uTokenTypes)
+CXXToken * cxxTokenChainLastTokenNotOfType(
+		CXXTokenChain * tc,
+		unsigned int uTokenTypes
+	)
 {
 	if(!tc)
 		return NULL;
@@ -575,7 +658,10 @@ CXXToken * cxxTokenChainLastTokenNotOfType(CXXTokenChain * tc,unsigned int uToke
 }
 
 
-int cxxTokenChainFindToken(CXXTokenChain * tc,CXXToken * t)
+int cxxTokenChainFindToken(
+		CXXTokenChain * tc,
+		CXXToken * t
+	)
 {
 	if(!tc)
 		return -1;
@@ -595,7 +681,10 @@ int cxxTokenChainFindToken(CXXTokenChain * tc,CXXToken * t)
 	return -1;
 }
 
-CXXToken * cxxTokenChainPreviousKeyword(CXXToken * from,enum CXXKeyword eKeyword)
+CXXToken * cxxTokenChainPreviousKeyword(
+		CXXToken * from,
+		enum CXXKeyword eKeyword
+	)
 {
 	if(!from)
 		return NULL;
@@ -603,7 +692,10 @@ CXXToken * cxxTokenChainPreviousKeyword(CXXToken * from,enum CXXKeyword eKeyword
 	CXXToken * t = from->pPrev;
 	while(t)
 	{
-		if((t->eType == CXXTokenTypeKeyword) && (t->eKeyword == eKeyword))
+		if(
+				(t->eType == CXXTokenTypeKeyword) &&
+				(t->eKeyword == eKeyword)
+			)
 			return t;
 		t = t->pPrev;
 	}
@@ -612,7 +704,10 @@ CXXToken * cxxTokenChainPreviousKeyword(CXXToken * from,enum CXXKeyword eKeyword
 }
 
 
-int cxxTokenChainFirstKeywordIndex(CXXTokenChain * tc,enum CXXKeyword eKeyword)
+int cxxTokenChainFirstKeywordIndex(
+		CXXTokenChain * tc,
+		enum CXXKeyword eKeyword
+	)
 {
 	if(!tc)
 		return -1;
@@ -635,7 +730,11 @@ int cxxTokenChainFirstKeywordIndex(CXXTokenChain * tc,enum CXXKeyword eKeyword)
 	return -1;
 }
 
-CXXToken * cxxTokenChainExtractRange(CXXToken * from,CXXToken * to,unsigned int uFlags)
+CXXToken * cxxTokenChainExtractRange(
+		CXXToken * from,
+		CXXToken * to,
+		unsigned int uFlags
+	)
 {
 	if(!from)
 		return NULL;
@@ -647,7 +746,10 @@ CXXToken * cxxTokenChainExtractRange(CXXToken * from,CXXToken * to,unsigned int 
 	pRet->oFilePosition = pToken->oFilePosition;
 
 	cxxTokenAppendToString(pRet->pszWord,pToken);
-	if((!(uFlags & CXXTokenChainExtractRangeNoTrailingSpaces)) && pToken->bFollowedBySpace)
+	if(
+			(!(uFlags & CXXTokenChainExtractRangeNoTrailingSpaces)) &&
+			pToken->bFollowedBySpace
+		)
 		vStringCatS(pRet->pszWord," ");
 	pRet->bFollowedBySpace = pToken->bFollowedBySpace;
 
@@ -657,7 +759,10 @@ CXXToken * cxxTokenChainExtractRange(CXXToken * from,CXXToken * to,unsigned int 
 		if(!pToken)
 			return pRet;
 		cxxTokenAppendToString(pRet->pszWord,pToken);
-		if((!(uFlags & CXXTokenChainExtractRangeNoTrailingSpaces)) && pToken->bFollowedBySpace)
+		if(
+				(!(uFlags & CXXTokenChainExtractRangeNoTrailingSpaces)) &&
+				pToken->bFollowedBySpace
+			)
 			vStringCatS(pRet->pszWord," ");
 		pRet->bFollowedBySpace = pToken->bFollowedBySpace;
 	}
@@ -665,7 +770,12 @@ CXXToken * cxxTokenChainExtractRange(CXXToken * from,CXXToken * to,unsigned int 
 	return pRet;
 }
 
-CXXToken * cxxTokenChainExtractIndexRange(CXXTokenChain * tc,int iFirstIndex,int iLastIndex,unsigned int uFlags)
+CXXToken * cxxTokenChainExtractIndexRange(
+		CXXTokenChain * tc,
+		int iFirstIndex,
+		int iLastIndex,
+		unsigned int uFlags
+	)
 {
 	if(!tc)
 		return NULL;
@@ -690,7 +800,10 @@ CXXToken * cxxTokenChainExtractIndexRange(CXXTokenChain * tc,int iFirstIndex,int
 	pRet->oFilePosition = pToken->oFilePosition;
 
 	cxxTokenAppendToString(pRet->pszWord,pToken);
-	if((!(uFlags & CXXTokenChainExtractRangeNoTrailingSpaces)) && pToken->bFollowedBySpace)
+	if(
+			(!(uFlags & CXXTokenChainExtractRangeNoTrailingSpaces)) &&
+			pToken->bFollowedBySpace
+		)
 		vStringCatS(pRet->pszWord," ");
 	pRet->bFollowedBySpace = pToken->bFollowedBySpace;
 
@@ -700,7 +813,10 @@ CXXToken * cxxTokenChainExtractIndexRange(CXXTokenChain * tc,int iFirstIndex,int
 		if(!pToken)
 			return pRet;
 		cxxTokenAppendToString(pRet->pszWord,pToken);
-		if((!(uFlags & CXXTokenChainExtractRangeNoTrailingSpaces)) && pToken->bFollowedBySpace)
+		if(
+				(!(uFlags & CXXTokenChainExtractRangeNoTrailingSpaces)) &&
+				pToken->bFollowedBySpace
+			)
 			vStringCatS(pRet->pszWord," ");
 		pRet->bFollowedBySpace = pToken->bFollowedBySpace;
 		idx++;
@@ -742,27 +858,33 @@ void cxxTokenChainNormalizeTypeNameSpacingInRange(CXXToken * pFrom,CXXToken * pT
 
 	for(;;)
 	{
-		if(cxxTokenTypeIsOneOf(t,CXXTokenTypeParenthesisChain | CXXTokenTypeSquareParenthesisChain))
+		if(cxxTokenTypeIsOneOf(
+				t,
+				CXXTokenTypeParenthesisChain | CXXTokenTypeSquareParenthesisChain
+			))
 		{
 			cxxTokenChainNormalizeTypeNameSpacing(t->pChain);
 			t->bFollowedBySpace = FALSE;
 		} else if(cxxTokenTypeIsOneOf(t,
-					CXXTokenTypeIdentifier | CXXTokenTypeKeyword | CXXTokenTypeGreaterThanSign |
-					CXXTokenTypeAnd | CXXTokenTypeMultipleAnds
+					CXXTokenTypeIdentifier | CXXTokenTypeKeyword |
+						CXXTokenTypeGreaterThanSign |
+						CXXTokenTypeAnd | CXXTokenTypeMultipleAnds
 				))
 		{
 			t->bFollowedBySpace = t->pNext &&
 				cxxTokenTypeIsOneOf(
 						t->pNext,
-						CXXTokenTypeParenthesisChain | CXXTokenTypeIdentifier | CXXTokenTypeKeyword |
-						CXXTokenTypeStar | CXXTokenTypeAnd | CXXTokenTypeMultipleAnds
+						CXXTokenTypeParenthesisChain | CXXTokenTypeIdentifier |
+							CXXTokenTypeKeyword | CXXTokenTypeStar |
+							CXXTokenTypeAnd | CXXTokenTypeMultipleAnds
 					);
 		} else if(cxxTokenTypeIs(t,CXXTokenTypeStar))
 		{
 			t->bFollowedBySpace = t->pNext &&
 				(!cxxTokenTypeIsOneOf(
 						t->pNext,
-						CXXTokenTypeStar | CXXTokenTypeComma | CXXTokenTypeClosingParenthesis
+						CXXTokenTypeStar | CXXTokenTypeComma |
+							CXXTokenTypeClosingParenthesis
 					));
 		} else {
 			t->bFollowedBySpace = FALSE;

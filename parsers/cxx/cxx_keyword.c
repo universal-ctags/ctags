@@ -16,9 +16,9 @@ enum CXXKeywordFlag
 	// int, void, const, float, stuff like that
 	CXXKeywordFlagMayBePartOfTypeName = 1,
 	// struct, class, union, enum, typename
-	CXXKeywordIsTypeRefMarker = 2,
+	CXXKeywordIsTypeRefMarker = (1 << 1),
 	// virtual, inline, friend, static
-	CXXKeywordExcludeFromTypeNames = 4
+	CXXKeywordExcludeFromTypeNames = (1 << 2)
 };
 
 typedef struct _CXXKeywordDescriptor
@@ -27,7 +27,6 @@ typedef struct _CXXKeywordDescriptor
 	const char * szName;
 	unsigned int uFlags;
 } CXXKeywordDescriptor;
-
 
 
 // This array is indexed by the CXXKeywordType enum
@@ -71,7 +70,8 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{ 0, "export", 0 },
 	{ 1, "extern", 0 },
 	{ 1, "false", 0 },
-	{ 0, "final", 0 }, // this is a keyword only in special contexts (we have a switch to enable/disable it)
+	// this is a keyword only in special contexts (we have a switch to enable/disable it)
+	{ 0, "final", 0 },
 	{ 1, "float", CXXKeywordFlagMayBePartOfTypeName },
 	{ 1, "for", 0 },
 	{ 0, "friend", CXXKeywordExcludeFromTypeNames },
@@ -90,7 +90,9 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{ 0, "operator", 0 },
 	//{ 0, "or", 0 },
 	//{ 0, "or_eq", 0 },
-	//{ 0, "override", 0 }, <-- override is a keyword only after function declarators, it's easier handling it as identifier
+	// override is a keyword only after function declarators,
+	// it's easier handling it as identifier
+	//{ 0, "override", 0 },
 	{ 0, "private", 0 },
 	{ 0, "protected", 0 },
 	{ 0, "public", 0 },
@@ -129,22 +131,27 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 
 boolean cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId)
 {
-	return g_aCXXKeywordTable[eKeywordId].uFlags & CXXKeywordFlagMayBePartOfTypeName;
+	return g_aCXXKeywordTable[eKeywordId].uFlags &
+			CXXKeywordFlagMayBePartOfTypeName;
 }
 
 boolean cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId)
 {
-	return g_aCXXKeywordTable[eKeywordId].uFlags & CXXKeywordIsTypeRefMarker;
+	return g_aCXXKeywordTable[eKeywordId].uFlags &
+			CXXKeywordIsTypeRefMarker;
 }
 
 boolean cxxKeywordExcludeFromTypeNames(enum CXXKeyword eKeywordId)
 {
-	return g_aCXXKeywordTable[eKeywordId].uFlags & CXXKeywordExcludeFromTypeNames;
+	return g_aCXXKeywordTable[eKeywordId].uFlags &
+			CXXKeywordExcludeFromTypeNames;
 }
 
 void cxxBuildKeywordHash(const langType language,boolean bCXX)
 {
-	const size_t count = sizeof(g_aCXXKeywordTable) / sizeof(CXXKeywordDescriptor);
+	const size_t count = sizeof(g_aCXXKeywordTable) /
+			sizeof(CXXKeywordDescriptor);
+			
 	size_t i;
 
 	if(bCXX)

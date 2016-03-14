@@ -26,23 +26,25 @@ void cxxScopeInit(void);
 void cxxScopeDone(void);
 void cxxScopeClear(void);
 
-// Returns the full current scope name or NULL if there is no scope currently.
+// Returns the full current scope name or NULL if there
+// is no scope currently.
 const char * cxxScopeGetFullName(void);
 
-// Returns the current scope name of NULL if there is no scope currnetly.
-// This name does not include namespaces so it is always a single identifier.
+// Returns the current scope name of NULL if there is no
+// scope currnetly. This name does not include namespaces so
+// it is always a single identifier.
 const char * cxxScopeGetName(void);
 
 // Return the number of components of the scope name.
 int cxxScopeGetSize(void);
 
-// Returns the current scope name or NULL if there is no scope currently.
-// Ownership of the string is transferred.
+// Returns the current scope name or NULL if there is no scope
+// currently. Ownership of the string is transferred.
 vString * cxxScopeGetFullNameAsString(void);
 
-// Returns the current scope name with the exception of the last component
-// or NULL if there is either no scope or there are less than two components.
-// Ownership of the string is transferred.
+// Returns the current scope name with the exception of the
+// last component or NULL if there is either no scope or there
+// are less than two components. Ownership of the string is transferred.
 vString * cxxScopeGetFullNameExceptLastComponentAsString(void);
 
 // Returns the current scope kind
@@ -53,7 +55,11 @@ enum CXXScopeAccess cxxScopeGetAccess(void);
 boolean cxxScopeIsGlobal(void);
 
 // Add a token to the scope chain. The token ownership is transferred.
-void cxxScopePush(CXXToken * t,enum CXXTagKind eScopeKind,enum CXXScopeAccess eInitialAccess);
+void cxxScopePush(
+		CXXToken * t,
+		enum CXXTagKind eScopeKind,
+		enum CXXScopeAccess eInitialAccess
+	);
 void cxxScopeSetAccess(enum CXXScopeAccess eAccess);
 void cxxScopePop(void);
 
