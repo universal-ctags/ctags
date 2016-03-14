@@ -87,11 +87,67 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 
 	tagEntryInfo * tag = cxxTagBegin(CXXTagKindFUNCTION,pIdentifier);
 
+	CXXToken * pAfterParenthesis = pParenthesis ? pParenthesis->pNext : NULL;
+
+	if(
+		pAfterParenthesis &&
+		cxxTokenTypeIs(pAfterParenthesis,CXXTokenTypeKeyword) && 
+		(pAfterParenthesis->eKeyword == CXXKeywordCONST)
+	)
+		pAfterParenthesis = pAfterParenthesis->pNext;
+
+	CXXToken * pTypeStart = NULL;
+	CXXToken * pTypeEnd;
+	
+	if(
+			pAfterParenthesis &&
+			cxxTokenTypeIs(pAfterParenthesis,CXXTokenTypePointerOperator) &&
+			pAfterParenthesis->pNext &&
+			!cxxTokenTypeIs(pAfterParenthesis->pNext,CXXTokenTypeOpeningBracket)
+		)
+	{
+		pTypeStart = pAfterParenthesis->pNext;
+		pTypeEnd = pTypeStart;
+		while(pTypeEnd->pNext && !cxxTokenTypeIs(pTypeEnd->pNext,CXXTokenTypeOpeningBracket))
+			pTypeEnd = pTypeEnd->pNext;
+
+		while(
+				(pTypeStart != pTypeEnd) &&
+				cxxTokenTypeIs(pTypeStart,CXXTokenTypeKeyword) &&
+				cxxKeywordExcludeFromTypeNames(pTypeStart->eKeyword)
+			)
+			pTypeStart = pTypeStart->pNext;
+	}
+
 	if(tag)
 	{
 		tag->isFileScope = TRUE;
 
+		// FIXME: Signature!
+		// FIXME: Captures?
+
+		CXXToken * pTypeName;
+
+		if(pTypeStart)
+		{
+			cxxTokenChainNormalizeTypeNameSpacingInRange(pTypeStart,pTypeEnd);
+			pTypeName = cxxTokenChainExtractRange(pTypeStart,pTypeEnd,0);
+			
+			CXX_DEBUG_PRINT("Type name is '%s'",vStringValue(pTypeName->pszWord));
+			
+			// FIXME: Maybe should exclude also class/struct/union/enum?
+			static const char * szTypename = "typename";
+			
+			tag->extensionFields.typeRef[0] = szTypename;
+			tag->extensionFields.typeRef[1] = vStringValue(pTypeName->pszWord);
+		} else {
+			pTypeName = NULL;
+		}
+
 		cxxTagCommit();
+		
+		if(pTypeName)
+			cxxTokenDestroy(pTypeName);
 	}
 
 	cxxScopePush(

@@ -1,6 +1,6 @@
 a	input.c	/^    int a;$/;"	l	function:main	file:
 b	input.c	/^    int b = 3;$/;"	l	function:main	file:
-isContextualKeyword	input.c	/^static boolean isContextualKeyword (const tokenInfo *const token)$/;"	f	file:
+isContextualKeyword	input.c	/^static boolean isContextualKeyword (const tokenInfo *const token)$/;"	f	typeref:typename:boolean	file:
 label	input.c	/^label:$/;"	L	function:isContextualKeyword	file:
 main	input.c	/^main ()$/;"	f
 result	input.c	/^    boolean result;$/;"	l	function:isContextualKeyword	file:

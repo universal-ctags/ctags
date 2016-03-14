@@ -1,17 +1,17 @@
-operator =	input.cpp	/^	X & operator = (const X &x)$/;"	f	class:X	file:
-operator ==	input.cpp	/^	bool operator == (const X &x)$/;"	f	class:X	file:
-operator -=	input.cpp	/^	inline X & operator-=(const X &x)$/;"	f	class:X	file:
-operator +=	input.cpp	/^	inline X & operator += (const X &x)$/;"	f	class:X	file:
-operator *=	input.cpp	/^	X & operator *= (int x);$/;"	p	class:X	file:
-operator *=	input.cpp	/^	X & operator *= (const X & x);$/;"	p	class:X	file:
-operator /=	input.cpp	/^	inline void operator \/= (int)$/;"	f	class:X	file:
-operator ()	input.cpp	/^	inline void *** operator()()$/;"	f	class:X	file:
-operator ++	input.cpp	/^	inline X & operator++()$/;"	f	class:X	file:
-operator --	input.cpp	/^	X & operator--()$/;"	f	class:X	file:
-operator []	input.cpp	/^	int operator[](int)$/;"	f	class:X	file:
-operator *	input.cpp	/^	inline friend X operator*(const X &a, const X &b)$/;"	f	class:X	file:
-operator &&	input.cpp	/^	friend X operator && (const X &a,const X & b);$/;"	p	class:X	file:
-operator *=	input.cpp	/^X & X::operator *= (int x)$/;"	f	class:X
-operator *=	input.cpp	/^X & X::operator *= (const X & x)$/;"	f	class:X
-operator &&	input.cpp	/^X X::operator && (const X &a,const X & b)$/;"	f	class:X
-main	input.cpp	/^int main(int argc,char ** argv)$/;"	f
+operator =	input.cpp	/^	X & operator = (const X &x)$/;"	f	class:X	typeref:typename:X &	file:
+operator ==	input.cpp	/^	bool operator == (const X &x)$/;"	f	class:X	typeref:typename:bool	file:
+operator -=	input.cpp	/^	inline X & operator-=(const X &x)$/;"	f	class:X	typeref:typename:X &	file:
+operator +=	input.cpp	/^	inline X & operator += (const X &x)$/;"	f	class:X	typeref:typename:X &	file:
+operator *=	input.cpp	/^	X & operator *= (int x);$/;"	p	class:X	typeref:typename:X &	file:
+operator *=	input.cpp	/^	X & operator *= (const X & x);$/;"	p	class:X	typeref:typename:X &	file:
+operator /=	input.cpp	/^	inline void operator \/= (int)$/;"	f	class:X	typeref:typename:void	file:
+operator ()	input.cpp	/^	inline void *** operator()()$/;"	f	class:X	typeref:typename:void ***	file:
+operator ++	input.cpp	/^	inline X & operator++()$/;"	f	class:X	typeref:typename:X &	file:
+operator --	input.cpp	/^	X & operator--()$/;"	f	class:X	typeref:typename:X &	file:
+operator []	input.cpp	/^	int operator[](int)$/;"	f	class:X	typeref:typename:int	file:
+operator *	input.cpp	/^	inline friend X operator*(const X &a, const X &b)$/;"	f	class:X	typeref:typename:X	file:
+operator &&	input.cpp	/^	friend X operator && (const X &a,const X & b);$/;"	p	class:X	typeref:typename:X	file:
+operator *=	input.cpp	/^X & X::operator *= (int x)$/;"	f	class:X	typeref:typename:X &
+operator *=	input.cpp	/^X & X::operator *= (const X & x)$/;"	f	class:X	typeref:typename:X &
+operator &&	input.cpp	/^X X::operator && (const X &a,const X & b)$/;"	f	class:X	typeref:typename:X
+main	input.cpp	/^int main(int argc,char ** argv)$/;"	f	typeref:typename:int

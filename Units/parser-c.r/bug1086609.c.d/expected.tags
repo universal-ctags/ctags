@@ -1,1 +1,1 @@
-func2	input.c	/^int func2(int a)$/;"	f
+func2	input.c	/^int func2(int a)$/;"	f	typeref:typename:int

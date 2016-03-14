@@ -1,5 +1,5 @@
 __anon329ddd92010a	input.c	/^typedef struct {$/;"	s	file:
-main	input.c	/^void main (void) {$/;"	f
+main	input.c	/^void main (void) {$/;"	f	typeref:typename:void
 my_struct	input.c	/^} my_struct;$/;"	t	typeref:struct:__anon329ddd92010a	file:
 var1	input.c	/^	my_struct var1;$/;"	l	function:main	file:
 var2	input.c	/^		var2;$/;"	l	function:main	file:

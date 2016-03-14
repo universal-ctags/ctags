@@ -5,7 +5,7 @@ STRINGIFY	input.c	/^%:define STRINGIFY(/;"	d	file:
 STRINGIFY_INTERN	input.c	/^%:define STRINGIFY_INTERN(/;"	d	file:
 buf	input.c	/^  char *buf;$/;"	m	struct:str	file:
 len	input.c	/^  unsigned int len, size;$/;"	m	struct:str	file:
-main	input.c	/^int main(void)$/;"	f
+main	input.c	/^int main(void)$/;"	f	typeref:typename:int
 matrix3	input.c	/^typedef int matrix3<:3:>;$/;"	t	typeref:typename:int[3]	file:
 size	input.c	/^  unsigned int len, size;$/;"	m	struct:str	file:
 str	input.c	/^struct str <%$/;"	s	file:

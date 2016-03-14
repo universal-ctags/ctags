@@ -1,7 +1,7 @@
-zero	input.cpp	/^zero (const T &v1, const T &v2)$/;"	f
+zero	input.cpp	/^zero (const T &v1, const T &v2)$/;"	f	typeref:typename:int
 v1	input.cpp	/^zero (const T &v1, const T &v2)$/;"	z	function:zero	typeref:typename:const T &	file:
 v2	input.cpp	/^zero (const T &v1, const T &v2)$/;"	z	function:zero	typeref:typename:const T &	file:
-min	input.cpp	/^min(const T&v1, const T&v2)$/;"	f
+min	input.cpp	/^min(const T&v1, const T&v2)$/;"	f	typeref:typename:T
 v1	input.cpp	/^min(const T&v1, const T&v2)$/;"	z	function:min	typeref:typename:const T &	file:
 v2	input.cpp	/^min(const T&v1, const T&v2)$/;"	z	function:min	typeref:typename:const T &	file:
 Item	input.cpp	/^class Item$/;"	c	file:

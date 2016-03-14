@@ -717,6 +717,14 @@ void cxxTokenChainNormalizeTypeNameSpacing(CXXTokenChain * pChain)
 	if(pChain->iCount < 1)
 		return;
 
+	cxxTokenChainNormalizeTypeNameSpacingInRange(pChain->pHead,pChain->pTail);
+}
+
+void cxxTokenChainNormalizeTypeNameSpacingInRange(CXXToken * pFrom,CXXToken * pTo)
+{
+	if(!pFrom || !pTo)
+		return;
+
 	// Goals:
 
 	// int
@@ -730,9 +738,9 @@ void cxxTokenChainNormalizeTypeNameSpacing(CXXTokenChain * pChain)
 	// ClassA<ClassB<type *,type>> <-- fixme: not sure about the trailing >>
 	// Class<Something> (*)(type[])
 
-	CXXToken * t = cxxTokenChainFirst(pChain);
+	CXXToken * t = pFrom;
 
-	while(t)
+	for(;;)
 	{
 		if(cxxTokenTypeIsOneOf(t,CXXTokenTypeParenthesisChain | CXXTokenTypeSquareParenthesisChain))
 		{
@@ -760,9 +768,12 @@ void cxxTokenChainNormalizeTypeNameSpacing(CXXTokenChain * pChain)
 			t->bFollowedBySpace = FALSE;
 		}
 
+		if(t == pTo)
+			break;
+
 		t = t->pNext;
 	}
 
 	// Finally the chain has no space at end
-	cxxTokenChainLast(pChain)->bFollowedBySpace = FALSE;
+	pTo->bFollowedBySpace = FALSE;
 }

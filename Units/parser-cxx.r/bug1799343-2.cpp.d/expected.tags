@@ -8,7 +8,7 @@ y	input.cpp	/^     int y;$/;"	m	class:A::Q	file:
 C	input.cpp	/^   namespace C {$/;"	n	namespace:A	file:
 R	input.cpp	/^     class R: ::P, A::Q {$/;"	c	namespace:A::C	file:
 z	input.cpp	/^       int z;$/;"	m	class:A::C::R	file:
-f	input.cpp	/^       int f (int v) { return v + x; }$/;"	f	class:A::C::R	file:
+f	input.cpp	/^       int f (int v) { return v + x; }$/;"	f	class:A::C::R	typeref:typename:int	file:
 v	input.cpp	/^       int f (int v) { return v + x; }$/;"	z	function:A::C::R::f	typeref:typename:int	file:
 B	input.cpp	/^namespace B {$/;"	n	file:
 S	input.cpp	/^   class S : A::C::R {$/;"	c	namespace:B	file:

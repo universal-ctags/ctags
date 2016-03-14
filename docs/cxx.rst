@@ -107,3 +107,21 @@ template<typename A> class B : public C<A>
 
 the old parser reported "C" as base class while the new one reports
 "C<A>".
+
+Typeref
+----------------------------------------------------------------------
+
+The syntax of the typeref field (typeref:A:B) was designed with only
+struct/class/union/enum types in mind. Generic types don't have A
+information and the keywords became entirely optional in C++:
+you just can't tell. Furthermore, struct/class/union/enum types
+share the same namespace and their names can't collide, so the A
+information is redundant for most purposes.
+
+To accomodate generic types and preserve some degree of backward
+compatibility the new parser uses struct/class/union/enum in place
+of A where such keyword can be inferred. Where the information is
+not available it uses the 'typename' keyword.
+
+Generally, you should ignore the information in field A and use
+only information in field B.

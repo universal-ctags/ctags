@@ -1,5 +1,5 @@
 Foo	input.cpp	/^namespace Foo$/;"	namespace	file:
-bar	input.cpp	/^T bar() $/;"	function	namespace:Foo	signature:()
-main	input.cpp	/^int main()$/;"	function	signature:()
+bar	input.cpp	/^T bar() $/;"	function	namespace:Foo	typeref:typename:T	signature:()
+main	input.cpp	/^int main()$/;"	function	typeref:typename:int	signature:()
 __anonaa3dc9860103	input.cpp	/^    auto l = []{return Foo::template bar<int>();};$/;"	function	function:main	file:
 l	input.cpp	/^    auto l = []{return Foo::template bar<int>();};$/;"	local	function:main	file:

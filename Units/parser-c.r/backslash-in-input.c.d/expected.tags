@@ -1,1 +1,1 @@
-main	input.c	/^int main \\$/;"	f
+main	input.c	/^int main \\$/;"	f	typeref:typename:int

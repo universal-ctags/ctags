@@ -1,4 +1,4 @@
 a	input.cpp	/^  std::ostringstream a;$/;"	l	function:main	file:
 b	input.cpp	/^  std::ostringstream b;$/;"	l	function:main	file:
-foo	input.cpp	/^int foo (int i)$/;"	f
-main	input.cpp	/^int main (int argc, char **argv)$/;"	f
+foo	input.cpp	/^int foo (int i)$/;"	f	typeref:typename:int
+main	input.cpp	/^int main (int argc, char **argv)$/;"	f	typeref:typename:int
