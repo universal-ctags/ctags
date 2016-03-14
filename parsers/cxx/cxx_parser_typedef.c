@@ -156,21 +156,11 @@ void cxxParserExtractTypedef(
 	{
 		pAux = t->pPrev;
 
-		// check for simple typerefs (this is to emulate what old ctags did!)
-		if(
-			cxxTokenTypeIs(pAux,CXXTokenTypeIdentifier) &&
-			pAux->pPrev &&
-			(!pAux->pPrev->pPrev) &&
-			cxxTokenTypeIs(pAux->pPrev,CXXTokenTypeKeyword) &&
-			cxxKeywordIsTypeRefMarker(pAux->pPrev->eKeyword)
-		)
-		{
-			tag->extensionFields.typeRef[0] = vStringValue(pAux->pPrev->pszWord);
-			tag->extensionFields.typeRef[1] = vStringValue(pAux->pszWord);
+		CXXToken * pTypeName = NULL;
 
-			// remove identifier as it will be destroyed separately
-			cxxTokenChainTake(pTParentChain,t);
-		} else if(
+		cxxTokenChainTake(pTParentChain,t);
+
+		if(
 				(pTParentChain == pChain) && // not function pointer (see above)
 				cxxTokenChainFirstTokenOfType(pChain,CXXTokenTypeParenthesisChain)
 			)
@@ -178,52 +168,23 @@ void cxxParserExtractTypedef(
 			CXX_DEBUG_LEAVE_TEXT(
 					"Wild parenthesis in type definition: not emitting typeref"
 				);
-			cxxTokenChainTake(pTParentChain,t);
 		} else {
 			// other kind of typeref, use typename here.
+			CXX_DEBUG_ASSERT(pChain->iCount > 0,"There should be at least another token here!");
 
-			// kill identifier
-			cxxTokenChainTake(pTParentChain,t);
-
-			pAux = cxxTokenChainFirst(pChain);
-			CXX_DEBUG_ASSERT(pAux,"There should be at least another token here!");
-
-			// avoid placing duplicated "typename" in there
-			if(
-					(pChain->iCount > 1) &&
-					cxxTokenTypeIs(pAux,CXXTokenTypeKeyword) &&
-					(pAux->eKeyword == CXXKeywordTYPENAME)
-				)
-			{
-				cxxTokenChainTake(pChain,pAux);
-				cxxTokenDestroy(pAux);
-			}
-
-			// attempt to normalize spacing a bit
-			cxxTokenChainNormalizeTypeNameSpacing(pChain);
-
-			cxxTokenChainCondense(pChain,0);
-
-			// "typename" is debatable since it's not really
-			// allowed by C++ for unqualified types.
-			// However I haven't been able to come up with something better...
-			// so "typename" it is for now.
-			tag->extensionFields.typeRef[0] = "typename";
-			tag->extensionFields.typeRef[1] = vStringValue(
-					cxxTokenChainFirst(pChain)->pszWord
-				);
+			pTypeName = cxxTagSetTypeField(
+						tag,
+						cxxTokenChainFirst(pChain),
+						cxxTokenChainLast(pChain)
+					);
 		}
-
-		CXX_DEBUG_PRINT(
-				"Typeref is %s:%s",
-				tag->extensionFields.typeRef[0],
-				tag->extensionFields.typeRef[1]
-			);
 
 		tag->isFileScope = !isInputHeaderFile();
 
 		cxxTagCommit();
 		cxxTokenDestroy(t);
+		if(pTypeName)
+			cxxTokenDestroy(pTypeName);
 	}
 
 	CXX_DEBUG_LEAVE();

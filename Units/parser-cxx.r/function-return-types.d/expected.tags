@@ -10,6 +10,13 @@ p08	input.cpp	/^std::vector<std::string> * p08();$/;"	p	typeref:typename:std::ve
 p09	input.cpp	/^auto p09() -> std::vector<std::string> ***;$/;"	p	typeref:typename:std::vector<std::string> ***	file:
 p10	input.cpp	/^auto p10() -> std::string;$/;"	p	typeref:typename:std::string	file:
 p11	input.cpp	/^auto p11() -> int (*)(int);$/;"	p	typeref:typename:int (*)(int)	file:
+p12	input.cpp	/^struct Struct p12();$/;"	p	typeref:struct:Struct	file:
+p13	input.cpp	/^Struct p13();$/;"	p	typeref:typename:Struct	file:
+p14	input.cpp	/^union Union p14();$/;"	p	typeref:union:Union	file:
+p15	input.cpp	/^Union p15();$/;"	p	typeref:typename:Union	file:
+p16	input.cpp	/^Class & p16();$/;"	p	typeref:typename:Class &	file:
+p17	input.cpp	/^const enum Enum p17();$/;"	p	typeref:typename:const enum Enum	file:
+p18	input.cpp	/^Enum p18();$/;"	p	typeref:typename:Enum	file:
 f00	input.cpp	/^void f00()$/;"	f	typeref:typename:void
 f01	input.cpp	/^int f01()$/;"	f	typeref:typename:int
 f02	input.cpp	/^unsigned int f02()$/;"	f	typeref:typename:unsigned int

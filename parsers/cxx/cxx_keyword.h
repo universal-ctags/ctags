@@ -115,6 +115,7 @@ boolean cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId);
 boolean cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId);
 boolean cxxKeywordExcludeFromTypeNames(enum CXXKeyword eKeywordId);
 
+const char * cxxKeywordName(enum CXXKeyword eKeywordId);
 
 void cxxBuildKeywordHash(const langType language,boolean bCXX);
 

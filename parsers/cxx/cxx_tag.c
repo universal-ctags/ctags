@@ -10,6 +10,7 @@
 
 #include "cxx_scope.h"
 #include "cxx_debug.h"
+#include "cxx_token_chain.h"
 
 #include "entry.h"
 #include "get.h"
@@ -123,6 +124,51 @@ tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
 	}
 
 	return &g_oCXXTag;
+}
+
+
+CXXToken * cxxTagSetTypeField(
+		tagEntryInfo * tag,
+		CXXToken * pTypeStart,
+		CXXToken * pTypeEnd
+	)
+{
+	CXX_DEBUG_ASSERT(tag && pTypeStart && pTypeEnd,"Non null parameters are expected");
+
+	const char * szTypeRef0;
+
+	// "typename" is debatable since it's not really
+	// allowed by C++ for unqualified types. However I haven't been able
+	// to come up with something better... so "typename" it is for now.
+	static const char * szTypename = "typename";
+
+	if(pTypeStart != pTypeEnd)
+	{
+		// Note that this does not work for types like "const enum X"
+		// But that's not backward compatible anyway, so we live with it.
+		if(
+				cxxTokenTypeIs(pTypeStart,CXXTokenTypeKeyword) &&
+				cxxKeywordIsTypeRefMarker(pTypeStart->eKeyword)
+			)
+		{
+			szTypeRef0 = cxxKeywordName(pTypeStart->eKeyword);
+			pTypeStart = pTypeStart->pNext;
+		} else {
+			szTypeRef0 = szTypename;
+		}
+	} else {
+		szTypeRef0 = szTypename;
+	}
+
+	cxxTokenChainNormalizeTypeNameSpacingInRange(pTypeStart,pTypeEnd);
+	CXXToken * pTypeName = cxxTokenChainExtractRange(pTypeStart,pTypeEnd,0);
+
+	CXX_DEBUG_PRINT("Type name is '%s'",vStringValue(pTypeName->pszWord));
+
+	tag->extensionFields.typeRef[0] = szTypeRef0;
+	tag->extensionFields.typeRef[1] = vStringValue(pTypeName->pszWord);
+	
+	return pTypeName;
 }
 
 void cxxTagCommit(void)

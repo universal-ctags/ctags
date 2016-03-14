@@ -133,20 +133,9 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 		CXXToken * pTypeName;
 
 		if(pTypeStart)
-		{
-			cxxTokenChainNormalizeTypeNameSpacingInRange(pTypeStart,pTypeEnd);
-			pTypeName = cxxTokenChainExtractRange(pTypeStart,pTypeEnd,0);
-			
-			CXX_DEBUG_PRINT("Type name is '%s'",vStringValue(pTypeName->pszWord));
-			
-			// FIXME: Maybe should exclude also class/struct/union/enum?
-			static const char * szTypename = "typename";
-			
-			tag->extensionFields.typeRef[0] = szTypename;
-			tag->extensionFields.typeRef[1] = vStringValue(pTypeName->pszWord);
-		} else {
+			pTypeName = cxxTagSetTypeField(tag,pTypeStart,pTypeEnd);
+		else
 			pTypeName = NULL;
-		}
 
 		cxxTagCommit();
 		
