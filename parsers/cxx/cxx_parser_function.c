@@ -233,6 +233,8 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 
 		vString * pszSignature = cxxTokenChainJoin(pParenthesis->pChain,NULL,0);
 
+		// FIXME: Return type!
+
 		if(pszSignature)
 			tag->extensionFields.signature = vStringValue(pszSignature);
 		cxxTagCommit();
@@ -655,6 +657,49 @@ next_token:
 		pInfo->pSignatureConst = NULL;
 	}
 
+	// Check return type
+	pToken = pInfo->pScopeStart ? pInfo->pScopeStart : pInfo->pIdentifierStart;
+	if(pToken->pPrev)
+	{
+		CXXToken * pParenthesisOrConst = pInfo->pSignatureConst ? pInfo->pSignatureConst : pInfo->pParenthesis;
+		if(
+				cxxParserCurrentLanguageIsCPP() &&
+				cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeKeyword) &&
+				(pToken->pPrev->eKeyword == CXXKeywordAUTO) &&
+				pParenthesisOrConst->pNext &&
+				cxxTokenTypeIs(pParenthesisOrConst->pNext,CXXTokenTypePointerOperator) &&
+				pParenthesisOrConst->pNext->pNext &&
+				!cxxTokenTypeIsOneOf(pParenthesisOrConst->pNext->pNext,CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket)
+			)
+		{
+			// looks like trailing return type
+			//   auto f() -> int;
+			//   auto f() -> int {
+			pInfo->pTypeStart = pParenthesisOrConst->pNext->pNext;
+			pInfo->pTypeEnd = pInfo->pTypeStart;
+			while(
+				pInfo->pTypeEnd->pNext &&
+				!cxxTokenTypeIsOneOf(pInfo->pTypeEnd->pNext,CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket)
+			)
+				pInfo->pTypeEnd = pInfo->pTypeEnd->pNext;
+		} else {
+			// probaby normal return type
+			pInfo->pTypeEnd = pToken->pPrev;
+			pInfo->pTypeStart = cxxTokenChainFirst(pChain);
+		}
+
+		while(
+				(pInfo->pTypeStart != pInfo->pTypeEnd) &&
+				cxxTokenTypeIs(pInfo->pTypeStart,CXXTokenTypeKeyword) &&
+				cxxKeywordExcludeFromTypeNames(pInfo->pTypeStart->eKeyword)
+			)
+			pInfo->pTypeStart = pInfo->pTypeStart->pNext;
+
+	} else {
+		pInfo->pTypeEnd = NULL;
+		pInfo->pTypeStart = NULL;
+	}
+
 	CXX_DEBUG_LEAVE_TEXT("Found function signature");
 	return TRUE;
 }
@@ -739,7 +784,24 @@ int cxxParserEmitFunctionTags(
 			vStringCatS(pszSignature," ");
 			cxxTokenAppendToString(pszSignature,pInfo->pSignatureConst);
 		}
-		// FIXME: Here we also know the return type (or whatever it is coming before the function name/scope)
+
+		CXXToken * pTypeName;
+
+		if(pInfo->pTypeStart)
+		{
+			cxxTokenChainNormalizeTypeNameSpacingInRange(pInfo->pTypeStart,pInfo->pTypeEnd);
+			pTypeName = cxxTokenChainExtractRange(pInfo->pTypeStart,pInfo->pTypeEnd,0);
+			
+			CXX_DEBUG_PRINT("Type name is '%s'",vStringValue(pTypeName->pszWord));
+			
+			// FIXME: Maybe should exclude also class/struct/union/enum?
+			static const char * szTypename = "typename";
+			
+			tag->extensionFields.typeRef[0] = szTypename;
+			tag->extensionFields.typeRef[1] = vStringValue(pTypeName->pszWord);
+		} else {
+			pTypeName = NULL;
+		}
 
 		if(pszSignature)
 			tag->extensionFields.signature = vStringValue(pszSignature);
@@ -748,6 +810,9 @@ int cxxParserEmitFunctionTags(
 
 		if(pszSignature)
 			vStringDelete(pszSignature);
+
+		if(pTypeName)
+			cxxTokenDestroy(pTypeName);
 	}
 
 #ifdef CXX_DO_DEBUGGING

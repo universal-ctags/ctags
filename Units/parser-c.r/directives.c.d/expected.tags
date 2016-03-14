@@ -11,10 +11,10 @@ VARIABLE_LIKE	input.c	/^#define VARIABLE_LIKE	/;"	d	file:
 WeakSymbol	input.c	/^#pragma weak WeakSymbol /;"	d	file:
 a	input.c	/^int a;$/;"	v
 b	input.c	/^int b;$/;"	v
-bar1	input.c	/^int bar1 (void)$/;"	f
+bar1	input.c	/^int bar1 (void)$/;"	f	typeref:typename:int
 c	input.c	/^int c;$/;"	v
 d	input.c	/^int d;$/;"	v
-foo1	input.c	/^int foo1 (void)$/;"	f
+foo1	input.c	/^int foo1 (void)$/;"	f	typeref:typename:int
 g	input.c	/^int g;$/;"	v
 p1	input.c	/^int p1;$/;"	v
 with_long_comment	input.c	/^#define with_long_comment /;"	d	file:

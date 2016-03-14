@@ -1,1 +1,1 @@
-main	input.nolang	/^main(void)$/;"	f	language:C
+main	input.nolang	/^main(void)$/;"	f	language:C	typeref:typename:int

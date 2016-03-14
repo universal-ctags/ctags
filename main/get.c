@@ -761,6 +761,7 @@ extern int cppGetc (void)
 	}
 	else do
 	{
+start_loop:
 		c = getcFromInputFile ();
 process:
 		switch (c)
@@ -829,7 +830,8 @@ process:
 				int next = getcFromInputFile ();
 
 				if (next == NEWLINE)
-					continue;
+					// continue; <-- this may exit returning the backslash, which si wrong.
+					goto start_loop;
 				else
 					ungetcToInputFile (next);
 				break;

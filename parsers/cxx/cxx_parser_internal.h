@@ -67,6 +67,10 @@ typedef struct _CXXFunctionSignatureInfo
 	// The scope ends at pIdentifierStart.
 	CXXToken * pScopeStart;
 
+	// Non-NULL if a return type has been identified
+	CXXToken * pTypeStart;
+	CXXToken * pTypeEnd;
+
 } CXXFunctionSignatureInfo;
 
 int cxxParserMaybeExtractKnRStyleFunctionDefinition(void);

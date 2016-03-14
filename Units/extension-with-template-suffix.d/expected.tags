@@ -1,1 +1,1 @@
-main	input.c.in	/^main (void)$/;"	f
+main	input.c.in	/^main (void)$/;"	f	typeref:typename:int
