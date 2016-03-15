@@ -1747,9 +1747,6 @@ extern void printLanguageKinds (const langType language, boolean allKindFields)
 			if (lang->invisible)
 				continue;
 
-			if (lang->method & METHOD_XCMD)
-				initializeParser (i);
-
 			if (!allKindFields)
 				printf ("%s%s\n", lang->name, isLanguageEnabled (i) ? "" : " [disabled]");
 			printKinds (i, allKindFields, TRUE);
