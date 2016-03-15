@@ -543,8 +543,8 @@ static boolean printXcmdKind (kindOption *kind, void *user_data)
 
         if (data->allKindFields && data->indent)
 		printf ("%s", data->langName);
-
 	printKind (kind, data->allKindFields, data->indent);
+
 	return FALSE;
 }
 #endif

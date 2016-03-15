@@ -1,3 +1,8 @@
+# SPECIFYING PARSER
 a	aa	aa	on	referenceOnly:FALSE	nRoles:0
 b	bb	bb	off	referenceOnly:FALSE	nRoles:0
 c	a_b_c	a b c	on	referenceOnly:FALSE	nRoles:0
+# PICKING PARSER with grep
+foo	a	aa	aa	on	referenceOnly:FALSE	nRoles:0
+foo	b	bb	bb	off	referenceOnly:FALSE	nRoles:0
+foo	c	a_b_c	a b c	on	referenceOnly:FALSE	nRoles:0
