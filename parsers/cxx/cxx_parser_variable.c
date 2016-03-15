@@ -216,10 +216,9 @@ next_token:
 							cxxTokenChainAt(t->pChain,1),
 							CXXTokenTypeParenthesisChain
 						) &&
-					// we're in a parenthesis chain so there is a previous
-					// token here (at least the open paren)
+					t->pPrev &&
 					cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier) &&
-					// if the one above succeeded there is yet another previous token
+					t->pPrev->pPrev &&
 					cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeIdentifier)
 				)
 			{
