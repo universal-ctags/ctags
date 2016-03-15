@@ -534,6 +534,7 @@ struct printXcmdKindCBData {
 	const char *langName;
 	boolean allKindFields;
 	boolean indent;
+	boolean tabSeparated;
 };
 
 #ifdef HAVE_COPROC
@@ -541,17 +542,18 @@ static boolean printXcmdKind (kindOption *kind, void *user_data)
 {
 	struct printXcmdKindCBData *data = user_data;
 
-        if (data->allKindFields && data->indent)
-		printf ("%s", data->langName);
-	printKind (kind, data->allKindFields, data->indent);
-
+	if (data->allKindFields && data->indent)
+		printf (Option.machinable? "%s": PR_KIND_FMT (LANG,s), data->langName);
+	
+	printKind (kind, data->allKindFields, data->indent, data->tabSeparated);
 	return FALSE;
 }
 #endif
 
 extern void printXcmdKinds (const langType language __unused__,
 			    boolean allKindFields __unused__,
-			    boolean indent __unused__)
+			    boolean indent __unused__,
+			    boolean tabSeparated __unused__)
 {
 #ifdef HAVE_COPROC
 	if (language <= SetUpper  &&  Sets [language].count > 0)
@@ -561,6 +563,7 @@ extern void printXcmdKinds (const langType language __unused__,
 			.langName      = langName,
 			.allKindFields = allKindFields,
 			.indent        = indent,
+			.tabSeparated  = tabSeparated,
 		};
 		foreachXcmdKinds (language, printXcmdKind, &data);
 	}

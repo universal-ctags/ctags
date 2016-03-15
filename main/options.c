@@ -309,6 +309,10 @@ static optionDescription LongOptionDescription [] = {
  {1,"       List kind letter for file."},
  {1,"  --list-kinds=[language|all]"},
  {1,"       Output a list of all tag kinds for specified language or all."},
+ {1,"  --list-kinds-full=[language|all]"},
+ {1,"       List the details of all tag kinds for specified language or all"},
+ {1,"       For each line, associated language name is printed when \"all\" is"},
+ {1,"       specified as language. This works with --machinable."},
  {1,"  --list-languages"},
  {1,"       Output list of supported languages."},
  {1,"  --list-maps=[language|all]"},
@@ -321,6 +325,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of flags which can be used in a regex parser definition."},
  {1,"  --machinable=[yes|no]"},
  {1,"       Use tab separated representation in --list- option output. [no]"},
+ {1,"       --list-kinds-full supports this option."}, 
  {1,"       Suitable for scripting. Specify before --list-* option."},
  {1,"  --map-<LANG>=[+|-]pattern|extension"},
  {1,"       Set or add(+) a map for <LANG>."},
@@ -373,6 +378,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --with-list-header=[yes|no]"},
  {1,"       Preprend the column descriptions in --list- output. [yes]"},
  {1,"       Specify before --list-* option."},
+ {1,"       --list-kinds-full supports this option."},
 #ifdef HAVE_COPROC
  {1,"  --xcmd-<LANG>=parser_command_path|parser_command_name"},
  {1,"       Define external parser command path or name for specific language."},
@@ -389,14 +395,6 @@ static optionDescription LongOptionDescription [] = {
  {1,"  --_force-quit=[num]"},
  {1,"       Quit when the option is processed. Useful to debug the chain"},
  {1,"       of loading option files."},
- {1,"  --_list-kinds-full=[language|all]"},
- {1,"       Output a list of quadruplet of all tag kinds for specified language or"},
- {1,"       all. The elements of a quadruplet are \"letter\", \"name\", \"description\""},
- {1,"       and \"disabled\". Elements are separated with tab characters."},
- {1,"       If a kind is disabled, its \"disabled\" element is printed as \"off\"."},
- {1,"       If it is enabled, \"on\" is printed."},
- {1,"       For each line, associated language name is printed when \"all\" is"},
- {1,"       specified as language."},
  {1,"  --_list-roles=[[language|all]:[kindletters|*]]"},
  {1,"       Output list of all roles of tag kind(s) specified for language(s)."},
  {1,"       e.g. --_list-roles=Make:I"},
@@ -1617,7 +1615,7 @@ static void processListFileKindOption (
 static void processListKindsOption (
 		const char *const option, const char *const parameter)
 {
-	boolean print_all = (strcmp (option, "_list-kinds-full") == 0)? TRUE: FALSE;
+	boolean print_all = (strcmp (option, "list-kinds-full") == 0)? TRUE: FALSE;
 
 	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
 		printLanguageKinds (LANG_AUTO, print_all);
@@ -2267,7 +2265,7 @@ static parametricOption ParametricOptions [] = {
 	{ "list-fields",            processListFieldsOption,        TRUE,   STAGE_ANY },
 	{ "list-file-kind",         processListFileKindOption,      TRUE,   STAGE_ANY },
 	{ "list-kinds",             processListKindsOption,         TRUE,   STAGE_ANY },
-	{ "_list-kinds-full",       processListKindsOption,         TRUE,   STAGE_ANY },
+	{ "list-kinds-full",       processListKindsOption,         TRUE,   STAGE_ANY },
 	{ "list-languages",         processListLanguagesOption,     TRUE,   STAGE_ANY },
 	{ "list-maps",              processListMapsOption,          TRUE,   STAGE_ANY },
 	{ "list-patterns",          processListPatternsOption,      TRUE,   STAGE_ANY },

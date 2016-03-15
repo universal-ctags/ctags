@@ -969,6 +969,7 @@ struct printRegexKindCBData{
 	const char* const langName;
 	boolean allKindFields;
 	boolean indent;
+	boolean tabSeparated;
 };
 
 static boolean printRegexKind (kindOption *kind, void *user_data)
@@ -977,21 +978,24 @@ static boolean printRegexKind (kindOption *kind, void *user_data)
 	if (kind->letter != KIND_GHOST)
 	{
 		if (data->allKindFields && data->indent)
-			printf ("%s", data->langName);
-		printKind (kind, data->allKindFields, data->indent);
+			printf (Option.machinable? "%s": PR_KIND_FMT (LANG,s), data->langName);
+		printKind (kind, data->allKindFields, data->indent,
+			   data->tabSeparated);
 	}
 	return FALSE;
 }
 
 extern void printRegexKinds (const langType language,
 			     boolean allKindFields,
-			     boolean indent)
+			     boolean indent,
+			     boolean tabSeparated)
 {
 	const char* const langName = getLanguageName (language);
 	struct printRegexKindCBData data = {
 		.langName      = langName,
 		.allKindFields = allKindFields,
 		.indent        = indent,
+		.tabSeparated  = tabSeparated,
 	};
 	foreachRegexKinds (language, printRegexKind, &data);
 }

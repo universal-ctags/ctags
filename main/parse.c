@@ -1727,12 +1727,12 @@ static void printKinds (langType language, boolean allKindFields, boolean indent
 		for (i = 0  ;  i < lang->kindCount  ;  ++i)
 		{
 			if (allKindFields && indent)
-				printf ("%s", lang->name);
-			printKind (lang->kinds + i, allKindFields, indent);
+				printf (Option.machinable? "%s": PR_KIND_FMT (LANG,s), lang->name);
+			printKind (lang->kinds + i, allKindFields, indent, Option.machinable);
 		}
 	}
-	printRegexKinds (language, allKindFields, indent);
-	printXcmdKinds (language, allKindFields, indent);
+	printRegexKinds (language, allKindFields, indent, Option.machinable);
+	printXcmdKinds (language, allKindFields, indent, Option.machinable);
 }
 
 extern void printLanguageKinds (const langType language, boolean allKindFields)
@@ -1740,6 +1740,10 @@ extern void printLanguageKinds (const langType language, boolean allKindFields)
 	if (language == LANG_AUTO)
 	{
 		unsigned int i;
+
+		if (Option.withListHeader && allKindFields)
+			printKindListHeader (TRUE, Option.machinable);
+
 		for (i = 0  ;  i < LanguageCount  ;  ++i)
 		{
 			const parserDefinition* const lang = LanguageTable [i];
@@ -1753,7 +1757,12 @@ extern void printLanguageKinds (const langType language, boolean allKindFields)
 		}
 	}
 	else
+	{
+		if (Option.withListHeader && allKindFields)
+			printKindListHeader (FALSE, Option.machinable);
+
 		printKinds (language, allKindFields, FALSE);
+	}
 }
 
 static void processLangAliasOption (const langType language,

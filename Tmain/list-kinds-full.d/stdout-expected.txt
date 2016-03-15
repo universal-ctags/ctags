@@ -1,0 +1,20 @@
+#LETTER	NAME	ENABLED	REFONLY	NROLES	DESCRIPTION
+c	class	on	FALSE	0	classes
+d	macro	on	FALSE	1	macro definitions
+e	enumerator	on	FALSE	0	enumerators (values inside an enumeration)
+f	function	on	FALSE	0	function definitions
+g	enum	on	FALSE	0	enumeration names
+h	header	off	TRUE	2	included header files
+l	local	off	FALSE	0	local variables
+m	member	on	FALSE	0	class, struct, and union members
+n	namespace	on	FALSE	0	namespaces
+p	prototype	off	FALSE	0	function prototypes
+s	struct	on	FALSE	0	structure names
+t	typedef	on	FALSE	0	typedefs
+u	union	on	FALSE	0	union names
+v	variable	on	FALSE	0	variable definitions
+x	externvar	off	FALSE	0	external and forward variable declarations
+z	parameter	off	FALSE	0	function parameters inside function definitions
+L	label	off	FALSE	0	goto labels
+N	name	off	FALSE	0	names imported via using scope::symbol
+U	using	off	TRUE	0	using namespace statements

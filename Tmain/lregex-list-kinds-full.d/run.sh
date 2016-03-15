@@ -10,4 +10,6 @@ ${CTAGS} --quiet --options=NONE -o - \
 	 --regex-foo=/c/\0/c/ \
 	 --kinds-foo=-c \
 	 --regex-foo=/d/\0/d/ \
-	 --_list-kinds-full=foo | sort
+	 --machinable \
+	 --with-list-header \
+	 --list-kinds-full=foo | sort

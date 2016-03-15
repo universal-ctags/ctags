@@ -13,7 +13,9 @@ ${CTAGS} --quiet --options=NONE -o - \
 	 --xcmd-foo=./foo.sh \
          --foo-kinds=+a \
 	 --foo-kinds=-b \
-	 --_list-kinds-full=foo
+	 --machinable \
+	 --with-list-header \
+	 --list-kinds-full=foo
 
 echo '# PICKING PARSER with grep'
 ${CTAGS} --quiet --options=NONE -o - \
@@ -21,4 +23,6 @@ ${CTAGS} --quiet --options=NONE -o - \
 	 --xcmd-foo=./foo.sh \
          --foo-kinds=+a \
 	 --foo-kinds=-b \
-	 --_list-kinds-full | grep ^foo
+	 --machinable \
+	 --with-list-header \
+	 --list-kinds-full | grep '^\(foo\|#\)'
