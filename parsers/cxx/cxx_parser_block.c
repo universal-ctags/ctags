@@ -34,24 +34,50 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 		);
 
 	enum CXXTagKind eScopeKind = cxxScopeGetKind();
+	boolean bIsCPP = cxxParserCurrentLanguageIsCPP();
 
 	if(
-			(g_cxx.pToken->pPrev) &&
-			cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeAssignment) &&
 			(
-				(eScopeKind == CXXTagKindFUNCTION) ||
-				(eScopeKind == CXXTagKindNAMESPACE)
+				// something = {...}
+				(g_cxx.pToken->pPrev) &&
+				cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeAssignment) &&
+				(
+					(eScopeKind == CXXTagKindFUNCTION) ||
+					(eScopeKind == CXXTagKindNAMESPACE)
+				)
+			) || (
+				// T { arg1, arg2, ... } (1)
+				// T object { arg1, arg2, ... } (2)
+				// new T { arg1, arg2, ... } (3)
+				// Class::Class() : member { arg1, arg2, ... } { (4)
+				bIsCPP &&
+				(g_cxx.pToken->pPrev) &&
+				cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeIdentifier) &&
+				(
+					(!g_cxx.pToken->pPrev->pPrev) ||
+					(cxxTokenTypeIsOneOf(
+							g_cxx.pToken->pPrev->pPrev,
+							CXXTokenTypeIdentifier | CXXTokenTypeStar | CXXTokenTypeAnd |
+							CXXTokenTypeGreaterThanSign | CXXTokenTypeKeyword |
+							// FIXME: This check could be made stricter?
+							CXXTokenTypeSingleColon | CXXTokenTypeComma
+					))
+				)
+			) || (
+				// return { }
+				(!g_cxx.pToken->pPrev) &&
+				(g_cxx.uKeywordState & CXXParserKeywordStateSeenReturn)
 			)
 		)
 	{
-		// array or C++11-list-like initialisation
+		// array or list-like initialisation
 		boolean bRet = cxxParserParseAndCondenseCurrentSubchain(
 				CXXTokenTypeOpeningBracket | CXXTokenTypeOpeningParenthesis |
 					CXXTokenTypeOpeningSquareParenthesis,
 				FALSE
 			);
 
-		CXX_DEBUG_LEAVE_TEXT("Handled array or C++11-list-like initialisation");
+		CXX_DEBUG_LEAVE_TEXT("Handled array or list-like initialisation or return");
 		return bRet;
 	}
 
@@ -60,6 +86,9 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 	{
 		// very likely a function definition
 		iScopes = cxxParserExtractFunctionSignatureBeforeOpeningBracket();
+
+		// FIXME: Handle syntax (5) of list initialization:
+		//        Class::Class() : member { arg1, arg2, ... } {...
 	} else {
 		// some kind of other block:
 		// - anonymous block
@@ -70,7 +99,7 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 		CXXToken * pParenthesis;
 
 		if(
-			cxxParserCurrentLanguageIsCPP() &&
+			bIsCPP &&
 			(pParenthesis = cxxParserOpeningBracketIsLambda())
 		)
 		{

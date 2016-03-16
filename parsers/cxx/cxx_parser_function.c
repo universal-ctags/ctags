@@ -324,7 +324,11 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 	return 1;
 }
 
-
+// This function is used to check both () and {} parenthesis chains.
+//     function(...)
+//     variable(...)
+//     variable{...}
+//
 boolean cxxParserTokenChainLooksLikeFunctionCallParameterSet(
 		CXXTokenChain * pChain
 	)
@@ -333,13 +337,15 @@ boolean cxxParserTokenChainLooksLikeFunctionCallParameterSet(
 	CXXToken * pLast = pChain->pTail;
 
 	CXX_DEBUG_ASSERT(
-			cxxTokenTypeIs(t,CXXTokenTypeOpeningParenthesis),
-			"The token chain should start with an opening parenthesis"
+			cxxTokenTypeIsOneOf(t,CXXTokenTypeOpeningParenthesis | CXXTokenTypeOpeningBracket),
+			"The token chain should start with an opening parenthesis/bracket"
 		);
 	CXX_DEBUG_ASSERT(
-			cxxTokenTypeIs(pLast,CXXTokenTypeOpeningParenthesis),
-			"The token chain should end with an opening parenthesis"
+			cxxTokenTypeIsOneOf(pLast,CXXTokenTypeOpeningParenthesis | CXXTokenTypeClosingBracket),
+			"The token chain should end with an opening parenthesis/bracket"
 		);
+
+	unsigned int uTerminator = t->eType << 4;
 
 	t = t->pNext;
 
@@ -433,9 +439,9 @@ boolean cxxParserTokenChainLooksLikeFunctionCallParameterSet(
 			// declarations may look the same, skip to next comma or end
 			t = cxxTokenChainNextTokenOfType(
 					t,
-					CXXTokenTypeClosingParenthesis | CXXTokenTypeComma
+					uTerminator | CXXTokenTypeComma
 				);
-			CXX_DEBUG_ASSERT(t,"We should have found the closing parenthesis here!");
+			CXX_DEBUG_ASSERT(t,"We should have found the terminator here!");
 			if(cxxTokenTypeIs(t,CXXTokenTypeComma))
 				t = t->pNext;
 		} else {

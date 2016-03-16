@@ -493,6 +493,33 @@ CXXToken * cxxTokenChainSkipToEndOfTemplateAngleBracket(CXXToken * t)
 	return NULL;
 }
 
+CXXToken * cxxTokenChainSkipBackToStartOfTemplateAngleBracket(CXXToken * t)
+{
+	if(!t)
+		return NULL;
+	CXX_DEBUG_ASSERT(
+			t->eType == CXXTokenTypeGreaterThanSign,
+			"This function must be called when pointing to a >"
+		);
+	int iLevel = 1;
+	t = t->pPrev;
+	while(t)
+	{
+		if(cxxTokenTypeIs(t,CXXTokenTypeGreaterThanSign))
+		{
+			iLevel++;
+		} else if(cxxTokenTypeIs(t,CXXTokenTypeSmallerThanSign))
+		{
+			if(iLevel == 1)
+				return t;
+			iLevel--;
+		}
+		t = t->pPrev;
+	}
+	// invalid
+	return NULL;
+}
+
 CXXToken * cxxTokenChainFirstTokenOfType(
 		CXXTokenChain * tc,
 		unsigned int uTokenTypes
@@ -729,6 +756,30 @@ int cxxTokenChainFirstKeywordIndex(
 
 	return -1;
 }
+
+void cxxTokenChainDestroyRange(CXXToken * from,CXXToken * to)
+{
+	if(!from || !to)
+		return;
+	CXX_DEBUG_ASSERT(from,"Bad from pointer passed to cxxTokenChainDestroyRange");
+	CXX_DEBUG_ASSERT(to,"Bad to pointer passed to cxxTokenChainDestroyRange");
+	CXX_DEBUG_ASSERT(from->pChain,"From token has no chain!");
+	CXX_DEBUG_ASSERT(from->pChain == to->pChain,"Tokens must belong to same chain");
+
+	CXXTokenChain * pChain = from->pChain;
+
+	for(;;)
+	{
+		CXXToken * next = from->pNext;
+		cxxTokenChainTake(pChain,from);
+		cxxTokenDestroy(from);
+		if(from == to) // may be compared even if invalid
+			return;
+		from = next;
+		CXX_DEBUG_ASSERT(from,"Should NOT have found chain termination here");
+	}
+}
+
 
 CXXToken * cxxTokenChainExtractRange(
 		CXXToken * from,
