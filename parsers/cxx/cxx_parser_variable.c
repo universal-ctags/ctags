@@ -56,6 +56,7 @@ boolean cxxParserExtractVariableDeclarations(
 	//   type var1,var2;
 	//   type var[];
 	//   type var(constructor args);
+	//   type var{list initializer};
 	//   type var = ...;
 	//   type (*ident)();
 	//   type var:bits;
@@ -67,11 +68,11 @@ boolean cxxParserExtractVariableDeclarations(
 	// Strategy:
 	//   - verify that the chain starts with an identifier or
 	//     keyword (always present)
-	//   - run to one of : ; [] () = ,
+	//   - run to one of : ; [] () {} = ,
 	//   - ensure that the previous token is an identifier (except for special cases)
 	//   - go back to skip the eventual scope
 	//   - ensure that there is a leading type
-	//   - if we are at : [] or () then run to the next ; = or ,
+	//   - if we are at : [], () or {} then run to the next ; = or ,
 	//   - emit variable tag
 	//   - if we are at , then check if there are more declarations
 	//
@@ -101,8 +102,6 @@ boolean cxxParserExtractVariableDeclarations(
 		return FALSE;
 	}
 
-	CXXToken * pTypeEnd = NULL;
-
 	boolean bGotVariable = FALSE;
 
 	while(t)
@@ -115,6 +114,7 @@ boolean cxxParserExtractVariableDeclarations(
 						CXXTokenTypeSingleColon |
 							CXXTokenTypeParenthesisChain |
 							CXXTokenTypeSquareParenthesisChain |
+							CXXTokenTypeBracketChain |
 							CXXTokenTypeAssignment |
 							CXXTokenTypeComma |
 							CXXTokenTypeSemicolon |
@@ -245,6 +245,16 @@ next_token:
 				CXX_DEBUG_LEAVE_TEXT("No recognizable parenthesis form for a variable");
 				return bGotVariable;
 			}
+		} else if(
+				cxxTokenTypeIs(t,CXXTokenTypeBracketChain) &&
+				cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier) &&
+				cxxParserCurrentLanguageIsCPP() &&
+				cxxParserTokenChainLooksLikeConstructorParameterSet(t->pChain)
+			)
+		{
+			// ok, *might* be new C++ style variable initialization
+			pIdentifier = t->pPrev;
+			pTokenBefore = pIdentifier->pPrev;
 		} else {
 			if(t->pPrev->eType != CXXTokenTypeIdentifier)
 			{
@@ -267,7 +277,7 @@ next_token:
 		CXXToken * pScopeEnd = pTokenBefore->pNext;
 		CXXToken * pScopeStart = NULL;
 
-		// Skip back to any namespace
+		// Skip back to the beginning of the scope, if any
 		while(pTokenBefore->eType == CXXTokenTypeMultipleColons)
 		{
 			pTokenBefore = pTokenBefore->pPrev;
@@ -278,6 +288,21 @@ next_token:
 							"but not preceeded by a type"
 					);
 				return bGotVariable;
+			}
+
+			if(cxxTokenTypeIs(pTokenBefore,CXXTokenTypeGreaterThanSign))
+			{
+				CXXToken * pAux = cxxTokenChainSkipBackToStartOfTemplateAngleBracket(pTokenBefore);
+				if((!pAux) || (!pAux->pPrev))
+				{
+					CXX_DEBUG_LEAVE_TEXT(
+							"Identifier preceeded by multiple colons " \
+								"and by a >, but failed to skip back to starting <"
+						);
+					return bGotVariable;
+				}
+
+				pTokenBefore = pAux->pPrev;
 			}
 
 			if(!cxxTokenTypeIs(pTokenBefore,CXXTokenTypeIdentifier))
@@ -302,9 +327,10 @@ next_token:
 			}
 		}
 
-		if(!pTypeEnd)
+		if(!bGotVariable)
 		{
-			// now pTokenBefore should be part of the type
+			// now pTokenBefore should be part of a type (either the variable type or return
+			// type of a function in case of a function pointer)
 			if(!cxxTokenTypeIsOneOf(
 					pTokenBefore,
 					CXXTokenTypeIdentifier | CXXTokenTypeKeyword |
@@ -348,41 +374,55 @@ next_token:
 					vStringValue(pTokenBefore->pszWord),
 					pTokenBefore->eType
 				);
-			pTypeEnd = pTokenBefore;
+
+			bGotVariable = TRUE;
 		}
 
 		// Goodie. We have an identifier and almost certainly a type here.
+
+		// From now on we start destroying the chain: mark the return value as true
+		// so nobody else will try to extract stuff from it
 
 		int iScopesPushed = 0;
 
 		if(pScopeStart)
 		{
+			// Push the scopes and remove them from the chain so they are not in the way
 			while(pScopeStart != pScopeEnd)
 			{
-				CXXToken * pScopeId = pScopeStart;
-				pScopeStart = cxxTokenChainNextTokenOfType(
+				// This is the scope id START. It might contain
+				// also other tokens like in ...::A<B>::...
+
+				CXXToken * pPartEnd = cxxTokenChainNextTokenOfType(
 						pScopeStart,
 						CXXTokenTypeMultipleColons
 					);
 				CXX_DEBUG_ASSERT(
-						pScopeStart,
+						pPartEnd,
 						"We should have found multiple colons here!"
 					);
-				pScopeStart = pScopeStart->pNext;
-
-				cxxTokenChainTake(pChain,pScopeId);
-
+				CXX_DEBUG_ASSERT(
+						pPartEnd->pPrev,
+						"And there should be a previous token too"
+					);
+				
+				CXXToken * pScopeId = cxxTokenChainExtractRange(pScopeStart,pPartEnd->pPrev,0);
 				cxxScopePush(
 						pScopeId,
 						CXXTagKindCLASS,
 						// WARNING: We don't know if it's really a class! (FIXME?)
 						CXXScopeAccessUnknown
 					);
+
+				CXXToken * pAux = pPartEnd->pNext;
+
+				cxxTokenChainDestroyRange(pScopeStart,pPartEnd);
+
+				pScopeStart = pAux;
+				
 				iScopesPushed++;
 			}
 		}
-
-		bGotVariable = TRUE;
 
 		boolean bKnRStyleParameters =
 				(uFlags & CXXExtractVariableDeclarationsKnRStyleParameters);
@@ -398,28 +438,6 @@ next_token:
 
 		if(tag)
 		{
-			// handle very simple typerefs
-			//   struct X y;
-			if(
-				pTypeEnd &&
-				(pChain->iCount == 4) &&
-				cxxTokenTypeIs(pTypeEnd,CXXTokenTypeIdentifier) &&
-				pTypeEnd->pPrev &&
-				cxxTokenTypeIs(pTypeEnd->pPrev,CXXTokenTypeKeyword) &&
-				cxxKeywordIsTypeRefMarker(pTypeEnd->pPrev->eKeyword)
-			)
-			{
-				tag->extensionFields.typeRef[0] = vStringValue(pTypeEnd->pPrev->pszWord);
-				tag->extensionFields.typeRef[1] = vStringValue(pTypeEnd->pszWord);
-				CXX_DEBUG_PRINT(
-						"Typeref is %s:%s",
-						tag->extensionFields.typeRef[0],
-						tag->extensionFields.typeRef[1]
-					);
-			} else {
-				CXX_DEBUG_PRINT("No typeref found");
-			}
-
 			tag->isFileScope = bKnRStyleParameters ?
 					TRUE :
 					(
@@ -449,7 +467,7 @@ next_token:
 		if(cxxTokenTypeIsOneOf(
 				t,
 				CXXTokenTypeParenthesisChain | CXXTokenTypeSquareParenthesisChain |
-					CXXTokenTypeSingleColon | CXXTokenTypeAssignment
+					CXXTokenTypeBracketChain | CXXTokenTypeSingleColon | CXXTokenTypeAssignment
 			))
 		{
 			t = cxxTokenChainNextTokenOfType(
@@ -460,7 +478,7 @@ next_token:
 			if(!t)
 			{
 				CXX_DEBUG_LEAVE_TEXT(
-						"Didn't find an assignment, comma, semicolon or {"
+						"Didn't find a comma, semicolon or {"
 					);
 				return bGotVariable;
 			}

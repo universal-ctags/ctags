@@ -100,6 +100,14 @@ CXXToken * cxxTokenChainSkipToEndOfTemplateAngleBracket(
 		CXXToken * t
 	);
 
+// Specialized function to skip back from a > to the matching < (used for
+// templates). Nested <> pairs are skipped properly.
+// Parenthesis chains are assumed to be condensed.
+// Note that the function stops at the initial < and not past it.
+CXXToken * cxxTokenChainSkipBackToStartOfTemplateAngleBracket(
+		CXXToken * t
+	);
+
 #define cxxTokenChainFirst(tc) (tc ? tc->pHead : NULL)
 #define cxxTokenChainLast(tc) (tc ? tc->pTail : NULL)
 
@@ -118,6 +126,8 @@ boolean cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t);
 // Destroy the first token
 #define cxxTokenChainDestroyFirst(tc) \
 		cxxTokenDestroy(cxxTokenChainTakeFirst(tc))
+
+void cxxTokenChainDestroyRange(CXXToken * from,CXXToken * to);
 
 void cxxTokenChainAppend(CXXTokenChain * tc,CXXToken * t);
 void cxxTokenChainPrepend(CXXTokenChain * tc,CXXToken * t);
