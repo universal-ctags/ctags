@@ -1,23 +1,24 @@
-N	name	tag name (fixed field)	format-char	on
-F	input	input file (fixed field)	format-char	on
-P	pattern	pattern (fixed field)	format-char	on
-C	compact	compact input line (fixed field, only used in -x option)	format-char	off
-a	access	Access (or export) of class members	format-char	off
-f	file	File-restricted scoping	format-char	on
-i	inherits	Inheritance information	format-char	off
-K	NONE	Kind of tag as full name	format-char	off
-k	NONE	Kind of tag as a single letter	format-char	on
-l	language	Language of input file containing tag	format-char	off
-m	implementation	Implementation information	format-char	off
-n	line	Line number of tag definition	format-char	off
-r	role	Role	format-char	off
-R	NONE	Marker (R or D) representing whether tag is definition or reference	format-char	off
-S	signature	Signature of routine (e.g. prototype or parameter list)	format-char	off
-s	NONE	Scope of tag definition (WARNING: this doesn't work well as a format letter)	format-char	on
-t	typeref	Type and name of a variable or typedef	format-char	on
-z	kind	Include the "kind:" key in kind field (use k or K)	NONE	off
-Z	scope	Include the "scope:" key in scope field (use s)	NONE	off
-E	extra	Extra tag type information	format-char	off
+#LETTER	NAME	ENABLED	XFMTCHAR	DESCRIPTION
+N	name	on	TRUE	tag name (fixed field)
+F	input	on	TRUE	input file (fixed field)
+P	pattern	on	TRUE	pattern (fixed field)
+C	compact	off	TRUE	compact input line (fixed field, only used in -x option)
+a	access	off	TRUE	Access (or export) of class members
+f	file	on	TRUE	File-restricted scoping
+i	inherits	off	TRUE	Inheritance information
+K	NONE	off	TRUE	Kind of tag as full name
+k	NONE	on	TRUE	Kind of tag as a single letter
+l	language	off	TRUE	Language of input file containing tag
+m	implementation	off	TRUE	Implementation information
+n	line	off	TRUE	Line number of tag definition
+r	role	off	TRUE	Role
+R	NONE	off	TRUE	Marker (R or D) representing whether tag is definition or reference
+S	signature	off	TRUE	Signature of routine (e.g. prototype or parameter list)
+s	NONE	on	TRUE	Scope of tag definition (WARNING: this doesn't work well as a format letter)
+t	typeref	on	TRUE	Type and name of a variable or typedef
+z	kind	off	FALSE	Include the "kind:" key in kind field (use k or K)
+Z	scope	off	FALSE	Include the "scope:" key in scope field (use s)
+E	extra	off	TRUE	Extra tag type information
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/
 x	input.java	/^    public int x;$/
