@@ -178,6 +178,7 @@ boolean cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t)
 	return FALSE;
 }
 
+#if 0
 CXXToken * cxxTokenChainTakeAt(CXXTokenChain * tc,int index)
 {
 	if(!tc)
@@ -188,6 +189,7 @@ CXXToken * cxxTokenChainTakeAt(CXXTokenChain * tc,int index)
 	cxxTokenChainTake(tc,token);
 	return token;
 }
+#endif
 
 void cxxTokenChainClear(CXXTokenChain * tc)
 {

@@ -115,7 +115,9 @@ CXXToken * cxxTokenChainAt(CXXTokenChain * tc,int index);
 
 CXXToken * cxxTokenChainTakeFirst(CXXTokenChain * tc);
 CXXToken * cxxTokenChainTakeLast(CXXTokenChain * tc);
+#if 0
 CXXToken * cxxTokenChainTakeAt(CXXTokenChain * tc,int index);
+#endif
 void cxxTokenChainTake(CXXTokenChain * tc,CXXToken * t);
 boolean cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t);
 
