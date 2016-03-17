@@ -604,6 +604,7 @@ static void createTag (tokenInfo *const token)
 		vStringCatS (scopedName, vStringValue (token->name));
 		tag.name = vStringValue (scopedName);
 
+		markTagExtraBit (&tag, XTAG_QUALIFIED_TAGS);
 		makeTagEntry (&tag);
 
 		vStringDelete (scopedName);

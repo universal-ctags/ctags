@@ -120,8 +120,13 @@ tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
 
 void cxxTagCommit(void)
 {
-	if(g_oCXXTag.isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
-		return;
+	if(g_oCXXTag.isFileScope)
+	{
+		if (isXtagEnabled(XTAG_FILE_SCOPE))
+			markTagExtraBit (&g_oCXXTag, XTAG_FILE_SCOPE);
+		else
+			return;
+	}
 
 	CXX_DEBUG_PRINT("Emitting tag for symbol '%s', kind '%s', line %d",g_oCXXTag.name,g_oCXXTag.kind->name,g_oCXXTag.lineNumber);
 	if(g_oCXXTag.extensionFields.typeRef[0] && g_oCXXTag.extensionFields.typeRef[1])
@@ -132,6 +137,8 @@ void cxxTagCommit(void)
 	// Handle --extra=+q
 	if(!isXtagEnabled(XTAG_QUALIFIED_TAGS))
 		return;
+	else
+		markTagExtraBit (&g_oCXXTag, XTAG_QUALIFIED_TAGS);
 
 	if(!g_oCXXTag.extensionFields.scopeName)
 		return;
