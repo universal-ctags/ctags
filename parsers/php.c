@@ -114,7 +114,6 @@ typedef enum {
 #define NAMESPACE_SEPARATOR "\\"
 static scopeSeparator PhpGenericSeparators [] = {
 	{ 'n'          , NAMESPACE_SEPARATOR },
-	{ '\0'	       , NAMESPACE_SEPARATOR }, /* root separator */
 	{ KIND_WILDCARD, "::" },
 };
 
@@ -296,16 +295,12 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 						  const phpKind kind, const accessType access)
 {
 	int parentKind = -1;
-	const char *rootsep;
 
 	vStringClear (FullScope);
 
 	if (vStringLength (CurrentNamesapce) > 0)
 	{
 		parentKind = K_NAMESPACE;
-		rootsep = scopeSeparatorFor (PhpKinds + parentKind,
-					     KIND_NULL);
-		vStringCatS (FullScope, rootsep);
 		vStringCat (FullScope, CurrentNamesapce);
 
 	}
@@ -329,13 +324,7 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 						    K_NAMESPACE);
 			vStringCatS (FullScope, sep);
 		}
-		else
-		{
-			rootsep = scopeSeparatorFor (PhpKinds + parentKind,
-						     KIND_NULL);
-			vStringCatS (FullScope, rootsep);
-		}
-		vStringCat (FullScope, token->scope);
+			vStringCat (FullScope, token->scope);
 	}
 	if (vStringLength (FullScope) > 0)
 	{

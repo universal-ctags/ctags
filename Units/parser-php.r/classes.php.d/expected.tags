@@ -1,7 +1,7 @@
 Bar	input.php	/^class Bar {$/;"	c
 Foo	input.php	/^class Foo {$/;"	c
-__construct	input.php	/^	function __construct () {$/;"	f	class:\\Bar
-__construct	input.php	/^	function __construct($a, $b) {$/;"	f	class:\\Foo
-method1	input.php	/^	function method1 () {$/;"	f	class:\\Bar
-method1	input.php	/^	function method1($arg) {$/;"	f	class:\\Foo
-method2	input.php	/^	function method2() {$/;"	f	class:\\Foo
+__construct	input.php	/^	function __construct () {$/;"	f	class:Bar
+__construct	input.php	/^	function __construct($a, $b) {$/;"	f	class:Foo
+method1	input.php	/^	function method1 () {$/;"	f	class:Bar
+method1	input.php	/^	function method1($arg) {$/;"	f	class:Foo
+method2	input.php	/^	function method2() {$/;"	f	class:Foo
