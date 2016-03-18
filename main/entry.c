@@ -926,6 +926,10 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 	const char* separator = ";\"";
 	const char* const empty = "";
 	int length = 0;
+
+	boolean making_fq_tag =  (doesInputLanguageRequestAutomaticFQTag ()
+				  && isXtagEnabled (XTAG_QUALIFIED_TAGS));
+
 /* "sep" returns a value only the first time it is evaluated */
 #define sep (first ? (first = FALSE, separator) : empty)
 
@@ -949,46 +953,50 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 				   getFieldName (FIELD_LANGUAGE),
 				   escapeName (tag, FIELD_LANGUAGE));
 
-	if (isFieldEnabled (FIELD_SCOPE))
+	if (isFieldEnabled (FIELD_SCOPE) || making_fq_tag)
 	{
+		const tagEntryInfo * scope = NULL;
+		char *full_qualified_scope_name = NULL;
+
+		const char* k = NULL, *v = NULL;
+
 		if (tag->extensionFields.scopeKind != NULL  &&
 		    tag->extensionFields.scopeName != NULL)
-			length += mio_printf (TagFile.fp, scopeFmt, sep,
-					   scopeKey,
-					   tag->extensionFields.scopeKind->name,
-					   escapeName (tag, FIELD_SCOPE));
-		else if (tag->extensionFields.scopeIndex != CORK_NIL
+		{
+			k = tag->extensionFields.scopeKind->name;
+			v = escapeName (tag, FIELD_SCOPE);
+		}
+		else if (tag->extensionFields.scopeIndex != SCOPE_NIL
 			 && TagFile.corkQueue.count > 0)
 		{
-			const tagEntryInfo * scope;
-			char *full_qualified_scope_name;
-
 			scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
 			full_qualified_scope_name = getFullQualifiedScopeNameFromCorkQueue(scope);
 			Assert (full_qualified_scope_name);
-			length += mio_printf (TagFile.fp, scopeFmt, sep,
-					   scopeKey,
-					   scope->kind->name, full_qualified_scope_name);
 
-			if (doesInputLanguageRequestAutomaticFQTag ()
-			    && isXtagEnabled (XTAG_QUALIFIED_TAGS))
-			{
-				/* Make the information reusable to generate full qualified entry.  */
-				((tagEntryInfo *const)tag)->extensionFields.scopeKind = scope->kind;
-				((tagEntryInfo *const)tag)->extensionFields.scopeName = full_qualified_scope_name;
-			}
-			else
-				eFree (full_qualified_scope_name);
+			k = scope->kind->name;
+			v = full_qualified_scope_name;
 		}
+
+		if (isFieldEnabled (FIELD_SCOPE) && k && v)
+			length += mio_printf (TagFile.fp, scopeFmt, sep, scopeKey, k, v);
+
+		if (scope && full_qualified_scope_name)
+		{
+			/* Make the information reusable to generate full qualified entry, and xformat output*/
+			((tagEntryInfo *const)tag)->extensionFields.scopeKind = scope->kind;
+			((tagEntryInfo *const)tag)->extensionFields.scopeName = full_qualified_scope_name;
+		}
+		else
+			eFree (full_qualified_scope_name);
 	}
 
 	if (isFieldEnabled (FIELD_TYPE_REF) &&
-			tag->extensionFields.typeRef [0] != NULL  &&
-			tag->extensionFields.typeRef [1] != NULL)
+	    tag->extensionFields.typeRef [0] != NULL  &&
+	    tag->extensionFields.typeRef [1] != NULL)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s:%s", sep,
-				   getFieldName (FIELD_TYPE_REF),
-				   tag->extensionFields.typeRef [0],
-				   escapeName (tag, FIELD_TYPE_REF));
+				      getFieldName (FIELD_TYPE_REF),
+				      tag->extensionFields.typeRef [0],
+				      escapeName (tag, FIELD_TYPE_REF));
 
 	if (isFieldEnabled (FIELD_FILE_SCOPE) &&  tag->isFileScope)
 		length += mio_printf (TagFile.fp, "%s\t%s:", sep,

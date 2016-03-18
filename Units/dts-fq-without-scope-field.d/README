@@ -1,0 +1,6 @@
+This test case verifies a corner use case of Cork based automatic full
+qualified tag generator(FQgen).
+
+FQgen caches scope informations built just before emitting it as value
+for scope fields. Therefore when --field=-s(disabling scope field) is
+given, FQ tags were not generated.
