@@ -176,8 +176,14 @@ static void addCommonPseudoTags (void)
 extern void makeFileTag (const char *const fileName)
 {
 	boolean via_line_directive = (strcmp (fileName, getInputFileName()) != 0);
-	if (isXtagEnabled(XTAG_FILE_NAMES)
-	    || isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES))
+	xtagType     xtag = XTAG_UNKNOWN;
+
+	if (isXtagEnabled(XTAG_FILE_NAMES))
+		xtag = XTAG_FILE_NAMES;
+	if (isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES))
+		xtag = XTAG_FILE_NAMES_WITH_TOTAL_LINES;
+
+	if (xtag != XTAG_UNKNOWN)
 	{
 		tagEntryInfo tag;
 		kindOption  *kind;
@@ -192,6 +198,7 @@ extern void makeFileTag (const char *const fileName)
 
 		tag.isFileEntry     = TRUE;
 		tag.lineNumberEntry = TRUE;
+		markTagExtraBit (&tag, xtag);
 
 		if (via_line_directive || (!isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES)))
 		{
@@ -950,6 +957,15 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 				   getFieldName (FIELD_ROLE),
 				   escapeName (tag, FIELD_ROLE));
 
+	if (getFieldDesc (FIELD_EXTRA)->enabled)
+	{
+		const char *value = escapeName (tag, FIELD_EXTRA);
+		if (value)
+			length += fprintf (TagFile.fp, "%s\t%s:%s", sep,
+					   getFieldName (FIELD_EXTRA),
+					   escapeName (tag, FIELD_EXTRA));
+	}
+
 	return length;
 #undef sep
 }
@@ -1261,6 +1277,7 @@ extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 	if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
 	{
 		x = *e;
+		markTagExtraBit (&x, XTAG_QUALIFIED_TAGS);
 
 		if (fqn == NULL)
 			fqn = vStringNew ();
@@ -1360,10 +1377,36 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	Assert (roleIndex >= ROLE_INDEX_DEFINITION);
 	Assert (kind == NULL || roleIndex < kind->nRoles);
 	e->extensionFields.roleIndex = roleIndex;
+	if (roleIndex > ROLE_INDEX_DEFINITION)
+		markTagExtraBit (e, XTAG_REFERENCE_TAGS);
 
 	e->sourceLanguage = sourceLanguage;
 	e->sourceFileName = sourceFileName;
 	e->sourceLineNumberDifference = sourceLineNumberDifference;
+}
+
+extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra)
+{
+	unsigned int index;
+	unsigned int offset;
+
+	Assert (extra < XTAG_COUNT);
+	Assert (extra != XTAG_UNKNOWN);
+
+	index = (extra / 8);
+	offset = (extra % 8);
+	tag->extra [ index ] |= (1 << offset);
+}
+
+extern boolean isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
+{
+	unsigned int index = (extra / 8);
+	unsigned int offset = (extra % 8);
+
+	Assert (extra < XTAG_COUNT);
+	Assert (extra != XTAG_UNKNOWN);
+
+	return !! ((tag->extra [ index ]) & (1 << offset));
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

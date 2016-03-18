@@ -42,6 +42,7 @@ static const char *renderFieldFile (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldPattern (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldRole (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldRefMarker (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldExtra (const tagEntryInfo *const tag, vString* b);
 
 #define DEFINE_FIELD_FULL(L,N, V, H, B, F, NWP) {		\
 		.enabled       = V,				\
@@ -128,6 +129,9 @@ static fieldDesc fieldDescs [] = {
 	DEFINE_FIELD_UCTAGS ('Z', "scope",   FALSE,
 			  "Include the \"scope:\" key in scope field (use s)",
 		      NULL),
+	DEFINE_FIELD_UCTAGS ('E', "extra",   FALSE,
+			     "Extra tag type information",
+			     renderFieldExtra),
 };
 
 extern fieldDesc* getFieldDesc(fieldType type)
@@ -407,6 +411,34 @@ static const char *renderFieldRefMarker (const tagEntryInfo *const tag, vString*
 	c [0] = tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION? 'D': 'R';
 
 	return renderAsIs (b, c);
+}
+
+static const char *renderFieldExtra (const tagEntryInfo *const tag, vString* b)
+{
+	int i;
+	boolean hasExtra = FALSE;
+
+	for (i = 0; i < XTAG_COUNT; i++)
+	{
+		const char *name = getXtagName (i);
+
+		if (!name)
+			continue;
+
+		if (isTagExtraBitMarked (tag, i))
+		{
+
+			if (hasExtra)
+				vStringPut (b, ',');
+			vStringCatS (b, name);
+			hasExtra = TRUE;
+		}
+	}
+
+	if (hasExtra)
+		return vStringValue (b);
+	else
+		return NULL;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

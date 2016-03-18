@@ -205,6 +205,7 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 		vStringCopy(name, package);
 		vStringNCatS(name, b, e - b + 1);
 		initTagEntry(&entry, vStringValue(name), &(PerlKinds[K_CONSTANT]));
+		markTagExtraBit (&entry, XTAG_QUALIFIED_TAGS);
 		makeTagEntry(&entry);
 	}
 }
@@ -496,6 +497,7 @@ static void findPerlTags (void)
 					vStringCopy (qualifiedName, package);
 					vStringCat (qualifiedName, name);
 					e.name = vStringValue(qualifiedName);
+					markTagExtraBit (&e, XTAG_QUALIFIED_TAGS);
 					makeTagEntry(&e);
 					vStringDelete (qualifiedName);
 				}
@@ -506,10 +508,13 @@ static void findPerlTags (void)
 					K_PACKAGE != kind &&
 					package != NULL  && vStringLength (package) > 0)
 				{
+					tagEntryInfo fqe;
 					vString *const qualifiedName = vStringNew ();
 					vStringCopy (qualifiedName, package);
 					vStringCat (qualifiedName, name);
-					makeSimpleTag (qualifiedName, PerlKinds, kind);
+					initTagEntry (&fqe, vStringValue (qualifiedName),
+						      PerlKinds + kind);
+					markTagExtraBit (&fqe, XTAG_QUALIFIED_TAGS);
 					vStringDelete (qualifiedName);
 				}
 			}

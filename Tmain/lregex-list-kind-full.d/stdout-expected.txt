@@ -1,4 +1,4 @@
-c	regex		off	referenceOnly:FALSE	nRoles:0
-d	regex		on	referenceOnly:FALSE	nRoles:0
 a	x y	x y z	on	referenceOnly:FALSE	nRoles:0
 b	regex		off	referenceOnly:FALSE	nRoles:0
+c	regex		off	referenceOnly:FALSE	nRoles:0
+d	regex		on	referenceOnly:FALSE	nRoles:0

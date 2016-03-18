@@ -493,11 +493,14 @@ nextLine:
 				/* x.Y */
 				if (isXtagEnabled(XTAG_QUALIFIED_TAGS))
 				{
+					tagEntryInfo fqe;
 					vStringCatS (fq, from_module);
 					vStringPut (fq, '.');
 					vStringCat (fq, name);
-					makeSimpleRefTag (fq, PythonKinds, K_UNKNOWN,
-							  PYTHON_UNKNOWN_INDIRECTLY_IMPORTED);
+					initRefTagEntry (&fqe, vStringValue (fq), PythonKinds + K_UNKNOWN,
+							 PYTHON_UNKNOWN_INDIRECTLY_IMPORTED);
+					markTagExtraBit (&fqe, XTAG_QUALIFIED_TAGS);
+					makeTagEntry (&fqe);
 					vStringClear(fq);
 				}
 				/* Z */
@@ -538,11 +541,15 @@ nextLine:
 				/* x.Y */
 				if (isXtagEnabled(XTAG_QUALIFIED_TAGS))
 				{
+					tagEntryInfo fqe;
 					vStringCatS (fq, from_module);
 					vStringPut (fq, '.');
 					vStringCat (fq, name);
-					makeSimpleRefTag (fq, PythonKinds, K_UNKNOWN,
-							  PYTHON_MODULE_IMPORTED);
+					initRefTagEntry (&fqe, vStringValue (fq),
+							 PythonKinds + K_UNKNOWN,
+							 PYTHON_MODULE_IMPORTED);
+					markTagExtraBit (&fqe, XTAG_QUALIFIED_TAGS);
+					makeTagEntry (&fqe);
 					vStringClear(fq);
 				}
 			}

@@ -397,6 +397,9 @@ static void findRubyTags (void)
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char *cp = line;
+		/* if we expect a separator after a while, for, or until statement
+		 * separators are "do", ";" or newline */
+		boolean expect_separator = FALSE;
 
 		if (canMatch (&cp, "=begin", isWhitespace))
 		{
@@ -430,11 +433,16 @@ static void findRubyTags (void)
 		*   puts("hello") \
 		*       unless <exp>
 		*/
-		if (canMatchKeyword (&cp, "case") ||
-		    canMatchKeyword (&cp, "for") ||
-			canMatchKeyword (&cp, "if") ||
-			canMatchKeyword (&cp, "unless") ||
-			canMatchKeyword (&cp, "while"))
+		if (canMatchKeyword (&cp, "for") ||
+		    canMatchKeyword (&cp, "until") ||
+		    canMatchKeyword (&cp, "while"))
+		{
+			expect_separator = TRUE;
+			enterUnnamedScope ();
+		}
+		else if (canMatchKeyword (&cp, "case") ||
+		         canMatchKeyword (&cp, "if") ||
+		         canMatchKeyword (&cp, "unless"))
 		{
 			enterUnnamedScope ();
 		}
@@ -492,10 +500,16 @@ static void findRubyTags (void)
 				*/
 				break;
 			}
-			else if (canMatchKeyword (&cp, "begin") ||
-			         canMatchKeyword (&cp, "do"))
+			else if (canMatchKeyword (&cp, "begin"))
 			{
 				enterUnnamedScope ();
+			}
+			else if (canMatchKeyword (&cp, "do"))
+			{
+				if (! expect_separator)
+					enterUnnamedScope ();
+				else
+					expect_separator = FALSE;
 			}
 			else if (canMatchKeyword (&cp, "end") && nesting->n > 0)
 			{
@@ -510,6 +524,13 @@ static void findRubyTags (void)
 				do {
 					++cp;
 				} while (*cp != 0 && *cp != '"');
+				if (*cp == '"')
+					cp++; /* skip the last found '"' */
+			}
+			else if (*cp == ';')
+			{
+				++cp;
+				expect_separator = FALSE;
 			}
 			else if (*cp != '\0')
 			{

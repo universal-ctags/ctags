@@ -1454,6 +1454,7 @@ static void makeExtraTagEntry (const tagType type, tagEntryInfo *const e,
 			addContextSeparator (scopedName);
 			vStringCatS (scopedName, e->name);
 			e->name = vStringValue (scopedName);
+			markTagExtraBit (e, XTAG_QUALIFIED_TAGS);
 			makeTagEntry (e);
 		}
 		vStringDelete (scopedName);
@@ -1497,6 +1498,8 @@ static void makeTag (const tokenInfo *const token,
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
 		e.isFileScope	= isFileScope;
+		if (e.isFileScope)
+			markTagExtraBit (&e, XTAG_FILE_SCOPE);
 
 		isScopeBuilt = findScopeHierarchy (scope, st);
 		addOtherFields (&e, type, st, scope, typeRef);
