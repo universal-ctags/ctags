@@ -17,6 +17,10 @@ l16	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	typeref
 l17	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	typeref:struct:Struct1 *	file:
 l18	input.cpp	/^	struct Struct1 * l16, l17, l18[10];$/;"	l	function:main	typeref:struct:Struct1 * [10]	file:
 l19	input.cpp	/^	Struct1 l19 = {};$/;"	l	function:main	typeref:typename:Struct1	file:
+l20	input.cpp	/^	std::string ** l20[SIZE];$/;"	l	function:main	typeref:typename:std::string ** []	file:
+l21	input.cpp	/^	std::string l21[1 << 2];$/;"	l	function:main	typeref:typename:std::string[]	file:
+l22	input.cpp	/^	std::string * const l22[SIZE][SIZE];$/;"	l	function:main	typeref:typename:std::string * const[][]	file:
+l23	input.cpp	/^	std::string l23[5][2];$/;"	l	function:main	typeref:typename:std::string[5][2]	file:
 m01	input.cpp	/^	unsigned int m01;$/;"	m	struct:Struct1	typeref:typename:unsigned int	file:
 m02	input.cpp	/^	std::string m02;$/;"	m	struct:Struct1	typeref:typename:std::string	file:
 m03	input.cpp	/^	std::string ** m03, m04;$/;"	m	struct:Struct1	typeref:typename:std::string **	file:

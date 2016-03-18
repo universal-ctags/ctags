@@ -42,6 +42,12 @@ int main(int argc,char ** argv)
 	struct Struct1 * l16, l17, l18[10];
 	Struct1 l19 = {};
 
+#define SIZE 25
+	std::string ** l20[SIZE];
+	std::string l21[1 << 2];
+	std::string * const l22[SIZE][SIZE];
+	std::string l23[5][2];
+
 	return 0;
 }
 
