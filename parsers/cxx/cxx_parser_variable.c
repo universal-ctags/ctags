@@ -19,19 +19,38 @@
 #include "read.h"
 
 
-
+//
+// Attempt to extract variable declarations from the chain.
+// Returns TRUE if at least one variable was extracted.
+// Returns FALSE if a variable declaration could not be identified.
+//
+// Recognized variable declarations are of the following kinds: 
+//
+//   type var;
+//   type var1,var2;
+//   type var[];
+//   type var(constructor args);
+//   type var{list initializer};
+//   type var = ...;
+//   type (*ident)();
+//   type var:bits;
+//   type var: range declaration <-- (FIXME: this is only inside for!)
+//   very complex type with modifiers() namespace::namespace::var = ...;
+//   type<with template> namespace::var[] = {
+//   ...
 //
 // Assumptions:
-//  - this function assumes that a function definition or prototype has
-//    been already excluded by other means.
-//  - there is a terminator at the end: one of ; = {
+//  - there is a terminator at the end: either ; or {
 //
-// Returns true if at least one variable was extracted.
+// Notes:
+// - Be aware that if this function returns TRUE then the pChain very likely has been modified
+//   (partially destroyed) as part of the type extraction algorithm.
+//   If the function returns FALSE the chain has not been modified (and 
+//   to extract something else from it).
 //
-boolean cxxParserExtractVariableDeclarations(
-		CXXTokenChain * pChain,
-		unsigned int uFlags
-	)
+// - This function is quite tricky.
+//
+boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uFlags)
 {
 	CXX_DEBUG_ENTER();
 
@@ -51,28 +70,15 @@ boolean cxxParserExtractVariableDeclarations(
 #endif
 
 	//
-	// Examples of possible matches:
-	//   type var;
-	//   type var1,var2;
-	//   type var[];
-	//   type var(constructor args);
-	//   type var{list initializer};
-	//   type var = ...;
-	//   type (*ident)();
-	//   type var:bits;
-	//   type var: range declaration <-- (FIXME: this is only inside for!)
-	//   very complex type with modifiers() namespace::namespace::var = ...;
-	//   type<with template> namespace::var[] = {
-	//   ...
-	//
 	// Strategy:
-	//   - verify that the chain starts with an identifier or
-	//     keyword (always present)
+	//   - verify that the chain starts with an identifier or keyword (always present)
 	//   - run to one of : ; [] () {} = ,
 	//   - ensure that the previous token is an identifier (except for special cases)
 	//   - go back to skip the eventual scope
 	//   - ensure that there is a leading type
 	//   - if we are at : [], () or {} then run to the next ; = or ,
+	//   - once we have determined that a variable declaration is there
+	//     modify the chain to contain only the type name
 	//   - emit variable tag
 	//   - if we are at , then check if there are more declarations
 	//
@@ -502,8 +508,31 @@ boolean cxxParserExtractVariableDeclarations(
 			// remove the identifier
 			cxxTokenChainTakeRecursive(pChain,pIdentifier);
 
-			// FIXME: We should check the contents of square parentheses and
-			//        empty them if they contains something that is not a numeric constant.
+			// Fix square parentheses: if they contain something that is not a numeric
+			// constant then empty them up
+			CXXToken * pPartOfType = t->pPrev;
+			CXX_DEBUG_ASSERT(pPartOfType,"There should be a part of type name here");
+
+			while(pPartOfType && cxxTokenTypeIs(pPartOfType,CXXTokenTypeSquareParenthesisChain))
+			{
+				CXXTokenChain * pAuxChain = pPartOfType->pChain;
+			
+				if(pAuxChain->iCount > 2)
+				{
+					if(
+						(pAuxChain->iCount > 3) ||
+						(!cxxTokenTypeIs(cxxTokenChainAt(pAuxChain,1),CXXTokenTypeNumber))
+					)
+					{
+						cxxTokenChainDestroyRange(
+								pAuxChain,
+								cxxTokenChainFirst(pAuxChain)->pNext,
+								cxxTokenChainLast(pAuxChain)->pPrev
+							);
+					}
+				}
+				pPartOfType = pPartOfType->pPrev;
+			}
 
 			// anything that remains is part of type
 			cxxTagSetTypeField(tag,cxxTokenChainFirst(pChain),t->pPrev);
