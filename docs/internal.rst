@@ -95,7 +95,7 @@ parser does not set `useCork` field. `writeTagEntry` calls one of
 three functions, `writeTagsEntry`, `writeXrefEntry` or `writeCtagsEntry`.
 One of them is chosen depending on the arguments passed to ctags.
 
-If `useCork` is set, the tag informations goes to a queue on memory.
+If `useCork` is set, the tag information goes to a queue on memory.
 The queue is flushed when `useCork` in unset. See `cork API` for more
 details.
 
@@ -121,7 +121,7 @@ Following code is taken from clojure.c(with modifications).
 		makeTagEntry (&current);
 
 `parent`, values stored to `scope [0]` and `scope [1]` are all
-something string.
+kind of strings.
 
 cork API provides more solid way to hold scope information. cork API
 expects `parent`, which represents scope of a tag(`current`)
@@ -199,3 +199,28 @@ When using `scopeIndex` of `current`, `NULL` must be assigned to both
 `current.extensionFields.scope[1]`.  `initTagEntry` function does this
 initialization internally, so you generally you don't have to write
 the initialization explicitly.
+
+Automatic full qualified tag generation
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+If a parser uses the cork for recording and emitting scope
+information, ctags can reuse it for generating full qualified(FQ)
+tags. Set `requestAutomaticFQTag` field of `parserDefinition` to
+`TRUE` then the main part of ctags emits FQ tags on behalf of the parser
+if `--extra=+q` is given.
+
+An example can be found in DTS parser:
+
+.. code-block:: c
+
+    extern parserDefinition* DTSParser (void)
+    {
+	    static const char *const extensions [] = { "dts", "dtsi", NULL };
+	    parserDefinition* const def = parserNew ("DTS");
+	    ...
+	    def->requestAutomaticFQTag = TRUE;
+	    return def;
+    }
+
+Setting `requestAutomaticFQTag` to `TRUE` implies setting
+`useCork` to `TRUE`.
