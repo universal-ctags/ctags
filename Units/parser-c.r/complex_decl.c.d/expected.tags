@@ -1,1 +1,1 @@
-ScanAction	input.c	/^static void (* const(ScanAction[5][5]))(void *)= {};$/;"	v	file:
+ScanAction	input.c	/^static void (* const(ScanAction[5][5]))(void *)= {};$/;"	v	typeref:typename:void (* const ([5][5]))(void *)	file:

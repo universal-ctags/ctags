@@ -70,10 +70,10 @@ x	input.c	/^  struct X x;$/
 #t
 X	input.c	/^struct X {$/
 Y	input.c	/^struct Y {$/
-i	input.c	/^  int i;$/
-j	input.c	/^  int j;$/
+i	input.c	/^  int i;$/;"	typeref:typename:int
+j	input.c	/^  int j;$/;"	typeref:typename:int
 main	input.c	/^int main(void)$/;"	typeref:typename:int
-x	input.c	/^  struct X x;$/
+x	input.c	/^  struct X x;$/;"	typeref:struct:X
 #r
 x	input.sh	/^source x$/;"	role:loaded
 y	input.sh	/^function y()$/

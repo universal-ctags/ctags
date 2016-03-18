@@ -129,7 +129,7 @@ boolean cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t);
 #define cxxTokenChainDestroyFirst(tc) \
 		cxxTokenDestroy(cxxTokenChainTakeFirst(tc))
 
-void cxxTokenChainDestroyRange(CXXToken * from,CXXToken * to);
+void cxxTokenChainDestroyRange(CXXTokenChain * pChain,CXXToken * from,CXXToken * to);
 
 void cxxTokenChainAppend(CXXTokenChain * tc,CXXToken * t);
 void cxxTokenChainPrepend(CXXTokenChain * tc,CXXToken * t);

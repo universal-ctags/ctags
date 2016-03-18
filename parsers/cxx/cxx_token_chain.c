@@ -759,16 +759,12 @@ int cxxTokenChainFirstKeywordIndex(
 	return -1;
 }
 
-void cxxTokenChainDestroyRange(CXXToken * from,CXXToken * to)
+void cxxTokenChainDestroyRange(CXXTokenChain * pChain,CXXToken * from,CXXToken * to)
 {
 	if(!from || !to)
 		return;
 	CXX_DEBUG_ASSERT(from,"Bad from pointer passed to cxxTokenChainDestroyRange");
 	CXX_DEBUG_ASSERT(to,"Bad to pointer passed to cxxTokenChainDestroyRange");
-	CXX_DEBUG_ASSERT(from->pChain,"From token has no chain!");
-	CXX_DEBUG_ASSERT(from->pChain == to->pChain,"Tokens must belong to same chain");
-
-	CXXTokenChain * pChain = from->pChain;
 
 	for(;;)
 	{

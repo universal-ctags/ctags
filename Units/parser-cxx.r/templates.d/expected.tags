@@ -8,7 +8,7 @@ Item	input.cpp	/^class Item$/;"	c	file:
 Item	input.cpp	/^  Item(const Type &t) : item (t), next (0) { }$/;"	f	class:Item	file:
 Item::Item	input.cpp	/^  Item(const Type &t) : item (t), next (0) { }$/;"	f	class:Item	file:
 t	input.cpp	/^  Item(const Type &t) : item (t), next (0) { }$/;"	z	function:Item::Item	typeref:typename:const Type &	file:
-item	input.cpp	/^  Type item;$/;"	m	class:Item	file:
-Item::item	input.cpp	/^  Type item;$/;"	m	class:Item	file:
-next	input.cpp	/^  Item *next;$/;"	m	class:Item	file:
-Item::next	input.cpp	/^  Item *next;$/;"	m	class:Item	file:
+item	input.cpp	/^  Type item;$/;"	m	class:Item	typeref:typename:Type	file:
+Item::item	input.cpp	/^  Type item;$/;"	m	class:Item	typeref:typename:Type	file:
+next	input.cpp	/^  Item *next;$/;"	m	class:Item	typeref:typename:Item *	file:
+Item::next	input.cpp	/^  Item *next;$/;"	m	class:Item	typeref:typename:Item *	file:

@@ -68,7 +68,7 @@ typedef struct _CXXToken
 	enum CXXTokenType eType;
 	vString * pszWord;
 	enum CXXKeyword eKeyword;
-	CXXTokenChain * pChain;
+	CXXTokenChain * pChain; // this is NOT the parent chain!
 	boolean bFollowedBySpace;
 
 	int iLineNumber;
