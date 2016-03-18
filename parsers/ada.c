@@ -432,6 +432,7 @@ static adaTokenInfo *newAdaToken(const char *name, int len, adaKind kind,
   }
   else
   {
+    markTagExtraBit (&token->tag, XTAG_FILE_SCOPE);
     token->tag.isFileScope = TRUE;
   }
 
@@ -2131,6 +2132,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
         currentScope[strlen(parentScope) + 1 + strlen(token->name)] = '\0';
 
         token->tag.name = currentScope;
+	markTagExtraBit (&token->tag, XTAG_QUALIFIED_TAGS);
         makeTagEntry(&token->tag);
       } /* if(parentScope != NULL) */
       else

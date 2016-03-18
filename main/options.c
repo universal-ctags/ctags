@@ -1858,6 +1858,7 @@ static void processPseudoTags (const char *const option __unused__,
 {
 	const char *p = parameter;
 	boolean s;
+	ptagType t;
 
 	if (*p == '*')
 	{
@@ -1867,24 +1868,32 @@ static void processPseudoTags (const char *const option __unused__,
 		return;
 	}
 
-	if (*p != '+'  &&  *p != '-')
+	if (*p == '-')
 	{
-		int i;
-		for (i = 0; i < PTAG_COUNT; i++)
-			enablePtag (i, FALSE);
+		s= FALSE;
+		p++;
+	}
+	else if (*p == '+')
+	{
+		s = TRUE;
+		p++;
 	}
 	else
 	{
-		ptagType t;
+		unsigned int i;
 
-		s = (*p == '+')? TRUE: FALSE;
-		p++;
-		t = getPtagTypeForName (p);
-		if (t == PTAG_UNKNOWN)
-			error (FATAL, "Unknown pseudo tag name: %s", p);
-
-		enablePtag (t, s);
+		s = TRUE;
+		for (i = 0; i < PTAG_COUNT; i++)
+			enablePtag (i, FALSE);
+		if (*p == '\0')
+			return;
 	}
+
+	t = getPtagTypeForName (p);
+	if (t == PTAG_UNKNOWN)
+		error (FATAL, "Unknown pseudo tag name: %s", p);
+
+	enablePtag (t, s);
 }
 
 static void processSortOption (

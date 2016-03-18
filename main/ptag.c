@@ -111,7 +111,16 @@ static boolean ptagMakeFileEncoding (ptagDesc *desc, void *data __unused__)
 static boolean ptagMakeKindSeparators (ptagDesc *desc, void *data)
 {
 	langType *language = data;
+
 	makeKindSeparatorsPseudoTags (*language, desc);
+
+	return TRUE;
+}
+
+static boolean ptagMakeKindDescriptions (ptagDesc *desc, void *data)
+{
+	langType *language = data;
+	makeKindDescriptionsPseudoTags (*language, desc);
 	return TRUE;
 }
 
@@ -150,6 +159,11 @@ static ptagDesc ptagDescs [] = {
 	  "the separators used in kinds",
 	  ptagMakeKindSeparators,
 	  FALSE },
+	{ FALSE, "TAG_KIND_DESCRIPTION",
+	  "the letters, names and descriptions of kinds in a parser",
+	  ptagMakeKindDescriptions,
+	  FALSE },
+
 };
 
 extern boolean makePtagIfEnabled (ptagType type, void *data)

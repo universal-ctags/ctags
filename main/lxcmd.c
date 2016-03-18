@@ -402,7 +402,7 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 #endif	/* HAVE_COPROC */
 
 
-static void foreachXcmdKinds (const langType language,
+extern void foreachXcmdKinds (const langType language,
 			      boolean (*func) (kindOption *, void *),
 			      void *data)
 {
@@ -530,20 +530,22 @@ extern boolean hasXcmdKind (const langType language, const int kind)
 	return d.result;
 }
 
+struct printXcmdKindCBData {
+	const char *langName;
+	boolean allKindFields;
+	boolean indent;
+};
+
 #ifdef HAVE_COPROC
-static void printXcmdKind (xcmdPath *path, unsigned int i,
-                           const char* const langName, boolean allKindFields, boolean indent)
+static boolean printXcmdKind (kindOption *kind, void *user_data)
 {
-	unsigned int k;
+	struct printXcmdKindCBData *data = user_data;
 
-	if (!path[i].available)
-		return;
+        if (data->allKindFields && data->indent)
+		printf ("%s", data->langName);
 
-        if (allKindFields && indent)
-            printf ("%s", langName);
-
-	for (k = 0; k < path[i].n_kinds; k++)
-		printKind (path[i].kinds + k, allKindFields, indent);
+	printKind (kind, data->allKindFields, data->indent);
+	return FALSE;
 }
 #endif
 
@@ -554,11 +556,13 @@ extern void printXcmdKinds (const langType language __unused__,
 #ifdef HAVE_COPROC
 	if (language <= SetUpper  &&  Sets [language].count > 0)
 	{
-		pathSet* const set = Sets + language;
                 const char* const langName = getLanguageName(language);
-		unsigned int i;
-		for (i = 0  ;  i < set->count  ;  ++i)
-			printXcmdKind (set->paths, i, langName, allKindFields, indent);
+		struct printXcmdKindCBData data = {
+			.langName      = langName,
+			.allKindFields = allKindFields,
+			.indent        = indent,
+		};
+		foreachXcmdKinds (language, printXcmdKind, &data);
 	}
 #endif
 }

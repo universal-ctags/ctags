@@ -1,4 +1,4 @@
-c  regex [off]
-d  regex
 a  regex
 b  regex [off]
+c  regex [off]
+d  regex

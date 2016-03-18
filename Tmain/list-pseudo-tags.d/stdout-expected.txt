@@ -5,3 +5,4 @@ TAG_PROGRAM_NAME	the name of this ctags implementation	on
 TAG_PROGRAM_URL	the official site URL of this ctags implementation	on
 TAG_PROGRAM_VERSION	the version of this ctags implementation	on
 TAG_KIND_SEPARATOR	the separators used in kinds	off
+TAG_KIND_DESCRIPTION	the letters, names and descriptions of kinds in a parser	off

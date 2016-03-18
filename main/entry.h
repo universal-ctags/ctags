@@ -18,6 +18,7 @@
 
 #include "kind.h"
 #include "vstring.h"
+#include "xtag.h"
 
 /*
 *   MACROS
@@ -53,6 +54,8 @@ typedef struct sTagEntryInfo {
 	const char *inputFileName;   /* name of input file */
 	const char *name;             /* name of the tag */
 	const kindOption *kind;	      /* kind descriptor */
+	unsigned char extra[ ((XTAG_COUNT) / 8) + 1 ];
+
 	struct {
 		const char* access;
 		const char* fileScope;
@@ -162,6 +165,9 @@ tagEntryInfo *getEntryInCorkQueue   (unsigned int n);
 size_t        countEntryInCorkQueue (void);
 
 extern void makeFileTag (const char *const fileName);
+
+extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
+extern boolean isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 
 #endif  /* CTAGS_MAIN_ENTRY_H */
 

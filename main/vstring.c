@@ -337,4 +337,27 @@ extern void vStringCatSWithEscaping (vString* b, const char *s)
 	}
 }
 
+extern void vStringCatSWithEscapingAsPattern (vString *output, const char* input)
+{
+	while (*input)
+	{
+		switch (*input)
+		{
+		case '\\':
+			vStringPut(output, '\\');
+			vStringPut(output, '\\');
+			break;
+		case '/':
+			vStringPut(output, '\\');
+			vStringPut(output, '/');
+			break;
+		default:
+			vStringPut(output, *input);
+			break;
+
+		}
+		input++;
+	}
+}
+
 /* vi:set tabstop=4 shiftwidth=4: */
