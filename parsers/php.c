@@ -1348,6 +1348,20 @@ static boolean parseDefine (tokenInfo *const token)
 	return FALSE;
 }
 
+static void readQualifiedName (tokenInfo *const token, vString *name,
+                               tokenInfo *const lastToken)
+{
+	while (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_BACKSLASH)
+	{
+		if (token->type == TOKEN_BACKSLASH)
+			vStringPut (name, '\\');
+		else
+			vStringCat (name, token->string);
+		copyToken (lastToken, token, TRUE);
+		readToken (token);
+	}
+}
+
 /* parses declarations of the form
  * 	use Foo
  * 	use Foo\Bar\Class
@@ -1358,7 +1372,8 @@ static boolean parseDefine (tokenInfo *const token)
  * 	use const Foo\Bar\CONST as FOOBARCONST
  * 	use Foo, Bar
  * 	use Foo, Bar as Baz
- * 	use Foo as Test, Bar as Baz */
+ * 	use Foo as Test, Bar as Baz
+ * 	use Foo\{Bar, Baz as Child, Nested\Other, Even\More as Something} */
 static boolean parseUse (tokenInfo *const token)
 {
 	boolean readNext = FALSE;
@@ -1366,6 +1381,9 @@ static boolean parseUse (tokenInfo *const token)
 	 * aliases are the same, and the only difference is the referenced name's
 	 * type */
 	const char *refType = "unknown";
+	vString *refName = vStringNew ();
+	tokenInfo *nameToken = newToken ();
+	boolean grouped = FALSE;
 
 	readToken (token); /* skip use keyword itself */
 	if (token->type == TOKEN_KEYWORD && (token->keyword == KEYWORD_function ||
@@ -1380,22 +1398,22 @@ static boolean parseUse (tokenInfo *const token)
 		readNext = TRUE;
 	}
 
+	if (readNext)
+		readToken (token);
+
+	readQualifiedName (token, refName, nameToken);
+	grouped = readNext = (token->type == TOKEN_OPEN_CURLY);
+
 	do
 	{
-		vString *refName = vStringNew ();
-		tokenInfo *nameToken = newToken ();
+		size_t refNamePrefixLength = grouped ? vStringLength (refName) : 0;
 
+		/* if it's either not the first name in a comma-separated list, or we
+		 * are in a grouped alias and need to read the leaf name */
 		if (readNext)
-			readToken (token);
-
-		while (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_BACKSLASH)
 		{
-			if (token->type == TOKEN_BACKSLASH)
-				vStringPut (refName, '\\');
-			else
-				vStringCat (refName, token->string);
-			copyToken (nameToken, token, TRUE);
 			readToken (token);
+			readQualifiedName (token, refName, nameToken);
 		}
 
 		if (token->type == TOKEN_KEYWORD && token->keyword == KEYWORD_as)
@@ -1417,12 +1435,17 @@ static boolean parseUse (tokenInfo *const token)
 			makePhpTagEntry (&entry);
 		}
 
-		vStringDelete (refName);
-		deleteToken (nameToken);
+		vStringTruncate (refName, refNamePrefixLength);
 
 		readNext = TRUE;
 	}
 	while (token->type == TOKEN_COMMA);
+
+	if (grouped && token->type == TOKEN_CLOSE_CURLY)
+		readToken (token);
+
+	vStringDelete (refName);
+	deleteToken (nameToken);
 
 	return (token->type == TOKEN_SEMICOLON);
 }

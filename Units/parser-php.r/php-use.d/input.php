@@ -37,12 +37,26 @@ namespace NS2 {
   }
 }
 
+namespace NS2\NS30 {
+  class Cls3 {}
+}
+
+namespace NS2\NS31 {
+  class Cls4 {}
+}
+
+namespace NS2\NS30\NS301 {}
+namespace NS2\NS30\NS302 {}
+
 namespace {
   use NS as SomeAliasedNS;
   use NS\Cls;
   use NS2\Cls as Cls2;
   use const NS\FOO as MYCONST;
   use function NS\test;
+  use NS2\{Cls as NS2Cls, Iface};
+  use NS2\{NS30, NS31\Cls4};
+  use NS2\{NS30 as NameSpaceTreePointO, NS31\Cls4 as ClassFour};
   
   $cls = new Cls;
   echo $cls::CONST, "\n";
@@ -54,4 +68,7 @@ namespace {
   
   $cls = new Cls2;
   $cls->hello();
+  
+  new ClassFour;
+  new NameSpaceTreePointO\Cls3;
 }
