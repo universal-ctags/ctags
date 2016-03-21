@@ -107,6 +107,7 @@ typedef enum {
 	K_NAMESPACE,
 	K_TRAIT,
 	K_VARIABLE,
+	K_ALIAS,
 	COUNT_KIND
 } phpKind;
 
@@ -133,6 +134,8 @@ static kindOption PhpKinds[COUNT_KIND] = {
 	{ TRUE, 't', "trait",		"traits",
 	  ATTACH_SEPARATORS(PhpGenericSeparators)},
 	{ TRUE, 'v', "variable",	"variables",
+	  ATTACH_SEPARATORS(PhpGenericSeparators)},
+	{ TRUE, 'a', "alias",		"aliases",
 	  ATTACH_SEPARATORS(PhpGenericSeparators)},
 };
 
@@ -1346,6 +1349,85 @@ static boolean parseDefine (tokenInfo *const token)
 }
 
 /* parses declarations of the form
+ * 	use Foo
+ * 	use Foo\Bar\Class
+ * 	use Foo\Bar\Class as FooBarClass
+ * 	use function Foo\Bar\func
+ * 	use function Foo\Bar\func as foobarfunc
+ * 	use const Foo\Bar\CONST
+ * 	use const Foo\Bar\CONST as FOOBARCONST
+ * 	use Foo, Bar
+ * 	use Foo, Bar as Baz
+ * 	use Foo as Test, Bar as Baz */
+static boolean parseUse (tokenInfo *const token)
+{
+	boolean readNext = FALSE;
+	/* we can't know the use type, because class, interface and namespaces
+	 * aliases are the same, and the only difference is the referenced name's
+	 * type */
+	const char *refType = "unknown";
+
+	readToken (token); /* skip use keyword itself */
+	if (token->type == TOKEN_KEYWORD && (token->keyword == KEYWORD_function ||
+	                                     token->keyword == KEYWORD_const))
+	{
+		switch (token->keyword)
+		{
+			case KEYWORD_function:	refType = PhpKinds[K_FUNCTION].name;	break;
+			case KEYWORD_const:		refType = PhpKinds[K_DEFINE].name;		break;
+			default: break; /* silence compilers */
+		}
+		readNext = TRUE;
+	}
+
+	do
+	{
+		vString *refName = vStringNew ();
+		tokenInfo *nameToken = newToken ();
+
+		if (readNext)
+			readToken (token);
+
+		while (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_BACKSLASH)
+		{
+			if (token->type == TOKEN_BACKSLASH)
+				vStringPut (refName, '\\');
+			else
+				vStringCat (refName, token->string);
+			copyToken (nameToken, token, TRUE);
+			readToken (token);
+		}
+
+		if (token->type == TOKEN_KEYWORD && token->keyword == KEYWORD_as)
+		{
+			readToken (token);
+			copyToken (nameToken, token, TRUE);
+			readToken (token);
+		}
+
+		if (nameToken->type == TOKEN_IDENTIFIER)
+		{
+			tagEntryInfo entry;
+
+			initPhpEntry (&entry, nameToken, K_ALIAS, ACCESS_UNDEFINED);
+
+			entry.extensionFields.typeRef[0] = refType;
+			entry.extensionFields.typeRef[1] = vStringValue (refName);
+
+			makePhpTagEntry (&entry);
+		}
+
+		vStringDelete (refName);
+		deleteToken (nameToken);
+
+		readNext = TRUE;
+	}
+	while (token->type == TOKEN_COMMA);
+
+	return (token->type == TOKEN_SEMICOLON);
+}
+
+/* parses declarations of the form
  * 	$var = VALUE
  * 	$var; */
 static boolean parseVariable (tokenInfo *const token)
@@ -1500,6 +1582,13 @@ static void enterScope (tokenInfo *const parentToken,
 					case KEYWORD_function:	readNext = parseFunction (token, NULL);						break;
 					case KEYWORD_const:		readNext = parseConstant (token);							break;
 					case KEYWORD_define:	readNext = parseDefine (token);								break;
+
+					case KEYWORD_use:
+						/* aliases are only allowed at root scope, but the keyword
+						 * is also used to i.e. "import" traits into a class */
+						if (vStringLength (token->scope) == 0)
+							readNext = parseUse (token);
+						break;
 
 					case KEYWORD_namespace:	readNext = parseNamespace (token);	break;
 

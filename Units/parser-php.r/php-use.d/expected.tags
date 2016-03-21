@@ -1,0 +1,23 @@
+CONST	input.php	/^    const CONST = 1;$/;"	d	class:\\NS\\Cls
+Cls	input.php	/^  class Cls implements Iface {$/;"	c	namespace:\\NS
+Cls	input.php	/^  class Cls implements NSIface {$/;"	c	namespace:\\NS2
+Cls	input.php	/^  use NS\\Cls;$/;"	a	typeref:unknown:NS\\Cls
+Cls2	input.php	/^  use NS2\\Cls as Cls2;$/;"	a	typeref:unknown:NS2\\Cls
+FOO	input.php	/^  const FOO = 1;$/;"	d	namespace:\\NS
+FOO	input.php	/^  use const NS\\FOO;$/;"	a	namespace:\\NS2	typeref:define:NS\\FOO
+Iface	input.php	/^  interface Iface extends NSIface {$/;"	i	namespace:\\NS2
+Iface	input.php	/^  interface Iface {$/;"	i	namespace:\\NS
+MYCONST	input.php	/^  use const NS\\FOO as MYCONST;$/;"	a	typeref:define:NS\\FOO
+NS	input.php	/^namespace NS {$/;"	n
+NS2	input.php	/^namespace NS2 {$/;"	n
+NSCls	input.php	/^  use NS\\Iface as NSIface, NS\\Cls as NSCls;$/;"	a	namespace:\\NS2	typeref:unknown:NS\\Cls
+NSIface	input.php	/^  use NS\\Iface as NSIface, NS\\Cls as NSCls;$/;"	a	namespace:\\NS2	typeref:unknown:NS\\Iface
+SomeAliasedNS	input.php	/^  use NS as SomeAliasedNS;$/;"	a	typeref:unknown:NS
+cls	input.php	/^  $cls = new Cls2;$/;"	v
+cls	input.php	/^  $cls = new Cls;$/;"	v
+foo	input.php	/^    private $foo = FOO;$/;"	v	class:\\NS2\\Cls
+hello	input.php	/^    public function hello() {$/;"	f	class:\\NS2\\Cls
+hello	input.php	/^    public function hello() {$/;"	f	class:\\NS\\Cls
+hello	input.php	/^    public function hello();$/;"	f	interface:\\NS\\Iface
+test	input.php	/^  function test() {$/;"	f	namespace:\\NS
+test	input.php	/^  use function NS\\test;$/;"	a	typeref:function:NS\\test
