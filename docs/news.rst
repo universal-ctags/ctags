@@ -735,7 +735,7 @@ Make tags(*foo.tags*) with following command line
 
 for following input (*foo.py*)
 
-.. code-block:: Python
+.. code-block:: python
 
     class Foo:
 	def aq ():
