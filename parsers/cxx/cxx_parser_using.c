@@ -24,7 +24,7 @@ boolean cxxParserParseUsingClause(void)
 	CXX_DEBUG_ENTER();
 
 	// using-directives for namespaces and using-declarations
-	// for namespace members 
+	// for namespace members
 	// using-declarations for class members
 	// type alias and alias template declaration (since C++11)
 

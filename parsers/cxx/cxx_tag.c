@@ -167,7 +167,7 @@ CXXToken * cxxTagSetTypeField(
 
 	tag->extensionFields.typeRef[0] = szTypeRef0;
 	tag->extensionFields.typeRef[1] = vStringValue(pTypeName->pszWord);
-	
+
 	return pTypeName;
 }
 

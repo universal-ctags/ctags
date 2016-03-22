@@ -24,7 +24,7 @@
 // Returns TRUE if at least one variable was extracted.
 // Returns FALSE if a variable declaration could not be identified.
 //
-// Recognized variable declarations are of the following kinds: 
+// Recognized variable declarations are of the following kinds:
 //
 //   type var;
 //   type var1,var2;
@@ -45,7 +45,7 @@
 // Notes:
 // - Be aware that if this function returns TRUE then the pChain very likely has been modified
 //   (partially destroyed) as part of the type extraction algorithm.
-//   If the function returns FALSE the chain has not been modified (and 
+//   If the function returns FALSE the chain has not been modified (and
 //   to extract something else from it).
 //
 // - This function is quite tricky.
@@ -303,7 +303,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 			case CXXTokenTypeSquareParenthesisChain:
 				// check for array
 				// Keep the array specifier as part of type
-				
+
 				pIdentifier = t->pPrev;
 				pTokenBefore = pIdentifier->pPrev;
 
@@ -472,7 +472,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 						pPartEnd->pPrev,
 						"And there should be a previous token too"
 					);
-				
+
 				CXXToken * pScopeId = cxxTokenChainExtractRange(pScopeStart,pPartEnd->pPrev,0);
 				cxxScopePush(
 						pScopeId,
@@ -486,7 +486,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 				cxxTokenChainDestroyRange(pChain,pScopeStart,pPartEnd);
 
 				pScopeStart = pAux;
-				
+
 				iScopesPushed++;
 			}
 		}
@@ -516,7 +516,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 			while(pPartOfType && cxxTokenTypeIs(pPartOfType,CXXTokenTypeSquareParenthesisChain))
 			{
 				CXXTokenChain * pAuxChain = pPartOfType->pChain;
-			
+
 				if(pAuxChain->iCount > 2)
 				{
 					if(
@@ -595,7 +595,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 
 		// Comma. Might have other declarations here.
 		CXX_DEBUG_PRINT("At a comma, might have other declarations here");
-		
+
 		t = t->pNext;
 
 		CXX_DEBUG_ASSERT(t,"There should be something after the comma here!");
