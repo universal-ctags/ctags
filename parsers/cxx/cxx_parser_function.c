@@ -175,7 +175,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 			// wouln't have a following variable declaration)
 			return 0;
 		}
-		
+
 		x = x->pNext;
 		CXX_DEBUG_ASSERT(x,"We should have found at least the closing parenthesis");
 		if(cxxTokenTypeIs(x,CXXTokenTypeClosingParenthesis))
@@ -379,14 +379,14 @@ boolean cxxParserTokenChainLooksLikeFunctionCallParameterSet(
 				// (double)
 				return FALSE;
 			}
-			
+
 			if(cxxKeywordMayBePartOfTypeName(t->eKeyword))
 			{
 				// parts of type name (not inside a parenthesis
 				// which is assumed to be condensed)
 				return FALSE;
 			}
-			
+
 		} else if(cxxTokenTypeIs(t,CXXTokenTypeIdentifier))
 		{
 			if(cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeKeyword | CXXTokenTypeIdentifier))
@@ -409,11 +409,11 @@ boolean cxxParserTokenChainLooksLikeFunctionCallParameterSet(
 				// >,
 				return FALSE;
 			}
-			
+
 			if(cxxTokenTypeIsOneOf(t->pPrev,CXXTokenTypeKeyword))
 			{
 				// int>
-				// 
+				//
 				return FALSE;
 			}
 		} else if(
@@ -432,7 +432,7 @@ boolean cxxParserTokenChainLooksLikeFunctionCallParameterSet(
 			//   someType (*p)(int)
 			return FALSE;
 		}
-		
+
 		if(cxxTokenTypeIs(t,CXXTokenTypeAssignment))
 		{
 			// after an assignment prototypes and constructor
@@ -1081,19 +1081,19 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 			// However the declaration might start or end with the identifier
 			// and in that case we would be effectively breaking the type chain.
 			// Work around it.
-			
+
 			CXXToken * pTypeStart = pInfo->aDeclarationStarts[i];
 			CXXToken * pTypeEnd = pInfo->aDeclarationEnds[i];
-			
+
 			if(pTypeStart != pTypeEnd)
 			{
 				if(pTypeStart == pInfo->aIdentifiers[i])
 					pTypeStart = pTypeStart->pNext;
 				else if(pTypeEnd == pInfo->aIdentifiers[i])
 					pTypeEnd = pTypeEnd->pPrev;
-	
+
 				cxxTokenChainTakeRecursive(pInfo->pChain,pInfo->aIdentifiers[i]);
-	
+
 				pTypeName = cxxTagSetTypeField(
 						tag,
 						pTypeStart,
@@ -1264,7 +1264,7 @@ try_again:
 
 			goto try_again;
 		}
-		
+
 		if(cxxTokenTypeIs(t,CXXTokenTypeGreaterThanSign))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Unbalanced > (a < should have been found before)");

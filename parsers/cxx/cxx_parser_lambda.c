@@ -92,14 +92,14 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 
 	if(
 		pAfterParenthesis &&
-		cxxTokenTypeIs(pAfterParenthesis,CXXTokenTypeKeyword) && 
+		cxxTokenTypeIs(pAfterParenthesis,CXXTokenTypeKeyword) &&
 		(pAfterParenthesis->eKeyword == CXXKeywordCONST)
 	)
 		pAfterParenthesis = pAfterParenthesis->pNext;
 
 	CXXToken * pTypeStart = NULL;
 	CXXToken * pTypeEnd;
-	
+
 	if(
 			pAfterParenthesis &&
 			cxxTokenTypeIs(pAfterParenthesis,CXXTokenTypePointerOperator) &&
@@ -138,7 +138,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 			pTypeName = NULL;
 
 		cxxTagCommit();
-		
+
 		if(pTypeName)
 			cxxTokenDestroy(pTypeName);
 	}

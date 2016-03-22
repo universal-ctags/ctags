@@ -156,7 +156,7 @@ void cxxBuildKeywordHash(const langType language,boolean bCXX)
 {
 	const size_t count = sizeof(g_aCXXKeywordTable) /
 			sizeof(CXXKeywordDescriptor);
-			
+
 	size_t i;
 
 	if(bCXX)
