@@ -1,8 +1,8 @@
 A	input.php	/^class A {$/;"	c
 B	input.php	/^class B {$/;"	c
-__construct	input.php	/^	public function __construct($p) {$/;"	f	class:\\B
-__construct	input.php	/^	public function __construct() {$/;"	f	class:\\A
-stuff	input.php	/^	protected function stuff($arg1, $arg2) {$/;"	f	trait:\\tBar
-stuff	input.php	/^	public function stuff() {$/;"	f	trait:\\tFoo
+__construct	input.php	/^	public function __construct($p) {$/;"	f	class:B
+__construct	input.php	/^	public function __construct() {$/;"	f	class:A
+stuff	input.php	/^	protected function stuff($arg1, $arg2) {$/;"	f	trait:tBar
+stuff	input.php	/^	public function stuff() {$/;"	f	trait:tFoo
 tBar	input.php	/^trait tBar {$/;"	t
 tFoo	input.php	/^trait tFoo {$/;"	t

@@ -69,7 +69,10 @@ const char *scopeSeparatorFor (const kindOption *kind, char parentLetter)
 
 	while (table - kind->separators < kind->separatorCount)
 	{
-		if (table->parentLetter == KIND_WILDCARD
+		/* KIND_WILDCARD cannot be used as a key for finding
+		   a root separator.*/
+		if ( (table->parentLetter == KIND_WILDCARD
+		       && parentLetter != KIND_NULL)
 		    || table->parentLetter == parentLetter)
 			return table->separator;
 		table++;
