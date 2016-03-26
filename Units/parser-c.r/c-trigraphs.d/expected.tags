@@ -6,9 +6,9 @@ F	input.c	/^??=define F /;"	d	file:
 M3_INIT	input.c	/^??=define M3_INIT(/;"	d	file:
 STRINGIFY	input.c	/^??=define STRINGIFY(/;"	d	file:
 STRINGIFY_INTERN	input.c	/^??=define STRINGIFY_INTERN(/;"	d	file:
-buf	input.c	/^  char *buf;$/;"	m	struct:str	file:
-len	input.c	/^  unsigned int len, size;$/;"	m	struct:str	file:
-main	input.c	/^int main(void)$/;"	f
+buf	input.c	/^  char *buf;$/;"	m	struct:str	typeref:typename:char *	file:
+len	input.c	/^  unsigned int len, size;$/;"	m	struct:str	typeref:typename:unsigned int	file:
+main	input.c	/^int main(void)$/;"	f	typeref:typename:int
 matrix3	input.c	/^typedef int matrix3??(3??);$/;"	t	typeref:typename:int[3]	file:
-size	input.c	/^  unsigned int len, size;$/;"	m	struct:str	file:
+size	input.c	/^  unsigned int len, size;$/;"	m	struct:str	typeref:typename:unsigned int	file:
 str	input.c	/^struct str ??<$/;"	s	file:

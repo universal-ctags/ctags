@@ -12,7 +12,7 @@
 #include "general.h"
 #include "parse.h"
 
-// WARNING: There is a table in cxx_keyword.c that must match the order in this enumeration
+// WARNING: There is a table in cxx_keyword.c that must match order in this enum
 enum CXXKeyword
 {
 	CXXKeyword__ATTRIBUTE__, // GCC
@@ -54,7 +54,7 @@ enum CXXKeyword
 	CXXKeywordEXPORT,
 	CXXKeywordEXTERN,
 	CXXKeywordFALSE,
-	CXXKeywordFINAL, // not really a keyword, but has meanings in some specific contexts
+	CXXKeywordFINAL, // not really a keyword, has meanings in some specific contexts
 	CXXKeywordFLOAT,
 	CXXKeywordFOR,
 	CXXKeywordFRIEND,
@@ -73,7 +73,7 @@ enum CXXKeyword
 	CXXKeywordOPERATOR,
 	//CXXKeywordOR,
 	//CXXKeywordOR_EQ,
-	//CXXKeywordOVERRIDE, // not really a keyword, but has meanings in some specific contexts
+	//CXXKeywordOVERRIDE, // not really a keyword, has meanings in some specific contexts
 	CXXKeywordPRIVATE,
 	CXXKeywordPROTECTED,
 	CXXKeywordPUBLIC,
@@ -108,8 +108,14 @@ enum CXXKeyword
 	CXXKeywordWHILE,
 	//CXXKeywordXOR,
 	//CXXKeywordXOR_EQ,
-	// WARNING: There is a table in cxx_keyword.c that must match the order in this enumeration
+	// WARNING: There is a table in cxx_keyword.c that must match order in this enumeration
 };
+
+boolean cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId);
+boolean cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId);
+boolean cxxKeywordExcludeFromTypeNames(enum CXXKeyword eKeywordId);
+
+const char * cxxKeywordName(enum CXXKeyword eKeywordId);
 
 void cxxBuildKeywordHash(const langType language,boolean bCXX);
 

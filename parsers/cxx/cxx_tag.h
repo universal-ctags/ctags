@@ -50,6 +50,16 @@ boolean cxxTagKindEnabled(enum CXXTagKind eKindId);
 // The pToken ownership is NOT transferred.
 tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken);
 
+// Set the type of the current tag from the specified token sequence
+// (which must belong to the same chain!).
+// Returns a token that must be destroyed after cxxTagCommit() has
+// been called.
+CXXToken * cxxTagSetTypeField(
+		tagEntryInfo * tag,
+		CXXToken * pTypeStart,
+		CXXToken * pTypeEnd
+	);
+
 // Commit the composed tag. Must follow a succesfull cxxTagBegin() call.
 void cxxTagCommit(void);
 

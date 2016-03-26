@@ -73,7 +73,11 @@ boolean cxxParserParseNamespace(void)
 					tag->isFileScope = !isInputHeaderFile();
 					cxxTagCommit();
 				}
-				cxxScopePush(cxxTokenChainTakeLast(g_cxx.pTokenChain),CXXTagKindNAMESPACE,CXXScopeAccessUnknown);
+				cxxScopePush(
+						cxxTokenChainTakeLast(g_cxx.pTokenChain),
+						CXXTagKindNAMESPACE,
+						CXXScopeAccessUnknown
+					);
 				iScopeCount++;
 			break;
 			case CXXTokenTypeMultipleColons:

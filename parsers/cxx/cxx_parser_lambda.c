@@ -27,11 +27,12 @@
 //
 // This has to be called when pointing at an opening bracket in function scope.
 // Returns NULL if it does not look to be a lambda invocation.
-// Returns the lambda parameter parenthesis chain token if it DOES look like a lambda invocation.
+// Returns the lambda parameter parenthesis chain token if it DOES look like a
+// lambda invocation.
 //
 CXXToken * cxxParserOpeningBracketIsLambda(void)
 {
-	// [ capture-list ] ( params ) mutable(optional) exception attribute -> ret { body }	(1)
+	// [ capture-list ] ( params ) mutable(opt) exception attr -> ret {} (1)
 	// [ capture-list ] ( params ) -> ret { body }	(2)
 	// [ capture-list ] ( params ) { body }	(3)
 	// [ capture-list ] { body }	(4)
@@ -87,11 +88,59 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 
 	tagEntryInfo * tag = cxxTagBegin(CXXTagKindFUNCTION,pIdentifier);
 
+	CXXToken * pAfterParenthesis = pParenthesis ? pParenthesis->pNext : NULL;
+
+	if(
+		pAfterParenthesis &&
+		cxxTokenTypeIs(pAfterParenthesis,CXXTokenTypeKeyword) &&
+		(pAfterParenthesis->eKeyword == CXXKeywordCONST)
+	)
+		pAfterParenthesis = pAfterParenthesis->pNext;
+
+	CXXToken * pTypeStart = NULL;
+	CXXToken * pTypeEnd;
+
+	if(
+			pAfterParenthesis &&
+			cxxTokenTypeIs(pAfterParenthesis,CXXTokenTypePointerOperator) &&
+			pAfterParenthesis->pNext &&
+			!cxxTokenTypeIs(pAfterParenthesis->pNext,CXXTokenTypeOpeningBracket)
+		)
+	{
+		pTypeStart = pAfterParenthesis->pNext;
+		pTypeEnd = pTypeStart;
+		while(
+				pTypeEnd->pNext &&
+				(!cxxTokenTypeIs(pTypeEnd->pNext,CXXTokenTypeOpeningBracket))
+			)
+			pTypeEnd = pTypeEnd->pNext;
+
+		while(
+				(pTypeStart != pTypeEnd) &&
+				cxxTokenTypeIs(pTypeStart,CXXTokenTypeKeyword) &&
+				cxxKeywordExcludeFromTypeNames(pTypeStart->eKeyword)
+			)
+			pTypeStart = pTypeStart->pNext;
+	}
+
 	if(tag)
 	{
 		tag->isFileScope = TRUE;
 
+		// FIXME: Signature!
+		// FIXME: Captures?
+
+		CXXToken * pTypeName;
+
+		if(pTypeStart)
+			pTypeName = cxxTagSetTypeField(tag,pTypeStart,pTypeEnd);
+		else
+			pTypeName = NULL;
+
 		cxxTagCommit();
+
+		if(pTypeName)
+			cxxTokenDestroy(pTypeName);
 	}
 
 	cxxScopePush(
@@ -102,9 +151,14 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 
 	if(pParenthesis && cxxTagKindEnabled(CXXTagKindPARAMETER))
 	{
-		CXX_DEBUG_ASSERT(pParenthesis->eType == CXXTokenTypeParenthesisChain,"The parameter must be really a parenthesis chain");
+		CXX_DEBUG_ASSERT(
+				pParenthesis->eType == CXXTokenTypeParenthesisChain,
+				"The parameter must be really a parenthesis chain"
+			);
 		CXXFunctionParameterInfo oParamInfo;
-		if(cxxParserTokenChainLooksLikeFunctionParameterList(pParenthesis->pChain,&oParamInfo))
+		if(cxxParserTokenChainLooksLikeFunctionParameterList(
+				pParenthesis->pChain,&oParamInfo
+			))
 			cxxParserEmitFunctionParameterTags(&oParamInfo);
 	}
 

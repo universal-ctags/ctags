@@ -18,80 +18,37 @@
 #include "vstring.h"
 #include "read.h"
 
+
 //
-// Try to tell if the specified token chain is valid as a parameter list for a constructor.
-// It's used to check if something like type name(args) belongs to a variable declaration.
+// Attempt to extract variable declarations from the chain.
+// Returns TRUE if at least one variable was extracted.
+// Returns FALSE if a variable declaration could not be identified.
 //
-// This is more of a guess for now: tries to exclude trivial cases.
+// Recognized variable declarations are of the following kinds:
 //
-static boolean cxxParserTokenChainLooksLikeConstructorParameterSet(CXXTokenChain * pChain)
-{
-	// We assume that the chain has a starting parenthesis and an ending parenthesis.
-
-	if(pChain->iCount < 3)
-		return FALSE; // type var() is NOT valid C++
-
-	CXXToken * t = pChain->pHead;
-	CXXToken * pLast = pChain->pTail;
-
-	CXX_DEBUG_ASSERT(cxxTokenTypeIs(t,CXXTokenTypeOpeningParenthesis),"The token chain should start with an opening parenthesis");
-	CXX_DEBUG_ASSERT(cxxTokenTypeIs(pLast,CXXTokenTypeOpeningParenthesis),"The token chain should end with an opening parenthesis");
-
-	t = t->pNext;
-
-	while(t != pLast)
-	{
-		if(cxxTokenTypeIsOneOf(t,
-				CXXTokenTypeNumber | CXXTokenTypeStringConstant | CXXTokenTypeCharacterConstant |
-				CXXTokenTypePointerOperator | CXXTokenTypeDotOperator | CXXTokenTypeOperator
-			))
-			return TRUE; // not allowed in a function prototype at this point
-
-		if(cxxTokenTypeIs(t,CXXTokenTypeKeyword))
-		{
-			if(cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeKeyword | CXXTokenTypeStar | CXXTokenTypeAnd | CXXTokenTypeMultipleAnds | CXXTokenTypeIdentifier))
-			{
-				// this is something like:
-				// (int a...
-				// (void *...
-				// (unsigned int...
-				return FALSE;
-			}
-		} else if(cxxTokenTypeIs(t,CXXTokenTypeIdentifier))
-		{
-			if(cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeKeyword | CXXTokenTypeIdentifier))
-			{
-				// this is something like:
-				// (int a...
-				// (void *...
-				// (unsigned int...
-				return FALSE;
-			}
-		}
-
-		if(cxxTokenTypeIs(t,CXXTokenTypeAssignment))
-		{
-			// after an assignment prototypes and constructor declarations may look the same, skip to next comma or end
-			t = cxxTokenChainNextTokenOfType(t,CXXTokenTypeClosingParenthesis | CXXTokenTypeComma);
-			CXX_DEBUG_ASSERT(t,"We should have found the closing parenthesis here!");
-			if(cxxTokenTypeIs(t,CXXTokenTypeComma))
-				t = t->pNext;
-		} else {
-			t = t->pNext;
-		}
-	}
-
-	// We must assume that it might be...
-	return TRUE;
-}
-
-
+//   type var;
+//   type var1,var2;
+//   type var[];
+//   type var(constructor args);
+//   type var{list initializer};
+//   type var = ...;
+//   type (*ident)();
+//   type var:bits;
+//   type var: range declaration <-- (FIXME: this is only inside for!)
+//   very complex type with modifiers() namespace::namespace::var = ...;
+//   type<with template> namespace::var[] = {
+//   ...
 //
 // Assumptions:
-//  - this function assumes that a function definition or prototype has been already excluded by other means.
-//  - there is a terminator at the end: one of ; = {
+//  - there is a terminator at the end: either ; or {
 //
-// Returns true if at least one variable was extracted.
+// Notes:
+// - Be aware that if this function returns TRUE then the pChain very likely has been modified
+//   (partially destroyed) as part of the type extraction algorithm.
+//   If the function returns FALSE the chain has not been modified (and
+//   to extract something else from it).
+//
+// - This function is quite tricky.
 //
 boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uFlags)
 {
@@ -105,31 +62,23 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 
 #ifdef CXX_DO_DEBUGGING
 	vString * pJoinedChain = cxxTokenChainJoin(pChain,NULL,0);
-	CXX_DEBUG_PRINT("Looking for variable declarations in '%s'",vStringValue(pJoinedChain));
+	CXX_DEBUG_PRINT(
+			"Looking for variable declarations in '%s'",
+			vStringValue(pJoinedChain)
+		);
 	vStringDelete(pJoinedChain);
 #endif
 
 	//
-	// Examples of possible matches:
-	//   type var;
-	//   type var1,var2;
-	//   type var[];
-	//   type var(constructor args);
-	//   type var = ...;
-	//   type (*ident)();
-	//   type var:bits;
-	//   type var: range declaration <-- (FIXME: this is only inside for!)
-	//   very complex type with modifiers() namespace::namespace::var = ...;
-	//   type<with template> namespace::var[] = {
-	//   ...
-	//
 	// Strategy:
 	//   - verify that the chain starts with an identifier or keyword (always present)
-	//   - run to one of : ; [] () = ,
+	//   - run to one of : ; [] () {} = ,
 	//   - ensure that the previous token is an identifier (except for special cases)
 	//   - go back to skip the eventual scope
 	//   - ensure that there is a leading type
-	//   - if we are at : [] or () then run to the next ; = or ,
+	//   - if we are at : [], () or {} then run to the next ; = or ,
+	//   - once we have determined that a variable declaration is there
+	//     modify the chain to contain only the type name
 	//   - emit variable tag
 	//   - if we are at , then check if there are more declarations
 	//
@@ -159,55 +108,65 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 		return FALSE;
 	}
 
-	CXXToken * pTypeEnd = NULL;
-
 	boolean bGotVariable = FALSE;
+
+	// Loop over the whole statement.
 
 	while(t)
 	{
+		// Scan up to a notable token: ()[]{}=,;:{
+
 		while(t)
 		{
+			if(cxxTokenTypeIsOneOf(
+						t,
+						CXXTokenTypeSingleColon | CXXTokenTypeParenthesisChain |
+							CXXTokenTypeSquareParenthesisChain | CXXTokenTypeBracketChain |
+							CXXTokenTypeAssignment | CXXTokenTypeComma |
+							CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket
+					))
+			{
+				// Notable token reached.
+				break;
+			}
+
 			if(
 				cxxTokenTypeIsOneOf(
 						t,
-						CXXTokenTypeSingleColon | CXXTokenTypeParenthesisChain | CXXTokenTypeSquareParenthesisChain |
-						CXXTokenTypeAssignment | CXXTokenTypeComma | CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket
+						CXXTokenTypeOperator | CXXTokenTypeMultipleAnds |
+							CXXTokenTypePointerOperator | CXXTokenTypeStringConstant |
+							CXXTokenTypeAngleBracketChain | CXXTokenTypeCharacterConstant |
+							CXXTokenTypeMultipleDots | CXXTokenTypeClosingBracket |
+							CXXTokenTypeClosingParenthesis | CXXTokenTypeClosingSquareParenthesis |
+							CXXTokenTypeGreaterThanSign
 					)
 				)
 			{
-				// possibly a variable ?
-				break;
+				// Something that should not appear in a variable declaration
+				CXX_DEBUG_LEAVE_TEXT(
+						"Found token '%s' of type 0x%02x that should " \
+							"not appear in the initial part of a variable declaration",
+						vStringValue(t->pszWord),
+						t->eType
+					);
+				return bGotVariable;
 			}
 
 			if(t->eType == CXXTokenTypeSmallerThanSign)
 			{
+				// Must be part of template type name (so properly balanced).
 				t = cxxTokenChainSkipToEndOfTemplateAngleBracket(t);
 				if(!t)
 				{
 					CXX_DEBUG_LEAVE_TEXT("Failed to skip past angle bracket chain");
 					return bGotVariable;
 				}
-				goto next_token;
 			}
 
-			if(
-				cxxTokenTypeIsOneOf(
-						t,
-						CXXTokenTypeOperator | CXXTokenTypeMultipleAnds | CXXTokenTypePointerOperator |
-						CXXTokenTypeBracketChain | CXXTokenTypeStringConstant | CXXTokenTypeAngleBracketChain |
-						CXXTokenTypeCharacterConstant | CXXTokenTypeMultipleDots |
-						CXXTokenTypeClosingBracket | CXXTokenTypeClosingParenthesis |
-						CXXTokenTypeClosingSquareParenthesis | CXXTokenTypeSmallerThanSign
-					)
-				)
-			{
-				// Nope.
-				CXX_DEBUG_LEAVE_TEXT("Found token '%s' of type 0x%02x that should not appear in the initial part of a variable declaration",vStringValue(t->pszWord),t->eType);
-				return bGotVariable;
-			}
-next_token:
 			t = t->pNext;
 		}
+
+		// Notable token reached?
 
 		if(!t)
 		{
@@ -215,10 +174,14 @@ next_token:
 			return bGotVariable;
 		}
 
-		CXX_DEBUG_PRINT("Found notable token '%s' of type 0x%02x",vStringValue(t->pszWord),t->eType);
+		CXX_DEBUG_PRINT(
+				"Found notable token '%s' of type 0x%02x",
+				vStringValue(t->pszWord),
+				t->eType
+			);
 
-		// Now before the notable token there MUST be an identifier (eventually hidden in a parenthesis chain)
-		// and also a typename.
+		// Now before the notable token there MUST be an identifier
+		// (eventually hidden in a parenthesis chain) and also a typename.
 		if(!t->pPrev)
 		{
 			CXX_DEBUG_LEAVE_TEXT("Nothing interesting before notable token");
@@ -228,46 +191,152 @@ next_token:
 		CXXToken * pIdentifier = NULL;
 		CXXToken * pTokenBefore = NULL;
 
-		if(cxxTokenTypeIs(t,CXXTokenTypeParenthesisChain))
+		// If we have to continue scanning we'll remove the tokens from here
+		// so they don't end up being part of the type name.
+		// If this is set to NULL then it means that we cannot determine properly
+		// what to remove and we should stop scanning after the current variable.
+		CXXToken * pRemoveStart = t;
+
+		switch(t->eType)
 		{
-			// check for function pointer special case
-			if(
-					t->pNext &&
-					cxxTokenTypeIs(t->pNext,CXXTokenTypeParenthesisChain) &&
-					(cxxParserTokenChainLooksLikeFunctionParameterList(t->pNext->pChain,NULL)) &&
-					(pIdentifier = cxxTokenChainLastPossiblyNestedTokenOfType(t->pChain,CXXTokenTypeIdentifier))
-				)
+			case CXXTokenTypeParenthesisChain:
 			{
-				// ok, function pointer
-				pTokenBefore = t->pPrev;
-				t = t->pNext;
-			} else if(
-					cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier) &&
-					(
-						(eScopeKind == CXXTagKindNAMESPACE) ||
-						(eScopeKind == CXXTagKindFUNCTION)
-					) &&
-					cxxParserCurrentLanguageIsCPP() &&
-					cxxParserTokenChainLooksLikeConstructorParameterSet(t->pChain)
-				)
-			{
-				// ok, *might* be variable instantiation
-				// (note that this function assumes that a function declaration of prototype was already excluded by other means)
+				// At a parenthesis chain we need some additional checks.
+				if(
+						t->pNext &&
+						cxxTokenTypeIs(t->pNext,CXXTokenTypeParenthesisChain) &&
+						cxxParserTokenChainLooksLikeFunctionParameterList(
+								t->pNext->pChain,
+								NULL
+							) &&
+						(pIdentifier = cxxTokenChainLastPossiblyNestedTokenOfType(
+								t->pChain,
+								CXXTokenTypeIdentifier
+							))
+					)
+				{
+					// A function pointer.
+					// There are two parentheses, skip the second too.
+					pTokenBefore = t->pPrev;
+					t = t->pNext->pNext;
+					pRemoveStart = t;
+				} else if(
+						(t->pChain->iCount == 3) &&
+						cxxTokenTypeIs(
+								cxxTokenChainAt(t->pChain,1),
+								CXXTokenTypeParenthesisChain
+							) &&
+						t->pPrev &&
+						cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier) &&
+						t->pPrev->pPrev &&
+						cxxTokenTypeIs(t->pPrev->pPrev,CXXTokenTypeIdentifier)
+					)
+				{
+					CXX_DEBUG_LEAVE_TEXT("Parenthesis seems to define an __ARGS style prototype");
+					return bGotVariable;
+				} else if(
+						cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier) &&
+						(
+							(eScopeKind == CXXTagKindNAMESPACE) ||
+							(eScopeKind == CXXTagKindFUNCTION)
+						) &&
+						cxxParserCurrentLanguageIsCPP() &&
+						cxxParserTokenChainLooksLikeConstructorParameterSet(t->pChain)
+					)
+				{
+					// ok, *might* be variable instantiation
+					pIdentifier = t->pPrev;
+					pTokenBefore = pIdentifier->pPrev;
+				} else {
+					CXX_DEBUG_LEAVE_TEXT("No recognizable parenthesis form for a variable");
+					return bGotVariable;
+				}
+			}
+			break;
+			case CXXTokenTypeBracketChain:
+				if(
+						cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier) &&
+						cxxParserCurrentLanguageIsCPP() &&
+						cxxParserTokenChainLooksLikeConstructorParameterSet(t->pChain)
+					)
+				{
+					// ok, *might* be new C++ style variable initialization
+					pIdentifier = t->pPrev;
+					pTokenBefore = pIdentifier->pPrev;
+				} else {
+					CXX_DEBUG_LEAVE_TEXT("Bracket chain that doesn't look like a C++ var init");
+					return bGotVariable;
+				}
+			break;
+			case CXXTokenTypeSingleColon:
+				// check for bitfield
+				if(
+						t->pNext &&
+						cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeNumber | CXXTokenTypeIdentifier)
+					)
+				{
+					// ok, looks like a bit field
+					if(
+							cxxTokenTypeIs(t->pNext,CXXTokenTypeNumber) &&
+							t->pNext->pNext &&
+							cxxTokenTypeIsOneOf(
+									t->pNext->pNext,
+									CXXTokenTypeComma | CXXTokenTypeSemicolon |
+									CXXTokenTypeAssignment
+								)
+						)
+					{
+						// keep bitfield width specification as part of type
+						pIdentifier = t->pPrev;
+						pTokenBefore = pIdentifier->pPrev;
+						t = t->pNext->pNext;
+					} else {
+						// Too complex: strip width specification (the best we can do)
+						pIdentifier = t->pPrev;
+						pTokenBefore = pIdentifier->pPrev;
+					}
+				} else {
+					CXX_DEBUG_LEAVE_TEXT("Single colon that doesn't look like a bit field");
+					return bGotVariable;
+				}
+			break;
+			case CXXTokenTypeSquareParenthesisChain:
+				// check for array
+				// Keep the array specifier as part of type
+
 				pIdentifier = t->pPrev;
 				pTokenBefore = pIdentifier->pPrev;
-			} else {
-				CXX_DEBUG_LEAVE_TEXT("No recognizable parenthesis form for a variable");
-				return bGotVariable;
-			}
-		} else {
-			if(t->pPrev->eType != CXXTokenTypeIdentifier)
-			{
-				CXX_DEBUG_LEAVE_TEXT("No identifier before the n otable token");
-				return bGotVariable;
-			}
 
-			pIdentifier = t->pPrev;
-			pTokenBefore = pIdentifier->pPrev;
+				while(t->pNext && cxxTokenTypeIs(t->pNext,CXXTokenTypeSquareParenthesisChain))
+					t = t->pNext;
+
+				if(
+						(!t->pNext) ||
+						(!cxxTokenTypeIsOneOf(
+								t->pNext,
+								CXXTokenTypeComma | CXXTokenTypeSemicolon |
+								CXXTokenTypeAssignment
+							))
+					)
+				{
+					CXX_DEBUG_LEAVE_TEXT("No comma, semicolon or assignment after array specifier");
+					return bGotVariable;
+				}
+
+				t = t->pNext;
+				pRemoveStart = t;
+			break;
+			default:
+				// Must be identifier
+				if(t->pPrev->eType != CXXTokenTypeIdentifier)
+				{
+					CXX_DEBUG_LEAVE_TEXT("No identifier before the notable token");
+					return bGotVariable;
+				}
+
+				pIdentifier = t->pPrev;
+				pTokenBefore = pIdentifier->pPrev;
+			break;
 		}
 
 		CXX_DEBUG_ASSERT(pIdentifier,"We should have found an identifier here");
@@ -281,19 +350,40 @@ next_token:
 		CXXToken * pScopeEnd = pTokenBefore->pNext;
 		CXXToken * pScopeStart = NULL;
 
-		// Skip back to any namespace
+		// Skip back to the beginning of the scope, if any
 		while(pTokenBefore->eType == CXXTokenTypeMultipleColons)
 		{
 			pTokenBefore = pTokenBefore->pPrev;
 			if(!pTokenBefore)
 			{
-				CXX_DEBUG_LEAVE_TEXT("Identifier preceeded by multiple colons but not preceeded by a type");
+				CXX_DEBUG_LEAVE_TEXT(
+						"Identifier preceeded by multiple colons " \
+							"but not preceeded by a type"
+					);
 				return bGotVariable;
+			}
+
+			if(cxxTokenTypeIs(pTokenBefore,CXXTokenTypeGreaterThanSign))
+			{
+				CXXToken * pAux = cxxTokenChainSkipBackToStartOfTemplateAngleBracket(pTokenBefore);
+				if((!pAux) || (!pAux->pPrev))
+				{
+					CXX_DEBUG_LEAVE_TEXT(
+							"Identifier preceeded by multiple colons " \
+								"and by a >, but failed to skip back to starting <"
+						);
+					return bGotVariable;
+				}
+
+				pTokenBefore = pAux->pPrev;
 			}
 
 			if(!cxxTokenTypeIs(pTokenBefore,CXXTokenTypeIdentifier))
 			{
-				CXX_DEBUG_LEAVE_TEXT("Identifier preceeded by multiple colons with probable syntax error");
+				CXX_DEBUG_LEAVE_TEXT(
+						"Identifier preceeded by multiple colons " \
+							"with probable syntax error"
+					);
 				return bGotVariable;
 			}
 
@@ -302,114 +392,171 @@ next_token:
 			pTokenBefore = pTokenBefore->pPrev;
 			if(!pTokenBefore)
 			{
-				CXX_DEBUG_LEAVE_TEXT("Identifier preceeded by multiple colons but not preceeded by a type");
+				CXX_DEBUG_LEAVE_TEXT(
+						"Identifier preceeded by multiple colons " \
+							"but not preceeded by a type"
+					);
 				return bGotVariable;
 			}
 		}
 
-		if(!pTypeEnd)
+		if(!bGotVariable)
 		{
-			// now pTokenBefore should be part of the type
-			if(!cxxTokenTypeIsOneOf(pTokenBefore,CXXTokenTypeIdentifier | CXXTokenTypeKeyword | CXXTokenTypeStar | CXXTokenTypeAnd))
+			// now pTokenBefore should be part of a type (either the variable type or return
+			// type of a function in case of a function pointer)
+			if(!cxxTokenTypeIsOneOf(
+					pTokenBefore,
+					CXXTokenTypeIdentifier | CXXTokenTypeKeyword |
+						CXXTokenTypeStar | CXXTokenTypeAnd
+				))
 			{
 				if(cxxTokenTypeIs(pTokenBefore,CXXTokenTypeGreaterThanSign))
 				{
 					// the < > must be balanced
-					CXXToken * t = pTokenBefore->pPrev;
+					CXXToken * t2 = pTokenBefore->pPrev;
 					int iLevel = 1;
-					while(t)
+					while(t2)
 					{
-						if(cxxTokenTypeIs(t,CXXTokenTypeGreaterThanSign))
+						if(cxxTokenTypeIs(t2,CXXTokenTypeGreaterThanSign))
 							iLevel++;
-						else if(cxxTokenTypeIs(t,CXXTokenTypeSmallerThanSign))
+						else if(cxxTokenTypeIs(t2,CXXTokenTypeSmallerThanSign))
 							iLevel--;
-						t = t->pPrev;
+						t2 = t2->pPrev;
 					}
 					if(iLevel != 0)
 					{
-						CXX_DEBUG_LEAVE_TEXT("The > token is unbalanced and does not seem to be part of type name");
+						CXX_DEBUG_LEAVE_TEXT(
+								"The > token is unbalanced and does not " \
+									"seem to be part of type name"
+							);
 						return bGotVariable;
 					}
 				} else {
-					CXX_DEBUG_LEAVE_TEXT("Token '%s' of type 0x%02x does not seem to be part of type name",vStringValue(pTokenBefore->pszWord),pTokenBefore->eType);
+					CXX_DEBUG_LEAVE_TEXT(
+							"Token '%s' of type 0x%02x does not seem " \
+								"to be part of type name",
+							vStringValue(pTokenBefore->pszWord),
+							pTokenBefore->eType
+						);
 					return bGotVariable;
 				}
 			}
 
-			CXX_DEBUG_PRINT("Type name seems to end at '%s' of type 0x%02x",vStringValue(pTokenBefore->pszWord),pTokenBefore->eType);
-			pTypeEnd = pTokenBefore;
+			bGotVariable = TRUE;
 		}
 
 		// Goodie. We have an identifier and almost certainly a type here.
+
+		// From now on we start destroying the chain: mark the return value as true
+		// so nobody else will try to extract stuff from it
 
 		int iScopesPushed = 0;
 
 		if(pScopeStart)
 		{
+			// Push the scopes and remove them from the chain so they are not in the way
 			while(pScopeStart != pScopeEnd)
 			{
-				CXXToken * pScopeId = pScopeStart;
-				pScopeStart = cxxTokenChainNextTokenOfType(pScopeStart,CXXTokenTypeMultipleColons);
-				CXX_DEBUG_ASSERT(pScopeStart,"We should have found multiple colons here!");
-				pScopeStart = pScopeStart->pNext;
+				// This is the scope id START. It might contain
+				// also other tokens like in ...::A<B>::...
 
-				cxxTokenChainTake(pChain,pScopeId);
+				CXXToken * pPartEnd = cxxTokenChainNextTokenOfType(
+						pScopeStart,
+						CXXTokenTypeMultipleColons
+					);
+				CXX_DEBUG_ASSERT(
+						pPartEnd,
+						"We should have found multiple colons here!"
+					);
+				CXX_DEBUG_ASSERT(
+						pPartEnd->pPrev,
+						"And there should be a previous token too"
+					);
 
+				CXXToken * pScopeId = cxxTokenChainExtractRange(pScopeStart,pPartEnd->pPrev,0);
 				cxxScopePush(
 						pScopeId,
 						CXXTagKindCLASS,
-						CXXScopeAccessUnknown // WARNING: We don't know if it's really a class! (FIXME?)
+						// WARNING: We don't know if it's really a class! (FIXME?)
+						CXXScopeAccessUnknown
 					);
+
+				CXXToken * pAux = pPartEnd->pNext;
+
+				cxxTokenChainDestroyRange(pChain,pScopeStart,pPartEnd);
+
+				pScopeStart = pAux;
+
 				iScopesPushed++;
 			}
 		}
 
-		bGotVariable = TRUE;
+		boolean bKnRStyleParameters =
+				(uFlags & CXXExtractVariableDeclarationsKnRStyleParameters);
 
-		boolean bKnRStyleParameters = (uFlags & CXXExtractVariableDeclarationsKnRStyleParameters);
-
-		// FIXME: Typeref?
 		tagEntryInfo * tag = cxxTagBegin(
 				bKnRStyleParameters ?
 					CXXTagKindPARAMETER :
-					((g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern) ? CXXTagKindEXTERNVAR : cxxScopeGetVariableKind()),
+					((g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern) ?
+							CXXTagKindEXTERNVAR : cxxScopeGetVariableKind()),
 				pIdentifier
 			);
 
 		if(tag)
 		{
-			// handle very simple typerefs
-			//   struct X y;
-			if(
-				pTypeEnd &&
-				(pChain->iCount == 4) &&
-				cxxTokenTypeIs(pTypeEnd,CXXTokenTypeIdentifier) &&
-				pTypeEnd->pPrev &&
-				cxxTokenTypeIs(pTypeEnd->pPrev,CXXTokenTypeKeyword) &&
-				(
-					(pTypeEnd->pPrev->eKeyword == CXXKeywordSTRUCT) ||
-					(pTypeEnd->pPrev->eKeyword == CXXKeywordUNION) ||
-					(pTypeEnd->pPrev->eKeyword == CXXKeywordCLASS) ||
-					(pTypeEnd->pPrev->eKeyword == CXXKeywordENUM)
-				)
-			)
+			CXX_DEBUG_ASSERT(t != pIdentifier,"This should not happen");
+			// remove the identifier
+			cxxTokenChainTakeRecursive(pChain,pIdentifier);
+
+			// Fix square parentheses: if they contain something that is not a numeric
+			// constant then empty them up
+			CXXToken * pPartOfType = t->pPrev;
+			CXX_DEBUG_ASSERT(pPartOfType,"There should be a part of type name here");
+
+			while(pPartOfType && cxxTokenTypeIs(pPartOfType,CXXTokenTypeSquareParenthesisChain))
 			{
-				tag->extensionFields.typeRef[0] = vStringValue(pTypeEnd->pPrev->pszWord);
-				tag->extensionFields.typeRef[1] = vStringValue(pTypeEnd->pszWord);
-				CXX_DEBUG_PRINT("Typeref is %s:%s",tag->extensionFields.typeRef[0],tag->extensionFields.typeRef[1]);
-			} else {
-				CXX_DEBUG_PRINT("No typeref found");
+				CXXTokenChain * pAuxChain = pPartOfType->pChain;
+
+				if(pAuxChain->iCount > 2)
+				{
+					if(
+						(pAuxChain->iCount > 3) ||
+						(!cxxTokenTypeIs(cxxTokenChainAt(pAuxChain,1),CXXTokenTypeNumber))
+					)
+					{
+						cxxTokenChainDestroyRange(
+								pAuxChain,
+								cxxTokenChainFirst(pAuxChain)->pNext,
+								cxxTokenChainLast(pAuxChain)->pPrev
+							);
+					}
+				}
+				pPartOfType = pPartOfType->pPrev;
 			}
 
+			// anything that remains is part of type
+			cxxTagSetTypeField(tag,cxxTokenChainFirst(pChain),t->pPrev);
+
 			tag->isFileScope = bKnRStyleParameters ?
-							TRUE :
-							(
-								((eScopeKind == CXXTagKindNAMESPACE) && (g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) && !isInputHeaderFile()) ||
-								(eScopeKind == CXXTagKindFUNCTION) || // locals are always hidden
-								((eScopeKind != CXXTagKindNAMESPACE) && (eScopeKind != CXXTagKindFUNCTION) && (!isInputHeaderFile()))
-							);
+					TRUE :
+					(
+						(
+							(eScopeKind == CXXTagKindNAMESPACE) &&
+							(g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) &&
+							(!isInputHeaderFile())
+						) ||
+						// locals are always hidden
+						(eScopeKind == CXXTagKindFUNCTION) ||
+						(
+							(eScopeKind != CXXTagKindNAMESPACE) &&
+							(eScopeKind != CXXTagKindFUNCTION) &&
+							(!isInputHeaderFile())
+						)
+					);
 
 			cxxTagCommit();
+
+			cxxTokenDestroy(pIdentifier);
 		}
 
 		while(iScopesPushed > 0)
@@ -418,12 +565,24 @@ next_token:
 			iScopesPushed--;
 		}
 
-		if(cxxTokenTypeIsOneOf(t,CXXTokenTypeParenthesisChain | CXXTokenTypeSquareParenthesisChain | CXXTokenTypeSingleColon | CXXTokenTypeAssignment))
+		if(!t)
 		{
-			t = cxxTokenChainNextTokenOfType(t,CXXTokenTypeComma | CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket);
+			CXX_DEBUG_LEAVE_TEXT("Nothing more");
+			return bGotVariable;
+		}
+
+		if(!cxxTokenTypeIsOneOf(
+				t,
+				CXXTokenTypeComma | CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket
+			))
+		{
+			t = cxxTokenChainNextTokenOfType(
+					t,
+					CXXTokenTypeComma | CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket
+				);
 			if(!t)
 			{
-				CXX_DEBUG_LEAVE_TEXT("Didn't find an assignment, comma, semicolon or {");
+				CXX_DEBUG_LEAVE_TEXT("Didn't find a comma, semicolon or {");
 				return bGotVariable;
 			}
 		}
@@ -436,7 +595,18 @@ next_token:
 
 		// Comma. Might have other declarations here.
 		CXX_DEBUG_PRINT("At a comma, might have other declarations here");
+
 		t = t->pNext;
+
+		CXX_DEBUG_ASSERT(t,"There should be something after the comma here!");
+
+		if(!pRemoveStart)
+		{
+			CXX_DEBUG_LEAVE_TEXT("Could not properly fix type name for next token: stopping here");
+			return bGotVariable;
+		}
+
+		cxxTokenChainDestroyRange(pChain,pRemoveStart,t->pPrev);
 	}
 
 	CXX_DEBUG_LEAVE_TEXT("Reached end");

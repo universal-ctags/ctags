@@ -1,6 +1,7 @@
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
 !_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_KIND_SEPARATOR!PHP	::	/*a/
 !_TAG_KIND_SEPARATOR!PHP	::	/*c/
 !_TAG_KIND_SEPARATOR!PHP	::	/*d/
 !_TAG_KIND_SEPARATOR!PHP	::	/*f/
@@ -9,12 +10,7 @@
 !_TAG_KIND_SEPARATOR!PHP	::	/*n/
 !_TAG_KIND_SEPARATOR!PHP	::	/*t/
 !_TAG_KIND_SEPARATOR!PHP	::	/*v/
-!_TAG_KIND_SEPARATOR!PHP	\\	/c/
-!_TAG_KIND_SEPARATOR!PHP	\\	/d/
-!_TAG_KIND_SEPARATOR!PHP	\\	/f/
-!_TAG_KIND_SEPARATOR!PHP	\\	/i/
-!_TAG_KIND_SEPARATOR!PHP	\\	/l/
-!_TAG_KIND_SEPARATOR!PHP	\\	/n/
+!_TAG_KIND_SEPARATOR!PHP	\\	/na/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nc/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nd/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nf/
@@ -23,8 +19,6 @@
 !_TAG_KIND_SEPARATOR!PHP	\\	/nn/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nt/
 !_TAG_KIND_SEPARATOR!PHP	\\	/nv/
-!_TAG_KIND_SEPARATOR!PHP	\\	/t/
-!_TAG_KIND_SEPARATOR!PHP	\\	/v/
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/

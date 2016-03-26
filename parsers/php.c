@@ -107,13 +107,13 @@ typedef enum {
 	K_NAMESPACE,
 	K_TRAIT,
 	K_VARIABLE,
+	K_ALIAS,
 	COUNT_KIND
 } phpKind;
 
 #define NAMESPACE_SEPARATOR "\\"
 static scopeSeparator PhpGenericSeparators [] = {
 	{ 'n'          , NAMESPACE_SEPARATOR },
-	{ '\0'	       , NAMESPACE_SEPARATOR }, /* root separator */
 	{ KIND_WILDCARD, "::" },
 };
 
@@ -133,6 +133,8 @@ static kindOption PhpKinds[COUNT_KIND] = {
 	{ TRUE, 't', "trait",		"traits",
 	  ATTACH_SEPARATORS(PhpGenericSeparators)},
 	{ TRUE, 'v', "variable",	"variables",
+	  ATTACH_SEPARATORS(PhpGenericSeparators)},
+	{ TRUE, 'a', "alias",		"aliases",
 	  ATTACH_SEPARATORS(PhpGenericSeparators)},
 };
 
@@ -293,16 +295,12 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 						  const phpKind kind, const accessType access)
 {
 	int parentKind = -1;
-	const char *rootsep;
 
 	vStringClear (FullScope);
 
 	if (vStringLength (CurrentNamesapce) > 0)
 	{
 		parentKind = K_NAMESPACE;
-		rootsep = scopeSeparatorFor (PhpKinds + parentKind,
-					     KIND_NULL);
-		vStringCatS (FullScope, rootsep);
 		vStringCat (FullScope, CurrentNamesapce);
 
 	}
@@ -326,13 +324,7 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 						    K_NAMESPACE);
 			vStringCatS (FullScope, sep);
 		}
-		else
-		{
-			rootsep = scopeSeparatorFor (PhpKinds + parentKind,
-						     KIND_NULL);
-			vStringCatS (FullScope, rootsep);
-		}
-		vStringCat (FullScope, token->scope);
+			vStringCat (FullScope, token->scope);
 	}
 	if (vStringLength (FullScope) > 0)
 	{
@@ -1345,6 +1337,108 @@ static boolean parseDefine (tokenInfo *const token)
 	return FALSE;
 }
 
+static void readQualifiedName (tokenInfo *const token, vString *name,
+                               tokenInfo *const lastToken)
+{
+	while (token->type == TOKEN_IDENTIFIER || token->type == TOKEN_BACKSLASH)
+	{
+		if (token->type == TOKEN_BACKSLASH)
+			vStringPut (name, '\\');
+		else
+			vStringCat (name, token->string);
+		copyToken (lastToken, token, TRUE);
+		readToken (token);
+	}
+}
+
+/* parses declarations of the form
+ * 	use Foo
+ * 	use Foo\Bar\Class
+ * 	use Foo\Bar\Class as FooBarClass
+ * 	use function Foo\Bar\func
+ * 	use function Foo\Bar\func as foobarfunc
+ * 	use const Foo\Bar\CONST
+ * 	use const Foo\Bar\CONST as FOOBARCONST
+ * 	use Foo, Bar
+ * 	use Foo, Bar as Baz
+ * 	use Foo as Test, Bar as Baz
+ * 	use Foo\{Bar, Baz as Child, Nested\Other, Even\More as Something} */
+static boolean parseUse (tokenInfo *const token)
+{
+	boolean readNext = FALSE;
+	/* we can't know the use type, because class, interface and namespaces
+	 * aliases are the same, and the only difference is the referenced name's
+	 * type */
+	const char *refType = "unknown";
+	vString *refName = vStringNew ();
+	tokenInfo *nameToken = newToken ();
+	boolean grouped = FALSE;
+
+	readToken (token); /* skip use keyword itself */
+	if (token->type == TOKEN_KEYWORD && (token->keyword == KEYWORD_function ||
+	                                     token->keyword == KEYWORD_const))
+	{
+		switch (token->keyword)
+		{
+			case KEYWORD_function:	refType = PhpKinds[K_FUNCTION].name;	break;
+			case KEYWORD_const:		refType = PhpKinds[K_DEFINE].name;		break;
+			default: break; /* silence compilers */
+		}
+		readNext = TRUE;
+	}
+
+	if (readNext)
+		readToken (token);
+
+	readQualifiedName (token, refName, nameToken);
+	grouped = readNext = (token->type == TOKEN_OPEN_CURLY);
+
+	do
+	{
+		size_t refNamePrefixLength = grouped ? vStringLength (refName) : 0;
+
+		/* if it's either not the first name in a comma-separated list, or we
+		 * are in a grouped alias and need to read the leaf name */
+		if (readNext)
+		{
+			readToken (token);
+			readQualifiedName (token, refName, nameToken);
+		}
+
+		if (token->type == TOKEN_KEYWORD && token->keyword == KEYWORD_as)
+		{
+			readToken (token);
+			copyToken (nameToken, token, TRUE);
+			readToken (token);
+		}
+
+		if (nameToken->type == TOKEN_IDENTIFIER)
+		{
+			tagEntryInfo entry;
+
+			initPhpEntry (&entry, nameToken, K_ALIAS, ACCESS_UNDEFINED);
+
+			entry.extensionFields.typeRef[0] = refType;
+			entry.extensionFields.typeRef[1] = vStringValue (refName);
+
+			makePhpTagEntry (&entry);
+		}
+
+		vStringTruncate (refName, refNamePrefixLength);
+
+		readNext = TRUE;
+	}
+	while (token->type == TOKEN_COMMA);
+
+	if (grouped && token->type == TOKEN_CLOSE_CURLY)
+		readToken (token);
+
+	vStringDelete (refName);
+	deleteToken (nameToken);
+
+	return (token->type == TOKEN_SEMICOLON);
+}
+
 /* parses declarations of the form
  * 	$var = VALUE
  * 	$var; */
@@ -1500,6 +1594,13 @@ static void enterScope (tokenInfo *const parentToken,
 					case KEYWORD_function:	readNext = parseFunction (token, NULL);						break;
 					case KEYWORD_const:		readNext = parseConstant (token);							break;
 					case KEYWORD_define:	readNext = parseDefine (token);								break;
+
+					case KEYWORD_use:
+						/* aliases are only allowed at root scope, but the keyword
+						 * is also used to i.e. "import" traits into a class */
+						if (vStringLength (token->scope) == 0)
+							readNext = parseUse (token);
+						break;
 
 					case KEYWORD_namespace:	readNext = parseNamespace (token);	break;
 

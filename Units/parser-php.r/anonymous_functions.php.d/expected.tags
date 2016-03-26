@@ -5,4 +5,4 @@ c	input.php	/^$c = function() {$/;"	f
 d	input.php	/^$d = function() {$/;"	f
 e	input.php	/^$e = function&() {$/;"	f
 f	input.php	/^$f = function&() use (&$_g) {$/;"	f
-f_sub	input.php	/^  function f_sub() {}$/;"	f	function:\\f
+f_sub	input.php	/^  function f_sub() {}$/;"	f	function:f

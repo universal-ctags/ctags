@@ -1,10 +1,10 @@
 __anon396601200108	input.cpp	/^namespace {$/;"	n	file:
-anon_f	input.cpp	/^	void anon_f() { }$/;"	f	namespace:__anon396601200108
-__anon396601200108::anon_f	input.cpp	/^	void anon_f() { }$/;"	f	namespace:__anon396601200108
+anon_f	input.cpp	/^	void anon_f() { }$/;"	f	namespace:__anon396601200108	typeref:typename:void
+__anon396601200108::anon_f	input.cpp	/^	void anon_f() { }$/;"	f	namespace:__anon396601200108	typeref:typename:void
 a	input.cpp	/^namespace a {$/;"	n	file:
-a_f	input.cpp	/^	void a_f() { }$/;"	f	namespace:a
-a::a_f	input.cpp	/^	void a_f() { }$/;"	f	namespace:a
+a_f	input.cpp	/^	void a_f() { }$/;"	f	namespace:a	typeref:typename:void
+a::a_f	input.cpp	/^	void a_f() { }$/;"	f	namespace:a	typeref:typename:void
 b	input.cpp	/^	namespace b {$/;"	n	namespace:a	file:
 a::b	input.cpp	/^	namespace b {$/;"	n	namespace:a	file:
-a_b_f	input.cpp	/^		void a_b_f() { }$/;"	f	namespace:a::b
-a::b::a_b_f	input.cpp	/^		void a_b_f() { }$/;"	f	namespace:a::b
+a_b_f	input.cpp	/^		void a_b_f() { }$/;"	f	namespace:a::b	typeref:typename:void
+a::b::a_b_f	input.cpp	/^		void a_b_f() { }$/;"	f	namespace:a::b	typeref:typename:void

@@ -1,1 +1,1 @@
-charset2uni	input.c	/^static wchar_t charset2uni[256] = {$/;"	v	file:
+charset2uni	input.c	/^static wchar_t charset2uni[256] = {$/;"	v	typeref:typename:wchar_t[256]	file:
