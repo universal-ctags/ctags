@@ -317,8 +317,14 @@ static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
 						 vString* b)
 {
 	const char *line;
+	static vString *tmp;
 
-	line = readLineFromBypassAnyway (TagFile.vLine, tag, NULL);
+	if (tmp == NULL)
+		tmp = vStringNew ();
+	else
+		vStringClear (tmp);
+
+	line = readLineFromBypassAnyway (tmp, tag, NULL);
 	if (line)
 		renderCompactInputLine (b, line);
 	else
