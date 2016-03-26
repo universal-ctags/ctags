@@ -763,6 +763,7 @@ extern int cppGetc (void)
 	}
 	else do
 	{
+start_loop:
 		c = getcFromInputFile ();
 process:
 		switch (c)
@@ -831,7 +832,7 @@ process:
 				int next = getcFromInputFile ();
 
 				if (next == NEWLINE)
-					continue;
+					goto start_loop;
 				else
 					ungetcToInputFile (next);
 				break;
