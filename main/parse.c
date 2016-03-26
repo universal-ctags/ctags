@@ -1942,13 +1942,13 @@ static rescanReason createTagsForFile (
 static boolean createTagsWithFallback (
 		const char *const fileName, const langType language)
 {
-	unsigned long numTags	= TagFile.numTags.added;
-	fpos_t tagFilePosition;
+	unsigned long numTags	= numTagsAdded ();
+	fpos_t tagfpos;
 	unsigned int passCount = 0;
 	boolean tagFileResized = FALSE;
 	rescanReason whyRescan;
 
-	fgetpos (TagFile.fp, &tagFilePosition);
+	tagFilePosition (&tagfpos);
 	while ( ( whyRescan =
 	            createTagsForFile (fileName, language, ++passCount) )
 	                != RESCAN_NONE)
@@ -1957,14 +1957,14 @@ static boolean createTagsWithFallback (
 		{
 			/*  Restore prior state of tag file.
 			*/
-			fsetpos (TagFile.fp, &tagFilePosition);
-			TagFile.numTags.added = numTags;
+			setTagFilePosition (&tagfpos);
+			setNumTagsAdded (numTags);
 			tagFileResized = TRUE;
 		}
 		else if (whyRescan == RESCAN_APPEND)
 		{
-			fgetpos(TagFile.fp, &tagFilePosition);
-			numTags = TagFile.numTags.added;
+			tagFilePosition (&tagfpos);
+			numTags = numTagsAdded ();
 		}
 	}
 	return tagFileResized;

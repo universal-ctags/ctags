@@ -1,3 +1,4 @@
+
 /*
 *   Copyright (c) 1996-2002, Darren Hiebert
 *
@@ -1442,6 +1443,11 @@ extern unsigned long numTagsAdded(void)
 	return TagFile.numTags.added;
 }
 
+extern void setNumTagsAdded (unsigned long nadded)
+{
+	TagFile.numTags.added = nadded;
+}
+
 extern unsigned long numTagsTotal(void)
 {
 	return TagFile.numTags.added + TagFile.numTags.prev;
@@ -1455,6 +1461,21 @@ extern unsigned long maxTagsLine (void)
 extern void invalidatePatternCache(void)
 {
 	TagFile.patternCacheValid = FALSE;
+}
+
+extern void tagFilePosition (fpos_t *p)
+{
+	fgetpos (TagFile.fp, p);
+}
+
+extern void setTagFilePosition (fpos_t *p)
+{
+	fsetpos (TagFile.fp, p);
+}
+
+extern const char* getTagFileDirectory (void)
+{
+	return TagFile.directory;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

@@ -143,9 +143,13 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 extern int makeQualifiedTagEntry (const tagEntryInfo *const e);
 
 extern unsigned long numTagsAdded(void);
+extern void setNumTagsAdded (unsigned long nadded);
 extern unsigned long numTagsTotal(void);
 extern unsigned long maxTagsLine(void);
 extern void invalidatePatternCache(void);
+extern void tagFilePosition (fpos_t *p);
+extern void setTagFilePosition (fpos_t *p);
+extern const char* getTagFileDirectory (void);
 
 /* Getting line associated with tag */
 extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo *const tag,

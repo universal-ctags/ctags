@@ -142,7 +142,8 @@ static void setInputFileParametersCommon (inputFileInfo *finfo, vString *const f
 		finfo->tagPath = vStringNewCopy (fileName);
 	else
 		finfo->tagPath =
-				vStringNewOwn (relativeFilename (vStringValue (fileName), TagFile.directory));
+				vStringNewOwn (relativeFilename (vStringValue (fileName),
+								 getTagFileDirectory ()));
 
 	finfo->isHeader = isIncludeFile (vStringValue (fileName));
 	finfo->language = language;
