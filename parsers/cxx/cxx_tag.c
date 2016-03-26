@@ -58,9 +58,10 @@ static kindOption g_aCXXKinds [] = {
 };
 
 static const char * g_aCXXAccessStrings [] = {
+	NULL,
 	"public",
+	"private",
 	"protected",
-	"private"
 };
 
 kindOption * cxxTagGetKindOptions(void)
@@ -106,22 +107,7 @@ tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
 	}
 
 	// FIXME: meaning of "is file scope" is quite debatable...
-
-	switch(cxxScopeGetAccess())
-	{
-		case CXXScopeAccessPrivate:
-			g_oCXXTag.extensionFields.access = g_aCXXAccessStrings[2];
-		break;
-		case CXXScopeAccessProtected:
-			g_oCXXTag.extensionFields.access = g_aCXXAccessStrings[1];
-		break;
-		case CXXScopeAccessPublic:
-			g_oCXXTag.extensionFields.access = g_aCXXAccessStrings[0];
-		break;
-		default:
-			// ignore
-		break;
-	}
+	g_oCXXTag.extensionFields.access = g_aCXXAccessStrings[cxxScopeGetAccess()];
 
 	return &g_oCXXTag;
 }
