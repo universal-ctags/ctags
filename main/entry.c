@@ -72,6 +72,32 @@
 # define O_RDWR         _O_RDWR
 #endif
 
+
+/*  Maintains the state of the tag file.
+ */
+typedef struct eTagFile {
+	char *name;
+	char *directory;
+	FILE *fp;
+	struct sNumTags { unsigned long added, prev; } numTags;
+	struct sMax { size_t line, tag; } max;
+	struct sEtags {
+		char *name;
+		FILE *fp;
+		size_t byteCount;
+	} etags;
+	vString *vLine;
+
+	unsigned int cork;
+	struct sCorkQueue {
+		struct sTagEntryInfo* queue;
+		unsigned int length;
+		unsigned int count;
+	} corkQueue;
+
+	boolean patternCacheValid;
+} tagFile;
+
 /*
 *   DATA DEFINITIONS
 */
