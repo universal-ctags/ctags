@@ -57,6 +57,13 @@ static kindOption g_aCXXKinds [] = {
 			.referenceOnly = TRUE },
 };
 
+enum CXXAccessString
+{
+	ACCESS_PUBLIC,
+	ACCESS_PROTECTED,
+	ACCESS_PRIVATE,
+};
+
 static const char * g_aCXXAccessStrings [] = {
 	"public",
 	"protected",
@@ -110,13 +117,13 @@ tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
 	switch(cxxScopeGetAccess())
 	{
 		case CXXScopeAccessPrivate:
-			g_oCXXTag.extensionFields.access = g_aCXXAccessStrings[2];
+			g_oCXXTag.extensionFields.access = g_aCXXAccessStrings[ACCESS_PRIVATE];
 		break;
 		case CXXScopeAccessProtected:
-			g_oCXXTag.extensionFields.access = g_aCXXAccessStrings[1];
+			g_oCXXTag.extensionFields.access = g_aCXXAccessStrings[ACCESS_PROTECTED];
 		break;
 		case CXXScopeAccessPublic:
-			g_oCXXTag.extensionFields.access = g_aCXXAccessStrings[0];
+			g_oCXXTag.extensionFields.access = g_aCXXAccessStrings[ACCESS_PUBLIC];
 		break;
 		default:
 			// ignore
