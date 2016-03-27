@@ -966,6 +966,30 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 					   escapeName (tag, FIELD_EXTRA));
 	}
 
+	int cfc = tag->extensionFields.customFieldCount;
+
+	if(cfc > 0)
+	{
+		// FIXME: Make this global and allocate only once!
+		vString * pBuffer = vStringNew();
+	
+		for(int i=0;i<cfc;i++)
+		{
+			vStringClear(pBuffer);
+			vStringCatSWithEscaping(pBuffer,tag->extensionFields.customValue[i]);
+		
+			length += fprintf(
+					TagFile.fp,
+					"%s\t%s:%s",
+					sep,
+					tag->extensionFields.customLabel[i],
+					vStringValue(pBuffer)
+				);
+		}
+		
+		vStringDelete(pBuffer);
+	}
+
 	return length;
 #undef sep
 }
@@ -1104,6 +1128,17 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 	if (slot->extensionFields.typeRef[1])
 		slot->extensionFields.typeRef[1] = eStrdup (slot->extensionFields.typeRef[1]);
 
+	int cfc = slot->extensionFields.customFieldCount;
+
+	for(int i=0;i<cfc;i++)
+	{
+		Assert(slot->extensionFields.customLabel[i]);
+		Assert(slot->extensionFields.customValue[i]);
+
+		slot->extensionFields.customLabel[i] = eStrdup(slot->extensionFields.customLabel[i]);
+		slot->extensionFields.customValue[i] = eStrdup(slot->extensionFields.customValue[i]);
+	}
+
 	if (slot->sourceLanguage)
 		slot->sourceLanguage = eStrdup (slot->sourceLanguage);
 	if (slot->sourceFileName)
@@ -1135,6 +1170,14 @@ static void clearTagEntryInQueue (tagEntryInfo* slot)
 		eFree ((char *)slot->extensionFields.typeRef[0]);
 	if (slot->extensionFields.typeRef[1])
 		eFree ((char *)slot->extensionFields.typeRef[1]);
+
+	int cfc = slot->extensionFields.customFieldCount;
+
+	for(int i=0;i<cfc;i++)
+	{
+		eFree((char *)slot->extensionFields.customLabel[i]);
+		eFree((char *)slot->extensionFields.customValue[i]);
+	}
 
 	if (slot->sourceLanguage)
 		eFree ((char *)slot->sourceLanguage);

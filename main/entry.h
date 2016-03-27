@@ -77,6 +77,15 @@ typedef struct sTagEntryInfo {
 
 #define ROLE_INDEX_DEFINITION -1
 		int roleIndex; /* for role of reference tag */
+
+		/* Custom fields. If they are added to this structure then they are
+		assumed to be enabled: the parser has to check this */
+#define MAX_CUSTOM_EXTENSION_FIELDS 3
+
+		int customFieldCount; // number of custom fields
+		const char * customLabel[MAX_CUSTOM_EXTENSION_FIELDS];
+		const char * customValue[MAX_CUSTOM_EXTENSION_FIELDS];
+
 	} extensionFields;  /* list of extension fields*/
 
 	/* Following source* fields are used only when #line is found
