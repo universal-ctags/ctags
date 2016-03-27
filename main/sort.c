@@ -55,7 +55,7 @@ extern void catFile (FILE *fp)
 # define PE_CONST const
 #endif
 
-extern void externalSortTags (const boolean toStdout)
+extern void externalSortTags (const boolean toStdout, FILE *tagFile)
 {
 	const char *const sortNormalCommand = "sort -u";
 	const char *const sortFoldedCommand = "sort -u -f";
@@ -101,7 +101,7 @@ extern void externalSortTags (const boolean toStdout)
 			fdsave = dup (fdstdin);
 			if (fdsave < 0)
 				error (FATAL | PERROR, "cannot save stdin fd");
-			if (dup2 (fileno (TagFile.fp), fdstdin) < 0)
+			if (dup2 (fileno (tagFile), fdstdin) < 0)
 				error (FATAL | PERROR, "cannot redirect stdin");
 			if (lseek (fdstdin, 0, SEEK_SET) != 0)
 				error (FATAL | PERROR, "cannot rewind tag file");
@@ -127,7 +127,7 @@ extern void externalSortTags (const boolean toStdout)
  *  so have lots of memory if you have large tag files.
  */
 
-static void failedSort (FILE *const fp, const char* msg)
+extern void failedSort (FILE *const fp, const char* msg)
 {
 	const char* const cannotSort = "cannot sort tag file";
 	if (fp != NULL)
@@ -185,17 +185,15 @@ static void writeSortedTags (
 		fclose (fp);
 }
 
-extern void internalSortTags (const boolean toStdout)
+extern void internalSortTags (const boolean toStdout, FILE* fp, size_t numTags)
 {
 	vString *vLine = vStringNew ();
-	FILE *fp = NULL;
 	const char *line;
 	size_t i;
 	int (*cmpFunc)(const void *, const void *);
 
 	/*  Allocate a table of line pointers to be sorted.
 	 */
-	size_t numTags = TagFile.numTags.added + TagFile.numTags.prev;
 	const size_t tableSize = numTags * sizeof (char *);
 	char **const table = (char **) malloc (tableSize);  /* line pointers */
 	DebugStatement ( size_t mallocSize = tableSize; )  /* cumulative total */
@@ -205,19 +203,6 @@ extern void internalSortTags (const boolean toStdout)
 	if (table == NULL)
 		failedSort (fp, "out of memory");
 
-	/*  Open the tag file and place its lines into allocated buffers.
-	 */
-	if (toStdout)
-	{
-		fp = TagFile.fp;
-		fseek (fp, 0, SEEK_SET);
-	}
-	else
-	{
-		fp = fopen (tagFileName (), "r");
-		if (fp == NULL)
-			failedSort (fp, NULL);
-	}
 	for (i = 0  ;  i < numTags  &&  ! feof (fp)  ;  )
 	{
 		line = readLineRaw (vLine, fp);
@@ -242,8 +227,6 @@ extern void internalSortTags (const boolean toStdout)
 		}
 	}
 	numTags = i;
-	if (! toStdout)
-		fclose (fp);
 	vStringDelete (vLine);
 
 	/*  Sort the lines.
