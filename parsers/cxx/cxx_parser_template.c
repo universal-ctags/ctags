@@ -140,7 +140,7 @@ evaluate_current_token:
 				if(iTemplateLevel == 0)
 				{
 					// Non-nested > : always a terminator
-					cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+					//cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					CXX_DEBUG_LEAVE_TEXT("Found end of template");
 					return TRUE;
 				}

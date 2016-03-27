@@ -1,4 +1,4 @@
-Bar	input.cpp	/^class Bar$/;"	class	file:
+Bar	input.cpp	/^class Bar$/;"	class	file:	template:<class T>
 foo	input.cpp	/^    A foo()$/;"	function	class:Bar	typeref:typename:A	file:	signature:()
 f1	input.cpp	/^int f1()$/;"	function	typeref:typename:int	signature:()
 b	input.cpp	/^    Bar<int> b;$/;"	local	function:f1	typeref:typename:Bar<int>	file:
