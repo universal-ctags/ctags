@@ -21,6 +21,7 @@
 #include "debug.h"
 #include "keyword.h"
 #include "read.h"
+#include "options.h"
 
 #include <string.h>
 
@@ -737,7 +738,11 @@ boolean cxxParserParseClassStructOrUnion(
 			}
 		}
 
-		if(g_cxx.pTemplateTokenChain && (g_cxx.pTemplateTokenChain->iCount > 0))
+		if(
+				Option.cxxEnableTemplateInfo &&
+				g_cxx.pTemplateTokenChain &&
+				(g_cxx.pTemplateTokenChain->iCount > 0)
+			)
 		{
 			cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
 			cxxTokenChainCondense(

@@ -1,2 +1,4 @@
 --sort=no
 --fields=+S
+--c++-enable-template-info
+

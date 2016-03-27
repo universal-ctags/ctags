@@ -102,6 +102,7 @@ typedef struct sOptionValues {
 	long debugLevel;        /* -D  debugging output */
 	unsigned long breakLine;/* -b  input line at which to call lineBreak() */
 #endif
+	boolean cxxEnableTemplateInfo; /* --c++-enable-template-info */
 } optionValues;
 
 typedef enum eOptionLoadingStage {

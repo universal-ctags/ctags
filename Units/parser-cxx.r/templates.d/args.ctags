@@ -1,3 +1,5 @@
 --sort=no
 --extra=+q
 --kinds-C++=*
+--c++-enable-template-info
+
