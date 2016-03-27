@@ -973,7 +973,8 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 		// FIXME: Make this global and allocate only once!
 		vString * pBuffer = vStringNew();
 	
-		for(int i=0;i<cfc;i++)
+		int i;
+		for(i=0;i<cfc;i++)
 		{
 			vStringClear(pBuffer);
 			vStringCatSWithEscaping(pBuffer,tag->extensionFields.customValue[i]);
@@ -1130,7 +1131,8 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 
 	int cfc = slot->extensionFields.customFieldCount;
 
-	for(int i=0;i<cfc;i++)
+	int i;
+	for(i=0;i<cfc;i++)
 	{
 		Assert(slot->extensionFields.customLabel[i]);
 		Assert(slot->extensionFields.customValue[i]);
@@ -1172,8 +1174,9 @@ static void clearTagEntryInQueue (tagEntryInfo* slot)
 		eFree ((char *)slot->extensionFields.typeRef[1]);
 
 	int cfc = slot->extensionFields.customFieldCount;
+	int i;
 
-	for(int i=0;i<cfc;i++)
+	for(i=0;i<cfc;i++)
 	{
 		eFree((char *)slot->extensionFields.customLabel[i]);
 		eFree((char *)slot->extensionFields.customValue[i]);
