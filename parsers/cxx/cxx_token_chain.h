@@ -21,6 +21,8 @@ struct _CXXTokenChain
 	int iCount;
 };
 
+// The struct is typedef'd in cxx_token.h
+// typedef struct _CXXTokenChain CXXTokenChain;
 
 CXXTokenChain * cxxTokenChainCreate(void);
 void cxxTokenChainDestroy(CXXTokenChain * tc);
