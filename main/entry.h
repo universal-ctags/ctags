@@ -30,12 +30,6 @@
 *   DATA DECLARATIONS
 */
 
-typedef struct sTagFields {
-	unsigned int count;        /* number of additional extension flags */
-	const char *const *label;  /* list of labels for extension flags */
-	const char *const *value;  /* list of values for extension flags */
-} tagFields;
-
 /*  Information about the current tag candidate.
  */
 typedef struct sTagEntryInfo {
