@@ -14,12 +14,12 @@
 #include "cxx_token.h"
 #include "cxx_keyword.h"
 
-typedef struct _CXXTokenChain
+struct _CXXTokenChain
 {
 	CXXToken * pHead;
 	CXXToken * pTail;
 	int iCount;
-} CXXTokenChain;
+};
 
 
 CXXTokenChain * cxxTokenChainCreate(void);
