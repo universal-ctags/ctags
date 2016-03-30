@@ -198,11 +198,34 @@ Following extra tag entries are newly introduced.
 	Include pseudo tags.
 
 
-``--list-...`` options
+Options for inspecting ctags internal
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Exuberant-ctags provides the way to inspect its internal via ``--list-kinds``,
+``--list-languages``, and ``--list-maps``.
+
+This idea is promoted in Universal-ctags more; ``--list-kinds-full``,
 ``--list-extensions``,  ``--list-extra``, ``--list-features``,
 ``--list-fields``, ``--list-patterns``, and ``--list-pseudo-tags`` are added.
+
+The original 3 ``--list-`` options are not changed for keeping the
+compatibility.  Newly introduced ``--list-`` is considered to be used
+in interactively and in scripts.
+
+By default, interactive use is assumed; ctags tries aligning the
+columns of list output for easier to read. When ``--machinable``
+option is given before newly introduced ``--list-`` option, ctags
+works for scripts; it uses tab characters as separators between
+columns.  The alignment of columns are never considered when
+``--machinable``.  Currently only ``--list-extra``, ``--list-fields``
+and ``--list-kinds-full`` support ``--machinable`` output.
+
+These new ``--list-`` options prints column header, a line
+representing the name of each column. The header may help users and
+scripts to understand and recognize the columns.  Ignoring the column
+header is easy because it starts with `#` character.
+
+``--with-list-header=no`` option suppresses the column header.
 
 
 ``--put-field-prefix`` options
