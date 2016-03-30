@@ -325,7 +325,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of flags which can be used in a regex parser definition."},
  {1,"  --machinable=[yes|no]"},
  {1,"       Use tab separated representation in --list- option output. [no]"},
- {1,"       --list-fields, and --list-kinds-full support this option."},
+ {1,"       --list-extra, --list-fields, and --list-kinds-full support this option."},
  {1,"       Suitable for scripting. Specify before --list-* option."},
  {1,"  --map-<LANG>=[+|-]pattern|extension"},
  {1,"       Set or add(+) a map for <LANG>."},
@@ -377,6 +377,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Print version identifier to standard output."},
  {1,"  --with-list-header=[yes|no]"},
  {1,"       Preprend the column descriptions in --list- output. [yes]"},
+ {1,"       --list-extra, --list-fields, and --list-kinds-full support this option."},
  {1,"       Specify before --list-* option."},
  {1,"       --list-fields, and --list-kinds-full support this option."},
 #ifdef HAVE_COPROC
@@ -1590,9 +1591,7 @@ static void processListAliasesOption (
 static void processListExtraOption (
 		const char *const option __unused__, const char *const parameter __unused__)
 {
-	int i;
-	for (i = 0; i < XTAG_COUNT; i++)
-		printXtag (i);
+	printXtags ();
 	exit (0);
 }
 
