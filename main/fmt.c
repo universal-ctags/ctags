@@ -40,7 +40,7 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 {
 	int i;
 	int width = fspec->field.width;
-	const char* str = renderFieldEscaped (fspec->field.ftype, tag);
+	const char* str = renderFieldEscaped (fspec->field.ftype, tag, NO_PARSER_FIELD);
 
 	if (width < 0)
 		i = mio_printf (fp, "%-*s", -1 * width, str);

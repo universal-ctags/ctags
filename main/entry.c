@@ -782,7 +782,7 @@ extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo 
 
 static const char* escapeName (const tagEntryInfo * tag, fieldType ftype)
 {
-	return renderFieldEscaped (ftype, tag);
+	return renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
 }
 
 static int writeXrefEntry (const tagEntryInfo *const tag)
@@ -1112,6 +1112,25 @@ static int writeLineNumberEntry (const tagEntryInfo *const tag)
 		return mio_printf (TagFile.fp, "%lu", tag->lineNumber);
 }
 
+static int addParserFields (const tagEntryInfo *const tag)
+{
+	unsigned int i;
+	unsigned int ftype;
+	int length = 0;
+
+	for (i = 0; i < tag->usedParserFields; i++)
+	{
+		ftype = tag->parserFields [i].ftype;
+		if (! isFieldEnabled (ftype))
+			continue;
+
+		length += mio_printf(TagFile.fp, "\t%s:%s",
+				     getFieldName (ftype),
+				     renderFieldEscaped (tag->parserFields [i].ftype, tag, i));
+	}
+	return length;
+}
+
 static int writeCtagsEntry (const tagEntryInfo *const tag)
 {
 	int length = mio_printf (TagFile.fp, "%s\t%s\t",
@@ -1128,9 +1147,39 @@ static int writeCtagsEntry (const tagEntryInfo *const tag)
 	if (includeExtensionFlags ())
 		length += addExtensionFields (tag);
 
+	length += addParserFields (tag);
+
 	length += mio_printf (TagFile.fp, "\n");
 
 	return length;
+}
+
+extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char * value)
+{
+	unsigned int index;
+
+	Assert (tag->usedParserFields + 1 < PRE_ALLOCATED_PARSER_FIELDS);
+
+	index = tag->usedParserFields++;
+	tag->parserFields [index].ftype = ftype;
+	tag->parserFields [index].value = value;
+}
+
+static void copyParserFields (const tagEntryInfo *const tag, tagEntryInfo* slot)
+{
+	unsigned int i;
+	const char* value;
+
+	for (i = 0; i < tag->usedParserFields; i++)
+	{
+		value = tag->parserFields [i].value;
+		if (value)
+			value = eStrdup (value);
+
+		attachParserField (slot,
+				   tag->parserFields [i].ftype,
+				   value);
+	}
 }
 
 static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* slot)
@@ -1165,6 +1214,24 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 		slot->sourceLanguage = eStrdup (slot->sourceLanguage);
 	if (slot->sourceFileName)
 		slot->sourceFileName = eStrdup (slot->sourceFileName);
+
+	slot->usedParserFields = 0;
+	copyParserFields (tag, slot);
+}
+
+extern void clearParserFields (tagEntryInfo *const tag)
+{
+	unsigned int i;
+	const char* value;
+
+	for (i = 0; i < tag->usedParserFields; i++)
+	{
+		value = tag->parserFields[i].value;
+		if (value)
+			eFree ((char *)value);
+		tag->parserFields[i].value = NULL;
+		tag->parserFields[i].ftype = FIELD_UNKNOWN;
+	}
 }
 
 static void clearTagEntryInQueue (tagEntryInfo* slot)
@@ -1197,8 +1264,9 @@ static void clearTagEntryInQueue (tagEntryInfo* slot)
 		eFree ((char *)slot->sourceLanguage);
 	if (slot->sourceFileName)
 		eFree ((char *)slot->sourceFileName);
-}
 
+	clearParserFields (slot);
+}
 
 static unsigned int queueTagEntry(const tagEntryInfo *const tag)
 {
@@ -1419,6 +1487,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      const char* sourceLanguage,
 			      long sourceLineNumberDifference)
 {
+	int i;
 	Assert (File.input.name != NULL);
 
 	memset (e, 0, sizeof (tagEntryInfo));
@@ -1440,6 +1509,11 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->sourceLanguage = sourceLanguage;
 	e->sourceFileName = sourceFileName;
 	e->sourceLineNumberDifference = sourceLineNumberDifference;
+
+	e->usedParserFields = 0;
+
+	for ( i = 0; i < PRE_ALLOCATED_PARSER_FIELDS; i++ )
+		e->parserFields[i].ftype = FIELD_UNKNOWN;
 }
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra)

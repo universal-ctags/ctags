@@ -26,7 +26,9 @@
 #include "routines.h"
 
 
-typedef const char* (* renderEscaped) (const tagEntryInfo *const tag, vString * buffer);
+typedef const char* (* renderEscaped) (const tagEntryInfo *const tag,
+				       const char *value,
+				       vString * buffer);
 
 typedef struct sFieldSpec fieldSpec;
 struct sFieldSpec {
@@ -46,24 +48,24 @@ struct sFieldDesc {
 	const char* nameWithPrefix;
 };
 
-static const char *renderFieldName (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldInput (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldSignature (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldScope (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldTyperef (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldInherits (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldKindName (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldLineNumber (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldLanguage (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldAccess (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldKindLetter (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldImplementation (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldFile (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldPattern (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldRole (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldRefMarker (const tagEntryInfo *const tag, vString* b);
-static const char *renderFieldExtra (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldName (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldInput (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldSignature (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldScope (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldTyperef (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldInherits (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldKindName (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldLineNumber (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldLanguage (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldAccess (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldKindLetter (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldImplementation (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldFile (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldPattern (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldRole (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldRefMarker (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldExtra (const tagEntryInfo *const tag, const char *value, vString* b);
 
 #define DEFINE_FIELD_FULL(L,N, V, H, B, F, NWP) {	\
 		.spec = {				\
@@ -273,12 +275,12 @@ static const char *renderEscapedName (const char* s,
 	return renderEscapedString (s, tag, b);
 }
 
-static const char *renderFieldName (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldName (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
 {
 	return renderEscapedName (tag->name, tag, b);
 }
 
-static const char *renderFieldInput (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldInput (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
 {
 	const char *f = tag->inputFileName;
 
@@ -287,33 +289,35 @@ static const char *renderFieldInput (const tagEntryInfo *const tag, vString* b)
 	return renderEscapedString (f, tag, b);
 }
 
-static const char *renderFieldSignature (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldSignature (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
 {
 	return renderEscapedString (WITH_DEFUALT_VALUE (tag->extensionFields.signature),
 				    tag, b);
 }
 
-static const char *renderFieldScope (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldScope (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
 {
 	return renderEscapedName (WITH_DEFUALT_VALUE(tag->extensionFields.scopeName), tag, b);
 }
 
-static const char *renderFieldInherits (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldInherits (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
 {
 	return renderEscapedString (WITH_DEFUALT_VALUE (tag->extensionFields.inheritance),
 				    tag, b);
 }
 
-static const char *renderFieldTyperef (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldTyperef (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
 {
 	return renderEscapedName (WITH_DEFUALT_VALUE (tag->extensionFields.typeRef [1]), tag, b);
 }
 
 
 extern const char* renderFieldEscaped (fieldType type,
-				       const tagEntryInfo *tag)
+				       const tagEntryInfo *tag,
+				       int index)
 {
 	fieldDesc *fdesc = fieldDescs + type;
+	const char *value;
 
 	Assert (tag);
 	Assert (fdesc->spec.renderEscaped);
@@ -323,7 +327,15 @@ extern const char* renderFieldEscaped (fieldType type,
 	else
 		vStringClear (fdesc->buffer);
 
-	return fdesc->spec.renderEscaped (tag, fdesc->buffer);
+	if (index >= 0)
+	{
+		Assert ( tag->usedParserFields > index );
+		value = tag->parserFields[ index ].value;
+	}
+	else
+		value = NULL;
+
+	return fdesc->spec.renderEscaped (tag, value, fdesc->buffer);
 }
 
 /*  Writes "line", stripping leading and duplicate white space.
@@ -358,12 +370,13 @@ static const char* renderCompactInputLine (vString *b,  const char *const line)
 	return vStringValue (b);
 }
 
-static const char *renderFieldKindName (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldKindName (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
 {
 	return renderAsIs (b, tag->kind->name);
 }
 
 static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
+						const char *value __unused__,
 						 vString* b)
 {
 	const char *line;
@@ -389,7 +402,9 @@ static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
 	return vStringValue (b);
 }
 
-static const char *renderFieldLineNumber (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldLineNumber (const tagEntryInfo *const tag,
+					  const char *value __unused__,
+					  vString* b)
 {
 	long ln = tag->lineNumber;
 	char buf[32] = {[0] = '\0'};
@@ -401,7 +416,9 @@ static const char *renderFieldLineNumber (const tagEntryInfo *const tag, vString
 	return vStringValue (b);
 }
 
-static const char *renderFieldRole (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldRole (const tagEntryInfo *const tag,
+				    const char *value __unused__,
+				    vString* b)
 {
 	int rindex = tag->extensionFields.roleIndex;
 	const roleDesc * role;
@@ -418,7 +435,9 @@ static const char *renderFieldRole (const tagEntryInfo *const tag, vString* b)
 	return vStringValue (b);
 }
 
-static const char *renderFieldLanguage (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldLanguage (const tagEntryInfo *const tag,
+					const char *value __unused__,
+					vString* b)
 {
 	const char *l = tag->language;
 
@@ -428,12 +447,16 @@ static const char *renderFieldLanguage (const tagEntryInfo *const tag, vString* 
 	return renderAsIs (b, WITH_DEFUALT_VALUE(l));
 }
 
-static const char *renderFieldAccess (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldAccess (const tagEntryInfo *const tag,
+				      const char *value,
+				      vString* b)
 {
 	return renderAsIs (b, WITH_DEFUALT_VALUE (tag->extensionFields.access));
 }
 
-static const char *renderFieldKindLetter (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldKindLetter (const tagEntryInfo *const tag,
+					  const char *value __unused__,
+					  vString* b)
 {
 	static char c[2] = { [1] = '\0' };
 
@@ -442,17 +465,23 @@ static const char *renderFieldKindLetter (const tagEntryInfo *const tag, vString
 	return renderAsIs (b, c);
 }
 
-static const char *renderFieldImplementation (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldImplementation (const tagEntryInfo *const tag,
+					      const char *value __unused__,
+					      vString* b)
 {
 	return renderAsIs (b, WITH_DEFUALT_VALUE (tag->extensionFields.implementation));
 }
 
-static const char *renderFieldFile (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldFile (const tagEntryInfo *const tag,
+				    const char *value __unused__,
+				    vString* b)
 {
 	return renderAsIs (b, tag->isFileScope? "file": "-");
 }
 
-static const char *renderFieldPattern (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldPattern (const tagEntryInfo *const tag,
+				       const char *value __unused__,
+				       vString* b)
 {
 	char* tmp = makePatternString (tag);
 	vStringCatS (b, tmp);
@@ -460,7 +489,9 @@ static const char *renderFieldPattern (const tagEntryInfo *const tag, vString* b
 	return vStringValue (b);
 }
 
-static const char *renderFieldRefMarker (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldRefMarker (const tagEntryInfo *const tag,
+					 const char *value __unused__,
+					 vString* b)
 {
 	static char c[2] = { [1] = '\0' };
 
@@ -469,7 +500,9 @@ static const char *renderFieldRefMarker (const tagEntryInfo *const tag, vString*
 	return renderAsIs (b, c);
 }
 
-static const char *renderFieldExtra (const tagEntryInfo *const tag, vString* b)
+static const char *renderFieldExtra (const tagEntryInfo *const tag,
+				     const char *value __unused__,
+				     vString* b)
 {
 	int i;
 	boolean hasExtra = FALSE;

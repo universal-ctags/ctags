@@ -13,7 +13,7 @@
 #define CTAGS_MAIN_FIELD_H
 
 #include "general.h"
-#include "entry.h"
+#include "vstring.h"
 
 typedef enum eFieldType { /* extension field content control */
 	FIELD_UNKNOWN = -1,
@@ -47,6 +47,8 @@ typedef enum eFieldType { /* extension field content control */
 struct sFieldDesc;
 typedef struct sFieldDesc fieldDesc;
 
+struct sTagEntryInfo;
+
 
 extern fieldType getFieldTypeForOption (char letter);
 extern boolean isFieldEnabled (fieldType type);
@@ -57,6 +59,6 @@ extern void printFields (void);
 
 extern boolean isFieldRenderable (fieldType type);
 
-extern const char* renderFieldEscaped (fieldType type, const tagEntryInfo *tag);
+extern const char* renderFieldEscaped (fieldType type, const struct sTagEntryInfo *tag, int index);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

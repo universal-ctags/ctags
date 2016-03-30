@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 
+#include "field.h"
 #include "kind.h"
 #include "vstring.h"
 #include "xtag.h"
@@ -29,6 +30,10 @@
 /*
 *   DATA DECLARATIONS
 */
+typedef struct sTagField {
+	fieldType  ftype;
+	const char* value;
+} tagField;
 
 /*  Information about the current tag candidate.
  */
@@ -73,6 +78,11 @@ typedef struct sTagEntryInfo {
 #define ROLE_INDEX_DEFINITION -1
 		int roleIndex; /* for role of reference tag */
 	} extensionFields;  /* list of extension fields*/
+
+#define PRE_ALLOCATED_PARSER_FIELDS 3
+#define NO_PARSER_FIELD -1
+	unsigned int usedParserFields;
+	tagField     parserFields [PRE_ALLOCATED_PARSER_FIELDS];
 
 	/* Following source* fields are used only when #line is found
 	   in input and --line-directive is given in ctags command line. */
@@ -146,6 +156,8 @@ extern void makeFileTag (const char *const fileName);
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern boolean isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
+
+extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char* value);
 
 #endif  /* CTAGS_MAIN_ENTRY_H */
 
