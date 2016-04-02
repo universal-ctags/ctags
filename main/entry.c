@@ -907,16 +907,19 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 
 static int addExtensionFields (const tagEntryInfo *const tag)
 {
-	const char* const kindKey = getFieldDesc (FIELD_KIND_KEY)->enabled
+	boolean isKindKeyEnabled = isFieldEnabled (FIELD_KIND_KEY);
+	boolean isScopeEnabled = isFieldEnabled   (FIELD_SCOPE_KEY);
+
+	const char* const kindKey = isKindKeyEnabled
 		?getFieldName (FIELD_KIND_KEY)
 		:"";
-	const char* const kindFmt = getFieldDesc (FIELD_KIND_KEY)->enabled
+	const char* const kindFmt = isKindKeyEnabled
 		?"%s\t%s:%s"
 		:"%s\t%s%s";
-	const char* const scopeKey = getFieldDesc (FIELD_SCOPE_KEY)->enabled
+	const char* const scopeKey = isScopeEnabled
 		?getFieldName (FIELD_SCOPE_KEY)
 		:"";
-	const char* const scopeFmt = getFieldDesc (FIELD_SCOPE_KEY)->enabled
+	const char* const scopeFmt = isScopeEnabled
 		?"%s\t%s:%s:%s"
 		:"%s\t%s%s:%s";
 
@@ -927,27 +930,27 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 /* "sep" returns a value only the first time it is evaluated */
 #define sep (first ? (first = FALSE, separator) : empty)
 
-	if (tag->kind->name != NULL && (getFieldDesc (FIELD_KIND_LONG)->enabled  ||
-		 (getFieldDesc (FIELD_KIND)->enabled  && tag->kind == '\0')))
+	if (tag->kind->name != NULL && (isFieldEnabled (FIELD_KIND_LONG)  ||
+		 (isFieldEnabled (FIELD_KIND)  && tag->kind == '\0')))
 		length += mio_printf (TagFile.fp, kindFmt, sep, kindKey, tag->kind->name);
-	else if (tag->kind != '\0'  && (getFieldDesc (FIELD_KIND)->enabled ||
-			(getFieldDesc (FIELD_KIND_LONG)->enabled &&  tag->kind->name == NULL)))
+	else if (tag->kind != '\0'  && (isFieldEnabled (FIELD_KIND) ||
+			(isFieldEnabled (FIELD_KIND_LONG) &&  tag->kind->name == NULL)))
 	{
 		char str[2] = {tag->kind->letter, '\0'};
 		length += mio_printf (TagFile.fp, kindFmt, sep, kindKey, str);
 	}
 
-	if (getFieldDesc (FIELD_LINE_NUMBER)->enabled)
+	if (isFieldEnabled (FIELD_LINE_NUMBER))
 		length += mio_printf (TagFile.fp, "%s\t%s:%ld", sep,
 				   getFieldName (FIELD_LINE_NUMBER),
 				   tag->lineNumber);
 
-	if (getFieldDesc (FIELD_LANGUAGE)->enabled  &&  tag->language != NULL)
+	if (isFieldEnabled (FIELD_LANGUAGE)  &&  tag->language != NULL)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_LANGUAGE),
 				   escapeName (tag, FIELD_LANGUAGE));
 
-	if (getFieldDesc (FIELD_SCOPE)->enabled)
+	if (isFieldEnabled (FIELD_SCOPE))
 	{
 		if (tag->extensionFields.scopeKind != NULL  &&
 		    tag->extensionFields.scopeName != NULL)
@@ -973,7 +976,7 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 		}
 	}
 
-	if (getFieldDesc (FIELD_TYPE_REF)->enabled &&
+	if (isFieldEnabled (FIELD_TYPE_REF) &&
 			tag->extensionFields.typeRef [0] != NULL  &&
 			tag->extensionFields.typeRef [1] != NULL)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s:%s", sep,
@@ -981,38 +984,38 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 				   tag->extensionFields.typeRef [0],
 				   escapeName (tag, FIELD_TYPE_REF));
 
-	if (getFieldDesc (FIELD_FILE_SCOPE)->enabled &&  tag->isFileScope)
+	if (isFieldEnabled (FIELD_FILE_SCOPE) &&  tag->isFileScope)
 		length += mio_printf (TagFile.fp, "%s\t%s:", sep,
-				   getFieldName (FIELD_FILE_SCOPE));
+				      getFieldName (FIELD_FILE_SCOPE));
 
-	if (getFieldDesc (FIELD_INHERITANCE)->enabled &&
+	if (isFieldEnabled (FIELD_INHERITANCE) &&
 			tag->extensionFields.inheritance != NULL)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_INHERITANCE),
 				   escapeName (tag, FIELD_INHERITANCE));
 
-	if (getFieldDesc (FIELD_ACCESS)->enabled &&  tag->extensionFields.access != NULL)
+	if (isFieldEnabled (FIELD_ACCESS) &&  tag->extensionFields.access != NULL)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_ACCESS),
 				   tag->extensionFields.access);
 
-	if (getFieldDesc (FIELD_IMPLEMENTATION)->enabled &&
+	if (isFieldEnabled (FIELD_IMPLEMENTATION) &&
 			tag->extensionFields.implementation != NULL)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_IMPLEMENTATION),
 				   tag->extensionFields.implementation);
 
-	if (getFieldDesc (FIELD_SIGNATURE)->enabled &&
+	if (isFieldEnabled (FIELD_SIGNATURE) &&
 			tag->extensionFields.signature != NULL)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_SIGNATURE),
 				   escapeName (tag, FIELD_SIGNATURE));
-	if (getFieldDesc (FIELD_ROLE)->enabled && tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
+	if (isFieldEnabled (FIELD_ROLE) && tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_ROLE),
 				   escapeName (tag, FIELD_ROLE));
 
-	if (getFieldDesc (FIELD_EXTRA)->enabled)
+	if (isFieldEnabled (FIELD_EXTRA))
 	{
 		const char *value = escapeName (tag, FIELD_EXTRA);
 		if (value)

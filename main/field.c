@@ -189,7 +189,7 @@ static void printField (fieldType i)
 	printf((Option.machinable? "%c\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(c)),
 	       fieldDescs[i].letter,
 	       (fieldDescs[i].name? getFieldName (i): "NONE"),
-	       getFieldDesc (i)->enabled? "on": "off",
+	       isFieldEnabled (i)? "on": "off",
 	       getFieldDesc (i)->renderEscaped? "TRUE": "FALSE",
 	       fieldDescs[i].description? fieldDescs[i].description: "NONE");
 }
@@ -471,6 +471,18 @@ static const char *renderFieldExtra (const tagEntryInfo *const tag, vString* b)
 		return vStringValue (b);
 	else
 		return NULL;
+}
+
+extern boolean isFieldEnabled (fieldType type)
+{
+	return getFieldDesc(type)->enabled? TRUE: FALSE;
+}
+
+extern boolean enableField (fieldType type, boolean state)
+{
+	boolean old = getFieldDesc(type)->enabled? TRUE: FALSE;
+	getFieldDesc(type)->enabled = state;
+	return old;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

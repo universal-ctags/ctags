@@ -1088,7 +1088,7 @@ static void resetFieldsOption (boolean mode)
 	int i;
 	for (i = 0; i < FIELD_COUNT; ++i)
 		if (!getFieldDesc (i)->basic)
-			getFieldDesc (i)->enabled = mode;
+			enableField (i, mode);
 }
 
 static void processFieldsOption (
@@ -1120,7 +1120,7 @@ static void processFieldsOption (
 				error(WARNING, "Cannot disable basic field: '%c'(%s) for \"%s\" option",
 				      c, getFieldDesc (t)->name, option);
 			else
-				getFieldDesc (t)->enabled = mode;
+				enableField (t, mode);
 			break;
 	}
 }

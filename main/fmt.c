@@ -85,7 +85,7 @@ static fmtElement** queueTagField (fmtElement **last, long width, char field_let
 	cur->spec.field.width = width;
 	cur->spec.field.desc  = fdesc;
 
-	fdesc->enabled   = TRUE;	/* TODO */
+	enableField (ftype, TRUE);
 
 	cur->printer = printTagField;
 	cur->next = NULL;

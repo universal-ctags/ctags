@@ -59,8 +59,11 @@ typedef struct sFieldDesc {
 
 extern fieldDesc* getFieldDesc(fieldType type);
 extern fieldType getFieldTypeForOption (char letter);
-extern const char* renderFieldEscaped (fieldDesc *fdesc, const tagEntryInfo *tag);
+extern boolean isFieldEnabled (fieldType type);
+extern boolean enableField (fieldType type, boolean state);
 extern const char* getFieldName(fieldType type);
 extern void printFields (void);
+
+extern const char* renderFieldEscaped (fieldDesc *fdesc, const tagEntryInfo *tag);
 
 #endif	/* CTAGS_MAIN_FIELD_H */
