@@ -485,4 +485,9 @@ extern boolean enableField (fieldType type, boolean state)
 	return old;
 }
 
+extern boolean isFieldRenderable (fieldType type)
+{
+	return getFieldDesc(type)->renderEscaped? TRUE: FALSE;
+}
+
 /* vi:set tabstop=4 shiftwidth=4: */

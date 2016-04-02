@@ -68,22 +68,19 @@ static fmtElement** queueLiteral (fmtElement **last, char *literal)
 static fmtElement** queueTagField (fmtElement **last, long width, char field_letter)
 {
 	fieldType ftype;
-	fieldDesc* fdesc;
-
 	fmtElement *cur;
 
 	ftype = getFieldTypeForOption (field_letter);
 	if (ftype == FIELD_UNKNOWN)
 		error (FATAL, "No such field letter: %c", field_letter);
 
-	fdesc = getFieldDesc (ftype);
-	if (fdesc->renderEscaped == NULL)
+	if (!isFieldRenderable (ftype))
 		error (FATAL, "The field cannot be printed in format output: %c", field_letter);
 
 	cur = xMalloc (1, fmtElement);
 
 	cur->spec.field.width = width;
-	cur->spec.field.desc  = fdesc;
+	cur->spec.field.desc  = getFieldDesc (ftype);
 
 	enableField (ftype, TRUE);
 
