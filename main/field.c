@@ -287,10 +287,11 @@ static const char *renderFieldTyperef (const tagEntryInfo *const tag, vString* b
 }
 
 
-extern const char* renderFieldEscaped (fieldDesc *fdesc,
+extern const char* renderFieldEscaped (fieldType type,
 				       const tagEntryInfo *tag)
 {
-	Assert (fdesc);
+	fieldDesc *fdesc = fieldDescs + type;
+
 	Assert (tag);
 	Assert (fdesc->renderEscaped);
 

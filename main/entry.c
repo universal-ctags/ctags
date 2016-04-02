@@ -782,8 +782,7 @@ extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo 
 
 static const char* escapeName (const tagEntryInfo * tag, fieldType ftype)
 {
-	fieldDesc *fdesc = getFieldDesc (ftype);
-	return renderFieldEscaped (fdesc, tag);
+	return renderFieldEscaped (ftype, tag);
 }
 
 static int writeXrefEntry (const tagEntryInfo *const tag)

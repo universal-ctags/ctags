@@ -66,6 +66,6 @@ extern void printFields (void);
 
 extern boolean isFieldRenderable (fieldType type);
 
-extern const char* renderFieldEscaped (fieldDesc *fdesc, const tagEntryInfo *tag);
+extern const char* renderFieldEscaped (fieldType type, const tagEntryInfo *tag);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

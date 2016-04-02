@@ -20,7 +20,7 @@
 typedef union uFmtSpec {
 	char *const_str;
 	struct {
-		fieldDesc *desc;
+		fieldType ftype;
 		int width;
 	} field;
 } fmtSpec;
@@ -40,7 +40,7 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 {
 	int i;
 	int width = fspec->field.width;
-	const char* str = renderFieldEscaped (fspec->field.desc, tag);
+	const char* str = renderFieldEscaped (fspec->field.ftype, tag);
 
 	if (width < 0)
 		i = mio_printf (fp, "%-*s", -1 * width, str);
@@ -80,7 +80,7 @@ static fmtElement** queueTagField (fmtElement **last, long width, char field_let
 	cur = xMalloc (1, fmtElement);
 
 	cur->spec.field.width = width;
-	cur->spec.field.desc  = getFieldDesc (ftype);
+	cur->spec.field.ftype = ftype;
 
 	enableField (ftype, TRUE);
 
