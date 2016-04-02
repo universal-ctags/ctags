@@ -1,3 +1,10 @@
-a	aa	aa	on	referenceOnly:FALSE	nRoles:0
-b	bb	bb	off	referenceOnly:FALSE	nRoles:0
-c	a_b_c	a b c	on	referenceOnly:FALSE	nRoles:0
+# SPECIFYING PARSER
+#LETTER	NAME	ENABLED	REFONLY	NROLES	DESCRIPTION
+a	aa	on	FALSE	0	aa
+b	bb	off	FALSE	0	bb
+c	a_b_c	on	FALSE	0	a b c
+# PICKING PARSER with grep
+#PARSER	LETTER	NAME	ENABLED	REFONLY	NROLES	DESCRIPTION
+foo	a	aa	on	FALSE	0	aa
+foo	b	bb	off	FALSE	0	bb
+foo	c	a_b_c	on	FALSE	0	a b c

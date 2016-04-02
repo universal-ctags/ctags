@@ -25,6 +25,9 @@
 #define ARRAY_SIZE(X)      (sizeof (X) / sizeof (X[0]))
 #define ARRAY_AND_SIZE(X)  (X), ARRAY_SIZE(X)
 
+#define STRINGIFY(X) STRINGIFY_(X)
+#define STRINGIFY_(X) #X
+
 /*
  *  Portability macros
  */
