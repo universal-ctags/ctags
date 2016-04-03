@@ -1,0 +1,5 @@
+#LETTER	NAME	ENABLED	REFONLY	NROLES	DESCRIPTION
+a	x y	on	FALSE	0	x y z
+b	regex	off	FALSE	0	
+c	regex	off	FALSE	0	
+d	regex	on	FALSE	0	

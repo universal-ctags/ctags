@@ -1727,12 +1727,12 @@ static void printKinds (langType language, boolean allKindFields, boolean indent
 		for (i = 0  ;  i < lang->kindCount  ;  ++i)
 		{
 			if (allKindFields && indent)
-				printf ("%s", lang->name);
-			printKind (lang->kinds + i, allKindFields, indent);
+				printf (Option.machinable? "%s": PR_KIND_FMT (LANG,s), lang->name);
+			printKind (lang->kinds + i, allKindFields, indent, Option.machinable);
 		}
 	}
-	printRegexKinds (language, allKindFields, indent);
-	printXcmdKinds (language, allKindFields, indent);
+	printRegexKinds (language, allKindFields, indent, Option.machinable);
+	printXcmdKinds (language, allKindFields, indent, Option.machinable);
 }
 
 extern void printLanguageKinds (const langType language, boolean allKindFields)
@@ -1740,6 +1740,10 @@ extern void printLanguageKinds (const langType language, boolean allKindFields)
 	if (language == LANG_AUTO)
 	{
 		unsigned int i;
+
+		if (Option.withListHeader && allKindFields)
+			printKindListHeader (TRUE, Option.machinable);
+
 		for (i = 0  ;  i < LanguageCount  ;  ++i)
 		{
 			const parserDefinition* const lang = LanguageTable [i];
@@ -1747,16 +1751,18 @@ extern void printLanguageKinds (const langType language, boolean allKindFields)
 			if (lang->invisible)
 				continue;
 
-			if (lang->method & METHOD_XCMD)
-				initializeParser (i);
-
 			if (!allKindFields)
 				printf ("%s%s\n", lang->name, isLanguageEnabled (i) ? "" : " [disabled]");
 			printKinds (i, allKindFields, TRUE);
 		}
 	}
 	else
+	{
+		if (Option.withListHeader && allKindFields)
+			printKindListHeader (FALSE, Option.machinable);
+
 		printKinds (language, allKindFields, FALSE);
+	}
 }
 
 static void processLangAliasOption (const langType language,
@@ -1942,13 +1948,13 @@ static rescanReason createTagsForFile (
 static boolean createTagsWithFallback (
 		const char *const fileName, const langType language)
 {
-	unsigned long numTags	= TagFile.numTags.added;
-	fpos_t tagFilePosition;
+	unsigned long numTags	= numTagsAdded ();
+	fpos_t tagfpos;
 	unsigned int passCount = 0;
 	boolean tagFileResized = FALSE;
 	rescanReason whyRescan;
 
-	fgetpos (TagFile.fp, &tagFilePosition);
+	tagFilePosition (&tagfpos);
 	while ( ( whyRescan =
 	            createTagsForFile (fileName, language, ++passCount) )
 	                != RESCAN_NONE)
@@ -1957,14 +1963,14 @@ static boolean createTagsWithFallback (
 		{
 			/*  Restore prior state of tag file.
 			*/
-			fsetpos (TagFile.fp, &tagFilePosition);
-			TagFile.numTags.added = numTags;
+			setTagFilePosition (&tagfpos);
+			setNumTagsAdded (numTags);
 			tagFileResized = TRUE;
 		}
 		else if (whyRescan == RESCAN_APPEND)
 		{
-			fgetpos(TagFile.fp, &tagFilePosition);
-			numTags = TagFile.numTags.added;
+			tagFilePosition (&tagfpos);
+			numTags = numTagsAdded ();
 		}
 	}
 	return tagFileResized;

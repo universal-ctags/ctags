@@ -1,3 +1,4 @@
+
 /*
 *   Copyright (c) 1996-2002, Darren Hiebert
 *
@@ -70,6 +71,32 @@
 # define close          _close
 # define O_RDWR         _O_RDWR
 #endif
+
+
+/*  Maintains the state of the tag file.
+ */
+typedef struct eTagFile {
+	char *name;
+	char *directory;
+	FILE *fp;
+	struct sNumTags { unsigned long added, prev; } numTags;
+	struct sMax { size_t line, tag; } max;
+	struct sEtags {
+		char *name;
+		FILE *fp;
+		size_t byteCount;
+	} etags;
+	vString *vLine;
+
+	unsigned int cork;
+	struct sCorkQueue {
+		struct sTagEntryInfo* queue;
+		unsigned int length;
+		unsigned int count;
+	} corkQueue;
+
+	boolean patternCacheValid;
+} tagFile;
 
 /*
 *   DATA DEFINITIONS
@@ -385,44 +412,6 @@ static boolean isTagFile (const char *const filename)
 	return ok;
 }
 
-extern void copyBytes (FILE* const fromFp, FILE* const toFp, const long size)
-{
-	enum { BufferSize = 1000 };
-	long toRead, numRead;
-	char* buffer = xMalloc (BufferSize, char);
-	long remaining = size;
-	do
-	{
-		toRead = (0 < remaining && remaining < BufferSize) ?
-					remaining : (long) BufferSize;
-		numRead = fread (buffer, (size_t) 1, (size_t) toRead, fromFp);
-		if (fwrite (buffer, (size_t)1, (size_t)numRead, toFp) < (size_t)numRead)
-			error (FATAL | PERROR, "cannot complete write");
-		if (remaining > 0)
-			remaining -= numRead;
-	} while (numRead == toRead  &&  remaining != 0);
-	eFree (buffer);
-}
-
-extern void copyFile (const char *const from, const char *const to, const long size)
-{
-	FILE* const fromFp = fopen (from, "rb");
-	if (fromFp == NULL)
-		error (FATAL | PERROR, "cannot open file to copy");
-	else
-	{
-		FILE* const toFp = fopen (to, "wb");
-		if (toFp == NULL)
-			error (FATAL | PERROR, "cannot open copy destination");
-		else
-		{
-			copyBytes (fromFp, toFp, size);
-			fclose (toFp);
-		}
-		fclose (fromFp);
-	}
-}
-
 extern void openTagFile (void)
 {
 	setDefaultTagFileName ();
@@ -489,6 +478,44 @@ extern void openTagFile (void)
 
 #ifdef USE_REPLACEMENT_TRUNCATE
 
+static void copyBytes (FILE* const fromFp, FILE* const toFp, const long size)
+{
+	enum { BufferSize = 1000 };
+	long toRead, numRead;
+	char* buffer = xMalloc (BufferSize, char);
+	long remaining = size;
+	do
+	{
+		toRead = (0 < remaining && remaining < BufferSize) ?
+					remaining : (long) BufferSize;
+		numRead = fread (buffer, (size_t) 1, (size_t) toRead, fromFp);
+		if (fwrite (buffer, (size_t)1, (size_t)numRead, toFp) < (size_t)numRead)
+			error (FATAL | PERROR, "cannot complete write");
+		if (remaining > 0)
+			remaining -= numRead;
+	} while (numRead == toRead  &&  remaining != 0);
+	eFree (buffer);
+}
+
+static void copyFile (const char *const from, const char *const to, const long size)
+{
+	FILE* const fromFp = fopen (from, "rb");
+	if (fromFp == NULL)
+		error (FATAL | PERROR, "cannot open file to copy");
+	else
+	{
+		FILE* const toFp = fopen (to, "wb");
+		if (toFp == NULL)
+			error (FATAL | PERROR, "cannot open copy destination");
+		else
+		{
+			copyBytes (fromFp, toFp, size);
+			fclose (toFp);
+		}
+		fclose (fromFp);
+	}
+}
+
 /*  Replacement for missing library function.
  */
 static int replacementTruncate (const char *const name, const long size)
@@ -506,6 +533,34 @@ static int replacementTruncate (const char *const name, const long size)
 
 #endif
 
+#ifndef EXTERNAL_SORT
+static void internalSortTagFile (void)
+{
+	FILE *fp;
+
+	/*  Open/Prepare the tag file and place its lines into allocated buffers.
+	 */
+	if (TagsToStdout)
+	{
+		fp = TagFile.fp;
+		fseek (fp, 0, SEEK_SET);
+	}
+	else
+	{
+		fp = fopen (tagFileName (), "r");
+		if (fp == NULL)
+			failedSort (fp, NULL);
+	}
+
+	internalSortTags (TagsToStdout,
+			  fp,
+			  TagFile.numTags.added + TagFile.numTags.prev);
+
+	if (! TagsToStdout)
+		fclose (fp);
+}
+#endif
+
 static void sortTagFile (void)
 {
 	if (TagFile.numTags.added > 0L)
@@ -514,9 +569,9 @@ static void sortTagFile (void)
 		{
 			verbose ("sorting tag file\n");
 #ifdef EXTERNAL_SORT
-			externalSortTags (TagsToStdout);
+			externalSortTags (TagsToStdout, TagFile.fp);
 #else
-			internalSortTags (TagsToStdout);
+			internalSortTagFile ();
 #endif
 		}
 		else if (TagsToStdout)
@@ -1407,6 +1462,46 @@ extern boolean isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extr
 	Assert (extra != XTAG_UNKNOWN);
 
 	return !! ((tag->extra [ index ]) & (1 << offset));
+}
+
+extern unsigned long numTagsAdded(void)
+{
+	return TagFile.numTags.added;
+}
+
+extern void setNumTagsAdded (unsigned long nadded)
+{
+	TagFile.numTags.added = nadded;
+}
+
+extern unsigned long numTagsTotal(void)
+{
+	return TagFile.numTags.added + TagFile.numTags.prev;
+}
+
+extern unsigned long maxTagsLine (void)
+{
+	return (unsigned long)TagFile.max.line;
+}
+
+extern void invalidatePatternCache(void)
+{
+	TagFile.patternCacheValid = FALSE;
+}
+
+extern void tagFilePosition (fpos_t *p)
+{
+	fgetpos (TagFile.fp, p);
+}
+
+extern void setTagFilePosition (fpos_t *p)
+{
+	fsetpos (TagFile.fp, p);
+}
+
+extern const char* getTagFileDirectory (void)
+{
+	return TagFile.directory;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

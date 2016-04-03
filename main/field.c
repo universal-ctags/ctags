@@ -139,6 +139,7 @@ extern fieldDesc* getFieldDesc(fieldType type)
 	Assert ((0 <= type) && (type < FIELD_COUNT));
 	return fieldDescs + type;
 }
+
 extern fieldType getFieldTypeForOption (char letter)
 {
 	int i;
@@ -162,19 +163,44 @@ extern const char* getFieldName(fieldType type)
 		return fdesc->name;
 }
 
+#define PR_FIELD_WIDTH_LETTER     7
+#define PR_FIELD_WIDTH_NAME      15
+#define PR_FIELD_WIDTH_DESC      30
+#define PR_FIELD_WIDTH_XFMTCHAR  8
+#define PR_FIELD_WIDTH_ENABLED   7
+
+#define PR_FIELD_STR(X) PR_FIELD_WIDTH_##X
+#define PR_FIELD_FMT(X,T) "%-" STRINGIFY(PR_FIELD_STR(X)) STRINGIFY(T)
+
+#define MAKE_FIELD_FMT(LETTER_SPEC)		\
+	PR_FIELD_FMT (LETTER,LETTER_SPEC)	\
+	" "					\
+	PR_FIELD_FMT (NAME,s)			\
+	" "					\
+	PR_FIELD_FMT (ENABLED,s)		\
+	" "					\
+	PR_FIELD_FMT (XFMTCHAR,s)		\
+	" "					\
+	PR_FIELD_FMT (DESC,s)			\
+	"\n"
+
 static void printField (fieldType i)
 {
-	printf("%c\t%s\t%s\t%s\t%s\n",
+	printf((Option.machinable? "%c\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(c)),
 	       fieldDescs[i].letter,
 	       (fieldDescs[i].name? getFieldName (i): "NONE"),
-	       fieldDescs[i].description? fieldDescs[i].description: "NONE",
-	       getFieldDesc (i)->renderEscaped? "format-char": "NONE",
-	       getFieldDesc (i)->enabled? "on": "off");
+	       getFieldDesc (i)->enabled? "on": "off",
+	       getFieldDesc (i)->renderEscaped? "TRUE": "FALSE",
+	       fieldDescs[i].description? fieldDescs[i].description: "NONE");
 }
 
 extern void printFields (void)
 {
 	unsigned int i;
+
+	if (Option.withListHeader)
+		printf ((Option.machinable? "%s\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(s)),
+			"#LETTER", "NAME", "ENABLED", "XFMTCHAR", "DESCRIPTION");
 
 	for (i = 0; i < ARRAY_SIZE (fieldDescs); i++)
 		printField (i);
@@ -317,8 +343,14 @@ static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
 						 vString* b)
 {
 	const char *line;
+	static vString *tmp;
 
-	line = readLineFromBypassAnyway (TagFile.vLine, tag, NULL);
+	if (tmp == NULL)
+		tmp = vStringNew ();
+	else
+		vStringClear (tmp);
+
+	line = readLineFromBypassAnyway (tmp, tag, NULL);
 	if (line)
 		renderCompactInputLine (b, line);
 	else

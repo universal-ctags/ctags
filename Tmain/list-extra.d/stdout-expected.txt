@@ -1,6 +1,14 @@
-F	fileScope	Include tags of file scope	on
-f	inputFile	Include an entry for the base file name of every input file	on
-p	pseudo	Include pseudo tags	on
-q	qualified	Include an extra class-qualified tag entry for each tag	on
-r	reference	Include reference tags	on
-.	inputFileWithEndline	Similar to the f extra flag but the entry addresses the end line	on
+#LETTER NAME                   ENABLED DESCRIPTION                   
+F       fileScope              TRUE    Include tags of file scope    
+f       inputFile              TRUE    Include an entry for the base file name of every input file
+p       pseudo                 TRUE    Include pseudo tags           
+q       qualified              TRUE    Include an extra class-qualified tag entry for each tag
+r       reference              TRUE    Include reference tags        
+.       inputFileWithEndline   TRUE    Similar to the f extra flag but the entry addresses the end line
+#LETTER	NAME	ENABLED	DESCRIPTION
+F	fileScope	TRUE	Include tags of file scope
+f	inputFile	TRUE	Include an entry for the base file name of every input file
+p	pseudo	TRUE	Include pseudo tags
+q	qualified	TRUE	Include an extra class-qualified tag entry for each tag
+r	reference	TRUE	Include reference tags
+.	inputFileWithEndline	TRUE	Similar to the f extra flag but the entry addresses the end line

@@ -13,6 +13,7 @@
 #include "general.h"  /* must always come first */
 #include "debug.h"
 #include "main.h"
+#include "options.h"
 #include "routines.h"
 #include "xtag.h"
 
@@ -55,13 +56,43 @@ extern xtagType  getXtagTypeForOption (char letter)
 	return XTAG_UNKNOWN;
 }
 
-void printXtag (xtagType i)
+
+#define PR_XTAG_WIDTH_LETTER     7
+#define PR_XTAG_WIDTH_NAME      22
+#define PR_XTAG_WIDTH_ENABLED   7
+#define PR_XTAG_WIDTH_DESC      30
+
+#define PR_XTAG_STR(X) PR_XTAG_WIDTH_##X
+#define PR_XTAG_FMT(X,T) "%-" STRINGIFY(PR_XTAG_STR(X)) STRINGIFY(T)
+#define MAKE_XTAG_FMT(LETTER_SPEC)		\
+	PR_XTAG_FMT (LETTER,LETTER_SPEC)	\
+	" "					\
+	PR_XTAG_FMT (NAME,s)			\
+	" "					\
+	PR_XTAG_FMT (ENABLED,s)			\
+	" "					\
+	PR_XTAG_FMT (DESC,s)			\
+	"\n"
+
+static void printXtag (xtagType i)
 {
-	printf("%c\t%s\t%s\t%s\n",
+	printf((Option.machinable? "%c\t%s\t%s\t%s\n": MAKE_XTAG_FMT(c)),
 	       xtagDescs[i].letter,
 	       xtagDescs[i].name,
-	       xtagDescs[i].description? xtagDescs[i].description: "NONE",
-	       getXtagDesc (i)->enabled? "on": "off");
+	       getXtagDesc (i)->enabled? "TRUE": "FALSE",
+	       xtagDescs[i].description? xtagDescs[i].description: "NONE");
+}
+
+extern void printXtags (void)
+{
+	unsigned int i;
+
+	if (Option.withListHeader)
+		printf ((Option.machinable? "%s\t%s\t%s\t%s\n": MAKE_XTAG_FMT(s)),
+			"#LETTER", "NAME", "ENABLED", "DESCRIPTION");
+
+	for (i = 0; i < XTAG_COUNT; i++)
+		printXtag (i);
 }
 
 extern boolean isXtagEnabled (xtagType type)

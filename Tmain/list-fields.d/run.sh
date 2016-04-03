@@ -9,11 +9,11 @@ with_field()
     local lang=$2
     : &&
 	echo "#$field" &&
-	$CTAGS --quiet --options=NONE $3 --fields=$field -o - input.$lang
+	$CTAGS --quiet --options=NONE $3 --machinable --fields=$field -o - input.$lang
 }
 
 : &&
-    $CTAGS --quiet --options=NONE --list-fields &&
+    $CTAGS --quiet --options=NONE --machinable --with-list-header --list-fields &&
     with_field "" java &&
     with_field a  java &&
     with_field i  java &&

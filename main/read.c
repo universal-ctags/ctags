@@ -142,7 +142,8 @@ static void setInputFileParametersCommon (inputFileInfo *finfo, vString *const f
 		finfo->tagPath = vStringNewCopy (fileName);
 	else
 		finfo->tagPath =
-				vStringNewOwn (relativeFilename (vStringValue (fileName), TagFile.directory));
+				vStringNewOwn (relativeFilename (vStringValue (fileName),
+								 getTagFileDirectory ()));
 
 	finfo->isHeader = isIncludeFile (vStringValue (fileName));
 	finfo->language = language;
@@ -314,7 +315,7 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 	/* File position is used as key for checking the availability of
 	   pattern cache in entry.h. If an input file is changed, the
 	   key is meaningless. So notifying the changing here. */
-	TagFile.patternCacheValid = FALSE;
+	invalidatePatternCache();
 
 	if (File.sourceTagPathHolder == NULL)
 		File.sourceTagPathHolder = stringListNew ();

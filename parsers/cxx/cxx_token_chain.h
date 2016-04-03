@@ -14,13 +14,15 @@
 #include "cxx_token.h"
 #include "cxx_keyword.h"
 
-typedef struct _CXXTokenChain
+struct _CXXTokenChain
 {
 	CXXToken * pHead;
 	CXXToken * pTail;
 	int iCount;
-} CXXTokenChain;
+};
 
+// The struct is typedef'd in cxx_token.h
+// typedef struct _CXXTokenChain CXXTokenChain;
 
 CXXTokenChain * cxxTokenChainCreate(void);
 void cxxTokenChainDestroy(CXXTokenChain * tc);

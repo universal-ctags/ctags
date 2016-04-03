@@ -9,6 +9,7 @@
 #define CTAGS_MAIN_KIND_H
 
 #include "general.h"
+#include "routines.h"		/* for STRINGIFY */
 #include "vstring.h"
 
 typedef struct sRoleDesc {
@@ -62,7 +63,16 @@ typedef struct sKindOption {
 
 #define ATTACH_ROLES(RS) .nRoles = ARRAY_SIZE(RS), .roles = RS
 #define ATTACH_SEPARATORS(S) .separators = S, .separatorCount = ARRAY_SIZE(S)
-extern void printKind (const kindOption* const kind, boolean allKindFields, boolean indent);
+
+/* The value of `tabSeparated' is meaningfull only when `allKindFields' is true. */
+extern void printKind (const kindOption* const kind, boolean allKindFields, boolean indent,
+		       boolean tabSeparated);
+extern void printKindListHeader (boolean indent, boolean tabSeparated);
 extern const char *scopeSeparatorFor (const kindOption *kind, char parentLetter);
+
+#define PR_KIND_STR(X) PR_KIND_WIDTH_##X
+#define PR_KIND_FMT(X,T) "%-" STRINGIFY(PR_KIND_STR(X)) STRINGIFY(T)
+
+#define PR_KIND_WIDTH_LANG 15
 
 #endif	/* CTAGS_MAIN_KIND_H */
