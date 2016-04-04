@@ -418,11 +418,12 @@ static roleDesc JavaPackageRoles [] = {
 
 typedef enum {
 	JK_UNDEFINED = COMMONK_UNDEFINED,
-	JK_CLASS, JK_ENUM_CONSTANT, JK_FIELD, JK_ENUM, JK_INTERFACE,
+	JK_ANNOTATION, JK_CLASS, JK_ENUM_CONSTANT, JK_FIELD, JK_ENUM, JK_INTERFACE,
 	JK_LOCAL, JK_METHOD, JK_PACKAGE, JK_ACCESS, JK_CLASS_PREFIX
 } javaKind;
 
 static kindOption JavaKinds [] = {
+	{ TRUE,  'a', "annotation",    "annotation declarations" },
 	{ TRUE,  'c', "class",         "classes"},
 	{ TRUE,  'e', "enumConstant",  "enum constants"},
 	{ TRUE,  'f', "field",         "fields"},
@@ -1062,10 +1063,7 @@ static javaKind javaTagKindFull (const tagType type, boolean with_assert)
 		case TAG_METHOD:     result = JK_METHOD;        break;
 		case TAG_PACKAGE:    /* Fall through */
 		case TAG_PACKAGEREF: result = JK_PACKAGE;       break;
-		/* I'm gonna go ahead and keep considering as interfaces for the output
-		 * since the official syntax reference seems to consider them interfaces too
-		 */
-		case TAG_ANNOTATION: result = JK_INTERFACE;     break;
+		case TAG_ANNOTATION: result = JK_ANNOTATION;     break;
 
 		default: if (with_assert) Assert ("Bad Java tag type" == NULL); break;
 	}
