@@ -93,7 +93,7 @@ static const char *renderFieldExtra (const tagEntryInfo *const tag, const char *
 
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):"-")
 
-static fieldDesc fieldDescs [] = {
+static fieldDesc fieldDescsFixed [] = {
         /* FIXED FIELDS */
 	DEFINE_FIXED_FIELD ('N', "name",     TRUE,
 			  "tag name (fixed field)",
@@ -104,6 +104,9 @@ static fieldDesc fieldDescs [] = {
 	DEFINE_FIXED_FIELD ('P', "pattern",  TRUE,
 			  "pattern (fixed field)",
 			  renderFieldPattern),
+};
+
+static fieldDesc fieldDescsExuberant [] = {
 	DEFINE_FIELD ('C', "compact",        FALSE,
 			  "compact input line (fixed field, only used in -x option)",
 		      renderFieldCompactInputLine),
@@ -133,12 +136,6 @@ static fieldDesc fieldDescs [] = {
 	DEFINE_FIELD ('n', "line",           FALSE,
 		      "Line number of tag definition",
 		      renderFieldLineNumber),
-	DEFINE_FIELD_UCTAGS ('r', "role",    FALSE,
-			  "Role",
-			  renderFieldRole),
-	DEFINE_FIELD_UCTAGS_NONAME ('R',     FALSE,
-			  "Marker (R or D) representing whether tag is definition or reference",
-			  renderFieldRefMarker),
 	DEFINE_FIELD ('S', "signature",	     FALSE,
 		      "Signature of routine (e.g. prototype or parameter list)",
 		      renderFieldSignature),
@@ -151,6 +148,15 @@ static fieldDesc fieldDescs [] = {
 	DEFINE_FIELD ('z', "kind",           FALSE,
 			  "Include the \"kind:\" key in kind field (use k or K)",
 		      NULL),
+};
+
+static fieldDesc fieldDescsUniversal [] = {
+	DEFINE_FIELD_UCTAGS ('r', "role",    FALSE,
+			  "Role",
+			  renderFieldRole),
+	DEFINE_FIELD_UCTAGS_NONAME ('R',     FALSE,
+			  "Marker (R or D) representing whether tag is definition or reference",
+			  renderFieldRefMarker),
 	DEFINE_FIELD_UCTAGS ('Z', "scope",   FALSE,
 			  "Include the \"scope:\" key in scope field (use s)",
 		      NULL),
@@ -159,9 +165,42 @@ static fieldDesc fieldDescs [] = {
 			     renderFieldExtra),
 };
 
+
+static unsigned int       fieldDescUsed = 0;
+static unsigned int       fieldDescAllocated = 0;
+static fieldDesc* fieldDescs = NULL;
+
+extern void initFieldDescs (void)
+{
+	int i;
+	Assert (fieldDescs == NULL);
+
+	fieldDescAllocated
+	  = ARRAY_SIZE (fieldDescsFixed)
+	  + ARRAY_SIZE (fieldDescsExuberant)
+	  + ARRAY_SIZE (fieldDescsUniversal);
+	fieldDescs = xMalloc (fieldDescAllocated, fieldDesc);
+
+	fieldDescUsed = 0;
+
+	for (i = 0; i < ARRAY_SIZE (fieldDescsFixed); i++)
+		fieldDescs[i + fieldDescUsed] = fieldDescsFixed[i];
+	fieldDescUsed += ARRAY_SIZE (fieldDescsFixed);
+
+	for (i = 0; i < ARRAY_SIZE (fieldDescsExuberant); i++)
+		fieldDescs[i + fieldDescUsed] = fieldDescsExuberant[i];
+	fieldDescUsed += ARRAY_SIZE (fieldDescsExuberant);
+
+	for (i = 0; i < ARRAY_SIZE (fieldDescsUniversal); i++)
+		fieldDescs[i + fieldDescUsed] = fieldDescsUniversal[i];
+	fieldDescUsed += ARRAY_SIZE (fieldDescsUniversal);
+
+	Assert ( fieldDescAllocated == fieldDescUsed );
+}
+
 static fieldDesc* getFieldDesc(fieldType type)
 {
-	Assert ((0 <= type) && (type < FIELD_COUNT));
+	Assert ((0 <= type) && (type < fieldDescUsed));
 	return fieldDescs + type;
 }
 
@@ -169,7 +208,7 @@ extern fieldType getFieldTypeForOption (char letter)
 {
 	int i;
 
-	for (i = 0; i < FIELD_COUNT; i++)
+	for (i = 0; i < fieldDescUsed; i++)
 	{
 		if (fieldDescs [i].spec.letter == letter)
 			return i;
@@ -227,7 +266,7 @@ extern void printFields (void)
 		printf ((Option.machinable? "%s\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(s)),
 			"#LETTER", "NAME", "ENABLED", "XFMTCHAR", "DESCRIPTION");
 
-	for (i = 0; i < ARRAY_SIZE (fieldDescs); i++)
+	for (i = 0; i < fieldDescUsed; i++)
 		printField (i);
 }
 
@@ -550,6 +589,11 @@ extern boolean isFieldFixed (fieldType type)
 extern boolean isFieldRenderable (fieldType type)
 {
 	return getFieldDesc(type)->spec.renderEscaped? TRUE: FALSE;
+}
+
+extern int countFields (void)
+{
+	return fieldDescUsed;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

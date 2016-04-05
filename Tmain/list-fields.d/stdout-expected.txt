@@ -11,12 +11,12 @@ k	NONE	on	TRUE	Kind of tag as a single letter
 l	language	off	TRUE	Language of input file containing tag
 m	implementation	off	TRUE	Implementation information
 n	line	off	TRUE	Line number of tag definition
-r	role	off	TRUE	Role
-R	NONE	off	TRUE	Marker (R or D) representing whether tag is definition or reference
 S	signature	off	TRUE	Signature of routine (e.g. prototype or parameter list)
 s	NONE	on	TRUE	Scope of tag definition (WARNING: this doesn't work well as a format letter)
 t	typeref	on	TRUE	Type and name of a variable or typedef
 z	kind	off	FALSE	Include the "kind:" key in kind field (use k or K)
+r	role	off	TRUE	Role
+R	NONE	off	TRUE	Marker (R or D) representing whether tag is definition or reference
 Z	scope	off	FALSE	Include the "scope:" key in scope field (use s)
 E	extra	off	TRUE	Extra tag type information
 #

@@ -33,15 +33,16 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_LANGUAGE,
 	FIELD_IMPLEMENTATION,
 	FIELD_LINE_NUMBER,
-	FIELD_ROLE,
-	FIELD_REF_MARK,
 	FIELD_SIGNATURE,
 	FIELD_SCOPE,
 	FIELD_TYPE_REF,
 	FIELD_KIND_KEY,
+
+	/* EXTENSION FIELDS NEWLY INTRODUCED IN UCTAGS */
+	FIELD_ROLE,
+	FIELD_REF_MARK,
 	FIELD_SCOPE_KEY,
 	FIELD_EXTRA,
-	FIELD_COUNT
 } fieldType ;
 
 struct sFieldDesc;
@@ -60,5 +61,8 @@ extern void printFields (void);
 extern boolean isFieldRenderable (fieldType type);
 
 extern const char* renderFieldEscaped (fieldType type, const struct sTagEntryInfo *tag, int index);
+
+extern void initFieldDescs (void);
+extern int countFields (void);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

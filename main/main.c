@@ -67,6 +67,7 @@
 
 #include "debug.h"
 #include "entry.h"
+#include "field.h"
 #include "keyword.h"
 #include "main.h"
 #include "options.h"
@@ -534,6 +535,7 @@ extern int main (int __unused__ argc, char **argv)
 	setExecutableName (*argv++);
 	sanitizeEnviron ();
 	checkRegex ();
+	initFieldDescs ();
 
 	args = cArgNewFromArgv (argv);
 	previewFirstOption (args);

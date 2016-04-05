@@ -1086,7 +1086,8 @@ static void processExtraTagsOption (
 static void resetFieldsOption (boolean mode)
 {
 	int i;
-	for (i = 0; i < FIELD_COUNT; ++i)
+
+	for (i = 0; i < countFields (); ++i)
 		if (!isFieldFixed (i))
 			enableField (i, mode);
 }
