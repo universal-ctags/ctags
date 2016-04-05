@@ -138,7 +138,7 @@ static void setInputFileParametersCommon (inputFileInfo *finfo, vString *const f
 		else
 			vStringDelete (finfo->tagPath);
 	}
-	if (! Option.tagRelative || isAbsolutePath (vStringValue (fileName)))
+	if (! Option.tagRelative)
 		finfo->tagPath = vStringNewCopy (fileName);
 	else
 		finfo->tagPath =
