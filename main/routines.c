@@ -477,26 +477,6 @@ extern boolean isRecursiveLink (const char* const dirName)
 	return result;
 }
 
-#ifndef HAVE_FGETPOS
-
-extern int fgetpos (FILE *stream, fpos_t *pos)
-{
-	int result = 0;
-
-	*pos = ftell (stream);
-	if (*pos == -1L)
-		result = -1;
-
-	return result;
-}
-
-extern int fsetpos (FILE *stream, fpos_t const *pos)
-{
-	return fseek (stream, *pos, SEEK_SET);
-}
-
-#endif
-
 /*
  *  Pathname manipulation (O/S dependent!!!)
  */
