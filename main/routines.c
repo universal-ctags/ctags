@@ -827,10 +827,11 @@ extern char* relativeFilename (const char *file, const char *dir)
 	return res;
 }
 
-extern FILE *tempFile (const char *const mode, char **const pName)
+extern MIO *tempFile (const char *const mode, char **const pName)
 {
 	char *name;
 	FILE *fp;
+	MIO *mio;
 	int fd;
 #if defined(HAVE_MKSTEMP)
 	const char *const pattern = "tags.XXXXXX";
@@ -870,11 +871,12 @@ extern FILE *tempFile (const char *const mode, char **const pName)
 	fp = fdopen (fd, mode);
 	if (fp == NULL)
 		error (FATAL | PERROR, "cannot open temporary file");
+	mio = mio_new_fp (fp, fclose);
 	DebugStatement (
 		debugPrintf (DEBUG_STATUS, "opened temporary file %s\n", name); )
 	Assert (*pName == NULL);
 	*pName = name;
-	return fp;
+	return mio;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

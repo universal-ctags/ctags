@@ -386,7 +386,7 @@ nominateLanguageCandidatesForPattern(const char *const baseName, parserCandidate
 	return count;
 }
 
-static vString* extractEmacsModeAtFirstLine(FILE* input);
+static vString* extractEmacsModeAtFirstLine(MIO* input);
 
 /*  The name of the language interpreter, either directly or as the argument
  *  to "env".
@@ -407,7 +407,7 @@ static vString* determineInterpreter (const char* const cmd)
 	return interpreter;
 }
 
-static vString* extractInterpreter (FILE* input)
+static vString* extractInterpreter (MIO* input)
 {
 	vString* const vLine = vStringNew ();
 	const char* const line = readLineRaw (vLine, input);
@@ -484,7 +484,7 @@ out:
 
 }
 
-static vString* extractEmacsModeAtFirstLine(FILE* input)
+static vString* extractEmacsModeAtFirstLine(MIO* input)
 {
 	vString* const vLine = vStringNew ();
 	const char* const line = readLineRaw (vLine, input);
@@ -501,7 +501,7 @@ static vString* extractEmacsModeAtFirstLine(FILE* input)
 	return mode;
 }
 
-static vString* determineEmacsModeAtEOF (FILE* const fp)
+static vString* determineEmacsModeAtEOF (MIO* const fp)
 {
 	vString* const vLine = vStringNew ();
 	const char* line;
@@ -532,7 +532,7 @@ static vString* determineEmacsModeAtEOF (FILE* const fp)
 	return mode;
 }
 
-static vString* extractEmacsModeLanguageAtEOF (FILE* input)
+static vString* extractEmacsModeLanguageAtEOF (MIO* input)
 {
 	vString* mode;
 
@@ -542,7 +542,7 @@ static vString* extractEmacsModeLanguageAtEOF (FILE* input)
 	   variables list" near the end of the file.  The start of the
 	   local variables list should be no more than 3000 characters
 	   from the end of the file, */
-	fseek(input, -3000, SEEK_END);
+	mio_seek(input, -3000, SEEK_END);
 
 	mode = determineEmacsModeAtEOF (input);
 	if (mode && (vStringLength (mode) == 0))
@@ -581,7 +581,7 @@ static vString* determineVimFileType (const char *const modeline)
 	return filetype;
 }
 
-static vString* extractVimFileType(FILE* input)
+static vString* extractVimFileType(MIO* input)
 {
 	/* http://vimdoc.sourceforge.net/htmldoc/options.html#modeline
 
@@ -661,7 +661,7 @@ static vString* determineZshAutoloadTag (const char *const modeline)
 		return NULL;
 }
 
-static vString* extractZshAutoloadTag(FILE* input)
+static vString* extractZshAutoloadTag(MIO* input)
 {
 	vString* const vLine = vStringNew ();
 	const char* const line = readLineRaw (vLine, input);
@@ -676,13 +676,13 @@ static vString* extractZshAutoloadTag(FILE* input)
 
 struct getLangCtx {
     const char *fileName;
-    FILE       *input;
+    MIO        *input;
     boolean     err;
 };
 
 #define GLC_FOPEN_IF_NECESSARY(_glc_, _label_) do {         \
     if (!(_glc_)->input) {                                  \
-        (_glc_)->input = fopen((_glc_)->fileName, "rb");    \
+        (_glc_)->input = mio_new_file((_glc_)->fileName, "rb"); \
         if (!(_glc_)->input) {                              \
             (_glc_)->err = TRUE;                            \
             goto _label_;                                   \
@@ -692,13 +692,13 @@ struct getLangCtx {
 
 #define GLC_FCLOSE(_glc_) do {                              \
     if ((_glc_)->input) {                                   \
-        fclose((_glc_)->input);                             \
+        mio_free((_glc_)->input);                             \
         (_glc_)->input = NULL;                              \
     }                                                       \
 } while (0)
 
 static const struct taster {
-	vString* (* taste) (FILE *);
+	vString* (* taste) (MIO *);
         const char     *msg;
 } eager_tasters[] = {
         {
@@ -774,7 +774,7 @@ commonSelector (const parserCandidate *candidates, int n_candidates)
  * language associated with the string returned by the selector.
  */
 static int
-pickLanguageBySelection (selectLanguage selector, FILE *input)
+pickLanguageBySelection (selectLanguage selector, MIO *input)
 {
     const char *lang = selector(input);
     if (lang)
@@ -935,7 +935,7 @@ tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n
         langType language;
         vString* spec;
 
-        rewind(glc->input);
+        mio_rewind(glc->input);
 	spec = tasters[i].taste(glc->input);
 
         if (NULL != spec) {
@@ -1012,7 +1012,7 @@ getFileLanguageInternal (const char *const fileName)
         {
             verbose ("	pattern + template(%s): %s\n", tExt, templateBaseName);
             GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
-            rewind(glc.input);
+            mio_rewind(glc.input);
             language = getPatternLanguage(templateBaseName, &glc,
 					  fallback + HINT_TEMPLATE);
             if (language != LANG_IGNORE)
@@ -1949,7 +1949,7 @@ static boolean createTagsWithFallback (
 		const char *const fileName, const langType language)
 {
 	unsigned long numTags	= numTagsAdded ();
-	fpos_t tagfpos;
+	MIOPos tagfpos;
 	unsigned int passCount = 0;
 	boolean tagFileResized = FALSE;
 	rescanReason whyRescan;

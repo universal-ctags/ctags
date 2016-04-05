@@ -206,7 +206,7 @@ typedef struct sTokenInfo {
 	keywordId     keyword;
 	vString*      name;          /* the name of the token */
 	unsigned long lineNumber;    /* line number of tag */
-	fpos_t        filePosition;  /* file position of line containing name */
+	MIOPos        filePosition;  /* file position of line containing name */
 } tokenInfo;
 
 typedef enum eImplementation {

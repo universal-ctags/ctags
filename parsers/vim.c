@@ -34,7 +34,7 @@ typedef struct sLineInfo {
 	vString *	string;
 	vString *	scope;
 	unsigned long lineNumber;
-	fpos_t filePosition;
+	MIOPos filePosition;
 } lineInfo;
 #endif
 

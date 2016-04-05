@@ -58,7 +58,7 @@ typedef struct {
 	vString			*string;
 	vString			*scope;
 	unsigned long	lineNumber;
-	fpos_t			filePosition;
+	MIOPos			filePosition;
 } tokenInfo;
 
 typedef enum {

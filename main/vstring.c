@@ -263,7 +263,7 @@ extern char    *vStringDeleteUnwrap       (vString *const string)
 	return buffer;
 }
 
-extern vString *vStringNewFile (FILE *input)
+extern vString *vStringNewFile (MIO *input)
 {
 	char tmp [1024];
 	vString *buf;
@@ -273,10 +273,10 @@ extern vString *vStringNewFile (FILE *input)
 	while (1)
 	{
 		if (r < sizeof (tmp)
-		    && (feof (input) || ferror (input)))
+		    && (mio_eof (input) || mio_error (input)))
 			break;
 
-		r = fread (tmp, 1, sizeof (tmp), input);
+		r = mio_read (input, tmp, 1, sizeof (tmp));
 
 		if (r > 0)
 			vStringNCatS (buf, tmp, r);

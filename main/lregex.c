@@ -548,7 +548,7 @@ static void processLanguageRegex (const langType language,
 	else
 	{
 		const char* regexfile = parameter + 1;
-		FILE* const fp = fopen (regexfile, "r");
+		MIO* const fp = mio_new_file (regexfile, "r");
 		if (fp == NULL)
 			error (WARNING | PERROR, "%s", regexfile);
 		else
@@ -556,7 +556,7 @@ static void processLanguageRegex (const langType language,
 			vString* const regex = vStringNew ();
 			while (readLineRaw (regex, fp))
 				addLanguageRegex (language, vStringValue (regex));
-			fclose (fp);
+			mio_free (fp);
 			vStringDelete (regex);
 		}
 	}

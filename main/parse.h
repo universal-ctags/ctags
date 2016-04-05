@@ -59,7 +59,7 @@ typedef void (*parserInitialize) (langType language);
    is called. */
 typedef void (*parserFinalize) (langType language, boolean initialized);
 
-typedef const char * (*selectLanguage) (FILE *);
+typedef const char * (*selectLanguage) (MIO *);
 
 typedef enum {
 	METHOD_NOT_CRAFTED    = 1 << 0,

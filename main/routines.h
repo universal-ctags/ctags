@@ -13,7 +13,10 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+
 #include <stdio.h>
+
+#include "mio.h"
 
 /*
 *   MACROS
@@ -136,7 +139,7 @@ extern char *combinePathAndFile (const char *const path, const char *const file)
 extern char* absoluteFilename (const char *file);
 extern char* absoluteDirname (char *file);
 extern char* relativeFilename (const char *file, const char *dir);
-extern FILE *tempFile (const char *const mode, char **const pName);
+extern MIO *tempFile (const char *const mode, char **const pName);
 
 extern char* baseFilenameSansExtensionNew (const char *const fileName, const char *const templateExt);
 

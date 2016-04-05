@@ -38,7 +38,7 @@
 *   DATA DEFINITIONS
 */
 inputFile File;  /* globally read through macros */
-static fpos_t StartOfLine;  /* holds deferred position of start of line */
+static MIOPos StartOfLine;  /* holds deferred position of start of line */
 
 /*
 *   FUNCTION DEFINITIONS
@@ -85,19 +85,19 @@ static void freeLineFposMap (inputLineFposMap *lineFposMap)
 static void allocLineFposMap (inputLineFposMap *lineFposMap)
 {
 #define INITIAL_lineFposMap_LEN 256
-	lineFposMap->pos = xCalloc (INITIAL_lineFposMap_LEN, fpos_t);
+	lineFposMap->pos = xCalloc (INITIAL_lineFposMap_LEN, MIOPos);
 	lineFposMap->size = INITIAL_lineFposMap_LEN;
 	lineFposMap->count = 0;
 }
 
-static void appendLineFposMap (inputLineFposMap *lineFposMap, fpos_t pos)
+static void appendLineFposMap (inputLineFposMap *lineFposMap, MIOPos pos)
 {
 	if (lineFposMap->size == lineFposMap->count)
 	{
 		lineFposMap->size *= 2;
 		lineFposMap->pos = xRealloc (lineFposMap->pos,
 					     lineFposMap->size,
-					     fpos_t);
+					     MIOPos);
 	}
 	lineFposMap->pos [lineFposMap->count] = pos;
 	lineFposMap->count++;
@@ -188,7 +188,7 @@ static int skipWhite (void)
 {
 	int c;
 	do
-		c = getc (File.fp);
+		c = mio_getc (File.fp);
 	while (c == ' '  ||  c == '\t');
 	return c;
 }
@@ -200,9 +200,9 @@ static unsigned long readLineNumber (void)
 	while (c != EOF  &&  isdigit (c))
 	{
 		lNum = (lNum * 10) + (c - '0');
-		c = getc (File.fp);
+		c = mio_getc (File.fp);
 	}
-	ungetc (c, File.fp);
+	mio_ungetc (File.fp, c);
 	if (c != ' '  &&  c != '\t')
 		lNum = 0;
 
@@ -225,17 +225,17 @@ static vString *readFileName (void)
 
 	if (c == '"')
 	{
-		c = getc (File.fp);  /* skip double-quote */
+		c = mio_getc (File.fp);  /* skip double-quote */
 		quoteDelimited = TRUE;
 	}
 	while (c != EOF  &&  c != '\n'  &&
 			(quoteDelimited ? (c != '"') : (c != ' '  &&  c != '\t')))
 	{
 		vStringPut (fileName, c);
-		c = getc (File.fp);
+		c = mio_getc (File.fp);
 	}
 	if (c == '\n')
-		ungetc (c, File.fp);
+		mio_ungetc (File.fp, c);
 	vStringPut (fileName, '\0');
 
 	return fileName;
@@ -249,13 +249,13 @@ static boolean parseLineDirective (void)
 
 	if (isdigit (c))
 	{
-		ungetc (c, File.fp);
+		mio_ungetc (File.fp, c);
 		result = TRUE;
 	}
-	else if (c == 'l'  &&  getc (File.fp) == 'i'  &&
-			 getc (File.fp) == 'n'  &&  getc (File.fp) == 'e')
+	else if (c == 'l'  &&  mio_getc (File.fp) == 'i'  &&
+			 mio_getc (File.fp) == 'n'  &&  mio_getc (File.fp) == 'e')
 	{
-		c = getc (File.fp);
+		c = mio_getc (File.fp);
 		if (c == ' '  ||  c == '\t')
 		{
 			DebugStatement ( lineStr = "line"; )
@@ -308,7 +308,7 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 	 */
 	if (File.fp != NULL)
 	{
-		fclose (File.fp);  /* close any open input file */
+		mio_free (File.fp);  /* close any open input file */
 		File.fp = NULL;
 	}
 
@@ -321,7 +321,7 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 		File.sourceTagPathHolder = stringListNew ();
 	stringListClear (File.sourceTagPathHolder);
 
-	File.fp = fopen (fileName, openMode);
+	File.fp = mio_new_file (fileName, openMode);
 	if (File.fp == NULL)
 		error (WARNING | PERROR, "cannot open \"%s\"", fileName);
 	else
@@ -329,8 +329,8 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 		opened = TRUE;
 
 		setOwnerDirectoryOfInputFile (fileName);
-		fgetpos (File.fp, &StartOfLine);
-		fgetpos (File.fp, &File.filePosition);
+		mio_getpos (File.fp, &StartOfLine);
+		mio_getpos (File.fp, &File.filePosition);
 		File.currentLine  = NULL;
 		File.eof          = FALSE;
 		File.newLine      = TRUE;
@@ -363,7 +363,7 @@ extern void closeInputFile (void)
 			fileStatus *status = eStat (vStringValue (File.input.name));
 			addTotals (0, File.input.lineNumber - 1L, status->size);
 		}
-		fclose (File.fp);
+		mio_free (File.fp);
 		File.fp = NULL;
 		freeLineFposMap (&File.lineFposMap);
 	}
@@ -389,7 +389,7 @@ static int iFileGetc (void)
 {
 	int	c;
 readnext:
-	c = getc (File.fp);
+	c = mio_getc (File.fp);
 
 	/*	If previous character was a newline, then we're starting a line.
 	 */
@@ -402,8 +402,8 @@ readnext:
 				goto readnext;
 			else
 			{
-				fsetpos (File.fp, &StartOfLine);
-				c = getc (File.fp);
+				mio_setpos (File.fp, &StartOfLine);
+				c = mio_getc (File.fp);
 			}
 		}
 	}
@@ -413,7 +413,7 @@ readnext:
 	else if (c == NEWLINE)
 	{
 		File.newLine = TRUE;
-		fgetpos (File.fp, &StartOfLine);
+		mio_getpos (File.fp, &StartOfLine);
 	}
 	else if (c == CRETURN)
 	{
@@ -422,15 +422,15 @@ readnext:
 		 * and CR-LF (MS-DOS) are converted into a generic newline.
 		 */
 #ifndef macintosh
-		const int next = getc (File.fp);  /* is CR followed by LF? */
+		const int next = mio_getc (File.fp);  /* is CR followed by LF? */
 		if (next != NEWLINE)
-			ungetc (next, File.fp);
+			mio_ungetc (File.fp, next);
 		else
 #endif
 		{
 			c = NEWLINE;  /* convert CR into newline */
 			File.newLine = TRUE;
-			fgetpos (File.fp, &StartOfLine);
+			mio_getpos (File.fp, &StartOfLine);
 		}
 	}
 	DebugStatement ( debugPutc (DEBUG_RAW, c); )
@@ -556,7 +556,7 @@ extern const unsigned char *readLineFromInputFile (void)
 /*
  *   Raw file line reading with automatic buffer sizing
  */
-extern char *readLineRaw (vString *const vLine, FILE *const fp)
+extern char *readLineRaw (vString *const vLine, MIO *const fp)
 {
 	char *result = NULL;
 
@@ -577,13 +577,13 @@ extern char *readLineRaw (vString *const vLine, FILE *const fp)
 			char *const pLastChar = vStringValue (vLine) + vStringSize (vLine) -2;
 			long startOfLine;
 
-			startOfLine = ftell(fp);
+			startOfLine = mio_tell(fp);
 			reReadLine = FALSE;
 			*pLastChar = '\0';
-			result = fgets (vStringValue (vLine), (int) vStringSize (vLine), fp);
+			result = mio_gets (fp, vStringValue (vLine), (int) vStringSize (vLine));
 			if (result == NULL)
 			{
-				if (! feof (fp))
+				if (! mio_eof (fp))
 					error (FATAL | PERROR, "Failure on attempt to read file");
 			}
 			else if (*pLastChar != '\0'  &&
@@ -592,14 +592,14 @@ extern char *readLineRaw (vString *const vLine, FILE *const fp)
 				/*  buffer overflow */
 				reReadLine = vStringAutoResize (vLine);
 				if (reReadLine)
-					fseek (fp, startOfLine, SEEK_SET);
+					mio_seek (fp, startOfLine, SEEK_SET);
 				else
 					error (FATAL | PERROR, "input line too big; out of memory");
 			}
 			else
 			{
 				char* eol;
-				vStringLength(vLine) = ftell(fp) - startOfLine;
+				vStringLength(vLine) = mio_tell(fp) - startOfLine;
 				/* canonicalize new line */
 				eol = vStringValue (vLine) + vStringLength (vLine) - 1;
 				if (*eol == '\r')
@@ -625,17 +625,17 @@ extern char *readLineRaw (vString *const vLine, FILE *const fp)
  *  "location".
  */
 extern char *readLineFromBypass (
-		vString *const vLine, fpos_t location, long *const pSeekValue)
+		vString *const vLine, MIOPos location, long *const pSeekValue)
 {
-	fpos_t orignalPosition;
+	MIOPos orignalPosition;
 	char *result;
 
-	fgetpos (File.fp, &orignalPosition);
-	fsetpos (File.fp, &location);
+	mio_getpos (File.fp, &orignalPosition);
+	mio_setpos (File.fp, &location);
 	if (pSeekValue != NULL)
-		*pSeekValue = ftell (File.fp);
+		*pSeekValue = mio_tell (File.fp);
 	result = readLineRaw (vLine, File.fp);
-	fsetpos (File.fp, &orignalPosition);
+	mio_setpos (File.fp, &orignalPosition);
 	/* If the file is empty, we can't get the line
 	   for location 0. readLineFromBypass doesn't know
 	   what itself should do; just report it to the caller. */
@@ -657,7 +657,7 @@ extern char *readLineFromBypassSlow (vString *const vLine,
 	char *result = NULL;
 
 
-	fpos_t originalPosition;
+	MIOPos originalPosition;
 	char *line;
 	size_t len;
 	long pos;
@@ -694,13 +694,13 @@ extern char *readLineFromBypassSlow (vString *const vLine,
 	{
 		unsigned long n;
 
-		fgetpos (File.fp, &originalPosition);
-		rewind (File.fp);
+		mio_getpos (File.fp, &originalPosition);
+		mio_rewind (File.fp);
 		line = NULL;
 		pos = 0;
 		for (n = 0; n < lineNumber; n++)
 		{
-			pos = ftell (File.fp);
+			pos = mio_tell (File.fp);
 			line = readLineRaw (vLine, File.fp);
 			if (line == NULL)
 				break;
@@ -738,7 +738,7 @@ extern char *readLineFromBypassSlow (vString *const vLine,
 
 out:
 	regfree (&patbuf);
-	fsetpos (File.fp, &originalPosition);
+	mio_setpos (File.fp, &originalPosition);
 	return result;
 }
 

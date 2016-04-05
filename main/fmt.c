@@ -27,28 +27,28 @@ typedef union uFmtSpec {
 
 struct sFmtElement {
 	union uFmtSpec spec;
-	int (* printer) (fmtSpec*, FILE* fp, const tagEntryInfo *);
+	int (* printer) (fmtSpec*, MIO* fp, const tagEntryInfo *);
 	struct sFmtElement *next;
 };
 
-static int printLiteral (fmtSpec* fspec, FILE* fp, const tagEntryInfo * tag __unused__)
+static int printLiteral (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag __unused__)
 {
-	return fputs (fspec->const_str, fp);
+	return mio_puts (fp, fspec->const_str);
 }
 
-static int printTagField (fmtSpec* fspec, FILE* fp, const tagEntryInfo * tag)
+static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 {
 	int i;
 	int width = fspec->field.width;
 	const char* str = renderFieldEscaped (fspec->field.desc, tag);
 
 	if (width < 0)
-		i = fprintf (fp, "%-*s", -1 * width, str);
+		i = mio_printf (fp, "%-*s", -1 * width, str);
 	else if (width > 0)
-		i = fprintf (fp, "%*s", width, str);
+		i = mio_printf (fp, "%*s", width, str);
 	else
 	{
-		fputs (str, fp);
+		mio_puts (fp, str);
 		i = strlen (str);
 	}
 	return i;
@@ -188,7 +188,7 @@ extern fmtElement *fmtNew (const char*  fmtString)
 	return code;
 }
 
-extern int fmtPrint   (fmtElement * fmtelts, FILE* fp, const tagEntryInfo *tag)
+extern int fmtPrint   (fmtElement * fmtelts, MIO* fp, const tagEntryInfo *tag)
 {
 	fmtElement *f = fmtelts;
 	int i = 0;

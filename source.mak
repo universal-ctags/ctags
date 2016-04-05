@@ -22,6 +22,7 @@ MAIN_HEADS =			\
 	main/kind.h		\
 	main/main.h		\
 	main/mbcs.h		\
+	main/mio.h		\
 	main/nestlevel.h	\
 	main/options.h		\
 	main/parse.h		\
@@ -51,6 +52,7 @@ MAIN_SRCS =				\
 	main/lxpath.c			\
 	main/main.c			\
 	main/mbcs.c			\
+	main/mio.c			\
 	main/nestlevel.c		\
 	main/options.c			\
 	main/parse.c			\

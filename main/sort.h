@@ -13,23 +13,26 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+
 #include <stdio.h>
+
+#include "mio.h"
 
 /*
 *   FUNCTION PROTOTYPES
 */
-extern void catFile (FILE *fp);
+extern void catFile (MIO *fp);
 
 #ifdef EXTERNAL_SORT
-extern void externalSortTags (const boolean toStdout, FILE *tagFile);
+extern void externalSortTags (const boolean toStdout, MIO *tagFile);
 #else
 extern void internalSortTags (const boolean toStdout,
-			      FILE *fp,
+			      MIO *fp,
 			      size_t numTags);
 #endif
 
 /* fp is closed in this function. */
-extern void failedSort (FILE *const fp, const char* msg);
+extern void failedSort (MIO *const fp, const char* msg);
 
 #endif  /* CTAGS_MAIN_SORT_H */
 
