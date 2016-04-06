@@ -296,6 +296,39 @@ static boolean parseLineDirective (void)
  *   Input file I/O operations
  */
 
+#define MAX_IN_MEMORY_FILE_SIZE (1024*1024)
+
+static MIO *getMio (const char *const fileName, const char *const openMode)
+{
+	char buf[4096];
+	MIO *src, *dst;
+	size_t size = 0;
+
+	src = mio_new_file (fileName, openMode);
+	dst = mio_new_memory (NULL, 0, eRealloc, free);
+	while (size < MAX_IN_MEMORY_FILE_SIZE)
+	{
+		size_t num;
+
+		num = mio_read (src, buf, 1, sizeof (buf));
+		mio_write (dst, buf, num, 1);
+		size += num;
+		if (num < sizeof (buf))
+			break;
+	}
+
+	if (!mio_eof (src) || mio_error (src))
+	{
+		mio_free (dst);
+		mio_rewind (src);
+		return src;
+	}
+
+	mio_free (src);
+	mio_rewind (dst);
+	return dst;
+}
+
 /*  This function opens an input file, and resets the line counter.  If it
  *  fails, it will display an error message and leave the File.fp set to NULL.
  */
@@ -321,7 +354,7 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 		File.sourceTagPathHolder = stringListNew ();
 	stringListClear (File.sourceTagPathHolder);
 
-	File.fp = mio_new_file (fileName, openMode);
+	File.fp = getMio (fileName, openMode);
 	if (File.fp == NULL)
 		error (WARNING | PERROR, "cannot open \"%s\"", fileName);
 	else
