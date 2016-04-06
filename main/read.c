@@ -300,33 +300,27 @@ static boolean parseLineDirective (void)
 
 static MIO *getMio (const char *const fileName, const char *const openMode)
 {
-	char buf[4096];
-	MIO *src, *dst;
-	size_t size = 0;
+	FILE *src;
+	fileStatus *st;
+	unsigned long size;
+	unsigned char *data;
 
-	src = mio_new_file (fileName, openMode);
-	dst = mio_new_memory (NULL, 0, eRealloc, free);
-	while (size < MAX_IN_MEMORY_FILE_SIZE)
+	st = eStat (fileName);
+	size = st->size;
+	eStatFree (st);
+	if (size > MAX_IN_MEMORY_FILE_SIZE || size == 0)
+		return mio_new_file (fileName, openMode);
+
+	data = eMalloc (size);
+	src = fopen (fileName, openMode);
+	if (fread (data, 1, size, src) != size)
 	{
-		size_t num;
-
-		num = mio_read (src, buf, 1, sizeof (buf));
-		mio_write (dst, buf, num, 1);
-		size += num;
-		if (num < sizeof (buf))
-			break;
+		eFree (data);
+		fclose (src);
+		return mio_new_file (fileName, openMode);
 	}
-
-	if (!mio_eof (src) || mio_error (src))
-	{
-		mio_free (dst);
-		mio_rewind (src);
-		return src;
-	}
-
-	mio_free (src);
-	mio_rewind (dst);
-	return dst;
+	fclose (src);
+	return mio_new_memory (data, size, eRealloc, eFree);
 }
 
 /*  This function opens an input file, and resets the line counter.  If it
