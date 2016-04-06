@@ -18,7 +18,10 @@
  *
  */
 
+#include "general.h"  /* must always come first */
+
 #include "mio.h"
+#include "routines.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -93,14 +96,14 @@ MIO *mio_new_file_full (const char *filename,
 	/* we need to create the MIO object first, because we may not be able to close
 	 * the opened file if the user passed NULL as the close function, which means
 	 * that everything must succeed if we've opened the file successfully */
-	mio = malloc (sizeof *mio);
+	mio = xMalloc (1, MIO);
 	if (mio)
 	{
 		FILE *fp = open_func (filename, mode);
 
 		if (! fp)
 		{
-			free (mio);
+			eFree (mio);
 			mio = NULL;
 		}
 		else
@@ -160,7 +163,7 @@ MIO *mio_new_fp (FILE *fp, MIOFCloseFunc close_func)
 	if (!fp)
 		return NULL;
 
-	mio = malloc (sizeof *mio);
+	mio = xMalloc (1, MIO);
 	if (mio)
 	{
 		mio->type = MIO_TYPE_FILE;
@@ -214,7 +217,7 @@ MIO *mio_new_memory (unsigned char *data,
 {
 	MIO *mio;
 
-	mio = malloc (sizeof *mio);
+	mio = xMalloc (1, MIO);
 	if (mio)
 	{
 		mio->type = MIO_TYPE_MEMORY;
@@ -319,7 +322,7 @@ int mio_free (MIO *mio)
 			mio->impl.mem.error = FALSE;
 		}
 
-		free (mio);
+		eFree (mio);
 	}
 
 	return rv;
