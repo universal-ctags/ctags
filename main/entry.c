@@ -1243,7 +1243,7 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 
 	++TagFile.numTags.added;
 	rememberMaxLengths (strlen (tag->name), (size_t) length);
-	DebugStatement ( fflush (TagFile.fp); )
+	DebugStatement ( mio_flush (TagFile.fp); )
 
 	abort_if_ferror (TagFile.fp);
 }
