@@ -22,6 +22,7 @@
 #include "nestlevel.h"
 #include "entry.h"
 #include "routines.h"
+#include "field.h"
 
 /*
 *   DATA DEFINITIONS
@@ -39,6 +40,18 @@ static kindOption RstKinds[] = {
 	{ TRUE, 's', "section",       "sections" },
 	{ TRUE, 'S', "subsection",    "subsections" },
 	{ TRUE, 't', "subsubsection", "subsubsections" }
+};
+
+typedef enum {
+	F_SECTION_MARKER,
+} rstField;
+
+static fieldSpec RstFields [] = {
+	{
+		.name = "sectionMarker",
+		.description = "character used for declaring section",
+		.enabled = FALSE,
+	}
 };
 
 static char kindchars[SECTION_COUNT];
@@ -64,13 +77,16 @@ static NestingLevel *getNestingLevel(const int kind)
 	return nl;
 }
 
-static void makeRstTag(const vString* const name, const int kind, const MIOPos filepos)
+static void makeRstTag(const vString* const name, const int kind, const MIOPos filepos,
+		       char marker)
 {
 	const NestingLevel *const nl = getNestingLevel(kind);
 
 	if (vStringLength (name) > 0)
 	{
 		tagEntryInfo e;
+		char m [2] = { [1] = '\0' };
+
 		initTagEntry (&e, vStringValue (name), &(RstKinds [kind]));
 
 		e.lineNumber--;	/* we want the line before the '---' underline chars */
@@ -81,6 +97,9 @@ static void makeRstTag(const vString* const name, const int kind, const MIOPos f
 			e.extensionFields.scopeKind = &(RstKinds [nl->kindIndex]);
 			e.extensionFields.scopeName = vStringValue (nl->name);
 		}
+
+		m[0] = marker;
+		attachParserField (&e, RstFields [F_SECTION_MARKER].ftype, m);
 		makeTagEntry (&e);
 	}
 	nestingLevelsPush(nestingLevels, name, kind);
@@ -183,7 +202,7 @@ static void findRstTags (void)
 
 			if (kind >= 0)
 			{
-				makeRstTag(name, kind, filepos);
+				makeRstTag(name, kind, filepos, c);
 				continue;
 			}
 		}
@@ -208,6 +227,10 @@ extern parserDefinition* RstParser (void)
 	def->kindCount = ARRAY_SIZE (RstKinds);
 	def->extensions = extensions;
 	def->parser = findRstTags;
+
+	def->fieldSpecs = RstFields;
+	def->fieldSpecCount = ARRAY_SIZE (RstFields);
+
 	return def;
 }
 
