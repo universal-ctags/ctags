@@ -50,6 +50,23 @@ typedef struct sFieldDesc fieldDesc;
 
 struct sTagEntryInfo;
 
+typedef const char* (* renderEscaped) (const struct sTagEntryInfo *const tag,
+				       const char *value,
+				       vString * buffer);
+
+typedef struct sFieldSpec {
+	/* lettern, and ftype are initialized in the main part,
+	   not in a parser. */
+#define NUL_FIELD_LETTER '\0'
+	unsigned char letter;
+	const char* name;
+	const char* description;
+	boolean enabled;
+	renderEscaped renderEscaped;
+
+	unsigned int ftype;	/* Given from the main part */
+} fieldSpec;
+
 
 extern fieldType getFieldTypeForOption (char letter);
 extern boolean isFieldEnabled (fieldType type);
@@ -64,5 +81,11 @@ extern const char* renderFieldEscaped (fieldType type, const struct sTagEntryInf
 
 extern void initFieldDescs (void);
 extern int countFields (void);
+
+/* language should be typed to langType.
+   Use int here to avoid circular dependency */
+extern int defineField (fieldSpec *spec, int language);
+extern int attachField (fieldType type, struct sTagEntryInfo *const tag,
+			const char *value);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

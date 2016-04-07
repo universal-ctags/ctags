@@ -55,7 +55,7 @@ typedef struct {
 /*
  * FUNCTION PROTOTYPES
  */
-static void initializeParser (langType lang);
+
 
 /*
 *   DATA DEFINITIONS
@@ -78,6 +78,11 @@ static kindOption defaultFileKind = {
 /*
 *   FUNCTION DEFINITIONS
 */
+
+extern unsigned int countParsers (void)
+{
+	return LanguageCount;
+}
 
 extern int makeSimpleTag (
 		const vString* const name, kindOption* const kinds, const int kind)
@@ -1316,13 +1321,33 @@ static boolean doesParserUseKind (const parserDefinition *const parser, char let
 }
 #endif
 
-static void initializeParser (langType lang)
+static void installFieldSpec (const langType language)
+{
+	int i;
+	parserDefinition * parser;
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	parser = LanguageTable [language];
+	if (! (parser->fieldSpecCount < PRE_ALLOCATED_PARSER_FIELDS))
+		error (FATAL,
+		       "INTERNAL ERROR: in a parser, fields are defined more than PRE_ALLOCATED_PARSER_FIELDS\n");
+
+	if ((parser->fieldSpecs != NULL) && (parser->fieldSpecInstalled == FALSE))
+	{
+		for (i = 0; i < parser->fieldSpecCount; i++)
+			defineField (& parser->fieldSpecs [i], language);
+		parser->fieldSpecInstalled = TRUE;
+	}
+}
+
+extern void initializeParser (langType lang)
 {
 	parserDefinition *const parser = LanguageTable [lang];
 
 	installKeywordTable (lang);
 	installTagRegexTable (lang);
 	installTagXpathTable (lang);
+	installFieldSpec     (lang);
 
 	if (hasScopeActionInRegex (lang))
 		parser->useCork = TRUE;

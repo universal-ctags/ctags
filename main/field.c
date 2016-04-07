@@ -30,22 +30,12 @@ typedef const char* (* renderEscaped) (const tagEntryInfo *const tag,
 				       const char *value,
 				       vString * buffer);
 
-typedef struct sFieldSpec fieldSpec;
-struct sFieldSpec {
-	unsigned char letter;
-	const char* name;
-	const char* description;
-	boolean enabled;
-	renderEscaped renderEscaped;
-
-	unsigned int ftype;	/* Given from the main part */
-};
-
 struct sFieldDesc {
 	fieldSpec *spec;
 	unsigned int fixed:   1;   /* fields which cannot be disabled. */
 	vString     *buffer;
 	const char* nameWithPrefix;
+	langType language;
 };
 
 static const char *renderFieldName (const tagEntryInfo *const tag, const char *value, vString* b);
@@ -177,6 +167,7 @@ extern void initFieldDescs (void)
 		fdesc->fixed  = 1;
 		fdesc->buffer = NULL;
 		fdesc->nameWithPrefix = fdesc->spec->name;
+		fdesc->language = LANG_IGNORE;
 	}
 	fieldDescUsed += ARRAY_SIZE (fieldSpecsFixed);
 
@@ -187,6 +178,7 @@ extern void initFieldDescs (void)
 		fdesc->fixed = 0;
 		fdesc->buffer = NULL;
 		fdesc->nameWithPrefix = fdesc->spec->name;
+		fdesc->language = LANG_IGNORE;
 	}
 	fieldDescUsed += ARRAY_SIZE (fieldSpecsExuberant);
 
@@ -209,6 +201,7 @@ extern void initFieldDescs (void)
 		}
 		else
 			fdesc->nameWithPrefix = NULL;
+		fdesc->language = LANG_IGNORE;
 	}
 	fieldDescUsed += ARRAY_SIZE (fieldSpecsUniversal);
 
@@ -588,7 +581,7 @@ static const char *renderFieldExtra (const tagEntryInfo *const tag,
 
 extern boolean isFieldEnabled (fieldType type)
 {
-	return getFieldDesc(type)->spec->enabled? TRUE: FALSE;
+	return getFieldDesc(type)->spec->enabled;
 }
 
 extern boolean enableField (fieldType type, boolean state)
@@ -611,6 +604,53 @@ extern boolean isFieldRenderable (fieldType type)
 extern int countFields (void)
 {
 	return fieldDescUsed;
+}
+
+extern int defineField (fieldSpec *spec, int language)
+{
+	fieldDesc *fdesc;
+	char *nameWithPrefix;
+	size_t i;
+
+	Assert (spec);
+	Assert (spec->name);
+	for (i = 0; i < strlen (spec->name); i++)
+	{
+		Assert ( isalnum (spec->name [i]) );
+	}
+	spec->letter = NUL_FIELD_LETTER;
+
+	if (fieldDescUsed == fieldDescAllocated)
+	{
+		fieldDescAllocated *= 2;
+		fieldDescs = xRealloc (fieldDescs, fieldDescAllocated, fieldDesc);
+	}
+	fdesc = fieldDescs + (fieldDescUsed);
+	spec->ftype = fieldDescUsed++;
+	fdesc->spec = spec;
+
+	fdesc->fixed =  0;
+	fdesc->buffer = NULL;
+
+	nameWithPrefix = eMalloc (sizeof CTAGS_FIELD_PREFIX + strlen (spec->name) + 1);
+	nameWithPrefix [0] = '\0';
+	strcat (nameWithPrefix, CTAGS_FIELD_PREFIX);
+	strcat (nameWithPrefix, spec->name);
+	fdesc->nameWithPrefix = nameWithPrefix;
+
+	fdesc->language = language;
+	return spec->ftype;
+}
+
+extern int attachField (fieldType type, struct sTagEntryInfo *const tag,
+			const char *value)
+{
+	Assert (tag->usedParserFields + 1 < PRE_ALLOCATED_PARSER_FIELDS);
+	Assert (tag);
+
+	tag->parserFields [ tag->usedParserFields ].ftype = type;
+	tag->parserFields [ tag->usedParserFields ].value = value;
+	return tag->usedParserFields++;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */
