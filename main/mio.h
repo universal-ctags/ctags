@@ -96,7 +96,7 @@ typedef void (*MIODestroyNotify) (void *data);
  */
 struct _MIOPos {
 	/*< private >*/
-	unsigned int type;
+	MIOType type;
 #ifdef MIO_DEBUG
 	void *tag;
 #endif
@@ -114,7 +114,7 @@ struct _MIOPos {
  */
 struct _MIO {
 	/*< private >*/
-	unsigned int type;
+	MIOType type;
 	union {
 		struct {
 			FILE *fp;
