@@ -13,23 +13,23 @@
 #include <stdio.h>
 
 const char *
-selectByPickingPerlVersion (FILE *);
+selectByPickingPerlVersion (MIO *);
 
 const char *
-selectByObjectiveCAndMatLabKeywords (FILE *);
+selectByObjectiveCAndMatLabKeywords (MIO *);
 
 const char *
-selectByObjectiveCKeywords(FILE *);
+selectByObjectiveCKeywords(MIO *);
 
 const char *
-selectByArrowOfR (FILE *);
+selectByArrowOfR (MIO *);
 
 const char *
-selectByRexxCommentAndDosbatchLabelPrefix (FILE *);
+selectByRexxCommentAndDosbatchLabelPrefix (MIO *);
 
 #ifdef HAVE_LIBXML
 const char *
-selectByDTD (FILE *input);
+selectByDTD (MIO *input);
 #endif
 
 #endif

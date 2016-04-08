@@ -27,6 +27,7 @@
 
 #include "parse.h"
 #include "vstring.h"
+#include "mio.h"
 
 /*
 *   MACROS
@@ -84,7 +85,7 @@ typedef struct sInputFileInfo {
 } inputFileInfo;
 
 typedef struct sInputLineFposMap {
-	fpos_t *pos;
+	MIOPos *pos;
 	unsigned int count;
 	unsigned int size;
 } inputLineFposMap;
@@ -93,8 +94,8 @@ typedef struct sInputFile {
 	vString    *path;          /* path of input file (if any) */
 	vString    *line;          /* last line read from file */
 	const unsigned char* currentLine;  /* current line being worked on */
-	FILE       *fp;            /* stream used for reading the file */
-	fpos_t      filePosition;  /* file position of current line */
+	MIO        *fp;            /* stream used for reading the file */
+	MIOPos      filePosition;  /* file position of current line */
 	unsigned int ungetchIdx;
 	int         ungetchBuf[3]; /* characters that were ungotten */
 	boolean     eof;           /* have we reached the end of file? */
@@ -137,11 +138,11 @@ extern void                 ungetcToInputFile (int c);
 extern const unsigned char *readLineFromInputFile (void);
 
 /* Raw: reading from given a parameter, fp */
-extern char *readLineRaw           (vString *const vLine, FILE *const fp);
+extern char *readLineRaw           (vString *const vLine, MIO *const fp);
 extern char* readLineRawWithNoSeek (vString *const vline, FILE *const pp);
 
 /* Bypass: reading from fp in inputFile WITHOUT updating fields in input fields */
-extern char *readLineFromBypass (vString *const vLine, fpos_t location, long *const pSeekValue);
+extern char *readLineFromBypass (vString *const vLine, MIOPos location, long *const pSeekValue);
 extern char *readLineFromBypassSlow (vString *const vLine, unsigned long lineNumber,
 				     const char *pattern, long *const pSeekValue);
 

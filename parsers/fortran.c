@@ -204,7 +204,7 @@ typedef struct sTokenInfo {
 	boolean isMethod;
 	struct sTokenInfo *secondary;
 	unsigned long lineNumber;
-	fpos_t filePosition;
+	MIOPos filePosition;
 } tokenInfo;
 
 /*

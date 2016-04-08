@@ -306,7 +306,7 @@ static const char *line;
 static int lineLen;
 static int pos;
 static unsigned long matchLineNum;
-static fpos_t matchFilePos;
+static MIOPos matchFilePos;
 
 /* utility functions */
 static void makeSpec(adaKind *kind);
@@ -1178,7 +1178,7 @@ static adaTokenInfo *adaParseVariables(adaTokenInfo *parent, adaKind kind)
   unsigned long int lineNum;
   int filePosIndex = 0;
   int filePosSize = 32;
-  fpos_t *filePos = xMalloc(filePosSize, fpos_t);
+  MIOPos *filePos = xMalloc(filePosSize, MIOPos);
 
   /* skip any preliminary whitespace or comments */
   skipWhiteSpace();
@@ -1294,7 +1294,7 @@ static adaTokenInfo *adaParseVariables(adaTokenInfo *parent, adaKind kind)
       while(filePosIndex >= filePosSize)
       {
         filePosSize *= 2;
-        filePos = xRealloc(filePos, filePosSize, fpos_t);
+        filePos = xRealloc(filePos, filePosSize, MIOPos);
       }
       filePos[filePosIndex] = getInputFilePosition();
 

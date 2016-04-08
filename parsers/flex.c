@@ -119,7 +119,7 @@ typedef struct sTokenInfo {
 	vString *		string;
 	vString *		scope;
 	unsigned long 	lineNumber;
-	fpos_t 			filePosition;
+	MIOPos 			filePosition;
 	int				nestLevel;
 	boolean			ignoreTag;
 	boolean			isClass;

@@ -162,7 +162,7 @@ typedef struct sTokenInfoSQL {
 	int         scopeKind;
 	int         begin_end_nest_lvl;
 	unsigned long lineNumber;
-	fpos_t filePosition;
+	MIOPos filePosition;
 } tokenInfo;
 
 /*

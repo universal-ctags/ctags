@@ -15,11 +15,12 @@
 
 #include "general.h"
 #include "entry.h"
+#include "mio.h"
 #include <stdio.h>
 
 typedef struct sFmtElement fmtElement;
 extern fmtElement *fmtNew     (const char* fmtString);
-extern int         fmtPrint   (fmtElement * fmtelts, FILE* fp, const tagEntryInfo *tag);
+extern int         fmtPrint   (fmtElement * fmtelts, MIO* fp, const tagEntryInfo *tag);
 extern void        fmtDelete  (fmtElement * fmtelts);
 
 #endif	/* FMT_H */

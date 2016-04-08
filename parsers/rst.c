@@ -64,7 +64,7 @@ static NestingLevel *getNestingLevel(const int kind)
 	return nl;
 }
 
-static void makeRstTag(const vString* const name, const int kind, const fpos_t filepos)
+static void makeRstTag(const vString* const name, const int kind, const MIOPos filepos)
 {
 	const NestingLevel *const nl = getNestingLevel(kind);
 
@@ -157,10 +157,10 @@ static int utf8_strlen(const char *buf, int buf_len)
 static void findRstTags (void)
 {
 	vString *name = vStringNew ();
-	fpos_t filepos;
+	MIOPos filepos;
 	const unsigned char *line;
 
-	memset(&filepos, 0, sizeof(fpos_t));
+	memset(&filepos, 0, sizeof(MIOPos));
 	memset(kindchars, 0, sizeof kindchars);
 	nestingLevels = nestingLevelsNew();
 

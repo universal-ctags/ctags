@@ -195,6 +195,7 @@
     <ClCompile Include="..\main\vstring.c" />
     <ClCompile Include="..\parsers\windres.c" />
     <ClCompile Include="..\main\xtag.c" />
+    <ClCompile Include="..\main\mio.c" />
     <ClCompile Include="..\parsers\yacc.c" />
   </ItemGroup>
   <ItemGroup>
@@ -226,6 +227,7 @@
     <ClInclude Include="..\main\strlist.h" />
     <ClInclude Include="..\main\vstring.h" />
     <ClInclude Include="..\main\xtag.h" />
+    <ClInclude Include="..\main\mio.h" />
     <ClInclude Include="..\parsers\cxx\cxx_debug.h" />
     <ClInclude Include="..\parsers\cxx\cxx_keyword.h" />
     <ClInclude Include="..\parsers\cxx\cxx_parser.h" />

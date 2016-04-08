@@ -81,7 +81,7 @@ typedef struct {
 	int cur_token;
 	vString* token_str;
 	unsigned long line;
-	fpos_t pos;
+	MIOPos pos;
 } lexerState;
 
 /*
@@ -434,7 +434,7 @@ static void deInitLexer (lexerState *lexer)
 	lexer->token_str = NULL;
 }
 
-static void addTag (vString* ident, const char* arg_list, int kind, unsigned long line, fpos_t pos, vString *scope, int parent_kind)
+static void addTag (vString* ident, const char* arg_list, int kind, unsigned long line, MIOPos pos, vString *scope, int parent_kind)
 {
 	if (kind == K_NONE || ! rustKinds[kind].enabled)
 		return;
@@ -528,7 +528,7 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
 	vString *name;
 	vString *arg_list;
 	unsigned long line;
-	fpos_t pos;
+	MIOPos pos;
 	int paren_level = 0;
 	boolean found_paren = FALSE;
 	boolean valid_signature = TRUE;
@@ -668,7 +668,7 @@ static void parseQualifiedType (lexerState *lexer, vString* name)
 static void parseImpl (lexerState *lexer, vString *scope, int parent_kind)
 {
 	unsigned long line;
-	fpos_t pos;
+	MIOPos pos;
 	vString *name;
 
 	advanceToken(lexer, TRUE);

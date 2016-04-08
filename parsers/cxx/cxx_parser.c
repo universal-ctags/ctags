@@ -263,7 +263,7 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 			szTypeName
 		);
 
-	fpos_t oFilePosition = getInputFilePosition();
+	MIOPos oFilePosition = getInputFilePosition();
 	int iFileLine = getInputLineNumber();
 
 	if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon))

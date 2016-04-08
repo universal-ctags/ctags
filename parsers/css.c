@@ -187,7 +187,7 @@ static void findCssTags (void)
 		else if (token.type == TOKEN_SELECTOR)
 		{ /* collect selectors and make a tag */
 			cssKind kind = K_SELECTOR;
-			fpos_t filePosition;
+			MIOPos filePosition;
 			unsigned long lineNumber;
 			vString *selector = vStringNew ();
 			do

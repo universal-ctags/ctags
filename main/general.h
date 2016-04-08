@@ -78,10 +78,6 @@ typedef bool boolean;
 typedef enum { FALSE, TRUE } boolean;
 #endif
 
-#if ! defined (HAVE_FGETPOS) && ! defined (fpos_t)
-# define fpos_t long
-#endif
-
 /*
 *   FUNCTION PROTOTYPES
 */

@@ -37,13 +37,13 @@ static const char *TR_DOSBATCH = "DosBatch";
 #define startsWith(line,prefix) \
   (strncmp(line, prefix, strlen(prefix)) == 0? TRUE: FALSE)
 
-static const char *selectByLines (FILE *input,
+static const char *selectByLines (MIO *input,
 				  const char* (* lineTaster) (const char *, void *),
 				  const char* defaultLang,
 				  void *userData)
 {
     char line[0x800];
-    while (fgets(line, sizeof(line), input)) {
+    while (mio_gets(input, line, sizeof(line))) {
 	const char *lang = lineTaster (line, userData);
 	if (lang)
 	    return lang;
@@ -119,7 +119,7 @@ tastePerlLine (const char *line, void *data __unused__)
 }
 
 const char *
-selectByPickingPerlVersion (FILE *input)
+selectByPickingPerlVersion (MIO *input)
 {
     /* Default to Perl 5 */
     return selectByLines (input, tastePerlLine, TR_PERL5, NULL);
@@ -160,7 +160,7 @@ tasteObjectiveCOrMatLabLines (const char *line, void *data __unused__)
 }
 
 const char *
-selectByObjectiveCAndMatLabKeywords (FILE * input)
+selectByObjectiveCAndMatLabKeywords (MIO * input)
 {
     return selectByLines (input, tasteObjectiveCOrMatLabLines,
 			  NULL, NULL);
@@ -178,7 +178,7 @@ tasteObjectiveC (const char *line, void *data __unused__)
 }
 
 const char *
-selectByObjectiveCKeywords (FILE * input)
+selectByObjectiveCKeywords (MIO * input)
 {
     /* TODO: Ideally opening input should be delayed til
        enable/disable based selection is done. */
@@ -218,7 +218,7 @@ tasteR (const char *line, void *data __unused__)
 }
 
 const char *
-selectByArrowOfR (FILE *input)
+selectByArrowOfR (MIO *input)
 {
     /* TODO: Ideally opening input should be delayed till
        enable/disable based selection is done. */
@@ -264,7 +264,7 @@ tasteREXXOrDosBatch (const char *line, void *data)
 }
 
 const char *
-selectByRexxCommentAndDosbatchLabelPrefix (FILE *input)
+selectByRexxCommentAndDosbatchLabelPrefix (MIO *input)
 {
     /* TODO: Ideally opening input should be delayed till
        enable/disable based selection is done. */
@@ -301,7 +301,7 @@ static void suppressWarning (void *ctx __unused__, const char *msg __unused__, .
 }
 
 static xmlDocPtr
-xmlParseFILE (FILE *input)
+xmlParseFILE (MIO *input)
 {
 	vString *buf;
 	xmlDocPtr doc;
@@ -364,7 +364,7 @@ selectParserForXmlDoc (xmlDocPtr doc)
 }
 
 const char *
-selectByDTD (FILE *input)
+selectByDTD (MIO *input)
 {
 	xmlDocPtr doc;
 	const char *r = NULL;

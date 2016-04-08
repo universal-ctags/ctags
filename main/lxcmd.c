@@ -1037,7 +1037,7 @@ static boolean makePseudoTagEntryFromTagEntry (tagEntry* entry)
 static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 {
 	tagEntryInfo tag;
-	fpos_t      filePosition;
+	MIOPos      filePosition;
 
 	if (hasPseudoTagPrefix (entry->name))
 	{

@@ -88,11 +88,11 @@ extern stringList* stringListNewFromArgv (const char* const* const argv)
 extern stringList* stringListNewFromFile (const char* const fileName)
 {
 	stringList* result = NULL;
-	FILE* const fp = fopen (fileName, "r");
+	MIO* const fp = mio_new_file (fileName, "r");
 	if (fp != NULL)
 	{
 		result = stringListNew ();
-		while (! feof (fp))
+		while (! mio_eof (fp))
 		{
 			vString* const str = vStringNew ();
 			readLineRaw (str, fp);

@@ -477,26 +477,6 @@ extern boolean isRecursiveLink (const char* const dirName)
 	return result;
 }
 
-#ifndef HAVE_FGETPOS
-
-extern int fgetpos (FILE *stream, fpos_t *pos)
-{
-	int result = 0;
-
-	*pos = ftell (stream);
-	if (*pos == -1L)
-		result = -1;
-
-	return result;
-}
-
-extern int fsetpos (FILE *stream, fpos_t const *pos)
-{
-	return fseek (stream, *pos, SEEK_SET);
-}
-
-#endif
-
 /*
  *  Pathname manipulation (O/S dependent!!!)
  */
@@ -827,10 +807,11 @@ extern char* relativeFilename (const char *file, const char *dir)
 	return res;
 }
 
-extern FILE *tempFile (const char *const mode, char **const pName)
+extern MIO *tempFile (const char *const mode, char **const pName)
 {
 	char *name;
 	FILE *fp;
+	MIO *mio;
 	int fd;
 #if defined(HAVE_MKSTEMP)
 	const char *const pattern = "tags.XXXXXX";
@@ -870,11 +851,12 @@ extern FILE *tempFile (const char *const mode, char **const pName)
 	fp = fdopen (fd, mode);
 	if (fp == NULL)
 		error (FATAL | PERROR, "cannot open temporary file");
+	mio = mio_new_fp (fp, fclose);
 	DebugStatement (
 		debugPrintf (DEBUG_STATUS, "opened temporary file %s\n", name); )
 	Assert (*pName == NULL);
 	*pName = name;
-	return fp;
+	return mio;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

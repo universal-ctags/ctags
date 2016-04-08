@@ -72,7 +72,7 @@ typedef struct _CXXToken
 	boolean bFollowedBySpace;
 
 	int iLineNumber;
-	fpos_t oFilePosition;
+	MIOPos oFilePosition;
 
 	struct _CXXToken * pNext;
 	struct _CXXToken * pPrev;

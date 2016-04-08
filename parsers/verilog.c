@@ -75,7 +75,7 @@ typedef struct sTokenInfo {
 	verilogKind         kind;
 	vString*            name;          /* the name of the token */
 	unsigned long       lineNumber;    /* line number where token was found */
-	fpos_t              filePosition;  /* file position where token was found */
+	MIOPos              filePosition;  /* file position where token was found */
 	struct sTokenInfo*  scope;         /* context of keyword */
 	int                 nestLevel;     /* Current nest level */
 	verilogKind         lastKind;      /* Kind of last found tag */
