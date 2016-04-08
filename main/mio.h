@@ -145,6 +145,9 @@ MIO *mio_new_memory (unsigned char *data,
 					 size_t size,
 					 MIOReallocFunc realloc_func,
 					 MIODestroyNotify free_func);
+
+MIO *mio_new_mio    (MIO *base, long start, size_t size);
+
 int mio_free (MIO *mio);
 FILE *mio_file_get_fp (MIO *mio);
 unsigned char *mio_memory_get_data (MIO *mio, size_t *size);

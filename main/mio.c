@@ -46,8 +46,8 @@
  * file based operations and in-memory operations. Its goal is to ease the port
  * of an application that uses C file I/O API to perform in-memory operations.
  *
- * A #MIO object is created using mio_new_file() or mio_new_memory(), depending
- * on whether you want file or in-memory operations, and destroyed using
+ * A #MIO object is created using mio_new_file(), mio_new_memory() or mio_new_mio(),
+ * depending on whether you want file or in-memory operations, and destroyed using
  * mio_free(). There is also some other convenient API to create file-based
  * #MIO objects for more complex cases, such as mio_new_file_full() and
  * mio_new_fp().
@@ -234,6 +234,67 @@ MIO *mio_new_memory (unsigned char *data,
 	}
 
 	return mio;
+}
+
+/**
+ * mio_new_mio:
+ * @base: The original mio
+ * @start: stream offset of the @base where new mio starts
+ * @size: the length of the data copied from @base to new mio
+ *
+ * Creates a new #MIO object by copying data from existing #MIO (@base).
+ * The range for copying are given with @start and @size.
+ * Copying data at the range from @start to the end of @base is
+ * done if 0 is given as @size.
+ *
+ * If @size(!= 0) is larger than the length from @start to the end of
+ * @base, %NULL is return.
+ *
+ * The function doesn't move the file position of @base.
+ *
+ * Free-function: mio_free()
+ *
+ */
+
+MIO *mio_new_mio (MIO *base, long start, size_t size)
+{
+	unsigned char *data;
+	long original_pos;
+	MIO *submio;
+	size_t r;
+
+	original_pos = mio_tell (base);
+
+	if (size == 0)
+	{
+		long end;
+
+		if (mio_seek (base, 0, SEEK_END) != 0)
+			return NULL;
+		end = mio_tell (base);
+		size = end - start;
+		Assert (size >= 0);
+	}
+
+	if (mio_seek (base, start, SEEK_SET) != 0)
+		return NULL;
+
+	data = xMalloc (size, unsigned char);
+	r= mio_read (base, data, 1, size);
+	mio_seek (base, original_pos, SEEK_SET);
+
+	if (r != size)
+		goto cleanup;
+
+	submio = mio_new_memory (data, size, eRealloc, eFree);
+	if (! submio)
+		goto cleanup;
+
+	return submio;
+
+cleanup:
+	eFree (data);
+	return NULL;
 }
 
 /**
