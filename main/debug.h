@@ -29,6 +29,7 @@
 # define PrintStatus(x)    if (debug(DEBUG_STATUS)) printf x;
 # ifdef NDEBUG
 #  define Assert(c)
+#  define AssertNotReached()
 # else
    /* based on glibc's assert.h __ASSERT_FUNCTION */
 #  if defined (__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 4))
@@ -39,11 +40,13 @@
 #   define ASSERT_FUNCTION ((const char*)0)
 #  endif
 #  define Assert(c) ((c) ? ((void)0) : debugAssert(#c, __FILE__, __LINE__, ASSERT_FUNCTION))
+#  define AssertNotReached() Assert(!"The control reaches unexpected place")
 # endif
 #else
 # define DebugStatement(x)
 # define PrintStatus(x)
 # define Assert(c)
+# define AssertNotReached()
 # ifndef NDEBUG
 #  define NDEBUG
 # endif
