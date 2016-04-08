@@ -47,8 +47,11 @@
  * of an application that uses C file I/O API to perform in-memory operations.
  *
  * A #MIO object is created using mio_new_file(), mio_new_memory() or mio_new_mio(),
- * depending on whether you want file or in-memory operations, and destroyed using
- * mio_free(). There is also some other convenient API to create file-based
+ * depending on whether you want file or in-memory operations.
+ * Its life is managed by reference counting. Just after calling one of functions
+ * for creating, the count is 1. mio_ref() increments the counter. mio_free()
+ * decrements it. When the counter becomes 0, the #MIO object will be destroyed
+ * in mio_free(). There is also some other convenient API to create file-based
  * #MIO objects for more complex cases, such as mio_new_file_full() and
  * mio_new_fp().
  *
@@ -112,6 +115,7 @@ MIO *mio_new_file_full (const char *filename,
 			mio->type = MIO_TYPE_FILE;
 			mio->impl.file.fp = fp;
 			mio->impl.file.close_func = close_func;
+			mio->refcount = 1;
 		}
 	}
 
@@ -170,6 +174,7 @@ MIO *mio_new_fp (FILE *fp, MIOFCloseFunc close_func)
 		mio->type = MIO_TYPE_FILE;
 		mio->impl.file.fp = fp;
 		mio->impl.file.close_func = close_func;
+		mio->refcount = 1;
 	}
 
 	return mio;
@@ -231,6 +236,7 @@ MIO *mio_new_memory (unsigned char *data,
 		mio->impl.mem.free_func = free_func;
 		mio->impl.mem.eof = FALSE;
 		mio->impl.mem.error = FALSE;
+		mio->refcount = 1;
 	}
 
 	return mio;
@@ -298,6 +304,20 @@ cleanup:
 }
 
 /**
+ * mio_ref:
+ * @mio: A #MIO object
+ *
+ * Increments the reference counter of a #MIO.
+ *
+ * Returns: passed @mio.
+ */
+MIO *mio_ref        (MIO *mio)
+{
+	mio->refcount++;
+	return mio;
+}
+
+/**
  * mio_file_get_fp:
  * @mio: A #MIO object
  *
@@ -353,7 +373,8 @@ unsigned char *mio_memory_get_data (MIO *mio, size_t *size)
  * mio_free:
  * @mio: A #MIO object
  *
- * Destroys a #MIO object.
+ * Decrements the reference counter of a #MIO and destroys the #MIO
+ * object if its counter becomes 0.
  *
  * Returns: Error code obtained from the registered MIOFCloseFunc or 0 on success.
  */
@@ -363,6 +384,9 @@ int mio_free (MIO *mio)
 
 	if (mio)
 	{
+		if (--mio->refcount)
+			return 0;
+
 		if (mio->type == MIO_TYPE_FILE)
 		{
 			if (mio->impl.file.close_func)

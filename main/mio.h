@@ -115,6 +115,7 @@ struct _MIOPos {
 struct _MIO {
 	/*< private >*/
 	MIOType type;
+	unsigned int refcount;
 	union {
 		struct {
 			FILE *fp;
@@ -147,6 +148,7 @@ MIO *mio_new_memory (unsigned char *data,
 					 MIODestroyNotify free_func);
 
 MIO *mio_new_mio    (MIO *base, long start, size_t size);
+MIO *mio_ref        (MIO *mio);
 
 int mio_free (MIO *mio);
 FILE *mio_file_get_fp (MIO *mio);
