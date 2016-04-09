@@ -25,7 +25,7 @@ a parser. Ctags uses a global variable `File` having type `inputFile`
 for maintaining the input file and stream.
 
 `fp` and `line` are the essential fields of `File`. `fp` having type
-well known `FILE` of stdio. By calling functions of input group
+well known `MIO` declared in main/mio.h. By calling functions of input group
 (`getcFromInputFile` and `readLineFromInputFile`), a parser gets input
 text from `fp`.
 
@@ -60,7 +60,7 @@ fields of tags file, for example.
 The functions of raw group
 ......................................................................
 The functions of this group(`readLineRaw` and `readLineRawWithNoSeek`)
-take a parameter having type `FILE *`; and don't touch `File` global
+take a parameter having type `MIO`; and don't touch `File` global
 variable.
 
 Parsers may not need the functions of this group.  The functions are
@@ -90,7 +90,7 @@ Output tag stream
 	    :scale: 80%
 
 Ctags provides `makeTagEntry` to parsers as an entry point for writing
-tag informations to FILE. `makeTagEntry` calls `writeTagEntry` if the
+tag informations to MIO. `makeTagEntry` calls `writeTagEntry` if the
 parser does not set `useCork` field. `writeTagEntry` calls one of
 three functions, `writeTagsEntry`, `writeXrefEntry` or `writeCtagsEntry`.
 One of them is chosen depending on the arguments passed to ctags.
