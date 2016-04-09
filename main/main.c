@@ -522,9 +522,6 @@ static void sanitizeEnviron (void)
 	}
 }
 
-extern void cxxParserCleanup(void);
-
-
 /*
  *		Start up code
  */
@@ -551,7 +548,6 @@ extern int main (int __unused__ argc, char **argv)
 
 	/*  Clean up.
 	 */
-	cxxParserCleanup();
 	cArgDelete (args);
 	freeKeywordTable ();
 	freeRoutineResources ();

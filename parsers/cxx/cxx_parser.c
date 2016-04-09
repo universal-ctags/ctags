@@ -1119,10 +1119,14 @@ void cxxCParserInitialize(const langType language)
 	cxxBuildKeywordHash(language,FALSE);
 }
 
-void cxxParserCleanup(void)
+void cxxParserCleanup (langType language __unused__, boolean initialized __unused__)
 {
 	if(g_bFirstRun)
 		return; // didn't run at all
+
+	// This function is used as finalizer for both C and C++ parsers.
+	// The next line forces this function to be called only once
+	g_bFirstRun = TRUE;
 
 	if(g_cxx.pTokenChain)
 		cxxTokenChainDestroy(g_cxx.pTokenChain);

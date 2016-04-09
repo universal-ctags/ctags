@@ -18,5 +18,6 @@ rescanReason cxxCParserMain(const unsigned int passCount);
 rescanReason cxxCppParserMain(const unsigned int passCount);
 void cxxCppParserInitialize(const langType language);
 void cxxCParserInitialize(const langType language);
+void cxxParserCleanup (langType language, boolean initialized);
 
 #endif //!ctags_cxx_parser_h_
