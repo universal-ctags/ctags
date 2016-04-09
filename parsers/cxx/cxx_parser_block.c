@@ -272,12 +272,16 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 							return FALSE;
 						}
 						cxxParserNewStatement();
+						// Force the cpp preprocessor to think that we're in the middle of a statement.
+						cppBeginStatement();
 					break;
 					case CXXKeywordTRY:
 					case CXXKeywordELSE:
 					case CXXKeywordDO:
 						// parse as normal statement/block
 						cxxParserNewStatement();
+						// Force the cpp preprocessor to think that we're in the middle of a statement.
+						cppBeginStatement();
 					break;
 					case CXXKeywordRETURN:
 						if(cxxParserCurrentLanguageIsCPP())
