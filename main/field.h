@@ -44,23 +44,14 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_COUNT
 } fieldType ;
 
-typedef const char* (* renderEscaped) (const tagEntryInfo *const tag, vString * buffer);
+struct sFieldDesc;
+typedef struct sFieldDesc fieldDesc;
 
-typedef struct sFieldDesc {
-	unsigned int enabled: 1;
-	unsigned int fixed:   1;   /* fields which cannot be disabled. */
-	unsigned char letter;
-	const char* name;         /* kind name */
-	const char* description;  /* displayed in --help output */
-	renderEscaped renderEscaped;
-	vString *buffer;
-	const char* nameWithPrefix;
-} fieldDesc;
 
-extern fieldDesc* getFieldDesc(fieldType type);
 extern fieldType getFieldTypeForOption (char letter);
 extern boolean isFieldEnabled (fieldType type);
 extern boolean enableField (fieldType type, boolean state);
+extern boolean isFieldFixed (fieldType type);
 extern const char* getFieldName(fieldType type);
 extern void printFields (void);
 

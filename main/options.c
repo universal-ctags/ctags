@@ -1087,7 +1087,7 @@ static void resetFieldsOption (boolean mode)
 {
 	int i;
 	for (i = 0; i < FIELD_COUNT; ++i)
-		if (!getFieldDesc (i)->fixed)
+		if (!isFieldFixed (i))
 			enableField (i, mode);
 }
 
@@ -1116,9 +1116,9 @@ static void processFieldsOption (
 			if (t == FIELD_UNKNOWN)
 				error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
 				      c, option);
-			else if (getFieldDesc (t)->fixed && (mode == FALSE))
+			else if (isFieldFixed (t) && (mode == FALSE))
 				error(WARNING, "Cannot disable basic field: '%c'(%s) for \"%s\" option",
-				      c, getFieldDesc (t)->name, option);
+				      c, getFieldName (t), option);
 			else
 				enableField (t, mode);
 			break;

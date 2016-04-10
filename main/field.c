@@ -25,6 +25,19 @@
 #include "read.h"
 #include "routines.h"
 
+
+typedef const char* (* renderEscaped) (const tagEntryInfo *const tag, vString * buffer);
+struct sFieldDesc {
+	unsigned int enabled: 1;
+	unsigned int fixed:   1;   /* fields which cannot be disabled. */
+	unsigned char letter;
+	const char* name;         /* kind name */
+	const char* description;  /* displayed in --help output */
+	renderEscaped renderEscaped;
+	vString *buffer;
+	const char* nameWithPrefix;
+};
+
 static const char *renderFieldName (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldInput (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag, vString* b);
@@ -134,7 +147,7 @@ static fieldDesc fieldDescs [] = {
 			     renderFieldExtra),
 };
 
-extern fieldDesc* getFieldDesc(fieldType type)
+static fieldDesc* getFieldDesc(fieldType type)
 {
 	Assert ((0 <= type) && (type < FIELD_COUNT));
 	return fieldDescs + type;
@@ -484,6 +497,11 @@ extern boolean enableField (fieldType type, boolean state)
 	boolean old = getFieldDesc(type)->enabled? TRUE: FALSE;
 	getFieldDesc(type)->enabled = state;
 	return old;
+}
+
+extern boolean isFieldFixed (fieldType type)
+{
+	return getFieldDesc(type)->fixed? TRUE: FALSE;
 }
 
 extern boolean isFieldRenderable (fieldType type)
