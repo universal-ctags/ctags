@@ -46,7 +46,7 @@ static const char *renderFieldExtra (const tagEntryInfo *const tag, vString* b);
 
 #define DEFINE_FIELD_FULL(L,N, V, H, B, F, NWP) {		\
 		.enabled       = V,				\
-		.basic         = B,				\
+		.fixed         = B,				\
 		.letter        = L,				\
 		.name          = N,				\
 		.description   = H,				\
@@ -55,7 +55,7 @@ static const char *renderFieldExtra (const tagEntryInfo *const tag, vString* b);
 		.nameWithPrefix = NWP,				\
 	}
 
-#define DEFINE_BASIC_FIELD(L,N,V,H,F)		\
+#define DEFINE_FIXED_FIELD(L,N,V,H,F)		\
 	DEFINE_FIELD_FULL(L,N,V,H,TRUE, F, N)
 
 #define DEFINE_FIELD(L,N,V,H, F)		\
@@ -69,14 +69,14 @@ static const char *renderFieldExtra (const tagEntryInfo *const tag, vString* b);
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):"-")
 
 static fieldDesc fieldDescs [] = {
-        /* BASIC FIELDS */
-	DEFINE_BASIC_FIELD ('N', "name",     TRUE,
+        /* FIXED FIELDS */
+	DEFINE_FIXED_FIELD ('N', "name",     TRUE,
 			  "tag name (fixed field)",
 			  renderFieldName),
-	DEFINE_BASIC_FIELD ('F', "input",    TRUE,
+	DEFINE_FIXED_FIELD ('F', "input",    TRUE,
 			  "input file (fixed field)",
 			  renderFieldInput),
-	DEFINE_BASIC_FIELD ('P', "pattern",  TRUE,
+	DEFINE_FIXED_FIELD ('P', "pattern",  TRUE,
 			  "pattern (fixed field)",
 			  renderFieldPattern),
 	DEFINE_FIELD ('C', "compact",        FALSE,

@@ -48,7 +48,7 @@ typedef const char* (* renderEscaped) (const tagEntryInfo *const tag, vString * 
 
 typedef struct sFieldDesc {
 	unsigned int enabled: 1;
-	unsigned int basic:   1;
+	unsigned int fixed:   1;   /* fields which cannot be disabled. */
 	unsigned char letter;
 	const char* name;         /* kind name */
 	const char* description;  /* displayed in --help output */
