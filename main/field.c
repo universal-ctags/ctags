@@ -226,6 +226,29 @@ extern fieldType getFieldTypeForOption (char letter)
 	return FIELD_UNKNOWN;
 }
 
+extern fieldType getFieldTypeForName (const char *name)
+{
+
+	static boolean initialized = FALSE;
+	int i;
+
+retry:
+	for (i = 0; i < fieldDescUsed; i++)
+	{
+		if (fieldDescs [i].spec->name
+		    && strcmp (fieldDescs [i].spec->name, name) == 0)
+			return i;
+	}
+
+	if (initialized)
+		return FIELD_UNKNOWN;
+
+	initialized = TRUE;
+	for (i = 0; i < countParsers(); i++)
+		initializeParser (i);
+	goto retry;
+}
+
 extern const char* getFieldName(fieldType type)
 {
 	fieldDesc* fdesc;
@@ -260,8 +283,13 @@ extern const char* getFieldName(fieldType type)
 
 static void printField (fieldType i)
 {
+	unsigned char letter = fieldDescs[i].spec->letter;
+
+	if (letter == FIELD_LETTER_NO_USE)
+		letter = '-';
+
 	printf((Option.machinable? "%c\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(c)),
-	       fieldDescs[i].spec->letter,
+	       letter,
 	       (fieldDescs[i].spec->name? getFieldName (i): "NONE"),
 	       isFieldEnabled (i)? "on": "off",
 	       getFieldDesc (i)->spec->renderEscaped? "TRUE": "FALSE",
@@ -627,6 +655,7 @@ extern int defineField (fieldSpec *spec, int language)
 	}
 	fdesc = fieldDescs + (fieldDescUsed);
 	spec->ftype = fieldDescUsed++;
+
 	fdesc->spec = spec;
 
 	fdesc->fixed =  0;

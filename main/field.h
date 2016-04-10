@@ -54,6 +54,7 @@ typedef const char* (* renderEscaped) (const struct sTagEntryInfo *const tag,
 				       const char *value,
 				       vString * buffer);
 
+#define FIELD_LETTER_NO_USE '\0'
 typedef struct sFieldSpec {
 	/* lettern, and ftype are initialized in the main part,
 	   not in a parser. */
@@ -69,6 +70,7 @@ typedef struct sFieldSpec {
 
 
 extern fieldType getFieldTypeForOption (char letter);
+extern fieldType getFieldTypeForName (const char *name);
 extern boolean isFieldEnabled (fieldType type);
 extern boolean enableField (fieldType type, boolean state);
 extern boolean isFieldFixed (fieldType type);

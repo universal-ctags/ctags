@@ -1101,31 +1101,81 @@ static void processFieldsOption (
 	fieldType t;
 	int i;
 
-	for (i = 0; i < countParsers(); i++)
-		initializeParser (i);
+	static vString * longName;
+	boolean inLongName = FALSE;
+
+	if (!longName)
+		longName = vStringNew ();
+	else
+		vStringClear (longName);
 
 	if (*p == '*')
 	{
+		for (i = 0; i < countParsers(); i++)
+			initializeParser (i);
+
 		resetFieldsOption (TRUE);
 		p++;
 	}
 	else if (*p != '+'  &&  *p != '-')
+	{
+		for (i = 0; i < countParsers(); i++)
+			initializeParser (i);
 		resetFieldsOption (FALSE);
-
+	}
 
 	while ((c = *p++) != '\0') switch (c)
 	{
-		case '+': mode = TRUE;                  break;
-		case '-': mode = FALSE;                 break;
-		default : t = getFieldTypeForOption (c);
-			if (t == FIELD_UNKNOWN)
-				error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
-				      c, option);
-			else if (isFieldFixed (t) && (mode == FALSE))
-				error(WARNING, "Cannot disable basic field: '%c'(%s) for \"%s\" option",
-				      c, getFieldName (t), option);
+		case '+':
+			if (inLongName)
+				vStringPut (longName, c);
 			else
-				enableField (t, mode);
+				mode = TRUE;
+			break;
+		case '-':
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				mode = FALSE;
+			break;
+		case '{':
+			if (inLongName)
+				error(FATAL,
+				      "unexpected character in field specification: \'%c\'",
+				      c);
+			inLongName = TRUE;
+			break;
+		case '}':
+			if (!inLongName)
+				error(FATAL,
+				      "unexpected character in field specification: \'%c\'",
+				      c);
+
+			t = getFieldTypeForName (vStringValue (longName));
+			if (t == FIELD_UNKNOWN)
+				error(FATAL,
+				      "nosuch field: \'%s\'",
+				      vStringValue (longName));
+
+			enableField (t, mode);
+			inLongName = FALSE;
+			vStringClear (longName);
+			break;
+		default :
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+			{
+				t = getFieldTypeForOption (c);
+				if (t == FIELD_UNKNOWN)
+					error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
+					      c, option);
+				else if (isFieldFixed (t) && (mode == FALSE))
+					error(WARNING, "Cannot disable basic field: '%c'(%s) for \"%s\" option",
+					      c, getFieldName (t), option);
+				else
+					enableField (t, mode);
+			}
 			break;
 	}
 }
