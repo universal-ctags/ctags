@@ -1,19 +1,19 @@
-call	input.cpp	/^template<typename T> void call(T x)$/;"	function	typeref:typename:void	signature:(T x)
-x	input.cpp	/^template<typename T> void call(T x)$/;"	parameter	function:call	typeref:typename:T	file:
-test	input.cpp	/^int test()$/;"	function	typeref:typename:int	signature:()
+call	input.cpp	/^template<typename T> void call(T x)$/;"	function	typeref:unknown:void	signature:(T x)
+x	input.cpp	/^template<typename T> void call(T x)$/;"	parameter	function:call	typeref:unknown:T	file:
+test	input.cpp	/^int test()$/;"	function	typeref:unknown:int	signature:()
 __anon4e7b1b580103	input.cpp	/^	auto l1 = [] { return 0; };$/;"	function	function:test	file:
-l1	input.cpp	/^	auto l1 = [] { return 0; };$/;"	local	function:test	typeref:typename:auto	file:
+l1	input.cpp	/^	auto l1 = [] { return 0; };$/;"	local	function:test	typeref:unknown:auto	file:
 __anon4e7b1b580203	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	function	function:test	file:
-a	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	parameter	function:test::__anon4e7b1b580203	typeref:typename:int	file:
-b	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	parameter	function:test::__anon4e7b1b580203	typeref:typename:int	file:
-l2	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	local	function:test	typeref:typename:auto	file:
-__anon4e7b1b580303	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	function	function:test	typeref:typename:int	file:
-a	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580303	typeref:typename:int	file:
-b	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580303	typeref:typename:int	file:
+a	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	parameter	function:test::__anon4e7b1b580203	typeref:unknown:int	file:
+b	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	parameter	function:test::__anon4e7b1b580203	typeref:unknown:int	file:
+l2	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	local	function:test	typeref:unknown:auto	file:
+__anon4e7b1b580303	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	function	function:test	typeref:unknown:int	file:
+a	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580303	typeref:unknown:int	file:
+b	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580303	typeref:unknown:int	file:
 __anon4e7b1b580403	input.cpp	/^		auto l4 = [a,b](int c){ return a+b+c; };$/;"	function	function:test::__anon4e7b1b580303	file:
-c	input.cpp	/^		auto l4 = [a,b](int c){ return a+b+c; };$/;"	parameter	function:test::__anon4e7b1b580303::__anon4e7b1b580403	typeref:typename:int	file:
-l4	input.cpp	/^		auto l4 = [a,b](int c){ return a+b+c; };$/;"	local	function:test::__anon4e7b1b580303	typeref:typename:auto	file:
-l3	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	local	function:test	typeref:typename:auto	file:
-__anon4e7b1b580503	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	function	function:test	typeref:typename:int	file:
-a	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580503	typeref:typename:int	file:
-b	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580503	typeref:typename:int	file:
+c	input.cpp	/^		auto l4 = [a,b](int c){ return a+b+c; };$/;"	parameter	function:test::__anon4e7b1b580303::__anon4e7b1b580403	typeref:unknown:int	file:
+l4	input.cpp	/^		auto l4 = [a,b](int c){ return a+b+c; };$/;"	local	function:test::__anon4e7b1b580303	typeref:unknown:auto	file:
+l3	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	local	function:test	typeref:unknown:auto	file:
+__anon4e7b1b580503	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	function	function:test	typeref:unknown:int	file:
+a	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580503	typeref:unknown:int	file:
+b	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580503	typeref:unknown:int	file:

@@ -1,7 +1,7 @@
 __anonadd2b98b010a	input.c	/^typedef struct {$/;"	s	file:
-a	input.c	/^	int a;$/;"	m	struct:__anonadd2b98b010a	typeref:typename:int	file:
-a	input.c	/^	int a;$/;"	m	struct:mystruct	typeref:typename:int	file:
-b	input.c	/^	int b;$/;"	m	struct:__anonadd2b98b010a	typeref:typename:int	file:
-b	input.c	/^	int b;$/;"	m	struct:mystruct	typeref:typename:int	file:
+a	input.c	/^	int a;$/;"	m	struct:__anonadd2b98b010a	typeref:unknown:int	file:
+a	input.c	/^	int a;$/;"	m	struct:mystruct	typeref:unknown:int	file:
+b	input.c	/^	int b;$/;"	m	struct:__anonadd2b98b010a	typeref:unknown:int	file:
+b	input.c	/^	int b;$/;"	m	struct:mystruct	typeref:unknown:int	file:
 mystruct	input.c	/^typedef struct mystruct {$/;"	s	file:
 mystruct	input.c	/^} mystruct;$/;"	t	typeref:struct:__anonadd2b98b010a	file:

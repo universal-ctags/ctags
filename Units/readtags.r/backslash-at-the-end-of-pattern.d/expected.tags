@@ -1,2 +1,2 @@
 M	input.c	/^#define M\\/;"	d	file:
-main	input.c	/^int main() {$/;"	f	typeref:typename:int
+main	input.c	/^int main() {$/;"	f	typeref:unknown:int

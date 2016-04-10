@@ -1,1 +1,1 @@
-fn	input.cpp	/^Class fn()$/;"	f	typeref:typename:Class
+fn	input.cpp	/^Class fn()$/;"	f	typeref:unknown:Class

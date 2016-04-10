@@ -1,1 +1,1 @@
-f	input.cpp	/^void f() {$/;"	f	typeref:typename:void
+f	input.cpp	/^void f() {$/;"	f	typeref:unknown:void

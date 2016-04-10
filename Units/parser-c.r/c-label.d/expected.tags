@@ -1,2 +1,2 @@
-main	input.c	/^main(int argc)$/;"	f	typeref:typename:int
+main	input.c	/^main(int argc)$/;"	f	typeref:unknown:int
 out	input.c	/^   out:$/;"	L	function:main	file:

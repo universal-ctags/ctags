@@ -1,1 +1,1 @@
-main	input.nolang	/^main(void)$/;"	f	typeref:typename:int
+main	input.nolang	/^main(void)$/;"	f	typeref:unknown:int

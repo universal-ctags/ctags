@@ -1,2 +1,2 @@
-size_t	input.c	/^typedef int size_t;$/;"	t	typeref:typename:int	file:
-wchar_t	input.c	/^typedef int wchar_t;$/;"	t	typeref:typename:int	file:
+size_t	input.c	/^typedef int size_t;$/;"	t	typeref:unknown:int	file:
+wchar_t	input.c	/^typedef int wchar_t;$/;"	t	typeref:unknown:int	file:

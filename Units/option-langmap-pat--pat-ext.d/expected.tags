@@ -1,1 +1,1 @@
-main	input.zzz	/^main(void)$/;"	f	typeref:typename:int
+main	input.zzz	/^main(void)$/;"	f	typeref:unknown:int
