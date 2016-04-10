@@ -42,7 +42,7 @@ struct sFieldSpec {
 };
 
 struct sFieldDesc {
-	fieldSpec spec;
+	fieldSpec *spec;
 	unsigned int fixed:   1;   /* fields which cannot be disabled. */
 	vString     *buffer;
 	const char* nameWithPrefix;
@@ -67,102 +67,87 @@ static const char *renderFieldRole (const tagEntryInfo *const tag, const char *v
 static const char *renderFieldRefMarker (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldExtra (const tagEntryInfo *const tag, const char *value, vString* b);
 
-#define DEFINE_FIELD_FULL(L,N, V, H, B, F, NWP) {	\
-		.spec = {				\
-			.letter        = L,		\
-			.name          = N,		\
-			.description   = H,		\
-			.enabled       = V,		\
-			.renderEscaped = F,		\
-		},					\
-		.fixed         = B,			\
-		.buffer        = NULL,			\
-		.nameWithPrefix = NWP,			\
-	 }
-
-#define DEFINE_FIXED_FIELD(L,N,V,H,F)		\
-	DEFINE_FIELD_FULL(L,N,V,H,TRUE, F, N)
-
-#define DEFINE_FIELD(L,N,V,H, F)		\
-	DEFINE_FIELD_FULL(L,N,V,H,FALSE, F, N)
-
-#define DEFINE_FIELD_UCTAGS(L,N,V,H,F)		\
-	DEFINE_FIELD_FULL(L,N,V,H,FALSE, F, (CTAGS_FIELD_PREFIX N))
-#define DEFINE_FIELD_UCTAGS_NONAME(L,V,H,F)		\
-	DEFINE_FIELD_FULL(L,NULL ,V,H,FALSE, F, NULL)
+#define DEFINE_FIELD_SPEC(L, N, V, H, F)	\
+	{					\
+		.letter        = L,		\
+		.name          = N,		\
+		.description   = H,		\
+		.enabled       = V,		\
+		.renderEscaped = F,		\
+	}
 
 #define WITH_DEFUALT_VALUE(str) ((str)?(str):"-")
 
-static fieldDesc fieldDescsFixed [] = {
+static fieldSpec fieldSpecsFixed [] = {
         /* FIXED FIELDS */
-	DEFINE_FIXED_FIELD ('N', "name",     TRUE,
+	DEFINE_FIELD_SPEC ('N', "name",     TRUE,
 			  "tag name (fixed field)",
 			  renderFieldName),
-	DEFINE_FIXED_FIELD ('F', "input",    TRUE,
-			  "input file (fixed field)",
-			  renderFieldInput),
-	DEFINE_FIXED_FIELD ('P', "pattern",  TRUE,
-			  "pattern (fixed field)",
-			  renderFieldPattern),
+	DEFINE_FIELD_SPEC ('F', "input",    TRUE,
+			   "input file (fixed field)",
+			   renderFieldInput),
+	DEFINE_FIELD_SPEC ('P', "pattern",  TRUE,
+			   "pattern (fixed field)",
+			   renderFieldPattern),
 };
 
-static fieldDesc fieldDescsExuberant [] = {
-	DEFINE_FIELD ('C', "compact",        FALSE,
-			  "compact input line (fixed field, only used in -x option)",
-		      renderFieldCompactInputLine),
+static fieldSpec fieldSpecsExuberant [] = {
+	DEFINE_FIELD_SPEC ('C', "compact",        FALSE,
+			   "compact input line (fixed field, only used in -x option)",
+			   renderFieldCompactInputLine),
 
 	/* EXTENSION FIELDS */
-	DEFINE_FIELD ('a', "access",         FALSE,
+	DEFINE_FIELD_SPEC ('a', "access",         FALSE,
 		      "Access (or export) of class members",
 		      renderFieldAccess),
-	DEFINE_FIELD ('f', "file",           TRUE,
+	DEFINE_FIELD_SPEC ('f', "file",           TRUE,
 		      "File-restricted scoping",
 		      renderFieldFile),
-	DEFINE_FIELD ('i', "inherits",       FALSE,
+	DEFINE_FIELD_SPEC ('i', "inherits",       FALSE,
 		      "Inheritance information",
 		      renderFieldInherits),
-	DEFINE_FIELD ('K', NULL,             FALSE,
+	DEFINE_FIELD_SPEC ('K', NULL,             FALSE,
 		      "Kind of tag as full name",
 		      renderFieldKindName),
-	DEFINE_FIELD ('k', NULL,             TRUE,
-		      "Kind of tag as a single letter",
-		      renderFieldKindLetter),
-	DEFINE_FIELD ('l', "language",       FALSE,
-		      "Language of input file containing tag",
-		      renderFieldLanguage),
-	DEFINE_FIELD ('m', "implementation", FALSE,
-		      "Implementation information",
-		      renderFieldImplementation),
-	DEFINE_FIELD ('n', "line",           FALSE,
-		      "Line number of tag definition",
-		      renderFieldLineNumber),
-	DEFINE_FIELD ('S', "signature",	     FALSE,
-		      "Signature of routine (e.g. prototype or parameter list)",
-		      renderFieldSignature),
-	DEFINE_FIELD ('s', NULL,             TRUE,
-			  "Scope of tag definition (WARNING: this doesn't work well as a format letter)",
-		      renderFieldScope),
-	DEFINE_FIELD ('t', "typeref",        TRUE,
-		      "Type and name of a variable or typedef",
-		      renderFieldTyperef),
-	DEFINE_FIELD ('z', "kind",           FALSE,
-			  "Include the \"kind:\" key in kind field (use k or K)",
-		      NULL),
+	DEFINE_FIELD_SPEC ('k', NULL,             TRUE,
+			   "Kind of tag as a single letter",
+			   renderFieldKindLetter),
+	DEFINE_FIELD_SPEC ('l', "language",       FALSE,
+			   "Language of input file containing tag",
+			   renderFieldLanguage),
+	DEFINE_FIELD_SPEC ('m', "implementation", FALSE,
+			   "Implementation information",
+			   renderFieldImplementation),
+	DEFINE_FIELD_SPEC ('n', "line",           FALSE,
+			   "Line number of tag definition",
+			   renderFieldLineNumber),
+	DEFINE_FIELD_SPEC ('S', "signature",	     FALSE,
+			   "Signature of routine (e.g. prototype or parameter list)",
+			   renderFieldSignature),
+	DEFINE_FIELD_SPEC ('s', NULL,             TRUE,
+			   "Scope of tag definition (WARNING: this doesn't work well as a format letter)",
+			   renderFieldScope),
+	DEFINE_FIELD_SPEC ('t', "typeref",        TRUE,
+			   "Type and name of a variable or typedef",
+			   renderFieldTyperef),
+	DEFINE_FIELD_SPEC ('z', "kind",           FALSE,
+			   "Include the \"kind:\" key in kind field (use k or K)",
+			   NULL),
 };
 
-static fieldDesc fieldDescsUniversal [] = {
-	DEFINE_FIELD_UCTAGS ('r', "role",    FALSE,
-			  "Role",
-			  renderFieldRole),
-	DEFINE_FIELD_UCTAGS_NONAME ('R',     FALSE,
-			  "Marker (R or D) representing whether tag is definition or reference",
-			  renderFieldRefMarker),
-	DEFINE_FIELD_UCTAGS ('Z', "scope",   FALSE,
+static fieldSpec fieldSpecsUniversal [] = {
+	DEFINE_FIELD_SPEC ('r', "role",    FALSE,
+			   "Role",
+			   renderFieldRole),
+	DEFINE_FIELD_SPEC ('R',  NULL,     FALSE,
+			   "Marker (R or D) representing whether tag is definition or reference",
+			   renderFieldRefMarker),
+	DEFINE_FIELD_SPEC ('Z', "scope",   FALSE,
 			  "Include the \"scope:\" key in scope field (use s)",
 		      NULL),
-	DEFINE_FIELD_UCTAGS ('E', "extra",   FALSE,
-			     "Extra tag type information",
-			     renderFieldExtra),
+	DEFINE_FIELD_SPEC ('E', "extra",   FALSE,
+			   "Extra tag type information",
+			   renderFieldExtra),
 };
 
 
@@ -173,27 +158,59 @@ static fieldDesc* fieldDescs = NULL;
 extern void initFieldDescs (void)
 {
 	int i;
+	fieldDesc *fdesc;
+
 	Assert (fieldDescs == NULL);
 
 	fieldDescAllocated
-	  = ARRAY_SIZE (fieldDescsFixed)
-	  + ARRAY_SIZE (fieldDescsExuberant)
-	  + ARRAY_SIZE (fieldDescsUniversal);
+	  = ARRAY_SIZE (fieldSpecsFixed)
+	  + ARRAY_SIZE (fieldSpecsExuberant)
+	  + ARRAY_SIZE (fieldSpecsUniversal);
 	fieldDescs = xMalloc (fieldDescAllocated, fieldDesc);
 
 	fieldDescUsed = 0;
 
-	for (i = 0; i < ARRAY_SIZE (fieldDescsFixed); i++)
-		fieldDescs[i + fieldDescUsed] = fieldDescsFixed[i];
-	fieldDescUsed += ARRAY_SIZE (fieldDescsFixed);
+	for (i = 0; i < ARRAY_SIZE (fieldSpecsFixed); i++)
+	{
+		fdesc = fieldDescs + i + fieldDescUsed;
+		fdesc->spec   = fieldSpecsFixed + i;
+		fdesc->fixed  = 1;
+		fdesc->buffer = NULL;
+		fdesc->nameWithPrefix = fdesc->spec->name;
+	}
+	fieldDescUsed += ARRAY_SIZE (fieldSpecsFixed);
 
-	for (i = 0; i < ARRAY_SIZE (fieldDescsExuberant); i++)
-		fieldDescs[i + fieldDescUsed] = fieldDescsExuberant[i];
-	fieldDescUsed += ARRAY_SIZE (fieldDescsExuberant);
+	for (i = 0; i < ARRAY_SIZE (fieldSpecsExuberant); i++)
+	{
+		fdesc = fieldDescs + i + fieldDescUsed;
+		fdesc->spec = fieldSpecsExuberant +i;
+		fdesc->fixed = 0;
+		fdesc->buffer = NULL;
+		fdesc->nameWithPrefix = fdesc->spec->name;
+	}
+	fieldDescUsed += ARRAY_SIZE (fieldSpecsExuberant);
 
-	for (i = 0; i < ARRAY_SIZE (fieldDescsUniversal); i++)
-		fieldDescs[i + fieldDescUsed] = fieldDescsUniversal[i];
-	fieldDescUsed += ARRAY_SIZE (fieldDescsUniversal);
+	for (i = 0; i < ARRAY_SIZE (fieldSpecsUniversal); i++)
+	{
+		char *nameWithPrefix;
+
+		fdesc = fieldDescs + i + fieldDescUsed;
+		fdesc->spec = fieldSpecsUniversal + i;
+		fdesc->fixed = 0;
+		fdesc->buffer = NULL;
+
+		if (fdesc->spec->name)
+		{
+			nameWithPrefix = eMalloc (sizeof CTAGS_FIELD_PREFIX + strlen (fdesc->spec->name) + 1);
+			nameWithPrefix [0] = '\0';
+			strcat (nameWithPrefix, CTAGS_FIELD_PREFIX);
+			strcat (nameWithPrefix, fdesc->spec->name);
+			fdesc->nameWithPrefix = nameWithPrefix;
+		}
+		else
+			fdesc->nameWithPrefix = NULL;
+	}
+	fieldDescUsed += ARRAY_SIZE (fieldSpecsUniversal);
 
 	Assert ( fieldDescAllocated == fieldDescUsed );
 }
@@ -210,7 +227,7 @@ extern fieldType getFieldTypeForOption (char letter)
 
 	for (i = 0; i < fieldDescUsed; i++)
 	{
-		if (fieldDescs [i].spec.letter == letter)
+		if (fieldDescs [i].spec->letter == letter)
 			return i;
 	}
 	return FIELD_UNKNOWN;
@@ -224,7 +241,7 @@ extern const char* getFieldName(fieldType type)
 	if (Option.putFieldPrefix)
 		return fdesc->nameWithPrefix;
 	else
-		return fdesc->spec.name;
+		return fdesc->spec->name;
 }
 
 #define PR_FIELD_WIDTH_LETTER     7
@@ -251,11 +268,11 @@ extern const char* getFieldName(fieldType type)
 static void printField (fieldType i)
 {
 	printf((Option.machinable? "%c\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(c)),
-	       fieldDescs[i].spec.letter,
-	       (fieldDescs[i].spec.name? getFieldName (i): "NONE"),
+	       fieldDescs[i].spec->letter,
+	       (fieldDescs[i].spec->name? getFieldName (i): "NONE"),
 	       isFieldEnabled (i)? "on": "off",
-	       getFieldDesc (i)->spec.renderEscaped? "TRUE": "FALSE",
-	       fieldDescs[i].spec.description? fieldDescs[i].spec.description: "NONE");
+	       getFieldDesc (i)->spec->renderEscaped? "TRUE": "FALSE",
+	       fieldDescs[i].spec->description? fieldDescs[i].spec->description: "NONE");
 }
 
 extern void printFields (void)
@@ -359,7 +376,7 @@ extern const char* renderFieldEscaped (fieldType type,
 	const char *value;
 
 	Assert (tag);
-	Assert (fdesc->spec.renderEscaped);
+	Assert (fdesc->spec->renderEscaped);
 
 	if (fdesc->buffer == NULL)
 		fdesc->buffer = vStringNew ();
@@ -374,7 +391,7 @@ extern const char* renderFieldEscaped (fieldType type,
 	else
 		value = NULL;
 
-	return fdesc->spec.renderEscaped (tag, value, fdesc->buffer);
+	return fdesc->spec->renderEscaped (tag, value, fdesc->buffer);
 }
 
 /*  Writes "line", stripping leading and duplicate white space.
@@ -571,13 +588,13 @@ static const char *renderFieldExtra (const tagEntryInfo *const tag,
 
 extern boolean isFieldEnabled (fieldType type)
 {
-	return getFieldDesc(type)->spec.enabled? TRUE: FALSE;
+	return getFieldDesc(type)->spec->enabled? TRUE: FALSE;
 }
 
 extern boolean enableField (fieldType type, boolean state)
 {
-	boolean old = getFieldDesc(type)->spec.enabled? TRUE: FALSE;
-	getFieldDesc(type)->spec.enabled = state;
+	boolean old = getFieldDesc(type)->spec->enabled? TRUE: FALSE;
+	getFieldDesc(type)->spec->enabled = state;
 	return old;
 }
 
@@ -588,7 +605,7 @@ extern boolean isFieldFixed (fieldType type)
 
 extern boolean isFieldRenderable (fieldType type)
 {
-	return getFieldDesc(type)->spec.renderEscaped? TRUE: FALSE;
+	return getFieldDesc(type)->spec->renderEscaped? TRUE: FALSE;
 }
 
 extern int countFields (void)
