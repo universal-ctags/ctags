@@ -27,14 +27,22 @@
 
 
 typedef const char* (* renderEscaped) (const tagEntryInfo *const tag, vString * buffer);
-struct sFieldDesc {
-	unsigned int enabled: 1;
-	unsigned int fixed:   1;   /* fields which cannot be disabled. */
+
+typedef struct sFieldSpec fieldSpec;
+struct sFieldSpec {
 	unsigned char letter;
-	const char* name;         /* kind name */
-	const char* description;  /* displayed in --help output */
+	const char* name;
+	const char* description;
+	boolean enabled;
 	renderEscaped renderEscaped;
-	vString *buffer;
+
+	unsigned int ftype;	/* Given from the main part */
+};
+
+struct sFieldDesc {
+	fieldSpec spec;
+	unsigned int fixed:   1;   /* fields which cannot be disabled. */
+	vString     *buffer;
 	const char* nameWithPrefix;
 };
 
@@ -57,16 +65,18 @@ static const char *renderFieldRole (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldRefMarker (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldExtra (const tagEntryInfo *const tag, vString* b);
 
-#define DEFINE_FIELD_FULL(L,N, V, H, B, F, NWP) {		\
-		.enabled       = V,				\
-		.fixed         = B,				\
-		.letter        = L,				\
-		.name          = N,				\
-		.description   = H,				\
-		.renderEscaped = F,				\
-		.buffer        = NULL,  			\
-		.nameWithPrefix = NWP,				\
-	}
+#define DEFINE_FIELD_FULL(L,N, V, H, B, F, NWP) {	\
+		.spec = {				\
+			.letter        = L,		\
+			.name          = N,		\
+			.description   = H,		\
+			.enabled       = V,		\
+			.renderEscaped = F,		\
+		},					\
+		.fixed         = B,			\
+		.buffer        = NULL,			\
+		.nameWithPrefix = NWP,			\
+	 }
 
 #define DEFINE_FIXED_FIELD(L,N,V,H,F)		\
 	DEFINE_FIELD_FULL(L,N,V,H,TRUE, F, N)
@@ -159,7 +169,7 @@ extern fieldType getFieldTypeForOption (char letter)
 
 	for (i = 0; i < FIELD_COUNT; i++)
 	{
-		if (fieldDescs [i].letter == letter)
+		if (fieldDescs [i].spec.letter == letter)
 			return i;
 	}
 	return FIELD_UNKNOWN;
@@ -173,7 +183,7 @@ extern const char* getFieldName(fieldType type)
 	if (Option.putFieldPrefix)
 		return fdesc->nameWithPrefix;
 	else
-		return fdesc->name;
+		return fdesc->spec.name;
 }
 
 #define PR_FIELD_WIDTH_LETTER     7
@@ -200,11 +210,11 @@ extern const char* getFieldName(fieldType type)
 static void printField (fieldType i)
 {
 	printf((Option.machinable? "%c\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(c)),
-	       fieldDescs[i].letter,
-	       (fieldDescs[i].name? getFieldName (i): "NONE"),
+	       fieldDescs[i].spec.letter,
+	       (fieldDescs[i].spec.name? getFieldName (i): "NONE"),
 	       isFieldEnabled (i)? "on": "off",
-	       getFieldDesc (i)->renderEscaped? "TRUE": "FALSE",
-	       fieldDescs[i].description? fieldDescs[i].description: "NONE");
+	       getFieldDesc (i)->spec.renderEscaped? "TRUE": "FALSE",
+	       fieldDescs[i].spec.description? fieldDescs[i].spec.description: "NONE");
 }
 
 extern void printFields (void)
@@ -306,14 +316,14 @@ extern const char* renderFieldEscaped (fieldType type,
 	fieldDesc *fdesc = fieldDescs + type;
 
 	Assert (tag);
-	Assert (fdesc->renderEscaped);
+	Assert (fdesc->spec.renderEscaped);
 
 	if (fdesc->buffer == NULL)
 		fdesc->buffer = vStringNew ();
 	else
 		vStringClear (fdesc->buffer);
 
-	return fdesc->renderEscaped (tag, fdesc->buffer);
+	return fdesc->spec.renderEscaped (tag, fdesc->buffer);
 }
 
 /*  Writes "line", stripping leading and duplicate white space.
@@ -489,13 +499,13 @@ static const char *renderFieldExtra (const tagEntryInfo *const tag, vString* b)
 
 extern boolean isFieldEnabled (fieldType type)
 {
-	return getFieldDesc(type)->enabled? TRUE: FALSE;
+	return getFieldDesc(type)->spec.enabled? TRUE: FALSE;
 }
 
 extern boolean enableField (fieldType type, boolean state)
 {
-	boolean old = getFieldDesc(type)->enabled? TRUE: FALSE;
-	getFieldDesc(type)->enabled = state;
+	boolean old = getFieldDesc(type)->spec.enabled? TRUE: FALSE;
+	getFieldDesc(type)->spec.enabled = state;
 	return old;
 }
 
@@ -506,7 +516,7 @@ extern boolean isFieldFixed (fieldType type)
 
 extern boolean isFieldRenderable (fieldType type)
 {
-	return getFieldDesc(type)->renderEscaped? TRUE: FALSE;
+	return getFieldDesc(type)->spec.renderEscaped? TRUE: FALSE;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */
