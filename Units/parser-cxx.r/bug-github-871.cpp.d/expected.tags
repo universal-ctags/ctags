@@ -1,2 +1,2 @@
-funa	input.cpp	/^bool funa()$/;"	f	typeref:typename:bool
-funb	input.cpp	/^int funb()$/;"	f	typeref:typename:int
+funa	input.cpp	/^bool funa()$/;"	f	typeref:unknown:bool
+funb	input.cpp	/^int funb()$/;"	f	typeref:unknown:int

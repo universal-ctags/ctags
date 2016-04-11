@@ -1,16 +1,16 @@
 n01	input.cpp	/^namespace n01 {$/;"	namespace	file:
-g01	input.cpp	/^	std::string g01 { "" };$/;"	variable	namespace:n01	typeref:typename:std::string
-f01	input.cpp	/^	auto f01(std::string p01) -> std::string {$/;"	function	namespace:n01	typeref:typename:std::string	signature:(std::string p01)
-p01	input.cpp	/^	auto f01(std::string p01) -> std::string {$/;"	parameter	function:n01::f01	typeref:typename:std::string	file:
-l01	input.cpp	/^		std::string l01 { "" };$/;"	local	function:n01::f01	typeref:typename:std::string	file:
-l02	input.cpp	/^		std::string l02 = { "" };$/;"	local	function:n01::f01	typeref:typename:std::string	file:
+g01	input.cpp	/^	std::string g01 { "" };$/;"	variable	namespace:n01	typeref:unknown:std::string
+f01	input.cpp	/^	auto f01(std::string p01) -> std::string {$/;"	function	namespace:n01	typeref:unknown:std::string	signature:(std::string p01)
+p01	input.cpp	/^	auto f01(std::string p01) -> std::string {$/;"	parameter	function:n01::f01	typeref:unknown:std::string	file:
+l01	input.cpp	/^		std::string l01 { "" };$/;"	local	function:n01::f01	typeref:unknown:std::string	file:
+l02	input.cpp	/^		std::string l02 = { "" };$/;"	local	function:n01::f01	typeref:unknown:std::string	file:
 C01	input.cpp	/^	class C01$/;"	class	namespace:n01	file:
-m01	input.cpp	/^		std::string m01 { "" };$/;"	member	class:n01::C01	typeref:typename:std::string	file:
-m02	input.cpp	/^		std::string m02;$/;"	member	class:n01::C01	typeref:typename:std::string	file:
-m03	input.cpp	/^		std::string m03;$/;"	member	class:n01::C01	typeref:typename:std::string	file:
+m01	input.cpp	/^		std::string m01 { "" };$/;"	member	class:n01::C01	typeref:unknown:std::string	file:
+m02	input.cpp	/^		std::string m02;$/;"	member	class:n01::C01	typeref:unknown:std::string	file:
+m03	input.cpp	/^		std::string m03;$/;"	member	class:n01::C01	typeref:unknown:std::string	file:
 C01	input.cpp	/^		C01(std::string p02)$/;"	function	class:n01::C01	file:	signature:(std::string p02)
-p02	input.cpp	/^		C01(std::string p02)$/;"	parameter	function:n01::C01::C01	typeref:typename:std::string	file:
+p02	input.cpp	/^		C01(std::string p02)$/;"	parameter	function:n01::C01::C01	typeref:unknown:std::string	file:
 C01	input.cpp	/^		C01()$/;"	function	class:n01::C01	file:	signature:()
-l03	input.cpp	/^			std::string l03 { "" };$/;"	local	function:n01::C01::C01	typeref:typename:std::string	file:
-l04	input.cpp	/^			std::string l04 { "" };$/;"	local	function:n01::C01::C01	typeref:typename:std::string	file:
-l05	input.cpp	/^			C01 l05{ "" };$/;"	local	function:n01::C01::C01	typeref:typename:C01	file:
+l03	input.cpp	/^			std::string l03 { "" };$/;"	local	function:n01::C01::C01	typeref:unknown:std::string	file:
+l04	input.cpp	/^			std::string l04 { "" };$/;"	local	function:n01::C01::C01	typeref:unknown:std::string	file:
+l05	input.cpp	/^			C01 l05{ "" };$/;"	local	function:n01::C01::C01	typeref:unknown:C01	file:

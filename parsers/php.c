@@ -1366,10 +1366,7 @@ static void readQualifiedName (tokenInfo *const token, vString *name,
 static boolean parseUse (tokenInfo *const token)
 {
 	boolean readNext = FALSE;
-	/* we can't know the use type, because class, interface and namespaces
-	 * aliases are the same, and the only difference is the referenced name's
-	 * type */
-	const char *refType = "unknown";
+	const char *refType = NULL;
 	vString *refName = vStringNew ();
 	tokenInfo *nameToken = newToken ();
 	boolean grouped = FALSE;

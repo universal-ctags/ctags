@@ -1,1 +1,1 @@
-label_forced_tags	input.c	/^static void label_forced_tags(void)$/;"	f	typeref:typename:void	file:
+label_forced_tags	input.c	/^static void label_forced_tags(void)$/;"	f	typeref:unknown:void	file:

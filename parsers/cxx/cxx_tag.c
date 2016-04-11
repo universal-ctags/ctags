@@ -121,12 +121,7 @@ CXXToken * cxxTagSetTypeField(
 {
 	CXX_DEBUG_ASSERT(tag && pTypeStart && pTypeEnd,"Non null parameters are expected");
 
-	const char * szTypeRef0;
-
-	// "typename" is debatable since it's not really
-	// allowed by C++ for unqualified types. However I haven't been able
-	// to come up with something better... so "typename" it is for now.
-	static const char * szTypename = "typename";
+	const char * szTypeRef0 = NULL;
 
 	if(pTypeStart != pTypeEnd)
 	{
@@ -139,11 +134,7 @@ CXXToken * cxxTagSetTypeField(
 		{
 			szTypeRef0 = cxxKeywordName(pTypeStart->eKeyword);
 			pTypeStart = pTypeStart->pNext;
-		} else {
-			szTypeRef0 = szTypename;
 		}
-	} else {
-		szTypeRef0 = szTypename;
 	}
 
 	cxxTokenChainNormalizeTypeNameSpacingInRange(pTypeStart,pTypeEnd);
