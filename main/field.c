@@ -624,6 +624,11 @@ extern boolean isFieldFixed (fieldType type)
 	return getFieldDesc(type)->fixed? TRUE: FALSE;
 }
 
+extern boolean isFieldOwnedByParser (fieldType type)
+{
+	return (FIELD_BUILTIN_LAST < type)? TRUE: FALSE;
+}
+
 extern boolean isFieldRenderable (fieldType type)
 {
 	return getFieldDesc(type)->spec->renderEscaped? TRUE: FALSE;

@@ -43,6 +43,7 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_REF_MARK,
 	FIELD_SCOPE_KEY,
 	FIELD_EXTRA,
+	FIELD_BUILTIN_LAST = FIELD_EXTRA,
 } fieldType ;
 
 struct sFieldDesc;
@@ -74,7 +75,8 @@ extern fieldType getFieldTypeForName (const char *name);
 extern boolean isFieldEnabled (fieldType type);
 extern boolean enableField (fieldType type, boolean state);
 extern boolean isFieldFixed (fieldType type);
-extern const char* getFieldName(fieldType type);
+extern boolean isFieldOwnedByParser (fieldType type);
+extern const char* getFieldName (fieldType type);
 extern void printFields (void);
 
 extern boolean isFieldRenderable (fieldType type);

@@ -11,6 +11,7 @@
  */
 
 #include "general.h"
+#include "debug.h"
 #include "fmt.h"
 #include "field.h"
 #include "routines.h"
@@ -40,7 +41,28 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 {
 	int i;
 	int width = fspec->field.width;
-	const char* str = renderFieldEscaped (fspec->field.ftype, tag, NO_PARSER_FIELD);
+	int ftype;
+	const char* str;
+
+	ftype = fspec->field.ftype;
+
+	if (isFieldOwnedByParser (ftype))
+	{
+		unsigned int findex;
+
+		for (findex = 0; findex < tag->usedParserFields; findex++)
+		{
+			if (tag->parserFields [findex].ftype == ftype)
+				break;
+		}
+
+		if (findex < tag->usedParserFields)
+			str = renderFieldEscaped (ftype, tag, findex);
+		else
+			str = ""; /* TODO */
+	}
+	else
+		str = renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
 
 	if (width < 0)
 		i = mio_printf (fp, "%-*s", -1 * width, str);
@@ -65,17 +87,30 @@ static fmtElement** queueLiteral (fmtElement **last, char *literal)
 	return &(cur->next);
 }
 
-static fmtElement** queueTagField (fmtElement **last, long width, char field_letter)
+static fmtElement** queueTagField (fmtElement **last, long width, char field_letter,
+				   const char *field_name)
 {
 	fieldType ftype;
 	fmtElement *cur;
 
-	ftype = getFieldTypeForOption (field_letter);
+	if (field_letter == NUL_FIELD_LETTER)
+		ftype = getFieldTypeForName (field_name);
+	else
+		ftype = getFieldTypeForOption (field_letter);
+
 	if (ftype == FIELD_UNKNOWN)
-		error (FATAL, "No such field letter: %c", field_letter);
+	{
+		if (field_letter == NUL_FIELD_LETTER)
+			error (FATAL, "No such field name: %s", field_name);
+		else
+			error (FATAL, "No such field letter: %c", field_letter);
+	}
 
 	if (!isFieldRenderable (ftype))
+	{
+		Assert (field_letter != NUL_FIELD_LETTER);
 		error (FATAL, "The field cannot be printed in format output: %c", field_letter);
+	}
 
 	cur = xMalloc (1, fmtElement);
 
@@ -159,7 +194,21 @@ extern fmtElement *fmtNew (const char*  fmtString)
 					column_width *= justification_right;
 				}
 
-				last = queueTagField (last, column_width, cursor[i]);
+				if (cursor[i] == '{')
+				{
+					vString *field_name = vStringNew ();
+
+					i++;
+					for (; cursor[i] != '}'; i++)
+						vStringPut (field_name, cursor[i]);
+
+					last = queueTagField (last, column_width, NUL_FIELD_LETTER,
+							      vStringValue (field_name));
+
+					vStringDelete (field_name);
+				}
+				else
+					last = queueTagField (last, column_width, cursor[i], NULL);
 			}
 
 		}
