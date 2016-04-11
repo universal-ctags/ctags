@@ -1,3 +1,4 @@
 r       UCTAGSrole      off     TRUE     Role                          
 Z       UCTAGSscope     off     FALSE    Include the "scope:" key in scope field (use s)
 E       UCTAGSextra     off     TRUE     Extra tag type information    
+T       UCTAGStype      off     TRUE     Variable type or function return type

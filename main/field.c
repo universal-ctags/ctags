@@ -43,6 +43,7 @@ static const char *renderFieldPattern (const tagEntryInfo *const tag, vString* b
 static const char *renderFieldRole (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldRefMarker (const tagEntryInfo *const tag, vString* b);
 static const char *renderFieldExtra (const tagEntryInfo *const tag, vString* b);
+static const char *renderFieldType (const tagEntryInfo *const tag, vString* b);
 
 #define DEFINE_FIELD_FULL(L,N, V, H, B, F, NWP) {		\
 		.enabled       = V,				\
@@ -132,6 +133,9 @@ static fieldDesc fieldDescs [] = {
 	DEFINE_FIELD_UCTAGS ('E', "extra",   FALSE,
 			     "Extra tag type information",
 			     renderFieldExtra),
+	DEFINE_FIELD_UCTAGS ('T', "type",   FALSE,
+			     "Variable type or function return type",
+			     renderFieldType),
 };
 
 extern fieldDesc* getFieldDesc(fieldType type)
@@ -473,4 +477,8 @@ static const char *renderFieldExtra (const tagEntryInfo *const tag, vString* b)
 		return NULL;
 }
 
+static const char *renderFieldType (const tagEntryInfo *const tag, vString* b)
+{
+	return renderFieldTyperef (tag, b);
+}
 /* vi:set tabstop=4 shiftwidth=4: */

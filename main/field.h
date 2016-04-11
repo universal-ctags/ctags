@@ -41,6 +41,7 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_KIND_KEY,
 	FIELD_SCOPE_KEY,
 	FIELD_EXTRA,
+	FIELD_TYPE,
 	FIELD_COUNT
 } fieldType ;
 

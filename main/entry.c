@@ -1021,6 +1021,13 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 					   escapeName (tag, FIELD_EXTRA));
 	}
 
+	if (getFieldDesc (FIELD_TYPE)->enabled        &&
+	    tag->extensionFields.typeRef [0] == NULL  &&
+	    tag->extensionFields.typeRef [1] != NULL)
+		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
+				      getFieldName (FIELD_TYPE),
+				      escapeName (tag, FIELD_TYPE));
+
 	return length;
 #undef sep
 }

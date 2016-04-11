@@ -19,6 +19,7 @@ t	typeref	on	TRUE	Type and name of a variable or typedef
 z	kind	off	FALSE	Include the "kind:" key in kind field (use k or K)
 Z	scope	off	FALSE	Include the "scope:" key in scope field (use s)
 E	extra	off	TRUE	Extra tag type information
+T	type	off	TRUE	Variable type or function return type
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/
 x	input.java	/^    public int x;$/
