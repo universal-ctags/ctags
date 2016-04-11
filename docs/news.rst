@@ -123,9 +123,9 @@ There were 3 classes of message in ctags:
 	Mainly for debugging purpose.
 
 
-*notice* is a new class of message. It is less important than warning*
-*but more important for users than *verbose*. Generally the user can
-*ignore *notice*. With ``--quiet`` option can be used to turn off the
+*notice* is a new class of message. It is less important than *warning*
+but more important for users than *verbose*. Generally the user can
+ignore *notice*. With ``--quiet`` option can be used to turn off the
 printing the *notice* class messages.
 
 ``--input-encoding=ENCODING`` and ``--output-encoding=ENCODING`` options
