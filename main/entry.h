@@ -73,8 +73,18 @@ typedef struct sTagEntryInfo {
 
 		const char* signature;
 
-		/* type (union/struct/etc.) and name for a variable or typedef. */
-		const char* typeRef [2];  /* e.g., "struct" and struct name */
+		const char* typeRef [2];
+		/* The values in the array are used in "typeref:" or "varType:"
+		   fields.
+
+		   + typeref:
+		     [0] -> type (union/struct/etc.) .e.g "struct".
+		     [1] -> name for a variable or typedef. e.g. tag of the struct.
+
+		   + type:
+		     [0] -> NULL
+		     [1] -> type for the current tag
+		            A variable or function  is assumed. */
 
 #define ROLE_INDEX_DEFINITION -1
 		int roleIndex; /* for role of reference tag */
