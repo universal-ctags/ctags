@@ -262,6 +262,7 @@ extern const char* getFieldName(fieldType type)
 
 #define PR_FIELD_WIDTH_LETTER     7
 #define PR_FIELD_WIDTH_NAME      15
+#define PR_FIELD_WIDTH_LANGUAGE  15
 #define PR_FIELD_WIDTH_DESC      30
 #define PR_FIELD_WIDTH_XFMTCHAR  8
 #define PR_FIELD_WIDTH_ENABLED   7
@@ -276,6 +277,8 @@ extern const char* getFieldName(fieldType type)
 	" "					\
 	PR_FIELD_FMT (ENABLED,s)		\
 	" "					\
+	PR_FIELD_FMT (LANGUAGE,s)		\
+	" "					\
 	PR_FIELD_FMT (XFMTCHAR,s)		\
 	" "					\
 	PR_FIELD_FMT (DESC,s)			\
@@ -284,14 +287,27 @@ extern const char* getFieldName(fieldType type)
 static void printField (fieldType i)
 {
 	unsigned char letter = fieldDescs[i].spec->letter;
+	const char *name;
+	const char *language;
 
 	if (letter == FIELD_LETTER_NO_USE)
 		letter = '-';
 
-	printf((Option.machinable? "%c\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(c)),
+	if (! fieldDescs[i].spec->name)
+		name = "NONE";
+	else
+		name = getFieldName (i);
+
+	if (fieldDescs[i].language == LANG_IGNORE)
+		language = "NONE";
+	else
+		language = getLanguageName (fieldDescs[i].language);
+
+	printf((Option.machinable? "%c\t%s\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(c)),
 	       letter,
-	       (fieldDescs[i].spec->name? getFieldName (i): "NONE"),
+	       name,
 	       isFieldEnabled (i)? "on": "off",
+	       language,
 	       getFieldDesc (i)->spec->renderEscaped? "TRUE": "FALSE",
 	       fieldDescs[i].spec->description? fieldDescs[i].spec->description: "NONE");
 }
@@ -302,7 +318,7 @@ extern void printFields (void)
 
 	if (Option.withListHeader)
 		printf ((Option.machinable? "%s\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(s)),
-			"#LETTER", "NAME", "ENABLED", "XFMTCHAR", "DESCRIPTION");
+			"#LETTER", "NAME", "ENABLED", "LANGUAGE", "XFMTCHAR", "DESCRIPTION");
 
 	for (i = 0; i < fieldDescUsed; i++)
 		printField (i);
