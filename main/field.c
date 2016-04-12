@@ -228,15 +228,32 @@ extern fieldType getFieldTypeForOption (char letter)
 
 extern fieldType getFieldTypeForName (const char *name)
 {
-
+	const char *fieldName;
+	langType language;
 	static boolean initialized = FALSE;
 	int i;
+
+	fieldName = strchr (name, '.');
+	if (fieldName)
+	{
+
+		language = getNamedLanguage (name, fieldName - name);
+		if (language == LANG_IGNORE)
+			return FIELD_UNKNOWN;
+		fieldName++;
+	}
+	else
+	{
+		language = LANG_IGNORE;
+		fieldName = name;
+	}
 
 retry:
 	for (i = 0; i < fieldDescUsed; i++)
 	{
 		if (fieldDescs [i].spec->name
-		    && strcmp (fieldDescs [i].spec->name, name) == 0)
+		    && strcmp (fieldDescs [i].spec->name, fieldName) == 0
+		    && fieldDescs [i].language == language)
 			return i;
 	}
 
