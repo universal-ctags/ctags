@@ -36,6 +36,7 @@ struct sFieldDesc {
 	vString     *buffer;
 	const char* nameWithPrefix;
 	langType language;
+	fieldType sibling;
 };
 
 static const char *renderFieldName (const tagEntryInfo *const tag, const char *value, vString* b);
@@ -168,6 +169,7 @@ extern void initFieldDescs (void)
 		fdesc->buffer = NULL;
 		fdesc->nameWithPrefix = fdesc->spec->name;
 		fdesc->language = LANG_IGNORE;
+		fdesc->sibling  = FIELD_UNKNOWN;
 	}
 	fieldDescUsed += ARRAY_SIZE (fieldSpecsFixed);
 
@@ -179,6 +181,7 @@ extern void initFieldDescs (void)
 		fdesc->buffer = NULL;
 		fdesc->nameWithPrefix = fdesc->spec->name;
 		fdesc->language = LANG_IGNORE;
+		fdesc->sibling  = FIELD_UNKNOWN;
 	}
 	fieldDescUsed += ARRAY_SIZE (fieldSpecsExuberant);
 
@@ -202,6 +205,7 @@ extern void initFieldDescs (void)
 		else
 			fdesc->nameWithPrefix = NULL;
 		fdesc->language = LANG_IGNORE;
+		fdesc->sibling  = FIELD_UNKNOWN;
 	}
 	fieldDescUsed += ARRAY_SIZE (fieldSpecsUniversal);
 
@@ -672,6 +676,31 @@ extern int countFields (void)
 	return fieldDescUsed;
 }
 
+extern fieldType nextFieldSibling (fieldType type)
+{
+	fieldDesc *fdesc;
+
+	fdesc = fieldDescs + type;
+	return fdesc->sibling;
+}
+
+static void updateSiblingField (fieldType type, const char* name)
+{
+	int i;
+	fieldDesc *fdesc;
+
+	for (i = type; i > 0; i--)
+	{
+		fdesc = fieldDescs + i - 1;
+		if (fdesc->spec->name && (strcmp (fdesc->spec->name, name) == 0))
+		{
+			Assert (fdesc->sibling == FIELD_UNKNOWN);
+			fdesc->sibling = type;
+			break;
+		}
+	}
+}
+
 extern int defineField (fieldSpec *spec, int language)
 {
 	fieldDesc *fdesc;
@@ -706,6 +735,9 @@ extern int defineField (fieldSpec *spec, int language)
 	fdesc->nameWithPrefix = nameWithPrefix;
 
 	fdesc->language = language;
+	fdesc->sibling  = FIELD_UNKNOWN;
+
+	updateSiblingField (spec->ftype, spec->name);
 	return spec->ftype;
 }
 
