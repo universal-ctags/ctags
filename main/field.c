@@ -728,6 +728,13 @@ static void updateSiblingField (fieldType type, const char* name)
 	}
 }
 
+static const char* defaultRenderer (const struct sTagEntryInfo *const tag,
+				    const char *value,
+				    vString * buffer)
+{
+	return value;
+}
+
 extern int defineField (fieldSpec *spec, int language)
 {
 	fieldDesc *fdesc;
@@ -749,6 +756,9 @@ extern int defineField (fieldSpec *spec, int language)
 	}
 	fdesc = fieldDescs + (fieldDescUsed);
 	spec->ftype = fieldDescUsed++;
+
+	if (spec->renderEscaped == NULL)
+		spec->renderEscaped = defaultRenderer;
 
 	fdesc->spec = spec;
 
