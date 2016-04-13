@@ -20,6 +20,14 @@
 #include "routines.h"
 #include "selectors.h"
 
+#ifdef HAVE_LIBXML
+#include <libxml/xpath.h>
+#include <libxml/tree.h>
+#endif
+
+#include <string.h>
+
+
 typedef enum {
 	K_GROUP_ID, K_ARTIFACT_ID, K_PROPERTY,
 } maven2Kind;
@@ -109,13 +117,47 @@ static tagXpathTableTable maven2XpathTableTable[] = {
 	[TABLE_MAIN] = { ARRAY_AND_SIZE(maven2XpathMainTable) },
 };
 
-static void makeTagWithScope (xmlNode *node __unused__,
+typedef enum {
+	F_VERSION,
+} maven2Field;
+
+static fieldSpec Maven2Fields [] = {
+	{
+		.name = "version",
+		.description = "version of artifact",
+		.enabled = FALSE,
+	}
+};
+
+static void attachVersionIfExisting (struct sTagEntryInfo *tag, xmlNode *node)
+{
+	const char *version = NULL;
+
+#ifdef HAVE_LIBXML
+	for (node = node->next; node != NULL; node = node->next)
+	{
+		if (strcmp ((char *)node->name, "version") == 0)
+		{
+			version = (const char *)xmlNodeGetContent (node);
+			break;
+		}
+	}
+#endif
+	if (version)
+		attachField (Maven2Fields [F_VERSION].ftype, tag, version);
+}
+
+static void makeTagWithScope (xmlNode *node,
 			      const struct sTagXpathMakeTagSpec *spec,
 			      struct sTagEntryInfo *tag,
 			      void *userData)
 {
 	int *corkIndexes = userData;
 	int i;
+
+
+	if (tag->kind == Maven2Kinds + K_ARTIFACT_ID)
+		attachVersionIfExisting (tag, node);
 
 	i = makeTagEntry (tag);
 
@@ -164,6 +206,8 @@ Maven2Parser (void)
 	def->tagXpathTableCount  = ARRAY_SIZE (maven2XpathTableTable);
 	def->useCork = TRUE;
 	def->selectLanguage = selectors;
+	def->fieldSpecs = Maven2Fields;
+	def->fieldSpecCount = ARRAY_SIZE (Maven2Fields);
 	return def;
 }
 
