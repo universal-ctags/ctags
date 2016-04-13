@@ -1103,6 +1103,7 @@ static void processFieldsOption (
 
 	static vString * longName;
 	boolean inLongName = FALSE;
+	langType language;
 
 	if (!longName)
 		longName = vStringNew ();
@@ -1151,13 +1152,24 @@ static void processFieldsOption (
 				      "unexpected character in field specification: \'%c\'",
 				      c);
 
-			t = getFieldTypeForName (vStringValue (longName));
+			{
+				const char *f;
+
+				language = getLanguageComponentInFieldName (vStringValue (longName), &f);
+				t = getFieldTypeForNameAndLanguage (f, language);
+			}
+
 			if (t == FIELD_UNKNOWN)
-				error(FATAL,
-				      "nosuch field: \'%s\'",
-				      vStringValue (longName));
+				error(FATAL, "nosuch field: \'%s\'", vStringValue (longName));
 
 			enableField (t, mode);
+			if (language == LANG_AUTO)
+			{
+				fieldType ftype_next = t;
+				while ((ftype_next = nextFieldSibling (ftype_next)) != FIELD_UNKNOWN)
+					enableField (ftype_next, mode);
+			}
+
 			inLongName = FALSE;
 			vStringClear (longName);
 			break;

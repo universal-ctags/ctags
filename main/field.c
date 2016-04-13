@@ -230,44 +230,71 @@ extern fieldType getFieldTypeForOption (char letter)
 	return FIELD_UNKNOWN;
 }
 
-extern fieldType getFieldTypeForName (const char *name)
+extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType language)
 {
-	const char *fieldName;
-	langType language;
 	static boolean initialized = FALSE;
 	int i;
 
-	fieldName = strchr (name, '.');
-	if (fieldName)
-	{
+	if (fieldName == NULL)
+		return FIELD_UNKNOWN;
 
-		language = getNamedLanguage (name, fieldName - name);
-		if (language == LANG_IGNORE)
-			return FIELD_UNKNOWN;
-		fieldName++;
-	}
-	else
+	if (language == LANG_AUTO && (initialized == FALSE))
 	{
-		language = LANG_IGNORE;
-		fieldName = name;
+		initialized = TRUE;
+		for (i = 0; i < countParsers(); i++)
+			initializeParser (i);
 	}
+	else if (language != LANG_IGNORE && (initialized == FALSE))
+		initializeParser (language);
 
-retry:
 	for (i = 0; i < fieldDescUsed; i++)
 	{
 		if (fieldDescs [i].spec->name
 		    && strcmp (fieldDescs [i].spec->name, fieldName) == 0
-		    && fieldDescs [i].language == language)
+		    && ((language == LANG_AUTO)
+			|| (fieldDescs [i].language == language)))
 			return i;
 	}
 
-	if (initialized)
-		return FIELD_UNKNOWN;
+	return FIELD_UNKNOWN;
+}
 
-	initialized = TRUE;
-	for (i = 0; i < countParsers(); i++)
-		initializeParser (i);
-	goto retry;
+extern langType getLanguageComponentInFieldName (const char *fullName,
+						 const char **fieldName)
+{
+	const char *tmp;
+	langType language;
+
+	tmp = strchr (fullName, '.');
+	if (tmp)
+	{
+		size_t len = tmp - fullName;
+
+		if (len == 1 && fullName[0] == '*')
+		{
+			language = LANG_AUTO;
+			*fieldName = tmp + 1;
+		}
+		else if (len == 0)
+		{
+			language = LANG_IGNORE;
+			*fieldName = tmp + 1;
+		}
+		else
+		{
+			language = getNamedLanguage (fullName, len);
+			if (language == LANG_IGNORE)
+				*fieldName = NULL;
+			else
+				*fieldName = tmp + 1;
+		}
+	}
+	else
+	{
+		language = LANG_AUTO;
+		*fieldName = fullName;
+	}
+	return language;
 }
 
 extern const char* getFieldName(fieldType type)

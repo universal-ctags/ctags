@@ -14,6 +14,8 @@
 #include "debug.h"
 #include "fmt.h"
 #include "field.h"
+#include "options.h"
+#include "parse.h"
 #include "routines.h"
 #include <string.h>
 #include <errno.h>
@@ -92,11 +94,20 @@ static fmtElement** queueTagField (fmtElement **last, long width, char field_let
 {
 	fieldType ftype;
 	fmtElement *cur;
+	langType language;
 
 	if (field_letter == NUL_FIELD_LETTER)
-		ftype = getFieldTypeForName (field_name);
+	{
+		const char *f;
+
+		language = getLanguageComponentInFieldName (field_name, &f);
+		ftype = getFieldTypeForNameAndLanguage (f, language);
+	}
 	else
+	{
+		language = LANG_IGNORE;
 		ftype = getFieldTypeForOption (field_letter);
+	}
 
 	if (ftype == FIELD_UNKNOWN)
 	{
@@ -118,6 +129,12 @@ static fmtElement** queueTagField (fmtElement **last, long width, char field_let
 	cur->spec.field.ftype = ftype;
 
 	enableField (ftype, TRUE);
+	if (language == LANG_AUTO)
+	{
+		fieldType ftype_next = ftype;
+		while ((ftype_next = nextFieldSibling (ftype_next)) != FIELD_UNKNOWN)
+			enableField (ftype_next, TRUE);
+	}
 
 	cur->printer = printTagField;
 	cur->next = NULL;

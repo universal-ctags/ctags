@@ -167,6 +167,7 @@ extern vString* expandOnDriversPathList (const char* leaf);
 
 extern langType getLanguageComponentInOption (const char *const option,
 					      const char *const prefix);
+extern langType getLanguageComponentInFieldName (const char *fullName, const char **fieldName);
 
 extern void processLanguageDefineOption (const char *const option, const char *const parameter);
 extern boolean processMapOption (const char *const option, const char *const parameter);

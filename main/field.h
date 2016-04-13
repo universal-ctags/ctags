@@ -72,6 +72,7 @@ typedef struct sFieldSpec {
 
 extern fieldType getFieldTypeForOption (char letter);
 extern fieldType getFieldTypeForName (const char *name);
+extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, int language);
 extern boolean isFieldEnabled (fieldType type);
 extern boolean enableField (fieldType type, boolean state);
 extern boolean isFieldFixed (fieldType type);
