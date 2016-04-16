@@ -1,3 +1,5 @@
 --c++-kinds=c
 --fields=i
 --sort=no
+--c++-enable-template-info
+

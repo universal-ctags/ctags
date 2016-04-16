@@ -21,6 +21,7 @@
 #include "debug.h"
 #include "keyword.h"
 #include "read.h"
+#include "options.h"
 
 #include <string.h>
 
@@ -732,9 +733,30 @@ boolean cxxParserParseClassStructOrUnion(
 						CXXTokenChainCondenseNoTrailingSpaces
 					);
 				tag->extensionFields.inheritance = vStringValue(
-						g_cxx.pTokenChain->pHead->pszWord
+						cxxTokenChainFirst(g_cxx.pTokenChain)->pszWord
 					);
 			}
+		}
+
+		if(
+				Option.cxxEnableTemplateInfo &&
+				g_cxx.pTemplateTokenChain &&
+				(g_cxx.pTemplateTokenChain->iCount > 0)
+			)
+		{
+			cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
+			cxxTokenChainCondense(
+					g_cxx.pTemplateTokenChain,
+					0
+				);
+
+			static const char * szTemplate = "template";
+
+			tag->extensionFields.customLabel[tag->extensionFields.customFieldCount] = szTemplate;
+			tag->extensionFields.customValue[tag->extensionFields.customFieldCount] = vStringValue(
+					cxxTokenChainFirst(g_cxx.pTemplateTokenChain)->pszWord
+				);
+			tag->extensionFields.customFieldCount++;
 		}
 
 		tag->isFileScope = !isInputHeaderFile();

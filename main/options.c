@@ -172,8 +172,9 @@ optionValues Option = {
 	.machinable = FALSE,
 	.withListHeader = TRUE,
 #ifdef DEBUG
-	0, 0        /* -D, -b */
+	0, 0,        /* -D, -b */
 #endif
+	FALSE       /* --c++-enable-template-info */
 };
 
 static OptionLoadingStage Stage = OptionLoadingStageNone;
@@ -2353,6 +2354,7 @@ static parametricOption ParametricOptions [] = {
 
 static booleanOption BooleanOptions [] = {
 	{ "append",         &Option.append,                 TRUE,  STAGE_ANY },
+	{ "c++-enable-template-info", &Option.cxxEnableTemplateInfo, TRUE, STAGE_ANY },
 	{ "file-scope",     ((boolean *)XTAG_FILE_SCOPE),   FALSE, STAGE_ANY, redirectToXtag },
 	{ "file-tags",      ((boolean *)XTAG_FILE_NAMES),   FALSE, STAGE_ANY, redirectToXtag },
 	{ "filter",         &Option.filter,                 TRUE,  STAGE_ANY },
