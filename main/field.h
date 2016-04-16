@@ -13,7 +13,7 @@
 #define CTAGS_MAIN_FIELD_H
 
 #include "general.h"
-#include "entry.h"
+#include "vstring.h"
 
 typedef enum eFieldType { /* extension field content control */
 	FIELD_UNKNOWN = -1,
@@ -33,34 +33,66 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_LANGUAGE,
 	FIELD_IMPLEMENTATION,
 	FIELD_LINE_NUMBER,
-	FIELD_ROLE,
-	FIELD_REF_MARK,
 	FIELD_SIGNATURE,
 	FIELD_SCOPE,
 	FIELD_TYPE_REF,
 	FIELD_KIND_KEY,
+
+	/* EXTENSION FIELDS NEWLY INTRODUCED IN UCTAGS */
+	FIELD_ROLE,
+	FIELD_REF_MARK,
 	FIELD_SCOPE_KEY,
 	FIELD_EXTRA,
-	FIELD_COUNT
+	FIELD_BUILTIN_LAST = FIELD_EXTRA,
 } fieldType ;
 
-typedef const char* (* renderEscaped) (const tagEntryInfo *const tag, vString * buffer);
+struct sFieldDesc;
+typedef struct sFieldDesc fieldDesc;
 
-typedef struct sFieldDesc {
-	unsigned int enabled: 1;
-	unsigned int basic:   1;
+struct sTagEntryInfo;
+
+typedef const char* (* renderEscaped) (const struct sTagEntryInfo *const tag,
+				       const char *value,
+				       vString * buffer);
+
+#define FIELD_LETTER_NO_USE '\0'
+typedef struct sFieldSpec {
+	/* lettern, and ftype are initialized in the main part,
+	   not in a parser. */
+#define NUL_FIELD_LETTER '\0'
 	unsigned char letter;
-	const char* name;         /* kind name */
-	const char* description;  /* displayed in --help output */
+	const char* name;
+	const char* description;
+	boolean enabled;
 	renderEscaped renderEscaped;
-	vString *buffer;
-	const char* nameWithPrefix;
-} fieldDesc;
 
-extern fieldDesc* getFieldDesc(fieldType type);
+	unsigned int ftype;	/* Given from the main part */
+} fieldSpec;
+
+
 extern fieldType getFieldTypeForOption (char letter);
-extern const char* renderFieldEscaped (fieldDesc *fdesc, const tagEntryInfo *tag);
-extern const char* getFieldName(fieldType type);
+extern fieldType getFieldTypeForName (const char *name);
+extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, int language);
+extern boolean isFieldEnabled (fieldType type);
+extern boolean enableField (fieldType type, boolean state);
+extern boolean isFieldFixed (fieldType type);
+extern boolean isFieldOwnedByParser (fieldType type);
+extern const char* getFieldName (fieldType type);
 extern void printFields (void);
+
+extern boolean isFieldRenderable (fieldType type);
+
+extern const char* renderFieldEscaped (fieldType type, const struct sTagEntryInfo *tag, int index);
+
+extern void initFieldDescs (void);
+extern int countFields (void);
+
+/* language should be typed to langType.
+   Use int here to avoid circular dependency */
+extern int defineField (fieldSpec *spec, int language);
+extern int attachField (fieldType type, struct sTagEntryInfo *const tag,
+			const char *value);
+
+extern fieldType nextFieldSibling (fieldType type);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

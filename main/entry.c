@@ -782,8 +782,7 @@ extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo 
 
 static const char* escapeName (const tagEntryInfo * tag, fieldType ftype)
 {
-	fieldDesc *fdesc = getFieldDesc (ftype);
-	return renderFieldEscaped (fdesc, tag);
+	return renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
 }
 
 static int writeXrefEntry (const tagEntryInfo *const tag)
@@ -907,16 +906,19 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 
 static int addExtensionFields (const tagEntryInfo *const tag)
 {
-	const char* const kindKey = getFieldDesc (FIELD_KIND_KEY)->enabled
+	boolean isKindKeyEnabled = isFieldEnabled (FIELD_KIND_KEY);
+	boolean isScopeEnabled = isFieldEnabled   (FIELD_SCOPE_KEY);
+
+	const char* const kindKey = isKindKeyEnabled
 		?getFieldName (FIELD_KIND_KEY)
 		:"";
-	const char* const kindFmt = getFieldDesc (FIELD_KIND_KEY)->enabled
+	const char* const kindFmt = isKindKeyEnabled
 		?"%s\t%s:%s"
 		:"%s\t%s%s";
-	const char* const scopeKey = getFieldDesc (FIELD_SCOPE_KEY)->enabled
+	const char* const scopeKey = isScopeEnabled
 		?getFieldName (FIELD_SCOPE_KEY)
 		:"";
-	const char* const scopeFmt = getFieldDesc (FIELD_SCOPE_KEY)->enabled
+	const char* const scopeFmt = isScopeEnabled
 		?"%s\t%s:%s:%s"
 		:"%s\t%s%s:%s";
 
@@ -927,27 +929,27 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 /* "sep" returns a value only the first time it is evaluated */
 #define sep (first ? (first = FALSE, separator) : empty)
 
-	if (tag->kind->name != NULL && (getFieldDesc (FIELD_KIND_LONG)->enabled  ||
-		 (getFieldDesc (FIELD_KIND)->enabled  && tag->kind == '\0')))
+	if (tag->kind->name != NULL && (isFieldEnabled (FIELD_KIND_LONG)  ||
+		 (isFieldEnabled (FIELD_KIND)  && tag->kind == '\0')))
 		length += mio_printf (TagFile.fp, kindFmt, sep, kindKey, tag->kind->name);
-	else if (tag->kind != '\0'  && (getFieldDesc (FIELD_KIND)->enabled ||
-			(getFieldDesc (FIELD_KIND_LONG)->enabled &&  tag->kind->name == NULL)))
+	else if (tag->kind != '\0'  && (isFieldEnabled (FIELD_KIND) ||
+			(isFieldEnabled (FIELD_KIND_LONG) &&  tag->kind->name == NULL)))
 	{
 		char str[2] = {tag->kind->letter, '\0'};
 		length += mio_printf (TagFile.fp, kindFmt, sep, kindKey, str);
 	}
 
-	if (getFieldDesc (FIELD_LINE_NUMBER)->enabled)
+	if (isFieldEnabled (FIELD_LINE_NUMBER))
 		length += mio_printf (TagFile.fp, "%s\t%s:%ld", sep,
 				   getFieldName (FIELD_LINE_NUMBER),
 				   tag->lineNumber);
 
-	if (getFieldDesc (FIELD_LANGUAGE)->enabled  &&  tag->language != NULL)
+	if (isFieldEnabled (FIELD_LANGUAGE)  &&  tag->language != NULL)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_LANGUAGE),
 				   escapeName (tag, FIELD_LANGUAGE));
 
-	if (getFieldDesc (FIELD_SCOPE)->enabled)
+	if (isFieldEnabled (FIELD_SCOPE))
 	{
 		if (tag->extensionFields.scopeKind != NULL  &&
 		    tag->extensionFields.scopeName != NULL)
@@ -973,7 +975,7 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 		}
 	}
 
-	if (getFieldDesc (FIELD_TYPE_REF)->enabled &&
+	if (isFieldEnabled (FIELD_TYPE_REF) &&
 			tag->extensionFields.typeRef [0] != NULL  &&
 			tag->extensionFields.typeRef [1] != NULL)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s:%s", sep,
@@ -981,38 +983,38 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 				   tag->extensionFields.typeRef [0],
 				   escapeName (tag, FIELD_TYPE_REF));
 
-	if (getFieldDesc (FIELD_FILE_SCOPE)->enabled &&  tag->isFileScope)
+	if (isFieldEnabled (FIELD_FILE_SCOPE) &&  tag->isFileScope)
 		length += mio_printf (TagFile.fp, "%s\t%s:", sep,
-				   getFieldName (FIELD_FILE_SCOPE));
+				      getFieldName (FIELD_FILE_SCOPE));
 
-	if (getFieldDesc (FIELD_INHERITANCE)->enabled &&
+	if (isFieldEnabled (FIELD_INHERITANCE) &&
 			tag->extensionFields.inheritance != NULL)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_INHERITANCE),
 				   escapeName (tag, FIELD_INHERITANCE));
 
-	if (getFieldDesc (FIELD_ACCESS)->enabled &&  tag->extensionFields.access != NULL)
+	if (isFieldEnabled (FIELD_ACCESS) &&  tag->extensionFields.access != NULL)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_ACCESS),
 				   tag->extensionFields.access);
 
-	if (getFieldDesc (FIELD_IMPLEMENTATION)->enabled &&
+	if (isFieldEnabled (FIELD_IMPLEMENTATION) &&
 			tag->extensionFields.implementation != NULL)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_IMPLEMENTATION),
 				   tag->extensionFields.implementation);
 
-	if (getFieldDesc (FIELD_SIGNATURE)->enabled &&
+	if (isFieldEnabled (FIELD_SIGNATURE) &&
 			tag->extensionFields.signature != NULL)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_SIGNATURE),
 				   escapeName (tag, FIELD_SIGNATURE));
-	if (getFieldDesc (FIELD_ROLE)->enabled && tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
+	if (isFieldEnabled (FIELD_ROLE) && tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_ROLE),
 				   escapeName (tag, FIELD_ROLE));
 
-	if (getFieldDesc (FIELD_EXTRA)->enabled)
+	if (isFieldEnabled (FIELD_EXTRA))
 	{
 		const char *value = escapeName (tag, FIELD_EXTRA);
 		if (value)
@@ -1110,6 +1112,25 @@ static int writeLineNumberEntry (const tagEntryInfo *const tag)
 		return mio_printf (TagFile.fp, "%lu", tag->lineNumber);
 }
 
+static int addParserFields (const tagEntryInfo *const tag)
+{
+	unsigned int i;
+	unsigned int ftype;
+	int length = 0;
+
+	for (i = 0; i < tag->usedParserFields; i++)
+	{
+		ftype = tag->parserFields [i].ftype;
+		if (! isFieldEnabled (ftype))
+			continue;
+
+		length += mio_printf(TagFile.fp, "\t%s:%s",
+				     getFieldName (ftype),
+				     renderFieldEscaped (tag->parserFields [i].ftype, tag, i));
+	}
+	return length;
+}
+
 static int writeCtagsEntry (const tagEntryInfo *const tag)
 {
 	int length = mio_printf (TagFile.fp, "%s\t%s\t",
@@ -1126,9 +1147,39 @@ static int writeCtagsEntry (const tagEntryInfo *const tag)
 	if (includeExtensionFlags ())
 		length += addExtensionFields (tag);
 
+	length += addParserFields (tag);
+
 	length += mio_printf (TagFile.fp, "\n");
 
 	return length;
+}
+
+extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char * value)
+{
+	unsigned int index;
+
+	Assert (tag->usedParserFields + 1 < PRE_ALLOCATED_PARSER_FIELDS);
+
+	index = tag->usedParserFields++;
+	tag->parserFields [index].ftype = ftype;
+	tag->parserFields [index].value = value;
+}
+
+static void copyParserFields (const tagEntryInfo *const tag, tagEntryInfo* slot)
+{
+	unsigned int i;
+	const char* value;
+
+	for (i = 0; i < tag->usedParserFields; i++)
+	{
+		value = tag->parserFields [i].value;
+		if (value)
+			value = eStrdup (value);
+
+		attachParserField (slot,
+				   tag->parserFields [i].ftype,
+				   value);
+	}
 }
 
 static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* slot)
@@ -1163,6 +1214,24 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 		slot->sourceLanguage = eStrdup (slot->sourceLanguage);
 	if (slot->sourceFileName)
 		slot->sourceFileName = eStrdup (slot->sourceFileName);
+
+	slot->usedParserFields = 0;
+	copyParserFields (tag, slot);
+}
+
+extern void clearParserFields (tagEntryInfo *const tag)
+{
+	unsigned int i;
+	const char* value;
+
+	for (i = 0; i < tag->usedParserFields; i++)
+	{
+		value = tag->parserFields[i].value;
+		if (value)
+			eFree ((char *)value);
+		tag->parserFields[i].value = NULL;
+		tag->parserFields[i].ftype = FIELD_UNKNOWN;
+	}
 }
 
 static void clearTagEntryInQueue (tagEntryInfo* slot)
@@ -1195,8 +1264,9 @@ static void clearTagEntryInQueue (tagEntryInfo* slot)
 		eFree ((char *)slot->sourceLanguage);
 	if (slot->sourceFileName)
 		eFree ((char *)slot->sourceFileName);
-}
 
+	clearParserFields (slot);
+}
 
 static unsigned int queueTagEntry(const tagEntryInfo *const tag)
 {
@@ -1417,6 +1487,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      const char* sourceLanguage,
 			      long sourceLineNumberDifference)
 {
+	int i;
 	Assert (File.input.name != NULL);
 
 	memset (e, 0, sizeof (tagEntryInfo));
@@ -1438,6 +1509,11 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->sourceLanguage = sourceLanguage;
 	e->sourceFileName = sourceFileName;
 	e->sourceLineNumberDifference = sourceLineNumberDifference;
+
+	e->usedParserFields = 0;
+
+	for ( i = 0; i < PRE_ALLOCATED_PARSER_FIELDS; i++ )
+		e->parserFields[i].ftype = FIELD_UNKNOWN;
 }
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra)

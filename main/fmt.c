@@ -11,8 +11,11 @@
  */
 
 #include "general.h"
+#include "debug.h"
 #include "fmt.h"
 #include "field.h"
+#include "options.h"
+#include "parse.h"
 #include "routines.h"
 #include <string.h>
 #include <errno.h>
@@ -20,7 +23,7 @@
 typedef union uFmtSpec {
 	char *const_str;
 	struct {
-		fieldDesc *desc;
+		fieldType ftype;
 		int width;
 	} field;
 } fmtSpec;
@@ -40,7 +43,28 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 {
 	int i;
 	int width = fspec->field.width;
-	const char* str = renderFieldEscaped (fspec->field.desc, tag);
+	int ftype;
+	const char* str;
+
+	ftype = fspec->field.ftype;
+
+	if (isFieldOwnedByParser (ftype))
+	{
+		unsigned int findex;
+
+		for (findex = 0; findex < tag->usedParserFields; findex++)
+		{
+			if (tag->parserFields [findex].ftype == ftype)
+				break;
+		}
+
+		if (findex < tag->usedParserFields)
+			str = renderFieldEscaped (ftype, tag, findex);
+		else
+			str = ""; /* TODO */
+	}
+	else
+		str = renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
 
 	if (width < 0)
 		i = mio_printf (fp, "%-*s", -1 * width, str);
@@ -65,27 +89,52 @@ static fmtElement** queueLiteral (fmtElement **last, char *literal)
 	return &(cur->next);
 }
 
-static fmtElement** queueTagField (fmtElement **last, long width, char field_letter)
+static fmtElement** queueTagField (fmtElement **last, long width, char field_letter,
+				   const char *field_name)
 {
 	fieldType ftype;
-	fieldDesc* fdesc;
-
 	fmtElement *cur;
+	langType language;
 
-	ftype = getFieldTypeForOption (field_letter);
+	if (field_letter == NUL_FIELD_LETTER)
+	{
+		const char *f;
+
+		language = getLanguageComponentInFieldName (field_name, &f);
+		ftype = getFieldTypeForNameAndLanguage (f, language);
+	}
+	else
+	{
+		language = LANG_IGNORE;
+		ftype = getFieldTypeForOption (field_letter);
+	}
+
 	if (ftype == FIELD_UNKNOWN)
-		error (FATAL, "No such field letter: %c", field_letter);
+	{
+		if (field_letter == NUL_FIELD_LETTER)
+			error (FATAL, "No such field name: %s", field_name);
+		else
+			error (FATAL, "No such field letter: %c", field_letter);
+	}
 
-	fdesc = getFieldDesc (ftype);
-	if (fdesc->renderEscaped == NULL)
+	if (!isFieldRenderable (ftype))
+	{
+		Assert (field_letter != NUL_FIELD_LETTER);
 		error (FATAL, "The field cannot be printed in format output: %c", field_letter);
+	}
 
 	cur = xMalloc (1, fmtElement);
 
 	cur->spec.field.width = width;
-	cur->spec.field.desc  = fdesc;
+	cur->spec.field.ftype = ftype;
 
-	fdesc->enabled   = TRUE;	/* TODO */
+	enableField (ftype, TRUE);
+	if (language == LANG_AUTO)
+	{
+		fieldType ftype_next = ftype;
+		while ((ftype_next = nextFieldSibling (ftype_next)) != FIELD_UNKNOWN)
+			enableField (ftype_next, TRUE);
+	}
 
 	cur->printer = printTagField;
 	cur->next = NULL;
@@ -162,7 +211,21 @@ extern fmtElement *fmtNew (const char*  fmtString)
 					column_width *= justification_right;
 				}
 
-				last = queueTagField (last, column_width, cursor[i]);
+				if (cursor[i] == '{')
+				{
+					vString *field_name = vStringNew ();
+
+					i++;
+					for (; cursor[i] != '}'; i++)
+						vStringPut (field_name, cursor[i]);
+
+					last = queueTagField (last, column_width, NUL_FIELD_LETTER,
+							      vStringValue (field_name));
+
+					vStringDelete (field_name);
+				}
+				else
+					last = queueTagField (last, column_width, cursor[i], NULL);
 			}
 
 		}

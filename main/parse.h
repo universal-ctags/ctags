@@ -13,6 +13,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+#include "field.h"
 #include "kind.h"
 #include "parsers.h"  /* contains list of parsers */
 #include "strlist.h"
@@ -140,6 +141,8 @@ typedef struct {
 	tagXpathTableTable *tagXpathTableTable;
 	unsigned int tagXpathTableCount;
 	boolean invisible;
+	fieldSpec *fieldSpecs;
+	unsigned int fieldSpecCount;
 
 	/* used internally */
 	unsigned int id;               /* id assigned to language */
@@ -150,6 +153,7 @@ typedef struct {
 	unsigned int tagXpathInstalled:1;  /* tagXpathTable is installed or not. */
 	unsigned int pseudoTagPrinted:1;   /* pseudo tags about this parser
 					      is emitted or not. */
+	unsigned int fieldSpecInstalled:1; /* fieldSpecs is installed or not. */
 
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
@@ -218,6 +222,8 @@ extern void printLanguageMaps (const langType language, langmapType type);
 extern void enableLanguages (const boolean state);
 extern void enableLanguage (const langType language, const boolean state);
 extern void initializeParsing (void);
+extern void initializeParser (langType language);
+extern unsigned int countParsers (void);
 extern void freeParserResources (void);
 extern void printLanguageFileKind (const langType language);
 extern void printLanguageKinds (const langType language, boolean allKindFields);

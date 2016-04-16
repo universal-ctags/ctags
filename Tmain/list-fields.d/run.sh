@@ -12,8 +12,14 @@ with_field()
 	$CTAGS --quiet --options=NONE $3 --machinable --fields=$field -o - input.$lang
 }
 
+ignore_xpath ()
+{
+    grep -v Maven2
+}
+
 : &&
-    $CTAGS --quiet --options=NONE --machinable --with-list-header --list-fields &&
+    $CTAGS --quiet --options=NONE --machinable --with-list-header --list-fields  \
+	| ignore_xpath &&
     with_field "" java &&
     with_field a  java &&
     with_field i  java &&

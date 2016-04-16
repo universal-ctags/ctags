@@ -1086,9 +1086,10 @@ static void processExtraTagsOption (
 static void resetFieldsOption (boolean mode)
 {
 	int i;
-	for (i = 0; i < FIELD_COUNT; ++i)
-		if (!getFieldDesc (i)->basic)
-			getFieldDesc (i)->enabled = mode;
+
+	for (i = 0; i < countFields (); ++i)
+		if (!isFieldFixed (i))
+			enableField (i, mode);
 }
 
 static void processFieldsOption (
@@ -1098,29 +1099,95 @@ static void processFieldsOption (
 	boolean mode = TRUE;
 	int c;
 	fieldType t;
+	int i;
+
+	static vString * longName;
+	boolean inLongName = FALSE;
+	langType language;
+
+	if (!longName)
+		longName = vStringNew ();
+	else
+		vStringClear (longName);
 
 	if (*p == '*')
 	{
+		for (i = 0; i < countParsers(); i++)
+			initializeParser (i);
+
 		resetFieldsOption (TRUE);
 		p++;
 	}
 	else if (*p != '+'  &&  *p != '-')
+	{
+		for (i = 0; i < countParsers(); i++)
+			initializeParser (i);
 		resetFieldsOption (FALSE);
-
+	}
 
 	while ((c = *p++) != '\0') switch (c)
 	{
-		case '+': mode = TRUE;                  break;
-		case '-': mode = FALSE;                 break;
-		default : t = getFieldTypeForOption (c);
-			if (t == FIELD_UNKNOWN)
-				error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
-				      c, option);
-			else if (getFieldDesc (t)->basic && (mode == FALSE))
-				error(WARNING, "Cannot disable basic field: '%c'(%s) for \"%s\" option",
-				      c, getFieldDesc (t)->name, option);
+		case '+':
+			if (inLongName)
+				vStringPut (longName, c);
 			else
-				getFieldDesc (t)->enabled = mode;
+				mode = TRUE;
+			break;
+		case '-':
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				mode = FALSE;
+			break;
+		case '{':
+			if (inLongName)
+				error(FATAL,
+				      "unexpected character in field specification: \'%c\'",
+				      c);
+			inLongName = TRUE;
+			break;
+		case '}':
+			if (!inLongName)
+				error(FATAL,
+				      "unexpected character in field specification: \'%c\'",
+				      c);
+
+			{
+				const char *f;
+
+				language = getLanguageComponentInFieldName (vStringValue (longName), &f);
+				t = getFieldTypeForNameAndLanguage (f, language);
+			}
+
+			if (t == FIELD_UNKNOWN)
+				error(FATAL, "nosuch field: \'%s\'", vStringValue (longName));
+
+			enableField (t, mode);
+			if (language == LANG_AUTO)
+			{
+				fieldType ftype_next = t;
+				while ((ftype_next = nextFieldSibling (ftype_next)) != FIELD_UNKNOWN)
+					enableField (ftype_next, mode);
+			}
+
+			inLongName = FALSE;
+			vStringClear (longName);
+			break;
+		default :
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+			{
+				t = getFieldTypeForOption (c);
+				if (t == FIELD_UNKNOWN)
+					error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
+					      c, option);
+				else if (isFieldFixed (t) && (mode == FALSE))
+					error(WARNING, "Cannot disable basic field: '%c'(%s) for \"%s\" option",
+					      c, getFieldName (t), option);
+				else
+					enableField (t, mode);
+			}
 			break;
 	}
 }
@@ -1219,6 +1286,9 @@ static void processListFeaturesOption(const char *const option __unused__,
 static void processListFieldsOption(const char *const option __unused__,
 				    const char *const parameter __unused__)
 {
+	int i;
+	for (i = 0; i < countParsers(); i++)
+		initializeParser (i);
 	printFields ();
 	exit (0);
 }

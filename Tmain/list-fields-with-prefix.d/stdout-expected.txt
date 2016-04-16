@@ -1,3 +1,4 @@
-r       UCTAGSrole      off     TRUE     Role                          
-Z       UCTAGSscope     off     FALSE    Include the "scope:" key in scope field (use s)
-E       UCTAGSextra     off     TRUE     Extra tag type information    
+r       UCTAGSrole      off     NONE            TRUE     Role                          
+Z       UCTAGSscope     off     NONE            FALSE    Include the "scope:" key in scope field (use s)
+E       UCTAGSextra     off     NONE            TRUE     Extra tag type information    
+-       UCTAGSsectionMarker off     reStructuredText TRUE     character used for declaring section
