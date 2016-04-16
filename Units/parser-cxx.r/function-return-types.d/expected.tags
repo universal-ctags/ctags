@@ -29,8 +29,8 @@ f08	input.cpp	/^std::vector<std::string> * f08()$/;"	f	typeref:typename:std::vec
 p09	input.cpp	/^auto p09() -> std::vector<std::string> ***$/;"	f	typeref:typename:std::vector<std::string> ***
 f10	input.cpp	/^auto f10() -> std::string$/;"	f	typeref:typename:std::string
 f11	input.cpp	/^auto f11() -> int (*)(int)$/;"	f	typeref:typename:int (*)(int)
-f13	input.cpp	/^template<typename A> std::vector<A> * f13()$/;"	f	typeref:typename:std::vector<A> *
-f14	input.cpp	/^template<typename A> auto f14() -> std::vector<A> *$/;"	f	typeref:typename:std::vector<A> *
+f13	input.cpp	/^template<typename A> std::vector<A> * f13()$/;"	f	typeref:typename:std::vector<A> *	template:<typename A>
+f14	input.cpp	/^template<typename A> auto f14() -> std::vector<A> *$/;"	f	typeref:typename:std::vector<A> *	template:<typename A>
 m00	input.cpp	/^	void m00();$/;"	p	class:X	typeref:typename:void	file:
 m01	input.cpp	/^	constexpr int m01(){ return 0; };$/;"	f	class:X	typeref:typename:int	file:
 m02	input.cpp	/^	unsigned int m02();$/;"	p	class:X	typeref:typename:unsigned int	file:
