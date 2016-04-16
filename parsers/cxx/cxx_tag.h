@@ -39,6 +39,15 @@ enum CXXTagKind
 	CXXTagKindUSING
 };
 
+typedef enum _CXXTagCPPField
+{
+	CXXTagCPPFieldTemplate
+} CXXTagCPPField;
+
+fieldSpec * cxxTagGetCPPFieldSpecifiers(void);
+int cxxTagGetCPPFieldSpecifierCount(void);
+int cxxTagCPPFieldEnabled(CXXTagCPPField eField);
+
 kindOption * cxxTagGetKindOptions(void);
 int cxxTagGetKindOptionCount(void);
 boolean cxxTagKindEnabled(enum CXXTagKind eKindId);
@@ -59,6 +68,10 @@ CXXToken * cxxTagSetTypeField(
 		CXXToken * pTypeStart,
 		CXXToken * pTypeEnd
 	);
+
+// Set a parser-local CPP field. The szValue pointer must persist
+// until cxxTagCommit() is called.
+void cxxTagSetCPPField(CXXTagCPPField eField,const char * szValue);
 
 // Commit the composed tag. Must follow a succesfull cxxTagBegin() call.
 void cxxTagCommit(void);

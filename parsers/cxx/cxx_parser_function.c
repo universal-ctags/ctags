@@ -961,6 +961,20 @@ int cxxParserEmitFunctionTags(
 		if(pszSignature)
 			tag->extensionFields.signature = vStringValue(pszSignature);
 
+		if(
+			g_cxx.pTemplateTokenChain && (g_cxx.pTemplateTokenChain->iCount > 0) &&
+			cxxParserCurrentLanguageIsCPP() &&
+			cxxTagCPPFieldEnabled(CXXTagCPPFieldTemplate)
+		)
+		{
+			cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
+			cxxTokenChainCondense(g_cxx.pTemplateTokenChain,0);
+			cxxTagSetCPPField(
+					CXXTagCPPFieldTemplate,
+					vStringValue(cxxTokenChainFirst(g_cxx.pTemplateTokenChain)->pszWord)
+				);
+		}
+
 		cxxTagCommit();
 
 		if(pszSignature)

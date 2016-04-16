@@ -85,12 +85,12 @@ parserDefinition * CParser (void)
 
 	parserDefinition* def = parserNew("C");
 
-	def->kinds      = cxxTagGetKindOptions();
-	def->kindCount  = cxxTagGetKindOptionCount();
+	def->kinds = cxxTagGetKindOptions();
+	def->kindCount = cxxTagGetKindOptionCount();
 	def->extensions = extensions;
-	def->parser2    = cxxCParserMain;
+	def->parser2 = cxxCParserMain;
 	def->initialize = cxxCParserInitialize;
-	def->finalize   = cxxParserCleanup;
+	def->finalize = cxxParserCleanup;
 	def->selectLanguage = selectors;
 	def->useCork = TRUE; // We use corking to block output until the end of file
 
@@ -113,12 +113,14 @@ parserDefinition * CppParser (void)
 
 	parserDefinition* def = parserNew("C++");
 
-	def->kinds      = cxxTagGetKindOptions();
-	def->kindCount  = cxxTagGetKindOptionCount();
+	def->kinds = cxxTagGetKindOptions();
+	def->kindCount = cxxTagGetKindOptionCount();
+	def->fieldSpecs = cxxTagGetCPPFieldSpecifiers();
+	def->fieldSpecCount = cxxTagGetCPPFieldSpecifierCount();
 	def->extensions = extensions;
-	def->parser2    = cxxCppParserMain;
+	def->parser2 = cxxCppParserMain;
 	def->initialize = cxxCppParserInitialize;
-	def->finalize   = cxxParserCleanup;
+	def->finalize = cxxParserCleanup;
 	def->selectLanguage = selectors;
 	def->useCork = TRUE; // We use corking to block output until the end of file
 

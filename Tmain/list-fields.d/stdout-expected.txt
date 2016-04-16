@@ -19,6 +19,7 @@ r	role	off	NONE	TRUE	Role
 R	NONE	off	NONE	TRUE	Marker (R or D) representing whether tag is definition or reference
 Z	scope	off	NONE	FALSE	Include the "scope:" key in scope field (use s)
 E	extra	off	NONE	TRUE	Extra tag type information
+-	template	off	C++	TRUE	template parameters
 -	sectionMarker	off	reStructuredText	TRUE	character used for declaring section
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/

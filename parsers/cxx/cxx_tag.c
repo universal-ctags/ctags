@@ -64,6 +64,15 @@ static const char * g_aCXXAccessStrings [] = {
 	"protected",
 };
 
+static fieldSpec g_aCXXCPPFields [] = {
+	{
+		//.letter = 'T', ?
+		.name = "template",
+		.description = "template parameters",
+		.enabled = FALSE,
+	}
+};
+
 kindOption * cxxTagGetKindOptions(void)
 {
 	return g_aCXXKinds;
@@ -77,6 +86,21 @@ int cxxTagGetKindOptionCount(void)
 boolean cxxTagKindEnabled(enum CXXTagKind eKindId)
 {
 	return g_aCXXKinds[eKindId].enabled;
+}
+
+fieldSpec * cxxTagGetCPPFieldSpecifiers(void)
+{
+	return g_aCXXCPPFields;
+}
+
+int cxxTagGetCPPFieldSpecifierCount(void)
+{
+	return sizeof(g_aCXXCPPFields) / sizeof(fieldSpec);
+}
+
+int cxxTagCPPFieldEnabled(CXXTagCPPField eField)
+{
+	return g_aCXXCPPFields[eField].enabled;
 }
 
 static tagEntryInfo g_oCXXTag;
@@ -155,6 +179,14 @@ CXXToken * cxxTagSetTypeField(
 	tag->extensionFields.typeRef[1] = vStringValue(pTypeName->pszWord);
 
 	return pTypeName;
+}
+
+void cxxTagSetCPPField(CXXTagCPPField eField,const char * szValue)
+{
+	if(!g_aCXXCPPFields[eField].enabled)
+		return;
+	
+	attachParserField(&g_oCXXTag,g_aCXXCPPFields[eField].ftype,szValue);
 }
 
 void cxxTagCommit(void)
