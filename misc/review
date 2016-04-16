@@ -1,0 +1,264 @@
+#!/bin/sh
+#
+# review - Review the diff between expected output and actual output in Units
+#
+# Copyright (C) 2016 Masatake YAMATO
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+print_help()
+{
+    echo Usage:
+    printf "	%-20s %-30s %s\n" "$0" "help|--help|-h" "show this message"
+    printf "	%-20s %-30s %s\n" "$0" "[list] [-b]" "list failed Units"
+    help_list
+    printf "	%-20s %-30s %s\n" "$0" "inspect [-b]" "inspect difference interactively"
+    help_inspect
+    exit $1
+}
+
+is_known_bug()
+{
+    [[ $1 == *.b ]]
+    return $?
+}
+
+do_list ()
+{
+    local d
+    local n
+    local a
+    local including_known_bugs
+
+    for a in "$@"; do
+	case $a in
+	    (-b)
+		including_known_bugs=-b
+		;;
+	    (-*)
+		echo "unknown option: ${a}" 1>&2
+		exit 1
+		;;
+	    (*)
+		echo "unexpected argument ${a}" 1>&2
+		exit 1
+		;;
+	esac
+    done
+
+    for d in $(find Units -name "DIFF.tmp"); do
+	n=$(dirname "$d")
+	if (( ! is_known_bug $(basename "$n") ) || [[ -n ${including_known_bugs} ]] ) \
+	       && [[ -e "$n"/expected.tags ]]; then
+	    echo ${n#Units/}
+	fi
+    done
+}
+
+help_list()
+{
+    printf "	%-20s %-30s %s\n" "" "-b" "list .b (known bug) marked cases"
+}
+
+inspect_cmd_accept ()
+{
+    local from=./Units/$1/FILTERED.tmp
+    local to=./Units/$1/expected.tags
+    local r
+    
+    if [[ ! -e "${from}" ]]; then
+	echo "./Units/$1/FILTERED.tmp is not found" 1>&2
+	echo "Remove DIFF.tmp?"
+	read -p "[Y/n] "
+	if [[ "$REPLY" == Y ]]; then
+	    rm ./Units/$t/DIFF.tmp
+	    echo "Removed: DIFF.tmp"
+	    r=1
+	else
+	    echo "Kept: DIFF.tmp"
+	    r=0
+	fi
+	return $r
+    fi
+
+    echo "Do you really want do following shell command?"
+    echo 
+    echo "   mv \"$from\"" '\'
+    echo "      \"$to\" "
+    echo
+    read -p "[Y/n] "
+
+    if [[ "$REPLY" == Y ]]; then
+	mv "$from" "$to"
+	echo "Renamed: $from => $to"
+	r=0
+
+	echo "Remove DIFF.tmp, too?"
+	read -p "[Y/n] "
+	if [[ "$REPLY" == Y ]]; then
+	    rm ./Units/$t/DIFF.tmp
+	    echo "Removed: DIFF.tmp"
+	else
+	    echo "Kept: DIFF.tmp"
+	fi
+    else
+	echo "Aborted"
+	r=1
+    fi
+
+    return $r
+}
+
+inspect_cmd_skip ()
+{
+    echo "SKIPPING $1" 1>&2
+}
+
+inspect_cmd_show_diff ()
+{
+    cat ./Units/$1/DIFF.tmp
+    echo '---'
+    echo '# ' ./Units/$1/DIFF.tmp
+}
+
+inspect_cmd_quit ()
+{
+    echo "BYE" 1>&2
+    exit 0
+}
+
+inspect_cmd_unknown()
+{
+    echo "unknown command: $REPLY" 1>&2
+    echo "Just return to show menu" 1>&2
+}
+
+help_inspect ()
+{
+    printf "	%-20s %-30s %s\n" "" "-b" "inspect .b (known bug) marked cases"
+}
+
+do_inspect ()
+{
+    local a
+    local t
+    local r
+    local next
+    local including_known_bugs
+
+    for a in "$@"; do
+	case $a in
+	    (-b)
+		including_known_bugs=-b
+		;;
+	    (-*)
+		echo "unknown option: ${a}" 1>&2
+		exit 1
+		;;
+	    (*)
+		echo "unexpected argument ${a}" 1>&2
+		exit 1
+		;;
+	esac
+    done
+
+    for t in $(do_list ${including_known_bugs}); do
+	next=0
+	PS3="[[ $t ]]? "
+	select r in 'accept' 'skip' 'diff' 'quit'; do
+	    case $r in
+		(accept)
+		    if inspect_cmd_accept "$t"; then
+			next=1
+		    fi
+		    ;;
+		(skip)
+		    inspect_cmd_skip "$t"
+		    next=1
+		    ;;
+		(diff)
+		    inspect_cmd_show_diff "$t"
+		    ;;
+		(quit)
+		    inspect_cmd_quit
+		    ;;
+		(*)
+		    case $REPLY in
+			(a|accept)
+			    if inspect_cmd_accept "$t"; then
+				next=1
+			    fi
+			    ;;
+			(!|s|skip)
+			    inspect_cmd_skip "$t"
+			    next=1
+			    ;;
+			(=|d|diff)
+			    inspect_cmd_show_diff "$t"
+			    ;;
+			(q|quit)
+			    inspect_cmd_quit
+			    ;;
+			(*)
+			    inspect_cmd_unknown
+			    ;;
+		    esac
+		    ;;
+	    esac
+	    if [[ $next == 1 ]]; then
+		break
+	    fi
+	done
+    done
+}
+
+main ()
+{
+    local action
+
+    while [[ $# -gt 0 ]]; do
+	case $1 in
+	    (help|--help|-h)
+		print_help 0
+		;;
+	    (list)
+		action=$1
+		shift
+		break
+		;;
+	    (inspect)
+		action=$1
+		shift
+		break
+		;;
+	    (*)
+		print_help 1 1>&2
+		;;
+	esac
+    done
+
+    if  [[ -z "$action" ]]; then
+	action=list
+    fi
+
+    if ! [[ -d ./Units ]]; then
+	echo "$0: cannot find ./Units directory" 1>&2
+	exit 1
+    fi
+
+    do_${action} "$@"
+}
+
+main "$@"
