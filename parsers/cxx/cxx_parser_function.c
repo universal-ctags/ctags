@@ -32,7 +32,7 @@
 // Returns -1 in case of error, 1 if a K&R style function declaration has been
 // found and parsed, 0 if no K&R style function declaration has been found.
 //
-int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
+int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 {
 #ifdef CXX_DO_DEBUGGING
 	vString * pChain = cxxTokenChainJoin(g_cxx.pTokenChain,NULL,0);
@@ -42,6 +42,9 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 		);
 	vStringDelete(pChain);
 #endif
+
+	if(piCorkQueueIndex)
+		*piCorkQueueIndex = SCOPE_NIL;
 
 	// Check if we are in the following situation:
 	//
@@ -284,7 +287,11 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(void)
 
 		if(pszSignature)
 			tag->extensionFields.signature = vStringValue(pszSignature);
-		cxxTagCommit();
+
+		int iCorkQueueIndex = cxxTagCommit();
+
+		if(piCorkQueueIndex)
+			*piCorkQueueIndex = iCorkQueueIndex;
 
 		if(pszSignature)
 			vStringDelete(pszSignature);
@@ -862,12 +869,16 @@ next_token:
 int cxxParserEmitFunctionTags(
 		CXXFunctionSignatureInfo * pInfo,
 		enum CXXTagKind eTagKind,
-		unsigned int uOptions
+		unsigned int uOptions,
+		int * piCorkQueueIndex
 	)
 {
 	CXX_DEBUG_ENTER();
 
 	int iScopesPushed = 0;
+	
+	if(piCorkQueueIndex)
+		*piCorkQueueIndex = SCOPE_NIL;
 
 	enum CXXTagKind eOuterScopeKind = cxxScopeGetKind();
 
@@ -975,7 +986,10 @@ int cxxParserEmitFunctionTags(
 				);
 		}
 
-		cxxTagCommit();
+		int iCorkQueueIndex = cxxTagCommit();
+
+		if(piCorkQueueIndex)
+			*piCorkQueueIndex = iCorkQueueIndex;
 
 		if(pszSignature)
 			vStringDelete(pszSignature);
@@ -983,6 +997,7 @@ int cxxParserEmitFunctionTags(
 		if(pTypeName)
 			cxxTokenDestroy(pTypeName);
 	}
+
 
 #ifdef CXX_DO_DEBUGGING
 	if(eTagKind == CXXTagKindFUNCTION)
@@ -1012,7 +1027,7 @@ int cxxParserEmitFunctionTags(
 // and push all the necessary scopes for the next block. It returns the number
 // of scopes pushed.
 //
-int cxxParserExtractFunctionSignatureBeforeOpeningBracket(void)
+int cxxParserExtractFunctionSignatureBeforeOpeningBracket(int * piCorkQueueIndex)
 {
 	CXX_DEBUG_ENTER();
 
@@ -1048,7 +1063,8 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(void)
 	int iScopesPushed = cxxParserEmitFunctionTags(
 			&oInfo,
 			CXXTagKindFUNCTION,
-			CXXEmitFunctionTagsPushScopes
+			CXXEmitFunctionTagsPushScopes,
+			piCorkQueueIndex
 		);
 
 #ifdef CXX_DO_DEBUGGING

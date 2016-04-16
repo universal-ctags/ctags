@@ -123,6 +123,8 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 			pTypeStart = pTypeStart->pNext;
 	}
 
+	int iCorkQueueIndex = SCOPE_NIL;
+
 	if(tag)
 	{
 		tag->isFileScope = TRUE;
@@ -137,7 +139,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 		else
 			pTypeName = NULL;
 
-		cxxTagCommit();
+		iCorkQueueIndex = cxxTagCommit();
 
 		if(pTypeName)
 			cxxTokenDestroy(pTypeName);
@@ -163,6 +165,9 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 	}
 
 	boolean bRet = cxxParserParseBlock(TRUE);
+
+	if(iCorkQueueIndex > SCOPE_NIL)
+		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
 
 	cxxScopePop();
 

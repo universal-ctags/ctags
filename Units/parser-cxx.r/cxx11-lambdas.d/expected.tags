@@ -1,19 +1,19 @@
-call	input.cpp	/^template<typename T> void call(T x)$/;"	function	typeref:typename:void	signature:(T x)
+call	input.cpp	/^template<typename T> void call(T x)$/;"	function	typeref:typename:void	signature:(T x)	end:6
 x	input.cpp	/^template<typename T> void call(T x)$/;"	parameter	function:call	typeref:typename:T	file:
-test	input.cpp	/^int test()$/;"	function	typeref:typename:int	signature:()
-__anon4e7b1b580103	input.cpp	/^	auto l1 = [] { return 0; };$/;"	function	function:test	file:
+test	input.cpp	/^int test()$/;"	function	typeref:typename:int	signature:()	end:24
+__anon4e7b1b580103	input.cpp	/^	auto l1 = [] { return 0; };$/;"	function	function:test	file:	end:10
 l1	input.cpp	/^	auto l1 = [] { return 0; };$/;"	local	function:test	typeref:typename:auto	file:
-__anon4e7b1b580203	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	function	function:test	file:
+__anon4e7b1b580203	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	function	function:test	file:	end:12
 a	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	parameter	function:test::__anon4e7b1b580203	typeref:typename:int	file:
 b	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	parameter	function:test::__anon4e7b1b580203	typeref:typename:int	file:
 l2	input.cpp	/^	auto l2 = [](int a,int b) { return a > b ? a : b; };$/;"	local	function:test	typeref:typename:auto	file:
-__anon4e7b1b580303	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	function	function:test	typeref:typename:int	file:
+__anon4e7b1b580303	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	function	function:test	typeref:typename:int	file:	end:17
 a	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580303	typeref:typename:int	file:
 b	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580303	typeref:typename:int	file:
-__anon4e7b1b580403	input.cpp	/^		auto l4 = [a,b](int c){ return a+b+c; };$/;"	function	function:test::__anon4e7b1b580303	file:
+__anon4e7b1b580403	input.cpp	/^		auto l4 = [a,b](int c){ return a+b+c; };$/;"	function	function:test::__anon4e7b1b580303	file:	end:15
 c	input.cpp	/^		auto l4 = [a,b](int c){ return a+b+c; };$/;"	parameter	function:test::__anon4e7b1b580303::__anon4e7b1b580403	typeref:typename:int	file:
 l4	input.cpp	/^		auto l4 = [a,b](int c){ return a+b+c; };$/;"	local	function:test::__anon4e7b1b580303	typeref:typename:auto	file:
 l3	input.cpp	/^	auto l3 = [=](int a,int b) -> int {$/;"	local	function:test	typeref:typename:auto	file:
-__anon4e7b1b580503	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	function	function:test	typeref:typename:int	file:
+__anon4e7b1b580503	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	function	function:test	typeref:typename:int	file:	end:22
 a	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580503	typeref:typename:int	file:
 b	input.cpp	/^			[l1,l2,l3](int a,int b) -> int {$/;"	parameter	function:test::__anon4e7b1b580503	typeref:typename:int	file:

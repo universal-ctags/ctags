@@ -1,2 +1,2 @@
 --c++-kinds=pfz
---fields=+S
+--fields=+S{c++.end}

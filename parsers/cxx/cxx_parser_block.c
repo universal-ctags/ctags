@@ -82,10 +82,13 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 	}
 
 	int iScopes;
+	// FIXME: Why the invalid cork queue entry index is SCOPE_NIL?
+	int iCorkQueueIndex = SCOPE_NIL;
+	
 	if(eScopeKind != CXXTagKindFUNCTION)
 	{
 		// very likely a function definition
-		iScopes = cxxParserExtractFunctionSignatureBeforeOpeningBracket();
+		iScopes = cxxParserExtractFunctionSignatureBeforeOpeningBracket(&iCorkQueueIndex);
 
 		// FIXME: Handle syntax (5) of list initialization:
 		//        Class::Class() : member { arg1, arg2, ... } {...
@@ -117,6 +120,9 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse nested block");
 		return FALSE;
 	}
+
+	if(iCorkQueueIndex > SCOPE_NIL)
+		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
 
 	while(iScopes > 0)
 	{
@@ -386,7 +392,8 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 					//  type whatever fname(par1,par2) int par1; int par2; {
 					//                                        ^
 					//
-					switch(cxxParserMaybeExtractKnRStyleFunctionDefinition())
+					int iCorkQueueIndex = SCOPE_NIL;
+					switch(cxxParserMaybeExtractKnRStyleFunctionDefinition(&iCorkQueueIndex))
 					{
 						case 1:
 							// got K&R style function definition, one scope was pushed.
@@ -396,6 +403,8 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 								CXX_DEBUG_LEAVE_TEXT("Failed to parse nested block");
 								return FALSE;
 							}
+							if(iCorkQueueIndex > SCOPE_NIL)
+								cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
 							cxxScopePop();
 						break;
 						case 0:

@@ -1,5 +1,7 @@
 r       UCTAGSrole      off     NONE            TRUE     Role                          
 Z       UCTAGSscope     off     NONE            FALSE    Include the "scope:" key in scope field (use s)
 E       UCTAGSextra     off     NONE            TRUE     Extra tag type information    
+-       UCTAGSend       off     C               TRUE     end lines of struct/function declarations
+-       UCTAGSend       off     C++             TRUE     end lines of class/function declarations
 -       UCTAGStemplate  off     C++             TRUE     template parameters           
 -       UCTAGSsectionMarker off     reStructuredText TRUE     character used for declaring section

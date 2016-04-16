@@ -17,22 +17,22 @@ p15	input.cpp	/^Union p15();$/;"	p	typeref:typename:Union	file:
 p16	input.cpp	/^Class & p16();$/;"	p	typeref:typename:Class &	file:
 p17	input.cpp	/^const enum Enum p17();$/;"	p	typeref:typename:const enum Enum	file:
 p18	input.cpp	/^Enum p18();$/;"	p	typeref:typename:Enum	file:
-f00	input.cpp	/^void f00()$/;"	f	typeref:typename:void
-f01	input.cpp	/^int f01()$/;"	f	typeref:typename:int
-f02	input.cpp	/^unsigned int f02()$/;"	f	typeref:typename:unsigned int
-f03	input.cpp	/^auto f03() -> int$/;"	f	typeref:typename:int
-f04	input.cpp	/^int * f04()$/;"	f	typeref:typename:int *
-f05	input.cpp	/^const unsigned long long int & f05()$/;"	f	typeref:typename:const unsigned long long int &
-f06	input.cpp	/^static inline int * f06()$/;"	f	typeref:typename:int *	file:
-f07	input.cpp	/^std::string & f07()$/;"	f	typeref:typename:std::string &
-f08	input.cpp	/^std::vector<std::string> * f08()$/;"	f	typeref:typename:std::vector<std::string> *
-p09	input.cpp	/^auto p09() -> std::vector<std::string> ***$/;"	f	typeref:typename:std::vector<std::string> ***
-f10	input.cpp	/^auto f10() -> std::string$/;"	f	typeref:typename:std::string
-f11	input.cpp	/^auto f11() -> int (*)(int)$/;"	f	typeref:typename:int (*)(int)
-f13	input.cpp	/^template<typename A> std::vector<A> * f13()$/;"	f	typeref:typename:std::vector<A> *	template:<typename A>
-f14	input.cpp	/^template<typename A> auto f14() -> std::vector<A> *$/;"	f	typeref:typename:std::vector<A> *	template:<typename A>
+f00	input.cpp	/^void f00()$/;"	f	typeref:typename:void	end:43
+f01	input.cpp	/^int f01()$/;"	f	typeref:typename:int	end:48
+f02	input.cpp	/^unsigned int f02()$/;"	f	typeref:typename:unsigned int	end:53
+f03	input.cpp	/^auto f03() -> int$/;"	f	typeref:typename:int	end:58
+f04	input.cpp	/^int * f04()$/;"	f	typeref:typename:int *	end:63
+f05	input.cpp	/^const unsigned long long int & f05()$/;"	f	typeref:typename:const unsigned long long int &	end:69
+f06	input.cpp	/^static inline int * f06()$/;"	f	typeref:typename:int *	file:	end:74
+f07	input.cpp	/^std::string & f07()$/;"	f	typeref:typename:std::string &	end:80
+f08	input.cpp	/^std::vector<std::string> * f08()$/;"	f	typeref:typename:std::vector<std::string> *	end:85
+p09	input.cpp	/^auto p09() -> std::vector<std::string> ***$/;"	f	typeref:typename:std::vector<std::string> ***	end:90
+f10	input.cpp	/^auto f10() -> std::string$/;"	f	typeref:typename:std::string	end:96
+f11	input.cpp	/^auto f11() -> int (*)(int)$/;"	f	typeref:typename:int (*)(int)	end:101
+f13	input.cpp	/^template<typename A> std::vector<A> * f13()$/;"	f	typeref:typename:std::vector<A> *	template:<typename A>	end:106
+f14	input.cpp	/^template<typename A> auto f14() -> std::vector<A> *$/;"	f	typeref:typename:std::vector<A> *	template:<typename A>	end:111
 m00	input.cpp	/^	void m00();$/;"	p	class:X	typeref:typename:void	file:
-m01	input.cpp	/^	constexpr int m01(){ return 0; };$/;"	f	class:X	typeref:typename:int	file:
+m01	input.cpp	/^	constexpr int m01(){ return 0; };$/;"	f	class:X	typeref:typename:int	file:	end:117
 m02	input.cpp	/^	unsigned int m02();$/;"	p	class:X	typeref:typename:unsigned int	file:
 m03	input.cpp	/^	static auto m03() -> int;$/;"	p	class:X	typeref:typename:int	file:
 m04	input.cpp	/^	int * m04();$/;"	p	class:X	typeref:typename:int *	file:

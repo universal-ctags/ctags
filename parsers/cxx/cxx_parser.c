@@ -244,6 +244,47 @@ boolean cxxParserParseUpToOneOf(unsigned int uTokenTypes)
 }
 
 //
+// Attach the current position of input file as "end" field of
+// the specified tag in the cork queue
+//
+void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex)
+{
+	CXX_DEBUG_ASSERT(iCorkQueueIndex > SCOPE_NIL,"The cork queue index is not valid");
+
+	char buf[16];
+
+	if(cxxParserCurrentLanguageIsCPP())
+	{
+		if(!cxxTagCPPFieldEnabled(CXXTagCPPFieldEndLine))
+			return;
+
+		tagEntryInfo * e = getEntryInCorkQueue(iCorkQueueIndex);
+		if(!e)
+		{
+			CXX_DEBUG_PRINT("WARNING: Could not find class tag entry in cork queue!");
+			return;
+		}
+
+		sprintf(buf,"%ld",getInputLineNumber());
+		cxxTagSetCorkQueueCPPField(e,CXXTagCPPFieldEndLine,buf);
+		return;
+	}
+
+	if(!cxxTagCFieldEnabled(CXXTagCFieldEndLine))
+		return;
+
+	tagEntryInfo * e = getEntryInCorkQueue(iCorkQueueIndex);
+	if(!e)
+	{
+		CXX_DEBUG_PRINT("WARNING: Could not find class tag entry in cork queue!");
+		return;
+	}
+
+	sprintf(buf,"%ld",getInputLineNumber());
+	cxxTagSetCorkQueueCField(e,CXXTagCFieldEndLine,buf);
+}
+
+//
 // This is called after a full enum/struct/class/union declaration
 // that ends with a closing bracket.
 //
@@ -422,12 +463,14 @@ boolean cxxParserParseEnum(void)
 
 	tagEntryInfo * tag = cxxTagBegin(CXXTagKindENUM,pEnumName);
 
+	int iCorkQueueIndex = SCOPE_NIL;
+
 	if(tag)
 	{
 		// FIXME: this is debatable
 		tag->isFileScope = !isInputHeaderFile();
 
-		cxxTagCommit();
+		iCorkQueueIndex = cxxTagCommit();
 	}
 
 	cxxScopePush(pEnumName,CXXTagKindENUM,CXXScopeAccessPublic);
@@ -472,6 +515,9 @@ boolean cxxParserParseEnum(void)
 			))
 			break;
 	}
+
+	if(iCorkQueueIndex > SCOPE_NIL)
+		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
 
 	while(iPushedScopes > 0)
 	{
@@ -696,6 +742,8 @@ boolean cxxParserParseClassStructOrUnion(
 
 	tagEntryInfo * tag = cxxTagBegin(eTagKind,pClassName);
 
+	int iCorkQueueIndex = SCOPE_NIL;
+
 	if(tag)
 	{
 		if(g_cxx.pTokenChain->iCount > 0)
@@ -752,7 +800,7 @@ boolean cxxParserParseClassStructOrUnion(
 
 		tag->isFileScope = !isInputHeaderFile();
 
-		cxxTagCommit();
+		iCorkQueueIndex = cxxTagCommit();
 	}
 
 	cxxScopePush(
@@ -771,6 +819,9 @@ boolean cxxParserParseClassStructOrUnion(
 			vStringDelete(pScopeName);
 		return FALSE;
 	}
+
+	if(iCorkQueueIndex > SCOPE_NIL)
+		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
 
 	iPushedScopes++;
 	while(iPushedScopes > 0)
@@ -893,7 +944,7 @@ void cxxParserAnalyzeOtherStatement(void)
 	// prefer function.
 	if(cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,NULL))
 	{
-		cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,0);
+		cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,0,NULL);
 		CXX_DEBUG_LEAVE_TEXT("Found function prototypes");
 		return;
 	}

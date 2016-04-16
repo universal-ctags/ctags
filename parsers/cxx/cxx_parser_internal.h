@@ -82,8 +82,8 @@ typedef struct _CXXFunctionSignatureInfo
 
 } CXXFunctionSignatureInfo;
 
-int cxxParserMaybeExtractKnRStyleFunctionDefinition(void);
-int cxxParserExtractFunctionSignatureBeforeOpeningBracket(void);
+int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex);
+int cxxParserExtractFunctionSignatureBeforeOpeningBracket(int * piCorkQueueIndex);
 
 #define CXX_MAX_EXTRACTED_PARAMETERS 24
 
@@ -121,7 +121,8 @@ enum CXXEmitFunctionTagsOptions
 int cxxParserEmitFunctionTags(
 		CXXFunctionSignatureInfo * pInfo,
 		enum CXXTagKind eTagKind,
-		unsigned int uOptions
+		unsigned int uOptions,
+		int * piCorkQueueIndex
 	);
 
 void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo);
@@ -156,6 +157,7 @@ boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
 		unsigned int uTokenTypes,
 		unsigned int uInitialSubchainMarkerTypes
 	);
+void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex);
 
 typedef enum _CXXParserKeywordState
 {

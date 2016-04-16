@@ -41,12 +41,22 @@ enum CXXTagKind
 
 typedef enum _CXXTagCPPField
 {
+	CXXTagCPPFieldEndLine,
 	CXXTagCPPFieldTemplate
 } CXXTagCPPField;
+
+typedef enum _CXXTagCField
+{
+	CXXTagCFieldEndLine
+} CXXTagCField;
 
 fieldSpec * cxxTagGetCPPFieldSpecifiers(void);
 int cxxTagGetCPPFieldSpecifierCount(void);
 int cxxTagCPPFieldEnabled(CXXTagCPPField eField);
+
+fieldSpec * cxxTagGetCFieldSpecifiers(void);
+int cxxTagGetCFieldSpecifierCount(void);
+int cxxTagCFieldEnabled(CXXTagCField eField);
 
 kindOption * cxxTagGetKindOptions(void);
 int cxxTagGetKindOptionCount(void);
@@ -73,8 +83,32 @@ CXXToken * cxxTagSetTypeField(
 // until cxxTagCommit() is called.
 void cxxTagSetCPPField(CXXTagCPPField eField,const char * szValue);
 
+// Set a parser-local CPP field for a tag in cork queue.
+// The szValue pointer is copied.
+// Make sure that the field is enabled before calling this function.
+void cxxTagSetCorkQueueCPPField(
+		tagEntryInfo * pTag,
+		CXXTagCPPField eField,
+		const char * szValue
+	);
+
+// Set a parser-local C field. The szValue pointer must persist
+// until cxxTagCommit() is called.
+void cxxTagSetCField(CXXTagCField eField,const char * szValue);
+
+// Set a parser-local C field for a tag in cork queue.
+// The szValue pointer is copied.
+// Make sure that the field is enabled before calling this function.
+void cxxTagSetCorkQueueCField(
+		tagEntryInfo * pTag,
+		CXXTagCField eField,
+		const char * szValue
+	);
+
+
 // Commit the composed tag. Must follow a succesfull cxxTagBegin() call.
-void cxxTagCommit(void);
+// Returns the index of the tag in the cork queue.
+int cxxTagCommit(void);
 
 // Same as cxxTagBegin() eventually followed by cxxTagCommit()
 void cxxTag(enum CXXTagKind eKindId,CXXToken * pToken);

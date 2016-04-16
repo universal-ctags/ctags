@@ -87,6 +87,8 @@ parserDefinition * CParser (void)
 
 	def->kinds = cxxTagGetKindOptions();
 	def->kindCount = cxxTagGetKindOptionCount();
+	def->fieldSpecs = cxxTagGetCFieldSpecifiers();
+	def->fieldSpecCount = cxxTagGetCFieldSpecifierCount();
 	def->extensions = extensions;
 	def->parser2 = cxxCParserMain;
 	def->initialize = cxxCParserInitialize;
