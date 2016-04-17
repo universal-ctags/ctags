@@ -90,9 +90,6 @@ extern int countFields (void);
 /* language should be typed to langType.
    Use int here to avoid circular dependency */
 extern int defineField (fieldSpec *spec, int language);
-extern int attachField (fieldType type, struct sTagEntryInfo *const tag,
-			const char *value);
-
 extern fieldType nextFieldSibling (fieldType type);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

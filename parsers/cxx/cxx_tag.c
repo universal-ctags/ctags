@@ -228,14 +228,14 @@ void cxxTagSetCPPField(CXXTagCPPField eField,const char * szValue)
 }
 
 void cxxTagSetCorkQueueCPPField(
-		tagEntryInfo * pTag,
+		int iIndex,
 		CXXTagCPPField eField,
 		const char * szValue
 	)
 {
 	CXX_DEBUG_ASSERT(g_aCXXCPPFields[eField].enabled,"The field must be enabled!");
 
-	attachParserField(pTag,g_aCXXCPPFields[eField].ftype,eStrdup(szValue));
+	attachParserFieldToCorkEntry(iIndex,g_aCXXCPPFields[eField].ftype,szValue);
 }
 
 void cxxTagSetCField(CXXTagCField eField,const char * szValue)
@@ -247,14 +247,14 @@ void cxxTagSetCField(CXXTagCField eField,const char * szValue)
 }
 
 void cxxTagSetCorkQueueCField(
-		tagEntryInfo * pTag,
+		int iIndex,
 		CXXTagCField eField,
 		const char * szValue
 	)
 {
 	CXX_DEBUG_ASSERT(g_aCXXCFields[eField].enabled,"The field must be enabled!");
 
-	attachParserField(pTag,g_aCXXCFields[eField].ftype,eStrdup(szValue));
+	attachParserFieldToCorkEntry(iIndex,g_aCXXCFields[eField].ftype,szValue);
 }
 
 int cxxTagCommit(void)
