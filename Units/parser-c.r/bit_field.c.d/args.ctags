@@ -1,2 +1,2 @@
 --sort=no
---fields=+{c.end}
+--fields=+{*.end}
