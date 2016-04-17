@@ -1156,13 +1156,11 @@ static int writeCtagsEntry (const tagEntryInfo *const tag)
 
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char * value)
 {
-	unsigned int index;
+	Assert (tag->usedParserFields < PRE_ALLOCATED_PARSER_FIELDS);
 
-	Assert (tag->usedParserFields + 1 < PRE_ALLOCATED_PARSER_FIELDS);
-
-	index = tag->usedParserFields++;
-	tag->parserFields [index].ftype = ftype;
-	tag->parserFields [index].value = value;
+	tag->parserFields [tag->usedParserFields].ftype = ftype;
+	tag->parserFields [tag->usedParserFields].value = value;
+	tag->usedParserFields++;
 }
 
 static void copyParserFields (const tagEntryInfo *const tag, tagEntryInfo* slot)
