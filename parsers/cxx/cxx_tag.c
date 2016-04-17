@@ -68,7 +68,7 @@ static fieldSpec g_aCXXCPPFields [] = {
 	{
 		//.letter = 'e'
 		.name = "end",
-		.description = "end lines of class/function declarations",
+		.description = "end lines of class/function declarations, and macro",
 		.enabled = FALSE
 	},
 	{
@@ -89,7 +89,7 @@ static fieldSpec g_aCXXCFields [] = {
 	{
 		//.letter = 'e'
 		.name = "end",
-		.description = "end lines of struct/function declarations",
+		.description = "end lines of struct/function declarations, and macro",
 		.enabled = FALSE
 	}
 };

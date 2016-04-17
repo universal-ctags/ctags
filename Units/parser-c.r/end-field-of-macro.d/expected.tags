@@ -1,0 +1,3 @@
+F	input.c	/^#define F(/;"	d	line:1	file:	end:1
+G	input.c	/^#define G$/;"	d	line:2	file:	end:2
+Z	input.c	/^#define Z(/;"	d	line:4	file:	end:8

@@ -19,8 +19,8 @@ r	role	off	NONE	TRUE	Role
 R	NONE	off	NONE	TRUE	Marker (R or D) representing whether tag is definition or reference
 Z	scope	off	NONE	FALSE	Include the "scope:" key in scope field (use s)
 E	extra	off	NONE	TRUE	Extra tag type information
--	end	off	C	TRUE	end lines of struct/function declarations
--	end	off	C++	TRUE	end lines of class/function declarations
+-	end	off	C	TRUE	end lines of struct/function declarations, and macro
+-	end	off	C++	TRUE	end lines of class/function declarations, and macro
 -	template	off	C++	TRUE	template parameters
 -	captures	off	C++	TRUE	lambda capture list
 -	sectionMarker	off	reStructuredText	TRUE	character used for declaring section
