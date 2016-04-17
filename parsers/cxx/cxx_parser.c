@@ -258,30 +258,16 @@ void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex)
 		if(!cxxTagCPPFieldEnabled(CXXTagCPPFieldEndLine))
 			return;
 
-		tagEntryInfo * e = getEntryInCorkQueue(iCorkQueueIndex);
-		if(!e)
-		{
-			CXX_DEBUG_PRINT("WARNING: Could not find class tag entry in cork queue!");
-			return;
-		}
-
 		sprintf(buf,"%ld",getInputLineNumber());
-		cxxTagSetCorkQueueCPPField(e,CXXTagCPPFieldEndLine,buf);
+		cxxTagSetCorkQueueCPPField(iCorkQueueIndex,CXXTagCPPFieldEndLine,buf);
 		return;
 	}
 
 	if(!cxxTagCFieldEnabled(CXXTagCFieldEndLine))
 		return;
 
-	tagEntryInfo * e = getEntryInCorkQueue(iCorkQueueIndex);
-	if(!e)
-	{
-		CXX_DEBUG_PRINT("WARNING: Could not find class tag entry in cork queue!");
-		return;
-	}
-
 	sprintf(buf,"%ld",getInputLineNumber());
-	cxxTagSetCorkQueueCField(e,CXXTagCFieldEndLine,buf);
+	cxxTagSetCorkQueueCField(iCorkQueueIndex,CXXTagCFieldEndLine,buf);
 }
 
 //

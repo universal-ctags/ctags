@@ -88,7 +88,7 @@ void cxxTagSetCPPField(CXXTagCPPField eField,const char * szValue);
 // The szValue pointer is copied.
 // Make sure that the field is enabled before calling this function.
 void cxxTagSetCorkQueueCPPField(
-		tagEntryInfo * pTag,
+		int iIndex,
 		CXXTagCPPField eField,
 		const char * szValue
 	);
@@ -101,7 +101,7 @@ void cxxTagSetCField(CXXTagCField eField,const char * szValue);
 // The szValue pointer is copied.
 // Make sure that the field is enabled before calling this function.
 void cxxTagSetCorkQueueCField(
-		tagEntryInfo * pTag,
+		int iIndex,
 		CXXTagCField eField,
 		const char * szValue
 	);
