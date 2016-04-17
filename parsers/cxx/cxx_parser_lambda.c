@@ -171,10 +171,22 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 				);
 		}
 
+		// FIXME: Return type!
+
+		vString * pszSignature = NULL;
+		if(cxxTokenTypeIs(pParenthesis,CXXTokenTypeParenthesisChain))
+			pszSignature = cxxTokenChainJoin(pParenthesis->pChain,NULL,0);
+
+		if(pszSignature)
+			tag->extensionFields.signature = vStringValue(pszSignature);
+
 		iCorkQueueIndex = cxxTagCommit();
 
 		if(pTypeName)
 			cxxTokenDestroy(pTypeName);
+
+		if(pszSignature)
+			vStringDelete(pszSignature);
 	}
 
 	cxxScopePush(
