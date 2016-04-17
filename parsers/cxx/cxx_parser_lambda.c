@@ -148,8 +148,6 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 	{
 		tag->isFileScope = TRUE;
 
-		// FIXME: Signature!
-
 		CXXToken * pTypeName;
 
 		if(pTypeStart)
@@ -170,8 +168,6 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 					vStringValue(cxxTokenChainFirst(pCaptureList->pChain)->pszWord)
 				);
 		}
-
-		// FIXME: Return type!
 
 		vString * pszSignature = NULL;
 		if(cxxTokenTypeIs(pParenthesis,CXXTokenTypeParenthesisChain))
