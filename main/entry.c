@@ -1163,6 +1163,23 @@ extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const c
 	tag->usedParserFields++;
 }
 
+extern void attachParserFieldToCorkEntry (int index,
+					 fieldType type,
+					 const char *value)
+{
+	tagEntryInfo * tag;
+	const char * v;
+
+	if (index == SCOPE_NIL)
+		return;
+
+	tag = getEntryInCorkQueue(index);
+	Assert (tag != NULL);
+
+	v = eStrdup (value);
+	attachParserField (tag, type, v);
+}
+
 static void copyParserFields (const tagEntryInfo *const tag, tagEntryInfo* slot)
 {
 	unsigned int i;
