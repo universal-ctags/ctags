@@ -76,6 +76,12 @@ static fieldSpec g_aCXXCPPFields [] = {
 		.name = "template",
 		.description = "template parameters",
 		.enabled = FALSE,
+	},
+	{
+		//.letter = 'L', ?
+		.name = "captures",
+		.description = "lambda capture list",
+		.enabled = FALSE
 	}
 };
 

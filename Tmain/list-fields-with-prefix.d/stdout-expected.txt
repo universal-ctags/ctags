@@ -4,4 +4,5 @@ E       UCTAGSextra     off     NONE            TRUE     Extra tag type informat
 -       UCTAGSend       off     C               TRUE     end lines of struct/function declarations
 -       UCTAGSend       off     C++             TRUE     end lines of class/function declarations
 -       UCTAGStemplate  off     C++             TRUE     template parameters           
+-       UCTAGScaptures  off     C++             TRUE     lambda capture list           
 -       UCTAGSsectionMarker off     reStructuredText TRUE     character used for declaring section

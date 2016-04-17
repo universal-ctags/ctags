@@ -76,6 +76,7 @@ CXXToken * cxxParserOpeningBracketIsLambda(void)
 	return NULL;
 }
 
+// In case of a lambda without parentheses this is the capture list token.
 boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 {
 	CXX_DEBUG_ENTER();
@@ -89,6 +90,24 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 	tagEntryInfo * tag = cxxTagBegin(CXXTagKindFUNCTION,pIdentifier);
 
 	CXXToken * pAfterParenthesis = pParenthesis ? pParenthesis->pNext : NULL;
+
+	CXXToken * pCaptureList = NULL;
+	
+	if(pParenthesis)
+	{
+		if(cxxTokenTypeIs(pParenthesis,CXXTokenTypeSquareParenthesisChain))
+		{
+			// form (4) of lambda (see cxxParserOpeningBracketIsLambda()).
+			pCaptureList = pParenthesis;
+		} else if(
+			pParenthesis->pPrev &&
+			cxxTokenTypeIs(pParenthesis->pPrev,CXXTokenTypeSquareParenthesisChain)
+		)
+		{
+			// other forms of lambda (see cxxParserOpeningBracketIsLambda()).
+			pCaptureList = pParenthesis->pPrev;
+		}
+	}
 
 	if(
 		pAfterParenthesis &&
@@ -130,7 +149,6 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 		tag->isFileScope = TRUE;
 
 		// FIXME: Signature!
-		// FIXME: Captures?
 
 		CXXToken * pTypeName;
 
@@ -138,6 +156,20 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 			pTypeName = cxxTagSetTypeField(tag,pTypeStart,pTypeEnd);
 		else
 			pTypeName = NULL;
+
+		if(pCaptureList && cxxTagCPPFieldEnabled(CXXTagCPPFieldLambdaCaptureList))
+		{
+			CXX_DEBUG_ASSERT(pCaptureList->pChain,"The capture list must be a chain");
+			cxxTokenChainCondense(pCaptureList->pChain,0);
+			CXX_DEBUG_ASSERT(
+					cxxTokenChainFirst(pCaptureList->pChain),
+					"Condensation should have created a single token in the chain"
+				);
+			cxxTagSetCPPField(
+					CXXTagCPPFieldLambdaCaptureList,
+					vStringValue(cxxTokenChainFirst(pCaptureList->pChain)->pszWord)
+				);
+		}
 
 		iCorkQueueIndex = cxxTagCommit();
 
@@ -151,12 +183,12 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 			CXXScopeAccessUnknown
 		);
 
-	if(pParenthesis && cxxTagKindEnabled(CXXTagKindPARAMETER))
+	if(
+		pParenthesis &&
+		cxxTokenTypeIs(pParenthesis,CXXTokenTypeParenthesisChain) &&
+		cxxTagKindEnabled(CXXTagKindPARAMETER)
+	)
 	{
-		CXX_DEBUG_ASSERT(
-				pParenthesis->eType == CXXTokenTypeParenthesisChain,
-				"The parameter must be really a parenthesis chain"
-			);
 		CXXFunctionParameterInfo oParamInfo;
 		if(cxxParserTokenChainLooksLikeFunctionParameterList(
 				pParenthesis->pChain,&oParamInfo

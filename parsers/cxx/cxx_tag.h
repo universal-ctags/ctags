@@ -42,7 +42,8 @@ enum CXXTagKind
 typedef enum _CXXTagCPPField
 {
 	CXXTagCPPFieldEndLine,
-	CXXTagCPPFieldTemplate
+	CXXTagCPPFieldTemplate,
+	CXXTagCPPFieldLambdaCaptureList
 } CXXTagCPPField;
 
 typedef enum _CXXTagCField

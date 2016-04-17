@@ -22,6 +22,7 @@ E	extra	off	NONE	TRUE	Extra tag type information
 -	end	off	C	TRUE	end lines of struct/function declarations
 -	end	off	C++	TRUE	end lines of class/function declarations
 -	template	off	C++	TRUE	template parameters
+-	captures	off	C++	TRUE	lambda capture list
 -	sectionMarker	off	reStructuredText	TRUE	character used for declaring section
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/
