@@ -75,6 +75,9 @@ AH_TEMPLATE([TMPDIR],
 AH_TEMPLATE([CHECK_REGCOMP],
 	[Define this label if you wish to check the regcomp() function at run time
 	for correct behavior. This function is currently broken on Cygwin.])
+AH_TEMPLATE([HAVE_SANITY_GETCWD],
+	[Define to 1 if the behavior of getcwd function and pwd command
+	 are consistent.])
 AH_TEMPLATE([NON_CONST_PUTENV_PROTOTYPE],
 	[Define this is you have a prototype for putenv() in <stdlib.h>, but
 	doesn't declare its argument as "const char *".])
@@ -540,6 +543,48 @@ if test "$have_setenv" != yes ; then
 		fi
 	fi
 fi
+
+AC_CHECK_FUNCS(getcwd,[
+AC_MSG_CHECKING(if getcwd works)
+AC_RUN_IFELSE([AC_LANG_SOURCE([
+m4_changequote([`],['])
+#include <unistd.h>
+#include <string.h>
+#include <limits.h>
+#include <stdio.h>
+int main(void)
+{
+  char buf1[PATH_MAX];
+  char buf2[PATH_MAX];
+  char *c1, *c2;
+  FILE *fp;
+
+  fp = popen("pwd", "r");
+  if (fp == NULL)
+    return 1;
+  if (fgets (buf1, PATH_MAX, fp) == 0)
+    return 1;
+  fclose (fp);
+
+  if (!getcwd (buf2, PATH_MAX))
+    return 1;
+
+  c1 = strpbrk (buf1, "/\\\");
+  c2 = strpbrk (buf2, "/\\\");
+
+  if (c1 && c2 && (*c1 == *c2))
+     return 0;
+
+  return 1;
+}
+
+m4_changequote(`[',`]')
+])],[getcwd_works=yes],[getcwd_works=no])
+AC_MSG_RESULT($getcwd_works)
+if test ${getcwd_works} = yes; then
+   AC_DEFINE(HAVE_SANITY_GETCWD)
+fi
+])
 
 dnl
 dnl

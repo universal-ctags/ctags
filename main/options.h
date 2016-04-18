@@ -59,6 +59,13 @@ typedef enum sortType {
 	SO_FOLDSORTED
 } sortType;
 
+typedef enum eTagRelative {
+	TREL_NO,
+	TREL_YES,
+	TREL_ALWAYS,
+	TREL_NEVER,
+} tagRelative;
+
 /*  This stores the command line options.
  */
 typedef struct sOptionValues {
@@ -87,7 +94,7 @@ typedef struct sOptionValues {
 	boolean followLinks;    /* --link  follow symbolic links? */
 	boolean filter;         /* --filter  behave as filter: files in, tags out */
 	char* filterTerminator; /* --filter-terminator  string to output */
-	boolean tagRelative;    /* --tag-relative file paths relative to tag file */
+	tagRelative tagRelative;    /* --tag-relative file paths relative to tag file */
 	boolean printTotals;    /* --totals  print cumulative statistics */
 	boolean lineDirectives; /* --linedirectives  process #line directives */
 	boolean printLanguage;  /* --print-language */

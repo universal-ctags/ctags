@@ -319,12 +319,24 @@ static void setInputFileParametersCommon (inputFileInfo *finfo, vString *const f
 		else
 			vStringDelete (finfo->tagPath);
 	}
-	if (! Option.tagRelative || isAbsolutePath (vStringValue (fileName)))
+
+	if (0)
+		;
+#ifdef HAVE_SANITY_GETCWD
+	else if (  Option.tagRelative == TREL_ALWAYS )
+		finfo->tagPath =
+			vStringNewOwn (relativeFilename (vStringValue (fileName),
+							 getTagFileDirectory ()));
+	else if ( Option.tagRelative == TREL_NEVER )
+		finfo->tagPath =
+			vStringNewOwn (absoluteFilename (vStringValue (fileName)));
+	else if ( Option.tagRelative == TREL_NO || isAbsolutePath (vStringValue (fileName)) )
 		finfo->tagPath = vStringNewCopy (fileName);
+#endif
 	else
 		finfo->tagPath =
-				vStringNewOwn (relativeFilename (vStringValue (fileName),
-								 getTagFileDirectory ()));
+			vStringNewOwn (relativeFilename (vStringValue (fileName),
+							 getTagFileDirectory ()));
 
 	finfo->isHeader = isIncludeFile (vStringValue (fileName));
 

@@ -380,8 +380,16 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Define regular expression for locating tags in specific language."},
  {0,"  --sort=[yes|no|foldcase]"},
  {0,"       Should tags be sorted (optionally ignoring case) [yes]?"},
- {0,"  --tag-relative=[yes|no]"},
+ {0,"  --tag-relative=[yes|no"
+#ifdef HAVE_SANITY_GETCWD
+  "|always|never"
+#endif
+  "]"},
  {0,"       Should paths be relative to location of tag file [no; yes when -e]?"},
+#ifdef HAVE_SANITY_GETCWD
+ {0,"       always: be relative even if input files are passed in with absolute paths" },
+ {0,"       never:  be absolute even if input files are passed in with relative paths" },
+#endif
  {1,"  --totals=[yes|no]"},
  {1,"       Print statistics about input and tag files [no]."},
  {1,"  --verbose=[yes|no]"},
@@ -710,7 +718,7 @@ static void setEtagsMode (void)
 	Option.etags = TRUE;
 	Option.sorted = SO_UNSORTED;
 	Option.lineDirectives = FALSE;
-	Option.tagRelative = TRUE;
+	Option.tagRelative = TREL_YES;
 	setTagWriter (&etagsWriter);
 }
 
@@ -2077,6 +2085,21 @@ static void processSortOption (
 		error (FATAL, "Invalid value for \"%s\" option", option);
 }
 
+static void processTagRelative (
+		const char *const option, const char *const parameter)
+{
+	if (isFalse (parameter))
+		Option.tagRelative = TREL_NO;
+	else if (isTrue (parameter))
+		Option.tagRelative = TREL_YES;
+	else if (strcasecmp (parameter, "always") == 0)
+		Option.tagRelative = TREL_ALWAYS;
+	else if (strcasecmp (parameter, "never") == 0)
+		Option.tagRelative = TREL_NEVER;
+	else
+		error (FATAL, "Invalid value for \"%s\" option", option);
+}
+
 static void installHeaderListDefaults (void)
 {
 	Option.headerExt = stringListNewFromArgv (HeaderExtensions);
@@ -2447,6 +2470,7 @@ static parametricOption ParametricOptions [] = {
 	{ "pattern-length-limit",   processPatternLengthLimit,      TRUE,   STAGE_ANY },
 	{ "pseudo-tags",            processPseudoTags,              FALSE,  STAGE_ANY },
 	{ "sort",                   processSortOption,              TRUE,   STAGE_ANY },
+	{ "tag-relative",           processTagRelative,             TRUE,   STAGE_ANY },
 	{ "version",                processVersionOption,           TRUE,   STAGE_ANY },
 	{ "_echo",                  processEchoOption,              FALSE,  STAGE_ANY },
 	{ "_force-quit",            processForceQuitOption,         FALSE,  STAGE_ANY },
@@ -2469,7 +2493,6 @@ static booleanOption BooleanOptions [] = {
 #ifdef RECURSE_SUPPORTED
 	{ "recurse",        &Option.recurse,                FALSE, STAGE_ANY },
 #endif
-	{ "tag-relative",   &Option.tagRelative,            TRUE,  STAGE_ANY },
 	{ "totals",         &Option.printTotals,            TRUE,  STAGE_ANY },
 	{ "verbose",        &Option.verbose,                FALSE, STAGE_ANY },
 	{ "with-list-header", &Option.withListHeader,       TRUE,  STAGE_ANY },
