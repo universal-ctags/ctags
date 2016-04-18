@@ -24,4 +24,16 @@
     <engine.groupId>org.ovirt.engine.core</engine.groupId>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>maven repo1</name>
+      <layout>default</layout>
+      <url>http://repo1.maven.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
 </project>

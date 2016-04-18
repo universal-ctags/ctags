@@ -29,7 +29,7 @@
 
 
 typedef enum {
-	K_GROUP_ID, K_ARTIFACT_ID, K_PROPERTY,
+	K_GROUP_ID, K_ARTIFACT_ID, K_PROPERTY, K_REPOSITORY_ID
 } maven2Kind;
 
 typedef enum {
@@ -54,6 +54,7 @@ static kindOption Maven2Kinds [] = {
 	{ TRUE,  'a', "artifactId", "artifact identifiers",
 	  .referenceOnly = FALSE, ATTACH_ROLES (Maven2ArtifactIdRoles) },
 	{ TRUE,  'p', "property",   "properties" },
+	{ TRUE,  'r', "repositoryId", "repository identifiers" },
 };
 
 static void makeTagWithScope (xmlNode *node,
@@ -106,6 +107,10 @@ static tagXpathTable maven2XpathMainTable[] = {
 	{ "/*[local-name()='project']/*[local-name()='properties']/*",
 	  LXPATH_TABLE_DO_RECUR,
 	  { .recurSpec = { makeTagForProperties } }
+	},
+	{ "/*[local-name()='project']/*[local-name()='repositories']/*[local-name()='repository']/*[local-name()='id']",
+	  LXPATH_TABLE_DO_MAKE,
+	  { .makeTagSpec = { K_REPOSITORY_ID, ROLE_INDEX_DEFINITION, } }
 	},
 };
 
