@@ -27,25 +27,28 @@
 
 #include <string.h>
 
-
 typedef enum {
 	K_GROUP_ID, K_ARTIFACT_ID, K_PROPERTY, K_REPOSITORY_ID
 } maven2Kind;
 
 typedef enum {
 	R_GROUP_ID_PARENT,
+	R_GROUP_ID_DEPENDENCY,
 } maven2GroupIdRole;
 
 typedef enum {
 	R_ARTIFACT_ID_PARENT,
+	R_ARTIFACT_ID_DEPENDENCY,
 } maven2ArtifactIdRole;
 
 static roleDesc Maven2GroupIdRoles [] = {
 	{ TRUE, "parent", "parent" },
+	{ TRUE, "dependency", "dependency" },
 };
 
 static roleDesc Maven2ArtifactIdRoles [] = {
 	{ TRUE, "parent", "parent" },
+	{ TRUE, "dependency", "dependency" },
 };
 
 static kindOption Maven2Kinds [] = {
@@ -90,6 +93,11 @@ static tagXpathTable maven2XpathMainTable[] = {
 	  { .makeTagSpec = { K_GROUP_ID,  R_GROUP_ID_PARENT,
 			     makeTagWithScope } }
 	},
+	{ "/*[local-name()='project']/*[local-name()='dependencies']/*[local-name()='dependency']/*[local-name()='groupId']",
+	  LXPATH_TABLE_DO_MAKE,
+	  { .makeTagSpec = { K_GROUP_ID,  R_GROUP_ID_DEPENDENCY,
+			     makeTagWithScope } }
+	},
 	{ "/*[local-name()='project']/*[local-name()='artifactId']",
 	  LXPATH_TABLE_DO_MAKE,
 	  { .makeTagSpec = { K_ARTIFACT_ID, ROLE_INDEX_DEFINITION,
@@ -98,6 +106,11 @@ static tagXpathTable maven2XpathMainTable[] = {
 	{ "/*[local-name()='project']/*[local-name()='parent']/*[local-name()='artifactId']",
 	  LXPATH_TABLE_DO_MAKE,
 	  { .makeTagSpec = { K_ARTIFACT_ID,  R_ARTIFACT_ID_PARENT,
+			     makeTagWithScope } }
+	},
+	{ "/*[local-name()='project']/*[local-name()='dependencies']/*[local-name()='dependency']/*[local-name()='artifactId']",
+	  LXPATH_TABLE_DO_MAKE,
+	  { .makeTagSpec = { K_ARTIFACT_ID,  R_ARTIFACT_ID_DEPENDENCY,
 			     makeTagWithScope } }
 	},
 	{ "/*[local-name()='project']/*[local-name()='properties']/*",

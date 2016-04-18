@@ -36,4 +36,15 @@
     </repository>
   </repositories>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.ovirt.engine.api</groupId>
+      <artifactId>ovirt-engine-extensions-api</artifactId>
+      <version>${org.ovirt.engine.api.ovirt-engine-extensions-api.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+    </dependency>
+  </dependencies>
 </project>
