@@ -97,7 +97,7 @@ Heavily improved parsers
 * Verilog
 
 
-New options
+New and extended options
 ---------------------------------------------------------------------
 
 Wildcard in options
@@ -486,6 +486,23 @@ used to enable it.
 
 
 See :ref:`JSON output <output-json>` for more details.
+
+"always" and "never" as an argument for --tag-relative
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+..
+	NOT REVIEWED YET
+
+Even if "yes" is specified as an option argument for --tag-relative,
+absolute paths are used in tags output if an input is given as
+an absolute path. This behavior is expected in exuberant-ctags
+as written in its man-page.
+
+In addition to "yes" and "no", universal-ctags takes "never" and "always".
+
+If "never" is given, absolute paths are used in tags output regardless
+of the path representation for input file(s). If "always" is given,
+relative paths are used always.
 
 
 Defining a macro in CPreProcessor input
