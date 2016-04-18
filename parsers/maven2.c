@@ -129,22 +129,23 @@ static fieldSpec Maven2Fields [] = {
 	}
 };
 
-static void attachVersionIfExisting (struct sTagEntryInfo *tag, xmlNode *node)
+static char* attachVersionIfExisting (struct sTagEntryInfo *tag, xmlNode *node)
 {
-	const char *version = NULL;
+	char *version = NULL;
 
 #ifdef HAVE_LIBXML
 	for (node = node->next; node != NULL; node = node->next)
 	{
 		if (strcmp ((char *)node->name, "version") == 0)
 		{
-			version = (const char *)xmlNodeGetContent (node);
+			version = (char *)xmlNodeGetContent (node);
 			break;
 		}
 	}
 #endif
 	if (version)
 		attachParserField (tag, Maven2Fields [F_VERSION].ftype, version);
+	return version;
 }
 
 static void makeTagWithScope (xmlNode *node,
@@ -154,12 +155,15 @@ static void makeTagWithScope (xmlNode *node,
 {
 	int *corkIndexes = userData;
 	int i;
-
+	char* version = NULL;
 
 	if (tag->kind == Maven2Kinds + K_ARTIFACT_ID)
-		attachVersionIfExisting (tag, node);
+		version = attachVersionIfExisting (tag, node);
 
 	i = makeTagEntry (tag);
+
+	if (version)
+		xmlFree (version);
 
 	if (((tag->kind == Maven2Kinds + K_GROUP_ID)
 	     && (tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION))
