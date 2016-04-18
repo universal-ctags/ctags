@@ -1,6 +1,6 @@
 backend	input.xml	/^  <artifactId>backend<\/artifactId>$/;"	a	groupId:org.ovirt.engine.core
 central	input.xml	/^      <id>central<\/id>$/;"	r
-engine.groupId	input.xml	/^    <engine.groupId>org.ovirt.engine.core<\/engine.groupId>$/;"	p	artifactId:org.ovirt.engine.core.backend
+engine.groupId	input.xml	/^    <engine.groupId>org.ovirt.engine.core<\/engine.groupId>$/;"	p
 org.ovirt.engine	input.xml	/^    <groupId>org.ovirt.engine<\/groupId>$/;"	g	role:parent
 org.ovirt.engine.core	input.xml	/^  <groupId>org.ovirt.engine.core<\/groupId>$/;"	g
 root	input.xml	/^    <artifactId>root<\/artifactId>$/;"	a	role:parent

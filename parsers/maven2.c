@@ -66,19 +66,15 @@ static void makeTagWithScope (xmlNode *node,
 static void makeTagForProperties (xmlNode *node,
 				  const struct sTagXpathRecurSpec *spec __unused__,
 				  xmlXPathContext *ctx __unused__,
-				  void *userData)
+				  void *userData __unused__)
 {
 	const xmlChar* str;
 	tagEntryInfo tag;
-	int *corkIndexes = userData;
 
 	str = node->name;
 	initTagEntry (&tag, (char *)str, Maven2Kinds + K_PROPERTY);
 	tag.lineNumber = xmlGetLineNo (node);
 	tag.filePosition = getInputFilePositionForLine (tag.lineNumber);
-
-	if ( corkIndexes [K_ARTIFACT_ID] != SCOPE_NIL )
-		tag.extensionFields.scopeIndex = corkIndexes [K_ARTIFACT_ID];
 
 	makeTagEntry (&tag);
 }
