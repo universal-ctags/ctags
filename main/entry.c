@@ -1156,13 +1156,28 @@ static int writeCtagsEntry (const tagEntryInfo *const tag)
 
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char * value)
 {
-	unsigned int index;
+	Assert (tag->usedParserFields < PRE_ALLOCATED_PARSER_FIELDS);
 
-	Assert (tag->usedParserFields + 1 < PRE_ALLOCATED_PARSER_FIELDS);
+	tag->parserFields [tag->usedParserFields].ftype = ftype;
+	tag->parserFields [tag->usedParserFields].value = value;
+	tag->usedParserFields++;
+}
 
-	index = tag->usedParserFields++;
-	tag->parserFields [index].ftype = ftype;
-	tag->parserFields [index].value = value;
+extern void attachParserFieldToCorkEntry (int index,
+					 fieldType type,
+					 const char *value)
+{
+	tagEntryInfo * tag;
+	const char * v;
+
+	if (index == SCOPE_NIL)
+		return;
+
+	tag = getEntryInCorkQueue(index);
+	Assert (tag != NULL);
+
+	v = eStrdup (value);
+	attachParserField (tag, type, v);
 }
 
 static void copyParserFields (const tagEntryInfo *const tag, tagEntryInfo* slot)

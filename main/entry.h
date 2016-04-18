@@ -158,6 +158,7 @@ extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
 extern boolean isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char* value);
+extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);
 
 #endif  /* CTAGS_MAIN_ENTRY_H */
 

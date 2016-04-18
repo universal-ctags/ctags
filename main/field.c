@@ -778,15 +778,4 @@ extern int defineField (fieldSpec *spec, int language)
 	return spec->ftype;
 }
 
-extern int attachField (fieldType type, struct sTagEntryInfo *const tag,
-			const char *value)
-{
-	Assert (tag->usedParserFields + 1 < PRE_ALLOCATED_PARSER_FIELDS);
-	Assert (tag);
-
-	tag->parserFields [ tag->usedParserFields ].ftype = type;
-	tag->parserFields [ tag->usedParserFields ].value = value;
-	return tag->usedParserFields++;
-}
-
 /* vi:set tabstop=4 shiftwidth=4: */

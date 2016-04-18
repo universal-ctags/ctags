@@ -64,6 +64,36 @@ static const char * g_aCXXAccessStrings [] = {
 	"protected",
 };
 
+static fieldSpec g_aCXXCPPFields [] = {
+	{
+		//.letter = 'e'
+		.name = "end",
+		.description = "end lines of class/function declarations",
+		.enabled = FALSE
+	},
+	{
+		//.letter = 'T', ?
+		.name = "template",
+		.description = "template parameters",
+		.enabled = FALSE,
+	},
+	{
+		//.letter = 'L', ?
+		.name = "captures",
+		.description = "lambda capture list",
+		.enabled = FALSE
+	}
+};
+
+static fieldSpec g_aCXXCFields [] = {
+	{
+		//.letter = 'e'
+		.name = "end",
+		.description = "end lines of struct/function declarations",
+		.enabled = FALSE
+	}
+};
+
 kindOption * cxxTagGetKindOptions(void)
 {
 	return g_aCXXKinds;
@@ -78,6 +108,38 @@ boolean cxxTagKindEnabled(enum CXXTagKind eKindId)
 {
 	return g_aCXXKinds[eKindId].enabled;
 }
+
+fieldSpec * cxxTagGetCPPFieldSpecifiers(void)
+{
+	return g_aCXXCPPFields;
+}
+
+int cxxTagGetCPPFieldSpecifierCount(void)
+{
+	return sizeof(g_aCXXCPPFields) / sizeof(fieldSpec);
+}
+
+int cxxTagCPPFieldEnabled(CXXTagCPPField eField)
+{
+	return g_aCXXCPPFields[eField].enabled;
+}
+
+
+fieldSpec * cxxTagGetCFieldSpecifiers(void)
+{
+	return g_aCXXCFields;
+}
+
+int cxxTagGetCFieldSpecifierCount(void)
+{
+	return sizeof(g_aCXXCFields) / sizeof(fieldSpec);
+}
+
+int cxxTagCFieldEnabled(CXXTagCField eField)
+{
+	return g_aCXXCFields[eField].enabled;
+}
+
 
 static tagEntryInfo g_oCXXTag;
 
@@ -157,14 +219,52 @@ CXXToken * cxxTagSetTypeField(
 	return pTypeName;
 }
 
-void cxxTagCommit(void)
+void cxxTagSetCPPField(CXXTagCPPField eField,const char * szValue)
+{
+	if(!g_aCXXCPPFields[eField].enabled)
+		return;
+	
+	attachParserField(&g_oCXXTag,g_aCXXCPPFields[eField].ftype,szValue);
+}
+
+void cxxTagSetCorkQueueCPPField(
+		int iIndex,
+		CXXTagCPPField eField,
+		const char * szValue
+	)
+{
+	CXX_DEBUG_ASSERT(g_aCXXCPPFields[eField].enabled,"The field must be enabled!");
+
+	attachParserFieldToCorkEntry(iIndex,g_aCXXCPPFields[eField].ftype,szValue);
+}
+
+void cxxTagSetCField(CXXTagCField eField,const char * szValue)
+{
+	if(!g_aCXXCFields[eField].enabled)
+		return;
+	
+	attachParserField(&g_oCXXTag,g_aCXXCFields[eField].ftype,szValue);
+}
+
+void cxxTagSetCorkQueueCField(
+		int iIndex,
+		CXXTagCField eField,
+		const char * szValue
+	)
+{
+	CXX_DEBUG_ASSERT(g_aCXXCFields[eField].enabled,"The field must be enabled!");
+
+	attachParserFieldToCorkEntry(iIndex,g_aCXXCFields[eField].ftype,szValue);
+}
+
+int cxxTagCommit(void)
 {
 	if(g_oCXXTag.isFileScope)
 	{
 		if (isXtagEnabled(XTAG_FILE_SCOPE))
 			markTagExtraBit (&g_oCXXTag, XTAG_FILE_SCOPE);
 		else
-			return;
+			return SCOPE_NIL; // FIXME: why the "invalid" cork queue index is SCOPE_NIL?
 	}
 
 	CXX_DEBUG_PRINT(
@@ -183,16 +283,16 @@ void cxxTagCommit(void)
 				g_oCXXTag.extensionFields.typeRef[1]
 			);
 
-	makeTagEntry(&g_oCXXTag);
+	int iCorkQueueIndex = makeTagEntry(&g_oCXXTag);
 
 	// Handle --extra=+q
 	if(!isXtagEnabled(XTAG_QUALIFIED_TAGS))
-		return;
+		return iCorkQueueIndex;
 	else
 		markTagExtraBit (&g_oCXXTag, XTAG_QUALIFIED_TAGS);
 
 	if(!g_oCXXTag.extensionFields.scopeName)
-		return;
+		return iCorkQueueIndex;
 
 	// WARNING: The following code assumes that the scope
 	// didn't change between cxxTagBegin() and cxxTagCommit().
@@ -203,7 +303,7 @@ void cxxTagCommit(void)
 	{
 		// old ctags didn't do this, and --extra=+q is mainly
 		// for backward compatibility so...
-		return;
+		return iCorkQueueIndex;
 	}
 
 	// Same tag. Only the name changes.
@@ -215,7 +315,7 @@ void cxxTagCommit(void)
 		// If the scope kind is enumeration then we need to remove the
 		// last scope part. This is what old ctags did.
 		if(cxxScopeGetSize() < 2)
-			return; // toplevel enum
+			return -1; // toplevel enum
 
 		x = cxxScopeGetFullNameExceptLastComponentAsString();
 		CXX_DEBUG_ASSERT(x,"Scope with size >= 2 should have returned a value here");
@@ -238,6 +338,8 @@ void cxxTagCommit(void)
 	makeTagEntry(&g_oCXXTag);
 
 	vStringDelete(x);
+
+	return iCorkQueueIndex;
 }
 
 void cxxTag(enum CXXTagKind eKindId,CXXToken * pToken)

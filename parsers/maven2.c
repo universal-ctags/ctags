@@ -144,7 +144,7 @@ static void attachVersionIfExisting (struct sTagEntryInfo *tag, xmlNode *node)
 	}
 #endif
 	if (version)
-		attachField (Maven2Fields [F_VERSION].ftype, tag, version);
+		attachParserField (tag, Maven2Fields [F_VERSION].ftype, version);
 }
 
 static void makeTagWithScope (xmlNode *node,

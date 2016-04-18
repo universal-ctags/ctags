@@ -52,6 +52,7 @@ boolean cxxParserParseNamespace(void)
 	// namespace;
 
 	int iScopeCount = 0;
+	int iCorkQueueIndex = SCOPE_NIL;
 
 	for(;;)
 	{
@@ -71,7 +72,7 @@ boolean cxxParserParseNamespace(void)
 				{
 					// This is highly questionable but well.. it's how old ctags did, so we do.
 					tag->isFileScope = !isInputHeaderFile();
-					cxxTagCommit();
+					iCorkQueueIndex = cxxTagCommit();
 				}
 				cxxScopePush(
 						cxxTokenChainTakeLast(g_cxx.pTokenChain),
@@ -87,6 +88,10 @@ boolean cxxParserParseNamespace(void)
 			case CXXTokenTypeSemicolon:
 				// doh.. but tolerate this
 				CXX_DEBUG_LEAVE_TEXT("got semicolon!");
+
+				if(iCorkQueueIndex > SCOPE_NIL)
+					cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
+
 				while(iScopeCount > 0)
 				{
 					cxxScopePop();
@@ -106,7 +111,7 @@ boolean cxxParserParseNamespace(void)
 					if(tag)
 					{
 						tag->isFileScope = !isInputHeaderFile();
-						cxxTagCommit();
+						iCorkQueueIndex = cxxTagCommit();
 					}
 					cxxScopePush(t,CXXTagKindNAMESPACE,CXXScopeAccessUnknown);
 					iScopeCount++;
@@ -117,6 +122,9 @@ boolean cxxParserParseNamespace(void)
 					CXX_DEBUG_LEAVE_TEXT("Failed to parse scope");
 					return FALSE;
 				}
+
+				if(iCorkQueueIndex > SCOPE_NIL)
+					cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
 
 				while(iScopeCount > 0)
 				{

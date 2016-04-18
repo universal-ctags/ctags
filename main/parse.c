@@ -1328,7 +1328,7 @@ static void installFieldSpec (const langType language)
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parser = LanguageTable [language];
-	if (! (parser->fieldSpecCount < PRE_ALLOCATED_PARSER_FIELDS))
+	if (parser->fieldSpecCount > PRE_ALLOCATED_PARSER_FIELDS)
 		error (FATAL,
 		       "INTERNAL ERROR: in a parser, fields are defined more than PRE_ALLOCATED_PARSER_FIELDS\n");
 
