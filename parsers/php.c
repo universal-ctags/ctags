@@ -1412,7 +1412,7 @@ static boolean parseUse (tokenInfo *const token)
 			readToken (token);
 		}
 
-		if (nameToken->type == TOKEN_IDENTIFIER)
+		if (nameToken->type == TOKEN_IDENTIFIER && PhpKinds[K_ALIAS].enabled)
 		{
 			tagEntryInfo entry;
 
