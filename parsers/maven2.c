@@ -66,6 +66,12 @@ static void makeTagWithScope (xmlNode *node,
 			      void *userData);
 
 
+static void makeTagForDependency (xmlNode *node,
+				  const struct sTagXpathRecurSpec *spec __unused__,
+				  xmlXPathContext *ctx __unused__,
+				  void *userData __unused__);
+
+
 static void makeTagForProperties (xmlNode *node,
 				  const struct sTagXpathRecurSpec *spec __unused__,
 				  xmlXPathContext *ctx __unused__,
@@ -93,10 +99,9 @@ static tagXpathTable maven2XpathMainTable[] = {
 	  { .makeTagSpec = { K_GROUP_ID,  R_GROUP_ID_PARENT,
 			     makeTagWithScope } }
 	},
-	{ "/*[local-name()='project']/*[local-name()='dependencies']/*[local-name()='dependency']/*[local-name()='groupId']",
-	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_GROUP_ID,  R_GROUP_ID_DEPENDENCY,
-			     makeTagWithScope } }
+	{ "/*[local-name()='project']/*[local-name()='dependencies']/*[local-name()='dependency']",
+	  LXPATH_TABLE_DO_RECUR,
+	  { .recurSpec = { makeTagForDependency } }
 	},
 	{ "/*[local-name()='project']/*[local-name()='artifactId']",
 	  LXPATH_TABLE_DO_MAKE,
@@ -106,11 +111,6 @@ static tagXpathTable maven2XpathMainTable[] = {
 	{ "/*[local-name()='project']/*[local-name()='parent']/*[local-name()='artifactId']",
 	  LXPATH_TABLE_DO_MAKE,
 	  { .makeTagSpec = { K_ARTIFACT_ID,  R_ARTIFACT_ID_PARENT,
-			     makeTagWithScope } }
-	},
-	{ "/*[local-name()='project']/*[local-name()='dependencies']/*[local-name()='dependency']/*[local-name()='artifactId']",
-	  LXPATH_TABLE_DO_MAKE,
-	  { .makeTagSpec = { K_ARTIFACT_ID,  R_ARTIFACT_ID_DEPENDENCY,
 			     makeTagWithScope } }
 	},
 	{ "/*[local-name()='project']/*[local-name()='properties']/*",
@@ -123,12 +123,27 @@ static tagXpathTable maven2XpathMainTable[] = {
 	},
 };
 
+static tagXpathTable maven2XpathDependencyTable[] = {
+	{ "./*[local-name()='groupId']",
+	  LXPATH_TABLE_DO_MAKE,
+	  { .makeTagSpec = { K_GROUP_ID, R_GROUP_ID_DEPENDENCY,
+			     makeTagWithScope } }
+	},
+	{ "./*[local-name()='artifactId']",
+	  LXPATH_TABLE_DO_MAKE,
+	  { .makeTagSpec = { K_ARTIFACT_ID, R_ARTIFACT_ID_DEPENDENCY,
+			     makeTagWithScope } }
+	},
+};
+
 enum maven2XpathTable {
 	TABLE_MAIN,
+	TABLE_DEPEDENCY,
 };
 
 static tagXpathTableTable maven2XpathTableTable[] = {
 	[TABLE_MAIN] = { ARRAY_AND_SIZE(maven2XpathMainTable) },
+	[TABLE_DEPEDENCY] = { ARRAY_AND_SIZE(maven2XpathDependencyTable) },
 };
 
 typedef enum {
@@ -180,24 +195,30 @@ static void makeTagWithScope (xmlNode *node,
 		xmlFree (version);
 
 	if (((tag->kind == Maven2Kinds + K_GROUP_ID)
-	     && (tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION))
+	     && ((tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION)
+		 || (tag->extensionFields.roleIndex == R_GROUP_ID_DEPENDENCY)))
 	    || ((tag->kind == Maven2Kinds + K_ARTIFACT_ID)
-		&& (tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION)))
+		&& ((tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION)
+		    || (tag->extensionFields.roleIndex == R_ARTIFACT_ID_DEPENDENCY))))
 	{
 		corkIndexes [spec->kind] = i;
 	}
 }
 
 static void
-findMaven2Tags (void)
+findMaven2TagsForTable (enum maven2XpathTable tindex,
+			xmlNode *node,
+			xmlXPathContext *ctx)
 {
 	int corkIndexes [] = {
 		[K_GROUP_ID]    = SCOPE_NIL,
 		[K_ARTIFACT_ID] = SCOPE_NIL,
 	};
 
-
-	findXMLTags (NULL, NULL, maven2XpathTableTable + TABLE_MAIN, Maven2Kinds, &corkIndexes);
+	findXMLTags (ctx, node,
+		     maven2XpathTableTable + tindex,
+		     Maven2Kinds,
+		     &corkIndexes);
 
 	if ( corkIndexes [K_ARTIFACT_ID] != SCOPE_NIL
 	     && corkIndexes [K_GROUP_ID] != SCOPE_NIL)
@@ -205,6 +226,20 @@ findMaven2Tags (void)
 		tagEntryInfo *tag = getEntryInCorkQueue (corkIndexes [K_ARTIFACT_ID]);
 		tag->extensionFields.scopeIndex = corkIndexes [K_GROUP_ID];
 	}
+}
+
+static void makeTagForDependency (xmlNode *node,
+				  const struct sTagXpathRecurSpec *spec __unused__,
+				  xmlXPathContext *ctx __unused__,
+				  void *userData __unused__)
+{
+	findMaven2TagsForTable (TABLE_DEPEDENCY, node, ctx);
+}
+
+static void
+findMaven2Tags (void)
+{
+	findMaven2TagsForTable (TABLE_MAIN, NULL, NULL);
 }
 
 extern parserDefinition*
