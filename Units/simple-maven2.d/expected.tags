@@ -7,4 +7,4 @@ org.ovirt.engine	input.xml	/^    <groupId>org.ovirt.engine<\/groupId>$/;"	g	role
 org.ovirt.engine.api	input.xml	/^      <groupId>org.ovirt.engine.api<\/groupId>$/;"	g	role:dependency
 org.ovirt.engine.core	input.xml	/^  <groupId>org.ovirt.engine.core<\/groupId>$/;"	g
 ovirt-engine-extensions-api	input.xml	/^      <artifactId>ovirt-engine-extensions-api<\/artifactId>$/;"	a	groupId:org.ovirt.engine.api	role:dependency	version:${org.ovirt.engine.api.ovirt-engine-extensions-api.version}
-root	input.xml	/^    <artifactId>root<\/artifactId>$/;"	a	role:parent	version:3.5.6.2
+root	input.xml	/^    <artifactId>root<\/artifactId>$/;"	a	groupId:org.ovirt.engine	role:parent	version:3.5.6.2
