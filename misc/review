@@ -126,11 +126,29 @@ inspect_cmd_skip ()
     echo "SKIPPING $1" 1>&2
 }
 
+inspect_cmd_show_genenric ()
+{
+    local tcase=$1
+    local file=$2
+    local f=./Units/${tcase}/${file}
+
+    if [[ -r "$f" ]]; then
+	cat "$f"
+    else
+	echo "No ${file}" 1>&2
+    fi
+    echo '---'
+    echo '# ' "$f"
+}
+
 inspect_cmd_show_diff ()
 {
-    cat ./Units/$1/DIFF.tmp
-    echo '---'
-    echo '# ' ./Units/$1/DIFF.tmp
+    inspect_cmd_show_genenric $1 DIFF.tmp
+}
+
+inspect_show_args_ctags ()
+{
+    inspect_cmd_show_genenric $1 args.ctags
 }
 
 inspect_cmd_quit ()
@@ -177,7 +195,7 @@ do_inspect ()
     for t in $(do_list ${including_known_bugs}); do
 	next=0
 	PS3="[[ $t ]]? "
-	select r in 'accept' 'skip' 'diff' 'quit'; do
+	select r in 'accept' 'skip' 'diff' 'quit' 'show args.ctags'; do
 	    case $r in
 		(accept)
 		    if inspect_cmd_accept "$t"; then
@@ -193,6 +211,9 @@ do_inspect ()
 		    ;;
 		(quit)
 		    inspect_cmd_quit
+		    ;;
+		("show args.ctags")
+		    inspect_show_args_ctags "$t"
 		    ;;
 		(*)
 		    case $REPLY in
@@ -210,6 +231,9 @@ do_inspect ()
 			    ;;
 			(q|quit)
 			    inspect_cmd_quit
+			    ;;
+			(A|args.ctags)
+			    inspect_show_args_ctags "$t"
 			    ;;
 			(*)
 			    inspect_cmd_unknown
