@@ -12,7 +12,7 @@ After installing the `ctags` executable will be in `$prefix/bin/`.
 `autogen.sh` runs `autoreconf` internally.
 If you use (binary oriented) GNU/Linux distribution, `autoreconf` may
 be part of `autoconf` package. In additional you may have to install
-`automake`, too.
+`automake` and/or `pkg-config`, too.
 
 Build system add possibility to change program name
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
