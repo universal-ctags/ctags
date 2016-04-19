@@ -1384,11 +1384,16 @@ extern int makeTagEntry (const tagEntryInfo *const tag)
 {
 	int r = SCOPE_NIL;
 	Assert (tag->name != NULL);
-	Assert (getInputLanguageFileKind() == tag->kind
-		|| ( isInputLanguageKindEnabled (tag->kind->letter)
-                    && (tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION ))
-		|| (tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION
-		    && tag->kind->roles[tag->extensionFields.roleIndex].enabled ));
+
+	if (getInputLanguageFileKind() != tag->kind)
+	{
+		if (! isInputLanguageKindEnabled (tag->kind->letter) &&
+		    (tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION))
+			return SCOPE_NIL;
+		if ((tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
+		    && (! tag->kind->roles[tag->extensionFields.roleIndex].enabled))
+			return SCOPE_NIL;
+	}
 
 	if (tag->name [0] == '\0' && (!tag->placeholder))
 	{
