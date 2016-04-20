@@ -74,6 +74,7 @@ typedef struct sCppState {
 	const kindOption  *headerKind;
 	int headerSystemRoleIndex;
 	int headerLocalRoleIndex;
+	int endFieldType;
 
 	struct sDirective {
 		enum eState state;       /* current directive being processed */
@@ -103,6 +104,7 @@ static cppState Cpp = {
 	NULL,	     /* headerKind */
 	.headerSystemRoleIndex = ROLE_INDEX_DEFINITION,
 	.headerLocalRoleIndex = ROLE_INDEX_DEFINITION,
+	.endFieldType = FIELD_UNKNOWN,
 	{
 		DRCTV_NONE,  /* state */
 		FALSE,       /* accept */
@@ -132,7 +134,8 @@ extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 		     const struct sKindOption *defineMacroKind,
 		     int macroUndefRoleIndex,
 		     const struct sKindOption *headerKind,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex)
+		     int headerSystemRoleIndex, int headerLocalRoleIndex,
+		     int endFieldType)
 {
 	BraceFormat = state;
 
@@ -147,6 +150,7 @@ extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 	Cpp.headerKind  = headerKind;
 	Cpp.headerSystemRoleIndex = headerSystemRoleIndex;
 	Cpp.headerLocalRoleIndex = headerLocalRoleIndex;
+	Cpp.endFieldType = endFieldType;
 
 	Cpp.directive.state     = DRCTV_NONE;
 	Cpp.directive.accept    = TRUE;
@@ -342,14 +346,14 @@ static boolean popConditional (void)
 }
 
 
-static void makeDefineTag (const char *const name, const char* const signature, boolean undef)
+static int makeDefineTag (const char *const name, const char* const signature, boolean undef)
 {
 	const boolean isFileScope = (boolean) (! isInputHeaderFile ());
 
 	if (!Cpp.defineMacroKind)
-		return;
+		return SCOPE_NIL;
 	if (isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
-		return;
+		return SCOPE_NIL;
 
 	if ( /* condition for definition tag */
 		((!undef) && Cpp.defineMacroKind->enabled)
@@ -370,8 +374,9 @@ static void makeDefineTag (const char *const name, const char* const signature, 
 			markTagExtraBit (&e, XTAG_FILE_SCOPE);
 		e.truncateLine = TRUE;
 		e.extensionFields.signature = signature;
-		makeTagEntry (&e);
+		return makeTagEntry (&e);
 	}
+	return SCOPE_NIL;
 }
 
 static void makeIncludeTag (const  char *const name, boolean systemHeader)
@@ -391,8 +396,10 @@ static void makeIncludeTag (const  char *const name, boolean systemHeader)
 }
 
 static vString *signature;
-static void directiveDefine (const int c, boolean undef)
+static int directiveDefine (const int c, boolean undef)
 {
+	int r = SCOPE_NIL;
+
 	if (isident1 (c))
 	{
 		readIdentifier (c, Cpp.directive.name);
@@ -417,19 +424,20 @@ static void directiveDefine (const int c, boolean undef)
 				if (p == ')')
 				{
 					vStringPut (signature, p);
-					makeDefineTag (vStringValue (Cpp.directive.name), vStringValue (signature), undef);
+					r = makeDefineTag (vStringValue (Cpp.directive.name), vStringValue (signature), undef);
 				}
 				else
-					makeDefineTag (vStringValue (Cpp.directive.name), NULL, undef);
+					r = makeDefineTag (vStringValue (Cpp.directive.name), NULL, undef);
 			}
 			else
 			{
 				ungetcToInputFile (p);
-				makeDefineTag (vStringValue (Cpp.directive.name), NULL, undef);
+				r = makeDefineTag (vStringValue (Cpp.directive.name), NULL, undef);
 			}
 		}
 	}
 	Cpp.directive.state = DRCTV_NONE;
+	return r;
 }
 
 static void directiveUndef (const int c)
@@ -532,14 +540,16 @@ static boolean directiveHash (const int c)
 
 /*  Handles a pre-processor directive whose first character is given by "c".
  */
-static boolean handleDirective (const int c)
+static boolean handleDirective (const int c, int *macroCorkIndex)
 {
 	boolean ignore = isIgnore ();
 
 	switch (Cpp.directive.state)
 	{
 		case DRCTV_NONE:    ignore = isIgnore ();        break;
-		case DRCTV_DEFINE:  directiveDefine (c, FALSE);  break;
+		case DRCTV_DEFINE:
+			*macroCorkIndex = directiveDefine (c, FALSE);
+			break;
 		case DRCTV_HASH:    ignore = directiveHash (c);  break;
 		case DRCTV_IF:      ignore = directiveIf (c);    break;
 		case DRCTV_PRAGMA:  directivePragma (c);         break;
@@ -743,6 +753,20 @@ static int skipToEndOfChar (void)
 	return CHAR_SYMBOL;  /* symbolic representation of character */
 }
 
+static void attachEndFieldMaybe (int macroCorkIndex)
+{
+	char buf[16];
+
+	if (Cpp.endFieldType != FIELD_UNKNOWN
+	    && macroCorkIndex != SCOPE_NIL)
+	{
+		sprintf(buf, "%ld", getInputLineNumber ());
+		attachParserFieldToCorkEntry (macroCorkIndex,
+					      Cpp.endFieldType,
+					      buf);
+	}
+}
+
 /*  This function returns the next character, stripping out comments,
  *  C pre-processor directives, and the contents of single and double
  *  quoted strings. In short, strip anything which places a burden upon
@@ -753,6 +777,7 @@ extern int cppGetc (void)
 	boolean directive = FALSE;
 	boolean ignore = FALSE;
 	int c;
+	int macroCorkIndex = SCOPE_NIL;
 
 	if (Cpp.ungetch != '\0')
 	{
@@ -771,6 +796,8 @@ process:
 			case EOF:
 				ignore    = FALSE;
 				directive = FALSE;
+				attachEndFieldMaybe (macroCorkIndex);
+				macroCorkIndex = SCOPE_NIL;
 				break;
 
 			case TAB:
@@ -779,7 +806,11 @@ process:
 
 			case NEWLINE:
 				if (directive  &&  ! ignore)
+				{
+					attachEndFieldMaybe (macroCorkIndex);
+					macroCorkIndex = SCOPE_NIL;
 					directive = FALSE;
+				}
 				Cpp.directive.accept = TRUE;
 				break;
 
@@ -955,7 +986,8 @@ process:
 			enter:
 				Cpp.directive.accept = FALSE;
 				if (directive)
-					ignore = handleDirective (c);
+					ignore = handleDirective (c,
+								  &macroCorkIndex);
 				break;
 		}
 	} while (directive || ignore);

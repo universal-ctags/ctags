@@ -67,7 +67,8 @@ extern void cppInit (const boolean state,
 		     const struct sKindOption *defineMacroKind,
 		     int macroUndefRoleIndex,
 		     const struct sKindOption *headerKind,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex);
+		     int headerSystemRoleIndex, int headerLocalRoleIndex,
+		     int endFieldType);
 extern void cppTerminate (void);
 extern void cppBeginStatement (void);
 extern void cppEndStatement (void);

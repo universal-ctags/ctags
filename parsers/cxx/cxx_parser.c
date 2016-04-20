@@ -1075,6 +1075,9 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 	int role_for_macro_undef = CR_MACRO_UNDEF;
 	int role_for_header_system = CR_HEADER_SYSTEM;
 	int role_for_header_local = CR_HEADER_LOCAL;
+	int end_field_type = cxxParserCurrentLanguageIsCPP()?
+		cxxTagGetCPPFieldSpecifiers () [CXXTagCPPFieldEndLine].ftype:
+		cxxTagGetCFieldSpecifiers ()   [CXXTagCFieldEndLine].ftype;
 
 	Assert(passCount < 3);
 
@@ -1087,7 +1090,8 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 			role_for_macro_undef,
 			kind_for_header,
 			role_for_header_system,
-			role_for_header_local
+			role_for_header_local,
+			end_field_type
 		);
 
 	g_cxx.iChar = ' ';

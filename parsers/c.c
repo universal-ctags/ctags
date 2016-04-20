@@ -3476,7 +3476,8 @@ static rescanReason findCTags (const unsigned int passCount)
 	cppInit ((boolean) (passCount > 1), isInputLanguage (Lang_csharp), isInputLanguage(Lang_cpp),
 		 isInputLanguage(Lang_vera),
 		 kind_for_define, role_for_macro_undef,
-		 kind_for_header, role_for_header_system, role_for_header_local);
+		 kind_for_header, role_for_header_system, role_for_header_local,
+		 FIELD_UNKNOWN);
 
 	Signature = vStringNew ();
 
