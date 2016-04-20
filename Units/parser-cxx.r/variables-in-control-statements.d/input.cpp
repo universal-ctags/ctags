@@ -23,6 +23,8 @@ int n04()
 	return 0;
 }
 
+int n05,n06,n07,n08,n09,n10;
+
 // The real test
 
 void test()
@@ -85,6 +87,19 @@ void test()
 	if(int i01 = 10 + 20)
 	{
 		
+	}
+
+	// non valid declarations inside if
+	if(n05 & n06)
+	{
+	}
+	
+	if(n07 * n08)
+	{
+	}
+	
+	if(n09 && n10)
+	{
 	}
 
 	// Valid variable declarations inside a while

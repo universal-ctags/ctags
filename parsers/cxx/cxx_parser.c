@@ -1040,16 +1040,33 @@ boolean cxxParserParseIfForWhileSwitch(void)
 				"The parenthesis chain must have initial and final parenthesis"
 			);
 
-		// Kill the initial parenthesis
-		cxxTokenChainDestroyFirst(pChain);
-		// Fake the final semicolon
-		CXXToken * t = cxxTokenChainLast(pChain);
-		t->eType = CXXTokenTypeSemicolon;
-		vStringClear(t->pszWord);
-		vStringPut(t->pszWord,';');
-
-		// and extract variable declarations if possible
-		cxxParserExtractVariableDeclarations(pChain,0);
+		// Simple check for cases like if(a & b), if(a * b).
+		// If there is &, && or * then we expect there to be also a =.
+		if(
+				// & && * not present
+				!cxxTokenChainFirstTokenOfType(
+						pChain,
+						CXXTokenTypeAnd | CXXTokenTypeMultipleAnds |
+						CXXTokenTypeStar
+					) ||
+				// or = present
+				cxxTokenChainFirstTokenOfType(
+						pChain,
+						CXXTokenTypeAssignment
+					)
+			)
+		{
+			// Kill the initial parenthesis
+			cxxTokenChainDestroyFirst(pChain);
+			// Fake the final semicolon
+			CXXToken * t = cxxTokenChainLast(pChain);
+			t->eType = CXXTokenTypeSemicolon;
+			vStringClear(t->pszWord);
+			vStringPut(t->pszWord,';');
+	
+			// and extract variable declarations if possible
+			cxxParserExtractVariableDeclarations(pChain,0);
+		}
 
 		CXX_DEBUG_LEAVE_TEXT("Found if/for/while/switch parenthesis chain");
 		return TRUE;
