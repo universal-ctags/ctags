@@ -151,7 +151,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 		CXXToken * pTypeName;
 
 		if(pTypeStart)
-			pTypeName = cxxTagSetTypeField(tag,pTypeStart,pTypeEnd);
+			pTypeName = cxxTagSetTypeField(pTypeStart,pTypeEnd);
 		else
 			pTypeName = NULL;
 
@@ -168,6 +168,8 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 					vStringValue(cxxTokenChainFirst(pCaptureList->pChain)->pszWord)
 				);
 		}
+
+		// FIXME: Properties?
 
 		vString * pszSignature = NULL;
 		if(cxxTokenTypeIs(pParenthesis,CXXTokenTypeParenthesisChain))

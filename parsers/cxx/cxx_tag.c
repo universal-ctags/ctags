@@ -11,6 +11,7 @@
 #include "cxx_scope.h"
 #include "cxx_debug.h"
 #include "cxx_token_chain.h"
+#include "cxx_parser_internal.h"
 
 #include "entry.h"
 #include "get.h"
@@ -68,7 +69,7 @@ static fieldSpec g_aCXXCPPFields [] = {
 	{
 		//.letter = 'e'
 		.name = "end",
-		.description = "end lines of class/function declarations, and macro",
+		.description = "end lines of various constructs",
 		.enabled = FALSE
 	},
 	{
@@ -82,6 +83,12 @@ static fieldSpec g_aCXXCPPFields [] = {
 		.name = "captures",
 		.description = "lambda capture list",
 		.enabled = FALSE
+	},
+	{
+		//.letter = 'P', ?
+		.name = "properties",
+		.description = "properties (static, virtual, inline, mutable,...)",
+		.enabled = FALSE
 	}
 };
 
@@ -89,7 +96,13 @@ static fieldSpec g_aCXXCFields [] = {
 	{
 		//.letter = 'e'
 		.name = "end",
-		.description = "end lines of struct/function declarations, and macro",
+		.description = "end lines of various constructs",
+		.enabled = FALSE
+	},
+	{
+		//.letter = 'P', ?
+		.name = "properties",
+		.description = "properties (static, inline, mutable,...)",
 		.enabled = FALSE
 	}
 };
@@ -174,14 +187,75 @@ tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
 	return &g_oCXXTag;
 }
 
+vString * cxxTagSetProperties(unsigned int uProperties)
+{
+	if(uProperties == 0)
+		return NULL;
+	
+	if(cxxParserCurrentLanguageIsCPP())
+	{
+		if(!cxxTagCPPFieldEnabled(CXXTagCPPFieldProperties))
+			return NULL;
+	} else {
+		if(!cxxTagCFieldEnabled(CXXTagCFieldProperties))
+			return NULL;
+	}
+
+	vString * pszProperties = vStringNew();
+
+	boolean bFirst = TRUE;
+
+#define ADD_PROPERTY(_szProperty) \
+	do { \
+		if(bFirst) \
+			bFirst = FALSE; \
+		else \
+			vStringPut(pszProperties,','); \
+		vStringCatS(pszProperties,_szProperty); \
+	} while(0)
+
+	if(uProperties & CXXTagPropertyConst)
+		ADD_PROPERTY("const");
+	if(uProperties & CXXTagPropertyDefault)
+		ADD_PROPERTY("default");
+	if(uProperties & CXXTagPropertyDelete)
+		ADD_PROPERTY("delete");
+	if(uProperties & CXXTagPropertyExplicit)
+		ADD_PROPERTY("explicit");
+	if(uProperties & CXXTagPropertyExtern)
+		ADD_PROPERTY("extern");
+	if(uProperties & CXXTagPropertyFinal)
+		ADD_PROPERTY("final");
+	if(uProperties & CXXTagPropertyInline)
+		ADD_PROPERTY("inline");
+	if(uProperties & CXXTagPropertyMutable)
+		ADD_PROPERTY("mutable");
+	if(uProperties & CXXTagPropertyOverride)
+		ADD_PROPERTY("override");
+	if(uProperties & CXXTagPropertyPure)
+		ADD_PROPERTY("pure");
+	if(uProperties & CXXTagPropertyStatic)
+		ADD_PROPERTY("static");
+	if(uProperties & CXXTagPropertyVirtual)
+		ADD_PROPERTY("virtual");
+	if(uProperties & CXXTagPropertyVolatile)
+		ADD_PROPERTY("volatile");
+
+	if(cxxParserCurrentLanguageIsCPP())
+		cxxTagSetCPPField(CXXTagCPPFieldProperties,vStringValue(pszProperties));
+	else
+		cxxTagSetCField(CXXTagCFieldProperties,vStringValue(pszProperties));
+
+	return pszProperties;
+}
+
 
 CXXToken * cxxTagSetTypeField(
-		tagEntryInfo * tag,
 		CXXToken * pTypeStart,
 		CXXToken * pTypeEnd
 	)
 {
-	CXX_DEBUG_ASSERT(tag && pTypeStart && pTypeEnd,"Non null parameters are expected");
+	CXX_DEBUG_ASSERT(pTypeStart && pTypeEnd,"Non null parameters are expected");
 
 	const char * szTypeRef0;
 
@@ -213,8 +287,8 @@ CXXToken * cxxTagSetTypeField(
 
 	CXX_DEBUG_PRINT("Type name is '%s'",vStringValue(pTypeName->pszWord));
 
-	tag->extensionFields.typeRef[0] = szTypeRef0;
-	tag->extensionFields.typeRef[1] = vStringValue(pTypeName->pszWord);
+	g_oCXXTag.extensionFields.typeRef[0] = szTypeRef0;
+	g_oCXXTag.extensionFields.typeRef[1] = vStringValue(pTypeName->pszWord);
 
 	return pTypeName;
 }

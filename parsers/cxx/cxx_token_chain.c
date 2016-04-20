@@ -721,10 +721,7 @@ CXXToken * cxxTokenChainPreviousKeyword(
 	CXXToken * t = from->pPrev;
 	while(t)
 	{
-		if(
-				(t->eType == CXXTokenTypeKeyword) &&
-				(t->eKeyword == eKeyword)
-			)
+		if(cxxTokenIsKeyword(t,eKeyword))
 			return t;
 		t = t->pPrev;
 	}
@@ -732,6 +729,24 @@ CXXToken * cxxTokenChainPreviousKeyword(
 	return NULL;
 }
 
+CXXToken * cxxTokenChainNextKeyword(
+		CXXToken * from,
+		enum CXXKeyword eKeyword
+	)
+{
+	if(!from)
+		return NULL;
+
+	CXXToken * t = from->pNext;
+	while(t)
+	{
+		if(cxxTokenIsKeyword(t,eKeyword))
+			return t;
+		t = t->pNext;
+	}
+
+	return NULL;
+}
 
 int cxxTokenChainFirstKeywordIndex(
 		CXXTokenChain * tc,
@@ -747,16 +762,35 @@ int cxxTokenChainFirstKeywordIndex(
 	int idx = 0;
 	while(pToken)
 	{
-		if(
-			(pToken->eType == CXXTokenTypeKeyword) &&
-			(pToken->eKeyword == eKeyword)
-		)
+		if(cxxTokenIsKeyword(pToken,eKeyword))
 			return idx;
 		idx++;
 		pToken = pToken->pNext;
 	}
 
 	return -1;
+}
+
+CXXToken * cxxTokenChainNextIdentifier(
+		CXXToken * from,
+		const char * szIdentifier
+	)
+{
+	if(!from)
+		return NULL;
+
+	CXXToken * t = from->pNext;
+	while(t)
+	{
+		if(
+			cxxTokenTypeIs(t,CXXTokenTypeIdentifier) &&
+			(strcmp(vStringValue(t->pszWord),szIdentifier) == 0)
+		)
+			return t;
+		t = t->pNext;
+	}
+
+	return NULL;
 }
 
 void cxxTokenChainDestroyRange(CXXTokenChain * pChain,CXXToken * from,CXXToken * to)

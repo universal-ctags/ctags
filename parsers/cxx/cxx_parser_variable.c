@@ -535,7 +535,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 			}
 
 			// anything that remains is part of type
-			CXXToken * pTypeToken = cxxTagSetTypeField(tag,cxxTokenChainFirst(pChain),t->pPrev);
+			CXXToken * pTypeToken = cxxTagSetTypeField(cxxTokenChainFirst(pChain),t->pPrev);
 
 			tag->isFileScope = bKnRStyleParameters ?
 					TRUE :
@@ -554,10 +554,34 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 						)
 					);
 
+			vString * pszProperties = NULL;
+			
+			if(
+				(cxxParserCurrentLanguageIsCPP() && cxxTagCPPFieldEnabled(CXXTagCPPFieldProperties)) ||
+				(cxxParserCurrentLanguageIsC() && cxxTagCFieldEnabled(CXXTagCFieldProperties))
+			)
+			{
+				unsigned int uProperties = 0;
+		
+				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic)
+					uProperties |= CXXTagPropertyStatic;
+				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern)
+					uProperties |= CXXTagPropertyExtern;
+				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenMutable)
+					uProperties |= CXXTagPropertyMutable;
+				// Volatile is part of the type, so we don't mark it as a property
+				//if(g_cxx.uKeywordState & CXXParserKeywordStateSeenVolatile)
+				//	uProperties |= CXXTagPropertyVolatile;
+
+				pszProperties = cxxTagSetProperties(uProperties);
+			}
+	
 			cxxTagCommit();
 
 			if(pTypeToken)
 				cxxTokenDestroy(pTypeToken);
+			if(pszProperties)
+				vStringDelete(pszProperties);
 			cxxTokenDestroy(pIdentifier);
 		}
 

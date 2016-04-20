@@ -54,6 +54,22 @@ boolean cxxParserTokenChainLooksLikeConstructorParameterSet(
 		CXXTokenChain * pChain
 	);
 
+typedef enum _CXXFunctionSignatureInfoFlag
+{
+	// Followed by = 0
+	CXXFunctionSignatureInfoPure = 1,
+	// Followed by = default
+	CXXFunctionSignatureInfoDefault = (1 << 1),
+	// Followed by "override"
+	CXXFunctionSignatureInfoOverride = (1 << 2),
+	// Followed by "final"
+	CXXFunctionSignatureInfoFinal = (1 << 3),
+	// Followed by = delete
+	CXXFunctionSignatureInfoDelete = (1 << 4),
+	// Followed by volatile
+	CXXFunctionSignatureInfoVolatile = (1 << 5)
+} CXXFunctionSignatureInfoFlag;
+
 //
 // Description of a function signature.
 //
@@ -79,6 +95,9 @@ typedef struct _CXXFunctionSignatureInfo
 	// Non-NULL if a return type has been identified
 	CXXToken * pTypeStart;
 	CXXToken * pTypeEnd;
+
+	// Additional informations
+	unsigned int uFlags;
 
 } CXXFunctionSignatureInfo;
 
@@ -166,23 +185,24 @@ typedef enum _CXXParserKeywordState
 	CXXParserKeywordStateSeenTypedef = 1,
 	// We are parsing a statement that comes right after
 	// an inline keyword
-	CXXParserKeywordStateSeenInline = 2,
+	CXXParserKeywordStateSeenInline = (1 << 1),
 	// We are parsing a statement that comes right after
 	// a extern keyword
-	CXXParserKeywordStateSeenExtern = 4,
+	CXXParserKeywordStateSeenExtern = (1 << 2),
 	// We are parsing a statement that comes right after
 	// a static keyword
-	CXXParserKeywordStateSeenStatic = 8,
+	CXXParserKeywordStateSeenStatic = (1 << 3),
 	// an "explicit" keyword has been seen
-	CXXParserKeywordStateSeenExplicit = 16,
+	CXXParserKeywordStateSeenExplicit = (1 << 4),
 	// an "operator" keyword has been seen
-	CXXParserKeywordStateSeenOperator = 32,
+	CXXParserKeywordStateSeenOperator = (1 << 5),
 	// "virtual" has been seen
-	CXXParserKeywordStateSeenVirtual = 64,
+	CXXParserKeywordStateSeenVirtual = (1 << 6),
 	// "return" has been seen
-	CXXParserKeywordStateSeenReturn = 128
+	CXXParserKeywordStateSeenReturn = (1 << 7),
+	// "mutable" has been seen
+	CXXParserKeywordStateSeenMutable = (1 << 8)
 } CXXParserKeywordState;
-
 
 typedef struct _CXXParserState
 {

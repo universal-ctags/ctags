@@ -284,6 +284,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 		vString * pszSignature = cxxTokenChainJoin(pParenthesis->pChain,NULL,0);
 
 		// FIXME: Return type!
+		// FIXME: Properties?
 
 		if(pszSignature)
 			tag->extensionFields.signature = vStringValue(pszSignature);
@@ -526,6 +527,7 @@ boolean cxxParserLookForFunctionSignature(
 
 	CXXToken * pToken = cxxTokenChainFirst(pChain);
 
+	pInfo->uFlags = 0;
 	pInfo->pParenthesis = NULL;
 
 	CXXToken * pIdentifierStart = NULL;
@@ -790,14 +792,64 @@ next_token:
 
 		// Look for trailing const.
 
-		if(
-				pTopLevelParenthesis->pNext &&
-				cxxTokenTypeIs(pTopLevelParenthesis->pNext,CXXTokenTypeKeyword) &&
-				(pTopLevelParenthesis->pNext->eKeyword == CXXKeywordCONST)
-		)
-			pInfo->pSignatureConst = pTopLevelParenthesis->pNext;
-		else
+		if(pTopLevelParenthesis->pNext)
+		{
+			if(cxxTokenIsKeyword(pTopLevelParenthesis->pNext,CXXKeywordCONST))
+				pInfo->pSignatureConst = pTopLevelParenthesis->pNext;
+			else
+				pInfo->pSignatureConst = NULL;
+				
+			// Look for = 0 for "pure" modifier
+			CXXToken * pAssignment = cxxTokenChainNextTokenOfType(
+					pTopLevelParenthesis,
+					CXXTokenTypeAssignment
+				);
+	
+			if(pAssignment && pAssignment->pNext)
+			{
+				if(
+					cxxTokenTypeIs(pAssignment->pNext,CXXTokenTypeNumber) &&
+					(strcmp(vStringValue(pAssignment->pNext->pszWord),"0") == 0)
+				)
+					pInfo->uFlags |= CXXFunctionSignatureInfoPure;
+				else if(cxxTokenTypeIs(pAssignment->pNext,CXXTokenTypeKeyword))
+				{
+					if(pAssignment->pNext->eKeyword == CXXKeywordDEFAULT)
+						pInfo->uFlags |= CXXFunctionSignatureInfoDefault;
+					if(pAssignment->pNext->eKeyword == CXXKeywordDELETE)
+						pInfo->uFlags |= CXXFunctionSignatureInfoDelete;
+				}
+			}
+			
+			CXXToken * pIdentOrKeyword = cxxTokenChainNextTokenOfType(
+					pTopLevelParenthesis,
+					CXXTokenTypeIdentifier | CXXTokenTypeKeyword
+				);
+
+			while(pIdentOrKeyword)
+			{
+				// override is a keyword only in specific contexts so we handle it as identifier
+				if(cxxTokenTypeIs(pIdentOrKeyword,CXXTokenTypeKeyword))
+				{
+					if(pIdentOrKeyword->eKeyword == CXXKeywordVOLATILE)
+						pInfo->uFlags |= CXXFunctionSignatureInfoVolatile;
+				} else {
+					// The "final" keyword is actually disabled in most contexts so we handle
+					// it as identifier. "override is always handled as identifier.
+					if(strcmp(vStringValue(pIdentOrKeyword->pszWord),"final") == 0)
+						pInfo->uFlags |= CXXFunctionSignatureInfoFinal;
+					else if(strcmp(vStringValue(pIdentOrKeyword->pszWord),"override") == 0)
+						pInfo->uFlags |= CXXFunctionSignatureInfoOverride;
+				}
+
+				pIdentOrKeyword = cxxTokenChainNextTokenOfType(
+						pIdentOrKeyword,
+						CXXTokenTypeIdentifier | CXXTokenTypeKeyword
+					);
+			}
+		} else {
 			pInfo->pSignatureConst = NULL;
+		}
 	} else {
 		pInfo->pSignatureConst = NULL;
 	}
@@ -965,7 +1017,7 @@ int cxxParserEmitFunctionTags(
 		CXXToken * pTypeName;
 
 		if(pInfo->pTypeStart)
-			pTypeName = cxxTagSetTypeField(tag,pInfo->pTypeStart,pInfo->pTypeEnd);
+			pTypeName = cxxTagSetTypeField(pInfo->pTypeStart,pInfo->pTypeEnd);
 		else
 			pTypeName = NULL;
 
@@ -985,6 +1037,43 @@ int cxxParserEmitFunctionTags(
 					vStringValue(cxxTokenChainFirst(g_cxx.pTemplateTokenChain)->pszWord)
 				);
 		}
+		
+		vString * pszProperties = NULL;
+		
+		if(
+			(cxxParserCurrentLanguageIsCPP() && cxxTagCPPFieldEnabled(CXXTagCPPFieldProperties)) ||
+			(cxxParserCurrentLanguageIsC() && cxxTagCFieldEnabled(CXXTagCFieldProperties))
+		)
+		{
+			unsigned int uProperties = 0;
+	
+			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenVirtual)
+				uProperties |= CXXTagPropertyVirtual;
+			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic)
+				uProperties |= CXXTagPropertyStatic;
+			// FIXME: Handle __inline, __inline__, __forceinline, __attribute__((always_inline)) ?
+			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenInline)
+				uProperties |= CXXTagPropertyInline;
+			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExplicit)
+				uProperties |= CXXTagPropertyExplicit; // FIXME: Handle "CXXTagPropertyConstructor"?
+			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern)
+				uProperties |= CXXTagPropertyExtern;
+			if(pInfo->pSignatureConst)
+				uProperties |= CXXTagPropertyConst;
+			if(pInfo->uFlags & CXXFunctionSignatureInfoPure)
+				uProperties |= CXXTagPropertyPure | CXXTagPropertyVirtual;
+			if(pInfo->uFlags & CXXFunctionSignatureInfoOverride)
+				uProperties |= CXXTagPropertyOverride | CXXTagPropertyVirtual;
+			if(pInfo->uFlags & CXXFunctionSignatureInfoFinal)
+				uProperties |= CXXTagPropertyFinal | CXXTagPropertyVirtual;
+			if(pInfo->uFlags & CXXFunctionSignatureInfoDefault)
+				uProperties |= CXXTagPropertyDefault;
+			if(pInfo->uFlags & CXXFunctionSignatureInfoDelete)
+				uProperties |= CXXTagPropertyDelete;
+			if(pInfo->uFlags & CXXFunctionSignatureInfoVolatile)
+				uProperties |= CXXTagPropertyVolatile;
+			pszProperties = cxxTagSetProperties(uProperties);
+		}
 
 		int iCorkQueueIndex = cxxTagCommit();
 
@@ -993,6 +1082,9 @@ int cxxParserEmitFunctionTags(
 
 		if(pszSignature)
 			vStringDelete(pszSignature);
+
+		if(pszProperties)
+			vStringDelete(pszProperties);
 
 		if(pTypeName)
 			cxxTokenDestroy(pTypeName);
@@ -1125,7 +1217,6 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 				cxxTokenChainTakeRecursive(pInfo->pChain,pInfo->aIdentifiers[i]);
 
 				pTypeName = cxxTagSetTypeField(
-						tag,
 						pTypeStart,
 						pTypeEnd
 					);

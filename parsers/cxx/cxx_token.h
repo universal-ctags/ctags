@@ -94,6 +94,11 @@ CXXToken * cxxTokenCreateAnonymousIdentifier(enum CXXTagKind k);
 
 #define cxxTokenTypeIsOneOf(_pToken,_uTypes) (_pToken->eType & (_uTypes))
 #define cxxTokenTypeIs(_pToken,_eType) (_pToken->eType == _eType)
+#define cxxTokenIsKeyword(_pToken,_eKeyword) \
+		( \
+			(_pToken->eType == CXXTokenTypeKeyword) && \
+			(_pToken->eKeyword == _eKeyword) \
+		)
 
 // FIXME: Bad argument order
 void cxxTokenAppendToString(vString * s,CXXToken * t);

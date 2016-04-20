@@ -342,25 +342,35 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 					break;
 					case CXXKeywordEXTERN:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenExtern;
-						cxxTokenChainClear(g_cxx.pTokenChain);
+						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
 					case CXXKeywordSTATIC:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenStatic;
-						cxxTokenChainClear(g_cxx.pTokenChain);
+						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
 					case CXXKeywordINLINE:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenInline;
-						cxxTokenChainClear(g_cxx.pTokenChain);
+						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
 					case CXXKeywordEXPLICIT:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenExplicit;
-						cxxTokenChainClear(g_cxx.pTokenChain);
+						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
 					case CXXKeywordOPERATOR:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenOperator;
 					break;
 					case CXXKeywordVIRTUAL:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenVirtual;
+						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+					break;
+					//case CXXKeywordVOLATILE:
+					// Volatile is actually part of the type!
+					//	g_cxx.uKeywordState |= CXXParserKeywordStateSeenVolatile;
+					//	cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+					//break;
+					case CXXKeywordMUTABLE:
+						g_cxx.uKeywordState |= CXXParserKeywordStateSeenMutable;
+						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
 					default:
 						if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
