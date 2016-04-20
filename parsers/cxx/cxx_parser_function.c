@@ -538,10 +538,7 @@ boolean cxxParserLookForFunctionSignature(
 
 	while(pToken)
 	{
-		if(
-				cxxTokenTypeIs(pToken,CXXTokenTypeKeyword) &&
-				(pToken->eKeyword == CXXKeywordOPERATOR)
-			)
+		if(cxxTokenIsKeyword(pToken,CXXKeywordOPERATOR))
 		{
 			// Special case for operator <something> ()
 
