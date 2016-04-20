@@ -126,7 +126,7 @@ inspect_cmd_skip ()
     echo "SKIPPING $1" 1>&2
 }
 
-inspect_cmd_show_genenric ()
+inspect_cmd_show_generic ()
 {
     local tcase=$1
     local file=$2
@@ -143,12 +143,12 @@ inspect_cmd_show_genenric ()
 
 inspect_cmd_show_diff ()
 {
-    inspect_cmd_show_genenric $1 DIFF.tmp
+    inspect_cmd_show_generic $1 DIFF.tmp
 }
 
 inspect_show_args_ctags ()
 {
-    inspect_cmd_show_genenric $1 args.ctags
+    inspect_cmd_show_generic $1 args.ctags
 }
 
 inspect_cmd_quit ()
