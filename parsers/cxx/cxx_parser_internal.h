@@ -67,7 +67,12 @@ typedef enum _CXXFunctionSignatureInfoFlag
 	// Followed by = delete
 	CXXFunctionSignatureInfoDelete = (1 << 4),
 	// Followed by volatile
-	CXXFunctionSignatureInfoVolatile = (1 << 5)
+	CXXFunctionSignatureInfoVolatile = (1 << 5),
+	// Is template specialization  a<x>()
+	CXXFunctionSignatureInfoTemplateSpecialization = (1 << 6),
+	// Is scope template specialization a<x>::b()
+	// (implies that this is a template specialization too)
+	CXXFunctionSignatureInfoScopeTemplateSpecialization = (1 << 7)
 } CXXFunctionSignatureInfoFlag;
 
 //

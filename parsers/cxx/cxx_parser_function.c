@@ -538,6 +538,12 @@ boolean cxxParserLookForFunctionSignature(
 
 	while(pToken)
 	{
+		CXX_DEBUG_PRINT(
+				"Token '%s' of type 0x%02x",
+				vStringValue(pToken->pszWord),
+				pToken->eType
+			);
+	
 		if(cxxTokenIsKeyword(pToken,CXXKeywordOPERATOR))
 		{
 			// Special case for operator <something> ()
@@ -651,6 +657,8 @@ boolean cxxParserLookForFunctionSignature(
 			if(!pToken->pPrev)
 				goto next_token;
 
+			CXX_DEBUG_PRINT("Found parenthesis chain: check for identifier");
+
 			// parentheses at position 1 they are very likely to be macro invocations...
 			// but we still handle them in case we find nothing else
 
@@ -659,8 +667,34 @@ boolean cxxParserLookForFunctionSignature(
 			if(cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeIdentifier))
 			{
 				// identifier before
+				CXX_DEBUG_PRINT("Got identifier before");
 				pIdentifierStart = pToken->pPrev;
 				pIdentifierEnd = pToken->pPrev;
+			} else if(
+					pToken->pPrev->pPrev &&
+					cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeGreaterThanSign)
+				)
+			{
+				// look for template specialisation
+				CXXToken * pSpecBegin = cxxTokenChainSkipBackToStartOfTemplateAngleBracket(
+						pToken->pPrev
+					);
+
+				if(
+						pSpecBegin &&
+						pSpecBegin->pPrev &&
+						cxxTokenTypeIs(pSpecBegin->pPrev,CXXTokenTypeIdentifier)
+					)
+				{
+					// template specialisation
+					CXX_DEBUG_PRINT("Maybe template specialisation?");
+					pIdentifierStart = pSpecBegin->pPrev;
+					pIdentifierEnd = pSpecBegin->pPrev;
+					pInfo->uFlags |= CXXFunctionSignatureInfoTemplateSpecialization;
+				} else {
+					// no way
+					goto next_token;
+				}
 			} else {
 				// no way
 				goto next_token;
@@ -741,8 +775,16 @@ next_token:
 		// Look for scope prefix
 		pToken = pInfo->pIdentifierStart->pPrev;
 
+		CXX_DEBUG_PRINT("Looking for scope prefix");
+
 		while(pToken)
 		{
+			CXX_DEBUG_PRINT(
+					"Token '%s' of type 0x%02x",
+					vStringValue(pToken->pszWord),
+					pToken->eType
+				);
+
 			if(!cxxTokenTypeIs(pToken,CXXTokenTypeMultipleColons))
 				break;
 			pToken = pToken->pPrev;
@@ -755,9 +797,8 @@ next_token:
 				{
 					// might be something like type X<TemplateArg>::func()
 					// (explicit specialization of template<A> class X).
-					CXXToken * pSmallerThan = cxxTokenChainPreviousTokenOfType(
-							pToken,
-							CXXTokenTypeSmallerThanSign
+					CXXToken * pSmallerThan = cxxTokenChainSkipBackToStartOfTemplateAngleBracket(
+							pToken
 						);
 					if(!pSmallerThan)
 						break; // nope
@@ -767,25 +808,31 @@ next_token:
 						break; // nope
 					// hmm.. probably a template specialisation
 					pToken = pSmallerThan->pPrev;
+					pInfo->uFlags |= CXXFunctionSignatureInfoScopeTemplateSpecialization;
 				} else if(pToken->eType == CXXTokenTypeAngleBracketChain)
 				{
-					// same as above, but already condensed
+					// same as above, but already condensed (though it should never happen)
 					if(!pToken->pPrev)
 						break; // nope
 					if(!cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeIdentifier))
 						break; // nope
 					// hmm.. probably a template specialisation
 					pToken = pToken->pPrev;
+					pInfo->uFlags |= CXXFunctionSignatureInfoScopeTemplateSpecialization;
 				} else {
 					// no more scope names
 					break;
 				}
 			}
 
+			CXX_DEBUG_PRINT("Shifting scope start to '%s'",vStringValue(pToken->pszWord));
+
 			pInfo->pScopeStart = pToken;
 
 			pToken = pToken->pPrev;
 		}
+
+		CXX_DEBUG_PRINT("Scope prefix search finished");
 
 		// Look for trailing const.
 
@@ -933,8 +980,12 @@ int cxxParserEmitFunctionTags(
 
 	boolean bPushScopes = uOptions & CXXEmitFunctionTagsPushScopes;
 
+	CXX_DEBUG_PRINT("Scope start is %x, push scope is %d",pInfo->pScopeStart,bPushScopes);
+
 	if(bPushScopes && pInfo->pScopeStart)
 	{
+		CXX_DEBUG_PRINT("There is a scope and we're requested to push scopes");
+
 		// there is a scope
 		while(pInfo->pScopeStart != pInfo->pIdentifierStart)
 		{
@@ -947,6 +998,8 @@ int cxxParserEmitFunctionTags(
 			pInfo->pScopeStart = pInfo->pScopeStart->pNext;
 
 			cxxTokenChainTake(g_cxx.pTokenChain,pScopeId);
+
+			CXX_DEBUG_PRINT("Pushing scope %s",vStringValue(pScopeId->pszWord));
 
 			cxxScopePush(
 					pScopeId,
@@ -1021,12 +1074,15 @@ int cxxParserEmitFunctionTags(
 		if(pszSignature)
 			tag->extensionFields.signature = vStringValue(pszSignature);
 
+		boolean bIsEmptyTemplate = FALSE;
+
 		if(
 			g_cxx.pTemplateTokenChain && (g_cxx.pTemplateTokenChain->iCount > 0) &&
 			cxxParserCurrentLanguageIsCPP() &&
 			cxxTagCPPFieldEnabled(CXXTagCPPFieldTemplate)
 		)
 		{
+			bIsEmptyTemplate = g_cxx.pTemplateTokenChain->iCount == 2;
 			cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
 			cxxTokenChainCondense(g_cxx.pTemplateTokenChain,0);
 			cxxTagSetCPPField(
@@ -1069,6 +1125,12 @@ int cxxParserEmitFunctionTags(
 				uProperties |= CXXTagPropertyDelete;
 			if(pInfo->uFlags & CXXFunctionSignatureInfoVolatile)
 				uProperties |= CXXTagPropertyVolatile;
+			if(pInfo->uFlags & CXXFunctionSignatureInfoScopeTemplateSpecialization)
+				uProperties |= CXXTagPropertyScopeTemplateSpecialization |
+								CXXTagPropertyTemplateSpecialization;
+			if((pInfo->uFlags & CXXFunctionSignatureInfoTemplateSpecialization) || bIsEmptyTemplate)
+				uProperties |= CXXTagPropertyTemplateSpecialization;
+
 			pszProperties = cxxTagSetProperties(uProperties);
 		}
 

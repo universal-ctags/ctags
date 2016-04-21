@@ -234,8 +234,12 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 		ADD_PROPERTY("override");
 	if(uProperties & CXXTagPropertyPure)
 		ADD_PROPERTY("pure");
+	if(uProperties & CXXTagPropertyScopeTemplateSpecialization)
+		ADD_PROPERTY("scopespecialization");
 	if(uProperties & CXXTagPropertyStatic)
 		ADD_PROPERTY("static");
+	if(uProperties & CXXTagPropertyTemplateSpecialization)
+		ADD_PROPERTY("specialization");
 	if(uProperties & CXXTagPropertyVirtual)
 		ADD_PROPERTY("virtual");
 	if(uProperties & CXXTagPropertyVolatile)

@@ -930,7 +930,12 @@ void cxxParserAnalyzeOtherStatement(void)
 	// prefer function.
 	if(cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,NULL))
 	{
-		cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,0,NULL);
+		int iScopesPushed = cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,CXXEmitFunctionTagsPushScopes,NULL);
+		while(iScopesPushed > 0)
+		{
+			cxxScopePop();
+			iScopesPushed--;
+		}
 		CXX_DEBUG_LEAVE_TEXT("Found function prototypes");
 		return;
 	}

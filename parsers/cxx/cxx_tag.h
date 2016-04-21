@@ -110,7 +110,11 @@ typedef enum _CXXTagProperty
 	CXXTagPropertyMutable = (1 << 11),
 	// Function (note: NOT variable) is marked as volatile as in "int a() volatile"
 	// (Because for variables it's treated as part of type)
-	CXXTagPropertyVolatile = (1 << 12)
+	CXXTagPropertyVolatile = (1 << 12),
+	// Template specialization a<x>()
+	CXXTagPropertyTemplateSpecialization = (1 << 13),
+	// Template specialization of scope a<x>::b() (which implies TemplateSpec too)
+	CXXTagPropertyScopeTemplateSpecialization = (1 << 14)
 } CXXTagProperty;
 
 // Set the modifiers field of the tag.
