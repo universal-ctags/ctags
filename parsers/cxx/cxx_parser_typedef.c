@@ -173,7 +173,6 @@ void cxxParserExtractTypedef(
 			CXX_DEBUG_ASSERT(pChain->iCount > 0,"There should be at least another token here!");
 
 			pTypeName = cxxTagSetTypeField(
-						tag,
 						cxxTokenChainFirst(pChain),
 						cxxTokenChainLast(pChain)
 					);

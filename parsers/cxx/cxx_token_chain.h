@@ -211,6 +211,16 @@ CXXToken * cxxTokenChainPreviousKeyword(
 		enum CXXKeyword eKeyword
 	);
 
+CXXToken * cxxTokenChainNextKeyword(
+		CXXToken * from,
+		enum CXXKeyword eKeyword
+	);
+
+CXXToken * cxxTokenChainNextIdentifier(
+		CXXToken * from,
+		const char * szIdentifier
+	);
+
 int cxxTokenChainFirstKeywordIndex(
 		CXXTokenChain * tc,
 		enum CXXKeyword eKeyword

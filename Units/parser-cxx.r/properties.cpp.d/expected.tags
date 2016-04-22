@@ -1,0 +1,22 @@
+C01	input.cpp	/^class C01$/;"	c	file:
+C01	input.cpp	/^	C01() = default;$/;"	p	class:C01	file:	properties:default
+mp01	input.cpp	/^	static int mp01;$/;"	m	class:C01	typeref:typename:int	file:	properties:static
+mp02	input.cpp	/^	mutable int mp02;$/;"	m	class:C01	typeref:typename:int	file:	properties:mutable
+mf01	input.cpp	/^	virtual void mf01();$/;"	p	class:C01	typeref:typename:void	file:	properties:virtual
+mf02	input.cpp	/^	virtual void mf02() final;$/;"	p	class:C01	typeref:typename:void	file:	properties:final,virtual
+C02	input.cpp	/^class C02 : public C01$/;"	c	file:
+C02	input.cpp	/^	C02() = delete;$/;"	p	class:C02	file:	properties:delete
+C02	input.cpp	/^	explicit C02(int i)$/;"	f	class:C02	file:	properties:explicit
+i	input.cpp	/^	explicit C02(int i)$/;"	z	function:C02::C02	typeref:typename:int	file:
+mf01	input.cpp	/^	void mf01() override;$/;"	p	class:C02	typeref:typename:void	file:	properties:override,virtual
+mf03	input.cpp	/^	virtual void mf03() = 0;$/;"	p	class:C02	typeref:typename:void	file:	properties:pure,virtual
+mf04	input.cpp	/^	virtual void mf04() final;$/;"	p	class:C02	typeref:typename:void	file:	properties:final,virtual
+mf05	input.cpp	/^	static inline void mf05()$/;"	f	class:C02	typeref:typename:void	file:	properties:inline,static
+mf06	input.cpp	/^	inline void mf06() const;$/;"	p	class:C02	typeref:typename:void	file:	properties:const,inline
+mf07	input.cpp	/^	void static mf07() volatile;$/;"	p	class:C02	typeref:typename:void	file:	properties:static,volatile
+v01	input.cpp	/^extern int v01;$/;"	x	typeref:typename:int	properties:extern
+v02	input.cpp	/^static volatile int v02;$/;"	v	typeref:typename:volatile int	file:	properties:static
+p01	input.cpp	/^static void p01();$/;"	p	typeref:typename:void	file:	properties:static
+p02	input.cpp	/^extern void p02();$/;"	p	typeref:typename:void	file:	properties:extern
+f01	input.cpp	/^static void f01()$/;"	f	typeref:typename:void	file:	properties:static
+f02	input.cpp	/^static inline void f02()$/;"	f	typeref:typename:void	file:	properties:inline,static
