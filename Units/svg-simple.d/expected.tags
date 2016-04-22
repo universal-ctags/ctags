@@ -1,0 +1,4 @@
+defs10	input.svg	/^     id="defs10" \/>$/;"	i
+desc4	input.svg	/^     id="desc4">RECTANGLE<\/desc>$/;"	i
+metadata12	input.svg	/^     id="metadata12">$/;"	i
+rect6	input.svg	/^     x="19.018383" \/>$/;"	i
