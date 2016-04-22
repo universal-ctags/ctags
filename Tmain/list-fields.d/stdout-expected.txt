@@ -19,6 +19,7 @@ r	role	off	NONE	TRUE	Role
 R	NONE	off	NONE	TRUE	Marker (R or D) representing whether tag is definition or reference
 Z	scope	off	NONE	FALSE	Include the "scope:" key in scope field (use s)
 E	extra	off	NONE	TRUE	Extra tag type information
+x	xpath	off	NONE	TRUE	xpath for the tag
 -	end	off	C	TRUE	end lines of various constructs
 -	properties	off	C	TRUE	properties (static, inline, mutable,...)
 -	end	off	C++	TRUE	end lines of various constructs

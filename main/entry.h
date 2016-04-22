@@ -77,6 +77,10 @@ typedef struct sTagEntryInfo {
 
 #define ROLE_INDEX_DEFINITION -1
 		int roleIndex; /* for role of reference tag */
+
+#ifdef HAVE_LIBXML
+		const char* xpath;
+#endif
 	} extensionFields;  /* list of extension fields*/
 
 #define PRE_ALLOCATED_PARSER_FIELDS 4
