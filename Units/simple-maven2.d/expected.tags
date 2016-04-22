@@ -1,5 +1,10 @@
 backend	input.xml	/^  <artifactId>backend<\/artifactId>$/;"	a	groupId:org.ovirt.engine.core
-engine.groupId	input.xml	/^    <engine.groupId>org.ovirt.engine.core<\/engine.groupId>$/;"	p	artifactId:org.ovirt.engine.core.backend
+central	input.xml	/^      <id>central<\/id>$/;"	r
+commons-collections	input.xml	/^      <artifactId>commons-collections<\/artifactId>$/;"	a	groupId:commons-collections	role:dependency
+commons-collections	input.xml	/^      <groupId>commons-collections<\/groupId>$/;"	g	role:dependency
+engine.groupId	input.xml	/^    <engine.groupId>org.ovirt.engine.core<\/engine.groupId>$/;"	p
 org.ovirt.engine	input.xml	/^    <groupId>org.ovirt.engine<\/groupId>$/;"	g	role:parent
+org.ovirt.engine.api	input.xml	/^      <groupId>org.ovirt.engine.api<\/groupId>$/;"	g	role:dependency
 org.ovirt.engine.core	input.xml	/^  <groupId>org.ovirt.engine.core<\/groupId>$/;"	g
-root	input.xml	/^    <artifactId>root<\/artifactId>$/;"	a	role:parent
+ovirt-engine-extensions-api	input.xml	/^      <artifactId>ovirt-engine-extensions-api<\/artifactId>$/;"	a	groupId:org.ovirt.engine.api	role:dependency	version:${org.ovirt.engine.api.ovirt-engine-extensions-api.version}
+root	input.xml	/^    <artifactId>root<\/artifactId>$/;"	a	groupId:org.ovirt.engine	role:parent	version:3.5.6.2

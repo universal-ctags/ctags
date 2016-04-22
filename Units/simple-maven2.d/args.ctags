@@ -1,2 +1,3 @@
 --extra=+r
---fields=+r
+--fields=+r{version}
+
