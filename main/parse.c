@@ -2258,6 +2258,7 @@ extern void installTagXpathTable (const langType language)
 			for (j = 0; j < lang->tagXpathTableTable[i].count; ++j)
 				addTagXpath (language, lang->tagXpathTableTable[i].table + j);
 		lang->tagXpathInstalled = TRUE;
+		useXpathMethod (language);
 	}
 }
 
