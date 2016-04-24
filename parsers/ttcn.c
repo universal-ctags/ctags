@@ -679,7 +679,7 @@ static int parseID (ttcnKind_t kind)
     ttcnToken_t * pTok = matchToken(T_ID);
     if (pTok)
     {
-        if ((kind >= 0) && (kind < K_NONE))
+        if (kind < K_NONE)
             makeSimpleTag(pTok->value, ttcnKinds, kind);
         return 1;
     }
