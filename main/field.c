@@ -26,10 +26,6 @@
 #include "routines.h"
 
 
-typedef const char* (* renderEscaped) (const tagEntryInfo *const tag,
-				       const char *value,
-				       vString * buffer);
-
 struct sFieldDesc {
 	fieldSpec *spec;
 	unsigned int fixed:   1;   /* fields which cannot be disabled. */
