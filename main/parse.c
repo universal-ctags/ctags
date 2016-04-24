@@ -2102,6 +2102,17 @@ static void addParserPseudoTags (langType language)
 	}
 }
 
+extern boolean doesParserRequireMemoryStream (const langType language)
+{
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	parserDefinition *const lang = LanguageTable [language];
+
+	if (lang->method & METHOD_XPATH)
+		return TRUE;
+	else
+		return FALSE;
+}
+
 extern boolean parseFile (const char *const fileName)
 {
 	boolean tagFileResized = FALSE;
