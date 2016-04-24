@@ -26,10 +26,6 @@
 #include "routines.h"
 
 
-typedef const char* (* renderEscaped) (const tagEntryInfo *const tag,
-				       const char *value,
-				       vString * buffer);
-
 struct sFieldDesc {
 	fieldSpec *spec;
 	unsigned int fixed:   1;   /* fields which cannot be disabled. */
@@ -365,7 +361,7 @@ extern void printFields (void)
 	unsigned int i;
 
 	if (Option.withListHeader)
-		printf ((Option.machinable? "%s\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(s)),
+		printf ((Option.machinable? "%s\t%s\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(s)),
 			"#LETTER", "NAME", "ENABLED", "LANGUAGE", "XFMTCHAR", "DESCRIPTION");
 
 	for (i = 0; i < fieldDescUsed; i++)
