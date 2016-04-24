@@ -263,29 +263,6 @@ extern char    *vStringDeleteUnwrap       (vString *const string)
 	return buffer;
 }
 
-extern vString *vStringNewFile (MIO *input)
-{
-	char tmp [1024];
-	vString *buf;
-	size_t r = sizeof (tmp);
-
-	buf = vStringNew ();
-	while (1)
-	{
-		if (r < sizeof (tmp)
-		    && (mio_eof (input) || mio_error (input)))
-			break;
-
-		r = mio_read (input, tmp, 1, sizeof (tmp));
-
-		if (r > 0)
-			vStringNCatS (buf, tmp, r);
-	}
-	vStringTerminate (buf);
-
-	return buf;
-}
-
 static char valueToXDigit (int v)
 {
 	Assert (v >= 0 && v <= 0xF);
