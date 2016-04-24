@@ -685,7 +685,7 @@ struct getLangCtx {
     boolean     err;
 };
 
-#define GLC_FOPEN_IF_NECESSARY(_glc_, _label_) do {         \
+#define GLC_FOPEN_IF_NECESSARY0(_glc_, _label_) do {        \
     if (!(_glc_)->input) {                                  \
         (_glc_)->input = mio_new_file((_glc_)->fileName, "rb"); \
         if (!(_glc_)->input) {                              \
@@ -694,6 +694,24 @@ struct getLangCtx {
         }                                                   \
     }                                                       \
 } while (0)                                                 \
+
+#define GLC_FOPEN_IF_NECESSARY(_glc_, _label_, _doesParserRequireMemoryStream_) \
+	do {								\
+		size_t size;						\
+		if (!(_glc_)->input)					\
+			GLC_FOPEN_IF_NECESSARY0 (_glc_, _label_);	\
+		if ((_doesParserRequireMemoryStream_) &&		\
+		    (mio_memory_get_data((_glc_)->input, &size) == NULL)) \
+		{							\
+			MIO *tmp_ = (_glc_)->input;			\
+			(_glc_)->input = mio_new_mio (tmp_, 0, 0);	\
+			mio_free (tmp_);				\
+			if (!(_glc_)->input) {				\
+				(_glc_)->err = TRUE;			\
+				goto _label_;				\
+			}						\
+		}							\
+	} while (0)
 
 #define GLC_FCLOSE(_glc_) do {                              \
     if ((_glc_)->input) {                                   \
@@ -856,6 +874,18 @@ static void verboseReportCandidate (const char *header,
 			 candidates[i].spec);
 }
 
+static boolean doesCandidatesRequireMemoryStream(const parserCandidate *candidates,
+						 int n_candidates)
+{
+	int i;
+
+	for (i = 0; i < n_candidates; i++)
+		if (doesParserRequireMemoryStream (candidates[i].lang))
+			return TRUE;
+
+	return FALSE;
+}
+
 static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx *glc,
 				       unsigned int nominate (const char *const, parserCandidate**),
 				       langType *fallback)
@@ -881,8 +911,11 @@ static langType getSpecLanguageCommon (const char *const spec, struct getLangCtx
 	}
 	else if (n_candidates > 1)
 	{
-		GLC_FOPEN_IF_NECESSARY(glc, fopen_error);
 		selectLanguage selector = commonSelector(candidates, n_candidates);
+		boolean memStreamRequired = doesCandidatesRequireMemoryStream (candidates,
+									       n_candidates);
+
+		GLC_FOPEN_IF_NECESSARY(glc, fopen_error, memStreamRequired);
 		if (selector) {
 			verbose ("	selector: %p\n", selector);
 			language = pickLanguageBySelection(selector, glc->input);
@@ -1016,7 +1049,7 @@ getFileLanguageInternal (const char *const fileName)
         if (templateBaseName)
         {
             verbose ("	pattern + template(%s): %s\n", tExt, templateBaseName);
-            GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
+            GLC_FOPEN_IF_NECESSARY(&glc, cleanup, FALSE);
             mio_rewind(glc.input);
             language = getPatternLanguage(templateBaseName, &glc,
 					  fallback + HINT_TEMPLATE);
@@ -1030,7 +1063,7 @@ getFileLanguageInternal (const char *const fileName)
     {
 	    if (fstatus->isExecutable || Option.guessLanguageEagerly)
 	    {
-		    GLC_FOPEN_IF_NECESSARY (&glc, cleanup);
+		    GLC_FOPEN_IF_NECESSARY (&glc, cleanup, FALSE);
 		    language = tasteLanguage(&glc, eager_tasters, 1,
 					    fallback + HINT_INTERP);
 	    }
@@ -1039,7 +1072,7 @@ getFileLanguageInternal (const char *const fileName)
 
 	    if (Option.guessLanguageEagerly)
 	    {
-		    GLC_FOPEN_IF_NECESSARY(&glc, cleanup);
+		    GLC_FOPEN_IF_NECESSARY(&glc, cleanup, FALSE);
 		    language = tasteLanguage(&glc, 
 					     eager_tasters + 1,
 					     ARRAY_SIZE(eager_tasters) - 1,
@@ -2107,10 +2140,7 @@ extern boolean doesParserRequireMemoryStream (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parserDefinition *const lang = LanguageTable [language];
 
-	if (lang->method & METHOD_XPATH)
-		return TRUE;
-	else
-		return FALSE;
+	return (lang->tagXpathTableCount > 0)? TRUE: FALSE;
 }
 
 extern boolean parseFile (const char *const fileName)
