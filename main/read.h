@@ -130,7 +130,7 @@ extern CONST_FILE inputFile File;
 /* InputFile: reading from fp in inputFile with updating fields in input fields */
 extern void                 freeInputFileResources (void);
 extern const unsigned char *getInpufFileData (size_t *size);
-extern boolean              openInputFile (const char *const fileName, const langType language);
+extern boolean              openInputFile (const char *const fileName, const langType language, MIO *mio);
 extern void                 closeInputFile (void);
 extern int                  getcFromInputFile (void);
 extern int                  getNthPrevCFromInputFile (unsigned int nth, int def);

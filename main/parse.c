@@ -685,9 +685,12 @@ struct getLangCtx {
     boolean     err;
 };
 
+extern MIO *getMio (const char *const fileName, const char *const openMode,
+		    boolean memStreamRequired);
+
 #define GLC_FOPEN_IF_NECESSARY0(_glc_, _label_) do {        \
     if (!(_glc_)->input) {                                  \
-        (_glc_)->input = mio_new_file((_glc_)->fileName, "rb"); \
+	    (_glc_)->input = getMio((_glc_)->fileName, "rb", FALSE);	\
         if (!(_glc_)->input) {                              \
             (_glc_)->err = TRUE;                            \
             goto _label_;                                   \
@@ -990,7 +993,7 @@ tasteLanguage (struct getLangCtx *glc, const struct taster *const tasters, int n
 }
 
 static langType
-getFileLanguageInternal (const char *const fileName)
+getFileLanguageInternal (const char *const fileName, MIO **mio)
 {
     langType language;
 
@@ -1082,6 +1085,8 @@ getFileLanguageInternal (const char *const fileName)
 
 
   cleanup:
+    if (mio && glc.input)
+	    *mio = mio_ref (glc.input);
     GLC_FCLOSE(&glc);
     if (fstatus)
 	    eStatFree (fstatus);
@@ -1100,12 +1105,15 @@ getFileLanguageInternal (const char *const fileName)
     return language;
 }
 
-extern langType getFileLanguage (const char *const fileName)
+static langType getFileLanguageAndKeepMIO (const char *const fileName, MIO **mio)
 {
 	langType l = Option.language;
 
+	if (mio)
+		*mio = NULL;
+
 	if (l == LANG_AUTO)
-		return getFileLanguageInternal(fileName);
+		return getFileLanguageInternal(fileName, mio);
 	else if (! isLanguageEnabled (l))
 	{
 		error (FATAL,
@@ -1116,6 +1124,11 @@ extern langType getFileLanguage (const char *const fileName)
 	}
 	else
 		return Option.language;
+}
+
+extern langType getFileLanguage (const char *const fileName)
+{
+	return getFileLanguageAndKeepMIO(fileName, NULL);
 }
 
 typedef void (*languageCallback)  (langType language, void* user_data);
@@ -1974,11 +1987,12 @@ extern void printLanguageList (void)
 
 static rescanReason createTagsForFile (
 		const char *const fileName, const langType language,
-		const unsigned int passCount)
+		const unsigned int passCount,
+		MIO *mio)
 {
 	rescanReason rescan = RESCAN_NONE;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	if (openInputFile (fileName, language))
+	if (openInputFile (fileName, language, mio))
 	{
 		parserDefinition *const lang = LanguageTable [language];
 
@@ -2004,7 +2018,8 @@ static rescanReason createTagsForFile (
 }
 
 static boolean createTagsWithFallback (
-		const char *const fileName, const langType language)
+	const char *const fileName, const langType language,
+	MIO *mio)
 {
 	unsigned long numTags	= numTagsAdded ();
 	MIOPos tagfpos;
@@ -2014,7 +2029,7 @@ static boolean createTagsWithFallback (
 
 	tagFilePosition (&tagfpos);
 	while ( ( whyRescan =
-	            createTagsForFile (fileName, language, ++passCount) )
+	            createTagsForFile (fileName, language, ++passCount, mio) )
 	                != RESCAN_NONE)
 	{
 		if (whyRescan == RESCAN_FAILED)
@@ -2036,11 +2051,12 @@ static boolean createTagsWithFallback (
 
 #ifdef HAVE_COPROC
 static boolean createTagsWithXcmd (
-		const char *const fileName, const langType language)
+		const char *const fileName, const langType language,
+		MIO *mio)
 {
 	boolean tagFileResized = FALSE;
 
-	if (openInputFile (fileName, language))
+	if (openInputFile (fileName, language, mio))
 	{
 		tagFileResized = invokeXcmd (fileName, language);
 
@@ -2147,9 +2163,9 @@ extern boolean parseFile (const char *const fileName)
 {
 	boolean tagFileResized = FALSE;
 	langType language;
+	MIO *mio;
 
-
-	language = getFileLanguage (fileName);
+	language = getFileLanguageAndKeepMIO (fileName, &mio);
 	Assert (language != LANG_AUTO);
 
 	if (Option.printLanguage)
@@ -2189,10 +2205,10 @@ extern boolean parseFile (const char *const fileName)
 
 		addParserPseudoTags (language);
 
-		tagFileResized = createTagsWithFallback (fileName, language);
+		tagFileResized = createTagsWithFallback (fileName, language, mio);
 #ifdef HAVE_COPROC
 		if (LanguageTable [language]->method & METHOD_XCMD_AVAILABLE)
-			tagFileResized = createTagsWithXcmd (fileName, language)? TRUE: tagFileResized;
+			tagFileResized = createTagsWithXcmd (fileName, language, mio)? TRUE: tagFileResized;
 #endif
 
 		if (Option.etags)
@@ -2204,9 +2220,13 @@ extern boolean parseFile (const char *const fileName)
 #ifdef HAVE_ICONV
 		closeConverter ();
 #endif
-
+		if (mio)
+			mio_free (mio);
 		return tagFileResized;
 	}
+
+	if (mio)
+		mio_free (mio);
 	return tagFileResized;
 }
 
