@@ -69,9 +69,11 @@ exuberant-ctags with following command line:
 
 Heavily improved language parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* ant *libxml*
+* ant (rewritten with *libxml*)
 * php
 * verilog
+* C/C++ (completely rewritten)
+
 
 New options
 ---------------------------------------------------------------------
