@@ -1023,6 +1023,18 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 					   escapeName (tag, FIELD_EXTRA));
 	}
 
+#ifdef HAVE_LIBXML
+	if (isFieldEnabled(FIELD_XPATH))
+	{
+		const char *value = escapeName (tag, FIELD_XPATH);
+		if (value)
+			length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
+					      getFieldName (FIELD_XPATH),
+					      escapeName (tag, FIELD_XPATH));
+
+	}
+#endif
+
 	return length;
 #undef sep
 }
@@ -1224,6 +1236,10 @@ static void recordTagEntryInQueue (const tagEntryInfo *const tag, tagEntryInfo* 
 		slot->extensionFields.typeRef[0] = eStrdup (slot->extensionFields.typeRef[0]);
 	if (slot->extensionFields.typeRef[1])
 		slot->extensionFields.typeRef[1] = eStrdup (slot->extensionFields.typeRef[1]);
+#ifdef HAVE_LIBXML
+	if (slot->extensionFields.xpath)
+		slot->extensionFields.xpath = eStrdup (slot->extensionFields.xpath);
+#endif
 
 	if (slot->sourceLanguage)
 		slot->sourceLanguage = eStrdup (slot->sourceLanguage);
@@ -1274,6 +1290,10 @@ static void clearTagEntryInQueue (tagEntryInfo* slot)
 		eFree ((char *)slot->extensionFields.typeRef[0]);
 	if (slot->extensionFields.typeRef[1])
 		eFree ((char *)slot->extensionFields.typeRef[1]);
+#ifdef HAVE_LIBXML
+	if (slot->extensionFields.xpath)
+		eFree ((char *)slot->extensionFields.xpath);
+#endif
 
 	if (slot->sourceLanguage)
 		eFree ((char *)slot->sourceLanguage);

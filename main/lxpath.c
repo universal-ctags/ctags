@@ -33,6 +33,7 @@ static void simpleXpathMakeTag (xmlNode *node,
 	tagEntryInfo tag;
 	xmlChar* str;
 	const kindOption *kind;
+	char *path;
 
 	str = xmlNodeGetContent(node);
 	if (str == NULL)
@@ -53,11 +54,16 @@ static void simpleXpathMakeTag (xmlNode *node,
 	tag.lineNumber = xmlGetLineNo (node);
 	tag.filePosition = getInputFilePositionForLine (tag.lineNumber);
 
+	path = (char *)xmlGetNodePath (node);
+	tag.extensionFields.xpath = path;
+
 	if (spec->make)
 		spec->make (node, spec, &tag, userData);
 	else
 		makeTagEntry (&tag);
 
+	if (path)
+		xmlFree (path);
 out:
 	xmlFree (str);
 }

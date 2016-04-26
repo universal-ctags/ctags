@@ -48,6 +48,7 @@ The following parsers have been added:
 * reStructuredText
 * Rust
 * SystemVerilog
+* SVG *libxml*
 * TTCN
 * WindRes
 * Zephir

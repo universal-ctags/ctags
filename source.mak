@@ -163,6 +163,7 @@ XML_SRCS = \
 	 parsers/maven2.c		\
 	 parsers/dbusintrospect.c	\
 	 parsers/glade.c		\
+	 parsers/svg.c			\
 	 \
 	 $(NULL)
 

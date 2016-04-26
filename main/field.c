@@ -53,6 +53,7 @@ static const char *renderFieldPattern (const tagEntryInfo *const tag, const char
 static const char *renderFieldRole (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldRefMarker (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldExtra (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldXpath (const tagEntryInfo *const tag, const char *value, vString* b);
 
 #define DEFINE_FIELD_SPEC(L, N, V, H, F)	\
 	{					\
@@ -135,6 +136,9 @@ static fieldSpec fieldSpecsUniversal [] = {
 	DEFINE_FIELD_SPEC ('E', "extra",   FALSE,
 			   "Extra tag type information",
 			   renderFieldExtra),
+	DEFINE_FIELD_SPEC ('x', "xpath",   FALSE,
+			   "xpath for the tag",
+			   renderFieldXpath),
 };
 
 
@@ -666,6 +670,19 @@ static const char *renderFieldExtra (const tagEntryInfo *const tag,
 	else
 		return NULL;
 }
+
+static const char *renderFieldXpath (const tagEntryInfo *const tag,
+				     const char *value,
+				     vString* b)
+{
+#ifdef HAVE_LIBXML
+	if (tag->extensionFields.xpath)
+		return renderEscapedString (tag->extensionFields.xpath,
+					    tag, b);
+#endif
+	return NULL;
+}
+
 
 extern boolean isFieldEnabled (fieldType type)
 {
