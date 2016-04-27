@@ -16,7 +16,7 @@
 #include "routines.h"
 #include "selectors.h"
 
-static const tagRegexTable const rexxTagRegexTable [] = {
+static const tagRegexTable rexxTagRegexTable [] = {
 	{"^([A-Za-z0-9@#$\\.!?_]+)[ \t]*:", "\\1",
 	 "s,subroutine,subroutines", NULL},
 };

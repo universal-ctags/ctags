@@ -122,7 +122,7 @@ typedef struct sOcaKeywordDesc {
 
 typedef ocamlKeyword ocaToken;
 
-static const keywordTable const OcamlKeywordTable[] = {
+static const keywordTable OcamlKeywordTable[] = {
 	{ "and"       , OcaKEYWORD_and       }, 
 	{ "begin"     , OcaKEYWORD_begin     }, 
 	{ "class"     , OcaKEYWORD_class     }, 

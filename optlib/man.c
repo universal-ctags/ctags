@@ -33,7 +33,7 @@ extern parserDefinition* ManParser (void)
 		NULL
 	};
 
-	static const tagRegexTable const ManTagRegexTable [] = {
+	static const tagRegexTable ManTagRegexTable [] = {
 		{"^\\.TH[[:space:]]{1,}\"([^\"]{1,})\".*", "\\1",
 		"t,title,titles", "{exclusive}{icase}{scope=push}"},
 		{"^\\.TH[[:space:]]{1,}([^[:space:]]{1,}).*", "\\1",
