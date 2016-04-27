@@ -420,6 +420,11 @@ extern void closeInputFile (void)
 	}
 }
 
+extern void *getInputFileUserData(void)
+{
+	return mio_get_user_data (File.fp);
+}
+
 /*  Action to take for each encountered input newline.
  */
 static void fileNewline (void)

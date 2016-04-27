@@ -132,6 +132,7 @@ extern void                 freeInputFileResources (void);
 extern const unsigned char *getInpufFileData (size_t *size);
 extern boolean              openInputFile (const char *const fileName, const langType language, MIO *mio);
 extern void                 closeInputFile (void);
+extern void                *getInputFileUserData(void);
 extern int                  getcFromInputFile (void);
 extern int                  getNthPrevCFromInputFile (unsigned int nth, int def);
 extern int                  skipToCharacterInInputFile (int c);
