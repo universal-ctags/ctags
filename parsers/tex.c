@@ -125,7 +125,7 @@ static kindOption TexKinds [] = {
 	{ TRUE,  'i', "include",	  	  "includes"		   }
 };
 
-static const keywordTable const TexKeywordTable [] = {
+static const keywordTable TexKeywordTable [] = {
 	/* keyword			keyword ID */
 	{ "part",			KEYWORD_part				},
 	{ "chapter",		KEYWORD_chapter				},

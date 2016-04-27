@@ -136,7 +136,7 @@ static kindOption JsKinds [] = {
 	{ TRUE,  'v', "variable",	  "global variables"   }
 };
 
-static const keywordTable const JsKeywordTable [] = {
+static const keywordTable JsKeywordTable [] = {
 	/* keyword		keyword ID */
 	{ "function",	KEYWORD_function			},
 	{ "Function",	KEYWORD_capital_function	},
