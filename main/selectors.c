@@ -301,21 +301,16 @@ static void suppressWarning (void *ctx __unused__, const char *msg __unused__, .
 }
 
 static xmlDocPtr
-xmlParseFILE (MIO *input)
+xmlParseMIO (MIO *input)
 {
-	vString *buf;
-	xmlDocPtr doc;
+	const unsigned char *buf;
+	size_t len;
 
-	buf = vStringNewFile (input);
-	if (!buf)
-		return NULL;
+	buf = mio_memory_get_data (input, &len);
+	Assert (buf);
 
 	xmlSetGenericErrorFunc (NULL, suppressWarning);
-	doc = xmlParseMemory(vStringValue(buf), vStringLength (buf));
-
-	vStringDelete (buf);
-
-	return doc;
+	return xmlParseMemory((const char *)buf, len);
 }
 
 static const char *
@@ -369,7 +364,7 @@ selectByDTD (MIO *input)
 	xmlDocPtr doc;
 	const char *r = NULL;
 
-	doc = xmlParseFILE (input);
+	doc = xmlParseMIO (input);
 	if (doc == NULL)
 		return NULL;
 

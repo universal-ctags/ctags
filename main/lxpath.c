@@ -135,6 +135,22 @@ static void suppressWarning (void *ctx __unused__, const char *msg __unused__, .
 {
 }
 
+static xmlDocPtr makeXMLDoc (void)
+{
+	const unsigned char* data;
+	size_t size;
+	xmlDocPtr doc = NULL;
+
+	data = getInpufFileData (&size);
+	if (data)
+	{
+		xmlLineNumbersDefault (1);
+		doc = xmlParseMemory((const char*)data, size);
+	}
+
+	return doc;
+}
+
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 			 const tagXpathTableTable *xpathTableTable,
 			 const kindOption* const kinds,void *userData)
@@ -149,7 +165,9 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 		findRegexTags ();
 
 		xmlSetGenericErrorFunc (NULL, suppressWarning);
-		doc = xmlParseFile(getInputFileName());
+
+		doc = makeXMLDoc ();
+
 		if (doc == NULL)
 		{
 			verbose ("could not parse %s as a XML file\n", getInputFileName());

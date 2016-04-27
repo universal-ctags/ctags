@@ -22,6 +22,7 @@
 
 #include "mio.h"
 #include "routines.h"
+#include "debug.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -45,8 +46,8 @@
  * file based operations and in-memory operations. Its goal is to ease the port
  * of an application that uses C file I/O API to perform in-memory operations.
  *
- * A #MIO object is created using mio_new_file() or mio_new_memory(), depending
- * on whether you want file or in-memory operations, and destroyed using
+ * A #MIO object is created using mio_new_file(), mio_new_memory() or mio_new_mio(),
+ * depending on whether you want file or in-memory operations, and destroyed using
  * mio_free(). There is also some other convenient API to create file-based
  * #MIO objects for more complex cases, such as mio_new_file_full() and
  * mio_new_fp().
@@ -236,6 +237,67 @@ MIO *mio_new_memory (unsigned char *data,
 }
 
 /**
+ * mio_new_mio:
+ * @base: The original mio
+ * @start: stream offset of the @base where new mio starts
+ * @size: the length of the data copied from @base to new mio
+ *
+ * Creates a new #MIO object by copying data from existing #MIO (@base).
+ * The range for copying are given with @start and @size.
+ * Copying data at the range from @start to the end of @base is
+ * done if 0 is given as @size.
+ *
+ * If @size(!= 0) is larger than the length from @start to the end of
+ * @base, %NULL is return.
+ *
+ * The function doesn't move the file position of @base.
+ *
+ * Free-function: mio_free()
+ *
+ */
+
+MIO *mio_new_mio (MIO *base, long start, size_t size)
+{
+	unsigned char *data;
+	long original_pos;
+	MIO *submio;
+	size_t r;
+
+	original_pos = mio_tell (base);
+
+	if (size == 0)
+	{
+		long end;
+
+		if (mio_seek (base, 0, SEEK_END) != 0)
+			return NULL;
+		end = mio_tell (base);
+		size = end - start;
+		Assert (size >= 0);
+	}
+
+	if (mio_seek (base, start, SEEK_SET) != 0)
+		return NULL;
+
+	data = xMalloc (size, unsigned char);
+	r= mio_read (base, data, 1, size);
+	mio_seek (base, original_pos, SEEK_SET);
+
+	if (r != size)
+		goto cleanup;
+
+	submio = mio_new_memory (data, size, eRealloc, eFree);
+	if (! submio)
+		goto cleanup;
+
+	return submio;
+
+cleanup:
+	eFree (data);
+	return NULL;
+}
+
+/**
  * mio_file_get_fp:
  * @mio: A #MIO object
  *
@@ -308,7 +370,7 @@ int mio_free (MIO *mio)
 			mio->impl.file.close_func = NULL;
 			mio->impl.file.fp = NULL;
 		}
-		else
+		else if (mio->type == MIO_TYPE_MEMORY)
 		{
 			if (mio->impl.mem.free_func)
 				mio->impl.mem.free_func (mio->impl.mem.buf);
@@ -321,6 +383,8 @@ int mio_free (MIO *mio)
 			mio->impl.mem.eof = FALSE;
 			mio->impl.mem.error = FALSE;
 		}
+		else
+			AssertNotReached ();
 
 		eFree (mio);
 	}
@@ -350,7 +414,7 @@ size_t mio_read (MIO *mio,
 {
 	if (mio->type == MIO_TYPE_FILE)
 		return fread (ptr_, size, nmemb, mio->impl.file.fp);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 	{
 		size_t n_read = 0;
 
@@ -384,6 +448,11 @@ size_t mio_read (MIO *mio,
 		}
 
 		return n_read;
+	}
+	else
+	{
+		AssertNotReached ();
+		return 0;
 	}
 }
 
@@ -493,7 +562,7 @@ size_t mio_write (MIO *mio,
 {
 	if (mio->type == MIO_TYPE_FILE)
 		return fwrite (ptr, size, nmemb, mio->impl.file.fp);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 	{
 		size_t n_written = 0;
 
@@ -508,6 +577,11 @@ size_t mio_write (MIO *mio,
 		}
 
 		return n_written;
+	}
+	else
+	{
+		AssertNotReached ();
+		return 0;
 	}
 }
 
@@ -525,7 +599,7 @@ int mio_putc (MIO *mio, int c)
 {
 	if (mio->type == MIO_TYPE_FILE)
 		return fputc (c, mio->impl.file.fp);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 	{
 		int rv = EOF;
 
@@ -537,6 +611,11 @@ int mio_putc (MIO *mio, int c)
 		}
 
 		return rv;
+	}
+	else
+	{
+		AssertNotReached ();
+		return 0;
 	}
 }
 
@@ -553,7 +632,7 @@ int mio_puts (MIO *mio, const char *s)
 {
 	if (mio->type == MIO_TYPE_FILE)
 		return fputs (s, mio->impl.file.fp);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 	{
 		int rv = EOF;
 		size_t len;
@@ -567,6 +646,11 @@ int mio_puts (MIO *mio, const char *s)
 		}
 
 		return rv;
+	}
+	else
+	{
+		AssertNotReached ();
+		return 0;
 	}
 }
 
@@ -586,7 +670,7 @@ int mio_vprintf (MIO *mio, const char *format, va_list ap)
 {
 	if (mio->type == MIO_TYPE_FILE)
 		return vfprintf (mio->impl.file.fp, format, ap);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 	{
 		int rv = -1;
 		size_t n;
@@ -625,6 +709,11 @@ int mio_vprintf (MIO *mio, const char *format, va_list ap)
 		}
 
 		return rv;
+	}
+	else
+	{
+		AssertNotReached ();
+		return 0;
 	}
 }
 
@@ -665,7 +754,7 @@ int mio_getc (MIO *mio)
 {
 	if (mio->type == MIO_TYPE_FILE)
 		return fgetc (mio->impl.file.fp);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 	{
 		int rv = EOF;
 
@@ -684,6 +773,11 @@ int mio_getc (MIO *mio)
 			mio->impl.mem.eof = TRUE;
 
 		return rv;
+	}
+	else
+	{
+		AssertNotReached ();
+		return 0;
 	}
 }
 
@@ -707,7 +801,7 @@ int mio_ungetc (MIO *mio, int ch)
 {
 	if (mio->type == MIO_TYPE_FILE)
 		return ungetc (ch, mio->impl.file.fp);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 	{
 		int rv = EOF;
 
@@ -719,6 +813,11 @@ int mio_ungetc (MIO *mio, int ch)
 		}
 
 		return rv;
+	}
+	else
+	{
+		AssertNotReached ();
+		return 0;
 	}
 }
 
@@ -738,7 +837,7 @@ char *mio_gets (MIO *mio, char *s, size_t size)
 {
 	if (mio->type == MIO_TYPE_FILE)
 		return fgets (s, (int)size, mio->impl.file.fp);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 	{
 		char *rv = NULL;
 
@@ -774,6 +873,11 @@ char *mio_gets (MIO *mio, char *s, size_t size)
 
 		return rv;
 	}
+	else
+	{
+		AssertNotReached ();
+		return 0;
+	}
 }
 
 /**
@@ -787,11 +891,13 @@ void mio_clearerr (MIO *mio)
 {
 	if (mio->type == MIO_TYPE_FILE)
 		clearerr (mio->impl.file.fp);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 	{
 		mio->impl.mem.error = FALSE;
 		mio->impl.mem.eof = FALSE;
 	}
+	else
+		AssertNotReached ();
 }
 
 /**
@@ -807,8 +913,13 @@ int mio_eof (MIO *mio)
 {
 	if (mio->type == MIO_TYPE_FILE)
 		return feof (mio->impl.file.fp);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 		return mio->impl.mem.eof != FALSE;
+	else
+	{
+		AssertNotReached ();
+		return 0;
+	}
 }
 
 /**
@@ -824,8 +935,13 @@ int mio_error (MIO *mio)
 {
 	if (mio->type == MIO_TYPE_FILE)
 		return ferror (mio->impl.file.fp);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 		return mio->impl.mem.error != FALSE;
+	else
+	{
+		AssertNotReached ();
+		return 0;
+	}
 }
 
 /**
@@ -846,7 +962,7 @@ int mio_seek (MIO *mio, long offset, int whence)
 {
 	if (mio->type == MIO_TYPE_FILE)
 		return fseek (mio->impl.file.fp, offset, whence);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 	{
 		/* FIXME: should we support seeking out of bounds like lseek() seems to do? */
 		int rv = -1;
@@ -897,6 +1013,12 @@ int mio_seek (MIO *mio, long offset, int whence)
 
 		return rv;
 	}
+	else
+	{
+		AssertNotReached ();
+		return 0;
+	}
+
 }
 
 /**
@@ -913,7 +1035,7 @@ long mio_tell (MIO *mio)
 {
 	if (mio->type == MIO_TYPE_FILE)
 		return ftell (mio->impl.file.fp);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 	{
 		long rv = -1;
 
@@ -927,6 +1049,11 @@ long mio_tell (MIO *mio)
 			rv = (long)mio->impl.mem.pos;
 
 		return rv;
+	}
+	else
+	{
+		AssertNotReached ();
+		return 0;
 	}
 }
 
@@ -942,13 +1069,15 @@ void mio_rewind (MIO *mio)
 {
 	if (mio->type == MIO_TYPE_FILE)
 		rewind (mio->impl.file.fp);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 	{
 		mio->impl.mem.pos = 0;
 		mio->impl.mem.ungetch = EOF;
 		mio->impl.mem.eof = FALSE;
 		mio->impl.mem.error = FALSE;
 	}
+	else
+		AssertNotReached ();
 }
 
 /**
@@ -970,7 +1099,7 @@ int mio_getpos (MIO *mio, MIOPos *pos)
 	pos->type = mio->type;
 	if (mio->type == MIO_TYPE_FILE)
 		rv = fgetpos (mio->impl.file.fp, &pos->impl.file);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 	{
 		rv = -1;
 
@@ -987,6 +1116,9 @@ int mio_getpos (MIO *mio, MIOPos *pos)
 			rv = 0;
 		}
 	}
+	else
+		AssertNotReached();
+
 #ifdef MIO_DEBUG
 	if (rv != -1)
 	{
@@ -1031,7 +1163,7 @@ int mio_setpos (MIO *mio, MIOPos *pos)
 
 	if (mio->type == MIO_TYPE_FILE)
 		rv = fsetpos (mio->impl.file.fp, &pos->impl.file);
-	else
+	else if (mio->type == MIO_TYPE_MEMORY)
 	{
 		rv = -1;
 
@@ -1044,6 +1176,8 @@ int mio_setpos (MIO *mio, MIOPos *pos)
 			rv = 0;
 		}
 	}
+	else
+		AssertNotReached ();
 
 	return rv;
 }

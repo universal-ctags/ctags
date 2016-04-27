@@ -68,6 +68,11 @@ extern void freeInputFileResources (void)
 	freeInputFileInfo (&File.source);
 }
 
+extern const unsigned char *getInpufFileData (size_t *size)
+{
+	return mio_memory_get_data (File.fp, size);
+}
+
 /*
  * inputLineFposMap related functions
  */
@@ -298,7 +303,8 @@ static boolean parseLineDirective (void)
 
 #define MAX_IN_MEMORY_FILE_SIZE (1024*1024)
 
-static MIO *getMio (const char *const fileName, const char *const openMode)
+static MIO *getMio (const char *const fileName, const char *const openMode,
+		    boolean memStreamRequired)
 {
 	FILE *src;
 	fileStatus *st;
@@ -308,7 +314,8 @@ static MIO *getMio (const char *const fileName, const char *const openMode)
 	st = eStat (fileName);
 	size = st->size;
 	eStatFree (st);
-	if (size > MAX_IN_MEMORY_FILE_SIZE || size == 0)
+	if ((!memStreamRequired)
+	    && (size > MAX_IN_MEMORY_FILE_SIZE || size == 0))
 		return mio_new_file (fileName, openMode);
 
 	data = eMalloc (size);
@@ -317,7 +324,10 @@ static MIO *getMio (const char *const fileName, const char *const openMode)
 	{
 		eFree (data);
 		fclose (src);
-		return mio_new_file (fileName, openMode);
+		if (memStreamRequired)
+			return NULL;
+		else
+			return mio_new_file (fileName, openMode);
 	}
 	fclose (src);
 	return mio_new_memory (data, size, eRealloc, eFree);
@@ -330,6 +340,7 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 {
 	const char *const openMode = "rb";
 	boolean opened = FALSE;
+	boolean memStreamRequired;
 
 	/*	If another file was already open, then close it.
 	 */
@@ -348,7 +359,8 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 		File.sourceTagPathHolder = stringListNew ();
 	stringListClear (File.sourceTagPathHolder);
 
-	File.fp = getMio (fileName, openMode);
+	memStreamRequired = doesParserRequireMemoryStream (language);
+	File.fp = getMio (fileName, openMode, memStreamRequired);
 	if (File.fp == NULL)
 		error (WARNING | PERROR, "cannot open \"%s\"", fileName);
 	else

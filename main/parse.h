@@ -230,6 +230,7 @@ extern void printLanguageKinds (const langType language, boolean allKindFields);
 extern void printLanguageRoles (const langType language, const char* letters);
 extern void printLanguageAliases (const langType language);
 extern void printLanguageList (void);
+extern boolean doesParserRequireMemoryStream (const langType language);
 extern boolean parseFile (const char *const fileName);
 
 #ifdef HAVE_ICONV
