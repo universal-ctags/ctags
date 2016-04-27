@@ -141,6 +141,13 @@ static xmlDocPtr makeXMLDoc (void)
 	size_t size;
 	xmlDocPtr doc = NULL;
 
+	doc = getInputFileUserData ();
+	if (doc)
+	{
+		verbose ("reuse xml doc data\n");
+		return doc;
+	}
+
 	data = getInpufFileData (&size);
 	if (data)
 	{
@@ -192,7 +199,9 @@ out:
 	if (usedAsEnterPoint)
 	{
 		xmlXPathFreeContext (ctx);
-		xmlFreeDoc (doc);
+
+		if (doc != getInputFileUserData ())
+			xmlFreeDoc (doc);
 	}
 }
 

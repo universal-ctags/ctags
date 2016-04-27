@@ -310,6 +310,7 @@ xmlParseMIO (MIO *input)
 	Assert (buf);
 
 	xmlSetGenericErrorFunc (NULL, suppressWarning);
+	xmlLineNumbersDefault (1);
 	return xmlParseMemory((const char *)buf, len);
 }
 
@@ -370,7 +371,11 @@ selectByDTD (MIO *input)
 
 	r = selectParserForXmlDoc (doc);
 
-	xmlFreeDoc (doc);
+	if (r == NULL)
+		xmlFreeDoc (doc);
+	else
+		mio_attach_user_data (input,
+				      doc,(MIODestroyNotify)xmlFreeDoc);
 
 	return r;
 }
