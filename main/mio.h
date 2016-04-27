@@ -152,4 +152,7 @@ int mio_getpos (MIO *mio, MIOPos *pos);
 int mio_setpos (MIO *mio, MIOPos *pos);
 int mio_flush (MIO *mio);
 
+void  mio_attach_user_data (MIO *mio, void *user_data, MIODestroyNotify user_data_free_func);
+void *mio_get_user_data (MIO *mio);
+
 #endif /* MIO_H */

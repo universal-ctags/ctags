@@ -65,6 +65,12 @@
  */
 
 
+typedef struct _MIOUserData MIOUserData;
+struct _MIOUserData {
+	void *d;
+	MIODestroyNotify f;
+};
+
 /**
  * MIO:
  *
@@ -92,6 +98,7 @@ struct _MIO {
 			boolean eof;
 		} mem;
 	} impl;
+	MIOUserData udata;
 };
 
 
@@ -146,6 +153,8 @@ MIO *mio_new_file_full (const char *filename,
 			mio->impl.file.fp = fp;
 			mio->impl.file.close_func = close_func;
 			mio->refcount = 1;
+			mio->udata.d = NULL;
+			mio->udata.f = NULL;
 		}
 	}
 
@@ -205,6 +214,8 @@ MIO *mio_new_fp (FILE *fp, MIOFCloseFunc close_func)
 		mio->impl.file.fp = fp;
 		mio->impl.file.close_func = close_func;
 		mio->refcount = 1;
+		mio->udata.d = NULL;
+		mio->udata.f = NULL;
 	}
 
 	return mio;
@@ -267,6 +278,8 @@ MIO *mio_new_memory (unsigned char *data,
 		mio->impl.mem.eof = FALSE;
 		mio->impl.mem.error = FALSE;
 		mio->refcount = 1;
+		mio->udata.d = NULL;
+		mio->udata.f = NULL;
 	}
 
 	return mio;
@@ -416,6 +429,9 @@ int mio_free (MIO *mio)
 	{
 		if (--mio->refcount)
 			return 0;
+
+		if (mio->udata.d && mio->udata.f)
+			mio->udata.f (mio->udata.d);
 
 		if (mio->type == MIO_TYPE_FILE)
 		{
@@ -1251,4 +1267,39 @@ int mio_flush (MIO *mio)
 	if (mio->type == MIO_TYPE_FILE)
 		return fflush (mio->impl.file.fp);
 	return 0;
+}
+
+
+/**
+ * mio_attach_user_data:
+ * @mio: A #MIO object
+ * @user_data: a pointer to any data object
+ * @user_data_free_func: a call back function to destroy the data object passed as @user_data
+ *
+ * Attach any data object to a #MIO object. Attached data can be got with
+ * mio_get_user_data(). The attached data is destroyed when new data is attached to
+ * the #MIO object, or #the MIO object itself is destroyed. For destroying the data
+ * @user_data_free_func is used.
+ *
+ */
+
+void  mio_attach_user_data (MIO *mio, void *user_data, MIODestroyNotify user_data_free_func)
+{
+	if (mio->udata.d && mio->udata.f)
+		mio->udata.f (mio->udata.d);
+
+	mio->udata.d = user_data;
+	mio->udata.f = user_data_free_func;
+}
+
+/**
+ * mio_get_user_data:
+ * @mio: A #MIO object
+ *
+ * Returns: user data attached with mio_attach_user_data() to a #MIO object.
+ *
+ */
+void *mio_get_user_data (MIO *mio)
+{
+	return mio->udata.d;
 }
