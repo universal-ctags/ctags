@@ -66,6 +66,36 @@
 
 
 /**
+ * MIO:
+ *
+ * An object representing a #MIO stream. No assumptions should be made about
+ * what compose this object, and none of its fields should be accessed directly.
+ */
+struct _MIO {
+	/*< private >*/
+	MIOType type;
+	unsigned int refcount;
+	union {
+		struct {
+			FILE *fp;
+			MIOFCloseFunc close_func;
+		} file;
+		struct {
+			unsigned char *buf;
+			int ungetch;
+			size_t pos;
+			size_t size;
+			size_t allocated_size;
+			MIOReallocFunc realloc_func;
+			MIODestroyNotify free_func;
+			boolean error;
+			boolean eof;
+		} mem;
+	} impl;
+};
+
+
+/**
  * mio_new_file_full:
  * @filename: Filename to open, passed as-is to @open_func as the first argument
  * @mode: Mode in which open the file, passed as-is to @open_func as the second

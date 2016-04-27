@@ -106,34 +106,6 @@ struct _MIOPos {
 	} impl;
 };
 
-/**
- * MIO:
- *
- * An object representing a #MIO stream. No assumptions should be made about
- * what compose this object, and none of its fields should be accessed directly.
- */
-struct _MIO {
-	/*< private >*/
-	MIOType type;
-	unsigned int refcount;
-	union {
-		struct {
-			FILE *fp;
-			MIOFCloseFunc close_func;
-		} file;
-		struct {
-			unsigned char *buf;
-			int ungetch;
-			size_t pos;
-			size_t size;
-			size_t allocated_size;
-			MIOReallocFunc realloc_func;
-			MIODestroyNotify free_func;
-			boolean error;
-			boolean eof;
-		} mem;
-	} impl;
-};
 
 
 MIO *mio_new_file (const char *filename, const char *mode);
