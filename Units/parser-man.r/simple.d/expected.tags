@@ -1,0 +1,4 @@
+CTAGS	input.1	/^.TH CTAGS 1 "Version 0.0.0" "Darren Hiebert" "Universal Ctags"$/;"	t
+DESCRIPTION	input.1	/^.SH "DESCRIPTION"$/;"	s	title:CTAGS
+NAME	input.1	/^.SH "NAME"$/;"	s	title:CTAGS
+SYNOPSIS	input.1	/^.SH SYNOPSIS$/;"	s	title:CTAGS
