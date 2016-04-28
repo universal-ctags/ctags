@@ -320,7 +320,7 @@ sub emit_regexs {
     return if (! @{$opts->{'regexs'}});
 
     print <<EOF;
-	static const tagRegexTable const $opts->{'Clangdef'}TagRegexTable [] = {
+	static const tagRegexTable $opts->{'Clangdef'}TagRegexTable [] = {
 EOF
     for (@{$opts->{'regexs'}}) {
 	my $flags = $_-> {'flags'}? '"' . $_-> {'flags'} . '"': "NULL";
