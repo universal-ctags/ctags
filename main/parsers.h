@@ -57,6 +57,7 @@
 	LispParser, \
 	LuaParser, \
 	M4Parser, \
+	ManParser, \
 	MakefileParser, \
 	MatLabParser, \
 	ObjcParser, \
