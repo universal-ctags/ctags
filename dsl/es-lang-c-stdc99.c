@@ -108,7 +108,7 @@ struct _EsObjectClass
   size_t         size;
   void           (* free)  (EsObject* object);
   int            (* equal) (const EsObject* self, const EsObject* other);
-  void           (* print) (const EsObject* object, FILE* fp);
+  void           (* print) (const EsObject* object, MIO* fp);
   char           atom_p;
   EsSingleton  **obarray;
   const char*    name;
@@ -117,35 +117,35 @@ struct _EsObjectClass
 
 static void es_nil_free(EsObject* object);
 static int  es_nil_equal(const EsObject* self, const EsObject* other);
-static void es_nil_print(const EsObject* object, FILE* fp);
+static void es_nil_print(const EsObject* object, MIO* fp);
 
 static void es_integer_free(EsObject* object);
 static int  es_integer_equal(const EsObject* self, const EsObject* other);
-static void es_integer_print(const EsObject* object, FILE* fp);
+static void es_integer_print(const EsObject* object, MIO* fp);
 
 static void es_real_free(EsObject* object);
 static int  es_real_equal(const EsObject* self, const EsObject* other);
-static void es_real_print(const EsObject* object, FILE* fp);
+static void es_real_print(const EsObject* object, MIO* fp);
 
 static void es_boolean_free(EsObject* object);
 static int  es_boolean_equal(const EsObject* self, const EsObject* other);
-static void es_boolean_print(const EsObject* object, FILE* fp);
+static void es_boolean_print(const EsObject* object, MIO* fp);
 
 static void es_string_free(EsObject* object);
 static int  es_string_equal(const EsObject* self, const EsObject* other);
-static void es_string_print(const EsObject* self, FILE* fp);
+static void es_string_print(const EsObject* self, MIO* fp);
 
 static void es_symbol_free(EsObject* object);
 static int  es_symbol_equal(const EsObject* self, const EsObject* other);
-static void es_symbol_print(const EsObject* object, FILE* fp);
+static void es_symbol_print(const EsObject* object, MIO* fp);
 
 static void es_cons_free(EsObject* object);
 static int  es_cons_equal(const EsObject* self, const EsObject* other);
-static void es_cons_print(const EsObject* object, FILE* fp);
+static void es_cons_print(const EsObject* object, MIO* fp);
 
 static void es_error_free(EsObject* object);
 static int  es_error_equal(const EsObject* self, const EsObject* other);
-static void es_error_print(const EsObject* other, FILE* fp);
+static void es_error_print(const EsObject* other, MIO* fp);
 
 
 static EsSingleton* es_obarray_intern(EsType type, const char* name);
@@ -232,6 +232,38 @@ static EsObjectClass classes[] = {
 
 
 
+static MIO *mio_stdout (void)
+{
+  static MIO  *out;
+
+  if (out == NULL)
+    out = mio_new_fp (stdout, NULL);
+
+  return out;
+}
+
+static MIO *mio_stdin (void)
+{
+  static MIO  *out;
+
+  if (out == NULL)
+    out = mio_new_fp (stdin, NULL);
+
+  return out;
+}
+
+static MIO *mio_stderr (void)
+{
+  static MIO  *out;
+
+  if (out == NULL)
+    out = mio_new_fp (stderr, NULL);
+
+  return out;
+}
+
+
+
 static EsObjectClass*
 class_of(const EsObject* object)
 {
@@ -249,7 +281,7 @@ es_object_new(EsType type)
   r->ref_count = 1;
 
   if (es_debug)
-    fprintf(stderr, ";; new{%s}: 0x%p\n",
+    mio_printf(mio_stderr(), ";; new{%s}: 0x%p\n",
 	    (&classes[type])->name,
 	    r);
 
@@ -284,7 +316,7 @@ es_object_ref           (EsObject*       object)
 	return object;
 
       if (es_debug)
-	fprintf(stderr, ";; ref{%s}: [%d]0x%p\n",
+	mio_printf(mio_stderr(), ";; ref{%s}: [%d]0x%p\n",
 		class_of(object)->name,
 		object->ref_count,
 		object);
@@ -305,20 +337,20 @@ es_object_unref         (EsObject*       object)
       if (object->ref_count == 0)
 	if ((1 || es_debug))
 	  {
-	    fprintf(stderr, "*** ref_count < 0: 0x%p ***\n", object);
-	    fprintf(stderr, "*** BOOSTING while(1). ***\n");
+	    mio_printf(mio_stderr(), "*** ref_count < 0: 0x%p ***\n", object);
+	    mio_printf(mio_stderr(), "*** BOOSTING while(1). ***\n");
 	    while (1);
 	  }
 
       object->ref_count--;
       if (es_debug)
-	fprintf(stderr, ";; unref{%s}: [%d]0x%p\n",
+	mio_printf(mio_stderr(), ";; unref{%s}: [%d]0x%p\n",
 		class_of(object)->name,
 		object->ref_count, object);
       if (object->ref_count == 0)
 	{
 	  if (es_debug)
-	    fprintf(stderr, ";; free{%s}: 0x%p\n",
+	    mio_printf(mio_stderr(), ";; free{%s}: 0x%p\n",
 		    class_of(object)->name,
 		    object);
 	  class_of(object)->free(object);
@@ -379,9 +411,9 @@ es_nil_equal(const EsObject* self, const EsObject* other)
 }
 
 static void
-es_nil_print(const EsObject* object, FILE* fp)
+es_nil_print(const EsObject* object, MIO* fp)
 {
-  fputs("()", fp);
+  mio_puts(fp, "()");
 }
 
 /*
@@ -410,9 +442,9 @@ es_integer_get (const EsObject*   object)
     return ((EsInteger *)object)->value;
   else
     {
-      fprintf(stderr, ";; es_integer_get, Wrong type argument: ");
-      es_print(object, stderr);
-      fputc('\n', stderr);
+      mio_printf(mio_stderr(), ";; es_integer_get, Wrong type argument: ");
+      es_print(object, mio_stderr());
+      mio_putc(mio_stderr(), '\n');
       return -1;
     }
 }
@@ -431,9 +463,9 @@ es_integer_equal(const EsObject* self, const EsObject* other)
 }
 
 static void
-es_integer_print(const EsObject* object, FILE* fp)
+es_integer_print(const EsObject* object, MIO* fp)
 {
-  fprintf(fp, "%d", es_integer_get(object));
+  mio_printf(fp, "%d", es_integer_get(object));
 }
 
 
@@ -463,9 +495,9 @@ es_real_get (const EsObject*   object)
     return ((EsReal *)object)->value;
   else
     {
-      fprintf(stderr, ";; es_real_get, Wrong type argument: ");
-      es_print(object, stderr);
-      fputc('\n', stderr);
+      mio_printf(mio_stderr(), ";; es_real_get, Wrong type argument: ");
+      es_print(object, mio_stderr());
+      mio_putc(mio_stderr(), '\n');
       return -1;
     }
 }
@@ -485,9 +517,9 @@ es_real_equal(const EsObject* self, const EsObject* other)
 }
 
 static void
-es_real_print(const EsObject* object, FILE* fp)
+es_real_print(const EsObject* object, MIO* fp)
 {
-  fprintf(fp, "%f", es_real_get(object));
+  mio_printf(fp, "%f", es_real_get(object));
 }
 
 /*
@@ -513,9 +545,9 @@ es_number_get  (const EsObject*   object)
       r = es_real_get(object);
       break;
     default:
-      fprintf(stderr, ";; es_number_get, Wrong type argument: ");
-      es_print(object, stderr);
-      fputc('\n', stderr);
+      mio_printf(mio_stderr(), ";; es_number_get, Wrong type argument: ");
+      es_print(object, mio_stderr());
+      mio_putc(mio_stderr(), '\n');
       r = -1.0;
       break;
     }
@@ -559,9 +591,9 @@ es_boolean_get (const EsObject*   object)
     return ((EsBoolean *)object)->value;
   else
     {
-      fprintf(stderr, ";; es_boolean_get, Wrong type argument: ");
-      es_print(object, stderr);
-      fputc('\n', stderr);
+      mio_printf(mio_stderr(), ";; es_boolean_get, Wrong type argument: ");
+      es_print(object, mio_stderr());
+      mio_putc(mio_stderr(), '\n');
       return -1;
     }
 }
@@ -579,9 +611,9 @@ es_boolean_equal(const EsObject* self, const EsObject* other)
 }
 
 static void
-es_boolean_print(const EsObject* object, FILE* fp)
+es_boolean_print(const EsObject* object, MIO* fp)
 {
-  fprintf(fp, "#%c", (es_boolean_get(object)? 't': 'f'));
+  mio_printf(fp, "#%c", (es_boolean_get(object)? 't': 'f'));
 }
 
 /*
@@ -663,9 +695,9 @@ es_symbol_name  (const EsObject*   object)
     return es_singleton_get((EsSingleton*)object);
   else
     {
-      fprintf(stderr, ";; es_symbol_name, Wrong type argument: ");
-      es_print(object, stderr);
-      fputc('\n', stderr);
+      mio_printf(mio_stderr(), ";; es_symbol_name, Wrong type argument: ");
+      es_print(object, mio_stderr());
+      mio_putc(mio_stderr(), '\n');
       return NULL;
     }
 }
@@ -682,9 +714,9 @@ void*        es_symbol_set_data (const EsObject*   object, void *data)
     }
   else
     {
-      fprintf(stderr, ";; es_symbol_set_data, Wrong type argument: ");
-      es_print(object, stderr);
-      fputc('\n', stderr);
+      mio_printf(mio_stderr(), ";; es_symbol_set_data, Wrong type argument: ");
+      es_print(object, mio_stderr());
+      mio_putc(mio_stderr(), '\n');
       return NULL;
     }
 }
@@ -695,9 +727,9 @@ void*        es_symbol_get_data (const EsObject*   object)
       return ((EsSymbol*)object)->data;
   else
     {
-      fprintf(stderr, ";; es_symbol_get_data, Wrong type argument: ");
-      es_print(object, stderr);
-      fputc('\n', stderr);
+      mio_printf(mio_stderr(), ";; es_symbol_get_data, Wrong type argument: ");
+      es_print(object, mio_stderr());
+      mio_putc(mio_stderr(), '\n');
       return NULL;
     }
 }
@@ -715,7 +747,7 @@ es_symbol_equal(const EsObject* self, const EsObject* other)
 }
 
 static void
-es_symbol_print(const EsObject* object, FILE* fp)
+es_symbol_print(const EsObject* object, MIO* fp)
 {
   const char* string;
   size_t len;
@@ -753,18 +785,18 @@ es_symbol_print(const EsObject* object, FILE* fp)
     }
 
   if (needs_bar)
-    fprintf(fp, "|");
+    mio_printf(fp, "|");
 
   for (i = 0; i < len; i++)
     {
       c = string[i];
       if (c == '\\' || c == '|')
-	fprintf(fp, "\\");
-      fprintf(fp, "%c", c);
+	mio_printf(fp, "\\");
+      mio_printf(fp, "%c", c);
     }
 
   if (needs_bar)
-    fprintf(fp, "|");
+    mio_printf(fp, "|");
 }
 
 
@@ -864,9 +896,9 @@ es_string_get  (const EsObject*   object)
     return ((EsString *)object)->value;
   else
     {
-      fprintf(stderr, ";; es_string_get, Wrong type argument: ");
-      es_print(object, stderr);
-      fputc('\n', stderr);
+      mio_printf(mio_stderr(), ";; es_string_get, Wrong type argument: ");
+      es_print(object, mio_stderr());
+      mio_putc(mio_stderr(), '\n');
       return NULL;
     }
 }
@@ -882,10 +914,10 @@ es_string_free(EsObject* object)
     }
   else
     {
-      fprintf(stderr, ";; Internal error: \n");
-      fprintf(stderr, ";;es_string_free, Wrong type argument: ");
-      es_print(object, stderr);
-      fputc('\n', stderr);
+      mio_printf(mio_stderr(), ";; Internal error: \n");
+      mio_printf(mio_stderr(), ";;es_string_free, Wrong type argument: ");
+      es_print(object, mio_stderr());
+      mio_putc(mio_stderr(), '\n');
     }
 }
 
@@ -902,7 +934,7 @@ es_string_equal(const EsObject* self, const EsObject* other)
 }
 
 static void
-es_string_print(const EsObject* object, FILE* fp)
+es_string_print(const EsObject* object, MIO* fp)
 {
   const char* string;
   char  c;
@@ -913,7 +945,7 @@ es_string_print(const EsObject* object, FILE* fp)
   string = es_string_get(object);
   len    = strlen(string);
 
-  fprintf(fp, "\"");
+  mio_printf(fp, "\"");
 
   for (i = 0; i < len; i++)
     {
@@ -940,17 +972,17 @@ es_string_print(const EsObject* object, FILE* fp)
 	}
       if (cc)
 	{
-	  fprintf(fp, "\\");
-	  fprintf(fp, "%c", cc);
+	  mio_printf(fp, "\\");
+	  mio_printf(fp, "%c", cc);
 	  continue;
 	}
 
       if (c == '\\' || c == '"')
-	fprintf(fp, "\\");
-      fprintf(fp, "%c", c);
+	mio_printf(fp, "\\");
+      mio_printf(fp, "%c", c);
     }
 
-  fprintf(fp, "\"");
+  mio_printf(fp, "\"");
 }
 
 /*
@@ -971,11 +1003,11 @@ es_cons        (EsObject* car, EsObject* cdr)
   r = es_object_new(ES_TYPE_CONS);
   if (es_debug)
     {
-      fprintf(stderr, ";; cons[0x%p] = (0x%p . 0x%p)\n", r, car, cdr);
-      /* es_print(car, stderr);
-	 fputc('\n', stderr);
-	 es_print(cdr, stderr);
-	 fputc('\n', stderr); */
+      mio_printf(mio_stderr(), ";; cons[0x%p] = (0x%p . 0x%p)\n", r, car, cdr);
+      /* es_print(car, mio_stderr());
+	 mio_putc('\n', mio_stderr());
+	 es_print(cdr, mio_stderr());
+	 mio_putc('\n', mio_stderr()); */
     }
   ((EsCons*)r)->car = es_object_ref(car);
   ((EsCons*)r)->cdr = es_object_ref(cdr);
@@ -1007,9 +1039,9 @@ es_car         (const EsObject* object)
     return es_nil;
   else
     {
-      fprintf(stderr, ";; es_car, Wrong type argument: ");
-      es_print(object, stderr);
-      fputc('\n', stderr);
+      mio_printf(mio_stderr(), ";; es_car, Wrong type argument: ");
+      es_print(object, mio_stderr());
+      mio_putc(mio_stderr(), '\n');
       return es_nil;
     }
 }
@@ -1023,9 +1055,9 @@ es_cdr         (const EsObject* object)
     return es_nil;
   else
     {
-      fprintf(stderr, ";; es_cdr, Wrong type argument: ");
-      es_print(object, stderr);
-      fputc('\n', stderr);
+      mio_printf(mio_stderr(), ";; es_cdr, Wrong type argument: ");
+      es_print(object, mio_stderr());
+      mio_putc(mio_stderr(), '\n');
       return es_nil;
     }
 }
@@ -1050,10 +1082,10 @@ es_cons_free(EsObject* object)
     ;				/* DO NOTHING */
   else
     {
-      fprintf(stderr, ";; Internal error: \n");
-      fprintf(stderr, ";; es_cons_free, Wrong type argument: ");
-      es_print(object, stderr);
-      fputc('\n', stderr);
+      mio_printf(mio_stderr(), ";; Internal error: \n");
+      mio_printf(mio_stderr(), ";; es_cons_free, Wrong type argument: ");
+      es_print(object, mio_stderr());
+      mio_putc(mio_stderr(), '\n');
     }
 }
 
@@ -1069,12 +1101,12 @@ es_cons_equal(const EsObject* self, const EsObject* other)
 }
 
 static void
-es_cons_print(const EsObject* object, FILE* fp)
+es_cons_print(const EsObject* object, MIO* fp)
 {
   EsObject* car;
   EsObject* cdr;
 
-  fprintf(fp, "(");
+  mio_printf(fp, "(");
   while(!es_null(object))
     {
       car = es_car(object);
@@ -1082,15 +1114,15 @@ es_cons_print(const EsObject* object, FILE* fp)
 
       es_print(car, fp);
       if (es_cons_p(cdr))
-	fputc(' ', fp);
+	mio_putc(fp, ' ');
       else if (!es_null(cdr))
 	{
-	  fprintf(stderr, ";; es_cons_print, dotted list given: ");
-	  fputc('\n', stderr);
+	  mio_printf(mio_stderr(), ";; es_cons_print, dotted list given: ");
+	  mio_putc(mio_stderr(), '\n');
 	}
       object = cdr;
     }
-  fprintf(fp, ")");
+  mio_printf(fp, ")");
 }
 
 static EsObject* es_cons_reverse_rec(EsObject* cdr,
@@ -1161,9 +1193,9 @@ es_error_name  (const EsObject*   object)
     return es_singleton_get((EsSingleton *)object);
   else
     {
-      fprintf(stderr, ";; es_error_name, Wrong type argument: ");
-      es_print(object, stderr);
-      fputc('\n', stderr);
+      mio_printf(mio_stderr(), ";; es_error_name, Wrong type argument: ");
+      es_print(object, mio_stderr());
+      mio_putc(mio_stderr(), '\n');
       return NULL;
     }
 }
@@ -1199,13 +1231,13 @@ es_error_equal(const EsObject* self, const EsObject* other)
 }
 
 static void
-es_error_print(const EsObject* object, FILE* fp)
+es_error_print(const EsObject* object, MIO* fp)
 {
   const char* string;
   EsError *e = (EsError *)object;
 
   string = es_error_name(object);
-  fprintf(fp, "#%s:", string);
+  mio_printf(fp, "#%s:", string);
   es_print (e->object, fp);
 }
 
@@ -1276,22 +1308,21 @@ hash(const char* keyarg)
  */
 void
 es_print           (const EsObject* object,
-		    FILE*           out)
+		    MIO*           out)
 {
-  class_of(object)->print(object, out? out: stdout);
+  class_of(object)->print(object, out? out: mio_stdout());
 }
 
 
 char*
 es_print_to_string (EsObject*        object)
 {
-#ifdef __GLIBC__
   char *bp;
   size_t size;
-  FILE* out;
+  MIO* out;
 
 
-  out = open_memstream (&bp, &size);
+  out = mio_new_memory (NULL, 0, realloc, NULL);
   if (!out)
     {
       /* TODO: Report error */
@@ -1299,24 +1330,22 @@ es_print_to_string (EsObject*        object)
     }
 
   es_print(object, out);
-  fclose(out);
+  bp = mio_memory_get_data (out, &size);
+  mio_free(out);
 
   return bp;
-#else
-  return NULL;
-#endif
 }
 
 static const char* comment_prefix = ";; ";
 void
-es_comment (const char* comment, FILE* out)
+es_comment (const char* comment, MIO* out)
 {
   const char* p;
   const char* c;
 
   p = comment_prefix? comment_prefix: ";; ";
   c = comment? comment: "";
-  out = out? out: stdout;
+  out = out? out: mio_stdout();
 
   /* ""
      => ;;
@@ -1340,18 +1369,18 @@ es_comment (const char* comment, FILE* out)
   */
   while (1)
     {
-      fputs(p, out);
+      mio_puts(out, p);
 
       while(1)
 	{
 	  if (*c == '\0')
 	    {
-	      putc('\n', out);
+	      mio_putc(out, '\n');
 	      return;
 	    }
 	  else
 	    {
-	      putc(*c++, out);
+	      mio_putc(out, *c++);
 	      if (*(c - 1) == '\n')
 		break;
 	    }
@@ -1362,12 +1391,11 @@ es_comment (const char* comment, FILE* out)
 char*
 es_comment_to_string (const char* comment)
 {
-#ifdef __GLIBC__
   char *bp;
   size_t size;
-  FILE* out;
+  MIO* out;
 
-  out = open_memstream (&bp, &size);
+  out = mio_new_memory (NULL, 0, realloc, NULL);
   if (!out)
     {
       /* TODO: Report error */
@@ -1375,12 +1403,10 @@ es_comment_to_string (const char* comment)
     }
 
   es_comment(comment, out);
-  fclose(out);
+  bp = mio_memory_get_data (out, &size);
+  mio_free(out);
 
   return bp;
-#else
-  return NULL;
-#endif
 }
 
 
@@ -1407,8 +1433,8 @@ static Token  open_paren_token;
 static Token  close_paren_token;
 #define CLOSE_PAREN_TOKEN (&close_paren_token)
 
-static Token*   get_token      (FILE* in);
-static void     skip_to_newline(FILE* in);
+static Token*   get_token      (MIO* in);
+static void     skip_to_newline(MIO* in);
 static int      is_whitespace    (char c);
 static int      is_paren_open    (char c);
 static int      is_paren_close   (char c);
@@ -1423,15 +1449,15 @@ static int is_string_end       (int c);
 static int is_fence_end        (int c);
 static int is_separator        (int c);
 
-static Token* get_sequence      (FILE* fp,
+static Token* get_sequence      (MIO* fp,
 				 Token* seed,
 				 TerminalDetector is_terminator,
 				 int              include_terminator);
-static Token* get_string        (FILE* fp, char seed);
-static Token* get_escaped_symbol(FILE* fp, char seed);
-static Token* get_symbol        (FILE* fp, char seed);
+static Token* get_string        (MIO* fp, char seed);
+static Token* get_escaped_symbol(MIO* fp, char seed);
+static Token* get_symbol        (MIO* fp, char seed);
 
-static EsObject* fill_list    (FILE*  fp);
+static EsObject* fill_list    (MIO*  fp);
 static EsObject* make_atom    (Token* token);
 static EsObject* make_string  (char* t);
 static EsObject* make_symbol  (char* t,
@@ -1446,13 +1472,13 @@ static EsObject* make_real    (double d);
 
 
 EsObject*
-es_read            (FILE* in)
+es_read            (MIO* in)
 {
   Token* t;
   EsObject* r;
 
 
-  in = in? in: stdin;
+  in = in? in: mio_stdin();
 
   t = get_token(in);
 
@@ -1474,14 +1500,14 @@ es_read            (FILE* in)
 
 
 static Token*
-get_token(FILE* in)
+get_token(MIO* in)
 {
   Token* t;
 
   int c;
   while (1)
     {
-      c = getc(in);
+      c = mio_getc(in);
 
       if (c == EOF)
 	{
@@ -1572,7 +1598,7 @@ is_fence_start  (char c)
 }
 
 static void
-skip_to_newline  (FILE* fp)
+skip_to_newline  (MIO* fp)
 {
   int c;
 
@@ -1582,7 +1608,7 @@ skip_to_newline  (FILE* fp)
       char c0;
 
 
-      c = fgetc(fp);
+      c = mio_getc(fp);
       if (c == EOF)
 	break;
 
@@ -1628,7 +1654,7 @@ is_separator     (int c)
 }
 
 static Token*
-get_string         (FILE* fp,
+get_string         (MIO* fp,
 		    char seed)
 {
   Token* t;
@@ -1638,7 +1664,7 @@ get_string         (FILE* fp,
 }
 
 static Token*
-get_escaped_symbol (FILE* fp,
+get_escaped_symbol (MIO* fp,
 		    char seed)
 {
   Token* t;
@@ -1648,7 +1674,7 @@ get_escaped_symbol (FILE* fp,
 }
 
 static Token*
-get_symbol         (FILE* fp,
+get_symbol         (MIO* fp,
 		    char seed)
 {
   Token* t;
@@ -1658,7 +1684,7 @@ get_symbol         (FILE* fp,
 }
 
 static void
-dump_token (FILE* stream, const char* prefix, Token* seed)
+dump_token (MIO* stream, const char* prefix, Token* seed)
 {
   const char* buf;
   int i;
@@ -1666,19 +1692,19 @@ dump_token (FILE* stream, const char* prefix, Token* seed)
 
 
   buf = seed->buffer;
-  fprintf(stream, "%s", prefix);
+  mio_printf(stream, "%s", prefix);
   for (i = 0; i < ( seed->filled - 1 ); i++)
     {
       c = buf[i];
-      fputc(c, stream);
+      mio_putc(stream, c);
       if (buf[i] == '\n')
-	fprintf(stream, "%s", prefix);
+	mio_printf(stream, "%s", prefix);
     }
-  putc('\n', stderr);
+  mio_putc(mio_stderr(), '\n');
 }
 
 static Token*
-get_sequence       (FILE* fp,
+get_sequence       (MIO* fp,
 		    Token* seed,
 		    TerminalDetector     is_terminator,
 		    int             include_terminator)
@@ -1689,7 +1715,7 @@ get_sequence       (FILE* fp,
   in_escape = 0;
   while (1)
     {
-      c = getc(fp);
+      c = mio_getc(fp);
       if (EOF == c)
 	{
 	  if (in_escape)
@@ -1697,10 +1723,10 @@ get_sequence       (FILE* fp,
 	      /*
 		throw ReadError("no character after escape character: " + seed);
 	      */
-	      fprintf(stderr, ";; no character after escape character:\n");
+	      mio_printf(mio_stderr(), ";; no character after escape character:\n");
 	      {
 		seed = token_append(seed, '\\');
-		dump_token(stderr, "; ", seed);
+		dump_token(mio_stderr(), "; ", seed);
 	      }
 	      token_free(seed);
 	      return NULL;
@@ -1712,8 +1738,8 @@ get_sequence       (FILE* fp,
 	      /*
 		throw ReadError("got EOF during reading a sequence: " + seed);
 	      */
-	      fprintf(stderr, ";; got EOF during reading a sequence: \n");
-	      dump_token(stderr, "; ", seed);
+	      mio_printf(mio_stderr(), ";; got EOF during reading a sequence: \n");
+	      dump_token(mio_stderr(), "; ", seed);
 	      token_free(seed);
 	      return NULL;
 	    }
@@ -1749,7 +1775,7 @@ get_sequence       (FILE* fp,
 		seed = token_append(seed, c0);
 	      else
 		{
-		  if (ungetc(c, fp) == EOF)
+		  if (mio_ungetc(fp, c) == EOF)
 		    {
 		      token_free(seed);
 		      return NULL;
@@ -1846,7 +1872,7 @@ token_append(Token* t, char c)
 }
 
 static EsObject*
-fill_list (FILE* fp)
+fill_list (MIO* fp)
 {
   EsObject* r;
   Token*    t;
@@ -2006,7 +2032,7 @@ is_integer   (const char* cstr,
       /*
       throw ReadError("Too large integer for `int': " + r);
       */
-      fprintf(stderr, ";; is_integer, Integer out of range: %s\n", cstr);
+      mio_printf(mio_stderr(), ";; is_integer, Integer out of range: %s\n", cstr);
       return 0;
     }
 
@@ -2051,23 +2077,19 @@ EsObject*
 es_read_from_string(const char* buf,
 		    const char** saveptr)
 {
-#ifdef HAVE_FMEMOPEN
-  FILE* in;
+  MIO* in;
   EsObject* o;
 
 
   /* IN is opend in "r" mode and the stream pointed by
      IN is short-lived here. */
-  in = fmemopen((void *)buf, strlen(buf), "r");
+  in = mio_new_memory((void *)buf, strlen(buf), NULL, NULL);
   o = es_read(in);
   if (saveptr)
-    *saveptr = buf + ftell(in);
-  fclose(in);
+    *saveptr = buf + mio_tell(in);
+  mio_free(in);
 
   return o;
-#else
-  return ES_PROC_UNIMPLEMENTED;
-#endif
 }
 
 
@@ -2337,7 +2359,7 @@ es_vrealize_atom(EsObject* fmt_object, va_list *ap)
   else if (fmt_object == pattern_f)
     {
       double x = va_arg(*ap, double);
-      fprintf(stderr, "=>%f\n", x);
+      mio_printf(mio_stderr(), "=>%f\n", x);
       return es_real_new(x);
     }
   else if (fmt_object == pattern_s)
@@ -2386,10 +2408,10 @@ es_vrealize(EsObject* fmt_object, va_list *ap)
 		  /* TODO: error */
 		  char *fmt;
 
-		  fprintf(stderr,
+		  mio_printf(mio_stderr(),
 			  ";; an atom is passed for splice format:\n");
 		  fmt = es_print_to_string(fmt_object);
-		  fprintf(stderr, ";; => %s\n", fmt);
+		  mio_printf(mio_stderr(), ";; => %s\n", fmt);
 		  free(fmt);
 		  r = es_nil;
 		}

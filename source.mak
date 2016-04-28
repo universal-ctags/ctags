@@ -8,6 +8,9 @@ REPOINFO_HEADS = main/repoinfo.h
 REPOINFO_SRCS  = main/repoinfo.c
 REPOINFO_OBJS  = $(REPOINFO_SRCS:.c=.$(OBJEXT))
 
+MIO_HEADS = main/mio.h
+MIO_SRCS  = main/mio.c
+
 MAIN_HEADS =			\
 	main/args.h		\
 	main/ctags.h		\
@@ -22,7 +25,6 @@ MAIN_HEADS =			\
 	main/kind.h		\
 	main/main.h		\
 	main/mbcs.h		\
-	main/mio.h		\
 	main/nestlevel.h	\
 	main/options.h		\
 	main/parse.h		\
@@ -35,7 +37,9 @@ MAIN_HEADS =			\
 	main/sort.h		\
 	main/strlist.h		\
 	main/vstring.h		\
-	main/xtag.h
+	main/xtag.h		\
+	\
+	$(MIO_HEADS)
 
 MAIN_SRCS =				\
 	main/args.c			\
@@ -52,7 +56,6 @@ MAIN_SRCS =				\
 	main/lxpath.c			\
 	main/main.c			\
 	main/mbcs.c			\
-	main/mio.c			\
 	main/nestlevel.c		\
 	main/options.c			\
 	main/parse.c			\
@@ -67,6 +70,7 @@ MAIN_SRCS =				\
 	main/xtag.c			\
 	\
 	$(REPOINFO_SRCS) \
+	$(MIO_SRCS)      \
 	\
 	$(NULL)
 
@@ -185,9 +189,19 @@ FNMATCH_SRCS = fnmatch/fnmatch.c
 FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.$(OBJEXT))
 
 QUALIFIER_HEAD = dsl/es-lang-c-stdc99.h \
-		 dsl/qualifier.h
+		 dsl/qualifier.h \
+		 \
+		 $(MIO_HEADS) \
+		 \
+		 $(NULL)
+
 QUALIFIER_SRCS = dsl/es-lang-c-stdc99.c \
-		 dsl/qualifier.c
+		 dsl/qualifier.c \
+		 \
+		 $(MIO_SRCS) \
+		 \
+		 $(NULL)
+
 QUALIFIER_OBJS = $(QUALIFIER_SRCS:.c=.$(OBJEXT))
 
 ALL_OBJS = \
