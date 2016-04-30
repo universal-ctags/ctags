@@ -11,7 +11,15 @@ operator --	input.cpp	/^	X & operator--()$/;"	f	class:X	typeref:typename:X &	fil
 operator []	input.cpp	/^	int operator[](int)$/;"	f	class:X	typeref:typename:int	file:
 operator *	input.cpp	/^	inline friend X operator*(const X &a, const X &b)$/;"	f	class:X	typeref:typename:X	file:
 operator &&	input.cpp	/^	friend X operator && (const X &a,const X & b);$/;"	p	class:X	typeref:typename:X	file:
+operator new	input.cpp	/^	void * operator new(size_t);$/;"	p	class:X	typeref:typename:void *	file:
+operator delete	input.cpp	/^	void operator delete(void *);$/;"	p	class:X	typeref:typename:void	file:
+operator new[]	input.cpp	/^	void * operator new[](size_t);$/;"	p	class:X	typeref:typename:void *	file:
+operator delete[]	input.cpp	/^	void operator delete[](void *);$/;"	p	class:X	typeref:typename:void	file:
 operator *=	input.cpp	/^X & X::operator *= (int x)$/;"	f	class:X	typeref:typename:X &
 operator *=	input.cpp	/^X & X::operator *= (const X & x)$/;"	f	class:X	typeref:typename:X &
 operator &&	input.cpp	/^X X::operator && (const X &a,const X & b)$/;"	f	class:X	typeref:typename:X
+operator new	input.cpp	/^void * X::operator new(size_t)$/;"	f	class:X	typeref:typename:void *
+operator delete	input.cpp	/^void X::operator delete(void *)$/;"	f	class:X	typeref:typename:void
+operator new[]	input.cpp	/^void * X::operator new[](size_t)$/;"	f	class:X	typeref:typename:void *
+operator delete[]	input.cpp	/^void X::operator delete[](void *)$/;"	f	class:X	typeref:typename:void
 main	input.cpp	/^int main(int argc,char ** argv)$/;"	f	typeref:typename:int
