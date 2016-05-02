@@ -1392,6 +1392,13 @@ extern tagEntryInfo *getEntryInCorkQueue   (unsigned int n)
 		return NULL;
 }
 
+extern tagEntryInfo *getEntryOfNestingLevel (const NestingLevel *nl)
+{
+	if (nl == NULL)
+		return NULL;
+	return getEntryInCorkQueue (nl->corkIndex);
+}
+
 extern size_t        countEntryInCorkQueue (void)
 {
 	return TagFile.corkQueue.count;

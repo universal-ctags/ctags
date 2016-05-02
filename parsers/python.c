@@ -179,20 +179,21 @@ static void addAccessFields (tagEntryInfo *const entry,
 /* Given a string with the contents of a line directly after the "def" keyword,
  * extract all relevant information and create a tag.
  */
-static void makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
+static int makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
 				 vString *const parent, int is_class_parent, const char *arglist)
 {
 	char scope_kind_letter = KIND_NULL;
+	int corkIndex;
 
 	if (is_class_parent)
 	{
 		if (!PythonKinds[K_MEMBER].enabled)
-			return;
+			return CORK_NIL;
 	}
 	else
 	{
 		if (!PythonKinds[K_FUNCTION].enabled)
-			return;
+			return CORK_NIL;
 	}
 
 	tag->extensionFields.signature = arglist;
@@ -216,11 +217,13 @@ static void makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
 	addAccessFields (tag, function, is_class_parent ? K_MEMBER : K_FUNCTION,
 		vStringLength (parent) > 0, is_class_parent);
 
-	makeTagEntry (tag);
+	corkIndex = makeTagEntry (tag);
 
 	if ((scope_kind_letter != KIND_NULL)
 	    && tag->extensionFields.scopeName)
 		makeQualifiedTagEntry (tag);
+
+	return corkIndex;
 }
 
 static void makeFunctionTag (vString *const function,
@@ -235,13 +238,13 @@ static void makeFunctionTag (vString *const function,
 /* Given a string with the contents of the line directly after the "class"
  * keyword, extract all necessary information and create a tag.
  */
-static void makeClassTag (vString *const class, vString *const inheritance,
+static int makeClassTag (vString *const class, vString *const inheritance,
 	vString *const parent, int is_class_parent)
 {
 	tagEntryInfo tag;
 
 	if (! PythonKinds[K_CLASS].enabled)
-		return;
+		return CORK_NIL;
 
 	initTagEntry (&tag, vStringValue (class), &(PythonKinds[K_CLASS]));
 	if (vStringLength (parent) > 0)
@@ -260,7 +263,7 @@ static void makeClassTag (vString *const class, vString *const inheritance,
 	tag.extensionFields.inheritance = vStringValue (inheritance);
 	addAccessFields (&tag, class, K_CLASS, vStringLength (parent) > 0,
 		is_class_parent);
-	makeTagEntry (&tag);
+	return makeTagEntry (&tag);
 }
 
 static void makeVariableTag (vString *const var, vString *const parent,
@@ -436,9 +439,10 @@ static const char *parseModule (const char *cp, vString *const module)
 	return cp;
 }
 
-static void parseClass (const char *cp, vString *const class,
+static int parseClass (const char *cp, vString *const class,
 	vString *const parent, int is_class_parent)
 {
+	int corkIndex;
 	vString *const inheritance = vStringNew ();
 	vStringClear (inheritance);
 	cp = parseIdentifier (cp, class);
@@ -461,8 +465,9 @@ static void parseClass (const char *cp, vString *const class,
 		}
 		vStringTerminate (inheritance);
 	}
-	makeClassTag (class, inheritance, parent, is_class_parent);
+	corkIndex = makeClassTag (class, inheritance, parent, is_class_parent);
 	vStringDelete (inheritance);
+	return corkIndex;
 }
 
 static void parseImports (const char *cp, const char* from_module)
@@ -779,7 +784,7 @@ static void skipParens (const char *start)
 	captureArguments (start, NULL);
 }
 
-static void parseFunction (const char *cp, vString *const def,
+static int parseFunction (const char *cp, vString *const def,
 	vString *const parent, int is_class_parent)
 {
 	tagEntryInfo tag;
@@ -793,7 +798,7 @@ static void parseFunction (const char *cp, vString *const def,
 	else
 	  arglist = vStringNew ();
 	captureArguments (cp, arglist);
-	makeFunctionTagFull (&tag, def, parent, is_class_parent, vStringValue (arglist));
+	return makeFunctionTagFull (&tag, def, parent, is_class_parent, vStringValue (arglist));
 }
 
 /* Get the combined name of a nested symbol. Classes are separated with ".",
@@ -817,6 +822,8 @@ static boolean constructParentString(NestingLevels *nls, int indent,
 	for (i = 0; i < nls->n; i++)
 	{
 		NestingLevel *nl = nls->levels + i;
+		tagEntryInfo *e;
+
 		if (indent <= nl->indentation)
 			break;
 		if (prev)
@@ -829,8 +836,16 @@ static boolean constructParentString(NestingLevels *nls, int indent,
 				vStringCatS(result, "/");
 */
 		}
-		vStringCat(result, nl->name);
-		is_class = (nl->kindIndex == K_CLASS);
+
+		e = getEntryOfNestingLevel (nl);
+		if (e)
+		{
+			vStringCatS(result, e->name);
+			is_class = ((e->kind - PythonKinds)  == K_CLASS);
+		}
+		else
+			is_class = K_FUNCTION; /* ??? */
+
 		prev = nl;
 	}
 	return is_class;
@@ -854,12 +869,10 @@ static void checkIndent(NestingLevels *nls, int indent)
 	}
 }
 
-static void addNestingLevel(NestingLevels *nls, int indentation,
-	const vString *name, boolean is_class)
+static void addNestingLevel(NestingLevels *nls, int indentation, int corkIndex)
 {
 	int i;
 	NestingLevel *nl = NULL;
-	int kindIndex = is_class ? K_CLASS : K_FUNCTION;
 
 	for (i = 0; i < nls->n; i++)
 	{
@@ -867,10 +880,10 @@ static void addNestingLevel(NestingLevels *nls, int indentation,
 		if (indentation <= nl->indentation) break;
 	}
 	if (i == nls->n)
-		nl = nestingLevelsPush(nls, name, kindIndex);
+		nl = nestingLevelsPush(nls, corkIndex);
 	else
 		/* reuse existing slot */
-		nl = nestingLevelsTruncate (nls, i + 1, name, kindIndex);
+		nl = nestingLevelsTruncate (nls, i + 1, corkIndex);
 
 	nl->indentation = indentation;
 }
@@ -1213,16 +1226,17 @@ static void findPythonTags (void)
 			if (found)
 			{
 				boolean is_parent_class;
+				int corkIndex;
 
 				is_parent_class =
 					constructParentString(nesting_levels, indent, parent);
 
 				if (is_class)
-					parseClass (cp, name, parent, is_parent_class);
+					corkIndex = parseClass (cp, name, parent, is_parent_class);
 				else
-					parseFunction(cp, name, parent, is_parent_class);
+					corkIndex = parseFunction(cp, name, parent, is_parent_class);
 
-				addNestingLevel(nesting_levels, indent, name, is_class);
+				addNestingLevel(nesting_levels, indent, corkIndex);
 			}
 			continue;
 		}
@@ -1257,6 +1271,7 @@ extern parserDefinition *PythonParser (void)
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findPythonTags;
+	def->useCork = TRUE;
 	return def;
 }
 

@@ -32,13 +32,12 @@ extern void nestingLevelsFree(NestingLevels *nls)
 {
 	int i;
 	for (i = 0; i < nls->allocated; i++)
-		vStringDelete(nls->levels[i].name);
+		nls->levels[i].corkIndex = CORK_NIL;
 	if (nls->levels) eFree(nls->levels);
 	eFree(nls);
 }
 
-extern NestingLevel * nestingLevelsPush(NestingLevels *nls,
-	const vString *name, int kindIndex)
+extern NestingLevel * nestingLevelsPush(NestingLevels *nls, int corkIndex)
 {
 	NestingLevel *nl = NULL;
 
@@ -47,35 +46,31 @@ extern NestingLevel * nestingLevelsPush(NestingLevels *nls,
 		nls->allocated++;
 		nls->levels = xRealloc(nls->levels,
 			nls->allocated, NestingLevel);
-		nls->levels[nls->n].name = vStringNew();
 	}
 	nl = &nls->levels[nls->n];
 	nls->n++;
 
-	vStringCopy(nl->name, name);
-	nl->kindIndex = kindIndex;
+	nl->corkIndex = corkIndex;
 	return nl;
 }
 
-extern NestingLevel *nestingLevelsTruncate(NestingLevels *nls, int depth,
-					   const vString *name, int kindIndex)
+extern NestingLevel *nestingLevelsTruncate(NestingLevels *nls, int depth, int corkIndex)
 {
 	NestingLevel *nl;
 
 	nls->n = depth;
 	nl = nestingLevelsGetCurrent(nls);
-	vStringCopy(nl->name, name);
-	nl->kindIndex = kindIndex;
+	nl->corkIndex = corkIndex;
 	return nl;
 }
 
 
 extern void nestingLevelsPop(NestingLevels *nls)
 {
-	const NestingLevel *nl = nestingLevelsGetCurrent(nls);
+	NestingLevel *nl = nestingLevelsGetCurrent(nls);
 
 	Assert (nl != NULL);
-	vStringClear(nl->name);
+	nl->corkIndex = CORK_NIL;
 	nls->n--;
 }
 

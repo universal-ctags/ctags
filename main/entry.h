@@ -21,6 +21,7 @@
 #include "vstring.h"
 #include "xtag.h"
 #include "mio.h"
+#include "nestlevel.h"
 
 /*
 *   MACROS
@@ -154,6 +155,7 @@ extern void writePseudoTag (const struct sPtagDesc *pdesc,
 void          corkTagFile(void);
 void          uncorkTagFile(void);
 tagEntryInfo *getEntryInCorkQueue   (unsigned int n);
+tagEntryInfo *getEntryOfNestingLevel (const NestingLevel *nl);
 size_t        countEntryInCorkQueue (void);
 
 extern void makeFileTag (const char *const fileName);
