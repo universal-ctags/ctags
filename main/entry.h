@@ -64,10 +64,9 @@ typedef struct sTagEntryInfo {
 
 		const kindOption* scopeKind;
 		const char* scopeName;
-#define SCOPE_NIL 0
 		int         scopeIndex;   /* cork queue entry for upper scope tag.
 					     This field is meaningful if the value
-					     is not SCOPE_NIL and scope[0]  and scope[1] are
+					     is not CORK_NIL and scope[0]  and scope[1] are
 					     NULL. */
 
 		const char* signature;
@@ -151,6 +150,7 @@ extern void writePseudoTag (const struct sPtagDesc *pdesc,
 			    const char *const pattern,
 			    const char *const parserName);
 
+#define CORK_NIL 0
 void          corkTagFile(void);
 void          uncorkTagFile(void);
 tagEntryInfo *getEntryInCorkQueue   (unsigned int n);

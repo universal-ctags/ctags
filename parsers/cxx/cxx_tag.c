@@ -342,7 +342,7 @@ int cxxTagCommit(void)
 		if (isXtagEnabled(XTAG_FILE_SCOPE))
 			markTagExtraBit (&g_oCXXTag, XTAG_FILE_SCOPE);
 		else
-			return SCOPE_NIL; // FIXME: why the "invalid" cork queue index is SCOPE_NIL?
+			return CORK_NIL; // FIXME: why the "invalid" cork queue index is CORK_NIL?
 	}
 
 	CXX_DEBUG_PRINT(

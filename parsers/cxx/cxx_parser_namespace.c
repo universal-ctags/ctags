@@ -52,7 +52,7 @@ boolean cxxParserParseNamespace(void)
 	// namespace;
 
 	int iScopeCount = 0;
-	int iCorkQueueIndex = SCOPE_NIL;
+	int iCorkQueueIndex = CORK_NIL;
 
 	for(;;)
 	{
@@ -89,7 +89,7 @@ boolean cxxParserParseNamespace(void)
 				// doh.. but tolerate this
 				CXX_DEBUG_LEAVE_TEXT("got semicolon!");
 
-				if(iCorkQueueIndex > SCOPE_NIL)
+				if(iCorkQueueIndex > CORK_NIL)
 					cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
 
 				while(iScopeCount > 0)
@@ -123,7 +123,7 @@ boolean cxxParserParseNamespace(void)
 					return FALSE;
 				}
 
-				if(iCorkQueueIndex > SCOPE_NIL)
+				if(iCorkQueueIndex > CORK_NIL)
 					cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
 
 				while(iScopeCount > 0)

@@ -957,7 +957,7 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 					   scopeKey,
 					   tag->extensionFields.scopeKind->name,
 					   escapeName (tag, FIELD_SCOPE));
-		else if (tag->extensionFields.scopeIndex != SCOPE_NIL
+		else if (tag->extensionFields.scopeIndex != CORK_NIL
 			 && TagFile.corkQueue.count > 0)
 		{
 			const tagEntryInfo * scope;
@@ -1179,7 +1179,7 @@ extern void attachParserFieldToCorkEntry (int index,
 	tagEntryInfo * tag;
 	const char * v;
 
-	if (index == SCOPE_NIL)
+	if (index == CORK_NIL)
 		return;
 
 	tag = getEntryInCorkQueue(index);
@@ -1386,7 +1386,7 @@ extern void uncorkTagFile(void)
 
 extern tagEntryInfo *getEntryInCorkQueue   (unsigned int n)
 {
-	if ((SCOPE_NIL < n) && (n < TagFile.corkQueue.count))
+	if ((CORK_NIL < n) && (n < TagFile.corkQueue.count))
 		return TagFile.corkQueue.queue + n;
 	else
 		return NULL;
@@ -1399,17 +1399,17 @@ extern size_t        countEntryInCorkQueue (void)
 
 extern int makeTagEntry (const tagEntryInfo *const tag)
 {
-	int r = SCOPE_NIL;
+	int r = CORK_NIL;
 	Assert (tag->name != NULL);
 
 	if (getInputLanguageFileKind() != tag->kind)
 	{
 		if (! isInputLanguageKindEnabled (tag->kind->letter) &&
 		    (tag->extensionFields.roleIndex == ROLE_INDEX_DEFINITION))
-			return SCOPE_NIL;
+			return CORK_NIL;
 		if ((tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
 		    && (! tag->kind->roles[tag->extensionFields.roleIndex].enabled))
-			return SCOPE_NIL;
+			return CORK_NIL;
 	}
 
 	if (tag->name [0] == '\0' && (!tag->placeholder))
@@ -1430,7 +1430,7 @@ out:
 
 extern int makeQualifiedTagEntry (const tagEntryInfo *const e)
 {
-	int r = SCOPE_NIL;
+	int r = CORK_NIL;
 	tagEntryInfo x;
 	char xk;
 	const char *sep;
@@ -1531,7 +1531,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	e->filePosition    = filePosition;
 	e->inputFileName   = inputFileName;
 	e->name            = name;
-	e->extensionFields.scopeIndex     = SCOPE_NIL;
+	e->extensionFields.scopeIndex     = CORK_NIL;
 	e->kind = kind;
 
 	Assert (roleIndex >= ROLE_INDEX_DEFINITION);

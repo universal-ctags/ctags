@@ -74,7 +74,7 @@ static int makeNamespaceTag (vString * const name, const char *dbp)
 		return makeTagEntry (&e);
 	}
 	else
-		return SCOPE_NIL;
+		return CORK_NIL;
 }
 
 static void makeFunctionTag (vString * const name, const char *dbp, int scope_index)
@@ -104,7 +104,7 @@ static void findClojureTags (void)
 {
 	vString *name = vStringNew ();
 	const char *p;
-	int scope_index = SCOPE_NIL;
+	int scope_index = CORK_NIL;
 
 	while ((p = (char *)readLineFromInputFile ()) != NULL)
 	{

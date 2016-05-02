@@ -87,7 +87,7 @@ extern unsigned int countParsers (void)
 extern int makeSimpleTag (
 		const vString* const name, kindOption* const kinds, const int kind)
 {
-	int r = SCOPE_NIL;
+	int r = CORK_NIL;
 
 	if (kinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
 	{
@@ -102,7 +102,7 @@ extern int makeSimpleTag (
 extern int makeSimpleRefTag (const vString* const name, kindOption* const kinds, const int kind,
 			     int roleIndex)
 {
-	int r = SCOPE_NIL;
+	int r = CORK_NIL;
 
 	if (! isXtagEnabled (XTAG_REFERENCE_TAGS))
 		return r;

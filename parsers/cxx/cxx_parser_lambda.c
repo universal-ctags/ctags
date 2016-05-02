@@ -142,7 +142,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 			pTypeStart = pTypeStart->pNext;
 	}
 
-	int iCorkQueueIndex = SCOPE_NIL;
+	int iCorkQueueIndex = CORK_NIL;
 
 	if(tag)
 	{
@@ -208,7 +208,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 
 	boolean bRet = cxxParserParseBlock(TRUE);
 
-	if(iCorkQueueIndex > SCOPE_NIL)
+	if(iCorkQueueIndex > CORK_NIL)
 		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
 
 	cxxScopePop();

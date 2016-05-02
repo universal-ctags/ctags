@@ -348,9 +348,9 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 	const boolean isFileScope = (boolean) (! isInputHeaderFile ());
 
 	if (!Cpp.defineMacroKind)
-		return SCOPE_NIL;
+		return CORK_NIL;
 	if (isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
-		return SCOPE_NIL;
+		return CORK_NIL;
 
 	if ( /* condition for definition tag */
 		((!undef) && Cpp.defineMacroKind->enabled)
@@ -373,7 +373,7 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 		e.extensionFields.signature = signature;
 		return makeTagEntry (&e);
 	}
-	return SCOPE_NIL;
+	return CORK_NIL;
 }
 
 static void makeIncludeTag (const  char *const name, boolean systemHeader)
@@ -395,7 +395,7 @@ static void makeIncludeTag (const  char *const name, boolean systemHeader)
 static vString *signature;
 static int directiveDefine (const int c, boolean undef)
 {
-	int r = SCOPE_NIL;
+	int r = CORK_NIL;
 
 	if (isident1 (c))
 	{
@@ -752,7 +752,7 @@ static void attachEndFieldMaybe (int macroCorkIndex)
 	char buf[16];
 
 	if (Cpp.endFieldType != FIELD_UNKNOWN
-	    && macroCorkIndex != SCOPE_NIL)
+	    && macroCorkIndex != CORK_NIL)
 	{
 		sprintf(buf, "%ld", getInputLineNumber ());
 		attachParserFieldToCorkEntry (macroCorkIndex,
@@ -771,7 +771,7 @@ extern int cppGetc (void)
 	boolean directive = FALSE;
 	boolean ignore = FALSE;
 	int c;
-	int macroCorkIndex = SCOPE_NIL;
+	int macroCorkIndex = CORK_NIL;
 
 	if (Cpp.ungetch != '\0')
 	{
@@ -791,7 +791,7 @@ process:
 				ignore    = FALSE;
 				directive = FALSE;
 				attachEndFieldMaybe (macroCorkIndex);
-				macroCorkIndex = SCOPE_NIL;
+				macroCorkIndex = CORK_NIL;
 				break;
 
 			case TAB:
@@ -802,7 +802,7 @@ process:
 				if (directive  &&  ! ignore)
 				{
 					attachEndFieldMaybe (macroCorkIndex);
-					macroCorkIndex = SCOPE_NIL;
+					macroCorkIndex = CORK_NIL;
 					directive = FALSE;
 				}
 				Cpp.directive.accept = TRUE;

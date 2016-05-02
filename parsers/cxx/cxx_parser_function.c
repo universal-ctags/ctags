@@ -44,7 +44,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 #endif
 
 	if(piCorkQueueIndex)
-		*piCorkQueueIndex = SCOPE_NIL;
+		*piCorkQueueIndex = CORK_NIL;
 
 	// Check if we are in the following situation:
 	//
@@ -974,7 +974,7 @@ int cxxParserEmitFunctionTags(
 	int iScopesPushed = 0;
 	
 	if(piCorkQueueIndex)
-		*piCorkQueueIndex = SCOPE_NIL;
+		*piCorkQueueIndex = CORK_NIL;
 
 	enum CXXTagKind eOuterScopeKind = cxxScopeGetKind();
 
