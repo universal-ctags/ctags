@@ -41,6 +41,7 @@ The following parsers have been added:
 * Glade *libxml*
 * Go
 * JSON
+* man *optlib*
 * Maven2 *libxml*
 * ObjectiveC
 * Perl6
@@ -70,9 +71,11 @@ exuberant-ctags with following command line:
 
 Heavily improved language parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* ant *libxml*
+* ant (rewritten with *libxml*)
 * php
 * verilog
+* C/C++ (completely rewritten)
+
 
 New options
 ---------------------------------------------------------------------
@@ -615,6 +618,72 @@ means `\\` is used when for combining a namespace item(upper) and a
 class item(lower). Of course, ctags uses more specific one when
 choosing a separator; the third one has higher priority than the
 first.
+
+
+Parser own fields
+---------------------------------------------------------------------
+
+A tag has `name`, `input` file name, and `pattern` as basic information.
+Some fields like `language:`, `signature:`, etc are attached
+to the tag as optional information.
+
+In exuberant-ctags, fields are common in all languages.
+universal-ctags extends the concept of fields; a parser can define its
+own field. This extension is proposed by @pragmaware in #857.
+
+For implementing the parser own fields, the option for listing and
+enabling/disabling fields are also extended.
+
+In `--list-fields` output, the owner of the field is printed at `LANGUAGE`
+column:
+
+.. code-block:: console
+
+	$ ./ctags --list-fields
+	#LETTER NAME            ENABLED LANGUAGE        XFMTCHAR DESCRIPTION
+	...
+	-       end             off     C               TRUE     end lines of various constructs
+	-       properties      off     C               TRUE     properties (static, inline, mutable,...)
+	-       end             off     C++             TRUE     end lines of various constructs
+	-       template        off     C++             TRUE     template parameters
+	-       captures        off     C++             TRUE     lambda capture list
+	-       properties      off     C++             TRUE     properties (static, virtual, inline, mutable,...)
+	-       sectionMarker   off     reStructuredText TRUE     character used for declaring section
+	-       version         off     Maven2          TRUE     version of artifact
+
+e.g. `reStructuredText` is the owner of `sectionMarker` field. Like
+`end` field owned by `C` and `C++`, more than one parsers have a field
+with the same name.
+
+A parser one field has only long name, no letter. For enabling and disabling
+such field, the long name must be passed to `--fields` option. e.g. for
+turning on `sectionMarker` field of `reStructuredText` parser, use following
+command line:
+
+.. code-block:: console
+
+	$ ./ctags --fields=+{sectionMarker} ...
+
+For enabling/disabling a field owned by specified parser, use the parser
+name as prefix for the field name. `.` is for combinator. e.g. for turning
+on `end` field of `C++` parser, use following command line:
+
+.. code-block:: console
+
+	$ ./ctags --fields=+{C++.end} ...
+
+The wild card notation can be used for enabling/disabling parser own
+fields, too. Following example enables all fields owned by `C++`
+parser.
+
+.. code-block:: console
+
+	$ ./ctags --fields=+{C++.*} ...
+
+From the view point of tags file format, nothing is changed with
+introducing parser own fields; `<fieldname>`:`<value>` is used as
+before. The name of field owner is never prefixed. `language:` field
+of the tag tells the owner.
 
 
 Readtags

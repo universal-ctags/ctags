@@ -149,6 +149,8 @@ sub gather_chars {
 	} elsif ($c eq '\\') {
 	    $output = $output . $c . $c;
 	    $escape = $escape? 0: 1;
+	  } elsif ($c eq '"') {
+	    $output = $output . '\\' . $c;
 	} else {
 	    $output = $output . $c;
 	    $escape = 0;

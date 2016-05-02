@@ -111,6 +111,9 @@
     <ClCompile Include="..\parsers\make.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\man.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\matlab.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
