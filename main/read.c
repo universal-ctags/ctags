@@ -303,7 +303,7 @@ static boolean parseLineDirective (void)
 
 #define MAX_IN_MEMORY_FILE_SIZE (1024*1024)
 
-static MIO *getMio (const char *const fileName, const char *const openMode,
+extern MIO *getMio (const char *const fileName, const char *const openMode,
 		    boolean memStreamRequired)
 {
 	FILE *src;
@@ -336,7 +336,8 @@ static MIO *getMio (const char *const fileName, const char *const openMode,
 /*  This function opens an input file, and resets the line counter.  If it
  *  fails, it will display an error message and leave the File.fp set to NULL.
  */
-extern boolean openInputFile (const char *const fileName, const langType language)
+extern boolean openInputFile (const char *const fileName, const langType language,
+			      MIO *mio)
 {
 	const char *const openMode = "rb";
 	boolean opened = FALSE;
@@ -360,7 +361,18 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 	stringListClear (File.sourceTagPathHolder);
 
 	memStreamRequired = doesParserRequireMemoryStream (language);
-	File.fp = getMio (fileName, openMode, memStreamRequired);
+
+	if (mio)
+	{
+		size_t tmp;
+		if (memStreamRequired && (!mio_memory_get_data (mio, &tmp)))
+			mio = NULL;
+		else
+			mio_rewind (mio);
+	}
+
+	File.fp = mio? mio_ref (mio): getMio (fileName, openMode, memStreamRequired);
+
 	if (File.fp == NULL)
 		error (WARNING | PERROR, "cannot open \"%s\"", fileName);
 	else
@@ -406,6 +418,11 @@ extern void closeInputFile (void)
 		File.fp = NULL;
 		freeLineFposMap (&File.lineFposMap);
 	}
+}
+
+extern void *getInputFileUserData(void)
+{
+	return mio_get_user_data (File.fp);
 }
 
 /*  Action to take for each encountered input newline.

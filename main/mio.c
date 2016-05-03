@@ -47,8 +47,11 @@
  * of an application that uses C file I/O API to perform in-memory operations.
  *
  * A #MIO object is created using mio_new_file(), mio_new_memory() or mio_new_mio(),
- * depending on whether you want file or in-memory operations, and destroyed using
- * mio_free(). There is also some other convenient API to create file-based
+ * depending on whether you want file or in-memory operations.
+ * Its life is managed by reference counting. Just after calling one of functions
+ * for creating, the count is 1. mio_ref() increments the counter. mio_free()
+ * decrements it. When the counter becomes 0, the #MIO object will be destroyed
+ * in mio_free(). There is also some other convenient API to create file-based
  * #MIO objects for more complex cases, such as mio_new_file_full() and
  * mio_new_fp().
  *
@@ -60,6 +63,43 @@
  * with the significant difference that the first parameter is always the #MIO
  * object to work on.
  */
+
+
+typedef struct _MIOUserData MIOUserData;
+struct _MIOUserData {
+	void *d;
+	MIODestroyNotify f;
+};
+
+/**
+ * MIO:
+ *
+ * An object representing a #MIO stream. No assumptions should be made about
+ * what compose this object, and none of its fields should be accessed directly.
+ */
+struct _MIO {
+	/*< private >*/
+	MIOType type;
+	unsigned int refcount;
+	union {
+		struct {
+			FILE *fp;
+			MIOFCloseFunc close_func;
+		} file;
+		struct {
+			unsigned char *buf;
+			int ungetch;
+			size_t pos;
+			size_t size;
+			size_t allocated_size;
+			MIOReallocFunc realloc_func;
+			MIODestroyNotify free_func;
+			boolean error;
+			boolean eof;
+		} mem;
+	} impl;
+	MIOUserData udata;
+};
 
 
 /**
@@ -112,6 +152,9 @@ MIO *mio_new_file_full (const char *filename,
 			mio->type = MIO_TYPE_FILE;
 			mio->impl.file.fp = fp;
 			mio->impl.file.close_func = close_func;
+			mio->refcount = 1;
+			mio->udata.d = NULL;
+			mio->udata.f = NULL;
 		}
 	}
 
@@ -170,6 +213,9 @@ MIO *mio_new_fp (FILE *fp, MIOFCloseFunc close_func)
 		mio->type = MIO_TYPE_FILE;
 		mio->impl.file.fp = fp;
 		mio->impl.file.close_func = close_func;
+		mio->refcount = 1;
+		mio->udata.d = NULL;
+		mio->udata.f = NULL;
 	}
 
 	return mio;
@@ -231,6 +277,9 @@ MIO *mio_new_memory (unsigned char *data,
 		mio->impl.mem.free_func = free_func;
 		mio->impl.mem.eof = FALSE;
 		mio->impl.mem.error = FALSE;
+		mio->refcount = 1;
+		mio->udata.d = NULL;
+		mio->udata.f = NULL;
 	}
 
 	return mio;
@@ -298,6 +347,20 @@ cleanup:
 }
 
 /**
+ * mio_ref:
+ * @mio: A #MIO object
+ *
+ * Increments the reference counter of a #MIO.
+ *
+ * Returns: passed @mio.
+ */
+MIO *mio_ref        (MIO *mio)
+{
+	mio->refcount++;
+	return mio;
+}
+
+/**
  * mio_file_get_fp:
  * @mio: A #MIO object
  *
@@ -353,7 +416,8 @@ unsigned char *mio_memory_get_data (MIO *mio, size_t *size)
  * mio_free:
  * @mio: A #MIO object
  *
- * Destroys a #MIO object.
+ * Decrements the reference counter of a #MIO and destroys the #MIO
+ * object if its counter becomes 0.
  *
  * Returns: Error code obtained from the registered MIOFCloseFunc or 0 on success.
  */
@@ -363,6 +427,12 @@ int mio_free (MIO *mio)
 
 	if (mio)
 	{
+		if (--mio->refcount)
+			return 0;
+
+		if (mio->udata.d && mio->udata.f)
+			mio->udata.f (mio->udata.d);
+
 		if (mio->type == MIO_TYPE_FILE)
 		{
 			if (mio->impl.file.close_func)
@@ -1197,4 +1267,39 @@ int mio_flush (MIO *mio)
 	if (mio->type == MIO_TYPE_FILE)
 		return fflush (mio->impl.file.fp);
 	return 0;
+}
+
+
+/**
+ * mio_attach_user_data:
+ * @mio: A #MIO object
+ * @user_data: a pointer to any data object
+ * @user_data_free_func: a call back function to destroy the data object passed as @user_data
+ *
+ * Attach any data object to a #MIO object. Attached data can be got with
+ * mio_get_user_data(). The attached data is destroyed when new data is attached to
+ * the #MIO object, or #the MIO object itself is destroyed. For destroying the data
+ * @user_data_free_func is used.
+ *
+ */
+
+void  mio_attach_user_data (MIO *mio, void *user_data, MIODestroyNotify user_data_free_func)
+{
+	if (mio->udata.d && mio->udata.f)
+		mio->udata.f (mio->udata.d);
+
+	mio->udata.d = user_data;
+	mio->udata.f = user_data_free_func;
+}
+
+/**
+ * mio_get_user_data:
+ * @mio: A #MIO object
+ *
+ * Returns: user data attached with mio_attach_user_data() to a #MIO object.
+ *
+ */
+void *mio_get_user_data (MIO *mio)
+{
+	return mio->udata.d;
 }

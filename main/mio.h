@@ -106,33 +106,6 @@ struct _MIOPos {
 	} impl;
 };
 
-/**
- * MIO:
- *
- * An object representing a #MIO stream. No assumptions should be made about
- * what compose this object, and none of its fields should be accessed directly.
- */
-struct _MIO {
-	/*< private >*/
-	MIOType type;
-	union {
-		struct {
-			FILE *fp;
-			MIOFCloseFunc close_func;
-		} file;
-		struct {
-			unsigned char *buf;
-			int ungetch;
-			size_t pos;
-			size_t size;
-			size_t allocated_size;
-			MIOReallocFunc realloc_func;
-			MIODestroyNotify free_func;
-			boolean error;
-			boolean eof;
-		} mem;
-	} impl;
-};
 
 
 MIO *mio_new_file (const char *filename, const char *mode);
@@ -147,6 +120,7 @@ MIO *mio_new_memory (unsigned char *data,
 					 MIODestroyNotify free_func);
 
 MIO *mio_new_mio    (MIO *base, long start, size_t size);
+MIO *mio_ref        (MIO *mio);
 
 int mio_free (MIO *mio);
 FILE *mio_file_get_fp (MIO *mio);
@@ -177,5 +151,8 @@ void mio_rewind (MIO *mio);
 int mio_getpos (MIO *mio, MIOPos *pos);
 int mio_setpos (MIO *mio, MIOPos *pos);
 int mio_flush (MIO *mio);
+
+void  mio_attach_user_data (MIO *mio, void *user_data, MIODestroyNotify user_data_free_func);
+void *mio_get_user_data (MIO *mio);
 
 #endif /* MIO_H */
