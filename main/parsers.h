@@ -52,6 +52,7 @@
 	GoParser, \
 	HtmlParser, \
 	JavaParser, \
+	JavaPropertiesParser, \
 	JavaScriptParser, \
 	JsonParser, \
 	LispParser, \
