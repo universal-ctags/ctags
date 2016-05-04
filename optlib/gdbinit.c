@@ -28,7 +28,7 @@ extern parserDefinition* GdbinitParser (void)
 		NULL
 	};
 
-	static const tagRegexTable const GdbinitTagRegexTable [] = {
+	static const tagRegexTable GdbinitTagRegexTable [] = {
 		{"^#.*", "",
 		"", "{exclusive}"},
 		{"^define[[:space:]]+([^[:space:]]+)$", "\\1",

@@ -68,7 +68,7 @@ static kindOption AsmKinds [] = {
 	{ TRUE, 't', "type",   "types (structs and records)"   }
 };
 
-static const keywordTable const AsmKeywords [] = {
+static const keywordTable AsmKeywords [] = {
 	{ "align",    OP_ALIGN       },
 	{ "endmacro", OP_ENDMACRO    },
 	{ "endm",     OP_ENDM        },

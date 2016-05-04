@@ -20,7 +20,7 @@
 *   FUNCTION DEFINITIONS
 */
 
-static const tagRegexTable const yaccTagRegexTable [] = {
+static const tagRegexTable yaccTagRegexTable [] = {
 	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
 	 "l,label,labels", NULL},
 };

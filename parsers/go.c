@@ -101,7 +101,7 @@ static kindOption GoKinds[] = {
 	{TRUE, 'm', "member", "struct members"}
 };
 
-static const keywordTable const GoKeywordTable[] = {
+static const keywordTable GoKeywordTable[] = {
 	{"package", KEYWORD_package},
 	{"import", KEYWORD_import},
 	{"const", KEYWORD_const},

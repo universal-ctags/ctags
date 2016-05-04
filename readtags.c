@@ -340,16 +340,31 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 				int delimiter = *(unsigned char*) p;
 				entry->address.lineNumber = 0;
 				entry->address.pattern = p;
+				
+				//
+				//	RMS 20080729 you can't strchr(delimiter) and then look backwards,
+				//	because that will fail on a search pattern such as this:
+				//
+				//	/^#define		  graphd_value_text_set(a, b, c, d, e)	\\/
+				//
+				//	We have to iterate the pattern one character at a time, skipping
+				//	backslash escapes in the normal fashion. [110932]
+				//
+				
+				p++;
+				
 				do
 				{
-					p = strchr (p + 1, delimiter);
-				} while (p != NULL
-					 &&  isOdd (countContinuousBackslashesBackward (p - 1,
-											entry->address.pattern)));
-
-				if (p == NULL)
+					if ('\\' == *p)
+						p++;
+					
+					p++;
+				}
+				while ((*p != 0) && (*p != delimiter));
+				
+				if (0 == *p)
 				{
-					/* invalid pattern */
+					p = NULL; /* invalid pattern */
 				}
 				else
 					++p;
@@ -366,10 +381,15 @@ static void parseTagLine (tagFile *file, tagEntry *const entry)
 			{
 				/* invalid pattern */
 			}
-			fieldsPresent = (strncmp (p, ";\"", 2) == 0);
-			*p = '\0';
-			if (fieldsPresent)
-				parseExtensionFields (file, entry, p + 2);
+			
+			//	NULL-safe this to avoid the original crash reported in [110932]
+			if (NULL != p)
+			{
+				int	fieldsPresent = (strncmp (p, ";\"", 2) == 0);
+				*p = '\0';
+				if (fieldsPresent)
+					parseExtensionFields (file, entry, p + 2);
+			}
 		}
 	}
 	if (entry->fields.count > 0)
@@ -395,7 +415,7 @@ static char *duplicate (const char *str)
 
 static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 {
-	fpos_t startOfLine;
+	fpos_t startOfLine = 0;
 	const size_t prefixLength = strlen (PseudoTagPrefix);
 	if (info != NULL)
 	{
@@ -448,7 +468,7 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 
 static void gotoFirstLogicalTag (tagFile *const file)
 {
-	fpos_t startOfLine;
+	fpos_t startOfLine = 0;
 	const size_t prefixLength = strlen (PseudoTagPrefix);
 	rewind (file->fp);
 	while (1)
@@ -684,8 +704,11 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 	fseek (file->fp, 0, SEEK_END);
 	file->size = ftell (file->fp);
 	rewind (file->fp);
-	if ((file->sortMethod == TAG_SORTED      && !file->search.ignorecase) ||
-		(file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase))
+//	RMS 20090604 must do sequential search for partial matches; binary search
+//	won't find anything.
+	if ((! file->search.partial) &&
+		((file->sortMethod == TAG_SORTED      && !file->search.ignorecase) ||
+		 (file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase)))
 	{
 #ifdef DEBUG
 		printf ("<performing binary search>\n");
@@ -714,8 +737,11 @@ static tagResult find (tagFile *const file, tagEntry *const entry,
 static tagResult findNext (tagFile *const file, tagEntry *const entry)
 {
 	tagResult result;
-	if ((file->sortMethod == TAG_SORTED      && !file->search.ignorecase) ||
-		(file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase))
+//	RMS 20090604 must do sequential search for partial matches; binary search
+//	won't find anything.
+	if ((! file->search.partial) &&
+		((file->sortMethod == TAG_SORTED      && !file->search.ignorecase) ||
+		 (file->sortMethod == TAG_FOLDSORTED  &&  file->search.ignorecase)))
 	{
 		result = tagsNext (file, entry);
 		if (result == TagSuccess  && nameComparison (file) != 0)
@@ -872,6 +898,19 @@ static void findTag (const char *const name, const int options)
 		exit (1);
 	}
 	else
+	if (NULL == info.program.name)
+	{
+		//
+		//	If the tag program author went to the effort to write a
+		//	!_TAG_PROGRAM_NAME then the file is probably OK. However,
+		//	we should go to more effort to validate the tag file than
+		//	just looking for a specific metadata key.
+		//
+		fprintf (stderr, "%s: cannot open tag file: Format not recognized: %s\n",
+				ProgramName, name);
+		exit (1);
+	}
+	else
 	{
 		if (SortOverride)
 			tagsSetSortType (file, SortMethod);
@@ -908,6 +947,18 @@ static void listTags (void)
 	{
 		fprintf (stderr, "%s: cannot open tag file: %s: %s\n",
 				ProgramName, strerror (info.status.error_number), TagFileName);
+		exit (1);
+	}
+	else if (NULL == info.program.name)
+	{
+		//
+		//	If the tag program author went to the effort to write a
+		//	!_TAG_PROGRAM_NAME then the file is probably OK. However,
+		//	we should go to more effort to validate the tag file than
+		//	just looking for a specific metadata key.
+		//
+		fprintf (stderr, "%s: cannot open tag file: Format not recognized: %s\n",
+				ProgramName, TagFileName);
 		exit (1);
 	}
 	else
@@ -950,7 +1001,7 @@ static const char *const Usage =
 	"    -n           Allow print line numbers if -e option is given.\n"
 	"    -p           Perform partial matching.\n"
 #ifdef QUALIFIER
-	"    -Q EXP      Fileter the result with EXP.\n"
+	"    -Q EXP       Filter the result with EXP.\n"
 #endif
 	"    -s[0|1|2]    Override sort detection of tag file.\n"
 	"    -t file      Use specified tag file (default: \"tags\").\n"
@@ -1002,7 +1053,10 @@ extern int main (int argc, char **argv)
 
 	ProgramName = argv [0];
 	if (argc == 1)
-		printUsage(stderr, 1);
+	{
+		fprintf (stderr, Usage, ProgramName, ProgramName);
+		exit (1);
+	}
 	for (i = 1  ;  i < argc  ;  ++i)
 	{
 		const char *const arg = argv [i];
