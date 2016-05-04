@@ -29,6 +29,12 @@
 *   DATA DECLARATIONS
 */
 
+struct pythonNestingLevelUserData {
+	int indentation;
+};
+#define PY_NL_INDENTATION(nl) ((struct pythonNestingLevelUserData *)nestingLevelGetUserData(nl))->indentation
+
+
 typedef enum {
 	K_UNDEFINED = -1,
 	K_CLASS, K_FUNCTION, K_MEMBER, K_VARIABLE, K_NAMESPACE, K_MODULE, K_UNKNOWN,
@@ -821,10 +827,10 @@ static boolean constructParentString(NestingLevels *nls, int indent,
 	vStringClear (result);
 	for (i = 0; i < nls->n; i++)
 	{
-		NestingLevel *nl = nls->levels + i;
+		NestingLevel *nl = nestingLevelsGetNth (nls, i);
 		tagEntryInfo *e;
 
-		if (indent <= nl->indentation)
+		if (indent <= PY_NL_INDENTATION(nl))
 			break;
 		if (prev)
 		{
@@ -859,8 +865,8 @@ static void checkIndent(NestingLevels *nls, int indent)
 
 	for (i = 0; i < nls->n; i++)
 	{
-		n = nls->levels + i;
-		if (n && indent <= n->indentation)
+		n = nestingLevelsGetNth (nls, i);
+		if (n && indent <= PY_NL_INDENTATION(n))
 		{
 			/* truncate levels */
 			nls->n = i;
@@ -876,8 +882,8 @@ static void addNestingLevel(NestingLevels *nls, int indentation, int corkIndex)
 
 	for (i = 0; i < nls->n; i++)
 	{
-		nl = nls->levels + i;
-		if (indentation <= nl->indentation) break;
+		nl = nestingLevelsGetNth(nls, i);
+		if (indentation <= PY_NL_INDENTATION(nl)) break;
 	}
 	if (i == nls->n)
 		nl = nestingLevelsPush(nls, corkIndex);
@@ -885,7 +891,7 @@ static void addNestingLevel(NestingLevels *nls, int indentation, int corkIndex)
 		/* reuse existing slot */
 		nl = nestingLevelsTruncate (nls, i + 1, corkIndex);
 
-	nl->indentation = indentation;
+	PY_NL_INDENTATION(nl) = indentation;
 }
 
 /* Return a pointer to the start of the next triple string, or NULL. Store
@@ -1092,7 +1098,7 @@ static void findPythonTags (void)
 	vString *const name = vStringNew ();
 	vString *const parent = vStringNew();
 
-	NestingLevels *const nesting_levels = nestingLevelsNew();
+	NestingLevels *const nesting_levels = nestingLevelsNew(sizeof (struct pythonNestingLevelUserData));
 
 	const char *line;
 	int line_skip = 0;

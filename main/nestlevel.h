@@ -25,26 +25,30 @@ typedef struct NestingLevels NestingLevels;
 
 struct NestingLevel
 {
-	int indentation;
 	int corkIndex;
+	char userData [];
 };
 
 struct NestingLevels
 {
-	NestingLevel *levels;
+	void *levels;
 	int n;					/* number of levels in use */
 	int allocated;
+	size_t userDataSize;
 };
 
 /*
 *   FUNCTION PROTOTYPES
 */
-extern NestingLevels *nestingLevelsNew(void);
+extern NestingLevels *nestingLevelsNew(size_t userDataSize);
 extern void nestingLevelsFree(NestingLevels *nls);
 extern NestingLevel *nestingLevelsPush(NestingLevels *nls, int corkIndex);
 extern NestingLevel * nestingLevelsTruncate(NestingLevels *nls, int depth, int corkIndex);
 extern void nestingLevelsPop(NestingLevels *nls);
-extern NestingLevel *nestingLevelsGetCurrent(NestingLevels *nls);
+extern NestingLevel *nestingLevelsGetCurrent(const NestingLevels *nls);
+extern NestingLevel *nestingLevelsGetNth(const NestingLevels *nls, int n);
+
+extern void *nestingLevelGetUserData (const NestingLevel *nl);
 
 #endif  /* CTAGS_MAIN_NESTLEVEL_H */
 

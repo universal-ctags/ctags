@@ -74,7 +74,8 @@ static vString* nestingLevelsToScope (const NestingLevels* nls)
 	vString* result = vStringNew ();
 	for (i = 0; i < nls->n; ++i)
 	{
-	    tagEntryInfo *e = getEntryOfNestingLevel (nls->levels + i);
+	    NestingLevel *nl = nestingLevelsGetNth (nls, i);
+	    tagEntryInfo *e = getEntryOfNestingLevel (nl);
 	    if (e && strlen (e->name) > 0 && (!e->placeholder))
 	    {
 	        if (chunks_output++ > 0)
@@ -393,7 +394,7 @@ static void findRubyTags (void)
 	const unsigned char *line;
 	boolean inMultiLineComment = FALSE;
 
-	nesting = nestingLevelsNew ();
+	nesting = nestingLevelsNew (0);
 
 	/* FIXME: this whole scheme is wrong, because Ruby isn't line-based.
 	* You could perfectly well write:

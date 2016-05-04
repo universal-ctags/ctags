@@ -203,7 +203,7 @@ static void findRstTags (void)
 
 	memset(&filepos, 0, sizeof(MIOPos));
 	memset(kindchars, 0, sizeof kindchars);
-	nestingLevels = nestingLevelsNew();
+	nestingLevels = nestingLevelsNew(0);
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
