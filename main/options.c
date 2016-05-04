@@ -1099,7 +1099,7 @@ static void processFieldsOption (
 	boolean mode = TRUE;
 	int c;
 	fieldType t;
-	int i;
+	unsigned int i;
 
 	static vString * longName;
 	boolean inLongName = FALSE;
@@ -1286,7 +1286,7 @@ static void processListFeaturesOption(const char *const option __unused__,
 static void processListFieldsOption(const char *const option __unused__,
 				    const char *const parameter __unused__)
 {
-	int i;
+	unsigned int i;
 	for (i = 0; i < countParsers(); i++)
 		initializeParser (i);
 	printFields ();

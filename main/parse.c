@@ -700,11 +700,10 @@ extern MIO *getMio (const char *const fileName, const char *const openMode,
 
 #define GLC_FOPEN_IF_NECESSARY(_glc_, _label_, _doesParserRequireMemoryStream_) \
 	do {								\
-		size_t size;						\
 		if (!(_glc_)->input)					\
 			GLC_FOPEN_IF_NECESSARY0 (_glc_, _label_);	\
 		if ((_doesParserRequireMemoryStream_) &&		\
-		    (mio_memory_get_data((_glc_)->input, &size) == NULL)) \
+		    (mio_memory_get_data((_glc_)->input, NULL) == NULL)) \
 		{							\
 			MIO *tmp_ = (_glc_)->input;			\
 			(_glc_)->input = mio_new_mio (tmp_, 0, 0);	\
@@ -1369,7 +1368,7 @@ static boolean doesParserUseKind (const parserDefinition *const parser, char let
 
 static void installFieldSpec (const langType language)
 {
-	int i;
+	unsigned int i;
 	parserDefinition * parser;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
