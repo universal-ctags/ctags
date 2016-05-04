@@ -415,7 +415,7 @@ static char *duplicate (const char *str)
 
 static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 {
-	fpos_t startOfLine = 0;
+	fpos_t startOfLine;
 	const size_t prefixLength = strlen (PseudoTagPrefix);
 	if (info != NULL)
 	{
@@ -468,7 +468,7 @@ static void readPseudoTags (tagFile *const file, tagFileInfo *const info)
 
 static void gotoFirstLogicalTag (tagFile *const file)
 {
-	fpos_t startOfLine = 0;
+	fpos_t startOfLine;
 	const size_t prefixLength = strlen (PseudoTagPrefix);
 	rewind (file->fp);
 	while (1)
