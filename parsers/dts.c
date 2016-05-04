@@ -47,7 +47,7 @@ static kindOption DTSKinds [] = {
 	  .referenceOnly = FALSE, ATTACH_ROLES(DTSHeaderRoles)},
 };
 
-static const tagRegexTable const dtsTagRegexTable [] = {
+static const tagRegexTable dtsTagRegexTable [] = {
 	/* phandle = <0x00> */
 	{"^[ \t]*phandle[ \t]+=[ \t]+<(0x[a-fA-F0-9]+)>", "\\1",
 	 "p,phandler,phandlers", "{scope=ref}"},

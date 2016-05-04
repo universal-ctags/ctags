@@ -17,7 +17,7 @@
 #include "routines.h"
 #include "selectors.h"
 
-static const tagRegexTable const matlabTagRegexTable [] = {
+static const tagRegexTable matlabTagRegexTable [] = {
 	/* function [x,y,z] = asdf */
 	{ "^function[ \t]*\\[.*\\][ \t]*=[ \t]*([a-zA-Z0-9_]+)",
 	  "\\1", "f,function", NULL},

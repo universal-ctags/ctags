@@ -25,7 +25,7 @@ extern parserDefinition* CtagsParser (void)
 		NULL
 	};
 
-	static const tagRegexTable const CtagsTagRegexTable [] = {
+	static const tagRegexTable CtagsTagRegexTable [] = {
 		{"^--langdef=([^ \\t]+)$", "\\1",
 		"l,langdef", NULL},
 		{"^--regex-[^=]+=.*\\/.,(.+)\\/.*", "\\1",

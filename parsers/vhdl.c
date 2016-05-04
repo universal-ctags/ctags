@@ -195,7 +195,7 @@ static kindOption VhdlKinds[] = {
 	{FALSE, 'l', "local", "local definitions"}
 };
 
-static const keywordTable const VhdlKeywordTable[] = {
+static const keywordTable VhdlKeywordTable[] = {
 	{"abs", KEYWORD_ABS},
 	{"access", KEYWORD_ACCESS},
 	{"after", KEYWORD_AFTER},

@@ -138,7 +138,7 @@ static kindOption PhpKinds[COUNT_KIND] = {
 	  ATTACH_SEPARATORS(PhpGenericSeparators)},
 };
 
-static const keywordTable const PhpKeywordTable[] = {
+static const keywordTable PhpKeywordTable[] = {
 	/* keyword			keyword ID */
 	{ "abstract",		KEYWORD_abstract		},
 	{ "and",			KEYWORD_and				},
