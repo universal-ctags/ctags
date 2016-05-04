@@ -1369,7 +1369,7 @@ static boolean doesParserUseKind (const parserDefinition *const parser, char let
 
 static void installFieldSpec (const langType language)
 {
-	int i;
+	unsigned int i;
 	parserDefinition * parser;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);

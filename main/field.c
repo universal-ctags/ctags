@@ -220,7 +220,7 @@ static fieldDesc* getFieldDesc(fieldType type)
 
 extern fieldType getFieldTypeForOption (char letter)
 {
-	int i;
+	unsigned int i;
 
 	for (i = 0; i < fieldDescUsed; i++)
 	{
@@ -233,7 +233,7 @@ extern fieldType getFieldTypeForOption (char letter)
 extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType language)
 {
 	static boolean initialized = FALSE;
-	int i;
+	unsigned int i;
 
 	if (fieldName == NULL)
 		return FIELD_UNKNOWN;
