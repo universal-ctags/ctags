@@ -183,6 +183,7 @@ typedef enum {
 	LMAP_ALL       = LMAP_PATTERN | LMAP_EXTENSION,
 } langmapType;
 
+
 /*
 *   FUNCTION PROTOTYPES
 */
@@ -297,6 +298,7 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 			 const tagXpathTableTable *xpathTableTable,
 			 const kindOption* const kinds, void *userData);
 extern void addTagXpath (const langType language, tagXpathTable *xpathTable);
+
 
 extern boolean makeKindSeparatorsPseudoTags (const langType language,
 					     const ptagDesc *pdesc);

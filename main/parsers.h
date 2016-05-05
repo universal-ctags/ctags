@@ -55,6 +55,7 @@
 	GdbinitParser, \
 	GoParser, \
 	HtmlParser, \
+        IniconfParser, \
 	JavaParser, \
 	JavaPropertiesParser, \
 	JavaScriptParser, \

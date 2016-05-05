@@ -101,6 +101,7 @@ PARSER_HEADS = \
 	parsers/cxx/cxx_token.h \
 	parsers/cxx/cxx_token_chain.h \
 	\
+	parsers/iniconf.h \
 	parsers/make.h \
 	\
 	$(NULL)
@@ -145,6 +146,7 @@ PARSER_SRCS =				\
 	parsers/fortran.c		\
 	parsers/go.c			\
 	parsers/html.c			\
+	parsers/iniconf.c		\
 	parsers/jprop.c			\
 	parsers/jscript.c		\
 	parsers/json.c			\
