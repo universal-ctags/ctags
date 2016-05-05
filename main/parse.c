@@ -685,9 +685,6 @@ struct getLangCtx {
     boolean     err;
 };
 
-extern MIO *getMio (const char *const fileName, const char *const openMode,
-		    boolean memStreamRequired);
-
 #define GLC_FOPEN_IF_NECESSARY0(_glc_, _label_) do {        \
     if (!(_glc_)->input) {                                  \
 	    (_glc_)->input = getMio((_glc_)->fileName, "rb", FALSE);	\
