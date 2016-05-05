@@ -1,0 +1,10 @@
+A	input.py	/^class A(object):$/;"	c	line:1	end:18
+f	input.py	/^    def f(self):$/;"	m	line:3	class:A	end:9
+A.f	input.py	/^    def f(self):$/;"	m	line:3	class:A	end:9
+g	input.py	/^        def g(x):$/;"	f	line:4	function:A.f	file:	end:6
+y	input.py	/^    y = 1$/;"	v	line:10	class:A
+h	input.py	/^    def h(self):$/;"	m	line:12	class:A	end:15
+A.h	input.py	/^    def h(self):$/;"	m	line:12	class:A	end:15
+i	input.py	/^    def i(self):$/;"	m	line:16	class:A	end:18
+A.i	input.py	/^    def i(self):$/;"	m	line:16	class:A	end:18
+input.py	input.py	18;"	F	line:18

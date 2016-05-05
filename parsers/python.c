@@ -29,10 +29,17 @@
 *   DATA DECLARATIONS
 */
 
-struct pythonNestingLevelUserData {
-	int indentation;
+struct corkPair {
+	int index;
+	int fqIndex;
 };
-#define PY_NL_INDENTATION(nl) ((struct pythonNestingLevelUserData *)nestingLevelGetUserData(nl))->indentation
+
+struct nestingLevelUserData {
+	int indentation;
+	int fqIndex;
+};
+#define PY_NL_INDENTATION(nl) ((struct nestingLevelUserData *)nestingLevelGetUserData(nl))->indentation
+#define PY_NL_FQINDEX(nl) ((struct nestingLevelUserData *)nestingLevelGetUserData(nl))->fqIndex
 
 
 typedef enum {
@@ -106,6 +113,18 @@ typedef enum {
 
 static const char *const PythonAccesses[] = {
 	"public", "private", "protected"
+};
+
+typedef enum {
+	F_END,
+} pythonField;
+
+static fieldSpec PythonFields [] = {
+	{
+		.name = "end",
+		.description = "end lines of various constructs",
+		.enabled = FALSE,
+	}
 };
 
 static char const * const singletriple = "'''";
@@ -185,21 +204,24 @@ static void addAccessFields (tagEntryInfo *const entry,
 /* Given a string with the contents of a line directly after the "def" keyword,
  * extract all relevant information and create a tag.
  */
-static int makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
-				 vString *const parent, int is_class_parent, const char *arglist)
+static struct corkPair makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
+						  vString *const parent, int is_class_parent, const char *arglist)
 {
 	char scope_kind_letter = KIND_NULL;
 	int corkIndex;
+	int fqCorkIndex = CORK_NIL;
+	const struct corkPair nilPair = {CORK_NIL, CORK_NIL};
+	struct corkPair pair;
 
 	if (is_class_parent)
 	{
 		if (!PythonKinds[K_MEMBER].enabled)
-			return CORK_NIL;
+			return nilPair;
 	}
 	else
 	{
 		if (!PythonKinds[K_FUNCTION].enabled)
-			return CORK_NIL;
+			return nilPair;
 	}
 
 	tag->extensionFields.signature = arglist;
@@ -227,9 +249,11 @@ static int makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
 
 	if ((scope_kind_letter != KIND_NULL)
 	    && tag->extensionFields.scopeName)
-		makeQualifiedTagEntry (tag);
+		fqCorkIndex = makeQualifiedTagEntry (tag);
 
-	return corkIndex;
+	pair.index = corkIndex;
+	pair.fqIndex = fqCorkIndex;
+	return pair;
 }
 
 static void makeFunctionTag (vString *const function,
@@ -790,7 +814,7 @@ static void skipParens (const char *start)
 	captureArguments (start, NULL);
 }
 
-static int parseFunction (const char *cp, vString *const def,
+static struct corkPair parseFunction (const char *cp, vString *const def,
 	vString *const parent, int is_class_parent)
 {
 	tagEntryInfo tag;
@@ -857,17 +881,43 @@ static boolean constructParentString(NestingLevels *nls, int indent,
 	return is_class;
 }
 
+static void attachEndField (NestingLevel *nl, int level, unsigned long end_line)
+{
+	char buf[16];
+
+	snprintf(buf, sizeof(buf), "%ld", (end_line));
+	if (nl->corkIndex != CORK_NIL)
+		attachParserFieldToCorkEntry (nl->corkIndex,
+					      PythonFields [F_END].ftype,
+					      buf);
+	if (PY_NL_FQINDEX(nl) != CORK_NIL)
+		attachParserFieldToCorkEntry (PY_NL_FQINDEX(nl),
+					      PythonFields [F_END].ftype, buf);
+}
+
 /* Check indentation level and truncate nesting levels accordingly */
-static void checkIndent(NestingLevels *nls, int indent)
+static void checkIndent(NestingLevels *nls, int indent, boolean eof)
 {
 	int i;
 	NestingLevel *n;
+	int dropper_i;
+	unsigned long end_line;
 
+	end_line = getInputLineNumber() - (eof? 0: 1);
 	for (i = 0; i < nls->n; i++)
 	{
 		n = nestingLevelsGetNth (nls, i);
 		if (n && indent <= PY_NL_INDENTATION(n))
 		{
+
+			for (dropper_i = i; dropper_i < nls->n; dropper_i++)
+			{
+				NestingLevel *dropper_nl;
+
+				dropper_nl = nestingLevelsGetNth (nls, dropper_i);
+				attachEndField (dropper_nl, dropper_i, end_line);
+			}
+
 			/* truncate levels */
 			nls->n = i;
 			break;
@@ -875,7 +925,7 @@ static void checkIndent(NestingLevels *nls, int indent)
 	}
 }
 
-static void addNestingLevel(NestingLevels *nls, int indentation, int corkIndex)
+static void addNestingLevel(NestingLevels *nls, int indentation, struct corkPair *corkPair)
 {
 	int i;
 	NestingLevel *nl = NULL;
@@ -886,12 +936,13 @@ static void addNestingLevel(NestingLevels *nls, int indentation, int corkIndex)
 		if (indentation <= PY_NL_INDENTATION(nl)) break;
 	}
 	if (i == nls->n)
-		nl = nestingLevelsPush(nls, corkIndex);
+		nl = nestingLevelsPush(nls, corkPair->index);
 	else
 		/* reuse existing slot */
-		nl = nestingLevelsTruncate (nls, i + 1, corkIndex);
+		nl = nestingLevelsTruncate (nls, i + 1, corkPair->index);
 
 	PY_NL_INDENTATION(nl) = indentation;
+	PY_NL_FQINDEX(nl) = corkPair->fqIndex;
 }
 
 /* Return a pointer to the start of the next triple string, or NULL. Store
@@ -1098,7 +1149,7 @@ static void findPythonTags (void)
 	vString *const name = vStringNew ();
 	vString *const parent = vStringNew();
 
-	NestingLevels *const nesting_levels = nestingLevelsNew(sizeof (struct pythonNestingLevelUserData));
+	NestingLevels *const nesting_levels = nestingLevelsNew(sizeof (struct nestingLevelUserData));
 
 	const char *line;
 	int line_skip = 0;
@@ -1144,7 +1195,7 @@ static void findPythonTags (void)
 			continue;
 		}
 
-		checkIndent(nesting_levels, indent);
+		checkIndent(nesting_levels, indent, FALSE);
 
 		/* Find global and class variables */
 		variable = findVariable(line, &variableLineContinuation);
@@ -1232,17 +1283,20 @@ static void findPythonTags (void)
 			if (found)
 			{
 				boolean is_parent_class;
-				int corkIndex;
+				struct corkPair corkPair;
 
 				is_parent_class =
 					constructParentString(nesting_levels, indent, parent);
 
 				if (is_class)
-					corkIndex = parseClass (cp, name, parent, is_parent_class);
+				{
+					corkPair.index = parseClass (cp, name, parent, is_parent_class);
+					corkPair.fqIndex = CORK_NIL;
+				}
 				else
-					corkIndex = parseFunction(cp, name, parent, is_parent_class);
+					corkPair = parseFunction(cp, name, parent, is_parent_class);
 
-				addNestingLevel(nesting_levels, indent, corkIndex);
+				addNestingLevel(nesting_levels, indent, &corkPair);
 			}
 			continue;
 		}
@@ -1258,6 +1312,10 @@ static void findPythonTags (void)
 		   ... ) */
 		skipParens (line);
 	}
+
+	/* Force popping all nesting levels. */
+	checkIndent(nesting_levels, 0, TRUE);
+
 	/* Clean up all memory we allocated. */
 	vStringDelete (parent);
 	vStringDelete (name);
@@ -1277,6 +1335,8 @@ extern parserDefinition *PythonParser (void)
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findPythonTags;
+	def->fieldSpecs = PythonFields;
+	def->fieldSpecCount = ARRAY_SIZE (PythonFields);
 	def->useCork = TRUE;
 	return def;
 }

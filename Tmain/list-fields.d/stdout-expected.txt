@@ -26,6 +26,7 @@ x	xpath	off	NONE	TRUE	xpath for the tag
 -	template	off	C++	TRUE	template parameters
 -	captures	off	C++	TRUE	lambda capture list
 -	properties	off	C++	TRUE	properties (static, virtual, inline, mutable,...)
+-	end	off	Python	TRUE	end lines of various constructs
 -	sectionMarker	off	reStructuredText	TRUE	character used for declaring section
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/

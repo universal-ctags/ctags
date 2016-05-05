@@ -7,32 +7,32 @@ KEY	input.py	/^KEY = 0x01$/;"	kind:variable	line:13	language:Python	access:publi
 TREEID	input.py	/^TREEID = 0x02$/;"	kind:variable	line:14	language:Python	access:public
 INDENT	input.py	/^INDENT = 0x04$/;"	kind:variable	line:15	language:Python	access:public
 DATA	input.py	/^DATA = 0x08 # Used by dbtreedata$/;"	kind:variable	line:16	language:Python	access:public
-one	input.py	/^class one:$/;"	kind:class	line:18	language:Python	inherits:	access:public
+one	input.py	/^class one:$/;"	kind:class	line:18	language:Python	inherits:	access:public	end:35
 x	input.py	/^    x = lambda x: x$/;"	kind:member	line:20	language:Python	scope:class:one	access:public	signature:(x)
 one.x	input.py	/^    x = lambda x: x$/;"	kind:member	line:20	language:Python	scope:class:one	access:public	signature:(x)	extra:qualified
 y	input.py	/^    y = 0$/;"	kind:variable	line:21	language:Python	scope:class:one	access:public
-__init__	input.py	/^    def __init__(self, filename, pathsep='', treegap=64):$/;"	kind:member	line:23	language:Python	scope:class:one	access:public	signature:(self, filename, pathsep=,, treegap=64)
-one.__init__	input.py	/^    def __init__(self, filename, pathsep='', treegap=64):$/;"	kind:member	line:23	language:Python	scope:class:one	access:public	signature:(self, filename, pathsep=,, treegap=64)	extra:qualified
-__private_function__	input.py	/^    def __private_function__(self, key, data):$/;"	kind:member	line:27	language:Python	scope:class:one	access:public	signature:(self, key, data)
-one.__private_function__	input.py	/^    def __private_function__(self, key, data):$/;"	kind:member	line:27	language:Python	scope:class:one	access:public	signature:(self, key, data)	extra:qualified
-public_function	input.py	/^    def public_function(self, key):$/;"	kind:member	line:29	language:Python	scope:class:one	access:public	signature:(self, key)
-one.public_function	input.py	/^    def public_function(self, key):$/;"	kind:member	line:29	language:Python	scope:class:one	access:public	signature:(self, key)	extra:qualified
-this_is_ignored	input.py	/^        class this_is_ignored:$/;"	kind:class	line:30	language:Python	scope:function:one.public_function	file:	inherits:	access:private
-_pack	input.py	/^    def _pack(self, key):$/;"	kind:member	line:32	language:Python	scope:class:one	access:protected	signature:(self, key)
-one._pack	input.py	/^    def _pack(self, key):$/;"	kind:member	line:32	language:Python	scope:class:one	access:protected	signature:(self, key)	extra:qualified
-so_is_this	input.py	/^    class so_is_this:$/;"	kind:class	line:34	language:Python	scope:class:one	inherits:	access:public
-_test	input.py	/^def _test(test, code, outcome, exception):$/;"	kind:function	line:36	language:Python	access:protected	signature:(test, code, outcome, exception)
-ignored_function	input.py	/^    def ignored_function():$/;"	kind:function	line:37	language:Python	scope:function:_test	file:	access:private	signature:()
-more_nesting	input.py	/^        def more_nesting():$/;"	kind:function	line:38	language:Python	scope:function:_test.ignored_function	file:	access:private	signature:()
-deeply_nested	input.py	/^            class deeply_nested():$/;"	kind:class	line:39	language:Python	scope:function:_test.ignored_function.more_nesting	file:	inherits:	access:private
-even_more	input.py	/^                def even_more():$/;"	kind:member	line:40	language:Python	scope:class:_test.ignored_function.more_nesting.deeply_nested	access:public	signature:()
-_test.ignored_function.more_nesting.deeply_nested.even_more	input.py	/^                def even_more():$/;"	kind:member	line:40	language:Python	scope:class:_test.ignored_function.more_nesting.deeply_nested	access:public	signature:()	extra:qualified
-this	input.py	/^                    @blah class this is seen???$/;"	kind:class	line:41	language:Python	scope:function:_test.ignored_function.more_nesting.deeply_nested.even_more	file:	inherits:	access:private
-this	input.py	/^                        @bleh def this also? good!$/;"	kind:member	line:42	language:Python	scope:class:_test.ignored_function.more_nesting.deeply_nested.even_more.this	access:public	signature:
-_test.ignored_function.more_nesting.deeply_nested.even_more.this.this	input.py	/^                        @bleh def this also? good!$/;"	kind:member	line:42	language:Python	scope:class:_test.ignored_function.more_nesting.deeply_nested.even_more.this	access:public	signature:	extra:qualified
-two	input.py	/^class two (one):$/;"	kind:class	line:46	language:Python	inherits:one	access:public
-only	input.py	/^    def only(arg):$/;"	kind:member	line:48	language:Python	scope:class:two	access:public	signature:(arg)
-two.only	input.py	/^    def only(arg):$/;"	kind:member	line:48	language:Python	scope:class:two	access:public	signature:(arg)	extra:qualified
-three	input.py	/^C):$/;"	kind:class	line:54	language:Python	inherits:A, B, C	access:public
-foo	input.py	/^foo($/;"	kind:function	line:57	language:Python	access:public	signature:(x,y, z)
+__init__	input.py	/^    def __init__(self, filename, pathsep='', treegap=64):$/;"	kind:member	line:23	language:Python	scope:class:one	access:public	signature:(self, filename, pathsep=,, treegap=64)	end:26
+one.__init__	input.py	/^    def __init__(self, filename, pathsep='', treegap=64):$/;"	kind:member	line:23	language:Python	scope:class:one	access:public	signature:(self, filename, pathsep=,, treegap=64)	extra:qualified	end:26
+__private_function__	input.py	/^    def __private_function__(self, key, data):$/;"	kind:member	line:27	language:Python	scope:class:one	access:public	signature:(self, key, data)	end:28
+one.__private_function__	input.py	/^    def __private_function__(self, key, data):$/;"	kind:member	line:27	language:Python	scope:class:one	access:public	signature:(self, key, data)	extra:qualified	end:28
+public_function	input.py	/^    def public_function(self, key):$/;"	kind:member	line:29	language:Python	scope:class:one	access:public	signature:(self, key)	end:31
+one.public_function	input.py	/^    def public_function(self, key):$/;"	kind:member	line:29	language:Python	scope:class:one	access:public	signature:(self, key)	extra:qualified	end:31
+this_is_ignored	input.py	/^        class this_is_ignored:$/;"	kind:class	line:30	language:Python	scope:function:one.public_function	file:	inherits:	access:private	end:31
+_pack	input.py	/^    def _pack(self, key):$/;"	kind:member	line:32	language:Python	scope:class:one	access:protected	signature:(self, key)	end:33
+one._pack	input.py	/^    def _pack(self, key):$/;"	kind:member	line:32	language:Python	scope:class:one	access:protected	signature:(self, key)	extra:qualified	end:33
+so_is_this	input.py	/^    class so_is_this:$/;"	kind:class	line:34	language:Python	scope:class:one	inherits:	access:public	end:35
+_test	input.py	/^def _test(test, code, outcome, exception):$/;"	kind:function	line:36	language:Python	access:protected	signature:(test, code, outcome, exception)	end:43
+ignored_function	input.py	/^    def ignored_function():$/;"	kind:function	line:37	language:Python	scope:function:_test	file:	access:private	signature:()	end:43
+more_nesting	input.py	/^        def more_nesting():$/;"	kind:function	line:38	language:Python	scope:function:_test.ignored_function	file:	access:private	signature:()	end:43
+deeply_nested	input.py	/^            class deeply_nested():$/;"	kind:class	line:39	language:Python	scope:function:_test.ignored_function.more_nesting	file:	inherits:	access:private	end:43
+even_more	input.py	/^                def even_more():$/;"	kind:member	line:40	language:Python	scope:class:_test.ignored_function.more_nesting.deeply_nested	access:public	signature:()	end:43
+_test.ignored_function.more_nesting.deeply_nested.even_more	input.py	/^                def even_more():$/;"	kind:member	line:40	language:Python	scope:class:_test.ignored_function.more_nesting.deeply_nested	access:public	signature:()	extra:qualified	end:43
+this	input.py	/^                    @blah class this is seen???$/;"	kind:class	line:41	language:Python	scope:function:_test.ignored_function.more_nesting.deeply_nested.even_more	file:	inherits:	access:private	end:43
+this	input.py	/^                        @bleh def this also? good!$/;"	kind:member	line:42	language:Python	scope:class:_test.ignored_function.more_nesting.deeply_nested.even_more.this	access:public	signature:	end:43
+_test.ignored_function.more_nesting.deeply_nested.even_more.this.this	input.py	/^                        @bleh def this also? good!$/;"	kind:member	line:42	language:Python	scope:class:_test.ignored_function.more_nesting.deeply_nested.even_more.this	access:public	signature:	extra:qualified	end:43
+two	input.py	/^class two (one):$/;"	kind:class	line:46	language:Python	inherits:one	access:public	end:52
+only	input.py	/^    def only(arg):$/;"	kind:member	line:48	language:Python	scope:class:two	access:public	signature:(arg)	end:52
+two.only	input.py	/^    def only(arg):$/;"	kind:member	line:48	language:Python	scope:class:two	access:public	signature:(arg)	extra:qualified	end:52
+three	input.py	/^C):$/;"	kind:class	line:54	language:Python	inherits:A, B, C	access:public	end:56
+foo	input.py	/^foo($/;"	kind:function	line:57	language:Python	access:public	signature:(x,y, z)	end:60
 input.py	input.py	60;"	kind:file	line:60	language:Python	extra:inputFileWithEndline

@@ -8,4 +8,5 @@ x       UCTAGSxpath     off     NONE            TRUE     xpath for the tag
 -       UCTAGStemplate  off     C++             TRUE     template parameters           
 -       UCTAGScaptures  off     C++             TRUE     lambda capture list           
 -       UCTAGSproperties off     C++             TRUE     properties (static, virtual, inline, mutable,...)
+-       UCTAGSend       off     Python          TRUE     end lines of various constructs
 -       UCTAGSsectionMarker off     reStructuredText TRUE     character used for declaring section
