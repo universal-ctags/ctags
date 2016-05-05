@@ -472,7 +472,7 @@ static tagFile *initialize (const char *const filePath, tagFileInfo *const info)
 		result->fields.max = 20;
 		result->fields.list = (tagExtensionField*) calloc (
 			result->fields.max, sizeof (tagExtensionField));
-		result->fp = fopen (filePath, "r");
+		result->fp = fopen (filePath, "rb");
 		if (result->fp == NULL)
 		{
 			free (result);

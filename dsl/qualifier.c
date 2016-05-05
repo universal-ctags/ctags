@@ -661,11 +661,15 @@ enum QRESULT q_is_acceptable  (QCode *code, tagEntry *entry)
 		i = Q_REJECT;
 	else if (es_error_p (r))
 	{
+		MIO  *mioerr = mio_new_fp (stderr, NULL);;
+
 		fprintf(stderr, "GOT ERROR in QUALIFYING: %s: ",
 			 es_error_name (r));
-		es_print(es_error_get_object(r), stderr);
+		es_print(es_error_get_object(r), mioerr);
 		putc('\n', stderr);
 		i = Q_ERROR;
+
+		mio_free(mioerr);
 	}
 	else
 		i = Q_ACCEPT;

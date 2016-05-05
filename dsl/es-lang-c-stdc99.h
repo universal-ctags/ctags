@@ -27,6 +27,8 @@
 #endif
 #include <stdio.h>
 
+#include "mio.h"
+
 #ifdef  __cplusplus
 extern "C" {
 #endif
@@ -145,13 +147,13 @@ EsObject*    es_cdr         (const EsObject* object);
  * Print
  */
 void         es_print           (const EsObject* object,
-				 FILE*           out);
+				 MIO*           out);
 char*        es_print_to_string (EsObject*        object);
 
 /*
  * Read
  */
-EsObject*    es_read            (FILE* in);
+EsObject*    es_read            (MIO* in);
 EsObject*    es_read_from_string(const char* in,
 				 const char** saveptr);
 
@@ -163,7 +165,7 @@ EsObject*    es_read_from_string(const char* in,
  * Comment
  */
 void         es_comment           (const char* comment,
-				   FILE*       out);
+				   MIO*       out);
 char*        es_comment_to_string (const char* comment);
 
 /*
