@@ -318,8 +318,11 @@ extern MIO *getMio (const char *const fileName, const char *const openMode,
 	    && (size > MAX_IN_MEMORY_FILE_SIZE || size == 0))
 		return mio_new_file (fileName, openMode);
 
-	data = eMalloc (size);
 	src = fopen (fileName, openMode);
+	if (!src)
+		return NULL;
+
+	data = eMalloc (size);
 	if (fread (data, 1, size, src) != size)
 	{
 		eFree (data);
