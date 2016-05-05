@@ -28,6 +28,12 @@ Python	x	imported	imported from the other module	on
 Python	x	indirectly-imported	classes/variables/functions/modules imported in alternative name	on
 RpmSpec	m	undef	undefined	on
 Sh	s	loaded	loaded	on
+SystemdUnit	u	Requires	referred in Requires key	on
+SystemdUnit	u	Wants	referred in Wants key	on
+SystemdUnit	u	After	referred in After key	on
+SystemdUnit	u	Before	referred in Before key	on
+SystemdUnit	u	RequiredBy	referred in RequiredBy key	on
+SystemdUnit	u	WantedBy	referred in WantedBy key	on
 Vera	d	undef	undefined	on
 Vera	h	system	system header	on
 Vera	h	local	local header	on
@@ -61,6 +67,12 @@ Python	x	imported	imported from the other module	on
 Python	x	indirectly-imported	classes/variables/functions/modules imported in alternative name	on
 RpmSpec	m	undef	undefined	on
 Sh	s	loaded	loaded	on
+SystemdUnit	u	Requires	referred in Requires key	on
+SystemdUnit	u	Wants	referred in Wants key	on
+SystemdUnit	u	After	referred in After key	on
+SystemdUnit	u	Before	referred in Before key	on
+SystemdUnit	u	RequiredBy	referred in RequiredBy key	on
+SystemdUnit	u	WantedBy	referred in WantedBy key	on
 Vera	d	undef	undefined	on
 Vera	h	system	system header	on
 Vera	h	local	local header	on

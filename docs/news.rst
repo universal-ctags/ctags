@@ -58,6 +58,7 @@ The following parsers have been added:
 * reStructuredText
 * RpmSpec
 * Rust
+* SystemdUnit
 * SystemVerilog
 * SVG *libxml*
 * TTCN

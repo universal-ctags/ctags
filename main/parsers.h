@@ -89,6 +89,7 @@
 	SlangParser, \
 	SmlParser, \
 	SqlParser, \
+	SystemdUnitParser, \
 	TclParser, \
 	TexParser, \
 	TTCNParser, \

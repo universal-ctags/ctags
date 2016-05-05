@@ -1,0 +1,11 @@
+[Unit]
+Description=download the file specified in /home/yamato/var/promise/t_conf/rhel-server-6_5-x86_64.promise and deploy it to the local file system
+After=network-online.target
+Requires=network-online.target
+
+[Service]
+Type=oneshot
+Nice=19
+IOSchedulingClass=3
+IOSchedulingPriority=7
+ExecStart=/usr/bin/promise force /home/yamato/var/promise/t_conf/rhel-server-6_5-x86_64.promise

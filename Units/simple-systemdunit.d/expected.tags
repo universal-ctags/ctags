@@ -1,0 +1,12 @@
+After	input.service	/^After=network-online.target$/;"	key	language:Iniconf	section:Unit
+Description	input.service	/^Description=download the file specified in \/home\/yamato\/var\/promise\/t_conf\/rhel-server-6_5/;"	key	language:Iniconf	section:Unit
+ExecStart	input.service	/^ExecStart=\/usr\/bin\/promise force \/home\/yamato\/var\/promise\/t_conf\/rhel-server-6_5-x86_64/;"	key	language:Iniconf	section:Service
+IOSchedulingClass	input.service	/^IOSchedulingClass=3$/;"	key	language:Iniconf	section:Service
+IOSchedulingPriority	input.service	/^IOSchedulingPriority=7$/;"	key	language:Iniconf	section:Service
+Nice	input.service	/^Nice=19$/;"	key	language:Iniconf	section:Service
+Requires	input.service	/^Requires=network-online.target$/;"	key	language:Iniconf	section:Unit
+Service	input.service	/^[Service]$/;"	section	language:Iniconf
+Type	input.service	/^Type=oneshot$/;"	key	language:Iniconf	section:Service
+Unit	input.service	/^[Unit]$/;"	section	language:Iniconf
+network-online.target	input.service	/^After=network-online.target$/;"	unit	language:SystemdUnit	role:After
+network-online.target	input.service	/^Requires=network-online.target$/;"	unit	language:SystemdUnit	role:Requires

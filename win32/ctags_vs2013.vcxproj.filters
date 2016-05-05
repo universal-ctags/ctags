@@ -168,6 +168,9 @@
     <ClCompile Include="..\parsers\sql.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\systemdunit.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\tcl.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
