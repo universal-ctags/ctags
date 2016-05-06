@@ -17,6 +17,7 @@ OPT = /O2
 REGEX_OBJS = $(REGEX_SRCS:.c=.obj)
 FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.obj)
 ALL_OBJS = $(ALL_SRCS:.c=.obj) $(REGEX_OBJS) $(FNMATCH_OBJS)
+READTAGS_OBJS = $(READTAGS_SRCS:.c=.obj)
 
 !if "$(WITH_ICONV)" == "yes"
 DEFINES = $(DEFINES) -DHAVE_ICONV
@@ -37,6 +38,8 @@ OPT = $(OPT) /Zi
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparsers\ /c $<
 {parsers\cxx}.c{parsers\cxx}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparsers\cxx\ /c $<
+{read}.c{read}.obj::
+	$(CC) $(OPT) -DREADTAGS_MAIN $(DEFINES) $(INCLUDES) /Foread\ /c $<
 
 all: ctags.exe readtags.exe
 
@@ -45,8 +48,8 @@ ctags: ctags.exe
 ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS)
 	$(CC) $(OPT) /Fe$@ $(ALL_OBJS) /link setargv.obj $(LIBS)
 
-readtags.exe: readtags.c
-	$(CC) $(OPT) /Fe$@ $(DEFINES) -DREADTAGS_MAIN readtags.c /link setargv.obj
+readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS)
+	$(CC) $(OPT) /Fe$@ $(READTAGS_OBJS) /link setargv.obj
 
 $(REGEX_OBJS): $(REGEX_SRCS)
 	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(REGEX_SRCS)
@@ -56,6 +59,6 @@ $(FNMATCH_OBJS): $(FNMATCH_SRCS)
 
 
 clean:
-	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj
+	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj read\*.obj
 	- del ctags.exe readtags.exe
 	- del tags

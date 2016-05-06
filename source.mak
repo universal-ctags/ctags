@@ -208,4 +208,9 @@ ALL_OBJS = \
 	$(ALL_SRCS:.c=.$(OBJEXT)) \
 	$(LIBOBJS)
 
+
+READTAGS_SRCS  = read/readtags.c
+READTAGS_HEADS = read/readtags.h
+READTAGS_OBJS  = $(READTAGS_SRCS:.c=.$(OBJEXT))
+
 # vim: ts=8
