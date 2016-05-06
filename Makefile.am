@@ -10,7 +10,7 @@ bin_PROGRAMS+= readtags
 readtags_CPPFLAGS = -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main
 dist_readtags_SOURCES = readtags.c readtags.h
 readtags_CPPFLAGS += -DQUALIFIER -I$(srcdir)/dsl
-dist_readtags_SOURCES += $(QUALIFIER_SRCS) $(QUALIFIER_HEAD)
+dist_readtags_SOURCES += $(QUALIFIER_SRCS) $(QUALIFIER_HEADS)
 endif
 
 if !HAVE_FNMATCH

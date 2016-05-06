@@ -188,7 +188,7 @@ FNMATCH_HEADS = fnmatch/fnmatch.h
 FNMATCH_SRCS = fnmatch/fnmatch.c
 FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.$(OBJEXT))
 
-QUALIFIER_HEAD = dsl/es-lang-c-stdc99.h \
+QUALIFIER_HEADS = dsl/es-lang-c-stdc99.h \
 		 dsl/qualifier.h \
 		 \
 		 $(MIO_HEADS) \
