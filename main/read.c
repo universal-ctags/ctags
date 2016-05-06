@@ -535,6 +535,26 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 	return opened;
 }
 
+extern void resetInputFile (const langType language)
+{
+	Assert (File.fp);
+
+	mio_rewind (File.fp);
+	mio_getpos (File.fp, &StartOfLine);
+	mio_getpos (File.fp, &File.filePosition);
+	File.currentLine  = NULL;
+	File.eof          = FALSE;
+	File.newLine      = TRUE;
+
+	if (File.line != NULL)
+		vStringClear (File.line);
+
+	File.input.language = language;
+	File.input.lineNumber = 0L;
+	File.source.language = language;
+	File.source.lineNumber = 0L;
+}
+
 extern void closeInputFile (void)
 {
 	if (File.fp != NULL)

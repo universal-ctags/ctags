@@ -56,6 +56,7 @@ typedef struct {
  * FUNCTION PROTOTYPES
  */
 
+static void addParserPseudoTags (langType language);
 
 /*
 *   DATA DEFINITIONS
@@ -1990,32 +1991,27 @@ extern void printLanguageList (void)
 
 static rescanReason createTagsForFile (
 		const char *const fileName, const langType language,
-		const unsigned int passCount,
-		MIO *mio)
+		const unsigned int passCount)
 {
+	parserDefinition *const lang = LanguageTable [language];
 	rescanReason rescan = RESCAN_NONE;
-	Assert (0 <= language  &&  language < (int) LanguageCount);
-	if (openInputFile (fileName, language, mio))
-	{
-		parserDefinition *const lang = LanguageTable [language];
 
-		Assert (lang->parser || lang->parser2);
+	resetInputFile (language);
 
-		if (LanguageTable [language]->useCork)
-			corkTagFile();
+	Assert (lang->parser || lang->parser2);
 
-		if (lang->parser != NULL)
-			lang->parser ();
-		else if (lang->parser2 != NULL)
-			rescan = lang->parser2 (passCount);
+	if (LanguageTable [language]->useCork)
+		corkTagFile();
 
-		makeFileTag (fileName);
+	if (lang->parser != NULL)
+		lang->parser ();
+	else if (lang->parser2 != NULL)
+		rescan = lang->parser2 (passCount);
 
-		if (LanguageTable [language]->useCork)
-			uncorkTagFile();
+	makeFileTag (fileName);
 
-		closeInputFile ();
-	}
+	if (LanguageTable [language]->useCork)
+		uncorkTagFile();
 
 	return rescan;
 }
@@ -2030,9 +2026,17 @@ static boolean createTagsWithFallback (
 	boolean tagFileResized = FALSE;
 	rescanReason whyRescan;
 
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+
+	if (!openInputFile (fileName, language, mio))
+		return tagFileResized;
+
+	initializeParser (language);
+	addParserPseudoTags (language);
 	tagFilePosition (&tagfpos);
+
 	while ( ( whyRescan =
-	            createTagsForFile (fileName, language, ++passCount, mio) )
+	            createTagsForFile (fileName, language, ++passCount) )
 	                != RESCAN_NONE)
 	{
 		if (whyRescan == RESCAN_FAILED)
@@ -2049,6 +2053,9 @@ static boolean createTagsWithFallback (
 			numTags = numTagsAdded ();
 		}
 	}
+
+	closeInputFile ();
+
 	return tagFileResized;
 }
 
@@ -2192,8 +2199,6 @@ extern boolean parseFile (const char *const fileName)
 	}
 	else
 	{
-		initializeParser (language);
-
 		if (Option.filter)
 			openTagFile ();
 
@@ -2205,8 +2210,6 @@ extern boolean parseFile (const char *const fileName)
 
 		if (Option.etags)
 			beginEtagsFile ();
-
-		addParserPseudoTags (language);
 
 		tagFileResized = createTagsWithFallback (fileName, language, mio);
 #ifdef HAVE_COPROC

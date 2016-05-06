@@ -78,6 +78,7 @@ extern const unsigned char *getInputFileData (size_t *size);
 extern boolean              openInputFile (const char *const fileName, const langType language, MIO *mio);
 extern MIO                 *getMio (const char *const fileName, const char *const openMode,
 				    boolean memStreamRequired);
+extern void                 resetInputFile (const langType language);
 
 extern void                 closeInputFile (void);
 extern void                *getInputFileUserData(void);
