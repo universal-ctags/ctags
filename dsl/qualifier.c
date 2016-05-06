@@ -17,6 +17,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 /*
  * Types
@@ -72,6 +73,7 @@ static EsObject* value_pattern (EsObject *args, tagEntry *entry);
 static EsObject* value_inherits (EsObject *args, tagEntry *entry);
 static EsObject* value_scope_kind (EsObject *args, tagEntry *entry);
 static EsObject* value_scope_name (EsObject *args, tagEntry *entry);
+static EsObject* value_end (EsObject *args, tagEntry *entry);
 
 
 struct sCode {
@@ -117,7 +119,8 @@ struct sCode {
 	{ "$inherits",       value_inherits,       NULL, MEMORABLE, 0UL,
 	  .helpstr = "<list>" },
 	{ "$scope-kind",     value_scope_kind,     NULL, MEMORABLE, 0UL },
-	{ "$scope-name",     value_scope_name,     NULL, MEMORABLE, 0UL }
+	{ "$scope-name",     value_scope_name,     NULL, MEMORABLE, 0UL },
+	{ "$end",            value_end,            NULL, MEMORABLE, 0UL },
 };
 
 static void define (Code *code)
@@ -514,6 +517,23 @@ static EsObject* value_line (EsObject *args, tagEntry *entry)
 		return es_false;
 	else
 		return es_object_autounref (es_integer_new (ln));
+}
+
+static EsObject* value_end (EsObject *args, tagEntry *entry)
+{
+	const char *end_str = entry_xget(entry, "end");
+	EsObject *o;
+
+	if (end_str)
+	{
+		o = es_read_from_string (end_str, NULL);
+		if (es_error_p (o))
+			return es_false;
+		else
+			return es_object_autounref (o);
+	}
+	else
+		return es_false;
 }
 
 static EsObject* value_kind (EsObject *args, tagEntry *entry)

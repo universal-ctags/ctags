@@ -1,0 +1,3 @@
+;; (and $end (> $end 14) (< $end 18))
+h	input.py	/^    def h(self):$/;"	kind:m	class:A	end:15
+A.h	input.py	/^    def h(self):$/;"	kind:m	class:A	end:15

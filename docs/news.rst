@@ -756,6 +756,7 @@ rejection: readtags doesn't print it.
 	      $inherits
 	    $scope-kind
 	    $scope-name
+	           $end
 
 All symbols started from `$` represent a field of an entry which is
 under judgment with the S expression. Most of all them are evaluated
