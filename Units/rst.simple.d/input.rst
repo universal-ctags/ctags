@@ -18,6 +18,11 @@ Subsubsection 1.1.1.1
 
 Text of subsubsection 1.1.1.1
 
+Section 1.2
+-----------
+
+Text of section 1.2
+
 Chapter 2
 =========
 
@@ -27,3 +32,8 @@ Section 2.1
 -----------
 
 Text of section 2.1
+
+Section 2.2
+-----------
+
+Text of section 2.2

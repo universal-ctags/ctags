@@ -10,3 +10,4 @@ x       UCTAGSxpath     off     NONE            TRUE     xpath for the tag
 -       UCTAGSproperties off     C++             TRUE     properties (static, virtual, inline, mutable,...)
 -       UCTAGSend       off     Python          TRUE     end lines of various constructs
 -       UCTAGSsectionMarker off     reStructuredText TRUE     character used for declaring section
+-       UCTAGSend       off     reStructuredText TRUE     end lines of various constructs

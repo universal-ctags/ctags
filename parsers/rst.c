@@ -28,6 +28,7 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
+	K_EOF = -1,
 	K_CHAPTER = 0,
 	K_SECTION,
 	K_SUBSECTION,
@@ -44,6 +45,7 @@ static kindOption RstKinds[] = {
 
 typedef enum {
 	F_SECTION_MARKER,
+	F_END,
 } rstField;
 
 static fieldSpec RstFields [] = {
@@ -51,7 +53,13 @@ static fieldSpec RstFields [] = {
 		.name = "sectionMarker",
 		.description = "character used for declaring section",
 		.enabled = FALSE,
-	}
+	},
+	{
+		.name = "end",
+		.description = "end lines of various constructs",
+		.enabled = FALSE,
+	},
+
 };
 
 static char kindchars[SECTION_COUNT];
@@ -67,12 +75,29 @@ static NestingLevel *getNestingLevel(const int kind)
 	NestingLevel *nl;
 	tagEntryInfo *e;
 
+	char buf[16];
+	int d = 0;
+
+	if (kind > K_EOF)
+	{
+		d++;
+		/* 1. we want the line before the '---' underline chars */
+		d++;
+		/* 2. we want the line before the next section/chapter title. */
+	}
+
+	snprintf(buf, sizeof(buf), "%ld", getInputLineNumber() - d);
+
 	while (1)
 	{
 		nl = nestingLevelsGetCurrent(nestingLevels);
 		e = getEntryOfNestingLevel (nl);
 		if ((nl && (e == NULL)) || (e && (e->kind - RstKinds) >= kind))
+		{
+			if (e)
+				attachParserField (e, RstFields [F_END].ftype, eStrdup(buf));
 			nestingLevelsPop(nestingLevels);
+		}
 		else
 			break;
 	}
@@ -236,6 +261,8 @@ static void findRstTags (void)
 		}
 		vStringTerminate(name);
 	}
+	/* Force popping all nesting levels */
+	getNestingLevel (K_EOF);
 	vStringDelete (name);
 	nestingLevelsFree(nestingLevels);
 }
