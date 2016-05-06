@@ -201,6 +201,7 @@
     <ClCompile Include="..\main\mio.c" />
     <ClCompile Include="..\parsers\yacc.c" />
     <ClCompile Include="..\parsers\rpmspec.c" />
+    <ClCompile Include="..\main\promise.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\fnmatch\fnmatch.h" />
@@ -240,6 +241,7 @@
     <ClInclude Include="..\parsers\cxx\cxx_tag.h" />
     <ClInclude Include="..\parsers\cxx\cxx_token.h" />
     <ClInclude Include="..\parsers\cxx\cxx_token_chain.h" />
+    <ClInclude Include="..\main\promise.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

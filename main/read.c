@@ -91,6 +91,7 @@ typedef struct sInputFile {
 *   DATA DEFINITIONS
 */
 static inputFile File;  /* static read through functions */
+static inputFile BackupFile;	/* File is copied here when a nested parser is pushed */
 static MIOPos StartOfLine;  /* holds deferred position of start of line */
 
 /*
@@ -589,7 +590,10 @@ extern void *getInputFileUserData(void)
 static void fileNewline (void)
 {
 	File.filePosition = StartOfLine;
-	appendLineFposMap (&File.lineFposMap, File.filePosition);
+
+	if (BackupFile.fp == NULL)
+		appendLineFposMap (&File.lineFposMap, File.filePosition);
+
 	File.newLine = FALSE;
 	File.input.lineNumber++;
 	File.source.lineNumber++;
@@ -959,7 +963,6 @@ out:
  *   Similar to readLineRaw but this doesn't use fgetpos/fsetpos.
  *   Useful for reading from pipe.
  */
-
 char* readLineRawWithNoSeek (vString* const vline, FILE *const pp)
 {
 	int c;
@@ -995,6 +998,48 @@ char* readLineRawWithNoSeek (vString* const vline, FILE *const pp)
 	}
 
 	return result;
+}
+
+extern void   pushNarrowedInputStream (const langType language,
+				       unsigned long startLine, int startCharOffset,
+				       unsigned long endLine, int endCharOffset,
+				       unsigned long sourceLineOffset)
+{
+	long p, q;
+	MIOPos original;
+	MIOPos tmp;
+	MIO *subio;
+
+	original = getInputFilePosition ();
+
+	tmp = getInputFilePositionForLine (startLine);
+	mio_setpos (File.fp, &tmp);
+	mio_seek (File.fp, startCharOffset, SEEK_CUR);
+	p = mio_tell (File.fp);
+
+	tmp = getInputFilePositionForLine (endLine);
+	mio_setpos (File.fp, &tmp);
+	mio_seek (File.fp, endCharOffset, SEEK_CUR);
+	q = mio_tell (File.fp);
+
+	mio_setpos (File.fp, &original);
+
+	subio = mio_new_mio (File.fp, p, q - p);
+
+
+	BackupFile = File;
+
+	File.fp = subio;
+
+	File.input.lineNumberOrigin = ((startLine == 0)? 0: startLine - 1);
+	File.source.lineNumberOrigin = ((sourceLineOffset == 0)? 0: sourceLineOffset - 1);
+}
+
+extern void   popNarrowedInputStream  (void)
+{
+	mio_free (File.fp);
+	File = BackupFile;
+	memset (&BackupFile, 0, sizeof (BackupFile));
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

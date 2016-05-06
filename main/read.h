@@ -102,6 +102,11 @@ extern char *readLineFromBypass (vString *const vLine, MIOPos location, long *co
 extern char *readLineFromBypassSlow (vString *const vLine, unsigned long lineNumber,
 				     const char *pattern, long *const pSeekValue);
 
+extern void   pushNarrowedInputStream (const langType language,
+				       unsigned long startLine, int startCharOffset,
+				       unsigned long endLine, int endCharOffset,
+				       unsigned long sourceLineOffset);
+extern void   popNarrowedInputStream  (void);
 
 #endif  /* CTAGS_MAIN_READ_H */
 

@@ -23,6 +23,7 @@
 #define OPTION_WRITE
 #include "options.h"
 #include "parsers.h"
+#include "promise.h"
 #include "ptag.h"
 #include "read.h"
 #include "routines.h"
@@ -2012,6 +2013,7 @@ static boolean createTagsWithFallback1 (const langType language)
 	boolean tagFileResized = FALSE;
 	unsigned long numTags	= numTagsAdded ();
 	MIOPos tagfpos;
+	int lastPromise = getLastPromise ();
 	unsigned int passCount = 0;
 	rescanReason whyRescan;
 
@@ -2040,11 +2042,13 @@ static boolean createTagsWithFallback1 (const langType language)
 			setTagFilePosition (&tagfpos);
 			setNumTagsAdded (numTags);
 			tagFileResized = TRUE;
+			breakPromisesAfter(lastPromise);
 		}
 		else if (whyRescan == RESCAN_APPEND)
 		{
 			tagFilePosition (&tagfpos);
 			numTags = numTagsAdded ();
+			lastPromise = getLastPromise ();
 		}
 	}
 
@@ -2052,6 +2056,22 @@ static boolean createTagsWithFallback1 (const langType language)
 		uncorkTagFile();
 
 	return tagFileResized;
+}
+
+extern boolean runParserInNarrowedInputStream (const langType language,
+					       unsigned long startLine, int startCharOffset,
+					       unsigned long endLine, int endCharOffset,
+					       unsigned long sourceLineOffset)
+{
+	boolean tagFileResized;
+	pushNarrowedInputStream (language,
+				 startLine, startCharOffset,
+				 endLine, endCharOffset,
+				 sourceLineOffset);
+	tagFileResized = createTagsWithFallback1 (language);
+	popNarrowedInputStream  ();
+	return tagFileResized;
+
 }
 
 static boolean createTagsWithFallback (
@@ -2066,6 +2086,7 @@ static boolean createTagsWithFallback (
 		return FALSE;
 
 	tagFileResized = createTagsWithFallback1 (language);
+	tagFileResized = forcePromises()? TRUE: tagFileResized;
 
 	makeFileTag (fileName);
 	closeInputFile ();

@@ -30,6 +30,7 @@ MAIN_HEADS =			\
 	main/parse.h		\
 	main/parsers.h		\
 	main/pcoproc.h		\
+	main/promise.h		\
 	main/ptag.h		\
 	main/read.h		\
 	main/routines.h		\
@@ -60,6 +61,7 @@ MAIN_SRCS =				\
 	main/options.c			\
 	main/parse.c			\
 	main/pcoproc.c			\
+	main/promise.c			\
 	main/ptag.c			\
 	main/read.c			\
 	main/routines.c			\
