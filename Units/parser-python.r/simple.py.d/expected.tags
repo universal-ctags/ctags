@@ -30,6 +30,7 @@ _test.ignored_function.more_nesting.deeply_nested.even_more	input.py	/^         
 this	input.py	/^                    @blah class this is seen???$/;"	kind:class	line:41	language:Python	scope:function:_test.ignored_function.more_nesting.deeply_nested.even_more	file:	inherits:	access:private
 this	input.py	/^                        @bleh def this also? good!$/;"	kind:member	line:42	language:Python	scope:class:_test.ignored_function.more_nesting.deeply_nested.even_more.this	access:public	signature:
 _test.ignored_function.more_nesting.deeply_nested.even_more.this.this	input.py	/^                        @bleh def this also? good!$/;"	kind:member	line:42	language:Python	scope:class:_test.ignored_function.more_nesting.deeply_nested.even_more.this	access:public	signature:	extra:qualified
+'__main__'	input.py	/^if __name__ == '__main__':$/;"	kind:entrypoint	line:44	language:Python
 two	input.py	/^class two (one):$/;"	kind:class	line:46	language:Python	inherits:one	access:public
 only	input.py	/^    def only(arg):$/;"	kind:member	line:48	language:Python	scope:class:two	access:public	signature:(arg)
 two.only	input.py	/^    def only(arg):$/;"	kind:member	line:48	language:Python	scope:class:two	access:public	signature:(arg)	extra:qualified

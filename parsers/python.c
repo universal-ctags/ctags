@@ -32,6 +32,7 @@
 typedef enum {
 	K_UNDEFINED = -1,
 	K_CLASS, K_FUNCTION, K_MEMBER, K_VARIABLE, K_NAMESPACE, K_MODULE, K_UNKNOWN,
+	K_ENTRYPOINT,
 } pythonKind;
 
 typedef enum {
@@ -92,6 +93,7 @@ static kindOption PythonKinds[] = {
 	 .referenceOnly = TRUE,  ATTACH_ROLES(PythonModuleRoles)},
 	{TRUE, 'x', "unknown",   "name referring a classe/variable/function/module defined in other module",
 	 .referenceOnly = FALSE, ATTACH_ROLES(PythonUnknownRoles)},
+	{TRUE, 'e', "entrypoint", "entry points"}
 };
 
 typedef enum {
@@ -1245,6 +1247,23 @@ static void findPythonTags (void)
 	nestingLevelsFree (nesting_levels);
 }
 
+static void makeTagForEntryPoint (const char *line, const regexMatch *matches, unsigned int count)
+{
+	static vString *name;
+
+	name = vStringNewOrClear (name);
+
+	vStringNCopyS (name, line + matches [1].start, matches [1].length);
+	makeSimpleTag (name, PythonKinds, K_ENTRYPOINT);
+}
+
+static void initializePythonParser (const langType language)
+{
+	addCallbackRegex (language,
+			  "^if[[:space:]]{1,}__name__[[:space:]]*==[[:space:]]*(\"__main__\"|'__main__')[[:space:]]*:$",
+			  NULL, makeTagForEntryPoint);
+}
+
 extern parserDefinition *PythonParser (void)
 {
 	static const char *const extensions[] = { "py", "pyx", "pxd", "pxi" ,"scons",
@@ -1257,6 +1276,7 @@ extern parserDefinition *PythonParser (void)
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findPythonTags;
+	def->initialize = initializePythonParser;
 	return def;
 }
 
