@@ -510,9 +510,7 @@ static vString *iFileGetLine (void)
 {
 	vString *result = NULL;
 	int c;
-	if (File.line == NULL)
-		File.line = vStringNew ();
-	vStringClear (File.line);
+	File.line = vStringNewOrClear (File.line);
 	do
 	{
 		c = iFileGetc ();

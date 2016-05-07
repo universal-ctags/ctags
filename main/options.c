@@ -1105,10 +1105,7 @@ static void processFieldsOption (
 	boolean inLongName = FALSE;
 	langType language;
 
-	if (!longName)
-		longName = vStringNew ();
-	else
-		vStringClear (longName);
+	longName = vStringNewOrClear (longName);
 
 	if (*p == '*')
 	{
