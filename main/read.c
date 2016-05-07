@@ -37,7 +37,7 @@
 /*
 *   DATA DEFINITIONS
 */
-inputFile File;  /* globally read through macros */
+static inputFile File;  /* static read through functions */
 static MIOPos StartOfLine;  /* holds deferred position of start of line */
 
 /*

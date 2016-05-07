@@ -9,14 +9,6 @@
 #ifndef CTAGS_MAIN_READ_H
 #define CTAGS_MAIN_READ_H
 
-#if defined(FILE_WRITE)
-# define CONST_FILE
-#else
-# define CONST_FILE /* const */
-/* TEMPORARY FIX 
-   `File' global variable should be file local. */
-#endif
-
 /*
 *   INCLUDE FILES
 */
@@ -100,10 +92,6 @@ typedef struct sInputFile {
 	inputLineFposMap lineFposMap;
 } inputFile;
 
-/*
-*   GLOBAL VARIABLES
-*/
-extern CONST_FILE inputFile File;
 
 /*
 *   FUNCTION PROTOTYPES

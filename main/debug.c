@@ -114,7 +114,7 @@ extern void debugAssert (const char *assertion, const char *file, unsigned int l
 	        file, line,
 	        function ? function : "", function ? ": " : "",
 	        assertion);
-	if (File.input.name)
+	if (getInputFileName())
 	{
 		fprintf(stderr, "ctags: %s:%u: parsing %s:%lu as %s\n",
 		        file, line,
