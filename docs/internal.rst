@@ -7,10 +7,11 @@ Input text stream
 .. figure:: input-text-stream.svg
 	    :scale: 80%
 
-Macro definitions and function prototypes for handling Input text
-stream are in main/read.h. The file exists in exuberant ctags, too.
-However, the names of macros and functions are changed when
-overhauling ``--line-directive`` option.
+Function prototypes for handling input text stream are declared in
+main/read.h. The file exists in exuberant ctags, too.  However, the
+names functions are changed when overhauling ``--line-directive``
+option. (In addition macros were converted to functions for making
+data structures for the input text stream opaque.)
 
 Ctags has 3 groups of functions for handling input: input, bypass, and
 raw. Parser developers should use input group. The rest of two
@@ -20,9 +21,16 @@ are for ctags main part.
 `inputFile` type and the functions of input group
 ......................................................................
 
+(The original version of this sub sub sub section was written
+ before `inputFile` type and `File` variable are made private. )
+
 `inputFile` is the type for representing the input file and stream for
-a parser. Ctags uses a global variable `File` having type `inputFile`
-for maintaining the input file and stream.
+a parser. It was declared in main/read.h but now it is defined in
+main/read.c.
+
+Ctags uses a file static variable `File` having type `inputFile` for
+maintaining the input file and stream. `File` is also defined in
+main/read.c as `inputFile` is.
 
 `fp` and `line` are the essential fields of `File`. `fp` having type
 well known `MIO` declared in main/mio.h. By calling functions of input group
@@ -48,7 +56,7 @@ The functions of bypass group
 ......................................................................
 The functions of bypass group (`readLineFromBypass` and
 `readLineFromBypassSlow`) are used for reading text from `fp` field of
-`File` global variable without updating `input` and `source` fields of
+`File` static variable without updating `input` and `source` fields of
 `File`.
 
 
@@ -60,7 +68,7 @@ fields of tags file, for example.
 The functions of raw group
 ......................................................................
 The functions of this group(`readLineRaw` and `readLineRawWithNoSeek`)
-take a parameter having type `MIO`; and don't touch `File` global
+take a parameter having type `MIO`; and don't touch `File` static
 variable.
 
 Parsers may not need the functions of this group.  The functions are

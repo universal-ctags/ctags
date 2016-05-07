@@ -48,50 +48,6 @@ enum eCharacters {
 	CHAR_SYMBOL   = ('C' + 0xff)
 };
 
-/*  Maintains the state of the current input file.
- */
-typedef struct sInputFileInfo {
-	vString *name;           /* name to report for input file */
-	vString *tagPath;        /* path of input file relative to tag file */
-	unsigned long lineNumber;/* line number in the input file */
-	boolean  isHeader;       /* is input file a header file? */
-	langType language;       /* language of input file */
-} inputFileInfo;
-
-typedef struct sInputLineFposMap {
-	MIOPos *pos;
-	unsigned int count;
-	unsigned int size;
-} inputLineFposMap;
-
-typedef struct sInputFile {
-	vString    *path;          /* path of input file (if any) */
-	vString    *line;          /* last line read from file */
-	const unsigned char* currentLine;  /* current line being worked on */
-	MIO        *fp;            /* stream used for reading the file */
-	MIOPos      filePosition;  /* file position of current line */
-	unsigned int ungetchIdx;
-	int         ungetchBuf[3]; /* characters that were ungotten */
-	boolean     eof;           /* have we reached the end of file? */
-	boolean     newLine;       /* will the next character begin a new line? */
-
-	/*  Contains data pertaining to the original `source' file in which the tag
-	 *  was defined. This may be different from the `input' file when #line
-	 *  directives are processed (i.e. the input file is preprocessor output).
-	 */
-	inputFileInfo input; /* name, lineNumber */
-	inputFileInfo source;
-
-	/* sourceTagPathHolder is a kind of trash box.
-	   The buffer pointed by tagPath field of source field can
-	   be referred from tagsEntryInfo instances. sourceTagPathHolder
-	   is used keeping the buffer till all processing about the current
-	   input file is done. After all processing is done, the buffers
-	   in sourceTagPathHolder are destroied. */
-	stringList  * sourceTagPathHolder;
-	inputLineFposMap lineFposMap;
-} inputFile;
-
 
 /*
 *   FUNCTION PROTOTYPES
