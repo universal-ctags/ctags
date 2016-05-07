@@ -463,10 +463,7 @@ extern const char* renderFieldEscaped (fieldType type,
 	Assert (tag);
 	Assert (fdesc->spec->renderEscaped);
 
-	if (fdesc->buffer == NULL)
-		fdesc->buffer = vStringNew ();
-	else
-		vStringClear (fdesc->buffer);
+	fdesc->buffer = vStringNewOrClear (fdesc->buffer);
 
 	if (index >= 0)
 	{
@@ -523,10 +520,7 @@ static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
 	const char *line;
 	static vString *tmp;
 
-	if (tmp == NULL)
-		tmp = vStringNew ();
-	else
-		vStringClear (tmp);
+	tmp = vStringNewOrClear (tmp);
 
 	line = readLineFromBypassAnyway (tmp, tag, NULL);
 	if (line)
