@@ -44,6 +44,87 @@ static MIOPos StartOfLine;  /* holds deferred position of start of line */
 *   FUNCTION DEFINITIONS
 */
 
+extern unsigned long getInputLineNumber (void)
+{
+	return File.input.lineNumber;
+}
+
+extern const char *getInputFileName (void)
+{
+	return vStringValue (File.input.name);
+}
+
+extern MIOPos getInputFilePosition (void)
+{
+	return File.filePosition;
+}
+
+extern MIOPos getInputFilePositionForLine (int line)
+{
+	return File.lineFposMap.pos[(((File.lineFposMap.count > (line - 1)) \
+				      && (line > 0))? (line - 1): 0)];
+}
+
+extern langType getInputLanguage (void)
+{
+	return File.input.language;
+}
+
+extern const char *getInputLanguageName (void)
+{
+	return getLanguageName (File.input.language);
+}
+
+extern const char *getInputFileTagPath (void)
+{
+	return vStringValue (File.input.tagPath);
+}
+
+extern boolean isInputLanguage (langType lang)
+{
+	return (boolean)((lang) == File.input.language);
+}
+
+extern boolean isInputHeaderFile (void)
+{
+	return File.input.isHeader;
+}
+
+extern boolean isInputLanguageKindEnabled (char c)
+{
+	return isLanguageKindEnabled (File.input.language, c);
+}
+
+extern boolean doesInputLanguageAllowNullTag (void)
+{
+	return doesLanguageAllowNullTag (File.input.language);
+}
+
+extern kindOption *getInputLanguageFileKind (void)
+{
+	return getLanguageFileKind (File.input.language);
+}
+
+extern boolean doesInputLanguageRequestAutomaticFQTag (void)
+{
+	return doesLanguageRequestAutomaticFQTag (File.input.language);
+}
+
+extern const char *getSourceFileTagPath (void)
+{
+	return vStringValue (File.source.tagPath);
+}
+
+extern const char *getSourceLanguageName (void)
+{
+	return getLanguageName (File.source.language);
+}
+
+extern unsigned long getSourceLineNumber (void)
+{
+	return File.source.lineNumber;
+}
+
 static void freeInputFileInfo (inputFileInfo *finfo)
 {
 	if (finfo->name)

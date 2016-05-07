@@ -32,25 +32,6 @@
 /*
 *   MACROS
 */
-#define getInputLineNumber()     File.input.lineNumber
-#define getInputFileName()       vStringValue (File.input.name)
-#define getInputFilePosition()   File.filePosition
-#define getInputFilePositionForLine(line) \
-	File.lineFposMap.pos[(((File.lineFposMap.count > (line - 1)) \
-			       && (line > 0))? (line - 1): 0)]
-#define getInputLanguage()       File.input.language
-#define getInputLanguageName()   getLanguageName (File.input.language)
-#define getInputFileTagPath()    vStringValue (File.input.tagPath)
-#define isInputLanguage(lang)         (boolean)((lang) == File.input.language)
-#define isInputHeaderFile()           File.input.isHeader
-#define isInputLanguageKindEnabled(c)  isLanguageKindEnabled (File.input.language, c)
-#define doesInputLanguageAllowNullTag() doesLanguageAllowNullTag (File.input.language)
-#define getInputLanguageFileKind()  getLanguageFileKind (File.input.language)
-
-#define doesInputLanguageRequestAutomaticFQTag() doesLanguageRequestAutomaticFQTag (File.input.language)
-#define getSourceFileTagPath()   vStringValue (File.source.tagPath)
-#define getSourceLanguageName()  getLanguageName (File.source.language)
-#define getSourceLineNumber()    File.source.lineNumber
 
 /*
 *   DATA DECLARATIONS
@@ -129,6 +110,20 @@ extern CONST_FILE inputFile File;
 */
 
 /* InputFile: reading from fp in inputFile with updating fields in input fields */
+extern unsigned long getInputLineNumber (void);
+extern const char *getInputFileName (void);
+extern MIOPos getInputFilePosition (void);
+extern MIOPos getInputFilePositionForLine (int line);
+extern langType getInputLanguage (void);
+extern const char *getInputLanguageName (void);
+extern const char *getInputFileTagPath (void);
+extern boolean isInputLanguage (langType lang);
+extern boolean isInputHeaderFile (void);
+extern boolean isInputLanguageKindEnabled (char c);
+extern boolean doesInputLanguageAllowNullTag (void);
+extern kindOption *getInputLanguageFileKind (void);
+extern boolean doesInputLanguageRequestAutomaticFQTag (void);
+
 extern void                 freeInputFileResources (void);
 extern const unsigned char *getInputFileData (size_t *size);
 
@@ -147,6 +142,11 @@ extern int                  getNthPrevCFromInputFile (unsigned int nth, int def)
 extern int                  skipToCharacterInInputFile (int c);
 extern void                 ungetcToInputFile (int c);
 extern const unsigned char *readLineFromInputFile (void);
+
+
+extern const char *getSourceFileTagPath (void);
+extern const char *getSourceLanguageName (void);
+extern unsigned long getSourceLineNumber (void);
 
 /* Raw: reading from given a parameter, fp */
 extern char *readLineRaw           (vString *const vLine, MIO *const fp);
