@@ -93,6 +93,9 @@
     <ClCompile Include="..\parsers\html.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\jprop.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\jscript.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>

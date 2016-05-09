@@ -40,6 +40,7 @@ The following parsers have been added:
 * Falcon
 * Glade *libxml*
 * Go
+* JavaProperties
 * JSON
 * man *optlib*
 * Maven2 *libxml*

@@ -126,6 +126,7 @@ PARSER_SRCS =				\
 	parsers/fortran.c		\
 	parsers/go.c			\
 	parsers/html.c			\
+	parsers/jprop.c			\
 	parsers/jscript.c		\
 	parsers/json.c			\
 	parsers/lisp.c			\
