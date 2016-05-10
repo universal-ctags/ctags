@@ -62,8 +62,8 @@ ctags: ctags.exe
 ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS)
 	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(ALL_OBJS) $(LIBS)
 
-read/readtags.o: read/readtags.c
-	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -DREADTAGS_MAIN -Iread -o $@ $<
+read/%.o: read/%.c
+	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -Iread -o $@ $<
 
 readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS)
 	$(V_CC) $(CC) $(OPT) -o $@ $(READTAGS_OBJS) $(LIBS)
