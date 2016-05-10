@@ -161,10 +161,7 @@ extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 	Cpp.directive.ifdef [0].branchChosen = FALSE;
 	Cpp.directive.ifdef [0].ignoring     = FALSE;
 
-	if (Cpp.directive.name == NULL)
-		Cpp.directive.name = vStringNew ();
-	else
-		vStringClear (Cpp.directive.name);
+	Cpp.directive.name = vStringNewOrClear (Cpp.directive.name);
 }
 
 extern void cppTerminate (void)
@@ -410,10 +407,7 @@ static int directiveDefine (const int c, boolean undef)
 			p = getcFromInputFile ();
 			if (p == '(')
 			{
-				if (! signature)
-					signature = vStringNew ();
-				else
-					vStringClear (signature);
+				signature = vStringNewOrClear (signature);
 				do {
 					if (!isspacetab(p))
 						vStringPut (signature, p);

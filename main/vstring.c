@@ -337,4 +337,15 @@ extern void vStringCatSWithEscapingAsPattern (vString *output, const char* input
 	}
 }
 
+extern vString *vStringNewOrClear (vString *const string)
+{
+	if (string)
+	{
+		vStringClear (string);
+		return string;
+	}
+	else
+		return vStringNew ();
+}
+
 /* vi:set tabstop=4 shiftwidth=4: */
