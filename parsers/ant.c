@@ -82,7 +82,7 @@ static tagXpathTable antXpathMainTable [] = {
 static tagXpathTable antXpathProjectTable [] = {
 	{ "target",
 	  LXPATH_TABLE_DO_RECUR,
-	  { .recurSpec= { antFindTagsUnderTask } }
+	  { .recurSpec= { antFindTagsUnderTask, TABLE_TARGET_NAME } }
 	},
 	{ "property/@name",
 	  LXPATH_TABLE_DO_MAKE,
@@ -154,14 +154,14 @@ antFindTagsUnderProject (xmlNode *node,
 }
 
 static void antFindTagsUnderTask (xmlNode *node,
-				  const struct sTagXpathRecurSpec *spec __unused__,
+				  const struct sTagXpathRecurSpec *spec,
 				  xmlXPathContext *ctx,
 				  void *userData)
 {
 	int corkIndex = *(int *)userData;
 
 	findXMLTags (ctx, node,
-		     antXpathTableTable + TABLE_TARGET_NAME,
+		     antXpathTableTable + spec->nextTable,
 		     AntKinds,
 		     &corkIndex);
 }

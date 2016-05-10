@@ -65,16 +65,10 @@ static void makeTagWithScope (xmlNode *node,
 			      struct sTagEntryInfo *tag,
 			      void *userData);
 
-static void makeTagForParent (xmlNode *node,
-			      const struct sTagXpathRecurSpec *spec __unused__,
-			      xmlXPathContext *ctx __unused__,
-			      void *userData __unused__);
-
-static void makeTagForDependency (xmlNode *node,
-				  const struct sTagXpathRecurSpec *spec __unused__,
-				  xmlXPathContext *ctx __unused__,
-				  void *userData __unused__);
-
+static void makeTagRecursively (xmlNode *node,
+				const struct sTagXpathRecurSpec *spec,
+				xmlXPathContext *ctx,
+				void *userData);
 
 static void makeTagForProperties (xmlNode *node,
 				  const struct sTagXpathRecurSpec *spec __unused__,
@@ -92,6 +86,13 @@ static void makeTagForProperties (xmlNode *node,
 	makeTagEntry (&tag);
 }
 
+
+enum maven2XpathTable {
+	TABLE_MAIN,
+	TABLE_PARENT,
+	TABLE_DEPEDENCY,
+};
+
 static tagXpathTable maven2XpathMainTable[] = {
 	{ "/*[local-name()='project']/*[local-name()='groupId']",
 	  LXPATH_TABLE_DO_MAKE,
@@ -100,11 +101,11 @@ static tagXpathTable maven2XpathMainTable[] = {
 	},
 	{ "/*[local-name()='project']/*[local-name()='parent']",
 	  LXPATH_TABLE_DO_RECUR,
-	  { .recurSpec = { makeTagForParent } }
+	  { .recurSpec = { makeTagRecursively, TABLE_PARENT } }
 	},
 	{ "/*[local-name()='project']/*[local-name()='dependencies']/*[local-name()='dependency']",
 	  LXPATH_TABLE_DO_RECUR,
-	  { .recurSpec = { makeTagForDependency } }
+	  { .recurSpec = { makeTagRecursively, TABLE_DEPEDENCY } }
 	},
 	{ "/*[local-name()='project']/*[local-name()='artifactId']",
 	  LXPATH_TABLE_DO_MAKE,
@@ -145,12 +146,6 @@ static tagXpathTable maven2XpathDependencyTable[] = {
 	  { .makeTagSpec = { K_ARTIFACT_ID, R_ARTIFACT_ID_DEPENDENCY,
 			     makeTagWithScope } }
 	},
-};
-
-enum maven2XpathTable {
-	TABLE_MAIN,
-	TABLE_PARENT,
-	TABLE_DEPEDENCY,
 };
 
 static tagXpathTableTable maven2XpathTableTable[] = {
@@ -235,20 +230,12 @@ findMaven2TagsForTable (enum maven2XpathTable tindex,
 	}
 }
 
-static void makeTagForParent (xmlNode *node,
-				  const struct sTagXpathRecurSpec *spec __unused__,
-				  xmlXPathContext *ctx __unused__,
+static void makeTagRecursively (xmlNode *node,
+				  const struct sTagXpathRecurSpec *spec,
+				  xmlXPathContext *ctx,
 				  void *userData __unused__)
 {
-	findMaven2TagsForTable (TABLE_PARENT, node, ctx);
-}
-
-static void makeTagForDependency (xmlNode *node,
-				  const struct sTagXpathRecurSpec *spec __unused__,
-				  xmlXPathContext *ctx __unused__,
-				  void *userData __unused__)
-{
-	findMaven2TagsForTable (TABLE_DEPEDENCY, node, ctx);
+	findMaven2TagsForTable (spec->nextTable, node, ctx);
 }
 
 static void
