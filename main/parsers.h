@@ -18,7 +18,8 @@
 	GladeParser,  \
 	Maven2Parser, \
 	PlistXMLParser, \
-	SvgParser
+	SvgParser, \
+	XsltParser
 #else
 #define XML_PARSER_LIST
 #endif

@@ -13,7 +13,7 @@ title()
 
 ignore_xml()
 {
-    grep -v 'Glade\|Ant\|Maven2'
+    grep -v 'Glade\|Ant\|Maven2\|XSLT'
 }
 
 # When introducing newly rewritten parser, we would like to provide
