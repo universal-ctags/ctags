@@ -18,10 +18,6 @@
 
 #include "readtags.h"
 
-#ifdef QUALIFIER
-#include "dsl/qualifier.h"
-#endif
-
 /*
 *   MACROS
 */

@@ -12,7 +12,7 @@ OPTLIB2C = ./misc/optlib2c
 OBJEXT = o
 ALL_OBJS += $(REGEX_OBJS)
 ALL_OBJS += $(FNMATCH_OBJS)
-VPATH = . ./main ./parsers ./optlib
+VPATH = . ./main ./parsers ./optlib ./read
 
 ifeq (yes, $(WITH_ICONV))
 DEFINES += -DHAVE_ICONV
@@ -62,11 +62,14 @@ ctags: ctags.exe
 ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS)
 	$(V_CC) $(CC) $(OPT) $(CFLAGS) $(LDFLAGS) $(DEFINES) $(INCLUDES) -o $@ $(ALL_OBJS) $(LIBS)
 
-readtags.exe: readtags.c
-	$(V_CC) $(CC) $(OPT) $(CFLAGS) -DREADTAGS_MAIN $(DEFINES) $(INCLUDES) -o $@ $<
+read/readtags.o: read/readtags.c
+	$(V_CC) $(CC) -c $(OPT) $(CFLAGS) -DWIN32 -DREADTAGS_MAIN -Iread -o $@ $<
+
+readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS)
+	$(V_CC) $(CC) $(OPT) -o $@ $(READTAGS_OBJS) $(LIBS)
 
 clean:
 	$(SILENT) echo Cleaning
 	$(SILENT) rm -f ctags.exe readtags.exe
 	$(SILENT) rm -f tags
-	$(SILENT) rm -f main/*.o parsers/*.o gnu_regex/*.o fnmatch/*.o
+	$(SILENT) rm -f main/*.o parsers/*.o gnu_regex/*.o fnmatch/*.o read/*.o

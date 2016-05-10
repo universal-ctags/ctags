@@ -190,7 +190,7 @@ FNMATCH_HEADS = fnmatch/fnmatch.h
 FNMATCH_SRCS = fnmatch/fnmatch.c
 FNMATCH_OBJS = $(FNMATCH_SRCS:.c=.$(OBJEXT))
 
-QUALIFIER_HEAD = dsl/es-lang-c-stdc99.h \
+QUALIFIER_HEADS = dsl/es-lang-c-stdc99.h \
 		 dsl/qualifier.h \
 		 \
 		 $(MIO_HEADS) \
@@ -209,5 +209,10 @@ QUALIFIER_OBJS = $(QUALIFIER_SRCS:.c=.$(OBJEXT))
 ALL_OBJS = \
 	$(ALL_SRCS:.c=.$(OBJEXT)) \
 	$(LIBOBJS)
+
+
+READTAGS_SRCS  = read/readtags.c
+READTAGS_HEADS = read/readtags.h
+READTAGS_OBJS  = $(READTAGS_SRCS:.c=.$(OBJEXT))
 
 # vim: ts=8

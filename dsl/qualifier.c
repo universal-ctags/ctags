@@ -361,7 +361,6 @@ static EsObject* builtin_prefix (EsObject* args, tagEntry *entry)
 	const char *ps;
 	size_t tl;
 	size_t pl;
-	unsigned int d;
 
 	if ((! es_string_p (target))
 	    || (! es_string_p (prefix)))
@@ -374,7 +373,6 @@ static EsObject* builtin_prefix (EsObject* args, tagEntry *entry)
 	pl = strlen (ps);
 	if (tl < pl)
 		return es_false;
-	d = tl - pl;
 	return (strncmp (ts, ps, pl) == 0)? es_true: es_false;
 }
 
