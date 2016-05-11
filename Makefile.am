@@ -7,7 +7,7 @@ bin_PROGRAMS = ctags
 
 if USE_READCMD
 bin_PROGRAMS+= readtags
-readtags_CPPFLAGS = -DREADTAGS_MAIN -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/read
+readtags_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)/main -I$(srcdir)/read
 dist_readtags_SOURCES = $(READTAGS_SRCS) $(READTAGS_HEADS)
 readtags_CPPFLAGS += -DQUALIFIER -I$(srcdir)/dsl
 dist_readtags_SOURCES += $(QUALIFIER_SRCS) $(QUALIFIER_HEADS)

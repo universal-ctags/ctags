@@ -211,7 +211,11 @@ ALL_OBJS = \
 	$(LIBOBJS)
 
 
-READTAGS_SRCS  = read/readtags.c
+READTAGS_SRCS  = \
+	       read/readtags.c      \
+	       read/readtags-cmd.c  \
+	       \
+	       $(NULL)
 READTAGS_HEADS = read/readtags.h
 READTAGS_OBJS  = $(READTAGS_SRCS:.c=.$(OBJEXT))
 

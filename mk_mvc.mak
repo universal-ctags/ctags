@@ -39,7 +39,7 @@ OPT = $(OPT) /Zi
 {parsers\cxx}.c{parsers\cxx}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foparsers\cxx\ /c $<
 {read}.c{read}.obj::
-	$(CC) $(OPT) -DREADTAGS_MAIN $(DEFINES) $(INCLUDES) /Foread\ /c $<
+	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Foread\ /c $<
 
 all: ctags.exe readtags.exe
 
