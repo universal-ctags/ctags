@@ -936,7 +936,7 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 		if (kind)
 			*kind = tag->extensionFields.scopeKind->name;
 		if (name)
-			*name = escapeName (tag, FIELD_SCOPE);
+			*name = tag->extensionFields.scopeName;
 	}
 }
 
@@ -993,7 +993,9 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 	{
 		const char* k = NULL, *v = NULL;
 
-		getTagScopeInformation (((tagEntryInfo *const)tag), &k, &v);
+		k = escapeName (tag, FIELD_SCOPE_KIND_LONG);
+		v = escapeName (tag, FIELD_SCOPE);
+
 		if (isFieldEnabled (FIELD_SCOPE) && k && v)
 			length += mio_printf (TagFile.fp, scopeFmt, sep, scopeKey, k, v);
 	}

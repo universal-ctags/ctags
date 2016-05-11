@@ -12,7 +12,7 @@ l	language	off	NONE	TRUE	Language of input file containing tag
 m	implementation	off	NONE	TRUE	Implementation information
 n	line	off	NONE	TRUE	Line number of tag definition
 S	signature	off	NONE	TRUE	Signature of routine (e.g. prototype or parameter list)
-s	NONE	on	NONE	TRUE	Scope of tag definition (WARNING: this doesn't work well as a format letter)
+s	NONE	on	NONE	TRUE	Scope of tag definition (`p' can be used for printing its kind)
 t	typeref	on	NONE	TRUE	Type and name of a variable or typedef
 z	kind	off	NONE	FALSE	Include the "kind:" key in kind field (use k or K)
 r	role	off	NONE	TRUE	Role

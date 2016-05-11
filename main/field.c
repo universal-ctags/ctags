@@ -114,7 +114,7 @@ static fieldSpec fieldSpecsExuberant [] = {
 			   "Signature of routine (e.g. prototype or parameter list)",
 			   renderFieldSignature),
 	DEFINE_FIELD_SPEC ('s', NULL,             TRUE,
-			   "Scope of tag definition (WARNING: this doesn't work well as a format letter)",
+			   "Scope of tag definition (`p' can be used for printing its kind)",
 			   renderFieldScope),
 	DEFINE_FIELD_SPEC ('t', "typeref",        TRUE,
 			   "Type and name of a variable or typedef",
@@ -442,7 +442,10 @@ static const char *renderFieldSignature (const tagEntryInfo *const tag, const ch
 
 static const char *renderFieldScope (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
 {
-	return renderEscapedName (WITH_DEFUALT_VALUE(tag->extensionFields.scopeName), tag, b);
+	const char* scope;
+
+	getTagScopeInformation ((tagEntryInfo *const)tag, NULL, &scope);
+	return scope? renderEscapedName (scope, tag, b): NULL;
 }
 
 static const char *renderFieldInherits (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
@@ -685,9 +688,10 @@ static const char *renderFieldScopeKindName(const tagEntryInfo *const tag,
 					    const char *value,
 					    vString* b)
 {
-	const kindOption *kind = tag->extensionFields.scopeKind;
+	const char* kind;
 
-	return renderAsIs (b, kind? kind->name: "-");
+	getTagScopeInformation ((tagEntryInfo *const)tag, &kind, NULL);
+	return kind? renderAsIs (b, kind): NULL;
 }
 
 extern boolean isFieldEnabled (fieldType type)
