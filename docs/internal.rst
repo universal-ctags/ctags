@@ -179,7 +179,7 @@ the object after calling.
 
 .. code-block:: c
 
-		static int parent = SCOPE_NIL;
+		static int parent = CORK_NIL;
 		...
 		parent = makeTagEntry (&e);
 
@@ -193,7 +193,7 @@ field of `current` tag, which is in the scope of `parent`.
 When passing `current` to `makeTagEntry`, the `scopeIndex` is
 refereed for emitting the scope information of `current`.
 
-`scopeIndex` must be set to `SCOPE_NIL` if a tag is not in any scope.
+`scopeIndex` must be set to `CORK_NIL` if a tag is not in any scope.
 When using `scopeIndex` of `current`, `NULL` must be assigned to both
 `current.extensionFields.scope[0]` and
 `current.extensionFields.scope[1]`.  `initTagEntry` function does this

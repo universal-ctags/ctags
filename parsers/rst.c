@@ -28,6 +28,7 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
+	K_EOF = -1,
 	K_CHAPTER = 0,
 	K_SECTION,
 	K_SUBSECTION,
@@ -44,6 +45,7 @@ static kindOption RstKinds[] = {
 
 typedef enum {
 	F_SECTION_MARKER,
+	F_END,
 } rstField;
 
 static fieldSpec RstFields [] = {
@@ -51,7 +53,13 @@ static fieldSpec RstFields [] = {
 		.name = "sectionMarker",
 		.description = "character used for declaring section",
 		.enabled = FALSE,
-	}
+	},
+	{
+		.name = "end",
+		.description = "end lines of various constructs",
+		.enabled = FALSE,
+	},
+
 };
 
 static char kindchars[SECTION_COUNT];
@@ -65,12 +73,31 @@ static NestingLevels *nestingLevels = NULL;
 static NestingLevel *getNestingLevel(const int kind)
 {
 	NestingLevel *nl;
+	tagEntryInfo *e;
+
+	char buf[16];
+	int d = 0;
+
+	if (kind > K_EOF)
+	{
+		d++;
+		/* 1. we want the line before the '---' underline chars */
+		d++;
+		/* 2. we want the line before the next section/chapter title. */
+	}
+
+	snprintf(buf, sizeof(buf), "%ld", getInputLineNumber() - d);
 
 	while (1)
 	{
 		nl = nestingLevelsGetCurrent(nestingLevels);
-		if (nl && nl->kindIndex >= kind)
+		e = getEntryOfNestingLevel (nl);
+		if ((nl && (e == NULL)) || (e && (e->kind - RstKinds) >= kind))
+		{
+			if (e)
+				attachParserField (e, RstFields [F_END].ftype, eStrdup(buf));
 			nestingLevelsPop(nestingLevels);
+		}
 		else
 			break;
 	}
@@ -81,6 +108,9 @@ static void makeRstTag(const vString* const name, const int kind, const MIOPos f
 		       char marker)
 {
 	const NestingLevel *const nl = getNestingLevel(kind);
+	tagEntryInfo *parent;
+
+	int r = CORK_NIL;
 
 	if (vStringLength (name) > 0)
 	{
@@ -92,17 +122,34 @@ static void makeRstTag(const vString* const name, const int kind, const MIOPos f
 		e.lineNumber--;	/* we want the line before the '---' underline chars */
 		e.filePosition = filepos;
 
-		if (nl && nl->kindIndex < kind)
+		parent = getEntryOfNestingLevel (nl);
+		if (parent && ((parent->kind - RstKinds) < kind))
 		{
-			e.extensionFields.scopeKind = &(RstKinds [nl->kindIndex]);
-			e.extensionFields.scopeName = vStringValue (nl->name);
+#if 1
+			e.extensionFields.scopeKind = &(RstKinds [parent->kind - RstKinds]);
+			e.extensionFields.scopeName = parent->name;
+#else
+			/* TODO
+
+			   Following code makes the scope information full qualified form.
+			   Do users want the full qualified form?
+			   --- ./Units/rst.simple.d/expected.tags	2015-12-18 01:32:35.574255617 +0900
+			   +++ /home/yamato/var/ctags-github/Units/rst.simple.d/FILTERED.tmp	2016-05-05 03:05:38.165604756 +0900
+			   @@ -5,2 +5,2 @@
+			   -Subsection 1.1.1	input.rst	/^Subsection 1.1.1$/;"	S	section:Section 1.1
+			   -Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:Subsection 1.1.1
+			   +Subsection 1.1.1	input.rst	/^Subsection 1.1.1$/;"	S	section:Chapter 1.Section 1.1
+			   +Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:Chapter 1.Section 1.1.Subsection 1.1.1
+			*/
+			   e.extensionFields.scopeIndex = nl->corkIndex;
+#endif
 		}
 
 		m[0] = marker;
 		attachParserField (&e, RstFields [F_SECTION_MARKER].ftype, m);
-		makeTagEntry (&e);
+		r = makeTagEntry (&e);
 	}
-	nestingLevelsPush(nestingLevels, name, kind);
+	nestingLevelsPush(nestingLevels, r);
 }
 
 
@@ -181,7 +228,7 @@ static void findRstTags (void)
 
 	memset(&filepos, 0, sizeof(MIOPos));
 	memset(kindchars, 0, sizeof kindchars);
-	nestingLevels = nestingLevelsNew();
+	nestingLevels = nestingLevelsNew(0);
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
@@ -214,6 +261,8 @@ static void findRstTags (void)
 		}
 		vStringTerminate(name);
 	}
+	/* Force popping all nesting levels */
+	getNestingLevel (K_EOF);
 	vStringDelete (name);
 	nestingLevelsFree(nestingLevels);
 }
@@ -230,6 +279,8 @@ extern parserDefinition* RstParser (void)
 
 	def->fieldSpecs = RstFields;
 	def->fieldSpecCount = ARRAY_SIZE (RstFields);
+
+	def->useCork = TRUE;
 
 	return def;
 }

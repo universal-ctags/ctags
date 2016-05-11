@@ -249,7 +249,7 @@ boolean cxxParserParseUpToOneOf(unsigned int uTokenTypes)
 //
 void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex)
 {
-	CXX_DEBUG_ASSERT(iCorkQueueIndex > SCOPE_NIL,"The cork queue index is not valid");
+	CXX_DEBUG_ASSERT(iCorkQueueIndex > CORK_NIL,"The cork queue index is not valid");
 
 	char buf[16];
 
@@ -449,7 +449,7 @@ boolean cxxParserParseEnum(void)
 
 	tagEntryInfo * tag = cxxTagBegin(CXXTagKindENUM,pEnumName);
 
-	int iCorkQueueIndex = SCOPE_NIL;
+	int iCorkQueueIndex = CORK_NIL;
 
 	if(tag)
 	{
@@ -502,7 +502,7 @@ boolean cxxParserParseEnum(void)
 			break;
 	}
 
-	if(iCorkQueueIndex > SCOPE_NIL)
+	if(iCorkQueueIndex > CORK_NIL)
 		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
 
 	while(iPushedScopes > 0)
@@ -728,7 +728,7 @@ boolean cxxParserParseClassStructOrUnion(
 
 	tagEntryInfo * tag = cxxTagBegin(eTagKind,pClassName);
 
-	int iCorkQueueIndex = SCOPE_NIL;
+	int iCorkQueueIndex = CORK_NIL;
 
 	if(tag)
 	{
@@ -806,7 +806,7 @@ boolean cxxParserParseClassStructOrUnion(
 		return FALSE;
 	}
 
-	if(iCorkQueueIndex > SCOPE_NIL)
+	if(iCorkQueueIndex > CORK_NIL)
 		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
 
 	iPushedScopes++;

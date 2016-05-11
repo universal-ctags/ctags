@@ -218,8 +218,8 @@ findMaven2TagsForTable (enum maven2XpathTable tindex,
 			xmlXPathContext *ctx)
 {
 	int corkIndexes [] = {
-		[K_GROUP_ID]    = SCOPE_NIL,
-		[K_ARTIFACT_ID] = SCOPE_NIL,
+		[K_GROUP_ID]    = CORK_NIL,
+		[K_ARTIFACT_ID] = CORK_NIL,
 	};
 
 	findXMLTags (ctx, node,
@@ -227,8 +227,8 @@ findMaven2TagsForTable (enum maven2XpathTable tindex,
 		     Maven2Kinds,
 		     &corkIndexes);
 
-	if ( corkIndexes [K_ARTIFACT_ID] != SCOPE_NIL
-	     && corkIndexes [K_GROUP_ID] != SCOPE_NIL)
+	if ( corkIndexes [K_ARTIFACT_ID] != CORK_NIL
+	     && corkIndexes [K_GROUP_ID] != CORK_NIL)
 	{
 		tagEntryInfo *tag = getEntryInCorkQueue (corkIndexes [K_ARTIFACT_ID]);
 		tag->extensionFields.scopeIndex = corkIndexes [K_GROUP_ID];

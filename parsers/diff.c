@@ -98,7 +98,7 @@ static int parseHunk (const unsigned char* cp, vString *hunk, int scope_index)
 	const char *next_delim;
 	const char *start, *end;
 	const char *c;
-	int i = SCOPE_NIL;
+	int i = CORK_NIL;
 
 	cp += 3;
 	start = (const char*)cp;
@@ -118,7 +118,7 @@ static int parseHunk (const unsigned char* cp, vString *hunk, int scope_index)
 			return i;
 	vStringNCopyS (hunk, start, end - start);
 	i = makeSimpleTag (hunk, DiffKinds, K_HUNK);
-	if (i > SCOPE_NIL && scope_index > SCOPE_NIL)
+	if (i > CORK_NIL && scope_index > CORK_NIL)
 	{
 		tagEntryInfo *e =  getEntryInCorkQueue (i);
 		e->extensionFields.scopeIndex = scope_index;
@@ -139,7 +139,7 @@ static void findDiffTags (void)
 	const unsigned char *line, *tmp;
 	int delim = DIFF_DELIM_MINUS;
 	diffKind kind;
-	int scope_index = SCOPE_NIL;
+	int scope_index = CORK_NIL;
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
@@ -147,7 +147,7 @@ static void findDiffTags (void)
 
 		if (strncmp ((const char*) cp, DiffDelims[delim], 4u) == 0)
 		{
-			scope_index = SCOPE_NIL;
+			scope_index = CORK_NIL;
 			cp += 4;
 			if (isspace ((int) *cp)) continue;
 			/* when original filename is /dev/null use the new one instead */
@@ -181,7 +181,7 @@ static void findDiffTags (void)
 			/* restore default delim */
 			delim = DIFF_DELIM_MINUS;
 		}
-		else if ((scope_index > SCOPE_NIL)
+		else if ((scope_index > CORK_NIL)
 			 && (strncmp ((const char*) cp, DiffDelims[1], 4u) == 0))
 		{
 			cp += 4;
@@ -193,7 +193,7 @@ static void findDiffTags (void)
 		}
 		else if (strncmp ((const char*) cp, HunkDelim[0], 3u) == 0)
 		{
-			if (parseHunk (cp, hunk, scope_index) != SCOPE_NIL)
+			if (parseHunk (cp, hunk, scope_index) != CORK_NIL)
 				vStringClear (hunk);
 		}
 	}

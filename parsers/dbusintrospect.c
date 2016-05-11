@@ -95,7 +95,7 @@ static void dbusIntrospectFindTagsUnderInterface (xmlNode *node,
 						  xmlXPathContext *ctx,
 						  void *userData __unused__)
 {
-	int corkIndex = SCOPE_NIL;
+	int corkIndex = CORK_NIL;
 
 	findXMLTags (ctx, node,
 		     dbusIntrospectXpathTableTable + TABLE_MAIN_NAME,

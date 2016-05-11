@@ -36,7 +36,7 @@
 #include "routines.h"
 
 static boolean regexAvailable = FALSE;
-static unsigned long currentScope = SCOPE_NIL;
+static unsigned long currentScope = CORK_NIL;
 
 /*
 *   MACROS
@@ -151,7 +151,7 @@ static int makeRegexTag (
 		return makeTagEntry (&e);
 	}
 	else
-		return SCOPE_NIL;
+		return CORK_NIL;
 }
 
 /*
@@ -599,7 +599,7 @@ static void matchTagPattern (const vString* const line,
 	vString *const name = substitute (vStringValue (line),
 			patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch);
 	boolean placeholder = !!((patbuf->scopeActions & SCOPE_PLACEHOLDER) == SCOPE_PLACEHOLDER);
-	unsigned long scope = SCOPE_NIL;
+	unsigned long scope = CORK_NIL;
 	int n;
 
 	vStringStripLeading (name);
@@ -615,11 +615,11 @@ static void matchTagPattern (const vString* const line,
 			scope = entry->extensionFields.scopeIndex;
 	}
 	if (patbuf->scopeActions & SCOPE_CLEAR)
-		currentScope = SCOPE_NIL;
+		currentScope = CORK_NIL;
 	if (patbuf->scopeActions & SCOPE_POP)
 	{
 		tagEntryInfo *entry = getEntryInCorkQueue (currentScope);
-		currentScope = entry? entry->extensionFields.scopeIndex: SCOPE_NIL;
+		currentScope = entry? entry->extensionFields.scopeIndex: CORK_NIL;
 	}
 
 	if (vStringLength (name) == 0 && (placeholder == FALSE))
@@ -628,7 +628,7 @@ static void matchTagPattern (const vString* const line,
 			error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
 			       getInputFileName (), getInputLineNumber (),
 			       patbuf->u.tag.name_pattern);
-		n = SCOPE_NIL;
+		n = CORK_NIL;
 	}
 	else
 		n = makeRegexTag (name, patbuf->u.tag.kind, scope, placeholder);
@@ -713,7 +713,7 @@ extern boolean matchRegex (const vString* const line, const langType language)
 
 extern void findRegexTagsMainloop (int (* driver)(void))
 {
-	currentScope = SCOPE_NIL;
+	currentScope = CORK_NIL;
 	/* merely read all lines of the file */
 	while (driver () != EOF)
 		;

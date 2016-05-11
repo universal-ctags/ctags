@@ -82,8 +82,8 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 	}
 
 	int iScopes;
-	// FIXME: Why the invalid cork queue entry index is SCOPE_NIL?
-	int iCorkQueueIndex = SCOPE_NIL;
+	// FIXME: Why the invalid cork queue entry index is CORK_NIL?
+	int iCorkQueueIndex = CORK_NIL;
 	
 	if(eScopeKind != CXXTagKindFUNCTION)
 	{
@@ -121,7 +121,7 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 		return FALSE;
 	}
 
-	if(iCorkQueueIndex > SCOPE_NIL)
+	if(iCorkQueueIndex > CORK_NIL)
 		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
 
 	while(iScopes > 0)
@@ -402,7 +402,7 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 					//  type whatever fname(par1,par2) int par1; int par2; {
 					//                                        ^
 					//
-					int iCorkQueueIndex = SCOPE_NIL;
+					int iCorkQueueIndex = CORK_NIL;
 					switch(cxxParserMaybeExtractKnRStyleFunctionDefinition(&iCorkQueueIndex))
 					{
 						case 1:
@@ -413,7 +413,7 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 								CXX_DEBUG_LEAVE_TEXT("Failed to parse nested block");
 								return FALSE;
 							}
-							if(iCorkQueueIndex > SCOPE_NIL)
+							if(iCorkQueueIndex > CORK_NIL)
 								cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);
 							cxxScopePop();
 						break;
