@@ -905,6 +905,41 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 	return vStringDeleteUnwrap (n);
 }
 
+extern void getTagScopeInformation (tagEntryInfo *const tag,
+				    const char **kind, const char **name)
+{
+	if (kind)
+		*kind = NULL;
+	if (name)
+		*name = NULL;
+
+	if (tag->extensionFields.scopeKind == NULL
+	    && tag->extensionFields.scopeName == NULL
+	    && tag->extensionFields.scopeIndex != CORK_NIL
+	    && TagFile.corkQueue.count > 0)
+	{
+		const tagEntryInfo * scope = NULL;
+		char *full_qualified_scope_name = NULL;
+
+		scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
+		full_qualified_scope_name = getFullQualifiedScopeNameFromCorkQueue(scope);
+		Assert (full_qualified_scope_name);
+
+		/* Make the information reusable to generate full qualified entry, and xformat output*/
+		tag->extensionFields.scopeKind = scope->kind;
+		tag->extensionFields.scopeName = full_qualified_scope_name;
+	}
+
+	if (tag->extensionFields.scopeKind != NULL  &&
+	    tag->extensionFields.scopeName != NULL)
+	{
+		if (kind)
+			*kind = tag->extensionFields.scopeKind->name;
+		if (name)
+			*name = escapeName (tag, FIELD_SCOPE);
+	}
+}
+
 static int addExtensionFields (const tagEntryInfo *const tag)
 {
 	boolean isKindKeyEnabled = isFieldEnabled (FIELD_KIND_KEY);
@@ -958,30 +993,7 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 	{
 		const char* k = NULL, *v = NULL;
 
-		if (tag->extensionFields.scopeKind == NULL
-		    && tag->extensionFields.scopeName == NULL
-		    && tag->extensionFields.scopeIndex != SCOPE_NIL
-		    && TagFile.corkQueue.count > 0)
-		{
-			const tagEntryInfo * scope = NULL;
-			char *full_qualified_scope_name = NULL;
-
-			scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
-			full_qualified_scope_name = getFullQualifiedScopeNameFromCorkQueue(scope);
-			Assert (full_qualified_scope_name);
-
-			/* Make the information reusable to generate full qualified entry, and xformat output*/
-			((tagEntryInfo *const)tag)->extensionFields.scopeKind = scope->kind;
-			((tagEntryInfo *const)tag)->extensionFields.scopeName = full_qualified_scope_name;
-		}
-
-		if (tag->extensionFields.scopeKind != NULL  &&
-		    tag->extensionFields.scopeName != NULL)
-		{
-			k = tag->extensionFields.scopeKind->name;
-			v = escapeName (tag, FIELD_SCOPE);
-		}
-
+		getTagScopeInformation (((tagEntryInfo *const)tag), &k, &v);
 		if (isFieldEnabled (FIELD_SCOPE) && k && v)
 			length += mio_printf (TagFile.fp, scopeFmt, sep, scopeKey, k, v);
 	}
