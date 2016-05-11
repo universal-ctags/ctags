@@ -62,6 +62,7 @@
 	ManParser, \
 	MakefileParser, \
 	MatLabParser, \
+	MyrddinParser, \
 	ObjcParser, \
 	OldCppParser, \
 	OldCParser, \
