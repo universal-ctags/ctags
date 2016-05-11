@@ -44,7 +44,8 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_SCOPE_KEY,
 	FIELD_EXTRA,
 	FIELD_XPATH,
-	FIELD_BUILTIN_LAST = FIELD_XPATH,
+	FIELD_SCOPE_KIND_LONG,
+	FIELD_BUILTIN_LAST = FIELD_SCOPE_KIND_LONG,
 } fieldType ;
 
 struct sFieldDesc;

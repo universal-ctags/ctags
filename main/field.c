@@ -54,6 +54,7 @@ static const char *renderFieldRole (const tagEntryInfo *const tag, const char *v
 static const char *renderFieldRefMarker (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldExtra (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldXpath (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldScopeKindName(const tagEntryInfo *const tag, const char *value, vString* b);
 
 #define DEFINE_FIELD_SPEC(L, N, V, H, F)	\
 	{					\
@@ -139,6 +140,9 @@ static fieldSpec fieldSpecsUniversal [] = {
 	DEFINE_FIELD_SPEC ('x', "xpath",   FALSE,
 			   "xpath for the tag",
 			   renderFieldXpath),
+	DEFINE_FIELD_SPEC ('p', "scopeKind", TRUE,
+			   "Kind of scope as full name",
+			   renderFieldScopeKindName),
 };
 
 
@@ -677,6 +681,14 @@ static const char *renderFieldXpath (const tagEntryInfo *const tag,
 	return NULL;
 }
 
+static const char *renderFieldScopeKindName(const tagEntryInfo *const tag,
+					    const char *value,
+					    vString* b)
+{
+	const kindOption *kind = tag->extensionFields.scopeKind;
+
+	return renderAsIs (b, kind? kind->name: "-");
+}
 
 extern boolean isFieldEnabled (fieldType type)
 {
