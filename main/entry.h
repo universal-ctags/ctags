@@ -135,6 +135,8 @@ extern void invalidatePatternCache(void);
 extern void tagFilePosition (MIOPos *p);
 extern void setTagFilePosition (MIOPos *p);
 extern const char* getTagFileDirectory (void);
+extern void getTagScopeInformation (tagEntryInfo *const tag,
+				    const char **kind, const char **name);
 
 /* Getting line associated with tag */
 extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo *const tag,
