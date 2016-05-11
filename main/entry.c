@@ -884,6 +884,9 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 				v = vStringNewInit (sep);
 				stringListAdd (queue, v);
 			}
+			/* TODO: scope field of SCOPE can be used for optimization.
+			   In that case, whether scope field is escaped or not
+			   must be cared. */
 			v = vStringNewInit (escapeName (scope, FIELD_NAME));
 			stringListAdd (queue, v);
 			kind = scope->kind;
@@ -955,39 +958,38 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 
 	if (isFieldEnabled (FIELD_SCOPE) || making_fq_tag)
 	{
-		const tagEntryInfo * scope = NULL;
-		char *full_qualified_scope_name = NULL;
-
 		const char* k = NULL, *v = NULL;
+		boolean hasAlreadyEscaped;
 
-		if (tag->extensionFields.scopeKind != NULL  &&
-		    tag->extensionFields.scopeName != NULL)
+		if (tag->extensionFields.scopeKind == NULL
+		    && tag->extensionFields.scopeName == NULL
+		    && tag->extensionFields.scopeIndex != SCOPE_NIL
+		    && TagFile.corkQueue.count > 0)
 		{
-			k = tag->extensionFields.scopeKind->name;
-			v = escapeName (tag, FIELD_SCOPE);
-		}
-		else if (tag->extensionFields.scopeIndex != SCOPE_NIL
-			 && TagFile.corkQueue.count > 0)
-		{
+			const tagEntryInfo * scope = NULL;
+			char *full_qualified_scope_name = NULL;
+
 			scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
 			full_qualified_scope_name = getFullQualifiedScopeNameFromCorkQueue(scope);
 			Assert (full_qualified_scope_name);
 
-			k = scope->kind->name;
-			v = full_qualified_scope_name;
-		}
-
-		if (isFieldEnabled (FIELD_SCOPE) && k && v)
-			length += mio_printf (TagFile.fp, scopeFmt, sep, scopeKey, k, v);
-
-		if (scope && full_qualified_scope_name)
-		{
 			/* Make the information reusable to generate full qualified entry, and xformat output*/
 			((tagEntryInfo *const)tag)->extensionFields.scopeKind = scope->kind;
 			((tagEntryInfo *const)tag)->extensionFields.scopeName = full_qualified_scope_name;
 		}
-		else
-			eFree (full_qualified_scope_name);
+
+		hasAlreadyEscaped = tag->extensionFields.scopeIndex != SCOPE_NIL;
+		if (tag->extensionFields.scopeKind != NULL  &&
+		    tag->extensionFields.scopeName != NULL)
+		{
+			k = tag->extensionFields.scopeKind->name;
+			v = hasAlreadyEscaped
+				? tag->extensionFields.scopeName
+				: escapeName (tag, FIELD_SCOPE);
+		}
+
+		if (isFieldEnabled (FIELD_SCOPE) && k && v)
+			length += mio_printf (TagFile.fp, scopeFmt, sep, scopeKey, k, v);
 	}
 
 	if (isFieldEnabled (FIELD_TYPE_REF) &&
