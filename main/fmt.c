@@ -66,6 +66,9 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 	else
 		str = renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
 
+	if (str == NULL)
+		str = "";
+
 	if (width < 0)
 		i = mio_printf (fp, "%-*s", -1 * width, str);
 	else if (width > 0)
