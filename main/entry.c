@@ -884,10 +884,8 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 				v = vStringNewInit (sep);
 				stringListAdd (queue, v);
 			}
-			/* TODO: scope field of SCOPE can be used for optimization.
-			   In that case, whether scope field is escaped or not
-			   must be cared. */
-			v = vStringNewInit (escapeName (scope, FIELD_NAME));
+			/* TODO: scope field of SCOPE can be used for optimization. */
+			v = vStringNewInit (scope->name);
 			stringListAdd (queue, v);
 			kind = scope->kind;
 		}
@@ -959,7 +957,6 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 	if (isFieldEnabled (FIELD_SCOPE) || making_fq_tag)
 	{
 		const char* k = NULL, *v = NULL;
-		boolean hasAlreadyEscaped;
 
 		if (tag->extensionFields.scopeKind == NULL
 		    && tag->extensionFields.scopeName == NULL
@@ -978,14 +975,11 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 			((tagEntryInfo *const)tag)->extensionFields.scopeName = full_qualified_scope_name;
 		}
 
-		hasAlreadyEscaped = tag->extensionFields.scopeIndex != SCOPE_NIL;
 		if (tag->extensionFields.scopeKind != NULL  &&
 		    tag->extensionFields.scopeName != NULL)
 		{
 			k = tag->extensionFields.scopeKind->name;
-			v = hasAlreadyEscaped
-				? tag->extensionFields.scopeName
-				: escapeName (tag, FIELD_SCOPE);
+			v = escapeName (tag, FIELD_SCOPE);
 		}
 
 		if (isFieldEnabled (FIELD_SCOPE) && k && v)
