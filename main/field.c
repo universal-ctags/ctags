@@ -132,8 +132,10 @@ static fieldSpec fieldSpecsUniversal [] = {
 			   "Marker (R or D) representing whether tag is definition or reference",
 			   renderFieldRefMarker),
 	DEFINE_FIELD_SPEC ('Z', "scope",   FALSE,
-			  "Include the \"scope:\" key in scope field (use s)",
-		      NULL),
+			  "Include the \"scope:\" key in scope field (use s) in tags output, scope name in xref output",
+			   /* Following renderer is for handling --_xformat=%{scope};
+			      and is not for tags output. */
+			   renderFieldScope),
 	DEFINE_FIELD_SPEC ('E', "extra",   FALSE,
 			   "Extra tag type information",
 			   renderFieldExtra),
