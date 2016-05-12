@@ -12,4 +12,4 @@ This section deals parser individual topics.
 .. toctree::
 	:maxdepth: 2
 
-	cxx.rst
+	parser-cxx.rst
