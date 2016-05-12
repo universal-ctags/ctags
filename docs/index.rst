@@ -33,6 +33,7 @@ Proofreading and pull-requests are welcome!
 	:maxdepth: 2
 
 	news.rst
+	contributions.rst
 	parsers.rst
 	guessing.rst
 	building.rst
