@@ -93,6 +93,10 @@ typedef struct sTagXpathRecurSpec {
 		       const struct sTagXpathRecurSpec *spec,
 		       xmlXPathContext *ctx,
 		       void *userData);
+
+	int  nextTable;		/* A parser can use this field any purpose.
+				   main/lxpath part doesn't touch this. */
+
 } tagXpathRecurSpec;
 
 typedef struct sTagXpathTable

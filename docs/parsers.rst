@@ -13,3 +13,4 @@ This section deals parser individual topics.
 	:maxdepth: 2
 
 	parser-cxx.rst
+	parser-xslt.rst

@@ -54,6 +54,7 @@ The following parsers have been added:
 * SVG *libxml*
 * TTCN
 * WindRes
+* XSLT v1.0 *libxml*
 * Zephir
 * coffee *xcmd*
 * ctags option library *optlib*
