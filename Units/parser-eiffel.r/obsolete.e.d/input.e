@@ -1,4 +1,4 @@
-class OBSOLETE obsolete "Use a different one"
+class OBSOLETE_ obsolete "Use a different one"
 
 feature
 
