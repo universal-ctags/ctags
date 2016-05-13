@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # units - Units test harness for ctags
 #
@@ -25,7 +25,7 @@ fi
 #
 # Global Parameters
 #
-SHELL=/bin/sh
+SHELL=$(which bash)
 CTAGS=./ctags
 READTAGS=./readtags
 LIBEXECDIR=./libexec

@@ -2,6 +2,7 @@
 
 check: tmain units
 
+BASH := /usr/bin/env bash
 CTAGS_TEST = ./ctags$(EXEEXT)
 READ_TEST = ./readtags$(EXEEXT)
 TIMEOUT=
@@ -12,7 +13,7 @@ UNITS=
 #
 # FUZZ Target
 #
-# SHELL must be dash or bash.
+# BASH must be dash or bash.
 #
 fuzz: TIMEOUT := $(shell timeout --version > /dev/null 2>&1 && echo 1 || echo 0)
 fuzz: $(CTAGS_TEST)
@@ -27,7 +28,7 @@ fuzz: $(CTAGS_TEST)
 		--libexecdir=$(srcdir)/libexec \
 		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
-	$(SHELL) $${c} $(srcdir)/Units
+	$(BASH) $${c} $(srcdir)/Units
 
 #
 # NOISE Target
@@ -44,7 +45,7 @@ noise: $(CTAGS_TEST)
 		--libexecdir=$(srcdir)/libexec \
 		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
-	$(SHELL) $${c} $(srcdir)/Units
+	$(BASH) $${c} $(srcdir)/Units
 
 #
 # CHOP Target
@@ -61,7 +62,7 @@ chop: $(CTAGS_TEST)
 		--libexecdir=$(srcdir)/libexec \
 		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT)"; \
-	$(SHELL) $${c} $(srcdir)/Units
+	$(BASH) $${c} $(srcdir)/Units
 
 #
 # UNITS Target
@@ -88,12 +89,12 @@ units: $(CTAGS_TEST)
 		$${VALGRIND} --run-shrink \
 		--with-timeout=$(TIMEOUT) \
 		$${SHOW_DIFF_OUTPUT}"; \
-	 $(SHELL) $${c} $(srcdir)/Units $${builddir}/Units
+	 $(BASH) $${c} $(srcdir)/Units $${builddir}/Units
 
 clean-units:
 	$(SILENT) echo Cleaning test units
 	$(SILENT) builddir=$$(pwd); \
-		$(SHELL) $(srcdir)/misc/units clean $${builddir}/Units
+		$(BASH) $(srcdir)/misc/units clean $${builddir}/Units
 
 #
 # Test main part, not parsers
@@ -116,12 +117,12 @@ tmain: $(CTAGS_TEST)
 		--libexecdir=$(srcdir)/libexec \
 		$${VALGRIND} \
 		$${SHOW_DIFF_OUTPUT}"; \
-	 $(SHELL) $${c} $(srcdir)/Tmain $${builddir}/Tmain
+	 $(BASH) $${c} $(srcdir)/Tmain $${builddir}/Tmain
 
 clean-tmain:
 	$(SILENT) echo Cleaning main part tests
 	$(SILENT) builddir=$$(pwd); \
-		$(SHELL) $(srcdir)/misc/units clean-tmain $${builddir}/Tmain
+		$(BASH) $(srcdir)/misc/units clean-tmain $${builddir}/Tmain
 
 #
 # Test installation
@@ -132,7 +133,7 @@ tinst:
 	builddir=$$(pwd); \
 	rm -rf $$builddir/$(TINST_ROOT); \
 	\
-	$(SHELL) $(srcdir)/misc/tinst $(srcdir) $$builddir/$(TINST_ROOT)
+	$(BASH) $(srcdir)/misc/tinst $(srcdir) $$builddir/$(TINST_ROOT)
 
 #
 # Test readtags
@@ -142,13 +143,13 @@ roundtrip: $(READ_TEST)
 	\
 	builddir=$$(pwd); \
 	\
-	$(SHELL) $(srcdir)/misc/roundtrip $(READ_TEST) $${builddir}/Units
+	$(BASH) $(srcdir)/misc/roundtrip $(READ_TEST) $${builddir}/Units
 
 #
 # Checking code in ctags own rules
 #
 codecheck:
-	$(SHELL) misc/src-check
+	$(BASH) misc/src-check
 
 #
 # Report coverage (usable only if ctags is built with COVERAGE=1.)
