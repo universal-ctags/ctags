@@ -506,11 +506,10 @@ run_tcase ()
 
     if [ -f "${ffeatures}" ] && ! tmp=$(check_features "${ffeatures}"); then
 	L_SKIPPED_BY_FEATURES="$L_SKIPPED_BY_FEATURES ${category}/${name}"
-	if [ "${tmp:0:1}" = '!' ]; then
-	    run_result skip "${oresult}" "unwated feature \"${tmp:1}\" is available"
-	else
-	    run_result skip "${oresult}" "required feature \"$tmp\" is not available"
-	fi
+	case "${tmp}" in
+	    !*) run_result skip "${oresult}" "unwated feature \"${tmp#?}\" is available";;
+	    *)  run_result skip "${oresult}" "required feature \"${tmp}\" is not available";;
+	esac
 	return 1
     elif [ -f "${flanguages}" ] && ! tmp=$(check_languages "${flanguages}"); then
 	L_SKIPPED_BY_LANGUAGES="$L_SKIPPED_BY_LANGUAGES ${category}/${name}"
