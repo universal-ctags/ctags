@@ -1,0 +1,7 @@
+LOCAL_KIND_TEST	input.e	/^class LOCAL_KIND_TEST$/;"	c
+c	input.e	/^         s: STRING; c: CHARACTER$/;"	l	feature:LOCAL_KIND_TEST.feature1	file:
+feature1	input.e	/^   feature1$/;"	f	class:LOCAL_KIND_TEST
+i	input.e	/^         i: INTEGER$/;"	l	feature:LOCAL_KIND_TEST.feature1	file:
+j	input.e	/^         j, k: INTEGER$/;"	l	feature:LOCAL_KIND_TEST.feature1	file:
+k	input.e	/^         j, k: INTEGER$/;"	l	feature:LOCAL_KIND_TEST.feature1	file:
+s	input.e	/^         s: STRING; c: CHARACTER$/;"	l	feature:LOCAL_KIND_TEST.feature1	file:
