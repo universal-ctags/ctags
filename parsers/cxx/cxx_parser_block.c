@@ -174,6 +174,7 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 			return TRUE; // EOF
 		}
 
+got_next_token:
 		CXX_DEBUG_PRINT(
 				"Token '%s' of type 0x%02x",
 				vStringValue(g_cxx.pToken->pszWord),
@@ -342,6 +343,26 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 					break;
 					case CXXKeywordEXTERN:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenExtern;
+						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+
+						if(!cxxParserParseNextToken())
+						{
+							if(bExpectClosingBracket)
+							{
+								CXX_DEBUG_LEAVE_TEXT(
+										"Syntax error: found EOF in block but a closing " \
+											"bracket was expected!"
+									);
+								return FALSE;
+							}
+							CXX_DEBUG_LEAVE_TEXT("EOF in main block");
+							return TRUE; // EOF
+						}
+				
+						if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeStringConstant))
+							goto got_next_token;
+
+						// assume extern "C"
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
 					case CXXKeywordSTATIC:
