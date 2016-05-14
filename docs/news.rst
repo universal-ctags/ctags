@@ -59,6 +59,7 @@ The following parsers have been added:
 * coffee *xcmd*
 * ctags option library *optlib*
 * m4 *optlib*
+* myrddin
 
 See "Option library" about  *optlib*.
 See "External parser command" about *xcmd*.

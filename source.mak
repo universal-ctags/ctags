@@ -133,6 +133,7 @@ PARSER_SRCS =				\
 	parsers/lua.c			\
 	parsers/make.c			\
 	parsers/matlab.c		\
+	parsers/myrddin.c		\
 	parsers/objc.c			\
 	parsers/ocaml.c			\
 	parsers/pascal.c		\
