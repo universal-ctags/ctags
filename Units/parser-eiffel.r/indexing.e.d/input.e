@@ -2,7 +2,7 @@ indexing
 
 	description: "A simple description"
 
-class INDEXING
+class INDEXING_
 
 indexing
 

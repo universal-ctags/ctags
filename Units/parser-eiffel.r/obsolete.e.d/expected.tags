@@ -1,0 +1,4 @@
+OBSOLETE_	input.e	/^class OBSOLETE_ obsolete "Use a different one"$/;"	c
+obsolete_attribute	input.e	/^	obsolete_attribute: INTEGER obsolete "Use something else"$/;"	f	class:OBSOLETE_
+obsolete_function	input.e	/^	obsolete_function (one: INTEGER): INTEGER obsolete "Use something else" is$/;"	f	class:OBSOLETE_
+obsolete_procedure	input.e	/^	obsolete_procedure (one: INTEGER) obsolete "Use something else" is$/;"	f	class:OBSOLETE_
