@@ -11,3 +11,4 @@ x       UCTAGSxpath     off     NONE            TRUE     xpath for the tag
 -       UCTAGSend       off     Python          TRUE     end lines of various constructs
 -       UCTAGSsectionMarker off     reStructuredText TRUE     character used for declaring section
 -       UCTAGSend       off     reStructuredText TRUE     end lines of various constructs
+-       UCTAGSend       off     Vim             TRUE     end lines of functions        

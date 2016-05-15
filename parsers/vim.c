@@ -21,7 +21,7 @@
 #include <stdio.h>
 #endif
 
-
+#include "entry.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
@@ -58,6 +58,19 @@ static kindOption VimKinds [] = {
 	{ TRUE,  'v', "variable", "variable definitions" },
 	{ TRUE,  'n', "filename", "vimball filename" },
 };
+
+typedef enum {
+	F_END,
+} vimField;
+
+static fieldSpec VimFields [] = {
+	{
+		.name = "end",
+		.description = "end lines of functions",
+		.enabled = FALSE,
+	}
+};
+
 
 /*
  *	 DATA DECLARATIONS
@@ -231,6 +244,7 @@ static void parseFunction (const unsigned char *line)
 	/* boolean inFunction = FALSE; */
 	int scope;
 	const unsigned char *cp = line;
+	int index = CORK_NIL;
 
 	if ((int) *cp == '!')
 		++cp;
@@ -258,7 +272,7 @@ static void parseFunction (const unsigned char *line)
 					++cp;
 				} while (isalnum ((int) *cp) ||  *cp == '_' ||	*cp == '.' ||  *cp == '#');
 				vStringTerminate (name);
-				makeSimpleTag (name, VimKinds, K_FUNCTION);
+				index = makeSimpleTag (name, VimKinds, K_FUNCTION);
 				vStringClear (name);
 			}
 		}
@@ -268,7 +282,15 @@ static void parseFunction (const unsigned char *line)
 	while ((line = readVimLine ()) != NULL)
 	{
 		if (wordMatchLen (line, "endfunction", 4))
+		{
+			char end[16];
+			snprintf(end, sizeof(end), "%ld", (getInputLineNumber()));
+			if (index != CORK_NIL)
+				attachParserFieldToCorkEntry (index,
+							      VimFields [F_END].ftype,
+							      end);
 			break;
+		}
 
 		parseVimLine(line, TRUE);
 	}
@@ -720,6 +742,9 @@ extern parserDefinition* VimParser (void)
 	def->extensions = extensions;
 	def->patterns   = patterns;
 	def->parser		= findVimTags;
+	def->fieldSpecs = VimFields;
+	def->fieldSpecCount = ARRAY_SIZE (VimFields);
+	def->useCork    = TRUE;
 	return def;
 }
 
