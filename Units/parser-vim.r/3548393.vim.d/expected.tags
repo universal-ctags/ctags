@@ -1,19 +1,11 @@
-Error	input.vim	/^function! s:Error(msg)$/;"	f
-ExecLoad	input.vim	/^function! s:ExecLoad(option, long_option, pattern)$/;"	f
-Extract	input.vim	/^function! s:Extract(line, target)$/;"	f
 Gozilla	input.vim	/^command! -nargs=0 Gozilla call s:Gozilla()$/;"	c
-Gozilla	input.vim	/^function! s:Gozilla()$/;"	f
 Gtags	input.vim	/^command! -nargs=* -complete=custom,GtagsCandidate Gtags call s:RunGlobal(<q-args>)$/;"	c
-GtagsAutoUpdate	input.vim	/^function! s:GtagsAutoUpdate()$/;"	f
 GtagsCandidate	input.vim	/^function! GtagsCandidate(lead, line, pos)$/;"	f
 GtagsCandidateCore	input.vim	/^function! GtagsCandidateCore(lead, line, pos)$/;"	f
 GtagsCursor	input.vim	/^command! -nargs=0 GtagsCursor call s:GtagsCursor()$/;"	c
-GtagsCursor	input.vim	/^function! s:GtagsCursor()$/;"	f
 GtagsUpdate	input.vim	/^command! -nargs=0 GtagsUpdate call s:GtagsAutoUpdate()$/;"	c
 Gtags_Auto_Map	input.vim	/^    let Gtags_Auto_Map = 0$/;"	v
 Gtags_Auto_Update	input.vim	/^    let Gtags_Auto_Update = 0$/;"	v
-RunGlobal	input.vim	/^function! s:RunGlobal(line)$/;"	f
-TrimOption	input.vim	/^function! s:TrimOption(option)$/;"	f
 g:Gtags_Double_Quote_Char	input.vim	/^        let g:Gtags_Double_Quote_Char = '"'$/;"	v
 g:Gtags_Double_Quote_Char	input.vim	/^        let g:Gtags_Double_Quote_Char = '\\"'$/;"	v
 g:Gtags_Efm	input.vim	/^    let g:Gtags_Efm = "%f\\t%l\\t%m"$/;"	v
@@ -27,6 +19,14 @@ g:Gtags_Single_Quote_Char	input.vim	/^        let g:Gtags_Single_Quote_Char = "'
 g:Gtags_Single_Quote_Char	input.vim	/^        let g:Gtags_Single_Quote_Char = s:sq . s:dq . s:sq . s:dq . s:sq$/;"	v
 g:Gtags_VerticalWindow	input.vim	/^    let g:Gtags_VerticalWindow = 0$/;"	v
 loaded_gtags	input.vim	/^let loaded_gtags = 1$/;"	v
+s:Error	input.vim	/^function! s:Error(msg)$/;"	f
+s:ExecLoad	input.vim	/^function! s:ExecLoad(option, long_option, pattern)$/;"	f
+s:Extract	input.vim	/^function! s:Extract(line, target)$/;"	f
+s:Gozilla	input.vim	/^function! s:Gozilla()$/;"	f
+s:GtagsAutoUpdate	input.vim	/^function! s:GtagsAutoUpdate()$/;"	f
+s:GtagsCursor	input.vim	/^function! s:GtagsCursor()$/;"	f
+s:RunGlobal	input.vim	/^function! s:RunGlobal(line)$/;"	f
+s:TrimOption	input.vim	/^function! s:TrimOption(option)$/;"	f
 s:dq	input.vim	/^        let s:dq = '"'$/;"	v
 s:global_command	input.vim	/^        let s:global_command = "global"$/;"	v
 s:global_command	input.vim	/^let s:global_command = $GTAGSGLOBAL$/;"	v

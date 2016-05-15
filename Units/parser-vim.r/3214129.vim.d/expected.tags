@@ -28,56 +28,28 @@
 <Plug>HGWatchRemove	input.vim	/^nnoremap <silent> <Plug>HGWatchRemove :HGWatchRemove<CR>$/;"	m
 <Plug>HGWatchers	input.vim	/^nnoremap <silent> <Plug>HGWatchers :HGWatchers<CR>$/;"	m
 HGAdd	input.vim	/^com! HGAdd call s:HGAdd()$/;"	c
-HGAdd	input.vim	/^function! s:HGAdd()$/;"	f
 HGAnnotate	input.vim	/^com! -nargs=? HGAnnotate call s:HGAnnotate(<f-args>)$/;"	c
-HGAnnotate	input.vim	/^function! s:HGAnnotate(...)$/;"	f
-HGBufferCheck	input.vim	/^function! s:HGBufferCheck(hgBuffer)$/;"	f
-HGChangeToCurrentFileDir	input.vim	/^function! s:HGChangeToCurrentFileDir(fileName)$/;"	f
 HGCommand	input.vim	/^      augroup HGCommand$/;"	a
 HGCommand	input.vim	/^augroup HGCommand$/;"	a
 HGCommandPlugin	input.vim	/^  augroup HGCommandPlugin$/;"	a
 HGCommit	input.vim	/^    augroup HGCommit$/;"	a
 HGCommit	input.vim	/^com! -bang -nargs=? HGCommit call s:HGCommit(<q-bang>, <q-args>)$/;"	c
-HGCommit	input.vim	/^function! s:HGCommit(...)$/;"	f
-HGCreateCommandBuffer	input.vim	/^function! s:HGCreateCommandBuffer(cmd, cmdName, statusText, origBuffNR)$/;"	f
-HGCurrentBufferCheck	input.vim	/^function! s:HGCurrentBufferCheck()$/;"	f
 HGDiff	input.vim	/^com! -nargs=* HGDiff call s:HGDiff(<f-args>)$/;"	c
-HGDiff	input.vim	/^function! s:HGDiff(...)$/;"	f
 HGDisableBufferSetup	input.vim	/^com! HGDisableBufferSetup call HGDisableBufferSetup()$/;"	c
 HGDisableBufferSetup	input.vim	/^function! HGDisableBufferSetup()$/;"	f
-HGDoCommand	input.vim	/^function! s:HGDoCommand(cmd, cmdName, statusText)$/;"	f
-HGEditFile	input.vim	/^function! s:HGEditFile(name, origBuffNR)$/;"	f
 HGEnableBufferSetup	input.vim	/^com! HGEnableBufferSetup call HGEnableBufferSetup()$/;"	c
 HGEnableBufferSetup	input.vim	/^function! HGEnableBufferSetup()$/;"	f
-HGFinishCommit	input.vim	/^function! s:HGFinishCommit(messageFile, targetDir, targetFile, origBuffNR)$/;"	f
-HGGetOption	input.vim	/^function! s:HGGetOption(name, default)$/;"	f
 HGGetRevision	input.vim	/^function! HGGetRevision()$/;"	f
 HGGetStatusLine	input.vim	/^function! HGGetStatusLine()$/;"	f
-HGGetStatusVars	input.vim	/^function! s:HGGetStatusVars(revisionVar, branchVar, repositoryVar)$/;"	f
 HGGotoOriginal	input.vim	/^com! -bang HGGotoOriginal call s:HGGotoOriginal(<q-bang>)$/;"	c
-HGGotoOriginal	input.vim	/^function! s:HGGotoOriginal(...)$/;"	f
-HGInstallDocumentation	input.vim	/^function! s:HGInstallDocumentation(full_name, revision)$/;"	f
 HGLog	input.vim	/^com! -nargs=? HGLog call s:HGLog(<f-args>)$/;"	c
-HGLog	input.vim	/^function! s:HGLog(...)$/;"	f
-HGMarkOrigBufferForSetup	input.vim	/^function! s:HGMarkOrigBufferForSetup(hgBuffer)$/;"	f
-HGOverrideOption	input.vim	/^function! s:HGOverrideOption(option, ...)$/;"	f
 HGReload	input.vim	/^com! HGReload unlet! loaded_hgcommand | runtime plugin\/hgcommand.vim$/;"	c
-HGResolveLink	input.vim	/^function! s:HGResolveLink(fileName)$/;"	f
 HGRevert	input.vim	/^com! HGRevert call s:HGRevert()$/;"	c
-HGRevert	input.vim	/^function! s:HGRevert()$/;"	f
 HGReview	input.vim	/^com! -nargs=? HGReview call s:HGReview(<f-args>)$/;"	c
-HGReview	input.vim	/^function! s:HGReview(...)$/;"	f
-HGSetupBuffer	input.vim	/^function! s:HGSetupBuffer()$/;"	f
 HGStatus	input.vim	/^com! HGStatus call s:HGStatus()$/;"	c
-HGStatus	input.vim	/^function! s:HGStatus()$/;"	f
-HGToggleDeleteOnHide	input.vim	/^function! s:HGToggleDeleteOnHide()$/;"	f
 HGUpdate	input.vim	/^com! HGUpdate call s:HGUpdate()$/;"	c
-HGUpdate	input.vim	/^function! s:HGUpdate()$/;"	f
 HGVimDiff	input.vim	/^com! -nargs=* HGVimDiff call s:HGVimDiff(<f-args>)$/;"	c
-HGVimDiff	input.vim	/^function! s:HGVimDiff(...)$/;"	f
 HGVimDiffRestore	input.vim	/^augroup HGVimDiffRestore$/;"	a
-HGVimDiffRestore	input.vim	/^function! s:HGVimDiffRestore(vimDiffBuff)$/;"	f
-HGWipeoutCommandBuffers	input.vim	/^function! s:HGWipeoutCommandBuffers(originalBuffer, hgCommand)$/;"	f
 \\add	input.vim	/^      nmap \\add <Plug>HGAdd$/;"	m
 buffer	input.vim	/^                        command buffer.  The HGCommand buffer variables may be $/;"	c
 g:HGCommandDeleteOnHide	input.vim	/^    let g:HGCommandDeleteOnHide=1$/;"	v
@@ -85,5 +57,33 @@ g:HGCommandEnableBufferSetup	input.vim	/^  let g:HGCommandEnableBufferSetup=0$/;
 g:HGCommandEnableBufferSetup	input.vim	/^  let g:HGCommandEnableBufferSetup=1$/;"	v
 loaded_hgcommand	input.vim	/^let loaded_hgcommand = 1$/;"	v
 loaded_hgcommand	input.vim	/^let loaded_hgcommand=2$/;"	v
+s:HGAdd	input.vim	/^function! s:HGAdd()$/;"	f
+s:HGAnnotate	input.vim	/^function! s:HGAnnotate(...)$/;"	f
+s:HGBufferCheck	input.vim	/^function! s:HGBufferCheck(hgBuffer)$/;"	f
+s:HGChangeToCurrentFileDir	input.vim	/^function! s:HGChangeToCurrentFileDir(fileName)$/;"	f
 s:HGCommandEditFileRunning	input.vim	/^let s:HGCommandEditFileRunning = 0$/;"	v
+s:HGCommit	input.vim	/^function! s:HGCommit(...)$/;"	f
+s:HGCreateCommandBuffer	input.vim	/^function! s:HGCreateCommandBuffer(cmd, cmdName, statusText, origBuffNR)$/;"	f
+s:HGCurrentBufferCheck	input.vim	/^function! s:HGCurrentBufferCheck()$/;"	f
+s:HGDiff	input.vim	/^function! s:HGDiff(...)$/;"	f
+s:HGDoCommand	input.vim	/^function! s:HGDoCommand(cmd, cmdName, statusText)$/;"	f
+s:HGEditFile	input.vim	/^function! s:HGEditFile(name, origBuffNR)$/;"	f
+s:HGFinishCommit	input.vim	/^function! s:HGFinishCommit(messageFile, targetDir, targetFile, origBuffNR)$/;"	f
+s:HGGetOption	input.vim	/^function! s:HGGetOption(name, default)$/;"	f
+s:HGGetStatusVars	input.vim	/^function! s:HGGetStatusVars(revisionVar, branchVar, repositoryVar)$/;"	f
+s:HGGotoOriginal	input.vim	/^function! s:HGGotoOriginal(...)$/;"	f
+s:HGInstallDocumentation	input.vim	/^function! s:HGInstallDocumentation(full_name, revision)$/;"	f
+s:HGLog	input.vim	/^function! s:HGLog(...)$/;"	f
+s:HGMarkOrigBufferForSetup	input.vim	/^function! s:HGMarkOrigBufferForSetup(hgBuffer)$/;"	f
+s:HGOverrideOption	input.vim	/^function! s:HGOverrideOption(option, ...)$/;"	f
+s:HGResolveLink	input.vim	/^function! s:HGResolveLink(fileName)$/;"	f
+s:HGRevert	input.vim	/^function! s:HGRevert()$/;"	f
+s:HGReview	input.vim	/^function! s:HGReview(...)$/;"	f
+s:HGSetupBuffer	input.vim	/^function! s:HGSetupBuffer()$/;"	f
+s:HGStatus	input.vim	/^function! s:HGStatus()$/;"	f
+s:HGToggleDeleteOnHide	input.vim	/^function! s:HGToggleDeleteOnHide()$/;"	f
+s:HGUpdate	input.vim	/^function! s:HGUpdate()$/;"	f
+s:HGVimDiff	input.vim	/^function! s:HGVimDiff(...)$/;"	f
+s:HGVimDiffRestore	input.vim	/^function! s:HGVimDiffRestore(vimDiffBuff)$/;"	f
+s:HGWipeoutCommandBuffers	input.vim	/^function! s:HGWipeoutCommandBuffers(originalBuffer, hgCommand)$/;"	f
 s:revision	input.vim	/^  let s:revision="0.1"$/;"	v
