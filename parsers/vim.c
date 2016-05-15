@@ -248,6 +248,10 @@ static void parseFunction (const unsigned char *line)
 					scope == 'd'  ||  /* dictionary */
 					scope == 'a')	  /* autoload */
 			{
+				char prefix[3] = { [0] = (char)scope, [1] = ':', [2] = '\0' };
+				if (scope == 's')
+					vStringCatS (name, prefix);
+
 				do
 				{
 					vStringPut (name, (int) *cp);

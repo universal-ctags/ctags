@@ -13,4 +13,5 @@ This section deals parser individual topics.
 	:maxdepth: 2
 
 	parser-cxx.rst
+	parser-vim.rst
 	parser-xslt.rst
