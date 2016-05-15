@@ -29,6 +29,7 @@ x	xpath	off	NONE	TRUE	xpath for the tag
 -	end	off	Python	TRUE	end lines of various constructs
 -	sectionMarker	off	reStructuredText	TRUE	character used for declaring section
 -	end	off	reStructuredText	TRUE	end lines of various constructs
+-	end	off	Vim	TRUE	end lines of functions
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/
 x	input.java	/^    public int x;$/
