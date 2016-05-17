@@ -1,0 +1,3 @@
+bug814263	input.java	/^public class bug814263 {$/;"	c
+map1	input.java	/^ protected java.util.Map map1;$/;"	f	class:bug814263
+map2	input.java	/^ protected Map map2;$/;"	f	class:bug814263
