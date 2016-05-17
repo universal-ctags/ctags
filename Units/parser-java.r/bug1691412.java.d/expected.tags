@@ -1,0 +1,4 @@
+C	input.java	/^public class C {$/;"	c
+CustomAnnotation	input.java	/^public @interface CustomAnnotation {$/;"	a
+newInstance	input.java	/^ public static DefaultCipherDialog newInstance() {$/;"	m	class:C
+toString	input.java	/^ public String toString() { return "hello"; }$/;"	m	class:C
