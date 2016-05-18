@@ -1,0 +1,3 @@
+AAssignmentExp	input.java	/^  public AAssignmentExp(@SuppressWarnings("hiding") TAssign _token_,$/;"	m	class:AAssignmentExp
+AAssignmentExp	input.java	/^public class AAssignmentExp {$/;"	c
+removeChild	input.java	/^  @Override void removeChild(@SuppressWarnings("unused") Node child) {$/;"	m	class:AAssignmentExp

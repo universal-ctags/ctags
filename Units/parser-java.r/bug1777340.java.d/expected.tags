@@ -1,0 +1,3 @@
+bug1777340	input.java	/^public @interface bug1777340 {$/;"	a
+m	input.java	/^    String m();$/;"	m	annotation:bug1777340
+n	input.java	/^    String n() default "ninjas; monkeys!";$/;"	m	annotation:bug1777340

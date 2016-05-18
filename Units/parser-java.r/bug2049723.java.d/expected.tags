@@ -1,0 +1,3 @@
+bug2049723	input.java	/^public class bug2049723 {$/;"	c
+m1	input.java	/^  public void m1(String arg) {}$/;"	m	class:bug2049723
+m2	input.java	/^  public void m2(@Nonnull String arg) {}$/;"	m	class:bug2049723
