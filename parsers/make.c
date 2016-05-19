@@ -27,7 +27,8 @@
 *   DATA DEFINITIONS
 */
 typedef enum {
-	K_MACRO, K_TARGET, K_INCLUDE
+	K_MACRO, K_TARGET, K_INCLUDE,
+	COUNT_KIND,
 } makeKind;
 
 typedef enum {
@@ -45,6 +46,58 @@ static kindOption MakeKinds [] = {
 	{ TRUE, 't', "target", "targets"},
 	{ TRUE, 'I', "makefile", "makefiles",
 	  .referenceOnly = TRUE, ATTACH_ROLES(MakeMakefileRoles)},
+};
+
+typedef enum {
+	AM_KIND_START = COUNT_KIND,
+	K_AM_DIR = AM_KIND_START,
+	K_AM_PROGRAM,
+	K_AM_MAN,
+	K_AM_LTLIBRARY,
+	K_AM_LIBRARY,
+	K_AM_SCRIPT,
+	K_AM_DATA,
+} makeAMKind;
+
+typedef enum {
+	R_AM_PROGRAMS,
+	R_AM_MANS,
+	R_AM_LTLIBRARIES,
+	R_AM_LIBRARIES,
+	R_AM_SCRIPTS,
+	R_AM_DATA,
+} makeAMDirectoryRole;
+
+static roleDesc AutomakeDirectoryRoles [] = {
+	{ TRUE, "program",   "directory for PROGRAMS primary" },
+	{ TRUE, "man",       "directory for MANS primary" },
+	{ TRUE, "ltlibrary", "directory for LTLIBRARIES primary"},
+	{ TRUE, "library",   "directory for LIBRARIES primary"},
+	{ TRUE, "script",    "directory for SCRIPTS primary"},
+	{ TRUE, "data",      "directory for DATA primary"},
+};
+
+
+static scopeSeparator AutomakeSeparators [] = {
+	{ 'd'          , "/" },
+};
+
+static kindOption AutomakeKinds [] = {
+	[AM_KIND_START] =
+	{ TRUE, 'd', "directory", "directories",
+	  .referenceOnly = FALSE, ATTACH_ROLES(AutomakeDirectoryRoles)},
+	{ TRUE, 'P', "program",   "programs",
+	  ATTACH_SEPARATORS(AutomakeSeparators) },
+	{ TRUE, 'M', "man",       "manuals",
+	  ATTACH_SEPARATORS(AutomakeSeparators) },
+	{ TRUE, 'T', "ltlibrary", "ltlibraries",
+	  ATTACH_SEPARATORS(AutomakeSeparators) },
+	{ TRUE, 'L', "library",   "libraries",
+	  ATTACH_SEPARATORS(AutomakeSeparators) },
+	{ TRUE, 'S', "script",    "scripts",
+	  ATTACH_SEPARATORS(AutomakeSeparators) },
+	{ TRUE, 'D', "data",      "datum",
+	  ATTACH_SEPARATORS(AutomakeSeparators) },
 };
 
 /*
@@ -112,9 +165,14 @@ static void newTarget (vString *const name)
 	makeSimpleTag (name, MakeKinds, K_TARGET);
 }
 
-static void newMacro (vString *const name)
+static void (* valuesFoundCB) (vString *name, void *data);
+
+static void (* newMacroCB) (vString *const name, boolean with_define_directive, void *data);
+static void newMacro (vString *const name, boolean with_define_directive, void *data)
 {
 	makeSimpleTag (name, MakeKinds, K_MACRO);
+	if (newMacroCB)
+		newMacroCB (name, with_define_directive, data);
 }
 
 static void newInclude (vString *const name, boolean optional)
@@ -148,11 +206,12 @@ static void readIdentifier (const int first, vString *const id)
 	vStringTerminate (id);
 }
 
-static void findMakeTags (void)
+static void findMakeTagsCommon (void *data)
 {
 	stringList *identifiers = stringListNew ();
 	boolean newline = TRUE;
 	boolean in_define = FALSE;
+	boolean in_value  = FALSE;
 	boolean in_rule = FALSE;
 	boolean variable_possible = TRUE;
 	int c;
@@ -171,6 +230,9 @@ static void findMakeTags (void)
 				else if (c != '\n')
 					in_rule = FALSE;
 			}
+			else if (in_value)
+				in_value = FALSE;
+
 			stringListClear (identifiers);
 			variable_possible = (boolean)(!in_rule);
 			newline = FALSE;
@@ -204,8 +266,8 @@ static void findMakeTags (void)
 		else if (variable_possible && c == '=' &&
 				 stringListCount (identifiers) == 1)
 		{
-			newMacro (stringListItem (identifiers, 0));
-			skipLine ();
+			newMacro (stringListItem (identifiers, 0), FALSE, data);
+			in_value = TRUE;
 			in_rule = FALSE;
 		}
 		else if (variable_possible && isIdentifier (c))
@@ -213,6 +275,9 @@ static void findMakeTags (void)
 			vString *name = vStringNew ();
 			readIdentifier (c, name);
 			stringListAdd (identifiers, name);
+
+			if (in_value && valuesFoundCB)
+				valuesFoundCB (name, data);
 
 			if (stringListCount (identifiers) == 1)
 			{
@@ -235,7 +300,7 @@ static void findMakeTags (void)
 						ungetcToInputFile (c);
 					vStringTerminate (name);
 					vStringStripTrailing (name);
-					newMacro (name);
+					newMacro (name, TRUE, data);
 				}
 				else if (! strcmp (vStringValue (name), "export"))
 					stringListClear (identifiers);
@@ -277,6 +342,145 @@ static void findMakeTags (void)
 	stringListDelete (identifiers);
 }
 
+static void findMakeTags (void)
+{
+	findMakeTagsCommon (NULL);
+}
+
+struct sBlacklist {
+	enum { BL_END, BL_PREFIX } type;
+	const char* substr;
+	size_t len;
+} am_blacklist [] = {
+	{ BL_PREFIX, "EXTRA",  5 },
+	{ BL_PREFIX, "noinst", 6 },
+	{ BL_PREFIX, "check",  5 },
+	{ BL_END,    NULL,     0 },
+};
+
+
+static boolean bl_check (const char *name, struct sBlacklist *blacklist)
+{
+	if ((blacklist->type == BL_PREFIX) &&
+	    (strncmp (blacklist->substr, name, blacklist->len) == 0))
+		return FALSE;
+	else
+		return TRUE;
+}
+
+static boolean AutomakeMakeTag (vString *const name, const char* suffix,
+			    int kindex, int rindex, struct sBlacklist *blacklist,
+			    void *data)
+{
+	int *index = data;
+	size_t expected_len;
+	size_t len;
+	char* tail;
+	vString *subname;
+	int i;
+
+	len = vStringLength (name);
+	expected_len = strlen (suffix);
+
+	if (len <= expected_len)
+		return FALSE;
+
+	for (i = 0; blacklist[i].type != BL_END; i++)
+	{
+		if (bl_check (vStringValue(name), blacklist + i) == FALSE)
+			return FALSE;
+	}
+
+	tail = vStringValue (name) + len - expected_len;
+	if (strcmp (tail, suffix))
+		return FALSE;
+
+	subname = vStringNew();
+
+	/* ??? dist, nodist, nobase, notrans,... */
+	if (strncmp (vStringValue(name), "dist_", 5) == 0)
+		vStringNCopyS(subname, vStringValue(name) + 5, len - expected_len - 5);
+	else
+		vStringNCopyS(subname, vStringValue(name), len - expected_len);
+
+	if (rindex == ROLE_INDEX_DEFINITION)
+		*index = makeSimpleTag (subname, AutomakeKinds, kindex);
+	else
+		*index = makeSimpleRefTag (subname, AutomakeKinds, kindex, rindex);
+
+	vStringDelete (subname);
+	return TRUE;
+}
+
+static void newMacroAM (vString *const name, boolean with_define_directive,
+			void * data)
+{
+	*((int *)data)  = CORK_NIL;
+
+	if (with_define_directive)
+		return;
+
+	(void)(0
+	       || AutomakeMakeTag (name, "dir",
+				   K_AM_DIR, ROLE_INDEX_DEFINITION, am_blacklist,
+				   data)
+	       || AutomakeMakeTag (name, "_PROGRAMS",
+				   K_AM_DIR, R_AM_PROGRAMS, am_blacklist,
+				   data)
+	       || AutomakeMakeTag (name, "_MANS",
+				   K_AM_DIR, R_AM_MANS, am_blacklist,
+				   data)
+	       || AutomakeMakeTag (name, "_LTLIBRARIES",
+				   K_AM_DIR, R_AM_LTLIBRARIES, am_blacklist,
+				   data)
+	       || AutomakeMakeTag (name, "_LIBRARIES",
+				   K_AM_DIR, R_AM_LIBRARIES, am_blacklist,
+				   data)
+	       || AutomakeMakeTag (name, "_SCRIPTS",
+				   K_AM_DIR, R_AM_SCRIPTS, am_blacklist,
+				   data)
+	       || AutomakeMakeTag  (name, "_DATA",
+				    K_AM_DIR, R_AM_DATA, am_blacklist,
+				    data)
+		);
+}
+
+static void valuesFoundAM (vString *name, void *data)
+{
+	int p;
+	tagEntryInfo *parent;
+	int k;
+	tagEntryInfo elt;
+
+	p = *(int *)data;
+
+	if (p == CORK_NIL)
+		return;
+
+	parent = getEntryInCorkQueue (p);
+	if (((parent->kind - AutomakeKinds) == K_AM_DIR)
+	    && (parent->extensionFields.roleIndex != ROLE_INDEX_DEFINITION))
+	{
+		k = K_AM_PROGRAM + parent->extensionFields.roleIndex;
+		initTagEntry (&elt, vStringValue (name), AutomakeKinds + k);
+		elt.extensionFields.scopeIndex = p;
+		makeTagEntry (&elt);
+	}
+}
+
+static void findAutomakeTags (void)
+{
+	int index = CORK_NIL;
+	void *backup_newMacro = newMacroCB;
+	void *backup_valuesFound = valuesFoundCB;
+
+	newMacroCB = newMacroAM;
+	valuesFoundCB = valuesFoundAM;
+	findMakeTagsCommon (&index);
+	valuesFoundCB = backup_valuesFound;
+	newMacroCB = backup_newMacro;
+}
+
 extern parserDefinition* MakefileParser (void)
 {
 	static const char *const patterns [] = { "[Mm]akefile", "GNUmakefile", NULL };
@@ -287,6 +491,23 @@ extern parserDefinition* MakefileParser (void)
 	def->patterns   = patterns;
 	def->extensions = extensions;
 	def->parser     = findMakeTags;
+	return def;
+}
+
+extern parserDefinition* AutomakeParser (void)
+{
+	int i;
+	static const char *const patterns [] = { "Makefile.am", NULL };
+	parserDefinition* const def = parserNew ("Automake");
+
+	for (i = 0; i < AM_KIND_START; i++)
+		AutomakeKinds [i] = MakeKinds [i];
+
+	def->kinds      = AutomakeKinds;
+	def->kindCount  = ARRAY_SIZE (AutomakeKinds);
+	def->patterns   = patterns;
+	def->parser     = findAutomakeTags;
+	def->useCork    = TRUE;
 	return def;
 }
 
