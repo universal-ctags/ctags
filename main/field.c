@@ -54,6 +54,7 @@ static const char *renderFieldRole (const tagEntryInfo *const tag, const char *v
 static const char *renderFieldRefMarker (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldExtra (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldXpath (const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldScopeKindName(const tagEntryInfo *const tag, const char *value, vString* b);
 
 #define DEFINE_FIELD_SPEC(L, N, V, H, F)	\
 	{					\
@@ -113,7 +114,7 @@ static fieldSpec fieldSpecsExuberant [] = {
 			   "Signature of routine (e.g. prototype or parameter list)",
 			   renderFieldSignature),
 	DEFINE_FIELD_SPEC ('s', NULL,             TRUE,
-			   "Scope of tag definition (WARNING: this doesn't work well as a format letter)",
+			   "Scope of tag definition (`p' can be used for printing its kind)",
 			   renderFieldScope),
 	DEFINE_FIELD_SPEC ('t', "typeref",        TRUE,
 			   "Type and name of a variable or typedef",
@@ -131,14 +132,19 @@ static fieldSpec fieldSpecsUniversal [] = {
 			   "Marker (R or D) representing whether tag is definition or reference",
 			   renderFieldRefMarker),
 	DEFINE_FIELD_SPEC ('Z', "scope",   FALSE,
-			  "Include the \"scope:\" key in scope field (use s)",
-		      NULL),
+			  "Include the \"scope:\" key in scope field (use s) in tags output, scope name in xref output",
+			   /* Following renderer is for handling --_xformat=%{scope};
+			      and is not for tags output. */
+			   renderFieldScope),
 	DEFINE_FIELD_SPEC ('E', "extra",   FALSE,
 			   "Extra tag type information",
 			   renderFieldExtra),
 	DEFINE_FIELD_SPEC ('x', "xpath",   FALSE,
 			   "xpath for the tag",
 			   renderFieldXpath),
+	DEFINE_FIELD_SPEC ('p', "scopeKind", TRUE,
+			   "Kind of scope as full name",
+			   renderFieldScopeKindName),
 };
 
 
@@ -438,7 +444,10 @@ static const char *renderFieldSignature (const tagEntryInfo *const tag, const ch
 
 static const char *renderFieldScope (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
 {
-	return renderEscapedName (WITH_DEFUALT_VALUE(tag->extensionFields.scopeName), tag, b);
+	const char* scope;
+
+	getTagScopeInformation ((tagEntryInfo *const)tag, NULL, &scope);
+	return scope? renderEscapedName (scope, tag, b): NULL;
 }
 
 static const char *renderFieldInherits (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
@@ -677,6 +686,15 @@ static const char *renderFieldXpath (const tagEntryInfo *const tag,
 	return NULL;
 }
 
+static const char *renderFieldScopeKindName(const tagEntryInfo *const tag,
+					    const char *value,
+					    vString* b)
+{
+	const char* kind;
+
+	getTagScopeInformation ((tagEntryInfo *const)tag, &kind, NULL);
+	return kind? renderAsIs (b, kind): NULL;
+}
 
 extern boolean isFieldEnabled (fieldType type)
 {

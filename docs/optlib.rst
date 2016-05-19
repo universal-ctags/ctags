@@ -435,6 +435,9 @@ Example 2::
     foo	/tmp/input.pp	/^class foo {$/;"	c
 
 
+NOTE: Giving a scope long flag implies setting `useCork` of the parser
+to `TRUE`. See `cork API`.
+
 Override the letter for file kind
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 (See also #317.)

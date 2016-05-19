@@ -1,0 +1,12 @@
+/dts-v1/;
+
+#include "foo.dtsi"
+#define bar 98
+
+label: test {
+       dummy {
+	     label2: chosen { } ;
+	     phandle = <0x00>;
+       };
+};
+#undef bar

@@ -89,6 +89,7 @@ extern parserDefinition* DTSParser (void)
 	def->tagRegexTable = dtsTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE (dtsTagRegexTable);
 	def->method     = METHOD_REGEX;
+	def->requestAutomaticFQTag = TRUE;
 	return def;
 }
 

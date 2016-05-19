@@ -884,7 +884,8 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 				v = vStringNewInit (sep);
 				stringListAdd (queue, v);
 			}
-			v = vStringNewInit (escapeName (scope, FIELD_NAME));
+			/* TODO: scope field of SCOPE can be used for optimization. */
+			v = vStringNewInit (scope->name);
 			stringListAdd (queue, v);
 			kind = scope->kind;
 		}
@@ -902,6 +903,41 @@ static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_
 	stringListDelete (queue);
 
 	return vStringDeleteUnwrap (n);
+}
+
+extern void getTagScopeInformation (tagEntryInfo *const tag,
+				    const char **kind, const char **name)
+{
+	if (kind)
+		*kind = NULL;
+	if (name)
+		*name = NULL;
+
+	if (tag->extensionFields.scopeKind == NULL
+	    && tag->extensionFields.scopeName == NULL
+	    && tag->extensionFields.scopeIndex != CORK_NIL
+	    && TagFile.corkQueue.count > 0)
+	{
+		const tagEntryInfo * scope = NULL;
+		char *full_qualified_scope_name = NULL;
+
+		scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
+		full_qualified_scope_name = getFullQualifiedScopeNameFromCorkQueue(scope);
+		Assert (full_qualified_scope_name);
+
+		/* Make the information reusable to generate full qualified entry, and xformat output*/
+		tag->extensionFields.scopeKind = scope->kind;
+		tag->extensionFields.scopeName = full_qualified_scope_name;
+	}
+
+	if (tag->extensionFields.scopeKind != NULL  &&
+	    tag->extensionFields.scopeName != NULL)
+	{
+		if (kind)
+			*kind = tag->extensionFields.scopeKind->name;
+		if (name)
+			*name = tag->extensionFields.scopeName;
+	}
 }
 
 static int addExtensionFields (const tagEntryInfo *const tag)
@@ -926,6 +962,10 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 	const char* separator = ";\"";
 	const char* const empty = "";
 	int length = 0;
+
+	boolean making_fq_tag =  (doesInputLanguageRequestAutomaticFQTag ()
+				  && isXtagEnabled (XTAG_QUALIFIED_TAGS));
+
 /* "sep" returns a value only the first time it is evaluated */
 #define sep (first ? (first = FALSE, separator) : empty)
 
@@ -949,39 +989,24 @@ static int addExtensionFields (const tagEntryInfo *const tag)
 				   getFieldName (FIELD_LANGUAGE),
 				   escapeName (tag, FIELD_LANGUAGE));
 
-	if (isFieldEnabled (FIELD_SCOPE))
+	if (isFieldEnabled (FIELD_SCOPE) || making_fq_tag)
 	{
-		if (tag->extensionFields.scopeKind != NULL  &&
-		    tag->extensionFields.scopeName != NULL)
-			length += mio_printf (TagFile.fp, scopeFmt, sep,
-					   scopeKey,
-					   tag->extensionFields.scopeKind->name,
-					   escapeName (tag, FIELD_SCOPE));
-		else if (tag->extensionFields.scopeIndex != CORK_NIL
-			 && TagFile.corkQueue.count > 0)
-		{
-			const tagEntryInfo * scope;
-			char *full_qualified_scope_name;
+		const char* k = NULL, *v = NULL;
 
-			scope = getEntryInCorkQueue (tag->extensionFields.scopeIndex);
-			full_qualified_scope_name = getFullQualifiedScopeNameFromCorkQueue(scope);
-			Assert (full_qualified_scope_name);
-			length += mio_printf (TagFile.fp, scopeFmt, sep,
-					   scopeKey,
-					   scope->kind->name, full_qualified_scope_name);
+		k = escapeName (tag, FIELD_SCOPE_KIND_LONG);
+		v = escapeName (tag, FIELD_SCOPE);
 
-			/* TODO: Make the value pointed by full_qualified_scope_name reusable. */
-			eFree (full_qualified_scope_name);
-		}
+		if (isFieldEnabled (FIELD_SCOPE) && k && v)
+			length += mio_printf (TagFile.fp, scopeFmt, sep, scopeKey, k, v);
 	}
 
 	if (isFieldEnabled (FIELD_TYPE_REF) &&
-			tag->extensionFields.typeRef [0] != NULL  &&
-			tag->extensionFields.typeRef [1] != NULL)
+	    tag->extensionFields.typeRef [0] != NULL  &&
+	    tag->extensionFields.typeRef [1] != NULL)
 		length += mio_printf (TagFile.fp, "%s\t%s:%s:%s", sep,
-				   getFieldName (FIELD_TYPE_REF),
-				   tag->extensionFields.typeRef [0],
-				   escapeName (tag, FIELD_TYPE_REF));
+				      getFieldName (FIELD_TYPE_REF),
+				      tag->extensionFields.typeRef [0],
+				      escapeName (tag, FIELD_TYPE_REF));
 
 	if (isFieldEnabled (FIELD_FILE_SCOPE) &&  tag->isFileScope)
 		length += mio_printf (TagFile.fp, "%s\t%s:", sep,
@@ -1372,7 +1397,16 @@ extern void uncorkTagFile(void)
 		return ;
 
 	for (i = 1; i < TagFile.corkQueue.count; i++)
-		writeTagEntry (TagFile.corkQueue.queue + i);
+	{
+		tagEntryInfo *tag = TagFile.corkQueue.queue + i;
+		writeTagEntry (tag);
+		if (doesInputLanguageRequestAutomaticFQTag ()
+		    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
+		    && tag->extensionFields.scopeKind
+		    && tag->extensionFields.scopeName
+		    && tag->extensionFields.scopeIndex)
+			makeQualifiedTagEntry (tag);
+	}
 	for (i = 1; i < TagFile.corkQueue.count; i++)
 		clearTagEntryInQueue (TagFile.corkQueue.queue + i);
 

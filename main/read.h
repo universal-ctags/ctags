@@ -47,6 +47,7 @@
 #define doesInputLanguageAllowNullTag() doesLanguageAllowNullTag (File.input.language)
 #define getInputLanguageFileKind()  getLanguageFileKind (File.input.language)
 
+#define doesInputLanguageRequestAutomaticFQTag() doesLanguageRequestAutomaticFQTag (File.input.language)
 #define getSourceFileTagPath()   vStringValue (File.source.tagPath)
 #define getSourceLanguageName()  getLanguageName (File.source.language)
 #define getSourceLineNumber()    File.source.lineNumber
