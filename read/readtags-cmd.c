@@ -150,7 +150,7 @@ static const char *const Usage =
 	"    -n           Allow print line numbers if -e option is given.\n"
 	"    -p           Perform partial matching.\n"
 #ifdef QUALIFIER
-	"    -Q EXP      Fileter the result with EXP.\n"
+	"    -Q EXP       Filter the result with EXP.\n"
 #endif
 	"    -s[0|1|2]    Override sort detection of tag file.\n"
 	"    -t file      Use specified tag file (default: \"tags\").\n"
