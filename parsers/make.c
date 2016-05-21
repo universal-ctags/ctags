@@ -15,6 +15,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "htable.h"
 #include "kind.h"
 #include "options.h"
 #include "parse.h"
@@ -100,6 +101,8 @@ static kindOption AutomakeKinds [] = {
 	  ATTACH_SEPARATORS(AutomakeSeparators) },
 };
 
+static hashTable* AutomakeDirectories;
+
 /*
 *   FUNCTION DEFINITIONS
 */
@@ -167,12 +170,13 @@ static void newTarget (vString *const name)
 
 static void (* valuesFoundCB) (vString *name, void *data);
 
-static void (* newMacroCB) (vString *const name, boolean with_define_directive, void *data);
-static void newMacro (vString *const name, boolean with_define_directive, void *data)
+static void (* newMacroCB) (vString *const name, boolean with_define_directive, boolean appending, void *data);
+static void newMacro (vString *const name, boolean with_define_directive, boolean appending, void *data)
 {
-	makeSimpleTag (name, MakeKinds, K_MACRO);
+	if (!appending)
+		makeSimpleTag (name, MakeKinds, K_MACRO);
 	if (newMacroCB)
-		newMacroCB (name, with_define_directive, data);
+		newMacroCB (name, with_define_directive, appending, data);
 }
 
 static void newInclude (vString *const name, boolean optional)
@@ -214,6 +218,7 @@ static void findMakeTagsCommon (void *data)
 	boolean in_value  = FALSE;
 	boolean in_rule = FALSE;
 	boolean variable_possible = TRUE;
+	boolean appending = FALSE;
 	int c;
 
 	while ((c = nextChar ()) != EOF)
@@ -249,6 +254,13 @@ static void findMakeTagsCommon (void *data)
 			ungetcToInputFile (c);
 			variable_possible = (c == '=');
 		}
+		else if (variable_possible && c == '+')
+		{
+			c = nextChar ();
+			ungetcToInputFile (c);
+			variable_possible = (c == '=');
+			appending = TRUE;
+		}
 		else if (variable_possible && c == ':' &&
 				 stringListCount (identifiers) > 0)
 		{
@@ -266,9 +278,10 @@ static void findMakeTagsCommon (void *data)
 		else if (variable_possible && c == '=' &&
 				 stringListCount (identifiers) == 1)
 		{
-			newMacro (stringListItem (identifiers, 0), FALSE, data);
+			newMacro (stringListItem (identifiers, 0), FALSE, appending, data);
 			in_value = TRUE;
 			in_rule = FALSE;
+			appending = FALSE;
 		}
 		else if (variable_possible && isIdentifier (c))
 		{
@@ -300,7 +313,7 @@ static void findMakeTagsCommon (void *data)
 						ungetcToInputFile (c);
 					vStringTerminate (name);
 					vStringStripTrailing (name);
-					newMacro (name, TRUE, data);
+					newMacro (name, TRUE, FALSE, data);
 				}
 				else if (! strcmp (vStringValue (name), "export"))
 					stringListClear (identifiers);
@@ -368,7 +381,27 @@ static boolean bl_check (const char *name, struct sBlacklist *blacklist)
 		return TRUE;
 }
 
-static boolean AutomakeMakeTag (vString *const name, const char* suffix,
+static int lookupAutomakeDirectory (vString *const name)
+{
+	int *i = hashTableGetItem (AutomakeDirectories,  vStringValue (name));
+
+	if (i)
+		return *i;
+	else
+		return CORK_NIL;
+}
+
+static void addAutomakeDirectory (vString *const name, int corkIndex)
+{
+	char * k = eStrdup (vStringValue (name));
+	int  * i = xMalloc (1, int);
+
+	*i = corkIndex;
+
+	hashTablePutItem (AutomakeDirectories, k, i);
+}
+
+static boolean AutomakeMakeTag (vString *const name, const char* suffix, boolean appending,
 			    int kindex, int rindex, struct sBlacklist *blacklist,
 			    void *data)
 {
@@ -404,16 +437,26 @@ static boolean AutomakeMakeTag (vString *const name, const char* suffix,
 		vStringNCopyS(subname, vStringValue(name), len - expected_len);
 
 	if (rindex == ROLE_INDEX_DEFINITION)
+	{
 		*index = makeSimpleTag (subname, AutomakeKinds, kindex);
+		addAutomakeDirectory (subname, *index);
+	}
 	else
-		*index = makeSimpleRefTag (subname, AutomakeKinds, kindex, rindex);
+	{
+		*index = CORK_NIL;
+		if (appending)
+			*index = lookupAutomakeDirectory (subname);
+
+		if ((!appending) || (*index == CORK_NIL))
+			*index = makeSimpleRefTag (subname, AutomakeKinds, kindex, rindex);
+	}
 
 	vStringDelete (subname);
 	return TRUE;
 }
 
 static void newMacroAM (vString *const name, boolean with_define_directive,
-			void * data)
+			boolean appending, void * data)
 {
 	*((int *)data)  = CORK_NIL;
 
@@ -421,25 +464,25 @@ static void newMacroAM (vString *const name, boolean with_define_directive,
 		return;
 
 	(void)(0
-	       || AutomakeMakeTag (name, "dir",
+	       || AutomakeMakeTag (name, "dir", appending,
 				   K_AM_DIR, ROLE_INDEX_DEFINITION, am_blacklist,
 				   data)
-	       || AutomakeMakeTag (name, "_PROGRAMS",
+	       || AutomakeMakeTag (name, "_PROGRAMS", appending,
 				   K_AM_DIR, R_AM_PROGRAMS, am_blacklist,
 				   data)
-	       || AutomakeMakeTag (name, "_MANS",
+	       || AutomakeMakeTag (name, "_MANS", appending,
 				   K_AM_DIR, R_AM_MANS, am_blacklist,
 				   data)
-	       || AutomakeMakeTag (name, "_LTLIBRARIES",
+	       || AutomakeMakeTag (name, "_LTLIBRARIES", appending,
 				   K_AM_DIR, R_AM_LTLIBRARIES, am_blacklist,
 				   data)
-	       || AutomakeMakeTag (name, "_LIBRARIES",
+	       || AutomakeMakeTag (name, "_LIBRARIES", appending,
 				   K_AM_DIR, R_AM_LIBRARIES, am_blacklist,
 				   data)
-	       || AutomakeMakeTag (name, "_SCRIPTS",
+	       || AutomakeMakeTag (name, "_SCRIPTS", appending,
 				   K_AM_DIR, R_AM_SCRIPTS, am_blacklist,
 				   data)
-	       || AutomakeMakeTag  (name, "_DATA",
+	       || AutomakeMakeTag  (name, "_DATA", appending,
 				    K_AM_DIR, R_AM_DATA, am_blacklist,
 				    data)
 		);
@@ -474,11 +517,13 @@ static void findAutomakeTags (void)
 	void *backup_newMacro = newMacroCB;
 	void *backup_valuesFound = valuesFoundCB;
 
+	AutomakeDirectories = hashTableNew (11, hashCstrhash, hashCstreq, eFree, eFree);
 	newMacroCB = newMacroAM;
 	valuesFoundCB = valuesFoundAM;
 	findMakeTagsCommon (&index);
 	valuesFoundCB = backup_valuesFound;
 	newMacroCB = backup_newMacro;
+	hashTableDelete (AutomakeDirectories);
 }
 
 extern parserDefinition* MakefileParser (void)
