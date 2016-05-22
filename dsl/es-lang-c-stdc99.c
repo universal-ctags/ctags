@@ -1330,7 +1330,7 @@ es_print_to_string (EsObject*        object)
     }
 
   es_print(object, out);
-  bp = mio_memory_get_data (out, &size);
+  bp = (char *)mio_memory_get_data (out, &size);
   mio_free(out);
 
   return bp;
@@ -1403,7 +1403,7 @@ es_comment_to_string (const char* comment)
     }
 
   es_comment(comment, out);
-  bp = mio_memory_get_data (out, &size);
+  bp = (char *)mio_memory_get_data (out, &size);
   mio_free(out);
 
   return bp;
