@@ -1243,65 +1243,23 @@ es_error_print(const EsObject* object, MIO* fp)
 
 
 
-/*	$NetBSD: hash_func.c,v 1.11 2007/02/03 23:46:09 christos Exp $	*/
-
-/*-
- * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
- *
- * This code is derived from software contributed to Berkeley by
- * Margo Seltzer.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
-/*
- * HASH FUNCTIONS
- *
- * Assume that we've already split the bucket to which this key hashes,
- * calculate that bucket, and check that in fact we did already split it.
- *
- * This came from ejb's hsearch.
- */
-#define PRIME1		37
-static unsigned int
-hash(const char* keyarg)
+/* http://www.cse.yorku.ca/~oz/hash.html */
+static unsigned long
+djb2(unsigned char *str)
 {
-  unsigned int len;
-  const unsigned char *key;
-  unsigned int h;
+	unsigned long hash = 5381;
+	int c;
 
+	while (c = *str++)
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 
-  len = strlen(keyarg);
-
-  /* Convert string to integer */
-  for (key = (unsigned char*)keyarg, h = 0; len--;)
-    h = h * PRIME1 ^ (*key++ - ' ');
-  h %= OBARRAY_SIZE;
-  return (h);
+	return hash;
 }
 
+static unsigned int hash(const char* keyarg)
+{
+	return ((unsigned int)djb2((unsigned char *)keyarg)) % OBARRAY_SIZE;
+}
 
 /*
  * Print
