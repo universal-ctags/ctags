@@ -1,0 +1,7 @@
+IdentifyImageMonochrome	input.c	/^  IdentifyImageMonochrome(const Image *,ExceptionInfo *),$/;"	p	typeref:typename:MagickExport MagickBooleanType	file:	signature:(const Image *,ExceptionInfo *)
+IsGrayImage	input.c	/^  IsGrayImage(const Image *,ExceptionInfo *),$/;"	p	typeref:typename:MagickExport MagickBooleanType	file:	signature:(const Image *,ExceptionInfo *)
+IsMonochromeImage	input.c	/^  IsMonochromeImage(const Image *,ExceptionInfo *),$/;"	p	typeref:typename:MagickExport MagickBooleanType	file:	signature:(const Image *,ExceptionInfo *)
+IsOpaqueImage	input.c	/^  IsOpaqueImage(const Image *,ExceptionInfo *),$/;"	p	typeref:typename:MagickExport MagickBooleanType	file:	signature:(const Image *,ExceptionInfo *)
+SetImageChannelDepth	input.c	/^  SetImageChannelDepth(Image *,const ChannelType,const size_t),$/;"	p	typeref:typename:MagickExport MagickBooleanType	file:	signature:(Image *,const ChannelType,const size_t)
+SetImageDepth	input.c	/^  SetImageDepth(Image *,const size_t),$/;"	p	typeref:typename:MagickExport MagickBooleanType	file:	signature:(Image *,const size_t)
+SetImageType	input.c	/^  SetImageType(Image *,const ImageType);$/;"	p	typeref:typename:MagickExport MagickBooleanType	file:	signature:(Image *,const ImageType)
