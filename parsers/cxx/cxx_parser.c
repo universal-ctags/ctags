@@ -942,7 +942,7 @@ check_function_signature:
 		
 		if(oInfo.pTrailingComma)
 		{
-			// got a trailing comma a fter the function signature.
+			// got a trailing comma after the function signature.
 			// This might be a special case of multiple prototypes in a single declaration.
 			//
 			//   RetType functionA(...), functionB(...), functionC(...);

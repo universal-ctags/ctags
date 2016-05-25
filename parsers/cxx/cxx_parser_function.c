@@ -618,7 +618,7 @@ boolean cxxParserLookForFunctionSignature(
 			// reached end
 			bStopScanning = TRUE;
 			break;
-		} else if(cxxTokenTypeIsOneOf(
+		} else if(cxxTokenTypeIs(
 				pToken,
 				CXXTokenTypeComma
 			))
