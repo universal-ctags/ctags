@@ -529,6 +529,7 @@ boolean cxxParserLookForFunctionSignature(
 
 	pInfo->uFlags = 0;
 	pInfo->pParenthesis = NULL;
+	pInfo->pTrailingComma = NULL;
 
 	CXXToken * pIdentifierStart = NULL;
 	CXXToken * pIdentifierEnd = NULL;
@@ -615,6 +616,15 @@ boolean cxxParserLookForFunctionSignature(
 			))
 		{
 			// reached end
+			bStopScanning = TRUE;
+			break;
+		} else if(cxxTokenTypeIsOneOf(
+				pToken,
+				CXXTokenTypeComma
+			))
+		{
+			// reached end, but we have a trailing comma.
+			pInfo->pTrailingComma = pToken;
 			bStopScanning = TRUE;
 			break;
 		} else if(
