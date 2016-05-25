@@ -162,6 +162,8 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 	{
 		if(!cxxParserParseNextToken())
 		{
+found_eof:
+
 			if(bExpectClosingBracket)
 			{
 				CXX_DEBUG_LEAVE_TEXT(
@@ -170,9 +172,12 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 					);
 				return FALSE;
 			}
+
 			CXX_DEBUG_LEAVE_TEXT("EOF in main block");
 			return TRUE; // EOF
 		}
+
+process_token:
 
 		CXX_DEBUG_PRINT(
 				"Token '%s' of type 0x%02x",
@@ -342,7 +347,43 @@ boolean cxxParserParseBlock(boolean bExpectClosingBracket)
 					break;
 					case CXXKeywordEXTERN:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenExtern;
+
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+
+						if(!cxxParserParseNextToken())
+							goto found_eof;
+
+						if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeStringConstant))
+						{
+							// assume extern "language"
+
+							// Strictly speaking this is a C++ only syntax.
+							// However we allow it also in C as it doesn't really hurt.
+
+							cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+
+							// Note that extern "C" may be followed by a block with declarations
+							//
+							//   extern "C" { ... }
+							//
+							// However in this case the declarations are ALSO definitions
+							// and extern "C" is used only to specify the name mangling mode.
+							//
+							//   extern "C" int x; <-- a declaration and not a definition
+							//   extern "C" { int x; } <-- a declaration and definition: x IS defined
+							//                             here and is NOT extern.
+							//
+							// A variable in an extern "C" block has to be re-declared extern again
+							// to be really treated as declaration only.
+							//
+							//   extern "C" { extern int x; }
+							//
+							// So in this case we do NOT treat the inner declarations as extern
+							// and we don't need specific handling code for this case.
+						} else {
+							// something else: handle it the normal way
+							goto process_token;
+						}
 					break;
 					case CXXKeywordSTATIC:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenStatic;
