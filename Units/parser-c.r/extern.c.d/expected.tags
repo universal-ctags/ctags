@@ -1,0 +1,4 @@
+f	input.c	/^extern "C" void f(void);$/;"	p	typeref:typename:void	file:	properties:extern
+g	input.c	/^extern "C" void g(void) {}$/;"	f	typeref:typename:void	properties:extern
+h	input.c	/^  void h(void);$/;"	p	typeref:typename:void	file:
+i	input.c	/^  int i;$/;"	v	typeref:typename:int
