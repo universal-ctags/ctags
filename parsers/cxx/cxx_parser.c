@@ -645,13 +645,13 @@ boolean cxxParserParseClassStructOrUnion(
 		{
 			// struct X Y = ...;
 			cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
+		}
 
-			// Skip the initialization (which almost certainly contains a block)
-			if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon))
-			{
-				CXX_DEBUG_LEAVE_TEXT("Failed to parse up to EOF/semicolon");
-				return FALSE;
-			}
+		// Skip the initialization (which almost certainly contains a block)
+		if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon))
+		{
+			CXX_DEBUG_LEAVE_TEXT("Failed to parse up to EOF/semicolon");
+			return FALSE;
 		}
 
 		cxxParserNewStatement();
