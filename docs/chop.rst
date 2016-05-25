@@ -6,11 +6,11 @@ Chop testing
 ----
 
 After reviving many bug reports, we recognized some of them spot
-unexpected EOF. The chop target is developed based on this recognition.
+unexpected EOF. The chop target was developed based on this recognition.
 
 The chop target generates many input files from an existing input file
 under *Units* by truncating the existing input file at variety file
-position.
+positions.
 
 ::
 
