@@ -12,9 +12,9 @@ help:
 	@echo "make units                        - Run parser unit test cases"
 	@echo "make tmain                        - Run ctags main functionality test cases"
 	@echo "make fuzz                         - Verify that all parsers are able to properly process each available test unit"
-	@echo "make noise                        - Veirfy the behavior of parsers for broken input: a character injected or removed randomly"
-	@echo "make chop                         - Veirfy the behavior of parsers for broken input: randomly truncated"
-	@echo "make roundtrip                    - Veirfy the behavior of readtags command"
+	@echo "make noise                        - Verify the behavior of parsers for broken input: a character injected or removed randomly"
+	@echo "make chop                         - Verify the behavior of parsers for broken input: randomly truncated"
+	@echo "make roundtrip                    - Verify the behavior of readtags command"
 	@echo
 	@echo "Arguments that can be used in testing targets:"
 	@echo "VG=1                              - Run test cases with Valgrind memory profiler"
