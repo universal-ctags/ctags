@@ -1,8 +1,10 @@
 1.
+Automake Makefile.am
 foo      [Mm]akefile GNUmakefile
 2.
 Ruby     *.rb *.ruby *.html [Mm]akefile GNUmakefile
 3.
+Automake Makefile.am
 Ruby     *.rb *.ruby *.html [Mm]akefile GNUmakefile
 4.
 Ruby     *.rb *.ruby *.html [Mm]akefile GNUmakefile
