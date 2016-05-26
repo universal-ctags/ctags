@@ -658,17 +658,14 @@ static void parseVimBallFile (const unsigned char *line)
 
 	/* Next line should be "finish" */
 	line = readVimLine();
-	if (line == NULL)
-	{
-		return;
-	}
+
 	while (line != NULL)
 	{
 		/* Next line should be a filename */
 		line = readVimLine();
 		if (line == NULL)
 		{
-			return;
+			goto cleanUp;
 		}
 		else
 		{
@@ -688,7 +685,7 @@ static void parseVimBallFile (const unsigned char *line)
 		line = readVimLine();
 		if (line == NULL)
 		{
-			return;
+			goto cleanUp;
 		}
 		else
 		{
@@ -701,11 +698,12 @@ static void parseVimBallFile (const unsigned char *line)
 			line = readVimballLine();
 			if (line == NULL)
 			{
-				return;
+				goto cleanUp;
 			}
 		}
 	}
 
+cleanUp:
 	vStringDelete (fname);
 }
 
