@@ -316,7 +316,7 @@ extern const char* getFieldName(fieldType type)
 
 #define PR_FIELD_WIDTH_LETTER     7
 #define PR_FIELD_WIDTH_NAME      15
-#define PR_FIELD_WIDTH_LANGUAGE  15
+#define PR_FIELD_WIDTH_LANGUAGE  16
 #define PR_FIELD_WIDTH_DESC      30
 #define PR_FIELD_WIDTH_XFMTCHAR  8
 #define PR_FIELD_WIDTH_ENABLED   7
