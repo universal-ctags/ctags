@@ -569,7 +569,7 @@ boolean cxxParserParseClassStructOrUnion(
 			CXXTokenTypeSmallerThanSign;
 
 	if(eTagKind != CXXTagKindCLASS)
-		uTerminatorTypes |= CXXTokenTypeParenthesisChain;
+		uTerminatorTypes |= CXXTokenTypeParenthesisChain | CXXTokenTypeAssignment;
 
 	boolean bRet;
 
@@ -632,6 +632,26 @@ boolean cxxParserParseClassStructOrUnion(
 				cxxParserExtractTypedef(g_cxx.pTokenChain,TRUE);
 			else
 				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
+		}
+
+		cxxParserNewStatement();
+		CXX_DEBUG_LEAVE();
+		return TRUE;
+	}
+
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeAssignment))
+	{
+		if(g_cxx.pTokenChain->iCount > 3)
+		{
+			// struct X Y = ...;
+			cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
+		}
+
+		// Skip the initialization (which almost certainly contains a block)
+		if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon))
+		{
+			CXX_DEBUG_LEAVE_TEXT("Failed to parse up to EOF/semicolon");
+			return FALSE;
 		}
 
 		cxxParserNewStatement();
