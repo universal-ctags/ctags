@@ -870,11 +870,6 @@ boolean cxxParserParseNextToken(void)
 
 	cxxTokenChainAppend(g_cxx.pTokenChain,t);
 
-	// More than 256 tokens is something like a big table, we
-	// don't need it (for now).
-	if(g_cxx.pTokenChain->iCount > 256)
-		cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
-
 	g_cxx.pToken = t;
 
 	cxxParserSkipToNonWhiteSpace();
