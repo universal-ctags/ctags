@@ -553,7 +553,7 @@ boolean cxxParserLookForFunctionSignature(
 
 			while(pToken)
 			{
-				if(pToken->eType == CXXTokenTypeParenthesisChain)
+				if(cxxTokenTypeIs(pToken,CXXTokenTypeParenthesisChain))
 				{
 					// check for operator ()()
 					if(
@@ -561,10 +561,19 @@ boolean cxxParserLookForFunctionSignature(
 							cxxTokenTypeIs(pToken->pNext,CXXTokenTypeParenthesisChain)
 						)
 						pToken = pToken->pNext;
-					break;
-				}
 
-				if(!cxxTokenTypeIsOneOf(
+					break;
+				} else if(cxxTokenTypeIs(pToken,CXXTokenTypeKeyword))
+				{
+					if(
+							(!cxxTokenIsKeyword(pToken,CXXKeywordNEW)) &&
+							(!cxxTokenIsKeyword(pToken,CXXKeywordDELETE))
+						)
+					{
+						CXX_DEBUG_LEAVE_TEXT("Unexpected token after the operator keyword");
+						return FALSE;
+					}
+				} else if(!cxxTokenTypeIsOneOf(
 						pToken,
 						CXXTokenTypeAnd | CXXTokenTypeAssignment |
 							CXXTokenTypeComma | CXXTokenTypeDotOperator |

@@ -57,6 +57,11 @@ public:
 	}
 	
 	friend X operator && (const X &a,const X & b);
+	
+	void * operator new(size_t);
+	void operator delete(void *);
+	void * operator new[](size_t);
+	void operator delete[](void *);
 };
 
 X & X::operator *= (int x)
@@ -72,6 +77,24 @@ X & X::operator *= (const X & x)
 X X::operator && (const X &a,const X & b)
 {
 	return *this;
+}
+
+void * X::operator new(size_t)
+{
+	return NULL;
+}
+
+void X::operator delete(void *)
+{
+}
+
+void * X::operator new[](size_t)
+{
+	return NULL;
+}
+
+void X::operator delete[](void *)
+{
 }
 
 int main(int argc,char ** argv)
