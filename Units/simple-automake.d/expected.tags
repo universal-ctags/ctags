@@ -3,20 +3,27 @@ EXTRA_DIST	input.am	/^EXTRA_DIST   = $(NULL)$/;"	m
 bin_PROGRAMS	input.am	/^bin_PROGRAMS = ctags$/;"	m
 bin	input.am	/^bin_PROGRAMS = ctags$/;"	d	role:program
 ctags	input.am	/^bin_PROGRAMS = ctags$/;"	P	directory:bin
+USE_READCMD	input.am	/^if USE_READCMD$/;"	c	role:branched
 bin	input.am	/^bin_PROGRAMS+= readtags$/;"	d	role:program
 readtags	input.am	/^bin_PROGRAMS+= readtags$/;"	P	directory:bin
 readtags_CPPFLAGS	input.am	/^readtags_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)\/main -I$(srcdir)\/read$/;"	m
 dist_readtags_SOURCES	input.am	/^dist_readtags_SOURCES = $(READTAGS_SRCS) $(READTAGS_HEADS)$/;"	m
+HAVE_FNMATCH	input.am	/^if !HAVE_FNMATCH$/;"	c	role:branched
+HAVE_REGCOMP	input.am	/^if !HAVE_REGCOMP$/;"	c	role:branched
+HAVE_LIBXML	input.am	/^if HAVE_LIBXML$/;"	c	role:branched
 ctags_CPPFLAGS	input.am	/^ctags_CPPFLAGS = -I. -I$(srcdir) -I$(srcdir)\/main$/;"	m
+ENABLE_DEBUGGING	input.am	/^if ENABLE_DEBUGGING$/;"	c	role:branched
 ctags_CFLAGS	input.am	/^ctags_CFLAGS   =$/;"	m
 ctags_LDADD	input.am	/^ctags_LDADD  =$/;"	m
 nodist_ctags_SOURCES	input.am	/^nodist_ctags_SOURCES = $(REPOINFO_HEADS)$/;"	m
 BUILT_SOURCES	input.am	/^BUILT_SOURCES = $(REPOINFO_HEADS)$/;"	m
 CLEANFILES	input.am	/^CLEANFILES = $(REPOINFO_HEADS)$/;"	m
 $(REPOINFO_OBJS)	input.am	/^$(REPOINFO_OBJS): $(REPOINFO_SRCS) $(REPOINFO_HEADS)$/;"	t
+BUILD_IN_GIT_REPO	input.am	/^if BUILD_IN_GIT_REPO$/;"	c	role:branched
 GEN_REPOINFO	input.am	/^GEN_REPOINFO = $(srcdir)\/misc\/gen-repoinfo$/;"	m
 $(REPOINFO_HEADS)	input.am	/^$(REPOINFO_HEADS): $(GEN_REPOINFO) $(srcdir)\/.git\/*$/;"	t
 $(REPOINFO_HEADS)	input.am	/^$(REPOINFO_HEADS):$/;"	t
+RUN_OPTLIB2C	input.am	/^if RUN_OPTLIB2C$/;"	c	role:branched
 optlib2c_verbose	input.am	/^optlib2c_verbose = $(optlib2c_verbose_@AM_V@)$/;"	m
 optlib2c_verbose_	input.am	/^optlib2c_verbose_ = $(optlib2c_verbose_@AM_DEFAULT_V@)$/;"	m
 optlib2c_verbose_0	input.am	/^optlib2c_verbose_0 = @echo OPTLIB2C "  $@";$/;"	m
@@ -26,11 +33,13 @@ dist_ctags_SOURCES	input.am	/^dist_ctags_SOURCES = $(ALL_HEADS) $(ALL_SRCS)$/;"	
 man_MANS	input.am	/^man_MANS = ctags.1$/;"	m
 man	input.am	/^man_MANS = ctags.1$/;"	d	role:man
 ctags.1	input.am	/^man_MANS = ctags.1$/;"	M	directory:man
+ENABLE_XCMD	input.am	/^if ENABLE_XCMD$/;"	c	role:branched
 driversdir	input.am	/^driversdir = $(pkglibexecdir)\/drivers$/;"	m
 drivers	input.am	/^driversdir = $(pkglibexecdir)\/drivers$/;"	d
 dist_drivers_SCRIPTS	input.am	/^dist_drivers_SCRIPTS = libexec\/drivers\/coffeetags$/;"	m
 drivers	input.am	/^dist_drivers_SCRIPTS = libexec\/drivers\/coffeetags$/;"	d	role:script
 libexec/drivers/coffeetags	input.am	/^dist_drivers_SCRIPTS = libexec\/drivers\/coffeetags$/;"	S	directory:drivers
+INSTALL_ETAGS	input.am	/^if INSTALL_ETAGS$/;"	c	role:branched
 install-exec-hook	input.am	/^install-exec-hook:$/;"	t
 uninstall-hook	input.am	/^uninstall-hook:$/;"	t
 $(top_srcdir)/makefiles/testing.mak	input.am	/^include $(top_srcdir)\/makefiles\/testing.mak$/;"	I	role:included

@@ -10,6 +10,7 @@ Automake	d	ltlibrary	directory for LTLIBRARIES primary	on
 Automake	d	library	directory for LIBRARIES primary	on
 Automake	d	script	directory for SCRIPTS primary	on
 Automake	d	data	directory for DATA primary	on
+Automake	c	branched	used for branching	on
 C	d	undef	undefined	on
 C	h	system	system header	on
 C	h	local	local header	on
@@ -43,6 +44,7 @@ Automake	d	ltlibrary	directory for LTLIBRARIES primary	on
 Automake	d	library	directory for LIBRARIES primary	on
 Automake	d	script	directory for SCRIPTS primary	on
 Automake	d	data	directory for DATA primary	on
+Automake	c	branched	used for branching	on
 C	d	undef	undefined	on
 C	h	system	system header	on
 C	h	local	local header	on

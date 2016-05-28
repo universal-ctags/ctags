@@ -58,6 +58,7 @@ typedef enum {
 	K_AM_LIBRARY,
 	K_AM_SCRIPT,
 	K_AM_DATA,
+	K_AM_CONDITION,
 } makeAMKind;
 
 typedef enum {
@@ -78,6 +79,13 @@ static roleDesc AutomakeDirectoryRoles [] = {
 	{ TRUE, "data",      "directory for DATA primary"},
 };
 
+typedef enum {
+	R_AM_CONDITION_BRANCHED,
+} makeAMConditionRole;
+
+static roleDesc AutomakeConditionRoles [] = {
+	{ TRUE, "branched",  "used for branching" },
+};
 
 static scopeSeparator AutomakeSeparators [] = {
 	{ 'd'          , "/" },
@@ -99,6 +107,8 @@ static kindOption AutomakeKinds [] = {
 	  ATTACH_SEPARATORS(AutomakeSeparators) },
 	{ TRUE, 'D', "data",      "datum",
 	  ATTACH_SEPARATORS(AutomakeSeparators) },
+	{ TRUE, 'c', "condition", "conditions",
+	  .referenceOnly = TRUE, ATTACH_ROLES(AutomakeConditionRoles) },
 };
 
 static hashTable* AutomakeDirectories;
@@ -169,6 +179,7 @@ static void newTarget (vString *const name)
 }
 
 static void (* valuesFoundCB) (vString *name, void *data);
+static void (* directiveFoundCB) (vString *name, void *data);
 
 static void (* newMacroCB) (vString *const name, boolean with_define_directive, boolean appending, void *data);
 static void newMacro (vString *const name, boolean with_define_directive, boolean appending, void *data)
@@ -347,6 +358,12 @@ static void findMakeTagsCommon (void *data)
 							break;
 					}
 				}
+				else
+				{
+					if (directiveFoundCB)
+						directiveFoundCB (name, data);
+
+				}
 			}
 		}
 		else
@@ -511,18 +528,54 @@ static void valuesFoundAM (vString *name, void *data)
 	}
 }
 
+static void refCondtionAM (vString *directive)
+{
+	makeSimpleRefTag (directive, AutomakeKinds,
+			  K_AM_CONDITION, R_AM_CONDITION_BRANCHED);
+}
+
+static void directiveFoundAM (vString *directive, void *data)
+{
+	int c;
+	if (! strcmp (vStringValue (directive), "if"))
+	{
+		vString *condition = vStringNew ();
+
+		c = skipToNonWhite (nextChar ());
+		while (c != EOF && c != '\n')
+		{
+			/* the operator for negation should not be
+			   part of the condition name. */
+			if (c != '!')
+				vStringPut (condition, c);
+			c = nextChar ();
+		}
+		if (c == '\n')
+			ungetcToInputFile (c);
+		vStringTerminate (condition);
+		vStringStripTrailing (condition);
+		if (vStringLength (condition) > 0 )
+			refCondtionAM (condition);
+		vStringDelete (condition);
+	}
+}
+
 static void findAutomakeTags (void)
 {
 	int index = CORK_NIL;
 	void *backup_newMacro = newMacroCB;
 	void *backup_valuesFound = valuesFoundCB;
+	void *backup_directiveFound = directiveFoundCB;
 
 	AutomakeDirectories = hashTableNew (11, hashCstrhash, hashCstreq, eFree, eFree);
 	newMacroCB = newMacroAM;
 	valuesFoundCB = valuesFoundAM;
+	directiveFoundCB = directiveFoundAM;
 	findMakeTagsCommon (&index);
 	valuesFoundCB = backup_valuesFound;
 	newMacroCB = backup_newMacro;
+	directiveFoundCB = backup_directiveFound;
+
 	hashTableDelete (AutomakeDirectories);
 }
 
