@@ -61,12 +61,12 @@ typedef enum {
 } makeAMKind;
 
 typedef enum {
-	R_AM_PROGRAMS,
-	R_AM_MANS,
-	R_AM_LTLIBRARIES,
-	R_AM_LIBRARIES,
-	R_AM_SCRIPTS,
-	R_AM_DATA,
+	R_AM_DIR_PROGRAMS,
+	R_AM_DIR_MANS,
+	R_AM_DIR_LTLIBRARIES,
+	R_AM_DIR_LIBRARIES,
+	R_AM_DIR_SCRIPTS,
+	R_AM_DIR_DATA,
 } makeAMDirectoryRole;
 
 static roleDesc AutomakeDirectoryRoles [] = {
@@ -468,22 +468,22 @@ static void newMacroAM (vString *const name, boolean with_define_directive,
 				   K_AM_DIR, ROLE_INDEX_DEFINITION, am_blacklist,
 				   data)
 	       || AutomakeMakeTag (name, "_PROGRAMS", appending,
-				   K_AM_DIR, R_AM_PROGRAMS, am_blacklist,
+				   K_AM_DIR, R_AM_DIR_PROGRAMS, am_blacklist,
 				   data)
 	       || AutomakeMakeTag (name, "_MANS", appending,
-				   K_AM_DIR, R_AM_MANS, am_blacklist,
+				   K_AM_DIR, R_AM_DIR_MANS, am_blacklist,
 				   data)
 	       || AutomakeMakeTag (name, "_LTLIBRARIES", appending,
-				   K_AM_DIR, R_AM_LTLIBRARIES, am_blacklist,
+				   K_AM_DIR, R_AM_DIR_LTLIBRARIES, am_blacklist,
 				   data)
 	       || AutomakeMakeTag (name, "_LIBRARIES", appending,
-				   K_AM_DIR, R_AM_LIBRARIES, am_blacklist,
+				   K_AM_DIR, R_AM_DIR_LIBRARIES, am_blacklist,
 				   data)
 	       || AutomakeMakeTag (name, "_SCRIPTS", appending,
-				   K_AM_DIR, R_AM_SCRIPTS, am_blacklist,
+				   K_AM_DIR, R_AM_DIR_SCRIPTS, am_blacklist,
 				   data)
 	       || AutomakeMakeTag  (name, "_DATA", appending,
-				    K_AM_DIR, R_AM_DATA, am_blacklist,
+				    K_AM_DIR, R_AM_DIR_DATA, am_blacklist,
 				    data)
 		);
 }
