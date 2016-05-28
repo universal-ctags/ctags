@@ -948,6 +948,8 @@ void cxxParserAnalyzeOtherStatement(void)
 	}
 
 	// prefer function.
+check_function_signature:
+	
 	if(cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,NULL))
 	{
 		int iScopesPushed = cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,CXXEmitFunctionTagsPushScopes,NULL);
@@ -956,7 +958,21 @@ void cxxParserAnalyzeOtherStatement(void)
 			cxxScopePop();
 			iScopesPushed--;
 		}
-		CXX_DEBUG_LEAVE_TEXT("Found function prototypes");
+		CXX_DEBUG_LEAVE_TEXT("Found function prototype");
+		
+		if(oInfo.pTrailingComma)
+		{
+			// got a trailing comma after the function signature.
+			// This might be a special case of multiple prototypes in a single declaration.
+			//
+			//   RetType functionA(...), functionB(...), functionC(...);
+			//
+			// Let's try to extract also the other declarations.
+			//
+			cxxTokenChainDestroyRange(g_cxx.pTokenChain,oInfo.pIdentifierStart,oInfo.pTrailingComma);
+			goto check_function_signature;
+		}
+		
 		return;
 	}
 

@@ -100,6 +100,12 @@ typedef struct _CXXFunctionSignatureInfo
 	// Non-NULL if a return type has been identified
 	CXXToken * pTypeStart;
 	CXXToken * pTypeEnd;
+	
+	// Non-NULL if there is a trailing comma after the function.
+	// This is used for the special case of multiple prototypes in a single
+	// declaration:
+	//     RetType functionA(...), functionB(...);
+	CXXToken * pTrailingComma;
 
 	// Additional informations
 	unsigned int uFlags;
