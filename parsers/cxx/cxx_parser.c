@@ -527,7 +527,7 @@ boolean cxxParserParseEnum(void)
 };
 
 
-boolean cxxParserParseClassStructOrUnion(
+static boolean cxxParserParseClassStructOrUnionInternal(
 		enum CXXKeyword eKeyword,
 		enum CXXTagKind eTagKind
 	)
@@ -563,7 +563,7 @@ boolean cxxParserParseClassStructOrUnion(
 
 	// enable "final" keyword handling
 	g_cxx.bParsingClassStructOrUnionDeclaration = TRUE;
-
+	
 	unsigned int uTerminatorTypes = CXXTokenTypeEOF | CXXTokenTypeSingleColon |
 			CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket |
 			CXXTokenTypeSmallerThanSign;
@@ -849,7 +849,38 @@ boolean cxxParserParseClassStructOrUnion(
 	cxxParserNewStatement();
 	CXX_DEBUG_LEAVE();
 	return bRet;
-};
+}
+
+boolean cxxParserParseClassStructOrUnion(
+		enum CXXKeyword eKeyword,
+		enum CXXTagKind eTagKind
+	)
+{
+	// Trick for "smart" handling of public/protected/private keywords in .h files parsed as C++.
+	// See the declaration of bEnablePublicProtectedPrivateKeywords for more info.
+
+	// Save the state
+	boolean bEnablePublicProtectedPrivateKeywords = g_cxx.bEnablePublicProtectedPrivateKeywords;
+	
+	// If parsing of the keywords was disabled, we're in C++ mode and the keyword is "class" then
+	// we're fairly certain that the source code is *really* C++.
+	if(
+			(!bEnablePublicProtectedPrivateKeywords) &&
+			(eKeyword == CXXKeywordCLASS) &&
+			cxxParserCurrentLanguageIsCPP()
+		)
+		bEnablePublicProtectedPrivateKeywords = TRUE; // leave it on for good.
+
+	// Enable public/protected/private keywords
+	g_cxx.bEnablePublicProtectedPrivateKeywords = TRUE;
+
+	boolean bRet = cxxParserParseClassStructOrUnionInternal(eKeyword,eTagKind);
+
+	g_cxx.bEnablePublicProtectedPrivateKeywords = bEnablePublicProtectedPrivateKeywords;
+
+	return bRet;
+}
+
 
 //
 // This is called at block level, upon encountering a semicolon, an unbalanced
@@ -1184,6 +1215,14 @@ rescanReason cxxCppParserMain(const unsigned int passCount)
 {
 	CXX_DEBUG_ENTER();
 	g_cxx.eLanguage = g_cxx.eCPPLanguage;
+
+	// In header files we disable processing of public/protected/private keywords
+	// until we either figure out that this is really C++ or we're start parsing
+	// a struct/union.
+	g_cxx.bEnablePublicProtectedPrivateKeywords = !isInputHeaderFile();
+
+	CXX_DEBUG_PRINT("Parsing of public/protected/private is %d",g_cxx.bEnablePublicProtectedPrivateKeywords);
+
 	rescanReason r = cxxParserMain(passCount);
 	CXX_DEBUG_LEAVE();
 	return r;

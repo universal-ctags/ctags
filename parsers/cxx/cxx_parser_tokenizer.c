@@ -947,8 +947,17 @@ boolean cxxParserParseNextToken(void)
 		if(iCXXKeyword >= 0)
 		{
 			if(
-					(iCXXKeyword == CXXKeywordFINAL) &&
-					(!g_cxx.bParsingClassStructOrUnionDeclaration)
+					(
+						(iCXXKeyword == CXXKeywordFINAL) &&
+						(!g_cxx.bParsingClassStructOrUnionDeclaration)
+					) || (
+						(
+							(iCXXKeyword == CXXKeywordPUBLIC) ||
+							(iCXXKeyword == CXXKeywordPROTECTED) ||
+							(iCXXKeyword == CXXKeywordPRIVATE)
+						) &&
+						(!g_cxx.bEnablePublicProtectedPrivateKeywords)
+					)
 				)
 			{
 				t->eType = CXXTokenTypeIdentifier;
