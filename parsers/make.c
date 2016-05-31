@@ -38,7 +38,7 @@ typedef enum {
 } makeMakefileRole;
 
 static roleDesc MakeMakefileRoles [] = {
-        { TRUE, "included", "included" },
+	{ TRUE, "included", "included" },
 	{ TRUE, "optional", "optionally included"},
 };
 
@@ -58,15 +58,16 @@ typedef enum {
 	K_AM_LIBRARY,
 	K_AM_SCRIPT,
 	K_AM_DATA,
+	K_AM_CONDITION,
 } makeAMKind;
 
 typedef enum {
-	R_AM_PROGRAMS,
-	R_AM_MANS,
-	R_AM_LTLIBRARIES,
-	R_AM_LIBRARIES,
-	R_AM_SCRIPTS,
-	R_AM_DATA,
+	R_AM_DIR_PROGRAMS,
+	R_AM_DIR_MANS,
+	R_AM_DIR_LTLIBRARIES,
+	R_AM_DIR_LIBRARIES,
+	R_AM_DIR_SCRIPTS,
+	R_AM_DIR_DATA,
 } makeAMDirectoryRole;
 
 static roleDesc AutomakeDirectoryRoles [] = {
@@ -78,6 +79,13 @@ static roleDesc AutomakeDirectoryRoles [] = {
 	{ TRUE, "data",      "directory for DATA primary"},
 };
 
+typedef enum {
+	R_AM_CONDITION_BRANCHED,
+} makeAMConditionRole;
+
+static roleDesc AutomakeConditionRoles [] = {
+	{ TRUE, "branched",  "used for branching" },
+};
 
 static scopeSeparator AutomakeSeparators [] = {
 	{ 'd'          , "/" },
@@ -99,6 +107,8 @@ static kindOption AutomakeKinds [] = {
 	  ATTACH_SEPARATORS(AutomakeSeparators) },
 	{ TRUE, 'D', "data",      "datum",
 	  ATTACH_SEPARATORS(AutomakeSeparators) },
+	{ TRUE, 'c', "condition", "conditions",
+	  .referenceOnly = TRUE, ATTACH_ROLES(AutomakeConditionRoles) },
 };
 
 static hashTable* AutomakeDirectories;
@@ -169,6 +179,7 @@ static void newTarget (vString *const name)
 }
 
 static void (* valuesFoundCB) (vString *name, void *data);
+static void (* directiveFoundCB) (vString *name, void *data);
 
 static void (* newMacroCB) (vString *const name, boolean with_define_directive, boolean appending, void *data);
 static void newMacro (vString *const name, boolean with_define_directive, boolean appending, void *data)
@@ -347,6 +358,12 @@ static void findMakeTagsCommon (void *data)
 							break;
 					}
 				}
+				else
+				{
+					if (directiveFoundCB)
+						directiveFoundCB (name, data);
+
+				}
 			}
 		}
 		else
@@ -468,22 +485,22 @@ static void newMacroAM (vString *const name, boolean with_define_directive,
 				   K_AM_DIR, ROLE_INDEX_DEFINITION, am_blacklist,
 				   data)
 	       || AutomakeMakeTag (name, "_PROGRAMS", appending,
-				   K_AM_DIR, R_AM_PROGRAMS, am_blacklist,
+				   K_AM_DIR, R_AM_DIR_PROGRAMS, am_blacklist,
 				   data)
 	       || AutomakeMakeTag (name, "_MANS", appending,
-				   K_AM_DIR, R_AM_MANS, am_blacklist,
+				   K_AM_DIR, R_AM_DIR_MANS, am_blacklist,
 				   data)
 	       || AutomakeMakeTag (name, "_LTLIBRARIES", appending,
-				   K_AM_DIR, R_AM_LTLIBRARIES, am_blacklist,
+				   K_AM_DIR, R_AM_DIR_LTLIBRARIES, am_blacklist,
 				   data)
 	       || AutomakeMakeTag (name, "_LIBRARIES", appending,
-				   K_AM_DIR, R_AM_LIBRARIES, am_blacklist,
+				   K_AM_DIR, R_AM_DIR_LIBRARIES, am_blacklist,
 				   data)
 	       || AutomakeMakeTag (name, "_SCRIPTS", appending,
-				   K_AM_DIR, R_AM_SCRIPTS, am_blacklist,
+				   K_AM_DIR, R_AM_DIR_SCRIPTS, am_blacklist,
 				   data)
 	       || AutomakeMakeTag  (name, "_DATA", appending,
-				    K_AM_DIR, R_AM_DATA, am_blacklist,
+				    K_AM_DIR, R_AM_DIR_DATA, am_blacklist,
 				    data)
 		);
 }
@@ -511,18 +528,54 @@ static void valuesFoundAM (vString *name, void *data)
 	}
 }
 
+static void refCondtionAM (vString *directive)
+{
+	makeSimpleRefTag (directive, AutomakeKinds,
+			  K_AM_CONDITION, R_AM_CONDITION_BRANCHED);
+}
+
+static void directiveFoundAM (vString *directive, void *data)
+{
+	int c;
+	if (! strcmp (vStringValue (directive), "if"))
+	{
+		vString *condition = vStringNew ();
+
+		c = skipToNonWhite (nextChar ());
+		while (c != EOF && c != '\n')
+		{
+			/* the operator for negation should not be
+			   part of the condition name. */
+			if (c != '!')
+				vStringPut (condition, c);
+			c = nextChar ();
+		}
+		if (c == '\n')
+			ungetcToInputFile (c);
+		vStringTerminate (condition);
+		vStringStripTrailing (condition);
+		if (vStringLength (condition) > 0 )
+			refCondtionAM (condition);
+		vStringDelete (condition);
+	}
+}
+
 static void findAutomakeTags (void)
 {
 	int index = CORK_NIL;
 	void *backup_newMacro = newMacroCB;
 	void *backup_valuesFound = valuesFoundCB;
+	void *backup_directiveFound = directiveFoundCB;
 
 	AutomakeDirectories = hashTableNew (11, hashCstrhash, hashCstreq, eFree, eFree);
 	newMacroCB = newMacroAM;
 	valuesFoundCB = valuesFoundAM;
+	directiveFoundCB = directiveFoundAM;
 	findMakeTagsCommon (&index);
 	valuesFoundCB = backup_valuesFound;
 	newMacroCB = backup_newMacro;
+	directiveFoundCB = backup_directiveFound;
+
 	hashTableDelete (AutomakeDirectories);
 }
 
