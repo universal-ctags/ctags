@@ -563,7 +563,7 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 
 	// enable "final" keyword handling
 	g_cxx.bParsingClassStructOrUnionDeclaration = TRUE;
-	
+
 	unsigned int uTerminatorTypes = CXXTokenTypeEOF | CXXTokenTypeSingleColon |
 			CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket |
 			CXXTokenTypeSmallerThanSign;
@@ -861,7 +861,7 @@ boolean cxxParserParseClassStructOrUnion(
 
 	// Save the state
 	boolean bEnablePublicProtectedPrivateKeywords = g_cxx.bEnablePublicProtectedPrivateKeywords;
-	
+
 	// If parsing of the keywords was disabled, we're in C++ mode and the keyword is "class" then
 	// we're fairly certain that the source code is *really* C++.
 	if(
@@ -980,7 +980,7 @@ void cxxParserAnalyzeOtherStatement(void)
 
 	// prefer function.
 check_function_signature:
-	
+
 	if(cxxParserLookForFunctionSignature(g_cxx.pTokenChain,&oInfo,NULL))
 	{
 		int iScopesPushed = cxxParserEmitFunctionTags(&oInfo,CXXTagKindPROTOTYPE,CXXEmitFunctionTagsPushScopes,NULL);
@@ -990,7 +990,7 @@ check_function_signature:
 			iScopesPushed--;
 		}
 		CXX_DEBUG_LEAVE_TEXT("Found function prototype");
-		
+
 		if(oInfo.pTrailingComma)
 		{
 			// got a trailing comma after the function signature.
@@ -1003,7 +1003,7 @@ check_function_signature:
 			cxxTokenChainDestroyRange(g_cxx.pTokenChain,oInfo.pIdentifierStart,oInfo.pTrailingComma);
 			goto check_function_signature;
 		}
-		
+
 		return;
 	}
 
@@ -1135,7 +1135,7 @@ boolean cxxParserParseIfForWhileSwitch(void)
 			t->eType = CXXTokenTypeSemicolon;
 			vStringClear(t->pszWord);
 			vStringPut(t->pszWord,';');
-	
+
 			// and extract variable declarations if possible
 			cxxParserExtractVariableDeclarations(pChain,0);
 		}
