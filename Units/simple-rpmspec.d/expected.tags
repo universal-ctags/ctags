@@ -1,0 +1,15 @@
+Summary	input.spec	/^Summary: Exuberant Ctags - a multi-language source code indexing tool$/;"	kind:macro
+Name	input.spec	/^Name: ctags$/;"	kind:macro
+ctags	input.spec	/^Name: ctags$/;"	kind:package
+Version	input.spec	/^Version: 99$/;"	kind:macro
+Release	input.spec	/^Release: 1$/;"	kind:macro
+License	input.spec	/^License: GPLv2$/;"	kind:macro
+Group	input.spec	/^Group: Development\/Tools$/;"	kind:macro
+Source	input.spec	/^Source: http:\/\/prdownloads.sourceforge.net\/ctags\/ctags-%{version}.tar.gz$/;"	kind:macro
+URL	input.spec	/^URL: http:\/\/ctags.sourceforge.net$/;"	kind:macro
+Buildroot	input.spec	/^Buildroot: %{_tmppath}\/%{name}-%{version}-root$/;"	kind:macro
+__scm_apply_git	input.spec	/^%define __scm_apply_git(qp:m:) %{__git} am$/;"	kind:macro	signature:(qp:m:)
+YES	input.spec	/^%define YES yes$/;"	kind:macro
+__scm_apply_git	input.spec	/^%undef __scm_apply_git$/;"	kind:macro	role:undef
+perf_make	input.spec	/^%global perf_make make %{?_smp_mflags} -C tools\/perf -s V=1 WERROR=0 NO_LIBUNWIND=1 HAVE_CPLUS_/;"	kind:global
+docs	input.spec	/^%package docs$/;"	kind:package

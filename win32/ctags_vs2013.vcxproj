@@ -200,6 +200,7 @@
     <ClCompile Include="..\main\xtag.c" />
     <ClCompile Include="..\main\mio.c" />
     <ClCompile Include="..\parsers\yacc.c" />
+    <ClCompile Include="..\parsers\rpmspec.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\fnmatch\fnmatch.h" />

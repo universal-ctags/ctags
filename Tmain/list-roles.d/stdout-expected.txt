@@ -28,6 +28,7 @@ Python	i	namespace	namespace from where classes/variables/functions are imported
 Python	i	indirectly-imported	module imported in alternative name	on
 Python	x	imported	imported from the other module	on
 Python	x	indirectly-imported	classes/variables/functions/modules imported in alternative name	on
+RpmSpec	m	undef	undefined	on
 Sh	s	loaded	loaded	on
 Vera	d	undef	undefined	on
 Vera	h	system	system header	on
@@ -62,6 +63,7 @@ Python	i	namespace	namespace from where classes/variables/functions are imported
 Python	i	indirectly-imported	module imported in alternative name	on
 Python	x	imported	imported from the other module	on
 Python	x	indirectly-imported	classes/variables/functions/modules imported in alternative name	on
+RpmSpec	m	undef	undefined	on
 Sh	s	loaded	loaded	on
 Vera	d	undef	undefined	on
 Vera	h	system	system header	on

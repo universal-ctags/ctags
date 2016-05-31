@@ -143,6 +143,7 @@ PARSER_SRCS =				\
 	parsers/python.c		\
 	parsers/r.c			\
 	parsers/rexx.c			\
+	parsers/rpmspec.c		\
 	parsers/rst.c			\
 	parsers/ruby.c			\
 	parsers/rust.c			\
