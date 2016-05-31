@@ -148,7 +148,7 @@ static xmlDocPtr makeXMLDoc (void)
 		return doc;
 	}
 
-	data = getInpufFileData (&size);
+	data = getInputFileData (&size);
 	if (data)
 	{
 		xmlLineNumbersDefault (1);

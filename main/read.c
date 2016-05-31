@@ -68,7 +68,7 @@ extern void freeInputFileResources (void)
 	freeInputFileInfo (&File.source);
 }
 
-extern const unsigned char *getInpufFileData (size_t *size)
+extern const unsigned char *getInputFileData (size_t *size)
 {
 	return mio_memory_get_data (File.fp, size);
 }
