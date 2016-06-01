@@ -40,13 +40,23 @@ typedef ATemplate1<int > (*T54)();
 template<typename Type> class Container
 {
 public:
-	typedef Type::iterator1 T61;
+	typedef typename Type::iterator1 T61;
 	typedef typename Type :: iterator2 T62;
-	typedef ATemplate<Type> T63;
-	typedef int (*T64)(ATemplate< Type> &);
+	typedef ATemplate1<AClass> T63;
+	typedef int (*T64)(ATemplate1<AUnion> &);
 };
 
 // This should appear as typedef but have not typeref since we can't resolve macros
 #define DECLPOINTER(name) name *
 
 typedef DECLPOINTER(struct AStruct) T71;
+
+// Multiple typedefs
+typedef struct _ABC {
+	int a;
+	int b;
+} T81, *T82;
+
+typedef int T83, *T84, **T85;
+typedef ATemplate2< ATemplate2< ATemplate1<int *>, AClass>, AStruct> T86, **T87;
+typedef int T88, *T89, (&T90)(int, int *), T91[10], &T92;
