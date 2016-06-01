@@ -372,6 +372,7 @@ static regexPattern* addCompiledTagCommon (const langType language,
 		}
 	}
 	ptrn = &set->patterns [set->count];
+	memset (ptrn, 0, sizeof (*ptrn));
 	ptrn->pattern = pattern;
 	ptrn->exclusive = FALSE;
 	ptrn->accept_empty_name = FALSE;
