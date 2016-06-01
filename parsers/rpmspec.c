@@ -45,13 +45,31 @@ static roleDesc RpmSpecMacroRoles [] = {
 	{ TRUE, "undef", "undefined" },
 };
 
+static scopeSeparator RpmSpecPackageSeparators [] = {
+	{ 'p'          , "-" },
+};
+
 static kindOption RpmSpecKinds[] = {
 	{ TRUE, 't', "tag", "tags" },
 	{ TRUE, 'm', "macro", "macros",
 	  .referenceOnly = FALSE, ATTACH_ROLES(RpmSpecMacroRoles) },
-	{ TRUE, 'p', "package", "packages" },
+	{ TRUE, 'p', "package", "packages",
+	  ATTACH_SEPARATORS(RpmSpecPackageSeparators) },
 	{ TRUE, 'g', "global", "global macros" },
 };
+
+typedef enum {
+	F_END,
+} rpmspecField;
+
+static fieldSpec RpmSpecFields [] = {
+	{
+		.name = "end",
+		.description = "end lines of macros",
+		.enabled = FALSE,
+	}
+};
+
 
 static boolean rejecting;
 
@@ -81,6 +99,8 @@ static void found_macro_cb (const char *line,
 		vString *signature = ((count > 1) && (matches[2].length > 0))? vStringNew(): NULL;
 		vString *name = vStringNew ();
 		tagEntryInfo tag;
+		unsigned long end_line;
+		char end_buf[16];
 
 		if (signature)
 			vStringNCopyS (signature, line + matches[2].start, matches[2].length);
@@ -94,13 +114,6 @@ static void found_macro_cb (const char *line,
 		if (signature)
 			tag.extensionFields.signature = vStringValue (signature);
 
-		makeTagEntry (&tag);
-		vStringDelete (name);
-		if (signature)
-			vStringDelete (signature);
-
-
-
 		/* Skip the definition */
 		while (line && is_line_continued (line))
 		{
@@ -108,19 +121,29 @@ static void found_macro_cb (const char *line,
 			line = (const char *)readLineFromInputFile ();
 		}
 		rejecting = FALSE;
+
+		end_line = getInputLineNumber();
+		snprintf(end_buf, sizeof(end_buf), "%ld", (end_line));
+		attachParserField (&tag, RpmSpecFields [F_END].ftype, end_buf);
+
+		makeTagEntry (&tag);
+
+		vStringDelete (name);
+		if (signature)
+			vStringDelete (signature);
 	}
 }
 
 static void found_tag_cb (const char *line,
 			  const regexMatch *matches,
 			  unsigned int count,
-			  void *userData __unused__)
+			  void *userData)
 {
 	if (count > 0)
 	{
 		vString *name = vStringNew ();
 		vStringNCopyS (name, line + matches[1].start, matches[1].length);
-		makeSimpleTag (name, RpmSpecKinds, K_MACOR);
+		makeSimpleTag (name, RpmSpecKinds, K_TAG);
 
 		if (count > 1)
 		{
@@ -128,7 +151,7 @@ static void found_tag_cb (const char *line,
 			{
 				vString *package = vStringNew ();
 				vStringNCopyS (package, line + matches[2].start, matches[2].length);
-				makeSimpleTag (package, RpmSpecKinds, K_PACKAGE);
+				*((int *)userData) = makeSimpleTag (package, RpmSpecKinds, K_PACKAGE);
 				vStringDelete (package);
 			}
 		}
@@ -139,19 +162,24 @@ static void found_tag_cb (const char *line,
 static void found_package_cb (const char *line,
 			      const regexMatch *matches,
 			      unsigned int count,
-			      void *userData __unused__)
+			      void *userData)
 {
 	if (count > 0)
 	{
 		vString *name = vStringNew ();
+		tagEntryInfo tag;
+
 		vStringNCopyS (name, line + matches[1].start, matches[1].length);
-		makeSimpleTag (name, RpmSpecKinds, K_PACKAGE);
+		initTagEntry (&tag, vStringValue (name), RpmSpecKinds + K_PACKAGE);
+		tag.extensionFields.scopeIndex = *(int *)userData;
+		makeTagEntry (&tag);
 		vStringDelete (name);
 	}
 }
 
 static void initializeRpmSpecParser (langType language)
 {
+	static int package_index = CORK_NIL;
 	rejecting = FALSE;
 
 	static struct macro_cb_data macro  = {K_MACOR,  ROLE_INDEX_DEFINITION};
@@ -159,7 +187,7 @@ static void initializeRpmSpecParser (langType language)
 	static struct macro_cb_data undef  = {K_MACOR,  R_MACRO_UNDEF};
 
 	addCallbackRegex (language,  "^([A-Za-z_][A-Za-z_0-9()]+)[ \t]*:[ \t]*([^ \t]*)",
-			  "{exclusive}", found_tag_cb, &rejecting, NULL);
+			  "{exclusive}", found_tag_cb, &rejecting, &package_index);
 	addCallbackRegex (language, "^%define[ \t]+([A-Za-z_][A-Za-z_0-9]+)(\\([^)]+\\))?",
 			  "{exclusive}", found_macro_cb, &rejecting, &macro);
 	addCallbackRegex (language, "^%undef[ \t]+([A-Za-z_][A-Za-z_0-9]+)",
@@ -167,7 +195,7 @@ static void initializeRpmSpecParser (langType language)
 	addCallbackRegex (language, "^%global[ \t]+([A-Za-z_][A-Za-z_0-9]+)(\\([^)]+\\))?",
 			  "{exclusive}", found_macro_cb, &rejecting, &global);
 	addCallbackRegex (language, "^%package[ \t]+([A-Za-z_][A-Za-z_0-9-]+)",
-			  "{exclusive}", found_package_cb, &rejecting, NULL);
+			  "{exclusive}", found_package_cb, &rejecting, &package_index);
 }
 
 extern parserDefinition* RpmSpecParser (void)
@@ -179,6 +207,10 @@ extern parserDefinition* RpmSpecParser (void)
 	def->extensions = extensions;
 	def->initialize = initializeRpmSpecParser;
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->fieldSpecs = RpmSpecFields;
+	def->fieldSpecCount = ARRAY_SIZE (RpmSpecFields);
+	def->useCork = TRUE;
+	def->requestAutomaticFQTag = TRUE;
 	return def;
 }
 

@@ -25,6 +25,15 @@ Install ctags if you are going to use your system for programming.
 %undef __scm_apply_git
 %global perf_make make %{?_smp_mflags} -C tools/perf -s V=1 WERROR=0 NO_LIBUNWIND=1 HAVE_CPLUS_DEMANGLE=1 NO_GTK2=1 NO_STRLCPY=1 prefix=%{_prefix} lib=%{_lib}
 
+%define install_post \
+  if [ "%{with_debug}" -ne "0" ]; then \
+    : \
+  fi \
+  if [ "%{with_default}" -ne "0" ]; then \
+    : \
+  fi \
+%{nil}
+
 %package docs
 %description docs
 Something must be written here.
