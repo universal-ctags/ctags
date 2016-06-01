@@ -111,79 +111,181 @@ void cxxParserExtractTypedef(
 		cxxTokenChainDestroyLast(pChain);
 	}
 
-	t = cxxTokenChainLast(pChain);
-	CXX_DEBUG_ASSERT(t,"We should have a last token here!");
+	// There may be multiple typedefs inside a single declaration.
 
-	CXXTokenChain * pTParentChain;
+	// [typedef] x y, *z;
+	//   -> y is x
+	//   -> z is x *
 
-	CXXToken * pAux;
+	// The angle brackets are not necessairly condensed in chains here
+	// since we were parsing a generic statement which expected less-than
+	// and greater-than operators to be present. We need to take care of that.
 
-	// check for special case of function pointer definition
-	if(
-		cxxTokenTypeIs(t,CXXTokenTypeParenthesisChain) &&
-		t->pPrev &&
-		cxxTokenTypeIs(t->pPrev,CXXTokenTypeParenthesisChain) &&
-		t->pPrev->pPrev &&
-		(pAux = cxxTokenChainLastTokenOfType(
-				t->pPrev->pChain,
-				CXXTokenTypeIdentifier
-			))
-	)
+
+	while(pChain->iCount >= 2)
 	{
-		CXX_DEBUG_PRINT("Found function pointer typedef");
-		pTParentChain = t->pPrev->pChain;
-		t = pAux;
-	} else {
-		t = cxxTokenChainLastTokenOfType(pChain,CXXTokenTypeIdentifier);
-		pTParentChain = pChain;
-	}
+		// Skip either to a comma or to the end.
 
-	if(!t)
-	{
-		CXX_DEBUG_LEAVE_TEXT("Didn't find an identifier");
-		return; // EOF
-	}
+		t = cxxTokenChainFirst(pChain);
 
-	if(!t->pPrev)
-	{
-		CXX_DEBUG_LEAVE_TEXT("No type before the typedef'd identifier");
-		return; // EOF
-	}
+		CXX_DEBUG_ASSERT(t,"There should be a token here!");
 
-	tagEntryInfo * tag = cxxTagBegin(CXXTagKindTYPEDEF,t);
+		CXXToken * pComma;
 
-	if(tag)
-	{
-		pAux = t->pPrev;
+skip_to_comma_or_end:
 
-		CXXToken * pTypeName = NULL;
+		pComma = cxxTokenChainNextTokenOfType(
+				t,
+				CXXTokenTypeComma | CXXTokenTypeSmallerThanSign
+			);
 
-		cxxTokenChainTake(pTParentChain,t);
-
-		if(
-				(pTParentChain == pChain) && // not function pointer (see above)
-				cxxTokenChainFirstTokenOfType(pChain,CXXTokenTypeParenthesisChain)
-			)
+		if(pComma)
 		{
-			CXX_DEBUG_LEAVE_TEXT(
-					"Wild parenthesis in type definition: not emitting typeref"
-				);
-		} else {
-			// other kind of typeref, use typename here.
-			CXX_DEBUG_ASSERT(pChain->iCount > 0,"There should be at least another token here!");
+			// Either a comma or <
+			if(cxxTokenTypeIs(pComma,CXXTokenTypeSmallerThanSign))
+			{
+				CXX_DEBUG_PRINT("Found angle bracket, trying to skip it");
 
-			pTypeName = cxxTagSetTypeField(
-						cxxTokenChainFirst(pChain),
-						cxxTokenChainLast(pChain)
-					);
+				t = cxxTokenChainSkipToEndOfTemplateAngleBracket(pComma);
+				if(!t)
+				{
+					CXX_DEBUG_LEAVE_TEXT("Mismatched < sign inside typedef: giving up on it");
+					return;
+				}
+				goto skip_to_comma_or_end;
+			}
+
+			CXX_DEBUG_PRINT("Found comma");
+
+			// Really a comma!
+			if((!pComma->pPrev) || (!pComma->pPrev->pPrev))
+			{
+				CXX_DEBUG_LEAVE_TEXT("Found comma but not enough tokens before it");
+				return;
+			}
+
+			t = pComma->pPrev;
+		} else {
+			CXX_DEBUG_PRINT("Found no comma, pointing at end of declaration");
+
+			t = cxxTokenChainLast(pChain);
 		}
 
-		tag->isFileScope = !isInputHeaderFile();
+		CXX_DEBUG_ASSERT(t,"We should have found an identifier token here!");
 
-		cxxTagCommit();
-		cxxTokenDestroy(t);
-		if(pTypeName)
-			cxxTokenDestroy(pTypeName);
+		CXXTokenChain * pTParentChain;
+
+		CXXToken * pAux;
+
+		// check for special case of function pointer definition
+		if(
+			cxxTokenTypeIs(t,CXXTokenTypeParenthesisChain) &&
+			t->pPrev &&
+			cxxTokenTypeIs(t->pPrev,CXXTokenTypeParenthesisChain) &&
+			t->pPrev->pPrev &&
+			(pAux = cxxTokenChainLastTokenOfType(
+					t->pPrev->pChain,
+					CXXTokenTypeIdentifier
+				))
+		)
+		{
+			CXX_DEBUG_PRINT("Found function pointer typedef");
+			pTParentChain = t->pPrev->pChain;
+			t = pAux;
+		} else if(cxxTokenTypeIs(t,CXXTokenTypeIdentifier))
+		{
+			CXX_DEBUG_PRINT("Found straight typedef");
+			pTParentChain = pChain;
+		} else if((pAux = cxxTokenChainPreviousTokenOfType(t,CXXTokenTypeIdentifier)))
+		{
+			CXX_DEBUG_PRINT("Found typedef of something that might look like an array");
+			t = pAux;
+			pTParentChain = pChain;
+		} else {
+			CXX_DEBUG_LEAVE_TEXT("Didn't find an identifier");
+			return; // EOF
+		}
+
+		if(!t->pPrev)
+		{
+			CXX_DEBUG_LEAVE_TEXT("No type before the typedef'd identifier");
+			return; // EOF
+		}
+
+		tagEntryInfo * tag = cxxTagBegin(CXXTagKindTYPEDEF,t);
+
+		if(tag)
+		{
+			CXXToken * pTypeName = NULL;
+
+			cxxTokenChainTake(pTParentChain,t);
+
+			// Avoid emitting typerefs for strange things like
+			//  typedef MACRO(stuff,stuff) X
+			if(
+					(pTParentChain == pChain) && // not function pointer (see above)
+					(
+						pComma ? 
+							cxxTokenChainPreviousTokenOfType(
+									pComma,
+									CXXTokenTypeParenthesisChain
+								) :
+							cxxTokenChainLastTokenOfType(
+									pChain,
+									CXXTokenTypeParenthesisChain
+								)
+					)
+				)
+			{
+				CXX_DEBUG_LEAVE_TEXT(
+						"Wild parenthesis in type definition: not emitting typeref"
+					);
+			} else {
+				// other kind of typeref, use typename here.
+				CXX_DEBUG_ASSERT(
+						pChain->iCount > 0,
+						"There should be at least another token here!"
+					);
+
+				pTypeName = cxxTagSetTypeField(
+							cxxTokenChainFirst(pChain),
+							pComma ? pComma->pPrev : cxxTokenChainLast(pChain)
+						);
+			}
+
+			tag->isFileScope = !isInputHeaderFile();
+
+			cxxTagCommit();
+			cxxTokenDestroy(t);
+			if(pTypeName)
+				cxxTokenDestroy(pTypeName);
+		}
+		
+		if(!pComma)
+			break;
+
+		// We must kill anything up to either an identifier, a keyword (type) or > which is
+		// assumed to be part of a template.
+
+		while(
+				pComma->pPrev &&
+				(
+					!cxxTokenTypeIsOneOf(
+							pComma->pPrev,
+							CXXTokenTypeIdentifier | CXXTokenTypeKeyword |
+							CXXTokenTypeGreaterThanSign | CXXTokenTypeAngleBracketChain
+						)
+				)
+			)
+		{
+			pAux = pComma->pPrev;
+			cxxTokenChainTake(pChain,pAux);
+			cxxTokenDestroy(pAux);
+		}
+
+		// got a comma.
+		cxxTokenChainTake(pChain,pComma);
+		cxxTokenDestroy(pComma);
 	}
 
 	CXX_DEBUG_LEAVE();

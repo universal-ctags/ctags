@@ -14,8 +14,20 @@ T51	input.cpp	/^typedef ATemplate1<int > T51;$/;"	t	typeref:typename:ATemplate1<
 T52	input.cpp	/^typedef ATemplate1< unsigned short int> T52;$/;"	t	typeref:typename:ATemplate1<unsigned short int>	file:
 T53	input.cpp	/^typedef ATemplate1<ATemplate2 < AStruct,AClass> > T53;$/;"	t	typeref:typename:ATemplate1<ATemplate2<AStruct,AClass>>	file:
 T54	input.cpp	/^typedef ATemplate1<int > (*T54)();$/;"	t	typeref:typename:ATemplate1<int> (*)()	file:
-T61	input.cpp	/^	typedef Type::iterator1 T61;$/;"	t	class:Container	typeref:typename:Type::iterator1	file:
+T61	input.cpp	/^	typedef typename Type::iterator1 T61;$/;"	t	class:Container	typeref:typename:Type::iterator1	file:
 T62	input.cpp	/^	typedef typename Type :: iterator2 T62;$/;"	t	class:Container	typeref:typename:Type::iterator2	file:
-T63	input.cpp	/^	typedef ATemplate<Type> T63;$/;"	t	class:Container	typeref:typename:ATemplate<Type>	file:
-T64	input.cpp	/^	typedef int (*T64)(ATemplate< Type> &);$/;"	t	class:Container	typeref:typename:int (*)(ATemplate<Type> &)	file:
+T63	input.cpp	/^	typedef ATemplate1<AClass> T63;$/;"	t	class:Container	typeref:typename:ATemplate1<AClass>	file:
+T64	input.cpp	/^	typedef int (*T64)(ATemplate1<AUnion> &);$/;"	t	class:Container	typeref:typename:int (*)(ATemplate1<AUnion> &)	file:
 T71	input.cpp	/^typedef DECLPOINTER(struct AStruct) T71;$/;"	t	file:
+T81	input.cpp	/^} T81, *T82;$/;"	t	typeref:struct:_ABC	file:
+T82	input.cpp	/^} T81, *T82;$/;"	t	typeref:struct:_ABC *	file:
+T83	input.cpp	/^typedef int T83, *T84, **T85;$/;"	t	typeref:typename:int	file:
+T84	input.cpp	/^typedef int T83, *T84, **T85;$/;"	t	typeref:typename:int *	file:
+T85	input.cpp	/^typedef int T83, *T84, **T85;$/;"	t	typeref:typename:int **	file:
+T86	input.cpp	/^typedef ATemplate2< ATemplate2< ATemplate1<int *>, AClass>, AStruct> T86, **T87;$/;"	t	typeref:typename:ATemplate2<ATemplate2<ATemplate1<int * >,AClass>,AStruct>	file:
+T87	input.cpp	/^typedef ATemplate2< ATemplate2< ATemplate1<int *>, AClass>, AStruct> T86, **T87;$/;"	t	typeref:typename:ATemplate2<ATemplate2<ATemplate1<int * >,AClass>,AStruct> **	file:
+T88	input.cpp	/^typedef int T88, *T89, (&T90)(int, int *), T91[10], &T92;$/;"	t	typeref:typename:int	file:
+T89	input.cpp	/^typedef int T88, *T89, (&T90)(int, int *), T91[10], &T92;$/;"	t	typeref:typename:int *	file:
+T90	input.cpp	/^typedef int T88, *T89, (&T90)(int, int *), T91[10], &T92;$/;"	t	typeref:typename:int (&)(int,int *)	file:
+T91	input.cpp	/^typedef int T88, *T89, (&T90)(int, int *), T91[10], &T92;$/;"	t	typeref:typename:int[10]	file:
+T92	input.cpp	/^typedef int T88, *T89, (&T90)(int, int *), T91[10], &T92;$/;"	t	typeref:typename:int &	file:
