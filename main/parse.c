@@ -2282,10 +2282,11 @@ extern void installTagRegexTable (const langType language)
 	{
 	    for (i = 0; i < lang->tagRegexCount; ++i)
 		    addTagRegex (language,
-			     lang->tagRegexTable [i].regex,
-			     lang->tagRegexTable [i].name,
-			     lang->tagRegexTable [i].kinds,
-			     lang->tagRegexTable [i].flags);
+				 lang->tagRegexTable [i].regex,
+				 lang->tagRegexTable [i].name,
+				 lang->tagRegexTable [i].kinds,
+				 lang->tagRegexTable [i].flags,
+				 (lang->tagRegexTable [i].disabled));
 	    lang->tagRegexInstalled = TRUE;
 	}
 }

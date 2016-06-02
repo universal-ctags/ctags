@@ -71,7 +71,7 @@ typedef struct {
 	regex_t *pattern;
 	enum pType type;
 	boolean exclusive;
-	boolean ignore;
+	boolean accept_empty_name;
 	union {
 		struct {
 			char *name_pattern;
@@ -79,9 +79,11 @@ typedef struct {
 		} tag;
 		struct {
 			regexCallback function;
+			void *userData;
 		} callback;
 	} u;
 	unsigned int scopeActions;
+	boolean *disabled;
 } regexPattern;
 
 
@@ -370,9 +372,10 @@ static regexPattern* addCompiledTagCommon (const langType language,
 		}
 	}
 	ptrn = &set->patterns [set->count];
+	memset (ptrn, 0, sizeof (*ptrn));
 	ptrn->pattern = pattern;
 	ptrn->exclusive = FALSE;
-	ptrn->ignore = FALSE;
+	ptrn->accept_empty_name = FALSE;
 	if (kind_letter)
 		ptrn->u.tag.kind = kind;
 	set->count += 1;
@@ -380,10 +383,10 @@ static regexPattern* addCompiledTagCommon (const langType language,
 	return ptrn;
 }
 
-static regexPattern *addCompiledTagPattern (
-		const langType language, regex_t* const pattern,
-		const char* const name, char kind, const char* kindName,
-		char *const description, const char* flags)
+static regexPattern *addCompiledTagPattern (const langType language, regex_t* const pattern,
+					    const char* const name, char kind, const char* kindName,
+					    char *const description, const char* flags,
+					    boolean *disabled)
 {
 	regexPattern * ptrn;
 	boolean exclusive = FALSE;
@@ -401,6 +404,7 @@ static regexPattern *addCompiledTagPattern (
 	ptrn->u.tag.name_pattern = eStrdup (name);
 	ptrn->exclusive = exclusive;
 	ptrn->scopeActions = scopeActions;
+	ptrn->disabled = disabled;
 	if (ptrn->u.tag.kind->letter == '\0')
 	{
 		/* This is a newly registered kind. */
@@ -413,9 +417,10 @@ static regexPattern *addCompiledTagPattern (
 	return ptrn;
 }
 
-static void addCompiledCallbackPattern (
-		const langType language, regex_t* const pattern,
-		const regexCallback callback, const char* flags)
+static void addCompiledCallbackPattern (const langType language, regex_t* const pattern,
+					const regexCallback callback, const char* flags,
+					boolean *disabled,
+					void *userData)
 {
 	regexPattern * ptrn;
 	boolean exclusive = FALSE;
@@ -423,7 +428,9 @@ static void addCompiledCallbackPattern (
 	ptrn  = addCompiledTagCommon(language, pattern, '\0');
 	ptrn->type    = PTRN_CALLBACK;
 	ptrn->u.callback.function = callback;
+	ptrn->u.callback.userData = userData;
 	ptrn->exclusive = exclusive;
+	ptrn->disabled = disabled;
 }
 
 
@@ -593,8 +600,7 @@ static vString* substitute (
 
 static void matchTagPattern (const vString* const line,
 		const regexPattern* const patbuf,
-		const regmatch_t* const pmatch,
-		boolean accept_null)
+		const regmatch_t* const pmatch)
 {
 	vString *const name = substitute (vStringValue (line),
 			patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch);
@@ -624,7 +630,7 @@ static void matchTagPattern (const vString* const line,
 
 	if (vStringLength (name) == 0 && (placeholder == FALSE))
 	{
-		if (accept_null == FALSE)
+		if (patbuf->accept_empty_name == FALSE)
 			error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
 			       getInputFileName (), getInputLineNumber (),
 			       patbuf->u.tag.name_pattern);
@@ -657,21 +663,27 @@ static void matchCallbackPattern (
 		if (pmatch [i].rm_so != -1)
 			count = i + 1;
 	}
-	patbuf->u.callback.function (vStringValue (line), matches, count);
+	patbuf->u.callback.function (vStringValue (line), matches, count,
+				     patbuf->u.callback.userData);
 }
 
 static boolean matchRegexPattern (const vString* const line,
-		const regexPattern* const patbuf)
+				  const regexPattern* const patbuf)
 {
 	boolean result = FALSE;
 	regmatch_t pmatch [BACK_REFERENCE_COUNT];
-	const int match = regexec (patbuf->pattern, vStringValue (line),
-							   BACK_REFERENCE_COUNT, pmatch, 0);
+	int match;
+
+	if (patbuf->disabled && *(patbuf->disabled))
+		return FALSE;
+
+	match = regexec (patbuf->pattern, vStringValue (line),
+			 BACK_REFERENCE_COUNT, pmatch, 0);
 	if (match == 0)
 	{
 		result = TRUE;
 		if (patbuf->type == PTRN_TAG)
-			matchTagPattern (line, patbuf, pmatch, patbuf->ignore);
+			matchTagPattern (line, patbuf, pmatch);
 		else if (patbuf->type == PTRN_CALLBACK)
 			matchCallbackPattern (line, patbuf, pmatch);
 		else
@@ -742,12 +754,12 @@ extern boolean hasScopeActionInRegex (const langType language)
 	return r;
 }
 
-static regexPattern *addTagRegexInternal (
-		const langType language,
-		const char* const regex,
-		const char* const name,
-		const char* const kinds,
-		const char* const flags)
+static regexPattern *addTagRegexInternal (const langType language,
+					  const char* const regex,
+					  const char* const name,
+					  const char* const kinds,
+					  const char* const flags,
+					  boolean *disabled)
 {
 	regexPattern *rptr = NULL;
 	Assert (regex != NULL);
@@ -770,7 +782,8 @@ static regexPattern *addTagRegexInternal (
 				       getLanguageName (language));
 
 			rptr = addCompiledTagPattern (language, cp, name,
-						      kind, kindName, description, flags);
+						      kind, kindName, description, flags,
+						      disabled);
 			if (kindName)
 				eFree (kindName);
 			if (description)
@@ -781,7 +794,7 @@ static regexPattern *addTagRegexInternal (
 	if (*name == '\0')
 	{
 		if (rptr->exclusive || rptr->scopeActions & SCOPE_PLACEHOLDER)
-			rptr->ignore = TRUE;
+			rptr->accept_empty_name = TRUE;
 		else
 			error (WARNING, "%s: regexp missing name pattern", regex);
 	}
@@ -789,28 +802,30 @@ static regexPattern *addTagRegexInternal (
 	return rptr;
 }
 
-extern void addTagRegex (
-		const langType language __unused__,
-		const char* const regex __unused__,
-		const char* const name __unused__,
-		const char* const kinds __unused__,
-		const char* const flags __unused__)
+extern void addTagRegex (const langType language __unused__,
+			 const char* const regex __unused__,
+			 const char* const name __unused__,
+			 const char* const kinds __unused__,
+			 const char* const flags __unused__,
+			 boolean *disabled)
 {
-	addTagRegexInternal (language, regex, name, kinds, flags);
+	addTagRegexInternal (language, regex, name, kinds, flags, disabled);
 }
 
-extern void addCallbackRegex (
-		const langType language __unused__,
-		const char* const regex __unused__,
-		const char* const flags __unused__,
-		const regexCallback callback __unused__)
+extern void addCallbackRegex (const langType language __unused__,
+			      const char* const regex __unused__,
+			      const char* const flags __unused__,
+			      const regexCallback callback __unused__,
+			      boolean *disabled,
+			      void * userData)
 {
 	Assert (regex != NULL);
 	if (regexAvailable)
 	{
 		regex_t* const cp = compileRegex (regex, flags);
 		if (cp != NULL)
-			addCompiledCallbackPattern (language, cp, callback, flags);
+			addCompiledCallbackPattern (language, cp, callback, flags,
+						    disabled, userData);
 	}
 }
 
@@ -823,7 +838,8 @@ extern void addLanguageRegex (
 		char *name, *kinds, *flags;
 		if (parseTagRegex (regex_pat, &name, &kinds, &flags))
 		{
-			addTagRegexInternal (language, regex_pat, name, kinds, flags);
+			addTagRegexInternal (language, regex_pat, name, kinds, flags,
+					     NULL);
 			eFree (regex_pat);
 		}
 	}

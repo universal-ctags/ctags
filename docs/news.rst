@@ -50,6 +50,7 @@ The following parsers have been added:
 * PropertiyList(plist) *libxml*
 * R
 * reStructuredText
+* RpmSpec
 * Rust
 * SystemVerilog
 * SVG *libxml*
