@@ -298,8 +298,8 @@ process_token:
 						if(cxxParserCurrentLanguageIsCPP())
 						{
 							// may be followed by a lambda, otherwise it's not interesting.
-							g_cxx.uKeywordState |= CXXParserKeywordStateSeenReturn;
 							cxxParserNewStatement();
+							g_cxx.uKeywordState |= CXXParserKeywordStateSeenReturn;
 						} else {
 							// ignore
 							if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF))
