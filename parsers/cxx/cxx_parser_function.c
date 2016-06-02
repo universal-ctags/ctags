@@ -349,8 +349,8 @@ boolean cxxParserTokenChainLooksLikeFunctionCallParameterSet(
 			"The token chain should start with an opening parenthesis/bracket"
 		);
 	CXX_DEBUG_ASSERT(
-			cxxTokenTypeIsOneOf(pLast,CXXTokenTypeOpeningParenthesis | CXXTokenTypeClosingBracket),
-			"The token chain should end with an opening parenthesis/bracket"
+			cxxTokenTypeIsOneOf(pLast,CXXTokenTypeClosingParenthesis | CXXTokenTypeClosingBracket),
+			"The token chain should end with an closing parenthesis/bracket"
 		);
 
 	unsigned int uTerminator = t->eType << 4;

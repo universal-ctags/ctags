@@ -193,6 +193,7 @@ evaluate_current_token:
 					}
 				}
 			break;
+			case CXXTokenTypeComma:
 			case CXXTokenTypeAssignment:
 				CXX_DEBUG_PRINT("Found assignment, trying to skip up to a 'notable' point");
 				// try to skip to the next > or , without stopping at < characters.
@@ -233,8 +234,8 @@ evaluate_current_token:
 				return TRUE;
 			break;
 			default:
-				CXX_DEBUG_ASSERT(FALSE,"Should not end up here");
 				CXX_DEBUG_LEAVE_TEXT("Found unexpected token type 0x%02x",g_cxx.pToken->eType);
+				CXX_DEBUG_ASSERT(FALSE,"Should not end up here");
 				return FALSE;
 			break;
 		}
