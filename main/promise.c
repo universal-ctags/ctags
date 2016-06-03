@@ -13,6 +13,7 @@
 #include "general.h"
 #include "promise.h"
 #include "debug.h"
+#include "xtag.h"
 
 
 struct promise {
@@ -36,6 +37,9 @@ int  makePromise   (const char *parser,
 	struct promise *p;
 	int r;
 	langType lang;
+
+	if (!isXtagEnabled (XTAG_TAGS_GENERATED_BY_SUB_PARSERS))
+		return -1;
 
 	lang = getNamedLanguage (parser, 0);
 	if (lang == LANG_IGNORE)
@@ -72,7 +76,8 @@ void breakPromisesAfter (int promise)
 boolean forcePromises (void)
 {
 	int i;
-	boolean tagFileResized = FALSE;;
+	boolean tagFileResized = FALSE;
+
 	for (i = 0; i < promise_count; ++i)
 	{
 		struct promise *p = promises + i;
@@ -87,7 +92,6 @@ boolean forcePromises (void)
 	}
 
 	promise_count = 0;
-
 	return tagFileResized;
 }
 
