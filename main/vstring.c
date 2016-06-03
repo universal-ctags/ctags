@@ -153,6 +153,10 @@ extern void vStringNCatS (
 extern void vStringStripNewline (vString *const string)
 {
 	const size_t final = string->length - 1;
+
+	if (string->length == 0)
+		return;
+
 	if (string->buffer [final] == '\n')
 	{
 		string->buffer [final] = '\0';
