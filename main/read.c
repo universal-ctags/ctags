@@ -44,6 +44,10 @@ typedef struct sInputFileInfo {
 	vString *name;           /* name to report for input file */
 	vString *tagPath;        /* path of input file relative to tag file */
 	unsigned long lineNumber;/* line number in the input file */
+	unsigned long lineNumberOrigin; /* The value set to `lineNumber'
+					   when `resetInputFile' is called
+					   on the input stream.
+					   This is needed for nested stream. */
 	boolean  isHeader;       /* is input file a header file? */
 	langType language;       /* language of input file */
 } inputFileInfo;
@@ -523,9 +527,11 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 			vStringClear (File.line);
 
 		setInputFileParameters  (vStringNewInit (fileName), language);
-		File.input.lineNumber = 0L;
+		File.input.lineNumberOrigin = 0L;
+		File.input.lineNumber = File.input.lineNumberOrigin;
 		setSourceFileParameters (vStringNewInit (fileName), language);
-		File.source.lineNumber = 0L;
+		File.source.lineNumberOrigin = 0L;
+		File.source.lineNumber = File.source.lineNumberOrigin;
 		allocLineFposMap (&File.lineFposMap);
 
 		verbose ("OPENING %s as %s language %sfile\n", fileName,
@@ -550,9 +556,9 @@ extern void resetInputFile (const langType language)
 		vStringClear (File.line);
 
 	File.input.language = language;
-	File.input.lineNumber = 0L;
+	File.input.lineNumber = File.input.lineNumberOrigin;
 	File.source.language = language;
-	File.source.lineNumber = 0L;
+	File.source.lineNumber = File.source.lineNumberOrigin;
 }
 
 extern void closeInputFile (void)
