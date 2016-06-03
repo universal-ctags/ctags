@@ -26,7 +26,7 @@ env:
       description: "Build submitted via Travis CI"
     notification_email: coverityctags@gmail.com
     build_command_prepend: "./autogen.sh ; ./configure ; make clean"
-    build_command:   "make -j 4"
+    build_command:   "make -j 4 CFLAGS=-O0"
     branch_pattern: master
 
 sudo: false
