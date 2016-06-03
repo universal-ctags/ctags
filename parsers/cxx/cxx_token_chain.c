@@ -827,7 +827,7 @@ CXXToken * cxxTokenChainExtractRange(
 	CXXToken * pRet = cxxTokenCreate();
 	pRet->iLineNumber = pToken->iLineNumber;
 	pRet->oFilePosition = pToken->oFilePosition;
-    pRet->eType = pToken->eType;
+	pRet->eType = pToken->eType;
 
 	cxxTokenAppendToString(pRet->pszWord,pToken);
 	if(
@@ -882,6 +882,7 @@ CXXToken * cxxTokenChainExtractIndexRange(
 	CXXToken * pRet = cxxTokenCreate();
 	pRet->iLineNumber = pToken->iLineNumber;
 	pRet->oFilePosition = pToken->oFilePosition;
+	pRet->eType = pToken->eType;
 
 	cxxTokenAppendToString(pRet->pszWord,pToken);
 	if(
