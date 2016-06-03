@@ -226,10 +226,14 @@ int cxxTokenChainFirstKeywordIndex(
 		enum CXXKeyword eKeyword
 	);
 
+#if 0
+// This is working code but it's unused and coveralls complains.. sigh.
+// Remove the #if above if needed.
 CXXToken * cxxTokenChainFirstKeyword(
 		CXXTokenChain * tc,
 		enum CXXKeyword eKeyword
 	);
+#endif
 
 // Assuming that pChain contains a type name, attempt to normalize the
 // spacing within the whole chain.

@@ -771,6 +771,9 @@ int cxxTokenChainFirstKeywordIndex(
 	return -1;
 }
 
+#if 0
+// This is working code but it's unused and coveralls complains.. sigh.
+// Remove the #if above if needed.
 CXXToken * cxxTokenChainFirstKeyword(
 		CXXTokenChain * tc,
 		enum CXXKeyword eKeyword
@@ -791,6 +794,7 @@ CXXToken * cxxTokenChainFirstKeyword(
 
 	return NULL;
 }
+#endif
 
 CXXToken * cxxTokenChainNextIdentifier(
 		CXXToken * from,
