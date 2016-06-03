@@ -404,14 +404,18 @@ process_token:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenVirtual;
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
-					//case CXXKeywordVOLATILE:
-					// Volatile is actually part of the type!
-					//	g_cxx.uKeywordState |= CXXParserKeywordStateSeenVolatile;
-					//	cxxTokenChainDestroyLast(g_cxx.pTokenChain);
-					//break;
 					case CXXKeywordMUTABLE:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenMutable;
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+					break;
+					// "const" and "volatile" are part of the type. Don't treat them specially
+					// and don't attempt to extract an eventual typedef yet,
+					// as there might be a struct/class/union keyword following.
+					case CXXKeywordVOLATILE:
+						g_cxx.uKeywordState |= CXXParserKeywordStateSeenVolatile;
+					break;
+					case CXXKeywordCONST:
+						g_cxx.uKeywordState |= CXXParserKeywordStateSeenConst;
 					break;
 					default:
 						if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)

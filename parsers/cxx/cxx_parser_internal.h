@@ -212,7 +212,11 @@ typedef enum _CXXParserKeywordState
 	// "return" has been seen
 	CXXParserKeywordStateSeenReturn = (1 << 7),
 	// "mutable" has been seen
-	CXXParserKeywordStateSeenMutable = (1 << 8)
+	CXXParserKeywordStateSeenMutable = (1 << 8),
+	// "const" has been seen at block level
+	CXXParserKeywordStateSeenConst = (1 << 9),
+	// "volatile" has been seen at block level
+	CXXParserKeywordStateSeenVolatile = (1 << 10)
 } CXXParserKeywordState;
 
 typedef struct _CXXParserState

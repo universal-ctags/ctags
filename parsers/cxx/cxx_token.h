@@ -88,6 +88,9 @@ typedef struct _CXXToken
 CXXToken * cxxTokenCreate(void);
 void cxxTokenDestroy(CXXToken * t);
 
+// A shortcut for quickly creating keyword tokens.
+CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,enum CXXKeyword eKeyword);
+
 enum CXXTagKind;
 
 CXXToken * cxxTokenCreateAnonymousIdentifier(enum CXXTagKind k);

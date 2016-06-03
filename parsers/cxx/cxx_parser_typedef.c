@@ -221,18 +221,20 @@ skip_to_comma_or_end:
 			cxxTokenChainTake(pTParentChain,t);
 
 			// Avoid emitting typerefs for strange things like
-			//  typedef MACRO(stuff,stuff) X
+			//  typedef MACRO(stuff,stuff) X;
+			// or parsing errors we might make in ugly cases like
+			//  typedef WHATEVER struct x { ... } y;
 			if(
 					(pTParentChain == pChain) && // not function pointer (see above)
 					(
 						pComma ? 
 							cxxTokenChainPreviousTokenOfType(
 									pComma,
-									CXXTokenTypeParenthesisChain
+									CXXTokenTypeParenthesisChain | CXXTokenTypeAngleBracketChain
 								) :
 							cxxTokenChainLastTokenOfType(
 									pChain,
-									CXXTokenTypeParenthesisChain
+									CXXTokenTypeParenthesisChain | CXXTokenTypeAngleBracketChain
 								)
 					)
 				)
