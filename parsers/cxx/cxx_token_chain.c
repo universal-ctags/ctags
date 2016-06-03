@@ -771,6 +771,27 @@ int cxxTokenChainFirstKeywordIndex(
 	return -1;
 }
 
+CXXToken * cxxTokenChainFirstKeyword(
+		CXXTokenChain * tc,
+		enum CXXKeyword eKeyword
+	)
+{
+	if(!tc)
+		return NULL;
+	if(tc->iCount < 1)
+		return NULL;
+
+	CXXToken * pToken = tc->pHead;
+	while(pToken)
+	{
+		if(cxxTokenIsKeyword(pToken,eKeyword))
+			return pToken;
+		pToken = pToken->pNext;
+	}
+
+	return NULL;
+}
+
 CXXToken * cxxTokenChainNextIdentifier(
 		CXXToken * from,
 		const char * szIdentifier

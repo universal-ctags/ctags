@@ -226,6 +226,11 @@ int cxxTokenChainFirstKeywordIndex(
 		enum CXXKeyword eKeyword
 	);
 
+CXXToken * cxxTokenChainFirstKeyword(
+		CXXTokenChain * tc,
+		enum CXXKeyword eKeyword
+	);
+
 // Assuming that pChain contains a type name, attempt to normalize the
 // spacing within the whole chain.
 void cxxTokenChainNormalizeTypeNameSpacing(

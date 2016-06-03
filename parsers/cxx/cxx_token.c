@@ -15,6 +15,7 @@
 
 #include "cxx_token_chain.h"
 #include "cxx_debug.h"
+#include "cxx_keyword.h"
 #include "cxx_tag.h"
 
 #define CXX_TOKEN_POOL_MAXIMUM_SIZE 8192
@@ -109,6 +110,19 @@ void cxxTokenForceDestroy(CXXToken * t)
 	vStringDelete(t->pszWord);
 
 	eFree(t);
+}
+
+CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,enum CXXKeyword eKeyword)
+{
+	CXXToken * pToken = cxxTokenCreate();
+	pToken->iLineNumber = iLineNumber;
+	pToken->oFilePosition = oFilePosition;
+	pToken->eType = CXXTokenTypeKeyword;
+	pToken->eKeyword = eKeyword;
+	pToken->bFollowedBySpace = TRUE;
+	vStringCatS(pToken->pszWord,cxxKeywordName(eKeyword));
+
+	return pToken;
 }
 
 
