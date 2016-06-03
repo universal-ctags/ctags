@@ -274,6 +274,8 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 	{
 		if(pParenthesis->pChain->pTail)
 		{
+			// normalize signature
+			cxxTokenChainNormalizeTypeNameSpacing(pParenthesis->pChain);
 			// make sure we don't emit the trailing space
 			pParenthesis->pChain->pTail->bFollowedBySpace = FALSE;
 		}
@@ -1053,6 +1055,8 @@ int cxxParserEmitFunctionTags(
 	{
 		if(pInfo->pParenthesis->pChain->pTail)
 		{
+			// normalize signature
+			cxxTokenChainNormalizeTypeNameSpacing(pInfo->pParenthesis->pChain);
 			// make sure we don't emit the trailing space
 			pInfo->pParenthesis->pChain->pTail->bFollowedBySpace = FALSE;
 		}
