@@ -1,4 +1,4 @@
-// Reported by Przemyslaw Szymanski on 6/3/2016
+// Reported by Przemyslaw Szymanski on 02.06.2016
 
 template <typename T = void, bool B1 = true> // (1) fail if there are multiple params with default values
 class A : public T
