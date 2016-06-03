@@ -9,54 +9,64 @@ template<typename AType> class ATemplate1;
 template<typename AType1,typename AType2> class ATemplate2;
 
 // class/struct/union/enum typedefs
-typedef struct AStruct T01;
-typedef class AClass T02;
-typedef union AUnion T03;
-typedef enum AEnum T04;
+typedef struct AStruct T001;
+typedef class AClass T002;
+typedef union AUnion T003;
+typedef enum AEnum T004;
 
 // typedefs with anonymous types
-typedef struct { int a; } T11;
-typedef union { int a; int b; } T12;
-typedef enum { E2 } T13;
+typedef struct { int a; } T101;
+typedef union { int a; int b; } T102;
+typedef enum { E2 } T103;
 
 // plain types, pointers etc
-typedef int* T21;
-typedef const AClass* *  T22;
+typedef int* T201;
+typedef const AClass* *  T202;
 
 // function pointers
-typedef int (*T31) (int &,int , AUnion *);
-typedef AClass &(* T32)(AClass &);
+typedef int (*T301) (int &,int , AUnion *);
+typedef AClass &(* T302)(AClass &);
 
 // arrays
-typedef int T41 [ 10];
+typedef int T401 [ 10];
 
 // stuff containing template instantiations
-typedef ATemplate1<int > T51;
-typedef ATemplate1< unsigned short int> T52;
-typedef ATemplate1<ATemplate2 < AStruct,AClass> > T53;
-typedef ATemplate1<int > (*T54)();
+typedef ATemplate1<int > T501;
+typedef ATemplate1< unsigned short int> T502;
+typedef ATemplate1<ATemplate2 < AStruct,AClass> > T503;
+typedef ATemplate1<int > (*T504)();
 
 // typedefs within a class
 template<typename Type> class Container
 {
 public:
-	typedef typename Type::iterator1 T61;
-	typedef typename Type :: iterator2 T62;
-	typedef ATemplate1<AClass> T63;
-	typedef int (*T64)(ATemplate1<AUnion> &);
+	typedef typename Type::iterator1 T601;
+	typedef typename Type :: iterator2 T602;
+	typedef ATemplate1<AClass> T603;
+	typedef int (*T604)(ATemplate1<AUnion> &);
 };
 
 // This should appear as typedef but have not typeref since we can't resolve macros
 #define DECLPOINTER(name) name *
 
-typedef DECLPOINTER(struct AStruct) T71;
+typedef DECLPOINTER(struct AStruct) T701;
 
 // Multiple typedefs
 typedef struct _ABC {
 	int a;
 	int b;
-} T81, *T82;
+} T801, *T802;
 
-typedef int T83, *T84, **T85;
-typedef ATemplate2< ATemplate2< ATemplate1<int *>, AClass>, AStruct> T86, **T87;
-typedef int T88, *T89, (&T90)(int, int *), T91[10], &T92;
+typedef int T803, *T804, **T805;
+typedef ATemplate2< ATemplate2< ATemplate1<int *>, AClass>, AStruct> T806, **T807;
+typedef int T808, *T809, (&T810)(int, int *), T811[10], &T812;
+
+// Typedefs with const/volatile prefix
+typedef const struct AStruct1 {
+	int a;
+} T901, *T902;
+
+typedef const struct AStruct1 T903;
+typedef const struct AStruct1 * T904,* T905;
+typedef volatile struct AStruct1 * T906;
+typedef const enum AEnum T907, &T908;
