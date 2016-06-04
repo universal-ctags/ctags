@@ -47,6 +47,7 @@ The following parsers have been added:
 * Maven2 *libxml*
 * ObjectiveC
 * Perl6
+* Pod *optlib*
 * PropertiyList(plist) *libxml*
 * R
 * reStructuredText

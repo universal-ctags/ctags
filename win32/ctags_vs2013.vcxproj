@@ -202,6 +202,7 @@
     <ClCompile Include="..\parsers\yacc.c" />
     <ClCompile Include="..\parsers\rpmspec.c" />
     <ClCompile Include="..\main\promise.c" />
+    <ClCompile Include="..\optlib\pod.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\fnmatch\fnmatch.h" />
