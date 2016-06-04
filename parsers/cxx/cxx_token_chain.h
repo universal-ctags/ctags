@@ -237,6 +237,9 @@ CXXToken * cxxTokenChainFirstKeyword(
 
 // Assuming that pChain contains a type name, attempt to normalize the
 // spacing within the whole chain.
+//
+// Please note that this will work also for entire function signatures
+// (since type names can contain function pointers which have signatures)
 void cxxTokenChainNormalizeTypeNameSpacing(
 		CXXTokenChain * pChain
 	);
