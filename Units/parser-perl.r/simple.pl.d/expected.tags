@@ -1,4 +1,5 @@
-A	input.pl	/^use constant A => 3;$/;"	c
-A::B	input.pl	/^package A::B;$/;"	p
-LABEL	input.pl	/^LABEL:$/;"	l
-MySub	input.pl	/^sub MySub {}$/;"	s
+A	input.pl	/^use constant A => 3;$/;"	c	language:Perl
+A::B	input.pl	/^package A::B;$/;"	p	language:Perl
+LABEL	input.pl	/^LABEL:$/;"	l	language:Perl
+MySub	input.pl	/^sub MySub {}$/;"	s	language:Perl
+NAME	input.pl	/^=head1 NAME$/;"	c	language:pod
