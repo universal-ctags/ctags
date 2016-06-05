@@ -245,6 +245,7 @@ typedef struct _CXXParserState
 	unsigned int uParameterKind;
 	unsigned int uTypedefKind;
 	unsigned int uExternvarKind;
+	unsigned int uEnumeratorKind;
 	
 	// FIXME: Do the same for fields!!!
 

@@ -153,6 +153,7 @@ void cxxTagInitGlobals(langType eLangType)
 		g_cxx.uParameterKind = CXXTagCKindPARAMETER;
 		g_cxx.uTypedefKind = CXXTagCKindTYPEDEF;
 		g_cxx.uExternvarKind = CXXTagCKindEXTERNVAR;
+		g_cxx.uEnumeratorKind = CXXTagCKindENUMERATOR;
 	} else if(eLangType == g_cxx.eCPPLanguage)
 	{
 		g_cxx.aKindOptions = g_aCXXCPPKinds;
@@ -173,6 +174,7 @@ void cxxTagInitGlobals(langType eLangType)
 		g_cxx.uParameterKind = CXXTagCPPKindPARAMETER;
 		g_cxx.uTypedefKind = CXXTagCPPKindTYPEDEF;
 		g_cxx.uExternvarKind = CXXTagCPPKindEXTERNVAR;
+		g_cxx.uEnumeratorKind = CXXTagCPPKindENUMERATOR;
 	} else {
 		CXX_DEBUG_ASSERT(false,"This should never happen: wrong language");
 	}

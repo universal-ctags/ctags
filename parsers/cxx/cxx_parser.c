@@ -478,7 +478,7 @@ boolean cxxParserParseEnum(void)
 			CXXToken * pNext = pNamespaceBegin->pNext;
 			cxxTokenChainTake(g_cxx.pTokenChain,pNamespaceBegin);
 			// FIXME: We don't really know if it's a class!
-			cxxScopePush(pNamespaceBegin,CXXTagCPPKindCLASS,CXXScopeAccessUnknown);
+			cxxScopePush(pNamespaceBegin,g_cxx.uClassKind,CXXScopeAccessUnknown);
 			iPushedScopes++;
 			pNamespaceBegin = pNext->pNext;
 		}
@@ -486,14 +486,14 @@ boolean cxxParserParseEnum(void)
 		CXX_DEBUG_PRINT("Enum name is %s",vStringValue(pEnumName->pszWord));
 		cxxTokenChainTake(g_cxx.pTokenChain,pEnumName);
 	} else {
-		pEnumName = cxxTokenCreateAnonymousIdentifier(CXXTagCPPKindENUM);
+		pEnumName = cxxTokenCreateAnonymousIdentifier(g_cxx.uEnumKind);
 		CXX_DEBUG_PRINT(
 				"Enum name is %s (anonymous)",
 				vStringValue(pEnumName->pszWord)
 			);
 	}
 
-	tagEntryInfo * tag = cxxTagBegin(CXXTagCPPKindENUM,pEnumName);
+	tagEntryInfo * tag = cxxTagBegin(g_cxx.uEnumKind,pEnumName);
 
 	int iCorkQueueIndex = CORK_NIL;
 
@@ -505,7 +505,7 @@ boolean cxxParserParseEnum(void)
 		iCorkQueueIndex = cxxTagCommit();
 	}
 
-	cxxScopePush(pEnumName,CXXTagCPPKindENUM,CXXScopeAccessPublic);
+	cxxScopePush(pEnumName,g_cxx.uEnumKind,CXXScopeAccessPublic);
 	iPushedScopes++;
 
 	vString * pScopeName = cxxScopeGetFullNameAsString();
@@ -533,7 +533,7 @@ boolean cxxParserParseEnum(void)
 				cxxTokenTypeIs(pFirst,CXXTokenTypeIdentifier)
 			)
 		{
-			tag = cxxTagBegin(CXXTagCPPKindENUMERATOR,pFirst);
+			tag = cxxTagBegin(g_cxx.uEnumeratorKind,pFirst);
 			if(tag)
 			{
 				tag->isFileScope = !isInputHeaderFile();
