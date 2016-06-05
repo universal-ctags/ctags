@@ -14,6 +14,7 @@
 
 #include "cxx_debug.h"
 #include "cxx_token_chain.h"
+#include "cxx_parser_internal.h"
 
 // The tokens defining current scope
 static CXXTokenChain * g_pScope = NULL;
@@ -51,31 +52,31 @@ boolean cxxScopeIsGlobal(void)
 	return (g_pScope->iCount < 1);
 }
 
-enum CXXTagKind cxxScopeGetVariableKind(void)
-{
-	switch(cxxScopeGetKind())
-	{
-		case CXXTagKindCLASS:
-		case CXXTagKindSTRUCT:
-		case CXXTagKindUNION:
-			return CXXTagKindMEMBER;
-		break;
-		case CXXTagKindFUNCTION:
-			return CXXTagKindLOCAL;
-		break;
-		//case CXXTagKindNAMESPACE:
-		default:
-			// fall down
-		break;
-	}
-	return CXXTagKindVARIABLE;
-}
-
-enum CXXTagKind cxxScopeGetKind(void)
+unsigned int cxxScopeGetVariableKind(void)
 {
 	if(g_pScope->iCount < 1)
-		return CXXTagKindNAMESPACE;
-	return (enum CXXTagKind)g_pScope->pTail->uInternalScopeKind;
+		return g_cxx.uVariableKind;
+
+	unsigned int uScopeKind = g_pScope->pTail->uInternalScopeKind;
+
+	if(
+		(uScopeKind == g_cxx.uClassKind) ||
+		(uScopeKind == g_cxx.uStructKind) ||
+		(uScopeKind == g_cxx.uUnionKind)
+	)
+		return g_cxx.uMemberKind;
+
+	if(uScopeKind == g_cxx.uFunctionKind)
+		return g_cxx.uLocalKind;
+
+	return g_cxx.uVariableKind;
+}
+
+unsigned int cxxScopeGetKind(void)
+{
+	if(g_pScope->iCount < 1)
+		return g_cxx.uNamespaceKind;
+	return g_pScope->pTail->uInternalScopeKind;
 }
 
 enum CXXScopeAccess cxxScopeGetAccess(void)
@@ -179,7 +180,7 @@ void cxxScopeSetAccess(enum CXXScopeAccess eAccess)
 
 void cxxScopePush(
 		CXXToken * t,
-		enum CXXTagKind eScopeKind,
+		unsigned int uScopeKind,
 		enum CXXScopeAccess eInitialAccess
 	)
 {
@@ -192,7 +193,7 @@ void cxxScopePush(
 			"The scope name should have a text"
 		);
 	cxxTokenChainAppend(g_pScope,t);
-	t->uInternalScopeKind = (unsigned char)eScopeKind;
+	t->uInternalScopeKind = (unsigned char)uScopeKind;
 	t->uInternalScopeAccess = (unsigned char)eInitialAccess;
 	g_bScopeNameDirty = TRUE;
 

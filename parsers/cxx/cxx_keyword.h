@@ -13,7 +13,7 @@
 #include "parse.h"
 
 // WARNING: There is a table in cxx_keyword.c that must match order in this enum
-enum CXXKeyword
+typedef enum _CXXKeyword
 {
 	CXXKeyword__ATTRIBUTE__, // GCC
 	CXXKeyword__DECLSPEC, // Microsoft C/C++
@@ -109,13 +109,13 @@ enum CXXKeyword
 	//CXXKeywordXOR,
 	//CXXKeywordXOR_EQ,
 	// WARNING: There is a table in cxx_keyword.c that must match order in this enumeration
-};
+} CXXKeyword;
 
-boolean cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId);
-boolean cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId);
-boolean cxxKeywordExcludeFromTypeNames(enum CXXKeyword eKeywordId);
+boolean cxxKeywordMayBePartOfTypeName(CXXKeyword eKeywordId);
+boolean cxxKeywordIsTypeRefMarker(CXXKeyword eKeywordId);
+boolean cxxKeywordExcludeFromTypeNames(CXXKeyword eKeywordId);
 
-const char * cxxKeywordName(enum CXXKeyword eKeywordId);
+const char * cxxKeywordName(CXXKeyword eKeywordId);
 
 void cxxBuildKeywordHash(const langType language,boolean bCXX);
 

@@ -85,8 +85,8 @@ parserDefinition * CParser (void)
 
 	parserDefinition* def = parserNew("C");
 
-	def->kinds = cxxTagGetKindOptions();
-	def->kindCount = cxxTagGetKindOptionCount();
+	def->kinds = cxxTagGetCKindOptions();
+	def->kindCount = cxxTagGetCKindOptionCount();
 	def->fieldSpecs = cxxTagGetCFieldSpecifiers();
 	def->fieldSpecCount = cxxTagGetCFieldSpecifierCount();
 	def->extensions = extensions;
@@ -115,8 +115,8 @@ parserDefinition * CppParser (void)
 
 	parserDefinition* def = parserNew("C++");
 
-	def->kinds = cxxTagGetKindOptions();
-	def->kindCount = cxxTagGetKindOptionCount();
+	def->kinds = cxxTagGetCPPKindOptions();
+	def->kindCount = cxxTagGetCPPKindOptionCount();
 	def->fieldSpecs = cxxTagGetCPPFieldSpecifiers();
 	def->fieldSpecCount = cxxTagGetCPPFieldSpecifierCount();
 	def->extensions = extensions;

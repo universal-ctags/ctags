@@ -150,7 +150,7 @@ enum CXXEmitFunctionTagsOptions
 
 int cxxParserEmitFunctionTags(
 		CXXFunctionSignatureInfo * pInfo,
-		enum CXXTagKind eTagKind,
+		unsigned int uTagKind,
 		unsigned int uOptions,
 		int * piCorkQueueIndex
 	);
@@ -170,8 +170,8 @@ void cxxParserNewStatement(void);
 boolean cxxParserParseNamespace(void);
 boolean cxxParserParseEnum(void);
 boolean cxxParserParseClassStructOrUnion(
-		enum CXXKeyword eKeyword,
-		enum CXXTagKind eTagKind
+		CXXKeyword eKeyword,
+		unsigned int uTagKind
 	);
 boolean cxxParserParseAndCondenseCurrentSubchain(
 		unsigned int uInitialSubchainMarkerTypes,
@@ -223,6 +223,30 @@ typedef struct _CXXParserState
 {
 	// The current language
 	langType eLanguage;
+
+	// The array of kind options for the current language.
+	kindOption * aKindOptions;
+	unsigned int uKindOptionCount;
+	
+	// Cached kind values to avoid switching everywhere on the current language
+	unsigned int uFunctionKind;
+	unsigned int uEnumKind;
+	unsigned int uMacroKind;
+	unsigned int uIncludeKind;
+	unsigned int uClassKind; // in C this is CXXTagKindInvalid
+	unsigned int uNamespaceKind; // in C this is CXXTagKindInvalid
+	unsigned int uVariableKind;
+	unsigned int uStructKind;
+	unsigned int uUnionKind;
+	unsigned int uMemberKind;
+	unsigned int uLocalKind;
+	unsigned int uPrototypeKind;
+	unsigned int uLabelKind;
+	unsigned int uParameterKind;
+	unsigned int uTypedefKind;
+	unsigned int uExternvarKind;
+	
+	// FIXME: Do the same for fields!!!
 
 	// The identifier of the CPP language, as indicated by ctags core
 	langType eCPPLanguage;

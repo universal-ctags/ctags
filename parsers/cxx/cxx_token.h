@@ -67,7 +67,7 @@ typedef struct _CXXToken
 {
 	enum CXXTokenType eType;
 	vString * pszWord;
-	enum CXXKeyword eKeyword;
+	CXXKeyword eKeyword;
 	CXXTokenChain * pChain; // this is NOT the parent chain!
 	boolean bFollowedBySpace;
 
@@ -89,11 +89,9 @@ CXXToken * cxxTokenCreate(void);
 void cxxTokenDestroy(CXXToken * t);
 
 // A shortcut for quickly creating keyword tokens.
-CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,enum CXXKeyword eKeyword);
+CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,CXXKeyword eKeyword);
 
-enum CXXTagKind;
-
-CXXToken * cxxTokenCreateAnonymousIdentifier(enum CXXTagKind k);
+CXXToken * cxxTokenCreateAnonymousIdentifier(unsigned int uKindId);
 
 #define cxxTokenTypeIsOneOf(_pToken,_uTypes) (_pToken->eType & (_uTypes))
 #define cxxTokenTypeIs(_pToken,_eType) (_pToken->eType == _eType)

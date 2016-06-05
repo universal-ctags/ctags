@@ -129,24 +129,24 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	//{ 0, 1, "xor_eq", 0 }
 };
 
-const char * cxxKeywordName(enum CXXKeyword eKeywordId)
+const char * cxxKeywordName(CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].szName;
 }
 
-boolean cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId)
+boolean cxxKeywordMayBePartOfTypeName(CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordFlagMayBePartOfTypeName;
 }
 
-boolean cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId)
+boolean cxxKeywordIsTypeRefMarker(CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordIsTypeRefMarker;
 }
 
-boolean cxxKeywordExcludeFromTypeNames(enum CXXKeyword eKeywordId)
+boolean cxxKeywordExcludeFromTypeNames(CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordExcludeFromTypeNames;

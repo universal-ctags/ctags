@@ -712,7 +712,7 @@ int cxxTokenChainFindToken(
 
 CXXToken * cxxTokenChainPreviousKeyword(
 		CXXToken * from,
-		enum CXXKeyword eKeyword
+		CXXKeyword eKeyword
 	)
 {
 	if(!from)
@@ -731,7 +731,7 @@ CXXToken * cxxTokenChainPreviousKeyword(
 
 CXXToken * cxxTokenChainNextKeyword(
 		CXXToken * from,
-		enum CXXKeyword eKeyword
+		CXXKeyword eKeyword
 	)
 {
 	if(!from)
@@ -750,7 +750,7 @@ CXXToken * cxxTokenChainNextKeyword(
 
 int cxxTokenChainFirstKeywordIndex(
 		CXXTokenChain * tc,
-		enum CXXKeyword eKeyword
+		CXXKeyword eKeyword
 	)
 {
 	if(!tc)
@@ -776,7 +776,7 @@ int cxxTokenChainFirstKeywordIndex(
 // Remove the #if above if needed.
 CXXToken * cxxTokenChainFirstKeyword(
 		CXXTokenChain * tc,
-		enum CXXKeyword eKeyword
+		CXXKeyword eKeyword
 	)
 {
 	if(!tc)

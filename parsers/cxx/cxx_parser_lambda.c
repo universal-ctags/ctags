@@ -81,13 +81,13 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 {
 	CXX_DEBUG_ENTER();
 
-	CXXToken * pIdentifier = cxxTokenCreateAnonymousIdentifier(CXXTagKindFUNCTION);
+	CXXToken * pIdentifier = cxxTokenCreateAnonymousIdentifier(g_cxx.uFunctionKind);
 
 	CXXTokenChain * pSave = g_cxx.pTokenChain;
 	CXXTokenChain * pNew = cxxTokenChainCreate();
 	g_cxx.pTokenChain = pNew;
 
-	tagEntryInfo * tag = cxxTagBegin(CXXTagKindFUNCTION,pIdentifier);
+	tagEntryInfo * tag = cxxTagBegin(g_cxx.uFunctionKind,pIdentifier);
 
 	CXXToken * pAfterParenthesis = pParenthesis ? pParenthesis->pNext : NULL;
 
@@ -189,14 +189,14 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 
 	cxxScopePush(
 			pIdentifier,
-			CXXTagKindFUNCTION,
+			g_cxx.uFunctionKind,
 			CXXScopeAccessUnknown
 		);
 
 	if(
 		pParenthesis &&
 		cxxTokenTypeIs(pParenthesis,CXXTokenTypeParenthesisChain) &&
-		cxxTagKindEnabled(CXXTagKindPARAMETER)
+		cxxTagKindEnabled(g_cxx.uParameterKind)
 	)
 	{
 		CXXFunctionParameterInfo oParamInfo;

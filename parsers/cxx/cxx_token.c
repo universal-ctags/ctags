@@ -112,7 +112,7 @@ void cxxTokenForceDestroy(CXXToken * t)
 	eFree(t);
 }
 
-CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,enum CXXKeyword eKeyword)
+CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,CXXKeyword eKeyword)
 {
 	CXXToken * pToken = cxxTokenCreate();
 	pToken->iLineNumber = iLineNumber;
@@ -138,7 +138,7 @@ static unsigned int hash(const unsigned char *str)
 }
 
 
-CXXToken * cxxTokenCreateAnonymousIdentifier(enum CXXTagKind k)
+CXXToken * cxxTokenCreateAnonymousIdentifier(unsigned int uKindId)
 {
 	g_uNextAnonumousIdentiferId++;
 
@@ -156,7 +156,7 @@ CXXToken * cxxTokenCreateAnonymousIdentifier(enum CXXTagKind k)
 
 	unsigned int uHash = hash((const unsigned char *)getInputFileName());
 
-	sprintf(szNum,"%08x%02x%02x",uHash,g_uNextAnonumousIdentiferId, k);
+	sprintf(szNum,"%08x%02x%02x",uHash,g_uNextAnonumousIdentiferId,uKindId);
 
 	vStringCatS(t->pszWord,szNum);
 	t->bFollowedBySpace = TRUE;

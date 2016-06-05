@@ -268,7 +268,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 		return 0;
 	}
 
-	tagEntryInfo * tag = cxxTagBegin(CXXTagKindFUNCTION,pIdentifier);
+	tagEntryInfo * tag = cxxTagBegin(g_cxx.uFunctionKind,pIdentifier);
 
 	if(tag)
 	{
@@ -307,10 +307,10 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 			vStringValue(pIdentifier->pszWord)
 		);
 
-	cxxScopePush(pIdentifier,CXXTagKindFUNCTION,CXXScopeAccessUnknown);
+	cxxScopePush(pIdentifier,g_cxx.uFunctionKind,CXXScopeAccessUnknown);
 
 	// emit parameters
-	if(cxxTagKindEnabled(CXXTagKindPARAMETER))
+	if(cxxTagKindEnabled(g_cxx.uParameterKind))
 	{
 		// The chain contains 1 + iExtraStatementsInChain statements now
 		int iIdx = 0;
@@ -985,7 +985,7 @@ next_token:
 //
 int cxxParserEmitFunctionTags(
 		CXXFunctionSignatureInfo * pInfo,
-		enum CXXTagKind eTagKind,
+		unsigned int uTagKind,
 		unsigned int uOptions,
 		int * piCorkQueueIndex
 	)
@@ -997,7 +997,7 @@ int cxxParserEmitFunctionTags(
 	if(piCorkQueueIndex)
 		*piCorkQueueIndex = CORK_NIL;
 
-	enum CXXTagKind eOuterScopeKind = cxxScopeGetKind();
+	unsigned int uOuterScopeKind = cxxScopeGetKind();
 
 	boolean bPushScopes = uOptions & CXXEmitFunctionTagsPushScopes;
 
@@ -1024,7 +1024,7 @@ int cxxParserEmitFunctionTags(
 
 			cxxScopePush(
 					pScopeId,
-					CXXTagKindCLASS,
+					g_cxx.uClassKind,
 					// WARNING: We don't know if it's really a class! (FIXME?)
 					CXXScopeAccessUnknown
 				);
@@ -1049,7 +1049,7 @@ int cxxParserEmitFunctionTags(
 
 	CXX_DEBUG_PRINT("Identifier is '%s'",vStringValue(pIdentifier->pszWord));
 
-	tagEntryInfo * tag = cxxTagBegin(eTagKind,pIdentifier);
+	tagEntryInfo * tag = cxxTagBegin(uTagKind,pIdentifier);
 
 	if(tag)
 	{
@@ -1061,12 +1061,12 @@ int cxxParserEmitFunctionTags(
 			pInfo->pParenthesis->pChain->pTail->bFollowedBySpace = FALSE;
 		}
 
-		if(eTagKind == CXXTagKindPROTOTYPE)
+		if(uTagKind == g_cxx.uPrototypeKind)
 		{
 			tag->isFileScope = !isInputHeaderFile();
 		} else {
 			// function definitions
-			if(eOuterScopeKind == CXXTagKindNAMESPACE)
+			if(uOuterScopeKind == g_cxx.uNamespaceKind)
 			{
 				// in a namespace only static stuff declared in cpp files is file scoped
 				tag->isFileScope = (
@@ -1174,7 +1174,7 @@ int cxxParserEmitFunctionTags(
 
 
 #ifdef CXX_DO_DEBUGGING
-	if(eTagKind == CXXTagKindFUNCTION)
+	if(uTagKind == g_cxx.uFunctionKind)
 		CXX_DEBUG_PRINT("Emitted function '%s'",vStringValue(pIdentifier->pszWord));
 	else
 		CXX_DEBUG_PRINT("Emitted prototype '%s'",vStringValue(pIdentifier->pszWord));
@@ -1182,7 +1182,7 @@ int cxxParserEmitFunctionTags(
 
 	if(bPushScopes)
 	{
-		cxxScopePush(pIdentifier,CXXTagKindFUNCTION,CXXScopeAccessUnknown);
+		cxxScopePush(pIdentifier,g_cxx.uFunctionKind,CXXScopeAccessUnknown);
 		iScopesPushed++;
 	} else {
 		cxxTokenDestroy(pIdentifier);
@@ -1236,7 +1236,7 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(int * piCorkQueueIndex
 
 	int iScopesPushed = cxxParserEmitFunctionTags(
 			&oInfo,
-			CXXTagKindFUNCTION,
+			g_cxx.uFunctionKind,
 			CXXEmitFunctionTagsPushScopes,
 			piCorkQueueIndex
 		);
@@ -1250,7 +1250,7 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(int * piCorkQueueIndex
 	vStringDelete(pJoinedChain);
 #endif
 
-	if(cxxTagKindEnabled(CXXTagKindPARAMETER))
+	if(cxxTagKindEnabled(g_cxx.uParameterKind))
 		cxxParserEmitFunctionParameterTags(&oParamInfo);
 
 	CXX_DEBUG_LEAVE();
@@ -1266,7 +1266,7 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 	while(i < pInfo->uParameterCount)
 	{
 		tagEntryInfo * tag = cxxTagBegin(
-				CXXTagKindPARAMETER,
+				g_cxx.uParameterKind,
 				pInfo->aIdentifiers[i]
 			);
 

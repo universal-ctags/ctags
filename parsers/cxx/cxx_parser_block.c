@@ -33,7 +33,7 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 			"This must be called when pointing at an opening bracket!"
 		);
 
-	enum CXXTagKind eScopeKind = cxxScopeGetKind();
+	unsigned int uScopeKind = cxxScopeGetKind();
 	boolean bIsCPP = cxxParserCurrentLanguageIsCPP();
 
 	if(
@@ -42,8 +42,8 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 				(g_cxx.pToken->pPrev) &&
 				cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeAssignment) &&
 				(
-					(eScopeKind == CXXTagKindFUNCTION) ||
-					(eScopeKind == CXXTagKindNAMESPACE)
+					(uScopeKind == g_cxx.uFunctionKind) ||
+					(uScopeKind == g_cxx.uNamespaceKind)
 				)
 			) || (
 				// T { arg1, arg2, ... } (1)
@@ -85,7 +85,7 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 	// FIXME: Why the invalid cork queue entry index is CORK_NIL?
 	int iCorkQueueIndex = CORK_NIL;
 	
-	if(eScopeKind != CXXTagKindFUNCTION)
+	if(uScopeKind != g_cxx.uFunctionKind)
 	{
 		// very likely a function definition
 		iScopes = cxxParserExtractFunctionSignatureBeforeOpeningBracket(&iCorkQueueIndex);
@@ -193,8 +193,8 @@ process_token:
 				{
 					case CXXKeywordNAMESPACE:
 					{
-						int iCurrentScopeKind = cxxScopeGetKind();
-						if(iCurrentScopeKind == CXXTagKindNAMESPACE)
+						unsigned int uCurrentScopeKind = cxxScopeGetKind();
+						if(uCurrentScopeKind == g_cxx.uNamespaceKind)
 						{
 							// namespaces can be nested only within themselves
 							if(!cxxParserParseNamespace())
@@ -234,21 +234,21 @@ process_token:
 						}
 					break;
 					case CXXKeywordCLASS:
-						if(!cxxParserParseClassStructOrUnion(CXXKeywordCLASS,CXXTagKindCLASS))
+						if(!cxxParserParseClassStructOrUnion(CXXKeywordCLASS,g_cxx.uClassKind))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 							return FALSE;
 						}
 					break;
 					case CXXKeywordSTRUCT:
-						if(!cxxParserParseClassStructOrUnion(CXXKeywordSTRUCT,CXXTagKindSTRUCT))
+						if(!cxxParserParseClassStructOrUnion(CXXKeywordSTRUCT,g_cxx.uStructKind))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 							return FALSE;
 						}
 					break;
 					case CXXKeywordUNION:
-						if(!cxxParserParseClassStructOrUnion(CXXKeywordUNION,CXXTagKindUNION))
+						if(!cxxParserParseClassStructOrUnion(CXXKeywordUNION,g_cxx.uUnionKind))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to parse class/struct/union");
 							return FALSE;
@@ -323,7 +323,7 @@ process_token:
 					break;
 					case CXXKeywordTHROW:
 						// ignore when inside a function
-						if(cxxScopeGetKind() == CXXTagKindFUNCTION)
+						if(cxxScopeGetKind() == g_cxx.uFunctionKind)
 						{
 							if(!cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF))
 							{
@@ -491,7 +491,7 @@ process_token:
 				{
 					CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
 					// assume it's label
-					tagEntryInfo * tag = cxxTagBegin(CXXTagKindLABEL,pFirst);
+					tagEntryInfo * tag = cxxTagBegin(g_cxx.uLabelKind,pFirst);
 
 					if(tag)
 					{

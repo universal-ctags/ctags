@@ -48,8 +48,8 @@ vString * cxxScopeGetFullNameAsString(void);
 vString * cxxScopeGetFullNameExceptLastComponentAsString(void);
 
 // Returns the current scope kind
-enum CXXTagKind cxxScopeGetKind(void);
-enum CXXTagKind cxxScopeGetVariableKind(void);
+unsigned int cxxScopeGetKind(void);
+unsigned int cxxScopeGetVariableKind(void);
 enum CXXScopeAccess cxxScopeGetAccess(void);
 // Are we in global scope?
 boolean cxxScopeIsGlobal(void);
@@ -57,7 +57,7 @@ boolean cxxScopeIsGlobal(void);
 // Add a token to the scope chain. The token ownership is transferred.
 void cxxScopePush(
 		CXXToken * t,
-		enum CXXTagKind eScopeKind,
+		unsigned int uScopeKind,
 		enum CXXScopeAccess eInitialAccess
 	);
 void cxxScopeSetAccess(enum CXXScopeAccess eAccess);
