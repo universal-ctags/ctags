@@ -5,11 +5,7 @@
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
 *
-*   This module contains functions for applying regular expression matching.
-*
-*   The code for utilizing the Gnu regex package with regards to processing the
-*   regex option and checking for regex matches was adapted from routines in
-*   Gnu etags.
+*   This module contains functions for xpath meta parser.
 */
 
 #include "general.h"  /* must always come first */
@@ -162,12 +158,12 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 			 const tagXpathTableTable *xpathTableTable,
 			 const kindOption* const kinds,void *userData)
 {
-	boolean usedAsEnterPoint = FALSE;
+	boolean usedAsEntryPoint = FALSE;
 	xmlDocPtr doc = NULL;
 
 	if (ctx == NULL)
 	{
-		usedAsEnterPoint = TRUE;
+		usedAsEntryPoint = TRUE;
 
 		findRegexTags ();
 
@@ -196,7 +192,7 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 	findXMLTagsCore (ctx, root, xpathTableTable, kinds, userData);
 
 out:
-	if (usedAsEnterPoint)
+	if (usedAsEntryPoint)
 	{
 		xmlXPathFreeContext (ctx);
 
