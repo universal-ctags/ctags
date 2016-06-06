@@ -85,7 +85,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 
 	CXXToken * t = cxxTokenChainFirst(pChain);
 
-	enum CXXTagKind eScopeKind = cxxScopeGetKind();
+	unsigned int uScopeKind = cxxScopeGetKind();
 
 	CXX_DEBUG_ASSERT(t,"There should be an initial token here");
 
@@ -237,8 +237,8 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 				} else if(
 						cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier) &&
 						(
-							(eScopeKind == CXXTagKindNAMESPACE) ||
-							(eScopeKind == CXXTagKindFUNCTION)
+							(uScopeKind == g_cxx.uNamespaceKind) ||
+							(uScopeKind == g_cxx.uFunctionKind)
 						) &&
 						cxxParserCurrentLanguageIsCPP() &&
 						cxxParserTokenChainLooksLikeConstructorParameterSet(t->pChain)
@@ -476,7 +476,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 				CXXToken * pScopeId = cxxTokenChainExtractRange(pScopeStart,pPartEnd->pPrev,0);
 				cxxScopePush(
 						pScopeId,
-						CXXTagKindCLASS,
+						g_cxx.uClassKind,
 						// WARNING: We don't know if it's really a class! (FIXME?)
 						CXXScopeAccessUnknown
 					);
@@ -496,9 +496,9 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 
 		tagEntryInfo * tag = cxxTagBegin(
 				bKnRStyleParameters ?
-					CXXTagKindPARAMETER :
+					g_cxx.uParameterKind :
 					((g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern) ?
-							CXXTagKindEXTERNVAR : cxxScopeGetVariableKind()),
+							g_cxx.uExternvarKind : cxxScopeGetVariableKind()),
 				pIdentifier
 			);
 
@@ -541,15 +541,15 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 					TRUE :
 					(
 						(
-							(eScopeKind == CXXTagKindNAMESPACE) &&
+							(uScopeKind == g_cxx.uNamespaceKind) &&
 							(g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) &&
 							(!isInputHeaderFile())
 						) ||
 						// locals are always hidden
-						(eScopeKind == CXXTagKindFUNCTION) ||
+						(uScopeKind == g_cxx.uFunctionKind) ||
 						(
-							(eScopeKind != CXXTagKindNAMESPACE) &&
-							(eScopeKind != CXXTagKindFUNCTION) &&
+							(uScopeKind != g_cxx.uNamespaceKind) &&
+							(uScopeKind != g_cxx.uFunctionKind) &&
 							(!isInputHeaderFile())
 						)
 					);

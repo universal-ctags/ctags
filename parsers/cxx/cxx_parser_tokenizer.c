@@ -963,7 +963,7 @@ boolean cxxParserParseNextToken(void)
 				t->eType = CXXTokenTypeIdentifier;
 			} else {
 				t->eType = CXXTokenTypeKeyword;
-				t->eKeyword = (enum CXXKeyword)iCXXKeyword;
+				t->eKeyword = (CXXKeyword)iCXXKeyword;
 			}
 		} else {
 			boolean bIgnoreParens = FALSE;

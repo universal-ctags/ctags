@@ -28,7 +28,29 @@ static roleDesc CHeaderRoles [] = {
 	RoleTemplateLocal,
 };
 
-static kindOption g_aCXXKinds [] = {
+static kindOption g_aCXXCKinds [] = {
+	{ TRUE,  'd', "macro",      "macro definitions",
+			.referenceOnly = FALSE, ATTACH_ROLES(CMacroRoles)
+	},
+	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)" },
+	{ TRUE,  'f', "function",   "function definitions" },
+	{ TRUE,  'g', "enum",       "enumeration names" },
+	{ FALSE, 'h', "header",     "included header files",
+			.referenceOnly = TRUE,  ATTACH_ROLES(CHeaderRoles)
+	},
+	{ FALSE, 'l', "local",      "local variables" },
+	{ TRUE,  'm', "member",     "struct, and union members" },
+	{ FALSE, 'p', "prototype",  "function prototypes" },
+	{ TRUE,  's', "struct",     "structure names" },
+	{ TRUE,  't', "typedef",    "typedefs" },
+	{ TRUE,  'u', "union",      "union names" },
+	{ TRUE,  'v', "variable",   "variable definitions" },
+	{ FALSE, 'x', "externvar",  "external and forward variable declarations" },
+	{ FALSE, 'z', "parameter",  "function parameters inside function definitions" },
+	{ FALSE, 'L', "label",      "goto labels" }
+};
+
+static kindOption g_aCXXCPPKinds [] = {
 	{ TRUE,  'c', "class",      "classes" },
 	{ TRUE,  'd', "macro",      "macro definitions",
 			.referenceOnly = FALSE, ATTACH_ROLES(CMacroRoles)
@@ -107,19 +129,86 @@ static fieldSpec g_aCXXCFields [] = {
 	}
 };
 
-kindOption * cxxTagGetKindOptions(void)
+void cxxTagInitGlobals(langType eLangType)
 {
-	return g_aCXXKinds;
+	g_cxx.eLanguage = eLangType;
+	
+	if(eLangType == g_cxx.eCLanguage)
+	{
+		g_cxx.aKindOptions = g_aCXXCKinds;
+		g_cxx.uKindOptionCount = sizeof(g_aCXXCKinds) / sizeof(kindOption);
+		g_cxx.uFunctionKind = CXXTagCKindFUNCTION;
+		g_cxx.uEnumKind = CXXTagCKindENUM;
+		g_cxx.uMacroKind = CXXTagCKindMACRO;
+		g_cxx.uIncludeKind = CXXTagCKindINCLUDE;
+		g_cxx.uClassKind = CXXTagKindInvalid;
+		g_cxx.uNamespaceKind = CXXTagKindInvalid;
+		g_cxx.uVariableKind = CXXTagCKindVARIABLE;
+		g_cxx.uStructKind = CXXTagCKindSTRUCT;
+		g_cxx.uUnionKind = CXXTagCKindUNION;
+		g_cxx.uMemberKind = CXXTagCKindMEMBER;
+		g_cxx.uLocalKind = CXXTagCKindLOCAL;
+		g_cxx.uPrototypeKind = CXXTagCKindPROTOTYPE;
+		g_cxx.uLabelKind = CXXTagCKindLABEL;
+		g_cxx.uParameterKind = CXXTagCKindPARAMETER;
+		g_cxx.uTypedefKind = CXXTagCKindTYPEDEF;
+		g_cxx.uExternvarKind = CXXTagCKindEXTERNVAR;
+		g_cxx.uEnumeratorKind = CXXTagCKindENUMERATOR;
+	} else if(eLangType == g_cxx.eCPPLanguage)
+	{
+		g_cxx.aKindOptions = g_aCXXCPPKinds;
+		g_cxx.uKindOptionCount = sizeof(g_aCXXCPPKinds) / sizeof(kindOption);
+		g_cxx.uFunctionKind = CXXTagCPPKindFUNCTION;
+		g_cxx.uEnumKind = CXXTagCPPKindENUM;
+		g_cxx.uMacroKind = CXXTagCPPKindMACRO;
+		g_cxx.uIncludeKind = CXXTagCPPKindINCLUDE;
+		g_cxx.uClassKind = CXXTagCPPKindCLASS;
+		g_cxx.uNamespaceKind = CXXTagCPPKindNAMESPACE;
+		g_cxx.uVariableKind = CXXTagCPPKindVARIABLE;
+		g_cxx.uStructKind = CXXTagCPPKindSTRUCT;
+		g_cxx.uUnionKind = CXXTagCPPKindUNION;
+		g_cxx.uMemberKind = CXXTagCPPKindMEMBER;
+		g_cxx.uLocalKind = CXXTagCPPKindLOCAL;
+		g_cxx.uPrototypeKind = CXXTagCPPKindPROTOTYPE;
+		g_cxx.uLabelKind = CXXTagCPPKindLABEL;
+		g_cxx.uParameterKind = CXXTagCPPKindPARAMETER;
+		g_cxx.uTypedefKind = CXXTagCPPKindTYPEDEF;
+		g_cxx.uExternvarKind = CXXTagCPPKindEXTERNVAR;
+		g_cxx.uEnumeratorKind = CXXTagCPPKindENUMERATOR;
+	} else {
+		CXX_DEBUG_ASSERT(false,"This should never happen: wrong language");
+	}
 }
 
-int cxxTagGetKindOptionCount(void)
+boolean cxxTagKindEnabled(unsigned int uKindId)
 {
-	return sizeof(g_aCXXKinds) / sizeof(kindOption);
+	CXX_DEBUG_ASSERT(
+			uKindId < g_cxx.uKindOptionCount,
+			"The specified kind probably belongs to the wrong language"
+		);
+
+	return g_cxx.aKindOptions[uKindId].enabled;
 }
 
-boolean cxxTagKindEnabled(enum CXXTagKind eKindId)
+
+kindOption * cxxTagGetCKindOptions(void)
 {
-	return g_aCXXKinds[eKindId].enabled;
+	return g_aCXXCKinds;
+}
+
+unsigned int cxxTagGetCKindOptionCount(void)
+{
+	return sizeof(g_aCXXCKinds) / sizeof(kindOption);
+}
+
+kindOption * cxxTagGetCPPKindOptions(void)
+{
+	return g_aCXXCPPKinds;
+}
+
+unsigned int cxxTagGetCPPKindOptionCount(void)
+{
+	return sizeof(g_aCXXCPPKinds) / sizeof(kindOption);
 }
 
 fieldSpec * cxxTagGetCPPFieldSpecifiers(void)
@@ -157,18 +246,25 @@ int cxxTagCFieldEnabled(CXXTagCField eField)
 static tagEntryInfo g_oCXXTag;
 
 
-tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
+tagEntryInfo * cxxTagBegin(unsigned int uKindId,CXXToken * pToken)
 {
-	if(!g_aCXXKinds[eKindId].enabled)
+	CXX_DEBUG_ASSERT(
+			uKindId < g_cxx.uKindOptionCount,
+			"The specified kind probably belongs to the wrong language"
+		);
+
+	kindOption * pKindOption = g_cxx.aKindOptions + uKindId;
+
+	if(!pKindOption->enabled)
 	{
-		//CXX_DEBUG_PRINT("Tag kind %s is not enabled",g_aCXXKinds[eKindId].name);
+		//CXX_DEBUG_PRINT("Tag kind %s is not enabled",aKindOptions[uKindId].name);
 		return NULL;
 	}
 
 	initTagEntry(
 			&g_oCXXTag,
 			vStringValue(pToken->pszWord),
-			&(g_aCXXKinds[eKindId])
+			pKindOption
 		);
 
 	g_oCXXTag.lineNumber = pToken->iLineNumber;
@@ -177,7 +273,7 @@ tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
 
 	if(!cxxScopeIsGlobal())
 	{
-		g_oCXXTag.extensionFields.scopeKind = &g_aCXXKinds[cxxScopeGetKind()];
+		g_oCXXTag.extensionFields.scopeKind = g_cxx.aKindOptions + cxxScopeGetKind();
 		g_oCXXTag.extensionFields.scopeName = cxxScopeGetFullName();
 	}
 
@@ -375,9 +471,9 @@ int cxxTagCommit(void)
 	// WARNING: The following code assumes that the scope
 	// didn't change between cxxTagBegin() and cxxTagCommit().
 
-	enum CXXTagKind eScopeKind = cxxScopeGetKind();
+	unsigned int uScopeKind = cxxScopeGetKind();
 
-	if(eScopeKind == CXXTagKindFUNCTION)
+	if(uScopeKind == g_cxx.uFunctionKind)
 	{
 		// old ctags didn't do this, and --extra=+q is mainly
 		// for backward compatibility so...
@@ -388,7 +484,7 @@ int cxxTagCommit(void)
 
 	vString * x;
 
-	if(eScopeKind == CXXTagKindENUM)
+	if(uScopeKind == g_cxx.uEnumKind)
 	{
 		// If the scope kind is enumeration then we need to remove the
 		// last scope part. This is what old ctags did.
@@ -420,8 +516,8 @@ int cxxTagCommit(void)
 	return iCorkQueueIndex;
 }
 
-void cxxTag(enum CXXTagKind eKindId,CXXToken * pToken)
+void cxxTag(unsigned int uKindId,CXXToken * pToken)
 {
-	if(cxxTagBegin(eKindId,pToken) != NULL)
+	if(cxxTagBegin(uKindId,pToken) != NULL)
 		cxxTagCommit();
 }

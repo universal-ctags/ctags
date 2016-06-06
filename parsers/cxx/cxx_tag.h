@@ -13,31 +13,54 @@
 
 #include "kind.h"
 #include "entry.h"
+#include "parse.h"
 
 #include "cxx_token.h"
 
-enum CXXTagKind
+enum CXXTagCPPKind
 {
-	CXXTagKindCLASS,
-	CXXTagKindMACRO,
-	CXXTagKindENUMERATOR,
-	CXXTagKindFUNCTION,
-	CXXTagKindENUM,
-	CXXTagKindINCLUDE,
-	CXXTagKindLOCAL,
-	CXXTagKindMEMBER,
-	CXXTagKindNAMESPACE,
-	CXXTagKindPROTOTYPE,
-	CXXTagKindSTRUCT,
-	CXXTagKindTYPEDEF,
-	CXXTagKindUNION,
-	CXXTagKindVARIABLE,
-	CXXTagKindEXTERNVAR,
-	CXXTagKindPARAMETER,
-	CXXTagKindLABEL,
-	CXXTagKindNAME,
-	CXXTagKindUSING
+	CXXTagCPPKindCLASS,
+	CXXTagCPPKindMACRO,
+	CXXTagCPPKindENUMERATOR,
+	CXXTagCPPKindFUNCTION,
+	CXXTagCPPKindENUM,
+	CXXTagCPPKindINCLUDE,
+	CXXTagCPPKindLOCAL,
+	CXXTagCPPKindMEMBER,
+	CXXTagCPPKindNAMESPACE,
+	CXXTagCPPKindPROTOTYPE,
+	CXXTagCPPKindSTRUCT,
+	CXXTagCPPKindTYPEDEF,
+	CXXTagCPPKindUNION,
+	CXXTagCPPKindVARIABLE,
+	CXXTagCPPKindEXTERNVAR,
+	CXXTagCPPKindPARAMETER,
+	CXXTagCPPKindLABEL,
+	CXXTagCPPKindNAME,
+	CXXTagCPPKindUSING
 };
+
+enum CXXTagCKind
+{
+	CXXTagCKindMACRO,
+	CXXTagCKindENUMERATOR,
+	CXXTagCKindFUNCTION,
+	CXXTagCKindENUM,
+	CXXTagCKindINCLUDE,
+	CXXTagCKindLOCAL,
+	CXXTagCKindMEMBER,
+	CXXTagCKindPROTOTYPE,
+	CXXTagCKindSTRUCT,
+	CXXTagCKindTYPEDEF,
+	CXXTagCKindUNION,
+	CXXTagCKindVARIABLE,
+	CXXTagCKindEXTERNVAR,
+	CXXTagCKindPARAMETER,
+	CXXTagCKindLABEL
+};
+
+// Must fit in a byte.
+#define CXXTagKindInvalid 0xff
 
 typedef enum _CXXTagCPPField
 {
@@ -53,24 +76,42 @@ typedef enum _CXXTagCField
 	CXXTagCFieldProperties
 } CXXTagCField;
 
-fieldSpec * cxxTagGetCPPFieldSpecifiers(void);
-int cxxTagGetCPPFieldSpecifierCount(void);
-int cxxTagCPPFieldEnabled(CXXTagCPPField eField);
-
 fieldSpec * cxxTagGetCFieldSpecifiers(void);
 int cxxTagGetCFieldSpecifierCount(void);
 int cxxTagCFieldEnabled(CXXTagCField eField);
 
-kindOption * cxxTagGetKindOptions(void);
-int cxxTagGetKindOptionCount(void);
-boolean cxxTagKindEnabled(enum CXXTagKind eKindId);
+fieldSpec * cxxTagGetCPPFieldSpecifiers(void);
+int cxxTagGetCPPFieldSpecifierCount(void);
+int cxxTagCPPFieldEnabled(CXXTagCPPField eField);
 
-// Begin composing a tag.
+//
+// Initialize the g_cxx structure for parsing a file in the specified language.
+//
+void cxxTagInitGlobals(langType eLangType);
+
+//
+// Returns true if the specified tag kind, belonging to the current language,
+// is enabled.
+//
+boolean cxxTagKindEnabled(unsigned int uKindId);
+
+
+kindOption * cxxTagGetCKindOptions(void);
+unsigned int cxxTagGetCKindOptionCount(void);
+kindOption * cxxTagGetCPPKindOptions(void);
+unsigned int cxxTagGetCPPKindOptionCount(void);
+
+//
+// Begin composing a tag for the current language.
+//
 // Returns NULL if the tag should *not* be included in the output
 // or the tag entry info that can be filled up with extension fields.
 // Must be followed by cxxTagCommit() if it returns a non-NULL value.
 // The pToken ownership is NOT transferred.
-tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken);
+//
+// WARNING: uKindId must be a kind of the current language.
+//
+tagEntryInfo * cxxTagBegin(unsigned int uKindId,CXXToken * pToken);
 
 // Set the type of the current tag from the specified token sequence
 // (which must belong to the same chain!).
@@ -155,7 +196,7 @@ void cxxTagSetCorkQueueCField(
 int cxxTagCommit(void);
 
 // Same as cxxTagBegin() eventually followed by cxxTagCommit()
-void cxxTag(enum CXXTagKind eKindId,CXXToken * pToken);
+void cxxTag(unsigned int uKindId,CXXToken * pToken);
 
 typedef enum {
 	CR_MACRO_UNDEF,

@@ -212,7 +212,7 @@ skip_to_comma_or_end:
 			return; // EOF
 		}
 
-		tagEntryInfo * tag = cxxTagBegin(CXXTagKindTYPEDEF,t);
+		tagEntryInfo * tag = cxxTagBegin(g_cxx.uTypedefKind,t);
 
 		if(tag)
 		{
