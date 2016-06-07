@@ -164,6 +164,7 @@ typedef struct {
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
 	stringList* currentAliaes;     /* current list of aliases */
+	unsigned int anonumousIdentiferId; /* managed by anon* functions */
 } parserDefinition;
 
 typedef parserDefinition* (parserDefinitionFunc) (void);
@@ -299,6 +300,9 @@ extern void makeKindSeparatorsPseudoTags (const langType language,
 					  const struct sPtagDesc *pdesc);
 extern void makeKindDescriptionsPseudoTags (const langType language,
 					    const struct sPtagDesc *pdesc);
+
+extern void anonReset (void);
+extern void anonGenerate (vString *buffer, const char *prefix, int kind);
 
 #endif  /* CTAGS_MAIN_PARSE_H */
 
