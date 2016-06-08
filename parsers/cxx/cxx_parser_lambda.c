@@ -64,8 +64,17 @@ CXXToken * cxxParserOpeningBracketIsLambda(void)
 		return NULL;
 	}
 
-	t = cxxTokenChainPreviousTokenOfType(t,CXXTokenTypeSquareParenthesisChain);
+	// Stop also at commas, so in very large structures we will not be searching far
+	t = cxxTokenChainPreviousTokenOfType(
+			t,
+			CXXTokenTypeSquareParenthesisChain |
+			CXXTokenTypeComma
+		);
+
 	if(!t)
+		return NULL;
+
+	if(!cxxTokenTypeIs(t,CXXTokenTypeSquareParenthesisChain))
 		return NULL;
 
 	t = t->pNext;
