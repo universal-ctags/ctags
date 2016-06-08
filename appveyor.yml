@@ -16,10 +16,13 @@ environment:
     - compiler: cygwin
 
 build_script:
-  - '%APPVEYOR_BUILD_FOLDER%\win32\appveyor.bat'
+  - '%APPVEYOR_BUILD_FOLDER%\win32\appveyor.bat build'
+
+after_build:
+  - '%APPVEYOR_BUILD_FOLDER%\win32\appveyor.bat package'
 
 test_script:
   - '%APPVEYOR_BUILD_FOLDER%\win32\appveyor.bat test'
 
 artifacts:
-  - path: ctags.exe
+  - path: ctags-*.zip

@@ -6,20 +6,20 @@
 
 
 cd %APPVEYOR_BUILD_FOLDER%
-if /I "%1"=="test" (
-  set _target=_test
+if "%1"=="" (
+  set target=build
 ) else (
-  set _target=
+  set target=%1
 )
 
-for %%i in (msbuild msvc mingw msys2 cygwin) do if "%compiler%"=="%%i" goto %compiler%%_target%
+for %%i in (msbuild msvc mingw msys2 cygwin) do if "%compiler%"=="%%i" goto %compiler%_%target%
 
 echo Unknown build target.
 exit 1
 
-:msbuild
+:msbuild_build
 :: ----------------------------------------------------------------------
-:: Using VC12 with msbuild, iconv disabled
+:: Using VC12 (VC2013) with msbuild, iconv disabled
 cd win32
 @echo on
 msbuild ctags_vs2013.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=%CONFIGURATION%
@@ -38,10 +38,14 @@ c:\cygwin\bin\file %CONFIGURATION%\ctags.exe
 @echo off
 goto :eof
 
+:msbuild_package
+:: Do nothing.
+goto :eof
 
-:msvc
+
+:msvc_build
 :: ----------------------------------------------------------------------
-:: Using VC12 with nmake, iconv enabled
+:: Using VC12 (VC2013) with nmake, iconv enabled
 call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %ARCH%
 
 :: Build libiconv (MSVC port)
@@ -78,8 +82,17 @@ c:\cygwin\bin\file readtags.exe
 @echo off
 goto :eof
 
+:msvc_package
+if "%APPVEYOR_REPO_TAG_NAME%"=="" (
+  for /f %%i in ('git rev-parse --short HEAD') do set ver=%%i
+) else (
+  set ver=%APPVEYOR_REPO_TAG_NAME%
+)
+7z a ctags-%ver%-%ARCH%.zip ctags.exe readtags.exe iconv.dll COPYING docs README.md
+goto :eof
 
-:mingw
+
+:mingw_build
 :: ----------------------------------------------------------------------
 :: Using MinGW without autotools, iconv disabled
 @echo on
@@ -100,8 +113,12 @@ c:\cygwin\bin\file readtags.exe
 @echo off
 goto :eof
 
+:mingw_package
+:: Do nothing.
+goto :eof
 
-:msys2
+
+:msys2_build
 :: ----------------------------------------------------------------------
 :: Using MSYS2, iconv enabled
 @echo on
@@ -133,8 +150,12 @@ bash -lc "make check APPVEYOR=1"
 @echo off
 goto :eof
 
+:msys2_package
+:: Do nothing.
+goto :eof
 
-:cygwin
+
+:cygwin_build
 :: ----------------------------------------------------------------------
 :: Using Cygwin, iconv enabled
 @echo on
@@ -162,4 +183,8 @@ c:\cygwin\bin\file readtags.exe
 bash -lc "make check APPVEYOR=1"
 
 @echo off
+goto :eof
+
+:cygwin_package
+:: Do nothing.
 goto :eof
