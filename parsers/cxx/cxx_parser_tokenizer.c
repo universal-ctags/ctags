@@ -868,6 +868,9 @@ boolean cxxParserParseNextToken(void)
 {
 	CXXToken * t = cxxTokenCreate();
 
+	if(g_cxx.pTokenChain->iCount > 16384)
+		cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+
 	cxxTokenChainAppend(g_cxx.pTokenChain,t);
 
 	g_cxx.pToken = t;
