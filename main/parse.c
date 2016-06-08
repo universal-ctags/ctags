@@ -2449,6 +2449,46 @@ extern void makeKindDescriptionsPseudoTags (const langType language,
 }
 
 /*
+*   Copyright (c) 2016, Szymon Tomasz Stefanek
+*
+*   This source code is released for free distribution under the terms of the
+*   GNU General Public License version 2 or (at your option) any later version.
+*
+*   Anonymous name generator
+*/
+
+extern void anonReset (void)
+{
+	parserDefinition* lang = LanguageTable [getInputLanguage ()];
+	lang -> anonumousIdentiferId = 0;
+}
+
+static unsigned int anonHash(const unsigned char *str)
+{
+	unsigned int hash = 5381;
+	int c;
+
+	while((c = *str++))
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+	return hash ;
+}
+
+extern void anonGenerate (vString *buffer, const char *prefix, int kind)
+{
+	parserDefinition* lang = LanguageTable [getInputLanguage ()];
+	lang -> anonumousIdentiferId ++;
+
+	char szNum[32];
+
+	vStringCopyS(buffer, prefix);
+
+	unsigned int uHash = anonHash((const unsigned char *)getInputFileName());
+	sprintf(szNum,"%08x%02x%02x",uHash,lang -> anonumousIdentiferId, kind);
+	vStringCatS(buffer,szNum);
+}
+
+/*
  * A parser for CTagsSelfTest (CTST)
  */
 typedef enum {
