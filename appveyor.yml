@@ -4,15 +4,17 @@ environment:
   matrix:
     - compiler: msbuild
       CONFIGURATION: Release
-    - compiler: msvc
+    - compiler: msvc_msys2
       ARCH: x64
-    - compiler: msvc
-      ARCH: x86
-    - compiler: mingw
-    - compiler: msys2
       MSYS2_ARCH: x86_64
       MSYS2_DIR: msys64
       MSYSTEM: MINGW64
+    - compiler: msvc_msys2
+      ARCH: x86
+      MSYS2_ARCH: x86
+      MSYS2_DIR: msys64
+      MSYSTEM: MINGW32
+    - compiler: mingw
     - compiler: cygwin
 
 build_script:

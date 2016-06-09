@@ -12,7 +12,7 @@ if "%1"=="" (
   set target=%1
 )
 
-for %%i in (msbuild msvc mingw msys2 cygwin) do if "%compiler%"=="%%i" goto %compiler%_%target%
+for %%i in (msbuild msvc_msys2 mingw cygwin) do if "%compiler%"=="%%i" goto %compiler%_%target%
 
 echo Unknown build target.
 exit 1
@@ -43,9 +43,10 @@ goto :eof
 goto :eof
 
 
-:msvc_build
+:msvc_msys2_build
 :: ----------------------------------------------------------------------
 :: Using VC12 (VC2013) with nmake, iconv enabled
+:: Also build with msys2 and test the VC binary on msys2.
 call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %ARCH%
 
 :: Build libiconv (MSVC port)
@@ -68,21 +69,54 @@ copy %ICONV_BUILD_DIR%\msvc10\iconv.dll %APPVEYOR_BUILD_FOLDER% > nul
 cd %APPVEYOR_BUILD_FOLDER%
 nmake -f mk_mvc.mak WITH_ICONV=yes ICONV_DIR=%ICONV_DIR%
 
-@echo off
-goto :eof
-
-:msvc_test
-@echo on
-:: Check filetype
+:: Check filetype (VC binaries)
 c:\cygwin\bin\file ctags.exe
 c:\cygwin\bin\file readtags.exe
 :: Check if it works
 .\ctags --version || exit 1
 
+:: Backup VC binaries
+mkdir vc
+move *.exe vc > nul
+
+:: Build with msys2
+PATH C:\%MSYS2_DIR%\%MSYSTEM%\bin;C:\%MSYS2_DIR%\usr\bin;%PATH%
+set CHERE_INVOKING=yes
+:: Install and update necessary packages
+rem bash -lc "for i in {1..3}; do update-core && break || sleep 15; done"
+rem bash -lc "for i in {1..3}; do pacman --noconfirm -Su mingw-w64-%MSYS2_ARCH%-{gcc,libiconv} automake autoconf make dos2unix && break || sleep 15; done"
+
+bash -lc "./autogen.sh"
+:: Patching configure.
+:: Workaround for "./configure: line 557: 0: Bad file descriptor"
+perl -i".bak" -pe "s/^test -n \".DJDIR\"/#$&/" configure
+bash -lc "./configure --enable-iconv && make"
+
+:: Check filetype (msys2 binaries)
+c:\cygwin\bin\file ctags.exe
+c:\cygwin\bin\file readtags.exe
+:: Check if it works
+.\ctags --version || exit 1
+
+:: Backup msys2 binaries (Currently not used.)
+mkdir msys2
+move *.exe msys2 > nul
+
+:: Restore VC binaries
+copy vc\*.exe . /y > nul
+
 @echo off
 goto :eof
 
-:msvc_package
+:msvc_msys2_test
+@echo on
+:: Run tests
+bash -lc "make check APPVEYOR=1"
+
+@echo off
+goto :eof
+
+:msvc_msys2_package
 if "%APPVEYOR_REPO_TAG_NAME%"=="" (
   for /f %%i in ('git rev-parse --short HEAD') do set ver=%%i
 ) else (
@@ -114,43 +148,6 @@ c:\cygwin\bin\file readtags.exe
 goto :eof
 
 :mingw_package
-:: Do nothing.
-goto :eof
-
-
-:msys2_build
-:: ----------------------------------------------------------------------
-:: Using MSYS2, iconv enabled
-@echo on
-PATH C:\%MSYS2_DIR%\%MSYSTEM%\bin;C:\%MSYS2_DIR%\usr\bin;%PATH%
-set CHERE_INVOKING=yes
-:: Install and update necessary packages
-rem bash -lc "for i in {1..3}; do update-core && break || sleep 15; done"
-rem bash -lc "for i in {1..3}; do pacman --noconfirm -Su mingw-w64-%MSYS2_ARCH%-{gcc,libiconv} automake autoconf make dos2unix && break || sleep 15; done"
-
-bash -lc "./autogen.sh"
-:: Patching configure.
-:: Workaround for "./configure: line 557: 0: Bad file descriptor"
-perl -i".bak" -pe "s/^test -n \".DJDIR\"/#$&/" configure
-bash -lc "./configure --enable-iconv && make"
-
-@echo off
-goto :eof
-
-:msys2_test
-@echo on
-:: Check filetype
-c:\cygwin\bin\file ctags.exe
-c:\cygwin\bin\file readtags.exe
-:: Check if it works
-.\ctags --version || exit 1
-:: Run tests
-bash -lc "make check APPVEYOR=1"
-
-@echo off
-goto :eof
-
-:msys2_package
 :: Do nothing.
 goto :eof
 
