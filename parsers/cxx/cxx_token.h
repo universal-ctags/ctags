@@ -81,7 +81,7 @@ typedef struct _CXXToken
 	// scope information. Only cxxScope* functions can make sense of it.
 	// In other contexts these are simply left
 	// uninitialized and must be treated as undefined.
-	unsigned char uInternalScopeKind;
+	unsigned char uInternalScopeType;
 	unsigned char uInternalScopeAccess;
 } CXXToken;
 
@@ -91,9 +91,7 @@ void cxxTokenDestroy(CXXToken * t);
 // A shortcut for quickly creating keyword tokens.
 CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,enum CXXKeyword eKeyword);
 
-enum CXXTagKind;
-
-CXXToken * cxxTokenCreateAnonymousIdentifier(enum CXXTagKind k);
+CXXToken * cxxTokenCreateAnonymousIdentifier(unsigned int uTagKind);
 
 #define cxxTokenTypeIsOneOf(_pToken,_uTypes) (_pToken->eType & (_uTypes))
 #define cxxTokenTypeIs(_pToken,_eType) (_pToken->eType == _eType)

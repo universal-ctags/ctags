@@ -14,6 +14,7 @@
 #include "cxx_token.h"
 #include "cxx_token_chain.h"
 #include "cxx_scope.h"
+#include "cxx_tag.h"
 
 #include "parse.h"
 #include "vstring.h"
@@ -198,7 +199,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 
 	cxxScopePush(
 			pIdentifier,
-			CXXTagKindFUNCTION,
+			CXXScopeTypeFunction,
 			CXXScopeAccessUnknown
 		);
 

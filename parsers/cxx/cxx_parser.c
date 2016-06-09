@@ -14,6 +14,7 @@
 #include "cxx_token.h"
 #include "cxx_token_chain.h"
 #include "cxx_scope.h"
+#include "cxx_tag.h"
 
 #include "parse.h"
 #include "vstring.h"
@@ -458,29 +459,32 @@ boolean cxxParserParseEnum(void)
 	{
 		// good.
 		// It may be qualified though.
-		CXXToken * pNamespaceBegin = pEnumName;
-		CXXToken * pPrev = pEnumName->pPrev;
-		while(pPrev)
+		if(cxxParserCurrentLanguageIsCPP())
 		{
-			if(!cxxTokenTypeIs(pPrev,CXXTokenTypeMultipleColons))
-				break;
-			pPrev = pPrev->pPrev;
-			if(!pPrev)
-				break;
-			if(!cxxTokenTypeIs(pPrev,CXXTokenTypeIdentifier))
-				break;
-			pNamespaceBegin = pPrev;
-			pPrev = pPrev->pPrev;
-		}
-
-		while(pNamespaceBegin != pEnumName)
-		{
-			CXXToken * pNext = pNamespaceBegin->pNext;
-			cxxTokenChainTake(g_cxx.pTokenChain,pNamespaceBegin);
-			// FIXME: We don't really know if it's a class!
-			cxxScopePush(pNamespaceBegin,CXXTagKindCLASS,CXXScopeAccessUnknown);
-			iPushedScopes++;
-			pNamespaceBegin = pNext->pNext;
+			CXXToken * pNamespaceBegin = pEnumName;
+			CXXToken * pPrev = pEnumName->pPrev;
+			while(pPrev)
+			{
+				if(!cxxTokenTypeIs(pPrev,CXXTokenTypeMultipleColons))
+					break;
+				pPrev = pPrev->pPrev;
+				if(!pPrev)
+					break;
+				if(!cxxTokenTypeIs(pPrev,CXXTokenTypeIdentifier))
+					break;
+				pNamespaceBegin = pPrev;
+				pPrev = pPrev->pPrev;
+			}
+	
+			while(pNamespaceBegin != pEnumName)
+			{
+				CXXToken * pNext = pNamespaceBegin->pNext;
+				cxxTokenChainTake(g_cxx.pTokenChain,pNamespaceBegin);
+				// FIXME: We don't really know if it's a class!
+				cxxScopePush(pNamespaceBegin,CXXScopeTypeClass,CXXScopeAccessUnknown);
+				iPushedScopes++;
+				pNamespaceBegin = pNext->pNext;
+			}
 		}
 
 		CXX_DEBUG_PRINT("Enum name is %s",vStringValue(pEnumName->pszWord));
@@ -505,7 +509,7 @@ boolean cxxParserParseEnum(void)
 		iCorkQueueIndex = cxxTagCommit();
 	}
 
-	cxxScopePush(pEnumName,CXXTagKindENUM,CXXScopeAccessPublic);
+	cxxScopePush(pEnumName,CXXScopeTypeEnum,CXXScopeAccessPublic);
 	iPushedScopes++;
 
 	vString * pScopeName = cxxScopeGetFullNameAsString();
@@ -573,7 +577,8 @@ boolean cxxParserParseEnum(void)
 
 static boolean cxxParserParseClassStructOrUnionInternal(
 		enum CXXKeyword eKeyword,
-		enum CXXTagKind eTagKind
+		unsigned int uTagKind,
+		unsigned int uScopeType
 	)
 {
 	CXX_DEBUG_ENTER();
@@ -610,7 +615,7 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 			CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket |
 			CXXTokenTypeSmallerThanSign;
 
-	if(eTagKind != CXXTagKindCLASS)
+	if(uTagKind != CXXTagCPPKindCLASS)
 		uTerminatorTypes |= CXXTokenTypeParenthesisChain | CXXTokenTypeAssignment;
 
 	boolean bRet;
@@ -743,7 +748,7 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 			CXXToken * pNext = pNamespaceBegin->pNext;
 			cxxTokenChainTake(g_cxx.pTokenChain,pNamespaceBegin);
 			// FIXME: We don't really know if it's a class!
-			cxxScopePush(pNamespaceBegin,CXXTagKindCLASS,CXXScopeAccessUnknown);
+			cxxScopePush(pNamespaceBegin,CXXScopeTypeClass,CXXScopeAccessUnknown);
 			iPushedScopes++;
 			pNamespaceBegin = pNext->pNext;
 		}
@@ -754,7 +759,7 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 			);
 		cxxTokenChainTake(g_cxx.pTokenChain,pClassName);
 	} else {
-		pClassName = cxxTokenCreateAnonymousIdentifier(eTagKind);
+		pClassName = cxxTokenCreateAnonymousIdentifier(uTagKind);
 		CXX_DEBUG_PRINT(
 				"Class/struct/union name is %s (anonymous)",
 				vStringValue(pClassName->pszWord)
@@ -788,7 +793,7 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 		cxxTokenChainClear(g_cxx.pTokenChain);
 	}
 
-	tagEntryInfo * tag = cxxTagBegin(eTagKind,pClassName);
+	tagEntryInfo * tag = cxxTagBegin(uTagKind,pClassName);
 
 	int iCorkQueueIndex = CORK_NIL;
 
@@ -853,8 +858,8 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 
 	cxxScopePush(
 			pClassName,
-			eTagKind,
-			(eTagKind == CXXTagKindCLASS) ?
+			uScopeType,
+			(uTagKind == CXXTagCPPKindCLASS) ?
 				CXXScopeAccessPrivate : CXXScopeAccessPublic
 		);
 
@@ -894,7 +899,8 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 
 boolean cxxParserParseClassStructOrUnion(
 		enum CXXKeyword eKeyword,
-		enum CXXTagKind eTagKind
+		unsigned int uTagKind,
+		unsigned int uScopeType
 	)
 {
 	// Trick for "smart" handling of public/protected/private keywords in .h files parsed as C++.
@@ -915,7 +921,7 @@ boolean cxxParserParseClassStructOrUnion(
 	// Enable public/protected/private keywords
 	g_cxx.bEnablePublicProtectedPrivateKeywords = TRUE;
 
-	boolean bRet = cxxParserParseClassStructOrUnionInternal(eKeyword,eTagKind);
+	boolean bRet = cxxParserParseClassStructOrUnionInternal(eKeyword,uTagKind,uScopeType);
 
 	g_cxx.bEnablePublicProtectedPrivateKeywords = bEnablePublicProtectedPrivateKeywords;
 
@@ -993,12 +999,12 @@ void cxxParserAnalyzeOtherStatement(void)
 		return;
 	}
 
-	enum CXXTagKind eScopeKind = cxxScopeGetKind();
+	enum CXXScopeType eScopeType = cxxScopeGetType();
 
 	CXXFunctionSignatureInfo oInfo;
 
 	// kinda looks like a function or variable instantiation... maybe
-	if(eScopeKind == CXXTagKindFUNCTION)
+	if(eScopeType == CXXScopeTypeFunction)
 	{
 		// prefer variable declarations.
 		// if none found then try function prototype
@@ -1075,19 +1081,19 @@ boolean cxxParserParseAccessSpecifier(void)
 {
 	CXX_DEBUG_ENTER();
 
-	enum CXXTagKind eScopeKind = cxxScopeGetKind();
+	enum CXXScopeType eScopeType = cxxScopeGetType();
 
 	if(
-			(eScopeKind != CXXTagKindCLASS) &&
-			(eScopeKind != CXXTagKindSTRUCT) &&
-			(eScopeKind != CXXTagKindUNION)
+			(eScopeType != CXXScopeTypeClass) &&
+			(eScopeType != CXXScopeTypeUnion) &&
+			(eScopeType != CXXScopeTypeStruct)
 		)
 	{
 		// this is a syntax error: we're in the wrong scope.
 		CXX_DEBUG_LEAVE_TEXT(
 				"Access specified in wrong context (%d): "
 					"bailing out to avoid reporting broken structure",
-				eScopeKind
+				eScopeType
 			);
 		return FALSE;
 	}
@@ -1200,8 +1206,8 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 	cxxTokenAPINewFile();
 	cxxParserNewStatement();
 
-	kindOption * kind_for_define = cxxTagGetKindOptions() + CXXTagKindMACRO;
-	kindOption * kind_for_header = cxxTagGetKindOptions() + CXXTagKindINCLUDE;
+	kindOption * kind_for_define = g_cxx.pKindOptions + CXXTagKindMACRO;
+	kindOption * kind_for_header = g_cxx.pKindOptions + CXXTagKindINCLUDE;
 	int role_for_macro_undef = CR_MACRO_UNDEF;
 	int role_for_header_system = CR_HEADER_SYSTEM;
 	int role_for_header_local = CR_HEADER_LOCAL;
@@ -1246,7 +1252,7 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 rescanReason cxxCParserMain(const unsigned int passCount)
 {
 	CXX_DEBUG_ENTER();
-	g_cxx.eLanguage = g_cxx.eCLanguage;
+	cxxTagInitForLanguage(g_cxx.eCLanguage);
 	rescanReason r = cxxParserMain(passCount);
 	CXX_DEBUG_LEAVE();
 	return r;
@@ -1255,7 +1261,7 @@ rescanReason cxxCParserMain(const unsigned int passCount)
 rescanReason cxxCppParserMain(const unsigned int passCount)
 {
 	CXX_DEBUG_ENTER();
-	g_cxx.eLanguage = g_cxx.eCPPLanguage;
+	cxxTagInitForLanguage(g_cxx.eCPPLanguage);
 
 	// In header files we disable processing of public/protected/private keywords
 	// until we either figure out that this is really C++ or we're start parsing

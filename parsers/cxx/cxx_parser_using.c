@@ -130,7 +130,7 @@ boolean cxxParserParseUsingClause(void)
 						"Found using clause '%s' which extends scope",
 						vStringValue(t->pszWord)
 					);
-				tag = cxxTagBegin(CXXTagKindUSING,t);
+				tag = cxxTagBegin(CXXTagCPPKindUSING,t);
 			} else {
 
 				t = cxxTokenChainLast(g_cxx.pTokenChain);
@@ -139,14 +139,14 @@ boolean cxxParserParseUsingClause(void)
 						"Found using clause '%s' which imports a name",
 						vStringValue(t->pszWord)
 					);
-				tag = cxxTagBegin(CXXTagKindNAME,t);
+				tag = cxxTagBegin(CXXTagCPPKindNAME,t);
 
 				// FIXME: We need something like "nameref:<condensed>" here!
 			}
 
 			if(tag)
 			{
-				tag->isFileScope = (cxxScopeGetKind() == CXXTagKindNAMESPACE) &&
+				tag->isFileScope = (cxxScopeGetType() == CXXScopeTypeNamespace) &&
 							(!isInputHeaderFile());
 				cxxTagCommit();
 			}

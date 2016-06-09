@@ -15,6 +15,7 @@
 #include "cxx_token_chain.h"
 #include "cxx_parser.h"
 #include "cxx_scope.h"
+#include "cxx_tag.h"
 
 #include "selectors.h"
 
@@ -85,8 +86,8 @@ parserDefinition * CParser (void)
 
 	parserDefinition* def = parserNew("C");
 
-	def->kinds = cxxTagGetKindOptions();
-	def->kindCount = cxxTagGetKindOptionCount();
+	def->kinds = cxxTagGetCKindOptions();
+	def->kindCount = cxxTagGetCKindOptionCount();
 	def->fieldSpecs = cxxTagGetCFieldSpecifiers();
 	def->fieldSpecCount = cxxTagGetCFieldSpecifierCount();
 	def->extensions = extensions;
@@ -115,8 +116,8 @@ parserDefinition * CppParser (void)
 
 	parserDefinition* def = parserNew("C++");
 
-	def->kinds = cxxTagGetKindOptions();
-	def->kindCount = cxxTagGetKindOptionCount();
+	def->kinds = cxxTagGetCPPKindOptions();
+	def->kindCount = cxxTagGetCPPKindOptionCount();
 	def->fieldSpecs = cxxTagGetCPPFieldSpecifiers();
 	def->fieldSpecCount = cxxTagGetCPPFieldSpecifierCount();
 	def->extensions = extensions;

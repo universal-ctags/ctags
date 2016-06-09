@@ -28,32 +28,38 @@ static roleDesc CHeaderRoles [] = {
 	RoleTemplateLocal,
 };
 
-static kindOption g_aCXXKinds [] = {
+
+
+#define CXX_COMMON_KINDS(_szMemberDescription) \
+	{ TRUE,  'd', "macro",      "macro definitions", \
+			.referenceOnly = FALSE, ATTACH_ROLES(CMacroRoles) \
+	}, \
+	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)" }, \
+	{ TRUE,  'f', "function",   "function definitions" }, \
+	{ TRUE,  'g', "enum",       "enumeration names" }, \
+	{ FALSE, 'h', "header",     "included header files", \
+			.referenceOnly = TRUE,  ATTACH_ROLES(CHeaderRoles) \
+	}, \
+	{ FALSE, 'l', "local",      "local variables" }, \
+	{ TRUE,  'm', "member",     _szMemberDescription }, \
+	{ FALSE, 'p', "prototype",  "function prototypes" }, \
+	{ TRUE,  's', "struct",     "structure names" }, \
+	{ TRUE,  't', "typedef",    "typedefs" }, \
+	{ TRUE,  'u', "union",      "union names" }, \
+	{ TRUE,  'v', "variable",   "variable definitions" }, \
+	{ FALSE, 'x', "externvar",  "external and forward variable declarations" }, \
+	{ FALSE, 'z', "parameter",  "function parameters inside function definitions" }, \
+	{ FALSE, 'L', "label",      "goto labels" }
+
+static kindOption g_aCXXCKinds [] = {
+	CXX_COMMON_KINDS("struct, and union members")
+};
+
+static kindOption g_aCXXCPPKinds [] = {
+	CXX_COMMON_KINDS("class, struct, and union members"),
 	{ TRUE,  'c', "class",      "classes" },
-	{ TRUE,  'd', "macro",      "macro definitions",
-			.referenceOnly = FALSE, ATTACH_ROLES(CMacroRoles)
-	},
-	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)" },
-	{ TRUE,  'f', "function",   "function definitions" },
-	{ TRUE,  'g', "enum",       "enumeration names" },
-	{ FALSE, 'h', "header",     "included header files",
-			.referenceOnly = TRUE,  ATTACH_ROLES(CHeaderRoles)
-	},
-	{ FALSE, 'l', "local",      "local variables" },
-	{ TRUE,  'm', "member",     "class, struct, and union members" },
 	{ TRUE,  'n', "namespace",  "namespaces" },
-	{ FALSE, 'p', "prototype",  "function prototypes" },
-	{ TRUE,  's', "struct",     "structure names" },
-	{ TRUE,  't', "typedef",    "typedefs" },
-	{ TRUE,  'u', "union",      "union names" },
-	{ TRUE,  'v', "variable",   "variable definitions" },
-	{ FALSE, 'x', "externvar",  "external and forward variable declarations" },
-	{ FALSE, 'z', "parameter",  "function parameters inside function definitions" },
-	{ FALSE, 'L', "label",      "goto labels" },
-	// FIXME: not sure about referenceOnly: if this is referenceOnly then
-	// so is externvar and probably also prototype.
-	{ FALSE, 'N', "name",       "names imported via using scope::symbol"
-			/*, .referenceOnly = TRUE*/ },
+	{ FALSE, 'N', "name",       "names imported via using scope::symbol" },
 	{ FALSE, 'U', "using",      "using namespace statements",
 			.referenceOnly = TRUE },
 };
@@ -107,19 +113,51 @@ static fieldSpec g_aCXXCFields [] = {
 	}
 };
 
-kindOption * cxxTagGetKindOptions(void)
+void cxxTagInitForLanguage(langType eLanguage)
 {
-	return g_aCXXKinds;
+	g_cxx.eLanguage = eLanguage;
+
+	if(g_cxx.eLanguage == g_cxx.eCLanguage)
+	{
+		g_cxx.pKindOptions = g_aCXXCKinds;
+		g_cxx.uKindOptionCount = sizeof(g_aCXXCKinds) / sizeof(kindOption);
+	} else if(g_cxx.eLanguage == g_cxx.eCPPLanguage)
+	{
+		g_cxx.pKindOptions = g_aCXXCPPKinds;
+		g_cxx.uKindOptionCount = sizeof(g_aCXXCPPKinds) / sizeof(kindOption);
+	} else {
+		CXX_DEBUG_ASSERT(FALSE,"Invalid language passed to cxxTagInitForLanguage()");
+	}
 }
 
-int cxxTagGetKindOptionCount(void)
+
+kindOption * cxxTagGetCKindOptions(void)
 {
-	return sizeof(g_aCXXKinds) / sizeof(kindOption);
+	return g_aCXXCKinds;
 }
 
-boolean cxxTagKindEnabled(enum CXXTagKind eKindId)
+int cxxTagGetCKindOptionCount(void)
 {
-	return g_aCXXKinds[eKindId].enabled;
+	return sizeof(g_aCXXCKinds) / sizeof(kindOption);
+}
+
+kindOption * cxxTagGetCPPKindOptions(void)
+{
+	return g_aCXXCPPKinds;
+}
+
+int cxxTagGetCPPKindOptionCount(void)
+{
+	return sizeof(g_aCXXCPPKinds) / sizeof(kindOption);
+}
+
+boolean cxxTagKindEnabled(unsigned int uKindId)
+{
+	CXX_DEBUG_ASSERT(
+			uKindId < g_cxx.uKindOptionCount,
+			"The kind must be associated to the current language!"
+		);
+	return g_cxx.pKindOptions[uKindId].enabled;
 }
 
 fieldSpec * cxxTagGetCPPFieldSpecifiers(void)
@@ -157,9 +195,11 @@ int cxxTagCFieldEnabled(CXXTagCField eField)
 static tagEntryInfo g_oCXXTag;
 
 
-tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
+tagEntryInfo * cxxTagBegin(unsigned int uKindId,CXXToken * pToken)
 {
-	if(!g_aCXXKinds[eKindId].enabled)
+	kindOption * pKindOptions = g_cxx.pKindOptions;
+
+	if(!pKindOptions[uKindId].enabled)
 	{
 		//CXX_DEBUG_PRINT("Tag kind %s is not enabled",g_aCXXKinds[eKindId].name);
 		return NULL;
@@ -168,7 +208,7 @@ tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
 	initTagEntry(
 			&g_oCXXTag,
 			vStringValue(pToken->pszWord),
-			&(g_aCXXKinds[eKindId])
+			pKindOptions + uKindId
 		);
 
 	g_oCXXTag.lineNumber = pToken->iLineNumber;
@@ -177,7 +217,7 @@ tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
 
 	if(!cxxScopeIsGlobal())
 	{
-		g_oCXXTag.extensionFields.scopeKind = &g_aCXXKinds[cxxScopeGetKind()];
+		g_oCXXTag.extensionFields.scopeKind = &(g_cxx.pKindOptions[cxxScopeGetKind()]);
 		g_oCXXTag.extensionFields.scopeName = cxxScopeGetFullName();
 	}
 
@@ -375,9 +415,9 @@ int cxxTagCommit(void)
 	// WARNING: The following code assumes that the scope
 	// didn't change between cxxTagBegin() and cxxTagCommit().
 
-	enum CXXTagKind eScopeKind = cxxScopeGetKind();
+	enum CXXScopeType eScopeType = cxxScopeGetType();
 
-	if(eScopeKind == CXXTagKindFUNCTION)
+	if(eScopeType == CXXScopeTypeFunction)
 	{
 		// old ctags didn't do this, and --extra=+q is mainly
 		// for backward compatibility so...
@@ -388,7 +428,7 @@ int cxxTagCommit(void)
 
 	vString * x;
 
-	if(eScopeKind == CXXTagKindENUM)
+	if(eScopeType == CXXScopeTypeEnum)
 	{
 		// If the scope kind is enumeration then we need to remove the
 		// last scope part. This is what old ctags did.
@@ -420,8 +460,8 @@ int cxxTagCommit(void)
 	return iCorkQueueIndex;
 }
 
-void cxxTag(enum CXXTagKind eKindId,CXXToken * pToken)
+void cxxTag(unsigned int uKindId,CXXToken * pToken)
 {
-	if(cxxTagBegin(eKindId,pToken) != NULL)
+	if(cxxTagBegin(uKindId,pToken) != NULL)
 		cxxTagCommit();
 }
