@@ -24,9 +24,9 @@ p	scopeKind	on	NONE	TRUE	Kind of scope as full name
 -	end	off	C	TRUE	end lines of various constructs
 -	properties	off	C	TRUE	properties (static, inline, mutable,...)
 -	end	off	C++	TRUE	end lines of various constructs
+-	properties	off	C++	TRUE	properties (static, inline, mutable,...)
 -	template	off	C++	TRUE	template parameters
 -	captures	off	C++	TRUE	lambda capture list
--	properties	off	C++	TRUE	properties (static, virtual, inline, mutable,...)
 -	end	off	Python	TRUE	end lines of various constructs
 -	end	off	RpmSpec	TRUE	end lines of macros
 -	sectionMarker	off	reStructuredText	TRUE	character used for declaring section
