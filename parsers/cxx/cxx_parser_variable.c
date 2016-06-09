@@ -556,10 +556,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 
 			vString * pszProperties = NULL;
 			
-			if(
-				(cxxParserCurrentLanguageIsCPP() && cxxTagCPPFieldEnabled(CXXTagCPPFieldProperties)) ||
-				(cxxParserCurrentLanguageIsC() && cxxTagCFieldEnabled(CXXTagCFieldProperties))
-			)
+			if(cxxTagFieldEnabled(CXXTagFieldProperties))
 			{
 				unsigned int uProperties = 0;
 		

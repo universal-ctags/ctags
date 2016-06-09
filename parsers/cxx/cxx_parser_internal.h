@@ -234,6 +234,11 @@ typedef struct _CXXParserState
 	kindOption * pKindOptions;
 	// The number of kind options, used mainly for checking/debug purposes
 	unsigned int uKindOptionCount;
+	
+	// The fields associated to the current language
+	fieldSpec * pFieldOptions;
+	// The number of field options, used mainly for checking/debug purposes
+	unsigned int uFieldOptionCount;
 
 	// The current token chain
 	CXXTokenChain * pTokenChain;

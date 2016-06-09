@@ -38,6 +38,8 @@ CXXToken * cxxParserOpeningBracketIsLambda(void)
 	// [ capture-list ] ( params ) { body }	(3)
 	// [ capture-list ] { body }	(4)
 
+	CXX_DEBUG_ASSERT(cxxParserCurrentLanguageIsCPP(),"C++ only");
+
 	CXXToken * t = g_cxx.pToken->pPrev;
 
 	if(!t)
@@ -90,6 +92,8 @@ CXXToken * cxxParserOpeningBracketIsLambda(void)
 boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 {
 	CXX_DEBUG_ENTER();
+	
+	CXX_DEBUG_ASSERT(cxxParserCurrentLanguageIsCPP(),"C++ only");
 
 	CXXToken * pIdentifier = cxxTokenCreateAnonymousIdentifier(CXXTagKindFUNCTION);
 
@@ -165,7 +169,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 		else
 			pTypeName = NULL;
 
-		if(pCaptureList && cxxTagCPPFieldEnabled(CXXTagCPPFieldLambdaCaptureList))
+		if(pCaptureList && cxxTagFieldEnabled(CXXTagCPPFieldLambdaCaptureList))
 		{
 			CXX_DEBUG_ASSERT(pCaptureList->pChain,"The capture list must be a chain");
 			cxxTokenChainCondense(pCaptureList->pChain,0);
@@ -173,7 +177,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 					cxxTokenChainFirst(pCaptureList->pChain),
 					"Condensation should have created a single token in the chain"
 				);
-			cxxTagSetCPPField(
+			cxxTagSetField(
 					CXXTagCPPFieldLambdaCaptureList,
 					vStringValue(cxxTokenChainFirst(pCaptureList->pChain)->pszWord)
 				);

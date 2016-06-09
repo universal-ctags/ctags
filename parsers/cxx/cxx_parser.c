@@ -254,21 +254,11 @@ void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex)
 
 	char buf[16];
 
-	if(cxxParserCurrentLanguageIsCPP())
-	{
-		if(!cxxTagCPPFieldEnabled(CXXTagCPPFieldEndLine))
-			return;
-
-		sprintf(buf,"%ld",getInputLineNumber());
-		cxxTagSetCorkQueueCPPField(iCorkQueueIndex,CXXTagCPPFieldEndLine,buf);
-		return;
-	}
-
-	if(!cxxTagCFieldEnabled(CXXTagCFieldEndLine))
+	if(!cxxTagFieldEnabled(CXXTagFieldEndLine))
 		return;
 
 	sprintf(buf,"%ld",getInputLineNumber());
-	cxxTagSetCorkQueueCField(iCorkQueueIndex,CXXTagCFieldEndLine,buf);
+	cxxTagSetCorkQueueField(iCorkQueueIndex,CXXTagFieldEndLine,buf);
 }
 
 // Make sure that the token chain contains only the specified keyword and eventually
@@ -840,12 +830,12 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 
 		if(
 			g_cxx.pTemplateTokenChain && (g_cxx.pTemplateTokenChain->iCount > 0) &&
-			cxxTagCPPFieldEnabled(CXXTagCPPFieldTemplate)
+			cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
 		)
 		{
 			cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
 			cxxTokenChainCondense(g_cxx.pTemplateTokenChain,0);
-			cxxTagSetCPPField(
+			cxxTagSetField(
 					CXXTagCPPFieldTemplate,
 					vStringValue(cxxTokenChainFirst(g_cxx.pTemplateTokenChain)->pszWord)
 				);
@@ -1212,8 +1202,8 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 	int role_for_header_system = CR_HEADER_SYSTEM;
 	int role_for_header_local = CR_HEADER_LOCAL;
 	int end_field_type = cxxParserCurrentLanguageIsCPP()?
-		cxxTagGetCPPFieldSpecifiers () [CXXTagCPPFieldEndLine].ftype:
-		cxxTagGetCFieldSpecifiers ()   [CXXTagCFieldEndLine].ftype;
+		cxxTagGetCPPFieldSpecifiers () [CXXTagFieldEndLine].ftype:
+		cxxTagGetCFieldSpecifiers ()   [CXXTagFieldEndLine].ftype;
 
 	Assert(passCount < 3);
 

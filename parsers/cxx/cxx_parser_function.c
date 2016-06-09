@@ -1102,13 +1102,13 @@ int cxxParserEmitFunctionTags(
 		if(
 			g_cxx.pTemplateTokenChain && (g_cxx.pTemplateTokenChain->iCount > 0) &&
 			cxxParserCurrentLanguageIsCPP() &&
-			cxxTagCPPFieldEnabled(CXXTagCPPFieldTemplate)
+			cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
 		)
 		{
 			bIsEmptyTemplate = g_cxx.pTemplateTokenChain->iCount == 2;
 			cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
 			cxxTokenChainCondense(g_cxx.pTemplateTokenChain,0);
-			cxxTagSetCPPField(
+			cxxTagSetField(
 					CXXTagCPPFieldTemplate,
 					vStringValue(cxxTokenChainFirst(g_cxx.pTemplateTokenChain)->pszWord)
 				);
@@ -1116,10 +1116,7 @@ int cxxParserEmitFunctionTags(
 		
 		vString * pszProperties = NULL;
 		
-		if(
-			(cxxParserCurrentLanguageIsCPP() && cxxTagCPPFieldEnabled(CXXTagCPPFieldProperties)) ||
-			(cxxParserCurrentLanguageIsC() && cxxTagCFieldEnabled(CXXTagCFieldProperties))
-		)
+		if(cxxTagFieldEnabled(CXXTagFieldProperties))
 		{
 			unsigned int uProperties = 0;
 	
