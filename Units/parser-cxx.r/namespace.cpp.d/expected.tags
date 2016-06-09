@@ -1,6 +1,6 @@
-__anon396601200108	input.cpp	/^namespace {$/;"	n	file:	end:3
-anon_f	input.cpp	/^	void anon_f() { }$/;"	f	namespace:__anon396601200108	typeref:typename:void	end:2
-__anon396601200108::anon_f	input.cpp	/^	void anon_f() { }$/;"	f	namespace:__anon396601200108	typeref:typename:void
+__anon396601200110	input.cpp	/^namespace {$/;"	n	file:	end:3
+anon_f	input.cpp	/^	void anon_f() { }$/;"	f	namespace:__anon396601200110	typeref:typename:void	end:2
+__anon396601200110::anon_f	input.cpp	/^	void anon_f() { }$/;"	f	namespace:__anon396601200110	typeref:typename:void
 a	input.cpp	/^namespace a {$/;"	n	file:	end:10
 a_f	input.cpp	/^	void a_f() { }$/;"	f	namespace:a	typeref:typename:void	end:6
 a::a_f	input.cpp	/^	void a_f() { }$/;"	f	namespace:a	typeref:typename:void
