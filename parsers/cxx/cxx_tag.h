@@ -47,6 +47,7 @@ enum CXXTagCPPKind
 	CXXTagCPPKindUSING
 };
 
+// The fields common to all (sub)languages this parser supports.
 enum CXXTagCommonField
 {
 	CXXTagFieldEndLine,
@@ -55,6 +56,7 @@ enum CXXTagCommonField
 	CXXTagCommonFieldCount
 };
 
+// The fields specific to the CPP language.
 enum CXXTagCPPField
 {
 	CXXTagCPPFieldTemplate = CXXTagCommonFieldCount,
