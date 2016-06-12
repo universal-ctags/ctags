@@ -18,26 +18,34 @@
 #include "routines.h"
 #include "xtag.h"
 
+#define CXX_COMMON_MACRO_ROLES(__langPrefix)		\
+    static roleDesc __langPrefix##MacroRoles [] = {	\
+	    RoleTemplateUndef,				\
+    }
 
-static roleDesc CMacroRoles [] = {
-	RoleTemplateUndef,
-};
-
-static roleDesc CHeaderRoles [] = {
-	RoleTemplateSystem,
-	RoleTemplateLocal,
-};
+CXX_COMMON_MACRO_ROLES(C);
+CXX_COMMON_MACRO_ROLES(CXX);
 
 
-#define CXX_COMMON_KINDS(_szMemberDescription) \
+#define CXX_COMMON_HEADER_ROLES(__langPrefix)		\
+    static roleDesc __langPrefix##HeaderRoles [] = {	\
+	    RoleTemplateSystem,				\
+	    RoleTemplateLocal,				\
+    }
+
+CXX_COMMON_HEADER_ROLES(C);
+CXX_COMMON_HEADER_ROLES(CXX);
+
+
+#define CXX_COMMON_KINDS(_langPrefix, _szMemberDescription) \
 	{ TRUE,  'd', "macro",      "macro definitions", \
-			.referenceOnly = FALSE, ATTACH_ROLES(CMacroRoles) \
+			.referenceOnly = FALSE, ATTACH_ROLES(_langPrefix##MacroRoles) \
 	}, \
 	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)" }, \
 	{ TRUE,  'f', "function",   "function definitions" }, \
 	{ TRUE,  'g', "enum",       "enumeration names" }, \
 	{ FALSE, 'h', "header",     "included header files", \
-			.referenceOnly = TRUE,  ATTACH_ROLES(CHeaderRoles) \
+			.referenceOnly = TRUE,  ATTACH_ROLES(_langPrefix##HeaderRoles) \
 	}, \
 	{ FALSE, 'l', "local",      "local variables" }, \
 	{ TRUE,  'm', "member",     _szMemberDescription }, \
@@ -51,11 +59,11 @@ static roleDesc CHeaderRoles [] = {
 	{ FALSE, 'L', "label",      "goto labels" }
 
 static kindOption g_aCXXCKinds [] = {
-	CXX_COMMON_KINDS("struct, and union members")
+	CXX_COMMON_KINDS(C,"struct, and union members")
 };
 
 static kindOption g_aCXXCPPKinds [] = {
-	CXX_COMMON_KINDS("class, struct, and union members"),
+	CXX_COMMON_KINDS(CXX,"class, struct, and union members"),
 	{ TRUE,  'c', "class",      "classes" },
 	{ TRUE,  'n', "namespace",  "namespaces" },
 	{ FALSE, 'N', "name",       "names imported via using scope::symbol" },
