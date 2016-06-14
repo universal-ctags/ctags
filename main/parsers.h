@@ -18,6 +18,7 @@
 	GladeParser,  \
 	Maven2Parser, \
 	PlistXMLParser, \
+	RelaxNGParser, \
 	SvgParser, \
 	XsltParser
 #else

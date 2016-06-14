@@ -1,0 +1,40 @@
+firstSentenceTags-element	input.rng	34;"	n
+gjdoc:firstSentenceTags	input.rng	39;"	e	namedPattern:firstSentenceTags-element
+inlineTags-element	input.rng	44;"	n
+gjdoc:inlineTags	input.rng	49;"	e	namedPattern:inlineTags-element
+seeTags-element	input.rng	54;"	n
+gjdoc:seeTags	input.rng	59;"	e	namedPattern:seeTags-element
+tags-element	input.rng	65;"	n
+gjdoc:tags	input.rng	70;"	e	namedPattern:tags-element
+tags-contents	input.rng	75;"	n
+implements-element	input.rng	86;"	n
+gjdoc:implements	input.rng	87;"	e	namedPattern:implements-element
+superimplements-element	input.rng	97;"	n
+gjdoc:superimplements	input.rng	98;"	e	namedPattern:superimplements-element
+typedef-attributes	input.rng	110;"	n
+typename	input.rng	111;"	a	namedPattern:typedef-attributes
+dimension	input.rng	124;"	a	namedPattern:typedef-attributes
+name-attribute	input.rng	135;"	n
+name	input.rng	136;"	a	namedPattern:name-attribute
+qualifiedtypename-attribute	input.rng	146;"	n
+qualifiedtypename	input.rng	147;"	a	namedPattern:qualifiedtypename-attribute
+superclass-element	input.rng	156;"	n
+gjdoc:superclass	input.rng	157;"	e	namedPattern:superclass-element
+tag-element	input.rng	166;"	n
+gjdoc:tag	input.rng	167;"	e	namedPattern:tag-element
+kind	input.rng	169;"	a	element:tag-element.gjdoc:tag
+exception-element	input.rng	178;"	n
+gjdoc:exception	input.rng	179;"	e	namedPattern:exception-element
+TagContent	input.rng	184;"	n
+containingPackage-element	input.rng	212;"	n
+gjdoc:containingPackage	input.rng	213;"	e	namedPattern:containingPackage-element
+name	input.rng	217;"	a	element:containingPackage-element.gjdoc:containingPackage
+tagletText-element	input.rng	223;"	n
+gjdoc:tagletText	input.rng	224;"	e	namedPattern:tagletText-element
+tagName	input.rng	228;"	a	element:tagletText-element.gjdoc:tagletText
+isError-element	input.rng	237;"	n
+gjdoc:isError	input.rng	238;"	e	namedPattern:isError-element
+isException-element	input.rng	246;"	n
+gjdoc:isException	input.rng	247;"	e	namedPattern:isException-element
+isInterface-element	input.rng	255;"	n
+gjdoc:isInterface	input.rng	256;"	e	namedPattern:isInterface-element

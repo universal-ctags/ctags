@@ -49,6 +49,7 @@ The following parsers have been added:
 * Perl6
 * PropertiyList(plist) *libxml*
 * R
+* RelaxNG *libxml*
 * reStructuredText
 * RpmSpec
 * Rust
