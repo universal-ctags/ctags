@@ -19,8 +19,8 @@ If you want to try the latest universal-ctags without building it yourself...
 
 ### Windows
 - Go to https://ci.appveyor.com/project/masatake/ctags
-  - Click the ```compiler=msvc, ARCH=x64``` (or ```compiler=msvc, ARCH=x86```) build.
-  - View the *Artifacts* tab and download ```ctags.exe```.
+  - Click the ```compiler=msvc_msys2, ARCH=x64, ...``` (or ```compiler=msvc_msys2, ARCH=x86, ...```) build.
+  - View the *Artifacts* tab and download ```ctags-XXXXXX-x64.zip``` (or ```ctags-XXXXXX-x86.zip```). (```XXXXXX``` is a version number or a commit ID.)
   - Add the binary folder to your PATH.
 
 ### Mac
