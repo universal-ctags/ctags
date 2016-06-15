@@ -85,7 +85,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 
 	CXXToken * t = cxxTokenChainFirst(pChain);
 
-	enum CXXTagKind eScopeKind = cxxScopeGetKind();
+	enum CXXScopeType eScopeType = cxxScopeGetType();
 
 	CXX_DEBUG_ASSERT(t,"There should be an initial token here");
 
@@ -237,8 +237,8 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 				} else if(
 						cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier) &&
 						(
-							(eScopeKind == CXXTagKindNAMESPACE) ||
-							(eScopeKind == CXXTagKindFUNCTION)
+							(eScopeType == CXXScopeTypeNamespace) ||
+							(eScopeType == CXXScopeTypeFunction)
 						) &&
 						cxxParserCurrentLanguageIsCPP() &&
 						cxxParserTokenChainLooksLikeConstructorParameterSet(t->pChain)
@@ -476,7 +476,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 				CXXToken * pScopeId = cxxTokenChainExtractRange(pScopeStart,pPartEnd->pPrev,0);
 				cxxScopePush(
 						pScopeId,
-						CXXTagKindCLASS,
+						CXXScopeTypeClass,
 						// WARNING: We don't know if it's really a class! (FIXME?)
 						CXXScopeAccessUnknown
 					);
@@ -541,25 +541,22 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 					TRUE :
 					(
 						(
-							(eScopeKind == CXXTagKindNAMESPACE) &&
+							(eScopeType == CXXScopeTypeNamespace) &&
 							(g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic) &&
 							(!isInputHeaderFile())
 						) ||
 						// locals are always hidden
-						(eScopeKind == CXXTagKindFUNCTION) ||
+						(eScopeType == CXXScopeTypeFunction) ||
 						(
-							(eScopeKind != CXXTagKindNAMESPACE) &&
-							(eScopeKind != CXXTagKindFUNCTION) &&
+							(eScopeType != CXXScopeTypeNamespace) &&
+							(eScopeType != CXXScopeTypeFunction) &&
 							(!isInputHeaderFile())
 						)
 					);
 
 			vString * pszProperties = NULL;
 			
-			if(
-				(cxxParserCurrentLanguageIsCPP() && cxxTagCPPFieldEnabled(CXXTagCPPFieldProperties)) ||
-				(cxxParserCurrentLanguageIsC() && cxxTagCFieldEnabled(CXXTagCFieldProperties))
-			)
+			if(cxxTagFieldEnabled(CXXTagFieldProperties))
 			{
 				unsigned int uProperties = 0;
 		

@@ -18,42 +18,55 @@
 #include "routines.h"
 #include "xtag.h"
 
+#define CXX_COMMON_MACRO_ROLES(__langPrefix)		\
+    static roleDesc __langPrefix##MacroRoles [] = {	\
+	    RoleTemplateUndef,				\
+    }
 
-static roleDesc CMacroRoles [] = {
-	RoleTemplateUndef,
+CXX_COMMON_MACRO_ROLES(C);
+CXX_COMMON_MACRO_ROLES(CXX);
+
+
+#define CXX_COMMON_HEADER_ROLES(__langPrefix)		\
+    static roleDesc __langPrefix##HeaderRoles [] = {	\
+	    RoleTemplateSystem,				\
+	    RoleTemplateLocal,				\
+    }
+
+CXX_COMMON_HEADER_ROLES(C);
+CXX_COMMON_HEADER_ROLES(CXX);
+
+
+#define CXX_COMMON_KINDS(_langPrefix, _szMemberDescription) \
+	{ TRUE,  'd', "macro",      "macro definitions", \
+			.referenceOnly = FALSE, ATTACH_ROLES(_langPrefix##MacroRoles) \
+	}, \
+	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)" }, \
+	{ TRUE,  'f', "function",   "function definitions" }, \
+	{ TRUE,  'g', "enum",       "enumeration names" }, \
+	{ FALSE, 'h', "header",     "included header files", \
+			.referenceOnly = TRUE,  ATTACH_ROLES(_langPrefix##HeaderRoles) \
+	}, \
+	{ FALSE, 'l', "local",      "local variables" }, \
+	{ TRUE,  'm', "member",     _szMemberDescription }, \
+	{ FALSE, 'p', "prototype",  "function prototypes" }, \
+	{ TRUE,  's', "struct",     "structure names" }, \
+	{ TRUE,  't', "typedef",    "typedefs" }, \
+	{ TRUE,  'u', "union",      "union names" }, \
+	{ TRUE,  'v', "variable",   "variable definitions" }, \
+	{ FALSE, 'x', "externvar",  "external and forward variable declarations" }, \
+	{ FALSE, 'z', "parameter",  "function parameters inside function definitions" }, \
+	{ FALSE, 'L', "label",      "goto labels" }
+
+static kindOption g_aCXXCKinds [] = {
+	CXX_COMMON_KINDS(C,"struct, and union members")
 };
 
-static roleDesc CHeaderRoles [] = {
-	RoleTemplateSystem,
-	RoleTemplateLocal,
-};
-
-static kindOption g_aCXXKinds [] = {
+static kindOption g_aCXXCPPKinds [] = {
+	CXX_COMMON_KINDS(CXX,"class, struct, and union members"),
 	{ TRUE,  'c', "class",      "classes" },
-	{ TRUE,  'd', "macro",      "macro definitions",
-			.referenceOnly = FALSE, ATTACH_ROLES(CMacroRoles)
-	},
-	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)" },
-	{ TRUE,  'f', "function",   "function definitions" },
-	{ TRUE,  'g', "enum",       "enumeration names" },
-	{ FALSE, 'h', "header",     "included header files",
-			.referenceOnly = TRUE,  ATTACH_ROLES(CHeaderRoles)
-	},
-	{ FALSE, 'l', "local",      "local variables" },
-	{ TRUE,  'm', "member",     "class, struct, and union members" },
 	{ TRUE,  'n', "namespace",  "namespaces" },
-	{ FALSE, 'p', "prototype",  "function prototypes" },
-	{ TRUE,  's', "struct",     "structure names" },
-	{ TRUE,  't', "typedef",    "typedefs" },
-	{ TRUE,  'u', "union",      "union names" },
-	{ TRUE,  'v', "variable",   "variable definitions" },
-	{ FALSE, 'x', "externvar",  "external and forward variable declarations" },
-	{ FALSE, 'z', "parameter",  "function parameters inside function definitions" },
-	{ FALSE, 'L', "label",      "goto labels" },
-	// FIXME: not sure about referenceOnly: if this is referenceOnly then
-	// so is externvar and probably also prototype.
-	{ FALSE, 'N', "name",       "names imported via using scope::symbol"
-			/*, .referenceOnly = TRUE*/ },
+	{ FALSE, 'N', "name",       "names imported via using scope::symbol" },
 	{ FALSE, 'U', "using",      "using namespace statements",
 			.referenceOnly = TRUE },
 };
@@ -65,61 +78,84 @@ static const char * g_aCXXAccessStrings [] = {
 	"protected",
 };
 
+#define CXX_COMMON_FIELDS \
+	{ \
+		.name = "end", \
+		.description = "end lines of various constructs", \
+		.enabled = FALSE \
+	}, \
+	{ \
+		.name = "properties", \
+		.description = "properties (static, inline, mutable,...)", \
+		.enabled = FALSE \
+	}
+
+static fieldSpec g_aCXXCFields [] = {
+	CXX_COMMON_FIELDS
+};
+
 static fieldSpec g_aCXXCPPFields [] = {
+	CXX_COMMON_FIELDS,
 	{
-		//.letter = 'e'
-		.name = "end",
-		.description = "end lines of various constructs",
-		.enabled = FALSE
-	},
-	{
-		//.letter = 'T', ?
 		.name = "template",
 		.description = "template parameters",
 		.enabled = FALSE,
 	},
 	{
-		//.letter = 'L', ?
 		.name = "captures",
 		.description = "lambda capture list",
 		.enabled = FALSE
-	},
-	{
-		//.letter = 'P', ?
-		.name = "properties",
-		.description = "properties (static, virtual, inline, mutable,...)",
-		.enabled = FALSE
 	}
 };
 
-static fieldSpec g_aCXXCFields [] = {
+void cxxTagInitForLanguage(langType eLanguage)
+{
+	g_cxx.eLanguage = eLanguage;
+
+	if(g_cxx.eLanguage == g_cxx.eCLanguage)
 	{
-		//.letter = 'e'
-		.name = "end",
-		.description = "end lines of various constructs",
-		.enabled = FALSE
-	},
+		g_cxx.pKindOptions = g_aCXXCKinds;
+		g_cxx.uKindOptionCount = sizeof(g_aCXXCKinds) / sizeof(kindOption);
+		g_cxx.pFieldOptions = g_aCXXCFields;
+		g_cxx.uFieldOptionCount = sizeof(g_aCXXCFields) / sizeof(fieldSpec);
+	} else if(g_cxx.eLanguage == g_cxx.eCPPLanguage)
 	{
-		//.letter = 'P', ?
-		.name = "properties",
-		.description = "properties (static, inline, mutable,...)",
-		.enabled = FALSE
+		g_cxx.pKindOptions = g_aCXXCPPKinds;
+		g_cxx.uKindOptionCount = sizeof(g_aCXXCPPKinds) / sizeof(kindOption);
+		g_cxx.pFieldOptions = g_aCXXCPPFields;
+		g_cxx.uFieldOptionCount = sizeof(g_aCXXCPPFields) / sizeof(fieldSpec);
+	} else {
+		CXX_DEBUG_ASSERT(FALSE,"Invalid language passed to cxxTagInitForLanguage()");
 	}
-};
-
-kindOption * cxxTagGetKindOptions(void)
-{
-	return g_aCXXKinds;
 }
 
-int cxxTagGetKindOptionCount(void)
+kindOption * cxxTagGetCKindOptions(void)
 {
-	return sizeof(g_aCXXKinds) / sizeof(kindOption);
+	return g_aCXXCKinds;
 }
 
-boolean cxxTagKindEnabled(enum CXXTagKind eKindId)
+int cxxTagGetCKindOptionCount(void)
 {
-	return g_aCXXKinds[eKindId].enabled;
+	return sizeof(g_aCXXCKinds) / sizeof(kindOption);
+}
+
+kindOption * cxxTagGetCPPKindOptions(void)
+{
+	return g_aCXXCPPKinds;
+}
+
+int cxxTagGetCPPKindOptionCount(void)
+{
+	return sizeof(g_aCXXCPPKinds) / sizeof(kindOption);
+}
+
+boolean cxxTagKindEnabled(unsigned int uKind)
+{
+	CXX_DEBUG_ASSERT(
+			uKind < g_cxx.uKindOptionCount,
+			"The kind must be associated to the current language!"
+		);
+	return g_cxx.pKindOptions[uKind].enabled;
 }
 
 fieldSpec * cxxTagGetCPPFieldSpecifiers(void)
@@ -132,12 +168,6 @@ int cxxTagGetCPPFieldSpecifierCount(void)
 	return sizeof(g_aCXXCPPFields) / sizeof(fieldSpec);
 }
 
-int cxxTagCPPFieldEnabled(CXXTagCPPField eField)
-{
-	return g_aCXXCPPFields[eField].enabled;
-}
-
-
 fieldSpec * cxxTagGetCFieldSpecifiers(void)
 {
 	return g_aCXXCFields;
@@ -148,27 +178,33 @@ int cxxTagGetCFieldSpecifierCount(void)
 	return sizeof(g_aCXXCFields) / sizeof(fieldSpec);
 }
 
-int cxxTagCFieldEnabled(CXXTagCField eField)
+boolean cxxTagFieldEnabled(unsigned int uField)
 {
-	return g_aCXXCFields[eField].enabled;
+	CXX_DEBUG_ASSERT(
+			uField < g_cxx.uFieldOptionCount,
+			"The field must be associated to the current language!"
+		);
+	return g_cxx.pFieldOptions[uField].enabled;
 }
 
 
 static tagEntryInfo g_oCXXTag;
 
 
-tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
+tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 {
-	if(!g_aCXXKinds[eKindId].enabled)
+	kindOption * pKindOptions = g_cxx.pKindOptions;
+
+	if(!pKindOptions[uKind].enabled)
 	{
-		//CXX_DEBUG_PRINT("Tag kind %s is not enabled",g_aCXXKinds[eKindId].name);
+		//CXX_DEBUG_PRINT("Tag kind %s is not enabled",g_aCXXKinds[eKind].name);
 		return NULL;
 	}
 
 	initTagEntry(
 			&g_oCXXTag,
 			vStringValue(pToken->pszWord),
-			&(g_aCXXKinds[eKindId])
+			pKindOptions + uKind
 		);
 
 	g_oCXXTag.lineNumber = pToken->iLineNumber;
@@ -177,7 +213,7 @@ tagEntryInfo * cxxTagBegin(enum CXXTagKind eKindId,CXXToken * pToken)
 
 	if(!cxxScopeIsGlobal())
 	{
-		g_oCXXTag.extensionFields.scopeKind = &g_aCXXKinds[cxxScopeGetKind()];
+		g_oCXXTag.extensionFields.scopeKind = &(g_cxx.pKindOptions[cxxScopeGetKind()]);
 		g_oCXXTag.extensionFields.scopeName = cxxScopeGetFullName();
 	}
 
@@ -192,14 +228,8 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 	if(uProperties == 0)
 		return NULL;
 	
-	if(cxxParserCurrentLanguageIsCPP())
-	{
-		if(!cxxTagCPPFieldEnabled(CXXTagCPPFieldProperties))
+	if(!cxxTagFieldEnabled(CXXTagFieldProperties))
 			return NULL;
-	} else {
-		if(!cxxTagCFieldEnabled(CXXTagCFieldProperties))
-			return NULL;
-	}
 
 	vString * pszProperties = vStringNew();
 
@@ -245,10 +275,7 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 	if(uProperties & CXXTagPropertyVolatile)
 		ADD_PROPERTY("volatile");
 
-	if(cxxParserCurrentLanguageIsCPP())
-		cxxTagSetCPPField(CXXTagCPPFieldProperties,vStringValue(pszProperties));
-	else
-		cxxTagSetCField(CXXTagCFieldProperties,vStringValue(pszProperties));
+	cxxTagSetField(CXXTagFieldProperties,vStringValue(pszProperties));
 
 	return pszProperties;
 }
@@ -297,54 +324,46 @@ CXXToken * cxxTagSetTypeField(
 	return pTypeName;
 }
 
-void cxxTagSetCPPField(CXXTagCPPField eField,const char * szValue)
+void cxxTagSetField(unsigned int uField,const char * szValue)
 {
-	if(!g_aCXXCPPFields[eField].enabled)
+	CXX_DEBUG_ASSERT(
+			uField < g_cxx.uFieldOptionCount,
+			"The field must be associated to the current language!"
+		);
+
+	if(!g_cxx.pFieldOptions[uField].enabled)
 		return;
 	
-	attachParserField(&g_oCXXTag,g_aCXXCPPFields[eField].ftype,szValue);
+	attachParserField(&g_oCXXTag,g_cxx.pFieldOptions[uField].ftype,szValue);
 }
 
-void cxxTagSetCorkQueueCPPField(
+void cxxTagSetCorkQueueField(
 		int iIndex,
-		CXXTagCPPField eField,
+		unsigned int uField,
 		const char * szValue
 	)
 {
-	CXX_DEBUG_ASSERT(g_aCXXCPPFields[eField].enabled,"The field must be enabled!");
+	CXX_DEBUG_ASSERT(
+			uField < g_cxx.uFieldOptionCount,
+			"The field must be associated to the current language!"
+		);
 
-	attachParserFieldToCorkEntry(iIndex,g_aCXXCPPFields[eField].ftype,szValue);
-}
+	CXX_DEBUG_ASSERT(g_cxx.pFieldOptions[uField].enabled,"The field must be enabled!");
 
-void cxxTagSetCField(CXXTagCField eField,const char * szValue)
-{
-	if(!g_aCXXCFields[eField].enabled)
-		return;
-	
-	attachParserField(&g_oCXXTag,g_aCXXCFields[eField].ftype,szValue);
-}
-
-void cxxTagSetCorkQueueCField(
-		int iIndex,
-		CXXTagCField eField,
-		const char * szValue
-	)
-{
-	CXX_DEBUG_ASSERT(g_aCXXCFields[eField].enabled,"The field must be enabled!");
-
-	attachParserFieldToCorkEntry(iIndex,g_aCXXCFields[eField].ftype,szValue);
+	attachParserFieldToCorkEntry(iIndex,g_cxx.pFieldOptions[uField].ftype,szValue);
 }
 
 int cxxTagCommit(void)
 {
 	if(g_oCXXTag.isFileScope)
 	{
-		if (isXtagEnabled(XTAG_FILE_SCOPE))
-			markTagExtraBit (&g_oCXXTag, XTAG_FILE_SCOPE);
-		else
-			return CORK_NIL; // FIXME: why the "invalid" cork queue index is CORK_NIL?
+		if(!isXtagEnabled(XTAG_FILE_SCOPE))
+			return CORK_NIL;
+
+		markTagExtraBit(&g_oCXXTag,XTAG_FILE_SCOPE);
 	}
 
+#ifdef CXX_DO_DEBUGGING
 	CXX_DEBUG_PRINT(
 			"Emitting tag for symbol '%s', kind '%s', line %d",
 			g_oCXXTag.name,
@@ -360,14 +379,15 @@ int cxxTagCommit(void)
 				g_oCXXTag.extensionFields.typeRef[0],
 				g_oCXXTag.extensionFields.typeRef[1]
 			);
+#endif
 
 	int iCorkQueueIndex = makeTagEntry(&g_oCXXTag);
 
 	// Handle --extra=+q
 	if(!isXtagEnabled(XTAG_QUALIFIED_TAGS))
 		return iCorkQueueIndex;
-	else
-		markTagExtraBit (&g_oCXXTag, XTAG_QUALIFIED_TAGS);
+
+	markTagExtraBit(&g_oCXXTag,XTAG_QUALIFIED_TAGS);
 
 	if(!g_oCXXTag.extensionFields.scopeName)
 		return iCorkQueueIndex;
@@ -375,9 +395,9 @@ int cxxTagCommit(void)
 	// WARNING: The following code assumes that the scope
 	// didn't change between cxxTagBegin() and cxxTagCommit().
 
-	enum CXXTagKind eScopeKind = cxxScopeGetKind();
+	enum CXXScopeType eScopeType = cxxScopeGetType();
 
-	if(eScopeKind == CXXTagKindFUNCTION)
+	if(eScopeType == CXXScopeTypeFunction)
 	{
 		// old ctags didn't do this, and --extra=+q is mainly
 		// for backward compatibility so...
@@ -388,7 +408,7 @@ int cxxTagCommit(void)
 
 	vString * x;
 
-	if(eScopeKind == CXXTagKindENUM)
+	if(eScopeType == CXXScopeTypeEnum)
 	{
 		// If the scope kind is enumeration then we need to remove the
 		// last scope part. This is what old ctags did.
@@ -420,8 +440,8 @@ int cxxTagCommit(void)
 	return iCorkQueueIndex;
 }
 
-void cxxTag(enum CXXTagKind eKindId,CXXToken * pToken)
+void cxxTag(unsigned int uKind,CXXToken * pToken)
 {
-	if(cxxTagBegin(eKindId,pToken) != NULL)
+	if(cxxTagBegin(uKind,pToken) != NULL)
 		cxxTagCommit();
 }

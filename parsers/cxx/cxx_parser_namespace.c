@@ -27,6 +27,8 @@
 boolean cxxParserParseNamespace(void)
 {
 	CXX_DEBUG_ENTER();
+	
+	CXX_DEBUG_ASSERT(cxxParserCurrentLanguageIsCPP(),"This should be called only in C++");
 
 	// FIXME: Do it better...
 
@@ -67,7 +69,7 @@ boolean cxxParserParseNamespace(void)
 		{
 			case CXXTokenTypeIdentifier:
 				CXX_DEBUG_PRINT("Got identifier %s",g_cxx.pToken->pszWord->buffer);
-				tagEntryInfo * tag = cxxTagBegin(CXXTagKindNAMESPACE,g_cxx.pToken);
+				tagEntryInfo * tag = cxxTagBegin(CXXTagCPPKindNAMESPACE,g_cxx.pToken);
 				if(tag)
 				{
 					// This is highly questionable but well.. it's how old ctags did, so we do.
@@ -76,7 +78,7 @@ boolean cxxParserParseNamespace(void)
 				}
 				cxxScopePush(
 						cxxTokenChainTakeLast(g_cxx.pTokenChain),
-						CXXTagKindNAMESPACE,
+						CXXScopeTypeNamespace,
 						CXXScopeAccessUnknown
 					);
 				iScopeCount++;
@@ -106,14 +108,14 @@ boolean cxxParserParseNamespace(void)
 				if(iScopeCount == 0)
 				{
 					// anonymous namespace!
-					CXXToken * t = cxxTokenCreateAnonymousIdentifier(CXXTagKindNAMESPACE);
-					tagEntryInfo * tag = cxxTagBegin(CXXTagKindNAMESPACE,t);
+					CXXToken * t = cxxTokenCreateAnonymousIdentifier(CXXTagCPPKindNAMESPACE);
+					tagEntryInfo * tag = cxxTagBegin(CXXTagCPPKindNAMESPACE,t);
 					if(tag)
 					{
 						tag->isFileScope = !isInputHeaderFile();
 						iCorkQueueIndex = cxxTagCommit();
 					}
-					cxxScopePush(t,CXXTagKindNAMESPACE,CXXScopeAccessUnknown);
+					cxxScopePush(t,CXXScopeTypeNamespace,CXXScopeAccessUnknown);
 					iScopeCount++;
 				}
 

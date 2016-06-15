@@ -125,11 +125,11 @@ CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,enum CXXKe
 }
 
 
-CXXToken * cxxTokenCreateAnonymousIdentifier(enum CXXTagKind k)
+CXXToken * cxxTokenCreateAnonymousIdentifier(unsigned int uTagKind)
 {
 	CXXToken * t = cxxTokenCreate();
 
-	anonGenerate (t->pszWord, "__anon", k);
+	anonGenerate (t->pszWord, "__anon", uTagKind);
 	t->bFollowedBySpace = TRUE;
 	t->iLineNumber = getInputLineNumber();
 	t->oFilePosition = getInputFilePosition();

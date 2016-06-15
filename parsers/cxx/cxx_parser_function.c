@@ -307,7 +307,7 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 			vStringValue(pIdentifier->pszWord)
 		);
 
-	cxxScopePush(pIdentifier,CXXTagKindFUNCTION,CXXScopeAccessUnknown);
+	cxxScopePush(pIdentifier,CXXScopeTypeFunction,CXXScopeAccessUnknown);
 
 	// emit parameters
 	if(cxxTagKindEnabled(CXXTagKindPARAMETER))
@@ -985,7 +985,7 @@ next_token:
 //
 int cxxParserEmitFunctionTags(
 		CXXFunctionSignatureInfo * pInfo,
-		enum CXXTagKind eTagKind,
+		unsigned int uTagKind,
 		unsigned int uOptions,
 		int * piCorkQueueIndex
 	)
@@ -997,7 +997,7 @@ int cxxParserEmitFunctionTags(
 	if(piCorkQueueIndex)
 		*piCorkQueueIndex = CORK_NIL;
 
-	enum CXXTagKind eOuterScopeKind = cxxScopeGetKind();
+	enum CXXScopeType eOuterScopeType = cxxScopeGetType();
 
 	boolean bPushScopes = uOptions & CXXEmitFunctionTagsPushScopes;
 
@@ -1024,7 +1024,7 @@ int cxxParserEmitFunctionTags(
 
 			cxxScopePush(
 					pScopeId,
-					CXXTagKindCLASS,
+					CXXScopeTypeClass,
 					// WARNING: We don't know if it's really a class! (FIXME?)
 					CXXScopeAccessUnknown
 				);
@@ -1049,7 +1049,7 @@ int cxxParserEmitFunctionTags(
 
 	CXX_DEBUG_PRINT("Identifier is '%s'",vStringValue(pIdentifier->pszWord));
 
-	tagEntryInfo * tag = cxxTagBegin(eTagKind,pIdentifier);
+	tagEntryInfo * tag = cxxTagBegin(uTagKind,pIdentifier);
 
 	if(tag)
 	{
@@ -1061,12 +1061,12 @@ int cxxParserEmitFunctionTags(
 			pInfo->pParenthesis->pChain->pTail->bFollowedBySpace = FALSE;
 		}
 
-		if(eTagKind == CXXTagKindPROTOTYPE)
+		if(uTagKind == CXXTagKindPROTOTYPE)
 		{
 			tag->isFileScope = !isInputHeaderFile();
 		} else {
 			// function definitions
-			if(eOuterScopeKind == CXXTagKindNAMESPACE)
+			if(eOuterScopeType == CXXScopeTypeNamespace)
 			{
 				// in a namespace only static stuff declared in cpp files is file scoped
 				tag->isFileScope = (
@@ -1102,13 +1102,13 @@ int cxxParserEmitFunctionTags(
 		if(
 			g_cxx.pTemplateTokenChain && (g_cxx.pTemplateTokenChain->iCount > 0) &&
 			cxxParserCurrentLanguageIsCPP() &&
-			cxxTagCPPFieldEnabled(CXXTagCPPFieldTemplate)
+			cxxTagFieldEnabled(CXXTagCPPFieldTemplate)
 		)
 		{
 			bIsEmptyTemplate = g_cxx.pTemplateTokenChain->iCount == 2;
 			cxxTokenChainNormalizeTypeNameSpacing(g_cxx.pTemplateTokenChain);
 			cxxTokenChainCondense(g_cxx.pTemplateTokenChain,0);
-			cxxTagSetCPPField(
+			cxxTagSetField(
 					CXXTagCPPFieldTemplate,
 					vStringValue(cxxTokenChainFirst(g_cxx.pTemplateTokenChain)->pszWord)
 				);
@@ -1116,10 +1116,7 @@ int cxxParserEmitFunctionTags(
 		
 		vString * pszProperties = NULL;
 		
-		if(
-			(cxxParserCurrentLanguageIsCPP() && cxxTagCPPFieldEnabled(CXXTagCPPFieldProperties)) ||
-			(cxxParserCurrentLanguageIsC() && cxxTagCFieldEnabled(CXXTagCFieldProperties))
-		)
+		if(cxxTagFieldEnabled(CXXTagFieldProperties))
 		{
 			unsigned int uProperties = 0;
 	
@@ -1174,7 +1171,7 @@ int cxxParserEmitFunctionTags(
 
 
 #ifdef CXX_DO_DEBUGGING
-	if(eTagKind == CXXTagKindFUNCTION)
+	if(uTagKind == CXXTagKindFUNCTION)
 		CXX_DEBUG_PRINT("Emitted function '%s'",vStringValue(pIdentifier->pszWord));
 	else
 		CXX_DEBUG_PRINT("Emitted prototype '%s'",vStringValue(pIdentifier->pszWord));
@@ -1182,7 +1179,7 @@ int cxxParserEmitFunctionTags(
 
 	if(bPushScopes)
 	{
-		cxxScopePush(pIdentifier,CXXTagKindFUNCTION,CXXScopeAccessUnknown);
+		cxxScopePush(pIdentifier,CXXScopeTypeFunction,CXXScopeAccessUnknown);
 		iScopesPushed++;
 	} else {
 		cxxTokenDestroy(pIdentifier);

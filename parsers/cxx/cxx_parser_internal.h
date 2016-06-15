@@ -150,7 +150,7 @@ enum CXXEmitFunctionTagsOptions
 
 int cxxParserEmitFunctionTags(
 		CXXFunctionSignatureInfo * pInfo,
-		enum CXXTagKind eTagKind,
+		unsigned int uTagKind,
 		unsigned int uOptions,
 		int * piCorkQueueIndex
 	);
@@ -171,7 +171,8 @@ boolean cxxParserParseNamespace(void);
 boolean cxxParserParseEnum(void);
 boolean cxxParserParseClassStructOrUnion(
 		enum CXXKeyword eKeyword,
-		enum CXXTagKind eTagKind
+		unsigned int uTagKind,
+		unsigned int uScopeType
 	);
 boolean cxxParserParseAndCondenseCurrentSubchain(
 		unsigned int uInitialSubchainMarkerTypes,
@@ -228,6 +229,16 @@ typedef struct _CXXParserState
 	langType eCPPLanguage;
 	// The identifier of the C language, as indicated by ctags core
 	langType eCLanguage;
+	
+	// The kind options associated to the current language
+	kindOption * pKindOptions;
+	// The number of kind options, used mainly for checking/debug purposes
+	unsigned int uKindOptionCount;
+	
+	// The fields associated to the current language
+	fieldSpec * pFieldOptions;
+	// The number of field options, used mainly for checking/debug purposes
+	unsigned int uFieldOptionCount;
 
 	// The current token chain
 	CXXTokenChain * pTokenChain;

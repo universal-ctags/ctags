@@ -12,7 +12,6 @@
 #include "general.h"
 
 #include "cxx_token.h"
-#include "cxx_tag.h"
 
 enum CXXScopeAccess
 {
@@ -20,6 +19,16 @@ enum CXXScopeAccess
 	CXXScopeAccessPublic,
 	CXXScopeAccessPrivate,
 	CXXScopeAccessProtected
+};
+
+enum CXXScopeType
+{
+	CXXScopeTypeFunction,
+	CXXScopeTypeNamespace,
+	CXXScopeTypeClass,
+	CXXScopeTypeEnum,
+	CXXScopeTypeUnion,
+	CXXScopeTypeStruct
 };
 
 void cxxScopeInit(void);
@@ -47,9 +56,10 @@ vString * cxxScopeGetFullNameAsString(void);
 // are less than two components. Ownership of the string is transferred.
 vString * cxxScopeGetFullNameExceptLastComponentAsString(void);
 
+enum CXXScopeType cxxScopeGetType(void);
 // Returns the current scope kind
-enum CXXTagKind cxxScopeGetKind(void);
-enum CXXTagKind cxxScopeGetVariableKind(void);
+unsigned int cxxScopeGetKind(void);
+unsigned int cxxScopeGetVariableKind(void);
 enum CXXScopeAccess cxxScopeGetAccess(void);
 // Are we in global scope?
 boolean cxxScopeIsGlobal(void);
@@ -57,7 +67,7 @@ boolean cxxScopeIsGlobal(void);
 // Add a token to the scope chain. The token ownership is transferred.
 void cxxScopePush(
 		CXXToken * t,
-		enum CXXTagKind eScopeKind,
+		enum CXXScopeType eScopeType,
 		enum CXXScopeAccess eInitialAccess
 	);
 void cxxScopeSetAccess(enum CXXScopeAccess eAccess);
