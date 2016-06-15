@@ -305,7 +305,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of extra tag flags."},
  {1,"  --list-features"},
  {1,"       Output list of features."},
- {1,"  --list-fields"},
+ {1,"  --list-fields=[language|all]"},
  {1,"       Output list of fields. This works with --machinable."},
  {1,"  --list-file-kind"},
  {1,"       List kind letter for file."},
@@ -1341,12 +1341,28 @@ static void processListFeaturesOption(const char *const option __unused__,
 }
 
 static void processListFieldsOption(const char *const option __unused__,
-				    const char *const parameter __unused__)
+				    const char *const parameter)
 {
 	unsigned int i;
-	for (i = 0; i < countParsers(); i++)
-		initializeParser (i);
-	printFields ();
+
+	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	{
+		for (i = 0; i < countParsers(); i++)
+			initializeParser (i);
+		printFields (LANG_AUTO);
+	}
+	else
+	{
+		langType language = getNamedLanguage (parameter, 0);
+		if (language == LANG_IGNORE)
+			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
+		else
+		{
+			initializeParser (language);
+			printFields (language);
+		}
+
+	}
 	exit (0);
 }
 

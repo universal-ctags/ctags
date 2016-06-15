@@ -366,7 +366,7 @@ static void printField (fieldType i)
 	       fieldDescs[i].spec->description? fieldDescs[i].spec->description: "NONE");
 }
 
-extern void printFields (void)
+extern void printFields (int language)
 {
 	unsigned int i;
 
@@ -375,7 +375,10 @@ extern void printFields (void)
 			"#LETTER", "NAME", "ENABLED", "LANGUAGE", "XFMTCHAR", "DESCRIPTION");
 
 	for (i = 0; i < fieldDescUsed; i++)
-		printField (i);
+	{
+		if (language == LANG_AUTO || getFieldOwner (i) == language)
+			printField (i);
+	}
 }
 
 static const char *renderAsIs (vString* b __unused__, const char *s)

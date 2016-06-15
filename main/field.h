@@ -80,7 +80,7 @@ extern boolean enableField (fieldType type, boolean state, boolean warnIfFixedFi
 extern boolean isCommonField (fieldType type);
 extern int     getFieldOwner (fieldType type);
 extern const char* getFieldName (fieldType type);
-extern void printFields (void);
+extern void printFields (int language);
 
 extern boolean isFieldRenderable (fieldType type);
 

@@ -695,9 +695,18 @@ e.g. `reStructuredText` is the owner of `sectionMarker` field. Like
 `end` field owned by `C` and `C++`, more than one parsers have a field
 with the same name.
 
-A parser one field has only long name, no letter. For enabling and disabling
-such field, the long name must be passed to ``--fields`` option. e.g. for
-turning on `sectionMarker` field of `reStructuredText` parser, use following
+``--list-fields`` takes one optional option argument, `LANGUAGE`. If it is given,
+``--list-fields`` prints only about it:
+
+.. code-block:: console
+
+	$ ./ctags --list-fields=Maven2
+	#LETTER NAME            ENABLED LANGUAGE        XFMTCHAR DESCRIPTION
+	-       version         off     Maven2          TRUE     version of artifact
+
+A parser own field has only a long name, no letter. For enabling and disabling
+such field, the long name must be passed to ``--fields-<LANG>`` option. e.g. for
+enabling `sectionMarker` field owned by `reStructuredText` parser, use following
 command line:
 
 .. code-block:: console
