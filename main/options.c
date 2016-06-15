@@ -2331,7 +2331,7 @@ static parametricOption ParametricOptions [] = {
 	{ "list-fields",            processListFieldsOption,        TRUE,   STAGE_ANY },
 	{ "list-file-kind",         processListFileKindOption,      TRUE,   STAGE_ANY },
 	{ "list-kinds",             processListKindsOption,         TRUE,   STAGE_ANY },
-	{ "list-kinds-full",       processListKindsOption,         TRUE,   STAGE_ANY },
+	{ "list-kinds-full",        processListKindsOption,         TRUE,   STAGE_ANY },
 	{ "list-languages",         processListLanguagesOption,     TRUE,   STAGE_ANY },
 	{ "list-maps",              processListMapsOption,          TRUE,   STAGE_ANY },
 	{ "list-patterns",          processListPatternsOption,      TRUE,   STAGE_ANY },
