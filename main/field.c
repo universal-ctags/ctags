@@ -718,6 +718,11 @@ extern boolean isFieldOwnedByParser (fieldType type)
 	return (FIELD_BUILTIN_LAST < type)? TRUE: FALSE;
 }
 
+extern int     getFieldOwner (fieldType type)
+{
+	return getFieldDesc(type)->language;
+}
+
 extern boolean isFieldRenderable (fieldType type)
 {
 	return getFieldDesc(type)->spec->renderEscaped? TRUE: FALSE;

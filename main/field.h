@@ -79,6 +79,7 @@ extern boolean isFieldEnabled (fieldType type);
 extern boolean enableField (fieldType type, boolean state);
 extern boolean isFieldFixed (fieldType type);
 extern boolean isFieldOwnedByParser (fieldType type);
+extern int     getFieldOwner (fieldType type);
 extern const char* getFieldName (fieldType type);
 extern void printFields (void);
 
