@@ -241,6 +241,10 @@ extern void printLanguageAliases (const langType language);
 extern void printLanguageList (void);
 extern boolean doesParserRequireMemoryStream (const langType language);
 extern boolean parseFile (const char *const fileName);
+extern boolean runParserInNarrowedInputStream (const langType language,
+					       unsigned long startLine, int startCharOffset,
+					       unsigned long endLine, int endCharOffset,
+					       unsigned long sourceLineOffset);
 
 #ifdef HAVE_ICONV
 extern void freeEncodingResources (void);

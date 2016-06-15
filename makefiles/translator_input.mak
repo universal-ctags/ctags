@@ -4,5 +4,6 @@ TRANSLATOR_INPUT = \
 	optlib/gdbinit.ctags			\
 	optlib/man.ctags			\
 	optlib/m4.ctags				\
+	optlib/pod.ctags			\
 	\
 	$(NULL)

@@ -18,6 +18,7 @@
 
 #include "entry.h"
 #include "options.h"
+#include "promise.h"
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"
@@ -273,6 +274,7 @@ static void findPerlTags (void)
 	vString *package = NULL;
 	boolean skipPodDoc = FALSE;
 	const unsigned char *line;
+	unsigned long podStart = 0UL;
 
 	/* Core modules AutoLoader and SelfLoader support delayed compilation
 	 * by allowing Perl code that follows __END__ and __DATA__ tokens,
@@ -297,12 +299,24 @@ static void findPerlTags (void)
 		if (skipPodDoc)
 		{
 			if (strncmp ((const char*) line, "=cut", (size_t) 4) == 0)
+			{
 				skipPodDoc = FALSE;
+				if (podStart != 0UL)
+				{
+					makePromise ("Pod",
+						     podStart, 0,
+						     getInputLineNumber(), 0,
+						     getSourceLineNumber());
+					podStart = 0UL;
+				}
+			}
 			continue;
 		}
 		else if (line [0] == '=')
 		{
 			skipPodDoc = isPodWord ((const char*)line + 1);
+			if (skipPodDoc)
+				podStart = getSourceLineNumber ();
 			continue;
 		}
 		else if (strcmp ((const char*) line, "__DATA__") == 0)

@@ -35,14 +35,149 @@
 #include <regex.h>
 
 /*
+*   DATA DECLARATIONS
+*/
+
+/*  Maintains the state of the current input file.
+ */
+typedef struct sInputFileInfo {
+	vString *name;           /* name to report for input file */
+	vString *tagPath;        /* path of input file relative to tag file */
+	unsigned long lineNumber;/* line number in the input file */
+	unsigned long lineNumberOrigin; /* The value set to `lineNumber'
+					   when `resetInputFile' is called
+					   on the input stream.
+					   This is needed for nested stream. */
+	boolean  isHeader;       /* is input file a header file? */
+	langType language;       /* language of input file */
+} inputFileInfo;
+
+typedef struct sInputLineFposMap {
+	MIOPos *pos;
+	unsigned int count;
+	unsigned int size;
+} inputLineFposMap;
+
+typedef struct sInputFile {
+	vString    *path;          /* path of input file (if any) */
+	vString    *line;          /* last line read from file */
+	const unsigned char* currentLine;  /* current line being worked on */
+	MIO        *fp;            /* stream used for reading the file */
+	MIOPos      filePosition;  /* file position of current line */
+	unsigned int ungetchIdx;
+	int         ungetchBuf[3]; /* characters that were ungotten */
+	boolean     eof;           /* have we reached the end of file? */
+	boolean     newLine;       /* will the next character begin a new line? */
+
+	/*  Contains data pertaining to the original `source' file in which the tag
+	 *  was defined. This may be different from the `input' file when #line
+	 *  directives are processed (i.e. the input file is preprocessor output).
+	 */
+	inputFileInfo input; /* name, lineNumber */
+	inputFileInfo source;
+
+	/* sourceTagPathHolder is a kind of trash box.
+	   The buffer pointed by tagPath field of source field can
+	   be referred from tagsEntryInfo instances. sourceTagPathHolder
+	   is used keeping the buffer till all processing about the current
+	   input file is done. After all processing is done, the buffers
+	   in sourceTagPathHolder are destroied. */
+	stringList  * sourceTagPathHolder;
+	inputLineFposMap lineFposMap;
+} inputFile;
+
+
+/*
 *   DATA DEFINITIONS
 */
-inputFile File;  /* globally read through macros */
+static inputFile File;  /* static read through functions */
+static inputFile BackupFile;	/* File is copied here when a nested parser is pushed */
 static MIOPos StartOfLine;  /* holds deferred position of start of line */
 
 /*
 *   FUNCTION DEFINITIONS
 */
+
+extern unsigned long getInputLineNumber (void)
+{
+	return File.input.lineNumber;
+}
+
+extern const char *getInputFileName (void)
+{
+	return vStringValue (File.input.name);
+}
+
+extern MIOPos getInputFilePosition (void)
+{
+	return File.filePosition;
+}
+
+extern MIOPos getInputFilePositionForLine (int line)
+{
+	return File.lineFposMap.pos[(((File.lineFposMap.count > (line - 1)) \
+				      && (line > 0))? (line - 1): 0)];
+}
+
+extern langType getInputLanguage (void)
+{
+	return File.input.language;
+}
+
+extern const char *getInputLanguageName (void)
+{
+	return getLanguageName (File.input.language);
+}
+
+extern const char *getInputFileTagPath (void)
+{
+	return vStringValue (File.input.tagPath);
+}
+
+extern boolean isInputLanguage (langType lang)
+{
+	return (boolean)((lang) == File.input.language);
+}
+
+extern boolean isInputHeaderFile (void)
+{
+	return File.input.isHeader;
+}
+
+extern boolean isInputLanguageKindEnabled (char c)
+{
+	return isLanguageKindEnabled (File.input.language, c);
+}
+
+extern boolean doesInputLanguageAllowNullTag (void)
+{
+	return doesLanguageAllowNullTag (File.input.language);
+}
+
+extern kindOption *getInputLanguageFileKind (void)
+{
+	return getLanguageFileKind (File.input.language);
+}
+
+extern boolean doesInputLanguageRequestAutomaticFQTag (void)
+{
+	return doesLanguageRequestAutomaticFQTag (File.input.language);
+}
+
+extern const char *getSourceFileTagPath (void)
+{
+	return vStringValue (File.source.tagPath);
+}
+
+extern const char *getSourceLanguageName (void)
+{
+	return getLanguageName (File.source.language);
+}
+
+extern unsigned long getSourceLineNumber (void)
+{
+	return File.source.lineNumber;
+}
 
 static void freeInputFileInfo (inputFileInfo *finfo)
 {
@@ -393,9 +528,11 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 			vStringClear (File.line);
 
 		setInputFileParameters  (vStringNewInit (fileName), language);
-		File.input.lineNumber = 0L;
+		File.input.lineNumberOrigin = 0L;
+		File.input.lineNumber = File.input.lineNumberOrigin;
 		setSourceFileParameters (vStringNewInit (fileName), language);
-		File.source.lineNumber = 0L;
+		File.source.lineNumberOrigin = 0L;
+		File.source.lineNumber = File.source.lineNumberOrigin;
 		allocLineFposMap (&File.lineFposMap);
 
 		verbose ("OPENING %s as %s language %sfile\n", fileName,
@@ -403,6 +540,26 @@ extern boolean openInputFile (const char *const fileName, const langType languag
 				File.input.isHeader ? "include " : "");
 	}
 	return opened;
+}
+
+extern void resetInputFile (const langType language)
+{
+	Assert (File.fp);
+
+	mio_rewind (File.fp);
+	mio_getpos (File.fp, &StartOfLine);
+	mio_getpos (File.fp, &File.filePosition);
+	File.currentLine  = NULL;
+	File.eof          = FALSE;
+	File.newLine      = TRUE;
+
+	if (File.line != NULL)
+		vStringClear (File.line);
+
+	File.input.language = language;
+	File.input.lineNumber = File.input.lineNumberOrigin;
+	File.source.language = language;
+	File.source.lineNumber = File.source.lineNumberOrigin;
 }
 
 extern void closeInputFile (void)
@@ -433,7 +590,10 @@ extern void *getInputFileUserData(void)
 static void fileNewline (void)
 {
 	File.filePosition = StartOfLine;
-	appendLineFposMap (&File.lineFposMap, File.filePosition);
+
+	if (BackupFile.fp == NULL)
+		appendLineFposMap (&File.lineFposMap, File.filePosition);
+
 	File.newLine = FALSE;
 	File.input.lineNumber++;
 	File.source.lineNumber++;
@@ -803,7 +963,6 @@ out:
  *   Similar to readLineRaw but this doesn't use fgetpos/fsetpos.
  *   Useful for reading from pipe.
  */
-
 char* readLineRawWithNoSeek (vString* const vline, FILE *const pp)
 {
 	int c;
@@ -839,6 +998,48 @@ char* readLineRawWithNoSeek (vString* const vline, FILE *const pp)
 	}
 
 	return result;
+}
+
+extern void   pushNarrowedInputStream (const langType language,
+				       unsigned long startLine, int startCharOffset,
+				       unsigned long endLine, int endCharOffset,
+				       unsigned long sourceLineOffset)
+{
+	long p, q;
+	MIOPos original;
+	MIOPos tmp;
+	MIO *subio;
+
+	original = getInputFilePosition ();
+
+	tmp = getInputFilePositionForLine (startLine);
+	mio_setpos (File.fp, &tmp);
+	mio_seek (File.fp, startCharOffset, SEEK_CUR);
+	p = mio_tell (File.fp);
+
+	tmp = getInputFilePositionForLine (endLine);
+	mio_setpos (File.fp, &tmp);
+	mio_seek (File.fp, endCharOffset, SEEK_CUR);
+	q = mio_tell (File.fp);
+
+	mio_setpos (File.fp, &original);
+
+	subio = mio_new_mio (File.fp, p, q - p);
+
+
+	BackupFile = File;
+
+	File.fp = subio;
+
+	File.input.lineNumberOrigin = ((startLine == 0)? 0: startLine - 1);
+	File.source.lineNumberOrigin = ((sourceLineOffset == 0)? 0: sourceLineOffset - 1);
+}
+
+extern void   popNarrowedInputStream  (void)
+{
+	mio_free (File.fp);
+	File = BackupFile;
+	memset (&BackupFile, 0, sizeof (BackupFile));
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

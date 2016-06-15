@@ -1563,7 +1563,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 			      long sourceLineNumberDifference)
 {
 	int i;
-	Assert (File.input.name != NULL);
+	Assert (getInputFileName() != NULL);
 
 	memset (e, 0, sizeof (tagEntryInfo));
 	e->lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
