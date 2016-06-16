@@ -1162,7 +1162,6 @@ static void processFieldsOption (
 	boolean mode = TRUE;
 	int c;
 	fieldType t;
-	unsigned int i;
 
 	static vString * longName;
 	boolean inLongName = FALSE;
@@ -1172,16 +1171,13 @@ static void processFieldsOption (
 
 	if (*p == '*')
 	{
-		for (i = 0; i < countParsers(); i++)
-			initializeParser (i);
-
+		initializeParser (LANG_AUTO);
 		resetFieldsOption (TRUE);
 		p++;
 	}
 	else if (*p != '+'  &&  *p != '-')
 	{
-		for (i = 0; i < countParsers(); i++)
-			initializeParser (i);
+		initializeParser (LANG_AUTO);
 		resetFieldsOption (FALSE);
 	}
 
@@ -1343,12 +1339,9 @@ static void processListFeaturesOption(const char *const option __unused__,
 static void processListFieldsOption(const char *const option __unused__,
 				    const char *const parameter)
 {
-	unsigned int i;
-
 	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
 	{
-		for (i = 0; i < countParsers(); i++)
-			initializeParser (i);
+		initializeParser (LANG_AUTO);
 		printFields (LANG_AUTO);
 	}
 	else

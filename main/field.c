@@ -252,8 +252,7 @@ extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType
 	if (language == LANG_AUTO && (initialized == FALSE))
 	{
 		initialized = TRUE;
-		for (i = 0; i < countParsers(); i++)
-			initializeParser (i);
+		initializeParser (LANG_AUTO);
 	}
 	else if (language != LANG_IGNORE && (initialized == FALSE))
 		initializeParser (language);

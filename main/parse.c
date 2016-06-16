@@ -1390,7 +1390,7 @@ static void installFieldSpec (const langType language)
 	}
 }
 
-extern void initializeParser (langType lang)
+static void initializeParserOne (langType lang)
 {
 	parserDefinition *const parser = LanguageTable [lang];
 
@@ -1413,6 +1413,17 @@ extern void initializeParser (langType lang)
 	Assert (!doesParserUseKind (parser, parser->fileKind->letter));
 }
 
+extern void initializeParser (langType lang)
+{
+	if (lang == LANG_AUTO)
+	{
+		int i;
+		for (i = 0; i < countParsers(); i++)
+			initializeParserOne (i);
+	}
+	else
+		initializeParserOne (lang);
+}
 
 extern void initializeParsing (void)
 {
