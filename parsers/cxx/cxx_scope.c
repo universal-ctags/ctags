@@ -16,6 +16,10 @@
 #include "cxx_debug.h"
 #include "cxx_token_chain.h"
 
+#ifdef CXX_DO_DEBUGGING
+#include "cxx_parser_internal.h"
+#endif
+
 // The tokens defining current scope
 static CXXTokenChain * g_pScope = NULL;
 static vString * g_szScopeName = NULL;
