@@ -1,2 +1,2 @@
 --c++-kinds=+px
---fields=+{c++.properties}
+--fields-c++=+{properties}

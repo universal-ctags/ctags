@@ -245,6 +245,9 @@ static optionDescription LongOptionDescription [] = {
  {1,"      Include extra tag entries for selected information (flags: \"Ffq.\") [F]."},
  {1,"  --fields=[+|-]flags"},
  {1,"      Include selected extension fields (flags: \"afmikKlnsStzZ\") [fks]."},
+ {1,"  --fields-<LANG|*>=[+|-]flags"},
+ {1,"      Include selected <LANG> own extension fields"},
+ {1,"      (flags: --list-flags=<LANG>)."},
  {1,"  --file-scope=[yes|no]"},
  {1,"       Should tags scoped only for a single file (e.g. \"static\" tags)"},
  {1,"       be included in the output [yes]?"},
@@ -1147,12 +1150,13 @@ static void processExtraTagsOption (
 	}
 }
 
-static void resetFieldsOption (boolean mode)
+static void resetFieldsOption (langType lang, boolean mode)
 {
 	int i;
 
 	for (i = 0; i < countFields (); ++i)
-		enableField (i, mode, FALSE);
+		if ((lang == LANG_AUTO) || (lang == getFieldOwner (i)))
+			enableField (i, mode, FALSE);
 }
 
 static void processFieldsOption (
@@ -1165,21 +1169,16 @@ static void processFieldsOption (
 
 	static vString * longName;
 	boolean inLongName = FALSE;
-	langType language;
 
 	longName = vStringNewOrClear (longName);
 
 	if (*p == '*')
 	{
-		initializeParser (LANG_AUTO);
-		resetFieldsOption (TRUE);
+		resetFieldsOption (LANG_IGNORE, TRUE);
 		p++;
 	}
 	else if (*p != '+'  &&  *p != '-')
-	{
-		initializeParser (LANG_AUTO);
-		resetFieldsOption (FALSE);
-	}
+		resetFieldsOption (LANG_IGNORE, FALSE);
 
 	while ((c = *p++) != '\0') switch (c)
 	{
@@ -1209,22 +1208,14 @@ static void processFieldsOption (
 				      c);
 
 			{
-				const char *f;
-
-				language = getLanguageComponentInFieldName (vStringValue (longName), &f);
-				t = getFieldTypeForNameAndLanguage (f, language);
+				const char *f = vStringValue (longName);
+				t = getFieldTypeForNameAndLanguage (f, LANG_IGNORE);
 			}
 
 			if (t == FIELD_UNKNOWN)
 				error(FATAL, "nosuch field: \'%s\'", vStringValue (longName));
 
 			enableField (t, mode, TRUE);
-			if (language == LANG_AUTO)
-			{
-				fieldType ftype_next = t;
-				while ((ftype_next = nextFieldSibling (ftype_next)) != FIELD_UNKNOWN)
-					enableField (ftype_next, mode, FALSE);
-			}
 
 			inLongName = FALSE;
 			vStringClear (longName);
@@ -2554,6 +2545,113 @@ static boolean processBooleanOption (
 	return found;
 }
 
+static void enableLanguageField (langType language, const char *field, boolean mode)
+{
+
+	fieldType t;
+
+	t = getFieldTypeForNameAndLanguage (field, language);
+	if (t == FIELD_UNKNOWN)
+		error(FATAL, "no such field: \'%s\'", field);
+	enableField (t, mode, (language != LANG_AUTO));
+	if (language == LANG_AUTO)
+	{
+		fieldType ftype_next = t;
+		while ((ftype_next = nextFieldSibling (ftype_next)) != FIELD_UNKNOWN)
+			enableField (ftype_next, mode, (language != LANG_AUTO));
+	}
+}
+
+static boolean processLangSpecificFieldsOption (const char *const option,
+						const char *const parameter)
+{
+#define PREFIX "fields-"
+#define PREFIX_LEN strlen(PREFIX)
+	const char* lang;
+	size_t len;
+	langType language = LANG_IGNORE;
+	const char *p = parameter;
+	int c;
+	static vString * longName;
+	boolean mode = TRUE;
+	const char *f;
+	boolean inLongName = FALSE;
+
+	if ( strncmp (option, PREFIX, PREFIX_LEN) != 0 )
+		return FALSE;
+
+	lang = option + PREFIX_LEN;
+	len = strlen (lang);
+	if (len == 0)
+		error (WARNING, "No language given in \"%s\" option", option);
+	else if (len == 1 && lang[0] == '*')
+		language = LANG_AUTO;
+	else
+		language = getNamedLanguage (lang, len);
+
+	if (language == LANG_IGNORE)
+		error (WARNING, "Unknown language: %s", lang);
+
+	initializeParser (language);
+
+	if (*p == '*')
+	{
+		resetFieldsOption (language, TRUE);
+		p++;
+	}
+	else if (*p == '{')
+		resetFieldsOption (language, FALSE);
+	else if (*p != '+' && *p != '-')
+		error (WARNING, "Wrong per language field specification: %s", p);
+
+	longName = vStringNewOrClear (longName);
+	while ((c = *p++) != '\0')
+	{
+		switch (c)
+		{
+		case '+':
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				mode = TRUE;
+			break;
+		case '-':
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				mode = FALSE;
+			break;
+		case '{':
+			if (inLongName)
+				error (FATAL,
+				       "unexpected character in field specification: \'%c\'",
+				       c);
+			inLongName = TRUE;
+			break;
+		case '}':
+			if (!inLongName)
+				error (FATAL,
+				       "unexpected character in field specification: \'%c\'",
+				       c);
+
+			f = vStringValue (longName);
+			enableLanguageField (language, f, mode);
+			inLongName = FALSE;
+			vStringClear (longName);
+			break;
+		default:
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				error (FATAL,
+				       "only long name can be used in per language field spec: \'%c\'",
+				       c);
+			break;
+		}
+	}
+	return TRUE;
+}
+
 static void processLongOption (
 		const char *const option, const char *const parameter)
 {
@@ -2567,6 +2665,8 @@ static void processLongOption (
 
 	if (processBooleanOption (option, parameter))
 		;
+	else if (processLangSpecificFieldsOption(option, parameter))
+		 ;
 	else if (processParametricOption (option, parameter))
 		;
 	else if (processKindOption (option, parameter))

@@ -1,2 +1,3 @@
 --c++-kinds=pfz
---fields=+S{c++.end}
+--fields=+S
+--fields-c++=+{end}

@@ -1,2 +1,3 @@
---fields={end}n
+--fields-*={end}
+--fields=n
 --sort=no

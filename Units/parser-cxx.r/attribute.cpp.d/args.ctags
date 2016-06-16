@@ -1,3 +1,4 @@
 --c++-kinds=*
---fields=+{c++.properties}tS
+--fields-C++=+{properties}
+--fields=+tS
 --sort=no
