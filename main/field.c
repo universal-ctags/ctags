@@ -236,6 +236,11 @@ extern fieldType getFieldTypeForOption (char letter)
 	return FIELD_UNKNOWN;
 }
 
+extern fieldType getFieldTypeForName (const char *name)
+{
+	return getFieldTypeForNameAndLanguage (name, LANG_IGNORE);
+}
+
 extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType language)
 {
 	static boolean initialized = FALSE;

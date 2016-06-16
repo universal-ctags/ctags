@@ -73,8 +73,21 @@ typedef struct sFieldSpec {
 
 
 extern fieldType getFieldTypeForOption (char letter);
+
+/*
+   `getFieldTypeForName' is for looking for a field not owned by any parser,
+
+   `getFieldTypeForNameAndLanguage' can be used for getting all fields having
+   the same name; specify `LANG_AUTO' as `language' parameter to get the first
+   field having the name. With the returned fieldType, `nextFieldSibling' gets
+   the next field having the same name. `nextFieldSibling' returns `FIELD_UNKNOWN'
+   at the end of iteration.
+
+   Specifying `LANG_IGNORE' has the same effects as `LANG_AUTO'. However,
+   internally, each parser is not initialized. `LANG_IGNORE' is a bit faster. */
 extern fieldType getFieldTypeForName (const char *name);
 extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, int language);
+
 extern boolean isFieldEnabled (fieldType type);
 extern boolean enableField (fieldType type, boolean state, boolean warnIfFixedField);
 extern boolean isCommonField (fieldType type);
