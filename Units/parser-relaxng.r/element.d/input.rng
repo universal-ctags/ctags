@@ -1,0 +1,14 @@
+<element name="script" xmlns="http://relaxng.org/ns/structure/0.9">
+  <zeroOrMore>
+    <element name="function">
+      <zeroOrMore>
+	<element name="variable">
+	  <attribute name="readonly">
+	    <text/>
+	  </attribute>
+	  <text/>
+	</element>
+      </zeroOrMore>
+    </element>
+  </zeroOrMore>
+</element>

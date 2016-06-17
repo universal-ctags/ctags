@@ -50,6 +50,7 @@ The following parsers have been added:
 * Pod *optlib*
 * PropertiyList(plist) *libxml*
 * R
+* RelaxNG *libxml*
 * reStructuredText
 * RpmSpec
 * Rust
