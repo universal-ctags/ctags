@@ -59,6 +59,7 @@ The following parsers have been added:
 * TTCN
 * WindRes
 * XSLT v1.0 *libxml*
+* Yacc
 * Zephir
 * coffee *xcmd*
 * ctags option library *optlib*
