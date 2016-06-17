@@ -1250,7 +1250,7 @@ djb2(unsigned char *str)
 	unsigned long hash = 5381;
 	int c;
 
-	while (c = *str++)
+	while ((c = *str++))
 		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 
 	return hash;
@@ -2566,7 +2566,7 @@ recover(EsObject* fmt_object, va_list *aq)
 	  char **s;
 
 	  s = va_arg(*aq, char **);
-	  /* free */(*s);
+	  (void)/* free */(*s);
 
 	  *s = NULL;
 	}
@@ -2576,7 +2576,7 @@ recover(EsObject* fmt_object, va_list *aq)
 	  EsObject** o;
 
 	  o = va_arg(*aq, EsObject**);
-	  /* es_object_unref */(*o);
+	  (void)/* es_object_unref */(*o);
 	  *o = NULL;
 	}
     }
