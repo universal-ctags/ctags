@@ -2583,14 +2583,18 @@ static boolean processLangSpecificFieldsOption (const char *const option,
 	lang = option + PREFIX_LEN;
 	len = strlen (lang);
 	if (len == 0)
-		error (WARNING, "No language given in \"%s\" option", option);
+		error (FATAL, "No language given in \"%s\" option", option);
 	else if (len == 1 && lang[0] == '*')
 		language = LANG_AUTO;
 	else
 		language = getNamedLanguage (lang, len);
 
 	if (language == LANG_IGNORE)
-		error (WARNING, "Unknown language: %s", lang);
+	{
+		error (WARNING, "Unknown language: %s (ignoring \"--%s\")", lang, option);
+		/* The option is consumed in tihs function. */
+		return TRUE;
+	}
 
 	initializeParser (language);
 
