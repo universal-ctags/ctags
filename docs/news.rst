@@ -692,7 +692,7 @@ column:
 	-       version         off     Maven2          TRUE     version of artifact
 
 e.g. `reStructuredText` is the owner of `sectionMarker` field. Like
-`end` field owned by `C` and `C++`, more than one parsers have a field
+`end` field owned by `C` and `C++`, more than one parsers have fields
 with the same name.
 
 ``--list-fields`` takes one optional option argument, `LANGUAGE`. If it is given,
@@ -704,22 +704,14 @@ with the same name.
 	#LETTER NAME            ENABLED LANGUAGE        XFMTCHAR DESCRIPTION
 	-       version         off     Maven2          TRUE     version of artifact
 
-A parser own field has only a long name, no letter. For enabling and disabling
+A parser own field has only a long name, no letter. For enabling/disabling
 such field, the long name must be passed to ``--fields-<LANG>`` option. e.g. for
 enabling `sectionMarker` field owned by `reStructuredText` parser, use following
 command line:
 
 .. code-block:: console
 
-	$ ./ctags --fields=+{sectionMarker} ...
-
-For enabling/disabling a field owned by specified parser, use the parser
-name as prefix for the field name. `.` is for combinator. e.g. for turning
-on `end` field of `C++` parser, use following command line:
-
-.. code-block:: console
-
-	$ ./ctags --fields=+{C++.end} ...
+	$ ./ctags --fields-reStructuredText=+{sectionMarker} ...
 
 The wild card notation can be used for enabling/disabling parser own
 fields, too. Following example enables all fields owned by `C++`
@@ -727,7 +719,31 @@ parser.
 
 .. code-block:: console
 
-	$ ./ctags --fields=+{C++.*} ...
+	$ ./ctags --fields-C++='*' ...
+
+`*` can be used for specifying languages, too. The next example
+is for enabling `end` field of languages which have `end`
+field.
+
+.. code-block:: console
+
+	$ ./ctags --fields-'*'=+'{end}' ...
+	...
+
+In this case, using wild card notation in language specification,
+not only fields owned by parsers but also common fields having
+the name specified (`end` in the example) are enabled/disabled.
+
+Using the wild card notation for language is helpful to avoid
+within-universal-ctags-version incompatibly (SELF INCOMPATIBLY).  In
+universal-ctags development, a parser developer may add a parser own
+field for the language dealt with the parser.  Sometimes other
+developers recognize it is meaningful not only the language but also
+the other languages. In such case the developers may promote the field
+to a common field. Such promotion will break the command line
+compatibility about ``--fields-<LANG>`` usage. The wild card
+for `<LANG>` will help you to avoid the unwanted effect of the
+promotion.
 
 From the view point of tags file format, nothing is changed with
 introducing parser own fields; `<fieldname>`:`<value>` is used as
