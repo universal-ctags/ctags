@@ -93,6 +93,62 @@ static fmtElement** queueLiteral (fmtElement **last, char *literal)
 	return &(cur->next);
 }
 
+/* `getLanguageComponentInFieldName' is used as part of the option parameter
+   for --_xformat option.
+
+   It splits the value of fullName into a language part and a field name part.
+   Here the two parts are combined with `.'.
+
+   If it cannot find a period, it returns LANG_IGNORE and sets
+   fullname to *fieldName.
+
+   If lang part if `*', it returns LANG_AUTO and sets the field
+   name part to *fieldName.
+
+   Though a period is found but no parser (langType) is found for
+   the language parser, this function returns LANG_IGNORE and sets
+   NULL to *fieldName.
+
+   A proper parser is found, this function returns langType for the
+   parser and sets the field name part to *fieldName. */
+static langType getLanguageComponentInFieldName (const char *fullName,
+						 const char **fieldName)
+{
+	const char *tmp;
+	langType language;
+
+	tmp = strchr (fullName, '.');
+	if (tmp)
+	{
+		size_t len = tmp - fullName;
+
+		if (len == 1 && fullName[0] == '*')
+		{
+			language = LANG_AUTO;
+			*fieldName = tmp + 1;
+		}
+		else if (len == 0)
+		{
+			language = LANG_IGNORE;
+			*fieldName = tmp + 1;
+		}
+		else
+		{
+			language = getNamedLanguage (fullName, len);
+			if (language == LANG_IGNORE)
+				*fieldName = NULL;
+			else
+				*fieldName = tmp + 1;
+		}
+	}
+	else
+	{
+		language = LANG_IGNORE;
+		*fieldName = fullName;
+	}
+	return language;
+}
+
 static fmtElement** queueTagField (fmtElement **last, long width, char field_letter,
 				   const char *field_name)
 {

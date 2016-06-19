@@ -269,44 +269,6 @@ extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType
 	return FIELD_UNKNOWN;
 }
 
-extern langType getLanguageComponentInFieldName (const char *fullName,
-						 const char **fieldName)
-{
-	const char *tmp;
-	langType language;
-
-	tmp = strchr (fullName, '.');
-	if (tmp)
-	{
-		size_t len = tmp - fullName;
-
-		if (len == 1 && fullName[0] == '*')
-		{
-			language = LANG_AUTO;
-			*fieldName = tmp + 1;
-		}
-		else if (len == 0)
-		{
-			language = LANG_IGNORE;
-			*fieldName = tmp + 1;
-		}
-		else
-		{
-			language = getNamedLanguage (fullName, len);
-			if (language == LANG_IGNORE)
-				*fieldName = NULL;
-			else
-				*fieldName = tmp + 1;
-		}
-	}
-	else
-	{
-		language = LANG_AUTO;
-		*fieldName = fullName;
-	}
-	return language;
-}
-
 extern const char* getFieldName(fieldType type)
 {
 	fieldDesc* fdesc;
