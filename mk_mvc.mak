@@ -10,7 +10,7 @@
 include source.mak
 
 OBJEXT = obj
-REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrcasecmp=stricmp
+REGEX_DEFINES = -DHAVE_REGCOMP -D__USE_GNU -Dbool=int -Dfalse=0 -Dtrue=1 -Dstrcasecmp=stricmp -DHAVE_REPOINFO_H
 DEFINES = -DWIN32 $(REGEX_DEFINES)
 INCLUDES = -I. -Imain -Ignu_regex -Ifnmatch -Iparsers
 OPT = /O2
@@ -37,6 +37,10 @@ PDBFLAG = /debug
 PDBFLAG =
 !endif
 
+# Generate repoinfo.h.
+!if [win32\gen-repoinfo.bat $(REPOINFO_HEADS)]
+!endif
+
 {main}.c{main}.obj::
 	$(CC) $(OPT) $(DEFINES) $(INCLUDES) /Fomain\ /c $<
 {optlib}.c{optlib}.obj::
@@ -52,7 +56,7 @@ all: ctags.exe readtags.exe
 
 ctags: ctags.exe
 
-ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS)
+ctags.exe: $(ALL_OBJS) $(ALL_HEADS) $(REGEX_HEADS) $(FNMATCH_HEADS) $(REPOINFO_HEADS)
 	$(CC) $(OPT) /Fe$@ $(ALL_OBJS) /link setargv.obj $(LIBS) $(PDBFLAG)
 
 readtags.exe: $(READTAGS_OBJS) $(READTAGS_HEADS)
@@ -64,8 +68,10 @@ $(REGEX_OBJS): $(REGEX_SRCS)
 $(FNMATCH_OBJS): $(FNMATCH_SRCS)
 	$(CC) /c $(OPT) /Fo$@ $(INCLUDES) $(DEFINES) $(FNMATCH_SRCS)
 
+main\repoinfo.obj: main\repoinfo.c main\repoinfo.h
+
 
 clean:
-	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj read\*.obj
+	- del *.obj main\*.obj optlib\*.obj parsers\*.obj parsers\cxx\*.obj gnu_regex\*.obj fnmatch\*.obj read\*.obj main\repoinfo.h
 	- del ctags.exe readtags.exe
 	- del tags
