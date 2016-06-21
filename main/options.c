@@ -1049,6 +1049,13 @@ static void processExcmdOption (
 	}
 }
 
+static void resetXtags (boolean mode)
+{
+	int i;
+	for (i = 0; i < XTAG_COUNT; i++)
+		enableXtag (i, mode);
+}
+
 static void processExtraTagsOption (
 		const char *const option, const char *const parameter)
 {
@@ -1059,19 +1066,13 @@ static void processExtraTagsOption (
 	int i;
 
 	if (*p != '+'  &&  *p != '-')
-	{
-		int i;
-		for (i = 0; i < XTAG_COUNT; i++)
-			enableXtag (i, FALSE);
-	}
+		resetXtags (FALSE);
 	while ((c = *p++) != '\0') switch (c)
 	{
 		case '+': mode = TRUE;                break;
 		case '-': mode = FALSE;               break;
 		case '*':
-			for (i = 0; i < XTAG_COUNT; ++i)
-				enableXtag (i, TRUE);
-			break;
+			resetXtags (TRUE);
 		default:
 			t = getXtagTypeForOption (c);
 			if (t == XTAG_UNKNOWN)
