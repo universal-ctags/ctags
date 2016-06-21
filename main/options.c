@@ -161,6 +161,7 @@ optionValues Option = {
 	FALSE,      /* --tag-relative */
 	FALSE,      /* --totals */
 	FALSE,      /* --line-directives */
+ 	FALSE,      /* --json */
 	FALSE,	    /* --print-language */
 	FALSE,	    /* --guess-language-eagerly(-G) */
 	FALSE,	    /* --quiet */
@@ -268,6 +269,10 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Print this option summary."},
  {1,"  --if0=[yes|no]"},
  {1,"       Should code within #if 0 conditional branches be parsed [no]?"},
+#ifdef HAVE_JANSSON
+ {1,"  --json"},
+ {1,"       Enter interactive json command mode."},
+#endif
 #ifdef HAVE_ICONV
  {1,"  --input-encoding=encoding"},
  {1,"      Specify encoding of all input files."},
@@ -626,7 +631,7 @@ extern void setDefaultTagFileName (void)
 extern boolean filesRequired (void)
 {
 	boolean result = FilesRequired;
-	if (Option.recurse)
+	if (Option.recurse || Option.json)
 		result = FALSE;
 	return result;
 }
@@ -1340,6 +1345,15 @@ static void processLanguageForceOption (
 	else
 		Option.language = language;
 }
+
+static void processJsonOption (
+		const char *const option,
+		const char *const parameter __unused__)
+{
+	Option.json = TRUE;
+	Option.tagFileName = stringCopy ("-");
+}
+
 static char* skipPastMap (char* p)
 {
 	while (*p != EXTENSION_SEPARATOR  &&
@@ -2312,6 +2326,9 @@ static parametricOption ParametricOptions [] = {
 	{ "filter-terminator",      processFilterTerminatorOption,  TRUE,   STAGE_ANY },
 	{ "format",                 processFormatOption,            TRUE,   STAGE_ANY },
 	{ "help",                   processHelpOption,              TRUE,   STAGE_ANY },
+#ifdef HAVE_JANSSON
+	{ "json",                   processJsonOption,              TRUE,   STAGE_ANY },
+#endif
 #ifdef HAVE_ICONV
 	{ "input-encoding",         processInputEncodingOption,     FALSE,  STAGE_ANY },
 	{ "output-encoding",        processOutputEncodingOption,    FALSE,  STAGE_ANY },

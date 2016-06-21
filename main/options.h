@@ -90,6 +90,7 @@ typedef struct sOptionValues {
 	boolean tagRelative;    /* --tag-relative file paths relative to tag file */
 	boolean printTotals;    /* --totals  print cumulative statistics */
 	boolean lineDirectives; /* --linedirectives  process #line directives */
+	boolean json;           /* --json interactive mode */
 	boolean printLanguage;  /* --print-language */
 	boolean guessLanguageEagerly; /* --guess-language-eagerly|-G */
 	boolean quiet;		      /* --quiet */

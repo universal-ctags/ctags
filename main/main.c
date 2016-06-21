@@ -21,6 +21,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+#include "ctags.h"
 
 #if HAVE_DECL___ENVIRON
 #include <unistd.h>
@@ -64,6 +65,9 @@
 # include <io.h>  /* to declare _findfirst() */
 #endif
 
+#ifdef HAVE_JANSSON
+#include <jansson.h>
+#endif
 
 #include "debug.h"
 #include "entry.h"
@@ -418,6 +422,65 @@ static boolean etagsInclude (void)
 	return (boolean)(Option.etags && Option.etagsInclude != NULL);
 }
 
+static void interactiveJsonMode ()
+{
+#ifdef HAVE_JANSSON
+	char buffer[1024];
+	json_t *request;
+
+	openTagFile ();
+	fprintf (stdout, "{\"name\": \"" PROGRAM_NAME "\", \"version\": \"" PROGRAM_VERSION "\"}\n");
+	fflush (stdout);
+
+	while (fgets (buffer, sizeof(buffer), stdin)) {
+		if (buffer[0] == '\n')
+			continue;
+
+		request = json_loads (buffer, JSON_DISABLE_EOF_CHECK, NULL);
+		if (! request) {
+			error (FATAL, "invalid json");
+			goto next;
+		}
+
+		json_t *command = json_object_get (request, "command");
+		if (! command) {
+			error (FATAL, "command name not found");
+			goto next;
+		}
+
+		if (!strcmp ("list-parsers", json_string_value (command))) {
+            /* todo */
+		} else if (!strcmp ("generate-tags", json_string_value (command))) {
+			json_int_t size = -1;
+			const char *filename;
+
+			if (json_unpack (request, "{s?I ss}", "size", &size, "filename", &filename) == -1) {
+				error (FATAL, "invalid generate-tags request");
+				goto next;
+			}
+
+			if (size == -1) { /* read from disk */
+				createTagsForEntry (filename);
+			} else {			/* read nbytes from stream */
+                uint8_t *data = eMalloc (size);
+                size = fread (data, 1, size, stdin);
+                MIO *mio = mio_new_memory (data, size, eRealloc, eFree);
+				parseFileWithMio (filename, mio);
+			}
+
+			fprintf (stdout, "{\"completed\": \"generate-tags\"}\n");
+			fflush (stdout);
+		} else {
+			error (FATAL, "unknown command name");
+			goto next;
+		}
+
+next:
+		json_decref (request);
+	}
+#endif
+}
+
 static void makeTags (cookedArgs *args)
 {
 	clock_t timeStamps [3];
@@ -546,7 +609,11 @@ extern int main (int __unused__ argc, char **argv)
 	verbose ("Reading initial options from command line\n");
 	parseCmdlineOptions (args);
 	checkOptions ();
-	makeTags (args);
+	if (Option.json)
+		interactiveJsonMode ();
+    else
+		makeTags (args);
+
 
 	/*  Clean up.
 	 */
