@@ -1063,24 +1063,74 @@ static void processExtraTagsOption (
 	const char *p = parameter;
 	boolean mode = TRUE;
 	int c;
-	int i;
+	static vString *longName;
+	boolean inLongName = FALSE;
+	const char *x;
 
-	if (*p != '+'  &&  *p != '-')
-		resetXtags (FALSE);
-	while ((c = *p++) != '\0') switch (c)
+	if (*p == '*')
 	{
-		case '+': mode = TRUE;                break;
-		case '-': mode = FALSE;               break;
-		case '*':
-			resetXtags (TRUE);
-		default:
-			t = getXtagTypeForOption (c);
+		resetXtags (TRUE);
+		p++;
+	}
+	else if (*p != '+'  &&  *p != '-')
+		resetXtags (FALSE);
+
+	longName = vStringNewOrClear (longName);
+
+	while ((c = *p++) != '\0')
+	{
+		switch (c)
+		{
+		case '+':
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				mode = TRUE;
+			break;
+		case '-':
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				mode = FALSE;
+			break;
+		case '{':
+			if (inLongName)
+				error(FATAL,
+				      "unexpected character in extra specification: \'%c\'",
+				      c);
+			inLongName = TRUE;
+			break;
+		case '}':
+			if (!inLongName)
+				error(FATAL,
+				      "unexpected character in extra specification: \'%c\'",
+				      c);
+			x = vStringValue (longName);
+			t = getXtagTypeForName (x);
+
 			if (t == XTAG_UNKNOWN)
-				error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
-				      c, option);
+				error(WARNING, "Unsupported parameter '{%s}' for \"%s\" option",
+				      x, option);
 			else
 				enableXtag (t, mode);
+
+			inLongName = FALSE;
+			vStringClear (longName);
 			break;
+		default:
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+			{
+				t = getXtagTypeForLetter (c);
+				if (t == XTAG_UNKNOWN)
+					error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
+					      c, option);
+				else
+					enableXtag (t, mode);
+			}
+			break;
+		}
 	}
 }
 
