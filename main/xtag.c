@@ -46,7 +46,7 @@ extern xtagDesc* getXtagDesc (xtagType type)
 	return xtagDescs + type;
 }
 
-extern xtagType  getXtagTypeForOption (char letter)
+extern xtagType  getXtagTypeForLetter (char letter)
 {
 	int i;
 

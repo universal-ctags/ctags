@@ -46,7 +46,7 @@ typedef struct sXtagDesc {
 } xtagDesc;
 
 extern xtagDesc* getXtagDesc (xtagType type);
-extern xtagType  getXtagTypeForOption (char letter);
+extern xtagType  getXtagTypeForLetter (char letter);
 extern boolean isXtagEnabled (xtagType type);
 extern boolean enableXtag (xtagType type, boolean state);
 const char* getXtagName (xtagType type);
