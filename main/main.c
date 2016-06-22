@@ -67,6 +67,7 @@
 
 #include "debug.h"
 #include "entry.h"
+#include "error.h"
 #include "field.h"
 #include "keyword.h"
 #include "main.h"
@@ -545,6 +546,7 @@ extern int main (int __unused__ argc, char **argv)
 {
 	cookedArgs *args;
 
+	setErrorPrinter (stderrDefaultErrorPrinter, NULL);
 	setMainLoop (batchMakeTags, NULL);
 	setTagWriter (writeCtagsEntry, NULL, NULL);
 

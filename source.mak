@@ -15,6 +15,7 @@ MAIN_HEADS =			\
 	main/args.h		\
 	main/ctags.h		\
 	main/entry.h		\
+	main/error.h		\
 	main/field.h		\
 	main/flags.h		\
 	main/fmt.h		\
@@ -46,6 +47,7 @@ MAIN_HEADS =			\
 MAIN_SRCS =				\
 	main/args.c			\
 	main/entry.c			\
+	main/error.c			\
 	main/field.c			\
 	main/flags.c			\
 	main/fmt.c			\

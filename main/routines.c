@@ -17,8 +17,6 @@
 #endif
 #include <ctype.h>
 #include <string.h>
-#include <stdarg.h>
-#include <errno.h>
 #include <stdio.h>  /* to declare tempnam(), and SEEK_SET (hopefully) */
 
 #ifdef HAVE_FCNTL_H
@@ -149,7 +147,7 @@
 /*
  *  Miscellaneous macros
  */
-#define selected(var,feature)	(((int)(var) & (int)(feature)) == (int)feature)
+
 
 /*
 *   DATA DEFINITIONS
@@ -200,27 +198,6 @@ extern const char *getExecutableName (void)
 extern const char *getExecutablePath (void)
 {
 	return ExecutableProgram;
-}
-
-extern void error (
-		const errorSelection selection, const char *const format, ...)
-{
-	va_list ap;
-
-	va_start (ap, format);
-	fprintf (stderr, "%s: %s", getExecutableName (),
-			selected (selection, WARNING) ? "Warning: " : "");
-	vfprintf (stderr, format, ap);
-	if (selected (selection, PERROR))
-#ifdef HAVE_STRERROR
-		fprintf (stderr, " : %s", strerror (errno));
-#else
-		perror (" ");
-#endif
-	fputs ("\n", stderr);
-	va_end (ap);
-	if (selected (selection, FATAL) || Option.fatalWarnings)
-		exit (1);
 }
 
 /*
