@@ -44,6 +44,7 @@
 #include "kind.h"
 #include "main.h"
 #include "options.h"
+#include "output.h"
 #include "ptag.h"
 #include "read.h"
 #include "routines.h"
@@ -54,7 +55,6 @@
 /*
 *   MACROS
 */
-#define includeExtensionFlags()         (Option.tagFileFormat > 1)
 
 /*
  *  Portability defines
@@ -81,11 +81,6 @@ typedef struct eTagFile {
 	MIO *fp;
 	struct sNumTags { unsigned long added, prev; } numTags;
 	struct sMax { size_t line, tag; } max;
-	struct sEtags {
-		char *name;
-		MIO *fp;
-		size_t byteCount;
-	} etags;
 	vString *vLine;
 
 	unsigned int cork;
@@ -108,7 +103,6 @@ tagFile TagFile = {
     NULL,               /* file pointer */
     { 0, 0 },           /* numTags */
     { 0, 0 },        /* max */
-    { NULL, NULL, 0 },  /* etags */
     NULL,                /* vLine */
     .cork = FALSE,
     .corkQueue = {
@@ -152,7 +146,7 @@ extern const char *tagFileName (void)
 *   Pseudo tag support
 */
 
-static void abort_if_ferror(MIO *const fp)
+extern void abort_if_ferror(MIO *const fp)
 {
 	if (mio_error (fp))
 		error (FATAL | PERROR, "cannot write tag file");
@@ -657,32 +651,6 @@ extern void closeTagFile (const boolean resize)
 	TagFile.name = NULL;
 }
 
-extern void beginEtagsFile (void)
-{
-	TagFile.etags.fp = tempFile ("w+b", &TagFile.etags.name);
-	TagFile.etags.byteCount = 0;
-}
-
-extern void endEtagsFile (const char *const filename)
-{
-	const char *line;
-
-	mio_printf (TagFile.fp, "\f\n%s,%ld\n", filename, (long) TagFile.etags.byteCount);
-	abort_if_ferror (TagFile.fp);
-
-	if (TagFile.etags.fp != NULL)
-	{
-		mio_rewind (TagFile.etags.fp);
-		while ((line = readLineRaw (TagFile.vLine, TagFile.etags.fp)) != NULL)
-			mio_puts (TagFile.fp, line);
-		mio_free (TagFile.etags.fp);
-		remove (TagFile.etags.name);
-		eFree (TagFile.etags.name);
-		TagFile.etags.fp = NULL;
-		TagFile.etags.name = NULL;
-	}
-}
-
 /*
  *  Tag entry management
  */
@@ -743,19 +711,6 @@ static int vstring_puts (const char* s, void *data)
 	return vStringLength (str) - len;
 }
 
-static int file_putc (char c, void *data)
-{
-	MIO *fp = data;
-	mio_putc (fp, c);
-	return 1;
-}
-
-static int file_puts (const char* s, void *data)
-{
-	MIO *fp = data;
-	return mio_puts (fp, s);
-}
-
 static boolean isPosSet(MIOPos pos)
 {
 	char * p = (char *)&pos;
@@ -780,48 +735,10 @@ extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo 
 	return line;
 }
 
-static const char* escapeName (const tagEntryInfo * tag, fieldType ftype)
-{
-	return renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
-}
-
-static int writeXrefEntry (const tagEntryInfo *const tag)
-{
-	int length;
-	static fmtElement *fmt1;
-	static fmtElement *fmt2;
-
-	if (Option.customXfmt)
-		length = fmtPrint (Option.customXfmt, TagFile.fp, tag);
-	else
-	{
-		if (tag->isFileEntry)
-			return 0;
-
-		if (Option.tagFileFormat == 1)
-		{
-			if (fmt1 == NULL)
-				fmt1 = fmtNew ("%-16N %4n %-16F %C");
-			length = fmtPrint (fmt1, TagFile.fp, tag);
-		}
-		else
-		{
-			if (fmt2 == NULL)
-				fmt2 = fmtNew ("%-16N %-10K %4n %-16F %C");
-			length = fmtPrint (fmt2, TagFile.fp, tag);
-		}
-	}
-
-	mio_putc (TagFile.fp, '\n');
-	length++;
-
-	return length;
-}
-
 /*  Truncates the text line containing the tag at the character following the
  *  tag, providing a character which designates the end of the tag.
  */
-static void truncateTagLine (
+extern void truncateTagLine (
 		char *const line, const char *const token, const boolean discardNewline)
 {
 	char *p = strstr (line, token);
@@ -833,34 +750,6 @@ static void truncateTagLine (
 			++p;    /* skip past character terminating character */
 		*p = '\0';
 	}
-}
-
-static int writeEtagsEntry (const tagEntryInfo *const tag)
-{
-	int length;
-
-	if (tag->isFileEntry)
-		length = mio_printf (TagFile.etags.fp, "\177%s\001%lu,0\n",
-				tag->name, tag->lineNumber);
-	else
-	{
-		long seekValue;
-		char *const line =
-				readLineFromBypassAnyway (TagFile.vLine, tag, &seekValue);
-		if (line == NULL)
-			return 0;
-
-		if (tag->truncateLine)
-			truncateTagLine (line, tag->name, TRUE);
-		else
-			line [strlen (line) - 1] = '\0';
-
-		length = mio_printf (TagFile.etags.fp, "%s\177%s\001%lu,%ld\n", line,
-				tag->name, tag->lineNumber, seekValue);
-	}
-	TagFile.etags.byteCount += length;
-
-	return length;
 }
 
 static char* getFullQualifiedScopeNameFromCorkQueue (const tagEntryInfo * inner_scope)
@@ -940,131 +829,8 @@ extern void getTagScopeInformation (tagEntryInfo *const tag,
 	}
 }
 
-static int addExtensionFields (const tagEntryInfo *const tag)
-{
-	boolean isKindKeyEnabled = isFieldEnabled (FIELD_KIND_KEY);
-	boolean isScopeEnabled = isFieldEnabled   (FIELD_SCOPE_KEY);
 
-	const char* const kindKey = isKindKeyEnabled
-		?getFieldName (FIELD_KIND_KEY)
-		:"";
-	const char* const kindFmt = isKindKeyEnabled
-		?"%s\t%s:%s"
-		:"%s\t%s%s";
-	const char* const scopeKey = isScopeEnabled
-		?getFieldName (FIELD_SCOPE_KEY)
-		:"";
-	const char* const scopeFmt = isScopeEnabled
-		?"%s\t%s:%s:%s"
-		:"%s\t%s%s:%s";
-
-	boolean first = TRUE;
-	const char* separator = ";\"";
-	const char* const empty = "";
-	int length = 0;
-
-	boolean making_fq_tag =  (doesInputLanguageRequestAutomaticFQTag ()
-				  && isXtagEnabled (XTAG_QUALIFIED_TAGS));
-
-/* "sep" returns a value only the first time it is evaluated */
-#define sep (first ? (first = FALSE, separator) : empty)
-
-	if (tag->kind->name != NULL && (isFieldEnabled (FIELD_KIND_LONG)  ||
-		 (isFieldEnabled (FIELD_KIND)  && tag->kind == '\0')))
-		length += mio_printf (TagFile.fp, kindFmt, sep, kindKey, tag->kind->name);
-	else if (tag->kind != '\0'  && (isFieldEnabled (FIELD_KIND) ||
-			(isFieldEnabled (FIELD_KIND_LONG) &&  tag->kind->name == NULL)))
-	{
-		char str[2] = {tag->kind->letter, '\0'};
-		length += mio_printf (TagFile.fp, kindFmt, sep, kindKey, str);
-	}
-
-	if (isFieldEnabled (FIELD_LINE_NUMBER))
-		length += mio_printf (TagFile.fp, "%s\t%s:%ld", sep,
-				   getFieldName (FIELD_LINE_NUMBER),
-				   tag->lineNumber);
-
-	if (isFieldEnabled (FIELD_LANGUAGE)  &&  tag->language != NULL)
-		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_LANGUAGE),
-				   escapeName (tag, FIELD_LANGUAGE));
-
-	if (isFieldEnabled (FIELD_SCOPE) || making_fq_tag)
-	{
-		const char* k = NULL, *v = NULL;
-
-		k = escapeName (tag, FIELD_SCOPE_KIND_LONG);
-		v = escapeName (tag, FIELD_SCOPE);
-
-		if (isFieldEnabled (FIELD_SCOPE) && k && v)
-			length += mio_printf (TagFile.fp, scopeFmt, sep, scopeKey, k, v);
-	}
-
-	if (isFieldEnabled (FIELD_TYPE_REF) &&
-	    tag->extensionFields.typeRef [0] != NULL  &&
-	    tag->extensionFields.typeRef [1] != NULL)
-		length += mio_printf (TagFile.fp, "%s\t%s:%s:%s", sep,
-				      getFieldName (FIELD_TYPE_REF),
-				      tag->extensionFields.typeRef [0],
-				      escapeName (tag, FIELD_TYPE_REF));
-
-	if (isFieldEnabled (FIELD_FILE_SCOPE) &&  tag->isFileScope)
-		length += mio_printf (TagFile.fp, "%s\t%s:", sep,
-				      getFieldName (FIELD_FILE_SCOPE));
-
-	if (isFieldEnabled (FIELD_INHERITANCE) &&
-			tag->extensionFields.inheritance != NULL)
-		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_INHERITANCE),
-				   escapeName (tag, FIELD_INHERITANCE));
-
-	if (isFieldEnabled (FIELD_ACCESS) &&  tag->extensionFields.access != NULL)
-		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_ACCESS),
-				   tag->extensionFields.access);
-
-	if (isFieldEnabled (FIELD_IMPLEMENTATION) &&
-			tag->extensionFields.implementation != NULL)
-		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_IMPLEMENTATION),
-				   tag->extensionFields.implementation);
-
-	if (isFieldEnabled (FIELD_SIGNATURE) &&
-			tag->extensionFields.signature != NULL)
-		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_SIGNATURE),
-				   escapeName (tag, FIELD_SIGNATURE));
-	if (isFieldEnabled (FIELD_ROLE) && tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
-		length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_ROLE),
-				   escapeName (tag, FIELD_ROLE));
-
-	if (isFieldEnabled (FIELD_EXTRA))
-	{
-		const char *value = escapeName (tag, FIELD_EXTRA);
-		if (value)
-			length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
-					   getFieldName (FIELD_EXTRA),
-					   escapeName (tag, FIELD_EXTRA));
-	}
-
-#ifdef HAVE_LIBXML
-	if (isFieldEnabled(FIELD_XPATH))
-	{
-		const char *value = escapeName (tag, FIELD_XPATH);
-		if (value)
-			length += mio_printf (TagFile.fp, "%s\t%s:%s", sep,
-					      getFieldName (FIELD_XPATH),
-					      escapeName (tag, FIELD_XPATH));
-
-	}
-#endif
-
-	return length;
-#undef sep
-}
-
-static int   makePatternStringCommon (const tagEntryInfo *const tag,
+extern int   makePatternStringCommon (const tagEntryInfo *const tag,
 				      int putc_func (char , void *),
 				      int puts_func (const char* , void *),
 				      void *output)
@@ -1131,61 +897,6 @@ extern char* makePatternString (const tagEntryInfo *const tag)
 	vString* pattern = vStringNew ();
 	makePatternStringCommon (tag, vstring_putc, vstring_puts, pattern);
 	return vStringDeleteUnwrap (pattern);
-}
-
-static int writePatternEntry (const tagEntryInfo *const tag)
-{
-	return makePatternStringCommon (tag, file_putc, file_puts, TagFile.fp);
-}
-
-static int writeLineNumberEntry (const tagEntryInfo *const tag)
-{
-	if (Option.lineDirectives)
-		return mio_printf (TagFile.fp, "%s", escapeName (tag, FIELD_LINE_NUMBER));
-	else
-		return mio_printf (TagFile.fp, "%lu", tag->lineNumber);
-}
-
-static int addParserFields (const tagEntryInfo *const tag)
-{
-	unsigned int i;
-	unsigned int ftype;
-	int length = 0;
-
-	for (i = 0; i < tag->usedParserFields; i++)
-	{
-		ftype = tag->parserFields [i].ftype;
-		if (! isFieldEnabled (ftype))
-			continue;
-
-		length += mio_printf(TagFile.fp, "\t%s:%s",
-				     getFieldName (ftype),
-				     renderFieldEscaped (tag->parserFields [i].ftype, tag, i));
-	}
-	return length;
-}
-
-static int writeCtagsEntry (const tagEntryInfo *const tag)
-{
-	int length = mio_printf (TagFile.fp, "%s\t%s\t",
-			      escapeName (tag, FIELD_NAME),
-			      escapeName (tag, FIELD_INPUT_FILE));
-
-	if (tag->lineNumberEntry)
-		length += writeLineNumberEntry (tag);
-	else if (tag->pattern)
-		length += mio_printf(TagFile.fp, "%s", tag->pattern);
-	else
-		length += writePatternEntry (tag);
-
-	if (includeExtensionFlags ())
-		length += addExtensionFields (tag);
-
-	length += addParserFields (tag);
-
-	length += mio_printf (TagFile.fp, "\n");
-
-	return length;
 }
 
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char * value)
@@ -1353,6 +1064,34 @@ static unsigned int queueTagEntry(const tagEntryInfo *const tag)
 	return i;
 }
 
+
+static void *writerData;
+static writeEntryFunc writeEntry;
+static preWriteEntryFunc preWriteEntry = NULL;
+static postWriteEntryFunc postWriteEntry = NULL;
+extern void setTagWriter (writeEntryFunc func,
+			  preWriteEntryFunc preFunc,
+			  postWriteEntryFunc postFunc)
+{
+	writeEntry = func;
+	preWriteEntry = preFunc;
+	postWriteEntry = postFunc;
+}
+
+extern void setupWriter (void)
+{
+	if (preWriteEntry)
+		writerData = preWriteEntry (TagFile.fp);
+	else
+		writerData = NULL;
+}
+
+extern void teardownWriter (const char *filename)
+{
+	if (postWriteEntry)
+		postWriteEntry (TagFile.fp, filename, writerData);
+}
+
 static void writeTagEntry (const tagEntryInfo *const tag)
 {
 	int length = 0;
@@ -1361,12 +1100,9 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 		return;
 
 	DebugStatement ( debugEntry (tag); )
-	if (Option.xref)
-		length = writeXrefEntry (tag);
-	else if (Option.etags)
-		length = writeEtagsEntry (tag);
-	else
-		length = writeCtagsEntry (tag);
+	Assert (writeEntry);
+
+	length = (* writeEntry) (TagFile.fp, tag, writerData);
 
 	++TagFile.numTags.added;
 	rememberMaxLengths (strlen (tag->name), (size_t) length);

@@ -27,6 +27,7 @@ MAIN_HEADS =			\
 	main/mbcs.h		\
 	main/nestlevel.h	\
 	main/options.h		\
+	main/output.h		\
 	main/parse.h		\
 	main/parsers.h		\
 	main/pcoproc.h		\
@@ -59,6 +60,9 @@ MAIN_SRCS =				\
 	main/mbcs.c			\
 	main/nestlevel.c		\
 	main/options.c			\
+	main/output-etags.c		\
+	main/output-ctags.c		\
+	main/output-xref.c		\
 	main/parse.c			\
 	main/pcoproc.c			\
 	main/promise.c			\

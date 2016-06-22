@@ -71,6 +71,7 @@
 #include "keyword.h"
 #include "main.h"
 #include "options.h"
+#include "output.h"
 #include "read.h"
 #include "routines.h"
 
@@ -530,6 +531,8 @@ static void sanitizeEnviron (void)
 extern int main (int __unused__ argc, char **argv)
 {
 	cookedArgs *args;
+
+	setTagWriter (writeCtagsEntry, NULL, NULL);
 
 	setCurrentDirectory ();
 	setExecutableName (*argv++);

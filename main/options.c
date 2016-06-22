@@ -28,6 +28,7 @@
 #include "main.h"
 #define OPTION_WRITE
 #include "options.h"
+#include "output.h"
 #include "parse.h"
 #include "ptag.h"
 #include "routines.h"
@@ -696,6 +697,7 @@ static void setEtagsMode (void)
 	Option.sorted = SO_UNSORTED;
 	Option.lineDirectives = FALSE;
 	Option.tagRelative = TRUE;
+	setTagWriter (writeEtagsEntry, beginEtagsFile, endEtagsFile);
 }
 
 extern void testEtagsInvocation (void)
@@ -2596,6 +2598,7 @@ static void processShortOption (
 		case 'x':
 			checkOptionOrder (option, FALSE);
 			Option.xref = TRUE;
+			setTagWriter (writeXrefEntry, NULL, NULL);
 			break;
 		default:
 			error (FATAL, "Unknown option: -%s", option);
