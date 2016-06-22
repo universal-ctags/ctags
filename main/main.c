@@ -84,6 +84,8 @@
 *   DATA DEFINITIONS
 */
 static struct { long files, lines, bytes; } Totals = { 0, 0, 0 };
+static mainLoopFunc mainLoop;
+static void *mainData;
 
 /*
 *   FUNCTION PROTOTYPES
@@ -419,7 +421,18 @@ static boolean etagsInclude (void)
 	return (boolean)(Option.etags && Option.etagsInclude != NULL);
 }
 
-static void makeTags (cookedArgs *args)
+extern void setMainLoop (mainLoopFunc func, void *data)
+{
+	mainLoop = func;
+	mainData = data;
+}
+
+static void runMainLoop (cookedArgs *args)
+{
+	(* mainLoop) (args, mainData);
+}
+
+static void batchMakeTags (cookedArgs *args, void *user __unused__)
 {
 	clock_t timeStamps [3];
 	boolean resize = FALSE;
@@ -532,6 +545,7 @@ extern int main (int __unused__ argc, char **argv)
 {
 	cookedArgs *args;
 
+	setMainLoop (batchMakeTags, NULL);
 	setTagWriter (writeCtagsEntry, NULL, NULL);
 
 	setCurrentDirectory ();
@@ -549,7 +563,8 @@ extern int main (int __unused__ argc, char **argv)
 	verbose ("Reading initial options from command line\n");
 	parseCmdlineOptions (args);
 	checkOptions ();
-	makeTags (args);
+
+	runMainLoop (args);
 
 	/*  Clean up.
 	 */
