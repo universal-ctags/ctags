@@ -346,6 +346,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"      The encoding to write the tag file in. Defaults to UTF-8 if --input-encoding"},
  {1,"      is specified, otherwise no conversion is performed."},
 #endif
+ {0,"  --output-format=ctags|etags|xref"},
+ {0,"      Specify the output format. [ctags]"},
  {0,"  --print-language"},
  {0,"       Don't make tags file but just print the guessed language name for"},
  {0,"       input file."},
@@ -1933,6 +1935,22 @@ static void processOptionFile (
 		vStringDelete (vpath);
 }
 
+static void processOutputFormat (const char *const option __unused__,
+				 const char *const parameter)
+{
+	if (parameter [0] == '\0')
+		error (FATAL, "no output format name supplied for \"%s\"", option);
+
+	if (strcmp (parameter, "ctags") == 0)
+		;
+	else if (strcmp (parameter, "etags") == 0)
+		setEtagsMode ();
+	else if (strcmp (parameter, "xref") == 0)
+		setXrefMode ();
+	else
+		error (FATAL, "unknown output format name supplied for \"%s=%s\"", option, parameter);
+}
+
 static void processPseudoTags (const char *const option __unused__,
 			       const char *const parameter)
 {
@@ -2348,6 +2366,7 @@ static parametricOption ParametricOptions [] = {
 	{ "_list-roles",            processListRolesOptions,        TRUE,   STAGE_ANY },
 	{ "maxdepth",               processMaxRecursionDepthOption, TRUE,   STAGE_ANY },
 	{ "options",                processOptionFile,              FALSE,  STAGE_ANY },
+	{ "output-format",          processOutputFormat,            TRUE,   STAGE_ANY},
 	{ "pseudo-tags",            processPseudoTags,              FALSE,  STAGE_ANY },
 	{ "sort",                   processSortOption,              TRUE,   STAGE_ANY },
 	{ "version",                processVersionOption,           TRUE,   STAGE_ANY },
