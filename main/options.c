@@ -717,6 +717,12 @@ extern void testEtagsInvocation (void)
 	eFree (etags);
 }
 
+static void setXrefMode (void)
+{
+	Option.xref = TRUE;
+	setTagWriter (writeXrefEntry, NULL, NULL);
+}
+
 /*
  *  Cooked argument parsing
  */
@@ -2597,8 +2603,7 @@ static void processShortOption (
 			break;
 		case 'x':
 			checkOptionOrder (option, FALSE);
-			Option.xref = TRUE;
-			setTagWriter (writeXrefEntry, NULL, NULL);
+			setXrefMode ();
 			break;
 		default:
 			error (FATAL, "Unknown option: -%s", option);
