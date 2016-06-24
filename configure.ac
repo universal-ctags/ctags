@@ -590,6 +590,14 @@ PKG_CHECK_MODULES(LIBXML, libxml-2.0,
 		       [have_libxml=no])
 AM_CONDITIONAL(HAVE_LIBXML, test "x$have_libxml" = xyes)
 
+AH_TEMPLATE([HAVE_JANSSON],
+	[Define this value if jansson is available.])
+PKG_CHECK_MODULES(JANSSON, jansson,
+		       [have_jansson=yes
+		       AC_DEFINE(HAVE_JANSSON)],
+		       [have_jansson=no])
+AM_CONDITIONAL(HAVE_JANSSON, test "x$have_jansson" = xyes)
+
 
 # Checks for missing prototypes
 # -----------------------------

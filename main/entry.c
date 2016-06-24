@@ -37,6 +37,10 @@
 # include <io.h>
 #endif
 
+#ifdef HAVE_JANSSON
+#include <jansson.h>
+#endif
+
 #include "debug.h"
 #include "entry.h"
 #include "field.h"
@@ -1353,6 +1357,64 @@ static unsigned int queueTagEntry(const tagEntryInfo *const tag)
 	return i;
 }
 
+static void writeJsonEntry (const tagEntryInfo *const tag)
+{
+#ifdef HAVE_JANSSON
+	json_t *response = json_pack ("{ss ss si ss ss ss ss}",
+		"_type", "tag",
+		"name", tag->name,
+		"line", tag->lineNumber,
+		"path", tag->sourceFileName,
+		"kind", tag->kind->name,
+		"language", tag->language,
+		"pattern", tag->pattern
+	);
+
+	if (tag->extensionFields.scopeKind)
+		json_object_set_new (response,
+				tag->extensionFields.scopeKind->name,
+				json_string (tag->extensionFields.scopeName));
+
+	if (tag->extensionFields.typeRef [0] != NULL  &&
+			tag->extensionFields.typeRef [1] != NULL) {
+		char *val;
+		asprintf(&val, "%s:%s",
+				tag->extensionFields.typeRef [0],
+				tag->extensionFields.typeRef [1]);
+		json_object_set_new (response,
+				"typeref",
+				json_string (val));
+		free (val);
+	}
+
+	if (tag->isFileScope)
+		json_object_set_new (response, "scope",
+				json_string ("file"));
+
+	if (tag->extensionFields.inheritance != NULL)
+		json_object_set_new (response, "inherits",
+				json_string (tag->extensionFields.inheritance));
+
+	if (tag->extensionFields.access != NULL)
+		json_object_set_new (response, "access",
+				json_string (tag->extensionFields.access));
+
+	if (tag->extensionFields.implementation != NULL)
+		json_object_set_new (response, "implementation",
+				json_string (tag->extensionFields.implementation));
+
+	if (tag->extensionFields.signature != NULL)
+		json_object_set_new (response, "signature",
+				json_string (tag->extensionFields.signature));
+
+	json_dumpf (response, stdout, 0);
+	fprintf (stdout, "\n");
+	fflush (stdout);
+
+	json_decref (response);
+#endif
+}
+
 static void writeTagEntry (const tagEntryInfo *const tag)
 {
 	int length = 0;
@@ -1361,7 +1423,9 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 		return;
 
 	DebugStatement ( debugEntry (tag); )
-	if (Option.xref)
+	if (Option.json)
+		writeJsonEntry (tag);
+    else if (Option.xref)
 		length = writeXrefEntry (tag);
 	else if (Option.etags)
 		length = writeEtagsEntry (tag);
