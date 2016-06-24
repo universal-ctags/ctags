@@ -233,7 +233,8 @@ static void readIdentifier (int c, vString *const name)
 	do
 	{
 		vStringPut (name, c);
-	} while (c = getcFromInputFile (), (c != EOF  &&  isident (c)));
+		c = getcFromInputFile ();
+	} while (c != EOF  &&  isident (c));
 	ungetcToInputFile (c);
 	vStringTerminate (name);
 }
