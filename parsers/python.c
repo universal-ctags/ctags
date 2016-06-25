@@ -357,7 +357,7 @@ static void readString (vString *const string, const int delimiter)
 	int escaped = 0;
 	int c;
 
-	while ((c = fileGetc ()) != EOF)
+	while ((c = getcFromInputFile ()) != EOF)
 	{
 		if (escaped)
 		{
@@ -369,7 +369,7 @@ static void readString (vString *const string, const int delimiter)
 		else if (c == delimiter || c == '\n' || c == '\r')
 		{
 			if (c != delimiter)
-				fileUngetc (c);
+				ungetcToInputFile (c);
 			break;
 		}
 		else
@@ -383,7 +383,7 @@ static void readTripleString (vString *const string, const int delimiter)
 	int c;
 	int escaped = 0;
 	int n = 0;
-	while ((c = fileGetc ()) != EOF)
+	while ((c = getcFromInputFile ()) != EOF)
 	{
 		if (c == delimiter && ! escaped)
 		{
@@ -412,10 +412,10 @@ static void readIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, (char) c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	}
 	while (isIdentifierChar (c));
-	fileUngetc (c);
+	ungetcToInputFile (c);
 	vStringTerminate (string);
 }
 
@@ -449,7 +449,7 @@ getNextChar:
 	n = 0;
 	do
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		n++;
 	}
 	while (c == ' ' || c == '\t' || c == '\f');
@@ -459,7 +459,7 @@ getNextChar:
 
 	if (inclWhitespaces && n > 1 && c != '\r' && c != '\n')
 	{
-		fileUngetc (c);
+		ungetcToInputFile (c);
 		vStringPut (token->string, ' ');
 		token->type = TOKEN_WHITESPACE;
 		return;
@@ -474,18 +474,18 @@ getNextChar:
 		case '\'':
 		case '"':
 		{
-			int d = fileGetc ();
+			int d = getcFromInputFile ();
 			token->type = TOKEN_STRING;
 			vStringPut (token->string, c);
 			if (d != c)
 			{
-				fileUngetc (d);
+				ungetcToInputFile (d);
 				readString (token->string, c);
 			}
-			else if ((d = fileGetc ()) == c)
+			else if ((d = getcFromInputFile ()) == c)
 				readTripleString (token->string, c);
 			else /* empty string */
-				fileUngetc (d);
+				ungetcToInputFile (d);
 			vStringPut (token->string, c);
 			token->lineNumber = getSourceLineNumber ();
 			token->filePosition = getInputFilePosition ();
@@ -494,7 +494,7 @@ getNextChar:
 
 		case '=':
 		{
-			int d = fileGetc ();
+			int d = getcFromInputFile ();
 			vStringPut (token->string, c);
 			if (d == c)
 			{
@@ -503,7 +503,7 @@ getNextChar:
 			}
 			else
 			{
-				fileUngetc (d);
+				ungetcToInputFile (d);
 				token->type = c;
 			}
 			break;
@@ -517,10 +517,10 @@ getNextChar:
 		case '>':
 		case '/':
 		{
-			int d = fileGetc ();
+			int d = getcFromInputFile ();
 			vStringPut (token->string, c);
 			if (d != '=')
-				fileUngetc (d);
+				ungetcToInputFile (d);
 			else
 				vStringPut (token->string, d);
 			token->type = TOKEN_OPERATOR;
@@ -530,11 +530,11 @@ getNextChar:
 		/* eats newline to implement line continuation  */
 		case '\\':
 		{
-			int d = fileGetc ();
+			int d = getcFromInputFile ();
 			if (d == '\r')
-				d = fileGetc ();
+				d = getcFromInputFile ();
 			if (d != '\n')
-				fileUngetc (d);
+				ungetcToInputFile (d);
 			goto getNextChar;
 			break;
 		}
@@ -547,18 +547,18 @@ getNextChar:
 				if (c == '#')
 				{
 					do
-						c = fileGetc ();
+						c = getcFromInputFile ();
 					while (c != EOF && c != '\r' && c != '\n');
 				}
 				if (c == '\r')
 				{
-					int d = fileGetc ();
+					int d = getcFromInputFile ();
 					if (d != '\n')
-						fileUngetc (d);
+						ungetcToInputFile (d);
 				}
 				token->type = TOKEN_INDENT;
 				token->indent = 0;
-				while ((c = fileGetc ()) == ' ' || c == '\t' || c == '\f')
+				while ((c = getcFromInputFile ()) == ' ' || c == '\t' || c == '\f')
 				{
 					if (c == '\t')
 						token->indent += 8;
@@ -569,7 +569,7 @@ getNextChar:
 				}
 			} /* skip completely empty lines, so retry */
 			while (c == '\r' || c == '\n' || c == '#');
-			fileUngetc (c);
+			ungetcToInputFile (c);
 			break;
 
 		default:
