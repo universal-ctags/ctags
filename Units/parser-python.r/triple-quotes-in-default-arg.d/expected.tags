@@ -1,0 +1,2 @@
+anothervar	input.py	/^anothervar=1$/;"	v
+f	input.py	/^def f(var=("""$/;"	f
