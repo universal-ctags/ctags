@@ -826,10 +826,16 @@ static void findPythonTags (void)
 			if (token->keyword == KEYWORD_from)
 			{
 				readToken (token);
-				if (token->type == TOKEN_IDENTIFIER)
+				if (token->type == TOKEN_IDENTIFIER ||
+				    token->type == '.')
 				{
-					from_module = vStringNewCopy (token->string);
-					readToken (token);
+					from_module = vStringNew ();
+					while (token->type == TOKEN_IDENTIFIER ||
+					       token->type == '.')
+					{
+						vStringCat (from_module, token->string);
+						readToken (token);
+					}
 				}
 			}
 
@@ -853,6 +859,7 @@ static void findPythonTags (void)
 
 						copyToken (name, token);
 						/* skip sub-levels in foo.bar.baz */
+						/* FIXME: should we include that in the report somehow? */
 						skipQualifiedName (token);
 						/* if there is an "as", use it as the name */
 						if (token->keyword == KEYWORD_as)
