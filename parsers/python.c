@@ -59,7 +59,7 @@ typedef enum {
 	K_FUNCTION,
 	K_METHOD,
 	K_VARIABLE,
-	K_IMPORT,
+	//~ K_IMPORT,
 	K_NAMESPACE,
 	K_MODULE,
 	K_UNKNOWN,
@@ -964,7 +964,7 @@ static void findPythonTags (void)
 							}
 						}
 
-						makeSimplePythonTag (name, K_IMPORT);
+						//~ makeSimplePythonTag (name, K_IMPORT);
 					}
 				}
 				while (token->type == ',');
