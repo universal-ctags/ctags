@@ -54,6 +54,14 @@ boolean cxxParserParseNamespace(void)
 	// namespace <X>;
 	// namespace;
 
+	unsigned int uProperties = 0;
+
+	if(cxxTagFieldEnabled(CXXTagFieldProperties))
+	{
+		if(g_cxx.uKeywordState & CXXParserKeywordStateSeenInline)
+			uProperties |= CXXTagPropertyInline;
+	}
+
 	int iScopeCount = 0;
 	
 	int i;
@@ -209,7 +217,7 @@ boolean cxxParserParseNamespace(void)
 		CXX_DEBUG_PRINT("Found regular namespace start");
 		
 		CXXToken * t = pFirstIdentifier;
-		
+
 		while(t)
 		{
 			tagEntryInfo * tag = cxxTagBegin(CXXTagCPPKindNAMESPACE,t);
@@ -219,9 +227,15 @@ boolean cxxParserParseNamespace(void)
 				// This is highly questionable but well.. it's how old ctags did, so we do.
 				tag->isFileScope = !isInputHeaderFile();
 
+				vString * pszProperties = uProperties ? cxxTagSetProperties(uProperties) : NULL;
+
 				int iCorkQueueIndex = cxxTagCommit();
+
 				if(iScopeCount < MAX_NESTED_NAMESPACES)
 					aCorkQueueIndices[iScopeCount] = iCorkQueueIndex;
+
+				if(pszProperties)
+					vStringDelete(pszProperties);
 			}
 
 			CXXToken * pNext = (t == pLastIdentifier) ? NULL : t->pNext->pNext;
@@ -249,7 +263,13 @@ boolean cxxParserParseNamespace(void)
 		if(tag)
 		{
 			tag->isFileScope = !isInputHeaderFile();
+
+			vString * pszProperties = uProperties ? cxxTagSetProperties(uProperties) : NULL;
+
 			aCorkQueueIndices[0] = cxxTagCommit();
+
+			if(pszProperties)
+				vStringDelete(pszProperties);
 		}
 		cxxScopePush(t,CXXScopeTypeNamespace,CXXScopeAccessUnknown);
 
