@@ -170,11 +170,10 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 	else
 		vStringClear (fullScope);
 
-	initTagEntry (e, vStringValue (token->string));
+	initTagEntry (e, vStringValue (token->string), &(PythonKinds[kind]));
 
 	e->lineNumber	= token->lineNumber;
 	e->filePosition	= token->filePosition;
-	e->kind			= &(PythonKinds[kind]);
 
 	if (PythonNestingLevels->n > 0)
 	{
