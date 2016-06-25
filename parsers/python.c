@@ -233,7 +233,7 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 
 		for (i = 0; i < PythonNestingLevels->n; i++)
 		{
-			parentKind = PythonNestingLevels->levels[i].type;
+			parentKind = PythonNestingLevels->levels[i].kindIndex;
 			if (vStringLength (fullScope) > 0)
 				vStringPut (fullScope, '.');
 			vStringCat (fullScope, PythonNestingLevels->levels[i].name);
@@ -957,7 +957,7 @@ static void findPythonTags (void)
 		{
 			NestingLevel *lv = nestingLevelsGetCurrent (PythonNestingLevels);
 
-			if (! lv || lv->type == K_CLASS)
+			if (! lv || lv->kindIndex == K_CLASS)
 			{
 				tokenInfo *name = newToken ();
 
