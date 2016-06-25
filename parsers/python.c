@@ -233,10 +233,13 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 
 		for (i = 0; i < PythonNestingLevels->n; i++)
 		{
-			parentKind = PythonNestingLevels->levels[i].kindIndex;
+			NestingLevel *nl = nestingLevelsGetNth (PythonNestingLevels, i);
+			tagEntryInfo *nlEntry = getEntryOfNestingLevel (nl);
+
+			parentKind = (int) (nlEntry->kind - PythonKinds);
 			if (vStringLength (fullScope) > 0)
 				vStringPut (fullScope, '.');
-			vStringCat (fullScope, PythonNestingLevels->levels[i].name);
+			vStringCatS (fullScope, nlEntry->name);
 		}
 	}
 
@@ -259,8 +262,8 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 	}
 }
 
-static void makeClassTag (const tokenInfo *const token,
-                          vString *const inheritance)
+static int makeClassTag (const tokenInfo *const token,
+                         vString *const inheritance)
 {
 	if (PythonKinds[K_CLASS].enabled)
 	{
@@ -271,12 +274,14 @@ static void makeClassTag (const tokenInfo *const token,
 		if (inheritance && vStringLength (inheritance) > 0)
 			e.extensionFields.inheritance = vStringValue (inheritance);
 
-		makeTagEntry (&e);
+		return makeTagEntry (&e);
 	}
+
+	return CORK_NIL;
 }
 
-static void makeFunctionTag (const tokenInfo *const token,
-                             const vString *const arglist)
+static int makeFunctionTag (const tokenInfo *const token,
+                            const vString *const arglist)
 {
 	if (PythonKinds[K_FUNCTION].enabled)
 	{
@@ -287,19 +292,23 @@ static void makeFunctionTag (const tokenInfo *const token,
 		if (arglist)
 			e.extensionFields.signature = vStringValue (arglist);
 
-		makeTagEntry (&e);
+		return makeTagEntry (&e);
 	}
+
+	return CORK_NIL;
 }
 
-static void makeSimplePythonTag (const tokenInfo *const token, pythonKind const kind)
+static int makeSimplePythonTag (const tokenInfo *const token, pythonKind const kind)
 {
 	if (PythonKinds[kind].enabled)
 	{
 		tagEntryInfo e;
 
 		initPythonEntry (&e, token, kind);
-		makeTagEntry (&e);
+		return makeTagEntry (&e);
 	}
+
+	return CORK_NIL;
 }
 
 static tokenInfo *newToken (void)
@@ -742,6 +751,7 @@ static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind,
 {
 	vString *arglist = NULL;
 	tokenInfo *name = NULL;
+	int corkIndex;
 
 	if (isCDef)
 	{
@@ -766,11 +776,11 @@ static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind,
 	}
 
 	if (kind == K_CLASS)
-		makeClassTag (name, arglist);
+		corkIndex = makeClassTag (name, arglist);
 	else
-		makeFunctionTag (name, arglist);
+		corkIndex = makeFunctionTag (name, arglist);
 
-	nestingLevelsPush (PythonNestingLevels, name->string, kind);
+	nestingLevelsPush (PythonNestingLevels, corkIndex);
 	nestingLevelsGetCurrent (PythonNestingLevels)->indentation = token->indent;
 
 	deleteToken (name);
@@ -964,8 +974,9 @@ static void findPythonTags (void)
 		else if (token->type == TOKEN_IDENTIFIER && atLineStart)
 		{
 			NestingLevel *lv = nestingLevelsGetCurrent (PythonNestingLevels);
+			tagEntryInfo *lvEntry = getEntryOfNestingLevel (lv);
 
-			if (! lv || lv->kindIndex == K_CLASS)
+			if (! lvEntry || lvEntry->kind == &(PythonKinds[K_CLASS]))
 			{
 				tokenInfo *name = newToken ();
 
