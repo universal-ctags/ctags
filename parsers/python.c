@@ -241,6 +241,13 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 			NestingLevel *nl = nestingLevelsGetNth (PythonNestingLevels, i);
 			tagEntryInfo *nlEntry = getEntryOfNestingLevel (nl);
 
+			/* This can happen if a kind was disabled.  But what can we do
+			 * here?  Even disabled kinds should count for the hierarchy I
+			 * guess -- as it'd otherwise be wrong -- but with cork we're
+			 * fucked up as there's nothing to look up.  Damn. */
+			if (! nlEntry)
+				continue;
+
 			parentKind = (int) (nlEntry->kind - PythonKinds);
 			if (vStringLength (fullScope) > 0)
 				vStringPut (fullScope, '.');
