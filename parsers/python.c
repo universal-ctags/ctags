@@ -200,8 +200,8 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 		Assert (parentKind >= 0);
 
 		vStringTerminate (fullScope);
-		e->extensionFields.scope[0] = PythonKinds[parentKind].name;
-		e->extensionFields.scope[1] = vStringValue (fullScope);
+		e->extensionFields.scopeKind = &(PythonKinds[parentKind]);
+		e->extensionFields.scopeName = vStringValue (fullScope);
 
 		if (kind == K_FUNCTION && parentKind == K_CLASS)
 			e->kind		= &(PythonKinds[K_METHOD]);
