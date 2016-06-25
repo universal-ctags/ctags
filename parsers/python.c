@@ -165,6 +165,11 @@ typedef struct {
 	fpos_t			filePosition;
 } tokenInfo;
 
+struct pythonNestingLevelUserData {
+	int indentation;
+};
+#define PY_NL(nl) ((struct pythonNestingLevelUserData *) nestingLevelGetUserData (nl))
+
 static langType Lang_python;
 static tokenInfo *NextToken = NULL;
 static NestingLevels *PythonNestingLevels = NULL;
@@ -781,7 +786,7 @@ static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind,
 		corkIndex = makeFunctionTag (name, arglist);
 
 	nestingLevelsPush (PythonNestingLevels, corkIndex);
-	nestingLevelsGetCurrent (PythonNestingLevels)->indentation = token->indent;
+	PY_NL (nestingLevelsGetCurrent (PythonNestingLevels))->indentation = token->indent;
 
 	deleteToken (name);
 	vStringDelete (arglist);
@@ -794,7 +799,7 @@ static void setIndent (int indent)
 {
 	NestingLevel *lv = nestingLevelsGetCurrent (PythonNestingLevels);
 
-	while (lv && lv->indentation >= indent)
+	while (lv && PY_NL (lv)->indentation >= indent)
 	{
 		nestingLevelsPop (PythonNestingLevels);
 		lv = nestingLevelsGetCurrent (PythonNestingLevels);
@@ -807,7 +812,7 @@ static void findPythonTags (void)
 	boolean atLineStart = TRUE;
 
 	NextToken = NULL;
-	PythonNestingLevels = nestingLevelsNew ();
+	PythonNestingLevels = nestingLevelsNew (sizeof (struct pythonNestingLevelUserData));
 
 	readToken (token);
 	while (token->type != TOKEN_EOF)
