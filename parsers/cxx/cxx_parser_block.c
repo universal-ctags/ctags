@@ -210,7 +210,7 @@ process_token:
 							return FALSE;
 						}
 
-						//cxxParserNewStatement(); <-- already called by cxxParserParseNamespace()
+						cxxParserNewStatement();
 					}
 					break;
 					case CXXKeywordTEMPLATE:

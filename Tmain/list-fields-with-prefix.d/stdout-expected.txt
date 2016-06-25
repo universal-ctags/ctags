@@ -9,6 +9,7 @@ p       UCTAGSscopeKind on      NONE             TRUE     Kind of scope as full 
 -       UCTAGSproperties off     C++              TRUE     properties (static, inline, mutable,...)
 -       UCTAGStemplate  off     C++              TRUE     template parameters           
 -       UCTAGScaptures  off     C++              TRUE     lambda capture list           
+-       UCTAGSname      on      C++              TRUE     aliased names                 
 -       UCTAGSend       off     Python           TRUE     end lines of various constructs
 -       UCTAGSend       off     RpmSpec          TRUE     end lines of macros           
 -       UCTAGSsectionMarker off     reStructuredText TRUE     character used for declaring section

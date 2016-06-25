@@ -101,8 +101,10 @@ boolean cxxParserParseAndCondenseCurrentSubchain(
 }
 
 //
-// This function parses input until one of the specified
-// tokens appears. The algorithm will also build subchains of matching
+// This function parses input until one of the specified tokens appears.
+// The current token is NOT checked agains the specified tokens.
+//
+// The algorithm will also build subchains of matching
 // pairs ([...],(...),<...>,{...}): within the subchain analysis
 // of uTokenTypes is completly disabled. Subchains do nest.
 //
@@ -225,6 +227,8 @@ boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
 
 //
 // This function parses input until one of the specified tokens appears.
+// The current token is NOT checked agains the specified tokens.
+//
 // The algorithm will also build subchains of matching pairs ([...],(...),{...}).
 // Within the subchain analysis of uTokenTypes is completly disabled.
 // Subchains do nest.
@@ -243,6 +247,86 @@ boolean cxxParserParseUpToOneOf(unsigned int uTokenTypes)
 				CXXTokenTypeOpeningSquareParenthesis
 		);
 }
+
+//
+// Attempts to skip to either a semicolon or an EOF, ignoring anything in between.
+// May be also used to recovery from certain forms of syntax errors.
+// This function works also if the current token is a semicolon or an EOF.
+//
+boolean cxxParserSkipToSemicolonOrEOF(void)
+{
+	if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeSemicolon | CXXTokenTypeEOF))
+		return TRUE;
+
+	return cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF);
+}
+
+// This has to be called when pointing to a double-colon token
+// or an identifier.
+//
+// It tries to parse a qualified name in the form of ...::A::B::C::D ...
+// and stops at the first token that is not part of such name.
+//
+// Returns false if it doesn't find an identifier after a double-colon
+// or if it finds an EOF. Returns true otherwise.
+//
+// Upon exit the token preceding the current is the last identifier
+// of the qualified name.
+boolean cxxParserParseToEndOfQualifedName(void)
+{
+	CXX_DEBUG_ENTER();
+
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIsOneOf(
+					g_cxx.pToken,
+					CXXTokenTypeMultipleColons | CXXTokenTypeIdentifier
+				),
+			"This function should be called when pointing to a double-colon or an identifier"
+		);
+
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier))
+	{
+		if(!cxxParserParseNextToken())
+		{
+			// syntax error, but we tolerate this
+			CXX_DEBUG_LEAVE_TEXT("EOF in cxxParserParseNextToken");
+			return FALSE; // EOF
+		}
+	}
+
+	while(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeMultipleColons))
+	{
+		if(!cxxParserParseNextToken())
+		{
+			// syntax error, but we tolerate this
+			CXX_DEBUG_LEAVE_TEXT("EOF in cxxParserParseNextToken");
+			return FALSE; // EOF
+		}
+		
+		if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier))
+		{
+			CXX_DEBUG_LEAVE_TEXT("Found no identifier after multiple colons");
+			return FALSE;
+		}
+
+		if(!cxxParserParseNextToken())
+		{
+			// syntax error, but we tolerate this
+			CXX_DEBUG_LEAVE_TEXT("EOF in cxxParserParseNextToken");
+			return FALSE; // EOF
+		}
+	}
+
+	CXX_DEBUG_ASSERT(g_cxx.pToken->pPrev,"There should be a previous token here");
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeIdentifier),
+			"The qualified name should end with an identifier"
+		);
+
+	CXX_DEBUG_LEAVE();
+	return TRUE;
+}
+
 
 //
 // Attach the current position of input file as "end" field of

@@ -66,6 +66,7 @@ static kindOption g_aCXXCPPKinds [] = {
 	CXX_COMMON_KINDS(CXX,"class, struct, and union members"),
 	{ TRUE,  'c', "class",      "classes" },
 	{ TRUE,  'n', "namespace",  "namespaces" },
+	{ FALSE, 'A', "alias",      "namespace aliases" },
 	{ FALSE, 'N', "name",       "names imported via using scope::symbol" },
 	{ FALSE, 'U', "using",      "using namespace statements",
 			.referenceOnly = TRUE },
@@ -105,6 +106,11 @@ static fieldSpec g_aCXXCPPFields [] = {
 		.name = "captures",
 		.description = "lambda capture list",
 		.enabled = FALSE
+	},
+	{
+		.name = "name",
+		.description = "aliased names",
+		.enabled = TRUE
 	}
 };
 
