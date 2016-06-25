@@ -756,6 +756,7 @@ static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind,
 {
 	vString *arglist = NULL;
 	tokenInfo *name = NULL;
+	NestingLevel *lv;
 	int corkIndex;
 
 	if (isCDef)
@@ -785,8 +786,8 @@ static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind,
 	else
 		corkIndex = makeFunctionTag (name, arglist);
 
-	nestingLevelsPush (PythonNestingLevels, corkIndex);
-	PY_NL (nestingLevelsGetCurrent (PythonNestingLevels))->indentation = token->indent;
+	lv = nestingLevelsPush (PythonNestingLevels, corkIndex);
+	PY_NL (lv)->indentation = token->indent;
 
 	deleteToken (name);
 	vStringDelete (arglist);
