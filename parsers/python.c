@@ -174,8 +174,7 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 
 	e->lineNumber	= token->lineNumber;
 	e->filePosition	= token->filePosition;
-	e->kindName		= PythonKinds[kind].name;
-	e->kind			= (char) PythonKinds[kind].letter;
+	e->kind			= &(PythonKinds[kind]);
 
 	if (PythonNestingLevels->n > 0)
 	{
@@ -205,10 +204,7 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 		e->extensionFields.scope[1] = vStringValue (fullScope);
 
 		if (kind == K_FUNCTION && parentKind == K_CLASS)
-		{
-			e->kindName	= PythonKinds[K_METHOD].name;
-			e->kind		= (char) PythonKinds[K_METHOD].letter;
-		}
+			e->kind		= &(PythonKinds[K_METHOD]);
 	}
 }
 
