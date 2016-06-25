@@ -59,7 +59,6 @@ typedef enum {
 	K_FUNCTION,
 	K_METHOD,
 	K_VARIABLE,
-	//~ K_IMPORT,
 	K_NAMESPACE,
 	K_MODULE,
 	K_UNKNOWN,
@@ -317,6 +316,30 @@ static int makeSimplePythonTag (const tokenInfo *const token, pythonKind const k
 		tagEntryInfo e;
 
 		initPythonEntry (&e, token, kind);
+		return makeTagEntry (&e);
+	}
+
+	return CORK_NIL;
+}
+
+static int makeSimplePythonRefTag (const tokenInfo *const token,
+                                   const vString *const altName,
+                                   pythonKind const kind,
+                                   int roleIndex, xtagType xtag)
+{
+	if (PythonKinds[kind].roles[roleIndex].enabled)
+	{
+		tagEntryInfo e;
+
+		initRefTagEntry (&e, vStringValue (altName ? altName : token->string),
+		                 &PythonKinds[kind], roleIndex);
+
+		e.lineNumber	= token->lineNumber;
+		e.filePosition	= token->filePosition;
+
+		if (xtag != XTAG_UNKNOWN)
+			markTagExtraBit (&e, xtag);
+
 		return makeTagEntry (&e);
 	}
 
@@ -685,19 +708,34 @@ static boolean skipLambdaArglist (tokenInfo *const token, vString *const repr)
 	return FALSE;
 }
 
-static boolean skipQualifiedName (tokenInfo *const token)
+static void readQualifiedName (tokenInfo *const nameToken)
 {
-	if (token->type == TOKEN_IDENTIFIER)
+	readToken (nameToken);
+
+	if (nameToken->type != TOKEN_IDENTIFIER &&
+	    nameToken->type != '.')
 	{
-		readToken (token);
-		while (token->type == '.')
+		vString *qualifiedName = vStringNew ();
+		tokenInfo *token = newToken ();
+
+		while (nameToken->type != TOKEN_IDENTIFIER &&
+		       nameToken->type != '.')
 		{
-			readToken (token);
-			if (token->type == TOKEN_IDENTIFIER)
-				readToken (token);
+			vStringCat (qualifiedName, nameToken->string);
+			copyToken (token, nameToken);
+
+			readToken (nameToken);
 		}
+		/* put the last, non-matching, token back */
+		ungetToken (nameToken);
+
+		copyToken (nameToken, token);
+		nameToken->type = TOKEN_IDENTIFIER;
+		vStringCopy (nameToken->string, qualifiedName);
+
+		deleteToken (token);
+		vStringDelete (qualifiedName);
 	}
-	return FALSE;
 }
 
 static boolean readCDefName (tokenInfo *const token, pythonKind *kind)
@@ -851,53 +889,47 @@ static void findPythonTags (void)
 		else if (token->keyword == KEYWORD_from ||
 		         token->keyword == KEYWORD_import)
 		{
-			vString *from_module = NULL;
+			tokenInfo *fromModule = NULL;
 
 			if (token->keyword == KEYWORD_from)
 			{
-				readToken (token);
-				if (token->type == TOKEN_IDENTIFIER ||
-				    token->type == '.')
+				readQualifiedName (token);
+				if (token->type == TOKEN_IDENTIFIER)
 				{
-					from_module = vStringNew ();
-					while (token->type == TOKEN_IDENTIFIER ||
-					       token->type == '.')
-					{
-						vStringCat (from_module, token->string);
-						readToken (token);
-					}
+					fromModule = newToken ();
+					copyToken (fromModule, token);
+					readToken (token);
 				}
 			}
 
 			if (token->keyword == KEYWORD_import)
 			{
-				if (from_module)
+				if (fromModule)
 				{
 					/* from X import ...
 					 * --------------------
 					 * X = (kind:module, role:namespace) */
-					makeSimpleRefTag (from_module, PythonKinds, K_MODULE,
-					                  PYTHON_MODULE_NAMESPACE);
+					makeSimplePythonRefTag (fromModule, NULL, K_MODULE,
+					                        PYTHON_MODULE_NAMESPACE,
+					                        XTAG_UNKNOWN);
 				}
 
 				do
 				{
-					readToken (token);
+					readQualifiedName (token);
 					if (token->type == TOKEN_IDENTIFIER)
 					{
 						tokenInfo *name = newToken ();
 
 						copyToken (name, token);
-						/* skip sub-levels in foo.bar.baz */
-						/* FIXME: should we include that in the report somehow? */
-						skipQualifiedName (token);
+						readToken (token);
 						/* if there is an "as", use it as the name */
 						if (token->keyword == KEYWORD_as)
 						{
 							readToken (token);
 							if (token->type == TOKEN_IDENTIFIER)
 							{
-								if (from_module)
+								if (fromModule)
 								{
 									/* from x import Y as Z
 									 * ----------------------------
@@ -906,20 +938,18 @@ static void findPythonTags (void)
 									 * Z = (kind:unknown) */
 
 									/* Y */
-									makeSimpleRefTag (name->string, PythonKinds, K_UNKNOWN,
-									                  PYTHON_UNKNOWN_INDIRECTLY_IMPORTED);
+									makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
+									                        PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
+									                        XTAG_UNKNOWN);
 									/* x.Y */
-									if (isXtagEnabled(XTAG_QUALIFIED_TAGS))
+									if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
 									{
-										tagEntryInfo fqe;
-										vString *fq = vStringNewCopy (from_module);
+										vString *fq = vStringNewCopy (fromModule->string);
 										vStringPut (fq, '.');
 										vStringCat (fq, name->string);
-										initRefTagEntry (&fqe, vStringValue (fq),
-										                 &(PythonKinds[K_UNKNOWN]),
-										                 PYTHON_UNKNOWN_INDIRECTLY_IMPORTED);
-										markTagExtraBit (&fqe, XTAG_QUALIFIED_TAGS);
-										makeTagEntry (&fqe);
+										makeSimplePythonRefTag (token, fq, K_UNKNOWN,
+										                        PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
+										                        XTAG_QUALIFIED_TAGS);
 										vStringDelete (fq);
 									}
 									/* Z */
@@ -932,8 +962,9 @@ static void findPythonTags (void)
 									 * X = (kind:module, role:indirectly-imported)
 									 * Y = (kind:namespace)*/
 									/* X */
-									makeSimpleRefTag (name->string, PythonKinds, K_MODULE,
-									                  PYTHON_MODULE_INDIRECTLY_IMPORTED);
+									makeSimplePythonRefTag (token, NULL, K_MODULE,
+									                        PYTHON_MODULE_INDIRECTLY_IMPORTED,
+									                        XTAG_UNKNOWN);
 									/* Y */
 									makeSimplePythonTag (token, K_NAMESPACE);
 								}
@@ -944,27 +975,25 @@ static void findPythonTags (void)
 						}
 						else
 						{
-							if (from_module)
+							if (fromModule)
 							{
 								/* from x import Y
 								   --------------
 								   x = (kind:module,  role:namespace),
 								   Y = (kind:unknown, role:imported) */
 								/* Y */
-								makeSimpleRefTag (name->string, PythonKinds, K_UNKNOWN,
-								                  PYTHON_MODULE_IMPORTED);
+								makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
+								                        PYTHON_MODULE_IMPORTED,
+								                        XTAG_UNKNOWN);
 								/* x.Y */
-								if (isXtagEnabled(XTAG_QUALIFIED_TAGS))
+								if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
 								{
-									tagEntryInfo fqe;
-									vString *fq = vStringNewCopy (from_module);
+									vString *fq = vStringNewCopy (fromModule->string);
 									vStringPut (fq, '.');
 									vStringCat (fq, name->string);
-									initRefTagEntry (&fqe, vStringValue (fq),
-									                 &(PythonKinds[K_UNKNOWN]),
-									                 PYTHON_MODULE_IMPORTED);
-									markTagExtraBit (&fqe, XTAG_QUALIFIED_TAGS);
-									makeTagEntry (&fqe);
+									makeSimplePythonRefTag (name, fq, K_UNKNOWN,
+									                        PYTHON_MODULE_IMPORTED,
+									                        XTAG_QUALIFIED_TAGS);
 									vStringDelete (fq);
 								}
 							}
@@ -973,19 +1002,19 @@ static void findPythonTags (void)
 								/* import X
 								   --------------
 								   X = (kind:module, role:imported) */
-								makeSimpleRefTag (name->string, PythonKinds, K_MODULE,
-								                  PYTHON_MODULE_IMPORTED);
+								makeSimplePythonRefTag (name, NULL, K_MODULE,
+								                        PYTHON_MODULE_IMPORTED,
+								                        XTAG_UNKNOWN);
 							}
 						}
-
-						//~ makeSimplePythonTag (name, K_IMPORT);
 					}
 				}
 				while (token->type == ',');
 			}
 			readNext = FALSE;
 
-			vStringDelete (from_module);
+			if (fromModule)
+				deleteToken (fromModule);
 		}
 		else if (token->type == '(')
 		{ /* skip parentheses to avoid finding stuff inside them */
