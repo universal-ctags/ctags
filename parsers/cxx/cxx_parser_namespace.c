@@ -32,10 +32,6 @@ boolean cxxParserParseNamespace(void)
 	
 	CXX_DEBUG_ASSERT(cxxParserCurrentLanguageIsCPP(),"This should be called only in C++");
 
-	// FIXME: Do it better...
-
-	cxxParserNewStatement(); // always a new statement
-
 	/*
 		Spec is:
 
@@ -61,6 +57,8 @@ boolean cxxParserParseNamespace(void)
 		if(g_cxx.uKeywordState & CXXParserKeywordStateSeenInline)
 			uProperties |= CXXTagPropertyInline;
 	}
+
+	cxxParserNewStatement(); // always a new statement
 
 	int iScopeCount = 0;
 	
