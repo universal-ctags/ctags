@@ -1258,7 +1258,7 @@ re_node_set_merge (re_node_set *dest, const re_node_set *src)
 
 /* Insert the new element ELEM to the re_node_set* SET.
    SET should not already have ELEM.
-   return -1 if an error is occured, return 1 otherwise.  */
+   return -1 if an error is occurred, return 1 otherwise.  */
 
 static int
 internal_function
@@ -1315,7 +1315,7 @@ re_node_set_insert (re_node_set *set, int elem)
 
 /* Insert the new element ELEM to the re_node_set* SET.
    SET should not already have any element greater than or equal to ELEM.
-   Return -1 if an error is occured, return 1 otherwise.  */
+   Return -1 if an error is occurred, return 1 otherwise.  */
 
 static int
 internal_function
@@ -1390,7 +1390,7 @@ re_node_set_remove_at (re_node_set *set, int idx)
 
 
 /* Add the token TOKEN to dfa->nodes, and return the index of the token.
-   Or return -1, if an error will be occured.  */
+   Or return -1, if an error will be occurred.  */
 
 static int
 internal_function

@@ -2,6 +2,7 @@
  * css.c
  * Token-based parser for CSS definitions
  * Author - Colomban Wendling <colomban@geany.org>
+ * License GPL-2
  **************************************************************************/
 #include "general.h"
 
@@ -11,7 +12,7 @@
 #include "entry.h"
 #include "parse.h" 
 #include "read.h" 
-
+#include "routines.h"
 
 typedef enum eCssKinds {
 	K_CLASS, K_SELECTOR, K_ID
@@ -59,9 +60,9 @@ static void parseSelector (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, (char) c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isSelectorChar (c));
-	fileUngetc (c);
+	ungetcToInputFile (c);
 	vStringTerminate (string);
 }
 
@@ -73,9 +74,9 @@ static void readToken (tokenInfo *const token)
 
 getNextChar:
 
-	c = fileGetc ();
+	c = getcFromInputFile ();
 	while (isspace (c))
-		c = fileGetc ();
+		c = getcFromInputFile ();
 
 	token->type = c;
 	switch (c)
@@ -89,9 +90,9 @@ getNextChar:
 			do
 			{
 				vStringPut (token->string, c);
-				c = fileGetc ();
+				c = getcFromInputFile ();
 				if (c == '\\')
-					c = fileGetc ();
+					c = getcFromInputFile ();
 			}
 			while (c != EOF && c != delimiter);
 			if (c != EOF)
@@ -102,20 +103,20 @@ getNextChar:
 
 		case '/': /* maybe comment start */
 		{
-			int d = fileGetc ();
+			int d = getcFromInputFile ();
 			if (d != '*')
 			{
-				fileUngetc (d);
+				ungetcToInputFile (d);
 				vStringPut (token->string, c);
 				token->type = c;
 			}
 			else
 			{
-				d = fileGetc ();
+				d = getcFromInputFile ();
 				do
 				{
 					c = d;
-					d = fileGetc ();
+					d = getcFromInputFile ();
 				}
 				while (d != EOF && ! (c == '*' && d == '/'));
 				goto getNextChar;
@@ -186,7 +187,7 @@ static void findCssTags (void)
 		else if (token.type == TOKEN_SELECTOR)
 		{ /* collect selectors and make a tag */
 			cssKind kind = K_SELECTOR;
-			fpos_t filePosition;
+			MIOPos filePosition;
 			unsigned long lineNumber;
 			vString *selector = vStringNew ();
 			do
@@ -196,7 +197,7 @@ static void findCssTags (void)
 				vStringCat (selector, token.string);
 
 				kind = classifySelector (token.string);
-				lineNumber = getSourceLineNumber ();
+				lineNumber = getInputLineNumber ();
 				filePosition = getInputFilePosition ();
 
 				readToken (&token);
@@ -227,12 +228,10 @@ static void findCssTags (void)
 			if (CssKinds[kind].enabled)
 			{
 				tagEntryInfo e;
-				initTagEntry (&e, vStringValue (selector));
+				initTagEntry (&e, vStringValue (selector), &(CssKinds[kind]));
 
 				e.lineNumber	= lineNumber;
 				e.filePosition	= filePosition;
-				e.kindName		= CssKinds[kind].name;
-				e.kind			= (char) CssKinds[kind].letter;
 
 				makeTagEntry (&e);
 			}
@@ -262,7 +261,7 @@ extern parserDefinition* CssParser (void)
     static const char *const extensions [] = { "css", NULL };
     parserDefinition* def = parserNew ("CSS");
     def->kinds      = CssKinds;
-    def->kindCount  = KIND_COUNT (CssKinds);
+    def->kindCount  = ARRAY_SIZE (CssKinds);
     def->extensions = extensions;
     def->parser     = findCssTags;
     return def;

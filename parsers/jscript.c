@@ -2,7 +2,7 @@
  *	 Copyright (c) 2003, Darren Hiebert
  *
  *	 This source code is released for free distribution under the terms of the
- *	 GNU General Public License.
+ *	 GNU General Public License version 2 or (at your option) any later version.
  *
  *	 This module contains functions for generating tags for JavaScript language
  *	 files.
@@ -73,14 +73,6 @@ typedef enum eKeywordId {
 	KEYWORD_return
 } keywordId;
 
-/*	Used to determine whether keyword is valid for the token language and
- *	what its ID is.
- */
-typedef struct sKeywordDesc {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
 	TOKEN_EOF,
@@ -111,7 +103,7 @@ typedef struct sTokenInfo {
 	vString *		string;
 	vString *		scope;
 	unsigned long 	lineNumber;
-	fpos_t 			filePosition;
+	MIOPos 			filePosition;
 	int				nestLevel;
 	boolean			ignoreTag;
 } tokenInfo;
@@ -144,7 +136,7 @@ static kindOption JsKinds [] = {
 	{ TRUE,  'v', "variable",	  "global variables"   }
 };
 
-static const keywordDesc JsKeywordTable [] = {
+static const keywordTable JsKeywordTable [] = {
 	/* keyword		keyword ID */
 	{ "function",	KEYWORD_function			},
 	{ "Function",	KEYWORD_capital_function	},
@@ -186,18 +178,6 @@ static boolean isIdentChar (const int c)
 		 c == '@' || c == '_' || c == '#');
 }
 
-static void buildJsKeywordHash (void)
-{
-	const size_t count = sizeof (JsKeywordTable) /
-		sizeof (JsKeywordTable [0]);
-	size_t i;
-	for (i = 0	;  i < count  ;  ++i)
-	{
-		const keywordDesc* const p = &JsKeywordTable [i];
-		addKeyword (p->name, Lang_js, (int) p->id);
-	}
-}
-
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
@@ -208,7 +188,7 @@ static tokenInfo *newToken (void)
 	token->scope		= vStringNew ();
 	token->nestLevel	= 0;
 	token->ignoreTag	= FALSE;
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	return token;
@@ -249,7 +229,7 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const
 		const char *p;
 		tagEntryInfo e;
 
-		if ( (p = strrchr (name, '.')) != NULL )
+		if (kind != JSTAG_PROPERTY &&  (p = strrchr (name, '.')) != NULL )
 		{
 			if (vStringLength (fullscope) > 0)
 				vStringPut (fullscope, '.');
@@ -257,12 +237,10 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const
 			name = p + 1;
 		}
 
-		initTagEntry (&e, name);
+		initTagEntry (&e, name, &(JsKinds [kind]));
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
-		e.kindName	   = JsKinds [kind].name;
-		e.kind		   = JsKinds [kind].letter;
 
 		if ( vStringLength(fullscope) > 0 )
 		{
@@ -275,8 +253,8 @@ static void makeJsTag (tokenInfo *const token, const jsKind kind, vString *const
 			if (kind == JSTAG_FUNCTION)
 				parent_kind = JSTAG_FUNCTION;
 
-			e.extensionFields.scope[0] = JsKinds [parent_kind].name;
-			e.extensionFields.scope[1] = vStringValue (fullscope);
+			e.extensionFields.scopeKind = &(JsKinds [parent_kind]);
+			e.extensionFields.scopeName = vStringValue (fullscope);
 		}
 
 		if (signature && vStringLength(signature))
@@ -364,7 +342,7 @@ static void parseString (vString *const string, const int delimiter)
 	boolean end = FALSE;
 	while (! end)
 	{
-		int c = fileGetc ();
+		int c = getcFromInputFile ();
 		if (c == EOF)
 			end = TRUE;
 		else if (c == '\\')
@@ -375,14 +353,14 @@ static void parseString (vString *const string, const int delimiter)
 			 * Also, handle the fact that <LineContinuation> produces an empty
 			 * sequence.
 			 * See ECMA-262 7.8.4 */
-			c = fileGetc();
+			c = getcFromInputFile ();
 			if (c != '\r' && c != '\n')
 				vStringPut(string, c);
 			else if (c == '\r')
 			{
-				c = fileGetc();
+				c = getcFromInputFile();
 				if (c != '\n')
-					fileUngetc (c);
+					ungetcToInputFile (c);
 			}
 		}
 		else if (c == delimiter)
@@ -393,7 +371,7 @@ static void parseString (vString *const string, const int delimiter)
 			end = TRUE;
 			/* we don't want to eat the newline itself to let the automatic
 			 * semicolon insertion code kick in */
-			fileUngetc (c);
+			ungetcToInputFile (c);
 		}
 		else
 			vStringPut (string, c);
@@ -408,18 +386,18 @@ static void parseRegExp (void)
 
 	do
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		if (! in_range && c == '/')
 		{
 			do /* skip flags */
 			{
-				c = fileGetc ();
+				c = getcFromInputFile ();
 			} while (isalpha (c));
-			fileUngetc (c);
+			ungetcToInputFile (c);
 			break;
 		}
 		else if (c == '\\')
-			c = fileGetc (); /* skip next character */
+			c = getcFromInputFile (); /* skip next character */
 		else if (c == '[')
 			in_range = TRUE;
 		else if (c == ']')
@@ -437,10 +415,10 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
-	fileUngetc (c);		/* unget non-identifier character */
+	ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
 static void parseTemplateString (vString *const string)
@@ -448,20 +426,20 @@ static void parseTemplateString (vString *const string)
 	int c;
 	do
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		if (c == '`')
 			break;
 		vStringPut (string, c);
 		if (c == '\\')
 		{
-			c = fileGetc();
+			c = getcFromInputFile();
 			vStringPut(string, c);
 		}
 		else if (c == '$')
 		{
-			c = fileGetc ();
+			c = getcFromInputFile ();
 			if (c != '{')
-				fileUngetc (c);
+				ungetcToInputFile (c);
 			else
 			{
 				int depth = 1;
@@ -510,14 +488,14 @@ getNextChar:
 	i = 0;
 	do
 	{
-		c = fileGetc ();
+		c = getcFromInputFile ();
 		if (include_newlines && (c == '\r' || c == '\n'))
 			newline_encountered = TRUE;
 		i++;
 	}
 	while (c == '\t' || c == ' ' || c == '\r' || c == '\n');
 
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	if (repr)
@@ -545,12 +523,12 @@ getNextChar:
 		case '+':
 		case '-':
 			{
-				int d = fileGetc ();
+				int d = getcFromInputFile ();
 				if (d == c) /* ++ or -- */
 					token->type = TOKEN_POSTFIX_OPERATOR;
 				else
 				{
-					fileUngetc (d);
+					ungetcToInputFile (d);
 					token->type = TOKEN_BINARY_OPERATOR;
 				}
 				break;
@@ -571,7 +549,7 @@ getNextChar:
 		case '"':
 				  token->type = TOKEN_STRING;
 				  parseString (token->string, c);
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  if (repr)
 				  {
@@ -583,7 +561,7 @@ getNextChar:
 		case '`':
 				  token->type = TOKEN_TEMPLATE_STRING;
 				  parseTemplateString (token->string);
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  if (repr)
 				  {
@@ -593,21 +571,21 @@ getNextChar:
 				  break;
 
 		case '\\':
-				  c = fileGetc ();
+				  c = getcFromInputFile ();
 				  if (c != '\\'  && c != '"'  &&  !isspace (c))
-					  fileUngetc (c);
+					  ungetcToInputFile (c);
 				  token->type = TOKEN_CHARACTER;
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
 		case '/':
 				  {
-					  int d = fileGetc ();
+					  int d = getcFromInputFile ();
 					  if ( (d != '*') &&		/* is this the start of a comment? */
 							  (d != '/') )		/* is a one line comment? */
 					  {
-						  fileUngetc (d);
+						  ungetcToInputFile (d);
 						  switch (LastTokenType)
 						  {
 							  case TOKEN_CHARACTER:
@@ -623,7 +601,7 @@ getNextChar:
 							  default:
 								  token->type = TOKEN_REGEXP;
 								  parseRegExp ();
-								  token->lineNumber = getSourceLineNumber ();
+								  token->lineNumber = getInputLineNumber ();
 								  token->filePosition = getInputFilePosition ();
 								  break;
 						  }
@@ -636,21 +614,21 @@ getNextChar:
 						  {
 							  do
 							  {
-								  fileSkipToCharacter ('*');
-								  c = fileGetc ();
+								  skipToCharacterInInputFile ('*');
+								  c = getcFromInputFile ();
 								  if (c == '/')
 									  break;
 								  else
-									  fileUngetc (c);
+									  ungetcToInputFile (c);
 							  } while (c != EOF && c != '\0');
 							  goto getNextChar;
 						  }
 						  else if (d == '/')	/* is this the start of a comment?  */
 						  {
-							  fileSkipToCharacter ('\n');
+							  skipToCharacterInInputFile ('\n');
 							  /* if we care about newlines, put it back so it is seen */
 							  if (include_newlines)
-								  fileUngetc ('\n');
+								  ungetcToInputFile ('\n');
 							  goto getNextChar;
 						  }
 					  }
@@ -661,14 +639,14 @@ getNextChar:
 				  /* skip shebang in case of e.g. Node.js scripts */
 				  if (token->lineNumber > 1)
 					  token->type = TOKEN_UNDEFINED;
-				  else if ((c = fileGetc ()) != '!')
+				  else if ((c = getcFromInputFile ()) != '!')
 				  {
-					  fileUngetc (c);
+					  ungetcToInputFile (c);
 					  token->type = TOKEN_UNDEFINED;
 				  }
 				  else
 				  {
-					  fileSkipToCharacter ('\n');
+					  skipToCharacterInInputFile ('\n');
 					  goto getNextChar;
 				  }
 				  break;
@@ -679,7 +657,7 @@ getNextChar:
 				  else
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getSourceLineNumber ();
+					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->keyword = analyzeToken (token->string, Lang_js);
 					  if (isKeyword (token, KEYWORD_NONE))
@@ -1079,6 +1057,9 @@ static void parseFunction (tokenInfo *const token)
 	 */
 
 	readToken (name);
+	if (!isType (name, TOKEN_IDENTIFIER))
+		goto cleanUp;
+
 	/* Add scope in case this is an INNER function */
 	addToScope(name, token->scope);
 
@@ -1107,6 +1088,7 @@ static void parseFunction (tokenInfo *const token)
 
 	findCmdTerm (token, FALSE, FALSE);
 
+ cleanUp:
 	vStringDelete (signature);
 	deleteToken (name);
 }
@@ -1369,7 +1351,7 @@ static boolean parseStatement (tokenInfo *const token, tokenInfo *const parent, 
 	if ( is_inside_class )
 		is_class = TRUE;
 	/*
-	 * var can preceed an inner function
+	 * var can precede an inner function
 	 */
 	if ( isKeyword(token, KEYWORD_var) ||
 		 isKeyword(token, KEYWORD_let) ||
@@ -1453,6 +1435,17 @@ nextVar:
 					 *     }
 					 *
 					 */
+					if (! ( isType (name, TOKEN_IDENTIFIER)
+						|| isType (name, TOKEN_STRING) ) )
+						/*
+						 * Unexpected input. Try to reset the parsing.
+						 *
+						 * TOKEN_STRING is acceptable. e.g.:
+						 * -----------------------------------
+						 * "a".prototype = function( mode ) {}
+						 */
+						goto cleanUp;
+
 					makeClassTag (name, NULL);
 					is_class = TRUE;
 
@@ -1647,6 +1640,14 @@ nextVar:
 				}
 				else
 				{
+					if (! ( isType (name, TOKEN_IDENTIFIER)
+						|| isType (name, TOKEN_STRING) ) )
+					{
+                                                /* Unexpected input. Try to reset the parsing. */
+						vStringDelete (signature);
+						goto cleanUp;
+					}
+
 					is_class = parseBlock (token, name);
 					if ( is_class )
 						makeClassTag (name, signature);
@@ -1976,9 +1977,8 @@ static void parseJsFile (tokenInfo *const token)
 
 static void initialize (const langType language)
 {
-	Assert (sizeof (JsKinds) / sizeof (JsKinds [0]) == JSTAG_COUNT);
+	Assert (ARRAY_SIZE (JsKinds) == JSTAG_COUNT);
 	Lang_js = language;
-	buildJsKeywordHash ();
 }
 
 static void findJsTags (void)
@@ -2014,9 +2014,11 @@ extern parserDefinition* JavaScriptParser (void)
 	 * New definitions for parsing instead of regex
 	 */
 	def->kinds		= JsKinds;
-	def->kindCount	= KIND_COUNT (JsKinds);
+	def->kindCount	= ARRAY_SIZE (JsKinds);
 	def->parser		= findJsTags;
 	def->initialize = initialize;
+	def->keywordTable = JsKeywordTable;
+	def->keywordCount = ARRAY_SIZE (JsKeywordTable);
 
 	return def;
 }

@@ -1,0 +1,7 @@
+CoffeeMachine	input.ttcn	/^module CoffeeMachine$/;"	M
+IntegerInputPortType	input.ttcn	/^   type port IntegerInputPortType message { in integer }$/;"	t
+CharstringOutputPortType	input.ttcn	/^   type port CharstringOutputPortType message { out charstring }$/;"	t
+CoffeeMachineComponentType	input.ttcn	/^   type component CoffeeMachineComponentType$/;"	t
+InputPort	input.ttcn	/^      port IntegerInputPortType InputPort;$/;"	p
+OutputPort	input.ttcn	/^      port CharstringOutputPortType OutputPort;$/;"	p
+machine	input.ttcn	/^   var CoffeeMachineComponentType machine$/;"	v

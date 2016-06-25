@@ -1,0 +1,5 @@
+FooClass2	input.cpp	/^class FooClass2{};$/;"	c	file:
+TemplClass	input.cpp	/^template<> class TemplClass< char* > { int i;};$/;"	c	file:
+TemplClass	input.cpp	/^template<class T> class TemplClass { double i;};$/;"	c	file:
+i	input.cpp	/^template<> class TemplClass< char* > { int i;};$/;"	m	class:TemplClass	typeref:typename:int	file:
+i	input.cpp	/^template<class T> class TemplClass { double i;};$/;"	m	class:TemplClass	typeref:typename:double	file:

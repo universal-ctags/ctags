@@ -1,0 +1,11 @@
+A	input.properties	/^    A: B$/;"	k
+C	input.properties	/^    C : D$/;"	k
+E	input.properties	/^        E = F$/;"	k
+G	input.properties	/^	G H$/;"	k
+X	input.properties	/^	X$/;"	k
+Y	input.properties	/^Y/;"	k
+key\\ with\\ spaces	input.properties	/^key\\ with\\ spaces = This is the value that could be looked up with the key "key with spaces".$/;"	k
+language	input.properties	/^language = English$/;"	k
+message	input.properties	/^message = Welcome to \\$/;"	k
+tab	input.properties	/^tab : \\u0009$/;"	k
+website	input.properties	/^website = http\\:\/\/en.wikipedia.org\/$/;"	k

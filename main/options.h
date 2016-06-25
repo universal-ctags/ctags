@@ -2,12 +2,12 @@
 *   Copyright (c) 1998-2003, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   Defines external interface to option processing.
 */
-#ifndef _OPTIONS_H
-#define _OPTIONS_H
+#ifndef CTAGS_MAIN_OPTIONS_H
+#define CTAGS_MAIN_OPTIONS_H
 
 #if defined(OPTION_WRITE)
 # define CONST_OPTION
@@ -23,6 +23,8 @@
 #include <stdarg.h>
 
 #include "args.h"
+#include "field.h"
+#include "fmt.h"
 #include "parse.h"
 #include "strlist.h"
 #include "vstring.h"
@@ -57,32 +59,9 @@ typedef enum sortType {
 	SO_FOLDSORTED
 } sortType;
 
-struct sInclude {
-	boolean fileNames;      /* include tags for source file names */
-	boolean qualifiedTags;  /* include tags for qualified class members */
-	boolean fileScope;      /* include tags of file scope only */
-};
-
-struct sExtFields {  /* extension field content control */
-	boolean access;
-	boolean fileScope;
-	boolean implementation;
-	boolean inheritance;
-	boolean kind;
-	boolean kindKey;
-	boolean kindLong;
-	boolean language;
-	boolean lineNumber;
-	boolean scope;
-	boolean signature;
-	boolean typeRef;
-};
-
 /*  This stores the command line options.
  */
 typedef struct sOptionValues {
-	struct sInclude include;/* --extra  extra tag inclusion */
-	struct sExtFields extensionFields;/* --fields  extension field control */
 	stringList* ignore;     /* -I  name of file containing tokens to ignore */
 	boolean append;         /* -a  append to "tags" file */
 	boolean backward;       /* -B  regexp patterns search backwards */
@@ -92,6 +71,7 @@ typedef struct sOptionValues {
 	sortType sorted;        /* -u,--sort  sort tags */
 	boolean verbose;        /* -V  verbose */
 	boolean xref;           /* -x  generate xref output instead */
+	fmtElement *customXfmt;	/* compiled code for --xformat=XFMT */
 	char *fileList;         /* -L  name of file containing names of files */
 	char *tagFileName;      /* -o  name of tags file */
 	stringList* headerExt;  /* -h  header extensions */
@@ -103,8 +83,6 @@ typedef struct sOptionValues {
 	char *outputEncoding;	/* --output-encoding	write tags file as this encoding */
 #endif
 	boolean if0;            /* --if0  examine code within "#if 0" branch */
-	boolean undef;          /* --undef  generate a tag from #undef'd macros  */
-	boolean kindLong;       /* --kind-long */
 	langType language;      /* --lang specified language override */
 	boolean followLinks;    /* --link  follow symbolic links? */
 	boolean filter;         /* --filter  behave as filter: files in, tags out */
@@ -116,9 +94,15 @@ typedef struct sOptionValues {
 	boolean guessLanguageEagerly; /* --guess-language-eagerly|-G */
 	boolean quiet;		      /* --quiet */
 	boolean allowXcmdInHomeDir;     /* --_allow-xcmd-in-homedir */
+	boolean fatalWarnings;	/* --_fatal-warnings */
+	unsigned int patternLengthLimit; /* Not implemented yet: --patern-length-limit=N */
+	boolean putFieldPrefix;		 /* --put-field-prefix */
+	unsigned int maxRecursionDepth; /* --maxdepth=<max-recursion-depth> */
+	boolean machinable;		/* --machinable */
+	boolean withListHeader;		/* --with-list-header */
 #ifdef DEBUG
 	long debugLevel;        /* -D  debugging output */
-	unsigned long breakLine;/* -b  source line at which to call lineBreak() */
+	unsigned long breakLine;/* -b  input line at which to call lineBreak() */
 #endif
 } optionValues;
 
@@ -146,7 +130,7 @@ extern CONST_OPTION optionValues		Option;
 extern void notice (const char *const format, ...) __printf__ (1, 2);
 extern void verbose (const char *const format, ...) __printf__ (1, 2);
 #define BEGIN_VERBOSE(VFP) do { if (Option.verbose) { \
-                                FILE* VFP = errout
+                                FILE* VFP = stderr
 #define END_VERBOSE()      } } while (0)
 
 extern void freeList (stringList** const pString);
@@ -177,12 +161,14 @@ extern void freeOptionResources (void);
 extern void freeEncodingResources (void);
 #endif
 
+/* Return vString must be freed by caller side. */
 extern vString* expandOnCorpusPathList (const char* leaf);
 extern vString* expandOnDriversPathList (const char* leaf);
-/* Return vString must be freed by caller side. */
+
 
 extern langType getLanguageComponentInOption (const char *const option,
 					      const char *const prefix);
+extern langType getLanguageComponentInFieldName (const char *fullName, const char **fieldName);
 
 extern void processLanguageDefineOption (const char *const option, const char *const parameter);
 extern boolean processMapOption (const char *const option, const char *const parameter);
@@ -195,6 +181,6 @@ extern boolean processLanguageEncodingOption (const char *const option, const ch
 extern boolean processRegexOption (const char *const option, const char *const parameter);
 extern boolean processXcmdOption (const char *const option, const char *const parameter, OptionLoadingStage stage);
 
-#endif  /* _OPTIONS_H */
+#endif  /* CTAGS_MAIN_OPTIONS_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

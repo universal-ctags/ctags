@@ -2,7 +2,7 @@
 *   Copyright (c) 2000-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for scripts for the
 *   Bourne shell (and its derivatives, the Korn and Z shells).
@@ -15,10 +15,12 @@
 
 #include <string.h>
 
+#include "kind.h"
 #include "parse.h"
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
+#include "xtag.h"
 
 /*
 *   DATA DEFINITIONS
@@ -30,10 +32,19 @@ typedef enum {
 	K_SOURCE,
 } shKind;
 
+typedef enum {
+	R_SOURCE_GENERIC,
+} shScriptRole;
+
+static roleDesc ShScriptRoles [] = {
+	{ TRUE, "loaded", "loaded" },
+};
+
 static kindOption ShKinds [] = {
 	{ TRUE, 'a', "alias", "aliases"},
 	{ TRUE, 'f', "function", "functions"},
-	{ FALSE, 's', "source", "read files"}
+	{ TRUE, 's', "script", "script files",
+	  .referenceOnly = TRUE, ATTACH_ROLES (ShScriptRoles) },
 };
 
 /*
@@ -53,6 +64,19 @@ static boolean isFileChar  (int c)
 static boolean isIdentChar (int c)
 {
 	return (isalnum (c) || c == '_' || c == '-');
+}
+
+/* bash allows all kinds of crazy stuff as the identifier after 'function' */
+static boolean isBashFunctionChar (int c)
+{
+	return (c > 1 /* NUL and SOH are disallowed */ && c != 0x7f &&
+	        /* blanks are disallowed, but VT and FF (and CR to some extent, but
+	         * let's not fall into the pit of craziness) */
+	        c != ' ' && c != '\t' && c != '\n' && c != '\r' &&
+	        c != '"' && c != '\'' && c != '$' && c != '`' && c != '\\' &&
+	        c != '&' && c != ';' &&
+	        c != '(' && c != ')' &&
+	        c != '<' && c != '>');
 }
 
 static const unsigned char *skipDoubleString (const unsigned char *cp)
@@ -83,7 +107,7 @@ static void findShTags (void)
 	boolean hereDocIndented = FALSE;
 	boolean (* check_char)(int);
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char* cp = line;
 		shKind found_kind = K_NOTHING;
@@ -174,42 +198,44 @@ static void findShTags (void)
 				}
 			}
 
+			check_char = isIdentChar;
+
 			if (strncmp ((const char*) cp, "function", (size_t) 8) == 0  &&
 				isspace ((int) cp [8]))
 			{
+				check_char = isBashFunctionChar;
 				found_kind = K_FUNCTION;
 				cp += 8;
 			}
-
 			else if (strncmp ((const char*) cp, "alias", (size_t) 5) == 0  &&
 				isspace ((int) cp [5]))
 			{
 				found_kind = K_ALIAS;
 				cp += 5;
 			}
-
-			else if (cp [0] == '.'
-				 && isspace((int) cp [1]))
+			else if (isXtagEnabled (XTAG_REFERENCE_TAGS)
+				 && ShKinds [K_SOURCE].enabled)
 			{
-				found_kind = K_SOURCE;
-				++cp;
+				if (cp [0] == '.'
+				    && isspace((int) cp [1]))
+				{
+					found_kind = K_SOURCE;
+					++cp;
+				}
+				else if (strncmp ((const char*) cp, "source", (size_t) 6) == 0
+					 && isspace((int) cp [6]))
+				{
+					found_kind = K_SOURCE;
+					cp += 6;
+				}
+				if (found_kind == K_SOURCE)
+					check_char = isFileChar;
 			}
-			else if (strncmp ((const char*) cp, "source", (size_t) 6) == 0
-				 && isspace((int) cp [6]))
-			{
-				found_kind = K_SOURCE;
-				cp += 6;
-			}
-
 			if (found_kind != K_NOTHING)
 				while (isspace ((int) *cp))
 					++cp;
 
 			// Get the name of the function, alias or file to be read by source
-			check_char = isIdentChar;
-			if (found_kind == K_SOURCE)
-				check_char = isFileChar;
-
 			if (! check_char ((int) *cp))
 			{
 				found_kind = K_NOTHING;
@@ -239,9 +265,13 @@ static void findShTags (void)
 					++cp;
 				}
 			}
+
 			if (found_kind != K_NOTHING)
 			{
-				makeSimpleTag (name, ShKinds, found_kind);
+				if (found_kind == K_SOURCE)
+					makeSimpleRefTag (name, ShKinds, K_SOURCE, R_SOURCE_GENERIC);
+				else
+					makeSimpleTag (name, ShKinds, found_kind);
 				found_kind = K_NOTHING;
 			}
 			vStringClear (name);
@@ -265,7 +295,7 @@ extern parserDefinition* ShParser (void)
 	};
 	parserDefinition* def = parserNew ("Sh");
 	def->kinds      = ShKinds;
-	def->kindCount  = KIND_COUNT (ShKinds);
+	def->kindCount  = ARRAY_SIZE (ShKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser     = findShTags;

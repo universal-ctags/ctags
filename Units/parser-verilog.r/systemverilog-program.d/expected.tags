@@ -1,0 +1,35 @@
+count	input.sv	/^    byte count;$/;"	r	block:prog.stop
+external_program	input.sv	/^extern program external_program;$/;"	Q
+i	input.sv	/^    longint i;$/;"	r	block:prog.start
+in1	input.sv	/^    input in1,$/;"	p	program:prog
+in2	input.sv	/^    input [11:0] in2,$/;"	p	program:prog
+iout	input.sv	/^    inout iout$/;"	p	program:prog
+logic_automatic	input.sv	/^    logic logic_automatic;$/;"	r	program:prog_automatic
+logic_static	input.sv	/^    logic logic_static;$/;"	r	program:prog_static
+mod_prog1	input.sv	/^program mod_prog1;$/;"	P	module:topmod
+mod_prog2	input.sv	/^program mod_prog2;$/;"	P	module:topmod
+ok	input.sv	/^    logic ok;$/;"	r	block:prog.start
+out	input.sv	/^    output out,$/;"	p	program:prog
+prog	input.sv	/^program prog ($/;"	P
+prog.in1	input.sv	/^    input in1,$/;"	p	program:prog
+prog.in2	input.sv	/^    input [11:0] in2,$/;"	p	program:prog
+prog.iout	input.sv	/^    inout iout$/;"	p	program:prog
+prog.out	input.sv	/^    output out,$/;"	p	program:prog
+prog.start	input.sv	/^initial begin : start$/;"	b	program:prog
+prog.start.i	input.sv	/^    longint i;$/;"	r	block:prog.start
+prog.start.ok	input.sv	/^    logic ok;$/;"	r	block:prog.start
+prog.stop	input.sv	/^final begin : stop$/;"	b	program:prog
+prog.stop.count	input.sv	/^    byte count;$/;"	r	block:prog.stop
+prog_automatic	input.sv	/^program automatic prog_automatic;$/;"	P
+prog_automatic.logic_automatic	input.sv	/^    logic logic_automatic;$/;"	r	program:prog_automatic
+prog_static	input.sv	/^program static prog_static;$/;"	P
+prog_static.logic_static	input.sv	/^    logic logic_static;$/;"	r	program:prog_static
+reg_in_anon_prog	input.sv	/^    reg reg_in_anon_prog;$/;"	r
+reg_in_anon_prog2	input.sv	/^    reg reg_in_anon_prog2;$/;"	r	module:topmod_anon
+start	input.sv	/^initial begin : start$/;"	b	program:prog
+stop	input.sv	/^final begin : stop$/;"	b	program:prog
+topmod	input.sv	/^module topmod;$/;"	m
+topmod.mod_prog1	input.sv	/^program mod_prog1;$/;"	P	module:topmod
+topmod.mod_prog2	input.sv	/^program mod_prog2;$/;"	P	module:topmod
+topmod_anon	input.sv	/^module topmod_anon;$/;"	m
+topmod_anon.reg_in_anon_prog2	input.sv	/^    reg reg_in_anon_prog2;$/;"	r	module:topmod_anon

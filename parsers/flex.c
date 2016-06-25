@@ -4,7 +4,7 @@
  *	 Copyright (c) 2008, David Fishburn
  *
  *	 This source code is released for free distribution under the terms of the
- *	 GNU General Public License.
+ *	 GNU General Public License version 2 or (at your option) any later version.
  *
  *	 This module contains functions for generating tags for Adobe languages.
  *	 There are a number of different ones, but this will begin with:
@@ -21,7 +21,6 @@
  */
 #include "general.h"	/* must always come first */
 #include <ctype.h>	/* to define isalpha () */
-#include <setjmp.h>
 #ifdef DEBUG
 #include <stdio.h>
 #endif
@@ -43,8 +42,6 @@
 /*
  *	 DATA DECLARATIONS
  */
-
-typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
 
 /*
  * Tracks class and function names already created
@@ -86,16 +83,9 @@ typedef enum eKeywordId {
 	KEYWORD_override
 } keywordId;
 
-/*	Used to determine whether keyword is valid for the token language and
- *	what its ID is.
- */
-typedef struct sKeywordDesc {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
+	TOKEN_EOF,
 	TOKEN_CHARACTER,
 	TOKEN_CLOSE_PAREN,
 	TOKEN_SEMICOLON,
@@ -129,7 +119,7 @@ typedef struct sTokenInfo {
 	vString *		string;
 	vString *		scope;
 	unsigned long 	lineNumber;
-	fpos_t 			filePosition;
+	MIOPos 			filePosition;
 	int				nestLevel;
 	boolean			ignoreTag;
 	boolean			isClass;
@@ -140,8 +130,6 @@ typedef struct sTokenInfo {
  */
 
 static langType Lang_js;
-
-static jmp_buf Exception;
 
 typedef enum {
 	FLEXTAG_FUNCTION,
@@ -162,7 +150,10 @@ static kindOption FlexKinds [] = {
 	{ TRUE,  'x', "mxtag",		  "mxtags" 			   }
 };
 
-static const keywordDesc FlexKeywordTable [] = {
+/*	Used to determine whether keyword is valid for the token language and
+ *	what its ID is.
+ */
+static const keywordTable FlexKeywordTable [] = {
 	/* keyword		keyword ID */
 	{ "function",	KEYWORD_function			},
 	{ "Function",	KEYWORD_capital_function	},
@@ -205,23 +196,16 @@ static boolean parseLine (tokenInfo *const token);
 static boolean parseActionScript (tokenInfo *const token);
 static boolean parseMXML (tokenInfo *const token);
 
+static boolean isEOF (tokenInfo *const token)
+{
+	return isType (token, TOKEN_EOF);
+}
+
 static boolean isIdentChar (const int c)
 {
 	return (boolean)
 		(isalpha (c) || isdigit (c) || c == '$' || 
 		 c == '@' || c == '_' || c == '#');
-}
-
-static void buildFlexKeywordHash (void)
-{
-	const size_t count = sizeof (FlexKeywordTable) /
-		sizeof (FlexKeywordTable [0]);
-	size_t i;
-	for (i = 0	;  i < count  ;  ++i)
-	{
-		const keywordDesc* const p = &FlexKeywordTable [i];
-		addKeyword (p->name, Lang_js, (int) p->id);
-	}
 }
 
 static tokenInfo *newToken (void)
@@ -235,7 +219,7 @@ static tokenInfo *newToken (void)
 	token->nestLevel	= 0;
 	token->isClass		= FALSE;
 	token->ignoreTag	= FALSE;
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	return token;
@@ -258,12 +242,10 @@ static void makeConstTag (tokenInfo *const token, const flexKind kind)
 	{
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
-		initTagEntry (&e, name);
+		initTagEntry (&e, name, &(FlexKinds [kind]));
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
-		e.kindName	   = FlexKinds [kind].name;
-		e.kind		   = FlexKinds [kind].letter;
 
 		makeTagEntry (&e);
 	}
@@ -391,12 +373,12 @@ static void parseString (vString *const string, const int delimiter)
 	boolean end = FALSE;
 	while (! end)
 	{
-		int c = fileGetc ();
+		int c = getcFromInputFile ();
 		if (c == EOF)
 			end = TRUE;
 		else if (c == '\\')
 		{
-			c = fileGetc(); /* This maybe a ' or ". */
+			c = getcFromInputFile(); /* This maybe a ' or ". */
 			vStringPut(string, c);
 		}
 		else if (c == delimiter)
@@ -417,11 +399,11 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
 	if (!isspace (c))
-		fileUngetc (c);		/* unget non-identifier character */
+		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
 static void readToken (tokenInfo *const token)
@@ -435,15 +417,15 @@ static void readToken (tokenInfo *const token)
 getNextChar:
 	do
 	{
-		c = fileGetc ();
-		token->lineNumber   = getSourceLineNumber ();
+		c = getcFromInputFile ();
+		token->lineNumber   = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\n');
 
 	switch (c)
 	{
-		case EOF: longjmp (Exception, (int)ExceptionEOF);	break;
+		case EOF: token->type = TOKEN_EOF;				break;
 		case '(': token->type = TOKEN_OPEN_PAREN;			break;
 		case ')': token->type = TOKEN_CLOSE_PAREN;			break;
 		case ';': token->type = TOKEN_SEMICOLON;			break;
@@ -461,29 +443,29 @@ getNextChar:
 		case '"':
 				  token->type = TOKEN_STRING;
 				  parseString (token->string, c);
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
 		case '\\':
-				  c = fileGetc ();
+				  c = getcFromInputFile ();
 				  if (c != '\\'  && c != '"'  &&  !isspace (c))
-					  fileUngetc (c);
+					  ungetcToInputFile (c);
 				  token->type = TOKEN_CHARACTER;
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
 		case '/':
 				  {
-					  int d = fileGetc ();
+					  int d = getcFromInputFile ();
 					  if ( (d != '*') &&		/* is this the start of a comment? */
 							  (d != '/') &&		/* is a one line comment? */
 							  (d != '>') )		/* is this a close XML tag? */
 					  {
-						  fileUngetc (d);
+						  ungetcToInputFile (d);
 						  token->type = TOKEN_FORWARD_SLASH;
-						  token->lineNumber = getSourceLineNumber ();
+						  token->lineNumber = getInputLineNumber ();
 						  token->filePosition = getInputFilePosition ();
 					  }
 					  else
@@ -492,24 +474,24 @@ getNextChar:
 						  {
 							  do
 							  {
-								  fileSkipToCharacter ('*');
-								  c = fileGetc ();
+								  skipToCharacterInInputFile ('*');
+								  c = getcFromInputFile ();
 								  if (c == '/')
 									  break;
 								  else
-									  fileUngetc (c);
+									  ungetcToInputFile (c);
 							  } while (c != EOF && c != '\0');
 							  goto getNextChar;
 						  }
 						  else if (d == '/')	/* is this the start of a comment?  */
 						  {
-							  fileSkipToCharacter ('\n');
+							  skipToCharacterInInputFile ('\n');
 							  goto getNextChar;
 						  }
 						  else if (d == '>')	/* is this the start of a comment?  */
 						  {
 							  token->type = TOKEN_CLOSE_SGML;
-							  token->lineNumber = getSourceLineNumber ();
+							  token->lineNumber = getInputLineNumber ();
 							  token->filePosition = getInputFilePosition ();
 						  }
 					  }
@@ -522,7 +504,7 @@ getNextChar:
 					   * An XML comment looks like this 
 					   *   <!-- anything over multiple lines -->
 					   */
-					  int d = fileGetc ();
+					  int d = getcFromInputFile ();
 
 					  if ( (d != '!' )  && 		/* is this the start of a comment? */
 					       (d != '/' )  &&	 	/* is this the start of a closing mx tag */
@@ -530,9 +512,9 @@ getNextChar:
 					       (d != 'f' )  &&  	/* is this the start of a fx tag */
 					       (d != 's' )    ) 	/* is this the start of a spark tag */
 					  {
-						  fileUngetc (d);
+						  ungetcToInputFile (d);
 						  token->type = TOKEN_LESS_THAN;
-						  token->lineNumber = getSourceLineNumber ();
+						  token->lineNumber = getInputLineNumber ();
 						  token->filePosition = getInputFilePosition ();
 						  break;						
 					  }
@@ -540,27 +522,27 @@ getNextChar:
 					  {
 						  if (d == '!')
 						  {
-							  int e = fileGetc ();
+							  int e = getcFromInputFile ();
 							  if ( e != '-' ) 		/* is this the start of a comment? */
 							  {
-								  fileUngetc (e);
-								  fileUngetc (d);
+								  ungetcToInputFile (e);
+								  ungetcToInputFile (d);
 								  token->type = TOKEN_LESS_THAN;
-								  token->lineNumber = getSourceLineNumber ();
+								  token->lineNumber = getInputLineNumber ();
 								  token->filePosition = getInputFilePosition ();
 							  }
 							  else
 							  {
 								  if (e == '-')
 								  {
-									  int f = fileGetc ();
+									  int f = getcFromInputFile ();
 									  if ( f != '-' ) 		/* is this the start of a comment? */
 									  {
-										  fileUngetc (f);
-										  fileUngetc (e);
-										  fileUngetc (d);
+										  ungetcToInputFile (f);
+										  ungetcToInputFile (e);
+										  ungetcToInputFile (d);
 										  token->type = TOKEN_LESS_THAN;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 									  }
 									  else
@@ -569,22 +551,22 @@ getNextChar:
 										  {
 											  do
 											  {
-												  fileSkipToCharacter ('-');
-												  c = fileGetc ();
+												  skipToCharacterInInputFile ('-');
+												  c = getcFromInputFile ();
 												  if (c == '-') 
 												  {
-													  d = fileGetc ();
+													  d = getcFromInputFile ();
 													  if (d == '>')
 														  break;
 													  else
 													  {
-														  fileUngetc (d);
-														  fileUngetc (c);
+														  ungetcToInputFile (d);
+														  ungetcToInputFile (c);
 													  }
 													  break;
 												  }
 												  else
-													  fileUngetc (c);
+													  ungetcToInputFile (c);
 											  } while (c != EOF && c != '\0');
 											  goto getNextChar;
 										  }
@@ -594,13 +576,13 @@ getNextChar:
 						  }
 						  else if (d == 'm' || d == 'f' || d == 's' )
 						  {
-							  int e = fileGetc ();
+							  int e = getcFromInputFile ();
 							  if ( (d == 'm' || d == 'f') && e != 'x' ) 		/* continuing an mx or fx tag */
 							  {
-								  fileUngetc (e);
-								  fileUngetc (d);
+								  ungetcToInputFile (e);
+								  ungetcToInputFile (d);
 								  token->type = TOKEN_LESS_THAN;
-								  token->lineNumber = getSourceLineNumber ();
+								  token->lineNumber = getInputLineNumber ();
 								  token->filePosition = getInputFilePosition ();
 								  break;
 							  }
@@ -608,21 +590,21 @@ getNextChar:
 							  {
 								  if ( (d == 'm' || d == 'f') && e == 'x' )
 								  {
-									  int f = fileGetc ();
+									  int f = getcFromInputFile ();
 									  if ( f != ':' ) 		/* start of the tag */
 									  {
-										  fileUngetc (f);
-										  fileUngetc (e);
-										  fileUngetc (d);
+										  ungetcToInputFile (f);
+										  ungetcToInputFile (e);
+										  ungetcToInputFile (d);
 										  token->type = TOKEN_LESS_THAN;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 										  break;
 									  }
 									  else
 									  {
 										  token->type = TOKEN_OPEN_MXML;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 										  break;
 									  }
@@ -630,16 +612,16 @@ getNextChar:
 								  if ( d == 's' && e == ':')    /* continuing a spark tag */
 								  {
 									  token->type = TOKEN_OPEN_MXML;
-									  token->lineNumber = getSourceLineNumber ();
+									  token->lineNumber = getInputLineNumber ();
 									  token->filePosition = getInputFilePosition ();
 									  break;
 								  }
 								  else
 								  {
-									  fileUngetc (e);
-									  fileUngetc (d);
+									  ungetcToInputFile (e);
+									  ungetcToInputFile (d);
 									  token->type = TOKEN_LESS_THAN;
-									  token->lineNumber = getSourceLineNumber ();
+									  token->lineNumber = getInputLineNumber ();
 									  token->filePosition = getInputFilePosition ();
 									  break;
 								  }
@@ -647,25 +629,25 @@ getNextChar:
 						  }
 						  else if (d == '/')
 						  {
-							  int e = fileGetc ();
+							  int e = getcFromInputFile ();
 							  if ( !(e == 'm' || e == 'f' || e == 's' ))
 							  {
-								  fileUngetc (e);
-								  fileUngetc (d);
+								  ungetcToInputFile (e);
+								  ungetcToInputFile (d);
 								  token->type = TOKEN_LESS_THAN;
-								  token->lineNumber = getSourceLineNumber ();
+								  token->lineNumber = getInputLineNumber ();
 								  token->filePosition = getInputFilePosition ();
 								  break;
 							  }
 							  else
 							  {
-								  int f = fileGetc ();
+								  int f = getcFromInputFile ();
 								  if ( (e == 'm' || e == 'f') && f != 'x' ) 		/* continuing an mx or fx tag */
 								  {
-									  fileUngetc (f);
-									  fileUngetc (e);
+									  ungetcToInputFile (f);
+									  ungetcToInputFile (e);
 									  token->type = TOKEN_LESS_THAN;
-									  token->lineNumber = getSourceLineNumber ();
+									  token->lineNumber = getInputLineNumber ();
 									  token->filePosition = getInputFilePosition ();
 									  break;
 								  }
@@ -673,21 +655,21 @@ getNextChar:
 								  {
 									  if (f == 'x')
 									  {
-										  int g = fileGetc ();
+										  int g = getcFromInputFile ();
 										  if ( g != ':' ) 		/* is this the start of a comment? */
 										  {
-											  fileUngetc (g);
-											  fileUngetc (f);
-											  fileUngetc (e);
+											  ungetcToInputFile (g);
+											  ungetcToInputFile (f);
+											  ungetcToInputFile (e);
 											  token->type = TOKEN_LESS_THAN;
-											  token->lineNumber = getSourceLineNumber ();
+											  token->lineNumber = getInputLineNumber ();
 											  token->filePosition = getInputFilePosition ();
 											  break;
 										  }
 										  else
 										  {
 											  token->type = TOKEN_CLOSE_MXML;
-											  token->lineNumber = getSourceLineNumber ();
+											  token->lineNumber = getInputLineNumber ();
 											  token->filePosition = getInputFilePosition ();
 											  break;
 										  }
@@ -695,16 +677,16 @@ getNextChar:
 									  if ( e == 's' && f == ':')    /* continuing a spark tag */
 									  {
 										  token->type = TOKEN_CLOSE_MXML;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 										  break;
 									  }
 									  else
 									  {
-										  fileUngetc (f);
-										  fileUngetc (e);
+										  ungetcToInputFile (f);
+										  ungetcToInputFile (e);
 										  token->type = TOKEN_LESS_THAN;
-										  token->lineNumber = getSourceLineNumber ();
+										  token->lineNumber = getInputLineNumber ();
 										  token->filePosition = getInputFilePosition ();
 										  break;
 									  }
@@ -717,13 +699,13 @@ getNextChar:
 
 		case '>':
 				  token->type = TOKEN_GREATER_THAN;
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
 		case '!': 
 				  token->type = TOKEN_EXCLAMATION;			
-				  /*token->lineNumber = getSourceLineNumber ();
+				  /*token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();*/
 				  break;
 
@@ -733,7 +715,7 @@ getNextChar:
 				  else
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getSourceLineNumber ();
+					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->keyword = analyzeToken (token->string, Lang_js);
 					  if (isKeyword (token, KEYWORD_NONE))
@@ -775,7 +757,8 @@ static void skipArgumentList (tokenInfo *const token)
 	if (isType (token, TOKEN_OPEN_PAREN))	/* arguments? */
 	{
 		nest_level++;
-		while (! (isType (token, TOKEN_CLOSE_PAREN) && (nest_level == 0)))
+		while (! ((isType (token, TOKEN_CLOSE_PAREN) && (nest_level == 0))
+			  || (isType (token, TOKEN_EOF))))
 		{
 			readToken (token);
 			if (isType (token, TOKEN_OPEN_PAREN))
@@ -807,7 +790,8 @@ static void skipArrayList (tokenInfo *const token)
 	if (isType (token, TOKEN_OPEN_SQUARE))	/* arguments? */
 	{
 		nest_level++;
-		while (! (isType (token, TOKEN_CLOSE_SQUARE) && (nest_level == 0)))
+		while (! ((isType (token, TOKEN_CLOSE_SQUARE) && (nest_level == 0))
+			  || isEOF (token)) )
 		{
 			readToken (token);
 			if (isType (token, TOKEN_OPEN_SQUARE))
@@ -857,7 +841,8 @@ static void findCmdTerm (tokenInfo *const token)
 	 * Any nested braces will be handled within.
 	 */
 	while (! ( isType (token, TOKEN_SEMICOLON) ||
-				isType (token, TOKEN_CLOSE_CURLY) ) )
+		   isType (token, TOKEN_CLOSE_CURLY) ||
+		   isEOF  (token) ))
 	{
 		/* Handle nested blocks */
 		if ( isType (token, TOKEN_OPEN_CURLY))
@@ -901,10 +886,11 @@ static void parseSwitch (tokenInfo *const token)
 		do
 		{
 			readToken (token);
-		} while (! (isType (token, TOKEN_CLOSE_SGML) || 
-					isType (token, TOKEN_CLOSE_MXML) ||
-					isType (token, TOKEN_CLOSE_CURLY) ||
-					isType (token, TOKEN_GREATER_THAN)) ); 
+		} while (! (isType (token, TOKEN_CLOSE_SGML) ||
+			    isType (token, TOKEN_CLOSE_MXML) ||
+			    isType (token, TOKEN_CLOSE_CURLY) ||
+			    isType (token, TOKEN_GREATER_THAN) ||
+			    isEOF (token)) );
 	}
 
 }
@@ -1206,7 +1192,6 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 	boolean read_next_token = TRUE;
 	vString * saveScope = vStringNew ();
 
-	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
 	token->nestLevel++;
 	DebugStatement ( 
@@ -1260,9 +1245,11 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 			 * If we find a statement without a terminator consider the 
 			 * block finished, otherwise the stack will be off by one.
 			 */
-		} while (! isType (token, TOKEN_CLOSE_CURLY) && read_next_token );
+		} while ((! isType (token, TOKEN_CLOSE_CURLY) && read_next_token )
+			 && (! isEOF (token) ) );
 	}
 
+	vStringCopy(token->scope, saveScope);
 	vStringDelete(saveScope);
 	token->nestLevel--;
 
@@ -1334,10 +1321,14 @@ static void parseMethods (tokenInfo *const token, tokenInfo *const class)
 				}
 			}
 		}
-	} while ( isType(token, TOKEN_COMMA) );
+
+		if (isEOF (token))
+			goto cleanUp;
+	} while ( isType(token, TOKEN_COMMA));
 
 	findCmdTerm (token);
 
+cleanUp:
 	deleteToken (name);
 }
 
@@ -1348,7 +1339,6 @@ static boolean parseVar (tokenInfo *const token, boolean is_public)
 	vString * saveScope = vStringNew ();
 	boolean is_terminated = TRUE;
 
-	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
 	/*
 	 * Variables are defined as:
@@ -1375,7 +1365,8 @@ static boolean parseVar (tokenInfo *const token, boolean is_public)
 		readToken (token);
 	}
 
-	while (! isType (token, TOKEN_SEMICOLON) )
+	while (! (isType (token, TOKEN_SEMICOLON) ||
+		  isEOF (token)))
 	{
 		readToken (token);
 	}
@@ -1407,7 +1398,6 @@ static boolean parseClass (tokenInfo *const token)
 	vString * saveScope = vStringNew ();
 	boolean saveIsClass = token->isClass;
 
-	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
 	/*
 	 * Variables are defined as:
@@ -1469,7 +1459,6 @@ static boolean parseStatement (tokenInfo *const token)
 	/* boolean is_prototype = FALSE; */
 	vString *	fulltag;
 
-	vStringClear(saveScope);
 	vStringCopy (saveScope, token->scope);
 	DebugStatement ( 
 			debugPrintf (DEBUG_PARSE
@@ -1545,15 +1534,15 @@ static boolean parseStatement (tokenInfo *const token)
 				break;
 			case KEYWORD_class:
 				parseClass (token); 
-				return is_terminated;
+				goto cleanUp;
 				break;
 			case KEYWORD_function:
 				parseFunction (token); 
-				return is_terminated;
+				goto cleanUp;
 				break;
 			case KEYWORD_var:
 				parseVar (token, is_public); 
-				return is_terminated;
+				goto cleanUp;
 				break;
 			default:
 				readToken(token);
@@ -1565,7 +1554,8 @@ static boolean parseStatement (tokenInfo *const token)
 
 	while (! isType (token, TOKEN_CLOSE_CURLY) &&
 	       ! isType (token, TOKEN_SEMICOLON)   &&
-	       ! isType (token, TOKEN_EQUAL_SIGN)  )
+	       ! isType (token, TOKEN_EQUAL_SIGN)  &&
+	       ! isEOF  (token) )
 	{
 		/* Potentially the name of the function */
 		readToken (token);
@@ -1674,7 +1664,8 @@ static boolean parseStatement (tokenInfo *const token)
 					}
 				}
 				readToken (token);
-			} while (isType (token, TOKEN_PERIOD));
+			} while (isType (token, TOKEN_PERIOD) &&
+				 ! isEOF (token));
 		}
 
 		if ( isType (token, TOKEN_OPEN_PAREN) )
@@ -2087,8 +2078,9 @@ static boolean parseNamespace (tokenInfo *const token)
 		{
 			readToken (token);
 		}
-	} while (! (isType (token, TOKEN_CLOSE_SGML) || isType (token, TOKEN_CLOSE_MXML)) ); 
-
+	} while (! (isType (token, TOKEN_CLOSE_SGML) ||
+		    isType (token, TOKEN_CLOSE_MXML) ||
+		    isEOF (token)) );
 	return TRUE;
 }
 
@@ -2118,9 +2110,10 @@ static boolean parseMXML (tokenInfo *const token)
 		do
 		{
 			readToken (token);
-		} while (! (isType (token, TOKEN_CLOSE_SGML) || 
-					isType (token, TOKEN_CLOSE_MXML) ||
-					isType (token, TOKEN_GREATER_THAN)) ); 
+		} while (! (isType (token, TOKEN_CLOSE_SGML)   ||
+			    isType (token, TOKEN_CLOSE_MXML)   ||
+			    isType (token, TOKEN_GREATER_THAN) ||
+			    isEOF (token)) );
 
 		if (isType (token, TOKEN_CLOSE_MXML))
 		{
@@ -2208,7 +2201,9 @@ static boolean parseMXML (tokenInfo *const token)
 		{
 			readToken (token);
 		}
-	} while (! (isType (token, TOKEN_CLOSE_SGML) || isType (token, TOKEN_CLOSE_MXML)) ); 
+	} while (! (isType (token, TOKEN_CLOSE_SGML) ||
+		    isType (token, TOKEN_CLOSE_MXML) ||
+		    isEOF (token)) );
 
 	if (isType (token, TOKEN_CLOSE_MXML))
 	{
@@ -2326,7 +2321,8 @@ static boolean parseActionScript (tokenInfo *const token)
 				parseLine (token); 
 			}
 		}
-	} while (TRUE);
+	} while (!isEOF (token));
+	return TRUE;
 }
 
 static void parseFlexFile (tokenInfo *const token)
@@ -2348,7 +2344,7 @@ static void parseFlexFile (tokenInfo *const token)
 				 * <?xml version="1.0" encoding="utf-8"?>
 				 */
 				readToken (token);
-				while (! isType (token, TOKEN_QUESTION_MARK) )
+				while (! (isType (token, TOKEN_QUESTION_MARK) || isEOF (token)))
 				{
 					readToken (token);
 				} 
@@ -2362,7 +2358,7 @@ static void parseFlexFile (tokenInfo *const token)
 				 * </something>
 				 */
 				readToken (token);
-				while (! isType (token, TOKEN_GREATER_THAN) )
+				while (! (isType (token, TOKEN_GREATER_THAN) || isEOF (token)))
 				{
 					readToken (token);
 				} 
@@ -2372,27 +2368,23 @@ static void parseFlexFile (tokenInfo *const token)
 		{
 			parseActionScript (token);
 		}
-	} while (TRUE);
+	} while (!isEOF (token));
 }
 
 static void initialize (const langType language)
 {
-	Assert (sizeof (FlexKinds) / sizeof (FlexKinds [0]) == FLEXTAG_COUNT);
+	Assert (ARRAY_SIZE (FlexKinds) == FLEXTAG_COUNT);
 	Lang_js = language;
-	buildFlexKeywordHash ();
 }
 
 static void findFlexTags (void)
 {
 	tokenInfo *const token = newToken ();
-	exception_t exception;
 	
 	ClassNames = stringListNew ();
 	FunctionNames = stringListNew ();
-	
-	exception = (exception_t) (setjmp (Exception));
-	while (exception == ExceptionNone)
-		parseFlexFile (token);
+
+	parseFlexFile (token);
 
 	stringListDelete (ClassNames);
 	stringListDelete (FunctionNames);
@@ -2411,9 +2403,11 @@ extern parserDefinition* FlexParser (void)
 	 * New definitions for parsing instead of regex
 	 */
 	def->kinds		= FlexKinds;
-	def->kindCount	= KIND_COUNT (FlexKinds);
+	def->kindCount	= ARRAY_SIZE (FlexKinds);
 	def->parser		= findFlexTags;
 	def->initialize = initialize;
+	def->keywordTable = FlexKeywordTable;
+	def->keywordCount = ARRAY_SIZE (FlexKeywordTable);
 
 	return def;
 }

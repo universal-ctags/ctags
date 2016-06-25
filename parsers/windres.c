@@ -4,7 +4,7 @@
  *	Copyright (c) 2013, Frank Fesevur <ffes(at)users.sourceforge.net>
  *
  *	This source code is released for free distribution under the terms of the
- *	GNU General Public License.
+ *	GNU General Public License version 2 or (at your option) any later version.
  *
  *	This module contains functions for generating tags for Windows Resource files.
  */
@@ -16,6 +16,7 @@
 
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 
 static int _blockDepth = 0;
 
@@ -133,7 +134,7 @@ static ResParserState parseResDefinition(const unsigned char *line)
 
 static ResParserState parseResLine(const unsigned char *line, ResParserState state)
 {
-	while (*line != '\0')	/* fileReadLine returns NULL terminated strings */
+	while (*line != '\0')	/* readLineFromInputFile returns NULL terminated strings */
 	{
 		while (isspace((int) *line))
 			line++;
@@ -214,7 +215,7 @@ static void findResTags(void)
 	ResParserState state = P_STATE_NONE;
 	_blockDepth = 0;
 
-	while ((line = fileReadLine()) != NULL)
+	while ((line = readLineFromInputFile()) != NULL)
 	{
 		state = parseResLine(line, state);
 		if (state == P_STATE_AT_END)
@@ -228,7 +229,7 @@ extern parserDefinition* WindResParser(void)
 	static const char *const extensions [] = { "rc", NULL };
 	parserDefinition* def = parserNew("WindRes");
 	def->kinds		= ResKinds;
-	def->kindCount	= KIND_COUNT(ResKinds);
+	def->kindCount	= ARRAY_SIZE(ResKinds);
 	def->extensions	= extensions;
 	def->parser		= findResTags;
 	return def;

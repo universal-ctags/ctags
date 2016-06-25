@@ -1,0 +1,3 @@
+listOfStrings	input.cpp	/^	List<String> listOfStrings(argv); \/\/ local$/;"	local	line:4
+main	input.cpp	/^int  main( int  argc, char ** argv )$/;"	function	line:1	signature:(int argc,char ** argv)
+sample	input.cpp	/^	String sample(argc); \/\/ local$/;"	local	line:3

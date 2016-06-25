@@ -1,0 +1,4 @@
+mud	input.cpp	/^namespace mud {$/;"	n	file:
+MajorVersion	input.cpp	/^	std::string MajorVersion;$/;"	v	namespace:mud	typeref:typename:std::string
+MinorVersion	input.cpp	/^	std::string MinorVersion;$/;"	v	namespace:mud	typeref:typename:std::string
+foo	input.cpp	/^	int (* foo) (void);$/;"	v	namespace:mud	typeref:typename:int (*)(void)

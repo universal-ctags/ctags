@@ -1,0 +1,5 @@
+CoffeeMachine	input.ttcn	/^module CoffeeMachine$/;"	M
+startCoffeePrepration	input.ttcn	/^    function startCoffeePrepration()$/;"	f
+drinkCoffee	input.ttcn	/^   function drinkCoffee(charstring coffeeType)$/;"	f
+getCoffee	input.ttcn	/^   function getCoffee() runs on CoffeeDrinkerComponentType$/;"	f
+boilWater	input.ttcn	/^   function boilWater() return Water$/;"	f

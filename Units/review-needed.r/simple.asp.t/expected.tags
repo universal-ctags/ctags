@@ -1,6 +1,6 @@
 HtmlCutout	input.asp	/^function HtmlCutout(lang, str)   'dig-out a piece of text from a multilang. string str$/;"	f
 constDecl	input.asp	/^Const constDecl = 512$/;"	d
-f_translate_9data	input.asp	/^Function f_translate_9data(id,defaulttext,data)   'lookup lang_???(id) and insert data at $0,$1,...$/;"	f
+f_translate_9data	input.asp	/^Function f_translate_9data(id,defaulttext,data)   'lookup lang_???(id) and insert data at $0,$1,/;"	f
 js_erroralert	input.asp	/^sub js_erroralert(txt)           'print inline-script to generate popup-window with txt$/;"	s
 lang_length	input.asp	/^DIM lang_length     '(htmlct.inc) num.chars to get, i.e. mid(str, lang_start, lang_length)$/;"	v
 lang_start	input.asp	/^Dim lang_start      '(htmlct.inc) char-index, use for multilanguage-strings$/;"	v

@@ -1,0 +1,13 @@
+NAME	input.pod	/^=head1 NAME$/;"	c
+SYNOPSIS	input.pod	/^=head1 SYNOPSIS$/;"	c
+DESCRIPTION	input.pod	/^=head1 DESCRIPTION$/;"	c
+CONCEPTS	input.pod	/^=head1 CONCEPTS$/;"	c
+KINDS	input.pod	/^=head2 KINDS$/;"	s
+C	input.pod	/^=head3 C$/;"	S
+function	input.pod	/^=head4 function$/;"	t
+variable	input.pod	/^=head4 variable$/;"	t
+PYTHON	input.pod	/^=head3 PYTHON$/;"	S
+class	input.pod	/^=head4 class$/;"	t
+method	input.pod	/^=head4 method$/;"	t
+FILEDS	input.pod	/^=head2 FILEDS$/;"	s
+EXTRA	input.pod	/^=head2 EXTRA$/;"	s

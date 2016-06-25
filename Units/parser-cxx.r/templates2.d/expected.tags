@@ -1,0 +1,8 @@
+foo1	input.cpp	/^auto foo1(const Container<Elem> & p_container)$/;"	f	typeref:typename:auto	template:<template<class...> class Container,class Elem>
+p_container	input.cpp	/^auto foo1(const Container<Elem> & p_container)$/;"	z	function:foo1	typeref:typename:const Container<Elem> &	file:
+foo2	input.cpp	/^auto foo2(const Container<Key,Elem> & p_container)$/;"	f	typeref:typename:auto	template:<template<class...> class Container,class Key,class Elem>
+p_container	input.cpp	/^auto foo2(const Container<Key,Elem> & p_container)$/;"	z	function:foo2	typeref:typename:const Container<Key,Elem> &	file:
+bar	input.cpp	/^void bar()$/;"	f	typeref:typename:void
+main	input.cpp	/^int main()$/;"	f	typeref:typename:int
+v	input.cpp	/^    auto v = foo1(std::vector<int>{1,2,3});$/;"	l	function:main	typeref:typename:auto	file:
+m	input.cpp	/^    auto m = foo2(std::map<int,int>{{1,2}});$/;"	l	function:main	typeref:typename:auto	file:

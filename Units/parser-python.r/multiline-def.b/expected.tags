@@ -1,0 +1,2 @@
+x	input.py	/^x=\\$/;"	v
+y	input.py	/^y()\\$/;"	f

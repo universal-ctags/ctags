@@ -2,17 +2,21 @@
 *   Copyright (c) 2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   External interface to routines.c
 */
-#ifndef _ROUTINES_H
-#define _ROUTINES_H
+#ifndef CTAGS_MAIN_ROUTINES_H
+#define CTAGS_MAIN_ROUTINES_H
 
 /*
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+
+#include <stdio.h>
+
+#include "mio.h"
 
 /*
 *   MACROS
@@ -22,6 +26,10 @@
 #define xRealloc(p,n,Type) (Type *)eRealloc((p), (n) * sizeof (Type))
 
 #define ARRAY_SIZE(X)      (sizeof (X) / sizeof (X[0]))
+#define ARRAY_AND_SIZE(X)  (X), ARRAY_SIZE(X)
+
+#define STRINGIFY(X) STRINGIFY_(X)
+#define STRINGIFY_(X) #X
 
 /*
  *  Portability macros
@@ -72,6 +80,9 @@ typedef struct {
 		/* Is file (pointed to) setuid? */
 	boolean isSetuid;
 
+		/* Is file (pointed to) setgid? */
+	boolean isSetgid;
+
 		/* Size of file (pointed to) */
 	unsigned long size;
 } fileStatus; 
@@ -117,10 +128,6 @@ extern boolean doesFileExist (const char *const fileName);
 extern boolean doesExecutableExist (const char *const fileName);
 extern boolean isRecursiveLink (const char* const dirName);
 extern boolean isSameFile (const char *const name1, const char *const name2);
-#if defined(NEED_PROTO_FGETPOS)
-extern int fgetpos  (FILE *stream, fpos_t *pos);
-extern int fsetpos  (FILE *stream, fpos_t *pos);
-#endif
 extern const char *baseFilename (const char *const filePath);
 extern const char *fileExtension (const char *const fileName);
 extern boolean isAbsolutePath (const char *const path);
@@ -128,10 +135,10 @@ extern char *combinePathAndFile (const char *const path, const char *const file)
 extern char* absoluteFilename (const char *file);
 extern char* absoluteDirname (char *file);
 extern char* relativeFilename (const char *file, const char *dir);
-extern FILE *tempFile (const char *const mode, char **const pName);
+extern MIO *tempFile (const char *const mode, char **const pName);
 
 extern char* baseFilenameSansExtensionNew (const char *const fileName, const char *const templateExt);
 
-#endif  /* _ROUTINES_H */
+#endif  /* CTAGS_MAIN_ROUTINES_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

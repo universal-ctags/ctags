@@ -1,0 +1,6 @@
+S         -          -, file =>  struct S{
+T         -          S, file => typedef S T;
+func      (T x)      int,    - => int func (T x)
+i         -          int, file =>     int i;
+t0        -          S, file => static struct S t0;
+t0        -          T, file => static T t0;

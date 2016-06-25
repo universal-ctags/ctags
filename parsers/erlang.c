@@ -2,7 +2,7 @@
 *   Copyright (c) 2003, Brent Fulgham <bfulgham@debian.org>
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for Erlang language
 *   files.  Some of the parsing constructs are based on the Emacs 'etags'
@@ -79,14 +79,12 @@ static void makeMemberTag (
 	if (ErlangKinds [kind].enabled  &&  vStringLength (identifier) > 0)
 	{
 		tagEntryInfo tag;
-		initTagEntry (&tag, vStringValue (identifier));
-		tag.kindName = ErlangKinds[kind].name;
-		tag.kind = ErlangKinds[kind].letter;
+		initTagEntry (&tag, vStringValue (identifier), & (ErlangKinds[kind]));
 
 		if (module != NULL  &&  vStringLength (module) > 0)
 		{
-			tag.extensionFields.scope [0] = "module";
-			tag.extensionFields.scope [1] = vStringValue (module);
+			tag.extensionFields.scopeKind = &(ErlangKinds [K_MODULE]);
+			tag.extensionFields.scopeName = vStringValue (module);
 		}
 		makeTagEntry (&tag);
 	}
@@ -160,7 +158,7 @@ static void findErlangTags (void)
 	vString *const module = vStringNew ();
 	const unsigned char *line;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char *cp = line;
 
@@ -185,7 +183,7 @@ extern parserDefinition *ErlangParser (void)
 	static const char *const extensions[] = { "erl", "ERL", "hrl", "HRL", NULL };
 	parserDefinition *def = parserNew ("Erlang");
 	def->kinds = ErlangKinds;
-	def->kindCount = KIND_COUNT (ErlangKinds);
+	def->kindCount = ARRAY_SIZE (ErlangKinds);
 	def->extensions = extensions;
 	def->parser = findErlangTags;
 	return def;

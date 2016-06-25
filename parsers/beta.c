@@ -4,7 +4,7 @@
 *   Written by Erik Corry <corry@mjolner.dk>
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for BETA language
 *   files.
@@ -70,9 +70,7 @@ static void makeBetaTag (const char* const name, const betaKind kind)
 	if (BetaKinds [kind].enabled)
 	{
 		tagEntryInfo e;
-		initTagEntry (&e, name);
-		e.kindName = BetaKinds [kind].name;
-		e.kind     = BetaKinds [kind].letter;
+		initTagEntry (&e, name, & (BetaKinds [kind]));
 		makeTagEntry (&e);
 	}
 }
@@ -85,17 +83,17 @@ static void findBetaTags (void)
 	boolean dovirtuals = BetaKinds [K_VIRTUAL].enabled;
 	boolean dopatterns = BetaKinds [K_PATTERN].enabled;
 
+	int c;
 	do
 	{
 		boolean foundfragmenthere = FALSE;
 		/* find fragment definition (line that starts and ends with --) */
 		int last;
 		int first;
-		int c;
 
 		vStringClear (line);
 
-		while ((c = fileGetc ()) != EOF && c != '\n' && c != '\r')
+		while ((c = getcFromInputFile ()) != EOF && c != '\n' && c != '\r')
 			vStringPut (line, c);
 
 		vStringTerminate (line);
@@ -301,7 +299,7 @@ static void findBetaTags (void)
 		}
 		endofline:
 		inquote = FALSE;  /* This shouldn't really make a difference */
-	} while (!feof (File.fp));
+	} while (c != EOF);
 	vStringDelete (line);
 }
 
@@ -310,7 +308,7 @@ extern parserDefinition* BetaParser (void)
 	static const char *const extensions [] = { "bet", NULL };
 	parserDefinition* def = parserNew ("BETA");
 	def->kinds      = BetaKinds;
-	def->kindCount  = KIND_COUNT (BetaKinds);
+	def->kindCount  = ARRAY_SIZE (BetaKinds);
 	def->extensions = extensions;
 	def->parser     = findBetaTags;
 	return def;

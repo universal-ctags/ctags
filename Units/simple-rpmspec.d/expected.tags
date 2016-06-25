@@ -1,0 +1,17 @@
+Summary	input.spec	/^Summary: Exuberant Ctags - a multi-language source code indexing tool$/;"	kind:tag	line:1
+Name	input.spec	/^Name: ctags$/;"	kind:tag	line:2
+ctags	input.spec	/^Name: ctags$/;"	kind:package	line:2
+Version	input.spec	/^Version: 99$/;"	kind:tag	line:3
+Release	input.spec	/^Release: 1$/;"	kind:tag	line:4
+License	input.spec	/^License: GPLv2$/;"	kind:tag	line:5
+Group	input.spec	/^Group: Development\/Tools$/;"	kind:tag	line:6
+Source	input.spec	/^Source: http:\/\/prdownloads.sourceforge.net\/ctags\/ctags-%{version}.tar.gz$/;"	kind:tag	line:7
+URL	input.spec	/^URL: http:\/\/ctags.sourceforge.net$/;"	kind:tag	line:8
+Buildroot	input.spec	/^Buildroot: %{_tmppath}\/%{name}-%{version}-root$/;"	kind:tag	line:9
+__scm_apply_git	input.spec	/^%define __scm_apply_git(qp:m:) %{__git} am$/;"	kind:macro	line:11	signature:(qp:m:)	end:11
+YES	input.spec	/^%define YES yes$/;"	kind:macro	line:13	end:13
+__scm_apply_git	input.spec	/^%undef __scm_apply_git$/;"	kind:macro	line:25	role:undef	end:25
+perf_make	input.spec	/^%global perf_make make %{?_smp_mflags} -C tools\/perf -s V=1 WERROR=0 NO_LIBUNWIND=1 HAVE_CPLUS_/;"	kind:global	line:26	end:26
+install_post	input.spec	/^%define install_post \\$/;"	kind:macro	line:28	end:35
+docs	input.spec	/^%package docs$/;"	kind:package	line:37	package:ctags
+ctags-docs	input.spec	/^%package docs$/;"	kind:package	line:37	package:ctags

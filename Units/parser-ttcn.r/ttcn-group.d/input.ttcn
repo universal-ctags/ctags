@@ -1,0 +1,5 @@
+group dataBroadcast
+{
+  type record DataReq {}
+  type record DataRsp {}
+}

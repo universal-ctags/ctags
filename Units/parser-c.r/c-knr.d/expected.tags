@@ -1,0 +1,12 @@
+f01	input.c	/^int f01()$/;"	f	typeref:typename:int
+f02	input.c	/^int f02(f02a01,f02a02)$/;"	f
+f02a01	input.c	/^  int f02a01;$/;"	z	function:f02	typeref:typename:int	file:
+f02a02	input.c	/^  int f02a02;$/;"	z	function:f02	typeref:typename:int	file:
+f03	input.c	/^int f03(void)$/;"	f	typeref:typename:int
+f04	input.c	/^int f04(...)$/;"	f	typeref:typename:int
+f05	input.c	/^int f05($/;"	f
+f05a01	input.c	/^	unsigned short f05a01;$/;"	z	function:f05	typeref:typename:unsigned short	file:
+f05a02	input.c	/^	int * f05a02;$/;"	z	function:f05	typeref:typename:int *	file:
+f06	input.c	/^int f06(f06a01,f06a02)$/;"	f
+f06a01	input.c	/^	unsigned short int f06a01, ** f06a02;$/;"	z	function:f06	typeref:typename:unsigned short int	file:
+f06a02	input.c	/^	unsigned short int f06a01, ** f06a02;$/;"	z	function:f06	typeref:typename:unsigned short int **	file:

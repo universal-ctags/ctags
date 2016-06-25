@@ -2,7 +2,7 @@
 *	Copyright (c) 2000-2003, Darren Hiebert
 *
 *	This source code is released for free distribution under the terms of the
-*	GNU General Public License.
+*	GNU General Public License version 2 or (at your option) any later version.
 *
 *	Thanks are due to Jay Glanville for significant improvements.
 *
@@ -21,9 +21,10 @@
 #include <stdio.h>
 #endif
 
-
+#include "entry.h"
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 #if 0
@@ -33,7 +34,7 @@ typedef struct sLineInfo {
 	vString *	string;
 	vString *	scope;
 	unsigned long lineNumber;
-	fpos_t filePosition;
+	MIOPos filePosition;
 } lineInfo;
 #endif
 
@@ -57,6 +58,19 @@ static kindOption VimKinds [] = {
 	{ TRUE,  'v', "variable", "variable definitions" },
 	{ TRUE,  'n', "filename", "vimball filename" },
 };
+
+typedef enum {
+	F_END,
+} vimField;
+
+static fieldSpec VimFields [] = {
+	{
+		.name = "end",
+		.description = "end lines of functions",
+		.enabled = FALSE,
+	}
+};
+
 
 /*
  *	 DATA DECLARATIONS
@@ -198,7 +212,7 @@ static const unsigned char * readVimLine (void)
 {
 	const unsigned char *line;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		while (isspace ((int) *line))
 			++line;
@@ -216,7 +230,7 @@ static const unsigned char * readVimballLine (void)
 {
 	const unsigned char *line;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		break;
 	}
@@ -230,6 +244,7 @@ static void parseFunction (const unsigned char *line)
 	/* boolean inFunction = FALSE; */
 	int scope;
 	const unsigned char *cp = line;
+	int index = CORK_NIL;
 
 	if ((int) *cp == '!')
 		++cp;
@@ -247,13 +262,17 @@ static void parseFunction (const unsigned char *line)
 					scope == 'd'  ||  /* dictionary */
 					scope == 'a')	  /* autoload */
 			{
+				char prefix[3] = { [0] = (char)scope, [1] = ':', [2] = '\0' };
+				if (scope == 's')
+					vStringCatS (name, prefix);
+
 				do
 				{
 					vStringPut (name, (int) *cp);
 					++cp;
 				} while (isalnum ((int) *cp) ||  *cp == '_' ||	*cp == '.' ||  *cp == '#');
 				vStringTerminate (name);
-				makeSimpleTag (name, VimKinds, K_FUNCTION);
+				index = makeSimpleTag (name, VimKinds, K_FUNCTION);
 				vStringClear (name);
 			}
 		}
@@ -263,7 +282,15 @@ static void parseFunction (const unsigned char *line)
 	while ((line = readVimLine ()) != NULL)
 	{
 		if (wordMatchLen (line, "endfunction", 4))
+		{
+			char end[16];
+			snprintf(end, sizeof(end), "%ld", (getInputLineNumber()));
+			if (index != CORK_NIL)
+				attachParserFieldToCorkEntry (index,
+							      VimFields [F_END].ftype,
+							      end);
 			break;
+		}
 
 		parseVimLine(line, TRUE);
 	}
@@ -306,9 +333,9 @@ static boolean parseCommand (const unsigned char *line)
 	/* 
 	 * Found a user-defined command 
 	 *
-	 * They can have many options preceeded by a dash
+	 * They can have many options preceded by a dash
 	 * command! -nargs=+ -complete Select  :call s:DB_execSql("select " . <q-args>)
-	 * The name of the command should be the first word not preceeded by a dash
+	 * The name of the command should be the first word not preceded by a dash
 	 *
 	 */
 	const unsigned char *cp = line;
@@ -369,7 +396,7 @@ static boolean parseCommand (const unsigned char *line)
 
 	/*
 	 * Strip off any spaces and options which are part of the command.
-	 * These should preceed the command name.
+	 * These should precede the command name.
 	 */
 	do
 	{
@@ -631,17 +658,14 @@ static void parseVimBallFile (const unsigned char *line)
 
 	/* Next line should be "finish" */
 	line = readVimLine();
-	if (line == NULL)
-	{
-		return;
-	}
+
 	while (line != NULL)
 	{
 		/* Next line should be a filename */
 		line = readVimLine();
 		if (line == NULL)
 		{
-			return;
+			goto cleanUp;
 		}
 		else
 		{
@@ -661,7 +685,7 @@ static void parseVimBallFile (const unsigned char *line)
 		line = readVimLine();
 		if (line == NULL)
 		{
-			return;
+			goto cleanUp;
 		}
 		else
 		{
@@ -674,11 +698,12 @@ static void parseVimBallFile (const unsigned char *line)
 			line = readVimballLine();
 			if (line == NULL)
 			{
-				return;
+				goto cleanUp;
 			}
 		}
 	}
 
+cleanUp:
 	vStringDelete (fname);
 }
 
@@ -711,10 +736,13 @@ extern parserDefinition* VimParser (void)
 		"[._]gvimrc", NULL };
 	parserDefinition* def = parserNew ("Vim");
 	def->kinds		= VimKinds;
-	def->kindCount	= KIND_COUNT (VimKinds);
+	def->kindCount	= ARRAY_SIZE (VimKinds);
 	def->extensions = extensions;
 	def->patterns   = patterns;
 	def->parser		= findVimTags;
+	def->fieldSpecs = VimFields;
+	def->fieldSpecCount = ARRAY_SIZE (VimFields);
+	def->useCork    = TRUE;
 	return def;
 }
 

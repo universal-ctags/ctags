@@ -1,0 +1,2 @@
+--extra=+q
+--systemverilog-kinds=+Q

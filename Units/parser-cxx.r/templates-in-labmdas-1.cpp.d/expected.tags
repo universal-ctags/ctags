@@ -1,0 +1,10 @@
+Bar	input.cpp	/^class Bar$/;"	class	file:
+foo	input.cpp	/^    A foo()$/;"	function	class:Bar	typeref:typename:A	file:	signature:()
+f1	input.cpp	/^int f1()$/;"	function	typeref:typename:int	signature:()
+b	input.cpp	/^    Bar<int> b;$/;"	local	function:f1	typeref:typename:Bar<int>	file:
+t	input.cpp	/^    auto t = b.template foo<int>();$/;"	local	function:f1	typeref:typename:auto	file:
+f2	input.cpp	/^int f2()$/;"	function	typeref:typename:int	signature:()
+b	input.cpp	/^    Bar<int> b;$/;"	local	function:f2	typeref:typename:Bar<int>	file:
+__anon1763e7850102	input.cpp	/^    auto l = [](auto & p){ return p.template foo<int>();};$/;"	function	function:f2	file:	signature:(auto & p)	captures:[]
+l	input.cpp	/^    auto l = [](auto & p){ return p.template foo<int>();};$/;"	local	function:f2	typeref:typename:auto	file:
+main	input.cpp	/^int main()$/;"	function	typeref:typename:int	signature:()

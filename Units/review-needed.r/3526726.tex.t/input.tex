@@ -551,7 +551,7 @@ available.
 
 As for OS selection, use what you like. When we implement Data Acquisition
 Plugin's in Snort 2.0 this may become more of a factor, but for now I'm hearing
-about a lot of people seeing alot of success using Snort on Solaris, Linux,
+about a lot of people seeing a lot of success using Snort on Solaris, Linux,
 *BSD and Windows 2000. Personally, I develop Snort on FreeBSD and Sourcefire
 uses OpenBSD for our sensor appliance OS, but I've been hearing some good
 things about the RedHat Turbo Packet interface (which would require mods for
@@ -638,7 +638,7 @@ these steps at your OWN risk.
 \item In a command prompt, run 'ipconfig' to verify the interface does not have an IP bound to it.
 \end{enumerate}
 
-If you do not recieve an IP address listing from the interface you
+If you do not receive an IP address listing from the interface you
 modified, you are good to go.  To run snort with the specified interface,
 use the -i flag such as 'snort -v -d -p -i1'
  
@@ -683,7 +683,7 @@ hub. The idea is to use the rcv cables for the wire going to the sniffer box
 and use the xmit cables from another hub port. This will give you a link light
 and allow your sniffer to rcv only. Cannot xmit because the xmit cables are not
 connected. This has been successfully used on netgear single speed hubs. It
-wont work on dual speed hubs due to the negotiation of speed.
+won't work on dual speed hubs due to the negotiation of speed.
 
 Pin outs. They are reversed in the picture in order to prevent lines from
 crossing, and I only included the pins used.
@@ -1602,7 +1602,7 @@ were detected by snort when a communications session attempt fails.
 
 The default order that the rules are applied in is alerts first, then pass
 rules, then log rules. This ordering ensures that you don't write 50 great
-alert rules and then disable them all accidently with an errant pass rule. If
+alert rules and then disable them all accidentally with an errant pass rule. If
 you really want to change this order so that the pass rules are applied first,
 use the ``-o'' command line switch, or the ``order'' config directive.
 
@@ -2401,7 +2401,7 @@ Try this script to archive the files:
   * []#!/bin/sh
 
     # 
-    # Logfile rotation script for snort writen by jameso@elwood.net.
+    # Logfile rotation script for snort written by jameso@elwood.net.
     # 
     # This script is pretty basic. We start out by setting some vars.
     # Its job is tho rotate the days logfiles, e-mail you with what 
@@ -2416,9 +2416,9 @@ Try this script to archive the files:
     # every night, so we want to set the dirdate var the day the script
     # runs minus a day so we label the files with the correct day. We
     # Then create a dir for the days logs, move the log files into 
-    # todays dir. As soon as that is done restart snort so we don't miss
+    # today's dir. As soon as that is done restart snort so we don't miss
     # anything. Then delete any logs that are uncompressed and over a
-    # week old. Then compress out todays logs and archive them away, and
+    # week old. Then compress out today's logs and archive them away, and
     # end up by mailling out the logs to you.
     #
     # Define where you have the base of your snort install
@@ -2455,14 +2455,14 @@ Try this script to archive the files:
      olddirdate=$month-$eightday-$year
     fi
     
-    # Create the Dir for todays logs.
+    # Create the Dir for today's logs.
     if [ ! -d $weeklogs/$dirdate ]
     then
      mkdir $weeklogs/$dirdate
     fi
     
-    # Move the log files into todays log dir. This is done with
-    # a for loop right now, because I am afriad that if alot is
+    # Move the log files into today's log dir. This is done with
+    # a for loop right now, because I am afraid that if alot is
     # logged there may be to many items to move with a "mv *"
     # type command. There may a better way to do this, but I don't
     # know it yet.
@@ -2704,7 +2704,7 @@ adapter basically mediating the 10 up to 100 and vice versa.
 The bad thing about hubs that {\em don't} have this ``feature,'' is that
 in order to support 10bt devices, they throttle the entire hub speed
 down to 10bt if there is one or more 10bt only devices hooked up to it.
-I have seen this behavior (and did the bandwidth tests to proove it) on
+I have seen this behavior (and did the bandwidth tests to prove it) on
 old 3com office connect 10/100 hubs (newer ones do the 2 hubs with a switch
 thing.)  So, the point of what I am saying is, since these old hubs have
 no switching capabilities, and they don't know which port the traffic is
@@ -2750,7 +2750,7 @@ traffic (telnet,http for example).  You set up a port to mirror
 traffic from the ports that have the devices your interested in to the
 port you have your analysis device plugged into.  Without doing so,
 you don't see the unicast conversations because the traffic is getting
-"switched" accross the backplane so pc on port 1 talks to server on
+"switched" across the backplane so pc on port 1 talks to server on
 port 2 and no other ports get this traffic. If server on port 2
 broadcasts or multicasts, the information is flooded out all ports.
 (multicast can be controlled on some switches so only those ports that
@@ -2761,7 +2761,7 @@ An excellent book on the topic is Interconnections by Radia Perlman.
 (Bridges and Routers).
   
 Additional caveat: if you deal with full duplex on a switched port,
-only a tap would save you - users have succesfully used Shomiti's
+only a tap would save you - users have successfully used Shomiti's
 ones on 100MB FD ports, and used two Snort instances, capturing
 traffic on both directions. Port mirroring didn't work in that case ...
 

@@ -1,0 +1,4 @@
+CoffeeTemperature	input.ttcn	/^type enumerated CoffeeTemperature $/;"	t
+e_cold	input.ttcn	/^    e_cold, e_warm, e_hot$/;"	e
+e_warm	input.ttcn	/^    e_cold, e_warm, e_hot$/;"	e
+e_hot	input.ttcn	/^    e_cold, e_warm, e_hot$/;"	e

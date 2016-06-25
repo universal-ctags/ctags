@@ -1,10 +1,26 @@
 #!/bin/sh
+#
+#   Copyright (C) 2014 Masatake YAMATO
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 TINST_ROOT=
 
 ERROR ()
 {
-    local status="$1"
-    local msg="$2"
+    local status=$1
+    local msg=$2
     shift 2
     echo "$msg" 1>&2
     exit $status
@@ -68,25 +84,26 @@ T_existing()
 
 prepare()
 {
-    local root=$1
+    local srcdir=$1
+    local root=$2
 
 
     MSG_title "Preparing installation tests"
     
-    if ! [ -e ./configure ]; then
+    if ! [ -e ${srcdir}/configure ]; then
 	ERROR 2 "cannot find configure script"
     fi
 
-    mkdir -p "$1"
+    mkdir -p "$root"
 
-    if ! [ -d "$1" ]; then
-	ERROR 2 "failed in directory creation: $1"
+    if ! [ -d "$root" ]; then
+	ERROR 2 "failed in directory creation: $roo"
     fi
 
     rm Makefile
 
-    if ! ./configure --prefix=$1 > /dev/null; then
-	ERROR 2 "failed in running configure script $1"
+    if ! ${srcdir}/configure --prefix=$root > /dev/null; then
+	ERROR 2 "failed in running configure script $root"
     fi
 
     if ! [ -e Makefile ]; then
@@ -118,37 +135,24 @@ check()
     T_existing /bin/readtags -f -x
 
     T_existing /libexec/ctags/drivers/coffeetags -f -x
-    T_existing /etc/ctags/optlib   -d -x -r
-    T_existing /etc/ctags/preload  -d -x -r
-    T_existing /etc/ctags/corpora  -d -x -r
-    
-    T_existing /share/ctags/optlib/m4.ctags -f -r
-    T_existing /share/ctags/optlib/coffee.ctags -f -r
-    T_existing /share/ctags/optlib/ctags.ctags -f -r
-    T_existing /share/ctags/optlib/gdbinit.ctags -f -r
-    T_existing /share/ctags/optlib/mib.ctags -f -r
-
-    T_existing /share/ctags/preload/default.ctags -f -r
-    
-    T_existing /share/ctags/corpora/ctags.ctags -f -r
-    T_existing  /share/ctags/corpora/RFC1213-MIB.txt -f -r
-    
     T_existing /share/man/man1/ctags.1 -f -r
 }
 
 main()
 {
+    local srcdir
     local root
     local status
 
-    if [ $# = 1 ]; then
-	root=$1
-	shift
+    if [ $# = 2 ]; then
+	srcdir=$1
+	root=$2
+	shift 2
     else
 	ERROR 2 "A installation root must be given as the first argument"
     fi
     
-    prepare "${root}"
+    prepare "${srcdir}" "${root}"
 
     TINST_ROOT=${root}
     check

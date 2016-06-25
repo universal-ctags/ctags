@@ -1,0 +1,4 @@
+ERROR_HAPPENED	input.cpp	3;"	d	file:
+NEXT_DEFINE	input.cpp	5;"	d	file:
+OK	input.cpp	4;"	d	file:
+main	input.cpp	7;"	f	typeref:typename:int

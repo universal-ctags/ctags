@@ -1,0 +1,3 @@
+See https://github.com/universal-ctags/ctags/pull/742
+local variable handling verified in variables-prototypes-2.cpp.d and
+variables-prototypes.cpp.b.

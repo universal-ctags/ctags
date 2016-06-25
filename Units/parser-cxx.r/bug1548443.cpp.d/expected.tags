@@ -1,0 +1,6 @@
+TestStruct	input.cpp	/^struct TestStruct$/;"	s	file:
+TestStruct::_number	input.cpp	/^int _number;$/;"	m	struct:TestStruct	typeref:typename:int	file:	access:public
+TestUnion	input.cpp	/^union TestUnion$/;"	u	file:
+TestUnion::_number	input.cpp	/^int _number;$/;"	m	union:TestUnion	typeref:typename:int	file:	access:public
+_number	input.cpp	/^int _number;$/;"	m	struct:TestStruct	typeref:typename:int	file:	access:public
+_number	input.cpp	/^int _number;$/;"	m	union:TestUnion	typeref:typename:int	file:	access:public

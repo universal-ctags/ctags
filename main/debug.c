@@ -2,7 +2,7 @@
 *   Copyright (c) 1996-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains debugging functions.
 */
@@ -74,30 +74,30 @@ extern void debugEntry (const tagEntryInfo *const tag)
 
 	if (debug (DEBUG_PARSE))
 	{
-		printf ("<#%s%s:%s", scope, tag->kindName, tag->name);
+		printf ("<#%s%s:%s", scope, tag->kind->name, tag->name);
 
-		if (tag->extensionFields.scope [0] != NULL  &&
-				tag->extensionFields.scope [1] != NULL)
-			printf (" [%s:%s]", tag->extensionFields.scope [0],
-					tag->extensionFields.scope [1]);
+		if (tag->extensionFields.scopeKind != NULL  &&
+				tag->extensionFields.scopeName != NULL)
+			printf (" [%s:%s]", tag->extensionFields.scopeKind->name,
+					tag->extensionFields.scopeName);
 
-		if (Option.extensionFields.inheritance  &&
+		if (isFieldEnabled (FIELD_INHERITANCE) &&
 				tag->extensionFields.inheritance != NULL)
 			printf (" [inherits:%s]", tag->extensionFields.inheritance);
 
-		if (Option.extensionFields.fileScope &&
-				tag->isFileScope && ! isHeaderFile ())
+		if (isFieldEnabled (FIELD_FILE_SCOPE) &&
+				tag->isFileScope && ! isInputHeaderFile ())
 			printf (" [file:]");
 
-		if (Option.extensionFields.access  &&
+		if (isFieldEnabled (FIELD_ACCESS) &&
 				tag->extensionFields.access != NULL)
 			printf (" [access:%s]", tag->extensionFields.access);
 
-		if (Option.extensionFields.implementation  &&
+		if (isFieldEnabled (FIELD_IMPLEMENTATION) &&
 				tag->extensionFields.implementation != NULL)
 			printf (" [imp:%s]", tag->extensionFields.implementation);
 
-		if (Option.extensionFields.typeRef  &&
+		if (isFieldEnabled (FIELD_TYPE_REF) &&
 				tag->extensionFields.typeRef [0] != NULL  &&
 				tag->extensionFields.typeRef [1] != NULL)
 			printf (" [%s:%s]", tag->extensionFields.typeRef [0],
@@ -114,12 +114,12 @@ extern void debugAssert (const char *assertion, const char *file, unsigned int l
 	        file, line,
 	        function ? function : "", function ? ": " : "",
 	        assertion);
-	if (File.name)
+	if (getInputFileName())
 	{
 		fprintf(stderr, "ctags: %s:%u: parsing %s:%lu as %s\n",
 		        file, line,
-		        getSourceFileName(), getSourceLineNumber(),
-		        getSourceLanguageName());
+		        getInputFileName(), getInputLineNumber(),
+		        getInputLanguageName());
 	}
 	fflush(stderr);
 	abort();

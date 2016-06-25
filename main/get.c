@@ -2,9 +2,9 @@
 *   Copyright (c) 1996-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
-*   This module contains the high level source read functions (preprocessor
+*   This module contains the high level input read functions (preprocessor
 *   directives are handled within this level).
 */
 
@@ -18,10 +18,12 @@
 #include "debug.h"
 #include "entry.h"
 #include "get.h"
+#include "kind.h"
 #include "options.h"
 #include "read.h"
 #include "vstring.h"
 #include "parse.h"
+#include "xtag.h"
 
 /*
 *   MACROS
@@ -64,10 +66,15 @@ typedef struct sCppState {
 	int		ungetch, ungetch2;   /* ungotten characters, if any */
 	boolean resolveRequired;     /* must resolve if/else/elif/endif branch */
 	boolean hasAtLiteralStrings; /* supports @"c:\" strings */
+	boolean hasCxxRawLiteralStrings; /* supports R"xxx(...)xxx" strings */
 	boolean hasSingleQuoteLiteralNumbers; /* supports vera number literals:
 						 'h..., 'o..., 'd..., and 'b... */
 	const kindOption  *defineMacroKind;
+	int macroUndefRoleIndex;
 	const kindOption  *headerKind;
+	int headerSystemRoleIndex;
+	int headerLocalRoleIndex;
+	int endFieldType;
 
 	struct sDirective {
 		enum eState state;       /* current directive being processed */
@@ -90,9 +97,14 @@ static cppState Cpp = {
 	'\0', '\0',  /* ungetch characters */
 	FALSE,       /* resolveRequired */
 	FALSE,       /* hasAtLiteralStrings */
+	FALSE,       /* hasCxxRawLiteralStrings */
 	FALSE,	     /* hasSingleQuoteLiteralNumbers */
 	NULL,	     /* defineMacroKind */
+	.macroUndefRoleIndex   = ROLE_INDEX_DEFINITION,
 	NULL,	     /* headerKind */
+	.headerSystemRoleIndex = ROLE_INDEX_DEFINITION,
+	.headerLocalRoleIndex = ROLE_INDEX_DEFINITION,
+	.endFieldType = FIELD_UNKNOWN,
 	{
 		DRCTV_NONE,  /* state */
 		FALSE,       /* accept */
@@ -117,9 +129,13 @@ extern unsigned int getDirectiveNestLevel (void)
 }
 
 extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
+		     const boolean hasCxxRawLiteralStrings,
 		     const boolean hasSingleQuoteLiteralNumbers,
 		     const struct sKindOption *defineMacroKind,
-		     const struct sKindOption *headerKind)
+		     int macroUndefRoleIndex,
+		     const struct sKindOption *headerKind,
+		     int headerSystemRoleIndex, int headerLocalRoleIndex,
+		     int endFieldType)
 {
 	BraceFormat = state;
 
@@ -127,9 +143,14 @@ extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 	Cpp.ungetch2        = '\0';
 	Cpp.resolveRequired = FALSE;
 	Cpp.hasAtLiteralStrings = hasAtLiteralStrings;
+	Cpp.hasCxxRawLiteralStrings = hasCxxRawLiteralStrings;
 	Cpp.hasSingleQuoteLiteralNumbers = hasSingleQuoteLiteralNumbers;
 	Cpp.defineMacroKind  = defineMacroKind;
+	Cpp.macroUndefRoleIndex = macroUndefRoleIndex;
 	Cpp.headerKind  = headerKind;
+	Cpp.headerSystemRoleIndex = headerSystemRoleIndex;
+	Cpp.headerLocalRoleIndex = headerLocalRoleIndex;
+	Cpp.endFieldType = endFieldType;
 
 	Cpp.directive.state     = DRCTV_NONE;
 	Cpp.directive.accept    = TRUE;
@@ -140,10 +161,7 @@ extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 	Cpp.directive.ifdef [0].branchChosen = FALSE;
 	Cpp.directive.ifdef [0].ignoring     = FALSE;
 
-	if (Cpp.directive.name == NULL)
-		Cpp.directive.name = vStringNew ();
-	else
-		vStringClear (Cpp.directive.name);
+	Cpp.directive.name = vStringNewOrClear (Cpp.directive.name);
 }
 
 extern void cppTerminate (void)
@@ -172,7 +190,7 @@ extern void cppEndStatement (void)
 *   directives and may emit a tag for #define directives.
 */
 
-/*  This puts a character back into the input queue for the source File.
+/*  This puts a character back into the input queue for the input File.
  *  Up to two characters may be ungotten.
  */
 extern void cppUngetc (const int c)
@@ -192,10 +210,10 @@ static boolean readDirective (int c, char *const name, unsigned int maxLength)
 	{
 		if (i > 0)
 		{
-			c = fileGetc ();
+			c = getcFromInputFile ();
 			if (c == EOF  ||  ! isalpha (c))
 			{
-				fileUngetc (c);
+				ungetcToInputFile (c);
 				break;
 			}
 		}
@@ -215,8 +233,9 @@ static void readIdentifier (int c, vString *const name)
 	do
 	{
 		vStringPut (name, c);
-	} while (c = fileGetc (), (c != EOF  &&  isident (c)));
-	fileUngetc (c);
+		c = getcFromInputFile ();
+	} while (c != EOF  &&  isident (c));
+	ungetcToInputFile (c);
 	vStringTerminate (name);
 }
 
@@ -226,7 +245,7 @@ static void readFilename (int c, vString *const name)
 
 	vStringClear (name);
 
-	while (c = fileGetc (), (c != EOF && c != c_end && c != '\n'))
+	while (c = getcFromInputFile (), (c != EOF && c != c_end && c != '\n'))
 		vStringPut (name, c);
 
 	vStringTerminate (name);
@@ -317,61 +336,110 @@ static boolean pushConditional (const boolean firstBranchChosen)
 static boolean popConditional (void)
 {
 	if (Cpp.directive.nestLevel > 0)
+	{
 		--Cpp.directive.nestLevel;
+	}
 
 	return isIgnore ();
 }
 
-static void makeDefineTag (const char *const name)
-{
-	const boolean isFileScope = (boolean) (! isHeaderFile ());
 
-	if (Cpp.defineMacroKind && Cpp.defineMacroKind->enabled &&
-		(! isFileScope  ||  Option.include.fileScope))
+static int makeDefineTag (const char *const name, const char* const signature, boolean undef)
+{
+	const boolean isFileScope = (boolean) (! isInputHeaderFile ());
+
+	if (!Cpp.defineMacroKind)
+		return CORK_NIL;
+	if (isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
+		return CORK_NIL;
+
+	if ( /* condition for definition tag */
+		((!undef) && Cpp.defineMacroKind->enabled)
+		|| /* condition for reference tag */
+		(undef && isXtagEnabled(XTAG_REFERENCE_TAGS) &&
+		 Cpp.defineMacroKind->roles [ Cpp.macroUndefRoleIndex ].enabled))
 	{
 		tagEntryInfo e;
-		initTagEntry (&e, name);
+
+		if (undef)
+			initRefTagEntry (&e, name, Cpp.defineMacroKind,
+					 Cpp.macroUndefRoleIndex);
+		else
+			initTagEntry (&e, name, Cpp.defineMacroKind);
 		e.lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
 		e.isFileScope  = isFileScope;
+		if (isFileScope)
+			markTagExtraBit (&e, XTAG_FILE_SCOPE);
 		e.truncateLine = TRUE;
-		e.kindName     = Cpp.defineMacroKind->name;
-		e.kind         = Cpp.defineMacroKind->letter;
-		makeTagEntry (&e);
+		e.extensionFields.signature = signature;
+		return makeTagEntry (&e);
 	}
+	return CORK_NIL;
 }
 
-static void makeIncludeTag (const  char *const name, const char separator)
+static void makeIncludeTag (const  char *const name, boolean systemHeader)
 {
 	tagEntryInfo e;
+	int role_index = systemHeader? Cpp.headerSystemRoleIndex: Cpp.headerLocalRoleIndex;
 
-	if (Cpp.headerKind && Cpp.headerKind->enabled)
+	if (Cpp.headerKind && isXtagEnabled (XTAG_REFERENCE_TAGS)
+	    && Cpp.headerKind->roles [ role_index ].enabled)
 	{
-		initTagEntry (&e, name);
+		initRefTagEntry (&e, name, Cpp.headerKind, role_index);
 		e.lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
 		e.isFileScope  = FALSE;
 		e.truncateLine = TRUE;
-		e.kindName     = Cpp.headerKind->name,
-		e.kind         = Cpp.headerKind->letter;
 		makeTagEntry (&e);
 	}
 }
 
-static void directiveDefine (const int c)
+static vString *signature;
+static int directiveDefine (const int c, boolean undef)
 {
+	int r = CORK_NIL;
+
 	if (isident1 (c))
 	{
 		readIdentifier (c, Cpp.directive.name);
 		if (! isIgnore ())
-			makeDefineTag (vStringValue (Cpp.directive.name));
+		{
+			int p;
+
+			p = getcFromInputFile ();
+			if (p == '(')
+			{
+				signature = vStringNewOrClear (signature);
+				do {
+					if (!isspacetab(p))
+						vStringPut (signature, p);
+					/* TODO: Macro parameters can be captured here. */
+					p = getcFromInputFile ();
+				} while (p != ')' && p != EOF);
+
+				if (p == ')')
+				{
+					vStringPut (signature, p);
+					r = makeDefineTag (vStringValue (Cpp.directive.name), vStringValue (signature), undef);
+				}
+				else
+					r = makeDefineTag (vStringValue (Cpp.directive.name), NULL, undef);
+			}
+			else
+			{
+				ungetcToInputFile (p);
+				r = makeDefineTag (vStringValue (Cpp.directive.name), NULL, undef);
+			}
+		}
 	}
 	Cpp.directive.state = DRCTV_NONE;
+	return r;
 }
 
 static void directiveUndef (const int c)
 {
-	if (Option.undef)
+	if (isXtagEnabled (XTAG_REFERENCE_TAGS))
 	{
-		directiveDefine (c);
+		directiveDefine (c, TRUE);
 	}
 	else
 	{
@@ -389,12 +457,12 @@ static void directivePragma (int c)
 			/* generate macro tag for weak name */
 			do
 			{
-				c = fileGetc ();
+				c = getcFromInputFile ();
 			} while (c == SPACE);
 			if (isident1 (c))
 			{
 				readIdentifier (c, Cpp.directive.name);
-				makeDefineTag (vStringValue (Cpp.directive.name));
+				makeDefineTag (vStringValue (Cpp.directive.name), NULL, FALSE);
 			}
 		}
 	}
@@ -420,7 +488,8 @@ static void directiveInclude (const int c)
 	{
 		readFilename (c, Cpp.directive.name);
 		if ((! isIgnore ()) && vStringLength (Cpp.directive.name))
-			makeIncludeTag (vStringValue (Cpp.directive.name), c);
+			makeIncludeTag (vStringValue (Cpp.directive.name),
+					c == '<');
 	}
 	Cpp.directive.state = DRCTV_NONE;
 }
@@ -466,14 +535,16 @@ static boolean directiveHash (const int c)
 
 /*  Handles a pre-processor directive whose first character is given by "c".
  */
-static boolean handleDirective (const int c)
+static boolean handleDirective (const int c, int *macroCorkIndex)
 {
 	boolean ignore = isIgnore ();
 
 	switch (Cpp.directive.state)
 	{
 		case DRCTV_NONE:    ignore = isIgnore ();        break;
-		case DRCTV_DEFINE:  directiveDefine (c);         break;
+		case DRCTV_DEFINE:
+			*macroCorkIndex = directiveDefine (c, FALSE);
+			break;
 		case DRCTV_HASH:    ignore = directiveHash (c);  break;
 		case DRCTV_IF:      ignore = directiveIf (c);    break;
 		case DRCTV_PRAGMA:  directivePragma (c);         break;
@@ -489,7 +560,7 @@ static boolean handleDirective (const int c)
 static Comment isComment (void)
 {
 	Comment comment;
-	const int next = fileGetc ();
+	const int next = getcFromInputFile ();
 
 	if (next == '*')
 		comment = COMMENT_C;
@@ -499,7 +570,7 @@ static Comment isComment (void)
 		comment = COMMENT_D;
 	else
 	{
-		fileUngetc (next);
+		ungetcToInputFile (next);
 		comment = COMMENT_NONE;
 	}
 	return comment;
@@ -510,15 +581,15 @@ static Comment isComment (void)
  */
 int skipOverCComment (void)
 {
-	int c = fileGetc ();
+	int c = getcFromInputFile ();
 
 	while (c != EOF)
 	{
 		if (c != '*')
-			c = fileGetc ();
+			c = getcFromInputFile ();
 		else
 		{
-			const int next = fileGetc ();
+			const int next = getcFromInputFile ();
 
 			if (next != '/')
 				c = next;
@@ -538,10 +609,10 @@ static int skipOverCplusComment (void)
 {
 	int c;
 
-	while ((c = fileGetc ()) != EOF)
+	while ((c = getcFromInputFile ()) != EOF)
 	{
 		if (c == BACKSLASH)
-			fileGetc ();  /* throw away next character, too */
+			getcFromInputFile ();  /* throw away next character, too */
 		else if (c == NEWLINE)
 			break;
 	}
@@ -553,15 +624,15 @@ static int skipOverCplusComment (void)
  */
 static int skipOverDComment (void)
 {
-	int c = fileGetc ();
+	int c = getcFromInputFile ();
 
 	while (c != EOF)
 	{
 		if (c != '+')
-			c = fileGetc ();
+			c = getcFromInputFile ();
 		else
 		{
-			const int next = fileGetc ();
+			const int next = getcFromInputFile ();
 
 			if (next != '/')
 				c = next;
@@ -582,14 +653,64 @@ static int skipToEndOfString (boolean ignoreBackslash)
 {
 	int c;
 
-	while ((c = fileGetc ()) != EOF)
+	while ((c = getcFromInputFile ()) != EOF)
 	{
 		if (c == BACKSLASH && ! ignoreBackslash)
-			fileGetc ();  /* throw away next character, too */
+			getcFromInputFile ();  /* throw away next character, too */
 		else if (c == DOUBLE_QUOTE)
 			break;
 	}
 	return STRING_SYMBOL;  /* symbolic representation of string */
+}
+
+
+static int isCxxRawLiteralDelimiterChar (int c)
+{
+	return (c != ' ' && c != '\f' && c != '\n' && c != '\r' && c != '\t' && c != '\v' &&
+	        c != '(' && c != ')' && c != '\\');
+}
+
+static int skipToEndOfCxxRawLiteralString (void)
+{
+	int c = getcFromInputFile ();
+
+	if (c != '(' && ! isCxxRawLiteralDelimiterChar (c))
+	{
+		ungetcToInputFile (c);
+		c = skipToEndOfString (FALSE);
+	}
+	else
+	{
+		char delim[16];
+		unsigned int delimLen = 0;
+		boolean collectDelim = TRUE;
+
+		do
+		{
+			if (collectDelim)
+			{
+				if (isCxxRawLiteralDelimiterChar (c) &&
+				    delimLen < (sizeof delim / sizeof *delim))
+					delim[delimLen++] = c;
+				else
+					collectDelim = FALSE;
+			}
+			else if (c == ')')
+			{
+				unsigned int i = 0;
+
+				while ((c = getcFromInputFile ()) != EOF && i < delimLen && delim[i] == c)
+					i++;
+				if (i == delimLen && c == DOUBLE_QUOTE)
+					break;
+				else
+					ungetcToInputFile (c);
+			}
+		}
+		while ((c = getcFromInputFile ()) != EOF);
+		c = STRING_SYMBOL;
+	}
+	return c;
 }
 
 /*  Skips to the end of the three (possibly four) 'c' sequence, returning a
@@ -601,16 +722,16 @@ static int skipToEndOfChar (void)
 	int c;
 	int count = 0, veraBase = '\0';
 
-	while ((c = fileGetc ()) != EOF)
+	while ((c = getcFromInputFile ()) != EOF)
 	{
 	    ++count;
 		if (c == BACKSLASH)
-			fileGetc ();  /* throw away next character, too */
+			getcFromInputFile ();  /* throw away next character, too */
 		else if (c == SINGLE_QUOTE)
 			break;
 		else if (c == NEWLINE)
 		{
-			fileUngetc (c);
+			ungetcToInputFile (c);
 			break;
 		}
 		else if (Cpp.hasSingleQuoteLiteralNumbers)
@@ -619,12 +740,26 @@ static int skipToEndOfChar (void)
 				veraBase = c;
 			else if (veraBase != '\0'  &&  ! isalnum (c))
 			{
-				fileUngetc (c);
+				ungetcToInputFile (c);
 				break;
 			}
 		}
 	}
 	return CHAR_SYMBOL;  /* symbolic representation of character */
+}
+
+static void attachEndFieldMaybe (int macroCorkIndex)
+{
+	char buf[16];
+
+	if (Cpp.endFieldType != FIELD_UNKNOWN
+	    && macroCorkIndex != CORK_NIL)
+	{
+		sprintf(buf, "%ld", getInputLineNumber ());
+		attachParserFieldToCorkEntry (macroCorkIndex,
+					      Cpp.endFieldType,
+					      buf);
+	}
 }
 
 /*  This function returns the next character, stripping out comments,
@@ -637,6 +772,7 @@ extern int cppGetc (void)
 	boolean directive = FALSE;
 	boolean ignore = FALSE;
 	int c;
+	int macroCorkIndex = CORK_NIL;
 
 	if (Cpp.ungetch != '\0')
 	{
@@ -647,13 +783,16 @@ extern int cppGetc (void)
 	}
 	else do
 	{
-		c = fileGetc ();
+start_loop:
+		c = getcFromInputFile ();
 process:
 		switch (c)
 		{
 			case EOF:
 				ignore    = FALSE;
 				directive = FALSE;
+				attachEndFieldMaybe (macroCorkIndex);
+				macroCorkIndex = CORK_NIL;
 				break;
 
 			case TAB:
@@ -662,7 +801,11 @@ process:
 
 			case NEWLINE:
 				if (directive  &&  ! ignore)
+				{
+					attachEndFieldMaybe (macroCorkIndex);
+					macroCorkIndex = CORK_NIL;
 					directive = FALSE;
+				}
 				Cpp.directive.accept = TRUE;
 				break;
 
@@ -701,7 +844,7 @@ process:
 				{
 					c = skipOverCplusComment ();
 					if (c == NEWLINE)
-						fileUngetc (c);
+						ungetcToInputFile (c);
 				}
 				else if (comment == COMMENT_D)
 					c = skipOverDComment ();
@@ -712,23 +855,23 @@ process:
 
 			case BACKSLASH:
 			{
-				int next = fileGetc ();
+				int next = getcFromInputFile ();
 
 				if (next == NEWLINE)
-					continue;
+					goto start_loop;
 				else
-					fileUngetc (next);
+					ungetcToInputFile (next);
 				break;
 			}
 
 			case '?':
 			{
-				int next = fileGetc ();
+				int next = getcFromInputFile ();
 				if (next != '?')
-					fileUngetc (next);
+					ungetcToInputFile (next);
 				else
 				{
-					next = fileGetc ();
+					next = getcFromInputFile ();
 					switch (next)
 					{
 						case '(':          c = '[';       break;
@@ -741,8 +884,8 @@ process:
 						case '-':          c = '~';       break;
 						case '=':          c = '#';       goto process;
 						default:
-							fileUngetc ('?');
-							fileUngetc (next);
+							ungetcToInputFile ('?');
+							ungetcToInputFile (next);
 							break;
 					}
 				}
@@ -754,32 +897,32 @@ process:
 			 */
 			case '<':
 			{
-				int next = fileGetc ();
+				int next = getcFromInputFile ();
 				switch (next)
 				{
 					case ':':	c = '['; break;
 					case '%':	c = '{'; break;
-					default: fileUngetc (next);
+					default: ungetcToInputFile (next);
 				}
 				goto enter;
 			}
 			case ':':
 			{
-				int next = fileGetc ();
+				int next = getcFromInputFile ();
 				if (next == '>')
 					c = ']';
 				else
-					fileUngetc (next);
+					ungetcToInputFile (next);
 				goto enter;
 			}
 			case '%':
 			{
-				int next = fileGetc ();
+				int next = getcFromInputFile ();
 				switch (next)
 				{
 					case '>':	c = '}'; break;
 					case ':':	c = '#'; goto process;
-					default: fileUngetc (next);
+					default: ungetcToInputFile (next);
 				}
 				goto enter;
 			}
@@ -787,7 +930,7 @@ process:
 			default:
 				if (c == '@' && Cpp.hasAtLiteralStrings)
 				{
-					int next = fileGetc ();
+					int next = getcFromInputFile ();
 					if (next == DOUBLE_QUOTE)
 					{
 						Cpp.directive.accept = FALSE;
@@ -795,12 +938,51 @@ process:
 						break;
 					}
 					else
-						fileUngetc (next);
+						ungetcToInputFile (next);
+				}
+				else if (c == 'R' && Cpp.hasCxxRawLiteralStrings)
+				{
+					/* OMG!11 HACK!!11  Get the previous character.
+					 *
+					 * We need to know whether the previous character was an identifier or not,
+					 * because "R" has to be on its own, not part of an identifier.  This allows
+					 * for constructs like:
+					 *
+					 * 	#define FOUR "4"
+					 * 	const char *p = FOUR"5";
+					 *
+					 * which is not a raw literal, but a preprocessor concatenation.
+					 *
+					 * FIXME: handle
+					 *
+					 * 	const char *p = R\
+					 * 	"xxx(raw)xxx";
+					 *
+					 * which is perfectly valid (yet probably very unlikely). */
+					int prev = getNthPrevCFromInputFile (1, '\0');
+					int prev2 = getNthPrevCFromInputFile (2, '\0');
+					int prev3 = getNthPrevCFromInputFile (3, '\0');
+
+					if (! isident (prev) ||
+					    (! isident (prev2) && (prev == 'L' || prev == 'u' || prev == 'U')) ||
+					    (! isident (prev3) && (prev2 == 'u' && prev == '8')))
+					{
+						int next = getcFromInputFile ();
+						if (next != DOUBLE_QUOTE)
+							ungetcToInputFile (next);
+						else
+						{
+							Cpp.directive.accept = FALSE;
+							c = skipToEndOfCxxRawLiteralString ();
+							break;
+						}
+					}
 				}
 			enter:
 				Cpp.directive.accept = FALSE;
 				if (directive)
-					ignore = handleDirective (c);
+					ignore = handleDirective (c,
+								  &macroCorkIndex);
 				break;
 		}
 	} while (directive || ignore);

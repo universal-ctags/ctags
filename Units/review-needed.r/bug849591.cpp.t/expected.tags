@@ -1,2 +1,0 @@
-Foo	input.cpp	/^void MainClass< ParamClass1&, ParamClass2>::Foo()$/;"	f	class:MainClass
-Foo	input.cpp	/^void MainClass<ParamClass1&, ParamClass2>::Foo()$/;"	f	class:MainClass

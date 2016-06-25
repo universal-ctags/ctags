@@ -2,12 +2,12 @@
 *   Copyright (c) 1999-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   Defines external interface to command line argument reading.
 */
-#ifndef _ARGS_H
-#define _ARGS_H
+#ifndef CTAGS_MAIN_ARGS_H
+#define CTAGS_MAIN_ARGS_H
 
 /*
 *   INCLUDE FILES
@@ -54,6 +54,6 @@ extern void argSetLineMode (Arguments* const current);
 extern void argForth (Arguments* const current);
 extern void argDelete (Arguments* const current);
 
-#endif  /* _ARGS_H */
+#endif  /* CTAGS_MAIN_ARGS_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

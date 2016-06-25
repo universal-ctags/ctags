@@ -1,4 +1,8 @@
 #!/bin/sh
+
+# Copyright: 2015 Masatake YAMATO
+# License: GPL-2
+
 CTAGS=$1
 
 if ${CTAGS} --quiet --options=NONE --list-features | grep -q multibyte ; then

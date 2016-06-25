@@ -1,0 +1,4 @@
+#!/bin/sh
+rinfo=`git describe --tag --exact-match HEAD 2> /dev/null || git rev-parse --short HEAD`
+echo "#define CTAGS_REPOINFO \"${rinfo}\""
+

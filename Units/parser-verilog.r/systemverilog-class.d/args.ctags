@@ -1,0 +1,3 @@
+--extra=+q
+--systemverilog-kinds=+Q
+--fields=+i

@@ -1,0 +1,9 @@
+# Taken from info manual of gawk.
+function mysub(pat, repl, str, global)
+{
+    if (global)
+        gsub(pat, repl, str)
+    else
+        sub(pat, repl, str)
+    return str
+}

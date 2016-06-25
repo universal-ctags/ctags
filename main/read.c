@@ -2,10 +2,10 @@
 *   Copyright (c) 1996-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
-*   This module contains low level source and tag file read functions (newline
-*   conversion for source files are performed at this level).
+*   This module contains low level input and tag file read functions (newline
+*   conversion for input files are performed at this level).
 */
 
 /*
@@ -27,51 +27,230 @@
 # include "mbcs.h"
 #endif
 
-#ifdef HAVE_REGCOMP
-# include <ctype.h>
-# include <stddef.h>
-# ifdef HAVE_SYS_TYPES_H
-#  include <sys/types.h>  /* declare off_t (not known to regex.h on FreeBSD) */
-# endif
-# include <regex.h>
+#include <ctype.h>
+#include <stddef.h>
+#ifdef HAVE_SYS_TYPES_H
+# include <sys/types.h>  /* declare off_t (not known to regex.h on FreeBSD) */
 #endif
+#include <regex.h>
+
+/*
+*   DATA DECLARATIONS
+*/
+
+/*  Maintains the state of the current input file.
+ */
+typedef struct sInputFileInfo {
+	vString *name;           /* name to report for input file */
+	vString *tagPath;        /* path of input file relative to tag file */
+	unsigned long lineNumber;/* line number in the input file */
+	unsigned long lineNumberOrigin; /* The value set to `lineNumber'
+					   when `resetInputFile' is called
+					   on the input stream.
+					   This is needed for nested stream. */
+	boolean  isHeader;       /* is input file a header file? */
+	langType language;       /* language of input file */
+} inputFileInfo;
+
+typedef struct sInputLineFposMap {
+	MIOPos *pos;
+	unsigned int count;
+	unsigned int size;
+} inputLineFposMap;
+
+typedef struct sInputFile {
+	vString    *path;          /* path of input file (if any) */
+	vString    *line;          /* last line read from file */
+	const unsigned char* currentLine;  /* current line being worked on */
+	MIO        *fp;            /* stream used for reading the file */
+	MIOPos      filePosition;  /* file position of current line */
+	unsigned int ungetchIdx;
+	int         ungetchBuf[3]; /* characters that were ungotten */
+	boolean     eof;           /* have we reached the end of file? */
+	boolean     newLine;       /* will the next character begin a new line? */
+
+	/*  Contains data pertaining to the original `source' file in which the tag
+	 *  was defined. This may be different from the `input' file when #line
+	 *  directives are processed (i.e. the input file is preprocessor output).
+	 */
+	inputFileInfo input; /* name, lineNumber */
+	inputFileInfo source;
+
+	/* sourceTagPathHolder is a kind of trash box.
+	   The buffer pointed by tagPath field of source field can
+	   be referred from tagsEntryInfo instances. sourceTagPathHolder
+	   is used keeping the buffer till all processing about the current
+	   input file is done. After all processing is done, the buffers
+	   in sourceTagPathHolder are destroied. */
+	stringList  * sourceTagPathHolder;
+	inputLineFposMap lineFposMap;
+} inputFile;
+
 
 /*
 *   DATA DEFINITIONS
 */
-inputFile File;  /* globally read through macros */
-static fpos_t StartOfLine;  /* holds deferred position of start of line */
+static inputFile File;  /* static read through functions */
+static inputFile BackupFile;	/* File is copied here when a nested parser is pushed */
+static MIOPos StartOfLine;  /* holds deferred position of start of line */
 
 /*
 *   FUNCTION DEFINITIONS
 */
 
-extern void freeSourceFileResources (void)
+extern unsigned long getInputLineNumber (void)
 {
-	if (File.name != NULL)
-		vStringDelete (File.name);
+	return File.input.lineNumber;
+}
+
+extern const char *getInputFileName (void)
+{
+	return vStringValue (File.input.name);
+}
+
+extern MIOPos getInputFilePosition (void)
+{
+	return File.filePosition;
+}
+
+extern MIOPos getInputFilePositionForLine (int line)
+{
+	return File.lineFposMap.pos[(((File.lineFposMap.count > (line - 1)) \
+				      && (line > 0))? (line - 1): 0)];
+}
+
+extern langType getInputLanguage (void)
+{
+	return File.input.language;
+}
+
+extern const char *getInputLanguageName (void)
+{
+	return getLanguageName (File.input.language);
+}
+
+extern const char *getInputFileTagPath (void)
+{
+	return vStringValue (File.input.tagPath);
+}
+
+extern boolean isInputLanguage (langType lang)
+{
+	return (boolean)((lang) == File.input.language);
+}
+
+extern boolean isInputHeaderFile (void)
+{
+	return File.input.isHeader;
+}
+
+extern boolean isInputLanguageKindEnabled (char c)
+{
+	return isLanguageKindEnabled (File.input.language, c);
+}
+
+extern boolean doesInputLanguageAllowNullTag (void)
+{
+	return doesLanguageAllowNullTag (File.input.language);
+}
+
+extern kindOption *getInputLanguageFileKind (void)
+{
+	return getLanguageFileKind (File.input.language);
+}
+
+extern boolean doesInputLanguageRequestAutomaticFQTag (void)
+{
+	return doesLanguageRequestAutomaticFQTag (File.input.language);
+}
+
+extern const char *getSourceFileTagPath (void)
+{
+	return vStringValue (File.source.tagPath);
+}
+
+extern const char *getSourceLanguageName (void)
+{
+	return getLanguageName (File.source.language);
+}
+
+extern unsigned long getSourceLineNumber (void)
+{
+	return File.source.lineNumber;
+}
+
+static void freeInputFileInfo (inputFileInfo *finfo)
+{
+	if (finfo->name)
+	{
+		vStringDelete (finfo->name);
+		finfo->name = NULL;
+	}
+	if (finfo->tagPath)
+	{
+		vStringDelete (finfo->tagPath);
+		finfo->tagPath = NULL;
+	}
+}
+
+extern void freeInputFileResources (void)
+{
 	if (File.path != NULL)
 		vStringDelete (File.path);
-	if (File.source.name != NULL)
-		vStringDelete (File.source.name);
-	if (File.source.tagPath != NULL)
-		eFree (File.source.tagPath);
 	if (File.line != NULL)
 		vStringDelete (File.line);
+	freeInputFileInfo (&File.input);
+	freeInputFileInfo (&File.source);
+}
+
+extern const unsigned char *getInputFileData (size_t *size)
+{
+	return mio_memory_get_data (File.fp, size);
 }
 
 /*
- *   Source file access functions
+ * inputLineFposMap related functions
+ */
+static void freeLineFposMap (inputLineFposMap *lineFposMap)
+{
+	if (lineFposMap->pos)
+	{
+		free (lineFposMap->pos);
+		lineFposMap->pos = NULL;
+		lineFposMap->count = 0;
+		lineFposMap->size = 0;
+	}
+}
+
+static void allocLineFposMap (inputLineFposMap *lineFposMap)
+{
+#define INITIAL_lineFposMap_LEN 256
+	lineFposMap->pos = xCalloc (INITIAL_lineFposMap_LEN, MIOPos);
+	lineFposMap->size = INITIAL_lineFposMap_LEN;
+	lineFposMap->count = 0;
+}
+
+static void appendLineFposMap (inputLineFposMap *lineFposMap, MIOPos pos)
+{
+	if (lineFposMap->size == lineFposMap->count)
+	{
+		lineFposMap->size *= 2;
+		lineFposMap->pos = xRealloc (lineFposMap->pos,
+					     lineFposMap->size,
+					     MIOPos);
+	}
+	lineFposMap->pos [lineFposMap->count] = pos;
+	lineFposMap->count++;
+}
+
+/*
+ *   Input file access functions
  */
 
-static void setInputFileName (const char *const fileName)
+static void setOwnerDirectoryOfInputFile (const char *const fileName)
 {
 	const char *const head = fileName;
 	const char *const tail = baseFilename (head);
-
-	if (File.name != NULL)
-		vStringDelete (File.name);
-	File.name = vStringNewInit (fileName);
 
 	if (File.path != NULL)
 		vStringDelete (File.path);
@@ -85,25 +264,39 @@ static void setInputFileName (const char *const fileName)
 	}
 }
 
+static void setInputFileParametersCommon (inputFileInfo *finfo, vString *const fileName,
+					  const langType language, stringList *holder)
+{
+	if (finfo->name != NULL)
+		vStringDelete (finfo->name);
+	finfo->name = fileName;
+
+	if (finfo->tagPath != NULL)
+	{
+		if (holder)
+			stringListAdd (holder, finfo->tagPath);
+		else
+			vStringDelete (finfo->tagPath);
+	}
+	if (! Option.tagRelative || isAbsolutePath (vStringValue (fileName)))
+		finfo->tagPath = vStringNewCopy (fileName);
+	else
+		finfo->tagPath =
+				vStringNewOwn (relativeFilename (vStringValue (fileName),
+								 getTagFileDirectory ()));
+
+	finfo->isHeader = isIncludeFile (vStringValue (fileName));
+	finfo->language = language;
+}
+
+static void setInputFileParameters (vString *const fileName, const langType language)
+{
+	setInputFileParametersCommon (&File.input, fileName, language, NULL);
+}
+
 static void setSourceFileParameters (vString *const fileName, const langType language)
 {
-	if (File.source.name != NULL)
-		vStringDelete (File.source.name);
-	File.source.name = fileName;
-
-	if (File.source.tagPath != NULL)
-		eFree (File.source.tagPath);
-	if (! Option.tagRelative || isAbsolutePath (vStringValue (fileName)))
-		File.source.tagPath = eStrdup (vStringValue (fileName));
-	else
-		File.source.tagPath =
-				relativeFilename (vStringValue (fileName), TagFile.directory);
-
-	if (vStringLength (fileName) > TagFile.max.file)
-		TagFile.max.file = vStringLength (fileName);
-
-	File.source.isHeader = isIncludeFile (vStringValue (fileName));
-	File.source.language = language;
+	setInputFileParametersCommon (&File.source, fileName, language, File.sourceTagPathHolder);
 }
 
 static boolean setSourceFileName (vString *const fileName)
@@ -135,7 +328,7 @@ static int skipWhite (void)
 {
 	int c;
 	do
-		c = getc (File.fp);
+		c = mio_getc (File.fp);
 	while (c == ' '  ||  c == '\t');
 	return c;
 }
@@ -147,9 +340,9 @@ static unsigned long readLineNumber (void)
 	while (c != EOF  &&  isdigit (c))
 	{
 		lNum = (lNum * 10) + (c - '0');
-		c = getc (File.fp);
+		c = mio_getc (File.fp);
 	}
-	ungetc (c, File.fp);
+	mio_ungetc (File.fp, c);
 	if (c != ' '  &&  c != '\t')
 		lNum = 0;
 
@@ -172,17 +365,17 @@ static vString *readFileName (void)
 
 	if (c == '"')
 	{
-		c = getc (File.fp);  /* skip double-quote */
+		c = mio_getc (File.fp);  /* skip double-quote */
 		quoteDelimited = TRUE;
 	}
 	while (c != EOF  &&  c != '\n'  &&
 			(quoteDelimited ? (c != '"') : (c != ' '  &&  c != '\t')))
 	{
 		vStringPut (fileName, c);
-		c = getc (File.fp);
+		c = mio_getc (File.fp);
 	}
 	if (c == '\n')
-		ungetc (c, File.fp);
+		mio_ungetc (File.fp, c);
 	vStringPut (fileName, '\0');
 
 	return fileName;
@@ -196,13 +389,13 @@ static boolean parseLineDirective (void)
 
 	if (isdigit (c))
 	{
-		ungetc (c, File.fp);
+		mio_ungetc (File.fp, c);
 		result = TRUE;
 	}
-	else if (c == 'l'  &&  getc (File.fp) == 'i'  &&
-			 getc (File.fp) == 'n'  &&  getc (File.fp) == 'e')
+	else if (c == 'l'  &&  mio_getc (File.fp) == 'i'  &&
+			 mio_getc (File.fp) == 'n'  &&  mio_getc (File.fp) == 'e')
 	{
-		c = getc (File.fp);
+		c = mio_getc (File.fp);
 		if (c == ' '  ||  c == '\t')
 		{
 			DebugStatement ( lineStr = "line"; )
@@ -240,54 +433,136 @@ static boolean parseLineDirective (void)
 }
 
 /*
- *   Source file I/O operations
+ *   Input file I/O operations
  */
 
-/*  This function opens a source file, and resets the line counter.  If it
+#define MAX_IN_MEMORY_FILE_SIZE (1024*1024)
+
+extern MIO *getMio (const char *const fileName, const char *const openMode,
+		    boolean memStreamRequired)
+{
+	FILE *src;
+	fileStatus *st;
+	unsigned long size;
+	unsigned char *data;
+
+	st = eStat (fileName);
+	size = st->size;
+	eStatFree (st);
+	if ((!memStreamRequired)
+	    && (size > MAX_IN_MEMORY_FILE_SIZE || size == 0))
+		return mio_new_file (fileName, openMode);
+
+	src = fopen (fileName, openMode);
+	if (!src)
+		return NULL;
+
+	data = eMalloc (size);
+	if (fread (data, 1, size, src) != size)
+	{
+		eFree (data);
+		fclose (src);
+		if (memStreamRequired)
+			return NULL;
+		else
+			return mio_new_file (fileName, openMode);
+	}
+	fclose (src);
+	return mio_new_memory (data, size, eRealloc, eFree);
+}
+
+/*  This function opens an input file, and resets the line counter.  If it
  *  fails, it will display an error message and leave the File.fp set to NULL.
  */
-extern boolean fileOpen (const char *const fileName, const langType language)
+extern boolean openInputFile (const char *const fileName, const langType language,
+			      MIO *mio)
 {
 	const char *const openMode = "rb";
 	boolean opened = FALSE;
+	boolean memStreamRequired;
 
 	/*	If another file was already open, then close it.
 	 */
 	if (File.fp != NULL)
 	{
-		fclose (File.fp);  /* close any open source file */
+		mio_free (File.fp);  /* close any open input file */
 		File.fp = NULL;
 	}
 
-	File.fp = fopen (fileName, openMode);
+	/* File position is used as key for checking the availability of
+	   pattern cache in entry.h. If an input file is changed, the
+	   key is meaningless. So notifying the changing here. */
+	invalidatePatternCache();
+
+	if (File.sourceTagPathHolder == NULL)
+		File.sourceTagPathHolder = stringListNew ();
+	stringListClear (File.sourceTagPathHolder);
+
+	memStreamRequired = doesParserRequireMemoryStream (language);
+
+	if (mio)
+	{
+		size_t tmp;
+		if (memStreamRequired && (!mio_memory_get_data (mio, &tmp)))
+			mio = NULL;
+		else
+			mio_rewind (mio);
+	}
+
+	File.fp = mio? mio_ref (mio): getMio (fileName, openMode, memStreamRequired);
+
 	if (File.fp == NULL)
 		error (WARNING | PERROR, "cannot open \"%s\"", fileName);
 	else
 	{
 		opened = TRUE;
 
-		setInputFileName (fileName);
-		fgetpos (File.fp, &StartOfLine);
-		fgetpos (File.fp, &File.filePosition);
+		setOwnerDirectoryOfInputFile (fileName);
+		mio_getpos (File.fp, &StartOfLine);
+		mio_getpos (File.fp, &File.filePosition);
 		File.currentLine  = NULL;
-		File.lineNumber   = 0L;
 		File.eof          = FALSE;
 		File.newLine      = TRUE;
 
 		if (File.line != NULL)
 			vStringClear (File.line);
 
+		setInputFileParameters  (vStringNewInit (fileName), language);
+		File.input.lineNumberOrigin = 0L;
+		File.input.lineNumber = File.input.lineNumberOrigin;
 		setSourceFileParameters (vStringNewInit (fileName), language);
-		File.source.lineNumber = 0L;
+		File.source.lineNumberOrigin = 0L;
+		File.source.lineNumber = File.source.lineNumberOrigin;
+		allocLineFposMap (&File.lineFposMap);
 
 		verbose ("OPENING %s as %s language %sfile\n", fileName,
 				getLanguageName (language),
-				File.source.isHeader ? "include " : "");
+				File.input.isHeader ? "include " : "");
 	}
 	return opened;
 }
 
-extern void fileClose (void)
+extern void resetInputFile (const langType language)
+{
+	Assert (File.fp);
+
+	mio_rewind (File.fp);
+	mio_getpos (File.fp, &StartOfLine);
+	mio_getpos (File.fp, &File.filePosition);
+	File.currentLine  = NULL;
+	File.eof          = FALSE;
+	File.newLine      = TRUE;
+
+	if (File.line != NULL)
+		vStringClear (File.line);
+
+	File.input.language = language;
+	File.input.lineNumber = File.input.lineNumberOrigin;
+	File.source.language = language;
+	File.source.lineNumber = File.source.lineNumberOrigin;
+}
+
+extern void closeInputFile (void)
 {
 	if (File.fp != NULL)
 	{
@@ -296,29 +571,34 @@ extern void fileClose (void)
 		 */
 		if (Option.printTotals)
 		{
-			fileStatus *status = eStat (vStringValue (File.name));
-			addTotals (0, File.lineNumber - 1L, status->size);
+			fileStatus *status = eStat (vStringValue (File.input.name));
+			addTotals (0, File.input.lineNumber - 1L, status->size);
 		}
-		fclose (File.fp);
+		mio_free (File.fp);
 		File.fp = NULL;
+		freeLineFposMap (&File.lineFposMap);
 	}
 }
 
-extern boolean fileEOF (void)
+extern void *getInputFileUserData(void)
 {
-	return File.eof;
+	return mio_get_user_data (File.fp);
 }
 
-/*  Action to take for each encountered source newline.
+/*  Action to take for each encountered input newline.
  */
 static void fileNewline (void)
 {
 	File.filePosition = StartOfLine;
+
+	if (BackupFile.fp == NULL)
+		appendLineFposMap (&File.lineFposMap, File.filePosition);
+
 	File.newLine = FALSE;
-	File.lineNumber++;
+	File.input.lineNumber++;
 	File.source.lineNumber++;
-	DebugStatement ( if (Option.breakLine == File.lineNumber) lineBreak (); )
-	DebugStatement ( debugPrintf (DEBUG_RAW, "%6ld: ", File.lineNumber); )
+	DebugStatement ( if (Option.breakLine == File.input.lineNumber) lineBreak (); )
+	DebugStatement ( debugPrintf (DEBUG_RAW, "%6ld: ", File.input.lineNumber); )
 }
 
 /*  This function reads a single character from the stream, performing newline
@@ -328,7 +608,7 @@ static int iFileGetc (void)
 {
 	int	c;
 readnext:
-	c = getc (File.fp);
+	c = mio_getc (File.fp);
 
 	/*	If previous character was a newline, then we're starting a line.
 	 */
@@ -341,8 +621,8 @@ readnext:
 				goto readnext;
 			else
 			{
-				fsetpos (File.fp, &StartOfLine);
-				c = getc (File.fp);
+				mio_setpos (File.fp, &StartOfLine);
+				c = mio_getc (File.fp);
 			}
 		}
 	}
@@ -352,7 +632,7 @@ readnext:
 	else if (c == NEWLINE)
 	{
 		File.newLine = TRUE;
-		fgetpos (File.fp, &StartOfLine);
+		mio_getpos (File.fp, &StartOfLine);
 	}
 	else if (c == CRETURN)
 	{
@@ -361,24 +641,24 @@ readnext:
 		 * and CR-LF (MS-DOS) are converted into a generic newline.
 		 */
 #ifndef macintosh
-		const int next = getc (File.fp);  /* is CR followed by LF? */
+		const int next = mio_getc (File.fp);  /* is CR followed by LF? */
 		if (next != NEWLINE)
-			ungetc (next, File.fp);
+			mio_ungetc (File.fp, next);
 		else
 #endif
 		{
 			c = NEWLINE;  /* convert CR into newline */
 			File.newLine = TRUE;
-			fgetpos (File.fp, &StartOfLine);
+			mio_getpos (File.fp, &StartOfLine);
 		}
 	}
 	DebugStatement ( debugPutc (DEBUG_RAW, c); )
 	return c;
 }
 
-extern void fileUngetc (int c)
+extern void ungetcToInputFile (int c)
 {
-	const size_t len = sizeof File.ungetchBuf / sizeof File.ungetchBuf[0];
+	const size_t len = ARRAY_SIZE (File.ungetchBuf);
 
 	Assert (File.ungetchIdx < len);
 	/* we cannot rely on the assertion that might be disabled in non-debug mode */
@@ -390,9 +670,7 @@ static vString *iFileGetLine (void)
 {
 	vString *result = NULL;
 	int c;
-	if (File.line == NULL)
-		File.line = vStringNew ();
-	vStringClear (File.line);
+	File.line = vStringNewOrClear (File.line);
 	do
 	{
 		c = iFileGetc ();
@@ -401,10 +679,10 @@ static vString *iFileGetLine (void)
 		if (c == '\n'  ||  (c == EOF  &&  vStringLength (File.line) > 0))
 		{
 			vStringTerminate (File.line);
-#ifdef HAVE_REGEX
+
 			if (vStringLength (File.line) > 0)
-				matchRegex (File.line, File.source.language);
-#endif
+				matchRegex (File.line, File.input.language);
+
 			result = File.line;
 			break;
 		}
@@ -413,15 +691,15 @@ static vString *iFileGetLine (void)
 	return result;
 }
 
-/*  Do not mix use of fileReadLine () and fileGetc () for the same file.
+/*  Do not mix use of fileReadLine () and getcFromInputFile () for the same file.
  */
-extern int fileGetc (void)
+extern int getcFromInputFile (void)
 {
 	int c;
 
 	/*  If there is an ungotten character, then return it.  Don't do any
 	 *  other processing on it, though, because we already did that the
-	 *  first time it was read through fileGetc ().
+	 *  first time it was read through getcFromInputFile ().
 	 */
 	if (File.ungetchIdx > 0)
 	{
@@ -451,22 +729,35 @@ extern int fileGetc (void)
 	return c;
 }
 
-extern int fileSkipToCharacter (int c)
+/* returns the nth previous character (0 meaning current), or def if nth cannot
+ * be accessed.  Note that this can't access previous line data. */
+extern int getNthPrevCFromInputFile (unsigned int nth, int def)
+{
+	const unsigned char *base = (unsigned char *) vStringValue (File.line);
+	const unsigned int offset = File.ungetchIdx + 1 + nth;
+
+	if (File.currentLine != NULL && File.currentLine >= base + offset)
+		return (int) *(File.currentLine - offset);
+	else
+		return def;
+}
+
+extern int skipToCharacterInInputFile (int c)
 {
 	int d;
 	do
 	{
-		d = fileGetc ();
+		d = getcFromInputFile ();
 	} while (d != EOF && d != c);
 	return d;
 }
 
-/*  An alternative interface to fileGetc (). Do not mix use of fileReadLine()
- *  and fileGetc() for the same file. The returned string does not contain
+/*  An alternative interface to getcFromInputFile (). Do not mix use of fileReadLine()
+ *  and getcFromInputFile() for the same file. The returned string does not contain
  *  the terminating newline. A NULL return value means that all lines in the
  *  file have been read and we are at the end of file.
  */
-extern const unsigned char *fileReadLine (void)
+extern const unsigned char *readLineFromInputFile (void)
 {
 	vString* const line = iFileGetLine ();
 	const unsigned char* result = NULL;
@@ -480,9 +771,9 @@ extern const unsigned char *fileReadLine (void)
 }
 
 /*
- *   Source file line reading with automatic buffer sizing
+ *   Raw file line reading with automatic buffer sizing
  */
-extern char *readLine (vString *const vLine, FILE *const fp)
+extern char *readLineRaw (vString *const vLine, MIO *const fp)
 {
 	char *result = NULL;
 
@@ -503,13 +794,13 @@ extern char *readLine (vString *const vLine, FILE *const fp)
 			char *const pLastChar = vStringValue (vLine) + vStringSize (vLine) -2;
 			long startOfLine;
 
-			startOfLine = ftell(fp);
+			startOfLine = mio_tell(fp);
 			reReadLine = FALSE;
 			*pLastChar = '\0';
-			result = fgets (vStringValue (vLine), (int) vStringSize (vLine), fp);
+			result = mio_gets (fp, vStringValue (vLine), (int) vStringSize (vLine));
 			if (result == NULL)
 			{
-				if (! feof (fp))
+				if (! mio_eof (fp))
 					error (FATAL | PERROR, "Failure on attempt to read file");
 			}
 			else if (*pLastChar != '\0'  &&
@@ -518,14 +809,14 @@ extern char *readLine (vString *const vLine, FILE *const fp)
 				/*  buffer overflow */
 				reReadLine = vStringAutoResize (vLine);
 				if (reReadLine)
-					fseek (fp, startOfLine, SEEK_SET);
+					mio_seek (fp, startOfLine, SEEK_SET);
 				else
 					error (FATAL | PERROR, "input line too big; out of memory");
 			}
 			else
 			{
 				char* eol;
-				vStringLength(vLine) = ftell(fp) - startOfLine;
+				vStringLength(vLine) = mio_tell(fp) - startOfLine;
 				/* canonicalize new line */
 				eol = vStringValue (vLine) + vStringLength (vLine) - 1;
 				if (*eol == '\r')
@@ -550,33 +841,32 @@ extern char *readLine (vString *const vLine, FILE *const fp)
 /*  Places into the line buffer the contents of the line referenced by
  *  "location".
  */
-extern char *readSourceLine (
-		vString *const vLine, fpos_t location, long *const pSeekValue)
+extern char *readLineFromBypass (
+		vString *const vLine, MIOPos location, long *const pSeekValue)
 {
-	fpos_t orignalPosition;
+	MIOPos orignalPosition;
 	char *result;
 
-	fgetpos (File.fp, &orignalPosition);
-	fsetpos (File.fp, &location);
+	mio_getpos (File.fp, &orignalPosition);
+	mio_setpos (File.fp, &location);
 	if (pSeekValue != NULL)
-		*pSeekValue = ftell (File.fp);
-	result = readLine (vLine, File.fp);
-	fsetpos (File.fp, &orignalPosition);
+		*pSeekValue = mio_tell (File.fp);
+	result = readLineRaw (vLine, File.fp);
+	mio_setpos (File.fp, &orignalPosition);
 	/* If the file is empty, we can't get the line
-	   for location 0. readSourceLine doesn't know
+	   for location 0. readLineFromBypass doesn't know
 	   what itself should do; just report it to the caller. */
 	return result;
 }
 
-#ifdef HAVE_REGEX
 /* If a xcmd parser is used, ctags cannot know the location for a tag.
  * In the other hand, etags output and cross reference output require the
  * line after the location.
  *
- * readSourceLineSlow retrieves the line for (lineNumber and pattern of a tag).
+ * readLineFromBypassSlow retrieves the line for (lineNumber and pattern of a tag).
  */
 
-extern char *readSourceLineSlow (vString *const vLine,
+extern char *readLineFromBypassSlow (vString *const vLine,
 				 unsigned long lineNumber,
 				 const char *pattern,
 				 long *const pSeekValue)
@@ -584,7 +874,7 @@ extern char *readSourceLineSlow (vString *const vLine,
 	char *result = NULL;
 
 
-	fpos_t orignalPosition;
+	MIOPos originalPosition;
 	char *line;
 	size_t len;
 	long pos;
@@ -609,7 +899,7 @@ extern char *readSourceLineSlow (vString *const vLine,
 		if (errcode != 0)
 		{
 			regerror (errcode, &patbuf, errmsg, 256);
-			error (WARNING, "regcomp %s in readSourceLineSlow: %s", pattern, errmsg);
+			error (WARNING, "regcomp %s in readLineFromBypassSlow: %s", pattern, errmsg);
 			regfree (&patbuf);
 			return NULL;
 		}
@@ -621,14 +911,14 @@ extern char *readSourceLineSlow (vString *const vLine,
 	{
 		unsigned long n;
 
-		fgetpos (File.fp, &orignalPosition);
-		rewind (File.fp);
+		mio_getpos (File.fp, &originalPosition);
+		mio_rewind (File.fp);
 		line = NULL;
 		pos = 0;
 		for (n = 0; n < lineNumber; n++)
 		{
-			pos = ftell (File.fp);
-			line = readLine (vLine, File.fp);
+			pos = mio_tell (File.fp);
+			line = readLineRaw (vLine, File.fp);
 			if (line == NULL)
 				break;
 		}
@@ -665,25 +955,15 @@ extern char *readSourceLineSlow (vString *const vLine,
 
 out:
 	regfree (&patbuf);
-	fsetpos (File.fp, &orignalPosition);
+	mio_setpos (File.fp, &originalPosition);
 	return result;
 }
-#else
-extern char *readSourceLineSlow (vString *const vLine,
-				 unsigned long lineNumber,
-				 const char *pattern,
-				 long *const pSeekValue)
-{
-	return NULL;
-}
-#endif
 
 /*
- *   Similar to readLine but this doesn't use fgetpos/fsetpos.
+ *   Similar to readLineRaw but this doesn't use fgetpos/fsetpos.
  *   Useful for reading from pipe.
  */
-
-char* readLineWithNoSeek (vString* const vline, FILE *const pp)
+char* readLineRawWithNoSeek (vString* const vline, FILE *const pp)
 {
 	int c;
 	boolean nlcr;
@@ -718,6 +998,48 @@ char* readLineWithNoSeek (vString* const vline, FILE *const pp)
 	}
 
 	return result;
+}
+
+extern void   pushNarrowedInputStream (const langType language,
+				       unsigned long startLine, int startCharOffset,
+				       unsigned long endLine, int endCharOffset,
+				       unsigned long sourceLineOffset)
+{
+	long p, q;
+	MIOPos original;
+	MIOPos tmp;
+	MIO *subio;
+
+	original = getInputFilePosition ();
+
+	tmp = getInputFilePositionForLine (startLine);
+	mio_setpos (File.fp, &tmp);
+	mio_seek (File.fp, startCharOffset, SEEK_CUR);
+	p = mio_tell (File.fp);
+
+	tmp = getInputFilePositionForLine (endLine);
+	mio_setpos (File.fp, &tmp);
+	mio_seek (File.fp, endCharOffset, SEEK_CUR);
+	q = mio_tell (File.fp);
+
+	mio_setpos (File.fp, &original);
+
+	subio = mio_new_mio (File.fp, p, q - p);
+
+
+	BackupFile = File;
+
+	File.fp = subio;
+
+	File.input.lineNumberOrigin = ((startLine == 0)? 0: startLine - 1);
+	File.source.lineNumberOrigin = ((sourceLineOffset == 0)? 0: sourceLineOffset - 1);
+}
+
+extern void   popNarrowedInputStream  (void)
+{
+	mio_free (File.fp);
+	File = BackupFile;
+	memset (&BackupFile, 0, sizeof (BackupFile));
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

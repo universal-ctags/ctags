@@ -1,0 +1,27 @@
+$env_var	input.vim	/^let $env_var = 'something'$/;"	v
+(	input.vim	/^inoremap <buffer> ( <C-R>=PreviewFunctionSignature()<LF> $/;"	m
+,,,	input.vim	/^inoremap ,,, <esc>diwi<<esc>pa><cr><\/<esc>pa><esc>kA$/;"	m
+<F8>	input.vim	/^nnoremap <silent> <F8> :Tlist<CR>$/;"	m
+<Leader>scdt	input.vim	/^map! <unique> <Leader>scdt <Plug>GetColumnDataType$/;"	m
+Bar	input.vim	/^fu Bar(arg)$/;"	f
+DBSetOption	input.vim	/^command! -nargs=* -complete=customlist,<SID>DB_settingsComplete DBSetOption :call s:DB_setMultip/;"	c
+E	input.vim	/^function E$/;"	f
+ExtraLines	input.vim	/^            \\ ExtraLines edit<bang> <args>$/;"	c
+Foo	input.vim	/^function! Foo(arg)$/;"	f
+Foo_SID	input.vim	/^function! <SID>Foo_SID(arg)$/;"	f
+IndentedFunction	input.vim	/^    fu IndentedFunction(arg)$/;"	f
+NoSpaceBeforeContinue	input.vim	/^            \\NoSpaceBeforeContinue edit<bang> <args>$/;"	c
+SelectCmd	input.vim	/^command! -nargs=+ SelectCmd         :call s:DB_execSql("select " . <q-args>)$/;"	c
+SpaceBeforeContinue	input.vim	/^            \\ SpaceBeforeContinue edit<bang> <args>$/;"	c
+autoloadFunc#subdirname#Funcname	input.vim	/^function autoloadFunc#subdirname#Funcname()$/;"	f
+forms#FT_TEXTFIELD	input.vim	/^let forms#FT_TEXTFIELD = 'textfield'$/;"	v
+forms#form	input.vim	/^let forms#form = {$/;"	v
+forms#form.addTextField	input.vim	/^function! forms#form.addTextField(fname, flabel, fvalue, hotkey)$/;"	f
+g:var_global_scope	input.vim	/^let g:var_global_scope = 1$/;"	v
+mydict	input.vim	/^let mydict = {'data': [0, 1, 2, 3]}$/;"	v
+mydict.len	input.vim	/^function mydict.len() dict$/;"	f
+s:Foo_scolon	input.vim	/^function! s:Foo_scolon(arg)$/;"	f
+s:validFuncLowerCaseInitialLetter	input.vim	/^function! s:validFuncLowerCaseInitialLetter(arg)$/;"	f
+s:var_script_scope	input.vim	/^let s:var_script_scope = 1$/;"	v
+uncompress	input.vim	/^augroup uncompress$/;"	a
+var_script_default_scope	input.vim	/^let var_script_default_scope = 1$/;"	v

@@ -99,5 +99,6 @@ task ExampleClass::setTrigger(event e) {
 function event ExampleClass::getTrigger() {
     getTrigger = m_eTrigger;
 }
-
+#undef DEFAULT_INT
+#undef DEFAULT_BIT
 // vim: sw=4:ts=4:expandtab

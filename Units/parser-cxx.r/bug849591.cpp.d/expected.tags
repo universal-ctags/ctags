@@ -1,0 +1,2 @@
+Foo	input.cpp	/^void MainClass< ParamClass1&, ParamClass2>::Foo()$/;"	f	class:MainClass	typeref:typename:void
+Foo	input.cpp	/^void MainClass<ParamClass1&, ParamClass2>::Foo()$/;"	f	class:MainClass	typeref:typename:void

@@ -2,7 +2,7 @@
  *	Copyright (c) 2002-2003, Darren Hiebert
  *
  *	This source code is released for free distribution under the terms of the
- *	GNU General Public License.
+ *	GNU General Public License version 2 or (at your option) any later version.
  *
  *	This module contains functions for generating tags for PL/SQL language
  *	files.
@@ -128,15 +128,6 @@ typedef enum eKeywordId {
 	KEYWORD_go
 } keywordId;
 
-/*
- * Used to determine whether keyword is valid for the token language and
- *	what its ID is.
- */
-typedef struct sKeywordDesc {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
 	TOKEN_EOF,
@@ -171,7 +162,7 @@ typedef struct sTokenInfoSQL {
 	int         scopeKind;
 	int         begin_end_nest_lvl;
 	unsigned long lineNumber;
-	fpos_t filePosition;
+	MIOPos filePosition;
 } tokenInfo;
 
 /*
@@ -233,7 +224,7 @@ static kindOption SqlKinds [] = {
 	{ TRUE,  'z', "mlprop",		  "MobiLink Properties "   }
 };
 
-static const keywordDesc SqlKeywordTable [] = {
+static const keywordTable SqlKeywordTable [] = {
 	/* keyword		keyword ID */
 	{ "as",								KEYWORD_is				      },
 	{ "is",								KEYWORD_is				      },
@@ -401,18 +392,6 @@ static boolean isMatchedEnd(tokenInfo *const token, int nest_lvl)
 	return terminated;
 }
 
-static void buildSqlKeywordHash (void)
-{
-	const size_t count = sizeof (SqlKeywordTable) /
-		sizeof (SqlKeywordTable [0]);
-	size_t i;
-	for (i = 0	;  i < count  ;  ++i)
-	{
-		const keywordDesc* const p = &SqlKeywordTable [i];
-		addKeyword (p->name, Lang_sql, (int) p->id);
-	}
-}
-
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
@@ -423,7 +402,7 @@ static tokenInfo *newToken (void)
 	token->scope              = vStringNew ();
 	token->scopeKind          = SQLTAG_COUNT;
 	token->begin_end_nest_lvl = 0;
-	token->lineNumber         = getSourceLineNumber ();
+	token->lineNumber         = getInputLineNumber ();
 	token->filePosition       = getInputFilePosition ();
 
 	return token;
@@ -446,18 +425,16 @@ static void makeSqlTag (tokenInfo *const token, const sqlKind kind)
 	{
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
-		initTagEntry (&e, name);
+		initTagEntry (&e, name, &(SqlKinds [kind]));
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
-		e.kindName	   = SqlKinds [kind].name;
-		e.kind		   = SqlKinds [kind].letter;
 
 		if (vStringLength (token->scope) > 0)
 		{
 			Assert (token->scopeKind < SQLTAG_COUNT);
-			e.extensionFields.scope[0] = SqlKinds [token->scopeKind].name;
-			e.extensionFields.scope[1] = vStringValue (token->scope);
+			e.extensionFields.scopeKind = &(SqlKinds [token->scopeKind]);
+			e.extensionFields.scopeName = vStringValue (token->scope);
 		}
 
 		makeTagEntry (&e);
@@ -473,13 +450,13 @@ static void parseString (vString *const string, const int delimiter)
 	boolean end = FALSE;
 	while (! end)
 	{
-		int c = fileGetc ();
+		int c = getcFromInputFile ();
 		if (c == EOF)
 			end = TRUE;
 		/*
 		else if (c == '\\')
 		{
-			c = fileGetc(); // This maybe a ' or ". //
+			c = getcFromInputFile(); // This maybe a ' or ". //
 			vStringPut(string, c);
 		}
 		*/
@@ -500,11 +477,11 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
 	if (!isspace (c))
-		fileUngetc (c);		/* unget non-identifier character */
+		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
 static void readToken (tokenInfo *const token)
@@ -518,8 +495,8 @@ static void readToken (tokenInfo *const token)
 getNextChar:
 	do
 	{
-		c = fileGetc ();
-		token->lineNumber   = getSourceLineNumber ();
+		c = getcFromInputFile ();
+		token->lineNumber   = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 		/* 
 		 * Added " to the list of ignores, not sure what this 
@@ -553,21 +530,21 @@ getNextChar:
 		case '"':
 				  token->type = TOKEN_STRING;
 				  parseString (token->string, c);
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
 		case '-':
-				  c = fileGetc ();
+				  c = getcFromInputFile ();
 				  if (c == '-')		/* -- is this the start of a comment? */
 				  {
-					  fileSkipToCharacter ('\n');
+					  skipToCharacterInInputFile ('\n');
 					  goto getNextChar;
 				  }
 				  else
 				  {
 					  if (!isspace (c))
-						  fileUngetc (c);
+						  ungetcToInputFile (c);
 					  token->type = TOKEN_OPERATOR;
 				  }
 				  break;
@@ -576,7 +553,7 @@ getNextChar:
 		case '>':
 				  {
 					  const int initial = c;
-					  int d = fileGetc ();
+					  int d = getcFromInputFile ();
 					  if (d == initial)
 					  {
 						  if (initial == '<')
@@ -586,29 +563,29 @@ getNextChar:
 					  }
 					  else
 					  {
-						  fileUngetc (d);
+						  ungetcToInputFile (d);
 						  token->type = TOKEN_UNDEFINED;
 					  }
 					  break;
 				  }
 
 		case '\\':
-				  c = fileGetc ();
+				  c = getcFromInputFile ();
 				  if (c != '\\'  && c != '"'  && c != '\''  &&  !isspace (c))
-					  fileUngetc (c);
+					  ungetcToInputFile (c);
 				  token->type = TOKEN_CHARACTER;
-				  token->lineNumber = getSourceLineNumber ();
+				  token->lineNumber = getInputLineNumber ();
 				  token->filePosition = getInputFilePosition ();
 				  break;
 
 		case '/':
 				  {
-					  int d = fileGetc ();
+					  int d = getcFromInputFile ();
 					  if ((d != '*') &&		/* is this the start of a comment? */
 						  (d != '/'))		/* is a one line comment? */
 					  {
 						  token->type = TOKEN_FORWARD_SLASH;
-						  fileUngetc (d);
+						  ungetcToInputFile (d);
 					  }
 					  else
 					  {
@@ -616,18 +593,18 @@ getNextChar:
 						  {
 							  do
 							  {
-								  fileSkipToCharacter ('*');
-								  c = fileGetc ();
+								  skipToCharacterInInputFile ('*');
+								  c = getcFromInputFile ();
 								  if (c == '/')
 									  break;
 								  else
-									  fileUngetc (c);
+									  ungetcToInputFile (c);
 							  } while (c != EOF && c != '\0');
 							  goto getNextChar;
 						  }
 						  else if (d == '/')	/* is this the start of a comment?  */
 						  {
-							  fileSkipToCharacter ('\n');
+							  skipToCharacterInInputFile ('\n');
 							  goto getNextChar;
 						  }
 					  }
@@ -640,13 +617,13 @@ getNextChar:
 				  else
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getSourceLineNumber ();
+					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->keyword = analyzeToken (token->string, Lang_sql);
 					  if (isKeyword (token, KEYWORD_rem))
 					  {
 						  vStringClear (token->string);
-						  fileSkipToCharacter ('\n');
+						  skipToCharacterInInputFile ('\n');
 						  goto getNextChar;
 					  }
 					  else if (isKeyword (token, KEYWORD_NONE))
@@ -708,6 +685,29 @@ static void addToScope (tokenInfo* const token, vString* const extra, sqlKind ki
 /*
  *	 Scanning functions
  */
+
+static boolean isOneOfKeyword (tokenInfo *const token, const keywordId *const keywords, unsigned int count)
+{
+	unsigned int i;
+	for (i = 0; i < count; i++)
+	{
+		if (isKeyword (token, keywords[i]))
+			return TRUE;
+	}
+	return FALSE;
+}
+
+static void findTokenOrKeywords (tokenInfo *const token, const tokenType type,
+				 const keywordId *const keywords,
+				 unsigned int kcount)
+{
+	while (! isType (token, type) &&
+	       ! (isType (token, TOKEN_KEYWORD) && isOneOfKeyword (token, keywords, kcount)) &&
+	       ! isType (token, TOKEN_EOF))
+	{
+		readToken (token);
+	}
+}
 
 static void findToken (tokenInfo *const token, const tokenType type)
 {
@@ -1152,6 +1152,11 @@ static void parseDeclare (tokenInfo *const token, const boolean local)
 		   ! isKeyword (token, KEYWORD_end) &&
 		   ! isType (token, TOKEN_EOF))
 	{
+		keywordId stoppers [] = {
+			KEYWORD_begin,
+			KEYWORD_end,
+		};
+
 		switch (token->keyword)
 		{
 			case KEYWORD_cursor:	parseSimple (token, SQLTAG_CURSOR); break;
@@ -1175,8 +1180,9 @@ static void parseDeclare (tokenInfo *const token, const boolean local)
 				}
 				break;
 		}
-		findToken (token, TOKEN_SEMICOLON);
-		readToken (token);
+		findTokenOrKeywords (token, TOKEN_SEMICOLON, stoppers, ARRAY_SIZE (stoppers));
+		if (isType (token, TOKEN_SEMICOLON))
+			readToken (token);
 	}
 }
 
@@ -1190,7 +1196,7 @@ static void parseDeclareANSI (tokenInfo *const token, const boolean local)
 	 *		 DECLARE varname2 datatype;
 	 *		 ...
 	 *
-	 * This differ from PL/SQL where DECLARE preceeds the BEGIN block
+	 * This differ from PL/SQL where DECLARE precedes the BEGIN block
 	 * and the DECLARE keyword is not repeated.
 	 */
 	while (isKeyword (token, KEYWORD_declare))
@@ -2379,9 +2385,8 @@ static tokenType parseSqlFile (tokenInfo *const token)
 
 static void initialize (const langType language)
 {
-	Assert (sizeof (SqlKinds) / sizeof (SqlKinds [0]) == SQLTAG_COUNT);
+	Assert (ARRAY_SIZE (SqlKinds) == SQLTAG_COUNT);
 	Lang_sql = language;
-	buildSqlKeywordHash ();
 }
 
 static void findSqlTags (void)
@@ -2396,13 +2401,14 @@ static void findSqlTags (void)
 extern parserDefinition* SqlParser (void)
 {
 	static const char *const extensions [] = { "sql", NULL };
-	parserDefinition* def = parserNew ("SQL");
+	parserDefinition* def = parserNewFull ("SQL", KIND_FILE_ALT);
 	def->kinds		= SqlKinds;
-	def->kindCount	= KIND_COUNT (SqlKinds);
-	def->fileKind = KIND_FILE_ALT;
+	def->kindCount	= ARRAY_SIZE (SqlKinds);
 	def->extensions = extensions;
 	def->parser		= findSqlTags;
 	def->initialize = initialize;
+	def->keywordTable = SqlKeywordTable;
+	def->keywordCount = ARRAY_SIZE (SqlKeywordTable);
 	return def;
 }
 

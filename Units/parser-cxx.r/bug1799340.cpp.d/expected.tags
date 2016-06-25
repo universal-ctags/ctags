@@ -1,0 +1,3 @@
+f1	input.cpp	/^std::string & f1() {}$/;"	f	typeref:typename:std::string &
+f2	input.cpp	/^const std::string & f2() {}$/;"	f	typeref:typename:const std::string &
+f3	input.cpp	/^std::string const & f3() {}$/;"	f	typeref:typename:std::string const &

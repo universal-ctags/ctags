@@ -1,0 +1,73 @@
+Universal ctags also reports NEWLANG as the language for input.c.
+
+================== THE ORIGINAL DOCUMENT ==================
+
+Currently this test case made an assertion failure.
+See also #402.
+
+"OK.zzz ", a line of input.c changes the language, the value stored to
+a global variable, File.source.language.
+
+Initially ctags sets C to File.source.language.  However, ctags sets
+NEWLANG to it as specified in args.ctags when ctags reads the line.
+
+Reset the language is not so bad. However, when the preprocessor part(get.c)
+of C parser reads "#define x 1" from input stream, get.c makes a
+'v, variable definitions' kind tag. Such kind doesn't exist in the kind table of
+NEWLANG. This makes the assertion failure.
+
+We can remove the code which reset File.source.language to avoid the
+assertion failure::
+
+```
+    diff --git a/main/read.c b/main/read.c
+    index 91c661c..79af808 100644
+    --- a/main/read.c
+    +++ b/main/read.c
+    @@ -118,7 +118,7 @@ static boolean setSourceFileName (vString *const fileName)
+				    vStringValue (File.path), vStringValue (fileName));
+			    pathName = vStringNewOwn (tmp);
+		    }
+    -		setSourceFileParameters (pathName, language);
+    +		setSourceFileParameters (pathName, getSourceLanguage());
+		    result = TRUE;
+	    }
+	    return result;
+```
+
+This looks good to me. However the output (tags file) becomes incompatible
+to exuberant ctags when --fields=+l option is given to ctags.
+
+```
+[exuberant]$ ctags -o - --fields='+l' \
+             --langdef=NEWLANG --langmap=NEWLANG:+.zzz --line-directives --excmd=number \
+             Units/review-needed.r/line_directives.c.d/input.c
+ctags: Warning: Ignoring non-option in ./.ctags
+
+a	Units/review-needed.r/line_directives.c.d/a.c	10;"	v	language:C
+b	Units/review-needed.r/line_directives.c.d/b.c	20;"	v	language:C
+c	Units/review-needed.r/line_directives.c.d/c.c	30;"	v	language:C
+d	Units/review-needed.r/line_directives.c.d/OK.zzz	2;"	v	language:NEWLANG
+
+[universal]$ ./ctags -o - --fields='+l' \
+             --langdef=NEWLANG --langmap=NEWLANG:+.zzz --line-directives --excmd=number \
+             Units/review-needed.r/line_directives.c.d/input.c
+
+a	Units/review-needed.r/line_directives.c.d/a.c	10;"	v	language:C
+b	Units/review-needed.r/line_directives.c.d/b.c	20;"	v	language:C
+c	Units/review-needed.r/line_directives.c.d/c.c	30;"	v	language:C
+d	Units/review-needed.r/line_directives.c.d/OK.zzz	2;"	v	language:C
+```
+
+Exuberant ctags reports NEWLANG as the language of OK.zzz.
+Universal ctags reports C as the language of OK.zzz.
+
+'v' is a kind of C language. So even we ignore the assertion
+issue, C should be reported. This is my position.
+
+As suffix shows OK.zzz is obviously not a C language source
+code. Reporting C as its language is wrong. This may be
+the position of exuberant ctags.
+
+I replaced expected.tags with the output of universal ctags
+with the above patch.

@@ -3,12 +3,12 @@
 *   Copyright 2009-2011 Nick Treleaven <nick(dot)treleaven(at)btinternet(dot)com>
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   Defines external interface to scope nesting levels for tags.
 */
-#ifndef _NESTLEVEL_H
-#define _NESTLEVEL_H
+#ifndef CTAGS_MAIN_NESTLEVEL_H
+#define CTAGS_MAIN_NESTLEVEL_H
 
 /*
 *   INCLUDE FILES
@@ -25,28 +25,31 @@ typedef struct NestingLevels NestingLevels;
 
 struct NestingLevel
 {
-	int indentation;
-	vString *name;
-	int type;
+	int corkIndex;
+	char userData [];
 };
 
 struct NestingLevels
 {
-	NestingLevel *levels;
+	void *levels;
 	int n;					/* number of levels in use */
 	int allocated;
+	size_t userDataSize;
 };
 
 /*
 *   FUNCTION PROTOTYPES
 */
-extern NestingLevels *nestingLevelsNew(void);
+extern NestingLevels *nestingLevelsNew(size_t userDataSize);
 extern void nestingLevelsFree(NestingLevels *nls);
-extern void nestingLevelsPush(NestingLevels *nls,
-	const vString *name, int type);
+extern NestingLevel *nestingLevelsPush(NestingLevels *nls, int corkIndex);
+extern NestingLevel * nestingLevelsTruncate(NestingLevels *nls, int depth, int corkIndex);
 extern void nestingLevelsPop(NestingLevels *nls);
-extern NestingLevel *nestingLevelsGetCurrent(NestingLevels *nls);
+extern NestingLevel *nestingLevelsGetCurrent(const NestingLevels *nls);
+extern NestingLevel *nestingLevelsGetNth(const NestingLevels *nls, int n);
 
-#endif  /* _NESTLEVEL_H */
+extern void *nestingLevelGetUserData (const NestingLevel *nl);
+
+#endif  /* CTAGS_MAIN_NESTLEVEL_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

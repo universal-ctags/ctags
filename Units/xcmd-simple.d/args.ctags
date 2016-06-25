@@ -1,6 +1,0 @@
---langdef=dog
---langmap=dog:.dog
---xcmd-dog=./Units/xcmd-simple.d/xcmd-dog
---extra=+f
---fields=+n
-

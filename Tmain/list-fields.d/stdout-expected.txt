@@ -1,0 +1,97 @@
+#LETTER	NAME	ENABLED	LANGUAGE	XFMTCHAR	DESCRIPTION
+N	name	on	NONE	TRUE	tag name (fixed field)
+F	input	on	NONE	TRUE	input file (fixed field)
+P	pattern	on	NONE	TRUE	pattern (fixed field)
+C	compact	off	NONE	TRUE	compact input line (fixed field, only used in -x option)
+a	access	off	NONE	TRUE	Access (or export) of class members
+f	file	on	NONE	TRUE	File-restricted scoping
+i	inherits	off	NONE	TRUE	Inheritance information
+K	NONE	off	NONE	TRUE	Kind of tag as full name
+k	NONE	on	NONE	TRUE	Kind of tag as a single letter
+l	language	off	NONE	TRUE	Language of input file containing tag
+m	implementation	off	NONE	TRUE	Implementation information
+n	line	off	NONE	TRUE	Line number of tag definition
+S	signature	off	NONE	TRUE	Signature of routine (e.g. prototype or parameter list)
+s	NONE	on	NONE	TRUE	Scope of tag definition (`p' can be used for printing its kind)
+t	typeref	on	NONE	TRUE	Type and name of a variable or typedef
+z	kind	off	NONE	FALSE	Include the "kind:" key in kind field (use k or K)
+r	role	off	NONE	TRUE	Role
+R	NONE	off	NONE	TRUE	Marker (R or D) representing whether tag is definition or reference
+Z	scope	off	NONE	TRUE	Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
+E	extra	off	NONE	TRUE	Extra tag type information
+x	xpath	off	NONE	TRUE	xpath for the tag
+p	scopeKind	on	NONE	TRUE	Kind of scope as full name
+-	end	off	C	TRUE	end lines of various constructs
+-	properties	off	C	TRUE	properties (static, inline, mutable,...)
+-	end	off	C++	TRUE	end lines of various constructs
+-	properties	off	C++	TRUE	properties (static, inline, mutable,...)
+-	template	off	C++	TRUE	template parameters
+-	captures	off	C++	TRUE	lambda capture list
+-	end	off	Python	TRUE	end lines of various constructs
+-	end	off	RpmSpec	TRUE	end lines of macros
+-	sectionMarker	off	reStructuredText	TRUE	character used for declaring section
+-	end	off	reStructuredText	TRUE	end lines of various constructs
+-	end	off	Vim	TRUE	end lines of functions
+#
+Foo	input.java	/^abstract public class Foo extends Bar$/
+x	input.java	/^    public int x;$/
+#a
+Foo	input.java	/^abstract public class Foo extends Bar$/
+x	input.java	/^    public int x;$/;"	access:public
+#i
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	inherits:Bar
+x	input.java	/^    public int x;$/
+#kz
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	kind:c
+x	input.java	/^    public int x;$/;"	kind:f
+#Kz
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	kind:class
+x	input.java	/^    public int x;$/;"	kind:field
+#k
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	c
+x	input.java	/^    public int x;$/;"	f
+#K
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	class
+x	input.java	/^    public int x;$/;"	field
+#l
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	language:Java
+x	input.java	/^    public int x;$/;"	language:Java
+#m
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	implementation:abstract
+x	input.java	/^    public int x;$/
+#n
+Foo	input.java	/^abstract public class Foo extends Bar$/;"	line:1
+x	input.java	/^    public int x;$/;"	line:3
+#s
+Foo	input.java	/^abstract public class Foo extends Bar$/
+x	input.java	/^    public int x;$/;"	class:Foo
+#sZ
+Foo	input.java	/^abstract public class Foo extends Bar$/
+x	input.java	/^    public int x;$/;"	scope:class:Foo
+#f
+X	input.c	/^struct X {$/;"	file:
+Y	input.c	/^struct Y {$/;"	file:
+i	input.c	/^  int i;$/;"	file:
+j	input.c	/^  int j;$/;"	file:
+main	input.c	/^int main(void)$/
+x	input.c	/^  struct X x;$/;"	file:
+#S
+X	input.c	/^struct X {$/
+Y	input.c	/^struct Y {$/
+i	input.c	/^  int i;$/
+j	input.c	/^  int j;$/
+main	input.c	/^int main(void)$/;"	signature:(void)
+x	input.c	/^  struct X x;$/
+#t
+X	input.c	/^struct X {$/
+Y	input.c	/^struct Y {$/
+i	input.c	/^  int i;$/;"	typeref:typename:int
+j	input.c	/^  int j;$/;"	typeref:typename:int
+main	input.c	/^int main(void)$/;"	typeref:typename:int
+x	input.c	/^  struct X x;$/;"	typeref:struct:X
+#r
+x	input.sh	/^source x$/;"	role:loaded
+y	input.sh	/^function y()$/
+#r
+D/
+R/loaded

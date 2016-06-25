@@ -1,0 +1,8 @@
+Base	input.cpp	/^class Base$/;"	c	file:
+Derived	input.cpp	/^class Derived final : public Base$/;"	c	file:
+final	input.cpp	/^	virtual void final();$/;"	p	class:Derived	typeref:typename:void	file:	signature:()
+final	input.cpp	/^void Derived::final()$/;"	f	class:Derived	typeref:typename:void	signature:()
+foo	input.cpp	/^	virtual void foo() = 0;$/;"	p	class:Base	typeref:typename:void	file:	signature:()
+foo	input.cpp	/^	virtual void foo() final;$/;"	p	class:Derived	typeref:typename:void	file:	signature:()
+foo	input.cpp	/^void Base::foo()$/;"	f	class:Base	typeref:typename:void	signature:()
+foo	input.cpp	/^void Derived::foo()$/;"	f	class:Derived	typeref:typename:void	signature:()

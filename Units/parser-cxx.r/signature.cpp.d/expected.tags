@@ -1,0 +1,4 @@
+BAR::bar	input.cpp	/^char *BAR::bar (char *c, double d[]) const {}$/;"	f	class:BAR	typeref:typename:char *	signature:(char * c,double d[]) const
+bar	input.cpp	/^char *BAR::bar (char *c, double d[]) const {}$/;"	f	class:BAR	typeref:typename:char *	signature:(char * c,double d[]) const
+foo	input.cpp	/^void foo (int a, char b) {}$/;"	f	typeref:typename:void	signature:(int a,char b)
+foobar	input.cpp	/^void foobar __ARGS ((int a, char b));$/;"	p	typeref:typename:void	file:	signature:(int a,char b)

@@ -1,0 +1,12 @@
+C	input.rb	/^class C$/;"	c
+X	input.rb	/^class X$/;"	c
+method1	input.rb	/^  def method1$/;"	f	class:C
+method2	input.rb	/^  def method2$/;"	f	class:C
+method3	input.rb	/^  def method3$/;"	f	class:C
+method4	input.rb	/^  def method4$/;"	f	class:C
+method5	input.rb	/^  def method5$/;"	f	class:C
+method6	input.rb	/^  def method6$/;"	f	class:C
+method7	input.rb	/^  def method7$/;"	f	class:C
+method8	input.rb	/^  def method8$/;"	f	class:C
+method9	input.rb	/^  def method9$/;"	f	class:C
+method_or_class	input.rb	/^def method_or_class$/;"	f

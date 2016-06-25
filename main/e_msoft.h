@@ -2,17 +2,12 @@
 *   Copyright (c) 2002-2003, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   Configures ctags for Microsoft environment.
 */
 #ifndef E_MSOFT_H
 #define E_MSOFT_H
-
-/*  MS-DOS/Windows doesn't allow manipulation of standard error,
- *  so we send it to stdout instead.
- */
-#define errout  stdout
 
 #define CASE_INSENSITIVE_FILENAMES 1
 #define MANUAL_GLOBBING 1
@@ -34,6 +29,7 @@
 #define HAVE_TEMPNAM 1
 #define HAVE_FNMATCH 1
 #define HAVE_FNMATCH_H 1
+#define HAVE_PUTENV 1
 #define tempnam(dir,pfx) _tempnam(dir,pfx)
 #define TMPDIR "\\"
 

@@ -1,0 +1,89 @@
+DEFINE	input.sv	/^`define DEFINE$/;"	c
+DEF_VALUE	input.sv	/^`define DEF_VALUE   1'd100$/;"	c
+DEF_WITH_EQ	input.sv	/^`define DEF_WITH_EQ = 1'd100$/;"	c
+LOCALPARAM	input.sv	/^localparam LOCALPARAM = 2**2;$/;"	c	module:mod
+PARAM1	input.sv	/^    parameter PARAM1 = 10,$/;"	c	module:mod
+PARAM2	input.sv	/^    parameter PARAM2 = 2.0$/;"	c	module:mod
+STATE1	input.sv	/^localparam STATE1 = 4'h0,$/;"	c	module:mod
+STATE2	input.sv	/^           STATE2 = 4'h1,$/;"	c	module:mod
+STATE3	input.sv	/^           STATE3 = 4'h2,$/;"	c	module:mod
+STATE4	input.sv	/^           STATE4 = 4'h5    ,$/;"	c	module:mod
+STATE5	input.sv	/^           STATE5 = 4'h6    ,$/;"	c	module:mod
+STATE6	input.sv	/^           STATE6 = 4'h7    ,$/;"	c	module:mod
+STATE7	input.sv	/^           STATE7 = 4'h8;$/;"	c	module:mod
+a	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
+a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
+a	input.sv	/^    input wire a,$/;"	p	module:mod
+a	input.sv	/^    reg a;$/;"	r	class:test
+add	input.sv	/^task add ($/;"	t	module:mod
+array	input.sv	/^    for (gencnt = 0; gencnt < PARAM1; gencnt = gencnt + 1) begin: array$/;"	b	module:mod
+b	input.sv	/^    b,c,$/;"	p	module:mod
+b	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
+b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
+b	input.sv	/^    logic b;$/;"	r	class:test
+c	input.sv	/^    b,c,$/;"	p	module:mod
+c	input.sv	/^    bit [1:0] c[3] = '{0, 0, 0};$/;"	r	class:test
+d	input.sv	/^    d ,$/;"	p	module:mod
+e	input.sv	/^    output wire e ,$/;"	p	module:mod
+extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	Q	class:test
+f	input.sv	/^    output reg f,$/;"	p	module:mod
+g	input.sv	/^    inout wire g$/;"	p	module:mod
+gencnt	input.sv	/^genvar gencnt;$/;"	r	module:mod
+k	input.sv	/^real k;$/;"	r	module:mod
+l	input.sv	/^integer l;$/;"	r	module:mod
+mod	input.sv	/^module mod#($/;"	m
+mod.LOCALPARAM	input.sv	/^localparam LOCALPARAM = 2**2;$/;"	c	module:mod
+mod.PARAM1	input.sv	/^    parameter PARAM1 = 10,$/;"	c	module:mod
+mod.PARAM2	input.sv	/^    parameter PARAM2 = 2.0$/;"	c	module:mod
+mod.STATE1	input.sv	/^localparam STATE1 = 4'h0,$/;"	c	module:mod
+mod.STATE2	input.sv	/^           STATE2 = 4'h1,$/;"	c	module:mod
+mod.STATE3	input.sv	/^           STATE3 = 4'h2,$/;"	c	module:mod
+mod.STATE4	input.sv	/^           STATE4 = 4'h5    ,$/;"	c	module:mod
+mod.STATE5	input.sv	/^           STATE5 = 4'h6    ,$/;"	c	module:mod
+mod.STATE6	input.sv	/^           STATE6 = 4'h7    ,$/;"	c	module:mod
+mod.STATE7	input.sv	/^           STATE7 = 4'h8;$/;"	c	module:mod
+mod.a	input.sv	/^    input wire a,$/;"	p	module:mod
+mod.add	input.sv	/^task add ($/;"	t	module:mod
+mod.add.x	input.sv	/^    input x, y$/;"	p	task:mod.add
+mod.add.y	input.sv	/^    input x, y$/;"	p	task:mod.add
+mod.add.z	input.sv	/^    ,output z$/;"	p	task:mod.add
+mod.array	input.sv	/^    for (gencnt = 0; gencnt < PARAM1; gencnt = gencnt + 1) begin: array$/;"	b	module:mod
+mod.b	input.sv	/^    b,c,$/;"	p	module:mod
+mod.c	input.sv	/^    b,c,$/;"	p	module:mod
+mod.d	input.sv	/^    d ,$/;"	p	module:mod
+mod.e	input.sv	/^    output wire e ,$/;"	p	module:mod
+mod.f	input.sv	/^    output reg f,$/;"	p	module:mod
+mod.g	input.sv	/^    inout wire g$/;"	p	module:mod
+mod.gencnt	input.sv	/^genvar gencnt;$/;"	r	module:mod
+mod.k	input.sv	/^real k;$/;"	r	module:mod
+mod.l	input.sv	/^integer l;$/;"	r	module:mod
+mod.mult	input.sv	/^function mult ($/;"	f	module:mod
+mod.mult.temp	input.sv	/^    reg temp;$/;"	r	function:mod.mult
+mod.mult.x	input.sv	/^    input x,$/;"	p	function:mod.mult
+mod.mult.y	input.sv	/^    input y);$/;"	p	function:mod.mult
+mod.mynet	input.sv	/^wire [PARAM1-1:0] mynet;$/;"	n	module:mod
+mod.ref_test	input.sv	/^function ref_test ($/;"	f	module:mod
+mod.ref_test.tref1	input.sv	/^    ref tref1,$/;"	p	function:mod.ref_test
+mod.ref_test.tref2	input.sv	/^    ref wire tref2,$/;"	p	function:mod.ref_test
+mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:test
+mult	input.sv	/^function mult ($/;"	f	module:mod
+mynet	input.sv	/^wire [PARAM1-1:0] mynet;$/;"	n	module:mod
+ref_test	input.sv	/^function ref_test ($/;"	f	module:mod
+temp	input.sv	/^    reg temp;$/;"	r	function:mod.mult
+test	input.sv	/^class test;$/;"	C
+test.a	input.sv	/^    reg a;$/;"	r	class:test
+test.b	input.sv	/^    logic b;$/;"	r	class:test
+test.c	input.sv	/^    bit [1:0] c[3] = '{0, 0, 0};$/;"	r	class:test
+test.extern_func	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	Q	class:test
+test.extern_func.a	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
+test.extern_func.b	input.sv	/^    extern virtual function void extern_func (input bit a, input b);$/;"	p	prototype:test.extern_func
+test.mult	input.sv	/^    function mult (a, input b = 0);$/;"	f	class:test
+test.mult.a	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
+test.mult.b	input.sv	/^    function mult (a, input b = 0);$/;"	p	function:test.mult
+tref1	input.sv	/^    ref tref1,$/;"	p	function:mod.ref_test
+tref2	input.sv	/^    ref wire tref2,$/;"	p	function:mod.ref_test
+x	input.sv	/^    input x, y$/;"	p	task:mod.add
+x	input.sv	/^    input x,$/;"	p	function:mod.mult
+y	input.sv	/^    input x, y$/;"	p	task:mod.add
+y	input.sv	/^    input y);$/;"	p	function:mod.mult
+z	input.sv	/^    ,output z$/;"	p	task:mod.add

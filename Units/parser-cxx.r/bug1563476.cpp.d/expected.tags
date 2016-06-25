@@ -1,0 +1,3 @@
+g	input.cpp	/^int g() {$/;"	f	typeref:typename:int
+IntroduceBitDef	input.cpp	/^struct IntroduceBitDef< Accessor, typename$/;"	s	file:
+f	input.cpp	/^ int f() { }$/;"	f	struct:IntroduceBitDef	typeref:typename:int	file:

@@ -1,0 +1,7 @@
+C	input.cpp	/^struct C { int x; };$/;"	s	file:
+x	input.cpp	/^struct C { int x; };$/;"	m	struct:C	typeref:typename:int	file:
+D	input.cpp	/^struct D : ::C {$/;"	s	file:
+D	input.cpp	/^ D() { x = 123; }$/;"	f	struct:D	file:
+~D	input.cpp	/^ ~D() { std::cout << x << std::endl; }$/;"	f	struct:D	file:
+main	input.cpp	/^int main(void) {$/;"	f	typeref:typename:int
+d	input.cpp	/^ D d;$/;"	l	function:main	typeref:typename:D	file:

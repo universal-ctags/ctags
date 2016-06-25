@@ -1,0 +1,1 @@
+hello	input.nolang	/^hello (void)$/;"	f	typeref:typename:int

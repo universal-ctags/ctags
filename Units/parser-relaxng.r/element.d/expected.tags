@@ -1,0 +1,4 @@
+script	input.rng	/^<element name="script" xmlns="http:\/\/relaxng.org\/ns\/structure\/0.9">$/;"	e
+function	input.rng	/^    <element name="function">$/;"	e	element:script
+variable	input.rng	/^	<element name="variable">$/;"	e	element:script.function
+readonly	input.rng	/^	  <attribute name="readonly">$/;"	a	element:script.function.variable

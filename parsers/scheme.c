@@ -2,7 +2,7 @@
 *   Copyright (c) 2000-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for Scheme language
 *   files.
@@ -17,6 +17,7 @@
 
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -57,7 +58,7 @@ static void findSchemeTags (void)
 	vString *name = vStringNew ();
 	const unsigned char *line;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char *cp = line;
 
@@ -73,7 +74,7 @@ static void findSchemeTags (void)
 				while (*cp != '\0' && (isspace (*cp) || *cp == '('))
 					cp++;
 				if (*cp == '\0')
-					cp = line = fileReadLine ();
+					cp = line = readLineFromInputFile ();
 				else
 					break;
 			} while (line);
@@ -95,7 +96,7 @@ static void findSchemeTags (void)
 				while (*cp != '\0' && isspace (*cp))
 					cp++;
 				if (*cp == '\0')
-					cp = line = fileReadLine ();
+					cp = line = readLineFromInputFile ();
 				else
 					break;
 			} while (line);
@@ -118,7 +119,7 @@ extern parserDefinition* SchemeParser (void)
 	};
 	parserDefinition* def = parserNew ("Scheme");
 	def->kinds      = SchemeKinds;
-	def->kindCount  = KIND_COUNT (SchemeKinds);
+	def->kindCount  = ARRAY_SIZE (SchemeKinds);
 	def->extensions = extensions;
 	def->aliases    = aliases;
 	def->parser     = findSchemeTags;

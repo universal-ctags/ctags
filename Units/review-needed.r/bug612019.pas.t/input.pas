@@ -16,7 +16,7 @@ Initial Comment:
 In attached sample there are some lines from tags file
 generated for object pascal sources.
 There are some problems with this lines.
-Generaly speaking they are parsed incorrectly.
+Generally speaking they are parsed incorrectly.
 *)
 unit a;
 

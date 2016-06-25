@@ -1,0 +1,13 @@
+f0	input.cpp	/^template<char i, bool B = (i>0)>     void f0(void) { }$/;"	f	typeref:typename:void
+f1	input.cpp	/^template<char i, bool B = i < 10>    void f1(void) { }$/;"	f	typeref:typename:void
+f2	input.cpp	/^template<char i, long j = (i << 10)> void f2(void) { }$/;"	f	typeref:typename:void
+f3	input.cpp	/^template<char i, long j = i << 10>   void f3(void) { }$/;"	f	typeref:typename:void
+f4	input.cpp	/^template<char i, long j = (i >> 10)> void f4(void) { }$/;"	f	typeref:typename:void
+f5	input.cpp	/^template<char i, long j = (i > 10)>  void f5(void) { }$/;"	f	typeref:typename:void
+f6	input.cpp	/^template<char i, bool B = (i <= 10)> void f6(void) { }$/;"	f	typeref:typename:void
+f7	input.cpp	/^template<char i, bool B = (i >= 10)> void f7(void) { }$/;"	f	typeref:typename:void
+f8	input.cpp	/^template<char i, char j, bool B = i < 10 && (30 > j)> void f8(void) { }$/;"	f	typeref:typename:void
+f9	input.cpp	/^template<char i, char j, bool B = i < (10 && 30 > j)> void f9(void) { }$/;"	f	typeref:typename:void
+f10	input.cpp	/^template<char i, char j, bool B = (i < 10 && 30 > j)> void f10(void) { }$/;"	f	typeref:typename:void
+f11	input.cpp	/^template<bool b = 0 < 2 && 2 < 4> void f11(void) { }$/;"	f	typeref:typename:void
+main	input.cpp	/^int main(void) { return 0; }$/;"	f	typeref:typename:int

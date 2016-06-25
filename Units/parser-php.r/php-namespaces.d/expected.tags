@@ -1,0 +1,13 @@
+B	input.php	/^	class B {$/;"	c	namespace:Bar\\Baz
+Bar\\Baz	input.php	/^namespace Bar\\Baz {$/;"	n
+C	input.php	/^	class C {$/;"	c	namespace:Foo
+Foo	input.php	/^namespace Foo {$/;"	n
+__construct	input.php	/^		function __construct() {$/;"	f	class:Bar\\Baz\\B
+__construct	input.php	/^		function __construct() {$/;"	f	class:Foo\\C
+a	input.php	/^	function a() {$/;"	f	namespace:Bar\\Baz
+a	input.php	/^	function a() {$/;"	f	namespace:Foo
+b	input.php	/^	function b() {$/;"	f	namespace:Foo
+c	input.php	/^		function c() {$/;"	f	class:Bar\\Baz\\B
+d	input.php	/^		function d() {$/;"	f	class:Foo\\C
+inRoot	input.php	/^	function inRoot() {$/;"	f
+meToo	input.php	/^	function meToo() {$/;"	f

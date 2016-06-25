@@ -1,0 +1,10 @@
+clock	input.vr	/^  input clock          CLOCK;$/;"	s	interface:sample_if
+count	input.vr	/^  input [7:0] count    PSAMPLE #-1 hdl_node "sample_if_verilog.counter";$/;"	s	interface:sample_if
+cout	input.vr	/^  input [7:0] cout     PSAMPLE #-1;$/;"	s	interface:sample_if
+data	input.vr	/^  inout data           PSAMPLE PHOLD NSAMPLE#-1 NHOLD #1;$/;"	s	interface:sample_if
+data_in	input.vr	/^  input data_in        PSAMPLE #-1 hdl_node "sample_if_verilog.data";$/;"	s	interface:sample_if
+ddr_data_in	input.vr	/^  input ddr_data_in    PSAMPLE NSAMPLE;$/;"	s	interface:sample_if
+enable	input.vr	/^  output enable        PHOLD#1;$/;"	s	interface:sample_if
+nenable	input.vr	/^  output  nenable      PHOLD   #1 hdl_node "sample_if_verilog.counter_en";$/;"	s	interface:sample_if
+reset	input.vr	/^  output reset         PHOLD#1;$/;"	s	interface:sample_if
+sample_if	input.vr	/^interface sample_if {$/;"	i

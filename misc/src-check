@@ -1,4 +1,38 @@
 #!/bin/sh
+#
+#   Copyright (C) 2014 Masatake YAMATO
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+CTAGS=./ctags
+
+line()
+{
+    local i
+    for i in $(seq 72); do
+	echo -n -e -
+    done
+    echo
+}
+
+header()
+{
+    echo
+    echo "$1"
+    line
+
+}
 
 check_include_general_h_first()
 {
@@ -6,6 +40,7 @@ check_include_general_h_first()
     local l
     local i=0
 
+    header "Check whether general.h is included first: $1"
     for f in $(find $1 -name '*.c'); do
 	if grep -a -q -e '^#[[:space:]]*include' $f; then
 	    l=$()
@@ -19,6 +54,24 @@ check_include_general_h_first()
     return $i
 }
 
+check_name_cpp_macro()
+{
+    local dir=$1
+    local r=0
+    local n
+
+    header "Check whether '_' is not used as ctags own macro name"
+    for f in $(find $dir -name '*.[ch]'); do
+	if ${CTAGS} --language-force=C -x --_xformat='%F:%N' --kinds-C=d -o - $f | grep -q '.*:_.*H'; then
+	    for n in $(${CTAGS} --language-force=C -x --_xformat='%N' --kinds-C=d -o - $f | grep  '^_.*H'); do
+		echo "#" $n
+		echo sed -i \""s|$n|CTAGS_$(echo $dir | tr a-z A-Z)_${n#_}|g\"" $f
+	    done
+	   r=1
+	fi
+    done
+    return $r
+}
 
 main()
 {
@@ -35,11 +88,15 @@ main()
     fi
 
     if ! check_include_general_h_first main; then
-	i=$(expr i + 1)
+	i=$(expr $i + 1)
     fi
 
     if ! check_include_general_h_first parsers; then
-	i=$(expr i + 1)
+	i=$(expr $i + 1)
+    fi
+
+    if ! check_name_cpp_macro main; then
+	i=$(expr $i + 1)
     fi
 
     return 0

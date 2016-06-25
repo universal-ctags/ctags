@@ -8,7 +8,7 @@
 * 
 * I'm trying to set ctags to work with some old FORTRAN 77 programs.
 * I'm in Windows 2000, vim 6.1 and exuberant ctags 5.3.1.
-* The programs are for VAX FORTRAN 77 as of 1988. Writen with tabs and 132 columns line length.
+* The programs are for VAX FORTRAN 77 as of 1988. Written with tabs and 132 columns line length.
 * 
 * [...]
 * 

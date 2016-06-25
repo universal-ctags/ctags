@@ -2,7 +2,7 @@
 *   Copyright (c) 1999-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions managing resizable string lists.
 */
@@ -13,9 +13,7 @@
 #include "general.h"  /* must always come first */
 
 #include <string.h>
-#ifdef HAVE_FNMATCH_H
-# include <fnmatch.h>
-#endif
+#include <fnmatch.h>
 
 #include "debug.h"
 #include "read.h"
@@ -90,14 +88,14 @@ extern stringList* stringListNewFromArgv (const char* const* const argv)
 extern stringList* stringListNewFromFile (const char* const fileName)
 {
 	stringList* result = NULL;
-	FILE* const fp = fopen (fileName, "r");
+	MIO* const fp = mio_new_file (fileName, "r");
 	if (fp != NULL)
 	{
 		result = stringListNew ();
-		while (! feof (fp))
+		while (! mio_eof (fp))
 		{
 			vString* const str = vStringNew ();
-			readLine (str, fp);
+			readLineRaw (str, fp);
 			vStringStripTrailing (str);
 			if (vStringLength (str) > 0)
 				stringListAdd (result, str);
@@ -231,8 +229,8 @@ extern boolean stringListHasTest (const stringList *const current,
 	return result;
 }
 
-extern boolean stringListRemoveExtension (
-		stringList* const current, const char* const extension)
+extern boolean stringListDeleteItemExtension (stringList* const current, const char* const extension)
+
 {
 	boolean result = FALSE;
 	int where;
@@ -243,6 +241,7 @@ extern boolean stringListRemoveExtension (
 #endif
 	if (where != -1)
 	{
+		vStringDelete (current->list [where]);
 		memmove (current->list + where, current->list + where + 1,
 				(current->count - where) * sizeof (*current->list));
 		current->list [current->count - 1] = NULL;
@@ -276,13 +275,7 @@ static boolean fileNameMatched (
 		const vString* const vpattern, const char* const fileName)
 {
 	const char* const pattern = vStringValue (vpattern);
-#if defined (HAVE_FNMATCH)
 	return (boolean) (fnmatch (pattern, fileName, 0) == 0);
-#elif defined (CASE_INSENSITIVE_FILENAMES)
-	return (boolean) (strcasecmp (pattern, fileName) == 0);
-#else
-	return (boolean) (strcmp (pattern, fileName) == 0);
-#endif
 }
 
 extern boolean stringListFileMatched (

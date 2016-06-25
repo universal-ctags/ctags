@@ -9,7 +9,7 @@
  *   - generate fully-qualified tags.
  *
  * This source code is released for free distribution under the terms of
- * the GNU General Public License.
+ * the GNU General Public License version 2 or (at your option) any later version.
  */
 
 #include "general.h"    /* must always come first */
@@ -220,9 +220,9 @@ trimIdentifier (enum perl6Kind kind, const char **ps, int len)
 
 struct p6Ctx {
     enum token  tokens[128 /* unlikely to need more than this */];
-    int         n_tokens;
+    unsigned int n_tokens;
     vString    *name;
-    const char *line;      /* Saved from fileReadLine() */
+    const char *line;      /* Saved from readLineFromInputFile() */
 };
 
 static void
@@ -230,9 +230,7 @@ makeTag (struct p6Ctx *ctx, int kind, const char *name, int len)
 {
     tagEntryInfo entry;
     vStringNCopyS(ctx->name, name, len);
-    initTagEntry(&entry, vStringValue(ctx->name));
-    entry.kind     = perl6Kinds[kind].letter;
-    entry.kindName = perl6Kinds[kind].name;
+    initTagEntry(&entry, vStringValue(ctx->name), &(perl6Kinds[kind]));
     makeTagEntry(&entry);
 }
 
@@ -272,7 +270,7 @@ getNonSpaceStr (struct p6Ctx *ctx, const char **ptok)
     const char *s = ctx->line;
     if (!s) {
 next_line:
-        s = (const char *) fileReadLine();
+        s = (const char *) readLineFromInputFile();
         if (!s)
             return 0;                           /* EOF */
     }
@@ -297,7 +295,7 @@ findPerl6Tags (void)
 #define RESET_TOKENS() do { ctx.n_tokens = 0; } while (0)
 
 #define PUSH_TOKEN(_t_) do {                                            \
-    if (ctx.n_tokens < sizeof(ctx.tokens) / sizeof(ctx.tokens[0])) {    \
+    if (ctx.n_tokens < ARRAY_SIZE(ctx.tokens)) {			\
         ctx.tokens[ ctx.n_tokens ] = _t_;                               \
         ++ctx.n_tokens;                                                 \
     } else {                                                            \
@@ -328,11 +326,13 @@ parserDefinition *
 Perl6Parser (void)
 {
     static const char *const extensions[] = { "p6", "pm6", "pm", "pl6", NULL };
+    static selectLanguage selectors [] = { selectByPickingPerlVersion,
+					   NULL };
     parserDefinition* def = parserNew("Perl6");
     def->kinds      = perl6Kinds;
-    def->kindCount  = KIND_COUNT(perl6Kinds);
+    def->kindCount  = ARRAY_SIZE(perl6Kinds);
     def->extensions = extensions;
     def->parser     = findPerl6Tags;
-    def->selectLanguage = selectByPickingPerlVersion;
+    def->selectLanguage = selectors;
     return def;
 }

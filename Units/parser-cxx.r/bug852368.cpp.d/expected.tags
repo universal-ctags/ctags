@@ -1,0 +1,1 @@
+foo	input.cpp	/^void foo(std::vector<float> &);$/;"	p	typeref:typename:void	file:	signature:(std::vector<float> &)

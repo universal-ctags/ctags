@@ -2,12 +2,12 @@
 *   Copyright (c) 1998-2003, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   Provides the general (non-ctags-specific) environment assumed by all.
 */
-#ifndef _GENERAL_H
-#define _GENERAL_H
+#ifndef CTAGS_MAIN_GENERAL_H
+#define CTAGS_MAIN_GENERAL_H
 
 /*
 *   INCLUDE FILES
@@ -25,17 +25,6 @@
 /*
 *   MACROS
 */
-
-/* Define standard error destination
- */
-#ifndef errout
-# define errout	stderr
-#endif
-
-/* Define regex if supported */
-#if (defined (HAVE_REGCOMP) && !defined (REGCOMP_BROKEN))
-# define HAVE_REGEX 1
-#endif
 
 /*  Prevent warnings about unused variables in GCC. */
 #if defined (__GNUC__) && !defined (__GNUG__)
@@ -75,6 +64,10 @@
 *   DATA DECLARATIONS
 */
 
+#ifdef USE_STDBOOL_H
+# include <stdbool.h>
+#endif
+
 #undef FALSE
 #undef TRUE
 #ifdef __cplusplus
@@ -83,10 +76,6 @@ typedef bool boolean;
 #define TRUE true
 #else
 typedef enum { FALSE, TRUE } boolean;
-#endif
-
-#if ! defined (HAVE_FGETPOS) && ! defined (fpos_t)
-# define fpos_t long
 #endif
 
 /*
@@ -105,6 +94,6 @@ extern void *unlink (const char *);
 extern char *getenv (const char *);
 #endif
 
-#endif  /* _GENERAL_H */
+#endif  /* CTAGS_MAIN_GENERAL_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

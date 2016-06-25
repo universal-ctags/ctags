@@ -1,0 +1,6 @@
+Class5	input.cpp	/^class Class5 {$/;"	c	file:
+~Class1	input.cpp	/^Class1::~Class1() { }$/;"	f	class:Class1
+~Class2	input.cpp	/^Class2::~ Class2() { }$/;"	f	class:Class2
+~Class3	input.cpp	/^Class3:: ~Class3() { }$/;"	f	class:Class3
+~Class4	input.cpp	/^Class4:: ~ Class4() { }$/;"	f	class:Class4
+~Class5	input.cpp	/^    public: ~ Class5() { }$/;"	f	class:Class5	file:

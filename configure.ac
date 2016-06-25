@@ -1,18 +1,21 @@
 #	Copyright (c) 2009, Darren Hiebert
 #
 #	This source code is released for free distribution under the terms
-#	of the GNU General Public License.
+#	of the GNU General Public License version 2 or (at your option) any
+#	later version.
 
 #	Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.61])
-AC_INIT([ctags],[universal])
+AC_PREREQ([2.59])
+AC_INIT([universal-ctags],[0.0.0])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
+AM_SILENT_RULES([yes])
 AC_CONFIG_HEADERS([config.h])
 if ! test -e "${srcdir}/config.h.in"; then
    echo "---"
    echo "--- ${srcdir}/config.h.in WAS NOT FOUND." 1>&2
    echo "--- YOU MIGHT HAVE RUN autoconf ONLY" 1>&2
-   echo "--- BUT YOU MAY HAVE TO RUN autoreconf." 1>&2
+   echo "--- BUT YOU MAY HAVE TO RUN autogen.sh." 1>&2
    echo "---"
    exit 1
 fi
@@ -34,9 +37,6 @@ AH_TEMPLATE([HAVE_STAT_ST_INO],
 	<sys/stat.h>.])
 AH_TEMPLATE([remove],
 	[Define remove to unlink if you have unlink(), but not remove().])
-AH_TEMPLATE([SEEK_SET],
-	[Define this value used by fseek() appropriately if <stdio.h>
-	(or <unistd.h> on SunOS 4.1.x) does not define them.])
 AH_TEMPLATE([INT_MAX],
 	[Define as the maximum integer on your system if not defined <limits.h>.])
 AH_TEMPLATE([CUSTOM_CONFIGURATION_FILE],
@@ -72,56 +72,14 @@ AH_TEMPLATE([HAVE_ICONV],
 AH_TEMPLATE([TMPDIR],
 	[If you wish to change the directory in which temporary files are stored,
 	define this label to the directory desired.])
-AH_TEMPLATE([REGCOMP_BROKEN],
-	[Define this label if regcomp() is broken.])
 AH_TEMPLATE([CHECK_REGCOMP],
 	[Define this label if you wish to check the regcomp() function at run time
 	for correct behavior. This function is currently broken on Cygwin.])
-AH_TEMPLATE([__USE_FIXED_PROTOTYPES__],
-	[This corrects the problem of missing prototypes for certain functions
-	in some GNU installations (e.g. SunOS 4.1.x).])
 AH_TEMPLATE([NON_CONST_PUTENV_PROTOTYPE],
 	[Define this is you have a prototype for putenv() in <stdlib.h>, but
 	doesn't declare its argument as "const char *".])
-AH_TEMPLATE([NEED_PROTO_REMOVE],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_UNLINK],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_MALLOC],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_GETENV],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_FGETPOS],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_STAT],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_LSTAT],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_TRUNCATE],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
-AH_TEMPLATE([NEED_PROTO_FTRUNCATE],
-	[If you receive error or warning messages indicating that you are missing
-	a prototype for, or a type mismatch using, the following function, define
-	this label and remake.])
 AH_TEMPLATE([MSDOS_STYLE_PATH],
 	[Define to 1 if your system uses MS-DOS style path.])
-
 
 
 # Report system info
@@ -136,10 +94,11 @@ uname -mrsv 2>/dev/null
 # CHECK_HEADER_DEFINE(LABEL, HEADER [,ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ] ])
 AC_DEFUN([CHECK_HEADER_DEFINE], [
 	AC_MSG_CHECKING([if $1 is defined in $2])
-	AC_EGREP_CPP(yes,
-[#include <$2>
+	AC_EGREP_CPP([$2:$1],
+[
+#include <$2>
 #ifdef $1
-  yes
+const char *result_yes = "$2:$1";
 #endif
 ], [
 	AC_MSG_RESULT(yes)
@@ -149,8 +108,49 @@ AC_DEFUN([CHECK_HEADER_DEFINE], [
 	[$4]
 ]) ])
 
+# CHECK_PROTO(FUNCTION, HEADER-FILE)
+AC_DEFUN([CHECK_PROTO], [
+	AC_EGREP_HEADER([[^A-Za-z0-9_]$1([ 	]+[A-Za-z0-9_]*)?[	 ]*\(],
+	[$2],
+	[],
+	[
+		AC_MSG_NOTICE([adding prototype for $1])
+		AH_TEMPLATE(AS_TR_CPP([NEED_PROTO_$1]),
+			    [If you receive error or warning messages indicating that you are missing a prototype for, or a type mismatch using, the following function, define this label and remake.])
+		AC_DEFINE(AS_TR_CPP([NEED_PROTO_$1]))
+	])
+])
+
+# PRETTY_ARG_VAR(VARIABLE, DESCRIPTION, DEFAULT)
+# ----------------------------------------------
+# Call AC_ARG_VAR with DEFAULT value.
+AC_DEFUN([PRETTY_ARG_VAR], [
+	AC_ARG_VAR([$1], [$2 [$3]])
+
+	if test "${ac_env_$1_set}" = "set"; then
+		$1="${ac_env_$1_value}"
+	else
+		$1="$3"
+	fi
+])
+
+# PRETTY_VAR_EXPAND(VARIABLE)
+# ---------------------------
+# Expand nested variable.
+# e.g. "\$\{prefix\}/bin" to "/usr/local/bin"
+AC_DEFUN([PRETTY_VAR_EXPAND],
+	 [$(eval "$as_echo_n" $(eval "$as_echo_n" "${$1}"))])
+
 # Checks for configuration options
 # --------------------------------
+
+AC_ARG_WITH([sparse-cgcc],
+	[AS_HELP_STRING([--with-sparse-cgcc],
+		[use Sparse 'compiler wrapper' cgcc as C compiler [no]])])
+
+AC_ARG_ENABLE([coverage-gcov],
+	[AS_HELP_STRING([--enable-coverage-gcov],
+		[enable 'gcov' coverage testing tool [no]])])
 
 AC_ARG_ENABLE(readlib,
 	[AS_HELP_STRING([--enable-readlib],
@@ -190,53 +190,64 @@ AC_ARG_ENABLE(macro-patterns,
 	[AS_HELP_STRING([--enable-macro-patterns],
 		[use patterns as default method to locate macros instead of line numbers])])
 
-AC_ARG_ENABLE(maintainer-mode,
-	[AS_HELP_STRING([--enable-maintainer-mode],
-		[use maintainer makefile])])
-
-AC_ARG_ENABLE(shell-globbing,
-	[AS_HELP_STRING([--enable-shell-globbing=DIR],
-		[does shell expand wildcards (yes|no)? [yes]])])
-
 AC_ARG_ENABLE(tmpdir,
 	[AS_HELP_STRING([--enable-tmpdir=DIR],
 		[default directory for temporary files [ARG=/tmp]])],
 	tmpdir_specified=yes)
+
+AC_ARG_WITH([ctags-sysconfdir],
+	[AS_HELP_STRING([--with-ctags-sysconfdir=DIR],
+		['universal-ctags'-specific read-only single-machine data [SYSCONFDIR/ctags]])])
+
+AC_ARG_WITH([ctags-libexecdir],
+	[AS_HELP_STRING([--with-ctags-libexecdir=DIR],
+		['universal-ctags'-specific program executables [LIBEXECDIR/ctags]])])
+
+AC_ARG_ENABLE([debugging],
+	[AS_HELP_STRING([--enable-debugging],
+		[enable debugging features])])
 
 AC_ARG_PROGRAM
 
 # Process configuration options
 # -----------------------------
 
-if test "$enable_maintainer_mode" = yes ; then
-	AC_MSG_RESULT(enabling maintainer mode)
-fi
+case "${with_ctags_sysconfdir+set}"-"$with_ctags_sysconfdir" in #(
+"set"-"yes") ctags_sysconfdir="${sysconfdir}/ctags"	 ;; #(
+"set"-"no")  ctags_sysconfdir="${sysconfdir}"		 ;; #(
+"set"-*)     ctags_sysconfdir="${with_ctags_sysconfdir}" ;; #(
+*)	     ctags_sysconfdir="${sysconfdir}/ctags"	 ;;
+esac
 
-install_targets="install-ctags install-data install-libexec"
-AC_MSG_CHECKING(whether to install link to etags)
-if test yes = "$enable_etags"; then
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-etags"
-else
-	AC_MSG_RESULT(no)
-fi
-AC_MSG_CHECKING(whether to install readtags object file)
-if test yes = "$enable_readlib"; then
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-lib"
-else
-	AC_MSG_RESULT(no)
-fi
-AC_MSG_CHECKING(whether to install readtags command)
-if test no = "$enable_readcmd"; then
-	AC_MSG_RESULT(no)
-else
-	AC_MSG_RESULT(yes)
-	install_targets="$install_targets install-cmd"
-fi
-AC_SUBST(install_targets)
+case "${with_ctags_libexecdir+set}"-"$with_ctags_libexecdir" in #(
+"set"-"yes") ctags_libexecdir="${libexecdir}/ctags"	 ;; #(
+"set"-"no")  ctags_libexecdir="${libexecdir}"		 ;; #(
+"set"-*)     ctags_libexecdir="${with_ctags_libexecdir}" ;; #(
+*)	     ctags_libexecdir="${libexecdir}/ctags"	 ;;
+esac
 
-dnl AC_MSG_RESULT(Change with $program_transform_name)
+pkgsysconfdir="${ctags_sysconfdir}"
+pkglibexecdir="${ctags_libexecdir}"
+
+AC_SUBST([pkgsysconfdir])
+AC_SUBST([pkglibexecdir])
+
+AH_TEMPLATE([PKGSYSCONFDIR], [installation directory of 'universal-ctags'-specific read-only single-machine data.])
+AH_TEMPLATE([PKGLIBEXECDIR], [installation directory of 'universal-ctags'-specific program executables.])
+
+AC_CONFIG_COMMANDS_PRE([
+	PKGSYSCONFDIR="PRETTY_VAR_EXPAND([pkgsysconfdir])"
+	PKGLIBEXECDIR="PRETTY_VAR_EXPAND([pkglibexecdir])"
+
+	AC_DEFINE_UNQUOTED([PKGSYSCONFDIR], ["${PKGSYSCONFDIR}"])
+	AC_DEFINE_UNQUOTED([PKGLIBEXECDIR], ["${PKGLIBEXECDIR}"])
+])
+
+AM_CONDITIONAL(INSTALL_LIB, [test "x$enable_readlib" = "xyes"])
+AM_CONDITIONAL(INSTALL_ETAGS, [test "x$enable_etags" = "xyes"])
+AM_CONDITIONAL(USE_READCMD, [test "x$enable_readcmd" = "xyes"])
+
+dnl AC_MSG_NOTICE(Change with $program_transform_name)
 ctags_name_executable=`echo ctags | sed "$program_transform_name"`
 AC_SUBST(ctags_name_executable)
 etags_name_executable=`echo etags | sed "$program_transform_name"`
@@ -245,60 +256,71 @@ AC_SUBST(etags_name_executable)
 AC_DEFINE_UNQUOTED(ETAGS, "$etags_name_executable")
 
 if test "$enable_custom_config" = no -o "$enable_custom_config" = yes ; then
-	AC_MSG_RESULT(no name supplied for custom configuration file)
+	AC_MSG_NOTICE(no name supplied for custom configuration file)
 elif test -n "$enable_custom_config" ; then
 	AC_DEFINE_UNQUOTED(CUSTOM_CONFIGURATION_FILE, "$enable_custom_config")
-	AC_MSG_RESULT($enable_custom_config will be used as custom configuration file)
+	AC_MSG_NOTICE($enable_custom_config will be used as custom configuration file)
 fi
 
 if test "$enable_macro_patterns" = yes ; then
 	AC_DEFINE(MACROS_USE_PATTERNS)
-	AC_MSG_RESULT(tag file will use patterns for macros by default)
+	AC_MSG_NOTICE(tag file will use patterns for macros by default)
 fi
+
+AM_CONDITIONAL(ENABLE_DEBUGGING, [test "x$enable_debugging" = "xyes"])
+
 
 # Checks for programs
 # -------------------
 
 AC_PROG_CC
 
-case `uname` in
-	HP-UX)
-		AC_MSG_CHECKING(HP-UX native compiler)
-		if test "$CC" = "cc"; then
-			AC_MSG_RESULT(yes; adding compiler options for ANSI support)
-			CFLAGS="$CFLAGS -Aa -D_HPUX_SOURCE"
-		else
-			AC_MSG_RESULT(no)
-		fi
-		;;
-	SunOS)
-		if uname -r | grep '5\.' >/dev/null 2>&1; then
-			AC_MSG_CHECKING(Solaris native compiler)
-			if test "$CC" = "cc" -a "`which cc`" = "/usr/ucb/cc"; then
-				AC_MSG_RESULT(yes; adding compiler option for ANSI support)
-				CC="$CC -Xa"
-			else
-				AC_MSG_RESULT(no)
-			fi
-		fi
-		;;
-esac
+if test "${with_sparse_cgcc}" = "yes"; then
+	REAL_CC="${CC}"
+	CC="cgcc"
+	AC_SUBST([REAL_CC])
+
+	PRETTY_ARG_VAR([CGCC_CFLAGS], [cgcc specific flags],
+		       [-Wsparse-all])
+else
+	CGCC_CFLAGS=""
+fi
+
+if test "${enable_coverage_gcov}" = "yes"; then
+	COVERAGE_CFLAGS="--coverage"
+	COVERAGE_LDFLAGS="--coverage"
+fi
+AC_SUBST([COVERAGE_CFLAGS])
+AC_SUBST([COVERAGE_LDFLAGS])
 
 AC_PROG_LN_S
-AC_PROG_MKDIR_P
 AC_CHECK_PROG(STRIP, strip, strip, :)
 AC_SYS_LARGEFILE
+
+AC_CHECK_PROGS([perl_found], [perl], [yes], [no])
+AM_CONDITIONAL([RUN_OPTLIB2C], [test "${perl_found}" = "yes"])
 
 
 # Checks for operating environment
 # --------------------------------
+in_git_repo=no
+AC_MSG_CHECKING(building in a git repository)
+if test -f "${srcdir}/.git/HEAD"; then
+	in_git_repo=yes
+fi
+AC_MSG_RESULT(${in_git_repo})
+
+AC_CHECK_PROGS([GIT], [git])
+if ! test "${GIT+set}" = "set"; then
+	in_git_repo=no
+fi
+AM_CONDITIONAL([BUILD_IN_GIT_REPO], [test "x${in_git_repo}" = "xyes"])
+
 
 # Check for temporary directory
 AC_MSG_CHECKING(directory to use for temporary files)
 if test -n "$enable_tmpdir"; then
 	tmpdir="$enable_tmpdir"
-elif test -n "$TMPDIR"; then
-	tmpdir="$TMPDIR"
 elif test -n "$TMPDIR"; then
 	tmpdir="$TMPDIR"
 elif test -n "$TMP"; then
@@ -350,16 +372,16 @@ else
     fi
 fi
 if test "$enable_external_sort" != yes ; then
-	AC_MSG_RESULT(using internal sort algorithm as fallback)
+	AC_MSG_NOTICE(using internal sort algorithm as fallback)
 fi
 
 
 # Checks for header files
 # -----------------------
 
-AC_CHECK_HEADERS_ONCE([dirent.h fcntl.h stat.h stdlib.h string.h])
-AC_CHECK_HEADERS_ONCE([time.h types.h unistd.h])
-AC_CHECK_HEADERS_ONCE([sys/dir.h sys/stat.h sys/times.h sys/types.h sys/wait.h])
+AC_CHECK_HEADERS([dirent.h fcntl.h io.h stat.h stdlib.h string.h])
+AC_CHECK_HEADERS([time.h types.h unistd.h])
+AC_CHECK_HEADERS([sys/dir.h sys/stat.h sys/times.h sys/types.h sys/wait.h])
 
 
 # Checks for header file macros
@@ -392,6 +414,23 @@ AC_EGREP_HEADER(clock_t, time.h, AC_MSG_RESULT(yes),
 	AC_DEFINE(clock_t, long)
 ])
 
+AC_CHECK_HEADERS([stdbool.h],
+[
+	AH_TEMPLATE([USE_STDBOOL_H], [whether or not to use <stdbool.h>.])
+	AC_DEFINE([USE_STDBOOL_H])
+],
+[
+	AH_TEMPLATE([bool],  [type for 'bool' if <stdbool.h> is missing or broken.])
+	AH_TEMPLATE([true],  [value of 'true' if <stdbool.h> is missing or broken.])
+	AH_TEMPLATE([false], [value of 'false' if <stdbool.h> is missing or broken.])
+
+	AC_CHECK_TYPES([_Bool],
+		       [AC_DEFINE([bool], [_Bool])],
+		       [AC_DEFINE([bool], [int])])
+	AC_DEFINE([true],  [1])
+	AC_DEFINE([false], [0])
+])
+
 
 # Checks for compiler characteristics
 # -----------------------------------
@@ -402,47 +441,58 @@ AC_C_CONST
 AC_OBJEXT
 AC_EXEEXT
 
-AC_MSG_CHECKING(if struct stat contains st_ino)
-AC_TRY_COMPILE([#include <sys/stat.h>
-				#include <stdlib.h>], [
-	struct stat st;
-	stat(".", &st);
-	if (st.st_ino > 0)
-		exit(0);
-], have_st_ino=yes, have_st_ino=no)
-AC_MSG_RESULT($have_st_ino)
-if test yes = "$have_st_ino"; then
-	AC_DEFINE(HAVE_STAT_ST_INO)
-fi
-
 # Check for host type
 case "$host" in
   i?86-*-mingw* | x86_64-*-mingw*)
+	host_mingw=yes
 	AC_DEFINE(MSDOS_STYLE_PATH)
 	;;
 esac
 
+# Check if struct stat contains st_ino.
+# MinGW has st_ino, but it doesn't work.
+if test yes != "$host_mingw"; then
+	AC_MSG_CHECKING(if struct stat contains st_ino)
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+		#include <sys/stat.h>
+		#include <stdlib.h>
+		], [
+		struct stat st;
+		stat(".", &st);
+		if (st.st_ino > 0)
+			exit(0);
+	])],[have_st_ino=yes],[have_st_ino=no])
+	AC_MSG_RESULT($have_st_ino)
+	if test yes = "$have_st_ino"; then
+		AC_DEFINE(HAVE_STAT_ST_INO)
+	fi
+fi
+
+PRETTY_ARG_VAR([EXTRA_CPPFLAGS], [extra (Objective) C/C++ preprocessor flags],
+	       [-D_GNU_SOURCE -D__USE_GNU])
+PRETTY_ARG_VAR([DEBUG_CPPFLAGS], [(Objective) C/C++ preprocessor debug flags],
+	       [-DDEBUG])
+
+PRETTY_ARG_VAR([EXTRA_CFLAGS], [extra C compiler flags],
+	       [-std=gnu99])
+PRETTY_ARG_VAR([WARNING_CFLAGS], [C compiler warning flags],
+	       [-Wall])
 
 # Checks for library functions
 # ----------------------------
-AC_CHECK_FUNCS(fnmatch,[],[
+AC_CHECK_FUNCS(fnmatch,[have_fnmatch=yes],[
 AC_LIBOBJ([fnmatch])
-CPPFLAGS="$CPPFLAGS -I${srcdir}/fnmatch"
+FNMATCH_CPPFLAGS="-I${srcdir}/fnmatch"
 AC_DEFINE(HAVE_FNMATCH)
-])
+have_fnmatch=no])
+AC_SUBST([FNMATCH_CPPFLAGS])
 AC_CHECK_HEADERS(fnmatch.h)
+AM_CONDITIONAL([HAVE_FNMATCH], [test "x$have_fnmatch" = "xyes"])
 
 AC_CHECK_FUNCS(strstr)
 AC_CHECK_FUNCS(strcasecmp stricmp, break)
 AC_CHECK_FUNCS(strncasecmp strnicmp, break)
 AC_CHECK_FUNCS(fgetpos, have_fgetpos=yes)
-
-# SEEK_SET should be in stdio.h, but may be in unistd.h on SunOS 4.1.x
-if test "$have_fgetpos" != yes ; then
-	CHECK_HEADER_DEFINE(SEEK_SET, stdio.h,,
-		CHECK_HEADER_DEFINE(SEEK_SET, unistd.h,,
-			AC_DEFINE(SEEK_SET, 0)))
-fi
 
 AC_CHECK_FUNCS(mkstemp, have_mkstemp=yes)
 if test "$have_mkstemp" != yes ; then
@@ -451,7 +501,7 @@ fi
 if test "$have_mkstemp" != yes -a "$have_tempnam" != yes; then
 	AC_CHECK_FUNCS(chmod)
 	if test "$tmpdir_specified" = yes ; then
-		AC_MSG_RESULT(use of tmpnam overrides temporary directory selection)
+		AC_MSG_NOTICE(use of tmpnam overrides temporary directory selection)
 	fi
 fi
 
@@ -492,7 +542,7 @@ dnl
 dnl
 dnl Check regcomp
 dnl
-dnl If it is found but broken, define REGCOMP_BROKEN.
+dnl If it is found but broken, abort with a message.
 dnl If it is found but cannot be test brokenness, define CHECK_REGCOMP.
 dnl If it is not found, use bundled implementation.
 dnl
@@ -505,65 +555,45 @@ dnl
 dnl
 AC_CHECK_FUNCS(regcomp,[
 AC_MSG_CHECKING(if regcomp works)
-AC_TRY_RUN([
+AC_RUN_IFELSE([AC_LANG_SOURCE([
 #include <sys/types.h>
 #include <regex.h>
 int main(void) {
 	regex_t patbuf;
 	return (regcomp (&patbuf, "/hello/", 0) != 0);
-}],regcomp_works=yes,regcomp_works=no,AC_DEFINE(CHECK_REGCOMP))
+}
+])],[regcomp_works=yes],[regcomp_works=no],[AC_DEFINE(CHECK_REGCOMP)])
 AC_MSG_RESULT($regcomp_works)
 if test yes != "$regcomp_works"; then
-	AC_DEFINE(REGCOMP_BROKEN)
+	AC_MSG_ERROR([regcomp() on this system is broken.])
 fi
+have_regcomp=yes
 ],[
 dnl Using bundled regex implementation
 AC_LIBOBJ([regex])
-CPPFLAGS="$CPPFLAGS -I${srcdir}/gnu_regex"
+REGCOMP_CPPFLAGS="-I${srcdir}/gnu_regex -D__USE_GNU"
 AC_DEFINE(HAVE_REGCOMP)
-])
-# if test yes = "$with_perl_regex"; then
-# 	AC_MSG_CHECKING(for Perl regex library)
-# 	pcre_candidates="$with_perl_regex $HOME/local/lib* /usr*/local/lib* /usr/lib*"
-# 	for lib in $pcre_candidates; do
-# 		if test -f $lib/libpcreposix.so; then
-# 			pcre_lib="-L$lib -lpcreposix"
-# 			break
-# 		elif test -f $lib/libpcreposix.a; then
-# 			pcre_lib="$lib/libpcreposix.a"
-# 			break
-# 		fi
-# 	done
-# 	if test -z "$pcre_lib"; then
-# 		AC_MSG_RESULT(not found)
-# 	else
-# 		AC_MSG_RESULT($lib)
-# 		AC_DEFINE(HAVE_REGCOMP)
-# 		LDFLAGS="$LDFLAGS $pcre_lib"
-# 		have_regex=yes
-# 	fi
-# fi
+have_regcomp=no])
+AC_SUBST([REGCOMP_CPPFLAGS])
+AM_CONDITIONAL([HAVE_REGCOMP], [test "xyes" = "x$have_regcomp"])
 
-install_data_targets="install-data-corpora"
-AC_CHECK_FUNCS(scandir,[install_data_targets="$install_data_targets install-data-optlib install-data-preload"])
-AC_SUBST(install_data_targets)
+AC_CHECK_FUNCS(scandir)
 
-install_libexec_targets=
-AC_CHECK_FUNCS(fork waitpid execv pipe,[install_libexec_targets="$install_libexec_targets install-libexec-drivers"])
-AC_SUBST(install_libexec_targets)
+AC_CHECK_FUNCS(fork waitpid execv pipe,[enable_xcmd=yes],[enable_xcmd=no])
+AM_CONDITIONAL([ENABLE_XCMD], [test "xyes" = "x$enable_xcmd"])
+
+AH_TEMPLATE([HAVE_LIBXML],
+	[Define this value if libxml is available.])
+PKG_CHECK_MODULES(LIBXML, libxml-2.0,
+		       [have_libxml=yes
+		       AC_DEFINE(HAVE_LIBXML)],
+		       [have_libxml=no])
+AM_CONDITIONAL(HAVE_LIBXML, test "x$have_libxml" = xyes)
+
 
 # Checks for missing prototypes
 # -----------------------------
-AC_CHECKING(for new missing prototypes)
-
-AC_DEFUN([CHECK_PROTO], [
-	AC_EGREP_HEADER([[^A-Za-z0-9_]$1([ 	]+[A-Za-z0-9_]*)?[	 ]*\(],
-	$2,
-	,
-	[
-		AC_MSG_RESULT([adding prototype for $1])
-		AC_DEFINE(patsubst([NEED_PROTO_NAME], [NAME], translit([$1], [[a-z]], [[A-Z]])))
-	])])
+AC_MSG_NOTICE(checking for new missing prototypes)
 
 if test "$have_remove" = yes ; then
 	CHECK_PROTO(remove, stdio.h)
@@ -612,11 +642,11 @@ AC_CHECK_DECLS([_NSGetEnviron],[],[],[
 ])
 
 if test "$ctags_name_executable" != ctags ; then
-	AC_MSG_RESULT(Changing name of 'ctags' for $ctags_name_executable)
+	AC_MSG_NOTICE(Changing name of 'ctags' for $ctags_name_executable)
 fi
 
 if test "$etags_name_executable" != etags ; then
-	AC_MSG_RESULT(Changing name of 'etags' for $etags_name_executable)
+	AC_MSG_NOTICE(Changing name of 'etags' for $etags_name_executable)
 fi
 
 # Output files
@@ -624,13 +654,8 @@ fi
 
 AC_CHECK_FUNCS([mblen], [], [HAVE_MBLEN=1], [])
 
-rm -f Makefile
-if test "$enable_maintainer_mode" = yes ; then
-	AC_MSG_RESULT(creating maintainer Makefile)
-	ln -s maintainer.mak Makefile
-else
-	AC_CONFIG_FILES(Makefile ctags.1)
-fi
+AC_CONFIG_FILES([Makefile
+		 ctags.1])
 
 AC_OUTPUT
 

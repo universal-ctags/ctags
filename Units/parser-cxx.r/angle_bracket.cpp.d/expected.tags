@@ -1,0 +1,3 @@
+bar	input.cpp	/^static void bar (int value)$/;"	f	typeref:typename:void	file:
+bar2	input.cpp	/^static bar2 (void)$/;"	f	file:
+foo	input.cpp	/^static void foo (int nelem)$/;"	f	typeref:typename:void	file:

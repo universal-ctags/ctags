@@ -3,6 +3,7 @@
  * Version:       0.6
  * Date:          October 26, 2006
  * Author:        A. Aaron Cornelius (ADotAaronDotCorneliusAtgmailDotcom)
+ * License:       GPL-2
  *
  * Installation:
  * You must have the Exuberant Ctags source to install this parser.  Once you
@@ -97,11 +98,12 @@
 #include <setjmp.h>
 
 #include "parse.h"      /* always include */
-#include "read.h"       /* to define file fileReadLine() */
+#include "read.h"       /* to define file readLineFromInputFile() */
 #include "entry.h"      /* for the tag entry manipulation */
 #include "routines.h"   /* for generic malloc/realloc/free routines */
 #include "options.h"    /* for the Option structure */
 #include "debug.h"      /* for Assert */
+#include "xtag.h"
 
 typedef enum eAdaException
 {
@@ -153,9 +155,11 @@ typedef enum eAdaKinds
   ADA_KIND_COUNT            /* must be last */
 } adaKind;
 
+static kindOption AdaSeparateKind = { TRUE, 'S', "separate", "something separately declared/defined" };
+
 static kindOption AdaKinds[] =
 {
-  { TRUE,  'P', "packspec",    "package specifications" },
+  { TRUE,   'P', "packspec",    "package specifications" },
   { TRUE,   'p', "package",     "packages" },
   { FALSE,  'T', "typespec",    "type specifications" },
   { TRUE,   't', "type",        "types" },
@@ -168,18 +172,18 @@ static kindOption AdaKinds[] =
   { TRUE,   'f', "formal",      "generic formal parameters" },
   { TRUE,   'n', "constant",    "constants" },
   { TRUE,   'x', "exception",   "user defined exceptions" },
-  { TRUE,  'R', "subprogspec", "subprogram specifications" },
+  { TRUE,   'R', "subprogspec", "subprogram specifications" },
   { TRUE,   'r', "subprogram",  "subprograms" },
-  { TRUE,  'K', "taskspec",    "task specifications" },
+  { TRUE,   'K', "taskspec",    "task specifications" },
   { TRUE,   'k', "task",        "tasks" },
-  { TRUE,  'O', "protectspec", "protected data specifications" },
+  { TRUE,   'O', "protectspec", "protected data specifications" },
   { TRUE,   'o', "protected",   "protected data" },
   { FALSE,  'E', "entryspec",   "task/protected data entry specifications" },
   { TRUE,   'e', "entry",       "task/protected data entries" },
   { TRUE,   'b', "label",       "labels" },
   { TRUE,   'i', "identifier",  "loop/declare identifiers"},
   { FALSE,  'a', "autovar",     "automatic variables" },
-  { FALSE,  'y', "annon",       "loops and blocks with no identifier" }
+  { FALSE,  'y', "anon",        "loops and blocks with no identifier" }
 };
 
 typedef struct sAdaTokenList
@@ -302,7 +306,7 @@ static const char *line;
 static int lineLen;
 static int pos;
 static unsigned long matchLineNum;
-static fpos_t matchFilePos;
+static MIOPos matchFilePos;
 
 /* utility functions */
 static void makeSpec(adaKind *kind);
@@ -402,7 +406,7 @@ static adaTokenInfo *newAdaToken(const char *name, int len, adaKind kind,
   }
 
   /* init the tag */
-  initTagEntry(&token->tag, tmpName);
+  initTagEntry(&token->tag, tmpName, NULL);
 
   token->kind = kind;
   token->isSpec = isSpec;
@@ -428,6 +432,7 @@ static adaTokenInfo *newAdaToken(const char *name, int len, adaKind kind,
   }
   else
   {
+    markTagExtraBit (&token->tag, XTAG_FILE_SCOPE);
     token->tag.isFileScope = TRUE;
   }
 
@@ -435,13 +440,11 @@ static adaTokenInfo *newAdaToken(const char *name, int len, adaKind kind,
    * them blank because they get filled in later. */
   if(kind > ADA_KIND_UNDEFINED)
   {
-    token->tag.kindName = AdaKinds[kind].name;
-    token->tag.kind = AdaKinds[kind].letter;
+    token->tag.kind = &(AdaKinds[kind]);
   }
   else
   {
-    token->tag.kindName = "";
-    token->tag.kind = '\0';
+    token->tag.kind = NULL;
   }
 
   /* setup the parent and children pointers */
@@ -571,7 +574,7 @@ static void readNewLine(void)
 {
   while(TRUE)
   {
-    line = (const char *) fileReadLine();
+    line = (const char *) readLineFromInputFile();
     pos = 0;
 
     if(line == NULL)
@@ -668,7 +671,7 @@ static boolean adaCmp(const char *match)
   /* if we match, increment the position pointer */
   if(status == TRUE && match != NULL)
   {
-    matchLineNum = getSourceLineNumber();
+    matchLineNum = getInputLineNumber();
     matchFilePos = getInputFilePosition();
 
     movePos((strlen(match)));
@@ -694,7 +697,7 @@ static boolean adaKeywordCmp(adaKeyword keyword)
   /* if we match, increment the position pointer */
   if(status == TRUE)
   {
-    matchLineNum = getSourceLineNumber();
+    matchLineNum = getInputLineNumber();
     matchFilePos = getInputFilePosition();
 
     movePos((strlen(AdaKeywords[keyword])));
@@ -722,7 +725,7 @@ static void skipUntilWhiteSpace(void)
      * immediately */
     if(pos >= lineLen)
     {
-      line = (const char *) fileReadLine();
+      line = (const char *) readLineFromInputFile();
       pos = 0;
 
       if(line == NULL)
@@ -833,7 +836,7 @@ static void skipPastWord(void)
      * immediately */
     if(pos >= lineLen)
     {
-      line = (const char *) fileReadLine();
+      line = (const char *) readLineFromInputFile();
       pos = 0;
 
       if(line == NULL)
@@ -1175,7 +1178,7 @@ static adaTokenInfo *adaParseVariables(adaTokenInfo *parent, adaKind kind)
   unsigned long int lineNum;
   int filePosIndex = 0;
   int filePosSize = 32;
-  fpos_t *filePos = xMalloc(filePosSize, fpos_t);
+  MIOPos *filePos = xMalloc(filePosSize, MIOPos);
 
   /* skip any preliminary whitespace or comments */
   skipWhiteSpace();
@@ -1187,7 +1190,7 @@ static adaTokenInfo *adaParseVariables(adaTokenInfo *parent, adaKind kind)
   /* before we start reading input save the current line number and file
    * position, so we can reconstruct the correct line & file position for any
    * tags we create */
-  lineNum = getSourceLineNumber();
+  lineNum = getInputLineNumber();
   filePos[filePosIndex] = getInputFilePosition();
 
   /* setup local buffer... Since we may have to read a few lines to verify
@@ -1291,7 +1294,7 @@ static adaTokenInfo *adaParseVariables(adaTokenInfo *parent, adaKind kind)
       while(filePosIndex >= filePosSize)
       {
         filePosSize *= 2;
-        filePos = xRealloc(filePos, filePosSize, fpos_t);
+        filePos = xRealloc(filePos, filePosSize, MIOPos);
       }
       filePos[filePosIndex] = getInputFilePosition();
 
@@ -2060,8 +2063,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
 
       if(token->kind != ADA_KIND_UNDEFINED)
       {
-        token->tag.kindName = AdaKinds[token->kind].name;
-        token->tag.kind = AdaKinds[token->kind].letter;
+        token->tag.kind = &(AdaKinds[token->kind]);
       }
     }
 
@@ -2071,15 +2073,13 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
       if(token->parent->kind > ADA_KIND_UNDEFINED &&
          token->parent->kind < ADA_KIND_COUNT)
       {
-        token->tag.extensionFields.scope[0] =
-          AdaKinds[token->parent->kind].name;
-        token->tag.extensionFields.scope[1] = token->parent->name;
+        token->tag.extensionFields.scopeKind = &(AdaKinds[token->parent->kind]);
+        token->tag.extensionFields.scopeName = token->parent->name;
       }
       else if(token->parent->kind == ADA_KIND_SEPARATE)
       {
-        token->tag.extensionFields.scope[0] =
-          AdaKeywords[ADA_KEYWORD_SEPARATE];
-        token->tag.extensionFields.scope[1] = token->parent->name;
+        token->tag.extensionFields.scopeKind = &(AdaSeparateKind);
+        token->tag.extensionFields.scopeName = token->parent->name;
       }
     } /* else if(token->parent->kind == ADA_KIND_ANONYMOUS) */
   } /* if(token->parent != NULL) */
@@ -2100,8 +2100,8 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
      (token->name != NULL) &&
      ((token->kind == ADA_KIND_ANONYMOUS && token->children.head != NULL) ||
       token->kind != ADA_KIND_ANONYMOUS) &&
-     ((Option.include.fileScope == TRUE) ||
-      ((Option.include.fileScope == FALSE) &&
+     ((isXtagEnabled(XTAG_FILE_SCOPE) == TRUE) ||
+      ((isXtagEnabled(XTAG_FILE_SCOPE) == FALSE) &&
        (token->tag.isFileScope == FALSE))))
   {
     makeTagEntry(&token->tag);
@@ -2110,7 +2110,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
      * an extra entry which is the full parent.tag name.  But only do this if 
      * the parentScope flag is not NULL, and this token is not of a limited 
      * scope type such as a record component, enum literal, label, etc. */
-    if((Option.include.qualifiedTags == TRUE) &&
+    if((isXtagEnabled(XTAG_QUALIFIED_TAGS) == TRUE) &&
        (token->kind != ADA_KIND_RECORD_COMPONENT) &&
        (token->kind != ADA_KIND_ENUM_LITERAL) &&
        (token->kind != ADA_KIND_FORMAL) &&
@@ -2132,6 +2132,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
         currentScope[strlen(parentScope) + 1 + strlen(token->name)] = '\0';
 
         token->tag.name = currentScope;
+	markTagExtraBit (&token->tag, XTAG_QUALIFIED_TAGS);
         makeTagEntry(&token->tag);
       } /* if(parentScope != NULL) */
       else
@@ -2142,7 +2143,7 @@ static void storeAdaTags(adaTokenInfo *token, const char *parentScope)
          * no extra entry. */
         currentScope = token->name;
       }
-    } /* if((Option.include.qualifiedTags == TRUE) && ... */
+    } /* if((isXtagsEnabled(XTAG_QUALIFIED_TAGS) == TRUE) && ... */
   } /* if((token->kind > ADA_KIND_UNDEFINED) && ... */
 
   /* now make the child tags */

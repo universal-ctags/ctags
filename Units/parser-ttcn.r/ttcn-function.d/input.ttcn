@@ -1,0 +1,24 @@
+module CoffeeMachine
+{
+    function startCoffeePrepration()
+    {
+        //do nothing
+    }
+
+   function drinkCoffee(charstring coffeeType)
+       runs on CoffeeDrinkerComponentType
+   {
+      //drinking coffee
+   }
+
+   function getCoffee() runs on CoffeeDrinkerComponentType
+       return template Coffee
+   {
+       return coffee("espresso")
+   }
+
+   function boilWater() return Water
+   {
+       return valueof(CleanWater{})
+   }
+}

@@ -2,7 +2,7 @@
  * Copyright (c) 2014, Colomban Wendling <colomban@geany.org>
  *
  * This source code is released for free distribution under the terms of the
- * GNU General Public License.
+ * GNU General Public License version 2 or (at your option) any later version.
  */
 /*
  * This module contains functions for generating tags for JSON files.
@@ -58,7 +58,7 @@ typedef struct {
 	vString			*string;
 	vString			*scope;
 	unsigned long	lineNumber;
-	fpos_t			filePosition;
+	MIOPos			filePosition;
 } tokenInfo;
 
 typedef enum {
@@ -78,6 +78,12 @@ static kindOption JsonKinds [] = {
 	{ TRUE,  'z', "null",		"nulls"		}
 };
 
+static const keywordTable JsonKeywordTable [] = {
+	{"true",  KEYWORD_true },
+	{"false", KEYWORD_false},
+	{"null", KEYWORD_null },
+};
+
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
@@ -86,7 +92,7 @@ static tokenInfo *newToken (void)
 	token->scopeKind	= TAG_NONE;
 	token->string		= vStringNew ();
 	token->scope		= vStringNew ();
-	token->lineNumber	= getSourceLineNumber ();
+	token->lineNumber	= getInputLineNumber ();
 	token->filePosition	= getInputFilePosition ();
 
 	return token;
@@ -116,19 +122,17 @@ static void makeJsonTag (tokenInfo *const token, const jsonKind kind)
 	if (! JsonKinds[kind].enabled)
 		return;
 
-	initTagEntry (&e, vStringValue (token->string));
+	initTagEntry (&e, vStringValue (token->string), &(JsonKinds[kind]));
 
 	e.lineNumber	= token->lineNumber;
 	e.filePosition	= token->filePosition;
-	e.kindName		= JsonKinds[kind].name;
-	e.kind			= JsonKinds[kind].letter;
 
 	if (vStringLength (token->scope) > 0)
 	{
 		Assert (token->scopeKind > TAG_NONE && token->scopeKind < TAG_COUNT);
 
-		e.extensionFields.scope[0] = JsonKinds[token->scopeKind].name;
-		e.extensionFields.scope[1] = vStringValue (token->scope);
+		e.extensionFields.scopeKind = &(JsonKinds[token->scopeKind]);
+		e.extensionFields.scopeName = vStringValue (token->scope);
 	}
 
 	makeTagEntry (&e);
@@ -148,10 +152,10 @@ static void readTokenFull (tokenInfo *const token,
 	vStringClear (token->string);
 
 	do
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	while (c == '\t' || c == ' ' || c == '\r' || c == '\n');
 
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	switch (c)
@@ -170,7 +174,7 @@ static void readTokenFull (tokenInfo *const token,
 			token->type = TOKEN_STRING;
 			while (TRUE)
 			{
-				c = fileGetc ();
+				c = getcFromInputFile ();
 				/* we don't handle unicode escapes but they are safe */
 				if (escaped)
 					escaped = FALSE;
@@ -195,11 +199,11 @@ static void readTokenFull (tokenInfo *const token,
 				do
 				{
 					vStringPut (token->string, c);
-					c = fileGetc ();
+					c = getcFromInputFile ();
 				}
 				while (c != EOF && isIdentChar (c));
 				vStringTerminate (token->string);
-				fileUngetc (c);
+				ungetcToInputFile (c);
 				switch (lookupKeyword (vStringValue (token->string), Lang_json))
 				{
 					case KEYWORD_true:	token->type = TOKEN_TRUE;	break;
@@ -373,9 +377,6 @@ static void findJsonTags (void)
 static void initialize (const langType language)
 {
 	Lang_json = language;
-	addKeyword ("true", language, KEYWORD_true);
-	addKeyword ("false", language, KEYWORD_false);
-	addKeyword ("null", language, KEYWORD_null);
 }
 
 /* Create parser definition structure */
@@ -385,9 +386,12 @@ extern parserDefinition* JsonParser (void)
 	parserDefinition *const def = parserNew ("JSON");
 	def->extensions = extensions;
 	def->kinds		= JsonKinds;
-	def->kindCount	= KIND_COUNT (JsonKinds);
+	def->kindCount	= ARRAY_SIZE (JsonKinds);
 	def->parser		= findJsonTags;
 	def->initialize = initialize;
+	def->keywordTable = JsonKeywordTable;
+	def->keywordCount = ARRAY_SIZE (JsonKeywordTable);
+	def->allowNullTag = TRUE;
 
 	return def;
 }

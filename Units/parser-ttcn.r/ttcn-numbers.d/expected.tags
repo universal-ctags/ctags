@@ -1,0 +1,12 @@
+emptyIntegerTemplate	input.ttcn	/^template integer emptyIntegerTemplate := omit$/;"	d
+myPositiveInteger	input.ttcn	/^var integer myPositiveInteger := 42$/;"	v
+myNegativeInteger	input.ttcn	/^var integer myNegativeInteger := -5$/;"	v
+myPositiveFloat	input.ttcn	/^var float myPositiveFloat := 3.14$/;"	v
+myNegativeFloat	input.ttcn	/^var float myNegativeFloat := -0.5$/;"	v
+myBigExponentialNotation1	input.ttcn	/^var integer myBigExponentialNotation1 := 6.022E23$/;"	v
+myBigExponentialNotation2	input.ttcn	/^var integer myBigExponentialNotation2 := 6.022E20.35$/;"	v
+myBigExponentialNotation3	input.ttcn	/^var integer myBigExponentialNotation3 := -6.022E23$/;"	v
+myBigExponentialNotation4	input.ttcn	/^var integer myBigExponentialNotation4 := 6.022E-23$/;"	v
+myBigExponentialNotation5	input.ttcn	/^var integer myBigExponentialNotation5 := 6.022E-20.35$/;"	v
+myBigExponentialNotation6	input.ttcn	/^var integer myBigExponentialNotation6 := -6.022E-23$/;"	v
+mySmallExponentialNotation	input.ttcn	/^var integer mySmallExponentialNotation := 6.022e23$/;"	v

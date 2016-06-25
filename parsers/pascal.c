@@ -2,7 +2,7 @@
 *   Copyright (c) 2001-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for the Pascal language,
 *   including some extensions for Object Pascal.
@@ -18,6 +18,7 @@
 #include "entry.h"
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -40,13 +41,10 @@ static void createPascalTag (
 		tagEntryInfo* const tag, const vString* const name, const int kind)
 {
 	if (PascalKinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
-	{
-	    initTagEntry (tag, vStringValue (name));
-	    tag->kindName = PascalKinds [kind].name;
-	    tag->kind     = PascalKinds [kind].letter;
-	}
+		initTagEntry (tag, vStringValue (name), &(PascalKinds [kind]));
 	else
-	    initTagEntry (tag, NULL);
+		/* TODO: Passing NULL as name makes an assertion behind initTagEntry failure */
+		initTagEntry (tag, NULL, NULL);
 }
 
 static void makePascalTag (const tagEntryInfo* const tag)
@@ -101,14 +99,14 @@ static void findPascalTags (void)
 		 * real tag
 		 */
 
-	dbp = fileReadLine ();
+	dbp = readLineFromInputFile ();
 	while (dbp != NULL)
 	{
 		int c = *dbp++;
 
 		if (c == '\0')  /* if end of line */
 		{
-			dbp = fileReadLine ();
+			dbp = readLineFromInputFile ();
 			if (dbp == NULL  ||  *dbp == '\0')
 				continue;
 			if (!((found_tag && verify_tag) || get_tagname))
@@ -257,7 +255,7 @@ extern parserDefinition* PascalParser (void)
 	parserDefinition* def = parserNew ("Pascal");
 	def->extensions = extensions;
 	def->kinds      = PascalKinds;
-	def->kindCount  = KIND_COUNT (PascalKinds);
+	def->kindCount  = ARRAY_SIZE (PascalKinds);
 	def->parser     = findPascalTags;
 	return def;
 }

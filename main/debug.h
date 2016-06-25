@@ -2,12 +2,12 @@
 *   Copyright (c) 1998-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   External interface to debug.c
 */
-#ifndef _DEBUG_H
-#define _DEBUG_H
+#ifndef CTAGS_MAIN_DEBUG_H
+#define CTAGS_MAIN_DEBUG_H
 
 /*
 *   Include files
@@ -29,6 +29,7 @@
 # define PrintStatus(x)    if (debug(DEBUG_STATUS)) printf x;
 # ifdef NDEBUG
 #  define Assert(c)
+#  define AssertNotReached()
 # else
    /* based on glibc's assert.h __ASSERT_FUNCTION */
 #  if defined (__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 4))
@@ -39,11 +40,13 @@
 #   define ASSERT_FUNCTION ((const char*)0)
 #  endif
 #  define Assert(c) ((c) ? ((void)0) : debugAssert(#c, __FILE__, __LINE__, ASSERT_FUNCTION))
+#  define AssertNotReached() Assert(!"The control reaches unexpected place")
 # endif
 #else
 # define DebugStatement(x)
 # define PrintStatus(x)
 # define Assert(c)
+# define AssertNotReached()
 # ifndef NDEBUG
 #  define NDEBUG
 # endif
@@ -76,6 +79,6 @@ extern void debugCppIgnore (const boolean ignore);
 extern void debugEntry (const tagEntryInfo *const tag);
 extern void debugAssert (const char *assertion, const char *file, unsigned int line, const char *function) attr__noreturn;
 
-#endif  /* _DEBUG_H */
+#endif  /* CTAGS_MAIN_DEBUG_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

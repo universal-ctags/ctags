@@ -1,0 +1,13 @@
+cappuccino	input.ttcn	/^var Coffee cappuccino := { id:= 5, description := "with creme" }$/;"	v
+latte	input.ttcn	/^var template Coffee latte := Latte()$/;"	v
+someCofee	input.ttcn	/^var template Coffee someCofee := SomeCoffee(8,?)$/;"	v
+espresso	input.ttcn	/^var template Coffee espresso := Espresso()$/;"	v
+latte	input.ttcn	/^var template Coffee latte := Latte$/;"	v
+espresso	input.ttcn	/^var template Coffee espresso := Black(getBlackId(),*)$/;"	v
+latteId	input.ttcn	/^var Coffee.id latteId := 4$/;"	v
+complecCoffee1	input.ttcn	/^var Coffee complecCoffee1 := { id:= {5}, description := omit }$/;"	v
+complecCoffee2	input.ttcn	/^var Coffee complecCoffee2 := { { 5 }, omit }$/;"	v
+complecCoffee3	input.ttcn	/^var Coffee complecCoffee3 := { { 5 }, {"complex"}}$/;"	v
+complecCoffee4	input.ttcn	/^var Coffee complecCoffee4 := { { 5 }, getComplex() }$/;"	v
+complecCoffee5	input.ttcn	/^var Coffee complecCoffee5 := { getComplex() }$/;"	v
+complecCoffee6	input.ttcn	/^var Coffee complecCoffee6 := { getComplex(), {"complex"} }$/;"	v

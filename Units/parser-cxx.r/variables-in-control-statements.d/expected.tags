@@ -1,0 +1,12 @@
+f01	input.cpp	/^	for(int f01=0;f01<10;f01++)$/;"	l	function:test	typeref:typename:int	file:
+f02	input.cpp	/^	for(int f02 = getUShort(), * f03 = getPointer();f03 < (getPointer() + 10);f03++)$/;"	l	function:test	typeref:typename:int	file:
+f03	input.cpp	/^	for(int f02 = getUShort(), * f03 = getPointer();f03 < (getPointer() + 10);f03++)$/;"	l	function:test	typeref:typename:int *	file:
+f04	input.cpp	/^	for(int f04=0,f05=5,f06=10;f04<10;f04++)$/;"	l	function:test	typeref:typename:int	file:
+f05	input.cpp	/^	for(int f04=0,f05=5,f06=10;f04<10;f04++)$/;"	l	function:test	typeref:typename:int	file:
+f06	input.cpp	/^	for(int f04=0,f05=5,f06=10;f04<10;f04++)$/;"	l	function:test	typeref:typename:int	file:
+f07	input.cpp	/^	for(std::string f07 = "test";;)$/;"	l	function:test	typeref:typename:std::string	file:
+f09	input.cpp	/^	for(std::unique_ptr<int> f09 = 0;;)$/;"	l	function:test	typeref:typename:std::unique_ptr<int>	file:
+f10	input.cpp	/^	for(std::unique_ptr<int> f10(getPointer());;)$/;"	l	function:test	typeref:typename:std::unique_ptr<int>	file:
+f11	input.cpp	/^	for(std::pair<int,int> f11;;)$/;"	l	function:test	typeref:typename:std::pair<int,int>	file:
+i01	input.cpp	/^	if(int i01 = 10 + 20)$/;"	l	function:test	typeref:typename:int	file:
+w01	input.cpp	/^	while(unsigned short int w01 = getUShort())$/;"	l	function:test	typeref:typename:unsigned short int	file:

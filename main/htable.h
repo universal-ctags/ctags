@@ -4,12 +4,12 @@
 *   Copyright (c) 2014, Masatake YAMATO
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   Defines hashtable
 */
-#ifndef _HTABLE_H
-#define _HTABLE_H
+#ifndef CTAGS_MAIN_HTABLE_H
+#define CTAGS_MAIN_HTABLE_H
 
 #include "general.h"
 
@@ -21,6 +21,9 @@ typedef void         (* hashTableForeachFunc) (void *key, void *value, void* use
 
 unsigned int hashPtrhash (void * x);
 boolean hashPtreq (void *a, void *b);
+
+unsigned int hashCstrhash (void * x);
+boolean hashCstreq (void *a, void *b);
 
 extern hashTable* hashTableNew         (unsigned int size,
 					hashTableHashFunc hashfn,
@@ -35,6 +38,6 @@ extern boolean    hashTableDeleteItem  (hashTable *htable, void *key);
 extern void       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data);
 extern int        hashTableCountItem   (hashTable *htable);
 
-#endif	/* _HTABLE_H */
+#endif	/* CTAGS_MAIN_HTABLE_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

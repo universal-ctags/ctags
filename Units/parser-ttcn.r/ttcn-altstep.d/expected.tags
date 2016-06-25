@@ -1,0 +1,4 @@
+Altsteps	input.ttcn	/^module Altsteps$/;"	M
+alt_guard	input.ttcn	/^    altstep alt_guard () runs on CoffeeMachine$/;"	a
+alt_catchAnything	input.ttcn	/^    altstep alt_catchAnything ()$/;"	a
+activateAltsteps	input.ttcn	/^    function activateAltsteps ()$/;"	f

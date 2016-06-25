@@ -1,0 +1,8 @@
+-0,0 +1,134	input.diff	/^@@ -0,0 +1,134 @@$/;"	h	newFile:b/parsers/diff.c
+-1,2 +0,0	input.diff	/^@@ -1,2 +0,0 @@$/;"	h	deletedFile:a/Units/review-needed.r/simple.ksh.t/expected.tags
+-28,6 +28,7	input.diff	/^@@ -28,6 +28,7 @@$/;"	h	modifiedFile:a/main/parsers.h
+-44,6 +44,7	input.diff	/^@@ -44,6 +44,7 @@ PARSER_SOURCES =				\\$/;"	h	modifiedFile:a/source.mak
+a/Units/review-needed.r/simple.ksh.t/expected.tags	input.diff	/^--- a\/Units\/review-needed.r\/simple.ksh.t\/expected.tags$/;"	d
+a/main/parsers.h	input.diff	/^--- a\/main\/parsers.h$/;"	m
+a/source.mak	input.diff	/^--- a\/source.mak$/;"	m
+b/parsers/diff.c	input.diff	/^+++ b\/parsers\/diff.c$/;"	n

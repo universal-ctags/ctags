@@ -1,0 +1,5 @@
+# DEPTH=1
+a	./src/a.c	/^int a (void)$/;"	f	typeref:typename:int
+# DEPTH=2
+a	./src/a.c	/^int a (void)$/;"	f	typeref:typename:int
+b	./src/subdir/b.c	/^int b(void)$/;"	f	typeref:typename:int

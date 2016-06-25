@@ -1,0 +1,2 @@
+func1	input.c	/^FUNCSTS func1(ENTSEQNO(seq)) {}$/;"	f	typeref:typename:FUNCSTS
+func2	input.c	/^FUNCSTS func2 (MEMTXT(form_msg), MEMTXT (text), MEMTXT (mail)) {}$/;"	f	typeref:typename:FUNCSTS

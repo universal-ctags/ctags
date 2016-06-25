@@ -1,0 +1,2 @@
+Test	input.vim	/^function Test()$/;"	line:1	end:3
+s:Test	input.vim	/^function s:Test()$/;"	line:5	end:6

@@ -1,0 +1,32 @@
+default map including *.m
+=======================================
+MatLab   *.m
+ObjectiveC *.mm *.m *.h
+
+[--map-<LANG>] removing from *.m from ObjetiveC
+=======================================
+MatLab   *.m
+
+[--map-<LANG>] adding *.m to Ada
+=======================================
+Ada      *.adb *.ads *.Ada *.m
+MatLab   *.m
+ObjectiveC *.mm *.m *.h
+
+[--map-<LANG>] removing from *.m from ObjetiveC, and adding *.m to Ada
+=======================================
+Ada      *.adb *.ads *.Ada *.m
+MatLab   *.m
+
+[--map-<LANG>] guessing parser with adding *.m to Ada
+=======================================
+ada.m: Ada
+matlab.m: Ada
+objc.m: Ada
+
+[--map-<LANG> --guess-language-eagerly] guessing parser with adding *.m to Ada
+=======================================
+ada.m: Ada
+matlab.m: MatLab
+objc.m: ObjectiveC
+

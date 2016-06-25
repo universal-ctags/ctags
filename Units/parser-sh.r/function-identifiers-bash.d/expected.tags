@@ -1,0 +1,113 @@
+foo!bar	input.bash	/^function foo!bar() { echo 'foo!bar'; }$/;"	f
+foo#bar	input.bash	/^function foo#bar() { echo 'foo#bar'; }$/;"	f
+foo%bar	input.bash	/^function foo%bar() { echo 'foo%bar'; }$/;"	f
+foo*bar	input.bash	/^function foo*bar() { echo 'foo*bar'; }$/;"	f
+foo+bar	input.bash	/^function foo+bar() { echo 'foo+bar'; }$/;"	f
+foo,bar	input.bash	/^function foo,bar() { echo 'foo,bar'; }$/;"	f
+foo-bar	input.bash	/^function foo-bar() { echo 'foo-bar'; }$/;"	f
+foo.bar	input.bash	/^function foo.bar() { echo 'foo.bar'; }$/;"	f
+foo/bar	input.bash	/^function foo\/bar() { echo 'foo\/bar'; }$/;"	f
+foo0bar	input.bash	/^function foo0bar() { echo 'foo0bar'; }$/;"	f
+foo1bar	input.bash	/^function foo1bar() { echo 'foo1bar'; }$/;"	f
+foo2bar	input.bash	/^function foo2bar() { echo 'foo2bar'; }$/;"	f
+foo3bar	input.bash	/^function foo3bar() { echo 'foo3bar'; }$/;"	f
+foo4bar	input.bash	/^function foo4bar() { echo 'foo4bar'; }$/;"	f
+foo5bar	input.bash	/^function foo5bar() { echo 'foo5bar'; }$/;"	f
+foo6bar	input.bash	/^function foo6bar() { echo 'foo6bar'; }$/;"	f
+foo7bar	input.bash	/^function foo7bar() { echo 'foo7bar'; }$/;"	f
+foo8bar	input.bash	/^function foo8bar() { echo 'foo8bar'; }$/;"	f
+foo9bar	input.bash	/^function foo9bar() { echo 'foo9bar'; }$/;"	f
+foo:bar	input.bash	/^function foo:bar() { echo 'foo:bar'; }$/;"	f
+foo=bar	input.bash	/^function foo=bar() { echo 'foo=bar'; }$/;"	f
+foo?bar	input.bash	/^function foo?bar() { echo 'foo?bar'; }$/;"	f
+foo@bar	input.bash	/^function foo@bar() { echo 'foo@bar'; }$/;"	f
+fooAbar	input.bash	/^function fooAbar() { echo 'fooAbar'; }$/;"	f
+fooBbar	input.bash	/^function fooBbar() { echo 'fooBbar'; }$/;"	f
+fooCbar	input.bash	/^function fooCbar() { echo 'fooCbar'; }$/;"	f
+fooDbar	input.bash	/^function fooDbar() { echo 'fooDbar'; }$/;"	f
+fooEbar	input.bash	/^function fooEbar() { echo 'fooEbar'; }$/;"	f
+fooFbar	input.bash	/^function fooFbar() { echo 'fooFbar'; }$/;"	f
+fooGbar	input.bash	/^function fooGbar() { echo 'fooGbar'; }$/;"	f
+fooHbar	input.bash	/^function fooHbar() { echo 'fooHbar'; }$/;"	f
+fooIbar	input.bash	/^function fooIbar() { echo 'fooIbar'; }$/;"	f
+fooJbar	input.bash	/^function fooJbar() { echo 'fooJbar'; }$/;"	f
+fooKbar	input.bash	/^function fooKbar() { echo 'fooKbar'; }$/;"	f
+fooLbar	input.bash	/^function fooLbar() { echo 'fooLbar'; }$/;"	f
+fooMbar	input.bash	/^function fooMbar() { echo 'fooMbar'; }$/;"	f
+fooNbar	input.bash	/^function fooNbar() { echo 'fooNbar'; }$/;"	f
+fooObar	input.bash	/^function fooObar() { echo 'fooObar'; }$/;"	f
+fooPbar	input.bash	/^function fooPbar() { echo 'fooPbar'; }$/;"	f
+fooQbar	input.bash	/^function fooQbar() { echo 'fooQbar'; }$/;"	f
+fooRbar	input.bash	/^function fooRbar() { echo 'fooRbar'; }$/;"	f
+fooSbar	input.bash	/^function fooSbar() { echo 'fooSbar'; }$/;"	f
+fooTbar	input.bash	/^function fooTbar() { echo 'fooTbar'; }$/;"	f
+fooUbar	input.bash	/^function fooUbar() { echo 'fooUbar'; }$/;"	f
+fooVbar	input.bash	/^function fooVbar() { echo 'fooVbar'; }$/;"	f
+fooWbar	input.bash	/^function fooWbar() { echo 'fooWbar'; }$/;"	f
+fooXbar	input.bash	/^function fooXbar() { echo 'fooXbar'; }$/;"	f
+fooYbar	input.bash	/^function fooYbar() { echo 'fooYbar'; }$/;"	f
+fooZbar	input.bash	/^function fooZbar() { echo 'fooZbar'; }$/;"	f
+foo[bar	input.bash	/^function foo[bar() { echo 'foo[bar'; }$/;"	f
+foo\abar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\bbar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\fbar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\vbar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x02bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x03bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x04bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x05bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x06bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x0Ebar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x0Fbar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x10bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x11bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x12bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x13bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x14bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x15bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x16bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x17bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x18bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x19bar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x1Abar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x1Bbar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x1Cbar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x1Dbar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x1Ebar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo\x1Fbar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo]bar	input.bash	/^function foo]bar() { echo 'foo]bar'; }$/;"	f
+foo^bar	input.bash	/^function foo^bar() { echo 'foo^bar'; }$/;"	f
+foo_bar	input.bash	/^function foo_bar() { echo 'foo_bar'; }$/;"	f
+fooabar	input.bash	/^function fooabar() { echo 'fooabar'; }$/;"	f
+foobbar	input.bash	/^function foobbar() { echo 'foobbar'; }$/;"	f
+foocbar	input.bash	/^function foocbar() { echo 'foocbar'; }$/;"	f
+foodbar	input.bash	/^function foodbar() { echo 'foodbar'; }$/;"	f
+fooebar	input.bash	/^function fooebar() { echo 'fooebar'; }$/;"	f
+foofbar	input.bash	/^function foofbar() { echo 'foofbar'; }$/;"	f
+foogbar	input.bash	/^function foogbar() { echo 'foogbar'; }$/;"	f
+foohbar	input.bash	/^function foohbar() { echo 'foohbar'; }$/;"	f
+fooibar	input.bash	/^function fooibar() { echo 'fooibar'; }$/;"	f
+foojbar	input.bash	/^function foojbar() { echo 'foojbar'; }$/;"	f
+fookbar	input.bash	/^function fookbar() { echo 'fookbar'; }$/;"	f
+foolbar	input.bash	/^function foolbar() { echo 'foolbar'; }$/;"	f
+foombar	input.bash	/^function foombar() { echo 'foombar'; }$/;"	f
+foonbar	input.bash	/^function foonbar() { echo 'foonbar'; }$/;"	f
+fooobar	input.bash	/^function fooobar() { echo 'fooobar'; }$/;"	f
+foopbar	input.bash	/^function foopbar() { echo 'foopbar'; }$/;"	f
+fooqbar	input.bash	/^function fooqbar() { echo 'fooqbar'; }$/;"	f
+foorbar	input.bash	/^function foorbar() { echo 'foorbar'; }$/;"	f
+foosbar	input.bash	/^function foosbar() { echo 'foosbar'; }$/;"	f
+footbar	input.bash	/^function footbar() { echo 'footbar'; }$/;"	f
+fooubar	input.bash	/^function fooubar() { echo 'fooubar'; }$/;"	f
+foovbar	input.bash	/^function foovbar() { echo 'foovbar'; }$/;"	f
+foowbar	input.bash	/^function foowbar() { echo 'foowbar'; }$/;"	f
+fooxbar	input.bash	/^function fooxbar() { echo 'fooxbar'; }$/;"	f
+fooybar	input.bash	/^function fooybar() { echo 'fooybar'; }$/;"	f
+foozbar	input.bash	/^function foozbar() { echo 'foozbar'; }$/;"	f
+foo{bar	input.bash	/^function foo{bar() { echo 'foo{bar'; }$/;"	f
+foo}bar	input.bash	/^function foo}bar() { echo 'foo}bar'; }$/;"	f
+foo~bar	input.bash	/^function foo~bar() { echo 'foo~bar'; }$/;"	f
+foobar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foobar	input.bash	/^function foobar() { echo 'foobar'; }$/;"	f
+foo bar	input.bash	/^function foo bar() { echo 'foo bar'; }$/;"	f
+fooÿbar	input.bash	/^function fooÿbar() { echo 'fooÿbar'; }$/;"	f

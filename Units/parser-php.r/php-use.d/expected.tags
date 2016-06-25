@@ -1,0 +1,35 @@
+CONST	input.php	/^    const CONST = 1;$/;"	d	class:NS\\Cls
+ClassFour	input.php	/^  use NS2\\{NS30 as NameSpaceTreePointO, NS31\\Cls4 as ClassFour};$/;"	a	typeref:unknown:NS2\\NS31\\Cls4
+Cls	input.php	/^  class Cls implements Iface {$/;"	c	namespace:NS
+Cls	input.php	/^  class Cls implements NSIface {$/;"	c	namespace:NS2
+Cls	input.php	/^  use NS\\Cls;$/;"	a	typeref:unknown:NS\\Cls
+Cls2	input.php	/^  use NS2\\Cls as Cls2;$/;"	a	typeref:unknown:NS2\\Cls
+Cls3	input.php	/^  class Cls3 {}$/;"	c	namespace:NS2\\NS30
+Cls4	input.php	/^  class Cls4 {}$/;"	c	namespace:NS2\\NS31
+Cls4	input.php	/^  use NS2\\{NS30, NS31\\Cls4};$/;"	a	typeref:unknown:NS2\\NS31\\Cls4
+FOO	input.php	/^  const FOO = 1;$/;"	d	namespace:NS
+FOO	input.php	/^  use const NS\\FOO;$/;"	a	namespace:NS2	typeref:define:NS\\FOO
+Iface	input.php	/^  interface Iface extends NSIface {$/;"	i	namespace:NS2
+Iface	input.php	/^  interface Iface {$/;"	i	namespace:NS
+Iface	input.php	/^  use NS2\\{Cls as NS2Cls, Iface};$/;"	a	typeref:unknown:NS2\\Iface
+MYCONST	input.php	/^  use const NS\\FOO as MYCONST;$/;"	a	typeref:define:NS\\FOO
+NS	input.php	/^namespace NS {$/;"	n
+NS2	input.php	/^namespace NS2 {$/;"	n
+NS2Cls	input.php	/^  use NS2\\{Cls as NS2Cls, Iface};$/;"	a	typeref:unknown:NS2\\Cls
+NS2\\NS30	input.php	/^namespace NS2\\NS30 {$/;"	n
+NS2\\NS30\\NS301	input.php	/^namespace NS2\\NS30\\NS301 {}$/;"	n
+NS2\\NS30\\NS302	input.php	/^namespace NS2\\NS30\\NS302 {}$/;"	n
+NS2\\NS31	input.php	/^namespace NS2\\NS31 {$/;"	n
+NS30	input.php	/^  use NS2\\{NS30, NS31\\Cls4};$/;"	a	typeref:unknown:NS2\\NS30
+NSCls	input.php	/^  use NS\\Iface as NSIface, NS\\Cls as NSCls;$/;"	a	namespace:NS2	typeref:unknown:NS\\Cls
+NSIface	input.php	/^  use NS\\Iface as NSIface, NS\\Cls as NSCls;$/;"	a	namespace:NS2	typeref:unknown:NS\\Iface
+NameSpaceTreePointO	input.php	/^  use NS2\\{NS30 as NameSpaceTreePointO, NS31\\Cls4 as ClassFour};$/;"	a	typeref:unknown:NS2\\NS30
+SomeAliasedNS	input.php	/^  use NS as SomeAliasedNS;$/;"	a	typeref:unknown:NS
+cls	input.php	/^  $cls = new Cls2;$/;"	v
+cls	input.php	/^  $cls = new Cls;$/;"	v
+foo	input.php	/^    private $foo = FOO;$/;"	v	class:NS2\\Cls
+hello	input.php	/^    public function hello() {$/;"	f	class:NS2\\Cls
+hello	input.php	/^    public function hello() {$/;"	f	class:NS\\Cls
+hello	input.php	/^    public function hello();$/;"	f	interface:NS\\Iface
+test	input.php	/^  function test() {$/;"	f	namespace:NS
+test	input.php	/^  use function NS\\test;$/;"	a	typeref:function:NS\\test

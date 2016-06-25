@@ -1,0 +1,4 @@
+Base	input.cpp	/^class Base$/;"	c	file:
+bar	input.cpp	/^	virtual void bar() const noexcept = 0;$/;"	p	class:Base	typeref:typename:void	file:	signature:() const
+baz	input.cpp	/^	int baz() noexcept { return 42; }$/;"	f	class:Base	typeref:typename:int	file:	signature:()
+foo	input.cpp	/^	virtual void foo() noexcept = 0;$/;"	p	class:Base	typeref:typename:void	file:	signature:()

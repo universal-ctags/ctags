@@ -2,12 +2,12 @@
 *   Copyright (c) 1998-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   External interface to keyword.c
 */
-#ifndef _KEYWORD_H
-#define _KEYWORD_H
+#ifndef CTAGS_MAIN_KEYWORD_H
+#define CTAGS_MAIN_KEYWORD_H
 
 /*
 *   INCLUDE FILES
@@ -27,6 +27,6 @@ extern void printKeywordTable (void);
 #endif
 extern int analyzeToken (vString *const name, langType language);
 
-#endif  /* _KEYWORD_H */
+#endif  /* CTAGS_MAIN_KEYWORD_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

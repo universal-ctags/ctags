@@ -1,0 +1,14 @@
+A	input.cpp	/^struct A {$/;"	s	file:	template:<typename T>
+f	input.cpp	/^    void f(T); \/\/ member, declared in the primary template$/;"	p	struct:A	typeref:typename:void	file:	signature:(T)
+h	input.cpp	/^    void h(T) {} \/\/ member, defined in the primary template$/;"	f	struct:A	typeref:typename:void	file:	signature:(T)
+g1	input.cpp	/^    template<class X1> void g1(T, X1); \/\/ member template$/;"	p	struct:A	typeref:typename:void	file:	signature:(T,X1)	template:<class X1>
+g2	input.cpp	/^    template<class X2> void g2(T, X2); \/\/ member template$/;"	p	struct:A	typeref:typename:void	file:	signature:(T,X2)	template:<class X2>
+f	input.cpp	/^template<> void A<int>::f(int);$/;"	p	class:A	typeref:typename:void	file:	signature:(int)	template:<>	properties:scopespecialization,specialization
+h	input.cpp	/^template<> void A<int>::h(int) {}$/;"	f	class:A	typeref:typename:void	signature:(int)	template:<>	properties:scopespecialization,specialization
+g1	input.cpp	/^template<class X1> void A<T>::g1(T, X1) { }$/;"	f	class:A	typeref:typename:void	signature:(T,X1)	template:<class X1>	properties:scopespecialization,specialization
+g1	input.cpp	/^template<class X1> void A<int>::g1(int, X1);$/;"	p	class:A	typeref:typename:void	file:	signature:(int,X1)	template:<class X1>	properties:scopespecialization,specialization
+g2	input.cpp	/^template<> void A<int>::g2<char>(int, char); \/\/ for X2 = char$/;"	p	class:A	typeref:typename:void	file:	signature:(int,char)	template:<>	properties:scopespecialization,specialization
+g1	input.cpp	/^template<> void A<int>::g1(int, char);$/;"	p	class:A	typeref:typename:void	file:	signature:(int,char)	template:<>	properties:scopespecialization,specialization
+m	input.cpp	/^template<typename X> void m(X)$/;"	f	typeref:typename:void	signature:(X)	template:<typename X>
+m	input.cpp	/^template<> void m<int>(int)$/;"	f	typeref:typename:void	signature:(int)	template:<>	properties:specialization
+m	input.cpp	/^template<> void m(char)$/;"	f	typeref:typename:void	signature:(char)	template:<>	properties:specialization

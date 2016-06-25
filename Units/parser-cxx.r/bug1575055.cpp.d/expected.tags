@@ -1,0 +1,3 @@
+MyClass	input.cpp	/^	class MyClass { };$/;"	c	namespace:TheNamespace	file:
+TheNamespace	input.cpp	/^namespace TheNamespace {$/;"	n	file:
+variable	input.cpp	/^	int variable;$/;"	v	namespace:TheNamespace	typeref:typename:int

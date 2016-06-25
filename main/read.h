@@ -2,20 +2,12 @@
 *   Copyright (c) 1998-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   External interface to read.c
 */
-#ifndef _READ_H
-#define _READ_H
-
-#if defined(FILE_WRITE)
-# define CONST_FILE
-#else
-# define CONST_FILE /* const */
-/* TEMPORARY FIX 
-   `File' global variable should be file local. */
-#endif
+#ifndef CTAGS_MAIN_READ_H
+#define CTAGS_MAIN_READ_H
 
 /*
 *   INCLUDE FILES
@@ -27,22 +19,11 @@
 
 #include "parse.h"
 #include "vstring.h"
+#include "mio.h"
 
 /*
 *   MACROS
 */
-#define getInputLineNumber()     File.lineNumber
-#define getInputFileName()       vStringValue (File.source.name)
-#define getInputFilePosition()   File.filePosition
-#define getSourceFileName()      vStringValue (File.source.name)
-#define getSourceFileTagPath()   File.source.tagPath
-#define getSourceLanguage()      File.source.language
-#define getSourceLanguageName()  getLanguageName (File.source.language)
-#define getSourceLanguageFileKind()  getLanguageFileKind (File.source.language)
-#define getSourceLineNumber()    File.source.lineNumber
-#define isLanguage(lang)         (boolean)((lang) == File.source.language)
-#define isHeaderFile()           File.source.isHeader
-#define isSourceLanguageKindEnabled(c)  isLanguageKindEnabled (File.source.language, c)
 
 /*
 *   DATA DECLARATIONS
@@ -67,55 +48,66 @@ enum eCharacters {
 	CHAR_SYMBOL   = ('C' + 0xff)
 };
 
-/*  Maintains the state of the current source file.
- */
-typedef struct sInputFile {
-	vString    *name;          /* name of input file */
-	vString    *path;          /* path of input file (if any) */
-	vString    *line;          /* last line read from file */
-	const unsigned char* currentLine;  /* current line being worked on */
-	FILE       *fp;            /* stream used for reading the file */
-	unsigned long lineNumber;  /* line number in the input file */
-	fpos_t      filePosition;  /* file position of current line */
-	unsigned int ungetchIdx;
-	int         ungetchBuf[3]; /* characters that were ungotten */
-	boolean     eof;           /* have we reached the end of file? */
-	boolean     newLine;       /* will the next character begin a new line? */
-
-	/*  Contains data pertaining to the original source file in which the tag
-	 *  was defined. This may be different from the input file when #line
-	 *  directives are processed (i.e. the input file is preprocessor output).
-	 */
-	struct sSource {
-		vString *name;           /* name to report for source file */
-		char    *tagPath;        /* path of source file relative to tag file */
-		unsigned long lineNumber;/* line number in the source file */
-		boolean  isHeader;       /* is source file a header file? */
-		langType language;       /* language of source file */
-	} source;
-} inputFile;
-
-/*
-*   GLOBAL VARIABLES
-*/
-extern CONST_FILE inputFile File;
 
 /*
 *   FUNCTION PROTOTYPES
 */
-extern void freeSourceFileResources (void);
-extern boolean fileOpen (const char *const fileName, const langType language);
-extern boolean fileEOF (void);
-extern void fileClose (void);
-extern int fileGetc (void);
-extern int fileSkipToCharacter (int c);
-extern void fileUngetc (int c);
-extern const unsigned char *fileReadLine (void);
-extern char *readLine (vString *const vLine, FILE *const fp);
-extern char *readSourceLine (vString *const vLine, fpos_t location, long *const pSeekValue);
-extern char *readSourceLineSlow (vString *const vLine, unsigned long lineNumber, const char *pattern, long *const pSeekValue);
-extern char* readLineWithNoSeek (vString *const vline, FILE *const pp);
 
-#endif  /* _READ_H */
+/* InputFile: reading from fp in inputFile with updating fields in input fields */
+extern unsigned long getInputLineNumber (void);
+extern const char *getInputFileName (void);
+extern MIOPos getInputFilePosition (void);
+extern MIOPos getInputFilePositionForLine (int line);
+extern langType getInputLanguage (void);
+extern const char *getInputLanguageName (void);
+extern const char *getInputFileTagPath (void);
+extern boolean isInputLanguage (langType lang);
+extern boolean isInputHeaderFile (void);
+extern boolean isInputLanguageKindEnabled (char c);
+extern boolean doesInputLanguageAllowNullTag (void);
+extern kindOption *getInputLanguageFileKind (void);
+extern boolean doesInputLanguageRequestAutomaticFQTag (void);
+
+extern void                 freeInputFileResources (void);
+extern const unsigned char *getInputFileData (size_t *size);
+
+/* Stream opend by getMio can be passed to openInputFile as the 3rd
+   argument. If the 3rd argument is NULL, openInputFile calls getMio
+   internally. The 3rd argument is introduced for reusing mio object
+   created in parser guessing stage. */
+extern boolean              openInputFile (const char *const fileName, const langType language, MIO *mio);
+extern MIO                 *getMio (const char *const fileName, const char *const openMode,
+				    boolean memStreamRequired);
+extern void                 resetInputFile (const langType language);
+
+extern void                 closeInputFile (void);
+extern void                *getInputFileUserData(void);
+extern int                  getcFromInputFile (void);
+extern int                  getNthPrevCFromInputFile (unsigned int nth, int def);
+extern int                  skipToCharacterInInputFile (int c);
+extern void                 ungetcToInputFile (int c);
+extern const unsigned char *readLineFromInputFile (void);
+
+
+extern const char *getSourceFileTagPath (void);
+extern const char *getSourceLanguageName (void);
+extern unsigned long getSourceLineNumber (void);
+
+/* Raw: reading from given a parameter, fp */
+extern char *readLineRaw           (vString *const vLine, MIO *const fp);
+extern char* readLineRawWithNoSeek (vString *const vline, FILE *const pp);
+
+/* Bypass: reading from fp in inputFile WITHOUT updating fields in input fields */
+extern char *readLineFromBypass (vString *const vLine, MIOPos location, long *const pSeekValue);
+extern char *readLineFromBypassSlow (vString *const vLine, unsigned long lineNumber,
+				     const char *pattern, long *const pSeekValue);
+
+extern void   pushNarrowedInputStream (const langType language,
+				       unsigned long startLine, int startCharOffset,
+				       unsigned long endLine, int endCharOffset,
+				       unsigned long sourceLineOffset);
+extern void   popNarrowedInputStream  (void);
+
+#endif  /* CTAGS_MAIN_READ_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

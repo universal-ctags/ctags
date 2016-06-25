@@ -1,4 +1,7 @@
 /*
+*   This source code is released for free distribution under the terms of the
+*   GNU General Public License version 2 or (at your option) any later version.
+*
 *   INCLUDE FILES
 */
 #include "general.h"        /* must always come first */
@@ -11,6 +14,7 @@
 #include "routines.h"
 #include "vstring.h"
 #include "options.h"
+#include "xtag.h"
 
 /*
  *	 MACROS
@@ -36,14 +40,6 @@ typedef enum eKeywordId {
 	KEYWORD_map,
 	KEYWORD_chan
 } keywordId;
-
-/*  Used to determine whether keyword is valid for the current language and
- *  what its ID is.
- */
-typedef struct sKeywordDesc {
-	const char *name;
-	keywordId id;
-} keywordDesc;
 
 typedef enum eTokenType {
 	TOKEN_NONE = -1,
@@ -71,7 +67,7 @@ typedef struct sTokenInfo {
 	keywordId keyword;
 	vString *string;		/* the name of the token */
 	unsigned long lineNumber;	/* line number of tag */
-	fpos_t filePosition;		/* file position of line containing name */
+	MIOPos filePosition;		/* file position of line containing name */
 } tokenInfo;
 
 /*
@@ -105,7 +101,7 @@ static kindOption GoKinds[] = {
 	{TRUE, 'm', "member", "struct members"}
 };
 
-static keywordDesc GoKeywordTable[] = {
+static const keywordTable GoKeywordTable[] = {
 	{"package", KEYWORD_package},
 	{"import", KEYWORD_import},
 	{"const", KEYWORD_const},
@@ -137,15 +133,7 @@ static boolean isIdentChar (const int c)
 
 static void initialize (const langType language)
 {
-	size_t i;
-	const size_t count =
-		sizeof (GoKeywordTable) / sizeof (GoKeywordTable[0]);
 	Lang_go = language;
-	for (i = 0; i < count; ++i)
-	{
-		const keywordDesc *const p = &GoKeywordTable[i];
-		addKeyword (p->name, language, (int) p->id);
-	}
 }
 
 static tokenInfo *newToken (void)
@@ -154,7 +142,7 @@ static tokenInfo *newToken (void)
 	token->type = TOKEN_NONE;
 	token->keyword = KEYWORD_NONE;
 	token->string = vStringNew ();
-	token->lineNumber = getSourceLineNumber ();
+	token->lineNumber = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 	return token;
 }
@@ -188,12 +176,12 @@ static void parseString (vString *const string, const int delimiter)
 	boolean end = FALSE;
 	while (!end)
 	{
-		int c = fileGetc ();
+		int c = getcFromInputFile ();
 		if (c == EOF)
 			end = TRUE;
 		else if (c == '\\' && delimiter != '`')
 		{
-			c = fileGetc ();
+			c = getcFromInputFile ();
 			if (c != '\'' && c != '\"')
 				vStringPut (string, '\\');
 			vStringPut (string, c);
@@ -212,10 +200,10 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	vStringTerminate (string);
-	fileUngetc (c);		/* always unget, LF might add a semicolon */
+	ungetcToInputFile (c);		/* always unget, LF might add a semicolon */
 }
 
 static void readToken (tokenInfo *const token)
@@ -232,8 +220,8 @@ static void readToken (tokenInfo *const token)
 getNextChar:
 	do
 	{
-		c = fileGetc ();
-		token->lineNumber = getSourceLineNumber ();
+		c = getcFromInputFile ();
+		token->lineNumber = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 		if (c == '\n' && (lastTokenType == TOKEN_IDENTIFIER ||
 						  lastTokenType == TOKEN_STRING ||
@@ -266,42 +254,42 @@ getNextChar:
 		case '/':
 			{
 				boolean hasNewline = FALSE;
-				int d = fileGetc ();
+				int d = getcFromInputFile ();
 				switch (d)
 				{
 					case '/':
-						fileSkipToCharacter ('\n');
+						skipToCharacterInInputFile ('\n');
 						/* Line comments start with the
 						 * character sequence // and
 						 * continue through the next
 						 * newline. A line comment acts
 						 * like a newline.  */
-						fileUngetc ('\n');
+						ungetcToInputFile ('\n');
 						goto getNextChar;
 					case '*':
 						do
 						{
 							do
 							{
-								d = fileGetc ();
+								d = getcFromInputFile ();
 								if (d == '\n')
 								{
 									hasNewline = TRUE;
 								}
 							} while (d != EOF && d != '*');
 
-							c = fileGetc ();
+							c = getcFromInputFile ();
 							if (c == '/')
 								break;
 							else
-								fileUngetc (c);
+								ungetcToInputFile (c);
 						} while (c != EOF && c != '\0');
 
-						fileUngetc (hasNewline ? '\n' : ' ');
+						ungetcToInputFile (hasNewline ? '\n' : ' ');
 						goto getNextChar;
 					default:
 						token->type = TOKEN_OTHER;
-						fileUngetc (d);
+						ungetcToInputFile (d);
 						break;
 				}
 			}
@@ -312,18 +300,18 @@ getNextChar:
 		case '`':
 			token->type = TOKEN_STRING;
 			parseString (token->string, c);
-			token->lineNumber = getSourceLineNumber ();
+			token->lineNumber = getInputLineNumber ();
 			token->filePosition = getInputFilePosition ();
 			break;
 
 		case '<':
 			{
-				int d = fileGetc ();
+				int d = getcFromInputFile ();
 				if (d == '-')
 					token->type = TOKEN_LEFT_ARROW;
 				else
 				{
-					fileUngetc (d);
+					ungetcToInputFile (d);
 					token->type = TOKEN_OTHER;
 				}
 			}
@@ -369,7 +357,7 @@ getNextChar:
 			if (isStartIdentChar (c))
 			{
 				parseIdentifier (token->string, c);
-				token->lineNumber = getSourceLineNumber ();
+				token->lineNumber = getInputLineNumber ();
 				token->filePosition = getInputFilePosition ();
 				token->keyword = lookupKeyword (vStringValue (token->string), Lang_go);
 				if (isKeyword (token, KEYWORD_NONE))
@@ -535,32 +523,31 @@ static void makeTag (tokenInfo *const token, const goKind kind,
 	const char *const name = vStringValue (token->string);
 
 	tagEntryInfo e;
-	initTagEntry (&e, name);
+	initTagEntry (&e, name, &(GoKinds [kind]));
 
 	if (!GoKinds [kind].enabled)
 		return;
 
 	e.lineNumber = token->lineNumber;
 	e.filePosition = token->filePosition;
-	e.kindName = GoKinds [kind].name;
-	e.kind = GoKinds [kind].letter;
 	if (argList)
 		e.extensionFields.signature = argList;
 
 	if (parent_kind != GOTAG_UNDEFINED && parent_token != NULL)
 	{
-		e.extensionFields.scope[0] = GoKinds[parent_kind].name;
-		e.extensionFields.scope[1] = vStringValue (parent_token->string);
+		e.extensionFields.scopeKind = &(GoKinds[parent_kind]);
+		e.extensionFields.scopeName = vStringValue (parent_token->string);
 	}
 	makeTagEntry (&e);
 
-	if (scope && Option.include.qualifiedTags)
+	if (scope && isXtagEnabled(XTAG_QUALIFIED_TAGS))
 	{
 		vString *qualifiedName = vStringNew ();
 		vStringCopy (qualifiedName, scope);
 		vStringCatS (qualifiedName, ".");
 		vStringCat (qualifiedName, token->string);
 		e.name = vStringValue (qualifiedName);
+		markTagExtraBit (&e, XTAG_QUALIFIED_TAGS);
 		makeTagEntry (&e);
 		vStringDelete (qualifiedName);
 	}
@@ -572,7 +559,7 @@ static void parsePackage (tokenInfo *const token)
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
 		makeTag (token, GOTAG_PACKAGE, NULL, GOTAG_UNDEFINED, NULL);
-		if (!scope && Option.include.qualifiedTags)
+		if (!scope && isXtagEnabled(XTAG_QUALIFIED_TAGS))
 		{
 			scope = vStringNew ();
 			vStringCopy (scope, token->string);
@@ -824,9 +811,11 @@ extern parserDefinition *GoParser (void)
 	static const char *const extensions[] = { "go", NULL };
 	parserDefinition *def = parserNew ("Go");
 	def->kinds = GoKinds;
-	def->kindCount = KIND_COUNT (GoKinds);
+	def->kindCount = ARRAY_SIZE (GoKinds);
 	def->extensions = extensions;
 	def->parser = findGoTags;
 	def->initialize = initialize;
+	def->keywordTable = GoKeywordTable;
+	def->keywordCount = ARRAY_SIZE (GoKeywordTable);
 	return def;
 }

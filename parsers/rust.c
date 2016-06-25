@@ -1,7 +1,7 @@
 /*
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for Rust files.
 */
@@ -19,6 +19,7 @@
 #include "entry.h"
 #include "options.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -80,7 +81,7 @@ typedef struct {
 	int cur_token;
 	vString* token_str;
 	unsigned long line;
-	fpos_t pos;
+	MIOPos pos;
 } lexerState;
 
 /*
@@ -140,7 +141,7 @@ static void writeCurTokenToStr (lexerState *lexer, vString *out_str)
 static void advanceChar (lexerState *lexer)
 {
 	lexer->cur_c = lexer->next_c;
-	lexer->next_c = fileGetc();
+	lexer->next_c = getcFromInputFile();
 }
 
 /* Reads N characters from the file */
@@ -345,7 +346,7 @@ static void scanCharacterOrLifetime (lexerState *lexer)
 static int advanceToken (lexerState *lexer, boolean skip_whitspace)
 {
 	boolean have_whitespace = FALSE;
-	lexer->line = getSourceLineNumber();
+	lexer->line = getInputLineNumber();
 	lexer->pos = getInputFilePosition();
 	while (lexer->cur_c != EOF)
 	{
@@ -366,7 +367,7 @@ static int advanceToken (lexerState *lexer, boolean skip_whitspace)
 			break;
 		}
 	}
-	lexer->line = getSourceLineNumber();
+	lexer->line = getInputLineNumber();
 	lexer->pos = getInputFilePosition();
 	while (lexer->cur_c != EOF)
 	{
@@ -433,26 +434,22 @@ static void deInitLexer (lexerState *lexer)
 	lexer->token_str = NULL;
 }
 
-static void addTag (vString* ident, const char* type, const char* arg_list, int kind, unsigned long line, fpos_t pos, vString *scope, int parent_kind)
+static void addTag (vString* ident, const char* arg_list, int kind, unsigned long line, MIOPos pos, vString *scope, int parent_kind)
 {
 	if (kind == K_NONE || ! rustKinds[kind].enabled)
 		return;
 	tagEntryInfo tag;
-	initTagEntry(&tag, ident->buffer);
+	initTagEntry(&tag, ident->buffer, &(rustKinds[kind]));
 
 	tag.lineNumber = line;
 	tag.filePosition = pos;
-	tag.sourceFileName = getSourceFileName();
-
-	tag.kindName = rustKinds[kind].name;
-	tag.kind = rustKinds[kind].letter;
 
 	tag.extensionFields.signature = arg_list;
 	/*tag.extensionFields.varType = type;*/ /* FIXME: map to typeRef[1]? */
 	if (parent_kind != K_NONE)
 	{
-		tag.extensionFields.scope[0] = rustKinds[parent_kind].name;
-		tag.extensionFields.scope[1] = scope->buffer;
+		tag.extensionFields.scopeKind = &(rustKinds[parent_kind]);
+		tag.extensionFields.scopeName = scope->buffer;
 	}
 	makeTagEntry(&tag);
 }
@@ -531,7 +528,7 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
 	vString *name;
 	vString *arg_list;
 	unsigned long line;
-	fpos_t pos;
+	MIOPos pos;
 	int paren_level = 0;
 	boolean found_paren = FALSE;
 	boolean valid_signature = TRUE;
@@ -585,7 +582,7 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
 	if (valid_signature)
 	{
 		vStringStripTrailing(arg_list);
-		addTag(name, NULL, arg_list->buffer, kind, line, pos, scope, parent_kind);
+		addTag(name, arg_list->buffer, kind, line, pos, scope, parent_kind);
 		addToScope(scope, name);
 		parseBlock(lexer, TRUE, kind, scope);
 	}
@@ -603,7 +600,7 @@ static void parseMod (lexerState *lexer, vString *scope, int parent_kind)
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
-	addTag(lexer->token_str, NULL, NULL, K_MOD, lexer->line, lexer->pos, scope, parent_kind);
+	addTag(lexer->token_str, NULL, K_MOD, lexer->line, lexer->pos, scope, parent_kind);
 	addToScope(scope, lexer->token_str);
 
 	advanceToken(lexer, TRUE);
@@ -622,7 +619,7 @@ static void parseTrait (lexerState *lexer, vString *scope, int parent_kind)
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
-	addTag(lexer->token_str, NULL, NULL, K_TRAIT, lexer->line, lexer->pos, scope, parent_kind);
+	addTag(lexer->token_str, NULL, K_TRAIT, lexer->line, lexer->pos, scope, parent_kind);
 	addToScope(scope, lexer->token_str);
 
 	advanceToken(lexer, TRUE);
@@ -650,7 +647,8 @@ static void parseQualifiedType (lexerState *lexer, vString* name)
 	{
 		if (lexer->cur_token == TOKEN_IDENT)
 		{
-			if (strcmp(lexer->token_str->buffer, "for") == 0)
+			if (strcmp(lexer->token_str->buffer, "for") == 0
+				|| strcmp(lexer->token_str->buffer, "where") == 0)
 				break;
 			vStringClear(name);
 			vStringCat(name, lexer->token_str);
@@ -670,7 +668,7 @@ static void parseQualifiedType (lexerState *lexer, vString* name)
 static void parseImpl (lexerState *lexer, vString *scope, int parent_kind)
 {
 	unsigned long line;
-	fpos_t pos;
+	MIOPos pos;
 	vString *name;
 
 	advanceToken(lexer, TRUE);
@@ -690,7 +688,7 @@ static void parseImpl (lexerState *lexer, vString *scope, int parent_kind)
 		parseQualifiedType(lexer, name);
 	}
 
-	addTag(name, NULL, NULL, K_IMPL, line, pos, scope, parent_kind);
+	addTag(name, NULL, K_IMPL, line, pos, scope, parent_kind);
 	addToScope(scope, name);
 
 	parseBlock(lexer, TRUE, K_IMPL, scope);
@@ -713,7 +711,7 @@ static void parseStatic (lexerState *lexer, vString *scope, int parent_kind)
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
-	addTag(lexer->token_str, NULL, NULL, K_STATIC, lexer->line, lexer->pos, scope, parent_kind);
+	addTag(lexer->token_str, NULL, K_STATIC, lexer->line, lexer->pos, scope, parent_kind);
 }
 
 /* Type format:
@@ -725,7 +723,7 @@ static void parseType (lexerState *lexer, vString *scope, int parent_kind)
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
-	addTag(lexer->token_str, NULL, NULL, K_TYPE, lexer->line, lexer->pos, scope, parent_kind);
+	addTag(lexer->token_str, NULL, K_TYPE, lexer->line, lexer->pos, scope, parent_kind);
 }
 
 /* Structs and enums are very similar syntax-wise.
@@ -747,7 +745,7 @@ static void parseStructOrEnum (lexerState *lexer, vString *scope, int parent_kin
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
-	addTag(lexer->token_str, NULL, NULL, kind, lexer->line, lexer->pos, scope, parent_kind);
+	addTag(lexer->token_str, NULL, kind, lexer->line, lexer->pos, scope, parent_kind);
 	addToScope(scope, lexer->token_str);
 
 	skipUntil(lexer, goal_tokens1, 2);
@@ -794,7 +792,7 @@ static void parseStructOrEnum (lexerState *lexer, vString *scope, int parent_kin
 
 				vStringClear(field_name);
 				vStringCat(field_name, lexer->token_str);
-				addTag(field_name, NULL, NULL, field_kind, lexer->line, lexer->pos, scope, kind);
+				addTag(field_name, NULL, field_kind, lexer->line, lexer->pos, scope, kind);
 				skipUntil(lexer, goal_tokens2, 2);
 			}
 			if (lexer->cur_token == '}')
@@ -865,7 +863,7 @@ static void parseMacroRules (lexerState *lexer, vString *scope, int parent_kind)
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
-	addTag(lexer->token_str, NULL, NULL, K_MACRO, lexer->line, lexer->pos, scope, parent_kind);
+	addTag(lexer->token_str, NULL, K_MACRO, lexer->line, lexer->pos, scope, parent_kind);
 
 	skipMacro(lexer);
 }
@@ -974,10 +972,9 @@ static void findRustTags (void)
 extern parserDefinition *RustParser (void)
 {
 	static const char *const extensions[] = { "rs", NULL };
-	parserDefinition *def = parserNew ("Rust");
+	parserDefinition *def = parserNewFull ("Rust", KIND_FILE_ALT);
 	def->kinds = rustKinds;
-	def->kindCount = KIND_COUNT (rustKinds);
-	def->fileKind = KIND_FILE_ALT;
+	def->kindCount = ARRAY_SIZE (rustKinds);
 	def->extensions = extensions;
 	def->parser = findRustTags;
 

@@ -1,0 +1,15 @@
+Bar	input.php	/^class Bar {$/;"	c
+Foo	input.php	/^class Foo {$/;"	c
+Iface1	input.php	/^interface Iface1 {$/;"	i
+Iface2	input.php	/^interface Iface2 {$/;"	i
+Inherited	input.php	/^class Inherited extends Bar {$/;"	c	inherits:Bar
+Interfaced	input.php	/^class Interfaced extends Inherited implements Iface1, Iface2 {$/;"	c	inherits:Inherited,Iface1,Iface2
+__construct	input.php	/^	function __construct () {$/;"	f	class:Bar
+__construct	input.php	/^	function __construct($a, $b) {$/;"	f	class:Foo
+ifaced_method1	input.php	/^	function ifaced_method1 () {$/;"	f	class:Interfaced
+ifaced_method1	input.php	/^	function ifaced_method1 ();$/;"	f	interface:Iface1
+ifaced_method2	input.php	/^	function ifaced_method2 () {$/;"	f	class:Interfaced
+ifaced_method2	input.php	/^	function ifaced_method2 ();$/;"	f	interface:Iface2
+method1	input.php	/^	function method1 () {$/;"	f	class:Bar
+method1	input.php	/^	function method1($arg) {$/;"	f	class:Foo
+method2	input.php	/^	function method2() {$/;"	f	class:Foo

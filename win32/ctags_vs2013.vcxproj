@@ -56,7 +56,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../main;../gnu_regex;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../main;../gnu_regex;../parsers;../parsers/cxx;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;;HAVE_REGCOMP;__USE_GNU;bool=int;true=1;false=0;strcasecmp=stricmp;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -75,7 +75,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../main;../gnu_regex;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../main;../gnu_regex;../parsers;../parsers/cxx;../fnmatch;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;HAVE_REGCOMP;__USE_GNU;bool=int;true=1;false=0;strcasecmp=stricmp;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -106,30 +106,43 @@
     <ClCompile Include="..\parsers\c.c" />
     <ClCompile Include="..\parsers\clojure.c" />
     <ClCompile Include="..\parsers\cobol.c" />
+    <ClCompile Include="..\optlib\CoffeeScript.c" />
     <ClCompile Include="..\parsers\css.c" />
+    <ClCompile Include="..\optlib\ctags-optlib.c" />
     <ClCompile Include="..\main\debug.c" />
+    <ClCompile Include="..\parsers\diff.c" />
     <ClCompile Include="..\parsers\dosbatch.c" />
+    <ClCompile Include="..\parsers\dts.c" />
     <ClCompile Include="..\parsers\eiffel.c" />
     <ClCompile Include="..\main\entry.c" />
     <ClCompile Include="..\parsers\erlang.c" />
     <ClCompile Include="..\parsers\falcon.c" />
+    <ClCompile Include="..\main\field.c" />
     <ClCompile Include="..\main\flags.c" />
     <ClCompile Include="..\parsers\flex.c" />
+    <ClCompile Include="..\main\fmt.c" />
     <ClCompile Include="..\fnmatch\fnmatch.c" />
     <ClCompile Include="..\parsers\fortran.c" />
+    <ClCompile Include="..\optlib\gdbinit.c" />
     <ClCompile Include="..\main\get.c" />
     <ClCompile Include="..\parsers\go.c" />
     <ClCompile Include="..\parsers\html.c" />
+    <ClCompile Include="..\parsers\jprop.c" />
     <ClCompile Include="..\parsers\jscript.c" />
     <ClCompile Include="..\parsers\json.c" />
     <ClCompile Include="..\main\keyword.c" />
+    <ClCompile Include="..\main\kind.c" />
     <ClCompile Include="..\parsers\lisp.c" />
     <ClCompile Include="..\main\lregex.c" />
     <ClCompile Include="..\main\lxcmd.c" />
+    <ClCompile Include="..\main\lxpath.c" />
     <ClCompile Include="..\parsers\lua.c" />
+    <ClCompile Include="..\optlib\m4.c" />
     <ClCompile Include="..\main\main.c" />
     <ClCompile Include="..\parsers\make.c" />
+    <ClCompile Include="..\optlib\man.c" />
     <ClCompile Include="..\parsers\matlab.c" />
+    <ClCompile Include="..\parsers\myrddin.c" />
     <ClCompile Include="..\parsers\objc.c" />
     <ClCompile Include="..\parsers\ocaml.c" />
     <ClCompile Include="..\main\options.c" />
@@ -138,13 +151,33 @@
     <ClCompile Include="..\parsers\perl.c" />
     <ClCompile Include="..\parsers\perl6.c" />
     <ClCompile Include="..\parsers\php.c" />
+    <ClCompile Include="..\main\ptag.c" />
     <ClCompile Include="..\parsers\python.c" />
     <ClCompile Include="..\main\read.c" />
+    <ClCompile Include="..\parsers\cxx\cxx.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_debug.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_keyword.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_parser.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_parser_block.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_parser_function.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_parser_lambda.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_parser_namespace.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_parser_template.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_parser_tokenizer.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_parser_typedef.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_parser_using.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_parser_variable.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_scope.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_tag.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_token.c" />
+    <ClCompile Include="..\parsers\cxx\cxx_token_chain.c" />
     <ClCompile Include="..\gnu_regex\regex.c">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
+    <ClCompile Include="..\main\repoinfo.c" />
     <ClCompile Include="..\parsers\rst.c" />
+    <ClCompile Include="..\parsers\r.c" />
     <ClCompile Include="..\parsers\rexx.c" />
     <ClCompile Include="..\main\routines.c" />
     <ClCompile Include="..\parsers\ruby.c" />
@@ -158,13 +191,18 @@
     <ClCompile Include="..\main\strlist.c" />
     <ClCompile Include="..\parsers\tcl.c" />
     <ClCompile Include="..\parsers\tex.c" />
-    <ClCompile Include="..\main\tg.c" />
+    <ClCompile Include="..\parsers\ttcn.c" />
     <ClCompile Include="..\parsers\verilog.c" />
     <ClCompile Include="..\parsers\vhdl.c" />
     <ClCompile Include="..\parsers\vim.c" />
     <ClCompile Include="..\main\vstring.c" />
     <ClCompile Include="..\parsers\windres.c" />
+    <ClCompile Include="..\main\xtag.c" />
+    <ClCompile Include="..\main\mio.c" />
     <ClCompile Include="..\parsers\yacc.c" />
+    <ClCompile Include="..\parsers\rpmspec.c" />
+    <ClCompile Include="..\main\promise.c" />
+    <ClCompile Include="..\optlib\pod.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\fnmatch\fnmatch.h" />
@@ -173,24 +211,38 @@
     <ClInclude Include="..\main\debug.h" />
     <ClInclude Include="..\main\entry.h" />
     <ClInclude Include="..\main\e_msoft.h" />
+    <ClInclude Include="..\main\field.h" />
     <ClInclude Include="..\main\flags.h" />
+    <ClInclude Include="..\main\fmt.h" />
     <ClInclude Include="..\main\general.h" />
     <ClInclude Include="..\main\get.h" />
     <ClInclude Include="..\gnu_regex\regex.h" />
     <ClInclude Include="..\main\htable.h" />
     <ClInclude Include="..\main\keyword.h" />
+    <ClInclude Include="..\main\kind.h" />
     <ClInclude Include="..\main\main.h" />
     <ClInclude Include="..\main\nestlevel.h" />
     <ClInclude Include="..\main\options.h" />
     <ClInclude Include="..\main\parse.h" />
     <ClInclude Include="..\main\parsers.h" />
+    <ClInclude Include="..\main\ptag.h" />
     <ClInclude Include="..\main\read.h" />
     <ClInclude Include="..\main\routines.h" />
     <ClInclude Include="..\main\selectors.h" />
     <ClInclude Include="..\main\sort.h" />
     <ClInclude Include="..\main\strlist.h" />
-    <ClInclude Include="..\main\tg.h" />
     <ClInclude Include="..\main\vstring.h" />
+    <ClInclude Include="..\main\xtag.h" />
+    <ClInclude Include="..\main\mio.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_debug.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_keyword.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_parser.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_parser_internal.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_scope.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_tag.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_token.h" />
+    <ClInclude Include="..\parsers\cxx\cxx_token_chain.h" />
+    <ClInclude Include="..\main\promise.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

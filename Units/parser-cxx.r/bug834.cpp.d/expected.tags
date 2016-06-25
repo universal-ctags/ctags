@@ -1,0 +1,5 @@
+std	input.cpp	/^using namespace std;$/;"	U	file:
+C	input.cpp	/^vector<vector<int>> C;$/;"	v	typeref:typename:vector<vector<int>>
+A	input.cpp	/^struct A {$/;"	s	file:
+a	input.cpp	/^    int a;$/;"	m	struct:A	typeref:typename:int	file:
+b	input.cpp	/^    int b;$/;"	m	struct:A	typeref:typename:int	file:

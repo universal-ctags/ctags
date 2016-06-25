@@ -1,0 +1,18 @@
+CfgFile	input.y	/^CfgFile		:	CfgEntryList$/;"	l	language:YACC
+CfgEntryList	input.y	/^CfgEntryList	:	CfgEntryList CfgEntry$/;"	l	language:YACC
+CfgEntry	input.y	/^CfgEntry	:	EventDef ActionDef$/;"	l	language:YACC
+VarDef	input.y	/^VarDef		:	Ident EQUALS NameSpec$/;"	l	language:YACC
+EventDef	input.y	/^EventDef	:	EventType OPAREN OptNameSpec CPAREN$/;"	l	language:YACC
+EventType	input.y	/^EventType	:	BELL		{ $$= XkbBellNotify; }$/;"	l	language:YACC
+ActionDef	input.y	/^ActionDef	:	ActionType OptString$/;"	l	language:YACC
+ActionType	input.y	/^ActionType	:	NONE	 { $$ = NoAction; }$/;"	l	language:YACC
+OptNameSpec	input.y	/^OptNameSpec	:	NameSpec { $$= $1; }$/;"	l	language:YACC
+NameSpec	input.y	/^NameSpec	:	Ident	{ $$= $1; }$/;"	l	language:YACC
+Ident	input.y	/^Ident		:	IDENT	{ $$= scanStr; scanStr= NULL; }$/;"	l	language:YACC
+OptString	input.y	/^OptString	:	String	{ $$= $1; }$/;"	l	language:YACC
+String	input.y	/^String		:	STRING	{ $$= scanStr; scanStr= NULL; }$/;"	l	language:YACC
+YYDEBUG	input.y	/^#define	YYDEBUG /;"	d	language:C	file:
+DEBUG_VAR	input.y	/^#define	DEBUG_VAR /;"	d	language:C	file:
+yyerror	input.y	/^yyerror(char *s)$/;"	f	language:C	typeref:typename:int
+yywrap	input.y	/^yywrap(void)$/;"	f	language:C	typeref:typename:int
+CFGParseFile	input.y	/^CFGParseFile(FILE *file)$/;"	f	language:C	typeref:typename:int

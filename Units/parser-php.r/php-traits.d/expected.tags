@@ -1,0 +1,10 @@
+A	input.php	/^class A {$/;"	c
+B	input.php	/^class B {$/;"	c
+__construct	input.php	/^	public function __construct($p) {$/;"	f	class:B	access:public	signature:($p)
+__construct	input.php	/^	public function __construct() {$/;"	f	class:A	access:public	signature:()
+prop1	input.php	/^	protected $prop1 = 0;$/;"	v	trait:tBar	access:protected
+prop2	input.php	/^	protected $prop2;$/;"	v	trait:tBar	access:protected
+stuff	input.php	/^	protected function stuff($arg1, $arg2) {$/;"	f	trait:tBar	access:protected	signature:($arg1, $arg2)
+stuff	input.php	/^	public function stuff() {$/;"	f	trait:tFoo	access:public	signature:()
+tBar	input.php	/^trait tBar {$/;"	t
+tFoo	input.php	/^trait tFoo {$/;"	t

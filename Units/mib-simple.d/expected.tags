@@ -1,2 +1,0 @@
-REDHAT-MIB	input.REDHAT-MIB	/^REDHAT-MIB DEFINITIONS ::= BEGIN$/;"	d
-redhat	input.REDHAT-MIB	/^redhat MODULE-IDENTITY$/;"	n

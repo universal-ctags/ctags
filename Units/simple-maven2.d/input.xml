@@ -1,0 +1,50 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- Taken from
+     rhevm-3.5.6.2-0.1.el6ev:ovirt-engine/backend/pom.xml -->
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.ovirt.engine</groupId>
+    <artifactId>root</artifactId>
+    <version>3.5.6.2</version>
+  </parent>
+
+  <artifactId>backend</artifactId>
+  <groupId>org.ovirt.engine.core</groupId>
+  <packaging>pom</packaging>
+
+  <name>oVirt Modules - backend</name>
+  <description>parent POM for all oVirt modules</description>
+
+  <modules>
+    <module>manager</module>
+  </modules>
+
+  <properties>
+    <engine.groupId>org.ovirt.engine.core</engine.groupId>
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>maven repo1</name>
+      <layout>default</layout>
+      <url>http://repo1.maven.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.ovirt.engine.api</groupId>
+      <artifactId>ovirt-engine-extensions-api</artifactId>
+      <version>${org.ovirt.engine.api.ovirt-engine-extensions-api.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+    </dependency>
+  </dependencies>
+</project>

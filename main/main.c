@@ -5,8 +5,9 @@
 *           http://ctags.sourceforge.net
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License. It is provided on an as-is basis and no
-*   responsibility is accepted for its failure to perform as expected.
+*   GNU General Public License version 2 or (at your option) any later version.
+*   It is provided on an as-is basis and no responsibility is accepted for its
+*   failure to perform as expected.
 *
 *   This is a reimplementation of the ctags (1) program. It is an attempt to
 *   provide a fully featured ctags program which is free of the limitations
@@ -65,6 +66,8 @@
 
 
 #include "debug.h"
+#include "entry.h"
+#include "field.h"
 #include "keyword.h"
 #include "main.h"
 #include "options.h"
@@ -195,13 +198,21 @@ static boolean createTagsForWildcardUsingFindfirst (const char *const pattern)
 
 #endif
 
+
 static boolean recurseIntoDirectory (const char *const dirName)
 {
+	static unsigned int recursionDepth = 0;
+
+	recursionDepth++;
+
 	boolean resize = FALSE;
 	if (isRecursiveLink (dirName))
 		verbose ("ignoring \"%s\" (recursive link)\n", dirName);
 	else if (! Option.recurse)
 		verbose ("ignoring \"%s\" (directory)\n", dirName);
+	else if(recursionDepth > Option.maxRecursionDepth)
+		verbose ("not descending in directory \"%s\" (depth %u > %u)\n",
+				dirName, recursionDepth, Option.maxRecursionDepth);
 	else
 	{
 		verbose ("RECURSING into directory \"%s\"\n", dirName);
@@ -218,6 +229,9 @@ static boolean recurseIntoDirectory (const char *const dirName)
 		}
 #endif
 	}
+
+	recursionDepth--;
+
 	return resize;
 }
 
@@ -232,7 +246,7 @@ static boolean createTagsForEntry (const char *const entryName)
 	else if (status->isSymbolicLink  &&  ! Option.followLinks)
 		verbose ("ignoring \"%s\" (symbolic link)\n", entryName);
 	else if (! status->exists)
-		error (WARNING | PERROR, "cannot open source file \"%s\"", entryName);
+		error (WARNING | PERROR, "cannot open input file \"%s\"", entryName);
 	else if (status->isDirectory)
 		resize = recurseIntoDirectory (entryName);
 	else if (! status->isNormalFile)
@@ -357,10 +371,10 @@ static clock_t clock (void)
 
 static void printTotals (const clock_t *const timeStamps)
 {
-	const unsigned long totalTags = TagFile.numTags.added +
-									TagFile.numTags.prev;
+	const unsigned long totalTags = numTagsTotal();
+	const unsigned long addedTags = numTagsAdded();
 
-	fprintf (errout, "%ld file%s, %ld line%s (%ld kB) scanned",
+	fprintf (stderr, "%ld file%s, %ld line%s (%ld kB) scanned",
 			Totals.files, plural (Totals.files),
 			Totals.lines, plural (Totals.lines),
 			Totals.bytes/1024L);
@@ -369,33 +383,33 @@ static void printTotals (const clock_t *const timeStamps)
 		const double interval = ((double) (timeStamps [1] - timeStamps [0])) /
 								CLOCKS_PER_SEC;
 
-		fprintf (errout, " in %.01f seconds", interval);
+		fprintf (stderr, " in %.01f seconds", interval);
 		if (interval != (double) 0.0)
-			fprintf (errout, " (%lu kB/s)",
+			fprintf (stderr, " (%lu kB/s)",
 					(unsigned long) (Totals.bytes / interval) / 1024L);
 	}
 #endif
-	fputc ('\n', errout);
+	fputc ('\n', stderr);
 
-	fprintf (errout, "%lu tag%s added to tag file",
-			TagFile.numTags.added, plural (TagFile.numTags.added));
+	fprintf (stderr, "%lu tag%s added to tag file",
+			addedTags, plural(addedTags));
 	if (Option.append)
-		fprintf (errout, " (now %lu tags)", totalTags);
-	fputc ('\n', errout);
+		fprintf (stderr, " (now %lu tags)", totalTags);
+	fputc ('\n', stderr);
 
 	if (totalTags > 0  &&  Option.sorted != SO_UNSORTED)
 	{
-		fprintf (errout, "%lu tag%s sorted", totalTags, plural (totalTags));
+		fprintf (stderr, "%lu tag%s sorted", totalTags, plural (totalTags));
 #ifdef CLOCK_AVAILABLE
-		fprintf (errout, " in %.02f seconds",
+		fprintf (stderr, " in %.02f seconds",
 				((double) (timeStamps [2] - timeStamps [1])) / CLOCKS_PER_SEC);
 #endif
-		fputc ('\n', errout);
+		fputc ('\n', stderr);
 	}
 
 #ifdef DEBUG
-	fprintf (errout, "longest tag line = %lu\n",
-			(unsigned long) TagFile.max.line);
+	fprintf (stderr, "longest tag line = %lu\n",
+		 (unsigned long) maxTagsLine ());
 #endif
 }
 
@@ -456,6 +470,22 @@ static void makeTags (cookedArgs *args)
 #undef timeStamp
 }
 
+static boolean isSafeVar (const char* var)
+{
+	const char *safe_vars[] = {
+		"BASH_FUNC_module()=",
+		"BASH_FUNC_scl()=",
+		NULL
+	};
+	const char *sv;
+
+	for (sv = safe_vars[0]; sv != NULL; sv++)
+		if (strncmp(var, sv, strlen (sv)) == 0)
+			return TRUE;
+
+	return FALSE;
+}
+
 static void sanitizeEnviron (void)
 {
 	char **e = NULL;
@@ -485,6 +515,8 @@ static void sanitizeEnviron (void)
 		value++;
 		if (!strncmp (value, "() {", 4))
 		{
+			if (isSafeVar (e [i]))
+				continue;
 			error (WARNING, "reset environment: %s", e [i]);
 			value [0] = '\0';
 		}
@@ -503,6 +535,7 @@ extern int main (int __unused__ argc, char **argv)
 	setExecutableName (*argv++);
 	sanitizeEnviron ();
 	checkRegex ();
+	initFieldDescs ();
 
 	args = cArgNewFromArgv (argv);
 	previewFirstOption (args);
@@ -513,7 +546,6 @@ extern int main (int __unused__ argc, char **argv)
 	verbose ("Reading initial options from command line\n");
 	parseCmdlineOptions (args);
 	checkOptions ();
-	unifyLanguageMaps ();
 	makeTags (args);
 
 	/*  Clean up.
@@ -521,7 +553,7 @@ extern int main (int __unused__ argc, char **argv)
 	cArgDelete (args);
 	freeKeywordTable ();
 	freeRoutineResources ();
-	freeSourceFileResources ();
+	freeInputFileResources ();
 	freeTagFileResources ();
 	freeOptionResources ();
 	freeParserResources ();

@@ -1,0 +1,4 @@
+[C] enabling: f  function definitions
+[C] disbaling: f  function definitions [off]
+[C++] enabling: f  function definitions
+[C++] disbaling: f  function definitions

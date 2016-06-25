@@ -2,7 +2,7 @@
  *   Copyright (c) 2015, Miloslav Nenadál <nenadalm@gmail.com>
  *
  *   This source code is released for free distribution under the terms of the
- *   GNU General Public License.
+ *   GNU General Public License version 2 or (at your option) any later version.
  *
  *   This module contains code for generating tags for the Clojure language.
  */
@@ -13,6 +13,7 @@
 
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 #include "entry.h"
 
@@ -66,16 +67,14 @@ static int makeNamespaceTag (vString * const name, const char *dbp)
 	if (vStringLength (name) > 0 && ClojureKinds[K_NAMESPACE].enabled)
 	{
 		tagEntryInfo e;
-		initTagEntry (&e, vStringValue (name));
-		e.lineNumber = getSourceLineNumber ();
+		initTagEntry (&e, vStringValue (name), &(ClojureKinds[K_NAMESPACE]));
+		e.lineNumber = getInputLineNumber ();
 		e.filePosition = getInputFilePosition ();
-		e.kindName = ClojureKinds[K_NAMESPACE].name;
-		e.kind = (char) ClojureKinds[K_NAMESPACE].letter;
 
 		return makeTagEntry (&e);
 	}
 	else
-		return SCOPE_NIL;
+		return CORK_NIL;
 }
 
 static void makeFunctionTag (vString * const name, const char *dbp, int scope_index)
@@ -84,11 +83,9 @@ static void makeFunctionTag (vString * const name, const char *dbp, int scope_in
 	if (vStringLength (name) > 0 && ClojureKinds[K_FUNCTION].enabled)
 	{
 		tagEntryInfo e;
-		initTagEntry (&e, vStringValue (name));
-		e.lineNumber = getSourceLineNumber ();
+		initTagEntry (&e, vStringValue (name), &(ClojureKinds[K_FUNCTION]));
+		e.lineNumber = getInputLineNumber ();
 		e.filePosition = getInputFilePosition ();
-		e.kindName = ClojureKinds[K_FUNCTION].name;
-		e.kind = (char) ClojureKinds[K_FUNCTION].letter;
 
 		e.extensionFields.scopeIndex =  scope_index;
 		makeTagEntry (&e);
@@ -107,9 +104,9 @@ static void findClojureTags (void)
 {
 	vString *name = vStringNew ();
 	const char *p;
-	int scope_index = SCOPE_NIL;
+	int scope_index = CORK_NIL;
 
-	while ((p = (char *)fileReadLine ()) != NULL)
+	while ((p = (char *)readLineFromInputFile ()) != NULL)
 	{
 		vStringClear (name);
 
@@ -144,7 +141,7 @@ extern parserDefinition *ClojureParser (void)
 
 	parserDefinition *def = parserNew ("Clojure");
 	def->kinds = ClojureKinds;
-	def->kindCount = KIND_COUNT (ClojureKinds);
+	def->kindCount = ARRAY_SIZE (ClojureKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findClojureTags;

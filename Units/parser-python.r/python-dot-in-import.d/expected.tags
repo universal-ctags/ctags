@@ -1,0 +1,12 @@
+A.B	input.py	/^from A.B import C as D$/;"	i	role:namespace
+C	input.py	/^from A.B import C as D$/;"	x	role:indirectly-imported
+D	input.py	/^from A.B import C as D$/;"	x
+.	input.py	/^from . import E$/;"	i	role:namespace
+E	input.py	/^from . import E$/;"	x	role:imported
+.F	input.py	/^from .F import G$/;"	i	role:namespace
+G	input.py	/^from .F import G$/;"	x	role:imported
+H.I	input.py	/^import H.I$/;"	i	role:imported
+.J.K	input.py	/^from .J.K import L$/;"	i	role:namespace
+L	input.py	/^from .J.K import L$/;"	x	role:imported
+..M.N	input.py	/^from ..M.N import O$/;"	i	role:namespace
+O	input.py	/^from ..M.N import O$/;"	x	role:imported

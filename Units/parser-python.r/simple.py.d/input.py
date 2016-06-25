@@ -29,11 +29,8 @@ class one:
     def public_function(self, key):
         class this_is_ignored:
 
-    def _pack(self, i, s): '''this is''' """a""" '''string
-        literal'''"""
-        class inside_string:
-        """
-
+    def _pack(self, key):
+        pass
     class so_is_this:
 
 def _test(test, code, outcome, exception):

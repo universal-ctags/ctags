@@ -1,0 +1,1 @@
+y	input.c	/^       void y(void) {}$/;"	f	typeref:typename:void

@@ -1,0 +1,22 @@
+FOUR	input.cpp	/^#define FOUR /;"	d	file:
+memb1	input.cpp	/^struct typ1 { int memb1; };$/;"	m	struct:typ1	typeref:typename:int	file:
+memb2	input.cpp	/^struct typ2 { int memb2; };$/;"	m	struct:typ2	typeref:typename:int	file:
+memb3	input.cpp	/^struct typ3 { int memb3; };$/;"	m	struct:typ3	typeref:typename:int	file:
+memb4	input.cpp	/^struct typ4 { int memb4; };$/;"	m	struct:typ4	typeref:typename:int	file:
+memb5	input.cpp	/^struct typ5 { int memb5; };$/;"	m	struct:typ5	typeref:typename:int	file:
+memb6	input.cpp	/^struct typ6 { int memb6; };$/;"	m	struct:typ6	typeref:typename:int	file:
+memb7	input.cpp	/^struct typ7 { int memb7; };$/;"	m	struct:typ7	typeref:typename:int	file:
+str1	input.cpp	/^static const char* str1 = R"blah($/;"	v	typeref:typename:const char *	file:
+str2	input.cpp	/^static const char* str2 = R"blah($/;"	v	typeref:typename:const char *	file:
+str3	input.cpp	/^static const char* str3 = FOUR"f(iv)e";$/;"	v	typeref:typename:const char *	file:
+str4	input.cpp	/^static const char* str4 = LR"blah(";int bug4;)blah";$/;"	v	typeref:typename:const char *	file:
+str5	input.cpp	/^static const char* str5 = u8R"blah(";int bug5;)blah";$/;"	v	typeref:typename:const char *	file:
+str6	input.cpp	/^static const char* str6 = uR"blah(";int bug6;)blah";$/;"	v	typeref:typename:const char *	file:
+str7	input.cpp	/^static const char* str7 = UR"blah(";int bug7;)blah";$/;"	v	typeref:typename:const char *	file:
+typ1	input.cpp	/^struct typ1 { int memb1; };$/;"	s	file:
+typ2	input.cpp	/^struct typ2 { int memb2; };$/;"	s	file:
+typ3	input.cpp	/^struct typ3 { int memb3; };$/;"	s	file:
+typ4	input.cpp	/^struct typ4 { int memb4; };$/;"	s	file:
+typ5	input.cpp	/^struct typ5 { int memb5; };$/;"	s	file:
+typ6	input.cpp	/^struct typ6 { int memb6; };$/;"	s	file:
+typ7	input.cpp	/^struct typ7 { int memb7; };$/;"	s	file:

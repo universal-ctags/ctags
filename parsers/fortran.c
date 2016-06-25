@@ -2,7 +2,7 @@
 *   Copyright (c) 1998-2003, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for Fortran language
 *   files.
@@ -25,6 +25,7 @@
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
+#include "xtag.h"
 
 /*
 *   MACROS
@@ -142,14 +143,6 @@ typedef enum eKeywordId {
 	KEYWORD_while
 } keywordId;
 
-/*  Used to determine whether keyword is valid for the token language and
- *  what its ID is.
- */
-typedef struct sKeywordDesc {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
 	TOKEN_EOF,
@@ -211,7 +204,7 @@ typedef struct sTokenInfo {
 	boolean isMethod;
 	struct sTokenInfo *secondary;
 	unsigned long lineNumber;
-	fpos_t filePosition;
+	MIOPos filePosition;
 } tokenInfo;
 
 /*
@@ -227,7 +220,7 @@ static boolean ParsingString;
 
 /* indexed by tagType */
 static kindOption FortranKinds [] = {
-	{ TRUE,  'b', "block data", "block data"},
+	{ TRUE,  'b', "blockData",  "block data"},
 	{ TRUE,  'c', "common",     "common blocks"},
 	{ TRUE,  'e', "entry",      "entry points"},
 	{ TRUE,  'E', "enum",       "enumerations"},
@@ -255,7 +248,7 @@ static kindOption FortranKinds [] = {
  * http://h18009.www1.hp.com/fortran/docs/lrm/dflrm.htm
  */
 
-static const keywordDesc FortranKeywordTable [] = {
+static const keywordTable FortranKeywordTable [] = {
 	/* keyword          keyword ID */
 	{ "abstract",       KEYWORD_abstract     },
 	{ "allocatable",    KEYWORD_allocatable  },
@@ -446,18 +439,6 @@ static boolean insideInterface (void)
 	return result;
 }
 
-static void buildFortranKeywordHash (void)
-{
-	const size_t count =
-			sizeof (FortranKeywordTable) / sizeof (FortranKeywordTable [0]);
-	size_t i;
-	for (i = 0  ;  i < count  ;  ++i)
-	{
-		const keywordDesc* const p = &FortranKeywordTable [i];
-		addKeyword (p->name, Lang_fortran, (int) p->id);
-	}
-}
-
 /*
 *   Tag generation functions
 */
@@ -474,7 +455,7 @@ static tokenInfo *newToken (void)
 	token->signature    = NULL;
 	token->implementation = IMP_DEFAULT;
 	token->isMethod     = FALSE;
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	return token;
@@ -515,7 +496,7 @@ static boolean includeTag (const tagType type)
 	Assert (type != TAG_UNDEFINED);
 	include = FortranKinds [(int) type].enabled;
 	if (include && isFileScope (type))
-		include = Option.include.fileScope;
+		include = isXtagEnabled(XTAG_FILE_SCOPE);
 	return include;
 }
 
@@ -524,7 +505,7 @@ static const char *implementationString (const impType imp)
 	static const char *const names [] ={
 		"?", "abstract", "deferred", "non_overridable"
 	};
-	Assert (sizeof (names) / sizeof (names [0]) == IMP_COUNT);
+	Assert (ARRAY_SIZE (names) == IMP_COUNT);
 	Assert ((int) imp < IMP_COUNT);
 	return names [(int) imp];
 }
@@ -537,7 +518,7 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 		const char *const name = vStringValue (token->string);
 		tagEntryInfo e;
 
-		initTagEntry (&e, name);
+		initTagEntry (&e, name, &(FortranKinds [token->tag]));
 
 		if (token->tag == TAG_COMMON_BLOCK)
 			e.lineNumberEntry = (boolean) (Option.locate != EX_PATTERN);
@@ -545,8 +526,8 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
 		e.isFileScope	= isFileScope (token->tag);
-		e.kindName		= FortranKinds [token->tag].name;
-		e.kind			= FortranKinds [token->tag].letter;
+		if (e.isFileScope)
+			markTagExtraBit (&e, XTAG_FILE_SCOPE);
 		e.truncateLine	= (boolean) (token->tag != TAG_LABEL);
 
 		if (ancestorCount () > 0)
@@ -554,8 +535,8 @@ static void makeFortranTag (tokenInfo *const token, tagType tag)
 			const tokenInfo* const scope = ancestorScope ();
 			if (scope != NULL)
 			{
-				e.extensionFields.scope [0] = FortranKinds [scope->tag].name;
-				e.extensionFields.scope [1] = vStringValue (scope->string);
+				e.extensionFields.scopeKind = &(FortranKinds [scope->tag]);
+				e.extensionFields.scopeName = vStringValue (scope->string);
 			}
 		}
 		if (token->parentType != NULL &&
@@ -584,7 +565,7 @@ static int skipLine (void)
 	int c;
 
 	do
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	while (c != EOF  &&  c != '\n');
 
 	return c;
@@ -607,7 +588,7 @@ static lineType getLineType (void)
 
 	do  /* read in first 6 "margin" characters */
 	{
-		int c = fileGetc ();
+		int c = getcFromInputFile ();
 
 		/* 3.2.1  Comment_Line.  A comment line is any line that contains
 		 * a C or an asterisk in column 1, or contains only blank characters
@@ -689,7 +670,7 @@ static int getFixedFormChar (void)
 		else
 #endif
 		{
-			c = fileGetc ();
+			c = getcFromInputFile ();
 			++Column;
 		}
 		if (c == '\n')
@@ -705,11 +686,11 @@ static int getFixedFormChar (void)
 		}
 		else if (c == '&')  /* check for free source form */
 		{
-			const int c2 = fileGetc ();
+			const int c2 = getcFromInputFile ();
 			if (c2 == '\n')
 				FreeSourceFormFound = TRUE;
 			else
-				fileUngetc (c2);
+				ungetcToInputFile (c2);
 		}
 	}
 	while (Column == 0)
@@ -746,14 +727,14 @@ static int getFixedFormChar (void)
 				Column = 5;
 				do
 				{
-					c = fileGetc ();
+					c = getcFromInputFile ();
 					++Column;
 				} while (isBlank (c));
 				if (c == '\n')
 					Column = 0;
 				else if (Column > 6)
 				{
-					fileUngetc (c);
+					ungetcToInputFile (c);
 					c = ' ';
 				}
 				break;
@@ -769,7 +750,7 @@ static int skipToNextLine (void)
 {
 	int c = skipLine ();
 	if (c != EOF)
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	return c;
 }
 
@@ -777,7 +758,7 @@ static int getFreeFormChar (void)
 {
 	static boolean newline = TRUE;
 	boolean advanceLine = FALSE;
-	int c = fileGetc ();
+	int c = getcFromInputFile ();
 
 	/* If the last nonblank, non-comment character of a FORTRAN 90
 	 * free-format text line is an ampersand then the next non-comment
@@ -786,7 +767,7 @@ static int getFreeFormChar (void)
 	if (c == '&')
 	{
 		do
-			c = fileGetc ();
+			c = getcFromInputFile ();
 		while (isspace (c)  &&  c != '\n');
 		if (c == '\n')
 		{
@@ -797,7 +778,7 @@ static int getFreeFormChar (void)
 			advanceLine = TRUE;
 		else
 		{
-			fileUngetc (c);
+			ungetcToInputFile (c);
 			c = '&';
 		}
 	}
@@ -806,7 +787,7 @@ static int getFreeFormChar (void)
 	while (advanceLine)
 	{
 		while (isspace (c))
-			c = fileGetc ();
+			c = getcFromInputFile ();
 		if (c == '!' || (newline && c == '#'))
 		{
 			c = skipToNextLine ();
@@ -814,7 +795,7 @@ static int getFreeFormChar (void)
 			continue;
 		}
 		if (c == '&')
-			c = fileGetc ();
+			c = getcFromInputFile ();
 		else
 			advanceLine = FALSE;
 	}
@@ -877,15 +858,12 @@ static vString *parseInteger (int c)
 
 static vString *parseNumeric (int c)
 {
-	vString *string = vStringNew ();
-	vString *integer = parseInteger (c);
-	vStringCopy (string, integer);
-	vStringDelete (integer);
+	vString *string = parseInteger (c);
 
 	c = getChar ();
 	if (c == '.')
 	{
-		integer = parseInteger ('\0');
+		vString *integer = parseInteger ('\0');
 		vStringPut (string, c);
 		vStringCat (string, integer);
 		vStringDelete (integer);
@@ -893,7 +871,7 @@ static vString *parseNumeric (int c)
 	}
 	if (tolower (c) == 'e')
 	{
-		integer = parseInteger ('\0');
+		vString *integer = parseInteger ('\0');
 		vStringPut (string, c);
 		vStringCat (string, integer);
 		vStringDelete (integer);
@@ -1018,7 +996,7 @@ static void readToken (tokenInfo *const token)
 getNextChar:
 	c = getChar ();
 
-	token->lineNumber	= getSourceLineNumber ();
+	token->lineNumber	= getInputLineNumber ();
 	token->filePosition	= getInputFilePosition ();
 
 	switch (c)
@@ -2077,7 +2055,8 @@ static void parseEnumBlock (tokenInfo *const token)
 		makeFortranTag (name, TAG_ENUM);
 	skipToNextStatement (token);
 	ancestorPush (name);
-	while (! isKeyword (token, KEYWORD_end))
+	while (! isKeyword (token, KEYWORD_end) &&
+		   ! isType(token, TOKEN_EOF))
 	{
 		if (isTypeSpec (token))
 			parseTypeDeclarationStmt (token);
@@ -2444,7 +2423,6 @@ static void parseSubprogramFull (tokenInfo *const token, const tagType tag)
 	{
 		tokenInfo* name = newTokenFrom (token);
 		if (tag == TAG_SUBROUTINE ||
-			tag == TAG_SUBROUTINE ||
 			tag == TAG_PROTOTYPE)
 			name->signature = parseSignature (token);
 		makeFortranTag (name, tag);
@@ -2585,7 +2563,6 @@ static rescanReason findFortranTags (const unsigned int passCount)
 static void initialize (const langType language)
 {
 	Lang_fortran = language;
-	buildFortranKeywordHash ();
 }
 
 extern parserDefinition* FortranParser (void)
@@ -2599,10 +2576,12 @@ extern parserDefinition* FortranParser (void)
 	};
 	parserDefinition* def = parserNew ("Fortran");
 	def->kinds      = FortranKinds;
-	def->kindCount  = KIND_COUNT (FortranKinds);
+	def->kindCount  = ARRAY_SIZE (FortranKinds);
 	def->extensions = extensions;
 	def->parser2    = findFortranTags;
 	def->initialize = initialize;
+	def->keywordTable = FortranKeywordTable;
+	def->keywordCount = ARRAY_SIZE (FortranKeywordTable);
 	return def;
 }
 

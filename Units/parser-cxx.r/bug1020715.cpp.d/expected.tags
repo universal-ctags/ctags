@@ -1,0 +1,1 @@
+f	input.cpp	/^void f() {$/;"	f	typeref:typename:void

@@ -1,0 +1,11 @@
+# -*-Shell-script-*-
+
+#
+# This is found in /etc/init.d/functions of Fedora23.
+#
+# This test case is special as as case for modeline
+# testing:
+#
+# 1. No whitespace between modename and -*-, and
+# 2. Capitalized
+#

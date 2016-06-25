@@ -1,0 +1,24 @@
+module Altsteps
+{
+
+    altstep alt_guard () runs on CoffeeMachine
+    {
+        [] guard.timeout { setverdict( fail ) }
+    }
+
+    altstep alt_catchAnything ()
+        runs on CoffeeMachine
+    {
+        [] CoffeePort.receive(?) { 
+        setverdict( fail )
+        }
+    }
+
+    function activateAltsteps ()
+        runs on CoffeeMachine 
+    {
+      activate(alt_guard())
+      activate(alt_catchAnything())
+    }
+
+}

@@ -1,0 +1,7 @@
+A	input.cpp	/^class A : public T$/;"	class	file:	inherits:T	template:<typename T=void,bool B1=true>
+this_type	input.cpp	/^    typedef A<T, B1> this_type;$/;"	typedef	scope:class:A	typeref:typename:A<T,B1>	file:
+A	input.cpp	/^    A(int i ) : m_i(i)$/;"	function	scope:class:A	file:	signature:(int i)
+create	input.cpp	/^    static A create(int i)$/;"	function	scope:class:A	typeref:typename:A	file:	signature:(int i)	properties:static
+g_i	input.cpp	/^    static int g_i;$/;"	member	scope:class:A	typeref:typename:int	file:	properties:static
+m_i	input.cpp	/^    int m_i;$/;"	member	scope:class:A	typeref:typename:int	file:
+g_i	input.cpp	/^int A<T, B1>::g_i; \/\/ (3) fail during parsing static member definition/;"	member	scope:class:A<T, B1>	typeref:typename:int

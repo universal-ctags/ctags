@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+<dict>
+	<key>A</key>
+	<string>v0</string>
+	<key>B</key>
+	<dict>
+		<key>C</key>
+		<string>v1</string>
+	</dict>
+	<key>D</key>
+	<array>
+	  <dict>
+	    <key>E</key>
+	    <string>v2</string>
+	    <key>F</key>
+	    <array>
+	      <dict>
+		<string>v3</string>
+		<key>G</key>
+		<string>v4</string>
+	      </dict>
+	    </array>
+	  </dict>
+	</array>
+</dict>
+</plist>

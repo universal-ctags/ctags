@@ -4,7 +4,7 @@
  *   Copyright (c) 2000-2006, Darren Hiebert, Elias Pschernig
  *
  *   This source code is released for free distribution under the terms of the
- *   GNU General Public License.
+ *   GNU General Public License version 2 or (at your option) any later version.
  *
  *   This module contains functions for generating tags for BlitzBasic
  *   (BlitzMax), PureBasic and FreeBasic language files. For now, this is kept
@@ -155,7 +155,7 @@ static void match_dot_label (char const *p)
 static void findBasicTags (void)
 {
 	const char *line;
-	const char *extension = fileExtension (vStringValue (File.name));
+	const char *extension = fileExtension (getInputFileName ());
 	KeyWord *keywords;
 
 	if (strcmp (extension, "bb") == 0)
@@ -165,7 +165,7 @@ static void findBasicTags (void)
 	else
 		keywords = freebasic_keywords;
 
-	while ((line = (const char *) fileReadLine ()) != NULL)
+	while ((line = (const char *) readLineFromInputFile ()) != NULL)
 	{
 		const char *p = line;
 		KeyWord const *kw;
@@ -194,7 +194,7 @@ parserDefinition *BasicParser (void)
 	static char const *extensions[] = { "bas", "bi", "bb", "pb", NULL };
 	parserDefinition *def = parserNew ("Basic");
 	def->kinds = BasicKinds;
-	def->kindCount = KIND_COUNT (BasicKinds);
+	def->kindCount = ARRAY_SIZE (BasicKinds);
 	def->extensions = extensions;
 	def->parser = findBasicTags;
 	return def;

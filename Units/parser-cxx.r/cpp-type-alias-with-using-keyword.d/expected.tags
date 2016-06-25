@@ -1,0 +1,2 @@
+Integer	input.cpp	/^using Integer = int;$/;"	t	typeref:typename:int	file:
+Vector	input.cpp	/^using Vector = std::vector<T>;$/;"	t	typeref:typename:std::vector<T>	file:

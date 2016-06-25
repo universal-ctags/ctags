@@ -2,7 +2,7 @@
 *   Copyright (c) 2002, Venkatesh Prasad Ranganath and Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for SML language files.
 */
@@ -14,9 +14,11 @@
 
 #include <string.h>
 
+#include "debug.h"
 #include "entry.h"
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -31,7 +33,8 @@ typedef enum {
 	K_SIGNATURE,
 	K_STRUCTURE,
 	K_TYPE,
-	K_VAL
+	K_VAL,
+	K_COUNT			/* must be last */
 } smlKind;
 
 /*
@@ -73,12 +76,11 @@ static void makeSmlTag (smlKind type, vString *name)
 {
 	tagEntryInfo tag;
 
+	Assert (0 <= type && type < K_COUNT);
 	if (! SmlKinds [type].enabled)
 		return;
 
-	initTagEntry (&tag, vStringValue (name));
-	tag.kindName = SmlKinds [type].name;
-	tag.kind = SmlKinds [type].letter;
+	initTagEntry (&tag, vStringValue (name), &(SmlKinds [type]));
 	makeTagEntry (&tag);
 }
 
@@ -139,7 +141,7 @@ static smlKind findNextIdentifier (const unsigned char **cp)
 {
 	smlKind result = K_NONE;
 	vString *const identifier = vStringNew ();
-	unsigned int count = sizeof (SmlKeywordTypes) / sizeof (SmlKeywordTypes [0]);
+	unsigned int count = ARRAY_SIZE (SmlKeywordTypes);
 	unsigned int i;
 	*cp = parseIdentifier (*cp, identifier);
 	for (i = 0  ;  i < count  &&  result == K_NONE ;  ++i)
@@ -158,7 +160,7 @@ static void findSmlTags (void)
 	const unsigned char *line;
 	smlKind lastTag = K_NONE;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char *cp = skipSpace (line);
 		do
@@ -181,7 +183,10 @@ static void findSmlTags (void)
 				cp = skipSpace (cp);
 				cp = parseIdentifier (cp, identifier);
 				if (foundTag == K_AND)
-					makeSmlTag (lastTag, identifier);
+				{
+					if (lastTag != K_NONE)
+						makeSmlTag (lastTag, identifier);
+				}
 				else
 				{
 					makeSmlTag (foundTag, identifier);
@@ -205,7 +210,7 @@ extern parserDefinition *SmlParser (void)
 	static const char *const extensions[] = { "sml", "sig", NULL };
 	parserDefinition *def = parserNew ("SML");
 	def->kinds = SmlKinds;
-	def->kindCount = KIND_COUNT (SmlKinds);
+	def->kindCount = ARRAY_SIZE (SmlKinds);
 	def->extensions = extensions;
 	def->parser = findSmlTags;
 	return def;

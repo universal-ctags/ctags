@@ -1,0 +1,3 @@
+private	input.h	/^extern int private;$/;"	x	typeref:typename:int
+protected	input.h	/^typedef int protected;$/;"	t	typeref:typename:int
+public	input.h	/^static inline int public(void)$/;"	f	typeref:typename:int

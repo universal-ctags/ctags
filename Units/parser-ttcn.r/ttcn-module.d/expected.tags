@@ -1,0 +1,6 @@
+Example	input.ttcn	/^module Example$/;"	M
+Par_One	input.ttcn	/^        integer Par_One, Par_Two;$/;"	P
+Par_Two	input.ttcn	/^        integer Par_One, Par_Two;$/;"	P
+Par_Three	input.ttcn	/^        boolean Par_Three := true$/;"	P
+Example2	input.ttcn	/^module Example2$/;"	M
+moduleName	input.ttcn	/^    modulepar charstring moduleName := "CoffeeMachine"$/;"	P

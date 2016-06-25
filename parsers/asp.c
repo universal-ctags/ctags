@@ -2,7 +2,7 @@
 *   Copyright (c) 2000, Patrick Dehne <patrick@steidle.net>
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for the ASP (Active
 *   Server Pages) web page scripting language.
@@ -17,6 +17,7 @@
 
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -43,7 +44,7 @@ static void findAspTags (void)
 	vString *name = vStringNew ();
 	const unsigned char *line;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char *cp = line;
 
@@ -316,7 +317,7 @@ extern parserDefinition* AspParser (void)
 	static const char *const extensions [] = { "asp", "asa", NULL };
 	parserDefinition* def = parserNew ("Asp");
 	def->kinds      = AspKinds;
-	def->kindCount  = KIND_COUNT (AspKinds);
+	def->kindCount  = ARRAY_SIZE (AspKinds);
 	def->extensions = extensions;
 	def->parser     = findAspTags;
 	return def;

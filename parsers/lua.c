@@ -2,7 +2,7 @@
 *   Copyright (c) 2000-2001, Max Ischenko <mfi@ukr.net>.
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for Lua language.
 */
@@ -17,6 +17,7 @@
 #include "options.h"
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -130,7 +131,7 @@ static void findLuaTags (void)
 	vString *name = vStringNew ();
 	const unsigned char *line;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const char *p, *q;
 
@@ -165,7 +166,7 @@ extern parserDefinition* LuaParser (void)
 	static const char* const extensions [] = { "lua", NULL };
 	parserDefinition* def = parserNew ("Lua");
 	def->kinds      = LuaKinds;
-	def->kindCount  = KIND_COUNT (LuaKinds);
+	def->kindCount  = ARRAY_SIZE (LuaKinds);
 	def->extensions = extensions;
 	def->parser     = findLuaTags;
 	return def;

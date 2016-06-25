@@ -2,7 +2,7 @@
 *   Copyright (c) 1998-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions supporting resizeable strings.
 */
@@ -139,7 +139,7 @@ extern void vStringNCatS (
 	const char *p = s;
 	size_t remain = length;
 
-	while (*p != '\0'  &&  remain > 0)
+	while (remain > 0 && *p != '\0')
 	{
 		vStringPut (string, *p);
 		--remain;
@@ -153,6 +153,10 @@ extern void vStringNCatS (
 extern void vStringStripNewline (vString *const string)
 {
 	const size_t final = string->length - 1;
+
+	if (string->length == 0)
+		return;
+
 	if (string->buffer [final] == '\n')
 	{
 		string->buffer [final] = '\0';
@@ -263,6 +267,89 @@ extern char    *vStringDeleteUnwrap       (vString *const string)
 	return buffer;
 }
 
+static char valueToXDigit (int v)
+{
+	Assert (v >= 0 && v <= 0xF);
 
+	if (v >= 0xA)
+		return 'A' + (v - 0xA);
+	else
+		return '0' + v;
+}
+
+extern void vStringCatSWithEscaping (vString* b, const char *s)
+{
+	for(; *s; s++)
+	{
+		int c = *s;
+
+		/* escape control characters (incl. \t) */
+		if ((c > 0x00 && c <= 0x1F) || c == 0x7F || c == '\\')
+		{
+			vStringPut (b, '\\');
+
+			switch (c)
+			{
+				/* use a short form for known escapes */
+			case '\a':
+				c = 'a'; break;
+			case '\b':
+				c = 'b'; break;
+			case '\t':
+				c = 't'; break;
+			case '\n':
+				c = 'n'; break;
+			case '\v':
+				c = 'v'; break;
+			case '\f':
+				c = 'f'; break;
+			case '\r':
+				c = 'r'; break;
+			case '\\':
+				c = '\\'; break;
+			default:
+				vStringPut (b, 'x');
+				vStringPut (b, valueToXDigit ((c & 0xF0) >> 4));
+				vStringPut (b, valueToXDigit (c & 0x0F));
+				continue;
+			}
+		}
+		vStringPut (b, c);
+	}
+}
+
+extern void vStringCatSWithEscapingAsPattern (vString *output, const char* input)
+{
+	while (*input)
+	{
+		switch (*input)
+		{
+		case '\\':
+			vStringPut(output, '\\');
+			vStringPut(output, '\\');
+			break;
+		case '/':
+			vStringPut(output, '\\');
+			vStringPut(output, '/');
+			break;
+		default:
+			vStringPut(output, *input);
+			break;
+
+		}
+		input++;
+	}
+}
+
+extern vString *vStringNewOrClear (vString *const string)
+{
+	if (string)
+	{
+		vStringClear (string);
+		return string;
+	}
+	else
+		return vStringNew ();
+}
 
 /* vi:set tabstop=4 shiftwidth=4: */

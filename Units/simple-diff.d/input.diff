@@ -1,0 +1,170 @@
+diff --git a/main/parsers.h b/main/parsers.h
+index 8000fa0..5332052 100644
+--- a/main/parsers.h
++++ b/main/parsers.h
+@@ -28,6 +28,7 @@
+ 	CsharpParser, \
+ 	CobolParser, \
+ 	DParser, \
++	DiffParser, \
+ 	DosBatchParser, \
+ 	EiffelParser, \
+ 	ErlangParser, \
+diff --git a/parsers/diff.c b/parsers/diff.c
+new file mode 100644
+index 0000000..a1bf5f3
+--- /dev/null
++++ b/parsers/diff.c
+@@ -0,0 +1,134 @@
++/*
++*
++*   Copyright (c) 2000-2001, Darren Hiebert
++*
++*   This source code is released for free distribution under the terms of the
++*   GNU General Public License.
++*
++*   This module contains functions for generating tags for diff files (based on Sh parser).
++*/
++
++/*
++*   INCLUDE FILES
++*/
++#include "general.h"	/* must always come first */
++
++#include <ctype.h>
++#include <string.h>
++
++#include "parse.h"
++#include "read.h"
++#include "vstring.h"
++
++/*
++*   DATA DEFINITIONS
++*/
++typedef enum {
++	K_FUNCTION
++} diffKind;
++
++static kindOption DiffKinds [] = {
++	{ TRUE, 'f', "compared file", "compared files"}
++};
++
++enum {
++	DIFF_DELIM_MINUS = 0,
++	DIFF_DELIM_PLUS
++};
++
++static const char *DiffDelims[2] = {
++	"--- ",
++	"+++ "
++};
++
++/*
++*   FUNCTION DEFINITIONS
++*/
++
++static const unsigned char *stripAbsolute (const unsigned char *filename)
++{
++	const unsigned char *tmp;
++
++	/* strip any absolute path */
++	if (*filename == '/' || *filename == '\\')
++	{
++		boolean skipSlash = TRUE;
++
++		tmp = (const unsigned char*) strrchr ((const char*) filename,  '/');
++		if (tmp == NULL)
++		{	/* if no / is contained try \ in case of a Windows filename */
++			tmp = (const unsigned char*) strrchr ((const char*) filename, '\\');
++			if (tmp == NULL)
++			{	/* last fallback, probably the filename doesn't contain a path, so take it */
++				tmp = filename;
++				skipSlash = FALSE;
++			}
++		}
++
++		/* skip the leading slash or backslash */
++		if (skipSlash)
++			tmp++;
++	}
++	else
++		tmp = filename;
++
++	return tmp;
++}
++
++static void findDiffTags (void)
++{
++	vString *filename = vStringNew ();
++	const unsigned char *line, *tmp;
++	int delim = DIFF_DELIM_MINUS;
++
++	while ((line = fileReadLine ()) != NULL)
++	{
++		const unsigned char* cp = line;
++
++		if (strncmp ((const char*) cp, DiffDelims[delim], 4u) == 0)
++		{
++			cp += 4;
++			if (isspace ((int) *cp)) continue;
++			/* when original filename is /dev/null use the new one instead */
++			if (delim == DIFF_DELIM_MINUS &&
++				strncmp ((const char*) cp, "/dev/null", 9u) == 0 &&
++				(cp[9] == 0 || isspace (cp[9])))
++			{
++				delim = DIFF_DELIM_PLUS;
++				continue;
++			}
++
++			tmp = stripAbsolute (cp);
++
++			if (tmp != NULL)
++			{
++				while (! isspace(*tmp) && *tmp != '\0')
++				{
++					vStringPut(filename, *tmp);
++					tmp++;
++				}
++
++				vStringTerminate(filename);
++				makeSimpleTag (filename, DiffKinds, K_FUNCTION);
++				vStringClear (filename);
++			}
++
++			/* restore default delim */
++			delim = DIFF_DELIM_MINUS;
++		}
++	}
++	vStringDelete (filename);
++}
++
++extern parserDefinition* DiffParser (void)
++{
++	static const char *const extensions [] = { "diff", "patch", NULL };
++	parserDefinition* const def = parserNew ("Diff");
++	def->kinds      = DiffKinds;
++	def->kindCount  = KIND_COUNT (DiffKinds);
++	def->extensions = extensions;
++	def->parser     = findDiffTags;
++	return def;
++}
++
++/* vi:set tabstop=8 shiftwidth=4: */
+diff --git a/source.mak b/source.mak
+index 2550028..eaa9154 100644
+--- a/source.mak
++++ b/source.mak
+@@ -44,6 +44,7 @@ PARSER_SOURCES =				\
+ 	$(PARSER_DIR)/clojure.c			\
+ 	$(PARSER_DIR)/css.c			\
+ 	$(PARSER_DIR)/cobol.c			\
++	$(PARSER_DIR)/diff.c			\
+ 	$(PARSER_DIR)/dosbatch.c		\
+ 	$(PARSER_DIR)/eiffel.c			\
+ 	$(PARSER_DIR)/erlang.c			\
+
+--- a/Units/review-needed.r/simple.ksh.t/expected.tags
++++ /dev/null
+@@ -1,2 +0,0 @@
+-f1     input.ksh       /^f1() {$/;"    f
+-f2     input.ksh       /^function f2 {$/;"     f

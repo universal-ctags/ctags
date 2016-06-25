@@ -5,7 +5,7 @@
  *	 Copyright (c) 2012, Jan Larres
  *
  *	 This source code is released for free distribution under the terms of the
- *	 GNU General Public License.
+ *	 GNU General Public License version 2 or (at your option) any later version.
  *
  *	 This module contains functions for generating tags for TeX language files.
  *
@@ -22,6 +22,7 @@
 #ifdef DEBUG
 #include <stdio.h>
 #endif
+#include <string.h>
 
 #include "debug.h"
 #include "entry.h"
@@ -59,14 +60,6 @@ typedef enum eKeywordId {
 	KEYWORD_include
 } keywordId;
 
-/*	Used to determine whether keyword is valid for the token language and
- *	what its ID is.
- */
-typedef struct sKeywordDesc {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
 	TOKEN_CHARACTER,
@@ -90,7 +83,7 @@ typedef struct sTokenInfo {
 	vString *		string;
 	vString *		scope;
 	unsigned long 	lineNumber;
-	fpos_t 			filePosition;
+	MIOPos 			filePosition;
 } tokenInfo;
 
 /*
@@ -132,7 +125,7 @@ static kindOption TexKinds [] = {
 	{ TRUE,  'i', "include",	  	  "includes"		   }
 };
 
-static const keywordDesc TexKeywordTable [] = {
+static const keywordTable TexKeywordTable [] = {
 	/* keyword			keyword ID */
 	{ "part",			KEYWORD_part				},
 	{ "chapter",		KEYWORD_chapter				},
@@ -156,18 +149,6 @@ static boolean isIdentChar (const int c)
 		  c == '_' || c == '#' || c == '-' || c == '.' || c == ':');
 }
 
-static void buildTexKeywordHash (void)
-{
-	const size_t count = sizeof (TexKeywordTable) /
-		sizeof (TexKeywordTable [0]);
-	size_t i;
-	for (i = 0	;  i < count  ;  ++i)
-	{
-		const keywordDesc* const p = &TexKeywordTable [i];
-		addKeyword (p->name, Lang_js, (int) p->id);
-	}
-}
-
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
@@ -176,7 +157,7 @@ static tokenInfo *newToken (void)
 	token->keyword		= KEYWORD_NONE;
 	token->string		= vStringNew ();
 	token->scope		= vStringNew ();
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	return token;
@@ -251,6 +232,17 @@ static void getScopeInfo(texKind kind, vString *const parentKind,
 /*
  *	 Tag generation functions
  */
+static kindOption *kindFromName (const char *kind_name)
+{
+	int i;
+
+	for (i = 0; i < TEXTAG_COUNT; i++)
+	{
+		if ( strcmp (kind_name, TexKinds[i].name) == 0)
+			return &(TexKinds[i]);
+	}
+	return NULL;
+}
 
 static void makeTexTag (tokenInfo *const token, texKind kind)
 {
@@ -260,17 +252,15 @@ static void makeTexTag (tokenInfo *const token, texKind kind)
 		vString *parentKind = vStringNew();
 		vString *parentName = vStringNew();
 		tagEntryInfo e;
-		initTagEntry (&e, name);
+		initTagEntry (&e, name, &(TexKinds [kind]));
 
 		e.lineNumber   = token->lineNumber;
 		e.filePosition = token->filePosition;
-		e.kindName	   = TexKinds [kind].name;
-		e.kind		   = TexKinds [kind].letter;
 
 		getScopeInfo(kind, parentKind, parentName);
 		if (vStringLength(parentKind) > 0) {
-			e.extensionFields.scope [0] = vStringValue(parentKind);
-			e.extensionFields.scope [1] = vStringValue(parentName);
+			e.extensionFields.scopeKind = kindFromName (vStringValue(parentKind));
+			e.extensionFields.scopeName = vStringValue(parentName);
 		}
 
 		makeTagEntry (&e);
@@ -294,12 +284,12 @@ static void parseIdentifier (vString *const string, const int firstChar)
 	do
 	{
 		vStringPut (string, c);
-		c = fileGetc ();
+		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 
 	vStringTerminate (string);
 	if (!isspace (c))
-		fileUngetc (c);		/* unget non-identifier character */
+		ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
 static void readToken (tokenInfo *const token)
@@ -313,8 +303,8 @@ static void readToken (tokenInfo *const token)
 getNextChar:
 	do
 	{
-		c = fileGetc ();
-		token->lineNumber   = getSourceLineNumber ();
+		c = getcFromInputFile ();
+		token->lineNumber   = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 	}
 	while (c == '\t'  ||  c == ' ' ||  c == '\n');
@@ -337,13 +327,13 @@ getNextChar:
 				   * Check if the next character is an alpha character
 				   * else it is not a potential tex tag.
 				   */
-				  c = fileGetc ();
+				  c = getcFromInputFile ();
 				  if (! isalpha (c))
-					  fileUngetc (c);
+					  ungetcToInputFile (c);
 				  else
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getSourceLineNumber ();
+					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->keyword = analyzeToken (token->string, Lang_js);
 					  if (isKeyword (token, KEYWORD_NONE))
@@ -354,7 +344,7 @@ getNextChar:
 				  break;
 
 		case '%':
-				  fileSkipToCharacter ('\n'); /* % are single line comments */
+				  skipToCharacterInInputFile ('\n'); /* % are single line comments */
 				  goto getNextChar;
 				  break;
 
@@ -364,7 +354,7 @@ getNextChar:
 				  else
 				  {
 					  parseIdentifier (token->string, c);
-					  token->lineNumber = getSourceLineNumber ();
+					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
 					  token->type = TOKEN_IDENTIFIER;
 				  }
@@ -547,9 +537,8 @@ static void parseTexFile (tokenInfo *const token)
 
 static void initialize (const langType language)
 {
-	Assert (sizeof (TexKinds) / sizeof (TexKinds [0]) == TEXTAG_COUNT);
+	Assert (ARRAY_SIZE (TexKinds) == TEXTAG_COUNT);
 	Lang_js = language;
-	buildTexKeywordHash ();
 
 	lastPart    = vStringNew();
 	lastChapter = vStringNew();
@@ -558,18 +547,22 @@ static void initialize (const langType language)
 	lastSubSubS = vStringNew();
 }
 
-static void finalize (const langType language __unused__)
+static void finalize (const langType language __unused__,
+		      boolean initialized)
 {
-	vStringDelete(lastPart);
-	lastPart = NULL;
-	vStringDelete(lastChapter);
-	lastChapter = NULL;
-	vStringDelete(lastSection);
-	lastSection = NULL;
-	vStringDelete(lastSubS);
-	lastSubS = NULL;
-	vStringDelete(lastSubSubS);
-	lastSubSubS = NULL;
+	if (initialized)
+	{
+		vStringDelete(lastPart);
+		lastPart = NULL;
+		vStringDelete(lastChapter);
+		lastChapter = NULL;
+		vStringDelete(lastSection);
+		lastSection = NULL;
+		vStringDelete(lastSubS);
+		lastSubS = NULL;
+		vStringDelete(lastSubSubS);
+		lastSubSubS = NULL;
+	}
 }
 
 static void findTexTags (void)
@@ -594,11 +587,12 @@ extern parserDefinition* TexParser (void)
 	 * New definitions for parsing instead of regex
 	 */
 	def->kinds		= TexKinds;
-	def->kindCount	= KIND_COUNT (TexKinds);
+	def->kindCount	= ARRAY_SIZE (TexKinds);
 	def->parser		= findTexTags;
 	def->initialize = initialize;
 	def->finalize   = finalize;
-
+	def->keywordTable =  TexKeywordTable;
+	def->keywordCount = ARRAY_SIZE (TexKeywordTable);
 	return def;
 }
 /* vi:set tabstop=4 shiftwidth=4 noexpandtab: */

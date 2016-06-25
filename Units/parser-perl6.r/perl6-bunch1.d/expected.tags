@@ -1,0 +1,45 @@
+JSONPrettyActions	input.pm	/^my class JSONPrettyActions {$/;"	c
+JSONPrettyGrammar	input.pm	/^my grammar JSONPrettyGrammar {$/;"	g
+TOP	input.pm	/^    method TOP($\/) {$/;"	m
+TOP	input.pm	/^    token TOP       { ^ \\s* [ <object> | <array> ] \\s* $ }$/;"	t
+array	input.pm	/^    method array($\/) {$/;"	m
+array	input.pm	/^    rule array      { '[' ~ ']' <arraylist>    }$/;"	u
+arraylist	input.pm	/^    method arraylist($\/) {$/;"	m
+arraylist	input.pm	/^    rule arraylist  {  <value> * % [ \\, ]        }$/;"	u
+from-json	input.pm	/^sub from-json($text) {$/;"	s
+object	input.pm	/^    method object($\/) {$/;"	m
+object	input.pm	/^    rule object     { '{' ~ '}' <pairlist>     }$/;"	u
+pair	input.pm	/^    method pair($\/) {$/;"	m
+pair	input.pm	/^    rule pair       { <string> ':' <value>     }$/;"	u
+pairlist	input.pm	/^    method pairlist($\/) {$/;"	m
+pairlist	input.pm	/^    rule pairlist   { <pair> * % \\,            }$/;"	u
+str	input.pm	/^    method str($\/)               { make ~$\/ }$/;"	m
+str	input.pm	/^    token str {$/;"	t
+str_escape	input.pm	/^    method str_escape($\/) {$/;"	m
+str_escape	input.pm	/^    token str_escape {$/;"	t
+string	input.pm	/^    method string($\/) {$/;"	m
+string	input.pm	/^    token string {$/;"	t
+to-json	input.pm	/^multi sub to-json(Associative:D $d, :$indent = 0, :$first = 0) {$/;"	s
+to-json	input.pm	/^multi sub to-json(Bool:D $d, :$indent = 0, :$first = 0) { (' ' x $first) ~ ($d ?? 'true' !! 'fal/;"	s
+to-json	input.pm	/^multi sub to-json(Mu:D $s, :$indent = 0, :$first = 0) {$/;"	s
+to-json	input.pm	/^multi sub to-json(Mu:U $, :$indent = 0, :$first = 0) { 'null' }$/;"	s
+to-json	input.pm	/^multi sub to-json(Positional:D $d, :$indent = 0, :$first = 0) {$/;"	s
+to-json	input.pm	/^multi sub to-json(Real:D $d, :$indent = 0, :$first = 0) { (' ' x $first) ~ ~$d }$/;"	s
+to-json	input.pm	/^multi sub to-json(Str:D $d, :$indent = 0, :$first = 0) {$/;"	s
+to-json	input.pm	/^multi sub to-json(Version:D $v, :$indent = 0, :$first = 0) { to-json(~$v, :$indent, :$first) }$/;"	s
+to-json	input.pm	/^proto sub to-json($, :$indent = 0, :$first = 0) {*}$/;"	s
+value	input.pm	/^    proto token value {*};$/;"	t
+value:sym	input.pm	/^    method value:sym<array>($\/)  { make $<array>.ast }$/;"	m
+value:sym	input.pm	/^    method value:sym<false>($\/)  { make Bool::False }$/;"	m
+value:sym	input.pm	/^    method value:sym<null>($\/)   { make Any }$/;"	m
+value:sym	input.pm	/^    method value:sym<number>($\/) { make +$\/.Str }$/;"	m
+value:sym	input.pm	/^    method value:sym<object>($\/) { make $<object>.ast }$/;"	m
+value:sym	input.pm	/^    method value:sym<string>($\/) { make $<string>.ast }$/;"	m
+value:sym	input.pm	/^    method value:sym<true>($\/)   { make Bool::True  }$/;"	m
+value:sym	input.pm	/^    token value:sym<array>   { <array>  };$/;"	t
+value:sym	input.pm	/^    token value:sym<false>   { <sym>    };$/;"	t
+value:sym	input.pm	/^    token value:sym<null>    { <sym>    };$/;"	t
+value:sym	input.pm	/^    token value:sym<number> {$/;"	t
+value:sym	input.pm	/^    token value:sym<object>  { <object> };$/;"	t
+value:sym	input.pm	/^    token value:sym<string>  { <string> }$/;"	t
+value:sym	input.pm	/^    token value:sym<true>    { <sym>    };$/;"	t

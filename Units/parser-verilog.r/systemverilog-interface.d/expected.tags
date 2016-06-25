@@ -1,0 +1,30 @@
+a	input.sv	/^logic a, b, c, d;$/;"	r	interface:intf
+b	input.sv	/^logic a, b, c, d;$/;"	r	interface:intf
+c	input.sv	/^logic a, b, c, d;$/;"	r	interface:intf
+d	input.sv	/^logic a, b, c, d;$/;"	r	interface:intf
+e	input.sv	/^logic [11:0] e;$/;"	r	interface:intf
+external_interface	input.sv	/^extern interface external_interface;$/;"	Q
+in1	input.sv	/^    input in1,$/;"	p	interface:intf
+in2	input.sv	/^    input [11:0] in2,$/;"	p	interface:intf
+intf	input.sv	/^interface intf ($/;"	I
+intf.a	input.sv	/^logic a, b, c, d;$/;"	r	interface:intf
+intf.b	input.sv	/^logic a, b, c, d;$/;"	r	interface:intf
+intf.c	input.sv	/^logic a, b, c, d;$/;"	r	interface:intf
+intf.d	input.sv	/^logic a, b, c, d;$/;"	r	interface:intf
+intf.e	input.sv	/^logic [11:0] e;$/;"	r	interface:intf
+intf.in1	input.sv	/^    input in1,$/;"	p	interface:intf
+intf.in2	input.sv	/^    input [11:0] in2,$/;"	p	interface:intf
+intf.iout	input.sv	/^    inout iout$/;"	p	interface:intf
+intf.master	input.sv	/^modport master (input a, b, output c, d, e);$/;"	M	interface:intf
+intf.out	input.sv	/^    output out,$/;"	p	interface:intf
+intf.slave	input.sv	/^modport slave (output a, b, input c, d, e);$/;"	M	interface:intf
+intf_automatic	input.sv	/^interface automatic intf_automatic;$/;"	I
+intf_automatic.logic_automatic	input.sv	/^    logic logic_automatic;$/;"	r	interface:intf_automatic
+intf_static	input.sv	/^interface static intf_static;$/;"	I
+intf_static.logic_static	input.sv	/^    logic logic_static;$/;"	r	interface:intf_static
+iout	input.sv	/^    inout iout$/;"	p	interface:intf
+logic_automatic	input.sv	/^    logic logic_automatic;$/;"	r	interface:intf_automatic
+logic_static	input.sv	/^    logic logic_static;$/;"	r	interface:intf_static
+master	input.sv	/^modport master (input a, b, output c, d, e);$/;"	M	interface:intf
+out	input.sv	/^    output out,$/;"	p	interface:intf
+slave	input.sv	/^modport slave (output a, b, input c, d, e);$/;"	M	interface:intf

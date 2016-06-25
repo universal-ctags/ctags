@@ -2,7 +2,7 @@
 *   Copyright (c) 2000-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for LISP files.
 */
@@ -14,6 +14,7 @@
 
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -81,7 +82,7 @@ static void findLispTags (void)
 	const unsigned char* p;
 
 
-	while ((p = fileReadLine ()) != NULL)
+	while ((p = readLineFromInputFile ()) != NULL)
 	{
 		if (*p == '(')
 		{
@@ -132,7 +133,7 @@ extern parserDefinition* LispParser (void)
 
 	parserDefinition* def = parserNew ("Lisp");
 	def->kinds      = LispKinds;
-	def->kindCount  = KIND_COUNT (LispKinds);
+	def->kindCount  = ARRAY_SIZE (LispKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser     = findLispTags;

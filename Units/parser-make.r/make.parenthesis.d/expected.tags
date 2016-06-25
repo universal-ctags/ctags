@@ -1,0 +1,4 @@
+$(A)-$(A:.c=.o)	input.mk	/^$(A)-$(A:.c=.o):$/;"	t
+${B}-${B:.c=.o}	input.mk	/^${B}-${B:.c=.o}:$/;"	t
+A	input.mk	/^A=X.c$/;"	m
+B	input.mk	/^B=Y.c$/;"	m

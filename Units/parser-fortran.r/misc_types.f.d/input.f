@@ -12,7 +12,7 @@
 	VIRTUAL M(10,10), Y(100) 
 	VOLATILE V, Z, MAT, /INI/ 
 
-	EXTERNAL ABS ! varations of external and global
+	EXTERNAL ABS ! variations of external and global
 	CEXTERNAL ABS1 ! not supported
 	CGLOBAL ABS2 ! not supported
 	PEXTERNAL ABS3 ! not supported

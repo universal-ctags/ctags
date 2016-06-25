@@ -1,0 +1,14 @@
+pkg test_package123 =
+;;
+
+const test_init_func = {; func_body() }
+const test_init_const666 = "foo"
+const test_const666 = "foo"
+var test_init_var999 = 123
+var test_var999
+type simple_def = int
+type complex_def = struct
+    x : int
+    y : char
+;;
+

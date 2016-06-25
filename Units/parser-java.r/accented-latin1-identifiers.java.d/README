@@ -1,0 +1,10 @@
+Test that the parser allows for the subset of extended ASCII characters in the
+range 0xC0-0xFF. 
+
+The specific range of characters allowed suggests the intent of this addition
+was to catch accented Latin 1 identifier characters.  It's clearly less useful
+in other encodings.
+
+This is handled as a special case for Java and C# identifiers only.
+
+See commits dce8772 and c9bd254.

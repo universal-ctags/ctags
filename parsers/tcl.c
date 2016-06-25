@@ -2,7 +2,7 @@
 *   Copyright (c) 2000-2003, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for TCL scripts.
 */
@@ -16,6 +16,7 @@
 
 #include "parse.h"
 #include "read.h"
+#include "routines.h"
 #include "vstring.h"
 
 /*
@@ -61,7 +62,7 @@ static void findTclTags (void)
 	vString *name = vStringNew ();
 	const unsigned char *line;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char *cp;
 
@@ -105,7 +106,7 @@ extern parserDefinition* TclParser (void)
 	static const char *const extensions [] = { "tcl", "tk", "wish", "itcl", NULL };
 	parserDefinition* def = parserNew ("Tcl");
 	def->kinds      = TclKinds;
-	def->kindCount  = KIND_COUNT (TclKinds);
+	def->kindCount  = ARRAY_SIZE (TclKinds);
 	def->extensions = extensions;
 	def->parser     = findTclTags;
 	return def;

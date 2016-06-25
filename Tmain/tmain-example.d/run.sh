@@ -1,5 +1,8 @@
-CTAGS=$1
-DATADIR=$2
-LIBEXECDIR=$3
+# Copyright: 2015 Masatake YAMATO
+# License: GPL-2
 
-${CTAGS} --quiet --options=NONE --list-kinds=Ruby && echo X > tags
+CTAGS=$1
+LIBEXECDIR=$2
+BUILDDIR=$3
+
+${CTAGS} --quiet --options=NONE --list-kinds=Ruby && echo X > ${BUILDDIR}/tags

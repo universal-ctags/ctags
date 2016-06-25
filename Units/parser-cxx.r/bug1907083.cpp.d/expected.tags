@@ -1,0 +1,4 @@
+m1	input.cpp	/^C::T * C::m1() {}$/;"	f	class:C	typeref:typename:C::T *
+m2	input.cpp	/^C::T * const C::m2() {}$/;"	f	class:C	typeref:typename:C::T * const
+m3	input.cpp	/^C::T const * C::m3() {}$/;"	f	class:C	typeref:typename:C::T const *
+m4	input.cpp	/^C::T const * const C::m4() {}$/;"	f	class:C	typeref:typename:C::T const * const

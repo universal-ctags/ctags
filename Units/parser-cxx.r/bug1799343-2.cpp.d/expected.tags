@@ -1,0 +1,15 @@
+P	input.cpp	/^class P {$/;"	c	file:
+x	input.cpp	/^   int x;$/;"	m	class:P	typeref:typename:int	file:
+A	input.cpp	/^namespace A {$/;"	n	file:
+P	input.cpp	/^   class P {$/;"	c	namespace:A	file:
+x	input.cpp	/^     int x;$/;"	m	class:A::P	typeref:typename:int	file:
+Q	input.cpp	/^   class Q {$/;"	c	namespace:A	file:
+y	input.cpp	/^     int y;$/;"	m	class:A::Q	typeref:typename:int	file:
+C	input.cpp	/^   namespace C {$/;"	n	namespace:A	file:
+R	input.cpp	/^     class R: ::P, A::Q {$/;"	c	namespace:A::C	file:
+z	input.cpp	/^       int z;$/;"	m	class:A::C::R	typeref:typename:int	file:
+f	input.cpp	/^       int f (int v) { return v + x; }$/;"	f	class:A::C::R	typeref:typename:int	file:
+v	input.cpp	/^       int f (int v) { return v + x; }$/;"	z	function:A::C::R::f	typeref:typename:int	file:
+B	input.cpp	/^namespace B {$/;"	n	file:
+S	input.cpp	/^   class S : A::C::R {$/;"	c	namespace:B	file:
+t	input.cpp	/^     int t;$/;"	m	class:B::S	typeref:typename:int	file:

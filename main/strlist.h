@@ -2,12 +2,12 @@
 *   Copyright (c) 1999-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   Defines external interface to resizable string lists.
 */
-#ifndef _STRLIST_H
-#define _STRLIST_H
+#ifndef CTAGS_MAIN_STRLIST_H
+#define CTAGS_MAIN_STRLIST_H
 
 /*
 *   INCLUDE FILES
@@ -46,7 +46,7 @@ extern boolean stringListHas (const stringList *const current, const char *const
 extern boolean stringListHasTest (const stringList *const current,
 				  boolean (*test)(const char *s, void *userData),
 				  void *userData);
-extern boolean stringListRemoveExtension (stringList* const current, const char* const extension);
+extern boolean stringListDeleteItemExtension (stringList* const current, const char* const extension);
 extern boolean stringListExtensionMatched (const stringList* const list, const char* const extension);
 extern vString* stringListExtensionFinds (const stringList* const list, const char* const extension);
 extern boolean stringListFileMatched (const stringList* const list, const char* const str);
@@ -54,6 +54,6 @@ extern vString* stringListFileFinds (const stringList* const list, const char* c
 extern void stringListPrint (const stringList *const current, FILE *fp);
 extern void stringListReverse (const stringList *const current);
 
-#endif  /* _STRLIST_H */
+#endif  /* CTAGS_MAIN_STRLIST_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

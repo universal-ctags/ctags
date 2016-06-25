@@ -1,0 +1,14 @@
+zero	input.cpp	/^zero (const T &v1, const T &v2)$/;"	f	typeref:typename:int	template:<typename T>
+v1	input.cpp	/^zero (const T &v1, const T &v2)$/;"	z	function:zero	typeref:typename:const T &	file:
+v2	input.cpp	/^zero (const T &v1, const T &v2)$/;"	z	function:zero	typeref:typename:const T &	file:
+min	input.cpp	/^min(const T&v1, const T&v2)$/;"	f	typeref:typename:T	template:<typename T>
+v1	input.cpp	/^min(const T&v1, const T&v2)$/;"	z	function:min	typeref:typename:const T &	file:
+v2	input.cpp	/^min(const T&v1, const T&v2)$/;"	z	function:min	typeref:typename:const T &	file:
+Item	input.cpp	/^class Item$/;"	c	file:	template:<class Type>
+Item	input.cpp	/^  Item(const Type &t) : item (t), next (0) { }$/;"	f	class:Item	file:
+Item::Item	input.cpp	/^  Item(const Type &t) : item (t), next (0) { }$/;"	f	class:Item	file:
+t	input.cpp	/^  Item(const Type &t) : item (t), next (0) { }$/;"	z	function:Item::Item	typeref:typename:const Type &	file:
+item	input.cpp	/^  Type item;$/;"	m	class:Item	typeref:typename:Type	file:
+Item::item	input.cpp	/^  Type item;$/;"	m	class:Item	typeref:typename:Type	file:
+next	input.cpp	/^  Item *next;$/;"	m	class:Item	typeref:typename:Item *	file:
+Item::next	input.cpp	/^  Item *next;$/;"	m	class:Item	typeref:typename:Item *	file:

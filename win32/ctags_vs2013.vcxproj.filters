@@ -42,6 +42,9 @@
     <ClCompile Include="..\parsers\beta.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\CoffeeScript.c">
+      <Filter>Source Files\Optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\c.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
@@ -54,7 +57,16 @@
     <ClCompile Include="..\parsers\css.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\ctags-optlib.c">
+      <Filter>Source Files\Optlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\diff.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\dosbatch.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\dts.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\eiffel.c">
@@ -72,10 +84,16 @@
     <ClCompile Include="..\parsers\fortran.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\gdbinit.c">
+      <Filter>Source Files\Optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\go.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\html.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\jprop.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\jscript.c">
@@ -90,10 +108,19 @@
     <ClCompile Include="..\parsers\lua.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\optlib\m4.c">
+      <Filter>Source Files\Optlib</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\make.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\man.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\matlab.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\myrddin.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\objc.c">
@@ -109,6 +136,9 @@
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\python.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\r.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\rexx.c">
@@ -141,6 +171,9 @@
     <ClCompile Include="..\parsers\tex.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\ttcn.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\verilog.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
@@ -168,7 +201,13 @@
     <ClCompile Include="..\main\entry.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\field.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\flags.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\fmt.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\fnmatch\fnmatch.c">
@@ -183,10 +222,17 @@
     <ClCompile Include="..\main\keyword.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\kind.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\lregex.c">
     <ClCompile Include="..\main\lregex.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\lxcmd.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\lxpath.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\main.c">
@@ -213,9 +259,6 @@
     <ClCompile Include="..\main\strlist.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\tg.c">
-      <Filter>Source Files\Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\main\vstring.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -231,6 +274,76 @@
     <ClCompile Include="..\main\selectors.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\xtag.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\mio.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\repoinfo.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\ptag.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_debug.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_keyword.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_block.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_function.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_lambda.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_namespace.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_template.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_tokenizer.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_typedef.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_parser_using.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_scope.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_tag.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_token.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\cxx\cxx_token_chain.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\rpmspec.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\promise.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\optlib\pod.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+  </ItemGroup>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\main\e_msoft.h">
@@ -242,7 +355,13 @@
     <ClInclude Include="..\main\entry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\field.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\flags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\fmt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\get.h">
@@ -252,6 +371,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\keyword.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\kind.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\main.h">
@@ -273,9 +395,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\strlist.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\main\tg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\vstring.h">
@@ -303,6 +422,42 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\selectors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\main\xtag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\mio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\main\ptag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_keyword.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_parser_internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_scope.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_tag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_token.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\cxx\cxx_token_chain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\main\promise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,0 +1,1 @@
+foo	input.cpp	/^void foo (int &x, int y, int z)$/;"	f	typeref:typename:void

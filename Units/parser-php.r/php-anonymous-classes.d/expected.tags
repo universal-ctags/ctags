@@ -1,0 +1,14 @@
+AnonymousClass1	input.php	/^$c = new class {$/;"	c
+AnonymousClass2	input.php	/^$d = new class(42) {$/;"	c
+AnonymousClass3	input.php	/^$e = new class(64) extends SomeClass implements SomeInterface {$/;"	c	inherits:SomeClass,SomeInterface
+SomeClass	input.php	/^class SomeClass {}$/;"	c
+SomeInterface	input.php	/^interface SomeInterface {}$/;"	i
+SomeTrait	input.php	/^trait SomeTrait {}$/;"	t
+__construct	input.php	/^	public function __construct($n) { echo $n; }$/;"	f	class:AnonymousClass2	access:public	signature:($n)
+__construct	input.php	/^	public function __construct($n) { echo $n; }$/;"	f	class:AnonymousClass3	access:public	signature:($n)
+c	input.php	/^$c = new class {$/;"	v
+d	input.php	/^$d = new class(42) {$/;"	v
+e	input.php	/^$e = new class(64) extends SomeClass implements SomeInterface {$/;"	v
+hello	input.php	/^	public function hello() { echo "hello"; }$/;"	f	class:AnonymousClass1	access:public	signature:()
+hello	input.php	/^	public function hello() { echo "hello"; }$/;"	f	class:AnonymousClass2	access:public	signature:()
+hello	input.php	/^	public function hello() { echo "hello"; }$/;"	f	class:AnonymousClass3	access:public	signature:()

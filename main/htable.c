@@ -4,7 +4,7 @@
 *   Copyright (c) 2014, Masatake YAMATO
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   Defines hashtable
 */
@@ -27,6 +27,9 @@
 #define eFree(x) free(x)
 #endif
 #endif	/* MAIN */
+
+#include <string.h>
+
 
 typedef struct sHashEntry hentry;
 struct sHashEntry {
@@ -222,3 +225,27 @@ boolean hashPtreq (void *a, void *b)
 	return (a == b)? TRUE: FALSE;
 }
 
+
+/* http://www.cse.yorku.ca/~oz/hash.html */
+static unsigned long
+djb2(unsigned char *str)
+{
+	unsigned long hash = 5381;
+	int c;
+
+	while ((c = *str++))
+		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+	return hash;
+}
+
+unsigned int hashCstrhash (void * x)
+{
+	char *s = x;
+	return (unsigned int)djb2((unsigned char *)s);
+}
+
+boolean hashCstreq (void *a, void *b)
+{
+	return !!(strcmp (a, b) == 0);
+}

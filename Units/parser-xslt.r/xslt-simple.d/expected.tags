@@ -1,0 +1,25 @@
+html_common.xsl	input.xsl	/^  <xsl:include href="html_common.xsl"\/>$/;"	s	role:included
+/	input.xsl	/^  <xsl:template match="\/">$/;"	m
+output_title	input.xsl	/^        <xsl:call-template name="output_title">$/;"	n	matchedTemplate:/	role:called
+p_pagetitle	input.xsl	/^          <xsl:with-param name="p_pagetitle" select="$gjdoc.outputfile.info"\/>$/;"	p	namedTemplate:/.output_title	role:bound
+include_common	input.xsl	/^        <xsl:call-template name="include_common"\/>$/;"	n	matchedTemplate:/	role:called
+output_navbar	input.xsl	/^        <xsl:call-template name="output_navbar">$/;"	n	matchedTemplate:/	role:called
+p_show_package	input.xsl	/^          <xsl:with-param name="p_show_package" select="0"\/>$/;"	p	namedTemplate:/.output_navbar	role:bound
+p_curr_package	input.xsl	/^          <xsl:with-param name="p_curr_package" select="1"\/>$/;"	p	namedTemplate:/.output_navbar	role:bound
+p_show_package_tree	input.xsl	/^          <xsl:with-param name="p_show_package_tree" select="1"\/>$/;"	p	namedTemplate:/.output_navbar	role:bound
+p_top	input.xsl	/^          <xsl:with-param name="p_top" select="1"\/> $/;"	p	namedTemplate:/.output_navbar	role:bound
+output_navbar	input.xsl	/^        <xsl:call-template name="output_navbar">$/;"	n	matchedTemplate:/	role:called
+p_show_package	input.xsl	/^          <xsl:with-param name="p_show_package" select="0"\/>$/;"	p	namedTemplate:/.output_navbar	role:bound
+p_curr_package	input.xsl	/^          <xsl:with-param name="p_curr_package" select="1"\/>$/;"	p	namedTemplate:/.output_navbar	role:bound
+p_show_package_tree	input.xsl	/^          <xsl:with-param name="p_show_package_tree" select="1"\/>$/;"	p	namedTemplate:/.output_navbar	role:bound
+p_top	input.xsl	/^          <xsl:with-param name="p_top" select="0"\/> $/;"	p	namedTemplate:/.output_navbar	role:bound
+/gjdoc:rootdoc/gjdoc:packagedoc[@name=$gjdoc.outputfile.info]/gjdoc:firstSentenceTags/node()	input.xsl	/^          <xsl:apply-templates select="\/gjdoc:rootdoc\/gjdoc:packagedoc[@name=$gjdoc.outputfile/;"	m	matchedTemplate:/	role:applied
+output-classes-summary	input.xsl	/^              <xsl:call-template name="output-classes-summary"\/>$/;"	n	matchedTemplate:/	role:called
+output-classes-summary	input.xsl	/^              <xsl:call-template name="output-classes-summary"\/>$/;"	n	matchedTemplate:/	role:called
+output-classes-summary	input.xsl	/^              <xsl:call-template name="output-classes-summary"\/>$/;"	n	matchedTemplate:/	role:called
+output-classes-summary	input.xsl	/^              <xsl:call-template name="output-classes-summary"\/>$/;"	n	matchedTemplate:/	role:called
+/gjdoc:rootdoc/gjdoc:packagedoc[@name=$gjdoc.outputfile.info]/gjdoc:inlineTags/node()	input.xsl	/^          <xsl:apply-templates select="\/gjdoc:rootdoc\/gjdoc:packagedoc[@name=$gjdoc.outputfile/;"	m	matchedTemplate:/	role:applied
+output-classes-summary	input.xsl	/^  <xsl:template name="output-classes-summary">$/;"	n
+v_currentclass	input.xsl	/^    <xsl:variable name="v_currentclass" select="@qualifiedtypename"\/>$/;"	v	namedTemplate:output-classes-summary
+v_sub_xml_filename	input.xsl	/^    <xsl:variable name="v_sub_xml_filename" select="concat(@qualifiedtypename,'.xml')"\/>$/;"	v	namedTemplate:output-classes-summary
+v_docstring	input.xsl	/^        <xsl:variable name="v_docstring" select="document($v_sub_xml_filename,\/gjdoc:rootdoc)\//;"	v	namedTemplate:output-classes-summary

@@ -1,0 +1,3 @@
+main	input.cpp	/^int main() {$/;"	f	typeref:typename:int
+std	input.cpp	/^using namespace std;$/;"	U	function:main
+m	input.cpp	/^int m;$/;"	l	function:main	typeref:typename:int	file:

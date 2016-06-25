@@ -2,7 +2,7 @@
 *   Copyright (c) 2002-2003, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains a lose assortment of shared functions.
 */
@@ -67,6 +67,8 @@
 # include "mbcs.h"
 #endif
 
+#include "options.h"
+
 /*
 *   MACROS
 */
@@ -121,6 +123,10 @@
 
 #ifndef S_ISUID
 # define S_ISUID 0
+#endif
+
+#ifndef S_ISGID
+# define S_ISGID 0
 #endif
 
 /*  Hack for ridiculous practice of Microsoft Visual C++.
@@ -202,18 +208,18 @@ extern void error (
 	va_list ap;
 
 	va_start (ap, format);
-	fprintf (errout, "%s: %s", getExecutableName (),
+	fprintf (stderr, "%s: %s", getExecutableName (),
 			selected (selection, WARNING) ? "Warning: " : "");
-	vfprintf (errout, format, ap);
+	vfprintf (stderr, format, ap);
 	if (selected (selection, PERROR))
 #ifdef HAVE_STRERROR
-		fprintf (errout, " : %s", strerror (errno));
+		fprintf (stderr, " : %s", strerror (errno));
 #else
 		perror (" ");
 #endif
-	fputs ("\n", errout);
+	fputs ("\n", stderr);
 	va_end (ap);
-	if (selected (selection, FATAL))
+	if (selected (selection, FATAL) || Option.fatalWarnings)
 		exit (1);
 }
 
@@ -417,6 +423,7 @@ extern fileStatus *eStat (const char *const fileName)
 				file.isExecutable = (boolean) ((status.st_mode &
 					(S_IXUSR | S_IXGRP | S_IXOTH)) != 0);
 				file.isSetuid = (boolean) ((status.st_mode & S_ISUID) != 0);
+				file.isSetgid = (boolean) ((status.st_mode & S_ISGID) != 0);
 				file.size = status.st_size;
 			}
 		}
@@ -470,26 +477,6 @@ extern boolean isRecursiveLink (const char* const dirName)
 	return result;
 }
 
-#ifndef HAVE_FGETPOS
-
-extern int fgetpos (FILE *stream, fpos_t *pos)
-{
-	int result = 0;
-
-	*pos = ftell (stream);
-	if (*pos == -1L)
-		result = -1;
-
-	return result;
-}
-
-extern int fsetpos (FILE *stream, fpos_t const *pos)
-{
-	return fseek (stream, *pos, SEEK_SET);
-}
-
-#endif
-
 /*
  *  Pathname manipulation (O/S dependent!!!)
  */
@@ -509,12 +496,12 @@ static boolean isPathSeparator (const int c)
 
 static void canonicalizePath (char *const path __unused__)
 {
-#if defined (MSDOS_STYLE_PATH)
+# if defined (MSDOS_STYLE_PATH)
 	char *p;
 	for (p = path  ;  *p != '\0'  ;  ++p)
 		if (isPathSeparator (*p)  &&  *p != ':')
 			*p = PATH_SEPARATOR;
-#endif
+# endif
 }
 
 #endif
@@ -535,9 +522,9 @@ extern boolean isSameFile (const char *const name1, const char *const name2)
 		canonicalizePath (n2);
 # if defined (CASE_INSENSITIVE_FILENAMES)
 		result = (boolean) (strcasecmp (n1, n2) == 0);
-#else
+# else
 		result = (boolean) (strcmp (n1, n2) == 0);
-#endif
+# endif
 		free (n1);
 		free (n2);
 	}
@@ -555,7 +542,7 @@ extern const char *baseFilename (const char *const filePath)
 	 */
 	for (i = 0  ;  i < strlen (PathDelimiters)  ;  ++i)
 	{
-#ifdef HAVE_MBLEN
+# ifdef HAVE_MBLEN
 		const char *p;
 		int ml;
 
@@ -569,12 +556,12 @@ extern const char *baseFilename (const char *const filePath)
 			else if (*p == PathDelimiters [i] && p > tail)
 				tail = p;
 		}
-#else
+# else
 		const char *sep = strrchr (filePath, PathDelimiters [i]);
 
 		if (sep > tail)
 			tail = sep;
-#endif
+# endif
 	}
 #else
 	const char *tail = strrchr (filePath, PATH_SEPARATOR);
@@ -820,17 +807,22 @@ extern char* relativeFilename (const char *file, const char *dir)
 	return res;
 }
 
-extern FILE *tempFile (const char *const mode, char **const pName)
+extern MIO *tempFile (const char *const mode, char **const pName)
 {
 	char *name;
 	FILE *fp;
+	MIO *mio;
 	int fd;
 #if defined(HAVE_MKSTEMP)
 	const char *const pattern = "tags.XXXXXX";
 	const char *tmpdir = NULL;
 	fileStatus *file = eStat (ExecutableProgram);
+# ifdef WIN32
+	tmpdir = getenv ("TMP");
+# else
 	if (! file->isSetuid)
 		tmpdir = getenv ("TMPDIR");
+# endif
 	if (tmpdir == NULL)
 		tmpdir = TMPDIR;
 	name = xMalloc (strlen (tmpdir) + 1 + strlen (pattern) + 1, char);
@@ -838,7 +830,13 @@ extern FILE *tempFile (const char *const mode, char **const pName)
 	fd = mkstemp (name);
 	eStatFree (file);
 #elif defined(HAVE_TEMPNAM)
-	name = tempnam (TMPDIR, "tags");
+	const char *tmpdir = NULL;
+# ifdef WIN32
+	tmpdir = getenv ("TMP");
+# endif
+	if (tmpdir == NULL)
+		tmpdir = TMPDIR;
+	name = tempnam (tmpdir, "tags");
 	if (name == NULL)
 		error (FATAL | PERROR, "cannot allocate temporary file name");
 	fd = open (name, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
@@ -853,11 +851,12 @@ extern FILE *tempFile (const char *const mode, char **const pName)
 	fp = fdopen (fd, mode);
 	if (fp == NULL)
 		error (FATAL | PERROR, "cannot open temporary file");
+	mio = mio_new_fp (fp, fclose);
 	DebugStatement (
 		debugPrintf (DEBUG_STATUS, "opened temporary file %s\n", name); )
 	Assert (*pName == NULL);
 	*pName = name;
-	return fp;
+	return mio;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

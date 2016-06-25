@@ -2,12 +2,12 @@
 *   Copyright (c) 1998-2002, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   Provides the external interface for resizeable strings.
 */
-#ifndef _VSTRING_H
-#define _VSTRING_H
+#ifndef CTAGS_MAIN_VSTRING_H
+#define CTAGS_MAIN_VSTRING_H
 
 /*
 *   INCLUDE FILES
@@ -17,6 +17,10 @@
 #if defined(HAVE_STDLIB_H)
 # include <stdlib.h>  /* to define size_t */
 #endif
+
+#include <stdio.h>
+
+#include "mio.h"
 
 /*
 *   MACROS
@@ -79,9 +83,14 @@ extern void vStringCopyToLower (vString *const dest, const vString *const src);
 extern void vStringSetLength (vString *const string);
 extern void vStringTruncate (vString *const string, const size_t length);
 
+extern vString *vStringNewOrClear (vString *const string);
+
 extern vString *vStringNewOwn (char *s);
 extern char    *vStringDeleteUnwrap (vString *const string);
 
-#endif  /* _VSTRING_H */
+extern void vStringCatSWithEscaping (vString* b, const char *s);
+extern void vStringCatSWithEscapingAsPattern (vString *output, const char* input);
+
+#endif  /* CTAGS_MAIN_VSTRING_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

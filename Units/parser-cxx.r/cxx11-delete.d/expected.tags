@@ -1,0 +1,3 @@
+Del	input.cpp	/^    Del(const Del &) = delete;$/;"	p	class:Del	file:	signature:(const Del &)
+Del	input.cpp	/^class Del$/;"	c	file:
+operator =	input.cpp	/^    void operator=(const Del& rDel) = delete;$/;"	p	class:Del	typeref:typename:void	file:	signature:(const Del & rDel)

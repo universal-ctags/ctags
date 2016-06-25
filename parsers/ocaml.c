@@ -2,7 +2,7 @@
 *   Copyright (c) 2009, Vincent Berthoux
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for Objective Caml
 *   language files.
@@ -42,7 +42,9 @@ typedef enum {
 	K_FUNCTION,
 	K_CONSTRUCTOR,  /* Constructor of a sum type */
 	K_RECORDFIELD,
-	K_EXCEPTION
+	K_EXCEPTION,
+	K_VALUE,		/* ??? */
+	K_BEGIN_END,		/* ??? */
 } ocamlKind;
 
 static kindOption OcamlKinds[] = {
@@ -53,8 +55,10 @@ static kindOption OcamlKinds[] = {
 	{TRUE, 't', "type", "Type name"},
 	{TRUE, 'f', "function", "A function"},
 	{TRUE, 'C', "Constructor", "A constructor"},
-	{TRUE, 'r', "Record field", "A 'structure' field"},
-	{TRUE, 'e', "Exception", "An exception"}
+	{TRUE, 'r', "RecordField", "A 'structure' field"},
+	{TRUE, 'e', "Exception", "An exception"},
+	{TRUE, 'V', "value", "A value ???"},
+	{TRUE, 'B', "beginEnd", "A begin end ???"},
 };
 
 typedef enum {
@@ -118,7 +122,7 @@ typedef struct sOcaKeywordDesc {
 
 typedef ocamlKeyword ocaToken;
 
-static const ocaKeywordDesc OcamlKeywordTable[] = {
+static const keywordTable OcamlKeywordTable[] = {
 	{ "and"       , OcaKEYWORD_and       }, 
 	{ "begin"     , OcaKEYWORD_begin     }, 
 	{ "class"     , OcaKEYWORD_class     }, 
@@ -177,18 +181,6 @@ typedef struct _lexingState {
 
 /* array of the size of all possible value for a char */
 static boolean isOperator[1 << (8 * sizeof (char))] = { FALSE };
-
-static void initKeywordHash ( void )
-{
-	const size_t count = sizeof (OcamlKeywordTable) / sizeof (ocaKeywordDesc);
-	size_t i;
-
-	for (i = 0; i < count; ++i)
-	{
-		addKeyword (OcamlKeywordTable[i].name, Lang_Ocaml,
-			(int) OcamlKeywordTable[i].id);
-	}
-}
 
 /* definition of all the operator in OCaml,
  * /!\ certain operator get special treatment
@@ -291,7 +283,7 @@ static void eatComment (lexingState * st)
 		 * so we have to reload a line... */
 		if (c == NULL || *c == '\0')
 		{
-			st->cp = fileReadLine ();
+			st->cp = readLineFromInputFile ();
 			/* WOOPS... no more input...
 			 * we return, next lexing read
 			 * will be null and ok */
@@ -410,7 +402,7 @@ static ocamlKeyword lex (lexingState * st)
 	/* handling data input here */
 	while (st->cp == NULL || st->cp[0] == '\0')
 	{
-		st->cp = fileReadLine ();
+		st->cp = readLineFromInputFile ();
 		if (st->cp == NULL)
 			return Tok_EOF;
 	}
@@ -583,24 +575,24 @@ static int getLastNamedIndex ( void )
 	return -1;
 }
 
-static const char *contextDescription (contextType t)
+static const kindOption* contextDescription (contextType t)
 {
 	switch (t)
 	{
 	case ContextFunction:
-		return "function";
+		return &(OcamlKinds[K_FUNCTION]);
 	case ContextMethod:
-		return "method";
+		return &(OcamlKinds[K_METHOD]);
 	case ContextValue:
-		return "value";
+		return &(OcamlKinds[K_VALUE]);
 	case ContextModule:
-		return "Module";
+		return &(OcamlKinds[K_MODULE]);
 	case ContextType:
-		return "type";
+		return &(OcamlKinds[K_TYPE]);
 	case ContextClass:
-		return "class";
+		return &(OcamlKinds[K_CLASS]);
 	case ContextBlock:
-		return "begin/end";
+		return &(OcamlKinds[K_BEGIN_END]);
 	}
 
 	return NULL;
@@ -881,9 +873,7 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, ocamlKind kind)
 {
 	int parentIndex;
 
-	initTagEntry (tag, vStringValue (name));
-	tag->kindName = OcamlKinds[kind].name;
-	tag->kind = OcamlKinds[kind].letter;
+	initTagEntry (tag, vStringValue (name), &(OcamlKinds[kind]));
 
 	if (kind == K_MODULE)
 	{
@@ -893,9 +883,9 @@ static void prepareTag (tagEntryInfo * tag, vString const *name, ocamlKind kind)
 	parentIndex = getLastNamedIndex ();
 	if (parentIndex >= 0)
 	{
-		tag->extensionFields.scope[0] =
+		tag->extensionFields.scopeKind =
 			contextDescription (stack[parentIndex].type);
-		tag->extensionFields.scope[1] =
+		tag->extensionFields.scopeName =
 			vStringValue (stack[parentIndex].contextName);
 	}
 }
@@ -1811,7 +1801,7 @@ static void computeModuleName ( void )
 	/* in Ocaml the file name define a module.
 	 * so we define a module =)
 	 */
-	const char *filename = getSourceFileName ();
+	const char *filename = getInputFileName ();
 	int beginIndex = 0;
 	int endIndex = strlen (filename) - 1;
 	vString *moduleName = vStringNew ();
@@ -1873,7 +1863,7 @@ static void findOcamlTags (void)
 	vStringCopyS (voidName, "_");
 
 	st.name = vStringNew ();
-	st.cp = fileReadLine ();
+	st.cp = readLineFromInputFile ();
 	toDoNext = &globalScope;
 	tok = lex (&st);
 	while (tok != Tok_EOF)
@@ -1896,7 +1886,6 @@ static void ocamlInitialize (const langType language)
 	Lang_Ocaml = language;
 
 	initOperatorTable ();
-	initKeywordHash ();
 }
 
 extern parserDefinition *OcamlParser (void)
@@ -1907,11 +1896,12 @@ extern parserDefinition *OcamlParser (void)
 					       NULL };
 	parserDefinition *def = parserNew ("OCaml");
 	def->kinds = OcamlKinds;
-	def->kindCount = KIND_COUNT (OcamlKinds);
+	def->kindCount = ARRAY_SIZE (OcamlKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findOcamlTags;
 	def->initialize = ocamlInitialize;
-
+	def->keywordTable = OcamlKeywordTable;
+	def->keywordCount = ARRAY_SIZE (OcamlKeywordTable);
 	return def;
 }

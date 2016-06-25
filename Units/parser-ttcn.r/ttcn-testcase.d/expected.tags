@@ -1,0 +1,3 @@
+CoffeeSuite	input.ttcn	/^module CoffeeSuite$/;"	M
+OneCoffeesPlease	input.ttcn	/^    testcase OneCoffeesPlease () runs on EmptyComponentType$/;"	C
+TwoCoffeesPlease	input.ttcn	/^    testcase TwoCoffeesPlease ()$/;"	C

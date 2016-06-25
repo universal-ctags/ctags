@@ -1,0 +1,3 @@
+java.util.Map	input.java	/^import java.util.Map;$/;"	p	role:imported
+java.util.*	input.java	/^import java.util.*;$/;"	p	role:imported
+X	input.java	/^package X;$/;"	p

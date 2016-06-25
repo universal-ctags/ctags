@@ -1,0 +1,10 @@
+A	input.java	/^		A(1), B(2);$/;"	e	enum:C.FancyEnum	file:
+B	input.java	/^		A(1), B(2);$/;"	e	enum:C.FancyEnum	file:
+C	input.java	/^public class C {$/;"	c
+FIRST_VALUE	input.java	/^		FIRST_VALUE,$/;"	e	enum:C.TrivialEnum	file:
+FancyEnum	input.java	/^		FancyEnum(int i) {$/;"	m	class:C.FancyEnum
+FancyEnum	input.java	/^	public enum FancyEnum {$/;"	g	class:C
+SECOND_VALUE	input.java	/^		SECOND_VALUE$/;"	e	enum:C.TrivialEnum	file:
+TrivialEnum	input.java	/^	public enum TrivialEnum {$/;"	g	class:C
+i	input.java	/^		private int i;$/;"	f	class:C.FancyEnum	file:
+m	input.java	/^		void m() {$/;"	m	class:C.FancyEnum

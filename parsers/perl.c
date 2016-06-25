@@ -2,7 +2,7 @@
 *   Copyright (c) 2000-2003, Darren Hiebert
 *
 *   This source code is released for free distribution under the terms of the
-*   GNU General Public License.
+*   GNU General Public License version 2 or (at your option) any later version.
 *
 *   This module contains functions for generating tags for PERL language
 *   files.
@@ -18,10 +18,12 @@
 
 #include "entry.h"
 #include "options.h"
+#include "promise.h"
 #include "read.h"
 #include "routines.h"
 #include "selectors.h"
 #include "vstring.h"
+#include "xtag.h"
 
 #define TRACE_PERL_C 0
 #define TRACE if (TRACE_PERL_C) printf("perl.c:%d: ", __LINE__), printf
@@ -45,7 +47,7 @@ static kindOption PerlKinds [] = {
 	{ TRUE,  'l', "label",                  "labels" },
 	{ TRUE,  'p', "package",                "packages" },
 	{ TRUE,  's', "subroutine",             "subroutines" },
-	{ FALSE, 'd', "subroutine declaration", "subroutine declarations" },
+	{ FALSE, 'd', "subroutineDeclaration",  "subroutine declarations" },
 };
 
 /*
@@ -165,7 +167,7 @@ SUB_DECL_SWITCH:
 					}
 			}
 		}
-	} while (NULL != (cp = fileReadLine ()));
+	} while (NULL != (cp = readLineFromInputFile ()));
 
 	return FALSE;
 }
@@ -193,20 +195,18 @@ static void makeTagFromLeftSide (const char *begin, const char *end,
 		++b;
 	else if (b != begin)
 		return;
-	Assert(e - b + 1 > 0);
+	if (e - b + 1 <= 0)
+		return;			/* Left side of => has an invalid identifier. */
 	vStringClear(name);
 	vStringNCatS(name, b, e - b + 1);
-	initTagEntry(&entry, vStringValue(name));
-	entry.kind = PerlKinds[K_CONSTANT].letter;
-	entry.kindName = PerlKinds[K_CONSTANT].name;
+	initTagEntry(&entry, vStringValue(name), &(PerlKinds[K_CONSTANT]));
 	makeTagEntry(&entry);
-	if (Option.include.qualifiedTags && package && vStringLength(package)) {
+	if (isXtagEnabled (XTAG_QUALIFIED_TAGS) && package && vStringLength(package)) {
 		vStringClear(name);
 		vStringCopy(name, package);
 		vStringNCatS(name, b, e - b + 1);
-		initTagEntry(&entry, vStringValue(name));
-		entry.kind = PerlKinds[K_CONSTANT].letter;
-		entry.kindName = PerlKinds[K_CONSTANT].name;
+		initTagEntry(&entry, vStringValue(name), &(PerlKinds[K_CONSTANT]));
+		markTagExtraBit (&entry, XTAG_QUALIFIED_TAGS);
 		makeTagEntry(&entry);
 	}
 }
@@ -253,7 +253,7 @@ static int parseConstantsFromHashRef (const unsigned char *cp,
 			parseConstantsFromLine((const char *) cp, name, package);
 		switch (state) {
 			case CONST_STATE_NEXT_LINE:
-				cp = fileReadLine();
+				cp = readLineFromInputFile();
 				if (cp)
 					break;
 				else
@@ -274,6 +274,7 @@ static void findPerlTags (void)
 	vString *package = NULL;
 	boolean skipPodDoc = FALSE;
 	const unsigned char *line;
+	unsigned long podStart = 0UL;
 
 	/* Core modules AutoLoader and SelfLoader support delayed compilation
 	 * by allowing Perl code that follows __END__ and __DATA__ tokens,
@@ -287,7 +288,7 @@ static void findPerlTags (void)
 		RESPECT_DATA	= (1 << 1),
 	} respect_token = RESPECT_END | RESPECT_DATA;
 
-	while ((line = fileReadLine ()) != NULL)
+	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		boolean spaceRequired = FALSE;
 		boolean qualified = FALSE;
@@ -298,12 +299,24 @@ static void findPerlTags (void)
 		if (skipPodDoc)
 		{
 			if (strncmp ((const char*) line, "=cut", (size_t) 4) == 0)
+			{
 				skipPodDoc = FALSE;
+				if (podStart != 0UL)
+				{
+					makePromise ("Pod",
+						     podStart, 0,
+						     getInputLineNumber(), 0,
+						     getSourceLineNumber());
+					podStart = 0UL;
+				}
+			}
 			continue;
 		}
 		else if (line [0] == '=')
 		{
 			skipPodDoc = isPodWord ((const char*)line + 1);
+			if (skipPodDoc)
+				podStart = getSourceLineNumber ();
 			continue;
 		}
 		else if (strcmp ((const char*) line, "__DATA__") == 0)
@@ -358,7 +371,7 @@ static void findPerlTags (void)
 			while (isspace(*cp))
 				cp++;
 			while (!*cp || '#' == *cp) {
-				cp = fileReadLine ();
+				cp = readLineFromInputFile ();
 				if (!cp)
 					goto END_MAIN_WHILE;
 				while (isspace (*cp))
@@ -383,7 +396,7 @@ static void findPerlTags (void)
 			while (isspace (*cp))
 				cp++;
 			while (!*cp || '#' == *cp) {
-				cp = fileReadLine ();
+				cp = readLineFromInputFile ();
 				if (!cp)
 					goto END_MAIN_WHILE;
 				while (isspace (*cp))
@@ -438,7 +451,7 @@ static void findPerlTags (void)
 
 			while (!*cp || '#' == *cp) { /* Gobble up empty lines
 				                            and comments */
-				cp = fileReadLine ();
+				cp = readLineFromInputFile ();
 				if (!cp)
 					goto END_MAIN_WHILE;
 				while (isspace (*cp))
@@ -474,7 +487,7 @@ static void findPerlTags (void)
 				 * isSubroutineDeclaration() may consume several lines.  So
 				 * we record line positions.
 				 */
-				initTagEntry(&e, vStringValue(name));
+				initTagEntry(&e, vStringValue(name), NULL);
 
 				if (TRUE == isSubroutineDeclaration(cp)) {
 					if (TRUE == PerlKinds[K_SUBROUTINE_DECLARATION].enabled) {
@@ -487,32 +500,35 @@ static void findPerlTags (void)
 					continue;
 				}
 
-				e.kind     = PerlKinds[kind].letter;
-				e.kindName = PerlKinds[kind].name;
+				e.kind     = &(PerlKinds[kind]);
 
 				makeTagEntry(&e);
 
-				if (Option.include.qualifiedTags && qualified &&
+				if (isXtagEnabled (XTAG_QUALIFIED_TAGS) && qualified &&
 					package != NULL  && vStringLength (package) > 0)
 				{
 					vString *const qualifiedName = vStringNew ();
 					vStringCopy (qualifiedName, package);
 					vStringCat (qualifiedName, name);
 					e.name = vStringValue(qualifiedName);
+					markTagExtraBit (&e, XTAG_QUALIFIED_TAGS);
 					makeTagEntry(&e);
 					vStringDelete (qualifiedName);
 				}
 			} else if (vStringLength (name) > 0)
 			{
 				makeSimpleTag (name, PerlKinds, kind);
-				if (Option.include.qualifiedTags && qualified &&
+				if (isXtagEnabled(XTAG_QUALIFIED_TAGS) && qualified &&
 					K_PACKAGE != kind &&
 					package != NULL  && vStringLength (package) > 0)
 				{
+					tagEntryInfo fqe;
 					vString *const qualifiedName = vStringNew ();
 					vStringCopy (qualifiedName, package);
 					vStringCat (qualifiedName, name);
-					makeSimpleTag (qualifiedName, PerlKinds, kind);
+					initTagEntry (&fqe, vStringValue (qualifiedName),
+						      PerlKinds + kind);
+					markTagExtraBit (&fqe, XTAG_QUALIFIED_TAGS);
 					vStringDelete (qualifiedName);
 				}
 			}
@@ -529,12 +545,14 @@ END_MAIN_WHILE:
 extern parserDefinition* PerlParser (void)
 {
 	static const char *const extensions [] = { "pl", "pm", "ph", "plx", "perl", NULL };
+	static selectLanguage selectors [] = { selectByPickingPerlVersion,
+					       NULL };
 	parserDefinition* def = parserNew ("Perl");
 	def->kinds      = PerlKinds;
-	def->kindCount  = KIND_COUNT (PerlKinds);
+	def->kindCount  = ARRAY_SIZE (PerlKinds);
 	def->extensions = extensions;
 	def->parser     = findPerlTags;
-	def->selectLanguage = selectByPickingPerlVersion;
+	def->selectLanguage = selectors;
 	return def;
 }
 

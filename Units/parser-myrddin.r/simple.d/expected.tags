@@ -1,0 +1,8 @@
+complex_def	input.myr	/^type complex_def = struct$/;"	t
+simple_def	input.myr	/^type simple_def = int$/;"	t
+test_const666	input.myr	/^const test_const666 = "foo"$/;"	c
+test_init_const666	input.myr	/^const test_init_const666 = "foo"$/;"	c
+test_init_func	input.myr	/^const test_init_func = {; func_body() }$/;"	f
+test_init_var999	input.myr	/^var test_init_var999 = 123$/;"	v
+test_package123	input.myr	/^pkg test_package123 =$/;"	p
+test_var999	input.myr	/^var test_var999$/;"	v

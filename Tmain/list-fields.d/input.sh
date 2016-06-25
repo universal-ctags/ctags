@@ -1,0 +1,5 @@
+source x
+function y()
+{
+}
+

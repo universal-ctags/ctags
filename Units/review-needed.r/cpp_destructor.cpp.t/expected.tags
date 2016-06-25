@@ -1,3 +1,0 @@
-~A	input.cpp	/^A::~A() { }$/;"	f	class:A
-~B	input.cpp	/^B:: ~B () { }$/;"	f	class:B
-~C	input.cpp	/^C:: ~ C () { }$/;"	f	class:C

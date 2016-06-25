@@ -1,0 +1,19 @@
+import from CoffeTypes all
+import from CoffeConstants all
+import from CoffeTemplates all
+import from CoffeFunctions { boilWatter }
+
+var Coffee cappuccino := { id:= 5, description := "with creme" }
+var template Coffee latte := Latte()
+var template Coffee someCofee := SomeCoffee(8,?)
+var template Coffee espresso := Espresso()
+var template Coffee latte := Latte
+var template Coffee espresso := Black(getBlackId(),*)
+//type reference
+var Coffee.id latteId := 4
+var Coffee complecCoffee1 := { id:= {5}, description := omit }
+var Coffee complecCoffee2 := { { 5 }, omit }
+var Coffee complecCoffee3 := { { 5 }, {"complex"}}
+var Coffee complecCoffee4 := { { 5 }, getComplex() }
+var Coffee complecCoffee5 := { getComplex() }
+var Coffee complecCoffee6 := { getComplex(), {"complex"} }

@@ -1,4 +1,0 @@
-A	input.pl	/^use constant A => 3;$/;"	c
-A::B	input.pl	/^package A::B;$/;"	p
-LABEL	input.pl	/^LABEL:$/;"	l
-MySub	input.pl	/^sub MySub {}$/;"	s

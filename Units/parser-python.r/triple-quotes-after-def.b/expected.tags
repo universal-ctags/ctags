@@ -1,0 +1,3 @@
+a	input.py	/^def a(i, s): '''a'''$/;"	f
+b	input.py	/^def b(i, s): """b"""$/;"	f
+c	input.py	/^def c(i, s): '''c$/;"	f

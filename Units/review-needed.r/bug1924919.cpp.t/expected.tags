@@ -1,3 +1,0 @@
-MajorVersion	input.cpp	/^	std::string MajorVersion;$/;"	m	namespace:mud	file:
-MinorVersion	input.cpp	/^	std::string MinorVersion;$/;"	m	namespace:mud	file:
-mud	input.cpp	/^namespace mud {$/;"	n	file:

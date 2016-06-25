@@ -1,0 +1,2 @@
+!_TAG_KIND_DESCRIPTION!foo	a,aa	/aa/
+!_TAG_KIND_DESCRIPTION!foo	b,bb	/bb/

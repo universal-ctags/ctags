@@ -1,0 +1,1 @@
+main	input.c	/^int main \\$/;"	f	typeref:typename:int

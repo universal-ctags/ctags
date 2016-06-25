@@ -88,6 +88,10 @@ have its own directory under Units directory.
 	enumerate them in this file line by line. If a target ctags
 	doesn't have one of the features, the test is skipped.
 
+	If a file line is started with ``!``, the effect is inverted;
+	if a target ctags has the feature specified with ``!``, the
+	test is skipped.
+
 	All features built-in can be listed with passing
 	``--list-features`` to ctags.
 
@@ -134,12 +138,15 @@ How to run unit tests
 	 $ make units
 
 The result of unit tests is reported by lines. You can specify
-test cases with ``UNITS=``. Consider you want to run a test under
-*vim-command.d* only. You can do it with following command line::
+test cases with ``UNITS=``.
+
+An example to run *vim-command.d* only::
 
 	$ make units UNITS=vim-command
 
-You can list more than two test cases with comma separator to UNITS.
+Another example to run *vim-command.d* and *parser-python.r/bug1856363.py.d*::
+
+	$ make units UNITS=vim-command,bug1856363.py
 
 During testing *OUTPUT.tmp*, *EXPECTED.tmp* and *DIFF.tmp* files are
 generated for each test case directory. These are removed when the
@@ -277,18 +284,18 @@ Categories
 
 With *.r* suffix, you can put test cases under a sub directory
 of *Units*. ``Units/parser-ada.r`` is an example. If *misc/units*
-test harness, the sub directory is called a category. ``parser-ada``
+test harness, the sub directory is called a category. ``parser-ada.r``
 is the name category in the above example.
 
 
 Finding minimal bad input
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If ``SHRINK=1`` is given as argument for make, the input causing
-``FAILED`` result is passed to *misc/units shrink*.  *misc/units
-shrink* tries to make the shortest input which makes ctags exits with
-non-zero status.  The result is reported to
-``Units/\*/SHRINK-${language}.tmp``.  Maybe useful to debug.
+When a test case is failed, the input causing ``FAILED`` result is
+passed to *misc/units shrink*.  *misc/units shrink* tries to make the
+shortest input which makes ctags exits with non-zero status.  The
+result is reported to ``Units/\*/SHRINK-${language}.tmp``.  Maybe
+useful to debug.
 
 Acknowledgments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

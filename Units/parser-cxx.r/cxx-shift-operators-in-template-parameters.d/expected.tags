@@ -1,0 +1,4 @@
+c	input.cpp	/^template <int P> class c {};$/;"	c	file:
+bVar	input.cpp	/^c< 8 > bVar;$/;"	v	typeref:typename:c<8>
+aVar	input.cpp	/^c< 1<<8 > aVar;$/;"	v	typeref:typename:c<1<<8>
+f12	input.cpp	/^template<int X> f12( c< 1<<X> & aVar) { };$/;"	f	signature:(c<1<<X> & aVar)

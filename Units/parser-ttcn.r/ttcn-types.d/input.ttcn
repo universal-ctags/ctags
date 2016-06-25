@@ -1,0 +1,32 @@
+module CoffeeTypes
+{
+
+type record Coffee
+{
+    integer id,
+    charstring description
+}
+
+type record of Coffee CoffeeList
+type record length (1..2) of Coffee RangedCoffeeList
+
+type record Tee
+{
+    record of integer nestedIntegersRecord,
+    record length (0..5) of integer nestedRangedIntegersRecord,
+    set of integer nestedIntegersSet,
+    set length (2..4) of integer nestedRangerdIntegersSet,
+    enumerated {e_type1, e_type2} nestedEnum,
+    union {Type1 t1, Type2 t2} nestedUnion
+}
+
+type set of Tee TeeSet
+type set length (0 .. 2) of Tee RangedTeeSet
+
+type union Drink
+{
+    Tee tee,
+    Coffee coffee,
+}
+
+}
