@@ -162,7 +162,7 @@ typedef struct {
 	vString *		string;
 	int				indent;
 	unsigned long 	lineNumber;
-	fpos_t			filePosition;
+	MIOPos			filePosition;
 } tokenInfo;
 
 struct pythonNestingLevelUserData {
