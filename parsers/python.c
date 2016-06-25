@@ -22,6 +22,7 @@
 #include "keyword.h"
 #include "routines.h"
 #include "debug.h"
+#include "xtag.h"
 
 
 typedef enum {
@@ -59,15 +60,66 @@ typedef enum {
 	K_METHOD,
 	K_VARIABLE,
 	K_IMPORT,
+	K_NAMESPACE,
+	K_MODULE,
+	K_UNKNOWN,
 	COUNT_KIND
 } pythonKind;
+
+typedef enum {
+	PYTHON_MODULE_IMPORTED,
+	PYTHON_MODULE_NAMESPACE,
+	PYTHON_MODULE_INDIRECTLY_IMPORTED,
+} pythonModuleRole;
+
+typedef enum {
+	PYTHON_UNKNOWN_IMPORTED,
+	PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
+} pythonUnknownRole;
+
+/* Roles related to `import'
+ * ==========================
+ * import X              X = (kind:module, role:imported)
+ *
+ * import X as Y         X = (kind:module, role:indirectly-imported),
+ *                       Y = (kind:namespace, [nameref:X])
+ *                       ------------------------------------------------
+ *                       Don't confuse with namespace role of module kind.
+ *
+ * from X import *       X = (kind:module,  role:namespace)
+ *
+ * from X import Y       X = (kind:module,  role:namespace),
+ *                       Y = (kind:unknown, role:imported, [scope:X])
+ *
+ * from X import Y as Z  X = (kind:module,  role:namespace),
+ *                       Y = (kind:unknown, role:indirectly-imported, [scope:X])
+ *                       Z = (kind:unknown, [nameref:X.Y]) */
+
+static roleDesc PythonModuleRoles [] = {
+	{ TRUE, "imported",
+	  "imported modules" },
+	{ TRUE, "namespace",
+	  "namespace from where classes/variables/functions are imported" },
+	{ TRUE, "indirectly-imported",
+	  "module imported in alternative name" },
+};
+
+static roleDesc PythonUnknownRoles [] = {
+	{ TRUE, "imported",   "imported from the other module" },
+	{ TRUE, "indirectly-imported",
+	  "classes/variables/functions imported in alternative name" },
+};
 
 static kindOption PythonKinds[COUNT_KIND] = {
 	{TRUE, 'c', "class",    "classes"},
 	{TRUE, 'f', "function", "functions"},
 	{TRUE, 'm', "member",   "class members"},
 	{TRUE, 'v', "variable", "variables"},
-	{TRUE, 'i', "namespace", "imports"}
+	{TRUE, 'I', "namespace", "name referring a module defined in other file"},
+	{TRUE, 'i', "module",    "modules",
+	 .referenceOnly = TRUE,  ATTACH_ROLES(PythonModuleRoles)},
+	{TRUE, 'x', "unknown",   "name referring a classe/variable/function defined in other module",
+	 .referenceOnly = FALSE, ATTACH_ROLES(PythonUnknownRoles)},
 };
 
 typedef struct {
@@ -766,34 +818,129 @@ static void findPythonTags (void)
 		{
 			readNext = parseClassOrDef (token, K_FUNCTION, TRUE);
 		}
-		else if (token->keyword == KEYWORD_import)
+		else if (token->keyword == KEYWORD_from ||
+		         token->keyword == KEYWORD_import)
 		{
-			do
+			vString *from_module = NULL;
+
+			if (token->keyword == KEYWORD_from)
 			{
 				readToken (token);
 				if (token->type == TOKEN_IDENTIFIER)
 				{
-					tokenInfo *name = newToken ();
-
-					copyToken (name, token);
-					/* skip sub-levels in foo.bar.baz */
-					skipQualifiedName (token);
-					/* if there is an "as", use it as the name */
-					if (token->keyword == KEYWORD_as)
-					{
-						readToken (token);
-						if (token->type == TOKEN_IDENTIFIER)
-						{
-							copyToken (name, token);
-							readToken (token);
-						}
-					}
-
-					makeSimplePythonTag (name, K_IMPORT);
+					from_module = vStringNewCopy (token->string);
+					readToken (token);
 				}
 			}
-			while (token->type == ',');
+
+			if (token->keyword == KEYWORD_import)
+			{
+				if (from_module)
+				{
+					/* from X import ...
+					 * --------------------
+					 * X = (kind:module, role:namespace) */
+					makeSimpleRefTag (from_module, PythonKinds, K_MODULE,
+					                  PYTHON_MODULE_NAMESPACE);
+				}
+
+				do
+				{
+					readToken (token);
+					if (token->type == TOKEN_IDENTIFIER)
+					{
+						tokenInfo *name = newToken ();
+
+						copyToken (name, token);
+						/* skip sub-levels in foo.bar.baz */
+						skipQualifiedName (token);
+						/* if there is an "as", use it as the name */
+						if (token->keyword == KEYWORD_as)
+						{
+							readToken (token);
+							if (token->type == TOKEN_IDENTIFIER)
+							{
+								if (from_module)
+								{
+									/* from x import Y as Z
+									 * ----------------------------
+									 * x = (kind:module,  role:namespace),
+									 * Y = (kind:unknown, role:indirectly-imported),
+									 * Z = (kind:unknown) */
+
+									/* Y */
+									makeSimpleRefTag (name->string, PythonKinds, K_UNKNOWN,
+									                  PYTHON_UNKNOWN_INDIRECTLY_IMPORTED);
+									/* x.Y */
+									if (isXtagEnabled(XTAG_QUALIFIED_TAGS))
+									{
+										vString *fq = vStringNewCopy (from_module);
+										vStringPut (fq, '.');
+										vStringCat (fq, name->string);
+										makeSimpleRefTag (fq, PythonKinds, K_UNKNOWN,
+										                  PYTHON_UNKNOWN_INDIRECTLY_IMPORTED);
+										vStringDelete (fq);
+									}
+									/* Z */
+									makeSimplePythonTag (token, K_UNKNOWN);
+								}
+								else
+								{
+									/* import x as Y
+									 * ----------------------------
+									 * X = (kind:module, role:indirectly-imported)
+									 * Y = (kind:namespace)*/
+									/* X */
+									makeSimpleRefTag (name->string, PythonKinds, K_MODULE,
+									                  PYTHON_MODULE_INDIRECTLY_IMPORTED);
+									/* Y */
+									makeSimplePythonTag (token, K_NAMESPACE);
+								}
+
+								copyToken (name, token);
+								readToken (token);
+							}
+						}
+						else
+						{
+							if (from_module)
+							{
+								/* from x import Y
+								   --------------
+								   x = (kind:module,  role:namespace),
+								   Y = (kind:unknown, role:imported) */
+								/* Y */
+								makeSimpleRefTag (name->string, PythonKinds, K_UNKNOWN,
+								                  PYTHON_MODULE_IMPORTED);
+								/* x.Y */
+								if (isXtagEnabled(XTAG_QUALIFIED_TAGS))
+								{
+									vString *fq = vStringNewCopy (from_module);
+									vStringPut (fq, '.');
+									vStringCat (fq, name->string);
+									makeSimpleRefTag (fq, PythonKinds, K_UNKNOWN,
+									                  PYTHON_MODULE_IMPORTED);
+									vStringDelete (fq);
+								}
+							}
+							else
+							{
+								/* import X
+								   --------------
+								   X = (kind:module, role:imported) */
+								makeSimpleRefTag (name->string, PythonKinds, K_MODULE,
+								                  PYTHON_MODULE_IMPORTED);
+							}
+						}
+
+						makeSimplePythonTag (name, K_IMPORT);
+					}
+				}
+				while (token->type == ',');
+			}
 			readNext = FALSE;
+
+			vStringDelete (from_module);
 		}
 		else if (token->type == '(')
 		{ /* skip parentheses to avoid finding stuff inside them */
