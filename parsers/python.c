@@ -1060,6 +1060,7 @@ extern parserDefinition* PythonParser (void)
 	def->aliases = aliases;
 	def->parser = findPythonTags;
 	def->initialize = initialize;
+	def->useCork = TRUE;
 	return def;
 }
 
