@@ -607,6 +607,19 @@ static void readToken (tokenInfo *const token)
 /*================================= parsing =================================*/
 
 
+static void reprCat (vString *const repr, const tokenInfo *const token)
+{
+	if (token->type != TOKEN_INDENT &&
+	    token->type != TOKEN_WHITESPACE)
+	{
+		vStringCat (repr, token->string);
+	}
+	else if (vStringLength (repr) > 0 && vStringLast (repr) != ' ')
+	{
+		vStringPut (repr, ' ');
+	}
+}
+
 static boolean skipOverPair (tokenInfo *const token, int tOpen, int tClose,
                              vString *const repr)
 {
@@ -615,18 +628,13 @@ static boolean skipOverPair (tokenInfo *const token, int tOpen, int tClose,
 		int depth = 1;
 
 		if (repr)
-			vStringCat (repr, token->string);
+			reprCat (repr, token);
 		do
 		{
 			readTokenFull (token, TRUE);
 			if (repr)
 			{
-				if ((token->type != TOKEN_INDENT &&
-				     token->type != TOKEN_WHITESPACE) ||
-				    vStringLast (repr) != ' ')
-				{
-					vStringCat (repr, token->string);
-				}
+				reprCat (repr, token);
 			}
 			if (token->type == tOpen)
 				depth ++;
@@ -658,18 +666,17 @@ static boolean skipLambdaArglist (tokenInfo *const token, vString *const repr)
 		else if (token->keyword == KEYWORD_lambda)
 		{ /* handle lambdas in a default value */
 			if (repr)
-				vStringCat (repr, token->string);
+				reprCat (repr, token);
 			readTokenFull (token, TRUE);
 			readNext = skipLambdaArglist (token, repr);
 			if (token->type == ':')
 				readNext = TRUE;
 			if (readNext && repr)
-				vStringCat (repr, token->string);
+				reprCat (repr, token);
 		}
-		else if (repr && (token->type != TOKEN_WHITESPACE ||
-		                  vStringLast (repr) != ' '))
+		else if (repr)
 		{
-			vStringCat (repr, token->string);
+			reprCat (repr, token);
 		}
 
 		if (readNext)
