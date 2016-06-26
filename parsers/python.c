@@ -329,7 +329,7 @@ static int makeSimplePythonRefTag (const tokenInfo *const token,
 		tagEntryInfo e;
 
 		initRefTagEntry (&e, vStringValue (altName ? altName : token->string),
-		                 &PythonKinds[kind], roleIndex);
+		                 &(PythonKinds[kind]), roleIndex);
 
 		e.lineNumber	= token->lineNumber;
 		e.filePosition	= token->filePosition;
@@ -945,7 +945,7 @@ static void findPythonTags (void)
 										vString *fq = vStringNewCopy (fromModule->string);
 										vStringPut (fq, '.');
 										vStringCat (fq, name->string);
-										makeSimplePythonRefTag (token, fq, K_UNKNOWN,
+										makeSimplePythonRefTag (name, fq, K_UNKNOWN,
 										                        PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
 										                        XTAG_QUALIFIED_TAGS);
 										vStringDelete (fq);
@@ -960,7 +960,7 @@ static void findPythonTags (void)
 									 * X = (kind:module, role:indirectly-imported)
 									 * Y = (kind:namespace)*/
 									/* X */
-									makeSimplePythonRefTag (token, NULL, K_MODULE,
+									makeSimplePythonRefTag (name, NULL, K_MODULE,
 									                        PYTHON_MODULE_INDIRECTLY_IMPORTED,
 									                        XTAG_UNKNOWN);
 									/* Y */
