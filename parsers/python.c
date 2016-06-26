@@ -1007,6 +1007,8 @@ static void findPythonTags (void)
 								                        XTAG_UNKNOWN);
 							}
 						}
+
+						deleteToken (name);
 					}
 				}
 				while (token->type == ',');
@@ -1064,6 +1066,7 @@ static void findPythonTags (void)
 								readNext = skipLambdaArglist (token, arglist);
 								vStringPut (arglist, ')');
 								makeFunctionTag (name, arglist);
+								vStringDelete (arglist);
 							}
 						}
 						break;
