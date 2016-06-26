@@ -709,14 +709,14 @@ static void readQualifiedName (tokenInfo *const nameToken)
 {
 	readToken (nameToken);
 
-	if (nameToken->type != TOKEN_IDENTIFIER &&
-	    nameToken->type != '.')
+	if (nameToken->type == TOKEN_IDENTIFIER ||
+	    nameToken->type == '.')
 	{
 		vString *qualifiedName = vStringNew ();
 		tokenInfo *token = newToken ();
 
-		while (nameToken->type != TOKEN_IDENTIFIER &&
-		       nameToken->type != '.')
+		while (nameToken->type == TOKEN_IDENTIFIER ||
+		       nameToken->type == '.')
 		{
 			vStringCat (qualifiedName, nameToken->string);
 			copyToken (token, nameToken);
