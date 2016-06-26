@@ -1,0 +1,2 @@
+Func	input.vim	/^function Func()$/;"	f
+g:global_var	input.vim	/^  let g:global_var = 42$/;"	v
