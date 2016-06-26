@@ -83,7 +83,7 @@ typedef struct sTagEntryInfo {
 #endif
 	} extensionFields;  /* list of extension fields*/
 
-#define PRE_ALLOCATED_PARSER_FIELDS 4
+#define PRE_ALLOCATED_PARSER_FIELDS 5
 #define NO_PARSER_FIELD -1
 	unsigned int usedParserFields;
 	tagField     parserFields [PRE_ALLOCATED_PARSER_FIELDS];

@@ -43,6 +43,7 @@ enum CXXTagCPPKind
 {
 	CXXTagCPPKindCLASS = CXXTagCommonKindCount,
 	CXXTagCPPKindNAMESPACE,
+	CXXTagCPPKindALIAS,
 	CXXTagCPPKindNAME,
 	CXXTagCPPKindUSING
 };
@@ -60,7 +61,8 @@ enum CXXTagCommonField
 enum CXXTagCPPField
 {
 	CXXTagCPPFieldTemplate = CXXTagCommonFieldCount,
-	CXXTagCPPFieldLambdaCaptureList
+	CXXTagCPPFieldLambdaCaptureList,
+	CXXTagCPPFieldAliasedName
 };
 
 

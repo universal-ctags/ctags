@@ -164,10 +164,13 @@ void cxxParserExtractTypedef(
 		boolean bExpectTerminatorAtEnd
 	);
 
+// cxx_parser_namespace.c
+boolean cxxParserParseNamespace(void);
 
 // cxx_parser.c
 void cxxParserNewStatement(void);
-boolean cxxParserParseNamespace(void);
+boolean cxxParserSkipToSemicolonOrEOF(void);
+boolean cxxParserParseToEndOfQualifedName(void);
 boolean cxxParserParseEnum(void);
 boolean cxxParserParseClassStructOrUnion(
 		enum CXXKeyword eKeyword,
