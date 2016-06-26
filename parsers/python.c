@@ -172,6 +172,7 @@ struct pythonNestingLevelUserData {
 static langType Lang_python;
 static tokenInfo *NextToken = NULL;
 static NestingLevels *PythonNestingLevels = NULL;
+static vString *FullScope = NULL;
 
 
 static void buildPythonKeywordHash (void)
@@ -218,13 +219,9 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
                              const pythonKind kind)
 {
 	accessType access;
-	static vString *fullScope = NULL;
 	int parentKind = -1;
 
-	if (fullScope == NULL)
-		fullScope = vStringNew ();
-	else
-		vStringClear (fullScope);
+	vStringClear (FullScope);
 
 	initTagEntry (e, vStringValue (token->string), &(PythonKinds[kind]));
 
@@ -248,9 +245,9 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 				continue;
 
 			parentKind = (int) (nlEntry->kind - PythonKinds);
-			if (vStringLength (fullScope) > 0)
-				vStringPut (fullScope, '.');
-			vStringCatS (fullScope, nlEntry->name);
+			if (vStringLength (FullScope) > 0)
+				vStringPut (FullScope, '.');
+			vStringCatS (FullScope, nlEntry->name);
 		}
 	}
 
@@ -260,13 +257,13 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 	if (access == ACCESS_PRIVATE)
 		e->isFileScope = TRUE;
 
-	if (vStringLength (fullScope) > 0)
+	if (vStringLength (FullScope) > 0)
 	{
 		Assert (parentKind >= 0);
 
-		vStringTerminate (fullScope);
+		vStringTerminate (FullScope);
 		e->extensionFields.scopeKind = &(PythonKinds[parentKind]);
-		e->extensionFields.scopeName = vStringValue (fullScope);
+		e->extensionFields.scopeName = vStringValue (FullScope);
 
 		if (kind == K_FUNCTION && parentKind == K_CLASS)
 			e->kind		= &(PythonKinds[K_METHOD]);
@@ -866,6 +863,7 @@ static void findPythonTags (void)
 
 	NextToken = NULL;
 	PythonNestingLevels = nestingLevelsNew (sizeof (struct pythonNestingLevelUserData));
+	FullScope = vStringNew ();
 
 	readToken (token);
 	while (token->type != TOKEN_EOF)
@@ -1084,6 +1082,7 @@ static void findPythonTags (void)
 			readToken (token);
 	}
 
+	vStringDelete (FullScope);
 	nestingLevelsFree (PythonNestingLevels);
 	deleteToken (token);
 	Assert (NextToken == NULL);
