@@ -31,7 +31,7 @@ New parsers
 The following parsers have been added:
 
 * Ada
-* Automake  
+* Automake
 * Clojure
 * CSS
 * D
@@ -118,6 +118,36 @@ code "wildcard"(``*``) in option is introduced.
 ``--*-kinds=*``
 
 	Enables all available kinds to all available language parsers.
+
+
+Long names in kinds, fields, and extra options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A letter is used for specifying a kind, a field, or an extra entry.
+In universal-ctags, a name can be used, too for the same purpose.
+
+Surround the name with braces (`{` and `}`) for specifying a name as a replacement
+of a letter in a parameter of options, ``--kind-<LANG>=``, ``--fields=``, or ``--extra=``.
+
+.. code-block:: console
+
+	$ ./ctags --kinds-C=+L-d ...
+
+This command line uses letters, `L` for enabling label kind and `d` of C, and
+for disabling macro of C. The command line can be rewritten with the associated
+names.
+
+.. code-block:: console
+
+	$ ./ctags --kinds-C='+{label}-{macro}' ...
+
+The quotes characters are needed because braces are meta characters in
+shell.
+
+The names can be listed with ``--list-kinds-full``, ``--list-fields``, or
+``--list-extras``.
+
+
 
 Notice message and ``--quiet`` option
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -763,7 +793,7 @@ rejection: readtags doesn't print it.
 	      $inherits
 	    $scope-kind
 	    $scope-name
-	           $end
+		   $end
 
 All symbols started from `$` represent a field of an entry which is
 under judgment with the S expression. Most of all them are evaluated

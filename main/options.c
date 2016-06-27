@@ -1059,6 +1059,13 @@ static void processExcmdOption (
 	}
 }
 
+static void resetXtags (boolean mode)
+{
+	int i;
+	for (i = 0; i < XTAG_COUNT; i++)
+		enableXtag (i, mode);
+}
+
 static void processExtraTagsOption (
 		const char *const option, const char *const parameter)
 {
@@ -1066,30 +1073,74 @@ static void processExtraTagsOption (
 	const char *p = parameter;
 	boolean mode = TRUE;
 	int c;
-	int i;
+	static vString *longName;
+	boolean inLongName = FALSE;
+	const char *x;
 
-	if (*p != '+'  &&  *p != '-')
+	if (*p == '*')
 	{
-		int i;
-		for (i = 0; i < XTAG_COUNT; i++)
-			enableXtag (i, FALSE);
+		resetXtags (TRUE);
+		p++;
 	}
-	while ((c = *p++) != '\0') switch (c)
+	else if (*p != '+'  &&  *p != '-')
+		resetXtags (FALSE);
+
+	longName = vStringNewOrClear (longName);
+
+	while ((c = *p++) != '\0')
 	{
-		case '+': mode = TRUE;                break;
-		case '-': mode = FALSE;               break;
-		case '*':
-			for (i = 0; i < XTAG_COUNT; ++i)
-				enableXtag (i, TRUE);
+		switch (c)
+		{
+		case '+':
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				mode = TRUE;
 			break;
-		default:
-			t = getXtagTypeForOption (c);
+		case '-':
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				mode = FALSE;
+			break;
+		case '{':
+			if (inLongName)
+				error(FATAL,
+				      "unexpected character in extra specification: \'%c\'",
+				      c);
+			inLongName = TRUE;
+			break;
+		case '}':
+			if (!inLongName)
+				error(FATAL,
+				      "unexpected character in extra specification: \'%c\'",
+				      c);
+			x = vStringValue (longName);
+			t = getXtagTypeForName (x);
+
 			if (t == XTAG_UNKNOWN)
-				error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
-				      c, option);
+				error(WARNING, "Unsupported parameter '{%s}' for \"%s\" option",
+				      x, option);
 			else
 				enableXtag (t, mode);
+
+			inLongName = FALSE;
+			vStringClear (longName);
 			break;
+		default:
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+			{
+				t = getXtagTypeForLetter (c);
+				if (t == XTAG_UNKNOWN)
+					error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
+					      c, option);
+				else
+					enableXtag (t, mode);
+			}
+			break;
+		}
 	}
 }
 
