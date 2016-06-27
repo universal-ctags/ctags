@@ -1148,6 +1148,7 @@ extern parserDefinition* PythonParser (void)
 	def->fieldSpecs = PythonFields;
 	def->fieldSpecCount = ARRAY_SIZE (PythonFields);
 	def->useCork = TRUE;
+	def->requestAutomaticFQTag = TRUE;
 	return def;
 }
 
