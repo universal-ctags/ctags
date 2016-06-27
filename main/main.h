@@ -16,8 +16,6 @@
 
 #include <stdio.h>
 
-#include "vstring.h"
-
 /*
 *   FUNCTION PROTOTYPES
 */

@@ -201,6 +201,9 @@
     <ClCompile Include="..\main\entry.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\error.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\field.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -239,6 +242,15 @@
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\options.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\output-ctags.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\output-etags.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\output-xref.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\parse.c">
@@ -355,6 +367,9 @@
     <ClInclude Include="..\main\entry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\field.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -380,6 +395,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\output.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\parse.h">

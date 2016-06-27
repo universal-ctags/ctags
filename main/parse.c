@@ -2243,8 +2243,7 @@ extern boolean parseFile (const char *const fileName)
 					EncodingMap[language] : Option.inputEncoding, Option.outputEncoding);
 #endif
 
-		if (Option.etags)
-			beginEtagsFile ();
+		setupWriter ();
 
 		tagFileResized = createTagsWithFallback (fileName, language, mio);
 #ifdef HAVE_COPROC
@@ -2252,8 +2251,8 @@ extern boolean parseFile (const char *const fileName)
 			tagFileResized = createTagsWithXcmd (fileName, language, mio)? TRUE: tagFileResized;
 #endif
 
-		if (Option.etags)
-			endEtagsFile (fileName);
+		teardownWriter (fileName);
+
 		if (Option.filter)
 			closeTagFile (tagFileResized);
 		addTotals (1, 0L, 0L);
