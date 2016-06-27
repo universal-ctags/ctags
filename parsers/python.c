@@ -275,8 +275,7 @@ static int makeClassTag (const tokenInfo *const token,
 
 		initPythonEntry (&e, token, K_CLASS);
 
-		if (inheritance && vStringLength (inheritance) > 0)
-			e.extensionFields.inheritance = vStringValue (inheritance);
+		e.extensionFields.inheritance = inheritance ? vStringValue (inheritance) : "";
 
 		return makeTagEntry (&e);
 	}
