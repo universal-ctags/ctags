@@ -1,0 +1,13 @@
+VAR01	input.py	/^VAR01 = ""$/;"	v
+VAR02	input.py	/^VAR02 = "hello"$/;"	v
+VAR03	input.py	/^VAR03 = ''$/;"	v
+VAR04	input.py	/^VAR04 = 'hi'$/;"	v
+VAR05	input.py	/^VAR05 = "\\""$/;"	v
+VAR06	input.py	/^VAR06 = '\\''$/;"	v
+VAR07	input.py	/^VAR07 = "'''"$/;"	v
+VAR08	input.py	/^VAR08 = '"""'$/;"	v
+VAR09	input.py	/^VAR09 = "oops$/;"	v
+VAR10	input.py	/^VAR10 = 'oopsie$/;"	v
+VAR11	input.py	/^VAR11 = "\\"$/;"	v
+VAR12	input.py	/^VAR12 = '\\'$/;"	v
+VAR13	input.py	/^VAR13 = 42$/;"	v
