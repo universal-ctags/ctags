@@ -762,48 +762,44 @@ static boolean readCDefName (tokenInfo *const token, pythonKind *kind)
 		readToken (token);
 	}
 	else
-	{ /* skip type declaration */
-		if (token->keyword == KEYWORD_inline)
-			readToken (token);
-		else
-		{ /* otherwise, skip the optional type -- everything on the same line
-		   * until an identifier followed by "(". */
-			tokenInfo *candidate = newToken ();
+	{
+		/* skip the optional type declaration -- everything on the same line
+		 * until an identifier followed by "(". */
+		tokenInfo *candidate = newToken ();
 
-			while (token->type != TOKEN_EOF &&
-			       token->type != TOKEN_INDENT &&
-			       token->type != '=' &&
-			       token->type != ',' &&
-			       token->type != ':')
+		while (token->type != TOKEN_EOF &&
+		       token->type != TOKEN_INDENT &&
+		       token->type != '=' &&
+		       token->type != ',' &&
+		       token->type != ':')
+		{
+			if (token->type == '[')
 			{
-				if (token->type == '[')
-				{
-					if (skipOverPair (token, '[', ']', NULL, FALSE))
-						readToken (token);
-				}
-				else if (token->type == '(')
-				{
-					if (skipOverPair (token, '(', ')', NULL, FALSE))
-						readToken (token);
-				}
-				else if (token->type == TOKEN_IDENTIFIER)
-				{
-					copyToken (candidate, token);
-					readToken (token);
-					if (token->type == '(')
-					{ /* okay, we really found a function, use this */
-						*kind = K_FUNCTION;
-						ungetToken (token);
-						copyToken (token, candidate);
-						break;
-					}
-				}
-				else
+				if (skipOverPair (token, '[', ']', NULL, FALSE))
 					readToken (token);
 			}
-
-			deleteToken (candidate);
+			else if (token->type == '(')
+			{
+				if (skipOverPair (token, '(', ')', NULL, FALSE))
+					readToken (token);
+			}
+			else if (token->type == TOKEN_IDENTIFIER)
+			{
+				copyToken (candidate, token);
+				readToken (token);
+				if (token->type == '(')
+				{ /* okay, we really found a function, use this */
+					*kind = K_FUNCTION;
+					ungetToken (token);
+					copyToken (token, candidate);
+					break;
+				}
+			}
+			else
+				readToken (token);
 		}
+
+		deleteToken (candidate);
 	}
 
 	return token->type == TOKEN_IDENTIFIER;
