@@ -79,8 +79,8 @@ extern fieldType getFieldTypeForOption (char letter);
 
    `getFieldTypeForNameAndLanguage' can be used for getting all fields having
    the same name; specify `LANG_AUTO' as `language' parameter to get the first
-   field having the name. With the returned fieldType, `nextFieldSibling' gets
-   the next field having the same name. `nextFieldSibling' returns `FIELD_UNKNOWN'
+   field having the name. With the returned fieldType, `nextSiblingField' gets
+   the next field having the same name. `nextSiblingField' returns `FIELD_UNKNOWN'
    at the end of iteration.
 
    Specifying `LANG_IGNORE' has the same effects as `LANG_AUTO'. However,
@@ -105,6 +105,6 @@ extern int countFields (void);
 /* language should be typed to langType.
    Use int here to avoid circular dependency */
 extern int defineField (fieldSpec *spec, int language);
-extern fieldType nextFieldSibling (fieldType type);
+extern fieldType nextSiblingField (fieldType type);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

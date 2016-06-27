@@ -192,7 +192,8 @@ static fmtElement** queueTagField (fmtElement **last, long width, char field_let
 	if (language == LANG_AUTO)
 	{
 		fieldType ftype_next = ftype;
-		while ((ftype_next = nextFieldSibling (ftype_next)) != FIELD_UNKNOWN)
+
+		while ((ftype_next = nextSiblingField (ftype_next)) != FIELD_UNKNOWN)
 			enableField (ftype_next, TRUE, FALSE);
 	}
 

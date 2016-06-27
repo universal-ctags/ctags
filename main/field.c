@@ -721,7 +721,7 @@ extern int countFields (void)
 	return fieldDescUsed;
 }
 
-extern fieldType nextFieldSibling (fieldType type)
+extern fieldType nextSiblingField (fieldType type)
 {
 	fieldDesc *fdesc;
 
