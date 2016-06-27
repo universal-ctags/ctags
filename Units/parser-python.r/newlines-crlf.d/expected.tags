@@ -1,0 +1,4 @@
+Cls	input.py	/^class Cls:$/;"	c
+__init__	input.py	/^    def __init__():$/;"	m	class:Cls
+bar	input.py	/^bar():$/;"	f
+foo	input.py	/^def foo():$/;"	f

@@ -1,0 +1,2 @@
+Tags are right, but location are not recorded correctly.
+Likely due to a bug in main part line number recording with CRs alone.
