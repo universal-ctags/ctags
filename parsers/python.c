@@ -1033,6 +1033,7 @@ static void findPythonTags (void)
 				{
 					copyToken (name, token);
 					readToken (token);
+					readNext = FALSE;
 					/* FIXME: to get perfect tag types, we'd need to collect
 					 *        the multiple names, and then map the initializers
 					 *        back, but that's very hard. */
@@ -1041,10 +1042,7 @@ static void findPythonTags (void)
 						makeSimplePythonTag (name, K_VARIABLE);
 						readToken (token);
 						if (token->type != TOKEN_IDENTIFIER)
-						{
-							readNext = FALSE;
 							break;
-						}
 					}
 					else
 					{
@@ -1052,7 +1050,6 @@ static void findPythonTags (void)
 						{
 							/* check for lambdas */
 							readToken (token);
-							readNext = FALSE;
 							if (token->keyword != KEYWORD_lambda)
 								makeSimplePythonTag (name, K_VARIABLE);
 							else
