@@ -950,6 +950,8 @@ static void findPythonTags (void)
 
 			if (token->keyword == KEYWORD_import)
 			{
+				boolean parenthesized = FALSE;
+
 				if (fromModule)
 				{
 					/* from X import ...
@@ -963,6 +965,14 @@ static void findPythonTags (void)
 				do
 				{
 					readQualifiedName (token);
+
+					/* support for `from x import (...)` */
+					if (fromModule && ! parenthesized && token->type == '(')
+					{
+						parenthesized = TRUE;
+						readQualifiedName (token);
+					}
+
 					if (token->type == TOKEN_IDENTIFIER)
 					{
 						tokenInfo *name = newToken ();
@@ -1058,6 +1068,9 @@ static void findPythonTags (void)
 					}
 				}
 				while (token->type == ',');
+
+				if (parenthesized && token->type == ')')
+					readToken (token);
 			}
 			readNext = FALSE;
 

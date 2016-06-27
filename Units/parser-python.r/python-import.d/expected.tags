@@ -41,8 +41,3 @@ z3	input.py	/^                        z3, z4)$/;"	unknown	role:imported
 x.z3	input.py	/^                        z3, z4)$/;"	unknown	role:imported
 z4	input.py	/^                        z3, z4)$/;"	unknown	role:imported
 x.z4	input.py	/^                        z3, z4)$/;"	unknown	role:imported
-X	input.py	/^import X as$/;"	module	role:indirectly-imported
-Y	input.py	/^import Y,$/;"	module	role:imported
-Z	input.py	/^from Z import ( A$/;"	module	role:namespace
-A	input.py	/^from Z import ( A$/;"	unknown	role:imported
-Z.A	input.py	/^from Z import ( A$/;"	unknown	role:imported
