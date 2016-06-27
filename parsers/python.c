@@ -55,6 +55,17 @@ static const char *const PythonAccesses[COUNT_ACCESS] = {
 };
 
 typedef enum {
+	F_END,
+	COUNT_FIELD
+} pythonField;
+
+static fieldSpec PythonFields[COUNT_FIELD] = {
+	{ .name = "end",
+	  .description = "end lines of various constructs",
+	  .enabled = FALSE },
+};
+
+typedef enum {
 	K_CLASS,
 	K_FUNCTION,
 	K_METHOD,
@@ -845,12 +856,21 @@ static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind,
 }
 
 /* pops any level >= to indent */
-static void setIndent (int indent)
+static void setIndent (tokenInfo *const token)
 {
+	char buf[16];
 	NestingLevel *lv = nestingLevelsGetCurrent (PythonNestingLevels);
 
-	while (lv && PY_NL (lv)->indentation >= indent)
+	snprintf (buf, sizeof buf, "%lu", token->lineNumber);
+
+	while (lv && PY_NL (lv)->indentation >= token->indent)
 	{
+		if (lv->corkIndex != CORK_NIL)
+		{
+			attachParserFieldToCorkEntry (lv->corkIndex,
+			                              PythonFields[F_END].ftype, buf);
+		}
+
 		nestingLevelsPop (PythonNestingLevels);
 		lv = nestingLevelsGetCurrent (PythonNestingLevels);
 	}
@@ -871,7 +891,7 @@ static void findPythonTags (void)
 		boolean readNext = TRUE;
 
 		if (token->type == TOKEN_INDENT)
-			setIndent (token->indent);
+			setIndent (token);
 		else if (token->keyword == KEYWORD_class ||
 		         token->keyword == KEYWORD_def)
 		{
@@ -1102,6 +1122,8 @@ extern parserDefinition* PythonParser (void)
 	def->aliases = aliases;
 	def->parser = findPythonTags;
 	def->initialize = initialize;
+	def->fieldSpecs = PythonFields;
+	def->fieldSpecCount = ARRAY_SIZE (PythonFields);
 	def->useCork = TRUE;
 	return def;
 }
