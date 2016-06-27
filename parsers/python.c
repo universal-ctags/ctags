@@ -181,6 +181,7 @@ struct pythonNestingLevelUserData {
 #define PY_NL(nl) ((struct pythonNestingLevelUserData *) nestingLevelGetUserData (nl))
 
 static langType Lang_python;
+static unsigned int TokenContinuationDepth = 0;
 static tokenInfo *NextToken = NULL;
 static NestingLevels *PythonNestingLevels = NULL;
 static vString *FullScope = NULL;
@@ -608,6 +609,16 @@ getNextChar:
 			} /* skip completely empty lines, so retry */
 			while (c == '\r' || c == '\n' || c == '#');
 			ungetcToInputFile (c);
+			if (TokenContinuationDepth > 0)
+			{
+				if (inclWhitespaces)
+				{
+					vStringPut (token->string, ' ');
+					token->type = TOKEN_WHITESPACE;
+				}
+				else
+					goto getNextChar;
+			}
 			break;
 
 		default:
@@ -627,6 +638,22 @@ getNextChar:
 					token->type = TOKEN_KEYWORD;
 			}
 			break;
+	}
+
+	/* handle implicit continuation lines not to emit INDENT inside brackets
+	 * https://docs.python.org/3.6/reference/lexical_analysis.html#implicit-line-joining */
+	if (token->type == '(' ||
+	    token->type == '{' ||
+	    token->type == '[')
+	{
+		TokenContinuationDepth ++;
+	}
+	else if (TokenContinuationDepth > 0 &&
+	         (token->type == ')' ||
+	          token->type == '}' ||
+	          token->type == ']'))
+	{
+		TokenContinuationDepth --;
 	}
 }
 
@@ -881,6 +908,7 @@ static void findPythonTags (void)
 	tokenInfo *const token = newToken ();
 	boolean atLineStart = TRUE;
 
+	TokenContinuationDepth = 0;
 	NextToken = NULL;
 	PythonNestingLevels = nestingLevelsNew (sizeof (struct pythonNestingLevelUserData));
 	FullScope = vStringNew ();
