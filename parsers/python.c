@@ -184,7 +184,6 @@ static langType Lang_python;
 static unsigned int TokenContinuationDepth = 0;
 static tokenInfo *NextToken = NULL;
 static NestingLevels *PythonNestingLevels = NULL;
-static vString *FullScope = NULL;
 
 
 static void buildPythonKeywordHash (void)
@@ -232,34 +231,31 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 {
 	accessType access;
 	int parentKind = -1;
-
-	vStringClear (FullScope);
+	NestingLevel *nl;
 
 	initTagEntry (e, vStringValue (token->string), &(PythonKinds[kind]));
 
 	e->lineNumber	= token->lineNumber;
 	e->filePosition	= token->filePosition;
 
-	if (PythonNestingLevels->n > 0)
+	nl = nestingLevelsGetCurrent (PythonNestingLevels);
+	if (nl)
 	{
-		int i;
+		tagEntryInfo *nlEntry = getEntryOfNestingLevel (nl);
 
-		for (i = 0; i < PythonNestingLevels->n; i++)
+		e->extensionFields.scopeIndex = nl->corkIndex;
+
+		/* nlEntry can be NULL if a kind was disabled.  But what can we do
+		 * here?  Even disabled kinds should count for the hierarchy I
+		 * guess -- as it'd otherwise be wrong -- but with cork we're
+		 * fucked up as there's nothing to look up.  Damn. */
+		if (nlEntry)
 		{
-			NestingLevel *nl = nestingLevelsGetNth (PythonNestingLevels, i);
-			tagEntryInfo *nlEntry = getEntryOfNestingLevel (nl);
-
-			/* This can happen if a kind was disabled.  But what can we do
-			 * here?  Even disabled kinds should count for the hierarchy I
-			 * guess -- as it'd otherwise be wrong -- but with cork we're
-			 * fucked up as there's nothing to look up.  Damn. */
-			if (! nlEntry)
-				continue;
-
 			parentKind = (int) (nlEntry->kind - PythonKinds);
-			if (vStringLength (FullScope) > 0)
-				vStringPut (FullScope, '.');
-			vStringCatS (FullScope, nlEntry->name);
+
+			/* functions directly inside classes are methods, fix it up */
+			if (kind == K_FUNCTION && parentKind == K_CLASS)
+				e->kind = &(PythonKinds[K_METHOD]);
 		}
 	}
 
@@ -268,18 +264,6 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 	/* FIXME: should we really set isFileScope in addition to access? */
 	if (access == ACCESS_PRIVATE)
 		e->isFileScope = TRUE;
-
-	if (vStringLength (FullScope) > 0)
-	{
-		Assert (parentKind >= 0);
-
-		vStringTerminate (FullScope);
-		e->extensionFields.scopeKind = &(PythonKinds[parentKind]);
-		e->extensionFields.scopeName = vStringValue (FullScope);
-
-		if (kind == K_FUNCTION && parentKind == K_CLASS)
-			e->kind		= &(PythonKinds[K_METHOD]);
-	}
 }
 
 static int makeClassTag (const tokenInfo *const token,
@@ -911,7 +895,6 @@ static void findPythonTags (void)
 	TokenContinuationDepth = 0;
 	NextToken = NULL;
 	PythonNestingLevels = nestingLevelsNew (sizeof (struct pythonNestingLevelUserData));
-	FullScope = vStringNew ();
 
 	readToken (token);
 	while (token->type != TOKEN_EOF)
@@ -1140,7 +1123,6 @@ static void findPythonTags (void)
 			readToken (token);
 	}
 
-	vStringDelete (FullScope);
 	nestingLevelsFree (PythonNestingLevels);
 	deleteToken (token);
 	Assert (NextToken == NULL);
