@@ -39,6 +39,16 @@ static int printLiteral (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag __unu
 	return mio_puts (fp, fspec->const_str);
 }
 
+static boolean isParserFieldCompatibleWithFtype (const tagField *pfield, int baseFtype)
+{
+	do {
+		if (pfield->ftype == baseFtype)
+			return TRUE;
+		baseFtype = nextSiblingField (baseFtype);
+	} while (baseFtype != FIELD_UNKNOWN);
+	return FALSE;
+}
+
 static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 {
 	int i;
@@ -56,19 +66,18 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 
 		for (findex = 0; findex < tag->usedParserFields; findex++)
 		{
-			if (tag->parserFields [findex].ftype == ftype)
+			if (isParserFieldCompatibleWithFtype (tag->parserFields + findex, ftype))
 				break;
 		}
 
-		if (findex < tag->usedParserFields)
-			str = renderFieldEscaped (ftype, tag, findex);
+		if (findex == tag->usedParserFields)
+			str = "";
+		else if (isFieldEnabled (tag->parserFields [findex].ftype))
+			str = renderFieldEscaped (tag->parserFields [findex].ftype,
+						  tag, findex);
 		else
-			str = ""; /* TODO */
+			str = "";
 	}
-
-
-	if (str == NULL)
-		str = "";
 
 	if (width < 0)
 		i = mio_printf (fp, "%-*s", -1 * width, str);
@@ -161,6 +170,8 @@ static fmtElement** queueTagField (fmtElement **last, long width, char field_let
 		const char *f;
 
 		language = getLanguageComponentInFieldName (field_name, &f);
+		if (f == NULL)
+			error (FATAL, "No suitable parser for field name: %s", field_name);
 		ftype = getFieldTypeForNameAndLanguage (f, language);
 	}
 	else
