@@ -641,18 +641,18 @@ static void reprCat (vString *const repr, const tokenInfo *const token)
 }
 
 static boolean skipOverPair (tokenInfo *const token, int tOpen, int tClose,
-                             vString *const repr)
+                             vString *const repr, boolean reprOuterPair)
 {
 	if (token->type == tOpen)
 	{
 		int depth = 1;
 
-		if (repr)
+		if (repr && reprOuterPair)
 			reprCat (repr, token);
 		do
 		{
 			readTokenFull (token, TRUE);
-			if (repr)
+			if (repr && (reprOuterPair || token->type != tClose || depth > 1))
 			{
 				reprCat (repr, token);
 			}
@@ -678,11 +678,11 @@ static boolean skipLambdaArglist (tokenInfo *const token, vString *const repr)
 		boolean readNext = TRUE;
 
 		if (token->type == '(')
-			readNext = skipOverPair (token, '(', ')', repr);
+			readNext = skipOverPair (token, '(', ')', repr, TRUE);
 		else if (token->type == '[')
-			readNext = skipOverPair (token, '[', ']', repr);
+			readNext = skipOverPair (token, '[', ']', repr, TRUE);
 		else if (token->type == '{')
-			readNext = skipOverPair (token, '{', '}', repr);
+			readNext = skipOverPair (token, '{', '}', repr, TRUE);
 		else if (token->keyword == KEYWORD_lambda)
 		{ /* handle lambdas in a default value */
 			if (repr)
@@ -769,12 +769,12 @@ static boolean readCDefName (tokenInfo *const token, pythonKind *kind)
 			{
 				if (token->type == '[')
 				{
-					if (skipOverPair (token, '[', ']', NULL))
+					if (skipOverPair (token, '[', ']', NULL, FALSE))
 						readToken (token);
 				}
 				else if (token->type == '(')
 				{
-					if (skipOverPair (token, '(', ')', NULL))
+					if (skipOverPair (token, '(', ')', NULL, FALSE))
 						readToken (token);
 				}
 				else if (token->type == TOKEN_IDENTIFIER)
@@ -827,7 +827,7 @@ static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind,
 	if (token->type == '(')
 	{
 		arglist = vStringNew ();
-		skipOverPair (token, '(', ')', arglist);
+		skipOverPair (token, '(', ')', arglist, kind != K_CLASS);
 	}
 
 	if (kind == K_CLASS)
@@ -1018,7 +1018,7 @@ static void findPythonTags (void)
 		}
 		else if (token->type == '(')
 		{ /* skip parentheses to avoid finding stuff inside them */
-			readNext = skipOverPair (token, '(', ')', NULL);
+			readNext = skipOverPair (token, '(', ')', NULL, FALSE);
 		}
 		else if (token->type == TOKEN_IDENTIFIER && atLineStart)
 		{
