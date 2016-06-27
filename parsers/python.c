@@ -583,7 +583,7 @@ getNextChar:
 				while ((c = getcFromInputFile ()) == ' ' || c == '\t' || c == '\f')
 				{
 					if (c == '\t')
-						token->indent += 8;
+						token->indent += 8 - (token->indent % 8);
 					else if (c == '\f') /* yeah, it's weird */
 						token->indent = 0;
 					else
