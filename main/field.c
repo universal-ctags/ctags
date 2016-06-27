@@ -697,7 +697,19 @@ extern boolean enableField (fieldType type, boolean state, boolean warnIfFixedFi
 		}
 	}
 	else
+	{
 		getFieldDesc(type)->spec->enabled = state;
+
+		if (isCommonField (type))
+			verbose ("enable field \"%s\": %s\n",
+				 getFieldDesc(type)->spec->name,
+				 (state? "TRUE": "FALSE"));
+		else
+			verbose ("enable field \"%s\"<%s>: %s\n",
+				 getFieldDesc(type)->spec->name,
+				 getLanguageName (getFieldOwner(type)),
+				 (state? "TRUE": "FALSE"));
+	}
 	return old;
 }
 
