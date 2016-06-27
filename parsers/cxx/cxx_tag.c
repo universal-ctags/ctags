@@ -280,6 +280,8 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 		ADD_PROPERTY("virtual");
 	if(uProperties & CXXTagPropertyVolatile)
 		ADD_PROPERTY("volatile");
+	if(uProperties & CXXTagPropertyDeprecated)
+		ADD_PROPERTY("deprecated");
 
 	cxxTagSetField(CXXTagFieldProperties,vStringValue(pszProperties));
 

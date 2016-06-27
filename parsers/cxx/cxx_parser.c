@@ -97,6 +97,7 @@ boolean cxxParserParseAndCondenseCurrentSubchain(
 		);
 	g_cxx.pTokenChain = pCurrentChain;
 	g_cxx.pToken = pCurrentChain->pTail;
+
 	return bRet;
 }
 

@@ -566,6 +566,8 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 					uProperties |= CXXTagPropertyExtern;
 				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenMutable)
 					uProperties |= CXXTagPropertyMutable;
+				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenAttributeDeprecated)
+					uProperties |= CXXTagPropertyDeprecated;
 				// Volatile is part of the type, so we don't mark it as a property
 				//if(g_cxx.uKeywordState & CXXParserKeywordStateSeenVolatile)
 				//	uProperties |= CXXTagPropertyVolatile;

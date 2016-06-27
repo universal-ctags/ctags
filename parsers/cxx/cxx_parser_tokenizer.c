@@ -917,20 +917,36 @@ static boolean cxxParserParseNextTokenCondenseAttribute(void)
 	CXXToken * pInner = cxxTokenChainFirst(g_cxx.pToken->pChain);
 	if(pInner)
 	{
-		if(cxxTokenTypeIs(pInner,CXXTokenTypeParenthesisChain))
-			pInner = cxxTokenChainFirst(pInner->pChain);
+		if(pInner->pNext && cxxTokenTypeIs(pInner->pNext,CXXTokenTypeParenthesisChain))
+			pInner = cxxTokenChainFirst(pInner->pNext->pChain);
 		
 		while(pInner)
 		{
 			if(cxxTokenTypeIs(pInner,CXXTokenTypeIdentifier))
 			{
-				if(strcmp(vStringValue(pInner->pszWord),"always_inline"))
+				CXX_DEBUG_PRINT("Analyzing attribyte %s",vStringValue(pInner->pszWord));
+				if(
+						(strcmp(vStringValue(pInner->pszWord),"always_inline") == 0) ||
+						(strcmp(vStringValue(pInner->pszWord),"__always_inline__") == 0)
+					)
 				{
+					CXX_DEBUG_PRINT("Found attribute 'always_inline'");
 					// assume "inline" has been seen.
 					g_cxx.uKeywordState |= CXXParserKeywordStateSeenInline;
-					
+				} else if(
+						(strcmp(vStringValue(pInner->pszWord),"deprecated") == 0) ||
+						(strcmp(vStringValue(pInner->pszWord),"__deprecated__") == 0)
+					)
+				{
+					CXX_DEBUG_PRINT("Found attribute 'deprecated'");
+					// assume "inline" has been seen.
+					g_cxx.uKeywordState |= CXXParserKeywordStateSeenAttributeDeprecated;
 				}
 			}
+		
+			// If needed, we could attach certain attributes to previous
+			// identifiers. But note that __attribute__ may apply to a
+			// following identifier too.
 		
 			pInner = pInner->pNext;
 		}
@@ -1051,13 +1067,15 @@ boolean cxxParserParseNextToken(void)
 				)
 			{
 				t->eType = CXXTokenTypeIdentifier;
-			} else if(iCXXKeyword == CXXKeyword__ATTRIBUTE__)
-			{
-				// special handling for __attribute__
-				return cxxParserParseNextTokenCondenseAttribute();
 			} else {
 				t->eType = CXXTokenTypeKeyword;
 				t->eKeyword = (enum CXXKeyword)iCXXKeyword;
+
+				if(iCXXKeyword == CXXKeyword__ATTRIBUTE__)
+				{
+					// special handling for __attribute__
+					return cxxParserParseNextTokenCondenseAttribute();
+				}
 			}
 		} else {
 			boolean bIgnoreParens = FALSE;

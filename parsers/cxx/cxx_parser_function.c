@@ -1124,13 +1124,14 @@ int cxxParserEmitFunctionTags(
 				uProperties |= CXXTagPropertyVirtual;
 			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic)
 				uProperties |= CXXTagPropertyStatic;
-			// FIXME: Handle __inline, __inline__, __forceinline, __attribute__((always_inline)) ?
 			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenInline)
 				uProperties |= CXXTagPropertyInline;
 			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExplicit)
 				uProperties |= CXXTagPropertyExplicit; // FIXME: Handle "CXXTagPropertyConstructor"?
 			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern)
 				uProperties |= CXXTagPropertyExtern;
+			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenAttributeDeprecated)
+				uProperties |= CXXTagPropertyDeprecated;
 			if(pInfo->pSignatureConst)
 				uProperties |= CXXTagPropertyConst;
 			if(pInfo->uFlags & CXXFunctionSignatureInfoPure)
