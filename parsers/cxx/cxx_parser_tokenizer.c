@@ -872,7 +872,7 @@ static CXXCharTypeData g_aCharTable[128] =
 static boolean cxxParserParseNextTokenCondenseAttribute(void)
 {
 	CXX_DEBUG_ENTER();
-	
+
 	CXX_DEBUG_ASSERT(
 			cxxTokenIsKeyword(g_cxx.pToken,CXXKeyword__ATTRIBUTE__),
 			"This function should be called only after we have parsed __attribute__"
@@ -894,7 +894,7 @@ static boolean cxxParserParseNextTokenCondenseAttribute(void)
 		CXX_DEBUG_LEAVE_TEXT("Something that is not an opening parenthesis");
 		return TRUE;
 	}
-	
+
 	if(!cxxParserParseAndCondenseCurrentSubchain(
 			CXXTokenTypeOpeningParenthesis |
 				CXXTokenTypeOpeningSquareParenthesis |
@@ -919,7 +919,7 @@ static boolean cxxParserParseNextTokenCondenseAttribute(void)
 	{
 		if(pInner->pNext && cxxTokenTypeIs(pInner->pNext,CXXTokenTypeParenthesisChain))
 			pInner = cxxTokenChainFirst(pInner->pNext->pChain);
-		
+
 		while(pInner)
 		{
 			if(cxxTokenTypeIs(pInner,CXXTokenTypeIdentifier))
@@ -943,11 +943,11 @@ static boolean cxxParserParseNextTokenCondenseAttribute(void)
 					g_cxx.uKeywordState |= CXXParserKeywordStateSeenAttributeDeprecated;
 				}
 			}
-		
+
 			// If needed, we could attach certain attributes to previous
 			// identifiers. But note that __attribute__ may apply to a
 			// following identifier too.
-		
+
 			pInner = pInner->pNext;
 		}
 	}

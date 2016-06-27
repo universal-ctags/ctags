@@ -233,7 +233,7 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 {
 	if(uProperties == 0)
 		return NULL;
-	
+
 	if(!cxxTagFieldEnabled(CXXTagFieldProperties))
 			return NULL;
 
@@ -341,7 +341,7 @@ void cxxTagSetField(unsigned int uField,const char * szValue)
 
 	if(!g_cxx.pFieldOptions[uField].enabled)
 		return;
-	
+
 	attachParserField(&g_oCXXTag,g_cxx.pFieldOptions[uField].ftype,szValue);
 }
 

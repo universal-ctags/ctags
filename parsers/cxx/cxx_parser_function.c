@@ -546,7 +546,7 @@ boolean cxxParserLookForFunctionSignature(
 				vStringValue(pToken->pszWord),
 				pToken->eType
 			);
-	
+
 		if(cxxTokenIsKeyword(pToken,CXXKeywordOPERATOR))
 		{
 			// Special case for operator <something> ()
@@ -863,13 +863,13 @@ next_token:
 				pInfo->pSignatureConst = pTopLevelParenthesis->pNext;
 			else
 				pInfo->pSignatureConst = NULL;
-				
+
 			// Look for = 0 for "pure" modifier
 			CXXToken * pAssignment = cxxTokenChainNextTokenOfType(
 					pTopLevelParenthesis,
 					CXXTokenTypeAssignment
 				);
-	
+
 			if(pAssignment && pAssignment->pNext)
 			{
 				if(
@@ -885,7 +885,7 @@ next_token:
 						pInfo->uFlags |= CXXFunctionSignatureInfoDelete;
 				}
 			}
-			
+
 			CXXToken * pIdentOrKeyword = cxxTokenChainNextTokenOfType(
 					pTopLevelParenthesis,
 					CXXTokenTypeIdentifier | CXXTokenTypeKeyword
@@ -993,7 +993,7 @@ int cxxParserEmitFunctionTags(
 	CXX_DEBUG_ENTER();
 
 	int iScopesPushed = 0;
-	
+
 	if(piCorkQueueIndex)
 		*piCorkQueueIndex = CORK_NIL;
 
@@ -1113,13 +1113,13 @@ int cxxParserEmitFunctionTags(
 					vStringValue(cxxTokenChainFirst(g_cxx.pTemplateTokenChain)->pszWord)
 				);
 		}
-		
+
 		vString * pszProperties = NULL;
-		
+
 		if(cxxTagFieldEnabled(CXXTagFieldProperties))
 		{
 			unsigned int uProperties = 0;
-	
+
 			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenVirtual)
 				uProperties |= CXXTagPropertyVirtual;
 			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic)

@@ -29,7 +29,7 @@
 boolean cxxParserParseNamespace(void)
 {
 	CXX_DEBUG_ENTER();
-	
+
 	CXX_DEBUG_ASSERT(cxxParserCurrentLanguageIsCPP(),"This should be called only in C++");
 
 	/*
@@ -40,7 +40,7 @@ boolean cxxParserParseNamespace(void)
 			namespace { declarations }	(3)
 			namespace name = qualified-namespace ;	(7)
 			namespace ns_name::name	{ (8)	(since C++17)
-			
+
 		Note that the using clauses have their own parsing routine and do not end up here.
 	*/
 
@@ -61,11 +61,11 @@ boolean cxxParserParseNamespace(void)
 	cxxParserNewStatement(); // always a new statement
 
 	int iScopeCount = 0;
-	
+
 	int i;
 
 	int aCorkQueueIndices[MAX_NESTED_NAMESPACES];
-	
+
 	for(i=0;i<MAX_NESTED_NAMESPACES;i++)
 		aCorkQueueIndices[i] = CORK_NIL;
 
@@ -91,21 +91,21 @@ boolean cxxParserParseNamespace(void)
 			CXX_DEBUG_LEAVE_TEXT("EOF in cxxParserParseNextToken");
 			return TRUE; // EOF
 		}
-	
+
 		switch(g_cxx.pToken->eType)
 		{
 			case CXXTokenTypeAssignment:
 			{
 				// probably namespace alias
 				CXX_DEBUG_PRINT("Found assignment");
-				
+
 				if(!cxxParserParseNextToken())
 				{
 					// syntax error, but we tolerate this
 					CXX_DEBUG_LEAVE_TEXT("EOF in cxxParserParseNextToken");
 					return TRUE; // EOF
 				}
-				
+
 				if(!cxxTokenTypeIsOneOf(
 						g_cxx.pToken,
 						CXXTokenTypeIdentifier | CXXTokenTypeMultipleColons
@@ -127,7 +127,7 @@ boolean cxxParserParseNamespace(void)
 				pLastIdentifier = g_cxx.pToken->pPrev;
 
 				tagEntryInfo * tag = cxxTagBegin(CXXTagCPPKindALIAS,pAlias);
-	
+
 				if(tag)
 				{
 					// This is highly questionable but well.. it's how old ctags did, so we do.
@@ -213,7 +213,7 @@ boolean cxxParserParseNamespace(void)
 			);
 
 		CXX_DEBUG_PRINT("Found regular namespace start");
-		
+
 		CXXToken * t = pFirstIdentifier;
 
 		while(t)
@@ -247,7 +247,7 @@ boolean cxxParserParseNamespace(void)
 				);
 
 			iScopeCount++;
-			
+
 			t = pNext;
 		}
 

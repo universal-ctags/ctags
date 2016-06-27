@@ -85,7 +85,7 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 	int iScopes;
 	// FIXME: Why the invalid cork queue entry index is CORK_NIL?
 	int iCorkQueueIndex = CORK_NIL;
-	
+
 	if(eScopeType != CXXScopeTypeFunction)
 	{
 		// very likely a function definition

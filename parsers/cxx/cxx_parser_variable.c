@@ -555,11 +555,11 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 					);
 
 			vString * pszProperties = NULL;
-			
+
 			if(cxxTagFieldEnabled(CXXTagFieldProperties))
 			{
 				unsigned int uProperties = 0;
-		
+
 				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic)
 					uProperties |= CXXTagPropertyStatic;
 				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern)
@@ -574,7 +574,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 
 				pszProperties = cxxTagSetProperties(uProperties);
 			}
-	
+
 			cxxTagCommit();
 
 			if(pTypeToken)

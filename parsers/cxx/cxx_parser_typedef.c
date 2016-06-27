@@ -227,7 +227,7 @@ skip_to_comma_or_end:
 			if(
 					(pTParentChain == pChain) && // not function pointer (see above)
 					(
-						pComma ? 
+						pComma ?
 							cxxTokenChainPreviousTokenOfType(
 									pComma,
 									CXXTokenTypeParenthesisChain | CXXTokenTypeAngleBracketChain
@@ -262,7 +262,7 @@ skip_to_comma_or_end:
 			if(pTypeName)
 				cxxTokenDestroy(pTypeName);
 		}
-		
+
 		if(!pComma)
 			break;
 
