@@ -701,16 +701,35 @@ extern boolean isFieldEnabled (fieldType type)
 	return getFieldDesc(type)->spec->enabled;
 }
 
-extern boolean enableField (fieldType type, boolean state)
-{
-	boolean old = getFieldDesc(type)->spec->enabled? TRUE: FALSE;
-	getFieldDesc(type)->spec->enabled = state;
-	return old;
-}
-
-extern boolean isFieldFixed (fieldType type)
+static boolean isFieldFixed (fieldType type)
 {
 	return getFieldDesc(type)->fixed? TRUE: FALSE;
+}
+
+extern boolean enableField (fieldType type, boolean state, boolean warnIfFixedField)
+{
+	fieldSpec *spec = getFieldDesc(type)->spec;
+	boolean old = spec->enabled? TRUE: FALSE;
+	if (isFieldFixed (type))
+	{
+		if ((!state) && warnIfFixedField)
+		{
+			if (spec->name && spec->letter != NUL_FIELD_LETTER)
+				error(WARNING, "Cannot disable fixed field: '%c'{%s}",
+				      spec->letter, spec->name);
+			else if (spec->name)
+				error(WARNING, "Cannot disable fixed field: {%s}",
+				      spec->name);
+			else if (spec->letter != NUL_FIELD_LETTER)
+				error(WARNING, "Cannot disable fixed field: '%c'",
+				      getFieldDesc(type)->spec->letter);
+			else
+				AssertNotReached();
+		}
+	}
+	else
+		getFieldDesc(type)->spec->enabled = state;
+	return old;
 }
 
 extern boolean isCommonField (fieldType type)

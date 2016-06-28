@@ -1152,8 +1152,7 @@ static void resetFieldsOption (boolean mode)
 	int i;
 
 	for (i = 0; i < countFields (); ++i)
-		if (!isFieldFixed (i))
-			enableField (i, mode);
+		enableField (i, mode, FALSE);
 }
 
 static void processFieldsOption (
@@ -1223,12 +1222,12 @@ static void processFieldsOption (
 			if (t == FIELD_UNKNOWN)
 				error(FATAL, "nosuch field: \'%s\'", vStringValue (longName));
 
-			enableField (t, mode);
+			enableField (t, mode, TRUE);
 			if (language == LANG_AUTO)
 			{
 				fieldType ftype_next = t;
 				while ((ftype_next = nextFieldSibling (ftype_next)) != FIELD_UNKNOWN)
-					enableField (ftype_next, mode);
+					enableField (ftype_next, mode, FALSE);
 			}
 
 			inLongName = FALSE;
@@ -1243,11 +1242,8 @@ static void processFieldsOption (
 				if (t == FIELD_UNKNOWN)
 					error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
 					      c, option);
-				else if (isFieldFixed (t) && (mode == FALSE))
-					error(WARNING, "Cannot disable basic field: '%c'(%s) for \"%s\" option",
-					      c, getFieldName (t), option);
 				else
-					enableField (t, mode);
+					enableField (t, mode, TRUE);
 			}
 			break;
 	}
