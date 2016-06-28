@@ -188,6 +188,10 @@ XML_SRCS = \
 	 \
 	 $(NULL)
 
+JANSSON_HEADS =
+JANSSON_SRCS = \
+	main/output-json.c
+
 DEBUG_HEADS = main/debug.h
 DEBUG_SRCS = main/debug.c
 

@@ -253,6 +253,9 @@
     <ClCompile Include="..\main\output-xref.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\output-json.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\parse.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>

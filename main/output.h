@@ -31,6 +31,7 @@ extern void  endEtagsFile   (MIO * mio, const char* filename, void *data);
 
 extern int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__);
 extern int writeXrefEntry  (MIO * mio, const tagEntryInfo *const tag, void *data __unused__);
+extern int writeJsonEntry  (MIO * mio, const tagEntryInfo *const tag, void *data __unused__);
 
 extern int makePatternStringCommon (const tagEntryInfo *const tag,
 				    int putc_func (char , void *),
