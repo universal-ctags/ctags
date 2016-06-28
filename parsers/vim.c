@@ -482,7 +482,7 @@ static void parseLet (const unsigned char *line, int infunction)
 			goto cleanUp;
 
 		/* Skip non-global vars in functions */
-		if (infunction && (int) *cp != 'g')
+		if (infunction && ((int) *np != ':' || (int) *cp != 'g'))
 			goto cleanUp;
 
 		/* deal with spaces, $, @ and & */
