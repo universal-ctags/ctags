@@ -13,3 +13,4 @@ run_with_format()
 run_with_format ctags
 run_with_format etags
 run_with_format xref
+run_with_format json
