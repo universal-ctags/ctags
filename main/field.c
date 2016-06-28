@@ -713,9 +713,9 @@ extern boolean isFieldFixed (fieldType type)
 	return getFieldDesc(type)->fixed? TRUE: FALSE;
 }
 
-extern boolean isFieldOwnedByParser (fieldType type)
+extern boolean isCommonField (fieldType type)
 {
-	return (FIELD_BUILTIN_LAST < type)? TRUE: FALSE;
+	return (FIELD_BUILTIN_LAST < type)? FALSE: TRUE;
 }
 
 extern int     getFieldOwner (fieldType type)

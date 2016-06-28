@@ -48,7 +48,9 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 
 	ftype = fspec->field.ftype;
 
-	if (isFieldOwnedByParser (ftype))
+	if (isCommonField (ftype))
+		str = renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
+	else
 	{
 		unsigned int findex;
 
@@ -63,8 +65,7 @@ static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 		else
 			str = ""; /* TODO */
 	}
-	else
-		str = renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
+
 
 	if (str == NULL)
 		str = "";
