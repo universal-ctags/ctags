@@ -486,6 +486,8 @@ The field can be used only in ``--_xformat`` option.
     R foo.h               2 reftag.c         #include "foo.h"
     R stdio.h             1 reftag.c         #include <stdio.h>
 
+See :ref:`Customizing xref output <xformat>` fore more details about the option.
+
 Though the facility for collecting reference tags is implemented, only
 few parsers utilized it now. All available roles can be listed with
 ``--list-roles`` option:
@@ -749,6 +751,131 @@ From the view point of tags file format, nothing is changed with
 introducing parser own fields; `<fieldname>`:`<value>` is used as
 before. The name of field owner is never prefixed. `language:` field
 of the tag tells the owner.
+
+
+.. _xformat:
+
+Customizing xref output
+---------------------------------------------------------------------
+
+``--_xformat`` option allows a user to customize Xref output enabled
+with ``-x`` option.
+::
+
+   --_xformat=FORMAT
+
+
+The notation of FORMAT is a bit similar to `printf(3) of C
+language; `%` represents a slot where ctags fills with a field value
+when printing. You can specify multiple slots in FORMAT.
+Here field means an item listed with ``-list-fields`` option.
+
+The notation of a slot::
+
+   %[WIDTH-AND-ADJUSTMENT]FIELD-SPECIFIER
+
+``FIELD-SPECIFIER`` specifies a field which value is printed.
+Short notation and long notation are available. They can be mixed
+in a FORMAT. Specifying a field with either notation, one or more
+fields are activated internally.
+
+The short notation is just a letter listed in LETTER column of
+``--list-fields`` output.
+
+The long notation is a name string surrounded by braces(`{` and
+`}`). The name string is listed in NAME column of the output of
+the same option. To specify a field owned by a parser, prepend
+the parser name to the name string with `.` as a separator.
+
+Wile card (`*`) can be used where a parser name is. In such case
+both common and parser own fields are activated and printed.
+If a common field and a parser own field have the same name,
+the common field has higher priority.
+
+`WIDTH-AND-ADJUSTMENT` is a positive or negative number.
+The absolute value of the number is used as the width of
+the column where a field is printed. The printing is
+right adjust with positive value is given, and left
+adjust with negative value.
+
+An examples of specifying common fields:
+
+.. code-block:: console
+
+    $  ./ctags -x --_xformat="%-20N %4n %-16{input}|" main/main.c | head
+    CLOCKS_PER_SEC        360 main/main.c     |
+    CLOCKS_PER_SEC        364 main/main.c     |
+    CLOCK_AVAILABLE       358 main/main.c     |
+    CLOCK_AVAILABLE       363 main/main.c     |
+    Totals                 87 main/main.c     |
+    __anonae81ef0f0108     87 main/main.c     |
+    addTotals             100 main/main.c     |
+    batchMakeTags         436 main/main.c     |
+    bytes                  87 main/main.c     |
+    clock                 365 main/main.c     |
+
+Here `%-20N %4n %-16{input}` is a format string. Let's look into the
+elements of the format.
+
+`%-20N`
+
+	The short notation is used here.
+	The element means filling the slot with the name of tag.
+	The width of column is 20 characters and left adjust.
+
+`%4n`
+
+	The short notation is used here.
+	The element means filling the slot with the line number of
+	tag. The width of column is 4 characters and right adjust.
+
+`%-16{input}`
+
+	The long notation is used here.
+	The element means filling the slot with the input file name where
+	the tag is defined. The width of column is 16 characters and left
+	adjust.
+
+`|`
+
+	Printed as is.
+
+Another examples of specifying parser own field:
+
+.. code-block:: console
+
+	$  ./ctags -x --_xformat="%-20N [%10{C.properties}]" main/main.c
+	CLOCKS_PER_SEC       [          ]
+	CLOCK_AVAILABLE      [          ]
+	Totals               [          ]
+	__anonae81ef0f0108   [          ]
+	addTotals            [    extern]
+	batchMakeTags        [    static]
+	bytes                [          ]
+	clock                [          ]
+	clock                [    static]
+	...
+
+Here `"%-20N [%10{C.properties}]"` is a format string. Let's look into the
+elements of the format.
+
+`%-20N`
+
+	Already explained in the first example.
+
+`[` and `]`
+
+	Printed as is.
+
+`%10{C.properties}`
+
+	The long notation is used here.
+	The element means filling the slot with the value
+	of properties field of C parser.
+	The width of column is 10 characters and right adjust.
+
+
+.. TODO: An example of using WIDLECARD
 
 
 Readtags
