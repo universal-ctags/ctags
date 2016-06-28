@@ -94,7 +94,7 @@ PARSER_HEADS = \
 	parsers/cxx/cxx_tag.h \
 	parsers/cxx/cxx_token.h \
 	parsers/cxx/cxx_token_chain.h
-	
+
 PARSER_SRCS =				\
 	parsers/ada.c			\
 	parsers/ant.c			\
