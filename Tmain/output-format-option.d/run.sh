@@ -3,14 +3,8 @@
 
 CTAGS=$1
 
-run_with_format()
-{
-    echo '#' $1
-    ${CTAGS} --quiet --options=NONE --output-format=$1 -o - input.c
-}
-
+. ../utils.sh
 
 run_with_format ctags
 run_with_format etags
 run_with_format xref
-run_with_format json
