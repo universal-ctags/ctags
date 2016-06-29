@@ -67,6 +67,7 @@ MAIN_SRCS =				\
 	main/options.c			\
 	main/output-etags.c		\
 	main/output-ctags.c		\
+	main/output-json.c		\
 	main/output-xref.c		\
 	main/parse.c			\
 	main/pcoproc.c			\
@@ -187,10 +188,6 @@ XML_SRCS = \
 	 parsers/xslt.c			\
 	 \
 	 $(NULL)
-
-JANSSON_HEADS =
-JANSSON_SRCS = \
-	main/output-json.c
 
 DEBUG_HEADS = main/debug.h
 DEBUG_SRCS = main/debug.c

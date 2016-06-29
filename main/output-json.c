@@ -14,7 +14,10 @@
 #include "options.h"
 #include "output.h"
 #include "read.h"
+
+#ifdef HAVE_JANSSON
 #include <jansson.h>
+
 
 #define includeExtensionFlags()         (Option.tagFileFormat > 1)
 
@@ -134,3 +137,10 @@ extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data 
 
 	return length;
 }
+
+#else /* HAVE_JANSSON */
+extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__)
+{
+	return 0;
+}
+#endif
