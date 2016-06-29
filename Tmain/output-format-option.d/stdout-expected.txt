@@ -6,5 +6,3 @@ input.c,20
 main(void)main2,4
 # xref
 main             function      2 input.c          main(void)
-# json
-{"_type": "tag", "kind": "f", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "typeref": "int"}

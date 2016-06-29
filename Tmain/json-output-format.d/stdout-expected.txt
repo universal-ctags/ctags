@@ -1,0 +1,2 @@
+# json
+{"_type": "tag", "kind": "f", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "typeref": "int"}
