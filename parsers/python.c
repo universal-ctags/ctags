@@ -849,6 +849,152 @@ static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind,
 	return TRUE;
 }
 
+static boolean parseImport (tokenInfo *const token)
+{
+	tokenInfo *fromModule = NULL;
+
+	if (token->keyword == KEYWORD_from)
+	{
+		readQualifiedName (token);
+		if (token->type == TOKEN_IDENTIFIER)
+		{
+			fromModule = newToken ();
+			copyToken (fromModule, token);
+			readToken (token);
+		}
+	}
+
+	if (token->keyword == KEYWORD_import)
+	{
+		boolean parenthesized = FALSE;
+
+		if (fromModule)
+		{
+			/* from X import ...
+			 * --------------------
+			 * X = (kind:module, role:namespace) */
+			makeSimplePythonRefTag (fromModule, NULL, K_MODULE,
+			                        PYTHON_MODULE_NAMESPACE,
+			                        XTAG_UNKNOWN);
+		}
+
+		do
+		{
+			readQualifiedName (token);
+
+			/* support for `from x import (...)` */
+			if (fromModule && ! parenthesized && token->type == '(')
+			{
+				parenthesized = TRUE;
+				readQualifiedName (token);
+			}
+
+			if (token->type == TOKEN_IDENTIFIER)
+			{
+				tokenInfo *name = newToken ();
+
+				copyToken (name, token);
+				readToken (token);
+				/* if there is an "as", use it as the name */
+				if (token->keyword == KEYWORD_as)
+				{
+					readToken (token);
+					if (token->type == TOKEN_IDENTIFIER)
+					{
+						if (fromModule)
+						{
+							/* from x import Y as Z
+							 * ----------------------------
+							 * x = (kind:module,  role:namespace),
+							 * Y = (kind:unknown, role:indirectly-imported),
+							 * Z = (kind:unknown) */
+
+							/* Y */
+							makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
+							                        PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
+							                        XTAG_UNKNOWN);
+							/* x.Y */
+							if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
+							{
+								vString *fq = vStringNewCopy (fromModule->string);
+								vStringPut (fq, '.');
+								vStringCat (fq, name->string);
+								makeSimplePythonRefTag (name, fq, K_UNKNOWN,
+								                        PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
+								                        XTAG_QUALIFIED_TAGS);
+								vStringDelete (fq);
+							}
+							/* Z */
+							makeSimplePythonTag (token, K_UNKNOWN);
+						}
+						else
+						{
+							/* import x as Y
+							 * ----------------------------
+							 * X = (kind:module, role:indirectly-imported)
+							 * Y = (kind:namespace)*/
+							/* X */
+							makeSimplePythonRefTag (name, NULL, K_MODULE,
+							                        PYTHON_MODULE_INDIRECTLY_IMPORTED,
+							                        XTAG_UNKNOWN);
+							/* Y */
+							makeSimplePythonTag (token, K_NAMESPACE);
+						}
+
+						copyToken (name, token);
+						readToken (token);
+					}
+				}
+				else
+				{
+					if (fromModule)
+					{
+						/* from x import Y
+						   --------------
+						   x = (kind:module,  role:namespace),
+						   Y = (kind:unknown, role:imported) */
+						/* Y */
+						makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
+						                        PYTHON_MODULE_IMPORTED,
+						                        XTAG_UNKNOWN);
+						/* x.Y */
+						if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
+						{
+							vString *fq = vStringNewCopy (fromModule->string);
+							vStringPut (fq, '.');
+							vStringCat (fq, name->string);
+							makeSimplePythonRefTag (name, fq, K_UNKNOWN,
+							                        PYTHON_MODULE_IMPORTED,
+							                        XTAG_QUALIFIED_TAGS);
+							vStringDelete (fq);
+						}
+					}
+					else
+					{
+						/* import X
+						   --------------
+						   X = (kind:module, role:imported) */
+						makeSimplePythonRefTag (name, NULL, K_MODULE,
+						                        PYTHON_MODULE_IMPORTED,
+						                        XTAG_UNKNOWN);
+					}
+				}
+
+				deleteToken (name);
+			}
+		}
+		while (token->type == ',');
+
+		if (parenthesized && token->type == ')')
+			readToken (token);
+	}
+
+	if (fromModule)
+		deleteToken (fromModule);
+
+	return FALSE;
+}
+
 /* pops any level >= to indent */
 static void setIndent (tokenInfo *const token)
 {
@@ -899,147 +1045,7 @@ static void findPythonTags (void)
 		else if (token->keyword == KEYWORD_from ||
 		         token->keyword == KEYWORD_import)
 		{
-			tokenInfo *fromModule = NULL;
-
-			if (token->keyword == KEYWORD_from)
-			{
-				readQualifiedName (token);
-				if (token->type == TOKEN_IDENTIFIER)
-				{
-					fromModule = newToken ();
-					copyToken (fromModule, token);
-					readToken (token);
-				}
-			}
-
-			if (token->keyword == KEYWORD_import)
-			{
-				boolean parenthesized = FALSE;
-
-				if (fromModule)
-				{
-					/* from X import ...
-					 * --------------------
-					 * X = (kind:module, role:namespace) */
-					makeSimplePythonRefTag (fromModule, NULL, K_MODULE,
-					                        PYTHON_MODULE_NAMESPACE,
-					                        XTAG_UNKNOWN);
-				}
-
-				do
-				{
-					readQualifiedName (token);
-
-					/* support for `from x import (...)` */
-					if (fromModule && ! parenthesized && token->type == '(')
-					{
-						parenthesized = TRUE;
-						readQualifiedName (token);
-					}
-
-					if (token->type == TOKEN_IDENTIFIER)
-					{
-						tokenInfo *name = newToken ();
-
-						copyToken (name, token);
-						readToken (token);
-						/* if there is an "as", use it as the name */
-						if (token->keyword == KEYWORD_as)
-						{
-							readToken (token);
-							if (token->type == TOKEN_IDENTIFIER)
-							{
-								if (fromModule)
-								{
-									/* from x import Y as Z
-									 * ----------------------------
-									 * x = (kind:module,  role:namespace),
-									 * Y = (kind:unknown, role:indirectly-imported),
-									 * Z = (kind:unknown) */
-
-									/* Y */
-									makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
-									                        PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
-									                        XTAG_UNKNOWN);
-									/* x.Y */
-									if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
-									{
-										vString *fq = vStringNewCopy (fromModule->string);
-										vStringPut (fq, '.');
-										vStringCat (fq, name->string);
-										makeSimplePythonRefTag (name, fq, K_UNKNOWN,
-										                        PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
-										                        XTAG_QUALIFIED_TAGS);
-										vStringDelete (fq);
-									}
-									/* Z */
-									makeSimplePythonTag (token, K_UNKNOWN);
-								}
-								else
-								{
-									/* import x as Y
-									 * ----------------------------
-									 * X = (kind:module, role:indirectly-imported)
-									 * Y = (kind:namespace)*/
-									/* X */
-									makeSimplePythonRefTag (name, NULL, K_MODULE,
-									                        PYTHON_MODULE_INDIRECTLY_IMPORTED,
-									                        XTAG_UNKNOWN);
-									/* Y */
-									makeSimplePythonTag (token, K_NAMESPACE);
-								}
-
-								copyToken (name, token);
-								readToken (token);
-							}
-						}
-						else
-						{
-							if (fromModule)
-							{
-								/* from x import Y
-								   --------------
-								   x = (kind:module,  role:namespace),
-								   Y = (kind:unknown, role:imported) */
-								/* Y */
-								makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
-								                        PYTHON_MODULE_IMPORTED,
-								                        XTAG_UNKNOWN);
-								/* x.Y */
-								if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
-								{
-									vString *fq = vStringNewCopy (fromModule->string);
-									vStringPut (fq, '.');
-									vStringCat (fq, name->string);
-									makeSimplePythonRefTag (name, fq, K_UNKNOWN,
-									                        PYTHON_MODULE_IMPORTED,
-									                        XTAG_QUALIFIED_TAGS);
-									vStringDelete (fq);
-								}
-							}
-							else
-							{
-								/* import X
-								   --------------
-								   X = (kind:module, role:imported) */
-								makeSimplePythonRefTag (name, NULL, K_MODULE,
-								                        PYTHON_MODULE_IMPORTED,
-								                        XTAG_UNKNOWN);
-							}
-						}
-
-						deleteToken (name);
-					}
-				}
-				while (token->type == ',');
-
-				if (parenthesized && token->type == ')')
-					readToken (token);
-			}
-			readNext = FALSE;
-
-			if (fromModule)
-				deleteToken (fromModule);
+			readNext = parseImport (token);
 		}
 		else if (token->type == '(')
 		{ /* skip parentheses to avoid finding stuff inside them */
