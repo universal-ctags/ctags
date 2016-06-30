@@ -73,6 +73,7 @@ typedef enum {
 	K_NAMESPACE,
 	K_MODULE,
 	K_UNKNOWN,
+	K_PARAMETER,
 	COUNT_KIND
 } pythonKind;
 
@@ -130,6 +131,7 @@ static kindOption PythonKinds[COUNT_KIND] = {
 	 .referenceOnly = TRUE,  ATTACH_ROLES(PythonModuleRoles)},
 	{TRUE, 'x', "unknown",   "name referring a classe/variable/function/module defined in other module",
 	 .referenceOnly = FALSE, ATTACH_ROLES(PythonUnknownRoles)},
+	{FALSE, 'z', "parameter", "function parameters" },
 };
 
 typedef struct {
@@ -822,6 +824,8 @@ static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind,
 {
 	vString *arglist = NULL;
 	tokenInfo *name = NULL;
+	tokenInfo *parameterTokens[16] = { NULL };
+	unsigned int parameterCount = 0;
 	NestingLevel *lv;
 	int corkIndex;
 
@@ -841,10 +845,44 @@ static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind,
 	copyToken (name, token);
 
 	readToken (token);
+	/* collect parameters or inheritance */
 	if (token->type == '(')
 	{
+		int prevTokenType = token->type;
+		int depth = 1;
+
 		arglist = vStringNew ();
-		skipOverPair (token, '(', ')', arglist, kind != K_CLASS);
+		if (kind != K_CLASS)
+			reprCat (arglist, token);
+
+		do
+		{
+			if (token->type != TOKEN_WHITESPACE)
+				prevTokenType = token->type;
+
+			readTokenFull (token, TRUE);
+			if (kind != K_CLASS || token->type != ')' || depth > 1)
+				reprCat (arglist, token);
+
+			if (token->type == '(')
+				depth ++;
+			else if (token->type == ')')
+				depth --;
+			else if (kind != K_CLASS && depth == 1 &&
+			         token->type == TOKEN_IDENTIFIER &&
+			         (prevTokenType == '(' || prevTokenType == ',') &&
+			         parameterCount < ARRAY_SIZE (parameterTokens) &&
+			         PythonKinds[K_PARAMETER].enabled)
+			{
+				tokenInfo *parameterName = newToken ();
+
+				copyToken (parameterName, token);
+				parameterTokens[parameterCount++] = parameterName;
+			}
+		}
+		while (token->type != TOKEN_EOF && depth > 0);
+
+		vStringTerminate (arglist);
 	}
 
 	if (kind == K_CLASS)
@@ -857,6 +895,17 @@ static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind,
 
 	deleteToken (name);
 	vStringDelete (arglist);
+
+	if (parameterCount > 0)
+	{
+		unsigned int i;
+
+		for (i = 0; i < parameterCount; i++)
+		{
+			makeSimplePythonTag (parameterTokens[i], K_PARAMETER);
+			deleteToken (parameterTokens[i]);
+		}
+	}
 
 	return TRUE;
 }
