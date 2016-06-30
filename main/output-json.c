@@ -83,8 +83,12 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 
 	if (isFieldEnabled (FIELD_SCOPE) || making_fq_tag)
 	{
+		json_t *k = escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG);
+
+		/* The value must be generated even if FIELD_SCOPE is disabled for
+		   generating FQN. */
 		if (isFieldEnabled (FIELD_SCOPE))
-			json_object_set_new (response, getFieldName (FIELD_SCOPE_KEY), escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG));
+			json_object_set_new (response, getFieldName (FIELD_SCOPE_KEY), k);
 	}
 
 	int field_keys [] = {

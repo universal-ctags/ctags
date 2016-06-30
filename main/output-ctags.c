@@ -131,6 +131,9 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 	{
 		const char* k = NULL, *v = NULL;
 
+		/* The value rendered in following calls are
+		   cached in tag. So even if FIELD_SCOPE is disabled,
+		   following calls are needed for automatic FQN generating. */
 		k = escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG);
 		v = escapeFieldValue (tag, FIELD_SCOPE);
 
