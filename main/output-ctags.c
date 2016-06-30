@@ -103,12 +103,12 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 		length += mio_printf (mio, kindFmt, sep, kindKey, str);
 	}
 
-	if (isFieldEnabled (FIELD_LINE_NUMBER))
+	if (isFieldEnabled (FIELD_LINE_NUMBER) &&  doesFieldHaveValue (FIELD_LINE_NUMBER, tag))
 		length += mio_printf (mio, "%s\t%s:%ld", sep,
 				   getFieldName (FIELD_LINE_NUMBER),
 				   tag->lineNumber);
 
-	if (isFieldEnabled (FIELD_LANGUAGE)  &&  tag->language != NULL)
+	if (isFieldEnabled (FIELD_LANGUAGE)  &&  doesFieldHaveValue (FIELD_LANGUAGE, tag))
 		length += mio_printf (mio, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_LANGUAGE),
 				   escapeName (tag, FIELD_LANGUAGE));
@@ -124,65 +124,49 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 			length += mio_printf (mio, scopeFmt, sep, scopeKey, k, v);
 	}
 
-	if (isFieldEnabled (FIELD_TYPE_REF) &&
-	    tag->extensionFields.typeRef [0] != NULL  &&
-	    tag->extensionFields.typeRef [1] != NULL)
+	if (isFieldEnabled (FIELD_TYPE_REF) && doesFieldHaveValue (FIELD_TYPE_REF, tag))
 		length += mio_printf (mio, "%s\t%s:%s:%s", sep,
 				      getFieldName (FIELD_TYPE_REF),
 				      tag->extensionFields.typeRef [0],
 				      escapeName (tag, FIELD_TYPE_REF));
 
-	if (isFieldEnabled (FIELD_FILE_SCOPE) &&  tag->isFileScope)
+	if (isFieldEnabled (FIELD_FILE_SCOPE) &&  doesFieldHaveValue (FIELD_FILE_SCOPE, tag))
 		length += mio_printf (mio, "%s\t%s:", sep,
 				      getFieldName (FIELD_FILE_SCOPE));
 
-	if (isFieldEnabled (FIELD_INHERITANCE) &&
-			tag->extensionFields.inheritance != NULL)
+	if (isFieldEnabled (FIELD_INHERITANCE) && doesFieldHaveValue (FIELD_INHERITANCE, tag))
 		length += mio_printf (mio, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_INHERITANCE),
 				   escapeName (tag, FIELD_INHERITANCE));
 
-	if (isFieldEnabled (FIELD_ACCESS) &&  tag->extensionFields.access != NULL)
+	if (isFieldEnabled (FIELD_ACCESS) && doesFieldHaveValue (FIELD_ACCESS, tag))
 		length += mio_printf (mio, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_ACCESS),
 				   escapeName (tag, FIELD_ACCESS));
 
-	if (isFieldEnabled (FIELD_IMPLEMENTATION) &&
-			tag->extensionFields.implementation != NULL)
+	if (isFieldEnabled (FIELD_IMPLEMENTATION) && doesFieldHaveValue (FIELD_IMPLEMENTATION, tag))
 		length += mio_printf (mio, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_IMPLEMENTATION),
 				   escapeName (tag, FIELD_IMPLEMENTATION));
 
-	if (isFieldEnabled (FIELD_SIGNATURE) &&
-			tag->extensionFields.signature != NULL)
+	if (isFieldEnabled (FIELD_SIGNATURE) && doesFieldHaveValue (FIELD_SIGNATURE, tag))
 		length += mio_printf (mio, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_SIGNATURE),
 				   escapeName (tag, FIELD_SIGNATURE));
-	if (isFieldEnabled (FIELD_ROLE) && tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
+	if (isFieldEnabled (FIELD_ROLE) && doesFieldHaveValue (FIELD_ROLE, tag))
 		length += mio_printf (mio, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_ROLE),
 				   escapeName (tag, FIELD_ROLE));
 
-	if (isFieldEnabled (FIELD_EXTRA))
-	{
-		const char *value = escapeName (tag, FIELD_EXTRA);
-		if (value)
-			length += mio_printf (mio, "%s\t%s:%s", sep,
-					   getFieldName (FIELD_EXTRA),
-					   escapeName (tag, FIELD_EXTRA));
-	}
+	if (isFieldEnabled (FIELD_EXTRA) && doesFieldHaveValue (FIELD_EXTRA, tag))
+		length += mio_printf (mio, "%s\t%s:%s", sep,
+				      getFieldName (FIELD_EXTRA),
+				      escapeName (tag, FIELD_EXTRA));
 
-#ifdef HAVE_LIBXML
-	if (isFieldEnabled(FIELD_XPATH))
-	{
-		const char *value = escapeName (tag, FIELD_XPATH);
-		if (value)
-			length += mio_printf (mio, "%s\t%s:%s", sep,
-					      getFieldName (FIELD_XPATH),
-					      escapeName (tag, FIELD_XPATH));
-
-	}
-#endif
+	if (isFieldEnabled(FIELD_XPATH) && doesFieldHaveValue (FIELD_XPATH, tag))
+		length += mio_printf (mio, "%s\t%s:%s", sep,
+				      getFieldName (FIELD_XPATH),
+				      escapeName (tag, FIELD_XPATH));
 
 	if (isFieldEnabled(FIELD_END))
 	{
