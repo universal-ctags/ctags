@@ -1,0 +1,13 @@
+a	input.py	/^def func03(a:"hello", b : 1 * 2 + 3 \/ 4 = 5):$/;"	z	function:func03	file:
+a	input.py	/^def func04(a:(1, 2, 3, 4)=(1, 2, 3, 4), b:[5,6]=[7,8], c=0) -> {'foo' : 'bar' }:$/;"	z	function:func04	file:
+b	input.py	/^def func03(a:"hello", b : 1 * 2 + 3 \/ 4 = 5):$/;"	z	function:func03	file:
+b	input.py	/^def func04(a:(1, 2, 3, 4)=(1, 2, 3, 4), b:[5,6]=[7,8], c=0) -> {'foo' : 'bar' }:$/;"	z	function:func04	file:
+c	input.py	/^def func04(a:(1, 2, 3, 4)=(1, 2, 3, 4), b:[5,6]=[7,8], c=0) -> {'foo' : 'bar' }:$/;"	z	function:func04	file:
+func01	input.py	/^def func01() -> "returns something":$/;"	f
+func02	input.py	/^def func02() -> 2 * 2 * 3 * 4:$/;"	f
+func03	input.py	/^def func03(a:"hello", b : 1 * 2 + 3 \/ 4 = 5):$/;"	f
+func04	input.py	/^def func04(a:(1, 2, 3, 4)=(1, 2, 3, 4), b:[5,6]=[7,8], c=0) -> {'foo' : 'bar' }:$/;"	f
+sub01	input.py	/^    def sub01(): pass$/;"	f	function:func01	file:
+sub02	input.py	/^    def sub02(): pass$/;"	f	function:func02	file:
+sub03	input.py	/^    def sub03(): pass$/;"	f	function:func03	file:
+sub04	input.py	/^    def sub04(): pass$/;"	f	function:func04	file:
