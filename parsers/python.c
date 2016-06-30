@@ -995,6 +995,54 @@ static boolean parseImport (tokenInfo *const token)
 	return FALSE;
 }
 
+static boolean parseVariable (tokenInfo *const token)
+{
+	tokenInfo *name = newToken ();
+
+	do
+	{
+		copyToken (name, token);
+		readToken (token);
+		/* FIXME: to get perfect tag types, we'd need to collect
+		 *        the multiple names, and then map the initializers
+		 *        back, but that's very hard. */
+		if (token->type == ',')
+		{
+			makeSimplePythonTag (name, K_VARIABLE);
+			readToken (token);
+			if (token->type != TOKEN_IDENTIFIER)
+				break;
+		}
+		else
+		{
+			if (token->type == '=')
+			{
+				/* check for lambdas */
+				readToken (token);
+				if (token->keyword != KEYWORD_lambda)
+					makeSimplePythonTag (name, K_VARIABLE);
+				else
+				{
+					vString *arglist = vStringNew ();
+
+					readToken (token);
+					vStringPut (arglist, '(');
+					skipLambdaArglist (token, arglist);
+					vStringPut (arglist, ')');
+					makeFunctionTag (name, arglist);
+					vStringDelete (arglist);
+				}
+			}
+			break;
+		}
+	}
+	while (token->type == TOKEN_IDENTIFIER);
+
+	deleteToken (name);
+
+	return FALSE;
+}
+
 /* pops any level >= to indent */
 static void setIndent (tokenInfo *const token)
 {
@@ -1057,51 +1105,7 @@ static void findPythonTags (void)
 			tagEntryInfo *lvEntry = getEntryOfNestingLevel (lv);
 
 			if (! lvEntry || lvEntry->kind == &(PythonKinds[K_CLASS]))
-			{
-				tokenInfo *name = newToken ();
-
-				do
-				{
-					copyToken (name, token);
-					readToken (token);
-					readNext = FALSE;
-					/* FIXME: to get perfect tag types, we'd need to collect
-					 *        the multiple names, and then map the initializers
-					 *        back, but that's very hard. */
-					if (token->type == ',')
-					{
-						makeSimplePythonTag (name, K_VARIABLE);
-						readToken (token);
-						if (token->type != TOKEN_IDENTIFIER)
-							break;
-					}
-					else
-					{
-						if (token->type == '=')
-						{
-							/* check for lambdas */
-							readToken (token);
-							if (token->keyword != KEYWORD_lambda)
-								makeSimplePythonTag (name, K_VARIABLE);
-							else
-							{
-								vString *arglist = vStringNew ();
-
-								readToken (token);
-								vStringPut (arglist, '(');
-								readNext = skipLambdaArglist (token, arglist);
-								vStringPut (arglist, ')');
-								makeFunctionTag (name, arglist);
-								vStringDelete (arglist);
-							}
-						}
-						break;
-					}
-				}
-				while (token->type == TOKEN_IDENTIFIER);
-
-				deleteToken (name);
-			}
+				readNext = parseVariable (token);
 		}
 
 		atLineStart = token->type == TOKEN_INDENT;
