@@ -30,6 +30,27 @@ static json_t* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
 		return NULL;
 }
 
+static void renderExtensionFieldMaybe (int xftype, const tagEntryInfo *const tag, json_t *response)
+{
+	if (isFieldEnabled (xftype) && doesFieldHaveValue (xftype, tag))
+	{
+		switch (xftype)
+		{
+		case FIELD_LINE_NUMBER:
+			json_object_set_new (response, getFieldName (xftype),
+					     json_integer (tag->lineNumber));
+			break;
+		case FIELD_FILE_SCOPE:
+			json_object_set_new (response, getFieldName (xftype),
+					     json_boolean(1));
+			break;
+		default:
+			json_object_set_new (response, getFieldName (xftype),
+					     escapeFieldValue (tag, xftype));
+		}
+	}
+}
+
 static void addParserFields (json_t *response, const tagEntryInfo *const tag)
 {
 	unsigned int i;
@@ -60,11 +81,8 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 		json_object_set_new (response, getFieldName (FIELD_KIND_KEY), json_string (str));
 	}
 
-	if (isFieldEnabled (FIELD_LINE_NUMBER) && doesFieldHaveValue (FIELD_LINE_NUMBER, tag))
-		json_object_set_new (response, getFieldName (FIELD_LINE_NUMBER), json_integer (tag->lineNumber));
-
-	if (isFieldEnabled (FIELD_LANGUAGE)  &&  doesFieldHaveValue (FIELD_LANGUAGE))
-		json_object_set_new (response, getFieldName (FIELD_LANGUAGE), escapeFieldValue (tag, FIELD_LANGUAGE));
+	renderExtensionFieldMaybe (FIELD_LINE_NUMBER, tag, response);
+	renderExtensionFieldMaybe (FIELD_LANGUAGE, tag, response);
 
 	if (isFieldEnabled (FIELD_SCOPE) || making_fq_tag)
 	{
@@ -72,32 +90,16 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 			json_object_set_new (response, getFieldName (FIELD_SCOPE_KEY), escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG));
 	}
 
-	if (isFieldEnabled (FIELD_TYPE_REF) && doesFieldHaveValue (FIELD_TYPE_REF, tag))
-		json_object_set_new (response, getFieldName (FIELD_TYPE_REF), escapeFieldValue (tag, FIELD_TYPE_REF));
+	renderExtensionFieldMaybe (FIELD_TYPE_REF, tag, response);
+	renderExtensionFieldMaybe (FIELD_SCOPE, tag, response);
+	renderExtensionFieldMaybe (FIELD_INHERITANCE, tag, response);
+	renderExtensionFieldMaybe (FIELD_ACCESS, tag, response);
+	renderExtensionFieldMaybe (FIELD_IMPLEMENTATION, tag, response);
+	renderExtensionFieldMaybe (FIELD_SIGNATURE, tag, response);
+	renderExtensionFieldMaybe (FIELD_ROLE, tag, response);
+	renderExtensionFieldMaybe (FIELD_EXTRA, tag, response);
+	renderExtensionFieldMaybe (FIELD_XPATH, tag, response);
 
-	if (isFieldEnabled (FIELD_FILE_SCOPE) &&  doesFieldHaveValue (FIELD_FILE_SCOPE, tag))
-		json_object_set_new (response, getFieldName (FIELD_FILE_SCOPE), json_boolean(1));
-
-	if (isFieldEnabled (FIELD_INHERITANCE) && doesFieldHaveValue (FIELD_INHERITANCE))
-		json_object_set_new (response, getFieldName (FIELD_INHERITANCE), escapeFieldValue (tag, FIELD_INHERITANCE));
-
-	if (isFieldEnabled (FIELD_ACCESS) && doesFieldHaveValue (FIELD_ACCESS))
-		json_object_set_new (response, getFieldName (FIELD_ACCESS), escapeFieldValue (tag, FIELD_ACCESS));
-
-	if (isFieldEnabled (FIELD_IMPLEMENTATION) && doesFieldHaveValue (FIELD_IMPLEMENTATION))
-		json_object_set_new (response, getFieldName (FIELD_IMPLEMENTATION), escapeFieldValue (tag, FIELD_IMPLEMENTATION));
-
-	if (isFieldEnabled (FIELD_SIGNATURE) && doesFieldHaveValue (tag, FIELD_SIGNATURE))
-		json_object_set_new (response, getFieldName (FIELD_SIGNATURE), escapeFieldValue (tag, FIELD_SIGNATURE));
-
-	if (isFieldEnabled (FIELD_ROLE) && doesFieldHaveValue (tag, FIELD_ROLE))
-		json_object_set_new (response, getFieldName (FIELD_ROLE), escapeFieldValue (tag, FIELD_ROLE));
-
-	if (isFieldEnabled (FIELD_EXTRA) && doesFieldHaveValue (tag, FIELD_EXTRA))
-		json_object_set_new (response, getFieldName (FIELD_EXTRA), escapeFieldValue (tag, FIELD_EXTRA));
-
-	if (isFieldEnabled(FIELD_XPATH) && doesFieldHaveValue (tag, FIELD_XPATH))
-		json_object_set_new (response, getFieldName (FIELD_XPATH), escapeFieldValue (tag, FIELD_XPATH));
 }
 
 extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__)
