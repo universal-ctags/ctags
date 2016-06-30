@@ -997,48 +997,70 @@ static boolean parseImport (tokenInfo *const token)
 
 static boolean parseVariable (tokenInfo *const token)
 {
-	tokenInfo *name = newToken ();
+	/* In order to support proper tag type for lambdas in multiple
+	 * assignations, we first collect all the names, and then try and map
+	 * an assignation to it */
+	tokenInfo *nameTokens[8] = { NULL };
+	unsigned int nameCount = 0;
 
-	do
+	/* first, collect variable name tokens */
+	while (token->type == TOKEN_IDENTIFIER &&
+	       nameCount < ARRAY_SIZE (nameTokens))
 	{
+		tokenInfo *name = newToken ();
 		copyToken (name, token);
+
+		nameTokens[nameCount++] = name;
+
 		readToken (token);
-		/* FIXME: to get perfect tag types, we'd need to collect
-		 *        the multiple names, and then map the initializers
-		 *        back, but that's very hard. */
 		if (token->type == ',')
-		{
-			makeSimplePythonTag (name, K_VARIABLE);
 			readToken (token);
-			if (token->type != TOKEN_IDENTIFIER)
-				break;
-		}
 		else
-		{
-			if (token->type == '=')
-			{
-				/* check for lambdas */
-				readToken (token);
-				if (token->keyword != KEYWORD_lambda)
-					makeSimplePythonTag (name, K_VARIABLE);
-				else
-				{
-					vString *arglist = vStringNew ();
-
-					readToken (token);
-					vStringPut (arglist, '(');
-					skipLambdaArglist (token, arglist);
-					vStringPut (arglist, ')');
-					makeFunctionTag (name, arglist);
-					vStringDelete (arglist);
-				}
-			}
 			break;
-		}
 	}
-	while (token->type == TOKEN_IDENTIFIER);
 
-	deleteToken (name);
+	/* then, if it's a proper assignation, try and map assignations so that
+	 * we catch lambdas and alike */
+	if (token->type == '=')
+	{
+		unsigned int i = 0;
+
+		do
+		{
+			readToken (token);
+
+			if (token->keyword != KEYWORD_lambda)
+				makeSimplePythonTag (nameTokens[i++], K_VARIABLE);
+			else
+			{
+				vString *arglist = vStringNew ();
+
+				readToken (token);
+				vStringPut (arglist, '(');
+				skipLambdaArglist (token, arglist);
+				vStringPut (arglist, ')');
+				makeFunctionTag (nameTokens[i++], arglist);
+				vStringDelete (arglist);
+			}
+
+			/* skip until next initializer */
+			while ((TokenContinuationDepth > 0 || token->type != ',') &&
+			       token->type != TOKEN_EOF &&
+			       token->type != TOKEN_INDENT)
+			{
+				readToken (token);
+			}
+		}
+		while (token->type == ',' && i < nameCount);
+
+		/* if we got leftover to initialize, just make variables out of them.
+		 * This handles cases like `a, b, c = (c, d, e)` -- or worse */
+		while (i < nameCount)
+			makeSimplePythonTag (nameTokens[i++], K_VARIABLE);
+	}
+
+	while (nameCount > 0)
+		deleteToken (nameTokens[--nameCount]);
 
 	return FALSE;
 }
