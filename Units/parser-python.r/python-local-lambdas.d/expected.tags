@@ -1,0 +1,7 @@
+class01	input.py	/^class class01:$/;"	c
+func01	input.py	/^def func01():$/;"	f
+globallambda01	input.py	/^globallambda01 = lambda x:x$/;"	f
+locallambda01	input.py	/^    locallambda01 = lambda x:x$/;"	f	function:func01	file:
+locallambda02	input.py	/^        locallambda02 = lambda x:x$/;"	f	member:class01.member01	file:
+member01	input.py	/^    def member01(self):$/;"	m	class:class01
+memberlambda01	input.py	/^    memberlambda01 = lambda x:x$/;"	m	class:class01

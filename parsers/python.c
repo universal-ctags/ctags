@@ -1182,8 +1182,7 @@ static void findPythonTags (void)
 			if (lvEntry && lvEntry->kind != &(PythonKinds[K_CLASS]))
 				kind = K_LOCAL_VARIABLE;
 
-			if (PythonKinds[kind].enabled)
-				readNext = parseVariable (token, kind);
+			readNext = parseVariable (token, kind);
 		}
 
 		atStatementStart = (token->type == TOKEN_INDENT || token->type == ';');
