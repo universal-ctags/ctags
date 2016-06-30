@@ -145,13 +145,13 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 	if (isFieldEnabled (FIELD_ACCESS) &&  tag->extensionFields.access != NULL)
 		length += mio_printf (mio, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_ACCESS),
-				   tag->extensionFields.access);
+				   escapeName (tag, FIELD_ACCESS));
 
 	if (isFieldEnabled (FIELD_IMPLEMENTATION) &&
 			tag->extensionFields.implementation != NULL)
 		length += mio_printf (mio, "%s\t%s:%s", sep,
 				   getFieldName (FIELD_IMPLEMENTATION),
-				   tag->extensionFields.implementation);
+				   escapeName (tag, FIELD_IMPLEMENTATION));
 
 	if (isFieldEnabled (FIELD_SIGNATURE) &&
 			tag->extensionFields.signature != NULL)
