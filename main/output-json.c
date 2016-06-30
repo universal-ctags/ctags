@@ -81,25 +81,29 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 		json_object_set_new (response, getFieldName (FIELD_KIND_KEY), json_string (str));
 	}
 
-	renderExtensionFieldMaybe (FIELD_LINE_NUMBER, tag, response);
-	renderExtensionFieldMaybe (FIELD_LANGUAGE, tag, response);
-
 	if (isFieldEnabled (FIELD_SCOPE) || making_fq_tag)
 	{
 		if (isFieldEnabled (FIELD_SCOPE))
 			json_object_set_new (response, getFieldName (FIELD_SCOPE_KEY), escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG));
 	}
 
-	renderExtensionFieldMaybe (FIELD_TYPE_REF, tag, response);
-	renderExtensionFieldMaybe (FIELD_SCOPE, tag, response);
-	renderExtensionFieldMaybe (FIELD_INHERITANCE, tag, response);
-	renderExtensionFieldMaybe (FIELD_ACCESS, tag, response);
-	renderExtensionFieldMaybe (FIELD_IMPLEMENTATION, tag, response);
-	renderExtensionFieldMaybe (FIELD_SIGNATURE, tag, response);
-	renderExtensionFieldMaybe (FIELD_ROLE, tag, response);
-	renderExtensionFieldMaybe (FIELD_EXTRA, tag, response);
-	renderExtensionFieldMaybe (FIELD_XPATH, tag, response);
-
+	int field_keys [] = {
+		FIELD_ACCESS,
+		FIELD_INHERITANCE,
+		FIELD_LANGUAGE,
+		FIELD_IMPLEMENTATION,
+		FIELD_LINE_NUMBER,
+		FIELD_SIGNATURE,
+		FIELD_SCOPE,
+		FIELD_TYPE_REF,
+		FIELD_ROLE,
+		FIELD_EXTRA,
+		FIELD_XPATH,
+		FIELD_UNKNOWN,
+	};
+	int *k;
+	for (k = field_keys; *k != FIELD_UNKNOWN; k++)
+		renderExtensionFieldMaybe (*k, tag, response);
 }
 
 extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__)
