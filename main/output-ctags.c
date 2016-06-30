@@ -187,9 +187,10 @@ extern int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data
 		length += writePatternEntry (mio, tag);
 
 	if (includeExtensionFlags ())
+	{
 		length += addExtensionFields (mio, tag);
-
-	length += addParserFields (mio, tag);
+		length += addParserFields (mio, tag);
+	}
 
 	length += mio_printf (mio, "\n");
 
