@@ -1058,6 +1058,7 @@ static boolean parseVariable (tokenInfo *const token)
 			/* skip until next initializer */
 			while ((TokenContinuationDepth > 0 || token->type != ',') &&
 			       token->type != TOKEN_EOF &&
+			       token->type != ';' &&
 			       token->type != TOKEN_INDENT)
 			{
 				readToken (token);
@@ -1101,7 +1102,7 @@ static void setIndent (tokenInfo *const token)
 static void findPythonTags (void)
 {
 	tokenInfo *const token = newToken ();
-	boolean atLineStart = TRUE;
+	boolean atStatementStart = TRUE;
 
 	TokenContinuationDepth = 0;
 	NextToken = NULL;
@@ -1135,7 +1136,7 @@ static void findPythonTags (void)
 		{ /* skip parentheses to avoid finding stuff inside them */
 			readNext = skipOverPair (token, '(', ')', NULL, FALSE);
 		}
-		else if (token->type == TOKEN_IDENTIFIER && atLineStart)
+		else if (token->type == TOKEN_IDENTIFIER && atStatementStart)
 		{
 			NestingLevel *lv = nestingLevelsGetCurrent (PythonNestingLevels);
 			tagEntryInfo *lvEntry = getEntryOfNestingLevel (lv);
@@ -1144,7 +1145,7 @@ static void findPythonTags (void)
 				readNext = parseVariable (token);
 		}
 
-		atLineStart = token->type == TOKEN_INDENT;
+		atStatementStart = (token->type == TOKEN_INDENT || token->type == ';');
 
 		if (readNext)
 			readToken (token);
