@@ -1,7 +1,0 @@
-LAMBDA1	input.py	/^VAR1, LAMBDA1 = 1, lambda x: x*x$/;"	f
-LAMBDA2	input.py	/^LAMBDA2, VAR2 = lambda x: x*x, 2$/;"	f
-LAMBDA3	input.py	/^VAR3, LAMBDA3, VAR4 = 3, lambda x: x*x, 4$/;"	f
-VAR1	input.py	/^VAR1, LAMBDA1 = 1, lambda x: x*x$/;"	v
-VAR2	input.py	/^LAMBDA2, VAR2 = lambda x: x*x, 2$/;"	v
-VAR3	input.py	/^VAR3, LAMBDA3, VAR4 = 3, lambda x: x*x, 4$/;"	v
-VAR4	input.py	/^VAR3, LAMBDA3, VAR4 = 3, lambda x: x*x, 4$/;"	v
