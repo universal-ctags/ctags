@@ -18,6 +18,24 @@ def func5( arg1 = 1,
            arg3 = None):
     pass
 
+def func6(arg1, arg2, *args):
+    return (arg1 + 1, arg2 + 2) + args
+
+def func7(*args, **kwargs):
+    pass
+
+def func8(arg1=1*2, arg2=func6(1, 2, 3, 4)):
+    pass
+
+VAR1=0
+
+def func9(arg1=VAR1*VAR1):
+    pass
+
+def func10(arg1=[VAR1,VAR1],
+           arg2={VAR1:VAR1}):
+    pass
+
 
 class Cls(object):
     def __init__(self):
