@@ -116,9 +116,10 @@ extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data 
 	);
 
 	if (includeExtensionFlags ())
+	{
 		addExtensionFields (response, tag);
-
-	addParserFields (response, tag);
+		addParserFields (response, tag);
+	}
 
 	char *buf = json_dumps (response, JSON_SORT_KEYS);
 	int length = mio_printf (mio, "%s\n", buf);
