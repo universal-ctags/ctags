@@ -21,7 +21,7 @@
 
 #define includeExtensionFlags()         (Option.tagFileFormat > 1)
 
-static json_t* escapeName (const tagEntryInfo * tag, fieldType ftype)
+static json_t* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
 {
 	const char *str = renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
 	if (str)
@@ -64,40 +64,40 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 		json_object_set_new (response, getFieldName (FIELD_LINE_NUMBER), json_integer (tag->lineNumber));
 
 	if (isFieldEnabled (FIELD_LANGUAGE)  &&  doesFieldHaveValue (FIELD_LANGUAGE))
-		json_object_set_new (response, getFieldName (FIELD_LANGUAGE), escapeName (tag, FIELD_LANGUAGE));
+		json_object_set_new (response, getFieldName (FIELD_LANGUAGE), escapeFieldValue (tag, FIELD_LANGUAGE));
 
 	if (isFieldEnabled (FIELD_SCOPE) || making_fq_tag)
 	{
 		if (isFieldEnabled (FIELD_SCOPE))
-			json_object_set_new (response, getFieldName (FIELD_SCOPE_KEY), escapeName (tag, FIELD_SCOPE_KIND_LONG));
+			json_object_set_new (response, getFieldName (FIELD_SCOPE_KEY), escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG));
 	}
 
 	if (isFieldEnabled (FIELD_TYPE_REF) && doesFieldHaveValue (FIELD_TYPE_REF, tag))
-		json_object_set_new (response, getFieldName (FIELD_TYPE_REF), escapeName (tag, FIELD_TYPE_REF));
+		json_object_set_new (response, getFieldName (FIELD_TYPE_REF), escapeFieldValue (tag, FIELD_TYPE_REF));
 
 	if (isFieldEnabled (FIELD_FILE_SCOPE) &&  doesFieldHaveValue (FIELD_FILE_SCOPE, tag))
 		json_object_set_new (response, getFieldName (FIELD_FILE_SCOPE), json_boolean(1));
 
 	if (isFieldEnabled (FIELD_INHERITANCE) && doesFieldHaveValue (FIELD_INHERITANCE))
-		json_object_set_new (response, getFieldName (FIELD_INHERITANCE), escapeName (tag, FIELD_INHERITANCE));
+		json_object_set_new (response, getFieldName (FIELD_INHERITANCE), escapeFieldValue (tag, FIELD_INHERITANCE));
 
 	if (isFieldEnabled (FIELD_ACCESS) && doesFieldHaveValue (FIELD_ACCESS))
-		json_object_set_new (response, getFieldName (FIELD_ACCESS), escapeName (tag, FIELD_ACCESS));
+		json_object_set_new (response, getFieldName (FIELD_ACCESS), escapeFieldValue (tag, FIELD_ACCESS));
 
 	if (isFieldEnabled (FIELD_IMPLEMENTATION) && doesFieldHaveValue (FIELD_IMPLEMENTATION))
-		json_object_set_new (response, getFieldName (FIELD_IMPLEMENTATION), escapeName (tag, FIELD_IMPLEMENTATION));
+		json_object_set_new (response, getFieldName (FIELD_IMPLEMENTATION), escapeFieldValue (tag, FIELD_IMPLEMENTATION));
 
 	if (isFieldEnabled (FIELD_SIGNATURE) && doesFieldHaveValue (tag, FIELD_SIGNATURE))
-		json_object_set_new (response, getFieldName (FIELD_SIGNATURE), escapeName (tag, FIELD_SIGNATURE));
+		json_object_set_new (response, getFieldName (FIELD_SIGNATURE), escapeFieldValue (tag, FIELD_SIGNATURE));
 
 	if (isFieldEnabled (FIELD_ROLE) && doesFieldHaveValue (tag, FIELD_ROLE))
-		json_object_set_new (response, getFieldName (FIELD_ROLE), escapeName (tag, FIELD_ROLE));
+		json_object_set_new (response, getFieldName (FIELD_ROLE), escapeFieldValue (tag, FIELD_ROLE));
 
 	if (isFieldEnabled (FIELD_EXTRA) && doesFieldHaveValue (tag, FIELD_EXTRA))
-		json_object_set_new (response, getFieldName (FIELD_EXTRA), escapeName (tag, FIELD_EXTRA));
+		json_object_set_new (response, getFieldName (FIELD_EXTRA), escapeFieldValue (tag, FIELD_EXTRA));
 
 	if (isFieldEnabled(FIELD_XPATH) && doesFieldHaveValue (tag, FIELD_XPATH))
-		json_object_set_new (response, getFieldName (FIELD_XPATH), escapeName (tag, FIELD_XPATH));
+		json_object_set_new (response, getFieldName (FIELD_XPATH), escapeFieldValue (tag, FIELD_XPATH));
 }
 
 extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__)

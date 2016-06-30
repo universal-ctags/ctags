@@ -19,7 +19,7 @@
 #define includeExtensionFlags()         (Option.tagFileFormat > 1)
 
 
-static const char* escapeName (const tagEntryInfo * tag, fieldType ftype)
+static const char* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
 {
 	return renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
 }
@@ -31,7 +31,7 @@ static int renderExtensionFieldMaybe (int xftype, const tagEntryInfo *const tag,
 		int len;
 		len = mio_printf (mio, "%s\t%s:%s", sep,
 				  getFieldName (xftype),
-				  escapeName (tag, xftype));
+				  escapeFieldValue (tag, xftype));
 		sep[0] = '\0';
 		return len;
 	}
@@ -61,7 +61,7 @@ static int addParserFields (MIO * mio, const tagEntryInfo *const tag)
 static int writeLineNumberEntry (MIO * mio, const tagEntryInfo *const tag)
 {
 	if (Option.lineDirectives)
-		return mio_printf (mio, "%s", escapeName (tag, FIELD_LINE_NUMBER));
+		return mio_printf (mio, "%s", escapeFieldValue (tag, FIELD_LINE_NUMBER));
 	else
 		return mio_printf (mio, "%lu", tag->lineNumber);
 }
@@ -131,8 +131,8 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 	{
 		const char* k = NULL, *v = NULL;
 
-		k = escapeName (tag, FIELD_SCOPE_KIND_LONG);
-		v = escapeName (tag, FIELD_SCOPE);
+		k = escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG);
+		v = escapeFieldValue (tag, FIELD_SCOPE);
 
 		if (isFieldEnabled (FIELD_SCOPE) && k && v)
 		{
@@ -146,7 +146,7 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 		length += mio_printf (mio, "%s\t%s:%s:%s", sep,
 				      getFieldName (FIELD_TYPE_REF),
 				      tag->extensionFields.typeRef [0],
-				      escapeName (tag, FIELD_TYPE_REF));
+				      escapeFieldValue (tag, FIELD_TYPE_REF));
 		sep [0] = '\0';
 	}
 
@@ -177,8 +177,8 @@ static int writePatternEntry (MIO *mio, const tagEntryInfo *const tag)
 extern int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__)
 {
 	int length = mio_printf (mio, "%s\t%s\t",
-			      escapeName (tag, FIELD_NAME),
-			      escapeName (tag, FIELD_INPUT_FILE));
+			      escapeFieldValue (tag, FIELD_NAME),
+			      escapeFieldValue (tag, FIELD_INPUT_FILE));
 
 	if (tag->lineNumberEntry)
 		length += writeLineNumberEntry (mio, tag);
