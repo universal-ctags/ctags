@@ -15,6 +15,7 @@ MAIN_HEADS =			\
 	main/args.h		\
 	main/ctags.h		\
 	main/entry.h		\
+	main/error.h		\
 	main/field.h		\
 	main/flags.h		\
 	main/fmt.h		\
@@ -27,6 +28,7 @@ MAIN_HEADS =			\
 	main/mbcs.h		\
 	main/nestlevel.h	\
 	main/options.h		\
+	main/output.h		\
 	main/parse.h		\
 	main/parsers.h		\
 	main/pcoproc.h		\
@@ -45,6 +47,7 @@ MAIN_HEADS =			\
 MAIN_SRCS =				\
 	main/args.c			\
 	main/entry.c			\
+	main/error.c			\
 	main/field.c			\
 	main/flags.c			\
 	main/fmt.c			\
@@ -59,6 +62,9 @@ MAIN_SRCS =				\
 	main/mbcs.c			\
 	main/nestlevel.c		\
 	main/options.c			\
+	main/output-etags.c		\
+	main/output-ctags.c		\
+	main/output-xref.c		\
 	main/parse.c			\
 	main/pcoproc.c			\
 	main/promise.c			\

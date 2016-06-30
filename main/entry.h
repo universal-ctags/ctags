@@ -83,7 +83,7 @@ typedef struct sTagEntryInfo {
 #endif
 	} extensionFields;  /* list of extension fields*/
 
-#define PRE_ALLOCATED_PARSER_FIELDS 4
+#define PRE_ALLOCATED_PARSER_FIELDS 5
 #define NO_PARSER_FIELD -1
 	unsigned int usedParserFields;
 	tagField     parserFields [PRE_ALLOCATED_PARSER_FIELDS];
@@ -108,8 +108,8 @@ extern void freeTagFileResources (void);
 extern const char *tagFileName (void);
 extern void openTagFile (void);
 extern void closeTagFile (const boolean resize);
-extern void beginEtagsFile (void);
-extern void endEtagsFile (const char *const name);
+extern void  setupWriter (void);
+extern void  teardownWriter (const char *inputFilename);
 extern int makeTagEntry (const tagEntryInfo *const tag);
 extern void initTagEntry (tagEntryInfo *const e, const char *const name,
 			  const kindOption *kind);

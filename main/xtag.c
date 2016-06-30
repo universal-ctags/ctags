@@ -17,6 +17,9 @@
 #include "routines.h"
 #include "xtag.h"
 
+#include <string.h>
+
+
 static boolean isPseudoTagsEnabled (xtagDesc *pdesc __unused__)
 {
 	return ! isDestinationStdout ();
@@ -46,16 +49,37 @@ extern xtagDesc* getXtagDesc (xtagType type)
 	return xtagDescs + type;
 }
 
-extern xtagType  getXtagTypeForOption (char letter)
+typedef boolean (* xtagPredicate) (xtagDesc *pdesc, const void *user_data);
+static xtagType  getXtagTypeGeneric (xtagPredicate predicate, const void *user_data)
 {
 	int i;
 
 	for (i = 0; i < XTAG_COUNT; i++)
 	{
-		if (xtagDescs [i].letter == letter)
+		if (predicate (xtagDescs + i, user_data))
 			return i;
 	}
 	return XTAG_UNKNOWN;
+}
+
+static boolean xtagEqualByLetter (xtagDesc *pdesc, const void *user_data)
+{
+	return (pdesc->letter == *((char *)user_data))? TRUE: FALSE;
+}
+
+extern xtagType  getXtagTypeForLetter (char letter)
+{
+	return getXtagTypeGeneric (xtagEqualByLetter, &letter);
+}
+
+static boolean xtagEqualByName (xtagDesc *pdesc, const void *user_data)
+{
+	return (strcmp (pdesc->name, user_data) == 0)? TRUE: FALSE;
+}
+
+extern xtagType  getXtagTypeForName (const char *name)
+{
+	return getXtagTypeGeneric (xtagEqualByName, name);
 }
 
 

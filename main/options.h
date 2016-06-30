@@ -181,6 +181,9 @@ extern boolean processLanguageEncodingOption (const char *const option, const ch
 extern boolean processRegexOption (const char *const option, const char *const parameter);
 extern boolean processXcmdOption (const char *const option, const char *const parameter, OptionLoadingStage stage);
 
+typedef void (* mainLoopFunc) (cookedArgs *args, void *data);
+extern void setMainLoop (mainLoopFunc func, void *data);
+
 #endif  /* CTAGS_MAIN_OPTIONS_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */

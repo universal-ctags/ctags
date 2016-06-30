@@ -1,0 +1,2 @@
+L       label           on       FALSE   0      goto labels                   
+d       macro           off      FALSE   1      macro definitions             

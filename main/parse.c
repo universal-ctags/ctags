@@ -1575,6 +1575,19 @@ static kindOption *langKindOption (const langType language, const int flag)
 	return result;
 }
 
+static kindOption *langKindLongOption (const langType language, const char *kindLong)
+{
+	unsigned int i;
+	kindOption* result = NULL;
+	const parserDefinition* lang;
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+	lang = LanguageTable [language];
+	for (i=0  ;  i < lang->kindCount  &&  result == NULL  ;  ++i)
+		if (strcmp (lang->kinds [i].name, kindLong) == 0)
+			result = &lang->kinds [i];
+	return result;
+}
+
 extern boolean isLanguageKindEnabled (const langType language, char kind)
 {
 	const kindOption *kindOpt;
@@ -1621,6 +1634,21 @@ static boolean enableLanguageKind (
 	return result;
 }
 
+static boolean enableLanguageKindLong (
+	const langType language, const const char *kindLong, const boolean mode)
+{
+	boolean result = FALSE;
+	kindOption* const opt = langKindLongOption (language, kindLong);
+	if (opt != NULL)
+	{
+		opt->enabled = mode;
+		result = TRUE;
+	}
+	result = enableRegexKindLong (language, kindLong, mode)? TRUE: result;
+	result = enableXcmdKindLong (language, kindLong, mode)? TRUE: result;
+	return result;
+}
+
 static void processLangKindOption (
 		const langType language, const char *const option,
 		const char *const parameter)
@@ -1628,6 +1656,10 @@ static void processLangKindOption (
 	const char *p = parameter;
 	boolean mode = TRUE;
 	int c;
+	static vString *longName;
+	boolean inLongName = FALSE;
+	const char *k;
+	boolean r;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 
@@ -1640,15 +1672,57 @@ static void processLangKindOption (
 	else if (*p != '+'  &&  *p != '-')
 		resetLanguageKinds (language, FALSE);
 
-	while ((c = *p++) != '\0') switch (c)
+	longName = vStringNewOrClear (longName);
+
+	while ((c = *p++) != '\0')
 	{
-		case '+': mode = TRUE;  break;
-		case '-': mode = FALSE; break;
-		default:
-			if (! enableLanguageKind (language, c, mode))
-				error (WARNING, "Unsupported kind: '%c' for --%s option",
-					c, option);
+		switch (c)
+		{
+		case '+':
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				mode = TRUE;
 			break;
+		case '-':
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				mode = FALSE;
+			break;
+		case '{':
+			if (inLongName)
+				error(FATAL,
+				      "unexpected character in kind specification: \'%c\'",
+				      c);
+			inLongName = TRUE;
+			break;
+		case '}':
+			if (!inLongName)
+				error(FATAL,
+				      "unexpected character in kind specification: \'%c\'",
+				      c);
+			k = vStringValue (longName);
+			r = enableLanguageKindLong (language, k, mode);
+			if (! r)
+				error (WARNING, "Unsupported kind: '%s' for --%s option",
+				       k, option);
+
+			inLongName = FALSE;
+			vStringClear (longName);
+			break;
+		default:
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+			{
+				r = enableLanguageKind (language, c, mode);
+				if (! r)
+					error (WARNING, "Unsupported kind: '%c' for --%s option",
+					       c, option);
+			}
+			break;
+		}
 	}
 }
 
@@ -2243,8 +2317,7 @@ extern boolean parseFile (const char *const fileName)
 					EncodingMap[language] : Option.inputEncoding, Option.outputEncoding);
 #endif
 
-		if (Option.etags)
-			beginEtagsFile ();
+		setupWriter ();
 
 		tagFileResized = createTagsWithFallback (fileName, language, mio);
 #ifdef HAVE_COPROC
@@ -2252,8 +2325,8 @@ extern boolean parseFile (const char *const fileName)
 			tagFileResized = createTagsWithXcmd (fileName, language, mio)? TRUE: tagFileResized;
 #endif
 
-		if (Option.etags)
-			endEtagsFile (fileName);
+		teardownWriter (fileName);
+
 		if (Option.filter)
 			closeTagFile (tagFileResized);
 		addTotals (1, 0L, 0L);

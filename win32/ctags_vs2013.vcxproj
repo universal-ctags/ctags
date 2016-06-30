@@ -115,6 +115,7 @@
     <ClCompile Include="..\parsers\dts.c" />
     <ClCompile Include="..\parsers\eiffel.c" />
     <ClCompile Include="..\main\entry.c" />
+    <ClCompile Include="..\main\error.c" />
     <ClCompile Include="..\parsers\erlang.c" />
     <ClCompile Include="..\parsers\falcon.c" />
     <ClCompile Include="..\main\field.c" />
@@ -146,6 +147,9 @@
     <ClCompile Include="..\parsers\objc.c" />
     <ClCompile Include="..\parsers\ocaml.c" />
     <ClCompile Include="..\main\options.c" />
+    <ClCompile Include="..\main\output-ctags.c" />
+    <ClCompile Include="..\main\output-etags.c" />
+    <ClCompile Include="..\main\output-xref.c" />
     <ClCompile Include="..\main\parse.c" />
     <ClCompile Include="..\parsers\pascal.c" />
     <ClCompile Include="..\parsers\perl.c" />
@@ -210,6 +214,7 @@
     <ClInclude Include="..\main\ctags.h" />
     <ClInclude Include="..\main\debug.h" />
     <ClInclude Include="..\main\entry.h" />
+    <ClInclude Include="..\main\error.h" />
     <ClInclude Include="..\main\e_msoft.h" />
     <ClInclude Include="..\main\field.h" />
     <ClInclude Include="..\main\flags.h" />
@@ -223,6 +228,7 @@
     <ClInclude Include="..\main\main.h" />
     <ClInclude Include="..\main\nestlevel.h" />
     <ClInclude Include="..\main\options.h" />
+    <ClInclude Include="..\main\output.h" />
     <ClInclude Include="..\main\parse.h" />
     <ClInclude Include="..\main\parsers.h" />
     <ClInclude Include="..\main\ptag.h" />

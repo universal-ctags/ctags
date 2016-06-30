@@ -440,6 +440,7 @@ extern void resetXcmdKinds (const langType language, boolean mode)
 struct kind_and_mode_and_result
 {
 	int kind;
+	const char *kindLong;
 	boolean mode;
 	boolean result;
 };
@@ -447,7 +448,10 @@ struct kind_and_mode_and_result
 static boolean enable_kind_cb (kindOption *kind, void *data)
 {
 	struct kind_and_mode_and_result *kmr = data;
-	if (kind->letter == kmr->kind)
+	if ((kmr->kind != KIND_NULL
+	     && kind->letter == kmr->kind)
+	    || (kmr->kindLong && kind->name
+		&& (strcmp (kmr->kindLong, kind->name) == 0)))
 	{
 		kind->enabled = kmr->mode;
 		kmr->result = TRUE;
@@ -459,12 +463,28 @@ static boolean enable_kind_cb (kindOption *kind, void *data)
 	return FALSE;
 
 }
+
 extern boolean enableXcmdKind (const langType language, const int kind,
 			       const boolean mode)
 {
 	struct kind_and_mode_and_result kmr;
 
 	kmr.kind = kind;
+	kmr.kindLong = NULL;
+	kmr.mode = mode;
+	kmr.result = FALSE;
+
+	foreachXcmdKinds (language, enable_kind_cb, &kmr);
+	return kmr.result;
+}
+
+extern boolean enableXcmdKindLong (const langType language, const char *kindLong,
+				   const boolean mode)
+{
+	struct kind_and_mode_and_result kmr;
+
+	kmr.kind = KIND_NULL;
+	kmr.kindLong = kindLong;
 	kmr.mode = mode;
 	kmr.result = FALSE;
 
