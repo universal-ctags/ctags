@@ -24,6 +24,21 @@ static const char* escapeName (const tagEntryInfo * tag, fieldType ftype)
 	return renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
 }
 
+static int renderExtensionFieldMaybe (int xftype, const tagEntryInfo *const tag, char sep[2], MIO *mio)
+{
+	if (isFieldEnabled (xftype) && doesFieldHaveValue (xftype, tag))
+	{
+		int len;
+		len = mio_printf (mio, "%s\t%s:%s", sep,
+				  getFieldName (xftype),
+				  escapeName (tag, xftype));
+		sep[0] = '\0';
+		return len;
+	}
+	else
+		return 0;
+}
+
 static int addParserFields (MIO * mio, const tagEntryInfo *const tag)
 {
 	unsigned int i;
@@ -82,36 +97,35 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 		?"%s\t%s:%s:%s"
 		:"%s\t%s%s:%s";
 
-	boolean first = TRUE;
-	const char* separator = ";\"";
-	const char* const empty = "";
+	char sep [] = {';', '"', '\0'};
 	int length = 0;
 
 	boolean making_fq_tag =  (doesInputLanguageRequestAutomaticFQTag ()
 				  && isXtagEnabled (XTAG_QUALIFIED_TAGS));
 
-/* "sep" returns a value only the first time it is evaluated */
-#define sep (first ? (first = FALSE, separator) : empty)
-
 	if (tag->kind->name != NULL && (isFieldEnabled (FIELD_KIND_LONG)  ||
 		 (isFieldEnabled (FIELD_KIND)  && tag->kind == '\0')))
+	{
 		length += mio_printf (mio, kindFmt, sep, kindKey, tag->kind->name);
+		sep [0] = '\0';
+	}
 	else if (tag->kind != '\0'  && (isFieldEnabled (FIELD_KIND) ||
 			(isFieldEnabled (FIELD_KIND_LONG) &&  tag->kind->name == NULL)))
 	{
 		char str[2] = {tag->kind->letter, '\0'};
 		length += mio_printf (mio, kindFmt, sep, kindKey, str);
+		sep [0] = '\0';
 	}
 
 	if (isFieldEnabled (FIELD_LINE_NUMBER) &&  doesFieldHaveValue (FIELD_LINE_NUMBER, tag))
+	{
 		length += mio_printf (mio, "%s\t%s:%ld", sep,
 				   getFieldName (FIELD_LINE_NUMBER),
 				   tag->lineNumber);
+		sep [0] = '\0';
+	}
 
-	if (isFieldEnabled (FIELD_LANGUAGE)  &&  doesFieldHaveValue (FIELD_LANGUAGE, tag))
-		length += mio_printf (mio, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_LANGUAGE),
-				   escapeName (tag, FIELD_LANGUAGE));
+	length += renderExtensionFieldMaybe (FIELD_LANGUAGE, tag, sep, mio);
 
 	if (isFieldEnabled (FIELD_SCOPE) || making_fq_tag)
 	{
@@ -121,55 +135,37 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 		v = escapeName (tag, FIELD_SCOPE);
 
 		if (isFieldEnabled (FIELD_SCOPE) && k && v)
+		{
 			length += mio_printf (mio, scopeFmt, sep, scopeKey, k, v);
+			sep [0] = '\0';
+		}
 	}
 
 	if (isFieldEnabled (FIELD_TYPE_REF) && doesFieldHaveValue (FIELD_TYPE_REF, tag))
+	{
 		length += mio_printf (mio, "%s\t%s:%s:%s", sep,
 				      getFieldName (FIELD_TYPE_REF),
 				      tag->extensionFields.typeRef [0],
 				      escapeName (tag, FIELD_TYPE_REF));
+		sep [0] = '\0';
+	}
 
 	if (isFieldEnabled (FIELD_FILE_SCOPE) &&  doesFieldHaveValue (FIELD_FILE_SCOPE, tag))
+	{
 		length += mio_printf (mio, "%s\t%s:", sep,
 				      getFieldName (FIELD_FILE_SCOPE));
+		sep [0] = '\0';
+	}
 
-	if (isFieldEnabled (FIELD_INHERITANCE) && doesFieldHaveValue (FIELD_INHERITANCE, tag))
-		length += mio_printf (mio, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_INHERITANCE),
-				   escapeName (tag, FIELD_INHERITANCE));
-
-	if (isFieldEnabled (FIELD_ACCESS) && doesFieldHaveValue (FIELD_ACCESS, tag))
-		length += mio_printf (mio, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_ACCESS),
-				   escapeName (tag, FIELD_ACCESS));
-
-	if (isFieldEnabled (FIELD_IMPLEMENTATION) && doesFieldHaveValue (FIELD_IMPLEMENTATION, tag))
-		length += mio_printf (mio, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_IMPLEMENTATION),
-				   escapeName (tag, FIELD_IMPLEMENTATION));
-
-	if (isFieldEnabled (FIELD_SIGNATURE) && doesFieldHaveValue (FIELD_SIGNATURE, tag))
-		length += mio_printf (mio, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_SIGNATURE),
-				   escapeName (tag, FIELD_SIGNATURE));
-	if (isFieldEnabled (FIELD_ROLE) && doesFieldHaveValue (FIELD_ROLE, tag))
-		length += mio_printf (mio, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_ROLE),
-				   escapeName (tag, FIELD_ROLE));
-
-	if (isFieldEnabled (FIELD_EXTRA) && doesFieldHaveValue (FIELD_EXTRA, tag))
-		length += mio_printf (mio, "%s\t%s:%s", sep,
-				      getFieldName (FIELD_EXTRA),
-				      escapeName (tag, FIELD_EXTRA));
-
-	if (isFieldEnabled(FIELD_XPATH) && doesFieldHaveValue (FIELD_XPATH, tag))
-		length += mio_printf (mio, "%s\t%s:%s", sep,
-				      getFieldName (FIELD_XPATH),
-				      escapeName (tag, FIELD_XPATH));
+	length += renderExtensionFieldMaybe (FIELD_INHERITANCE, tag, sep, mio);
+	length += renderExtensionFieldMaybe (FIELD_ACCESS, tag, sep, mio);
+	length += renderExtensionFieldMaybe (FIELD_IMPLEMENTATION, tag, sep, mio);
+	length += renderExtensionFieldMaybe (FIELD_SIGNATURE, tag, sep, mio);
+	length += renderExtensionFieldMaybe (FIELD_ROLE, tag, sep, mio);
+	length += renderExtensionFieldMaybe (FIELD_EXTRA, tag, sep, mio);
+	length += renderExtensionFieldMaybe (FIELD_XPATH, tag, sep, mio);
 
 	return length;
-#undef sep
 }
 
 static int writePatternEntry (MIO *mio, const tagEntryInfo *const tag)
