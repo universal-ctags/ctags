@@ -74,6 +74,7 @@ typedef enum {
 	K_MODULE,
 	K_UNKNOWN,
 	K_PARAMETER,
+	K_LOCAL_VARIABLE,
 	COUNT_KIND
 } pythonKind;
 
@@ -132,6 +133,7 @@ static kindOption PythonKinds[COUNT_KIND] = {
 	{TRUE, 'x', "unknown",   "name referring a classe/variable/function/module defined in other module",
 	 .referenceOnly = FALSE, ATTACH_ROLES(PythonUnknownRoles)},
 	{FALSE, 'z', "parameter", "function parameters" },
+	{FALSE, 'l', "local",    "local variables" },
 };
 
 typedef struct {
@@ -1056,7 +1058,7 @@ static boolean parseImport (tokenInfo *const token)
 	return FALSE;
 }
 
-static boolean parseVariable (tokenInfo *const token)
+static boolean parseVariable (tokenInfo *const token, const pythonKind kind)
 {
 	/* In order to support proper tag type for lambdas in multiple
 	 * assignations, we first collect all the names, and then try and map
@@ -1091,7 +1093,7 @@ static boolean parseVariable (tokenInfo *const token)
 			readToken (token);
 
 			if (token->keyword != KEYWORD_lambda)
-				makeSimplePythonTag (nameTokens[i++], K_VARIABLE);
+				makeSimplePythonTag (nameTokens[i++], kind);
 			else
 			{
 				vString *arglist = vStringNew ();
@@ -1118,7 +1120,7 @@ static boolean parseVariable (tokenInfo *const token)
 		/* if we got leftover to initialize, just make variables out of them.
 		 * This handles cases like `a, b, c = (c, d, e)` -- or worse */
 		while (i < nameCount)
-			makeSimplePythonTag (nameTokens[i++], K_VARIABLE);
+			makeSimplePythonTag (nameTokens[i++], kind);
 	}
 
 	while (nameCount > 0)
@@ -1189,9 +1191,13 @@ static void findPythonTags (void)
 		{
 			NestingLevel *lv = nestingLevelsGetCurrent (PythonNestingLevels);
 			tagEntryInfo *lvEntry = getEntryOfNestingLevel (lv);
+			pythonKind kind = K_VARIABLE;
 
-			if (! lvEntry || lvEntry->kind == &(PythonKinds[K_CLASS]))
-				readNext = parseVariable (token);
+			if (lvEntry && lvEntry->kind != &(PythonKinds[K_CLASS]))
+				kind = K_LOCAL_VARIABLE;
+
+			if (PythonKinds[kind].enabled)
+				readNext = parseVariable (token, kind);
 		}
 
 		atStatementStart = (token->type == TOKEN_INDENT || token->type == ';');

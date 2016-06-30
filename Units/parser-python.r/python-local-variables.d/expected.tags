@@ -1,0 +1,15 @@
+Cls01	input.py	/^class Cls01:$/;"	c
+func01	input.py	/^def func01():$/;"	f
+func02	input.py	/^def func02():$/;"	f
+func03	input.py	/^def func03(x):$/;"	f
+func04	input.py	/^def func04(x):$/;"	f
+global01	input.py	/^global01 = 1$/;"	v
+local01	input.py	/^    local01 = 1$/;"	l	function:func01	file:
+local02	input.py	/^    local02 = 2$/;"	l	function:func02	file:
+local03	input.py	/^    local03 = 3$/;"	l	function:func02	file:
+local04	input.py	/^        local04 = 4$/;"	l	member:Cls01.method01	file:
+localfunc01	input.py	/^    def localfunc01():$/;"	f	function:func04	file:
+locallambda01	input.py	/^    locallambda01 = lambda x:x$/;"	f	function:func03	file:
+member01	input.py	/^    member01 = 1$/;"	v	class:Cls01
+member02	input.py	/^    member02 = 2$/;"	v	class:Cls01
+method01	input.py	/^    def method01(self):$/;"	m	class:Cls01
