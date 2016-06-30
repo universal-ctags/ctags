@@ -55,11 +55,15 @@ static const char *const PythonAccesses[COUNT_ACCESS] = {
 };
 
 typedef enum {
+	F_DECORATORS,
 	F_END,
 	COUNT_FIELD
 } pythonField;
 
 static fieldSpec PythonFields[COUNT_FIELD] = {
+	{ .name = "decorators",
+	  .description = "decorators on functions and classes",
+	  .enabled = FALSE },
 	{ .name = "end",
 	  .description = "end lines of various constructs",
 	  .enabled = FALSE },
@@ -271,7 +275,8 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 }
 
 static int makeClassTag (const tokenInfo *const token,
-                         vString *const inheritance)
+                         const vString *const inheritance,
+                         const vString *const decorators)
 {
 	if (PythonKinds[K_CLASS].enabled)
 	{
@@ -280,6 +285,11 @@ static int makeClassTag (const tokenInfo *const token,
 		initPythonEntry (&e, token, K_CLASS);
 
 		e.extensionFields.inheritance = inheritance ? vStringValue (inheritance) : "";
+		if (decorators && vStringLength (decorators) > 0)
+		{
+			attachParserField (&e, PythonFields[F_DECORATORS].ftype,
+			                   vStringValue (decorators));
+		}
 
 		return makeTagEntry (&e);
 	}
@@ -288,7 +298,8 @@ static int makeClassTag (const tokenInfo *const token,
 }
 
 static int makeFunctionTag (const tokenInfo *const token,
-                            const vString *const arglist)
+                            const vString *const arglist,
+                            const vString *const decorators)
 {
 	if (PythonKinds[K_FUNCTION].enabled)
 	{
@@ -298,6 +309,11 @@ static int makeFunctionTag (const tokenInfo *const token,
 
 		if (arglist)
 			e.extensionFields.signature = vStringValue (arglist);
+		if (decorators && vStringLength (decorators) > 0)
+		{
+			attachParserField (&e, PythonFields[F_DECORATORS].ftype,
+			                   vStringValue (decorators));
+		}
 
 		return makeTagEntry (&e);
 	}
@@ -826,8 +842,9 @@ static boolean readCDefName (tokenInfo *const token, pythonKind *kind)
 	return token->type == TOKEN_IDENTIFIER;
 }
 
-static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind,
-                                boolean isCDef)
+static boolean parseClassOrDef (tokenInfo *const token,
+                                const vString *const decorators,
+                                pythonKind kind, boolean isCDef)
 {
 	vString *arglist = NULL;
 	tokenInfo *name = NULL;
@@ -902,9 +919,9 @@ static boolean parseClassOrDef (tokenInfo *const token, pythonKind kind,
 	}
 
 	if (kind == K_CLASS)
-		corkIndex = makeClassTag (name, arglist);
+		corkIndex = makeClassTag (name, arglist, decorators);
 	else
-		corkIndex = makeFunctionTag (name, arglist);
+		corkIndex = makeFunctionTag (name, arglist, decorators);
 
 	lv = nestingLevelsPush (PythonNestingLevels, corkIndex);
 	PY_NL (lv)->indentation = token->indent;
@@ -1116,7 +1133,7 @@ static boolean parseVariable (tokenInfo *const token, const pythonKind kind)
 				vStringPut (arglist, '(');
 				skipLambdaArglist (token, arglist);
 				vStringPut (arglist, ')');
-				makeFunctionTag (nameTokens[i++], arglist);
+				makeFunctionTag (nameTokens[i++], arglist, NULL);
 				vStringDelete (arglist);
 			}
 
@@ -1167,6 +1184,7 @@ static void setIndent (tokenInfo *const token)
 static void findPythonTags (void)
 {
 	tokenInfo *const token = newToken ();
+	vString *decorators = vStringNew ();
 	boolean atStatementStart = TRUE;
 
 	TokenContinuationDepth = 0;
@@ -1176,6 +1194,7 @@ static void findPythonTags (void)
 	readToken (token);
 	while (token->type != TOKEN_EOF)
 	{
+		tokenType iterationTokenType = token->type;
 		boolean readNext = TRUE;
 
 		if (token->type == TOKEN_INDENT)
@@ -1185,12 +1204,12 @@ static void findPythonTags (void)
 		{
 			pythonKind kind = token->keyword == KEYWORD_class ? K_CLASS : K_FUNCTION;
 
-			readNext = parseClassOrDef (token, kind, FALSE);
+			readNext = parseClassOrDef (token, decorators, kind, FALSE);
 		}
 		else if (token->keyword == KEYWORD_cdef ||
 		         token->keyword == KEYWORD_cpdef)
 		{
-			readNext = parseClassOrDef (token, K_FUNCTION, TRUE);
+			readNext = parseClassOrDef (token, decorators, K_FUNCTION, TRUE);
 		}
 		else if (token->keyword == KEYWORD_from ||
 		         token->keyword == KEYWORD_import)
@@ -1212,6 +1231,32 @@ static void findPythonTags (void)
 
 			readNext = parseVariable (token, kind);
 		}
+		else if (token->type == '@' && atStatementStart &&
+		         PythonFields[F_DECORATORS].enabled)
+		{
+			/* collect decorators */
+			readQualifiedName (token);
+			if (token->type != TOKEN_IDENTIFIER)
+				readNext = FALSE;
+			else
+			{
+				if (vStringLength (decorators) > 0)
+					vStringPut (decorators, ',');
+				vStringCat (decorators, token->string);
+				readToken (token);
+				readNext = skipOverPair (token, '(', ')', decorators, TRUE);
+			}
+		}
+
+		/* clear collected decorators for any non-decorator tokens non-indent
+		 * token.  decorator collection takes care of skipping the possible
+		 * argument list, so we should never hit here parsing a decorator */
+		if (iterationTokenType != TOKEN_INDENT &&
+		    iterationTokenType != '@' &&
+		    PythonFields[F_DECORATORS].enabled)
+		{
+			vStringClear (decorators);
+		}
 
 		atStatementStart = (token->type == TOKEN_INDENT || token->type == ';');
 
@@ -1220,6 +1265,7 @@ static void findPythonTags (void)
 	}
 
 	nestingLevelsFree (PythonNestingLevels);
+	vStringDelete (decorators);
 	deleteToken (token);
 	Assert (NextToken == NULL);
 }
