@@ -25,6 +25,7 @@ Fully rewritten parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * c (see :ref:`The new C/C++ parser <cxx>`)
 * c++ (see :ref:`The new C/C++ parser <cxx>`)
+* python (see :ref:`The new Python parser <python>`)
 
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -84,6 +85,7 @@ Heavily improved language parsers
 * php
 * verilog
 * C/C++ (completely rewritten)
+* Python (completely rewritten)
 
 
 New options
