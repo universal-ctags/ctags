@@ -140,12 +140,7 @@ static kindOption PythonKinds[COUNT_KIND] = {
 	{FALSE, 'l', "local",    "local variables" },
 };
 
-typedef struct {
-	const char *name;
-	keywordId id;
-} keywordDesc;
-
-static const keywordDesc PythonKeywordTable[] = {
+static const keywordTable PythonKeywordTable[] = {
 	/* keyword			keyword ID */
 	{ "as",				KEYWORD_as				},
 	{ "cdef",			KEYWORD_cdef			},
@@ -193,17 +188,6 @@ static unsigned int TokenContinuationDepth = 0;
 static tokenInfo *NextToken = NULL;
 static NestingLevels *PythonNestingLevels = NULL;
 
-
-static void buildPythonKeywordHash (void)
-{
-	const size_t count = sizeof (PythonKeywordTable) / sizeof (PythonKeywordTable[0]);
-	size_t i;
-	for (i = 0; i < count ; i++)
-	{
-		const keywordDesc* const p = &PythonKeywordTable[i];
-		addKeyword (p->name, Lang_python, (int) p->id);
-	}
-}
 
 /* follows PEP-8, and always reports single-underscores as protected
  * See:
@@ -1273,7 +1257,6 @@ static void findPythonTags (void)
 static void initialize (const langType language)
 {
 	Lang_python = language;
-	buildPythonKeywordHash ();
 }
 
 extern parserDefinition* PythonParser (void)
@@ -1287,6 +1270,8 @@ extern parserDefinition* PythonParser (void)
 	def->aliases = aliases;
 	def->parser = findPythonTags;
 	def->initialize = initialize;
+	def->keywordTable = PythonKeywordTable;
+	def->keywordCount = ARRAY_SIZE (PythonKeywordTable);
 	def->fieldSpecs = PythonFields;
 	def->fieldSpecCount = ARRAY_SIZE (PythonFields);
 	def->useCork = TRUE;
