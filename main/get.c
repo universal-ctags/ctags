@@ -131,9 +131,9 @@ extern unsigned int getDirectiveNestLevel (void)
 extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 		     const boolean hasCxxRawLiteralStrings,
 		     const boolean hasSingleQuoteLiteralNumbers,
-		     const struct sKindOption *defineMacroKind,
+		     const kindOption *defineMacroKind,
 		     int macroUndefRoleIndex,
-		     const struct sKindOption *headerKind,
+		     const kindOption *headerKind,
 		     int headerSystemRoleIndex, int headerLocalRoleIndex,
 		     int endFieldType)
 {

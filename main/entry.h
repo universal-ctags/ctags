@@ -13,6 +13,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+#include "types.h"
 
 #include <stdio.h>
 
@@ -148,8 +149,7 @@ extern char* makePatternString (const tagEntryInfo *const tag);
 
 
 /* language is optional: can be NULL. */
-struct sPtagDesc;
-extern void writePseudoTag (const struct sPtagDesc *pdesc,
+extern void writePseudoTag (const ptagDesc *pdesc,
 			    const char *const fileName,
 			    const char *const pattern,
 			    const char *const parserName);

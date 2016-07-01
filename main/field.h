@@ -13,6 +13,8 @@
 #define CTAGS_MAIN_FIELD_H
 
 #include "general.h"
+#include "types.h"
+
 #include "vstring.h"
 
 typedef enum eFieldType { /* extension field content control */
@@ -48,12 +50,7 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_BUILTIN_LAST = FIELD_SCOPE_KIND_LONG,
 } fieldType ;
 
-struct sFieldDesc;
-typedef struct sFieldDesc fieldDesc;
-
-struct sTagEntryInfo;
-
-typedef const char* (* renderEscaped) (const struct sTagEntryInfo *const tag,
+typedef const char* (* renderEscaped) (const tagEntryInfo *const tag,
 				       const char *value,
 				       vString * buffer);
 
@@ -86,8 +83,7 @@ extern fieldType getFieldTypeForOption (char letter);
    Specifying `LANG_IGNORE' has the same effects as `LANG_AUTO'. However,
    internally, each parser is not initialized. `LANG_IGNORE' is a bit faster. */
 extern fieldType getFieldTypeForName (const char *name);
-extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, int language);
-
+extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType language);
 extern boolean isFieldEnabled (fieldType type);
 extern boolean enableField (fieldType type, boolean state, boolean warnIfFixedField);
 extern boolean isCommonField (fieldType type);
@@ -97,14 +93,14 @@ extern void printFields (int language);
 
 extern boolean isFieldRenderable (fieldType type);
 
-extern const char* renderFieldEscaped (fieldType type, const struct sTagEntryInfo *tag, int index);
+extern const char* renderFieldEscaped (fieldType type, const tagEntryInfo *tag, int index);
 
 extern void initFieldDescs (void);
 extern int countFields (void);
 
 /* language should be typed to langType.
    Use int here to avoid circular dependency */
-extern int defineField (fieldSpec *spec, int language);
+extern int defineField (fieldSpec *spec, langType language);
 extern fieldType nextSiblingField (fieldType type);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

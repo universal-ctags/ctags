@@ -39,6 +39,7 @@ MAIN_HEADS =			\
 	main/selectors.h	\
 	main/sort.h		\
 	main/strlist.h		\
+	main/types.h		\
 	main/vstring.h		\
 	main/xtag.h		\
 	\

@@ -418,6 +418,9 @@
     <ClInclude Include="..\main\vstring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\gnu_regex\regex.h">
       <Filter>Header Files</Filter>
     </ClInclude>

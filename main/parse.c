@@ -2453,7 +2453,7 @@ extern void installTagXpathTable (const langType language)
 }
 
 extern void makeKindSeparatorsPseudoTags (const langType language,
-					  const struct sPtagDesc *pdesc)
+					  const ptagDesc *pdesc)
 {
 	parserDefinition* lang;
 	kindOption *kinds;
@@ -2518,7 +2518,7 @@ extern void makeKindSeparatorsPseudoTags (const langType language,
 
 struct makeKindDescriptionPseudoTagData {
 	const char* langName;
-	const struct sPtagDesc *pdesc;
+	const ptagDesc *pdesc;
 };
 
 static boolean makeKindDescriptionPseudoTag (kindOption *kind,
@@ -2550,7 +2550,7 @@ static boolean makeKindDescriptionPseudoTag (kindOption *kind,
 }
 
 extern void makeKindDescriptionsPseudoTags (const langType language,
-					    const struct sPtagDesc *pdesc)
+					    const ptagDesc *pdesc)
 {
 
 	parserDefinition* lang;

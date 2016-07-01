@@ -13,6 +13,8 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+#include "types.h"
+
 #include "field.h"
 #include "kind.h"
 #include "parsers.h"  /* contains list of parsers */
@@ -36,8 +38,6 @@
 /*
 *   DATA DECLARATIONS
 */
-typedef int langType;
-
 typedef enum {
 	RESCAN_NONE,   /* No rescan needed */
 	RESCAN_FAILED, /* Scan failed, clear out tags added, rescan */
@@ -78,14 +78,13 @@ typedef struct {
 	boolean    *disabled;
 } tagRegexTable;
 
-struct sTagEntryInfo;
 typedef struct sTagXpathMakeTagSpec {
 	int   kind;
 	int   role;
 	/* If make is NULL, just makeTagEntry is used instead. */
 	void (*make) (xmlNode *node,
 		      const struct sTagXpathMakeTagSpec *spec,
-		      struct sTagEntryInfo *tag,
+		      tagEntryInfo *tag,
 		      void *userData);
 } tagXpathMakeTagSpec;
 
@@ -122,7 +121,7 @@ typedef struct {
 	const int id;
 } keywordTable;
 
-typedef struct {
+typedef struct sParserDefinition {
 	/* defined by parser */
 	char* name;                    /* name of language */
 	kindOption* kinds;             /* tag kinds handled by parser */
@@ -151,7 +150,7 @@ typedef struct {
 	unsigned int fieldSpecCount;
 
 	/* used internally */
-	unsigned int id;               /* id assigned to language */
+	langType id;		    /* id assigned to language */
 	unsigned int enabled:1;	       /* currently enabled? */
 	unsigned int initialized:1;    /* initialize() is called or not */
 	unsigned int tagRegexInstalled:1; /* tagRegexTable is installed or not. */
@@ -301,11 +300,10 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 extern void installTagXpathTable (const langType language);
 extern void addTagXpath (const langType language, tagXpathTable *xpathTable);
 
-struct sPtagDesc;
 extern void makeKindSeparatorsPseudoTags (const langType language,
-					  const struct sPtagDesc *pdesc);
+					  const ptagDesc *pdesc);
 extern void makeKindDescriptionsPseudoTags (const langType language,
-					    const struct sPtagDesc *pdesc);
+					    const ptagDesc *pdesc);
 
 extern void anonReset (void);
 extern void anonGenerate (vString *buffer, const char *prefix, int kind);

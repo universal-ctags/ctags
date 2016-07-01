@@ -16,7 +16,6 @@
 #include "general.h"
 #include "entry.h"
 #include "mio.h"
-#include <stdio.h>
 
 typedef struct sFmtElement fmtElement;
 extern fmtElement *fmtNew     (const char* fmtString);
