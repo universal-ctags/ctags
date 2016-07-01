@@ -1,4 +1,4 @@
-Chop testing
+*Chop* testing
 ---------------------------------------------------------------------
 
 :Maintainer: Masatake YAMATO <yamato@redhat.com>
