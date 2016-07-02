@@ -1425,6 +1425,23 @@ extern void initializeParser (langType lang)
 		initializeParserOne (lang);
 }
 
+static void linkDependenciesAtInitializeParsing (parserDefinition *const parser)
+{
+	unsigned int i;
+	parserDependency *d;
+	langType upper;
+	parserDefinition *upperParserDef;
+
+	for (i = 0; i < parser->dependencyCount; i++)
+	{
+		d = parser->dependencies + i;
+		upper = getNamedLanguage (d->upperParser, 0);
+		upperParserDef = LanguageTable [upper];
+
+		linkDependencyAtInitializeParsing (d->type, upperParserDef, parser);
+	}
+}
+
 extern void initializeParsing (void)
 {
 	unsigned int builtInCount;
@@ -1462,6 +1479,9 @@ extern void initializeParsing (void)
 		}
 	}
 	verbose ("\n");
+
+	for (i = 0; i < builtInCount  ;  ++i)
+		linkDependenciesAtInitializeParsing (LanguageTable [i]);
 }
 
 extern void freeParserResources (void)

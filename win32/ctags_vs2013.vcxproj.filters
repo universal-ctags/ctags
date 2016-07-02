@@ -352,6 +352,9 @@
     <ClCompile Include="..\main\promise.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\dependency.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\pod.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -479,6 +482,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
    <ClInclude Include="..\main\promise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\main\depedency.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

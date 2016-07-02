@@ -24,4 +24,6 @@ typedef struct sPtagDesc ptagDesc;
 struct sKindOption;
 typedef struct sKindOption kindOption;
 
+struct sParserDefinition;
+typedef struct sParserDefinition parserDefinition;
 #endif	/* CTAGS_MAIN_TYPES_H */

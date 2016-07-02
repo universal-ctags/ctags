@@ -15,6 +15,7 @@
 #include "general.h"  /* must always come first */
 #include "types.h"
 
+#include "dependency.h"
 #include "field.h"
 #include "kind.h"
 #include "parsers.h"  /* contains list of parsers */
@@ -149,6 +150,8 @@ typedef struct sParserDefinition {
 	fieldSpec *fieldSpecs;
 	unsigned int fieldSpecCount;
 
+	parserDependency * dependencies;
+	unsigned int dependencyCount;
 	/* used internally */
 	langType id;		    /* id assigned to language */
 	unsigned int enabled:1;	       /* currently enabled? */
