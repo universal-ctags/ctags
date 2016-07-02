@@ -1833,20 +1833,20 @@ static void processListRolesOptions (const char *const option __unused__,
 		exit (0);
 	}
 
-	sep = strchr (parameter, ':');
+	sep = strchr (parameter, '.');
 
 	if (sep == NULL || sep [1] == '\0')
 	{
 		vString* vstr = vStringNewInit (parameter);
-		vStringCatS (vstr, (sep? "*": ":*"));
+		vStringCatS (vstr, (sep? "*": ".*"));
 		processListRolesOptions (option, vStringValue (vstr));
 		/* The control should never reache here. */
 	}
 
 	kindletters = sep + 1;
-	if (strncmp (parameter, "all:", 4) == 0
-	    || strncmp (parameter, "*:", 1) == 0
-	    || strncmp (parameter, ":", 1) == 0)
+	if (strncmp (parameter, "all.", 4) == 0
+	    || strncmp (parameter, "*.", 1) == 0
+	    || strncmp (parameter, ".", 1) == 0)
 		lang = LANG_AUTO;
 	else
 	{
