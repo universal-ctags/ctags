@@ -18,6 +18,7 @@
 
 
 typedef enum eDepType {
+	DEPTYPE_KIND_OWNER,
 	COUNT_DEPTYPES,
 } depType;
 

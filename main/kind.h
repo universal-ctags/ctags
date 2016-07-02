@@ -9,6 +9,7 @@
 #define CTAGS_MAIN_KIND_H
 
 #include "general.h"
+#include "types.h"
 #include "routines.h"		/* for STRINGIFY */
 #include "vstring.h"
 
@@ -59,6 +60,24 @@ typedef struct sKindOption {
 	roleDesc *roles;
 	scopeSeparator *separators;
 	unsigned int separatorCount;
+
+	/* Usage of `sharedWith' field is a bit tricky.
+
+	   If `LANG_AUTO' is specified to `sharedWith' field, a master
+	   kind is looked up in other parsers.  This kind is linked to
+	   the master kind as a slave kind.
+
+	   Parsers from where master kind is searched must be declared
+	   with DEPTYPE_KIND_OWNER in `dependencies' array of the
+	   parser owning this kind.
+
+	   Though a parser specifies `LANG_AUTO' to `sharedWith'
+	   field, in parser initialization, it is overwritten by the
+	   main part of ctags; a real parser id assigned. The real
+	   parser is the owner of the master kind. */
+	langType sharedWith;
+	kindOption *slave;
+	kindOption *master;
 } kindOption;
 
 #define ATTACH_ROLES(RS) .nRoles = ARRAY_SIZE(RS), .roles = RS
@@ -69,6 +88,8 @@ extern void printKind (const kindOption* const kind, boolean allKindFields, bool
 		       boolean tabSeparated);
 extern void printKindListHeader (boolean indent, boolean tabSeparated);
 extern const char *scopeSeparatorFor (const kindOption *kind, char parentLetter);
+
+extern void enableKind (kindOption *kind, boolean enable);
 
 #define PR_KIND_STR(X) PR_KIND_WIDTH_##X
 #define PR_KIND_FMT(X,T) "%-" STRINGIFY(PR_KIND_STR(X)) STRINGIFY(T)

@@ -135,3 +135,17 @@ const char *scopeSeparatorFor (const kindOption *kind, char parentLetter)
 	else
 		return ".";
 }
+
+extern void enableKind (kindOption *kind, boolean enable)
+{
+	kindOption *slave;
+
+	if (kind->master)
+		enableKind (kind->master, enable);
+	else
+	{
+		kind->enabled = enable;
+		for (slave = kind->slave; slave; slave = slave->slave)
+			slave->enabled = enable;
+	}
+}

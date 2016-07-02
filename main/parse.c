@@ -1646,7 +1646,7 @@ static void resetLanguageKinds (const langType language, const boolean mode)
 	{
 		unsigned int i;
 		for (i = 0  ;  i < lang->kindCount  ;  ++i)
-			lang->kinds [i].enabled = mode;
+			enableKind (lang->kinds + i, mode);
 	}
 }
 
@@ -1657,7 +1657,7 @@ static boolean enableLanguageKind (
 	kindOption* const opt = langKindOption (language, kind);
 	if (opt != NULL)
 	{
-		opt->enabled = mode;
+		enableKind (opt, mode);
 		result = TRUE;
 	}
 	result = enableRegexKind (language, kind, mode)? TRUE: result;
@@ -1672,7 +1672,7 @@ static boolean enableLanguageKindLong (
 	kindOption* const opt = langKindLongOption (language, kindLong);
 	if (opt != NULL)
 	{
-		opt->enabled = mode;
+		enableKind (opt, mode);
 		result = TRUE;
 	}
 	result = enableRegexKindLong (language, kindLong, mode)? TRUE: result;
