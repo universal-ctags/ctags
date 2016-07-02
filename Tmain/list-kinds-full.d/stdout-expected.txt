@@ -1,16 +1,37 @@
-#LETTER	NAME	ENABLED	REFONLY	NROLES	DESCRIPTION
-d	macro	on	FALSE	1	macro definitions
-e	enumerator	on	FALSE	0	enumerators (values inside an enumeration)
-f	function	on	FALSE	0	function definitions
-g	enum	on	FALSE	0	enumeration names
-h	header	off	TRUE	2	included header files
-l	local	off	FALSE	0	local variables
-m	member	on	FALSE	0	struct, and union members
-p	prototype	off	FALSE	0	function prototypes
-s	struct	on	FALSE	0	structure names
-t	typedef	on	FALSE	0	typedefs
-u	union	on	FALSE	0	union names
-v	variable	on	FALSE	0	variable definitions
-x	externvar	off	FALSE	0	external and forward variable declarations
-z	parameter	off	FALSE	0	function parameters inside function definitions
-L	label	off	FALSE	0	goto labels
+#LETTER	NAME	ENABLED	REFONLY	NROLES	MASTER	DESCRIPTION
+d	macro	on	FALSE	1	C	macro definitions
+e	enumerator	on	FALSE	0	C	enumerators (values inside an enumeration)
+f	function	on	FALSE	0	C	function definitions
+g	enum	on	FALSE	0	C	enumeration names
+h	header	off	TRUE	2	C	included header files
+l	local	off	FALSE	0	C	local variables
+m	member	on	FALSE	0	C	struct, and union members
+p	prototype	off	FALSE	0	C	function prototypes
+s	struct	on	FALSE	0	C	structure names
+t	typedef	on	FALSE	0	C	typedefs
+u	union	on	FALSE	0	C	union names
+v	variable	on	FALSE	0	C	variable definitions
+x	externvar	off	FALSE	0	C	external and forward variable declarations
+z	parameter	off	FALSE	0	C	function parameters inside function definitions
+L	label	off	FALSE	0	C	goto labels
+#LETTER	NAME	ENABLED	REFONLY	NROLES	MASTER	DESCRIPTION
+d	macro	on	FALSE	1	C	macro definitions
+e	enumerator	on	FALSE	0	C	enumerators (values inside an enumeration)
+f	function	on	FALSE	0	C	function definitions
+g	enum	on	FALSE	0	C	enumeration names
+h	header	off	TRUE	2	C	included header files
+l	local	off	FALSE	0	C	local variables
+m	member	on	FALSE	0	C	class, struct, and union members
+p	prototype	off	FALSE	0	C	function prototypes
+s	struct	on	FALSE	0	C	structure names
+t	typedef	on	FALSE	0	C	typedefs
+u	union	on	FALSE	0	C	union names
+v	variable	on	FALSE	0	C	variable definitions
+x	externvar	off	FALSE	0	C	external and forward variable declarations
+z	parameter	off	FALSE	0	C	function parameters inside function definitions
+L	label	off	FALSE	0	C	goto labels
+c	class	on	FALSE	0		classes
+n	namespace	on	FALSE	0		namespaces
+A	alias	off	FALSE	0		namespace aliases
+N	name	off	FALSE	0		names imported via using scope::symbol
+U	using	off	TRUE	0		using namespace statements
