@@ -2610,8 +2610,17 @@ typedef enum {
 	KIND_COUNT
 } CTST_Kind;
 
+typedef enum {
+	R_BROKEN_REF,
+} CTST_BrokenRole;
+
+static roleDesc CTST_BrokenRoles [] = {
+	{TRUE, "broken", "broken" },
+};
+
 static kindOption CTST_Kinds[KIND_COUNT] = {
-	{TRUE, 'b', "broken tag", "name with unwanted characters"},
+	{TRUE, 'b', "broken tag", "name with unwanted characters",
+	 .referenceOnly = FALSE, ATTACH_ROLES (CTST_BrokenRoles) },
 };
 
 static void createCTSTTags (void)
