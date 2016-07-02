@@ -1808,6 +1808,9 @@ static void printRoles (const langType language, const char* letters, boolean al
 	const parserDefinition* const lang = LanguageTable [language];
 	const char *c;
 
+	if (lang->invisible)
+		return;
+
 	for (c = letters; *c != '\0'; c++)
 	{
 		unsigned int i;
