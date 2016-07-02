@@ -61,21 +61,16 @@ typedef struct sKindOption {
 	scopeSeparator *separators;
 	unsigned int separatorCount;
 
-	/* Usage of `sharedWith' field is a bit tricky.
+	/* Usage of `syncWith' field is a bit tricky.
 
-	   If `LANG_AUTO' is specified to `sharedWith' field, a master
-	   kind is looked up in other parsers.  This kind is linked to
-	   the master kind as a slave kind.
+	   If `LANG_AUTO' is specified to `syncWith' field of a kind
+	   (target kind), the main part of ctags updtes the field with
+	   the id of a  parser (master parser) when initializing
+	   parsers. It also updates `slave' and `master' fields.
 
-	   Parsers from where master kind is searched must be declared
-	   with DEPTYPE_KIND_OWNER in `dependencies' array of the
-	   parser owning this kind.
-
-	   Though a parser specifies `LANG_AUTO' to `sharedWith'
-	   field, in parser initialization, it is overwritten by the
-	   main part of ctags; a real parser id assigned. The real
-	   parser is the owner of the master kind. */
-	langType sharedWith;
+	   If the value other than `LANG_AUTO' is specified,
+	   the main part does nothing. */
+	langType syncWith;
 	kindOption *slave;
 	kindOption *master;
 } kindOption;

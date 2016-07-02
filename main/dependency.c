@@ -43,7 +43,7 @@ static void linkKindDependency (parserDefinition *const masterParser,
 
 	for (k_slave = 0; k_slave < slaveParser->kindCount; k_slave++)
 	{
-		if (slaveParser->kinds [k_slave].sharedWith == LANG_AUTO)
+		if (slaveParser->kinds [k_slave].syncWith == LANG_AUTO)
 		{
 			kind_slave = slaveParser->kinds + k_slave;
 			for (k_master = 0; k_master < masterParser->kindCount; k_master++)
@@ -53,8 +53,8 @@ static void linkKindDependency (parserDefinition *const masterParser,
 				    && (strcmp (kind_slave->name, kind_master->name) == 0))
 				{
 					linkKinds (kind_master, kind_slave);
-					kind_slave->sharedWith = masterParser->id;
-					kind_master->sharedWith = masterParser->id;
+					kind_slave->syncWith = masterParser->id;
+					kind_master->syncWith = masterParser->id;
 					break;
 				}
 			}
