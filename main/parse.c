@@ -1436,7 +1436,7 @@ extern void initializeParsing (void)
 				def->parser = findRegexTags;
 				accepted = TRUE;
 			}
-			else if (((!!def->parser) + (!!def->parser2)) != 1)
+			else if ((!def->invisible) && (((!!def->parser) + (!!def->parser2)) != 1))
 				error (FATAL,
 		"%s parser definition must define one and only one parsing routine\n",
 					   def->name);
