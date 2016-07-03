@@ -1083,9 +1083,25 @@ static boolean parseVariable (tokenInfo *const token, const pythonKind kind)
 		tokenInfo *name = newToken ();
 		copyToken (name, token);
 
+		readToken (token);
+		if (token->type == '.')
+		{
+			/* FIXME: what to do with dotted names?  We currently ignore them
+			 *        as we need to do something not to break the whole
+			 *        declaration, but the expected behavior is questionable */
+			deleteToken (name);
+			name = NULL;
+
+			do
+			{
+				readToken (token);
+			}
+			while (token->type == TOKEN_IDENTIFIER ||
+			       token->type == '.');
+		}
+
 		nameTokens[nameCount++] = name;
 
-		readToken (token);
 		if (token->type == ',')
 			readToken (token);
 		else
@@ -1100,10 +1116,14 @@ static boolean parseVariable (tokenInfo *const token, const pythonKind kind)
 
 		do
 		{
+			const tokenInfo *const nameToken = nameTokens[i++];
+
 			readToken (token);
 
-			if (token->keyword != KEYWORD_lambda)
-				makeSimplePythonTag (nameTokens[i++], kind);
+			if (! nameToken)
+				/* nothing */;
+			else if (token->keyword != KEYWORD_lambda)
+				makeSimplePythonTag (nameToken, kind);
 			else
 			{
 				vString *arglist = vStringNew ();
@@ -1112,7 +1132,7 @@ static boolean parseVariable (tokenInfo *const token, const pythonKind kind)
 				vStringPut (arglist, '(');
 				skipLambdaArglist (token, arglist);
 				vStringPut (arglist, ')');
-				makeFunctionTag (nameTokens[i++], arglist, NULL);
+				makeFunctionTag (nameToken, arglist, NULL);
 				vStringDelete (arglist);
 			}
 
@@ -1134,7 +1154,10 @@ static boolean parseVariable (tokenInfo *const token, const pythonKind kind)
 	}
 
 	while (nameCount > 0)
-		deleteToken (nameTokens[--nameCount]);
+	{
+		if (nameTokens[--nameCount])
+			deleteToken (nameTokens[nameCount]);
+	}
 
 	return FALSE;
 }
