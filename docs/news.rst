@@ -673,7 +673,7 @@ own field. This extension is proposed by @pragmaware in #857.
 For implementing the parser own fields, the option for listing and
 enabling/disabling fields are also extended.
 
-In `--list-fields` output, the owner of the field is printed at `LANGUAGE`
+In ``--list-fields`` output, the owner of the field is printed at `LANGUAGE`
 column:
 
 .. code-block:: console
@@ -695,7 +695,7 @@ e.g. `reStructuredText` is the owner of `sectionMarker` field. Like
 with the same name.
 
 A parser one field has only long name, no letter. For enabling and disabling
-such field, the long name must be passed to `--fields` option. e.g. for
+such field, the long name must be passed to ``--fields`` option. e.g. for
 turning on `sectionMarker` field of `reStructuredText` parser, use following
 command line:
 
