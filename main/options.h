@@ -95,7 +95,7 @@ typedef struct sOptionValues {
 	boolean quiet;		      /* --quiet */
 	boolean allowXcmdInHomeDir;     /* --_allow-xcmd-in-homedir */
 	boolean fatalWarnings;	/* --_fatal-warnings */
-	unsigned int patternLengthLimit; /* Not implemented yet: --patern-length-limit=N */
+	unsigned int patternLengthLimit; /* --pattern-length-limit=N */
 	boolean putFieldPrefix;		 /* --put-field-prefix */
 	unsigned int maxRecursionDepth; /* --maxdepth=<max-recursion-depth> */
 	boolean machinable;		/* --machinable */

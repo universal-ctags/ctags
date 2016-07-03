@@ -676,7 +676,7 @@ static size_t appendInputLine (int putc_func (char , void *), const char *const 
 		if (c == CRETURN  ||  c == NEWLINE)
 			break;
 
-		if (length >= Option.patternLengthLimit)
+		if (Option.patternLengthLimit != 0 && length >= Option.patternLengthLimit)
 		{
 			*omitted = TRUE;
 			break;

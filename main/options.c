@@ -33,6 +33,7 @@
 #include "ptag.h"
 #include "routines.h"
 #include "xtag.h"
+#include "routines.h"
 
 /*
 *   MACROS
@@ -348,6 +349,8 @@ static optionDescription LongOptionDescription [] = {
 #endif
  {0,"  --output-format=ctags|etags|xref"},
  {0,"      Specify the output format. [ctags]"},
+ {0,"  --pattern-length-limit=N"},
+ {0,"      Cutoff patterns of tag entries after N characters. Disable by setting to 0. [96]"},
  {0,"  --print-language"},
  {0,"       Don't make tags file but just print the guessed language name for"},
  {0,"       input file."},
@@ -2363,6 +2366,15 @@ static void processMaxRecursionDepthOption (const char *const option, const char
 	Option.maxRecursionDepth = atol(parameter);
 }
 
+static void processPatternLengthLimit(const char *const option, const char *const parameter)
+{
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "A parameter is needed after \"%s\" option", option);
+
+	if (!strToUInt(parameter, 0, &Option.patternLengthLimit))
+		error (FATAL, "-%s: Invalid pattern length limit", option);
+}
+
 static boolean* redirectToXtag(const booleanOption *const option)
 {
 	/* WARNING/TODO: This function breaks capsulization. */
@@ -2418,6 +2430,7 @@ static parametricOption ParametricOptions [] = {
 	{ "maxdepth",               processMaxRecursionDepthOption, TRUE,   STAGE_ANY },
 	{ "options",                processOptionFile,              FALSE,  STAGE_ANY },
 	{ "output-format",          processOutputFormat,            TRUE,   STAGE_ANY },
+	{ "pattern-length-limit",   processPatternLengthLimit,      TRUE,   STAGE_ANY },
 	{ "pseudo-tags",            processPseudoTags,              FALSE,  STAGE_ANY },
 	{ "sort",                   processSortOption,              TRUE,   STAGE_ANY },
 	{ "version",                processVersionOption,           TRUE,   STAGE_ANY },
