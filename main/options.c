@@ -2417,7 +2417,7 @@ static parametricOption ParametricOptions [] = {
 	{ "_list-roles",            processListRolesOptions,        TRUE,   STAGE_ANY },
 	{ "maxdepth",               processMaxRecursionDepthOption, TRUE,   STAGE_ANY },
 	{ "options",                processOptionFile,              FALSE,  STAGE_ANY },
-	{ "output-format",          processOutputFormat,            TRUE,   STAGE_ANY},
+	{ "output-format",          processOutputFormat,            TRUE,   STAGE_ANY },
 	{ "pseudo-tags",            processPseudoTags,              FALSE,  STAGE_ANY },
 	{ "sort",                   processSortOption,              TRUE,   STAGE_ANY },
 	{ "version",                processVersionOption,           TRUE,   STAGE_ANY },
