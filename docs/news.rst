@@ -399,7 +399,8 @@ Changes in tags file format
 Omitting the pattern for too long input line
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Not to make too large tags file, a pattern filed of tags file is
-omitted when its size goes beyond 96 bytes.
+omitted when its size goes beyond 96 bytes. The limit can be
+controlled with ``--pattern-length-limit=N`` option.
 
 An input source file with single long line causes too large tags file.
 Such input files are popular in javascript: tools for size optimizing
