@@ -222,7 +222,7 @@ typedef enum _CXXParserKeywordState
 	// "volatile" has been seen at block level
 	CXXParserKeywordStateSeenVolatile = (1 << 10),
 	// __attribute__((deprecated)) has been seen
-	CXXParserKeywordStateSeenAttributeDeprecated = (1 << 11)
+	CXXParserKeywordStateSeenAttributeDeprecated = (1 << 11),
 } CXXParserKeywordState;
 
 typedef struct _CXXParserState
