@@ -72,7 +72,7 @@ typedef enum _CXXFunctionSignatureInfoFlag
 	CXXFunctionSignatureInfoTemplateSpecialization = (1 << 6),
 	// Is scope template specialization a<x>::b()
 	// (implies that this is a template specialization too)
-	CXXFunctionSignatureInfoScopeTemplateSpecialization = (1 << 7)
+	CXXFunctionSignatureInfoScopeTemplateSpecialization = (1 << 7),
 } CXXFunctionSignatureInfoFlag;
 
 //

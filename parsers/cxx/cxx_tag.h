@@ -134,7 +134,7 @@ typedef enum _CXXTagProperty
 	// Template specialization of scope a<x>::b() (which implies TemplateSpec too)
 	CXXTagPropertyScopeTemplateSpecialization = (1 << 14),
 	// __attribute__((deprecated)) has been seen
-	CXXTagPropertyDeprecated = (1 << 15)
+	CXXTagPropertyDeprecated = (1 << 15),
 } CXXTagProperty;
 
 // Set the modifiers field of the tag.
