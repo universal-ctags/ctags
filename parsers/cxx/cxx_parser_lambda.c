@@ -92,7 +92,7 @@ CXXToken * cxxParserOpeningBracketIsLambda(void)
 boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 {
 	CXX_DEBUG_ENTER();
-	
+
 	CXX_DEBUG_ASSERT(cxxParserCurrentLanguageIsCPP(),"C++ only");
 
 	CXXToken * pIdentifier = cxxTokenCreateAnonymousIdentifier(CXXTagKindFUNCTION);
@@ -106,7 +106,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 	CXXToken * pAfterParenthesis = pParenthesis ? pParenthesis->pNext : NULL;
 
 	CXXToken * pCaptureList = NULL;
-	
+
 	if(pParenthesis)
 	{
 		if(cxxTokenTypeIs(pParenthesis,CXXTokenTypeSquareParenthesisChain))

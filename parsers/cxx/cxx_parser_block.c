@@ -85,7 +85,7 @@ static boolean cxxParserParseBlockHandleOpeningBracket(void)
 	int iScopes;
 	// FIXME: Why the invalid cork queue entry index is CORK_NIL?
 	int iCorkQueueIndex = CORK_NIL;
-	
+
 	if(eScopeType != CXXScopeTypeFunction)
 	{
 		// very likely a function definition
@@ -390,6 +390,9 @@ process_token:
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;
 					case CXXKeywordINLINE:
+					case CXXKeyword__INLINE:
+					case CXXKeyword__INLINE__:
+					case CXXKeyword__FORCEINLINE:
 						g_cxx.uKeywordState |= CXXParserKeywordStateSeenInline;
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					break;

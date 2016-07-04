@@ -18,6 +18,9 @@ enum CXXKeyword
 	CXXKeyword__ATTRIBUTE__, // GCC
 	CXXKeyword__DECLSPEC, // Microsoft C/C++
 	CXXKeyword__FASTCALL, // Microsoft C/C++
+	CXXKeyword__FORCEINLINE, // Microsoft C/C++
+	CXXKeyword__INLINE, // Microsoft C/C++
+	CXXKeyword__INLINE__, // GCC
 	CXXKeyword__STDCALL, // Microsoft C/C++
 	CXXKeyword__THISCALL, // Microsoft C/C++
 	CXXKeywordALIGNAS, // (since C++11)

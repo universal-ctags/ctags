@@ -1,0 +1,28 @@
+v1	input.cpp	/^int v1 __attribute__((aligned(16)));$/;"	v	typeref:typename:int
+v2	input.cpp	/^unsigned int v2 __attribute__((aligned(8),weak,visibility("hidden")));$/;"	v	typeref:typename:unsigned int
+v3	input.cpp	/^char v3[10000] __attribute__((section("STACK"))) = { 0 };$/;"	v	typeref:typename:char[10000]
+v4	input.cpp	/^char *__attribute__((aligned(8))) *v4;$/;"	v	typeref:typename:char **
+s1	input.cpp	/^struct s1$/;"	s	file:
+s1v1	input.cpp	/^	char s1v1;$/;"	m	struct:s1	typeref:typename:char	file:
+s1v2	input.cpp	/^	int s1v2[2] __attribute__((packed));$/;"	m	struct:s1	typeref:typename:int[2]	file:
+v5	input.cpp	/^struct s1 __attribute__((vector_size(16))) v5;$/;"	v	typeref:struct:s1
+s2	input.cpp	/^struct s2$/;"	s	file:
+s2v1	input.cpp	/^	short s2v1[3];$/;"	m	struct:s2	typeref:typename:short[3]	file:
+s3	input.cpp	/^struct __attribute__((__packed__)) s3$/;"	s	file:
+s3v1	input.cpp	/^	char s3v1 __attribute__((deprecated));$/;"	m	struct:s3	typeref:typename:char	file:	properties:deprecated
+s3v2	input.cpp	/^	char s3v2;$/;"	m	struct:s3	typeref:typename:char	file:
+t1	input.cpp	/^typedef int t1 __attribute__ ((aligned (8)));$/;"	t	typeref:typename:int	file:
+t2	input.cpp	/^typedef int t2 __attribute__ ((deprecated));$/;"	t	typeref:typename:int	file:
+e1	input.cpp	/^enum e1 {$/;"	g	file:
+e1e1	input.cpp	/^	e1e1 __attribute__((deprecated)),$/;"	e	enum:e1	file:
+e1e2	input.cpp	/^	e1e2$/;"	e	enum:e1	file:
+p1	input.cpp	/^__attribute__((noreturn)) void p1(void),$/;"	p	typeref:typename:void	file:	signature:(void)
+p2	input.cpp	/^	__attribute__((format(printf, 1, 2))) p2 (const char *, ...),$/;"	p	typeref:typename:void	file:	signature:(const char *,...)
+p3	input.cpp	/^	p3 (void);$/;"	p	typeref:typename:void	file:	signature:(void)
+p4	input.cpp	/^void (__attribute__((noreturn)) ****p4) (void) __attribute__((deprecated));$/;"	v	typeref:typename:void (****)(void)	properties:deprecated
+p5	input.cpp	/^void p5() __attribute__ ((weak, alias ("p4")));$/;"	p	typeref:typename:void	file:	signature:()
+f1	input.cpp	/^	f1(int f1p1,int f1p2 __attribute__((unused)),int f1p3)$/;"	f	typeref:typename:int	signature:(int f1p1,int f1p2,int f1p3)	properties:inline,deprecated
+f1p1	input.cpp	/^	f1(int f1p1,int f1p2 __attribute__((unused)),int f1p3)$/;"	z	function:f1	typeref:typename:int	file:
+f1p2	input.cpp	/^	f1(int f1p1,int f1p2 __attribute__((unused)),int f1p3)$/;"	z	function:f1	typeref:typename:int	file:
+f1p3	input.cpp	/^	f1(int f1p1,int f1p2 __attribute__((unused)),int f1p3)$/;"	z	function:f1	typeref:typename:int	file:
+l1	input.cpp	/^l1:$/;"	L	function:f1	file:
