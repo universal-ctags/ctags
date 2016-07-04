@@ -1436,7 +1436,7 @@ extern void initializeParsing (void)
 				def->parser = findRegexTags;
 				accepted = TRUE;
 			}
-			else if (((!!def->parser) + (!!def->parser2)) != 1)
+			else if ((!def->invisible) && (((!!def->parser) + (!!def->parser2)) != 1))
 				error (FATAL,
 		"%s parser definition must define one and only one parsing routine\n",
 					   def->name);
@@ -1807,6 +1807,9 @@ static void printRoles (const langType language, const char* letters, boolean al
 {
 	const parserDefinition* const lang = LanguageTable [language];
 	const char *c;
+
+	if (lang->invisible)
+		return;
 
 	for (c = letters; *c != '\0'; c++)
 	{
@@ -2607,8 +2610,17 @@ typedef enum {
 	KIND_COUNT
 } CTST_Kind;
 
+typedef enum {
+	R_BROKEN_REF,
+} CTST_BrokenRole;
+
+static roleDesc CTST_BrokenRoles [] = {
+	{TRUE, "broken", "broken" },
+};
+
 static kindOption CTST_Kinds[KIND_COUNT] = {
-	{TRUE, 'b', "broken tag", "name with unwanted characters"},
+	{TRUE, 'b', "broken tag", "name with unwanted characters",
+	 .referenceOnly = FALSE, ATTACH_ROLES (CTST_BrokenRoles) },
 };
 
 static void createCTSTTags (void)
