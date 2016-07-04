@@ -50,7 +50,7 @@ typedef struct sScopeSeparator {
 	const char *separator;
 } scopeSeparator;
 
-typedef struct sKindOption {
+struct sKindOption {
 	boolean enabled;          /* are tags for kind enabled? */
 	char  letter;               /* kind letter */
 	const char* name;		  /* kind name */
@@ -73,7 +73,7 @@ typedef struct sKindOption {
 	langType syncWith;
 	kindOption *slave;
 	kindOption *master;
-} kindOption;
+};
 
 #define ATTACH_ROLES(RS) .nRoles = ARRAY_SIZE(RS), .roles = RS
 #define ATTACH_SEPARATORS(S) .separators = S, .separatorCount = ARRAY_SIZE(S)

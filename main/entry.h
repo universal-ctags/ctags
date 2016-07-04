@@ -39,7 +39,7 @@ typedef struct sTagField {
 
 /*  Information about the current tag candidate.
  */
-typedef struct sTagEntryInfo {
+struct sTagEntryInfo {
 	unsigned int lineNumberEntry:1;  /* pattern or line number entry */
 	unsigned int isFileScope    :1;  /* is tag visible only within input file? */
 	unsigned int isFileEntry    :1;  /* is this just an entry for a file name? */
@@ -95,7 +95,7 @@ typedef struct sTagEntryInfo {
 	const char* sourceLanguage;
 	const char *sourceFileName;
 	unsigned long sourceLineNumberDifference;
-} tagEntryInfo;
+};
 
 
 /*

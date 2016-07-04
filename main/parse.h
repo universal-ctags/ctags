@@ -122,7 +122,7 @@ typedef struct {
 	const int id;
 } keywordTable;
 
-typedef struct sParserDefinition {
+struct sParserDefinition {
 	/* defined by parser */
 	char* name;                    /* name of language */
 	kindOption* kinds;             /* tag kinds handled by parser */
@@ -167,7 +167,7 @@ typedef struct sParserDefinition {
 	stringList* currentExtensions; /* current list of extensions */
 	stringList* currentAliaes;     /* current list of aliases */
 	unsigned int anonumousIdentiferId; /* managed by anon* functions */
-} parserDefinition;
+};
 
 typedef parserDefinition* (parserDefinitionFunc) (void);
 
