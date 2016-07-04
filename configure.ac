@@ -274,6 +274,7 @@ AM_CONDITIONAL(ENABLE_DEBUGGING, [test "x$enable_debugging" = "xyes"])
 # -------------------
 
 AC_PROG_CC
+AC_PROG_CC_C99
 
 if test "${with_sparse_cgcc}" = "yes"; then
 	REAL_CC="${CC}"
