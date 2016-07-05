@@ -205,9 +205,7 @@ extern fmtElement *fmtNew (const char*  fmtString)
 				column_width = 0;
 				if (width)
 				{
-					errno = 0;
-					column_width = strtol (vStringValue (width), NULL, 0);
-					if (errno != 0)
+					if(!strToLong (vStringValue (width), 0, &column_width))
 						error (FATAL | PERROR, "coverting failed: %s", vStringValue (width));
 					vStringDelete (width);
 					width = NULL;
