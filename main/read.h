@@ -88,6 +88,11 @@ extern int                  skipToCharacterInInputFile (int c);
 extern void                 ungetcToInputFile (int c);
 extern const unsigned char *readLineFromInputFile (void);
 
+enum nestedInputBoundaryFlag {
+	BOUNDARY_START = 1UL << 0,
+	BOUNDARY_END   = 1UL << 1,
+};
+extern unsigned int getNestedInputBoundaryInfo (unsigned long lineNumber);
 
 extern const char *getSourceFileTagPath (void);
 extern const char *getSourceLanguageName (void);

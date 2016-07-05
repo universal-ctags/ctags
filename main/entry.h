@@ -50,6 +50,7 @@ typedef struct sTagEntryInfo {
 	unsigned long lineNumber;     /* line number of tag */
 	const char* pattern;	      /* pattern for locating input line
 				       * (may be NULL if not present) *//*  */
+	unsigned int boundaryInfo;    /* info about nested input stream */
 	MIOPos      filePosition;     /* file position of line containing tag */
 	const char* language;         /* language of input file */
 	const char *inputFileName;   /* name of input file */
