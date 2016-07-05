@@ -2215,9 +2215,9 @@ static void processEchoOption (const char *const option, const char *const param
 static void processForceQuitOption (const char *const option __unused__,
 				    const char *const parameter)
 {
-	long s = 0;
-	if (parameter != NULL && parameter[0] != '\0')
-		s = strtol (parameter, NULL, 0);
+	int s;
+	if (parameter == NULL || parameter[0] == '\0' || !strToInt(parameter, 0, &s))
+		s = 0;
 	exit (s);
 }
 
