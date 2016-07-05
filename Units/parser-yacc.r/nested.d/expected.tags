@@ -1,4 +1,4 @@
-CfgFile	input.y	/^CfgFile		:	CfgEntryList$/;"	l	language:YACC
+CfgFile	input.y	/^CfgFile		$/;"	l	language:YACC
 CfgEntryList	input.y	/^CfgEntryList	:	CfgEntryList CfgEntry$/;"	l	language:YACC
 CfgEntry	input.y	/^CfgEntry	:	EventDef ActionDef$/;"	l	language:YACC
 VarDef	input.y	/^VarDef		:	Ident EQUALS NameSpec$/;"	l	language:YACC

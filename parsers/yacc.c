@@ -24,6 +24,8 @@ static boolean not_in_grammar_rules = TRUE;
 static tagRegexTable yaccTagRegexTable [] = {
 	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
 	 "l,label,labels", NULL, &not_in_grammar_rules },
+	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*$", "\\1",
+	 "l,label,labels", NULL, &not_in_grammar_rules },
 };
 
 struct cStart {
