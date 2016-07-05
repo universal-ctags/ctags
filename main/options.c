@@ -2600,7 +2600,9 @@ static void processShortOption (
 			Option.breakLine = atol (parameter);
 			break;
 		case 'D':
-			Option.debugLevel = strtol (parameter, NULL, 0);
+			if (!strToLong(parameter, 0, &Option.debugLevel))
+				error (FATAL, "-%s: Invalid debug level", option);
+
 			if (debug (DEBUG_STATUS))
 				Option.verbose = TRUE;
 			break;
