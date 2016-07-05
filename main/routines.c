@@ -64,6 +64,9 @@
 #ifdef HAVE_ICONV
 # include "mbcs.h"
 #endif
+#ifdef HAVE_ERRNO_H
+# include <errno.h>
+#endif
 
 #include "options.h"
 
@@ -354,6 +357,56 @@ extern char* newUpperString (const char* str)
 		result [i] = toupper ((int) str [i]);
 	while (str [i++] != '\0');
 	return result;
+}
+
+/* Safe wrapper for strtoul
+ *
+ * The conversion result is placed in value and must only be used if the
+ * function returned true.
+ */
+extern boolean strToULong(const char *const str, int base, unsigned long *value)
+{
+	char *endptr;
+
+	errno = 0;
+	*value = strtoul (str, &endptr, base);
+	return *endptr == '\0' && str != endptr && errno == 0;
+}
+
+/* Safe wrapper for strtol/atol
+ *
+ * The conversion result is placed in value and must only be used if the
+ * function returned true.
+ */
+extern boolean strToLong(const char *const str, int base, long *value)
+{
+	char *endptr;
+
+	errno = 0;
+	*value = strtol (str, &endptr, base);
+	return *endptr == '\0' && str != endptr && errno == 0;
+}
+
+extern boolean strToUInt(const char *const str, int base, unsigned int *value)
+{
+	unsigned long ulong_value;
+
+	if(!strToULong(str, base, &ulong_value) || ulong_value > UINT_MAX)
+		return false;
+
+	*value = (unsigned int) ulong_value;
+	return true;
+}
+
+extern boolean strToInt(const char *const str, int base, int *value)
+{
+	long long_value;
+
+	if(!strToLong(str, base, &long_value) || long_value > INT_MAX || long_value < INT_MIN)
+		return false;
+
+	*value = (int) long_value;
+	return true;
 }
 
 /*
