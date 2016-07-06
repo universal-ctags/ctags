@@ -45,7 +45,7 @@ x0(int no, char* pattern_arg, char* str_arg,
   r = onig_new(&reg, pattern, pattern + strlen((char* )pattern),
 	ONIG_OPTION_NEWLINE_CRLF, ONIG_ENCODING_UTF8, ONIG_SYNTAX_DEFAULT, &einfo);
   if (r != ONIG_NORMAL) {
-    char s[ONIG_MAX_ERROR_MESSAGE_LEN];
+    OnigUChar s[ONIG_MAX_ERROR_MESSAGE_LEN];
     onig_error_code_to_str(s, r, &einfo);
     fprintf(stderr, "ERROR: %s\n", s);
     return -1;
@@ -70,7 +70,7 @@ x0(int no, char* pattern_arg, char* str_arg,
     result(no, r, -1, expected_from, expected_to);
   }
   else { /* error */
-    char s[ONIG_MAX_ERROR_MESSAGE_LEN];
+    OnigUChar s[ONIG_MAX_ERROR_MESSAGE_LEN];
     onig_error_code_to_str(s, r);
     fprintf(stderr, "ERROR: %s\n", s);
     return -1;
