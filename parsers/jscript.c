@@ -749,6 +749,8 @@ static void skipArgumentList (tokenInfo *const token, boolean include_newlines, 
 				nest_level++;
 			else if (isType (token, TOKEN_CLOSE_PAREN))
 				nest_level--;
+			else if (isKeyword (token, KEYWORD_function))
+				parseFunction (token);
 		}
 		readTokenFull (token, include_newlines, NULL);
 	}
