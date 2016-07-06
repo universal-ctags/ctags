@@ -1,0 +1,6 @@
+a	./input.java	/^public class Foo extends Bar {static Logger a = Logger.getLogger(Foo.class.getName()); static Lo/;"	f
+b	./input.java	/^public class Foo extends Bar {static Logger a = Logger.getLogger(Foo.class.getName()); static Lo/;"	f
+a	./input.java	/^public cla/;"	f
+b	./input.java	/^public cla/;"	f
+a	./input.java	/^public class Foo extends Bar {static Logger a = Logger.getLogger(Foo.class.getName()); static Logger b = Logger.getLogger(Foo.class.getName());}$/;"	f
+b	./input.java	/^public class Foo extends Bar {static Logger a = Logger.getLogger(Foo.class.getName()); static Logger b = Logger.getLogger(Foo.class.getName());}$/;"	f
