@@ -85,7 +85,8 @@
 %type <act>	ActionDef
 %type <entry>	CfgFile CfgEntryList CfgEntry EventDef VarDef
 %%
-CfgFile		:	CfgEntryList
+CfgFile		
+		:	CfgEntryList
 			{ InterpretConfigs($1); }
 		;
 
