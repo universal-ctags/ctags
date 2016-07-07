@@ -234,6 +234,9 @@ static void findRstTags (void)
 	{
 		int line_len = strlen((const char*) line);
 		int name_len_bytes = vStringLength(name);
+		/* FIXME: this isn't right, actually we need the real display width,
+		 * taking into account double-width characters and stuff like that.
+		 * But duh. */
 		int name_len = utf8_strlen(vStringValue(name), name_len_bytes);
 
 		/* if the name doesn't look like UTF-8, assume one-byte charset */
