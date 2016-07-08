@@ -1,5 +1,5 @@
 --sort=no
 --fields-python=+{end}
---fields=+{line}
---extra=.q
+--fields=+{line}{end}
+--extra=qf
 
