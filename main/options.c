@@ -3175,6 +3175,9 @@ extern void initOptions (void)
 	processExcludeOption (NULL, "*.gcda");
 
 	processExcludeOption (NULL, "*.class");
+
+	processExcludeOption (NULL, "*.pyc");
+	processExcludeOption (NULL, "*.pyo");	
 }
 
 extern void freeOptionResources (void)
