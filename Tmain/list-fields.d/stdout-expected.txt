@@ -21,18 +21,14 @@ Z	scope	off	NONE	TRUE	Include the "scope:" key in scope field (use s) in tags ou
 E	extra	off	NONE	TRUE	Extra tag type information
 x	xpath	off	NONE	TRUE	xpath for the tag
 p	scopeKind	on	NONE	TRUE	Kind of scope as full name
--	end	off	C	TRUE	end lines of various constructs
+e	end	off	NONE	TRUE	end lines of various items
 -	properties	off	C	TRUE	properties (static, inline, mutable,...)
--	end	off	C++	TRUE	end lines of various constructs
 -	properties	off	C++	TRUE	properties (static, inline, mutable,...)
 -	template	off	C++	TRUE	template parameters
 -	captures	off	C++	TRUE	lambda capture list
 -	name	on	C++	TRUE	aliased names
 -	end	off	Python	TRUE	end lines of various constructs
--	end	off	RpmSpec	TRUE	end lines of macros
 -	sectionMarker	off	reStructuredText	TRUE	character used for declaring section
--	end	off	reStructuredText	TRUE	end lines of various constructs
--	end	off	Vim	TRUE	end lines of functions
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/
 x	input.java	/^    public int x;$/

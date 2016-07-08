@@ -55,6 +55,7 @@ static const char *renderFieldRefMarker (const tagEntryInfo *const tag, const ch
 static const char *renderFieldExtra (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldXpath (const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldScopeKindName(const tagEntryInfo *const tag, const char *value, vString* b);
+static const char *renderFieldEnd (const tagEntryInfo *const tag, const char *value, vString* b);
 
 #define DEFINE_FIELD_SPEC(L, N, V, H, F)	\
 	{					\
@@ -145,6 +146,9 @@ static fieldSpec fieldSpecsUniversal [] = {
 	DEFINE_FIELD_SPEC ('p', "scopeKind", TRUE,
 			   "Kind of scope as full name",
 			   renderFieldScopeKindName),
+	DEFINE_FIELD_SPEC ('e', "end", FALSE,
+			   "end lines of various items",
+			   renderFieldEnd),
 };
 
 
@@ -663,6 +667,21 @@ static const char *renderFieldScopeKindName(const tagEntryInfo *const tag,
 
 	getTagScopeInformation ((tagEntryInfo *const)tag, &kind, NULL);
 	return kind? renderAsIs (b, kind): NULL;
+}
+
+static const char *renderFieldEnd (const tagEntryInfo *const tag,
+				   const char *value,
+				   vString* b)
+{
+	static char buf[16];
+
+	if (tag->extensionFields.endLine != 0)
+	{
+		sprintf (buf, "%ld", tag->extensionFields.endLine);
+		return renderAsIs (b, buf);
+	}
+	else
+		return NULL;
 }
 
 extern boolean isFieldEnabled (fieldType type)

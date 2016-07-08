@@ -59,18 +59,6 @@ static kindOption VimKinds [] = {
 	{ TRUE,  'n', "filename", "vimball filename" },
 };
 
-typedef enum {
-	F_END,
-} vimField;
-
-static fieldSpec VimFields [] = {
-	{
-		.name = "end",
-		.description = "end lines of functions",
-		.enabled = FALSE,
-	}
-};
-
 
 /*
  *	 DATA DECLARATIONS
@@ -283,12 +271,12 @@ static void parseFunction (const unsigned char *line)
 	{
 		if (wordMatchLen (line, "endfunction", 4))
 		{
-			char end[16];
-			snprintf(end, sizeof(end), "%ld", (getInputLineNumber()));
+			tagEntryInfo *e;
 			if (index != CORK_NIL)
-				attachParserFieldToCorkEntry (index,
-							      VimFields [F_END].ftype,
-							      end);
+			{
+				e = getEntryInCorkQueue (index);
+				e->extensionFields.endLine = getInputLineNumber();
+			}
 			break;
 		}
 
@@ -742,8 +730,6 @@ extern parserDefinition* VimParser (void)
 	def->extensions = extensions;
 	def->patterns   = patterns;
 	def->parser		= findVimTags;
-	def->fieldSpecs = VimFields;
-	def->fieldSpecCount = ARRAY_SIZE (VimFields);
 	def->useCork    = TRUE;
 	return def;
 }
