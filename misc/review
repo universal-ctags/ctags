@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # review - Review the diff between expected output and actual output in Units
 #
