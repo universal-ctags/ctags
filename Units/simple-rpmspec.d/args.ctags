@@ -1,4 +1,4 @@
 --sort=no
 --extra=+rq
---fields=+rSzK
---fields=+n{end}
+--fields=+rSzKn
+--fields-*=+{end}

@@ -236,6 +236,11 @@ extern fieldType getFieldTypeForOption (char letter)
 	return FIELD_UNKNOWN;
 }
 
+extern fieldType getFieldTypeForName (const char *name)
+{
+	return getFieldTypeForNameAndLanguage (name, LANG_IGNORE);
+}
+
 extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType language)
 {
 	static boolean initialized = FALSE;
@@ -247,8 +252,7 @@ extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType
 	if (language == LANG_AUTO && (initialized == FALSE))
 	{
 		initialized = TRUE;
-		for (i = 0; i < countParsers(); i++)
-			initializeParser (i);
+		initializeParser (LANG_AUTO);
 	}
 	else if (language != LANG_IGNORE && (initialized == FALSE))
 		initializeParser (language);
@@ -263,44 +267,6 @@ extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType
 	}
 
 	return FIELD_UNKNOWN;
-}
-
-extern langType getLanguageComponentInFieldName (const char *fullName,
-						 const char **fieldName)
-{
-	const char *tmp;
-	langType language;
-
-	tmp = strchr (fullName, '.');
-	if (tmp)
-	{
-		size_t len = tmp - fullName;
-
-		if (len == 1 && fullName[0] == '*')
-		{
-			language = LANG_AUTO;
-			*fieldName = tmp + 1;
-		}
-		else if (len == 0)
-		{
-			language = LANG_IGNORE;
-			*fieldName = tmp + 1;
-		}
-		else
-		{
-			language = getNamedLanguage (fullName, len);
-			if (language == LANG_IGNORE)
-				*fieldName = NULL;
-			else
-				*fieldName = tmp + 1;
-		}
-	}
-	else
-	{
-		language = LANG_AUTO;
-		*fieldName = fullName;
-	}
-	return language;
 }
 
 extern const char* getFieldName(fieldType type)
@@ -366,7 +332,7 @@ static void printField (fieldType i)
 	       fieldDescs[i].spec->description? fieldDescs[i].spec->description: "NONE");
 }
 
-extern void printFields (void)
+extern void printFields (int language)
 {
 	unsigned int i;
 
@@ -375,7 +341,10 @@ extern void printFields (void)
 			"#LETTER", "NAME", "ENABLED", "LANGUAGE", "XFMTCHAR", "DESCRIPTION");
 
 	for (i = 0; i < fieldDescUsed; i++)
-		printField (i);
+	{
+		if (language == LANG_AUTO || getFieldOwner (i) == language)
+			printField (i);
+	}
 }
 
 static const char *renderAsIs (vString* b __unused__, const char *s)
@@ -701,21 +670,57 @@ extern boolean isFieldEnabled (fieldType type)
 	return getFieldDesc(type)->spec->enabled;
 }
 
-extern boolean enableField (fieldType type, boolean state)
-{
-	boolean old = getFieldDesc(type)->spec->enabled? TRUE: FALSE;
-	getFieldDesc(type)->spec->enabled = state;
-	return old;
-}
-
-extern boolean isFieldFixed (fieldType type)
+static boolean isFieldFixed (fieldType type)
 {
 	return getFieldDesc(type)->fixed? TRUE: FALSE;
 }
 
-extern boolean isFieldOwnedByParser (fieldType type)
+extern boolean enableField (fieldType type, boolean state, boolean warnIfFixedField)
 {
-	return (FIELD_BUILTIN_LAST < type)? TRUE: FALSE;
+	fieldSpec *spec = getFieldDesc(type)->spec;
+	boolean old = spec->enabled? TRUE: FALSE;
+	if (isFieldFixed (type))
+	{
+		if ((!state) && warnIfFixedField)
+		{
+			if (spec->name && spec->letter != NUL_FIELD_LETTER)
+				error(WARNING, "Cannot disable fixed field: '%c'{%s}",
+				      spec->letter, spec->name);
+			else if (spec->name)
+				error(WARNING, "Cannot disable fixed field: {%s}",
+				      spec->name);
+			else if (spec->letter != NUL_FIELD_LETTER)
+				error(WARNING, "Cannot disable fixed field: '%c'",
+				      getFieldDesc(type)->spec->letter);
+			else
+				AssertNotReached();
+		}
+	}
+	else
+	{
+		getFieldDesc(type)->spec->enabled = state;
+
+		if (isCommonField (type))
+			verbose ("enable field \"%s\": %s\n",
+				 getFieldDesc(type)->spec->name,
+				 (state? "TRUE": "FALSE"));
+		else
+			verbose ("enable field \"%s\"<%s>: %s\n",
+				 getFieldDesc(type)->spec->name,
+				 getLanguageName (getFieldOwner(type)),
+				 (state? "TRUE": "FALSE"));
+	}
+	return old;
+}
+
+extern boolean isCommonField (fieldType type)
+{
+	return (FIELD_BUILTIN_LAST < type)? FALSE: TRUE;
+}
+
+extern int     getFieldOwner (fieldType type)
+{
+	return getFieldDesc(type)->language;
 }
 
 extern boolean isFieldRenderable (fieldType type)
@@ -728,7 +733,7 @@ extern int countFields (void)
 	return fieldDescUsed;
 }
 
-extern fieldType nextFieldSibling (fieldType type)
+extern fieldType nextSiblingField (fieldType type)
 {
 	fieldDesc *fdesc;
 

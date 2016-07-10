@@ -156,7 +156,7 @@ done in ctags side if necessary.
 
 Tag lines in the output are merged to the final tags file with
 filtering; some fields in the tag lines may be dropped if user
-specifies ``--field=-`` option.
+specifies ``--fields=-`` option.
 
 In addition to real tag informations, Pseudo-tag lines started
 from ``!_TAG_`` are expected.

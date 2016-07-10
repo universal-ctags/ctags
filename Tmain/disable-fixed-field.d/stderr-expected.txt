@@ -1,0 +1,6 @@
+ctags: Warning: Cannot disable fixed field: 'N'{name}
+ctags: Warning: Cannot disable fixed field: 'F'{input}
+ctags: Warning: Cannot disable fixed field: 'P'{pattern}
+ctags: Warning: Cannot disable fixed field: 'N'{name}
+ctags: Warning: Cannot disable fixed field: 'F'{input}
+ctags: Warning: Cannot disable fixed field: 'P'{pattern}

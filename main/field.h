@@ -73,14 +73,27 @@ typedef struct sFieldSpec {
 
 
 extern fieldType getFieldTypeForOption (char letter);
+
+/*
+   `getFieldTypeForName' is for looking for a field not owned by any parser,
+
+   `getFieldTypeForNameAndLanguage' can be used for getting all fields having
+   the same name; specify `LANG_AUTO' as `language' parameter to get the first
+   field having the name. With the returned fieldType, `nextSiblingField' gets
+   the next field having the same name. `nextSiblingField' returns `FIELD_UNKNOWN'
+   at the end of iteration.
+
+   Specifying `LANG_IGNORE' has the same effects as `LANG_AUTO'. However,
+   internally, each parser is not initialized. `LANG_IGNORE' is a bit faster. */
 extern fieldType getFieldTypeForName (const char *name);
 extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, int language);
+
 extern boolean isFieldEnabled (fieldType type);
-extern boolean enableField (fieldType type, boolean state);
-extern boolean isFieldFixed (fieldType type);
-extern boolean isFieldOwnedByParser (fieldType type);
+extern boolean enableField (fieldType type, boolean state, boolean warnIfFixedField);
+extern boolean isCommonField (fieldType type);
+extern int     getFieldOwner (fieldType type);
 extern const char* getFieldName (fieldType type);
-extern void printFields (void);
+extern void printFields (int language);
 
 extern boolean isFieldRenderable (fieldType type);
 
@@ -92,6 +105,6 @@ extern int countFields (void);
 /* language should be typed to langType.
    Use int here to avoid circular dependency */
 extern int defineField (fieldSpec *spec, int language);
-extern fieldType nextFieldSibling (fieldType type);
+extern fieldType nextSiblingField (fieldType type);
 
 #endif	/* CTAGS_MAIN_FIELD_H */
