@@ -1,0 +1,3 @@
+INHERIT_RENAME_TEST	input.e	/^class INHERIT_RENAME_TEST$/;"	c
+feat2	input.e	/^         feat1 as feat2$/;"	f	class:INHERIT_RENAME_TEST
+feat4	input.e	/^         feat3 as feat4$/;"	f	class:INHERIT_RENAME_TEST
