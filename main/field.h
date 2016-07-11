@@ -56,6 +56,7 @@ struct sTagEntryInfo;
 typedef const char* (* renderEscaped) (const struct sTagEntryInfo *const tag,
 				       const char *value,
 				       vString * buffer);
+typedef boolean (* isValueAvailable) (const struct sTagEntryInfo *const tag);
 
 #define FIELD_LETTER_NO_USE '\0'
 typedef struct sFieldSpec {
@@ -67,6 +68,7 @@ typedef struct sFieldSpec {
 	const char* description;
 	boolean enabled;
 	renderEscaped renderEscaped;
+	isValueAvailable isValueAvailable;
 
 	unsigned int ftype;	/* Given from the main part */
 } fieldSpec;
@@ -84,6 +86,7 @@ extern void printFields (void);
 
 extern boolean isFieldRenderable (fieldType type);
 
+extern boolean doesFieldHaveValue (fieldType type, const struct sTagEntryInfo *tag);
 extern const char* renderFieldEscaped (fieldType type, const struct sTagEntryInfo *tag, int index);
 
 extern void initFieldDescs (void);
