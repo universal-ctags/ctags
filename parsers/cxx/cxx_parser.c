@@ -97,6 +97,7 @@ boolean cxxParserParseAndCondenseCurrentSubchain(
 		);
 	g_cxx.pTokenChain = pCurrentChain;
 	g_cxx.pToken = pCurrentChain->pTail;
+
 	return bRet;
 }
 
@@ -302,7 +303,7 @@ boolean cxxParserParseToEndOfQualifedName(void)
 			CXX_DEBUG_LEAVE_TEXT("EOF in cxxParserParseNextToken");
 			return FALSE; // EOF
 		}
-		
+
 		if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Found no identifier after multiple colons");
@@ -432,7 +433,7 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 			g_cxx.pTokenChain,
 			cxxTokenCreateKeyword(iFileLine,oFilePosition,eTagKeyword)
 		);
-	
+
 	if(uKeywordState & CXXParserKeywordStateSeenConst)
 	{
 		cxxTokenChainPrepend(
@@ -549,7 +550,7 @@ boolean cxxParserParseEnum(void)
 				pNamespaceBegin = pPrev;
 				pPrev = pPrev->pPrev;
 			}
-	
+
 			while(pNamespaceBegin != pEnumName)
 			{
 				CXXToken * pNext = pNamespaceBegin->pNext;

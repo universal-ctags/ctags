@@ -274,6 +274,7 @@ AM_CONDITIONAL(ENABLE_DEBUGGING, [test "x$enable_debugging" = "xyes"])
 # -------------------
 
 AC_PROG_CC
+AC_PROG_CC_C99
 
 if test "${with_sparse_cgcc}" = "yes"; then
 	REAL_CC="${CC}"
@@ -379,7 +380,7 @@ fi
 # Checks for header files
 # -----------------------
 
-AC_CHECK_HEADERS([dirent.h fcntl.h io.h stat.h stdlib.h string.h])
+AC_CHECK_HEADERS([dirent.h errno.h fcntl.h io.h limits.h stat.h stdlib.h string.h])
 AC_CHECK_HEADERS([time.h types.h unistd.h])
 AC_CHECK_HEADERS([sys/dir.h sys/stat.h sys/times.h sys/types.h sys/wait.h])
 

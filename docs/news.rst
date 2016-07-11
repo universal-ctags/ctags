@@ -270,6 +270,67 @@ header is easy because it starts with `#` character.
 
 ``--with-list-header=no`` option suppresses the column header.
 
+Kinds synchronization
+----------------------------------------------------------------------
+
+In Universal-ctags, as the same as Exuberant-ctags, the most of all
+kinds are parser local; enabling(or disabling) a kind in a parser
+has no effect on kinds in any other parsers even between two kinds
+having a same name and/or letter.
+
+However, there are exceptions, C and C++ for an example.
+C++ can be assumed as a language extended from C. Therefore it is
+natural that all kinds defied in C parser are also defined in C++
+parser. Enabling a kind in a C parser also enables a kind having
+the same name in a C++ parser, and vice versa.
+
+A kind group is a group of kinds satisfying following conditions:
+
+1. Having a same name and letter, and
+2. Being synchronized each other
+
+A master parser manages the synchronization of a kind group.
+The `MASTER` column of ``--list-kinds-full`` shows the
+master parser of the kind of the line.
+
+Internally, a state change (enabled or disabled with
+``--kind-<LANG>=[+|-]...`` option) of a kind of a kind group is
+reported to its master parser as an event. Then the master parser
+changes the state of all kinds in the kind group as specified with the
+option.
+
+.. code-block:: console
+
+    $ ./ctags --list-kinds-full=C++
+    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
+    d       macro           on       FALSE   1      C          macro definitions
+    ...
+    $ ./ctags --list-kinds-full=C
+    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
+    d       macro           on       FALSE   1      C          macro definitions
+    ...
+
+The example output tells that `d` kinds of C++ parser and C parser are
+in the same group. `C` parser manages the group. 
+
+.. code-block:: console
+
+    $ ./ctags --kinds-C++=-d --list-kinds-full=C | head -2
+    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
+    d       macro           off      FALSE   1      C          macro definitions
+    $ ./ctags --kinds-C=-d --list-kinds-full=C | head -2
+    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
+    d       macro           off      FALSE   1      C          macro definitions
+    $ ./ctags --kinds-C++=-d --list-kinds-full=C++ | head -2
+    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
+    d       macro           off      FALSE   1      C          macro definitions
+    $ ./ctags --kinds-C=-d --list-kinds-full=C++ | head -2
+    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
+    d       macro           off      FALSE   1      C          macro definitions
+
+In the above example, `d` kind is disabled via C or C++. Disabling a `d` kind via a
+language disables the other `d` kind of the other parser, too.
+
 
 ``--put-field-prefix`` options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -399,7 +460,8 @@ Changes in tags file format
 Omitting the pattern for too long input line
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Not to make too large tags file, a pattern filed of tags file is
-omitted when its size goes beyond 96 bytes.
+omitted when its size goes beyond 96 bytes. The limit can be
+controlled with ``--pattern-length-limit=N`` option.
 
 An input source file with single long line causes too large tags file.
 Such input files are popular in javascript: tools for size optimizing
@@ -484,6 +546,8 @@ The field can be used only in ``--_xformat`` option.
     R TYPE                6 reftag.c         #undef TYPE
     R foo.h               2 reftag.c         #include "foo.h"
     R stdio.h             1 reftag.c         #include <stdio.h>
+
+See :ref:`Customizing xref output <xformat>` fore more details about the option.
 
 Though the facility for collecting reference tags is implemented, only
 few parsers utilized it now. All available roles can be listed with
@@ -673,7 +737,7 @@ own field. This extension is proposed by @pragmaware in #857.
 For implementing the parser own fields, the option for listing and
 enabling/disabling fields are also extended.
 
-In `--list-fields` output, the owner of the field is printed at `LANGUAGE`
+In ``--list-fields`` output, the owner of the field is printed at `LANGUAGE`
 column:
 
 .. code-block:: console
@@ -691,25 +755,26 @@ column:
 	-       version         off     Maven2          TRUE     version of artifact
 
 e.g. `reStructuredText` is the owner of `sectionMarker` field. Like
-`end` field owned by `C` and `C++`, more than one parsers have a field
+`end` field owned by `C` and `C++`, more than one parsers have fields
 with the same name.
 
-A parser one field has only long name, no letter. For enabling and disabling
-such field, the long name must be passed to `--fields` option. e.g. for
-turning on `sectionMarker` field of `reStructuredText` parser, use following
+``--list-fields`` takes one optional option argument, `LANGUAGE`. If it is given,
+``--list-fields`` prints only about it:
+
+.. code-block:: console
+
+	$ ./ctags --list-fields=Maven2
+	#LETTER NAME            ENABLED LANGUAGE        XFMTCHAR DESCRIPTION
+	-       version         off     Maven2          TRUE     version of artifact
+
+A parser own field has only a long name, no letter. For enabling/disabling
+such field, the long name must be passed to ``--fields-<LANG>`` option. e.g. for
+enabling `sectionMarker` field owned by `reStructuredText` parser, use following
 command line:
 
 .. code-block:: console
 
-	$ ./ctags --fields=+{sectionMarker} ...
-
-For enabling/disabling a field owned by specified parser, use the parser
-name as prefix for the field name. `.` is for combinator. e.g. for turning
-on `end` field of `C++` parser, use following command line:
-
-.. code-block:: console
-
-	$ ./ctags --fields=+{C++.end} ...
+	$ ./ctags --fields-reStructuredText=+{sectionMarker} ...
 
 The wild card notation can be used for enabling/disabling parser own
 fields, too. Following example enables all fields owned by `C++`
@@ -717,12 +782,161 @@ parser.
 
 .. code-block:: console
 
-	$ ./ctags --fields=+{C++.*} ...
+	$ ./ctags --fields-C++='*' ...
+
+`*` can be used for specifying languages, too. The next example
+is for enabling `end` field of languages which have `end`
+field.
+
+.. code-block:: console
+
+	$ ./ctags --fields-'*'=+'{end}' ...
+	...
+
+In this case, using wild card notation in language specification,
+not only fields owned by parsers but also common fields having
+the name specified (`end` in the example) are enabled/disabled.
+
+Using the wild card notation for language is helpful to avoid
+within-universal-ctags-version incompatibly (SELF INCOMPATIBLY).  In
+universal-ctags development, a parser developer may add a parser own
+field for the language dealt with the parser.  Sometimes other
+developers recognize it is meaningful not only the language but also
+the other languages. In such case the developers may promote the field
+to a common field. Such promotion will break the command line
+compatibility about ``--fields-<LANG>`` usage. The wild card
+for `<LANG>` will help you to avoid the unwanted effect of the
+promotion.
 
 From the view point of tags file format, nothing is changed with
 introducing parser own fields; `<fieldname>`:`<value>` is used as
 before. The name of field owner is never prefixed. `language:` field
 of the tag tells the owner.
+
+
+.. _xformat:
+
+Customizing xref output
+---------------------------------------------------------------------
+
+``--_xformat`` option allows a user to customize Xref output enabled
+with ``-x`` option.
+::
+
+   --_xformat=FORMAT
+
+
+The notation of FORMAT is a bit similar to `printf(3) of C
+language; `%` represents a slot where ctags fills with a field value
+when printing. You can specify multiple slots in FORMAT.
+Here field means an item listed with ``-list-fields`` option.
+
+The notation of a slot::
+
+   %[WIDTH-AND-ADJUSTMENT]FIELD-SPECIFIER
+
+``FIELD-SPECIFIER`` specifies a field which value is printed.
+Short notation and long notation are available. They can be mixed
+in a FORMAT. Specifying a field with either notation, one or more
+fields are activated internally.
+
+The short notation is just a letter listed in LETTER column of
+``--list-fields`` output.
+
+The long notation is a name string surrounded by braces(`{` and
+`}`). The name string is listed in NAME column of the output of
+the same option. To specify a field owned by a parser, prepend
+the parser name to the name string with `.` as a separator.
+
+Wile card (`*`) can be used where a parser name is. In such case
+both common and parser own fields are activated and printed.
+If a common field and a parser own field have the same name,
+the common field has higher priority.
+
+`WIDTH-AND-ADJUSTMENT` is a positive or negative number.
+The absolute value of the number is used as the width of
+the column where a field is printed. The printing is
+right adjust with positive value is given, and left
+adjust with negative value.
+
+An examples of specifying common fields:
+
+.. code-block:: console
+
+    $  ./ctags -x --_xformat="%-20N %4n %-16{input}|" main/main.c | head
+    CLOCKS_PER_SEC        360 main/main.c     |
+    CLOCKS_PER_SEC        364 main/main.c     |
+    CLOCK_AVAILABLE       358 main/main.c     |
+    CLOCK_AVAILABLE       363 main/main.c     |
+    Totals                 87 main/main.c     |
+    __anonae81ef0f0108     87 main/main.c     |
+    addTotals             100 main/main.c     |
+    batchMakeTags         436 main/main.c     |
+    bytes                  87 main/main.c     |
+    clock                 365 main/main.c     |
+
+Here `%-20N %4n %-16{input}` is a format string. Let's look into the
+elements of the format.
+
+`%-20N`
+
+	The short notation is used here.
+	The element means filling the slot with the name of tag.
+	The width of column is 20 characters and left adjust.
+
+`%4n`
+
+	The short notation is used here.
+	The element means filling the slot with the line number of
+	tag. The width of column is 4 characters and right adjust.
+
+`%-16{input}`
+
+	The long notation is used here.
+	The element means filling the slot with the input file name where
+	the tag is defined. The width of column is 16 characters and left
+	adjust.
+
+`|`
+
+	Printed as is.
+
+Another examples of specifying parser own field:
+
+.. code-block:: console
+
+	$  ./ctags -x --_xformat="%-20N [%10{C.properties}]" main/main.c
+	CLOCKS_PER_SEC       [          ]
+	CLOCK_AVAILABLE      [          ]
+	Totals               [          ]
+	__anonae81ef0f0108   [          ]
+	addTotals            [    extern]
+	batchMakeTags        [    static]
+	bytes                [          ]
+	clock                [          ]
+	clock                [    static]
+	...
+
+Here `"%-20N [%10{C.properties}]"` is a format string. Let's look into the
+elements of the format.
+
+`%-20N`
+
+	Already explained in the first example.
+
+`[` and `]`
+
+	Printed as is.
+
+`%10{C.properties}`
+
+	The long notation is used here.
+	The element means filling the slot with the value
+	of properties field of C parser.
+	The width of column is 10 characters and right adjust.
+
+
+.. TODO: An example of using WIDLECARD
 
 
 Readtags

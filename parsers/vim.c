@@ -520,7 +520,7 @@ static boolean parseMap (const unsigned char *line)
 
 	/*
 	 * Maps follow this basic format
-	 *     map 
+	 *    map
      *    nnoremap <silent> <F8> :Tlist<CR>
      *    map <unique> <Leader>scdt <Plug>GetColumnDataType
      *    inoremap ,,, <esc>diwi<<esc>pa><cr></<esc>pa><esc>kA
@@ -529,6 +529,7 @@ static boolean parseMap (const unsigned char *line)
 	 * The Vim help shows the various special arguments available to a map:
 	 * 1.2 SPECIAL ARGUMENTS					*:map-arguments*
      *    <buffer>
+	 *    <nowait>
 	 *    <silent>
 	 *    <script>
 	 *    <unique>
@@ -549,6 +550,7 @@ static boolean parseMap (const unsigned char *line)
 	
 		if (
 				strncmp ((const char*) cp, "<buffer>", (size_t) 8) == 0 ||
+				strncmp ((const char*) cp, "<nowait>", (size_t) 8) == 0 ||
 				strncmp ((const char*) cp, "<silent>", (size_t) 8) == 0 ||
 				strncmp ((const char*) cp, "<script>", (size_t) 8) == 0 ||
 				strncmp ((const char*) cp, "<unique>", (size_t) 8) == 0

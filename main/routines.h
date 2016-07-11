@@ -119,6 +119,10 @@ extern void toLowerString (char* str);
 extern void toUpperString (char* str);
 extern char* newLowerString (const char* str);
 extern char* newUpperString (const char* str);
+extern boolean strToUInt(const char *const str, int base, unsigned int *value);
+extern boolean strToULong(const char *string, int base, unsigned long *value);
+extern boolean strToInt(const char *const str, int base, int *value);
+extern boolean strToLong(const char *string, int base, long *value);
 
 /* File system functions */
 extern void setCurrentDirectory (void);

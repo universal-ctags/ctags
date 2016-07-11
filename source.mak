@@ -14,6 +14,7 @@ MIO_SRCS  = main/mio.c
 MAIN_HEADS =			\
 	main/args.h		\
 	main/ctags.h		\
+	main/dependency.h	\
 	main/entry.h		\
 	main/error.h		\
 	main/field.h		\
@@ -39,6 +40,7 @@ MAIN_HEADS =			\
 	main/selectors.h	\
 	main/sort.h		\
 	main/strlist.h		\
+	main/types.h		\
 	main/vstring.h		\
 	main/xtag.h		\
 	\
@@ -46,6 +48,7 @@ MAIN_HEADS =			\
 
 MAIN_SRCS =				\
 	main/args.c			\
+	main/dependency.c		\
 	main/entry.c			\
 	main/error.c			\
 	main/field.c			\

@@ -13,6 +13,8 @@
 #define CTAGS_MAIN_FIELD_H
 
 #include "general.h"
+#include "types.h"
+
 #include "vstring.h"
 
 typedef enum eFieldType { /* extension field content control */
@@ -48,15 +50,10 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_BUILTIN_LAST = FIELD_SCOPE_KIND_LONG,
 } fieldType ;
 
-struct sFieldDesc;
-typedef struct sFieldDesc fieldDesc;
-
-struct sTagEntryInfo;
-
-typedef const char* (* renderEscaped) (const struct sTagEntryInfo *const tag,
+typedef const char* (* renderEscaped) (const tagEntryInfo *const tag,
 				       const char *value,
 				       vString * buffer);
-typedef boolean (* isValueAvailable) (const struct sTagEntryInfo *const tag);
+typedef boolean (* isValueAvailable) (const tagEntryInfo *const tag);
 
 #define FIELD_LETTER_NO_USE '\0'
 typedef struct sFieldSpec {
@@ -75,26 +72,38 @@ typedef struct sFieldSpec {
 
 
 extern fieldType getFieldTypeForOption (char letter);
+
+/*
+   `getFieldTypeForName' is for looking for a field not owned by any parser,
+
+   `getFieldTypeForNameAndLanguage' can be used for getting all fields having
+   the same name; specify `LANG_AUTO' as `language' parameter to get the first
+   field having the name. With the returned fieldType, `nextSiblingField' gets
+   the next field having the same name. `nextSiblingField' returns `FIELD_UNKNOWN'
+   at the end of iteration.
+
+   Specifying `LANG_IGNORE' has the same effects as `LANG_AUTO'. However,
+   internally, each parser is not initialized. `LANG_IGNORE' is a bit faster. */
 extern fieldType getFieldTypeForName (const char *name);
-extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, int language);
+extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType language);
 extern boolean isFieldEnabled (fieldType type);
-extern boolean enableField (fieldType type, boolean state);
-extern boolean isFieldFixed (fieldType type);
-extern boolean isFieldOwnedByParser (fieldType type);
+extern boolean enableField (fieldType type, boolean state, boolean warnIfFixedField);
+extern boolean isCommonField (fieldType type);
+extern int     getFieldOwner (fieldType type);
 extern const char* getFieldName (fieldType type);
-extern void printFields (void);
+extern void printFields (int language);
 
 extern boolean isFieldRenderable (fieldType type);
 
 extern boolean doesFieldHaveValue (fieldType type, const struct sTagEntryInfo *tag);
-extern const char* renderFieldEscaped (fieldType type, const struct sTagEntryInfo *tag, int index);
+extern const char* renderFieldEscaped (fieldType type, const tagEntryInfo *tag, int index);
 
 extern void initFieldDescs (void);
 extern int countFields (void);
 
 /* language should be typed to langType.
    Use int here to avoid circular dependency */
-extern int defineField (fieldSpec *spec, int language);
-extern fieldType nextFieldSibling (fieldType type);
+extern int defineField (fieldSpec *spec, langType language);
+extern fieldType nextSiblingField (fieldType type);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

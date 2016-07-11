@@ -35,7 +35,7 @@ Vera	h	system	system header	on
 Vera	h	local	local header	on
 
 #
-# all:*
+# all.*
 #
 Automake	I	included	included	on
 Automake	I	optional	optionally included	on
@@ -70,14 +70,14 @@ Vera	h	system	system header	on
 Vera	h	local	local header	on
 
 #
-# C:*
+# C.*
 #
 C	d	undef	undefined	on
 C	h	system	system header	on
 C	h	local	local header	on
 
 #
-# all:h
+# all.h
 #
 C	h	system	system header	on
 C	h	local	local header	on
@@ -89,6 +89,6 @@ Vera	h	system	system header	on
 Vera	h	local	local header	on
 
 #
-# Sh:s
+# Sh.s
 #
 Sh	s	loaded	loaded	on

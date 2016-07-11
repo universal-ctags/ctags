@@ -125,37 +125,3 @@ not available it uses the 'typename' keyword.
 
 Generally, you should ignore the information in field A and use
 only information in field B.
-
-Kinds separation
-----------------------------------------------------------------------
-
-Old C and C++ parsers share the definition of kinds. So
-enabling/disabling a kind in one parser affects another parser.  In
-the new parsers, they are separated.
-
-
-Let's see an example::
-
-    $ ./ctags --kinds-OldC=+f --list-kinds=OldC++ | grep ^f
-    f  function definitions
-    $ ./ctags --kinds-OldC=-f --list-kinds=OldC++ | grep ^f
-    f  function definitions [off]
-
-In the first command invocation, `f` kind of OldC parser is enabled
-and all kinds of OldC++ parser are listed. grep is appended for
-extracting the information about `f` kind of OldC++ parser. In the
-second command invocation, `f` kind of OldC parser is disabled. Both
-operations are for the kind of OldC parser, however the kind having the
-same name (`f`) of OldC++ parser gets affected by the operations.
-
-Let's do the same on new C and new C++ parsers::
-
-    $ ./ctags --kinds-C=+f --list-kinds=C++ | grep ^f
-    ./ctags --kinds-C=+f --list-kinds=C++ | grep ^f
-    f  function definitions
-    $ ./ctags --kinds-C=-f --list-kinds=C++ | grep ^f
-    ./ctags --kinds-C=-f --list-kinds=C++ | grep ^f
-    f  function definitions
-
-Enabling and disabling a kind of C parser don't affect the kind having
-the same name of C++ parser.

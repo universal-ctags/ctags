@@ -58,6 +58,13 @@ typedef struct sInputLineFposMap {
 	unsigned int size;
 } inputLineFposMap;
 
+typedef struct sNestedInputStreamInfo {
+	unsigned long startLine;
+	int startCharOffset;
+	unsigned long endLine;
+	int endCharOffset;
+} nestedInputStreamInfo;
+
 typedef struct sInputFile {
 	vString    *path;          /* path of input file (if any) */
 	vString    *line;          /* last line read from file */
@@ -75,6 +82,8 @@ typedef struct sInputFile {
 	 */
 	inputFileInfo input; /* name, lineNumber */
 	inputFileInfo source;
+
+	nestedInputStreamInfo nestedInputStreamInfo;
 
 	/* sourceTagPathHolder is a kind of trash box.
 	   The buffer pointed by tagPath field of source field can
@@ -1030,11 +1039,36 @@ extern void   pushNarrowedInputStream (const langType language,
 	BackupFile = File;
 
 	File.fp = subio;
+	File.nestedInputStreamInfo.startLine = startLine;
+	File.nestedInputStreamInfo.startCharOffset = startCharOffset;
+	File.nestedInputStreamInfo.endLine = endLine;
+	File.nestedInputStreamInfo.endCharOffset = endCharOffset;
 
 	File.input.lineNumberOrigin = ((startLine == 0)? 0: startLine - 1);
 	File.source.lineNumberOrigin = ((sourceLineOffset == 0)? 0: sourceLineOffset - 1);
 }
 
+extern unsigned int getNestedInputBoundaryInfo (unsigned long lineNumber)
+{
+	unsigned int info;
+
+	if (File.nestedInputStreamInfo.startLine == 0
+	    && File.nestedInputStreamInfo.startCharOffset == 0
+	    && File.nestedInputStreamInfo.endLine == 0
+	    && File.nestedInputStreamInfo.endCharOffset == 0)
+		/* Not in a nested input stream  */
+		return 0;
+
+	info = 0;
+	if (File.nestedInputStreamInfo.startLine == lineNumber
+	    && File.nestedInputStreamInfo.startCharOffset != 0)
+		info |= BOUNDARY_START;
+	if (File.nestedInputStreamInfo.endLine == lineNumber
+	    && File.nestedInputStreamInfo.endCharOffset != 0)
+		info |= BOUNDARY_END;
+
+	return info;
+}
 extern void   popNarrowedInputStream  (void)
 {
 	mio_free (File.fp);

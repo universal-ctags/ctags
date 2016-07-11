@@ -1390,7 +1390,7 @@ static void installFieldSpec (const langType language)
 	}
 }
 
-extern void initializeParser (langType lang)
+static void initializeParserOne (langType lang)
 {
 	parserDefinition *const parser = LanguageTable [lang];
 
@@ -1413,6 +1413,34 @@ extern void initializeParser (langType lang)
 	Assert (!doesParserUseKind (parser, parser->fileKind->letter));
 }
 
+extern void initializeParser (langType lang)
+{
+	if (lang == LANG_AUTO)
+	{
+		int i;
+		for (i = 0; i < countParsers(); i++)
+			initializeParserOne (i);
+	}
+	else
+		initializeParserOne (lang);
+}
+
+static void linkDependenciesAtInitializeParsing (parserDefinition *const parser)
+{
+	unsigned int i;
+	parserDependency *d;
+	langType upper;
+	parserDefinition *upperParserDef;
+
+	for (i = 0; i < parser->dependencyCount; i++)
+	{
+		d = parser->dependencies + i;
+		upper = getNamedLanguage (d->upperParser, 0);
+		upperParserDef = LanguageTable [upper];
+
+		linkDependencyAtInitializeParsing (d->type, upperParserDef, parser);
+	}
+}
 
 extern void initializeParsing (void)
 {
@@ -1436,7 +1464,7 @@ extern void initializeParsing (void)
 				def->parser = findRegexTags;
 				accepted = TRUE;
 			}
-			else if (((!!def->parser) + (!!def->parser2)) != 1)
+			else if ((!def->invisible) && (((!!def->parser) + (!!def->parser2)) != 1))
 				error (FATAL,
 		"%s parser definition must define one and only one parsing routine\n",
 					   def->name);
@@ -1451,6 +1479,9 @@ extern void initializeParsing (void)
 		}
 	}
 	verbose ("\n");
+
+	for (i = 0; i < builtInCount  ;  ++i)
+		linkDependenciesAtInitializeParsing (LanguageTable [i]);
 }
 
 extern void freeParserResources (void)
@@ -1615,7 +1646,7 @@ static void resetLanguageKinds (const langType language, const boolean mode)
 	{
 		unsigned int i;
 		for (i = 0  ;  i < lang->kindCount  ;  ++i)
-			lang->kinds [i].enabled = mode;
+			enableKind (lang->kinds + i, mode);
 	}
 }
 
@@ -1626,7 +1657,7 @@ static boolean enableLanguageKind (
 	kindOption* const opt = langKindOption (language, kind);
 	if (opt != NULL)
 	{
-		opt->enabled = mode;
+		enableKind (opt, mode);
 		result = TRUE;
 	}
 	result = enableRegexKind (language, kind, mode)? TRUE: result;
@@ -1641,7 +1672,7 @@ static boolean enableLanguageKindLong (
 	kindOption* const opt = langKindLongOption (language, kindLong);
 	if (opt != NULL)
 	{
-		opt->enabled = mode;
+		enableKind (opt, mode);
 		result = TRUE;
 	}
 	result = enableRegexKindLong (language, kindLong, mode)? TRUE: result;
@@ -1807,6 +1838,9 @@ static void printRoles (const langType language, const char* letters, boolean al
 {
 	const parserDefinition* const lang = LanguageTable [language];
 	const char *c;
+
+	if (lang->invisible)
+		return;
 
 	for (c = letters; *c != '\0'; c++)
 	{
@@ -2439,7 +2473,7 @@ extern void installTagXpathTable (const langType language)
 }
 
 extern void makeKindSeparatorsPseudoTags (const langType language,
-					  const struct sPtagDesc *pdesc)
+					  const ptagDesc *pdesc)
 {
 	parserDefinition* lang;
 	kindOption *kinds;
@@ -2504,7 +2538,7 @@ extern void makeKindSeparatorsPseudoTags (const langType language,
 
 struct makeKindDescriptionPseudoTagData {
 	const char* langName;
-	const struct sPtagDesc *pdesc;
+	const ptagDesc *pdesc;
 };
 
 static boolean makeKindDescriptionPseudoTag (kindOption *kind,
@@ -2536,7 +2570,7 @@ static boolean makeKindDescriptionPseudoTag (kindOption *kind,
 }
 
 extern void makeKindDescriptionsPseudoTags (const langType language,
-					    const struct sPtagDesc *pdesc)
+					    const ptagDesc *pdesc)
 {
 
 	parserDefinition* lang;
@@ -2607,8 +2641,17 @@ typedef enum {
 	KIND_COUNT
 } CTST_Kind;
 
+typedef enum {
+	R_BROKEN_REF,
+} CTST_BrokenRole;
+
+static roleDesc CTST_BrokenRoles [] = {
+	{TRUE, "broken", "broken" },
+};
+
 static kindOption CTST_Kinds[KIND_COUNT] = {
-	{TRUE, 'b', "broken tag", "name with unwanted characters"},
+	{TRUE, 'b', "broken tag", "name with unwanted characters",
+	 .referenceOnly = FALSE, ATTACH_ROLES (CTST_BrokenRoles) },
 };
 
 static void createCTSTTags (void)

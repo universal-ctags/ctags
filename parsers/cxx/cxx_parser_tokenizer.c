@@ -22,6 +22,8 @@
 #include "read.h"
 #include "options.h"
 
+#include <string.h>
+
 
 static void cxxParserSkipToNonWhiteSpace(void)
 {
@@ -864,6 +866,100 @@ static CXXCharTypeData g_aCharTable[128] =
 	{ 0, 0, 0 }
 };
 
+// The __attribute__((...)) sequence complicates parsing quite a lot.
+// For this reason we attempt to "hide" it from the rest of the parser
+// at tokenizer level.
+static boolean cxxParserParseNextTokenCondenseAttribute(void)
+{
+	CXX_DEBUG_ENTER();
+
+	CXX_DEBUG_ASSERT(
+			cxxTokenIsKeyword(g_cxx.pToken,CXXKeyword__ATTRIBUTE__),
+			"This function should be called only after we have parsed __attribute__"
+		);
+
+	// Kill it
+	cxxTokenDestroy(cxxTokenChainTakeLast(g_cxx.pTokenChain));
+
+	// And go ahead.
+
+	if(!cxxParserParseNextToken())
+	{
+		CXX_DEBUG_LEAVE_TEXT("No next token after __attribute__");
+		return FALSE;
+	}
+
+	if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningParenthesis))
+	{
+		CXX_DEBUG_LEAVE_TEXT("Something that is not an opening parenthesis");
+		return TRUE;
+	}
+
+	if(!cxxParserParseAndCondenseCurrentSubchain(
+			CXXTokenTypeOpeningParenthesis |
+				CXXTokenTypeOpeningSquareParenthesis |
+				CXXTokenTypeOpeningBracket,
+			FALSE
+		))
+	{
+		CXX_DEBUG_LEAVE_TEXT("Failed to parse and condense subchains");
+		return FALSE;
+	}
+
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain),
+			"Should have a parenthesis chain as last token!"
+		);
+
+	// Try to make sense of certain kinds of __attribute__.
+	// the proper syntax is __attribute__(()), so look at the inner chain
+
+	CXXToken * pInner = cxxTokenChainFirst(g_cxx.pToken->pChain);
+	if(pInner)
+	{
+		if(pInner->pNext && cxxTokenTypeIs(pInner->pNext,CXXTokenTypeParenthesisChain))
+			pInner = cxxTokenChainFirst(pInner->pNext->pChain);
+
+		while(pInner)
+		{
+			if(cxxTokenTypeIs(pInner,CXXTokenTypeIdentifier))
+			{
+				CXX_DEBUG_PRINT("Analyzing attribyte %s",vStringValue(pInner->pszWord));
+				if(
+						(strcmp(vStringValue(pInner->pszWord),"always_inline") == 0) ||
+						(strcmp(vStringValue(pInner->pszWord),"__always_inline__") == 0)
+					)
+				{
+					CXX_DEBUG_PRINT("Found attribute 'always_inline'");
+					// assume "inline" has been seen.
+					g_cxx.uKeywordState |= CXXParserKeywordStateSeenInline;
+				} else if(
+						(strcmp(vStringValue(pInner->pszWord),"deprecated") == 0) ||
+						(strcmp(vStringValue(pInner->pszWord),"__deprecated__") == 0)
+					)
+				{
+					CXX_DEBUG_PRINT("Found attribute 'deprecated'");
+					// assume "inline" has been seen.
+					g_cxx.uKeywordState |= CXXParserKeywordStateSeenAttributeDeprecated;
+				}
+			}
+
+			// If needed, we could attach certain attributes to previous
+			// identifiers. But note that __attribute__ may apply to a
+			// following identifier too.
+
+			pInner = pInner->pNext;
+		}
+	}
+
+	// Now just kill the chain.
+	cxxTokenDestroy(cxxTokenChainTakeLast(g_cxx.pTokenChain));
+
+	// And finally extract yet another token.
+	CXX_DEBUG_LEAVE();
+	return cxxParserParseNextToken();
+}
+
 boolean cxxParserParseNextToken(void)
 {
 	CXXToken * t = cxxTokenCreate();
@@ -974,6 +1070,12 @@ boolean cxxParserParseNextToken(void)
 			} else {
 				t->eType = CXXTokenTypeKeyword;
 				t->eKeyword = (enum CXXKeyword)iCXXKeyword;
+
+				if(iCXXKeyword == CXXKeyword__ATTRIBUTE__)
+				{
+					// special handling for __attribute__
+					return cxxParserParseNextTokenCondenseAttribute();
+				}
 			}
 		} else {
 			boolean bIgnoreParens = FALSE;

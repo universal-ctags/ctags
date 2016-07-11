@@ -355,6 +355,9 @@
     <ClCompile Include="..\main\promise.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\dependency.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\pod.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -421,6 +424,9 @@
     <ClInclude Include="..\main\vstring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\gnu_regex\regex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -479,6 +485,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
    <ClInclude Include="..\main\promise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\main\depedency.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

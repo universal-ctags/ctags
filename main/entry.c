@@ -161,7 +161,7 @@ static void rememberMaxLengths (const size_t nameLength, const size_t lineLength
 		TagFile.max.line = lineLength;
 }
 
-extern void writePseudoTag (const struct sPtagDesc *desc,
+extern void writePseudoTag (const ptagDesc *desc,
 			    const char *const fileName,
 			    const char *const pattern,
 			    const char *const parserName)
@@ -676,7 +676,7 @@ static size_t appendInputLine (int putc_func (char , void *), const char *const 
 		if (c == CRETURN  ||  c == NEWLINE)
 			break;
 
-		if (length >= Option.patternLengthLimit)
+		if (Option.patternLengthLimit != 0 && length >= Option.patternLengthLimit)
 		{
 			*omitted = TRUE;
 			break;
@@ -877,7 +877,8 @@ extern int   makePatternStringCommon (const tagEntryInfo *const tag,
 	}
 
 	length += putc_func(searchChar, output);
-	length += putc_func('^', output);
+	if ((tag->boundaryInfo & BOUNDARY_START) == 0)
+		length += putc_func('^', output);
 	length += appendInputLine (putc_func, line, output, &omitted);
 	length += puts_func (omitted? "": terminator, output);
 	length += putc_func (searchChar, output);
@@ -1304,6 +1305,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	memset (e, 0, sizeof (tagEntryInfo));
 	e->lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
 	e->lineNumber      = lineNumber;
+	e->boundaryInfo    = getNestedInputBoundaryInfo (lineNumber);
 	e->language        = language;
 	e->filePosition    = filePosition;
 	e->inputFileName   = inputFileName;

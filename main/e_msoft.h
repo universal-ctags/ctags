@@ -14,6 +14,7 @@
 #define MSDOS_STYLE_PATH 1
 #define HAVE_FCNTL_H 1
 #define HAVE_IO_H 1
+#define HAVE_LIMITS_H 1
 #define HAVE_STDLIB_H 1
 #define HAVE_SYS_STAT_H 1
 #define HAVE_SYS_TYPES_H 1
