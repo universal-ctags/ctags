@@ -14,7 +14,8 @@
 */
 #include "general.h"  /* must always come first */
 
-#include "parse.h"
+#include "types.h"
+#include "vstring.h"
 
 /*
 *   FUNCTION PROTOTYPES

@@ -14,7 +14,7 @@
 #define LONG_FLAGS_OPEN  '{'
 #define LONG_FLAGS_CLOSE '}'
 
-typedef struct {
+typedef struct sFlagDefinition {
 	char shortChar;
 	const char *longStr;
 	void (* shortProc) (char c,  void *data);

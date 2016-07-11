@@ -758,14 +758,14 @@ static void updateSiblingField (fieldType type, const char* name)
 	}
 }
 
-static const char* defaultRenderer (const struct sTagEntryInfo *const tag,
+static const char* defaultRenderer (const tagEntryInfo *const tag,
 				    const char *value,
 				    vString * buffer)
 {
 	return value;
 }
 
-extern int defineField (fieldSpec *spec, int language)
+extern int defineField (fieldSpec *spec, langType language)
 {
 	fieldDesc *fdesc;
 	char *nameWithPrefix;

@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include "debug.h"
 #include "kind.h"
+#include "parse.h"
 
 extern void printRole (const roleDesc* const role)
 {
@@ -34,6 +35,7 @@ extern const char *renderRole (const roleDesc* const role, vString* b)
 #define PR_KIND_WIDTH_ENABLED        8
 #define PR_KIND_WIDTH_REFONLY        7
 #define PR_KIND_WIDTH_NROLE          6
+#define PR_KIND_WIDTH_MASTER	    10
 #define MAKE_KIND_FMT(PREFIX,LETTER_SPEC,NROLL_SPEC)		\
 	PREFIX							\
 	PR_KIND_FMT (LETTER,LETTER_SPEC)			\
@@ -46,6 +48,8 @@ extern const char *renderRole (const roleDesc* const role, vString* b)
 	" "							\
 	PR_KIND_FMT (NROLE,NROLL_SPEC)				\
 	" "							\
+	PR_KIND_FMT (MASTER,s)					\
+	" "							\
 	PR_KIND_FMT (DESCRIPTION,s)				\
 	"\n"
 
@@ -54,7 +58,7 @@ extern void printKindListHeader (boolean indent, boolean tabSeparated)
 #define KIND_HEADER_COMMON_FMT MAKE_KIND_FMT("%s", s, s)
 
 	const char *fmt = tabSeparated
-		? "%s%s%s\t%s\t%s\t%s\t%s\t%s\n"
+		? "%s%s%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
 		: (indent
 		   ? PR_KIND_FMT (LANG,s) KIND_HEADER_COMMON_FMT
 		   : "%s"                 KIND_HEADER_COMMON_FMT)
@@ -68,6 +72,7 @@ extern void printKindListHeader (boolean indent, boolean tabSeparated)
 		"ENABLED",
 		"REFONLY",
 		"NROLES",
+		"MASTER",
 		"DESCRIPTION");
 
 #undef KIND_HEADER_COMMON_FMT
@@ -81,7 +86,7 @@ extern void printKind (const kindOption* const kind, boolean allKindFields, bool
 	if (allKindFields)
 	{
 		printf ((tabSeparated
-			 ?"%s%c\t%s\t%s\t%s\t%d\t%s\n"
+			 ?"%s%c\t%s\t%s\t%s\t%d\t%s\t%s\n"
 			 :"%s" KIND_FMT),
 			(indent? (tabSeparated? "\t": " "): ""),
 			kind->letter,
@@ -89,6 +94,8 @@ extern void printKind (const kindOption* const kind, boolean allKindFields, bool
 			kind->enabled             ? "on"              : "off",
 			kind->referenceOnly       ? "TRUE"            : "FALSE",
 			kind->nRoles,
+			(kind->master
+			 || kind->slave ) ? getLanguageName (kind->syncWith): "",
 			kind->description != NULL ? kind->description : "");
 	}
 	else if (!kind->referenceOnly)
@@ -134,4 +141,18 @@ const char *scopeSeparatorFor (const kindOption *kind, char parentLetter)
 		return NULL;
 	else
 		return ".";
+}
+
+extern void enableKind (kindOption *kind, boolean enable)
+{
+	kindOption *slave;
+
+	if (kind->master)
+		enableKind (kind->master, enable);
+	else
+	{
+		kind->enabled = enable;
+		for (slave = kind->slave; slave; slave = slave->slave)
+			slave->enabled = enable;
+	}
 }

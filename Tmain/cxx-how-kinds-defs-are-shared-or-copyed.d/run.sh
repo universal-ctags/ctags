@@ -3,18 +3,34 @@
 
 CTAGS=$1
 
-printf "[C] enabling: "
+printf "[C] enabling in C: "
 ${CTAGS} --quiet --options=NONE \
 	 --kinds-C=+f --list-kinds=C | grep ^f
 
-printf "[C] disbaling: "
+printf "[C] disbaling in C: "
 ${CTAGS} --quiet --options=NONE \
 	 --kinds-C=-f --list-kinds=C | grep ^f
 
-printf "[C++] enabling: "
+printf "[C++] enabling in C: "
 ${CTAGS} --quiet --options=NONE \
 	 --kinds-C=+f --list-kinds=C++ | grep ^f
 
-printf "[C++] disbaling: "
+printf "[C++] disbaling in C: "
 ${CTAGS} --quiet --options=NONE \
 	 --kinds-C=-f --list-kinds=C++ | grep ^f
+
+printf "[C] enabling in C++: "
+${CTAGS} --quiet --options=NONE \
+	 --kinds-C++=+f --list-kinds=C | grep ^f
+
+printf "[C] disbaling in C++: "
+${CTAGS} --quiet --options=NONE \
+	 --kinds-C++=-f --list-kinds=C | grep ^f
+
+printf "[C++] enabling in C++: "
+${CTAGS} --quiet --options=NONE \
+	 --kinds-C++=+f --list-kinds=C++ | grep ^f
+
+printf "[C++] disbaling in C++: "
+${CTAGS} --quiet --options=NONE \
+	 --kinds-C++=-f --list-kinds=C++ | grep ^f

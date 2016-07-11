@@ -270,6 +270,67 @@ header is easy because it starts with `#` character.
 
 ``--with-list-header=no`` option suppresses the column header.
 
+Kinds synchronization
+----------------------------------------------------------------------
+
+In Universal-ctags, as the same as Exuberant-ctags, the most of all
+kinds are parser local; enabling(or disabling) a kind in a parser
+has no effect on kinds in any other parsers even between two kinds
+having a same name and/or letter.
+
+However, there are exceptions, C and C++ for an example.
+C++ can be assumed as a language extended from C. Therefore it is
+natural that all kinds defied in C parser are also defined in C++
+parser. Enabling a kind in a C parser also enables a kind having
+the same name in a C++ parser, and vice versa.
+
+A kind group is a group of kinds satisfying following conditions:
+
+1. Having a same name and letter, and
+2. Being synchronized each other
+
+A master parser manages the synchronization of a kind group.
+The `MASTER` column of ``--list-kinds-full`` shows the
+master parser of the kind of the line.
+
+Internally, a state change (enabled or disabled with
+``--kind-<LANG>=[+|-]...`` option) of a kind of a kind group is
+reported to its master parser as an event. Then the master parser
+changes the state of all kinds in the kind group as specified with the
+option.
+
+.. code-block:: console
+
+    $ ./ctags --list-kinds-full=C++
+    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
+    d       macro           on       FALSE   1      C          macro definitions
+    ...
+    $ ./ctags --list-kinds-full=C
+    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
+    d       macro           on       FALSE   1      C          macro definitions
+    ...
+
+The example output tells that `d` kinds of C++ parser and C parser are
+in the same group. `C` parser manages the group. 
+
+.. code-block:: console
+
+    $ ./ctags --kinds-C++=-d --list-kinds-full=C | head -2
+    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
+    d       macro           off      FALSE   1      C          macro definitions
+    $ ./ctags --kinds-C=-d --list-kinds-full=C | head -2
+    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
+    d       macro           off      FALSE   1      C          macro definitions
+    $ ./ctags --kinds-C++=-d --list-kinds-full=C++ | head -2
+    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
+    d       macro           off      FALSE   1      C          macro definitions
+    $ ./ctags --kinds-C=-d --list-kinds-full=C++ | head -2
+    #LETTER NAME            ENABLED  REFONLY NROLES MASTER     DESCRIPTION
+    d       macro           off      FALSE   1      C          macro definitions
+
+In the above example, `d` kind is disabled via C or C++. Disabling a `d` kind via a
+language disables the other `d` kind of the other parser, too.
+
 
 ``--put-field-prefix`` options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

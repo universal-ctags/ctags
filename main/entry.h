@@ -13,6 +13,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
+#include "types.h"
 
 #include <stdio.h>
 
@@ -38,7 +39,7 @@ typedef struct sTagField {
 
 /*  Information about the current tag candidate.
  */
-typedef struct sTagEntryInfo {
+struct sTagEntryInfo {
 	unsigned int lineNumberEntry:1;  /* pattern or line number entry */
 	unsigned int isFileScope    :1;  /* is tag visible only within input file? */
 	unsigned int isFileEntry    :1;  /* is this just an entry for a file name? */
@@ -94,7 +95,7 @@ typedef struct sTagEntryInfo {
 	const char* sourceLanguage;
 	const char *sourceFileName;
 	unsigned long sourceLineNumberDifference;
-} tagEntryInfo;
+};
 
 
 /*
@@ -148,8 +149,7 @@ extern char* makePatternString (const tagEntryInfo *const tag);
 
 
 /* language is optional: can be NULL. */
-struct sPtagDesc;
-extern void writePseudoTag (const struct sPtagDesc *pdesc,
+extern void writePseudoTag (const ptagDesc *pdesc,
 			    const char *const fileName,
 			    const char *const pattern,
 			    const char *const parserName);

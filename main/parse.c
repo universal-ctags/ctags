@@ -1425,6 +1425,23 @@ extern void initializeParser (langType lang)
 		initializeParserOne (lang);
 }
 
+static void linkDependenciesAtInitializeParsing (parserDefinition *const parser)
+{
+	unsigned int i;
+	parserDependency *d;
+	langType upper;
+	parserDefinition *upperParserDef;
+
+	for (i = 0; i < parser->dependencyCount; i++)
+	{
+		d = parser->dependencies + i;
+		upper = getNamedLanguage (d->upperParser, 0);
+		upperParserDef = LanguageTable [upper];
+
+		linkDependencyAtInitializeParsing (d->type, upperParserDef, parser);
+	}
+}
+
 extern void initializeParsing (void)
 {
 	unsigned int builtInCount;
@@ -1462,6 +1479,9 @@ extern void initializeParsing (void)
 		}
 	}
 	verbose ("\n");
+
+	for (i = 0; i < builtInCount  ;  ++i)
+		linkDependenciesAtInitializeParsing (LanguageTable [i]);
 }
 
 extern void freeParserResources (void)
@@ -1626,7 +1646,7 @@ static void resetLanguageKinds (const langType language, const boolean mode)
 	{
 		unsigned int i;
 		for (i = 0  ;  i < lang->kindCount  ;  ++i)
-			lang->kinds [i].enabled = mode;
+			enableKind (lang->kinds + i, mode);
 	}
 }
 
@@ -1637,7 +1657,7 @@ static boolean enableLanguageKind (
 	kindOption* const opt = langKindOption (language, kind);
 	if (opt != NULL)
 	{
-		opt->enabled = mode;
+		enableKind (opt, mode);
 		result = TRUE;
 	}
 	result = enableRegexKind (language, kind, mode)? TRUE: result;
@@ -1652,7 +1672,7 @@ static boolean enableLanguageKindLong (
 	kindOption* const opt = langKindLongOption (language, kindLong);
 	if (opt != NULL)
 	{
-		opt->enabled = mode;
+		enableKind (opt, mode);
 		result = TRUE;
 	}
 	result = enableRegexKindLong (language, kindLong, mode)? TRUE: result;
@@ -2453,7 +2473,7 @@ extern void installTagXpathTable (const langType language)
 }
 
 extern void makeKindSeparatorsPseudoTags (const langType language,
-					  const struct sPtagDesc *pdesc)
+					  const ptagDesc *pdesc)
 {
 	parserDefinition* lang;
 	kindOption *kinds;
@@ -2518,7 +2538,7 @@ extern void makeKindSeparatorsPseudoTags (const langType language,
 
 struct makeKindDescriptionPseudoTagData {
 	const char* langName;
-	const struct sPtagDesc *pdesc;
+	const ptagDesc *pdesc;
 };
 
 static boolean makeKindDescriptionPseudoTag (kindOption *kind,
@@ -2550,7 +2570,7 @@ static boolean makeKindDescriptionPseudoTag (kindOption *kind,
 }
 
 extern void makeKindDescriptionsPseudoTags (const langType language,
-					    const struct sPtagDesc *pdesc)
+					    const ptagDesc *pdesc)
 {
 
 	parserDefinition* lang;

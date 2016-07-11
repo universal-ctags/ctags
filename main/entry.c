@@ -161,7 +161,7 @@ static void rememberMaxLengths (const size_t nameLength, const size_t lineLength
 		TagFile.max.line = lineLength;
 }
 
-extern void writePseudoTag (const struct sPtagDesc *desc,
+extern void writePseudoTag (const ptagDesc *desc,
 			    const char *const fileName,
 			    const char *const pattern,
 			    const char *const parserName)
