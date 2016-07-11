@@ -18,6 +18,9 @@
 #ifdef HAVE_JANSSON
 #include <jansson.h>
 
+#ifndef json_boolean /* compat with jannson < 2.4 */
+#define json_boolean(val)      ((val) ? json_true() : json_false())
+#endif
 
 #define includeExtensionFlags()         (Option.tagFileFormat > 1)
 
