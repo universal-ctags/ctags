@@ -24,6 +24,8 @@ exit_if_no_coproc()
 
 run_with_format()
 {
-    echo '#' $1
-    ${CTAGS} --quiet --options=NONE --output-format=$1 -o - input.c
+    echo '#' $*
+    local format=$1
+    shift
+    ${CTAGS} --quiet --options=NONE --output-format=$format "$@" -o - input.c
 }
