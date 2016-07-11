@@ -1,3 +1,7 @@
 # json
 {"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "kind": "f", "typeref": "int"}
-{"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "kind": "function", "language": "C", "line": 2, "signature": "(void)", "typeref": "int"}
+# json --fields=*
+{"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "kind": "function", "language": "C", "line": 4, "signature": "(void)", "typeref": "int"}
+# json --fields=* --extra=+r
+{"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "kind": "function", "language": "C", "line": 4, "signature": "(void)", "typeref": "int"}
+{"_type": "tag", "name": "stdio.h", "path": "input.c", "pattern": "/^#include <stdio.h>/", "kind": "header", "language": "C", "line": 1, "role": "system", "extra": "reference"}
