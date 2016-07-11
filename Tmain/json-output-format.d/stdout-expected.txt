@@ -1,2 +1,3 @@
 # json
-{"_type": "tag", "kind": "f", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "typeref": "int"}
+{"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "kind": "f", "typeref": "int"}
+{"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "kind": "function", "language": "C", "line": 2, "signature": "(void)", "typeref": "int"}

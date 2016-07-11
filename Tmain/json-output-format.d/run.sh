@@ -7,4 +7,5 @@ CTAGS=$1
 
 if is_feature_available ${CTAGS} json; then
     run_with_format json
+    ${CTAGS} --quiet --options=NONE --output-format=json --fields="*" -o - input.c
 fi
