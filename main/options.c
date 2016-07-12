@@ -741,7 +741,7 @@ static void setXrefMode (void)
 static void setJsonMode (void)
 {
 	Option.json = TRUE;
-	setTagWriter (writeJsonEntry, NULL, NULL);
+	setTagWriter (writeJsonEntry, beginJsonFile, NULL);
 }
 #endif
 

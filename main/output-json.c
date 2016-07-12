@@ -9,6 +9,7 @@
 
 #include "general.h"  /* must always come first */
 
+#include "ctags.h"
 #include "entry.h"
 #include "mio.h"
 #include "options.h"
@@ -111,6 +112,26 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 	int *k;
 	for (k = field_keys; *k != FIELD_UNKNOWN; k++)
 		renderExtensionFieldMaybe (*k, tag, response);
+}
+
+extern void *beginJsonFile (MIO * mio)
+{
+	json_t *response = json_pack ("{ss ss ss ss ss ss}",
+		"_type", "header",
+		"program_name", PROGRAM_NAME,
+		"program_author", AUTHOR_NAME,
+		"program_url", PROGRAM_URL,
+		"program_version", PROGRAM_VERSION,
+		"file_format", "1.0"
+	);
+
+	char *buf = json_dumps (response, JSON_PRESERVE_ORDER);
+	mio_printf (mio, "%s\n", buf);
+
+	free (buf);
+	json_decref (response);
+
+	return NULL;
 }
 
 extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__)
