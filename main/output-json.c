@@ -14,6 +14,7 @@
 #include "options.h"
 #include "output.h"
 #include "read.h"
+#include "ptag.h"
 
 #ifdef HAVE_JANSSON
 #include <jansson.h>
@@ -118,8 +119,50 @@ extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data 
 	return length;
 }
 
+extern int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
+			       const char *const fileName,
+			       const char *const pattern,
+			       const char *const parserName, void *data __unused__)
+{
+#define OPT(X) ((X)?(X):"")
+	json_t *response;
+
+	if (parserName)
+	{
+		response = json_pack ("{ss ss ss ss ss}",
+				      "_type", "ptag",
+				      "name", desc->name,
+				      "parserName", parserName,
+				      "path", OPT(fileName),
+				      "pattern", OPT(pattern));
+	}
+	else
+	{
+		response = json_pack ("{ss ss ss ss}",
+				      "_type", "ptag",
+				      "name", desc->name,
+				      "path", OPT(fileName),
+				      "pattern", OPT(pattern));
+	}
+
+	char *buf = json_dumps (response, JSON_PRESERVE_ORDER);
+	int length = mio_printf (mio, "%s\n", buf);
+	free (buf);
+	json_decref (response);
+
+	return length;
+#undef OPT
+}
+
 #else /* HAVE_JANSSON */
 extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__)
+{
+	return 0;
+}
+extern int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
+			       const char *const fileName,
+			       const char *const pattern,
+			       const char *const parserName, void *data __unused__)
 {
 	return 0;
 }

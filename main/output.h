@@ -44,6 +44,10 @@ extern int writeCtagsPtagEntry (MIO * mio, const ptagDesc *desc,
 				const char *const fileName,
 				const char *const pattern,
 				const char *const parserName, void *data __unused__);
+extern int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
+				const char *const fileName,
+				const char *const pattern,
+				const char *const parserName, void *data __unused__);
 
 extern int makePatternStringCommon (const tagEntryInfo *const tag,
 				    int putc_func (char , void *),
