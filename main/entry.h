@@ -151,10 +151,10 @@ extern char* makePatternString (const tagEntryInfo *const tag);
 
 
 /* language is optional: can be NULL. */
-extern void writePseudoTag (const ptagDesc *pdesc,
-			    const char *const fileName,
-			    const char *const pattern,
-			    const char *const parserName);
+extern boolean writePseudoTag (const ptagDesc *pdesc,
+			       const char *const fileName,
+			       const char *const pattern,
+			       const char *const parserName);
 
 #define CORK_NIL 0
 void          corkTagFile(void);

@@ -2472,13 +2472,15 @@ extern void installTagXpathTable (const langType language)
 	}
 }
 
-extern void makeKindSeparatorsPseudoTags (const langType language,
-					  const ptagDesc *pdesc)
+extern boolean makeKindSeparatorsPseudoTags (const langType language,
+					     const ptagDesc *pdesc)
 {
 	parserDefinition* lang;
 	kindOption *kinds;
 	unsigned int kindCount;
 	unsigned int i, j;
+
+	boolean r = FALSE;
 
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
@@ -2486,7 +2488,7 @@ extern void makeKindSeparatorsPseudoTags (const langType language,
 	kindCount = lang->kindCount;
 
 	if (kinds == NULL)
-		return;
+		return r;
 
 	for (i = 0; i < kindCount; ++i)
 	{
@@ -2530,15 +2532,18 @@ extern void makeKindSeparatorsPseudoTags (const langType language,
 			vStringClear (sepval);
 			vStringCatSWithEscaping (sepval, sep->separator);
 
-			writePseudoTag (pdesc, vStringValue (sepval),
-					name, lang->name);
+			r = writePseudoTag (pdesc, vStringValue (sepval),
+					    name, lang->name) || r;
 		}
 	}
+
+	return r;
 }
 
 struct makeKindDescriptionPseudoTagData {
 	const char* langName;
 	const ptagDesc *pdesc;
+	boolean written;
 };
 
 static boolean makeKindDescriptionPseudoTag (kindOption *kind,
@@ -2559,9 +2564,9 @@ static boolean makeKindDescriptionPseudoTag (kindOption *kind,
 	vStringCatSWithEscapingAsPattern (description,
 					  kind -> description);
 	vStringPut (description, '/');
-	writePseudoTag (data->pdesc, vStringValue (letter_and_name),
-			vStringValue (description),
-			data->langName);
+	data->written |=  writePseudoTag (data->pdesc, vStringValue (letter_and_name),
+					  vStringValue (description),
+					  data->langName);
 
 	vStringDelete (description);
 	vStringDelete (letter_and_name);
@@ -2569,7 +2574,7 @@ static boolean makeKindDescriptionPseudoTag (kindOption *kind,
 	return FALSE;
 }
 
-extern void makeKindDescriptionsPseudoTags (const langType language,
+extern boolean makeKindDescriptionsPseudoTags (const langType language,
 					    const ptagDesc *pdesc)
 {
 
@@ -2585,12 +2590,15 @@ extern void makeKindDescriptionsPseudoTags (const langType language,
 
 	data.langName = lang->name;
 	data.pdesc = pdesc;
+	data.written = FALSE;
 
 	for (i = 0; i < kindCount; ++i)
 		makeKindDescriptionPseudoTag (kinds + i, &data);
 
 	foreachRegexKinds (language, makeKindDescriptionPseudoTag, &data);
 	foreachXcmdKinds (language, makeKindDescriptionPseudoTag, &data);
+
+	return data.written;
 }
 
 /*

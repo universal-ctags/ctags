@@ -161,10 +161,10 @@ static void rememberMaxLengths (const size_t nameLength, const size_t lineLength
 		TagFile.max.line = lineLength;
 }
 
-extern void writePseudoTag (const ptagDesc *desc,
-			    const char *const fileName,
-			    const char *const pattern,
-			    const char *const parserName)
+extern boolean writePseudoTag (const ptagDesc *desc,
+			       const char *const fileName,
+			       const char *const pattern,
+			       const char *const parserName)
 {
 	const int length = parserName
 
@@ -181,6 +181,8 @@ extern void writePseudoTag (const ptagDesc *desc,
 
 	++TagFile.numTags.added;
 	rememberMaxLengths (strlen (desc->name), (size_t) length);
+
+	return TRUE;
 }
 
 static void addCommonPseudoTags (void)

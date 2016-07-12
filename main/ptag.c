@@ -21,11 +21,11 @@
 #include <string.h>
 
 
-static void writePseudoTagForXcmdData (ptagDesc *desc,
-				       struct ptagXcmdData *pdata)
+static boolean writePseudoTagForXcmdData (ptagDesc *desc,
+					  struct ptagXcmdData *pdata)
 {
-	writePseudoTag (desc,
-			pdata->fileName,  pdata->pattern, pdata->language);
+	return writePseudoTag (desc,
+			       pdata->fileName,  pdata->pattern, pdata->language);
 }
 
 static boolean ptagMakeFormat (ptagDesc *desc, void *data __unused__)
@@ -39,19 +39,16 @@ static boolean ptagMakeFormat (ptagDesc *desc, void *data __unused__)
 	else if (Option.tagFileFormat == 2)
 		formatComment =
 			"extended format; --format=1 will not append ;\" to lines";
-	writePseudoTag (desc, format, formatComment, NULL);
-
-	return TRUE;
+	return writePseudoTag (desc, format, formatComment, NULL);
 }
 
 static boolean ptagMakeHowSorted (ptagDesc *desc, void *data __unused__)
 {
-	writePseudoTag (desc,
-			Option.sorted == SO_FOLDSORTED ? "2" :
-			(Option.sorted == SO_SORTED ? "1" : "0"),
-			"0=unsorted, 1=sorted, 2=foldcase",
-			NULL);
-	return TRUE;
+	return writePseudoTag (desc,
+			       Option.sorted == SO_FOLDSORTED ? "2" :
+			       (Option.sorted == SO_SORTED ? "1" : "0"),
+			       "0=unsorted, 1=sorted, 2=foldcase",
+			       NULL);
 }
 
 static boolean ptagMakeAuthor (ptagDesc *desc, void *data)
@@ -59,11 +56,10 @@ static boolean ptagMakeAuthor (ptagDesc *desc, void *data)
 	struct ptagXcmdData *pdata = data;
 
 	if (pdata)
-		writePseudoTagForXcmdData (desc, data);
+		return writePseudoTagForXcmdData (desc, data);
 	else
-		writePseudoTag (desc,
-				AUTHOR_NAME,  "", NULL);
-	return TRUE;
+		return writePseudoTag (desc,
+				       AUTHOR_NAME,  "", NULL);
 }
 
 static boolean ptagMakeProgName (ptagDesc *desc, void *data)
@@ -71,11 +67,10 @@ static boolean ptagMakeProgName (ptagDesc *desc, void *data)
 	struct ptagXcmdData *pdata = data;
 
 	if (pdata)
-		writePseudoTagForXcmdData (desc, data);
+		return writePseudoTagForXcmdData (desc, data);
 	else
-		writePseudoTag (desc,
+		return writePseudoTag (desc,
 				PROGRAM_NAME,  "Derived from Exuberant Ctags", NULL);
-	return TRUE;
 }
 
 static boolean ptagMakeProgURL (ptagDesc *desc, void *data)
@@ -83,18 +78,16 @@ static boolean ptagMakeProgURL (ptagDesc *desc, void *data)
 	struct ptagXcmdData *pdata = data;
 
 	if (pdata)
-		writePseudoTagForXcmdData (desc, data);
+		return writePseudoTagForXcmdData (desc, data);
 	else
-		writePseudoTag (desc,
-				PROGRAM_URL, "official site", NULL);
-	return TRUE;
+		return writePseudoTag (desc,
+				       PROGRAM_URL, "official site", NULL);
 }
 
 static boolean ptagMakeProgVersion (ptagDesc *desc, void *data __unused__)
 {
 	const char* repoinfo = ctags_repoinfo? ctags_repoinfo: "";
-	writePseudoTag (desc, PROGRAM_VERSION, repoinfo, NULL);
-	return TRUE;
+	return writePseudoTag (desc, PROGRAM_VERSION, repoinfo, NULL);
 }
 
 #ifdef HAVE_ICONV
@@ -103,8 +96,7 @@ static boolean ptagMakeFileEncoding (ptagDesc *desc, void *data __unused__)
 	if (! Option.outputEncoding)
 		return FALSE;
 
-	writePseudoTag (desc, Option.outputEncoding, "", NULL);
-	return TRUE;
+	return writePseudoTag (desc, Option.outputEncoding, "", NULL);
 }
 #endif
 
@@ -112,16 +104,13 @@ static boolean ptagMakeKindSeparators (ptagDesc *desc, void *data)
 {
 	langType *language = data;
 
-	makeKindSeparatorsPseudoTags (*language, desc);
-
-	return TRUE;
+	return makeKindSeparatorsPseudoTags (*language, desc);
 }
 
 static boolean ptagMakeKindDescriptions (ptagDesc *desc, void *data)
 {
 	langType *language = data;
-	makeKindDescriptionsPseudoTags (*language, desc);
-	return TRUE;
+	return makeKindDescriptionsPseudoTags (*language, desc);
 }
 
 static ptagDesc ptagDescs [] = {
