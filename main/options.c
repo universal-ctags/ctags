@@ -646,11 +646,10 @@ extern void checkOptions (void)
 	if (Option.xref && (Option.customXfmt == NULL))
 	{
 		notice = "xref output";
-		if (isXtagEnabled(XTAG_FILE_NAMES) || isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES))
+		if (isXtagEnabled(XTAG_FILE_NAMES))
 		{
 			error (WARNING, "%s disables file name tags", notice);
 			enableXtag (XTAG_FILE_NAMES, FALSE);
-			enableXtag (XTAG_FILE_NAMES_WITH_TOTAL_LINES, FALSE);
 		}
 	}
 	if (Option.append)

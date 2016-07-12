@@ -232,10 +232,6 @@ Following extra tag entries are newly introduced.
 
 	Equivalent to --file-scope.
 
-``.``
-
-	Do the similar to the ``f`` extra flag but the entry addresses the end line.
-
 ``p``
 
 	Include pseudo tags.

@@ -7,4 +7,4 @@ h	input.py	/^    def h(self):$/;"	m	line:12	class:A	end:15
 A.h	input.py	/^    def h(self):$/;"	m	line:12	class:A	end:15
 i	input.py	/^    def i(self):$/;"	m	line:16	class:A	end:18
 A.i	input.py	/^    def i(self):$/;"	m	line:16	class:A	end:18
-input.py	input.py	18;"	F	line:18
+input.py	input.py	1;"	F	line:1	end:18

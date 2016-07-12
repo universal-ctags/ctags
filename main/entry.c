@@ -196,13 +196,10 @@ static void addCommonPseudoTags (void)
 
 extern void makeFileTag (const char *const fileName)
 {
-	boolean via_line_directive = (strcmp (fileName, getInputFileName()) != 0);
 	xtagType     xtag = XTAG_UNKNOWN;
 
 	if (isXtagEnabled(XTAG_FILE_NAMES))
 		xtag = XTAG_FILE_NAMES;
-	if (isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES))
-		xtag = XTAG_FILE_NAMES_WITH_TOTAL_LINES;
 
 	if (xtag != XTAG_UNKNOWN)
 	{
@@ -221,15 +218,15 @@ extern void makeFileTag (const char *const fileName)
 		tag.lineNumberEntry = TRUE;
 		markTagExtraBit (&tag, xtag);
 
-		if (via_line_directive || (!isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES)))
+		tag.lineNumber = 1;
+		if (isFieldEnabled (FIELD_END))
 		{
-			tag.lineNumber = 1;
-		}
-		else
-		{
+			/* isFieldEnabled is called again in the rendering
+			   stage. However, it is called here for avoiding
+			   unnecessary read line loop. */
 			while (readLineFromInputFile () != NULL)
-				;		/* Do nothing */
-			tag.lineNumber = getInputLineNumber ();
+				; /* Do nothing */
+			tag.extensionFields.endLine = getInputLineNumber ();
 		}
 
 		makeTagEntry (&tag);

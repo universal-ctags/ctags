@@ -58,18 +58,6 @@ static kindOption RpmSpecKinds[] = {
 	{ TRUE, 'g', "global", "global macros" },
 };
 
-typedef enum {
-	F_END,
-} rpmspecField;
-
-static fieldSpec RpmSpecFields [] = {
-	{
-		.name = "end",
-		.description = "end lines of macros",
-		.enabled = FALSE,
-	}
-};
-
 
 static boolean rejecting;
 
@@ -99,8 +87,6 @@ static void found_macro_cb (const char *line,
 		vString *signature = ((count > 1) && (matches[2].length > 0))? vStringNew(): NULL;
 		vString *name = vStringNew ();
 		tagEntryInfo tag;
-		unsigned long end_line;
-		char end_buf[16];
 
 		if (signature)
 			vStringNCopyS (signature, line + matches[2].start, matches[2].length);
@@ -122,9 +108,7 @@ static void found_macro_cb (const char *line,
 		}
 		rejecting = FALSE;
 
-		end_line = getInputLineNumber();
-		snprintf(end_buf, sizeof(end_buf), "%ld", (end_line));
-		attachParserField (&tag, RpmSpecFields [F_END].ftype, end_buf);
+		tag.extensionFields.endLine = getInputLineNumber();
 
 		makeTagEntry (&tag);
 
@@ -207,8 +191,6 @@ extern parserDefinition* RpmSpecParser (void)
 	def->extensions = extensions;
 	def->initialize = initializeRpmSpecParser;
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
-	def->fieldSpecs = RpmSpecFields;
-	def->fieldSpecCount = ARRAY_SIZE (RpmSpecFields);
 	def->useCork = TRUE;
 	def->requestAutomaticFQTag = TRUE;
 	return def;

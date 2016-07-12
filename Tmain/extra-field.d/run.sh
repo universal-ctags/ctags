@@ -3,6 +3,6 @@
 
 CTAGS=$1
 
-${CTAGS} --quiet --options=NONE --fields=+Er --extra=+qr. -o - input.cpp \
+${CTAGS} --quiet --options=NONE --fields=+Ere --extra=+qrf -o - input.cpp \
     | sed -e 's|[^	]*\(input.cpp\)|\1|'
 

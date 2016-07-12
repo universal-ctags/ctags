@@ -51,7 +51,6 @@ enum CXXTagCPPKind
 // The fields common to all (sub)languages this parser supports.
 enum CXXTagCommonField
 {
-	CXXTagFieldEndLine,
 	CXXTagFieldProperties,
 	
 	CXXTagCommonFieldCount

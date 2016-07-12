@@ -184,6 +184,16 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 	}
 #endif
 
+	if (isFieldEnabled(FIELD_END))
+	{
+		const char *value = escapeName (tag, FIELD_END);
+		if (value)
+			length += mio_printf (mio, "%s\t%s:%s", sep,
+					      getFieldName (FIELD_END),
+					      escapeName (tag, FIELD_END));
+
+	}
+
 	return length;
 #undef sep
 }
