@@ -22,7 +22,6 @@
 #define json_boolean(val)      ((val) ? json_true() : json_false())
 #endif
 
-#define includeExtensionFlags()         (Option.tagFileFormat > 1)
 
 static json_t* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
 {
@@ -71,9 +70,6 @@ static void addParserFields (json_t *response, const tagEntryInfo *const tag)
 
 static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 {
-	boolean making_fq_tag =  (doesInputLanguageRequestAutomaticFQTag ()
-				  && isXtagEnabled (XTAG_QUALIFIED_TAGS));
-
 	if (tag->kind->name != NULL && (isFieldEnabled (FIELD_KIND_LONG)  ||
 		 (isFieldEnabled (FIELD_KIND)  && tag->kind == '\0')))
 		json_object_set_new (response, getFieldName (FIELD_KIND_KEY), json_string (tag->kind->name));
@@ -84,14 +80,10 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 		json_object_set_new (response, getFieldName (FIELD_KIND_KEY), json_string (str));
 	}
 
-	if (isFieldEnabled (FIELD_SCOPE) || making_fq_tag)
+	if (isFieldEnabled (FIELD_SCOPE))
 	{
 		json_t *k = escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG);
-
-		/* The value must be generated even if FIELD_SCOPE is disabled for
-		   generating FQN. */
-		if (isFieldEnabled (FIELD_SCOPE))
-			json_object_set_new (response, getFieldName (FIELD_SCOPE_KEY), k);
+		json_object_set_new (response, getFieldName (FIELD_SCOPE_KEY), k);
 	}
 
 	int field_keys [] = {

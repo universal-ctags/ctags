@@ -16,9 +16,6 @@
 #include "read.h"
 
 
-#define includeExtensionFlags()         (Option.tagFileFormat > 1)
-
-
 static const char* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
 {
 	return renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
@@ -100,9 +97,6 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 	char sep [] = {';', '"', '\0'};
 	int length = 0;
 
-	boolean making_fq_tag =  (doesInputLanguageRequestAutomaticFQTag ()
-				  && isXtagEnabled (XTAG_QUALIFIED_TAGS));
-
 	if (tag->kind->name != NULL && (isFieldEnabled (FIELD_KIND_LONG)  ||
 		 (isFieldEnabled (FIELD_KIND)  && tag->kind == '\0')))
 	{
@@ -127,17 +121,13 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 
 	length += renderExtensionFieldMaybe (FIELD_LANGUAGE, tag, sep, mio);
 
-	if (isFieldEnabled (FIELD_SCOPE) || making_fq_tag)
+	if (isFieldEnabled (FIELD_SCOPE))
 	{
 		const char* k = NULL, *v = NULL;
 
-		/* The value rendered in following calls are
-		   cached in tag. So even if FIELD_SCOPE is disabled,
-		   following calls are needed for automatic FQN generating. */
 		k = escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG);
 		v = escapeFieldValue (tag, FIELD_SCOPE);
-
-		if (isFieldEnabled (FIELD_SCOPE) && k && v)
+		if (k && v)
 		{
 			length += mio_printf (mio, scopeFmt, sep, scopeKey, k, v);
 			sep [0] = '\0';

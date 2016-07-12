@@ -1090,6 +1090,12 @@ extern void teardownWriter (const char *filename)
 		postWriteEntry (TagFile.fp, filename, writerData);
 }
 
+static void buildFqTagCache (const tagEntryInfo *const tag)
+{
+	renderFieldEscaped (FIELD_SCOPE_KIND_LONG, tag, NO_PARSER_FIELD);
+	renderFieldEscaped (FIELD_SCOPE, tag, NO_PARSER_FIELD);
+}
+
 static void writeTagEntry (const tagEntryInfo *const tag)
 {
 	int length = 0;
@@ -1099,6 +1105,11 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 
 	DebugStatement ( debugEntry (tag); )
 	Assert (writeEntry);
+
+	if (includeExtensionFlags ()
+	    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
+	    && doesInputLanguageRequestAutomaticFQTag ())
+		buildFqTagCache (tag);
 
 	length = (* writeEntry) (TagFile.fp, tag, writerData);
 
