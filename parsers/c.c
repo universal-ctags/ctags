@@ -18,7 +18,7 @@
 
 #include "debug.h"
 #include "entry.h"
-#include "get.h"
+#include "lcpp.h"
 #include "keyword.h"
 #include "options.h"
 #include "parse.h"
@@ -1721,8 +1721,8 @@ static void skipToFormattedBraceMatch (void)
 static void skipToMatch (const char *const pair)
 {
 	const boolean braceMatching = (boolean) (strcmp ("{}", pair) == 0);
-	const boolean braceFormatting = (boolean) (isBraceFormat () && braceMatching);
-	const unsigned int initialLevel = getDirectiveNestLevel ();
+	const boolean braceFormatting = (boolean) (cppIsBraceFormat () && braceMatching);
+	const unsigned int initialLevel = cppGetDirectiveNestLevel ();
 	const int begin = pair [0], end = pair [1];
 	const unsigned long inputLineNumber = getInputLineNumber ();
 	int matchLevel = 1;
@@ -1735,7 +1735,7 @@ static void skipToMatch (const char *const pair)
 		if (c == begin)
 		{
 			++matchLevel;
-			if (braceFormatting  &&  getDirectiveNestLevel () != initialLevel)
+			if (braceFormatting  &&  cppGetDirectiveNestLevel () != initialLevel)
 			{
 				skipToFormattedBraceMatch ();
 				break;
@@ -1744,7 +1744,7 @@ static void skipToMatch (const char *const pair)
 		else if (c == end)
 		{
 			--matchLevel;
-			if (braceFormatting  &&  getDirectiveNestLevel () != initialLevel)
+			if (braceFormatting  &&  cppGetDirectiveNestLevel () != initialLevel)
 			{
 				skipToFormattedBraceMatch ();
 				break;
@@ -1908,7 +1908,7 @@ static void readIdentifier (tokenInfo *const token, const int firstChar)
 			first = FALSE;
 		}
 		c = cppGetc ();
-	} while (isident (c) || ((isInputLanguage (Lang_java) || isInputLanguage (Lang_csharp)) && (isHighChar (c) || c == '.')));
+	} while (cppIsident (c) || ((isInputLanguage (Lang_java) || isInputLanguage (Lang_csharp)) && (isHighChar (c) || c == '.')));
 	vStringTerminate (name);
 	cppUngetc (c);        /* unget non-identifier character */
 
@@ -1922,7 +1922,7 @@ static void readPackageName (tokenInfo *const token, const int firstChar, boolea
 
 	initToken (token);
 
-	while (isident (c)  || (allowWildCard && (c == '*')) ||  c == '.')
+	while (cppIsident (c)  || (allowWildCard && (c == '*')) ||  c == '.')
 	{
 		vStringPut (name, c);
 		c = cppGetc ();
@@ -1959,7 +1959,7 @@ static void readVersionName (tokenInfo *const token, const int firstChar)
 
 	initToken (token);
 
-	while (isident (c))
+	while (cppIsident (c))
 	{
 		vStringPut (name, c);
 		c = cppGetc ();
@@ -2019,7 +2019,7 @@ static void readOperator (statementInfo *const st)
 			c = cppGetc ();
 		}
 	}
-	else if (isident1 (c))
+	else if (cppIsident1 (c))
 	{
 		/*  Handle "new" and "delete" operators, and conversion functions
 		 *  (per 13.3.1.1.2 [2] of the C++ spec).
@@ -2134,7 +2134,7 @@ static void setAccess (statementInfo *const st, const accessType access)
 static void discardTypeList (tokenInfo *const token)
 {
 	int c = skipToNonWhite ();
-	while (isident1 (c))
+	while (cppIsident1 (c))
 	{
 		readIdentifier (token, c);
 		c = skipToNonWhite ();
@@ -2163,7 +2163,7 @@ static void readParents (statementInfo *const st, const int qualifier)
 	do
 	{
 		c = skipToNonWhite ();
-		if (isident1 (c))
+		if (cppIsident1 (c))
 		{
 			readIdentifier (token, c);
 			if (isType (token, TOKEN_NAME))
@@ -2353,7 +2353,7 @@ static void skipMemIntializerList (tokenInfo *const token)
 	do
 	{
 		c = skipToNonWhite ();
-		while (isident1 (c)  ||  c == ':')
+		while (cppIsident1 (c)  ||  c == ':')
 		{
 			if (c != ':')
 				readIdentifier (token, c);
@@ -2435,7 +2435,7 @@ static boolean skipPostArgumentStuff (
 			break;
 
 		default:
-			if (isident1 (c))
+			if (cppIsident1 (c))
 			{
 				readIdentifier (token, c);
 				switch (token->keyword)
@@ -2528,7 +2528,7 @@ static void skipJavaThrows (statementInfo *const st)
 	tokenInfo *const token = activeToken (st);
 	int c = skipToNonWhite ();
 
-	if (isident1 (c))
+	if (cppIsident1 (c))
 	{
 		readIdentifier (token, c);
 		if (token->keyword == KEYWORD_THROWS)
@@ -2536,7 +2536,7 @@ static void skipJavaThrows (statementInfo *const st)
 			do
 			{
 				c = skipToNonWhite ();
-				if (isident1 (c))
+				if (cppIsident1 (c))
 				{
 					readIdentifier (token, c);
 					c = skipToNonWhite ();
@@ -2757,7 +2757,7 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 				{
 					parseJavaAnnotation(st);
 				}
-				else if (isident1 (c))
+				else if (cppIsident1 (c))
 				{
 					if (++identifierCount > 1)
 						info->isKnrParamList = FALSE;
@@ -2992,7 +2992,7 @@ static int skipInitializer (statementInfo *const st)
 			case '}':
 				if (insideEnumBody (st))
 					done = TRUE;
-				else if (! isBraceFormat ())
+				else if (! cppIsBraceFormat ())
 				{
 					verbose ("%s: unexpected closing brace at line %lu\n",
 							getInputFileName (), getInputLineNumber ());
@@ -3043,7 +3043,7 @@ static void parseGeneralToken (statementInfo *const st, const int c)
 {
 	const tokenInfo *const prev = prevToken (st, 1);
 
-	if (isident1 (c) || (isInputLanguage (Lang_java) && isHighChar (c)))
+	if (cppIsident1 (c) || (isInputLanguage (Lang_java) && isHighChar (c)))
 	{
 
 		parseIdentifier (st, c);

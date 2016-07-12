@@ -23,7 +23,7 @@
 #include <setjmp.h>
 
 #include "debug.h"
-#include "get.h"
+#include "lcpp.h"
 #include "keyword.h"
 #include "options.h"
 #include "parse.h"
@@ -381,7 +381,7 @@ static int vGetc (void)
 		}
 		else if (c2 == '*')  /* strip block comment */
 		{
-			c = skipOverCComment();
+			c = cppSkipOverCComment();
 		}
 		else
 		{

@@ -125,7 +125,6 @@
     <ClCompile Include="..\fnmatch\fnmatch.c" />
     <ClCompile Include="..\parsers\fortran.c" />
     <ClCompile Include="..\optlib\gdbinit.c" />
-    <ClCompile Include="..\main\get.c" />
     <ClCompile Include="..\parsers\go.c" />
     <ClCompile Include="..\parsers\html.c" />
     <ClCompile Include="..\parsers\jprop.c" />
@@ -133,6 +132,7 @@
     <ClCompile Include="..\parsers\json.c" />
     <ClCompile Include="..\main\keyword.c" />
     <ClCompile Include="..\main\kind.c" />
+    <ClCompile Include="..\main\lcpp.c" />
     <ClCompile Include="..\parsers\lisp.c" />
     <ClCompile Include="..\main\lregex.c" />
     <ClCompile Include="..\main\lxcmd.c" />
@@ -222,11 +222,11 @@
     <ClInclude Include="..\main\flags.h" />
     <ClInclude Include="..\main\fmt.h" />
     <ClInclude Include="..\main\general.h" />
-    <ClInclude Include="..\main\get.h" />
     <ClInclude Include="..\gnu_regex\regex.h" />
     <ClInclude Include="..\main\htable.h" />
     <ClInclude Include="..\main\keyword.h" />
     <ClInclude Include="..\main\kind.h" />
+    <ClInclude Include="..\main\lcpp.h" />
     <ClInclude Include="..\main\main.h" />
     <ClInclude Include="..\main\nestlevel.h" />
     <ClInclude Include="..\main\options.h" />
