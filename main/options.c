@@ -741,6 +741,7 @@ static void setXrefMode (void)
 #ifdef HAVE_JANSSON
 static void setJsonMode (void)
 {
+	Option.json = TRUE;
 	setTagWriter (writeJsonEntry, NULL, NULL);
 }
 #endif
