@@ -162,7 +162,7 @@ extern boolean makePtagIfEnabled (ptagType type, void *data)
 	Assert (0 <= type && type < PTAG_COUNT);
 
 	desc = ptagDescs + type;
-	if ((!Option.etags) && (!Option.xref) && desc->enabled)
+	if (desc->enabled)
 		return desc->makeTag (desc, data);
 	else
 		return FALSE;

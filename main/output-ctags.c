@@ -14,6 +14,7 @@
 #include "options.h"
 #include "output.h"
 #include "read.h"
+#include "ptag.h"
 
 
 static const char* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
@@ -189,4 +190,21 @@ extern int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data
 	length += mio_printf (mio, "\n");
 
 	return length;
+}
+
+extern int writeCtagsPtagEntry (MIO * mio, const ptagDesc *desc,
+				const char *const fileName,
+				const char *const pattern,
+				const char *const parserName, void *data __unused__)
+{
+	return parserName
+
+#define OPT(X) ((X)?(X):"")
+		? mio_printf (mio, "%s%s%s%s\t%s\t%s\n",
+			      PSEUDO_TAG_PREFIX, desc->name, PSEUDO_TAG_SEPARATOR, parserName,
+			      OPT(fileName), OPT(pattern))
+		: mio_printf (mio, "%s%s\t%s\t/%s/\n",
+			      PSEUDO_TAG_PREFIX, desc->name,
+			      OPT(fileName), OPT(pattern));
+#undef OPT
 }

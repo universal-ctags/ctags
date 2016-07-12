@@ -161,30 +161,6 @@ static void rememberMaxLengths (const size_t nameLength, const size_t lineLength
 		TagFile.max.line = lineLength;
 }
 
-extern boolean writePseudoTag (const ptagDesc *desc,
-			       const char *const fileName,
-			       const char *const pattern,
-			       const char *const parserName)
-{
-	const int length = parserName
-
-#define OPT(X) ((X)?(X):"")
-	  ? mio_printf (TagFile.fp, "%s%s%s%s\t%s\t%s\n",
-		     PSEUDO_TAG_PREFIX, desc->name, PSEUDO_TAG_SEPARATOR, parserName,
-		     OPT(fileName), OPT(pattern))
-	  : mio_printf (TagFile.fp, "%s%s\t%s\t/%s/\n",
-		     PSEUDO_TAG_PREFIX, desc->name,
-		     OPT(fileName), OPT(pattern));
-#undef OPT
-
-	abort_if_ferror (TagFile.fp);
-
-	++TagFile.numTags.added;
-	rememberMaxLengths (strlen (desc->name), (size_t) length);
-
-	return TRUE;
-}
-
 static void addCommonPseudoTags (void)
 {
 	int i;
@@ -1069,13 +1045,18 @@ static void *writerData;
 static writeEntryFunc writeEntry;
 static preWriteEntryFunc preWriteEntry = NULL;
 static postWriteEntryFunc postWriteEntry = NULL;
+static writePtagEntryFunc writePtagEntry;
+
 extern void setTagWriter (writeEntryFunc func,
 			  preWriteEntryFunc preFunc,
-			  postWriteEntryFunc postFunc)
+			  postWriteEntryFunc postFunc,
+			  writePtagEntryFunc ptagFunc)
 {
 	writeEntry = func;
 	preWriteEntry = preFunc;
 	postWriteEntry = postFunc;
+	writePtagEntry = ptagFunc;
+
 }
 
 extern void setupWriter (void)
@@ -1120,6 +1101,25 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 	DebugStatement ( mio_flush (TagFile.fp); )
 
 	abort_if_ferror (TagFile.fp);
+}
+
+extern boolean writePseudoTag (const ptagDesc *desc,
+			       const char *const fileName,
+			       const char *const pattern,
+			       const char *const parserName)
+{
+	int length;
+
+	if (writePtagEntry == NULL)
+		return FALSE;
+
+	length = (* writePtagEntry) (TagFile.fp, desc, fileName, pattern, parserName, writerData);
+	abort_if_ferror (TagFile.fp);
+
+	++TagFile.numTags.added;
+	rememberMaxLengths (strlen (desc->name), (size_t) length);
+
+	return TRUE;
 }
 
 extern void corkTagFile(void)
