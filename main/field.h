@@ -54,6 +54,7 @@ typedef enum eFieldType { /* extension field content control */
 typedef const char* (* renderEscaped) (const tagEntryInfo *const tag,
 				       const char *value,
 				       vString * buffer);
+typedef boolean (* isValueAvailable) (const tagEntryInfo *const tag);
 
 #define FIELD_LETTER_NO_USE '\0'
 typedef struct sFieldSpec {
@@ -65,6 +66,7 @@ typedef struct sFieldSpec {
 	const char* description;
 	boolean enabled;
 	renderEscaped renderEscaped;
+	isValueAvailable isValueAvailable;
 
 	unsigned int ftype;	/* Given from the main part */
 } fieldSpec;
@@ -94,6 +96,7 @@ extern void printFields (int language);
 
 extern boolean isFieldRenderable (fieldType type);
 
+extern boolean doesFieldHaveValue (fieldType type, const struct sTagEntryInfo *tag);
 extern const char* renderFieldEscaped (fieldType type, const tagEntryInfo *tag, int index);
 
 extern void initFieldDescs (void);

@@ -110,7 +110,7 @@ extern boolean isDestinationStdout (void)
 {
 	boolean toStdout = FALSE;
 
-	if (Option.xref  ||  Option.filter  ||
+	if (Option.xref  ||  Option.filter  ||  Option.json  ||
 		(Option.tagFileName != NULL  &&  (strcmp (Option.tagFileName, "-") == 0
 						  || strcmp (Option.tagFileName, "/dev/stdout") == 0
 		)))

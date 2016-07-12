@@ -350,7 +350,11 @@ static optionDescription LongOptionDescription [] = {
  {1,"      The encoding to write the tag file in. Defaults to UTF-8 if --input-encoding"},
  {1,"      is specified, otherwise no conversion is performed."},
 #endif
- {0,"  --output-format=ctags|etags|xref"},
+ {0,"  --output-format=ctags|etags|xref"
+#ifdef HAVE_JANSSON
+  "|json"
+#endif
+ },
  {0,"      Specify the output format. [ctags]"},
  {0,"  --pattern-length-limit=N"},
  {0,"      Cutoff patterns of tag entries after N characters. Disable by setting to 0. [96]"},
@@ -463,6 +467,9 @@ static const char *const Features [] = {
 #endif
 #ifdef HAVE_LIBXML
 	"xpath",
+#endif
+#ifdef HAVE_JANSSON
+	"json",
 #endif
 	NULL
 };
@@ -729,6 +736,14 @@ static void setXrefMode (void)
 	Option.xref = TRUE;
 	setTagWriter (writeXrefEntry, NULL, NULL);
 }
+
+#ifdef HAVE_JANSSON
+static void setJsonMode (void)
+{
+	Option.json = TRUE;
+	setTagWriter (writeJsonEntry, beginJsonFile, NULL);
+}
+#endif
 
 /*
  *  Cooked argument parsing
@@ -1996,6 +2011,10 @@ static void processOutputFormat (const char *const option __unused__,
 		setEtagsMode ();
 	else if (strcmp (parameter, "xref") == 0)
 		setXrefMode ();
+#ifdef HAVE_JANSSON
+	else if (strcmp (parameter, "json") == 0)
+		setJsonMode ();
+#endif
 	else
 		error (FATAL, "unknown output format name supplied for \"%s=%s\"", option, parameter);
 }
