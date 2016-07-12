@@ -40,4 +40,4 @@ extern void truncateTagLine (char *const line, const char *const token,
 			     const boolean discardNewline);
 extern void abort_if_ferror(MIO *const fp);
 
-#endif 
+#endif
