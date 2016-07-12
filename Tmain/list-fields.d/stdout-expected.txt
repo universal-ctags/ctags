@@ -20,7 +20,7 @@ R	NONE	off	NONE	TRUE	Marker (R or D) representing whether tag is definition or r
 Z	scope	off	NONE	TRUE	Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
 E	extra	off	NONE	TRUE	Extra tag type information
 x	xpath	off	NONE	TRUE	xpath for the tag
-p	scopeKind	on	NONE	TRUE	Kind of scope as full name
+p	scopeKind	off	NONE	TRUE	Kind of scope as full name
 e	end	off	NONE	TRUE	end lines of various items
 -	properties	off	C	TRUE	properties (static, inline, mutable,...)
 -	properties	off	C++	TRUE	properties (static, inline, mutable,...)
