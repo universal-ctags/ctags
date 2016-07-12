@@ -149,6 +149,7 @@ static const keywordTable EiffelKeywordTable [] = {
 	{ "indexing",       KEYWORD_indexing   },
 	{ "infix",          KEYWORD_infix      },
 	{ "inherit",        KEYWORD_inherit    },
+	{ "insert",         KEYWORD_inherit    },
 	{ "inspect",        KEYWORD_inspect    },
 	{ "invariant",      KEYWORD_invariant  },
 	{ "is",             KEYWORD_is         },
