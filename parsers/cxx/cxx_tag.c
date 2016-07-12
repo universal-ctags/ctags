@@ -84,11 +84,6 @@ static const char * g_aCXXAccessStrings [] = {
 
 #define CXX_COMMON_FIELDS \
 	{ \
-		.name = "end", \
-		.description = "end lines of various constructs", \
-		.enabled = FALSE \
-	}, \
-	{ \
 		.name = "properties", \
 		.description = "properties (static, inline, mutable,...)", \
 		.enabled = FALSE \

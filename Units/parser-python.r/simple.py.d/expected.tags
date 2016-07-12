@@ -35,4 +35,4 @@ only	input.py	/^    def only(arg):$/;"	kind:member	line:48	language:Python	scope
 two.only	input.py	/^    def only(arg):$/;"	kind:member	line:48	language:Python	scope:class:two	access:public	signature:(arg)	extra:qualified	end:52
 three	input.py	/^C):$/;"	kind:class	line:54	language:Python	inherits:A, B, C	access:public	end:56
 foo	input.py	/^foo($/;"	kind:function	line:57	language:Python	access:public	signature:(x,y, z)	end:60
-input.py	input.py	60;"	kind:file	line:60	language:Python	extra:inputFileWithEndline
+input.py	input.py	1;"	kind:file	line:1	language:Python	extra:inputFile	end:60

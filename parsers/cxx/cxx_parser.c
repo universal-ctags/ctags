@@ -337,13 +337,11 @@ void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex)
 {
 	CXX_DEBUG_ASSERT(iCorkQueueIndex > CORK_NIL,"The cork queue index is not valid");
 
-	char buf[16];
+	tagEntryInfo * tag = getEntryInCorkQueue (iCorkQueueIndex);
 
-	if(!cxxTagFieldEnabled(CXXTagFieldEndLine))
-		return;
+	CXX_DEBUG_ASSERT(tag,"No tag entry in the cork queue");
 
-	sprintf(buf,"%ld",getInputLineNumber());
-	cxxTagSetCorkQueueField(iCorkQueueIndex,CXXTagFieldEndLine,buf);
+	tag->extensionFields.endLine = getInputLineNumber();
 }
 
 // Make sure that the token chain contains only the specified keyword and eventually
@@ -1286,9 +1284,6 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 	int role_for_macro_undef = CR_MACRO_UNDEF;
 	int role_for_header_system = CR_HEADER_SYSTEM;
 	int role_for_header_local = CR_HEADER_LOCAL;
-	int end_field_type = cxxParserCurrentLanguageIsCPP()?
-		cxxTagGetCPPFieldSpecifiers () [CXXTagFieldEndLine].ftype:
-		cxxTagGetCFieldSpecifiers ()   [CXXTagFieldEndLine].ftype;
 
 	Assert(passCount < 3);
 
@@ -1301,8 +1296,7 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 			role_for_macro_undef,
 			kind_for_header,
 			role_for_header_system,
-			role_for_header_local,
-			end_field_type
+			role_for_header_local
 		);
 
 	g_cxx.iChar = ' ';

@@ -83,6 +83,7 @@ struct sTagEntryInfo {
 #ifdef HAVE_LIBXML
 		const char* xpath;
 #endif
+		unsigned long endLine;
 	} extensionFields;  /* list of extension fields*/
 
 #define PRE_ALLOCATED_PARSER_FIELDS 5

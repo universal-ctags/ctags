@@ -168,6 +168,16 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 	length += renderExtensionFieldMaybe (FIELD_EXTRA, tag, sep, mio);
 	length += renderExtensionFieldMaybe (FIELD_XPATH, tag, sep, mio);
 
+	if (isFieldEnabled(FIELD_END))
+	{
+		const char *value = escapeName (tag, FIELD_END);
+		if (value)
+			length += mio_printf (mio, "%s\t%s:%s", sep,
+					      getFieldName (FIELD_END),
+					      escapeName (tag, FIELD_END));
+
+	}
+
 	return length;
 }
 
