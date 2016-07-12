@@ -101,7 +101,8 @@ extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data 
 		"_type", "tag",
 		"name", tag->name,
 		"path", tag->sourceFileName,
-		"pattern", tag->pattern
+		/* --extra=f option can generates a tag with NULL pattern. */
+		"pattern", tag->pattern? tag->pattern: ""
 	);
 
 	if (includeExtensionFlags ())
