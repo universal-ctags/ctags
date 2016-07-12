@@ -1,7 +1,13 @@
 # json
-{"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "kind": "f", "typeref": "int"}
+{"_type": "tag", "name": "Foo", "path": "input.py", "pattern": "/^class Foo:$/", "kind": "class"}
+{"_type": "tag", "name": "doIt", "path": "input.py", "pattern": "/^    def doIt():$/", "kind": "member", "scope": "Foo", "scopeKind": "class"}
+{"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "typeref": "int", "kind": "function"}
 # json --fields=*
-{"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "kind": "function", "language": "C", "line": 4, "signature": "(void)", "typeref": "int"}
+{"_type": "tag", "name": "Foo", "path": "input.py", "pattern": "/^class Foo:$/", "access": "public", "inherits": "", "language": "Python", "line": 1, "kind": "class"}
+{"_type": "tag", "name": "doIt", "path": "input.py", "pattern": "/^    def doIt():$/", "access": "public", "language": "Python", "line": 2, "signature": "()", "kind": "member", "scope": "Foo", "scopeKind": "class"}
+{"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "language": "C", "line": 4, "signature": "(void)", "typeref": "int", "kind": "function"}
 # json --fields=* --extra=+r
-{"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "kind": "function", "language": "C", "line": 4, "signature": "(void)", "typeref": "int"}
-{"_type": "tag", "name": "stdio.h", "path": "input.c", "pattern": "/^#include <stdio.h>/", "kind": "header", "language": "C", "line": 1, "role": "system", "extra": "reference"}
+{"_type": "tag", "name": "Foo", "path": "input.py", "pattern": "/^class Foo:$/", "access": "public", "inherits": "", "language": "Python", "line": 1, "kind": "class"}
+{"_type": "tag", "name": "doIt", "path": "input.py", "pattern": "/^    def doIt():$/", "access": "public", "language": "Python", "line": 2, "signature": "()", "kind": "member", "scope": "Foo", "scopeKind": "class"}
+{"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "language": "C", "line": 4, "signature": "(void)", "typeref": "int", "kind": "function"}
+{"_type": "tag", "name": "stdio.h", "path": "input.c", "pattern": "/^#include <stdio.h>/", "language": "C", "line": 1, "kind": "header", "role": "system", "extra": "reference"}

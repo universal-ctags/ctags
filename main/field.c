@@ -137,8 +137,10 @@ static fieldSpec fieldSpecsExuberant [] = {
 			   "Type and name of a variable or typedef",
 			   renderFieldTyperef, isTyperefFieldAvailable),
 	DEFINE_FIELD_SPEC ('z', "kind",           FALSE,
-			   "Include the \"kind:\" key in kind field (use k or K)",
-			   NULL),
+			   "Include the \"kind:\" key in kind field (use k or K) in tags output, kind full name in xref output",
+			   /* Following renderer is for handling --_xformat=%{kind};
+			      and is not for tags output. */
+			   renderFieldKindName),
 };
 
 static fieldSpec fieldSpecsUniversal [] = {

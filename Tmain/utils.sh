@@ -27,5 +27,5 @@ run_with_format()
     echo '#' $*
     local format=$1
     shift
-    ${CTAGS} --quiet --options=NONE --output-format=$format "$@" -o - input.c
+    ${CTAGS} --quiet --options=NONE --output-format=$format "$@" -o - input.*
 }

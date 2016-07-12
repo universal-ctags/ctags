@@ -34,20 +34,22 @@ static json_t* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
 
 static void renderExtensionFieldMaybe (int xftype, const tagEntryInfo *const tag, json_t *response)
 {
-	if (isFieldEnabled (xftype) && doesFieldHaveValue (xftype, tag))
+	const char *fname = getFieldName (xftype);
+
+	if (fname && isFieldRenderable (xftype) && isFieldEnabled (xftype) && doesFieldHaveValue (xftype, tag))
 	{
 		switch (xftype)
 		{
 		case FIELD_LINE_NUMBER:
-			json_object_set_new (response, getFieldName (xftype),
+			json_object_set_new (response, fname,
 					     json_integer (tag->lineNumber));
 			break;
 		case FIELD_FILE_SCOPE:
-			json_object_set_new (response, getFieldName (xftype),
+			json_object_set_new (response, fname,
 					     json_boolean(1));
 			break;
 		default:
-			json_object_set_new (response, getFieldName (xftype),
+			json_object_set_new (response, fname,
 					     escapeFieldValue (tag, xftype));
 		}
 	}
@@ -70,39 +72,26 @@ static void addParserFields (json_t *response, const tagEntryInfo *const tag)
 
 static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 {
-	if (tag->kind->name != NULL && (isFieldEnabled (FIELD_KIND_LONG)  ||
-		 (isFieldEnabled (FIELD_KIND)  && tag->kind == '\0')))
-		json_object_set_new (response, getFieldName (FIELD_KIND_KEY), json_string (tag->kind->name));
-	else if (tag->kind != '\0'  && (isFieldEnabled (FIELD_KIND) ||
-			(isFieldEnabled (FIELD_KIND_LONG) &&  tag->kind->name == NULL)))
-	{
-		char str[2] = {tag->kind->letter, '\0'};
-		json_object_set_new (response, getFieldName (FIELD_KIND_KEY), json_string (str));
-	}
+	int k;
 
+	/* FIELD_KIND has no name; getFieldName (FIELD_KIND) returns NULL.
+	   FIELD_KIND_LONG does, too.
+	   That cannot be changed to keep the compatibility of tags file format.
+	   Use FIELD_KIND_KEY instead */
+	if (isFieldEnabled (FIELD_KIND) || isFieldEnabled (FIELD_KIND_LONG))
+		enableField (FIELD_KIND_KEY, TRUE, FALSE);
+
+	/* FIELD_SCOPE has no name; getFieldName (FIELD_KIND_KEY) returns NULL.
+	   That cannot be changed to keep the compatibility of tags file format.
+	   Use FIELD_SCOPE_KEY and FIELD_SCOPE_KIND_LONG instead. */
 	if (isFieldEnabled (FIELD_SCOPE))
 	{
-		json_t *k = escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG);
-		json_object_set_new (response, getFieldName (FIELD_SCOPE_KEY), k);
+		enableField (FIELD_SCOPE_KEY, TRUE, FALSE);
+		enableField (FIELD_SCOPE_KIND_LONG, TRUE, FALSE);
 	}
 
-	int field_keys [] = {
-		FIELD_ACCESS,
-		FIELD_INHERITANCE,
-		FIELD_LANGUAGE,
-		FIELD_IMPLEMENTATION,
-		FIELD_LINE_NUMBER,
-		FIELD_SIGNATURE,
-		FIELD_SCOPE,
-		FIELD_TYPE_REF,
-		FIELD_ROLE,
-		FIELD_EXTRA,
-		FIELD_XPATH,
-		FIELD_UNKNOWN,
-	};
-	int *k;
-	for (k = field_keys; *k != FIELD_UNKNOWN; k++)
-		renderExtensionFieldMaybe (*k, tag, response);
+	for (k = FIELD_EXTENSION_START; k <= FIELD_BUILTIN_LAST; k++)
+		renderExtensionFieldMaybe (k, tag, response);
 }
 
 extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__)
