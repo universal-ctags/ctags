@@ -1046,17 +1046,24 @@ static writeEntryFunc writeEntry;
 static preWriteEntryFunc preWriteEntry = NULL;
 static postWriteEntryFunc postWriteEntry = NULL;
 static writePtagEntryFunc writePtagEntry;
+static boolean useStdoutByDefault;
 
 extern void setTagWriter (writeEntryFunc func,
 			  preWriteEntryFunc preFunc,
 			  postWriteEntryFunc postFunc,
-			  writePtagEntryFunc ptagFunc)
+			  writePtagEntryFunc ptagFunc,
+			  boolean useStdout)
 {
 	writeEntry = func;
 	preWriteEntry = preFunc;
 	postWriteEntry = postFunc;
 	writePtagEntry = ptagFunc;
+	useStdoutByDefault = useStdout;
+}
 
+extern boolean outpuFormatUsedStdoutByDefault (void)
+{
+	return useStdoutByDefault;
 }
 
 extern void setupWriter (void)

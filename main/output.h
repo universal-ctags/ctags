@@ -27,8 +27,10 @@ typedef void (* postWriteEntryFunc)  (MIO * mio, const char* filename, void *dat
 extern void setTagWriter (writeEntryFunc func,
 			  preWriteEntryFunc preFunc,
 			  postWriteEntryFunc postFunc,
-			  writePtagEntryFunc ptagFunc);
+			  writePtagEntryFunc ptagFunc,
+			  boolean useStdout);
 
+extern boolean outpuFormatUsedStdoutByDefault (void);
 
 extern int writeEtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data);
 extern void *beginEtagsFile (MIO * mio);
