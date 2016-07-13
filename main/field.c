@@ -143,7 +143,7 @@ static fieldSpec fieldSpecsUniversal [] = {
 	DEFINE_FIELD_SPEC ('x', "xpath",   FALSE,
 			   "xpath for the tag",
 			   renderFieldXpath),
-	DEFINE_FIELD_SPEC ('p', "scopeKind", TRUE,
+	DEFINE_FIELD_SPEC ('p', "scopeKind", FALSE,
 			   "Kind of scope as full name",
 			   renderFieldScopeKindName),
 	DEFINE_FIELD_SPEC ('e', "end", FALSE,
