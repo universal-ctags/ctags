@@ -254,6 +254,10 @@ Patches are always there. So it is easy to evaluate the value:)
 
 		d2bdf505abb7569deae2b50305ea1edce6208557
 
+   <55> TTCN-3 support
+
+	* contributed by the original author
+
    <51> Ada support
 
 	* Ada support is now available in universal-ctags tree::
