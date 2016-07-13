@@ -222,6 +222,8 @@
     <ClInclude Include="..\main\flags.h" />
     <ClInclude Include="..\main\fmt.h" />
     <ClInclude Include="..\main\general.h" />
+    <ClInclude Include="..\main\gcc-attr.h" />
+    <ClInclude Include="..\main\mybool.h" />
     <ClInclude Include="..\gnu_regex\regex.h" />
     <ClInclude Include="..\main\htable.h" />
     <ClInclude Include="..\main\keyword.h" />
