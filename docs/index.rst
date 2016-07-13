@@ -35,6 +35,7 @@ Proofreading and pull-requests are welcome!
 	news.rst
 	contributions.rst
 	parsers.rst
+	output-format.rst
 	guessing.rst
 	building.rst
 	testing.rst

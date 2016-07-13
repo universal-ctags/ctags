@@ -110,7 +110,7 @@ extern boolean isDestinationStdout (void)
 {
 	boolean toStdout = FALSE;
 
-	if (Option.xref  ||  Option.filter  ||
+	if (outpuFormatUsedStdoutByDefault() ||  Option.filter  ||
 		(Option.tagFileName != NULL  &&  (strcmp (Option.tagFileName, "-") == 0
 						  || strcmp (Option.tagFileName, "/dev/stdout") == 0
 		)))
@@ -548,7 +548,7 @@ extern int main (int __unused__ argc, char **argv)
 
 	setErrorPrinter (stderrDefaultErrorPrinter, NULL);
 	setMainLoop (batchMakeTags, NULL);
-	setTagWriter (writeCtagsEntry, NULL, NULL);
+	setTagWriter (writeCtagsEntry, NULL, NULL, writeCtagsPtagEntry, FALSE);
 
 	setCurrentDirectory ();
 	setExecutableName (*argv++);

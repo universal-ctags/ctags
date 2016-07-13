@@ -1062,11 +1062,10 @@ static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 
 	if (hasPseudoTagPrefix (entry->name))
 	{
-		if  ((! isXtagEnabled (XTAG_PSEUDO_TAGS))
-		     || (Option.xref)
-		     || (Option.etags))
+		if  (isXtagEnabled (XTAG_PSEUDO_TAGS))
+			return makePseudoTagEntryFromTagEntry (entry);
+		else
 			return FALSE;
-		return makePseudoTagEntryFromTagEntry (entry);
 	}
 
 	memset(&filePosition, 0, sizeof(filePosition));

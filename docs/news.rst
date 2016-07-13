@@ -448,6 +448,21 @@ For specifying only one pseudo tag, specify it without sign:
 
 	--pseudo-tags=ptag
 
+Json output
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Experimetal json output is added. ``--output-format`` option can be
+used to enable it.
+
+.. code-block:: console
+
+   $ ./ctags --output-format=json --fields=-s /tmp/foo.py
+   {"_type": "tag", "name": "Foo", "path": "/tmp/foo.py", "pattern": "/^class Foo:$/", "kind": "class"}
+   {"_type": "tag", "name": "doIt", "path": "/tmp/foo.py", "pattern": "/^    def doIt():$/", "kind": "member"}
+
+
+See :ref:`Json output <output-json>` for more details.
+
 
 Changes in tags file format
 ---------------------------------------------------------------------

@@ -21,3 +21,11 @@ exit_if_no_coproc()
 {
     is_feature_available $1 coproc
 }
+
+run_with_format()
+{
+    echo '#' $*
+    local format=$1
+    shift
+    ${CTAGS} --quiet --options=NONE --output-format=$format "$@" -o - input.*
+}

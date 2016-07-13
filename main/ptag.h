@@ -19,6 +19,10 @@
 
 typedef enum ePtagType { /* pseudo tag content control */
 	PTAG_UNKNOWN = -1,
+	/* Only --output-format=json use this ptag.
+	   Applications of the output may expect this comes first in the output. */
+	PTAG_JSON_OUTPUT_VERSION,
+
 	PTAG_FILE_FORMAT,
 	PTAG_FILE_SORTED,
 	PTAG_PROGRAM_AUTHOR,
@@ -38,7 +42,7 @@ typedef struct sPtagDesc {
 	const char* name;
 	const char* description;  /* displayed in --list-pseudo-tags output */
 	boolean (* makeTag) (struct sPtagDesc *, void *);
-	boolean common;
+	boolean commonInParsers;
 } ptagDesc;
 
 struct ptagXcmdData {
@@ -52,7 +56,7 @@ extern ptagDesc* getPtagDesc (ptagType type);
 extern ptagType  getPtagTypeForName (const char *name);
 extern void printPtag (ptagType type);
 extern boolean isPtagEnabled (ptagType type);
-extern boolean isPtagCommon  (ptagType type);
+extern boolean isPtagCommonInParsers  (ptagType type);
 extern boolean enablePtag (ptagType type, boolean state);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

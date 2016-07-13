@@ -303,10 +303,10 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 extern void installTagXpathTable (const langType language);
 extern void addTagXpath (const langType language, tagXpathTable *xpathTable);
 
-extern void makeKindSeparatorsPseudoTags (const langType language,
-					  const ptagDesc *pdesc);
-extern void makeKindDescriptionsPseudoTags (const langType language,
-					    const ptagDesc *pdesc);
+extern boolean makeKindSeparatorsPseudoTags (const langType language,
+					     const ptagDesc *pdesc);
+extern boolean makeKindDescriptionsPseudoTags (const langType language,
+					       const ptagDesc *pdesc);
 
 extern void anonReset (void);
 extern void anonGenerate (vString *buffer, const char *prefix, int kind);

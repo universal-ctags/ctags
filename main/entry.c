@@ -161,35 +161,13 @@ static void rememberMaxLengths (const size_t nameLength, const size_t lineLength
 		TagFile.max.line = lineLength;
 }
 
-extern void writePseudoTag (const ptagDesc *desc,
-			    const char *const fileName,
-			    const char *const pattern,
-			    const char *const parserName)
-{
-	const int length = parserName
-
-#define OPT(X) ((X)?(X):"")
-	  ? mio_printf (TagFile.fp, "%s%s%s%s\t%s\t%s\n",
-		     PSEUDO_TAG_PREFIX, desc->name, PSEUDO_TAG_SEPARATOR, parserName,
-		     OPT(fileName), OPT(pattern))
-	  : mio_printf (TagFile.fp, "%s%s\t%s\t/%s/\n",
-		     PSEUDO_TAG_PREFIX, desc->name,
-		     OPT(fileName), OPT(pattern));
-#undef OPT
-
-	abort_if_ferror (TagFile.fp);
-
-	++TagFile.numTags.added;
-	rememberMaxLengths (strlen (desc->name), (size_t) length);
-}
-
 static void addCommonPseudoTags (void)
 {
 	int i;
 
 	for (i = 0; i < PTAG_COUNT; i++)
 	{
-		if (isPtagCommon (i))
+		if (isPtagCommonInParsers (i))
 			makePtagIfEnabled (i, NULL);
 	}
 }
@@ -1067,13 +1045,25 @@ static void *writerData;
 static writeEntryFunc writeEntry;
 static preWriteEntryFunc preWriteEntry = NULL;
 static postWriteEntryFunc postWriteEntry = NULL;
+static writePtagEntryFunc writePtagEntry;
+static boolean useStdoutByDefault;
+
 extern void setTagWriter (writeEntryFunc func,
 			  preWriteEntryFunc preFunc,
-			  postWriteEntryFunc postFunc)
+			  postWriteEntryFunc postFunc,
+			  writePtagEntryFunc ptagFunc,
+			  boolean useStdout)
 {
 	writeEntry = func;
 	preWriteEntry = preFunc;
 	postWriteEntry = postFunc;
+	writePtagEntry = ptagFunc;
+	useStdoutByDefault = useStdout;
+}
+
+extern boolean outpuFormatUsedStdoutByDefault (void)
+{
+	return useStdoutByDefault;
 }
 
 extern void setupWriter (void)
@@ -1090,6 +1080,12 @@ extern void teardownWriter (const char *filename)
 		postWriteEntry (TagFile.fp, filename, writerData);
 }
 
+static void buildFqTagCache (const tagEntryInfo *const tag)
+{
+	renderFieldEscaped (FIELD_SCOPE_KIND_LONG, tag, NO_PARSER_FIELD);
+	renderFieldEscaped (FIELD_SCOPE, tag, NO_PARSER_FIELD);
+}
+
 static void writeTagEntry (const tagEntryInfo *const tag)
 {
 	int length = 0;
@@ -1100,6 +1096,11 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 	DebugStatement ( debugEntry (tag); )
 	Assert (writeEntry);
 
+	if (includeExtensionFlags ()
+	    && isXtagEnabled (XTAG_QUALIFIED_TAGS)
+	    && doesInputLanguageRequestAutomaticFQTag ())
+		buildFqTagCache (tag);
+
 	length = (* writeEntry) (TagFile.fp, tag, writerData);
 
 	++TagFile.numTags.added;
@@ -1107,6 +1108,25 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 	DebugStatement ( mio_flush (TagFile.fp); )
 
 	abort_if_ferror (TagFile.fp);
+}
+
+extern boolean writePseudoTag (const ptagDesc *desc,
+			       const char *const fileName,
+			       const char *const pattern,
+			       const char *const parserName)
+{
+	int length;
+
+	if (writePtagEntry == NULL)
+		return FALSE;
+
+	length = (* writePtagEntry) (TagFile.fp, desc, fileName, pattern, parserName, writerData);
+	abort_if_ferror (TagFile.fp);
+
+	++TagFile.numTags.added;
+	rememberMaxLengths (strlen (desc->name), (size_t) length);
+
+	return TRUE;
 }
 
 extern void corkTagFile(void)
