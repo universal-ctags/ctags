@@ -212,10 +212,10 @@ extern ptagType getPtagTypeForName (const char *name)
 	return PTAG_UNKNOWN;
 }
 
-extern boolean isPtagCommon  (ptagType type)
+extern boolean isPtagCommonInParsers  (ptagType type)
 {
 	ptagDesc* pdesc = getPtagDesc (type);
-	return pdesc->common;
+	return pdesc->commonInParsers;
 }
 
 extern void printPtag (ptagType type)
