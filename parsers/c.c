@@ -66,7 +66,6 @@ typedef enum eException {
 /*  Used to specify type of keyword.
  */
 typedef enum eKeywordId {
-	KEYWORD_NONE = -1,
 	KEYWORD_ALIAS, KEYWORD_ATTRIBUTE, KEYWORD_ABSTRACT,
 	KEYWORD_BOOLEAN, KEYWORD_BYTE, KEYWORD_BAD_STATE, KEYWORD_BAD_TRANS,
 	KEYWORD_BIND, KEYWORD_BIND_VAR, KEYWORD_BIT,
@@ -2213,7 +2212,7 @@ static void checkIsClassEnum (statementInfo *const st, const declType decl)
 
 static void processToken (tokenInfo *const token, statementInfo *const st)
 {
-	switch (token->keyword)        /* is it a reserved word? */
+	switch ((int)token->keyword)        /* is it a reserved word? */
 	{
 		default: break;
 

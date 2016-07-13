@@ -256,6 +256,8 @@
     <ClInclude Include="..\parsers\cxx\cxx_token_chain.h" />
     <ClInclude Include="..\main\promise.h" />
     <ClInclude Include="..\main\dependency.h" />
+    <ClInclude Include="..\main\gcc-attr.h" />
+    <ClInclude Include="..\main\mybool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

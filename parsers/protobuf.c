@@ -83,7 +83,6 @@ static kindOption ProtobufKinds [] = {
 };
 
 typedef enum eKeywordId {
-	KEYWORD_NONE = -1,
 	KEYWORD_OPTION,
 	KEYWORD_PACKAGE,
 	KEYWORD_MESSAGE,

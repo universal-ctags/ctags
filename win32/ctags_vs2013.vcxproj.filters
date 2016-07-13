@@ -501,5 +501,11 @@
    <ClInclude Include="..\main\depedency.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+   <ClInclude Include="..\main\gcc-attr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\main\mybool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

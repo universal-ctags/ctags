@@ -48,7 +48,6 @@ typedef enum eException { ExceptionNone, ExceptionEOF } exception_t;
  * Used to specify type of keyword.
  */
 typedef enum eKeywordId {
-	KEYWORD_NONE = -1,
 	KEYWORD_part,
 	KEYWORD_chapter,
 	KEYWORD_section,
