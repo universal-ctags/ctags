@@ -209,6 +209,7 @@
     <ClCompile Include="..\main\promise.c" />
     <ClCompile Include="..\main\dependency.c" />
     <ClCompile Include="..\optlib\pod.c" />
+    <ClCompile Include="..\parsers\protobuf.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\fnmatch\fnmatch.h" />

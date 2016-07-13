@@ -363,6 +363,9 @@
     <ClCompile Include="..\optlib\pod.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\protobuf.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
   </ItemGroup>
   </ItemGroup>
   <ItemGroup>

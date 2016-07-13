@@ -154,6 +154,7 @@ PARSER_SRCS =				\
 	parsers/perl.c			\
 	parsers/perl6.c			\
 	parsers/php.c			\
+	parsers/protobuf.c		\
 	parsers/python.c		\
 	parsers/r.c			\
 	parsers/rexx.c			\

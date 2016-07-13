@@ -234,6 +234,10 @@ Patches are always there. So it is easy to evaluate the value:)
 
 	* contributed by the original author
 
+   <74> protobuf parser
+
+	* Merged after getting approval from the original author
+
    <67> Objective C language parser
 
 	* This is the implementation we have in universal-ctags tree.

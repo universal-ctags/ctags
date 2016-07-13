@@ -75,6 +75,7 @@
 	Perl6Parser, \
 	PhpParser, \
 	PodParser, \
+	ProtobufParser, \
 	PythonParser, \
 	RParser, \
 	RexxParser, \
