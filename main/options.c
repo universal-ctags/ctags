@@ -740,6 +740,7 @@ static void setXrefMode (void)
 #ifdef HAVE_JANSSON
 static void setJsonMode (void)
 {
+	enablePtag (PTAG_JSON_OUTPUT_VERSION, TRUE);
 	setTagWriter (writeJsonEntry, NULL, NULL, writeJsonPtagEntry, TRUE);
 }
 #endif

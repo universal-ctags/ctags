@@ -19,6 +19,10 @@
 
 typedef enum ePtagType { /* pseudo tag content control */
 	PTAG_UNKNOWN = -1,
+	/* Only --output-format=json use this ptag.
+	   Applications of the output may expect this comes first in the output. */
+	PTAG_JSON_OUTPUT_VERSION,
+
 	PTAG_FILE_FORMAT,
 	PTAG_FILE_SORTED,
 	PTAG_PROGRAM_AUTHOR,

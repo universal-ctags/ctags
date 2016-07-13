@@ -7,6 +7,7 @@
 {"_type": "tag", "name": "doIt", "path": "input.py", "pattern": "/^    def doIt():$/", "access": "public", "language": "Python", "line": 2, "signature": "()", "kind": "member", "scope": "Foo", "scopeKind": "class"}
 {"_type": "tag", "name": "main", "path": "input.c", "pattern": "/^main(void)$/", "language": "C", "line": 4, "signature": "(void)", "typeref": "int", "kind": "function"}
 # json --fields=* --extra=*
+{"_type": "ptag", "name": "JSON_OUTPUT_VERSION", "path": "0.0", "pattern": "in development"}
 {"_type": "ptag", "name": "TAG_FILE_FORMAT", "path": "2", "pattern": "extended format; --format=1 will not append ;\" to lines"}
 {"_type": "ptag", "name": "TAG_FILE_SORTED", "path": "1", "pattern": "0=unsorted, 1=sorted, 2=foldcase"}
 {"_type": "ptag", "name": "TAG_PROGRAM_AUTHOR", "path": "Universal Ctags Team", "pattern": ""}

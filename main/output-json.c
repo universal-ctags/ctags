@@ -155,6 +155,14 @@ extern int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
 #undef OPT
 }
 
+extern boolean ptagMakeJsonOutputVersion (ptagDesc *desc, void *data __unused__)
+{
+	return writePseudoTag (desc,
+			       "0.0",
+			       "in development",
+			       NULL);
+}
+
 #else /* HAVE_JANSSON */
 extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__)
 {
@@ -167,4 +175,10 @@ extern int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
 {
 	return 0;
 }
+
+extern boolean ptagMakeJsonOutputVersion (ptagDesc *desc, void *data __unused__)
+{
+	return FALSE;
+}
+
 #endif

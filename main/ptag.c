@@ -18,6 +18,7 @@
 #include "options.h"
 #include "parse.h"
 #include "ptag.h"
+#include "output.h"
 #include <string.h>
 
 
@@ -114,6 +115,13 @@ static boolean ptagMakeKindDescriptions (ptagDesc *desc, void *data)
 }
 
 static ptagDesc ptagDescs [] = {
+	{
+	  /* The prefix is not "TAG_".
+	     Only --output-format=json use this ptag. */
+	  FALSE, "JSON_OUTPUT_VERSION",
+	  "the version of json output stream format",
+	  ptagMakeJsonOutputVersion,
+	  TRUE },
 	{ TRUE, "TAG_FILE_FORMAT",
 	  "the version of tags file format",
 	  ptagMakeFormat,
@@ -152,7 +160,6 @@ static ptagDesc ptagDescs [] = {
 	  "the letters, names and descriptions of kinds in a parser",
 	  ptagMakeKindDescriptions,
 	  FALSE },
-
 };
 
 extern boolean makePtagIfEnabled (ptagType type, void *data)

@@ -57,4 +57,6 @@ extern void truncateTagLine (char *const line, const char *const token,
 			     const boolean discardNewline);
 extern void abort_if_ferror(MIO *const fp);
 
+extern boolean ptagMakeJsonOutputVersion (ptagDesc *desc, void *data __unused__);
+
 #endif 
