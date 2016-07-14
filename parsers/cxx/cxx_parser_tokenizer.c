@@ -16,7 +16,7 @@
 
 #include "parse.h"
 #include "vstring.h"
-#include "get.h"
+#include "lcpp.h"
 #include "debug.h"
 #include "keyword.h"
 #include "read.h"
