@@ -13,6 +13,7 @@
 #define CTAGS_MAIN_PTAG_H
 
 #include "general.h"
+#include "types.h"
 
 #define PSEUDO_TAG_PREFIX       "!_"
 #define PSEUDO_TAG_SEPARATOR    "!"
@@ -37,13 +38,13 @@ typedef enum ePtagType { /* pseudo tag content control */
 	PTAG_COUNT
 } ptagType;
 
-typedef struct sPtagDesc {
+struct sPtagDesc {
 	boolean enabled;
 	const char* name;
 	const char* description;  /* displayed in --list-pseudo-tags output */
-	boolean (* makeTag) (struct sPtagDesc *, void *);
+	boolean (* makeTag) (ptagDesc *, void *);
 	boolean commonInParsers;
-} ptagDesc;
+};
 
 struct ptagXcmdData {
 	const char *fileName;
