@@ -1,0 +1,28 @@
+gen-input.sh generates a header file in which C++ keywords are used as C identifiers.
+gen-expected-tags.sh generates an incomplete expected.tags.
+
+Copyed from #930:
+
+    I found this case in linux kernel.
+
+    Consider a C language header having .h suffix.
+    In C language private is not a keyword.
+    New Cxx parser doesn't record a variable named private because
+    the parser recognized it as C++ keyword.``
+    Old Cxx parser
+
+    [yamato@x201]/tmp% cat foo.h
+    extern int private;
+    static inline int f(void)
+    {
+      return private;
+    }
+    typedef int int32;
+
+
+    [yamato@x201]/tmp% u-ctags -o - /tmp/foo.h 
+    # nothing is captured.
+
+    [yamato@x201]/tmp% u-ctags --languages=+OldC++ --language-force=OldC++ -o - /tmp/foo.h
+    f   /tmp/foo.h  /^static inline int f(void)$/;" f
+    int32   /tmp/foo.h  /^typedef int int32;$/;"    t

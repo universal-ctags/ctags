@@ -1,0 +1,356 @@
+NotKeyword	input.h	/^struct NotKeyword {int x;} v0;$/;"	s
+x	input.h	/^struct NotKeyword {int x;} v0;$/;"	m	struct:NotKeyword	typeref:typename:int
+v0	input.h	/^struct NotKeyword {int x;} v0;$/;"	v	typeref:struct:NotKeyword
+alignas	input.h	/^struct alignas {int x;} v1;$/;"	s
+x	input.h	/^struct alignas {int x;} v1;$/;"	m	struct:alignas	typeref:typename:int
+v1	input.h	/^struct alignas {int x;} v1;$/;"	v	typeref:struct:alignas
+alignof	input.h	/^struct alignof {int x;} v2;$/;"	s
+x	input.h	/^struct alignof {int x;} v2;$/;"	m	struct:alignof	typeref:typename:int
+v2	input.h	/^struct alignof {int x;} v2;$/;"	v	typeref:struct:alignof
+__anon9f26d24b0108	input.h	/^struct bool {int x;} v3;$/;"	s
+x	input.h	/^struct bool {int x;} v3;$/;"	m	struct:__anon9f26d24b0108	typeref:typename:int
+v3	input.h	/^struct bool {int x;} v3;$/;"	v	typeref:struct:__anon9f26d24b0108
+catch	input.h	/^struct catch {int x;} v4;$/;"	s
+x	input.h	/^struct catch {int x;} v4;$/;"	m	struct:catch	typeref:typename:int
+v4	input.h	/^struct catch {int x;} v4;$/;"	v	typeref:struct:catch
+char16_t	input.h	/^struct char16_t {int x;} v5;$/;"	s
+x	input.h	/^struct char16_t {int x;} v5;$/;"	m	struct:char16_t	typeref:typename:int
+v5	input.h	/^struct char16_t {int x;} v5;$/;"	v	typeref:struct:char16_t
+char32_t	input.h	/^struct char32_t {int x;} v6;$/;"	s
+x	input.h	/^struct char32_t {int x;} v6;$/;"	m	struct:char32_t	typeref:typename:int
+v6	input.h	/^struct char32_t {int x;} v6;$/;"	v	typeref:struct:char32_t
+class	input.h	/^struct class {int x;} v7;$/;"	s
+x	input.h	/^struct class {int x;} v7;$/;"	m	struct:class	typeref:typename:int
+v7	input.h	/^struct class {int x;} v7;$/;"	v	typeref:struct:class
+concept	input.h	/^struct concept {int x;} v8;$/;"	s
+x	input.h	/^struct concept {int x;} v8;$/;"	m	struct:concept	typeref:typename:int
+v8	input.h	/^struct concept {int x;} v8;$/;"	v	typeref:struct:concept
+constexpr	input.h	/^struct constexpr {int x;} v9;$/;"	s
+x	input.h	/^struct constexpr {int x;} v9;$/;"	m	struct:constexpr	typeref:typename:int
+v9	input.h	/^struct constexpr {int x;} v9;$/;"	v	typeref:struct:constexpr
+const_cast	input.h	/^struct const_cast {int x;} v10;$/;"	s
+x	input.h	/^struct const_cast {int x;} v10;$/;"	m	struct:const_cast	typeref:typename:int
+v10	input.h	/^struct const_cast {int x;} v10;$/;"	v	typeref:struct:const_cast
+decltype	input.h	/^struct decltype {int x;} v11;$/;"	s
+x	input.h	/^struct decltype {int x;} v11;$/;"	m	struct:decltype	typeref:typename:int
+v11	input.h	/^struct decltype {int x;} v11;$/;"	v	typeref:struct:decltype
+delete	input.h	/^struct delete {int x;} v12;$/;"	s
+x	input.h	/^struct delete {int x;} v12;$/;"	m	struct:delete	typeref:typename:int
+v12	input.h	/^struct delete {int x;} v12;$/;"	v	typeref:struct:delete
+dynamic_cast	input.h	/^struct dynamic_cast {int x;} v13;$/;"	s
+x	input.h	/^struct dynamic_cast {int x;} v13;$/;"	m	struct:dynamic_cast	typeref:typename:int
+v13	input.h	/^struct dynamic_cast {int x;} v13;$/;"	v	typeref:struct:dynamic_cast
+explicit	input.h	/^struct explicit {int x;} v14;$/;"	s
+x	input.h	/^struct explicit {int x;} v14;$/;"	m	struct:explicit	typeref:typename:int
+v14	input.h	/^struct explicit {int x;} v14;$/;"	v	typeref:struct:explicit
+export	input.h	/^struct export {int x;} v15;$/;"	s
+x	input.h	/^struct export {int x;} v15;$/;"	m	struct:export	typeref:typename:int
+v15	input.h	/^struct export {int x;} v15;$/;"	v	typeref:struct:export
+final	input.h	/^struct final {int x;} v16;$/;"	s
+x	input.h	/^struct final {int x;} v16;$/;"	m	struct:final	typeref:typename:int
+v16	input.h	/^struct final {int x;} v16;$/;"	v	typeref:struct:final
+friend	input.h	/^struct friend {int x;} v17;$/;"	s
+x	input.h	/^struct friend {int x;} v17;$/;"	m	struct:friend	typeref:typename:int
+v17	input.h	/^struct friend {int x;} v17;$/;"	v	typeref:struct:friend
+mutable	input.h	/^struct mutable {int x;} v18;$/;"	s
+x	input.h	/^struct mutable {int x;} v18;$/;"	m	struct:mutable	typeref:typename:int
+v18	input.h	/^struct mutable {int x;} v18;$/;"	v	typeref:struct:mutable
+namespace	input.h	/^struct namespace {int x;} v19;$/;"	s
+x	input.h	/^struct namespace {int x;} v19;$/;"	m	struct:namespace	typeref:typename:int
+v19	input.h	/^struct namespace {int x;} v19;$/;"	v	typeref:struct:namespace
+new	input.h	/^struct new {int x;} v20;$/;"	s
+x	input.h	/^struct new {int x;} v20;$/;"	m	struct:new	typeref:typename:int
+v20	input.h	/^struct new {int x;} v20;$/;"	v	typeref:struct:new
+noexcept	input.h	/^struct noexcept {int x;} v21;$/;"	s
+x	input.h	/^struct noexcept {int x;} v21;$/;"	m	struct:noexcept	typeref:typename:int
+v21	input.h	/^struct noexcept {int x;} v21;$/;"	v	typeref:struct:noexcept
+nullptr	input.h	/^struct nullptr {int x;} v22;$/;"	s
+x	input.h	/^struct nullptr {int x;} v22;$/;"	m	struct:nullptr	typeref:typename:int
+v22	input.h	/^struct nullptr {int x;} v22;$/;"	v	typeref:struct:nullptr
+operator	input.h	/^struct operator {int x;} v23;$/;"	s
+x	input.h	/^struct operator {int x;} v23;$/;"	m	struct:operator	typeref:typename:int
+v23	input.h	/^struct operator {int x;} v23;$/;"	v	typeref:struct:operator
+private	input.h	/^struct private {int x;} v24;$/;"	s
+x	input.h	/^struct private {int x;} v24;$/;"	m	struct:private	typeref:typename:int
+v24	input.h	/^struct private {int x;} v24;$/;"	v	typeref:struct:private
+protected	input.h	/^struct protected {int x;} v25;$/;"	s
+x	input.h	/^struct protected {int x;} v25;$/;"	m	struct:protected	typeref:typename:int
+v25	input.h	/^struct protected {int x;} v25;$/;"	v	typeref:struct:protected
+public	input.h	/^struct public {int x;} v26;$/;"	s
+x	input.h	/^struct public {int x;} v26;$/;"	m	struct:public	typeref:typename:int
+v26	input.h	/^struct public {int x;} v26;$/;"	v	typeref:struct:public
+reinterpret_cast	input.h	/^struct reinterpret_cast {int x;} v27;$/;"	s
+x	input.h	/^struct reinterpret_cast {int x;} v27;$/;"	m	struct:reinterpret_cast	typeref:typename:int
+v27	input.h	/^struct reinterpret_cast {int x;} v27;$/;"	v	typeref:struct:reinterpret_cast
+requires	input.h	/^struct requires {int x;} v28;$/;"	s
+x	input.h	/^struct requires {int x;} v28;$/;"	m	struct:requires	typeref:typename:int
+v28	input.h	/^struct requires {int x;} v28;$/;"	v	typeref:struct:requires
+static_assert	input.h	/^struct static_assert {int x;} v29;$/;"	s
+x	input.h	/^struct static_assert {int x;} v29;$/;"	m	struct:static_assert	typeref:typename:int
+v29	input.h	/^struct static_assert {int x;} v29;$/;"	v	typeref:struct:static_assert
+static_cast	input.h	/^struct static_cast {int x;} v30;$/;"	s
+x	input.h	/^struct static_cast {int x;} v30;$/;"	m	struct:static_cast	typeref:typename:int
+v30	input.h	/^struct static_cast {int x;} v30;$/;"	v	typeref:struct:static_cast
+template	input.h	/^struct template {int x;} v31;$/;"	s
+x	input.h	/^struct template {int x;} v31;$/;"	m	struct:template	typeref:typename:int
+v31	input.h	/^struct template {int x;} v31;$/;"	v	typeref:struct:template
+this	input.h	/^struct this {int x;} v32;$/;"	s
+x	input.h	/^struct this {int x;} v32;$/;"	m	struct:this	typeref:typename:int
+v32	input.h	/^struct this {int x;} v32;$/;"	v	typeref:struct:this
+thread_local	input.h	/^struct thread_local {int x;} v33;$/;"	s
+x	input.h	/^struct thread_local {int x;} v33;$/;"	m	struct:thread_local	typeref:typename:int
+v33	input.h	/^struct thread_local {int x;} v33;$/;"	v	typeref:struct:thread_local
+throw	input.h	/^struct throw {int x;} v34;$/;"	s
+x	input.h	/^struct throw {int x;} v34;$/;"	m	struct:throw	typeref:typename:int
+v34	input.h	/^struct throw {int x;} v34;$/;"	v	typeref:struct:throw
+try	input.h	/^struct try {int x;} v35;$/;"	s
+x	input.h	/^struct try {int x;} v35;$/;"	m	struct:try	typeref:typename:int
+v35	input.h	/^struct try {int x;} v35;$/;"	v	typeref:struct:try
+typeid	input.h	/^struct typeid {int x;} v36;$/;"	s
+x	input.h	/^struct typeid {int x;} v36;$/;"	m	struct:typeid	typeref:typename:int
+v36	input.h	/^struct typeid {int x;} v36;$/;"	v	typeref:struct:typeid
+typename	input.h	/^struct typename {int x;} v37;$/;"	s
+x	input.h	/^struct typename {int x;} v37;$/;"	m	struct:typename	typeref:typename:int
+v37	input.h	/^struct typename {int x;} v37;$/;"	v	typeref:struct:typename
+using	input.h	/^struct using {int x;} v38;$/;"	s
+x	input.h	/^struct using {int x;} v38;$/;"	m	struct:using	typeref:typename:int
+v38	input.h	/^struct using {int x;} v38;$/;"	v	typeref:struct:using
+virtual	input.h	/^struct virtual {int x;} v39;$/;"	s
+x	input.h	/^struct virtual {int x;} v39;$/;"	m	struct:virtual	typeref:typename:int
+v39	input.h	/^struct virtual {int x;} v39;$/;"	v	typeref:struct:virtual
+s0	input.h	/^struct s0 {int NotKeyword;} ;$/;"	s
+NotKeyword	input.h	/^struct s0 {int NotKeyword;} ;$/;"	m	struct:s0	typeref:typename:int
+s1	input.h	/^struct s1 {int alignas;} ;$/;"	s
+alignas	input.h	/^struct s1 {int alignas;} ;$/;"	m	struct:s1	typeref:typename:int
+s2	input.h	/^struct s2 {int alignof;} ;$/;"	s
+alignof	input.h	/^struct s2 {int alignof;} ;$/;"	m	struct:s2	typeref:typename:int
+s3	input.h	/^struct s3 {int bool;} ;$/;"	s
+s4	input.h	/^struct s4 {int catch;} ;$/;"	s
+catch	input.h	/^struct s4 {int catch;} ;$/;"	m	struct:s4	typeref:typename:int
+s5	input.h	/^struct s5 {int char16_t;} ;$/;"	s
+char16_t	input.h	/^struct s5 {int char16_t;} ;$/;"	m	struct:s5	typeref:typename:int
+s6	input.h	/^struct s6 {int char32_t;} ;$/;"	s
+char32_t	input.h	/^struct s6 {int char32_t;} ;$/;"	m	struct:s6	typeref:typename:int
+s7	input.h	/^struct s7 {int class;} ;$/;"	s
+class	input.h	/^struct s7 {int class;} ;$/;"	m	struct:s7	typeref:typename:int
+s8	input.h	/^struct s8 {int concept;} ;$/;"	s
+concept	input.h	/^struct s8 {int concept;} ;$/;"	m	struct:s8	typeref:typename:int
+s9	input.h	/^struct s9 {int constexpr;} ;$/;"	s
+constexpr	input.h	/^struct s9 {int constexpr;} ;$/;"	m	struct:s9	typeref:typename:int
+s10	input.h	/^struct s10 {int const_cast;} ;$/;"	s
+const_cast	input.h	/^struct s10 {int const_cast;} ;$/;"	m	struct:s10	typeref:typename:int
+s11	input.h	/^struct s11 {int decltype;} ;$/;"	s
+decltype	input.h	/^struct s11 {int decltype;} ;$/;"	m	struct:s11	typeref:typename:int
+s12	input.h	/^struct s12 {int delete;} ;$/;"	s
+delete	input.h	/^struct s12 {int delete;} ;$/;"	m	struct:s12	typeref:typename:int
+s13	input.h	/^struct s13 {int dynamic_cast;} ;$/;"	s
+dynamic_cast	input.h	/^struct s13 {int dynamic_cast;} ;$/;"	m	struct:s13	typeref:typename:int
+s14	input.h	/^struct s14 {int explicit;} ;$/;"	s
+explicit	input.h	/^struct s14 {int explicit;} ;$/;"	m	struct:s14	typeref:typename:int
+s15	input.h	/^struct s15 {int export;} ;$/;"	s
+export	input.h	/^struct s15 {int export;} ;$/;"	m	struct:s15	typeref:typename:int
+s16	input.h	/^struct s16 {int final;} ;$/;"	s
+final	input.h	/^struct s16 {int final;} ;$/;"	m	struct:s16	typeref:typename:int
+s17	input.h	/^struct s17 {int friend;} ;$/;"	s
+friend	input.h	/^struct s17 {int friend;} ;$/;"	m	struct:s17	typeref:typename:int
+s18	input.h	/^struct s18 {int mutable;} ;$/;"	s
+mutable	input.h	/^struct s18 {int mutable;} ;$/;"	m	struct:s18	typeref:typename:int
+s19	input.h	/^struct s19 {int namespace;} ;$/;"	s
+namespace	input.h	/^struct s19 {int namespace;} ;$/;"	m	struct:s19	typeref:typename:int
+s20	input.h	/^struct s20 {int new;} ;$/;"	s
+new	input.h	/^struct s20 {int new;} ;$/;"	m	struct:s20	typeref:typename:int
+s21	input.h	/^struct s21 {int noexcept;} ;$/;"	s
+noexcept	input.h	/^struct s21 {int noexcept;} ;$/;"	m	struct:s21	typeref:typename:int
+s22	input.h	/^struct s22 {int nullptr;} ;$/;"	s
+nullptr	input.h	/^struct s22 {int nullptr;} ;$/;"	m	struct:s22	typeref:typename:int
+s23	input.h	/^struct s23 {int operator;} ;$/;"	s
+operator	input.h	/^struct s23 {int operator;} ;$/;"	m	struct:s23	typeref:typename:int
+s24	input.h	/^struct s24 {int private;} ;$/;"	s
+private	input.h	/^struct s24 {int private;} ;$/;"	m	struct:s24	typeref:typename:int
+s25	input.h	/^struct s25 {int protected;} ;$/;"	s
+protected	input.h	/^struct s25 {int protected;} ;$/;"	m	struct:s25	typeref:typename:int
+s26	input.h	/^struct s26 {int public;} ;$/;"	s
+public	input.h	/^struct s26 {int public;} ;$/;"	m	struct:s26	typeref:typename:int
+s27	input.h	/^struct s27 {int reinterpret_cast;} ;$/;"	s
+reinterpret_cast	input.h	/^struct s27 {int reinterpret_cast;} ;$/;"	m	struct:s27	typeref:typename:int
+s28	input.h	/^struct s28 {int requires;} ;$/;"	s
+requires	input.h	/^struct s28 {int requires;} ;$/;"	m	struct:s28	typeref:typename:int
+s29	input.h	/^struct s29 {int static_assert;} ;$/;"	s
+static_assert	input.h	/^struct s29 {int static_assert;} ;$/;"	m	struct:s29	typeref:typename:int
+s30	input.h	/^struct s30 {int static_cast;} ;$/;"	s
+static_cast	input.h	/^struct s30 {int static_cast;} ;$/;"	m	struct:s30	typeref:typename:int
+s31	input.h	/^struct s31 {int template;} ;$/;"	s
+template	input.h	/^struct s31 {int template;} ;$/;"	m	struct:s31	typeref:typename:int
+s32	input.h	/^struct s32 {int this;} ;$/;"	s
+this	input.h	/^struct s32 {int this;} ;$/;"	m	struct:s32	typeref:typename:int
+s33	input.h	/^struct s33 {int thread_local;} ;$/;"	s
+thread_local	input.h	/^struct s33 {int thread_local;} ;$/;"	m	struct:s33	typeref:typename:int
+s34	input.h	/^struct s34 {int throw;} ;$/;"	s
+throw	input.h	/^struct s34 {int throw;} ;$/;"	m	struct:s34	typeref:typename:int
+s35	input.h	/^struct s35 {int try;} ;$/;"	s
+try	input.h	/^struct s35 {int try;} ;$/;"	m	struct:s35	typeref:typename:int
+s36	input.h	/^struct s36 {int typeid;} ;$/;"	s
+typeid	input.h	/^struct s36 {int typeid;} ;$/;"	m	struct:s36	typeref:typename:int
+s37	input.h	/^struct s37 {int typename;} ;$/;"	s
+typename	input.h	/^struct s37 {int typename;} ;$/;"	m	struct:s37	typeref:typename:int
+s38	input.h	/^struct s38 {int using;} ;$/;"	s
+using	input.h	/^struct s38 {int using;} ;$/;"	m	struct:s38	typeref:typename:int
+s39	input.h	/^struct s39 {int virtual;} ;$/;"	s
+virtual	input.h	/^struct s39 {int virtual;} ;$/;"	m	struct:s39	typeref:typename:int
+NotKeyword	input.h	/^typedef int NotKeyword; \/* 0 *\/$/;"	t	typeref:typename:int
+alignas	input.h	/^typedef int alignas; \/* 1 *\/$/;"	t	typeref:typename:int
+alignof	input.h	/^typedef int alignof; \/* 2 *\/$/;"	t	typeref:typename:int
+catch	input.h	/^typedef int catch; \/* 4 *\/$/;"	t	typeref:typename:int
+char16_t	input.h	/^typedef int char16_t; \/* 5 *\/$/;"	t	typeref:typename:int
+char32_t	input.h	/^typedef int char32_t; \/* 6 *\/$/;"	t	typeref:typename:int
+class	input.h	/^typedef int class; \/* 7 *\/$/;"	t	typeref:typename:int
+concept	input.h	/^typedef int concept; \/* 8 *\/$/;"	t	typeref:typename:int
+constexpr	input.h	/^typedef int constexpr; \/* 9 *\/$/;"	t	typeref:typename:int
+const_cast	input.h	/^typedef int const_cast; \/* 10 *\/$/;"	t	typeref:typename:int
+decltype	input.h	/^typedef int decltype; \/* 11 *\/$/;"	t	typeref:typename:int
+delete	input.h	/^typedef int delete; \/* 12 *\/$/;"	t	typeref:typename:int
+dynamic_cast	input.h	/^typedef int dynamic_cast; \/* 13 *\/$/;"	t	typeref:typename:int
+explicit	input.h	/^typedef int explicit; \/* 14 *\/$/;"	t	typeref:typename:int
+export	input.h	/^typedef int export; \/* 15 *\/$/;"	t	typeref:typename:int
+final	input.h	/^typedef int final; \/* 16 *\/$/;"	t	typeref:typename:int
+friend	input.h	/^typedef int friend; \/* 17 *\/$/;"	t	typeref:typename:int
+mutable	input.h	/^typedef int mutable; \/* 18 *\/$/;"	t	typeref:typename:int
+namespace	input.h	/^typedef int namespace; \/* 19 *\/$/;"	t	typeref:typename:int
+new	input.h	/^typedef int new; \/* 20 *\/$/;"	t	typeref:typename:int
+noexcept	input.h	/^typedef int noexcept; \/* 21 *\/$/;"	t	typeref:typename:int
+nullptr	input.h	/^typedef int nullptr; \/* 22 *\/$/;"	t	typeref:typename:int
+operator	input.h	/^typedef int operator; \/* 23 *\/$/;"	t	typeref:typename:int
+private	input.h	/^typedef int private; \/* 24 *\/$/;"	t	typeref:typename:int
+protected	input.h	/^typedef int protected; \/* 25 *\/$/;"	t	typeref:typename:int
+public	input.h	/^typedef int public; \/* 26 *\/$/;"	t	typeref:typename:int
+reinterpret_cast	input.h	/^typedef int reinterpret_cast; \/* 27 *\/$/;"	t	typeref:typename:int
+requires	input.h	/^typedef int requires; \/* 28 *\/$/;"	t	typeref:typename:int
+static_assert	input.h	/^typedef int static_assert; \/* 29 *\/$/;"	t	typeref:typename:int
+static_cast	input.h	/^typedef int static_cast; \/* 30 *\/$/;"	t	typeref:typename:int
+template	input.h	/^typedef int template; \/* 31 *\/$/;"	t	typeref:typename:int
+this	input.h	/^typedef int this; \/* 32 *\/$/;"	t	typeref:typename:int
+thread_local	input.h	/^typedef int thread_local; \/* 33 *\/$/;"	t	typeref:typename:int
+throw	input.h	/^typedef int throw; \/* 34 *\/$/;"	t	typeref:typename:int
+try	input.h	/^typedef int try; \/* 35 *\/$/;"	t	typeref:typename:int
+typeid	input.h	/^typedef int typeid; \/* 36 *\/$/;"	t	typeref:typename:int
+typename	input.h	/^typedef int typename; \/* 37 *\/$/;"	t	typeref:typename:int
+using	input.h	/^typedef int using; \/* 38 *\/$/;"	t	typeref:typename:int
+virtual	input.h	/^typedef int virtual; \/* 39 *\/$/;"	t	typeref:typename:int
+v0	input.h	/^int v0, NotKeyword;$/;"	v	typeref:typename:int
+NotKeyword	input.h	/^int v0, NotKeyword;$/;"	v	typeref:typename:int
+v1	input.h	/^int v1, alignas;$/;"	v	typeref:typename:int
+alignas	input.h	/^int v1, alignas;$/;"	v	typeref:typename:int
+v2	input.h	/^int v2, alignof;$/;"	v	typeref:typename:int
+alignof	input.h	/^int v2, alignof;$/;"	v	typeref:typename:int
+v3	input.h	/^int v3, bool;$/;"	v	typeref:typename:int
+v4	input.h	/^int v4, catch;$/;"	v	typeref:typename:int
+catch	input.h	/^int v4, catch;$/;"	v	typeref:typename:int
+v5	input.h	/^int v5, char16_t;$/;"	v	typeref:typename:int
+char16_t	input.h	/^int v5, char16_t;$/;"	v	typeref:typename:int
+v6	input.h	/^int v6, char32_t;$/;"	v	typeref:typename:int
+char32_t	input.h	/^int v6, char32_t;$/;"	v	typeref:typename:int
+v7	input.h	/^int v7, class;$/;"	v	typeref:typename:int
+class	input.h	/^int v7, class;$/;"	v	typeref:typename:int
+v8	input.h	/^int v8, concept;$/;"	v	typeref:typename:int
+concept	input.h	/^int v8, concept;$/;"	v	typeref:typename:int
+v9	input.h	/^int v9, constexpr;$/;"	v	typeref:typename:int
+constexpr	input.h	/^int v9, constexpr;$/;"	v	typeref:typename:int
+v10	input.h	/^int v10, const_cast;$/;"	v	typeref:typename:int
+const_cast	input.h	/^int v10, const_cast;$/;"	v	typeref:typename:int
+v11	input.h	/^int v11, decltype;$/;"	v	typeref:typename:int
+decltype	input.h	/^int v11, decltype;$/;"	v	typeref:typename:int
+v12	input.h	/^int v12, delete;$/;"	v	typeref:typename:int
+delete	input.h	/^int v12, delete;$/;"	v	typeref:typename:int
+v13	input.h	/^int v13, dynamic_cast;$/;"	v	typeref:typename:int
+dynamic_cast	input.h	/^int v13, dynamic_cast;$/;"	v	typeref:typename:int
+v14	input.h	/^int v14, explicit;$/;"	v	typeref:typename:int
+explicit	input.h	/^int v14, explicit;$/;"	v	typeref:typename:int
+v15	input.h	/^int v15, export;$/;"	v	typeref:typename:int
+export	input.h	/^int v15, export;$/;"	v	typeref:typename:int
+v16	input.h	/^int v16, final;$/;"	v	typeref:typename:int
+final	input.h	/^int v16, final;$/;"	v	typeref:typename:int
+v17	input.h	/^int v17, friend;$/;"	v	typeref:typename:int
+friend	input.h	/^int v17, friend;$/;"	v	typeref:typename:int
+v18	input.h	/^int v18, mutable;$/;"	v	typeref:typename:int
+mutable	input.h	/^int v18, mutable;$/;"	v	typeref:typename:int
+v19	input.h	/^int v19, namespace;$/;"	v	typeref:typename:int
+namespace	input.h	/^int v19, namespace;$/;"	v	typeref:typename:int
+v20	input.h	/^int v20, new;$/;"	v	typeref:typename:int
+new	input.h	/^int v20, new;$/;"	v	typeref:typename:int
+v21	input.h	/^int v21, noexcept;$/;"	v	typeref:typename:int
+noexcept	input.h	/^int v21, noexcept;$/;"	v	typeref:typename:int
+v22	input.h	/^int v22, nullptr;$/;"	v	typeref:typename:int
+nullptr	input.h	/^int v22, nullptr;$/;"	v	typeref:typename:int
+v23	input.h	/^int v23, operator;$/;"	v	typeref:typename:int
+operator	input.h	/^int v23, operator;$/;"	v	typeref:typename:int
+v24	input.h	/^int v24, private;$/;"	v	typeref:typename:int
+private	input.h	/^int v24, private;$/;"	v	typeref:typename:int
+v25	input.h	/^int v25, protected;$/;"	v	typeref:typename:int
+protected	input.h	/^int v25, protected;$/;"	v	typeref:typename:int
+v26	input.h	/^int v26, public;$/;"	v	typeref:typename:int
+public	input.h	/^int v26, public;$/;"	v	typeref:typename:int
+v27	input.h	/^int v27, reinterpret_cast;$/;"	v	typeref:typename:int
+reinterpret_cast	input.h	/^int v27, reinterpret_cast;$/;"	v	typeref:typename:int
+v28	input.h	/^int v28, requires;$/;"	v	typeref:typename:int
+requires	input.h	/^int v28, requires;$/;"	v	typeref:typename:int
+v29	input.h	/^int v29, static_assert;$/;"	v	typeref:typename:int
+static_assert	input.h	/^int v29, static_assert;$/;"	v	typeref:typename:int
+v30	input.h	/^int v30, static_cast;$/;"	v	typeref:typename:int
+static_cast	input.h	/^int v30, static_cast;$/;"	v	typeref:typename:int
+v31	input.h	/^int v31, template;$/;"	v	typeref:typename:int
+template	input.h	/^int v31, template;$/;"	v	typeref:typename:int
+v32	input.h	/^int v32, this;$/;"	v	typeref:typename:int
+this	input.h	/^int v32, this;$/;"	v	typeref:typename:int
+v33	input.h	/^int v33, thread_local;$/;"	v	typeref:typename:int
+thread_local	input.h	/^int v33, thread_local;$/;"	v	typeref:typename:int
+v34	input.h	/^int v34, throw;$/;"	v	typeref:typename:int
+throw	input.h	/^int v34, throw;$/;"	v	typeref:typename:int
+v35	input.h	/^int v35, try;$/;"	v	typeref:typename:int
+try	input.h	/^int v35, try;$/;"	v	typeref:typename:int
+v36	input.h	/^int v36, typeid;$/;"	v	typeref:typename:int
+typeid	input.h	/^int v36, typeid;$/;"	v	typeref:typename:int
+v37	input.h	/^int v37, typename;$/;"	v	typeref:typename:int
+typename	input.h	/^int v37, typename;$/;"	v	typeref:typename:int
+v38	input.h	/^int v38, using;$/;"	v	typeref:typename:int
+using	input.h	/^int v38, using;$/;"	v	typeref:typename:int
+v39	input.h	/^int v39, virtual;$/;"	v	typeref:typename:int
+virtual	input.h	/^int v39, virtual;$/;"	v	typeref:typename:int
+NotKeyword	input.h	/^int NotKeyword (int a0);$/;"	p	typeref:typename:int
+alignas	input.h	/^int alignas (int a1);$/;"	p	typeref:typename:int
+alignof	input.h	/^int alignof (int a2);$/;"	p	typeref:typename:int
+catch	input.h	/^int catch (int a4);$/;"	p	typeref:typename:int
+char16_t	input.h	/^int char16_t (int a5);$/;"	p	typeref:typename:int
+char32_t	input.h	/^int char32_t (int a6);$/;"	p	typeref:typename:int
+class	input.h	/^int class (int a7);$/;"	p	typeref:typename:int
+concept	input.h	/^int concept (int a8);$/;"	p	typeref:typename:int
+constexpr	input.h	/^int constexpr (int a9);$/;"	p	typeref:typename:int
+const_cast	input.h	/^int const_cast (int a10);$/;"	p	typeref:typename:int
+decltype	input.h	/^int decltype (int a11);$/;"	p	typeref:typename:int
+delete	input.h	/^int delete (int a12);$/;"	p	typeref:typename:int
+dynamic_cast	input.h	/^int dynamic_cast (int a13);$/;"	p	typeref:typename:int
+explicit	input.h	/^int explicit (int a14);$/;"	p	typeref:typename:int
+export	input.h	/^int export (int a15);$/;"	p	typeref:typename:int
+final	input.h	/^int final (int a16);$/;"	p	typeref:typename:int
+friend	input.h	/^int friend (int a17);$/;"	p	typeref:typename:int
+mutable	input.h	/^int mutable (int a18);$/;"	p	typeref:typename:int
+namespace	input.h	/^int namespace (int a19);$/;"	p	typeref:typename:int
+new	input.h	/^int new (int a20);$/;"	p	typeref:typename:int
+noexcept	input.h	/^int noexcept (int a21);$/;"	p	typeref:typename:int
+nullptr	input.h	/^int nullptr (int a22);$/;"	p	typeref:typename:int
+operator	input.h	/^int operator (int a23);$/;"	p	typeref:typename:int
+private	input.h	/^int private (int a24);$/;"	p	typeref:typename:int
+protected	input.h	/^int protected (int a25);$/;"	p	typeref:typename:int
+public	input.h	/^int public (int a26);$/;"	p	typeref:typename:int
+reinterpret_cast	input.h	/^int reinterpret_cast (int a27);$/;"	p	typeref:typename:int
+requires	input.h	/^int requires (int a28);$/;"	p	typeref:typename:int
+static_assert	input.h	/^int static_assert (int a29);$/;"	p	typeref:typename:int
+static_cast	input.h	/^int static_cast (int a30);$/;"	p	typeref:typename:int
+template	input.h	/^int template (int a31);$/;"	p	typeref:typename:int
+this	input.h	/^int this (int a32);$/;"	p	typeref:typename:int
+thread_local	input.h	/^int thread_local (int a33);$/;"	p	typeref:typename:int
+throw	input.h	/^int throw (int a34);$/;"	p	typeref:typename:int
+try	input.h	/^int try (int a35);$/;"	p	typeref:typename:int
+typeid	input.h	/^int typeid (int a36);$/;"	p	typeref:typename:int
+typename	input.h	/^int typename (int a37);$/;"	p	typeref:typename:int
+using	input.h	/^int using (int a38);$/;"	p	typeref:typename:int
+virtual	input.h	/^int virtual (int a39);$/;"	p	typeref:typename:int
