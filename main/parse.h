@@ -253,6 +253,7 @@ extern void printLanguageList (void);
 extern void printLanguageParameters (const langType language);
 extern bool doesParserRequireMemoryStream (const langType language);
 extern bool parseFile (const char *const fileName);
+extern bool parseFileWithMio (const char *const fileName, MIO *mio);
 extern bool runParserInNarrowedInputStream (const langType language,
 					       unsigned long startLine, int startCharOffset,
 					       unsigned long endLine, int endCharOffset,
