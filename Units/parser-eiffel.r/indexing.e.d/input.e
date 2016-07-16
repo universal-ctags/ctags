@@ -1,11 +1,22 @@
 indexing
+	name1: "value"
 
-	description: "A simple description"
+class
+	INDEXING_KEYWORD_TEST
 
-class INDEXING_
+feature
+	feature1
+			-- header comment
+		indexing
+		obsolete
+			"Obsolete message"
+		require
+		local
+		do
+		end
+
+	feature2: INTEGER
 
 indexing
-
-	license: "Eiffel Forum License, version 1"
-
+	name2: "value"
 end

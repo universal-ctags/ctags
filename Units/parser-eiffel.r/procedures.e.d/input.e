@@ -17,6 +17,10 @@ feature -- Two
 		end
 
 	procedure_full (one: STRING) is
+			-- header comment
+		note
+		obsolete
+			"Obsolete message"
 		require
 		local
 		do
