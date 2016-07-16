@@ -44,23 +44,68 @@
  */
 typedef enum eKeywordId {
 	KEYWORD_NONE = -1,
-	KEYWORD_across, KEYWORD_alias, KEYWORD_all, KEYWORD_and,
-	KEYWORD_as, KEYWORD_assign, KEYWORD_attached,
-	KEYWORD_check, KEYWORD_class, KEYWORD_convert, KEYWORD_create,
-	KEYWORD_creation, KEYWORD_Current,
-	KEYWORD_debug, KEYWORD_deferred, KEYWORD_detachable, KEYWORD_do,
-	KEYWORD_else, KEYWORD_elseif, KEYWORD_end, KEYWORD_ensure,
-	KEYWORD_expanded, KEYWORD_export, KEYWORD_external,
-	KEYWORD_false, KEYWORD_feature, KEYWORD_from, KEYWORD_frozen,
-	KEYWORD_if, KEYWORD_implies,
-	KEYWORD_indexing, KEYWORD_infix, KEYWORD_inherit, KEYWORD_inspect,
-	KEYWORD_invariant, KEYWORD_is, KEYWORD_like, KEYWORD_local,
-	KEYWORD_loop, KEYWORD_not, KEYWORD_obsolete, KEYWORD_old, KEYWORD_once,
-	KEYWORD_or, KEYWORD_prefix, KEYWORD_redefine, KEYWORD_rename,
-	KEYWORD_require, KEYWORD_rescue, KEYWORD_Result, KEYWORD_retry,
-	KEYWORD_select, KEYWORD_separate, KEYWORD_strip, KEYWORD_then,
-	KEYWORD_true, KEYWORD_undefine, KEYWORD_unique, KEYWORD_until,
-	KEYWORD_variant, KEYWORD_when, KEYWORD_xor
+	KEYWORD_across,
+	KEYWORD_alias,
+	KEYWORD_all,
+	KEYWORD_and,
+	KEYWORD_as,
+	KEYWORD_assign,
+	KEYWORD_attached,
+	KEYWORD_check,
+	KEYWORD_class,
+	KEYWORD_convert,
+	KEYWORD_create,
+	KEYWORD_creation,
+	KEYWORD_Current,
+	KEYWORD_debug,
+	KEYWORD_deferred,
+	KEYWORD_detachable,
+	KEYWORD_do,
+	KEYWORD_else,
+	KEYWORD_elseif,
+	KEYWORD_end,
+	KEYWORD_ensure,
+	KEYWORD_expanded,
+	KEYWORD_export,
+	KEYWORD_external,
+	KEYWORD_false,
+	KEYWORD_feature,
+	KEYWORD_from,
+	KEYWORD_frozen,
+	KEYWORD_if,
+	KEYWORD_implies,
+	KEYWORD_infix,
+	KEYWORD_inherit,
+	KEYWORD_inspect,
+	KEYWORD_invariant,
+	KEYWORD_is,
+	KEYWORD_like,
+	KEYWORD_local,
+	KEYWORD_loop,
+	KEYWORD_not,
+	KEYWORD_note,
+	KEYWORD_obsolete,
+	KEYWORD_old,
+	KEYWORD_once,
+	KEYWORD_or,
+	KEYWORD_prefix,
+	KEYWORD_redefine,
+	KEYWORD_rename,
+	KEYWORD_require,
+	KEYWORD_rescue,
+	KEYWORD_Result,
+	KEYWORD_retry,
+	KEYWORD_select,
+	KEYWORD_separate,
+	KEYWORD_strip,
+	KEYWORD_then,
+	KEYWORD_true,
+	KEYWORD_undefine,
+	KEYWORD_unique,
+	KEYWORD_until,
+	KEYWORD_variant,
+	KEYWORD_when,
+	KEYWORD_xor
 } keywordId;
 
 typedef enum eTokenType {
@@ -146,7 +191,7 @@ static const keywordTable EiffelKeywordTable [] = {
 	{ "frozen",         KEYWORD_frozen     },
 	{ "if",             KEYWORD_if         },
 	{ "implies",        KEYWORD_implies    },
-	{ "indexing",       KEYWORD_indexing   },
+	{ "indexing",       KEYWORD_note       },
 	{ "infix",          KEYWORD_infix      },
 	{ "inherit",        KEYWORD_inherit    },
 	{ "insert",         KEYWORD_inherit    },
@@ -157,6 +202,7 @@ static const keywordTable EiffelKeywordTable [] = {
 	{ "local",          KEYWORD_local      },
 	{ "loop",           KEYWORD_loop       },
 	{ "not",            KEYWORD_not        },
+	{ "note",           KEYWORD_note       },
 	{ "obsolete",       KEYWORD_obsolete   },
 	{ "old",            KEYWORD_old        },
 	{ "once",           KEYWORD_once       },
@@ -795,6 +841,7 @@ static void findFeatureEnd (tokenInfo *const token)
 		case KEYWORD_do:
 		case KEYWORD_external:
 		case KEYWORD_local:
+		case KEYWORD_note:
 		case KEYWORD_obsolete:
 		case KEYWORD_once:
 		case KEYWORD_require:
@@ -933,14 +980,14 @@ static void parseFeatureClauses (tokenInfo *const token)
 			parseExport (token);
 		if (! isKeyword (token, KEYWORD_feature) &&
 			! isKeyword (token, KEYWORD_invariant) &&
-			! isKeyword (token, KEYWORD_indexing))
+			! isKeyword (token, KEYWORD_note))
 		{
 			if (! parseFeature (token))
 				readToken (token);
 		}
 	} while (! isKeyword (token, KEYWORD_end) &&
 			 ! isKeyword (token, KEYWORD_invariant) &&
-			 ! isKeyword (token, KEYWORD_indexing) &&
+			 ! isKeyword (token, KEYWORD_note) &&
 			 ! isType (token, TOKEN_EOF));
 }
 

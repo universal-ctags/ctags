@@ -1,0 +1,4 @@
+The "indexing" keyword has been replaced by "note" (see ECMA-367 8.4.3).
+
+Currently (July 2016) Eiffel Software only supports it behind a compatibility
+setting and Liberty Eiffel issues a warning.

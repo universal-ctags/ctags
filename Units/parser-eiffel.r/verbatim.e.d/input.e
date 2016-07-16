@@ -1,4 +1,4 @@
-indexing
+note
 
 	description: "[
 		This is a verbatim string.
@@ -24,7 +24,7 @@ feature {NONE} -- Implementation
 
 	tail_attribute: INTEGER
 
-indexing
+note
 
 	library: "[
 			EiffelBase: Library of reusable components for Eiffel.
