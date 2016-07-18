@@ -21,7 +21,11 @@
 #ifndef MIO_H
 #define MIO_H
 
+#ifndef QUALIFIER
 #include "general.h"  /* must always come first */
+#else
+#include "gcc-attr.h"
+#endif
 
 #include <stdio.h>
 #include <stdarg.h>
