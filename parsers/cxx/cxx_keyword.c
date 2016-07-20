@@ -83,7 +83,7 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{ 1, "inline", CXXKeywordExcludeFromTypeNames },
 	{ 1, "int", CXXKeywordFlagMayBePartOfTypeName },
 	{ 1, "long", CXXKeywordFlagMayBePartOfTypeName },
-	{ 1, "mutable", 0 },
+	{ 0, "mutable", 0 },
 	{ 0, "namespace", 0 },
 	{ 0, "new", 0 },
 	{ 0, "noexcept", 0 },
