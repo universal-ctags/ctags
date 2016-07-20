@@ -1,32 +1,32 @@
-.. Universal Ctag documentation master file
+.. Universal Ctags documentation master file
 
 #####################################################################
-universal-ctags hacking guide
+Universal-ctags Hacking Guide
 #####################################################################
 
 :Version: Draft
 :Authors: universal-ctags developers
 :Web Page: https://ctags.io/
 
-universal-ctags has the objective of continuing the
-development from what existed in the `Sourceforge`_ area. GitHub
-exuberant-ctags repository was started by Reza Jelveh
-<reza.jelveh@gmail.com> and was later moved to the `universal-ctags
-organization`_.
+`Universal-ctags`_ was created to continue the development of Darren
+Hiebert's `Exuberant-ctags`_ after activity on that project
+unfortunately stalled.
 
-The goal of the project is preparing and maintaining common/unified
-space where people interested in making ctags better can work
-together.
+Reza Jelveh <reza.jelveh@gmail.com> initially created a personal fork
+on GitHub and as interest and participation grew it was decided to
+move development to a dedicated GitHub organization.
 
-This guide is for developers. ctags.1 man page is for users.
-Though ctags.1 is not updated yet because universal-ctags is still in
-development.
+The goal of this project is to maintain a common/unified space where
+people interested in improving ctags can work together.
 
-Proofreading and pull-requests are welcome!
+This guide is primarily intended for developers. Users should first
+consult the ctags.1 man page.
+
+This is a draft document. Proofreading and pull-requests are welcome!
 
 
-.. _Sourceforge: http://ctags.sourceforge.net/
-.. _universal-ctags organization: https://github.com/universal-ctags
+.. _Exuberant-ctags: http://ctags.sourceforge.net/
+.. _Universal-ctags: https://github.com/universal-ctags
 
 
 .. toctree::
