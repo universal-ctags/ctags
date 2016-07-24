@@ -1035,7 +1035,7 @@ static void parseFunction (tokenInfo *const token)
 	while (isType (token, TOKEN_PERIOD))
 	{
 		readToken (token);
-		if ( isKeyword(token, KEYWORD_NONE) )
+		if (! isType(token, TOKEN_KEYWORD))
 		{
 			addContext (name, token);
 			readToken (token);
@@ -1076,8 +1076,7 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 	 * Make this routine a bit more forgiving.
 	 * If called on an open_curly advance it
 	 */
-	if ( isType (token, TOKEN_OPEN_CURLY) &&
-			isKeyword(token, KEYWORD_NONE) )
+	if (isType (token, TOKEN_OPEN_CURLY))
 		readToken(token);
 
 	if (! isType (token, TOKEN_CLOSE_CURLY))
@@ -1186,7 +1185,7 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 			goto cleanUp;
 		}
 
-		if (isType (token, TOKEN_STRING) || isKeyword(token, KEYWORD_NONE))
+		if (! isType (token, TOKEN_KEYWORD))
 		{
 			copyToken(name, token, TRUE);
 
@@ -1368,7 +1367,7 @@ nextVar:
 			do
 			{
 				readToken (token);
-				if ( isKeyword(token, KEYWORD_NONE) )
+				if (! isType(token, TOKEN_KEYWORD))
 				{
 					if ( is_class )
 					{
@@ -1427,7 +1426,7 @@ nextVar:
 						 * Handle CASE 1
 						 */
 						readToken (token);
-						if ( isKeyword(token, KEYWORD_NONE) )
+						if (! isType(token, TOKEN_KEYWORD))
 						{
 							vString *const signature = vStringNew ();
 
@@ -1564,8 +1563,8 @@ nextVar:
 
 			readToken (token);
 
-			if ( isKeyword (token, KEYWORD_NONE) &&
-					! isType (token, TOKEN_OPEN_PAREN) )
+			if (! isType (token, TOKEN_KEYWORD) &&
+			    ! isType (token, TOKEN_OPEN_PAREN))
 			{
 				/*
 				 * Functions of this format:
@@ -1734,7 +1733,7 @@ nextVar:
 					is_terminated = FALSE;
 			}
 		}
-		else if (isKeyword (token, KEYWORD_NONE))
+		else if (! isType (token, TOKEN_KEYWORD))
 		{
 			/*
 			 * Only create variables for global scope
