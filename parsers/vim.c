@@ -234,7 +234,7 @@ static void parseFunction (const unsigned char *line)
 	const unsigned char *cp = line;
 	int index = CORK_NIL;
 
-	if ((int) *cp == '!')
+	if (*cp == '!')
 		++cp;
 	if (isspace ((int) *cp))
 	{
@@ -328,7 +328,7 @@ static boolean parseCommand (const unsigned char *line)
 	 */
 	const unsigned char *cp = line;
 
-	if ( cp && ( (int) *cp == '\\' ) ) 
+	if (cp && (*cp == '\\'))
 	{
 		/*
 		 * We are recursively calling this function is the command
@@ -344,7 +344,7 @@ static boolean parseCommand (const unsigned char *line)
 		 * the command must not be spanning multiple lines and should
 		 * be synatically incorrect.
 		 */
-		if ((int) *cp == '\\')
+		if (*cp == '\\')
 			++cp;
 
 		while (*cp && isspace ((int) *cp))
@@ -354,10 +354,10 @@ static boolean parseCommand (const unsigned char *line)
 	{
 		cp = skipWord (cp);
 
-		if ((int) *cp == '!')
+		if (*cp == '!')
 			++cp;
 
-		if ((int) *cp != ' ')
+		if (*cp != ' ')
 		{
 			/*
 			 * :command must be followed by a space.  If it is not, it is 
@@ -466,11 +466,11 @@ static void parseLet (const unsigned char *line, int infunction)
 		 */
 		np = cp;
 		++np;
-		if ((int) *cp == 'v' && (int) *np == ':' )
+		if (*cp == 'v' && *np == ':')
 			goto cleanUp;
 
 		/* Skip non-global vars in functions */
-		if (infunction && ((int) *np != ':' || (int) *cp != 'g'))
+		if (infunction && (*np != ':' || *cp != 'g'))
 			goto cleanUp;
 
 		/* deal with spaces, $, @ and & */
@@ -503,7 +503,7 @@ static boolean parseMap (const unsigned char *line)
 	vString *name = vStringNew ();
 	const unsigned char *cp = line;
 
-	if ((int) *cp == '!')
+	if (*cp == '!')
 		++cp;
 
 	/*
