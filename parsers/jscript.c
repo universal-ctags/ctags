@@ -858,10 +858,6 @@ static void parseSwitch (tokenInfo *const token)
 
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
-		/*
-		 * Handle nameless functions, these will only
-		 * be considered methods.
-		 */
 		skipArgumentList(token, FALSE, NULL);
 	}
 
@@ -902,21 +898,11 @@ static boolean parseLoop (tokenInfo *const token, tokenInfo *const parent)
 
 		if (isType (token, TOKEN_OPEN_PAREN))
 		{
-			/*
-			 * Handle nameless functions, these will only
-			 * be considered methods.
-			 */
 			skipArgumentList(token, FALSE, NULL);
 		}
 
 		if (isType (token, TOKEN_OPEN_CURLY))
 		{
-			/*
-			 * This will be either a function or a class.
-			 * We can only determine this by checking the body
-			 * of the function.  If we find a "this." we know
-			 * it is a class, otherwise it is a function.
-			 */
 			parseBlock (token, parent);
 		}
 		else
@@ -930,12 +916,6 @@ static boolean parseLoop (tokenInfo *const token, tokenInfo *const parent)
 
 		if (isType (token, TOKEN_OPEN_CURLY))
 		{
-			/*
-			 * This will be either a function or a class.
-			 * We can only determine this by checking the body
-			 * of the function.  If we find a "this." we know
-			 * it is a class, otherwise it is a function.
-			 */
 			parseBlock (token, parent);
 		}
 		else
@@ -952,10 +932,6 @@ static boolean parseLoop (tokenInfo *const token, tokenInfo *const parent)
 
 			if (isType (token, TOKEN_OPEN_PAREN))
 			{
-				/*
-				 * Handle nameless functions, these will only
-				 * be considered methods.
-				 */
 				skipArgumentList(token, TRUE, NULL);
 			}
 			if (! isType (token, TOKEN_SEMICOLON))
@@ -1021,21 +997,11 @@ static boolean parseIf (tokenInfo *const token, tokenInfo *const parent)
 
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
-		/*
-		 * Handle nameless functions, these will only
-		 * be considered methods.
-		 */
 		skipArgumentList(token, FALSE, NULL);
 	}
 
 	if (isType (token, TOKEN_OPEN_CURLY))
 	{
-		/*
-		 * This will be either a function or a class.
-		 * We can only determine this by checking the body
-		 * of the function.  If we find a "this." we know
-		 * it is a class, otherwise it is a function.
-		 */
 		parseBlock (token, parent);
 	}
 	else
