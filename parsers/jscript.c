@@ -396,6 +396,12 @@ static void parseRegExp (void)
 			ungetcToInputFile (c);
 			break;
 		}
+		else if (c == '\n' || c == '\r')
+		{
+			/* invalid in a regex */
+			ungetcToInputFile (c);
+			break;
+		}
 		else if (c == '\\')
 			c = getcFromInputFile (); /* skip next character */
 		else if (c == '[')
