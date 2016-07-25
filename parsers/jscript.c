@@ -7,6 +7,8 @@
  *	 This module contains functions for generating tags for JavaScript language
  *	 files.
  *
+ *	 Reference: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
+ *
  *	 This is a good reference for different forms of the function statement:
  *		 http://www.permadi.com/tutorial/jsFunc/
  *   Another good reference:
