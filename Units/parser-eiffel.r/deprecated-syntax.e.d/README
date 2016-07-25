@@ -1,0 +1,6 @@
+Currently (July 2016) the keywords "indexing", "is", and "creation" are all
+deprecated in both the Eiffel Software and Liberty Eiffel dialects.
+
+The "infix" and "prefix" keywords are deprecated by Eiffel Software. Liberty
+Eiffel currently still supports them alongside "alias" though this is expected
+to change in the near future.

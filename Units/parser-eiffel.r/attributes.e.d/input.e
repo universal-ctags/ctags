@@ -14,16 +14,16 @@ feature
 	four: DOUBLE
 			-- Header comment
 
-	five, six: INTEGER is unique
+	five, six: INTEGER = unique
 			-- Header comment
 
-	seven: INTEGER is 1
+	seven: INTEGER = 1
 			-- Header comment
 
-	eight: DOUBLE is 2.0
+	eight: DOUBLE = 2.0
 			-- Header comment
 
-	nine: STRING is "abc"
+	nine: STRING = "abc"
 			-- Header comment
 
 	anchored: like one

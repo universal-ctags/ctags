@@ -2,25 +2,25 @@ deferred class FUNCTIONS
 
 feature -- One
 
-	function0: INTEGER is
+	function0: INTEGER
 		do
 		end
 
 feature -- Two
 
-	function1 (one: STRING) is
+	function1 (one: STRING)
 		once
 		end
 
-	function2 (one: INTEGER; two: STRING): INTEGER is
+	function2 (one: INTEGER; two: STRING): INTEGER
 		deferred
 		end
 
-	function_anchored: like function0 is
+	function_anchored: like function0
 		do
 		end
 
-	function_full (one: STRING) is
+	function_full (one: STRING)
 			-- header comment
 		note
 		obsolete
@@ -33,11 +33,11 @@ feature -- Two
 		rescue
 		end
 
-	infix "<" (other: like Current): BOOLEAN is
+	infix_alias alias "<" (other: like Current): BOOLEAN
 		do
 		end
 
-	prefix "+": like Current is
+	prefix_alias alias "+": like Current
 		do
 		end
 

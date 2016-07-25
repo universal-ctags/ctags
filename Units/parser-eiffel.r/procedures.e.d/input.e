@@ -2,21 +2,21 @@ deferred class PROCEDURES
 
 feature -- One
 
-	procedure0 is
+	procedure0
 		do
 		end
 
 feature -- Two
 
-	procedure1 (one: STRING) is
+	procedure1 (one: STRING)
 		once
 		end
 
-	procedure2 (one: INTEGER; two: STRING) is
+	procedure2 (one: INTEGER; two: STRING)
 		deferred
 		end
 
-	procedure_full (one: STRING) is
+	procedure_full (one: STRING)
 			-- header comment
 		note
 		obsolete
