@@ -27,5 +27,28 @@ feature
 			-- Header comment
 
 	anchored: like one
+			-- Header comment
+
+	attribute_short: STRING
+			-- Header comment
+		attribute
+		end
+
+	attribute_full: STRING
+			-- Header comment
+		note
+		obsolete
+			"Obsolete message"
+		require
+		local
+		attribute
+			-- Implementation
+		ensure
+		rescue
+		end
+
+	final_feature
+		do
+		end
 
 end

@@ -1,6 +1,9 @@
 ATTRIBUTES	input.e	/^expanded class ATTRIBUTES$/;"	c
 anchored	input.e	/^	anchored: like one$/;"	f	class:ATTRIBUTES
+attribute_full	input.e	/^	attribute_full: STRING$/;"	f	class:ATTRIBUTES
+attribute_short	input.e	/^	attribute_short: STRING$/;"	f	class:ATTRIBUTES
 eight	input.e	/^	eight: DOUBLE = 2.0$/;"	f	class:ATTRIBUTES
+final_feature	input.e	/^	final_feature$/;"	f	class:ATTRIBUTES
 five	input.e	/^	five, six: INTEGER = unique$/;"	f	class:ATTRIBUTES
 four	input.e	/^	four: DOUBLE$/;"	f	class:ATTRIBUTES
 nine	input.e	/^	nine: STRING = "abc"$/;"	f	class:ATTRIBUTES

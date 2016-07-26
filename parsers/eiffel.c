@@ -50,6 +50,7 @@ typedef enum eKeywordId {
 	KEYWORD_as,
 	KEYWORD_assign,
 	KEYWORD_attached,
+	KEYWORD_attribute,
 	KEYWORD_check,
 	KEYWORD_class,
 	KEYWORD_convert,
@@ -167,6 +168,7 @@ static const keywordTable EiffelKeywordTable [] = {
 	{ "as",             KEYWORD_as         },
 	{ "assign",         KEYWORD_assign     },
 	{ "attached",       KEYWORD_attached   },
+	{ "attribute",      KEYWORD_attribute  },
 	{ "check",          KEYWORD_check      },
 	{ "class",          KEYWORD_class      },
 	{ "convert",        KEYWORD_convert    },
@@ -819,6 +821,7 @@ static void parseLocal (tokenInfo *const token)
 	 */
 	while (! isKeyword (token, KEYWORD_do)  &&
 		   ! isKeyword (token, KEYWORD_once) &&
+		   ! isKeyword (token, KEYWORD_attribute) &&
 		   ! isType (token, TOKEN_EOF))
 	{
 		if (isType (token, TOKEN_IDENTIFIER))
@@ -836,6 +839,7 @@ static void findFeatureEnd (tokenInfo *const token)
 		readToken (token);
 	switch (token->keyword)
 	{
+		case KEYWORD_attribute:
 		case KEYWORD_deferred:
 		case KEYWORD_do:
 		case KEYWORD_external:
