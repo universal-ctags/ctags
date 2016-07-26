@@ -49,6 +49,7 @@ The following parsers have been added:
 * Perl6
 * Pod *optlib*
 * PropertiyList(plist) *libxml*
+* Protobuf
 * R
 * RelaxNG *libxml*
 * reStructuredText

@@ -22,7 +22,6 @@
 
 
 typedef enum {
-	KEYWORD_NONE = -1,
 	KEYWORD_abstract,
 	KEYWORD_and,
 	KEYWORD_as,

@@ -43,7 +43,6 @@
 /*  Used to specify type of keyword.
  */
 typedef enum eKeywordId {
-	KEYWORD_NONE = -1,
 	KEYWORD_across,
 	KEYWORD_alias,
 	KEYWORD_all,

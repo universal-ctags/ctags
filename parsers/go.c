@@ -28,7 +28,6 @@
  */
 
 typedef enum eKeywordId {
-	KEYWORD_NONE = -1,
 	KEYWORD_package,
 	KEYWORD_import,
 	KEYWORD_const,

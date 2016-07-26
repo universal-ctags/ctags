@@ -139,7 +139,7 @@ extern int lookupKeyword (const char *const string, langType language)
 {
 	const unsigned int index = hashValue (string, language) % TableSize;
 	hashEntry *entry = getHashTableEntry (index);
-	int result = -1;
+	int result = KEYWORD_NONE;
 
 	while (entry != NULL)
 	{

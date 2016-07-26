@@ -234,6 +234,10 @@ Patches are always there. So it is easy to evaluate the value:)
 
 	* contributed by the original author
 
+   <74> protobuf parser
+
+	* Merged after getting approval from the original author
+
    <67> Objective C language parser
 
 	* This is the implementation we have in universal-ctags tree.
@@ -249,6 +253,10 @@ Patches are always there. So it is easy to evaluate the value:)
 	* Fixed in universal-ctags tree, however the ticket is still open::
 
 		d2bdf505abb7569deae2b50305ea1edce6208557
+
+   <55> TTCN-3 support
+
+	* contributed by the original author
 
    <51> Ada support
 

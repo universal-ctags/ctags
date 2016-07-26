@@ -39,7 +39,6 @@
  * Used to specify type of keyword.
  */
 typedef enum eKeywordId {
-	KEYWORD_NONE = -1,
 	KEYWORD_ABS,
 	KEYWORD_ACCESS,
 	KEYWORD_AFTER,

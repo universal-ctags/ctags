@@ -52,7 +52,6 @@ static stringList *FunctionNames;
 /*	Used to specify type of keyword.
 */
 typedef enum eKeywordId {
-	KEYWORD_NONE = -1,
 	KEYWORD_function,
 	KEYWORD_capital_function,
 	KEYWORD_object,
