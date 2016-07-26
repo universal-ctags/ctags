@@ -1,0 +1,1 @@
+mutable	input.c	/^static int mutable;$/;"	v	typeref:typename:int	file:
