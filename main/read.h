@@ -113,6 +113,9 @@ extern void   pushNarrowedInputStream (const langType language,
 				       unsigned long sourceLineOffset);
 extern void   popNarrowedInputStream  (void);
 
+extern void     pushLanguage(const langType language);
+extern langType popLanguage (void);
+
 #endif  /* CTAGS_MAIN_READ_H */
 
 /* vi:set tabstop=4 shiftwidth=4: */
