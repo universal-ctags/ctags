@@ -11,7 +11,7 @@ Introduction
 
 The C++ language has strongly evolved since the old C/C++ parser was
 written. The old parser was struggling with some of the new features
-of the language and hash shown signs of reaching its limits.
+of the language and has shown signs of reaching its limits.
 For this reason in february/march 2016 the C/C++ parser has been
 rewritten from scratch.
 
