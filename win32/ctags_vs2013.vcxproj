@@ -140,6 +140,7 @@
     <ClCompile Include="..\parsers\lua.c" />
     <ClCompile Include="..\optlib\m4.c" />
     <ClCompile Include="..\main\main.c" />
+    <ClCompile Include="..\parsers\automake.c" />
     <ClCompile Include="..\parsers\make.c" />
     <ClCompile Include="..\optlib\man.c" />
     <ClCompile Include="..\parsers\matlab.c" />
@@ -258,6 +259,7 @@
     <ClInclude Include="..\main\dependency.h" />
     <ClInclude Include="..\main\gcc-attr.h" />
     <ClInclude Include="..\main\mybool.h" />
+    <ClInclude Include="..\parsers\make.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

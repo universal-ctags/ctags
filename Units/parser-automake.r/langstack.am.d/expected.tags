@@ -1,0 +1,9 @@
+prefix	input.am	/^prefix=c$/;"	macro	language:Make
+$(top_srcdir)/source.mak	input.am	/^include $(top_srcdir)\/source.mak$/;"	makefile	language:Make	role:included
+cbin	input.am	/^cbin=$(bindir)\/ctags$/;"	macro	language:Make
+cbin_PROGRAMS	input.am	/^cbin_PROGRAMS = $(prefix)ctags$/;"	macro	language:Make
+cbin	input.am	/^cbin_PROGRAMS = $(prefix)ctags$/;"	directory	language:Automake	role:program
+$(prefix)ctags	input.am	/^cbin_PROGRAMS = $(prefix)ctags$/;"	program	language:Automake	directory:cbin
+INSTALL_ETAGS	input.am	/^if INSTALL_ETAGS$/;"	condition	language:Automake	role:branched
+install-exec-hook	input.am	/^install-exec-hook:$/;"	target	language:Make
+uninstall-hook	input.am	/^uninstall-hook:$/;"	target	language:Make
