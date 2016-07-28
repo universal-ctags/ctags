@@ -19,6 +19,9 @@ DTS	d	undef	undefined	on
 DTS	h	system	system header	on
 DTS	h	local	local header	on
 Java	p	imported	imported package	on
+M4	d	undef	undefined	on
+M4	I	included	included macro	on
+M4	I	sincluded	silently included macro	on
 Make	I	included	included	on
 Make	I	optional	optionally included	on
 Python	i	imported	imported modules	on
@@ -58,6 +61,9 @@ DTS	d	undef	undefined	on
 DTS	h	system	system header	on
 DTS	h	local	local header	on
 Java	p	imported	imported package	on
+M4	d	undef	undefined	on
+M4	I	included	included macro	on
+M4	I	sincluded	silently included macro	on
 Make	I	included	included	on
 Make	I	optional	optionally included	on
 Python	i	imported	imported modules	on

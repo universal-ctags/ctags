@@ -3,7 +3,6 @@ TRANSLATOR_INPUT = \
 	optlib/ctags-optlib.ctags		\
 	optlib/gdbinit.ctags			\
 	optlib/man.ctags			\
-	optlib/m4.ctags				\
 	optlib/pod.ctags			\
 	\
 	$(NULL)

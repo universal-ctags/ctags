@@ -1,3 +1,3 @@
--   define(IGNORED,val0)
+-   define(CAPTUREME,val0)
 -   dnl define(IGNORED,val1)
 dnl include(IGNORED)
