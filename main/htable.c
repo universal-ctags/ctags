@@ -249,3 +249,23 @@ boolean hashCstreq (void *a, void *b)
 {
 	return !!(strcmp (a, b) == 0);
 }
+
+unsigned int hashInthash (void *x)
+{
+       union tmp {
+               unsigned int u;
+               int i;
+       } x0;
+
+       x0.u = 0;
+       x0.i = *(int *)x;
+       return x0.u;
+}
+
+boolean hashInteq (void *a, void *b)
+{
+       int ai = *(int *)a;
+       int bi = *(int *)b;
+
+       return !!(ai == bi);
+}
