@@ -1,0 +1,8 @@
+USE_STDBOOL_H	input.ac	/^	AH_TEMPLATE([USE_STDBOOL_H], [whether or not to use <stdbool.h>.])$/;"	kind:template	line:3	language:Autoconf	end:3
+USE_STDBOOL_H	input.ac	/^	AC_DEFINE([USE_STDBOOL_H])$/;"	kind:definition	line:4	language:Autoconf	end:4
+bool	input.ac	/^	AH_TEMPLATE([bool],  [type for 'bool' if <stdbool.h> is missing or broken.])$/;"	kind:template	line:7	language:Autoconf	end:7
+true	input.ac	/^	AH_TEMPLATE([true],  [value of 'true' if <stdbool.h> is missing or broken.])$/;"	kind:template	line:8	language:Autoconf	end:8
+false	input.ac	/^	AH_TEMPLATE([false], [value of 'false' if <stdbool.h> is missing or broken.])$/;"	kind:template	line:9	language:Autoconf	end:9
+true	input.ac	/^	AC_DEFINE([true],  [1])$/;"	kind:definition	line:10	language:Autoconf	end:10
+false	input.ac	/^	AC_DEFINE([false], [0])$/;"	kind:definition	line:11	language:Autoconf	end:11
+input.ac	input.ac	1;"	kind:file	line:1	language:Autoconf	extra:inputFile	end:12

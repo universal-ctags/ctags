@@ -34,6 +34,7 @@ New parsers
 The following parsers have been added:
 
 * Ada
+* Autoconf
 * Automake
 * Clojure
 * CSS

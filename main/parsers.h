@@ -31,6 +31,7 @@
 	AntParser, \
 	AsmParser, \
 	AspParser, \
+	AutoconfParser, \
 	AutomakeParser, \
 	AwkParser, \
 	BasicParser, \

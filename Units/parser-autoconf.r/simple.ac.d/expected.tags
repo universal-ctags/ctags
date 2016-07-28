@@ -1,0 +1,14 @@
+universal-ctags	input.ac	/^AC_INIT([universal-ctags],[0.0.0])$/;"	package	end:1
+TMPDIR	input.ac	/^AH_TEMPLATE([TMPDIR],$/;"	template	end:4
+CHECK_HEADER_DEFINE	input.ac	/^AC_DEFUN([CHECK_HEADER_DEFINE], [$/;"	macro	end:19
+ctags-libexecdir	input.ac	/^AC_ARG_WITH([ctags-libexecdir],$/;"	optwith	end:22
+tmpdir	input.ac	/^AC_ARG_ENABLE(tmpdir,$/;"	optenable	end:26
+pkgsysconfdir	input.ac	/^AC_SUBST([pkgsysconfdir])$/;"	subst	end:27
+pkglibexecdir	input.ac	/^AC_SUBST([pkglibexecdir])$/;"	subst	end:28
+INSTALL_LIB	input.ac	/^AM_CONDITIONAL(INSTALL_LIB, [test "x$enable_readlib" = "xyes"])$/;"	condition	end:29
+INSTALL_ETAGS	input.ac	/^AM_CONDITIONAL(INSTALL_ETAGS, [test "x$enable_etags" = "xyes"])$/;"	condition	end:30
+USE_READCMD	input.ac	/^AM_CONDITIONAL(USE_READCMD, [test "x$enable_readcmd" = "xyes"])$/;"	condition	end:31
+ctags_name_executable	input.ac	/^AC_SUBST(ctags_name_executable)$/;"	subst	end:35
+etags_name_executable	input.ac	/^AC_SUBST(etags_name_executable)$/;"	subst	end:37
+ETAGS	input.ac	/^AC_DEFINE_UNQUOTED(ETAGS, "$etags_name_executable")$/;"	definition	end:39
+MSDOS_STYLE_PATH	input.ac	/^	AC_DEFINE(MSDOS_STYLE_PATH)$/;"	definition	end:45

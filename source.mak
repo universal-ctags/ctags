@@ -112,6 +112,7 @@ PARSER_SRCS =				\
 	parsers/ant.c			\
 	parsers/asm.c			\
 	parsers/asp.c			\
+	parsers/autoconf.c		\
 	parsers/automake.c		\
 	parsers/awk.c			\
 	parsers/basic.c			\
