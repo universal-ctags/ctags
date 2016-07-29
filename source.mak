@@ -14,18 +14,21 @@ MIO_SRCS  = main/mio.c
 MAIN_HEADS =			\
 	main/args.h		\
 	main/ctags.h		\
+	main/dependency.h	\
 	main/entry.h		\
 	main/error.h		\
 	main/field.h		\
 	main/flags.h		\
 	main/fmt.h		\
+	main/gcc-attr.h		\
 	main/general.h		\
-	main/get.h		\
 	main/htable.h		\
 	main/keyword.h		\
 	main/kind.h		\
+	main/lcpp.h		\
 	main/main.h		\
 	main/mbcs.h		\
+	main/mybool.h		\
 	main/nestlevel.h	\
 	main/options.h		\
 	main/output.h		\
@@ -39,6 +42,7 @@ MAIN_HEADS =			\
 	main/selectors.h	\
 	main/sort.h		\
 	main/strlist.h		\
+	main/types.h		\
 	main/vstring.h		\
 	main/xtag.h		\
 	\
@@ -46,15 +50,16 @@ MAIN_HEADS =			\
 
 MAIN_SRCS =				\
 	main/args.c			\
+	main/dependency.c		\
 	main/entry.c			\
 	main/error.c			\
 	main/field.c			\
 	main/flags.c			\
 	main/fmt.c			\
-	main/get.c			\
 	main/htable.c			\
 	main/keyword.c			\
 	main/kind.c			\
+	main/lcpp.c			\
 	main/lregex.c			\
 	main/lxcmd.c			\
 	main/lxpath.c			\
@@ -64,6 +69,7 @@ MAIN_SRCS =				\
 	main/options.c			\
 	main/output-etags.c		\
 	main/output-ctags.c		\
+	main/output-json.c		\
 	main/output-xref.c		\
 	main/parse.c			\
 	main/pcoproc.c			\
@@ -148,6 +154,7 @@ PARSER_SRCS =				\
 	parsers/perl.c			\
 	parsers/perl6.c			\
 	parsers/php.c			\
+	parsers/protobuf.c		\
 	parsers/python.c		\
 	parsers/r.c			\
 	parsers/rexx.c			\

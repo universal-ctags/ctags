@@ -14,26 +14,22 @@ n	line	off	NONE	TRUE	Line number of tag definition
 S	signature	off	NONE	TRUE	Signature of routine (e.g. prototype or parameter list)
 s	NONE	on	NONE	TRUE	Scope of tag definition (`p' can be used for printing its kind)
 t	typeref	on	NONE	TRUE	Type and name of a variable or typedef
-z	kind	off	NONE	FALSE	Include the "kind:" key in kind field (use k or K)
+z	kind	off	NONE	TRUE	Include the "kind:" key in kind field (use k or K) in tags output, kind full name in xref output
 r	role	off	NONE	TRUE	Role
 R	NONE	off	NONE	TRUE	Marker (R or D) representing whether tag is definition or reference
 Z	scope	off	NONE	TRUE	Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
 E	extra	off	NONE	TRUE	Extra tag type information
 x	xpath	off	NONE	TRUE	xpath for the tag
-p	scopeKind	on	NONE	TRUE	Kind of scope as full name
--	end	off	C	TRUE	end lines of various constructs
+p	scopeKind	off	NONE	TRUE	Kind of scope as full name
+e	end	off	NONE	TRUE	end lines of various items
 -	properties	off	C	TRUE	properties (static, inline, mutable,...)
--	end	off	C++	TRUE	end lines of various constructs
 -	properties	off	C++	TRUE	properties (static, inline, mutable,...)
 -	template	off	C++	TRUE	template parameters
 -	captures	off	C++	TRUE	lambda capture list
 -	name	on	C++	TRUE	aliased names
 -	decorators	off	Python	TRUE	decorators on functions and classes
 -	end	off	Python	TRUE	end lines of various constructs
--	end	off	RpmSpec	TRUE	end lines of macros
 -	sectionMarker	off	reStructuredText	TRUE	character used for declaring section
--	end	off	reStructuredText	TRUE	end lines of various constructs
--	end	off	Vim	TRUE	end lines of functions
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/
 x	input.java	/^    public int x;$/

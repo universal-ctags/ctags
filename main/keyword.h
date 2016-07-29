@@ -14,7 +14,10 @@
 */
 #include "general.h"  /* must always come first */
 
-#include "parse.h"
+#include "types.h"
+#include "vstring.h"
+
+#define KEYWORD_NONE -1
 
 /*
 *   FUNCTION PROTOTYPES

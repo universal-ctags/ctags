@@ -45,7 +45,6 @@ static kindOption RstKinds[] = {
 
 typedef enum {
 	F_SECTION_MARKER,
-	F_END,
 } rstField;
 
 static fieldSpec RstFields [] = {
@@ -54,12 +53,6 @@ static fieldSpec RstFields [] = {
 		.description = "character used for declaring section",
 		.enabled = FALSE,
 	},
-	{
-		.name = "end",
-		.description = "end lines of various constructs",
-		.enabled = FALSE,
-	},
-
 };
 
 static char kindchars[SECTION_COUNT];
@@ -75,7 +68,6 @@ static NestingLevel *getNestingLevel(const int kind)
 	NestingLevel *nl;
 	tagEntryInfo *e;
 
-	char buf[16];
 	int d = 0;
 
 	if (kind > K_EOF)
@@ -86,8 +78,6 @@ static NestingLevel *getNestingLevel(const int kind)
 		/* 2. we want the line before the next section/chapter title. */
 	}
 
-	snprintf(buf, sizeof(buf), "%ld", getInputLineNumber() - d);
-
 	while (1)
 	{
 		nl = nestingLevelsGetCurrent(nestingLevels);
@@ -95,7 +85,7 @@ static NestingLevel *getNestingLevel(const int kind)
 		if ((nl && (e == NULL)) || (e && (e->kind - RstKinds) >= kind))
 		{
 			if (e)
-				attachParserField (e, RstFields [F_END].ftype, eStrdup(buf));
+				e->extensionFields.endLine = (getInputLineNumber() - d);
 			nestingLevelsPop(nestingLevels);
 		}
 		else
@@ -234,6 +224,9 @@ static void findRstTags (void)
 	{
 		int line_len = strlen((const char*) line);
 		int name_len_bytes = vStringLength(name);
+		/* FIXME: this isn't right, actually we need the real display width,
+		 * taking into account double-width characters and stuff like that.
+		 * But duh. */
 		int name_len = utf8_strlen(vStringValue(name), name_len_bytes);
 
 		/* if the name doesn't look like UTF-8, assume one-byte charset */

@@ -7,6 +7,8 @@
  *	 This module contains functions for generating tags for JavaScript language
  *	 files.
  *
+ *	 Reference: http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
+ *
  *	 This is a good reference for different forms of the function statement:
  *		 http://www.permadi.com/tutorial/jsFunc/
  *   Another good reference:
@@ -50,7 +52,6 @@ static stringList *FunctionNames;
 /*	Used to specify type of keyword.
 */
 typedef enum eKeywordId {
-	KEYWORD_NONE = -1,
 	KEYWORD_function,
 	KEYWORD_capital_function,
 	KEYWORD_capital_object,
@@ -393,6 +394,12 @@ static void parseRegExp (void)
 			{
 				c = getcFromInputFile ();
 			} while (isalpha (c));
+			ungetcToInputFile (c);
+			break;
+		}
+		else if (c == '\n' || c == '\r')
+		{
+			/* invalid in a regex */
 			ungetcToInputFile (c);
 			break;
 		}
@@ -749,6 +756,8 @@ static void skipArgumentList (tokenInfo *const token, boolean include_newlines, 
 				nest_level++;
 			else if (isType (token, TOKEN_CLOSE_PAREN))
 				nest_level--;
+			else if (isKeyword (token, KEYWORD_function))
+				parseFunction (token);
 		}
 		readTokenFull (token, include_newlines, NULL);
 	}
@@ -856,10 +865,6 @@ static void parseSwitch (tokenInfo *const token)
 
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
-		/*
-		 * Handle nameless functions, these will only
-		 * be considered methods.
-		 */
 		skipArgumentList(token, FALSE, NULL);
 	}
 
@@ -900,21 +905,11 @@ static boolean parseLoop (tokenInfo *const token, tokenInfo *const parent)
 
 		if (isType (token, TOKEN_OPEN_PAREN))
 		{
-			/*
-			 * Handle nameless functions, these will only
-			 * be considered methods.
-			 */
 			skipArgumentList(token, FALSE, NULL);
 		}
 
 		if (isType (token, TOKEN_OPEN_CURLY))
 		{
-			/*
-			 * This will be either a function or a class.
-			 * We can only determine this by checking the body
-			 * of the function.  If we find a "this." we know
-			 * it is a class, otherwise it is a function.
-			 */
 			parseBlock (token, parent);
 		}
 		else
@@ -928,12 +923,6 @@ static boolean parseLoop (tokenInfo *const token, tokenInfo *const parent)
 
 		if (isType (token, TOKEN_OPEN_CURLY))
 		{
-			/*
-			 * This will be either a function or a class.
-			 * We can only determine this by checking the body
-			 * of the function.  If we find a "this." we know
-			 * it is a class, otherwise it is a function.
-			 */
 			parseBlock (token, parent);
 		}
 		else
@@ -950,10 +939,6 @@ static boolean parseLoop (tokenInfo *const token, tokenInfo *const parent)
 
 			if (isType (token, TOKEN_OPEN_PAREN))
 			{
-				/*
-				 * Handle nameless functions, these will only
-				 * be considered methods.
-				 */
 				skipArgumentList(token, TRUE, NULL);
 			}
 			if (! isType (token, TOKEN_SEMICOLON))
@@ -1019,21 +1004,11 @@ static boolean parseIf (tokenInfo *const token, tokenInfo *const parent)
 
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
-		/*
-		 * Handle nameless functions, these will only
-		 * be considered methods.
-		 */
 		skipArgumentList(token, FALSE, NULL);
 	}
 
 	if (isType (token, TOKEN_OPEN_CURLY))
 	{
-		/*
-		 * This will be either a function or a class.
-		 * We can only determine this by checking the body
-		 * of the function.  If we find a "this." we know
-		 * it is a class, otherwise it is a function.
-		 */
 		parseBlock (token, parent);
 	}
 	else
@@ -1067,7 +1042,7 @@ static void parseFunction (tokenInfo *const token)
 	while (isType (token, TOKEN_PERIOD))
 	{
 		readToken (token);
-		if ( isKeyword(token, KEYWORD_NONE) )
+		if (! isType(token, TOKEN_KEYWORD))
 		{
 			addContext (name, token);
 			readToken (token);
@@ -1108,8 +1083,7 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const orig_parent)
 	 * Make this routine a bit more forgiving.
 	 * If called on an open_curly advance it
 	 */
-	if ( isType (token, TOKEN_OPEN_CURLY) &&
-			isKeyword(token, KEYWORD_NONE) )
+	if (isType (token, TOKEN_OPEN_CURLY))
 		readToken(token);
 
 	if (! isType (token, TOKEN_CLOSE_CURLY))
@@ -1218,7 +1192,7 @@ static boolean parseMethods (tokenInfo *const token, tokenInfo *const class)
 			goto cleanUp;
 		}
 
-		if (isType (token, TOKEN_STRING) || isKeyword(token, KEYWORD_NONE))
+		if (! isType (token, TOKEN_KEYWORD))
 		{
 			copyToken(name, token, TRUE);
 
@@ -1400,7 +1374,7 @@ nextVar:
 			do
 			{
 				readToken (token);
-				if ( isKeyword(token, KEYWORD_NONE) )
+				if (! isType(token, TOKEN_KEYWORD))
 				{
 					if ( is_class )
 					{
@@ -1459,7 +1433,7 @@ nextVar:
 						 * Handle CASE 1
 						 */
 						readToken (token);
-						if ( isKeyword(token, KEYWORD_NONE) )
+						if (! isType(token, TOKEN_KEYWORD))
 						{
 							vString *const signature = vStringNew ();
 
@@ -1596,8 +1570,8 @@ nextVar:
 
 			readToken (token);
 
-			if ( isKeyword (token, KEYWORD_NONE) &&
-					! isType (token, TOKEN_OPEN_PAREN) )
+			if (! isType (token, TOKEN_KEYWORD) &&
+			    ! isType (token, TOKEN_OPEN_PAREN))
 			{
 				/*
 				 * Functions of this format:
@@ -1766,7 +1740,7 @@ nextVar:
 					is_terminated = FALSE;
 			}
 		}
-		else if (isKeyword (token, KEYWORD_NONE))
+		else if (! isType (token, TOKEN_KEYWORD))
 		{
 			/*
 			 * Only create variables for global scope

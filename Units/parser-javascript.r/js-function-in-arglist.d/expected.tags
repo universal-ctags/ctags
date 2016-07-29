@@ -1,0 +1,5 @@
+func1	input.js	/^    Test.func1 = function func1(){ console.log('func1'); };$/;"	f
+func1	input.js	/^    Test.func1 = function func1(){ console.log('func1'); };$/;"	f	function:Test
+func2	input.js	/^    Test.func2 = function func2(){ console.log('func2'); };$/;"	f
+func2	input.js	/^    Test.func2 = function func2(){ console.log('func2'); };$/;"	f	function:Test
+funcGen	input.js	/^  function funcGen(A){$/;"	f

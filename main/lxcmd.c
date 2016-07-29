@@ -604,11 +604,12 @@ extern void freeXcmdResources (void)
 }
 
 #ifdef HAVE_COPROC
-static void xcmd_flag_not_avaible_status_long (const char* const s __unused__, const char* const v, void* data)
+static void xcmd_flag_not_avaible_status_long (const char* const s, const char* const v, void* data)
 {
 	xcmdPath *path = data;
 
-	path->not_available_status = strtol ((const char *)v, NULL, 0);
+	if(!strToInt(v, 0, &path->not_available_status))
+		error (FATAL, "Could not parse the value for %s flag: %s", s, v);
 }
 #endif
 
@@ -1061,11 +1062,10 @@ static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 
 	if (hasPseudoTagPrefix (entry->name))
 	{
-		if  ((! isXtagEnabled (XTAG_PSEUDO_TAGS))
-		     || (Option.xref)
-		     || (Option.etags))
+		if  (isXtagEnabled (XTAG_PSEUDO_TAGS))
+			return makePseudoTagEntryFromTagEntry (entry);
+		else
 			return FALSE;
-		return makePseudoTagEntryFromTagEntry (entry);
 	}
 
 	memset(&filePosition, 0, sizeof(filePosition));

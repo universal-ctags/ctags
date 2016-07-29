@@ -1,3 +1,4 @@
 --c++-kinds=+cfl
---fields=+SsK{c++.template}{c++.captures}{c++.end}
+--fields=+SsKe
+--fields-c++=+{template}{captures}
 --sort=no

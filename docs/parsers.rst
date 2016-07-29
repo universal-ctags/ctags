@@ -7,7 +7,7 @@ Parsers
 	:depth: 3
 	:local:
 
-This section deals parser individual topics.
+This section deals with individual parser topics.
 	   
 .. toctree::
 	:maxdepth: 2

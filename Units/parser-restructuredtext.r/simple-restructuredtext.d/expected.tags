@@ -1,0 +1,8 @@
+Chapter 1	input.rst	/^Chapter 1$/;"	c	end:25	sectionMarker:=
+Chapter 2	input.rst	/^Chapter 2$/;"	c	end:39	sectionMarker:=
+Section 1.1	input.rst	/^Section 1.1$/;"	s	chapter:Chapter 1	end:20	sectionMarker:-
+Section 1.2	input.rst	/^Section 1.2$/;"	s	chapter:Chapter 1	end:25	sectionMarker:-
+Section 2.1	input.rst	/^Section 2.1$/;"	s	chapter:Chapter 2	end:35	sectionMarker:-
+Section 2.2	input.rst	/^Section 2.2$/;"	s	chapter:Chapter 2	end:39	sectionMarker:-
+Subsection 1.1.1	input.rst	/^Subsection 1.1.1$/;"	S	section:Section 1.1	end:20	sectionMarker:*
+Subsubsection 1.1.1.1	input.rst	/^Subsubsection 1.1.1.1$/;"	t	subsection:Subsection 1.1.1	end:20	sectionMarker:~

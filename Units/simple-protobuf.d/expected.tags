@@ -1,0 +1,17 @@
+TestPackage	input.proto	/^package TestPackage;$/;"	kind:package
+Message1	input.proto	/^message Message1 {$/;"	kind:message
+field1	input.proto	/^    required string field1 = 1 [default="; required string thisIsNotAField = 1;"];$/;"	kind:field
+Message2	input.proto	/^message Message2 {$/;"	kind:message
+NestedMessage	input.proto	/^    message NestedMessage {$/;"	kind:message
+field2	input.proto	/^        required string field2 = 2;$/;"	kind:field
+Enum1	input.proto	/^    enum Enum1 {$/;"	kind:enum
+YES	input.proto	/^        YES = 1;$/;"	kind:enumerator
+NO	input.proto	/^        NO = 2;$/;"	kind:enumerator
+field3	input.proto	/^    repeated NestedMessage field3 = 3;$/;"	kind:field
+field4	input.proto	/^    optional Enum1 field4 = 4;$/;"	kind:field
+Message3	input.proto	/^message Message3 {$/;"	kind:message
+field5	input.proto	/^    required Message2.NestedMessage field5 = 5;$/;"	kind:field
+field6	input.proto	/^    required .TestPackage.Message2.Enum1 field6 = 6;$/;"	kind:field
+field7	input.proto	/^    optional Message2 . NestedMessage field7 = 7;$/;"	kind:field
+field8	input.proto	/^    repeated int32 field8 = 8 [packed=true];$/;"	kind:field
+Service1	input.proto	/^service Service1 {$/;"	kind:service

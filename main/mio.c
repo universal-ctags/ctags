@@ -23,6 +23,8 @@
 
 #include "routines.h"
 #include "debug.h"
+#else
+#include "mybool.h"
 #endif
 
 #include "mio.h"

@@ -11,12 +11,12 @@ Introduction
 
 The C++ language has strongly evolved since the old C/C++ parser was
 written. The old parser was struggling with some of the new features
-of the language and hash shown signs of reaching its limits.
-For this reason in february/march 2016 the C/C++ parser has been
-rewritten from scratch.
+of the language and has shown signs of reaching its limits. For this
+reason in February/March 2016 the C/C++ parser was rewritten from
+scratch.
 
 In the first release several outstanding bugs were fixed and some new
-features have been added. Among them:
+features were added. Among them:
 
 - Tagging of "using namespace" declarations
 - Tagging of function parameters
@@ -27,7 +27,7 @@ features have been added. Among them:
 - Extraction of local variables which include calls to constructors
 - Extraction of local variables from within the for(), while(), if()
   and switch() parentheses.
-- Support of function prototypes/declarations with trailing return type
+- Support for function prototypes/declarations with trailing return type
 
 At the time of writing (March 2016) more features are planned.
 
@@ -63,8 +63,8 @@ of the scope of a symbol to a single file simply cannot be determined
 with a single pass or without looking at a program as a whole.
 
 The new parser defines a simple policy for file scope association
-that tries to be as compatible as possible with the old parser ad should
-reflect the most common usages. The policy is the following:
+that tries to be as compatible as possible with the old parser and
+should reflect the most common usages. The policy is the following:
 
 - Namespaces are in file scope if declared inside a .c or .cpp file
 
@@ -118,44 +118,10 @@ you just can't tell. Furthermore, struct/class/union/enum types
 share the same namespace and their names can't collide, so the A
 information is redundant for most purposes.
 
-To accomodate generic types and preserve some degree of backward
+To accommodate generic types and preserve some degree of backward
 compatibility the new parser uses struct/class/union/enum in place
 of A where such keyword can be inferred. Where the information is
 not available it uses the 'typename' keyword.
 
 Generally, you should ignore the information in field A and use
 only information in field B.
-
-Kinds separation
-----------------------------------------------------------------------
-
-Old C and C++ parsers share the definition of kinds. So
-enabling/disabling a kind in one parser affects another parser.  In
-the new parsers, they are separated.
-
-
-Let's see an example::
-
-    $ ./ctags --kinds-OldC=+f --list-kinds=OldC++ | grep ^f
-    f  function definitions
-    $ ./ctags --kinds-OldC=-f --list-kinds=OldC++ | grep ^f
-    f  function definitions [off]
-
-In the first command invocation, `f` kind of OldC parser is enabled
-and all kinds of OldC++ parser are listed. grep is appended for
-extracting the information about `f` kind of OldC++ parser. In the
-second command invocation, `f` kind of OldC parser is disabled. Both
-operations are for the kind of OldC parser, however the kind having the
-same name (`f`) of OldC++ parser gets affected by the operations.
-
-Let's do the same on new C and new C++ parsers::
-
-    $ ./ctags --kinds-C=+f --list-kinds=C++ | grep ^f
-    ./ctags --kinds-C=+f --list-kinds=C++ | grep ^f
-    f  function definitions
-    $ ./ctags --kinds-C=-f --list-kinds=C++ | grep ^f
-    ./ctags --kinds-C=-f --list-kinds=C++ | grep ^f
-    f  function definitions
-
-Enabling and disabling a kind of C parser don't affect the kind having
-the same name of C++ parser.

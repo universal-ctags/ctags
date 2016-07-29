@@ -274,6 +274,7 @@ AM_CONDITIONAL(ENABLE_DEBUGGING, [test "x$enable_debugging" = "xyes"])
 # -------------------
 
 AC_PROG_CC
+AC_PROG_CC_C99
 
 if test "${with_sparse_cgcc}" = "yes"; then
 	REAL_CC="${CC}"
@@ -379,7 +380,7 @@ fi
 # Checks for header files
 # -----------------------
 
-AC_CHECK_HEADERS([dirent.h fcntl.h io.h stat.h stdlib.h string.h])
+AC_CHECK_HEADERS([dirent.h errno.h fcntl.h io.h limits.h stat.h stdlib.h string.h])
 AC_CHECK_HEADERS([time.h types.h unistd.h])
 AC_CHECK_HEADERS([sys/dir.h sys/stat.h sys/times.h sys/types.h sys/wait.h])
 
@@ -589,6 +590,14 @@ PKG_CHECK_MODULES(LIBXML, libxml-2.0,
 		       AC_DEFINE(HAVE_LIBXML)],
 		       [have_libxml=no])
 AM_CONDITIONAL(HAVE_LIBXML, test "x$have_libxml" = xyes)
+
+AH_TEMPLATE([HAVE_JANSSON],
+	[Define this value if jansson is available.])
+PKG_CHECK_MODULES(JANSSON, jansson,
+		       [have_jansson=yes
+		       AC_DEFINE(HAVE_JANSSON)],
+		       [have_jansson=no])
+AM_CONDITIONAL(HAVE_JANSSON, test "x$have_jansson" = xyes)
 
 
 # Checks for missing prototypes

@@ -37,6 +37,7 @@ addons:
       - lcov
       - binutils-mingw-w64-i686
       - gcc-mingw-w64-i686
+      - libjansson-dev
 
 env:
   - TARGET=Unix

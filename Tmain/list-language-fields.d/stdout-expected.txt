@@ -1,0 +1,2 @@
+#LETTER	NAME	ENABLED	LANGUAGE	XFMTCHAR	DESCRIPTION
+-	sectionMarker	off	reStructuredText	TRUE	character used for declaring section

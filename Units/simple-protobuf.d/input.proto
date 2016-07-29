@@ -1,0 +1,69 @@
+/*
+  Masatake YAMATO takes this from https://sourceforge.net/p/ctags/patches/74/
+  after getting following approval:
+  ===============================================================================
+  Message-ID: <CALPttHe+hSa_kjwx6GoWS6CsDf_OG0bcmhmPahb4shnKb8tkWg@mail.gmail.com>
+  Subject: Re: your protobuf.patch
+  From: Ivan Krasilnikov <infnty@gmail.com>
+  To: m_yamato@users.sf.net
+  Date: Fri, 8 Jul 2016 15:37:07 +0200
+
+  Hi, yes, it's fine, no problem.
+
+  --
+  Ivan
+
+  On 8 July 2016 at 06:31, <m_yamato@users.sf.net> wrote:
+
+  > Hi,
+  >
+  > I am a developer of universal ctags(http://ctags.io).
+  >
+  > I would like to merge your patch for protobuf in *GPL v2 or later*.
+  >
+  > Is it o.k.?
+  > ------------------------------
+  >
+  > This message was sent to you via the SourceForge web mail form.
+  > You may reply to this message directly, or at
+  > https://sourceforge.net/u/userid-2121776/profile/send_message
+  >
+  ===============================================================================
+*/
+package TestPackage;
+
+message Message1 {
+    required string field1 = 1 [default="; required string thisIsNotAField = 1;"];
+    //optional string commentedField2 = 2;
+    /* optional string commentedField3 = 3; */
+}
+
+message Message2 {
+    message NestedMessage {
+        required string field2 = 2;
+    }
+
+    enum Enum1 {
+        YES = 1;
+        NO = 2;
+    }
+
+    repeated NestedMessage field3 = 3;
+    optional Enum1 field4 = 4;
+}
+
+message Message3 {
+    required Message2.NestedMessage field5 = 5;
+    required .TestPackage.Message2.Enum1 field6 = 6;
+
+    extensions 7 to 8;
+}
+
+extend Message3 {
+    optional Message2 . NestedMessage field7 = 7;
+    repeated int32 field8 = 8 [packed=true];
+}
+
+service Service1 {
+    rpc Method1(Message1) returns(Message2);
+}

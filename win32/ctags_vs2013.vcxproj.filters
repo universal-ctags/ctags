@@ -228,7 +228,9 @@
     <ClCompile Include="..\main\kind.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\lregex.c">
+    <ClCompile Include="..\main\lcpp.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\lregex.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
@@ -251,6 +253,9 @@
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\output-xref.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\main\output-json.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\parse.c">
@@ -352,7 +357,13 @@
     <ClCompile Include="..\main\promise.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\dependency.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\optlib\pod.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\protobuf.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
   </ItemGroup>
@@ -379,9 +390,6 @@
     <ClInclude Include="..\main\fmt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\get.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\main\htable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -389,6 +397,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\kind.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\lcpp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\main.h">
@@ -418,6 +429,9 @@
     <ClInclude Include="..\main\vstring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\gnu_regex\regex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -425,6 +439,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\general.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\gcc-attr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\main\mybool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\routines.h">
@@ -476,6 +496,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
    <ClInclude Include="..\main\promise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\main\depedency.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\main\gcc-attr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\main\mybool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

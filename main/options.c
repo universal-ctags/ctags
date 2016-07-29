@@ -33,6 +33,7 @@
 #include "ptag.h"
 #include "routines.h"
 #include "xtag.h"
+#include "routines.h"
 
 /*
 *   MACROS
@@ -244,6 +245,9 @@ static optionDescription LongOptionDescription [] = {
  {1,"      Include extra tag entries for selected information (flags: \"Ffq.\") [F]."},
  {1,"  --fields=[+|-]flags"},
  {1,"      Include selected extension fields (flags: \"afmikKlnsStzZ\") [fks]."},
+ {1,"  --fields-<LANG|*>=[+|-]flags"},
+ {1,"      Include selected <LANG> own extension fields"},
+ {1,"      (flags: --list-flags=<LANG>)."},
  {1,"  --file-scope=[yes|no]"},
  {1,"       Should tags scoped only for a single file (e.g. \"static\" tags)"},
  {1,"       be included in the output [yes]?"},
@@ -304,7 +308,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of extra tag flags."},
  {1,"  --list-features"},
  {1,"       Output list of features."},
- {1,"  --list-fields"},
+ {1,"  --list-fields=[language|all]"},
  {1,"       Output list of fields. This works with --machinable."},
  {1,"  --list-file-kind"},
  {1,"       List kind letter for file."},
@@ -346,8 +350,14 @@ static optionDescription LongOptionDescription [] = {
  {1,"      The encoding to write the tag file in. Defaults to UTF-8 if --input-encoding"},
  {1,"      is specified, otherwise no conversion is performed."},
 #endif
- {0,"  --output-format=ctags|etags|xref"},
+ {0,"  --output-format=ctags|etags|xref"
+#ifdef HAVE_JANSSON
+  "|json"
+#endif
+ },
  {0,"      Specify the output format. [ctags]"},
+ {0,"  --pattern-length-limit=N"},
+ {0,"      Cutoff patterns of tag entries after N characters. Disable by setting to 0. [96]"},
  {0,"  --print-language"},
  {0,"       Don't make tags file but just print the guessed language name for"},
  {0,"       input file."},
@@ -457,6 +467,9 @@ static const char *const Features [] = {
 #endif
 #ifdef HAVE_LIBXML
 	"xpath",
+#endif
+#ifdef HAVE_JANSSON
+	"json",
 #endif
 	NULL
 };
@@ -640,11 +653,10 @@ extern void checkOptions (void)
 	if (Option.xref && (Option.customXfmt == NULL))
 	{
 		notice = "xref output";
-		if (isXtagEnabled(XTAG_FILE_NAMES) || isXtagEnabled(XTAG_FILE_NAMES_WITH_TOTAL_LINES))
+		if (isXtagEnabled(XTAG_FILE_NAMES))
 		{
 			error (WARNING, "%s disables file name tags", notice);
 			enableXtag (XTAG_FILE_NAMES, FALSE);
-			enableXtag (XTAG_FILE_NAMES_WITH_TOTAL_LINES, FALSE);
 		}
 	}
 	if (Option.append)
@@ -699,7 +711,7 @@ static void setEtagsMode (void)
 	Option.sorted = SO_UNSORTED;
 	Option.lineDirectives = FALSE;
 	Option.tagRelative = TRUE;
-	setTagWriter (writeEtagsEntry, beginEtagsFile, endEtagsFile);
+	setTagWriter (writeEtagsEntry, beginEtagsFile, endEtagsFile, NULL, FALSE);
 }
 
 extern void testEtagsInvocation (void)
@@ -722,8 +734,16 @@ extern void testEtagsInvocation (void)
 static void setXrefMode (void)
 {
 	Option.xref = TRUE;
-	setTagWriter (writeXrefEntry, NULL, NULL);
+	setTagWriter (writeXrefEntry, NULL, NULL, NULL, TRUE);
 }
+
+#ifdef HAVE_JANSSON
+static void setJsonMode (void)
+{
+	enablePtag (PTAG_JSON_OUTPUT_VERSION, TRUE);
+	setTagWriter (writeJsonEntry, NULL, NULL, writeJsonPtagEntry, TRUE);
+}
+#endif
 
 /*
  *  Cooked argument parsing
@@ -1144,13 +1164,13 @@ static void processExtraTagsOption (
 	}
 }
 
-static void resetFieldsOption (boolean mode)
+static void resetFieldsOption (langType lang, boolean mode)
 {
 	int i;
 
 	for (i = 0; i < countFields (); ++i)
-		if (!isFieldFixed (i))
-			enableField (i, mode);
+		if ((lang == LANG_AUTO) || (lang == getFieldOwner (i)))
+			enableField (i, mode, FALSE);
 }
 
 static void processFieldsOption (
@@ -1160,28 +1180,19 @@ static void processFieldsOption (
 	boolean mode = TRUE;
 	int c;
 	fieldType t;
-	unsigned int i;
 
 	static vString * longName;
 	boolean inLongName = FALSE;
-	langType language;
 
 	longName = vStringNewOrClear (longName);
 
 	if (*p == '*')
 	{
-		for (i = 0; i < countParsers(); i++)
-			initializeParser (i);
-
-		resetFieldsOption (TRUE);
+		resetFieldsOption (LANG_IGNORE, TRUE);
 		p++;
 	}
 	else if (*p != '+'  &&  *p != '-')
-	{
-		for (i = 0; i < countParsers(); i++)
-			initializeParser (i);
-		resetFieldsOption (FALSE);
-	}
+		resetFieldsOption (LANG_IGNORE, FALSE);
 
 	while ((c = *p++) != '\0') switch (c)
 	{
@@ -1211,22 +1222,14 @@ static void processFieldsOption (
 				      c);
 
 			{
-				const char *f;
-
-				language = getLanguageComponentInFieldName (vStringValue (longName), &f);
-				t = getFieldTypeForNameAndLanguage (f, language);
+				const char *f = vStringValue (longName);
+				t = getFieldTypeForNameAndLanguage (f, LANG_IGNORE);
 			}
 
 			if (t == FIELD_UNKNOWN)
 				error(FATAL, "nosuch field: \'%s\'", vStringValue (longName));
 
-			enableField (t, mode);
-			if (language == LANG_AUTO)
-			{
-				fieldType ftype_next = t;
-				while ((ftype_next = nextFieldSibling (ftype_next)) != FIELD_UNKNOWN)
-					enableField (ftype_next, mode);
-			}
+			enableField (t, mode, TRUE);
 
 			inLongName = FALSE;
 			vStringClear (longName);
@@ -1240,11 +1243,8 @@ static void processFieldsOption (
 				if (t == FIELD_UNKNOWN)
 					error(WARNING, "Unsupported parameter '%c' for \"%s\" option",
 					      c, option);
-				else if (isFieldFixed (t) && (mode == FALSE))
-					error(WARNING, "Cannot disable basic field: '%c'(%s) for \"%s\" option",
-					      c, getFieldName (t), option);
 				else
-					enableField (t, mode);
+					enableField (t, mode, TRUE);
 			}
 			break;
 	}
@@ -1342,12 +1342,25 @@ static void processListFeaturesOption(const char *const option __unused__,
 }
 
 static void processListFieldsOption(const char *const option __unused__,
-				    const char *const parameter __unused__)
+				    const char *const parameter)
 {
-	unsigned int i;
-	for (i = 0; i < countParsers(); i++)
-		initializeParser (i);
-	printFields ();
+	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+	{
+		initializeParser (LANG_AUTO);
+		printFields (LANG_AUTO);
+	}
+	else
+	{
+		langType language = getNamedLanguage (parameter, 0);
+		if (language == LANG_IGNORE)
+			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
+		else
+		{
+			initializeParser (language);
+			printFields (language);
+		}
+
+	}
 	exit (0);
 }
 
@@ -1833,20 +1846,20 @@ static void processListRolesOptions (const char *const option __unused__,
 		exit (0);
 	}
 
-	sep = strchr (parameter, ':');
+	sep = strchr (parameter, '.');
 
 	if (sep == NULL || sep [1] == '\0')
 	{
 		vString* vstr = vStringNewInit (parameter);
-		vStringCatS (vstr, (sep? "*": ":*"));
+		vStringCatS (vstr, (sep? "*": ".*"));
 		processListRolesOptions (option, vStringValue (vstr));
 		/* The control should never reache here. */
 	}
 
 	kindletters = sep + 1;
-	if (strncmp (parameter, "all:", 4) == 0
-	    || strncmp (parameter, "*:", 1) == 0
-	    || strncmp (parameter, ":", 1) == 0)
+	if (strncmp (parameter, "all.", 4) == 0
+	    || strncmp (parameter, "*.", 1) == 0
+	    || strncmp (parameter, ".", 1) == 0)
 		lang = LANG_AUTO;
 	else
 	{
@@ -1998,6 +2011,10 @@ static void processOutputFormat (const char *const option __unused__,
 		setEtagsMode ();
 	else if (strcmp (parameter, "xref") == 0)
 		setXrefMode ();
+#ifdef HAVE_JANSSON
+	else if (strcmp (parameter, "json") == 0)
+		setJsonMode ();
+#endif
 	else
 		error (FATAL, "unknown output format name supplied for \"%s=%s\"", option, parameter);
 }
@@ -2215,9 +2232,9 @@ static void processEchoOption (const char *const option, const char *const param
 static void processForceQuitOption (const char *const option __unused__,
 				    const char *const parameter)
 {
-	long s = 0;
-	if (parameter != NULL && parameter[0] != '\0')
-		s = strtol (parameter, NULL, 0);
+	int s;
+	if (parameter == NULL || parameter[0] == '\0' || !strToInt(parameter, 0, &s))
+		s = 0;
 	exit (s);
 }
 
@@ -2363,6 +2380,15 @@ static void processMaxRecursionDepthOption (const char *const option, const char
 	Option.maxRecursionDepth = atol(parameter);
 }
 
+static void processPatternLengthLimit(const char *const option, const char *const parameter)
+{
+	if (parameter == NULL || parameter[0] == '\0')
+		error (FATAL, "A parameter is needed after \"%s\" option", option);
+
+	if (!strToUInt(parameter, 0, &Option.patternLengthLimit))
+		error (FATAL, "-%s: Invalid pattern length limit", option);
+}
+
 static boolean* redirectToXtag(const booleanOption *const option)
 {
 	/* WARNING/TODO: This function breaks capsulization. */
@@ -2417,7 +2443,8 @@ static parametricOption ParametricOptions [] = {
 	{ "_list-roles",            processListRolesOptions,        TRUE,   STAGE_ANY },
 	{ "maxdepth",               processMaxRecursionDepthOption, TRUE,   STAGE_ANY },
 	{ "options",                processOptionFile,              FALSE,  STAGE_ANY },
-	{ "output-format",          processOutputFormat,            TRUE,   STAGE_ANY},
+	{ "output-format",          processOutputFormat,            TRUE,   STAGE_ANY },
+	{ "pattern-length-limit",   processPatternLengthLimit,      TRUE,   STAGE_ANY },
 	{ "pseudo-tags",            processPseudoTags,              FALSE,  STAGE_ANY },
 	{ "sort",                   processSortOption,              TRUE,   STAGE_ANY },
 	{ "version",                processVersionOption,           TRUE,   STAGE_ANY },
@@ -2536,6 +2563,118 @@ static boolean processBooleanOption (
 	return found;
 }
 
+static void enableLanguageField (langType language, const char *field, boolean mode)
+{
+
+	fieldType t;
+
+	t = getFieldTypeForNameAndLanguage (field, language);
+	if (t == FIELD_UNKNOWN)
+		error(FATAL, "no such field: \'%s\'", field);
+	enableField (t, mode, (language != LANG_AUTO));
+	if (language == LANG_AUTO)
+	{
+		fieldType ftype_next = t;
+
+		while ((ftype_next = nextSiblingField (ftype_next)) != FIELD_UNKNOWN)
+			enableField (ftype_next, mode, (language != LANG_AUTO));
+	}
+}
+
+static boolean processLangSpecificFieldsOption (const char *const option,
+						const char *const parameter)
+{
+#define PREFIX "fields-"
+#define PREFIX_LEN strlen(PREFIX)
+	const char* lang;
+	size_t len;
+	langType language = LANG_IGNORE;
+	const char *p = parameter;
+	int c;
+	static vString * longName;
+	boolean mode = TRUE;
+	const char *f;
+	boolean inLongName = FALSE;
+
+	if ( strncmp (option, PREFIX, PREFIX_LEN) != 0 )
+		return FALSE;
+
+	lang = option + PREFIX_LEN;
+	len = strlen (lang);
+	if (len == 0)
+		error (FATAL, "No language given in \"%s\" option", option);
+	else if (len == 1 && lang[0] == '*')
+		language = LANG_AUTO;
+	else
+		language = getNamedLanguage (lang, len);
+
+	if (language == LANG_IGNORE)
+	{
+		error (WARNING, "Unknown language: %s (ignoring \"--%s\")", lang, option);
+		/* The option is consumed in tihs function. */
+		return TRUE;
+	}
+
+	initializeParser (language);
+
+	if (*p == '*')
+	{
+		resetFieldsOption (language, TRUE);
+		p++;
+	}
+	else if (*p == '{')
+		resetFieldsOption (language, FALSE);
+	else if (*p != '+' && *p != '-')
+		error (WARNING, "Wrong per language field specification: %s", p);
+
+	longName = vStringNewOrClear (longName);
+	while ((c = *p++) != '\0')
+	{
+		switch (c)
+		{
+		case '+':
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				mode = TRUE;
+			break;
+		case '-':
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				mode = FALSE;
+			break;
+		case '{':
+			if (inLongName)
+				error (FATAL,
+				       "unexpected character in field specification: \'%c\'",
+				       c);
+			inLongName = TRUE;
+			break;
+		case '}':
+			if (!inLongName)
+				error (FATAL,
+				       "unexpected character in field specification: \'%c\'",
+				       c);
+
+			f = vStringValue (longName);
+			enableLanguageField (language, f, mode);
+			inLongName = FALSE;
+			vStringClear (longName);
+			break;
+		default:
+			if (inLongName)
+				vStringPut (longName, c);
+			else
+				error (FATAL,
+				       "only long name can be used in per language field spec: \'%c\'",
+				       c);
+			break;
+		}
+	}
+	return TRUE;
+}
+
 static void processLongOption (
 		const char *const option, const char *const parameter)
 {
@@ -2549,6 +2688,8 @@ static void processLongOption (
 
 	if (processBooleanOption (option, parameter))
 		;
+	else if (processLangSpecificFieldsOption(option, parameter))
+		 ;
 	else if (processParametricOption (option, parameter))
 		;
 	else if (processKindOption (option, parameter))
@@ -2600,7 +2741,9 @@ static void processShortOption (
 			Option.breakLine = atol (parameter);
 			break;
 		case 'D':
-			Option.debugLevel = strtol (parameter, NULL, 0);
+			if (!strToLong(parameter, 0, &Option.debugLevel))
+				error (FATAL, "-%s: Invalid debug level", option);
+
 			if (debug (DEBUG_STATUS))
 				Option.verbose = TRUE;
 			break;
@@ -3160,6 +3303,9 @@ extern void initOptions (void)
 	processExcludeOption (NULL, "*.gcda");
 
 	processExcludeOption (NULL, "*.class");
+
+	processExcludeOption (NULL, "*.pyc");
+	processExcludeOption (NULL, "*.pyo");	
 }
 
 extern void freeOptionResources (void)

@@ -13,7 +13,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"  /* must always come first */
-#include "kind.h"
+#include "types.h"
 
 /*
 *   MACROS
@@ -21,13 +21,13 @@
 /*  Is the character valid as a character of a C identifier?
  *  VMS allows '$' in identifiers.
  */
-#define isident(c)  (isalnum(c) || (c) == '_' || (c) == '$')
+#define cppIsident(c)  (isalnum(c) || (c) == '_' || (c) == '$')
 
 /*  Is the character valid as the first character of a C identifier?
  *  C++ allows '~' in destructors.
  *  VMS allows '$' in identifiers.
  */
-#define isident1(c)  ( ((c >= 0) && (c < 0x80) && isalpha(c)) \
+#define cppIsident1(c)  ( ((c >= 0) && (c < 0x80) && isalpha(c)) \
 		       || (c) == '_' || (c) == '~' || (c) == '$')
 /* NOTE about isident1 profitability
 
@@ -57,24 +57,23 @@
 /*
 *   FUNCTION PROTOTYPES
 */
-extern boolean isBraceFormat (void);
-extern unsigned int getDirectiveNestLevel (void);
+extern boolean cppIsBraceFormat (void);
+extern unsigned int cppGetDirectiveNestLevel (void);
 
 extern void cppInit (const boolean state,
 		     const boolean hasAtLiteralStrings,
 		     const boolean hasCxxRawLiteralStrings,
 		     const boolean hasSingleQuoteLiteralNumbers,
-		     const struct sKindOption *defineMacroKind,
+		     const kindOption *defineMacroKind,
 		     int macroUndefRoleIndex,
-		     const struct sKindOption *headerKind,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex,
-		     int endFieldType);
+		     const kindOption *headerKind,
+		     int headerSystemRoleIndex, int headerLocalRoleIndex);
 extern void cppTerminate (void);
 extern void cppBeginStatement (void);
 extern void cppEndStatement (void);
 extern void cppUngetc (const int c);
 extern int cppGetc (void);
-extern int skipOverCComment (void);
+extern int cppSkipOverCComment (void);
 
 #endif  /* CTAGS_MAIN_GET_H */
 

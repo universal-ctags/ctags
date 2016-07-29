@@ -18,7 +18,7 @@
 
 #include "parse.h"
 #include "vstring.h"
-#include "get.h"
+#include "lcpp.h"
 #include "debug.h"
 #include "keyword.h"
 #include "read.h"
@@ -97,6 +97,7 @@ boolean cxxParserParseAndCondenseCurrentSubchain(
 		);
 	g_cxx.pTokenChain = pCurrentChain;
 	g_cxx.pToken = pCurrentChain->pTail;
+
 	return bRet;
 }
 
@@ -302,7 +303,7 @@ boolean cxxParserParseToEndOfQualifedName(void)
 			CXX_DEBUG_LEAVE_TEXT("EOF in cxxParserParseNextToken");
 			return FALSE; // EOF
 		}
-		
+
 		if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Found no identifier after multiple colons");
@@ -336,13 +337,11 @@ void cxxParserMarkEndLineForTagInCorkQueue(int iCorkQueueIndex)
 {
 	CXX_DEBUG_ASSERT(iCorkQueueIndex > CORK_NIL,"The cork queue index is not valid");
 
-	char buf[16];
+	tagEntryInfo * tag = getEntryInCorkQueue (iCorkQueueIndex);
 
-	if(!cxxTagFieldEnabled(CXXTagFieldEndLine))
-		return;
+	CXX_DEBUG_ASSERT(tag,"No tag entry in the cork queue");
 
-	sprintf(buf,"%ld",getInputLineNumber());
-	cxxTagSetCorkQueueField(iCorkQueueIndex,CXXTagFieldEndLine,buf);
+	tag->extensionFields.endLine = getInputLineNumber();
 }
 
 // Make sure that the token chain contains only the specified keyword and eventually
@@ -432,7 +431,7 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 			g_cxx.pTokenChain,
 			cxxTokenCreateKeyword(iFileLine,oFilePosition,eTagKeyword)
 		);
-	
+
 	if(uKeywordState & CXXParserKeywordStateSeenConst)
 	{
 		cxxTokenChainPrepend(
@@ -549,7 +548,7 @@ boolean cxxParserParseEnum(void)
 				pNamespaceBegin = pPrev;
 				pPrev = pPrev->pPrev;
 			}
-	
+
 			while(pNamespaceBegin != pEnumName)
 			{
 				CXXToken * pNext = pNamespaceBegin->pNext;
@@ -1285,9 +1284,6 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 	int role_for_macro_undef = CR_MACRO_UNDEF;
 	int role_for_header_system = CR_HEADER_SYSTEM;
 	int role_for_header_local = CR_HEADER_LOCAL;
-	int end_field_type = cxxParserCurrentLanguageIsCPP()?
-		cxxTagGetCPPFieldSpecifiers () [CXXTagFieldEndLine].ftype:
-		cxxTagGetCFieldSpecifiers ()   [CXXTagFieldEndLine].ftype;
 
 	Assert(passCount < 3);
 
@@ -1300,8 +1296,7 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 			role_for_macro_undef,
 			kind_for_header,
 			role_for_header_system,
-			role_for_header_local,
-			end_field_type
+			role_for_header_local
 		);
 
 	g_cxx.iChar = ' ';

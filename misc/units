@@ -507,7 +507,7 @@ run_tcase ()
     if [ -f "${ffeatures}" ] && ! tmp=$(check_features "${ffeatures}"); then
 	L_SKIPPED_BY_FEATURES="$L_SKIPPED_BY_FEATURES ${category}/${name}"
 	case "${tmp}" in
-	    !*) run_result skip "${oresult}" "unwated feature \"${tmp#?}\" is available";;
+	    !*) run_result skip "${oresult}" "unwanted feature \"${tmp#?}\" is available";;
 	    *)  run_result skip "${oresult}" "required feature \"${tmp}\" is not available";;
 	esac
 	return 1

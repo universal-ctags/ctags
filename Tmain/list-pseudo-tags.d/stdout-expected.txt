@@ -1,3 +1,4 @@
+JSON_OUTPUT_VERSION	the version of json output stream format	off
 TAG_FILE_FORMAT	the version of tags file format	on
 TAG_FILE_SORTED	how tags are sorted	on
 TAG_PROGRAM_AUTHOR	the author of this ctags implementation	on

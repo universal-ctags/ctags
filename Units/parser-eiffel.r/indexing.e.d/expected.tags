@@ -1,1 +1,3 @@
-INDEXING_	input.e	/^class INDEXING_$/;"	c
+INDEXING_KEYWORD_TEST	input.e	/^	INDEXING_KEYWORD_TEST$/;"	c
+feature1	input.e	/^	feature1$/;"	f	class:INDEXING_KEYWORD_TEST
+feature2	input.e	/^	feature2: INTEGER$/;"	f	class:INDEXING_KEYWORD_TEST

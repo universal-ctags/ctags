@@ -1,4 +1,4 @@
-indexing
+note
 
 	description: "Try everything"
 
@@ -65,7 +65,7 @@ invariant
 
 	invariant: condition
 
-indexing
+note
 
 	license: "May not be used for any purpose"
 

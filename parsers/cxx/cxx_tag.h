@@ -51,7 +51,6 @@ enum CXXTagCPPKind
 // The fields common to all (sub)languages this parser supports.
 enum CXXTagCommonField
 {
-	CXXTagFieldEndLine,
 	CXXTagFieldProperties,
 	
 	CXXTagCommonFieldCount
@@ -132,7 +131,9 @@ typedef enum _CXXTagProperty
 	// Template specialization a<x>()
 	CXXTagPropertyTemplateSpecialization = (1 << 13),
 	// Template specialization of scope a<x>::b() (which implies TemplateSpec too)
-	CXXTagPropertyScopeTemplateSpecialization = (1 << 14)
+	CXXTagPropertyScopeTemplateSpecialization = (1 << 14),
+	// __attribute__((deprecated)) has been seen
+	CXXTagPropertyDeprecated = (1 << 15),
 } CXXTagProperty;
 
 // Set the modifiers field of the tag.

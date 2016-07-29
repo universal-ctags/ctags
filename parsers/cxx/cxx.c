@@ -17,6 +17,7 @@
 #include "cxx_scope.h"
 #include "cxx_tag.h"
 
+#include "dependency.h"
 #include "selectors.h"
 
 //
@@ -111,11 +112,16 @@ parserDefinition * CppParser (void)
 #endif
 		NULL
 	};
+	static parserDependency dependencies [] = {
+		{ DEPTYPE_KIND_OWNER, "C" },
+	};
 
 	static selectLanguage selectors[] = { selectByObjectiveCKeywords, NULL };
 
 	parserDefinition* def = parserNew("C++");
 
+	def->dependencies = dependencies;
+	def->dependencyCount = ARRAY_SIZE (dependencies);
 	def->kinds = cxxTagGetCPPKindOptions();
 	def->kindCount = cxxTagGetCPPKindOptionCount();
 	def->fieldSpecs = cxxTagGetCPPFieldSpecifiers();

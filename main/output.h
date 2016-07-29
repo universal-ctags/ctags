@@ -17,13 +17,20 @@
    preWriteEntryFunc, it should be freed in postWriteEntryFunc. */
 
 typedef int (* writeEntryFunc) (MIO * mio, const tagEntryInfo *const tag, void *data);
+typedef int (* writePtagEntryFunc) (MIO * mio, const ptagDesc *desc,
+				    const char *const fileName,
+				    const char *const pattern,
+				    const char *const parserName, void *data);
 typedef void * (* preWriteEntryFunc) (MIO * mio);
 typedef void (* postWriteEntryFunc)  (MIO * mio, const char* filename, void *data);
 
 extern void setTagWriter (writeEntryFunc func,
 			  preWriteEntryFunc preFunc,
-			  postWriteEntryFunc postFunc);
+			  postWriteEntryFunc postFunc,
+			  writePtagEntryFunc ptagFunc,
+			  boolean useStdout);
 
+extern boolean outpuFormatUsedStdoutByDefault (void);
 
 extern int writeEtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data);
 extern void *beginEtagsFile (MIO * mio);
@@ -31,6 +38,16 @@ extern void  endEtagsFile   (MIO * mio, const char* filename, void *data);
 
 extern int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__);
 extern int writeXrefEntry  (MIO * mio, const tagEntryInfo *const tag, void *data __unused__);
+extern int writeJsonEntry  (MIO * mio, const tagEntryInfo *const tag, void *data __unused__);
+
+extern int writeCtagsPtagEntry (MIO * mio, const ptagDesc *desc,
+				const char *const fileName,
+				const char *const pattern,
+				const char *const parserName, void *data __unused__);
+extern int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
+				const char *const fileName,
+				const char *const pattern,
+				const char *const parserName, void *data __unused__);
 
 extern int makePatternStringCommon (const tagEntryInfo *const tag,
 				    int putc_func (char , void *),
@@ -39,5 +56,7 @@ extern int makePatternStringCommon (const tagEntryInfo *const tag,
 extern void truncateTagLine (char *const line, const char *const token,
 			     const boolean discardNewline);
 extern void abort_if_ferror(MIO *const fp);
+
+extern boolean ptagMakeJsonOutputVersion (ptagDesc *desc, void *data __unused__);
 
 #endif 

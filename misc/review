@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # review - Review the diff between expected output and actual output in Units
 #
@@ -130,10 +130,11 @@ inspect_cmd_show_generic ()
 {
     local tcase=$1
     local file=$2
+    shift 2
     local f=./Units/${tcase}/${file}
 
     if [[ -r "$f" ]]; then
-	cat "$f"
+	"$@" "$f"
     else
 	echo "No ${file}" 1>&2
     fi
@@ -143,12 +144,34 @@ inspect_cmd_show_generic ()
 
 inspect_cmd_show_diff ()
 {
-    inspect_cmd_show_generic $1 DIFF.tmp
+    local cmd=cat
+
+    if which colordiff > /dev/null; then
+	cmd=colordiff
+    fi
+
+    inspect_cmd_show_generic $1 DIFF.tmp cat | ${cmd}
 }
 
 inspect_show_args_ctags ()
 {
-    inspect_cmd_show_generic $1 args.ctags
+    inspect_cmd_show_generic $1 args.ctags cat
+}
+
+pygmentize_or_cat ()
+{
+    if which pygmentize > /dev/null; then
+	pygmentize -O "style=colorful,linenos=1" $1 2>/dev/null || cat -n $1
+    else
+	cat -n $1
+    fi
+}
+
+inspect_show_input ()
+{
+    local tcase=$1
+
+    inspect_cmd_show_generic $tcase $(basename ./Units/${tcase}/input.*) pygmentize_or_cat
 }
 
 inspect_cmd_quit ()
@@ -195,7 +218,7 @@ do_inspect ()
     for t in $(do_list ${including_known_bugs}); do
 	next=0
 	PS3="[[ $t ]]? "
-	select r in 'accept' 'skip' 'diff' 'quit' 'show args.ctags'; do
+	select r in '<a>ccept' '<s>kip' '<d>iff' 'show args.<c>tags' 'show <i>nput' '<q>uit'; do
 	    case $r in
 		(accept)
 		    if inspect_cmd_accept "$t"; then
@@ -215,6 +238,9 @@ do_inspect ()
 		("show args.ctags")
 		    inspect_show_args_ctags "$t"
 		    ;;
+		("show input")
+		    inspect_show_input "$t"
+		    ;;
 		(*)
 		    case $REPLY in
 			(a|accept)
@@ -232,8 +258,11 @@ do_inspect ()
 			(q|quit)
 			    inspect_cmd_quit
 			    ;;
-			(A|args.ctags)
+			(c|A|args.ctags)
 			    inspect_show_args_ctags "$t"
+			    ;;
+			(i|input)
+			    inspect_show_input "$t"
 			    ;;
 			(*)
 			    inspect_cmd_unknown

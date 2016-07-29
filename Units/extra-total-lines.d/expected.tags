@@ -1,2 +1,2 @@
-input.c	input.c	6;"	F
-main	input.c	2;"	f	typeref:typename:int
+input.c	input.c	1;"	F	end:6
+main	input.c	2;"	f	typeref:typename:int	end:5

@@ -555,24 +555,26 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 					);
 
 			vString * pszProperties = NULL;
-			
+
 			if(cxxTagFieldEnabled(CXXTagFieldProperties))
 			{
 				unsigned int uProperties = 0;
-		
+
 				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenStatic)
 					uProperties |= CXXTagPropertyStatic;
 				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenExtern)
 					uProperties |= CXXTagPropertyExtern;
 				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenMutable)
 					uProperties |= CXXTagPropertyMutable;
+				if(g_cxx.uKeywordState & CXXParserKeywordStateSeenAttributeDeprecated)
+					uProperties |= CXXTagPropertyDeprecated;
 				// Volatile is part of the type, so we don't mark it as a property
 				//if(g_cxx.uKeywordState & CXXParserKeywordStateSeenVolatile)
 				//	uProperties |= CXXTagPropertyVolatile;
 
 				pszProperties = cxxTagSetProperties(uProperties);
 			}
-	
+
 			cxxTagCommit();
 
 			if(pTypeToken)

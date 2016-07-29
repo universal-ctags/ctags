@@ -39,32 +39,43 @@ static int printLiteral (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag __unu
 	return mio_puts (fp, fspec->const_str);
 }
 
+static boolean isParserFieldCompatibleWithFtype (const tagField *pfield, int baseFtype)
+{
+	do {
+		if (pfield->ftype == baseFtype)
+			return TRUE;
+		baseFtype = nextSiblingField (baseFtype);
+	} while (baseFtype != FIELD_UNKNOWN);
+	return FALSE;
+}
+
 static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
 {
 	int i;
 	int width = fspec->field.width;
 	int ftype;
-	const char* str;
+	const char* str = NULL;
 
 	ftype = fspec->field.ftype;
 
-	if (isFieldOwnedByParser (ftype))
+	if (isCommonField (ftype))
+		str = renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
+	else
 	{
 		unsigned int findex;
 
 		for (findex = 0; findex < tag->usedParserFields; findex++)
 		{
-			if (tag->parserFields [findex].ftype == ftype)
+			if (isParserFieldCompatibleWithFtype (tag->parserFields + findex, ftype))
 				break;
 		}
 
-		if (findex < tag->usedParserFields)
-			str = renderFieldEscaped (ftype, tag, findex);
-		else
-			str = ""; /* TODO */
+		if (findex == tag->usedParserFields)
+			str = "";
+		else if (isFieldEnabled (tag->parserFields [findex].ftype))
+			str = renderFieldEscaped (tag->parserFields [findex].ftype,
+						  tag, findex);
 	}
-	else
-		str = renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
 
 	if (str == NULL)
 		str = "";
@@ -92,6 +103,62 @@ static fmtElement** queueLiteral (fmtElement **last, char *literal)
 	return &(cur->next);
 }
 
+/* `getLanguageComponentInFieldName' is used as part of the option parameter
+   for --_xformat option.
+
+   It splits the value of fullName into a language part and a field name part.
+   Here the two parts are combined with `.'.
+
+   If it cannot find a period, it returns LANG_IGNORE and sets
+   fullname to *fieldName.
+
+   If lang part if `*', it returns LANG_AUTO and sets the field
+   name part to *fieldName.
+
+   Though a period is found but no parser (langType) is found for
+   the language parser, this function returns LANG_IGNORE and sets
+   NULL to *fieldName.
+
+   A proper parser is found, this function returns langType for the
+   parser and sets the field name part to *fieldName. */
+static langType getLanguageComponentInFieldName (const char *fullName,
+						 const char **fieldName)
+{
+	const char *tmp;
+	langType language;
+
+	tmp = strchr (fullName, '.');
+	if (tmp)
+	{
+		size_t len = tmp - fullName;
+
+		if (len == 1 && fullName[0] == '*')
+		{
+			language = LANG_AUTO;
+			*fieldName = tmp + 1;
+		}
+		else if (len == 0)
+		{
+			language = LANG_IGNORE;
+			*fieldName = tmp + 1;
+		}
+		else
+		{
+			language = getNamedLanguage (fullName, len);
+			if (language == LANG_IGNORE)
+				*fieldName = NULL;
+			else
+				*fieldName = tmp + 1;
+		}
+	}
+	else
+	{
+		language = LANG_IGNORE;
+		*fieldName = fullName;
+	}
+	return language;
+}
+
 static fmtElement** queueTagField (fmtElement **last, long width, char field_letter,
 				   const char *field_name)
 {
@@ -104,6 +171,8 @@ static fmtElement** queueTagField (fmtElement **last, long width, char field_let
 		const char *f;
 
 		language = getLanguageComponentInFieldName (field_name, &f);
+		if (f == NULL)
+			error (FATAL, "No suitable parser for field name: %s", field_name);
 		ftype = getFieldTypeForNameAndLanguage (f, language);
 	}
 	else
@@ -131,12 +200,13 @@ static fmtElement** queueTagField (fmtElement **last, long width, char field_let
 	cur->spec.field.width = width;
 	cur->spec.field.ftype = ftype;
 
-	enableField (ftype, TRUE);
+	enableField (ftype, TRUE, FALSE);
 	if (language == LANG_AUTO)
 	{
 		fieldType ftype_next = ftype;
-		while ((ftype_next = nextFieldSibling (ftype_next)) != FIELD_UNKNOWN)
-			enableField (ftype_next, TRUE);
+
+		while ((ftype_next = nextSiblingField (ftype_next)) != FIELD_UNKNOWN)
+			enableField (ftype_next, TRUE, FALSE);
 	}
 
 	cur->printer = printTagField;
@@ -205,9 +275,7 @@ extern fmtElement *fmtNew (const char*  fmtString)
 				column_width = 0;
 				if (width)
 				{
-					errno = 0;
-					column_width = strtol (vStringValue (width), NULL, 0);
-					if (errno != 0)
+					if(!strToLong (vStringValue (width), 0, &column_width))
 						error (FATAL | PERROR, "coverting failed: %s", vStringValue (width));
 					vStringDelete (width);
 					width = NULL;

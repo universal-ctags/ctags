@@ -14,14 +14,27 @@
 #include "options.h"
 #include "output.h"
 #include "read.h"
+#include "ptag.h"
 
 
-#define includeExtensionFlags()         (Option.tagFileFormat > 1)
-
-
-static const char* escapeName (const tagEntryInfo * tag, fieldType ftype)
+static const char* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
 {
 	return renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
+}
+
+static int renderExtensionFieldMaybe (int xftype, const tagEntryInfo *const tag, char sep[2], MIO *mio)
+{
+	if (isFieldEnabled (xftype) && doesFieldHaveValue (xftype, tag))
+	{
+		int len;
+		len = mio_printf (mio, "%s\t%s:%s", sep,
+				  getFieldName (xftype),
+				  escapeFieldValue (tag, xftype));
+		sep[0] = '\0';
+		return len;
+	}
+	else
+		return 0;
 }
 
 static int addParserFields (MIO * mio, const tagEntryInfo *const tag)
@@ -46,7 +59,7 @@ static int addParserFields (MIO * mio, const tagEntryInfo *const tag)
 static int writeLineNumberEntry (MIO * mio, const tagEntryInfo *const tag)
 {
 	if (Option.lineDirectives)
-		return mio_printf (mio, "%s", escapeName (tag, FIELD_LINE_NUMBER));
+		return mio_printf (mio, "%s", escapeFieldValue (tag, FIELD_LINE_NUMBER));
 	else
 		return mio_printf (mio, "%lu", tag->lineNumber);
 }
@@ -82,110 +95,72 @@ static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 		?"%s\t%s:%s:%s"
 		:"%s\t%s%s:%s";
 
-	boolean first = TRUE;
-	const char* separator = ";\"";
-	const char* const empty = "";
+	char sep [] = {';', '"', '\0'};
 	int length = 0;
-
-	boolean making_fq_tag =  (doesInputLanguageRequestAutomaticFQTag ()
-				  && isXtagEnabled (XTAG_QUALIFIED_TAGS));
-
-/* "sep" returns a value only the first time it is evaluated */
-#define sep (first ? (first = FALSE, separator) : empty)
 
 	if (tag->kind->name != NULL && (isFieldEnabled (FIELD_KIND_LONG)  ||
 		 (isFieldEnabled (FIELD_KIND)  && tag->kind == '\0')))
+	{
 		length += mio_printf (mio, kindFmt, sep, kindKey, tag->kind->name);
+		sep [0] = '\0';
+	}
 	else if (tag->kind != '\0'  && (isFieldEnabled (FIELD_KIND) ||
 			(isFieldEnabled (FIELD_KIND_LONG) &&  tag->kind->name == NULL)))
 	{
 		char str[2] = {tag->kind->letter, '\0'};
 		length += mio_printf (mio, kindFmt, sep, kindKey, str);
+		sep [0] = '\0';
 	}
 
-	if (isFieldEnabled (FIELD_LINE_NUMBER))
+	if (isFieldEnabled (FIELD_LINE_NUMBER) &&  doesFieldHaveValue (FIELD_LINE_NUMBER, tag))
+	{
 		length += mio_printf (mio, "%s\t%s:%ld", sep,
 				   getFieldName (FIELD_LINE_NUMBER),
 				   tag->lineNumber);
+		sep [0] = '\0';
+	}
 
-	if (isFieldEnabled (FIELD_LANGUAGE)  &&  tag->language != NULL)
-		length += mio_printf (mio, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_LANGUAGE),
-				   escapeName (tag, FIELD_LANGUAGE));
+	length += renderExtensionFieldMaybe (FIELD_LANGUAGE, tag, sep, mio);
 
-	if (isFieldEnabled (FIELD_SCOPE) || making_fq_tag)
+	if (isFieldEnabled (FIELD_SCOPE))
 	{
 		const char* k = NULL, *v = NULL;
 
-		k = escapeName (tag, FIELD_SCOPE_KIND_LONG);
-		v = escapeName (tag, FIELD_SCOPE);
-
-		if (isFieldEnabled (FIELD_SCOPE) && k && v)
+		k = escapeFieldValue (tag, FIELD_SCOPE_KIND_LONG);
+		v = escapeFieldValue (tag, FIELD_SCOPE);
+		if (k && v)
+		{
 			length += mio_printf (mio, scopeFmt, sep, scopeKey, k, v);
+			sep [0] = '\0';
+		}
 	}
 
-	if (isFieldEnabled (FIELD_TYPE_REF) &&
-	    tag->extensionFields.typeRef [0] != NULL  &&
-	    tag->extensionFields.typeRef [1] != NULL)
+	if (isFieldEnabled (FIELD_TYPE_REF) && doesFieldHaveValue (FIELD_TYPE_REF, tag))
+	{
 		length += mio_printf (mio, "%s\t%s:%s:%s", sep,
 				      getFieldName (FIELD_TYPE_REF),
 				      tag->extensionFields.typeRef [0],
-				      escapeName (tag, FIELD_TYPE_REF));
+				      escapeFieldValue (tag, FIELD_TYPE_REF));
+		sep [0] = '\0';
+	}
 
-	if (isFieldEnabled (FIELD_FILE_SCOPE) &&  tag->isFileScope)
+	if (isFieldEnabled (FIELD_FILE_SCOPE) &&  doesFieldHaveValue (FIELD_FILE_SCOPE, tag))
+	{
 		length += mio_printf (mio, "%s\t%s:", sep,
 				      getFieldName (FIELD_FILE_SCOPE));
-
-	if (isFieldEnabled (FIELD_INHERITANCE) &&
-			tag->extensionFields.inheritance != NULL)
-		length += mio_printf (mio, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_INHERITANCE),
-				   escapeName (tag, FIELD_INHERITANCE));
-
-	if (isFieldEnabled (FIELD_ACCESS) &&  tag->extensionFields.access != NULL)
-		length += mio_printf (mio, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_ACCESS),
-				   tag->extensionFields.access);
-
-	if (isFieldEnabled (FIELD_IMPLEMENTATION) &&
-			tag->extensionFields.implementation != NULL)
-		length += mio_printf (mio, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_IMPLEMENTATION),
-				   tag->extensionFields.implementation);
-
-	if (isFieldEnabled (FIELD_SIGNATURE) &&
-			tag->extensionFields.signature != NULL)
-		length += mio_printf (mio, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_SIGNATURE),
-				   escapeName (tag, FIELD_SIGNATURE));
-	if (isFieldEnabled (FIELD_ROLE) && tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)
-		length += mio_printf (mio, "%s\t%s:%s", sep,
-				   getFieldName (FIELD_ROLE),
-				   escapeName (tag, FIELD_ROLE));
-
-	if (isFieldEnabled (FIELD_EXTRA))
-	{
-		const char *value = escapeName (tag, FIELD_EXTRA);
-		if (value)
-			length += mio_printf (mio, "%s\t%s:%s", sep,
-					   getFieldName (FIELD_EXTRA),
-					   escapeName (tag, FIELD_EXTRA));
+		sep [0] = '\0';
 	}
 
-#ifdef HAVE_LIBXML
-	if (isFieldEnabled(FIELD_XPATH))
-	{
-		const char *value = escapeName (tag, FIELD_XPATH);
-		if (value)
-			length += mio_printf (mio, "%s\t%s:%s", sep,
-					      getFieldName (FIELD_XPATH),
-					      escapeName (tag, FIELD_XPATH));
-
-	}
-#endif
+	length += renderExtensionFieldMaybe (FIELD_INHERITANCE, tag, sep, mio);
+	length += renderExtensionFieldMaybe (FIELD_ACCESS, tag, sep, mio);
+	length += renderExtensionFieldMaybe (FIELD_IMPLEMENTATION, tag, sep, mio);
+	length += renderExtensionFieldMaybe (FIELD_SIGNATURE, tag, sep, mio);
+	length += renderExtensionFieldMaybe (FIELD_ROLE, tag, sep, mio);
+	length += renderExtensionFieldMaybe (FIELD_EXTRA, tag, sep, mio);
+	length += renderExtensionFieldMaybe (FIELD_XPATH, tag, sep, mio);
+	length += renderExtensionFieldMaybe (FIELD_END, tag, sep, mio);
 
 	return length;
-#undef sep
 }
 
 static int writePatternEntry (MIO *mio, const tagEntryInfo *const tag)
@@ -196,8 +171,8 @@ static int writePatternEntry (MIO *mio, const tagEntryInfo *const tag)
 extern int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__)
 {
 	int length = mio_printf (mio, "%s\t%s\t",
-			      escapeName (tag, FIELD_NAME),
-			      escapeName (tag, FIELD_INPUT_FILE));
+			      escapeFieldValue (tag, FIELD_NAME),
+			      escapeFieldValue (tag, FIELD_INPUT_FILE));
 
 	if (tag->lineNumberEntry)
 		length += writeLineNumberEntry (mio, tag);
@@ -207,11 +182,29 @@ extern int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data
 		length += writePatternEntry (mio, tag);
 
 	if (includeExtensionFlags ())
+	{
 		length += addExtensionFields (mio, tag);
-
-	length += addParserFields (mio, tag);
+		length += addParserFields (mio, tag);
+	}
 
 	length += mio_printf (mio, "\n");
 
 	return length;
+}
+
+extern int writeCtagsPtagEntry (MIO * mio, const ptagDesc *desc,
+				const char *const fileName,
+				const char *const pattern,
+				const char *const parserName, void *data __unused__)
+{
+	return parserName
+
+#define OPT(X) ((X)?(X):"")
+		? mio_printf (mio, "%s%s%s%s\t%s\t%s\n",
+			      PSEUDO_TAG_PREFIX, desc->name, PSEUDO_TAG_SEPARATOR, parserName,
+			      OPT(fileName), OPT(pattern))
+		: mio_printf (mio, "%s%s\t%s\t/%s/\n",
+			      PSEUDO_TAG_PREFIX, desc->name,
+			      OPT(fileName), OPT(pattern));
+#undef OPT
 }

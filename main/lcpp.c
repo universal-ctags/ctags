@@ -17,7 +17,7 @@
 
 #include "debug.h"
 #include "entry.h"
-#include "get.h"
+#include "lcpp.h"
 #include "kind.h"
 #include "options.h"
 #include "read.h"
@@ -74,7 +74,6 @@ typedef struct sCppState {
 	const kindOption  *headerKind;
 	int headerSystemRoleIndex;
 	int headerLocalRoleIndex;
-	int endFieldType;
 
 	struct sDirective {
 		enum eState state;       /* current directive being processed */
@@ -104,7 +103,6 @@ static cppState Cpp = {
 	NULL,	     /* headerKind */
 	.headerSystemRoleIndex = ROLE_INDEX_DEFINITION,
 	.headerLocalRoleIndex = ROLE_INDEX_DEFINITION,
-	.endFieldType = FIELD_UNKNOWN,
 	{
 		DRCTV_NONE,  /* state */
 		FALSE,       /* accept */
@@ -118,12 +116,12 @@ static cppState Cpp = {
 *   FUNCTION DEFINITIONS
 */
 
-extern boolean isBraceFormat (void)
+extern boolean cppIsBraceFormat (void)
 {
 	return BraceFormat;
 }
 
-extern unsigned int getDirectiveNestLevel (void)
+extern unsigned int cppGetDirectiveNestLevel (void)
 {
 	return Cpp.directive.nestLevel;
 }
@@ -131,11 +129,10 @@ extern unsigned int getDirectiveNestLevel (void)
 extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 		     const boolean hasCxxRawLiteralStrings,
 		     const boolean hasSingleQuoteLiteralNumbers,
-		     const struct sKindOption *defineMacroKind,
+		     const kindOption *defineMacroKind,
 		     int macroUndefRoleIndex,
-		     const struct sKindOption *headerKind,
-		     int headerSystemRoleIndex, int headerLocalRoleIndex,
-		     int endFieldType)
+		     const kindOption *headerKind,
+		     int headerSystemRoleIndex, int headerLocalRoleIndex)
 {
 	BraceFormat = state;
 
@@ -150,7 +147,6 @@ extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 	Cpp.headerKind  = headerKind;
 	Cpp.headerSystemRoleIndex = headerSystemRoleIndex;
 	Cpp.headerLocalRoleIndex = headerLocalRoleIndex;
-	Cpp.endFieldType = endFieldType;
 
 	Cpp.directive.state     = DRCTV_NONE;
 	Cpp.directive.accept    = TRUE;
@@ -234,7 +230,7 @@ static void readIdentifier (int c, vString *const name)
 	{
 		vStringPut (name, c);
 		c = getcFromInputFile ();
-	} while (c != EOF  &&  isident (c));
+	} while (c != EOF  && cppIsident (c));
 	ungetcToInputFile (c);
 	vStringTerminate (name);
 }
@@ -353,6 +349,9 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 	if (isFileScope && !isXtagEnabled(XTAG_FILE_SCOPE))
 		return CORK_NIL;
 
+	if (Cpp.macroUndefRoleIndex == ROLE_INDEX_DEFINITION)
+		return CORK_NIL;
+
 	if ( /* condition for definition tag */
 		((!undef) && Cpp.defineMacroKind->enabled)
 		|| /* condition for reference tag */
@@ -382,7 +381,11 @@ static void makeIncludeTag (const  char *const name, boolean systemHeader)
 	tagEntryInfo e;
 	int role_index = systemHeader? Cpp.headerSystemRoleIndex: Cpp.headerLocalRoleIndex;
 
-	if (Cpp.headerKind && isXtagEnabled (XTAG_REFERENCE_TAGS)
+	if (role_index == ROLE_INDEX_DEFINITION)
+		return;
+
+	if (Cpp.headerKind && Cpp.headerKind->enabled
+	    && isXtagEnabled (XTAG_REFERENCE_TAGS)
 	    && Cpp.headerKind->roles [ role_index ].enabled)
 	{
 		initRefTagEntry (&e, name, Cpp.headerKind, role_index);
@@ -398,7 +401,7 @@ static int directiveDefine (const int c, boolean undef)
 {
 	int r = CORK_NIL;
 
-	if (isident1 (c))
+	if (cppIsident1 (c))
 	{
 		readIdentifier (c, Cpp.directive.name);
 		if (! isIgnore ())
@@ -449,7 +452,7 @@ static void directiveUndef (const int c)
 
 static void directivePragma (int c)
 {
-	if (isident1 (c))
+	if (cppIsident1 (c))
 	{
 		readIdentifier (c, Cpp.directive.name);
 		if (stringMatch (vStringValue (Cpp.directive.name), "weak"))
@@ -459,7 +462,7 @@ static void directivePragma (int c)
 			{
 				c = getcFromInputFile ();
 			} while (c == SPACE);
-			if (isident1 (c))
+			if (cppIsident1 (c))
 			{
 				readIdentifier (c, Cpp.directive.name);
 				makeDefineTag (vStringValue (Cpp.directive.name), NULL, FALSE);
@@ -579,7 +582,7 @@ static Comment isComment (void)
 /*  Skips over a C style comment. According to ANSI specification a comment
  *  is treated as white space, so we perform this substitution.
  */
-int skipOverCComment (void)
+int cppSkipOverCComment (void)
 {
 	int c = getcFromInputFile ();
 
@@ -750,15 +753,12 @@ static int skipToEndOfChar (void)
 
 static void attachEndFieldMaybe (int macroCorkIndex)
 {
-	char buf[16];
-
-	if (Cpp.endFieldType != FIELD_UNKNOWN
-	    && macroCorkIndex != CORK_NIL)
+	if (macroCorkIndex != CORK_NIL)
 	{
-		sprintf(buf, "%ld", getInputLineNumber ());
-		attachParserFieldToCorkEntry (macroCorkIndex,
-					      Cpp.endFieldType,
-					      buf);
+		tagEntryInfo *tag;
+
+		tag = getEntryInCorkQueue (macroCorkIndex);
+		tag->extensionFields.endLine = getInputLineNumber ();
 	}
 }
 
@@ -839,7 +839,7 @@ process:
 				const Comment comment = isComment ();
 
 				if (comment == COMMENT_C)
-					c = skipOverCComment ();
+					c = cppSkipOverCComment ();
 				else if (comment == COMMENT_CPLUS)
 				{
 					c = skipOverCplusComment ();
@@ -963,9 +963,9 @@ process:
 					int prev2 = getNthPrevCFromInputFile (2, '\0');
 					int prev3 = getNthPrevCFromInputFile (3, '\0');
 
-					if (! isident (prev) ||
-					    (! isident (prev2) && (prev == 'L' || prev == 'u' || prev == 'U')) ||
-					    (! isident (prev3) && (prev2 == 'u' && prev == '8')))
+					if (! cppIsident (prev) ||
+					    (! cppIsident (prev2) && (prev == 'L' || prev == 'u' || prev == 'U')) ||
+					    (! cppIsident (prev3) && (prev2 == 'u' && prev == '8')))
 					{
 						int next = getcFromInputFile ();
 						if (next != DOUBLE_QUOTE)

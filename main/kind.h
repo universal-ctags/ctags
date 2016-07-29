@@ -9,6 +9,7 @@
 #define CTAGS_MAIN_KIND_H
 
 #include "general.h"
+#include "types.h"
 #include "routines.h"		/* for STRINGIFY */
 #include "vstring.h"
 
@@ -49,7 +50,7 @@ typedef struct sScopeSeparator {
 	const char *separator;
 } scopeSeparator;
 
-typedef struct sKindOption {
+struct sKindOption {
 	boolean enabled;          /* are tags for kind enabled? */
 	char  letter;               /* kind letter */
 	const char* name;		  /* kind name */
@@ -59,7 +60,20 @@ typedef struct sKindOption {
 	roleDesc *roles;
 	scopeSeparator *separators;
 	unsigned int separatorCount;
-} kindOption;
+
+	/* Usage of `syncWith' field is a bit tricky.
+
+	   If `LANG_AUTO' is specified to `syncWith' field of a kind
+	   (target kind), the main part of ctags updtes the field with
+	   the id of a  parser (master parser) when initializing
+	   parsers. It also updates `slave' and `master' fields.
+
+	   If the value other than `LANG_AUTO' is specified,
+	   the main part does nothing. */
+	langType syncWith;
+	kindOption *slave;
+	kindOption *master;
+};
 
 #define ATTACH_ROLES(RS) .nRoles = ARRAY_SIZE(RS), .roles = RS
 #define ATTACH_SEPARATORS(S) .separators = S, .separatorCount = ARRAY_SIZE(S)
@@ -69,6 +83,8 @@ extern void printKind (const kindOption* const kind, boolean allKindFields, bool
 		       boolean tabSeparated);
 extern void printKindListHeader (boolean indent, boolean tabSeparated);
 extern const char *scopeSeparatorFor (const kindOption *kind, char parentLetter);
+
+extern void enableKind (kindOption *kind, boolean enable);
 
 #define PR_KIND_STR(X) PR_KIND_WIDTH_##X
 #define PR_KIND_FMT(X,T) "%-" STRINGIFY(PR_KIND_STR(X)) STRINGIFY(T)

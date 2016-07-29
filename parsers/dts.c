@@ -11,7 +11,7 @@
 *   INCLUDE FILES
 */
 #include "general.h"
-#include "get.h"
+#include "lcpp.h"
 #include "kind.h"
 #include "parse.h"
 #include "routines.h"
@@ -43,8 +43,8 @@ typedef enum {
 static kindOption DTSKinds [] = {
 	{ TRUE,  'd', "macro",      "macro definitions",
 	  .referenceOnly = FALSE, ATTACH_ROLES(DTSMacroRoles)},
-	{ FALSE, 'h', "header",     "included header files",
-	  .referenceOnly = FALSE, ATTACH_ROLES(DTSHeaderRoles)},
+	{ TRUE, 'h', "header",     "included header files",
+	  .referenceOnly = TRUE, ATTACH_ROLES(DTSHeaderRoles)},
 };
 
 static tagRegexTable dtsTagRegexTable [] = {
@@ -70,8 +70,7 @@ static void runCppGetc (void)
 {
 	cppInit (0, FALSE, FALSE, FALSE,
 		 DTSKinds + DTS_MACRO, DTS_MACRO_KIND_UNDEF_ROLE,
-		 DTSKinds + DTS_HEADER, DTS_HEADER_KIND_SYSTEM_ROLE, DTS_HEADER_KIND_LOCAL_ROLE,
-		 FIELD_UNKNOWN);
+		 DTSKinds + DTS_HEADER, DTS_HEADER_KIND_SYSTEM_ROLE, DTS_HEADER_KIND_LOCAL_ROLE);
 
 	findRegexTagsMainloop (cppGetc);
 

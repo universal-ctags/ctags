@@ -14,7 +14,7 @@
 #include "cxx_parser_internal.h"
 
 #include "entry.h"
-#include "get.h"
+#include "lcpp.h"
 #include "routines.h"
 #include "xtag.h"
 
@@ -37,33 +37,36 @@ CXX_COMMON_HEADER_ROLES(C);
 CXX_COMMON_HEADER_ROLES(CXX);
 
 
-#define CXX_COMMON_KINDS(_langPrefix, _szMemberDescription) \
+#define CXX_COMMON_KINDS(_langPrefix, _szMemberDescription, _syncWith)	\
 	{ TRUE,  'd', "macro",      "macro definitions", \
-			.referenceOnly = FALSE, ATTACH_ROLES(_langPrefix##MacroRoles) \
+			.referenceOnly = FALSE, ATTACH_ROLES(_langPrefix##MacroRoles), .syncWith = _syncWith \
 	}, \
-	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)" }, \
-	{ TRUE,  'f', "function",   "function definitions" }, \
-	{ TRUE,  'g', "enum",       "enumeration names" }, \
-	{ FALSE, 'h', "header",     "included header files", \
-			.referenceOnly = TRUE,  ATTACH_ROLES(_langPrefix##HeaderRoles) \
+	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)", .syncWith = _syncWith }, \
+	{ TRUE,  'f', "function",   "function definitions", .syncWith = _syncWith },		\
+	{ TRUE,  'g', "enum",       "enumeration names", .syncWith = _syncWith },		\
+	{ TRUE, 'h', "header",     "included header files", \
+			.referenceOnly = TRUE,  ATTACH_ROLES(_langPrefix##HeaderRoles), .syncWith = _syncWith \
 	}, \
-	{ FALSE, 'l', "local",      "local variables" }, \
-	{ TRUE,  'm', "member",     _szMemberDescription }, \
-	{ FALSE, 'p', "prototype",  "function prototypes" }, \
-	{ TRUE,  's', "struct",     "structure names" }, \
-	{ TRUE,  't', "typedef",    "typedefs" }, \
-	{ TRUE,  'u', "union",      "union names" }, \
-	{ TRUE,  'v', "variable",   "variable definitions" }, \
-	{ FALSE, 'x', "externvar",  "external and forward variable declarations" }, \
-	{ FALSE, 'z', "parameter",  "function parameters inside function definitions" }, \
-	{ FALSE, 'L', "label",      "goto labels" }
+	{ FALSE, 'l', "local",      "local variables", .syncWith = _syncWith },   \
+	{ TRUE,  'm', "member",     _szMemberDescription, .syncWith = _syncWith },	\
+	{ FALSE, 'p', "prototype",  "function prototypes", .syncWith = _syncWith },		\
+	{ TRUE,  's', "struct",     "structure names", .syncWith = _syncWith },		\
+	{ TRUE,  't', "typedef",    "typedefs", .syncWith = _syncWith },			\
+	{ TRUE,  'u', "union",      "union names", .syncWith = _syncWith },			\
+	{ TRUE,  'v', "variable",   "variable definitions", .syncWith = _syncWith },		\
+	{ FALSE, 'x', "externvar",  "external and forward variable declarations", .syncWith = _syncWith }, \
+	{ FALSE, 'z', "parameter",  "function parameters inside function definitions", .syncWith = _syncWith }, \
+	{ FALSE, 'L', "label",      "goto labels", .syncWith = _syncWith }
 
 static kindOption g_aCXXCKinds [] = {
-	CXX_COMMON_KINDS(C,"struct, and union members")
+	/* All other than LANG_AUTO are ignored.
+	   LANG_IGNORE is specified as a just placeholder for the macro,
+	   and is not needed. */
+	CXX_COMMON_KINDS(C,"struct, and union members", LANG_IGNORE)
 };
 
 static kindOption g_aCXXCPPKinds [] = {
-	CXX_COMMON_KINDS(CXX,"class, struct, and union members"),
+	CXX_COMMON_KINDS(CXX,"class, struct, and union members", LANG_AUTO),
 	{ TRUE,  'c', "class",      "classes" },
 	{ TRUE,  'n', "namespace",  "namespaces" },
 	{ FALSE, 'A', "alias",      "namespace aliases" },
@@ -80,11 +83,6 @@ static const char * g_aCXXAccessStrings [] = {
 };
 
 #define CXX_COMMON_FIELDS \
-	{ \
-		.name = "end", \
-		.description = "end lines of various constructs", \
-		.enabled = FALSE \
-	}, \
 	{ \
 		.name = "properties", \
 		.description = "properties (static, inline, mutable,...)", \
@@ -233,7 +231,7 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 {
 	if(uProperties == 0)
 		return NULL;
-	
+
 	if(!cxxTagFieldEnabled(CXXTagFieldProperties))
 			return NULL;
 
@@ -280,6 +278,8 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 		ADD_PROPERTY("virtual");
 	if(uProperties & CXXTagPropertyVolatile)
 		ADD_PROPERTY("volatile");
+	if(uProperties & CXXTagPropertyDeprecated)
+		ADD_PROPERTY("deprecated");
 
 	cxxTagSetField(CXXTagFieldProperties,vStringValue(pszProperties));
 
@@ -339,7 +339,7 @@ void cxxTagSetField(unsigned int uField,const char * szValue)
 
 	if(!g_cxx.pFieldOptions[uField].enabled)
 		return;
-	
+
 	attachParserField(&g_oCXXTag,g_cxx.pFieldOptions[uField].ftype,szValue);
 }
 

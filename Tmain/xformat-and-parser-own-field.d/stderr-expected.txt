@@ -1,0 +1,3 @@
+ctags: No such field name: sectionMarker
+ctags: No suitable parser for field name: NOSUCHLANG.sectionMarker
+ctags: No such field name: NOSUCHFIELD

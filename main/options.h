@@ -95,7 +95,7 @@ typedef struct sOptionValues {
 	boolean quiet;		      /* --quiet */
 	boolean allowXcmdInHomeDir;     /* --_allow-xcmd-in-homedir */
 	boolean fatalWarnings;	/* --_fatal-warnings */
-	unsigned int patternLengthLimit; /* Not implemented yet: --patern-length-limit=N */
+	unsigned int patternLengthLimit; /* --pattern-length-limit=N */
 	boolean putFieldPrefix;		 /* --put-field-prefix */
 	unsigned int maxRecursionDepth; /* --maxdepth=<max-recursion-depth> */
 	boolean machinable;		/* --machinable */
@@ -168,7 +168,6 @@ extern vString* expandOnDriversPathList (const char* leaf);
 
 extern langType getLanguageComponentInOption (const char *const option,
 					      const char *const prefix);
-extern langType getLanguageComponentInFieldName (const char *fullName, const char **fieldName);
 
 extern void processLanguageDefineOption (const char *const option, const char *const parameter);
 extern boolean processMapOption (const char *const option, const char *const parameter);
