@@ -44,7 +44,7 @@ CXX_COMMON_HEADER_ROLES(CXX);
 	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)", .syncWith = _syncWith }, \
 	{ TRUE,  'f', "function",   "function definitions", .syncWith = _syncWith },		\
 	{ TRUE,  'g', "enum",       "enumeration names", .syncWith = _syncWith },		\
-	{ FALSE, 'h', "header",     "included header files", \
+	{ TRUE, 'h', "header",     "included header files", \
 			.referenceOnly = TRUE,  ATTACH_ROLES(_langPrefix##HeaderRoles), .syncWith = _syncWith \
 	}, \
 	{ FALSE, 'l', "local",      "local variables", .syncWith = _syncWith },   \

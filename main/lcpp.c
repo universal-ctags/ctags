@@ -384,7 +384,8 @@ static void makeIncludeTag (const  char *const name, boolean systemHeader)
 	if (role_index == ROLE_INDEX_DEFINITION)
 		return;
 
-	if (Cpp.headerKind && isXtagEnabled (XTAG_REFERENCE_TAGS)
+	if (Cpp.headerKind && Cpp.headerKind->enabled
+	    && isXtagEnabled (XTAG_REFERENCE_TAGS)
 	    && Cpp.headerKind->roles [ role_index ].enabled)
 	{
 		initRefTagEntry (&e, name, Cpp.headerKind, role_index);
