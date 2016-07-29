@@ -43,8 +43,8 @@ typedef enum {
 static kindOption DTSKinds [] = {
 	{ TRUE,  'd', "macro",      "macro definitions",
 	  .referenceOnly = FALSE, ATTACH_ROLES(DTSMacroRoles)},
-	{ FALSE, 'h', "header",     "included header files",
-	  .referenceOnly = FALSE, ATTACH_ROLES(DTSHeaderRoles)},
+	{ TRUE, 'h', "header",     "included header files",
+	  .referenceOnly = TRUE, ATTACH_ROLES(DTSHeaderRoles)},
 };
 
 static tagRegexTable dtsTagRegexTable [] = {

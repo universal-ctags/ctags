@@ -339,7 +339,7 @@ static kindOption CKinds [] = {
 	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)"},
 	{ TRUE,  'f', "function",   "function definitions"},
 	{ TRUE,  'g', "enum",       "enumeration names"},
-	{ FALSE, 'h', "header",     "included header files",
+	{ TRUE,  'h', "header",     "included header files",
 	  .referenceOnly = TRUE,  ATTACH_ROLES(CHeaderRoles)},
 	{ FALSE, 'l', "local",      "local variables"},
 	{ TRUE,  'm', "member",     "class, struct, and union members"},
@@ -479,8 +479,8 @@ static kindOption VeraKinds [] = {
 	{ TRUE,  'T', "typedef",    "typedefs"},
 	{ TRUE,  'v', "variable",   "variable definitions"},
 	{ FALSE, 'x', "externvar",  "external variable declarations"},
-	{ FALSE, 'h', "header",     "included header files",
-	  .referenceOnly = FALSE, ATTACH_ROLES(VeraHeaderRoles)},
+	{ TRUE,  'h', "header",     "included header files",
+	  .referenceOnly = TRUE, ATTACH_ROLES(VeraHeaderRoles)},
 };
 
 static const keywordDesc KeywordTable [] = {
