@@ -9,4 +9,5 @@ e       UCTAGSend       off     NONE             TRUE     end lines of various i
 -       UCTAGStemplate  off     C++              TRUE     template parameters           
 -       UCTAGScaptures  off     C++              TRUE     lambda capture list           
 -       UCTAGSname      on      C++              TRUE     aliased names                 
+-       UCTAGSdecorators off     Python           TRUE     decorators on functions and classes
 -       UCTAGSsectionMarker off     reStructuredText TRUE     character used for declaring section
