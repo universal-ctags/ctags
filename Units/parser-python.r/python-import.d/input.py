@@ -11,10 +11,3 @@ from p import b1, b2 as b3, b4, b5
 
 from x import (y as z1, z2,
                         z3, z4)
-
-
-import X as
-import Y,
-
-from Z import ( A
-
