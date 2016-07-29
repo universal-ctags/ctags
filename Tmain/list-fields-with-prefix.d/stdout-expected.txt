@@ -1,8 +1,8 @@
-r       UCTAGSrole      off     NONE             TRUE     Role                          
-Z       UCTAGSscope     off     NONE             TRUE     Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
-E       UCTAGSextra     off     NONE             TRUE     Extra tag type information    
-x       UCTAGSxpath     off     NONE             TRUE     xpath for the tag             
-p       UCTAGSscopeKind off     NONE             TRUE     Kind of scope as full name    
+r       UCTAGSrole      off     NONE             TRUE     role                          
+Z       UCTAGSscope     off     NONE             TRUE     include the "scope:" key in scope field (use s) in tags output, scope name in xref output
+E       UCTAGSextra     off     NONE             TRUE     extra tag type information    
+x       UCTAGSxpath     off     NONE             TRUE     XPath for the tag             
+p       UCTAGSscopeKind off     NONE             TRUE     kind of scope as full name    
 e       UCTAGSend       off     NONE             TRUE     end lines of various items    
 -       UCTAGSproperties off     C                TRUE     properties (static, inline, mutable,...)
 -       UCTAGSproperties off     C++              TRUE     properties (static, inline, mutable,...)
