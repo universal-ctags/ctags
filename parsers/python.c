@@ -55,16 +55,12 @@ static const char *const PythonAccesses[COUNT_ACCESS] = {
 
 typedef enum {
 	F_DECORATORS,
-	F_END,
 	COUNT_FIELD
 } pythonField;
 
 static fieldSpec PythonFields[COUNT_FIELD] = {
 	{ .name = "decorators",
 	  .description = "decorators on functions and classes",
-	  .enabled = FALSE },
-	{ .name = "end",
-	  .description = "end lines of various constructs",
 	  .enabled = FALSE },
 };
 
@@ -1163,17 +1159,15 @@ static boolean parseVariable (tokenInfo *const token, const pythonKind kind)
 /* pops any level >= to indent */
 static void setIndent (tokenInfo *const token)
 {
-	char buf[16];
 	NestingLevel *lv = nestingLevelsGetCurrent (PythonNestingLevels);
-
-	snprintf (buf, sizeof buf, "%lu", token->lineNumber);
 
 	while (lv && PY_NL (lv)->indentation >= token->indent)
 	{
 		if (lv->corkIndex != CORK_NIL)
 		{
-			attachParserFieldToCorkEntry (lv->corkIndex,
-			                              PythonFields[F_END].ftype, buf);
+			tagEntryInfo *e = getEntryInCorkQueue ((unsigned int) lv->corkIndex);
+
+			e->extensionFields.endLine = token->lineNumber;
 		}
 
 		nestingLevelsPop (PythonNestingLevels);
