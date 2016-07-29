@@ -1,1 +1,1 @@
---fields=+{decorators}
+--fields-python=+{decorators}
