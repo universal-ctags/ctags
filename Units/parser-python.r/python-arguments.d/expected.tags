@@ -1,0 +1,74 @@
+func1	input.py	/^def func1():$/;"	f
+func2	input.py	/^def func2(arg1):$/;"	f
+arg1	input.py	/^def func2(arg1):$/;"	z	function:func2	file:
+func2.arg1	input.py	/^def func2(arg1):$/;"	z	function:func2	file:
+func3	input.py	/^def func3(arg1, arg2):$/;"	f
+arg1	input.py	/^def func3(arg1, arg2):$/;"	z	function:func3	file:
+func3.arg1	input.py	/^def func3(arg1, arg2):$/;"	z	function:func3	file:
+arg2	input.py	/^def func3(arg1, arg2):$/;"	z	function:func3	file:
+func3.arg2	input.py	/^def func3(arg1, arg2):$/;"	z	function:func3	file:
+func4	input.py	/^def func4( arg1 ,$/;"	f
+arg1	input.py	/^def func4( arg1 ,$/;"	z	function:func4	file:
+func4.arg1	input.py	/^def func4( arg1 ,$/;"	z	function:func4	file:
+arg2	input.py	/^           arg2 ,$/;"	z	function:func4	file:
+func4.arg2	input.py	/^           arg2 ,$/;"	z	function:func4	file:
+arg3	input.py	/^           arg3 ):$/;"	z	function:func4	file:
+func4.arg3	input.py	/^           arg3 ):$/;"	z	function:func4	file:
+func5	input.py	/^def func5( arg1 = 1,$/;"	f
+arg1	input.py	/^def func5( arg1 = 1,$/;"	z	function:func5	file:
+func5.arg1	input.py	/^def func5( arg1 = 1,$/;"	z	function:func5	file:
+arg2	input.py	/^           arg2 = r'hello',$/;"	z	function:func5	file:
+func5.arg2	input.py	/^           arg2 = r'hello',$/;"	z	function:func5	file:
+arg3	input.py	/^           arg3 = None):$/;"	z	function:func5	file:
+func5.arg3	input.py	/^           arg3 = None):$/;"	z	function:func5	file:
+func6	input.py	/^def func6(arg1, arg2, *args):$/;"	f
+arg1	input.py	/^def func6(arg1, arg2, *args):$/;"	z	function:func6	file:
+func6.arg1	input.py	/^def func6(arg1, arg2, *args):$/;"	z	function:func6	file:
+arg2	input.py	/^def func6(arg1, arg2, *args):$/;"	z	function:func6	file:
+func6.arg2	input.py	/^def func6(arg1, arg2, *args):$/;"	z	function:func6	file:
+args	input.py	/^def func6(arg1, arg2, *args):$/;"	z	function:func6	file:
+func6.args	input.py	/^def func6(arg1, arg2, *args):$/;"	z	function:func6	file:
+func7	input.py	/^def func7(*args, **kwargs):$/;"	f
+args	input.py	/^def func7(*args, **kwargs):$/;"	z	function:func7	file:
+func7.args	input.py	/^def func7(*args, **kwargs):$/;"	z	function:func7	file:
+kwargs	input.py	/^def func7(*args, **kwargs):$/;"	z	function:func7	file:
+func7.kwargs	input.py	/^def func7(*args, **kwargs):$/;"	z	function:func7	file:
+func8	input.py	/^def func8(arg1=1*2, arg2=func6(1, 2, 3, 4)):$/;"	f
+arg1	input.py	/^def func8(arg1=1*2, arg2=func6(1, 2, 3, 4)):$/;"	z	function:func8	file:
+func8.arg1	input.py	/^def func8(arg1=1*2, arg2=func6(1, 2, 3, 4)):$/;"	z	function:func8	file:
+arg2	input.py	/^def func8(arg1=1*2, arg2=func6(1, 2, 3, 4)):$/;"	z	function:func8	file:
+func8.arg2	input.py	/^def func8(arg1=1*2, arg2=func6(1, 2, 3, 4)):$/;"	z	function:func8	file:
+VAR1	input.py	/^VAR1=0$/;"	v
+func9	input.py	/^def func9(arg1=VAR1*VAR1):$/;"	f
+arg1	input.py	/^def func9(arg1=VAR1*VAR1):$/;"	z	function:func9	file:
+func9.arg1	input.py	/^def func9(arg1=VAR1*VAR1):$/;"	z	function:func9	file:
+func10	input.py	/^def func10(arg1=[VAR1,VAR1],$/;"	f
+arg1	input.py	/^def func10(arg1=[VAR1,VAR1],$/;"	z	function:func10	file:
+func10.arg1	input.py	/^def func10(arg1=[VAR1,VAR1],$/;"	z	function:func10	file:
+arg2	input.py	/^           arg2={VAR1:VAR1}):$/;"	z	function:func10	file:
+func10.arg2	input.py	/^           arg2={VAR1:VAR1}):$/;"	z	function:func10	file:
+Cls	input.py	/^class Cls(object):$/;"	c
+__init__	input.py	/^    def __init__(self):$/;"	m	class:Cls
+Cls.__init__	input.py	/^    def __init__(self):$/;"	m	class:Cls
+self	input.py	/^    def __init__(self):$/;"	z	member:Cls.__init__	file:
+Cls.__init__.self	input.py	/^    def __init__(self):$/;"	z	member:Cls.__init__	file:
+method1	input.py	/^    def method1(self, arg1):$/;"	m	class:Cls
+Cls.method1	input.py	/^    def method1(self, arg1):$/;"	m	class:Cls
+self	input.py	/^    def method1(self, arg1):$/;"	z	member:Cls.method1	file:
+Cls.method1.self	input.py	/^    def method1(self, arg1):$/;"	z	member:Cls.method1	file:
+arg1	input.py	/^    def method1(self, arg1):$/;"	z	member:Cls.method1	file:
+Cls.method1.arg1	input.py	/^    def method1(self, arg1):$/;"	z	member:Cls.method1	file:
+method2	input.py	/^    def method2(self, arg1 = 0, arg2=None):$/;"	m	class:Cls
+Cls.method2	input.py	/^    def method2(self, arg1 = 0, arg2=None):$/;"	m	class:Cls
+self	input.py	/^    def method2(self, arg1 = 0, arg2=None):$/;"	z	member:Cls.method2	file:
+Cls.method2.self	input.py	/^    def method2(self, arg1 = 0, arg2=None):$/;"	z	member:Cls.method2	file:
+arg1	input.py	/^    def method2(self, arg1 = 0, arg2=None):$/;"	z	member:Cls.method2	file:
+Cls.method2.arg1	input.py	/^    def method2(self, arg1 = 0, arg2=None):$/;"	z	member:Cls.method2	file:
+arg2	input.py	/^    def method2(self, arg1 = 0, arg2=None):$/;"	z	member:Cls.method2	file:
+Cls.method2.arg2	input.py	/^    def method2(self, arg1 = 0, arg2=None):$/;"	z	member:Cls.method2	file:
+method3	input.py	/^    def method3(arg1, arg2=0):$/;"	m	class:Cls
+Cls.method3	input.py	/^    def method3(arg1, arg2=0):$/;"	m	class:Cls
+arg1	input.py	/^    def method3(arg1, arg2=0):$/;"	z	member:Cls.method3	file:
+Cls.method3.arg1	input.py	/^    def method3(arg1, arg2=0):$/;"	z	member:Cls.method3	file:
+arg2	input.py	/^    def method3(arg1, arg2=0):$/;"	z	member:Cls.method3	file:
+Cls.method3.arg2	input.py	/^    def method3(arg1, arg2=0):$/;"	z	member:Cls.method3	file:

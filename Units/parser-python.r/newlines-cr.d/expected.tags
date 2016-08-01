@@ -1,0 +1,4 @@
+Cls	input.py	/^$/;"	c
+__init__	input.py	/^$/;"	m	class:Cls
+bar	input.py	/^$/;"	f
+foo	input.py	/^$/;"	f

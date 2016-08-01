@@ -1,0 +1,1 @@
+order_spam1	input.pyx	/^cdef extern void order_spam1(int tons)$/;"	f
