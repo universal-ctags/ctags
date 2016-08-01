@@ -9,8 +9,9 @@ Output formats
 	:depth: 3
 	:local:
 
-This section deals output forrmats individual topics.
-``--output-format=`` can be used for choosing output format.
+This section deals with individual output-format topics.
+
+``--output-format=`` can be used for choosing an output format.
 
 .. toctree::
 	:maxdepth: 2

@@ -1,11 +1,11 @@
 .. _output-json:
 
 ======================================================================
-Json output
+JSON output
 ======================================================================
 
-Json output goes the standard output by default.
-Each tag line is represented in an object.
+JSON output goes to standard output by default.
+Each generated tag line is represented as an object.
 
 .. code-block:: console
 
@@ -13,19 +13,17 @@ Each tag line is represented in an object.
     {"_type": "tag", "name": "Foo", "path": "/tmp/foo.py", "pattern": "/^class Foo:$/", "kind": "class"}
 
 
-The pair which key is not started from `_` is a normal field.
-The meanings of the pairs are the same as that of tags output.
+Object keys which do not start with `_` are normal fields and map
+directly to the fields of the default tags file format.
 
-The pair which key is started from `_` is a json format own meta field.
-Currently only `_type` is used.
+Keys that have names starting with `_` are a JSON format meta field.
+Currently only `_type` is used and it can have the values `tag` for a
+normal tag or `ptag` for a pseudo tag.
 
-The key `_type` takes `tag` or `ptag`. As name show, `tag` means the
-object holds a tag. `ptag` means the object holds a pseudo tag.
-
-Json output is under development. So the format will be changed in the
-future. To give applications a chance to handle the change, ctags
-uses a pseudo tag, `JSON_OUTPUT_VERSION` for notifying the version of the
-format.
+JSON output is still under development and it is expected the format
+will change in the future. To give applications a chance to handle
+these changes ctags uses a pseudo tag, `JSON_OUTPUT_VERSION`, for
+specifying the format version.
 
 .. code-block:: console
 
@@ -34,17 +32,17 @@ format.
    {"_type": "tag", "name": "Foo", "path": "/tmp/foo.py", "pattern": "/^class Foo:$/", "kind": "class"}
    ...
 
-Unlike tags output format, Json output is newly designed. So the odd restrictions
-and behaviors of fields control in the tags output format are not in Json output.
+The JSON output format is newly designed and does not need to support
+the historical quirks of the default tags file format.
 
-Kind long names are used always instead of kind letters.
-Enabling `k` and/or `K` fields enables `z` {kind} field internally.
+Kind long names are always used instead of kind letters. Enabling the
+`k` and/or `K` fields enables the `z` {kind} field internally.
 
-Scopes information are split into scope kinds and scope names always.
-Enabling `s` field enables `Z` {kind} and `p` {scopeKind} fields internally.
-As same as kind, long names are used for printing scope kinds; kind
-letters are not used for printing scopes information.
+Scope information is always split into scope kinds and scope names.
+Enabling the `s` field enables the `Z` {kind} and `p` {scopeKind}
+fields internally. As for all kinds, long names are used for printing
+; kind letters are never used.
 
-If you need kind letters, open an issue at the github site of
-Universal ctags.
+If you need kind letters, open an issue at the GitHub site of
+Universal-ctags.
 
