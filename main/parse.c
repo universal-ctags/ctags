@@ -1666,7 +1666,7 @@ static boolean enableLanguageKind (
 }
 
 static boolean enableLanguageKindLong (
-	const langType language, const const char *kindLong, const boolean mode)
+	const langType language, const char * const kindLong, const boolean mode)
 {
 	boolean result = FALSE;
 	kindOption* const opt = langKindLongOption (language, kindLong);
