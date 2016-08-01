@@ -99,13 +99,18 @@ PARSER_HEADS = \
 	parsers/cxx/cxx_scope.h \
 	parsers/cxx/cxx_tag.h \
 	parsers/cxx/cxx_token.h \
-	parsers/cxx/cxx_token_chain.h
+	parsers/cxx/cxx_token_chain.h \
+	\
+	parsers/make.h \
+	\
+	$(NULL)
 	
 PARSER_SRCS =				\
 	parsers/ada.c			\
 	parsers/ant.c			\
 	parsers/asm.c			\
 	parsers/asp.c			\
+	parsers/automake.c		\
 	parsers/awk.c			\
 	parsers/basic.c			\
 	parsers/beta.c			\

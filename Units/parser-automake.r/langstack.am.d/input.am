@@ -1,0 +1,15 @@
+prefix=c
+
+include $(top_srcdir)/source.mak
+
+cbin=$(bindir)/ctags
+cbin_PROGRAMS = $(prefix)ctags
+
+if INSTALL_ETAGS
+install-exec-hook:
+	cd $(DESTDIR)$(bindir) && \
+		$(LN_S) ctags$(EXEEXT) etags$(EXEEXT)
+
+uninstall-hook:
+	rm $(DESTDIR)$(bindir)/etags$(EXEEXT)
+endif

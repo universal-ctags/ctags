@@ -38,8 +38,19 @@
 *   DATA DECLARATIONS
 */
 
+typedef struct sLangStack {
+	langType *languages;
+	unsigned int count;
+	unsigned int size;
+} langStack;
+
 /*  Maintains the state of the current input file.
  */
+typedef union sInputLangInfo {
+	langStack stack;
+	langType  type;
+} inputLangInfo;
+
 typedef struct sInputFileInfo {
 	vString *name;           /* name to report for input file */
 	vString *tagPath;        /* path of input file relative to tag file */
@@ -49,7 +60,9 @@ typedef struct sInputFileInfo {
 					   on the input stream.
 					   This is needed for nested stream. */
 	boolean  isHeader;       /* is input file a header file? */
-	langType language;       /* language of input file */
+
+	/* language of input file */
+	inputLangInfo langInfo;
 } inputFileInfo;
 
 typedef struct sInputLineFposMap {
@@ -97,6 +110,16 @@ typedef struct sInputFile {
 
 
 /*
+*   FUNCTION DECLARATIONS
+*/
+static void     langStackInit (langStack *langStack);
+static langType langStackTop  (langStack *langStack);
+static void     langStackPush (langStack *langStack, langType type);
+static langType langStackPop  (langStack *langStack);
+
+
+
+/*
 *   DATA DEFINITIONS
 */
 static inputFile File;  /* static read through functions */
@@ -130,12 +153,12 @@ extern MIOPos getInputFilePositionForLine (int line)
 
 extern langType getInputLanguage (void)
 {
-	return File.input.language;
+	return langStackTop (&File.input.langInfo.stack);
 }
 
 extern const char *getInputLanguageName (void)
 {
-	return getLanguageName (File.input.language);
+	return getLanguageName (getInputLanguage());
 }
 
 extern const char *getInputFileTagPath (void)
@@ -145,7 +168,7 @@ extern const char *getInputFileTagPath (void)
 
 extern boolean isInputLanguage (langType lang)
 {
-	return (boolean)((lang) == File.input.language);
+	return (boolean)((lang) == getInputLanguage ());
 }
 
 extern boolean isInputHeaderFile (void)
@@ -155,22 +178,22 @@ extern boolean isInputHeaderFile (void)
 
 extern boolean isInputLanguageKindEnabled (char c)
 {
-	return isLanguageKindEnabled (File.input.language, c);
+	return isLanguageKindEnabled (getInputLanguage (), c);
 }
 
 extern boolean doesInputLanguageAllowNullTag (void)
 {
-	return doesLanguageAllowNullTag (File.input.language);
+	return doesLanguageAllowNullTag (getInputLanguage ());
 }
 
 extern kindOption *getInputLanguageFileKind (void)
 {
-	return getLanguageFileKind (File.input.language);
+	return getLanguageFileKind (getInputLanguage ());
 }
 
 extern boolean doesInputLanguageRequestAutomaticFQTag (void)
 {
-	return doesLanguageRequestAutomaticFQTag (File.input.language);
+	return doesLanguageRequestAutomaticFQTag (getInputLanguage ());
 }
 
 extern const char *getSourceFileTagPath (void)
@@ -180,7 +203,7 @@ extern const char *getSourceFileTagPath (void)
 
 extern const char *getSourceLanguageName (void)
 {
-	return getLanguageName (File.source.language);
+	return getLanguageName (File.source.langInfo.type);
 }
 
 extern unsigned long getSourceLineNumber (void)
@@ -274,7 +297,9 @@ static void setOwnerDirectoryOfInputFile (const char *const fileName)
 }
 
 static void setInputFileParametersCommon (inputFileInfo *finfo, vString *const fileName,
-					  const langType language, stringList *holder)
+					  const langType language,
+					  void (* setLang) (inputLangInfo *, langType),
+					  stringList *holder)
 {
 	if (finfo->name != NULL)
 		vStringDelete (finfo->name);
@@ -295,17 +320,44 @@ static void setInputFileParametersCommon (inputFileInfo *finfo, vString *const f
 								 getTagFileDirectory ()));
 
 	finfo->isHeader = isIncludeFile (vStringValue (fileName));
-	finfo->language = language;
+
+	setLang (& (finfo->langInfo), language);
+}
+
+static void resetLangOnStack (inputLangInfo *langInfo, langType lang)
+{
+	Assert (langInfo->stack.count == 1);
+	langStackPop  (& (langInfo->stack));
+	langStackPush (& (langInfo->stack), lang);
+}
+
+static void pushLangOnStack (inputLangInfo *langInfo, langType lang)
+{
+	langStackPush (& langInfo->stack, lang);
+}
+
+static langType popLangOnStack (inputLangInfo *langInfo)
+{
+	return langStackPop (& langInfo->stack);
+}
+
+static void setLangToType  (inputLangInfo *langInfo, langType lang)
+{
+	langInfo->type = lang;
 }
 
 static void setInputFileParameters (vString *const fileName, const langType language)
 {
-	setInputFileParametersCommon (&File.input, fileName, language, NULL);
+	setInputFileParametersCommon (&File.input, fileName,
+				      language, pushLangOnStack,
+				      NULL);
 }
 
 static void setSourceFileParameters (vString *const fileName, const langType language)
 {
-	setInputFileParametersCommon (&File.source, fileName, language, File.sourceTagPathHolder);
+	setInputFileParametersCommon (&File.source, fileName,
+				      language, setLangToType,
+				      File.sourceTagPathHolder);
 }
 
 static boolean setSourceFileName (vString *const fileName)
@@ -565,9 +617,9 @@ extern void resetInputFile (const langType language)
 	if (File.line != NULL)
 		vStringClear (File.line);
 
-	File.input.language = language;
+	resetLangOnStack (& (File.input.langInfo), language);
 	File.input.lineNumber = File.input.lineNumberOrigin;
-	File.source.language = language;
+	setLangToType (& (File.source.langInfo), language);
 	File.source.lineNumber = File.source.lineNumberOrigin;
 }
 
@@ -575,6 +627,8 @@ extern void closeInputFile (void)
 {
 	if (File.fp != NULL)
 	{
+		popLangOnStack (& (File.input.langInfo));
+
 		/*  The line count of the file is 1 too big, since it is one-based
 		 *  and is incremented upon each newline.
 		 */
@@ -690,7 +744,7 @@ static vString *iFileGetLine (void)
 			vStringTerminate (File.line);
 
 			if (vStringLength (File.line) > 0)
-				matchRegex (File.line, File.input.language);
+				matchRegex (File.line, getInputLanguage ());
 
 			result = File.line;
 			break;
@@ -1074,6 +1128,44 @@ extern void   popNarrowedInputStream  (void)
 	mio_free (File.fp);
 	File = BackupFile;
 	memset (&BackupFile, 0, sizeof (BackupFile));
+}
+
+extern void pushLanguage (const langType language)
+{
+	pushLangOnStack (&File.input.langInfo, language);
+}
+
+extern langType popLanguage (void)
+{
+	return popLangOnStack (&File.input.langInfo);
+}
+
+static void langStackInit (langStack *langStack)
+{
+	langStack->count = 0;
+	langStack->size  = 1;
+	langStack->languages = xCalloc (langStack->size, langType);
+}
+
+static langType langStackTop (langStack *langStack)
+{
+	Assert (langStack->count > 0);
+	return langStack->languages [langStack->count - 1];
+}
+
+static void     langStackPush (langStack *langStack, langType type)
+{
+	if (langStack->size == 0)
+		langStackInit (langStack);
+	else if (langStack->count == langStack->size)
+		langStack->languages = xRealloc (langStack->languages,
+						 ++ langStack->size, langType);
+	langStack->languages [ langStack->count ++ ] = type;
+}
+
+static langType langStackPop  (langStack *langStack)
+{
+	return langStack->languages [ -- langStack->count ];
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */
