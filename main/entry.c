@@ -1092,6 +1092,8 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 
 	if (tag->placeholder)
 		return;
+	if (! tag->kind->enabled)
+		return;
 
 	DebugStatement ( debugEntry (tag); )
 	Assert (writeEntry);
