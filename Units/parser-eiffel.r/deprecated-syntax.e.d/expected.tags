@@ -1,0 +1,7 @@
++	input.e	/^	prefix "+": like Current$/;"	f	class:DEPRECATED_SYNTAX_TEST
+//	input.e	/^			infix "\/" as infix "\/\/"$/;"	f	class:DEPRECATED_SYNTAX_TEST
+<	input.e	/^	infix "<" (other: like Current): BOOLEAN$/;"	f	class:DEPRECATED_SYNTAX_TEST
+DEPRECATED_SYNTAX_TEST	input.e	/^	DEPRECATED_SYNTAX_TEST$/;"	c
+feature1	input.e	/^	feature1 is$/;"	f	class:DEPRECATED_SYNTAX_TEST
+feature2	input.e	/^	feature2: INTEGER is 42$/;"	f	class:DEPRECATED_SYNTAX_TEST
+make	input.e	/^	make is$/;"	f	class:DEPRECATED_SYNTAX_TEST
