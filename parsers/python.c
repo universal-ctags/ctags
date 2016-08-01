@@ -1,5 +1,6 @@
 /*
 *   Copyright (c) 2000-2003, Darren Hiebert
+*   Copyright (c) 2014-2016, Colomban Wendling <ban@herbesfolles.org>
 *
 *   This source code is released for free distribution under the terms of the
 *   GNU General Public License version 2 or (at your option) any later version.
@@ -7,44 +8,73 @@
 *   This module contains functions for generating tags for Python language
 *   files.
 */
-/*
-*   INCLUDE FILES
-*/
+
 #include "general.h"  /* must always come first */
 
 #include <string.h>
-#include <stdio.h>
 
 #include "entry.h"
 #include "nestlevel.h"
-#include "options.h"
 #include "read.h"
 #include "main.h"
+#include "parse.h"
 #include "vstring.h"
+#include "keyword.h"
 #include "routines.h"
 #include "debug.h"
 #include "xtag.h"
 
-/*
-*   DATA DECLARATIONS
-*/
-
-struct corkPair {
-	int index;
-	int fqIndex;
-};
-
-struct nestingLevelUserData {
-	int indentation;
-	int fqIndex;
-};
-#define PY_NL_INDENTATION(nl) ((struct nestingLevelUserData *)nestingLevelGetUserData(nl))->indentation
-#define PY_NL_FQINDEX(nl) ((struct nestingLevelUserData *)nestingLevelGetUserData(nl))->fqIndex
-
 
 typedef enum {
-	K_UNDEFINED = -1,
-	K_CLASS, K_FUNCTION, K_MEMBER, K_VARIABLE, K_NAMESPACE, K_MODULE, K_UNKNOWN,
+	KEYWORD_as,
+	KEYWORD_cdef,
+	KEYWORD_class,
+	KEYWORD_cpdef,
+	KEYWORD_def,
+	KEYWORD_extern,
+	KEYWORD_from,
+	KEYWORD_import,
+	KEYWORD_inline,
+	KEYWORD_lambda,
+	KEYWORD_pass,
+	KEYWORD_return,
+} keywordId;
+
+typedef enum {
+	ACCESS_PRIVATE,
+	ACCESS_PROTECTED,
+	ACCESS_PUBLIC,
+	COUNT_ACCESS
+} accessType;
+
+static const char *const PythonAccesses[COUNT_ACCESS] = {
+	"private",
+	"protected",
+	"public"
+};
+
+typedef enum {
+	F_DECORATORS,
+	COUNT_FIELD
+} pythonField;
+
+static fieldSpec PythonFields[COUNT_FIELD] = {
+	{ .name = "decorators",
+	  .description = "decorators on functions and classes",
+	  .enabled = FALSE },
+};
+
+typedef enum {
+	K_CLASS,
+	K_FUNCTION,
+	K_METHOD,
+	K_VARIABLE,
+	K_NAMESPACE,
+	K_MODULE,
+	K_UNKNOWN,
+	K_PARAMETER,
+	K_LOCAL_VARIABLE,
+	COUNT_KIND
 } pythonKind;
 
 typedef enum {
@@ -58,11 +88,7 @@ typedef enum {
 	PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
 } pythonUnknownRole;
 
-/*
-*   DATA DEFINITIONS
-*/
-
-/* Roles releated to `import'
+/* Roles related to `import'
  * ==========================
  * import X              X = (kind:module, role:imported)
  *
@@ -95,7 +121,7 @@ static roleDesc PythonUnknownRoles [] = {
 	  "classes/variables/functions/modules imported in alternative name" },
 };
 
-static kindOption PythonKinds[] = {
+static kindOption PythonKinds[COUNT_KIND] = {
 	{TRUE, 'c', "class",    "classes"},
 	{TRUE, 'f', "function", "functions"},
 	{TRUE, 'm', "member",   "class members"},
@@ -105,1239 +131,1167 @@ static kindOption PythonKinds[] = {
 	 .referenceOnly = TRUE,  ATTACH_ROLES(PythonModuleRoles)},
 	{TRUE, 'x', "unknown",   "name referring a classe/variable/function/module defined in other module",
 	 .referenceOnly = FALSE, ATTACH_ROLES(PythonUnknownRoles)},
+	{FALSE, 'z', "parameter", "function parameters" },
+	{FALSE, 'l', "local",    "local variables" },
 };
 
-typedef enum {
-	A_PUBLIC, A_PRIVATE, A_PROTECTED
-} pythonAccess;
-
-static const char *const PythonAccesses[] = {
-	"public", "private", "protected"
+static const keywordTable PythonKeywordTable[] = {
+	/* keyword			keyword ID */
+	{ "as",				KEYWORD_as				},
+	{ "cdef",			KEYWORD_cdef			},
+	{ "cimport",		KEYWORD_import			},
+	{ "class",			KEYWORD_class			},
+	{ "cpdef",			KEYWORD_cpdef			},
+	{ "def",			KEYWORD_def				},
+	{ "extern",			KEYWORD_extern			},
+	{ "from",			KEYWORD_from			},
+	{ "import",			KEYWORD_import			},
+	{ "inline",			KEYWORD_inline			},
+	{ "lambda",			KEYWORD_lambda			},
+	{ "pass",			KEYWORD_pass			},
+	{ "return",			KEYWORD_return			},
 };
 
-typedef enum {
-	F_END,
-} pythonField;
+typedef enum eTokenType {
+	/* 0..255 are the byte's value */
+	TOKEN_EOF = 256,
+	TOKEN_UNDEFINED,
+	TOKEN_INDENT,
+	TOKEN_KEYWORD,
+	TOKEN_OPERATOR,
+	TOKEN_IDENTIFIER,
+	TOKEN_STRING,
+	TOKEN_WHITESPACE,
+} tokenType;
 
-static fieldSpec PythonFields [] = {
-	{
-		.name = "end",
-		.description = "end lines of various constructs",
-		.enabled = FALSE,
-	}
+typedef struct {
+	int				type;
+	keywordId		keyword;
+	vString *		string;
+	int				indent;
+	unsigned long 	lineNumber;
+	MIOPos			filePosition;
+} tokenInfo;
+
+struct pythonNestingLevelUserData {
+	int indentation;
 };
+#define PY_NL(nl) ((struct pythonNestingLevelUserData *) nestingLevelGetUserData (nl))
 
-static char const * const singletriple = "'''";
-static char const * const doubletriple = "\"\"\"";
+static langType Lang_python;
+static unsigned int TokenContinuationDepth = 0;
+static tokenInfo *NextToken = NULL;
+static NestingLevels *PythonNestingLevels = NULL;
 
-/*
-*   FUNCTION DEFINITIONS
-*/
-
-static boolean isIdentifierFirstCharacter (int c)
-{
-	return (boolean) (isalpha (c) || c == '_');
-}
-
-static boolean isIdentifierFirstCharacterCB (int c, void *dummy __unused__)
-{
-	return isIdentifierFirstCharacter (c);
-}
-
-static boolean isModuleFirstCharacterCB (int c, void *dummy __unused__)
-{
-	return (boolean) (isIdentifierFirstCharacter (c) || c == '.');
-}
-
-static boolean isIdentifierCharacter (int c)
-{
-	return (boolean) (isalnum (c) || c == '_');
-}
-
-static boolean isModuleCharacter (int c)
-{
-	return (boolean) (isIdentifierCharacter (c) || c == '.');
-}
 
 /* follows PEP-8, and always reports single-underscores as protected
  * See:
  * - http://www.python.org/dev/peps/pep-0008/#method-names-and-instance-variables
  * - http://www.python.org/dev/peps/pep-0008/#designing-for-inheritance
  */
-static pythonAccess accessFromIdentifier (const vString *const ident,
-	pythonKind kind, boolean has_parent, boolean parent_is_class)
+static accessType accessFromIdentifier (const vString *const ident,
+                                        pythonKind kind, int parentKind)
 {
 	const char *const p = vStringValue (ident);
 	const size_t len = vStringLength (ident);
 
 	/* inside a function/method, private */
-	if (has_parent && !parent_is_class)
-		return A_PRIVATE;
+	if (parentKind != -1 && parentKind != K_CLASS)
+		return ACCESS_PRIVATE;
 	/* not starting with "_", public */
 	else if (len < 1 || p[0] != '_')
-		return A_PUBLIC;
+		return ACCESS_PUBLIC;
 	/* "__...__": magic methods */
-	else if (kind == K_MEMBER && parent_is_class &&
-			 len > 3 && p[1] == '_' && p[len - 2] == '_' && p[len - 1] == '_')
-		return A_PUBLIC;
+	else if (kind == K_FUNCTION && parentKind == K_CLASS &&
+	         len > 3 && p[1] == '_' && p[len - 2] == '_' && p[len - 1] == '_')
+		return ACCESS_PUBLIC;
 	/* "__...": name mangling */
-	else if (parent_is_class && len > 1 && p[1] == '_')
-		return A_PRIVATE;
+	else if (parentKind == K_CLASS && len > 1 && p[1] == '_')
+		return ACCESS_PRIVATE;
 	/* "_...": suggested as non-public, but easily accessible */
 	else
-		return A_PROTECTED;
+		return ACCESS_PROTECTED;
 }
 
-static void addAccessFields (tagEntryInfo *const entry,
-	const vString *const ident, pythonKind kind,
-	boolean has_parent, boolean parent_is_class)
+static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token,
+                             const pythonKind kind)
 {
-	pythonAccess access;
+	accessType access;
+	int parentKind = -1;
+	NestingLevel *nl;
 
-	access = accessFromIdentifier (ident, kind, has_parent, parent_is_class);
-	entry->extensionFields.access = PythonAccesses [access];
+	initTagEntry (e, vStringValue (token->string), &(PythonKinds[kind]));
+
+	e->lineNumber	= token->lineNumber;
+	e->filePosition	= token->filePosition;
+
+	nl = nestingLevelsGetCurrent (PythonNestingLevels);
+	if (nl)
+	{
+		tagEntryInfo *nlEntry = getEntryOfNestingLevel (nl);
+
+		e->extensionFields.scopeIndex = nl->corkIndex;
+
+		/* nlEntry can be NULL if a kind was disabled.  But what can we do
+		 * here?  Even disabled kinds should count for the hierarchy I
+		 * guess -- as it'd otherwise be wrong -- but with cork we're
+		 * fucked up as there's nothing to look up.  Damn. */
+		if (nlEntry)
+		{
+			parentKind = (int) (nlEntry->kind - PythonKinds);
+
+			/* functions directly inside classes are methods, fix it up */
+			if (kind == K_FUNCTION && parentKind == K_CLASS)
+				e->kind = &(PythonKinds[K_METHOD]);
+		}
+	}
+
+	access = accessFromIdentifier (token->string, kind, parentKind);
+	e->extensionFields.access = PythonAccesses[access];
 	/* FIXME: should we really set isFileScope in addition to access? */
-	if (access == A_PRIVATE)
-		entry->isFileScope = TRUE;
+	if (access == ACCESS_PRIVATE)
+		e->isFileScope = TRUE;
 }
 
-/* Given a string with the contents of a line directly after the "def" keyword,
- * extract all relevant information and create a tag.
- */
-static struct corkPair makeFunctionTagFull (tagEntryInfo *tag, vString *const function,
-						  vString *const parent, int is_class_parent, const char *arglist)
+static int makeClassTag (const tokenInfo *const token,
+                         const vString *const inheritance,
+                         const vString *const decorators)
 {
-	char scope_kind_letter = KIND_NULL;
-	int corkIndex;
-	int fqCorkIndex = CORK_NIL;
-	const struct corkPair nilPair = {CORK_NIL, CORK_NIL};
-	struct corkPair pair;
-
-	if (is_class_parent)
+	if (PythonKinds[K_CLASS].enabled)
 	{
-		if (!PythonKinds[K_MEMBER].enabled)
-			return nilPair;
-	}
-	else
-	{
-		if (!PythonKinds[K_FUNCTION].enabled)
-			return nilPair;
-	}
+		tagEntryInfo e;
 
-	tag->extensionFields.signature = arglist;
+		initPythonEntry (&e, token, K_CLASS);
 
-	if (vStringLength (parent) > 0)
-	{
-		if (is_class_parent)
+		e.extensionFields.inheritance = inheritance ? vStringValue (inheritance) : "";
+		if (decorators && vStringLength (decorators) > 0)
 		{
-			tag->kind = &(PythonKinds[K_MEMBER]);
-			tag->extensionFields.scopeKind = &(PythonKinds[K_CLASS]);
-			tag->extensionFields.scopeName = vStringValue (parent);
-			scope_kind_letter = PythonKinds[K_CLASS].letter;
+			attachParserField (&e, PythonFields[F_DECORATORS].ftype,
+			                   vStringValue (decorators));
 		}
-		else
-		{
-			tag->extensionFields.scopeKind = &(PythonKinds[K_FUNCTION]);
-			tag->extensionFields.scopeName = vStringValue (parent);
-		}
+
+		return makeTagEntry (&e);
 	}
 
-	addAccessFields (tag, function, is_class_parent ? K_MEMBER : K_FUNCTION,
-		vStringLength (parent) > 0, is_class_parent);
-
-	corkIndex = makeTagEntry (tag);
-
-	if ((scope_kind_letter != KIND_NULL)
-	    && tag->extensionFields.scopeName)
-		fqCorkIndex = makeQualifiedTagEntry (tag);
-
-	pair.index = corkIndex;
-	pair.fqIndex = fqCorkIndex;
-	return pair;
+	return CORK_NIL;
 }
 
-static void makeFunctionTag (vString *const function,
-	vString *const parent, int is_class_parent, const char *arglist)
+static int makeFunctionTag (const tokenInfo *const token,
+                            const vString *const arglist,
+                            const vString *const decorators)
 {
-	tagEntryInfo tag;
+	if (PythonKinds[K_FUNCTION].enabled)
+	{
+		tagEntryInfo e;
 
-	initTagEntry (&tag, vStringValue (function), &(PythonKinds[K_FUNCTION]));
-	makeFunctionTagFull (&tag, function, parent, is_class_parent, arglist);
+		initPythonEntry (&e, token, K_FUNCTION);
+
+		if (arglist)
+			e.extensionFields.signature = vStringValue (arglist);
+		if (decorators && vStringLength (decorators) > 0)
+		{
+			attachParserField (&e, PythonFields[F_DECORATORS].ftype,
+			                   vStringValue (decorators));
+		}
+
+		return makeTagEntry (&e);
+	}
+
+	return CORK_NIL;
 }
 
-/* Given a string with the contents of the line directly after the "class"
- * keyword, extract all necessary information and create a tag.
- */
-static int makeClassTag (vString *const class, vString *const inheritance,
-	vString *const parent, int is_class_parent)
+static int makeSimplePythonTag (const tokenInfo *const token, pythonKind const kind)
 {
-	tagEntryInfo tag;
-
-	if (! PythonKinds[K_CLASS].enabled)
-		return CORK_NIL;
-
-	initTagEntry (&tag, vStringValue (class), &(PythonKinds[K_CLASS]));
-	if (vStringLength (parent) > 0)
+	if (PythonKinds[kind].enabled)
 	{
-		if (is_class_parent)
-		{
-			tag.extensionFields.scopeKind = &(PythonKinds[K_CLASS]);
-			tag.extensionFields.scopeName = vStringValue (parent);
-		}
-		else
-		{
-			tag.extensionFields.scopeKind = &(PythonKinds[K_FUNCTION]);
-			tag.extensionFields.scopeName = vStringValue (parent);
-		}
+		tagEntryInfo e;
+
+		initPythonEntry (&e, token, kind);
+		return makeTagEntry (&e);
 	}
-	tag.extensionFields.inheritance = vStringValue (inheritance);
-	addAccessFields (&tag, class, K_CLASS, vStringLength (parent) > 0,
-		is_class_parent);
-	return makeTagEntry (&tag);
+
+	return CORK_NIL;
 }
 
-static void makeVariableTag (vString *const var, vString *const parent,
-	boolean is_class_parent)
+static int makeSimplePythonRefTag (const tokenInfo *const token,
+                                   const vString *const altName,
+                                   pythonKind const kind,
+                                   int roleIndex, xtagType xtag)
 {
-	tagEntryInfo tag;
-
-	if (! PythonKinds[K_VARIABLE].enabled)
-		return;
-
-	initTagEntry (&tag, vStringValue (var), &(PythonKinds[K_VARIABLE]));
-	if (vStringLength (parent) > 0)
+	if (PythonKinds[kind].roles[roleIndex].enabled)
 	{
-		tag.extensionFields.scopeKind = &(PythonKinds[K_CLASS]);
-		tag.extensionFields.scopeName = vStringValue (parent);
+		tagEntryInfo e;
+
+		initRefTagEntry (&e, vStringValue (altName ? altName : token->string),
+		                 &(PythonKinds[kind]), roleIndex);
+
+		e.lineNumber	= token->lineNumber;
+		e.filePosition	= token->filePosition;
+
+		if (xtag != XTAG_UNKNOWN)
+			markTagExtraBit (&e, xtag);
+
+		return makeTagEntry (&e);
 	}
-	addAccessFields (&tag, var, K_VARIABLE, vStringLength (parent) > 0,
-		is_class_parent);
-	makeTagEntry (&tag);
+
+	return CORK_NIL;
+}
+
+static tokenInfo *newToken (void)
+{
+	tokenInfo *const token = xMalloc (1, tokenInfo);
+
+	token->type			= TOKEN_UNDEFINED;
+	token->keyword		= KEYWORD_NONE;
+	token->string		= vStringNew ();
+	token->indent		= 0;
+	token->lineNumber   = getSourceLineNumber ();
+	token->filePosition = getInputFilePosition ();
+
+	return token;
+}
+
+static void deleteToken (tokenInfo *const token)
+{
+	vStringDelete (token->string);
+	eFree (token);
+}
+
+static void copyToken (tokenInfo *const dest, const tokenInfo *const src)
+{
+	dest->lineNumber = src->lineNumber;
+	dest->filePosition = src->filePosition;
+	dest->type = src->type;
+	dest->keyword = src->keyword;
+	dest->indent = src->indent;
+	vStringCopy(dest->string, src->string);
+}
+
+static boolean isIdentifierChar (const int c)
+{
+	return (isalnum (c) || c == '_' || c >= 0x80);
 }
 
 /* Skip a single or double quoted string. */
-static const char *skipString (const char *cp)
+static void readString (vString *const string, const int delimiter)
 {
-	const char *start = cp;
 	int escaped = 0;
-	for (cp++; *cp; cp++)
+	int c;
+
+	while ((c = getcFromInputFile ()) != EOF)
 	{
 		if (escaped)
+		{
+			vStringPut (string, c);
 			escaped--;
-		else if (*cp == '\\')
+		}
+		else if (c == '\\')
 			escaped++;
-		else if (*cp == *start)
-			return cp + 1;
-	}
-	return cp;
-}
-
-static char const *find_triple_start0(char const *string)
-{
-	if (strncmp(string, doubletriple, 3) == 0)
-		return doubletriple;
-	else if (strncmp(string, singletriple, 3) == 0)
-		return singletriple;
-	else
-		return NULL;
-}
-
-static const char *skipUntil (const char *cp,
-			      const char **longStringLiteral,
-			      boolean (* isAcceptable) (int, void*),
-			      void *user_data)
-{
-	int match;
-	for (; *cp; cp++)
-	{
-		if (*cp == '#')
-			return strchr(cp, '\0');
-
-		match = 0;
-		if (*cp == '"' || *cp == '\'')
+		else if (c == delimiter || c == '\n' || c == '\r')
 		{
-			if (longStringLiteral)
-			{
-				*longStringLiteral = find_triple_start0 (cp);
-				if (*longStringLiteral)
-					return strchr(cp, '\0');
-			}
-			match = 1;
+			if (c != delimiter)
+				ungetcToInputFile (c);
+			break;
+		}
+		else
+			vStringPut (string, c);
+	}
+}
+
+/* Skip a single or double triple quoted string. */
+static void readTripleString (vString *const string, const int delimiter)
+{
+	int c;
+	int escaped = 0;
+	int n = 0;
+	while ((c = getcFromInputFile ()) != EOF)
+	{
+		if (c == delimiter && ! escaped)
+		{
+			if (++n >= 3)
+				break;
+		}
+		else
+		{
+			for (; n > 0; n--)
+				vStringPut (string, delimiter);
+			if (c != '\\' || escaped)
+				vStringPut (string, c);
+			n = 0;
 		}
 
-		/* these checks find unicode, binary (Python 3) and raw strings */
-		if (!match)
+		if (escaped)
+			escaped--;
+		else if (c == '\\')
+			escaped++;
+	}
+}
+
+static void readIdentifier (vString *const string, const int firstChar)
+{
+	int c = firstChar;
+	do
+	{
+		vStringPut (string, (char) c);
+		c = getcFromInputFile ();
+	}
+	while (isIdentifierChar (c));
+	ungetcToInputFile (c);
+	vStringTerminate (string);
+}
+
+static void ungetToken (tokenInfo *const token)
+{
+	Assert (NextToken == NULL);
+	NextToken = newToken ();
+	copyToken (NextToken, token);
+}
+
+static void readTokenFull (tokenInfo *const token, boolean inclWhitespaces)
+{
+	int c;
+	int n;
+
+	/* if we've got a token held back, emit it */
+	if (NextToken)
+	{
+		copyToken (token, NextToken);
+		deleteToken (NextToken);
+		NextToken = NULL;
+		return;
+	}
+
+	token->type		= TOKEN_UNDEFINED;
+	token->keyword	= KEYWORD_NONE;
+	vStringClear (token->string);
+
+getNextChar:
+
+	n = 0;
+	do
+	{
+		c = getcFromInputFile ();
+		n++;
+	}
+	while (c == ' ' || c == '\t' || c == '\f');
+
+	token->lineNumber   = getSourceLineNumber ();
+	token->filePosition = getInputFilePosition ();
+
+	if (inclWhitespaces && n > 1 && c != '\r' && c != '\n')
+	{
+		ungetcToInputFile (c);
+		vStringPut (token->string, ' ');
+		token->type = TOKEN_WHITESPACE;
+		return;
+	}
+
+	switch (c)
+	{
+		case EOF:
+			token->type = TOKEN_EOF;
+			break;
+
+		case '\'':
+		case '"':
 		{
-			boolean r_first = (*cp == 'r' || *cp == 'R');
-
-			/* "r" | "R" | "u" | "U" | "b" | "B" */
-			if (r_first || *cp == 'u' || *cp == 'U' ||  *cp == 'b' || *cp == 'B')
+			int d = getcFromInputFile ();
+			token->type = TOKEN_STRING;
+			vStringPut (token->string, c);
+			if (d != c)
 			{
-				unsigned int i = 1;
+				ungetcToInputFile (d);
+				readString (token->string, c);
+			}
+			else if ((d = getcFromInputFile ()) == c)
+				readTripleString (token->string, c);
+			else /* empty string */
+				ungetcToInputFile (d);
+			vStringPut (token->string, c);
+			token->lineNumber = getSourceLineNumber ();
+			token->filePosition = getInputFilePosition ();
+			break;
+		}
 
-				/*  r_first -> "rb" | "rB" | "Rb" | "RB"
-				   !r_first -> "ur" | "UR" | "Ur" | "uR" | "br" | "Br" | "bR" | "BR" */
-				if (( r_first && (cp[i] == 'b' || cp[i] == 'B')) ||
-					(!r_first && (cp[i] == 'r' || cp[i] == 'R')))
-					i++;
+		case '=':
+		{
+			int d = getcFromInputFile ();
+			vStringPut (token->string, c);
+			if (d == c)
+			{
+				vStringPut (token->string, d);
+				token->type = TOKEN_OPERATOR;
+			}
+			else
+			{
+				ungetcToInputFile (d);
+				token->type = c;
+			}
+			break;
+		}
 
-				if (cp[i] == '\'' || cp[i] == '"')
+		case '+':
+		case '-':
+		case '*':
+		case '%':
+		case '<':
+		case '>':
+		case '/':
+		{
+			int d = getcFromInputFile ();
+			vStringPut (token->string, c);
+			if (d != '=')
+			{
+				ungetcToInputFile (d);
+				token->type = c;
+			}
+			else
+			{
+				vStringPut (token->string, d);
+				token->type = TOKEN_OPERATOR;
+			}
+			break;
+		}
+
+		/* eats newline to implement line continuation  */
+		case '\\':
+		{
+			int d = getcFromInputFile ();
+			if (d == '\r')
+				d = getcFromInputFile ();
+			if (d != '\n')
+				ungetcToInputFile (d);
+			goto getNextChar;
+			break;
+		}
+
+		case '#': /* comment */
+		case '\r': /* newlines for indent */
+		case '\n':
+			do
+			{
+				if (c == '#')
 				{
-					match = 1;
-					cp += i;
+					do
+						c = getcFromInputFile ();
+					while (c != EOF && c != '\r' && c != '\n');
 				}
-			}
-		}
-		if (match)
-		{
-			cp = skipString(cp);
-			if (!*cp) break;
-		}
-		if (isAcceptable ((int) *cp, user_data))
-			return cp;
-		if (match)
-			cp--; /* avoid jumping over the character after a skipped string */
-	}
-	return cp;
-}
-
-/* Skip everything up to an identifier start. */
-static const char *skipToNextIdentifier (const char *cp)
-{
-	return skipUntil (cp, NULL, isIdentifierFirstCharacterCB, NULL);
-}
-
-/* Skip everything up to a module start. */
-static const char *skipToNextModule (const char *cp)
-{
-	return skipUntil (cp, NULL, isModuleFirstCharacterCB, NULL);
-}
-
-
-/* Skip an identifier. */
-static const char *skipIdentifier (const char *cp)
-{
-	while (isIdentifierCharacter ((int) *cp))
-		cp++;
-	return cp;
-}
-
-static const char *findDefinitionOrClass (const char *cp)
-{
-	while (*cp)
-	{
-		cp = skipToNextIdentifier (cp);
-		if (!strncmp(cp, "def", 3) || !strncmp(cp, "class", 5) ||
-			!strncmp(cp, "cdef", 4) || !strncmp(cp, "cpdef", 5))
-		{
-			return cp;
-		}
-		cp = skipIdentifier (cp);
-	}
-	return NULL;
-}
-
-static const char *skipSpace (const char *cp)
-{
-	while (isspace ((int) *cp))
-		++cp;
-	return cp;
-}
-
-/* Starting at ''cp'', parse an identifier into ''identifier''. */
-static const char *parseIdentifier (const char *cp, vString *const identifier)
-{
-	vStringClear (identifier);
-	while (isIdentifierCharacter ((int) *cp))
-	{
-		vStringPut (identifier, (int) *cp);
-		++cp;
-	}
-	vStringTerminate (identifier);
-	return cp;
-}
-
-static const char *parseModule (const char *cp, vString *const module)
-{
-	vStringClear (module);
-	while (isModuleCharacter (*cp))
-	{
-		vStringPut (module, (int) *cp);
-		++cp;
-	}
-	vStringTerminate (module);
-	return cp;
-}
-
-static int parseClass (const char *cp, vString *const class,
-	vString *const parent, int is_class_parent)
-{
-	int corkIndex;
-	vString *const inheritance = vStringNew ();
-	vStringClear (inheritance);
-	cp = parseIdentifier (cp, class);
-	cp = skipSpace (cp);
-	if (*cp == '(')
-	{
-		++cp;
-		while (*cp != ')')
-		{
-			if (*cp == '\0')
-			{
-				/* Closing parenthesis can be in follow up line. */
-				cp = (const char *) readLineFromInputFile ();
-				if (!cp) break;
-				vStringPut (inheritance, ' ');
-				continue;
-			}
-			vStringPut (inheritance, *cp);
-			++cp;
-		}
-		vStringTerminate (inheritance);
-	}
-	corkIndex = makeClassTag (class, inheritance, parent, is_class_parent);
-	vStringDelete (inheritance);
-	return corkIndex;
-}
-
-static void parseImports (const char *cp, const char* from_module)
-{
-	const char* cp_next;
-	vString *name, *name_next, *fq;
-	boolean maybe_multiline = FALSE;
-	boolean found_multiline_end = FALSE;
-
-	name = vStringNew ();
-	name_next = vStringNew ();
-	fq = vStringNew ();
-
-	cp = skipSpace (cp);
-	if (from_module && *cp == '(')
-	{
-		maybe_multiline = TRUE;
-		++cp;
-	}
-
-	cp = skipToNextModule (cp);
-nextLine:
-	while (*cp)
-	{
-		cp = parseModule (cp, name);
-		cp = skipSpace (cp);
-		if (*cp == ')')
-			found_multiline_end = TRUE;
-		cp = skipToNextModule (cp);
-		cp_next = parseIdentifier (cp, name_next);
-
-		if (strcmp (vStringValue (name_next), "as") == 0)
-		{
-			cp = skipToNextIdentifier (cp_next);
-			cp = parseIdentifier (cp, name_next);
-			if (from_module)
-			{
-				/* from x import Y as Z
-				   ----------------------------
-				   x = (kind:module,  role:namespace),
-				   Y = (kind:unknown, role:indirectly-imported),
-				   Z = (kind:unknown) */
-
-				/* Y */
-				makeSimpleRefTag (name, PythonKinds, K_UNKNOWN,
-						  PYTHON_UNKNOWN_INDIRECTLY_IMPORTED);
-				/* x.Y */
-				if (isXtagEnabled(XTAG_QUALIFIED_TAGS))
+				if (c == '\r')
 				{
-					tagEntryInfo fqe;
-					vStringCatS (fq, from_module);
-					vStringPut (fq, '.');
-					vStringCat (fq, name);
-					initRefTagEntry (&fqe, vStringValue (fq), PythonKinds + K_UNKNOWN,
-							 PYTHON_UNKNOWN_INDIRECTLY_IMPORTED);
-					markTagExtraBit (&fqe, XTAG_QUALIFIED_TAGS);
-					makeTagEntry (&fqe);
-					vStringClear(fq);
+					int d = getcFromInputFile ();
+					if (d != '\n')
+						ungetcToInputFile (d);
 				}
-				/* Z */
-				makeSimpleTag (name_next, PythonKinds, K_UNKNOWN);
-			}
-			else
-			{
-				/* import x as Y
-				   ----------------------------
-				   X = (kind:module, role:indirectly-imported)
-				   Y = (kind:namespace)*/
-				/* X */
-				makeSimpleRefTag (name, PythonKinds, K_MODULE,
-						  PYTHON_MODULE_INDIRECTLY_IMPORTED);
-				/* Y */
-				makeSimpleTag (name_next, PythonKinds, K_NAMESPACE);
-			}
-
-			cp = skipSpace (cp);
-			if (*cp == ')')
-			{
-				found_multiline_end = TRUE;
-				cp++;
-			}
-			cp = skipToNextIdentifier (cp);
-		}
-		else
-		{
-			if (from_module)
-			{
-				/* from x import Y
-				   --------------
-				   x = (kind:module,  role:namespace),
-				   Y = (kind:unknown, role:imported) */
-				/* Y */
-				makeSimpleRefTag (name, PythonKinds, K_UNKNOWN,
-						  PYTHON_MODULE_IMPORTED);
-				/* x.Y */
-				if (isXtagEnabled(XTAG_QUALIFIED_TAGS))
+				token->type = TOKEN_INDENT;
+				token->indent = 0;
+				while ((c = getcFromInputFile ()) == ' ' || c == '\t' || c == '\f')
 				{
-					tagEntryInfo fqe;
-					vStringCatS (fq, from_module);
-					vStringPut (fq, '.');
-					vStringCat (fq, name);
-					initRefTagEntry (&fqe, vStringValue (fq),
-							 PythonKinds + K_UNKNOWN,
-							 PYTHON_MODULE_IMPORTED);
-					markTagExtraBit (&fqe, XTAG_QUALIFIED_TAGS);
-					makeTagEntry (&fqe);
-					vStringClear(fq);
+					if (c == '\t')
+						token->indent += 8 - (token->indent % 8);
+					else if (c == '\f') /* yeah, it's weird */
+						token->indent = 0;
+					else
+						token->indent++;
 				}
+			} /* skip completely empty lines, so retry */
+			while (c == '\r' || c == '\n' || c == '#');
+			ungetcToInputFile (c);
+			if (TokenContinuationDepth > 0)
+			{
+				if (inclWhitespaces)
+				{
+					vStringPut (token->string, ' ');
+					token->type = TOKEN_WHITESPACE;
+				}
+				else
+					goto getNextChar;
+			}
+			break;
+
+		default:
+			if (! isIdentifierChar (c))
+			{
+				vStringPut (token->string, c);
+				token->type = c;
 			}
 			else
 			{
-				/* import X
-				   --------------
-				   X = (kind:module, role:imported) */
-				makeSimpleRefTag (name, PythonKinds, K_MODULE,
-						  PYTHON_MODULE_IMPORTED);
+				/* FIXME: handle U, B and R string prefixes? */
+				readIdentifier (token->string, c);
+				token->keyword = analyzeToken (token->string, Lang_python);
+				if (token->keyword == KEYWORD_NONE)
+					token->type = TOKEN_IDENTIFIER;
+				else
+					token->type = TOKEN_KEYWORD;
 			}
-			/* Don't update cp. Start from the position of name_next. */
-		}
+			break;
 	}
 
-	if (maybe_multiline && (!found_multiline_end))
+	/* handle implicit continuation lines not to emit INDENT inside brackets
+	 * https://docs.python.org/3.6/reference/lexical_analysis.html#implicit-line-joining */
+	if (token->type == '(' ||
+	    token->type == '{' ||
+	    token->type == '[')
 	{
-		if ((cp = (const char *) readLineFromInputFile ()) != NULL)
+		TokenContinuationDepth ++;
+	}
+	else if (TokenContinuationDepth > 0 &&
+	         (token->type == ')' ||
+	          token->type == '}' ||
+	          token->type == ']'))
+	{
+		TokenContinuationDepth --;
+	}
+}
+
+static void readToken (tokenInfo *const token)
+{
+	readTokenFull (token, FALSE);
+}
+
+/*================================= parsing =================================*/
+
+
+static void reprCat (vString *const repr, const tokenInfo *const token)
+{
+	if (token->type != TOKEN_INDENT &&
+	    token->type != TOKEN_WHITESPACE)
+	{
+		vStringCat (repr, token->string);
+	}
+	else if (vStringLength (repr) > 0 && vStringLast (repr) != ' ')
+	{
+		vStringPut (repr, ' ');
+	}
+}
+
+static boolean skipOverPair (tokenInfo *const token, int tOpen, int tClose,
+                             vString *const repr, boolean reprOuterPair)
+{
+	if (token->type == tOpen)
+	{
+		int depth = 1;
+
+		if (repr && reprOuterPair)
+			reprCat (repr, token);
+		do
 		{
-			cp = skipSpace (cp);
-			if (*cp == ')')
+			readTokenFull (token, TRUE);
+			if (repr && (reprOuterPair || token->type != tClose || depth > 1))
 			{
-				cp++;
-				found_multiline_end = TRUE;
+				reprCat (repr, token);
 			}
-			else
-				goto nextLine;
+			if (token->type == tOpen)
+				depth ++;
+			else if (token->type == tClose)
+				depth --;
 		}
+		while (token->type != TOKEN_EOF && depth > 0);
 	}
+	if (repr)
+		vStringTerminate (repr);
 
-	vStringDelete (fq);
-	vStringDelete (name);
-	vStringDelete (name_next);
+	return token->type == tClose;
 }
 
-static void parseFromModule (const char *cp, const char* dummy __unused__)
+static boolean skipLambdaArglist (tokenInfo *const token, vString *const repr)
 {
-	vString *from_module;
-	vString *import_keyword;
-
-	/* from X import ...
-	   --------------------
-	   X = (kind:module, role:namespace) */
-
-	from_module = vStringNew ();
-	import_keyword = vStringNew ();
-
-	cp = skipToNextModule (cp);
-	cp = parseModule (cp, from_module);
-	cp = skipToNextIdentifier (cp);
-	cp = parseIdentifier (cp, import_keyword);
-
-	if (strcmp (vStringValue (import_keyword), "import") == 0
-	    || strcmp (vStringValue (import_keyword), "cimport") == 0)
+	while (token->type != TOKEN_EOF && token->type != ':' &&
+	       /* avoid reading too much, just in case */
+	       token->type != TOKEN_INDENT)
 	{
-		makeSimpleRefTag (from_module, PythonKinds, K_MODULE,
-				  PYTHON_MODULE_NAMESPACE);
-		parseImports (cp, vStringValue (from_module));
-	}
+		boolean readNext = TRUE;
 
-	vStringDelete (import_keyword);
-	vStringDelete (from_module);
-}
-
-
-static boolean parseNamespace (const char *cp)
-{
-	void (* parse_sub) (const char *, const char *);
-
-	cp = skipToNextIdentifier (cp);
-
-	if (strncmp (cp, "import", 6) == 0)
-	{
-		cp += 6;
-		parse_sub = parseImports;
-	}
-	else if (strncmp (cp, "cimport", 7) == 0)
-	{
-		cp += 7;
-		parse_sub = parseImports;
-	}
-	else if (strncmp (cp, "from", 4) == 0)
-	{
-		cp += 4;
-		parse_sub = parseFromModule;
-	}
-	else
-		return FALSE;
-
-	/* continue only if there is some space between the keyword and the identifier */
-	if (! isspace (*cp))
-		return FALSE;
-
-	cp++;
-	cp = skipSpace (cp);
-
-	parse_sub (cp, NULL);
-	return TRUE;
-}
-
-/* modified from get.c getArglistFromStr().
- * warning: terminates rest of string past arglist!
- * note: does not ignore brackets inside strings! */
-struct argParsingState
-{
-	vString *arglist;
-	int level;
-	char const *longStringLiteral;
-};
-
-static boolean gatherArglistCB (int c, void *arglist)
-{
-	if (arglist)
-	{
-		if ('\t' == c)
-			c = ' ';
-
-		if (vStringLast ((vString *)arglist) != ' '
-		    || c != ' ')
-			vStringPut ((vString *)arglist, c);
-	}
-
-	if (c == '(' || c == ')')
-		return TRUE;
-	else
-		return FALSE;
-}
-
-static boolean parseArglist(const char* buf, struct argParsingState *state)
-{
-	const char *start, *current;
-
-	start = buf;
-	if (state->level == 0)
-	{
-		if (NULL == (start = strchr(buf, '(')))
-			return FALSE;
-		else
+		if (token->type == '(')
+			readNext = skipOverPair (token, '(', ')', repr, TRUE);
+		else if (token->type == '[')
+			readNext = skipOverPair (token, '[', ']', repr, TRUE);
+		else if (token->type == '{')
+			readNext = skipOverPair (token, '{', '}', repr, TRUE);
+		else if (token->keyword == KEYWORD_lambda)
+		{ /* handle lambdas in a default value */
+			if (repr)
+				reprCat (repr, token);
+			readTokenFull (token, TRUE);
+			readNext = skipLambdaArglist (token, repr);
+			if (token->type == ':')
+				readNext = TRUE;
+			if (readNext && repr)
+				reprCat (repr, token);
+		}
+		else if (repr)
 		{
-			if (state->arglist)
-				vStringPut (state->arglist, *start);
-			state->level = 1;
-			start += 1;
-		}
-	}
-
-
-	do {
-		current = skipUntil (start, &state->longStringLiteral,
-				     gatherArglistCB, state->arglist);
-		switch (*current)
-		{
-		case '\0':
-			break;
-		case '(':
-			++ state->level;
-			break;
-		case ')':
-			-- state->level;
-			break;
-		}
-		start = current + 1;
-	} while (
-		/* Still be in parenthesis */
-		state->level > 0
-		/* the input string is continued. */
-		&& *current && *start
-		);
-
-	return TRUE;
-}
-
-static char const *find_triple_end(char const *string, char const **which,
-				   boolean dontRepeat);
-static void captureArguments (const char *start, vString *arglist)
-{
-	struct argParsingState state;
-
-	state.level = 0;
-	state.arglist = arglist;
-	state.longStringLiteral = NULL;
-
-	while (start)
-	{
-		if (arglist == NULL && state.longStringLiteral)
-		{
-			start = find_triple_end(start, &state.longStringLiteral,
-						TRUE);
-			if (arglist == NULL && state.longStringLiteral)
-			{
-				start = (const char *) readLineFromInputFile ();
-				continue;
-			}
+			reprCat (repr, token);
 		}
 
-		if (parseArglist (start, &state) == FALSE)
-			/* No '(' is found: broken input */
-			break;
-		else if (state.level == 0)
-			break;
-		else
-			start = (const char *) readLineFromInputFile ();
-	}
-}
-
-static void skipParens (const char *start)
-{
-	captureArguments (start, NULL);
-}
-
-static struct corkPair parseFunction (const char *cp, vString *const def,
-	vString *const parent, int is_class_parent)
-{
-	tagEntryInfo tag;
-	static vString *arglist;
-
-	cp = parseIdentifier (cp, def);
-	initTagEntry (&tag, vStringValue (def), &(PythonKinds[K_FUNCTION]));
-
-	if (arglist)
-	  vStringClear (arglist);
-	else
-	  arglist = vStringNew ();
-	captureArguments (cp, arglist);
-	return makeFunctionTagFull (&tag, def, parent, is_class_parent, vStringValue (arglist));
-}
-
-/* Get the combined name of a nested symbol. Classes are separated with ".",
- * functions with "/". For example this code:
- * class MyClass:
- *     def myFunction:
- *         def SubFunction:
- *             class SubClass:
- *                 def Method:
- *                     pass
- * Would produce this string:
- * MyClass.MyFunction/SubFunction/SubClass.Method
- */
-static boolean constructParentString(NestingLevels *nls, int indent,
-	vString *result)
-{
-	int i;
-	NestingLevel *prev = NULL;
-	int is_class = FALSE;
-	vStringClear (result);
-	for (i = 0; i < nls->n; i++)
-	{
-		NestingLevel *nl = nestingLevelsGetNth (nls, i);
-		tagEntryInfo *e;
-
-		if (indent <= PY_NL_INDENTATION(nl))
-			break;
-		if (prev)
-		{
-			vStringCatS(result, ".");	/* make Geany symbol list grouping work properly */
-/*
-			if (prev->kindIndex == K_CLASS)
-				vStringCatS(result, ".");
-			else
-				vStringCatS(result, "/");
-*/
-		}
-
-		e = getEntryOfNestingLevel (nl);
-		if (e)
-		{
-			vStringCatS(result, e->name);
-			is_class = ((e->kind - PythonKinds)  == K_CLASS);
-		}
-		else
-			is_class = K_FUNCTION; /* ??? */
-
-		prev = nl;
-	}
-	return is_class;
-}
-
-static void attachEndField (NestingLevel *nl, int level, unsigned long end_line)
-{
-	char buf[16];
-
-	snprintf(buf, sizeof(buf), "%ld", (end_line));
-	if (nl->corkIndex != CORK_NIL)
-		attachParserFieldToCorkEntry (nl->corkIndex,
-					      PythonFields [F_END].ftype,
-					      buf);
-	if (PY_NL_FQINDEX(nl) != CORK_NIL)
-		attachParserFieldToCorkEntry (PY_NL_FQINDEX(nl),
-					      PythonFields [F_END].ftype, buf);
-}
-
-/* Check indentation level and truncate nesting levels accordingly */
-static void checkIndent(NestingLevels *nls, int indent, boolean eof)
-{
-	int i;
-	NestingLevel *n;
-	int dropper_i;
-	unsigned long end_line;
-
-	end_line = getInputLineNumber() - (eof? 0: 1);
-	for (i = 0; i < nls->n; i++)
-	{
-		n = nestingLevelsGetNth (nls, i);
-		if (n && indent <= PY_NL_INDENTATION(n))
-		{
-
-			for (dropper_i = i; dropper_i < nls->n; dropper_i++)
-			{
-				NestingLevel *dropper_nl;
-
-				dropper_nl = nestingLevelsGetNth (nls, dropper_i);
-				attachEndField (dropper_nl, dropper_i, end_line);
-			}
-
-			/* truncate levels */
-			nls->n = i;
-			break;
-		}
-	}
-}
-
-static void addNestingLevel(NestingLevels *nls, int indentation, struct corkPair *corkPair)
-{
-	int i;
-	NestingLevel *nl = NULL;
-
-	for (i = 0; i < nls->n; i++)
-	{
-		nl = nestingLevelsGetNth(nls, i);
-		if (indentation <= PY_NL_INDENTATION(nl)) break;
-	}
-	if (i == nls->n)
-		nl = nestingLevelsPush(nls, corkPair->index);
-	else
-		/* reuse existing slot */
-		nl = nestingLevelsTruncate (nls, i + 1, corkPair->index);
-
-	PY_NL_INDENTATION(nl) = indentation;
-	PY_NL_FQINDEX(nl) = corkPair->fqIndex;
-}
-
-/* Return a pointer to the start of the next triple string, or NULL. Store
- * the kind of triple string in "which" if the return is not NULL.
- */
-static char const *find_triple_start(char const *string, char const **which)
-{
-	char const *cp = string;
-
-	for (; *cp; cp++)
-	{
-		if (*cp == '#')
-			break;
-		if (*cp == '"' || *cp == '\'')
-		{
-			*which = find_triple_start0 (cp);
-			if (*which)
-				return cp;
-			cp = skipString(cp);
-			if (!*cp) break;
-			cp--; /* avoid jumping over the character after a skipped string */
-		}
-	}
-	return NULL;
-}
-
-/* Find the end of a triple string as pointed to by "which", and update "which"
- * with any other triple strings following in the given string.
- */
-static char const *find_triple_end(char const *string, char const **which,
-				   boolean dontRepeat)
-{
-	char const *s = string;
-	while (1)
-	{
-		char const *last;
-
-		/* Check if the string ends in the same line. */
-		last = s;
-		s = strstr (s, *which);
-		if (!s)
-		{
-			s = last;
-			break;
-		}
-		s += 3;
-		*which = NULL;
-
-		if (dontRepeat)
-			break;
-		/* If yes, check if another one starts in the same line. */
-		last = s;
-		s = find_triple_start(s, which);
-		if (!s)
-		{
-			s = last;
-			break;
-		}
-		s += 3;
-	}
-	return s;
-}
-
-static const char *findVariable(const char *line, const char** lineContinuation)
-{
-	/* Parse global and class variable names (C.x) from assignment statements.
-	 * Object attributes (obj.x) are ignored.
-	 * Assignment to a tuple 'x, y = 2, 3' not supported.
-	 * TODO: ignore duplicate tags from reassignment statements. */
-	const char *cp, *sp, *eq, *start;
-
-	cp = strstr(line, "=");
-	if (!cp)
-		return NULL;
-	eq = cp + 1;
-	while (*eq)
-	{
-		if (*eq == '=')
-			return NULL;	/* ignore '==' operator and 'x=5,y=6)' function lines */
-		if (*eq == '(' || *eq == '#')
-			break;	/* allow 'x = func(b=2,y=2,' lines and comments at the end of line */
-		eq++;
-	}
-
-	if (*eq == '(')
-		*lineContinuation = eq;
-
-	/* go backwards to the start of the line, checking we have valid chars */
-	start = cp - 1;
-	while (start >= line && isspace ((int) *start))
-		--start;
-	while (start >= line && isIdentifierCharacter ((int) *start))
-		--start;
-	if (!isIdentifierFirstCharacter(*(start + 1)))
-		return NULL;
-	sp = start;
-	while (sp >= line && isspace ((int) *sp))
-		--sp;
-	if ((sp + 1) != line)	/* the line isn't a simple variable assignment */
-		return NULL;
-	/* the line is valid, parse the variable name */
-	++start;
-	return start;
-}
-
-/* Skip type declaration that optionally follows a cdef/cpdef */
-static const char *skipTypeDecl (const char *cp, boolean *is_class)
-{
-	const char *lastStart = cp, *ptr = cp;
-	int loopCount = 0;
-	ptr = skipSpace(cp);
-	if (!strncmp("extern", ptr, 6)) {
-		ptr += 6;
-		ptr = skipSpace(ptr);
-		if (!strncmp("from", ptr, 4)) { return NULL; }
-	}
-	if (!strncmp("class", ptr, 5)) {
-		ptr += 5 ;
-		*is_class = TRUE;
-		ptr = skipSpace(ptr);
-		return ptr;
-	}
-	/* limit so that we don't pick off "int item=obj()" */
-	while (*ptr && loopCount++ < 2) {
-		while (*ptr && *ptr != '=' && *ptr != '(' && !isspace(*ptr)) {
-			/* skip over e.g. 'cpdef numpy.ndarray[dtype=double, ndim=1]' */
-			if(*ptr == '[') {
-				while (*ptr && *ptr != ']') ptr++;
-				if (*ptr) ptr++;
-			} else {
-				ptr++;
-			}
-		}
-		if (!*ptr || *ptr == '=') return NULL;
-		if (*ptr == '(') {
-			return lastStart; /* if we stopped on a '(' we are done */
-		}
-		ptr = skipSpace(ptr);
-		lastStart = ptr;
-		while (*lastStart == '*') lastStart++;  /* cdef int *identifier */
-	}
-	return NULL;
-}
-
-/* checks if there is a lambda at position of cp, and return its argument list
- * if so.
- * We don't return the lambda name since it is useless for now since we already
- * know it when we call this function, and it would be a little slower. */
-static boolean varIsLambda (const char *cp, char **arglist)
-{
-	boolean is_lambda = FALSE;
-
-	cp = skipSpace (cp);
-	cp = skipIdentifier (cp); /* skip the lambda's name */
-	cp = skipSpace (cp);
-	if (*cp == '=')
-	{
-		cp++;
-		cp = skipSpace (cp);
-		if (strncmp (cp, "lambda", 6) == 0)
-		{
-			const char *tmp;
-
-			cp += 6; /* skip the lambda */
-			tmp = skipSpace (cp);
-			/* check if there is a space after lambda to detect assignations
-			 * starting with 'lambdaXXX' */
-			if (tmp != cp)
-			{
-				vString *args = vStringNew ();
-
-				cp = tmp;
-				vStringPut (args, '(');
-				for (; *cp != 0 && *cp != ':'; cp++)
-					vStringPut (args, *cp);
-				vStringPut (args, ')');
-				vStringTerminate (args);
-				if (arglist)
-					*arglist = strdup (vStringValue (args));
-				vStringDelete (args);
-				is_lambda = TRUE;
-			}
-		}
-	}
-	return is_lambda;
-}
-
-/* checks if @p cp has keyword @p keyword at the start, and fills @p cp_n with
- * the position of the next non-whitespace after the keyword */
-static boolean matchKeyword (const char *keyword, const char *cp, const char **cp_n)
-{
-	size_t kw_len = strlen (keyword);
-	if (strncmp (cp, keyword, kw_len) == 0 && isspace (cp[kw_len]))
-	{
-		*cp_n = skipSpace (&cp[kw_len + 1]);
-		return TRUE;
+		if (readNext)
+			readTokenFull (token, TRUE);
 	}
 	return FALSE;
 }
 
-static void findPythonTags (void)
+static void readQualifiedName (tokenInfo *const nameToken)
 {
-	vString *const continuation = vStringNew ();
-	vString *const name = vStringNew ();
-	vString *const parent = vStringNew();
+	readToken (nameToken);
 
-	NestingLevels *const nesting_levels = nestingLevelsNew(sizeof (struct nestingLevelUserData));
-
-	const char *line;
-	int line_skip = 0;
-	char const *longStringLiteral = NULL;
-
-	while ((line = (const char *) readLineFromInputFile ()) != NULL)
+	if (nameToken->type == TOKEN_IDENTIFIER ||
+	    nameToken->type == '.')
 	{
-		const char *variableLineContinuation = NULL;
-		const char *cp = line, *candidate;
-		char const *longstring;
-		char const *keyword, *variable;
-		int indent;
+		vString *qualifiedName = vStringNew ();
+		tokenInfo *token = newToken ();
 
-		cp = skipSpace (cp);
-
-		if (*cp == '\0')  /* skip blank line */
-			continue;
-
-		/* Skip comment if we are not inside a multi-line string. */
-		if (*cp == '#' && !longStringLiteral)
-			continue;
-
-		/* Deal with line continuation. */
-		if (!line_skip) vStringClear(continuation);
-		vStringCatS(continuation, line);
-		vStringStripTrailing(continuation);
-		if (vStringLast(continuation) == '\\')
+		while (nameToken->type == TOKEN_IDENTIFIER ||
+		       nameToken->type == '.')
 		{
-			vStringChop(continuation);
-			vStringCatS(continuation, " ");
-			line_skip = 1;
-			continue;
+			vStringCat (qualifiedName, nameToken->string);
+			copyToken (token, nameToken);
+
+			readToken (nameToken);
 		}
-		cp = line = vStringValue(continuation);
-		cp = skipSpace (cp);
-		indent = cp - line;
-		line_skip = 0;
+		/* put the last, non-matching, token back */
+		ungetToken (nameToken);
 
-		/* Deal with multiline string ending. */
-		if (longStringLiteral)
-		{
-			find_triple_end(cp, &longStringLiteral, FALSE);
-			continue;
-		}
+		copyToken (nameToken, token);
+		nameToken->type = TOKEN_IDENTIFIER;
+		vStringCopy (nameToken->string, qualifiedName);
 
-		checkIndent(nesting_levels, indent, FALSE);
-
-		/* Find global and class variables */
-		variable = findVariable(line, &variableLineContinuation);
-		if (variable)
-		{
-			const char *start = variable;
-			char *arglist;
-			boolean parent_is_class;
-
-			vStringClear (name);
-			while (isIdentifierCharacter ((int) *start))
-			{
-				vStringPut (name, (int) *start);
-				++start;
-			}
-			vStringTerminate (name);
-
-			parent_is_class = constructParentString(nesting_levels, indent, parent);
-			if (varIsLambda (variable, &arglist))
-			{
-				/* show class members or top-level script lambdas only */
-				if (parent_is_class || vStringLength(parent) == 0)
-					makeFunctionTag (name, parent, parent_is_class, arglist);
-				eFree (arglist);
-			}
-			else
-			{
-				/* skip variables in methods */
-				if (parent_is_class || vStringLength(parent) == 0)
-					makeVariableTag (name, parent, parent_is_class);
-			}
-
-			if (variableLineContinuation)
-			{
-				skipParens (variableLineContinuation);
-				continue;
-			}
-		}
-
-		/* Deal with multiline string start. */
-		longstring = find_triple_start(cp, &longStringLiteral);
-		if (longstring)
-		{
-			longstring += 3;
-			find_triple_end(longstring, &longStringLiteral, FALSE);
-			/* We don't parse for any tags in the rest of the line. */
-			continue;
-		}
-
-		/* Deal with def and class keywords. */
-		keyword = findDefinitionOrClass (cp);
-		if (keyword)
-		{
-			boolean found = FALSE;
-			boolean is_class = FALSE;
-			if (matchKeyword ("def", keyword, &cp))
-			{
-				found = TRUE;
-			}
-			else if (matchKeyword ("class", keyword, &cp))
-			{
-				found = TRUE;
-				is_class = TRUE;
-			}
-			else if (matchKeyword ("cdef", keyword, &cp))
-			{
-				candidate = skipTypeDecl (cp, &is_class);
-				if (candidate)
-				{
-					found = TRUE;
-					cp = candidate;
-				}
-
-			}
-			else if (matchKeyword ("cpdef", keyword, &cp))
-			{
-				candidate = skipTypeDecl (cp, &is_class);
-				if (candidate)
-				{
-					found = TRUE;
-					cp = candidate;
-				}
-			}
-
-			if (found)
-			{
-				boolean is_parent_class;
-				struct corkPair corkPair;
-
-				is_parent_class =
-					constructParentString(nesting_levels, indent, parent);
-
-				if (is_class)
-				{
-					corkPair.index = parseClass (cp, name, parent, is_parent_class);
-					corkPair.fqIndex = CORK_NIL;
-				}
-				else
-					corkPair = parseFunction(cp, name, parent, is_parent_class);
-
-				addNestingLevel(nesting_levels, indent, &corkPair);
-			}
-			continue;
-		}
-		/* Find and parse namespace releated elements */
-		if (parseNamespace(line))
-			continue;
-
-		/* If the current line contains
-		   an open parenthesis skip lines till its associated
-		   close parenthesis:
-
-		   foo (...
-		   ... ) */
-		skipParens (line);
+		deleteToken (token);
+		vStringDelete (qualifiedName);
 	}
-
-	/* Force popping all nesting levels. */
-	checkIndent(nesting_levels, 0, TRUE);
-
-	/* Clean up all memory we allocated. */
-	vStringDelete (parent);
-	vStringDelete (name);
-	vStringDelete (continuation);
-	nestingLevelsFree (nesting_levels);
 }
 
-extern parserDefinition *PythonParser (void)
+static boolean readCDefName (tokenInfo *const token, pythonKind *kind)
 {
-	static const char *const extensions[] = { "py", "pyx", "pxd", "pxi" ,"scons",
-											  NULL };
-	static const char *const aliases[] = { "python[23]*", "scons",
-										   NULL };
+	readToken (token);
+
+	if (token->keyword == KEYWORD_extern ||
+	    token->keyword == KEYWORD_import)
+	{
+		readToken (token);
+		if (token->keyword == KEYWORD_from)
+			return FALSE;
+	}
+
+	if (token->keyword == KEYWORD_class)
+	{
+		*kind = K_CLASS;
+		readToken (token);
+	}
+	else
+	{
+		/* skip the optional type declaration -- everything on the same line
+		 * until an identifier followed by "(". */
+		tokenInfo *candidate = newToken ();
+
+		while (token->type != TOKEN_EOF &&
+		       token->type != TOKEN_INDENT &&
+		       token->type != '=' &&
+		       token->type != ',' &&
+		       token->type != ':')
+		{
+			if (token->type == '[')
+			{
+				if (skipOverPair (token, '[', ']', NULL, FALSE))
+					readToken (token);
+			}
+			else if (token->type == '(')
+			{
+				if (skipOverPair (token, '(', ')', NULL, FALSE))
+					readToken (token);
+			}
+			else if (token->type == TOKEN_IDENTIFIER)
+			{
+				copyToken (candidate, token);
+				readToken (token);
+				if (token->type == '(')
+				{ /* okay, we really found a function, use this */
+					*kind = K_FUNCTION;
+					ungetToken (token);
+					copyToken (token, candidate);
+					break;
+				}
+			}
+			else
+				readToken (token);
+		}
+
+		deleteToken (candidate);
+	}
+
+	return token->type == TOKEN_IDENTIFIER;
+}
+
+static boolean parseClassOrDef (tokenInfo *const token,
+                                const vString *const decorators,
+                                pythonKind kind, boolean isCDef)
+{
+	vString *arglist = NULL;
+	tokenInfo *name = NULL;
+	tokenInfo *parameterTokens[16] = { NULL };
+	unsigned int parameterCount = 0;
+	NestingLevel *lv;
+	int corkIndex;
+
+	if (isCDef)
+	{
+		if (! readCDefName (token, &kind))
+			return FALSE;
+	}
+	else
+	{
+		readToken (token);
+		if (token->type != TOKEN_IDENTIFIER)
+			return FALSE;
+	}
+
+	name = newToken ();
+	copyToken (name, token);
+
+	readToken (token);
+	/* collect parameters or inheritance */
+	if (token->type == '(')
+	{
+		int prevTokenType = token->type;
+		int depth = 1;
+
+		arglist = vStringNew ();
+		if (kind != K_CLASS)
+			reprCat (arglist, token);
+
+		do
+		{
+			if (token->type != TOKEN_WHITESPACE &&
+			    /* for easy `*args` and `**kwargs` support, we also ignore
+			     * `*`, which anyway can't otherwise screw us up */
+			    token->type != '*')
+			{
+				prevTokenType = token->type;
+			}
+
+			readTokenFull (token, TRUE);
+			if (kind != K_CLASS || token->type != ')' || depth > 1)
+				reprCat (arglist, token);
+
+			if (token->type == '(' ||
+			    token->type == '[' ||
+			    token->type == '{')
+				depth ++;
+			else if (token->type == ')' ||
+			         token->type == ']' ||
+			         token->type == '}')
+				depth --;
+			else if (kind != K_CLASS && depth == 1 &&
+			         token->type == TOKEN_IDENTIFIER &&
+			         (prevTokenType == '(' || prevTokenType == ',') &&
+			         parameterCount < ARRAY_SIZE (parameterTokens) &&
+			         PythonKinds[K_PARAMETER].enabled)
+			{
+				tokenInfo *parameterName = newToken ();
+
+				copyToken (parameterName, token);
+				parameterTokens[parameterCount++] = parameterName;
+			}
+		}
+		while (token->type != TOKEN_EOF && depth > 0);
+
+		vStringTerminate (arglist);
+	}
+
+	if (kind == K_CLASS)
+		corkIndex = makeClassTag (name, arglist, decorators);
+	else
+		corkIndex = makeFunctionTag (name, arglist, decorators);
+
+	lv = nestingLevelsPush (PythonNestingLevels, corkIndex);
+	PY_NL (lv)->indentation = token->indent;
+
+	deleteToken (name);
+	vStringDelete (arglist);
+
+	if (parameterCount > 0)
+	{
+		unsigned int i;
+
+		for (i = 0; i < parameterCount; i++)
+		{
+			makeSimplePythonTag (parameterTokens[i], K_PARAMETER);
+			deleteToken (parameterTokens[i]);
+		}
+	}
+
+	return TRUE;
+}
+
+static boolean parseImport (tokenInfo *const token)
+{
+	tokenInfo *fromModule = NULL;
+
+	if (token->keyword == KEYWORD_from)
+	{
+		readQualifiedName (token);
+		if (token->type == TOKEN_IDENTIFIER)
+		{
+			fromModule = newToken ();
+			copyToken (fromModule, token);
+			readToken (token);
+		}
+	}
+
+	if (token->keyword == KEYWORD_import)
+	{
+		boolean parenthesized = FALSE;
+
+		if (fromModule)
+		{
+			/* from X import ...
+			 * --------------------
+			 * X = (kind:module, role:namespace) */
+			makeSimplePythonRefTag (fromModule, NULL, K_MODULE,
+			                        PYTHON_MODULE_NAMESPACE,
+			                        XTAG_UNKNOWN);
+		}
+
+		do
+		{
+			readQualifiedName (token);
+
+			/* support for `from x import (...)` */
+			if (fromModule && ! parenthesized && token->type == '(')
+			{
+				parenthesized = TRUE;
+				readQualifiedName (token);
+			}
+
+			if (token->type == TOKEN_IDENTIFIER)
+			{
+				tokenInfo *name = newToken ();
+
+				copyToken (name, token);
+				readToken (token);
+				/* if there is an "as", use it as the name */
+				if (token->keyword == KEYWORD_as)
+				{
+					readToken (token);
+					if (token->type == TOKEN_IDENTIFIER)
+					{
+						if (fromModule)
+						{
+							/* from x import Y as Z
+							 * ----------------------------
+							 * x = (kind:module,  role:namespace),
+							 * Y = (kind:unknown, role:indirectly-imported),
+							 * Z = (kind:unknown) */
+
+							/* Y */
+							makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
+							                        PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
+							                        XTAG_UNKNOWN);
+							/* x.Y */
+							if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
+							{
+								vString *fq = vStringNewCopy (fromModule->string);
+								vStringPut (fq, '.');
+								vStringCat (fq, name->string);
+								makeSimplePythonRefTag (name, fq, K_UNKNOWN,
+								                        PYTHON_UNKNOWN_INDIRECTLY_IMPORTED,
+								                        XTAG_QUALIFIED_TAGS);
+								vStringDelete (fq);
+							}
+							/* Z */
+							makeSimplePythonTag (token, K_UNKNOWN);
+						}
+						else
+						{
+							/* import x as Y
+							 * ----------------------------
+							 * X = (kind:module, role:indirectly-imported)
+							 * Y = (kind:namespace)*/
+							/* X */
+							makeSimplePythonRefTag (name, NULL, K_MODULE,
+							                        PYTHON_MODULE_INDIRECTLY_IMPORTED,
+							                        XTAG_UNKNOWN);
+							/* Y */
+							makeSimplePythonTag (token, K_NAMESPACE);
+						}
+
+						copyToken (name, token);
+						readToken (token);
+					}
+				}
+				else
+				{
+					if (fromModule)
+					{
+						/* from x import Y
+						   --------------
+						   x = (kind:module,  role:namespace),
+						   Y = (kind:unknown, role:imported) */
+						/* Y */
+						makeSimplePythonRefTag (name, NULL, K_UNKNOWN,
+						                        PYTHON_MODULE_IMPORTED,
+						                        XTAG_UNKNOWN);
+						/* x.Y */
+						if (isXtagEnabled (XTAG_QUALIFIED_TAGS))
+						{
+							vString *fq = vStringNewCopy (fromModule->string);
+							vStringPut (fq, '.');
+							vStringCat (fq, name->string);
+							makeSimplePythonRefTag (name, fq, K_UNKNOWN,
+							                        PYTHON_MODULE_IMPORTED,
+							                        XTAG_QUALIFIED_TAGS);
+							vStringDelete (fq);
+						}
+					}
+					else
+					{
+						/* import X
+						   --------------
+						   X = (kind:module, role:imported) */
+						makeSimplePythonRefTag (name, NULL, K_MODULE,
+						                        PYTHON_MODULE_IMPORTED,
+						                        XTAG_UNKNOWN);
+					}
+				}
+
+				deleteToken (name);
+			}
+		}
+		while (token->type == ',');
+
+		if (parenthesized && token->type == ')')
+			readToken (token);
+	}
+
+	if (fromModule)
+		deleteToken (fromModule);
+
+	return FALSE;
+}
+
+static boolean parseVariable (tokenInfo *const token, const pythonKind kind)
+{
+	/* In order to support proper tag type for lambdas in multiple
+	 * assignations, we first collect all the names, and then try and map
+	 * an assignation to it */
+	tokenInfo *nameTokens[8] = { NULL };
+	unsigned int nameCount = 0;
+
+	/* first, collect variable name tokens */
+	while (token->type == TOKEN_IDENTIFIER &&
+	       nameCount < ARRAY_SIZE (nameTokens))
+	{
+		tokenInfo *name = newToken ();
+		copyToken (name, token);
+
+		readToken (token);
+		if (token->type == '.')
+		{
+			/* FIXME: what to do with dotted names?  We currently ignore them
+			 *        as we need to do something not to break the whole
+			 *        declaration, but the expected behavior is questionable */
+			deleteToken (name);
+			name = NULL;
+
+			do
+			{
+				readToken (token);
+			}
+			while (token->type == TOKEN_IDENTIFIER ||
+			       token->type == '.');
+		}
+
+		nameTokens[nameCount++] = name;
+
+		if (token->type == ',')
+			readToken (token);
+		else
+			break;
+	}
+
+	/* then, if it's a proper assignation, try and map assignations so that
+	 * we catch lambdas and alike */
+	if (token->type == '=')
+	{
+		unsigned int i = 0;
+
+		do
+		{
+			const tokenInfo *const nameToken = nameTokens[i++];
+
+			readToken (token);
+
+			if (! nameToken)
+				/* nothing */;
+			else if (token->keyword != KEYWORD_lambda)
+				makeSimplePythonTag (nameToken, kind);
+			else
+			{
+				vString *arglist = vStringNew ();
+
+				readToken (token);
+				vStringPut (arglist, '(');
+				skipLambdaArglist (token, arglist);
+				vStringPut (arglist, ')');
+				makeFunctionTag (nameToken, arglist, NULL);
+				vStringDelete (arglist);
+			}
+
+			/* skip until next initializer */
+			while ((TokenContinuationDepth > 0 || token->type != ',') &&
+			       token->type != TOKEN_EOF &&
+			       token->type != ';' &&
+			       token->type != TOKEN_INDENT)
+			{
+				readToken (token);
+			}
+		}
+		while (token->type == ',' && i < nameCount);
+
+		/* if we got leftover to initialize, just make variables out of them.
+		 * This handles cases like `a, b, c = (c, d, e)` -- or worse */
+		while (i < nameCount)
+			makeSimplePythonTag (nameTokens[i++], kind);
+	}
+
+	while (nameCount > 0)
+	{
+		if (nameTokens[--nameCount])
+			deleteToken (nameTokens[nameCount]);
+	}
+
+	return FALSE;
+}
+
+/* pops any level >= to indent */
+static void setIndent (tokenInfo *const token)
+{
+	NestingLevel *lv = nestingLevelsGetCurrent (PythonNestingLevels);
+
+	while (lv && PY_NL (lv)->indentation >= token->indent)
+	{
+		if (lv->corkIndex != CORK_NIL)
+		{
+			tagEntryInfo *e = getEntryInCorkQueue ((unsigned int) lv->corkIndex);
+
+			e->extensionFields.endLine = token->lineNumber;
+		}
+
+		nestingLevelsPop (PythonNestingLevels);
+		lv = nestingLevelsGetCurrent (PythonNestingLevels);
+	}
+}
+
+static void findPythonTags (void)
+{
+	tokenInfo *const token = newToken ();
+	vString *decorators = vStringNew ();
+	boolean atStatementStart = TRUE;
+
+	TokenContinuationDepth = 0;
+	NextToken = NULL;
+	PythonNestingLevels = nestingLevelsNew (sizeof (struct pythonNestingLevelUserData));
+
+	readToken (token);
+	while (token->type != TOKEN_EOF)
+	{
+		tokenType iterationTokenType = token->type;
+		boolean readNext = TRUE;
+
+		if (token->type == TOKEN_INDENT)
+			setIndent (token);
+		else if (token->keyword == KEYWORD_class ||
+		         token->keyword == KEYWORD_def)
+		{
+			pythonKind kind = token->keyword == KEYWORD_class ? K_CLASS : K_FUNCTION;
+
+			readNext = parseClassOrDef (token, decorators, kind, FALSE);
+		}
+		else if (token->keyword == KEYWORD_cdef ||
+		         token->keyword == KEYWORD_cpdef)
+		{
+			readNext = parseClassOrDef (token, decorators, K_FUNCTION, TRUE);
+		}
+		else if (token->keyword == KEYWORD_from ||
+		         token->keyword == KEYWORD_import)
+		{
+			readNext = parseImport (token);
+		}
+		else if (token->type == '(')
+		{ /* skip parentheses to avoid finding stuff inside them */
+			readNext = skipOverPair (token, '(', ')', NULL, FALSE);
+		}
+		else if (token->type == TOKEN_IDENTIFIER && atStatementStart)
+		{
+			NestingLevel *lv = nestingLevelsGetCurrent (PythonNestingLevels);
+			tagEntryInfo *lvEntry = getEntryOfNestingLevel (lv);
+			pythonKind kind = K_VARIABLE;
+
+			if (lvEntry && lvEntry->kind != &(PythonKinds[K_CLASS]))
+				kind = K_LOCAL_VARIABLE;
+
+			readNext = parseVariable (token, kind);
+		}
+		else if (token->type == '@' && atStatementStart &&
+		         PythonFields[F_DECORATORS].enabled)
+		{
+			/* collect decorators */
+			readQualifiedName (token);
+			if (token->type != TOKEN_IDENTIFIER)
+				readNext = FALSE;
+			else
+			{
+				if (vStringLength (decorators) > 0)
+					vStringPut (decorators, ',');
+				vStringCat (decorators, token->string);
+				readToken (token);
+				readNext = skipOverPair (token, '(', ')', decorators, TRUE);
+			}
+		}
+
+		/* clear collected decorators for any non-decorator tokens non-indent
+		 * token.  decorator collection takes care of skipping the possible
+		 * argument list, so we should never hit here parsing a decorator */
+		if (iterationTokenType != TOKEN_INDENT &&
+		    iterationTokenType != '@' &&
+		    PythonFields[F_DECORATORS].enabled)
+		{
+			vStringClear (decorators);
+		}
+
+		atStatementStart = (token->type == TOKEN_INDENT || token->type == ';');
+
+		if (readNext)
+			readToken (token);
+	}
+
+	nestingLevelsFree (PythonNestingLevels);
+	vStringDelete (decorators);
+	deleteToken (token);
+	Assert (NextToken == NULL);
+}
+
+static void initialize (const langType language)
+{
+	Lang_python = language;
+}
+
+extern parserDefinition* PythonParser (void)
+{
+	static const char *const extensions[] = { "py", "pyx", "pxd", "pxi", "scons", NULL };
+	static const char *const aliases[] = { "python[23]*", "scons", NULL };
 	parserDefinition *def = parserNew ("Python");
 	def->kinds = PythonKinds;
 	def->kindCount = ARRAY_SIZE (PythonKinds);
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findPythonTags;
+	def->initialize = initialize;
+	def->keywordTable = PythonKeywordTable;
+	def->keywordCount = ARRAY_SIZE (PythonKeywordTable);
 	def->fieldSpecs = PythonFields;
 	def->fieldSpecCount = ARRAY_SIZE (PythonFields);
 	def->useCork = TRUE;
+	def->requestAutomaticFQTag = TRUE;
 	return def;
 }
 

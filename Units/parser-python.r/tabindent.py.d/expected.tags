@@ -1,0 +1,1 @@
+find_heading	input.py	/^def find_heading(self, position=0, direction=Direction.FORWARD, \\$/;"	f

@@ -1,0 +1,14 @@
+class01	input.py	/^class class01(object):$/;"	c	decorators:noop
+dummy	input.py	/^    def dummy():$/;"	m	class:class01	decorators:noopwrapper(1, 2, 3),staticmethod,noop
+func01	input.py	/^def func01():$/;"	f	decorators:noop
+func02	input.py	/^def func02(): pass$/;"	f	decorators:noop
+func03	input.py	/^def func03(): pass$/;"	f
+func04	input.py	/^def func04(): pass$/;"	f	decorators:noop
+func05	input.py	/^def func05():$/;"	f	decorators:class01.tracer
+func06	input.py	/^def func06():$/;"	f	decorators:class01.tracer
+hello	input.py	/^    def hello():$/;"	m	class:class01	decorators:staticmethod
+hi	input.py	/^    def hi(cls):$/;"	m	class:class01	decorators:classmethod
+noop	input.py	/^def noop(f):$/;"	f
+noopwrapper	input.py	/^def noopwrapper(*args):$/;"	f
+tracer	input.py	/^    def tracer(f):$/;"	m	class:class01	decorators:staticmethod
+wrapper	input.py	/^        def wrapper():$/;"	f	member:class01.tracer	file:

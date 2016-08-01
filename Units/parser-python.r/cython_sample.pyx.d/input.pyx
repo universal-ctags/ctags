@@ -9,6 +9,9 @@ cdef :
 cdef k = 4 # no type here
 
 cdef int int_identity(int i) : return i  
+cdef (int) int_identity2(int i) : return i
+cdef inline int int_identity3(int i) : return i
+cdef inline (int) int_identity4(int i) : return i
 
 # here is a long one
 cdef object int2string(int i) :

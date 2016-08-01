@@ -1,0 +1,6 @@
+VAR1	input.py	/^VAR1, VAR2, VAR3 = 1, 2, 3$/;"	v
+VAR2	input.py	/^VAR1, VAR2, VAR3 = 1, 2, 3$/;"	v
+VAR3	input.py	/^VAR1, VAR2, VAR3 = 1, 2, 3$/;"	v
+VAR4	input.py	/^VAR4 = 4$/;"	v
+VAR5	input.py	/^VAR5, VAR6 = 5, 6$/;"	v
+VAR6	input.py	/^VAR5, VAR6 = 5, 6$/;"	v

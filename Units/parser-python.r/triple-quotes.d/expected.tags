@@ -1,0 +1,3 @@
+VAR1	input.py	/^VAR1 = '''$/;"	v
+VAR2	input.py	/^VAR2 = """ "" ""\\" "\\"" \\"\\"\\"\\\\"""$/;"	v
+ZZZ	input.py	/^ZZZ = True$/;"	v

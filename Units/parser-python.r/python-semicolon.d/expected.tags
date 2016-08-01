@@ -1,0 +1,7 @@
+Cls	input.py	/^class Cls:$/;"	c
+VAR1	input.py	/^VAR1 = 1; VAR2 = 2;$/;"	v
+VAR2	input.py	/^VAR1 = 1; VAR2 = 2;$/;"	v
+func	input.py	/^    def func(): pass;$/;"	m	class:Cls
+func2	input.py	/^    def func2(x): x += 1; y = x + 1; return y;$/;"	m	class:Cls
+memb1	input.py	/^    memb1 = 1; memb2 = 2$/;"	v	class:Cls
+memb2	input.py	/^    memb1 = 1; memb2 = 2$/;"	v	class:Cls

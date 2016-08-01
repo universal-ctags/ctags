@@ -1,0 +1,10 @@
+Bar	input.py	/^class Bar:$/;"	c
+Foo	input.py	/^class Foo:$/;"	c
+d1	input.py	/^	def d1(): pass$/;"	m	class:Foo
+d2	input.py	/^        def d2(): pass$/;"	m	class:Foo
+d3	input.py	/^ 	def d3(): pass$/;"	m	class:Foo
+d4	input.py	/^        def d4(): pass$/;"	m	class:Foo
+d5	input.py	/^        def d5(): pass$/;"	m	class:Bar
+d6	input.py	/^    def d6(): pass$/;"	m	class:Bar
+d7	input.py	/^    def d7():$/;"	m	class:Bar
+d8	input.py	/^        def d8(): pass$/;"	m	class:Bar

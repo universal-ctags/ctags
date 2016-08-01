@@ -27,7 +27,7 @@ e	end	off	NONE	TRUE	end lines of various items
 -	template	off	C++	TRUE	template parameters
 -	captures	off	C++	TRUE	lambda capture list
 -	name	on	C++	TRUE	aliased names
--	end	off	Python	TRUE	end lines of various constructs
+-	decorators	off	Python	TRUE	decorators on functions and classes
 -	sectionMarker	off	reStructuredText	TRUE	character used for declaring section
 #
 Foo	input.java	/^abstract public class Foo extends Bar$/
