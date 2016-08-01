@@ -113,6 +113,9 @@ static void makeSimpleMakeTag (vString *const name, kindOption *MakeKinds, makeK
 	if (make == LANG_IGNORE)
 		make = getNamedLanguage ("Make", 0);
 
+	if (! isLanguageEnabled (make))
+		return;
+
 	pushLanguage (make);
 	makeSimpleTag (name, MakeKinds, kind);
 	popLanguage ();
@@ -125,6 +128,9 @@ static void makeSimpleMakeRefTag (const vString* const name, kindOption* const k
 
 	if (make == LANG_IGNORE)
 		make = getNamedLanguage ("Make", 0);
+
+	if (! isLanguageEnabled (make))
+		return;
 
 	pushLanguage (make);
 	makeSimpleRefTag (name, kinds, kind, roleIndex);
