@@ -318,7 +318,8 @@ static int makeSimplePythonRefTag (const tokenInfo *const token,
                                    pythonKind const kind,
                                    int roleIndex, xtagType xtag)
 {
-	if (PythonKinds[kind].roles[roleIndex].enabled)
+	if (isXtagEnabled (XTAG_REFERENCE_TAGS) &&
+	    PythonKinds[kind].roles[roleIndex].enabled)
 	{
 		tagEntryInfo e;
 
