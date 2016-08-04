@@ -3,37 +3,8 @@
 x	xpath	off	NONE	TRUE	XPath for the tag
 # --list-kinds-full
 HTML	f	function	on	FALSE	0		JavaScript functions
-ObjectiveC	P	protocol	on	FALSE	0		Protocol
-ObjectiveC	m	method	on	FALSE	0		Object's method
-ObjectiveC	c	class	on	FALSE	0		Class' method
-ObjectiveC	v	var	on	FALSE	0		Global variable
-ObjectiveC	F	field	on	FALSE	0		Object field
-ObjectiveC	f	function	on	FALSE	0		A function
-ObjectiveC	p	property	on	FALSE	0		A property
-ObjectiveC	t	typedef	on	FALSE	0		A type alias
-ObjectiveC	s	struct	on	FALSE	0		A type structure
-ObjectiveC	e	enum	on	FALSE	0		An enumeration
-ObjectiveC	M	macro	on	FALSE	0		A preprocessor macro
-OCaml	m	method	on	FALSE	0		Object's method
-OCaml	M	module	on	FALSE	0		Module or functor
-OCaml	v	var	on	FALSE	0		Global variable
-OCaml	t	type	on	FALSE	0		Type name
-OCaml	f	function	on	FALSE	0		A function
-OCaml	C	Constructor	on	FALSE	0		A constructor
-OCaml	r	RecordField	on	FALSE	0		A 'structure' field
-OCaml	e	Exception	on	FALSE	0		An exception
-OCaml	V	value	on	FALSE	0		A value ???
-OCaml	B	beginEnd	on	FALSE	0		A begin end ???
 Protobuf	r	rpc	off	FALSE	0		RPC methods
-Rust	f	function	on	FALSE	0		Function
-Rust	g	enum	on	FALSE	0		Enum
-Rust	t	typedef	on	FALSE	0		Type Alias
-Rust	v	variable	on	FALSE	0		Global variable
-Rust	M	macro	on	FALSE	0		Macro Definition
-Rust	m	field	on	FALSE	0		A struct field
-Rust	e	enumerator	on	FALSE	0		An enum variant
-Rust	F	method	on	FALSE	0		A method
-SQL	x	mltable	on	FALSE	0		MobiLink Table Scripts
-SQL	y	mlconn	on	FALSE	0		MobiLink Conn Scripts
-SQL	z	mlprop	on	FALSE	0		MobiLink Properties 
+SQL	x	mltable	on	FALSE	0		MobiLink table scripts
+SQL	y	mlconn	on	FALSE	0		MobiLink conn scripts
+SQL	z	mlprop	on	FALSE	0		MobiLink properties
 # --list-pseudo-tags

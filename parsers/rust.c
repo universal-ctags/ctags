@@ -48,18 +48,18 @@ typedef enum {
 } RustKind;
 
 static kindOption rustKinds[] = {
-	{TRUE, 'n', "module", "module"},
-	{TRUE, 's', "struct", "structural type"},
-	{TRUE, 'i', "interface", "trait interface"},
-	{TRUE, 'c', "implementation", "implementation"},
-	{TRUE, 'f', "function", "Function"},
-	{TRUE, 'g', "enum", "Enum"},
-	{TRUE, 't', "typedef", "Type Alias"},
-	{TRUE, 'v', "variable", "Global variable"},
-	{TRUE, 'M', "macro", "Macro Definition"},
-	{TRUE, 'm', "field", "A struct field"},
-	{TRUE, 'e', "enumerator", "An enum variant"},
-	{TRUE, 'F', "method", "A method"},
+	{TRUE, 'n', "module", "modules"},
+	{TRUE, 's', "struct", "structural types"},
+	{TRUE, 'i', "interface", "traits"},
+	{TRUE, 'c', "implementation", "implementations"},
+	{TRUE, 'f', "function", "functions"},
+	{TRUE, 'g', "enum", "enums"},
+	{TRUE, 't', "typedef", "type aliases"},
+	{TRUE, 'v', "variable", "global variables"},
+	{TRUE, 'M', "macro", "macro definitions"},
+	{TRUE, 'm', "field", "struct fields"},
+	{TRUE, 'e', "enumerator", "enum variants"},
+	{TRUE, 'F', "method", "methods"},
 };
 
 typedef enum {

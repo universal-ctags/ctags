@@ -51,19 +51,19 @@ typedef enum {
 } objcKind;
 
 static kindOption ObjcKinds[] = {
-	{TRUE, 'i', "interface", "class interface"},
-	{TRUE, 'I', "implementation", "class implementation"},
-	{TRUE, 'P', "protocol", "Protocol"},
-	{TRUE, 'm', "method", "Object's method"},
-	{TRUE, 'c', "class", "Class' method"},
-	{TRUE, 'v', "var", "Global variable"},
-	{TRUE, 'F', "field", "Object field"},
-	{TRUE, 'f', "function", "A function"},
-	{TRUE, 'p', "property", "A property"},
-	{TRUE, 't', "typedef", "A type alias"},
-	{TRUE, 's', "struct", "A type structure"},
-	{TRUE, 'e', "enum", "An enumeration"},
-	{TRUE, 'M', "macro", "A preprocessor macro"},
+	{TRUE, 'i', "interface", "class interfaces"},
+	{TRUE, 'I', "implementation", "class implementations"},
+	{TRUE, 'P', "protocol", "protocols"},
+	{TRUE, 'm', "method", "object methods"},
+	{TRUE, 'c', "class", "class methods"},
+	{TRUE, 'v', "var", "global variables"},
+	{TRUE, 'F', "field", "object fields"},
+	{TRUE, 'f', "function", "functions"},
+	{TRUE, 'p', "property", "properties"},
+	{TRUE, 't', "typedef", "typedefs"},
+	{TRUE, 's', "struct", "structure names"},
+	{TRUE, 'e', "enum", "enumerations"},
+	{TRUE, 'M', "macro", "macro definitions"},
 };
 
 typedef enum {

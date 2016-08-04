@@ -218,9 +218,9 @@ static kindOption SqlKinds [] = {
 	{ TRUE,  'D', "domain",		  "domains"				   },
 	{ TRUE,  'V', "view",		  "views"				   },
 	{ TRUE,  'n', "synonym",	  "synonyms"			   },
-	{ TRUE,  'x', "mltable",	  "MobiLink Table Scripts" },
-	{ TRUE,  'y', "mlconn",		  "MobiLink Conn Scripts"  },
-	{ TRUE,  'z', "mlprop",		  "MobiLink Properties "   }
+	{ TRUE,  'x', "mltable",	  "MobiLink table scripts" },
+	{ TRUE,  'y', "mlconn",		  "MobiLink conn scripts"  },
+	{ TRUE,  'z', "mlprop",		  "MobiLink properties"   }
 };
 
 static const keywordTable SqlKeywordTable [] = {
