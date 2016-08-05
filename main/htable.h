@@ -39,5 +39,3 @@ extern void       hashTableForeachItem (hashTable *htable, hashTableForeachFunc 
 extern int        hashTableCountItem   (hashTable *htable);
 
 #endif	/* CTAGS_MAIN_HTABLE_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

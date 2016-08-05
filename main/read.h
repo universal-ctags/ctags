@@ -117,5 +117,3 @@ extern void     pushLanguage(const langType language);
 extern langType popLanguage (void);
 
 #endif  /* CTAGS_MAIN_READ_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

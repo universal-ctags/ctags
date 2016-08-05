@@ -1414,5 +1414,3 @@ extern const char* getTagFileDirectory (void)
 {
 	return TagFile.directory;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

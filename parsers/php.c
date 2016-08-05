@@ -1699,5 +1699,3 @@ extern parserDefinition* ZephirParser (void)
 	def->keywordCount = ARRAY_SIZE (PhpKeywordTable);
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

@@ -1176,5 +1176,3 @@ extern parserDefinition* SystemVerilogParser (void)
 	def->initialize = initializeSystemVerilog;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

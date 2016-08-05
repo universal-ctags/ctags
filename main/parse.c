@@ -2700,5 +2700,3 @@ static parserDefinition *CTagsSelfTestParser (void)
 	def->invisible = TRUE;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4 nowrap: */

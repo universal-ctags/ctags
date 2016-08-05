@@ -2410,5 +2410,3 @@ extern parserDefinition* SqlParser (void)
 	def->keywordCount = ARRAY_SIZE (SqlKeywordTable);
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4 noexpandtab: */

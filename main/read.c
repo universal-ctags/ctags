@@ -1167,5 +1167,3 @@ static langType langStackPop  (langStack *langStack)
 {
 	return langStack->languages [ -- langStack->count ];
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

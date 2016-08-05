@@ -301,5 +301,3 @@ extern parserDefinition* ShParser (void)
 	def->parser     = findShTags;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

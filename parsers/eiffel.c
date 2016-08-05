@@ -1127,5 +1127,3 @@ extern parserDefinition* EiffelParser (void)
 	def->keywordCount = ARRAY_SIZE (EiffelKeywordTable);
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

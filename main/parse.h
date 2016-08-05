@@ -312,5 +312,3 @@ extern void anonReset (void);
 extern void anonGenerate (vString *buffer, const char *prefix, int kind);
 
 #endif  /* CTAGS_MAIN_PARSE_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

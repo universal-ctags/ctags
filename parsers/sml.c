@@ -215,5 +215,3 @@ extern parserDefinition *SmlParser (void)
 	def->parser = findSmlTags;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

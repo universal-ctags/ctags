@@ -170,5 +170,3 @@ PlistXMLParser (void)
 	def->tagXpathTableCount  = ARRAY_SIZE (plistXpathTableTable);
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

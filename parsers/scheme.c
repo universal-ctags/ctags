@@ -125,5 +125,3 @@ extern parserDefinition* SchemeParser (void)
 	def->parser     = findSchemeTags;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

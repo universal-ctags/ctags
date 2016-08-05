@@ -215,5 +215,3 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 }
 
 #endif
-
-/* vi:set tabstop=4 shiftwidth=4: */

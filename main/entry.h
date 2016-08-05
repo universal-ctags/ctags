@@ -172,5 +172,3 @@ extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const c
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);
 
 #endif  /* CTAGS_MAIN_ENTRY_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

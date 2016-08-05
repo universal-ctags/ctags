@@ -42,5 +42,3 @@ extern parserDefinition* DosBatchParser (void)
 	def->selectLanguage = selectors;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

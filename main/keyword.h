@@ -31,5 +31,3 @@ extern void printKeywordTable (void);
 extern int analyzeToken (vString *const name, langType language);
 
 #endif  /* CTAGS_MAIN_KEYWORD_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

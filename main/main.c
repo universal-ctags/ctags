@@ -589,5 +589,3 @@ extern int main (int __unused__ argc, char **argv)
 	exit (0);
 	return 0;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

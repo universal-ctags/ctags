@@ -351,5 +351,3 @@ extern vString *vStringNewOrClear (vString *const string)
 	else
 		return vStringNew ();
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

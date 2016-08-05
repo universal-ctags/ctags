@@ -147,5 +147,3 @@ extern parserDefinition* FalconParser (void)
     def->parser     = findFalconTags;
     return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

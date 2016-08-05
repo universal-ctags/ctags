@@ -184,5 +184,3 @@ typedef void (* mainLoopFunc) (cookedArgs *args, void *data);
 extern void setMainLoop (mainLoopFunc func, void *data);
 
 #endif  /* CTAGS_MAIN_OPTIONS_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

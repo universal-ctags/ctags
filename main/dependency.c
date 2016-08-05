@@ -69,5 +69,3 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 	if (dtype == DEPTYPE_KIND_OWNER)
 		linkKindDependency (masterParser, slaveParser);
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

@@ -102,8 +102,9 @@ Use underscores in names only in file scope objects.
 Don't use them in function declarations, variable declarations or
 macro names in header files.
 
-Trim unnecessary white space at the end of a line. In emacs, `M-x
-whitespace-cleanup`.
+Basic whitespace settings are specified in the `.editorconfig` file.
+There are `plugins <http://editorconfig.org/#download>`_ available
+for most popular editors to automatically configure these settings.
 
 Don't mix `whitespace cleanup` fixes and other improvements in one
 commit when changing the existing code. Style fixes, including

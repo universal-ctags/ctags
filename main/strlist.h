@@ -55,5 +55,3 @@ extern void stringListPrint (const stringList *const current, FILE *fp);
 extern void stringListReverse (const stringList *const current);
 
 #endif  /* CTAGS_MAIN_STRLIST_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

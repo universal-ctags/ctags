@@ -107,4 +107,3 @@ extern void *nestingLevelGetUserData (const NestingLevel *nl)
 {
 	return (void *)nl->userData;
 }
-/* vi:set tabstop=4 shiftwidth=4: */

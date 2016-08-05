@@ -732,5 +732,3 @@ extern parserDefinition *VimParser (void)
 	def->useCork    = TRUE;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4 noexpandtab: */

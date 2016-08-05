@@ -313,5 +313,3 @@ extern parserDefinition* BetaParser (void)
 	def->parser     = findBetaTags;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

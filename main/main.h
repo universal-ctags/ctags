@@ -24,5 +24,3 @@ extern boolean isDestinationStdout (void);
 extern int main (int argc, char **argv);
 
 #endif  /* CTAGS_MAIN_MAIN_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

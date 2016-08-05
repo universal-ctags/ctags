@@ -319,5 +319,3 @@ extern void stringListReverse (const stringList *const current)
 		current->list[j] = tmp;
 	}
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */
