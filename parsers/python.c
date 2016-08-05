@@ -346,7 +346,7 @@ static tokenInfo *newToken (void)
 	token->keyword		= KEYWORD_NONE;
 	token->string		= vStringNew ();
 	token->indent		= 0;
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	return token;
@@ -476,7 +476,7 @@ getNextChar:
 	}
 	while (c == ' ' || c == '\t' || c == '\f');
 
-	token->lineNumber   = getSourceLineNumber ();
+	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
 	if (inclWhitespaces && n > 1 && c != '\r' && c != '\n')
@@ -509,7 +509,7 @@ getNextChar:
 			else /* empty string */
 				ungetcToInputFile (d);
 			vStringPut (token->string, c);
-			token->lineNumber = getSourceLineNumber ();
+			token->lineNumber = getInputLineNumber ();
 			token->filePosition = getInputFilePosition ();
 			break;
 		}
