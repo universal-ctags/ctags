@@ -1,0 +1,1 @@
+Warning: Don't reuse the kind letter `a' in a language X (old: "anyobject", new: "anyitem")
