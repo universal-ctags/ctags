@@ -1399,6 +1399,7 @@ static void initializeParserOne (langType lang)
 	if (parser->initialized)
 		return;
 
+	verbose ("Initialize parser: %s\n", parser->name);
 	parser->initialized = TRUE;
 
 	installKeywordTable (lang);
