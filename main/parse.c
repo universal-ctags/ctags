@@ -1414,6 +1414,8 @@ static void initializeParserOne (langType lang)
 	if (parser->initialize != NULL)
 		parser->initialize (lang);
 
+	initializeSubparsers (parser);
+
 	Assert (parser->fileKind != KIND_NULL);
 	Assert (!doesParserUseKind (parser, parser->fileKind->letter));
 }
@@ -1498,6 +1500,9 @@ extern void freeParserResources (void)
 
 		if (lang->finalize)
 			(lang->finalize)((langType)i, (boolean)lang->initialized);
+
+		finalizeSubparsers (lang);
+
 		if (lang->fileKind != &defaultFileKind)
 		{
 			eFree (lang->fileKind);

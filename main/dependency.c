@@ -68,6 +68,37 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 {
 	if (dtype == DEPTYPE_KIND_OWNER)
 		linkKindDependency (masterParser, slaveParser);
+	else if (dtype == DEPTYPE_SUBPARSER)
+	{
+		subparser *s = xMalloc (1, subparser);
+
+		s->id = slaveParser->id;
+		s->next = masterParser->subparsers;
+		masterParser->subparsers = s;
+	}
+}
+
+extern void initializeSubparsers (const parserDefinition *parser)
+{
+	subparser *sp;
+
+	for (sp = parser->subparsers; sp; sp = sp->next)
+		initializeParser (sp->id);
+}
+
+extern void finalizeSubparsers (parserDefinition *parser)
+{
+	subparser *sp;
+	subparser *tmp;
+
+	for (sp = parser->subparsers; sp;)
+	{
+		tmp = sp;
+		sp = sp->next;
+		tmp->next = NULL;
+		eFree (tmp);
+	}
+	parser->subparsers = NULL;
 }
 
 /* vi:set tabstop=4 shiftwidth=4: */

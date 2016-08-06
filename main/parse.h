@@ -158,6 +158,8 @@ struct sParserDefinition {
 	unsigned int initialized:1;    /* initialize() is called or not */
 	unsigned int pseudoTagPrinted:1;   /* pseudo tags about this parser
 					      is emitted or not. */
+	subparser *subparsers;	/* The parsers on this list must be initialized when
+				   this parser is initialized. */
 
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
