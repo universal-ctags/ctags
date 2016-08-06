@@ -116,7 +116,7 @@ static void     langStackInit (langStack *langStack);
 static langType langStackTop  (langStack *langStack);
 static void     langStackPush (langStack *langStack, langType type);
 static langType langStackPop  (langStack *langStack);
-
+static void     langStackClear(langStack *langStack);
 
 
 /*
@@ -326,8 +326,8 @@ static void setInputFileParametersCommon (inputFileInfo *finfo, vString *const f
 
 static void resetLangOnStack (inputLangInfo *langInfo, langType lang)
 {
-	Assert (langInfo->stack.count == 1);
-	langStackPop  (& (langInfo->stack));
+	Assert (langInfo->stack.count > 0);
+	langStackClear  (& (langInfo->stack));
 	langStackPush (& (langInfo->stack), lang);
 }
 
@@ -339,6 +339,11 @@ static void pushLangOnStack (inputLangInfo *langInfo, langType lang)
 static langType popLangOnStack (inputLangInfo *langInfo)
 {
 	return langStackPop (& langInfo->stack);
+}
+
+static void clearLangOnStack (inputLangInfo *langInfo)
+{
+	return langStackClear (& langInfo->stack);
 }
 
 static void setLangToType  (inputLangInfo *langInfo, langType lang)
@@ -627,7 +632,7 @@ extern void closeInputFile (void)
 {
 	if (File.fp != NULL)
 	{
-		popLangOnStack (& (File.input.langInfo));
+		clearLangOnStack (& (File.input.langInfo));
 
 		/*  The line count of the file is 1 too big, since it is one-based
 		 *  and is incremented upon each newline.
@@ -1151,6 +1156,12 @@ static langType langStackTop (langStack *langStack)
 {
 	Assert (langStack->count > 0);
 	return langStack->languages [langStack->count - 1];
+}
+
+static void     langStackClear (langStack *langStack)
+{
+	while (langStack->count > 0)
+		langStackPop (langStack);
 }
 
 static void     langStackPush (langStack *langStack, langType type)
