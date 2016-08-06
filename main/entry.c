@@ -1,4 +1,3 @@
-
 /*
 *   Copyright (c) 1996-2002, Darren Hiebert
 *
