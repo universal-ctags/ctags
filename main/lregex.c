@@ -563,15 +563,15 @@ static void processLanguageRegex (const langType language,
 	else
 	{
 		const char* regexfile = parameter + 1;
-		MIO* const fp = mio_new_file (regexfile, "r");
-		if (fp == NULL)
+		MIO* const mio = mio_new_file (regexfile, "r");
+		if (mio == NULL)
 			error (WARNING | PERROR, "%s", regexfile);
 		else
 		{
 			vString* const regex = vStringNew ();
-			while (readLineRaw (regex, fp))
+			while (readLineRaw (regex, mio))
 				addLanguageRegex (language, vStringValue (regex));
-			mio_free (fp);
+			mio_free (mio);
 			vStringDelete (regex);
 		}
 	}

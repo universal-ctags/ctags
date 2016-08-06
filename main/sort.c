@@ -35,13 +35,13 @@
 *   FUNCTION DEFINITIONS
 */
 
-extern void catFile (MIO *fp)
+extern void catFile (MIO *mio)
 {
-	if (fp != NULL)
+	if (mio != NULL)
 	{
 		int c;
-		mio_seek (fp, 0, SEEK_SET);
-		while ((c = mio_getc (fp)) != EOF)
+		mio_seek (mio, 0, SEEK_SET);
+		while ((c = mio_getc (mio)) != EOF)
 			putchar (c);
 		fflush (stdout);
 	}
@@ -127,11 +127,11 @@ extern void externalSortTags (const boolean toStdout, MIO *tagFile)
  *  so have lots of memory if you have large tag files.
  */
 
-extern void failedSort (MIO *const fp, const char* msg)
+extern void failedSort (MIO *const mio, const char* msg)
 {
 	const char* const cannotSort = "cannot sort tag file";
-	if (fp != NULL)
-		mio_free (fp);
+	if (mio != NULL)
+		mio_free (mio);
 	if (msg == NULL)
 		error (FATAL | PERROR, "%s", cannotSort);
 	else
@@ -157,18 +157,18 @@ static int compareTags (const void *const one, const void *const two)
 static void writeSortedTags (
 		char **const table, const size_t numTags, const boolean toStdout)
 {
-	MIO *fp;
+	MIO *mio;
 	size_t i;
 
 	/*  Write the sorted lines back into the tag file.
 	 */
 	if (toStdout)
-		fp = mio_new_fp (stdout, NULL);
+		mio = mio_new_fp (stdout, NULL);
 	else
 	{
-		fp = mio_new_file (tagFileName (), "w");
-		if (fp == NULL)
-			failedSort (fp, NULL);
+		mio = mio_new_file (tagFileName (), "w");
+		if (mio == NULL)
+			failedSort (mio, NULL);
 	}
 	for (i = 0 ; i < numTags ; ++i)
 	{
@@ -176,15 +176,15 @@ static void writeSortedTags (
 		 *  pattern) if this is not an xref file.
 		 */
 		if (i == 0  ||  Option.xref  ||  strcmp (table [i], table [i-1]) != 0)
-			if (mio_puts (fp, table [i]) == EOF)
-				failedSort (fp, NULL);
+			if (mio_puts (mio, table [i]) == EOF)
+				failedSort (mio, NULL);
 	}
 	if (toStdout)
-		mio_flush (fp);
-	mio_free (fp);
+		mio_flush (mio);
+	mio_free (mio);
 }
 
-extern void internalSortTags (const boolean toStdout, MIO* fp, size_t numTags)
+extern void internalSortTags (const boolean toStdout, MIO* mio, size_t numTags)
 {
 	vString *vLine = vStringNew ();
 	const char *line;
@@ -200,15 +200,15 @@ extern void internalSortTags (const boolean toStdout, MIO* fp, size_t numTags)
 
 	cmpFunc = Option.sorted == SO_FOLDSORTED ? compareTagsFolded : compareTags;
 	if (table == NULL)
-		failedSort (fp, "out of memory");
+		failedSort (mio, "out of memory");
 
-	for (i = 0  ;  i < numTags  &&  ! mio_eof (fp)  ;  )
+	for (i = 0  ;  i < numTags  &&  ! mio_eof (mio)  ;  )
 	{
-		line = readLineRaw (vLine, fp);
+		line = readLineRaw (vLine, mio);
 		if (line == NULL)
 		{
-			if (! mio_eof (fp))
-				failedSort (fp, NULL);
+			if (! mio_eof (mio))
+				failedSort (mio, NULL);
 			break;
 		}
 		else if (*line == '\0'  ||  strcmp (line, "\n") == 0)
@@ -219,7 +219,7 @@ extern void internalSortTags (const boolean toStdout, MIO* fp, size_t numTags)
 
 			table [i] = (char *) malloc (stringSize);
 			if (table [i] == NULL)
-				failedSort (fp, "out of memory");
+				failedSort (mio, "out of memory");
 			DebugStatement ( mallocSize += stringSize; )
 			strcpy (table [i], line);
 			++i;
