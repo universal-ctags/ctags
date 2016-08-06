@@ -1,6 +1,4 @@
 /*
- *	 $Id: tex.c 666 2008-05-15 17:47:31Z dfishburn $
- *
  *	 Copyright (c) 2008, David Fishburn
  *	 Copyright (c) 2012, Jan Larres
  *

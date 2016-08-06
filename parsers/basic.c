@@ -1,6 +1,4 @@
 /*
- *   $Id:$
- *
  *   Copyright (c) 2000-2006, Darren Hiebert, Elias Pschernig
  *
  *   This source code is released for free distribution under the terms of the
