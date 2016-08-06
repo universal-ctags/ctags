@@ -156,12 +156,8 @@ struct sParserDefinition {
 	langType id;		    /* id assigned to language */
 	unsigned int enabled:1;	       /* currently enabled? */
 	unsigned int initialized:1;    /* initialize() is called or not */
-	unsigned int tagRegexInstalled:1; /* tagRegexTable is installed or not. */
-	unsigned int keywordInstalled:1;  /* keywordTable is installed or not. */
-	unsigned int tagXpathInstalled:1;  /* tagXpathTable is installed or not. */
 	unsigned int pseudoTagPrinted:1;   /* pseudo tags about this parser
 					      is emitted or not. */
-	unsigned int fieldSpecInstalled:1; /* fieldSpecs is installed or not. */
 
 	stringList* currentPatterns;   /* current list of file name patterns */
 	stringList* currentExtensions; /* current list of extensions */
@@ -252,14 +248,12 @@ extern boolean runParserInNarrowedInputStream (const langType language,
 extern void freeEncodingResources (void);
 #endif
 
-extern void installKeywordTable (const langType language);
 
 /* Regex interface */
 extern void findRegexTags (void);
 extern void findRegexTagsMainloop (int (* driver)(void));
 extern boolean matchRegex (const vString* const line, const langType language);
 extern void addLanguageRegex (const langType language, const char* const regex);
-extern void installTagRegexTable (const langType language);
 extern void addTagRegex (const langType language, const char* const regex,
 			 const char* const name, const char* const kinds, const char* const flags,
 			 boolean *disabled);
@@ -300,7 +294,6 @@ extern void notifyAvailabilityXcmdMethod (const langType language);
 extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 			 const tagXpathTableTable *xpathTableTable,
 			 const kindOption* const kinds, void *userData);
-extern void installTagXpathTable (const langType language);
 extern void addTagXpath (const langType language, tagXpathTable *xpathTable);
 
 extern boolean makeKindSeparatorsPseudoTags (const langType language,

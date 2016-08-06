@@ -867,7 +867,7 @@ extern void foreachRegexKinds (const langType language,
 			       boolean (*func) (kindOption *, void *),
 			       void *data)
 {
-	installTagRegexTable (language);
+	initializeParser (language);
 	if (language <= SetUpper  &&  Sets [language].count > 0)
 	{
 		patternSet* const set = Sets + language;

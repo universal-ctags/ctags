@@ -58,6 +58,9 @@ typedef struct {
  */
 
 static void addParserPseudoTags (langType language);
+static void installKeywordTable (const langType language);
+static void installTagRegexTable (const langType language);
+static void installTagXpathTable (const langType language);
 
 /*
 *   DATA DEFINITIONS
@@ -1382,17 +1385,21 @@ static void installFieldSpec (const langType language)
 		error (FATAL,
 		       "INTERNAL ERROR: in a parser, fields are defined more than PRE_ALLOCATED_PARSER_FIELDS\n");
 
-	if ((parser->fieldSpecs != NULL) && (parser->fieldSpecInstalled == FALSE))
+	if (parser->fieldSpecs != NULL)
 	{
 		for (i = 0; i < parser->fieldSpecCount; i++)
 			defineField (& parser->fieldSpecs [i], language);
-		parser->fieldSpecInstalled = TRUE;
 	}
 }
 
 static void initializeParserOne (langType lang)
 {
 	parserDefinition *const parser = LanguageTable [lang];
+
+	if (parser->initialized)
+		return;
+
+	parser->initialized = TRUE;
 
 	installKeywordTable (lang);
 	installTagRegexTable (lang);
@@ -1403,11 +1410,8 @@ static void initializeParserOne (langType lang)
 	    || parser->requestAutomaticFQTag)
 		parser->useCork = TRUE;
 
-	if ((parser->initialize != NULL) && (parser->initialized == FALSE))
-	{
+	if (parser->initialize != NULL)
 		parser->initialize (lang);
-		parser->initialized = TRUE;
-	}
 
 	Assert (parser->fileKind != KIND_NULL);
 	Assert (!doesParserUseKind (parser, parser->fileKind->letter));
@@ -2414,7 +2418,7 @@ extern void notifyAvailabilityXcmdMethod (const langType language)
 	lang->method |= METHOD_XCMD_AVAILABLE;
 }
 
-extern void installTagRegexTable (const langType language)
+static void installTagRegexTable (const langType language)
 {
 	parserDefinition* lang;
 	unsigned int i;
@@ -2423,7 +2427,7 @@ extern void installTagRegexTable (const langType language)
 	lang = LanguageTable [language];
 
 
-	if ((lang->tagRegexTable != NULL) && (lang->tagRegexInstalled == FALSE))
+	if (lang->tagRegexTable != NULL)
 	{
 	    for (i = 0; i < lang->tagRegexCount; ++i)
 		    addTagRegex (language,
@@ -2432,11 +2436,10 @@ extern void installTagRegexTable (const langType language)
 				 lang->tagRegexTable [i].kinds,
 				 lang->tagRegexTable [i].flags,
 				 (lang->tagRegexTable [i].disabled));
-	    lang->tagRegexInstalled = TRUE;
 	}
 }
 
-extern void installKeywordTable (const langType language)
+static void installKeywordTable (const langType language)
 {
 	parserDefinition* lang;
 	unsigned int i;
@@ -2444,17 +2447,16 @@ extern void installKeywordTable (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
 
-	if ((lang->keywordTable != NULL) && (lang->keywordInstalled == FALSE))
+	if (lang->keywordTable != NULL)
 	{
 		for (i = 0; i < lang->keywordCount; ++i)
 			addKeyword (lang->keywordTable [i].name,
 				    language,
 				    lang->keywordTable [i].id);
-		lang->keywordInstalled = TRUE;
 	}
 }
 
-extern void installTagXpathTable (const langType language)
+static void installTagXpathTable (const langType language)
 {
 	parserDefinition* lang;
 	unsigned int i, j;
@@ -2462,12 +2464,11 @@ extern void installTagXpathTable (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
 
-	if ((lang->tagXpathTableTable != NULL) && (lang->tagXpathInstalled == FALSE))
+	if (lang->tagXpathTableTable != NULL)
 	{
 		for (i = 0; i < lang->tagXpathTableCount; ++i)
 			for (j = 0; j < lang->tagXpathTableTable[i].count; ++j)
 				addTagXpath (language, lang->tagXpathTableTable[i].table + j);
-		lang->tagXpathInstalled = TRUE;
 		useXpathMethod (language);
 	}
 }
