@@ -133,7 +133,7 @@ static void findClojureTags (void)
 extern parserDefinition *ClojureParser (void)
 {
 	static const char *const extensions[] = {
-		"clj", NULL
+		"clj", "cljs", "cljc", NULL
 	};
 	static const char *const aliases[] = {
 		NULL
