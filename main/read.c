@@ -759,7 +759,7 @@ static vString *iFileGetLine (void)
 	return result;
 }
 
-/*  Do not mix use of fileReadLine () and getcFromInputFile () for the same file.
+/*  Do not mix use of readLineFromInputFile () and getcFromInputFile () for the same file.
  */
 extern int getcFromInputFile (void)
 {
@@ -820,7 +820,7 @@ extern int skipToCharacterInInputFile (int c)
 	return d;
 }
 
-/*  An alternative interface to getcFromInputFile (). Do not mix use of fileReadLine()
+/*  An alternative interface to getcFromInputFile (). Do not mix use of readLineFromInputFile()
  *  and getcFromInputFile() for the same file. The returned string does not contain
  *  the terminating newline. A NULL return value means that all lines in the
  *  file have been read and we are at the end of file.
