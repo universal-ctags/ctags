@@ -139,7 +139,8 @@
     <ClCompile Include="..\main\lxcmd.c" />
     <ClCompile Include="..\main\lxpath.c" />
     <ClCompile Include="..\parsers\lua.c" />
-    <ClCompile Include="..\optlib\m4.c" />
+    <ClCompile Include="..\parsers\autoconf.c" />
+    <ClCompile Include="..\parsers\m4.c" />
     <ClCompile Include="..\main\main.c" />
     <ClCompile Include="..\parsers\automake.c" />
     <ClCompile Include="..\parsers\make.c" />
@@ -265,6 +266,7 @@
     <ClInclude Include="..\main\mybool.h" />
     <ClInclude Include="..\parsers\make.h" />
     <ClInclude Include="..\parsers\iniconf.h" />
+    <ClInclude Include="..\parsers\m4.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
