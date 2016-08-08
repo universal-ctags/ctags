@@ -97,8 +97,12 @@ static boolean autoconfProbeLanguage (const char* token)
 static int autoconfMakeTag (int kind)
 {
 	int index = CORK_NIL;
-	vString *const name = vStringNew();
+	vString * name;
 
+	if (!isLanguageEnabled (getInputLanguage ()))
+		return CORK_NIL;
+
+	name = vStringNew();
 	readM4MacroArgument(name);
 	if (vStringLength (name) > 0)
 	{

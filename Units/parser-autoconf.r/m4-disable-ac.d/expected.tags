@@ -1,0 +1,2 @@
+PKG_PREREQ	input.ac	/^AC_DEFUN([PKG_PREREQ],$/;"	m	line:4	language:Autoconf	end:8
+input.ac	input.ac	1;"	F	line:1	language:Autoconf	end:12
