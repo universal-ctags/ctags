@@ -213,7 +213,8 @@ static struct m4ParserClient * maySwitchLanguage (struct m4ParserClient *client,
 		   This is for specifying the language name
 		   in the file tag for the current input.
 		   (The file tag is enabled with --extra=+f.) */
-		pushLanguage (probe_data.client->lang);
+		if (isLanguageEnabled (probe_data.client->lang))
+			pushLanguage (probe_data.client->lang);
 	}
 
 	return probe_data.client;
@@ -469,6 +470,9 @@ static int makeM4RefTag(const kindOption *kind, const vString *const name, int r
 
 	if (lang == LANG_IGNORE)
 		lang = getNamedLanguage ("M4", 0);
+
+	if (! isLanguageEnabled (lang))
+		return CORK_NIL;
 
 	initRefTagEntry (&e, vStringValue(name), kind, role);
 
