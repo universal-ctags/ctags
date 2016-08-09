@@ -370,7 +370,6 @@
       <Filter>Source Files\Main</Filter>
     </ClCompile>
   </ItemGroup>
-  </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\main\e_msoft.h">
       <Filter>Header Files</Filter>
