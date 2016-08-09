@@ -128,6 +128,8 @@ enum eKeywordId {
 	KEYWORD_class,
 	KEYWORD_extends,
 	KEYWORD_static,
+	KEYWORD_default,
+	KEYWORD_export,
 };
 typedef int keywordId; /* to allow KEYWORD_NONE */
 
@@ -224,6 +226,8 @@ static const keywordTable JsKeywordTable [] = {
 	{ "class",		KEYWORD_class				},
 	{ "extends",	KEYWORD_extends				},
 	{ "static",		KEYWORD_static				},
+	{ "default",		KEYWORD_default				},
+	{ "export",		KEYWORD_export				},
 };
 
 /*
@@ -2182,6 +2186,9 @@ static void parseJsFile (tokenInfo *const token)
 
 		if (isType (token, TOKEN_KEYWORD) && token->keyword == KEYWORD_sap)
 			parseUI5 (token);
+		else if (isType (token, TOKEN_KEYWORD) && (token->keyword == KEYWORD_export ||
+		                                           token->keyword == KEYWORD_default))
+			/* skip those at top-level */;
 		else
 			parseLine (token, NULL, false);
 	} while (! isType (token, TOKEN_EOF));

@@ -1,0 +1,3 @@
+cube	input.js	/^export function cube(x) {$/;"	f
+foo	input.js	/^const foo = Math.PI + Math.SQRT2;$/;"	C
+pie	input.js	/^export const pie = Math.PI;$/;"	C
