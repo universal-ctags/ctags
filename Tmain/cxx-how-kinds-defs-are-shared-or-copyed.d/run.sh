@@ -7,7 +7,7 @@ printf "[C] enabling in C: "
 ${CTAGS} --quiet --options=NONE \
 	 --kinds-C=+f --list-kinds=C | grep ^f
 
-printf "[C] disbaling in C: "
+printf "[C] disabling in C: "
 ${CTAGS} --quiet --options=NONE \
 	 --kinds-C=-f --list-kinds=C | grep ^f
 
@@ -15,7 +15,7 @@ printf "[C++] enabling in C: "
 ${CTAGS} --quiet --options=NONE \
 	 --kinds-C=+f --list-kinds=C++ | grep ^f
 
-printf "[C++] disbaling in C: "
+printf "[C++] disabling in C: "
 ${CTAGS} --quiet --options=NONE \
 	 --kinds-C=-f --list-kinds=C++ | grep ^f
 
@@ -23,7 +23,7 @@ printf "[C] enabling in C++: "
 ${CTAGS} --quiet --options=NONE \
 	 --kinds-C++=+f --list-kinds=C | grep ^f
 
-printf "[C] disbaling in C++: "
+printf "[C] disabling in C++: "
 ${CTAGS} --quiet --options=NONE \
 	 --kinds-C++=-f --list-kinds=C | grep ^f
 
@@ -31,6 +31,6 @@ printf "[C++] enabling in C++: "
 ${CTAGS} --quiet --options=NONE \
 	 --kinds-C++=+f --list-kinds=C++ | grep ^f
 
-printf "[C++] disbaling in C++: "
+printf "[C++] disabling in C++: "
 ${CTAGS} --quiet --options=NONE \
 	 --kinds-C++=-f --list-kinds=C++ | grep ^f

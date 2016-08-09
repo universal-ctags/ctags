@@ -3,7 +3,7 @@ default map including *.m
 MatLab   *.m
 ObjectiveC *.mm *.m *.h
 
-[--map-<LANG>] removing from *.m from ObjetiveC
+[--map-<LANG>] removing from *.m from ObjectiveC
 =======================================
 MatLab   *.m
 
@@ -13,7 +13,7 @@ Ada      *.adb *.ads *.Ada *.m
 MatLab   *.m
 ObjectiveC *.mm *.m *.h
 
-[--map-<LANG>] removing from *.m from ObjetiveC, and adding *.m to Ada
+[--map-<LANG>] removing from *.m from ObjectiveC, and adding *.m to Ada
 =======================================
 Ada      *.adb *.ads *.Ada *.m
 MatLab   *.m
