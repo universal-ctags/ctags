@@ -9,7 +9,7 @@ ${CTAGS} --quiet --options=NONE \
 	 --list-maps | grep '\*\.m\>.*$'
 echo
 
-echo '[--map-<LANG>]' removing from '*.m' from 'ObjetiveC'
+echo '[--map-<LANG>]' removing from '*.m' from 'ObjectiveC'
 echo =======================================
 ${CTAGS} --quiet --options=NONE \
 	 --map-ObjectiveC=-.m --list-maps | grep '\*\.m\>.*$'
@@ -21,7 +21,7 @@ ${CTAGS} --quiet --options=NONE \
 	 --map-Ada=+.m --list-maps | grep '\*\.m\>.*$'
 echo
 
-echo '[--map-<LANG>]' removing from '*.m' from 'ObjetiveC', and adding '*.m' to 'Ada'
+echo '[--map-<LANG>]' removing from '*.m' from 'ObjectiveC', and adding '*.m' to 'Ada'
 echo =======================================
 ${CTAGS} --quiet --options=NONE \
 	 --map-ObjectiveC=-.m --map-Ada=+.m --list-maps | grep '\*\.m\>.*$'
