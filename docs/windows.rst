@@ -5,24 +5,24 @@ Building/hacking/using on MS-Windows
 
 ----
 
-This part of the documentation is written by Frank Fesevur, co-maintainer of universal-ctags and the maintainer of the Windows port of this project. It is still very much work in progress. Things still need to be written down, tested or even investigated. When building for Windows you need to know there are many compilers and many building environments. This is a summary of available options and things that have been tested so far.
+This part of the documentation is written by Frank Fesevur, co-maintainer of universal-ctags and the maintainer of the Windows port of this project. It is still very much a work in progress. Things still need to be written down, tested or even investigated. When building for Windows you should be aware that there are many compilers and build environments available. This is a summary of available options and things that have been tested so far.
 
 
 Compilers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are many compilers for Windows. Apart from the ones mentioned here others do exist, but not used by me.
+There are many compilers for Windows. Compilers not mentioned here may work but are not tested.
 
 
 Microsoft Visual Studio
 .............................................................................
 http://www.visualstudio.com/
 
-Obviously there is Microsoft Visual Studio 2013. Many professional developers targeting Windows use Visual Studio. Visual Studio comes in a couple of different editions. Their Express Edition is free to use, but a Microsoft-account is required to download the .iso and when you want to continue using it after a 30-days trial period. All other editions you need to be paid for.
+Obviously there is Microsoft Visual Studio 2013. Many professional developers targeting Windows use Visual Studio. Visual Studio comes in a couple of different editions. Their Express and Community editions are free to use, but a Microsoft-account is required to download the .iso and when you want to continue using it after a 30-days trial period. Other editions of Visual Studio must be purchased.
 
 Installing Visual Studio will give you the IDE, the command line compilers and the MS-version of make named nmake.
 
-Note that ctags can not be build with Visual Studio older than 2013 anymore. There is C99 (or C11) coding used that generate syntax errors with VS2012 and older. This could effect compilers from other vendors as well.
+Note that ctags cannot be built with Visual Studio older than 2013 anymore. There is C99 (or C11) coding used that generates syntax errors with VS2012 and older. This could affect compilers from other vendors as well.
 
 
 GCC
@@ -34,7 +34,7 @@ There are three flavors of GCC for Windows:
 - MinGW-w64 http://mingw-w64.sourceforge.net
 - TDM-GCC http://tdm-gcc.tdragon.net
 
-MinGW started it all, but development stalled a while and no x64 was available. Then the MinGW-w64 fork emerged. It started as a 64-bit compiler, but soon they included both a 32-bit and a 64-bit compiler. But the name remained, a bit confusing. Another fork of MinGW is TDM-GCC. It also provides both 32-bit and 64-bit compilers. All have at least GCC 4.8. MinGW-w64 appears to be the most used flavor of MinGW at this moment. Many well known program the originate from GNU/Linux use MinGW-w64 to compile their Windows port.
+MinGW started it all, but development stalled for a while and no x64 was available. Then the MinGW-w64 fork emerged. It started as a 64-bit compiler, but soon they included both a 32-bit and a 64-bit compiler. But the name remained, a bit confusing. Another fork of MinGW is TDM-GCC. It also provides both 32-bit and 64-bit compilers. All have at least GCC 4.8. MinGW-w64 appears to be the most used flavor of MinGW at this moment. Many well known programs that originate from GNU/Linux use MinGW-w64 to compile their Windows port.
 
 Building ctags from the command line
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -42,7 +42,7 @@ Building ctags from the command line
 Microsoft Visual Studio
 .............................................................................
 
-Most users of Visual Studio will use the IDE and not the command line to compile a project. But by default a shortcut to the command prompt that sets the proper path is installed in the Start Menu. When this command prompt is used ``nmake -f mk_mvc.mak`` will compile ctags. You can also go into the ``win32`` subdirectory and run ``msbuild ctags_vs2013.sln`` for the default build. Use ``msbuild ctags_vs2013.sln /p:Configuration=Release`` to specifically build a release build. MSBuild is what the IDE uses internally and therefore will product the same files as the IDE.
+Most users of Visual Studio will use the IDE and not the command line to compile a project. But by default a shortcut to the command prompt that sets the proper path is installed in the Start Menu. When this command prompt is used ``nmake -f mk_mvc.mak`` will compile ctags. You can also go into the ``win32`` subdirectory and run ``msbuild ctags_vs2013.sln`` for the default build. Use ``msbuild ctags_vs2013.sln /p:Configuration=Release`` to specifically build a release build. MSBuild is what the IDE uses internally and therefore will produce the same files as the IDE.
 
 If you want to build an iconv enabled version, you must specify ``WITH_ICONV=yes`` and ``ICONV_DIR`` like below::
 
@@ -61,7 +61,7 @@ All the GCC's come with installers or with zipped archives. Install or extract t
 
 GNU Make builds for Win32 are available as well, and sometimes are included with the compilers. Make sure it is in your path, for instance by copying the make.exe in the bin directory of your compiler.
 
-Native win32 version of the GNU/Linux command cp, rm and mv can be useful. rm is almost always used in by the ``clean`` target of a makefile.
+Native win32 versions of the GNU/Linux commands cp, rm and mv can be useful. rm is almost always used in by the ``clean`` target of a makefile.
 
 
 **CMD**
@@ -78,17 +78,17 @@ If you want to build a debug version, you must specify ``DEBUG=1`` like below::
 
 **MSYS**
 
-From their site: MSYS is a collection of GNU utilities such as bash, make, gawk and grep to allow building of applications and programs which depend on traditionally UNIX tools to be present. It is intended to supplement MinGW and the deficiencies of the cmd shell.
+From their site: MSYS is a collection of GNU utilities such as bash, make, gawk and grep to allow building of applications and programs which depend on traditional UNIX tools to be present. It is intended to supplement MinGW and the deficiencies of the cmd shell.
 
 MSYS comes in two flavors. The original from MinGW and a MSYS2 http://sourceforge.net/projects/msys2/
 
-MSYS is old but still works. You can build ctags with it using ``make -f mk_mingw.mak``. The Autotools are too old on MSYS so you can not use them.
+MSYS is old but still works. You can build ctags with it using ``make -f mk_mingw.mak``. The Autotools are too old on MSYS so you cannot use them.
 
 MSYS2 is a more maintained version of MSYS, but specially geared towards MinGW-w64. You can also use Autotools to build ctags.
 
 **Cygwin**
 
-Cygwin provides ports of many GNU/Linux tools and a POSIX API layer. This is the most complete way to get the GNU/Linux terminal feel under Windows. Cygwin has a setup that helps you install all the tools you need. Drawback of Cygwin is that the POSIX API layer (cygwin1.dll) is not fast.
+Cygwin provides ports of many GNU/Linux tools and a POSIX API layer. This is the most complete way to get the GNU/Linux terminal feel under Windows. Cygwin has a setup that helps you install all the tools you need. One drawback of Cygwin is that it has poor performance.
 
 It is easy to build a Cygwin version of ctags using the normal GNU/Linux build steps. This ctags.exe will depend on cygwin1.dll and should only be used within the Cygwin ecosystem.
 
@@ -104,11 +104,11 @@ You can also build a native Windows version using Autotools.
 
 If you use Autotools you can also do the Units testing with `make units`. Some tests fail, that needs to be investigated.
 
-Sometimes anti-virus product can slowdown the build and test process significantly, especially when ``./configure`` is running and during the Units tests. In that case it could help to temporary disable them. But be aware of the risks when you disable your anti-virus product.
+Some anti-virus software slows down the build and test process significantly, especially when ``./configure`` is running and during the Units tests. In that case it could help to temporarily disable them. But be aware of the risks when you disable your anti-virus software.
 
 **Cross-compile from GNU/Linux**
 
-All major distributions have both MinGW and MinGW-w64 packages. Cross-compiling works the same way as with Cygwin. You can not do the Windows based Units tests on GNU/Linux.
+All major distributions have both MinGW and MinGW-w64 packages. Cross-compiling works the same way as with Cygwin. You cannot do the Windows based Units tests on GNU/Linux.
 
 
 Building ctags with IDEs
@@ -119,7 +119,7 @@ I have no idea how things work for most GNU/Linux developers, but most Windows d
 Microsoft Visual Studio
 .............................................................................
 
-As already mentioned Microsoft Visual Studio 2013 has the free Express edition. For ctags the Windows Desktop Express Edition is enough to get the job done. The IDE has a proper debugger. Project files for VS2013 can be found in the win32 directory.
+As already mentioned Microsoft Visual Studio 2013 has the free Express and Community editions. For ctags the Windows Desktop Express Edition is enough to get the job done. The IDE has a proper debugger. Project files for VS2013 can be found in the win32 directory.
 
 Please know that when files are added to the sources.mak, these files need to be added to the .vcproj and .vcproj.filters files as well. The XML of these files should not be a problem.
 
