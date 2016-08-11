@@ -3632,5 +3632,3 @@ extern parserDefinition* VeraParser (void)
 	def->initialize = initializeVeraParser;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4 noexpandtab: */

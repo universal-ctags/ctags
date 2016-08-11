@@ -80,5 +80,3 @@ extern void debugEntry (const tagEntryInfo *const tag);
 extern void debugAssert (const char *assertion, const char *file, unsigned int line, const char *function) attr__noreturn;
 
 #endif  /* CTAGS_MAIN_DEBUG_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

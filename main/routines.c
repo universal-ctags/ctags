@@ -888,5 +888,3 @@ extern MIO *tempFile (const char *const mode, char **const pName)
 	*pName = name;
 	return mio;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

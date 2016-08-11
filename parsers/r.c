@@ -215,5 +215,3 @@ extern parserDefinition *RParser (void)
 	def->selectLanguage = selectors;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4 noexpandtab: */

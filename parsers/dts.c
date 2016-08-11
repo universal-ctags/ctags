@@ -91,5 +91,3 @@ extern parserDefinition* DTSParser (void)
 	def->requestAutomaticFQTag = TRUE;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

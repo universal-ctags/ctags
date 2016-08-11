@@ -32,5 +32,3 @@ extern const char* ctags_repoinfo;
 
 
 #endif	/* CTAGS_MAIN_CTAGS_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

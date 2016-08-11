@@ -2583,5 +2583,3 @@ extern parserDefinition* FortranParser (void)
 	def->keywordCount = ARRAY_SIZE (FortranKeywordTable);
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

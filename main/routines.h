@@ -144,5 +144,3 @@ extern MIO *tempFile (const char *const mode, char **const pName);
 extern char* baseFilenameSansExtensionNew (const char *const fileName, const char *const templateExt);
 
 #endif  /* CTAGS_MAIN_ROUTINES_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

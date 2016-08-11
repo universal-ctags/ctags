@@ -826,5 +826,3 @@ extern parserDefinition *VhdlParser (void)
 	def->keywordCount = ARRAY_SIZE (VhdlKeywordTable);
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4 noet: */

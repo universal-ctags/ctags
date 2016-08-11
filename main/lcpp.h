@@ -76,5 +76,3 @@ extern int cppGetc (void);
 extern int cppSkipOverCComment (void);
 
 #endif  /* CTAGS_MAIN_GET_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

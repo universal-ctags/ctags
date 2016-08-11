@@ -34,5 +34,3 @@ extern void linkDependencyAtInitializeParsing (depType dtype,
 					       parserDefinition *const slaveParser);
 
 #endif	/* CTAGS_MAIN_DEPENDENCY_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

@@ -594,4 +594,3 @@ extern parserDefinition* TexParser (void)
 	def->keywordCount = ARRAY_SIZE (TexKeywordTable);
 	return def;
 }
-/* vi:set tabstop=4 shiftwidth=4 noexpandtab: */

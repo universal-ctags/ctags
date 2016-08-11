@@ -76,5 +76,3 @@ extern parserDefinition* AwkParser (void)
 	def->parser     = findAwkTags;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

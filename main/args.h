@@ -55,5 +55,3 @@ extern void argForth (Arguments* const current);
 extern void argDelete (Arguments* const current);
 
 #endif  /* CTAGS_MAIN_ARGS_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

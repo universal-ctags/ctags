@@ -265,5 +265,3 @@ Maven2Parser (void)
 	def->fieldSpecCount = ARRAY_SIZE (Maven2Fields);
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

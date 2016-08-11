@@ -139,5 +139,3 @@ extern parserDefinition* LispParser (void)
 	def->parser     = findLispTags;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

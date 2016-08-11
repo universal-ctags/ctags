@@ -159,5 +159,3 @@ extern parserDefinition* YaccParser (void)
 	def->tagRegexCount = ARRAY_SIZE (yaccTagRegexTable);
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

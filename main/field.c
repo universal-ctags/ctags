@@ -919,5 +919,3 @@ extern int defineField (fieldSpec *spec, langType language)
 	updateSiblingField (spec->ftype, spec->name);
 	return spec->ftype;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

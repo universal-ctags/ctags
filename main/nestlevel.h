@@ -51,5 +51,3 @@ extern NestingLevel *nestingLevelsGetNth(const NestingLevels *nls, int n);
 extern void *nestingLevelGetUserData (const NestingLevel *nl);
 
 #endif  /* CTAGS_MAIN_NESTLEVEL_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

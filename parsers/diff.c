@@ -212,5 +212,3 @@ extern parserDefinition* DiffParser (void)
 	def->useCork    = TRUE;
 	return def;
 }
-
-/* vi:set tabstop=8 shiftwidth=4: */

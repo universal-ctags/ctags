@@ -322,6 +322,3 @@ extern parserDefinition* AspParser (void)
 	def->parser     = findAspTags;
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */
-

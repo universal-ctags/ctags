@@ -800,5 +800,3 @@ extern tagResult tagsClose (tagFile *const file)
 	}
 	return result;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

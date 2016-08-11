@@ -3325,5 +3325,3 @@ extern void freeOptionResources (void)
 
 	freeList (&OptionFiles);
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

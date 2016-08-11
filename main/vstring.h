@@ -92,5 +92,3 @@ extern void vStringCatSWithEscaping (vString* b, const char *s);
 extern void vStringCatSWithEscapingAsPattern (vString *output, const char* input);
 
 #endif  /* CTAGS_MAIN_VSTRING_H */
-
-/* vi:set tabstop=4 shiftwidth=4: */

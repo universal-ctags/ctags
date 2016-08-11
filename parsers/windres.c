@@ -234,4 +234,3 @@ extern parserDefinition* WindResParser(void)
 	def->parser		= findResTags;
 	return def;
 }
-/* vi:set tabstop=4 shiftwidth=4 noexpandtab: */

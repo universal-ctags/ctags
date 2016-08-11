@@ -126,5 +126,3 @@ extern void debugAssert (const char *assertion, const char *file, unsigned int l
 }
 
 #endif
-
-/* vi:set tabstop=4 shiftwidth=4: */

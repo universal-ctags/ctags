@@ -1071,5 +1071,3 @@ extern boolean checkRegex (void)
 #endif
 	return regexAvailable;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

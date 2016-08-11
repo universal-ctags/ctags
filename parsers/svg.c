@@ -64,5 +64,3 @@ SvgParser (void)
 	def->tagXpathTableCount = ARRAY_SIZE (svgXpathTableTable);
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */

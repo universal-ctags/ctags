@@ -90,5 +90,3 @@ GladeParser (void)
 	def->tagXpathTableCount  = ARRAY_SIZE (gladeXpathTableTable);
 	return def;
 }
-
-/* vi:set tabstop=4 shiftwidth=4: */
