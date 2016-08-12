@@ -43,19 +43,23 @@ static void makeTagWithScope (xmlNode *node,
 static tagXpathTable plistXpathMainTable[] = {
 	{ "///plist//dict/key",
 	  LXPATH_TABLE_DO_RECUR,
-	  .recurSpec = {
-			plistFindTagsUnderKey
-		}
+    {
+      .recurSpec = {
+        plistFindTagsUnderKey
+      }
+    }
 	},
 };
 
 static tagXpathTable plistXpathTextTable[] = {
 	{ "text()",
 	  LXPATH_TABLE_DO_MAKE,
-	  .makeTagSpec = {
-			K_KEY,  ROLE_INDEX_DEFINITION,
-			makeTagWithScope
-		}
+    {
+      .makeTagSpec = {
+        K_KEY,  ROLE_INDEX_DEFINITION,
+        makeTagWithScope
+      }
+    }
 	},
 };
 
