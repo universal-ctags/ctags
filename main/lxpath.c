@@ -118,9 +118,9 @@ static void findXMLTagsCore (xmlXPathContext *ctx, xmlNode *root,
 			{
 				node = set->nodeTab[j];
 				if (elt->specType == LXPATH_TABLE_DO_MAKE)
-					simpleXpathMakeTag (node, &(elt->makeTagSpec), kinds, userData);
+					simpleXpathMakeTag (node, &(elt->spec.makeTagSpec), kinds, userData);
 				else
-					elt->recurSpec.enter (node, &(elt->recurSpec), ctx, userData);
+					elt->spec.recurSpec.enter (node, &(elt->spec.recurSpec), ctx, userData);
 			}
 		}
 		xmlXPathFreeObject (object);

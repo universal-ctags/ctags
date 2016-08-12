@@ -107,7 +107,7 @@ typedef struct sTagXpathTable
 	union {
 		tagXpathMakeTagSpec makeTagSpec;
 		tagXpathRecurSpec   recurSpec;
-	};
+	} spec;
 	xmlXPathCompExpr* xpathCompiled;
 } tagXpathTable;
 
