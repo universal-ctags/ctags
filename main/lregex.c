@@ -413,6 +413,14 @@ static regexPattern *addCompiledTagPattern (const langType language, regex_t* co
 		ptrn->u.tag.kind->name    = kindName? eStrdup (kindName): NULL;
 		ptrn->u.tag.kind->description = description? eStrdup (description): NULL;
 	}
+	else if (ptrn->u.tag.kind->name && kindName && strcmp(ptrn->u.tag.kind->name, kindName))
+	{
+		/* When using a same kind letter for multiple regex patterns, the name of kind
+		   should be the same. */
+		error  (WARNING, "Don't reuse the kind letter `%c' in a language %s (old: \"%s\", new: \"%s\")",
+			ptrn->u.tag.kind->letter, getLanguageName (language),
+			ptrn->u.tag.kind->name, kindName);
+	}
 
 	return ptrn;
 }
