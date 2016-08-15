@@ -33,6 +33,10 @@ To build with Autotools, see `docs/autotools.rst` for more information.
 To build on Windows, see `docs/windows.rst` for more information.
 To build on OSX, see `docs/osx.rst` for more information.
 
+## Manual ##
+Man page (ctags.1) is generated only in Autotools based building process.
+In addition rst2man command is needed.
+
 ## Difference ##
 
 You may be interested in how universal-ctags is different from
