@@ -101,6 +101,7 @@ PARSER_HEADS = \
 	parsers/cxx/cxx_token.h \
 	parsers/cxx/cxx_token_chain.h \
 	\
+	parsers/iniconf.h \
 	parsers/make.h \
 	\
 	$(NULL)
@@ -145,6 +146,7 @@ PARSER_SRCS =				\
 	parsers/fortran.c		\
 	parsers/go.c			\
 	parsers/html.c			\
+	parsers/iniconf.c		\
 	parsers/jprop.c			\
 	parsers/jscript.c		\
 	parsers/json.c			\
@@ -161,6 +163,7 @@ PARSER_SRCS =				\
 	parsers/php.c			\
 	parsers/protobuf.c		\
 	parsers/python.c		\
+	parsers/pythonloggingconfig.c	\
 	parsers/r.c			\
 	parsers/rexx.c			\
 	parsers/rpmspec.c		\
@@ -172,6 +175,7 @@ PARSER_SRCS =				\
 	parsers/slang.c			\
 	parsers/sml.c			\
 	parsers/sql.c			\
+	parsers/systemdunit.c		\
 	parsers/tcl.c			\
 	parsers/tex.c			\
 	parsers/ttcn.c			\
@@ -180,6 +184,7 @@ PARSER_SRCS =				\
 	parsers/vim.c			\
 	parsers/windres.c		\
 	parsers/yacc.c			\
+	parsers/yumrepo.c		\
 	\
 	$(TRANSLATED_SRCS)		\
 	\

@@ -53,17 +53,20 @@ The following parsers have been added:
 * Pod *optlib*
 * PropertiyList(plist) *libxml*
 * Protobuf
+* PythonLoggingConfig
 * R
 * RelaxNG *libxml*
 * reStructuredText
 * RpmSpec
 * Rust
+* SystemdUnit
 * SystemVerilog
 * SVG *libxml*
 * TTCN
 * WindRes
 * XSLT v1.0 *libxml*
 * Yacc
+* YumRepo
 * Zephir
 * CoffeeScript *xcmd*
 * ctags option library *optlib*

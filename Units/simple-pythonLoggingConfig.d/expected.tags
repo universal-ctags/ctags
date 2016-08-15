@@ -1,0 +1,26 @@
+args	input.conf	/^args=(sys.stdout,)$/;"	key	language:Iniconf	section:handler_hand01
+class	input.conf	/^class=StreamHandler$/;"	key	language:Iniconf	section:handler_hand01
+class	input.conf	/^class=logging.Formatter$/;"	key	language:Iniconf	section:formatter_form01
+compiler.parser	input.conf	/^qualname=compiler.parser$/;"	qualname	language:PythonLoggingConfig	loggerSection:parser
+datefmt	input.conf	/^datefmt=$/;"	key	language:Iniconf	section:formatter_form01
+format	input.conf	/^format=F1 %(asctime)s %(levelname)s %(message)s$/;"	key	language:Iniconf	section:formatter_form01
+formatter	input.conf	/^formatter=form01$/;"	key	language:Iniconf	section:handler_hand01
+formatter_form01	input.conf	/^[formatter_form01]$/;"	section	language:Iniconf
+formatters	input.conf	/^[formatters]$/;"	section	language:Iniconf
+handler_hand01	input.conf	/^[handler_hand01]$/;"	section	language:Iniconf
+handlers	input.conf	/^[handlers]$/;"	section	language:Iniconf
+handlers	input.conf	/^handlers=hand01$/;"	key	language:Iniconf	section:logger_parser
+handlers	input.conf	/^handlers=hand01$/;"	key	language:Iniconf	section:logger_root
+keys	input.conf	/^keys=form01$/;"	key	language:Iniconf	section:formatters
+keys	input.conf	/^keys=hand01$/;"	key	language:Iniconf	section:handlers
+keys	input.conf	/^keys=root,parser$/;"	key	language:Iniconf	section:loggers
+level	input.conf	/^level=DEBUG$/;"	key	language:Iniconf	section:logger_parser
+level	input.conf	/^level=NOTSET$/;"	key	language:Iniconf	section:handler_hand01
+level	input.conf	/^level=NOTSET$/;"	key	language:Iniconf	section:logger_root
+logger_parser	input.conf	/^[logger_parser]$/;"	section	language:Iniconf
+logger_root	input.conf	/^[logger_root]$/;"	section	language:Iniconf
+loggers	input.conf	/^[loggers]$/;"	section	language:Iniconf
+parser	input.conf	/^[logger_parser]$/;"	loggerSection	language:PythonLoggingConfig
+propagate	input.conf	/^propagate=1$/;"	key	language:Iniconf	section:logger_parser
+qualname	input.conf	/^qualname=compiler.parser$/;"	key	language:Iniconf	section:logger_parser
+root	input.conf	/^[logger_root]$/;"	loggerSection	language:PythonLoggingConfig

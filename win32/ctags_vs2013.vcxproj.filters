@@ -141,6 +141,9 @@
     <ClCompile Include="..\parsers\python.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\pythonloggingconfig.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\r.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
@@ -168,6 +171,9 @@
     <ClCompile Include="..\parsers\sql.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
+    <ClCompile Include="..\parsers\systemdunit.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
     <ClCompile Include="..\parsers\tcl.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
@@ -190,6 +196,9 @@
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\yacc.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\yumrepo.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\php.c">
@@ -232,6 +241,9 @@
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\lcpp.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\iniconf.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\main\lregex.c">
@@ -510,6 +522,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
    <ClInclude Include="..\parsers\make.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\iniconf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -134,6 +134,7 @@
     <ClCompile Include="..\main\kind.c" />
     <ClCompile Include="..\main\lcpp.c" />
     <ClCompile Include="..\parsers\lisp.c" />
+    <ClCompile Include="..\parsers\iniconf.c" />
     <ClCompile Include="..\main\lregex.c" />
     <ClCompile Include="..\main\lxcmd.c" />
     <ClCompile Include="..\main\lxpath.c" />
@@ -211,6 +212,9 @@
     <ClCompile Include="..\main\dependency.c" />
     <ClCompile Include="..\optlib\pod.c" />
     <ClCompile Include="..\parsers\protobuf.c" />
+    <ClCompile Include="..\parsers\systemdunit.c" />
+    <ClCompile Include="..\parsers\yumrepo.c" />
+    <ClCompile Include="..\parsers\pythonloggingconfig.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\fnmatch\fnmatch.h" />
@@ -260,6 +264,7 @@
     <ClInclude Include="..\main\gcc-attr.h" />
     <ClInclude Include="..\main\mybool.h" />
     <ClInclude Include="..\parsers\make.h" />
+    <ClInclude Include="..\parsers\iniconf.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

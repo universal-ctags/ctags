@@ -55,6 +55,7 @@
 	GdbinitParser, \
 	GoParser, \
 	HtmlParser, \
+        IniconfParser, \
 	JavaParser, \
 	JavaPropertiesParser, \
 	JavaScriptParser, \
@@ -77,6 +78,7 @@
 	PodParser, \
 	ProtobufParser, \
 	PythonParser, \
+	PythonLoggingConfigParser, \
 	RParser, \
 	RexxParser, \
 	RpmSpecParser, \
@@ -88,6 +90,7 @@
 	SlangParser, \
 	SmlParser, \
 	SqlParser, \
+	SystemdUnitParser, \
 	TclParser, \
 	TexParser, \
 	TTCNParser, \
@@ -98,6 +101,7 @@
 	VimParser, \
 	WindResParser, \
 	YaccParser, \
+	YumRepoParser, \
 	ZephirParser
 
 #endif  /* CTAGS_MAIN_PARSERS_H */

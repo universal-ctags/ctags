@@ -1,6 +1,7 @@
 ctags: Notice: No options will be read from files or environment
 Reading command line arguments
 OPENING input.cst as CTagsSelfTest language file
+Initialize parser: CTagsSelfTest
 Unexpected character (0 < *c && *c < 0x20) included in a tagEntryInfo: one
 ofbroken	name
 File: input.cst, Line: 1, Lang: CTagsSelfTest, Kind: b
