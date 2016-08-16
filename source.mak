@@ -102,6 +102,7 @@ PARSER_HEADS = \
 	parsers/cxx/cxx_token_chain.h \
 	\
 	parsers/iniconf.h \
+	parsers/m4.h \
 	parsers/make.h \
 	\
 	$(NULL)
@@ -111,6 +112,7 @@ PARSER_SRCS =				\
 	parsers/ant.c			\
 	parsers/asm.c			\
 	parsers/asp.c			\
+	parsers/autoconf.c		\
 	parsers/automake.c		\
 	parsers/awk.c			\
 	parsers/basic.c			\
@@ -152,6 +154,7 @@ PARSER_SRCS =				\
 	parsers/json.c			\
 	parsers/lisp.c			\
 	parsers/lua.c			\
+	parsers/m4.c			\
 	parsers/make.c			\
 	parsers/matlab.c		\
 	parsers/myrddin.c		\

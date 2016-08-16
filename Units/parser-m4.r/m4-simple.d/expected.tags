@@ -1,51 +1,47 @@
-A0	input.m4	/^undefine(`A0')$/;"	u
-A4	input.m4	/^m4_undefine(`A4')$/;"	u
-B0	input.m4	/^undefine([B0])$/;"	u
-B4	input.m4	/^m4_undefine([B4])$/;"	u
-C0	input.m4	/^undefine(C0)$/;"	u
-I0	input.m4	/^include(`I0')$/;"	I
-I4	input.m4	/^m4_include(`I4')$/;"	I
+A0	input.m4	/^undefine(`A0')$/;"	d	role:undef
+A4	input.m4	/^m4_undefine(`A4')$/;"	d	role:undef
+B0	input.m4	/^undefine([B0])$/;"	d	role:undef
+B4	input.m4	/^m4_undefine([B4])$/;"	d	role:undef
+C0	input.m4	/^undefine(C0)$/;"	d	role:undef
+I0	input.m4	/^include(`I0')$/;"	I	role:included
+I4	input.m4	/^m4_include(`I4')$/;"	I	role:included
 INDENT_1	input.m4	/^  define(`INDENT_1',x)$/;"	d
 INDENT_2	input.m4	/^ define([INDENT_2],y)$/;"	d
 INDENT_3	input.m4	/^ define({INDENT_3},z)$/;"	d
-INDENT_4	input.m4	/^ define(<<INDENT_4>>,w)$/;"	d
 INDENT_5	input.m4	/^ define(INDENT_5, v)$/;"	d
 INDENT_6	input.m4	/^    m4_define(`INDENT_6',x)$/;"	d
 INDENT_7	input.m4	/^    m4_define([INDENT_7],y)$/;"	d
 INDENT_8	input.m4	/^    m4_define({INDENT_8},z)$/;"	d
-INDENT_9	input.m4	/^    m4_define(<<INDENT_9>>,w)$/;"	d
 INDENT_A	input.m4	/^    m4_define(INDENT_A,v)$/;"	d
-INDENT_B	input.m4	/^    undefine(`INDENT_B')$/;"	u
-INDENT_C	input.m4	/^    undefine([INDENT_C])$/;"	u
-INDENT_D	input.m4	/^    undefine(INDENT_D)$/;"	u
-INDENT_E	input.m4	/^    m4_undefine(`INDENT_E')$/;"	u
-INDENT_F	input.m4	/^    m4_undefine([INDENT_F])$/;"	u
-INDENT_G	input.m4	/^	include(`INDENT_G')$/;"	I
-INDENT_H	input.m4	/^	m4_include(`INDENT_H')$/;"	I
-INDENT_I	input.m4	/^	sinclude(`INDENT_I')$/;"	I
-INDENT_J	input.m4	/^	m4_sinclude(`INDENT_J')$/;"	I
-INDENT_K	input.m4	/^	include([INDENT_K])$/;"	I
-INDENT_L	input.m4	/^	m4_include([INDENT_L])$/;"	I
-INDENT_M	input.m4	/^	sinclude([INDENT_M])$/;"	I
-INDENT_N	input.m4	/^	m4_sinclude([INDENT_N])$/;"	I
-INDENT_O	input.m4	/^	include(INDENT_O)$/;"	I
-INDENT_P	input.m4	/^	m4_include(INDENT_P)$/;"	I
-INDENT_Q	input.m4	/^	sinclude(INDENT_Q)$/;"	I
-INDENT_R	input.m4	/^	m4_sinclude(INDENT_R)$/;"	I
-J0	input.m4	/^include([J0])$/;"	I
-J4	input.m4	/^m4_include([J4])$/;"	I
-K0	input.m4	/^include(K0)$/;"	I
-K4	input.m4	/^m4_include(K4)$/;"	I
-S0	input.m4	/^sinclude(`S0')$/;"	I
-S4	input.m4	/^m4_sinclude(`S4')$/;"	I
-T0	input.m4	/^sinclude([T0])$/;"	I
-T4	input.m4	/^m4_sinclude([T4])$/;"	I
-U0	input.m4	/^sinclude(U0)$/;"	I
-U4	input.m4	/^m4_sinclude(U4)$/;"	I
+INDENT_B	input.m4	/^    undefine(`INDENT_B')$/;"	d	role:undef
+INDENT_C	input.m4	/^    undefine([INDENT_C])$/;"	d	role:undef
+INDENT_D	input.m4	/^    undefine(INDENT_D)$/;"	d	role:undef
+INDENT_E	input.m4	/^    m4_undefine(`INDENT_E')$/;"	d	role:undef
+INDENT_F	input.m4	/^    m4_undefine([INDENT_F])$/;"	d	role:undef
+INDENT_G	input.m4	/^	include(`INDENT_G')$/;"	I	role:included
+INDENT_H	input.m4	/^	m4_include(`INDENT_H')$/;"	I	role:included
+INDENT_I	input.m4	/^	sinclude(`INDENT_I')$/;"	I	role:sincluded
+INDENT_J	input.m4	/^	m4_sinclude(`INDENT_J')$/;"	I	role:sincluded
+INDENT_K	input.m4	/^	include([INDENT_K])$/;"	I	role:included
+INDENT_L	input.m4	/^	m4_include([INDENT_L])$/;"	I	role:included
+INDENT_M	input.m4	/^	sinclude([INDENT_M])$/;"	I	role:sincluded
+INDENT_N	input.m4	/^	m4_sinclude([INDENT_N])$/;"	I	role:sincluded
+INDENT_O	input.m4	/^	include(INDENT_O)$/;"	I	role:included
+INDENT_P	input.m4	/^	m4_include(INDENT_P)$/;"	I	role:included
+INDENT_Q	input.m4	/^	sinclude(INDENT_Q)$/;"	I	role:sincluded
+INDENT_R	input.m4	/^	m4_sinclude(INDENT_R)$/;"	I	role:sincluded
+J0	input.m4	/^include([J0])$/;"	I	role:included
+J4	input.m4	/^m4_include([J4])$/;"	I	role:included
+K0	input.m4	/^include(K0)$/;"	I	role:included
+K4	input.m4	/^m4_include(K4)$/;"	I	role:included
+S0	input.m4	/^sinclude(`S0')$/;"	I	role:sincluded
+S4	input.m4	/^m4_sinclude(`S4')$/;"	I	role:sincluded
+T0	input.m4	/^sinclude([T0])$/;"	I	role:sincluded
+T4	input.m4	/^m4_sinclude([T4])$/;"	I	role:sincluded
+U0	input.m4	/^sinclude(U0)$/;"	I	role:sincluded
+U4	input.m4	/^m4_sinclude(U4)$/;"	I	role:sincluded
 V0	input.m4	/^define(V0, v)$/;"	d
 V4	input.m4	/^m4_define(V4,v)$/;"	d
-W0	input.m4	/^define(<<W0>>,w)$/;"	d
-W4	input.m4	/^m4_define(<<W4>>,w)$/;"	d
 X0	input.m4	/^define(`X0',x)$/;"	d
 X4	input.m4	/^m4_define(`X4',x)$/;"	d
 Y0	input.m4	/^define([Y0],y)$/;"	d

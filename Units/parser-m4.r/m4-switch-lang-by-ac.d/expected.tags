@@ -1,0 +1,5 @@
+x	input.m4	/^define(`x', 1)$/;"	d	line:1	language:M4	end:1
+PKG_PREREQ	input.m4	/^AC_DEFUN([PKG_PREREQ],$/;"	m	line:2	language:Autoconf	end:6
+y	input.m4	/^m4_define([y], 2)$/;"	d	line:7	language:M4	end:7
+z	input.m4	/^define(`z', 3)$/;"	d	line:9	language:M4	end:9
+input.m4	input.m4	1;"	F	line:1	language:Autoconf	end:10

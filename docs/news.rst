@@ -34,6 +34,7 @@ New parsers
 The following parsers have been added:
 
 * Ada
+* Autoconf
 * Automake
 * Clojure
 * CSS
@@ -48,6 +49,7 @@ The following parsers have been added:
 * JSON
 * man page *optlib*
 * Maven2 *libxml*
+* M4
 * ObjectiveC
 * Perl6
 * Pod *optlib*
@@ -70,7 +72,6 @@ The following parsers have been added:
 * Zephir
 * CoffeeScript *xcmd*
 * ctags option library *optlib*
-* m4 *optlib*
 * Myrddin
 
 See "Option library" for details on *optlib*.

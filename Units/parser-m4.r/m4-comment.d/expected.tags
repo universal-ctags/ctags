@@ -1,0 +1,2 @@
+CAPTUREME	input.m4	/^-   define(CAPTUREME,val0)$/;"	d	line:1	language:M4	end:1
+input.m4	input.m4	1;"	F	line:1	language:M4	end:3

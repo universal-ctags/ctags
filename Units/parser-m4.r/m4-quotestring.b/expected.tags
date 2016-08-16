@@ -1,0 +1,2 @@
+X	input.m4	/^define(<<X>>,1)$/;"	d
+X	input.m4	/^define([Y],1)$/;"	d

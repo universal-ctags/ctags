@@ -108,8 +108,11 @@
     <ClCompile Include="..\parsers\lua.c">
       <Filter>Source Files\Parsers</Filter>
     </ClCompile>
-    <ClCompile Include="..\optlib\m4.c">
-      <Filter>Source Files\Optlib</Filter>
+    <ClCompile Include="..\parsers\m4.c">
+      <Filter>Source Files\Parsers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\parsers\autoconf.c">
+      <Filter>Source Files\Parsers</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\make.c">
       <Filter>Source Files\Parsers</Filter>
@@ -525,6 +528,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
    <ClInclude Include="..\parsers\iniconf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\parsers\m4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

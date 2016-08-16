@@ -1,0 +1,47 @@
+AC_INIT([universal-ctags],[0.0.0])
+AH_TEMPLATE([TMPDIR],
+	[If you wish to change the directory in which temporary files are stored,
+	define this label to the directory desired.])
+AC_DEFUN([CHECK_HEADER_DEFINE], [
+	AC_MSG_CHECKING([if $1 is defined in $2])
+	AC_EGREP_CPP([$2:$1],
+[
+#include <$2>
+#ifdef $1
+const char *result_yes = "$2:$1";
+#endif
+], [
+	AC_MSG_RESULT(yes)
+	[$3]
+], [
+	AC_MSG_RESULT(no)
+	[$4]
+]) ])
+AC_ARG_WITH([ctags-libexecdir],
+	[AS_HELP_STRING([--with-ctags-libexecdir=DIR],
+		['universal-ctags'-specific program executables [LIBEXECDIR/ctags]])])
+AC_ARG_ENABLE(tmpdir,
+	[AS_HELP_STRING([--enable-tmpdir=DIR],
+		[default directory for temporary files [ARG=/tmp]])],
+	tmpdir_specified=yes)
+AC_SUBST([pkgsysconfdir])
+AC_SUBST([pkglibexecdir])
+AM_CONDITIONAL(INSTALL_LIB, [test "x$enable_readlib" = "xyes"])
+AM_CONDITIONAL(INSTALL_ETAGS, [test "x$enable_etags" = "xyes"])
+AM_CONDITIONAL(USE_READCMD, [test "x$enable_readcmd" = "xyes"])
+
+dnl AC_MSG_NOTICE(Change with $program_transform_name)
+ctags_name_executable=`echo ctags | sed "$program_transform_name"`
+AC_SUBST(ctags_name_executable)
+etags_name_executable=`echo etags | sed "$program_transform_name"`
+AC_SUBST(etags_name_executable)
+
+AC_DEFINE_UNQUOTED(ETAGS, "$etags_name_executable")
+
+# Check for host type
+case "$host" in
+  i?86-*-mingw* | x86_64-*-mingw*)
+	host_mingw=yes
+	AC_DEFINE(MSDOS_STYLE_PATH)
+	;;
+esac
