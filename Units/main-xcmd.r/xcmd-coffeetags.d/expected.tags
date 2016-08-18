@@ -1,7 +1,5 @@
 Animal	input.coffee	/^class Animal$/;"	c
 Horse	input.coffee	/^class Horse extends Animal$/;"	c
 Snake	input.coffee	/^class Snake extends Animal$/;"	c
-constructor	input.coffee	/^  constructor: (@name) ->$/;"	f	object:Animal
-move	input.coffee	/^  move: (meters) ->$/;"	f	object:Animal
-move	input.coffee	/^  move: ->$/;"	f	object:Horse
-move	input.coffee	/^  move: ->$/;"	f	object:Snake
+constructor	input.coffee	/^  constructor: (@name) ->$/;"	p	object:Animal
+move	input.coffee	/^  move: (meters) ->$/;"	p	object:Animal

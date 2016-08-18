@@ -1,9 +1,7 @@
 
-input.coffee,223
+input.coffee,177
 class AnimalAnimal3,40
 class Horse extends AnimalHorse14,217
 class Snake extends AnimalSnake9,140
   constructor: (@name) ->constructor4,53
   move: (meters) ->move6,80
-  move: ->move10,167
-  move: ->move15,244
