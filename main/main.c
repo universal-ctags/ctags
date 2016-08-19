@@ -433,7 +433,7 @@ static void runMainLoop (cookedArgs *args)
 	(* mainLoop) (args, mainData);
 }
 
-static void batchMakeTags (cookedArgs *args, void *user __unused__)
+static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 {
 	clock_t timeStamps [3];
 	boolean resize = FALSE;
@@ -542,7 +542,7 @@ static void sanitizeEnviron (void)
  *		Start up code
  */
 
-extern int main (int __unused__ argc, char **argv)
+extern int main (int argc CTAGS_ATTR_UNUSED, char **argv)
 {
 	cookedArgs *args;
 

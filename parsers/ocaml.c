@@ -21,16 +21,6 @@
 #include "routines.h"
 #include "vstring.h"
 
-/* To get rid of unused parameter warning in
- * -Wextra */
-#ifdef UNUSED
-#elif defined(__GNUC__)
-# define UNUSED(x) UNUSED_ ## x __attribute__((unused))
-#elif defined(__LCLINT__)
-# define UNUSED(x) /*@unused@*/ x
-#else
-# define UNUSED(x) x
-#endif
 #define OCAML_MAX_STACK_SIZE 256
 
 typedef enum {
@@ -744,7 +734,7 @@ static contextType popStrongContext ( void )
 /* Ignore everything till waitedToken and jump to comeAfter.
  * If the "end" keyword is encountered break, doesn't remember
  * why though. */
-static void tillToken (vString * const UNUSED (ident), ocaToken what)
+static void tillToken (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
 {
 	if (what == waitedToken)
 		toDoNext = comeAfter;
@@ -757,7 +747,7 @@ static void tillToken (vString * const UNUSED (ident), ocaToken what)
 
 /* Ignore everything till a waitedToken is seen, but
  * take care of balanced parentheses/bracket use */
-static void contextualTillToken (vString * const UNUSED (ident), ocaToken what)
+static void contextualTillToken (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
 {
 	static int parentheses = 0;
 	static int bracket = 0;
@@ -824,7 +814,7 @@ static void tillTokenOrTerminatingOrFallback (vString * const ident,
 
 /* ignore the next token in the stream and jump to the
  * given comeAfter state */
-static void ignoreToken (vString * const UNUSED (ident), ocaToken UNUSED (what))
+static void ignoreToken (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what CTAGS_ATTR_UNUSED)
 {
 	toDoNext = comeAfter;
 }
@@ -1419,7 +1409,7 @@ static void letParam (vString * const ident, ocaToken what)
 /* parse object ...
  * used to be sure the class definition is not a type
  * alias */
-static void classSpecif (vString * const UNUSED (ident), ocaToken what)
+static void classSpecif (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
 {
 	switch (what)
 	{
@@ -1614,7 +1604,7 @@ static void globalLet (vString * const ident, ocaToken what)
 
 /* Handle the "strong" top levels, all 'big' declarations
  * happen here */
-static void globalScope (vString * const UNUSED (ident), ocaToken what)
+static void globalScope (vString * const ident CTAGS_ATTR_UNUSED, ocaToken what)
 {
 	/* Do not touch, this is used only by the global scope
 	 * to handle an 'and' */

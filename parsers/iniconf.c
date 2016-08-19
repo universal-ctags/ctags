@@ -61,7 +61,7 @@ struct probeData {
 
 };
 
-static void mayRunProbe (void *key __unused__, void *value, void *user_data)
+static void mayRunProbe (void *key CTAGS_ATTR_UNUSED, void *value, void *user_data)
 {
 	struct probeData *probe_data = user_data;
 	struct iniconfParserClient *client = value;

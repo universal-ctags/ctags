@@ -377,13 +377,13 @@ extern void printFields (int language)
 	}
 }
 
-static const char *renderAsIs (vString* b __unused__, const char *s)
+static const char *renderAsIs (vString* b CTAGS_ATTR_UNUSED, const char *s)
 {
 	return s;
 }
 
 static const char *renderEscapedString (const char *s,
-					const tagEntryInfo *const tag __unused__,
+					const tagEntryInfo *const tag CTAGS_ATTR_UNUSED,
 					vString* b)
 {
 	vStringCatSWithEscaping (b, s);
@@ -421,12 +421,12 @@ static const char *renderEscapedName (const char* s,
 	return renderEscapedString (s, tag, b);
 }
 
-static const char *renderFieldName (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
+static const char *renderFieldName (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b)
 {
 	return renderEscapedName (tag->name, tag, b);
 }
 
-static const char *renderFieldInput (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
+static const char *renderFieldInput (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b)
 {
 	const char *f = tag->inputFileName;
 
@@ -435,13 +435,13 @@ static const char *renderFieldInput (const tagEntryInfo *const tag, const char *
 	return renderEscapedString (f, tag, b);
 }
 
-static const char *renderFieldSignature (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
+static const char *renderFieldSignature (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b)
 {
 	return renderEscapedString (WITH_DEFUALT_VALUE (tag->extensionFields.signature),
 				    tag, b);
 }
 
-static const char *renderFieldScope (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
+static const char *renderFieldScope (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b)
 {
 	const char* scope;
 
@@ -449,13 +449,13 @@ static const char *renderFieldScope (const tagEntryInfo *const tag, const char *
 	return scope? renderEscapedName (scope, tag, b): NULL;
 }
 
-static const char *renderFieldInherits (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
+static const char *renderFieldInherits (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b)
 {
 	return renderEscapedString (WITH_DEFUALT_VALUE (tag->extensionFields.inheritance),
 				    tag, b);
 }
 
-static const char *renderFieldTyperef (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
+static const char *renderFieldTyperef (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b)
 {
 	return renderEscapedName (WITH_DEFUALT_VALUE (tag->extensionFields.typeRef [1]), tag, b);
 }
@@ -516,13 +516,13 @@ static const char* renderCompactInputLine (vString *b,  const char *const line)
 	return vStringValue (b);
 }
 
-static const char *renderFieldKindName (const tagEntryInfo *const tag, const char *value __unused__, vString* b)
+static const char *renderFieldKindName (const tagEntryInfo *const tag, const char *value CTAGS_ATTR_UNUSED, vString* b)
 {
 	return renderAsIs (b, tag->kind->name);
 }
 
 static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
-						const char *value __unused__,
+						const char *value CTAGS_ATTR_UNUSED,
 						 vString* b)
 {
 	const char *line;
@@ -546,7 +546,7 @@ static const char *renderFieldCompactInputLine (const tagEntryInfo *const tag,
 }
 
 static const char *renderFieldLineNumber (const tagEntryInfo *const tag,
-					  const char *value __unused__,
+					  const char *value CTAGS_ATTR_UNUSED,
 					  vString* b)
 {
 	long ln = tag->lineNumber;
@@ -560,7 +560,7 @@ static const char *renderFieldLineNumber (const tagEntryInfo *const tag,
 }
 
 static const char *renderFieldRole (const tagEntryInfo *const tag,
-				    const char *value __unused__,
+				    const char *value CTAGS_ATTR_UNUSED,
 				    vString* b)
 {
 	int rindex = tag->extensionFields.roleIndex;
@@ -579,7 +579,7 @@ static const char *renderFieldRole (const tagEntryInfo *const tag,
 }
 
 static const char *renderFieldLanguage (const tagEntryInfo *const tag,
-					const char *value __unused__,
+					const char *value CTAGS_ATTR_UNUSED,
 					vString* b)
 {
 	const char *l = tag->language;
@@ -598,7 +598,7 @@ static const char *renderFieldAccess (const tagEntryInfo *const tag,
 }
 
 static const char *renderFieldKindLetter (const tagEntryInfo *const tag,
-					  const char *value __unused__,
+					  const char *value CTAGS_ATTR_UNUSED,
 					  vString* b)
 {
 	static char c[2] = { [1] = '\0' };
@@ -609,21 +609,21 @@ static const char *renderFieldKindLetter (const tagEntryInfo *const tag,
 }
 
 static const char *renderFieldImplementation (const tagEntryInfo *const tag,
-					      const char *value __unused__,
+					      const char *value CTAGS_ATTR_UNUSED,
 					      vString* b)
 {
 	return renderAsIs (b, WITH_DEFUALT_VALUE (tag->extensionFields.implementation));
 }
 
 static const char *renderFieldFile (const tagEntryInfo *const tag,
-				    const char *value __unused__,
+				    const char *value CTAGS_ATTR_UNUSED,
 				    vString* b)
 {
 	return renderAsIs (b, tag->isFileScope? "file": "-");
 }
 
 static const char *renderFieldPattern (const tagEntryInfo *const tag,
-				       const char *value __unused__,
+				       const char *value CTAGS_ATTR_UNUSED,
 				       vString* b)
 {
 	char* tmp = makePatternString (tag);
@@ -633,7 +633,7 @@ static const char *renderFieldPattern (const tagEntryInfo *const tag,
 }
 
 static const char *renderFieldRefMarker (const tagEntryInfo *const tag,
-					 const char *value __unused__,
+					 const char *value CTAGS_ATTR_UNUSED,
 					 vString* b)
 {
 	static char c[2] = { [1] = '\0' };
@@ -644,7 +644,7 @@ static const char *renderFieldRefMarker (const tagEntryInfo *const tag,
 }
 
 static const char *renderFieldExtra (const tagEntryInfo *const tag,
-				     const char *value __unused__,
+				     const char *value CTAGS_ATTR_UNUSED,
 				     vString* b)
 {
 	int i;

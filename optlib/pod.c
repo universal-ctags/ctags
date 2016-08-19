@@ -6,7 +6,7 @@
 #include "routines.h"
 
 
-static void initializePodParser (const langType language __unused__)
+static void initializePodParser (const langType language CTAGS_ATTR_UNUSED)
 {
 }
 

@@ -544,7 +544,7 @@ static void initialize (const langType language)
 	lastSubSubS = vStringNew();
 }
 
-static void finalize (const langType language __unused__,
+static void finalize (const langType language CTAGS_ATTR_UNUSED,
 		      boolean initialized)
 {
 	if (initialized)

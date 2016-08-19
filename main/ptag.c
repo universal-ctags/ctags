@@ -29,7 +29,7 @@ static boolean writePseudoTagForXcmdData (ptagDesc *desc,
 			       pdata->fileName,  pdata->pattern, pdata->language);
 }
 
-static boolean ptagMakeFormat (ptagDesc *desc, void *data __unused__)
+static boolean ptagMakeFormat (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 {
 	char format [11];
 	const char *formatComment = "unknown format";
@@ -43,7 +43,7 @@ static boolean ptagMakeFormat (ptagDesc *desc, void *data __unused__)
 	return writePseudoTag (desc, format, formatComment, NULL);
 }
 
-static boolean ptagMakeHowSorted (ptagDesc *desc, void *data __unused__)
+static boolean ptagMakeHowSorted (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 {
 	return writePseudoTag (desc,
 			       Option.sorted == SO_FOLDSORTED ? "2" :
@@ -85,14 +85,14 @@ static boolean ptagMakeProgURL (ptagDesc *desc, void *data)
 				       PROGRAM_URL, "official site", NULL);
 }
 
-static boolean ptagMakeProgVersion (ptagDesc *desc, void *data __unused__)
+static boolean ptagMakeProgVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 {
 	const char* repoinfo = ctags_repoinfo? ctags_repoinfo: "";
 	return writePseudoTag (desc, PROGRAM_VERSION, repoinfo, NULL);
 }
 
 #ifdef HAVE_ICONV
-static boolean ptagMakeFileEncoding (ptagDesc *desc, void *data __unused__)
+static boolean ptagMakeFileEncoding (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 {
 	if (! Option.outputEncoding)
 		return FALSE;

@@ -143,8 +143,8 @@ int mio_ungetc (MIO *mio, int ch);
 int mio_putc (MIO *mio, int c);
 int mio_puts (MIO *mio, const char *s);
 
-int mio_vprintf (MIO *mio, const char *format, va_list ap) __printf__ (2, 0);
-int mio_printf (MIO *mio, const char *format, ...) __printf__ (2, 3);
+int mio_vprintf (MIO *mio, const char *format, va_list ap) CTAGS_ATTR_PRINTF (2, 0);
+int mio_printf (MIO *mio, const char *format, ...) CTAGS_ATTR_PRINTF (2, 3);
 
 void mio_clearerr (MIO *mio);
 int mio_eof (MIO *mio);

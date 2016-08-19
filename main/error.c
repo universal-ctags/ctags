@@ -27,7 +27,7 @@ extern void setErrorPrinter (errorPrintFunc printer, void *data)
 
 extern boolean stderrDefaultErrorPrinter (const errorSelection selection,
 					  const char *const format,
-					  va_list ap, void *data __unused__)
+					  va_list ap, void *data CTAGS_ATTR_UNUSED)
 {
 	fprintf (stderr, "%s: %s", getExecutableName (),
 		 selected (selection, WARNING) ? "Warning: " : "");

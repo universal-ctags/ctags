@@ -524,7 +524,7 @@ static boolean isPathSeparator (const int c)
 
 #if ! defined (HAVE_STAT_ST_INO)
 
-static void canonicalizePath (char *const path __unused__)
+static void canonicalizePath (char *const path CTAGS_ATTR_UNUSED)
 {
 # if defined (MSDOS_STYLE_PATH)
 	char *p;
