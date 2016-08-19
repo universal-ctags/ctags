@@ -711,7 +711,7 @@ static void setEtagsMode (void)
 	Option.sorted = SO_UNSORTED;
 	Option.lineDirectives = FALSE;
 	Option.tagRelative = TRUE;
-	setTagWriter (writeEtagsEntry, beginEtagsFile, endEtagsFile, NULL, FALSE);
+	setTagWriter (&etagsWriter);
 }
 
 extern void testEtagsInvocation (void)
@@ -734,14 +734,14 @@ extern void testEtagsInvocation (void)
 static void setXrefMode (void)
 {
 	Option.xref = TRUE;
-	setTagWriter (writeXrefEntry, NULL, NULL, NULL, TRUE);
+	setTagWriter (&xrefWriter);
 }
 
 #ifdef HAVE_JANSSON
 static void setJsonMode (void)
 {
 	enablePtag (PTAG_JSON_OUTPUT_VERSION, TRUE);
-	setTagWriter (writeJsonEntry, NULL, NULL, writeJsonPtagEntry, TRUE);
+	setTagWriter (&jsonWriter);
 }
 #endif
 
@@ -3305,7 +3305,7 @@ extern void initOptions (void)
 	processExcludeOption (NULL, "*.class");
 
 	processExcludeOption (NULL, "*.pyc");
-	processExcludeOption (NULL, "*.pyo");	
+	processExcludeOption (NULL, "*.pyo");
 }
 
 extern void freeOptionResources (void)
