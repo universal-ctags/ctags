@@ -135,6 +135,13 @@ extern unsigned long getInputLineNumber (void)
 	return File.input.lineNumber;
 }
 
+extern int getInputLineOffset (void)
+{
+	unsigned char *base = (unsigned char *) vStringValue (File.line);
+	int ret = File.currentLine - base - File.ungetchIdx;
+	return ret >= 0 ? ret : 0;
+}
+
 extern const char *getInputFileName (void)
 {
 	return vStringValue (File.input.name);
