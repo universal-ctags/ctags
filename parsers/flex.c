@@ -1,6 +1,4 @@
 /*
- *	 $Id: flex.c 666 2008-05-15 17:47:31Z dfishburn $
- *
  *	 Copyright (c) 2008, David Fishburn
  *
  *	 This source code is released for free distribution under the terms of the

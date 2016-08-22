@@ -88,14 +88,14 @@ extern stringList* stringListNewFromArgv (const char* const* const argv)
 extern stringList* stringListNewFromFile (const char* const fileName)
 {
 	stringList* result = NULL;
-	MIO* const fp = mio_new_file (fileName, "r");
-	if (fp != NULL)
+	MIO* const mio = mio_new_file (fileName, "r");
+	if (mio != NULL)
 	{
 		result = stringListNew ();
-		while (! mio_eof (fp))
+		while (! mio_eof (mio))
 		{
 			vString* const str = vStringNew ();
-			readLineRaw (str, fp);
+			readLineRaw (str, mio);
 			vStringStripTrailing (str);
 			if (vStringLength (str) > 0)
 				stringListAdd (result, str);

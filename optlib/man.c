@@ -6,7 +6,7 @@
 #include "routines.h"
 
 
-static void initializeManParser (const langType language __unused__)
+static void initializeManParser (const langType language CTAGS_ATTR_UNUSED)
 {
 }
 

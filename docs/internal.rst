@@ -167,9 +167,9 @@ is a marker of C code area.
 
 .. code-block:: c
 
-    static void enter_c_prologue (const char *line __unused__,
-				 const regexMatch *matches __unused__,
-				 unsigned int count __unused__,
+    static void enter_c_prologue (const char *line CTAGS_ATTR_UNUSED,
+				 const regexMatch *matches CTAGS_ATTR_UNUSED,
+				 unsigned int count CTAGS_ATTR_UNUSED,
 				 void *data)
     {
 	   struct cStart *cstart = data;
@@ -190,9 +190,9 @@ the end marker of C code area is found in the current input text stream.
 
 .. code-block:: c
 
-    static void leave_c_prologue (const char *line __unused__,
-				 const regexMatch *matches __unused__,
-				 unsigned int count __unused__,
+    static void leave_c_prologue (const char *line CTAGS_ATTR_UNUSED,
+				 const regexMatch *matches CTAGS_ATTR_UNUSED,
+				 unsigned int count CTAGS_ATTR_UNUSED,
 				 void *data)
     {
 	   struct cStart *cstart = data;

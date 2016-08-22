@@ -168,7 +168,7 @@ static int writePatternEntry (MIO *mio, const tagEntryInfo *const tag)
 	return makePatternStringCommon (tag, file_putc, file_puts, mio);
 }
 
-extern int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__)
+extern int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)
 {
 	int length = mio_printf (mio, "%s\t%s\t",
 			      escapeFieldValue (tag, FIELD_NAME),
@@ -195,7 +195,7 @@ extern int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data
 extern int writeCtagsPtagEntry (MIO * mio, const ptagDesc *desc,
 				const char *const fileName,
 				const char *const pattern,
-				const char *const parserName, void *data __unused__)
+				const char *const parserName, void *data CTAGS_ATTR_UNUSED)
 {
 	return parserName
 

@@ -251,13 +251,13 @@ static boolean parseTagRegex (
 }
 
 
-static void pre_ptrn_flag_exclusive_short (char c __unused__, void* data)
+static void pre_ptrn_flag_exclusive_short (char c CTAGS_ATTR_UNUSED, void* data)
 {
 	boolean *exclusive = data;
 	*exclusive = TRUE;
 }
 
-static void pre_ptrn_flag_exclusive_long (const char* const s __unused__, const char* const unused __unused__, void* data)
+static void pre_ptrn_flag_exclusive_long (const char* const s CTAGS_ATTR_UNUSED, const char* const unused CTAGS_ATTR_UNUSED, void* data)
 {
 	pre_ptrn_flag_exclusive_short ('x', data);
 }
@@ -267,7 +267,7 @@ static flagDefinition prePtrnFlagDef[] = {
 	  NULL, "skip testing the other patterns if a line is matched to this pattern"},
 };
 
-static void scope_ptrn_flag_eval (const char* const f  __unused__,
+static void scope_ptrn_flag_eval (const char* const f  CTAGS_ATTR_UNUSED,
 				  const char* const v, void* data)
 {
 	unsigned long *bfields = data;
@@ -286,8 +286,8 @@ static void scope_ptrn_flag_eval (const char* const f  __unused__,
 		error (FATAL, "Unexpected value for scope flag in regex definition: scope=%s", v);
 }
 
-static void placeholder_ptrn_flag_eval (const char* const f  __unused__,
-				     const char* const v  __unused__, void* data)
+static void placeholder_ptrn_flag_eval (const char* const f  CTAGS_ATTR_UNUSED,
+				     const char* const v  CTAGS_ATTR_UNUSED, void* data)
 {
 	unsigned long *bfields = data;
 	*bfields |= SCOPE_PLACEHOLDER;
@@ -442,34 +442,34 @@ static void addCompiledCallbackPattern (const langType language, regex_t* const 
 }
 
 
-static void regex_flag_basic_short (char c __unused__, void* data)
+static void regex_flag_basic_short (char c CTAGS_ATTR_UNUSED, void* data)
 {
 	int* cflags = data;
 	*cflags &= ~REG_EXTENDED;
 }
-static void regex_flag_basic_long (const char* const s __unused__, const char* const unused __unused__, void* data)
+static void regex_flag_basic_long (const char* const s CTAGS_ATTR_UNUSED, const char* const unused CTAGS_ATTR_UNUSED, void* data)
 {
 	regex_flag_basic_short ('b', data);
 }
 
-static void regex_flag_extend_short (char c __unused__, void* data)
+static void regex_flag_extend_short (char c CTAGS_ATTR_UNUSED, void* data)
 {
 	int* cflags = data;
 	*cflags |= REG_EXTENDED;
 }
 
-static void regex_flag_extend_long (const char* const c __unused__, const char* const unused __unused__, void* data)
+static void regex_flag_extend_long (const char* const c CTAGS_ATTR_UNUSED, const char* const unused CTAGS_ATTR_UNUSED, void* data)
 {
 	regex_flag_extend_short('e', data);
 }
 
-static void regex_flag_icase_short (char c __unused__, void* data)
+static void regex_flag_icase_short (char c CTAGS_ATTR_UNUSED, void* data)
 {
 	int* cflags = data;
 	*cflags |= REG_ICASE;
 }
 
-static void regex_flag_icase_long (const char* s __unused__, const char* const unused __unused__, void* data)
+static void regex_flag_icase_long (const char* s CTAGS_ATTR_UNUSED, const char* const unused CTAGS_ATTR_UNUSED, void* data)
 {
 	regex_flag_icase_short ('i', data);
 }
@@ -563,15 +563,15 @@ static void processLanguageRegex (const langType language,
 	else
 	{
 		const char* regexfile = parameter + 1;
-		MIO* const fp = mio_new_file (regexfile, "r");
-		if (fp == NULL)
+		MIO* const mio = mio_new_file (regexfile, "r");
+		if (mio == NULL)
 			error (WARNING | PERROR, "%s", regexfile);
 		else
 		{
 			vString* const regex = vStringNew ();
-			while (readLineRaw (regex, fp))
+			while (readLineRaw (regex, mio))
 				addLanguageRegex (language, vStringValue (regex));
-			mio_free (fp);
+			mio_free (mio);
 			vStringDelete (regex);
 		}
 	}
@@ -810,20 +810,20 @@ static regexPattern *addTagRegexInternal (const langType language,
 	return rptr;
 }
 
-extern void addTagRegex (const langType language __unused__,
-			 const char* const regex __unused__,
-			 const char* const name __unused__,
-			 const char* const kinds __unused__,
-			 const char* const flags __unused__,
+extern void addTagRegex (const langType language CTAGS_ATTR_UNUSED,
+			 const char* const regex CTAGS_ATTR_UNUSED,
+			 const char* const name CTAGS_ATTR_UNUSED,
+			 const char* const kinds CTAGS_ATTR_UNUSED,
+			 const char* const flags CTAGS_ATTR_UNUSED,
 			 boolean *disabled)
 {
 	addTagRegexInternal (language, regex, name, kinds, flags, disabled);
 }
 
-extern void addCallbackRegex (const langType language __unused__,
-			      const char* const regex __unused__,
-			      const char* const flags __unused__,
-			      const regexCallback callback __unused__,
+extern void addCallbackRegex (const langType language CTAGS_ATTR_UNUSED,
+			      const char* const regex CTAGS_ATTR_UNUSED,
+			      const char* const flags CTAGS_ATTR_UNUSED,
+			      const regexCallback callback CTAGS_ATTR_UNUSED,
 			      boolean *disabled,
 			      void * userData)
 {
@@ -838,7 +838,7 @@ extern void addCallbackRegex (const langType language __unused__,
 }
 
 extern void addLanguageRegex (
-		const langType language __unused__, const char* const regex __unused__)
+		const langType language CTAGS_ATTR_UNUSED, const char* const regex CTAGS_ATTR_UNUSED)
 {
 	if (regexAvailable)
 	{
@@ -858,7 +858,7 @@ extern void addLanguageRegex (
 */
 
 extern boolean processRegexOption (const char *const option,
-				   const char *const parameter __unused__)
+				   const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	langType language;
 

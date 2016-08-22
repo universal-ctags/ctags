@@ -79,7 +79,7 @@ static void makeMemberTag (
 	if (ErlangKinds [kind].enabled  &&  vStringLength (identifier) > 0)
 	{
 		tagEntryInfo tag;
-		initTagEntry (&tag, vStringValue (identifier), & (ErlangKinds[kind]));
+		initTagEntry (&tag, vStringValue (identifier), &(ErlangKinds[kind]));
 
 		if (module != NULL  &&  vStringLength (module) > 0)
 		{

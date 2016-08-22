@@ -1004,7 +1004,7 @@ extern boolean isIncludeFile (const char *const fileName)
  */
 
  static void processConfigFilenameOption (
-		const char *const option __unused__, const char *const parameter)
+		const char *const option CTAGS_ATTR_UNUSED, const char *const parameter)
  {
 	freeString (&Option.configFilename);
 	Option.configFilename = stringCopy (parameter);
@@ -1026,7 +1026,7 @@ static void processEtagsInclude (
 }
 
 static void processExcludeOption (
-		const char *const option __unused__, const char *const parameter)
+		const char *const option CTAGS_ATTR_UNUSED, const char *const parameter)
 {
 	const char *const fileName = parameter + 1;
 	if (parameter [0] == '\0')
@@ -1251,7 +1251,7 @@ static void processFieldsOption (
 }
 
 static void processFilterTerminatorOption (
-		const char *const option __unused__, const char *const parameter)
+		const char *const option CTAGS_ATTR_UNUSED, const char *const parameter)
 {
 	freeString (&Option.filterTerminator);
 	Option.filterTerminator = stringCopy (parameter);
@@ -1328,8 +1328,8 @@ static void printFeatureList (void)
 }
 
 
-static void processListFeaturesOption(const char *const option __unused__,
-				      const char *const parameter __unused__)
+static void processListFeaturesOption(const char *const option CTAGS_ATTR_UNUSED,
+				      const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	int i;
 
@@ -1341,7 +1341,7 @@ static void processListFeaturesOption(const char *const option __unused__,
 	exit (0);
 }
 
-static void processListFieldsOption(const char *const option __unused__,
+static void processListFieldsOption(const char *const option CTAGS_ATTR_UNUSED,
 				    const char *const parameter)
 {
 	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
@@ -1385,8 +1385,8 @@ static void printProgramIdentification (void)
 }
 
 static void processHelpOption (
-		const char *const option __unused__,
-		const char *const parameter __unused__)
+		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	printProgramIdentification ();
 	putchar ('\n');
@@ -1703,8 +1703,8 @@ extern boolean processMapOption (
 }
 
 static void processLicenseOption (
-		const char *const option __unused__,
-		const char *const parameter __unused__)
+		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	printProgramIdentification ();
 	puts ("");
@@ -1730,7 +1730,7 @@ static void processListAliasesOption (
 }
 
 static void processListExtraOption (
-		const char *const option __unused__, const char *const parameter __unused__)
+		const char *const option CTAGS_ATTR_UNUSED, const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	printXtags ();
 	exit (0);
@@ -1770,7 +1770,7 @@ static void processListKindsOption (
 	exit (0);
 }
 
-static void processListMapsOptionForType (const char *const __unused__ option,
+static void processListMapsOptionForType (const char *const option CTAGS_ATTR_UNUSED,
 					  const char *const  parameter,
 					  langmapType type)
 {
@@ -1800,23 +1800,23 @@ static void processListPatternsOption (const char *const option,
 }
 
 static void processListMapsOption (
-		const char *const __unused__ option,
-		const char *const __unused__ parameter)
+		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	processListMapsOptionForType (option, parameter, LMAP_ALL);
 }
 
 static void processListLanguagesOption (
-		const char *const option __unused__,
-		const char *const parameter __unused__)
+		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	printLanguageList ();
 	exit (0);
 }
 
 static void processListPseudoTagsOptions (
-		const char *const option __unused__,
-		const char *const parameter __unused__)
+		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	int i;
 	for (i = 0; i < PTAG_COUNT; i++)
@@ -1825,14 +1825,14 @@ static void processListPseudoTagsOptions (
 }
 
 static void processListRegexFlagsOptions (
-		const char *const option __unused__,
-		const char *const parameter __unused__)
+		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	printRegexFlags ();
 	exit (0);
 }
 
-static void processListRolesOptions (const char *const option __unused__,
+static void processListRolesOptions (const char *const option CTAGS_ATTR_UNUSED,
 				     const char *const parameter)
 {
 	const char* sep;
@@ -1999,7 +1999,7 @@ static void processOptionFile (
 		vStringDelete (vpath);
 }
 
-static void processOutputFormat (const char *const option __unused__,
+static void processOutputFormat (const char *const option CTAGS_ATTR_UNUSED,
 				 const char *const parameter)
 {
 	if (parameter [0] == '\0')
@@ -2019,7 +2019,7 @@ static void processOutputFormat (const char *const option __unused__,
 		error (FATAL, "unknown output format name supplied for \"%s=%s\"", option, parameter);
 }
 
-static void processPseudoTags (const char *const option __unused__,
+static void processPseudoTags (const char *const option CTAGS_ATTR_UNUSED,
 			       const char *const parameter)
 {
 	const char *p = parameter;
@@ -2229,7 +2229,7 @@ static void processEchoOption (const char *const option, const char *const param
 	notice ("%s", parameter);
 }
 
-static void processForceQuitOption (const char *const option __unused__,
+static void processForceQuitOption (const char *const option CTAGS_ATTR_UNUSED,
 				    const char *const parameter)
 {
 	int s;
@@ -2239,14 +2239,14 @@ static void processForceQuitOption (const char *const option __unused__,
 }
 
 static void processVersionOption (
-		const char *const option __unused__,
-		const char *const parameter __unused__)
+		const char *const option CTAGS_ATTR_UNUSED,
+		const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	printProgramIdentification ();
 	exit (0);
 }
 
-static void processXformatOption (const char *const option __unused__,
+static void processXformatOption (const char *const option CTAGS_ATTR_UNUSED,
 				  const char *const parameter)
 {
 	if (Option.customXfmt)

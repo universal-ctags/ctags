@@ -14,7 +14,7 @@
 #include "mio.h"
 #include "options.h"
 
-extern int writeXrefEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__)
+extern int writeXrefEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)
 {
 	int length;
 	static fmtElement *fmt1;

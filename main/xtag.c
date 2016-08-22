@@ -20,7 +20,7 @@
 #include <string.h>
 
 
-static boolean isPseudoTagsEnabled (xtagDesc *pdesc __unused__)
+static boolean isPseudoTagsEnabled (xtagDesc *pdesc CTAGS_ATTR_UNUSED)
 {
 	return ! isDestinationStdout ();
 }

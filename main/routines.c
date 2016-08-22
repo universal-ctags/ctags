@@ -524,7 +524,7 @@ static boolean isPathSeparator (const int c)
 
 #if ! defined (HAVE_STAT_ST_INO)
 
-static void canonicalizePath (char *const path __unused__)
+static void canonicalizePath (char *const path CTAGS_ATTR_UNUSED)
 {
 # if defined (MSDOS_STYLE_PATH)
 	char *p;
@@ -686,15 +686,15 @@ extern char *combinePathAndFile (
  */
 static char* concat (const char *s1, const char *s2, const char *s3)
 {
-  int len1 = strlen (s1), len2 = strlen (s2), len3 = strlen (s3);
-  char *result = xMalloc (len1 + len2 + len3 + 1, char);
+	int len1 = strlen (s1), len2 = strlen (s2), len3 = strlen (s3);
+	char *result = xMalloc (len1 + len2 + len3 + 1, char);
 
-  strcpy (result, s1);
-  strcpy (result + len1, s2);
-  strcpy (result + len1 + len2, s3);
-  result [len1 + len2 + len3] = '\0';
+	strcpy (result, s1);
+	strcpy (result + len1, s2);
+	strcpy (result + len1 + len2, s3);
+	result [len1 + len2 + len3] = '\0';
 
-  return result;
+	return result;
 }
 
 /* Return a newly allocated string containing the absolute file name of FILE

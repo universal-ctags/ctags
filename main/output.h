@@ -36,18 +36,18 @@ extern int writeEtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data
 extern void *beginEtagsFile (MIO * mio);
 extern void  endEtagsFile   (MIO * mio, const char* filename, void *data);
 
-extern int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data __unused__);
-extern int writeXrefEntry  (MIO * mio, const tagEntryInfo *const tag, void *data __unused__);
-extern int writeJsonEntry  (MIO * mio, const tagEntryInfo *const tag, void *data __unused__);
+extern int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED);
+extern int writeXrefEntry  (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED);
+extern int writeJsonEntry  (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED);
 
 extern int writeCtagsPtagEntry (MIO * mio, const ptagDesc *desc,
 				const char *const fileName,
 				const char *const pattern,
-				const char *const parserName, void *data __unused__);
+				const char *const parserName, void *data CTAGS_ATTR_UNUSED);
 extern int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
 				const char *const fileName,
 				const char *const pattern,
-				const char *const parserName, void *data __unused__);
+				const char *const parserName, void *data CTAGS_ATTR_UNUSED);
 
 extern int makePatternStringCommon (const tagEntryInfo *const tag,
 				    int putc_func (char , void *),
@@ -57,6 +57,6 @@ extern void truncateTagLine (char *const line, const char *const token,
 			     const boolean discardNewline);
 extern void abort_if_ferror(MIO *const fp);
 
-extern boolean ptagMakeJsonOutputVersion (ptagDesc *desc, void *data __unused__);
+extern boolean ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED);
 
 #endif 

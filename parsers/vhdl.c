@@ -1,6 +1,4 @@
 /*
-*   $Id: vhdl.c 652 2008-04-18 03:51:47Z elliotth $
-*
 *   Copyright (c) 2008, Nicolas Vincent
 *
 *   This source code is released for free distribution under the terms of the

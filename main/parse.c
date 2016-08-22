@@ -340,7 +340,7 @@ found:
 	return result;
 }
 
-static parserCandidate* parserCandidateNew(unsigned int count __unused__)
+static parserCandidate* parserCandidateNew(unsigned int count CTAGS_ATTR_UNUSED)
 {
 	parserCandidate* candidates;
 	unsigned int i;
@@ -1568,7 +1568,7 @@ static flagDefinition LangDefFlagDef [] = {
 };
 
 extern void processLanguageDefineOption (
-		const char *const option, const char *const parameter __unused__)
+		const char *const option, const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	if (parameter [0] == '\0')
 		error (WARNING, "No language specified for \"%s\" option", option);

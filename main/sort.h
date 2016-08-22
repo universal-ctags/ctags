@@ -21,17 +21,17 @@
 /*
 *   FUNCTION PROTOTYPES
 */
-extern void catFile (MIO *fp);
+extern void catFile (MIO *mio);
 
 #ifdef EXTERNAL_SORT
 extern void externalSortTags (const boolean toStdout, MIO *tagFile);
 #else
 extern void internalSortTags (const boolean toStdout,
-			      MIO *fp,
+			      MIO *mio,
 			      size_t numTags);
 #endif
 
-/* fp is closed in this function. */
-extern void failedSort (MIO *const fp, const char* msg);
+/* mio is closed in this function. */
+extern void failedSort (MIO *const mio, const char* msg);
 
 #endif  /* CTAGS_MAIN_SORT_H */

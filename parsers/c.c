@@ -795,7 +795,7 @@ static const char *keywordString (const keywordId keyword)
 	return name;
 }
 
-static void __unused__ pt (tokenInfo *const token)
+static void CTAGS_ATTR_UNUSED pt (tokenInfo *const token)
 {
 	if (isType (token, TOKEN_NAME))
 		printf ("type: %-12s: %-13s   line: %lu\n",
@@ -810,7 +810,7 @@ static void __unused__ pt (tokenInfo *const token)
 			tokenString (token->type), token->lineNumber);
 }
 
-static void __unused__ ps (statementInfo *const st)
+static void CTAGS_ATTR_UNUSED ps (statementInfo *const st)
 {
 #define P	"[%-7u]"
 	static unsigned int id = 0;

@@ -1,6 +1,4 @@
 /*
- *	 $Id: tex.c 666 2008-05-15 17:47:31Z dfishburn $
- *
  *	 Copyright (c) 2008, David Fishburn
  *	 Copyright (c) 2012, Jan Larres
  *
@@ -546,7 +544,7 @@ static void initialize (const langType language)
 	lastSubSubS = vStringNew();
 }
 
-static void finalize (const langType language __unused__,
+static void finalize (const langType language CTAGS_ATTR_UNUSED,
 		      boolean initialized)
 {
 	if (initialized)

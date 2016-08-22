@@ -71,7 +71,7 @@ enum eDebugLevels {
 *   Function prototypes
 */
 extern void lineBreak (void);
-extern void debugPrintf (const enum eDebugLevels level, const char *const format, ...) __printf__ (2, 3);
+extern void debugPrintf (const enum eDebugLevels level, const char *const format, ...) CTAGS_ATTR_PRINTF (2, 3);
 extern void debugPutc (const int level, const int c);
 extern void debugParseNest (const boolean increase, const unsigned int level);
 extern void debugCppNest (const boolean begin, const unsigned int level);

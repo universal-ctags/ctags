@@ -33,10 +33,10 @@ struct cStart {
 	unsigned long source;
 };
 
-static  void change_section (const char *line __unused__,
-			     const regexMatch *matches __unused__,
-			     unsigned int count __unused__,
-			     void *data __unused__)
+static  void change_section (const char *line CTAGS_ATTR_UNUSED,
+			     const regexMatch *matches CTAGS_ATTR_UNUSED,
+			     unsigned int count CTAGS_ATTR_UNUSED,
+			     void *data CTAGS_ATTR_UNUSED)
 {
 	not_in_grammar_rules = !not_in_grammar_rules;
 
@@ -60,9 +60,9 @@ static  void change_section (const char *line __unused__,
 	}
 }
 
-static void enter_c_prologue (const char *line __unused__,
-			      const regexMatch *matches __unused__,
-			      unsigned int count __unused__,
+static void enter_c_prologue (const char *line CTAGS_ATTR_UNUSED,
+			      const regexMatch *matches CTAGS_ATTR_UNUSED,
+			      unsigned int count CTAGS_ATTR_UNUSED,
 			      void *data)
 {
 	struct cStart *cstart = data;
@@ -73,9 +73,9 @@ static void enter_c_prologue (const char *line __unused__,
 	cstart->source = getSourceLineNumber ();
 }
 
-static void leave_c_prologue (const char *line __unused__,
-			      const regexMatch *matches __unused__,
-			      unsigned int count __unused__,
+static void leave_c_prologue (const char *line CTAGS_ATTR_UNUSED,
+			      const regexMatch *matches CTAGS_ATTR_UNUSED,
+			      unsigned int count CTAGS_ATTR_UNUSED,
 			      void *data)
 {
 	struct cStart *cstart = data;
@@ -86,9 +86,9 @@ static void leave_c_prologue (const char *line __unused__,
 	memset (cstart, 0, sizeof (*cstart));
 }
 
-static void enter_union (const char *line __unused__,
+static void enter_union (const char *line CTAGS_ATTR_UNUSED,
 			 const regexMatch *matches,
-			 unsigned int count __unused__,
+			 unsigned int count CTAGS_ATTR_UNUSED,
 			 void *data)
 {
 	struct cStart *cstart = data;
@@ -100,9 +100,9 @@ static void enter_union (const char *line __unused__,
 	}
 }
 
-static void leave_union (const char *line __unused__,
+static void leave_union (const char *line CTAGS_ATTR_UNUSED,
 			 const regexMatch *matches,
-			 unsigned int count __unused__,
+			 unsigned int count CTAGS_ATTR_UNUSED,
 			 void *data)
 {
 	struct cStart *cstart = data;
