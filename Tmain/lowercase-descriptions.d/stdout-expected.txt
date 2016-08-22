@@ -1,0 +1,10 @@
+# --list-extra
+# --list-fields
+x	xpath	off	NONE	TRUE	XPath for the tag
+# --list-kinds-full
+HTML	f	function	on	FALSE	0		JavaScript functions
+Protobuf	r	rpc	off	FALSE	0		RPC methods
+SQL	x	mltable	on	FALSE	0		MobiLink table scripts
+SQL	y	mlconn	on	FALSE	0		MobiLink conn scripts
+SQL	z	mlprop	on	FALSE	0		MobiLink properties
+# --list-pseudo-tags
