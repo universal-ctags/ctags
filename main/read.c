@@ -86,8 +86,6 @@ typedef struct sInputFile {
 	MIOPos      filePosition;  /* file position of current line */
 	unsigned int ungetchIdx;
 	int         ungetchBuf[3]; /* characters that were ungotten */
-	bool     eof;           /* have we reached the end of file? */
-	bool     newLine;       /* will the next character begin a new line? */
 
 	/*  Contains data pertaining to the original `source' file in which the tag
 	 *  was defined. This may be different from the `input' file when #line
@@ -397,27 +395,27 @@ static bool setSourceFileName (vString *const fileName)
  *   Line directive parsing
  */
 
-static int skipWhite (void)
+static void skipWhite (char **str)
 {
-	int c;
-	do
-		c = mio_getc (File.mio);
-	while (c == ' '  ||  c == '\t');
-	return c;
+	while (**str == ' '  ||  **str == '\t')
+		(*str)++;
 }
 
-static unsigned long readLineNumber (void)
+static unsigned long readLineNumber (char **str)
 {
+	char *s;
 	unsigned long lNum = 0;
-	int c = skipWhite ();
-	while (c != EOF  &&  isdigit (c))
+
+	skipWhite (str);
+	s = *str;
+	while (*s != '\0' && isdigit (*s))
 	{
-		lNum = (lNum * 10) + (c - '0');
-		c = mio_getc (File.mio);
+		lNum = (lNum * 10) + (*s - '0');
+		s++;
 	}
-	mio_ungetc (File.mio, c);
-	if (c != ' '  &&  c != '\t')
+	if (*s != ' ' && *s != '\t')
 		lNum = 0;
+	*str = s;
 
 	return lNum;
 }
@@ -430,46 +428,41 @@ static unsigned long readLineNumber (void)
  *   # n "filename"
  * So we need to be fairly flexible in what we accept.
  */
-static vString *readFileName (void)
+static vString *readFileName (char *s)
 {
 	vString *const fileName = vStringNew ();
 	bool quoteDelimited = false;
-	int c = skipWhite ();
 
-	if (c == '"')
+	skipWhite (&s);
+	if (*s == '"')
 	{
-		c = mio_getc (File.mio);  /* skip double-quote */
+		s++;  /* skip double-quote */
 		quoteDelimited = true;
 	}
-	while (c != EOF  &&  c != '\n'  &&
-			(quoteDelimited ? (c != '"') : (c != ' '  &&  c != '\t')))
+	while (*s != '\0'  &&  *s != '\n'  &&
+			(quoteDelimited ? (*s != '"') : (*s != ' '  &&  *s != '\t')))
 	{
-		vStringPut (fileName, c);
-		c = mio_getc (File.mio);
+		vStringPut (fileName, *s);
+		s++;
 	}
-	if (c == '\n')
-		mio_ungetc (File.mio, c);
 	vStringPut (fileName, '\0');
 
 	return fileName;
 }
 
-static bool parseLineDirective (void)
+static bool parseLineDirective (char *s)
 {
 	bool result = false;
-	int c = skipWhite ();
+
+	skipWhite (&s);
 	DebugStatement ( const char* lineStr = ""; )
 
-	if (isdigit (c))
-	{
-		mio_ungetc (File.mio, c);
+	if (isdigit (*s))
 		result = true;
-	}
-	else if (c == 'l'  &&  mio_getc (File.mio) == 'i'  &&
-			 mio_getc (File.mio) == 'n'  &&  mio_getc (File.mio) == 'e')
+	else if (strncmp (s, "line", 4) == 0)
 	{
-		c = mio_getc (File.mio);
-		if (c == ' '  ||  c == '\t')
+		s += 4;
+		if (*s == ' '  ||  *s == '\t')
 		{
 			DebugStatement ( lineStr = "line"; )
 			result = true;
@@ -477,12 +470,12 @@ static bool parseLineDirective (void)
 	}
 	if (result)
 	{
-		const unsigned long lNum = readLineNumber ();
+		const unsigned long lNum = readLineNumber (&s);
 		if (lNum == 0)
 			result = false;
 		else
 		{
-			vString *const fileName = readFileName ();
+			vString *const fileName = readFileName (s);
 			if (vStringLength (fileName) == 0)
 			{
 				File.source.lineNumber = lNum - 1;  /* applies to NEXT line */
@@ -594,8 +587,6 @@ extern bool openInputFile (const char *const fileName, const langType language,
 		mio_getpos (File.mio, &StartOfLine);
 		mio_getpos (File.mio, &File.filePosition);
 		File.currentLine  = NULL;
-		File.eof          = false;
-		File.newLine      = true;
 
 		if (File.line != NULL)
 			vStringClear (File.line);
@@ -623,8 +614,6 @@ extern void resetInputFile (const langType language)
 	mio_getpos (File.mio, &StartOfLine);
 	mio_getpos (File.mio, &File.filePosition);
 	File.currentLine  = NULL;
-	File.eof          = false;
-	File.newLine      = true;
 
 	if (File.line != NULL)
 		vStringClear (File.line);
@@ -669,66 +658,10 @@ static void fileNewline (void)
 	if (BackupFile.mio == NULL)
 		appendLineFposMap (&File.lineFposMap, File.filePosition);
 
-	File.newLine = false;
 	File.input.lineNumber++;
 	File.source.lineNumber++;
 	DebugStatement ( if (Option.breakLine == File.input.lineNumber) lineBreak (); )
 	DebugStatement ( debugPrintf (DEBUG_RAW, "%6ld: ", File.input.lineNumber); )
-}
-
-/*  This function reads a single character from the stream, performing newline
- *  canonicalization.
- */
-static int iFileGetc (void)
-{
-	int	c;
-readnext:
-	c = mio_getc (File.mio);
-
-	/*	If previous character was a newline, then we're starting a line.
-	 */
-	if (File.newLine  &&  c != EOF)
-	{
-		fileNewline ();
-		if (c == '#'  &&  Option.lineDirectives)
-		{
-			if (parseLineDirective ())
-				goto readnext;
-			else
-			{
-				mio_setpos (File.mio, &StartOfLine);
-				c = mio_getc (File.mio);
-			}
-		}
-	}
-
-	if (c == EOF)
-		File.eof = true;
-	else if (c == NEWLINE)
-	{
-		File.newLine = true;
-		mio_getpos (File.mio, &StartOfLine);
-	}
-	else if (c == CRETURN)
-	{
-		/* Turn line breaks into a canonical form. The three commonly
-		 * used forms if line breaks: LF (UNIX/Mac OS X), CR (Mac OS 9),
-		 * and CR-LF (MS-DOS) are converted into a generic newline.
-		 */
-#ifndef macintosh
-		const int next = mio_getc (File.mio);  /* is CR followed by LF? */
-		if (next != NEWLINE)
-			mio_ungetc (File.mio, next);
-		else
-#endif
-		{
-			c = NEWLINE;  /* convert CR into newline */
-			File.newLine = true;
-			mio_getpos (File.mio, &StartOfLine);
-		}
-	}
-	DebugStatement ( debugPutc (DEBUG_RAW, c); )
-	return c;
 }
 
 extern void ungetcToInputFile (int c)
@@ -743,25 +676,54 @@ extern void ungetcToInputFile (int c)
 
 static vString *iFileGetLine (void)
 {
-	vString *result = NULL;
-	int c;
-	File.line = vStringNewOrClear (File.line);
-	do
-	{
-		c = iFileGetc ();
-		if (c != EOF)
-			vStringPut (File.line, c);
-		if (c == '\n'  ||  (c == EOF  &&  vStringLength (File.line) > 0))
-		{
-			if (vStringLength (File.line) > 0)
-				matchRegex (File.line, getInputLanguage ());
+	char *str;
+	size_t size;
+	bool haveLine;
 
-			result = File.line;
-			break;
+	File.line = vStringNewOrClear (File.line);
+	str = vStringValue (File.line);
+	size = vStringSize (File.line);
+
+	for (;;)
+	{
+		bool newLine;
+		bool eof;
+
+		mio_gets (File.mio, str, size);
+		vStringSetLength (File.line);
+		haveLine = vStringLength (File.line) > 0;
+		newLine = haveLine && vStringLast (File.line) == '\n';
+		eof = mio_eof (File.mio);
+		if (newLine && vStringLength (File.line) > 1 &&
+			vStringItem (File.line, vStringLength (File.line) - 2) == '\r')
+		{
+			vStringItem (File.line, vStringLength (File.line) - 2) = '\n';
+			vStringChop (File.line);
 		}
-	} while (c != EOF);
-	Assert (result != NULL  ||  File.eof);
-	return result;
+
+		if (newLine || eof)
+			break;
+
+		vStringResize (File.line, vStringLength (File.line) * 2);
+		str = vStringValue (File.line) + vStringLength (File.line);
+		size = vStringSize (File.line) - vStringLength (File.line);
+	}
+
+	if (haveLine)
+	{
+		/* Use StartOfLine from previous iFileGetLine() call */
+		fileNewline ();
+		/* Store StartOfLine for the next iFileGetLine() call */
+		mio_getpos (File.mio, &StartOfLine);
+
+		if (Option.lineDirectives && vStringChar (File.line, 0) == '#')
+			parseLineDirective (vStringValue (File.line) + 1);
+		matchRegex (File.line, getInputLanguage ());
+
+		return File.line;
+	}
+
+	return NULL;
 }
 
 /*  Do not mix use of readLineFromInputFile () and getcFromInputFile () for the same file.
