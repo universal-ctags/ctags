@@ -28,6 +28,7 @@ Fully rewritten parsers
 * C (see :ref:`The new C/C++ parser <cxx>`)
 * C++ (see :ref:`The new C/C++ parser <cxx>`)
 * Python (see :ref:`The new Python parser <python>`)
+* HTML (see :ref:`The new HTML parser <html>`)
 
 New parsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

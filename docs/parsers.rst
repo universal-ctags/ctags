@@ -15,3 +15,5 @@ This section deals with individual parser topics.
 	parser-cxx.rst
 	parser-vim.rst
 	parser-xslt.rst
+	parser-python.rst
+	parser-html.rst
