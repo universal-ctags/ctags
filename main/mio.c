@@ -984,18 +984,21 @@ char *mio_gets (MIO *mio, char *s, size_t size)
 		{
 			size_t i = 0;
 			bool newline = false;
+			size_t pos = mio->impl.mem.pos;
+			size_t buf_size = mio->impl.mem.size;
+			unsigned char *buf = mio->impl.mem.buf;
 
 			if (mio->impl.mem.ungetch != EOF)
 			{
 				s[i] = (char)mio->impl.mem.ungetch;
 				mio->impl.mem.ungetch = EOF;
-				mio->impl.mem.pos++;
+				pos++;
 				i++;
 			}
-			for (; mio->impl.mem.pos < mio->impl.mem.size && i < (size - 1); i++)
+			for (; pos < buf_size && i < (size - 1); i++)
 			{
-				s[i] = (char)mio->impl.mem.buf[mio->impl.mem.pos];
-				mio->impl.mem.pos++;
+				s[i] = (char)buf[pos];
+				pos++;
 				if (s[i] == '\n')
 				{
 					i++;
@@ -1008,8 +1011,10 @@ char *mio_gets (MIO *mio, char *s, size_t size)
 				s[i] = 0;
 				rv = s;
 			}
-			if (!newline && mio->impl.mem.pos >= mio->impl.mem.size)
+			if (!newline && pos >= buf_size)
 				mio->impl.mem.eof = true;
+			mio->impl.mem.pos = pos;
+			mio->impl.mem.size = buf_size;
 		}
 
 		return rv;
