@@ -207,9 +207,13 @@ After recording the line number of the end of the C code area,
 
 Of course "C" stands for C language, the name of guest parser.
 Available parser names can be listed by running ctags with
-`--list-languages` option. Two `0` are specified as the 3rd and 5th
-arguments. They are byte offset of the C language area. The first one
-is for start and the second one is for the end.
+`--list-languages` option. In this example two `0` characters are provided as
+the 3rd and 5th argument. They are byte offsets of the start and the end of the
+C language area from the beginning of the line which is 0 in this case. In
+general, the guest language's section does not have to start at the beginning of
+the line in which case the two offsets have to be provided. Compilers reading
+the input character by character can obtain the current offset by calling
+`getInputLineOffset()`.
 
 Internal design
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
