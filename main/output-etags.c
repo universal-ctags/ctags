@@ -19,6 +19,18 @@
 #include "read.h"
 #include "vstring.h"
 
+
+static int writeEtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data);
+static void *beginEtagsFile (MIO * mio);
+static void  endEtagsFile   (MIO * mio, const char* filename, void *data);
+
+tagWriter etagsWriter = {
+	.writeEntry = writeEtagsEntry,
+	.writePtagEntry = NULL,
+	.preWriteEntry = beginEtagsFile,
+	.postWriteEntry = endEtagsFile,
+};
+
 struct sEtags {
 	char *name;
 	MIO *mio;
@@ -28,7 +40,7 @@ struct sEtags {
 
 
 
-extern void *beginEtagsFile (MIO *mio)
+static void *beginEtagsFile (MIO *mio)
 {
 	static struct sEtags etags = { NULL, NULL, 0, NULL };
 
@@ -38,7 +50,7 @@ extern void *beginEtagsFile (MIO *mio)
 	return &etags;
 }
 
-extern void endEtagsFile (MIO *mainfp, const char *filename, void *data)
+static void endEtagsFile (MIO *mainfp, const char *filename, void *data)
 {
 	const char *line;
 	struct sEtags *etags = data;
@@ -63,7 +75,7 @@ extern void endEtagsFile (MIO *mainfp, const char *filename, void *data)
 	}
 }
 
-extern int writeEtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data)
+static int writeEtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data)
 {
 	int length;
 	struct sEtags *etags = data;

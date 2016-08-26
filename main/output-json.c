@@ -24,6 +24,22 @@
 #endif
 
 
+static int writeJsonEntry  (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED);
+
+static int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
+				const char *const fileName,
+				const char *const pattern,
+				const char *const parserName, void *data CTAGS_ATTR_UNUSED);
+
+tagWriter jsonWriter = {
+	.writeEntry = writeJsonEntry,
+	.writePtagEntry = writeJsonPtagEntry,
+	.preWriteEntry = NULL,
+	.postWriteEntry = NULL,
+	.useStdoutByDefault = TRUE,
+};
+
+
 static json_t* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
 {
 	const char *str = renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
@@ -95,7 +111,7 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 		renderExtensionFieldMaybe (k, tag, response);
 }
 
-extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)
+static int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)
 {
 	json_t *response = json_pack ("{ss ss ss ss}",
 		"_type", "tag",
@@ -120,7 +136,7 @@ extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data 
 	return length;
 }
 
-extern int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
+static int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
 			       const char *const fileName,
 			       const char *const pattern,
 			       const char *const parserName, void *data CTAGS_ATTR_UNUSED)
@@ -164,11 +180,11 @@ extern boolean ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_
 }
 
 #else /* HAVE_JANSSON */
-extern int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)
+static int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)
 {
 	return 0;
 }
-extern int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
+static int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
 			       const char *const fileName,
 			       const char *const pattern,
 			       const char *const parserName, void *data CTAGS_ATTR_UNUSED)
