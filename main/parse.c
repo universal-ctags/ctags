@@ -1083,7 +1083,7 @@ getFileLanguageInternal (const char *const fileName, MIO **mio)
 	    if (Option.guessLanguageEagerly)
 	    {
 		    GLC_FOPEN_IF_NECESSARY(&glc, cleanup, FALSE);
-		    language = tasteLanguage(&glc, 
+		    language = tasteLanguage(&glc,
 					     eager_tasters + 1,
 					     ARRAY_SIZE(eager_tasters) - 1,
 					     fallback + HINT_OTHER);
