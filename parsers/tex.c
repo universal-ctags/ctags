@@ -332,7 +332,7 @@ getNextChar:
 					  parseIdentifier (token->string, c);
 					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
-					  token->keyword = analyzeToken (token->string, Lang_js);
+					  token->keyword = lookupCaseKeyword (vStringValue (token->string), Lang_js);
 					  if (isKeyword (token, KEYWORD_NONE))
 						  token->type = TOKEN_IDENTIFIER;
 					  else

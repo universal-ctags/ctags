@@ -692,7 +692,7 @@ getNextChar:
 			if (isalpha (c))
 			{
 				parseIdentifier (token->string, c);
-				token->keyword = analyzeToken (token->string, Lang_eiffel);
+				token->keyword = lookupCaseKeyword (vStringValue (token->string), Lang_eiffel);
 				if (isKeyword (token, KEYWORD_NONE))
 					token->type = TOKEN_IDENTIFIER;
 				else

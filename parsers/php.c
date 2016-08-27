@@ -990,7 +990,7 @@ getNextChar:
 			else
 			{
 				parseIdentifier (token->string, c);
-				token->keyword = analyzeToken (token->string, getInputLanguage ());
+				token->keyword = lookupCaseKeyword (vStringValue (token->string), getInputLanguage ());
 				if (token->keyword == KEYWORD_NONE)
 					token->type = TOKEN_IDENTIFIER;
 				else

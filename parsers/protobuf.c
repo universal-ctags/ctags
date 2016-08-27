@@ -143,7 +143,7 @@ repeat:
 			vStringPut (token.value, c);
 			c = cppGetc ();
 		}
-		token.keyword = analyzeToken (token.value, Lang_protobuf);
+		token.keyword = lookupCaseKeyword (vStringValue (token.value), Lang_protobuf);
 		cppUngetc (c);
 	}
 	else

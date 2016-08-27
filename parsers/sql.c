@@ -618,7 +618,7 @@ getNextChar:
 					  parseIdentifier (token->string, c);
 					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
-					  token->keyword = analyzeToken (token->string, Lang_sql);
+					  token->keyword = lookupCaseKeyword (vStringValue (token->string), Lang_sql);
 					  if (isKeyword (token, KEYWORD_rem))
 					  {
 						  vStringClear (token->string);
