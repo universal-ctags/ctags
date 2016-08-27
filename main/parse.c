@@ -1083,7 +1083,7 @@ getFileLanguageInternal (const char *const fileName, MIO **mio)
 	    if (Option.guessLanguageEagerly)
 	    {
 		    GLC_FOPEN_IF_NECESSARY(&glc, cleanup, FALSE);
-		    language = tasteLanguage(&glc, 
+		    language = tasteLanguage(&glc,
 					     eager_tasters + 1,
 					     ARRAY_SIZE(eager_tasters) - 1,
 					     fallback + HINT_OTHER);
@@ -2559,6 +2559,7 @@ static boolean makeKindDescriptionPseudoTag (kindOption *kind,
 	struct makeKindDescriptionPseudoTagData *data = user_data;
 	vString *letter_and_name;
 	vString *description;
+	const char *d;
 
 	letter_and_name = vStringNew ();
 	description = vStringNew ();
@@ -2567,9 +2568,9 @@ static boolean makeKindDescriptionPseudoTag (kindOption *kind,
 	vStringPut (letter_and_name, ',');
 	vStringCatS (letter_and_name, kind -> name);
 
+	d = kind->description? kind->description: kind->name;
 	vStringPut (description, '/');
-	vStringCatSWithEscapingAsPattern (description,
-					  kind -> description);
+	vStringCatSWithEscapingAsPattern (description, d);
 	vStringPut (description, '/');
 	data->written |=  writePseudoTag (data->pdesc, vStringValue (letter_and_name),
 					  vStringValue (description),
