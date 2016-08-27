@@ -2559,6 +2559,7 @@ static boolean makeKindDescriptionPseudoTag (kindOption *kind,
 	struct makeKindDescriptionPseudoTagData *data = user_data;
 	vString *letter_and_name;
 	vString *description;
+	const char *d;
 
 	letter_and_name = vStringNew ();
 	description = vStringNew ();
@@ -2567,9 +2568,9 @@ static boolean makeKindDescriptionPseudoTag (kindOption *kind,
 	vStringPut (letter_and_name, ',');
 	vStringCatS (letter_and_name, kind -> name);
 
+	d = kind->description? kind->description: kind->name;
 	vStringPut (description, '/');
-	vStringCatSWithEscapingAsPattern (description,
-					  kind -> description);
+	vStringCatSWithEscapingAsPattern (description, d);
 	vStringPut (description, '/');
 	data->written |=  writePseudoTag (data->pdesc, vStringValue (letter_and_name),
 					  vStringValue (description),
