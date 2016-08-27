@@ -1150,8 +1150,11 @@ static boolean parseVariable (tokenInfo *const token, const pythonKind kind)
 
 		/* if we got leftover to initialize, just make variables out of them.
 		 * This handles cases like `a, b, c = (c, d, e)` -- or worse */
-		while (i < nameCount)
-			makeSimplePythonTag (nameTokens[i++], kind);
+		for (; i < nameCount; i++)
+		{
+			if (nameTokens[i])
+				makeSimplePythonTag (nameTokens[i], kind);
+		}
 	}
 
 	while (nameCount > 0)
