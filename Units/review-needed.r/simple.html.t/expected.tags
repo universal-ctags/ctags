@@ -1,7 +1,0 @@
-commented_anchor	input.html	/^  <!-- <a name="commented_anchor"><\/a> -->$/;"	a
-commented_function2	input.html	/^	function commented_function2 () {} $/;"	f
-message	input.html	/^function message()$/;"	f
-postfixed_anchor	input.html	/^  <a name=postfixed_anchor href="http:\/\/darrenhiebert.com"><\/a>$/;"	a
-prefixed_anchor	input.html	/^  <a title="Title" name="prefixed_anchor"><\/a>$/;"	a
-simple_anchor	input.html	/^  <a name="simple_anchor"><\/a>$/;"	a
-unquoted_anchor	input.html	/^  <a name=unquoted_anchor><\/a>$/;"	a

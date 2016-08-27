@@ -1,0 +1,16 @@
+#firstname	input.html	/#firstname { background-color: yellow;}/;"	i	language:CSS
+.intro	input.html	/^.intro { $/;"	c	language:CSS
+MY_FAV	input.html	/const MY_FAV = 7;/;"	C	language:JavaScript
+heading1	input.html	/^  <h1>heading1<\/h1>$/;"	h	language:HTML
+heading2	input.html	/^  <h2>heading2<\/h2>$/;"	i	language:HTML
+heading3	input.html	/^  <h1>head<!--ing1-->ing<!--ing2-->3<\/h1>$/;"	h	language:HTML
+html_commented_function	input.html	/^function html_commented_function()$/;"	f	language:JavaScript
+message	input.html	/^function message()$/;"	f	language:JavaScript
+my heading3	input.html	/^  <h3>my	heading3<\/h3>$/;"	j	language:HTML
+p	input.html	/^p {color:blue;}$/;"	s	language:CSS
+postfixed_anchor	input.html	/^  <a name=postfixed_anchor href="http:\/\/darrenhiebert.com"><\/a>$/;"	a	language:HTML
+prefixed_anchor	input.html	/^  <a title="Title" name="prefixed_anchor"><\/a>$/;"	a	language:HTML
+q	input.html	/^var q = new Polygon();$/;"	v	language:JavaScript
+simple_anchor	input.html	/^  <a name="simple_anchor"><\/a>$/;"	a	language:HTML
+some other heading1	input.html	/^    <\/h1>$/;"	h	language:HTML
+unquoted_anchor	input.html	/^  <a name=unquoted_anchor><\/a>$/;"	a	language:HTML
