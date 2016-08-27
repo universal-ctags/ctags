@@ -87,7 +87,7 @@ typedef struct sTokenInfo {
  *	DATA DEFINITIONS
  */
 
-static langType Lang_js;
+static langType Lang_tex;
 
 static jmp_buf Exception;
 
@@ -332,7 +332,7 @@ getNextChar:
 					  parseIdentifier (token->string, c);
 					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
-					  token->keyword = lookupCaseKeyword (vStringValue (token->string), Lang_js);
+					  token->keyword = lookupCaseKeyword (vStringValue (token->string), Lang_tex);
 					  if (isKeyword (token, KEYWORD_NONE))
 						  token->type = TOKEN_IDENTIFIER;
 					  else
@@ -535,7 +535,7 @@ static void parseTexFile (tokenInfo *const token)
 static void initialize (const langType language)
 {
 	Assert (ARRAY_SIZE (TexKinds) == TEXTAG_COUNT);
-	Lang_js = language;
+	Lang_tex = language;
 
 	lastPart    = vStringNew();
 	lastChapter = vStringNew();
