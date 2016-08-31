@@ -1,13 +1,13 @@
-r       UCTAGSrole      off     NONE             TRUE     Role                          
-Z       UCTAGSscope     off     NONE             TRUE     Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
-E       UCTAGSextra     off     NONE             TRUE     Extra tag type information    
-x       UCTAGSxpath     off     NONE             TRUE     xpath for the tag             
-p       UCTAGSscopeKind off     NONE             TRUE     Kind of scope as full name    
-e       UCTAGSend       off     NONE             TRUE     end lines of various items    
--       UCTAGSproperties off     C                TRUE     properties (static, inline, mutable,...)
--       UCTAGSproperties off     C++              TRUE     properties (static, inline, mutable,...)
--       UCTAGStemplate  off     C++              TRUE     template parameters           
--       UCTAGScaptures  off     C++              TRUE     lambda capture list           
--       UCTAGSname      on      C++              TRUE     aliased names                 
--       UCTAGSdecorators off     Python           TRUE     decorators on functions and classes
--       UCTAGSsectionMarker off     reStructuredText TRUE     character used for declaring section
+r       UCTAGSrole      off     NONE             TRUE   Role                          
+Z       UCTAGSscope     off     NONE             TRUE   Include the "scope:" key in scope field (use s) in tags output, scope name in xref output
+E       UCTAGSextra     off     NONE             TRUE   Extra tag type information    
+x       UCTAGSxpath     off     NONE             TRUE   xpath for the tag             
+p       UCTAGSscopeKind off     NONE             TRUE   Kind of scope as full name    
+e       UCTAGSend       off     NONE             TRUE   end lines of various items    
+-       UCTAGSproperties off     C                TRUE   properties (static, inline, mutable,...)
+-       UCTAGSproperties off     C++              TRUE   properties (static, inline, mutable,...)
+-       UCTAGStemplate  off     C++              TRUE   template parameters           
+-       UCTAGScaptures  off     C++              TRUE   lambda capture list           
+-       UCTAGSname      on      C++              TRUE   aliased names                 
+-       UCTAGSdecorators off     Python           TRUE   decorators on functions and classes
+-       UCTAGSsectionMarker off     reStructuredText TRUE   character used for declaring section

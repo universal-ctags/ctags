@@ -1,4 +1,4 @@
-#LETTER	NAME	ENABLED	LANGUAGE	XFMTCHAR	DESCRIPTION
+#LETTER	NAME	ENABLED	LANGUAGE	XFMT	DESCRIPTION
 N	name	on	NONE	TRUE	tag name (fixed field)
 F	input	on	NONE	TRUE	input file (fixed field)
 P	pattern	on	NONE	TRUE	pattern (fixed field)

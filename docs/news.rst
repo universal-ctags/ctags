@@ -789,16 +789,16 @@ in the `LANGUAGE` column:
 .. code-block:: console
 
 	$ ./ctags --list-fields
-	#LETTER NAME            ENABLED LANGUAGE         XFMTCHAR DESCRIPTION
+	#LETTER NAME            ENABLED LANGUAGE         XFMT  DESCRIPTION
 	...
-	-       end             off     C                TRUE     end lines of various constructs
-	-       properties      off     C                TRUE     properties (static, inline, mutable,...)
-	-       end             off     C++              TRUE     end lines of various constructs
-	-       template        off     C++              TRUE     template parameters
-	-       captures        off     C++              TRUE     lambda capture list
-	-       properties      off     C++              TRUE     properties (static, virtual, inline, mutable,...)
-	-       sectionMarker   off     reStructuredText TRUE     character used for declaring section
-	-       version         off     Maven2           TRUE     version of artifact
+	-       end             off     C                TRUE   end lines of various constructs
+	-       properties      off     C                TRUE   properties (static, inline, mutable,...)
+	-       end             off     C++              TRUE   end lines of various constructs
+	-       template        off     C++              TRUE   template parameters
+	-       captures        off     C++              TRUE   lambda capture list
+	-       properties      off     C++              TRUE   properties (static, virtual, inline, mutable,...)
+	-       sectionMarker   off     reStructuredText TRUE   character used for declaring section
+	-       version         off     Maven2           TRUE   version of artifact
 
 e.g. reStructuredText is the owner of the sectionMarker field and
 both C and C++ own the end field.
@@ -809,8 +809,8 @@ given, ``--list-fields`` prints only the fields for that parser:
 .. code-block:: console
 
 	$ ./ctags --list-fields=Maven2
-	#LETTER NAME            ENABLED LANGUAGE        XFMTCHAR DESCRIPTION
-	-       version         off     Maven2          TRUE     version of artifact
+	#LETTER NAME            ENABLED LANGUAGE        XFMT  DESCRIPTION
+	-       version         off     Maven2          TRUE  version of artifact
 
 A parser own field only has a long name, no letter. For
 enabling/disabling such fields, the name must be passed to
