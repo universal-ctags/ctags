@@ -569,6 +569,8 @@ getNextChar:
 		case '#': /* comment */
 		case '\r': /* newlines for indent */
 		case '\n':
+		{
+			int indent = 0;
 			do
 			{
 				if (c == '#')
@@ -583,16 +585,15 @@ getNextChar:
 					if (d != '\n')
 						ungetcToInputFile (d);
 				}
-				token->type = TOKEN_INDENT;
-				token->indent = 0;
+				indent = 0;
 				while ((c = getcFromInputFile ()) == ' ' || c == '\t' || c == '\f')
 				{
 					if (c == '\t')
-						token->indent += 8 - (token->indent % 8);
+						indent += 8 - (indent % 8);
 					else if (c == '\f') /* yeah, it's weird */
-						token->indent = 0;
+						indent = 0;
 					else
-						token->indent++;
+						indent++;
 				}
 			} /* skip completely empty lines, so retry */
 			while (c == '\r' || c == '\n' || c == '#');
@@ -607,7 +608,13 @@ getNextChar:
 				else
 					goto getNextChar;
 			}
+			else
+			{
+				token->type = TOKEN_INDENT;
+				token->indent = indent;
+			}
 			break;
+		}
 
 		default:
 			if (! isIdentifierChar (c))

@@ -1,0 +1,4 @@
+A	input.py	/^class A(Foo,$/;"	c
+B	input.py	/^class B():$/;"	c
+a	input.py	/^    a = 1$/;"	v	class:A
+b	input.py	/^    b = 2$/;"	v	class:B
