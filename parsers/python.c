@@ -122,17 +122,17 @@ static roleDesc PythonUnknownRoles [] = {
 };
 
 static kindOption PythonKinds[COUNT_KIND] = {
-	{TRUE, 'c', "class",    "classes"},
-	{TRUE, 'f', "function", "functions"},
-	{TRUE, 'm', "member",   "class members"},
-	{TRUE, 'v', "variable", "variables"},
-	{TRUE, 'I', "namespace", "name referring a module defined in other file"},
-	{TRUE, 'i', "module",    "modules",
-	 .referenceOnly = TRUE,  ATTACH_ROLES(PythonModuleRoles)},
-	{TRUE, 'x', "unknown",   "name referring a classe/variable/function/module defined in other module",
-	 .referenceOnly = FALSE, ATTACH_ROLES(PythonUnknownRoles)},
+	{TRUE, 'c', "class",      "classes"},
+	{TRUE, 'f', "function",   "functions"},
+	{TRUE, 'm', "method",     "class methods"},
+	{TRUE, 'v', "variable",   "class variables"},
+	{TRUE, 'I', "namespace",  "name referring a module defined in other file"},
+	{TRUE, 'i', "module",     "modules",
+	 .referenceOnly = TRUE,   ATTACH_ROLES(PythonModuleRoles)},
+	{TRUE, 'x', "unknown",    "name referring a class/variable/function/module defined in other module",
+	 .referenceOnly = FALSE,  ATTACH_ROLES(PythonUnknownRoles)},
 	{FALSE, 'z', "parameter", "function parameters" },
-	{FALSE, 'l', "local",    "local variables" },
+	{FALSE, 'l', "local",     "local variables" },
 };
 
 static const keywordTable PythonKeywordTable[] = {

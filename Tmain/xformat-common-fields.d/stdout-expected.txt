@@ -78,7 +78,7 @@ status: 0
 
 field: z
 output: Foo class
-output: doIt member
+output: doIt method
 status: 0
 
 field: r
