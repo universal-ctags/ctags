@@ -75,8 +75,6 @@ OPTLIB2C = $(srcdir)/misc/optlib2c
 endif
 dist_ctags_SOURCES = $(ALL_HEADS) $(ALL_SRCS)
 
-man_MANS = man/ctags.1
-
 if ENABLE_XCMD
 driversdir = $(pkglibexecdir)/drivers
 dist_drivers_SCRIPTS = libexec/drivers/coffeetags
@@ -97,6 +95,7 @@ include $(top_srcdir)/makefiles/test-cases.mak
 include $(top_srcdir)/makefiles/help.mak
 
 if HAVE_RST2MAN
+man_MANS = man/ctags.1
 rst2man_verbose = $(rst2man_verbose_@AM_V@)
 rst2man_verbose_ = $(rst2man_verbose_@AM_DEFAULT_V@)
 rst2man_verbose_0 = @echo RST2MAN "  $@";
