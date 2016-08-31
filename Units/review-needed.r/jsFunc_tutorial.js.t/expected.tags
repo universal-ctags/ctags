@@ -26,7 +26,7 @@ addSalaryFunction	input.js	/^function addSalaryFunction(addition)$/;"	c
 addSalaryFunctionDT9	input.js	/^function addSalaryFunctionDT9(addition)$/;"	c
 ball0	input.js	/^var ball0=new DT1(); \/\/ ball0 now points to a new object$/;"	v
 ball1	input.js	/^var ball1=new DT2("creating new Ball");  \/\/ creates object & $/;"	v
-ball2	input.js	/^var ball2=new Object();$/;"	v
+ball2	input.js	/^var ball2=new Object();$/;"	c
 ball3	input.js	/^var ball3=new DT3(); \/\/ ball0 now points to a new instance of type Ball$/;"	v
 ball4	input.js	/^var ball4=new DT3();$/;"	v
 ball5	input.js	/^var ball5=new DT3();$/;"	v
@@ -61,11 +61,11 @@ myFunction6A	input.js	/^function myFunction6A() $/;"	f
 myFunction6AE	input.js	/^myFunction6AE=function()$/;"	f
 myFunction6B	input.js	/^function myFunction6B() $/;"	f
 myFunction6E	input.js	/^myFunction6E=function()$/;"	f
-myObject	input.js	/^var myObject=new Object();$/;"	v
+myObject	input.js	/^var myObject=new Object();$/;"	c
 my_global_var1	input.js	/^var my_global_var1 = 'global';$/;"	v
-object1	input.js	/^var object1=new Object();      \/\/ creates 3 objects$/;"	v
-object2	input.js	/^var object2=new Object();$/;"	v
-object3	input.js	/^var object3=new Object();$/;"	v
+object1	input.js	/^var object1=new Object();      \/\/ creates 3 objects$/;"	c
+object2	input.js	/^var object2=new Object();$/;"	c
+object3	input.js	/^var object3=new Object();$/;"	c
 price	input.js	/^PT2.prototype.price=20;$/;"	m	class:PT2
 savedFunc6B	input.js	/^savedFunc6B=function()$/;"	f
 sayName4A	input.js	/^function sayName4A(name) $/;"	f

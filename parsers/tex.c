@@ -332,7 +332,7 @@ getNextChar:
 					  parseIdentifier (token->string, c);
 					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
-					  token->keyword = lookupCaseKeyword (vStringValue (token->string), Lang_tex);
+					  token->keyword = lookupKeyword (vStringValue (token->string), Lang_tex);
 					  if (isKeyword (token, KEYWORD_NONE))
 						  token->type = TOKEN_IDENTIFIER;
 					  else
