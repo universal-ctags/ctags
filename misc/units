@@ -50,6 +50,7 @@ readonly _DEFAULT_CATEGORY=ROOT
 readonly _TIMEOUT_EXIT=124
 readonly _VG_TIMEOUT_FACTOR=10
 readonly _VALGRIND_EXIT=58
+readonly _BASH_INTERRUPT_EXIT=59
 readonly _LINE_SPLITER=$(if type dos2unix > /dev/null 2>&1; then echo "dos2unix"; else echo "cat"; fi)
 readonly _STDERR_OUTPUT_NAME="STDERR.tmp"
 readonly _DIFF_OUTPUT_NAME="DIFF.tmp"
@@ -535,17 +536,35 @@ run_tcase ()
     fi
 
     {
-	#
-	# When a launched process is exited abnormally, the parent shell reports it
-	# to stderr: See j_strsignal function call in wait_for in bash-4.2/nojobs.c.
-	# This becomes noise; close the stderr of subshell.
-	#
-	(exec  2>&-; ${_CMDLINE} 2> "${ostderr}" > "${orawout}" )
+	(
+	    #
+	    # When a launched process is exited abnormally, the parent shell reports it
+	    # to stderr: See j_strsignal function call in wait_for in bash-4.2/nojobs.c.
+	    # This becomes noise; close the stderr of subshell.
+	    #
+	    exec  2>&-;
+	    #
+	    # The original bug report(#1100 by @techee):
+	    # --------------------------------------------------------------------------
+	    # When running
+	    #
+	    #     make units VG=1
+	    #
+	    # one cannot stop its execution by pressing Ctrl+C and
+	    # there doesn't seem to be any way (except for looking at
+	    # processes which run and killing them) to stop its
+	    # execution.
+	    #
+	    trap "exit ${_BASH_INTERRUPT_EXIT}" INT;
+	    ${_CMDLINE} 2> "${ostderr}" > "${orawout}"
+	)
 	tmp="$?"
 	run_record_cmdline "${ffilter}" "${ocmdline}"
     }
     if [ "$tmp" != 0 ]; then
-	if ! [ "$WITH_TIMEOUT" = 0 ] && [ "${tmp}" = "${_TIMEOUT_EXIT}" ]; then
+	if [ "${tmp}" = "${_BASH_INTERRUPT_EXIT}" ]; then
+	    ERROR 1 "The execution is interrupted"
+	elif ! [ "$WITH_TIMEOUT" = 0 ] && [ "${tmp}" = "${_TIMEOUT_EXIT}" ]; then
 	    L_FAILED_BY_TIMEED_OUT="${L_FAILED_BY_TIMEED_OUT} ${category}/${name}"
 	    run_result error "${oresult}" "TIMED OUT"
 	    run_record_cmdline "${ffilter}" "${ocmdline}"
