@@ -247,7 +247,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"      Include selected extension fields (flags: \"afmikKlnsStzZ\") [fks]."},
  {1,"  --fields-<LANG|*>=[+|-]flags"},
  {1,"      Include selected <LANG> own extension fields"},
- {1,"      (flags: --list-flags=<LANG>)."},
+ {1,"      (flags: --list-fields=<LANG>)."},
  {1,"  --file-scope=[yes|no]"},
  {1,"       Should tags scoped only for a single file (e.g. \"static\" tags)"},
  {1,"       be included in the output [yes]?"},
