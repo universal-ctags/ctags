@@ -1,0 +1,4 @@
+ABC	input.cpp	/^namespace ABC {$/;"	n	file:
+X	input.cpp	/^  namespace X = ABC;$/;"	A	function:foo	file:	name:ABC
+foo	input.cpp	/^int foo (void)$/;"	f	typeref:typename:int
+x	input.cpp	/^  int x = 1;$/;"	v	namespace:ABC	typeref:typename:int

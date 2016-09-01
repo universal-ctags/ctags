@@ -194,7 +194,8 @@ process_token:
 				{
 					case CXXKeywordNAMESPACE:
 					{
-						if(cxxScopeGetType() == CXXScopeTypeNamespace)
+						if(cxxScopeGetType() == CXXScopeTypeNamespace ||
+						   cxxScopeGetType() == CXXScopeTypeFunction)
 						{
 							// namespaces can be nested only within themselves
 							if(!cxxParserParseNamespace())
