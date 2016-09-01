@@ -314,7 +314,7 @@ extern boolean doesFieldHaveValue (fieldType type, const tagEntryInfo *tag)
 #define PR_FIELD_WIDTH_NAME      15
 #define PR_FIELD_WIDTH_LANGUAGE  16
 #define PR_FIELD_WIDTH_DESC      30
-#define PR_FIELD_WIDTH_XFMTCHAR  8
+#define PR_FIELD_WIDTH_XFMT      6
 #define PR_FIELD_WIDTH_ENABLED   7
 
 #define PR_FIELD_STR(X) PR_FIELD_WIDTH_##X
@@ -329,7 +329,7 @@ extern boolean doesFieldHaveValue (fieldType type, const tagEntryInfo *tag)
 	" "					\
 	PR_FIELD_FMT (LANGUAGE,s)		\
 	" "					\
-	PR_FIELD_FMT (XFMTCHAR,s)		\
+	PR_FIELD_FMT (XFMT,s)		\
 	" "					\
 	PR_FIELD_FMT (DESC,s)			\
 	"\n"
@@ -368,7 +368,7 @@ extern void printFields (int language)
 
 	if (Option.withListHeader)
 		printf ((Option.machinable? "%s\t%s\t%s\t%s\t%s\t%s\n": MAKE_FIELD_FMT(s)),
-			"#LETTER", "NAME", "ENABLED", "LANGUAGE", "XFMTCHAR", "DESCRIPTION");
+			"#LETTER", "NAME", "ENABLED", "LANGUAGE", "XFMT", "DESCRIPTION");
 
 	for (i = 0; i < fieldDescUsed; i++)
 	{

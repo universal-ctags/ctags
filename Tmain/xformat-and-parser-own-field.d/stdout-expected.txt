@@ -25,4 +25,4 @@ subsection reStructuredText
 #
 # LIST: ENABLING COMMON FIELD BY SPECIFYING WILDCARD
 #
-l       language        on      NONE             TRUE     Language of input file containing tag
+l       language        on      NONE             TRUE   Language of input file containing tag
