@@ -29,6 +29,7 @@ MAIN_HEADS =			\
 	main/main.h		\
 	main/mbcs.h		\
 	main/nestlevel.h	\
+	main/objpool.h		\
 	main/options.h		\
 	main/output.h		\
 	main/parse.h		\
@@ -66,6 +67,7 @@ MAIN_SRCS =				\
 	main/main.c			\
 	main/mbcs.c			\
 	main/nestlevel.c		\
+	main/objpool.c			\
 	main/options.c			\
 	main/output-etags.c		\
 	main/output-ctags.c		\

@@ -12,6 +12,7 @@
 #include "routines.h"
 #include "vstring.h"
 #include "read.h"
+#include "objpool.h"
 
 #include "cxx_token_chain.h"
 #include "cxx_debug.h"
@@ -20,13 +21,45 @@
 
 #define CXX_TOKEN_POOL_MAXIMUM_SIZE 8192
 
-static CXXTokenChain * g_pTokenPool = NULL;
+static objPool * g_pTokenPool = NULL;
 
 void cxxTokenForceDestroy(CXXToken * t);
 
+static CXXToken *createToken(void)
+{
+	CXXToken *t = xMalloc(sizeof(CXXToken),CXXToken);
+	// we almost always want a string, and since this token
+	// is being reused..well.. we always want it
+	t->pszWord = vStringNew();
+	return t;
+}
+
+static void deleteToken(CXXToken *token)
+{
+	vStringDelete(token->pszWord);
+	eFree(token);
+}
+
+static void clearToken(CXXToken *t)
+{
+	CXX_DEBUG_ASSERT(t->pszWord,"The string shouldn't have been destroyed");
+
+	// this won't actually release memory (but we're taking care
+	// to do not create very large strings)
+	vStringClear(t->pszWord);
+
+	t->bFollowedBySpace = false;
+
+	t->pChain = NULL;
+	t->pNext = NULL;
+	t->pPrev = NULL;
+}
+
 void cxxTokenAPIInit(void)
 {
-	g_pTokenPool = cxxTokenChainCreate();
+	g_pTokenPool = objPoolNew(CXX_TOKEN_POOL_MAXIMUM_SIZE,
+		(objPoolCreateFunc)createToken, (objPoolDeleteFunc)deleteToken,
+		(objPoolClearFunc)clearToken);
 }
 
 void cxxTokenAPINewFile(void)
@@ -36,36 +69,12 @@ void cxxTokenAPINewFile(void)
 
 void cxxTokenAPIDone(void)
 {
-	CXXToken * t;
-
-	while((t = cxxTokenChainTakeFirst(g_pTokenPool)))
-		cxxTokenForceDestroy(t);
-
-	cxxTokenChainDestroy(g_pTokenPool);
+	objPoolDelete (g_pTokenPool);
 }
 
 CXXToken * cxxTokenCreate(void)
 {
-	CXXToken * t;
-
-	if(g_pTokenPool->iCount > 0)
-	{
-		t = cxxTokenChainTakeFirst(g_pTokenPool);
-		CXX_DEBUG_ASSERT(t->pszWord,"The string shouldn't have been destroyed");
-	} else {
-		t = xMalloc(sizeof(CXXToken),CXXToken);
-		// we almost always want a string, and since this token
-		// is being reused..well.. we always want it
-		t->pszWord = vStringNew();
-	}
-
-	t->bFollowedBySpace = false;
-
-	t->pChain = NULL;
-	t->pNext = NULL;
-	t->pPrev = NULL;
-
-	return t;
+	return objPoolGet (g_pTokenPool);
 }
 
 void cxxTokenDestroy(CXXToken * t)
@@ -79,18 +88,7 @@ void cxxTokenDestroy(CXXToken * t)
 		t->pChain = NULL;
 	}
 
-	CXX_DEBUG_ASSERT(t->pszWord,"There should be a word here");
-
-	if(g_pTokenPool->iCount < CXX_TOKEN_POOL_MAXIMUM_SIZE)
-	{
-		// this won't actually release memory (but we're taking care
-		// to do not create very large strings)
-		vStringClear(t->pszWord);
-		cxxTokenChainAppend(g_pTokenPool,t);
-	} else {
-		vStringDelete(t->pszWord);
-		eFree(t);
-	}
+	objPoolPut (g_pTokenPool, t);
 }
 
 void cxxTokenForceDestroy(CXXToken * t)

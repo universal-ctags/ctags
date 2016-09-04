@@ -217,6 +217,7 @@
     <ClCompile Include="..\parsers\yumrepo.c" />
     <ClCompile Include="..\parsers\pythonloggingconfig.c" />
     <ClCompile Include="..\main\ptrarray.c" />
+    <ClCompile Include="..\main\objpool.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\fnmatch\fnmatch.h" />
@@ -267,6 +268,7 @@
     <ClInclude Include="..\parsers\iniconf.h" />
     <ClInclude Include="..\parsers\m4.h" />
     <ClInclude Include="..\main\ptrarray.h" />
+    <ClInclude Include="..\main\objpool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

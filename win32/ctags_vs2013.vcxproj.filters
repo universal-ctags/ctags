@@ -387,6 +387,9 @@
     <ClCompile Include="..\main\ptrarray.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\objpool.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\main\e_msoft.h">
@@ -531,6 +534,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
    <ClInclude Include="..\main\ptrarray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+   <ClInclude Include="..\main\objpool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
