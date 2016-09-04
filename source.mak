@@ -36,6 +36,7 @@ MAIN_HEADS =			\
 	main/pcoproc.h		\
 	main/promise.h		\
 	main/ptag.h		\
+	main/ptrarray.h		\
 	main/read.h		\
 	main/routines.h		\
 	main/selectors.h	\
@@ -74,6 +75,7 @@ MAIN_SRCS =				\
 	main/pcoproc.c			\
 	main/promise.c			\
 	main/ptag.c			\
+	main/ptrarray.c			\
 	main/read.c			\
 	main/routines.c			\
 	main/selectors.c		\
