@@ -124,7 +124,6 @@ extern void runIniconfParser (const iniconfCallback callback, void* userData)
 				vStringPut (name, (int) *cp);
 				++cp;
 			}
-			vStringTerminate (name);
 
 			if (isLanguageEnabled (iniconf))
 				makeIniconfTagMaybe (iniconf, vStringValue (name), NULL, NULL,
@@ -144,7 +143,6 @@ extern void runIniconfParser (const iniconfCallback callback, void* userData)
 				cb (vStringValue (name), NULL, NULL, userData);
 
 			vStringCopy (scope, name);
-			vStringTerminate (scope);
 			vStringClear (name);
 			continue;
 		}
@@ -159,7 +157,6 @@ extern void runIniconfParser (const iniconfCallback callback, void* userData)
 					vStringPut (name, (int) *cp);
 					++cp;
 				}
-				vStringTerminate (name);
 				vStringStripTrailing (name);
 				while (isspace ((int) *cp))
 					++cp;
@@ -174,7 +171,6 @@ extern void runIniconfParser (const iniconfCallback callback, void* userData)
 						vStringPut (val, (int) *cp);
 						++cp;
 					}
-					vStringTerminate (val);
 					vStringStripTrailing (val);
 
 					if (isLanguageEnabled (iniconf))

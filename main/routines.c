@@ -671,10 +671,7 @@ extern char *combinePathAndFile (
 
 	vStringCopyS (filePath, path);
 	if (! terminated)
-	{
 		vStringPut (filePath, OUTPUT_PATH_SEPARATOR);
-		vStringTerminate (filePath);
-	}
 	vStringCatS (filePath, file);
 
 	return vStringDeleteUnwrap (filePath);

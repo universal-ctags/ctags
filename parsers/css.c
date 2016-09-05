@@ -61,7 +61,6 @@ static void parseSelector (vString *const string, const int firstChar)
 		c = getcFromInputFile ();
 	} while (isSelectorChar (c));
 	ungetcToInputFile (c);
-	vStringTerminate (string);
 }
 
 static void readToken (tokenInfo *const token)
@@ -222,7 +221,6 @@ static void findCssTags (void)
 			/* we already consumed the next token, don't read it twice */
 			readNextToken = false;
 
-			vStringTerminate (selector);
 			if (CssKinds[kind].enabled)
 			{
 				tagEntryInfo e;

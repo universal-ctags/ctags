@@ -50,7 +50,6 @@ static void readIdentifier (vString *const name, const unsigned char *cp)
 	/* Go till you get to white space or a syntactic break */
 	for (p = cp; *p != '\0' && *p != '(' && *p != ')' && !isspace (*p); p++)
 		vStringPut (name, (int) *p);
-	vStringTerminate (name);
 }
 
 static void findSchemeTags (void)

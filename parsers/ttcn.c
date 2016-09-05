@@ -522,10 +522,6 @@ static ttcnToken_t * getToken (void)
         vStringDelete(pTtcnToken->value);
         pTtcnToken->value = NULL;
     }
-    else
-    {
-        vStringTerminate(pTtcnToken->value);
-    }
     return pTtcnToken;
 } 
 

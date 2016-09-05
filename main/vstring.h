@@ -45,7 +45,6 @@
 #define vStringCopy(vs,s)     vStringCopyS((vs), vStringValue((s)))
 #define vStringNCopy(vs,s,l)  vStringNCopyS((vs), vStringValue((s)), (l))
 #define vStringChar(vs,i)     ((vs)->buffer[i])
-#define vStringTerminate(vs)  vStringPut(vs, '\0')
 #define vStringLower(vs)      toLowerString((vs)->buffer)
 #define vStringUpper(vs)      toUpperString((vs)->buffer)
 

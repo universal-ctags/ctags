@@ -281,7 +281,6 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 
-	vStringTerminate (string);
 	if (!isspace (c))
 		ungetcToInputFile (c);		/* unget non-identifier character */
 }
@@ -410,7 +409,6 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 			}
 			readToken (token);
 		}
-		vStringTerminate (fullname);
 		vStringCopy (name->string, fullname);
 		makeTexTag (name, kind);
 	}
@@ -436,7 +434,6 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 		}
 		if (useLongName)
 		{
-			vStringTerminate (fullname);
 			if (vStringLength (fullname) > 0)
 			{
 				vStringCopy (name->string, fullname);

@@ -602,7 +602,6 @@ static vString* substitute (
 		else if (*p != '\n'  &&  *p != '\r')
 			vStringPut (result, *p);
 	}
-	vStringTerminate (result);
 	return result;
 }
 

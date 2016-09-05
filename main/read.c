@@ -753,8 +753,6 @@ static vString *iFileGetLine (void)
 			vStringPut (File.line, c);
 		if (c == '\n'  ||  (c == EOF  &&  vStringLength (File.line) > 0))
 		{
-			vStringTerminate (File.line);
-
 			if (vStringLength (File.line) > 0)
 				matchRegex (File.line, getInputLanguage ());
 

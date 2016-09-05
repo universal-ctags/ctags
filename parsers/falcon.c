@@ -84,7 +84,6 @@ static void findFalconTags (void)
                 vStringPut (name, (int) *cp);
                 ++cp;
             }
-            vStringTerminate (name);
             makeSimpleTag (name, FalconKinds, K_FUNCTION);
             vStringClear (name);
         }
@@ -98,7 +97,6 @@ static void findFalconTags (void)
                 vStringPut (name, (int) *cp);
                 ++cp;
             }
-            vStringTerminate (name);
             makeSimpleTag (name, FalconKinds, K_CLASS);
             vStringClear (name);
         }
@@ -112,7 +110,6 @@ static void findFalconTags (void)
                 vStringPut (name, (int) *cp);
                 ++cp;
             }
-            vStringTerminate (name);
             makeSimpleTag (name, FalconKinds, K_NAMESPACE);
             vStringClear (name);
         }
@@ -126,7 +123,6 @@ static void findFalconTags (void)
                 vStringPut (name, (int) *cp);
                 ++cp;
             }
-            vStringTerminate (name);
             makeSimpleTag (name, FalconKinds, K_NAMESPACE);
             vStringClear (name);
         }

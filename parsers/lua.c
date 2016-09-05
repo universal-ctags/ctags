@@ -90,7 +90,6 @@ static void extract_next_token (const char *begin, const char *end_sentinel, vSt
 
 	if (found)
 	{
-		vStringTerminate (name);
 		makeSimpleTag (name, LuaKinds, K_FUNCTION);
 		vStringClear (name);
 	}

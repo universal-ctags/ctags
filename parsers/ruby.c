@@ -192,7 +192,6 @@ static void emitRubyTag (vString* name, rubyKind kind)
             return;
         }
 
-	vStringTerminate (name);
 	scope = nestingLevelsToScope (nesting);
 	lvl = nestingLevelsGetCurrent (nesting);
 	parent = getEntryOfNestingLevel (lvl);
@@ -315,7 +314,6 @@ static rubyKind parseIdentifier (
 			/* Recognize singleton methods. */
 			if (last_char == '.')
 			{
-				vStringTerminate (name);
 				vStringClear (name);
 				return parseIdentifier (cp, name, K_SINGLETON);
 			}

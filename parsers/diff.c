@@ -169,7 +169,6 @@ static void findDiffTags (void)
 					tmp++;
 				}
 
-				vStringTerminate(filename);
 				if (delim == DIFF_DELIM_PLUS)
 					kind = K_NEW_FILE;
 				else

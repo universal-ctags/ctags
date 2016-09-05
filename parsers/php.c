@@ -331,7 +331,6 @@ static void initPhpEntry (tagEntryInfo *const e, const tokenInfo *const token,
 	{
 		Assert (parentKind >= 0);
 
-		vStringTerminate (FullScope);
 		e->extensionFields.scopeKind = &(PhpKinds[parentKind]);
 		e->extensionFields.scopeName = vStringValue (FullScope);
 	}
@@ -520,7 +519,6 @@ static void addToScope (tokenInfo *const token, const vString *const extra,
 		vStringCatS (token->scope, sep);
 	}
 	vStringCat (token->scope, extra);
-	vStringTerminate(token->scope);
 }
 
 static int skipToCharacter (const int c)
@@ -546,7 +544,6 @@ static void parseString (vString *const string, const int delimiter)
 		else
 			vStringPut (string, (char) c);
 	}
-	vStringTerminate (string);
 }
 
 /* reads an HereDoc or a NowDoc (the part after the <<<).
@@ -664,8 +661,6 @@ static void parseHeredoc (vString *const string)
 	}
 	while (c != EOF);
 
-	vStringTerminate (string);
-
 	return;
 
 error:
@@ -681,7 +676,6 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 	ungetcToInputFile (c);
-	vStringTerminate (string);
 }
 
 static bool isSpace (int c)
@@ -1235,8 +1229,6 @@ static bool parseFunction (tokenInfo *const token, const tokenInfo *name)
 		}
 		while (token->type != TOKEN_EOF && depth > 0);
 
-		vStringTerminate (arglist);
-
 		makeFunctionTag (name, arglist, access, impl);
 		vStringDelete (arglist);
 
@@ -1524,7 +1516,6 @@ static bool parseNamespace (tokenInfo *const token)
 		   token->type != TOKEN_SEMICOLON &&
 		   token->type != TOKEN_OPEN_CURLY);
 
-	vStringTerminate (CurrentNamesapce);
 	if (vStringLength (CurrentNamesapce) > 0)
 		makeNamespacePhpTag (nsToken, CurrentNamesapce);
 

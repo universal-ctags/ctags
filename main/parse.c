@@ -418,7 +418,6 @@ static vString* determineInterpreter (const char* const cmd)
 			;  /* no-op */
 		for ( ;  *p != '\0'  &&  ! isspace ((int) *p)  ;  ++p)
 			vStringPut (interpreter, (int) *p);
-		vStringTerminate (interpreter);
 	} while (strcmp (vStringValue (interpreter), "env") == 0);
 	return interpreter;
 }
@@ -473,7 +472,6 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 			;  /* no-op */
 		for ( ;  *p != '\0'  &&  (isalnum ((int) *p)  || *p == '-')  ;  ++p)
 			vStringPut (mode, (int) *p);
-		vStringTerminate (mode);
 	}
 	else
 	{
@@ -485,7 +483,6 @@ static vString* determineEmacsModeAtFirstLine (const char* const line)
 
 		for ( ;  p < end &&  (isalnum ((int) *p) || *p == '-')  ;  ++p)
 			vStringPut (mode, (int) *p);
-		vStringTerminate (mode);
 
 		for ( ;  isspace ((int) *p)  ;  ++p)
 			;  /* no-op */
@@ -537,7 +534,6 @@ static vString* determineEmacsModeAtEOF (MIO* const fp)
 				;  /* no-op */
 			for ( ;  *p != '\0'  &&  (isalnum ((int) *p)  || *p == '-')  ;  ++p)
 				vStringPut (mode, (int) *p);
-			vStringTerminate (mode);
 		}
 		else if (headerFound && (p = strstr(line, "End:")))
 			headerFound = false;
@@ -591,7 +587,6 @@ static vString* determineVimFileType (const char *const modeline)
 		p += strlen(filetype_prefix[i]);
 		for ( ;  *p != '\0'  &&  isalnum ((int) *p)  ;  ++p)
 			vStringPut (filetype, (int) *p);
-		vStringTerminate (filetype);
 		break;
 	}
 	return filetype;

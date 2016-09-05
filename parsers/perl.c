@@ -473,7 +473,6 @@ static void findPerlTags (void)
 				vStringCatS (name, "STDOUT");
 			}
 
-			vStringTerminate (name);
 			TRACE("name: %s\n", name->buffer);
 
 			if (0 == vStringLength(name)) {

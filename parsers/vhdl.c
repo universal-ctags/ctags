@@ -361,7 +361,6 @@ static void parseString (vString * const string, const int delimiter)
 		else
 			vStringPut (string, c);
 	}
-	vStringTerminate (string);
 }
 
 /*  Read a VHDL identifier beginning with "firstChar" and place it into "name".
@@ -375,7 +374,6 @@ static void parseIdentifier (vString * const string, const int firstChar)
 		vStringPut (string, c);
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
-	vStringTerminate (string);
 	if (!isspace (c))
 		ungetcToInputFile (c);	/* unget non-identifier character */
 }
@@ -538,7 +536,6 @@ static void makeVhdlTag (tokenInfo * const token, const vhdlKind kind)
 			vStringCopy (fulltag, token->scope);
 			vStringCatS (fulltag, ".");
 			vStringCatS (fulltag, vStringValue (token->string));
-			vStringTerminate (fulltag);
 			vStringCopy (token->string, fulltag);
 			vStringDelete (fulltag);
 		}

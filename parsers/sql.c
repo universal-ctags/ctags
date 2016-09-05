@@ -457,7 +457,6 @@ static void parseString (vString *const string, const int delimiter)
 		else
 			vStringPut (string, c);
 	}
-	vStringTerminate (string);
 }
 
 /*	Read a C identifier beginning with "firstChar" and places it into "name".
@@ -471,7 +470,6 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		vStringPut (string, c);
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
-	vStringTerminate (string);
 	if (!isspace (c))
 		ungetcToInputFile (c);		/* unget non-identifier character */
 }
@@ -659,7 +657,6 @@ static void readIdentifier (tokenInfo *const token)
  *		   vStringCatS (parent->string, ".");
  *	   }
  *	   vStringCatS (parent->string, vStringValue(child->string));
- *	   vStringTerminate(parent->string);
  * }
  */
 
@@ -670,7 +667,6 @@ static void addToScope (tokenInfo* const token, vString* const extra, sqlKind ki
 		vStringCatS (token->scope, ".");
 	}
 	vStringCatS (token->scope, vStringValue(extra));
-	vStringTerminate(token->scope);
 	token->scopeKind = kind;
 }
 
