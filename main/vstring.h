@@ -40,10 +40,6 @@
 #define vStringLast(vs)       ((vs)->buffer[(vs)->length - 1])
 #define vStringLength(vs)     ((vs)->length)
 #define vStringSize(vs)       ((vs)->size)
-#define vStringCat(vs,s)      vStringCatS((vs), vStringValue((s)))
-#define vStringNCat(vs,s,l)   vStringNCatS((vs), vStringValue((s)), (l))
-#define vStringCopy(vs,s)     vStringCopyS((vs), vStringValue((s)))
-#define vStringNCopy(vs,s,l)  vStringNCopyS((vs), vStringValue((s)), (l))
 #define vStringChar(vs,i)     ((vs)->buffer[i])
 #define vStringLower(vs)      toLowerString((vs)->buffer)
 #define vStringUpper(vs)      toUpperString((vs)->buffer)
@@ -72,11 +68,15 @@ extern void vStringStripNewline (vString *const string);
 extern void vStringStripLeading (vString *const string);
 extern void vStringChop (vString *const string);
 extern void vStringStripTrailing (vString *const string);
+extern void vStringCat (vString *const string, const vString *const s);
 extern void vStringCatS (vString *const string, const char *const s);
+extern void vStringNCat (vString *const string, const vString *const s, const size_t length);
 extern void vStringNCatS (vString *const string, const char *const s, const size_t length);
 extern vString *vStringNewCopy (const vString *const string);
 extern vString *vStringNewInit (const char *const s);
+extern void vStringCopy (vString *const string, const vString *const s);
 extern void vStringCopyS (vString *const string, const char *const s);
+extern void vStringNCopy (vString *const string, const vString *const s, const size_t length);
 extern void vStringNCopyS (vString *const string, const char *const s, const size_t length);
 extern void vStringCopyToLower (vString *const dest, const vString *const src);
 extern void vStringSetLength (vString *const string);

@@ -103,22 +103,6 @@ extern void vStringPut (vString *const string, const int c)
 }
 #endif
 
-extern void vStringCatS (vString *const string, const char *const s)
-{
-#if 1
-	const size_t len = strlen (s);
-	while (string->length + len + 1 >= string->size)/*  check for buffer overflow */
-		vStringAutoResize (string);
-	strcpy (string->buffer + string->length, s);
-	string->length += len;
-#else
-	const char *p = s;
-	do
-		vStringPut (string, *p);
-	while (*p++ != '\0');
-#endif
-}
-
 extern vString *vStringNewCopy (const vString *const string)
 {
 	vString *vs = vStringNew ();
@@ -133,19 +117,47 @@ extern vString *vStringNewInit (const char *const s)
 	return vs;
 }
 
+static void stringCat (
+		vString *const string, const char *const s, const size_t length)
+{
+	while (string->length + length + 1 >= string->size)
+		vStringAutoResize (string);
+
+	strncpy (string->buffer + string->length, s, length);
+	string->length += length;
+	vStringPut (string, '\0');
+}
+
+extern void vStringNCat (
+		vString *const string, const vString *const s, const size_t length)
+{
+	size_t len = vStringLength (s);
+
+	len = len < length ? len: length;
+	stringCat (string, s->buffer, len);
+}
+
 extern void vStringNCatS (
 		vString *const string, const char *const s, const size_t length)
 {
-	const char *p = s;
-	size_t remain = length;
+	size_t len = strlen (s);
 
-	while (remain > 0 && *p != '\0')
-	{
-		vStringPut (string, *p);
-		--remain;
-		++p;
-	}
-	vStringPut (string, '\0');
+	len = len < length ? len : length;
+	stringCat (string, s, len);
+}
+
+extern void vStringCat (vString *const string, const vString *const s)
+{
+	size_t len = vStringLength (s);
+
+	stringCat (string, s->buffer, len);
+}
+
+extern void vStringCatS (vString *const string, const char *const s)
+{
+	size_t len = strlen (s);
+
+	stringCat (string, s, len);
 }
 
 /*  Strip trailing newline from string.
@@ -201,10 +213,23 @@ extern void vStringChop (vString *const string)
 	}
 }
 
+extern void vStringCopy (vString *const string, const vString *const s)
+{
+	vStringClear (string);
+	vStringCat (string, s);
+}
+
 extern void vStringCopyS (vString *const string, const char *const s)
 {
 	vStringClear (string);
 	vStringCatS (string, s);
+}
+
+extern void vStringNCopy (
+		vString *const string, const vString *const s, const size_t length)
+{
+	vStringClear (string);
+	vStringNCat (string, s, length);
 }
 
 extern void vStringNCopyS (
