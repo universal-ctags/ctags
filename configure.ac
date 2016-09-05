@@ -248,12 +248,12 @@ AM_CONDITIONAL(INSTALL_ETAGS, [test "x$enable_etags" = "xyes"])
 AM_CONDITIONAL(USE_READCMD, [test "x$enable_readcmd" = "xyes"])
 
 dnl AC_MSG_NOTICE(Change with $program_transform_name)
-ctags_name_executable=`echo ctags | sed "$program_transform_name"`
-AC_SUBST(ctags_name_executable)
-etags_name_executable=`echo etags | sed "$program_transform_name"`
-AC_SUBST(etags_name_executable)
+CTAGS_NAME_EXECUTABLE=`echo ctags | sed "$program_transform_name"`
+AC_SUBST(CTAGS_NAME_EXECUTABLE)
+ETAGS_NAME_EXECUTABLE=`echo etags | sed "$program_transform_name"`
+AC_SUBST(ETAGS_NAME_EXECUTABLE)
 
-AC_DEFINE_UNQUOTED(ETAGS, "$etags_name_executable")
+AC_DEFINE_UNQUOTED(ETAGS, "$ETAGS_NAME_EXECUTABLE")
 
 if test "$enable_custom_config" = no -o "$enable_custom_config" = yes ; then
 	AC_MSG_NOTICE(no name supplied for custom configuration file)
@@ -301,6 +301,8 @@ AC_SYS_LARGEFILE
 AC_CHECK_PROGS([perl_found], [perl], [yes], [no])
 AM_CONDITIONAL([RUN_OPTLIB2C], [test "${perl_found}" = "yes"])
 
+AC_PATH_PROGS(RST2MAN, [rst2man rst2man.py], [no])
+AM_CONDITIONAL([HAVE_RST2MAN], [test "x$RST2MAN" != "xno"])
 
 # Checks for operating environment
 # --------------------------------
@@ -664,7 +666,8 @@ fi
 AC_CHECK_FUNCS([mblen], [], [HAVE_MBLEN=1], [])
 
 AC_CONFIG_FILES([Makefile
-		 ctags.1])
+		 man/ctags.1.rst
+		 ])
 
 AC_OUTPUT
 
