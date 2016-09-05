@@ -43,6 +43,12 @@
 #define vStringChar(vs,i)     ((vs)->buffer[i])
 #define vStringLower(vs)      toLowerString((vs)->buffer)
 #define vStringUpper(vs)      toUpperString((vs)->buffer)
+#define vStringClear(string) \
+	do { \
+		vString *vStringClear_s = (string); \
+		vStringClear_s->length = 0; \
+		vStringClear_s->buffer[0] = '\0'; \
+	} while (false)
 
 /*
 *   DATA DECLARATIONS
@@ -58,7 +64,6 @@ typedef struct sVString {
 *   FUNCTION PROTOTYPES
 */
 extern bool vStringAutoResize (vString *const string);
-extern void vStringClear (vString *const string);
 extern vString *vStringNew (void);
 extern void vStringDelete (vString *const string);
 #ifndef VSTRING_PUTC_MACRO

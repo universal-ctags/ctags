@@ -63,11 +63,6 @@ extern void vStringTruncate (vString *const string, const size_t length)
 	                         string->size - string->length); )
 }
 
-extern void vStringClear (vString *const string)
-{
-	vStringTruncate (string, 0);
-}
-
 extern void vStringDelete (vString *const string)
 {
 	if (string != NULL)
