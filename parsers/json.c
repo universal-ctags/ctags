@@ -25,6 +25,9 @@
 #include "routines.h"
 #include "vstring.h"
 
+#define isIdentChar(c) \
+	(isalnum (c) || (c) == '+' || (c) == '-' || (c) == '.')
+
 typedef enum {
 	TOKEN_EOF,
 	TOKEN_UNDEFINED,
@@ -136,11 +139,6 @@ static void makeJsonTag (tokenInfo *const token, const jsonKind kind)
 	}
 
 	makeTagEntry (&e);
-}
-
-static bool isIdentChar (int c)
-{
-	return (isalnum (c) || c == '+' || c == '-' || c == '.');
 }
 
 static void readTokenFull (tokenInfo *const token,

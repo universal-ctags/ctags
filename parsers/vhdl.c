@@ -28,6 +28,8 @@
  */
 #define isType(token,t)     (bool) ((token)->type == (t))
 #define isKeyword(token,k)  (bool) ((token)->keyword == (k))
+#define isIdentChar1(c) (isalpha (c) || (c) == '_')
+#define isIdentChar(c) (isalpha (c) || isdigit (c) || (c) == '_')
 
 /*
  *   DATA DECLARATIONS
@@ -299,17 +301,6 @@ static void parseKeywords (tokenInfo * const token, bool local);
 /*
  *   FUNCTION DEFINITIONS
  */
-
-static bool isIdentChar1 (const int c)
-{
-	return (bool) (isalpha (c) || c == '_');
-}
-
-static bool isIdentChar (const int c)
-{
-	return (bool) (isalpha (c) || isdigit (c) || c == '_');
-}
-
 static bool isIdentifierMatch (const tokenInfo * const token,
 	const vString * const name)
 {

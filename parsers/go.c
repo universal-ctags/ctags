@@ -22,6 +22,8 @@
 #define MAX_SIGNATURE_LENGTH 512
 #define isType(token,t) (bool) ((token)->type == (t))
 #define isKeyword(token,k) (bool) ((token)->keyword == (k))
+#define isStartIdentChar(c) (isalpha (c) ||  (c) == '_' || (c) > 128) /* XXX UTF-8 */
+#define isIdentChar(c) (isStartIdentChar (c) || isdigit (c))
 
 /*
  *	 DATA DECLARATIONS
@@ -117,19 +119,6 @@ static const keywordTable GoKeywordTable[] = {
 /*
 *   FUNCTION DEFINITIONS
 */
-
-// XXX UTF-8
-static bool isStartIdentChar (const int c)
-{
-	return (bool)
-		(isalpha (c) ||  c == '_' || c > 128);
-}
-
-static bool isIdentChar (const int c)
-{
-	return (bool)
-		(isStartIdentChar (c) || isdigit (c));
-}
 
 static void initialize (const langType language)
 {

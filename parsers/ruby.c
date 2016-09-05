@@ -26,6 +26,11 @@
 #include "vstring.h"
 
 /*
+ *	 MACROS
+ */
+#define isIdentChar(c) (isalnum (c) || (c) == '_')
+
+/*
 *   DATA DECLARATIONS
 */
 typedef enum {
@@ -110,11 +115,6 @@ static bool canMatch (const unsigned char** s, const char* literal,
 	}
 	*s += literal_length;
 	return true;
-}
-
-static bool isIdentChar (int c)
-{
-	return (isalnum (c) || c == '_');
 }
 
 static bool notIdentChar (int c)

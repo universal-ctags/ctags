@@ -20,6 +20,7 @@
 #include "routines.h"
 #include "debug.h"
 
+#define isIdentChar(c) (isalnum (c) || (c) == '_' || (c) >= 0x80)
 
 enum {
 	KEYWORD_abstract,
@@ -520,11 +521,6 @@ static void addToScope (tokenInfo *const token, const vString *const extra,
 	}
 	vStringCat (token->scope, extra);
 	vStringTerminate(token->scope);
-}
-
-static bool isIdentChar (const int c)
-{
-	return (isalnum (c) || c == '_' || c >= 0x80);
 }
 
 static int skipToCharacter (const int c)

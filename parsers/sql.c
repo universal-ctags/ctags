@@ -42,6 +42,17 @@
  */
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
+#define isIdentChar1(c) \
+	/*
+	 * Other databases are less restrictive on the first character of
+	 * an identifier.
+	 * isIdentChar1 is used to identify the first character of an 
+	 * identifier, so we are removing some restrictions.
+	 */ \
+	(isalpha (c) || (c) == '@' || (c) == '_' )
+#define isIdentChar(c) \
+	(isalpha (c) || isdigit (c) || (c) == '$' || \
+		(c) == '@' || (c) == '_' || (c) == '#')
 
 /*
  *	 DATA DECLARATIONS
@@ -314,25 +325,6 @@ static tokenType parseSqlFile (tokenInfo *const token);
 /*
  *	 FUNCTION DEFINITIONS
  */
-
-static bool isIdentChar1 (const int c)
-{
-	/*
-	 * Other databases are less restrictive on the first character of
-	 * an identifier.
-	 * isIdentChar1 is used to identify the first character of an 
-	 * identifier, so we are removing some restrictions.
-	 */
-	return (bool)
-		(isalpha (c) || c == '@' || c == '_' );
-}
-
-static bool isIdentChar (const int c)
-{
-	return (bool)
-		(isalpha (c) || isdigit (c) || c == '$' || 
-		 c == '@' || c == '_' || c == '#');
-}
 
 static bool isCmdTerm (tokenInfo *const token)
 {

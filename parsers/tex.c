@@ -35,6 +35,9 @@
  */
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
+#define isIdentChar(c) \
+	(isalpha (c) || isdigit (c) || (c) == '$' || \
+		(c) == '_' || (c) == '#' || (c) == '-' || (c) == '.' || (c) == ':')
 
 /*
  *	 DATA DECLARATIONS
@@ -139,13 +142,6 @@ static const keywordTable TexKeywordTable [] = {
 /*
  *	 FUNCTION DEFINITIONS
  */
-
-static bool isIdentChar (const int c)
-{
-	return (bool)
-		(isalpha (c) || isdigit (c) || c == '$' ||
-		  c == '_' || c == '#' || c == '-' || c == '.' || c == ':');
-}
 
 static tokenInfo *newToken (void)
 {

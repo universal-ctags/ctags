@@ -14,6 +14,21 @@
 #include "read.h" 
 #include "routines.h"
 
+#define isSelectorChar(c) \
+	/* attribute selectors are handled separately */ \
+	(isalnum (c) || \
+		(c) == '_' || /* allowed char */ \
+		(c) == '-' || /* allowed char */ \
+		(c) == '+' || /* allow all sibling in a single tag */ \
+		(c) == '>' || /* allow all child in a single tag */ \
+		(c) == '|' || /* allow namespace separator */ \
+		(c) == '(' || /* allow pseudo-class arguments */ \
+		(c) == ')' || \
+		(c) == '.' || /* allow classes and selectors */ \
+		(c) == ':' || /* allow pseudo classes */ \
+		(c) == '*' || /* allow globs as P + * */ \
+		(c) == '#')   /* allow ids */
+
 typedef enum eCssKinds {
 	K_CLASS, K_SELECTOR, K_ID
 } cssKind;
@@ -36,23 +51,6 @@ typedef struct {
 	vString *string;
 } tokenInfo;
 
-
-static bool isSelectorChar (const int c)
-{
-	/* attribute selectors are handled separately */
-	return (isalnum (c) ||
-			c == '_' || // allowed char
-			c == '-' || // allowed char
-			c == '+' || // allow all sibling in a single tag
-			c == '>' || // allow all child in a single tag
-			c == '|' || // allow namespace separator
-			c == '(' || // allow pseudo-class arguments
-			c == ')' ||
-			c == '.' || // allow classes and selectors
-			c == ':' || // allow pseudo classes
-			c == '*' || // allow globs as P + *
-			c == '#');  // allow ids
-}
 
 static void parseSelector (vString *const string, const int firstChar)
 {

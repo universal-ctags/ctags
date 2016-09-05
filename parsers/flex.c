@@ -36,6 +36,10 @@
  */
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
+#define isEOF(token) (isType ((token), TOKEN_EOF))
+#define isIdentChar(c) \
+	(isalpha (c) || isdigit (c) || (c) == '$' || \
+		(c) == '@' || (c) == '_' || (c) == '#')
 
 /*
  *	 DATA DECLARATIONS
@@ -193,18 +197,6 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const parent);
 static bool parseLine (tokenInfo *const token);
 static bool parseActionScript (tokenInfo *const token);
 static bool parseMXML (tokenInfo *const token);
-
-static bool isEOF (tokenInfo *const token)
-{
-	return isType (token, TOKEN_EOF);
-}
-
-static bool isIdentChar (const int c)
-{
-	return (bool)
-		(isalpha (c) || isdigit (c) || c == '$' || 
-		 c == '@' || c == '_' || c == '#');
-}
 
 static tokenInfo *newToken (void)
 {
