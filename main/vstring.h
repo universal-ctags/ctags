@@ -30,7 +30,7 @@
 #endif
 #ifdef VSTRING_PUTC_MACRO
 #define vStringPut(s,c) \
-	(void)(((s)->length + 1 == (s)->size ? vStringAutoResize (s) : 0), \
+	(void)(((s)->length + 1 == (s)->size ? vStringResize ((s), (s)->size * 2) : 0), \
 	((s)->buffer [(s)->length] = (c)), \
 	((c) == '\0' ? 0 : ((s)->buffer [++(s)->length] = '\0')))
 #endif
@@ -63,7 +63,7 @@ typedef struct sVString {
 /*
 *   FUNCTION PROTOTYPES
 */
-extern bool vStringAutoResize (vString *const string);
+extern void vStringResize (vString *const string, const size_t newSize);
 extern vString *vStringNew (void);
 extern void vStringDelete (vString *const string);
 #ifndef VSTRING_PUTC_MACRO

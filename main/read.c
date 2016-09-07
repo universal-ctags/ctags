@@ -880,11 +880,9 @@ extern char *readLineRaw (vString *const vLine, MIO *const mio)
 					 *pLastChar != '\n'  &&  *pLastChar != '\r')
 			{
 				/*  buffer overflow */
-				reReadLine = vStringAutoResize (vLine);
-				if (reReadLine)
-					mio_seek (mio, startOfLine, SEEK_SET);
-				else
-					error (FATAL | PERROR, "input line too big; out of memory");
+				vStringResize (vLine, vStringSize (vLine) * 2);
+				mio_seek (mio, startOfLine, SEEK_SET);
+				reReadLine = true;
 			}
 			else
 			{

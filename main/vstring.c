@@ -29,29 +29,22 @@ static const size_t vStringInitialSize = 32;
 *   FUNCTION DEFINITIONS
 */
 
-static void vStringResize (vString *const string, const size_t newSize)
-{
-	char *const newBuffer = xRealloc (string->buffer, newSize, char);
-
-	string->size = newSize;
-	string->buffer = newBuffer;
-}
-
 /*
 *   External interface
 */
 
-extern bool vStringAutoResize (vString *const string)
+extern void vStringResize (vString *const string, const size_t newSize)
 {
-	bool ok = true;
+	size_t size = vStringInitialSize;
 
-	if (string->size <= INT_MAX / 2)
+	while (size < newSize)
+		size *= 2;
+
+	if (size > string->size)
 	{
-		const size_t newSize = string->size * 2;
-
-		vStringResize (string, newSize);
+		string->size = size;
+		string->buffer = xRealloc (string->buffer, size, char);
 	}
-	return ok;
 }
 
 extern void vStringTruncate (vString *const string, const size_t length)
@@ -90,7 +83,7 @@ extern vString *vStringNew (void)
 extern void vStringPut (vString *const string, const int c)
 {
 	if (string->length + 1 == string->size)  /*  check for buffer overflow */
-		vStringAutoResize (string);
+		vStringResize (string, string->size * 2);
 
 	string->buffer [string->length] = c;
 	if (c != '\0')
@@ -115,8 +108,8 @@ extern vString *vStringNewInit (const char *const s)
 static void stringCat (
 		vString *const string, const char *const s, const size_t length)
 {
-	while (string->length + length + 1 >= string->size)
-		vStringAutoResize (string);
+	if (string->length + length + 1 > string->size)
+		vStringResize (string, string->length + length + 1);
 
 	strncpy (string->buffer + string->length, s, length);
 	string->length += length;
