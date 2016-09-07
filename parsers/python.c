@@ -25,7 +25,7 @@
 #include "xtag.h"
 
 
-typedef enum {
+enum {
 	KEYWORD_as,
 	KEYWORD_cdef,
 	KEYWORD_class,
@@ -38,7 +38,8 @@ typedef enum {
 	KEYWORD_lambda,
 	KEYWORD_pass,
 	KEYWORD_return,
-} keywordId;
+};
+typedef int keywordId; /* to allow KEYWORD_NONE */
 
 typedef enum {
 	ACCESS_PRIVATE,

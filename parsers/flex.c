@@ -49,7 +49,7 @@ static stringList *FunctionNames;
 
 /*	Used to specify type of keyword.
 */
-typedef enum eKeywordId {
+enum eKeywordId {
 	KEYWORD_function,
 	KEYWORD_capital_function,
 	KEYWORD_object,
@@ -78,7 +78,8 @@ typedef enum eKeywordId {
 	KEYWORD_mx,
 	KEYWORD_fx,
 	KEYWORD_override
-} keywordId;
+};
+typedef int keywordId; /* to allow KEYWORD_NONE */
 
 typedef enum eTokenType {
 	TOKEN_UNDEFINED,
