@@ -12,7 +12,6 @@
 */
 #include "general.h"  /* must always come first */
 
-#include <limits.h>  /* to define INT_MAX */
 #include <string.h>
 #include <ctype.h>
 
@@ -41,17 +40,9 @@ static void vStringResize (vString *const string, const size_t newSize)
 *   External interface
 */
 
-extern boolean vStringAutoResize (vString *const string)
+extern void vStringAutoResize (vString *const string)
 {
-	boolean ok = TRUE;
-
-	if (string->size <= INT_MAX / 2)
-	{
-		const size_t newSize = string->size * 2;
-
-		vStringResize (string, newSize);
-	}
-	return ok;
+	vStringResize (string, string->size * 2);
 }
 
 extern void vStringTruncate (vString *const string, const size_t length)
