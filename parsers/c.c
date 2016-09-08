@@ -65,7 +65,7 @@ typedef enum eException {
 
 /*  Used to specify type of keyword.
  */
-typedef enum eKeywordId {
+enum eKeywordId {
 	KEYWORD_ALIAS, KEYWORD_ATTRIBUTE, KEYWORD_ABSTRACT,
 	KEYWORD_BOOLEAN, KEYWORD_BYTE, KEYWORD_BAD_STATE, KEYWORD_BAD_TRANS,
 	KEYWORD_BIND, KEYWORD_BIND_VAR, KEYWORD_BIT,
@@ -113,7 +113,8 @@ typedef enum eKeywordId {
 	KEYWORD_SUPER, KEYWORD_TRUE, KEYWORD_TYPEID, KEYWORD_TYPEOF,
 	KEYWORD_UBYTE, KEYWORD_UCENT, KEYWORD_UNITTEST, KEYWORD_VERSION,
 	KEYWORD_WCHAR, KEYWORD_WITH
-} keywordId;
+};
+typedef int keywordId; /* to allow KEYWORD_NONE */
 
 /*  Used to determine whether keyword is valid for the current language and
  *  what its ID is.

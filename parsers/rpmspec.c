@@ -37,9 +37,10 @@ typedef enum {
 	K_GLOBAL,
 } rpmSpecKind;
 
-typedef enum rpmSpecMacroRole {
+enum rpmSpecMacroRole {
 	R_MACRO_UNDEF,
-} rpmSpecMacroRole;
+};
+typedef int rpmSpecMacroRole; /* to allow ROLE_INDEX_* */;
 
 static roleDesc RpmSpecMacroRoles [] = {
 	{ TRUE, "undef", "undefined" },

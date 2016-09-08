@@ -27,7 +27,7 @@
  *	 DATA DECLARATIONS
  */
 
-typedef enum eKeywordId {
+enum eKeywordId {
 	KEYWORD_package,
 	KEYWORD_import,
 	KEYWORD_const,
@@ -38,7 +38,8 @@ typedef enum eKeywordId {
 	KEYWORD_interface,
 	KEYWORD_map,
 	KEYWORD_chan
-} keywordId;
+};
+typedef int keywordId; /* to allow KEYWORD_NONE */
 
 typedef enum eTokenType {
 	TOKEN_NONE = -1,
