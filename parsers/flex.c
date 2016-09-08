@@ -127,7 +127,7 @@ typedef struct sTokenInfo {
  *	DATA DEFINITIONS
  */
 
-static langType Lang_js;
+static langType Lang_flex;
 
 typedef enum {
 	FLEXTAG_FUNCTION,
@@ -715,7 +715,7 @@ getNextChar:
 					  parseIdentifier (token->string, c);
 					  token->lineNumber = getInputLineNumber ();
 					  token->filePosition = getInputFilePosition ();
-					  token->keyword = analyzeToken (token->string, Lang_js);
+					  token->keyword = lookupCaseKeyword (vStringValue (token->string), Lang_flex);
 					  if (isKeyword (token, KEYWORD_NONE))
 						  token->type = TOKEN_IDENTIFIER;
 					  else
@@ -2372,7 +2372,7 @@ static void parseFlexFile (tokenInfo *const token)
 static void initialize (const langType language)
 {
 	Assert (ARRAY_SIZE (FlexKinds) == FLEXTAG_COUNT);
-	Lang_js = language;
+	Lang_flex = language;
 }
 
 static void findFlexTags (void)

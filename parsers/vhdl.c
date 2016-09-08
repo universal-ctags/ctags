@@ -456,7 +456,7 @@ static void readToken (tokenInfo * const token)
 			parseIdentifier (token->string, c);
 			token->lineNumber = getInputLineNumber ();
 			token->filePosition = getInputFilePosition ();
-			token->keyword = analyzeToken (token->string, Lang_vhdl);
+			token->keyword = lookupCaseKeyword (vStringValue (token->string), Lang_vhdl);
 			if (isKeyword (token, KEYWORD_NONE))
 				token->type = TOKEN_IDENTIFIER;
 			else
