@@ -138,7 +138,7 @@ extern bool isLanguageEnabled (const langType language)
 		 (!(lang->method & METHOD_XCMD_AVAILABLE)) &&
 		 (lang->kinds == NULL) &&
 		 (!(lang->method & METHOD_REGEX)) &&
-	         (!(lang->method & METHOD_XPATH)))
+		 (!(lang->method & METHOD_XPATH)))
 		return false;
 	else
 		return true;
