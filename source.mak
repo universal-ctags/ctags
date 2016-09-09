@@ -109,7 +109,7 @@ PARSER_HEADS = \
 	parsers/make.h \
 	\
 	$(NULL)
-	
+
 PARSER_SRCS =				\
 	parsers/ada.c			\
 	parsers/ant.c			\
