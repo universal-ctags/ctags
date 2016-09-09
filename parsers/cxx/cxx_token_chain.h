@@ -75,6 +75,13 @@ CXXToken * cxxTokenChainLastPossiblyNestedTokenOfType(
 		unsigned int uTokenTypes
 	);
 
+// Find the first token with one of the specified types. Look also
+// in nested () chains (only (), not [], {}...)
+CXXToken * cxxTokenChainFirstPossiblyNestedTokenOfType(
+		CXXTokenChain * tc,
+		unsigned int uTokenTypes
+	);
+
 // Find the first token with type that is not one of the specified types
 CXXToken * cxxTokenChainFirstTokenNotOfType(
 		CXXTokenChain * tc,

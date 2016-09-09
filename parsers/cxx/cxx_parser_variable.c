@@ -203,16 +203,26 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 			{
 				// At a parenthesis chain we need some additional checks.
 				if(
+						// check for function pointers.
+						// Possible cases:
+						//    ret type (*variable)(params)
+						//    ret type (* const (variable[4]))(params)
 						t->pNext &&
 						cxxTokenTypeIs(t->pNext,CXXTokenTypeParenthesisChain) &&
 						cxxParserTokenChainLooksLikeFunctionParameterList(
 								t->pNext->pChain,
 								NULL
 							) &&
-						(pIdentifier = cxxTokenChainLastPossiblyNestedTokenOfType(
+						(pIdentifier = cxxTokenChainFirstPossiblyNestedTokenOfType(
 								t->pChain,
 								CXXTokenTypeIdentifier
-							))
+							)) &&
+						// Discard function declarations with function return types
+						// like void (*A(B))(C);
+						(
+							(!pIdentifier->pNext) ||
+							(!cxxTokenTypeIs(pIdentifier->pNext,CXXTokenTypeParenthesisChain))
+						)
 					)
 				{
 					// A function pointer.

@@ -634,6 +634,33 @@ CXXToken * cxxTokenChainLastPossiblyNestedTokenOfType(
 
 }
 
+CXXToken * cxxTokenChainFirstPossiblyNestedTokenOfType(
+		CXXTokenChain * tc,
+		unsigned int uTokenTypes
+	)
+{
+	if(!tc)
+		return NULL;
+	CXXToken * t = tc->pHead;
+	while(t)
+	{
+		if(t->eType & uTokenTypes)
+			return t;
+		if(t->eType == CXXTokenTypeParenthesisChain)
+		{
+			CXXToken * tmp = cxxTokenChainFirstPossiblyNestedTokenOfType(
+					t->pChain,
+					uTokenTypes
+				);
+			if(tmp)
+				return tmp;
+		}
+		t = t->pNext;
+	}
+	return NULL;
+
+}
+
 
 CXXToken * cxxTokenChainFirstTokenNotOfType(
 		CXXTokenChain * tc,
