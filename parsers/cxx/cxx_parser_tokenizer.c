@@ -24,6 +24,7 @@
 
 #include <string.h>
 
+#define UINFO(c) (((c) < 0x80 && (c) >= 0) ? g_aCharTable[c].uType : 0)
 
 static void cxxParserSkipToNonWhiteSpace(void)
 {
@@ -995,7 +996,7 @@ boolean cxxParserParseNextToken(void)
 		return FALSE;
 	}
 
-	unsigned int uInfo = (g_cxx.iChar < 0x80) ? g_aCharTable[g_cxx.iChar].uType : 0;
+	unsigned int uInfo = UINFO(g_cxx.iChar);
 
 	//printf("Char %c %02x info %u\n",g_cxx.iChar,g_cxx.iChar,uInfo);
 
@@ -1021,7 +1022,7 @@ boolean cxxParserParseNextToken(void)
 			}
 
 			// non space
-			uInfo = (g_cxx.iChar < 0x80) ? g_aCharTable[g_cxx.iChar].uType : 0;
+			uInfo = UINFO(g_cxx.iChar);
 			if(!(uInfo & CXXCharTypeStartOfIdentifier))
 			{
 				// this is not an identifier after all
@@ -1042,7 +1043,7 @@ boolean cxxParserParseNextToken(void)
 
 		for(;;)
 		{
-			uInfo = (g_cxx.iChar < 0x80) ? g_aCharTable[g_cxx.iChar].uType : 0;
+			uInfo = UINFO(g_cxx.iChar);
 			if(!(uInfo & CXXCharTypePartOfIdentifier))
 				break;
 			vStringPut(t->pszWord,g_cxx.iChar);
@@ -1233,7 +1234,7 @@ boolean cxxParserParseNextToken(void)
 		for(;;)
 		{
 			g_cxx.iChar = cppGetc();
-			uInfo = (g_cxx.iChar < 0x80) ? g_aCharTable[g_cxx.iChar].uType : 0;
+			uInfo = UINFO(g_cxx.iChar);
 			if(!(uInfo & CXXCharTypeValidInNumber))
 				break;
 			vStringPut(t->pszWord,g_cxx.iChar);
@@ -1268,14 +1269,14 @@ boolean cxxParserParseNextToken(void)
 		t->eType = g_aCharTable[g_cxx.iChar].uSingleTokenType;
 		vStringPut(t->pszWord,g_cxx.iChar);
 		g_cxx.iChar = cppGetc();
-		uInfo = (g_cxx.iChar < 0x80) ? g_aCharTable[g_cxx.iChar].uType : 0;
+		uInfo = UINFO(g_cxx.iChar);
 		if(uInfo & (CXXCharTypeOperator | CXXCharTypeNamedSingleOrOperatorToken))
 		{
 			t->eType = CXXTokenTypeOperator;
 			do {
 				vStringPut(t->pszWord,g_cxx.iChar);
 				g_cxx.iChar = cppGetc();
-				uInfo = (g_cxx.iChar < 0x80) ? g_aCharTable[g_cxx.iChar].uType : 0;
+				uInfo = UINFO(g_cxx.iChar);
 			} while(
 					uInfo &
 						(CXXCharTypeOperator | CXXCharTypeNamedSingleOrOperatorToken)
@@ -1299,12 +1300,12 @@ boolean cxxParserParseNextToken(void)
 		t->eType = CXXTokenTypeOperator;
 		vStringPut(t->pszWord,g_cxx.iChar);
 		g_cxx.iChar = cppGetc();
-		uInfo = (g_cxx.iChar < 0x80) ? g_aCharTable[g_cxx.iChar].uType : 0;
+		uInfo = UINFO(g_cxx.iChar);
 		while(uInfo & CXXCharTypeOperator)
 		{
 			vStringPut(t->pszWord,g_cxx.iChar);
 			g_cxx.iChar = cppGetc();
-			uInfo = (g_cxx.iChar < 0x80) ? g_aCharTable[g_cxx.iChar].uType : 0;
+			uInfo = UINFO(g_cxx.iChar);
 		}
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
 		return TRUE;
