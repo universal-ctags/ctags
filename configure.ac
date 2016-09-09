@@ -601,6 +601,15 @@ PKG_CHECK_MODULES(JANSSON, jansson,
 		       [have_jansson=no])
 AM_CONDITIONAL(HAVE_JANSSON, test "x$have_jansson" = xyes)
 
+AH_TEMPLATE([HAVE_LIBYAML],
+	[Define this value if libyaml is available.])
+PKG_CHECK_MODULES(LIBYAML, yaml-0.1,
+		       [have_libyaml=yes
+		       AC_DEFINE(HAVE_LIBYAML)],
+		       [have_libyaml=no])
+AM_CONDITIONAL(HAVE_LIBYAML, test "x$have_libyaml" = xyes)
+
+
 
 # Checks for missing prototypes
 # -----------------------------

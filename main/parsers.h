@@ -25,6 +25,14 @@
 #define XML_PARSER_LIST
 #endif
 
+#ifdef HAVE_LIBYAML
+#define YAML_PARSER_LIST						\
+	YamlParser
+#else
+#define YAML_PARSER_LIST
+#endif
+
+
 /* Add the name of any new parser definition function here */
 #define PARSER_LIST \
 	AdaParser, \

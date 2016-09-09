@@ -69,6 +69,7 @@ typedef enum {
 	METHOD_XCMD           = 1 << 2,
 	METHOD_XCMD_AVAILABLE = 1 << 3,
 	METHOD_XPATH          = 1 << 4,
+	METHOD_YAML           = 1 << 5,
 } parsingMethod;
 
 typedef struct {
@@ -196,6 +197,10 @@ extern parserDefinitionFunc PARSER_LIST;
 #ifdef HAVE_LIBXML
 extern parserDefinitionFunc XML_PARSER_LIST;
 #endif
+#ifdef HAVE_LIBYAML
+extern parserDefinitionFunc YAML_PARSER_LIST;
+#endif
+
 
 /* Language processing and parsing */
 extern int makeSimpleTag (const vString* const name, kindOption* const kinds, const int kind);

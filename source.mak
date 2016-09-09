@@ -208,6 +208,12 @@ XML_SRCS = \
 	 \
 	 $(NULL)
 
+YAML_HEAD = parsers/meta-yaml.h
+YAML_SRCS = \
+	  parsers/yaml.c		\
+	  \
+	  $(NULL)
+
 DEBUG_HEADS = main/debug.h
 DEBUG_SRCS = main/debug.c
 
