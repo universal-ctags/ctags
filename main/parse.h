@@ -136,7 +136,7 @@ struct sParserDefinition {
 	simpleParser parser;           /* simple parser (common case) */
 	rescanParser parser2;          /* rescanning parser (unusual case) */
 	selectLanguage* selectLanguage; /* may be used to resolve conflicts */
-	unsigned int method;           /* See PARSE__... definitions above */
+	unsigned int method;           /* See METHOD_ definitions above */
 	bool useCork;
 	bool allowNullTag;
 	bool requestAutomaticFQTag;
