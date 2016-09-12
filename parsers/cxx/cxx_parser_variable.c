@@ -535,7 +535,7 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 			}
 
 			// anything that remains is part of type
-			CXXToken * pTypeToken = cxxTagSetTypeField(cxxTokenChainFirst(pChain),t->pPrev);
+			CXXToken * pTypeToken = cxxTagCheckAndSetTypeField(cxxTokenChainFirst(pChain),t->pPrev);
 
 			tag->isFileScope = bKnRStyleParameters ?
 					TRUE :

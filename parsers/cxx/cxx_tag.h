@@ -91,9 +91,12 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken);
 
 // Set the type of the current tag from the specified token sequence
 // (which must belong to the same chain!).
-// Returns a token that must be destroyed after cxxTagCommit() has
-// been called.
-CXXToken * cxxTagSetTypeField(
+// Before setting the type this function will check that the specified
+// range of tokens looks reasonable for a type name and if it looks
+// suspicious will refuse to emit it.
+// If the type is effectively set then the return value is a token that must
+// be destroyed after cxxTagCommit() has been called.
+CXXToken * cxxTagCheckAndSetTypeField(
 		CXXToken * pTypeStart,
 		CXXToken * pTypeEnd
 	);

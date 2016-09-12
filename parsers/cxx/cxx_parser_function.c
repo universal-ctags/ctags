@@ -1090,7 +1090,7 @@ int cxxParserEmitFunctionTags(
 		CXXToken * pTypeName;
 
 		if(pInfo->pTypeStart)
-			pTypeName = cxxTagSetTypeField(pInfo->pTypeStart,pInfo->pTypeEnd);
+			pTypeName = cxxTagCheckAndSetTypeField(pInfo->pTypeStart,pInfo->pTypeEnd);
 		else
 			pTypeName = NULL;
 
@@ -1296,7 +1296,7 @@ void cxxParserEmitFunctionParameterTags(CXXFunctionParameterInfo * pInfo)
 
 				cxxTokenChainTakeRecursive(pInfo->pChain,pInfo->aIdentifiers[i]);
 
-				pTypeName = cxxTagSetTypeField(
+				pTypeName = cxxTagCheckAndSetTypeField(
 						pTypeStart,
 						pTypeEnd
 					);
