@@ -2,4 +2,4 @@
 # License: GPL-2
 CTAGS=$1
 
-${CTAGS} --language-force=C --languages=-C input.c
+${CTAGS} --quiet --options=NONE --language-force=C --languages=-C input.c
