@@ -1046,11 +1046,11 @@ char* readLineRawWithNoSeek (vString* const vline, FILE *const pp)
 
 	vStringClear (vline);
 	nlcr = FALSE;
-	
+
 	while (1)
 	{
 		c = fgetc (pp);
-		
+
 		if (c == EOF)
 		{
 			if (! feof (pp))
@@ -1060,7 +1060,7 @@ char* readLineRawWithNoSeek (vString* const vline, FILE *const pp)
 		}
 
 		result = vStringValue (vline);
-		
+
 		if (c == '\n' || c == '\r')
 			nlcr = TRUE;
 		else if (nlcr)
