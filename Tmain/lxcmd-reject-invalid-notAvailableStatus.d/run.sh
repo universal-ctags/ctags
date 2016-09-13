@@ -6,4 +6,4 @@ CTAGS=$1
 . ../utils.sh
 exit_if_no_coproc ${CTAGS}
 
-${CTAGS} --quiet --langdef=ZZZ --xcmd-ZZZ=ls'{notAvailableStatus=x}'
+${CTAGS} --quiet --options=NONE --langdef=ZZZ --xcmd-ZZZ=ls'{notAvailableStatus=x}'

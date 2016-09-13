@@ -3,4 +3,5 @@
 
 CTAGS=$1
 
-${CTAGS} -o - --fields-'*'=+{signature}-{typeref} --list-fields | grep 'signature\|typeref'
+${CTAGS} --quiet --options=NONE \
+		 -o - --fields-'*'=+{signature}-{typeref} --list-fields | grep 'signature\|typeref'
