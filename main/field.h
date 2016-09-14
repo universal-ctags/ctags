@@ -49,7 +49,7 @@ typedef enum eFieldType { /* extension field content control */
 	FIELD_XPATH,
 	FIELD_SCOPE_KIND_LONG,
 	FIELD_END,
-	FIELD_BUILTIN_LAST = FIELD_SCOPE_KIND_LONG,
+	FIELD_BUILTIN_LAST = FIELD_END,
 } fieldType ;
 
 typedef const char* (* renderEscaped) (const tagEntryInfo *const tag,

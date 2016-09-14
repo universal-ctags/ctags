@@ -112,7 +112,7 @@ output: doIt class
 status: 0
 
 field: e
-output: Foo 
-output: doIt 
+output: Foo 3
+output: doIt 3
 status: 0
 
