@@ -1,0 +1,6 @@
+cat	input.dog	/^define: cat/;"	d	line:2
+cat	xcmd-tag-relative-option.d/input.dog	/^define: cat/;"	d	line:2
+dog	input.dog	/^define: dog$/;"	d	line:1
+dog	xcmd-tag-relative-option.d/input.dog	/^define: dog$/;"	d	line:1
+input.dog	input.dog	1;"	F	line:1
+input.dog	xcmd-tag-relative-option.d/input.dog	1;"	F	line:1

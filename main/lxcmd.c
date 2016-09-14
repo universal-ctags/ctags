@@ -1167,6 +1167,12 @@ static boolean invokeXcmdPath (const char* const fileName, xcmdPath* path, const
 			if (parseXcmdPath (line, path, &entry) )
 			{
 				entryAddField (&entry, "language", getLanguageName (language));
+
+				/* Throw away the input file name returned from the xcmd.
+				   Instead we use the input file name arranged
+				   (relative or absolute) by ctags main side. */
+				entry.file = getInputFileTagPath ();
+
 				if (makeTagEntryFromTagEntry (path, &entry))
 					result = TRUE;
 				freeTagEntry (&entry);
