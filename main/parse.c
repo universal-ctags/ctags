@@ -259,7 +259,7 @@ static langType getNameOrAliasesLanguageAndSpec (const char *const key, langType
 	for (i = start_index  ;  i < LanguageCount  &&  result == LANG_IGNORE  ;  ++i)
 	{
 		const parserDefinition* const lang = LanguageTable [i];
-		stringList* const aliases = lang->currentAliaes;
+		stringList* const aliases = lang->currentAliases;
 		vString* tmp;
 
 		/* isLanguageEnabled is not used here.
@@ -1221,14 +1221,14 @@ extern void installLanguageAliasesDefault (const langType language)
 	parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
-	if (lang->currentAliaes != NULL)
-		stringListDelete (lang->currentAliaes);
+	if (lang->currentAliases != NULL)
+		stringListDelete (lang->currentAliases);
 
 	if (lang->aliases == NULL)
-		lang->currentAliaes = stringListNew ();
+		lang->currentAliases = stringListNew ();
 	else
 	{
-		lang->currentAliaes =
+		lang->currentAliases =
 			stringListNewFromArgv (lang->aliases);
 	}
 	BEGIN_VERBOSE(vfp);
@@ -1256,7 +1256,7 @@ extern void clearLanguageMap (const langType language)
 extern void clearLanguageAliases (const langType language)
 {
 	Assert (0 <= language  &&  language < (int) LanguageCount);
-	stringListClear (LanguageTable [language]->currentAliaes);
+	stringListClear (LanguageTable [language]->currentAliases);
 }
 
 static boolean removeLanguagePatternMap1(const langType language, const char *const pattern)
@@ -1344,9 +1344,9 @@ extern void addLanguageAlias (const langType language, const char* alias)
 	parserDefinition* lang;
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
-	if (lang->currentAliaes == NULL)
-		lang->currentAliaes = stringListNew ();
-	stringListAdd (lang->currentAliaes, str);
+	if (lang->currentAliases == NULL)
+		lang->currentAliases = stringListNew ();
+	stringListAdd (lang->currentAliases, str);
 }
 
 extern void enableLanguage (const langType language, const boolean state)
@@ -1511,7 +1511,7 @@ extern void freeParserResources (void)
 
 		freeList (&lang->currentPatterns);
 		freeList (&lang->currentExtensions);
-		freeList (&lang->currentAliaes);
+		freeList (&lang->currentAliases);
 
 		eFree (lang->name);
 		lang->name = NULL;
@@ -1978,10 +1978,10 @@ static void processLangAliasOption (const langType language,
 	}
 	else if (parameter[0] == '-')
 	{
-		if (lang->currentAliaes)
+		if (lang->currentAliases)
 		{
 			alias = parameter + 1;
-			if (stringListDeleteItemExtension (lang->currentAliaes, alias))
+			if (stringListDeleteItemExtension (lang->currentAliases, alias))
 			{
 				verbose ("remove alias %s from %s\n", alias, lang->name);
 			}
@@ -2035,10 +2035,10 @@ static void printAliases (const langType language, FILE *fp)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	lang = LanguageTable [language];
 
-	if (lang->currentAliaes != NULL)
-		for (i = 0  ;  i < stringListCount (lang->currentAliaes)  ;  ++i)
+	if (lang->currentAliases != NULL)
+		for (i = 0  ;  i < stringListCount (lang->currentAliases)  ;  ++i)
 			fprintf (fp, " %s", vStringValue (
-					stringListItem (lang->currentAliaes, i)));
+					stringListItem (lang->currentAliases, i)));
 }
 
 extern void printLanguageMaps (const langType language, langmapType type)
