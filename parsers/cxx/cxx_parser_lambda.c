@@ -165,7 +165,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 		CXXToken * pTypeName;
 
 		if(pTypeStart)
-			pTypeName = cxxTagSetTypeField(pTypeStart,pTypeEnd);
+			pTypeName = cxxTagCheckAndSetTypeField(pTypeStart,pTypeEnd);
 		else
 			pTypeName = NULL;
 

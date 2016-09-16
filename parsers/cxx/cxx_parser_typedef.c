@@ -249,7 +249,7 @@ skip_to_comma_or_end:
 						"There should be at least another token here!"
 					);
 
-				pTypeName = cxxTagSetTypeField(
+				pTypeName = cxxTagCheckAndSetTypeField(
 							cxxTokenChainFirst(pChain),
 							pComma ? pComma->pPrev : cxxTokenChainLast(pChain)
 						);

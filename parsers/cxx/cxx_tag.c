@@ -286,8 +286,96 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 	return pszProperties;
 }
 
+static boolean cxxTagCheckTypeField(
+		CXXToken * pTypeStart,
+		CXXToken * pTypeEnd
+	)
+{
+	CXX_DEBUG_ENTER();
+	if(!pTypeStart || !pTypeEnd)
+	{
+		CXX_DEBUG_LEAVE_TEXT("One of the pointers is NULL");
+		return FALSE;
+	}
+	
+	int iTotalCount = 0;
+	int iParenthesisCount = 0;
+	int iIdentifierOrKeywordCount = 0;
+	int iConsecutiveIdentifiers = 0;
+	
+	while(pTypeStart)
+	{
+		iTotalCount++;
+		if(iTotalCount > 30)
+		{
+			CXX_DEBUG_LEAVE_TEXT("The chain is really too long to be a type name");
+			return FALSE;
+		}
 
-CXXToken * cxxTagSetTypeField(
+		if(cxxTokenTypeIs(pTypeStart,CXXTokenTypeIdentifier))
+		{
+			iConsecutiveIdentifiers++;
+			iIdentifierOrKeywordCount++;
+			if(iConsecutiveIdentifiers > 4)
+			{
+				// Probably many macros inside. Too many.
+				CXX_DEBUG_LEAVE_TEXT("Too many consecutive identifiers for a type name");
+				return FALSE;
+			}
+		} else {
+			iConsecutiveIdentifiers = 0;
+
+			if(cxxTokenTypeIs(pTypeStart,CXXTokenTypeParenthesisChain))
+			{
+				iParenthesisCount++;
+				if(iParenthesisCount > 3)
+				{
+					CXX_DEBUG_LEAVE_TEXT("Too many non-nested parentheses for a type name");
+					return FALSE;
+				}
+				
+				if(
+					(iTotalCount > 1) &&
+					cxxTokenTypeIs(pTypeStart->pPrev,CXXTokenTypeIdentifier) &&
+					pTypeStart != pTypeEnd &&
+					pTypeStart->pNext &&
+					cxxTokenTypeIs(pTypeStart->pNext,CXXTokenTypeIdentifier)
+				)
+				{
+					// identifier () identifier
+					// Looks suspicious, might be macros gathered by mistake
+					CXX_DEBUG_LEAVE_TEXT("Identifier-parenthesis-identifier pattern: looks suspicious");
+					return FALSE;
+				}
+			} else if(cxxTokenTypeIs(pTypeStart,CXXTokenTypeKeyword))
+			{
+				iIdentifierOrKeywordCount++;
+			}
+		}
+
+		if(pTypeStart == pTypeEnd)
+			break;
+
+		pTypeStart = pTypeStart->pNext;
+	}
+	
+	if(iIdentifierOrKeywordCount < 1)
+	{
+		CXX_DEBUG_LEAVE_TEXT("Type does not seem to contains identifiers or keywords, can't be a type name");
+		return FALSE;
+	}
+	
+	if(!pTypeStart)
+	{
+		CXX_DEBUG_LEAVE_TEXT("Type tokens do not belong to the same chain!");
+		return FALSE;
+	}
+	
+	CXX_DEBUG_LEAVE();
+	return TRUE;
+}
+
+CXXToken * cxxTagCheckAndSetTypeField(
 		CXXToken * pTypeStart,
 		CXXToken * pTypeEnd
 	)
@@ -317,6 +405,12 @@ CXXToken * cxxTagSetTypeField(
 		}
 	} else {
 		szTypeRef0 = szTypename;
+	}
+
+	if(!cxxTagCheckTypeField(pTypeStart,pTypeEnd))
+	{
+		CXX_DEBUG_PRINT("Type name looks suspicious: refusing to emit it");
+		return NULL;
 	}
 
 	cxxTokenChainNormalizeTypeNameSpacingInRange(pTypeStart,pTypeEnd);
