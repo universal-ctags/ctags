@@ -25,6 +25,7 @@ auto p04() -> int (*)(int);
 static std::string p05(const int *** p05a01);
 auto n01::n02::p06(n01::c01 && p06a01) -> n01::n02::type01 *;
 unsigned int p07(int (*p07a01)(int * x1,int x2),...);
+void (*p08(void (*)(int *p08a01)))(int *);
 
 // Valid function declarations
 int f01(int f01a01,int f01a02)
@@ -58,6 +59,11 @@ auto n01::n02::f06(n01::c01 && f06a01) -> n01::n02::type01 *
 }
 
 unsigned int f07(int (*f07a01)(int * x1,int x2),...)
+{
+	return 0;
+}
+
+void (*f08(void (*)(int *f08a01)))(int *)
 {
 	return 0;
 }

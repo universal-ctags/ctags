@@ -1,19 +1,21 @@
-f01	input.cpp	/^int f01(int f01a01,int f01a02)$/;"	f	typeref:typename:int	signature:(int f01a01,int f01a02)	end:33
+f01	input.cpp	/^int f01(int f01a01,int f01a02)$/;"	f	typeref:typename:int	signature:(int f01a01,int f01a02)	end:34
 f01a01	input.cpp	/^int f01(int f01a01,int f01a02)$/;"	z	function:f01	typeref:typename:int	file:
 f01a02	input.cpp	/^int f01(int f01a01,int f01a02)$/;"	z	function:f01	typeref:typename:int	file:
-f02	input.cpp	/^unsigned short int * f02(unsigned int & f02a01,...)$/;"	f	typeref:typename:unsigned short int *	signature:(unsigned int & f02a01,...)	end:38
+f02	input.cpp	/^unsigned short int * f02(unsigned int & f02a01,...)$/;"	f	typeref:typename:unsigned short int *	signature:(unsigned int & f02a01,...)	end:39
 f02a01	input.cpp	/^unsigned short int * f02(unsigned int & f02a01,...)$/;"	z	function:f02	typeref:typename:unsigned int &	file:
-f03	input.cpp	/^auto f03(const int & f03a01,void * f03a02) -> const int &$/;"	f	typeref:typename:const int &	signature:(const int & f03a01,void * f03a02)	end:43
+f03	input.cpp	/^auto f03(const int & f03a01,void * f03a02) -> const int &$/;"	f	typeref:typename:const int &	signature:(const int & f03a01,void * f03a02)	end:44
 f03a01	input.cpp	/^auto f03(const int & f03a01,void * f03a02) -> const int &$/;"	z	function:f03	typeref:typename:const int &	file:
 f03a02	input.cpp	/^auto f03(const int & f03a01,void * f03a02) -> const int &$/;"	z	function:f03	typeref:typename:void *	file:
-f04	input.cpp	/^auto f04() -> int (*)(int)$/;"	f	typeref:typename:int (*)(int)	signature:()	end:48
-f05	input.cpp	/^static inline std::string f05(const int *** f05a01)$/;"	f	typeref:typename:std::string	file:	signature:(const int *** f05a01)	end:53
+f04	input.cpp	/^auto f04() -> int (*)(int)$/;"	f	typeref:typename:int (*)(int)	signature:()	end:49
+f05	input.cpp	/^static inline std::string f05(const int *** f05a01)$/;"	f	typeref:typename:std::string	file:	signature:(const int *** f05a01)	end:54
 f05a01	input.cpp	/^static inline std::string f05(const int *** f05a01)$/;"	z	function:f05	typeref:typename:const int ***	file:
 f06	input.cpp	/^		auto f06(n01::c01 && f06a01) -> type01 *;$/;"	p	namespace:n01::n02	typeref:typename:type01 *	file:	signature:(n01::c01 && f06a01)
-f06	input.cpp	/^auto n01::n02::f06(n01::c01 && f06a01) -> n01::n02::type01 *$/;"	f	class:n01::n02	typeref:typename:n01::n02::type01 *	signature:(n01::c01 && f06a01)	end:58
+f06	input.cpp	/^auto n01::n02::f06(n01::c01 && f06a01) -> n01::n02::type01 *$/;"	f	class:n01::n02	typeref:typename:n01::n02::type01 *	signature:(n01::c01 && f06a01)	end:59
 f06a01	input.cpp	/^auto n01::n02::f06(n01::c01 && f06a01) -> n01::n02::type01 *$/;"	z	function:n01::n02::f06	typeref:typename:n01::c01 &&	file:
-f07	input.cpp	/^unsigned int f07(int (*f07a01)(int * x1,int x2),...)$/;"	f	typeref:typename:unsigned int	signature:(int (* f07a01)(int * x1,int x2),...)	end:63
+f07	input.cpp	/^unsigned int f07(int (*f07a01)(int * x1,int x2),...)$/;"	f	typeref:typename:unsigned int	signature:(int (* f07a01)(int * x1,int x2),...)	end:64
 f07a01	input.cpp	/^unsigned int f07(int (*f07a01)(int * x1,int x2),...)$/;"	z	function:f07	typeref:typename:int (*)(int * x1,int x2)	file:
+f08	input.cpp	/^void (*f08(void (*)(int *f08a01)))(int *)$/;"	f	signature:(void (*)(int * f08a01))	end:69
+f08a01	input.cpp	/^void (*f08(void (*)(int *f08a01)))(int *)$/;"	z	function:f08	typeref:typename:void (*)(int *)	file:
 p01	input.cpp	/^int p01(int p01a01,int p01a02);$/;"	p	typeref:typename:int	file:	signature:(int p01a01,int p01a02)
 p02	input.cpp	/^unsigned short int * p02(unsigned int & p02a01,...);$/;"	p	typeref:typename:unsigned short int *	file:	signature:(unsigned int & p02a01,...)
 p03	input.cpp	/^auto p03(const int & p03a01,void * p03a02) -> const int &;$/;"	p	typeref:typename:const int &	file:	signature:(const int & p03a01,void * p03a02)
@@ -22,7 +24,8 @@ p05	input.cpp	/^static std::string p05(const int *** p05a01);$/;"	p	typeref:type
 p06	input.cpp	/^		auto p06(n01::c01 && p06a01) -> type01 *;$/;"	p	namespace:n01::n02	typeref:typename:type01 *	file:	signature:(n01::c01 && p06a01)
 p06	input.cpp	/^auto n01::n02::p06(n01::c01 && p06a01) -> n01::n02::type01 *;$/;"	p	class:n01::n02	typeref:typename:n01::n02::type01 *	file:	signature:(n01::c01 && p06a01)
 p07	input.cpp	/^unsigned int p07(int (*p07a01)(int * x1,int x2),...);$/;"	p	typeref:typename:unsigned int	file:	signature:(int (* p07a01)(int * x1,int x2),...)
-t01	input.cpp	/^template <typename T> std::unique_ptr<T> t01(T && t01a01)$/;"	f	typeref:typename:std::unique_ptr<T>	signature:(T && t01a01)	end:69
+p08	input.cpp	/^void (*p08(void (*)(int *p08a01)))(int *);$/;"	p	file:	signature:(void (*)(int * p08a01))
+t01	input.cpp	/^template <typename T> std::unique_ptr<T> t01(T && t01a01)$/;"	f	typeref:typename:std::unique_ptr<T>	signature:(T && t01a01)	end:75
 t01a01	input.cpp	/^template <typename T> std::unique_ptr<T> t01(T && t01a01)$/;"	z	function:t01	typeref:typename:T &&	file:
-t02	input.cpp	/^template <typename T> auto t02(T && t02a01) -> std::unique_ptr<T>$/;"	f	typeref:typename:std::unique_ptr<T>	signature:(T && t02a01)	end:74
+t02	input.cpp	/^template <typename T> auto t02(T && t02a01) -> std::unique_ptr<T>$/;"	f	typeref:typename:std::unique_ptr<T>	signature:(T && t02a01)	end:80
 t02a01	input.cpp	/^template <typename T> auto t02(T && t02a01) -> std::unique_ptr<T>$/;"	z	function:t02	typeref:typename:T &&	file:

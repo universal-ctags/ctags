@@ -499,6 +499,9 @@ boolean cxxParserTokenChainLooksLikeConstructorParameterSet(
 // cxxParserTokenChainLooksLikeFunctionParameterList() which will eventually
 // fill it up.
 //
+// FIXME:
+// WS_DLL_PUBLIC void (*except_unhandled_catcher(void (*)(except_t *)))(except_t *); 
+//
 boolean cxxParserLookForFunctionSignature(
 		CXXTokenChain * pChain,
 		CXXFunctionSignatureInfo * pInfo,
@@ -537,6 +540,7 @@ boolean cxxParserLookForFunctionSignature(
 	CXXToken * pIdentifierEnd = NULL;
 	CXXToken * pTopLevelParenthesis = NULL;
 
+	boolean bTryToExtractType = TRUE;
 	boolean bStopScanning = FALSE;
 
 	while(pToken)
@@ -680,17 +684,65 @@ boolean cxxParserLookForFunctionSignature(
 
 			CXX_DEBUG_PRINT("Found parenthesis chain: check for identifier");
 
-			// parentheses at position 1 they are very likely to be macro invocations...
-			// but we still handle them in case we find nothing else
+			// parentheses at position 1 they are likely to be macro invocations...
+			// but we still handle them in case we find nothing else.
 
 			// must have an identifier before (this excludes things like __attribute__
 			// and declspec which are marked as keywords)
+			
+			// FIXME: Check for double parenthesis chain: a function returning a function.
+			
 			if(cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeIdentifier))
 			{
 				// identifier before
 				CXX_DEBUG_PRINT("Got identifier before");
 				pIdentifierStart = pToken->pPrev;
 				pIdentifierEnd = pToken->pPrev;
+			} else if(
+				// check for double parenthesis, keep functions returning function pointers
+				// discard everything else.
+				//
+				// Possible cases:
+				//    ret type (*variable)(params) <-- function pointer
+				//    ret type (* const (variable[4]))(params) <-- function pointer
+				//    ret type (*function_name())() <-- function returning function pointer
+				pToken->pNext &&
+				cxxTokenTypeIs(pToken->pNext,CXXTokenTypeParenthesisChain) &&
+				// the next parenthesis must look like a function parameter list (return function)
+				cxxParserTokenChainLooksLikeFunctionParameterList(
+						pToken->pNext->pChain,
+						NULL
+					) &&
+				// look for the identifier
+				(pIdentifierStart = cxxTokenChainFirstPossiblyNestedTokenOfType(
+						pToken->pChain,
+						CXXTokenTypeIdentifier
+					))
+				)
+			{
+				// Now pIdentifierStart points at the innermost identifier
+				// Check if it's followed by a parameter list
+				if(
+					pIdentifierStart->pNext &&
+					cxxTokenTypeIs(pIdentifierStart->pNext,CXXTokenTypeParenthesisChain) &&
+					cxxParserTokenChainLooksLikeFunctionParameterList(
+							pIdentifierStart->pNext->pChain,
+							NULL
+						)
+					)
+				{
+					CXX_DEBUG_PRINT("Looks like a function returning a function pointer");
+					pIdentifierEnd = pIdentifierStart;
+					pToken = pIdentifierStart->pNext; // point it to the correct parenthesis
+					bStopScanning = TRUE;
+					bTryToExtractType = FALSE; // don't attempt to extract type, it's too hard.
+				} else {
+					// Looks more like a function pointer or something else we can't figure out
+					CXX_DEBUG_LEAVE_TEXT(
+							"Does not look like a function returning a function pointer"
+						);
+					return FALSE;
+				}
 			} else if(
 					pToken->pPrev->pPrev &&
 					cxxTokenTypeIs(pToken->pPrev,CXXTokenTypeGreaterThanSign)
@@ -721,6 +773,11 @@ boolean cxxParserLookForFunctionSignature(
 				goto next_token;
 			}
 		}
+
+		CXX_DEBUG_ASSERT(
+				cxxTokenTypeIs(pToken,CXXTokenTypeParenthesisChain),
+				"Must have found a parenthesis chain here"
+			);
 
 		// looks almost fine
 
@@ -921,7 +978,7 @@ next_token:
 
 	// Check return type
 	pToken = pInfo->pScopeStart ? pInfo->pScopeStart : pInfo->pIdentifierStart;
-	if(pToken->pPrev)
+	if(pToken->pPrev && bTryToExtractType)
 	{
 		CXXToken * pParenthesisOrConst = pInfo->pSignatureConst ?
 				pInfo->pSignatureConst : pInfo->pParenthesis;
