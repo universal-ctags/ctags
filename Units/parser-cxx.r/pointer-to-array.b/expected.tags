@@ -1,0 +1,8 @@
+arr	input.c	/^  int (*arr)[] = foo();$/;"	l	function:main	typeref:typename:int (*)[]	file:
+bar	input.c	/^int2ptr_func bar = foo;$/;"	v	typeref:typename:int2ptr_func
+baz	input.c	/^int2ptr (*baz)(void) = foo;$/;"	v	typeref:typename:int2ptr (*)(void)
+foo	input.c	/^static int (*foo(void))[2] {$/;"	f	typeref:typename:int (*)[2]	file:
+foo_arr	input.c	/^  static int foo_arr[2] = {1, 2};$/;"	l	function:foo	typeref:typename:int[2]	file:
+int2ptr	input.c	/^typedef int (*int2ptr)[2];$/;"	t	typeref:typename:int (*)[2]	file:
+int2ptr_func	input.c	/^typedef int (*(*int2ptr_func)(void))[2];$/;"	t	typeref:typename:int (*(*)(void))[2]	file:
+main	input.c	/^int main(void) {$/;"	f	typeref:typename:int
