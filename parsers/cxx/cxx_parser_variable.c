@@ -363,6 +363,12 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 		// Skip back to the beginning of the scope, if any
 		while(pTokenBefore->eType == CXXTokenTypeMultipleColons)
 		{
+			if(!cxxParserCurrentLanguageIsCPP())
+			{
+				CXX_DEBUG_LEAVE_TEXT("Syntax error: found multiple colons in C language");
+				return FALSE;
+			}
+
 			pTokenBefore = pTokenBefore->pPrev;
 			if(!pTokenBefore)
 			{
