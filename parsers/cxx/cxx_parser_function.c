@@ -1389,15 +1389,6 @@ int cxxParserExtractFunctionSignatureBeforeOpeningBracket(int * piCorkQueueIndex
 			piCorkQueueIndex
 		);
 
-#ifdef CXX_DO_DEBUGGING
-	vString * pJoinedChain = cxxTokenChainJoin(g_cxx.pTokenChain,NULL,0);
-	CXX_DEBUG_PRINT(
-			"Might be emitting parameters from chain %s",
-			vStringValue(pJoinedChain)
-		);
-	vStringDelete(pJoinedChain);
-#endif
-
 	if(cxxTagKindEnabled(CXXTagKindPARAMETER))
 		cxxParserEmitFunctionParameterTags(&oParamInfo);
 
