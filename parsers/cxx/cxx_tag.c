@@ -387,6 +387,12 @@ CXXToken * cxxTagCheckAndSetTypeField(
 	// "typename" is debatable since it's not really
 	// allowed by C++ for unqualified types. However I haven't been able
 	// to come up with something better... so "typename" it is for now.
+	
+	// FIXME: The typeRef forma with two fields should be dropped.
+	//        It has been created with specific use cases in mind
+	//        and we are pushing it way beyond them.
+	//        We should have a plain "type" field instead.
+	
 	static const char * szTypename = "typename";
 
 	if(pTypeStart != pTypeEnd)

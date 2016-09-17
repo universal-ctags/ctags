@@ -80,26 +80,45 @@ typedef enum _CXXFunctionSignatureInfoFlag
 //
 typedef struct _CXXFunctionSignatureInfo
 {
-	// The parenthesis token. Note that in some special cases it may
-	// belong to a subchain.
+	// The parenthesis token.
+	// It is always contained in the chain pointed by pParenthesisContainerChain
 	CXXToken * pParenthesis;
+	
+	// The token chain that contains the parenthesis above. May or may not
+	// be the toplevel chain.
+	CXXTokenChain * pParenthesisContainerChain;
 
 	// The identifier. It's either a single token (so both pIdentifierStart
 	// and pIdentifierEnd point to the same token) or multiple tokens starting
 	// with the "operator" keyword. Spacing of the tokens is adjusted.
+	// The identifier is always contained in the chain pointed by pIdentifierChain.
 	CXXToken * pIdentifierStart;
 	CXXToken * pIdentifierEnd;
+	
+	// The chain that pIdentifierStart, pIdentifierEnd and pScopeStart
+	// belong to. It MAY be a nested chain and it may even be included in the
+	// range specified by pTypeStart / pTypeEnd below!
+	CXXTokenChain * pIdentifierChain;
 
 	// Non-NULL if the signature is followed by the "const" keyword
 	CXXToken * pSignatureConst;
 
 	// Non-NULL if there is a scope before the identifier.
 	// The scope ends at pIdentifierStart.
+	// The scope start is always in the chain pointed by pIdentifierChain.
 	CXXToken * pScopeStart;
 
-	// Non-NULL if a return type has been identified
+	// Non-NULL if a return type has been identified.
 	CXXToken * pTypeStart;
 	CXXToken * pTypeEnd;
+	// There are cases in that the type range defined above may
+	// contain the identifier, scope and signature ranges.
+	// This happens, for example, with functions returning
+	// nasty things, like:
+	//     int (*foo(void))[2]
+	// It is granted that the scope and identifier are either
+	// completly included or completly excluded from the type range.
+	boolean bTypeContainsIdentifierScopeAndSignature;
 	
 	// Non-NULL if there is a trailing comma after the function.
 	// This is used for the special case of multiple prototypes in a single

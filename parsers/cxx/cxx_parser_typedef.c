@@ -71,12 +71,74 @@ boolean cxxParserParseGenericTypedef(void)
 	return TRUE;
 }
 
+//
 // This function attempts to extract a typedef from the
 // specified chain.
 // The typedef keyword should already have been removed (!)
 // The function expects a terminator to be present at the end
 // unless bExpectTerminatorAtEnd is set to FALSE
 // The token chain may be condensed/destroyed upon exit.
+//
+// Samples:
+//    [typedef] int x;
+//        x = int
+//
+//    [typedef] struct y x;
+//        x = struct y
+//
+//    [typedef] some complex type x, *y, **z;
+//        x = some complex type
+//        y = some complex type *
+//        z = some complex type **
+//
+//    [typedef] int x[2];
+//        x = int[2]
+//
+//    [typedef] int (*x)[2];
+//        x = int (*)[2] <-- pointer to an array of two integers
+//
+//    [typedef] int *x[2];
+//        x = int * [2] <-- array of two pointers to integer
+//
+//    [typedef] int (*x)(void);
+//        x = int (*)(void) <--- function pointer
+//
+//    [typedef] int (x)(void)
+//        x = int ()(void) <--- function type (not a pointer!)
+//
+//    [typedef] int ((x))(void)
+//        x = int ()(void) <--- same as above
+//
+//    [typedef] int (*(*x)(int))[2];
+//        x = int (*(*)(int))[2] <-- which is a function pointer taking an int and
+//                                   returning a pointer to an array of two integers...
+//
+//    [typedef] blah (*x(k (*)(y *)))(z *);
+//        x = blah (*(k (*)(y *)))(z *) <-- which is a function (!not a function pointer!)
+//                                   taking a function pointer A as argument and returning
+//                                   a function pointer B. A = k (*)(y *)
+//                                   and B = blah (*)(z *)
+//
+// Note that not all syntaxes involving parentheses are valid.
+// Examples of what is NOT valid:
+// 
+//    [typedef] unsigned (int)(*x)() 
+//    [typedef] int[] x;
+//
+// So:
+//  - if there is an identifier at the end, we use that
+//  - if there are round parentheses then the identifier seems to be the first
+//    one found in the nested parentheses chain
+//  - if there are no round parentheses then the identifier is the last one
+//    found in the toplevel chain
+//
+// In case of multiple declarations it seems that only the first part with identifiers
+// and keywords is kept across types.
+// Ex:
+//    [typedef] int (*int2ptr)[2], baz;
+//        int2ptr = int (*)[2]
+//        baz     = int
+//
 void cxxParserExtractTypedef(
 		CXXTokenChain * pChain,
 		boolean bExpectTerminatorAtEnd
@@ -121,27 +183,28 @@ void cxxParserExtractTypedef(
 	// since we were parsing a generic statement which expected less-than
 	// and greater-than operators to be present. We need to take care of that.
 
-
 	while(pChain->iCount >= 2)
 	{
-		// Skip either to a comma or to the end.
+		//
+		// Skip either to a comma or to the end, but keep track of the first parenthesis.
+		//
 
 		t = cxxTokenChainFirst(pChain);
 
 		CXX_DEBUG_ASSERT(t,"There should be a token here!");
 
+		CXXToken * pFirstParenthesis = NULL;
+		int iSearchTypes = CXXTokenTypeComma | CXXTokenTypeSmallerThanSign |
+								CXXTokenTypeParenthesisChain;
 		CXXToken * pComma;
 
 skip_to_comma_or_end:
 
-		pComma = cxxTokenChainNextTokenOfType(
-				t,
-				CXXTokenTypeComma | CXXTokenTypeSmallerThanSign
-			);
+		pComma = cxxTokenChainNextTokenOfType(t,iSearchTypes);
 
 		if(pComma)
 		{
-			// Either a comma or <
+			// , < or (
 			if(cxxTokenTypeIs(pComma,CXXTokenTypeSmallerThanSign))
 			{
 				CXX_DEBUG_PRINT("Found angle bracket, trying to skip it");
@@ -152,12 +215,29 @@ skip_to_comma_or_end:
 					CXX_DEBUG_LEAVE_TEXT("Mismatched < sign inside typedef: giving up on it");
 					return;
 				}
+				// and go ahead
+				goto skip_to_comma_or_end;
+			}
+			
+			if(cxxTokenTypeIs(pComma,CXXTokenTypeParenthesisChain))
+			{
+				// We keep track only of the first one
+				CXX_DEBUG_ASSERT(
+						!pFirstParenthesis,
+						"We should have stopped only at the first parenthesis"
+					);
+
+				iSearchTypes &= ~CXXTokenTypeParenthesisChain;
+				pFirstParenthesis = pComma;
+				// and go ahead
 				goto skip_to_comma_or_end;
 			}
 
-			CXX_DEBUG_PRINT("Found comma");
+			CXX_DEBUG_ASSERT(cxxTokenTypeIs(pComma,CXXTokenTypeComma),"Oops, expected a comma!");
 
 			// Really a comma!
+			CXX_DEBUG_PRINT("Found comma");
+
 			if((!pComma->pPrev) || (!pComma->pPrev->pPrev))
 			{
 				CXX_DEBUG_LEAVE_TEXT("Found comma but not enough tokens before it");
@@ -171,45 +251,38 @@ skip_to_comma_or_end:
 			t = cxxTokenChainLast(pChain);
 		}
 
-		CXX_DEBUG_ASSERT(t,"We should have found an identifier token here!");
+		CXX_DEBUG_ASSERT(t,"We should have found a token here!");
 
+		//
+		// Now look for the identifier
+		//
 		CXXTokenChain * pTParentChain;
 
-		CXXToken * pAux;
-
-		// check for special case of function pointer definition
-		if(
-			cxxTokenTypeIs(t,CXXTokenTypeParenthesisChain) &&
-			t->pPrev &&
-			cxxTokenTypeIs(t->pPrev,CXXTokenTypeParenthesisChain) &&
-			t->pPrev->pPrev &&
-			(pAux = cxxTokenChainLastTokenOfType(
-					t->pPrev->pChain,
-					CXXTokenTypeIdentifier
-				))
-		)
+		if(cxxTokenTypeIs(t,CXXTokenTypeIdentifier))
 		{
-			CXX_DEBUG_PRINT("Found function pointer typedef");
-			pTParentChain = t->pPrev->pChain;
-			t = pAux;
-		} else if(cxxTokenTypeIs(t,CXXTokenTypeIdentifier))
-		{
-			CXX_DEBUG_PRINT("Found straight typedef");
+			// Use the identifer at end, whatever comes before
+			CXX_DEBUG_PRINT("Identifier seems to be at end: %s",vStringValue(t->pszWord));
 			pTParentChain = pChain;
-		} else if((pAux = cxxTokenChainPreviousTokenOfType(t,CXXTokenTypeIdentifier)))
+		} else if(pFirstParenthesis)
 		{
-			CXX_DEBUG_PRINT("Found typedef of something that might look like an array");
-			t = pAux;
-			pTParentChain = pChain;
+			// look for the first nested identifier in here
+			CXX_DEBUG_PRINT("Identifier not at end, but got parenthesis chain");
+			t = cxxTokenChainFirstPossiblyNestedTokenOfType(
+					pFirstParenthesis->pChain,
+					CXXTokenTypeIdentifier,
+					&pTParentChain
+				);
 		} else {
-			CXX_DEBUG_LEAVE_TEXT("Didn't find an identifier");
-			return; // EOF
+			// just scan backwards to the last identifier
+			CXX_DEBUG_PRINT("No identifier and no parenthesis chain, trying to scan backwards");
+			pTParentChain = pChain;
+			t = cxxTokenChainPreviousTokenOfType(t,CXXTokenTypeIdentifier);
 		}
 
-		if(!t->pPrev)
+		if(!t)
 		{
-			CXX_DEBUG_LEAVE_TEXT("No type before the typedef'd identifier");
-			return; // EOF
+			CXX_DEBUG_LEAVE_TEXT("Didn't find an identifier: something nasty is going on");
+			return;
 		}
 
 		tagEntryInfo * tag = cxxTagBegin(CXXTagKindTYPEDEF,t);
@@ -280,7 +353,7 @@ skip_to_comma_or_end:
 				)
 			)
 		{
-			pAux = pComma->pPrev;
+			CXXToken * pAux = pComma->pPrev;
 			cxxTokenChainTake(pChain,pAux);
 			cxxTokenDestroy(pAux);
 		}

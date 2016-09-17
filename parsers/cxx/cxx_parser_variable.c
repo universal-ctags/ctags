@@ -215,7 +215,8 @@ boolean cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int
 							) &&
 						(pIdentifier = cxxTokenChainFirstPossiblyNestedTokenOfType(
 								t->pChain,
-								CXXTokenTypeIdentifier
+								CXXTokenTypeIdentifier,
+								NULL
 							)) &&
 						// Discard function declarations with function return types
 						// like void (*A(B))(C);
