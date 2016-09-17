@@ -1,0 +1,1 @@
+mysub	input.unknown	/^function mysub(pat, repl, str, global)$/;"	f

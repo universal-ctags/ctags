@@ -74,6 +74,7 @@ extern parserDefinition* AwkParser (void)
 	def->kinds      = AwkKinds;
 	def->kindCount  = ARRAY_SIZE (AwkKinds);
 	def->extensions = extensions;
+	def->aliases    = aliases;
 	def->parser     = findAwkTags;
 	return def;
 }
