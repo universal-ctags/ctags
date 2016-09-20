@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include "entry.h"
-#include "iniconf.h"
+#include "meta-iniconf.h"
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
