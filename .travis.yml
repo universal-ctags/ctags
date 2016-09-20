@@ -38,6 +38,7 @@ addons:
       - binutils-mingw-w64-i686
       - gcc-mingw-w64-i686
       - libjansson-dev
+      - libyaml-dev
 
 env:
   - TARGET=Unix
