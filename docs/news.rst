@@ -35,6 +35,7 @@ New parsers
 The following parsers have been added:
 
 * Ada
+* AnsiblePlaybook *libyaml*
 * Autoconf
 * Automake
 * Clojure

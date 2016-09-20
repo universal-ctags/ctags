@@ -212,6 +212,8 @@ YAML_HEAD = parsers/meta-yaml.h
 YAML_SRCS = \
 	  parsers/yaml.c		\
 	  \
+	  parsers/ansibleplaybook.c	\
+	  \
 	  $(NULL)
 
 DEBUG_HEADS = main/debug.h

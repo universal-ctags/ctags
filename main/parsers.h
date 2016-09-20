@@ -27,7 +27,8 @@
 
 #ifdef HAVE_LIBYAML
 #define YAML_PARSER_LIST						\
-	YamlParser
+	YamlParser,									\
+	AnsiblePlaybookParser
 #else
 #define YAML_PARSER_LIST
 #endif
