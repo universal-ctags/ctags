@@ -19,7 +19,6 @@
 #include "meta-yaml.h"
 
 
-#ifdef HAVE_LIBYAML
 
 #define entry(X) [X] = #X
 static const char *tokenTypeName [] = {
@@ -203,19 +202,3 @@ extern parserDefinition* YamlParser (void)
 
 	return def;
 }
-
-#else
-
-extern void parserYaml (yamlCallback cb, void *data)
-{
-}
-
-extern void attachYamlPosition (tagEntryInfo *tag, yaml_token_t *token)
-{
-}
-
-extern void registerYamlParserClient (struct yamlParserClient *client)
-{
-}
-
-#endif
