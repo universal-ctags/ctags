@@ -32,6 +32,6 @@ struct yamlParserClient {
 
 extern void registerYamlParserClient (struct yamlParserClient *client);
 extern void runYamlParser (const yamlCallback callback, void* userData);
-extern void attachYamlPosition (tagEntryInfo *tag, yaml_token_t *token);
+extern void attachYamlPosition (tagEntryInfo *tag, yaml_token_t *token, bool asEndPosition);
 
 #endif

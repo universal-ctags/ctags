@@ -91,10 +91,17 @@ extern void runYamlParser (const yamlCallback callback, void* userData)
 	yamlFini (&yaml);
 }
 
-extern void attachYamlPosition (tagEntryInfo *tag, yaml_token_t *token)
+extern void attachYamlPosition (tagEntryInfo *tag, yaml_token_t *token, bool asEndPosition)
 {
-	tag->lineNumber = token->start_mark.line + 1;
-	tag->filePosition = getInputFilePositionForLine (tag->lineNumber);
+	unsigned int ln = token->start_mark.line + 1;
+
+	if (asEndPosition)
+		tag->extensionFields.endLine = ln;
+	else
+		{
+			tag->lineNumber = ln;
+			tag->filePosition = getInputFilePositionForLine (tag->lineNumber);
+		}
 }
 
 static hashTable *yamlParserClients;
@@ -165,14 +172,14 @@ static void yaml (yaml_token_t *token, void *data CTAGS_ATTR_UNUSED)
 		{
 			initTagEntry (&tag, (char *)token->data.anchor.value,
 						  YamlKinds + K_ANCHOR);
-			attachYamlPosition (&tag, token);
+			attachYamlPosition (&tag, token, false);
 			makeTagEntry (&tag);
 		}
 	else if (token->type == YAML_ALIAS_TOKEN)
 		{
 			initRefTagEntry (&tag, (char *)token->data.alias.value,
 							 YamlKinds + K_ANCHOR, R_ANCHOR_ALIAS);
-			attachYamlPosition (&tag, token);
+			attachYamlPosition (&tag, token, false);
 			makeTagEntry (&tag);
 		}
 

@@ -133,7 +133,7 @@ static void	ansiblePlaybookPlayStateMachine (struct ansiblePlaybookState *state,
 					tagEntryInfo tag;
 					initTagEntry (&tag, (char *)token->data.scalar.value,
 								  AnsiblePlaybookKinds + K_PLAY);
-					attachYamlPosition (&tag, token);
+					attachYamlPosition (&tag, token, false);
 					makeTagEntry (&tag);
 					state->play_detection_state = DSTAT_PLAY_NAME_INITIAL;
 				}
