@@ -81,7 +81,8 @@ extern void runYamlParser (const yamlCallback callback, void* userData)
 				break;
 
 			callback (&token, userData);
-			verbose("yaml token:%s<%d>\n", tokenTypeName[token.type], token.type);
+			verbose("yaml token:%s<%d>@Line:%lu\n", tokenTypeName[token.type], token.type,
+					token.start_mark.line + 1);
 			if (token.type == YAML_STREAM_END_TOKEN)
 				done = true;
 
