@@ -9,6 +9,7 @@
 */
 
 #include "general.h"	/* must always come first */
+#include "debug.h"
 #include "entry.h"
 #include "kind.h"
 #include "meta-yaml.h"
@@ -27,6 +28,7 @@ static kindOption AnsiblePlaybookKinds [] = {
 
 struct yamlBlockTypeStack {
 	yaml_token_type_t type;
+	int associatedCorkIndex;
 	struct yamlBlockTypeStack *next;
 };
 
@@ -54,9 +56,11 @@ static void pushBlockType (struct ansiblePlaybookState *state, yaml_token_type_t
 	state->type_stack = s;
 
 	s->type = t;
+	s->associatedCorkIndex = CORK_NIL;
 }
 
-static void popBlockType (struct ansiblePlaybookState *state)
+static void popBlockType (struct ansiblePlaybookState *state,
+						  yaml_token_t *token)
 {
 	struct yamlBlockTypeStack *s;
 
@@ -64,13 +68,22 @@ static void popBlockType (struct ansiblePlaybookState *state)
 	state->type_stack = s->next;
 
 	s->next = NULL;
+	if (s->associatedCorkIndex != CORK_NIL)
+		{
+			tagEntryInfo *tag;
+
+			tag = getEntryInCorkQueue (s->associatedCorkIndex);
+			attachYamlPosition (tag, token, true);
+		}
+
 	eFree (s);
 }
 
-static void popAllBlockType (struct ansiblePlaybookState *state)
+static void popAllBlockType (struct ansiblePlaybookState *state,
+							 yaml_token_t *token)
 {
 	while (state->type_stack)
-		popBlockType (state);
+		popBlockType (state, token);
 }
 
 static bool stateStackMatch (struct yamlBlockTypeStack *stack,
@@ -134,7 +147,9 @@ static void	ansiblePlaybookPlayStateMachine (struct ansiblePlaybookState *state,
 					initTagEntry (&tag, (char *)token->data.scalar.value,
 								  AnsiblePlaybookKinds + K_PLAY);
 					attachYamlPosition (&tag, token, false);
-					makeTagEntry (&tag);
+
+					Assert (state->type_stack->associatedCorkIndex == CORK_NIL);
+					state->type_stack->associatedCorkIndex = makeTagEntry (&tag);
 					state->play_detection_state = DSTAT_PLAY_NAME_INITIAL;
 				}
 			else
@@ -163,7 +178,9 @@ static void ansiblePlaybook (yaml_token_t *token, void *data)
 	ansiblePlaybookPlayStateMachine (state, token);
 
 	if (token->type == YAML_BLOCK_END_TOKEN)
-		popBlockType (state);
+		popBlockType (state, token);
+	else if (token->type == YAML_STREAM_END_TOKEN)
+		popAllBlockType (data, token);
 }
 
 static void *ansiblePlaybookPrepare(void)
@@ -175,22 +192,15 @@ static void *ansiblePlaybookPrepare(void)
 	return &state;
 }
 
-static void ansiblePlaybookTeardown (void *data)
-{
-	popAllBlockType (data);
-}
-
 static void
 findAnsiblePlaybookTags (void)
 {
 	void *data = ansiblePlaybookPrepare ();
 	runYamlParser (ansiblePlaybook, data);
-	ansiblePlaybookTeardown (data);
 }
 
 static struct yamlParserClient AnsiblePlaybookYamlClient = {
 	.prepareForNewInput = ansiblePlaybookPrepare,
-	.teardownForTheLastInput = ansiblePlaybookTeardown,
 	.callback = ansiblePlaybook,
 };
 
@@ -216,6 +226,7 @@ extern parserDefinition* AnsiblePlaybookParser (void)
 	def->kindCount     = ARRAY_SIZE (AnsiblePlaybookKinds);
 	def->parser        = findAnsiblePlaybookTags;
 	def->method        = METHOD_YAML;
+	def->useCork       = true;
 	return def;
 }
 
