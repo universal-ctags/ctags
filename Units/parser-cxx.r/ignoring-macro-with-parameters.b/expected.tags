@@ -1,0 +1,2 @@
+foo	input.hxx	/^namespace foo _GLIBCXX_VISIBILITY(default)$/;"	n
+x	input.hxx	/^  int x;$/;"	v	namespace:foo	typeref:typename:int
