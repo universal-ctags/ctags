@@ -392,10 +392,10 @@ extern boolean strToUInt(const char *const str, int base, unsigned int *value)
 	unsigned long ulong_value;
 
 	if(!strToULong(str, base, &ulong_value) || ulong_value > UINT_MAX)
-		return false;
+		return FALSE;
 
 	*value = (unsigned int) ulong_value;
-	return true;
+	return TRUE;
 }
 
 extern boolean strToInt(const char *const str, int base, int *value)
@@ -403,10 +403,10 @@ extern boolean strToInt(const char *const str, int base, int *value)
 	long long_value;
 
 	if(!strToLong(str, base, &long_value) || long_value > INT_MAX || long_value < INT_MIN)
-		return false;
+		return FALSE;
 
 	*value = (int) long_value;
-	return true;
+	return TRUE;
 }
 
 /*
