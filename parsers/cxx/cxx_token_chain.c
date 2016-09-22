@@ -210,6 +210,26 @@ void cxxTokenChainClear(CXXTokenChain * tc)
 	Assert(tc->pTail == NULL);
 }
 
+void cxxTokenChainInsertAfter(CXXTokenChain * tc,CXXToken * before,CXXToken * t)
+{
+	if(!before)
+	{
+		cxxTokenChainPrepend(tc,t);
+		return;
+	}
+	
+	if(!before->pNext)
+	{
+		cxxTokenChainAppend(tc,t);
+		return;
+	}
+	
+	t->pNext = before->pNext;
+	t->pPrev = before;
+	before->pNext = t;
+	t->pNext->pPrev = t;
+}
+
 void cxxTokenChainAppend(CXXTokenChain * tc,CXXToken * t)
 {
 	tc->iCount++;
@@ -636,7 +656,8 @@ CXXToken * cxxTokenChainLastPossiblyNestedTokenOfType(
 
 CXXToken * cxxTokenChainFirstPossiblyNestedTokenOfType(
 		CXXTokenChain * tc,
-		unsigned int uTokenTypes
+		unsigned int uTokenTypes,
+		CXXTokenChain ** ppParentChain
 	)
 {
 	if(!tc)
@@ -645,15 +666,20 @@ CXXToken * cxxTokenChainFirstPossiblyNestedTokenOfType(
 	while(t)
 	{
 		if(t->eType & uTokenTypes)
+		{
+			if(ppParentChain)
+				*ppParentChain = tc;
 			return t;
+		}
 		if(t->eType == CXXTokenTypeParenthesisChain)
 		{
 			CXXToken * tmp = cxxTokenChainFirstPossiblyNestedTokenOfType(
 					t->pChain,
-					uTokenTypes
+					uTokenTypes,
+					ppParentChain
 				);
 			if(tmp)
-				return tmp;
+				return tmp; // ppParentChain is already set
 		}
 		t = t->pNext;
 	}
@@ -905,6 +931,7 @@ CXXToken * cxxTokenChainExtractRange(
 
 	return pRet;
 }
+
 
 CXXToken * cxxTokenChainExtractIndexRange(
 		CXXTokenChain * tc,

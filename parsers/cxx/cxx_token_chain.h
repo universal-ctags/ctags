@@ -79,7 +79,8 @@ CXXToken * cxxTokenChainLastPossiblyNestedTokenOfType(
 // in nested () chains (only (), not [], {}...)
 CXXToken * cxxTokenChainFirstPossiblyNestedTokenOfType(
 		CXXTokenChain * tc,
-		unsigned int uTokenTypes
+		unsigned int uTokenTypes,
+		CXXTokenChain ** ppParentChain
 	);
 
 // Find the first token with type that is not one of the specified types
@@ -142,6 +143,7 @@ void cxxTokenChainDestroyRange(CXXTokenChain * pChain,CXXToken * from,CXXToken *
 
 void cxxTokenChainAppend(CXXTokenChain * tc,CXXToken * t);
 void cxxTokenChainPrepend(CXXTokenChain * tc,CXXToken * t);
+void cxxTokenChainInsertAfter(CXXTokenChain * tc,CXXToken * before,CXXToken * t);
 
 void cxxTokenChainMoveEntries(
 		CXXTokenChain * src,
@@ -206,6 +208,14 @@ CXXToken * cxxTokenChainExtractRange(
 		CXXToken * to,
 		unsigned int uFlags
 	);
+CXXToken * cxxTokenChainExtractRangeWithExclusions(
+		CXXToken * from,
+		CXXToken * to,
+		unsigned int uFlags,
+		CXXToken ** pExcludedTokens,
+		unsigned int uExcludedTokenCount
+	);
+
 CXXToken * cxxTokenChainExtractIndexRange(
 		CXXTokenChain * tc,
 		int iFirstIndex,

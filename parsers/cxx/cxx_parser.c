@@ -1120,7 +1120,16 @@ check_function_signature:
 			//
 			// Let's try to extract also the other declarations.
 			//
-			cxxTokenChainDestroyRange(g_cxx.pTokenChain,oInfo.pIdentifierStart,oInfo.pTrailingComma);
+			// We cannot rely on oInfo.pIdentifierStart after cxxParserEmitFunctionTags()
+			// since it has been removed. Manually skip the initial type name.
+
+			CXXToken * pBegin = cxxTokenChainFirstTokenNotOfType(
+					g_cxx.pTokenChain,
+					CXXTokenTypeIdentifier | CXXTokenTypeKeyword
+				);
+
+			CXX_DEBUG_ASSERT(pBegin,"We should have found a begin token here!");
+			cxxTokenChainDestroyRange(g_cxx.pTokenChain,pBegin,oInfo.pTrailingComma);
 			goto check_function_signature;
 		}
 
