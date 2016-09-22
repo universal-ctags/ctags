@@ -961,6 +961,58 @@ static boolean cxxParserParseNextTokenCondenseAttribute(void)
 	return cxxParserParseNextToken();
 }
 
+// An ignore token was encountered and it specifies to skip the
+// eventual following parenthesis.
+// The routine has to check if there is a following parenthesis
+// and eventually skip it but it MUST NOT parse the next token
+// if it is not a parenthesis. This is because the ignored token
+// may have a replacement and is that one that has to be returned
+// back to the caller from cxxParserParseNextToken().
+static boolean cxxParserParseNextTokenSkipIgnoredParenthesis(void)
+{
+	CXX_DEBUG_ENTER();
+
+	cxxParserSkipToNonWhiteSpace();
+
+	if(g_cxx.iChar != '(')
+		return TRUE; // no parenthesis
+
+	if(!cxxParserParseNextToken())
+	{
+		CXX_DEBUG_LEAVE_TEXT("No next token after ignored identifier");
+		return FALSE;
+	}
+
+	if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningParenthesis))
+	{
+		CXX_DEBUG_ASSERT(false,"Should have found an open parenthesis token here!");
+		CXX_DEBUG_LEAVE_TEXT("Internal error");
+		return FALSE;
+	}
+
+	if(!cxxParserParseAndCondenseCurrentSubchain(
+			CXXTokenTypeOpeningParenthesis |
+				CXXTokenTypeOpeningSquareParenthesis |
+				CXXTokenTypeOpeningBracket,
+			FALSE
+		))
+	{
+		CXX_DEBUG_LEAVE_TEXT("Failed to parse and condense subchains");
+		return FALSE;
+	}
+
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain),
+			"Should have a parenthesis chain as last token!"
+		);
+	
+	// Now just kill the chain.
+	cxxTokenDestroy(cxxTokenChainTakeLast(g_cxx.pTokenChain));
+
+	CXX_DEBUG_LEAVE();
+	return TRUE;
+}
+
 boolean cxxParserParseNextToken(void)
 {
 	CXXToken * t = cxxTokenCreate();
@@ -1088,16 +1140,30 @@ boolean cxxParserParseNextToken(void)
 				))
 			{
 				CXX_DEBUG_PRINT("Ignore token %s",vStringValue(t->pszWord));
-				// FIXME: Handle ignore parens!
+
 				if(szReplacement && *szReplacement)
 				{
+					CXX_DEBUG_PRINT("The token has replacement %s: applying",szReplacement);
 					vStringClear(t->pszWord);
 					vStringCatS(t->pszWord,szReplacement);
+					// FIXME: Do we need to interpret the replacement?
 				} else {
-					// skip
+					// kill it
+					CXX_DEBUG_PRINT("Ignore token has no replacement");
 					cxxTokenChainDestroyLast(g_cxx.pTokenChain);
-					return cxxParserParseNextToken();
 				}
+
+				if(bIgnoreParens)
+				{
+					CXX_DEBUG_PRINT("Ignored token specifies to ignore parenthesis");
+					if(!cxxParserParseNextTokenSkipIgnoredParenthesis())
+						return FALSE;
+				}
+
+				if(szReplacement && *szReplacement)
+					return TRUE; // already have a token to return
+
+				return cxxParserParseNextToken();
 			}
 		}
 
