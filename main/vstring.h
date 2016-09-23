@@ -62,7 +62,7 @@ typedef struct sVString {
 /*
 *   FUNCTION PROTOTYPES
 */
-extern boolean vStringAutoResize (vString *const string);
+extern void vStringAutoResize (vString *const string);
 extern void vStringClear (vString *const string);
 extern vString *vStringNew (void);
 extern void vStringDelete (vString *const string);
