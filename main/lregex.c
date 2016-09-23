@@ -871,6 +871,23 @@ extern boolean processRegexOption (const char *const option,
 	return TRUE;
 }
 
+struct kindCbHelperData {
+	boolean (*func) (kindOption *, void *);
+	void *func_data;
+	boolean result;
+};
+
+static void kindCbHelper (void *key, void *value, void* user_data)
+{
+	kindOption *kind = value;
+	struct kindCbHelperData *helper_data = user_data;
+
+	if (helper_data->result)
+		return;
+
+	helper_data->result = helper_data->func (kind, helper_data->func_data);
+}
+
 extern void foreachRegexKinds (const langType language,
 			       boolean (*func) (kindOption *, void *),
 			       void *data)
@@ -879,11 +896,13 @@ extern void foreachRegexKinds (const langType language,
 	if (language <= SetUpper  &&  Sets [language].count > 0)
 	{
 		patternSet* const set = Sets + language;
-		unsigned int i;
-		for (i = 0  ;  i < set->count  ;  ++i)
-			if ((set->patterns [i].type == PTRN_TAG)
-			    && (func (set->patterns [i].u.tag.kind, data)))
-				break;
+		hashTable *kinds = set->kinds;
+		struct kindCbHelperData helper_data = {
+			.func = func,
+			.func_data = data,
+			.result = FALSE,
+		};
+		hashTableForeachItem (kinds, kindCbHelper, &helper_data);
 	}
 }
 
