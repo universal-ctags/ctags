@@ -1161,7 +1161,45 @@ boolean cxxParserParseNextToken(void)
 				}
 
 				if(szReplacement && *szReplacement)
-					return TRUE; // already have a token to return
+				{
+					// Already have a token to return.
+					// Check again for keywords.
+					
+					// There is a bit of code duplication here but I'd rather
+					// avoid a function call and a switch as the keyword check
+					// must be fast (especially the one above).
+					iCXXKeyword = lookupKeyword(t->pszWord->buffer,g_cxx.eLanguage);
+					if(iCXXKeyword >= 0)
+					{
+						if(
+								(
+									(iCXXKeyword == CXXKeywordFINAL) &&
+									(!g_cxx.bParsingClassStructOrUnionDeclaration)
+								) || (
+									(
+										(iCXXKeyword == CXXKeywordPUBLIC) ||
+										(iCXXKeyword == CXXKeywordPROTECTED) ||
+										(iCXXKeyword == CXXKeywordPRIVATE)
+									) &&
+									(!g_cxx.bEnablePublicProtectedPrivateKeywords)
+								)
+							)
+						{
+							t->eType = CXXTokenTypeIdentifier;
+						} else {
+							t->eType = CXXTokenTypeKeyword;
+							t->eKeyword = (enum CXXKeyword)iCXXKeyword;
+			
+							if(iCXXKeyword == CXXKeyword__ATTRIBUTE__)
+							{
+								// special handling for __attribute__
+								return cxxParserParseNextTokenCondenseAttribute();
+							}
+						}
+					}
+
+					return TRUE;
+				}
 
 				return cxxParserParseNextToken();
 			}
