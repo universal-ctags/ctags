@@ -1000,7 +1000,7 @@ next_token:
 		CXX_DEBUG_PRINT("Nested parentheses, probably a function returning pointers");
 		pInfo->pTypeStart = cxxTokenChainFirst(pChain);
 		pInfo->pTypeEnd = pToken ? pToken->pPrev : cxxTokenChainLast(pChain);
-		pInfo->bTypeContainsIdentifierScopeAndSignature = true;
+		pInfo->bTypeContainsIdentifierScopeAndSignature = TRUE;
 	} else {
 		pToken = pInfo->pScopeStart ? pInfo->pScopeStart : pInfo->pIdentifierStart;
 		
@@ -1046,7 +1046,7 @@ next_token:
 			pInfo->pTypeEnd = NULL;
 			pInfo->pTypeStart = NULL;
 		}
-		pInfo->bTypeContainsIdentifierScopeAndSignature = false;
+		pInfo->bTypeContainsIdentifierScopeAndSignature = FALSE;
 	}
 
 	while(

@@ -515,7 +515,7 @@ static int m4MakeTag (int kind, int role)
 		else if (role == M4_MACRO_ROLE_UNDEF)
 		{
 			name = vStringNew();
-			while (true)
+			while (TRUE)
 			{
 				boolean more = readM4MacroArgument(name);
 				/* TODO: The cork indexes are thrown away here.
