@@ -54,8 +54,6 @@
 # include <stdbool.h>
 #endif
 
-#include "mybool.h"
-
 /*
 *   FUNCTION PROTOTYPES
 */

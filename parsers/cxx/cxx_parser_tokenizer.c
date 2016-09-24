@@ -870,7 +870,7 @@ static CXXCharTypeData g_aCharTable[128] =
 // The __attribute__((...)) sequence complicates parsing quite a lot.
 // For this reason we attempt to "hide" it from the rest of the parser
 // at tokenizer level.
-static boolean cxxParserParseNextTokenCondenseAttribute(void)
+static bool cxxParserParseNextTokenCondenseAttribute(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -887,24 +887,24 @@ static boolean cxxParserParseNextTokenCondenseAttribute(void)
 	if(!cxxParserParseNextToken())
 	{
 		CXX_DEBUG_LEAVE_TEXT("No next token after __attribute__");
-		return FALSE;
+		return false;
 	}
 
 	if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningParenthesis))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Something that is not an opening parenthesis");
-		return TRUE;
+		return true;
 	}
 
 	if(!cxxParserParseAndCondenseCurrentSubchain(
 			CXXTokenTypeOpeningParenthesis |
 				CXXTokenTypeOpeningSquareParenthesis |
 				CXXTokenTypeOpeningBracket,
-			FALSE
+			false
 		))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse and condense subchains");
-		return FALSE;
+		return false;
 	}
 
 	CXX_DEBUG_ASSERT(
@@ -961,7 +961,7 @@ static boolean cxxParserParseNextTokenCondenseAttribute(void)
 	return cxxParserParseNextToken();
 }
 
-boolean cxxParserParseNextToken(void)
+bool cxxParserParseNextToken(void)
 {
 	CXXToken * t = cxxTokenCreate();
 
@@ -992,8 +992,8 @@ boolean cxxParserParseNextToken(void)
 	if(g_cxx.iChar == EOF)
 	{
 		t->eType = CXXTokenTypeEOF;
-		t->bFollowedBySpace = FALSE;
-		return FALSE;
+		t->bFollowedBySpace = false;
+		return false;
 	}
 
 	unsigned int uInfo = UINFO(g_cxx.iChar);
@@ -1004,7 +1004,7 @@ boolean cxxParserParseNextToken(void)
 	{
 		// word
 		t->eType = CXXTokenTypeIdentifier;
-		t->bFollowedBySpace = FALSE;
+		t->bFollowedBySpace = false;
 
 		vStringPut(t->pszWord,g_cxx.iChar);
 
@@ -1015,7 +1015,7 @@ boolean cxxParserParseNextToken(void)
 			g_cxx.iChar = cppGetc();
 			if(isspace(g_cxx.iChar))
 			{
-				t->bFollowedBySpace = TRUE;
+				t->bFollowedBySpace = true;
 				g_cxx.iChar = cppGetc();
 				while(isspace(g_cxx.iChar))
 					g_cxx.iChar = cppGetc();
@@ -1035,7 +1035,7 @@ boolean cxxParserParseNextToken(void)
 					g_cxx.iChar = cppGetc();
 					t->bFollowedBySpace = isspace(g_cxx.iChar);
 				}
-				return TRUE;
+				return true;
 			}
 		} else {
 			g_cxx.iChar = cppGetc();
@@ -1079,7 +1079,7 @@ boolean cxxParserParseNextToken(void)
 				}
 			}
 		} else {
-			boolean bIgnoreParens = FALSE;
+			bool bIgnoreParens = false;
 			const char * szReplacement = NULL;
 			if(isIgnoreToken(
 					vStringValue(t->pszWord),
@@ -1103,7 +1103,7 @@ boolean cxxParserParseNextToken(void)
 
 		t->bFollowedBySpace = t->bFollowedBySpace | isspace(g_cxx.iChar);
 
-		return TRUE;
+		return true;
 	}
 
 	if(g_cxx.iChar == '-')
@@ -1125,7 +1125,7 @@ boolean cxxParserParseNextToken(void)
 			}
 		}
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
-		return TRUE;
+		return true;
 	}
 
 #if 0
@@ -1145,8 +1145,8 @@ boolean cxxParserParseNextToken(void)
 			g_cxx.iChar = cppGetc();
 			if(g_cxx.iChar == EOF)
 			{
-				t->bFollowedBySpace = FALSE;
-				return TRUE;
+				t->bFollowedBySpace = false;
+				return true;
 			}
 			if(g_cxx.iChar == '\\')
 			{
@@ -1154,8 +1154,8 @@ boolean cxxParserParseNextToken(void)
 				g_cxx.iChar = cppGetc();
 				if(g_cxx.iChar == EOF)
 				{
-					t->bFollowedBySpace = FALSE;
-					return TRUE;
+					t->bFollowedBySpace = false;
+					return true;
 				}
 			} else if(g_cxx.iChar == '"')
 			{
@@ -1164,7 +1164,7 @@ boolean cxxParserParseNextToken(void)
 			}
 		}
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
-		return TRUE;
+		return true;
 	}
 #else
 	if(g_cxx.iChar == STRING_SYMBOL)
@@ -1174,7 +1174,7 @@ boolean cxxParserParseNextToken(void)
 		vStringPut(t->pszWord,'"');
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
-		return TRUE;
+		return true;
 	}
 #endif
 
@@ -1192,8 +1192,8 @@ boolean cxxParserParseNextToken(void)
 			g_cxx.iChar = cppGetc();
 			if(g_cxx.iChar == EOF)
 			{
-				t->bFollowedBySpace = FALSE;
-				return TRUE;
+				t->bFollowedBySpace = false;
+				return true;
 			}
 			if(g_cxx.iChar == '\\')
 			{
@@ -1201,8 +1201,8 @@ boolean cxxParserParseNextToken(void)
 				g_cxx.iChar = cppGetc();
 				if(g_cxx.iChar == EOF)
 				{
-					t->bFollowedBySpace = FALSE;
-					return TRUE;
+					t->bFollowedBySpace = false;
+					return true;
 				}
 			} else if(g_cxx.iChar == '\'')
 			{
@@ -1211,7 +1211,7 @@ boolean cxxParserParseNextToken(void)
 			}
 		}
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
-		return TRUE;
+		return true;
 	}
 #else
 	if(g_cxx.iChar == CHAR_SYMBOL)
@@ -1221,7 +1221,7 @@ boolean cxxParserParseNextToken(void)
 		vStringPut(t->pszWord,'\'');
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
-		return TRUE;
+		return true;
 	}
 #endif
 
@@ -1241,7 +1241,7 @@ boolean cxxParserParseNextToken(void)
 		}
 
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
-		return TRUE;
+		return true;
 	}
 
 	if(uInfo & CXXCharTypeNamedSingleOrRepeatedCharToken)
@@ -1261,7 +1261,7 @@ boolean cxxParserParseNextToken(void)
 			} while(g_cxx.iChar == iChar);
 		}
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
-		return TRUE;
+		return true;
 	}
 
 	if(uInfo & CXXCharTypeNamedSingleOrOperatorToken)
@@ -1283,7 +1283,7 @@ boolean cxxParserParseNextToken(void)
 				);
 		}
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
-		return TRUE;
+		return true;
 	}
 
 	if(uInfo & CXXCharTypeNamedSingleCharToken)
@@ -1292,7 +1292,7 @@ boolean cxxParserParseNextToken(void)
 		vStringPut(t->pszWord,g_cxx.iChar);
 		g_cxx.iChar = cppGetc();
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
-		return TRUE;
+		return true;
 	}
 
 	if(uInfo & CXXCharTypeOperator)
@@ -1308,7 +1308,7 @@ boolean cxxParserParseNextToken(void)
 			uInfo = UINFO(g_cxx.iChar);
 		}
 		t->bFollowedBySpace = isspace(g_cxx.iChar);
-		return TRUE;
+		return true;
 	}
 
 	t->eType = CXXTokenTypeUnknown;
@@ -1316,5 +1316,5 @@ boolean cxxParserParseNextToken(void)
 	g_cxx.iChar = cppGetc();
 	t->bFollowedBySpace = isspace(g_cxx.iChar);
 
-	return TRUE;
+	return true;
 }

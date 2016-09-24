@@ -55,21 +55,21 @@ typedef enum {
 } ttcnKind_t;
 
 static kindOption ttcnKinds [] = {
-    { TRUE, 'M', "module",    "module definition" },
-    { TRUE, 't', "type",      "type definition" },
-    { TRUE, 'c', "const",     "constant definition" },
-    { TRUE, 'd', "template",  "template definition" },
-    { TRUE, 'f', "function",  "function definition" },
-    { TRUE, 's', "signature", "signature definition" },
-    { TRUE, 'C', "testcase",  "testcase definition" },
-    { TRUE, 'a', "altstep",   "altstep definition" },
-    { TRUE, 'G', "group",     "group definition" },
-    { TRUE, 'P', "modulepar", "module parameter definition" },
-    { TRUE, 'v', "var",       "variable instance" },
-    { TRUE, 'T', "timer",     "timer instance" },
-    { TRUE, 'p', "port",      "port instance" },
-    { TRUE, 'm', "member",    "record/set/union member" },
-    { TRUE, 'e', "enum",      "enumeration value" }
+    { true, 'M', "module",    "module definition" },
+    { true, 't', "type",      "type definition" },
+    { true, 'c', "const",     "constant definition" },
+    { true, 'd', "template",  "template definition" },
+    { true, 'f', "function",  "function definition" },
+    { true, 's', "signature", "signature definition" },
+    { true, 'C', "testcase",  "testcase definition" },
+    { true, 'a', "altstep",   "altstep definition" },
+    { true, 'G', "group",     "group definition" },
+    { true, 'P', "modulepar", "module parameter definition" },
+    { true, 'v', "var",       "variable instance" },
+    { true, 'T', "timer",     "timer instance" },
+    { true, 'p', "port",      "port instance" },
+    { true, 'm', "member",    "record/set/union member" },
+    { true, 'e', "enum",      "enumeration value" }
 };
 
 /* TTCN token types */
@@ -122,7 +122,7 @@ static struct s_ttcnKeyword {
     {T_ANY,         "any",          K_NONE},
     {T_ANYTYPE,     "anytype",      K_NONE},
     {T_BITSTRING,   "bitstring",    K_NONE},
-    {T_BOOLEAN,     "boolean",      K_NONE},
+    {T_BOOLEAN,     "bool",      K_NONE},
     {T_CASE,        "case",         K_NONE},
     {T_CALL,        "call",         K_NONE},
     {T_CATCH,       "catch",        K_NONE},
@@ -316,7 +316,7 @@ static void findTTCNKeyword(ttcnToken_t * pTok)
 }
 
 static ttcnToken_t * pTtcnToken = NULL;
-static int repeatLastToken = FALSE;
+static int repeatLastToken = false;
 
 static void freeToken(ttcnToken_t * pTok) 
 {
@@ -378,7 +378,7 @@ static ttcnToken_t * getToken (void)
     if (repeatLastToken) 
     {
         /* If ungetToken() has been called before, return last token again */
-        repeatLastToken = FALSE;
+        repeatLastToken = false;
         return pTtcnToken;
     }
     else 
@@ -529,7 +529,7 @@ static ttcnToken_t * getToken (void)
     return pTtcnToken;
 } 
 
-static void ungetToken (void) { repeatLastToken = TRUE; }
+static void ungetToken (void) { repeatLastToken = true; }
 
 /*    PARSER    */
 

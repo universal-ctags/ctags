@@ -23,8 +23,8 @@ typedef enum {
 } clojureKind;
 
 static kindOption ClojureKinds[] = {
-	{TRUE, 'f', "function", "functions"},
-	{TRUE, 'n', "namespace", "namespaces"}
+	{true, 'f', "function", "functions"},
+	{true, 'n', "namespace", "namespaces"}
 };
 
 static int isNamespace (const char *strp)
@@ -145,6 +145,6 @@ extern parserDefinition *ClojureParser (void)
 	def->extensions = extensions;
 	def->aliases = aliases;
 	def->parser = findClojureTags;
-	def->useCork = TRUE;
+	def->useCork = true;
 	return def;
 }

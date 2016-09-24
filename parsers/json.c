@@ -70,12 +70,12 @@ typedef enum {
 static langType Lang_json;
 
 static kindOption JsonKinds [] = {
-	{ TRUE,  'o', "object",		"objects"	},
-	{ TRUE,  'a', "array",		"arrays"	},
-	{ TRUE,  'n', "number",		"numbers"	},
-	{ TRUE,  's', "string",		"strings"	},
-	{ TRUE,  'b', "boolean",	"booleans"	},
-	{ TRUE,  'z', "null",		"nulls"		}
+	{ true,  'o', "object",		"objects"	},
+	{ true,  'a', "array",		"arrays"	},
+	{ true,  'n', "number",		"numbers"	},
+	{ true,  's', "string",		"strings"	},
+	{ true,  'b', "bool",	"booleans"	},
+	{ true,  'z', "null",		"nulls"		}
 };
 
 static const keywordTable JsonKeywordTable [] = {
@@ -138,13 +138,13 @@ static void makeJsonTag (tokenInfo *const token, const jsonKind kind)
 	makeTagEntry (&e);
 }
 
-static boolean isIdentChar (int c)
+static bool isIdentChar (int c)
 {
 	return (isalnum (c) || c == '+' || c == '-' || c == '.');
 }
 
 static void readTokenFull (tokenInfo *const token,
-						   boolean includeStringRepr)
+						   bool includeStringRepr)
 {
 	int c;
 
@@ -170,16 +170,16 @@ static void readTokenFull (tokenInfo *const token,
 
 		case '"':
 		{
-			boolean escaped = FALSE;
+			bool escaped = false;
 			token->type = TOKEN_STRING;
-			while (TRUE)
+			while (true)
 			{
 				c = getcFromInputFile ();
 				/* we don't handle unicode escapes but they are safe */
 				if (escaped)
-					escaped = FALSE;
+					escaped = false;
 				else if (c == '\\')
-					escaped = TRUE;
+					escaped = true;
 				else if (c >= 0x00 && c <= 0x1F)
 					break; /* break on invalid, unescaped, control characters */
 				else if (c == '"' || c == EOF)
@@ -216,7 +216,7 @@ static void readTokenFull (tokenInfo *const token,
 	}
 }
 
-#define readToken(t) (readTokenFull ((t), FALSE))
+#define readToken(t) (readTokenFull ((t), false))
 
 static void pushScope (tokenInfo *const token,
 					   const tokenInfo *const parent,
@@ -288,7 +288,7 @@ static void parseValue (tokenInfo *const token)
 
 		do
 		{
-			readTokenFull (token, TRUE);
+			readTokenFull (token, true);
 			if (token->type == TOKEN_STRING)
 			{
 				jsonKind tagKind = TAG_NULL; /* default in case of invalid value */
@@ -391,7 +391,7 @@ extern parserDefinition* JsonParser (void)
 	def->initialize = initialize;
 	def->keywordTable = JsonKeywordTable;
 	def->keywordCount = ARRAY_SIZE (JsonKeywordTable);
-	def->allowNullTag = TRUE;
+	def->allowNullTag = true;
 
 	return def;
 }

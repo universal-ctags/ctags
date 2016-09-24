@@ -42,7 +42,7 @@ static hashEntry **HashTable = NULL;
 
 static hashEntry **getHashTable (void)
 {
-	static boolean allocated = FALSE;
+	static bool allocated = false;
 
 	if (! allocated)
 	{
@@ -53,7 +53,7 @@ static hashEntry **getHashTable (void)
 		for (i = 0  ;  i < TableSize  ;  ++i)
 			HashTable [i] = NULL;
 
-		allocated = TRUE;
+		allocated = true;
 	}
 	return HashTable;
 }
@@ -136,7 +136,7 @@ extern void addKeyword (const char *const string, langType language, int value)
 	}
 }
 
-static int lookupKeywordFull (const char *const string, boolean caseSensitive, langType language)
+static int lookupKeywordFull (const char *const string, bool caseSensitive, langType language)
 {
 	const unsigned int index = hashValue (string, language) % TableSize;
 	hashEntry *entry = getHashTableEntry (index);
@@ -158,12 +158,12 @@ static int lookupKeywordFull (const char *const string, boolean caseSensitive, l
 
 extern int lookupKeyword (const char *const string, langType language)
 {
-	return lookupKeywordFull (string, TRUE, language);
+	return lookupKeywordFull (string, true, language);
 }
 
 extern int lookupCaseKeyword (const char *const string, langType language)
 {
-	return lookupKeywordFull (string, FALSE, language);
+	return lookupKeywordFull (string, false, language);
 }
 
 extern void freeKeywordTable (void)
@@ -199,7 +199,7 @@ static unsigned int printBucket (const unsigned int i)
 	hashEntry **const table = getHashTable ();
 	hashEntry *entry = table [i];
 	unsigned int measure = 1;
-	boolean first = TRUE;
+	bool first = true;
 
 	printf ("%2d:", i);
 	if (entry == NULL)
@@ -211,7 +211,7 @@ static unsigned int printBucket (const unsigned int i)
 		else
 		{
 			printf (" ");
-			first = FALSE;
+			first = false;
 		}
 		printEntry (entry);
 		entry = entry->next;

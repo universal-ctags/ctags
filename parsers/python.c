@@ -62,7 +62,7 @@ typedef enum {
 static fieldSpec PythonFields[COUNT_FIELD] = {
 	{ .name = "decorators",
 	  .description = "decorators on functions and classes",
-	  .enabled = FALSE },
+	  .enabled = false },
 };
 
 typedef enum {
@@ -108,32 +108,32 @@ typedef enum {
  *                       Z = (kind:unknown, [nameref:X.Y]) */
 
 static roleDesc PythonModuleRoles [] = {
-	{ TRUE, "imported",
+	{ true, "imported",
 	  "imported modules" },
-	{ TRUE, "namespace",
+	{ true, "namespace",
 	  "namespace from where classes/variables/functions are imported" },
-	{ TRUE, "indirectly-imported",
+	{ true, "indirectly-imported",
 	  "module imported in alternative name" },
 };
 
 static roleDesc PythonUnknownRoles [] = {
-	{ TRUE, "imported",   "imported from the other module" },
-	{ TRUE, "indirectly-imported",
+	{ true, "imported",   "imported from the other module" },
+	{ true, "indirectly-imported",
 	  "classes/variables/functions/modules imported in alternative name" },
 };
 
 static kindOption PythonKinds[COUNT_KIND] = {
-	{TRUE, 'c', "class",    "classes"},
-	{TRUE, 'f', "function", "functions"},
-	{TRUE, 'm', "member",   "class members"},
-	{TRUE, 'v', "variable", "variables"},
-	{TRUE, 'I', "namespace", "name referring a module defined in other file"},
-	{TRUE, 'i', "module",    "modules",
-	 .referenceOnly = TRUE,  ATTACH_ROLES(PythonModuleRoles)},
-	{TRUE, 'x', "unknown",   "name referring a class/variable/function/module defined in other module",
-	 .referenceOnly = FALSE, ATTACH_ROLES(PythonUnknownRoles)},
-	{FALSE, 'z', "parameter", "function parameters" },
-	{FALSE, 'l', "local",    "local variables" },
+	{true, 'c', "class",    "classes"},
+	{true, 'f', "function", "functions"},
+	{true, 'm', "member",   "class members"},
+	{true, 'v', "variable", "variables"},
+	{true, 'I', "namespace", "name referring a module defined in other file"},
+	{true, 'i', "module",    "modules",
+	 .referenceOnly = true,  ATTACH_ROLES(PythonModuleRoles)},
+	{true, 'x', "unknown",   "name referring a class/variable/function/module defined in other module",
+	 .referenceOnly = false, ATTACH_ROLES(PythonUnknownRoles)},
+	{false, 'z', "parameter", "function parameters" },
+	{false, 'l', "local",    "local variables" },
 };
 
 static const keywordTable PythonKeywordTable[] = {
@@ -251,7 +251,7 @@ static void initPythonEntry (tagEntryInfo *const e, const tokenInfo *const token
 	e->extensionFields.access = PythonAccesses[access];
 	/* FIXME: should we really set isFileScope in addition to access? */
 	if (access == ACCESS_PRIVATE)
-		e->isFileScope = TRUE;
+		e->isFileScope = true;
 }
 
 static int makeClassTag (const tokenInfo *const token,
@@ -369,7 +369,7 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src)
 	vStringCopy(dest->string, src->string);
 }
 
-static boolean isIdentifierChar (const int c)
+static bool isIdentifierChar (const int c)
 {
 	return (isalnum (c) || c == '_' || c >= 0x80);
 }
@@ -449,7 +449,7 @@ static void ungetToken (tokenInfo *const token)
 	copyToken (NextToken, token);
 }
 
-static void readTokenFull (tokenInfo *const token, boolean inclWhitespaces)
+static void readTokenFull (tokenInfo *const token, bool inclWhitespaces)
 {
 	int c;
 	int n;
@@ -655,7 +655,7 @@ getNextChar:
 
 static void readToken (tokenInfo *const token)
 {
-	readTokenFull (token, FALSE);
+	readTokenFull (token, false);
 }
 
 /*================================= parsing =================================*/
@@ -674,8 +674,8 @@ static void reprCat (vString *const repr, const tokenInfo *const token)
 	}
 }
 
-static boolean skipOverPair (tokenInfo *const token, int tOpen, int tClose,
-                             vString *const repr, boolean reprOuterPair)
+static bool skipOverPair (tokenInfo *const token, int tOpen, int tClose,
+                             vString *const repr, bool reprOuterPair)
 {
 	if (token->type == tOpen)
 	{
@@ -685,7 +685,7 @@ static boolean skipOverPair (tokenInfo *const token, int tOpen, int tClose,
 			reprCat (repr, token);
 		do
 		{
-			readTokenFull (token, TRUE);
+			readTokenFull (token, true);
 			if (repr && (reprOuterPair || token->type != tClose || depth > 1))
 			{
 				reprCat (repr, token);
@@ -703,28 +703,28 @@ static boolean skipOverPair (tokenInfo *const token, int tOpen, int tClose,
 	return token->type == tClose;
 }
 
-static boolean skipLambdaArglist (tokenInfo *const token, vString *const repr)
+static bool skipLambdaArglist (tokenInfo *const token, vString *const repr)
 {
 	while (token->type != TOKEN_EOF && token->type != ':' &&
 	       /* avoid reading too much, just in case */
 	       token->type != TOKEN_INDENT)
 	{
-		boolean readNext = TRUE;
+		bool readNext = true;
 
 		if (token->type == '(')
-			readNext = skipOverPair (token, '(', ')', repr, TRUE);
+			readNext = skipOverPair (token, '(', ')', repr, true);
 		else if (token->type == '[')
-			readNext = skipOverPair (token, '[', ']', repr, TRUE);
+			readNext = skipOverPair (token, '[', ']', repr, true);
 		else if (token->type == '{')
-			readNext = skipOverPair (token, '{', '}', repr, TRUE);
+			readNext = skipOverPair (token, '{', '}', repr, true);
 		else if (token->keyword == KEYWORD_lambda)
 		{ /* handle lambdas in a default value */
 			if (repr)
 				reprCat (repr, token);
-			readTokenFull (token, TRUE);
+			readTokenFull (token, true);
 			readNext = skipLambdaArglist (token, repr);
 			if (token->type == ':')
-				readNext = TRUE;
+				readNext = true;
 			if (readNext && repr)
 				reprCat (repr, token);
 		}
@@ -734,9 +734,9 @@ static boolean skipLambdaArglist (tokenInfo *const token, vString *const repr)
 		}
 
 		if (readNext)
-			readTokenFull (token, TRUE);
+			readTokenFull (token, true);
 	}
-	return FALSE;
+	return false;
 }
 
 static void readQualifiedName (tokenInfo *const nameToken)
@@ -769,7 +769,7 @@ static void readQualifiedName (tokenInfo *const nameToken)
 	}
 }
 
-static boolean readCDefName (tokenInfo *const token, pythonKind *kind)
+static bool readCDefName (tokenInfo *const token, pythonKind *kind)
 {
 	readToken (token);
 
@@ -778,7 +778,7 @@ static boolean readCDefName (tokenInfo *const token, pythonKind *kind)
 	{
 		readToken (token);
 		if (token->keyword == KEYWORD_from)
-			return FALSE;
+			return false;
 	}
 
 	if (token->keyword == KEYWORD_class)
@@ -800,12 +800,12 @@ static boolean readCDefName (tokenInfo *const token, pythonKind *kind)
 		{
 			if (token->type == '[')
 			{
-				if (skipOverPair (token, '[', ']', NULL, FALSE))
+				if (skipOverPair (token, '[', ']', NULL, false))
 					readToken (token);
 			}
 			else if (token->type == '(')
 			{
-				if (skipOverPair (token, '(', ')', NULL, FALSE))
+				if (skipOverPair (token, '(', ')', NULL, false))
 					readToken (token);
 			}
 			else if (token->type == TOKEN_IDENTIFIER)
@@ -830,9 +830,9 @@ static boolean readCDefName (tokenInfo *const token, pythonKind *kind)
 	return token->type == TOKEN_IDENTIFIER;
 }
 
-static boolean parseClassOrDef (tokenInfo *const token,
+static bool parseClassOrDef (tokenInfo *const token,
                                 const vString *const decorators,
-                                pythonKind kind, boolean isCDef)
+                                pythonKind kind, bool isCDef)
 {
 	vString *arglist = NULL;
 	tokenInfo *name = NULL;
@@ -844,13 +844,13 @@ static boolean parseClassOrDef (tokenInfo *const token,
 	if (isCDef)
 	{
 		if (! readCDefName (token, &kind))
-			return FALSE;
+			return false;
 	}
 	else
 	{
 		readToken (token);
 		if (token->type != TOKEN_IDENTIFIER)
-			return FALSE;
+			return false;
 	}
 
 	name = newToken ();
@@ -877,7 +877,7 @@ static boolean parseClassOrDef (tokenInfo *const token,
 				prevTokenType = token->type;
 			}
 
-			readTokenFull (token, TRUE);
+			readTokenFull (token, true);
 			if (kind != K_CLASS || token->type != ')' || depth > 1)
 				reprCat (arglist, token);
 
@@ -928,10 +928,10 @@ static boolean parseClassOrDef (tokenInfo *const token,
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
-static boolean parseImport (tokenInfo *const token)
+static bool parseImport (tokenInfo *const token)
 {
 	tokenInfo *fromModule = NULL;
 
@@ -948,7 +948,7 @@ static boolean parseImport (tokenInfo *const token)
 
 	if (token->keyword == KEYWORD_import)
 	{
-		boolean parenthesized = FALSE;
+		bool parenthesized = false;
 
 		if (fromModule)
 		{
@@ -967,7 +967,7 @@ static boolean parseImport (tokenInfo *const token)
 			/* support for `from x import (...)` */
 			if (fromModule && ! parenthesized && token->type == '(')
 			{
-				parenthesized = TRUE;
+				parenthesized = true;
 				readQualifiedName (token);
 			}
 
@@ -1074,10 +1074,10 @@ static boolean parseImport (tokenInfo *const token)
 	if (fromModule)
 		deleteToken (fromModule);
 
-	return FALSE;
+	return false;
 }
 
-static boolean parseVariable (tokenInfo *const token, const pythonKind kind)
+static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 {
 	/* In order to support proper tag type for lambdas in multiple
 	 * assignations, we first collect all the names, and then try and map
@@ -1171,7 +1171,7 @@ static boolean parseVariable (tokenInfo *const token, const pythonKind kind)
 			deleteToken (nameTokens[nameCount]);
 	}
 
-	return FALSE;
+	return false;
 }
 
 /* pops any level >= to indent */
@@ -1197,7 +1197,7 @@ static void findPythonTags (void)
 {
 	tokenInfo *const token = newToken ();
 	vString *decorators = vStringNew ();
-	boolean atStatementStart = TRUE;
+	bool atStatementStart = true;
 
 	TokenContinuationDepth = 0;
 	NextToken = NULL;
@@ -1207,7 +1207,7 @@ static void findPythonTags (void)
 	while (token->type != TOKEN_EOF)
 	{
 		tokenType iterationTokenType = token->type;
-		boolean readNext = TRUE;
+		bool readNext = true;
 
 		if (token->type == TOKEN_INDENT)
 			setIndent (token);
@@ -1216,12 +1216,12 @@ static void findPythonTags (void)
 		{
 			pythonKind kind = token->keyword == KEYWORD_class ? K_CLASS : K_FUNCTION;
 
-			readNext = parseClassOrDef (token, decorators, kind, FALSE);
+			readNext = parseClassOrDef (token, decorators, kind, false);
 		}
 		else if (token->keyword == KEYWORD_cdef ||
 		         token->keyword == KEYWORD_cpdef)
 		{
-			readNext = parseClassOrDef (token, decorators, K_FUNCTION, TRUE);
+			readNext = parseClassOrDef (token, decorators, K_FUNCTION, true);
 		}
 		else if (token->keyword == KEYWORD_from ||
 		         token->keyword == KEYWORD_import)
@@ -1230,7 +1230,7 @@ static void findPythonTags (void)
 		}
 		else if (token->type == '(')
 		{ /* skip parentheses to avoid finding stuff inside them */
-			readNext = skipOverPair (token, '(', ')', NULL, FALSE);
+			readNext = skipOverPair (token, '(', ')', NULL, false);
 		}
 		else if (token->type == TOKEN_IDENTIFIER && atStatementStart)
 		{
@@ -1249,14 +1249,14 @@ static void findPythonTags (void)
 			/* collect decorators */
 			readQualifiedName (token);
 			if (token->type != TOKEN_IDENTIFIER)
-				readNext = FALSE;
+				readNext = false;
 			else
 			{
 				if (vStringLength (decorators) > 0)
 					vStringPut (decorators, ',');
 				vStringCat (decorators, token->string);
 				readToken (token);
-				readNext = skipOverPair (token, '(', ')', decorators, TRUE);
+				readNext = skipOverPair (token, '(', ')', decorators, true);
 			}
 		}
 
@@ -1302,7 +1302,7 @@ extern parserDefinition* PythonParser (void)
 	def->keywordCount = ARRAY_SIZE (PythonKeywordTable);
 	def->fieldSpecs = PythonFields;
 	def->fieldSpecCount = ARRAY_SIZE (PythonFields);
-	def->useCork = TRUE;
-	def->requestAutomaticFQTag = TRUE;
+	def->useCork = true;
+	def->requestAutomaticFQTag = true;
 	return def;
 }

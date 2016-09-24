@@ -39,11 +39,11 @@ typedef enum ePtagType { /* pseudo tag content control */
 } ptagType;
 
 struct sPtagDesc {
-	boolean enabled;
+	bool enabled;
 	const char* name;
 	const char* description;  /* displayed in --list-pseudo-tags output */
-	boolean (* makeTag) (ptagDesc *, void *);
-	boolean commonInParsers;
+	bool (* makeTag) (ptagDesc *, void *);
+	bool commonInParsers;
 };
 
 struct ptagXcmdData {
@@ -52,12 +52,12 @@ struct ptagXcmdData {
 	const char *language;
 };
 
-extern boolean makePtagIfEnabled (ptagType type, void *data);
+extern bool makePtagIfEnabled (ptagType type, void *data);
 extern ptagDesc* getPtagDesc (ptagType type);
 extern ptagType  getPtagTypeForName (const char *name);
 extern void printPtag (ptagType type);
-extern boolean isPtagEnabled (ptagType type);
-extern boolean isPtagCommonInParsers  (ptagType type);
-extern boolean enablePtag (ptagType type, boolean state);
+extern bool isPtagEnabled (ptagType type);
+extern bool isPtagCommonInParsers  (ptagType type);
+extern bool enablePtag (ptagType type, bool state);
 
 #endif	/* CTAGS_MAIN_FIELD_H */

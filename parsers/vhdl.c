@@ -26,8 +26,8 @@
 /*
  *   MACROS
  */
-#define isType(token,t)     (boolean) ((token)->type == (t))
-#define isKeyword(token,k)  (boolean) ((token)->keyword == (k))
+#define isType(token,t)     (bool) ((token)->type == (t))
+#define isKeyword(token,k)  (bool) ((token)->keyword == (k))
 
 /*
  *   DATA DECLARATIONS
@@ -180,17 +180,17 @@ typedef enum {
 } vhdlKind;
 
 static kindOption VhdlKinds[] = {
-	{TRUE, 'c', "constant", "constant declarations"},
-	{TRUE, 't', "type", "type definitions"},
-	{TRUE, 'T', "subtype", "subtype definitions"},
-	{TRUE, 'r', "record", "record names"},
-	{TRUE, 'e', "entity", "entity declarations"},
-	{FALSE, 'C', "component", "component declarations"},
-	{FALSE, 'd', "prototype", "prototypes"},
-	{TRUE, 'f', "function", "function prototypes and declarations"},
-	{TRUE, 'p', "procedure", "procedure prototypes and declarations"},
-	{TRUE, 'P', "package", "package definitions"},
-	{FALSE, 'l', "local", "local definitions"}
+	{true, 'c', "constant", "constant declarations"},
+	{true, 't', "type", "type definitions"},
+	{true, 'T', "subtype", "subtype definitions"},
+	{true, 'r', "record", "record names"},
+	{true, 'e', "entity", "entity declarations"},
+	{false, 'C', "component", "component declarations"},
+	{false, 'd', "prototype", "prototypes"},
+	{true, 'f', "function", "function prototypes and declarations"},
+	{true, 'p', "procedure", "procedure prototypes and declarations"},
+	{true, 'P', "package", "package definitions"},
+	{false, 'l', "local", "local definitions"}
 };
 
 static const keywordTable VhdlKeywordTable[] = {
@@ -294,35 +294,35 @@ static const keywordTable VhdlKeywordTable[] = {
 /*
  *   FUNCTION DECLARATIONS
  */
-static void parseKeywords (tokenInfo * const token, boolean local);
+static void parseKeywords (tokenInfo * const token, bool local);
 
 /*
  *   FUNCTION DEFINITIONS
  */
 
-static boolean isIdentChar1 (const int c)
+static bool isIdentChar1 (const int c)
 {
-	return (boolean) (isalpha (c) || c == '_');
+	return (bool) (isalpha (c) || c == '_');
 }
 
-static boolean isIdentChar (const int c)
+static bool isIdentChar (const int c)
 {
-	return (boolean) (isalpha (c) || isdigit (c) || c == '_');
+	return (bool) (isalpha (c) || isdigit (c) || c == '_');
 }
 
-static boolean isIdentifierMatch (const tokenInfo * const token,
+static bool isIdentifierMatch (const tokenInfo * const token,
 	const vString * const name)
 {
-	return (boolean) (isType (token, TOKEN_IDENTIFIER) &&
+	return (bool) (isType (token, TOKEN_IDENTIFIER) &&
 		strcasecmp (vStringValue (token->string), vStringValue (name)) == 0);
 	/* XXX this is copy/paste from eiffel.c and slightly modified */
 	/* shouldn't we use strNcasecmp ? */
 }
 
-static boolean isKeywordOrIdent (const tokenInfo * const token,
+static bool isKeywordOrIdent (const tokenInfo * const token,
 	const keywordId keyword, const vString * const name)
 {
-	return (boolean) (isKeyword (token, keyword) ||
+	return (bool) (isKeyword (token, keyword) ||
 		isIdentifierMatch (token, name));
 }
 
@@ -354,19 +354,19 @@ static void deleteToken (tokenInfo * const token)
 
 static void parseString (vString * const string, const int delimiter)
 {
-	boolean end = FALSE;
+	bool end = false;
 	while (!end)
 	{
 		int c = getcFromInputFile ();
 		if (c == EOF)
-			end = TRUE;
+			end = true;
 		else if (c == '\\')
 		{
 			c = getcFromInputFile ();	/* This maybe a ' or ". */
 			vStringPut (string, c);
 		}
 		else if (c == delimiter)
-			end = TRUE;
+			end = true;
 		else
 			vStringPut (string, c);
 	}
@@ -647,7 +647,7 @@ static void parseTypes (tokenInfo * const token)
 	deleteToken (name);
 }
 
-static void parseConstant (boolean local)
+static void parseConstant (bool local)
 {
 	tokenInfo *const name = newToken ();
 	readToken (name);
@@ -666,7 +666,7 @@ static void parseConstant (boolean local)
 static void parseSubProgram (tokenInfo * const token)
 {
 	tokenInfo *const name = newToken ();
-	boolean endSubProgram = FALSE;
+	bool endSubProgram = false;
 	const vhdlKind kind = isKeyword (token, KEYWORD_FUNCTION) ?
 		VHDLTAG_FUNCTION : VHDLTAG_PROCEDURE;
 	Assert (isKeyword (token, KEYWORD_FUNCTION) ||
@@ -716,11 +716,11 @@ static void parseSubProgram (tokenInfo * const token)
 				{
 					if (isType (token, TOKEN_EOF))
 					{
-						endSubProgram = TRUE;
+						endSubProgram = true;
 					}
 					else
 					{
-						parseKeywords (token, TRUE);
+						parseKeywords (token, true);
 					}
 				}
 			} while (!endSubProgram);
@@ -742,11 +742,11 @@ static void parseSubProgram (tokenInfo * const token)
 				{
 					if (isType (token, TOKEN_EOF))
 					{
-						endSubProgram = TRUE;
+						endSubProgram = true;
 					}
 					else
 					{
-						parseKeywords (token, TRUE);
+						parseKeywords (token, true);
 					}
 				}
 			} while (!endSubProgram);
@@ -757,7 +757,7 @@ static void parseSubProgram (tokenInfo * const token)
 
 /* TODO */
 /* records */
-static void parseKeywords (tokenInfo * const token, boolean local)
+static void parseKeywords (tokenInfo * const token, bool local)
 {
 	switch (token->keyword)
 	{
@@ -798,7 +798,7 @@ static tokenType parseVhdlFile (tokenInfo * const token)
 	do
 	{
 		readToken (token);
-		parseKeywords (token, FALSE);
+		parseKeywords (token, false);
 	} while (!isKeyword (token, KEYWORD_END) && !isType (token, TOKEN_EOF));
 	return token->type;
 }

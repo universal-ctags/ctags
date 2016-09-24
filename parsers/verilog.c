@@ -81,8 +81,8 @@ typedef struct sTokenInfo {
 	verilogKind         lastKind;      /* Kind of last found tag */
 	vString*            blockName;     /* Current block name */
 	vString*            inheritance;   /* Class inheritance */
-	boolean             prototype;     /* Is only a prototype */
-	boolean             classScope;    /* Context is local to the current sub-context */
+	bool             prototype;     /* Is only a prototype */
+	bool             classScope;    /* Context is local to the current sub-context */
 } tokenInfo;
 
 /*
@@ -93,37 +93,37 @@ static int Lang_verilog;
 static int Lang_systemverilog;
 
 static kindOption VerilogKinds [] = {
- { TRUE, 'c', "constant",  "constants (define, parameter, specparam)" },
- { TRUE, 'e', "event",     "events" },
- { TRUE, 'f', "function",  "functions" },
- { TRUE, 'm', "module",    "modules" },
- { TRUE, 'n', "net",       "net data types" },
- { TRUE, 'p', "port",      "ports" },
- { TRUE, 'r', "register",  "register data types" },
- { TRUE, 't', "task",      "tasks" },
- { TRUE, 'b', "block",     "blocks" }
+ { true, 'c', "constant",  "constants (define, parameter, specparam)" },
+ { true, 'e', "event",     "events" },
+ { true, 'f', "function",  "functions" },
+ { true, 'm', "module",    "modules" },
+ { true, 'n', "net",       "net data types" },
+ { true, 'p', "port",      "ports" },
+ { true, 'r', "register",  "register data types" },
+ { true, 't', "task",      "tasks" },
+ { true, 'b', "block",     "blocks" }
 };
 
 static kindOption SystemVerilogKinds [] = {
- { TRUE, 'c', "constant",  "constants (define, parameter, specparam)" },
- { TRUE, 'e', "event",     "events" },
- { TRUE, 'f', "function",  "functions" },
- { TRUE, 'm', "module",    "modules" },
- { TRUE, 'n', "net",       "net data types" },
- { TRUE, 'p', "port",      "ports" },
- { TRUE, 'r', "register",  "register data types" },
- { TRUE, 't', "task",      "tasks" },
- { TRUE, 'b', "block",     "blocks" },
- { TRUE, 'A', "assert",    "assertions" },
- { TRUE, 'C', "class",     "classes" },
- { TRUE, 'V', "covergroup","covergroups" },
- { TRUE, 'I', "interface", "interfaces" },
- { TRUE, 'M', "modport",   "modports" },
- { TRUE, 'K', "package",   "packages" },
- { TRUE, 'P', "program",   "programs" },
- { FALSE,'Q', "prototype", "prototypes" },
- { TRUE, 'R', "property",  "properties" },
- { TRUE, 'T', "typedef",   "type declarations" }
+ { true, 'c', "constant",  "constants (define, parameter, specparam)" },
+ { true, 'e', "event",     "events" },
+ { true, 'f', "function",  "functions" },
+ { true, 'm', "module",    "modules" },
+ { true, 'n', "net",       "net data types" },
+ { true, 'p', "port",      "ports" },
+ { true, 'r', "register",  "register data types" },
+ { true, 't', "task",      "tasks" },
+ { true, 'b', "block",     "blocks" },
+ { true, 'A', "assert",    "assertions" },
+ { true, 'C', "class",     "classes" },
+ { true, 'V', "covergroup","covergroups" },
+ { true, 'I', "interface", "interfaces" },
+ { true, 'M', "modport",   "modports" },
+ { true, 'K', "package",   "packages" },
+ { true, 'P', "program",   "programs" },
+ { false,'Q', "prototype", "prototypes" },
+ { true, 'R', "property",  "properties" },
+ { true, 'T', "typedef",   "type declarations" }
 };
 
 static const keywordAssoc KeywordTable [] = {
@@ -213,9 +213,9 @@ static short isContainer (tokenInfo const* token)
 		case K_PACKAGE:
 		case K_PROGRAM:
 		case K_PROPERTY:
-			return TRUE;
+			return true;
 		default:
-			return FALSE;
+			return false;
 	}
 }
 
@@ -228,9 +228,9 @@ static short isVariable (tokenInfo const* token)
 		case K_NET:
 		case K_PORT:
 		case K_REGISTER:
-			return TRUE;
+			return true;
 		default:
-			return FALSE;
+			return false;
 	}
 }
 
@@ -244,9 +244,9 @@ static short hasSimplePortList (tokenInfo const* token)
 		case K_INTERFACE:
 		case K_PROGRAM:
 		case K_PROPERTY:
-			return TRUE;
+			return true;
 		default:
-			return FALSE;
+			return false;
 	}
 }
 
@@ -255,9 +255,9 @@ static short isPrototype (tokenInfo const* token)
 	if (strcmp (vStringValue (token->name), "extern")  == 0 ||
         strcmp (vStringValue (token->name), "pure") == 0 )
 	{
-		return TRUE;
+		return true;
 	} else {
-		return FALSE;
+		return false;
 	}
 }
 
@@ -273,8 +273,8 @@ static tokenInfo *newToken (void)
 	token->lastKind = K_UNDEFINED;
 	token->blockName = vStringNew ();
 	token->inheritance = vStringNew ();
-	token->prototype = FALSE;
-	token->classScope = FALSE;
+	token->prototype = false;
+	token->classScope = false;
 	return token;
 }
 
@@ -399,9 +399,9 @@ static int vGetc (void)
 	return c;
 }
 
-static boolean isIdentifierCharacter (const int c)
+static bool isIdentifierCharacter (const int c)
 {
-	return (boolean)(isalnum (c)  ||  c == '_'  ||  c == '`');
+	return (bool)(isalnum (c)  ||  c == '_'  ||  c == '`');
 }
 
 static int skipWhite (int c)
@@ -437,7 +437,7 @@ static void skipToSemiColon (void)
 	} while (c != EOF && c != ';');
 }
 
-static boolean readIdentifier (tokenInfo *const token, int c)
+static bool readIdentifier (tokenInfo *const token, int c)
 {
 	vStringClear (token->name);
 	if (isIdentifierCharacter (c))
@@ -452,7 +452,7 @@ static boolean readIdentifier (tokenInfo *const token, int c)
 		token->lineNumber = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 	}
-	return (boolean)(vStringLength (token->name) > 0);
+	return (bool)(vStringLength (token->name) > 0);
 }
 
 static int skipMacro (int c)
@@ -624,7 +624,7 @@ static void createTag (tokenInfo *const token)
 	vStringClear (token->inheritance);
 }
 
-static boolean findBlockName (tokenInfo *const token)
+static bool findBlockName (tokenInfo *const token)
 {
 	int c;
 
@@ -633,27 +633,27 @@ static boolean findBlockName (tokenInfo *const token)
 	{
 		c = skipWhite (vGetc ());
 		readIdentifier (token, c);
-		return (boolean) (vStringLength (token->name) > 0);
+		return (bool) (vStringLength (token->name) > 0);
 	}
 	else
 		vUngetc (c);
-	return FALSE;
+	return false;
 }
 
 static void processBlock (tokenInfo *const token)
 {
-	boolean blockStart = FALSE;
-	boolean blockEnd   = FALSE;
+	bool blockStart = false;
+	bool blockEnd   = false;
 
 	if (strcmp (vStringValue (token->name), "begin") == 0)
 	{
 		currentContext->nestLevel++;
-		blockStart = TRUE;
+		blockStart = true;
 	}
 	else if (strcmp (vStringValue (token->name), "end") == 0)
 	{
 		currentContext->nestLevel--;
-		blockEnd = TRUE;
+		blockEnd = true;
 	}
 
 	if (findBlockName (token))
@@ -767,7 +767,7 @@ static void processFunction (tokenInfo *const token)
 				vStringCopy (classType->name, token->name);
 				classType->kind = K_CLASS;
 				createContext (classType);
-				currentContext->classScope = TRUE;
+				currentContext->classScope = true;
 			}
 			else
 			{
@@ -801,7 +801,7 @@ static void processTypedef (tokenInfo *const token)
 		/* A typedef class is just a prototype */
 		if (strcmp (vStringValue (token->name), "class") == 0)
 		{
-			currentContext->prototype = TRUE;
+			currentContext->prototype = true;
 		}
 	}
 
@@ -925,7 +925,7 @@ static void processClass (tokenInfo *const token)
 static void tagNameList (tokenInfo* token, int c)
 {
 	verilogKind localKind;
-	boolean repeat;
+	bool repeat;
 
 	/* Many keywords can have bit width.
 	*   reg [3:0] net_name;
@@ -947,7 +947,7 @@ static void tagNameList (tokenInfo* token, int c)
 
 	do
 	{ 
-		repeat = FALSE;
+		repeat = false;
 
 		while (c == '`' && c != EOF)
 		{
@@ -970,7 +970,7 @@ static void tagNameList (tokenInfo* token, int c)
 				{
 					token->kind = localKind;
 				}
-				repeat = TRUE;
+				repeat = true;
 			}
 		}
 		else
@@ -1002,7 +1002,7 @@ static void tagNameList (tokenInfo* token, int c)
 		if (c == ',')
 		{
 			c = skipWhite (vGetc ());
-			repeat = TRUE;
+			repeat = true;
 		}
 	} while (repeat);
 	vUngetc (c);
@@ -1062,7 +1062,7 @@ static void findTag (tokenInfo *const token)
 	}
 	else if (token->kind == K_IGNORE && isPrototype (token))
 	{
-		currentContext->prototype = TRUE;
+		currentContext->prototype = true;
 	}
 	else if (isVariable (token))
 	{
@@ -1130,12 +1130,12 @@ static void findVerilogTags (void)
 				{
 					verbose ("Dropping context %s\n", vStringValue (currentContext->name));
 					currentContext = popToken (currentContext);
-					currentContext->prototype = FALSE;
+					currentContext->prototype = false;
 				}
 				/* Prototypes end at the end of statement */
 				if (currentContext->prototype)
 				{
-					currentContext->prototype = FALSE;
+					currentContext->prototype = false;
 				}
 				break;
 			default :

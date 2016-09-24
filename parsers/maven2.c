@@ -42,22 +42,22 @@ typedef enum {
 } maven2ArtifactIdRole;
 
 static roleDesc Maven2GroupIdRoles [] = {
-	{ TRUE, "parent", "parent" },
-	{ TRUE, "dependency", "dependency" },
+	{ true, "parent", "parent" },
+	{ true, "dependency", "dependency" },
 };
 
 static roleDesc Maven2ArtifactIdRoles [] = {
-	{ TRUE, "parent", "parent" },
-	{ TRUE, "dependency", "dependency" },
+	{ true, "parent", "parent" },
+	{ true, "dependency", "dependency" },
 };
 
 static kindOption Maven2Kinds [] = {
-	{ TRUE,  'g', "groupId",    "group identifiers",
-	  .referenceOnly = FALSE, ATTACH_ROLES (Maven2GroupIdRoles) },
-	{ TRUE,  'a', "artifactId", "artifact identifiers",
-	  .referenceOnly = FALSE, ATTACH_ROLES (Maven2ArtifactIdRoles) },
-	{ TRUE,  'p', "property",   "properties" },
-	{ TRUE,  'r', "repositoryId", "repository identifiers" },
+	{ true,  'g', "groupId",    "group identifiers",
+	  .referenceOnly = false, ATTACH_ROLES (Maven2GroupIdRoles) },
+	{ true,  'a', "artifactId", "artifact identifiers",
+	  .referenceOnly = false, ATTACH_ROLES (Maven2ArtifactIdRoles) },
+	{ true,  'p', "property",   "properties" },
+	{ true,  'r', "repositoryId", "repository identifiers" },
 };
 
 static void makeTagWithScope (xmlNode *node,
@@ -162,7 +162,7 @@ static fieldSpec Maven2Fields [] = {
 	{
 		.name = "version",
 		.description = "version of artifact",
-		.enabled = FALSE,
+		.enabled = false,
 	}
 };
 
@@ -259,7 +259,7 @@ Maven2Parser (void)
 	def->parser        = findMaven2Tags;
 	def->tagXpathTableTable  = maven2XpathTableTable;
 	def->tagXpathTableCount  = ARRAY_SIZE (maven2XpathTableTable);
-	def->useCork = TRUE;
+	def->useCork = true;
 	def->selectLanguage = selectors;
 	def->fieldSpecs = Maven2Fields;
 	def->fieldSpecCount = ARRAY_SIZE (Maven2Fields);

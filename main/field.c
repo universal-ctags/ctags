@@ -57,17 +57,17 @@ static const char *renderFieldXpath (const tagEntryInfo *const tag, const char *
 static const char *renderFieldScopeKindName(const tagEntryInfo *const tag, const char *value, vString* b);
 static const char *renderFieldEnd (const tagEntryInfo *const tag, const char *value, vString* b);
 
-static boolean     isLanguageFieldAvailable  (const tagEntryInfo *const tag);
-static boolean     isTyperefFieldAvailable   (const tagEntryInfo *const tag);
-static boolean     isFileFieldAvailable      (const tagEntryInfo *const tag);
-static boolean     isInheritsFieldAvailable  (const tagEntryInfo *const tag);
-static boolean     isAccessFieldAvailable    (const tagEntryInfo *const tag);
-static boolean     isImplementationFieldAvailable (const tagEntryInfo *const tag);
-static boolean     isSignatureFieldAvailable (const tagEntryInfo *const tag);
-static boolean     isRoleFieldAvailable      (const tagEntryInfo *const tag);
-static boolean     isExtraFieldAvailable     (const tagEntryInfo *const tag);
-static boolean     isXpathFieldAvailable     (const tagEntryInfo *const tag);
-static boolean     isEndFieldAvailable       (const tagEntryInfo *const tag);
+static bool     isLanguageFieldAvailable  (const tagEntryInfo *const tag);
+static bool     isTyperefFieldAvailable   (const tagEntryInfo *const tag);
+static bool     isFileFieldAvailable      (const tagEntryInfo *const tag);
+static bool     isInheritsFieldAvailable  (const tagEntryInfo *const tag);
+static bool     isAccessFieldAvailable    (const tagEntryInfo *const tag);
+static bool     isImplementationFieldAvailable (const tagEntryInfo *const tag);
+static bool     isSignatureFieldAvailable (const tagEntryInfo *const tag);
+static bool     isRoleFieldAvailable      (const tagEntryInfo *const tag);
+static bool     isExtraFieldAvailable     (const tagEntryInfo *const tag);
+static bool     isXpathFieldAvailable     (const tagEntryInfo *const tag);
+static bool     isEndFieldAvailable       (const tagEntryInfo *const tag);
 
 
 #define DEFINE_FIELD_SPEC(L, N, V, H, F)		\
@@ -86,57 +86,57 @@ static boolean     isEndFieldAvailable       (const tagEntryInfo *const tag);
 
 static fieldSpec fieldSpecsFixed [] = {
         /* FIXED FIELDS */
-	DEFINE_FIELD_SPEC ('N', "name",     TRUE,
+	DEFINE_FIELD_SPEC ('N', "name",     true,
 			  "tag name (fixed field)",
 			  renderFieldName),
-	DEFINE_FIELD_SPEC ('F', "input",    TRUE,
+	DEFINE_FIELD_SPEC ('F', "input",    true,
 			   "input file (fixed field)",
 			   renderFieldInput),
-	DEFINE_FIELD_SPEC ('P', "pattern",  TRUE,
+	DEFINE_FIELD_SPEC ('P', "pattern",  true,
 			   "pattern (fixed field)",
 			   renderFieldPattern),
 };
 
 static fieldSpec fieldSpecsExuberant [] = {
-	DEFINE_FIELD_SPEC ('C', "compact",        FALSE,
+	DEFINE_FIELD_SPEC ('C', "compact",        false,
 			   "compact input line (fixed field, only used in -x option)",
 			   renderFieldCompactInputLine),
 
 	/* EXTENSION FIELDS */
-	DEFINE_FIELD_SPEC_FULL ('a', "access",         FALSE,
+	DEFINE_FIELD_SPEC_FULL ('a', "access",         false,
 		      "Access (or export) of class members",
 		      renderFieldAccess, isAccessFieldAvailable),
-	DEFINE_FIELD_SPEC_FULL ('f', "file",           TRUE,
+	DEFINE_FIELD_SPEC_FULL ('f', "file",           true,
 		      "File-restricted scoping",
 		      renderFieldFile, isFileFieldAvailable),
-	DEFINE_FIELD_SPEC_FULL ('i', "inherits",       FALSE,
+	DEFINE_FIELD_SPEC_FULL ('i', "inherits",       false,
 		      "Inheritance information",
 		      renderFieldInherits, isInheritsFieldAvailable),
-	DEFINE_FIELD_SPEC ('K', NULL,             FALSE,
+	DEFINE_FIELD_SPEC ('K', NULL,             false,
 		      "Kind of tag as full name",
 		      renderFieldKindName),
-	DEFINE_FIELD_SPEC ('k', NULL,             TRUE,
+	DEFINE_FIELD_SPEC ('k', NULL,             true,
 			   "Kind of tag as a single letter",
 			   renderFieldKindLetter),
-	DEFINE_FIELD_SPEC_FULL ('l', "language",       FALSE,
+	DEFINE_FIELD_SPEC_FULL ('l', "language",       false,
 			   "Language of input file containing tag",
 			   renderFieldLanguage, isLanguageFieldAvailable),
-	DEFINE_FIELD_SPEC_FULL ('m', "implementation", FALSE,
+	DEFINE_FIELD_SPEC_FULL ('m', "implementation", false,
 			   "Implementation information",
 			   renderFieldImplementation, isImplementationFieldAvailable),
-	DEFINE_FIELD_SPEC ('n', "line",           FALSE,
+	DEFINE_FIELD_SPEC ('n', "line",           false,
 			   "Line number of tag definition",
 			   renderFieldLineNumber),
-	DEFINE_FIELD_SPEC_FULL ('S', "signature",	     FALSE,
+	DEFINE_FIELD_SPEC_FULL ('S', "signature",	     false,
 			   "Signature of routine (e.g. prototype or parameter list)",
 			   renderFieldSignature, isSignatureFieldAvailable),
-	DEFINE_FIELD_SPEC ('s', NULL,             TRUE,
+	DEFINE_FIELD_SPEC ('s', NULL,             true,
 			   "Scope of tag definition (`p' can be used for printing its kind)",
 			   renderFieldScope),
-	DEFINE_FIELD_SPEC_FULL ('t', "typeref",        TRUE,
+	DEFINE_FIELD_SPEC_FULL ('t', "typeref",        true,
 			   "Type and name of a variable or typedef",
 			   renderFieldTyperef, isTyperefFieldAvailable),
-	DEFINE_FIELD_SPEC ('z', "kind",           FALSE,
+	DEFINE_FIELD_SPEC ('z', "kind",           false,
 			   "Include the \"kind:\" key in kind field (use k or K) in tags output, kind full name in xref output",
 			   /* Following renderer is for handling --_xformat=%{kind};
 			      and is not for tags output. */
@@ -144,27 +144,27 @@ static fieldSpec fieldSpecsExuberant [] = {
 };
 
 static fieldSpec fieldSpecsUniversal [] = {
-	DEFINE_FIELD_SPEC_FULL ('r', "role",    FALSE,
+	DEFINE_FIELD_SPEC_FULL ('r', "role",    false,
 			   "Role",
 			   renderFieldRole, isRoleFieldAvailable),
-	DEFINE_FIELD_SPEC ('R',  NULL,     FALSE,
+	DEFINE_FIELD_SPEC ('R',  NULL,     false,
 			   "Marker (R or D) representing whether tag is definition or reference",
 			   renderFieldRefMarker),
-	DEFINE_FIELD_SPEC ('Z', "scope",   FALSE,
+	DEFINE_FIELD_SPEC ('Z', "scope",   false,
 			  "Include the \"scope:\" key in scope field (use s) in tags output, scope name in xref output",
 			   /* Following renderer is for handling --_xformat=%{scope};
 			      and is not for tags output. */
 			   renderFieldScope),
-	DEFINE_FIELD_SPEC_FULL ('E', "extra",   FALSE,
+	DEFINE_FIELD_SPEC_FULL ('E', "extra",   false,
 			   "Extra tag type information",
 			   renderFieldExtra, isExtraFieldAvailable),
-	DEFINE_FIELD_SPEC_FULL ('x', "xpath",   FALSE,
+	DEFINE_FIELD_SPEC_FULL ('x', "xpath",   false,
 			   "xpath for the tag",
 			   renderFieldXpath, isXpathFieldAvailable),
-	DEFINE_FIELD_SPEC ('p', "scopeKind", FALSE,
+	DEFINE_FIELD_SPEC ('p', "scopeKind", false,
 			   "Kind of scope as full name",
 			   renderFieldScopeKindName),
-	DEFINE_FIELD_SPEC_FULL ('e', "end", FALSE,
+	DEFINE_FIELD_SPEC_FULL ('e', "end", false,
 			   "end lines of various items",
 			   renderFieldEnd, isEndFieldAvailable),
 };
@@ -265,18 +265,18 @@ extern fieldType getFieldTypeForName (const char *name)
 
 extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType language)
 {
-	static boolean initialized = FALSE;
+	static bool initialized = false;
 	unsigned int i;
 
 	if (fieldName == NULL)
 		return FIELD_UNKNOWN;
 
-	if (language == LANG_AUTO && (initialized == FALSE))
+	if (language == LANG_AUTO && (initialized == false))
 	{
-		initialized = TRUE;
+		initialized = true;
 		initializeParser (LANG_AUTO);
 	}
-	else if (language != LANG_IGNORE && (initialized == FALSE))
+	else if (language != LANG_IGNORE && (initialized == false))
 		initializeParser (language);
 
 	for (i = 0; i < fieldDescUsed; i++)
@@ -302,12 +302,12 @@ extern const char* getFieldName(fieldType type)
 		return fdesc->spec->name;
 }
 
-extern boolean doesFieldHaveValue (fieldType type, const tagEntryInfo *tag)
+extern bool doesFieldHaveValue (fieldType type, const tagEntryInfo *tag)
 {
 	if (getFieldDesc(type)->spec->isValueAvailable)
 		return getFieldDesc(type)->spec->isValueAvailable(tag);
 	else
-		return TRUE;
+		return true;
 }
 
 #define PR_FIELD_WIDTH_LETTER     7
@@ -488,7 +488,7 @@ extern const char* renderFieldEscaped (fieldType type,
  */
 static const char* renderCompactInputLine (vString *b,  const char *const line)
 {
-	boolean lineStarted = FALSE;
+	bool lineStarted = false;
 	const char *p;
 	int c;
 
@@ -498,7 +498,7 @@ static const char* renderCompactInputLine (vString *b,  const char *const line)
 	{
 		if (lineStarted  || ! isspace (c))  /* ignore leading spaces */
 		{
-			lineStarted = TRUE;
+			lineStarted = true;
 			if (isspace (c))
 			{
 				int next;
@@ -648,7 +648,7 @@ static const char *renderFieldExtra (const tagEntryInfo *const tag,
 				     vString* b)
 {
 	int i;
-	boolean hasExtra = FALSE;
+	bool hasExtra = false;
 
 	for (i = 0; i < XTAG_COUNT; i++)
 	{
@@ -663,7 +663,7 @@ static const char *renderFieldExtra (const tagEntryInfo *const tag,
 			if (hasExtra)
 				vStringPut (b, ',');
 			vStringCatS (b, name);
-			hasExtra = TRUE;
+			hasExtra = true;
 		}
 	}
 
@@ -710,87 +710,87 @@ static const char *renderFieldEnd (const tagEntryInfo *const tag,
 		return NULL;
 }
 
-static boolean     isLanguageFieldAvailable (const tagEntryInfo *const tag)
+static bool     isLanguageFieldAvailable (const tagEntryInfo *const tag)
 {
-	return (tag->language != NULL)? TRUE: FALSE;
+	return (tag->language != NULL)? true: false;
 }
 
-static boolean     isTyperefFieldAvailable  (const tagEntryInfo *const tag)
+static bool     isTyperefFieldAvailable  (const tagEntryInfo *const tag)
 {
 	return (tag->extensionFields.typeRef [0] != NULL
-		&& tag->extensionFields.typeRef [1] != NULL)? TRUE: FALSE;
+		&& tag->extensionFields.typeRef [1] != NULL)? true: false;
 }
 
-static boolean     isFileFieldAvailable  (const tagEntryInfo *const tag)
+static bool     isFileFieldAvailable  (const tagEntryInfo *const tag)
 {
-	return tag->isFileScope? TRUE: FALSE;
+	return tag->isFileScope? true: false;
 }
 
-static boolean     isInheritsFieldAvailable (const tagEntryInfo *const tag)
+static bool     isInheritsFieldAvailable (const tagEntryInfo *const tag)
 {
-	return (tag->extensionFields.inheritance != NULL)? TRUE: FALSE;
+	return (tag->extensionFields.inheritance != NULL)? true: false;
 }
 
-static boolean     isAccessFieldAvailable   (const tagEntryInfo *const tag)
+static bool     isAccessFieldAvailable   (const tagEntryInfo *const tag)
 {
-	return (tag->extensionFields.access != NULL)? TRUE: FALSE;
+	return (tag->extensionFields.access != NULL)? true: false;
 }
 
-static boolean     isImplementationFieldAvailable (const tagEntryInfo *const tag)
+static bool     isImplementationFieldAvailable (const tagEntryInfo *const tag)
 {
-	return (tag->extensionFields.implementation != NULL)? TRUE: FALSE;
+	return (tag->extensionFields.implementation != NULL)? true: false;
 }
 
-static boolean     isSignatureFieldAvailable (const tagEntryInfo *const tag)
+static bool     isSignatureFieldAvailable (const tagEntryInfo *const tag)
 {
-	return (tag->extensionFields.signature != NULL)? TRUE: FALSE;
+	return (tag->extensionFields.signature != NULL)? true: false;
 }
 
-static boolean     isRoleFieldAvailable      (const tagEntryInfo *const tag)
+static bool     isRoleFieldAvailable      (const tagEntryInfo *const tag)
 {
-	return (tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)? TRUE: FALSE;
+	return (tag->extensionFields.roleIndex != ROLE_INDEX_DEFINITION)? true: false;
 }
 
-static boolean     isExtraFieldAvailable     (const tagEntryInfo *const tag)
+static bool     isExtraFieldAvailable     (const tagEntryInfo *const tag)
 {
 	int i;
 	for (i = 0; i < sizeof (tag->extra); i++)
 	{
 		if (tag->extra [i])
-			return TRUE;
+			return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
-static boolean     isXpathFieldAvailable      (const tagEntryInfo *const tag)
+static bool     isXpathFieldAvailable      (const tagEntryInfo *const tag)
 {
 #ifdef HAVE_LIBXML
-	return (tag->extensionFields.xpath != NULL)? TRUE: FALSE;
+	return (tag->extensionFields.xpath != NULL)? true: false;
 #else
-	return FALSE;
+	return false;
 #endif
 }
 
-static boolean     isEndFieldAvailable       (const tagEntryInfo *const tag)
+static bool     isEndFieldAvailable       (const tagEntryInfo *const tag)
 {
-	return (tag->extensionFields.endLine != 0)? TRUE: FALSE;
+	return (tag->extensionFields.endLine != 0)? true: false;
 }
 
-extern boolean isFieldEnabled (fieldType type)
+extern bool isFieldEnabled (fieldType type)
 {
 	return getFieldDesc(type)->spec->enabled;
 }
 
-static boolean isFieldFixed (fieldType type)
+static bool isFieldFixed (fieldType type)
 {
-	return getFieldDesc(type)->fixed? TRUE: FALSE;
+	return getFieldDesc(type)->fixed? true: false;
 }
 
-extern boolean enableField (fieldType type, boolean state, boolean warnIfFixedField)
+extern bool enableField (fieldType type, bool state, bool warnIfFixedField)
 {
 	fieldSpec *spec = getFieldDesc(type)->spec;
-	boolean old = spec->enabled? TRUE: FALSE;
+	bool old = spec->enabled? true: false;
 	if (isFieldFixed (type))
 	{
 		if ((!state) && warnIfFixedField)
@@ -825,9 +825,9 @@ extern boolean enableField (fieldType type, boolean state, boolean warnIfFixedFi
 	return old;
 }
 
-extern boolean isCommonField (fieldType type)
+extern bool isCommonField (fieldType type)
 {
-	return (FIELD_BUILTIN_LAST < type)? FALSE: TRUE;
+	return (FIELD_BUILTIN_LAST < type)? false: true;
 }
 
 extern int     getFieldOwner (fieldType type)
@@ -835,9 +835,9 @@ extern int     getFieldOwner (fieldType type)
 	return getFieldDesc(type)->language;
 }
 
-extern boolean isFieldRenderable (fieldType type)
+extern bool isFieldRenderable (fieldType type)
 {
-	return getFieldDesc(type)->spec->renderEscaped? TRUE: FALSE;
+	return getFieldDesc(type)->spec->renderEscaped? true: false;
 }
 
 extern int countFields (void)

@@ -35,7 +35,7 @@ extern parserDefinition* CtagsParser (void)
 
 	parserDefinition* const def = parserNew ("ctags");
 
-	def->enabled       = TRUE;
+	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;
 	def->aliases       = aliases;

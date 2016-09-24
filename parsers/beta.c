@@ -36,10 +36,10 @@ typedef enum {
 } betaKind;
 
 static kindOption BetaKinds [] = {
-	{ TRUE,  'f', "fragment", "fragment definitions"},
-	{ FALSE, 'p', "pattern",  "all patterns"},
-	{ TRUE,  's', "slot",     "slots (fragment uses)"},
-	{ TRUE,  'v', "virtual",  "patterns (virtual or rebound)"}
+	{ true,  'f', "fragment", "fragment definitions"},
+	{ false, 'p', "pattern",  "all patterns"},
+	{ true,  's', "slot",     "slots (fragment uses)"},
+	{ true,  'v', "virtual",  "patterns (virtual or rebound)"}
 };
 
 /* [A-Z_a-z0-9] */
@@ -78,15 +78,15 @@ static void makeBetaTag (const char* const name, const betaKind kind)
 static void findBetaTags (void)
 {
 	vString *line = vStringNew ();
-	boolean incomment = FALSE;
-	boolean inquote = FALSE;
-	boolean dovirtuals = BetaKinds [K_VIRTUAL].enabled;
-	boolean dopatterns = BetaKinds [K_PATTERN].enabled;
+	bool incomment = false;
+	bool inquote = false;
+	bool dovirtuals = BetaKinds [K_VIRTUAL].enabled;
+	bool dopatterns = BetaKinds [K_PATTERN].enabled;
 
 	int c;
 	do
 	{
-		boolean foundfragmenthere = FALSE;
+		bool foundfragmenthere = false;
 		/* find fragment definition (line that starts and ends with --) */
 		int last;
 		int first;
@@ -112,7 +112,7 @@ static void findBetaTags (void)
 		{
 			if (!incomment && !inquote)
 			{
-				foundfragmenthere = TRUE;
+				foundfragmenthere = true;
 				/* skip past -- and whitespace.  Also skip back past 'dopart'
 				   or 'attributes' to the :.  We have to do this because there
 				   is no sensible way to include whitespace in a ctags token
@@ -147,20 +147,20 @@ static void findBetaTags (void)
 				if (vStringChar (line, pos) == '\'')
 				{
 					pos++;
-					inquote = TRUE;
+					inquote = true;
 					goto stringtext;
 				}
 				if (vStringChar (line, pos) == '{')
 				{
 					pos++;
-					incomment = TRUE;
+					incomment = true;
 					goto commenttext;
 				}
 				if (vStringChar (line, pos) == '(' && pos < len - 1 &&
 					vStringChar (line, pos+1) == '*')
 				{
 					pos +=2;
-					incomment = TRUE;
+					incomment = true;
 					goto commenttext;
 				}
 				/*
@@ -266,13 +266,13 @@ static void findBetaTags (void)
 					vStringChar (line, pos+1) == ')')
 				{
 					pos += 2;
-					incomment = FALSE;
+					incomment = false;
 					goto programtext;
 				}
 				if (vStringChar (line, pos) == '}')
 				{
 					pos++;
-					incomment = FALSE;
+					incomment = false;
 					goto programtext;
 				}
 			}
@@ -292,13 +292,13 @@ static void findBetaTags (void)
 					{
 						continue;
 					}
-					inquote = FALSE;
+					inquote = false;
 					goto programtext;
 				}
 			}
 		}
 		endofline:
-		inquote = FALSE;  /* This shouldn't really make a difference */
+		inquote = false;  /* This shouldn't really make a difference */
 	} while (c != EOF);
 	vStringDelete (line);
 }

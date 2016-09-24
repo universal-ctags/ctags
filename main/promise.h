@@ -20,7 +20,7 @@ int  makePromise   (const char *parser,
 		    unsigned long startLine, int startCharOffset,
 		    unsigned long endLine, int endCharOffset,
 		    unsigned long sourceLineOffset);
-boolean forcePromises (void);
+bool forcePromises (void);
 void breakPromisesAfter (int promise);
 int getLastPromise (void);
 

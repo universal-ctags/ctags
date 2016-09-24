@@ -15,12 +15,12 @@
 #include <stdarg.h>
 #include "routines.h"
 
-typedef boolean (* errorPrintFunc) (const errorSelection selection, const char *const format,
+typedef bool (* errorPrintFunc) (const errorSelection selection, const char *const format,
 				    va_list ap, void *data);
 
 extern void setErrorPrinter (errorPrintFunc printer, void *data);
 
-extern boolean stderrDefaultErrorPrinter (const errorSelection selection, const char *const format, va_list ap,
+extern bool stderrDefaultErrorPrinter (const errorSelection selection, const char *const format, va_list ap,
 					  void *data);
 
 #endif

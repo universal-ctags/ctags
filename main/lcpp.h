@@ -49,21 +49,21 @@
    isascii is for suitable to verify the range of input. However, it
    is not portable enough. */
 
-#define RoleTemplateUndef { TRUE, "undef", "undefined" }
+#define RoleTemplateUndef { true, "undef", "undefined" }
 
-#define RoleTemplateSystem { TRUE, "system", "system header" }
-#define RoleTemplateLocal  { TRUE, "local", "local header" }
+#define RoleTemplateSystem { true, "system", "system header" }
+#define RoleTemplateLocal  { true, "local", "local header" }
 
 /*
 *   FUNCTION PROTOTYPES
 */
-extern boolean cppIsBraceFormat (void);
+extern bool cppIsBraceFormat (void);
 extern unsigned int cppGetDirectiveNestLevel (void);
 
-extern void cppInit (const boolean state,
-		     const boolean hasAtLiteralStrings,
-		     const boolean hasCxxRawLiteralStrings,
-		     const boolean hasSingleQuoteLiteralNumbers,
+extern void cppInit (const bool state,
+		     const bool hasAtLiteralStrings,
+		     const bool hasCxxRawLiteralStrings,
+		     const bool hasSingleQuoteLiteralNumbers,
 		     const kindOption *defineMacroKind,
 		     int macroUndefRoleIndex,
 		     const kindOption *headerKind,

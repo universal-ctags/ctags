@@ -89,7 +89,7 @@ typedef struct eTagFile {
 		unsigned int count;
 	} corkQueue;
 
-	boolean patternCacheValid;
+	bool patternCacheValid;
 } tagFile;
 
 /*
@@ -103,16 +103,16 @@ tagFile TagFile = {
     { 0, 0 },           /* numTags */
     { 0, 0 },        /* max */
     NULL,                /* vLine */
-    .cork = FALSE,
+    .cork = false,
     .corkQueue = {
 	    .queue = NULL,
 	    .length = 0,
 	    .count  = 0
     },
-    .patternCacheValid = FALSE,
+    .patternCacheValid = false,
 };
 
-static boolean TagsToStdout = FALSE;
+static bool TagsToStdout = false;
 
 /*
 *   FUNCTION PROTOTYPES
@@ -187,12 +187,12 @@ extern void makeFileTag (const char *const fileName)
 		Assert (kind);
 		kind->enabled = isXtagEnabled(XTAG_FILE_NAMES);
 
-		/* TODO: you can return here if enabled == FALSE. */
+		/* TODO: you can return here if enabled == false. */
 
 		initTagEntry (&tag, baseFilename (fileName), kind);
 
-		tag.isFileEntry     = TRUE;
-		tag.lineNumberEntry = TRUE;
+		tag.isFileEntry     = true;
+		tag.lineNumberEntry = true;
 		markTagExtraBit (&tag, xtag);
 
 		tag.lineNumber = 1;
@@ -295,27 +295,27 @@ static long unsigned int updatePseudoTags (MIO *const mio)
  *  Tag file management
  */
 
-static boolean isValidTagAddress (const char *const excmd)
+static bool isValidTagAddress (const char *const excmd)
 {
-	boolean isValid = FALSE;
+	bool isValid = false;
 
 	if (strchr ("/?", excmd [0]) != NULL)
-		isValid = TRUE;
+		isValid = true;
 	else
 	{
 		char *address = xMalloc (strlen (excmd) + 1, char);
 		if (sscanf (excmd, "%[^;\n]", address) == 1  &&
 			strspn (address,"0123456789") == strlen (address))
-				isValid = TRUE;
+				isValid = true;
 		eFree (address);
 	}
 	return isValid;
 }
 
-static boolean isCtagsLine (const char *const line)
+static bool isCtagsLine (const char *const line)
 {
 	enum fieldList { TAG, TAB1, SRC_FILE, TAB2, EXCMD, NUM_FIELDS };
-	boolean ok = FALSE;  /* we assume not unless confirmed */
+	bool ok = false;  /* we assume not unless confirmed */
 	const size_t fieldLength = strlen (line) + 1;
 	char *const fields = xMalloc (NUM_FIELDS * fieldLength, char);
 
@@ -345,36 +345,36 @@ static boolean isCtagsLine (const char *const line)
 			field (TAG) [0] != '#'      &&
 			field (SRC_FILE) [strlen (field (SRC_FILE)) - 1] != ';'  &&
 			isValidTagAddress (field (EXCMD)))
-				ok = TRUE;
+				ok = true;
 
 		eFree (fields);
 	}
 	return ok;
 }
 
-static boolean isEtagsLine (const char *const line)
+static bool isEtagsLine (const char *const line)
 {
-	boolean result = FALSE;
+	bool result = false;
 	if (line [0] == '\f')
-		result = (boolean) (line [1] == '\n'  ||  line [1] == '\r');
+		result = (bool) (line [1] == '\n'  ||  line [1] == '\r');
 	return result;
 }
 
-static boolean isTagFile (const char *const filename)
+static bool isTagFile (const char *const filename)
 {
-	boolean ok = FALSE;  /* we assume not unless confirmed */
+	bool ok = false;  /* we assume not unless confirmed */
 	MIO *const mio = mio_new_file (filename, "rb");
 
 	if (mio == NULL  &&  errno == ENOENT)
-		ok = TRUE;
+		ok = true;
 	else if (mio != NULL)
 	{
 		const char *line = readLineRaw (TagFile.vLine, mio);
 
 		if (line == NULL)
-			ok = TRUE;
+			ok = true;
 		else
-			ok = (boolean) (isCtagsLine (line) || isEtagsLine (line));
+			ok = (bool) (isCtagsLine (line) || isEtagsLine (line));
 		mio_free (mio);
 	}
 	return ok;
@@ -400,7 +400,7 @@ extern void openTagFile (void)
 	}
 	else
 	{
-		boolean fileExists;
+		bool fileExists;
 
 		TagFile.name = eStrdup (Option.tagFileName);
 		fileExists = doesFileExist (TagFile.name);
@@ -591,7 +591,7 @@ static void writeEtagsIncludes (MIO *const mio)
 	}
 }
 
-extern void closeTagFile (const boolean resize)
+extern void closeTagFile (const bool resize)
 {
 	long desiredSize, size;
 
@@ -634,14 +634,14 @@ extern void closeTagFile (const boolean resize)
  *  are doubled and a leading '^' or trailing '$' is also quoted. End of line
  *  characters (line feed or carriage return) are dropped.
  */
-static size_t appendInputLine (int putc_func (char , void *), const char *const line, void * data, boolean *omitted)
+static size_t appendInputLine (int putc_func (char , void *), const char *const line, void * data, bool *omitted)
 {
 	size_t length = 0;
 	const char *p;
 
 	/*  Write everything up to, but not including, a line end character.
 	 */
-	*omitted = FALSE;
+	*omitted = false;
 	for (p = line  ;  *p != '\0'  ;  ++p)
 	{
 		const int next = *(p + 1);
@@ -652,7 +652,7 @@ static size_t appendInputLine (int putc_func (char , void *), const char *const 
 
 		if (Option.patternLengthLimit != 0 && length >= Option.patternLengthLimit)
 		{
-			*omitted = TRUE;
+			*omitted = true;
 			break;
 		}
 		/*  If character is '\', or a terminal '$', then quote it.
@@ -685,10 +685,10 @@ static int vstring_puts (const char* s, void *data)
 	return vStringLength (str) - len;
 }
 
-static boolean isPosSet(MIOPos pos)
+static bool isPosSet(MIOPos pos)
 {
 	char * p = (char *)&pos;
-	boolean r = FALSE;
+	bool r = false;
 	unsigned int i;
 
 	for (i = 0; i < sizeof(pos); i++)
@@ -713,7 +713,7 @@ extern char *readLineFromBypassAnyway (vString *const vLine, const tagEntryInfo 
  *  tag, providing a character which designates the end of the tag.
  */
 extern void truncateTagLine (
-		char *const line, const char *const token, const boolean discardNewline)
+		char *const line, const char *const token, const bool discardNewline)
 {
 	char *p = strstr (line, token);
 
@@ -814,10 +814,10 @@ extern int   makePatternStringCommon (const tagEntryInfo *const tag,
 	char *line;
 	int searchChar;
 	const char *terminator;
-	boolean  omitted;
+	bool  omitted;
 	size_t line_len;
 
-	boolean making_cache = FALSE;
+	bool making_cache = false;
 	int (* puts_o_func)(const char* , void *);
 	void * o_output;
 
@@ -832,15 +832,15 @@ extern int   makePatternStringCommon (const tagEntryInfo *const tag,
 	if (line == NULL)
 		error (FATAL, "could not read tag line from %s at line %lu", getInputFileName (),tag->lineNumber);
 	if (tag->truncateLine)
-		truncateTagLine (line, tag->name, FALSE);
+		truncateTagLine (line, tag->name, false);
 
 	line_len = strlen (line);
 	searchChar = Option.backward ? '?' : '/';
-	terminator = (boolean) (line [line_len - 1] == '\n') ? "$": "";
+	terminator = (bool) (line [line_len - 1] == '\n') ? "$": "";
 
 	if (!tag->truncateLine)
 	{
-		making_cache = TRUE;
+		making_cache = true;
 		cached_pattern = vStringNewOrClear (cached_pattern);
 
 		puts_o_func = puts_func;
@@ -861,7 +861,7 @@ extern int   makePatternStringCommon (const tagEntryInfo *const tag,
 	{
 		puts_o_func (vStringValue (cached_pattern), o_output);
 		cached_location = tag->filePosition;
-		TagFile.patternCacheValid = TRUE;
+		TagFile.patternCacheValid = true;
 	}
 
 	return length;
@@ -1048,7 +1048,7 @@ extern void setTagWriter (tagWriter *t)
 	writer = t;
 }
 
-extern boolean outpuFormatUsedStdoutByDefault (void)
+extern bool outpuFormatUsedStdoutByDefault (void)
 {
 	return writer->useStdoutByDefault;
 }
@@ -1102,7 +1102,7 @@ static void writeTagEntry (const tagEntryInfo *const tag)
 	abort_if_ferror (TagFile.mio);
 }
 
-extern boolean writePseudoTag (const ptagDesc *desc,
+extern bool writePseudoTag (const ptagDesc *desc,
 			       const char *const fileName,
 			       const char *const pattern,
 			       const char *const parserName)
@@ -1110,7 +1110,7 @@ extern boolean writePseudoTag (const ptagDesc *desc,
 	int length;
 
 	if (writer->writePtagEntry == NULL)
-		return FALSE;
+		return false;
 
 	length = writer->writePtagEntry (TagFile.mio, desc, fileName,
 									 pattern, parserName, writerData);
@@ -1119,7 +1119,7 @@ extern boolean writePseudoTag (const ptagDesc *desc,
 	++TagFile.numTags.added;
 	rememberMaxLengths (strlen (desc->name), (size_t) length);
 
-	return TRUE;
+	return true;
 }
 
 extern void corkTagFile(void)
@@ -1313,7 +1313,7 @@ extern void initTagEntryFull (tagEntryInfo *const e, const char *const name,
 	Assert (getInputFileName() != NULL);
 
 	memset (e, 0, sizeof (tagEntryInfo));
-	e->lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
+	e->lineNumberEntry = (bool) (Option.locate == EX_LINENUM);
 	e->lineNumber      = lineNumber;
 	e->boundaryInfo    = getNestedInputBoundaryInfo (lineNumber);
 	e->language        = language;
@@ -1352,7 +1352,7 @@ extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra)
 	tag->extra [ index ] |= (1 << offset);
 }
 
-extern boolean isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
+extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra)
 {
 	unsigned int index = (extra / 8);
 	unsigned int offset = (extra % 8);
@@ -1385,7 +1385,7 @@ extern unsigned long maxTagsLine (void)
 
 extern void invalidatePatternCache(void)
 {
-	TagFile.patternCacheValid = FALSE;
+	TagFile.patternCacheValid = false;
 }
 
 extern void tagFilePosition (MIOPos *p)

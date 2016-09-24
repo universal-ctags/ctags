@@ -14,9 +14,9 @@
 
 #ifdef HAVE_ICONV
 
-extern boolean isConverting (void);
-extern boolean openConverter (char*, char*);
-extern boolean convertString (vString *const);
+extern bool isConverting (void);
+extern bool openConverter (char*, char*);
+extern bool convertString (vString *const);
 extern void closeConverter (void);
 
 #endif /* HAVE_ICONV */

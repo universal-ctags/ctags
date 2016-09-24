@@ -51,12 +51,12 @@ typedef enum {
 } vimKind;
 
 static kindOption VimKinds [] = {
-	{ TRUE,  'a', "augroup",  "autocommand groups" },
-	{ TRUE,  'c', "command",  "user-defined commands" },
-	{ TRUE,  'f', "function", "function definitions" },
-	{ TRUE,  'm', "map",      "maps" },
-	{ TRUE,  'v', "variable", "variable definitions" },
-	{ TRUE,  'n', "filename", "vimball filename" },
+	{ true,  'a', "augroup",  "autocommand groups" },
+	{ true,  'c', "command",  "user-defined commands" },
+	{ true,  'f', "function", "function definitions" },
+	{ true,  'm', "map",      "maps" },
+	{ true,  'v', "variable", "variable definitions" },
+	{ true,  'n', "filename", "vimball filename" },
 };
 
 /*
@@ -81,7 +81,7 @@ static jmp_buf Exception;
  *  FUNCTION DEFINITIONS
  */
 
-static boolean parseVimLine (const unsigned char *line, int infunction);
+static bool parseVimLine (const unsigned char *line, int infunction);
 
 /* This function takes a char pointer, tries to find a scope separator in the
  * string, and if it does, returns a pointer to the character after the colon,
@@ -137,14 +137,14 @@ static const unsigned char *skipPrefix (const unsigned char *name, int *scope)
 	return result;
 }
 
-static boolean isWordChar (const unsigned char c)
+static bool isWordChar (const unsigned char c)
 {
 	return (isalnum (c) || c == '_');
 }
 
 /* checks if a word at the start of `p` matches at least `min_len` first
  * characters from `word` */
-static boolean wordMatchLen (const unsigned char *p, const char *const word, size_t min_len)
+static bool wordMatchLen (const unsigned char *p, const char *const word, size_t min_len)
 {
 	const unsigned char *w = (const unsigned char *) word;
 	size_t n = 0;
@@ -157,7 +157,7 @@ static boolean wordMatchLen (const unsigned char *p, const char *const word, siz
 	}
 
 	if (isWordChar (*p))
-		return FALSE;
+		return false;
 
 	return n >= min_len;
 }
@@ -169,7 +169,7 @@ static const unsigned char *skipWord (const unsigned char *p)
 	return p;
 }
 
-static boolean isMap (const unsigned char *line)
+static bool isMap (const unsigned char *line)
 {
 	/*
 	 * There are many different short cuts for specifying a map.
@@ -228,7 +228,7 @@ static const unsigned char *readVimballLine (void)
 static void parseFunction (const unsigned char *line)
 {
 	vString *name = vStringNew ();
-	/* boolean inFunction = FALSE; */
+	/* bool inFunction = false; */
 	int scope;
 	const unsigned char *cp = line;
 	int index = CORK_NIL;
@@ -279,7 +279,7 @@ static void parseFunction (const unsigned char *line)
 			break;
 		}
 
-		parseVimLine (line, TRUE);
+		parseVimLine (line, true);
 	}
 	vStringDelete (name);
 }
@@ -312,10 +312,10 @@ static void parseAutogroup (const unsigned char *line)
 	vStringDelete (name);
 }
 
-static boolean parseCommand (const unsigned char *line)
+static bool parseCommand (const unsigned char *line)
 {
 	vString *name = vStringNew ();
-	boolean cmdProcessed = TRUE;
+	bool cmdProcessed = true;
 
 	/*
 	 * Found a user-defined command
@@ -363,7 +363,7 @@ static boolean parseCommand (const unsigned char *line)
 			 * not a valid command.
 			 * Treat the line as processed and continue.
 			 */
-			cmdProcessed = TRUE;
+			cmdProcessed = true;
 			goto cleanUp;
 		}
 
@@ -377,7 +377,7 @@ static boolean parseCommand (const unsigned char *line)
 		 * with "com" or a line continuation character, we have moved off
 		 * the command line and should let the other routines parse this file.
 		 */
-		cmdProcessed = FALSE;
+		cmdProcessed = false;
 		goto cleanUp;
 	}
 
@@ -404,7 +404,7 @@ static boolean parseCommand (const unsigned char *line)
 			/*
 			 * Broken syntax: throw away this line
 			 */
-			cmdProcessed = TRUE;
+			cmdProcessed = true;
 			goto cleanUp;
 		}
 	} while (*cp &&  !isalnum ((int) *cp));
@@ -418,7 +418,7 @@ static boolean parseCommand (const unsigned char *line)
 		if ((line = readVimLine ()) != NULL)
 			cmdProcessed = parseCommand (line);
 		else
-			cmdProcessed = FALSE;
+			cmdProcessed = false;
 		goto cleanUp;
 	}
 
@@ -497,7 +497,7 @@ cleanUp:
 	vStringDelete (name);
 }
 
-static boolean parseMap (const unsigned char *line)
+static bool parseMap (const unsigned char *line)
 {
 	vString *name = vStringNew ();
 	const unsigned char *cp = line;
@@ -574,17 +574,17 @@ static boolean parseMap (const unsigned char *line)
 
 	vStringDelete (name);
 
-	return TRUE;
+	return true;
 }
 
-static boolean parseVimLine (const unsigned char *line, int infunction)
+static bool parseVimLine (const unsigned char *line, int infunction)
 {
-	boolean readNextLine = TRUE;
+	bool readNextLine = true;
 
 	if (wordMatchLen (line, "command", 3))
 	{
 		readNextLine = parseCommand (line);
-		/* TODO - Handle parseCommand returning FALSE */
+		/* TODO - Handle parseCommand returning false */
 	}
 
 	else if (isMap (line))
@@ -612,11 +612,11 @@ static boolean parseVimLine (const unsigned char *line, int infunction)
 
 static void parseVimFile (const unsigned char *line)
 {
-	boolean readNextLine = TRUE;
+	bool readNextLine = true;
 
 	while (line != NULL)
 	{
-		readNextLine = parseVimLine (line, FALSE);
+		readNextLine = parseVimLine (line, false);
 
 		if (readNextLine)
 			line = readVimLine ();
@@ -729,6 +729,6 @@ extern parserDefinition *VimParser (void)
 	def->extensions = extensions;
 	def->patterns   = patterns;
 	def->parser     = findVimTags;
-	def->useCork    = TRUE;
+	def->useCork    = true;
 	return def;
 }

@@ -19,9 +19,9 @@ typedef enum eCssKinds {
 } cssKind;
 
 static kindOption CssKinds [] = {
-	{ TRUE, 'c', "class",		"classes" },
-	{ TRUE, 's', "selector",	"selectors" },
-	{ TRUE, 'i', "id",			"identities" }
+	{ true, 'c', "class",		"classes" },
+	{ true, 's', "selector",	"selectors" },
+	{ true, 'i', "id",			"identities" }
 };
 
 typedef enum {
@@ -37,7 +37,7 @@ typedef struct {
 } tokenInfo;
 
 
-static boolean isSelectorChar (const int c)
+static bool isSelectorChar (const int c)
 {
 	/* attribute selectors are handled separately */
 	return (isalnum (c) ||
@@ -157,7 +157,7 @@ static cssKind classifySelector (const vString *const selector)
 
 static void findCssTags (void)
 {
-	boolean readNextToken = TRUE;
+	bool readNextToken = true;
 	tokenInfo token;
 
 	token.string = vStringNew ();
@@ -167,11 +167,11 @@ static void findCssTags (void)
 		if (readNextToken)
 			readToken (&token);
 
-		readNextToken = TRUE;
+		readNextToken = true;
 
 		if (token.type == '@')
 		{ /* At-rules, from the "@" to the next block or semicolon */
-			boolean useContents;
+			bool useContents;
 			readToken (&token);
 			useContents = (strcmp (vStringValue (token.string), "media") == 0 ||
 						   strcmp (vStringValue (token.string), "supports") == 0);
@@ -222,7 +222,7 @@ static void findCssTags (void)
 			}
 			while (token.type == TOKEN_SELECTOR);
 			/* we already consumed the next token, don't read it twice */
-			readNextToken = FALSE;
+			readNextToken = false;
 
 			vStringTerminate (selector);
 			if (CssKinds[kind].enabled)

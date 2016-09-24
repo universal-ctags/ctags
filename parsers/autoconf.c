@@ -32,14 +32,14 @@ enum {
 };
 
 static kindOption AutoconfKinds[] = {
-	{ TRUE, 'p', "package", "packages" },
-	{ TRUE, 't', "template", "templates" },
-	{ TRUE, 'm', "macro", "autoconf macros" },
-	{ TRUE, 'w', "optwith", "options specified with --with-..."},
-	{ TRUE, 'e', "optenable", "options specified with --enable-..."},
-	{ TRUE, 's', "subst", "substitution keys"},
-	{ TRUE, 'c', "condition", "automake conditions" },
-	{ TRUE, 'd', "definition", "definitions" },
+	{ true, 'p', "package", "packages" },
+	{ true, 't', "template", "templates" },
+	{ true, 'm', "macro", "autoconf macros" },
+	{ true, 'w', "optwith", "options specified with --with-..."},
+	{ true, 'e', "optenable", "options specified with --enable-..."},
+	{ true, 's', "subst", "substitution keys"},
+	{ true, 'c', "condition", "automake conditions" },
+	{ true, 'd', "definition", "definitions" },
 };
 
 typedef enum {
@@ -74,17 +74,17 @@ static void *autoconfPrepareForNewInput (void)
 	return &roleIndex;
 }
 
-static boolean autoconfDoesStartLineComment (int c, const char* token, void *data)
+static bool autoconfDoesStartLineComment (int c, const char* token, void *data)
 {
 	return (c == '#');
 }
 
-static boolean autoconfDoesStartStringLiteral (int c, void *data)
+static bool autoconfDoesStartStringLiteral (int c, void *data)
 {
 	return (c == '"') || (c == '\'') || (c == '`');
 }
 
-static boolean autoconfProbeLanguage (const char* token)
+static bool autoconfProbeLanguage (const char* token)
 {
 	return strncmp (token, "m4_", 3) == 0
 		|| strncmp (token, "AC_", 3) == 0
@@ -121,7 +121,7 @@ struct m4HandleTokenResult autoconfHandleMacro (const char* token, void *data)
 	int keyword;
 	struct m4HandleTokenResult result = {
 		.index = CORK_NIL,
-		.consumed = TRUE,
+		.consumed = true,
 	};
 
 	if (lang == LANG_IGNORE)
@@ -135,7 +135,7 @@ struct m4HandleTokenResult autoconfHandleMacro (const char* token, void *data)
 	switch (keyword)
 	{
 	case KEYWORD_NONE:
-		result.consumed = FALSE;
+		result.consumed = false;
 		break;
 	case KEYWORD_init:
 		result.index = autoconfMakeTag (PACKAGE_KIND);
@@ -163,7 +163,7 @@ struct m4HandleTokenResult autoconfHandleMacro (const char* token, void *data)
 		break;
 	default:
 		AssertNotReached ();
-		result.consumed = FALSE;
+		result.consumed = false;
 	}
 	return result;
 }
@@ -213,7 +213,7 @@ extern parserDefinition* AutoconfParser (void)
 	def->extensions = extensions;
 	def->parser = findAutoconfTags;
 	def->initialize = initializeAutoconfParser;
-	def->useCork = TRUE;
+	def->useCork = true;
 
 	def->keywordTable = autoconfKeywordTable;
 	def->keywordCount = ARRAY_SIZE (autoconfKeywordTable);

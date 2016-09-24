@@ -137,25 +137,25 @@ const char * cxxKeywordName(enum CXXKeyword eKeywordId)
 	return g_aCXXKeywordTable[eKeywordId].szName;
 }
 
-boolean cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId)
+bool cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordFlagMayBePartOfTypeName;
 }
 
-boolean cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId)
+bool cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordIsTypeRefMarker;
 }
 
-boolean cxxKeywordExcludeFromTypeNames(enum CXXKeyword eKeywordId)
+bool cxxKeywordExcludeFromTypeNames(enum CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordExcludeFromTypeNames;
 }
 
-void cxxBuildKeywordHash(const langType language,boolean bCXX)
+void cxxBuildKeywordHash(const langType language,bool bCXX)
 {
 	const size_t count = sizeof(g_aCXXKeywordTable) /
 			sizeof(CXXKeywordDescriptor);

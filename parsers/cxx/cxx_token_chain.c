@@ -148,10 +148,10 @@ void cxxTokenChainTake(CXXTokenChain * tc,CXXToken * t)
 	Assert(tc->iCount > 1);
 }
 
-boolean cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t)
+bool cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t)
 {
 	if(!tc)
-		return FALSE;
+		return false;
 
 	CXXToken * aux = tc->pHead;
 	while(aux)
@@ -159,7 +159,7 @@ boolean cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t)
 		if(t == aux)
 		{
 			cxxTokenChainTake(tc,aux);
-			return TRUE;
+			return true;
 		}
 
 		if(cxxTokenTypeIsOneOf(
@@ -169,13 +169,13 @@ boolean cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t)
 			))
 		{
 			if(cxxTokenChainTakeRecursive(aux->pChain,t))
-				return TRUE;
+				return true;
 		}
 
 		aux = aux->pNext;
 	}
 
-	return FALSE;
+	return false;
 }
 
 #if 0
@@ -1028,7 +1028,7 @@ void cxxTokenChainNormalizeTypeNameSpacingInRange(CXXToken * pFrom,CXXToken * pT
 			))
 		{
 			cxxTokenChainNormalizeTypeNameSpacing(t->pChain);
-			t->bFollowedBySpace = FALSE;
+			t->bFollowedBySpace = false;
 		} else if(cxxTokenTypeIsOneOf(t,
 					CXXTokenTypeIdentifier | CXXTokenTypeKeyword |
 						CXXTokenTypeGreaterThanSign |
@@ -1051,7 +1051,7 @@ void cxxTokenChainNormalizeTypeNameSpacingInRange(CXXToken * pFrom,CXXToken * pT
 							CXXTokenTypeClosingParenthesis
 					));
 		} else {
-			t->bFollowedBySpace = FALSE;
+			t->bFollowedBySpace = false;
 		}
 
 		if(t == pTo)
@@ -1061,5 +1061,5 @@ void cxxTokenChainNormalizeTypeNameSpacingInRange(CXXToken * pFrom,CXXToken * pT
 	}
 
 	// Finally the chain has no space at end
-	pTo->bFollowedBySpace = FALSE;
+	pTo->bFollowedBySpace = false;
 }

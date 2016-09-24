@@ -28,11 +28,11 @@ typedef enum {
 } aspKind;
 
 static kindOption AspKinds [] = {
-	{ TRUE, 'd', "constant",   "constants"},
-	{ TRUE, 'c', "class",      "classes"}, 
-	{ TRUE, 'f', "function",   "functions"},
-	{ TRUE, 's', "subroutine", "subroutines"},
-	{ TRUE, 'v', "variable",   "variables"}
+	{ true, 'd', "constant",   "constants"},
+	{ true, 'c', "class",      "classes"}, 
+	{ true, 'f', "function",   "functions"},
+	{ true, 's', "subroutine", "subroutines"},
+	{ true, 'v', "variable",   "variables"}
 };
 
 /*

@@ -23,7 +23,7 @@
 // The tokens defining current scope
 static CXXTokenChain * g_pScope = NULL;
 static vString * g_szScopeName = NULL;
-static boolean g_bScopeNameDirty = TRUE;
+static bool g_bScopeNameDirty = true;
 
 void cxxScopeInit(void)
 {
@@ -51,7 +51,7 @@ void cxxScopeClear(void)
 	}
 }
 
-boolean cxxScopeIsGlobal(void)
+bool cxxScopeIsGlobal(void)
 {
 	return (g_pScope->iCount < 1);
 }
@@ -106,7 +106,7 @@ unsigned int cxxScopeGetKind(void)
 		case CXXScopeTypeUnion:
 			return CXXTagKindUNION;
 		default:
-			CXX_DEBUG_ASSERT(FALSE,"Unhandled scope type!");
+			CXX_DEBUG_ASSERT(false,"Unhandled scope type!");
 			break;
 	}
 
@@ -140,7 +140,7 @@ const char * cxxScopeGetFullName(void)
 
 	if(g_pScope->iCount < 1)
 	{
-		g_bScopeNameDirty = FALSE;
+		g_bScopeNameDirty = false;
 		return NULL;
 	}
 
@@ -156,7 +156,7 @@ const char * cxxScopeGetFullName(void)
 			CXXTokenChainJoinNoTrailingSpaces
 		);
 
-	g_bScopeNameDirty = FALSE;
+	g_bScopeNameDirty = false;
 	return g_szScopeName->buffer;
 }
 
@@ -168,7 +168,7 @@ vString * cxxScopeGetFullNameAsString(void)
 	{
 		ret = g_szScopeName;
 		g_szScopeName = NULL;
-		g_bScopeNameDirty = TRUE;
+		g_bScopeNameDirty = true;
 		return ret;
 	}
 
@@ -230,7 +230,7 @@ void cxxScopePush(
 	cxxTokenChainAppend(g_pScope,t);
 	t->uInternalScopeType = (unsigned char)eScopeType;
 	t->uInternalScopeAccess = (unsigned char)eInitialAccess;
-	g_bScopeNameDirty = TRUE;
+	g_bScopeNameDirty = true;
 
 #ifdef CXX_DO_DEBUGGING
 	const char * szScopeName = cxxScopeGetFullName();
@@ -247,7 +247,7 @@ void cxxScopePop(void)
 		);
 
 	cxxTokenDestroy(cxxTokenChainTakeLast(g_pScope));
-	g_bScopeNameDirty = TRUE;
+	g_bScopeNameDirty = true;
 
 #ifdef CXX_DO_DEBUGGING
 	const char * szScopeName = cxxScopeGetFullName();

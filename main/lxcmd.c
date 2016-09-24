@@ -134,7 +134,7 @@ typedef struct {
 	vString *path;
 	kindOption *kinds;
 	unsigned int n_kinds;
-	boolean available;
+	bool available;
 	unsigned int id;	/* not used yet */
 	int not_available_status;
 } xcmdPath;
@@ -161,7 +161,7 @@ static void clearPathSet (const langType language)
 
 			vStringDelete (p->path);
 			p->path = NULL;
-			p->available = FALSE;
+			p->available = false;
 			for (k = 0; k < p->n_kinds; k++)
 			{
 				kindOption* kind = &(p->kinds[k]);
@@ -184,7 +184,7 @@ static void clearPathSet (const langType language)
 	}
 }
 
-static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
+static bool loadPathKind (xcmdPath *const path, char* line, char *args[])
 {
 	const char* backup = line;
 	char* off;
@@ -192,21 +192,21 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 	kindOption *kind;
 
 	if (line[0] == '\0')
-		return FALSE;
+		return false;
 	else if (!isblank(line[1]))
 	{
 		error (WARNING, "[%s] a space after letter is not found in kind description line: %s", args[0], backup);
-		return FALSE;
+		return false;
 	}
 
 	path->kinds = xRealloc (path->kinds, path->n_kinds + 1, kindOption);
 	kind = &path->kinds [path->n_kinds];
 	memset (kind, 0, sizeof (*kind));
-	kind->enabled = TRUE;
+	kind->enabled = true;
 	kind->letter = line[0];
 	kind->name = NULL;
 	kind->description = NULL;
-	kind->referenceOnly = FALSE;
+	kind->referenceOnly = false;
 	kind->nRoles = 0;
 	kind->roles = NULL;
 
@@ -219,7 +219,7 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 	{
 		error (WARNING, "[%s] unexpectedly a kind description line is terminated: %s",
 		       args[0], backup);
-		return FALSE;
+		return false;
 	}
 
 	Assert (!isblank (*line));
@@ -229,7 +229,7 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 	{
 		error (WARNING, "[%s] [off] is given but no kind description is found: %s",
 		       args[0], backup);
-		return FALSE;
+		return false;
 	}
 	else if (off)
 	{
@@ -237,9 +237,9 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 		{
 			error (WARNING, "[%s] a whitespace must precede [off] flag: %s",
 			       args[0], backup);
-			return FALSE;
+			return false;
 		}
-		kind->enabled = FALSE;
+		kind->enabled = false;
 		*off = '\0';
 	}
 	desc = vStringNewInit (line);
@@ -262,13 +262,13 @@ static boolean loadPathKind (xcmdPath *const path, char* line, char *args[])
 	}
 
 	path->n_kinds += 1;
-	return TRUE;
+	return true;
 }
 
-static boolean isSafeExecutable (const char* path)
+static bool isSafeExecutable (const char* path)
 {
 	fileStatus *file;
-	boolean r;
+	bool r;
 
 	Assert (path);
 	file =  eStat (path);
@@ -278,26 +278,26 @@ static boolean isSafeExecutable (const char* path)
 		/* The file doesn't exist. So I cannot say
 		   it is unsafe. The caller should
 		   handle this case. */
-		r = TRUE;
+		r = true;
 	}
 	else if (file->isSetuid)
 	{
 		error (WARNING, "xcmd doesn't run a setuid executable: %s", path);
-		r = FALSE;
+		r = false;
 	}
 	else if (file->isSetgid)
 	{
 		error (WARNING, "xcmd doesn't run a setgid executable: %s", path);
-		r = FALSE;
+		r = false;
 	}
 	else
-		r = TRUE;
+		r = true;
 
 	eStatFree (file);
 	return r;
 }
 
-static boolean loadPathKinds  (xcmdPath *const path, const langType language)
+static bool loadPathKinds  (xcmdPath *const path, const langType language)
 {
 	enum pcoprocError r;
 	FILE* pp = NULL;
@@ -320,13 +320,13 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 	{
 		verbose ("all xcmd feature is disabled when running ctags in root privilege\n");
 		vStringDelete (opt);
-		return FALSE;
+		return false;
 	}
 
 	if (! isSafeExecutable (argv [0]))
 	{
 		vStringDelete (opt);
-		return FALSE;
+		return false;
 	}
 	verbose ("loading path kinds of %s from [%s %s]\n", getLanguageName(language), argv[0], argv[1]);
 	r = pcoprocOpen (vStringValue (path->path), argv, &pp, NULL);
@@ -387,7 +387,7 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 				error (WARNING, "xcmd exits abnormally status(%d): [%s %s]",
 				       status, argv[0], argv[1]);
 			vStringDelete (opt);
-			return FALSE;
+			return false;
 		}
 	}
 	else
@@ -397,13 +397,13 @@ static boolean loadPathKinds  (xcmdPath *const path, const langType language)
 	}
 
 	vStringDelete (opt);
-	return path->kinds == NULL? FALSE: TRUE;
+	return path->kinds == NULL? false: true;
 }
 #endif	/* HAVE_COPROC */
 
 
 extern void foreachXcmdKinds (const langType language,
-			      boolean (*func) (kindOption *, void *),
+			      bool (*func) (kindOption *, void *),
 			      void *data)
 {
 #ifdef HAVE_COPROC
@@ -426,13 +426,13 @@ extern void foreachXcmdKinds (const langType language,
 #endif
 }
 
-static boolean kind_reset_cb (kindOption *kind, void *data)
+static bool kind_reset_cb (kindOption *kind, void *data)
 {
-	kind->enabled = *(boolean *)data;
-	return FALSE;		/* continue */
+	kind->enabled = *(bool *)data;
+	return false;		/* continue */
 }
 
-extern void resetXcmdKinds (const langType language, boolean mode)
+extern void resetXcmdKinds (const langType language, bool mode)
 {
 	foreachXcmdKinds (language, kind_reset_cb, &mode);
 }
@@ -441,11 +441,11 @@ struct kind_and_mode_and_result
 {
 	int kind;
 	const char *kindLong;
-	boolean mode;
-	boolean result;
+	bool mode;
+	bool result;
 };
 
-static boolean enable_kind_cb (kindOption *kind, void *data)
+static bool enable_kind_cb (kindOption *kind, void *data)
 {
 	struct kind_and_mode_and_result *kmr = data;
 	if ((kmr->kind != KIND_NULL
@@ -454,39 +454,39 @@ static boolean enable_kind_cb (kindOption *kind, void *data)
 		&& (strcmp (kmr->kindLong, kind->name) == 0)))
 	{
 		kind->enabled = kmr->mode;
-		kmr->result = TRUE;
+		kmr->result = true;
 	}
 	/* conitnue:
 	   There can be more than one paths which deals this kind.
 	   Consider /bin/X and /bin/Y are both parser for a language L.
 	   ctags --langdef=L --xcmd-L=/bin/X --xcmd-L=/bin/Y ... */
-	return FALSE;
+	return false;
 
 }
 
-extern boolean enableXcmdKind (const langType language, const int kind,
-			       const boolean mode)
+extern bool enableXcmdKind (const langType language, const int kind,
+			       const bool mode)
 {
 	struct kind_and_mode_and_result kmr;
 
 	kmr.kind = kind;
 	kmr.kindLong = NULL;
 	kmr.mode = mode;
-	kmr.result = FALSE;
+	kmr.result = false;
 
 	foreachXcmdKinds (language, enable_kind_cb, &kmr);
 	return kmr.result;
 }
 
-extern boolean enableXcmdKindLong (const langType language, const char *kindLong,
-				   const boolean mode)
+extern bool enableXcmdKindLong (const langType language, const char *kindLong,
+				   const bool mode)
 {
 	struct kind_and_mode_and_result kmr;
 
 	kmr.kind = KIND_NULL;
 	kmr.kindLong = kindLong;
 	kmr.mode = mode;
-	kmr.result = FALSE;
+	kmr.result = false;
 
 	foreachXcmdKinds (language, enable_kind_cb, &kmr);
 	return kmr.result;
@@ -495,55 +495,55 @@ extern boolean enableXcmdKindLong (const langType language, const char *kindLong
 struct kind_and_result
 {
 	int kind;
-	boolean result;
+	bool result;
 };
 
-static boolean is_kind_enabled_cb (kindOption *kind, void *data)
+static bool is_kind_enabled_cb (kindOption *kind, void *data)
 {
-	boolean r = FALSE;
+	bool r = false;
 	struct kind_and_result *kr = data;
 
 	if (kind->letter == kr->kind)
 	{
 		kr->result = kind->enabled;
-		r = TRUE;
+		r = true;
 	}
 
 	return r;
 }
 
-static boolean does_kind_exist_cb (kindOption *kind, void *data)
+static bool does_kind_exist_cb (kindOption *kind, void *data)
 {
-	boolean r = FALSE;
+	bool r = false;
 	struct kind_and_result *kr = data;
 
 	if (kind->letter == kr->kind)
 	{
-		kr->result = TRUE;
-		r = TRUE;
+		kr->result = true;
+		r = true;
 	}
 
 	return r;
 }
 
-extern boolean isXcmdKindEnabled (const langType language, const int kind)
+extern bool isXcmdKindEnabled (const langType language, const int kind)
 {
 	struct kind_and_result d;
 
 	d.kind = kind;
-	d.result = FALSE;
+	d.result = false;
 
 	foreachXcmdKinds (language, is_kind_enabled_cb, &d);
 
 	return d.result;
 }
 
-extern boolean hasXcmdKind (const langType language, const int kind)
+extern bool hasXcmdKind (const langType language, const int kind)
 {
 	struct kind_and_result d;
 
 	d.kind = kind;
-	d.result = FALSE;
+	d.result = false;
 
 	foreachXcmdKinds (language, does_kind_exist_cb, &d);
 
@@ -552,13 +552,13 @@ extern boolean hasXcmdKind (const langType language, const int kind)
 
 struct printXcmdKindCBData {
 	const char *langName;
-	boolean allKindFields;
-	boolean indent;
-	boolean tabSeparated;
+	bool allKindFields;
+	bool indent;
+	bool tabSeparated;
 };
 
 #ifdef HAVE_COPROC
-static boolean printXcmdKind (kindOption *kind, void *user_data)
+static bool printXcmdKind (kindOption *kind, void *user_data)
 {
 	struct printXcmdKindCBData *data = user_data;
 
@@ -566,14 +566,14 @@ static boolean printXcmdKind (kindOption *kind, void *user_data)
 		printf (Option.machinable? "%s": PR_KIND_FMT (LANG,s), data->langName);
 	
 	printKind (kind, data->allKindFields, data->indent, data->tabSeparated);
-	return FALSE;
+	return false;
 }
 #endif
 
 extern void printXcmdKinds (const langType language CTAGS_ATTR_UNUSED,
-			    boolean allKindFields CTAGS_ATTR_UNUSED,
-			    boolean indent CTAGS_ATTR_UNUSED,
-			    boolean tabSeparated CTAGS_ATTR_UNUSED)
+			    bool allKindFields CTAGS_ATTR_UNUSED,
+			    bool indent CTAGS_ATTR_UNUSED,
+			    bool tabSeparated CTAGS_ATTR_UNUSED)
 {
 #ifdef HAVE_COPROC
 	if (language <= SetUpper  &&  Sets [language].count > 0)
@@ -695,28 +695,28 @@ static void processLanguageXcmd (const langType language,
 }
 #endif
 
-extern boolean processXcmdOption (const char *const option, const char *const parameter,
+extern bool processXcmdOption (const char *const option, const char *const parameter,
 				  OptionLoadingStage stage)
 {
 	langType language;
 
 	language = getLanguageComponentInOption (option, "xcmd-");
 	if (language == LANG_IGNORE)
-		return FALSE;
+		return false;
 
 	if (stage == OptionLoadingStageCurrentRecursive)
 	{
 		error (WARNING, "Don't use --xcmd-<LANG> option in ./.ctags nor ./.ctags/*: %s",
 		       option);
 		/* Consume it here. */
-		return TRUE;
+		return true;
 	}
 	else if (stage == OptionLoadingStageHomeRecursive && (!Option.allowXcmdInHomeDir))
 	{
 		error (WARNING, "Don't use --xcmd-<LANG> option in ~/.ctags and/or ~/.ctags/*: %s",
 		       option);
 		/* Consume it here. */
-		return TRUE;
+		return true;
 	}
 
 #ifdef HAVE_COPROC
@@ -726,7 +726,7 @@ extern boolean processXcmdOption (const char *const option, const char *const pa
 	       option);
 #endif
 
-	return TRUE;
+	return true;
 }
 
 #ifdef HAVE_COPROC
@@ -761,7 +761,7 @@ static const kindOption* lookupKindFromName (const xcmdPath* const path, const c
 
 }
 
-static const char* entryLookupField (tagEntry *const entry, const char *const kind, boolean pulling)
+static const char* entryLookupField (tagEntry *const entry, const char *const kind, bool pulling)
 {
 	int i;
 
@@ -777,7 +777,7 @@ static const char* entryLookupField (tagEntry *const entry, const char *const ki
 	return NULL;
 }
 
-static const char* entryGetAnyUnpulledField (tagEntry *const entry, const char **const kind, boolean pulling)
+static const char* entryGetAnyUnpulledField (tagEntry *const entry, const char **const kind, bool pulling)
 {
 	int i;
 
@@ -794,7 +794,7 @@ static const char* entryGetAnyUnpulledField (tagEntry *const entry, const char *
 	return NULL;
 }
 
-static boolean isKindEnabled (xcmdPath* path, const char* value)
+static bool isKindEnabled (xcmdPath* path, const char* value)
 {
 	unsigned int k;
 	kindOption *kind;
@@ -809,14 +809,14 @@ static boolean isKindEnabled (xcmdPath* path, const char* value)
 		if (!kind->enabled)
 		{
 			if (value[1] == '\0' && value[0] == kind->letter)
-				return FALSE;
+				return false;
 			if (!strcmp(value, kind->name))
-				return FALSE;
+				return false;
 			if (!strcmp(value, kind->description))
-				return FALSE;
+				return false;
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 static void entryAddField (tagEntry *const entry, const char *const key, const char *const value)
@@ -830,7 +830,7 @@ static void entryAddField (tagEntry *const entry, const char *const key, const c
 	++entry->fields.count;
 }
 
-static boolean parseExtensionFields (tagEntry *const entry, char *const string, xcmdPath* path)
+static bool parseExtensionFields (tagEntry *const entry, char *const string, xcmdPath* path)
 {
 	char *p = string;
 
@@ -914,7 +914,7 @@ static boolean parseExtensionFields (tagEntry *const entry, char *const string, 
 			}
 		}
 	}
-	return TRUE;
+	return true;
   reject:
 	if (entry->fields.list)
 	{
@@ -922,20 +922,20 @@ static boolean parseExtensionFields (tagEntry *const entry, char *const string, 
 		entry->fields.list = NULL;
 	}
 	entry->fields.count = 0;
-	return FALSE;
+	return false;
 }
 
-static boolean hasPseudoTagPrefix (const char* const name)
+static bool hasPseudoTagPrefix (const char* const name)
 {
 	const size_t prefixLength = strlen (PSEUDO_TAG_PREFIX);
 	return !strncmp (name, PSEUDO_TAG_PREFIX, prefixLength);
 }
 
-static boolean parseXcmdPath (char* line, xcmdPath* path, tagEntry* entry)
+static bool parseXcmdPath (char* line, xcmdPath* path, tagEntry* entry)
 {
 	char *p = line;
 	char *tab = strchr (p, TAB);
-	boolean pseudoTag = FALSE;
+	bool pseudoTag = false;
 
 	// verbose("<%s>line: %s\n", vStringValue (path->path), line);
 
@@ -970,7 +970,7 @@ static boolean parseXcmdPath (char* line, xcmdPath* path, tagEntry* entry)
 						vStringValue (path->path),
 						(char)delimiter,
 					       line);
-					 return FALSE;
+					 return false;
 				 }
 				else
 					++p;
@@ -988,23 +988,23 @@ static boolean parseXcmdPath (char* line, xcmdPath* path, tagEntry* entry)
 				 *tab = '\t';
 				 error (WARNING, "cannot parse as ctags output from %s: %s",
 					vStringValue (path->path), line);
-				 return FALSE;
+				 return false;
 			 }
 			 fieldsPresent = (strncmp (p, ";\"", 2) == 0);
 			 *p = '\0';
 
 			 if (pseudoTag)
-				 return TRUE;
+				 return true;
 
 			 if (fieldsPresent)
 			 {
 				 if (!parseExtensionFields (entry, p + 2, path))
-					 return FALSE;
-				 return TRUE;
+					 return false;
+				 return true;
 			 }
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 static void freeTagEntry (tagEntry* entry)
@@ -1017,7 +1017,7 @@ static void freeTagEntry (tagEntry* entry)
 	entry->fields.count = 0;
 }
 
-static boolean makePseudoTagEntryFromTagEntry (tagEntry* entry)
+static bool makePseudoTagEntryFromTagEntry (tagEntry* entry)
 {
 	const char *tagName, *fileName, *pattern;
 	const size_t prefixLength = strlen (PSEUDO_TAG_PREFIX);
@@ -1028,9 +1028,9 @@ static boolean makePseudoTagEntryFromTagEntry (tagEntry* entry)
 	pattern = entry->address.pattern;
 
 	if (strcmp (tagName, "TAG_FILE_SORTED") == 0)
-		return FALSE;
+		return false;
 	else if (strcmp (tagName, "TAG_FILE_FORMAT") == 0)
-		return FALSE;	/* ??? */
+		return false;	/* ??? */
 	else if (strcmp (tagName, "TAG_PROGRAM_AUTHOR") == 0)
 		t = PTAG_PROGRAM_AUTHOR;
 	else if (strcmp (tagName, "TAG_PROGRAM_NAME") == 0)
@@ -1041,7 +1041,7 @@ static boolean makePseudoTagEntryFromTagEntry (tagEntry* entry)
 		t = PTAG_PROGRAM_VERSION;
 
 	if (t == PTAG_UNKNOWN)
-		return FALSE;
+		return false;
 	else
 	{
 		struct ptagXcmdData data = {
@@ -1049,13 +1049,13 @@ static boolean makePseudoTagEntryFromTagEntry (tagEntry* entry)
 			.pattern  = pattern,
 			.language = entryLookupField(entry,
 						     "language",
-						     FALSE),
+						     false),
 		};
 		return makePtagIfEnabled (t, &data);
 	}
 }
 
-static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
+static bool makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 {
 	tagEntryInfo tag;
 	MIOPos      filePosition;
@@ -1065,7 +1065,7 @@ static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 		if  (isXtagEnabled (XTAG_PSEUDO_TAGS))
 			return makePseudoTagEntryFromTagEntry (entry);
 		else
-			return FALSE;
+			return false;
 	}
 
 	memset(&filePosition, 0, sizeof(filePosition));
@@ -1073,7 +1073,7 @@ static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 	// pseudo if (entry->name...);
 	initTagEntryFull (&tag, entry->name,
 			  entry->address.lineNumber,
-			  entryLookupField(entry, "language", TRUE),
+			  entryLookupField(entry, "language", true),
 			  filePosition,
 			  entry->file,
 			  entry->kind,
@@ -1084,12 +1084,12 @@ static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 
 	tag.pattern = entry->address.pattern;
 
-	tag.isFileScope = (boolean)entry->fileScope;
-	tag.extensionFields.access = entryLookupField(entry, "access", TRUE);
-	tag.extensionFields.implementation = entryLookupField(entry, "implementation", TRUE);
-	tag.extensionFields.inheritance = entryLookupField(entry, "inherits", TRUE);
-	tag.extensionFields.signature = entryLookupField(entry, "signature", TRUE);
-	tag.extensionFields.typeRef[0] = entryLookupField(entry, "typeref", TRUE);
+	tag.isFileScope = (bool)entry->fileScope;
+	tag.extensionFields.access = entryLookupField(entry, "access", true);
+	tag.extensionFields.implementation = entryLookupField(entry, "implementation", true);
+	tag.extensionFields.inheritance = entryLookupField(entry, "inherits", true);
+	tag.extensionFields.signature = entryLookupField(entry, "signature", true);
+	tag.extensionFields.typeRef[0] = entryLookupField(entry, "typeref", true);
 	if (tag.extensionFields.typeRef[0])
 	{
 		char *tmp;
@@ -1102,25 +1102,25 @@ static boolean makeTagEntryFromTagEntry (xcmdPath* path, tagEntry* entry)
 	}
 
 	const char *kindName = NULL;
-	tag.extensionFields.scopeName = entryGetAnyUnpulledField (entry, &kindName, TRUE);
+	tag.extensionFields.scopeName = entryGetAnyUnpulledField (entry, &kindName, true);
 	if (tag.extensionFields.scopeName && kindName)
 		tag.extensionFields.scopeKind = lookupKindFromName (path, kindName);
 
 	/* TODO: role */
 
 	makeTagEntry (&tag);
-	return TRUE;
+	return true;
 }
 
-static boolean invokeXcmdPath (const char* const fileName, xcmdPath* path, const langType language)
+static bool invokeXcmdPath (const char* const fileName, xcmdPath* path, const langType language)
 {
 	enum pcoprocError r;
-	boolean result = FALSE;
+	bool result = false;
 	char* argv[4];
 	FILE* pp = NULL;
 
 	if (!path->available)
-		return FALSE;
+		return false;
 
 	argv[2] = NULL;
 	argv[1] = (char * const)fileName;
@@ -1128,7 +1128,7 @@ static boolean invokeXcmdPath (const char* const fileName, xcmdPath* path, const
 
 	Assert (!(getuid() == 0 || geteuid() == 0));
 	if (! isSafeExecutable (argv [0]))
-		return FALSE;
+		return false;
 
 	verbose ("getting tags of %s language from [%s %s]\n", getLanguageName(language), argv[0], argv[1]);
 	r = pcoprocOpen (vStringValue (path->path), argv, &pp, NULL);
@@ -1174,7 +1174,7 @@ static boolean invokeXcmdPath (const char* const fileName, xcmdPath* path, const
 				entry.file = getInputFileTagPath ();
 
 				if (makeTagEntryFromTagEntry (path, &entry))
-					result = TRUE;
+					result = true;
 				freeTagEntry (&entry);
 			}
 		}
@@ -1187,7 +1187,7 @@ static boolean invokeXcmdPath (const char* const fileName, xcmdPath* path, const
 		{
 			error (WARNING | PERROR, "xcmd exits abnormally status(%d): [%s %s]",
 			       status, argv[0], argv[1]);
-			return FALSE;
+			return false;
 		}
 	}
 	else
@@ -1202,9 +1202,9 @@ static boolean invokeXcmdPath (const char* const fileName, xcmdPath* path, const
 #endif
 
 #ifdef HAVE_COPROC
-extern boolean invokeXcmd (const char* const fileName, const langType language)
+extern bool invokeXcmd (const char* const fileName, const langType language)
 {
-	boolean result = FALSE;
+	bool result = false;
 
 	if (language != LANG_IGNORE  &&  language <= SetUpper  &&
 		Sets [language].count > 0)
@@ -1216,7 +1216,7 @@ extern boolean invokeXcmd (const char* const fileName, const langType language)
 		{
 			xcmdPath* path = set->paths + i;
 			if (invokeXcmdPath (fileName, path, language))
-				result = TRUE;
+				result = true;
 		}
 
 	}

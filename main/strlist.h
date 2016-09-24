@@ -41,15 +41,15 @@ extern unsigned int stringListCount (const stringList *const current);
 extern vString* stringListItem (const stringList *const current, const unsigned int indx);
 extern vString* stringListLast (const stringList *const current);
 extern void stringListDelete (stringList *const current);
-extern boolean stringListHasInsensitive (const stringList *const current, const char *const string);
-extern boolean stringListHas (const stringList *const current, const char *const string);
-extern boolean stringListHasTest (const stringList *const current,
-				  boolean (*test)(const char *s, void *userData),
+extern bool stringListHasInsensitive (const stringList *const current, const char *const string);
+extern bool stringListHas (const stringList *const current, const char *const string);
+extern bool stringListHasTest (const stringList *const current,
+				  bool (*test)(const char *s, void *userData),
 				  void *userData);
-extern boolean stringListDeleteItemExtension (stringList* const current, const char* const extension);
-extern boolean stringListExtensionMatched (const stringList* const list, const char* const extension);
+extern bool stringListDeleteItemExtension (stringList* const current, const char* const extension);
+extern bool stringListExtensionMatched (const stringList* const list, const char* const extension);
 extern vString* stringListExtensionFinds (const stringList* const list, const char* const extension);
-extern boolean stringListFileMatched (const stringList* const list, const char* const str);
+extern bool stringListFileMatched (const stringList* const list, const char* const str);
 extern vString* stringListFileFinds (const stringList* const list, const char* const str);
 extern void stringListPrint (const stringList *const current, FILE *fp);
 extern void stringListReverse (const stringList *const current);

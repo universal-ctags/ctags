@@ -46,18 +46,18 @@ typedef enum {
 } systemdUnitRole;
 
 static roleDesc SystemdUnitUnitRoles [] = {
-	{ TRUE, "Requires", "referred in Requires key" },
-	{ TRUE, "Wants", "referred in Wants key" },
-	{ TRUE, "After", "referred in After key" },
-	{ TRUE, "Before", "referred in Before key" },
-	{ TRUE, "RequiredBy", "referred in RequiredBy key" },
-	{ TRUE, "WantedBy", "referred in WantedBy key" },
+	{ true, "Requires", "referred in Requires key" },
+	{ true, "Wants", "referred in Wants key" },
+	{ true, "After", "referred in After key" },
+	{ true, "Before", "referred in Before key" },
+	{ true, "RequiredBy", "referred in RequiredBy key" },
+	{ true, "WantedBy", "referred in WantedBy key" },
 	/* ... */
 };
 
 static kindOption SystemdUnitKinds [] = {
-	{ TRUE, 'u', "unit", "units",
-	  .referenceOnly = TRUE, ATTACH_ROLES(SystemdUnitUnitRoles)},
+	{ true, 'u', "unit", "units",
+	  .referenceOnly = true, ATTACH_ROLES(SystemdUnitUnitRoles)},
 };
 
 static int roleOf (const char* key, kindOption* kind)
@@ -125,6 +125,6 @@ extern parserDefinition* SystemdUnitParser (void)
 	def->kindCount  = ARRAY_SIZE (SystemdUnitKinds);
 	def->extensions = extensions;
 	def->parser     = findSystemdUnitTags;
-	def->useCork    = TRUE;
+	def->useCork    = true;
 	return def;
 }
