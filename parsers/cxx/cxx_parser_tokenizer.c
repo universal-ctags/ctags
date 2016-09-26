@@ -1103,6 +1103,7 @@ boolean cxxParserParseNextToken(void)
 		}
 
 		int iCXXKeyword;
+		const char * szReplacement = NULL;
 
 check_keyword:
 
@@ -1135,48 +1136,58 @@ check_keyword:
 				}
 			}
 		} else {
-			boolean bIgnoreParens = FALSE;
-			const char * szReplacement = NULL;
-			if(isIgnoreToken(
-					vStringValue(t->pszWord),
-					&bIgnoreParens,
-					&szReplacement
-				))
+			// We can enter here also from a jump to check_keyword after finding
+			// and ignored token and a replacement. 
+
+			if(!szReplacement)
 			{
-				CXX_DEBUG_PRINT("Ignore token %s",vStringValue(t->pszWord));
-
-				if(szReplacement && *szReplacement)
+				boolean bIgnoreParens = FALSE;
+	
+				if(
+					isIgnoreToken(
+							vStringValue(t->pszWord),
+							&bIgnoreParens,
+							&szReplacement
+						)
+					)
 				{
-					CXX_DEBUG_PRINT("The token has replacement %s: applying",szReplacement);
-					vStringClear(t->pszWord);
-					vStringCatS(t->pszWord,szReplacement);
-					// FIXME: Do we need to interpret the replacement?
-				} else {
-					// kill it
-					CXX_DEBUG_PRINT("Ignore token has no replacement");
-					cxxTokenChainDestroyLast(g_cxx.pTokenChain);
-				}
-
-				if(bIgnoreParens)
-				{
-					CXX_DEBUG_PRINT("Ignored token specifies to ignore parenthesis");
-					if(!cxxParserParseNextTokenSkipIgnoredParenthesis())
-						return FALSE;
-				}
-
-				if(szReplacement && *szReplacement)
-				{
-					// Already have a token to return.
-					// Check again for keywords.
-					
-					goto check_keyword;
-				} else {
+					CXX_DEBUG_PRINT("Ignore token %s",vStringValue(t->pszWord));
+	
+					if(szReplacement && *szReplacement)
+					{
+						CXX_DEBUG_PRINT(
+								"The token has replacement %s: applying",
+								szReplacement
+							);
+						vStringClear(t->pszWord);
+						vStringCatS(t->pszWord,szReplacement);
+						// FIXME: Do we need to interpret the replacement?
+					} else {
+						// kill it
+						CXX_DEBUG_PRINT("Ignore token has no replacement");
+						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+					}
+	
+					if(bIgnoreParens)
+					{
+						CXX_DEBUG_PRINT("Ignored token specifies to ignore parenthesis");
+						if(!cxxParserParseNextTokenSkipIgnoredParenthesis())
+							return FALSE;
+					}
+	
+					if(szReplacement && *szReplacement)
+					{
+						// Already have a token to return.
+						// Check again for keywords.
+						goto check_keyword;
+					}
+	
 					return cxxParserParseNextToken();
 				}
 			}
 		}
 
-		t->bFollowedBySpace = t->bFollowedBySpace | isspace(g_cxx.iChar);
+		t->bFollowedBySpace = isspace(g_cxx.iChar);
 
 		return TRUE;
 	}
