@@ -18,9 +18,6 @@ C++	h	local	local header	on
 CPreProcessor	d	undef	undefined	on
 CPreProcessor	h	system	system header	on
 CPreProcessor	h	local	local header	on
-DTS	d	undef	undefined	on
-DTS	h	system	system header	on
-DTS	h	local	local header	on
 Java	p	imported	imported package	on
 M4	d	undef	undefined	on
 M4	I	included	included macro	on
@@ -63,9 +60,6 @@ C++	h	local	local header	on
 CPreProcessor	d	undef	undefined	on
 CPreProcessor	h	system	system header	on
 CPreProcessor	h	local	local header	on
-DTS	d	undef	undefined	on
-DTS	h	system	system header	on
-DTS	h	local	local header	on
 Java	p	imported	imported package	on
 M4	d	undef	undefined	on
 M4	I	included	included macro	on
@@ -105,8 +99,6 @@ C++	h	system	system header	on
 C++	h	local	local header	on
 CPreProcessor	h	system	system header	on
 CPreProcessor	h	local	local header	on
-DTS	h	system	system header	on
-DTS	h	local	local header	on
 Vera	h	system	system header	on
 Vera	h	local	local header	on
 
