@@ -223,9 +223,8 @@ static void parseStatement (int kind)
 
 static void findProtobufTags (void)
 {
-	cppInit (false, false, false, false, NULL,
-		 ROLE_INDEX_DEFINITION, NULL,
-		 ROLE_INDEX_DEFINITION, ROLE_INDEX_DEFINITION);
+	cppInit (false, false, false, false,
+			 NULL, 0, NULL, 0, 0);
 	token.value = vStringNew ();
 
 	nextToken ();
