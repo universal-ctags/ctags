@@ -114,13 +114,13 @@ enum CXXKeyword
 	// WARNING: There is a table in cxx_keyword.c that must match order in this enumeration
 };
 
-boolean cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId);
-boolean cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId);
-boolean cxxKeywordExcludeFromTypeNames(enum CXXKeyword eKeywordId);
+bool cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId);
+bool cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId);
+bool cxxKeywordExcludeFromTypeNames(enum CXXKeyword eKeywordId);
 
 const char * cxxKeywordName(enum CXXKeyword eKeywordId);
 
-void cxxBuildKeywordHash(const langType language,boolean bCXX);
+void cxxBuildKeywordHash(const langType language,bool bCXX);
 
 
 #endif //!ctags_cxx_keyword_h_

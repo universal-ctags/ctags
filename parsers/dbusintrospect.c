@@ -27,10 +27,10 @@ typedef enum {
 } dbusIntrospectKind;
 
 static kindOption DbusIntrospectKinds [] = {
-	{ TRUE,  'i', "interface", "interfaces" },
-	{ TRUE,  'm', "method",    "methods"    },
-	{ TRUE,  's', "signal",    "signals"    },
-	{ TRUE,  'p', "property",  "properties" },
+	{ true,  'i', "interface", "interfaces" },
+	{ true,  'm', "method",    "methods"    },
+	{ true,  's', "signal",    "signals"    },
+	{ true,  'p', "property",  "properties" },
 };
 
 static void dbusIntrospectFindTagsUnderInterface (xmlNode *node,
@@ -151,7 +151,7 @@ DbusIntrospectParser (void)
 	def->parser        = findDbusIntrospectTags;
 	def->tagXpathTableTable = dbusIntrospectXpathTableTable;
 	def->tagXpathTableCount = ARRAY_SIZE (dbusIntrospectXpathTableTable);
-	def->useCork = TRUE;
+	def->useCork = true;
 	def->selectLanguage = selectors;
 	return def;
 }

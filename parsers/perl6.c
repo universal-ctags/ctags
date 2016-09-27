@@ -40,16 +40,16 @@ enum perl6Kind {
 };
 
 static kindOption perl6Kinds[] = {
-    [K_CLASS]       = { TRUE,  'c', "class",      "classes" },
-    [K_GRAMMAR]     = { TRUE,  'g', "grammar",    "grammars" },
-    [K_METHOD]      = { TRUE,  'm', "method",     "methods" },
-    [K_MODULE]      = { TRUE,  'o', "module",     "modules" },
-    [K_PACKAGE]     = { TRUE,  'p', "package",    "packages" },
-    [K_ROLE]        = { TRUE,  'r', "role",       "roles" },
-    [K_RULE]        = { TRUE,  'u', "rule",       "rules" },
-    [K_SUBMETHOD]   = { TRUE,  'b', "submethod",  "submethods" },
-    [K_SUBROUTINE]  = { TRUE,  's', "subroutine", "subroutines" },
-    [K_TOKEN]       = { TRUE,  't', "token",      "tokens" },
+    [K_CLASS]       = { true,  'c', "class",      "classes" },
+    [K_GRAMMAR]     = { true,  'g', "grammar",    "grammars" },
+    [K_METHOD]      = { true,  'm', "method",     "methods" },
+    [K_MODULE]      = { true,  'o', "module",     "modules" },
+    [K_PACKAGE]     = { true,  'p', "package",    "packages" },
+    [K_ROLE]        = { true,  'r', "role",       "roles" },
+    [K_RULE]        = { true,  'u', "rule",       "rules" },
+    [K_SUBMETHOD]   = { true,  'b', "submethod",  "submethods" },
+    [K_SUBROUTINE]  = { true,  's', "subroutine", "subroutines" },
+    [K_TOKEN]       = { true,  't', "token",      "tokens" },
 };
 
 enum token {

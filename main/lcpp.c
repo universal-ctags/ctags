@@ -44,10 +44,10 @@ enum eCppLimits {
 /*  Defines the one nesting level of a preprocessor conditional.
  */
 typedef struct sConditionalInfo {
-	boolean ignoreAllBranches;  /* ignoring parent conditional branch */
-	boolean singleBranch;       /* choose only one branch */
-	boolean branchChosen;       /* branch already selected */
-	boolean ignoring;           /* current ignore state */
+	bool ignoreAllBranches;  /* ignoring parent conditional branch */
+	bool singleBranch;       /* choose only one branch */
+	bool branchChosen;       /* branch already selected */
+	bool ignoring;           /* current ignore state */
 } conditionalInfo;
 
 enum eState {
@@ -64,10 +64,10 @@ enum eState {
  */
 typedef struct sCppState {
 	int		ungetch, ungetch2;   /* ungotten characters, if any */
-	boolean resolveRequired;     /* must resolve if/else/elif/endif branch */
-	boolean hasAtLiteralStrings; /* supports @"c:\" strings */
-	boolean hasCxxRawLiteralStrings; /* supports R"xxx(...)xxx" strings */
-	boolean hasSingleQuoteLiteralNumbers; /* supports vera number literals:
+	bool resolveRequired;     /* must resolve if/else/elif/endif branch */
+	bool hasAtLiteralStrings; /* supports @"c:\" strings */
+	bool hasCxxRawLiteralStrings; /* supports R"xxx(...)xxx" strings */
+	bool hasSingleQuoteLiteralNumbers; /* supports vera number literals:
 						 'h..., 'o..., 'd..., and 'b... */
 	const kindOption  *defineMacroKind;
 	int macroUndefRoleIndex;
@@ -77,7 +77,7 @@ typedef struct sCppState {
 
 	struct sDirective {
 		enum eState state;       /* current directive being processed */
-		boolean	accept;          /* is a directive syntactically permitted? */
+		bool	accept;          /* is a directive syntactically permitted? */
 		vString * name;          /* macro name */
 		unsigned int nestLevel;  /* level 0 is not used */
 		conditionalInfo ifdef [MaxCppNestingLevel];
@@ -90,14 +90,14 @@ typedef struct sCppState {
 
 /*  Use brace formatting to detect end of block.
  */
-static boolean BraceFormat = FALSE;
+static bool BraceFormat = false;
 
 static cppState Cpp = {
 	'\0', '\0',  /* ungetch characters */
-	FALSE,       /* resolveRequired */
-	FALSE,       /* hasAtLiteralStrings */
-	FALSE,       /* hasCxxRawLiteralStrings */
-	FALSE,	     /* hasSingleQuoteLiteralNumbers */
+	false,       /* resolveRequired */
+	false,       /* hasAtLiteralStrings */
+	false,       /* hasCxxRawLiteralStrings */
+	false,	     /* hasSingleQuoteLiteralNumbers */
 	NULL,	     /* defineMacroKind */
 	.macroUndefRoleIndex   = ROLE_INDEX_DEFINITION,
 	NULL,	     /* headerKind */
@@ -105,10 +105,10 @@ static cppState Cpp = {
 	.headerLocalRoleIndex = ROLE_INDEX_DEFINITION,
 	{
 		DRCTV_NONE,  /* state */
-		FALSE,       /* accept */
+		false,       /* accept */
 		NULL,        /* tag name */
 		0,           /* nestLevel */
-		{ {FALSE,FALSE,FALSE,FALSE} }  /* ifdef array */
+		{ {false,false,false,false} }  /* ifdef array */
 	}  /* directive */
 };
 
@@ -116,7 +116,7 @@ static cppState Cpp = {
 *   FUNCTION DEFINITIONS
 */
 
-extern boolean cppIsBraceFormat (void)
+extern bool cppIsBraceFormat (void)
 {
 	return BraceFormat;
 }
@@ -126,9 +126,9 @@ extern unsigned int cppGetDirectiveNestLevel (void)
 	return Cpp.directive.nestLevel;
 }
 
-extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
-		     const boolean hasCxxRawLiteralStrings,
-		     const boolean hasSingleQuoteLiteralNumbers,
+extern void cppInit (const bool state, const bool hasAtLiteralStrings,
+		     const bool hasCxxRawLiteralStrings,
+		     const bool hasSingleQuoteLiteralNumbers,
 		     const kindOption *defineMacroKind,
 		     int macroUndefRoleIndex,
 		     const kindOption *headerKind,
@@ -138,7 +138,7 @@ extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 
 	Cpp.ungetch         = '\0';
 	Cpp.ungetch2        = '\0';
-	Cpp.resolveRequired = FALSE;
+	Cpp.resolveRequired = false;
 	Cpp.hasAtLiteralStrings = hasAtLiteralStrings;
 	Cpp.hasCxxRawLiteralStrings = hasCxxRawLiteralStrings;
 	Cpp.hasSingleQuoteLiteralNumbers = hasSingleQuoteLiteralNumbers;
@@ -149,13 +149,13 @@ extern void cppInit (const boolean state, const boolean hasAtLiteralStrings,
 	Cpp.headerLocalRoleIndex = headerLocalRoleIndex;
 
 	Cpp.directive.state     = DRCTV_NONE;
-	Cpp.directive.accept    = TRUE;
+	Cpp.directive.accept    = true;
 	Cpp.directive.nestLevel = 0;
 
-	Cpp.directive.ifdef [0].ignoreAllBranches = FALSE;
-	Cpp.directive.ifdef [0].singleBranch = FALSE;
-	Cpp.directive.ifdef [0].branchChosen = FALSE;
-	Cpp.directive.ifdef [0].ignoring     = FALSE;
+	Cpp.directive.ifdef [0].ignoreAllBranches = false;
+	Cpp.directive.ifdef [0].singleBranch = false;
+	Cpp.directive.ifdef [0].branchChosen = false;
+	Cpp.directive.ifdef [0].ignoring     = false;
 
 	Cpp.directive.name = vStringNewOrClear (Cpp.directive.name);
 }
@@ -171,12 +171,12 @@ extern void cppTerminate (void)
 
 extern void cppBeginStatement (void)
 {
-	Cpp.resolveRequired = TRUE;
+	Cpp.resolveRequired = true;
 }
 
 extern void cppEndStatement (void)
 {
-	Cpp.resolveRequired = FALSE;
+	Cpp.resolveRequired = false;
 }
 
 /*
@@ -198,7 +198,7 @@ extern void cppUngetc (const int c)
 
 /*  Reads a directive, whose first character is given by "c", into "name".
  */
-static boolean readDirective (int c, char *const name, unsigned int maxLength)
+static bool readDirective (int c, char *const name, unsigned int maxLength)
 {
 	unsigned int i;
 
@@ -217,7 +217,7 @@ static boolean readDirective (int c, char *const name, unsigned int maxLength)
 	}
 	name [i] = '\0';  /* null terminate */
 
-	return (boolean) isspacetab (c);
+	return (bool) isspacetab (c);
 }
 
 /*  Reads an identifier, whose first character is given by "c", into "tag",
@@ -252,17 +252,17 @@ static conditionalInfo *currentConditional (void)
 	return &Cpp.directive.ifdef [Cpp.directive.nestLevel];
 }
 
-static boolean isIgnore (void)
+static bool isIgnore (void)
 {
 	return Cpp.directive.ifdef [Cpp.directive.nestLevel].ignoring;
 }
 
-static boolean setIgnore (const boolean ignore)
+static bool setIgnore (const bool ignore)
 {
 	return Cpp.directive.ifdef [Cpp.directive.nestLevel].ignoring = ignore;
 }
 
-static boolean isIgnoreBranch (void)
+static bool isIgnoreBranch (void)
 {
 	conditionalInfo *const ifdef = currentConditional ();
 
@@ -271,7 +271,7 @@ static boolean isIgnoreBranch (void)
 	 *  statements to be followed, but we must follow no further branches.
 	 */
 	if (Cpp.resolveRequired  &&  ! BraceFormat)
-		ifdef->singleBranch = TRUE;
+		ifdef->singleBranch = true;
 
 	/*  We will ignore this branch in the following cases:
 	 *
@@ -281,7 +281,7 @@ static boolean isIgnoreBranch (void)
 	 *      a.  A statement was incomplete upon entering the conditional
 	 *      b.  A statement is incomplete upon encountering a branch
 	 */
-	return (boolean) (ifdef->ignoreAllBranches ||
+	return (bool) (ifdef->ignoreAllBranches ||
 					 (ifdef->branchChosen  &&  ifdef->singleBranch));
 }
 
@@ -291,7 +291,7 @@ static void chooseBranch (void)
 	{
 		conditionalInfo *const ifdef = currentConditional ();
 
-		ifdef->branchChosen = (boolean) (ifdef->singleBranch ||
+		ifdef->branchChosen = (bool) (ifdef->singleBranch ||
 										Cpp.resolveRequired);
 	}
 }
@@ -299,10 +299,10 @@ static void chooseBranch (void)
 /*  Pushes one nesting level for an #if directive, indicating whether or not
  *  the branch should be ignored and whether a branch has already been chosen.
  */
-static boolean pushConditional (const boolean firstBranchChosen)
+static bool pushConditional (const bool firstBranchChosen)
 {
-	const boolean ignoreAllBranches = isIgnore ();  /* current ignore */
-	boolean ignoreBranch = FALSE;
+	const bool ignoreAllBranches = isIgnore ();  /* current ignore */
+	bool ignoreBranch = false;
 
 	if (Cpp.directive.nestLevel < (unsigned int) MaxCppNestingLevel - 1)
 	{
@@ -319,7 +319,7 @@ static boolean pushConditional (const boolean firstBranchChosen)
 		ifdef->ignoreAllBranches = ignoreAllBranches;
 		ifdef->singleBranch      = Cpp.resolveRequired;
 		ifdef->branchChosen      = firstBranchChosen;
-		ifdef->ignoring = (boolean) (ignoreAllBranches || (
+		ifdef->ignoring = (bool) (ignoreAllBranches || (
 				! firstBranchChosen  &&  ! BraceFormat  &&
 				(ifdef->singleBranch || !Option.if0)));
 		ignoreBranch = ifdef->ignoring;
@@ -329,7 +329,7 @@ static boolean pushConditional (const boolean firstBranchChosen)
 
 /*  Pops one nesting level for an #endif directive.
  */
-static boolean popConditional (void)
+static bool popConditional (void)
 {
 	if (Cpp.directive.nestLevel > 0)
 	{
@@ -340,9 +340,9 @@ static boolean popConditional (void)
 }
 
 
-static int makeDefineTag (const char *const name, const char* const signature, boolean undef)
+static int makeDefineTag (const char *const name, const char* const signature, bool undef)
 {
-	const boolean isFileScope = (boolean) (! isInputHeaderFile ());
+	const bool isFileScope = (bool) (! isInputHeaderFile ());
 
 	if (!Cpp.defineMacroKind)
 		return CORK_NIL;
@@ -365,18 +365,18 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 					 Cpp.macroUndefRoleIndex);
 		else
 			initTagEntry (&e, name, Cpp.defineMacroKind);
-		e.lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
+		e.lineNumberEntry = (bool) (Option.locate == EX_LINENUM);
 		e.isFileScope  = isFileScope;
 		if (isFileScope)
 			markTagExtraBit (&e, XTAG_FILE_SCOPE);
-		e.truncateLine = TRUE;
+		e.truncateLine = true;
 		e.extensionFields.signature = signature;
 		return makeTagEntry (&e);
 	}
 	return CORK_NIL;
 }
 
-static void makeIncludeTag (const  char *const name, boolean systemHeader)
+static void makeIncludeTag (const  char *const name, bool systemHeader)
 {
 	tagEntryInfo e;
 	int role_index = systemHeader? Cpp.headerSystemRoleIndex: Cpp.headerLocalRoleIndex;
@@ -389,15 +389,15 @@ static void makeIncludeTag (const  char *const name, boolean systemHeader)
 	    && Cpp.headerKind->roles [ role_index ].enabled)
 	{
 		initRefTagEntry (&e, name, Cpp.headerKind, role_index);
-		e.lineNumberEntry = (boolean) (Option.locate == EX_LINENUM);
-		e.isFileScope  = FALSE;
-		e.truncateLine = TRUE;
+		e.lineNumberEntry = (bool) (Option.locate == EX_LINENUM);
+		e.isFileScope  = false;
+		e.truncateLine = true;
 		makeTagEntry (&e);
 	}
 }
 
 static vString *signature;
-static int directiveDefine (const int c, boolean undef)
+static int directiveDefine (const int c, bool undef)
 {
 	int r = CORK_NIL;
 
@@ -442,7 +442,7 @@ static void directiveUndef (const int c)
 {
 	if (isXtagEnabled (XTAG_REFERENCE_TAGS))
 	{
-		directiveDefine (c, TRUE);
+		directiveDefine (c, true);
 	}
 	else
 	{
@@ -465,20 +465,20 @@ static void directivePragma (int c)
 			if (cppIsident1 (c))
 			{
 				readIdentifier (c, Cpp.directive.name);
-				makeDefineTag (vStringValue (Cpp.directive.name), NULL, FALSE);
+				makeDefineTag (vStringValue (Cpp.directive.name), NULL, false);
 			}
 		}
 	}
 	Cpp.directive.state = DRCTV_NONE;
 }
 
-static boolean directiveIf (const int c)
+static bool directiveIf (const int c)
 {
-	DebugStatement ( const boolean ignore0 = isIgnore (); )
-	const boolean ignore = pushConditional ((boolean) (c != '0'));
+	DebugStatement ( const bool ignore0 = isIgnore (); )
+	const bool ignore = pushConditional ((bool) (c != '0'));
 
 	Cpp.directive.state = DRCTV_NONE;
-	DebugStatement ( debugCppNest (TRUE, Cpp.directive.nestLevel);
+	DebugStatement ( debugCppNest (true, Cpp.directive.nestLevel);
 	                 if (ignore != ignore0) debugCppIgnore (ignore); )
 
 	return ignore;
@@ -497,11 +497,11 @@ static void directiveInclude (const int c)
 	Cpp.directive.state = DRCTV_NONE;
 }
 
-static boolean directiveHash (const int c)
+static bool directiveHash (const int c)
 {
-	boolean ignore = FALSE;
+	bool ignore = false;
 	char directive [MaxDirectiveName];
-	DebugStatement ( const boolean ignore0 = isIgnore (); )
+	DebugStatement ( const bool ignore0 = isIgnore (); )
 
 	readDirective (c, directive, MaxDirectiveName);
 	if (stringMatch (directive, "define"))
@@ -523,7 +523,7 @@ static boolean directiveHash (const int c)
 	}
 	else if (stringMatch (directive, "endif"))
 	{
-		DebugStatement ( debugCppNest (FALSE, Cpp.directive.nestLevel); )
+		DebugStatement ( debugCppNest (false, Cpp.directive.nestLevel); )
 		ignore = popConditional ();
 		Cpp.directive.state = DRCTV_NONE;
 		DebugStatement ( if (ignore != ignore0) debugCppIgnore (ignore); )
@@ -538,15 +538,15 @@ static boolean directiveHash (const int c)
 
 /*  Handles a pre-processor directive whose first character is given by "c".
  */
-static boolean handleDirective (const int c, int *macroCorkIndex)
+static bool handleDirective (const int c, int *macroCorkIndex)
 {
-	boolean ignore = isIgnore ();
+	bool ignore = isIgnore ();
 
 	switch (Cpp.directive.state)
 	{
 		case DRCTV_NONE:    ignore = isIgnore ();        break;
 		case DRCTV_DEFINE:
-			*macroCorkIndex = directiveDefine (c, FALSE);
+			*macroCorkIndex = directiveDefine (c, false);
 			break;
 		case DRCTV_HASH:    ignore = directiveHash (c);  break;
 		case DRCTV_IF:      ignore = directiveIf (c);    break;
@@ -652,7 +652,7 @@ static int skipOverDComment (void)
 /*  Skips to the end of a string, returning a special character to
  *  symbolically represent a generic string.
  */
-static int skipToEndOfString (boolean ignoreBackslash)
+static int skipToEndOfString (bool ignoreBackslash)
 {
 	int c;
 
@@ -680,13 +680,13 @@ static int skipToEndOfCxxRawLiteralString (void)
 	if (c != '(' && ! isCxxRawLiteralDelimiterChar (c))
 	{
 		ungetcToInputFile (c);
-		c = skipToEndOfString (FALSE);
+		c = skipToEndOfString (false);
 	}
 	else
 	{
 		char delim[16];
 		unsigned int delimLen = 0;
-		boolean collectDelim = TRUE;
+		bool collectDelim = true;
 
 		do
 		{
@@ -696,7 +696,7 @@ static int skipToEndOfCxxRawLiteralString (void)
 				    delimLen < (sizeof delim / sizeof *delim))
 					delim[delimLen++] = c;
 				else
-					collectDelim = FALSE;
+					collectDelim = false;
 			}
 			else if (c == ')')
 			{
@@ -769,8 +769,8 @@ static void attachEndFieldMaybe (int macroCorkIndex)
  */
 extern int cppGetc (void)
 {
-	boolean directive = FALSE;
-	boolean ignore = FALSE;
+	bool directive = false;
+	bool ignore = false;
 	int c;
 	int macroCorkIndex = CORK_NIL;
 
@@ -789,8 +789,8 @@ process:
 		switch (c)
 		{
 			case EOF:
-				ignore    = FALSE;
-				directive = FALSE;
+				ignore    = false;
+				directive = false;
 				attachEndFieldMaybe (macroCorkIndex);
 				macroCorkIndex = CORK_NIL;
 				break;
@@ -804,9 +804,9 @@ process:
 				{
 					attachEndFieldMaybe (macroCorkIndex);
 					macroCorkIndex = CORK_NIL;
-					directive = FALSE;
+					directive = false;
 				}
-				Cpp.directive.accept = TRUE;
+				Cpp.directive.accept = true;
 				break;
 
 			case DOUBLE_QUOTE:
@@ -814,8 +814,8 @@ process:
 					goto enter;
 				else
 				{
-					Cpp.directive.accept = FALSE;
-					c = skipToEndOfString (FALSE);
+					Cpp.directive.accept = false;
+					c = skipToEndOfString (false);
 				}
 
 				break;
@@ -823,14 +823,14 @@ process:
 			case '#':
 				if (Cpp.directive.accept)
 				{
-					directive = TRUE;
+					directive = true;
 					Cpp.directive.state  = DRCTV_HASH;
-					Cpp.directive.accept = FALSE;
+					Cpp.directive.accept = false;
 				}
 				break;
 
 			case SINGLE_QUOTE:
-				Cpp.directive.accept = FALSE;
+				Cpp.directive.accept = false;
 				c = skipToEndOfChar ();
 				break;
 
@@ -849,7 +849,7 @@ process:
 				else if (comment == COMMENT_D)
 					c = skipOverDComment ();
 				else
-					Cpp.directive.accept = FALSE;
+					Cpp.directive.accept = false;
 				break;
 			}
 
@@ -933,8 +933,8 @@ process:
 					int next = getcFromInputFile ();
 					if (next == DOUBLE_QUOTE)
 					{
-						Cpp.directive.accept = FALSE;
-						c = skipToEndOfString (TRUE);
+						Cpp.directive.accept = false;
+						c = skipToEndOfString (true);
 						break;
 					}
 					else
@@ -972,14 +972,14 @@ process:
 							ungetcToInputFile (next);
 						else
 						{
-							Cpp.directive.accept = FALSE;
+							Cpp.directive.accept = false;
 							c = skipToEndOfCxxRawLiteralString ();
 							break;
 						}
 					}
 				}
 			enter:
-				Cpp.directive.accept = FALSE;
+				Cpp.directive.accept = false;
 				if (directive)
 					ignore = handleDirective (c,
 								  &macroCorkIndex);

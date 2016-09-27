@@ -20,8 +20,8 @@
  *	 MACROS
  */
 #define MAX_SIGNATURE_LENGTH 512
-#define isType(token,t) (boolean) ((token)->type == (t))
-#define isKeyword(token,k) (boolean) ((token)->keyword == (k))
+#define isType(token,t) (bool) ((token)->type == (t))
+#define isKeyword(token,k) (bool) ((token)->keyword == (k))
 
 /*
  *	 DATA DECLARATIONS
@@ -91,14 +91,14 @@ typedef enum {
 } goKind;
 
 static kindOption GoKinds[] = {
-	{TRUE, 'p', "package", "packages"},
-	{TRUE, 'f', "func", "functions"},
-	{TRUE, 'c', "const", "constants"},
-	{TRUE, 't', "type", "types"},
-	{TRUE, 'v', "var", "variables"},
-	{TRUE, 's', "struct", "structs"},
-	{TRUE, 'i', "interface", "interfaces"},
-	{TRUE, 'm', "member", "struct members"}
+	{true, 'p', "package", "packages"},
+	{true, 'f', "func", "functions"},
+	{true, 'c', "const", "constants"},
+	{true, 't', "type", "types"},
+	{true, 'v', "var", "variables"},
+	{true, 's', "struct", "structs"},
+	{true, 'i', "interface", "interfaces"},
+	{true, 'm', "member", "struct members"}
 };
 
 static const keywordTable GoKeywordTable[] = {
@@ -119,15 +119,15 @@ static const keywordTable GoKeywordTable[] = {
 */
 
 // XXX UTF-8
-static boolean isStartIdentChar (const int c)
+static bool isStartIdentChar (const int c)
 {
-	return (boolean)
+	return (bool)
 		(isalpha (c) ||  c == '_' || c > 128);
 }
 
-static boolean isIdentChar (const int c)
+static bool isIdentChar (const int c)
 {
-	return (boolean)
+	return (bool)
 		(isStartIdentChar (c) || isdigit (c));
 }
 
@@ -173,12 +173,12 @@ static void deleteToken (tokenInfo * const token)
 
 static void parseString (vString *const string, const int delimiter)
 {
-	boolean end = FALSE;
+	bool end = false;
 	while (!end)
 	{
 		int c = getcFromInputFile ();
 		if (c == EOF)
-			end = TRUE;
+			end = true;
 		else if (c == '\\' && delimiter != '`')
 		{
 			c = getcFromInputFile ();
@@ -187,7 +187,7 @@ static void parseString (vString *const string, const int delimiter)
 			vStringPut (string, c);
 		}
 		else if (c == delimiter)
-			end = TRUE;
+			end = true;
 		else
 			vStringPut (string, c);
 	}
@@ -210,8 +210,8 @@ static void readToken (tokenInfo *const token)
 {
 	int c;
 	static tokenType lastTokenType = TOKEN_NONE;
-	boolean firstWhitespace = TRUE;
-	boolean whitespace;
+	bool firstWhitespace = true;
+	bool whitespace;
 
 	token->type = TOKEN_NONE;
 	token->keyword = KEYWORD_NONE;
@@ -235,7 +235,7 @@ getNextChar:
 		whitespace = c == '\t'  ||  c == ' ' ||  c == '\r' || c == '\n';
 		if (signature && whitespace && firstWhitespace && vStringLength (signature) < MAX_SIGNATURE_LENGTH)
 		{
-			firstWhitespace = FALSE;
+			firstWhitespace = false;
 			vStringPut(signature, ' ');
 		}
 	}
@@ -253,7 +253,7 @@ getNextChar:
 
 		case '/':
 			{
-				boolean hasNewline = FALSE;
+				bool hasNewline = false;
 				int d = getcFromInputFile ();
 				switch (d)
 				{
@@ -274,7 +274,7 @@ getNextChar:
 								d = getcFromInputFile ();
 								if (d == '\n')
 								{
-									hasNewline = TRUE;
+									hasNewline = true;
 								}
 							} while (d != EOF && d != '*');
 
@@ -391,7 +391,7 @@ getNextChar:
 	lastTokenType = token->type;
 }
 
-static boolean skipToMatchedNoRead (tokenInfo *const token)
+static bool skipToMatchedNoRead (tokenInfo *const token)
 {
 	int nest_level = 0;
 	tokenType open_token = token->type;
@@ -409,7 +409,7 @@ static boolean skipToMatchedNoRead (tokenInfo *const token)
 			close_token = TOKEN_CLOSE_SQUARE;
 			break;
 		default:
-			return FALSE;
+			return false;
 	}
 
 	/*
@@ -426,7 +426,7 @@ static boolean skipToMatchedNoRead (tokenInfo *const token)
 			nest_level--;
 	}
 
-	return TRUE;
+	return true;
 }
 
 static void skipToMatched (tokenInfo *const token)
@@ -435,14 +435,14 @@ static void skipToMatched (tokenInfo *const token)
 		readToken (token);
 }
 
-static boolean skipType (tokenInfo *const token)
+static bool skipType (tokenInfo *const token)
 {
 	// Type      = TypeName | TypeLit | "(" Type ")" .
 	// Skips also function multiple return values "(" Type {"," Type} ")"
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
 		skipToMatched (token);
-		return TRUE;
+		return true;
 	}
 
 	// TypeName  = QualifiedIdent.
@@ -457,7 +457,7 @@ static boolean skipType (tokenInfo *const token)
 			if (isType (token, TOKEN_IDENTIFIER))
 				readToken (token);
 		}
-		return TRUE;
+		return true;
 	}
 
 	// StructType     = "struct" "{" { FieldDecl ";" } "}"
@@ -467,7 +467,7 @@ static boolean skipType (tokenInfo *const token)
 		readToken (token);
 		// skip over "{}"
 		skipToMatched (token);
-		return TRUE;
+		return true;
 	}
 
 	// ArrayType   = "[" ArrayLength "]" ElementType .
@@ -513,7 +513,7 @@ static boolean skipType (tokenInfo *const token)
 		return skipType (token);
 	}
 
-	return FALSE;
+	return false;
 }
 
 static void makeTag (tokenInfo *const token, const goKind kind,
@@ -627,7 +627,7 @@ static void parseStructMembers (tokenInfo *const token, tokenInfo *const parent_
 	while (!isType (token, TOKEN_EOF) && !isType (token, TOKEN_CLOSE_CURLY))
 	{
 		tokenInfo *memberCandidate = NULL;
-		boolean first = TRUE;
+		bool first = true;
 
 		while (!isType (token, TOKEN_EOF))
 		{
@@ -637,7 +637,7 @@ static void parseStructMembers (tokenInfo *const token, tokenInfo *const parent_
 				{
 					// could be anonymous field like in 'struct {int}' - we don't know yet
 					memberCandidate = copyToken (token);
-					first = FALSE;
+					first = false;
 				}
 				else
 				{
@@ -658,7 +658,7 @@ static void parseStructMembers (tokenInfo *const token, tokenInfo *const parent_
 		}
 
 		// in the case of  an anonymous field, we already read part of the
-		// type into memberCandidate and skipType() should return FALSE so no tag should
+		// type into memberCandidate and skipType() should return false so no tag should
 		// be generated in this case.
 		if (skipType (token) && memberCandidate)
 			makeTag (memberCandidate, GOTAG_MEMBER, parent_token, GOTAG_STRUCT, NULL);
@@ -691,13 +691,13 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 	// TypeSpec     = identifier Type .
 	// VarDecl     = "var" ( VarSpec | "(" { VarSpec ";" } ")" ) .
 	// VarSpec     = IdentifierList ( Type [ "=" ExpressionList ] | "=" ExpressionList ) .
-	boolean usesParens = FALSE;
+	bool usesParens = false;
 
 	readToken (token);
 
 	if (isType (token, TOKEN_OPEN_PAREN))
 	{
-		usesParens = TRUE;
+		usesParens = true;
 		readToken (token);
 	}
 

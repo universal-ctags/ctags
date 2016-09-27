@@ -23,7 +23,7 @@ typedef enum {
 } svgKind;
 
 static kindOption SvgKinds [] = {
-	{ TRUE,  'i', "id", "id attributes" },
+	{ true,  'i', "id", "id attributes" },
 };
 
 static tagXpathTable svgXpathMainTable [] = {

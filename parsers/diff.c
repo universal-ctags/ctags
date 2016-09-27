@@ -33,10 +33,10 @@ typedef enum {
 } diffKind;
 
 static kindOption DiffKinds [] = {
-	{ TRUE, 'm', "modifiedFile",  "modified files"},
-	{ TRUE, 'n', "newFile",       "newly created files"},
-	{ TRUE, 'd', "deletedFile",   "deleted files"},
-	{ TRUE, 'h', "hunk",          "hunks"},
+	{ true, 'm', "modifiedFile",  "modified files"},
+	{ true, 'n', "newFile",       "newly created files"},
+	{ true, 'd', "deletedFile",   "deleted files"},
+	{ true, 'h', "hunk",          "hunks"},
 };
 
 enum {
@@ -65,7 +65,7 @@ static const unsigned char *stripAbsolute (const unsigned char *filename)
 	/* strip any absolute path */
 	if (*filename == '/' || *filename == '\\')
 	{
-		boolean skipSlash = TRUE;
+		bool skipSlash = true;
 
 		tmp = (const unsigned char*) strrchr ((const char*) filename,  '/');
 		if (tmp == NULL)
@@ -74,7 +74,7 @@ static const unsigned char *stripAbsolute (const unsigned char *filename)
 			if (tmp == NULL)
 			{	/* last fallback, probably the filename doesn't contain a path, so take it */
 				tmp = filename;
-				skipSlash = FALSE;
+				skipSlash = false;
 			}
 		}
 
@@ -209,6 +209,6 @@ extern parserDefinition* DiffParser (void)
 	def->kindCount  = ARRAY_SIZE (DiffKinds);
 	def->extensions = extensions;
 	def->parser     = findDiffTags;
-	def->useCork    = TRUE;
+	def->useCork    = true;
 	return def;
 }

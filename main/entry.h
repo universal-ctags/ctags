@@ -111,7 +111,7 @@ struct sTagEntryInfo {
 extern void freeTagFileResources (void);
 extern const char *tagFileName (void);
 extern void openTagFile (void);
-extern void closeTagFile (const boolean resize);
+extern void closeTagFile (const bool resize);
 extern void  setupWriter (void);
 extern void  teardownWriter (const char *inputFilename);
 extern int makeTagEntry (const tagEntryInfo *const tag);
@@ -151,7 +151,7 @@ extern char* makePatternString (const tagEntryInfo *const tag);
 
 
 /* language is optional: can be NULL. */
-extern boolean writePseudoTag (const ptagDesc *pdesc,
+extern bool writePseudoTag (const ptagDesc *pdesc,
 			       const char *const fileName,
 			       const char *const pattern,
 			       const char *const parserName);
@@ -166,7 +166,7 @@ size_t        countEntryInCorkQueue (void);
 extern void makeFileTag (const char *const fileName);
 
 extern void    markTagExtraBit     (tagEntryInfo *const tag, xtagType extra);
-extern boolean isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
+extern bool isTagExtraBitMarked (const tagEntryInfo *const tag, xtagType extra);
 
 extern void attachParserField (tagEntryInfo *const tag, fieldType ftype, const char* value);
 extern void attachParserFieldToCorkEntry (int index, fieldType ftype, const char* value);

@@ -57,15 +57,15 @@ typedef enum {
 } antAntfileRole;
 
 static roleDesc AntAntfileRoles [] = {
-        { TRUE, "imported", "imported" },
+        { true, "imported", "imported" },
 };
 
 static kindOption AntKinds [] = {
-	{ TRUE,  'p', "project",  "projects"   },
-	{ TRUE,  't', "target",   "targets"    },
-	{ TRUE,  'P', "property", "properties(global)" },
-	{ TRUE,  'i', "antfile",  "antfiles",
-	  .referenceOnly = TRUE, ATTACH_ROLES(AntAntfileRoles)},
+	{ true,  'p', "project",  "projects"   },
+	{ true,  't', "target",   "targets"    },
+	{ true,  'P', "property", "properties(global)" },
+	{ true,  'i', "antfile",  "antfiles",
+	  .referenceOnly = true, ATTACH_ROLES(AntAntfileRoles)},
 };
 
 enum antXpathTable {
@@ -234,7 +234,7 @@ extern parserDefinition* AntParser (void)
 	def->parser = findAntTags;
 	def->tagXpathTableTable = antXpathTableTable;
 	def->tagXpathTableCount = ARRAY_SIZE (antXpathTableTable);
-	def->useCork = TRUE;
+	def->useCork = true;
 	def->selectLanguage = selectors;
 #else
 	def->tagRegexTable = antTagRegexTable;

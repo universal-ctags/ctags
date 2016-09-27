@@ -41,10 +41,10 @@ typedef enum {
 } dtsKind;
 
 static kindOption DTSKinds [] = {
-	{ TRUE,  'd', "macro",      "macro definitions",
-	  .referenceOnly = FALSE, ATTACH_ROLES(DTSMacroRoles)},
-	{ TRUE, 'h', "header",     "included header files",
-	  .referenceOnly = TRUE, ATTACH_ROLES(DTSHeaderRoles)},
+	{ true,  'd', "macro",      "macro definitions",
+	  .referenceOnly = false, ATTACH_ROLES(DTSMacroRoles)},
+	{ true, 'h', "header",     "included header files",
+	  .referenceOnly = true, ATTACH_ROLES(DTSHeaderRoles)},
 };
 
 static tagRegexTable dtsTagRegexTable [] = {
@@ -68,7 +68,7 @@ static tagRegexTable dtsTagRegexTable [] = {
 */
 static void runCppGetc (void)
 {
-	cppInit (0, FALSE, FALSE, FALSE,
+	cppInit (0, false, false, false,
 		 DTSKinds + DTS_MACRO, DTS_MACRO_KIND_UNDEF_ROLE,
 		 DTSKinds + DTS_HEADER, DTS_HEADER_KIND_SYSTEM_ROLE, DTS_HEADER_KIND_LOCAL_ROLE);
 
@@ -88,6 +88,6 @@ extern parserDefinition* DTSParser (void)
 	def->tagRegexTable = dtsTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE (dtsTagRegexTable);
 	def->method     = METHOD_REGEX;
-	def->requestAutomaticFQTag = TRUE;
+	def->requestAutomaticFQTag = true;
 	return def;
 }

@@ -27,7 +27,7 @@ typedef enum eAwkKinds {
 } awkKind;
 
 static kindOption AwkKinds [] = {
-	{ TRUE, 'f', "function", "functions" }
+	{ true, 'f', "function", "functions" }
 };
 
 /*

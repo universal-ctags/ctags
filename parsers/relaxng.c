@@ -24,9 +24,9 @@ typedef enum {
 } relaxngKind;
 
 static kindOption RelaxNGKinds [] = {
-	{ TRUE,  'e', "element",     "elements"       },
-	{ TRUE,  'a', "attribute",   "attributes"     },
-	{ TRUE,  'n', "namedPattern", "named patterns" },
+	{ true,  'e', "element",     "elements"       },
+	{ true,  'a', "attribute",   "attributes"     },
+	{ true,  'n', "namedPattern", "named patterns" },
 };
 
 enum relaxngXpathTable {
@@ -233,7 +233,7 @@ RelaxNGParser (void)
 	def->parser        = findRelaxNGTags;
 	def->tagXpathTableTable = relaxngXpathTableTable;
 	def->tagXpathTableCount = ARRAY_SIZE (relaxngXpathTableTable);
-	def->useCork = TRUE;
+	def->useCork = true;
 	/* def->selectLanguage = selectors; */
 	return def;
 }

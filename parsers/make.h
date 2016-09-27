@@ -21,8 +21,8 @@ struct makeParserClient {
 	void (* directiveFound) (struct makeParserClient*, vString *name, void *data);
 	void (* newMacro) (struct makeParserClient*,
 			   vString *const name,
-			   boolean withDefineDirective,
-			   boolean appending, void *data);
+			   bool withDefineDirective,
+			   bool appending, void *data);
 };
 
 extern void runMakeParser (struct makeParserClient *client, void *data);

@@ -53,7 +53,7 @@ extern const char *renderRole (const roleDesc* const role, vString* b)
 	PR_KIND_FMT (DESCRIPTION,s)				\
 	"\n"
 
-extern void printKindListHeader (boolean indent, boolean tabSeparated)
+extern void printKindListHeader (bool indent, bool tabSeparated)
 {
 #define KIND_HEADER_COMMON_FMT MAKE_KIND_FMT("%s", s, s)
 
@@ -78,8 +78,8 @@ extern void printKindListHeader (boolean indent, boolean tabSeparated)
 #undef KIND_HEADER_COMMON_FMT
 }
 
-extern void printKind (const kindOption* const kind, boolean allKindFields, boolean indent,
-		       boolean tabSeparated)
+extern void printKind (const kindOption* const kind, bool allKindFields, bool indent,
+		       bool tabSeparated)
 {
 #define KIND_FMT MAKE_KIND_FMT("", c, d)
 
@@ -143,7 +143,7 @@ const char *scopeSeparatorFor (const kindOption *kind, char parentLetter)
 		return ".";
 }
 
-extern void enableKind (kindOption *kind, boolean enable)
+extern void enableKind (kindOption *kind, bool enable)
 {
 	kindOption *slave;
 

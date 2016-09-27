@@ -30,7 +30,7 @@
 // Here we are pointing at the initial < (but the token chain has been
 // emptied by cxxParserParseTemplatePrefix())
 //
-static boolean cxxParserParseTemplatePrefixAngleBrackets(void)
+static bool cxxParserParseTemplatePrefixAngleBrackets(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -67,7 +67,7 @@ static boolean cxxParserParseTemplatePrefixAngleBrackets(void)
 			))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Failed to parse up to '<>{EOF'");
-			return FALSE;
+			return false;
 		}
 
 evaluate_current_token:
@@ -85,7 +85,7 @@ evaluate_current_token:
 					if(!cxxParserParseNextToken())
 					{
 						CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerate it at this level");
-						return TRUE;
+						return true;
 					}
 
 					CXX_DEBUG_PRINT(
@@ -113,18 +113,18 @@ evaluate_current_token:
 							if(!cxxParserParseAndCondenseCurrentSubchain(
 									CXXTokenTypeOpeningParenthesis |
 										CXXTokenTypeOpeningSquareParenthesis,
-									TRUE
+									true
 								))
 							{
 								CXX_DEBUG_LEAVE_TEXT("Failed to condense current subchain");
-								return TRUE;
+								return true;
 							}
 							if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 							{
 								CXX_DEBUG_LEAVE_TEXT(
 										"Found EOF, syntax error but we tolerate it"
 									);
-								return TRUE;
+								return true;
 							}
 						} else {
 							// it's ok
@@ -141,14 +141,14 @@ evaluate_current_token:
 				{
 					// Non-nested > : always a terminator
 					CXX_DEBUG_LEAVE_TEXT("Found end of template");
-					return TRUE;
+					return true;
 				}
 				// Nested > : is is a shift operator?
 
 				if(!cxxParserParseNextToken())
 				{
 					CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerate it at this level");
-					return TRUE;
+					return true;
 				}
 
 				CXX_DEBUG_PRINT(
@@ -176,16 +176,16 @@ evaluate_current_token:
 						if(!cxxParserParseAndCondenseCurrentSubchain(
 								CXXTokenTypeOpeningParenthesis |
 									CXXTokenTypeOpeningSquareParenthesis,
-								TRUE
+								true
 							))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Failed to condense current subchain");
-							return TRUE;
+							return true;
 						}
 						if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 						{
 							CXX_DEBUG_LEAVE_TEXT("Found EOF, syntax error but we tolerate it");
-							return TRUE;
+							return true;
 						}
 					} else {
 						// it's ok
@@ -204,7 +204,7 @@ evaluate_current_token:
 					))
 				{
 					CXX_DEBUG_LEAVE_TEXT("Failed to parse up to '}EOF'");
-					return FALSE;
+					return false;
 				}
 				if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeComma))
 					goto evaluate_current_token; // backward jump to re-evaluate token
@@ -212,12 +212,12 @@ evaluate_current_token:
 			break;
 			case CXXTokenTypeEOF:
 				CXX_DEBUG_LEAVE_TEXT("Syntax error, but tolerate it at this level");
-				return TRUE;
+				return true;
 			break;
 			case CXXTokenTypeSemicolon:
 				cxxParserNewStatement();
 				CXX_DEBUG_LEAVE_TEXT("Broken template arguments, attempting to continue");
-				return TRUE;
+				return true;
 			break;
 			case CXXTokenTypeOpeningBracket:
 				CXX_DEBUG_PRINT(
@@ -229,30 +229,30 @@ evaluate_current_token:
 				if(!cxxParserParseUpToOneOf(CXXTokenTypeClosingBracket | CXXTokenTypeEOF))
 				{
 					CXX_DEBUG_LEAVE_TEXT("Failed to parse up to '}EOF'");
-					return FALSE;
+					return false;
 				}
 				cxxParserNewStatement();
 				CXX_DEBUG_LEAVE_TEXT("Broken template arguments recovery complete");
-				return TRUE;
+				return true;
 			break;
 			default:
-				CXX_DEBUG_ASSERT(FALSE,"Found unexpected token type 0x%02x",g_cxx.pToken->eType);
+				CXX_DEBUG_ASSERT(false,"Found unexpected token type 0x%02x",g_cxx.pToken->eType);
 				CXX_DEBUG_LEAVE_TEXT("Found unexpected token type 0x%02x",g_cxx.pToken->eType);
-				return FALSE;
+				return false;
 			break;
 		}
 	}
 
 	// never reached
 	CXX_DEBUG_LEAVE();
-	return TRUE;
+	return true;
 }
 
 //
 // Parses a template<anything> prefix.
 // The parsed template parameter definition is stored in a separate token chain.
 //
-boolean cxxParserParseTemplatePrefix(void)
+bool cxxParserParseTemplatePrefix(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -268,14 +268,14 @@ boolean cxxParserParseTemplatePrefix(void)
 		))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to the < sign");
-		return FALSE;
+		return false;
 	}
 
 	if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeEOF | CXXTokenTypeSemicolon))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Found EOF or semicolon: assuming this is unparseable");
 		cxxParserNewStatement();
-		return TRUE; // tolerate syntax error
+		return true; // tolerate syntax error
 	}
 
 	CXXTokenChain * pSave = g_cxx.pTokenChain;
@@ -286,7 +286,7 @@ boolean cxxParserParseTemplatePrefix(void)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse angle brackets");
 		cxxTokenChainDestroy(pSave);
-		return FALSE;
+		return false;
 	}
 
 	if(g_cxx.pTemplateTokenChain)
@@ -296,5 +296,5 @@ boolean cxxParserParseTemplatePrefix(void)
 	g_cxx.pTokenChain = pSave;
 
 	CXX_DEBUG_LEAVE();
-	return TRUE;
+	return true;
 }

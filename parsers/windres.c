@@ -34,14 +34,14 @@ typedef enum _WindResKinds
 } ResKind;
 
 static kindOption ResKinds [] = {
-	{ TRUE, 'd', "dialog",			"dialogs"		},
-	{ TRUE, 'm', "menu",			"menus"			},
-	{ TRUE, 'i', "icon",			"icons"			},
-	{ TRUE, 'b', "bitmap",			"bitmaps"		},
-	{ TRUE, 'c', "cursor",			"cursors"		},
-	{ TRUE, 'f', "font",			"fonts"			},
-	{ TRUE, 'v', "version",			"versions"		},
-	{ TRUE, 'a', "accelerators",	"accelerators"	}
+	{ true, 'd', "dialog",			"dialogs"		},
+	{ true, 'm', "menu",			"menus"			},
+	{ true, 'i', "icon",			"icons"			},
+	{ true, 'b', "bitmap",			"bitmaps"		},
+	{ true, 'c', "cursor",			"cursors"		},
+	{ true, 'f', "font",			"fonts"			},
+	{ true, 'v', "version",			"versions"		},
+	{ true, 'a', "accelerators",	"accelerators"	}
 };
 
 typedef enum _WindResParserState

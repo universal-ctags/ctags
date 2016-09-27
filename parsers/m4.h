@@ -20,7 +20,7 @@
 struct m4HandleTokenResult
 {
 	int index;
-	boolean consumed;
+	bool consumed;
 };
 
 struct m4ParserClient
@@ -34,12 +34,12 @@ struct m4ParserClient
 	/* Do something for new input file. Returned value is stored to
 	   `data' field. */
 	void*   (* prepareForNewInput) (void);
-	boolean (* doesStartLineComment) (int c, const char *token, void *data);
-	boolean (* doesStartStringLiteral) (int c, void *data);
+	bool (* doesStartLineComment) (int c, const char *token, void *data);
+	bool (* doesStartStringLiteral) (int c, void *data);
 
 	/* If the token is the part of the language the parser deals with,
-	   return TRUE. This can be called before `prepareForNewInput' method. */
-	boolean (* probeLanguage) (const char* token);
+	   return true. This can be called before `prepareForNewInput' method. */
+	bool (* probeLanguage) (const char* token);
 
 	struct m4HandleTokenResult (* handleMacro) (const char* token, void *data);
 
@@ -51,6 +51,6 @@ extern void registerM4ParserClient (const char *hostLang, struct m4ParserClient 
 extern void runM4Parser (langType lang);
 
 /* Helpers functions */
-extern boolean readM4MacroArgument(vString *const arg);
+extern bool readM4MacroArgument(vString *const arg);
 
 #endif

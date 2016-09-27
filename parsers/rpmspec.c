@@ -43,7 +43,7 @@ enum rpmSpecMacroRole {
 typedef int rpmSpecMacroRole; /* to allow ROLE_INDEX_* */;
 
 static roleDesc RpmSpecMacroRoles [] = {
-	{ TRUE, "undef", "undefined" },
+	{ true, "undef", "undefined" },
 };
 
 static scopeSeparator RpmSpecPackageSeparators [] = {
@@ -51,29 +51,29 @@ static scopeSeparator RpmSpecPackageSeparators [] = {
 };
 
 static kindOption RpmSpecKinds[] = {
-	{ TRUE, 't', "tag", "tags" },
-	{ TRUE, 'm', "macro", "macros",
-	  .referenceOnly = FALSE, ATTACH_ROLES(RpmSpecMacroRoles) },
-	{ TRUE, 'p', "package", "packages",
+	{ true, 't', "tag", "tags" },
+	{ true, 'm', "macro", "macros",
+	  .referenceOnly = false, ATTACH_ROLES(RpmSpecMacroRoles) },
+	{ true, 'p', "package", "packages",
 	  ATTACH_SEPARATORS(RpmSpecPackageSeparators) },
-	{ TRUE, 'g', "global", "global macros" },
+	{ true, 'g', "global", "global macros" },
 };
 
 
-static boolean rejecting;
+static bool rejecting;
 
 struct macro_cb_data {
 	rpmSpecKind kindex;
 	rpmSpecMacroRole rindex;
 };
 
-static boolean is_line_continued(const char *line)
+static bool is_line_continued(const char *line)
 {
 	size_t len = strlen (line);
 	Assert (len > 0);
 
 	return ((line[len - 1] == '\\')
-		|| ((len >= 2) && (line[len - 1] == '\n') && (line[len - 2] == '\\')))? TRUE: FALSE;
+		|| ((len >= 2) && (line[len - 1] == '\n') && (line[len - 2] == '\\')))? true: false;
 }
 
 static void found_macro_cb (const char *line,
@@ -104,10 +104,10 @@ static void found_macro_cb (const char *line,
 		/* Skip the definition */
 		while (line && is_line_continued (line))
 		{
-			rejecting = TRUE;
+			rejecting = true;
 			line = (const char *)readLineFromInputFile ();
 		}
-		rejecting = FALSE;
+		rejecting = false;
 
 		tag.extensionFields.endLine = getInputLineNumber();
 
@@ -165,7 +165,7 @@ static void found_package_cb (const char *line,
 static void initializeRpmSpecParser (langType language)
 {
 	static int package_index = CORK_NIL;
-	rejecting = FALSE;
+	rejecting = false;
 
 	static struct macro_cb_data macro  = {K_MACOR,  ROLE_INDEX_DEFINITION};
 	static struct macro_cb_data global = {K_GLOBAL, ROLE_INDEX_DEFINITION};
@@ -192,7 +192,7 @@ extern parserDefinition* RpmSpecParser (void)
 	def->extensions = extensions;
 	def->initialize = initializeRpmSpecParser;
 	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
-	def->useCork = TRUE;
-	def->requestAutomaticFQTag = TRUE;
+	def->useCork = true;
+	def->requestAutomaticFQTag = true;
 	return def;
 }

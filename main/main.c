@@ -52,7 +52,6 @@
 #  include <sys/types.h>  /* required by dirent.h */
 # endif
 # include <dirent.h>  /* to declare opendir() */
-# undef boolean
 #endif
 #ifdef HAVE_DIRECT_H
 # include <direct.h>  /* to _getcwd() */
@@ -91,7 +90,7 @@ static void *mainData;
 /*
 *   FUNCTION PROTOTYPES
 */
-static boolean createTagsForEntry (const char *const entryName);
+static bool createTagsForEntry (const char *const entryName);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -106,22 +105,22 @@ extern void addTotals (
 	Totals.bytes += bytes;
 }
 
-extern boolean isDestinationStdout (void)
+extern bool isDestinationStdout (void)
 {
-	boolean toStdout = FALSE;
+	bool toStdout = false;
 
 	if (outpuFormatUsedStdoutByDefault() ||  Option.filter  ||
 		(Option.tagFileName != NULL  &&  (strcmp (Option.tagFileName, "-") == 0
 						  || strcmp (Option.tagFileName, "/dev/stdout") == 0
 		)))
-		toStdout = TRUE;
+		toStdout = true;
 	return toStdout;
 }
 
 #if defined (HAVE_OPENDIR)
-static boolean recurseUsingOpendir (const char *const dirName)
+static bool recurseUsingOpendir (const char *const dirName)
 {
-	boolean resize = FALSE;
+	bool resize = false;
 	DIR *const dir = opendir (dirName);
 	if (dir == NULL)
 		error (WARNING | PERROR, "cannot recurse into directory \"%s\"", dirName);
@@ -134,13 +133,13 @@ static boolean recurseUsingOpendir (const char *const dirName)
 				strcmp (entry->d_name, "..") != 0)
 			{
 				char *filePath;
-				boolean free_p = FALSE;
+				bool free_p = false;
 				if (strcmp (dirName, ".") == 0)
 					filePath = entry->d_name;
 				else
 				  {
 					filePath = combinePathAndFile (dirName, entry->d_name);
-					free_p = TRUE;
+					free_p = true;
 				  }
 				resize |= createTagsForEntry (filePath);
 				if (free_p)
@@ -154,11 +153,11 @@ static boolean recurseUsingOpendir (const char *const dirName)
 
 #elif defined (HAVE_FINDFIRST) || defined (HAVE__FINDFIRST)
 
-static boolean createTagsForWildcardEntry (
+static bool createTagsForWildcardEntry (
 		const char *const pattern, const size_t dirLength,
 		const char *const entryName)
 {
-	boolean resize = FALSE;
+	bool resize = false;
 	/* we must not recurse into the directories "." or ".." */
 	if (strcmp (entryName, ".") != 0  &&  strcmp (entryName, "..") != 0)
 	{
@@ -171,9 +170,9 @@ static boolean createTagsForWildcardEntry (
 	return resize;
 }
 
-static boolean createTagsForWildcardUsingFindfirst (const char *const pattern)
+static bool createTagsForWildcardUsingFindfirst (const char *const pattern)
 {
-	boolean resize = FALSE;
+	bool resize = false;
 	const size_t dirLength = baseFilename (pattern) - pattern;
 #if defined (HAVE_FINDFIRST)
 	struct ffblk fileInfo;
@@ -203,13 +202,13 @@ static boolean createTagsForWildcardUsingFindfirst (const char *const pattern)
 #endif
 
 
-static boolean recurseIntoDirectory (const char *const dirName)
+static bool recurseIntoDirectory (const char *const dirName)
 {
 	static unsigned int recursionDepth = 0;
 
 	recursionDepth++;
 
-	boolean resize = FALSE;
+	bool resize = false;
 	if (isRecursiveLink (dirName))
 		verbose ("ignoring \"%s\" (recursive link)\n", dirName);
 	else if (! Option.recurse)
@@ -239,9 +238,9 @@ static boolean recurseIntoDirectory (const char *const dirName)
 	return resize;
 }
 
-static boolean createTagsForEntry (const char *const entryName)
+static bool createTagsForEntry (const char *const entryName)
 {
-	boolean resize = FALSE;
+	bool resize = false;
 	fileStatus *status = eStat (entryName);
 
 	Assert (entryName != NULL);
@@ -264,9 +263,9 @@ static boolean createTagsForEntry (const char *const entryName)
 
 #ifdef MANUAL_GLOBBING
 
-static boolean createTagsForWildcardArg (const char *const arg)
+static bool createTagsForWildcardArg (const char *const arg)
 {
-	boolean resize = FALSE;
+	bool resize = false;
 	vString *const pattern = vStringNewInit (arg);
 	char *patternS = vStringValue (pattern);
 
@@ -288,9 +287,9 @@ static boolean createTagsForWildcardArg (const char *const arg)
 
 #endif
 
-static boolean createTagsForArgs (cookedArgs *const args)
+static bool createTagsForArgs (cookedArgs *const args)
 {
-	boolean resize = FALSE;
+	bool resize = false;
 
 	/*  Generate tags for each argument on the command line.
 	 */
@@ -311,9 +310,9 @@ static boolean createTagsForArgs (cookedArgs *const args)
 
 /*  Read from an opened file a list of file names for which to generate tags.
  */
-static boolean createTagsFromFileInput (FILE *const fp, const boolean filter)
+static bool createTagsFromFileInput (FILE *const fp, const bool filter)
 {
-	boolean resize = FALSE;
+	bool resize = false;
 	if (fp != NULL)
 	{
 		cookedArgs *args = cArgNewFromLineFile (fp);
@@ -337,18 +336,18 @@ static boolean createTagsFromFileInput (FILE *const fp, const boolean filter)
 
 /*  Read from a named file a list of file names for which to generate tags.
  */
-static boolean createTagsFromListFile (const char *const fileName)
+static bool createTagsFromListFile (const char *const fileName)
 {
-	boolean resize;
+	bool resize;
 	Assert (fileName != NULL);
 	if (strcmp (fileName, "-") == 0)
-		resize = createTagsFromFileInput (stdin, FALSE);
+		resize = createTagsFromFileInput (stdin, false);
 	else
 	{
 		FILE *const fp = fopen (fileName, "r");
 		if (fp == NULL)
 			error (FATAL | PERROR, "cannot open list file \"%s\"", fileName);
-		resize = createTagsFromFileInput (fp, FALSE);
+		resize = createTagsFromFileInput (fp, false);
 		fclose (fp);
 	}
 	return resize;
@@ -417,9 +416,9 @@ static void printTotals (const clock_t *const timeStamps)
 #endif
 }
 
-static boolean etagsInclude (void)
+static bool etagsInclude (void)
 {
-	return (boolean)(Option.etags && Option.etagsInclude != NULL);
+	return (bool)(Option.etags && Option.etagsInclude != NULL);
 }
 
 extern void setMainLoop (mainLoopFunc func, void *data)
@@ -436,8 +435,8 @@ static void runMainLoop (cookedArgs *args)
 static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 {
 	clock_t timeStamps [3];
-	boolean resize = FALSE;
-	boolean files = (boolean)(! cArgOff (args) || Option.fileList != NULL
+	bool resize = false;
+	bool files = (bool)(! cArgOff (args) || Option.fileList != NULL
 							  || Option.filter);
 
 	if (! files)
@@ -463,12 +462,12 @@ static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 	if (Option.fileList != NULL)
 	{
 		verbose ("Reading list file\n");
-		resize = (boolean) (createTagsFromListFile (Option.fileList) || resize);
+		resize = (bool) (createTagsFromListFile (Option.fileList) || resize);
 	}
 	if (Option.filter)
 	{
 		verbose ("Reading filter input\n");
-		resize = (boolean) (createTagsFromFileInput (stdin, TRUE) || resize);
+		resize = (bool) (createTagsFromFileInput (stdin, true) || resize);
 	}
 	if (! files  &&  Option.recurse)
 		resize = recurseIntoDirectory (".");
@@ -485,7 +484,7 @@ static void batchMakeTags (cookedArgs *args, void *user CTAGS_ATTR_UNUSED)
 #undef timeStamp
 }
 
-static boolean isSafeVar (const char* var)
+static bool isSafeVar (const char* var)
 {
 	const char *safe_vars[] = {
 		"BASH_FUNC_module()=",
@@ -496,9 +495,9 @@ static boolean isSafeVar (const char* var)
 
 	for (sv = safe_vars[0]; sv != NULL; sv++)
 		if (strncmp(var, sv, strlen (sv)) == 0)
-			return TRUE;
+			return true;
 
-	return FALSE;
+	return false;
 }
 
 static void sanitizeEnviron (void)
@@ -584,7 +583,7 @@ extern int main (int argc CTAGS_ATTR_UNUSED, char **argv)
 #endif
 
 	if (Option.printLanguage)
-		return (Option.printLanguage == TRUE)? 0: 1;
+		return (Option.printLanguage == true)? 0: 1;
 
 	exit (0);
 	return 0;

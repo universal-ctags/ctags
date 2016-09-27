@@ -33,8 +33,8 @@
 /*
  *	 MACROS
  */
-#define isType(token,t)		(boolean) ((token)->type == (t))
-#define isKeyword(token,k)	(boolean) ((token)->keyword == (k))
+#define isType(token,t)		(bool) ((token)->type == (t))
+#define isKeyword(token,k)	(bool) ((token)->keyword == (k))
 
 /*
  *	 DATA DECLARATIONS
@@ -112,15 +112,15 @@ typedef enum {
 } texKind;
 
 static kindOption TexKinds [] = {
-	{ TRUE,  'p', "part",			  "parts"			   },
-	{ TRUE,  'c', "chapter",		  "chapters"		   },
-	{ TRUE,  's', "section",		  "sections"		   },
-	{ TRUE,  'u', "subsection",		  "subsections"		   },
-	{ TRUE,  'b', "subsubsection",	  "subsubsections"	   },
-	{ TRUE,  'P', "paragraph",		  "paragraphs"		   },
-	{ TRUE,  'G', "subparagraph",	  "subparagraphs"	   },
-	{ TRUE,  'l', "label",			  "labels"			   },
-	{ TRUE,  'i', "include",	  	  "includes"		   }
+	{ true,  'p', "part",			  "parts"			   },
+	{ true,  'c', "chapter",		  "chapters"		   },
+	{ true,  's', "section",		  "sections"		   },
+	{ true,  'u', "subsection",		  "subsections"		   },
+	{ true,  'b', "subsubsection",	  "subsubsections"	   },
+	{ true,  'P', "paragraph",		  "paragraphs"		   },
+	{ true,  'G', "subparagraph",	  "subparagraphs"	   },
+	{ true,  'l', "label",			  "labels"			   },
+	{ true,  'i', "include",	  	  "includes"		   }
 };
 
 static const keywordTable TexKeywordTable [] = {
@@ -140,9 +140,9 @@ static const keywordTable TexKeywordTable [] = {
  *	 FUNCTION DEFINITIONS
  */
 
-static boolean isIdentChar (const int c)
+static bool isIdentChar (const int c)
 {
-	return (boolean)
+	return (bool)
 		(isalpha (c) || isdigit (c) || c == '$' ||
 		  c == '_' || c == '#' || c == '-' || c == '.' || c == ':');
 }
@@ -374,11 +374,11 @@ static void copyToken (tokenInfo *const dest, tokenInfo *const src)
  *	 Scanning functions
  */
 
-static boolean parseTag (tokenInfo *const token, texKind kind)
+static bool parseTag (tokenInfo *const token, texKind kind)
 {
 	tokenInfo *const name = newToken ();
 	vString *	fullname;
-	boolean		useLongName = TRUE;
+	bool		useLongName = true;
 
 	fullname = vStringNew ();
 	vStringClear (fullname);
@@ -401,7 +401,7 @@ static boolean parseTag (tokenInfo *const token, texKind kind)
 
 	if (isType (token, TOKEN_OPEN_SQUARE))
 	{
-		useLongName = FALSE;
+		useLongName = false;
 
 		readToken (token);
 		while (! isType (token, TOKEN_CLOSE_SQUARE) )
@@ -486,7 +486,7 @@ static boolean parseTag (tokenInfo *const token, texKind kind)
 
 	deleteToken (name);
 	vStringDelete (fullname);
-	return TRUE;
+	return true;
 }
 
 static void parseTexFile (tokenInfo *const token)
@@ -530,7 +530,7 @@ static void parseTexFile (tokenInfo *const token)
 					break;
 			}
 		}
-	} while (TRUE);
+	} while (true);
 }
 
 static void initialize (const langType language)
@@ -546,7 +546,7 @@ static void initialize (const langType language)
 }
 
 static void finalize (const langType language CTAGS_ATTR_UNUSED,
-		      boolean initialized)
+		      bool initialized)
 {
 	if (initialized)
 	{

@@ -96,7 +96,7 @@ parserDefinition * CParser (void)
 	def->initialize = cxxCParserInitialize;
 	def->finalize = cxxParserCleanup;
 	def->selectLanguage = selectors;
-	def->useCork = TRUE; // We use corking to block output until the end of file
+	def->useCork = true; // We use corking to block output until the end of file
 
 	return def;
 }
@@ -131,7 +131,7 @@ parserDefinition * CppParser (void)
 	def->initialize = cxxCppParserInitialize;
 	def->finalize = cxxParserCleanup;
 	def->selectLanguage = selectors;
-	def->useCork = TRUE; // We use corking to block output until the end of file
+	def->useCork = true; // We use corking to block output until the end of file
 
 	return def;
 }

@@ -36,7 +36,7 @@ tagWriter jsonWriter = {
 	.writePtagEntry = writeJsonPtagEntry,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
-	.useStdoutByDefault = TRUE,
+	.useStdoutByDefault = true,
 };
 
 
@@ -96,15 +96,15 @@ static void addExtensionFields (json_t *response, const tagEntryInfo *const tag)
 	   That cannot be changed to keep the compatibility of tags file format.
 	   Use FIELD_KIND_KEY instead */
 	if (isFieldEnabled (FIELD_KIND) || isFieldEnabled (FIELD_KIND_LONG))
-		enableField (FIELD_KIND_KEY, TRUE, FALSE);
+		enableField (FIELD_KIND_KEY, true, false);
 
 	/* FIELD_SCOPE has no name; getFieldName (FIELD_KIND_KEY) returns NULL.
 	   That cannot be changed to keep the compatibility of tags file format.
 	   Use FIELD_SCOPE_KEY and FIELD_SCOPE_KIND_LONG instead. */
 	if (isFieldEnabled (FIELD_SCOPE))
 	{
-		enableField (FIELD_SCOPE_KEY, TRUE, FALSE);
-		enableField (FIELD_SCOPE_KIND_LONG, TRUE, FALSE);
+		enableField (FIELD_SCOPE_KEY, true, false);
+		enableField (FIELD_SCOPE_KIND_LONG, true, false);
 	}
 
 	for (k = FIELD_EXTENSION_START; k <= FIELD_BUILTIN_LAST; k++)
@@ -171,7 +171,7 @@ static int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
 #undef OPT
 }
 
-extern boolean ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 {
 	return writePseudoTag (desc,
 			       "0.0",
@@ -192,9 +192,9 @@ static int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
 	return 0;
 }
 
-extern boolean ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
+extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 {
-	return FALSE;
+	return false;
 }
 
 #endif

@@ -38,25 +38,25 @@ CXX_COMMON_HEADER_ROLES(CXX);
 
 
 #define CXX_COMMON_KINDS(_langPrefix, _szMemberDescription, _syncWith)	\
-	{ TRUE,  'd', "macro",      "macro definitions", \
-			.referenceOnly = FALSE, ATTACH_ROLES(_langPrefix##MacroRoles), .syncWith = _syncWith \
+	{ true,  'd', "macro",      "macro definitions", \
+			.referenceOnly = false, ATTACH_ROLES(_langPrefix##MacroRoles), .syncWith = _syncWith \
 	}, \
-	{ TRUE,  'e', "enumerator", "enumerators (values inside an enumeration)", .syncWith = _syncWith }, \
-	{ TRUE,  'f', "function",   "function definitions", .syncWith = _syncWith },		\
-	{ TRUE,  'g', "enum",       "enumeration names", .syncWith = _syncWith },		\
-	{ TRUE, 'h', "header",     "included header files", \
-			.referenceOnly = TRUE,  ATTACH_ROLES(_langPrefix##HeaderRoles), .syncWith = _syncWith \
+	{ true,  'e', "enumerator", "enumerators (values inside an enumeration)", .syncWith = _syncWith }, \
+	{ true,  'f', "function",   "function definitions", .syncWith = _syncWith },		\
+	{ true,  'g', "enum",       "enumeration names", .syncWith = _syncWith },		\
+	{ true, 'h', "header",     "included header files", \
+			.referenceOnly = true,  ATTACH_ROLES(_langPrefix##HeaderRoles), .syncWith = _syncWith \
 	}, \
-	{ FALSE, 'l', "local",      "local variables", .syncWith = _syncWith },   \
-	{ TRUE,  'm', "member",     _szMemberDescription, .syncWith = _syncWith },	\
-	{ FALSE, 'p', "prototype",  "function prototypes", .syncWith = _syncWith },		\
-	{ TRUE,  's', "struct",     "structure names", .syncWith = _syncWith },		\
-	{ TRUE,  't', "typedef",    "typedefs", .syncWith = _syncWith },			\
-	{ TRUE,  'u', "union",      "union names", .syncWith = _syncWith },			\
-	{ TRUE,  'v', "variable",   "variable definitions", .syncWith = _syncWith },		\
-	{ FALSE, 'x', "externvar",  "external and forward variable declarations", .syncWith = _syncWith }, \
-	{ FALSE, 'z', "parameter",  "function parameters inside function definitions", .syncWith = _syncWith }, \
-	{ FALSE, 'L', "label",      "goto labels", .syncWith = _syncWith }
+	{ false, 'l', "local",      "local variables", .syncWith = _syncWith },   \
+	{ true,  'm', "member",     _szMemberDescription, .syncWith = _syncWith },	\
+	{ false, 'p', "prototype",  "function prototypes", .syncWith = _syncWith },		\
+	{ true,  's', "struct",     "structure names", .syncWith = _syncWith },		\
+	{ true,  't', "typedef",    "typedefs", .syncWith = _syncWith },			\
+	{ true,  'u', "union",      "union names", .syncWith = _syncWith },			\
+	{ true,  'v', "variable",   "variable definitions", .syncWith = _syncWith },		\
+	{ false, 'x', "externvar",  "external and forward variable declarations", .syncWith = _syncWith }, \
+	{ false, 'z', "parameter",  "function parameters inside function definitions", .syncWith = _syncWith }, \
+	{ false, 'L', "label",      "goto labels", .syncWith = _syncWith }
 
 static kindOption g_aCXXCKinds [] = {
 	/* All other than LANG_AUTO are ignored.
@@ -67,12 +67,12 @@ static kindOption g_aCXXCKinds [] = {
 
 static kindOption g_aCXXCPPKinds [] = {
 	CXX_COMMON_KINDS(CXX,"class, struct, and union members", LANG_AUTO),
-	{ TRUE,  'c', "class",      "classes" },
-	{ TRUE,  'n', "namespace",  "namespaces" },
-	{ FALSE, 'A', "alias",      "namespace aliases" },
-	{ FALSE, 'N', "name",       "names imported via using scope::symbol" },
-	{ FALSE, 'U', "using",      "using namespace statements",
-			.referenceOnly = TRUE },
+	{ true,  'c', "class",      "classes" },
+	{ true,  'n', "namespace",  "namespaces" },
+	{ false, 'A', "alias",      "namespace aliases" },
+	{ false, 'N', "name",       "names imported via using scope::symbol" },
+	{ false, 'U', "using",      "using namespace statements",
+			.referenceOnly = true },
 };
 
 static const char * g_aCXXAccessStrings [] = {
@@ -86,7 +86,7 @@ static const char * g_aCXXAccessStrings [] = {
 	{ \
 		.name = "properties", \
 		.description = "properties (static, inline, mutable,...)", \
-		.enabled = FALSE \
+		.enabled = false \
 	}
 
 static fieldSpec g_aCXXCFields [] = {
@@ -98,17 +98,17 @@ static fieldSpec g_aCXXCPPFields [] = {
 	{
 		.name = "template",
 		.description = "template parameters",
-		.enabled = FALSE,
+		.enabled = false,
 	},
 	{
 		.name = "captures",
 		.description = "lambda capture list",
-		.enabled = FALSE
+		.enabled = false
 	},
 	{
 		.name = "name",
 		.description = "aliased names",
-		.enabled = TRUE
+		.enabled = true
 	}
 };
 
@@ -129,7 +129,7 @@ void cxxTagInitForLanguage(langType eLanguage)
 		g_cxx.pFieldOptions = g_aCXXCPPFields;
 		g_cxx.uFieldOptionCount = sizeof(g_aCXXCPPFields) / sizeof(fieldSpec);
 	} else {
-		CXX_DEBUG_ASSERT(FALSE,"Invalid language passed to cxxTagInitForLanguage()");
+		CXX_DEBUG_ASSERT(false,"Invalid language passed to cxxTagInitForLanguage()");
 	}
 }
 
@@ -153,7 +153,7 @@ int cxxTagGetCPPKindOptionCount(void)
 	return sizeof(g_aCXXCPPKinds) / sizeof(kindOption);
 }
 
-boolean cxxTagKindEnabled(unsigned int uKind)
+bool cxxTagKindEnabled(unsigned int uKind)
 {
 	CXX_DEBUG_ASSERT(
 			uKind < g_cxx.uKindOptionCount,
@@ -182,7 +182,7 @@ int cxxTagGetCFieldSpecifierCount(void)
 	return sizeof(g_aCXXCFields) / sizeof(fieldSpec);
 }
 
-boolean cxxTagFieldEnabled(unsigned int uField)
+bool cxxTagFieldEnabled(unsigned int uField)
 {
 	CXX_DEBUG_ASSERT(
 			uField < g_cxx.uFieldOptionCount,
@@ -213,7 +213,7 @@ tagEntryInfo * cxxTagBegin(unsigned int uKind,CXXToken * pToken)
 
 	g_oCXXTag.lineNumber = pToken->iLineNumber;
 	g_oCXXTag.filePosition = pToken->oFilePosition;
-	g_oCXXTag.isFileScope = FALSE;
+	g_oCXXTag.isFileScope = false;
 
 	if(!cxxScopeIsGlobal())
 	{
@@ -237,12 +237,12 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 
 	vString * pszProperties = vStringNew();
 
-	boolean bFirst = TRUE;
+	bool bFirst = true;
 
 #define ADD_PROPERTY(_szProperty) \
 	do { \
 		if(bFirst) \
-			bFirst = FALSE; \
+			bFirst = false; \
 		else \
 			vStringPut(pszProperties,','); \
 		vStringCatS(pszProperties,_szProperty); \
@@ -286,7 +286,7 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 	return pszProperties;
 }
 
-static boolean cxxTagCheckTypeField(
+static bool cxxTagCheckTypeField(
 		CXXToken * pTypeStart,
 		CXXToken * pTypeEnd
 	)
@@ -295,7 +295,7 @@ static boolean cxxTagCheckTypeField(
 	if(!pTypeStart || !pTypeEnd)
 	{
 		CXX_DEBUG_LEAVE_TEXT("One of the pointers is NULL");
-		return FALSE;
+		return false;
 	}
 	
 	int iTotalCount = 0;
@@ -309,7 +309,7 @@ static boolean cxxTagCheckTypeField(
 		if(iTotalCount > 30)
 		{
 			CXX_DEBUG_LEAVE_TEXT("The chain is really too long to be a type name");
-			return FALSE;
+			return false;
 		}
 
 		if(cxxTokenTypeIs(pTypeStart,CXXTokenTypeIdentifier))
@@ -320,7 +320,7 @@ static boolean cxxTagCheckTypeField(
 			{
 				// Probably many macros inside. Too many.
 				CXX_DEBUG_LEAVE_TEXT("Too many consecutive identifiers for a type name");
-				return FALSE;
+				return false;
 			}
 		} else {
 			iConsecutiveIdentifiers = 0;
@@ -331,7 +331,7 @@ static boolean cxxTagCheckTypeField(
 				if(iParenthesisCount > 3)
 				{
 					CXX_DEBUG_LEAVE_TEXT("Too many non-nested parentheses for a type name");
-					return FALSE;
+					return false;
 				}
 				
 				if(
@@ -345,7 +345,7 @@ static boolean cxxTagCheckTypeField(
 					// identifier () identifier
 					// Looks suspicious, might be macros gathered by mistake
 					CXX_DEBUG_LEAVE_TEXT("Identifier-parenthesis-identifier pattern: looks suspicious");
-					return FALSE;
+					return false;
 				}
 			} else if(cxxTokenTypeIs(pTypeStart,CXXTokenTypeKeyword))
 			{
@@ -362,17 +362,17 @@ static boolean cxxTagCheckTypeField(
 	if(iIdentifierOrKeywordCount < 1)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Type does not seem to contains identifiers or keywords, can't be a type name");
-		return FALSE;
+		return false;
 	}
 	
 	if(!pTypeStart)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Type tokens do not belong to the same chain!");
-		return FALSE;
+		return false;
 	}
 	
 	CXX_DEBUG_LEAVE();
-	return TRUE;
+	return true;
 }
 
 CXXToken * cxxTagCheckAndSetTypeField(

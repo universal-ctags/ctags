@@ -15,21 +15,21 @@
 
 typedef struct sHashTable hashTable;
 typedef unsigned int (* hashTableHashFunc)  (void * key);
-typedef boolean      (* hashTableEqualFunc) (void* a, void* b);
+typedef bool      (* hashTableEqualFunc) (void* a, void* b);
 typedef void         (* hashTableFreeFunc)  (void * ptr);
 typedef void         (* hashTableForeachFunc) (void *key, void *value, void* user_data);
 
 unsigned int hashPtrhash (void * x);
-boolean hashPtreq (void *a, void *b);
+bool hashPtreq (void *a, void *b);
 
 unsigned int hashCstrhash (void * x);
-boolean hashCstreq (void *a, void *b);
+bool hashCstreq (void *a, void *b);
 
 unsigned int hashCstrhash (void * x);
-boolean hashCstreq (void *a, void *b);
+bool hashCstreq (void *a, void *b);
 
 unsigned int hashInthash (void *x);
-boolean hashInteq (void *a, void *b);
+bool hashInteq (void *a, void *b);
 
 extern hashTable* hashTableNew         (unsigned int size,
 					hashTableHashFunc hashfn,
@@ -39,8 +39,8 @@ extern hashTable* hashTableNew         (unsigned int size,
 extern void       hashTableDelete      (hashTable *htable);
 extern void       hashTablePutItem     (hashTable *htable, void *key, void *value);
 extern void*      hashTableGetItem     (hashTable *htable, void *key);
-extern boolean    hashTableHasItem     (hashTable *htable, void *key);
-extern boolean    hashTableDeleteItem  (hashTable *htable, void *key);
+extern bool    hashTableHasItem     (hashTable *htable, void *key);
+extern bool    hashTableDeleteItem  (hashTable *htable, void *key);
 extern void       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data);
 extern int        hashTableCountItem   (hashTable *htable);
 

@@ -26,7 +26,7 @@ struct sTagWriter {
 							const char *const parserName, void *data);
 	void * (* preWriteEntry) (MIO * mio);
 	void (* postWriteEntry)  (MIO * mio, const char* filename, void *data);
-	boolean useStdoutByDefault;
+	bool useStdoutByDefault;
 };
 
 extern void setTagWriter (tagWriter *tagWriter);
@@ -35,16 +35,16 @@ extern tagWriter ctagsWriter;
 extern tagWriter xrefWriter;
 extern tagWriter jsonWriter;
 
-extern boolean outpuFormatUsedStdoutByDefault (void);
+extern bool outpuFormatUsedStdoutByDefault (void);
 
 extern int makePatternStringCommon (const tagEntryInfo *const tag,
 				    int putc_func (char , void *),
 				    int puts_func (const char* , void *),
 				    void *output);
 extern void truncateTagLine (char *const line, const char *const token,
-			     const boolean discardNewline);
+			     const bool discardNewline);
 extern void abort_if_ferror(MIO *const fp);
 
-extern boolean ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED);
+extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED);
 
 #endif

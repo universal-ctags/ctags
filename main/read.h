@@ -62,12 +62,12 @@ extern MIOPos getInputFilePositionForLine (int line);
 extern langType getInputLanguage (void);
 extern const char *getInputLanguageName (void);
 extern const char *getInputFileTagPath (void);
-extern boolean isInputLanguage (langType lang);
-extern boolean isInputHeaderFile (void);
-extern boolean isInputLanguageKindEnabled (char c);
-extern boolean doesInputLanguageAllowNullTag (void);
+extern bool isInputLanguage (langType lang);
+extern bool isInputHeaderFile (void);
+extern bool isInputLanguageKindEnabled (char c);
+extern bool doesInputLanguageAllowNullTag (void);
 extern kindOption *getInputLanguageFileKind (void);
-extern boolean doesInputLanguageRequestAutomaticFQTag (void);
+extern bool doesInputLanguageRequestAutomaticFQTag (void);
 
 extern void                 freeInputFileResources (void);
 extern const unsigned char *getInputFileData (size_t *size);
@@ -76,9 +76,9 @@ extern const unsigned char *getInputFileData (size_t *size);
    argument. If the 3rd argument is NULL, openInputFile calls getMio
    internally. The 3rd argument is introduced for reusing mio object
    created in parser guessing stage. */
-extern boolean              openInputFile (const char *const fileName, const langType language, MIO *mio);
+extern bool              openInputFile (const char *const fileName, const langType language, MIO *mio);
 extern MIO                 *getMio (const char *const fileName, const char *const openMode,
-				    boolean memStreamRequired);
+				    bool memStreamRequired);
 extern void                 resetInputFile (const langType language);
 
 extern void                 closeInputFile (void);

@@ -158,12 +158,12 @@ extern void findXMLTags (xmlXPathContext *ctx, xmlNode *root,
 			 const tagXpathTableTable *xpathTableTable,
 			 const kindOption* const kinds,void *userData)
 {
-	boolean usedAsEntryPoint = FALSE;
+	bool usedAsEntryPoint = false;
 	xmlDocPtr doc = NULL;
 
 	if (ctx == NULL)
 	{
-		usedAsEntryPoint = TRUE;
+		usedAsEntryPoint = true;
 
 		findRegexTags ();
 

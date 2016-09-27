@@ -29,7 +29,7 @@ extern parserDefinition* CoffeeScriptParser (void)
 
 	parserDefinition* const def = parserNew ("CoffeeScript");
 
-	def->enabled       = TRUE;
+	def->enabled       = true;
 	def->extensions    = extensions;
 	def->patterns      = patterns;
 	def->aliases       = aliases;

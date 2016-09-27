@@ -154,22 +154,22 @@ extern void stringListDelete (stringList *const current)
 	}
 }
 
-static boolean compareString (
+static bool compareString (
 		const char *const string, vString *const itm)
 {
-	return (boolean) (strcmp (string, vStringValue (itm)) == 0);
+	return (bool) (strcmp (string, vStringValue (itm)) == 0);
 }
 
-static boolean compareStringInsensitive (
+static bool compareStringInsensitive (
 		const char *const string, vString *const itm)
 {
-	return (boolean) (strcasecmp (string, vStringValue (itm)) == 0);
+	return (bool) (strcasecmp (string, vStringValue (itm)) == 0);
 }
 
 static int stringListIndex (
 		const stringList *const current,
 		const char *const string,
-		boolean (*test)(const char *s, vString *const vs))
+		bool (*test)(const char *s, vString *const vs))
 {
 	int result = -1;
 	unsigned int i;
@@ -182,10 +182,10 @@ static int stringListIndex (
 	return result;
 }
 
-extern boolean stringListHas (
+extern bool stringListHas (
 		const stringList *const current, const char *const string)
 {
-	boolean result = FALSE;
+	bool result = false;
 	Assert (current != NULL);
 	result = stringListIndex (current, string, compareString) != -1;
 	return result;
@@ -193,7 +193,7 @@ extern boolean stringListHas (
 
 static vString* stringListFinds (
 		const stringList *const current, const char *const string,
-		boolean (*test)(const char *s, vString *const vs))
+		bool (*test)(const char *s, vString *const vs))
 {
 	int i;
 
@@ -207,21 +207,21 @@ static vString* stringListFinds (
 		return stringListItem(current, i);
 }
 
-extern boolean stringListHasInsensitive (
+extern bool stringListHasInsensitive (
 		const stringList *const current, const char *const string)
 {
-	boolean result = FALSE;
+	bool result = false;
 	Assert (current != NULL);
 	Assert (string != NULL);
 	result = stringListIndex (current, string, compareStringInsensitive) != -1;
 	return result;
 }
 
-extern boolean stringListHasTest (const stringList *const current,
-				  boolean (*test)(const char *s, void *userData),
+extern bool stringListHasTest (const stringList *const current,
+				  bool (*test)(const char *s, void *userData),
 				  void *userData)
 {
-	boolean result = FALSE;
+	bool result = false;
 	unsigned int i;
 	Assert (current != NULL);
 	for (i = 0  ;  ! result  &&  i < current->count  ;  ++i)
@@ -229,10 +229,10 @@ extern boolean stringListHasTest (const stringList *const current,
 	return result;
 }
 
-extern boolean stringListDeleteItemExtension (stringList* const current, const char* const extension)
+extern bool stringListDeleteItemExtension (stringList* const current, const char* const extension)
 
 {
-	boolean result = FALSE;
+	bool result = false;
 	int where;
 #ifdef CASE_INSENSITIVE_FILENAMES
 	where = stringListIndex (current, extension, compareStringInsensitive);
@@ -246,12 +246,12 @@ extern boolean stringListDeleteItemExtension (stringList* const current, const c
 				(current->count - where) * sizeof (*current->list));
 		current->list [current->count - 1] = NULL;
 		--current->count;
-		result = TRUE;
+		result = true;
 	}
 	return result;
 }
 
-extern boolean stringListExtensionMatched (
+extern bool stringListExtensionMatched (
 		const stringList* const current, const char* const extension)
 {
 #ifdef CASE_INSENSITIVE_FILENAMES
@@ -271,24 +271,24 @@ extern vString* stringListExtensionFinds (
 #endif
 }
 
-static boolean fileNameMatched (
+static bool fileNameMatched (
 		const vString* const vpattern, const char* const fileName)
 {
 	const char* const pattern = vStringValue (vpattern);
-	return (boolean) (fnmatch (pattern, fileName, 0) == 0);
+	return (bool) (fnmatch (pattern, fileName, 0) == 0);
 }
 
-extern boolean stringListFileMatched (
+extern bool stringListFileMatched (
 			const stringList* const current, const char* const fileName)
 {
-	return stringListFileFinds (current, fileName)? TRUE: FALSE;
+	return stringListFileFinds (current, fileName)? true: false;
 }
 
 extern vString* stringListFileFinds (
 		const stringList* const current, const char* const fileName)
 {
 	vString* vstr = NULL;
-	boolean matched = FALSE;
+	bool matched = false;
 	unsigned int i;
 	for (i = 0  ;  ! matched  &&  i < stringListCount (current)  ;  ++i)
 	{

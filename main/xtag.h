@@ -28,7 +28,7 @@ typedef enum eXtagType { /* extra tag content control */
 } xtagType;
 
 typedef struct sXtagDesc {
-	boolean enabled;
+	bool enabled;
 	unsigned char letter;
 	const char* name;	 /* used in extra: field */
 	const char* description;  /* displayed in --list-extra output */
@@ -41,14 +41,14 @@ typedef struct sXtagDesc {
 	   to standared output, the tag is disabled by default.
 	   If it is connected to a regular file, the tag is enabled
 	   by default. */
-	boolean (* isEnabled) (struct sXtagDesc *desc);
+	bool (* isEnabled) (struct sXtagDesc *desc);
 } xtagDesc;
 
 extern xtagDesc* getXtagDesc (xtagType type);
 extern xtagType  getXtagTypeForLetter (char letter);
 extern xtagType  getXtagTypeForName (const char *name);
-extern boolean isXtagEnabled (xtagType type);
-extern boolean enableXtag (xtagType type, boolean state);
+extern bool isXtagEnabled (xtagType type);
+extern bool enableXtag (xtagType type, bool state);
 const char* getXtagName (xtagType type);
 extern void printXtags (void);
 

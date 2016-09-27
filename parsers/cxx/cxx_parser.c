@@ -34,7 +34,7 @@ CXXParserState g_cxx;
 // This is set to false once the parser is run at least one time.
 // Used by cleanup routines.
 //
-boolean g_bFirstRun = TRUE;
+bool g_bFirstRun = true;
 
 //
 // Reset parser state:
@@ -64,9 +64,9 @@ void cxxParserNewStatement(void)
 // Inner parsing is done by cxxParserParseAndCondenseSubchainsUpToOneOf()
 // so this is actually a recursive subchain nesting algorithm.
 //
-boolean cxxParserParseAndCondenseCurrentSubchain(
+bool cxxParserParseAndCondenseCurrentSubchain(
 		unsigned int uInitialSubchainMarkerTypes,
-		boolean bAcceptEOF
+		bool bAcceptEOF
 	)
 {
 	CXXTokenChain * pCurrentChain = g_cxx.pTokenChain;
@@ -91,7 +91,7 @@ boolean cxxParserParseAndCondenseCurrentSubchain(
 	unsigned int uTokenTypes = g_cxx.pToken->eType << 4;
 	if(bAcceptEOF)
 		uTokenTypes |= CXXTokenTypeEOF;
-	boolean bRet = cxxParserParseAndCondenseSubchainsUpToOneOf(
+	bool bRet = cxxParserParseAndCondenseSubchainsUpToOneOf(
 			uTokenTypes,
 			uInitialSubchainMarkerTypes
 		);
@@ -113,7 +113,7 @@ boolean cxxParserParseAndCondenseCurrentSubchain(
 // is present in uTokenTypes. Returns false in all the other stop conditions
 // and when an unmatched subchain character pair is found (syntax error).
 //
-boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
+bool cxxParserParseAndCondenseSubchainsUpToOneOf(
 		unsigned int uTokenTypes,
 		unsigned int uInitialSubchainMarkerTypes
 	)
@@ -144,7 +144,7 @@ boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
 					vStringValue(g_cxx.pToken->pszWord),
 					g_cxx.pToken->eType
 				);
-			return TRUE;
+			return true;
 		}
 
 		if(cxxTokenTypeIsOneOf(g_cxx.pToken,uInitialSubchainMarkerTypes))
@@ -166,7 +166,7 @@ boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
 				if(!cxxParserHandleLambda(pParenthesis))
 				{
 					CXX_DEBUG_LEAVE_TEXT("Failed to handle lambda");
-					return FALSE;
+					return false;
 				}
 			} else {
 				if(!cxxParserParseAndCondenseCurrentSubchain(
@@ -179,7 +179,7 @@ boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
 							"Failed to parse subchain of type 0x%x",
 							g_cxx.pToken->eType
 						);
-					return FALSE;
+					return false;
 				}
 			}
 
@@ -190,7 +190,7 @@ boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
 						"Got terminator subchain token 0x%x",
 						g_cxx.pToken->eType
 					);
-				return TRUE;
+				return true;
 			}
 
 			if(!cxxParserParseNextToken())
@@ -211,7 +211,7 @@ boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
 					"Got mismatched subchain terminator 0x%x",
 					g_cxx.pToken->eType
 				);
-			return FALSE; // unmatched: syntax error
+			return false; // unmatched: syntax error
 		}
 
 		if(!cxxParserParseNextToken())
@@ -223,7 +223,7 @@ boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
 
 	// not reached
 	CXX_DEBUG_LEAVE_TEXT("Internal error");
-	return FALSE;
+	return false;
 }
 
 //
@@ -239,7 +239,7 @@ boolean cxxParserParseAndCondenseSubchainsUpToOneOf(
 // This is usually what you want, unless you're really expecting a scope to begin
 // in the current statement.
 //
-boolean cxxParserParseUpToOneOf(unsigned int uTokenTypes)
+bool cxxParserParseUpToOneOf(unsigned int uTokenTypes)
 {
 	return cxxParserParseAndCondenseSubchainsUpToOneOf(
 			uTokenTypes,
@@ -254,10 +254,10 @@ boolean cxxParserParseUpToOneOf(unsigned int uTokenTypes)
 // May be also used to recovery from certain forms of syntax errors.
 // This function works also if the current token is a semicolon or an EOF.
 //
-boolean cxxParserSkipToSemicolonOrEOF(void)
+bool cxxParserSkipToSemicolonOrEOF(void)
 {
 	if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeSemicolon | CXXTokenTypeEOF))
-		return TRUE;
+		return true;
 
 	return cxxParserParseUpToOneOf(CXXTokenTypeSemicolon | CXXTokenTypeEOF);
 }
@@ -273,7 +273,7 @@ boolean cxxParserSkipToSemicolonOrEOF(void)
 //
 // Upon exit the token preceding the current is the last identifier
 // of the qualified name.
-boolean cxxParserParseToEndOfQualifedName(void)
+bool cxxParserParseToEndOfQualifedName(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -291,7 +291,7 @@ boolean cxxParserParseToEndOfQualifedName(void)
 		{
 			// syntax error, but we tolerate this
 			CXX_DEBUG_LEAVE_TEXT("EOF in cxxParserParseNextToken");
-			return FALSE; // EOF
+			return false; // EOF
 		}
 	}
 
@@ -301,20 +301,20 @@ boolean cxxParserParseToEndOfQualifedName(void)
 		{
 			// syntax error, but we tolerate this
 			CXX_DEBUG_LEAVE_TEXT("EOF in cxxParserParseNextToken");
-			return FALSE; // EOF
+			return false; // EOF
 		}
 
 		if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Found no identifier after multiple colons");
-			return FALSE;
+			return false;
 		}
 
 		if(!cxxParserParseNextToken())
 		{
 			// syntax error, but we tolerate this
 			CXX_DEBUG_LEAVE_TEXT("EOF in cxxParserParseNextToken");
-			return FALSE; // EOF
+			return false; // EOF
 		}
 	}
 
@@ -325,7 +325,7 @@ boolean cxxParserParseToEndOfQualifedName(void)
 		);
 
 	CXX_DEBUG_LEAVE();
-	return TRUE;
+	return true;
 }
 
 
@@ -381,7 +381,7 @@ static void cxxParserCleanupEnumStructClassOrUnionPrefixChain(enum CXXKeyword eK
 // This is called after a full enum/struct/class/union declaration
 // that ends with a closing bracket.
 //
-static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
+static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 		unsigned int uKeywordState,
 		enum CXXKeyword eTagKeyword,
 		const char * szTypeName
@@ -402,20 +402,20 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 	if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to EOF/semicolon");
-		return FALSE;
+		return false;
 	}
 
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
 	{
 		// It's a syntax error, but we can be tolerant here.
 		CXX_DEBUG_LEAVE_TEXT("Got EOF after enum/class/struct/union block");
-		return TRUE;
+		return true;
 	}
 
 	if(g_cxx.pTokenChain->iCount < 2)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Nothing interesting after enum/class/struct block");
-		return TRUE;
+		return true;
 	}
 
 	// fake the initial two tokens
@@ -423,7 +423,7 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 	pIdentifier->oFilePosition = oFilePosition;
 	pIdentifier->iLineNumber = iFileLine;
 	pIdentifier->eType = CXXTokenTypeIdentifier;
-	pIdentifier->bFollowedBySpace = TRUE;
+	pIdentifier->bFollowedBySpace = true;
 	vStringCatS(pIdentifier->pszWord,szTypeName);
 	cxxTokenChainPrepend(g_cxx.pTokenChain,pIdentifier);
 
@@ -449,15 +449,15 @@ static boolean cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 	}
 
 	if(uKeywordState & CXXParserKeywordStateSeenTypedef)
-		cxxParserExtractTypedef(g_cxx.pTokenChain,TRUE);
+		cxxParserExtractTypedef(g_cxx.pTokenChain,true);
 	else
 		cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 
 	CXX_DEBUG_LEAVE();
-	return TRUE;
+	return true;
 }
 
-boolean cxxParserParseEnum(void)
+bool cxxParserParseEnum(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -481,7 +481,7 @@ boolean cxxParserParseEnum(void)
 		))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Could not parse enum name");
-		return FALSE;
+		return false;
 	}
 
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain))
@@ -490,7 +490,7 @@ boolean cxxParserParseEnum(void)
 		// something like enum x func()....
 		// do not clear statement
 		CXX_DEBUG_LEAVE_TEXT("Probably a function declaration!");
-		return TRUE;
+		return true;
 	}
 
 	// FIXME: This block is duplicated in struct/union/class
@@ -500,14 +500,14 @@ boolean cxxParserParseEnum(void)
 		{
 			 // [typedef] struct X Y; <-- typedef has been removed!
 			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
-				cxxParserExtractTypedef(g_cxx.pTokenChain,TRUE);
+				cxxParserExtractTypedef(g_cxx.pTokenChain,true);
 			else
 				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 		}
 
 		cxxParserNewStatement();
 		CXX_DEBUG_LEAVE();
-		return TRUE;
+		return true;
 	}
 
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
@@ -515,7 +515,7 @@ boolean cxxParserParseEnum(void)
 		// tolerate EOF, treat as forward declaration
 		cxxParserNewStatement();
 		CXX_DEBUG_LEAVE_TEXT("EOF before enum block: treating as forward declaration");
-		return TRUE;
+		return true;
 	}
 
 	// semicolon or opening bracket
@@ -599,7 +599,7 @@ boolean cxxParserParseEnum(void)
 			CXX_DEBUG_LEAVE_TEXT("Failed to parse enum contents");
 			if(pScopeName)
 				vStringDelete(pScopeName);
-			return FALSE;
+			return false;
 		}
 
 		CXXToken * pFirst = cxxTokenChainFirst(g_cxx.pTokenChain);
@@ -634,7 +634,7 @@ boolean cxxParserParseEnum(void)
 		iPushedScopes--;
 	}
 
-	boolean bRet = cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
+	bool bRet = cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 			uInitialKeywordState,
 			CXXKeywordENUM,
 			vStringValue(pScopeName)
@@ -648,7 +648,7 @@ boolean cxxParserParseEnum(void)
 	return bRet;
 };
 
-static boolean cxxParserParseClassStructOrUnionInternal(
+static bool cxxParserParseClassStructOrUnionInternal(
 		enum CXXKeyword eKeyword,
 		unsigned int uTagKind,
 		unsigned int uScopeType
@@ -682,7 +682,7 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 	// Skip attr and class-head-name
 
 	// enable "final" keyword handling
-	g_cxx.bParsingClassStructOrUnionDeclaration = TRUE;
+	g_cxx.bParsingClassStructOrUnionDeclaration = true;
 
 	unsigned int uTerminatorTypes = CXXTokenTypeEOF | CXXTokenTypeSingleColon |
 			CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket |
@@ -691,7 +691,7 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 	if(uTagKind != CXXTagCPPKindCLASS)
 		uTerminatorTypes |= CXXTokenTypeParenthesisChain | CXXTokenTypeAssignment;
 
-	boolean bRet;
+	bool bRet;
 
 	for(;;)
 	{
@@ -699,9 +699,9 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 
 		if(!bRet)
 		{
-			g_cxx.bParsingClassStructOrUnionDeclaration = FALSE;
+			g_cxx.bParsingClassStructOrUnionDeclaration = false;
 			CXX_DEBUG_LEAVE_TEXT("Could not parse class/struct/union name");
-			return FALSE;
+			return false;
 		}
 
 		if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSmallerThanSign))
@@ -720,18 +720,18 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 					CXXTokenTypeOpeningParenthesis | CXXTokenTypeOpeningBracket |
 						CXXTokenTypeOpeningSquareParenthesis |
 						CXXTokenTypeSmallerThanSign,
-					FALSE
+					false
 				);
 
 		if(!bRet)
 		{
-			g_cxx.bParsingClassStructOrUnionDeclaration = FALSE;
+			g_cxx.bParsingClassStructOrUnionDeclaration = false;
 			CXX_DEBUG_LEAVE_TEXT("Could not parse class/struct/union name");
-			return FALSE;
+			return false;
 		}
 	}
 
-	g_cxx.bParsingClassStructOrUnionDeclaration = FALSE;
+	g_cxx.bParsingClassStructOrUnionDeclaration = false;
 
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain))
 	{
@@ -739,7 +739,7 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 		// something like struct x * func()....
 		// do not clear statement
 		CXX_DEBUG_LEAVE_TEXT("Probably a function declaration!");
-		return TRUE;
+		return true;
 	}
 
 	// FIXME: This block is duplicated in enum
@@ -749,14 +749,14 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 		{
 			// [typedef] struct X Y; <-- typedef has been removed!
 			if(uInitialKeywordState & CXXParserKeywordStateSeenTypedef)
-				cxxParserExtractTypedef(g_cxx.pTokenChain,TRUE);
+				cxxParserExtractTypedef(g_cxx.pTokenChain,true);
 			else
 				cxxParserExtractVariableDeclarations(g_cxx.pTokenChain,0);
 		}
 
 		cxxParserNewStatement();
 		CXX_DEBUG_LEAVE();
-		return TRUE;
+		return true;
 	}
 
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeAssignment))
@@ -771,12 +771,12 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 		if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Failed to parse up to EOF/semicolon");
-			return FALSE;
+			return false;
 		}
 
 		cxxParserNewStatement();
 		CXX_DEBUG_LEAVE();
-		return TRUE;
+		return true;
 	}
 
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
@@ -784,7 +784,7 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 		// tolerate EOF, just ignore this
 		cxxParserNewStatement();
 		CXX_DEBUG_LEAVE_TEXT("EOF: ignoring");
-		return TRUE;
+		return true;
 	}
 
 	// semicolon or opening bracket
@@ -850,7 +850,7 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 		{
 			cxxTokenDestroy(pClassName);
 			CXX_DEBUG_LEAVE_TEXT("Failed to parse base class part");
-			return FALSE;
+			return false;
 		}
 
 		if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeSemicolon | CXXTokenTypeEOF))
@@ -858,7 +858,7 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 			cxxTokenDestroy(pClassName);
 			cxxParserNewStatement();
 			CXX_DEBUG_LEAVE_TEXT("Syntax error: ignoring");
-			return TRUE;
+			return true;
 		}
 
 		cxxTokenChainDestroyLast(g_cxx.pTokenChain); // remove the {
@@ -938,12 +938,12 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 
 	vString * pScopeName = cxxScopeGetFullNameAsString();
 
-	if(!cxxParserParseBlock(TRUE))
+	if(!cxxParserParseBlock(true))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse scope");
 		if(pScopeName)
 			vStringDelete(pScopeName);
-		return FALSE;
+		return false;
 	}
 
 	if(iCorkQueueIndex > CORK_NIL)
@@ -970,7 +970,7 @@ static boolean cxxParserParseClassStructOrUnionInternal(
 	return bRet;
 }
 
-boolean cxxParserParseClassStructOrUnion(
+bool cxxParserParseClassStructOrUnion(
 		enum CXXKeyword eKeyword,
 		unsigned int uTagKind,
 		unsigned int uScopeType
@@ -980,7 +980,7 @@ boolean cxxParserParseClassStructOrUnion(
 	// See the declaration of bEnablePublicProtectedPrivateKeywords for more info.
 
 	// Save the state
-	boolean bEnablePublicProtectedPrivateKeywords = g_cxx.bEnablePublicProtectedPrivateKeywords;
+	bool bEnablePublicProtectedPrivateKeywords = g_cxx.bEnablePublicProtectedPrivateKeywords;
 
 	// If parsing of the keywords was disabled, we're in C++ mode and the keyword is "class" then
 	// we're fairly certain that the source code is *really* C++.
@@ -989,12 +989,12 @@ boolean cxxParserParseClassStructOrUnion(
 			(eKeyword == CXXKeywordCLASS) &&
 			cxxParserCurrentLanguageIsCPP()
 		)
-		bEnablePublicProtectedPrivateKeywords = TRUE; // leave it on for good.
+		bEnablePublicProtectedPrivateKeywords = true; // leave it on for good.
 
 	// Enable public/protected/private keywords
-	g_cxx.bEnablePublicProtectedPrivateKeywords = TRUE;
+	g_cxx.bEnablePublicProtectedPrivateKeywords = true;
 
-	boolean bRet = cxxParserParseClassStructOrUnionInternal(eKeyword,uTagKind,uScopeType);
+	bool bRet = cxxParserParseClassStructOrUnionInternal(eKeyword,uTagKind,uScopeType);
 
 	g_cxx.bEnablePublicProtectedPrivateKeywords = bEnablePublicProtectedPrivateKeywords;
 
@@ -1159,7 +1159,7 @@ check_function_signature:
 
 // This is called when we encounter a "public", "protected" or "private" keyword
 // that is NOT in the class declaration header line.
-boolean cxxParserParseAccessSpecifier(void)
+bool cxxParserParseAccessSpecifier(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -1177,7 +1177,7 @@ boolean cxxParserParseAccessSpecifier(void)
 					"bailing out to avoid reporting broken structure",
 				eScopeType
 			);
-		return FALSE;
+		return false;
 	}
 
 	switch(g_cxx.pToken->eKeyword)
@@ -1192,7 +1192,7 @@ boolean cxxParserParseAccessSpecifier(void)
 			cxxScopeSetAccess(CXXScopeAccessProtected);
 		break;
 		default:
-			CXX_DEBUG_ASSERT(FALSE,"Bad keyword in cxxParserParseAccessSpecifier!");
+			CXX_DEBUG_ASSERT(false,"Bad keyword in cxxParserParseAccessSpecifier!");
 		break;
 	}
 
@@ -1203,15 +1203,15 @@ boolean cxxParserParseAccessSpecifier(void)
 		))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to the next ;");
-		return FALSE;
+		return false;
 	}
 
 	cxxTokenChainClear(g_cxx.pTokenChain);
 	CXX_DEBUG_LEAVE();
-	return TRUE;
+	return true;
 }
 
-boolean cxxParserParseIfForWhileSwitch(void)
+bool cxxParserParseIfForWhileSwitch(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -1221,13 +1221,13 @@ boolean cxxParserParseIfForWhileSwitch(void)
 		))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse if/for/while/switch up to parenthesis");
-		return FALSE;
+		return false;
 	}
 
 	if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeEOF | CXXTokenTypeSemicolon))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Found EOF/semicolon while parsing if/for/while/switch");
-		return TRUE;
+		return true;
 	}
 
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain))
@@ -1270,12 +1270,12 @@ boolean cxxParserParseIfForWhileSwitch(void)
 		}
 
 		CXX_DEBUG_LEAVE_TEXT("Found if/for/while/switch parenthesis chain");
-		return TRUE;
+		return true;
 	}
 
 	// must be opening bracket: parse it here.
 
-	boolean bRet = cxxParserParseBlock(TRUE);
+	bool bRet = cxxParserParseBlock(true);
 
 	CXX_DEBUG_LEAVE();
 
@@ -1297,10 +1297,10 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 	Assert(passCount < 3);
 
 	cppInit(
-			(boolean) (passCount > 1),
-			FALSE,
-			TRUE, // raw literals
-			FALSE,
+			(bool) (passCount > 1),
+			false,
+			true, // raw literals
+			false,
 			kind_for_define,
 			role_for_macro_undef,
 			kind_for_header,
@@ -1310,7 +1310,7 @@ static rescanReason cxxParserMain(const unsigned int passCount)
 
 	g_cxx.iChar = ' ';
 
-	boolean bRet = cxxParserParseBlock(FALSE);
+	bool bRet = cxxParserParseBlock(false);
 
 	cppTerminate ();
 
@@ -1366,7 +1366,7 @@ static void cxxParserFirstInit()
 
 	cxxScopeInit();
 
-	g_bFirstRun = FALSE;
+	g_bFirstRun = false;
 }
 
 void cxxCppParserInitialize(const langType language)
@@ -1379,7 +1379,7 @@ void cxxCppParserInitialize(const langType language)
 
 	g_cxx.eCPPLanguage = language;
 
-	cxxBuildKeywordHash(language,TRUE);
+	cxxBuildKeywordHash(language,true);
 }
 
 void cxxCParserInitialize(const langType language)
@@ -1392,17 +1392,17 @@ void cxxCParserInitialize(const langType language)
 
 	g_cxx.eCLanguage = language;
 
-	cxxBuildKeywordHash(language,FALSE);
+	cxxBuildKeywordHash(language,false);
 }
 
-void cxxParserCleanup (langType language CTAGS_ATTR_UNUSED, boolean initialized CTAGS_ATTR_UNUSED)
+void cxxParserCleanup (langType language CTAGS_ATTR_UNUSED, bool initialized CTAGS_ATTR_UNUSED)
 {
 	if(g_bFirstRun)
 		return; // didn't run at all
 
 	// This function is used as finalizer for both C and C++ parsers.
 	// The next line forces this function to be called only once
-	g_bFirstRun = TRUE;
+	g_bFirstRun = true;
 
 	if(g_cxx.pTokenChain)
 		cxxTokenChainDestroy(g_cxx.pTokenChain);

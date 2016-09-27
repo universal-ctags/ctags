@@ -71,7 +71,7 @@ int cxxTagGetCPPFieldSpecifierCount(void);
 fieldSpec * cxxTagGetCFieldSpecifiers(void);
 int cxxTagGetCFieldSpecifierCount(void);
 
-boolean cxxTagFieldEnabled(unsigned int uField);
+bool cxxTagFieldEnabled(unsigned int uField);
 
 kindOption * cxxTagGetCKindOptions(void);
 int cxxTagGetCKindOptionCount(void);
@@ -80,7 +80,7 @@ kindOption * cxxTagGetCPPKindOptions(void);
 int cxxTagGetCPPKindOptionCount(void);
 
 // Returns true if the specified tag kind is enabled in the current language
-boolean cxxTagKindEnabled(unsigned int uTagKind);
+bool cxxTagKindEnabled(unsigned int uTagKind);
 
 // Begin composing a tag. The tag kind must correspond to the current language.
 // Returns NULL if the tag should *not* be included in the output

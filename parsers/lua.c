@@ -28,7 +28,7 @@ typedef enum {
 } luaKind;
 
 static kindOption LuaKinds [] = {
-	{ TRUE, 'f', "function", "functions" }
+	{ true, 'f', "function", "functions" }
 };
 
 /*
@@ -43,29 +43,29 @@ static kindOption LuaKinds [] = {
  * (Lua treat first line as a comment if it starts with #!)
  *
  */
-static boolean is_a_code_line (const unsigned char *line)
+static bool is_a_code_line (const unsigned char *line)
 {
-	boolean result;
+	bool result;
 	const unsigned char *p = line;
 	while (isspace ((int) *p))
 		p++;
 	if (p [0] == '\0')
-		result = FALSE;
+		result = false;
 	else if (p [0] == '-' && p [1] == '-')
-		result = FALSE;
+		result = false;
 	else
-		result = TRUE;
+		result = true;
 	return result;
 }
 
-static boolean isLuaIdentifier (char c)
+static bool isLuaIdentifier (char c)
 {
-	return (boolean) !(isspace(c)  || c == '(' || c == ')' || c == '=');
+	return (bool) !(isspace(c)  || c == '(' || c == ')' || c == '=');
 }
 
 static void extract_next_token (const char *begin, const char *end_sentinel, vString *name)
 {
-	boolean found;
+	bool found;
 
 	if (begin == NULL || end_sentinel == NULL)
 		return;
@@ -80,12 +80,12 @@ static void extract_next_token (const char *begin, const char *end_sentinel, vSt
 			return;
 	}
 
-	found = FALSE;
+	found = false;
 	while (begin != end_sentinel && isLuaIdentifier (*begin))
 	{
 		vStringPut (name, (int) *begin);
 		begin++;
-		found = TRUE;
+		found = true;
 	}
 
 	if (found)

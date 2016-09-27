@@ -62,10 +62,10 @@ typedef struct {
 static langType Lang_asm;
 
 static kindOption AsmKinds [] = {
-	{ TRUE, 'd', "define", "defines" },
-	{ TRUE, 'l', "label",  "labels"  },
-	{ TRUE, 'm', "macro",  "macros"  },
-	{ TRUE, 't', "type",   "types (structs and records)"   }
+	{ true, 'd', "define", "defines" },
+	{ true, 'l', "label",  "labels"  },
+	{ true, 'm', "macro",  "macros"  },
+	{ true, 't', "type",   "types (structs and records)"   }
 };
 
 static const keywordTable AsmKeywords [] = {
@@ -121,20 +121,20 @@ static opKeyword analyzeOperator (const vString *const op)
 	return result;
 }
 
-static boolean isInitialSymbolCharacter (int c)
+static bool isInitialSymbolCharacter (int c)
 {
-	return (boolean) (c != '\0' && (isalpha (c) || strchr ("_$", c) != NULL));
+	return (bool) (c != '\0' && (isalpha (c) || strchr ("_$", c) != NULL));
 }
 
-static boolean isSymbolCharacter (int c)
+static bool isSymbolCharacter (int c)
 {
 	/* '?' character is allowed in AMD 29K family */
-	return (boolean) (c != '\0' && (isalnum (c) || strchr ("_$?", c) != NULL));
+	return (bool) (c != '\0' && (isalnum (c) || strchr ("_$?", c) != NULL));
 }
 
-static boolean readPreProc (const unsigned char *const line)
+static bool readPreProc (const unsigned char *const line)
 {
-	boolean result;
+	bool result;
 	const unsigned char *cp = line;
 	vString *name = vStringNew ();
 	while (isSymbolCharacter ((int) *cp))
@@ -143,7 +143,7 @@ static boolean readPreProc (const unsigned char *const line)
 		++cp;
 	}
 	vStringTerminate (name);
-	result = (boolean) (strcmp (vStringValue (name), "define") == 0);
+	result = (bool) (strcmp (vStringValue (name), "define") == 0);
 	if (result)
 	{
 		while (isspace ((int) *cp))
@@ -163,11 +163,11 @@ static boolean readPreProc (const unsigned char *const line)
 
 static AsmKind operatorKind (
 		const vString *const operator,
-		boolean *const found)
+		bool *const found)
 {
 	AsmKind result = K_NONE;
 	const opKeyword kw = analyzeOperator (operator);
-	*found = (boolean) (kw != OP_UNDEFINED);
+	*found = (bool) (kw != OP_UNDEFINED);
 	if (*found)
 	{
 		result = OpKinds [kw].kind;
@@ -178,12 +178,12 @@ static AsmKind operatorKind (
 
 /*  We must check for "DB", "DB.L", "DCB.W" (68000)
  */
-static boolean isDefineOperator (const vString *const operator)
+static bool isDefineOperator (const vString *const operator)
 {
 	const unsigned char *const op =
 		(unsigned char*) vStringValue (operator); 
 	const size_t length = vStringLength (operator);
-	const boolean result = (boolean) (length > 0  &&
+	const bool result = (bool) (length > 0  &&
 		toupper ((int) *op) == 'D'  &&
 		(length == 2 ||
 		 (length == 4  &&  (int) op [2] == '.') ||
@@ -194,12 +194,12 @@ static boolean isDefineOperator (const vString *const operator)
 static void makeAsmTag (
 		const vString *const name,
 		const vString *const operator,
-		const boolean labelCandidate,
-		const boolean nameFollows)
+		const bool labelCandidate,
+		const bool nameFollows)
 {
 	if (vStringLength (name) > 0)
 	{
-		boolean found;
+		bool found;
 		const AsmKind kind = operatorKind (operator, &found);
 		if (found)
 		{
@@ -258,20 +258,20 @@ static void findAsmTags (void)
 	vString *name = vStringNew ();
 	vString *operator = vStringNew ();
 	const unsigned char *line;
-	boolean inCComment = FALSE;
+	bool inCComment = false;
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char *cp = line;
-		boolean labelCandidate = (boolean) (! isspace ((int) *cp));
-		boolean nameFollows = FALSE;
-		const boolean isComment = (boolean)
+		bool labelCandidate = (bool) (! isspace ((int) *cp));
+		bool nameFollows = false;
+		const bool isComment = (bool)
 				(*cp != '\0' && strchr (";*@", *cp) != NULL);
 
 		/* skip comments */
 		if (strncmp ((const char*) cp, "/*", (size_t) 2) == 0)
 		{
-			inCComment = TRUE;
+			inCComment = true;
 			cp += 2;
 		}
 		if (inCComment)
@@ -280,7 +280,7 @@ static void findAsmTags (void)
 			{
 				if (strncmp ((const char*) cp, "*/", (size_t) 2) == 0)
 				{
-					inCComment = FALSE;
+					inCComment = false;
 					cp += 2;
 					break;
 				}
@@ -306,7 +306,7 @@ static void findAsmTags (void)
 		cp = readSymbol (cp, name);
 		if (vStringLength (name) > 0  &&  *cp == ':')
 		{
-			labelCandidate = TRUE;
+			labelCandidate = true;
 			++cp;
 		}
 
@@ -331,7 +331,7 @@ static void findAsmTags (void)
 			while (isspace ((int) *cp))
 				++cp;
 			cp = readSymbol (cp, name);
-			nameFollows = TRUE;
+			nameFollows = true;
 		}
 		makeAsmTag (name, operator, labelCandidate, nameFollows);
 	}

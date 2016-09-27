@@ -26,11 +26,11 @@ typedef enum {
 } gladeHandleRoler;
 
 static roleDesc GladeClassRoles [] = {
-	{ TRUE, "widget", "specifed as a widget constructor" },
+	{ true, "widget", "specifed as a widget constructor" },
 };
 
 static roleDesc GladeHandlerRoles [] = {
-	{ TRUE, "handler", "specifed as a callback for signal emission" },
+	{ true, "handler", "specifed as a callback for signal emission" },
 };
 
 typedef enum {
@@ -38,13 +38,13 @@ typedef enum {
 } gladeKind;
 
 static kindOption GladeKinds [] = {
-	{ TRUE,  'i', "id",	  "identifiers" },
+	{ true,  'i', "id",	  "identifiers" },
 
 	/* These two are appeared on names in C source code. */
-	{ TRUE,  'c', "class",	  "classes",
-	  .referenceOnly = TRUE, ATTACH_ROLES (GladeClassRoles) },
-	{ TRUE,  'h', "handler",  "handlers",
-	  .referenceOnly = TRUE, ATTACH_ROLES (GladeHandlerRoles) },
+	{ true,  'c', "class",	  "classes",
+	  .referenceOnly = true, ATTACH_ROLES (GladeClassRoles) },
+	{ true,  'h', "handler",  "handlers",
+	  .referenceOnly = true, ATTACH_ROLES (GladeHandlerRoles) },
 };
 
 static tagXpathTable gladeXpathMainTable[] = {

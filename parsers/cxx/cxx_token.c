@@ -59,7 +59,7 @@ CXXToken * cxxTokenCreate(void)
 		t->pszWord = vStringNew();
 	}
 
-	t->bFollowedBySpace = FALSE;
+	t->bFollowedBySpace = false;
 
 	t->pChain = NULL;
 	t->pNext = NULL;
@@ -118,7 +118,7 @@ CXXToken * cxxTokenCreateKeyword(int iLineNumber,MIOPos oFilePosition,enum CXXKe
 	pToken->oFilePosition = oFilePosition;
 	pToken->eType = CXXTokenTypeKeyword;
 	pToken->eKeyword = eKeyword;
-	pToken->bFollowedBySpace = TRUE;
+	pToken->bFollowedBySpace = true;
 	vStringCatS(pToken->pszWord,cxxKeywordName(eKeyword));
 
 	return pToken;
@@ -131,7 +131,7 @@ CXXToken * cxxTokenCreateAnonymousIdentifier(unsigned int uTagKind)
 
 	anonGenerate (t->pszWord, "__anon", uTagKind);
 	t->eType = CXXTokenTypeIdentifier;
-	t->bFollowedBySpace = TRUE;
+	t->bFollowedBySpace = true;
 	t->iLineNumber = getInputLineNumber();
 	t->oFilePosition = getInputFilePosition();
 

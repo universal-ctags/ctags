@@ -89,7 +89,7 @@
 # ifdef S_IFLNK
 #  define S_ISLNK(mode)		(((mode) & S_IFMT) == S_IFLNK)
 # else
-#  define S_ISLNK(mode)		FALSE  /* assume no soft links */
+#  define S_ISLNK(mode)		false  /* assume no soft links */
 # endif
 #endif
 
@@ -97,7 +97,7 @@
 # ifdef S_IFDIR
 #  define S_ISDIR(mode)		(((mode) & S_IFMT) == S_IFDIR)
 # else
-#  define S_ISDIR(mode)		FALSE  /* assume no soft links */
+#  define S_ISDIR(mode)		false  /* assume no soft links */
 # endif
 #endif
 
@@ -364,7 +364,7 @@ extern char* newUpperString (const char* str)
  * The conversion result is placed in value and must only be used if the
  * function returned true.
  */
-extern boolean strToULong(const char *const str, int base, unsigned long *value)
+extern bool strToULong(const char *const str, int base, unsigned long *value)
 {
 	char *endptr;
 
@@ -378,7 +378,7 @@ extern boolean strToULong(const char *const str, int base, unsigned long *value)
  * The conversion result is placed in value and must only be used if the
  * function returned true.
  */
-extern boolean strToLong(const char *const str, int base, long *value)
+extern bool strToLong(const char *const str, int base, long *value)
 {
 	char *endptr;
 
@@ -387,26 +387,26 @@ extern boolean strToLong(const char *const str, int base, long *value)
 	return *endptr == '\0' && str != endptr && errno == 0;
 }
 
-extern boolean strToUInt(const char *const str, int base, unsigned int *value)
+extern bool strToUInt(const char *const str, int base, unsigned int *value)
 {
 	unsigned long ulong_value;
 
 	if(!strToULong(str, base, &ulong_value) || ulong_value > UINT_MAX)
-		return FALSE;
+		return false;
 
 	*value = (unsigned int) ulong_value;
-	return TRUE;
+	return true;
 }
 
-extern boolean strToInt(const char *const str, int base, int *value)
+extern bool strToInt(const char *const str, int base, int *value)
 {
 	long long_value;
 
 	if(!strToLong(str, base, &long_value) || long_value > INT_MAX || long_value < INT_MIN)
-		return FALSE;
+		return false;
 
 	*value = (int) long_value;
-	return TRUE;
+	return true;
 }
 
 /*
@@ -439,21 +439,21 @@ extern fileStatus *eStat (const char *const fileName)
 		eStatFree (&file);
 		file.name = eStrdup (fileName);
 		if (lstat (file.name, &status) != 0)
-			file.exists = FALSE;
+			file.exists = false;
 		else
 		{
-			file.isSymbolicLink = (boolean) S_ISLNK (status.st_mode);
+			file.isSymbolicLink = (bool) S_ISLNK (status.st_mode);
 			if (file.isSymbolicLink  &&  stat (file.name, &status) != 0)
-				file.exists = FALSE;
+				file.exists = false;
 			else
 			{
-				file.exists = TRUE;
-				file.isDirectory = (boolean) S_ISDIR (status.st_mode);
-				file.isNormalFile = (boolean) (S_ISREG (status.st_mode));
-				file.isExecutable = (boolean) ((status.st_mode &
+				file.exists = true;
+				file.isDirectory = (bool) S_ISDIR (status.st_mode);
+				file.isNormalFile = (bool) (S_ISREG (status.st_mode));
+				file.isExecutable = (bool) ((status.st_mode &
 					(S_IXUSR | S_IXGRP | S_IXOTH)) != 0);
-				file.isSetuid = (boolean) ((status.st_mode & S_ISUID) != 0);
-				file.isSetgid = (boolean) ((status.st_mode & S_ISGID) != 0);
+				file.isSetuid = (bool) ((status.st_mode & S_ISUID) != 0);
+				file.isSetgid = (bool) ((status.st_mode & S_ISGID) != 0);
 				file.size = status.st_size;
 			}
 		}
@@ -470,21 +470,21 @@ extern void eStatFree (fileStatus *status)
 	}
 }
 
-extern boolean doesFileExist (const char *const fileName)
+extern bool doesFileExist (const char *const fileName)
 {
 	fileStatus *status = eStat (fileName);
 	return status->exists;
 }
 
-extern boolean doesExecutableExist (const char *const fileName)
+extern bool doesExecutableExist (const char *const fileName)
 {
 	fileStatus *status = eStat (fileName);
 	return status->exists && status->isExecutable;
 }
 
-extern boolean isRecursiveLink (const char* const dirName)
+extern bool isRecursiveLink (const char* const dirName)
 {
-	boolean result = FALSE;
+	bool result = false;
 	fileStatus *status = eStat (dirName);
 	if (status->isSymbolicLink)
 	{
@@ -511,13 +511,13 @@ extern boolean isRecursiveLink (const char* const dirName)
  *  Pathname manipulation (O/S dependent!!!)
  */
 
-static boolean isPathSeparator (const int c)
+static bool isPathSeparator (const int c)
 {
-	boolean result;
+	bool result;
 #if defined (MSDOS_STYLE_PATH)
-	result = (boolean) (strchr (PathDelimiters, c) != NULL);
+	result = (bool) (strchr (PathDelimiters, c) != NULL);
 #else
-	result = (boolean) (c == PATH_SEPARATOR);
+	result = (bool) (c == PATH_SEPARATOR);
 #endif
 	return result;
 }
@@ -536,14 +536,14 @@ static void canonicalizePath (char *const path CTAGS_ATTR_UNUSED)
 
 #endif
 
-extern boolean isSameFile (const char *const name1, const char *const name2)
+extern bool isSameFile (const char *const name1, const char *const name2)
 {
-	boolean result = FALSE;
+	bool result = false;
 #if defined (HAVE_STAT_ST_INO)
 	struct stat stat1, stat2;
 
 	if (stat (name1, &stat1) == 0  &&  stat (name2, &stat2) == 0)
-		result = (boolean) (stat1.st_ino == stat2.st_ino);
+		result = (bool) (stat1.st_ino == stat2.st_ino);
 #else
 	{
 		char *const n1 = absoluteFilename (name1);
@@ -551,9 +551,9 @@ extern boolean isSameFile (const char *const name1, const char *const name2)
 		canonicalizePath (n1);
 		canonicalizePath (n2);
 # if defined (CASE_INSENSITIVE_FILENAMES)
-		result = (boolean) (strcasecmp (n1, n2) == 0);
+		result = (bool) (strcasecmp (n1, n2) == 0);
 # else
-		result = (boolean) (strcmp (n1, n2) == 0);
+		result = (bool) (strcmp (n1, n2) == 0);
 # endif
 		free (n1);
 		free (n2);
@@ -638,16 +638,16 @@ extern char* baseFilenameSansExtensionNew (const char *const fileName,
 		return NULL;
 }
 
-extern boolean isAbsolutePath (const char *const path)
+extern bool isAbsolutePath (const char *const path)
 {
-	boolean result = FALSE;
+	bool result = false;
 #if defined (MSDOS_STYLE_PATH)
 	if (isPathSeparator (path [0]))
-		result = TRUE;
+		result = true;
 	else if (isalpha (path [0])  &&  path [1] == ':')
 	{
 		if (isPathSeparator (path [2]))
-			result = TRUE;
+			result = true;
 		else
 			/*  We don't support non-absolute file names with a drive
 			 *  letter, like `d:NAME' (it's too much hassle).
@@ -667,7 +667,7 @@ extern char *combinePathAndFile (
 {
 	vString *const filePath = vStringNew ();
 	const int lastChar = path [strlen (path) - 1];
-	boolean terminated = isPathSeparator (lastChar);
+	bool terminated = isPathSeparator (lastChar);
 
 	vStringCopyS (filePath, path);
 	if (! terminated)

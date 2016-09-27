@@ -41,13 +41,13 @@ typedef enum {
  *   DATA DEFINITIONS
  */
 static kindOption SmlKinds[] = {
-	{ TRUE, 'e', "exception", "exception declarations" },
-	{ TRUE, 'f', "function",  "function definitions" },
-	{ TRUE, 'c', "functor",   "functor definitions" },
-	{ TRUE, 's', "signature", "signature declarations" },
-	{ TRUE, 'r', "structure", "structure declarations" },
-	{ TRUE, 't', "type",      "type definitions" },
-	{ TRUE, 'v', "value",     "value bindings" }
+	{ true, 'e', "exception", "exception declarations" },
+	{ true, 'f', "function",  "function definitions" },
+	{ true, 'c', "functor",   "functor definitions" },
+	{ true, 's', "signature", "signature declarations" },
+	{ true, 'r', "structure", "structure declarations" },
+	{ true, 't', "type",      "type definitions" },
+	{ true, 'v', "value",     "value bindings" }
 };
 
 static struct {
@@ -91,39 +91,39 @@ static const unsigned char *skipSpace (const unsigned char *cp)
 	return cp;
 }
 
-static boolean isIdentifier (int c)
+static bool isIdentifier (int c)
 {
-	boolean result = FALSE;
+	bool result = false;
 	/* Consider '_' as an delimiter to aid user in tracking it's usage. */
 	const char *const alternateIdentifiers = "!%&$#+-<>=/?@\\~'^|*_";
 	if (isalnum (c))
-		result = TRUE;
+		result = true;
 	else if (c != '\0'  &&  strchr (alternateIdentifiers, c) != NULL)
-		result = TRUE;
+		result = true;
 	return result;
 }
 
 static const unsigned char *parseIdentifier (
 		const unsigned char *cp, vString *const identifier)
 {
-	boolean stringLit = FALSE;
+	bool stringLit = false;
 	vStringClear (identifier);
 	while (*cp != '\0'  &&  (!isIdentifier ((int) *cp) || stringLit))
 	{
 		int oneback = *cp;
 		cp++;
-		if (oneback == '('  &&  *cp == '*'  &&  stringLit == FALSE)
+		if (oneback == '('  &&  *cp == '*'  &&  stringLit == false)
 		{
 			CommentLevel++;
 			return ++cp;
 		}
 		if (*cp == '"' && oneback != '\\')
 		{
-			stringLit = TRUE;
+			stringLit = true;
 			continue;
 		}
 		if (stringLit && *cp == '"' && oneback != '\\')
-			stringLit = FALSE;
+			stringLit = false;
 	}
 	if (strcmp ((const char *) cp, "") == 0 || cp == NULL)
 		return cp;

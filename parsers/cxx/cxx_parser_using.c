@@ -19,7 +19,7 @@
 #include "vstring.h"
 #include "read.h"
 
-boolean cxxParserParseUsingClause(void)
+bool cxxParserParseUsingClause(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -41,13 +41,13 @@ boolean cxxParserParseUsingClause(void)
 		))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to the next ;");
-		return FALSE;
+		return false;
 	}
 
 	if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSemicolon))
 	{
 		CXX_DEBUG_LEAVE_TEXT("This is a syntax error but we tolerate it");
-		return TRUE;
+		return true;
 	}
 
 	cxxTokenChainDestroyLast(g_cxx.pTokenChain);
@@ -55,7 +55,7 @@ boolean cxxParserParseUsingClause(void)
 	if(g_cxx.pTokenChain->iCount < 1)
 	{
 		CXX_DEBUG_LEAVE_TEXT("This is a syntax error but we tolerate it");
-		return TRUE;
+		return true;
 	}
 
 	CXXToken * pAssignment = cxxTokenChainFirstTokenOfType(
@@ -87,7 +87,7 @@ boolean cxxParserParseUsingClause(void)
 			// in typedefs it's at the end
 			cxxTokenChainAppend(g_cxx.pTokenChain,pFirst);
 
-			cxxParserExtractTypedef(g_cxx.pTokenChain,FALSE);
+			cxxParserExtractTypedef(g_cxx.pTokenChain,false);
 		}
 	} else {
 		CXX_DEBUG_ASSERT(
@@ -97,13 +97,13 @@ boolean cxxParserParseUsingClause(void)
 
 		CXXToken * t = cxxTokenChainFirst(g_cxx.pTokenChain);
 
-		boolean bUsingNamespace = FALSE;
+		bool bUsingNamespace = false;
 
 		if(cxxTokenTypeIs(t,CXXTokenTypeKeyword))
 		{
 			if(t->eKeyword == CXXKeywordNAMESPACE)
 			{
-				bUsingNamespace = TRUE;
+				bUsingNamespace = true;
 				cxxTokenChainDestroyFirst(g_cxx.pTokenChain);
 			} else if(t->eKeyword == CXXKeywordTYPENAME)
 			{
@@ -154,5 +154,5 @@ boolean cxxParserParseUsingClause(void)
 	}
 
 	CXX_DEBUG_LEAVE();
-	return TRUE;
+	return true;
 }

@@ -35,7 +35,7 @@
 #include "read.h"
 #include "routines.h"
 
-static boolean regexAvailable = FALSE;
+static bool regexAvailable = false;
 static unsigned long currentScope = CORK_NIL;
 
 /*
@@ -70,8 +70,8 @@ enum scopeAction {
 typedef struct {
 	regex_t *pattern;
 	enum pType type;
-	boolean exclusive;
-	boolean accept_empty_name;
+	bool exclusive;
+	bool accept_empty_name;
 	union {
 		struct {
 			char *name_pattern;
@@ -83,7 +83,7 @@ typedef struct {
 		} callback;
 	} u;
 	unsigned int scopeActions;
-	boolean *disabled;
+	bool *disabled;
 } regexPattern;
 
 
@@ -171,7 +171,7 @@ static char* scanSeparators (char* name)
 {
 	char sep = name [0];
 	char *copyto = name;
-	boolean quoted = FALSE;
+	bool quoted = false;
 
 	for (++name ; *name != '\0' ; ++name)
 	{
@@ -187,10 +187,10 @@ static char* scanSeparators (char* name)
 				*copyto++ = '\\';
 				*copyto++ = *name;
 			}
-			quoted = FALSE;
+			quoted = false;
 		}
 		else if (*name == '\\')
-			quoted = TRUE;
+			quoted = true;
 		else if (*name == sep)
 		{
 			break;
@@ -211,11 +211,11 @@ static char* scanSeparators (char* name)
  * to the trailing flags is written to `flags'. If the pattern is not in the
  * correct format, a false value is returned.
  */
-static boolean parseTagRegex (
+static bool parseTagRegex (
 		char* const regexp, char** const name,
 		char** const kinds, char** const flags)
 {
-	boolean result = FALSE;
+	bool result = false;
 	const int separator = (unsigned char) regexp [0];
 
 	*name = scanSeparators (regexp);
@@ -244,7 +244,7 @@ static boolean parseTagRegex (
 				*flags = third;
 				*kinds = NULL;
 			}
-			result = TRUE;
+			result = true;
 		}
 	}
 	return result;
@@ -253,8 +253,8 @@ static boolean parseTagRegex (
 
 static void pre_ptrn_flag_exclusive_short (char c CTAGS_ATTR_UNUSED, void* data)
 {
-	boolean *exclusive = data;
-	*exclusive = TRUE;
+	bool *exclusive = data;
+	*exclusive = true;
 }
 
 static void pre_ptrn_flag_exclusive_long (const char* const s CTAGS_ATTR_UNUSED, const char* const unused CTAGS_ATTR_UNUSED, void* data)
@@ -306,8 +306,8 @@ static kindOption *kindNew ()
 	kind->letter        = '\0';
 	kind->name = NULL;
 	kind->description = NULL;
-	kind->enabled = FALSE;
-	kind->referenceOnly = FALSE;
+	kind->enabled = false;
+	kind->referenceOnly = false;
 	kind->nRoles = 0;
 	kind->roles = NULL;
 	return kind;
@@ -374,8 +374,8 @@ static regexPattern* addCompiledTagCommon (const langType language,
 	ptrn = &set->patterns [set->count];
 	memset (ptrn, 0, sizeof (*ptrn));
 	ptrn->pattern = pattern;
-	ptrn->exclusive = FALSE;
-	ptrn->accept_empty_name = FALSE;
+	ptrn->exclusive = false;
+	ptrn->accept_empty_name = false;
 	if (kind_letter)
 		ptrn->u.tag.kind = kind;
 	set->count += 1;
@@ -386,10 +386,10 @@ static regexPattern* addCompiledTagCommon (const langType language,
 static regexPattern *addCompiledTagPattern (const langType language, regex_t* const pattern,
 					    const char* const name, char kind, const char* kindName,
 					    char *const description, const char* flags,
-					    boolean *disabled)
+					    bool *disabled)
 {
 	regexPattern * ptrn;
-	boolean exclusive = FALSE;
+	bool exclusive = false;
 	unsigned long scopeActions = 0UL;
 
 	flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &exclusive);
@@ -409,7 +409,7 @@ static regexPattern *addCompiledTagPattern (const langType language, regex_t* co
 	{
 		/* This is a newly registered kind. */
 		ptrn->u.tag.kind->letter  = kind;
-		ptrn->u.tag.kind->enabled = TRUE;
+		ptrn->u.tag.kind->enabled = true;
 		ptrn->u.tag.kind->name    = kindName? eStrdup (kindName): NULL;
 		ptrn->u.tag.kind->description = description? eStrdup (description): NULL;
 	}
@@ -427,11 +427,11 @@ static regexPattern *addCompiledTagPattern (const langType language, regex_t* co
 
 static void addCompiledCallbackPattern (const langType language, regex_t* const pattern,
 					const regexCallback callback, const char* flags,
-					boolean *disabled,
+					bool *disabled,
 					void *userData)
 {
 	regexPattern * ptrn;
-	boolean exclusive = FALSE;
+	bool exclusive = false;
 	flagsEval (flags, prePtrnFlagDef, ARRAY_SIZE(prePtrnFlagDef), &exclusive);
 	ptrn  = addCompiledTagCommon(language, pattern, '\0');
 	ptrn->type    = PTRN_CALLBACK;
@@ -612,7 +612,7 @@ static void matchTagPattern (const vString* const line,
 {
 	vString *const name = substitute (vStringValue (line),
 			patbuf->u.tag.name_pattern, BACK_REFERENCE_COUNT, pmatch);
-	boolean placeholder = !!((patbuf->scopeActions & SCOPE_PLACEHOLDER) == SCOPE_PLACEHOLDER);
+	bool placeholder = !!((patbuf->scopeActions & SCOPE_PLACEHOLDER) == SCOPE_PLACEHOLDER);
 	unsigned long scope = CORK_NIL;
 	int n;
 
@@ -636,9 +636,9 @@ static void matchTagPattern (const vString* const line,
 		currentScope = entry? entry->extensionFields.scopeIndex: CORK_NIL;
 	}
 
-	if (vStringLength (name) == 0 && (placeholder == FALSE))
+	if (vStringLength (name) == 0 && (placeholder == false))
 	{
-		if (patbuf->accept_empty_name == FALSE)
+		if (patbuf->accept_empty_name == false)
 			error (WARNING, "%s:%ld: null expansion of name pattern \"%s\"",
 			       getInputFileName (), getInputLineNumber (),
 			       patbuf->u.tag.name_pattern);
@@ -675,21 +675,21 @@ static void matchCallbackPattern (
 				     patbuf->u.callback.userData);
 }
 
-static boolean matchRegexPattern (const vString* const line,
+static bool matchRegexPattern (const vString* const line,
 				  const regexPattern* const patbuf)
 {
-	boolean result = FALSE;
+	bool result = false;
 	regmatch_t pmatch [BACK_REFERENCE_COUNT];
 	int match;
 
 	if (patbuf->disabled && *(patbuf->disabled))
-		return FALSE;
+		return false;
 
 	match = regexec (patbuf->pattern, vStringValue (line),
 			 BACK_REFERENCE_COUNT, pmatch, 0);
 	if (match == 0)
 	{
-		result = TRUE;
+		result = true;
 		if (patbuf->type == PTRN_TAG)
 			matchTagPattern (line, patbuf, pmatch);
 		else if (patbuf->type == PTRN_CALLBACK)
@@ -697,7 +697,7 @@ static boolean matchRegexPattern (const vString* const line,
 		else
 		{
 			Assert ("invalid pattern type" == NULL);
-			result = FALSE;
+			result = false;
 		}
 	}
 	return result;
@@ -709,9 +709,9 @@ static boolean matchRegexPattern (const vString* const line,
 /* Match against all patterns for specified language. Returns true if at least
  * on pattern matched.
  */
-extern boolean matchRegex (const vString* const line, const langType language)
+extern bool matchRegex (const vString* const line, const langType language)
 {
-	boolean result = FALSE;
+	bool result = false;
 	if (language != LANG_IGNORE  &&  language <= SetUpper  &&
 		Sets [language].count > 0)
 	{
@@ -722,7 +722,7 @@ extern boolean matchRegex (const vString* const line, const langType language)
 			regexPattern* ptrn = set->patterns + i;
 			if (matchRegexPattern (line, ptrn))
 			{
-				result = TRUE;
+				result = true;
 				if (ptrn->exclusive)
 					break;
 			}
@@ -749,15 +749,15 @@ extern void findRegexTags (void)
 	findRegexTagsMainloop (fileReadLineDriver);
 }
 
-extern boolean hasScopeActionInRegex (const langType language)
+extern bool hasScopeActionInRegex (const langType language)
 {
-	boolean r = FALSE;
+	bool r = false;
 	unsigned int i;
 
 	if (language <= SetUpper  &&  Sets [language].count > 0)
 		for (i = 0; i < Sets [language].count; i++)
 			if (Sets[language].patterns[i].scopeActions)
-				r= TRUE;
+				r= true;
 
 	return r;
 }
@@ -767,7 +767,7 @@ static regexPattern *addTagRegexInternal (const langType language,
 					  const char* const name,
 					  const char* const kinds,
 					  const char* const flags,
-					  boolean *disabled)
+					  bool *disabled)
 {
 	regexPattern *rptr = NULL;
 	Assert (regex != NULL);
@@ -802,7 +802,7 @@ static regexPattern *addTagRegexInternal (const langType language,
 	if (*name == '\0')
 	{
 		if (rptr->exclusive || rptr->scopeActions & SCOPE_PLACEHOLDER)
-			rptr->accept_empty_name = TRUE;
+			rptr->accept_empty_name = true;
 		else
 			error (WARNING, "%s: regexp missing name pattern", regex);
 	}
@@ -815,7 +815,7 @@ extern void addTagRegex (const langType language CTAGS_ATTR_UNUSED,
 			 const char* const name CTAGS_ATTR_UNUSED,
 			 const char* const kinds CTAGS_ATTR_UNUSED,
 			 const char* const flags CTAGS_ATTR_UNUSED,
-			 boolean *disabled)
+			 bool *disabled)
 {
 	addTagRegexInternal (language, regex, name, kinds, flags, disabled);
 }
@@ -824,7 +824,7 @@ extern void addCallbackRegex (const langType language CTAGS_ATTR_UNUSED,
 			      const char* const regex CTAGS_ATTR_UNUSED,
 			      const char* const flags CTAGS_ATTR_UNUSED,
 			      const regexCallback callback CTAGS_ATTR_UNUSED,
-			      boolean *disabled,
+			      bool *disabled,
 			      void * userData)
 {
 	Assert (regex != NULL);
@@ -857,24 +857,24 @@ extern void addLanguageRegex (
 *   Regex option parsing
 */
 
-extern boolean processRegexOption (const char *const option,
+extern bool processRegexOption (const char *const option,
 				   const char *const parameter CTAGS_ATTR_UNUSED)
 {
 	langType language;
 
 	language = getLanguageComponentInOption (option, "regex-");
 	if (language == LANG_IGNORE)
-		return FALSE;
+		return false;
 
 	processLanguageRegex (language, parameter);
 
-	return TRUE;
+	return true;
 }
 
 struct kindCbHelperData {
-	boolean (*func) (kindOption *, void *);
+	bool (*func) (kindOption *, void *);
 	void *func_data;
-	boolean result;
+	bool result;
 };
 
 static void kindCbHelper (void *key, void *value, void* user_data)
@@ -889,7 +889,7 @@ static void kindCbHelper (void *key, void *value, void* user_data)
 }
 
 extern void foreachRegexKinds (const langType language,
-			       boolean (*func) (kindOption *, void *),
+			       bool (*func) (kindOption *, void *),
 			       void *data)
 {
 	initializeParser (language);
@@ -900,20 +900,20 @@ extern void foreachRegexKinds (const langType language,
 		struct kindCbHelperData helper_data = {
 			.func = func,
 			.func_data = data,
-			.result = FALSE,
+			.result = false,
 		};
 		hashTableForeachItem (kinds, kindCbHelper, &helper_data);
 	}
 }
 
 
-static boolean kind_reset_cb (kindOption *kind, void *data)
+static bool kind_reset_cb (kindOption *kind, void *data)
 {
-	kind->enabled = *(boolean *)data;
-	return FALSE;		/* continue */
+	kind->enabled = *(bool *)data;
+	return false;		/* continue */
 }
 
-extern void resetRegexKinds (const langType language, boolean mode)
+extern void resetRegexKinds (const langType language, bool mode)
 {
 	foreachRegexKinds (language, kind_reset_cb, &mode);
 }
@@ -922,11 +922,11 @@ struct kind_and_mode_and_result
 {
 	int kind;
 	const char *kindLong;
-	boolean mode;
-	boolean result;
+	bool mode;
+	bool result;
 };
 
-static boolean enable_kind_cb (kindOption *kind, void *data)
+static bool enable_kind_cb (kindOption *kind, void *data)
 {
 	struct kind_and_mode_and_result *kmr = data;
 	if ((kmr->kind != KIND_NULL
@@ -935,34 +935,34 @@ static boolean enable_kind_cb (kindOption *kind, void *data)
 		&& (strcmp (kmr->kindLong, kind->name) == 0)))
 	{
 		kind->enabled = kmr->mode;
-		kmr->result = TRUE;
+		kmr->result = true;
 	}
 	/* continue:
 	   There can be more than one patterns which represents this kind. */
-	return FALSE;
+	return false;
 }
 
-extern boolean enableRegexKind (const langType language, const int kind, const boolean mode)
+extern bool enableRegexKind (const langType language, const int kind, const bool mode)
 {
 	struct kind_and_mode_and_result kmr;
 
 	kmr.kind = kind;
 	kmr.kindLong = NULL;
 	kmr.mode = mode;
-	kmr.result = FALSE;
+	kmr.result = false;
 
 	foreachRegexKinds (language, enable_kind_cb, &kmr);
 	return kmr.result;
 }
 
-extern boolean enableRegexKindLong (const langType language, const char *kindLong, const boolean mode)
+extern bool enableRegexKindLong (const langType language, const char *kindLong, const bool mode)
 {
 	struct kind_and_mode_and_result kmr;
 
 	kmr.kind = KIND_NULL;
 	kmr.kindLong = kindLong;
 	kmr.mode = mode;
-	kmr.result = FALSE;
+	kmr.result = false;
 
 	foreachRegexKinds (language, enable_kind_cb, &kmr);
 	return kmr.result;
@@ -971,55 +971,55 @@ extern boolean enableRegexKindLong (const langType language, const char *kindLon
 struct kind_and_result
 {
 	int kind;
-	boolean result;
+	bool result;
 };
 
-static boolean is_kind_enabled_cb (kindOption *kind, void *data)
+static bool is_kind_enabled_cb (kindOption *kind, void *data)
 {
-	boolean r = FALSE;
+	bool r = false;
 	struct kind_and_result *kr = data;
 
 	if (kind->letter == kr->kind)
 	{
 		kr->result = kind->enabled;
-		r = TRUE;
+		r = true;
 	}
 
 	return r;
 }
 
-static boolean does_kind_exist_cb (kindOption *kind, void *data)
+static bool does_kind_exist_cb (kindOption *kind, void *data)
 {
-	boolean r = FALSE;
+	bool r = false;
 	struct kind_and_result *kr = data;
 
 	if (kind->letter == kr->kind)
 	{
-		kr->result = TRUE;
-		r = TRUE;
+		kr->result = true;
+		r = true;
 	}
 
 	return r;
 }
 
-extern boolean isRegexKindEnabled (const langType language, const int kind)
+extern bool isRegexKindEnabled (const langType language, const int kind)
 {
 	struct kind_and_result d;
 
 	d.kind = kind;
-	d.result = FALSE;
+	d.result = false;
 
 	foreachRegexKinds (language, is_kind_enabled_cb, &d);
 
 	return d.result;
 }
 
-extern boolean hasRegexKind (const langType language, const int kind)
+extern bool hasRegexKind (const langType language, const int kind)
 {
 	struct kind_and_result d;
 
 	d.kind = kind;
-	d.result = FALSE;
+	d.result = false;
 
 	foreachRegexKinds (language, does_kind_exist_cb, &d);
 
@@ -1028,12 +1028,12 @@ extern boolean hasRegexKind (const langType language, const int kind)
 
 struct printRegexKindCBData{
 	const char* const langName;
-	boolean allKindFields;
-	boolean indent;
-	boolean tabSeparated;
+	bool allKindFields;
+	bool indent;
+	bool tabSeparated;
 };
 
-static boolean printRegexKind (kindOption *kind, void *user_data)
+static bool printRegexKind (kindOption *kind, void *user_data)
 {
 	struct printRegexKindCBData *data = user_data;
 	if (kind->letter != KIND_GHOST)
@@ -1043,13 +1043,13 @@ static boolean printRegexKind (kindOption *kind, void *user_data)
 		printKind (kind, data->allKindFields, data->indent,
 			   data->tabSeparated);
 	}
-	return FALSE;
+	return false;
 }
 
 extern void printRegexKinds (const langType language,
-			     boolean allKindFields,
-			     boolean indent,
-			     boolean tabSeparated)
+			     bool allKindFields,
+			     bool indent,
+			     bool tabSeparated)
 {
 	const char* const langName = getLanguageName (language);
 	struct printRegexKindCBData data = {
@@ -1079,8 +1079,8 @@ extern void freeRegexResources (void)
 	SetUpper = -1;
 }
 
-/* Return TRUE if available. */
-extern boolean checkRegex (void)
+/* Return true if available. */
+extern bool checkRegex (void)
 {
 #if defined (CHECK_REGCOMP)
 	{
@@ -1090,11 +1090,11 @@ extern boolean checkRegex (void)
 		if (regcomp (&patbuf, "/hello/", 0) != 0)
 			error (WARNING, "Disabling broken regex");
 		else
-			regexAvailable = TRUE;
+			regexAvailable = true;
 	}
 #else
 	/* We are using bundled regex engine. */
-	regexAvailable = TRUE;
+	regexAvailable = true;
 #endif
 	return regexAvailable;
 }

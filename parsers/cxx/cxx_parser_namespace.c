@@ -26,7 +26,7 @@
 #define MAX_NESTED_NAMESPACES 8
 
 
-boolean cxxParserParseNamespace(void)
+bool cxxParserParseNamespace(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -73,7 +73,7 @@ boolean cxxParserParseNamespace(void)
 	{
 		// syntax error, but we tolerate this
 		CXX_DEBUG_LEAVE_TEXT("Implicit EOF in cxxParserParseNextToken");
-		return TRUE; // EOF
+		return true; // EOF
 	}
 
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeIdentifier))
@@ -89,7 +89,7 @@ boolean cxxParserParseNamespace(void)
 		{
 			// syntax error, but we tolerate this
 			CXX_DEBUG_LEAVE_TEXT("EOF in cxxParserParseNextToken");
-			return TRUE; // EOF
+			return true; // EOF
 		}
 
 		switch(g_cxx.pToken->eType)
@@ -103,7 +103,7 @@ boolean cxxParserParseNamespace(void)
 				{
 					// syntax error, but we tolerate this
 					CXX_DEBUG_LEAVE_TEXT("EOF in cxxParserParseNextToken");
-					return TRUE; // EOF
+					return true; // EOF
 				}
 
 				if(!cxxTokenTypeIsOneOf(
@@ -177,19 +177,19 @@ boolean cxxParserParseNamespace(void)
 						))
 					{
 						CXX_DEBUG_LEAVE_TEXT("Failed to parse up to an opening bracket");
-						return FALSE;
+						return false;
 					}
 
 					if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
 					{
 						// tolerate syntax error
 						CXX_DEBUG_LEAVE_TEXT("Found semicolon just after namespace declaration");
-						return TRUE;
+						return true;
 					}
 
 					CXX_DEBUG_LEAVE_TEXT("Was expecting an opening bracket here");
 					// FIXME: Maybe we could attempt to recover here?
-					return TRUE;
+					return true;
 				}
 			break;
 			case CXXTokenTypeOpeningBracket:
@@ -199,7 +199,7 @@ boolean cxxParserParseNamespace(void)
 			case CXXTokenTypeSemicolon:
 				// tolerate syntax error
 				CXX_DEBUG_LEAVE_TEXT("Found semicolon just after namespace declaration");
-				return TRUE;
+				return true;
 			break;
 			default:
 				CXX_DEBUG_LEAVE_TEXT("Some kind of syntax error here");
@@ -286,10 +286,10 @@ boolean cxxParserParseNamespace(void)
 
 	// Here we certainly got an opening bracket: namespace block
 
-	if(!cxxParserParseBlock(TRUE))
+	if(!cxxParserParseBlock(true))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse namespace block");
-		return FALSE;
+		return false;
 	}
 
 	while(iScopeCount > 0)
@@ -302,5 +302,5 @@ boolean cxxParserParseNamespace(void)
 	}
 
 	CXX_DEBUG_LEAVE_TEXT("Finished parsing namespace");
-	return TRUE;
+	return true;
 }

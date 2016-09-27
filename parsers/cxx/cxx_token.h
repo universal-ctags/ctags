@@ -69,7 +69,7 @@ typedef struct _CXXToken
 	vString * pszWord;
 	enum CXXKeyword eKeyword;
 	CXXTokenChain * pChain; // this is NOT the parent chain!
-	boolean bFollowedBySpace;
+	bool bFollowedBySpace;
 
 	int iLineNumber;
 	MIOPos oFilePosition;

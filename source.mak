@@ -28,7 +28,6 @@ MAIN_HEADS =			\
 	main/lcpp.h		\
 	main/main.h		\
 	main/mbcs.h		\
-	main/mybool.h		\
 	main/nestlevel.h	\
 	main/options.h		\
 	main/output.h		\

@@ -129,7 +129,7 @@ CXXToken * cxxTokenChainTakeLast(CXXTokenChain * tc);
 CXXToken * cxxTokenChainTakeAt(CXXTokenChain * tc,int index);
 #endif
 void cxxTokenChainTake(CXXTokenChain * tc,CXXToken * t);
-boolean cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t);
+bool cxxTokenChainTakeRecursive(CXXTokenChain * tc,CXXToken * t);
 
 // Destroy the last token
 #define cxxTokenChainDestroyLast(tc) \

@@ -30,10 +30,10 @@ typedef enum {
 
 
 static kindOption HtmlKinds [] = {
-	{ TRUE, 'a', "anchor",		"named anchors" },
-	{ TRUE, 'h', "heading1",	"H1 headings" },
-	{ TRUE, 'i', "heading2",	"H2 headings" },
-	{ TRUE, 'j', "heading3",	"H3 headings" }
+	{ true, 'a', "anchor",		"named anchors" },
+	{ true, 'h', "heading1",	"H1 headings" },
+	{ true, 'i', "heading2",	"H2 headings" },
+	{ true, 'j', "heading3",	"H3 headings" }
 };
 
 typedef enum {
@@ -82,7 +82,7 @@ static int Lang_html;
 static void readTag (tokenInfo *token, vString *text);
 
 
-static void readTokenText (tokenInfo *const token, boolean collectText)
+static void readTokenText (tokenInfo *const token, bool collectText)
 {
 	int c;
 	int lastC = 'X';  /* whatever non-space character */
@@ -121,7 +121,7 @@ getNextChar:
 	}
 }
 
-static void readToken (tokenInfo *const token, boolean skipComments)
+static void readToken (tokenInfo *const token, bool skipComments)
 {
 	int c;
 
@@ -248,7 +248,7 @@ static void appendText (vString *text, vString *appendedText)
 	}
 }
 
-static boolean readTagContent (tokenInfo *token, vString *text, long *line, int *lineOffset)
+static bool readTagContent (tokenInfo *token, vString *text, long *line, int *lineOffset)
 {
 	tokenType type;
 
@@ -259,7 +259,7 @@ static boolean readTagContent (tokenInfo *token, vString *text, long *line, int 
 	{
 		*line = getInputLineNumber ();
 		*lineOffset = getInputLineOffset ();
-		readToken (token, FALSE);
+		readToken (token, false);
 		type = token->type;
 		if (type == TOKEN_TAG_START)
 			readTag (token, text);
@@ -276,35 +276,35 @@ static boolean readTagContent (tokenInfo *token, vString *text, long *line, int 
 
 static void readTag (tokenInfo *token, vString *text)
 {
-	boolean textCreated = FALSE;
+	bool textCreated = false;
 
-	readToken (token, TRUE);
+	readToken (token, true);
 	if (token->type == TOKEN_NAME)
 	{
 		keywordId startTag;
-		boolean isHeading;
+		bool isHeading;
 
 		startTag = lookupKeyword (vStringValue (token->string), Lang_html);
 		isHeading = (startTag == KEYWORD_h1 || startTag == KEYWORD_h2 || startTag == KEYWORD_h3);
 		if (text == NULL && isHeading)
 		{
 			text = vStringNew ();
-			textCreated = TRUE;
+			textCreated = true;
 		}
 
 		do
 		{
-			readToken (token, TRUE);
+			readToken (token, true);
 			if (startTag == KEYWORD_a && token->type == TOKEN_NAME)
 			{
 				keywordId attribute = lookupKeyword (vStringValue (token->string), Lang_html);
 
 				if (attribute == KEYWORD_name)
 				{
-					readToken (token, TRUE);
+					readToken (token, true);
 					if (token->type == TOKEN_EQUAL)
 					{
-						readToken (token, TRUE);
+						readToken (token, true);
 						if (token->type == TOKEN_STRING || token->type == TOKEN_NAME)
 							makeSimpleTag (token->string, HtmlKinds, K_ANCHOR);
 					}
@@ -321,13 +321,13 @@ static void readTag (tokenInfo *token, vString *text)
 			int startLineOffset = getInputLineOffset ();
 			long endLineNumber;
 			int endLineOffset;
-			boolean tag_start2;
+			bool tag_start2;
 
 			tag_start2 = readTagContent (token, text, &endLineNumber, &endLineOffset);
 
 			if (tag_start2)
 			{
-				readToken (token, TRUE);
+				readToken (token, true);
 				if (isHeading && textCreated && vStringLength (text) > 0)
 				{
 					keywordId endTag = lookupKeyword (vStringValue (token->string), Lang_html);
@@ -361,7 +361,7 @@ static void readTag (tokenInfo *token, vString *text)
 									 endLineNumber, endLineOffset, startSourceLineNumber);
 				}
 
-				readToken (token, TRUE);
+				readToken (token, true);
 			}
 		}
 	}
@@ -378,7 +378,7 @@ static void findHtmlTags (void)
 
 	do
 	{
-		readToken (&token, TRUE);
+		readToken (&token, true);
 		if (token.type == TOKEN_TAG_START)
 			readTag (&token, NULL);
 	}
