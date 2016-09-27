@@ -15,6 +15,9 @@ C	h	local	local header	on
 C++	d	undef	undefined	on
 C++	h	system	system header	on
 C++	h	local	local header	on
+CPreProcessor	d	undef	undefined	on
+CPreProcessor	h	system	system header	on
+CPreProcessor	h	local	local header	on
 DTS	d	undef	undefined	on
 DTS	h	system	system header	on
 DTS	h	local	local header	on
@@ -57,6 +60,9 @@ C	h	local	local header	on
 C++	d	undef	undefined	on
 C++	h	system	system header	on
 C++	h	local	local header	on
+CPreProcessor	d	undef	undefined	on
+CPreProcessor	h	system	system header	on
+CPreProcessor	h	local	local header	on
 DTS	d	undef	undefined	on
 DTS	h	system	system header	on
 DTS	h	local	local header	on
@@ -97,6 +103,8 @@ C	h	system	system header	on
 C	h	local	local header	on
 C++	h	system	system header	on
 C++	h	local	local header	on
+CPreProcessor	h	system	system header	on
+CPreProcessor	h	local	local header	on
 DTS	h	system	system header	on
 DTS	h	local	local header	on
 Vera	h	system	system header	on

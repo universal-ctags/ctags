@@ -1,0 +1,2 @@
+X	input.c	/^#define X /;"	d	file:
+stdio.h	input.c	/^#include <stdio.h>/;"	h	role:system

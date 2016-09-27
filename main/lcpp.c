@@ -84,6 +84,38 @@ typedef struct sCppState {
 	} directive;
 } cppState;
 
+
+typedef enum {
+	CPREPRO_MACRO_KIND_UNDEF_ROLE,
+} cPreProMacroRole;
+
+static roleDesc CPREPROMacroRoles [] = {
+	RoleTemplateUndef,
+};
+
+
+typedef enum {
+	CPREPRO_HEADER_KIND_SYSTEM_ROLE,
+	CPREPRO_HEADER_KIND_LOCAL_ROLE,
+} cPreProHeaderRole;
+
+static roleDesc CPREPROHeaderRoles [] = {
+	RoleTemplateSystem,
+	RoleTemplateLocal,
+};
+
+
+typedef enum {
+	CPREPRO_MACRO, CPREPRO_HEADER,
+} cPreProkind;
+
+static kindOption CPreProKinds [] = {
+	{ true,  'd', "macro",      "macro definitions",
+	  .referenceOnly = false, ATTACH_ROLES(CPREPROMacroRoles)},
+	{ true, 'h', "header",     "included header files",
+	  .referenceOnly = true, ATTACH_ROLES(CPREPROHeaderRoles)},
+};
+
 /*
 *   DATA DEFINITIONS
 */
@@ -989,4 +1021,25 @@ process:
 				debugPrintf (DEBUG_CPP, "%6ld: ", getInputLineNumber () + 1); )
 
 	return c;
+}
+
+static void findCppTags (void)
+{
+	cppInit (0, false, false, false,
+			 CPreProKinds + CPREPRO_MACRO, CPREPRO_MACRO_KIND_UNDEF_ROLE,
+			 CPreProKinds + CPREPRO_HEADER, CPREPRO_HEADER_KIND_SYSTEM_ROLE,
+			 CPREPRO_HEADER_KIND_LOCAL_ROLE);
+
+	findRegexTagsMainloop (cppGetc);
+
+	cppTerminate ();
+}
+
+extern parserDefinition* CPreProParser (void)
+{
+	parserDefinition* const def = parserNew ("CPreProcessor");
+	def->kinds      = CPreProKinds;
+	def->kindCount  = ARRAY_SIZE (CPreProKinds);
+	def->parser     = findCppTags;
+	return def;
 }
