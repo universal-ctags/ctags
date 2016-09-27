@@ -53,17 +53,17 @@ extern void debugPutc (const int level, const int c)
 	}
 }
 
-extern void debugParseNest (const boolean increase, const unsigned int level)
+extern void debugParseNest (const bool increase, const unsigned int level)
 {
 	debugPrintf (DEBUG_PARSE, "<*%snesting:%d*>", increase ? "++" : "--", level);
 }
 
-extern void debugCppNest (const boolean begin, const unsigned int level)
+extern void debugCppNest (const bool begin, const unsigned int level)
 {
 	debugPrintf (DEBUG_CPP, "<*cpp:%s level %d*>", begin ? "begin":"end", level);
 }
 
-extern void debugCppIgnore (const boolean ignore)
+extern void debugCppIgnore (const bool ignore)
 {
 	debugPrintf (DEBUG_CPP, "<*cpp:%s ignore*>", ignore ? "begin":"end");
 }

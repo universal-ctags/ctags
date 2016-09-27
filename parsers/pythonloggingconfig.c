@@ -35,8 +35,8 @@ typedef enum {
 } pythonLoggingConfigKind;
 
 static kindOption PythonLoggingConfigKinds [] = {
-	{ TRUE, 'L', "loggerSection", "logger sections" },
-	{ TRUE, 'q', "qualname",      "logger qualnames" },
+	{ true, 'L', "loggerSection", "logger sections" },
+	{ true, 'q', "qualname",      "logger qualnames" },
 };
 
 #define LOGGER_PREFIX "logger_"
@@ -80,12 +80,12 @@ static void *pythonLoggingConfigPrepareForNewInput (void)
 	return &sectionIndex;
 }
 
-static boolean pythonLoggingConfigProbeLanguage (const char *section, const char *key, const char *value)
+static bool pythonLoggingConfigProbeLanguage (const char *section, const char *key, const char *value)
 {
 	if (section && (strncmp (LOGGER_PREFIX, section, LOGGER_LEN) == 0))
-		return TRUE;
+		return true;
 	else
-		return FALSE;
+		return false;
 }
 
 static struct iniconfParserClient PythonLoggingConfigIniconfClient = {
@@ -123,7 +123,7 @@ extern parserDefinition* PythonLoggingConfigParser (void)
 	def->kinds      = PythonLoggingConfigKinds;
 	def->kindCount  = ARRAY_SIZE (PythonLoggingConfigKinds);
 	def->parser     = findPythonLoggingConfigTags;
-	def->useCork    = TRUE;
+	def->useCork    = true;
 
 	return def;
 }

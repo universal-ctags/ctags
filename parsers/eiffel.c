@@ -33,8 +33,8 @@
 #define isident(c)            (isalnum(c) || (c) == '_')
 #define isFreeOperatorChar(c) ((c) == '@' || (c) == '#' || \
                                (c) == '|' || (c) == '&')
-#define isType(token,t)       (boolean) ((token)->type == (t))
-#define isKeyword(token,k)    (boolean) ((token)->keyword == (k))
+#define isType(token,t)       (bool) ((token)->type == (t))
+#define isKeyword(token,k)    (bool) ((token)->keyword == (k))
 
 /*
 *   DATA DECLARATIONS
@@ -138,7 +138,7 @@ typedef enum eTokenType {
 typedef struct sTokenInfo {
 	tokenType type;
 	keywordId keyword;
-	boolean   isExported;
+	bool   isExported;
 	vString*  string;
 	vString*  className;
 	vString*  featureName;
@@ -155,9 +155,9 @@ typedef enum {
 } eiffelKind;
 
 static kindOption EiffelKinds [] = {
-	{ TRUE,  'c', "class",   "classes"},
-	{ TRUE,  'f', "feature", "features"},
-	{ FALSE, 'l', "local",   "local entities"}
+	{ true,  'c', "class",   "classes"},
+	{ true,  'f', "feature", "features"},
+	{ false, 'l', "local",   "local entities"}
 };
 
 static const keywordTable EiffelKeywordTable [] = {
@@ -261,7 +261,7 @@ static void makeEiffelFeatureTag (tokenInfo *const token)
 
 		initTagEntry (&e, name, &(EiffelKinds [EKIND_FEATURE]));
 
-		e.isFileScope = (boolean) (! token->isExported);
+		e.isFileScope = (bool) (! token->isExported);
 		if (e.isFileScope)
 			markTagExtraBit (&e, XTAG_FILE_SCOPE);
 		e.extensionFields.scopeKind = &(EiffelKinds [EKIND_CLASS]);
@@ -293,7 +293,7 @@ static void makeEiffelLocalTag (tokenInfo *const token)
 
 		initTagEntry (&e, name, &(EiffelKinds [EKIND_LOCAL]));
 
-		e.isFileScope = TRUE;
+		e.isFileScope = true;
 		markTagExtraBit (&e, XTAG_FILE_SCOPE);
 
 		vStringCopy (scope, token->className);
@@ -448,9 +448,9 @@ static int parseCharacter (void)
 
 static void parseString (vString *const string)
 {
-	boolean verbatim = FALSE;
-	boolean align = FALSE;
-	boolean end = FALSE;
+	bool verbatim = false;
+	bool align = false;
+	bool end = false;
 	vString *verbatimCloser = vStringNew ();
 	vString *lastLine = vStringNew ();
 	int prev = '\0';
@@ -460,13 +460,13 @@ static void parseString (vString *const string)
 	{
 		c = getcFromInputFile ();
 		if (c == EOF)
-			end = TRUE;
+			end = true;
 		else if (c == '"')
 		{
 			if (! verbatim)
-				end = TRUE;
+				end = true;
 			else
-				end = (boolean) (strcmp (vStringValue (lastLine),
+				end = (bool) (strcmp (vStringValue (lastLine),
 				                         vStringValue (verbatimCloser)) == 0);
 		}
 		else if (c == '\n')
@@ -475,7 +475,7 @@ static void parseString (vString *const string)
 				vStringClear (lastLine);
 			if (prev == '[' /* ||  prev == '{' */)
 			{
-				verbatim = TRUE;
+				verbatim = true;
 				vStringClear (verbatimCloser);
 				vStringClear (lastLine);
 				if (prev == '{')
@@ -483,7 +483,7 @@ static void parseString (vString *const string)
 				else
 				{
 					vStringPut (verbatimCloser, ']');
-					align = TRUE;
+					align = true;
 				}
 				vStringNCat (verbatimCloser, string, vStringLength (string) - 1);
 				vStringClear (string);
@@ -562,7 +562,7 @@ static tokenInfo *newToken (void)
 
 	token->type			= TOKEN_UNDEFINED;
 	token->keyword		= KEYWORD_NONE;
-	token->isExported	= TRUE;
+	token->isExported	= true;
 
 	token->string = vStringNew ();
 	token->className = vStringNew ();
@@ -721,30 +721,30 @@ getNextChar:
 *   Scanning functions
 */
 
-static boolean isIdentifierMatch (
+static bool isIdentifierMatch (
 		const tokenInfo *const token, const char *const name)
 {
-	return (boolean) (isType (token, TOKEN_IDENTIFIER)  &&
+	return (bool) (isType (token, TOKEN_IDENTIFIER)  &&
 		strcasecmp (vStringValue (token->string), name) == 0);
 }
 
-static boolean findToken (tokenInfo *const token, const tokenType type)
+static bool findToken (tokenInfo *const token, const tokenType type)
 {
 	while (! isType (token, type) && ! isType (token, TOKEN_EOF))
 		readToken (token);
 	return isType (token, type);
 }
 
-static boolean findKeyword (tokenInfo *const token, const keywordId keyword)
+static bool findKeyword (tokenInfo *const token, const keywordId keyword)
 {
 	while (! isKeyword (token, keyword) && ! isType (token, TOKEN_EOF))
 		readToken (token);
 	return isKeyword (token, keyword);
 }
 
-static boolean parseType (tokenInfo *const token);
+static bool parseType (tokenInfo *const token);
 
-static void parseGeneric (tokenInfo *const token, boolean declaration CTAGS_ATTR_UNUSED)
+static void parseGeneric (tokenInfo *const token, bool declaration CTAGS_ATTR_UNUSED)
 {
 	unsigned int depth = 0;
 
@@ -766,7 +766,7 @@ static void parseGeneric (tokenInfo *const token, boolean declaration CTAGS_ATTR
 	} while (depth > 0 && ! isType (token, TOKEN_EOF));
 }
 
-static boolean parseType (tokenInfo *const token)
+static bool parseType (tokenInfo *const token)
 {
 	tokenInfo* const id = newToken ();
 	copyToken (id, token);
@@ -794,13 +794,13 @@ static boolean parseType (tokenInfo *const token)
 		if (isType (id, TOKEN_IDENTIFIER))
 		{
 			if (isType (token, TOKEN_OPEN_BRACKET))
-				parseGeneric (token, FALSE);
+				parseGeneric (token, false);
 			else if ((strcmp ("BIT", vStringValue (id->string)) == 0))
 				readToken (token);  /* read token after number of bits */
 		}
 	}
 	deleteToken (id);
-	return TRUE;
+	return true;
 }
 
 static void parseEntityType (tokenInfo *const token)
@@ -835,7 +835,7 @@ static void parseLocal (tokenInfo *const token)
 
 static void findFeatureEnd (tokenInfo *const token)
 {
-	boolean isFound = isKeyword (token, KEYWORD_is);
+	bool isFound = isKeyword (token, KEYWORD_is);
 	if (isFound)
 		readToken (token);
 	switch (token->keyword)
@@ -892,22 +892,22 @@ static void findFeatureEnd (tokenInfo *const token)
 	}
 }
 
-static boolean readFeatureName (tokenInfo *const token)
+static bool readFeatureName (tokenInfo *const token)
 {
-	boolean isFeatureName = FALSE;
+	bool isFeatureName = false;
 
 	if (isKeyword (token, KEYWORD_frozen))
 		readToken (token);
 	if (isType (token, TOKEN_IDENTIFIER))
-		isFeatureName = TRUE;
+		isFeatureName = true;
 	else if (isKeyword (token, KEYWORD_assign))  /* legacy code */
-		isFeatureName = TRUE;
+		isFeatureName = true;
 	else if (isKeyword (token, KEYWORD_infix)  ||
 			isKeyword (token, KEYWORD_prefix))
 	{
 		readToken (token);
 		if (isType (token, TOKEN_STRING))
-			isFeatureName = TRUE;
+			isFeatureName = true;
 	}
 	return isFeatureName;
 }
@@ -918,12 +918,12 @@ static void parseArguments (tokenInfo *const token)
 		readToken (token);
 }
 
-static boolean parseFeature (tokenInfo *const token)
+static bool parseFeature (tokenInfo *const token)
 {
-	boolean found = FALSE;
+	bool found = false;
 	while (readFeatureName (token))
 	{
-		found = TRUE;
+		found = true;
 		makeEiffelFeatureTag (token);
 		readToken (token);
 		if (isType (token, TOKEN_COMMA))
@@ -959,11 +959,11 @@ static boolean parseFeature (tokenInfo *const token)
 
 static void parseExport (tokenInfo *const token)
 {
-	token->isExported = TRUE;
+	token->isExported = true;
 	readToken (token);
 	if (isType (token, TOKEN_OPEN_BRACE))
 	{
-		token->isExported = FALSE;
+		token->isExported = false;
 		while (! isType (token, TOKEN_CLOSE_BRACE) &&
 		       ! isType (token, TOKEN_EOF))
 		{
@@ -1087,7 +1087,7 @@ static void parseClass (tokenInfo *const token)
 	do
 	{
 		if (isType (token, TOKEN_OPEN_BRACKET))
-			parseGeneric (token, TRUE);
+			parseGeneric (token, true);
 		else if (! isType (token, TOKEN_KEYWORD))
 			readToken (token);
 		else switch (token->keyword)

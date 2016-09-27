@@ -20,7 +20,7 @@ typedef enum {
 } javaPropertiesKind;
 
 static kindOption JavaPropertiesKinds [] = {
-	{ TRUE, 'k', "key", "keys" },
+	{ true, 'k', "key", "keys" },
 };
 
 static const unsigned char *skipWhiteSpace (const unsigned char *line)
@@ -32,15 +32,15 @@ static const unsigned char *skipWhiteSpace (const unsigned char *line)
 	return line;
 }
 
-static boolean doesValueContinue (const unsigned char *line)
+static bool doesValueContinue (const unsigned char *line)
 {
-	boolean in_escaping = FALSE;
+	bool in_escaping = false;
 	while (*line != '\0')
 	{
 		if (in_escaping)
-			in_escaping = FALSE;
+			in_escaping = false;
 		else if (*line == '\\')
-			in_escaping = TRUE;
+			in_escaping = true;
 		line++;
 	}
 	return in_escaping;
@@ -48,14 +48,14 @@ static boolean doesValueContinue (const unsigned char *line)
 
 static const unsigned char * extractKey (const unsigned char *line, vString *key)
 {
-	boolean in_escaping = FALSE;
+	bool in_escaping = false;
 
 	while (*line != '\0')
 	{
 		if (in_escaping)
 		{
 			vStringPut (key, *line);
-			in_escaping = FALSE;
+			in_escaping = false;
 		}
 		else if (*line == ':' || *line == '='
 			 || *line == ' ' || *line == '\t' || *line == '\f')
@@ -66,7 +66,7 @@ static const unsigned char * extractKey (const unsigned char *line, vString *key
 		else if (*line == '\\')
 		{
 			vStringPut (key, *line);
-			in_escaping = TRUE;
+			in_escaping = true;
 		}
 		else
 			vStringPut (key, *line);
@@ -78,8 +78,8 @@ static const unsigned char * extractKey (const unsigned char *line, vString *key
 static void findJavaPropertiesTags (void)
 {
 	const unsigned char *line;
-	boolean in_value = FALSE;
-	boolean value_continues;
+	bool in_value = false;
+	bool value_continues;
 	static vString *key;
 
 	if (key == NULL)
@@ -93,7 +93,7 @@ static void findJavaPropertiesTags (void)
 		{
 			value_continues = doesValueContinue (line);
 			if (!value_continues)
-				in_value = FALSE;
+				in_value = false;
 			continue;
 		}
 
@@ -108,7 +108,7 @@ static void findJavaPropertiesTags (void)
 
 		value_continues = doesValueContinue (line);
 		if (value_continues)
-			in_value = TRUE;
+			in_value = true;
 	}
 }
 

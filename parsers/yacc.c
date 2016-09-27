@@ -20,7 +20,7 @@
 #include "promise.h"
 
 
-static boolean not_in_grammar_rules = TRUE;
+static bool not_in_grammar_rules = true;
 static tagRegexTable yaccTagRegexTable [] = {
 	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
 	 "l,label,labels", NULL, &not_in_grammar_rules },
@@ -141,7 +141,7 @@ static void initializeYaccParser (langType language)
 	addCallbackRegex (language, "^%\\{", "{exclusive}", enter_c_prologue, NULL, &cStart);
 	addCallbackRegex (language, "^%\\}", "{exclusive}", leave_c_prologue, NULL, &cStart);
 
-	not_in_grammar_rules = TRUE;
+	not_in_grammar_rules = true;
 	addCallbackRegex (language, "^%%", "{exclusive}", change_section, NULL, NULL);
 
 	addCallbackRegex (language, "^%union", "{exclusive}", enter_union, NULL, &cStart);

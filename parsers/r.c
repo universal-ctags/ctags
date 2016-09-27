@@ -36,11 +36,11 @@ typedef enum {
 } rKind;
 
 static kindOption RKinds[KIND_COUNT] = {
-	{TRUE, 'f', "function", "functions"},
-	{TRUE, 'l', "library", "libraries"},
-	{TRUE, 's', "source", "sources"},
-	{TRUE, 'g', "globalVar", "global variables"},
-	{TRUE, 'v', "functionVar", "function variables"},
+	{true, 'f', "function", "functions"},
+	{true, 'l', "library", "libraries"},
+	{true, 's', "source", "sources"},
+	{true, 'g', "globalVar", "global variables"},
+	{true, 'v', "functionVar", "function variables"},
 };
 
 static void makeRTag (const vString * const name, rKind kind)

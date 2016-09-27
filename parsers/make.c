@@ -39,15 +39,15 @@ typedef enum {
 } makeMakefileRole;
 
 static roleDesc MakeMakefileRoles [] = {
-	{ TRUE, "included", "included" },
-	{ TRUE, "optional", "optionally included"},
+	{ true, "included", "included" },
+	{ true, "optional", "optionally included"},
 };
 
 static kindOption MakeKinds [] = {
-	{ TRUE, 'm', "macro",  "macros"},
-	{ TRUE, 't', "target", "targets"},
-	{ TRUE, 'I', "makefile", "makefiles",
-	  .referenceOnly = TRUE, ATTACH_ROLES(MakeMakefileRoles)},
+	{ true, 'm', "macro",  "macros"},
+	{ true, 't', "target", "targets"},
+	{ true, 'I', "makefile", "makefiles",
+	  .referenceOnly = true, ATTACH_ROLES(MakeMakefileRoles)},
 };
 
 
@@ -84,26 +84,26 @@ static int skipToNonWhite (int c)
 	return c;
 }
 
-static boolean isIdentifier (int c)
+static bool isIdentifier (int c)
 {
-	return (boolean)(c != '\0' && (isalnum (c)  ||  strchr (".-_/$(){}%", c) != NULL));
+	return (bool)(c != '\0' && (isalnum (c)  ||  strchr (".-_/$(){}%", c) != NULL));
 }
 
-static boolean isSpecialTarget (vString *const name)
+static bool isSpecialTarget (vString *const name)
 {
 	size_t i = 0;
 	/* All special targets begin with '.'. */
 	if (vStringLength (name) < 1 || vStringChar (name, i++) != '.') {
-		return FALSE;
+		return false;
 	}
 	while (i < vStringLength (name)) {
 		char ch = vStringChar (name, i++);
 		if (ch != '_' && !isupper (ch))
 		{
-			return FALSE;
+			return false;
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 static void makeSimpleMakeTag (vString *const name, kindOption *MakeKinds, makeKind kind)
@@ -147,7 +147,7 @@ static void newTarget (vString *const name)
 	makeSimpleMakeTag (name, MakeKinds, K_TARGET);
 }
 
-static void newMacro (vString *const name, boolean with_define_directive, boolean appending, struct makeParserClient *client, void *data)
+static void newMacro (vString *const name, bool with_define_directive, bool appending, struct makeParserClient *client, void *data)
 {
 	if (!appending)
 		makeSimpleMakeTag (name, MakeKinds, K_MACRO);
@@ -155,17 +155,17 @@ static void newMacro (vString *const name, boolean with_define_directive, boolea
 		client->newMacro (client, name, with_define_directive, appending, data);
 }
 
-static void newInclude (vString *const name, boolean optional)
+static void newInclude (vString *const name, bool optional)
 {
 	makeSimpleMakeRefTag (name, MakeKinds, K_INCLUDE,
 			      optional? R_INCLUDE_OPTIONAL: R_INCLUDE_GENERIC);
 }
 
-static boolean isAcceptableAsInclude (vString *const name)
+static bool isAcceptableAsInclude (vString *const name)
 {
 	if (strcmp (vStringValue (name), "$") == 0)
-		return FALSE;
-	return TRUE;
+		return false;
+	return true;
 }
 
 static void readIdentifier (const int first, vString *const id)
@@ -189,12 +189,12 @@ static void readIdentifier (const int first, vString *const id)
 extern void runMakeParser (struct makeParserClient *client, void *data)
 {
 	stringList *identifiers = stringListNew ();
-	boolean newline = TRUE;
-	boolean in_define = FALSE;
-	boolean in_value  = FALSE;
-	boolean in_rule = FALSE;
-	boolean variable_possible = TRUE;
-	boolean appending = FALSE;
+	bool newline = true;
+	bool in_define = false;
+	bool in_value  = false;
+	bool in_rule = false;
+	bool variable_possible = true;
+	bool appending = false;
 	int c;
 
 	static int make = LANG_IGNORE;
@@ -217,17 +217,17 @@ extern void runMakeParser (struct makeParserClient *client, void *data)
 					c = nextChar ();
 				}
 				else if (c != '\n')
-					in_rule = FALSE;
+					in_rule = false;
 			}
 			else if (in_value)
-				in_value = FALSE;
+				in_value = false;
 
 			stringListClear (identifiers);
-			variable_possible = (boolean)(!in_rule);
-			newline = FALSE;
+			variable_possible = (bool)(!in_rule);
+			newline = false;
 		}
 		if (c == '\n')
-			newline = TRUE;
+			newline = true;
 		else if (isspace (c))
 			continue;
 		else if (c == '#')
@@ -243,7 +243,7 @@ extern void runMakeParser (struct makeParserClient *client, void *data)
 			c = nextChar ();
 			ungetcToInputFile (c);
 			variable_possible = (c == '=');
-			appending = TRUE;
+			appending = true;
 		}
 		else if (variable_possible && c == ':' &&
 				 stringListCount (identifiers) > 0)
@@ -256,16 +256,16 @@ extern void runMakeParser (struct makeParserClient *client, void *data)
 				for (i = 0; i < stringListCount (identifiers); i++)
 					newTarget (stringListItem (identifiers, i));
 				stringListClear (identifiers);
-				in_rule = TRUE;
+				in_rule = true;
 			}
 		}
 		else if (variable_possible && c == '=' &&
 				 stringListCount (identifiers) == 1)
 		{
-			newMacro (stringListItem (identifiers, 0), FALSE, appending, client, data);
-			in_value = TRUE;
-			in_rule = FALSE;
-			appending = FALSE;
+			newMacro (stringListItem (identifiers, 0), false, appending, client, data);
+			in_value = true;
+			in_rule = false;
+			appending = false;
 		}
 		else if (variable_possible && isIdentifier (c))
 		{
@@ -279,12 +279,12 @@ extern void runMakeParser (struct makeParserClient *client, void *data)
 			if (stringListCount (identifiers) == 1)
 			{
 				if (in_define && ! strcmp (vStringValue (name), "endef"))
-					in_define = FALSE;
+					in_define = false;
 				else if (in_define)
 					skipLine ();
 				else if (! strcmp (vStringValue (name), "define"))
 				{
-					in_define = TRUE;
+					in_define = true;
 					c = skipToNonWhite (nextChar ());
 					vStringClear (name);
 					/* all remaining characters on the line are the name -- even spaces */
@@ -297,7 +297,7 @@ extern void runMakeParser (struct makeParserClient *client, void *data)
 						ungetcToInputFile (c);
 					vStringTerminate (name);
 					vStringStripTrailing (name);
-					newMacro (name, TRUE, FALSE, client, data);
+					newMacro (name, true, false, client, data);
 				}
 				else if (! strcmp (vStringValue (name), "export"))
 					stringListClear (identifiers);
@@ -305,7 +305,7 @@ extern void runMakeParser (struct makeParserClient *client, void *data)
 					 || ! strcmp (vStringValue (name), "sinclude")
 					 || ! strcmp (vStringValue (name), "-include"))
 				{
-					boolean optional = (vStringValue (name)[0] == 'i')? FALSE: TRUE;
+					bool optional = (vStringValue (name)[0] == 'i')? false: true;
 					while (1)
 					{
 						c = skipToNonWhite (nextChar ());
@@ -340,7 +340,7 @@ extern void runMakeParser (struct makeParserClient *client, void *data)
 			}
 		}
 		else
-			variable_possible = FALSE;
+			variable_possible = false;
 	}
 	stringListDelete (identifiers);
 }

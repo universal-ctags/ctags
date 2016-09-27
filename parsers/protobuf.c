@@ -73,13 +73,13 @@ typedef enum {
 } protobufKind;
 
 static kindOption ProtobufKinds [] = {
-	{ TRUE,  'p', "package",    "packages" },
-	{ TRUE,  'm', "message",    "messages" },
-	{ TRUE,  'f', "field",      "fields" },
-	{ TRUE,  'e', "enumerator", "enum constants" },
-	{ TRUE,  'g', "enum",       "enum types" },
-	{ TRUE,  's', "service",    "services" },
-	{ FALSE, 'r', "rpc",        "RPC methods" }
+	{ true,  'p', "package",    "packages" },
+	{ true,  'm', "message",    "messages" },
+	{ true,  'f', "field",      "fields" },
+	{ true,  'e', "enumerator", "enum constants" },
+	{ true,  'g', "enum",       "enum types" },
+	{ true,  's', "service",    "services" },
+	{ false, 'r', "rpc",        "RPC methods" }
 };
 
 typedef enum eKeywordId {
@@ -223,7 +223,7 @@ static void parseStatement (int kind)
 
 static void findProtobufTags (void)
 {
-	cppInit (FALSE, FALSE, FALSE, FALSE, NULL,
+	cppInit (false, false, false, false, NULL,
 		 ROLE_INDEX_DEFINITION, NULL,
 		 ROLE_INDEX_DEFINITION, ROLE_INDEX_DEFINITION);
 	token.value = vStringNew ();

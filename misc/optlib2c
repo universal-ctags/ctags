@@ -275,7 +275,7 @@ EOF
     }
     for (@{$opts->{'disabledKinds'}}) {
 	print <<EOF;
-	enableRegexKind (language, '$_', FALSE);
+	enableRegexKind (language, '$_', false);
 EOF
     }
     print <<EOF;
@@ -340,7 +340,7 @@ EOF
 
 sub emit_fields_initialization {
     my $opts = shift;
-    my $enabled = $opts->{"disabled"} ? "FALSE": "TRUE";
+    my $enabled = $opts->{"disabled"} ? "false": "true";
     my $method;
 
     $method  = "METHOD_NOT_CRAFTED";

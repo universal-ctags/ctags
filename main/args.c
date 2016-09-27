@@ -155,7 +155,7 @@ static char* nextFileLine (FILE* const fp)
 	return result;
 }
 
-static boolean isCommentLine (char* line)
+static bool isCommentLine (char* line)
 {
 	while (isspace(*line))
 		++line;
@@ -165,7 +165,7 @@ static boolean isCommentLine (char* line)
 static char* nextFileLineSkippingComments (FILE* const fp)
 {
 	char* result;
-	boolean comment;
+	bool comment;
 
 	do
 	{
@@ -223,7 +223,7 @@ extern Arguments* argNewFromLineFile (FILE* const fp)
 	Arguments* result = xMalloc (1, Arguments);
 	memset (result, 0, sizeof (Arguments));
 	result->type = ARG_FILE;
-	result->lineMode = TRUE;
+	result->lineMode = true;
 	result->u.fileArgs.fp = fp;
 	result->item = nextFileString (result, result->u.fileArgs.fp);
 	return result;
@@ -236,22 +236,22 @@ extern char *argItem (const Arguments* const current)
 	return current->item;
 }
 
-extern boolean argOff (const Arguments* const current)
+extern bool argOff (const Arguments* const current)
 {
 	Assert (current != NULL);
-	return (boolean) (current->item == NULL);
+	return (bool) (current->item == NULL);
 }
 
 extern void argSetWordMode (Arguments* const current)
 {
 	Assert (current != NULL);
-	current->lineMode = FALSE;
+	current->lineMode = false;
 }
 
 extern void argSetLineMode (Arguments* const current)
 {
 	Assert (current != NULL);
-	current->lineMode = TRUE;
+	current->lineMode = true;
 }
 
 extern void argForth (Arguments* const current)

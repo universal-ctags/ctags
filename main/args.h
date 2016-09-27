@@ -37,7 +37,7 @@ typedef struct sArgs {
 		} fileArgs;
 	} u;
 	char* item;
-	boolean lineMode;
+	bool lineMode;
 } Arguments;
 
 /*
@@ -48,7 +48,7 @@ extern Arguments* argNewFromArgv (char* const* const argv);
 extern Arguments* argNewFromFile (FILE* const fp);
 extern Arguments* argNewFromLineFile (FILE* const fp);
 extern char *argItem (const Arguments* const current);
-extern boolean argOff (const Arguments* const current);
+extern bool argOff (const Arguments* const current);
 extern void argSetWordMode (Arguments* const current);
 extern void argSetLineMode (Arguments* const current);
 extern void argForth (Arguments* const current);

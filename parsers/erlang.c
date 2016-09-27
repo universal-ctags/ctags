@@ -29,11 +29,11 @@ typedef enum {
 } erlangKind;
 
 static kindOption ErlangKinds[] = {
-	{TRUE, 'd', "macro",    "macro definitions"},
-	{TRUE, 'f', "function", "functions"},
-	{TRUE, 'm', "module",   "modules"},
-	{TRUE, 'r', "record",   "record definitions"},
-	{TRUE, 't', "type",     "type definitions"},
+	{true, 'd', "macro",    "macro definitions"},
+	{true, 'f', "function", "functions"},
+	{true, 'm', "module",   "modules"},
+	{true, 'r', "record",   "record definitions"},
+	{true, 't', "type",     "type definitions"},
 };
 
 /*
@@ -43,14 +43,14 @@ static kindOption ErlangKinds[] = {
  * necessary. If successful you will find class name in vString
  */
 
-static boolean isIdentifierFirstCharacter (int c)
+static bool isIdentifierFirstCharacter (int c)
 {
-	return (boolean) (isalpha (c));
+	return (bool) (isalpha (c));
 }
 
-static boolean isIdentifierCharacter (int c)
+static bool isIdentifierCharacter (int c)
 {
-	return (boolean) (isalnum (c) || c == '_' || c == ':');
+	return (bool) (isalnum (c) || c == '_' || c == ':');
 }
 
 static const unsigned char *skipSpace (const unsigned char *cp)

@@ -96,7 +96,7 @@ static void *entry_find (hentry* entry, void* key, hashTableEqualFunc equalfn)
 	return NULL;
 }
 
-static boolean		entry_delete (hentry **entry, void *key, hashTableEqualFunc equalfn,
+static bool		entry_delete (hentry **entry, void *key, hashTableEqualFunc equalfn,
 			      hashTableFreeFunc keyfreefn, hashTableFreeFunc valfreefn)
 {
 	while (*entry)
@@ -104,11 +104,11 @@ static boolean		entry_delete (hentry **entry, void *key, hashTableEqualFunc equa
 		if (equalfn (key, (*entry)->key))
 		{
 			*entry = entry_destroy (*entry, keyfreefn, valfreefn);
-			return TRUE;
+			return true;
 		}
 
 	}
-	return FALSE;
+	return false;
 }
 
 static void  entry_foreach (hentry *entry, hashTableForeachFunc proc, void *user_data)
@@ -174,7 +174,7 @@ extern void*      hashTableGetItem   (hashTable *htable, void *key)
 	return entry_find(htable->table[i], key, htable->equalfn);
 }
 
-extern boolean     hashTableDeleteItem (hashTable *htable, void *key)
+extern bool     hashTableDeleteItem (hashTable *htable, void *key)
 {
 	unsigned int i;
 
@@ -183,9 +183,9 @@ extern boolean     hashTableDeleteItem (hashTable *htable, void *key)
 			    htable->equalfn, htable->keyfreefn, htable->valfreefn);
 }
 
-extern boolean    hashTableHasItem    (hashTable *htable, void *key)
+extern bool    hashTableHasItem    (hashTable *htable, void *key)
 {
-	return hashTableGetItem (htable, key)? TRUE: FALSE;
+	return hashTableGetItem (htable, key)? true: false;
 }
 
 extern void       hashTableForeachItem (hashTable *htable, hashTableForeachFunc proc, void *user_data)
@@ -220,9 +220,9 @@ unsigned int hashPtrhash (void * x)
 	return v.ui;
 }
 
-boolean hashPtreq (void *a, void *b)
+bool hashPtreq (void *a, void *b)
 {
-	return (a == b)? TRUE: FALSE;
+	return (a == b)? true: false;
 }
 
 
@@ -245,7 +245,7 @@ unsigned int hashCstrhash (void * x)
 	return (unsigned int)djb2((unsigned char *)s);
 }
 
-boolean hashCstreq (void *a, void *b)
+bool hashCstreq (void *a, void *b)
 {
 	return !!(strcmp (a, b) == 0);
 }
@@ -262,7 +262,7 @@ unsigned int hashInthash (void *x)
        return x0.u;
 }
 
-boolean hashInteq (void *a, void *b)
+bool hashInteq (void *a, void *b)
 {
        int ai = *(int *)a;
        int bi = *(int *)b;

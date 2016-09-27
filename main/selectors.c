@@ -35,7 +35,7 @@ static const char *TR_REXX     = "REXX";
 static const char *TR_DOSBATCH = "DosBatch";
 
 #define startsWith(line,prefix) \
-  (strncmp(line, prefix, strlen(prefix)) == 0? TRUE: FALSE)
+  (strncmp(line, prefix, strlen(prefix)) == 0? true: false)
 
 static const char *selectByLines (MIO *input,
 				  const char* (* lineTaster) (const char *, void *),
@@ -247,7 +247,7 @@ selectByArrowOfR (MIO *input)
 static const char *
 tasteREXXOrDosBatch (const char *line, void *data)
 {
-	boolean * in_rexx_comment = data;
+	bool * in_rexx_comment = data;
 
 	if (startsWith (line, ":"))
 		return TR_DOSBATCH;
@@ -256,7 +256,7 @@ tasteREXXOrDosBatch (const char *line, void *data)
 		return TR_REXX;
 	else if (strstr (line, "/*"))
 	{
-		*in_rexx_comment = TRUE;
+		*in_rexx_comment = true;
 		return NULL;
 	}
 	else
@@ -271,7 +271,7 @@ selectByRexxCommentAndDosbatchLabelPrefix (MIO *input)
 
     static langType rexx     = LANG_IGNORE;
     static langType dosbatch = LANG_IGNORE;
-    boolean in_rexx_comment = FALSE;
+    bool in_rexx_comment = false;
 
     if (rexx == LANG_IGNORE)
 	    rexx = getNamedLanguage (TR_R, 0);

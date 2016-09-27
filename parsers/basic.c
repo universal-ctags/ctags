@@ -42,12 +42,12 @@ typedef struct {
 } KeyWord;
 
 static kindOption BasicKinds[] = {
-	{TRUE, 'c', "constant", "constants"},
-	{TRUE, 'f', "function", "functions"},
-	{TRUE, 'l', "label", "labels"},
-	{TRUE, 't', "type", "types"},
-	{TRUE, 'v', "variable", "variables"},
-	{TRUE, 'g', "enum", "enumerations"}
+	{true, 'c', "constant", "constants"},
+	{true, 'f', "function", "functions"},
+	{true, 'l', "label", "labels"},
+	{true, 't', "type", "types"},
+	{true, 'v', "variable", "variables"},
+	{true, 'g', "enum", "enumerations"}
 };
 
 static KeyWord blitzbasic_keywords[] = {

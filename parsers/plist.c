@@ -27,7 +27,7 @@ typedef enum {
 } plistKind;
 
 static kindOption PlistKinds [] = {
-	{ TRUE,  'k', "key",	  "keys" },
+	{ true,  'k', "key",	  "keys" },
 };
 
 static void plistFindTagsUnderKey (xmlNode *node,

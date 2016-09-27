@@ -34,13 +34,13 @@
 
 static void makeIniconfTagMaybe (langType iniconf, const char *section, const char *key, const char *value, void *userData);
 
-static boolean isIdentifier (int c)
+static bool isIdentifier (int c)
 {
     /* allow whitespace within keys and sections */
-    return (boolean)(isalnum (c) || isspace (c) ||  c == '_');
+    return (bool)(isalnum (c) || isspace (c) ||  c == '_');
 }
 
-static boolean isValue (int c)
+static bool isValue (int c)
 {
 	return (c != '\0');
 }
@@ -109,7 +109,7 @@ extern void runIniconfParser (const iniconfCallback callback, void* userData)
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
 		const unsigned char* cp = line;
-		boolean possible = TRUE;
+		bool possible = true;
 
 		if (isspace ((int) *cp) || *cp == '#' || *cp == ';'
 		    || (*cp != '\0' && *cp == '/' && *(cp+1) == '/'))
@@ -230,8 +230,8 @@ typedef enum {
 } makeKind;
 
 static kindOption IniconfKinds [] = {
-	{ TRUE, 's', "section",  "sections"},
-	{ TRUE, 'k', "key",      "keys"},
+	{ true, 's', "section",  "sections"},
+	{ true, 'k', "key",      "keys"},
 };
 
 static void makeIniconfTagMaybe (langType iniconf, const char *section, const char *key, const char *value, void *userData)
@@ -276,7 +276,7 @@ extern parserDefinition* IniconfParser (void)
 	def->kindCount  = ARRAY_SIZE (IniconfKinds);
 	def->extensions = extensions;
 	def->parser     = findIniconfTags;
-	def->useCork   = TRUE;
+	def->useCork   = true;
 
 	return def;
 }

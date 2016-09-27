@@ -24,7 +24,7 @@
 // This is used to pre-parse non struct/class/union/enum typedefs.
 // Please note that struct/class/union/enum has its own pre-parsing routine.
 //
-boolean cxxParserParseGenericTypedef(void)
+bool cxxParserParseGenericTypedef(void)
 {
 	CXX_DEBUG_ENTER();
 
@@ -36,7 +36,7 @@ boolean cxxParserParseGenericTypedef(void)
 			))
 		{
 			CXX_DEBUG_LEAVE_TEXT("Failed to parse fast statement");
-			return FALSE;
+			return false;
 		}
 
 		// This fixes bug reported by Emil Rojas in 2002.
@@ -48,7 +48,7 @@ boolean cxxParserParseGenericTypedef(void)
 			{
 				// not semicolon
 				CXX_DEBUG_LEAVE_TEXT("Found EOF/closing bracket at typedef");
-				return TRUE; // EOF
+				return true; // EOF
 			}
 			// semicolon: exit
 			break;
@@ -62,13 +62,13 @@ boolean cxxParserParseGenericTypedef(void)
 		)
 		{
 			CXX_DEBUG_LEAVE_TEXT("Found a terminating keyword inside typedef");
-			return TRUE; // treat as semicolon but don't dare to emit a tag
+			return true; // treat as semicolon but don't dare to emit a tag
 		}
 	}
 
-	cxxParserExtractTypedef(g_cxx.pTokenChain,TRUE);
+	cxxParserExtractTypedef(g_cxx.pTokenChain,true);
 	CXX_DEBUG_LEAVE();
-	return TRUE;
+	return true;
 }
 
 //
@@ -76,7 +76,7 @@ boolean cxxParserParseGenericTypedef(void)
 // specified chain.
 // The typedef keyword should already have been removed (!)
 // The function expects a terminator to be present at the end
-// unless bExpectTerminatorAtEnd is set to FALSE
+// unless bExpectTerminatorAtEnd is set to false
 // The token chain may be condensed/destroyed upon exit.
 //
 // Samples:
@@ -141,7 +141,7 @@ boolean cxxParserParseGenericTypedef(void)
 //
 void cxxParserExtractTypedef(
 		CXXTokenChain * pChain,
-		boolean bExpectTerminatorAtEnd
+		bool bExpectTerminatorAtEnd
 	)
 {
 	CXX_DEBUG_ENTER();

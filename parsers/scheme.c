@@ -28,8 +28,8 @@ typedef enum {
 } schemeKind;
 
 static kindOption SchemeKinds [] = {
-	{ TRUE, 'f', "function", "functions" },
-	{ TRUE, 's', "set",      "sets" }
+	{ true, 'f', "function", "functions" },
+	{ true, 's', "set",      "sets" }
 };
 
 /*

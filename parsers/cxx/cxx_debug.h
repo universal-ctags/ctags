@@ -53,7 +53,7 @@ void cxxDebugInit(void);
 		if(!(_condition)) \
 		{ \
 			cxxDebugPrint(__PRETTY_FUNCTION__,_szFormat,## __VA_ARGS__); \
-			Assert(FALSE); \
+			Assert(false); \
 		} \
 	} while(0)
 

@@ -45,12 +45,12 @@ typedef enum {
 } makeAMDirectoryRole;
 
 static roleDesc AutomakeDirectoryRoles [] = {
-	{ TRUE, "program",   "directory for PROGRAMS primary" },
-	{ TRUE, "man",       "directory for MANS primary" },
-	{ TRUE, "ltlibrary", "directory for LTLIBRARIES primary"},
-	{ TRUE, "library",   "directory for LIBRARIES primary"},
-	{ TRUE, "script",    "directory for SCRIPTS primary"},
-	{ TRUE, "data",      "directory for DATA primary"},
+	{ true, "program",   "directory for PROGRAMS primary" },
+	{ true, "man",       "directory for MANS primary" },
+	{ true, "ltlibrary", "directory for LTLIBRARIES primary"},
+	{ true, "library",   "directory for LIBRARIES primary"},
+	{ true, "script",    "directory for SCRIPTS primary"},
+	{ true, "data",      "directory for DATA primary"},
 };
 
 typedef enum {
@@ -58,7 +58,7 @@ typedef enum {
 } makeAMConditionRole;
 
 static roleDesc AutomakeConditionRoles [] = {
-	{ TRUE, "branched",  "used for branching" },
+	{ true, "branched",  "used for branching" },
 };
 
 static scopeSeparator AutomakeSeparators [] = {
@@ -66,22 +66,22 @@ static scopeSeparator AutomakeSeparators [] = {
 };
 
 static kindOption AutomakeKinds [] = {
-	{ TRUE, 'd', "directory", "directories",
-	  .referenceOnly = FALSE, ATTACH_ROLES(AutomakeDirectoryRoles)},
-	{ TRUE, 'P', "program",   "programs",
+	{ true, 'd', "directory", "directories",
+	  .referenceOnly = false, ATTACH_ROLES(AutomakeDirectoryRoles)},
+	{ true, 'P', "program",   "programs",
 	  ATTACH_SEPARATORS(AutomakeSeparators) },
-	{ TRUE, 'M', "man",       "manuals",
+	{ true, 'M', "man",       "manuals",
 	  ATTACH_SEPARATORS(AutomakeSeparators) },
-	{ TRUE, 'T', "ltlibrary", "ltlibraries",
+	{ true, 'T', "ltlibrary", "ltlibraries",
 	  ATTACH_SEPARATORS(AutomakeSeparators) },
-	{ TRUE, 'L', "library",   "libraries",
+	{ true, 'L', "library",   "libraries",
 	  ATTACH_SEPARATORS(AutomakeSeparators) },
-	{ TRUE, 'S', "script",    "scripts",
+	{ true, 'S', "script",    "scripts",
 	  ATTACH_SEPARATORS(AutomakeSeparators) },
-	{ TRUE, 'D', "data",      "datum",
+	{ true, 'D', "data",      "datum",
 	  ATTACH_SEPARATORS(AutomakeSeparators) },
-	{ TRUE, 'c', "condition", "conditions",
-	  .referenceOnly = TRUE, ATTACH_ROLES(AutomakeConditionRoles) },
+	{ true, 'c', "condition", "conditions",
+	  .referenceOnly = true, ATTACH_ROLES(AutomakeConditionRoles) },
 };
 
 static hashTable* AutomakeDirectories;
@@ -99,13 +99,13 @@ struct sBlacklist {
 };
 
 
-static boolean bl_check (const char *name, struct sBlacklist *blacklist)
+static bool bl_check (const char *name, struct sBlacklist *blacklist)
 {
 	if ((blacklist->type == BL_PREFIX) &&
 	    (strncmp (blacklist->substr, name, blacklist->len) == 0))
-		return FALSE;
+		return false;
 	else
-		return TRUE;
+		return true;
 }
 
 static int lookupAutomakeDirectory (vString *const name)
@@ -128,7 +128,7 @@ static void addAutomakeDirectory (vString *const name, int corkIndex)
 	hashTablePutItem (AutomakeDirectories, k, i);
 }
 
-static boolean AutomakeMakeTag (vString *const name, const char* suffix, boolean appending,
+static bool AutomakeMakeTag (vString *const name, const char* suffix, bool appending,
 			    int kindex, int rindex, struct sBlacklist *blacklist,
 			    void *data)
 {
@@ -143,17 +143,17 @@ static boolean AutomakeMakeTag (vString *const name, const char* suffix, boolean
 	expected_len = strlen (suffix);
 
 	if (len <= expected_len)
-		return FALSE;
+		return false;
 
 	for (i = 0; blacklist[i].type != BL_END; i++)
 	{
-		if (bl_check (vStringValue(name), blacklist + i) == FALSE)
-			return FALSE;
+		if (bl_check (vStringValue(name), blacklist + i) == false)
+			return false;
 	}
 
 	tail = vStringValue (name) + len - expected_len;
 	if (strcmp (tail, suffix))
-		return FALSE;
+		return false;
 
 	subname = vStringNew();
 
@@ -179,7 +179,7 @@ static boolean AutomakeMakeTag (vString *const name, const char* suffix, boolean
 	}
 
 	vStringDelete (subname);
-	return TRUE;
+	return true;
 }
 
 static void valuesFoundAM (struct makeParserClient *client, vString *name, void *data)
@@ -258,8 +258,8 @@ static void directiveFoundAM (struct makeParserClient *client,
 }
 
 static void newMacroAM (struct makeParserClient *client,
-			vString *const name, boolean with_define_directive,
-			boolean appending, void * data)
+			vString *const name, bool with_define_directive,
+			bool appending, void * data)
 {
 	*((int *)data)  = CORK_NIL;
 
@@ -316,6 +316,6 @@ extern parserDefinition* AutomakeParser (void)
 	def->kindCount  = ARRAY_SIZE (AutomakeKinds);
 	def->patterns   = patterns;
 	def->parser     = findAutomakeTags;
-	def->useCork    = TRUE;
+	def->useCork    = true;
 	return def;
 }

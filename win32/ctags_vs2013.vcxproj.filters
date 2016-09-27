@@ -461,9 +461,6 @@
     <ClInclude Include="..\main\gcc-attr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\mybool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\main\routines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -519,9 +516,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
    <ClInclude Include="..\main\gcc-attr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-   <ClInclude Include="..\main\mybool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
    <ClInclude Include="..\parsers\make.h">

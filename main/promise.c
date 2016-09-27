@@ -73,10 +73,10 @@ void breakPromisesAfter (int promise)
 	promise_count = promise;
 }
 
-boolean forcePromises (void)
+bool forcePromises (void)
 {
 	int i;
-	boolean tagFileResized = FALSE;
+	bool tagFileResized = false;
 
 	for (i = 0; i < promise_count; ++i)
 	{
@@ -87,7 +87,7 @@ boolean forcePromises (void)
 								 p->endLine,
 								 p->endCharOffset,
 								 p->sourceLineOffset)
-			? TRUE
+			? true
 			: tagFileResized;
 	}
 

@@ -31,7 +31,7 @@ typedef enum {
 } yumRepoKind;
 
 static kindOption YumRepoKinds [] = {
-	{ TRUE, 'r', "repoid", "repository id" },
+	{ true, 'r', "repoid", "repository id" },
 };
 
 

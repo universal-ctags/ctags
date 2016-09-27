@@ -23,7 +23,7 @@ tagWriter xrefWriter = {
 	.writePtagEntry = NULL,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
-	.useStdoutByDefault = TRUE,
+	.useStdoutByDefault = true,
 };
 
 static int writeXrefEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)

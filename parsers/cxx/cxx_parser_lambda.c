@@ -89,7 +89,7 @@ CXXToken * cxxParserOpeningBracketIsLambda(void)
 }
 
 // In case of a lambda without parentheses this is the capture list token.
-boolean cxxParserHandleLambda(CXXToken * pParenthesis)
+bool cxxParserHandleLambda(CXXToken * pParenthesis)
 {
 	CXX_DEBUG_ENTER();
 
@@ -160,7 +160,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 
 	if(tag)
 	{
-		tag->isFileScope = TRUE;
+		tag->isFileScope = true;
 
 		CXXToken * pTypeName;
 
@@ -220,7 +220,7 @@ boolean cxxParserHandleLambda(CXXToken * pParenthesis)
 			cxxParserEmitFunctionParameterTags(&oParamInfo);
 	}
 
-	boolean bRet = cxxParserParseBlock(TRUE);
+	bool bRet = cxxParserParseBlock(true);
 
 	if(iCorkQueueIndex > CORK_NIL)
 		cxxParserMarkEndLineForTagInCorkQueue(iCorkQueueIndex);

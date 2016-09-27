@@ -63,25 +63,25 @@ typedef struct {
 	char* name;
 
 		/* Does file exist? If not, members below do not contain valid data. */
-	boolean exists;
+	bool exists;
 
 		/* is file path a symbolic link to another file? */
-	boolean isSymbolicLink;
+	bool isSymbolicLink;
 
 		/* Is file (pointed to) a directory? */
-	boolean isDirectory;
+	bool isDirectory;
 
 		/* Is file (pointed to) a normal file? */
-	boolean isNormalFile;
+	bool isNormalFile;
 
 		/* Is file (pointed to) executable? */
-	boolean isExecutable;
+	bool isExecutable;
 
 		/* Is file (pointed to) setuid? */
-	boolean isSetuid;
+	bool isSetuid;
 
 		/* Is file (pointed to) setgid? */
-	boolean isSetgid;
+	bool isSetgid;
 
 		/* Size of file (pointed to) */
 	unsigned long size;
@@ -119,22 +119,22 @@ extern void toLowerString (char* str);
 extern void toUpperString (char* str);
 extern char* newLowerString (const char* str);
 extern char* newUpperString (const char* str);
-extern boolean strToUInt(const char *const str, int base, unsigned int *value);
-extern boolean strToULong(const char *string, int base, unsigned long *value);
-extern boolean strToInt(const char *const str, int base, int *value);
-extern boolean strToLong(const char *string, int base, long *value);
+extern bool strToUInt(const char *const str, int base, unsigned int *value);
+extern bool strToULong(const char *string, int base, unsigned long *value);
+extern bool strToInt(const char *const str, int base, int *value);
+extern bool strToLong(const char *string, int base, long *value);
 
 /* File system functions */
 extern void setCurrentDirectory (void);
 extern fileStatus *eStat (const char *const fileName);
 extern void eStatFree (fileStatus *status);
-extern boolean doesFileExist (const char *const fileName);
-extern boolean doesExecutableExist (const char *const fileName);
-extern boolean isRecursiveLink (const char* const dirName);
-extern boolean isSameFile (const char *const name1, const char *const name2);
+extern bool doesFileExist (const char *const fileName);
+extern bool doesExecutableExist (const char *const fileName);
+extern bool isRecursiveLink (const char* const dirName);
+extern bool isSameFile (const char *const name1, const char *const name2);
 extern const char *baseFilename (const char *const filePath);
 extern const char *fileExtension (const char *const fileName);
-extern boolean isAbsolutePath (const char *const path);
+extern bool isAbsolutePath (const char *const path);
 extern char *combinePathAndFile (const char *const path, const char *const file);
 extern char* absoluteFilename (const char *file);
 extern char* absoluteDirname (char *file);

@@ -94,7 +94,7 @@ static int writeEtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data
 			return 0;
 
 		if (tag->truncateLine)
-			truncateTagLine (line, tag->name, TRUE);
+			truncateTagLine (line, tag->name, true);
 		else
 			line [strlen (line) - 1] = '\0';
 

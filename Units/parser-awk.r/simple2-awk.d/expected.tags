@@ -1,0 +1,2 @@
+max	input.awk	/^function max(x, y) { return (x > y) ? x : y }$/;"	f
+numjust	input.awk	/^function numjust(n, s) {   # position s in field n$/;"	f

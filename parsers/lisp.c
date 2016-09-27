@@ -25,7 +25,7 @@ typedef enum {
 } lispKind;
 
 static kindOption LispKinds [] = {
-	{ TRUE, 'f', "function", "functions" }
+	{ true, 'f', "function", "functions" }
 };
 
 /*

@@ -38,7 +38,7 @@ struct iniconfParserClient {
 	void *data;
 
 	void* (* prepareForNewInput) (void);
-	boolean (* probeLanguage) (const char *section, const char *key, const char *value);
+	bool (* probeLanguage) (const char *section, const char *key, const char *value);
 	iniconfCallback handleInputData;
 };
 

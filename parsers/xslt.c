@@ -36,42 +36,42 @@ typedef enum {
 	R_STYLESHEET_INCLUDED,
 } xsltStylesheetRole;
 static roleDesc XsltStylesheetRoles [] = {
-	{ TRUE, "imported", "imported" },
-	{ TRUE, "included", "included" },
+	{ true, "imported", "imported" },
+	{ true, "included", "included" },
 };
 
 typedef enum {
 	R_PARAMETER_BOUND,
 } xsltParameterRole;
 static roleDesc XsltParameterRoles [] = {
-	{ TRUE, "bound", "bound to value" },
+	{ true, "bound", "bound to value" },
 };
 
 typedef enum {
 	R_MATCHED_TEMPLATE_APPLIED,
 } xsltMatchedTemplateRole;
 static roleDesc XsltMatchedTemplateRoles [] = {
-	{ TRUE, "applied", "applied" },
+	{ true, "applied", "applied" },
 };
 
 typedef enum {
 	R_NAMED_TEMPLATE_CALLED,
 } xsltNamedTemplateRole;
 static roleDesc XsltNamedTemplateRoles [] = {
-	{ TRUE, "called", "called" },
+	{ true, "called", "called" },
 };
 
 
 static kindOption XsltKinds [] = {
-	{ TRUE,  's', "stylesheet", "stylesheets",
-	  .referenceOnly = TRUE, ATTACH_ROLES (XsltStylesheetRoles) },
-	{ TRUE,  'p', "parameter", "parameters",
-	  .referenceOnly = FALSE, ATTACH_ROLES (XsltParameterRoles) },
-	{ TRUE,  'm', "matchedTemplate", "matched template",
-	  .referenceOnly = FALSE, ATTACH_ROLES (XsltMatchedTemplateRoles) },
-	{ TRUE,  'n', "namedTemplate",   "matched template",
-	  .referenceOnly = FALSE, ATTACH_ROLES (XsltNamedTemplateRoles) },
-	{ TRUE,  'v', "variable", "variables" },
+	{ true,  's', "stylesheet", "stylesheets",
+	  .referenceOnly = true, ATTACH_ROLES (XsltStylesheetRoles) },
+	{ true,  'p', "parameter", "parameters",
+	  .referenceOnly = false, ATTACH_ROLES (XsltParameterRoles) },
+	{ true,  'm', "matchedTemplate", "matched template",
+	  .referenceOnly = false, ATTACH_ROLES (XsltMatchedTemplateRoles) },
+	{ true,  'n', "namedTemplate",   "matched template",
+	  .referenceOnly = false, ATTACH_ROLES (XsltNamedTemplateRoles) },
+	{ true,  'v', "variable", "variables" },
 };
 
 static void makeTagRecursivelyWithVersionVerification (xmlNode *node,
@@ -221,7 +221,7 @@ static void verifyVersion (xmlNode *node,
 			   xmlXPathContext *ctx,
 			   void *userData)
 {
-	boolean *acceptable = userData;
+	bool *acceptable = userData;
 	char *version = (char *)xmlNodeGetContent (node);
 
 	if (version)
@@ -229,7 +229,7 @@ static void verifyVersion (xmlNode *node,
 		if (strcmp (version, "1.0") == 0)
 		{
 			verbose ("xslt: accept versoin: %s\n", version);
-			*acceptable = TRUE;
+			*acceptable = true;
 		}
 		else
 			verbose ("xslt: unsupported versoin: %s\n", version);
@@ -266,7 +266,7 @@ static void makeTagRecursivelyWithVersionVerification (xmlNode *node,
 						       xmlXPathContext *ctx,
 						       void *userData)
 {
-	boolean acceptable = FALSE;
+	bool acceptable = false;
 	int backup;
 
 	findXMLTags (ctx, node,
@@ -334,6 +334,6 @@ XsltParser (void)
 	def->parser        = findXsltTags;
 	def->tagXpathTableTable = xsltXpathTableTable;
 	def->tagXpathTableCount = ARRAY_SIZE (xsltXpathTableTable);
-	def->useCork = TRUE;
+	def->useCork = true;
 	return def;
 }

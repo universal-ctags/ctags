@@ -37,21 +37,21 @@ typedef enum {
 } shScriptRole;
 
 static roleDesc ShScriptRoles [] = {
-	{ TRUE, "loaded", "loaded" },
+	{ true, "loaded", "loaded" },
 };
 
 static kindOption ShKinds [] = {
-	{ TRUE, 'a', "alias", "aliases"},
-	{ TRUE, 'f', "function", "functions"},
-	{ TRUE, 's', "script", "script files",
-	  .referenceOnly = TRUE, ATTACH_ROLES (ShScriptRoles) },
+	{ true, 'a', "alias", "aliases"},
+	{ true, 'f', "function", "functions"},
+	{ true, 's', "script", "script files",
+	  .referenceOnly = true, ATTACH_ROLES (ShScriptRoles) },
 };
 
 /*
 *   FUNCTION DEFINITIONS
 */
 
-static boolean isFileChar  (int c)
+static bool isFileChar  (int c)
 {
 	return (isalnum (c)
 		|| c == '_' || c == '-'
@@ -61,13 +61,13 @@ static boolean isFileChar  (int c)
 		|| c == '~');
 }
 
-static boolean isIdentChar (int c)
+static bool isIdentChar (int c)
 {
 	return (isalnum (c) || c == '_' || c == '-');
 }
 
 /* bash allows all kinds of crazy stuff as the identifier after 'function' */
-static boolean isBashFunctionChar (int c)
+static bool isBashFunctionChar (int c)
 {
 	return (c > 1 /* NUL and SOH are disallowed */ && c != 0x7f &&
 	        /* blanks are disallowed, but VT and FF (and CR to some extent, but
@@ -104,8 +104,8 @@ static void findShTags (void)
 	vString *name = vStringNew ();
 	const unsigned char *line;
 	vString *hereDocDelimiter = NULL;
-	boolean hereDocIndented = FALSE;
-	boolean (* check_char)(int);
+	bool hereDocIndented = false;
+	bool (* check_char)(int);
 
 	while ((line = readLineFromInputFile ()) != NULL)
 	{
@@ -145,15 +145,15 @@ static void findShTags (void)
 			else if (cp[0] == '<' && cp[1] == '<')
 			{
 				const unsigned char *start, *end;
-				boolean trimEscapeSequences = FALSE;
-				boolean quoted = FALSE;
+				bool trimEscapeSequences = false;
+				bool quoted = false;
 				cp += 2;
 				/* an optional "-" strips leading tabulations from the heredoc lines */
 				if (*cp != '-')
-					hereDocIndented = FALSE;
+					hereDocIndented = false;
 				else
 				{
-					hereDocIndented = TRUE;
+					hereDocIndented = true;
 					cp++;
 				}
 				while (isspace (*cp))
@@ -166,14 +166,14 @@ static void findShTags (void)
 					end = cp = skipDoubleString (cp);
 					/* we need not to worry about variable substitution, they
 					 * don't happen in heredoc delimiter definition */
-					trimEscapeSequences = TRUE;
-					quoted = TRUE;
+					trimEscapeSequences = true;
+					quoted = true;
 				}
 				else if (*cp == '\'')
 				{
 					start++;
 					end = cp = skipSingleString (cp);
-					quoted = TRUE;
+					quoted = true;
 				}
 				else
 				{

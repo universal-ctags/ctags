@@ -34,8 +34,8 @@
 /*
  *	 MACROS
  */
-#define isType(token,t)		(boolean) ((token)->type == (t))
-#define isKeyword(token,k)	(boolean) ((token)->keyword == (k))
+#define isType(token,t)		(bool) ((token)->type == (t))
+#define isKeyword(token,k)	(bool) ((token)->keyword == (k))
 
 /*
  *	 DATA DECLARATIONS
@@ -119,8 +119,8 @@ typedef struct sTokenInfo {
 	unsigned long 	lineNumber;
 	MIOPos 			filePosition;
 	int				nestLevel;
-	boolean			ignoreTag;
-	boolean			isClass;
+	bool			ignoreTag;
+	bool			isClass;
 } tokenInfo;
 
 /*
@@ -140,12 +140,12 @@ typedef enum {
 } flexKind;
 
 static kindOption FlexKinds [] = {
-	{ TRUE,  'f', "function",	  "functions"		   },
-	{ TRUE,  'c', "class",		  "classes"			   },
-	{ TRUE,  'm', "method",		  "methods"			   },
-	{ TRUE,  'p', "property",	  "properties"		   },
-	{ TRUE,  'v', "variable",	  "global variables"   },
-	{ TRUE,  'x', "mxtag",		  "mxtags" 			   }
+	{ true,  'f', "function",	  "functions"		   },
+	{ true,  'c', "class",		  "classes"			   },
+	{ true,  'm', "method",		  "methods"			   },
+	{ true,  'p', "property",	  "properties"		   },
+	{ true,  'v', "variable",	  "global variables"   },
+	{ true,  'x', "mxtag",		  "mxtags" 			   }
 };
 
 /*	Used to determine whether keyword is valid for the token language and
@@ -189,19 +189,19 @@ static const keywordTable FlexKeywordTable [] = {
 
 /* Recursive functions */
 static void parseFunction (tokenInfo *const token);
-static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent);
-static boolean parseLine (tokenInfo *const token);
-static boolean parseActionScript (tokenInfo *const token);
-static boolean parseMXML (tokenInfo *const token);
+static bool parseBlock (tokenInfo *const token, tokenInfo *const parent);
+static bool parseLine (tokenInfo *const token);
+static bool parseActionScript (tokenInfo *const token);
+static bool parseMXML (tokenInfo *const token);
 
-static boolean isEOF (tokenInfo *const token)
+static bool isEOF (tokenInfo *const token)
 {
 	return isType (token, TOKEN_EOF);
 }
 
-static boolean isIdentChar (const int c)
+static bool isIdentChar (const int c)
 {
-	return (boolean)
+	return (bool)
 		(isalpha (c) || isdigit (c) || c == '$' || 
 		 c == '@' || c == '_' || c == '#');
 }
@@ -215,8 +215,8 @@ static tokenInfo *newToken (void)
 	token->string		= vStringNew ();
 	token->scope		= vStringNew ();
 	token->nestLevel	= 0;
-	token->isClass		= FALSE;
-	token->ignoreTag	= FALSE;
+	token->isClass		= false;
+	token->ignoreTag	= false;
 	token->lineNumber   = getInputLineNumber ();
 	token->filePosition = getInputFilePosition ();
 
@@ -368,19 +368,19 @@ static void makeFunctionTag (tokenInfo *const token)
 
 static void parseString (vString *const string, const int delimiter)
 {
-	boolean end = FALSE;
+	bool end = false;
 	while (! end)
 	{
 		int c = getcFromInputFile ();
 		if (c == EOF)
-			end = TRUE;
+			end = true;
 		else if (c == '\\')
 		{
 			c = getcFromInputFile(); /* This maybe a ' or ". */
 			vStringPut(string, c);
 		}
 		else if (c == delimiter)
-			end = TRUE;
+			end = true;
 		else
 			vStringPut (string, c);
 	}
@@ -982,9 +982,9 @@ static void parseLoop (tokenInfo *const token)
 	}
 }
 
-static boolean parseIf (tokenInfo *const token)
+static bool parseIf (tokenInfo *const token)
 {
-	boolean read_next_token = TRUE;
+	bool read_next_token = true;
 	/*
 	 * If statements have two forms
 	 *	   if ( ... )
@@ -1069,7 +1069,7 @@ static boolean parseIf (tokenInfo *const token)
 			/*
 			 * This statement did not have a line terminator.
 			 */
-			read_next_token = FALSE;
+			read_next_token = false;
 		} 
 		else 
 		{
@@ -1080,7 +1080,7 @@ static boolean parseIf (tokenInfo *const token)
 				/*
 				* This statement did not have a line terminator.
 				*/
-				read_next_token = FALSE;
+				read_next_token = false;
 			} 
 			else
 			{
@@ -1185,9 +1185,9 @@ static void parseFunction (tokenInfo *const token)
 	deleteToken (name);
 }
 
-static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
+static bool parseBlock (tokenInfo *const token, tokenInfo *const parent)
 {
-	boolean read_next_token = TRUE;
+	bool read_next_token = true;
 	vString * saveScope = vStringNew ();
 
 	vStringCopy (saveScope, token->scope);
@@ -1259,7 +1259,7 @@ static boolean parseBlock (tokenInfo *const token, tokenInfo *const parent)
 				, vStringValue(token->string)
 				);
 			);
-	return FALSE;
+	return false;
 }
 
 static void parseMethods (tokenInfo *const token, tokenInfo *const class)
@@ -1330,12 +1330,12 @@ cleanUp:
 	deleteToken (name);
 }
 
-static boolean parseVar (tokenInfo *const token, boolean is_public)
+static bool parseVar (tokenInfo *const token, bool is_public)
 {
 	tokenInfo *const name = newToken ();
 	tokenInfo *const secondary_name = newToken ();
 	vString * saveScope = vStringNew ();
-	boolean is_terminated = TRUE;
+	bool is_terminated = true;
 
 	vStringCopy (saveScope, token->scope);
 	/*
@@ -1390,11 +1390,11 @@ static boolean parseVar (tokenInfo *const token, boolean is_public)
 	return is_terminated;
 }
 
-static boolean parseClass (tokenInfo *const token)
+static bool parseClass (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
 	vString * saveScope = vStringNew ();
-	boolean saveIsClass = token->isClass;
+	bool saveIsClass = token->isClass;
 
 	vStringCopy (saveScope, token->scope);
 	/*
@@ -1408,7 +1408,7 @@ static boolean parseClass (tokenInfo *const token)
 		readToken(token);
 	}
 
-	token->isClass = TRUE;
+	token->isClass = true;
 	/* Add class name to scope */
 	addToScope(token, token->string);
 	/* Class name */
@@ -1442,19 +1442,19 @@ static boolean parseClass (tokenInfo *const token)
 	deleteToken (name);
 	vStringDelete(saveScope);
 
-	return TRUE;
+	return true;
 }
 
-static boolean parseStatement (tokenInfo *const token)
+static bool parseStatement (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
 	tokenInfo *const secondary_name = newToken ();
 	vString * saveScope = vStringNew ();
-	boolean is_public = FALSE;
-	boolean is_class = FALSE;
-	boolean is_terminated = TRUE;
-	boolean is_global = FALSE;
-	/* boolean is_prototype = FALSE; */
+	bool is_public = false;
+	bool is_class = false;
+	bool is_terminated = true;
+	bool is_global = false;
+	/* bool is_prototype = false; */
 	vString *	fulltag;
 
 	vStringCopy (saveScope, token->scope);
@@ -1496,7 +1496,7 @@ static boolean parseStatement (tokenInfo *const token)
 
 	if ( isKeyword(token, KEYWORD_public) )
 	{
-		is_public = TRUE;
+		is_public = true;
 		readToken(token);
 	}
 
@@ -1562,7 +1562,7 @@ static boolean parseStatement (tokenInfo *const token)
 			/*
 			 * Cannot be a global variable is it has dot references in the name
 			 */
-			is_global = FALSE;
+			is_global = false;
 			do
 			{
 				readToken (token);
@@ -1601,8 +1601,8 @@ static boolean parseStatement (tokenInfo *const token)
 					 *
 					 */
 					makeClassTag (name);
-					is_class = TRUE;
-					/* is_prototype = TRUE; */
+					is_class = true;
+					/* is_prototype = true; */
 
 					/*
 					 * There should a ".function_name" next.
@@ -1626,13 +1626,13 @@ static boolean parseStatement (tokenInfo *const token)
 							 * we do NOT want to create any tags based on what is
 							 * within the blocks.
 							 */
-							token->ignoreTag = TRUE;
+							token->ignoreTag = true;
 							/*
 							 * Find to the end of the statement 
 							 */
 							findCmdTerm (token);
-							token->ignoreTag = FALSE;
-							is_terminated = TRUE;
+							token->ignoreTag = false;
+							is_terminated = true;
 							goto cleanUp;
 						}
 					} 
@@ -1655,8 +1655,8 @@ static boolean parseStatement (tokenInfo *const token)
 							 * Find to the end of the statement 
 							 */
 							findCmdTerm (token);
-							token->ignoreTag = FALSE;
-							is_terminated = TRUE;
+							token->ignoreTag = false;
+							is_terminated = true;
 							goto cleanUp;
 						}
 					}
@@ -1691,7 +1691,7 @@ static boolean parseStatement (tokenInfo *const token)
 		 * processed an open curly brace indicates
 		 * the statement is most likely not terminated.
 		 */
-		is_terminated = FALSE;
+		is_terminated = false;
 		goto cleanUp;
 	}
 
@@ -1815,7 +1815,7 @@ static boolean parseStatement (tokenInfo *const token)
 				 * Assume the closing parantheses terminates
 				 * this statements.
 				 */
-				is_terminated = TRUE;
+				is_terminated = true;
 			}
 		}
 		else if (isKeyword (token, KEYWORD_new))
@@ -1828,7 +1828,7 @@ static boolean parseStatement (tokenInfo *const token)
 			{
 				if ( isKeyword (token, KEYWORD_object) || 
 						isKeyword (token, KEYWORD_capital_object) )
-					is_class = TRUE;
+					is_class = true;
 
 				readToken (token);
 				if ( isType (token, TOKEN_OPEN_PAREN) )
@@ -1906,7 +1906,7 @@ static boolean parseStatement (tokenInfo *const token)
 	 * }
 	 */
 	if ( ! is_terminated && isType (token, TOKEN_CLOSE_CURLY)) 
-		is_terminated = FALSE;
+		is_terminated = false;
 
 
 cleanUp:
@@ -1918,9 +1918,9 @@ cleanUp:
 	return is_terminated;
 }
 
-static boolean parseLine (tokenInfo *const token)
+static bool parseLine (tokenInfo *const token)
 {
-	boolean is_terminated = TRUE;
+	bool is_terminated = true;
 	/*
 	 * Detect the common statements, if, while, for, do, ...
 	 * This is necessary since the last statement within a block "{}"
@@ -1968,7 +1968,7 @@ static boolean parseLine (tokenInfo *const token)
 	return is_terminated;
 }
 
-static boolean parseCDATA (tokenInfo *const token)
+static bool parseCDATA (tokenInfo *const token)
 {
 	if (isType (token, TOKEN_LESS_THAN))
 	{
@@ -2008,10 +2008,10 @@ static boolean parseCDATA (tokenInfo *const token)
 	{
 		parseActionScript (token);
 	}
-	return TRUE;
+	return true;
 }
 
-static boolean parseNamespace (tokenInfo *const token)
+static bool parseNamespace (tokenInfo *const token)
 {
 	/*
 	 * If we have found a <, we know it is not a TOKEN_OPEN_MXML 
@@ -2041,17 +2041,17 @@ static boolean parseNamespace (tokenInfo *const token)
 			readToken (token);
 			if ( ! isType (token, TOKEN_IDENTIFIER))
 			{
-				return TRUE;
+				return true;
 			}
 		}
 		else
 		{
-			return TRUE;
+			return true;
 		}
 	}
 	else
 	{
-		return TRUE;
+		return true;
 	}
 
 	/* 
@@ -2079,14 +2079,14 @@ static boolean parseNamespace (tokenInfo *const token)
 	} while (! (isType (token, TOKEN_CLOSE_SGML) ||
 		    isType (token, TOKEN_CLOSE_MXML) ||
 		    isEOF (token)) );
-	return TRUE;
+	return true;
 }
 
-static boolean parseMXML (tokenInfo *const token)
+static bool parseMXML (tokenInfo *const token)
 {
 	tokenInfo *const name = newToken ();
 	tokenInfo *const type = newToken ();
-	boolean inside_attributes = TRUE;
+	bool inside_attributes = true;
 	/*
 	 * Detect the common statements, if, while, for, do, ...
 	 * This is necessary since the last statement within a block "{}"
@@ -2163,7 +2163,7 @@ static boolean parseMXML (tokenInfo *const token)
 	{
 		if (isType (token, TOKEN_GREATER_THAN))
 		{
-			inside_attributes = FALSE;
+			inside_attributes = false;
 		}
 		if (isType (token, TOKEN_LESS_THAN))
 		{
@@ -2216,10 +2216,10 @@ static boolean parseMXML (tokenInfo *const token)
 cleanUp:
 	deleteToken (name);
 	deleteToken (type);
-	return TRUE;
+	return true;
 }
 
-static boolean parseActionScript (tokenInfo *const token)
+static bool parseActionScript (tokenInfo *const token)
 {
 	do
 	{
@@ -2260,7 +2260,7 @@ static boolean parseActionScript (tokenInfo *const token)
 				readToken (token);
 				if (isType (token, TOKEN_GREATER_THAN))
 				{
-					return TRUE;
+					return true;
 				}
 			}
 		}
@@ -2271,7 +2271,7 @@ static boolean parseActionScript (tokenInfo *const token)
 			 */
 			readToken (token);
 			readToken (token);
-			return TRUE;
+			return true;
 		} 
 		else if (isType (token, TOKEN_OPEN_MXML))
 		{
@@ -2320,7 +2320,7 @@ static boolean parseActionScript (tokenInfo *const token)
 			}
 		}
 	} while (!isEOF (token));
-	return TRUE;
+	return true;
 }
 
 static void parseFlexFile (tokenInfo *const token)

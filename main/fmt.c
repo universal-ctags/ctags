@@ -39,14 +39,14 @@ static int printLiteral (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag CTAGS
 	return mio_puts (fp, fspec->const_str);
 }
 
-static boolean isParserFieldCompatibleWithFtype (const tagField *pfield, int baseFtype)
+static bool isParserFieldCompatibleWithFtype (const tagField *pfield, int baseFtype)
 {
 	do {
 		if (pfield->ftype == baseFtype)
-			return TRUE;
+			return true;
 		baseFtype = nextSiblingField (baseFtype);
 	} while (baseFtype != FIELD_UNKNOWN);
-	return FALSE;
+	return false;
 }
 
 static int printTagField (fmtSpec* fspec, MIO* fp, const tagEntryInfo * tag)
@@ -200,13 +200,13 @@ static fmtElement** queueTagField (fmtElement **last, long width, char field_let
 	cur->spec.field.width = width;
 	cur->spec.field.ftype = ftype;
 
-	enableField (ftype, TRUE, FALSE);
+	enableField (ftype, true, false);
 	if (language == LANG_AUTO)
 	{
 		fieldType ftype_next = ftype;
 
 		while ((ftype_next = nextSiblingField (ftype_next)) != FIELD_UNKNOWN)
-			enableField (ftype_next, TRUE, FALSE);
+			enableField (ftype_next, true, false);
 	}
 
 	cur->printer = printTagField;
@@ -221,7 +221,7 @@ extern fmtElement *fmtNew (const char*  fmtString)
 	vString *literal = NULL;
 	fmtElement *code  = NULL;
 	fmtElement **last = &code;
-	boolean found_percent = FALSE;
+	bool found_percent = false;
 	long column_width;
 	const char*  cursor;
 
@@ -231,7 +231,7 @@ extern fmtElement *fmtNew (const char*  fmtString)
 	{
 		if (found_percent)
 		{
-			found_percent = FALSE;
+			found_percent = false;
 			if (cursor[i] == '%')
 			{
 				if (literal == NULL)
@@ -303,7 +303,7 @@ extern fmtElement *fmtNew (const char*  fmtString)
 		else
 		{
 			if (cursor[i] == '%')
-				found_percent = TRUE;
+				found_percent = true;
 			else
 			{
 				if (literal == NULL)

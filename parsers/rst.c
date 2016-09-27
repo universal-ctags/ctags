@@ -37,10 +37,10 @@ typedef enum {
 } rstKind;
 
 static kindOption RstKinds[] = {
-	{ TRUE, 'c', "chapter",       "chapters"},
-	{ TRUE, 's', "section",       "sections" },
-	{ TRUE, 'S', "subsection",    "subsections" },
-	{ TRUE, 't', "subsubsection", "subsubsections" }
+	{ true, 'c', "chapter",       "chapters"},
+	{ true, 's', "section",       "sections" },
+	{ true, 'S', "subsection",    "subsections" },
+	{ true, 't', "subsubsection", "subsubsections" }
 };
 
 typedef enum {
@@ -51,7 +51,7 @@ static fieldSpec RstFields [] = {
 	{
 		.name = "sectionMarker",
 		.description = "character used for declaring section",
-		.enabled = FALSE,
+		.enabled = false,
 	},
 };
 
@@ -144,7 +144,7 @@ static void makeRstTag(const vString* const name, const int kind, const MIOPos f
 
 
 /* checks if str is all the same character */
-static boolean issame(const char *str)
+static bool issame(const char *str)
 {
 	char first = *str;
 
@@ -155,9 +155,9 @@ static boolean issame(const char *str)
 		str++;
 		c = *str;
 		if (c && c != first)
-			return FALSE;
+			return false;
 	}
-	return TRUE;
+	return true;
 }
 
 
@@ -273,7 +273,7 @@ extern parserDefinition* RstParser (void)
 	def->fieldSpecs = RstFields;
 	def->fieldSpecCount = ARRAY_SIZE (RstFields);
 
-	def->useCork = TRUE;
+	def->useCork = true;
 
 	return def;
 }

@@ -55,7 +55,7 @@ typedef enum eFieldType { /* extension field content control */
 typedef const char* (* renderEscaped) (const tagEntryInfo *const tag,
 				       const char *value,
 				       vString * buffer);
-typedef boolean (* isValueAvailable) (const struct sTagEntryInfo *const tag);
+typedef bool (* isValueAvailable) (const struct sTagEntryInfo *const tag);
 
 #define FIELD_LETTER_NO_USE '\0'
 typedef struct sFieldSpec {
@@ -65,7 +65,7 @@ typedef struct sFieldSpec {
 	unsigned char letter;
 	const char* name;
 	const char* description;
-	boolean enabled;
+	bool enabled;
 	renderEscaped renderEscaped;
 	isValueAvailable isValueAvailable;
 
@@ -88,16 +88,16 @@ extern fieldType getFieldTypeForOption (char letter);
    internally, each parser is not initialized. `LANG_IGNORE' is a bit faster. */
 extern fieldType getFieldTypeForName (const char *name);
 extern fieldType getFieldTypeForNameAndLanguage (const char *fieldName, langType language);
-extern boolean isFieldEnabled (fieldType type);
-extern boolean enableField (fieldType type, boolean state, boolean warnIfFixedField);
-extern boolean isCommonField (fieldType type);
+extern bool isFieldEnabled (fieldType type);
+extern bool enableField (fieldType type, bool state, bool warnIfFixedField);
+extern bool isCommonField (fieldType type);
 extern int     getFieldOwner (fieldType type);
 extern const char* getFieldName (fieldType type);
 extern void printFields (int language);
 
-extern boolean isFieldRenderable (fieldType type);
+extern bool isFieldRenderable (fieldType type);
 
-extern boolean doesFieldHaveValue (fieldType type, const tagEntryInfo *tag);
+extern bool doesFieldHaveValue (fieldType type, const tagEntryInfo *tag);
 extern const char* renderFieldEscaped (fieldType type, const tagEntryInfo *tag, int index);
 
 extern void initFieldDescs (void);

@@ -122,23 +122,23 @@ static void readQuotedWord(vString *const name)
 	}
 }
 
-static boolean skipLineEnding(int c)
+static bool skipLineEnding(int c)
 {
 	if (c == '\n')
-		return TRUE;
+		return true;
 	else if (c == '\r')
 	{
 		/* try to eat the `\n' of a `\r\n' sequence */
 		c = getcFromInputFile();
 		if (c != '\n')
 			ungetcToInputFile(c);
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
-static void skipToCharacter(int ch, boolean oneLine)
+static void skipToCharacter(int ch, bool oneLine)
 {
 	int c;
 
@@ -171,7 +171,7 @@ static void prepareForNewInput (struct m4ParserClient *client)
 
 struct probeData {
 	struct m4ParserClient *client;
-	boolean found;
+	bool found;
 	const char* token;
 };
 
@@ -189,7 +189,7 @@ static void mayRunProbe (void *key CTAGS_ATTR_UNUSED, void *value, void* user_da
 	if (client->probeLanguage && client->probeLanguage (probe_data->token))
 	{
 		probe_data->client = client;
-		probe_data->found = TRUE;
+		probe_data->found = true;
 	}
 }
 
@@ -198,7 +198,7 @@ static struct m4ParserClient * maySwitchLanguage (struct m4ParserClient *client,
 {
 	struct probeData probe_data = {
 		.client = client,
-		.found  = FALSE,
+		.found  = false,
 		.token  = vStringValue (token),
 	};
 
@@ -221,8 +221,8 @@ static struct m4ParserClient * maySwitchLanguage (struct m4ParserClient *client,
 }
 
 /* reads everything in a macro argument
- * return TRUE if there are more args, FALSE otherwise */
-extern boolean readM4MacroArgument(vString *const arg)
+ * return true if there are more args, false otherwise */
+extern bool readM4MacroArgument(vString *const arg)
 {
 	int c;
 
@@ -246,7 +246,7 @@ extern boolean readM4MacroArgument(vString *const arg)
 			vStringPut(arg, c);
 	}
 
-	return FALSE;
+	return false;
 }
 
 static void handleM4Changequote(void)
@@ -254,7 +254,7 @@ static void handleM4Changequote(void)
 	vString *const arg = vStringNew();
 	char args[2] = {0,0};
 	int i, n = (sizeof(args) / sizeof(args[0]));
-	boolean more = TRUE;
+	bool more = true;
 
 	for (i = 0; more && i < n; i++)
 	{
@@ -310,32 +310,32 @@ extern void registerM4ParserClient (const char *hostLang, struct m4ParserClient 
 	hashTablePutItem (m4ParserClients, &client->lang, client);
 }
 
-static boolean doesStartLineComment (struct m4ParserClient *client, int c, const char* token)
+static bool doesStartLineComment (struct m4ParserClient *client, int c, const char* token)
 {
 	struct m4ParserClient *current;
 	for (current = client; current; current = current->host)
 	{
 		if (current->doesStartLineComment (c, token, client->data))
-			return TRUE;
+			return true;
 	}
-	return FALSE;
+	return false;
 }
 
-static boolean doesStartQuote (int c)
+static bool doesStartQuote (int c)
 {
 	return (c == m4QuoteOpen);
 }
 
-static boolean doesStartStringLiteral (struct m4ParserClient *client, int c)
+static bool doesStartStringLiteral (struct m4ParserClient *client, int c)
 {
 	struct m4ParserClient *current;
 	for (current = client; current; current = current->host)
 	{
 		if (current->doesStartStringLiteral
 		    && current->doesStartStringLiteral (c, client->data))
-		    return TRUE;
+		    return true;
 	}
-	return FALSE;
+	return false;
 }
 
 static int handleMacro (struct m4ParserClient *client, const char *token)
@@ -343,7 +343,7 @@ static int handleMacro (struct m4ParserClient *client, const char *token)
 	struct m4ParserClient *current;
 	struct m4HandleTokenResult result = {
 		.index = CORK_NIL,
-		.consumed = FALSE,
+		.consumed = false,
 	};
 
 	for (current = client; current; current = current->host)
@@ -381,7 +381,7 @@ extern void runM4Parser (langType lang)
 		else if (doesStartQuote (c))
 			skipQuotes(c);
 		else if (doesStartStringLiteral (client, c))
-			skipToCharacter(c, FALSE);
+			skipToCharacter(c, false);
 		else if (c == '(' && vStringLength(token) > 0) /* catch a few macro calls */
 		{
 			client = maySwitchLanguage (client, token);
@@ -424,19 +424,19 @@ enum M4MacrofileRole {
 
 
 static roleDesc M4MacroRoles [] = {
-	{ TRUE, "undef", "undefined" },
+	{ true, "undef", "undefined" },
 };
 
 static roleDesc M4MacrofileRoles [] = {
-	{ TRUE, "included", "included macro" },
-	{ TRUE, "sincluded", "silently included macro" },
+	{ true, "included", "included macro" },
+	{ true, "sincluded", "silently included macro" },
 };
 
 static kindOption M4Kinds[] = {
-	{ TRUE, 'd', "macro", "macros",
-	  .referenceOnly = FALSE, ATTACH_ROLES(M4MacroRoles) },
-	{ TRUE, 'I', "macrofile", "macro files",
-	  .referenceOnly = TRUE, ATTACH_ROLES(M4MacrofileRoles) },
+	{ true, 'd', "macro", "macros",
+	  .referenceOnly = false, ATTACH_ROLES(M4MacroRoles) },
+	{ true, 'I', "macrofile", "macro files",
+	  .referenceOnly = true, ATTACH_ROLES(M4MacrofileRoles) },
 };
 
 typedef enum {
@@ -494,7 +494,7 @@ static void *m4PrepareForNewInput (void)
 	return &role;
 }
 
-static boolean m4DoesStartLineComment (int c, const char* token, void *data)
+static bool m4DoesStartLineComment (int c, const char* token, void *data)
 {
 	return (strcmp(token, "dnl") == 0);
 }
@@ -517,7 +517,7 @@ static int m4MakeTag (int kind, int role)
 			name = vStringNew();
 			while (true)
 			{
-				boolean more = readM4MacroArgument(name);
+				bool more = readM4MacroArgument(name);
 				/* TODO: The cork indexes are thrown away here.
 				   `end' field cannot be attached to multiple
 				   indexes. */
@@ -549,7 +549,7 @@ static struct m4HandleTokenResult m4HandleMacro (const char* token, void *data)
 	static langType lang = LANG_IGNORE;
 	struct m4HandleTokenResult result = {
 		.index = CORK_NIL,
-		.consumed = FALSE,
+		.consumed = false,
 	};
 
 	int keyword;
@@ -567,26 +567,26 @@ static struct m4HandleTokenResult m4HandleMacro (const char* token, void *data)
 	case KEYWORD_define:
 		kind = M4_MACRO_KIND;
 		role = ROLE_INDEX_DEFINITION;
-		result.consumed = TRUE;
+		result.consumed = true;
 		break;
 	case KEYWORD_undefine:
 		kind = M4_MACRO_KIND;
 		role = M4_MACRO_ROLE_UNDEF;
-		result.consumed = TRUE;
+		result.consumed = true;
 		break;
 	case KEYWORD_include:
 		kind = M4_MACROFILE_KIND;
 		role = M4_MACROFILE_ROLE_INCLUDED;
-		result.consumed = TRUE;
+		result.consumed = true;
 		break;
 	case KEYWORD_sinclude:
 		kind = M4_MACROFILE_KIND;
 		role = M4_MACROFILE_ROLE_SILENTLY_INCLUDED;
-		result.consumed = TRUE;
+		result.consumed = true;
 		break;
 	case KEYWORD_changequote:
 		handleM4Changequote ();
-		result.consumed = TRUE;
+		result.consumed = true;
 		break;
 	}
 

@@ -28,7 +28,7 @@ tagWriter ctagsWriter = {
 	.writePtagEntry = writeCtagsPtagEntry,
 	.preWriteEntry = NULL,
 	.postWriteEntry = NULL,
-	.useStdoutByDefault = FALSE,
+	.useStdoutByDefault = false,
 };
 
 static const char* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
@@ -93,8 +93,8 @@ static int file_puts (const char* s, void *data)
 
 static int addExtensionFields (MIO *mio, const tagEntryInfo *const tag)
 {
-	boolean isKindKeyEnabled = isFieldEnabled (FIELD_KIND_KEY);
-	boolean isScopeEnabled = isFieldEnabled   (FIELD_SCOPE_KEY);
+	bool isKindKeyEnabled = isFieldEnabled (FIELD_KIND_KEY);
+	bool isScopeEnabled = isFieldEnabled   (FIELD_SCOPE_KEY);
 
 	const char* const kindKey = isKindKeyEnabled
 		?getFieldName (FIELD_KIND_KEY)

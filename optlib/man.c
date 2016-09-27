@@ -47,7 +47,7 @@ extern parserDefinition* ManParser (void)
 
 	parserDefinition* const def = parserNew ("man");
 
-	def->enabled       = FALSE;
+	def->enabled       = false;
 	def->extensions    = extensions;
 	def->patterns      = patterns;
 	def->aliases       = aliases;

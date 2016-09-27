@@ -48,18 +48,18 @@ typedef enum {
 } RustKind;
 
 static kindOption rustKinds[] = {
-	{TRUE, 'n', "module", "module"},
-	{TRUE, 's', "struct", "structural type"},
-	{TRUE, 'i', "interface", "trait interface"},
-	{TRUE, 'c', "implementation", "implementation"},
-	{TRUE, 'f', "function", "Function"},
-	{TRUE, 'g', "enum", "Enum"},
-	{TRUE, 't', "typedef", "Type Alias"},
-	{TRUE, 'v', "variable", "Global variable"},
-	{TRUE, 'M', "macro", "Macro Definition"},
-	{TRUE, 'm', "field", "A struct field"},
-	{TRUE, 'e', "enumerator", "An enum variant"},
-	{TRUE, 'F', "method", "A method"},
+	{true, 'n', "module", "module"},
+	{true, 's', "struct", "structural type"},
+	{true, 'i', "interface", "trait interface"},
+	{true, 'c', "implementation", "implementation"},
+	{true, 'f', "function", "Function"},
+	{true, 'g', "enum", "Enum"},
+	{true, 't', "typedef", "Type Alias"},
+	{true, 'v', "variable", "Global variable"},
+	{true, 'M', "macro", "Macro Definition"},
+	{true, 'm', "field", "A struct field"},
+	{true, 'e', "enumerator", "An enum variant"},
+	{true, 'F', "method", "A method"},
 };
 
 typedef enum {
@@ -88,7 +88,7 @@ typedef struct {
 *   FUNCTION PROTOTYPES
 */
 
-static void parseBlock (lexerState *lexer, boolean delim, int kind, vString *scope);
+static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -160,24 +160,24 @@ static void advanceAndStoreChar (lexerState *lexer)
 	advanceChar(lexer);
 }
 
-static boolean isWhitespace (int c)
+static bool isWhitespace (int c)
 {
 	return c == ' ' || c == '\t' || c == '\r' || c == '\n';
 }
 
-static boolean isAscii (int c)
+static bool isAscii (int c)
 {
 	return (c >= 0) && (c < 0x80);
 }
 
 /* This isn't quite right for Unicode identifiers */
-static boolean isIdentifierStart (int c)
+static bool isIdentifierStart (int c)
 {
 	return (isAscii(c) && (isalpha(c) || c == '_')) || !isAscii(c);
 }
 
 /* This isn't quite right for Unicode identifiers */
-static boolean isIdentifierContinue (int c)
+static bool isIdentifierContinue (int c)
 {
 	return (isAscii(c) && (isalnum(c) || c == '_')) || !isAscii(c);
 }
@@ -343,9 +343,9 @@ static void scanCharacterOrLifetime (lexerState *lexer)
  * (otherwise it is concatenated and returned as a single whitespace token).
  * Whitespace is needed to properly render function signatures. Unrecognized
  * token starts are stored literally, e.g. token may equal to a character '#'. */
-static int advanceToken (lexerState *lexer, boolean skip_whitspace)
+static int advanceToken (lexerState *lexer, bool skip_whitspace)
 {
-	boolean have_whitespace = FALSE;
+	bool have_whitespace = false;
 	lexer->line = getInputLineNumber();
 	lexer->pos = getInputFilePosition();
 	while (lexer->cur_c != EOF)
@@ -353,12 +353,12 @@ static int advanceToken (lexerState *lexer, boolean skip_whitspace)
 		if (isWhitespace(lexer->cur_c))
 		{
 			scanWhitespace(lexer);
-			have_whitespace = TRUE;
+			have_whitespace = true;
 		}
 		else if (lexer->cur_c == '/' && (lexer->next_c == '/' || lexer->next_c == '*'))
 		{
 			scanComments(lexer);
-			have_whitespace = TRUE;
+			have_whitespace = true;
 		}
 		else
 		{
@@ -425,7 +425,7 @@ static void initLexer (lexerState *lexer)
 
 	if (lexer->cur_c == '#' && lexer->next_c == '!')
 		scanComments(lexer);
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 }
 
 static void deInitLexer (lexerState *lexer)
@@ -516,7 +516,7 @@ static void skipUntil (lexerState *lexer, int goal_tokens[], int num_goal_tokens
 		if (num_goal_tokens == 0 && angle_level == 0 && paren_level == 0 && brace_level == 0
 		    && bracket_level == 0)
 			break;
-		advanceToken(lexer, TRUE);
+		advanceToken(lexer, true);
 	}
 }
 
@@ -530,10 +530,10 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
 	unsigned long line;
 	MIOPos pos;
 	int paren_level = 0;
-	boolean found_paren = FALSE;
-	boolean valid_signature = TRUE;
+	bool found_paren = false;
+	bool valid_signature = true;
 
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
@@ -543,7 +543,7 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
 	line = lexer->line;
 	pos = lexer->pos;
 
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 
 	/* HACK: This is a bit coarse as far as what tag entry means by
 	 * 'arglist'... */
@@ -551,12 +551,12 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
 	{
 		if (lexer->cur_token == '}')
 		{
-			valid_signature = FALSE;
+			valid_signature = false;
 			break;
 		}
 		else if (lexer->cur_token == '(')
 		{
-			found_paren = TRUE;
+			found_paren = true;
 			paren_level++;
 		}
 		else if (lexer->cur_token == ')')
@@ -564,27 +564,27 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
 			paren_level--;
 			if (paren_level < 0)
 			{
-				valid_signature = FALSE;
+				valid_signature = false;
 				break;
 			}
 		}
 		else if (lexer->cur_token == TOKEN_EOF)
 		{
-			valid_signature = FALSE;
+			valid_signature = false;
 			break;
 		}
 		writeCurTokenToStr(lexer, arg_list);
-		advanceToken(lexer, FALSE);
+		advanceToken(lexer, false);
 	}
 	if (!found_paren || paren_level != 0)
-		valid_signature = FALSE;
+		valid_signature = false;
 
 	if (valid_signature)
 	{
 		vStringStripTrailing(arg_list);
 		addTag(name, arg_list->buffer, kind, line, pos, scope, parent_kind);
 		addToScope(scope, name);
-		parseBlock(lexer, TRUE, kind, scope);
+		parseBlock(lexer, true, kind, scope);
 	}
 
 	vStringDelete(name);
@@ -596,16 +596,16 @@ static void parseFn (lexerState *lexer, vString *scope, int parent_kind)
  * "mod" <ident> ";"*/
 static void parseMod (lexerState *lexer, vString *scope, int parent_kind)
 {
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
 	addTag(lexer->token_str, NULL, K_MOD, lexer->line, lexer->pos, scope, parent_kind);
 	addToScope(scope, lexer->token_str);
 
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 
-	parseBlock(lexer, TRUE, K_MOD, scope);
+	parseBlock(lexer, true, K_MOD, scope);
 }
 
 /* Trait format:
@@ -615,18 +615,18 @@ static void parseTrait (lexerState *lexer, vString *scope, int parent_kind)
 {
 	int goal_tokens[] = {'{'};
 
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
 	addTag(lexer->token_str, NULL, K_TRAIT, lexer->line, lexer->pos, scope, parent_kind);
 	addToScope(scope, lexer->token_str);
 
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 
 	skipUntil(lexer, goal_tokens, 1);
 
-	parseBlock(lexer, TRUE, K_TRAIT, scope);
+	parseBlock(lexer, true, K_TRAIT, scope);
 }
 
 /* Skips type blocks of the form <T:T<T>, ...> */
@@ -635,7 +635,7 @@ static void skipTypeBlock (lexerState *lexer)
 	if (lexer->cur_token == '<')
 	{
 		skipUntil(lexer, NULL, 0);
-		advanceToken(lexer, TRUE);
+		advanceToken(lexer, true);
 	}
 }
 
@@ -657,7 +657,7 @@ static void parseQualifiedType (lexerState *lexer, vString* name)
 		{
 			break;
 		}
-		advanceToken(lexer, TRUE);
+		advanceToken(lexer, true);
 	}
 	skipTypeBlock(lexer);
 }
@@ -671,7 +671,7 @@ static void parseImpl (lexerState *lexer, vString *scope, int parent_kind)
 	MIOPos pos;
 	vString *name;
 
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 
 	line = lexer->line;
 	pos = lexer->pos;
@@ -684,14 +684,14 @@ static void parseImpl (lexerState *lexer, vString *scope, int parent_kind)
 
 	if (lexer->cur_token == TOKEN_IDENT && strcmp(lexer->token_str->buffer, "for") == 0)
 	{
-		advanceToken(lexer, TRUE);
+		advanceToken(lexer, true);
 		parseQualifiedType(lexer, name);
 	}
 
 	addTag(name, NULL, K_IMPL, line, pos, scope, parent_kind);
 	addToScope(scope, name);
 
-	parseBlock(lexer, TRUE, K_IMPL, scope);
+	parseBlock(lexer, true, K_IMPL, scope);
 
 	vStringDelete(name);
 }
@@ -701,12 +701,12 @@ static void parseImpl (lexerState *lexer, vString *scope, int parent_kind)
  */
 static void parseStatic (lexerState *lexer, vString *scope, int parent_kind)
 {
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 	if (strcmp(lexer->token_str->buffer, "mut") == 0)
 	{
-		advanceToken(lexer, TRUE);
+		advanceToken(lexer, true);
 	}
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
@@ -719,7 +719,7 @@ static void parseStatic (lexerState *lexer, vString *scope, int parent_kind)
  */
 static void parseType (lexerState *lexer, vString *scope, int parent_kind)
 {
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
@@ -735,13 +735,13 @@ static void parseType (lexerState *lexer, vString *scope, int parent_kind)
  * "struct/enum" <ident>[<type_bounds>] "{" [<ident>,]+ "}"
  * "struct/enum" <ident>[<type_bounds>] ";"
  * */
-static void parseStructOrEnum (lexerState *lexer, vString *scope, int parent_kind, boolean is_struct)
+static void parseStructOrEnum (lexerState *lexer, vString *scope, int parent_kind, bool is_struct)
 {
 	int kind = is_struct ? K_STRUCT : K_ENUM;
 	int field_kind = is_struct ? K_FIELD : K_VARIANT;
 	int goal_tokens1[] = {';', '{'};
 
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
 
@@ -761,9 +761,9 @@ static void parseStructOrEnum (lexerState *lexer, vString *scope, int parent_kin
 			 * */
 			if (lexer->cur_token == '#')
 			{
-				advanceToken(lexer, TRUE);
+				advanceToken(lexer, true);
 				if (lexer->cur_token == '!')
-					advanceToken(lexer, TRUE);
+					advanceToken(lexer, true);
 				if (lexer->cur_token == '[')
 				{
 					/* It's an attribute, skip it. */
@@ -781,7 +781,7 @@ static void parseStructOrEnum (lexerState *lexer, vString *scope, int parent_kin
 				if (strcmp(lexer->token_str->buffer, "priv") == 0
 				    || strcmp(lexer->token_str->buffer, "pub") == 0)
 				{
-					advanceToken(lexer, TRUE);
+					advanceToken(lexer, true);
 					if (lexer->cur_token != TOKEN_IDENT)
 					{
 						/* Something's up with this field, skip to the next one */
@@ -797,10 +797,10 @@ static void parseStructOrEnum (lexerState *lexer, vString *scope, int parent_kin
 			}
 			if (lexer->cur_token == '}')
 			{
-				advanceToken(lexer, TRUE);
+				advanceToken(lexer, true);
 				break;
 			}
-			advanceToken(lexer, TRUE);
+			advanceToken(lexer, true);
 		}
 		vStringDelete(field_name);
 	}
@@ -815,7 +815,7 @@ static void skipMacro (lexerState *lexer)
 	int plus_token = 0;
 	int minus_token = 0;
 
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 	switch (lexer->cur_token)
 	{
 		case '(':
@@ -842,9 +842,9 @@ static void skipMacro (lexerState *lexer)
 			level--;
 		if (level == 0)
 			break;
-		advanceToken(lexer, TRUE);
+		advanceToken(lexer, true);
 	}
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 }
 
 /*
@@ -853,12 +853,12 @@ static void skipMacro (lexerState *lexer)
  */
 static void parseMacroRules (lexerState *lexer, vString *scope, int parent_kind)
 {
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 
 	if (lexer->cur_token != '!')
 		return;
 
-	advanceToken(lexer, TRUE);
+	advanceToken(lexer, true);
 
 	if (lexer->cur_token != TOKEN_IDENT)
 		return;
@@ -871,14 +871,14 @@ static void parseMacroRules (lexerState *lexer, vString *scope, int parent_kind)
 /*
  * Rust is very liberal with nesting, so this function is used pretty much for any block
  */
-static void parseBlock (lexerState *lexer, boolean delim, int kind, vString *scope)
+static void parseBlock (lexerState *lexer, bool delim, int kind, vString *scope)
 {
 	int level = 1;
 	if (delim)
 	{
 		if (lexer->cur_token != '{')
 			return;
-		advanceToken(lexer, TRUE);
+		advanceToken(lexer, true);
 	}
 	while (lexer->cur_token != TOKEN_EOF)
 	{
@@ -911,11 +911,11 @@ static void parseBlock (lexerState *lexer, boolean delim, int kind, vString *sco
 			}
 			else if(strcmp(lexer->token_str->buffer, "struct") == 0)
 			{
-				parseStructOrEnum(lexer, scope, kind, TRUE);
+				parseStructOrEnum(lexer, scope, kind, true);
 			}
 			else if(strcmp(lexer->token_str->buffer, "enum") == 0)
 			{
-				parseStructOrEnum(lexer, scope, kind, FALSE);
+				parseStructOrEnum(lexer, scope, kind, false);
 			}
 			else if(strcmp(lexer->token_str->buffer, "macro_rules") == 0)
 			{
@@ -923,7 +923,7 @@ static void parseBlock (lexerState *lexer, boolean delim, int kind, vString *sco
 			}
 			else
 			{
-				advanceToken(lexer, TRUE);
+				advanceToken(lexer, true);
 				if (lexer->cur_token == '!')
 				{
 					skipMacro(lexer);
@@ -934,23 +934,23 @@ static void parseBlock (lexerState *lexer, boolean delim, int kind, vString *sco
 		else if (lexer->cur_token == '{')
 		{
 			level++;
-			advanceToken(lexer, TRUE);
+			advanceToken(lexer, true);
 		}
 		else if (lexer->cur_token == '}')
 		{
 			level--;
-			advanceToken(lexer, TRUE);
+			advanceToken(lexer, true);
 		}
 		else if (lexer->cur_token == '\'')
 		{
 			/* Skip over the 'static lifetime, as it confuses the static parser above */
-			advanceToken(lexer, TRUE);
+			advanceToken(lexer, true);
 			if (lexer->cur_token == TOKEN_IDENT && strcmp(lexer->token_str->buffer, "static") == 0)
-				advanceToken(lexer, TRUE);
+				advanceToken(lexer, true);
 		}
 		else
 		{
-			advanceToken(lexer, TRUE);
+			advanceToken(lexer, true);
 		}
 		if (delim && level <= 0)
 			break;
@@ -963,7 +963,7 @@ static void findRustTags (void)
 	vString* scope = vStringNew();
 	initLexer(&lexer);
 
-	parseBlock(&lexer, FALSE, K_NONE, scope);
+	parseBlock(&lexer, false, K_NONE, scope);
 	vStringDelete(scope);
 
 	deInitLexer(&lexer);
