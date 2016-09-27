@@ -2158,7 +2158,7 @@ extern bool isIgnoreToken (
 				}
 				else if (vStringChar (token, nameLen) == '=')
 				{
-					result = TRUE;
+					result = true;
 					if (replacement != NULL)
 						*replacement = vStringValue (token) + nameLen + 1;
 					break;
