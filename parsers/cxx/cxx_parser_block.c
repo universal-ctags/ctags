@@ -36,6 +36,7 @@ static bool cxxParserParseBlockHandleOpeningBracket(void)
 
 	enum CXXScopeType eScopeType = cxxScopeGetType();
 	bool bIsCPP = cxxParserCurrentLanguageIsCPP();
+	CXXToken * pAux;
 
 	if(
 			(
@@ -47,22 +48,37 @@ static bool cxxParserParseBlockHandleOpeningBracket(void)
 					(eScopeType == CXXScopeTypeNamespace)
 				)
 			) || (
-				// T { arg1, arg2, ... } (1)
-				// T object { arg1, arg2, ... } (2)
-				// new T { arg1, arg2, ... } (3)
-				// Class::Class() : member { arg1, arg2, ... } { (4)
 				bIsCPP &&
 				(g_cxx.pToken->pPrev) &&
-				cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeIdentifier) &&
 				(
-					(!g_cxx.pToken->pPrev->pPrev) ||
-					(cxxTokenTypeIsOneOf(
-							g_cxx.pToken->pPrev->pPrev,
-							CXXTokenTypeIdentifier | CXXTokenTypeStar | CXXTokenTypeAnd |
-							CXXTokenTypeGreaterThanSign | CXXTokenTypeKeyword |
-							// FIXME: This check could be made stricter?
-							CXXTokenTypeSingleColon | CXXTokenTypeComma
-					))
+					(
+						// T { arg1, arg2, ... } (1)
+						// T object { arg1, arg2, ... } (2)
+						// new T { arg1, arg2, ... } (3)
+						// Class::Class() : member { arg1, arg2, ... } { (4)
+						cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeIdentifier) &&
+						(
+							(!g_cxx.pToken->pPrev->pPrev) ||
+							(cxxTokenTypeIsOneOf(
+									g_cxx.pToken->pPrev->pPrev,
+									CXXTokenTypeIdentifier | CXXTokenTypeStar | CXXTokenTypeAnd |
+									CXXTokenTypeGreaterThanSign | CXXTokenTypeKeyword |
+									// FIXME: This check could be made stricter?
+									CXXTokenTypeSingleColon | CXXTokenTypeComma
+							))
+						)
+					) || (
+						// type var[][][]..[] { ... }
+						// (but not '[] { ... }' which is a parameterelss lambda)
+						cxxTokenTypeIs(g_cxx.pToken->pPrev,CXXTokenTypeSquareParenthesisChain) &&
+						(
+							pAux = cxxTokenChainPreviousTokenNotOfType(
+									g_cxx.pToken->pPrev,
+									CXXTokenTypeSquareParenthesisChain
+								)
+						) &&
+						cxxTokenTypeIs(pAux,CXXTokenTypeIdentifier)
+					)
 				)
 			) || (
 				// return { }

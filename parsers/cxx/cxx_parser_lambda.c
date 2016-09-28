@@ -37,6 +37,9 @@ CXXToken * cxxParserOpeningBracketIsLambda(void)
 	// [ capture-list ] ( params ) -> ret { body }	(2)
 	// [ capture-list ] ( params ) { body }	(3)
 	// [ capture-list ] { body }	(4)
+	
+	// Exclude the case of array bracket initialization
+	//  type var[] { ... } (5 - not lambda)
 
 	CXX_DEBUG_ASSERT(cxxParserCurrentLanguageIsCPP(),"C++ only");
 
@@ -47,9 +50,14 @@ CXXToken * cxxParserOpeningBracketIsLambda(void)
 
 	// Check simple cases first
 
-	// case 4
+	// case 4?
 	if(cxxTokenTypeIs(t,CXXTokenTypeSquareParenthesisChain))
 	{
+		if(t->pPrev && cxxTokenTypeIs(t->pPrev,CXXTokenTypeIdentifier))
+		{
+			// case 5
+			return NULL;
+		}
 		// very likely parameterless lambda
 		return t;
 	}
