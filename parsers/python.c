@@ -23,6 +23,7 @@
 #include "routines.h"
 #include "debug.h"
 #include "xtag.h"
+#include "objpool.h"
 
 
 enum {
@@ -183,6 +184,7 @@ static langType Lang_python;
 static unsigned int TokenContinuationDepth = 0;
 static tokenInfo *NextToken = NULL;
 static NestingLevels *PythonNestingLevels = NULL;
+static objPool *TokenPool = NULL;
 
 
 /* follows PEP-8, and always reports single-underscores as protected
@@ -342,14 +344,7 @@ static int makeSimplePythonRefTag (const tokenInfo *const token,
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
-
-	token->type			= TOKEN_UNDEFINED;
-	token->keyword		= KEYWORD_NONE;
 	token->string		= vStringNew ();
-	token->indent		= 0;
-	token->lineNumber   = getInputLineNumber ();
-	token->filePosition = getInputFilePosition ();
-
 	return token;
 }
 
@@ -357,6 +352,16 @@ static void deleteToken (tokenInfo *const token)
 {
 	vStringDelete (token->string);
 	eFree (token);
+}
+
+static void clearToken (tokenInfo *const token)
+{
+	token->type			= TOKEN_UNDEFINED;
+	token->keyword		= KEYWORD_NONE;
+	token->indent		= 0;
+	token->lineNumber   = getInputLineNumber ();
+	token->filePosition = getInputFilePosition ();
+	vStringClear (token->string);
 }
 
 static void copyToken (tokenInfo *const dest, const tokenInfo *const src)
@@ -445,7 +450,7 @@ static void readIdentifier (vString *const string, const int firstChar)
 static void ungetToken (tokenInfo *const token)
 {
 	Assert (NextToken == NULL);
-	NextToken = newToken ();
+	NextToken = objPoolGet (TokenPool);
 	copyToken (NextToken, token);
 }
 
@@ -458,7 +463,7 @@ static void readTokenFull (tokenInfo *const token, bool inclWhitespaces)
 	if (NextToken)
 	{
 		copyToken (token, NextToken);
-		deleteToken (NextToken);
+		objPoolPut (TokenPool, NextToken);
 		NextToken = NULL;
 		return;
 	}
@@ -747,7 +752,7 @@ static void readQualifiedName (tokenInfo *const nameToken)
 	    nameToken->type == '.')
 	{
 		vString *qualifiedName = vStringNew ();
-		tokenInfo *token = newToken ();
+		tokenInfo *token = objPoolGet (TokenPool);
 
 		while (nameToken->type == TOKEN_IDENTIFIER ||
 		       nameToken->type == '.')
@@ -764,7 +769,7 @@ static void readQualifiedName (tokenInfo *const nameToken)
 		nameToken->type = TOKEN_IDENTIFIER;
 		vStringCopy (nameToken->string, qualifiedName);
 
-		deleteToken (token);
+		objPoolPut (TokenPool, token);
 		vStringDelete (qualifiedName);
 	}
 }
@@ -790,7 +795,7 @@ static bool readCDefName (tokenInfo *const token, pythonKind *kind)
 	{
 		/* skip the optional type declaration -- everything on the same line
 		 * until an identifier followed by "(". */
-		tokenInfo *candidate = newToken ();
+		tokenInfo *candidate = objPoolGet (TokenPool);
 
 		while (token->type != TOKEN_EOF &&
 		       token->type != TOKEN_INDENT &&
@@ -824,7 +829,7 @@ static bool readCDefName (tokenInfo *const token, pythonKind *kind)
 				readToken (token);
 		}
 
-		deleteToken (candidate);
+		objPoolPut (TokenPool, candidate);
 	}
 
 	return token->type == TOKEN_IDENTIFIER;
@@ -853,7 +858,7 @@ static bool parseClassOrDef (tokenInfo *const token,
 			return false;
 	}
 
-	name = newToken ();
+	name = objPoolGet (TokenPool);
 	copyToken (name, token);
 
 	readToken (token);
@@ -895,7 +900,7 @@ static bool parseClassOrDef (tokenInfo *const token,
 			         parameterCount < ARRAY_SIZE (parameterTokens) &&
 			         PythonKinds[K_PARAMETER].enabled)
 			{
-				tokenInfo *parameterName = newToken ();
+				tokenInfo *parameterName = objPoolGet (TokenPool);
 
 				copyToken (parameterName, token);
 				parameterTokens[parameterCount++] = parameterName;
@@ -914,7 +919,7 @@ static bool parseClassOrDef (tokenInfo *const token,
 	lv = nestingLevelsPush (PythonNestingLevels, corkIndex);
 	PY_NL (lv)->indentation = token->indent;
 
-	deleteToken (name);
+	objPoolPut (TokenPool, name);
 	vStringDelete (arglist);
 
 	if (parameterCount > 0)
@@ -924,7 +929,7 @@ static bool parseClassOrDef (tokenInfo *const token,
 		for (i = 0; i < parameterCount; i++)
 		{
 			makeSimplePythonTag (parameterTokens[i], K_PARAMETER);
-			deleteToken (parameterTokens[i]);
+			objPoolPut (TokenPool, parameterTokens[i]);
 		}
 	}
 
@@ -940,7 +945,7 @@ static bool parseImport (tokenInfo *const token)
 		readQualifiedName (token);
 		if (token->type == TOKEN_IDENTIFIER)
 		{
-			fromModule = newToken ();
+			fromModule = objPoolGet (TokenPool);
 			copyToken (fromModule, token);
 			readToken (token);
 		}
@@ -973,7 +978,7 @@ static bool parseImport (tokenInfo *const token)
 
 			if (token->type == TOKEN_IDENTIFIER)
 			{
-				tokenInfo *name = newToken ();
+				tokenInfo *name = objPoolGet (TokenPool);
 
 				copyToken (name, token);
 				readToken (token);
@@ -1062,7 +1067,7 @@ static bool parseImport (tokenInfo *const token)
 					}
 				}
 
-				deleteToken (name);
+				objPoolPut (TokenPool, name);
 			}
 		}
 		while (token->type == ',');
@@ -1072,7 +1077,7 @@ static bool parseImport (tokenInfo *const token)
 	}
 
 	if (fromModule)
-		deleteToken (fromModule);
+		objPoolPut (TokenPool, fromModule);
 
 	return false;
 }
@@ -1089,7 +1094,7 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 	while (token->type == TOKEN_IDENTIFIER &&
 	       nameCount < ARRAY_SIZE (nameTokens))
 	{
-		tokenInfo *name = newToken ();
+		tokenInfo *name = objPoolGet (TokenPool);
 		copyToken (name, token);
 
 		readToken (token);
@@ -1098,7 +1103,7 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 			/* FIXME: what to do with dotted names?  We currently ignore them
 			 *        as we need to do something not to break the whole
 			 *        declaration, but the expected behavior is questionable */
-			deleteToken (name);
+			objPoolPut (TokenPool, name);
 			name = NULL;
 
 			do
@@ -1168,7 +1173,7 @@ static bool parseVariable (tokenInfo *const token, const pythonKind kind)
 	while (nameCount > 0)
 	{
 		if (nameTokens[--nameCount])
-			deleteToken (nameTokens[nameCount]);
+			objPoolPut (TokenPool, nameTokens[nameCount]);
 	}
 
 	return false;
@@ -1195,7 +1200,7 @@ static void setIndent (tokenInfo *const token)
 
 static void findPythonTags (void)
 {
-	tokenInfo *const token = newToken ();
+	tokenInfo *const token = objPoolGet (TokenPool);
 	vString *decorators = vStringNew ();
 	bool atStatementStart = true;
 
@@ -1278,13 +1283,24 @@ static void findPythonTags (void)
 
 	nestingLevelsFree (PythonNestingLevels);
 	vStringDelete (decorators);
-	deleteToken (token);
+	objPoolPut (TokenPool, token);
 	Assert (NextToken == NULL);
 }
 
 static void initialize (const langType language)
 {
 	Lang_python = language;
+
+	TokenPool = objPoolNew (16, (objPoolCreateFunc)newToken, (objPoolDeleteFunc)deleteToken,
+		(objPoolClearFunc)clearToken);
+}
+
+static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
+{
+	if (!initialized)
+		return;
+
+	objPoolDelete (TokenPool);
 }
 
 extern parserDefinition* PythonParser (void)
@@ -1298,6 +1314,7 @@ extern parserDefinition* PythonParser (void)
 	def->aliases = aliases;
 	def->parser = findPythonTags;
 	def->initialize = initialize;
+	def->finalize = finalize;
 	def->keywordTable = PythonKeywordTable;
 	def->keywordCount = ARRAY_SIZE (PythonKeywordTable);
 	def->fieldSpecs = PythonFields;

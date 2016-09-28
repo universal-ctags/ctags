@@ -26,53 +26,24 @@
 
 extern stringList *stringListNew (void)
 {
-	stringList* const result = xMalloc (1, stringList);
-	result->max   = 0;
-	result->count = 0;
-	result->list  = NULL;
-	return result;
+	return ptrArrayNew ((ptrArrayDeleteFunc)vStringDelete);
 }
 
 extern void stringListAdd (stringList *const current, vString *string)
 {
-	enum { incrementalIncrease = 10 };
-	Assert (current != NULL);
-	if (current->list == NULL)
-	{
-		Assert (current->max == 0);
-		current->count = 0;
-		current->max   = incrementalIncrease;
-		current->list  = xMalloc (current->max, vString*);
-	}
-	else if (current->count == current->max)
-	{
-		current->max += incrementalIncrease;
-		current->list = xRealloc (current->list, current->max, vString*);
-	}
-	current->list [current->count++] = string;
+	ptrArrayAdd (current, string);
 }
 
 extern void stringListRemoveLast (stringList *const current)
 {
-	Assert (current != NULL);
-	Assert (current->count > 0);
-	--current->count;
-	current->list [current->count] = NULL;
+	ptrArrayRemoveLast (current);
 }
 
 /* Combine list `from' into `current', deleting `from' */
 extern void stringListCombine (
 		stringList *const current, stringList *const from)
 {
-	unsigned int i;
-	Assert (current != NULL);
-	Assert (from != NULL);
-	for (i = 0  ;  i < from->count  ;  ++i)
-	{
-		stringListAdd (current, from->list [i]);
-		from->list [i] = NULL;
-	}
-	stringListDelete (from);
+	ptrArrayCombine (current, from);
 }
 
 extern stringList* stringListNewFromArgv (const char* const* const argv)
@@ -108,50 +79,28 @@ extern stringList* stringListNewFromFile (const char* const fileName)
 
 extern unsigned int stringListCount (const stringList *const current)
 {
-	Assert (current != NULL);
-	return current->count;
+	return ptrArrayCount (current);
 }
 
 extern vString* stringListItem (
 		const stringList *const current, const unsigned int indx)
 {
-	Assert (current != NULL);
-	return current->list [indx];
+	return ptrArrayItem (current, indx);
 }
 
 extern vString* stringListLast (const stringList *const current)
 {
-	Assert (current != NULL);
-	Assert (current->count > 0);
-	return current->list [current->count - 1];
+	return ptrArrayLast (current);
 }
 
 extern void stringListClear (stringList *const current)
 {
-	unsigned int i;
-	Assert (current != NULL);
-	for (i = 0  ;  i < current->count  ;  ++i)
-	{
-		vStringDelete (current->list [i]);
-		current->list [i] = NULL;
-	}
-	current->count = 0;
+	ptrArrayClear (current);
 }
 
 extern void stringListDelete (stringList *const current)
 {
-	if (current != NULL)
-	{
-		if (current->list != NULL)
-		{
-			stringListClear (current);
-			eFree (current->list);
-			current->list = NULL;
-		}
-		current->max   = 0;
-		current->count = 0;
-		eFree (current);
-	}
+	ptrArrayDelete (current);
 }
 
 static bool compareString (
@@ -176,8 +125,8 @@ static int stringListIndex (
 	Assert (current != NULL);
 	Assert (string != NULL);
 	Assert (test != NULL);
-	for (i = 0  ;  result == -1  &&  i < current->count  ;  ++i)
-		if ((*test)(string, current->list [i]))
+	for (i = 0  ;  result == -1  &&  i < ptrArrayCount (current)  ;  ++i)
+		if ((*test)(string, ptrArrayItem (current, i)))
 			result = i;
 	return result;
 }
@@ -224,15 +173,13 @@ extern bool stringListHasTest (const stringList *const current,
 	bool result = false;
 	unsigned int i;
 	Assert (current != NULL);
-	for (i = 0  ;  ! result  &&  i < current->count  ;  ++i)
-		result = (*test)(vStringValue (current->list [i]), userData);
+	for (i = 0  ;  ! result  &&  i < ptrArrayCount (current)  ;  ++i)
+		result = (*test)(vStringValue ((vString *)ptrArrayItem (current, i)), userData);
 	return result;
 }
 
 extern bool stringListDeleteItemExtension (stringList* const current, const char* const extension)
-
 {
-	bool result = false;
 	int where;
 #ifdef CASE_INSENSITIVE_FILENAMES
 	where = stringListIndex (current, extension, compareStringInsensitive);
@@ -240,15 +187,8 @@ extern bool stringListDeleteItemExtension (stringList* const current, const char
 	where = stringListIndex (current, extension, compareString);
 #endif
 	if (where != -1)
-	{
-		vStringDelete (current->list [where]);
-		memmove (current->list + where, current->list + where + 1,
-				(current->count - where) * sizeof (*current->list));
-		current->list [current->count - 1] = NULL;
-		--current->count;
-		result = true;
-	}
-	return result;
+		ptrArrayDeleteItem (current, where);
+	return where != -1;
 }
 
 extern bool stringListExtensionMatched (
@@ -302,20 +242,11 @@ extern void stringListPrint (const stringList *const current, FILE *fp)
 {
 	unsigned int i;
 	Assert (current != NULL);
-	for (i = 0  ;  i < current->count  ;  ++i)
-		fprintf (fp, "%s%s", (i > 0) ? ", " : "", vStringValue (current->list [i]));
+	for (i = 0  ;  i < ptrArrayCount (current)  ;  ++i)
+		fprintf (fp, "%s%s", (i > 0) ? ", " : "", vStringValue ((vString *)ptrArrayItem (current, i)));
 }
 
 extern void stringListReverse (const stringList *const current)
 {
-	unsigned int i, j;
-	vString *tmp;
-
-	Assert (current != NULL);
-	for (i = 0, j = current->count - 1 ; i <  (current->count / 2); ++i, --j)
-	{
-		tmp = current->list[i];
-		current->list[i] = current->list[j];
-		current->list[j] = tmp;
-	}
+	ptrArrayReverse (current);
 }

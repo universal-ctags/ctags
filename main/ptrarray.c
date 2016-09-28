@@ -1,0 +1,152 @@
+/*
+*   Copyright (c) 1999-2002, Darren Hiebert
+*
+*   This source code is released for free distribution under the terms of the
+*   GNU General Public License version 2 or (at your option) any later version.
+*
+*   This module contains functions managing resizable pointer arrays.
+*/
+
+/*
+*   INCLUDE FILES
+*/
+#include "general.h"  /* must always come first */
+
+#include <string.h>
+
+#include "debug.h"
+#include "ptrarray.h"
+
+/*
+*   DATA DECLARATIONS
+*/
+
+struct sPtrArray {
+	unsigned int max;
+	unsigned int count;
+	void **array;
+	ptrArrayDeleteFunc deleteFunc;
+};
+
+/*
+*   FUNCTION DEFINITIONS
+*/
+
+extern ptrArray *ptrArrayNew (ptrArrayDeleteFunc deleteFunc)
+{
+	ptrArray* const result = xMalloc (1, ptrArray);
+	result->max = 8;
+	result->count = 0;
+	result->array = xMalloc (result->max, void*);
+	result->deleteFunc = deleteFunc;
+	return result;
+}
+
+extern void ptrArrayAdd (ptrArray *const current, void *ptr)
+{
+	Assert (current != NULL);
+	if (current->count == current->max)
+	{
+		current->max *= 2;
+		current->array = xRealloc (current->array, current->max, void*);
+	}
+	current->array [current->count++] = ptr;
+}
+
+extern void ptrArrayRemoveLast (ptrArray *const current)
+{
+	Assert (current != NULL);
+	Assert (current->count > 0);
+	--current->count;
+}
+
+/* Combine array `from' into `current', deleting `from' */
+extern void ptrArrayCombine (ptrArray *const current, ptrArray *const from)
+{
+	unsigned int i;
+	Assert (current != NULL);
+	Assert (from != NULL);
+	for (i = 0  ;  i < from->count  ;  ++i)
+		ptrArrayAdd (current, from->array [i]);
+	from->count = 0;
+	ptrArrayDelete (from);
+}
+
+extern unsigned int ptrArrayCount (const ptrArray *const current)
+{
+	Assert (current != NULL);
+	return current->count;
+}
+
+extern void* ptrArrayItem (const ptrArray *const current, const unsigned int indx)
+{
+	Assert (current != NULL);
+	return current->array [indx];
+}
+
+extern void* ptrArrayLast (const ptrArray *const current)
+{
+	Assert (current != NULL);
+	Assert (current->count > 0);
+	return current->array [current->count - 1];
+}
+
+extern void ptrArrayClear (ptrArray *const current)
+{
+	Assert (current != NULL);
+	if (current->deleteFunc)
+	{
+		unsigned int i;
+		for (i = 0  ;  i < current->count  ;  ++i)
+			current->deleteFunc (current->array [i]);
+	}
+	current->count = 0;
+}
+
+extern void ptrArrayDelete (ptrArray *const current)
+{
+	if (current != NULL)
+	{
+		ptrArrayClear (current);
+		eFree (current->array);
+		eFree (current);
+	}
+}
+
+extern bool ptrArrayHasTest (const ptrArray *const current,
+				  bool (*test)(const void *ptr, void *userData),
+				  void *userData)
+{
+	bool result = false;
+	unsigned int i;
+	Assert (current != NULL);
+	for (i = 0  ;  ! result  &&  i < current->count  ;  ++i)
+		result = (*test)(current->array [i], userData);
+	return result;
+}
+
+extern void ptrArrayReverse (const ptrArray *const current)
+{
+	unsigned int i, j;
+	void *tmp;
+
+	Assert (current != NULL);
+	for (i = 0, j = current->count - 1 ; i <  (current->count / 2); ++i, --j)
+	{
+		tmp = current->array[i];
+		current->array[i] = current->array[j];
+		current->array[j] = tmp;
+	}
+}
+
+extern void ptrArrayDeleteItem (ptrArray* const current, unsigned int indx)
+{
+	void *ptr = current->array[indx];
+
+	if (current->deleteFunc)
+		current->deleteFunc (ptr);
+
+	memmove (current->array + indx, current->array + indx + 1,
+			(current->count - indx) * sizeof (*current->array));
+	--current->count;
+}
