@@ -19,8 +19,11 @@
 #include "entry.h"
 #include "routines.h"
 #include "debug.h"
+#include "objpool.h"
 
 #define isIdentChar(c) (isalnum (c) || (c) == '_' || (c) >= 0x80)
+#define newToken() (objPoolGet (TokenPool))
+#define deleteToken(t) (objPoolPut (TokenPool, (t)))
 
 enum {
 	KEYWORD_abstract,
@@ -257,6 +260,8 @@ static vString *FullScope;
 /* Anonymous symbol count to generate file-unique names */
 static unsigned int AnonymousID;
 
+static objPool *TokenPool = NULL;
+
 static const char *phpScopeSeparatorFor (int phpKind,
 					 int phpUpperScopeKind)
 {
@@ -405,23 +410,31 @@ static void makeFunctionTag (const tokenInfo *const token,
 	}
 }
 
-static tokenInfo *newToken (void)
+static void *newPoolToken (void)
 {
-	tokenInfo *const token = xMalloc (1, tokenInfo);
+	tokenInfo *token = xMalloc (1, tokenInfo);
 
-	token->type			= TOKEN_UNDEFINED;
-	token->keyword		= KEYWORD_NONE;
-	token->string		= vStringNew ();
-	token->scope		= vStringNew ();
-	token->lineNumber   = getInputLineNumber ();
-	token->filePosition = getInputFilePosition ();
-	token->parentKind	= -1;
-
+	token->string = vStringNew ();
+	token->scope  = vStringNew ();
 	return token;
 }
 
-static void deleteToken (tokenInfo *const token)
+static void clearPoolToken (void *data)
 {
+	tokenInfo *token = data;
+
+	token->type			= TOKEN_UNDEFINED;
+	token->keyword		= KEYWORD_NONE;
+	token->lineNumber   = getInputLineNumber ();
+	token->filePosition = getInputFilePosition ();
+	token->parentKind	= -1;
+	vStringClear (token->string);
+	vStringClear (token->scope);
+}
+
+static void deletePoolToken (void *data)
+{
+	tokenInfo *token = data;
 	vStringDelete (token->string);
 	vStringDelete (token->scope);
 	eFree (token);
@@ -1650,14 +1663,34 @@ static void findZephirTags (void)
 	findTags (true);
 }
 
+static void initializePool (void)
+{
+	if (TokenPool == NULL)
+		TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken);
+}
+
 static void initializePhpParser (const langType language)
 {
 	Lang_php = language;
+	initializePool ();
 }
 
 static void initializeZephirParser (const langType language)
 {
 	Lang_zephir = language;
+	initializePool ();
+}
+
+static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
+{
+	if (!initialized)
+		return;
+
+	if (TokenPool != NULL)
+	{
+		objPoolDelete (TokenPool);
+		TokenPool = NULL;
+	}
 }
 
 extern parserDefinition* PhpParser (void)
@@ -1669,6 +1702,7 @@ extern parserDefinition* PhpParser (void)
 	def->extensions = extensions;
 	def->parser     = findPhpTags;
 	def->initialize = initializePhpParser;
+	def->finalize   = finalize;
 	def->keywordTable = PhpKeywordTable;
 	def->keywordCount = ARRAY_SIZE (PhpKeywordTable);
 	return def;
@@ -1683,6 +1717,7 @@ extern parserDefinition* ZephirParser (void)
 	def->extensions = extensions;
 	def->parser     = findZephirTags;
 	def->initialize = initializeZephirParser;
+	def->finalize   = finalize;
 	def->keywordTable = PhpKeywordTable;
 	def->keywordCount = ARRAY_SIZE (PhpKeywordTable);
 	return def;
