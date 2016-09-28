@@ -335,7 +335,7 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 							))
 					)
 				{
-					CXX_DEBUG_LEAVE_TEXT("No comma, semicolon, = or {} after [] (got %x)",t->pNext->eType);
+					CXX_DEBUG_LEAVE_TEXT("No comma, semicolon, = or {} after []");
 					return bGotVariable;
 				}
 
