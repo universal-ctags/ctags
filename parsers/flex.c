@@ -36,6 +36,10 @@
  */
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
+#define isEOF(token) (isType ((token), TOKEN_EOF))
+#define isIdentChar(c) \
+	(isalpha (c) || isdigit (c) || (c) == '$' || \
+		(c) == '@' || (c) == '_' || (c) == '#')
 
 /*
  *	 DATA DECLARATIONS
@@ -194,18 +198,6 @@ static bool parseLine (tokenInfo *const token);
 static bool parseActionScript (tokenInfo *const token);
 static bool parseMXML (tokenInfo *const token);
 
-static bool isEOF (tokenInfo *const token)
-{
-	return isType (token, TOKEN_EOF);
-}
-
-static bool isIdentChar (const int c)
-{
-	return (bool)
-		(isalpha (c) || isdigit (c) || c == '$' || 
-		 c == '@' || c == '_' || c == '#');
-}
-
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
@@ -277,7 +269,6 @@ static void makeFlexTag (tokenInfo *const token, flexKind kind)
 			vStringCopy(fulltag, token->scope);
 			vStringCatS (fulltag, ".");
 			vStringCatS (fulltag, vStringValue(token->string));
-			vStringTerminate(fulltag);
 			vStringCopy(token->string, fulltag);
 			vStringDelete (fulltag);
 		}
@@ -302,7 +293,6 @@ static void makeClassTag (tokenInfo *const token)
 		{
 			vStringCopy(fulltag, token->string);
 		}
-		vStringTerminate(fulltag);
 		if ( ! stringListHas(ClassNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (ClassNames, vStringNewCopy (fulltag));
@@ -329,7 +319,6 @@ static void makeMXTag (tokenInfo *const token)
 		{
 			vStringCopy(fulltag, token->string);
 		}
-		vStringTerminate(fulltag);
 		makeFlexTag (token, FLEXTAG_MXTAG);
 		vStringDelete (fulltag);
 	}
@@ -352,7 +341,6 @@ static void makeFunctionTag (tokenInfo *const token)
 		{
 			vStringCopy(fulltag, token->string);
 		}
-		vStringTerminate(fulltag);
 		if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (FunctionNames, vStringNewCopy (fulltag));
@@ -384,7 +372,6 @@ static void parseString (vString *const string, const int delimiter)
 		else
 			vStringPut (string, c);
 	}
-	vStringTerminate (string);
 }
 
 /*	Read a C identifier beginning with "firstChar" and places it into
@@ -399,7 +386,6 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		vStringPut (string, c);
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
-	vStringTerminate (string);
 	if (!isspace (c))
 		ungetcToInputFile (c);		/* unget non-identifier character */
 }
@@ -815,7 +801,6 @@ static void addContext (tokenInfo* const parent, const tokenInfo* const child)
 		vStringCatS (parent->string, ".");
 	}
 	vStringCatS (parent->string, vStringValue(child->string));
-	vStringTerminate(parent->string);
 }
 
 static void addToScope (tokenInfo* const token, vString* const extra)
@@ -825,7 +810,6 @@ static void addToScope (tokenInfo* const token, vString* const extra)
 		vStringCatS (token->scope, ".");
 	}
 	vStringCatS (token->scope, vStringValue(extra));
-	vStringTerminate(token->scope);
 }
 
 /*
@@ -1879,7 +1863,6 @@ static bool parseStatement (tokenInfo *const token)
 				{
 					vStringCopy(fulltag, token->string);
 				}
-				vStringTerminate(fulltag);
 				if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 						! stringListHas(ClassNames, vStringValue (fulltag)) )
 				{

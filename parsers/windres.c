@@ -55,7 +55,6 @@ typedef enum _WindResParserState
 
 static void makeResTag(vString *name, ResKind kind)
 {
-	vStringTerminate(name);
 	vStringStripTrailing(name);
 	makeSimpleTag(name, ResKinds, kind);
 	vStringClear(name);
@@ -72,7 +71,6 @@ static ResParserState parseResDefinition(const unsigned char *line)
 		vStringPut(name, (int) *line);
 		line++;
 	}
-	vStringTerminate(name);
 
 	while (*line && isspace((int) *line))
 		line++;
@@ -83,7 +81,6 @@ static ResParserState parseResDefinition(const unsigned char *line)
 		vStringPut(type, (int) *line);
 		line++;
 	}
-	vStringTerminate(type);
 
 	if (strcmp(vStringValue(type), "DIALOG") == 0 || strcmp(vStringValue(type), "DIALOGEX") == 0)
 	{

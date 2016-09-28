@@ -345,7 +345,6 @@ static vString *parseInteger (int c)
 		vStringPut (string, c);
 		c = getcFromInputFile ();
 	}
-	vStringTerminate (string);
 	ungetcToInputFile (c);
 
 	return string;
@@ -376,8 +375,6 @@ static vString *parseNumeric (int c)
 	}
 	else if (!isspace (c))
 		ungetcToInputFile (c);
-
-	vStringTerminate (string);
 
 	return string;
 }
@@ -501,14 +498,10 @@ static void parseString (vString *const string)
 		{
 			vStringPut (string, c);
 			if (verbatim)
-			{
 				vStringPut (lastLine, c);
-				vStringTerminate (lastLine);
-			}
 			prev = c;
 		}
 	}
-	vStringTerminate (string);
 	vStringDelete (lastLine);
 	vStringDelete (verbatimCloser);
 }
@@ -525,7 +518,6 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		c = getcFromInputFile ();
 	} while (isident (c));
 
-	vStringTerminate (string);
 	if (!isspace (c))
 		ungetcToInputFile (c);  /* unget non-identifier character */
 }
@@ -540,7 +532,6 @@ static void parseFreeOperator (vString *const string, const int firstChar)
 		c = getcFromInputFile ();
 	} while (c > ' ');
 
-	vStringTerminate (string);
 	if (!isspace (c))
 		ungetcToInputFile (c);  /* unget non-identifier character */
 }

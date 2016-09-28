@@ -130,7 +130,6 @@ static void findAspTags (void)
 						    vStringPut (name, (int) *cp);
 						    ++cp;
 					    }
-					    vStringTerminate (name);
 					    makeSimpleTag (name, AspKinds, K_FUNCTION);
 					    vStringClear (name);
 					}
@@ -144,7 +143,6 @@ static void findAspTags (void)
 						    vStringPut (name, (int) *cp);
 						    ++cp;
 					    }
-					    vStringTerminate (name);
 					    makeSimpleTag (name, AspKinds, K_SUB);
 					    vStringClear (name);
 					}
@@ -154,7 +152,6 @@ static void findAspTags (void)
 						    vStringPut (name, (int) *cp);
 						    ++cp;
 					    }
-					    vStringTerminate (name);
 					    makeSimpleTag (name, AspKinds, K_DIM);
 					    vStringClear (name);
 					}
@@ -177,7 +174,6 @@ static void findAspTags (void)
 						    vStringPut (name, (int) *cp);
 						    ++cp;
 					    }
-					    vStringTerminate (name);
 					    makeSimpleTag (name, AspKinds, K_FUNCTION);
 					    vStringClear (name);
 					}
@@ -191,7 +187,6 @@ static void findAspTags (void)
 						    vStringPut (name, (int) *cp);
 						    ++cp;
 					    }
-					    vStringTerminate (name);
 					    makeSimpleTag (name, AspKinds, K_SUB);
 					    vStringClear (name);
 					}
@@ -201,7 +196,6 @@ static void findAspTags (void)
 						    vStringPut (name, (int) *cp);
 						    ++cp;
 					    }
-					    vStringTerminate (name);
 					    makeSimpleTag (name, AspKinds, K_DIM);
 					    vStringClear (name);
 					}
@@ -222,7 +216,6 @@ static void findAspTags (void)
 						vStringPut (name, (int) *cp);
 						++cp;
 					}
-					vStringTerminate (name);
 					makeSimpleTag (name, AspKinds, K_FUNCTION);
 					vStringClear (name);
 				}
@@ -241,7 +234,6 @@ static void findAspTags (void)
 						vStringPut (name, (int) *cp);
 						++cp;
 					}
-					vStringTerminate (name);
 					makeSimpleTag (name, AspKinds, K_SUB);
 					vStringClear (name);
 				}
@@ -260,7 +252,6 @@ static void findAspTags (void)
 						vStringPut (name, (int) *cp);
 						++cp;
 					}
-					vStringTerminate (name);
 					makeSimpleTag (name, AspKinds, K_DIM);
 					vStringClear (name);
 				}
@@ -279,7 +270,6 @@ static void findAspTags (void)
 						vStringPut (name, (int) *cp);
 						++cp;
 					}
-					vStringTerminate (name);
 					makeSimpleTag (name, AspKinds, K_CLASS);
 					vStringClear (name);
 				}
@@ -298,7 +288,6 @@ static void findAspTags (void)
 						vStringPut (name, (int) *cp);
 						++cp;
 					}
-					vStringTerminate (name);
 					makeSimpleTag (name, AspKinds, K_CONST);
 					vStringClear (name);
 				}

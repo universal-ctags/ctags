@@ -105,7 +105,6 @@ static void createRTags (void)
 						vStringPut (name, (int) *cp);
 						cp++;
 					}
-					vStringTerminate (name);
 
 					/* if the string really exists, make a tag of it */
 					if (vStringLength (name) > 0)
@@ -154,7 +153,6 @@ static void createRTags (void)
 					{
 						/* it's a function: ident <- function(args) */
 						cp += 8;
-						vStringTerminate (name);
 						/* if the string really exists, make a tag of it */
 						if (vStringLength (name) > 0)
 							makeRTag (name, K_FUNCTION);
@@ -166,7 +164,6 @@ static void createRTags (void)
 					else
 					{
 						/* it's a variable: ident <- value */
-						vStringTerminate (name);
 						/* if the string really exists, make a tag of it */
 						if (vStringLength (name) > 0)
 						{

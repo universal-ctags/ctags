@@ -47,7 +47,6 @@ static const unsigned char *makeTclTag (
 		vStringPut (name, (int) *cp);
 		++cp;
 	}
-	vStringTerminate (name);
 	makeSimpleTag (name, TclKinds, kind);
 	return cp;
 }

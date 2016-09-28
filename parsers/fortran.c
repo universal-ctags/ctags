@@ -646,10 +646,7 @@ static lineType getLineType (void)
 	Assert (type != LTYPE_UNDETERMINED);
 
 	if (vStringLength (label) > 0)
-	{
-		vStringTerminate (label);
 		makeLabelTag (label);
-	}
 	vStringDelete (label);
 	return type;
 }
@@ -843,7 +840,6 @@ static vString *parseInteger (int c)
 		vStringPut (string, c);
 		c = getChar ();
 	}
-	vStringTerminate (string);
 
 	if (c == '_')
 	{
@@ -879,8 +875,6 @@ static vString *parseNumeric (int c)
 	else
 		ungetChar (c);
 
-	vStringTerminate (string);
-
 	return string;
 }
 
@@ -902,7 +896,6 @@ static void parseString (vString *const string, const int delimiter)
 		if (c != EOF && ! FreeSourceForm)
 			FreeSourceFormFound = true;
 	}
-	vStringTerminate (string);
 	ParsingString = false;
 }
 
@@ -918,7 +911,6 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		c = getChar ();
 	} while (isident (c));
 
-	vStringTerminate (string);
 	ungetChar (c);  /* unget non-identifier character */
 }
 
@@ -944,7 +936,6 @@ static void checkForLabel (void)
 	}
 	if (length > 0  &&  token != NULL)
 	{
-		vStringTerminate (token->string);
 		makeFortranTag (token, TAG_LABEL);
 		deleteToken (token);
 	}
@@ -1025,7 +1016,6 @@ getNextChar:
 				c = getChar ();
 			} while (strchr (operatorChars, c) != NULL);
 			ungetChar (c);
-			vStringTerminate (token->string);
 			token->type = TOKEN_OPERATOR;
 			break;
 		}
@@ -1055,7 +1045,6 @@ getNextChar:
 			if (c == '.')
 			{
 				vStringPut (token->string, c);
-				vStringTerminate (token->string);
 				token->type = TOKEN_OPERATOR;
 			}
 			else

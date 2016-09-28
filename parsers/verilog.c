@@ -448,7 +448,6 @@ static bool readIdentifier (tokenInfo *const token, int c)
 			c = vGetc ();
 		}
 		vUngetc (c);
-		vStringTerminate (token->name);
 		token->lineNumber = getInputLineNumber ();
 		token->filePosition = getInputFilePosition ();
 	}

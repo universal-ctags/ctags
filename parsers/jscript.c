@@ -38,6 +38,9 @@
  */
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
+#define isIdentChar(c) \
+	(isalpha (c) || isdigit (c) || (c) == '$' || \
+		(c) == '@' || (c) == '_' || (c) == '#')
 
 /*
  *	 DATA DECLARATIONS
@@ -173,13 +176,6 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const orig_parent);
 static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_inside_class);
 static void parseUI5 (tokenInfo *const token);
 
-static bool isIdentChar (const int c)
-{
-	return (bool)
-		(isalpha (c) || isdigit (c) || c == '$' ||
-		 c == '@' || c == '_' || c == '#');
-}
-
 static tokenInfo *newToken (void)
 {
 	tokenInfo *const token = xMalloc (1, tokenInfo);
@@ -298,7 +294,6 @@ static void makeClassTag (tokenInfo *const token, vString *const signature)
 		{
 			vStringCopy(fulltag, token->string);
 		}
-		vStringTerminate(fulltag);
 		if ( ! stringListHas(ClassNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (ClassNames, vStringNewCopy (fulltag));
@@ -325,7 +320,6 @@ static void makeFunctionTag (tokenInfo *const token, vString *const signature)
 		{
 			vStringCopy(fulltag, token->string);
 		}
-		vStringTerminate(fulltag);
 		if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) )
 		{
 			stringListAdd (FunctionNames, vStringNewCopy (fulltag));
@@ -378,7 +372,6 @@ static void parseString (vString *const string, const int delimiter)
 		else
 			vStringPut (string, c);
 	}
-	vStringTerminate (string);
 }
 
 static void parseRegExp (void)
@@ -425,7 +418,6 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		vStringPut (string, c);
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
-	vStringTerminate (string);
 	ungetcToInputFile (c);		/* unget non-identifier character */
 }
 
@@ -470,7 +462,6 @@ static void parseTemplateString (vString *const string)
 		}
 	}
 	while (c != EOF);
-	vStringTerminate (string);
 }
 
 static void readTokenFull (tokenInfo *const token, bool include_newlines, vString *const repr)
@@ -796,7 +787,6 @@ static void addContext (tokenInfo* const parent, const tokenInfo* const child)
 		vStringCatS (parent->string, ".");
 	}
 	vStringCatS (parent->string, vStringValue(child->string));
-	vStringTerminate(parent->string);
 }
 
 static void addToScope (tokenInfo* const token, vString* const extra)
@@ -806,7 +796,6 @@ static void addToScope (tokenInfo* const token, vString* const extra)
 		vStringCatS (token->scope, ".");
 	}
 	vStringCatS (token->scope, vStringValue(extra));
-	vStringTerminate(token->scope);
 }
 
 /*
@@ -1681,7 +1670,6 @@ nextVar:
 					{
 						vStringCopy(fulltag, token->string);
 					}
-					vStringTerminate(fulltag);
 					if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 							! stringListHas(ClassNames, vStringValue (fulltag)) )
 					{
@@ -1772,7 +1760,6 @@ nextVar:
 				{
 					vStringCopy(fulltag, token->string);
 				}
-				vStringTerminate(fulltag);
 				if ( ! stringListHas(FunctionNames, vStringValue (fulltag)) &&
 						! stringListHas(ClassNames, vStringValue (fulltag)) )
 				{

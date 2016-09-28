@@ -444,7 +444,6 @@ static void readIdentifier (vString *const string, const int firstChar)
 	}
 	while (isIdentifierChar (c));
 	ungetcToInputFile (c);
-	vStringTerminate (string);
 }
 
 static void ungetToken (tokenInfo *const token)
@@ -702,8 +701,6 @@ static bool skipOverPair (tokenInfo *const token, int tOpen, int tClose,
 		}
 		while (token->type != TOKEN_EOF && depth > 0);
 	}
-	if (repr)
-		vStringTerminate (repr);
 
 	return token->type == tClose;
 }
@@ -907,8 +904,6 @@ static bool parseClassOrDef (tokenInfo *const token,
 			}
 		}
 		while (token->type != TOKEN_EOF && depth > 0);
-
-		vStringTerminate (arglist);
 	}
 
 	if (kind == K_CLASS)

@@ -58,7 +58,6 @@ static void functionName (vString * const name, const char *dbp)
 	for (p = dbp; *p != '\0' && *p != '(' && !isspace ((int) *p) && *p != ')';
 		p++)
 		vStringPut (name, *p);
-	vStringTerminate (name);
 }
 
 static int makeNamespaceTag (vString * const name, const char *dbp)

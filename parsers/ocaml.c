@@ -336,8 +336,6 @@ static void readIdentifier (lexingState * st)
 		vStringPut (st->name, (int) *p);
 
 	st->cp = p;
-
-	vStringTerminate (st->name);
 }
 
 static ocamlKeyword eatNumber (lexingState * st)
@@ -361,8 +359,6 @@ static ocamlKeyword eatOperator (lexingState * st)
 		vStringPut (st->name, st->cp[count]);
 		count++;
 	}
-
-	vStringTerminate (st->name);
 
 	st->cp += count;
 	if (count <= 1)
@@ -1813,7 +1809,6 @@ static void computeModuleName ( void )
 	}
 
 	vStringNCopyS (moduleName, &filename[beginIndex], endIndex - beginIndex);
-	vStringTerminate (moduleName);
 
 	if (isLowerAlpha (moduleName->buffer[0]))
 		moduleName->buffer[0] += ('A' - 'a');

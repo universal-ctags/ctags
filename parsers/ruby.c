@@ -26,6 +26,11 @@
 #include "vstring.h"
 
 /*
+ *	 MACROS
+ */
+#define isIdentChar(c) (isalnum (c) || (c) == '_')
+
+/*
 *   DATA DECLARATIONS
 */
 typedef enum {
@@ -112,11 +117,6 @@ static bool canMatch (const unsigned char** s, const char* literal,
 	return true;
 }
 
-static bool isIdentChar (int c)
-{
-	return (isalnum (c) || c == '_');
-}
-
 static bool notIdentChar (int c)
 {
 	return ! isIdentChar (c);
@@ -192,7 +192,6 @@ static void emitRubyTag (vString* name, rubyKind kind)
             return;
         }
 
-	vStringTerminate (name);
 	scope = nestingLevelsToScope (nesting);
 	lvl = nestingLevelsGetCurrent (nesting);
 	parent = getEntryOfNestingLevel (lvl);
@@ -315,7 +314,6 @@ static rubyKind parseIdentifier (
 			/* Recognize singleton methods. */
 			if (last_char == '.')
 			{
-				vStringTerminate (name);
 				vStringClear (name);
 				return parseIdentifier (cp, name, K_SINGLETON);
 			}

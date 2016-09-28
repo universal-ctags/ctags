@@ -142,7 +142,6 @@ static bool readPreProc (const unsigned char *const line)
 		vStringPut (name, *cp);
 		++cp;
 	}
-	vStringTerminate (name);
 	result = (bool) (strcmp (vStringValue (name), "define") == 0);
 	if (result)
 	{
@@ -154,7 +153,6 @@ static bool readPreProc (const unsigned char *const line)
 			vStringPut (name, *cp);
 			++cp;
 		}
-		vStringTerminate (name);
 		makeSimpleTag (name, AsmKinds, K_DEFINE);
 	}
 	vStringDelete (name);
@@ -233,7 +231,6 @@ static const unsigned char *readSymbol (
 			vStringPut (sym, *cp);
 			++cp;
 		}
-		vStringTerminate (sym);
 	}
 	return cp;
 }
@@ -249,7 +246,6 @@ static const unsigned char *readOperator (
 		vStringPut (operator, *cp);
 		++cp;
 	}
-	vStringTerminate (operator);
 	return cp;
 }
 

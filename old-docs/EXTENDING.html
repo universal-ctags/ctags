@@ -242,7 +242,6 @@ static void findSwineTags (void)
                 vStringPut (name, (int) *cp);
                 ++cp;
             }
-            vStringTerminate (name);
             makeSimpleTag (name, SwineKinds, K_DEFINE);
             vStringClear (name);
         }

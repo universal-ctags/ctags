@@ -252,7 +252,6 @@ static void findRstTags (void)
 			vStringCatS(name, (const char*)line);
 			filepos = getInputFilePosition();
 		}
-		vStringTerminate(name);
 	}
 	/* Force popping all nesting levels */
 	getNestingLevel (K_EOF);

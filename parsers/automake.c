@@ -249,7 +249,6 @@ static void directiveFoundAM (struct makeParserClient *client,
 		}
 		if (c == '\n')
 			ungetcToInputFile (c);
-		vStringTerminate (condition);
 		vStringStripTrailing (condition);
 		if (vStringLength (condition) > 0 )
 			refCondtionAM (condition);

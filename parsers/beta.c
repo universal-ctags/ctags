@@ -96,8 +96,6 @@ static void findBetaTags (void)
 		while ((c = getcFromInputFile ()) != EOF && c != '\n' && c != '\r')
 			vStringPut (line, c);
 
-		vStringTerminate (line);
-
 		last = vStringLength (line) - 1;
 		first = 0;
 		/* skip white space at start and end of line */

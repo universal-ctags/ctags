@@ -35,6 +35,9 @@
  */
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
+#define isIdentChar(c) \
+	(isalpha (c) || isdigit (c) || (c) == '$' || \
+		(c) == '_' || (c) == '#' || (c) == '-' || (c) == '.' || (c) == ':')
 
 /*
  *	 DATA DECLARATIONS
@@ -139,13 +142,6 @@ static const keywordTable TexKeywordTable [] = {
 /*
  *	 FUNCTION DEFINITIONS
  */
-
-static bool isIdentChar (const int c)
-{
-	return (bool)
-		(isalpha (c) || isdigit (c) || c == '$' ||
-		  c == '_' || c == '#' || c == '-' || c == '.' || c == ':');
-}
 
 static tokenInfo *newToken (void)
 {
@@ -285,7 +281,6 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
 
-	vStringTerminate (string);
 	if (!isspace (c))
 		ungetcToInputFile (c);		/* unget non-identifier character */
 }
@@ -414,7 +409,6 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 			}
 			readToken (token);
 		}
-		vStringTerminate (fullname);
 		vStringCopy (name->string, fullname);
 		makeTexTag (name, kind);
 	}
@@ -440,7 +434,6 @@ static bool parseTag (tokenInfo *const token, texKind kind)
 		}
 		if (useLongName)
 		{
-			vStringTerminate (fullname);
 			if (vStringLength (fullname) > 0)
 			{
 				vStringCopy (name->string, fullname);

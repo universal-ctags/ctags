@@ -29,43 +29,31 @@ static const size_t vStringInitialSize = 32;
 *   FUNCTION DEFINITIONS
 */
 
-static void vStringResize (vString *const string, const size_t newSize)
-{
-	char *const newBuffer = xRealloc (string->buffer, newSize, char);
-
-	string->size = newSize;
-	string->buffer = newBuffer;
-}
-
 /*
 *   External interface
 */
 
-extern bool vStringAutoResize (vString *const string)
+extern void vStringResize (vString *const string, const size_t newSize)
 {
-	bool ok = true;
+	size_t size = vStringInitialSize;
 
-	if (string->size <= INT_MAX / 2)
+	while (size < newSize)
+		size *= 2;
+
+	if (size > string->size)
 	{
-		const size_t newSize = string->size * 2;
-
-		vStringResize (string, newSize);
+		string->size = size;
+		string->buffer = xRealloc (string->buffer, size, char);
 	}
-	return ok;
 }
 
 extern void vStringTruncate (vString *const string, const size_t length)
 {
 	Assert (length <= string->length);
 	string->length = length;
-	vStringTerminate (string);
+	string->buffer[string->length] = '\0';
 	DebugStatement ( memset (string->buffer + string->length, 0,
 	                         string->size - string->length); )
-}
-
-extern void vStringClear (vString *const string)
-{
-	vStringTruncate (string, 0);
 }
 
 extern void vStringDelete (vString *const string)
@@ -95,29 +83,13 @@ extern vString *vStringNew (void)
 extern void vStringPut (vString *const string, const int c)
 {
 	if (string->length + 1 == string->size)  /*  check for buffer overflow */
-		vStringAutoResize (string);
+		vStringResize (string, string->size * 2);
 
 	string->buffer [string->length] = c;
 	if (c != '\0')
 		string->buffer [++string->length] = '\0';
 }
 #endif
-
-extern void vStringCatS (vString *const string, const char *const s)
-{
-#if 1
-	const size_t len = strlen (s);
-	while (string->length + len + 1 >= string->size)/*  check for buffer overflow */
-		vStringAutoResize (string);
-	strcpy (string->buffer + string->length, s);
-	string->length += len;
-#else
-	const char *p = s;
-	do
-		vStringPut (string, *p);
-	while (*p++ != '\0');
-#endif
-}
 
 extern vString *vStringNewCopy (const vString *const string)
 {
@@ -133,19 +105,47 @@ extern vString *vStringNewInit (const char *const s)
 	return vs;
 }
 
+static void stringCat (
+		vString *const string, const char *const s, const size_t length)
+{
+	if (string->length + length + 1 > string->size)
+		vStringResize (string, string->length + length + 1);
+
+	strncpy (string->buffer + string->length, s, length);
+	string->length += length;
+	vStringPut (string, '\0');
+}
+
+extern void vStringNCat (
+		vString *const string, const vString *const s, const size_t length)
+{
+	size_t len = vStringLength (s);
+
+	len = len < length ? len: length;
+	stringCat (string, s->buffer, len);
+}
+
 extern void vStringNCatS (
 		vString *const string, const char *const s, const size_t length)
 {
-	const char *p = s;
-	size_t remain = length;
+	size_t len = strlen (s);
 
-	while (remain > 0 && *p != '\0')
-	{
-		vStringPut (string, *p);
-		--remain;
-		++p;
-	}
-	vStringTerminate (string);
+	len = len < length ? len : length;
+	stringCat (string, s, len);
+}
+
+extern void vStringCat (vString *const string, const vString *const s)
+{
+	size_t len = vStringLength (s);
+
+	stringCat (string, s->buffer, len);
+}
+
+extern void vStringCatS (vString *const string, const char *const s)
+{
+	size_t len = strlen (s);
+
+	stringCat (string, s, len);
 }
 
 /*  Strip trailing newline from string.
@@ -201,10 +201,23 @@ extern void vStringChop (vString *const string)
 	}
 }
 
+extern void vStringCopy (vString *const string, const vString *const s)
+{
+	vStringClear (string);
+	vStringCat (string, s);
+}
+
 extern void vStringCopyS (vString *const string, const char *const s)
 {
 	vStringClear (string);
 	vStringCatS (string, s);
+}
+
+extern void vStringNCopy (
+		vString *const string, const vString *const s, const size_t length)
+{
+	vStringClear (string);
+	vStringNCat (string, s, length);
 }
 
 extern void vStringNCopyS (
