@@ -3,7 +3,7 @@
  */
 #include <stdio.h>
 #include <string.h>
-#include "oniguruma.h"
+#include "onigmo.h"
 
 extern int main(int argc, char* argv[])
 {

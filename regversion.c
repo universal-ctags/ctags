@@ -29,7 +29,7 @@
  */
 
 #include "config.h"
-#include "oniguruma.h"
+#include "onigmo.h"
 #include <stdio.h>
 
 extern const char*
@@ -38,9 +38,9 @@ onig_version(void)
   static char s[12];
 
   sprintf(s, "%d.%d.%d",
-          ONIGURUMA_VERSION_MAJOR,
-          ONIGURUMA_VERSION_MINOR,
-          ONIGURUMA_VERSION_TEENY);
+          ONIGMO_VERSION_MAJOR,
+          ONIGMO_VERSION_MINOR,
+          ONIGMO_VERSION_TEENY);
   return s;
 }
 
@@ -51,8 +51,8 @@ onig_copyright(void)
 
   sprintf(s, "Onigmo %d.%d.%d : Copyright (C) 2002-2009 K.Kosako, "
 	     "2011-2014 K.Takata",
-          ONIGURUMA_VERSION_MAJOR,
-          ONIGURUMA_VERSION_MINOR,
-          ONIGURUMA_VERSION_TEENY);
+          ONIGMO_VERSION_MAJOR,
+          ONIGMO_VERSION_MINOR,
+          ONIGMO_VERSION_TEENY);
   return s;
 }

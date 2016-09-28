@@ -4,8 +4,8 @@ from __future__ import print_function
 import re
 
 header_files = (
-    "oniguruma.h", "regenc.h",
-    "oniggnu.h", "onigposix.h"
+    "onigmo.h", "regenc.h",
+    "onigmognu.h", "onigmoposix.h"
 )
 
 exclude_symbols = [

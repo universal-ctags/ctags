@@ -1,7 +1,7 @@
-#ifndef ONIGPOSIX_H
-#define ONIGPOSIX_H
+#ifndef ONIGMOPOSIX_H
+#define ONIGMOPOSIX_H
 /**********************************************************************
-  onigposix.h - Oniguruma (regular expression library)
+  onigmoposix.h - Oniguruma (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2005  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
@@ -109,7 +109,7 @@ typedef struct {
 #define ONIG_EXTERN   extern
 #endif
 
-#ifndef ONIGURUMA_H
+#ifndef ONIGMO_H
 typedef unsigned int        OnigOptionType;
 
 /* syntax */
@@ -148,7 +148,7 @@ ONIG_EXTERN void onig_copy_syntax P_((OnigSyntaxType* to, OnigSyntaxType* from))
 ONIG_EXTERN const char* onig_version P_((void));
 ONIG_EXTERN const char* onig_copyright P_((void));
 
-#endif /* ONIGURUMA_H */
+#endif /* ONIGMO_H */
 
 
 ONIG_EXTERN int    regcomp P_((regex_t* reg, const char* pat, int options));
@@ -166,4 +166,4 @@ ONIG_EXTERN int  reg_number_of_names P_((regex_t* reg));
 }
 #endif
 
-#endif /* ONIGPOSIX_H */
+#endif /* ONIGMOPOSIX_H */

@@ -2,7 +2,7 @@
  * encode.c
  */
 #include <stdio.h>
-#include "oniguruma.h"
+#include "onigmo.h"
 
 static int
 search(regex_t* reg, unsigned char* str, unsigned char* end)

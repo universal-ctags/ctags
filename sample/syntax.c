@@ -3,7 +3,7 @@
  */
 #include <stdio.h>
 #include <string.h>
-#include "oniguruma.h"
+#include "onigmo.h"
 
 extern int exec(const OnigSyntaxType* syntax,
 		char* apattern, char* astr)

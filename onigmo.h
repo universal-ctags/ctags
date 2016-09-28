@@ -1,5 +1,5 @@
-#ifndef ONIGURUMA_H
-#define ONIGURUMA_H
+#ifndef ONIGMO_H
+#define ONIGMO_H
 /**********************************************************************
   oniguruma.h - Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
@@ -37,10 +37,9 @@ extern "C" {
 #endif
 #endif
 
-#define ONIGURUMA
-#define ONIGURUMA_VERSION_MAJOR   5
-#define ONIGURUMA_VERSION_MINOR   15
-#define ONIGURUMA_VERSION_TEENY   0
+#define ONIGMO_VERSION_MAJOR   6
+#define ONIGMO_VERSION_MINOR   0
+#define ONIGMO_VERSION_TEENY   0
 
 #ifdef __cplusplus
 # ifndef  HAVE_PROTOTYPES
@@ -960,4 +959,4 @@ RUBY_SYMBOL_EXPORT_END
 }
 #endif
 
-#endif /* ONIGURUMA_H */
+#endif /* ONIGMO_H */

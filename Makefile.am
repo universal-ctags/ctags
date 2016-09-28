@@ -1,7 +1,7 @@
 ## Makefile.am for Onigmo
 encdir    = $(top_srcdir)/enc
 sampledir = $(top_srcdir)/sample
-libname = libonig.la
+libname = libonigmo.la
 
 ACLOCAL_AMFLAGS = -I m4
 #AM_CFLAGS = -DNOT_RUBY
@@ -10,10 +10,10 @@ INCLUDES  = -I$(top_srcdir) -I$(includedir)
 
 SUBDIRS = . sample
 
-include_HEADERS = oniguruma.h oniggnu.h onigposix.h
+include_HEADERS = onigmo.h onigmognu.h onigmoposix.h
 lib_LTLIBRARIES = $(libname)
 
-libonig_la_SOURCES = regint.h regparse.h regenc.h st.h \
+libonigmo_la_SOURCES = regint.h regparse.h regenc.h st.h \
 	regerror.c regparse.c regext.c regcomp.c regexec.c reggnu.c \
 	regenc.c regsyntax.c regtrav.c regversion.c st.c \
 	regposix.c regposerr.c \
@@ -34,26 +34,26 @@ libonig_la_SOURCES = regint.h regparse.h regenc.h st.h \
 	$(encdir)/euc_tw.c $(encdir)/euc_kr.c $(encdir)/big5.c \
 	$(encdir)/gb18030.c $(encdir)/koi8_r.c $(encdir)/windows_1251.c
 
-libonig_la_LDFLAGS = -version-info $(LTVERSION) -no-undefined
+libonigmo_la_LDFLAGS = -version-info $(LTVERSION) -no-undefined
 
-EXTRA_DIST = .gitignore oniguruma.pc.in HISTORY README.ja index.html \
+EXTRA_DIST = .gitignore onigmo.pc.in HISTORY README.ja index.html \
 	index_ja.html doc/API doc/API.ja doc/RE doc/RE.ja doc/FAQ doc/FAQ.ja \
 	doc/UnicodeProps.txt \
 	tool/.gitignore tool/case-folding.rb tool/convert-name2ctype.sh \
 	tool/convert-jis-props.sh \
 	tool/enc-unicode.rb tool/download-ucd.sh tool/update-doc.py \
 	win32/Makefile win32/Makefile.mingw win32/config.h win32/testc.c \
-	win32/makedef.py win32/onig.rc \
+	win32/makedef.py win32/onigmo.rc \
 	$(encdir)/koi8.c $(encdir)/mktable.c \
 	$(sampledir)/encode.c $(sampledir)/listcap.c $(sampledir)/names.c \
 	$(sampledir)/posix.c $(sampledir)/simple.c $(sampledir)/sql.c \
 	$(sampledir)/syntax.c $(sampledir)/crnl.c \
 	test.rb testconv.rb testconvu.rb \
-	onig.py testpy.py .editorconfig
+	onigmo.py testpy.py .editorconfig
 
-bin_SCRIPTS = onig-config
+bin_SCRIPTS = onigmo-config
 
-onig-config: onig-config.in
+onigmo-config: onigmo-config.in
 
 do_subst = sed                                          \
       -e 's,[@]datadir[@],$(datadir),g'                 \
@@ -64,16 +64,16 @@ do_subst = sed                                          \
       -e 's,[@]libdir[@],$(libdir),g'                   \
       -e 's,[@]includedir[@],$(includedir),g'
 
-oniguruma.pc: $(srcdir)/oniguruma.pc.in Makefile
-	$(do_subst) < $(srcdir)/oniguruma.pc.in > $(@)
+onigmo.pc: $(srcdir)/onigmo.pc.in Makefile
+	$(do_subst) < $(srcdir)/onigmo.pc.in > $(@)
 
 pkgconfigdir   = $(libdir)/pkgconfig
-pkgconfig_DATA = oniguruma.pc
+pkgconfig_DATA = onigmo.pc
 
 dll:
-	$(CXX) -shared -Wl,--output-def,libonig.def -o libonig.dll *.o \
+	$(CXX) -shared -Wl,--output-def,libonigmo.def -o libonigmo.dll *.o \
 	$(LIBS)
-	strip libonig.dll
+	strip libonigmo.dll
 
 # Ruby TEST
 rtest:
@@ -90,22 +90,22 @@ TESTS = testc testp testcu
 check_PROGRAMS = testc testp testcu
 
 atest: testc testp testcu
-	@echo "[Oniguruma API, ASCII/EUC-JP check]"
+	@echo "[Onigmo API, ASCII/EUC-JP check]"
 	@$(top_builddir)/testc  | grep RESULT
 	@echo "[POSIX API, ASCII/EUC-JP check]"
 	@$(top_builddir)/testp  | grep RESULT
-	@echo "[Oniguruma API, UTF-16 check]"
+	@echo "[Onigmo API, UTF-16 check]"
 	@$(top_builddir)/testcu | grep RESULT
 
 testc_SOURCES = testc.c
-testc_LDADD = libonig.la
+testc_LDADD = libonigmo.la
 
 testp_SOURCES = testc.c
-testp_LDADD = libonig.la
+testp_LDADD = libonigmo.la
 testp_CFLAGS = -DPOSIX_TEST
 
 testcu_SOURCES = testu.c
-testcu_LDADD = libonig.la
+testcu_LDADD = libonigmo.la
 
 
 testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb

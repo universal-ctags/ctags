@@ -1,5 +1,5 @@
-#ifndef ONIGURUMA_REGPARSE_H
-#define ONIGURUMA_REGPARSE_H
+#ifndef ONIGMO_REGPARSE_H
+#define ONIGMO_REGPARSE_H
 /**********************************************************************
   regparse.h -  Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
@@ -366,4 +366,4 @@ extern int onig_print_names(FILE*, regex_t*);
 
 RUBY_SYMBOL_EXPORT_END
 
-#endif /* ONIGURUMA_REGPARSE_H */
+#endif /* ONIGMO_REGPARSE_H */

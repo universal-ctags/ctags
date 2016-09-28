@@ -6,10 +6,10 @@ product_name = onigmo
 USE_LTCG = 1
 
 # Enable the next line, if you want to use a .def file.
-#DEFFILE = onig.def
+#DEFFILE = onigmo.def
 
 
-CPPFLAGS = 
+CPPFLAGS =
 CFLAGS = -O2 -nologo /W3
 LDFLAGS =
 LOADLIBES =
@@ -46,15 +46,15 @@ CFLAGS = $(CFLAGS) /DONIG_EXTERN=extern
 ARDLL_FLAGS = $(ARDLL_FLAGS) -def:$(DEFFILE)
 !endif
 
-subdirs = 
+subdirs =
 
-libbase   = onig
+libbase   = onigmo
 libname   = $(libbase)_s.lib
 dllname   = $(libbase).dll
 dlllib    = $(libbase).lib
 
-onigheaders  = oniguruma.h regint.h regparse.h regenc.h st.h
-posixheaders = onigposix.h
+onigheaders  = onigmo.h regint.h regparse.h regenc.h st.h
+posixheaders = onigmoposix.h
 headers      = $(posixheaders) $(onigheaders)
 
 onigobjs     = reggnu.obj regerror.obj regparse.obj regext.obj regcomp.obj \
@@ -83,7 +83,7 @@ encobjs      =  $(encdir)\ascii.obj $(encdir)\utf_8.obj \
 		$(encdir)\koi8_r.obj  \
 		$(encdir)\windows_1251.obj # $(encdir)\koi8.obj
 
-resobj       = win32\onig.res
+resobj       = win32\onigmo.res
 
 onigsources  = regerror.c regparse.c regext.c regcomp.c regexec.c regenc.c \
 	       regsyntax.c regtrav.c regversion.c reggnu.c st.c
@@ -127,7 +127,7 @@ setup:
 	$(CP) win32\testc.c  testc.c
 
 
-all: $(libname) $(dllname) 
+all: $(libname) $(dllname)
 
 $(libname): $(libobjs) $(encobjs)
 	$(ARLIB) $(ARLIB_FLAGS) -out:$@ $(libobjs) $(encobjs)
@@ -139,15 +139,15 @@ regparse.obj:  regparse.c $(onigheaders) config.h st.h
 regext.obj:    regext.c   $(onigheaders) config.h
 regtrav.obj:   regtrav.c  $(onigheaders) config.h
 regcomp.obj:   regcomp.c  $(onigheaders) config.h
-regexec.obj:   regexec.c  regint.h regenc.h oniguruma.h config.h
-reggnu.obj:    reggnu.c   regint.h regenc.h oniguruma.h config.h oniggnu.h
-regerror.obj:  regerror.c regint.h regenc.h oniguruma.h config.h
-regenc.obj:    regenc.c   regint.h regenc.h oniguruma.h config.h
-regsyntax.obj: regsyntax.c regint.h regenc.h oniguruma.h config.h
-regversion.obj: regversion.c oniguruma.h config.h
-regposix.obj:  regposix.c $(posixheaders) oniguruma.h config.h
+regexec.obj:   regexec.c  regint.h regenc.h onigmo.h config.h
+reggnu.obj:    reggnu.c   regint.h regenc.h onigmo.h config.h onigmognu.h
+regerror.obj:  regerror.c regint.h regenc.h onigmo.h config.h
+regenc.obj:    regenc.c   regint.h regenc.h onigmo.h config.h
+regsyntax.obj: regsyntax.c regint.h regenc.h onigmo.h config.h
+regversion.obj: regversion.c onigmo.h config.h
+regposix.obj:  regposix.c $(posixheaders) onigmo.h config.h
 regposerr.obj: regposerr.c $(posixheaders) config.h
-st.obj:        st.c regint.h oniguruma.h config.h st.h
+st.obj:        st.c regint.h onigmo.h config.h st.h
 
 $(encdir)\ascii.obj:      $(encdir)\ascii.c regenc.h config.h
 $(encdir)\unicode.obj:    $(encdir)\unicode.c regint.h regenc.h config.h $(encdir)\unicode\casefold.h $(encdir)\unicode\name2ctype.h
@@ -182,7 +182,7 @@ $(encdir)\windows_1251.obj: $(encdir)\windows_1251.c regenc.h config.h
 $(encdir)\big5.obj:       $(encdir)\big5.c   regenc.h config.h
 $(encdir)\gb18030.obj:    $(encdir)\gb18030.c   regenc.h config.h
 
-win32\onig.res: win32\onig.rc oniguruma.h
+win32\onigmo.res: win32\onigmo.rc onigmo.h
 
 
 # Ruby test
@@ -209,7 +209,7 @@ $(testp): $(testc).c $(dlllib)
 $(testcu): $(testcu).c $(libname)
 	$(CC) -nologo -o $(testcu) -DONIG_EXTERN=extern $(testcu).c $(libname)
 
-$(libbase).def: win32\makedef.py oniguruma.h regenc.h oniggnu.h onigposix.h
+$(libbase).def: win32\makedef.py onigmo.h regenc.h onigmognu.h onigmoposix.h
 	$(PYTHON) win32\makedef.py > $@
 
 clean:
@@ -229,7 +229,7 @@ SORIG = ruby_orig
 	$(CP) regint.h      $(RUBYDIR)
 	$(CP) regparse.h    $(RUBYDIR)
 	$(CP) regenc.h      $(RUBYDIR)
-	$(CP) oniguruma.h   $(RUBYDIR)
+	$(CP) onigmo.h      $(RUBYDIR)
 	$(CP) enc\ascii.c   $(RUBYDIR)
 	$(CP) enc\utf_8.c    $(RUBYDIR)
 	$(CP) enc\euc_jp.c  $(RUBYDIR)

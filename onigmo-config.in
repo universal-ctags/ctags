@@ -1,12 +1,12 @@
 #!/bin/sh
 # Copyright (C) 2006  K.Kosako (sndgk393 AT ybb DOT ne DOT jp)
 
-ONIG_VERSION=@PACKAGE_VERSION@
+ONIGMO_VERSION=@PACKAGE_VERSION@
 
 show_usage()
 {
   cat <<EOF
-Usage: onig-config [OPTION]
+Usage: onigmo-config [OPTION]
 
   Values for OPTION are:
   --prefix[=DIR]       change prefix to DIR
@@ -15,7 +15,7 @@ Usage: onig-config [OPTION]
   --exec-prefix        print exec_prefix
   --cflags             print C compiler flags
   --libs               print library information
-  --version            print oniguruma version
+  --version            print onigmo version
   --help               print this help
 
 EOF
@@ -63,10 +63,10 @@ while test $# -gt 0; do
       echo $show_includedir
       ;;
     --libs)
-      echo -L@libdir@ -lonig
+      echo -L@libdir@ -lonigmo
       ;;
     --version)
-      echo $ONIG_VERSION
+      echo $ONIGMO_VERSION
       ;;
     *)
       show_usage

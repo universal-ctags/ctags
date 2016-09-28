@@ -3,7 +3,7 @@
 
 from __future__ import print_function, unicode_literals
 from ctypes import *
-import onig
+import onigmo
 import sys
 import io
 import locale

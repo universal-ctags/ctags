@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(onig, 5.15.0)
+AC_INIT(onigmo, 6.0.0)
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -114,4 +114,4 @@ if test "${multithread}" = yes; then
 fi
 
 
-AC_OUTPUT([Makefile onig-config sample/Makefile], [chmod +x onig-config])
+AC_OUTPUT([Makefile onigmo-config sample/Makefile], [chmod +x onigmo-config])

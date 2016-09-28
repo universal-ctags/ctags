@@ -28,13 +28,13 @@
  */
 
 #include <windows.h>
-#include "oniguruma.h"
+#include "onigmo.h"
 
 #define TOSTR_(a)	#a
 #define ONIG_VERSION_TOSTR_(a,b,c)	\
 	TOSTR_(a) "." TOSTR_(b) "." TOSTR_(c)
 #define ONIG_VERSION_STRING	\
-	ONIG_VERSION_TOSTR_(ONIGURUMA_VERSION_MAJOR, ONIGURUMA_VERSION_MINOR, ONIGURUMA_VERSION_TEENY)
+	ONIG_VERSION_TOSTR_(ONIGMO_VERSION_MAJOR, ONIGMO_VERSION_MINOR, ONIGMO_VERSION_TEENY)
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -52,8 +52,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION ONIGURUMA_VERSION_MAJOR,ONIGURUMA_VERSION_MINOR,ONIGURUMA_VERSION_TEENY,0
- PRODUCTVERSION ONIGURUMA_VERSION_MAJOR,ONIGURUMA_VERSION_MINOR,ONIGURUMA_VERSION_TEENY,0
+ FILEVERSION ONIGMO_VERSION_MAJOR,ONIGMO_VERSION_MINOR,ONIGMO_VERSION_TEENY,0
+ PRODUCTVERSION ONIGMO_VERSION_MAJOR,ONIGMO_VERSION_MINOR,ONIGMO_VERSION_TEENY,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -72,10 +72,10 @@ BEGIN
             VALUE "CompanyName", " \0"
             VALUE "FileDescription", "Onigmo (Oniguruma-mod) (regular expression library)\0"
             VALUE "FileVersion", ONIG_VERSION_STRING "\0"
-            VALUE "InternalName", "onig.dll\0"
+            VALUE "InternalName", "onigmo.dll\0"
             VALUE "LegalCopyright", "Copyright (C) 2002-2009 K.Kosako, 2011-2014 K.Takata\0"
             VALUE "LegalTrademarks", "\0"
-            VALUE "OriginalFilename", "onig.dll\0"
+            VALUE "OriginalFilename", "onigmo.dll\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "Onigmo (Oniguruma-mod)\0"
             VALUE "ProductVersion", ONIG_VERSION_STRING "\0"

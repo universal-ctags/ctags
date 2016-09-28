@@ -1,6 +1,6 @@
 noinst_PROGRAMS = encode listcap names posix simple sql syntax crnl
 
-libname = $(top_builddir)/libonig.la
+libname = $(top_builddir)/libonigmo.la
 LDADD   = $(libname)
 INCLUDES  = -I$(top_srcdir) -I$(includedir)
 

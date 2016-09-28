@@ -5,7 +5,7 @@
  */
 #include <stdio.h>
 #include <string.h>
-#include "oniguruma.h"
+#include "onigmo.h"
 
 static int
 node_callback(int group, OnigPosition beg, OnigPosition end, int level,

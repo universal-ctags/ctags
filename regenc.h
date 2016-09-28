@@ -1,5 +1,5 @@
-#ifndef ONIGURUMA_REGENC_H
-#define ONIGURUMA_REGENC_H
+#ifndef ONIGMO_REGENC_H
+#define ONIGMO_REGENC_H
 /**********************************************************************
   regenc.h -  Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
@@ -31,7 +31,7 @@
  */
 
 #ifdef RUBY
-#ifndef ONIGURUMA_REGINT_H
+#ifndef ONIGMO_REGINT_H
 #ifndef RUBY_EXTERN
 #include "ruby/config.h"
 #include "ruby/defines.h"
@@ -49,9 +49,9 @@
 #endif
 
 #ifdef RUBY
-#include "ruby/oniguruma.h"
+#include "ruby/onigmo.h"
 #else
-#include "oniguruma.h"
+#include "onigmo.h"
 #endif
 
 RUBY_SYMBOL_EXPORT_BEGIN
@@ -245,4 +245,4 @@ extern int ONIG_ENC_REGISTER(const char *, OnigEncoding);
 
 RUBY_SYMBOL_EXPORT_END
 
-#endif /* ONIGURUMA_REGENC_H */
+#endif /* ONIGMO_REGENC_H */

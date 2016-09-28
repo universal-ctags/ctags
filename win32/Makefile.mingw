@@ -9,7 +9,7 @@ USE_LTCG = 1
 #DEFFILE = onig.def
 
 
-CPPFLAGS = 
+CPPFLAGS =
 CFLAGS = -O2 -Wall
 LDFLAGS =
 LOADLIBES =
@@ -33,15 +33,15 @@ CFLAGS = $(CFLAGS) -DONIG_EXTERN=extern
 ARDLL_FLAGS = $(ARDLL_FLAGS) $(DEFFILE)
 endif
 
-subdirs = 
+subdirs =
 
-libbase   = onig
+libbase   = onigmo
 libname   = $(libbase)_s.a
 dllname   = $(libbase).dll
 dlllib    = $(libbase).a
 
-onigheaders  = oniguruma.h regint.h regparse.h regenc.h st.h
-posixheaders = onigposix.h
+onigheaders  = onigmo.h regint.h regparse.h regenc.h st.h
+posixheaders = onigmoposix.h
 headers      = $(posixheaders) $(onigheaders)
 
 onigobjs     = reggnu.o regerror.o regparse.o regext.o regcomp.o \
@@ -70,7 +70,7 @@ encobjs      =  $(encdir)\ascii.o $(encdir)\utf8.o \
 		$(encdir)\koi8_r.o  \
 		$(encdir)\cp1251.o # $(encdir)\koi8.o
 
-resobj       = win32\onig.res
+resobj       = win32\onigmo.res
 
 onigsources  = regerror.c regparse.c regext.c regcomp.c regexec.c regenc.c \
 	       regsyntax.c regtrav.c regversion.c reggnu.c st.c
@@ -106,7 +106,7 @@ setup:
 	$(CP) win32/testc.c  testc.c
 
 
-all: $(libname) $(dllname) 
+all: $(libname) $(dllname)
 
 $(libname): $(libobjs) $(encobjs)
 	$(ARLIB) $(ARLIB_FLAGS) $@ $(libobjs) $(encobjs)
@@ -118,15 +118,15 @@ regparse.o:  regparse.c $(onigheaders) config.h st.h
 regext.o:    regext.c   $(onigheaders) config.h
 regtrav.o:   regtrav.c  $(onigheaders) config.h
 regcomp.o:   regcomp.c  $(onigheaders) config.h
-regexec.o:   regexec.c  regint.h regenc.h oniguruma.h config.h
-reggnu.o:    reggnu.c   regint.h regenc.h oniguruma.h config.h oniggnu.h
-regerror.o:  regerror.c regint.h regenc.h oniguruma.h config.h
-regenc.o:    regenc.c   regint.h regenc.h oniguruma.h config.h
-regsyntax.o: regsyntax.c regint.h regenc.h oniguruma.h config.h
-regversion.o: regversion.c oniguruma.h config.h
-regposix.o:  regposix.c $(posixheaders) oniguruma.h config.h
+regexec.o:   regexec.c  regint.h regenc.h onigmo.h config.h
+reggnu.o:    reggnu.c   regint.h regenc.h onigmo.h config.h onigmognu.h
+regerror.o:  regerror.c regint.h regenc.h onigmo.h config.h
+regenc.o:    regenc.c   regint.h regenc.h onigmo.h config.h
+regsyntax.o: regsyntax.c regint.h regenc.h onigmo.h config.h
+regversion.o: regversion.c onigmo.h config.h
+regposix.o:  regposix.c $(posixheaders) onigmo.h config.h
 regposerr.o: regposerr.c $(posixheaders) config.h
-st.o:        st.c regint.h oniguruma.h config.h st.h
+st.o:        st.c regint.h onigmo.h config.h st.h
 
 $(encdir)\ascii.o:      $(encdir)\ascii.c regenc.h config.h
 $(encdir)\unicode.o:    $(encdir)\unicode.c regint.h regenc.h config.h $(encdir)\unicode\casefold.h $(encdir)\unicode\name2ctype.h
@@ -161,7 +161,7 @@ $(encdir)\cp1251.o:     $(encdir)\cp1251.c regenc.h config.h
 $(encdir)\big5.o:       $(encdir)\big5.c   regenc.h config.h
 $(encdir)\gb18030.o:    $(encdir)\gb18030.c   regenc.h config.h
 
-win32\onig.res: win32\onig.rc oniguruma.h
+win32\onigmo.res: win32\onigmo.rc onigmo.h
 
 
 # Ruby test
@@ -188,7 +188,7 @@ $(testp): $(testc).c $(dlllib)
 $(testcu): $(testcu).c $(libname)
 	$(CC) -o $(testcu) -DONIG_EXTERN=extern $(testcu).c $(libname)
 
-$(libbase).def: win32\makedef.py oniguruma.h regenc.h oniggnu.h onigposix.h
+$(libbase).def: win32\makedef.py onigmo.h regenc.h onigmognu.h onigmoposix.h
 	$(PYTHON) win32\makedef.py > $@
 
 clean:
@@ -208,7 +208,7 @@ SORIG = ruby_orig
 	$(CP) regint.h      $(RUBYDIR)
 	$(CP) regparse.h    $(RUBYDIR)
 	$(CP) regenc.h      $(RUBYDIR)
-	$(CP) oniguruma.h   $(RUBYDIR)
+	$(CP) onigmo.h      $(RUBYDIR)
 	$(CP) enc\ascii.c   $(RUBYDIR)
 	$(CP) enc\utf8.c    $(RUBYDIR)
 	$(CP) enc\euc_jp.c  $(RUBYDIR)

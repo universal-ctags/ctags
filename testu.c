@@ -4,9 +4,9 @@
 #include<stdio.h>
 
 #ifdef POSIX_TEST
-#include "onigposix.h"
+#include "onigmoposix.h"
 #else
-#include "oniguruma.h"
+#include "onigmo.h"
 #endif
 
 static int nsucc  = 0;

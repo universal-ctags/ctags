@@ -1,6 +1,6 @@
-Onigmo (Oniguruma-mod) API  Version 5.14.0  2014/07/01
+Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
 
-#include <oniguruma.h>
+#include <onigmo.h>
 
 
 # int onig_init(void)

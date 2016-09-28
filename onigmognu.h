@@ -1,7 +1,7 @@
-#ifndef ONIGGNU_H
-#define ONIGGNU_H
+#ifndef ONIGMOGNU_H
+#define ONIGMOGNU_H
 /**********************************************************************
-  oniggnu.h - Oniguruma (regular expression library)
+  onigmognu.h - Oniguruma (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2005  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  */
 
-#include "oniguruma.h"
+#include "onigmo.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -82,4 +82,4 @@ int re_alloc_pattern P_((struct re_pattern_buffer**));  /* added */
 }
 #endif
 
-#endif /* ONIGGNU_H */
+#endif /* ONIGMOGNU_H */

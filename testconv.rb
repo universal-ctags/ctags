@@ -37,9 +37,9 @@ print(<<"EOS")
 #include <stdio.h>
 
 #ifdef POSIX_TEST
-#include "onigposix.h"
+#include "onigmoposix.h"
 #else
-#include "oniguruma.h"
+#include "onigmo.h"
 #endif
 
 #ifdef HAVE_STRING_H

@@ -1,5 +1,5 @@
-#ifndef ONIGURUMA_REGINT_H
-#define ONIGURUMA_REGINT_H
+#ifndef ONIGMO_REGINT_H
+#define ONIGMO_REGINT_H
 /**********************************************************************
   regint.h -  Onigmo (Oniguruma-mod) (regular expression library)
 **********************************************************************/
@@ -1005,4 +1005,4 @@ extern size_t onig_region_memsize P_((const struct re_registers *regs));
 
 RUBY_SYMBOL_EXPORT_END
 
-#endif /* ONIGURUMA_REGINT_H */
+#endif /* ONIGMO_REGINT_H */

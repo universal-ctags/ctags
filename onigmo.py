@@ -7,7 +7,7 @@ This is a low level wrapper for Onigmo regular expression DLL/shared object.
 This provides almost same API as the original C API, so the API is not
 object oriented.
 
-Onigmo DLL (onig.dll, libonig.so, etc.) must be placed in the
+Onigmo DLL (onigmo.dll, libonigmo.so, etc.) must be placed in the
 default search path. The default search path depends on the system.
 """
 
@@ -108,11 +108,11 @@ class OnigErrorInfo(ctypes.Structure):
 # load the DLL or the shared library
 
 if os.name in ("nt", "ce"):
-    _libname = "onig.dll"
+    _libname = "onigmo.dll"
 elif sys.platform == "cygwin":
-    _libname = "libonig.dll"
+    _libname = "libonigmo.dll"
 else:
-    _libname = "libonig.so"
+    _libname = "libonigmo.so"
 
 libonig = ctypes.cdll.LoadLibrary(_libname)
 

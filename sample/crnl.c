@@ -7,7 +7,7 @@
  */
 #include <stdio.h>
 #include <string.h>
-#include "oniguruma.h"
+#include "onigmo.h"
 
 /* #define USE_UNICODE_ALL_LINE_TERMINATORS */
 

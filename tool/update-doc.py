@@ -9,7 +9,7 @@ import sys
 import re
 import datetime
 
-onig_ver = "5.14.0"
+onig_ver = "6.0.0"
 
 def print_list(arr, title):
     print()
