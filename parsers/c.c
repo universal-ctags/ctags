@@ -1909,7 +1909,6 @@ static void readIdentifier (tokenInfo *const token, const int firstChar)
 		}
 		c = cppGetc ();
 	} while (cppIsident (c) || ((isInputLanguage (Lang_java) || isInputLanguage (Lang_csharp)) && (isHighChar (c) || c == '.')));
-	vStringTerminate (name);
 	cppUngetc (c);        /* unget non-identifier character */
 
 	analyzeIdentifier (token);
@@ -1927,7 +1926,6 @@ static void readPackageName (tokenInfo *const token, const int firstChar, bool a
 		vStringPut (name, c);
 		c = cppGetc ();
 	}
-	vStringTerminate (name);
 	cppUngetc (c);        /* unget non-package character */
 }
 
@@ -1964,7 +1962,6 @@ static void readVersionName (tokenInfo *const token, const int firstChar)
 		vStringPut (name, c);
 		c = cppGetc ();
 	}
-	vStringTerminate (name);
     cppGetc ();
 }
 
@@ -2040,7 +2037,6 @@ static void readOperator (statementInfo *const st)
 			}
 			c = cppGetc ();
 		} while (! isOneOf (c, "(;")  &&  c != EOF);
-		vStringTerminate (name);
 	}
 	else if (isOneOf (c, acceptable))
 	{
@@ -2050,7 +2046,6 @@ static void readOperator (statementInfo *const st)
 			vStringPut (name, c);
 			c = cppGetc ();
 		} while (isOneOf (c, acceptable));
-		vStringTerminate (name);
 	}
 
 	cppUngetc (c);
@@ -2796,7 +2791,6 @@ static int parseParens (statementInfo *const st, parenInfo *const info)
 	if (! info->isNameCandidate)
 		initToken (token);
 
-	vStringTerminate (Signature);
 	if (info->isKnrParamList)
 		vStringClear (Signature);
 	CollectingSignature = false;

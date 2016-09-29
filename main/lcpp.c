@@ -232,7 +232,6 @@ static void readIdentifier (int c, vString *const name)
 		c = getcFromInputFile ();
 	} while (c != EOF  && cppIsident (c));
 	ungetcToInputFile (c);
-	vStringTerminate (name);
 }
 
 static void readFilename (int c, vString *const name)
@@ -243,8 +242,6 @@ static void readFilename (int c, vString *const name)
 
 	while (c = getcFromInputFile (), (c != EOF && c != c_end && c != '\n'))
 		vStringPut (name, c);
-
-	vStringTerminate (name);
 }
 
 static conditionalInfo *currentConditional (void)

@@ -183,7 +183,6 @@ static void readIdentifier (const int first, vString *const id)
 		c = nextChar ();
 	}
 	ungetcToInputFile (c);
-	vStringTerminate (id);
 }
 
 extern void runMakeParser (struct makeParserClient *client, void *data)
@@ -295,7 +294,6 @@ extern void runMakeParser (struct makeParserClient *client, void *data)
 					}
 					if (c == '\n')
 						ungetcToInputFile (c);
-					vStringTerminate (name);
 					vStringStripTrailing (name);
 					newMacro (name, true, false, client, data);
 				}

@@ -89,8 +89,8 @@ retry:
 	dest_len = dest_ptr - dest;
 
 	vStringClear (string);
-	while (vStringSize (string) <= dest_len + 1)
-		vStringAutoResize (string);
+	if (vStringSize (string) < dest_len + 1)
+		vStringResize (string, dest_len + 1);
 	memcpy (vStringValue (string), dest, dest_len + 1);
 	vStringLength (string) = dest_len;
 	eFree (dest);

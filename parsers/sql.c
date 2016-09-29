@@ -42,6 +42,17 @@
  */
 #define isType(token,t)		(bool) ((token)->type == (t))
 #define isKeyword(token,k)	(bool) ((token)->keyword == (k))
+#define isIdentChar1(c) \
+	/*
+	 * Other databases are less restrictive on the first character of
+	 * an identifier.
+	 * isIdentChar1 is used to identify the first character of an 
+	 * identifier, so we are removing some restrictions.
+	 */ \
+	(isalpha (c) || (c) == '@' || (c) == '_' )
+#define isIdentChar(c) \
+	(isalpha (c) || isdigit (c) || (c) == '$' || \
+		(c) == '@' || (c) == '_' || (c) == '#')
 
 /*
  *	 DATA DECLARATIONS
@@ -315,25 +326,6 @@ static tokenType parseSqlFile (tokenInfo *const token);
  *	 FUNCTION DEFINITIONS
  */
 
-static bool isIdentChar1 (const int c)
-{
-	/*
-	 * Other databases are less restrictive on the first character of
-	 * an identifier.
-	 * isIdentChar1 is used to identify the first character of an 
-	 * identifier, so we are removing some restrictions.
-	 */
-	return (bool)
-		(isalpha (c) || c == '@' || c == '_' );
-}
-
-static bool isIdentChar (const int c)
-{
-	return (bool)
-		(isalpha (c) || isdigit (c) || c == '$' || 
-		 c == '@' || c == '_' || c == '#');
-}
-
 static bool isCmdTerm (tokenInfo *const token)
 {
 	DebugStatement ( 
@@ -465,7 +457,6 @@ static void parseString (vString *const string, const int delimiter)
 		else
 			vStringPut (string, c);
 	}
-	vStringTerminate (string);
 }
 
 /*	Read a C identifier beginning with "firstChar" and places it into "name".
@@ -479,7 +470,6 @@ static void parseIdentifier (vString *const string, const int firstChar)
 		vStringPut (string, c);
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
-	vStringTerminate (string);
 	if (!isspace (c))
 		ungetcToInputFile (c);		/* unget non-identifier character */
 }
@@ -667,7 +657,6 @@ static void readIdentifier (tokenInfo *const token)
  *		   vStringCatS (parent->string, ".");
  *	   }
  *	   vStringCatS (parent->string, vStringValue(child->string));
- *	   vStringTerminate(parent->string);
  * }
  */
 
@@ -678,7 +667,6 @@ static void addToScope (tokenInfo* const token, vString* const extra, sqlKind ki
 		vStringCatS (token->scope, ".");
 	}
 	vStringCatS (token->scope, vStringValue(extra));
-	vStringTerminate(token->scope);
 	token->scopeKind = kind;
 }
 

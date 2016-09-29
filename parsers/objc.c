@@ -246,8 +246,6 @@ static void readIdentifier (lexingState * st)
 		vStringPut (st->name, (int) *p);
 
 	st->cp = p;
-
-	vStringTerminate (st->name);
 }
 
 /* read the @something directives */
@@ -265,8 +263,6 @@ static void readIdentifierObjcDirective (lexingState * st)
 		vStringPut (st->name, (int) *p);
 
 	st->cp = p;
-
-	vStringTerminate (st->name);
 }
 
 /* The lexer is in charge of reading the file.

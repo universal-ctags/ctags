@@ -69,7 +69,6 @@ static const unsigned char *parseIdentifier (
 		vStringPut (identifier, (int) *cp);
 		++cp;
 	}
-	vStringTerminate (identifier);
 	return cp;
 }
 

@@ -28,6 +28,8 @@
  */
 #define isType(token,t)     (bool) ((token)->type == (t))
 #define isKeyword(token,k)  (bool) ((token)->keyword == (k))
+#define isIdentChar1(c) (isalpha (c) || (c) == '_')
+#define isIdentChar(c) (isalpha (c) || isdigit (c) || (c) == '_')
 
 /*
  *   DATA DECLARATIONS
@@ -299,17 +301,6 @@ static void parseKeywords (tokenInfo * const token, bool local);
 /*
  *   FUNCTION DEFINITIONS
  */
-
-static bool isIdentChar1 (const int c)
-{
-	return (bool) (isalpha (c) || c == '_');
-}
-
-static bool isIdentChar (const int c)
-{
-	return (bool) (isalpha (c) || isdigit (c) || c == '_');
-}
-
 static bool isIdentifierMatch (const tokenInfo * const token,
 	const vString * const name)
 {
@@ -370,7 +361,6 @@ static void parseString (vString * const string, const int delimiter)
 		else
 			vStringPut (string, c);
 	}
-	vStringTerminate (string);
 }
 
 /*  Read a VHDL identifier beginning with "firstChar" and place it into "name".
@@ -384,7 +374,6 @@ static void parseIdentifier (vString * const string, const int firstChar)
 		vStringPut (string, c);
 		c = getcFromInputFile ();
 	} while (isIdentChar (c));
-	vStringTerminate (string);
 	if (!isspace (c))
 		ungetcToInputFile (c);	/* unget non-identifier character */
 }
@@ -547,7 +536,6 @@ static void makeVhdlTag (tokenInfo * const token, const vhdlKind kind)
 			vStringCopy (fulltag, token->scope);
 			vStringCatS (fulltag, ".");
 			vStringCatS (fulltag, vStringValue (token->string));
-			vStringTerminate (fulltag);
 			vStringCopy (token->string, fulltag);
 			vStringDelete (fulltag);
 		}

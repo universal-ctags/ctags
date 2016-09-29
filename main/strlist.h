@@ -15,17 +15,14 @@
 #include "general.h"  /* must always come first */
 
 #include "vstring.h"
+#include "ptrarray.h"
 
 #include <stdio.h>
 
 /*
 *   DATA DECLARATIONS
 */
-typedef struct sStringList {
-	unsigned int max;
-	unsigned int count;
-	vString    **list;
-} stringList;
+typedef ptrArray stringList;
 
 /*
 *   FUNCTION PROTOTYPES

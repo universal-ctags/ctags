@@ -67,7 +67,6 @@ static void L_getit (vString *const name, const unsigned char *dbp)
 	}
 	for (p=dbp ; *p!='\0' && *p!='(' && !isspace ((int) *p) && *p!=')' ; p++)
 		vStringPut (name, *p);
-	vStringTerminate (name);
 
 	if (vStringLength (name) > 0)
 		makeSimpleTag (name, LispKinds, K_FUNCTION);
