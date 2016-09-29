@@ -25,6 +25,8 @@
 #include "xtag.h"
 #include "objpool.h"
 
+#define isIdentifierChar(c) \
+	(isalnum (c) || (c) == '_' || (c) >= 0x80)
 
 enum {
 	KEYWORD_as,
@@ -372,11 +374,6 @@ static void copyToken (tokenInfo *const dest, const tokenInfo *const src)
 	dest->keyword = src->keyword;
 	dest->indent = src->indent;
 	vStringCopy(dest->string, src->string);
-}
-
-static bool isIdentifierChar (const int c)
-{
-	return (isalnum (c) || c == '_' || c >= 0x80);
 }
 
 /* Skip a single or double quoted string. */
