@@ -136,15 +136,13 @@ static tokenInfo *newToken (void)
 	return token;
 }
 
-static tokenInfo *copyToken (tokenInfo *other)
+static void copyToken (tokenInfo *const dest, const tokenInfo *const other)
 {
-	tokenInfo *const token = xMalloc (1, tokenInfo);
-	token->type = other->type;
-	token->keyword = other->keyword;
-	token->string = vStringNewCopy (other->string);
-	token->lineNumber = other->lineNumber;
-	token->filePosition = other->filePosition;
-	return token;
+	dest->type = other->type;
+	dest->keyword = other->keyword;
+	vStringCopy(dest->string, other->string);
+	dest->lineNumber = other->lineNumber;
+	dest->filePosition = other->filePosition;
 }
 
 static void deleteToken (tokenInfo * const token)
@@ -570,7 +568,9 @@ static void parseFunctionOrMethod (tokenInfo *const token)
 
 	if (isType (token, TOKEN_IDENTIFIER))
 	{
-		tokenInfo *functionToken = copyToken (token);
+		tokenInfo *functionToken = newToken ();
+
+		copyToken (functionToken, token);
 
 		// Start recording signature
 		signature = vStringNew ();
@@ -623,7 +623,8 @@ static void parseStructMembers (tokenInfo *const token, tokenInfo *const parent_
 				if (first)
 				{
 					// could be anonymous field like in 'struct {int}' - we don't know yet
-					memberCandidate = copyToken (token);
+					memberCandidate = newToken ();
+					copyToken (memberCandidate, token);
 					first = false;
 				}
 				else
@@ -698,7 +699,8 @@ static void parseConstTypeVar (tokenInfo *const token, goKind kind)
 			{
 				if (kind == GOTAG_TYPE)
 				{
-					typeToken = copyToken (token);
+					typeToken = newToken ();
+					copyToken (typeToken, token);
 					readToken (token);
 					if (isKeyword (token, KEYWORD_struct))
 						makeTag (typeToken, GOTAG_STRUCT, NULL, GOTAG_UNDEFINED, NULL);
