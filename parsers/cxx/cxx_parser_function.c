@@ -478,7 +478,28 @@ bool cxxParserTokenChainLooksLikeConstructorParameterSet(
 	// ending parenthesis.
 
 	if(pChain->iCount < 3)
+	{
+		CXX_DEBUG_ASSERT(
+				pChain->iCount == 2,
+				"This function should be called only on parenthesis and bracket chains"
+			);
+
+		if(cxxTokenTypeIs(cxxTokenChainFirst(pChain),CXXTokenTypeOpeningBracket))
+		{
+			CXX_DEBUG_ASSERT(
+					cxxTokenTypeIs(cxxTokenChainLast(pChain),CXXTokenTypeClosingBracket),
+					"The last token should have been a closing bracket here"
+				);
+			return true; // type var {} is valid in C++11
+		}
+
+		CXX_DEBUG_ASSERT(
+				cxxTokenTypeIs(cxxTokenChainFirst(pChain),CXXTokenTypeOpeningParenthesis),
+				"This function should be called only on parenthesis and bracket chains"
+			);
+
 		return false; // type var() is NOT valid C++
+	}
 
 	return cxxParserTokenChainLooksLikeFunctionCallParameterSet(pChain);
 }

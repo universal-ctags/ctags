@@ -331,11 +331,11 @@ bool cxxParserExtractVariableDeclarations(CXXTokenChain * pChain,unsigned int uF
 						(!cxxTokenTypeIsOneOf(
 								t->pNext,
 								CXXTokenTypeComma | CXXTokenTypeSemicolon |
-								CXXTokenTypeAssignment
+								CXXTokenTypeAssignment | CXXTokenTypeBracketChain
 							))
 					)
 				{
-					CXX_DEBUG_LEAVE_TEXT("No comma, semicolon or assignment after array specifier");
+					CXX_DEBUG_LEAVE_TEXT("No comma, semicolon, = or {} after []");
 					return bGotVariable;
 				}
 

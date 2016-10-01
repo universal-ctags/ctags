@@ -1,4 +1,5 @@
 #include <string>
+#include <array>
 
 // All of these are valid variable declarations
 
@@ -9,6 +10,12 @@ struct Struct1
 	std::string ** m03, m04;
 	std::string & (*m05)(int a,int b);
 	std::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t> > m06[10];
+	std::string m07 { "test" }; // C++11
+	std::string m08[2] { "a", "b" };
+	int m09 {};
+	int m10[2][2]{{1, 2}, {3, 4}};
+	std::array<int, 3> m11 { {1,2,3} };
+	std::string m12[3] { std::string("one"),"two",{'t', 'h', 'r', 'e', 'e'} };
 } v01, v02[10];
 
 enum Enum1
@@ -45,8 +52,14 @@ int main(int argc,char ** argv)
 #define SIZE 25
 	std::string ** l20[SIZE];
 	std::string l21[1 << 2];
-	std::string * const l22[SIZE][SIZE];
+	std::string * l22[SIZE][SIZE];
 	std::string l23[5][2];
+	std::string * const l24 = 0;
+
+	wchar_t l25[] = { L"кошка" };
+	wchar_t l26[] { L'к', L'о', L'ш', L'к', L'а', L'\0' };
+	std::string l27[] = { std::string("one"),"two",{'t', 'h', 'r', 'e', 'e'} };
+	int l28 {};
 
 	return 0;
 }
