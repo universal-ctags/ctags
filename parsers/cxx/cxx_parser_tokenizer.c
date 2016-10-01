@@ -961,6 +961,58 @@ static bool cxxParserParseNextTokenCondenseAttribute(void)
 	return cxxParserParseNextToken();
 }
 
+// An ignore token was encountered and it specifies to skip the
+// eventual following parenthesis.
+// The routine has to check if there is a following parenthesis
+// and eventually skip it but it MUST NOT parse the next token
+// if it is not a parenthesis. This is because the ignored token
+// may have a replacement and is that one that has to be returned
+// back to the caller from cxxParserParseNextToken().
+static bool cxxParserParseNextTokenSkipIgnoredParenthesis(void)
+{
+	CXX_DEBUG_ENTER();
+
+	cxxParserSkipToNonWhiteSpace();
+
+	if(g_cxx.iChar != '(')
+		return true; // no parenthesis
+
+	if(!cxxParserParseNextToken())
+	{
+		CXX_DEBUG_LEAVE_TEXT("No next token after ignored identifier");
+		return false;
+	}
+
+	if(!cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningParenthesis))
+	{
+		CXX_DEBUG_ASSERT(false,"Should have found an open parenthesis token here!");
+		CXX_DEBUG_LEAVE_TEXT("Internal error");
+		return false;
+	}
+
+	if(!cxxParserParseAndCondenseCurrentSubchain(
+			CXXTokenTypeOpeningParenthesis |
+				CXXTokenTypeOpeningSquareParenthesis |
+				CXXTokenTypeOpeningBracket,
+			false
+		))
+	{
+		CXX_DEBUG_LEAVE_TEXT("Failed to parse and condense subchains");
+		return false;
+	}
+
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain),
+			"Should have a parenthesis chain as last token!"
+		);
+
+	// Now just kill the chain.
+	cxxTokenDestroy(cxxTokenChainTakeLast(g_cxx.pTokenChain));
+
+	CXX_DEBUG_LEAVE();
+	return true;
+}
+
 bool cxxParserParseNextToken(void)
 {
 	CXXToken * t = cxxTokenCreate();
@@ -1050,7 +1102,12 @@ bool cxxParserParseNextToken(void)
 			g_cxx.iChar = cppGetc();
 		}
 
-		int iCXXKeyword = lookupKeyword(t->pszWord->buffer,g_cxx.eLanguage);
+		int iCXXKeyword;
+		const char * szReplacement = NULL;
+
+check_keyword:
+
+		iCXXKeyword = lookupKeyword(t->pszWord->buffer,g_cxx.eLanguage);
 		if(iCXXKeyword >= 0)
 		{
 			if(
@@ -1079,29 +1136,55 @@ bool cxxParserParseNextToken(void)
 				}
 			}
 		} else {
-			bool bIgnoreParens = false;
-			const char * szReplacement = NULL;
-			if(isIgnoreToken(
-					vStringValue(t->pszWord),
-					&bIgnoreParens,
-					&szReplacement
-				))
+			// We can enter here also from a jump to check_keyword after finding
+			// and ignored token and a replacement.
+
+			if(!szReplacement)
 			{
-				CXX_DEBUG_PRINT("Ignore token %s",vStringValue(t->pszWord));
-				// FIXME: Handle ignore parens!
-				if(szReplacement && *szReplacement)
+				bool bIgnoreParens = false;
+				if(isIgnoreToken(
+						vStringValue(t->pszWord),
+						&bIgnoreParens,
+						&szReplacement
+					))
 				{
-					vStringClear(t->pszWord);
-					vStringCatS(t->pszWord,szReplacement);
-				} else {
-					// skip
-					cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+					CXX_DEBUG_PRINT("Ignore token %s",vStringValue(t->pszWord));
+
+					if(szReplacement && *szReplacement)
+					{
+						CXX_DEBUG_PRINT(
+								"The token has replacement %s: applying",
+								szReplacement
+							);
+						vStringClear(t->pszWord);
+						vStringCatS(t->pszWord,szReplacement);
+					} else {
+						// kill it
+						CXX_DEBUG_PRINT("Ignore token has no replacement");
+						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+					}
+					
+					if(bIgnoreParens)
+					{
+						CXX_DEBUG_PRINT("Ignored token specifies to ignore parens too");
+						if(!cxxParserParseNextTokenSkipIgnoredParenthesis())
+							return false;
+					}
+					
+					if(szReplacement && *szReplacement)
+					{
+						// Already have a token to return
+						// Check again for keywords
+						goto check_keyword;
+					}
+					
+					// Have no token to return: parse it
 					return cxxParserParseNextToken();
 				}
 			}
 		}
 
-		t->bFollowedBySpace = t->bFollowedBySpace | isspace(g_cxx.iChar);
+		t->bFollowedBySpace = isspace(g_cxx.iChar);
 
 		return true;
 	}
