@@ -18,7 +18,9 @@ enum CXXKeywordFlag
 	// struct, class, union, enum, typename
 	CXXKeywordIsTypeRefMarker = (1 << 1),
 	// virtual, inline, friend, static
-	CXXKeywordExcludeFromTypeNames = (1 << 2)
+	CXXKeywordExcludeFromTypeNames = (1 << 2),
+	// true, false, nullptr
+	CXXKeywordIsConstant = (1 << 3)
 };
 
 typedef struct _CXXKeywordDescriptor
@@ -65,14 +67,14 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{ 1, "default", 0 },
 	{ 0, "delete", 0 },
 	{ 1, "do", 0 },
-	{ 1, "double", 0 },
+	{ 1, "double", CXXKeywordFlagMayBePartOfTypeName },
 	{ 0, "dynamic_cast", 0 },
 	{ 1, "else", 0 },
 	{ 1, "enum", CXXKeywordFlagMayBePartOfTypeName | CXXKeywordIsTypeRefMarker },
 	{ 0, "explicit", 0 },
 	{ 0, "export", 0 },
 	{ 1, "extern", 0 },
-	{ 1, "false", 0 },
+	{ 1, "false", CXXKeywordIsConstant },
 	// this is a keyword only in special contexts (we have a switch to enable/disable it)
 	{ 0, "final", 0 },
 	{ 1, "float", CXXKeywordFlagMayBePartOfTypeName },
@@ -89,7 +91,7 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{ 0, "noexcept", 0 },
 	//{ 0, "not", 0 },
 	//{ 0, "not_eq", 0 },
-	{ 0, "nullptr", 0 },
+	{ 0, "nullptr", CXXKeywordIsConstant },
 	{ 0, "operator", 0 },
 	//{ 0, "or", 0 },
 	//{ 0, "or_eq", 0 },
@@ -115,7 +117,7 @@ static const CXXKeywordDescriptor g_aCXXKeywordTable[] = {
 	{ 0, "this", 0 },
 	{ 0, "thread_local", 0 },
 	{ 0, "throw", 0 },
-	{ 1, "true", 0 },
+	{ 1, "true", CXXKeywordIsConstant },
 	{ 0, "try", 0 },
 	{ 1, "typedef", 0 },
 	{ 0, "typeid", 0 },
@@ -147,6 +149,12 @@ bool cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId)
 {
 	return g_aCXXKeywordTable[eKeywordId].uFlags &
 			CXXKeywordIsTypeRefMarker;
+}
+
+bool cxxKeywordIsConstant(enum CXXKeyword eKeywordId)
+{
+	return g_aCXXKeywordTable[eKeywordId].uFlags &
+			CXXKeywordIsConstant;
 }
 
 bool cxxKeywordExcludeFromTypeNames(enum CXXKeyword eKeywordId)

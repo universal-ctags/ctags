@@ -16,6 +16,8 @@ struct Struct1
 	int m10[2][2]{{1, 2}, {3, 4}};
 	std::array<int, 3> m11 { {1,2,3} };
 	std::string m12[3] { std::string("one"),"two",{'t', 'h', 'r', 'e', 'e'} };
+	int m13 {false};
+	std::string * m14 { new std::string("test") };
 } v01, v02[10];
 
 enum Enum1
@@ -60,6 +62,9 @@ int main(int argc,char ** argv)
 	wchar_t l26[] { L'к', L'о', L'ш', L'к', L'а', L'\0' };
 	std::string l27[] = { std::string("one"),"two",{'t', 'h', 'r', 'e', 'e'} };
 	int l28 {};
+	bool l29 { false };
+	std::string * l30{ new std::string("test") };
+	std::string * l31(new std::string("test"));
 
 	return 0;
 }

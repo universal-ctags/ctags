@@ -26,6 +26,9 @@ l25	input.cpp	/^	wchar_t l25[] = { L"кошка" };$/;"	l	function:main	typeref:
 l26	input.cpp	/^	wchar_t l26[] { L'к', L'о', L'ш', L'к', L'а', L'\\0' };$/;"	l	function:main	typeref:typename:wchar_t[]	file:
 l27	input.cpp	/^	std::string l27[] = { std::string("one"),"two",{'t', 'h', 'r', 'e', 'e'} };$/;"	l	function:main	typeref:typename:std::string[]	file:
 l28	input.cpp	/^	int l28 {};$/;"	l	function:main	typeref:typename:int	file:
+l29	input.cpp	/^	bool l29 { false };$/;"	l	function:main	typeref:typename:bool	file:
+l30	input.cpp	/^	std::string * l30{ new std::string("test") };$/;"	l	function:main	typeref:typename:std::string *	file:
+l31	input.cpp	/^	std::string * l31(new std::string("test"));$/;"	l	function:main	typeref:typename:std::string *	file:
 m01	input.cpp	/^	unsigned int m01;$/;"	m	struct:Struct1	typeref:typename:unsigned int	file:
 m02	input.cpp	/^	std::string m02;$/;"	m	struct:Struct1	typeref:typename:std::string	file:
 m03	input.cpp	/^	std::string ** m03, m04;$/;"	m	struct:Struct1	typeref:typename:std::string **	file:
@@ -38,6 +41,8 @@ m09	input.cpp	/^	int m09 {};$/;"	m	struct:Struct1	typeref:typename:int	file:
 m10	input.cpp	/^	int m10[2][2]{{1, 2}, {3, 4}};$/;"	m	struct:Struct1	typeref:typename:int[2][2]	file:
 m11	input.cpp	/^	std::array<int, 3> m11 { {1,2,3} };$/;"	m	struct:Struct1	typeref:typename:std::array<int,3>	file:
 m12	input.cpp	/^	std::string m12[3] { std::string("one"),"two",{'t', 'h', 'r', 'e', 'e'} };$/;"	m	struct:Struct1	typeref:typename:std::string[3]	file:
+m13	input.cpp	/^	int m13 {false};$/;"	m	struct:Struct1	typeref:typename:int	file:
+m14	input.cpp	/^	std::string * m14 { new std::string("test") };$/;"	m	struct:Struct1	typeref:typename:std::string *	file:
 v01	input.cpp	/^} v01, v02[10];$/;"	v	typeref:struct:Struct1
 v02	input.cpp	/^} v01, v02[10];$/;"	v	typeref:struct:Struct1[10]
 v03	input.cpp	/^} v03, * v04;$/;"	v	typeref:enum:Enum1
