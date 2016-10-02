@@ -2198,9 +2198,9 @@ static void saveIgnoreToken(const char * ignoreToken)
 	ignoredTokenInfo * info = (ignoredTokenInfo *)eMalloc(sizeof(ignoredTokenInfo));
 	
 	info->ignoreFollowingParenthesis = ignoreFollowingParenthesis;
-	info->replacement = replacement ? stringCopy(replacement) : NULL;
+	info->replacement = replacement ? eStrdup(replacement) : NULL;
 
-	hashTablePutItem(Option.ignore,strndup(tokenBegin,tokenEnd - tokenBegin),info);
+	hashTablePutItem(Option.ignore,eStrndup(tokenBegin,tokenEnd - tokenBegin),info);
 
 	verbose ("    ignore token: %s\n", ignoreToken);
 }
