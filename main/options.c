@@ -2225,7 +2225,9 @@ static void addIgnoreListFromFile (const char *const fileName)
 		error (FATAL | PERROR, "cannot open \"%s\"", fileName);
 
 	int c = stringListCount(tokens);
-	for(int i=0;i<c;i++)
+	int i;
+
+	for(i=0;i<c;i++)
 	{
 		vString * s = stringListItem(tokens,i);
 		saveIgnoreToken(vStringValue(s));
