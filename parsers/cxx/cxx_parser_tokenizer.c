@@ -1103,7 +1103,7 @@ bool cxxParserParseNextToken(void)
 		}
 
 		int iCXXKeyword;
-		const char * szReplacement = NULL;
+		const ignoredTokenInfo * pIgnore = NULL;
 
 check_keyword:
 
@@ -1139,39 +1139,36 @@ check_keyword:
 			// We can enter here also from a jump to check_keyword after finding
 			// and ignored token and a replacement.
 
-			if(!szReplacement)
+			if(!pIgnore)
 			{
-				bool bIgnoreParens = false;
-				if(isIgnoreToken(
-						vStringValue(t->pszWord),
-						&bIgnoreParens,
-						&szReplacement
-					))
+				pIgnore = isIgnoreToken(vStringValue(t->pszWord));
+			
+				if(pIgnore)
 				{
 					CXX_DEBUG_PRINT("Ignore token %s",vStringValue(t->pszWord));
 
-					if(szReplacement && *szReplacement)
+					if(pIgnore->replacement)
 					{
 						CXX_DEBUG_PRINT(
 								"The token has replacement %s: applying",
 								szReplacement
 							);
 						vStringClear(t->pszWord);
-						vStringCatS(t->pszWord,szReplacement);
+						vStringCatS(t->pszWord,pIgnore->replacement);
 					} else {
 						// kill it
 						CXX_DEBUG_PRINT("Ignore token has no replacement");
 						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
 					}
 					
-					if(bIgnoreParens)
+					if(pIgnore->ignoreFollowingParenthesis)
 					{
 						CXX_DEBUG_PRINT("Ignored token specifies to ignore parens too");
 						if(!cxxParserParseNextTokenSkipIgnoredParenthesis())
 							return false;
 					}
 					
-					if(szReplacement && *szReplacement)
+					if(pIgnore->replacement)
 					{
 						// Already have a token to return
 						// Check again for keywords
