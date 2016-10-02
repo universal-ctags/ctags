@@ -984,6 +984,8 @@ char *mio_gets (MIO *mio, char *s, size_t size)
 		{
 			size_t i = 0;
 			bool newline = false;
+			/* Avoiding dereference inside the for loop below improves
+			 * performance so we do it here. */
 			size_t pos = mio->impl.mem.pos;
 			size_t buf_size = mio->impl.mem.size;
 			unsigned char *buf = mio->impl.mem.buf;
