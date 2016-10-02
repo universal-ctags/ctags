@@ -694,6 +694,11 @@ static vString *iFileGetLine (void)
 		haveLine = vStringLength (File.line) > 0;
 		newLine = haveLine && vStringLast (File.line) == '\n';
 		eof = mio_eof (File.mio);
+
+		/* Turn line breaks into a canonical form. The three commonly
+		 * used forms of line breaks are: LF (UNIX/Mac OS X), CR-LF (MS-DOS) and
+		 * CR (Mac OS 9). As CR-only EOL isn't haneled by gets() and Mac OS 9
+		 * is dead, we only handle CR-LF EOLs and convert them into LF. */
 		if (newLine && vStringLength (File.line) > 1 &&
 			vStringItem (File.line, vStringLength (File.line) - 2) == '\r')
 		{
