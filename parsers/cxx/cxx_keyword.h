@@ -114,6 +114,7 @@ enum CXXKeyword
 	// WARNING: There is a table in cxx_keyword.c that must match order in this enumeration
 };
 
+bool cxxKeywordIsConstant(enum CXXKeyword eKeywordId);
 bool cxxKeywordMayBePartOfTypeName(enum CXXKeyword eKeywordId);
 bool cxxKeywordIsTypeRefMarker(enum CXXKeyword eKeywordId);
 bool cxxKeywordExcludeFromTypeNames(enum CXXKeyword eKeywordId);

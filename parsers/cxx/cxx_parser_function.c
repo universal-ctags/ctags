@@ -334,6 +334,14 @@ int cxxParserMaybeExtractKnRStyleFunctionDefinition(int * piCorkQueueIndex)
 	return 1;
 }
 
+//
+// This function attempts to verify that the specified chain _looks like_
+// a set of parameters to a function call. It's quite fuzzy and thus not
+// 100% accurate, but it tries to exclude the obvious cases. If it says
+// "no" then the specified chain CAN'T be a set of parameters to
+// a function call. If it says "yes" then the result has to be considered
+// a guess: the chain *might* be a set of parameters to a functino call.
+//
 // This function is used to check both () and {} parenthesis chains.
 //     function(...)
 //     variable(...)
@@ -357,43 +365,63 @@ bool cxxParserTokenChainLooksLikeFunctionCallParameterSet(
 
 	unsigned int uTerminator = t->eType << 4;
 
+	// Dealing with (...) type chain and not {...} one
+	bool bDealingWithParenthesisChain = (uTerminator == CXXTokenTypeClosingParenthesis);
+
 	t = t->pNext;
 
 	while(t != pLast)
 	{
-		if(cxxTokenTypeIsOneOf(t,
+		if(
+			bDealingWithParenthesisChain &&
+			cxxTokenTypeIsOneOf(t,
 				CXXTokenTypeNumber | CXXTokenTypeStringConstant |
 				CXXTokenTypeCharacterConstant | CXXTokenTypePointerOperator |
 				CXXTokenTypeDotOperator | CXXTokenTypeOperator | CXXTokenTypeMultipleDots
 			))
 		{
-			// not allowed in a function signature: assume this looks like a function call
+			// Not allowed in a function signature before an equal sign (which
+			// we haven't encountered yet).
+			// assume this looks like a function call
 			return true;
 		}
 
 		if(cxxTokenTypeIs(t,CXXTokenTypeKeyword))
 		{
+			if(cxxKeywordMayBePartOfTypeName(t->eKeyword))
+			{
+				// parts of type name (not inside a parenthesis
+				// which is assumed to be condensed)
+				return false;
+			}
+			
 			if(
+				bDealingWithParenthesisChain &&
+				(
+					cxxKeywordIsConstant(t->eKeyword) ||
+					(t->eKeyword == CXXKeywordNEW)
+				)
+			)
+			{
+				// Not allowed in a function signature before an equal sign (which
+				// we haven't encountered yet).
+				// assume this looks like a function call
+				return true;
+			}
+			
+			if(
+					(t->eKeyword != CXXKeywordNEW) &&
 					cxxTokenTypeIsOneOf(
 							t->pNext,
 							CXXTokenTypeKeyword | CXXTokenTypeStar | CXXTokenTypeAnd |
 								CXXTokenTypeMultipleAnds | CXXTokenTypeIdentifier
-						) ||
-					(pChain->iCount == 3) // (double)
+						)
 				)
 			{
 				// this is something like:
 				// (int a...
 				// (void *...
 				// (unsigned int...
-				// (double)
-				return false;
-			}
-
-			if(cxxKeywordMayBePartOfTypeName(t->eKeyword))
-			{
-				// parts of type name (not inside a parenthesis
-				// which is assumed to be condensed)
 				return false;
 			}
 
@@ -402,7 +430,7 @@ bool cxxParserTokenChainLooksLikeFunctionCallParameterSet(
 			if(cxxTokenTypeIsOneOf(t->pNext,CXXTokenTypeKeyword | CXXTokenTypeIdentifier))
 			{
 				// this is something like:
-				// (type a...
+				// (a b...
 				return false;
 			}
 		} else if(cxxTokenTypeIs(t,CXXTokenTypeGreaterThanSign))
@@ -410,13 +438,14 @@ bool cxxParserTokenChainLooksLikeFunctionCallParameterSet(
 			if(cxxTokenTypeIsOneOf(
 					t->pNext,
 					CXXTokenTypeAnd | CXXTokenTypeStar |
-						CXXTokenTypeMultipleAnds | CXXTokenTypeComma
+						CXXTokenTypeMultipleAnds | CXXTokenTypeComma | uTerminator
 				))
 			{
 				// > &
 				// > *
 				// > &&
 				// >,
+				// >) or >}
 				return false;
 			}
 
