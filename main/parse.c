@@ -70,6 +70,13 @@ static parserDefinitionFunc* BuiltInParsers[] = {
 	CTagsSelfTestParser,
 	PARSER_LIST,
 	XML_PARSER_LIST
+#ifdef HAVE_LIBXML
+	,
+#endif
+	YAML_PARSER_LIST
+#ifdef HAVE_LIBYAML
+	,
+#endif
 };
 static parserDefinition** LanguageTable = NULL;
 static unsigned int LanguageCount = 0;
@@ -138,7 +145,7 @@ extern bool isLanguageEnabled (const langType language)
 		 (!(lang->method & METHOD_XCMD_AVAILABLE)) &&
 		 (lang->kinds == NULL) &&
 		 (!(lang->method & METHOD_REGEX)) &&
-	         (!(lang->method & METHOD_XPATH)))
+		 (!(lang->method & METHOD_XPATH)))
 		return false;
 	else
 		return true;
@@ -2314,7 +2321,13 @@ extern bool doesParserRequireMemoryStream (const langType language)
 	Assert (0 <= language  &&  language < (int) LanguageCount);
 	parserDefinition *const lang = LanguageTable [language];
 
-	return (lang->tagXpathTableCount > 0)? true: false;
+	if (lang->tagXpathTableCount > 0)
+		return true;
+
+	if (lang->method & METHOD_YAML)
+		return true;
+
+	return false;
 }
 
 extern bool parseFile (const char *const fileName)

@@ -471,6 +471,9 @@ static const char *const Features [] = {
 #ifdef HAVE_JANSSON
 	"json",
 #endif
+#ifdef HAVE_LIBYAML
+	"yaml",
+#endif
 	NULL
 };
 

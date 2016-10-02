@@ -35,6 +35,7 @@ New parsers
 The following parsers have been added:
 
 * Ada
+* AnsiblePlaybook *libyaml*
 * Autoconf
 * Automake
 * Clojure
@@ -69,6 +70,7 @@ The following parsers have been added:
 * WindRes
 * XSLT v1.0 *libxml*
 * Yacc
+* Yaml *libyaml*
 * YumRepo
 * Zephir
 * CoffeeScript *xcmd*
@@ -78,6 +80,7 @@ The following parsers have been added:
 See "Option library" for details on *optlib*.
 See "External parser command" for details on *xcmd*.
 Libxml2 is required to use the parser(s) marked with *libxml*.
+Libyaml is required to use the parser(s) marked with *libyaml*.
 
 TIPS: you can list newly introduced parsers if you also have
 Exuberant-ctags installed with following command line:

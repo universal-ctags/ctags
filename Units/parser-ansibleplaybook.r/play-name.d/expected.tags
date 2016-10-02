@@ -1,0 +1,2 @@
+Update ctags	input.yml	/^- name: Update ctags$/;"	p	end:3
+Update etags	input.yml	/^- name: Update etags$/;"	p	end:5

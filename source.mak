@@ -104,12 +104,12 @@ PARSER_HEADS = \
 	parsers/cxx/cxx_token.h \
 	parsers/cxx/cxx_token_chain.h \
 	\
-	parsers/iniconf.h \
-	parsers/m4.h \
-	parsers/make.h \
+	parsers/meta-iniconf.h \
+	parsers/meta-m4.h \
+	parsers/meta-make.h \
 	\
 	$(NULL)
-	
+
 PARSER_SRCS =				\
 	parsers/ada.c			\
 	parsers/ant.c			\
@@ -207,6 +207,14 @@ XML_SRCS = \
 	 parsers/xslt.c			\
 	 \
 	 $(NULL)
+
+YAML_HEAD = parsers/meta-yaml.h
+YAML_SRCS = \
+	  parsers/yaml.c		\
+	  \
+	  parsers/ansibleplaybook.c	\
+	  \
+	  $(NULL)
 
 DEBUG_HEADS = main/debug.h
 DEBUG_SRCS = main/debug.c
