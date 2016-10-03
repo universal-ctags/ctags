@@ -1852,34 +1852,48 @@ static keywordId analyzeKeyword (const char *const name)
 
 static void analyzeIdentifier (tokenInfo *const token)
 {
-	char *const name = vStringValue (token->name);
-	const char *replacement = NULL;
-	bool parensToo = false;
-
-	if (isInputLanguage (Lang_java)  ||
-		! isIgnoreToken (name, &parensToo, &replacement))
+	const char * name = vStringValue (token->name);
+	
+	if(!isInputLanguage(Lang_java))
 	{
-		if (replacement != NULL)
-			token->keyword = analyzeKeyword (replacement);
-		else
-			token->keyword = analyzeKeyword (vStringValue (token->name));
+		// C: check for ignored token
+		// (FIXME: java doesn't support -I... but maybe it should?)
+		const ignoredTokenInfo * ignore = isIgnoreToken(name);
 
-		if (token->keyword == KEYWORD_NONE)
-			token->type = TOKEN_NAME;
-		else
-			token->type = TOKEN_KEYWORD;
-	}
-	else
-	{
-		initToken (token);
-		if (parensToo)
+		if(ignore)
 		{
-			int c = skipToNonWhite ();
+			// Ignored token.
+			if(ignore->replacement)
+			{
+				// There is a replacement: analyze it
+				name = ignore->replacement;
+			} else {
+				// There is no replacement: just ignore
+				name = NULL;
+			}
+			
+			if(ignore->ignoreFollowingParenthesis)
+			{
+				int c = skipToNonWhite ();
 
-			if (c == '(')
-				skipToMatch ("()");
+				if (c == '(')
+					skipToMatch ("()");
+			}
 		}
 	}
+
+	if(!name)
+	{
+		initToken(token);
+		return;
+	}
+
+	token->keyword = analyzeKeyword (name);
+
+	if (token->keyword == KEYWORD_NONE)
+		token->type = TOKEN_NAME;
+	else
+		token->type = TOKEN_KEYWORD;
 }
 
 static void readIdentifier (tokenInfo *const token, const int firstChar)

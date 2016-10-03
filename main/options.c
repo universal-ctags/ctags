@@ -2124,60 +2124,85 @@ static void processHeaderListOption (const int option, const char *parameter)
 
 /*  Determines whether or not "name" should be ignored, per the ignore list.
  */
-extern bool isIgnoreToken (
-		const char *const name, bool *const pIgnoreParens,
-		const char **const replacement)
+extern const ignoredTokenInfo * isIgnoreToken(const char * name)
 {
-	bool result = false;
+	if(!Option.ignore)
+		return NULL;
 
-	if (Option.ignore != NULL)
-	{
-		const size_t nameLen = strlen (name);
-		unsigned int i;
-
-		if (pIgnoreParens != NULL)
-			*pIgnoreParens = false;
-
-		for (i = 0  ;  i < stringListCount (Option.ignore)  ;  ++i)
-		{
-			vString *token = stringListItem (Option.ignore, i);
-
-			if (strncmp (vStringValue (token), name, nameLen) == 0)
-			{
-				const size_t tokenLen = vStringLength (token);
-
-				if (nameLen == tokenLen)
-				{
-					result = true;
-					break;
-				}
-				else if (tokenLen == nameLen + 1  &&
-						vStringChar (token, tokenLen - 1) == '+')
-				{
-					result = true;
-					if (pIgnoreParens != NULL)
-						*pIgnoreParens = true;
-					break;
-				}
-				else if (vStringChar (token, nameLen) == '=')
-				{
-					result = true;
-					if (replacement != NULL)
-						*replacement = vStringValue (token) + nameLen + 1;
-					break;
-				}
-			}
-		}
-	}
-	return result;
+	return (const ignoredTokenInfo *)hashTableGetItem(Option.ignore,(char *)name);
 }
 
-static void saveIgnoreToken (vString *const ignoreToken)
+static void freeIgnoredTokenInfo(ignoredTokenInfo * info)
 {
-	if (Option.ignore == NULL)
-		Option.ignore = stringListNew ();
-	stringListAdd (Option.ignore, ignoreToken);
-	verbose ("    ignore token: %s\n", vStringValue (ignoreToken));
+	if(!info)
+		return;
+	if(info->replacement)
+		eFree(info->replacement);
+	eFree(info);
+}
+
+static void saveIgnoreToken(const char * ignoreToken)
+{
+	if(!ignoreToken)
+		return;
+
+	if(!Option.ignore)
+	{
+		Option.ignore = hashTableNew(
+				1024,
+				hashCstrhash,
+				hashCstreq,
+				free,
+				(void (*)(void *))freeIgnoredTokenInfo
+			);
+	}
+
+	const char * c = ignoreToken;
+	char cc = *c;
+	
+	const char * tokenBegin = c;
+	const char * tokenEnd = NULL;
+	const char * replacement = NULL;
+	bool ignoreFollowingParenthesis = false;
+
+	while(cc)
+	{
+		if(cc == '=')
+		{
+			if(!tokenEnd)
+				tokenEnd = c;
+			c++;
+			if(*c)
+				replacement = c;
+			break;
+		}
+		
+		if(cc == '+')
+		{
+			if(!tokenEnd)
+				tokenEnd = c;
+			ignoreFollowingParenthesis = true;
+		}
+		
+		c++;
+		cc = *c;
+	}
+
+	if(!tokenEnd)
+		tokenEnd = c;
+	
+	if(tokenEnd <= tokenBegin)
+		return;
+
+	
+	ignoredTokenInfo * info = (ignoredTokenInfo *)eMalloc(sizeof(ignoredTokenInfo));
+	
+	info->ignoreFollowingParenthesis = ignoreFollowingParenthesis;
+	info->replacement = replacement ? eStrdup(replacement) : NULL;
+
+	hashTablePutItem(Option.ignore,eStrndup(tokenBegin,tokenEnd - tokenBegin),info);
+
+	verbose ("    ignore token: %s\n", ignoreToken);
 }
 
 static void readIgnoreList (const char *const list)
@@ -2187,9 +2212,7 @@ static void readIgnoreList (const char *const list)
 
 	while (token != NULL)
 	{
-		vString *const entry = vStringNewInit (token);
-
-		saveIgnoreToken (entry);
+		saveIgnoreToken (token);
 		token = strtok (NULL, IGNORE_SEPARATORS);
 	}
 	eFree (newList);
@@ -2200,10 +2223,17 @@ static void addIgnoreListFromFile (const char *const fileName)
 	stringList* tokens = stringListNewFromFile (fileName);
 	if (tokens == NULL)
 		error (FATAL | PERROR, "cannot open \"%s\"", fileName);
-	if (Option.ignore == NULL)
-		Option.ignore = tokens;
-	else
-		stringListCombine (Option.ignore, tokens);
+
+	int c = stringListCount(tokens);
+	int i;
+
+	for(i=0;i<c;i++)
+	{
+		vString * s = stringListItem(tokens,i);
+		saveIgnoreToken(vStringValue(s));
+	}
+
+	stringListDelete(tokens);
 }
 
 static void processIgnoreOption (const char *const list)
@@ -2219,7 +2249,11 @@ static void processIgnoreOption (const char *const list)
 #endif
 	else if (strcmp (list, "-") == 0)
 	{
-		freeList (&Option.ignore);
+		if(Option.ignore)
+		{
+			hashTableDelete(Option.ignore);
+			Option.ignore = NULL;
+		}
 		verbose ("    clearing list\n");
 	}
 	else
@@ -3319,7 +3353,11 @@ extern void freeOptionResources (void)
 	freeString (&Option.filterTerminator);
 
 	freeList (&Excluded);
-	freeList (&Option.ignore);
+	if(Option.ignore)
+	{
+		hashTableDelete(Option.ignore);
+		Option.ignore = NULL;
+	}
 	freeList (&Option.headerExt);
 	freeList (&Option.etagsInclude);
 
