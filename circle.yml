@@ -1,0 +1,22 @@
+version: 2
+jobs:
+   build:
+     working_directory: ~/universal-ctags
+     docker:
+       - image: docker.io/fedora:rawhide
+     steps:
+       - checkout
+       - run:
+           name: Install build tools
+           command: |
+             dnf -y install gcc automake autoconf pkgconfig make aspell-devel aspell-en libxml2-devel jansson-devel libyaml-devel
+       - run:
+           name: Build
+           command: |
+             bash ./autogen.sh
+             ./configure --enable-debugging
+             make -j 2
+       - run:
+           name: Test
+           command: |
+             make check
