@@ -180,17 +180,6 @@ extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNU
 }
 
 #else /* HAVE_JANSSON */
-static int writeJsonEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED)
-{
-	return 0;
-}
-static int writeJsonPtagEntry (MIO * mio, const ptagDesc *desc,
-			       const char *const fileName,
-			       const char *const pattern,
-			       const char *const parserName, void *data CTAGS_ATTR_UNUSED)
-{
-	return 0;
-}
 
 extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 {
