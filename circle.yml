@@ -1,0 +1,11 @@
+machine
+  services:
+    - docker
+dependencies:
+  pre:
+   - docker pull masatake/ctags-centos6
+
+test:
+  post:
+    - docker run masatake/ctags-centos6
+
