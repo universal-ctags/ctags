@@ -28,8 +28,8 @@ struct m4ParserClient
 	langType lang;
 	void *data;
 
-	char quoteOpen;
-	char quoteClose;
+	const char quoteOpen;
+	const char quoteClose;
 
 	/* Do something for new input file. Returned value is stored to
 	   `data' field. */
