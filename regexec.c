@@ -1575,7 +1575,7 @@ static void  *oplabels[] = {
   &&L_OP_RETURN,
 #else
   &&L_DEFAULT,
-  &&L_DEFAULT,  
+  &&L_DEFAULT,
 #endif
   &&L_OP_CONDITION,
 
