@@ -44,7 +44,7 @@
 
 #define numberof(array) (int)(sizeof(array) / sizeof((array)[0]))
 
-static char* ESTRING[] = {
+static const char* ESTRING[] = {
   NULL,
   "failed to match",                         /* REG_NOMATCH    */
   "Invalid regular expression",              /* REG_BADPAT     */
@@ -74,7 +74,7 @@ extern size_t
 regerror(int posix_ecode, const regex_t* reg ARG_UNUSED, char* buf,
 	 size_t size)
 {
-  char* s;
+  const char* s;
   char tbuf[35];
   size_t len;
 
