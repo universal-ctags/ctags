@@ -183,7 +183,7 @@ static void ansiblePlaybook (yaml_token_t *token, void *data)
 		popAllBlockType (data, token);
 }
 
-static void *ansiblePlaybookPrepare(void)
+static void *ansiblePlaybookInputStart(void)
 {
 	static struct ansiblePlaybookState state;
 
@@ -202,12 +202,12 @@ static void ansiblePlaybookInputEnd(void *data)
 static void
 findAnsiblePlaybookTags (void)
 {
-	void *data = ansiblePlaybookPrepare ();
+	void *data = ansiblePlaybookInputStart ();
 	runYamlParser (ansiblePlaybook, data);
 }
 
 static struct yamlParserClient AnsiblePlaybookYamlClient = {
-	.prepareForNewInput = ansiblePlaybookPrepare,
+	.inputStart = ansiblePlaybookInputStart,
 	.callback = ansiblePlaybook,
 	.inputEnd = ansiblePlaybookInputEnd,
 };

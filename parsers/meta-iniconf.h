@@ -37,7 +37,7 @@ struct iniconfParserClient {
 	langType lang;
 	void *data;
 
-	void* (* prepareForNewInput) (void);
+	void* (* inputStart) (void);
 	bool (* probeLanguage) (const char *section, const char *key, const char *value);
 	iniconfCallback handleInputData;
 };
@@ -45,4 +45,4 @@ struct iniconfParserClient {
 extern void registerIniconfParserClient (struct iniconfParserClient *client);
 extern void runIniconfParser (const iniconfCallback callback, void* userData);
 
-#endif 
+#endif

@@ -160,11 +160,11 @@ static void skipLine(int c)
 	}
 }
 
-static void prepareForNewInput (struct m4ParserClient *client)
+static void inputStart (struct m4ParserClient *client)
 {
 	do {
-		if (client->prepareForNewInput)
-			client->data = client->prepareForNewInput ();
+		if (client->inputStart)
+			client->data = client->inputStart ();
 		client = client->host;
 	} while (client);
 }
@@ -206,7 +206,7 @@ static struct m4ParserClient * maySwitchLanguage (struct m4ParserClient *client,
 
 	if (probe_data.client != client)
 	{
-		prepareForNewInput (probe_data.client);
+		inputStart (probe_data.client);
 		setM4Quotes (probe_data.client->quoteOpen,
 			     probe_data.client->quoteClose);
 		/* This is an unbalanced push.
@@ -371,7 +371,7 @@ extern void runM4Parser (langType lang)
 	if (client == NULL)
 		return;
 
-	prepareForNewInput (client);
+	inputStart (client);
 	setM4Quotes (client->quoteOpen, client->quoteClose);
 
 	while ((c = getcFromInputFile()) != EOF)
@@ -486,7 +486,7 @@ static int makeM4Tag(const kindOption *kind, const vString *const name)
 
 /* methods for adapting to meta parser  */
 
-static void *m4PrepareForNewInput (void)
+static void *m4InputStart (void)
 {
 	static int role;
 
@@ -607,7 +607,7 @@ static struct m4ParserClient M4M4Client = {
 
 	.quoteOpen = '`',
 	.quoteClose = '\'',
-	.prepareForNewInput = m4PrepareForNewInput,
+	.inputStart = m4InputStart,
 	.doesStartLineComment = m4DoesStartLineComment,
 	.doesStartStringLiteral = NULL,
 	.probeLanguage = NULL,
@@ -627,7 +627,7 @@ static void findM4Tags(void)
 	langType lang = getInputLanguage ();
 
 	/* The other per-input initialization is done
-	   in m4PrepareForNewInput. */
+	   in m4InputStart. */
 	runM4Parser (lang);
 }
 

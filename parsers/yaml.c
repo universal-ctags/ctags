@@ -122,8 +122,8 @@ static void call_callback (void *key CTAGS_ATTR_UNUSED, void *value, void *user_
 		return;
 
 	if (token->type == YAML_STREAM_START_TOKEN
-		&& client->prepareForNewInput)
-		client->data = client->prepareForNewInput ();
+		&& client->inputStart)
+		client->data = client->inputStart ();
 
 	pushLanguage (client->lang);
 	client->callback (token, client->data);
@@ -131,8 +131,8 @@ static void call_callback (void *key CTAGS_ATTR_UNUSED, void *value, void *user_
 
 	if (token->type == YAML_STREAM_END_TOKEN)
 	{
-		if (client->teardownForTheLastInput)
-			client->teardownForTheLastInput (client->data);
+		if (client->inputEnd)
+			client->inputEnd (client->data);
 		client->data = NULL;
 	}
 }

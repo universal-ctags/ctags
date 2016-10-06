@@ -66,7 +66,7 @@ static const keywordTable autoconfKeywordTable[] = {
 	{ "AC_DEFINE_UNQUOTED", KEYWORD_define, },
 };
 
-static void *autoconfPrepareForNewInput (void)
+static void *autoconfInputStart (void)
 {
 	static int roleIndex;
 
@@ -174,7 +174,7 @@ static struct m4ParserClient AutoconfM4Client = {
 
 	.quoteOpen = '[',
 	.quoteClose = ']',
-	.prepareForNewInput = autoconfPrepareForNewInput,
+	.inputStart = autoconfInputStart,
 	.doesStartLineComment = autoconfDoesStartLineComment,
 	.doesStartStringLiteral = autoconfDoesStartStringLiteral,
 	.probeLanguage = autoconfProbeLanguage,
