@@ -1603,12 +1603,13 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 #ifdef ONIG_DEBUG_MATCH
 #define OPCODE_EXEC_HOOK                                                \
     if (s) {                                                            \
-      UChar *q, *bp, buf[50];                                           \
+      UChar *op, *q, *bp, buf[50];                                      \
       int len;                                                          \
-      fprintf(stderr, "%4"PRIdPTR"> \"", (*p == OP_FINISH) ? (ptrdiff_t )-1 : s - str); \
+      op = p - 1;                                                       \
+      fprintf(stderr, "%4"PRIdPTR"> \"", (*op == OP_FINISH) ? (ptrdiff_t )-1 : s - str); \
       bp = buf;                                                         \
       q = s;                                                            \
-      if (*p != OP_FINISH) {    /* s may not be a valid pointer if OP_FINISH. */ \
+      if (*op != OP_FINISH) {    /* s may not be a valid pointer if OP_FINISH. */ \
 	for (i = 0; i < 7 && q < end; i++) {                            \
 	  len = enclen(encode, q);                                      \
 	  while (len-- > 0) *bp++ = *q++;                               \
@@ -1619,8 +1620,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       *bp = 0;                                                          \
       fputs((char* )buf, stderr);                                       \
       for (i = 0; i < 20 - (bp - buf); i++) fputc(' ', stderr);         \
-      fprintf(stderr, "%4"PRIdPTR":", (p == FinishCode) ? (ptrdiff_t )-1 : p - reg->p); \
-      onig_print_compiled_byte_code(stderr, p, NULL, encode);           \
+      fprintf(stderr, "%4"PRIdPTR":", (op == FinishCode) ? (ptrdiff_t )-1 : op - reg->p); \
+      onig_print_compiled_byte_code(stderr, op, NULL, encode);           \
       fprintf(stderr, "\n");                                            \
     }
 #else
@@ -3054,10 +3055,13 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       goto finish;
       NEXT;
 
-    fail:
-      MOP_OUT;
-      /* fall */
-    CASE(OP_FAIL)  MOP_IN(OP_FAIL);
+    CASE(OP_FAIL)
+      if (0) {
+        /* fall */
+      fail:
+        MOP_OUT;
+      }
+      MOP_IN(OP_FAIL);
       STACK_POP;
       p     = stk->u.state.pcode;
       s     = stk->u.state.pstr;
