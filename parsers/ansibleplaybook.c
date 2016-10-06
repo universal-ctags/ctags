@@ -185,11 +185,18 @@ static void ansiblePlaybook (yaml_token_t *token, void *data)
 
 static void *ansiblePlaybookPrepare(void)
 {
-	static struct ansiblePlaybookState state = {
-		.type_stack = NULL,
-		.play_detection_state = DSTAT_PLAY_NAME_INITIAL,
-	};
+	static struct ansiblePlaybookState state;
+
+	state.play_detection_state = DSTAT_PLAY_NAME_INITIAL;
+
 	return &state;
+}
+
+static void ansiblePlaybookInputEnd(void *data)
+{
+	struct ansiblePlaybookState *state CTAGS_ATTR_UNUSED = data;
+
+	Assert (state->type_stack == NULL);
 }
 
 static void
@@ -202,6 +209,7 @@ findAnsiblePlaybookTags (void)
 static struct yamlParserClient AnsiblePlaybookYamlClient = {
 	.prepareForNewInput = ansiblePlaybookPrepare,
 	.callback = ansiblePlaybook,
+	.inputEnd = ansiblePlaybookInputEnd,
 };
 
 static void initializeAnsiblePlaybookParser (const langType language)
