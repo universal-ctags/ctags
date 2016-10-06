@@ -65,7 +65,11 @@
                        BIT_NT_CANY | BIT_NT_BREF)) != 0)
 
 #define NTYPE(node)             ((node)->u.base.type)
-#define SET_NTYPE(node, ntype)   (node)->u.base.type = (ntype)
+#define SET_NTYPE(node, ntype) \
+    do { \
+	int value = ntype; \
+	memcpy(&((node)->u.base.type), &value, sizeof(int)); \
+    } while (0)
 
 #define NSTR(node)         (&((node)->u.str))
 #define NCCLASS(node)      (&((node)->u.cclass))
