@@ -73,6 +73,7 @@ extern stringList* stringListNewFromFile (const char* const fileName)
 			else
 				vStringDelete (str);
 		}
+		mio_free (mio);
 	}
 	return result;
 }
