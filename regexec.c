@@ -40,6 +40,7 @@
 # endif
 #endif
 
+#ifdef RUBY
 #define ENC_DUMMY_FLAG (1<<24)
 static inline int
 rb_enc_asciicompat(OnigEncoding enc)
@@ -51,6 +52,7 @@ rb_enc_asciicompat(OnigEncoding enc)
     (rb_enc_asciicompat(enc) ? (ISALNUM(*s) || *s=='_') : \
    onigenc_ascii_is_code_ctype( \
 	ONIGENC_MBC_TO_CODE(enc,s,end),ONIGENC_CTYPE_WORD,enc))
+#endif /* RUBY */
 
 #ifdef USE_CRNL_AS_LINE_TERMINATOR
 #define ONIGENC_IS_MBC_CRNL(enc,p,end) \
