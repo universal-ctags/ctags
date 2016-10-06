@@ -1592,13 +1592,15 @@ compile_length_tree(Node* node, regex_t* reg)
 
   case NT_ALT:
     {
-      int n;
-
-      n = r = 0;
+      int n = 0;
+      len = 0;
       do {
-	r += compile_length_tree(NCAR(node), reg);
-	n++;
+        r = compile_length_tree(NCAR(node), reg);
+        if (r < 0) return r;
+        len += r;
+        n++;
       } while (IS_NOT_NULL(node = NCDR(node)));
+      r = len;
       r += (SIZE_OP_PUSH + SIZE_OP_JUMP) * (n - 1);
     }
     break;
@@ -5358,7 +5360,7 @@ set_sub_anchor(regex_t* reg, OptAncInfo* anc)
   reg->sub_anchor |= anc->right_anchor & ANCHOR_END_LINE;
 }
 
-#ifdef ONIG_DEBUG
+#if defined(ONIG_DEBUG_COMPILE) || defined(ONIG_DEBUG_MATCH)
 static void print_optimize_info(FILE* f, regex_t* reg);
 #endif
 
@@ -5468,7 +5470,9 @@ static void print_enc_string(FILE* fp, OnigEncoding enc,
 
   fprintf(fp, "/ (%s)\n", enc->name);
 }
+#endif	/* ONIG_DEBUG */
 
+#if defined(ONIG_DEBUG_COMPILE) || defined(ONIG_DEBUG_MATCH)
 static void
 print_distance_range(FILE* f, OnigDistance a, OnigDistance b)
 {
@@ -5586,7 +5590,7 @@ print_optimize_info(FILE* f, regex_t* reg)
     }
   }
 }
-#endif /* ONIG_DEBUG */
+#endif /* ONIG_DEBUG_COMPILE || ONIG_DEBUG_MATCH */
 
 
 extern void
@@ -5687,7 +5691,7 @@ onig_chain_reduce(regex_t* reg)
   }
 }
 
-#ifdef ONIG_DEBUG
+#ifdef ONIG_DEBUG_COMPILE
 static void print_compiled_byte_code_list P_((FILE* f, regex_t* reg));
 #endif
 #ifdef ONIG_DEBUG_PARSE_TREE
@@ -6277,15 +6281,17 @@ op2arg_type(int opcode)
   return ARG_SPECIAL;
 }
 
+#ifdef ONIG_DEBUG_PARSE_TREE
 static void
 Indent(FILE* f, int indent)
 {
   int i;
   for (i = 0; i < indent; i++) putc(' ', f);
 }
+#endif /* ONIG_DEBUG_PARSE_TREE */
 
 static void
-p_string(FILE* f, int len, UChar* s)
+p_string(FILE* f, ptrdiff_t len, UChar* s)
 {
   fputs(":", f);
   while (len-- > 0) { fputc(*s++, f); }
@@ -6550,6 +6556,7 @@ onig_print_compiled_byte_code(FILE* f, UChar* bp, UChar* bpend, UChar** nextp,
   if (nextp) *nextp = bp;
 }
 
+#ifdef ONIG_DEBUG_COMPILE
 static void
 print_compiled_byte_code_list(FILE* f, regex_t* reg)
 {
@@ -6571,7 +6578,9 @@ print_compiled_byte_code_list(FILE* f, regex_t* reg)
 
   fprintf(f, "\n");
 }
+#endif /* ONIG_DEBUG_COMPILE */
 
+#ifdef ONIG_DEBUG_PARSE_TREE
 static void
 print_indent_tree(FILE* f, Node* node, int indent)
 {
@@ -6743,12 +6752,11 @@ print_indent_tree(FILE* f, Node* node, int indent)
 
   fflush(f);
 }
-#endif /* ONIG_DEBUG */
 
-#ifdef ONIG_DEBUG_PARSE_TREE
 static void
 print_tree(FILE* f, Node* node)
 {
   print_indent_tree(f, node, 0);
 }
-#endif
+#endif /* ONIG_DEBUG_PARSE_TREE */
+#endif /* ONIG_DEBUG */
