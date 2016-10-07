@@ -6310,7 +6310,7 @@ onig_print_compiled_byte_code(FILE* f, UChar* bp, UChar** nextp,
       break;
     case ARG_RELADDR:
       GET_RELADDR_INC(addr, bp);
-      fprintf(f, ":(%d)", addr);
+      fprintf(f, ":(+%d)", addr);
       break;
     case ARG_ABSADDR:
       GET_ABSADDR_INC(addr, bp);
