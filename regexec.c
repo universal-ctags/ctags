@@ -1623,7 +1623,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       q = s;                                                            \
       if (*op != OP_FINISH) {    /* s may not be a valid pointer if OP_FINISH. */ \
 	for (i = 0; i < 7 && q < end; i++) {                            \
-	  len = enclen(encode, q, end);                                  \
+	  len = enclen(encode, q, end);                                 \
 	  while (len-- > 0) *bp++ = *q++;                               \
 	}                                                               \
       }                                                                 \
