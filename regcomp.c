@@ -5692,9 +5692,24 @@ static void print_compiled_byte_code_list P_((FILE* f, regex_t* reg));
 static void print_tree P_((FILE* f, Node* node));
 #endif
 
+#ifdef RUBY
 extern int
 onig_compile(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
+	      OnigErrorInfo* einfo)
+{
+  return onig_compile_ruby(reg, pattern, pattern_end, einfo, NULL, 0);
+}
+#endif
+
+#ifdef RUBY
+extern int
+onig_compile_ruby(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
 	      OnigErrorInfo* einfo, const char *sourcefile, int sourceline)
+#else
+extern int
+onig_compile(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
+	      OnigErrorInfo* einfo)
+#endif
 {
 #define COMPILE_INIT_SIZE  20
 
@@ -5708,8 +5723,10 @@ onig_compile(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
 
   if (IS_NOT_NULL(einfo)) einfo->par = (UChar* )NULL;
 
+#ifdef RUBY
   scan_env.sourcefile = sourcefile;
   scan_env.sourceline = sourceline;
+#endif
   reg->state = ONIG_STATE_COMPILING;
 
 #ifdef ONIG_DEBUG
@@ -5969,7 +5986,7 @@ onig_new_without_alloc(regex_t* reg, const UChar* pattern,
   r = onig_reg_init(reg, option, ONIGENC_CASE_FOLD_DEFAULT, enc, syntax);
   if (r) return r;
 
-  r = onig_compile(reg, pattern, pattern_end, einfo, NULL, 0);
+  r = onig_compile(reg, pattern, pattern_end, einfo);
   return r;
 }
 
@@ -5986,7 +6003,7 @@ onig_new(regex_t** reg, const UChar* pattern, const UChar* pattern_end,
   r = onig_reg_init(*reg, option, ONIGENC_CASE_FOLD_DEFAULT, enc, syntax);
   if (r) goto err;
 
-  r = onig_compile(*reg, pattern, pattern_end, einfo, NULL, 0);
+  r = onig_compile(*reg, pattern, pattern_end, einfo);
   if (r) {
   err:
     onig_free(*reg);

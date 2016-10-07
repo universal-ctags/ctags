@@ -2,11 +2,11 @@
 
 /* static	char	sccsid[] = "@(#) st.c 5.1 89/12/14 Crucible"; */
 
-#ifdef NOT_RUBY
+#ifdef RUBY
+#include "ruby/ruby.h"
+#else
 #include "regint.h"
 #include "st.h"
-#else
-#include "ruby/ruby.h"
 #endif
 
 #include <stdio.h>
@@ -81,7 +81,14 @@ static void rehash(st_table *);
 #define calloc xcalloc
 #define realloc xrealloc
 #define free(x) xfree(x)
-#endif
+#else /* RUBY */
+#define MEMZERO(p,type,n)     memset((p), 0, sizeof(type)*(n))
+#define MEMCPY(p1,p2,type,n)  memcpy((p1), (p2), sizeof(type)*(n))
+#define MEMMOVE(p1,p2,type,n) memmove((p1), (p2), sizeof(type)*(n))
+enum ruby_special_consts {
+  RUBY_SPECIAL_SHIFT  = 8
+};
+#endif /* RUBY */
 
 #define EQUAL(table,x,y) ((x)==(y) || (*(table)->type->compare)((x),(y)) == 0)
 

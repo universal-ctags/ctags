@@ -318,8 +318,10 @@ typedef struct {
   int has_recursion;
 #endif
   int warnings_flag;
+#ifdef RUBY
   const char* sourcefile;
   int sourceline;
+#endif
 } ScanEnv;
 
 

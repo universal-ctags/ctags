@@ -12,10 +12,18 @@ extern "C" {
 #endif
 #endif
 
+#ifdef RUBY
 #include "ruby/defines.h"
+#else /* RUBY */
+#ifndef RUBY_SYMBOL_EXPORT_BEGIN
+#define RUBY_SYMBOL_EXPORT_BEGIN
+#define RUBY_SYMBOL_EXPORT_END
+#endif
+#endif /* RUBY */
 
 RUBY_SYMBOL_EXPORT_BEGIN
 
+#ifdef RUBY
 #if SIZEOF_LONG == SIZEOF_VOIDP
 typedef unsigned long st_data_t;
 #elif SIZEOF_LONG_LONG == SIZEOF_VOIDP
@@ -23,6 +31,9 @@ typedef unsigned LONG_LONG st_data_t;
 #else
 # error ---->> st.c requires sizeof(void*) == sizeof(long) or sizeof(LONG_LONG) to be compiled. <<----
 #endif
+#else /* RUBY */
+typedef uintptr_t st_data_t;
+#endif /* RUBY */
 #define ST_DATA_T_DEFINED
 
 #ifndef CHAR_BIT

@@ -29,6 +29,7 @@
  */
 
 #include "regparse.h"
+#include <stdarg.h>
 
 #define WARN_BUFSIZE    256
 
@@ -325,7 +326,11 @@ strcat_capa_from_static(UChar* dest, UChar* dest_end,
 
 #ifdef USE_ST_LIBRARY
 
+#ifdef RUBY
 #include "ruby/st.h"
+#else
+#include "st.h"
+#endif
 
 typedef struct {
   const UChar* s;
@@ -2617,7 +2622,12 @@ get_name_end_code_point(OnigCodePoint start)
 }
 
 #ifdef USE_NAMED_GROUP
-#define ONIGENC_IS_CODE_NAME(enc, c) TRUE
+#ifdef RUBY
+#define ONIGENC_IS_CODE_NAME(enc, c)  TRUE
+#else
+#define ONIGENC_IS_CODE_NAME(enc, c)  ONIGENC_IS_CODE_WORD(enc, c)
+#endif
+
 #ifdef USE_BACKREF_WITH_LEVEL
 /*
    \k<name+n>, \k<name-n>
@@ -2939,8 +2949,6 @@ fetch_name(OnigCodePoint start_code, UChar** src, UChar* end,
 }
 #endif /* USE_NAMED_GROUP */
 
-void onig_vsnprintf_with_pattern(UChar buf[], int bufsize, OnigEncoding enc,
-                           UChar* pat, UChar* pat_end, const UChar *fmt, va_list args);
 
 static void
 onig_syntax_warn(ScanEnv *env, const char *fmt, ...)
@@ -2952,10 +2960,14 @@ onig_syntax_warn(ScanEnv *env, const char *fmt, ...)
 		env->pattern, env->pattern_end,
 		(const UChar *)fmt, args);
     va_end(args);
+#ifdef RUBY
     if (env->sourcefile == NULL)
       rb_warn("%s", (char *)buf);
     else
       rb_compile_warn(env->sourcefile, env->sourceline, "%s", (char *)buf);
+#else
+    (*onig_warn)((char* )buf);
+#endif
 }
 
 static void
@@ -2978,6 +2990,10 @@ CLOSE_BRACKET_WITHOUT_ESC_WARN(ScanEnv* env, UChar* c)
     onig_syntax_warn(env, "regular expression has '%s' without escape", c);
   }
 }
+
+#ifndef RTEST
+#define RTEST(v)  1
+#endif
 
 static void
 CC_DUP_WARN(ScanEnv *env)
@@ -4687,7 +4703,7 @@ parse_char_class(Node** np, Node** asc_np, OnigToken* tok, UChar** src, UChar* e
 	  goto err;
 	}
 
-	len = enclen(env->enc, buf, buf+i);
+	len = enclen(env->enc, buf, buf + i);
 	if (i < len) {
 	  r = ONIGERR_TOO_SHORT_MULTI_BYTE_STRING;
 	  goto err;

@@ -180,9 +180,10 @@ cp1251_get_case_fold_codes_by_str(OnigCaseFoldType flag,
 	     flag, p, end, items);
 }
 
+#ifdef RUBY
 OnigEncodingDefine(windows_1251, Windows_1251) = {
   onigenc_single_byte_mbc_enc_len,
-  "Windows-1251",      /* name */
+  "Windows-1251",/* name */
   1,             /* max enc length */
   1,             /* min enc length */
   onigenc_is_mbc_newline_0x0a,
@@ -200,6 +201,28 @@ OnigEncodingDefine(windows_1251, Windows_1251) = {
   0,
   ONIGENC_FLAG_NONE,
 };
+#else /* RUBY */
+OnigEncodingDefine(cp1251, CP1251) = {
+  onigenc_single_byte_mbc_enc_len,
+  "CP1251",      /* name */
+  1,             /* max enc length */
+  1,             /* min enc length */
+  onigenc_is_mbc_newline_0x0a,
+  onigenc_single_byte_mbc_to_code,
+  onigenc_single_byte_code_to_mbclen,
+  onigenc_single_byte_code_to_mbc,
+  cp1251_mbc_case_fold,
+  cp1251_apply_all_case_fold,
+  cp1251_get_case_fold_codes_by_str,
+  onigenc_minimum_property_name_to_ctype,
+  cp1251_is_code_ctype,
+  onigenc_not_support_get_ctype_code_range,
+  onigenc_single_byte_left_adjust_char_head,
+  onigenc_always_true_is_allowed_reverse_match,
+  0,
+  ONIGENC_FLAG_NONE,
+};
+#endif /* RUBY */
 /*
  * Name: windows-1251
  * MIBenum: 2251

@@ -86,8 +86,7 @@ re_compile_pattern(const char* pattern, int size, regex_t* reg, char* ebuf)
   int r;
   OnigErrorInfo einfo;
 
-  r = onig_compile(reg, (UChar* )pattern, (UChar* )(pattern + size), &einfo,
-      NULL, 0);
+  r = onig_compile(reg, (UChar* )pattern, (UChar* )(pattern + size), &einfo);
   if (r != ONIG_NORMAL) {
     if (IS_NOT_NULL(ebuf))
       (void )onig_error_code_to_str((UChar* )ebuf, r, &einfo);

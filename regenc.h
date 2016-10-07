@@ -30,18 +30,29 @@
  * SUCH DAMAGE.
  */
 
-#ifndef REGINT_H
+#ifdef RUBY
+#ifndef ONIGURUMA_REGINT_H
 #ifndef RUBY_EXTERN
 #include "ruby/config.h"
 #include "ruby/defines.h"
 #endif
 #endif
+#else /* RUBY */
+#ifndef PACKAGE
+/* PACKAGE is defined in config.h */
+#include "config.h"
+#endif
+#endif /* RUBY */
 
 #ifdef ONIG_ESCAPE_UCHAR_COLLISION
 #undef ONIG_ESCAPE_UCHAR_COLLISION
 #endif
 
+#ifdef RUBY
 #include "ruby/oniguruma.h"
+#else
+#include "oniguruma.h"
+#endif
 
 RUBY_SYMBOL_EXPORT_BEGIN
 

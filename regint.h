@@ -101,6 +101,7 @@
 #  define ARG_UNUSED
 #endif
 
+#ifdef RUBY
 #ifndef RUBY_DEFINES_H
 #include "ruby/ruby.h"
 #undef xmalloc
@@ -108,6 +109,9 @@
 #undef xcalloc
 #undef xfree
 #endif
+#else /* RUBY */
+#include "config.h"
+#endif /* RUBY */
 
 /* */
 /* escape other system UChar definition */
@@ -116,7 +120,11 @@
 #endif
 
 #define USE_WORD_BEGIN_END          /* "\<": word-begin, "\>": word-end */
+#ifdef RUBY
 #undef USE_CAPTURE_HISTORY
+#else
+#define USE_CAPTURE_HISTORY
+#endif
 #define USE_VARIABLE_META_CHARS
 #define USE_POSIX_API_REGION_OPTION     /* needed for POSIX API support */
 #define USE_FIND_LONGEST_SEARCH_ALL_OF_RANGE
@@ -199,7 +207,7 @@ extern pthread_mutex_t gOnigMutex;
 #define onig_st_is_member                   st_is_member
 
 #define USE_UPPER_CASE_TABLE
-#else
+#else /* RUBY */
 
 #define CHECK_INTERRUPT_IN_MATCH_AT
 
@@ -223,7 +231,7 @@ extern pthread_mutex_t gOnigMutex;
 /* */
 #define onig_st_is_member              st_is_member
 
-#endif
+#endif /* RUBY */
 
 #define STATE_CHECK_STRING_THRESHOLD_LEN             7
 #define STATE_CHECK_BUFF_MAX_SIZE               0x4000
@@ -318,10 +326,12 @@ typedef unsigned int uintptr_t;
 #ifndef PRIdPTR
 #ifdef _WIN64
 #define PRIdPTR	"I64d"
+#define PRIdPTRDIFF	"I64d"
 #define PRIuPTR	"I64u"
 #define PRIxPTR	"I64x"
 #else
 #define PRIdPTR	"ld"
+#define PRIdPTRDIFF	"ld"
 #define PRIuPTR	"lu"
 #define PRIxPTR	"lx"
 #endif
@@ -945,9 +955,13 @@ extern void onig_print_statistics P_((FILE* f));
 #endif
 
 extern UChar* onig_error_code_to_format P_((OnigPosition code));
-extern void  onig_snprintf_with_pattern PV_((UChar buf[], int bufsize, OnigEncoding enc, UChar* pat, UChar* pat_end, const UChar *fmt, ...));
+extern void onig_vsnprintf_with_pattern P_((UChar buf[], int bufsize, OnigEncoding enc, UChar* pat, UChar* pat_end, const UChar *fmt, va_list args));
+extern void onig_snprintf_with_pattern PV_((UChar buf[], int bufsize, OnigEncoding enc, UChar* pat, UChar* pat_end, const UChar *fmt, ...));
 extern int  onig_bbuf_init P_((BBuf* buf, OnigDistance size));
-extern int  onig_compile P_((regex_t* reg, const UChar* pattern, const UChar* pattern_end, OnigErrorInfo* einfo, const char *sourcefile, int sourceline));
+extern int  onig_compile P_((regex_t* reg, const UChar* pattern, const UChar* pattern_end, OnigErrorInfo* einfo));
+#ifdef RUBY
+extern int  onig_compile_ruby P_((regex_t* reg, const UChar* pattern, const UChar* pattern_end, OnigErrorInfo* einfo, const char *sourcefile, int sourceline));
+#endif
 extern void onig_chain_reduce P_((regex_t* reg));
 extern void onig_chain_link_add P_((regex_t* to, regex_t* add));
 extern void onig_transfer P_((regex_t* to, regex_t* from));
@@ -958,11 +972,10 @@ extern int  onig_is_code_in_cc_len P_((int enclen, OnigCodePoint code, CClassNod
 typedef void hash_table_type;
 #ifdef RUBY
 #include "ruby/st.h"
-typedef st_data_t hash_data_type;
 #else
 #include "st.h"
-typedef uintptr_t hash_data_type;
 #endif
+typedef st_data_t hash_data_type;
 
 extern hash_table_type* onig_st_init_strend_table_with_size P_((st_index_t size));
 extern int onig_st_lookup_strend P_((hash_table_type* table, const UChar* str_key, const UChar* end_key, hash_data_type *value));
