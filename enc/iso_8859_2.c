@@ -221,9 +221,9 @@ is_code_ctype(OnigCodePoint code, unsigned int ctype, OnigEncoding enc ARG_UNUSE
 }
 
 static int
-case_map (OnigCaseFoldType* flagP, const OnigUChar** pp,
-           const OnigUChar* end, OnigUChar* to, OnigUChar* to_end,
-           const struct OnigEncodingTypeST* enc)
+case_map(OnigCaseFoldType* flagP, const OnigUChar** pp,
+	 const OnigUChar* end, OnigUChar* to, OnigUChar* to_end,
+	 const struct OnigEncodingTypeST* enc)
 {
   OnigCodePoint code;
   OnigUChar *to_start = to;

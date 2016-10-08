@@ -191,9 +191,9 @@ cp1250_get_case_fold_codes_by_str(OnigCaseFoldType flag,
 }
 
 static int
-case_map (OnigCaseFoldType* flagP, const OnigUChar** pp,
-		const OnigUChar* end, OnigUChar* to, OnigUChar* to_end,
-		const struct OnigEncodingTypeST* enc)
+case_map(OnigCaseFoldType* flagP, const OnigUChar** pp,
+	 const OnigUChar* end, OnigUChar* to, OnigUChar* to_end,
+	 const struct OnigEncodingTypeST* enc)
 {
   OnigCodePoint code;
   OnigUChar *to_start = to;

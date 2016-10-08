@@ -223,9 +223,9 @@ get_case_fold_codes_by_str(OnigCaseFoldType flag,
 #define DOTLESS_i        (0xB9)
 #define I_WITH_DOT_ABOVE (0xA9)
 static int
-case_map (OnigCaseFoldType* flagP, const OnigUChar** pp,
-					 const OnigUChar* end, OnigUChar* to, OnigUChar* to_end,
-					 const struct OnigEncodingTypeST* enc)
+case_map(OnigCaseFoldType* flagP, const OnigUChar** pp,
+	 const OnigUChar* end, OnigUChar* to, OnigUChar* to_end,
+	 const struct OnigEncodingTypeST* enc)
 {
   OnigCodePoint code;
   OnigUChar *to_start = to;

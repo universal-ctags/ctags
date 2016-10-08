@@ -168,7 +168,7 @@ ONIG_EXTERN int onigenc_mb4_code_to_mbclen P_((OnigCodePoint code, OnigEncoding 
 ONIG_EXTERN int onigenc_mb4_code_to_mbc P_((OnigEncoding enc, OnigCodePoint code, UChar *buf));
 ONIG_EXTERN int onigenc_mb4_is_code_ctype P_((OnigEncoding enc, OnigCodePoint code, unsigned int ctype));
 
-ONIG_EXTERN int    onigenc_unicode_case_map P_((OnigCaseFoldType* flagP, const OnigUChar** pp, const OnigUChar* end, OnigUChar* to, OnigUChar* to_end, const struct OnigEncodingTypeST* enc));
+ONIG_EXTERN int onigenc_unicode_case_map P_((OnigCaseFoldType* flagP, const OnigUChar** pp, const OnigUChar* end, OnigUChar* to, OnigUChar* to_end, const struct OnigEncodingTypeST* enc));
 
 
 /* in enc/unicode.c */

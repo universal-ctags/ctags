@@ -961,8 +961,8 @@ onigenc_property_list_init(int (*f)(void))
 }
 
 extern int
-onigenc_ascii_only_case_map (OnigCaseFoldType* flagP, const OnigUChar** pp, const OnigUChar* end,
-			      OnigUChar* to, OnigUChar* to_end, const struct OnigEncodingTypeST* enc)
+onigenc_ascii_only_case_map(OnigCaseFoldType* flagP, const OnigUChar** pp, const OnigUChar* end,
+			    OnigUChar* to, OnigUChar* to_end, const struct OnigEncodingTypeST* enc)
 {
   OnigCodePoint code;
   OnigUChar *to_start = to;
@@ -989,9 +989,9 @@ onigenc_ascii_only_case_map (OnigCaseFoldType* flagP, const OnigUChar** pp, cons
 }
 
 extern int
-onigenc_single_byte_ascii_only_case_map (OnigCaseFoldType* flagP, const OnigUChar** pp,
-					 const OnigUChar* end, OnigUChar* to, OnigUChar* to_end,
-					 const struct OnigEncodingTypeST* enc)
+onigenc_single_byte_ascii_only_case_map(OnigCaseFoldType* flagP, const OnigUChar** pp,
+					const OnigUChar* end, OnigUChar* to, OnigUChar* to_end,
+					const struct OnigEncodingTypeST* enc)
 {
   OnigCodePoint code;
   OnigUChar *to_start = to;

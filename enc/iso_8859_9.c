@@ -204,9 +204,9 @@ apply_all_case_fold(OnigCaseFoldType flag,
 
 static int
 get_case_fold_codes_by_str(OnigCaseFoldType flag,
-				      const OnigUChar* p, const OnigUChar* end,
-				      OnigCaseFoldCodeItem items[],
-				      OnigEncoding enc ARG_UNUSED)
+			   const OnigUChar* p, const OnigUChar* end,
+			   OnigCaseFoldCodeItem items[],
+			   OnigEncoding enc ARG_UNUSED)
 {
   return onigenc_get_case_fold_codes_by_str_with_map(
 	     numberof(CaseFoldMap), CaseFoldMap, 1,
@@ -216,9 +216,9 @@ get_case_fold_codes_by_str(OnigCaseFoldType flag,
 #define DOTLESS_i        (0xFD)
 #define I_WITH_DOT_ABOVE (0xDD)
 static int
-case_map (OnigCaseFoldType* flagP, const OnigUChar** pp,
-					 const OnigUChar* end, OnigUChar* to, OnigUChar* to_end,
-					 const struct OnigEncodingTypeST* enc)
+case_map(OnigCaseFoldType* flagP, const OnigUChar** pp,
+	 const OnigUChar* end, OnigUChar* to, OnigUChar* to_end,
+	 const struct OnigEncodingTypeST* enc)
 {
   OnigCodePoint code;
   OnigUChar *to_start = to;
