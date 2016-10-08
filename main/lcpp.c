@@ -144,6 +144,8 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 {
 	BraceFormat = state;
 
+	Cpp.ungetBuffer = NULL;
+	Cpp.ungetPointer = NULL;
 
 	Cpp.resolveRequired = false;
 	Cpp.hasAtLiteralStrings = hasAtLiteralStrings;
@@ -227,7 +229,7 @@ extern void cppUngetc (const int c)
 	{
 		Cpp.ungetBufferSize += 8;
 		int * tmp = (int *)eMalloc(Cpp.ungetBufferSize * sizeof(int));
-		memmove(tmp+8,Cpp.ungetPointer,Cpp.ungetDataSize);
+		memcpy(tmp+8,Cpp.ungetPointer,Cpp.ungetDataSize * sizeof(int));
 		eFree(Cpp.ungetBuffer);
 		Cpp.ungetBuffer = tmp;
 		Cpp.ungetPointer = tmp + 7;
@@ -270,10 +272,9 @@ void cppUngetString(const char * string,int len)
 
 		if(Cpp.ungetBufferSize < (Cpp.ungetDataSize + len))
 		{
-			Cpp.ungetBufferSize += 8 + len;
+			Cpp.ungetBufferSize = 8 + len + Cpp.ungetDataSize;
 			int * tmp = (int *)eMalloc(Cpp.ungetBufferSize * sizeof(int));
-			
-			memmove(tmp + 8 + len,Cpp.ungetPointer,Cpp.ungetDataSize);
+			memcpy(tmp + 8 + len,Cpp.ungetPointer,Cpp.ungetDataSize * sizeof(int));
 			eFree(Cpp.ungetBuffer);
 			Cpp.ungetBuffer = tmp;
 			Cpp.ungetPointer = tmp + 8;
