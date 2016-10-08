@@ -1,0 +1,14 @@
+DECLARE_FUNCTION	input.cpp	/^#define DECLARE_FUNCTION(/;"	d	file:
+DECLARE_FUNCTION_2	input.cpp	/^#define DECLARE_FUNCTION_2(/;"	d	file:
+DECLARE_VARS	input.cpp	/^#define DECLARE_VARS(/;"	d	file:
+DEPRECATED	input.cpp	/^#define DEPRECATED(/;"	d	file:
+IMPLEMENT_FUNCTIONS	input.cpp	/^#define IMPLEMENT_FUNCTIONS(/;"	d	file:
+f1a	input.cpp	/^IMPLEMENT_FUNCTIONS(f1);$/;"	f	typeref:typename:void
+f1b	input.cpp	/^IMPLEMENT_FUNCTIONS(f1);$/;"	f	typeref:typename:void
+la	input.cpp	/^	DECLARE_VARS(l);$/;"	l	function:main	typeref:typename:int	file:
+lb	input.cpp	/^	DECLARE_VARS(l);$/;"	l	function:main	typeref:typename:int	file:
+main	input.cpp	/^int main(int,char **)$/;"	f	typeref:typename:int
+p1	input.cpp	/^DECLARE_FUNCTION(int,p1);$/;"	p	typeref:typename:int	file:
+p2	input.cpp	/^DECLARE_FUNCTION(std::string,p2);$/;"	p	typeref:typename:std::string	file:
+p3	input.cpp	/^DECLARE_FUNCTION(int,p3,int a,int b);$/;"	p	typeref:typename:int	file:
+p4	input.cpp	/^DEPRECATED(int p4());$/;"	p	typeref:typename:int	file:	properties:deprecated
