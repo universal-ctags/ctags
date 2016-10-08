@@ -28,7 +28,10 @@
  */
 
 #include "regenc.h"
+#ifdef RUBY
 #include "encindex.h"
+#endif
+
 #ifndef ENCINDEX_UTF_8
 #define ENCINDEX_UTF_8 0
 #endif

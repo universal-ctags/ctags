@@ -29,7 +29,10 @@
  */
 
 #include "regenc.h"
+#ifdef RUBY
 #include "encindex.h"
+#endif
+
 #ifndef ENCINDEX_ASCII
 #define ENCINDEX_ASCII 0
 #endif
