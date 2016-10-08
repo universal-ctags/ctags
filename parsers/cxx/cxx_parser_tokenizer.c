@@ -968,14 +968,19 @@ static bool cxxParserParseNextTokenCondenseAttribute(void)
 // if it is not a parenthesis. This is because the ignored token
 // may have a replacement and is that one that has to be returned
 // back to the caller from cxxParserParseNextToken().
-static bool cxxParserParseNextTokenSkipIgnoredParenthesis(void)
+static bool cxxParserParseNextTokenSkipIgnoredParenthesis(CXXToken ** ppChain)
 {
 	CXX_DEBUG_ENTER();
+	
+	CXX_DEBUG_ASSERT(ppChain,"ppChain should not be null here");
 
 	cxxParserSkipToNonWhiteSpace();
 
 	if(g_cxx.iChar != '(')
+	{
+		*ppChain = NULL;
 		return true; // no parenthesis
+	}
 
 	if(!cxxParserParseNextToken())
 	{
@@ -1007,10 +1012,134 @@ static bool cxxParserParseNextTokenSkipIgnoredParenthesis(void)
 		);
 
 	// Now just kill the chain.
-	cxxTokenDestroy(cxxTokenChainTakeLast(g_cxx.pTokenChain));
+	*ppChain = cxxTokenChainTakeLast(g_cxx.pTokenChain);
 
 	CXX_DEBUG_LEAVE();
 	return true;
+}
+
+static void cxxParserParseNextTokenApplyReplacement(
+		const ignoredTokenInfo * pInfo,
+		CXXToken * pParameterChainToken
+	)
+{
+	CXX_DEBUG_ENTER();
+
+	CXX_DEBUG_ASSERT(pInfo,"Info must be not null");
+	CXX_DEBUG_ASSERT(pInfo->replacement,"There should be a replacement");
+	CXX_DEBUG_ASSERT(pInfo->replacementLength > 0,"The replacement is too short");
+
+	if(!pInfo->ignoreFollowingParenthesis)
+	{
+		CXX_DEBUG_ASSERT(!pParameterChainToken,"This shouldn't have been extracted");
+		cppUngetString(pInfo->replacement,pInfo->replacementLength);
+		CXX_DEBUG_LEAVE_TEXT("Applied simple replacement %s",pInfo->replacement);
+		return;
+	}
+
+	const char * c = pInfo->replacement;
+	const char * e = c + pInfo->replacementLength;
+	
+	vString * pReplacement = vStringNew();
+	
+	const char * b = c;
+	
+	CXXTokenChain * pParameters = NULL;
+	
+	while(c < e)
+	{
+		if(*c == '$')
+		{
+			if(c > b)
+				vStringNCatS(pReplacement,b,c-b);
+			c++;
+			if(c >= e)
+			{
+				// stray $
+				vStringPut(pReplacement,'$');
+				break;
+			}
+			
+			int idx;
+			
+			if(*c == '*')
+			{
+				idx = -1; // all parameters
+			} else {
+				if((*c < '0') && (*c > '9'))
+				{
+					vStringPut(pReplacement,'$');
+					b = c;
+					continue;
+				}
+				idx = *c - '0';
+			}
+			
+			
+			if(!pParameters)
+			{
+				if(pParameterChainToken && (pParameterChainToken->pChain->iCount >= 3))
+				{
+					// kill parenthesis
+					cxxTokenChainDestroyFirst(pParameterChainToken->pChain);
+					cxxTokenChainDestroyLast(pParameterChainToken->pChain);
+
+					pParameters = cxxTokenChainSplitOnComma(
+							pParameterChainToken->pChain
+						);
+					
+					cxxTokenChainCondense(pParameterChainToken->pChain,0);
+					
+					CXX_DEBUG_PRINT(
+							"Parameter chain is '%s'",
+							vStringValue(cxxTokenChainFirst(pParameterChainToken->pChain)->pszWord)
+						);
+				}
+			}
+			
+			if(pParameters)
+			{
+				if(idx >= 0)
+				{
+					CXX_DEBUG_PRINT("Applying $%d",idx);
+
+					CXXToken * pParameter = cxxTokenChainAt(pParameters,idx);
+					if(pParameter)
+						vStringCat(pReplacement,pParameter->pszWord);
+				} else {
+					if(pParameterChainToken)
+					{
+						// Note that we have condensed the chain above!
+						CXXToken * pAll = cxxTokenChainFirst(
+								pParameterChainToken->pChain
+							);
+						if(pAll)
+							vStringCat(pReplacement,pAll->pszWord);
+					}
+				}
+			
+			}
+			
+			c++;
+			b = c;
+		} else {
+			c++;
+		}
+	}
+
+	if(c > b)
+		vStringNCatS(pReplacement,b,c-b);
+	
+	if(pParameters)
+		cxxTokenChainDestroy(pParameters);
+	
+	CXX_DEBUG_PRINT("Applying complex replacement '%s'",vStringValue(pReplacement));
+	
+	cppUngetString(vStringValue(pReplacement),vStringLength(pReplacement));
+	
+	vStringDelete(pReplacement);
+	
+	CXX_DEBUG_LEAVE();
 }
 
 bool cxxParserParseNextToken(void)
@@ -1050,7 +1179,7 @@ bool cxxParserParseNextToken(void)
 
 	unsigned int uInfo = UINFO(g_cxx.iChar);
 
-	//printf("Char %c %02x info %u\n",g_cxx.iChar,g_cxx.iChar,uInfo);
+	//fprintf(stderr,"Char %c %02x info %u\n",g_cxx.iChar,g_cxx.iChar,uInfo);
 
 	if(uInfo & CXXCharTypeStartOfIdentifier)
 	{
@@ -1102,12 +1231,7 @@ bool cxxParserParseNextToken(void)
 			g_cxx.iChar = cppGetc();
 		}
 
-		int iCXXKeyword;
-		const ignoredTokenInfo * pIgnore = NULL;
-
-check_keyword:
-
-		iCXXKeyword = lookupKeyword(t->pszWord->buffer,g_cxx.eLanguage);
+		int iCXXKeyword = lookupKeyword(t->pszWord->buffer,g_cxx.eLanguage);
 		if(iCXXKeyword >= 0)
 		{
 			if(
@@ -1136,48 +1260,59 @@ check_keyword:
 				}
 			}
 		} else {
-			// We can enter here also from a jump to check_keyword after finding
-			// and ignored token and a replacement.
 
-			if(!pIgnore)
+			const ignoredTokenInfo * pIgnore = isIgnoreToken(vStringValue(t->pszWord));
+		
+			if(pIgnore)
 			{
-				pIgnore = isIgnoreToken(vStringValue(t->pszWord));
-			
-				if(pIgnore)
-				{
-					CXX_DEBUG_PRINT("Ignore token %s",vStringValue(t->pszWord));
+				CXX_DEBUG_PRINT("Ignore token %s",vStringValue(t->pszWord));
 
-					if(pIgnore->replacement)
-					{
-						CXX_DEBUG_PRINT(
-								"The token has replacement %s: applying",
-								szReplacement
-							);
-						vStringClear(t->pszWord);
-						vStringCatS(t->pszWord,pIgnore->replacement);
-					} else {
-						// kill it
-						CXX_DEBUG_PRINT("Ignore token has no replacement");
-						cxxTokenChainDestroyLast(g_cxx.pTokenChain);
-					}
-					
-					if(pIgnore->ignoreFollowingParenthesis)
-					{
-						CXX_DEBUG_PRINT("Ignored token specifies to ignore parens too");
-						if(!cxxParserParseNextTokenSkipIgnoredParenthesis())
-							return false;
-					}
-					
-					if(pIgnore->replacement)
-					{
-						// Already have a token to return
-						// Check again for keywords
-						goto check_keyword;
-					}
-					
-					// Have no token to return: parse it
-					return cxxParserParseNextToken();
+				cxxTokenChainDestroyLast(g_cxx.pTokenChain);
+				
+				CXXToken * pParameterChain = NULL;
+				
+				if(pIgnore->ignoreFollowingParenthesis)
+				{
+					CXX_DEBUG_PRINT("Ignored token specifies to ignore parens too");
+					if(!cxxParserParseNextTokenSkipIgnoredParenthesis(&pParameterChain))
+						return false;
 				}
+				
+				// This is used to avoid infinite recursion in substitution
+				// (things like -I foo=foo or similar)
+				static int iReplacementRecursionCount = 0;
+
+				if(pIgnore->replacement)
+				{
+					CXX_DEBUG_PRINT(
+							"The token has replacement %s: applying",
+							pIgnore->replacement
+						);
+
+					if(iReplacementRecursionCount < 1024)
+					{
+						// unget last char
+						cppUngetc(g_cxx.iChar);
+						// unget the replacement
+						cxxParserParseNextTokenApplyReplacement(
+								pIgnore,
+								pParameterChain
+							);
+
+						g_cxx.iChar = cppGetc();
+					}
+				}
+				
+				if(pParameterChain)
+					cxxTokenDestroy(pParameterChain);
+				
+				iReplacementRecursionCount++;
+				// Have no token to return: parse it
+				CXX_DEBUG_PRINT("Parse inner token");
+				bool bRet = cxxParserParseNextToken();
+				CXX_DEBUG_PRINT("Parsed inner token: %s type %d",g_cxx.pToken->pszWord->buffer,g_cxx.pToken->eType);
+				iReplacementRecursionCount--;
+				return bRet;
 			}
 		}
 

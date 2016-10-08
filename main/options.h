@@ -63,6 +63,7 @@ typedef enum sortType {
 typedef struct sIgnoredTokenInfo {
 	bool ignoreFollowingParenthesis; /* -I SOMETHING+ */
 	char * replacement;              /* -I SOMETHING=REPLACEMENT */
+	int replacementLength;
 } ignoredTokenInfo;
 
 /*  This stores the command line options.
