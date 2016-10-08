@@ -816,13 +816,13 @@ int mio_vprintf (MIO *mio, const char *format, va_list ap)
 		size_t old_pos;
 		size_t old_size;
 		va_list ap_copy;
-		char c;
+		char dummy;
 
 		old_pos = mio->impl.mem.pos;
 		old_size = mio->impl.mem.size;
 		va_copy (ap_copy, ap);
 		/* compute the size we will need into the buffer */
-		n = vsnprintf (&c, 1, format, ap_copy);
+		n = vsnprintf (&dummy, 1, format, ap_copy);
 		va_end (ap_copy);
 		if (mem_try_ensure_space (mio, n))
 		{
