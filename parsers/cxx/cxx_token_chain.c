@@ -437,6 +437,46 @@ void cxxTokenChainMoveEntryRange(
 	}
 }
 
+CXXTokenChain * cxxTokenChainSplitOnComma(CXXTokenChain * tc)
+{
+	if(!tc)
+		return NULL;
+
+	CXXTokenChain * pRet = cxxTokenChainCreate();
+
+	CXXToken * pToken = cxxTokenChainFirst(tc);
+
+	if(!pToken)
+		return pRet;
+
+	CXXToken * pStart = pToken;
+
+	while(pStart && pToken->pNext)
+	{
+		while(pToken->pNext && (!cxxTokenTypeIs(pToken->pNext,CXXTokenTypeComma)))
+			pToken = pToken->pNext;
+
+		CXXToken * pNew = cxxTokenChainExtractRange(pStart,pToken,0);
+		if(pNew)
+			cxxTokenChainAppend(pRet,pNew);
+
+		pToken = pToken->pNext; // comma or nothing
+		if(pToken)
+			pToken = pToken->pNext; // after comma
+		pStart = pToken;
+	}
+
+	if(pStart)
+	{
+		// finished without comma
+		CXXToken * pNew = cxxTokenChainExtractRange(pStart,cxxTokenChainLast(tc),0);
+		if(pNew)
+			cxxTokenChainAppend(pRet,pNew);
+	}
+
+	return pRet;
+}
+
 
 void cxxTokenChainCondense(CXXTokenChain * tc,unsigned int uFlags)
 {

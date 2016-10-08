@@ -1351,7 +1351,7 @@ bool cxxParserParseIfForWhileSwitch(void)
 			);
 
 		// Simple check for cases like if(a & b), if(a * b).
-		// If there is &, && or * then we expect there to be also a =.
+		// If there is &, && or * then we expect there to be also a = or a ;.
 		if(
 				// & && * not present
 				!cxxTokenChainFirstTokenOfType(
@@ -1359,10 +1359,10 @@ bool cxxParserParseIfForWhileSwitch(void)
 						CXXTokenTypeAnd | CXXTokenTypeMultipleAnds |
 						CXXTokenTypeStar
 					) ||
-				// or = present
+				// or [=;] present
 				cxxTokenChainFirstTokenOfType(
 						pChain,
-						CXXTokenTypeAssignment
+						CXXTokenTypeAssignment | CXXTokenTypeSemicolon
 					)
 			)
 		{
