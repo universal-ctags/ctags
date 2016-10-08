@@ -43,7 +43,9 @@
 */
 #include "general.h"  /* must always come first */
 
-#define _GNU_SOURCE   /* for WIFEXITED and WEXITSTATUS */
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE   /* for WIFEXITED and WEXITSTATUS */
+#endif
 #include <errno.h>
 #include <ctype.h>
 #include <stdlib.h>   /* for WIFEXITED and WEXITSTATUS */
