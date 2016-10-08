@@ -609,8 +609,8 @@ extern const char *fileExtension (const char *const fileName)
 	const char *extension;
 	const char *pDelimiter = NULL;
 	const char *const base = baseFilename (fileName);
-	if (pDelimiter == NULL)
-	    pDelimiter = strrchr (base, '.');
+
+	pDelimiter = strrchr (base, '.');
 
 	if (pDelimiter == NULL)
 		extension = "";
