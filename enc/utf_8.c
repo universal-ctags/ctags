@@ -28,6 +28,13 @@
  */
 
 #include "regenc.h"
+#ifdef RUBY
+#include "encindex.h"
+#endif
+
+#ifndef ENCINDEX_UTF_8
+#define ENCINDEX_UTF_8 0
+#endif
 
 #define USE_INVALID_CODE_SCHEME
 
@@ -424,8 +431,9 @@ OnigEncodingDefine(utf_8, UTF_8) = {
   get_ctype_code_range,
   left_adjust_char_head,
   onigenc_always_true_is_allowed_reverse_match,
-  0,
+  ENCINDEX_UTF_8,
   ONIGENC_FLAG_UNICODE,
+  onigenc_unicode_case_map,
 };
 ENC_ALIAS("CP65001", "UTF-8")
 

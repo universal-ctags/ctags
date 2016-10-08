@@ -1,5 +1,5 @@
 /**********************************************************************
-  iso8859_2.c -  Oniguruma (regular expression library)
+  windows_1257.c -  Oniguruma (regular expression library)
 **********************************************************************/
 /*-
  * Copyright (c) 2002-2007  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
@@ -30,11 +30,19 @@
 #include "regenc.h"
 #include "iso_8859.h"
 
-#define ENC_ISO_8859_2_TO_LOWER_CASE(c) EncISO_8859_2_ToLowerCaseTable[c]
-#define ENC_IS_ISO_8859_2_CTYPE(code,ctype) \
-  ((EncISO_8859_2_CtypeTable[code] & CTYPE_TO_BIT(ctype)) != 0)
+/*
+ * Name: windows-1257
+ * MIBenum: 2257
+ * Link: http://www.iana.org/assignments/character-sets
+ * Link: http://www.microsoft.com/globaldev/reference/sbcs/1257.mspx
+ * Link: http://en.wikipedia.org/wiki/Windows-1257
+ */
 
-static const UChar EncISO_8859_2_ToLowerCaseTable[256] = {
+#define ENC_CP1252_TO_LOWER_CASE(c) EncCP1252_ToLowerCaseTable[c]
+#define ENC_IS_CP1252_CTYPE(code,ctype) \
+  ((EncCP1252_CtypeTable[code] & CTYPE_TO_BIT(ctype)) != 0)
+
+static const UChar EncCP1252_ToLowerCaseTable[256] = {
   '\000', '\001', '\002', '\003', '\004', '\005', '\006', '\007',
   '\010', '\011', '\012', '\013', '\014', '\015', '\016', '\017',
   '\020', '\021', '\022', '\023', '\024', '\025', '\026', '\027',
@@ -55,8 +63,8 @@ static const UChar EncISO_8859_2_ToLowerCaseTable[256] = {
   '\210', '\211', '\212', '\213', '\214', '\215', '\216', '\217',
   '\220', '\221', '\222', '\223', '\224', '\225', '\226', '\227',
   '\230', '\231', '\232', '\233', '\234', '\235', '\236', '\237',
-  '\240', '\261', '\242', '\263', '\244', '\265', '\266', '\247',
-  '\250', '\271', '\272', '\273', '\274', '\255', '\276', '\277',
+  '\240', '\241', '\242', '\243', '\244', '\245', '\246', '\247',
+  '\270', '\251', '\272', '\253', '\254', '\255', '\256', '\277',
   '\260', '\261', '\262', '\263', '\264', '\265', '\266', '\267',
   '\270', '\271', '\272', '\273', '\274', '\275', '\276', '\277',
   '\340', '\341', '\342', '\343', '\344', '\345', '\346', '\347',
@@ -69,7 +77,7 @@ static const UChar EncISO_8859_2_ToLowerCaseTable[256] = {
   '\370', '\371', '\372', '\373', '\374', '\375', '\376', '\377'
 };
 
-static const unsigned short EncISO_8859_2_CtypeTable[256] = {
+static const unsigned short EncCP1252_CtypeTable[256] = {
   0x4008, 0x4008, 0x4008, 0x4008, 0x4008, 0x4008, 0x4008, 0x4008,
   0x4008, 0x420c, 0x4209, 0x4208, 0x4208, 0x4208, 0x4008, 0x4008,
   0x4008, 0x4008, 0x4008, 0x4008, 0x4008, 0x4008, 0x4008, 0x4008,
@@ -90,10 +98,10 @@ static const unsigned short EncISO_8859_2_CtypeTable[256] = {
   0x0008, 0x0008, 0x0008, 0x0008, 0x0008, 0x0008, 0x0008, 0x0008,
   0x0008, 0x0008, 0x0008, 0x0008, 0x0008, 0x0008, 0x0008, 0x0008,
   0x0008, 0x0008, 0x0008, 0x0008, 0x0008, 0x0008, 0x0008, 0x0008,
-  0x0284, 0x34a2, 0x00a0, 0x34a2, 0x00a0, 0x34a2, 0x34a2, 0x00a0,
-  0x00a0, 0x34a2, 0x34a2, 0x34a2, 0x34a2, 0x01a0, 0x34a2, 0x34a2,
-  0x00a0, 0x30e2, 0x00a0, 0x30e2, 0x00a0, 0x30e2, 0x30e2, 0x00a0,
-  0x00a0, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x00a0, 0x30e2, 0x30e2,
+  0x0284, 0x01a0, 0x00a0, 0x00a0, 0x00a0, 0x01a0, 0x00a0, 0x00a0,
+  0x34a2, 0x00a0, 0x34a2, 0x01a0, 0x00a0, 0x01a0, 0x00a0, 0x34a2,
+  0x00a0, 0x00a0, 0x10a0, 0x10a0, 0x01a0, 0x30e2, 0x00a0, 0x01a0,
+  0x30e2, 0x10a0, 0x30e2, 0x01a0, 0x10a0, 0x10a0, 0x10a0, 0x30e2,
   0x34a2, 0x34a2, 0x34a2, 0x34a2, 0x34a2, 0x34a2, 0x34a2, 0x34a2,
   0x34a2, 0x34a2, 0x34a2, 0x34a2, 0x34a2, 0x34a2, 0x34a2, 0x34a2,
   0x34a2, 0x34a2, 0x34a2, 0x34a2, 0x34a2, 0x34a2, 0x34a2, 0x00a0,
@@ -101,13 +109,13 @@ static const unsigned short EncISO_8859_2_CtypeTable[256] = {
   0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2,
   0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2,
   0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x00a0,
-  0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x00a0
+  0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x01a0
 };
 
 static int
 mbc_case_fold(OnigCaseFoldType flag,
-	      const UChar** pp, const UChar* end ARG_UNUSED, UChar* lower,
-	      OnigEncoding enc ARG_UNUSED)
+			  const UChar** pp, const UChar* end ARG_UNUSED,
+			  UChar* lower, OnigEncoding enc ARG_UNUSED)
 {
   const UChar* p = *pp;
 
@@ -118,9 +126,9 @@ mbc_case_fold(OnigCaseFoldType flag,
     return 2;
   }
 
-  *lower = ENC_ISO_8859_2_TO_LOWER_CASE(*p);
+  *lower = ENC_CP1252_TO_LOWER_CASE(*p);
   (*pp)++;
-  return 1; /* return byte length of converted char to lower */
+  return 1;
 }
 
 #if 0
@@ -136,25 +144,31 @@ is_mbc_ambiguous(OnigCaseFoldType flag, const UChar** pp, const UChar* end)
   }
 
   (*pp)++;
-  v = (EncISO_8859_2_CtypeTable[*p] & (BIT_CTYPE_UPPER | BIT_CTYPE_LOWER));
+  v = (EncCP1252_CtypeTable[*p] & (BIT_CTYPE_UPPER | BIT_CTYPE_LOWER));
   if ((v | BIT_CTYPE_LOWER) != 0) {
-    return TRUE;
+    /* 0xdf, 0xb5 are lower case letter, but can't convert. */
+    if (*p == 0xb5)
+      return FALSE;
+    else
+      return TRUE;
   }
 
   return (v != 0 ? TRUE : FALSE);
 }
 #endif
 
+static int
+is_code_ctype(OnigCodePoint code, unsigned int ctype, OnigEncoding enc ARG_UNUSED)
+{
+  if (code < 256)
+    return ENC_IS_CP1252_CTYPE(code, ctype);
+  else
+    return FALSE;
+}
+
 static const OnigPairCaseFoldCodes CaseFoldMap[] = {
- { 0xa1, 0xb1 },
- { 0xa3, 0xb3 },
- { 0xa5, 0xb5 },
- { 0xa6, 0xb6 },
- { 0xa9, 0xb9 },
+ { 0xa8, 0xb8 },
  { 0xaa, 0xba },
- { 0xab, 0xbb },
- { 0xac, 0xbc },
- { 0xae, 0xbe },
  { 0xaf, 0xbf },
 
  { 0xc0, 0xe0 },
@@ -192,38 +206,31 @@ static const OnigPairCaseFoldCodes CaseFoldMap[] = {
 
 static int
 apply_all_case_fold(OnigCaseFoldType flag,
-		    OnigApplyAllCaseFoldFunc f, void* arg,
-		    OnigEncoding enc ARG_UNUSED)
+				OnigApplyAllCaseFoldFunc f, void* arg,
+				OnigEncoding enc ARG_UNUSED)
 {
   return onigenc_apply_all_case_fold_with_map(
-            numberof(CaseFoldMap), CaseFoldMap, 1,
-            flag, f, arg);
+             numberof(CaseFoldMap), CaseFoldMap, 1,
+             flag, f, arg);
 }
 
 static int
 get_case_fold_codes_by_str(OnigCaseFoldType flag,
-			   const OnigUChar* p, const OnigUChar* end,
-			   OnigCaseFoldCodeItem items[],
-			   OnigEncoding enc ARG_UNUSED)
+				       const OnigUChar* p, const OnigUChar* end,
+				       OnigCaseFoldCodeItem items[],
+				       OnigEncoding enc ARG_UNUSED)
 {
   return onigenc_get_case_fold_codes_by_str_with_map(
 	     numberof(CaseFoldMap), CaseFoldMap, 1,
 	     flag, p, end, items);
 }
 
-static int
-is_code_ctype(OnigCodePoint code, unsigned int ctype, OnigEncoding enc ARG_UNUSED)
-{
-  if (code < 256)
-    return ENC_IS_ISO_8859_2_CTYPE(code, ctype);
-  else
-    return FALSE;
-}
-
+#define DOTLESS_i        (0xB9)
+#define I_WITH_DOT_ABOVE (0xA9)
 static int
 case_map (OnigCaseFoldType* flagP, const OnigUChar** pp,
-           const OnigUChar* end, OnigUChar* to, OnigUChar* to_end,
-           const struct OnigEncodingTypeST* enc)
+		const OnigUChar* end, OnigUChar* to, OnigUChar* to_end,
+		const struct OnigEncodingTypeST* enc)
 {
   OnigCodePoint code;
   OnigUChar *to_start = to;
@@ -243,21 +250,26 @@ case_map (OnigCaseFoldType* flagP, const OnigUChar** pp,
 	code = 's';
       }
     }
-    else if ((EncISO_8859_2_CtypeTable[code] & BIT_CTYPE_UPPER)
+    else if (code==0xB5) ;
+    else if ((EncCP1252_CtypeTable[code] & BIT_CTYPE_UPPER)
 	     && (flags & (ONIGENC_CASE_DOWNCASE|ONIGENC_CASE_FOLD))) {
       flags |= ONIGENC_CASE_MODIFIED;
-      code = ENC_ISO_8859_2_TO_LOWER_CASE(code);
+      if (code=='I')
+	code = flags&ONIGENC_CASE_FOLD_TURKISH_AZERI ? DOTLESS_i : 'i';
+      else
+	code = ENC_CP1252_TO_LOWER_CASE(code);
     }
-    else if ((EncISO_8859_2_CtypeTable[code]&BIT_CTYPE_LOWER)
-       && (flags&ONIGENC_CASE_UPCASE)) {
-      if (code>=0xB1 && code<=0xBF){
-	flags |= ONIGENC_CASE_MODIFIED;
+    else if ((EncCP1252_CtypeTable[code]&BIT_CTYPE_LOWER)
+	     && (flags&ONIGENC_CASE_UPCASE)) {
+      flags |= ONIGENC_CASE_MODIFIED;
+      if (code=='i')
+	code = flags&ONIGENC_CASE_FOLD_TURKISH_AZERI ? I_WITH_DOT_ABOVE : 'I';
+      else if (code==DOTLESS_i)
+	code = 'I';
+      else if (code>=0xB0 && code<=0xBF )
 	code -= 0x10;
-      }
-      else{
-	flags |= ONIGENC_CASE_MODIFIED;
+      else
 	code -= 0x20;
-      }
     }
     *to++ = code;
     if (flags&ONIGENC_CASE_TITLECASE)  /* switch from titlecase to lowercase for capitalize */
@@ -267,9 +279,9 @@ case_map (OnigCaseFoldType* flagP, const OnigUChar** pp,
   return (int)(to-to_start);
 }
 
-OnigEncodingDefine(iso_8859_2, ISO_8859_2) = {
+OnigEncodingDefine(windows_1257, Windows_1257) = {
   onigenc_single_byte_mbc_enc_len,
-  "ISO-8859-2",  /* name */
+  "Windows-1257",  /* name */
   1,             /* max enc length */
   1,             /* min enc length */
   onigenc_is_mbc_newline_0x0a,
@@ -288,4 +300,5 @@ OnigEncodingDefine(iso_8859_2, ISO_8859_2) = {
   ONIGENC_FLAG_NONE,
   case_map,
 };
-ENC_ALIAS("ISO8859-2", "ISO-8859-2")
+
+ENC_ALIAS("CP1257", "Windows-1257")

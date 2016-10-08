@@ -123,14 +123,48 @@ typedef ptrdiff_t      OnigPosition;
 
 #define ONIG_INFINITE_DISTANCE  ~((OnigDistance )0)
 
+/*
+ * Onig casefold/case mapping flags and related definitions
+ *
+ * Subfields (starting with 0 at LSB):
+ *   0-2: Code point count in casefold.h
+ *   3-12: Index into SpecialCaseMapping array in casefold.h
+ *   13-22: Case folding/mapping flags
+ */
 typedef unsigned int OnigCaseFoldType; /* case fold flag */
 
 ONIG_EXTERN OnigCaseFoldType OnigDefaultCaseFoldFlag;
 
-/* #define ONIGENC_CASE_FOLD_HIRAGANA_KATAKANA  (1<<1) */
-/* #define ONIGENC_CASE_FOLD_KATAKANA_WIDTH     (1<<2) */
-#define ONIGENC_CASE_FOLD_TURKISH_AZERI         (1<<20)
-#define INTERNAL_ONIGENC_CASE_FOLD_MULTI_CHAR   (1<<30)
+/* bits for actual code point count; 3 bits is more than enough, currently only 2 used */
+#define OnigCodePointMaskWidth    3
+#define OnigCodePointMask     ((1<<OnigCodePointMaskWidth)-1)
+#define OnigCodePointCount(n) ((n)&OnigCodePointMask)
+#define OnigCaseFoldFlags(n) ((n)&~OnigCodePointMask)
+
+/* #define ONIGENC_CASE_FOLD_HIRAGANA_KATAKANA  (1<<1) */ /* no longer usable with these values! */
+/* #define ONIGENC_CASE_FOLD_KATAKANA_WIDTH     (1<<2) */ /* no longer usable with these values! */
+
+/* bits for index into table with separate titlecase mappings */
+/* 10 bits provide 1024 values */
+#define OnigSpecialIndexShift 3
+#define OnigSpecialIndexWidth 10
+
+#define ONIGENC_CASE_UPCASE                     (1<<13) /* has/needs uppercase mapping */
+#define ONIGENC_CASE_DOWNCASE                   (1<<14) /* has/needs lowercase mapping */
+#define ONIGENC_CASE_TITLECASE                  (1<<15) /* has/needs (special) titlecase mapping */
+#define ONIGENC_CASE_SPECIAL_OFFSET             3       /* offset in bytes from ONIGENC_CASE to ONIGENC_CASE_SPECIAL */
+#define ONIGENC_CASE_UP_SPECIAL                 (1<<16) /* has special upcase mapping */
+#define ONIGENC_CASE_DOWN_SPECIAL               (1<<17) /* has special downcase mapping */
+#define ONIGENC_CASE_MODIFIED                   (1<<18) /* data has been modified */
+#define ONIGENC_CASE_FOLD                       (1<<19) /* has/needs case folding */
+
+#define ONIGENC_CASE_FOLD_TURKISH_AZERI         (1<<20) /* needs mapping specific to Turkic languages; better not change original value! */
+
+#define ONIGENC_CASE_FOLD_LITHUANIAN            (1<<21) /* needs Lithuanian-specific mapping */
+#define ONIGENC_CASE_ASCII_ONLY                 (1<<22) /* only modify ASCII range */
+#define ONIGENC_CASE_IS_TITLECASE               (1<<23) /* character itself is already titlecase */
+
+#define INTERNAL_ONIGENC_CASE_FOLD_MULTI_CHAR   (1<<30) /* better not change original value! */
 
 #define ONIGENC_CASE_FOLD_MIN      INTERNAL_ONIGENC_CASE_FOLD_MULTI_CHAR
 #define ONIGENC_CASE_FOLD_DEFAULT  OnigDefaultCaseFoldFlag
@@ -174,13 +208,14 @@ typedef struct OnigEncodingTypeST {
   int    (*mbc_case_fold)(OnigCaseFoldType flag, const OnigUChar** pp, const OnigUChar* end, OnigUChar* to, const struct OnigEncodingTypeST* enc);
   int    (*apply_all_case_fold)(OnigCaseFoldType flag, OnigApplyAllCaseFoldFunc f, void* arg, const struct OnigEncodingTypeST* enc);
   int    (*get_case_fold_codes_by_str)(OnigCaseFoldType flag, const OnigUChar* p, const OnigUChar* end, OnigCaseFoldCodeItem acs[], const struct OnigEncodingTypeST* enc);
-  int    (*property_name_to_ctype)(const struct OnigEncodingTypeST* enc, OnigUChar* p, OnigUChar* end);
+  int    (*property_name_to_ctype)(const struct OnigEncodingTypeST* enc, const OnigUChar* p, const OnigUChar* end);
   int    (*is_code_ctype)(OnigCodePoint code, OnigCtype ctype, const struct OnigEncodingTypeST* enc);
   int    (*get_ctype_code_range)(OnigCtype ctype, OnigCodePoint* sb_out, const OnigCodePoint* ranges[], const struct OnigEncodingTypeST* enc);
   OnigUChar* (*left_adjust_char_head)(const OnigUChar* start, const OnigUChar* p, const OnigUChar* end, const struct OnigEncodingTypeST* enc);
   int    (*is_allowed_reverse_match)(const OnigUChar* p, const OnigUChar* end, const struct OnigEncodingTypeST* enc);
   int ruby_encoding_index;
   unsigned int  flags;
+  int    (*case_map)(OnigCaseFoldType* flagP, const OnigUChar** pp, const OnigUChar* end, OnigUChar* to, OnigUChar* to_end, const struct OnigEncodingTypeST* enc);
 } OnigEncodingType;
 
 typedef const OnigEncodingType* OnigEncoding;
@@ -264,6 +299,12 @@ ONIG_EXTERN const OnigEncodingType OnigEncodingGB18030;
 #endif /* RUBY */
 
 #define ONIG_ENCODING_UNDEF    ((OnigEncoding )0)
+
+/* this declaration needs to be here because it is used in string.c */
+ONIG_EXTERN int onigenc_ascii_only_case_map P_((OnigCaseFoldType* flagP,
+			const OnigUChar** pp, const OnigUChar* end,
+			OnigUChar* to, OnigUChar* to_end,
+			const struct OnigEncodingTypeST* enc));
 
 
 /* work size */
@@ -393,10 +434,8 @@ ONIG_EXTERN
 int onigenc_init P_((void));
 ONIG_EXTERN
 int onigenc_set_default_encoding P_((OnigEncoding enc));
-ONIG_EXTERN
-OnigEncoding onigenc_get_default_encoding P_((void));
-ONIG_EXTERN
-void  onigenc_set_default_caseconv_table P_((const OnigUChar* table));
+PUREFUNC(ONIG_EXTERN OnigEncoding onigenc_get_default_encoding P_((void)));
+PUREFUNC(ONIG_EXTERN void  onigenc_set_default_caseconv_table P_((const OnigUChar* table)));
 ONIG_EXTERN
 OnigUChar* onigenc_get_right_adjust_char_head_with_prev P_((OnigEncoding enc, const OnigUChar* start, const OnigUChar* s, const OnigUChar* end, const OnigUChar** prev));
 ONIG_EXTERN

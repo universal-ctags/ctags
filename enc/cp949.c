@@ -213,6 +213,7 @@ OnigEncodingDefine(cp949, CP949) = {
   cp949_is_allowed_reverse_match,
   0,
   ONIGENC_FLAG_NONE,
+  onigenc_ascii_only_case_map,
 };
 /*
  * Name: CP949

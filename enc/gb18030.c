@@ -599,5 +599,6 @@ OnigEncodingDefine(gb18030, GB18030) = {
   gb18030_is_allowed_reverse_match,
   0,
   ONIGENC_FLAG_NONE,
+  onigenc_ascii_only_case_map,
 };
 

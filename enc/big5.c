@@ -302,6 +302,7 @@ OnigEncodingDefine(big5, BIG5) = {
   big5_is_allowed_reverse_match,
   0,
   ONIGENC_FLAG_NONE,
+  onigenc_ascii_only_case_map,
 };
 
 /*
@@ -336,6 +337,7 @@ OnigEncodingDefine(big5_hkscs, BIG5_HKSCS) = {
   big5_is_allowed_reverse_match,
   0,
   ONIGENC_FLAG_NONE,
+  onigenc_ascii_only_case_map,
 };
 ENC_ALIAS("Big5-HKSCS:2008", "Big5-HKSCS")
 
@@ -370,4 +372,5 @@ OnigEncodingDefine(big5_uao, BIG5_UAO) = {
   big5_is_allowed_reverse_match,
   0,
   ONIGENC_FLAG_NONE,
+  onigenc_ascii_only_case_map,
 };

@@ -51,6 +51,7 @@ OnigEncodingDefine(windows_31j, Windows_31J) = {
   is_allowed_reverse_match,
   0,
   ONIGENC_FLAG_NONE,
+  onigenc_ascii_only_case_map,
 };
 #else /* RUBY */
 OnigEncodingDefine(cp932, CP932) = {
