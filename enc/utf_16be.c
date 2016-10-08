@@ -28,6 +28,7 @@
  */
 
 #include "regenc.h"
+#include "iso_8859.h"
 
 #if 0
 static const int EncLen_UTF16[] = {
@@ -183,7 +184,7 @@ utf16be_is_mbc_ambiguous(OnigCaseFoldType flag, const UChar** pp, const UChar* e
     int c, v;
 
     p++;
-    if (*p == 0xdf && (flag & INTERNAL_ONIGENC_CASE_FOLD_MULTI_CHAR) != 0) {
+    if (*p == SHARP_s && (flag & INTERNAL_ONIGENC_CASE_FOLD_MULTI_CHAR) != 0) {
       return TRUE;
     }
 
@@ -250,5 +251,6 @@ OnigEncodingDefine(utf_16be, UTF_16BE) = {
   onigenc_always_false_is_allowed_reverse_match,
   0,
   ONIGENC_FLAG_UNICODE,
+  onigenc_unicode_case_map,
 };
 ENC_ALIAS("UCS-2BE", "UTF-16BE")

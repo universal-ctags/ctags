@@ -220,4 +220,5 @@ OnigEncodingDefine(koi8_u, KOI8_U) = {
   onigenc_always_true_is_allowed_reverse_match,
   0,
   ONIGENC_FLAG_NONE,
+  onigenc_single_byte_ascii_only_case_map,
 };

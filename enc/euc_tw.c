@@ -223,5 +223,6 @@ OnigEncodingDefine(euc_tw, EUC_TW) = {
   euctw_is_allowed_reverse_match,
   0,
   ONIGENC_FLAG_NONE,
+  onigenc_ascii_only_case_map,
 };
 ENC_ALIAS("eucTW", "EUC-TW")

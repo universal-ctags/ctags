@@ -490,9 +490,9 @@ static const OnigCodePoint CR_Cyrillic[] = {
 #include "enc/jis/props.h"
 
 static int
-property_name_to_ctype(OnigEncoding enc, UChar* p, UChar* end)
+property_name_to_ctype(OnigEncoding enc, const UChar* p, const UChar* end)
 {
-  UChar *s = p, *e = end;
+  const UChar *s = p, *e = end;
   const struct enc_property *prop =
     onig_jis_property((const char* )s, (unsigned int )(e - s));
 
@@ -565,6 +565,7 @@ OnigEncodingDefine(shift_jis, Shift_JIS) = {
   is_allowed_reverse_match,
   0,
   ONIGENC_FLAG_NONE,
+  onigenc_ascii_only_case_map,
 };
 /*
  * Name: Shift_JIS

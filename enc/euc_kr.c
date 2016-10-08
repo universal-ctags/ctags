@@ -190,5 +190,6 @@ OnigEncodingDefine(euc_kr, EUC_KR) = {
   euckr_is_allowed_reverse_match,
   0,
   ONIGENC_FLAG_NONE,
+  onigenc_ascii_only_case_map,
 };
 ENC_ALIAS("eucKR", "EUC-KR")

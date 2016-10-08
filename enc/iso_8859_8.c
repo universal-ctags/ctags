@@ -95,6 +95,7 @@ OnigEncodingDefine(iso_8859_8, ISO_8859_8) = {
   onigenc_always_true_is_allowed_reverse_match,
   0,
   ONIGENC_FLAG_NONE,
+  onigenc_single_byte_ascii_only_case_map,
 };
 ENC_ALIAS("ISO8859-8", "ISO-8859-8")
 
