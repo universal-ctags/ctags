@@ -1,0 +1,6 @@
+a	input.cpp	/^int a,b;$/;"	v	typeref:typename:int
+b	input.cpp	/^int a,b;$/;"	v	typeref:typename:int
+foreach	input.cpp	/^#define foreach(/;"	d	file:
+main	input.cpp	/^int main(int,char **)$/;"	f	typeref:typename:int
+p	input.cpp	/^	foreach(char * p,pointers)$/;"	l	function:main	typeref:typename:char *	file:
+pointers	input.cpp	/^char * pointers[10];$/;"	v	typeref:typename:char * [10]
