@@ -98,7 +98,7 @@ static cppState Cpp = {
 	false,       /* hasAtLiteralStrings */
 	false,       /* hasCxxRawLiteralStrings */
 	false,	     /* hasSingleQuoteLiteralNumbers */
-	NULL,	     /* defineMacroKind */
+	NULL,        /* defineMacroKind */
 	.macroUndefRoleIndex   = ROLE_INDEX_DEFINITION,
 	NULL,	     /* headerKind */
 	.headerSystemRoleIndex = ROLE_INDEX_DEFINITION,
@@ -230,7 +230,7 @@ static void readIdentifier (int c, vString *const name)
 	{
 		vStringPut (name, c);
 		c = getcFromInputFile ();
-	} while (c != EOF  && cppIsident (c));
+	} while (c != EOF && cppIsident (c));
 	ungetcToInputFile (c);
 }
 
@@ -329,13 +329,10 @@ static bool pushConditional (const bool firstBranchChosen)
 static bool popConditional (void)
 {
 	if (Cpp.directive.nestLevel > 0)
-	{
 		--Cpp.directive.nestLevel;
-	}
 
 	return isIgnore ();
 }
-
 
 static int makeDefineTag (const char *const name, const char* const signature, bool undef)
 {
@@ -663,7 +660,6 @@ static int skipToEndOfString (bool ignoreBackslash)
 	return STRING_SYMBOL;  /* symbolic representation of string */
 }
 
-
 static int isCxxRawLiteralDelimiterChar (int c)
 {
 	return (c != ' ' && c != '\f' && c != '\n' && c != '\r' && c != '\t' && c != '\v' &&
@@ -978,8 +974,7 @@ process:
 			enter:
 				Cpp.directive.accept = false;
 				if (directive)
-					ignore = handleDirective (c,
-								  &macroCorkIndex);
+					ignore = handleDirective (c, &macroCorkIndex);
 				break;
 		}
 	} while (directive || ignore);
