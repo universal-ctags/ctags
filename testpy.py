@@ -13,13 +13,13 @@ nsucc = 0
 nfail = 0
 
 # default encoding
-onig_encoding = onig.ONIG_ENCODING_EUC_JP
+onig_encoding = onigmo.ONIG_ENCODING_EUC_JP
 encoding = onig_encoding[0].name.decode()
 
 # special syntactic settings
-_syntax_default = onig.OnigSyntaxType()
-onig.onig_copy_syntax(byref(_syntax_default), onig.ONIG_SYNTAX_DEFAULT)
-_syntax_default.options &= ~onig.ONIG_OPTION_ASCII_RANGE
+_syntax_default = onigmo.OnigSyntaxType()
+onigmo.onig_copy_syntax(byref(_syntax_default), onigmo.ONIG_SYNTAX_DEFAULT)
+_syntax_default.options &= ~onigmo.ONIG_OPTION_ASCII_RANGE
 syntax_default = byref(_syntax_default)
 
 
@@ -65,15 +65,15 @@ def print_result(result, pattern, file=None):
         print('(' + str(e) + ')')
 
 def xx(pattern, target, s_from, s_to, mem, not_match,
-        syn=syntax_default, opt=onig.ONIG_OPTION_DEFAULT,
-        err=onig.ONIG_NORMAL):
+        syn=syntax_default, opt=onigmo.ONIG_OPTION_DEFAULT,
+        err=onigmo.ONIG_NORMAL):
     global nerror
     global nsucc
     global nfail
 
-    reg = onig.OnigRegex()
-    einfo = onig.OnigErrorInfo()
-    msg = create_string_buffer(onig.ONIG_MAX_ERROR_MESSAGE_LEN)
+    reg = onigmo.OnigRegex()
+    einfo = onigmo.OnigErrorInfo()
+    msg = create_string_buffer(onigmo.ONIG_MAX_ERROR_MESSAGE_LEN)
 
     pattern2 = pattern
     if not isinstance(pattern, bytes):
@@ -94,10 +94,10 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
     if len(pattern) > limit:
         pattern = pattern[:limit] + "..."
 
-    r = onig.onig_new(byref(reg), patternp.getptr(), patternp.getptr(-1),
+    r = onigmo.onig_new(byref(reg), patternp.getptr(), patternp.getptr(-1),
             opt, onig_encoding, syn, byref(einfo));
     if r != 0:
-        onig.onig_error_code_to_str(msg, r, byref(einfo))
+        onigmo.onig_error_code_to_str(msg, r, byref(einfo))
         if r == err:
             nsucc += 1
             print_result("OK(E)", "%s (/%s/ '%s')" % \
@@ -108,18 +108,18 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
                     (msg.value.decode(), pattern, target), file=sys.stderr)
         return
 
-    if err != onig.ONIG_NORMAL:
+    if err != onigmo.ONIG_NORMAL:
         nfail += 1
         print_result("FAIL(E)", "/%s/ '%s'" % (pattern, target))
-        onig.onig_free(reg)
+        onigmo.onig_free(reg)
         return
 
-    region = onig.onig_region_new()
-    r = onig.onig_search(reg, targetp.getptr(), targetp.getptr(-1),
+    region = onigmo.onig_region_new()
+    r = onigmo.onig_search(reg, targetp.getptr(), targetp.getptr(-1),
                     targetp.getptr(), targetp.getptr(-1),
-                    region, onig.ONIG_OPTION_NONE);
-    if r < onig.ONIG_MISMATCH:
-        onig.onig_error_code_to_str(msg, r)
+                    region, onigmo.ONIG_OPTION_NONE);
+    if r < onigmo.ONIG_MISMATCH:
+        onigmo.onig_error_code_to_str(msg, r)
         if r == err:
             nsucc += 1
             print_result("OK(E)", "%s (/%s/ '%s')" % \
@@ -128,10 +128,10 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
             nerror += 1
             print_result("ERROR", "%s (/%s/ '%s')" % \
                     (msg.value.decode(), pattern, target), file=sys.stderr)
-        onig.onig_region_free(region, 1)
+        onigmo.onig_region_free(region, 1)
         return
 
-    if r == onig.ONIG_MISMATCH:
+    if r == onigmo.ONIG_MISMATCH:
         if not_match:
             nsucc += 1
             print_result("OK(N)", "/%s/ '%s'" % (pattern, target))
@@ -152,8 +152,8 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
                 nfail += 1
                 print_result("FAIL", "/%s/ '%s' %d-%d : %d-%d" % (pattern, target,
                         s_from, s_to, start, end))
-    onig.onig_free(reg)
-    onig.onig_region_free(region, 1)
+    onigmo.onig_free(reg)
+    onigmo.onig_region_free(region, 1)
 
 def x2(pattern, target, s_from, s_to, **kwargs):
     xx(pattern, target, s_from, s_to, 0, False, **kwargs)
@@ -166,27 +166,27 @@ def n(pattern, target, **kwargs):
 
 
 def is_unicode_encoding(enc):
-    return enc in (onig.ONIG_ENCODING_UTF32_LE,
-                   onig.ONIG_ENCODING_UTF32_BE,
-                   onig.ONIG_ENCODING_UTF16_LE,
-                   onig.ONIG_ENCODING_UTF16_BE,
-                   onig.ONIG_ENCODING_UTF8)
+    return enc in (onigmo.ONIG_ENCODING_UTF32_LE,
+                   onigmo.ONIG_ENCODING_UTF32_BE,
+                   onigmo.ONIG_ENCODING_UTF16_LE,
+                   onigmo.ONIG_ENCODING_UTF16_BE,
+                   onigmo.ONIG_ENCODING_UTF8)
 
 
 def set_encoding(enc):
     global onig_encoding
     global encoding
 
-    if isinstance(enc, onig.OnigEncoding):
+    if isinstance(enc, onigmo.OnigEncoding):
         onig_encoding = enc
     else:
-        encs = {"EUC-JP": onig.ONIG_ENCODING_EUC_JP,
-                "SJIS": onig.ONIG_ENCODING_SJIS,
-                "UTF-8": onig.ONIG_ENCODING_UTF8,
-                "UTF-16LE": onig.ONIG_ENCODING_UTF16_LE,
-                "UTF-16BE": onig.ONIG_ENCODING_UTF16_BE,
-                "UTF-32LE": onig.ONIG_ENCODING_UTF32_LE,
-                "UTF-32BE": onig.ONIG_ENCODING_UTF32_BE}
+        encs = {"EUC-JP": onigmo.ONIG_ENCODING_EUC_JP,
+                "SJIS": onigmo.ONIG_ENCODING_SJIS,
+                "UTF-8": onigmo.ONIG_ENCODING_UTF8,
+                "UTF-16LE": onigmo.ONIG_ENCODING_UTF16_LE,
+                "UTF-16BE": onigmo.ONIG_ENCODING_UTF16_BE,
+                "UTF-32LE": onigmo.ONIG_ENCODING_UTF32_LE,
+                "UTF-32BE": onigmo.ONIG_ENCODING_UTF32_BE}
         onig_encoding = encs[enc]
     encoding = onig_encoding[0].name.decode()
 
@@ -246,13 +246,13 @@ def main():
     x2("q[\\c\\\\]", "q\034", 0, 2);
     x2("", "a", 0, 0);
     x2("a", "a", 0, 1);
-    if onig_encoding == onig.ONIG_ENCODING_UTF16_LE:
+    if onig_encoding == onigmo.ONIG_ENCODING_UTF16_LE:
         x2("\\x61\\x00", "a", 0, 1);
-    elif onig_encoding == onig.ONIG_ENCODING_UTF16_BE:
+    elif onig_encoding == onigmo.ONIG_ENCODING_UTF16_BE:
         x2("\\x00\\x61", "a", 0, 1);
-    elif onig_encoding == onig.ONIG_ENCODING_UTF32_LE:
+    elif onig_encoding == onigmo.ONIG_ENCODING_UTF32_LE:
         x2("\\x61\\x00\\x00\\x00", "a", 0, 1);
-    elif onig_encoding == onig.ONIG_ENCODING_UTF32_BE:
+    elif onig_encoding == onigmo.ONIG_ENCODING_UTF32_BE:
         x2("\\x00\\x00\\x00\\x61", "a", 0, 1);
     else:
         x2("\\x61", "a", 0, 1);
@@ -263,16 +263,16 @@ def main():
     x2("b", "ab", 1, 2);
     x2("bc", "abc", 1, 3);
     x2("(?i:#RET#)", "#INS##RET#", 5, 10);
-    if onig_encoding == onig.ONIG_ENCODING_UTF16_LE:
+    if onig_encoding == onigmo.ONIG_ENCODING_UTF16_LE:
         x2("\\17\\00", "\017", 0, 1);
         x2("\\x1f\\x00", "\x1f", 0, 1);
-    elif onig_encoding == onig.ONIG_ENCODING_UTF16_BE:
+    elif onig_encoding == onigmo.ONIG_ENCODING_UTF16_BE:
         x2("\\00\\17", "\017", 0, 1);
         x2("\\x00\\x1f", "\x1f", 0, 1);
-    elif onig_encoding == onig.ONIG_ENCODING_UTF32_LE:
+    elif onig_encoding == onigmo.ONIG_ENCODING_UTF32_LE:
         x2("\\17\\00\\00\\00", "\017", 0, 1);
         x2("\\x1f\\x00\\x00\\x00", "\x1f", 0, 1);
-    elif onig_encoding == onig.ONIG_ENCODING_UTF32_BE:
+    elif onig_encoding == onigmo.ONIG_ENCODING_UTF32_BE:
         x2("\\00\\00\\00\\17", "\017", 0, 1);
         x2("\\x00\\x00\\x00\\x1f", "\x1f", 0, 1);
     else:
@@ -323,22 +323,22 @@ def main():
     x2("[*[:xdigit:]+]", "-@^+", 3, 4);
     n("[[:upper]]", "A");
     x2("[[:upper]]", ":", 0, 1);
-    if onig_encoding == onig.ONIG_ENCODING_UTF16_LE:
+    if onig_encoding == onigmo.ONIG_ENCODING_UTF16_LE:
         x2("[\\044\\000-\\047\\000]", "\046", 0, 1);
         x2("[\\x5a\\x00-\\x5c\\x00]", "\x5b", 0, 1);
         x2("[\\x6A\\x00-\\x6D\\x00]", "\x6c", 0, 1);
         n("[\\x6A\\x00-\\x6D\\x00]", "\x6E");
-    elif onig_encoding == onig.ONIG_ENCODING_UTF16_BE:
+    elif onig_encoding == onigmo.ONIG_ENCODING_UTF16_BE:
         x2("[\\000\\044-\\000\\047]", "\046", 0, 1);
         x2("[\\x00\\x5a-\\x00\\x5c]", "\x5b", 0, 1);
         x2("[\\x00\\x6A-\\x00\\x6D]", "\x6c", 0, 1);
         n("[\\x00\\x6A-\\x00\\x6D]", "\x6E");
-    elif onig_encoding == onig.ONIG_ENCODING_UTF32_LE:
+    elif onig_encoding == onigmo.ONIG_ENCODING_UTF32_LE:
         x2("[\\044\\000\\000\\000-\\047\\000\\000\\000]", "\046", 0, 1);
         x2("[\\x5a\\x00\\x00\\x00-\\x5c\\x00\\x00\\x00]", "\x5b", 0, 1);
         x2("[\\x6A\\x00\\x00\\x00-\\x6D\\x00\\x00\\x00]", "\x6c", 0, 1);
         n("[\\x6A\\x00\\x00\\x00-\\x6D\\x00\\x00\\x00]", "\x6E");
-    elif onig_encoding == onig.ONIG_ENCODING_UTF32_BE:
+    elif onig_encoding == onigmo.ONIG_ENCODING_UTF32_BE:
         x2("[\\000\\000\\000\\044-\\000\\000\\000\\047]", "\046", 0, 1);
         x2("[\\x00\\x00\\x00\\x5a-\\x00\\x00\\x00\\x5c]", "\x5b", 0, 1);
         x2("[\\x00\\x00\\x00\\x6A-\\x00\\x00\\x00\\x6D]", "\x6c", 0, 1);
@@ -684,19 +684,19 @@ def main():
     x2("x((.)*)*x(?i:\\1)\\Z", "0x1x2x1X2", 1, 9);
     x2("(?:()|()|()|()|()|())*\\2\\5", "", 0, 0);
     x2("(?:()|()|()|(x)|()|())*\\2b\\5", "b", 0, 1);
-    if onig_encoding == onig.ONIG_ENCODING_UTF16_LE:
+    if onig_encoding == onigmo.ONIG_ENCODING_UTF16_LE:
         x2("\\xFA\\x8F", "\u8ffa", 0, 1);
-    elif onig_encoding == onig.ONIG_ENCODING_UTF16_BE:
+    elif onig_encoding == onigmo.ONIG_ENCODING_UTF16_BE:
         x2("\\x8F\\xFA", "\u8ffa", 0, 1);
-    elif onig_encoding == onig.ONIG_ENCODING_UTF32_LE:
+    elif onig_encoding == onigmo.ONIG_ENCODING_UTF32_LE:
         x2("\\xFA\\x8F\\x00\\x00", "\u8ffa", 0, 1);
-    elif onig_encoding == onig.ONIG_ENCODING_UTF32_BE:
+    elif onig_encoding == onigmo.ONIG_ENCODING_UTF32_BE:
         x2("\\x00\\x00\\x8F\\xFA", "\u8ffa", 0, 1);
-    elif onig_encoding == onig.ONIG_ENCODING_UTF8:
+    elif onig_encoding == onigmo.ONIG_ENCODING_UTF8:
         x2("\\xE8\\xBF\\xBA", "\u8ffa", 0, 1);
-    elif onig_encoding == onig.ONIG_ENCODING_SJIS:
+    elif onig_encoding == onigmo.ONIG_ENCODING_SJIS:
         x2("\\xE7\\x92", "\u8ffa", 0, 1);
-    elif onig_encoding == onig.ONIG_ENCODING_EUC_JP:
+    elif onig_encoding == onigmo.ONIG_ENCODING_EUC_JP:
         x2("\\xED\\xF2", "\u8ffa", 0, 1); # "迺"
     x2("", "あ", 0, 0);
     x2("あ", "あ", 0, 1);
@@ -977,9 +977,9 @@ def main():
     # additional test patterns
     if is_unicode_encoding(onig_encoding):
         x2("\\x{3042}\\x{3044}", "あい", 0, 2)
-    elif onig_encoding == onig.ONIG_ENCODING_SJIS:
+    elif onig_encoding == onigmo.ONIG_ENCODING_SJIS:
         x2("\\x{82a0}\\x{82A2}", "あい", 0, 2)
-    elif onig_encoding == onig.ONIG_ENCODING_EUC_JP:
+    elif onig_encoding == onigmo.ONIG_ENCODING_EUC_JP:
         x2("\\x{a4a2}\\x{A4A4}", "あい", 0, 2)
     x2("\\p{Hiragana}\\p{Katakana}", "あイ", 0, 2)
     x2("(?m)^A.B$", "X\nA\nB\nZ", 2, 5)
@@ -1051,7 +1051,7 @@ def main():
       (?<content> [^<&]+ (\g<element> | [^<&]+)* ){0}
       (?<etag> </ \k<name+1> >){0}
       \g<element>''',
-      "<foo>f<bar>bbb</bar>f</foo>", 0, 27, opt=onig.ONIG_OPTION_EXTEND)
+      "<foo>f<bar>bbb</bar>f</foo>", 0, 27, opt=onigmo.ONIG_OPTION_EXTEND)
     x2("\\p{Print}+", "\n a", 1, 3)
     x2("\\p{Graph}+", "\n a", 2, 3)
     n("a(?!b)", "ab");
@@ -1060,11 +1060,11 @@ def main():
     x2("(?<=(?:[a-z]|\\w){3})x", "ab1x", 3, 4)  # repeat inside look-behind
     x2("(?<n>(a|b\\g<n>c){3,5}?)", "baaaaca", 1, 4)
     x2("\\p{WoRd}", "a", 0, 1)  # property name is not case sensitive
-    n("[[:WoRd:]]", "a", err=onig.ONIGERR_INVALID_POSIX_BRACKET_TYPE)   # POSIX bracket name is case sensitive
+    n("[[:WoRd:]]", "a", err=onigmo.ONIGERR_INVALID_POSIX_BRACKET_TYPE)   # POSIX bracket name is case sensitive
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
-    x2("foo|foobar", "foobar", 0, 6, opt=onig.ONIG_OPTION_FIND_LONGEST)
+    x2("foo|foobar", "foobar", 0, 6, opt=onigmo.ONIG_OPTION_FIND_LONGEST)
 
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
@@ -1080,7 +1080,7 @@ def main():
     n("a++a", "aaaa")
     x2("a{2,3}+a", "aaa", 0, 3) # Not a possessive quantifier in Ruby,
                                 # same as "(?:a{2,3})+a"
-    n("a{2,3}+a", "aaa", syn=onig.ONIG_SYNTAX_PERL)
+    n("a{2,3}+a", "aaa", syn=onigmo.ONIG_SYNTAX_PERL)
 
     # automatic possessification
     x2("\\w+\\W", "abc#", 0, 4)
@@ -1123,21 +1123,21 @@ def main():
     x2("(?<=ab|a\\Ka)cd", "abcd", 2, 4)     # This behaviour is currently not well defined. (see: perlre)
 
     # named group and subroutine call
-    x2("(?<name_2>ab)(?&name_2)", "abab", 0, 4, syn=onig.ONIG_SYNTAX_PERL);
-    x2("(?<name_2>ab)(?1)", "abab", 0, 4, syn=onig.ONIG_SYNTAX_PERL);
-    x2("(?'n'|\\((?&n)\\))+$", "()(())", 0, 6, syn=onig.ONIG_SYNTAX_PERL);
-    x2("(a|x(?-1)x)", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
-    x2("(a|(x(?-2)x))", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
-    x2("a|x(?0)x", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
-    x2("a|x(?R)x", "xax", 0, 3, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(?<name_2>ab)(?&name_2)", "abab", 0, 4, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("(?<name_2>ab)(?1)", "abab", 0, 4, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("(?'n'|\\((?&n)\\))+$", "()(())", 0, 6, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("(a|x(?-1)x)", "xax", 0, 3, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("(a|(x(?-2)x))", "xax", 0, 3, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("a|x(?0)x", "xax", 0, 3, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("a|x(?R)x", "xax", 0, 3, syn=onigmo.ONIG_SYNTAX_PERL);
     x2("(a|x\g<0>x)", "xax", 0, 3);
     x2("(a|x\g'0'x)", "xax", 0, 3);
-    x2("(?-i:(?+1))(?i:(a)){0}", "A", 0, 1, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(?-i:(?+1))(?i:(a)){0}", "A", 0, 1, syn=onigmo.ONIG_SYNTAX_PERL);
     x2("(?-i:\g<+1>)(?i:(a)){0}", "A", 0, 1);
     x2("(?-i:\g'+1')(?i:(a)){0}", "A", 0, 1);
-    n("(.(?=\\g<1>))", "", err=onig.ONIGERR_NEVER_ENDING_RECURSION)
-    n("(a)(?<n>b)\\g<1>\\g<n>", "abab", err=onig.ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED)
-    x2("(a)(?<n>b)(?1)(?&n)", "abab", 0, 4, syn=onig.ONIG_SYNTAX_PERL)
+    n("(.(?=\\g<1>))", "", err=onigmo.ONIGERR_NEVER_ENDING_RECURSION)
+    n("(a)(?<n>b)\\g<1>\\g<n>", "abab", err=onigmo.ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED)
+    x2("(a)(?<n>b)(?1)(?&n)", "abab", 0, 4, syn=onigmo.ONIG_SYNTAX_PERL)
 
     # character set modifiers
     x2("(?u)\\w+", "あa#", 0, 2);
@@ -1196,29 +1196,29 @@ def main():
         n("(?a)[[:upper:]]", "\u212a");
 
     # \< and \>
-    x2("\\<abc\\>", " abc ", 1, 4, syn=onig.ONIG_SYNTAX_GREP)
-    n("\\<abc\\>", "zabc ", syn=onig.ONIG_SYNTAX_GREP)
-    n("\\<abc\\>", " abcd", syn=onig.ONIG_SYNTAX_GREP)
-    n("\\<abc\\>", "あabcい", syn=onig.ONIG_SYNTAX_GREP)
-    x2("\\<abc\\>", "あabcい", 1, 4, syn=onig.ONIG_SYNTAX_GREP, opt=onig.ONIG_OPTION_ASCII_RANGE)
-    n("\\<abc\\>", "zabcい", syn=onig.ONIG_SYNTAX_GREP, opt=onig.ONIG_OPTION_ASCII_RANGE)
-    n("\\<abc\\>", "あabcd", syn=onig.ONIG_SYNTAX_GREP, opt=onig.ONIG_OPTION_ASCII_RANGE)
+    x2("\\<abc\\>", " abc ", 1, 4, syn=onigmo.ONIG_SYNTAX_GREP)
+    n("\\<abc\\>", "zabc ", syn=onigmo.ONIG_SYNTAX_GREP)
+    n("\\<abc\\>", " abcd", syn=onigmo.ONIG_SYNTAX_GREP)
+    n("\\<abc\\>", "あabcい", syn=onigmo.ONIG_SYNTAX_GREP)
+    x2("\\<abc\\>", "あabcい", 1, 4, syn=onigmo.ONIG_SYNTAX_GREP, opt=onigmo.ONIG_OPTION_ASCII_RANGE)
+    n("\\<abc\\>", "zabcい", syn=onigmo.ONIG_SYNTAX_GREP, opt=onigmo.ONIG_OPTION_ASCII_RANGE)
+    n("\\<abc\\>", "あabcd", syn=onigmo.ONIG_SYNTAX_GREP, opt=onigmo.ONIG_OPTION_ASCII_RANGE)
 
     # \g{} backref
-    x2("((?<name1>\\d)|(?<name2>\\w))(\\g{name1}|\\g{name2})", "ff", 0, 2, syn=onig.ONIG_SYNTAX_PERL);
-    x2("(?:(?<x>)|(?<x>efg))\\g{x}", "", 0, 0, syn=onig.ONIG_SYNTAX_PERL);
-    x2("(?:(?<x>abc)|(?<x>efg))\\g{x}", "abcefgefg", 3, 9, syn=onig.ONIG_SYNTAX_PERL);
-    n("(?:(?<x>abc)|(?<x>efg))\\g{x}", "abcefg", syn=onig.ONIG_SYNTAX_PERL);
-    x2("((.*)a\\g{2}f)", "bacbabf", 3, 7, syn=onig.ONIG_SYNTAX_PERL);
-    x2("(.*)a\\g{1}f", "baczzzzzz\nbazz\nzzzzbabf", 19, 23, syn=onig.ONIG_SYNTAX_PERL);
-    x2("((.*)a\\g{-1}f)", "bacbabf", 3, 7, syn=onig.ONIG_SYNTAX_PERL);
-    x2("(.*)a\\g{-1}f", "baczzzzzz\nbazz\nzzzzbabf", 19, 23, syn=onig.ONIG_SYNTAX_PERL);
-    x2("(あ*)(い*)\\g{-2}\\g{-1}", "あああいいあああいい", 0, 10, syn=onig.ONIG_SYNTAX_PERL);
+    x2("((?<name1>\\d)|(?<name2>\\w))(\\g{name1}|\\g{name2})", "ff", 0, 2, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("(?:(?<x>)|(?<x>efg))\\g{x}", "", 0, 0, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("(?:(?<x>abc)|(?<x>efg))\\g{x}", "abcefgefg", 3, 9, syn=onigmo.ONIG_SYNTAX_PERL);
+    n("(?:(?<x>abc)|(?<x>efg))\\g{x}", "abcefg", syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("((.*)a\\g{2}f)", "bacbabf", 3, 7, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("(.*)a\\g{1}f", "baczzzzzz\nbazz\nzzzzbabf", 19, 23, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("((.*)a\\g{-1}f)", "bacbabf", 3, 7, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("(.*)a\\g{-1}f", "baczzzzzz\nbazz\nzzzzbabf", 19, 23, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("(あ*)(い*)\\g{-2}\\g{-1}", "あああいいあああいい", 0, 10, syn=onigmo.ONIG_SYNTAX_PERL);
 
     # Python/PCRE compatible named group
-    x2("(?P<name_2>ab)(?P>name_2)", "abab", 0, 4, syn=onig.ONIG_SYNTAX_PERL);
-    x2("(?P<n>|\\((?P>n)\\))+$", "()(())", 0, 6, syn=onig.ONIG_SYNTAX_PERL);
-    x2("((?P<name1>\\d)|(?P<name2>\\w))((?P=name1)|(?P=name2))", "ff", 0, 2, syn=onig.ONIG_SYNTAX_PERL);
+    x2("(?P<name_2>ab)(?P>name_2)", "abab", 0, 4, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("(?P<n>|\\((?P>n)\\))+$", "()(())", 0, 6, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("((?P<name1>\\d)|(?P<name2>\\w))((?P=name1)|(?P=name2))", "ff", 0, 2, syn=onigmo.ONIG_SYNTAX_PERL);
 
     # Fullwidth Alphabet
     n("ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ", "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ");
@@ -1244,11 +1244,11 @@ def main():
     # multiple name definition
     x2("(?<a>a)(?<a>b)\\k<a>", "aba", 0, 3)
     x2("(?<a>a)(?<a>b)\\k<a>", "abb", 0, 3)
-    x2("(?<a>a)(?<a>b)\\g{a}", "aba", 0, 3, syn=onig.ONIG_SYNTAX_PERL)
-#    n("(?<a>a)(?<a>b)\\g{a}", "abb", syn=onig.ONIG_SYNTAX_PERL)
-    n("(?<a>a)(?<a>b)\\g<a>", "aba", err=onig.ONIGERR_MULTIPLEX_DEFINITION_NAME_CALL)
-    x2("(?<a>[ac])(?<a>b)(?&a)", "abc", 0, 3, syn=onig.ONIG_SYNTAX_PERL)
-    n("(?<a>[ac])(?<a>b)(?&a)", "abb", syn=onig.ONIG_SYNTAX_PERL)
+    x2("(?<a>a)(?<a>b)\\g{a}", "aba", 0, 3, syn=onigmo.ONIG_SYNTAX_PERL)
+#    n("(?<a>a)(?<a>b)\\g{a}", "abb", syn=onigmo.ONIG_SYNTAX_PERL)
+    n("(?<a>a)(?<a>b)\\g<a>", "aba", err=onigmo.ONIGERR_MULTIPLEX_DEFINITION_NAME_CALL)
+    x2("(?<a>[ac])(?<a>b)(?&a)", "abc", 0, 3, syn=onigmo.ONIG_SYNTAX_PERL)
+    n("(?<a>[ac])(?<a>b)(?&a)", "abb", syn=onigmo.ONIG_SYNTAX_PERL)
     x2("(?:(?<x>abc)|(?<x>efg))(?i:\\k<x>)", "abcefgEFG", 3, 9)
     x2("(?<x>a)(?<x>b)(?i:\\k<x>)+", "abAB", 0, 4)
 
@@ -1276,8 +1276,8 @@ def main():
     x2("((?<x>x)|(?<y>y))(?(<x>)y|x)", "yx", 0, 2)
     n("((?<x>x)|(?<y>y))(?(<x>)y|x)", "xx")
     n("((?<x>x)|(?<y>y))(?(<x>)y|x)", "yy")
-    n("(a)?(?<n>b)?(?(1)a)(?(<n>)b)", "aa", err=onig.ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED)
-    x2("(a)?(?<n>b)?(?(1)a)(?(<n>)b)", "aa", 0, 2, syn=onig.ONIG_SYNTAX_PERL)
+    n("(a)?(?<n>b)?(?(1)a)(?(<n>)b)", "aa", err=onigmo.ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED)
+    x2("(a)?(?<n>b)?(?(1)a)(?(<n>)b)", "aa", 0, 2, syn=onigmo.ONIG_SYNTAX_PERL)
 
     # Implicit-anchor optimization
     x2("(?m:.*abc)", "dddabdd\nddabc", 0, 13)   # optimized /(?m:.*abc)/ ==> /\A(?m:.*abc)/
@@ -1301,13 +1301,13 @@ def main():
     n("(?<!(?i:ab))cd", "ABcd")
 
     # Perl syntax
-    x2("\\Q()\\\\E", "()\\", 0, 3, syn=onig.ONIG_SYNTAX_PERL)
+    x2("\\Q()\\\\E", "()\\", 0, 3, syn=onigmo.ONIG_SYNTAX_PERL)
 
     print("\nEncoding:", encoding)
     print("RESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
-          nsucc, nfail, nerror, onig.onig_version()))
+          nsucc, nfail, nerror, onigmo.onig_version()))
 
-    onig.onig_end()
+    onigmo.onig_end()
 
     if (nfail == 0 and nerror == 0):
         exit(0)
