@@ -59,21 +59,21 @@ check_PROGRAMS = testc$(EXEEXT) testp$(EXEEXT) testcu$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(include_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/config.h.in $(srcdir)/onig-config.in \
+	$(srcdir)/config.h.in $(srcdir)/onigmo-config.in \
 	$(top_srcdir)/configure AUTHORS COPYING INSTALL compile \
 	config.guess config.sub depcomp install-sh ltmain.sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
 	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/configure.in
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = onig-config
+CONFIG_CLEAN_FILES = onigmo-config
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -105,8 +105,8 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libonig_la_LIBADD =
-am_libonig_la_OBJECTS = regerror.lo regparse.lo regext.lo regcomp.lo \
+libonigmo_la_LIBADD =
+am_libonigmo_la_OBJECTS = regerror.lo regparse.lo regext.lo regcomp.lo \
 	regexec.lo reggnu.lo regenc.lo regsyntax.lo regtrav.lo \
 	regversion.lo st.lo regposix.lo regposerr.lo unicode.lo \
 	ascii.lo utf_8.lo utf_16be.lo utf_16le.lo utf_32be.lo \
@@ -116,19 +116,19 @@ am_libonig_la_OBJECTS = regerror.lo regparse.lo regext.lo regcomp.lo \
 	iso_8859_9.lo iso_8859_10.lo iso_8859_11.lo iso_8859_13.lo \
 	iso_8859_14.lo iso_8859_15.lo iso_8859_16.lo euc_tw.lo \
 	euc_kr.lo big5.lo gb18030.lo koi8_r.lo windows_1251.lo
-libonig_la_OBJECTS = $(am_libonig_la_OBJECTS)
-libonig_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+libonigmo_la_OBJECTS = $(am_libonigmo_la_OBJECTS)
+libonigmo_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libonig_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(libonigmo_la_LDFLAGS) $(LDFLAGS) -o $@
 am_testc_OBJECTS = testc.$(OBJEXT)
 testc_OBJECTS = $(am_testc_OBJECTS)
-testc_DEPENDENCIES = libonig.la
+testc_DEPENDENCIES = libonigmo.la
 am_testcu_OBJECTS = testu.$(OBJEXT)
 testcu_OBJECTS = $(am_testcu_OBJECTS)
-testcu_DEPENDENCIES = libonig.la
+testcu_DEPENDENCIES = libonigmo.la
 am_testp_OBJECTS = testp-testc.$(OBJEXT)
 testp_OBJECTS = $(am_testp_OBJECTS)
-testp_DEPENDENCIES = libonig.la
+testp_DEPENDENCIES = libonigmo.la
 testp_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(testp_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
@@ -146,9 +146,9 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libonig_la_SOURCES) $(testc_SOURCES) $(testcu_SOURCES) \
+SOURCES = $(libonigmo_la_SOURCES) $(testc_SOURCES) $(testcu_SOURCES) \
 	$(testp_SOURCES)
-DIST_SOURCES = $(libonig_la_SOURCES) $(testc_SOURCES) \
+DIST_SOURCES = $(libonigmo_la_SOURCES) $(testc_SOURCES) \
 	$(testcu_SOURCES) $(testp_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -334,15 +334,15 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 encdir = $(top_srcdir)/enc
 sampledir = $(top_srcdir)/sample
-libname = libonig.la
+libname = libonigmo.la
 ACLOCAL_AMFLAGS = -I m4
 #AM_CFLAGS = -DNOT_RUBY
 AM_CFLAGS = 
 INCLUDES = -I$(top_srcdir) -I$(includedir)
 SUBDIRS = . sample
-include_HEADERS = oniguruma.h oniggnu.h onigposix.h
+include_HEADERS = onigmo.h onigmognu.h onigmoposix.h
 lib_LTLIBRARIES = $(libname)
-libonig_la_SOURCES = regint.h regparse.h regenc.h st.h \
+libonigmo_la_SOURCES = regint.h regparse.h regenc.h st.h \
 	regerror.c regparse.c regext.c regcomp.c regexec.c reggnu.c \
 	regenc.c regsyntax.c regtrav.c regversion.c st.c \
 	regposix.c regposerr.c \
@@ -363,23 +363,23 @@ libonig_la_SOURCES = regint.h regparse.h regenc.h st.h \
 	$(encdir)/euc_tw.c $(encdir)/euc_kr.c $(encdir)/big5.c \
 	$(encdir)/gb18030.c $(encdir)/koi8_r.c $(encdir)/windows_1251.c
 
-libonig_la_LDFLAGS = -version-info $(LTVERSION) -no-undefined
-EXTRA_DIST = .gitignore oniguruma.pc.in HISTORY README.ja index.html \
+libonigmo_la_LDFLAGS = -version-info $(LTVERSION) -no-undefined
+EXTRA_DIST = .gitignore onigmo.pc.in HISTORY README.ja index.html \
 	index_ja.html doc/API doc/API.ja doc/RE doc/RE.ja doc/FAQ doc/FAQ.ja \
 	doc/UnicodeProps.txt \
 	tool/.gitignore tool/case-folding.rb tool/convert-name2ctype.sh \
 	tool/convert-jis-props.sh \
 	tool/enc-unicode.rb tool/download-ucd.sh tool/update-doc.py \
 	win32/Makefile win32/Makefile.mingw win32/config.h win32/testc.c \
-	win32/makedef.py win32/onig.rc \
+	win32/makedef.py win32/onigmo.rc \
 	$(encdir)/koi8.c $(encdir)/mktable.c \
 	$(sampledir)/encode.c $(sampledir)/listcap.c $(sampledir)/names.c \
 	$(sampledir)/posix.c $(sampledir)/simple.c $(sampledir)/sql.c \
 	$(sampledir)/syntax.c $(sampledir)/crnl.c \
 	test.rb testconv.rb testconvu.rb \
-	onig.py testpy.py .editorconfig
+	onigmo.py testpy.py .editorconfig
 
-bin_SCRIPTS = onig-config
+bin_SCRIPTS = onigmo-config
 do_subst = sed                                          \
       -e 's,[@]datadir[@],$(datadir),g'                 \
       -e 's,[@]datarootdir[@],$(datarootdir),g'         \
@@ -390,14 +390,14 @@ do_subst = sed                                          \
       -e 's,[@]includedir[@],$(includedir),g'
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = oniguruma.pc
+pkgconfig_DATA = onigmo.pc
 testc_SOURCES = testc.c
-testc_LDADD = libonig.la
+testc_LDADD = libonigmo.la
 testp_SOURCES = testc.c
-testp_LDADD = libonig.la
+testp_LDADD = libonigmo.la
 testp_CFLAGS = -DPOSIX_TEST
 testcu_SOURCES = testu.c
-testcu_LDADD = libonig.la
+testcu_LDADD = libonigmo.la
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -452,7 +452,7 @@ $(srcdir)/config.h.in:  $(am__configure_deps)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-onig-config: $(top_builddir)/config.status $(srcdir)/onig-config.in
+onigmo-config: $(top_builddir)/config.status $(srcdir)/onigmo-config.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
@@ -486,8 +486,8 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libonig.la: $(libonig_la_OBJECTS) $(libonig_la_DEPENDENCIES) $(EXTRA_libonig_la_DEPENDENCIES) 
-	$(libonig_la_LINK) -rpath $(libdir) $(libonig_la_OBJECTS) $(libonig_la_LIBADD) $(LIBS)
+libonigmo.la: $(libonigmo_la_OBJECTS) $(libonigmo_la_DEPENDENCIES) $(EXTRA_libonigmo_la_DEPENDENCIES) 
+	$(libonigmo_la_LINK) -rpath $(libdir) $(libonigmo_la_OBJECTS) $(libonigmo_la_LIBADD) $(LIBS)
 
 clean-checkPROGRAMS:
 	@list='$(check_PROGRAMS)'; test -n "$$list" || exit 0; \
@@ -1455,15 +1455,15 @@ uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
 	uninstall-pkgconfigDATA
 
 
-onig-config: onig-config.in
+onigmo-config: onigmo-config.in
 
-oniguruma.pc: $(srcdir)/oniguruma.pc.in Makefile
-	$(do_subst) < $(srcdir)/oniguruma.pc.in > $(@)
+onigmo.pc: $(srcdir)/onigmo.pc.in Makefile
+	$(do_subst) < $(srcdir)/onigmo.pc.in > $(@)
 
 dll:
-	$(CXX) -shared -Wl,--output-def,libonig.def -o libonig.dll *.o \
+	$(CXX) -shared -Wl,--output-def,libonigmo.def -o libonigmo.dll *.o \
 	$(LIBS)
-	strip libonig.dll
+	strip libonigmo.dll
 
 # Ruby TEST
 rtest:
@@ -1474,11 +1474,11 @@ mktable: $(encdir)/mktable.c $(srcdir)/regenc.h
 	$(CC) -I$(top_srcdir) -o mktable $(encdir)/mktable.c
 
 atest: testc testp testcu
-	@echo "[Oniguruma API, ASCII/EUC-JP check]"
+	@echo "[Onigmo API, ASCII/EUC-JP check]"
 	@$(top_builddir)/testc  | grep RESULT
 	@echo "[POSIX API, ASCII/EUC-JP check]"
 	@$(top_builddir)/testp  | grep RESULT
-	@echo "[Oniguruma API, UTF-16 check]"
+	@echo "[Onigmo API, UTF-16 check]"
 	@$(top_builddir)/testcu | grep RESULT
 
 testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb

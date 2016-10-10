@@ -1,5 +1,5 @@
 #! /bin/sh
-## DO NOT EDIT - This file generated from /usr/src/ports/libtool/libtool-2.4.6-4.i686/src/libtool-2.4.6/build-aux/ltmain.in
+## DO NOT EDIT - This file generated from /usr/src/ports/libtool/libtool-2.4.6-4.x86_64/src/libtool-2.4.6/build-aux/ltmain.in
 ##               by inline-source v2014-01-03.01
 
 # libtool (GNU libtool) 2.4.6
