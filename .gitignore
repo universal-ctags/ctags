@@ -41,8 +41,8 @@
 /config.log
 /config.status
 /libtool
-/onig-config
-/oniguruma.pc
+/onigmo-config
+/onigmo.pc
 /Makefile
 /sample/Makefile
 /stamp-h1
