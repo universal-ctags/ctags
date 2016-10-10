@@ -113,6 +113,10 @@
 #include "config.h"
 #endif /* RUBY */
 
+#ifdef HAVE_STDARG_PROTOTYPES
+#include <stdarg.h>
+#endif
+
 /* */
 /* escape other system UChar definition */
 #ifdef ONIG_ESCAPE_UCHAR_COLLISION

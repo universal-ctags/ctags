@@ -30,8 +30,8 @@
 
 #include "regint.h"
 
-#ifndef ONIGGNU_H
-#include "oniggnu.h"
+#ifndef ONIGMOGNU_H
+#include "onigmognu.h"
 #endif
 
 extern void

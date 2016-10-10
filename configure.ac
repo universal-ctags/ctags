@@ -58,6 +58,7 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_SIZEOF(int, 4)
 AC_CHECK_SIZEOF(short, 2)
 AC_CHECK_SIZEOF(long, 4)
+AC_CHECK_SIZEOF([void*])
 AC_C_CONST
 AC_HEADER_TIME
 

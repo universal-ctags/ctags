@@ -155,7 +155,7 @@ new_size(st_index_t size)
     for (i=3; i<31; i++) {
 	if ((st_index_t)(1<<i) > size) return 1<<i;
     }
-#ifndef NOT_RUBY
+#ifdef RUBY
     rb_raise(rb_eRuntimeError, "st_table too big");
 #endif
     return -1;			/* should raise exception */

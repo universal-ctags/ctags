@@ -2,7 +2,7 @@
  * posix.c
  */
 #include <stdio.h>
-#include "onigposix.h"
+#include "onigmoposix.h"
 
 typedef unsigned char  UChar;
 
