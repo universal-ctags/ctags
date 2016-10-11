@@ -196,13 +196,13 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   the following cases only.
 
     pattern_enc: ASCII, ISO_8859_1
-    target_enc:  UTF16_BE, UTF16_LE, UTF32_BE, UTF32_LE
+    target_enc:  UTF_16BE, UTF_16LE, UTF_32BE, UTF_32LE
 
-    pattern_enc: UTF16_BE/LE
-    target_enc:  UTF16_LE/BE
+    pattern_enc: UTF_16BE/LE
+    target_enc:  UTF_16LE/BE
 
-    pattern_enc: UTF32_BE/LE
-    target_enc:  UTF32_LE/BE
+    pattern_enc: UTF_32BE/LE
+    target_enc:  UTF_32LE/BE
 
 
 # void onig_free(regex_t* reg)
