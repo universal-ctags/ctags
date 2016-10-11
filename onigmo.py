@@ -20,6 +20,11 @@ import sys
 #           "onig_region_new", "onig_region_free",
 #           "onig_version", "onig_copyright"]
 
+#
+# Onigmo API version
+# (Must be synchronized with LTVERSION in configure.ac.)
+#
+_onig_api_version = 6
 
 #
 # Type Definitions
@@ -75,6 +80,9 @@ class OnigEncodingType(ctypes.Structure):
         ("get_ctype_code_range",    ctypes.c_void_p),
         ("left_adjust_char_head",   ctypes.c_void_p),
         ("is_allowed_reverse_match",ctypes.c_void_p),
+        ("case_map",                ctypes.c_void_p),
+        ("ruby_encoding_index",     ctypes.c_void_p),
+        ("flags",                   ctypes.c_void_p),
     ]
 OnigEncoding = ctypes.POINTER(OnigEncodingType)
 
@@ -108,13 +116,31 @@ class OnigErrorInfo(ctypes.Structure):
 # load the DLL or the shared library
 
 if os.name in ("nt", "ce"):
+    # Win32
     _libname = "onigmo.dll"
+    try:
+        libonig = ctypes.cdll.LoadLibrary(_libname)
+    except OSError:
+        # Sometimes MinGW version has a prefix "lib".
+        _libname = "libonigmo.dll"
+        try:
+            libonig = ctypes.cdll.LoadLibrary(_libname)
+        except OSError:
+            # Sometimes MinGW version has the API version.
+            _libname = "libonigmo-%d.dll" % _onig_api_version
+            libonig = ctypes.cdll.LoadLibrary(_libname)
 elif sys.platform == "cygwin":
-    _libname = "libonigmo.dll"
+    # Cygwin
+    _libname = "cyg-onigmo-%d.dll" % _onig_api_version
+    libonig = ctypes.cdll.LoadLibrary(_libname)
+elif sys.platform == "msys":
+    # MSYS/MSYS2
+    _libname = "msys-onigmo-%d.dll" % _onig_api_version
+    libonig = ctypes.cdll.LoadLibrary(_libname)
 else:
+    # Unix
     _libname = "libonigmo.so"
-
-libonig = ctypes.cdll.LoadLibrary(_libname)
+    libonig = ctypes.cdll.LoadLibrary(_libname)
 
 #
 # Encodings
