@@ -138,36 +138,23 @@ ONIG_ENCODING_ISO_8859_13   = _load_encoding("OnigEncodingISO_8859_13")
 ONIG_ENCODING_ISO_8859_14   = _load_encoding("OnigEncodingISO_8859_14")
 ONIG_ENCODING_ISO_8859_15   = _load_encoding("OnigEncodingISO_8859_15")
 ONIG_ENCODING_ISO_8859_16   = _load_encoding("OnigEncodingISO_8859_16")
-try:
-    ONIG_ENCODING_UTF_8     = _load_encoding("OnigEncodingUTF_8")
-    ONIG_ENCODING_UTF_16LE  = _load_encoding("OnigEncodingUTF_16LE")
-    ONIG_ENCODING_UTF_16BE  = _load_encoding("OnigEncodingUTF_16BE")
-    ONIG_ENCODING_UTF_32LE  = _load_encoding("OnigEncodingUTF_32LE")
-    ONIG_ENCODING_UTF_32BE  = _load_encoding("OnigEncodingUTF_32BE")
-    ONIG_ENCODING_UTF8      = ONIG_ENCODING_UTF_8
-    ONIG_ENCODING_UTF16_LE  = ONIG_ENCODING_UTF_16LE
-    ONIG_ENCODING_UTF16_BE  = ONIG_ENCODING_UTF_16BE
-    ONIG_ENCODING_UTF32_LE  = ONIG_ENCODING_UTF_32LE
-    ONIG_ENCODING_UTF32_BE  = ONIG_ENCODING_UTF_32BE
-except ValueError:
-    ONIG_ENCODING_UTF8      = _load_encoding("OnigEncodingUTF8")
-    ONIG_ENCODING_UTF16_LE  = _load_encoding("OnigEncodingUTF16_LE")
-    ONIG_ENCODING_UTF16_BE  = _load_encoding("OnigEncodingUTF16_BE")
-    ONIG_ENCODING_UTF32_LE  = _load_encoding("OnigEncodingUTF32_LE")
-    ONIG_ENCODING_UTF32_BE  = _load_encoding("OnigEncodingUTF32_BE")
+ONIG_ENCODING_UTF_8         = _load_encoding("OnigEncodingUTF_8")
+ONIG_ENCODING_UTF_16LE      = _load_encoding("OnigEncodingUTF_16LE")
+ONIG_ENCODING_UTF_16BE      = _load_encoding("OnigEncodingUTF_16BE")
+ONIG_ENCODING_UTF_32LE      = _load_encoding("OnigEncodingUTF_32LE")
+ONIG_ENCODING_UTF_32BE      = _load_encoding("OnigEncodingUTF_32BE")
+ONIG_ENCODING_UTF8          = ONIG_ENCODING_UTF_8
+ONIG_ENCODING_UTF16_LE      = ONIG_ENCODING_UTF_16LE
+ONIG_ENCODING_UTF16_BE      = ONIG_ENCODING_UTF_16BE
+ONIG_ENCODING_UTF32_LE      = ONIG_ENCODING_UTF_32LE
+ONIG_ENCODING_UTF32_BE      = ONIG_ENCODING_UTF_32BE
 ONIG_ENCODING_EUC_JP        = _load_encoding("OnigEncodingEUC_JP")
 ONIG_ENCODING_EUC_TW        = _load_encoding("OnigEncodingEUC_TW")
 ONIG_ENCODING_EUC_KR        = _load_encoding("OnigEncodingEUC_KR")
 ONIG_ENCODING_EUC_CN        = _load_encoding("OnigEncodingEUC_CN")
-try:
-    ONIG_ENCODING_SHIFT_JIS = _load_encoding("OnigEncodingShift_JIS")
-    ONIG_ENCODING_SJIS      = ONIG_ENCODING_SHIFT_JIS
-except ValueError:
-    ONIG_ENCODING_SJIS      = _load_encoding("OnigEncodingSJIS")
-try:
-    ONIG_ENCODING_CP932     = _load_encoding("OnigEncodingCP932")
-except ValueError:
-    pass
+ONIG_ENCODING_SHIFT_JIS     = _load_encoding("OnigEncodingShift_JIS")
+ONIG_ENCODING_SJIS          = ONIG_ENCODING_SHIFT_JIS
+ONIG_ENCODING_CP932         = _load_encoding("OnigEncodingCP932")
 #ONIG_ENCODING_KOI8         = _load_encoding("OnigEncodingKOI8")
 ONIG_ENCODING_KOI8_R        = _load_encoding("OnigEncodingKOI8_R")
 ONIG_ENCODING_CP1251        = _load_encoding("OnigEncodingCP1251")
@@ -191,20 +178,10 @@ ONIG_SYNTAX_GREP            = _load_syntax("OnigSyntaxGrep")
 ONIG_SYNTAX_GNU_REGEX       = _load_syntax("OnigSyntaxGnuRegex")
 ONIG_SYNTAX_JAVA            = _load_syntax("OnigSyntaxJava")
 ONIG_SYNTAX_PERL            = _load_syntax("OnigSyntaxPerl")
-try:
-    ONIG_SYNTAX_PERL58      = _load_syntax("OnigSyntaxPerl58")
-    ONIG_SYNTAX_PERL58_NG   = _load_syntax("OnigSyntaxPerl58_NG")
-except ValueError:
-    pass
-try:
-    ONIG_SYNTAX_PERL_NG     = _load_syntax("OnigSyntaxPerl_NG")
-except ValueError:
-    pass
+ONIG_SYNTAX_PERL58          = _load_syntax("OnigSyntaxPerl58")
+ONIG_SYNTAX_PERL58_NG       = _load_syntax("OnigSyntaxPerl58_NG")
 ONIG_SYNTAX_RUBY            = _load_syntax("OnigSyntaxRuby")
-try:
-    ONIG_SYNTAX_PYTHON      = _load_syntax("OnigSyntaxPython")
-except ValueError:
-    pass
+ONIG_SYNTAX_PYTHON          = _load_syntax("OnigSyntaxPython")
 
 ONIG_SYNTAX_DEFAULT         = ctypes.POINTER(OnigSyntaxType).in_dll(
                                     libonig, "OnigDefaultSyntax")
