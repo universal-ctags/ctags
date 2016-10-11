@@ -49,7 +49,7 @@
 static inline int
 rb_enc_asciicompat(OnigEncoding enc)
 {
-    return ONIGENC_MBC_MINLEN(enc)==1 && !((enc)->ruby_encoding_index & ENC_DUMMY_FLAG);
+  return ONIGENC_MBC_MINLEN(enc)==1 && !((enc)->ruby_encoding_index & ENC_DUMMY_FLAG);
 }
 # undef ONIGENC_IS_MBC_ASCII_WORD
 # define ONIGENC_IS_MBC_ASCII_WORD(enc,s,end) \
@@ -111,7 +111,7 @@ history_tree_clear(OnigCaptureTreeNode* node)
   if (IS_NOT_NULL(node)) {
     for (i = 0; i < node->num_childs; i++) {
       if (IS_NOT_NULL(node->childs[i])) {
-        history_tree_free(node->childs[i]);
+	history_tree_free(node->childs[i]);
       }
     }
     for (i = 0; i < node->allocated; i++) {
@@ -170,15 +170,15 @@ history_tree_add_child(OnigCaptureTreeNode* parent, OnigCaptureTreeNode* child)
     if (IS_NULL(parent->childs)) {
       n = HISTORY_TREE_INIT_ALLOC_SIZE;
       parent->childs =
-        (OnigCaptureTreeNode** )xmalloc(sizeof(OnigCaptureTreeNode*) * n);
+	(OnigCaptureTreeNode** )xmalloc(sizeof(OnigCaptureTreeNode*) * n);
       CHECK_NULL_RETURN_MEMERR(parent->childs);
     }
     else {
       OnigCaptureTreeNode** tmp;
       n = parent->allocated * 2;
       tmp =
-        (OnigCaptureTreeNode** )xrealloc(parent->childs,
-                                         sizeof(OnigCaptureTreeNode*) * n);
+	(OnigCaptureTreeNode** )xrealloc(parent->childs,
+					 sizeof(OnigCaptureTreeNode*) * n);
       if (tmp == 0) {
 	history_tree_clear(parent);
 	return ONIGERR_MEMORY;
@@ -554,9 +554,9 @@ stack_double(OnigStackType** arg_stk_base, OnigStackType** arg_stk_end,
     n *= 2;
     if (limit_size != 0 && n > limit_size) {
       if ((unsigned int )(stk_end - stk_base) == limit_size)
-        return ONIGERR_MATCH_STACK_LIMIT_OVER;
+	return ONIGERR_MATCH_STACK_LIMIT_OVER;
       else
-        n = limit_size;
+	n = limit_size;
     }
     x = (OnigStackType* )xrealloc(stk_base, sizeof(OnigStackType) * n);
     if (IS_NULL(x)) {
@@ -1156,29 +1156,29 @@ make_capture_history_tree(OnigCaptureTreeNode* node, OnigStackType** kp,
     if (k->type == STK_MEM_START) {
       n = k->u.mem.num;
       if (n <= ONIG_MAX_CAPTURE_HISTORY_GROUP &&
-          BIT_STATUS_AT(reg->capture_history, n) != 0) {
-        child = history_node_new();
-        CHECK_NULL_RETURN_MEMERR(child);
-        child->group = n;
-        child->beg = k->u.mem.pstr - str;
-        r = history_tree_add_child(node, child);
-        if (r != 0) {
-          history_tree_free(child);
-          return r;
-        }
-        *kp = (k + 1);
-        r = make_capture_history_tree(child, kp, stk_top, str, reg);
-        if (r != 0) return r;
+	  BIT_STATUS_AT(reg->capture_history, n) != 0) {
+	child = history_node_new();
+	CHECK_NULL_RETURN_MEMERR(child);
+	child->group = n;
+	child->beg = k->u.mem.pstr - str;
+	r = history_tree_add_child(node, child);
+	if (r != 0) {
+	  history_tree_free(child);
+	  return r;
+	}
+	*kp = (k + 1);
+	r = make_capture_history_tree(child, kp, stk_top, str, reg);
+	if (r != 0) return r;
 
-        k = *kp;
-        child->end = k->u.mem.pstr - str;
+	k = *kp;
+	child->end = k->u.mem.pstr - str;
       }
     }
     else if (k->type == STK_MEM_END) {
       if (k->u.mem.num == node->group) {
-        node->end = k->u.mem.pstr - str;
-        *kp = k;
-        return 0;
+	node->end = k->u.mem.pstr - str;
+	*kp = k;
+	return 0;
       }
     }
     k++;
@@ -1596,11 +1596,11 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 		      mem_end_stk[1]..mem_end_stk[num_mem] */
 #endif /* USE_SUBEXP_CALL */
   {
-      OnigStackIndex *pp = mem_start_stk;
-      for (; pp < (repeat_stk + n); pp+=2) {
-	  pp[0] = INVALID_STACK_INDEX;
-	  pp[1] = INVALID_STACK_INDEX;
-      }
+    OnigStackIndex *pp = mem_start_stk;
+    for (; pp < (repeat_stk + n); pp+=2) {
+      pp[0] = INVALID_STACK_INDEX;
+      pp[1] = INVALID_STACK_INDEX;
+    }
   }
 
 #ifdef ONIG_DEBUG_MATCH
@@ -1658,7 +1658,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  }
 	  else
 	    goto end_best_len;
-        }
+	}
 #endif
 	best_len = n;
 	region = msa->region;
@@ -1685,8 +1685,9 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	      }
 	    }
 	  }
-	  else {
+	  else
 #endif /* USE_POSIX_API_REGION_OPTION */
+	  {
 	    region->beg[0] = ((pkeep > s) ? s : pkeep) - str;
 	    region->end[0] = s - str;
 	    for (i = 1; i <= num_mem; i++) {
@@ -1707,34 +1708,32 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
 #ifdef USE_CAPTURE_HISTORY
 	    if (reg->capture_history != 0) {
-              int r;
-              OnigCaptureTreeNode* node;
+	      int r;
+	      OnigCaptureTreeNode* node;
 
-              if (IS_NULL(region->history_root)) {
-                region->history_root = node = history_node_new();
-                CHECK_NULL_RETURN_MEMERR(node);
-              }
-              else {
-                node = region->history_root;
-                history_tree_clear(node);
-              }
+	      if (IS_NULL(region->history_root)) {
+		region->history_root = node = history_node_new();
+		CHECK_NULL_RETURN_MEMERR(node);
+	      }
+	      else {
+		node = region->history_root;
+		history_tree_clear(node);
+	      }
 
-              node->group = 0;
-              node->beg   = ((pkeep > s) ? s : pkeep) - str;
-              node->end   = s - str;
+	      node->group = 0;
+	      node->beg   = ((pkeep > s) ? s : pkeep) - str;
+	      node->end   = s - str;
 
-              stkp = stk_base;
-              r = make_capture_history_tree(region->history_root, &stkp,
-                                            stk, (UChar* )str, reg);
-              if (r < 0) {
-                best_len = r; /* error code */
-                goto finish;
-              }
+	      stkp = stk_base;
+	      r = make_capture_history_tree(region->history_root, &stkp,
+		  stk, (UChar* )str, reg);
+	      if (r < 0) {
+		best_len = r; /* error code */
+		goto finish;
+	      }
 	    }
 #endif /* USE_CAPTURE_HISTORY */
-#ifdef USE_POSIX_API_REGION_OPTION
 	  } /* else IS_POSIX_REGION() */
-#endif
 	} /* if (region) */
       } /* n > best_len */
 
@@ -1783,8 +1782,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	q = lowbuf;
 	while (len-- > 0) {
 	  if (*p != *q) {
-            goto fail;
-          }
+	    goto fail;
+	  }
 	  p++; q++;
 	}
       }
@@ -2042,7 +2041,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	int mb_len = enclen(encode, s, end);
 
 	if (! DATA_ENSURE_CHECK(mb_len)) {
-          DATA_ENSURE(1);
+	  DATA_ENSURE(1);
 	  s = (UChar* )end;
 	  p += tlen;
 	  goto cc_mb_not_success;
@@ -2087,12 +2086,12 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     CASE(OP_CCLASS_NODE)  MOP_IN(OP_CCLASS_NODE);
       {
 	OnigCodePoint code;
-        void *node;
-        int mb_len;
-        UChar *ss;
+	void *node;
+	int mb_len;
+	UChar *ss;
 
-        DATA_ENSURE(1);
-        GET_POINTER_INC(node, p);
+	DATA_ENSURE(1);
+	GET_POINTER_INC(node, p);
 	mb_len = enclen(encode, s, end);
 	ss = s;
 	s += mb_len;
@@ -2124,10 +2123,10 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       while (DATA_ENSURE_CHECK1) {
 	STACK_PUSH_ALT(p, s, sprev, pkeep);
 	n = enclen(encode, s, end);
-        DATA_ENSURE(n);
-        if (ONIGENC_IS_MBC_NEWLINE_EX(encode, s, str, end, option, 0))  goto fail;
-        sprev = s;
-        s += n;
+	DATA_ENSURE(n);
+	if (ONIGENC_IS_MBC_NEWLINE_EX(encode, s, str, end, option, 0))  goto fail;
+	sprev = s;
+	s += n;
       }
       MOP_OUT;
       NEXT;
@@ -2155,10 +2154,10 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	  STACK_PUSH_ALT(p + 1, s, sprev, pkeep);
 	}
 	n = enclen(encode, s, end);
-        DATA_ENSURE(n);
-        if (ONIGENC_IS_MBC_NEWLINE_EX(encode, s, str, end, option, 0))  goto fail;
-        sprev = s;
-        s += n;
+	DATA_ENSURE(n);
+	if (ONIGENC_IS_MBC_NEWLINE_EX(encode, s, str, end, option, 0))  goto fail;
+	sprev = s;
+	s += n;
       }
       p++;
       MOP_OUT;
@@ -2193,10 +2192,10 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
 	STACK_PUSH_ALT_WITH_STATE_CHECK(p, s, sprev, mem, pkeep);
 	n = enclen(encode, s, end);
-        DATA_ENSURE(n);
-        if (ONIGENC_IS_MBC_NEWLINE_EX(encode, s, str, end, option, 0))  goto fail;
-        sprev = s;
-        s += n;
+	DATA_ENSURE(n);
+	if (ONIGENC_IS_MBC_NEWLINE_EX(encode, s, str, end, option, 0))  goto fail;
+	sprev = s;
+	s += n;
       }
       MOP_OUT;
       NEXT;
@@ -2921,14 +2920,14 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     repeat_inc:
       stkp->u.repeat.count++;
       if (stkp->u.repeat.count >= reg->repeat_range[mem].upper) {
-        /* end of repeat. Nothing to do. */
+	/* end of repeat. Nothing to do. */
       }
       else if (stkp->u.repeat.count >= reg->repeat_range[mem].lower) {
-        STACK_PUSH_ALT(p, s, sprev, pkeep);
-        p = STACK_AT(si)->u.repeat.pcode; /* Don't use stkp after PUSH. */
+	STACK_PUSH_ALT(p, s, sprev, pkeep);
+	p = STACK_AT(si)->u.repeat.pcode; /* Don't use stkp after PUSH. */
       }
       else {
-        p = stkp->u.repeat.pcode;
+	p = stkp->u.repeat.pcode;
       }
       STACK_PUSH_REPEAT_INC(si);
       MOP_OUT;
@@ -2950,19 +2949,19 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     repeat_inc_ng:
       stkp->u.repeat.count++;
       if (stkp->u.repeat.count < reg->repeat_range[mem].upper) {
-        if (stkp->u.repeat.count >= reg->repeat_range[mem].lower) {
-          UChar* pcode = stkp->u.repeat.pcode;
+	if (stkp->u.repeat.count >= reg->repeat_range[mem].lower) {
+	  UChar* pcode = stkp->u.repeat.pcode;
 
-          STACK_PUSH_REPEAT_INC(si);
-          STACK_PUSH_ALT(pcode, s, sprev, pkeep);
-        }
-        else {
-          p = stkp->u.repeat.pcode;
-          STACK_PUSH_REPEAT_INC(si);
-        }
+	  STACK_PUSH_REPEAT_INC(si);
+	  STACK_PUSH_ALT(pcode, s, sprev, pkeep);
+	}
+	else {
+	  p = stkp->u.repeat.pcode;
+	  STACK_PUSH_REPEAT_INC(si);
+	}
       }
       else if (stkp->u.repeat.count == reg->repeat_range[mem].upper) {
-        STACK_PUSH_REPEAT_INC(si);
+	STACK_PUSH_REPEAT_INC(si);
       }
       MOP_OUT;
       CHECK_INTERRUPT_IN_MATCH_AT;
@@ -3073,9 +3072,9 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
     CASE(OP_FAIL)
       if (0) {
-        /* fall */
+	/* fall */
       fail:
-        MOP_OUT;
+	MOP_OUT;
       }
       MOP_IN(OP_FAIL);
       STACK_POP;
@@ -3086,8 +3085,8 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
       if (stk->u.state.state_check != 0) {
-        stk->type = STK_STATE_CHECK_MARK;
-        stk++;
+	stk->type = STK_STATE_CHECK_MARK;
+	stk++;
       }
 #endif
 
@@ -3164,7 +3163,7 @@ slow_search(OnigEncoding enc, UChar* target, UChar* target_end,
 
 static int
 str_lower_case_match(OnigEncoding enc, int case_fold_flag,
-                     const UChar* t, const UChar* tend,
+		     const UChar* t, const UChar* tend,
 		     const UChar* p, const UChar* end)
 {
   int lowlen;
@@ -3256,7 +3255,7 @@ slow_search_backward_ic(OnigEncoding enc, int case_fold_flag,
 
   while (s >= text) {
     if (str_lower_case_match(enc, case_fold_flag,
-                             target, target_end, s, text_end))
+			     target, target_end, s, text_end))
       return s;
 
     s = (UChar* )onigenc_get_prev_char_head(enc, adjust_text, s, text_end);
@@ -3300,7 +3299,7 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
       skip = reg->map[*se];
       t = s;
       do {
-        s += enclen(reg->enc, s, end);
+	s += enclen(reg->enc, s, end);
       } while ((s - t) < skip && s < end);
     }
   }
@@ -3315,7 +3314,7 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
       skip = reg->int_map[*se];
       t = s;
       do {
-        s += enclen(reg->enc, s, end);
+	s += enclen(reg->enc, s, end);
       } while ((s - t) < skip && s < end);
     }
   }
@@ -3405,7 +3404,7 @@ bm_search_notrev_ic(regex_t* reg, const UChar* target, const UChar* target_end,
       skip = reg->map[*se];
       t = s;
       do {
-        s += enclen(reg->enc, s, end);
+	s += enclen(reg->enc, s, end);
       } while ((s - t) < skip && s < end);
     }
   }
@@ -3418,7 +3417,7 @@ bm_search_notrev_ic(regex_t* reg, const UChar* target, const UChar* target_end,
       skip = reg->int_map[*se];
       t = s;
       do {
-        s += enclen(reg->enc, s, end);
+	s += enclen(reg->enc, s, end);
       } while ((s - t) < skip && s < end);
     }
   }
@@ -3506,7 +3505,7 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
       skip = reg->map[se[1]];
       t = s;
       do {
-        s += enclen(enc, s, end);
+	s += enclen(enc, s, end);
       } while ((s - t) < skip && s < end);
     }
   }
@@ -3522,7 +3521,7 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
       skip = reg->int_map[se[1]];
       t = s;
       do {
-        s += enclen(enc, s, end);
+	s += enclen(enc, s, end);
       } while ((s - t) < skip && s < end);
     }
   }
@@ -3608,7 +3607,7 @@ bm_search_notrev_ic(regex_t* reg, const UChar* target, const UChar* target_end,
       skip = reg->map[se[1]];
       t = s;
       do {
-        s += enclen(enc, s, end);
+	s += enclen(enc, s, end);
       } while ((s - t) < skip && s < end);
     }
   }
@@ -3622,7 +3621,7 @@ bm_search_notrev_ic(regex_t* reg, const UChar* target, const UChar* target_end,
       skip = reg->int_map[se[1]];
       t = s;
       do {
-        s += enclen(enc, s, end);
+	s += enclen(enc, s, end);
       } while ((s - t) < skip && s < end);
     }
   }
@@ -3850,7 +3849,7 @@ forward_search_range(regex_t* reg, const UChar* str, const UChar* end, UChar* s,
     break;
   case ONIG_OPTIMIZE_EXACT_IC:
     p = slow_search_ic(reg->enc, reg->case_fold_flag,
-                       reg->exact, reg->exact_end, p, end, range);
+		       reg->exact, reg->exact_end, p, end, range);
     break;
 
   case ONIG_OPTIMIZE_EXACT_BM:
@@ -3976,8 +3975,8 @@ backward_search_range(regex_t* reg, const UChar* str, const UChar* end,
   case ONIG_OPTIMIZE_EXACT_BM_IC:
   case ONIG_OPTIMIZE_EXACT_BM_NOT_REV_IC:
     p = slow_search_backward_ic(reg->enc, reg->case_fold_flag,
-                                reg->exact, reg->exact_end,
-                                range, adjrange, end, p);
+				reg->exact, reg->exact_end,
+				range, adjrange, end, p);
     break;
 
   case ONIG_OPTIMIZE_EXACT_BM:
@@ -4312,7 +4311,7 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
       }
 
       if ((end - start) < reg->threshold_len)
-        goto mismatch;
+	goto mismatch;
 
       if (reg->dmax != ONIG_INFINITE_DISTANCE) {
 	do {
@@ -4334,24 +4333,24 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 	if (! forward_search_range(reg, str, end, s, sch_range,
 				   &low, &high, (UChar** )NULL)) goto mismatch;
 
-        if ((reg->anchor & ANCHOR_ANYCHAR_STAR) != 0) {
-          do {
-            if ((reg->anchor & ANCHOR_BEGIN_POSITION) == 0)
-              msa.gpos = s;     /* move \G position */
-            MATCH_AND_RETURN_CHECK(orig_range);
-            prev = s;
-            s += enclen(reg->enc, s, end);
+	if ((reg->anchor & ANCHOR_ANYCHAR_STAR) != 0) {
+	  do {
+	    if ((reg->anchor & ANCHOR_BEGIN_POSITION) == 0)
+	      msa.gpos = s;     /* move \G position */
+	    MATCH_AND_RETURN_CHECK(orig_range);
+	    prev = s;
+	    s += enclen(reg->enc, s, end);
 
-            if ((reg->anchor & (ANCHOR_LOOK_BEHIND | ANCHOR_PREC_READ_NOT)) == 0) {
-              while (!ONIGENC_IS_MBC_NEWLINE_EX(reg->enc, prev, str, end, reg->options, 0)
-                     && s < range) {
-                prev = s;
-                s += enclen(reg->enc, s, end);
-              }
-            }
-          } while (s < range);
-          goto mismatch;
-        }
+	    if ((reg->anchor & (ANCHOR_LOOK_BEHIND | ANCHOR_PREC_READ_NOT)) == 0) {
+	      while (!ONIGENC_IS_MBC_NEWLINE_EX(reg->enc, prev, str, end, reg->options, 0)
+		  && s < range) {
+		prev = s;
+		s += enclen(reg->enc, s, end);
+	      }
+	    }
+	  } while (s < range);
+	  goto mismatch;
+	}
       }
     }
 
