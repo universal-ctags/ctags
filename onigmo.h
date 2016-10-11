@@ -57,7 +57,7 @@ extern "C" {
 # endif
 #endif
 
-#ifdef HAVE_STDARG_H
+#if defined(HAVE_STDARG_H) || defined(_WIN32)
 # ifndef  HAVE_STDARG_PROTOTYPES
 #  define HAVE_STDARG_PROTOTYPES 1
 # endif
