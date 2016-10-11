@@ -1138,6 +1138,10 @@ def main():
     n("(.(?=\\g<1>))", "", err=onigmo.ONIGERR_NEVER_ENDING_RECURSION)
     n("(a)(?<n>b)\\g<1>\\g<n>", "abab", err=onigmo.ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED)
     x2("(a)(?<n>b)(?1)(?&n)", "abab", 0, 4, syn=onigmo.ONIG_SYNTAX_PERL)
+    x2("((?<v>)a)|b\\g<0>b", "bbabb", 0, 5)
+    x2("((?<v>)a)|b(?0)b", "bbabb", 0, 5, syn=onigmo.ONIG_SYNTAX_PERL)
+    x2("((?<v>)a|b(?1)b)", "bbabb", 0, 5, syn=onigmo.ONIG_SYNTAX_PERL)
+    x2("((?<v>a|b(?&v)b))", "bbabb", 0, 5, syn=onigmo.ONIG_SYNTAX_PERL)
 
     # character set modifiers
     x2("(?u)\\w+", "あa#", 0, 2);
