@@ -563,9 +563,9 @@ OnigEncodingDefine(shift_jis, Shift_JIS) = {
   get_ctype_code_range,
   left_adjust_char_head,
   is_allowed_reverse_match,
+  onigenc_ascii_only_case_map,
   0,
   ONIGENC_FLAG_NONE,
-  onigenc_ascii_only_case_map,
 };
 /*
  * Name: Shift_JIS

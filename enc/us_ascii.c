@@ -32,9 +32,9 @@ OnigEncodingDefine(us_ascii, US_ASCII) = {
   onigenc_not_support_get_ctype_code_range,
   onigenc_single_byte_left_adjust_char_head,
   onigenc_always_true_is_allowed_reverse_match,
+  onigenc_single_byte_ascii_only_case_map,
   ENCINDEX_US_ASCII,
   ONIGENC_FLAG_NONE,
-  onigenc_single_byte_ascii_only_case_map,
 };
 ENC_ALIAS("ASCII", "US-ASCII")
 ENC_ALIAS("ANSI_X3.4-1968", "US-ASCII")

@@ -188,9 +188,9 @@ OnigEncodingDefine(euc_kr, EUC_KR) = {
   onigenc_not_support_get_ctype_code_range,
   euckr_left_adjust_char_head,
   euckr_is_allowed_reverse_match,
+  onigenc_ascii_only_case_map,
   0,
   ONIGENC_FLAG_NONE,
-  onigenc_ascii_only_case_map,
 };
 ENC_ALIAS("eucKR", "EUC-KR")
 
@@ -213,6 +213,7 @@ OnigEncodingDefine(euc_cn, EUC_CN) = {
   onigenc_not_support_get_ctype_code_range,
   euckr_left_adjust_char_head,
   euckr_is_allowed_reverse_match,
+  onigenc_ascii_only_case_map,
   0,
   ONIGENC_FLAG_NONE,
 };

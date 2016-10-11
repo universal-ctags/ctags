@@ -296,9 +296,8 @@ OnigEncodingDefine(windows_1257, Windows_1257) = {
   onigenc_not_support_get_ctype_code_range,
   onigenc_single_byte_left_adjust_char_head,
   onigenc_always_true_is_allowed_reverse_match,
+  case_map,
   0,
   ONIGENC_FLAG_NONE,
-  case_map,
 };
-
 ENC_ALIAS("CP1257", "Windows-1257")

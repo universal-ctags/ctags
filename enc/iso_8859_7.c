@@ -277,8 +277,8 @@ OnigEncodingDefine(iso_8859_7, ISO_8859_7) = {
   onigenc_not_support_get_ctype_code_range,
   onigenc_single_byte_left_adjust_char_head,
   onigenc_always_true_is_allowed_reverse_match,
+  case_map,
   0,
   ONIGENC_FLAG_NONE,
-  case_map,
 };
 ENC_ALIAS("ISO8859-7", "ISO-8859-7")

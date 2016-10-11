@@ -431,9 +431,9 @@ OnigEncodingDefine(utf_8, UTF_8) = {
   get_ctype_code_range,
   left_adjust_char_head,
   onigenc_always_true_is_allowed_reverse_match,
+  onigenc_unicode_case_map,
   ENCINDEX_UTF_8,
   ONIGENC_FLAG_UNICODE,
-  onigenc_unicode_case_map,
 };
 ENC_ALIAS("CP65001", "UTF-8")
 
@@ -447,4 +447,3 @@ ENC_ALIAS("CP65001", "UTF-8")
 ENC_REPLICATE("UTF8-MAC", "UTF-8")
 ENC_ALIAS("UTF-8-MAC", "UTF8-MAC")
 ENC_ALIAS("UTF-8-HFS", "UTF8-MAC") /* Emacs 23.2 */
-
