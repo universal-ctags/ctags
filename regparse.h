@@ -359,9 +359,9 @@ extern int    onig_parse_make_tree P_((Node** root, const UChar* pattern, const 
 extern int    onig_free_shared_cclass_table P_((void));
 
 #ifdef ONIG_DEBUG
-#ifdef USE_NAMED_GROUP
+# ifdef USE_NAMED_GROUP
 extern int onig_print_names(FILE*, regex_t*);
-#endif
+# endif
 #endif
 
 RUBY_SYMBOL_EXPORT_END

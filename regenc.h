@@ -31,27 +31,27 @@
  */
 
 #ifdef RUBY
-#ifndef ONIGMO_REGINT_H
-#ifndef RUBY_EXTERN
-#include "ruby/config.h"
-#include "ruby/defines.h"
-#endif
-#endif
+# ifndef ONIGMO_REGINT_H
+#  ifndef RUBY_EXTERN
+#   include "ruby/config.h"
+#   include "ruby/defines.h"
+#  endif
+# endif
 #else /* RUBY */
-#ifndef PACKAGE
+# ifndef PACKAGE
 /* PACKAGE is defined in config.h */
-#include "config.h"
-#endif
+#  include "config.h"
+# endif
 #endif /* RUBY */
 
 #ifdef ONIG_ESCAPE_UCHAR_COLLISION
-#undef ONIG_ESCAPE_UCHAR_COLLISION
+# undef ONIG_ESCAPE_UCHAR_COLLISION
 #endif
 
 #ifdef RUBY
-#include "ruby/onigmo.h"
+# include "ruby/onigmo.h"
 #else
-#include "onigmo.h"
+# include "onigmo.h"
 #endif
 
 RUBY_SYMBOL_EXPORT_BEGIN
@@ -63,23 +63,23 @@ typedef struct {
 
 
 #ifndef NULL
-#define NULL   ((void* )0)
+# define NULL   ((void* )0)
 #endif
 
 #ifndef TRUE
-#define TRUE    1
+# define TRUE    1
 #endif
 
 #ifndef FALSE
-#define FALSE   0
+# define FALSE   0
 #endif
 
 #ifndef ARG_UNUSED
-#if defined(__GNUC__)
+# if defined(__GNUC__)
 #  define ARG_UNUSED  __attribute__ ((unused))
-#else
+# else
 #  define ARG_UNUSED
-#endif
+# endif
 #endif
 
 #define ONIG_IS_NULL(p)                    (((void*)(p)) == (void*)0)
@@ -122,7 +122,7 @@ typedef struct {
   {(short int )(sizeof(name) - 1), (name), (ctype)}
 
 #ifndef numberof
-#define numberof(array) (int )(sizeof(array) / sizeof((array)[0]))
+# define numberof(array) (int )(sizeof(array) / sizeof((array)[0]))
 #endif
 
 
@@ -223,9 +223,9 @@ ONIG_EXTERN const unsigned short OnigEncAsciiCtypeTable[];
 
 #ifdef ONIG_ENC_REGISTER
 extern int ONIG_ENC_REGISTER(const char *, OnigEncoding);
-#define OnigEncodingName(n) encoding_##n
-#define OnigEncodingDeclare(n) static const OnigEncodingType OnigEncodingName(n)
-#define OnigEncodingDefine(f,n)			     \
+# define OnigEncodingName(n) encoding_##n
+# define OnigEncodingDeclare(n) static const OnigEncodingType OnigEncodingName(n)
+# define OnigEncodingDefine(f,n)			     \
     OnigEncodingDeclare(n);			     \
     void Init_##f(void) {			     \
 	ONIG_ENC_REGISTER(OnigEncodingName(n).name,  \
@@ -233,9 +233,9 @@ extern int ONIG_ENC_REGISTER(const char *, OnigEncoding);
     }						     \
     OnigEncodingDeclare(n)
 #else
-#define OnigEncodingName(n) OnigEncoding##n
-#define OnigEncodingDeclare(n) const OnigEncodingType OnigEncodingName(n)
-#define OnigEncodingDefine(f,n) OnigEncodingDeclare(n)
+# define OnigEncodingName(n) OnigEncoding##n
+# define OnigEncodingDeclare(n) const OnigEncodingType OnigEncodingName(n)
+# define OnigEncodingDefine(f,n) OnigEncodingDeclare(n)
 #endif
 
 /* macros for define replica encoding and encoding alias */

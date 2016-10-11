@@ -266,9 +266,9 @@ strdup_with_null(OnigEncoding enc, UChar* s, UChar* end)
 
 #ifdef __GNUC__
 /* get rid of Wunused-but-set-variable and Wuninitialized */
-#define PFETCH_READY  UChar* pfetch_prev = NULL; (void)pfetch_prev
+# define PFETCH_READY  UChar* pfetch_prev = NULL; (void)pfetch_prev
 #else
-#define PFETCH_READY  UChar* pfetch_prev
+# define PFETCH_READY  UChar* pfetch_prev
 #endif
 #define PEND         (p < end ?  0 : 1)
 #define PUNFETCH     p = pfetch_prev
@@ -326,11 +326,11 @@ strcat_capa_from_static(UChar* dest, UChar* dest_end,
 
 #ifdef USE_ST_LIBRARY
 
-#ifdef RUBY
-#include "ruby/st.h"
-#else
-#include "st.h"
-#endif
+# ifdef RUBY
+#  include "ruby/st.h"
+# else
+#  include "st.h"
+# endif
 
 typedef struct {
   const UChar* s;
@@ -422,7 +422,7 @@ onig_st_insert_strend(hash_table_type* table, const UChar* str_key,
 
 #ifdef USE_NAMED_GROUP
 
-#define INIT_NAME_BACKREFS_ALLOC_NUM   8
+# define INIT_NAME_BACKREFS_ALLOC_NUM   8
 
 typedef struct {
   UChar* name;
@@ -433,12 +433,12 @@ typedef struct {
   int*   back_refs;
 } NameEntry;
 
-#ifdef USE_ST_LIBRARY
+# ifdef USE_ST_LIBRARY
 
 typedef st_table  NameTable;
 typedef st_data_t HashDataType;   /* 1.6 st.h doesn't define st_data_t type */
 
-#ifdef ONIG_DEBUG
+#  ifdef ONIG_DEBUG
 static int
 i_print_name_entry(UChar* key, NameEntry* e, void* arg)
 {
@@ -472,7 +472,7 @@ onig_print_names(FILE* fp, regex_t* reg)
   }
   return 0;
 }
-#endif /* ONIG_DEBUG */
+#  endif /* ONIG_DEBUG */
 
 static int
 i_free_name_entry(UChar* key, NameEntry* e, void* arg ARG_UNUSED)
@@ -604,9 +604,9 @@ onig_number_of_names(regex_t* reg)
     return 0;
 }
 
-#else  /* USE_ST_LIBRARY */
+# else  /* USE_ST_LIBRARY */
 
-#define INIT_NAMES_ALLOC_NUM    8
+#  define INIT_NAMES_ALLOC_NUM    8
 
 typedef struct {
   NameEntry* e;
@@ -614,7 +614,7 @@ typedef struct {
   int        alloc;
 } NameTable;
 
-#ifdef ONIG_DEBUG
+#  ifdef ONIG_DEBUG
 extern int
 onig_print_names(FILE* fp, regex_t* reg)
 {
@@ -645,7 +645,7 @@ onig_print_names(FILE* fp, regex_t* reg)
   }
   return 0;
 }
-#endif
+#  endif
 
 static int
 names_clear(regex_t* reg)
@@ -740,7 +740,7 @@ onig_number_of_names(regex_t* reg)
     return 0;
 }
 
-#endif /* else USE_ST_LIBRARY */
+# endif /* else USE_ST_LIBRARY */
 
 static int
 name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
@@ -754,7 +754,7 @@ name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
 
   e = name_find(reg, name, name_end);
   if (IS_NULL(e)) {
-#ifdef USE_ST_LIBRARY
+# ifdef USE_ST_LIBRARY
     if (IS_NULL(t)) {
       t = onig_st_init_strend_table_with_size(5);
       reg->name_table = (void* )t;
@@ -775,7 +775,7 @@ name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
     e->back_alloc = 0;
     e->back_refs  = (int* )NULL;
 
-#else
+# else
 
     if (IS_NULL(t)) {
       alloc = INIT_NAMES_ALLOC_NUM;
@@ -818,7 +818,7 @@ name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
     e->name = strdup_with_null(reg->enc, name, name_end);
     if (IS_NULL(e->name)) return ONIGERR_MEMORY;
     e->name_len = name_end - name;
-#endif
+# endif
   }
 
   if (e->back_num >= 1 &&
@@ -1212,7 +1212,7 @@ node_new_cclass_locked(void)
   return node;
 }
 #else
-#define node_new_cclass_locked()  node_new_cclass()
+# define node_new_cclass_locked()  node_new_cclass()
 #endif
 
 #ifdef USE_SHARED_CCLASS_TABLE
@@ -2236,7 +2236,7 @@ conv_backslash_value(int c, ScanEnv* env)
 }
 
 #ifdef USE_NO_INVALID_QUANTIFIER
-#define is_invalid_quantifier_target(node) 0
+# define is_invalid_quantifier_target(node) 0
 #else
 static int
 is_invalid_quantifier_target(Node* node)
@@ -2622,13 +2622,13 @@ get_name_end_code_point(OnigCodePoint start)
 }
 
 #ifdef USE_NAMED_GROUP
-#ifdef RUBY
-#define ONIGENC_IS_CODE_NAME(enc, c)  TRUE
-#else
-#define ONIGENC_IS_CODE_NAME(enc, c)  ONIGENC_IS_CODE_WORD(enc, c)
-#endif
+# ifdef RUBY
+#  define ONIGENC_IS_CODE_NAME(enc, c)  TRUE
+# else
+#  define ONIGENC_IS_CODE_NAME(enc, c)  ONIGENC_IS_CODE_WORD(enc, c)
+# endif
 
-#ifdef USE_BACKREF_WITH_LEVEL
+# ifdef USE_BACKREF_WITH_LEVEL
 /*
    \k<name+n>, \k<name-n>
    \k<num+n>,  \k<num-n>
@@ -2742,7 +2742,7 @@ fetch_name_with_level(OnigCodePoint start_code, UChar** src, UChar* end,
     return r;
   }
 }
-#endif /* USE_BACKREF_WITH_LEVEL */
+# endif /* USE_BACKREF_WITH_LEVEL */
 
 /*
   ref: 0 -> define name    (don't allow number name)
@@ -2992,7 +2992,7 @@ CLOSE_BRACKET_WITHOUT_ESC_WARN(ScanEnv* env, UChar* c)
 }
 
 #ifndef RTEST
-#define RTEST(v)  1
+# define RTEST(v)  1
 #endif
 
 static void
@@ -3318,15 +3318,15 @@ fetch_named_backref_token(OnigCodePoint c, OnigToken* tok, UChar** src,
 
   prev = p;
 
-#ifdef USE_BACKREF_WITH_LEVEL
+# ifdef USE_BACKREF_WITH_LEVEL
   name_end = NULL_UCHARP; /* no need. escape gcc warning. */
   r = fetch_name_with_level(c, &p, end, &name_end,
 			    env, &back_num, &tok->u.backref.level);
   if (r == 1) tok->u.backref.exist_level = 1;
   else        tok->u.backref.exist_level = 0;
-#else
+# else
   r = fetch_name(&p, end, &name_end, env, &back_num, 1);
-#endif
+# endif
   if (r < 0) return r;
 
   if (back_num != 0) {
@@ -3730,7 +3730,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 
 #if defined(USE_SUBEXP_CALL) || defined(USE_NAMED_GROUP)
     case 'g':
-#ifdef USE_NAMED_GROUP
+# ifdef USE_NAMED_GROUP
       if (IS_SYNTAX_OP2(syn, ONIG_SYN_OP2_ESC_G_BRACE_BACKREF)) {
 	PFETCH(c);
 	if (c == '{') {
@@ -3740,8 +3740,8 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	else
 	  PUNFETCH;
       }
-#endif
-#ifdef USE_SUBEXP_CALL
+# endif
+# ifdef USE_SUBEXP_CALL
       if (IS_SYNTAX_OP2(syn, ONIG_SYN_OP2_ESC_G_SUBEXP_CALL)) {
 	PFETCH(c);
 	if (c == '<' || c == '\'') {
@@ -3779,7 +3779,7 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	  PUNFETCH;
 	}
       }
-#endif
+# endif
       break;
 #endif
 
@@ -5044,7 +5044,7 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	return ONIGERR_UNDEFINED_GROUP_OPTION;
       break;
 
-#ifdef USE_CAPITAL_P_NAMED_GROUP
+# ifdef USE_CAPITAL_P_NAMED_GROUP
     case 'P':   /* (?P<name>...) */
       if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_QMARK_CAPITAL_P_NAMED_GROUP)) {
 	PFETCH(c);
@@ -5052,7 +5052,7 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
       }
       return ONIGERR_UNDEFINED_GROUP_OPTION;
       break;
-#endif
+# endif
 #endif
 
     case '<':   /* look behind (?<=...), (?<!...) */
@@ -5500,7 +5500,7 @@ set_quantifier(Node* qnode, Node* target, int group, ScanEnv* env)
 
 #ifdef USE_SHARED_CCLASS_TABLE
 
-#define THRESHOLD_RANGE_NUM_FOR_SHARE_CCLASS     8
+# define THRESHOLD_RANGE_NUM_FOR_SHARE_CCLASS     8
 
 /* for ctype node hash table */
 

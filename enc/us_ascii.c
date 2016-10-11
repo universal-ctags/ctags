@@ -1,10 +1,10 @@
 #include "regenc.h"
 #ifdef RUBY
-#include "encindex.h"
+# include "encindex.h"
 #endif
 
 #ifndef ENCINDEX_US_ASCII
-#define ENCINDEX_US_ASCII 0
+# define ENCINDEX_US_ASCII 0
 #endif
 
 static int

@@ -32,11 +32,11 @@
 
 #if defined(USE_MULTI_THREAD_SYSTEM) \
   && defined(USE_DEFAULT_MULTI_THREAD_SYSTEM)
-#ifdef _WIN32
+# ifdef _WIN32
 CRITICAL_SECTION gOnigMutex;
-#else
+# else
 pthread_mutex_t gOnigMutex;
-#endif
+# endif
 #endif
 
 OnigCaseFoldType OnigDefaultCaseFoldFlag = ONIGENC_CASE_FOLD_MIN;
@@ -2091,7 +2091,7 @@ quantifiers_memory_node_info(Node* node)
     }
     break;
 
-#ifdef USE_SUBEXP_CALL
+# ifdef USE_SUBEXP_CALL
   case NT_CALL:
     if (IS_CALL_RECURSION(NCALL(node))) {
       return NQ_TARGET_IS_EMPTY_REC; /* tiny version */
@@ -2099,7 +2099,7 @@ quantifiers_memory_node_info(Node* node)
     else
       r = quantifiers_memory_node_info(NCALL(node)->target);
     break;
-#endif
+# endif
 
   case NT_QTFR:
     {
@@ -2854,8 +2854,8 @@ check_type_tree(Node* node, int type_mask, int enclose_mask, int anchor_mask)
 
 #ifdef USE_SUBEXP_CALL
 
-#define RECURSION_EXIST       1
-#define RECURSION_INFINITE    2
+# define RECURSION_EXIST       1
+# define RECURSION_INFINITE    2
 
 static int
 subexp_inf_recursive_check(Node* node, ScanEnv* env, int head)
@@ -3055,7 +3055,7 @@ subexp_recursive_check(Node* node)
 static int
 subexp_recursive_check_trav(Node* node, ScanEnv* env)
 {
-#define FOUND_CALLED_NODE    1
+# define FOUND_CALLED_NODE    1
 
   int type;
   int r = 0;
@@ -3156,22 +3156,22 @@ setup_subexp_call(Node* node, ScanEnv* env)
       if (cn->group_num != 0) {
 	int gnum = cn->group_num;
 
-#ifdef USE_NAMED_GROUP
+# ifdef USE_NAMED_GROUP
 	if (env->num_named > 0 &&
 	    IS_SYNTAX_BV(env->syntax, ONIG_SYN_CAPTURE_ONLY_NAMED_GROUP) &&
 	    !ONIG_IS_OPTION_ON(env->option, ONIG_OPTION_CAPTURE_GROUP)) {
 	  return ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED;
 	}
-#endif
+# endif
 	if (gnum > env->num_mem) {
 	  onig_scan_env_set_error_string(env,
 		 ONIGERR_UNDEFINED_GROUP_REFERENCE, cn->name, cn->name_end);
 	  return ONIGERR_UNDEFINED_GROUP_REFERENCE;
 	}
 
-#ifdef USE_NAMED_GROUP
+# ifdef USE_NAMED_GROUP
       set_call_attr:
-#endif
+# endif
 	cn->target = nodes[cn->group_num];
 	if (IS_NULL(cn->target)) {
 	  onig_scan_env_set_error_string(env,
@@ -3182,12 +3182,12 @@ setup_subexp_call(Node* node, ScanEnv* env)
 	BIT_STATUS_ON_AT(env->bt_mem_start, cn->group_num);
 	cn->unset_addr_list = env->unset_addr_list;
       }
-#ifdef USE_NAMED_GROUP
-#ifdef USE_PERL_SUBEXP_CALL
+# ifdef USE_NAMED_GROUP
+#  ifdef USE_PERL_SUBEXP_CALL
       else if (cn->name == cn->name_end) {
 	goto set_call_attr;
       }
-#endif
+#  endif
       else {
 	int *refs;
 
@@ -3209,7 +3209,7 @@ setup_subexp_call(Node* node, ScanEnv* env)
 	  goto set_call_attr;
 	}
       }
-#endif
+# endif
     }
     break;
 
@@ -3711,12 +3711,12 @@ expand_case_fold_string(Node* node, regex_t* reg)
 
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
 
-#define CEC_THRES_NUM_BIG_REPEAT         512
-#define CEC_INFINITE_NUM          0x7fffffff
+# define CEC_THRES_NUM_BIG_REPEAT         512
+# define CEC_INFINITE_NUM          0x7fffffff
 
-#define CEC_IN_INFINITE_REPEAT    (1<<0)
-#define CEC_IN_FINITE_REPEAT      (1<<1)
-#define CEC_CONT_BIG_REPEAT       (1<<2)
+# define CEC_IN_INFINITE_REPEAT    (1<<0)
+# define CEC_IN_FINITE_REPEAT      (1<<1)
+# define CEC_CONT_BIG_REPEAT       (1<<2)
 
 static int
 setup_comb_exp_check(Node* node, int state, ScanEnv* env)
@@ -3832,14 +3832,14 @@ setup_comb_exp_check(Node* node, int state, ScanEnv* env)
     }
     break;
 
-#ifdef USE_SUBEXP_CALL
+# ifdef USE_SUBEXP_CALL
   case NT_CALL:
     if (IS_CALL_RECURSION(NCALL(node)))
       env->has_recursion = 1;
     else
       r = setup_comb_exp_check(NCALL(node)->target, state, env);
     break;
-#endif
+# endif
 
   default:
     break;
@@ -5811,17 +5811,17 @@ onig_compile(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
 
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
   if (scan_env.backrefed_mem == 0
-#ifdef USE_SUBEXP_CALL
+# ifdef USE_SUBEXP_CALL
       || scan_env.num_call == 0
-#endif
+# endif
       ) {
     setup_comb_exp_check(root, 0, &scan_env);
-#ifdef USE_SUBEXP_CALL
+# ifdef USE_SUBEXP_CALL
     if (scan_env.has_recursion != 0) {
       scan_env.num_comb_exp_check = 0;
     }
     else
-#endif
+# endif
     if (scan_env.comb_exp_max_regnum > 0) {
       int i;
       for (i = 1; i <= scan_env.comb_exp_max_regnum; i++) {
@@ -5875,9 +5875,9 @@ onig_compile(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
   onig_node_free(root);
 
 #ifdef ONIG_DEBUG_COMPILE
-#ifdef USE_NAMED_GROUP
+# ifdef USE_NAMED_GROUP
   onig_print_names(stderr, reg);
-#endif
+# endif
   print_compiled_byte_code_list(stderr, reg);
 #endif
 
@@ -6154,14 +6154,14 @@ onig_is_code_in_cc(OnigEncoding enc, OnigCodePoint code, CClassNode* cc)
 #ifdef ONIG_DEBUG
 
 /* arguments type */
-#define ARG_SPECIAL     -1
-#define ARG_NON          0
-#define ARG_RELADDR      1
-#define ARG_ABSADDR      2
-#define ARG_LENGTH       3
-#define ARG_MEMNUM       4
-#define ARG_OPTION       5
-#define ARG_STATE_CHECK  6
+# define ARG_SPECIAL     -1
+# define ARG_NON          0
+# define ARG_RELADDR      1
+# define ARG_ABSADDR      2
+# define ARG_LENGTH       3
+# define ARG_MEMNUM       4
+# define ARG_OPTION       5
+# define ARG_STATE_CHECK  6
 
 OnigOpInfoType OnigOpInfo[] = {
   { OP_FINISH,            "finish",          ARG_NON },
@@ -6289,14 +6289,14 @@ op2arg_type(int opcode)
   return ARG_SPECIAL;
 }
 
-#ifdef ONIG_DEBUG_PARSE_TREE
+# ifdef ONIG_DEBUG_PARSE_TREE
 static void
 Indent(FILE* f, int indent)
 {
   int i;
   for (i = 0; i < indent; i++) putc(' ', f);
 }
-#endif /* ONIG_DEBUG_PARSE_TREE */
+# endif /* ONIG_DEBUG_PARSE_TREE */
 
 static void
 p_string(FILE* f, ptrdiff_t len, UChar* s)
@@ -6440,9 +6440,9 @@ onig_print_compiled_byte_code(FILE* f, UChar* bp, UChar* bpend, UChar** nextp,
     case OP_CCLASS_MB_NOT:
       GET_LENGTH_INC(len, bp);
       q = bp;
-#ifndef PLATFORM_UNALIGNED_WORD_ACCESS
+# ifndef PLATFORM_UNALIGNED_WORD_ACCESS
       ALIGNMENT_RIGHT(q);
-#endif
+# endif
       GET_CODE_POINT(code, q);
       bp += len;
       fprintf(f, ":%d:%d", (int )code, len);
@@ -6454,9 +6454,9 @@ onig_print_compiled_byte_code(FILE* f, UChar* bp, UChar* bpend, UChar** nextp,
       bp += SIZE_BITSET;
       GET_LENGTH_INC(len, bp);
       q = bp;
-#ifndef PLATFORM_UNALIGNED_WORD_ACCESS
+# ifndef PLATFORM_UNALIGNED_WORD_ACCESS
       ALIGNMENT_RIGHT(q);
-#endif
+# endif
       GET_CODE_POINT(code, q);
       bp += len;
       fprintf(f, ":%d:%d:%d", n, (int )code, len);
@@ -6564,7 +6564,7 @@ onig_print_compiled_byte_code(FILE* f, UChar* bp, UChar* bpend, UChar** nextp,
   if (nextp) *nextp = bp;
 }
 
-#ifdef ONIG_DEBUG_COMPILE
+# ifdef ONIG_DEBUG_COMPILE
 static void
 print_compiled_byte_code_list(FILE* f, regex_t* reg)
 {
@@ -6586,9 +6586,9 @@ print_compiled_byte_code_list(FILE* f, regex_t* reg)
 
   fprintf(f, "\n");
 }
-#endif /* ONIG_DEBUG_COMPILE */
+# endif /* ONIG_DEBUG_COMPILE */
 
-#ifdef ONIG_DEBUG_PARSE_TREE
+# ifdef ONIG_DEBUG_PARSE_TREE
 static void
 print_indent_tree(FILE* f, Node* node, int indent)
 {
@@ -6678,10 +6678,10 @@ print_indent_tree(FILE* f, Node* node, int indent)
 
     case ANCHOR_WORD_BOUND:      fputs("word bound",     f); break;
     case ANCHOR_NOT_WORD_BOUND:  fputs("not word bound", f); break;
-#ifdef USE_WORD_BEGIN_END
+#  ifdef USE_WORD_BEGIN_END
     case ANCHOR_WORD_BEGIN:      fputs("word begin", f);     break;
     case ANCHOR_WORD_END:        fputs("word end", f);       break;
-#endif
+#  endif
     case ANCHOR_PREC_READ:       fputs("prec read",      f); container_p = TRUE; break;
     case ANCHOR_PREC_READ_NOT:   fputs("prec read not",  f); container_p = TRUE; break;
     case ANCHOR_LOOK_BEHIND:     fputs("look_behind",    f); container_p = TRUE; break;
@@ -6707,7 +6707,7 @@ print_indent_tree(FILE* f, Node* node, int indent)
     }
     break;
 
-#ifdef USE_SUBEXP_CALL
+#  ifdef USE_SUBEXP_CALL
   case NT_CALL:
     {
       CallNode* cn = NCALL(node);
@@ -6715,7 +6715,7 @@ print_indent_tree(FILE* f, Node* node, int indent)
       p_string(f, cn->name_end - cn->name, cn->name);
     }
     break;
-#endif
+#  endif
 
   case NT_QTFR:
     fprintf(f, "<quantifier:%"PRIxPTR">{%d,%d}%s\n", (intptr_t )node,
@@ -6766,5 +6766,5 @@ print_tree(FILE* f, Node* node)
 {
   print_indent_tree(f, node, 0);
 }
-#endif /* ONIG_DEBUG_PARSE_TREE */
+# endif /* ONIG_DEBUG_PARSE_TREE */
 #endif /* ONIG_DEBUG */

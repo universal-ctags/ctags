@@ -29,19 +29,19 @@
 
 #include "regenc.h"
 #ifdef RUBY
-#include "encindex.h"
+# include "encindex.h"
 #endif
 
 #ifndef ENCINDEX_UTF_8
-#define ENCINDEX_UTF_8 0
+# define ENCINDEX_UTF_8 0
 #endif
 
 #define USE_INVALID_CODE_SCHEME
 
 #ifdef USE_INVALID_CODE_SCHEME
 /* virtual codepoint values for invalid encoding byte 0xfe and 0xff */
-#define INVALID_CODE_FE   0xfffffffe
-#define INVALID_CODE_FF   0xffffffff
+# define INVALID_CODE_FE  0xfffffffe
+# define INVALID_CODE_FF  0xffffffff
 #endif
 #define VALID_CODE_LIMIT  0x0010ffff
 

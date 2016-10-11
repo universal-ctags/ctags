@@ -37,9 +37,9 @@
 #endif
 
 #if defined(__GNUC__)
-#  define ARG_UNUSED  __attribute__ ((unused))
+# define ARG_UNUSED  __attribute__ ((unused))
 #else
-#  define ARG_UNUSED
+# define ARG_UNUSED
 #endif
 
 #define numberof(array) (int)(sizeof(array) / sizeof((array)[0]))

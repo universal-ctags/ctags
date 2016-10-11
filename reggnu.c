@@ -31,7 +31,7 @@
 #include "regint.h"
 
 #ifndef ONIGMOGNU_H
-#include "onigmognu.h"
+# include "onigmognu.h"
 #endif
 
 extern void

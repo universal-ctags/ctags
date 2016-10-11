@@ -32,9 +32,9 @@
 
 #ifdef __cplusplus
 extern "C" {
-#if 0
+# if 0
 } /* satisfy cc-mode */
-#endif
+# endif
 #endif
 
 #define ONIGMO_VERSION_MAJOR   6
@@ -64,44 +64,44 @@ extern "C" {
 #endif
 
 #ifndef P_
-#if defined(__STDC__) || defined(_WIN32)
-# define P_(args) args
-#else
-# define P_(args) ()
-#endif
+# if defined(__STDC__) || defined(_WIN32)
+#  define P_(args) args
+# else
+#  define P_(args) ()
+# endif
 #endif
 
 #ifndef PV_
-#ifdef HAVE_STDARG_PROTOTYPES
-# define PV_(args) args
-#else
-# define PV_(args) ()
-#endif
-#endif
-
-#ifndef ONIG_EXTERN
-#ifdef RUBY_EXTERN
-#define ONIG_EXTERN   RUBY_EXTERN
-#else
-#if defined(_WIN32) && !defined(__GNUC__)
-#if defined(EXPORT) || defined(RUBY_EXPORT)
-#define ONIG_EXTERN   extern __declspec(dllexport)
-#else
-#define ONIG_EXTERN   extern __declspec(dllimport)
-#endif
-#endif
-#endif
+# ifdef HAVE_STDARG_PROTOTYPES
+#  define PV_(args) args
+# else
+#  define PV_(args) ()
+# endif
 #endif
 
 #ifndef ONIG_EXTERN
-#define ONIG_EXTERN   extern
+# ifdef RUBY_EXTERN
+#  define ONIG_EXTERN   RUBY_EXTERN
+# else
+#  if defined(_WIN32) && !defined(__GNUC__)
+#   if defined(EXPORT) || defined(RUBY_EXPORT)
+#    define ONIG_EXTERN   extern __declspec(dllexport)
+#   else
+#    define ONIG_EXTERN   extern __declspec(dllimport)
+#   endif
+#  endif
+# endif
+#endif
+
+#ifndef ONIG_EXTERN
+# define ONIG_EXTERN   extern
 #endif
 
 #ifndef RUBY
-#ifndef RUBY_SYMBOL_EXPORT_BEGIN
-#define RUBY_SYMBOL_EXPORT_BEGIN
-#define RUBY_SYMBOL_EXPORT_END
-#endif
+# ifndef RUBY_SYMBOL_EXPORT_BEGIN
+#  define RUBY_SYMBOL_EXPORT_BEGIN
+#  define RUBY_SYMBOL_EXPORT_END
+# endif
 #endif
 
 RUBY_SYMBOL_EXPORT_BEGIN
@@ -111,7 +111,7 @@ RUBY_SYMBOL_EXPORT_BEGIN
 /* PART: character encoding */
 
 #ifndef ONIG_ESCAPE_UCHAR_COLLISION
-#define UChar OnigUChar
+# define UChar OnigUChar
 #endif
 
 typedef unsigned char  OnigUChar;
@@ -256,45 +256,45 @@ ONIG_EXTERN const OnigEncodingType OnigEncodingGB18030;
 
 #define ONIG_ENCODING_ASCII        (&OnigEncodingASCII)
 #ifndef RUBY
-#define ONIG_ENCODING_ISO_8859_1   (&OnigEncodingISO_8859_1)
-#define ONIG_ENCODING_ISO_8859_2   (&OnigEncodingISO_8859_2)
-#define ONIG_ENCODING_ISO_8859_3   (&OnigEncodingISO_8859_3)
-#define ONIG_ENCODING_ISO_8859_4   (&OnigEncodingISO_8859_4)
-#define ONIG_ENCODING_ISO_8859_5   (&OnigEncodingISO_8859_5)
-#define ONIG_ENCODING_ISO_8859_6   (&OnigEncodingISO_8859_6)
-#define ONIG_ENCODING_ISO_8859_7   (&OnigEncodingISO_8859_7)
-#define ONIG_ENCODING_ISO_8859_8   (&OnigEncodingISO_8859_8)
-#define ONIG_ENCODING_ISO_8859_9   (&OnigEncodingISO_8859_9)
-#define ONIG_ENCODING_ISO_8859_10  (&OnigEncodingISO_8859_10)
-#define ONIG_ENCODING_ISO_8859_11  (&OnigEncodingISO_8859_11)
-#define ONIG_ENCODING_ISO_8859_13  (&OnigEncodingISO_8859_13)
-#define ONIG_ENCODING_ISO_8859_14  (&OnigEncodingISO_8859_14)
-#define ONIG_ENCODING_ISO_8859_15  (&OnigEncodingISO_8859_15)
-#define ONIG_ENCODING_ISO_8859_16  (&OnigEncodingISO_8859_16)
-#define ONIG_ENCODING_UTF_8        (&OnigEncodingUTF_8)
-#define ONIG_ENCODING_UTF_16BE     (&OnigEncodingUTF_16BE)
-#define ONIG_ENCODING_UTF_16LE     (&OnigEncodingUTF_16LE)
-#define ONIG_ENCODING_UTF_32BE     (&OnigEncodingUTF_32BE)
-#define ONIG_ENCODING_UTF_32LE     (&OnigEncodingUTF_32LE)
-#define ONIG_ENCODING_EUC_JP       (&OnigEncodingEUC_JP)
-#define ONIG_ENCODING_EUC_TW       (&OnigEncodingEUC_TW)
-#define ONIG_ENCODING_EUC_KR       (&OnigEncodingEUC_KR)
-#define ONIG_ENCODING_EUC_CN       (&OnigEncodingEUC_CN)
-#define ONIG_ENCODING_SHIFT_JIS    (&OnigEncodingShift_JIS)
-#define ONIG_ENCODING_CP932        (&OnigEncodingCP932)
-#define ONIG_ENCODING_KOI8         (&OnigEncodingKOI8)
-#define ONIG_ENCODING_KOI8_R       (&OnigEncodingKOI8_R)
-#define ONIG_ENCODING_CP1251       (&OnigEncodingCP1251)
-#define ONIG_ENCODING_BIG5         (&OnigEncodingBIG5)
-#define ONIG_ENCODING_GB18030      (&OnigEncodingGB18030)
+# define ONIG_ENCODING_ISO_8859_1   (&OnigEncodingISO_8859_1)
+# define ONIG_ENCODING_ISO_8859_2   (&OnigEncodingISO_8859_2)
+# define ONIG_ENCODING_ISO_8859_3   (&OnigEncodingISO_8859_3)
+# define ONIG_ENCODING_ISO_8859_4   (&OnigEncodingISO_8859_4)
+# define ONIG_ENCODING_ISO_8859_5   (&OnigEncodingISO_8859_5)
+# define ONIG_ENCODING_ISO_8859_6   (&OnigEncodingISO_8859_6)
+# define ONIG_ENCODING_ISO_8859_7   (&OnigEncodingISO_8859_7)
+# define ONIG_ENCODING_ISO_8859_8   (&OnigEncodingISO_8859_8)
+# define ONIG_ENCODING_ISO_8859_9   (&OnigEncodingISO_8859_9)
+# define ONIG_ENCODING_ISO_8859_10  (&OnigEncodingISO_8859_10)
+# define ONIG_ENCODING_ISO_8859_11  (&OnigEncodingISO_8859_11)
+# define ONIG_ENCODING_ISO_8859_13  (&OnigEncodingISO_8859_13)
+# define ONIG_ENCODING_ISO_8859_14  (&OnigEncodingISO_8859_14)
+# define ONIG_ENCODING_ISO_8859_15  (&OnigEncodingISO_8859_15)
+# define ONIG_ENCODING_ISO_8859_16  (&OnigEncodingISO_8859_16)
+# define ONIG_ENCODING_UTF_8        (&OnigEncodingUTF_8)
+# define ONIG_ENCODING_UTF_16BE     (&OnigEncodingUTF_16BE)
+# define ONIG_ENCODING_UTF_16LE     (&OnigEncodingUTF_16LE)
+# define ONIG_ENCODING_UTF_32BE     (&OnigEncodingUTF_32BE)
+# define ONIG_ENCODING_UTF_32LE     (&OnigEncodingUTF_32LE)
+# define ONIG_ENCODING_EUC_JP       (&OnigEncodingEUC_JP)
+# define ONIG_ENCODING_EUC_TW       (&OnigEncodingEUC_TW)
+# define ONIG_ENCODING_EUC_KR       (&OnigEncodingEUC_KR)
+# define ONIG_ENCODING_EUC_CN       (&OnigEncodingEUC_CN)
+# define ONIG_ENCODING_SHIFT_JIS    (&OnigEncodingShift_JIS)
+# define ONIG_ENCODING_CP932        (&OnigEncodingCP932)
+# define ONIG_ENCODING_KOI8         (&OnigEncodingKOI8)
+# define ONIG_ENCODING_KOI8_R       (&OnigEncodingKOI8_R)
+# define ONIG_ENCODING_CP1251       (&OnigEncodingCP1251)
+# define ONIG_ENCODING_BIG5         (&OnigEncodingBIG5)
+# define ONIG_ENCODING_GB18030      (&OnigEncodingGB18030)
 
 /* old names */
-#define ONIG_ENCODING_SJIS         ONIG_ENCODING_SHIFT_JIS
-#define ONIG_ENCODING_UTF8         ONIG_ENCODING_UTF_8
-#define ONIG_ENCODING_UTF16_BE     ONIG_ENCODING_UTF_16BE
-#define ONIG_ENCODING_UTF16_LE     ONIG_ENCODING_UTF_16LE
-#define ONIG_ENCODING_UTF32_BE     ONIG_ENCODING_UTF_32BE
-#define ONIG_ENCODING_UTF32_LE     ONIG_ENCODING_UTF_32LE
+# define ONIG_ENCODING_SJIS         ONIG_ENCODING_SHIFT_JIS
+# define ONIG_ENCODING_UTF8         ONIG_ENCODING_UTF_8
+# define ONIG_ENCODING_UTF16_BE     ONIG_ENCODING_UTF_16BE
+# define ONIG_ENCODING_UTF16_LE     ONIG_ENCODING_UTF_16LE
+# define ONIG_ENCODING_UTF32_BE     ONIG_ENCODING_UTF_32BE
+# define ONIG_ENCODING_UTF32_LE     ONIG_ENCODING_UTF_32LE
 #endif /* RUBY */
 
 #define ONIG_ENCODING_UNDEF    ((OnigEncoding )0)
@@ -827,7 +827,7 @@ typedef struct re_pattern_buffer {
 typedef OnigRegexType*  OnigRegex;
 
 #ifndef ONIG_ESCAPE_REGEX_T_COLLISION
-  typedef OnigRegexType  regex_t;
+typedef OnigRegexType  regex_t;
 #endif
 
 
@@ -953,9 +953,9 @@ const char* onig_copyright P_((void));
 RUBY_SYMBOL_EXPORT_END
 
 #ifdef __cplusplus
-#if 0
+# if 0
 { /* satisfy cc-mode */
-#endif
+# endif
 }
 #endif
 

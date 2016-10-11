@@ -163,9 +163,9 @@ code3_equal(const OnigCodePoint *x, const OnigCodePoint *y)
 #define L(n) SpecialsLengthEncode(n)
 
 #ifdef RUBY
-#include "casefold.h"
+# include "casefold.h"
 #else
-#include "enc/unicode/casefold.h"
+# include "enc/unicode/casefold.h"
 #endif
 
 #undef U
@@ -179,9 +179,9 @@ code3_equal(const OnigCodePoint *x, const OnigCodePoint *y)
 #undef L
 
 #ifdef RUBY
-#include "name2ctype.h"
+# include "name2ctype.h"
 #else
-#include "enc/unicode/name2ctype.h"
+# include "enc/unicode/name2ctype.h"
 #endif
 
 #define CODE_RANGES_NUM numberof(CodeRanges)

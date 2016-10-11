@@ -30,11 +30,11 @@
 
 #include "regenc.h"
 #ifdef RUBY
-#include "encindex.h"
+# include "encindex.h"
 #endif
 
 #ifndef ENCINDEX_ASCII
-#define ENCINDEX_ASCII 0
+# define ENCINDEX_ASCII 0
 #endif
 
 OnigEncodingDefine(ascii, ASCII) = {
