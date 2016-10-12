@@ -299,11 +299,9 @@ ONIG_EXTERN const OnigEncodingType OnigEncodingGB18030;
 
 #define ONIG_ENCODING_UNDEF    ((OnigEncoding )0)
 
-/* this declaration needs to be here because it is used in string.c */
-ONIG_EXTERN int onigenc_ascii_only_case_map P_((OnigCaseFoldType* flagP,
-			const OnigUChar** pp, const OnigUChar* end,
-			OnigUChar* to, OnigUChar* to_end,
-			const struct OnigEncodingTypeST* enc));
+/* this declaration needs to be here because it is used in string.c in Ruby */
+ONIG_EXTERN
+int onigenc_ascii_only_case_map P_((OnigCaseFoldType* flagP, const OnigUChar** pp, const OnigUChar* end, OnigUChar* to, OnigUChar* to_end, const struct OnigEncodingTypeST* enc));
 
 
 /* work size */

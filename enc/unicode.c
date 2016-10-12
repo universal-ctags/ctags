@@ -139,17 +139,17 @@ code3_equal(const OnigCodePoint *x, const OnigCodePoint *y)
 
 /* macros related to ONIGENC_CASE flags */
 /* defined here because not used in other files */
-#define ONIGENC_CASE_SPECIALS       (ONIGENC_CASE_TITLECASE|ONIGENC_CASE_IS_TITLECASE|ONIGENC_CASE_UP_SPECIAL|ONIGENC_CASE_DOWN_SPECIAL)
+#define ONIGENC_CASE_SPECIALS       (ONIGENC_CASE_TITLECASE | ONIGENC_CASE_IS_TITLECASE | ONIGENC_CASE_UP_SPECIAL | ONIGENC_CASE_DOWN_SPECIAL)
 
 /* macros for length in CaseMappingSpecials array in enc/unicode/casefold.h */
 #define SpecialsLengthOffset 25  /* needs to be higher than the 22 bits used for Unicode codepoints */
-#define SpecialsLengthExtract(n)    ((n)>>SpecialsLengthOffset)
-#define SpecialsCodepointExtract(n) ((n)&((1<<SpecialsLengthOffset)-1))
-#define SpecialsLengthEncode(n)     ((n)<<SpecialsLengthOffset)
+#define SpecialsLengthExtract(n)    ((n) >> SpecialsLengthOffset)
+#define SpecialsCodepointExtract(n) ((n) & ((1 << SpecialsLengthOffset) - 1))
+#define SpecialsLengthEncode(n)     ((n) << SpecialsLengthOffset)
 
-#define OnigSpecialIndexMask        (((1<<OnigSpecialIndexWidth)-1)<<OnigSpecialIndexShift)
-#define OnigSpecialIndexEncode(n)   ((n)<<OnigSpecialIndexShift)
-#define OnigSpecialIndexDecode(n)   (((n)&OnigSpecialIndexMask)>>OnigSpecialIndexShift)
+#define OnigSpecialIndexMask        (((1 << OnigSpecialIndexWidth) - 1) << OnigSpecialIndexShift)
+#define OnigSpecialIndexEncode(n)   ((n) << OnigSpecialIndexShift)
+#define OnigSpecialIndexDecode(n)   (((n) & OnigSpecialIndexMask) >> OnigSpecialIndexShift)
 
 /* macros to shorten "enc/unicode/casefold.h", undefined immediately after including the file */
 #define U ONIGENC_CASE_UPCASE
@@ -676,80 +676,82 @@ onigenc_unicode_case_map(OnigCaseFoldType* flagP,
   to_end -= CASE_MAPPING_SLACK;
   /* copy flags ONIGENC_CASE_UPCASE     and ONIGENC_CASE_DOWNCASE over to
    *            ONIGENC_CASE_UP_SPECIAL and ONIGENC_CASE_DOWN_SPECIAL */
-  flags |= (flags&(ONIGENC_CASE_UPCASE|ONIGENC_CASE_DOWNCASE))<<ONIGENC_CASE_SPECIAL_OFFSET;
+  flags |= (flags & (ONIGENC_CASE_UPCASE | ONIGENC_CASE_DOWNCASE)) << ONIGENC_CASE_SPECIAL_OFFSET;
 
-  while (*pp<end && to<=to_end) {
+  while (*pp < end && to <= to_end) {
     codepoint_length = ONIGENC_PRECISE_MBC_ENC_LEN(enc, *pp, end);
     if (codepoint_length < 0)
       return codepoint_length; /* encoding invalid */
     code = ONIGENC_MBC_TO_CODE(enc, *pp, end);
     *pp += codepoint_length;
 
-    if (code<='z') { /* ASCII comes first */
-      if (code>='a' && code<='z') {
-	if (flags&ONIGENC_CASE_UPCASE) {
+    if (code <= 'z') { /* ASCII comes first */
+      if (code >= 'a' && code <= 'z') {
+	if (flags & ONIGENC_CASE_UPCASE) {
 	  MODIFIED;
-	  if (flags&ONIGENC_CASE_FOLD_TURKISH_AZERI && code=='i')
+	  if (flags & ONIGENC_CASE_FOLD_TURKISH_AZERI && code == 'i')
 	    code = I_WITH_DOT_ABOVE;
 	  else
 	    code += 'A'-'a';
 	}
       }
-      else if (code>='A' && code<='Z') {
-	if (flags&(ONIGENC_CASE_DOWNCASE|ONIGENC_CASE_FOLD)) {
+      else if (code >= 'A' && code <= 'Z') {
+	if (flags & (ONIGENC_CASE_DOWNCASE | ONIGENC_CASE_FOLD)) {
 	  MODIFIED;
-	  if (flags&ONIGENC_CASE_FOLD_TURKISH_AZERI && code=='I')
+	  if (flags & ONIGENC_CASE_FOLD_TURKISH_AZERI && code == 'I')
 	    code = DOTLESS_i;
 	  else
 	    code += 'a'-'A';
 	}
       }
     }
-    else if (!(flags&ONIGENC_CASE_ASCII_ONLY) && code>=0x00B5) { /* deal with non-ASCII; micron sign (U+00B5) is lowest affected */
+    else if (!(flags & ONIGENC_CASE_ASCII_ONLY) && code >= 0x00B5) { /* deal with non-ASCII; micron sign (U+00B5) is lowest affected */
       const CodePointList3 *folded;
 
-      if (code==I_WITH_DOT_ABOVE) {
-	if (flags&(ONIGENC_CASE_DOWNCASE|ONIGENC_CASE_FOLD)) {
+      if (code == I_WITH_DOT_ABOVE) {
+	if (flags & (ONIGENC_CASE_DOWNCASE | ONIGENC_CASE_FOLD)) {
 	  MODIFIED;
 	  code = 'i';
-	  if (!(flags&ONIGENC_CASE_FOLD_TURKISH_AZERI)) { /* make dot above explicit */
+	  if (!(flags & ONIGENC_CASE_FOLD_TURKISH_AZERI)) { /* make dot above explicit */
 	    to += ONIGENC_CODE_TO_MBC(enc, code, to);
 	    code = DOT_ABOVE;
 	  }
 	}
       }
-      else if (code==DOTLESS_i) { /* handle this manually, because it isn't involved in folding */
-	if (flags&ONIGENC_CASE_UPCASE)
-	  MODIFIED, code = 'I';
+      else if (code == DOTLESS_i) { /* handle this manually, because it isn't involved in folding */
+	if (flags & ONIGENC_CASE_UPCASE) {
+	  MODIFIED;
+	  code = 'I';
+	}
       }
       else if ((folded = onigenc_unicode_fold_lookup(code)) != 0) { /* data about character found in CaseFold_11_Table */
-	if ((flags&ONIGENC_CASE_TITLECASE)                                 /* Titlecase needed, */
-	    && (OnigCaseFoldFlags(folded->n)&ONIGENC_CASE_IS_TITLECASE)) { /* but already Titlecase  */
+	if ((flags & ONIGENC_CASE_TITLECASE)                                 /* Titlecase needed, */
+	    && (OnigCaseFoldFlags(folded->n) & ONIGENC_CASE_IS_TITLECASE)) { /* but already Titlecase  */
 	  /* already Titlecase, no changes needed */
 	}
-	else if (flags&OnigCaseFoldFlags(folded->n)) { /* needs and data availability match */
+	else if (flags & OnigCaseFoldFlags(folded->n)) { /* needs and data availability match */
 	  const OnigCodePoint *next;
 	  int count;
 
 	  MODIFIED;
-	  if (flags&OnigCaseFoldFlags(folded->n)&ONIGENC_CASE_SPECIALS) { /* special */
+	  if (flags & OnigCaseFoldFlags(folded->n) & ONIGENC_CASE_SPECIALS) { /* special */
 	    OnigCodePoint *SpecialsStart = CaseMappingSpecials + OnigSpecialIndexDecode(folded->n);
 
-	    if (OnigCaseFoldFlags(folded->n)&ONIGENC_CASE_IS_TITLECASE) { /* swapCASE available */
-	      if ((flags&(ONIGENC_CASE_UPCASE|ONIGENC_CASE_DOWNCASE))
-		  == (ONIGENC_CASE_UPCASE|ONIGENC_CASE_DOWNCASE)) /* swapCASE needed */
+	    if (OnigCaseFoldFlags(folded->n) & ONIGENC_CASE_IS_TITLECASE) { /* swapCASE available */
+	      if ((flags & (ONIGENC_CASE_UPCASE | ONIGENC_CASE_DOWNCASE))
+		  == (ONIGENC_CASE_UPCASE | ONIGENC_CASE_DOWNCASE)) /* swapCASE needed */
 		goto SpecialsCopy;
 	      else /* swapCASE not needed */
 		SpecialsStart += SpecialsLengthExtract(*SpecialsStart);
 	    }
-	    if (OnigCaseFoldFlags(folded->n)&ONIGENC_CASE_TITLECASE) { /* Titlecase available */
-	      if (flags&ONIGENC_CASE_TITLECASE) /* Titlecase needed, but not yet Titlecase */
+	    if (OnigCaseFoldFlags(folded->n) & ONIGENC_CASE_TITLECASE) { /* Titlecase available */
+	      if (flags & ONIGENC_CASE_TITLECASE) /* Titlecase needed, but not yet Titlecase */
 		goto SpecialsCopy;
 	      else /* Titlecase not needed */
 		SpecialsStart += SpecialsLengthExtract(*SpecialsStart);
 	    }
-	    if (OnigCaseFoldFlags(folded->n)&ONIGENC_CASE_DOWN_SPECIAL) {
-	      if (!(flags&ONIGENC_CASE_DOWN_SPECIAL))
+	    if (OnigCaseFoldFlags(folded->n) & ONIGENC_CASE_DOWN_SPECIAL) {
+	      if (!(flags & ONIGENC_CASE_DOWN_SPECIAL))
 		SpecialsStart += SpecialsLengthExtract(*SpecialsStart);
 	    }
 	    /* here, we know we use ONIGENC_CASE_UP_SPECIAL, and the position is right */
@@ -763,9 +765,9 @@ SpecialsCopy:
 	    next = folded->code;
 	    code = *next++;
 	  }
-	  if (count==1)
+	  if (count == 1)
 	    ;
-	  else if (count==2) {
+	  else if (count == 2) {
 	    to += ONIGENC_CODE_TO_MBC(enc, code, to);
 	    code = *next;
 	  }
@@ -777,15 +779,15 @@ SpecialsCopy:
 	}
       }
       else if ((folded = onigenc_unicode_unfold1_lookup(code)) != 0) {  /* data about character found in CaseUnfold_11_Table */
-	if (flags&OnigCaseFoldFlags(folded->n)) { /* needs and data availability match */
+	if (flags & OnigCaseFoldFlags(folded->n)) { /* needs and data availability match */
 	  MODIFIED;
-	  if (flags&OnigCaseFoldFlags(folded->n)&ONIGENC_CASE_TITLECASE)
+	  if (flags & OnigCaseFoldFlags(folded->n) & ONIGENC_CASE_TITLECASE)
 	    code = folded->code[1];
 	  else
 	    code = folded->code[0];
 	}
-	else if ((flags&(ONIGENC_CASE_UPCASE))
-	    && (code==0x03B9||code==0x03BC)) { /* GREEK SMALL LETTERs IOTA/MU */
+	else if ((flags & (ONIGENC_CASE_UPCASE))
+	    && (code == 0x03B9 || code == 0x03BC)) { /* GREEK SMALL LETTERs IOTA/MU */
 	  MODIFIED;
 	  code = folded->code[1];
 	}
@@ -794,11 +796,11 @@ SpecialsCopy:
     to += ONIGENC_CODE_TO_MBC(enc, code, to);
     /* switch from titlecase to lowercase for capitalize */
     if (flags & ONIGENC_CASE_TITLECASE)
-      flags ^= (ONIGENC_CASE_UPCASE    |ONIGENC_CASE_DOWNCASE|ONIGENC_CASE_TITLECASE|
-	  ONIGENC_CASE_UP_SPECIAL|ONIGENC_CASE_DOWN_SPECIAL);
+      flags ^= (ONIGENC_CASE_UPCASE | ONIGENC_CASE_DOWNCASE | ONIGENC_CASE_TITLECASE|
+	  ONIGENC_CASE_UP_SPECIAL | ONIGENC_CASE_DOWN_SPECIAL);
   }
   *flagP = flags;
-  return (int)(to-to_start);
+  return (int )(to - to_start);
 }
 
 #if 0
