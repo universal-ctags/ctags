@@ -646,7 +646,7 @@ bool cxxParserParseEnum(void)
 	cxxParserNewStatement();
 	CXX_DEBUG_LEAVE();
 	return bRet;
-};
+}
 
 static bool cxxParserParseClassStructOrUnionInternal(
 		enum CXXKeyword eKeyword,

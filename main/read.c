@@ -348,7 +348,7 @@ static langType popLangOnStack (inputLangInfo *langInfo)
 
 static void clearLangOnStack (inputLangInfo *langInfo)
 {
-	return langStackClear (& langInfo->stack);
+	langStackClear (& langInfo->stack);
 }
 
 static void setLangToType  (inputLangInfo *langInfo, langType lang)
