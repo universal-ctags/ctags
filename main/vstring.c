@@ -79,18 +79,6 @@ extern vString *vStringNew (void)
 	return string;
 }
 
-#ifndef VSTRING_PUTC_MACRO
-extern void vStringPut (vString *const string, const int c)
-{
-	if (string->length + 1 == string->size)  /*  check for buffer overflow */
-		vStringResize (string, string->size * 2);
-
-	string->buffer [string->length] = c;
-	if (c != '\0')
-		string->buffer [++string->length] = '\0';
-}
-#endif
-
 extern vString *vStringNewCopy (const vString *const string)
 {
 	vString *vs = vStringNew ();
