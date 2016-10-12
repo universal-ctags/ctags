@@ -76,18 +76,18 @@ extern void runYamlParser (const yamlCallback callback, void* userData)
 
 	done = false;
 	while (!done)
-		{
-			if (!yaml_parser_scan (&yaml, &token))
-				break;
+	{
+		if (!yaml_parser_scan (&yaml, &token))
+			break;
 
-			callback (&token, userData);
-			verbose("yaml token:%s<%d>@Line:%lu\n", tokenTypeName[token.type], token.type,
-					token.start_mark.line + 1);
-			if (token.type == YAML_STREAM_END_TOKEN)
-				done = true;
+		callback (&token, userData);
+		verbose("yaml token:%s<%d>@Line:%lu\n", tokenTypeName[token.type], token.type,
+				token.start_mark.line + 1);
+		if (token.type == YAML_STREAM_END_TOKEN)
+			done = true;
 
-			yaml_token_delete (&token);
-		}
+		yaml_token_delete (&token);
+	}
 	yamlFini (&yaml);
 }
 
@@ -98,10 +98,10 @@ extern void attachYamlPosition (tagEntryInfo *tag, yaml_token_t *token, bool asE
 	if (asEndPosition)
 		tag->extensionFields.endLine = ln;
 	else
-		{
-			tag->lineNumber = ln;
-			tag->filePosition = getInputFilePositionForLine (tag->lineNumber);
-		}
+	{
+		tag->lineNumber = ln;
+		tag->filePosition = getInputFilePositionForLine (tag->lineNumber);
+	}
 }
 
 static hashTable *yamlParserClients;
@@ -122,19 +122,19 @@ static void call_callback (void *key CTAGS_ATTR_UNUSED, void *value, void *user_
 		return;
 
 	if (token->type == YAML_STREAM_START_TOKEN
-		&& client->prepareForNewInput)
-		client->data = client->prepareForNewInput ();
+		&& client->inputStart)
+		client->data = client->inputStart ();
 
 	pushLanguage (client->lang);
 	client->callback (token, client->data);
 	popLanguage ();
 
 	if (token->type == YAML_STREAM_END_TOKEN)
-		{
-			if (client->teardownForTheLastInput)
-				client->teardownForTheLastInput (client->data);
-			client->data = NULL;
-		}
+	{
+		if (client->inputEnd)
+			client->inputEnd (client->data);
+		client->data = NULL;
+	}
 }
 
 static void multiplexer (yaml_token_t *token, void *data)
@@ -169,19 +169,19 @@ static void yaml (yaml_token_t *token, void *data CTAGS_ATTR_UNUSED)
 	tagEntryInfo tag;
 
 	if (token->type == YAML_ANCHOR_TOKEN)
-		{
-			initTagEntry (&tag, (char *)token->data.anchor.value,
-						  YamlKinds + K_ANCHOR);
-			attachYamlPosition (&tag, token, false);
-			makeTagEntry (&tag);
-		}
+	{
+		initTagEntry (&tag, (char *)token->data.anchor.value,
+					  YamlKinds + K_ANCHOR);
+		attachYamlPosition (&tag, token, false);
+		makeTagEntry (&tag);
+	}
 	else if (token->type == YAML_ALIAS_TOKEN)
-		{
-			initRefTagEntry (&tag, (char *)token->data.alias.value,
-							 YamlKinds + K_ANCHOR, R_ANCHOR_ALIAS);
-			attachYamlPosition (&tag, token, false);
-			makeTagEntry (&tag);
-		}
+	{
+		initRefTagEntry (&tag, (char *)token->data.alias.value,
+						 YamlKinds + K_ANCHOR, R_ANCHOR_ALIAS);
+		attachYamlPosition (&tag, token, false);
+		makeTagEntry (&tag);
+	}
 
 }
 

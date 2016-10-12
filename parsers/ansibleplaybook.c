@@ -69,12 +69,12 @@ static void popBlockType (struct ansiblePlaybookState *state,
 
 	s->next = NULL;
 	if (s->associatedCorkIndex != CORK_NIL)
-		{
-			tagEntryInfo *tag;
+	{
+		tagEntryInfo *tag;
 
-			tag = getEntryInCorkQueue (s->associatedCorkIndex);
-			attachYamlPosition (tag, token, true);
-		}
+		tag = getEntryInCorkQueue (s->associatedCorkIndex);
+		attachYamlPosition (tag, token, true);
+	}
 
 	eFree (s);
 }
@@ -87,19 +87,19 @@ static void popAllBlockType (struct ansiblePlaybookState *state,
 }
 
 static bool stateStackMatch (struct yamlBlockTypeStack *stack,
-								yaml_token_type_t *expectation,
-								unsigned int length,
-								bool partial)
+							 yaml_token_type_t *expectation,
+							 unsigned int length,
+							 bool partial)
 {
 	if (length == 0)
-		{
-			if (stack == NULL)
-				return true;
-			else if (partial)
-				return true;
-			else
-				return false;
-		}
+	{
+		if (stack == NULL)
+			return true;
+		else if (partial)
+			return true;
+		else
+			return false;
+	}
 
 	if (stack == NULL)
 		return false;
@@ -128,43 +128,43 @@ static void	ansiblePlaybookPlayStateMachine (struct ansiblePlaybookState *state,
 	};
 
 	switch (token->type)
-		{
-		case YAML_KEY_TOKEN:
-			if (stateStackMatch (state->type_stack,
-								 play_expect, ARRAY_SIZE (play_expect),
-								 false))
-				state->play_detection_state = DSTAT_PLAY_NAME_KEY;
-			else
-				state->play_detection_state = DSTAT_PLAY_NAME_INITIAL;
-			break;
-		case YAML_SCALAR_TOKEN:
-			if ((state->play_detection_state == DSTAT_PLAY_NAME_KEY)
-				&& scalarNeq (token, 4, "name"))
-				state->play_detection_state = DSTAT_PLAY_NAME_KEY_SCALAR;
-			else if (state->play_detection_state == DSTAT_PLAY_NAME_VALUE)
-				{
-					tagEntryInfo tag;
-					initTagEntry (&tag, (char *)token->data.scalar.value,
-								  AnsiblePlaybookKinds + K_PLAY);
-					attachYamlPosition (&tag, token, false);
-
-					Assert (state->type_stack->associatedCorkIndex == CORK_NIL);
-					state->type_stack->associatedCorkIndex = makeTagEntry (&tag);
-					state->play_detection_state = DSTAT_PLAY_NAME_INITIAL;
-				}
-			else
-				state->play_detection_state = DSTAT_PLAY_NAME_INITIAL;
-			break;
-		case YAML_VALUE_TOKEN:
-			if (state->play_detection_state == DSTAT_PLAY_NAME_KEY_SCALAR)
-				state->play_detection_state = DSTAT_PLAY_NAME_VALUE;
-			else
-				state->play_detection_state = DSTAT_PLAY_NAME_INITIAL;
-			break;
-		default:
+	{
+	case YAML_KEY_TOKEN:
+		if (stateStackMatch (state->type_stack,
+							 play_expect, ARRAY_SIZE (play_expect),
+							 false))
+			state->play_detection_state = DSTAT_PLAY_NAME_KEY;
+		else
 			state->play_detection_state = DSTAT_PLAY_NAME_INITIAL;
-			break;
+		break;
+	case YAML_SCALAR_TOKEN:
+		if ((state->play_detection_state == DSTAT_PLAY_NAME_KEY)
+			&& scalarNeq (token, 4, "name"))
+			state->play_detection_state = DSTAT_PLAY_NAME_KEY_SCALAR;
+		else if (state->play_detection_state == DSTAT_PLAY_NAME_VALUE)
+		{
+			tagEntryInfo tag;
+			initTagEntry (&tag, (char *)token->data.scalar.value,
+						  AnsiblePlaybookKinds + K_PLAY);
+			attachYamlPosition (&tag, token, false);
+
+			Assert (state->type_stack->associatedCorkIndex == CORK_NIL);
+			state->type_stack->associatedCorkIndex = makeTagEntry (&tag);
+			state->play_detection_state = DSTAT_PLAY_NAME_INITIAL;
 		}
+		else
+			state->play_detection_state = DSTAT_PLAY_NAME_INITIAL;
+		break;
+	case YAML_VALUE_TOKEN:
+		if (state->play_detection_state == DSTAT_PLAY_NAME_KEY_SCALAR)
+			state->play_detection_state = DSTAT_PLAY_NAME_VALUE;
+		else
+			state->play_detection_state = DSTAT_PLAY_NAME_INITIAL;
+		break;
+	default:
+		state->play_detection_state = DSTAT_PLAY_NAME_INITIAL;
+		break;
+	}
 }
 
 static void ansiblePlaybook (yaml_token_t *token, void *data)
@@ -183,25 +183,33 @@ static void ansiblePlaybook (yaml_token_t *token, void *data)
 		popAllBlockType (data, token);
 }
 
-static void *ansiblePlaybookPrepare(void)
+static void *ansiblePlaybookInputStart(void)
 {
-	static struct ansiblePlaybookState state = {
-		.type_stack = NULL,
-		.play_detection_state = DSTAT_PLAY_NAME_INITIAL,
-	};
+	static struct ansiblePlaybookState state;
+
+	state.play_detection_state = DSTAT_PLAY_NAME_INITIAL;
+
 	return &state;
+}
+
+static void ansiblePlaybookInputEnd(void *data)
+{
+	struct ansiblePlaybookState *state CTAGS_ATTR_UNUSED = data;
+
+	Assert (state->type_stack == NULL);
 }
 
 static void
 findAnsiblePlaybookTags (void)
 {
-	void *data = ansiblePlaybookPrepare ();
+	void *data = ansiblePlaybookInputStart ();
 	runYamlParser (ansiblePlaybook, data);
 }
 
 static struct yamlParserClient AnsiblePlaybookYamlClient = {
-	.prepareForNewInput = ansiblePlaybookPrepare,
+	.inputStart = ansiblePlaybookInputStart,
 	.callback = ansiblePlaybook,
+	.inputEnd = ansiblePlaybookInputEnd,
 };
 
 static void initializeAnsiblePlaybookParser (const langType language)

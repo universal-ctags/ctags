@@ -84,7 +84,7 @@ static struct iniconfParserClient *maySwitchLanguage (const char *section, const
 	hashTableForeachItem (iniconfParserClients, mayRunProbe, &probe_data);
 	if (probe_data.client)
 	{
-		probe_data.client->data = probe_data.client->prepareForNewInput ();
+		probe_data.client->data = probe_data.client->inputStart ();
 		pushLanguage (probe_data.client->lang);
 	}
 	return probe_data.client;

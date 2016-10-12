@@ -28,17 +28,17 @@ struct m4ParserClient
 	langType lang;
 	void *data;
 
-	char quoteOpen;
-	char quoteClose;
+	const char quoteOpen;
+	const char quoteClose;
 
 	/* Do something for new input file. Returned value is stored to
 	   `data' field. */
-	void*   (* prepareForNewInput) (void);
+	void*   (* inputStart) (void);
 	bool (* doesStartLineComment) (int c, const char *token, void *data);
 	bool (* doesStartStringLiteral) (int c, void *data);
 
 	/* If the token is the part of the language the parser deals with,
-	   return true. This can be called before `prepareForNewInput' method. */
+	   return true. This can be called before `inputStart' method. */
 	bool (* probeLanguage) (const char* token);
 
 	struct m4HandleTokenResult (* handleMacro) (const char* token, void *data);

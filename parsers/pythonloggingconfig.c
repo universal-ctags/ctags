@@ -72,7 +72,7 @@ out:
 	return;
 }
 
-static void *pythonLoggingConfigPrepareForNewInput (void)
+static void *pythonLoggingConfiginputStart (void)
 {
 	static int sectionIndex;
 
@@ -90,7 +90,7 @@ static bool pythonLoggingConfigProbeLanguage (const char *section, const char *k
 
 static struct iniconfParserClient PythonLoggingConfigIniconfClient = {
 	.lang = LANG_IGNORE,
-	.prepareForNewInput = pythonLoggingConfigPrepareForNewInput,
+	.inputStart         = pythonLoggingConfiginputStart,
 	.probeLanguage      = pythonLoggingConfigProbeLanguage,
 	.handleInputData    = makePythonLoggingConfigTag,
 };

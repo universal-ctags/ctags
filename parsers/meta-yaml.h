@@ -25,8 +25,8 @@ typedef void (* yamlCallback) (yaml_token_t *token, void *data);
 struct yamlParserClient {
 	langType lang;
 	yamlCallback callback;
-	void* (* prepareForNewInput) (void);
-	void  (* teardownForTheLastInput) (void*);
+	void* (* inputStart) (void);
+	void  (* inputEnd) (void*);
 	void *data;
 };
 
