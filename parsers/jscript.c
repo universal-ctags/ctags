@@ -32,6 +32,7 @@
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
+#include "objpool.h"
 
 /*
  *	 MACROS
@@ -41,6 +42,8 @@
 #define isIdentChar(c) \
 	(isalpha (c) || isdigit (c) || (c) == '$' || \
 		(c) == '@' || (c) == '_' || (c) == '#')
+#define newToken() (objPoolGet (TokenPool))
+#define deleteToken(t) (objPoolPut (TokenPool, (t)))
 
 /*
  *	 DATA DECLARATIONS
@@ -122,6 +125,8 @@ static tokenInfo *NextToken;
 
 static langType Lang_js;
 
+static objPool *TokenPool = NULL;
+
 typedef enum {
 	JSTAG_FUNCTION,
 	JSTAG_CLASS,
@@ -176,24 +181,33 @@ static bool parseBlock (tokenInfo *const token, tokenInfo *const orig_parent);
 static bool parseLine (tokenInfo *const token, tokenInfo *const parent, bool is_inside_class);
 static void parseUI5 (tokenInfo *const token);
 
-static tokenInfo *newToken (void)
+static void *newPoolToken (void)
 {
-	tokenInfo *const token = xMalloc (1, tokenInfo);
+	tokenInfo *token = xMalloc (1, tokenInfo);
 
-	token->type			= TOKEN_UNDEFINED;
-	token->keyword		= KEYWORD_NONE;
 	token->string		= vStringNew ();
 	token->scope		= vStringNew ();
-	token->nestLevel	= 0;
-	token->ignoreTag	= false;
-	token->lineNumber   = getInputLineNumber ();
-	token->filePosition = getInputFilePosition ();
 
 	return token;
 }
 
-static void deleteToken (tokenInfo *const token)
+static void clearPoolToken (void *data)
 {
+	tokenInfo *token = data;
+
+	token->type			= TOKEN_UNDEFINED;
+	token->keyword		= KEYWORD_NONE;
+	token->nestLevel	= 0;
+	token->ignoreTag	= false;
+	token->lineNumber   = getInputLineNumber ();
+	token->filePosition = getInputFilePosition ();
+	vStringClear (token->string);
+	vStringClear (token->scope);
+}
+
+static void deletePoolToken (void *data)
+{
+	tokenInfo *token = data;
 	vStringDelete (token->string);
 	vStringDelete (token->scope);
 	eFree (token);
@@ -1941,6 +1955,16 @@ static void initialize (const langType language)
 {
 	Assert (ARRAY_SIZE (JsKinds) == JSTAG_COUNT);
 	Lang_js = language;
+
+	TokenPool = objPoolNew (16, newPoolToken, deletePoolToken, clearPoolToken);
+}
+
+static void finalize (langType language CTAGS_ATTR_UNUSED, bool initialized)
+{
+	if (!initialized)
+		return;
+
+	objPoolDelete (TokenPool);
 }
 
 static void findJsTags (void)
@@ -1981,6 +2005,7 @@ extern parserDefinition* JavaScriptParser (void)
 	def->kindCount	= ARRAY_SIZE (JsKinds);
 	def->parser		= findJsTags;
 	def->initialize = initialize;
+	def->finalize   = finalize;
 	def->keywordTable = JsKeywordTable;
 	def->keywordCount = ARRAY_SIZE (JsKeywordTable);
 

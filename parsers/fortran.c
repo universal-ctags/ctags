@@ -582,10 +582,11 @@ static void makeLabelTag (vString *const label)
 
 static lineType getLineType (void)
 {
-	vString *label = vStringNew ();
+	static vString *label = NULL;
 	int column = 0;
 	lineType type = LTYPE_UNDETERMINED;
 
+	label = vStringNewOrClear (label);
 	do  /* read in first 6 "margin" characters */
 	{
 		int c = getcFromInputFile ();
@@ -647,7 +648,6 @@ static lineType getLineType (void)
 
 	if (vStringLength (label) > 0)
 		makeLabelTag (label);
-	vStringDelete (label);
 	return type;
 }
 
