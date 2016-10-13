@@ -1961,6 +1961,53 @@ extern void printLanguageKinds (const langType language, bool allKindFields)
 	}
 }
 
+static void printParameters (langType language, bool indent)
+{
+	const parserDefinition* lang;
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+
+	initializeParser (language);
+	lang = LanguageTable [language];
+	if (lang->parameterHandlerTable != NULL)
+	{
+		unsigned int i;
+
+		for (i = 0; i < lang->parameterHandlerCount; ++i)
+		{
+			if (indent)
+				printf (Option.machinable? "%s": PR_PARAM_FMT (LANG,s), lang->name);
+			printParameter (lang->parameterHandlerTable + i, indent, Option.machinable);
+		}
+	}
+
+}
+
+extern void printLanguageParameters (const langType language)
+{
+	if (language == LANG_AUTO)
+	{
+		unsigned int i;
+
+		if (Option.withListHeader)
+			printParameterListHeader (true, Option.machinable);
+		for (i = 0; i < LanguageCount ; ++i)
+		{
+			const parserDefinition* const lang = LanguageTable [i];
+
+			if (lang->invisible)
+				continue;
+			printParameters (i, true);
+		}
+	}
+	else
+	{
+		if (Option.withListHeader)
+			printParameterListHeader (false, Option.machinable);
+
+		printParameters (language, false);
+	}
+}
+
 static void processLangAliasOption (const langType language,
 				    const char *const parameter)
 {

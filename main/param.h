@@ -23,4 +23,13 @@ typedef struct sParameterHandlerTable {
 
 extern void applyParameter (const langType language, const char *name, const char *args);
 
+extern void printParameterListHeader (bool indent, bool tabSeparated);
+extern void printParameter (const parameterHandlerTable *const paramHandler, bool indent, bool tabSeparated);
+
+
+#define PR_PARAM_STR(X) PR_PARAM_WIDTH_##X
+#define PR_PARAM_FMT(X,T) "%-" STRINGIFY(PR_PARAM_STR(X)) STRINGIFY(T)
+
+#define PR_PARAM_WIDTH_LANG 15
+
 #endif	/* CTAGS_MAIN_PARAM_H */

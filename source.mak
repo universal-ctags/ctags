@@ -74,6 +74,7 @@ MAIN_SRCS =				\
 	main/output-ctags.c		\
 	main/output-json.c		\
 	main/output-xref.c		\
+	main/param.c			\
 	main/parse.c			\
 	main/pcoproc.c			\
 	main/promise.c			\

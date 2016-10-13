@@ -322,6 +322,8 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of supported languages."},
  {1,"  --list-maps=[language|all]"},
  {1,"       Output list of language mappings(both extensions and patterns)."},
+ {1,"  --list-params=[language|all]"},
+ {1,"       Output list of language parameters. This works with --machinable."},
  {1,"  --list-patterns=[language|all]"},
  {1,"       Output list of language patterns in mapping."},
  {0,"  --list-pseudo-tags"},
@@ -330,7 +332,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Output list of flags which can be used in a regex parser definition."},
  {1,"  --machinable=[yes|no]"},
  {1,"       Use tab separated representation in --list- option output. [no]"},
- {1,"       --list-extra, --list-fields, and --list-kinds-full support this option."},
+ {1,"       --list-extra, --list-fields, --list-kinds-full, and --list-params support this option."},
  {1,"       Suitable for scripting. Specify before --list-* option."},
  {1,"  --map-<LANG>=[+|-]pattern|extension"},
  {1,"       Set or add(+) a map for <LANG>."},
@@ -357,7 +359,7 @@ static optionDescription LongOptionDescription [] = {
  },
  {0,"      Specify the output format. [ctags]"},
  {1,"  --param-<LANG>=name:argument"},
- {1,"       Set <LANG> specific parameter. Available parameters can be listed."},
+ {1,"       Set <LANG> specific parameter. Available parameters can be listed with --list-params."},
  {0,"  --pattern-length-limit=N"},
  {0,"      Cutoff patterns of tag entries after N characters. Disable by setting to 0. [96]"},
  {0,"  --print-language"},
@@ -392,7 +394,7 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Print version identifier to standard output."},
  {1,"  --with-list-header=[yes|no]"},
  {1,"       Preprend the column descriptions in --list- output. [yes]"},
- {1,"       --list-extra, --list-fields, and --list-kinds-full support this option."},
+ {1,"       --list-extra, --list-fields, --list-kinds-full, and --list-params support this option."},
  {1,"       Specify before --list-* option."},
 #ifdef HAVE_COPROC
  {1,"  --xcmd-<LANG>=parser_command_path|parser_command_name"},
@@ -1813,6 +1815,23 @@ static void processListKindsOption (
 	exit (0);
 }
 
+static void processListParametersOption (const char *const option,
+										 const char *const parameter)
+{
+	if (parameter [0] == '\0' || strcasecmp (parameter, "all") == 0)
+		printLanguageParameters (LANG_AUTO);
+	else
+	{
+		langType language = getNamedLanguage (parameter, 0);
+		if (language == LANG_IGNORE)
+			error (FATAL, "Unknown language \"%s\" in \"%s\" option", parameter, option);
+		else
+			printLanguageParameters (language);
+	}
+	exit (0);
+}
+
+
 static void processListMapsOptionForType (const char *const option CTAGS_ATTR_UNUSED,
 					  const char *const  parameter,
 					  langmapType type)
@@ -2430,6 +2449,7 @@ static parametricOption ParametricOptions [] = {
 	{ "list-kinds-full",        processListKindsOption,         true,   STAGE_ANY },
 	{ "list-languages",         processListLanguagesOption,     true,   STAGE_ANY },
 	{ "list-maps",              processListMapsOption,          true,   STAGE_ANY },
+	{ "list-params",            processListParametersOption,    true,   STAGE_ANY },
 	{ "list-patterns",          processListPatternsOption,      true,   STAGE_ANY },
 	{ "list-pseudo-tags",       processListPseudoTagsOptions,   true,   STAGE_ANY },
 	{ "list-regex-flags",       processListRegexFlagsOptions,   true,   STAGE_ANY },
