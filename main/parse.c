@@ -2657,6 +2657,34 @@ extern void anonGenerate (vString *buffer, const char *prefix, int kind)
 	vStringCatS(buffer,szNum);
 }
 
+
+extern void applyParameter (const langType language, const char *name, const char *args)
+{
+	parserDefinition* parser;
+
+
+	Assert (0 <= language  &&  language < (int) LanguageCount);
+
+	initializeParserOne (language);
+	parser = LanguageTable [language];
+
+	if (parser->parameterHandlerTable)
+	{
+		unsigned int i;
+
+		for (i = 0; i < parser->parameterHandlerCount; i++)
+		{
+			if (strcmp (parser->parameterHandlerTable [i].name, name) == 0)
+			{
+				parser->parameterHandlerTable [i].handleParameter (language, name, args);
+				return;
+			}
+		}
+	}
+
+	error (FATAL, "no such parameter in %s: %s", parser->name, name);
+}
+
 /*
  * A parser for CTagsSelfTest (CTST)
  */

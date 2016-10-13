@@ -123,6 +123,12 @@ typedef struct {
 	const int id;
 } keywordTable;
 
+typedef struct sParameterHandlerTable {
+	const char *name;
+	const char *desc;
+	void  (* handleParameter) (langType lang, const char *name, const char *arg);
+} parameterHandlerTable;
+
 struct sParserDefinition {
 	/* defined by parser */
 	char* name;                    /* name of language */
@@ -153,6 +159,10 @@ struct sParserDefinition {
 
 	parserDependency * dependencies;
 	unsigned int dependencyCount;
+
+	parameterHandlerTable  *parameterHandlerTable;
+	unsigned int parameterHandlerCount;
+
 	/* used internally */
 	langType id;		    /* id assigned to language */
 	unsigned int enabled:1;	       /* currently enabled? */
@@ -312,5 +322,8 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 
 extern void anonReset (void);
 extern void anonGenerate (vString *buffer, const char *prefix, int kind);
+
+/* Parameter */
+extern void applyParameter (const langType language, const char *name, const char *args);
 
 #endif  /* CTAGS_MAIN_PARSE_H */

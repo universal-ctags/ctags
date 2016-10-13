@@ -358,6 +358,8 @@ static optionDescription LongOptionDescription [] = {
 #endif
  },
  {0,"      Specify the output format. [ctags]"},
+ {1,"  --param-<LANG>=name:argument"},
+ {1,"       Set <LANG> specific parameter. Available parameters can be listed."},
  {0,"  --pattern-length-limit=N"},
  {0,"      Cutoff patterns of tag entries after N characters. Disable by setting to 0. [96]"},
  {0,"  --print-language"},
@@ -1707,6 +1709,34 @@ extern bool processMapOption (
 	return true;
 }
 
+extern bool processParamOption (
+			const char *const option, const char *const value)
+{
+	langType language;
+	char* name;
+	const char* arg;
+	const char* sep;
+
+	language = getLanguageComponentInOption (option, "param-");
+	if (language == LANG_IGNORE)
+		return false;
+
+	if (value == NULL || value [0] == '\0')
+		error (FATAL, "no parameter is given for %s", option);
+
+	sep = strchr (value, ':');
+	if (sep == NULL)
+		error (FATAL, "no separator(:) is given for %s=%s", option, value);
+
+	name = eStrndup (value, sep - value);
+	arg = sep + 1;
+
+	applyParameter (language, name, arg);
+
+	eFree (name);
+	return true;
+}
+
 static void processLicenseOption (
 		const char *const option CTAGS_ATTR_UNUSED,
 		const char *const parameter CTAGS_ATTR_UNUSED)
@@ -2161,7 +2191,7 @@ static void saveIgnoreToken(const char * ignoreToken)
 
 	const char * c = ignoreToken;
 	char cc = *c;
-	
+
 	const char * tokenBegin = c;
 	const char * tokenEnd = NULL;
 	const char * replacement = NULL;
@@ -2178,27 +2208,27 @@ static void saveIgnoreToken(const char * ignoreToken)
 				replacement = c;
 			break;
 		}
-		
+
 		if(cc == '+')
 		{
 			if(!tokenEnd)
 				tokenEnd = c;
 			ignoreFollowingParenthesis = true;
 		}
-		
+
 		c++;
 		cc = *c;
 	}
 
 	if(!tokenEnd)
 		tokenEnd = c;
-	
+
 	if(tokenEnd <= tokenBegin)
 		return;
 
-	
+
 	ignoredTokenInfo * info = (ignoredTokenInfo *)eMalloc(sizeof(ignoredTokenInfo));
-	
+
 	info->ignoreFollowingParenthesis = ignoreFollowingParenthesis;
 	info->replacement = replacement ? eStrdup(replacement) : NULL;
 
@@ -2741,6 +2771,8 @@ static void processLongOption (
 	else if (processXcmdOption (option, parameter, Stage))
 		;
 	else if (processMapOption (option, parameter))
+		;
+	else if (processParamOption (option, parameter))
 		;
 #ifdef HAVE_ICONV
 	else if (processLanguageEncodingOption (option, parameter))
