@@ -411,7 +411,6 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 					 Cpp.macroUndefRoleIndex);
 		else
 			initTagEntry (&e, name, Cpp.defineMacroKind);
-		e.lineNumberEntry = (bool) (Option.locate == EX_LINENUM);
 		e.isFileScope  = isFileScope;
 		if (isFileScope)
 			markTagExtraBit (&e, XTAG_FILE_SCOPE);
@@ -449,7 +448,6 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 			pushLanguage (Cpp.lang);
 
 		initRefTagEntry (&e, name, Cpp.headerKind, role_index);
-		e.lineNumberEntry = (bool) (Option.locate == EX_LINENUM);
 		e.isFileScope  = false;
 		e.truncateLine = true;
 		makeTagEntry (&e);
