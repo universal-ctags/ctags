@@ -1853,12 +1853,12 @@ static keywordId analyzeKeyword (const char *const name)
 static void analyzeIdentifier (tokenInfo *const token)
 {
 	const char * name = vStringValue (token->name);
-	
+
 	if(!isInputLanguage(Lang_java))
 	{
 		// C: check for ignored token
 		// (FIXME: java doesn't support -I... but maybe it should?)
-		const ignoredTokenInfo * ignore = isIgnoreToken(name);
+		const cppIgnoredTokenInfo * ignore = cppIsIgnoreToken(name);
 
 		if(ignore)
 		{

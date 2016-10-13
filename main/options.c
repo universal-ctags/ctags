@@ -133,7 +133,6 @@ static const char *const HeaderExtensions [] = {
 };
 
 optionValues Option = {
-	NULL,       /* -I */
 	false,      /* -a */
 	false,      /* -B */
 	false,      /* -e */
@@ -2153,98 +2152,15 @@ static void processHeaderListOption (const int option, const char *parameter)
 /*
  *  Token ignore processing
  */
-
-/*  Determines whether or not "name" should be ignored, per the ignore list.
- */
-extern const ignoredTokenInfo * isIgnoreToken(const char * name)
-{
-	if(!Option.ignore)
-		return NULL;
-
-	return (const ignoredTokenInfo *)hashTableGetItem(Option.ignore,(char *)name);
-}
-
-static void freeIgnoredTokenInfo(ignoredTokenInfo * info)
-{
-	if(!info)
-		return;
-	if(info->replacement)
-		eFree(info->replacement);
-	eFree(info);
-}
-
-static void saveIgnoreToken(const char * ignoreToken)
-{
-	if(!ignoreToken)
-		return;
-
-	if(!Option.ignore)
-	{
-		Option.ignore = hashTableNew(
-				1024,
-				hashCstrhash,
-				hashCstreq,
-				free,
-				(void (*)(void *))freeIgnoredTokenInfo
-			);
-	}
-
-	const char * c = ignoreToken;
-	char cc = *c;
-
-	const char * tokenBegin = c;
-	const char * tokenEnd = NULL;
-	const char * replacement = NULL;
-	bool ignoreFollowingParenthesis = false;
-
-	while(cc)
-	{
-		if(cc == '=')
-		{
-			if(!tokenEnd)
-				tokenEnd = c;
-			c++;
-			if(*c)
-				replacement = c;
-			break;
-		}
-
-		if(cc == '+')
-		{
-			if(!tokenEnd)
-				tokenEnd = c;
-			ignoreFollowingParenthesis = true;
-		}
-
-		c++;
-		cc = *c;
-	}
-
-	if(!tokenEnd)
-		tokenEnd = c;
-
-	if(tokenEnd <= tokenBegin)
-		return;
-
-
-	ignoredTokenInfo * info = (ignoredTokenInfo *)eMalloc(sizeof(ignoredTokenInfo));
-
-	info->ignoreFollowingParenthesis = ignoreFollowingParenthesis;
-	info->replacement = replacement ? eStrdup(replacement) : NULL;
-
-	hashTablePutItem(Option.ignore,eStrndup(tokenBegin,tokenEnd - tokenBegin),info);
-
-	verbose ("    ignore token: %s\n", ignoreToken);
-}
-
 static void readIgnoreList (const char *const list)
 {
+	langType lang = getNamedLanguage ("CPreProcessor", 0);
 	char* newList = stringCopy (list);
 	const char *token = strtok (newList, IGNORE_SEPARATORS);
 
 	while (token != NULL)
 	{
-		saveIgnoreToken (token);
+		applyParameter (lang, "ignore", token);
 		token = strtok (NULL, IGNORE_SEPARATORS);
 	}
 	eFree (newList);
@@ -2252,6 +2168,8 @@ static void readIgnoreList (const char *const list)
 
 static void addIgnoreListFromFile (const char *const fileName)
 {
+	langType lang = getNamedLanguage ("CPreProcessor", 0);
+
 	stringList* tokens = stringListNewFromFile (fileName);
 	if (tokens == NULL)
 		error (FATAL | PERROR, "cannot open \"%s\"", fileName);
@@ -2262,7 +2180,7 @@ static void addIgnoreListFromFile (const char *const fileName)
 	for(i=0;i<c;i++)
 	{
 		vString * s = stringListItem(tokens,i);
-		saveIgnoreToken(vStringValue(s));
+		applyParameter (lang, "ignore", vStringValue(s));
 	}
 
 	stringListDelete(tokens);
@@ -2270,6 +2188,8 @@ static void addIgnoreListFromFile (const char *const fileName)
 
 static void processIgnoreOption (const char *const list)
 {
+	langType lang = getNamedLanguage ("CPreProcessor", 0);
+
 	if (strchr ("@./\\", list [0]) != NULL)
 	{
 		const char* fileName = (*list == '@') ? list + 1 : list;
@@ -2280,14 +2200,7 @@ static void processIgnoreOption (const char *const list)
 		addIgnoreListFromFile (list);
 #endif
 	else if (strcmp (list, "-") == 0)
-	{
-		if(Option.ignore)
-		{
-			hashTableDelete(Option.ignore);
-			Option.ignore = NULL;
-		}
-		verbose ("    clearing list\n");
-	}
+		applyParameter (lang, "ignore", NULL);
 	else
 		readIgnoreList (list);
 }
@@ -3387,11 +3300,6 @@ extern void freeOptionResources (void)
 	freeString (&Option.filterTerminator);
 
 	freeList (&Excluded);
-	if(Option.ignore)
-	{
-		hashTableDelete(Option.ignore);
-		Option.ignore = NULL;
-	}
 	freeList (&Option.headerExt);
 	freeList (&Option.etagsInclude);
 
