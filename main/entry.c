@@ -467,12 +467,12 @@ static void copyBytes (MIO* const fromMio, MIO* const toMio, const long size)
 
 static void copyFile (const char *const from, const char *const to, const long size)
 {
-	MIO* const fromMio = mio_new_file_full (from, "rb", g_fopen, fclose);
+	MIO* const fromMio = mio_new_file (from, "rb");
 	if (fromMio == NULL)
 		error (FATAL | PERROR, "cannot open file to copy");
 	else
 	{
-		MIO* const toMio = mio_new_file_full (to, "wb", g_fopen, fclose);
+		MIO* const toMio = mio_new_file (to, "wb");
 		if (toMio == NULL)
 			error (FATAL | PERROR, "cannot open copy destination");
 		else
