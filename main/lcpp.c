@@ -122,6 +122,9 @@ static kindOption CPreProKinds [] = {
 *   DATA DEFINITIONS
 */
 
+static bool doesExaminCodeWithInIf0Branch;
+
+
 /*  Use brace formatting to detect end of block.
  */
 static bool BraceFormat = false;
@@ -366,7 +369,7 @@ static bool pushConditional (const bool firstBranchChosen)
 		ifdef->branchChosen      = firstBranchChosen;
 		ifdef->ignoring = (bool) (ignoreAllBranches || (
 				! firstBranchChosen  &&  ! BraceFormat  &&
-				(ifdef->singleBranch || !Option.if0)));
+				(ifdef->singleBranch || !doesExaminCodeWithInIf0Branch)));
 		ignoreBranch = ifdef->ignoring;
 	}
 	return ignoreBranch;
@@ -1174,7 +1177,17 @@ static void CpreProInstallIgnoreToken (const langType language, const char *name
 		saveIgnoreToken (arg);
 }
 
+static void CpreProSetIf0 (const langType language, const char *name, const char *arg)
+{
+	if (strcmp (arg, "true") == 0)
+		doesExaminCodeWithInIf0Branch = true;
+}
+
 static parameterHandlerTable CpreProParameterHandlerTable [] = {
+	{ .name = "if0",
+	  .desc = "examine code within \"#if 0\" branch (true or [false])",
+	  .handleParameter = CpreProSetIf0,
+	},
 	{ .name = "ignore",
 	  .desc = "a token to be specially handled",
 	  .handleParameter = CpreProInstallIgnoreToken,

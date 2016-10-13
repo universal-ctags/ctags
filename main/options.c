@@ -156,7 +156,6 @@ optionValues Option = {
 	NULL,		/* --input-encoding */
 	NULL,		/* --output-encoding */
 #endif
-	false,      /* --if0 */
 	LANG_AUTO,  /* --lang */
 	true,       /* --links */
 	false,      /* --filter */
@@ -499,6 +498,7 @@ static const char *const StageDescription [] = {
 static bool parseFileOptions (const char *const fileName);
 static bool parseAllConfigurationFilesOptionsInDirectory (const char *const fileName,
 							     stringList* const already_loaded_files);
+static bool getBooleanOption (const char *const option, const char *const parameter);
 
 /*
 *   FUNCTION DEFINITIONS
@@ -1400,6 +1400,16 @@ static void processHelpOption (
 	putchar ('\n');
 	printOptionDescriptions (LongOptionDescription);
 	exit (0);
+}
+
+static void processIf0Option (const char *const option,
+							  const char *const parameter)
+{
+	bool if0 = getBooleanOption (option, parameter);
+	langType lang = getNamedLanguage ("CPreProcessor", 0);
+	const char *arg = if0? "true": "false";
+
+	applyParameter (lang, "if0", arg);
 }
 
 static void processLanguageForceOption (
@@ -2398,6 +2408,7 @@ static parametricOption ParametricOptions [] = {
 	{ "filter-terminator",      processFilterTerminatorOption,  true,   STAGE_ANY },
 	{ "format",                 processFormatOption,            true,   STAGE_ANY },
 	{ "help",                   processHelpOption,              true,   STAGE_ANY },
+	{ "if0",                    processIf0Option,               false,  STAGE_ANY },
 #ifdef HAVE_ICONV
 	{ "input-encoding",         processInputEncodingOption,     false,  STAGE_ANY },
 	{ "output-encoding",        processOutputEncodingOption,    false,  STAGE_ANY },
@@ -2442,7 +2453,6 @@ static booleanOption BooleanOptions [] = {
 	{ "file-tags",      ((bool *)XTAG_FILE_NAMES),   false, STAGE_ANY, redirectToXtag },
 	{ "filter",         &Option.filter,                 true,  STAGE_ANY },
 	{ "guess-language-eagerly", &Option.guessLanguageEagerly, false, STAGE_ANY },
-	{ "if0",            &Option.if0,                    false, STAGE_ANY },
 	{ "line-directives",&Option.lineDirectives,         false, STAGE_ANY },
 	{ "links",          &Option.followLinks,            false, STAGE_ANY },
 	{ "machinable",     &Option.machinable,             true,  STAGE_ANY },
