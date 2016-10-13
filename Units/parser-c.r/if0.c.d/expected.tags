@@ -1,0 +1,2 @@
+x	input.c	/^int x;$/;"	v	typeref:typename:int
+y	input.c	/^int y;$/;"	v	typeref:typename:int
