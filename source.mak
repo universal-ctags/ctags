@@ -25,7 +25,6 @@ MAIN_HEADS =			\
 	main/htable.h		\
 	main/keyword.h		\
 	main/kind.h		\
-	main/lcpp.h		\
 	main/main.h		\
 	main/mbcs.h		\
 	main/nestlevel.h	\
@@ -61,7 +60,6 @@ MAIN_SRCS =				\
 	main/htable.c			\
 	main/keyword.c			\
 	main/kind.c			\
-	main/lcpp.c			\
 	main/lregex.c			\
 	main/lxcmd.c			\
 	main/lxpath.c			\
@@ -109,6 +107,7 @@ PARSER_HEADS = \
 	parsers/meta-iniconf.h \
 	parsers/meta-m4.h \
 	parsers/meta-make.h \
+	parsers/meta-cpreprocessor.h \
 	\
 	$(NULL)
 
@@ -126,6 +125,7 @@ PARSER_SRCS =				\
 	parsers/clojure.c		\
 	parsers/css.c			\
 	parsers/cobol.c			\
+	parsers/cpreprocessor.c		\
 	parsers/cxx/cxx.c		\
 	parsers/cxx/cxx_debug.c		\
 	parsers/cxx/cxx_keyword.c		\

@@ -243,7 +243,7 @@
     <ClCompile Include="..\main\kind.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\main\lcpp.c">
+    <ClCompile Include="..\parsers\cpreprocessor.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
     <ClCompile Include="..\parsers\iniconf.c">
@@ -425,7 +425,7 @@
     <ClInclude Include="..\main\kind.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\main\lcpp.h">
+    <ClInclude Include="..\parsers\meta-cpreprocessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\main\main.h">
