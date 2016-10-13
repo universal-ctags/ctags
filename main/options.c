@@ -394,7 +394,6 @@ static optionDescription LongOptionDescription [] = {
  {1,"       Preprend the column descriptions in --list- output. [yes]"},
  {1,"       --list-extra, --list-fields, and --list-kinds-full support this option."},
  {1,"       Specify before --list-* option."},
- {1,"       --list-fields, and --list-kinds-full support this option."},
 #ifdef HAVE_COPROC
  {1,"  --xcmd-<LANG>=parser_command_path|parser_command_name"},
  {1,"       Define external parser command path or name for specific language."},
