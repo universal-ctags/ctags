@@ -434,6 +434,9 @@
     <ClInclude Include="..\main\output.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\main\param.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\main\parse.h">
       <Filter>Header Files</Filter>
     </ClInclude>

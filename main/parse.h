@@ -18,6 +18,7 @@
 #include "dependency.h"
 #include "field.h"
 #include "kind.h"
+#include "param.h"
 #include "parsers.h"  /* contains list of parsers */
 #include "strlist.h"
 
@@ -122,12 +123,6 @@ typedef struct {
 	const char *name;
 	const int id;
 } keywordTable;
-
-typedef struct sParameterHandlerTable {
-	const char *name;
-	const char *desc;
-	void  (* handleParameter) (langType lang, const char *name, const char *arg);
-} parameterHandlerTable;
 
 struct sParserDefinition {
 	/* defined by parser */
@@ -322,8 +317,5 @@ extern bool makeKindDescriptionsPseudoTags (const langType language,
 
 extern void anonReset (void);
 extern void anonGenerate (vString *buffer, const char *prefix, int kind);
-
-/* Parameter */
-extern void applyParameter (const langType language, const char *name, const char *args);
 
 #endif  /* CTAGS_MAIN_PARSE_H */

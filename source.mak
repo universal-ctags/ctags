@@ -32,6 +32,7 @@ MAIN_HEADS =			\
 	main/objpool.h		\
 	main/options.h		\
 	main/output.h		\
+	main/param.h		\
 	main/parse.h		\
 	main/parsers.h		\
 	main/pcoproc.h		\
