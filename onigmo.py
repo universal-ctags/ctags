@@ -131,7 +131,7 @@ if os.name in ("nt", "ce"):
             libonig = ctypes.cdll.LoadLibrary(_libname)
 elif sys.platform == "cygwin":
     # Cygwin
-    _libname = "cyg-onigmo-%d.dll" % _onig_api_version
+    _libname = "cygonigmo-%d.dll" % _onig_api_version
     libonig = ctypes.cdll.LoadLibrary(_libname)
 elif sys.platform == "msys":
     # MSYS/MSYS2
