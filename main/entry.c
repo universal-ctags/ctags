@@ -223,7 +223,7 @@ static void updateSortedFlag (
 		{
 			MIOPos nextLine;
 
-			if (mio_getpos (mio, &nextLine) == -1 || mio_getpos (mio, &startOfLine) == -1)
+			if (mio_getpos (mio, &nextLine) == -1 || mio_setpos (mio, &startOfLine) == -1)
 				error (WARNING, "Failed to update 'sorted' pseudo-tag");
 			else
 			{
