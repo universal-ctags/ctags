@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/11
+Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/15
 
 * POSIX brackets
     Alpha
@@ -15,6 +15,7 @@ Onigmo (Oniguruma-mod) Unicode Properties  Version 6.0.0    2016/10/11
     Word
     Alnum
     ASCII
+    XPosixPunct
 
 * Special
     Any

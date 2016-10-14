@@ -25,6 +25,7 @@ def output_header():
     posix_brackets = [
         "Alpha", "Blank", "Cntrl", "Digit", "Graph", "Lower", "Print",
         "Punct", "Space", "Upper", "XDigit", "Word", "Alnum", "ASCII",
+        "XPosixPunct"
         ]
     specials = ["Any", "Assigned"]
 
