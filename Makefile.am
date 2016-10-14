@@ -39,8 +39,8 @@ libonigmo_la_LDFLAGS = -version-info $(LTVERSION) -no-undefined
 EXTRA_DIST = .gitignore onigmo.pc.in HISTORY README.ja index.html \
 	index_ja.html doc/API doc/API.ja doc/RE doc/RE.ja doc/FAQ doc/FAQ.ja \
 	doc/UnicodeProps.txt \
-	tool/.gitignore tool/case-folding.rb tool/convert-name2ctype.sh \
-	tool/convert-jis-props.sh \
+	tool/.gitignore tool/Makefile tool/case-folding.rb \
+	tool/convert-name2ctype.sh tool/convert-jis-props.sh \
 	tool/enc-unicode.rb tool/download-ucd.sh tool/update-doc.py \
 	win32/Makefile win32/Makefile.mingw win32/config.h win32/testc.c \
 	win32/makedef.py win32/onigmo.rc \
