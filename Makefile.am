@@ -6,7 +6,7 @@ libname = libonigmo.la
 ACLOCAL_AMFLAGS = -I m4
 #AM_CFLAGS = -DNOT_RUBY
 AM_CFLAGS =
-INCLUDES  = -I$(top_srcdir) -I$(includedir)
+INCLUDES  = -I$(top_srcdir) -I$(includedir) -I$(encdir)/unicode
 
 SUBDIRS = . sample
 
