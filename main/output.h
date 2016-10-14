@@ -16,6 +16,14 @@
    and postWriteEntry. If a resource is allocated in
    preWriteEntry, postWriteEntry should free it. */
 
+typedef enum eOutputType {
+	OUTPUT_CTAGS,
+	OUTPUT_ETAGS,
+	OUTPUT_XREF,
+	OUTPUT_JSON,
+	OUTPUT_COUNT,
+} outputType;
+
 struct sTagWriter;
 typedef struct sTagWriter tagWriter;
 struct sTagWriter {
@@ -27,13 +35,11 @@ struct sTagWriter {
 	void * (* preWriteEntry) (MIO * mio);
 	void (* postWriteEntry)  (MIO * mio, const char* filename, void *data);
 	bool useStdoutByDefault;
+
+	outputType type;
 };
 
-extern void setTagWriter (tagWriter *tagWriter);
-extern tagWriter etagsWriter;
-extern tagWriter ctagsWriter;
-extern tagWriter xrefWriter;
-extern tagWriter jsonWriter;
+extern void setTagWriter (outputType otype);
 
 extern bool outpuFormatUsedStdoutByDefault (void);
 

@@ -1040,12 +1040,25 @@ static unsigned int queueTagEntry(const tagEntryInfo *const tag)
 }
 
 
+extern tagWriter ctagsWriter;
+extern tagWriter etagsWriter;
+extern tagWriter xrefWriter;
+extern tagWriter jsonWriter;
+
+static tagWriter *writerTable [OUTPUT_COUNT] = {
+	&ctagsWriter,
+	&etagsWriter,
+	&xrefWriter,
+	&jsonWriter,
+};
+
 static void *writerData;
 static tagWriter *writer;
 
-extern void setTagWriter (tagWriter *t)
+extern void setTagWriter (outputType otype)
 {
-	writer = t;
+	writer = writerTable [otype];
+	writer->type = otype;
 }
 
 extern bool outpuFormatUsedStdoutByDefault (void)

@@ -724,7 +724,7 @@ static void setEtagsMode (void)
 	Option.sorted = SO_UNSORTED;
 	Option.lineDirectives = false;
 	Option.tagRelative = true;
-	setTagWriter (&etagsWriter);
+	setTagWriter (OUTPUT_ETAGS);
 }
 
 extern void testEtagsInvocation (void)
@@ -747,14 +747,14 @@ extern void testEtagsInvocation (void)
 static void setXrefMode (void)
 {
 	Option.xref = true;
-	setTagWriter (&xrefWriter);
+	setTagWriter (OUTPUT_XREF);
 }
 
 #ifdef HAVE_JANSSON
 static void setJsonMode (void)
 {
 	enablePtag (PTAG_JSON_OUTPUT_VERSION, true);
-	setTagWriter (&jsonWriter);
+	setTagWriter (OUTPUT_JSON);
 }
 #endif
 
