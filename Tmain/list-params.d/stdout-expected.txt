@@ -1,0 +1,28 @@
+# ALL
+#PARSER         NAME     DESCRIPTION                   
+CPreProcessor   if0      examine code within "#if 0" branch (true or [false])
+CPreProcessor   ignore   a token to be specially handled
+
+# ALL MACHINABLE
+#PARSER	NAME	DESCRIPTION
+CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
+CPreProcessor	ignore	a token to be specially handled
+
+# ALL MACHINABLE NOHEADER
+CPreProcessor	if0	examine code within "#if 0" branch (true or [false])
+CPreProcessor	ignore	a token to be specially handled
+
+# CPP
+NAME     DESCRIPTION                   
+if0      examine code within "#if 0" branch (true or [false])
+ignore   a token to be specially handled
+
+# CPP MACHINABLE
+NAME	DESCRIPTION
+if0	examine code within "#if 0" branch (true or [false])
+ignore	a token to be specially handled
+
+# CPP MACHINABLE NOHEADER
+if0	examine code within "#if 0" branch (true or [false])
+ignore	a token to be specially handled
+
