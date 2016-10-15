@@ -28,7 +28,7 @@
  * SUCH DAMAGE.
  */
 
-#include "regint.h"
+#include "regenc.h"
 
 static const int EncLen_SJIS[] = {
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,

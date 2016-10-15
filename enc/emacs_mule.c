@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "regint.h"
+#include "regenc.h"
 
 
 #define emacsmule_islead(c)    ((UChar )(c) < 0x9e)
