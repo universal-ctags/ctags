@@ -30,21 +30,13 @@ install:
 
 build_script:
 - cmd: |-
-    copy win32\Makefile .
-    copy win32\config.h .
-    nmake
-    dir onigmo.dll
-    \msys64\usr\bin\file onigmo.dll
+    nmake -f win32\Makefile
+    dir build_%ARCH%\onigmo.dll
+    \msys64\usr\bin\file build_%ARCH%\onigmo.dll
 
 test_script:
 - cmd: |-
     py %PYOPT% -c "import locale; print(locale.getpreferredencoding())"
-    py %PYOPT% testpy.py EUC-JP
-    py %PYOPT% testpy.py SJIS
-    py %PYOPT% testpy.py UTF-8
-    py %PYOPT% testpy.py UTF-16LE
-    py %PYOPT% testpy.py UTF-16BE
-    py %PYOPT% testpy.py UTF-32LE
-    py %PYOPT% testpy.py UTF-32BE
+    nmake -f win32\Makefile test
 
 # vim: ts=2 sw=2 sts=2 et
