@@ -36,7 +36,7 @@ RUBYDIR = ..
 ifneq ($(ARCH),x86-64)
 PYTHON = py -3.4-32
 else
-PYTHON = py
+PYTHON = py -3
 endif
 
 WORKDIR = build_$(ARCH)

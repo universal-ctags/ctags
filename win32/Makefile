@@ -40,7 +40,7 @@ RUBYDIR = ..
 !if "$(ARCH)"=="x86"
 PYTHON = py -3.4-32
 !else
-PYTHON = py
+PYTHON = py -3
 !endif
 
 WORKDIR = build_$(ARCH)
