@@ -8,7 +8,7 @@
 */
 
 #include "general.h"
-#include "output.h"
+#include "writer.h"
 
 extern tagWriter ctagsWriter;
 extern tagWriter etagsWriter;

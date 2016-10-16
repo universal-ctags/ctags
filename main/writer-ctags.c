@@ -12,9 +12,9 @@
 #include "entry.h"
 #include "mio.h"
 #include "options.h"
-#include "output.h"
 #include "read.h"
 #include "ptag.h"
+#include "writer.h"
 
 
 static int writeCtagsEntry (MIO * mio, const tagEntryInfo *const tag, void *data CTAGS_ATTR_UNUSED);

@@ -71,9 +71,9 @@
 #include "keyword.h"
 #include "main.h"
 #include "options.h"
-#include "output.h"
 #include "read.h"
 #include "routines.h"
+#include "writer.h"
 
 /*
 *   MACROS

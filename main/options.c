@@ -30,12 +30,12 @@
 #include "main.h"
 #define OPTION_WRITE
 #include "options.h"
-#include "output.h"
 #include "parse.h"
 #include "ptag.h"
 #include "routines.h"
 #include "xtag.h"
 #include "routines.h"
+#include "writer.h"
 
 /*
 *   MACROS

@@ -43,12 +43,12 @@
 #include "kind.h"
 #include "main.h"
 #include "options.h"
-#include "output.h"
 #include "ptag.h"
 #include "read.h"
 #include "routines.h"
 #include "sort.h"
 #include "strlist.h"
+#include "writer.h"
 #include "xtag.h"
 
 /*

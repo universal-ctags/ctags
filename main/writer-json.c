@@ -12,9 +12,9 @@
 #include "entry.h"
 #include "mio.h"
 #include "options.h"
-#include "output.h"
 #include "read.h"
 #include "ptag.h"
+#include "writer.h"
 
 #ifdef HAVE_JANSSON
 #include <jansson.h>
