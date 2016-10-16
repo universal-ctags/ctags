@@ -6,8 +6,8 @@
 *   GNU General Public License version 2 or (at your option) any later version.
 *
 */
-#ifndef CTAGS_MAIN_OUTPUT_H
-#define CTAGS_MAIN_OUTPUT_H
+#ifndef CTAGS_MAIN_WRITER_H
+#define CTAGS_MAIN_WRITER_H
 
 #include "general.h"  /* must always come first */
 #include "mio.h"
