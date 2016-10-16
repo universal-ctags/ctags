@@ -68,6 +68,7 @@ MAIN_SRCS =				\
 	main/nestlevel.c		\
 	main/objpool.c			\
 	main/options.c			\
+	main/output.c			\
 	main/output-etags.c		\
 	main/output-ctags.c		\
 	main/output-json.c		\

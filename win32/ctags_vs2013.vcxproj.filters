@@ -264,6 +264,9 @@
     <ClCompile Include="..\main\options.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\main\output.c">
+      <Filter>Source Files\Main</Filter>
+    </ClCompile>
     <ClCompile Include="..\main\output-ctags.c">
       <Filter>Source Files\Main</Filter>
     </ClCompile>

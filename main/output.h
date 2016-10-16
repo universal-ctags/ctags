@@ -10,6 +10,8 @@
 #define CTAGS_MAIN_OUTPUT_H
 
 #include "general.h"  /* must always come first */
+#include "mio.h"
+#include "types.h"
 
 /* Other than writeEntry can be NULL.
    The value returned from preWriteEntry is passed to writeEntry,
@@ -40,6 +42,15 @@ struct sTagWriter {
 };
 
 extern void setTagWriter (outputType otype);
+extern void writerSetup  (MIO *mio);
+extern void writerTeardown (MIO *mio, const char *filename);
+
+int writerWriteTag (MIO * mio, const tagEntryInfo *const tag);
+int writerWritePtag (MIO * mio,
+					 const ptagDesc *desc,
+					 const char *const fileName,
+					 const char *const pattern,
+					 const char *const parserName);
 
 extern bool outpuFormatUsedStdoutByDefault (void);
 

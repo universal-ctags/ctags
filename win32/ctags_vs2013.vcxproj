@@ -150,6 +150,7 @@
     <ClCompile Include="..\parsers\objc.c" />
     <ClCompile Include="..\parsers\ocaml.c" />
     <ClCompile Include="..\main\options.c" />
+    <ClCompile Include="..\main\output.c" />
     <ClCompile Include="..\main\output-ctags.c" />
     <ClCompile Include="..\main\output-etags.c" />
     <ClCompile Include="..\main\output-xref.c" />
