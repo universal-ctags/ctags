@@ -15,7 +15,7 @@ extern tagWriter etagsWriter;
 extern tagWriter xrefWriter;
 extern tagWriter jsonWriter;
 
-static tagWriter *writerTable [OUTPUT_COUNT] = {
+static tagWriter *writerTable [WRITER_COUNT] = {
 	&ctagsWriter,
 	&etagsWriter,
 	&xrefWriter,
@@ -25,10 +25,10 @@ static tagWriter *writerTable [OUTPUT_COUNT] = {
 static void *writerData;
 static tagWriter *writer;
 
-extern void setTagWriter (outputType otype)
+extern void setTagWriter (writerType wtype)
 {
-	writer = writerTable [otype];
-	writer->type = otype;
+	writer = writerTable [wtype];
+	writer->type = wtype;
 }
 
 extern bool outpuFormatUsedStdoutByDefault (void)
