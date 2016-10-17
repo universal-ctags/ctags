@@ -887,6 +887,7 @@ extern char *readLineFromBypass (
 
 	mio_getpos (File.mio, &orignalPosition);
 	mio_setpos (File.mio, &location);
+	mio_clearerr (File.mio);
 	if (pSeekValue != NULL)
 		*pSeekValue = mio_tell (File.mio);
 	result = readLineRaw (vLine, File.mio);
