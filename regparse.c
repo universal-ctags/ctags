@@ -594,7 +594,7 @@ onig_renumber_name_table(regex_t* reg, GroupNumRemap* map)
 
 
 extern int
-onig_number_of_names(regex_t* reg)
+onig_number_of_names(const regex_t* reg)
 {
   NameTable* t = (NameTable* )reg->name_table;
 
@@ -730,7 +730,7 @@ onig_foreach_name(regex_t* reg,
 }
 
 extern int
-onig_number_of_names(regex_t* reg)
+onig_number_of_names(const regex_t* reg)
 {
   NameTable* t = (NameTable* )reg->name_table;
 
@@ -927,14 +927,14 @@ onig_foreach_name(regex_t* reg,
 }
 
 extern int
-onig_number_of_names(regex_t* reg)
+onig_number_of_names(const regex_t* reg)
 {
   return 0;
 }
 #endif /* else USE_NAMED_GROUP */
 
 extern int
-onig_noname_group_capture_is_active(regex_t* reg)
+onig_noname_group_capture_is_active(const regex_t* reg)
 {
   if (ONIG_IS_OPTION_ON(reg->options, ONIG_OPTION_DONT_CAPTURE_GROUP))
     return 0;

@@ -4468,37 +4468,37 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 }
 
 extern OnigEncoding
-onig_get_encoding(regex_t* reg)
+onig_get_encoding(const regex_t* reg)
 {
   return reg->enc;
 }
 
 extern OnigOptionType
-onig_get_options(regex_t* reg)
+onig_get_options(const regex_t* reg)
 {
   return reg->options;
 }
 
 extern  OnigCaseFoldType
-onig_get_case_fold_flag(regex_t* reg)
+onig_get_case_fold_flag(const regex_t* reg)
 {
   return reg->case_fold_flag;
 }
 
 extern const OnigSyntaxType*
-onig_get_syntax(regex_t* reg)
+onig_get_syntax(const regex_t* reg)
 {
   return reg->syntax;
 }
 
 extern int
-onig_number_of_captures(regex_t* reg)
+onig_number_of_captures(const regex_t* reg)
 {
   return reg->num_mem;
 }
 
 extern int
-onig_number_of_capture_histories(regex_t* reg)
+onig_number_of_capture_histories(const regex_t* reg)
 {
 #ifdef USE_CAPTURE_HISTORY
   int i, n;

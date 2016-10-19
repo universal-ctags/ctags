@@ -890,37 +890,37 @@ int onig_name_to_backref_number P_((OnigRegex reg, const OnigUChar* name, const 
 ONIG_EXTERN
 int onig_foreach_name P_((OnigRegex reg, int (*func)(const OnigUChar*, const OnigUChar*,int,int*,OnigRegex,void*), void* arg));
 ONIG_EXTERN
-int onig_number_of_names P_((OnigRegex reg));
+int onig_number_of_names P_((const OnigRegexType *reg));
 ONIG_EXTERN
-int onig_number_of_captures P_((OnigRegex reg));
+int onig_number_of_captures P_((const OnigRegexType *reg));
 ONIG_EXTERN
-int onig_number_of_capture_histories P_((OnigRegex reg));
+int onig_number_of_capture_histories P_((const OnigRegexType *reg));
 ONIG_EXTERN
 OnigCaptureTreeNode* onig_get_capture_tree P_((OnigRegion* region));
 ONIG_EXTERN
 int onig_capture_tree_traverse P_((OnigRegion* region, int at, int(*callback_func)(int,OnigPosition,OnigPosition,int,int,void*), void* arg));
 ONIG_EXTERN
-int onig_noname_group_capture_is_active P_((OnigRegex reg));
+int onig_noname_group_capture_is_active P_((const OnigRegexType *reg));
 ONIG_EXTERN
-OnigEncoding onig_get_encoding P_((OnigRegex reg));
+OnigEncoding onig_get_encoding P_((const OnigRegexType *reg));
 ONIG_EXTERN
-OnigOptionType onig_get_options P_((OnigRegex reg));
+OnigOptionType onig_get_options P_((const OnigRegexType *reg));
 ONIG_EXTERN
-OnigCaseFoldType onig_get_case_fold_flag P_((OnigRegex reg));
+OnigCaseFoldType onig_get_case_fold_flag P_((const OnigRegexType *reg));
 ONIG_EXTERN
-const OnigSyntaxType* onig_get_syntax P_((OnigRegex reg));
+const OnigSyntaxType* onig_get_syntax P_((const OnigRegexType *reg));
 ONIG_EXTERN
 int onig_set_default_syntax P_((const OnigSyntaxType* syntax));
 ONIG_EXTERN
 void onig_copy_syntax P_((OnigSyntaxType* to, const OnigSyntaxType* from));
 ONIG_EXTERN
-unsigned int onig_get_syntax_op P_((OnigSyntaxType* syntax));
+unsigned int onig_get_syntax_op P_((const OnigSyntaxType* syntax));
 ONIG_EXTERN
-unsigned int onig_get_syntax_op2 P_((OnigSyntaxType* syntax));
+unsigned int onig_get_syntax_op2 P_((const OnigSyntaxType* syntax));
 ONIG_EXTERN
-unsigned int onig_get_syntax_behavior P_((OnigSyntaxType* syntax));
+unsigned int onig_get_syntax_behavior P_((const OnigSyntaxType* syntax));
 ONIG_EXTERN
-OnigOptionType onig_get_syntax_options P_((OnigSyntaxType* syntax));
+OnigOptionType onig_get_syntax_options P_((const OnigSyntaxType* syntax));
 ONIG_EXTERN
 void onig_set_syntax_op P_((OnigSyntaxType* syntax, unsigned int op));
 ONIG_EXTERN

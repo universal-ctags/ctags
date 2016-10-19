@@ -376,7 +376,7 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
   3 arg:     funcに対する追加引数
 
 
-# int onig_number_of_names(regex_t* reg)
+# int onig_number_of_names(const regex_t* reg)
 
   パターン中で定義された名前の数を返す。
   一個の名前の多重定義は一個と看做す。
@@ -385,10 +385,10 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
   1 reg:    正規表現オブジェクト
 
 
-# OnigEncoding     onig_get_encoding(regex_t* reg)
-# OnigOptionType   onig_get_options(regex_t* reg)
-# OnigCaseFoldType onig_get_case_fold_flag(regex_t* reg)
-# OnigSyntaxType*  onig_get_syntax(regex_t* reg)
+# OnigEncoding     onig_get_encoding(const regex_t* reg)
+# OnigOptionType   onig_get_options(const regex_t* reg)
+# OnigCaseFoldType onig_get_case_fold_flag(const regex_t* reg)
+# OnigSyntaxType*  onig_get_syntax(const regex_t* reg)
 
   正規表現オブジェクトに対して、対応する値を返す。
 
@@ -396,7 +396,7 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
   1 reg:    正規表現オブジェクト
 
 
-# int onig_number_of_captures(regex_t* reg)
+# int onig_number_of_captures(const regex_t* reg)
 
   パターン中で定義された捕獲グループの数を返す。
 
@@ -404,7 +404,7 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
   1 reg:    正規表現オブジェクト
 
 
-# int onig_number_of_capture_histories(regex_t* reg)
+# int onig_number_of_capture_histories(const regex_t* reg)
 
   パターン中で定義された捕獲履歴(?@...)の数を返す。
 
@@ -463,7 +463,7 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
   4 arg;     funcに対する追加引数
 
 
-# int onig_noname_group_capture_is_active(regex_t* reg)
+# int onig_noname_group_capture_is_active(const regex_t* reg)
 
   名前なし式集合の捕獲機能が有効かどうかを返す。
 
@@ -548,10 +548,10 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
   2 from: 元
 
 
-# unsigned int onig_get_syntax_op(OnigSyntaxType* syntax)
-# unsigned int onig_get_syntax_op2(OnigSyntaxType* syntax)
-# unsigned int onig_get_syntax_behavior(OnigSyntaxType* syntax)
-# OnigOptionType onig_get_syntax_options(OnigSyntaxType* syntax)
+# unsigned int onig_get_syntax_op(const OnigSyntaxType* syntax)
+# unsigned int onig_get_syntax_op2(const OnigSyntaxType* syntax)
+# unsigned int onig_get_syntax_behavior(const OnigSyntaxType* syntax)
+# OnigOptionType onig_get_syntax_options(const OnigSyntaxType* syntax)
 
 # void onig_set_syntax_op(OnigSyntaxType* syntax, unsigned int op)
 # void onig_set_syntax_op2(OnigSyntaxType* syntax, unsigned int op2)

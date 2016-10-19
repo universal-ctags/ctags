@@ -370,7 +370,7 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   3 arg:     argument for func.
 
 
-# int onig_number_of_names(regex_t* reg)
+# int onig_number_of_names(const regex_t* reg)
 
   Return the number of names defined in the pattern.
   Multiple definitions of one name is counted as one.
@@ -379,10 +379,10 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   1 reg:     regex object.
 
 
-# OnigEncoding     onig_get_encoding(regex_t* reg)
-# OnigOptionType   onig_get_options(regex_t* reg)
-# OnigCaseFoldType onig_get_case_fold_flag(regex_t* reg)
-# OnigSyntaxType*  onig_get_syntax(regex_t* reg)
+# OnigEncoding     onig_get_encoding(const regex_t* reg)
+# OnigOptionType   onig_get_options(const regex_t* reg)
+# OnigCaseFoldType onig_get_case_fold_flag(const regex_t* reg)
+# OnigSyntaxType*  onig_get_syntax(const regex_t* reg)
 
   Return a value of the regex object.
 
@@ -390,7 +390,7 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   1 reg:     regex object.
 
 
-# int onig_number_of_captures(regex_t* reg)
+# int onig_number_of_captures(const regex_t* reg)
 
   Return the number of capture group in the pattern.
 
@@ -398,7 +398,7 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   1 reg:     regex object.
 
 
-# int onig_number_of_capture_histories(regex_t* reg)
+# int onig_number_of_capture_histories(const regex_t* reg)
 
   Return the number of capture history defined in the pattern.
 
@@ -456,7 +456,7 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   4 arg;     optional callback argument.
 
 
-# int onig_noname_group_capture_is_active(regex_t* reg)
+# int onig_noname_group_capture_is_active(const regex_t* reg)
 
   Return noname group capture activity.
 
@@ -541,10 +541,10 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   2 from: source address.
 
 
-# unsigned int onig_get_syntax_op(OnigSyntaxType* syntax)
-# unsigned int onig_get_syntax_op2(OnigSyntaxType* syntax)
-# unsigned int onig_get_syntax_behavior(OnigSyntaxType* syntax)
-# OnigOptionType onig_get_syntax_options(OnigSyntaxType* syntax)
+# unsigned int onig_get_syntax_op(const OnigSyntaxType* syntax)
+# unsigned int onig_get_syntax_op2(const OnigSyntaxType* syntax)
+# unsigned int onig_get_syntax_behavior(const OnigSyntaxType* syntax)
+# OnigOptionType onig_get_syntax_options(const OnigSyntaxType* syntax)
 
 # void onig_set_syntax_op(OnigSyntaxType* syntax, unsigned int op)
 # void onig_set_syntax_op2(OnigSyntaxType* syntax, unsigned int op2)

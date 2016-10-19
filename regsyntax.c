@@ -332,25 +332,25 @@ onig_set_syntax_options(OnigSyntaxType* syntax, OnigOptionType options)
 }
 
 extern unsigned int
-onig_get_syntax_op(OnigSyntaxType* syntax)
+onig_get_syntax_op(const OnigSyntaxType* syntax)
 {
   return syntax->op;
 }
 
 extern unsigned int
-onig_get_syntax_op2(OnigSyntaxType* syntax)
+onig_get_syntax_op2(const OnigSyntaxType* syntax)
 {
   return syntax->op2;
 }
 
 extern unsigned int
-onig_get_syntax_behavior(OnigSyntaxType* syntax)
+onig_get_syntax_behavior(const OnigSyntaxType* syntax)
 {
   return syntax->behavior;
 }
 
 extern OnigOptionType
-onig_get_syntax_options(OnigSyntaxType* syntax)
+onig_get_syntax_options(const OnigSyntaxType* syntax)
 {
   return syntax->options;
 }
