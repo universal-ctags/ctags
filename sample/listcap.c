@@ -36,7 +36,7 @@ extern int ex(unsigned char* str, unsigned char* pattern,
   r = onig_new(&reg, pattern, pattern + strlen((char* )pattern),
 	       ONIG_OPTION_DEFAULT, ONIG_ENCODING_ASCII, syntax, &einfo);
   if (r != ONIG_NORMAL) {
-    char s[ONIG_MAX_ERROR_MESSAGE_LEN];
+    OnigUChar s[ONIG_MAX_ERROR_MESSAGE_LEN];
     onig_error_code_to_str(s, r, &einfo);
     fprintf(stderr, "ERROR: %s\n", s);
     return -1;
@@ -68,7 +68,7 @@ extern int ex(unsigned char* str, unsigned char* pattern,
     fprintf(stderr, "search fail\n");
   }
   else { /* error */
-    char s[ONIG_MAX_ERROR_MESSAGE_LEN];
+    OnigUChar s[ONIG_MAX_ERROR_MESSAGE_LEN];
     onig_error_code_to_str(s, r);
     return -1;
   }
