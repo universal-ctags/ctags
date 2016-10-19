@@ -477,7 +477,8 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   else --> active
 
 
-# UChar* onigenc_get_prev_char_head(OnigEncoding enc, const UChar* start, const UChar* s)
+# UChar* onigenc_get_prev_char_head(OnigEncoding enc, const UChar* start,
+                                    const UChar* s, const UChar* end)
 
   Return previous character head address.
 
@@ -485,10 +486,11 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   1 enc:   character encoding
   2 start: string address
   3 s:     target address of string
+  4 end:   end of string
 
 
 # UChar* onigenc_get_left_adjust_char_head(OnigEncoding enc,
-                                           const UChar* start, const UChar* s)
+                           const UChar* start, const UChar* s, const UChar* end)
 
   Return left-adjusted head address of a character.
 
@@ -496,10 +498,11 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   1 enc:   character encoding
   2 start: string address
   3 s:     target address of string
+  4 end:   end of string
 
 
 # UChar* onigenc_get_right_adjust_char_head(OnigEncoding enc,
-                                            const UChar* start, const UChar* s)
+                    const UChar* start, const UChar* s, const UChar* end)
 
   Return right-adjusted head address of a character.
 
@@ -507,6 +510,7 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   1 enc:   character encoding
   2 start: string address
   3 s:     target address of string
+  4 end:   end of string
 
 
 # int onigenc_strlen(OnigEncoding enc, const UChar* s, const UChar* end)
@@ -554,7 +558,7 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   2 op, op2, behavior, options: value of element.
 
 
-# void onig_copy_encoding(OnigEncoding to, OnigOnigEncoding from)
+# void onig_copy_encoding(OnigEncodingType *to, OnigEncoding from)
 
   Copy encoding.
 
@@ -587,7 +591,7 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   3 code: meta character or ONIG_INEFFECTIVE_META_CHAR.
 
 
-# OnigCaseFoldType onig_get_default_case_fold_flag()
+# OnigCaseFoldType onig_get_default_case_fold_flag(void)
 
   Get default case fold flag.
 

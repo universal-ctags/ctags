@@ -250,8 +250,8 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
 
     ONIG_OPTION_NOTBOL        文字列の先頭(str)を行頭と看做さない
     ONIG_OPTION_NOTEOL        文字列の終端(end)を行末と看做さない
-    ONIG_OPTION_NOTBOS        文字列の先頭(str)を先頭(\A)と見做さない
-    ONIG_OPTION_NOTEOS        文字列の終端(end)を終端(\z)と見做さない
+    ONIG_OPTION_NOTBOS        文字列の先頭(str)を先頭(\A)と看做さない
+    ONIG_OPTION_NOTEOS        文字列の終端(end)を終端(\z)と看做さない
     ONIG_OPTION_POSIX_REGION  region引数をPOSIX APIのregmatch_t[]にする
 
 
@@ -484,7 +484,8 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
   上記以外の場合 --> 有効
 
 
-# UChar* onigenc_get_prev_char_head(OnigEncoding enc, const UChar* start, const UChar* s)
+# UChar* onigenc_get_prev_char_head(OnigEncoding enc, const UChar* start,
+                                    const UChar* s, const UChar* end)
 
   文字一個分前の文字列位置を返す。
 
@@ -492,10 +493,11 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
   1 enc:   文字エンコーディング
   2 start: 文字列の先頭アドレス
   3 s:     文字列中の位置
+  4 end:   文字列の末尾
 
 
 # UChar* onigenc_get_left_adjust_char_head(OnigEncoding enc,
-                                           const UChar* start, const UChar* s)
+                           const UChar* start, const UChar* s, const UChar* end)
 
   文字の先頭バイト位置になるように左側に調整したアドレスを返す。
 
@@ -503,10 +505,11 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
   1 enc:   文字エンコーディング
   2 start: 文字列の先頭アドレス
   3 s:     文字列中の位置
+  4 end:   文字列の末尾
 
 
 # UChar* onigenc_get_right_adjust_char_head(OnigEncoding enc,
-                                            const UChar* start, const UChar* s)
+                    const UChar* start, const UChar* s, const UChar* end)
 
   文字の先頭バイト位置になるように右側に調整したアドレスを返す。
 
@@ -514,6 +517,7 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
   1 enc:   文字エンコーディング
   2 start: 文字列の先頭アドレス
   3 s:     文字列中の位置
+  4 end:   文字列の末尾
 
 
 # int onigenc_strlen(OnigEncoding enc, const UChar* s, const UChar* end)
@@ -561,7 +565,7 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
   2 op, op2, behavior, options: 要素の値
 
 
-# void onig_copy_encoding(OnigEncoding to, OnigOnigEncoding from)
+# void onig_copy_encoding(OnigEncodingType *to, OnigEncoding from)
 
   文字エンコーディングをコピーする。
 
@@ -594,7 +598,7 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
   3 code: メタ文字のコードポイント または ONIG_INEFFECTIVE_META_CHAR.
 
 
-# OnigCaseFoldType onig_get_default_case_fold_flag()
+# OnigCaseFoldType onig_get_default_case_fold_flag(void)
 
   デフォルトのcase foldフラグを取得する。
 

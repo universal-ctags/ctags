@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) Regular Expressions Version 5.13.0    2012/01/19
+Onigmo (Oniguruma-mod) Regular Expressions Version 6.0.0    2016/10/19
 
 syntax: ONIG_SYNTAX_RUBY (default)
 
@@ -94,8 +94,13 @@ syntax: ONIG_SYNTAX_RUBY (default)
      + works on EUC_JP, Shift_JIS, CP932
        Hiragana, Katakana, Han, Latin, Greek, Cyrillic
 
-     + works on UTF8, UTF16, UTF32
+     + works on UTF-8, UTF-16, UTF-32
        see UnicodeProps.txt
+
+    \p{Punct} works slightly different on Unicode encodings and the other
+    encodings. It matches the nine characters "$+<=>^`|~" on non-Unicode
+    encodings (which is the same as [[:punct:]]), but not on Unicode encodings.
+    \p{XPosixPunct} matches the nine characters on Unicode encodings.
 
 
   \R       Linebreak
@@ -106,7 +111,7 @@ syntax: ONIG_SYNTAX_RUBY (default)
            Not Unicode:
              (?>\x0D\x0A|[\x0A-\x0D])
 
-  \X       eXtended grapheme cluster
+  \X       Grapheme cluster
 
            Unicode:
              (?>\P{M}\p{M}*)
@@ -207,7 +212,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
       print    [[:graph:]] | Space_Separator
       punct    Connector_Punctuation | Dash_Punctuation | Close_Punctuation |
                Final_Punctuation | Initial_Punctuation | Other_Punctuation |
-               Open_Punctuation
+               Open_Punctuation | 0024 | 002B | 003C | 003D | 003E | 005E |
+               0060 | 007C | 007E
       space    Space_Separator | Line_Separator | Paragraph_Separator |
                0009 | 000A | 000B | 000C | 000D | 0085
       upper    Uppercase_Letter
