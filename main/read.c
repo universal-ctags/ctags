@@ -1022,8 +1022,6 @@ char* readLineRawWithNoSeek (vString* const vline, FILE *const pp)
 				break;
 		}
 
-		result = vStringValue (vline);
-		
 		if (c == '\n' || c == '\r')
 			nlcr = true;
 		else if (nlcr)
@@ -1033,6 +1031,8 @@ char* readLineRawWithNoSeek (vString* const vline, FILE *const pp)
 		}
 		else
 			vStringPut (vline, c);
+
+		result = vStringValue (vline);
 	}
 
 	return result;
