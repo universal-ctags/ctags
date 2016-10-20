@@ -1067,6 +1067,7 @@ def main():
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
     x2("foo|foobar", "foobar", 0, 6, opt=onigmo.ONIG_OPTION_FIND_LONGEST)
+    x2("a*", "aa aaa aaaa aaaaa ", 12, 17, opt=onigmo.ONIG_OPTION_FIND_LONGEST)
 
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
