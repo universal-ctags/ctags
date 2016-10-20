@@ -524,7 +524,7 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   Return number of bytes in the string.
 
 
-# int onig_set_default_syntax(OnigSyntaxType* syntax)
+# int onig_set_default_syntax(const OnigSyntaxType* syntax)
 
   Set default syntax.
 

@@ -120,14 +120,14 @@ typedef struct {
   OnigOptionType options;    /* default option */
 } OnigSyntaxType;
 
-ONIG_EXTERN OnigSyntaxType OnigSyntaxPosixBasic;
-ONIG_EXTERN OnigSyntaxType OnigSyntaxPosixExtended;
-ONIG_EXTERN OnigSyntaxType OnigSyntaxEmacs;
-ONIG_EXTERN OnigSyntaxType OnigSyntaxGrep;
-ONIG_EXTERN OnigSyntaxType OnigSyntaxGnuRegex;
-ONIG_EXTERN OnigSyntaxType OnigSyntaxJava;
-ONIG_EXTERN OnigSyntaxType OnigSyntaxPerl;
-ONIG_EXTERN OnigSyntaxType OnigSyntaxRuby;
+ONIG_EXTERN const OnigSyntaxType OnigSyntaxPosixBasic;
+ONIG_EXTERN const OnigSyntaxType OnigSyntaxPosixExtended;
+ONIG_EXTERN const OnigSyntaxType OnigSyntaxEmacs;
+ONIG_EXTERN const OnigSyntaxType OnigSyntaxGrep;
+ONIG_EXTERN const OnigSyntaxType OnigSyntaxGnuRegex;
+ONIG_EXTERN const OnigSyntaxType OnigSyntaxJava;
+ONIG_EXTERN const OnigSyntaxType OnigSyntaxPerl;
+ONIG_EXTERN const OnigSyntaxType OnigSyntaxRuby;
 
 /* predefined syntaxes (see regsyntax.c) */
 #define ONIG_SYNTAX_POSIX_BASIC        (&OnigSyntaxPosixBasic)
@@ -141,10 +141,10 @@ ONIG_EXTERN OnigSyntaxType OnigSyntaxRuby;
 /* default syntax */
 #define ONIG_SYNTAX_DEFAULT             OnigDefaultSyntax
 
-ONIG_EXTERN OnigSyntaxType*  OnigDefaultSyntax;
+ONIG_EXTERN const OnigSyntaxType*  OnigDefaultSyntax;
 
-ONIG_EXTERN int  onig_set_default_syntax P_((OnigSyntaxType* syntax));
-ONIG_EXTERN void onig_copy_syntax P_((OnigSyntaxType* to, OnigSyntaxType* from));
+ONIG_EXTERN int  onig_set_default_syntax P_((const OnigSyntaxType* syntax));
+ONIG_EXTERN void onig_copy_syntax P_((OnigSyntaxType* to, const OnigSyntaxType* from));
 ONIG_EXTERN const char* onig_version P_((void));
 ONIG_EXTERN const char* onig_copyright P_((void));
 

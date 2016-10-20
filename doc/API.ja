@@ -531,7 +531,7 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
   文字列のバイト数を返す。
 
 
-# int onig_set_default_syntax(OnigSyntaxType* syntax)
+# int onig_set_default_syntax(const OnigSyntaxType* syntax)
 
   デフォルトの正規表現パターン文法をセットする。
 
