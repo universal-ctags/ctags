@@ -63,7 +63,12 @@ enum eState {
 /*  Defines the current state of the pre-processor.
  */
 typedef struct sCppState {
-	int		ungetch, ungetch2;   /* ungotten characters, if any */
+
+	int * ungetBuffer;       /* memory buffer for unget characters */
+	int ungetBufferSize;      /* the current unget buffer size */
+	int * ungetPointer;      /* the current unget char: points in the middle of the buffer */
+	int ungetDataSize;        /* the number of valid unget characters in the buffer */
+
 	bool resolveRequired;     /* must resolve if/else/elif/endif branch */
 	bool hasAtLiteralStrings; /* supports @"c:\" strings */
 	bool hasCxxRawLiteralStrings; /* supports R"xxx(...)xxx" strings */
@@ -93,7 +98,10 @@ typedef struct sCppState {
 static bool BraceFormat = false;
 
 static cppState Cpp = {
-	'\0', '\0',  /* ungetch characters */
+	NULL,        /* ungetBuffer */
+	0,           /* ungetBufferSize */
+	NULL,        /* ungetPointer */
+	0,           /* ungetDataSize */
 	false,       /* resolveRequired */
 	false,       /* hasAtLiteralStrings */
 	false,       /* hasCxxRawLiteralStrings */
@@ -136,8 +144,9 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 {
 	BraceFormat = state;
 
-	Cpp.ungetch         = '\0';
-	Cpp.ungetch2        = '\0';
+	Cpp.ungetBuffer = NULL;
+	Cpp.ungetPointer = NULL;
+
 	Cpp.resolveRequired = false;
 	Cpp.hasAtLiteralStrings = hasAtLiteralStrings;
 	Cpp.hasCxxRawLiteralStrings = hasCxxRawLiteralStrings;
@@ -167,6 +176,12 @@ extern void cppTerminate (void)
 		vStringDelete (Cpp.directive.name);
 		Cpp.directive.name = NULL;
 	}
+	
+	if(Cpp.ungetBuffer)
+	{
+		eFree(Cpp.ungetBuffer);
+		Cpp.ungetBuffer = NULL;
+	}
 }
 
 extern void cppBeginStatement (void)
@@ -186,15 +201,119 @@ extern void cppEndStatement (void)
 *   directives and may emit a tag for #define directives.
 */
 
-/*  This puts a character back into the input queue for the input File.
- *  Up to two characters may be ungotten.
- */
+/*  This puts a character back into the input queue for the input File. */
 extern void cppUngetc (const int c)
 {
-	Assert (Cpp.ungetch2 == '\0');
-	Cpp.ungetch2 = Cpp.ungetch;
-	Cpp.ungetch = c;
+	if(!Cpp.ungetPointer)
+	{
+		// no unget data
+		if(!Cpp.ungetBuffer)
+		{
+			Cpp.ungetBuffer = (int *)eMalloc(8 * sizeof(int));
+			Cpp.ungetBufferSize = 8;
+		}
+		Assert(Cpp.ungetBufferSize > 0);
+		Cpp.ungetPointer = Cpp.ungetBuffer + Cpp.ungetBufferSize - 1;
+		*(Cpp.ungetPointer) = c;
+		Cpp.ungetDataSize = 1;
+		return;
+	}
+
+	// Already have some unget data in the buffer. Must prepend.
+	Assert(Cpp.ungetBuffer);
+	Assert(Cpp.ungetBufferSize > 0);
+	Assert(Cpp.ungetDataSize > 0);
+	Assert(Cpp.ungetPointer >= Cpp.ungetBuffer);
+	
+	if(Cpp.ungetPointer == Cpp.ungetBuffer)
+	{
+		Cpp.ungetBufferSize += 8;
+		int * tmp = (int *)eMalloc(Cpp.ungetBufferSize * sizeof(int));
+		memcpy(tmp+8,Cpp.ungetPointer,Cpp.ungetDataSize * sizeof(int));
+		eFree(Cpp.ungetBuffer);
+		Cpp.ungetBuffer = tmp;
+		Cpp.ungetPointer = tmp + 7;
+	} else {
+		Cpp.ungetPointer--;
+	}
+
+	*(Cpp.ungetPointer) = c;
+	Cpp.ungetDataSize++;
 }
+
+
+/*  This puts an entire string back into the input queue for the input File. */
+void cppUngetString(const char * string,int len)
+{
+	if(!string)
+		return;
+	if(len < 1)
+		return;
+
+	if(!Cpp.ungetPointer)
+	{
+		// no unget data
+		if(!Cpp.ungetBuffer)
+		{
+			Cpp.ungetBufferSize = 8 + len;
+			Cpp.ungetBuffer = (int *)eMalloc(Cpp.ungetBufferSize * sizeof(int));
+		} else if(Cpp.ungetBufferSize < len)
+		{
+			Cpp.ungetBufferSize = 8 + len;
+			Cpp.ungetBuffer = (int *)eRealloc(Cpp.ungetBuffer,Cpp.ungetBufferSize * sizeof(int));
+		}
+		Cpp.ungetPointer = Cpp.ungetBuffer + Cpp.ungetBufferSize - len;
+	} else {
+		// Already have some unget data in the buffer. Must prepend.
+		Assert(Cpp.ungetBuffer);
+		Assert(Cpp.ungetBufferSize > 0);
+		Assert(Cpp.ungetDataSize > 0);
+		Assert(Cpp.ungetPointer >= Cpp.ungetBuffer);
+
+		if(Cpp.ungetBufferSize < (Cpp.ungetDataSize + len))
+		{
+			Cpp.ungetBufferSize = 8 + len + Cpp.ungetDataSize;
+			int * tmp = (int *)eMalloc(Cpp.ungetBufferSize * sizeof(int));
+			memcpy(tmp + 8 + len,Cpp.ungetPointer,Cpp.ungetDataSize * sizeof(int));
+			eFree(Cpp.ungetBuffer);
+			Cpp.ungetBuffer = tmp;
+			Cpp.ungetPointer = tmp + 8;
+		} else {
+			Cpp.ungetPointer -= len;
+			Assert(Cpp.ungetPointer >= Cpp.ungetBuffer);
+		}
+	}
+
+	int * p = Cpp.ungetPointer;
+	const char * s = string;
+	const char * e = string + len;
+
+	while(s < e)
+		*p++ = *s++;
+
+	Cpp.ungetDataSize += len;
+}
+
+static int cppGetcFromUngetBufferOrFile(void)
+{
+	if(Cpp.ungetPointer)
+	{
+		Assert(Cpp.ungetBuffer);
+		Assert(Cpp.ungetBufferSize > 0);
+		Assert(Cpp.ungetDataSize > 0);
+		
+		int c = *(Cpp.ungetPointer);
+		Cpp.ungetDataSize--;
+		if(Cpp.ungetDataSize > 0)
+			Cpp.ungetPointer++;
+		else
+			Cpp.ungetPointer = NULL;
+		return c;
+	}
+
+	return getcFromInputFile();
+}
+
 
 /*  Reads a directive, whose first character is given by "c", into "name".
  */
@@ -206,10 +325,10 @@ static bool readDirective (int c, char *const name, unsigned int maxLength)
 	{
 		if (i > 0)
 		{
-			c = getcFromInputFile ();
+			c = cppGetcFromUngetBufferOrFile ();
 			if (c == EOF  ||  ! isalpha (c))
 			{
-				ungetcToInputFile (c);
+				cppUngetc (c);
 				break;
 			}
 		}
@@ -229,9 +348,9 @@ static void readIdentifier (int c, vString *const name)
 	do
 	{
 		vStringPut (name, c);
-		c = getcFromInputFile ();
+		c = cppGetcFromUngetBufferOrFile ();
 	} while (c != EOF  && cppIsident (c));
-	ungetcToInputFile (c);
+	cppUngetc (c);
 }
 
 static void readFilename (int c, vString *const name)
@@ -240,7 +359,7 @@ static void readFilename (int c, vString *const name)
 
 	vStringClear (name);
 
-	while (c = getcFromInputFile (), (c != EOF && c != c_end && c != '\n'))
+	while (c = cppGetcFromUngetBufferOrFile (), (c != EOF && c != c_end && c != '\n'))
 		vStringPut (name, c);
 }
 
@@ -405,7 +524,7 @@ static int directiveDefine (const int c, bool undef)
 		{
 			int p;
 
-			p = getcFromInputFile ();
+			p = cppGetcFromUngetBufferOrFile ();
 			if (p == '(')
 			{
 				signature = vStringNewOrClear (signature);
@@ -413,7 +532,7 @@ static int directiveDefine (const int c, bool undef)
 					if (!isspacetab(p))
 						vStringPut (signature, p);
 					/* TODO: Macro parameters can be captured here. */
-					p = getcFromInputFile ();
+					p = cppGetcFromUngetBufferOrFile ();
 				} while (p != ')' && p != EOF);
 
 				if (p == ')')
@@ -426,7 +545,7 @@ static int directiveDefine (const int c, bool undef)
 			}
 			else
 			{
-				ungetcToInputFile (p);
+				cppUngetc (p);
 				r = makeDefineTag (vStringValue (Cpp.directive.name), NULL, undef);
 			}
 		}
@@ -457,7 +576,7 @@ static void directivePragma (int c)
 			/* generate macro tag for weak name */
 			do
 			{
-				c = getcFromInputFile ();
+				c = cppGetcFromUngetBufferOrFile ();
 			} while (c == SPACE);
 			if (cppIsident1 (c))
 			{
@@ -560,7 +679,7 @@ static bool handleDirective (const int c, int *macroCorkIndex)
 static Comment isComment (void)
 {
 	Comment comment;
-	const int next = getcFromInputFile ();
+	const int next = cppGetcFromUngetBufferOrFile ();
 
 	if (next == '*')
 		comment = COMMENT_C;
@@ -570,7 +689,7 @@ static Comment isComment (void)
 		comment = COMMENT_D;
 	else
 	{
-		ungetcToInputFile (next);
+		cppUngetc (next);
 		comment = COMMENT_NONE;
 	}
 	return comment;
@@ -581,15 +700,15 @@ static Comment isComment (void)
  */
 int cppSkipOverCComment (void)
 {
-	int c = getcFromInputFile ();
+	int c = cppGetcFromUngetBufferOrFile ();
 
 	while (c != EOF)
 	{
 		if (c != '*')
-			c = getcFromInputFile ();
+			c = cppGetcFromUngetBufferOrFile ();
 		else
 		{
-			const int next = getcFromInputFile ();
+			const int next = cppGetcFromUngetBufferOrFile ();
 
 			if (next != '/')
 				c = next;
@@ -609,10 +728,10 @@ static int skipOverCplusComment (void)
 {
 	int c;
 
-	while ((c = getcFromInputFile ()) != EOF)
+	while ((c = cppGetcFromUngetBufferOrFile ()) != EOF)
 	{
 		if (c == BACKSLASH)
-			getcFromInputFile ();  /* throw away next character, too */
+			cppGetcFromUngetBufferOrFile ();  /* throw away next character, too */
 		else if (c == NEWLINE)
 			break;
 	}
@@ -624,15 +743,15 @@ static int skipOverCplusComment (void)
  */
 static int skipOverDComment (void)
 {
-	int c = getcFromInputFile ();
+	int c = cppGetcFromUngetBufferOrFile ();
 
 	while (c != EOF)
 	{
 		if (c != '+')
-			c = getcFromInputFile ();
+			c = cppGetcFromUngetBufferOrFile ();
 		else
 		{
-			const int next = getcFromInputFile ();
+			const int next = cppGetcFromUngetBufferOrFile ();
 
 			if (next != '/')
 				c = next;
@@ -653,10 +772,10 @@ static int skipToEndOfString (bool ignoreBackslash)
 {
 	int c;
 
-	while ((c = getcFromInputFile ()) != EOF)
+	while ((c = cppGetcFromUngetBufferOrFile ()) != EOF)
 	{
 		if (c == BACKSLASH && ! ignoreBackslash)
-			getcFromInputFile ();  /* throw away next character, too */
+			cppGetcFromUngetBufferOrFile ();  /* throw away next character, too */
 		else if (c == DOUBLE_QUOTE)
 			break;
 	}
@@ -672,11 +791,11 @@ static int isCxxRawLiteralDelimiterChar (int c)
 
 static int skipToEndOfCxxRawLiteralString (void)
 {
-	int c = getcFromInputFile ();
+	int c = cppGetcFromUngetBufferOrFile ();
 
 	if (c != '(' && ! isCxxRawLiteralDelimiterChar (c))
 	{
-		ungetcToInputFile (c);
+		cppUngetc (c);
 		c = skipToEndOfString (false);
 	}
 	else
@@ -699,15 +818,15 @@ static int skipToEndOfCxxRawLiteralString (void)
 			{
 				unsigned int i = 0;
 
-				while ((c = getcFromInputFile ()) != EOF && i < delimLen && delim[i] == c)
+				while ((c = cppGetcFromUngetBufferOrFile ()) != EOF && i < delimLen && delim[i] == c)
 					i++;
 				if (i == delimLen && c == DOUBLE_QUOTE)
 					break;
 				else
-					ungetcToInputFile (c);
+					cppUngetc (c);
 			}
 		}
-		while ((c = getcFromInputFile ()) != EOF);
+		while ((c = cppGetcFromUngetBufferOrFile ()) != EOF);
 		c = STRING_SYMBOL;
 	}
 	return c;
@@ -722,16 +841,16 @@ static int skipToEndOfChar (void)
 	int c;
 	int count = 0, veraBase = '\0';
 
-	while ((c = getcFromInputFile ()) != EOF)
+	while ((c = cppGetcFromUngetBufferOrFile ()) != EOF)
 	{
 	    ++count;
 		if (c == BACKSLASH)
-			getcFromInputFile ();  /* throw away next character, too */
+			cppGetcFromUngetBufferOrFile ();  /* throw away next character, too */
 		else if (c == SINGLE_QUOTE)
 			break;
 		else if (c == NEWLINE)
 		{
-			ungetcToInputFile (c);
+			cppUngetc (c);
 			break;
 		}
 		else if (Cpp.hasSingleQuoteLiteralNumbers)
@@ -740,7 +859,7 @@ static int skipToEndOfChar (void)
 				veraBase = c;
 			else if (veraBase != '\0'  &&  ! isalnum (c))
 			{
-				ungetcToInputFile (c);
+				cppUngetc (c);
 				break;
 			}
 		}
@@ -759,6 +878,7 @@ static void attachEndFieldMaybe (int macroCorkIndex)
 	}
 }
 
+
 /*  This function returns the next character, stripping out comments,
  *  C pre-processor directives, and the contents of single and double
  *  quoted strings. In short, strip anything which places a burden upon
@@ -771,17 +891,10 @@ extern int cppGetc (void)
 	int c;
 	int macroCorkIndex = CORK_NIL;
 
-	if (Cpp.ungetch != '\0')
-	{
-		c = Cpp.ungetch;
-		Cpp.ungetch = Cpp.ungetch2;
-		Cpp.ungetch2 = '\0';
-		return c;  /* return here to avoid re-calling debugPutc () */
-	}
-	else do
-	{
+
+	do {
 start_loop:
-		c = getcFromInputFile ();
+		c = cppGetcFromUngetBufferOrFile ();
 process:
 		switch (c)
 		{
@@ -841,7 +954,7 @@ process:
 				{
 					c = skipOverCplusComment ();
 					if (c == NEWLINE)
-						ungetcToInputFile (c);
+						cppUngetc (c);
 				}
 				else if (comment == COMMENT_D)
 					c = skipOverDComment ();
@@ -852,23 +965,23 @@ process:
 
 			case BACKSLASH:
 			{
-				int next = getcFromInputFile ();
+				int next = cppGetcFromUngetBufferOrFile ();
 
 				if (next == NEWLINE)
 					goto start_loop;
 				else
-					ungetcToInputFile (next);
+					cppUngetc (next);
 				break;
 			}
 
 			case '?':
 			{
-				int next = getcFromInputFile ();
+				int next = cppGetcFromUngetBufferOrFile ();
 				if (next != '?')
-					ungetcToInputFile (next);
+					cppUngetc (next);
 				else
 				{
-					next = getcFromInputFile ();
+					next = cppGetcFromUngetBufferOrFile ();
 					switch (next)
 					{
 						case '(':          c = '[';       break;
@@ -881,8 +994,8 @@ process:
 						case '-':          c = '~';       break;
 						case '=':          c = '#';       goto process;
 						default:
-							ungetcToInputFile ('?');
-							ungetcToInputFile (next);
+							cppUngetc ('?');
+							cppUngetc (next);
 							break;
 					}
 				}
@@ -894,32 +1007,32 @@ process:
 			 */
 			case '<':
 			{
-				int next = getcFromInputFile ();
+				int next = cppGetcFromUngetBufferOrFile ();
 				switch (next)
 				{
 					case ':':	c = '['; break;
 					case '%':	c = '{'; break;
-					default: ungetcToInputFile (next);
+					default: cppUngetc (next);
 				}
 				goto enter;
 			}
 			case ':':
 			{
-				int next = getcFromInputFile ();
+				int next = cppGetcFromUngetBufferOrFile ();
 				if (next == '>')
 					c = ']';
 				else
-					ungetcToInputFile (next);
+					cppUngetc (next);
 				goto enter;
 			}
 			case '%':
 			{
-				int next = getcFromInputFile ();
+				int next = cppGetcFromUngetBufferOrFile ();
 				switch (next)
 				{
 					case '>':	c = '}'; break;
 					case ':':	c = '#'; goto process;
-					default: ungetcToInputFile (next);
+					default: cppUngetc (next);
 				}
 				goto enter;
 			}
@@ -927,7 +1040,7 @@ process:
 			default:
 				if (c == '@' && Cpp.hasAtLiteralStrings)
 				{
-					int next = getcFromInputFile ();
+					int next = cppGetcFromUngetBufferOrFile ();
 					if (next == DOUBLE_QUOTE)
 					{
 						Cpp.directive.accept = false;
@@ -935,7 +1048,7 @@ process:
 						break;
 					}
 					else
-						ungetcToInputFile (next);
+						cppUngetc (next);
 				}
 				else if (c == 'R' && Cpp.hasCxxRawLiteralStrings)
 				{
@@ -964,9 +1077,9 @@ process:
 					    (! cppIsident (prev2) && (prev == 'L' || prev == 'u' || prev == 'U')) ||
 					    (! cppIsident (prev3) && (prev2 == 'u' && prev == '8')))
 					{
-						int next = getcFromInputFile ();
+						int next = cppGetcFromUngetBufferOrFile ();
 						if (next != DOUBLE_QUOTE)
-							ungetcToInputFile (next);
+							cppUngetc (next);
 						else
 						{
 							Cpp.directive.accept = false;

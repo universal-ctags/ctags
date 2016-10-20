@@ -1,0 +1,7 @@
+--c++-kinds=*
+--fields-c++=+{properties}
+-I DECLARE_FUNCTION+=$0 $1()
+-I ARGS+=$*
+-I DECLARE_VARS+=int $0a; int $0b;
+-I IMPLEMENT_FUNCTIONS+=void $0a(){}; void $0b(){};
+-I DEPRECATED+=$* __attribute__((deprecated))

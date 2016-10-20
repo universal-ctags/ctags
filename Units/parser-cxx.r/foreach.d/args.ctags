@@ -1,0 +1,2 @@
+--c++-kinds=+pxl
+-I foreach+=for($0;;)

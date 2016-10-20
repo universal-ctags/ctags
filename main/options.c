@@ -57,7 +57,7 @@
 #define EXTENSION_SEPARATOR '.'
 #define PATTERN_START '('
 #define PATTERN_STOP  ')'
-#define IGNORE_SEPARATORS   ", \t\n"
+#define IGNORE_SEPARATORS   ",\n"
 
 #ifndef DEFAULT_FILE_FORMAT
 # define DEFAULT_FILE_FORMAT  2
@@ -2194,11 +2194,11 @@ static void saveIgnoreToken(const char * ignoreToken)
 	if(tokenEnd <= tokenBegin)
 		return;
 
-	
 	ignoredTokenInfo * info = (ignoredTokenInfo *)eMalloc(sizeof(ignoredTokenInfo));
 	
 	info->ignoreFollowingParenthesis = ignoreFollowingParenthesis;
 	info->replacement = replacement ? eStrdup(replacement) : NULL;
+	info->replacementLength = replacement ? strlen(replacement) : 0;
 
 	hashTablePutItem(Option.ignore,eStrndup(tokenBegin,tokenEnd - tokenBegin),info);
 
