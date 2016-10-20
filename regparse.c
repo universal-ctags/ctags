@@ -1995,7 +1995,7 @@ or_code_range_buf(OnigEncoding enc, BBuf* bbuf1, int not1,
 
 static int
 and_code_range1(BBuf** pbuf, ScanEnv* env, OnigCodePoint from1, OnigCodePoint to1,
-	        OnigCodePoint* data, int n)
+		OnigCodePoint* data, int n)
 {
   int i, r;
   OnigCodePoint from2, to2;
@@ -4457,7 +4457,7 @@ enum CCVALTYPE {
 
 static int
 next_state_class(CClassNode* cc, CClassNode* asc_cc,
-	         OnigCodePoint* vs, enum CCVALTYPE* type,
+		 OnigCodePoint* vs, enum CCVALTYPE* type,
 		 enum CCSTATE* state, ScanEnv* env)
 {
   int r;
@@ -5149,7 +5149,7 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 #endif
 	  if (IS_SYNTAX_BV(env->syntax, ONIG_SYN_STRICT_CHECK_BACKREF)) {
 	    if (num > env->num_mem ||
-	        IS_NULL(SCANENV_MEM_NODES(env)[num]))
+		IS_NULL(SCANENV_MEM_NODES(env)[num]))
 	    return ONIGERR_INVALID_BACKREF;
 	  }
 	}
@@ -5271,8 +5271,8 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 
 	  case 'a':     /* limits \d, \s, \w and POSIX brackets to ASCII range */
 	    if ((IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_PERL) ||
-	         IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_RUBY)) &&
-	        (neg == 0)) {
+		 IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_RUBY)) &&
+		(neg == 0)) {
 	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 0);
 	      ONOFF(option, ONIG_OPTION_POSIX_BRACKET_ALL_RANGE, 1);
 	      ONOFF(option, ONIG_OPTION_WORD_BOUND_ALL_RANGE, 1);
@@ -5283,8 +5283,8 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 
 	  case 'u':
 	    if ((IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_PERL) ||
-	         IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_RUBY)) &&
-	        (neg == 0)) {
+		 IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_RUBY)) &&
+		(neg == 0)) {
 	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 1);
 	      ONOFF(option, ONIG_OPTION_POSIX_BRACKET_ALL_RANGE, 1);
 	      ONOFF(option, ONIG_OPTION_WORD_BOUND_ALL_RANGE, 1);
@@ -5295,11 +5295,11 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 
 	  case 'd':
 	    if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_PERL) &&
-	        (neg == 0)) {
+		(neg == 0)) {
 	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 1);
 	    }
 	    else if (IS_SYNTAX_OP2(env->syntax, ONIG_SYN_OP2_OPTION_RUBY) &&
-	        (neg == 0)) {
+		(neg == 0)) {
 	      ONOFF(option, ONIG_OPTION_ASCII_RANGE, 0);
 	      ONOFF(option, ONIG_OPTION_POSIX_BRACKET_ALL_RANGE, 0);
 	      ONOFF(option, ONIG_OPTION_WORD_BOUND_ALL_RANGE, 0);

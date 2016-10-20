@@ -5186,7 +5186,7 @@ optimize_node_left(Node* node, NodeOptInfo* opt, OptEnv* env)
 	  if (nopt.exb.len > 0) {
 	    if (nopt.exb.reach_end) {
 	      for (i = 2; i <= qn->lower &&
-		          ! is_full_opt_exact_info(&opt->exb); i++) {
+			  ! is_full_opt_exact_info(&opt->exb); i++) {
 		concat_opt_exact_info(&opt->exb, &nopt.exb, env->enc);
 	      }
 	      if (i < qn->lower) {
@@ -5308,7 +5308,7 @@ set_optimize_exact_info(regex_t* reg, OptExactInfo* e)
   else {
     if (e->len >= 3 || (e->len >= 2 && allow_reverse)) {
       r = set_bm_skip(reg->exact, reg->exact_end, reg,
-	              reg->map, &(reg->int_map), 0);
+		      reg->map, &(reg->int_map), 0);
       if (r) return r;
 
       reg->optimize = (allow_reverse != 0
