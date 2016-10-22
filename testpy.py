@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function, unicode_literals
-from ctypes import *
+import ctypes
 import onigmo
 import sys
 import io
@@ -18,9 +18,9 @@ encoding = onig_encoding[0].name.decode()
 
 # special syntactic settings
 _syntax_default = onigmo.OnigSyntaxType()
-onigmo.onig_copy_syntax(byref(_syntax_default), onigmo.ONIG_SYNTAX_DEFAULT)
+onigmo.onig_copy_syntax(ctypes.byref(_syntax_default), onigmo.ONIG_SYNTAX_DEFAULT)
 _syntax_default.options &= ~onigmo.ONIG_OPTION_ASCII_RANGE
-syntax_default = byref(_syntax_default)
+syntax_default = ctypes.byref(_syntax_default)
 
 
 class strptr:
@@ -30,9 +30,11 @@ class strptr:
             raise TypeError
         self._str = s
         try:
-            self._ptr = cast(self._str, c_void_p)   # CPython 2.x/3.x
+            # CPython 2.x/3.x
+            self._ptr = ctypes.cast(self._str, ctypes.c_void_p)
         except TypeError:
-            self._ptr = c_void_p(self._str)         # PyPy 1.x
+            # PyPy 1.x
+            self._ptr = ctypes.c_void_p(self._str)
 
     def getptr(self, offset=0):
         if offset == -1:    # -1 means the end of the string
@@ -73,7 +75,7 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
 
     reg = onigmo.OnigRegex()
     einfo = onigmo.OnigErrorInfo()
-    msg = create_string_buffer(onigmo.ONIG_MAX_ERROR_MESSAGE_LEN)
+    msg = ctypes.create_string_buffer(onigmo.ONIG_MAX_ERROR_MESSAGE_LEN)
 
     pattern2 = pattern
     if not isinstance(pattern, bytes):
@@ -94,10 +96,11 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
     if len(pattern) > limit:
         pattern = pattern[:limit] + "..."
 
-    r = onigmo.onig_new(byref(reg), patternp.getptr(), patternp.getptr(-1),
-            opt, onig_encoding, syn, byref(einfo));
+    r = onigmo.onig_new(ctypes.byref(reg),
+            patternp.getptr(), patternp.getptr(-1),
+            opt, onig_encoding, syn, ctypes.byref(einfo));
     if r != 0:
-        onigmo.onig_error_code_to_str(msg, r, byref(einfo))
+        onigmo.onig_error_code_to_str(msg, r, ctypes.byref(einfo))
         if r == err:
             nsucc += 1
             print_result("OK(E)", "%s (/%s/ '%s')" % \
