@@ -115,7 +115,9 @@ am_libonigmo_la_OBJECTS = regerror.lo regparse.lo regext.lo regcomp.lo \
 	iso_8859_5.lo iso_8859_6.lo iso_8859_7.lo iso_8859_8.lo \
 	iso_8859_9.lo iso_8859_10.lo iso_8859_11.lo iso_8859_13.lo \
 	iso_8859_14.lo iso_8859_15.lo iso_8859_16.lo euc_tw.lo \
-	euc_kr.lo big5.lo gb18030.lo koi8_r.lo windows_1251.lo
+	euc_kr.lo big5.lo gb18030.lo koi8_r.lo koi8_u.lo \
+	windows_1250.lo windows_1251.lo windows_1252.lo \
+	windows_1253.lo windows_1254.lo windows_1257.lo
 libonigmo_la_OBJECTS = $(am_libonigmo_la_OBJECTS)
 libonigmo_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -361,7 +363,10 @@ libonigmo_la_SOURCES = regint.h regparse.h regenc.h st.h \
 	$(encdir)/iso_8859_13.c $(encdir)/iso_8859_14.c \
 	$(encdir)/iso_8859_15.c $(encdir)/iso_8859_16.c \
 	$(encdir)/euc_tw.c $(encdir)/euc_kr.c $(encdir)/big5.c \
-	$(encdir)/gb18030.c $(encdir)/koi8_r.c $(encdir)/windows_1251.c
+	$(encdir)/gb18030.c $(encdir)/koi8_r.c $(encdir)/koi8_u.c \
+	$(encdir)/windows_1250.c $(encdir)/windows_1251.c \
+	$(encdir)/windows_1252.c $(encdir)/windows_1253.c \
+	$(encdir)/windows_1254.c $(encdir)/windows_1257.c
 
 libonigmo_la_LDFLAGS = -version-info $(LTVERSION) -no-undefined
 EXTRA_DIST = .gitignore onigmo.pc.in HISTORY README.ja index.html \
@@ -570,6 +575,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_8.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iso_8859_9.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/koi8_r.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/koi8_u.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/regcomp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/regenc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/regerror.Plo@am__quote@
@@ -593,7 +599,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utf_32be.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utf_32le.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utf_8.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/windows_1250.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/windows_1251.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/windows_1252.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/windows_1253.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/windows_1254.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/windows_1257.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/windows_31j.Plo@am__quote@
 
 .c.o:
@@ -827,12 +838,54 @@ koi8_r.lo: $(encdir)/koi8_r.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o koi8_r.lo `test -f '$(encdir)/koi8_r.c' || echo '$(srcdir)/'`$(encdir)/koi8_r.c
 
+koi8_u.lo: $(encdir)/koi8_u.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT koi8_u.lo -MD -MP -MF $(DEPDIR)/koi8_u.Tpo -c -o koi8_u.lo `test -f '$(encdir)/koi8_u.c' || echo '$(srcdir)/'`$(encdir)/koi8_u.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/koi8_u.Tpo $(DEPDIR)/koi8_u.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/koi8_u.c' object='koi8_u.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o koi8_u.lo `test -f '$(encdir)/koi8_u.c' || echo '$(srcdir)/'`$(encdir)/koi8_u.c
+
+windows_1250.lo: $(encdir)/windows_1250.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT windows_1250.lo -MD -MP -MF $(DEPDIR)/windows_1250.Tpo -c -o windows_1250.lo `test -f '$(encdir)/windows_1250.c' || echo '$(srcdir)/'`$(encdir)/windows_1250.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/windows_1250.Tpo $(DEPDIR)/windows_1250.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/windows_1250.c' object='windows_1250.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o windows_1250.lo `test -f '$(encdir)/windows_1250.c' || echo '$(srcdir)/'`$(encdir)/windows_1250.c
+
 windows_1251.lo: $(encdir)/windows_1251.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT windows_1251.lo -MD -MP -MF $(DEPDIR)/windows_1251.Tpo -c -o windows_1251.lo `test -f '$(encdir)/windows_1251.c' || echo '$(srcdir)/'`$(encdir)/windows_1251.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/windows_1251.Tpo $(DEPDIR)/windows_1251.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/windows_1251.c' object='windows_1251.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o windows_1251.lo `test -f '$(encdir)/windows_1251.c' || echo '$(srcdir)/'`$(encdir)/windows_1251.c
+
+windows_1252.lo: $(encdir)/windows_1252.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT windows_1252.lo -MD -MP -MF $(DEPDIR)/windows_1252.Tpo -c -o windows_1252.lo `test -f '$(encdir)/windows_1252.c' || echo '$(srcdir)/'`$(encdir)/windows_1252.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/windows_1252.Tpo $(DEPDIR)/windows_1252.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/windows_1252.c' object='windows_1252.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o windows_1252.lo `test -f '$(encdir)/windows_1252.c' || echo '$(srcdir)/'`$(encdir)/windows_1252.c
+
+windows_1253.lo: $(encdir)/windows_1253.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT windows_1253.lo -MD -MP -MF $(DEPDIR)/windows_1253.Tpo -c -o windows_1253.lo `test -f '$(encdir)/windows_1253.c' || echo '$(srcdir)/'`$(encdir)/windows_1253.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/windows_1253.Tpo $(DEPDIR)/windows_1253.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/windows_1253.c' object='windows_1253.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o windows_1253.lo `test -f '$(encdir)/windows_1253.c' || echo '$(srcdir)/'`$(encdir)/windows_1253.c
+
+windows_1254.lo: $(encdir)/windows_1254.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT windows_1254.lo -MD -MP -MF $(DEPDIR)/windows_1254.Tpo -c -o windows_1254.lo `test -f '$(encdir)/windows_1254.c' || echo '$(srcdir)/'`$(encdir)/windows_1254.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/windows_1254.Tpo $(DEPDIR)/windows_1254.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/windows_1254.c' object='windows_1254.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o windows_1254.lo `test -f '$(encdir)/windows_1254.c' || echo '$(srcdir)/'`$(encdir)/windows_1254.c
+
+windows_1257.lo: $(encdir)/windows_1257.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT windows_1257.lo -MD -MP -MF $(DEPDIR)/windows_1257.Tpo -c -o windows_1257.lo `test -f '$(encdir)/windows_1257.c' || echo '$(srcdir)/'`$(encdir)/windows_1257.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/windows_1257.Tpo $(DEPDIR)/windows_1257.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(encdir)/windows_1257.c' object='windows_1257.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o windows_1257.lo `test -f '$(encdir)/windows_1257.c' || echo '$(srcdir)/'`$(encdir)/windows_1257.c
 
 testp-testc.o: testc.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(testp_CFLAGS) $(CFLAGS) -MT testp-testc.o -MD -MP -MF $(DEPDIR)/testp-testc.Tpo -c -o testp-testc.o `test -f 'testc.c' || echo '$(srcdir)/'`testc.c

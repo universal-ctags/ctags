@@ -111,8 +111,10 @@ encobjs       = $(WORKDIR)\ascii.obj $(WORKDIR)\utf_8.obj \
 		$(jp_objs) $(iso_8859_objs) \
 		$(WORKDIR)\euc_tw.obj $(WORKDIR)\euc_kr.obj $(WORKDIR)\big5.obj \
 		$(WORKDIR)\gb18030.obj \
-		$(WORKDIR)\koi8_r.obj  \
-		$(WORKDIR)\windows_1251.obj # $(WORKDIR)\koi8.obj
+		$(WORKDIR)\koi8_r.obj $(WORKDIR)\koi8_u.obj \
+		$(WORKDIR)\windows_1250.obj $(WORKDIR)\windows_1251.obj \
+		$(WORKDIR)\windows_1252.obj $(WORKDIR)\windows_1253.obj \
+		$(WORKDIR)\windows_1254.obj $(WORKDIR)\windows_1257.obj
 
 resobj        = $(WORKDIR)\onigmo.res
 
@@ -208,9 +210,15 @@ $(WORKDIR)\iso_8859_13.obj: $(encdir)\iso_8859_13.c regenc.h win32\config.h
 $(WORKDIR)\iso_8859_14.obj: $(encdir)\iso_8859_14.c regenc.h win32\config.h
 $(WORKDIR)\iso_8859_15.obj: $(encdir)\iso_8859_15.c regenc.h win32\config.h
 $(WORKDIR)\iso_8859_16.obj: $(encdir)\iso_8859_16.c regenc.h win32\config.h
-$(WORKDIR)\koi8.obj:       $(encdir)\koi8.c   regenc.h win32\config.h
+#$(WORKDIR)\koi8.obj:       $(encdir)\koi8.c   regenc.h win32\config.h
 $(WORKDIR)\koi8_r.obj:     $(encdir)\koi8_r.c regenc.h win32\config.h
+$(WORKDIR)\koi8_u.obj:     $(encdir)\koi8_u.c regenc.h win32\config.h
+$(WORKDIR)\windows_1250.obj: $(encdir)\windows_1250.c regenc.h win32\config.h
 $(WORKDIR)\windows_1251.obj: $(encdir)\windows_1251.c regenc.h win32\config.h
+$(WORKDIR)\windows_1252.obj: $(encdir)\windows_1252.c regenc.h win32\config.h
+$(WORKDIR)\windows_1253.obj: $(encdir)\windows_1253.c regenc.h win32\config.h
+$(WORKDIR)\windows_1254.obj: $(encdir)\windows_1254.c regenc.h win32\config.h
+$(WORKDIR)\windows_1257.obj: $(encdir)\windows_1257.c regenc.h win32\config.h
 $(WORKDIR)\big5.obj:       $(encdir)\big5.c   regenc.h win32\config.h
 $(WORKDIR)\gb18030.obj:    $(encdir)\gb18030.c   regenc.h win32\config.h
 

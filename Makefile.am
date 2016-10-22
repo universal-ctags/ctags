@@ -32,7 +32,10 @@ libonigmo_la_SOURCES = regint.h regparse.h regenc.h st.h \
 	$(encdir)/iso_8859_13.c $(encdir)/iso_8859_14.c \
 	$(encdir)/iso_8859_15.c $(encdir)/iso_8859_16.c \
 	$(encdir)/euc_tw.c $(encdir)/euc_kr.c $(encdir)/big5.c \
-	$(encdir)/gb18030.c $(encdir)/koi8_r.c $(encdir)/windows_1251.c
+	$(encdir)/gb18030.c $(encdir)/koi8_r.c $(encdir)/koi8_u.c \
+	$(encdir)/windows_1250.c $(encdir)/windows_1251.c \
+	$(encdir)/windows_1252.c $(encdir)/windows_1253.c \
+	$(encdir)/windows_1254.c $(encdir)/windows_1257.c
 
 libonigmo_la_LDFLAGS = -version-info $(LTVERSION) -no-undefined
 

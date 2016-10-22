@@ -118,13 +118,36 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
       ONIG_ENCODING_EUC_KR        EUC-KR
       ONIG_ENCODING_EUC_CN        EUC-CN
       ONIG_ENCODING_SHIFT_JIS     Shift_JIS
-      ONIG_ENCODING_CP932         CP932
+      ONIG_ENCODING_WINDOWS_31J   Windows-31J (CP932)
       ONIG_ENCODING_KOI8_R        KOI8-R
-      ONIG_ENCODING_CP1251        CP1251
+      ONIG_ENCODING_KOI8_U        KOI8-U
+      ONIG_ENCODING_WINDOWS_1250  Windows-1250 (CP1250)
+      ONIG_ENCODING_WINDOWS_1251  Windows-1251 (CP1251)
+      ONIG_ENCODING_WINDOWS_1252  Windows-1252 (CP1252)
+      ONIG_ENCODING_WINDOWS_1253  Windows-1253 (CP1253)
+      ONIG_ENCODING_WINDOWS_1254  Windows-1254 (CP1254)
+      ONIG_ENCODING_WINDOWS_1257  Windows-1257 (CP1257)
       ONIG_ENCODING_BIG5          Big5
       ONIG_ENCODING_GB18030       GB18030
 
       or any OnigEncodingType data address defined by user.
+
+      The following encoding names can be also used for backward compatibility:
+
+      ONIG_ENCODING_UTF8          UTF-8
+      ONIG_ENCODING_UTF16_BE      UTF-16BE
+      ONIG_ENCODING_UTF16_LE      UTF-16LE
+      ONIG_ENCODING_UTF32_BE      UTF-32BE
+      ONIG_ENCODING_UTF32_LE      UTF-32LE
+      ONIG_ENCODING_SJIS          Shift_JIS
+      ONIG_ENCODING_CP932         Windows-31J (CP932)
+      ONIG_ENCODING_CP1250        Windows-1250 (CP1250)
+      ONIG_ENCODING_CP1251        Windows-1251 (CP1251)
+      ONIG_ENCODING_CP1252        Windows-1252 (CP1252)
+      ONIG_ENCODING_CP1253        Windows-1253 (CP1253)
+      ONIG_ENCODING_CP1254        Windows-1254 (CP1254)
+      ONIG_ENCODING_CP1257        Windows-1257 (CP1257)
+
 
   6 syntax:     address of pattern syntax definition.
 

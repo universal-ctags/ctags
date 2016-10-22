@@ -246,10 +246,16 @@ ONIG_EXTERN const OnigEncodingType OnigEncodingEUC_TW;
 ONIG_EXTERN const OnigEncodingType OnigEncodingEUC_KR;
 ONIG_EXTERN const OnigEncodingType OnigEncodingEUC_CN;
 ONIG_EXTERN const OnigEncodingType OnigEncodingShift_JIS;
-ONIG_EXTERN const OnigEncodingType OnigEncodingCP932;
-ONIG_EXTERN const OnigEncodingType OnigEncodingKOI8;
+ONIG_EXTERN const OnigEncodingType OnigEncodingWindows_31J;
+/* ONIG_EXTERN const OnigEncodingType OnigEncodingKOI8; */
 ONIG_EXTERN const OnigEncodingType OnigEncodingKOI8_R;
-ONIG_EXTERN const OnigEncodingType OnigEncodingCP1251;
+ONIG_EXTERN const OnigEncodingType OnigEncodingKOI8_U;
+ONIG_EXTERN const OnigEncodingType OnigEncodingWindows_1250;
+ONIG_EXTERN const OnigEncodingType OnigEncodingWindows_1251;
+ONIG_EXTERN const OnigEncodingType OnigEncodingWindows_1252;
+ONIG_EXTERN const OnigEncodingType OnigEncodingWindows_1253;
+ONIG_EXTERN const OnigEncodingType OnigEncodingWindows_1254;
+ONIG_EXTERN const OnigEncodingType OnigEncodingWindows_1257;
 ONIG_EXTERN const OnigEncodingType OnigEncodingBIG5;
 ONIG_EXTERN const OnigEncodingType OnigEncodingGB18030;
 #endif /* RUBY */
@@ -281,15 +287,28 @@ ONIG_EXTERN const OnigEncodingType OnigEncodingGB18030;
 # define ONIG_ENCODING_EUC_KR       (&OnigEncodingEUC_KR)
 # define ONIG_ENCODING_EUC_CN       (&OnigEncodingEUC_CN)
 # define ONIG_ENCODING_SHIFT_JIS    (&OnigEncodingShift_JIS)
-# define ONIG_ENCODING_CP932        (&OnigEncodingCP932)
-# define ONIG_ENCODING_KOI8         (&OnigEncodingKOI8)
+# define ONIG_ENCODING_WINDOWS_31J  (&OnigEncodingWindows_31J)
+/* # define ONIG_ENCODING_KOI8         (&OnigEncodingKOI8) */
 # define ONIG_ENCODING_KOI8_R       (&OnigEncodingKOI8_R)
-# define ONIG_ENCODING_CP1251       (&OnigEncodingCP1251)
+# define ONIG_ENCODING_KOI8_U       (&OnigEncodingKOI8_U)
+# define ONIG_ENCODING_WINDOWS_1250 (&OnigEncodingWindows_1250)
+# define ONIG_ENCODING_WINDOWS_1251 (&OnigEncodingWindows_1251)
+# define ONIG_ENCODING_WINDOWS_1252 (&OnigEncodingWindows_1252)
+# define ONIG_ENCODING_WINDOWS_1253 (&OnigEncodingWindows_1253)
+# define ONIG_ENCODING_WINDOWS_1254 (&OnigEncodingWindows_1254)
+# define ONIG_ENCODING_WINDOWS_1257 (&OnigEncodingWindows_1257)
 # define ONIG_ENCODING_BIG5         (&OnigEncodingBIG5)
 # define ONIG_ENCODING_GB18030      (&OnigEncodingGB18030)
 
 /* old names */
 # define ONIG_ENCODING_SJIS         ONIG_ENCODING_SHIFT_JIS
+# define ONIG_ENCODING_CP932        ONIG_ENCODING_WINDOWS_31J
+# define ONIG_ENCODING_CP1250       ONIG_ENCODING_WINDOWS_1250
+# define ONIG_ENCODING_CP1251       ONIG_ENCODING_WINDOWS_1251
+# define ONIG_ENCODING_CP1252       ONIG_ENCODING_WINDOWS_1252
+# define ONIG_ENCODING_CP1253       ONIG_ENCODING_WINDOWS_1253
+# define ONIG_ENCODING_CP1254       ONIG_ENCODING_WINDOWS_1254
+# define ONIG_ENCODING_CP1257       ONIG_ENCODING_WINDOWS_1257
 # define ONIG_ENCODING_UTF8         ONIG_ENCODING_UTF_8
 # define ONIG_ENCODING_UTF16_BE     ONIG_ENCODING_UTF_16BE
 # define ONIG_ENCODING_UTF16_LE     ONIG_ENCODING_UTF_16LE
