@@ -1063,6 +1063,7 @@ def main():
     x2("(?<n>(a|b\\g<n>c){3,5}?)", "baaaaca", 1, 4)
     x2("\\p{WoRd}", "a", 0, 1)  # property name is not case sensitive
     n("[[:WoRd:]]", "a", err=onigmo.ONIGERR_INVALID_POSIX_BRACKET_TYPE)   # POSIX bracket name is case sensitive
+    n("(\\2)(\\1)", "")     # Issue #65
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)

@@ -2238,18 +2238,23 @@ get_min_match_length(Node* node, OnigDistance *min, ScanEnv* env)
       EncloseNode* en = NENCLOSE(node);
       switch (en->type) {
       case ENCLOSE_MEMORY:
-#ifdef USE_SUBEXP_CALL
-	if (IS_ENCLOSE_MIN_FIXED(en))
-	  *min = en->min_len;
-	else {
-	  r = get_min_match_length(en->target, min, env);
-	  if (r == 0) {
-	    en->min_len = *min;
-	    SET_ENCLOSE_STATUS(node, NST_MIN_FIXED);
+        if (IS_ENCLOSE_MIN_FIXED(en))
+          *min = en->min_len;
+        else {
+	  if (IS_ENCLOSE_MARK1(NENCLOSE(node)))
+	    *min = 0;  // recursive
+	  else {
+	    SET_ENCLOSE_STATUS(node, NST_MARK1);
+	    r = get_min_match_length(en->target, min, env);
+	    CLEAR_ENCLOSE_STATUS(node, NST_MARK1);
+	    if (r == 0) {
+	      en->min_len = *min;
+	      SET_ENCLOSE_STATUS(node, NST_MIN_FIXED);
+	    }
 	  }
-	}
-	break;
-#endif
+        }
+        break;
+
       case ENCLOSE_OPTION:
       case ENCLOSE_STOP_BACKTRACK:
       case ENCLOSE_CONDITION:
@@ -2356,18 +2361,23 @@ get_max_match_length(Node* node, OnigDistance *max, ScanEnv* env)
       EncloseNode* en = NENCLOSE(node);
       switch (en->type) {
       case ENCLOSE_MEMORY:
-#ifdef USE_SUBEXP_CALL
 	if (IS_ENCLOSE_MAX_FIXED(en))
 	  *max = en->max_len;
 	else {
-	  r = get_max_match_length(en->target, max, env);
-	  if (r == 0) {
-	    en->max_len = *max;
-	    SET_ENCLOSE_STATUS(node, NST_MAX_FIXED);
+	  if (IS_ENCLOSE_MARK1(NENCLOSE(node)))
+	    *max = ONIG_INFINITE_DISTANCE;
+	  else {
+	    SET_ENCLOSE_STATUS(node, NST_MARK1);
+	    r = get_max_match_length(en->target, max, env);
+	    CLEAR_ENCLOSE_STATUS(node, NST_MARK1);
+	    if (r == 0) {
+	      en->max_len = *max;
+	      SET_ENCLOSE_STATUS(node, NST_MAX_FIXED);
+	    }
 	  }
 	}
 	break;
-#endif
+
       case ENCLOSE_OPTION:
       case ENCLOSE_STOP_BACKTRACK:
       case ENCLOSE_CONDITION:
