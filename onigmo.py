@@ -81,8 +81,8 @@ class OnigEncodingType(ctypes.Structure):
         ("left_adjust_char_head",   ctypes.c_void_p),
         ("is_allowed_reverse_match",ctypes.c_void_p),
         ("case_map",                ctypes.c_void_p),
-        ("ruby_encoding_index",     ctypes.c_void_p),
-        ("flags",                   ctypes.c_void_p),
+        ("ruby_encoding_index",     ctypes.c_int),
+        ("flags",                   ctypes.c_int),
     ]
 OnigEncoding = ctypes.POINTER(OnigEncodingType)
 
