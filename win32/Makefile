@@ -248,16 +248,16 @@ pytest:
 
 
 $(WORKDIR)\$(testc).exe: win32\$(testc).c $(libname)
-	$(CC) -nologo -Fe$(WORKDIR)\$(testc) -DONIG_EXTERN=extern win32\$(testc).c -I. $(libname)
+	$(CC) $(CFLAGS) -Fe$(WORKDIR)\$(testc) -DONIG_EXTERN=extern win32\$(testc).c -I. $(libname)
 
 $(WORKDIR)\$(testp).exe: win32\$(testc).c $(dlllib)
-	$(CC) -nologo -DPOSIX_TEST -Fe$(WORKDIR)\$(testp) win32\$(testc).c -I. $(dlllib)
+	$(CC) $(CFLAGS) -DPOSIX_TEST -Fe$(WORKDIR)\$(testp) win32\$(testc).c -I. $(dlllib)
 
 #$(testc)u.c: test.rb testconvu.rb
 #	ruby -Ke testconvu.rb test.rb > $@
 
 $(WORKDIR)\$(testcu).exe: $(testcu).c $(libname)
-	$(CC) -nologo -Fe$(WORKDIR)\$(testcu) -DONIG_EXTERN=extern $(testcu).c -I. $(libname)
+	$(CC) $(CFLAGS) -Fe$(WORKDIR)\$(testcu) -DONIG_EXTERN=extern $(testcu).c -I. $(libname)
 
 $(libbase).def: win32\makedef.py onigmo.h regenc.h onigmognu.h onigmoposix.h
 	$(PYTHON) win32\makedef.py > $@

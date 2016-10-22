@@ -218,16 +218,16 @@ pytest:
 
 
 $(WORKDIR)/$(testc): win32/$(testc).c $(libname)
-	$(CC) -o $(WORKDIR)/$(testc) -DONIG_EXTERN=extern win32/$(testc).c -I. $(libname)
+	$(CC) $(CFLAGS) -o $(WORKDIR)/$(testc) -DONIG_EXTERN=extern win32/$(testc).c -I. $(libname)
 
 $(WORKDIR)/$(testp): win32/$(testc).c $(dlllib)
-	$(CC) -DPOSIX_TEST -o $(WORKDIR)/$(testp) win32/$(testc).c -I. $(dlllib)
+	$(CC) $(CFLAGS) -DPOSIX_TEST -o $(WORKDIR)/$(testp) win32/$(testc).c -I. $(dlllib)
 
 #$(testc)u.c: test.rb testconvu.rb
 #	ruby -Ke testconvu.rb test.rb > $@
 
 $(WORKDIR)/$(testcu): $(testcu).c $(libname)
-	$(CC) -o $(WORKDIR)/$(testcu) -DONIG_EXTERN=extern $(testcu).c -I. $(libname)
+	$(CC) $(CFLAGS) -o $(WORKDIR)/$(testcu) -DONIG_EXTERN=extern $(testcu).c -I. $(libname)
 
 $(libbase).def: win32/makedef.py onigmo.h regenc.h onigmognu.h onigmoposix.h
 	$(PYTHON) win32/makedef.py > $@
