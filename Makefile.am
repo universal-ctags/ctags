@@ -23,7 +23,7 @@ libonigmo_la_SOURCES = regint.h regparse.h regenc.h st.h \
 	$(encdir)/unicode/casefold.h $(encdir)/unicode/name2ctype.h \
 	$(encdir)/euc_jp.c $(encdir)/shift_jis.c $(encdir)/windows_31j.c \
 	$(encdir)/jis/props.h $(encdir)/jis/props.kwd \
-	$(encdir)/iso_8859_1.c \
+	$(encdir)/iso_8859.h $(encdir)/iso_8859_1.c \
 	$(encdir)/iso_8859_2.c  $(encdir)/iso_8859_3.c \
 	$(encdir)/iso_8859_4.c  $(encdir)/iso_8859_5.c \
 	$(encdir)/iso_8859_6.c  $(encdir)/iso_8859_7.c \
@@ -47,7 +47,7 @@ EXTRA_DIST = .gitignore onigmo.pc.in HISTORY README.ja index.html \
 	tool/enc-unicode.rb tool/download-ucd.sh tool/update-doc.py \
 	win32/Makefile win32/Makefile.mingw win32/config.h win32/testc.c \
 	win32/makedef.py win32/onigmo.rc \
-	$(encdir)/koi8.c $(encdir)/mktable.c \
+	$(encdir)/mktable.c \
 	$(sampledir)/encode.c $(sampledir)/listcap.c $(sampledir)/names.c \
 	$(sampledir)/posix.c $(sampledir)/simple.c $(sampledir)/sql.c \
 	$(sampledir)/syntax.c $(sampledir)/crnl.c \
@@ -72,6 +72,7 @@ onigmo.pc: $(srcdir)/onigmo.pc.in Makefile
 
 pkgconfigdir   = $(libdir)/pkgconfig
 pkgconfig_DATA = onigmo.pc
+CLEANFILES = onigmo.pc
 
 dll:
 	$(CXX) -shared -Wl,--output-def,libonigmo.def -o libonigmo.dll *.o \
