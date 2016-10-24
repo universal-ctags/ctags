@@ -217,6 +217,7 @@ bitset_copy(BitSetRef dest, BitSetRef bs)
   for (i = 0; i < BITSET_SIZE; i++) { dest[i] = bs[i]; }
 }
 
+#if defined(USE_NAMED_GROUP) && !defined(USE_ST_LIBRARY)
 extern int
 onig_strncmp(const UChar* s1, const UChar* s2, int n)
 {
@@ -228,6 +229,7 @@ onig_strncmp(const UChar* s1, const UChar* s2, int n)
   }
   return 0;
 }
+#endif
 
 extern void
 onig_strcpy(UChar* dest, const UChar* src, const UChar* end)
@@ -1553,6 +1555,7 @@ node_str_cat_codepoint(Node* node, OnigEncoding enc, OnigCodePoint c)
   return onig_node_str_cat(node, buf, buf + num);
 }
 
+#if 0
 extern void
 onig_node_conv_to_str_node(Node* node, int flag)
 {
@@ -1562,6 +1565,7 @@ onig_node_conv_to_str_node(Node* node, int flag)
   NSTR(node)->s    = NSTR(node)->buf;
   NSTR(node)->end  = NSTR(node)->buf;
 }
+#endif
 
 extern void
 onig_node_str_clear(Node* node)
