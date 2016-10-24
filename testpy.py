@@ -1067,6 +1067,11 @@ def main():
     x2("\\p{WoRd}", "a", 0, 1)  # property name is not case sensitive
     n("[[:WoRd:]]", "a", err=onigmo.ONIGERR_INVALID_POSIX_BRACKET_TYPE)   # POSIX bracket name is case sensitive
     n("(\\2)(\\1)", "")     # Issue #65
+    n("(0?0|(?(5)||)|(?(5)||))?", "", err=onigmo.ONIGERR_INVALID_CONDITION_PATTERN) # Ruby Bug#12418
+    n("[\\40000000000", "", err=onigmo.ONIGERR_TOO_BIG_NUMBER)  # Ruby Bug#12420
+    n("[\\600000000000\n", "", err=onigmo.ONIGERR_TOO_BIG_NUMBER)   # Ruby Bug#12423
+    n("[]", "", err=onigmo.ONIGERR_EMPTY_CHAR_CLASS)
+    x2("[[:ab:\\x{30}]]+", ":ab0x", 0, 4)
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
@@ -1079,7 +1084,11 @@ def main():
     x2("(?i)[A\\x{41}]", "a", 0, 1);
     x2("[abA]", "a", 0, 1);
     x2("[[ab]&&[ac]]+", "aaa", 0, 3);
+    x2("[[ab]&&[^b]]+", "aaa", 0, 3);
+    x2("[[^b]&&[ab]]+", "aaa", 0, 3);
     x2("[[あい]&&[あう]]+", "あああ", 0, 3);
+    x2("[[あい]&&[^い]]+", "あああ", 0, 3);
+    x2("[[^い]&&[あい]]+", "あああ", 0, 3);
 
     # possessive quantifiers
     n("a?+a", "a")
@@ -1206,6 +1215,15 @@ def main():
         x2("(?u)[[:upper:]]", "\u212a", 0, 1);
         n("(?a)[[:upper:]]", "\u212a");
 
+    # Grep syntax
+    # \+, \?, \|, \{n,m\}
+    x2("a\\+", "aa", 0, 2, syn=onigmo.ONIG_SYNTAX_GREP)
+    n("a\\+", "b", syn=onigmo.ONIG_SYNTAX_GREP)
+    x2("a\\?", "", 0, 0, syn=onigmo.ONIG_SYNTAX_GREP)
+    x2("a\\?", "a", 0, 1, syn=onigmo.ONIG_SYNTAX_GREP)
+    x2("ab\\|cd", "cd", 0, 2, syn=onigmo.ONIG_SYNTAX_GREP)
+    x2("a\\{1,2\\}", "aaa", 0, 2, syn=onigmo.ONIG_SYNTAX_GREP)
+    x2("a\\{2\\}", "aaa", 0, 2, syn=onigmo.ONIG_SYNTAX_GREP)
     # \< and \>
     x2("\\<abc\\>", " abc ", 1, 4, syn=onigmo.ONIG_SYNTAX_GREP)
     n("\\<abc\\>", "zabc ", syn=onigmo.ONIG_SYNTAX_GREP)
@@ -1312,7 +1330,13 @@ def main():
     n("(?<!(?i:ab))cd", "ABcd")
 
     # Perl syntax
-    x2("\\Q()\\\\E", "()\\", 0, 3, syn=onigmo.ONIG_SYNTAX_PERL)
+    x2("\\Q()\\[a]\\E", "()\\[a]", 0, 6, syn=onigmo.ONIG_SYNTAX_PERL)
+    x2("(?a)(?d)\\w+", "あ", 0, 1, syn=onigmo.ONIG_SYNTAX_PERL) # For now (?d) == (?u)
+    x2("(?a)(?l)\\w+", "あ", 0, 1, syn=onigmo.ONIG_SYNTAX_PERL) # For now (?l) == (?u)
+    x2("(?a)(?^)\\w+", "あ", 0, 1, syn=onigmo.ONIG_SYNTAX_PERL)
+    n("(?i)(?^)a", "A", syn=onigmo.ONIG_SYNTAX_PERL)
+    n("(?m)(?^)a$", "a\nb", syn=onigmo.ONIG_SYNTAX_PERL)
+    x2("(?s)(?^).*", "a\nb", 0, 1, syn=onigmo.ONIG_SYNTAX_PERL)
 
     print("\nEncoding:", encoding)
     print("RESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
