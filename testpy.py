@@ -66,7 +66,14 @@ def print_result(result, pattern, file=None):
     except UnicodeEncodeError as e:
         print('(' + str(e) + ')')
 
+
+class SearchType:
+    FORWARD = 0
+    BACKWARD = 1
+    MATCH = 2
+
 def xx(pattern, target, s_from, s_to, mem, not_match,
+        searchtype=SearchType.FORWARD,
         syn=syntax_default, opt=onigmo.ONIG_OPTION_DEFAULT,
         err=onigmo.ONIG_NORMAL):
     global nerror
@@ -118,9 +125,25 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
         return
 
     region = onigmo.onig_region_new()
-    r = onigmo.onig_search(reg, targetp.getptr(), targetp.getptr(-1),
-                    targetp.getptr(), targetp.getptr(-1),
-                    region, onigmo.ONIG_OPTION_NONE);
+    if searchtype == SearchType.FORWARD:
+        r = onigmo.onig_search(reg, targetp.getptr(), targetp.getptr(-1),
+                        targetp.getptr(), targetp.getptr(-1),
+                        region, onigmo.ONIG_OPTION_NONE);
+    elif searchtype == SearchType.BACKWARD:
+        r = onigmo.onig_search(reg, targetp.getptr(), targetp.getptr(-1),
+                        targetp.getptr(-1), targetp.getptr(),
+                        region, onigmo.ONIG_OPTION_NONE);
+    elif searchtype == SearchType.MATCH:
+        r = onigmo.onig_match(reg, targetp.getptr(), targetp.getptr(-1),
+                        targetp.getptr(),
+                        region, onigmo.ONIG_OPTION_NONE);
+    else:
+        nerror += 1
+        print_result("ERROR", "wrong searchtype", file=sys.stderr)
+        onigmo.onig_free(reg)
+        onigmo.onig_region_free(region, 1)
+        return
+
     if r < onigmo.ONIG_MISMATCH:
         onigmo.onig_error_code_to_str(msg, r)
         if r == err:
@@ -131,6 +154,7 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
             nerror += 1
             print_result("ERROR", "%s (/%s/ '%s')" % \
                     (msg.value.decode(), pattern, target), file=sys.stderr)
+        onigmo.onig_free(reg)
         onigmo.onig_region_free(region, 1)
         return
 
@@ -1337,6 +1361,14 @@ def main():
     n("(?i)(?^)a", "A", syn=onigmo.ONIG_SYNTAX_PERL)
     n("(?m)(?^)a$", "a\nb", syn=onigmo.ONIG_SYNTAX_PERL)
     x2("(?s)(?^).*", "a\nb", 0, 1, syn=onigmo.ONIG_SYNTAX_PERL)
+
+    # Backward search
+    x2("abc", "abcabc", 3, 6, searchtype=SearchType.BACKWARD)
+    x2("あいう", "あいうあいう", 3, 6, searchtype=SearchType.BACKWARD)
+
+    # onig_match()
+    x2("abc", "abcabc", 0, 3, searchtype=SearchType.MATCH)
+    n("abc", " abcabc", searchtype=SearchType.MATCH)
 
     print("\nEncoding:", encoding)
     print("RESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
