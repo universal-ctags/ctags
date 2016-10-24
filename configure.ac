@@ -587,7 +587,9 @@ AM_CONDITIONAL([ENABLE_XCMD], [test "xyes" = "x$enable_xcmd"])
 
 AH_TEMPLATE([HAVE_LIBXML],
 	[Define this value if libxml is available.])
-PKG_CHECK_MODULES(LIBXML, libxml-2.0,
+dnl About the condition of version
+dnl see https://mail.gnome.org/archives/xml/2010-February/msg00008.html
+PKG_CHECK_MODULES(LIBXML, [libxml-2.0 >= 2.7.7],
 		       [have_libxml=yes
 		       AC_DEFINE(HAVE_LIBXML)],
 		       [have_libxml=no])
