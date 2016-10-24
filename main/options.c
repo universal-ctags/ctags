@@ -12,7 +12,9 @@
 */
 #include "general.h"  /* must always come first */
 
-#define _GNU_SOURCE   /* for asprintf */
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE   /* for asprintf */
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

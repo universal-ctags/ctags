@@ -59,7 +59,7 @@ typedef struct sInputFileInfo {
 					   when `resetInputFile' is called
 					   on the input stream.
 					   This is needed for nested stream. */
-	bool  isHeader;       /* is input file a header file? */
+	bool isHeader;           /* is input file a header file? */
 
 	/* language of input file */
 	inputLangInfo langInfo;

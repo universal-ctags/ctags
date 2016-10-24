@@ -142,11 +142,11 @@ static void clearPatternSet (const langType language)
 static int makeRegexTag (
 		const vString* const name, const kindOption* const kind, int scopeIndex, int placeholder)
 {
+	Assert (kind != NULL);
 	if (kind->enabled)
 	{
 		tagEntryInfo e;
 		Assert (name != NULL  &&  ((vStringLength (name) > 0) || placeholder));
-		Assert (kind != NULL);
 		initTagEntry (&e, vStringValue (name), kind);
 		e.extensionFields.scopeIndex = scopeIndex;
 		e.placeholder = !!placeholder;
@@ -330,8 +330,6 @@ static void kindFree (void *data)
 	eFree (kind);
 }
 
-
-
 static regexPattern* addCompiledTagCommon (const langType language,
 					   regex_t* const pattern,
 					   char kind_letter)
@@ -447,6 +445,7 @@ static void regex_flag_basic_short (char c CTAGS_ATTR_UNUSED, void* data)
 	int* cflags = data;
 	*cflags &= ~REG_EXTENDED;
 }
+
 static void regex_flag_basic_long (const char* const s CTAGS_ATTR_UNUSED, const char* const unused CTAGS_ATTR_UNUSED, void* data)
 {
 	regex_flag_basic_short ('b', data);

@@ -103,10 +103,10 @@ extern int makeSimpleTag (
 
 	if (kinds [kind].enabled  &&  name != NULL  &&  vStringLength (name) > 0)
 	{
-	    tagEntryInfo e;
-	    initTagEntry (&e, vStringValue (name), & kinds [kind]);
+		tagEntryInfo e;
+		initTagEntry (&e, vStringValue (name), & kinds [kind]);
 
-	    r = makeTagEntry (&e);
+		r = makeTagEntry (&e);
 	}
 	return r;
 }
