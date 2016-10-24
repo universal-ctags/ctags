@@ -1036,9 +1036,9 @@ def main():
     x2("x.*?\\Z$", "x\n", 0, 1)
     x2("x.*?\\Z$", "x\r\n", 0, 2)   # \Z will match between \r and \n, if
                                     # ONIG_OPTION_NEWLINE_CRLF isn't specified.
-    x2("(?<=fo).*", "foo", 2, 3)
-    x2("(?m)(?<=fo).*", "foo", 2, 3)
-    x2("(?m)(?<=fo).+", "foo", 2, 3)
+    x2("(?<=fo).*", "foo", 2, 3)        # Issue #15
+    x2("(?m)(?<=fo).*", "foo", 2, 3)    # Issue #15
+    x2("(?m)(?<=fo).+", "foo", 2, 3)    # Issue #15
     x2("\\n?\\z", "hello", 5, 5)
     x2("\\z", "hello", 5, 5)
     x2("\\n?\\z", "こんにちは", 5, 5)

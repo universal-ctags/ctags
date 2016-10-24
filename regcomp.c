@@ -5388,6 +5388,9 @@ set_optimize_info_from_tree(Node* node, regex_t* reg, ScanEnv* scan_env)
         ANCHOR_BEGIN_POSITION | ANCHOR_ANYCHAR_STAR | ANCHOR_ANYCHAR_STAR_ML |
         ANCHOR_LOOK_BEHIND);
 
+  if ((opt.anc.left_anchor & (ANCHOR_LOOK_BEHIND | ANCHOR_PREC_READ_NOT)) != 0)
+    reg->anchor &= ~ANCHOR_ANYCHAR_STAR_ML;
+
   reg->anchor |= opt.anc.right_anchor & (ANCHOR_END_BUF | ANCHOR_SEMI_END_BUF |
 	ANCHOR_PREC_READ_NOT);
 
