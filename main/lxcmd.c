@@ -65,6 +65,7 @@
 #include "read.h"
 #include "routines.h"
 #include "vstring.h"
+#include "mio.h"
 
 #include "pcoproc.h"
 
@@ -349,9 +350,10 @@ static bool loadPathKinds  (xcmdPath *const path, const langType language)
 
 	if (pp)
 	{
+		MIO *mio = mio_new_fp (pp, NULL);
 		vString* vline = vStringNew();
 
-		while (readLineRawWithNoSeek (vline, pp))
+		while (readLineRaw (vline, mio))
 		{
 			char* line;
 			char  kind_letter;
@@ -371,7 +373,7 @@ static bool loadPathKinds  (xcmdPath *const path, const langType language)
 		}
 
 		vStringDelete (vline);
-
+		mio_free (mio);
 
 		status = pcoprocClose (pp);
 
@@ -1151,10 +1153,11 @@ static bool invokeXcmdPath (const char* const fileName, xcmdPath* path, const la
 
 	if (pp)
 	{
+		MIO *mio = mio_new_fp (pp, NULL);
 		vString* vline = vStringNew();
 		int status;
 
-		while (readLineRawWithNoSeek (vline, pp))
+		while (readLineRaw (vline, mio))
 		{
 			char* line;
 			tagEntry entry;
@@ -1180,6 +1183,7 @@ static bool invokeXcmdPath (const char* const fileName, xcmdPath* path, const la
 		}
 
 		vStringDelete (vline);
+		mio_free (mio);
 
 		status = pcoprocClose (pp);
 		verbose("	status: %d\n", status);

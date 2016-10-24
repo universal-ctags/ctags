@@ -962,47 +962,6 @@ out:
 	return result;
 }
 
-/*
- *   Similar to readLineRaw but this doesn't use fgetpos/fsetpos.
- *   Useful for reading from pipe.
- */
-char* readLineRawWithNoSeek (vString* const vline, FILE *const pp)
-{
-	int c;
-	bool nlcr;
-	char *result = NULL;
-
-	vStringClear (vline);
-	nlcr = false;
-	
-	while (1)
-	{
-		c = fgetc (pp);
-		
-		if (c == EOF)
-		{
-			if (! feof (pp))
-				error (FATAL | PERROR, "Failure on attempt to read file");
-			else
-				break;
-		}
-
-		result = vStringValue (vline);
-		
-		if (c == '\n' || c == '\r')
-			nlcr = true;
-		else if (nlcr)
-		{
-			ungetc (c, pp);
-			break;
-		}
-		else
-			vStringPut (vline, c);
-	}
-
-	return result;
-}
-
 extern void   pushNarrowedInputStream (const langType language,
 				       unsigned long startLine, int startCharOffset,
 				       unsigned long endLine, int endCharOffset,
