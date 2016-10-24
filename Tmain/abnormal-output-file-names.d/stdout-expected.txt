@@ -1,0 +1,8 @@
+# SINGLE QUOTE
+x	input.c	/^int x;$/;"	v	typeref:typename:int
+# DOUBLE QUOTES
+x	input.c	/^int x;$/;"	v	typeref:typename:int
+# PROCESS SUBSTITUTION
+x	input.c	/^int x;$/;"	v	typeref:typename:int
+# SPACE
+x	input.c	/^int x;$/;"	v	typeref:typename:int
