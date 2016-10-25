@@ -883,7 +883,7 @@ onig_name_to_group_numbers(regex_t* reg, const UChar* name,
 
 extern int
 onig_name_to_backref_number(regex_t* reg, const UChar* name,
-			    const UChar* name_end, OnigRegion *region)
+			    const UChar* name_end, const OnigRegion *region)
 {
   int i, n, *nums;
 
@@ -916,7 +916,7 @@ onig_name_to_group_numbers(regex_t* reg, const UChar* name,
 
 extern int
 onig_name_to_backref_number(regex_t* reg, const UChar* name,
-			    const UChar* name_end, OnigRegion* region)
+			    const UChar* name_end, const OnigRegion* region)
 {
   return ONIG_NO_SUPPORT_CONFIG;
 }

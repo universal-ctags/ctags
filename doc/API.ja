@@ -362,7 +362,7 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
 
 
 # int onig_name_to_backref_number(regex_t* reg, const UChar* name, const UChar* name_end,
-                                  OnigRegion *region)
+                                  const OnigRegion *region)
 
   指定された名前の後方参照(\k<name>)に対する捕獲式集合(グループ)の番号を返す。
   名前に対して、複数のマッチ領域が有効であれば、その中の最大の番号を返す。

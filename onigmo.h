@@ -905,7 +905,7 @@ int onig_region_set P_((OnigRegion* region, int at, int beg, int end));
 ONIG_EXTERN
 int onig_name_to_group_numbers P_((OnigRegex reg, const OnigUChar* name, const OnigUChar* name_end, int** nums));
 ONIG_EXTERN
-int onig_name_to_backref_number P_((OnigRegex reg, const OnigUChar* name, const OnigUChar* name_end, OnigRegion *region));
+int onig_name_to_backref_number P_((OnigRegex reg, const OnigUChar* name, const OnigUChar* name_end, const OnigRegion *region));
 ONIG_EXTERN
 int onig_foreach_name P_((OnigRegex reg, int (*func)(const OnigUChar*, const OnigUChar*,int,int*,OnigRegex,void*), void* arg));
 ONIG_EXTERN

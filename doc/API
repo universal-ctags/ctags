@@ -360,7 +360,7 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
 
 
 # int onig_name_to_backref_number(regex_t* reg, const UChar* name, const UChar* name_end,
-                                  OnigRegion *region)
+                                  const OnigRegion *region)
 
   Return the group number corresponding to the named backref (\k<name>).
   If two or more regions for the groups of the name are effective,
