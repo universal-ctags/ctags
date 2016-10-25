@@ -124,8 +124,18 @@ extern int main(int argc, char* argv[])
   static unsigned char str[] = { 0xc7, 0xd6, 0xfe, 0xea, 0xe0, 0xe2, 0x00 };
   static unsigned char pattern[] = { '(', '?', 'u', ')', 0xe7, 0xf6, 0xde, '\\', 'w', '+', 0x00 };
 
-  r |= exec(ONIG_ENCODING_CP1251, ONIG_OPTION_IGNORECASE,
-	   "aBc", " AbC");
+  r |= exec(ONIG_ENCODING_WINDOWS_1250, ONIG_OPTION_IGNORECASE,
+	   "aBc\\w", " AbCd");
+  r |= exec(ONIG_ENCODING_WINDOWS_1251, ONIG_OPTION_IGNORECASE,
+	   "aBc\\w", " AbCd");
+  r |= exec(ONIG_ENCODING_WINDOWS_1252, ONIG_OPTION_IGNORECASE,
+	   "aBc\\w", " AbCd");
+  r |= exec(ONIG_ENCODING_WINDOWS_1253, ONIG_OPTION_IGNORECASE,
+	   "aBc\\w", " AbCd");
+  r |= exec(ONIG_ENCODING_WINDOWS_1254, ONIG_OPTION_IGNORECASE,
+	   "aBc\\w", " AbCd");
+  r |= exec(ONIG_ENCODING_WINDOWS_1257, ONIG_OPTION_IGNORECASE,
+	   "aBc\\w", " AbCd");
 
   r |= exec(ONIG_ENCODING_ISO_8859_1, ONIG_OPTION_IGNORECASE,
 	   " [a-c\337z] ", "  SS  ");
@@ -171,6 +181,7 @@ extern int main(int argc, char* argv[])
 	   (char* )pattern, (char* )str);
 
   r |= exec(ONIG_ENCODING_KOI8_R, ONIG_OPTION_NONE, "a+", "bbbaaaccc");
+  r |= exec(ONIG_ENCODING_KOI8_U, ONIG_OPTION_NONE, "a+", "bbbaaaccc");
   r |= exec(ONIG_ENCODING_EUC_TW, ONIG_OPTION_NONE, "b*a+?c+", "bbbaaaccc");
   r |= exec(ONIG_ENCODING_EUC_KR, ONIG_OPTION_NONE, "a+", "bbbaaaccc");
   r |= exec(ONIG_ENCODING_EUC_CN, ONIG_OPTION_NONE, "c+", "bbbaaaccc");

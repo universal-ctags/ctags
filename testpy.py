@@ -1365,6 +1365,8 @@ def main():
     # Backward search
     x2("abc", "abcabc", 3, 6, searchtype=SearchType.BACKWARD)
     x2("あいう", "あいうあいう", 3, 6, searchtype=SearchType.BACKWARD)
+    x2("(?i)abc", "ABCABC", 3, 6, searchtype=SearchType.BACKWARD)
+    x2("(?i)ａｂｃ", "ＡＢＣＡＢＣ", 3, 6, searchtype=SearchType.BACKWARD)
 
     # onig_match()
     x2("abc", "abcabc", 0, 3, searchtype=SearchType.MATCH)
