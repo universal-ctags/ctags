@@ -4,9 +4,8 @@ sampledir = $(top_srcdir)/sample
 libname = libonigmo.la
 
 ACLOCAL_AMFLAGS = -I m4
-#AM_CFLAGS = -DNOT_RUBY
-AM_CFLAGS =
-INCLUDES  = -I$(top_srcdir) -I$(includedir) -I$(encdir)/unicode
+AM_CFLAGS = -Wall
+AM_CPPFLAGS = -I$(top_srcdir) -I$(includedir) -I$(encdir)/unicode
 
 SUBDIRS = . sample
 
@@ -93,7 +92,7 @@ TESTS = testc testp testcu
 
 check_PROGRAMS = testc testp testcu
 
-atest: testc testp testcu
+atest: testc$(EXEEXT) testp$(EXEEXT) testcu$(EXEEXT)
 	@echo "[Onigmo API, ASCII/EUC-JP check]"
 	@$(top_builddir)/testc  | grep RESULT
 	@echo "[POSIX API, ASCII/EUC-JP check]"
@@ -123,12 +122,12 @@ win32/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
 
 # Python TEST
 pytest:
-	LD_LIBRARY_PATH=.libs python testpy.py EUC-JP
-	LD_LIBRARY_PATH=.libs python testpy.py SJIS
-	LD_LIBRARY_PATH=.libs python testpy.py UTF-8
-	LD_LIBRARY_PATH=.libs python testpy.py UTF-16LE
-	LD_LIBRARY_PATH=.libs python testpy.py UTF-16BE
-	LD_LIBRARY_PATH=.libs python testpy.py UTF-32LE
-	LD_LIBRARY_PATH=.libs python testpy.py UTF-32BE
+	LD_LIBRARY_PATH=.libs python $(srcdir)/testpy.py EUC-JP
+	LD_LIBRARY_PATH=.libs python $(srcdir)/testpy.py SJIS
+	LD_LIBRARY_PATH=.libs python $(srcdir)/testpy.py UTF-8
+	LD_LIBRARY_PATH=.libs python $(srcdir)/testpy.py UTF-16LE
+	LD_LIBRARY_PATH=.libs python $(srcdir)/testpy.py UTF-16BE
+	LD_LIBRARY_PATH=.libs python $(srcdir)/testpy.py UTF-32LE
+	LD_LIBRARY_PATH=.libs python $(srcdir)/testpy.py UTF-32BE
 
 ## END OF FILE
