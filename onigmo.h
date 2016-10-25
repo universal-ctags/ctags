@@ -895,7 +895,7 @@ void onig_region_init P_((OnigRegion* region));
 ONIG_EXTERN
 void onig_region_free P_((OnigRegion* region, int free_self));
 ONIG_EXTERN
-void onig_region_copy P_((OnigRegion* to, OnigRegion* from));
+void onig_region_copy P_((OnigRegion* to, const OnigRegion* from));
 ONIG_EXTERN
 void onig_region_clear P_((OnigRegion* region));
 ONIG_EXTERN

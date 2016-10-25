@@ -314,7 +314,7 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
   2 free_self: [1: free all, 0: free memory used in region but not self]
 
 
-# void onig_region_copy(OnigRegion* to, OnigRegion* from)
+# void onig_region_copy(OnigRegion* to, const OnigRegion* from)
 
   Copy contents of region.
 

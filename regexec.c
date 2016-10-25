@@ -354,7 +354,7 @@ onig_region_free(OnigRegion* r, int free_self)
 }
 
 extern void
-onig_region_copy(OnigRegion* to, OnigRegion* from)
+onig_region_copy(OnigRegion* to, const OnigRegion* from)
 {
 #define RREGC_SIZE   (sizeof(int) * from->num_regs)
   int i, r;

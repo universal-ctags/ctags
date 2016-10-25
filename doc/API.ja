@@ -296,8 +296,8 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
 
     ONIG_OPTION_NOTBOL        文字列の先頭(str)を行頭と看做さない
     ONIG_OPTION_NOTEOL        文字列の終端(end)を行末と看做さない
-    ONIG_OPTION_NOTBOS        文字列の先頭(str)を先頭(\A)と見做さない
-    ONIG_OPTION_NOTEOS        文字列の終端(end)を終端(\z)と見做さない
+    ONIG_OPTION_NOTBOS        文字列の先頭(str)を先頭(\A)と看做さない
+    ONIG_OPTION_NOTEOS        文字列の終端(end)を終端(\z)と看做さない
     ONIG_OPTION_POSIX_REGION  region引数をPOSIX APIのregmatch_t[]にする
 
 
@@ -315,7 +315,7 @@ Onigmo インターフェース Version 6.0.0   2016/10/10
   2 free_self:  [1: region自身を含めて全て解放, 0: region自身は解放しない]
 
 
-# void onig_region_copy(OnigRegion* to, OnigRegion* from)
+# void onig_region_copy(OnigRegion* to, const OnigRegion* from)
 
   マッチ領域情報(region)を複製する。
 
