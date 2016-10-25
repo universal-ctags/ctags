@@ -211,6 +211,21 @@ extern int main(int argc, char* argv[])
                   "\000b\000a\000a\000a\000c\000c\000\000",
                   "x\000b\000a\000a\000a\000c\000c\000\000\000");
 
+  r |= exec_deluxe(ONIG_ENCODING_UTF16_LE, ONIG_ENCODING_UTF16_BE,
+                  ONIG_OPTION_NONE,
+                  "b\000a\000a\000a\000c\000c\000\000\000",
+                  "\000x\000b\000a\000a\000a\000c\000c\000\000");
+
+  r |= exec_deluxe(ONIG_ENCODING_UTF32_BE, ONIG_ENCODING_UTF32_LE,
+                  ONIG_OPTION_NONE,
+                  "\000\000\000b\000\000\000a\000\000\000a\000\000\000a\000\000\000c\000\000\000c\000\000\000\000",
+                  "x\000\000\000b\000\000\000a\000\000\000a\000\000\000a\000\000\000c\000\000\000c\000\000\000\000\000\000\000");
+
+  r |= exec_deluxe(ONIG_ENCODING_UTF32_LE, ONIG_ENCODING_UTF32_BE,
+                  ONIG_OPTION_NONE,
+                  "b\000\000\000a\000\000\000a\000\000\000a\000\000\000c\000\000\000c\000\000\000\000\000\000\000",
+                  "\000\000\000x\000\000\000b\000\000\000a\000\000\000a\000\000\000a\000\000\000c\000\000\000c\000\000\000\000");
+
   r |= exec_deluxe(ONIG_ENCODING_ISO_8859_1, ONIG_ENCODING_UTF16_BE,
                   ONIG_OPTION_IGNORECASE,
                   "\337", "\000S\000S\000\000");
