@@ -1095,6 +1095,7 @@ def main():
     n("[\\40000000000", "", err=onigmo.ONIGERR_TOO_BIG_NUMBER)  # Ruby Bug#12420
     n("[\\600000000000\n", "", err=onigmo.ONIGERR_TOO_BIG_NUMBER)   # Ruby Bug#12423
     n("[]", "", err=onigmo.ONIGERR_EMPTY_CHAR_CLASS)
+    n("[c-a]", "", err=onigmo.ONIGERR_EMPTY_RANGE_IN_CHAR_CLASS)
     x2("[[:ab:\\x{30}]]+", ":ab0x", 0, 4)
     n("\\x{FFFFFFFF}", "", err=onigmo.ONIGERR_TOO_BIG_WIDE_CHAR_VALUE);
     n("\\x{100000000}", "", err=onigmo.ONIGERR_TOO_LONG_WIDE_CHAR_VALUE);
@@ -1187,6 +1188,9 @@ def main():
     x2("((?<v>)a)|b(?0)b", "bbabb", 0, 5, syn=onigmo.ONIG_SYNTAX_PERL)
     x2("((?<v>)a|b(?1)b)", "bbabb", 0, 5, syn=onigmo.ONIG_SYNTAX_PERL)
     x2("((?<v>a|b(?&v)b))", "bbabb", 0, 5, syn=onigmo.ONIG_SYNTAX_PERL)
+    n("(?<", "", err=onigmo.ONIGERR_EMPTY_GROUP_NAME)
+    n("(?<>)", "", err=onigmo.ONIGERR_EMPTY_GROUP_NAME)
+    n("(?<.>)", "", err=onigmo.ONIGERR_INVALID_CHAR_IN_GROUP_NAME)
 
     # character set modifiers
     x2("(?u)\\w+", "あa#", 0, 2);
