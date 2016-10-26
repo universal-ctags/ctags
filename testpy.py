@@ -1096,6 +1096,11 @@ def main():
     n("[\\600000000000\n", "", err=onigmo.ONIGERR_TOO_BIG_NUMBER)   # Ruby Bug#12423
     n("[]", "", err=onigmo.ONIGERR_EMPTY_CHAR_CLASS)
     x2("[[:ab:\\x{30}]]+", ":ab0x", 0, 4)
+    n("\\x{FFFFFFFF}", "", err=onigmo.ONIGERR_TOO_BIG_WIDE_CHAR_VALUE);
+    n("\\x{100000000}", "", err=onigmo.ONIGERR_TOO_LONG_WIDE_CHAR_VALUE);
+    x2("\\u0026", "\u0026", 0, 1)
+    x2("[\\u0024-\\u0027]", "\u0026", 0, 1)
+    n("\\u026x", "", err=onigmo.ONIGERR_TOO_SHORT_DIGITS)
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)

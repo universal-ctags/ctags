@@ -52,6 +52,9 @@ const OnigSyntaxType OnigSyntaxRuby = {
       ONIG_SYN_OP2_CCLASS_SET_OP | ONIG_SYN_OP2_ESC_CAPITAL_C_BAR_CONTROL |
       ONIG_SYN_OP2_ESC_CAPITAL_M_BAR_META | ONIG_SYN_OP2_ESC_V_VTAB |
       ONIG_SYN_OP2_ESC_H_XDIGIT |
+#ifndef RUBY
+      ONIG_SYN_OP2_ESC_U_HEX4 |
+#endif
       ONIG_SYN_OP2_ESC_CAPITAL_X_EXTENDED_GRAPHEME_CLUSTER |
       ONIG_SYN_OP2_QMARK_LPAREN_CONDITION |
       ONIG_SYN_OP2_ESC_CAPITAL_R_LINEBREAK |
@@ -1724,6 +1727,7 @@ scan_unsigned_hexadecimal_number(UChar** src, UChar* end, int minlen,
     }
     else {
       PUNFETCH;
+      maxlen++;
       break;
     }
   }
