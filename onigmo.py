@@ -349,6 +349,7 @@ ONIG_SYN_ALLOW_DOUBLE_RANGE_OP_IN_CC    = (1<<23)
 # syntax (behavior) warning
 ONIG_SYN_WARN_CC_OP_NOT_ESCAPED         = (1<<24)
 ONIG_SYN_WARN_REDUNDANT_NESTED_REPEAT   = (1<<25)
+ONIG_SYN_WARN_CC_DUP                    = (1<<26)
 
 # meta character specifiers (onig_set_meta_char())
 ONIG_META_CHAR_ESCAPE               = 0
@@ -438,6 +439,8 @@ ONIGERR_INVALID_COMBINATION_OF_OPTIONS                  =  -403
 ONIGERR_OVER_THREAD_PASS_LIMIT_COUNT                    = -1001
 
 
+OnigWarnFunc = ctypes.CFUNCTYPE(None, ctypes.c_char_p)
+
 #
 # Onigmo APIs
 #
@@ -452,7 +455,12 @@ def onig_error_code_to_str(err_buf, err_code, err_info=None):
     return libonig.onig_error_code_to_str(err_buf, err_code, err_info)
 
 # onig_set_warn_func
+libonig.onig_set_warn_func.argtypes = [OnigWarnFunc]
+onig_set_warn_func = libonig.onig_set_warn_func
+
 # onig_set_verb_warn_func
+libonig.onig_set_verb_warn_func.argtypes = [OnigWarnFunc]
+onig_set_verb_warn_func = libonig.onig_set_verb_warn_func
 
 # onig_new
 libonig.onig_new.argtypes = [ctypes.POINTER(OnigRegex),

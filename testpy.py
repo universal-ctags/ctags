@@ -255,6 +255,15 @@ def main():
         outenc = sys.argv[2]
     set_output_encoding(outenc)
 
+    # set warning function
+    def warn_func(str):
+        print("warning: " + str.decode(encoding))
+
+    warn_func_ptr = onigmo.OnigWarnFunc(warn_func)
+    onigmo.onig_set_warn_func(warn_func_ptr)
+    onigmo.onig_set_verb_warn_func(warn_func_ptr)
+
+
     # Copied from onig-5.9.2/testc.c
     #   '?\?' which is used to avoid trigraph is replaced by '??'.
     #   Match positions are specified by unit of character instead of byte.
