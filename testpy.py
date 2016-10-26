@@ -1361,6 +1361,12 @@ def main():
     n("(?i)(?^)a", "A", syn=onigmo.ONIG_SYNTAX_PERL)
     n("(?m)(?^)a$", "a\nb", syn=onigmo.ONIG_SYNTAX_PERL)
     x2("(?s)(?^).*", "a\nb", 0, 1, syn=onigmo.ONIG_SYNTAX_PERL)
+    x2("\\o{046}", "\046", 0, 1, syn=onigmo.ONIG_SYNTAX_PERL);
+    x2("[\\o{044}-\\o{047}]", "\046", 0, 1, syn=onigmo.ONIG_SYNTAX_PERL);
+    n("\\o{40000000000}", "", syn=onigmo.ONIG_SYNTAX_PERL, err=onigmo.ONIGERR_TOO_BIG_WIDE_CHAR_VALUE);
+    n("\\o{100000000000}", "", syn=onigmo.ONIG_SYNTAX_PERL, err=onigmo.ONIGERR_TOO_LONG_WIDE_CHAR_VALUE);
+    n("[\\o{40000000000}]", "", syn=onigmo.ONIG_SYNTAX_PERL, err=onigmo.ONIGERR_TOO_BIG_WIDE_CHAR_VALUE);
+    n("[\\o{100000000000}]", "", syn=onigmo.ONIG_SYNTAX_PERL, err=onigmo.ONIGERR_TOO_LONG_WIDE_CHAR_VALUE);
 
     # Backward search
     x2("abc", "abcabc", 3, 6, searchtype=SearchType.BACKWARD)

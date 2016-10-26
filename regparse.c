@@ -3243,6 +3243,33 @@ fetch_token_in_cc(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
       }
       break;
 
+    case 'o':
+      if (PEND) break;
+
+      prev = p;
+      if (PPEEK_IS('{') && IS_SYNTAX_OP(syn, ONIG_SYN_OP_ESC_O_BRACE_OCTAL)) {
+	PINC;
+	num = scan_unsigned_octal_number(&p, end, 11, enc);
+	if (num < 0) return ONIGERR_TOO_BIG_WIDE_CHAR_VALUE;
+	if (!PEND) {
+	  c2 = PPEEK;
+	  if (ONIGENC_IS_CODE_DIGIT(enc, c2) && c2 < '8')
+	    return ONIGERR_TOO_LONG_WIDE_CHAR_VALUE;
+	}
+
+	if (p > prev + enclen(enc, prev, end) && !PEND && (PPEEK_IS('}'))) {
+	  PINC;
+	  tok->type   = TK_CODE_POINT;
+	  tok->base   = 8;
+	  tok->u.code = (OnigCodePoint )num;
+	}
+	else {
+	  /* can't read nothing or invalid format */
+	  p = prev;
+	}
+      }
+      break;
+
     case '0':
     case '1': case '2': case '3': case '4': case '5': case '6': case '7':
       if (IS_SYNTAX_OP(syn, ONIG_SYN_OP_ESC_OCTAL3)) {
@@ -3661,6 +3688,32 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 	tok->type   = TK_CODE_POINT;
 	tok->base   = 16;
 	tok->u.code = (OnigCodePoint )num;
+      }
+      break;
+
+    case 'o':
+      if (PEND) break;
+
+      prev = p;
+      if (PPEEK_IS('{') && IS_SYNTAX_OP(syn, ONIG_SYN_OP_ESC_O_BRACE_OCTAL)) {
+	PINC;
+	num = scan_unsigned_octal_number(&p, end, 11, enc);
+	if (num < 0) return ONIGERR_TOO_BIG_WIDE_CHAR_VALUE;
+	if (!PEND) {
+	  OnigCodePoint c = PPEEK;
+	  if (ONIGENC_IS_CODE_DIGIT(enc, c) && c < '8')
+	    return ONIGERR_TOO_LONG_WIDE_CHAR_VALUE;
+	}
+
+	if ((p > prev + enclen(enc, prev, end)) && !PEND && PPEEK_IS('}')) {
+	  PINC;
+	  tok->type   = TK_CODE_POINT;
+	  tok->u.code = (OnigCodePoint )num;
+	}
+	else {
+	  /* can't read nothing or invalid format */
+	  p = prev;
+	}
       }
       break;
 
