@@ -430,6 +430,11 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 	return CORK_NIL;
 }
 
+static bool doesCPreProRunAsStandaloneParser (void)
+{
+	return (Cpp.headerKind == CPreProKinds + CPREPRO_HEADER);
+}
+
 static void makeIncludeTag (const  char *const name, bool systemHeader)
 {
 	tagEntryInfo e;
@@ -442,7 +447,7 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 	    && isXtagEnabled (XTAG_REFERENCE_TAGS)
 	    && Cpp.headerKind->roles [ role_index ].enabled)
 	{
-		if (Cpp.headerKind == CPreProKinds + CPREPRO_HEADER)
+		if (doesCPreProRunAsStandaloneParser ())
 			pushLanguage (Cpp.lang);
 
 		initRefTagEntry (&e, name, Cpp.headerKind, role_index);
@@ -451,7 +456,7 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 		e.truncateLine = true;
 		makeTagEntry (&e);
 
-		if (Cpp.headerKind == CPreProKinds + CPREPRO_HEADER)
+		if (doesCPreProRunAsStandaloneParser ())
 			popLanguage ();
 	}
 }
