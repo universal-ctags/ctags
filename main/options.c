@@ -686,26 +686,32 @@ extern void checkOptions (void)
 }
 
 extern langType getLanguageComponentInOption (const char *const option,
-					      const char *const prefix)
+											  const char *const prefix)
 {
-	size_t len;
+	size_t prefix_len;
 	langType language;
 	const char *lang;
+	char *colon = NULL;
+	size_t lang_len = 0;
 
 	Assert (prefix && prefix[0]);
 	Assert (option);
 
-	len = strlen (prefix);
-	if (strncmp (option, prefix, len) != 0)
+	prefix_len = strlen (prefix);
+	if (strncmp (option, prefix, prefix_len) != 0)
 		return LANG_IGNORE;
 	else
 	{
-		lang = option + len;
+		lang = option + prefix_len;
 		if (lang [0] == '\0')
 			return LANG_IGNORE;
 	}
 
-	language = getNamedLanguage (lang, 0);
+	/* --para-<LANG>:<PARAM>=... */
+	colon = strchr (lang, ':');
+	if (colon)
+		lang_len = colon - lang;
+	language = getNamedLanguage (lang, lang_len);
 	if (language == LANG_IGNORE)
 		error (FATAL, "Unknown language \"%s\" in \"%s\" option", lang, option);
 
@@ -1723,27 +1729,23 @@ extern bool processParamOption (
 			const char *const option, const char *const value)
 {
 	langType language;
-	char* name;
-	const char* arg;
+	const char* name;
 	const char* sep;
 
 	language = getLanguageComponentInOption (option, "param-");
 	if (language == LANG_IGNORE)
 		return false;
 
+	sep = option + strlen ("param-") + strlen (getLanguageName (language));
+	if (*sep != ':')
+		error (FATAL, "no separator(:) is given for %s=%s", option, value);
+	name = sep + 1;
+
 	if (value == NULL || value [0] == '\0')
 		error (FATAL, "no parameter is given for %s", option);
 
-	sep = strchr (value, ':');
-	if (sep == NULL)
-		error (FATAL, "no separator(:) is given for %s=%s", option, value);
+	applyParameter (language, name, value);
 
-	name = eStrndup (value, sep - value);
-	arg = sep + 1;
-
-	applyParameter (language, name, arg);
-
-	eFree (name);
 	return true;
 }
 
