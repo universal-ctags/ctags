@@ -63,6 +63,7 @@ enum eState {
 /*  Defines the current state of the pre-processor.
  */
 typedef struct sCppState {
+	langType lang;
 	int		ungetch, ungetch2;   /* ungotten characters, if any */
 	bool resolveRequired;     /* must resolve if/else/elif/endif branch */
 	bool hasAtLiteralStrings; /* supports @"c:\" strings */
@@ -84,6 +85,38 @@ typedef struct sCppState {
 	} directive;
 } cppState;
 
+
+typedef enum {
+	CPREPRO_MACRO_KIND_UNDEF_ROLE,
+} cPreProMacroRole;
+
+static roleDesc CPREPROMacroRoles [] = {
+	RoleTemplateUndef,
+};
+
+
+typedef enum {
+	CPREPRO_HEADER_KIND_SYSTEM_ROLE,
+	CPREPRO_HEADER_KIND_LOCAL_ROLE,
+} cPreProHeaderRole;
+
+static roleDesc CPREPROHeaderRoles [] = {
+	RoleTemplateSystem,
+	RoleTemplateLocal,
+};
+
+
+typedef enum {
+	CPREPRO_MACRO, CPREPRO_HEADER,
+} cPreProkind;
+
+static kindOption CPreProKinds [] = {
+	{ true,  'd', "macro",      "macro definitions",
+	  .referenceOnly = false, ATTACH_ROLES(CPREPROMacroRoles)},
+	{ true, 'h', "header",     "included header files",
+	  .referenceOnly = true, ATTACH_ROLES(CPREPROHeaderRoles)},
+};
+
 /*
 *   DATA DEFINITIONS
 */
@@ -93,6 +126,7 @@ typedef struct sCppState {
 static bool BraceFormat = false;
 
 static cppState Cpp = {
+	LANG_IGNORE,
 	'\0', '\0',  /* ungetch characters */
 	false,       /* resolveRequired */
 	false,       /* hasAtLiteralStrings */
@@ -136,17 +170,30 @@ extern void cppInit (const bool state, const bool hasAtLiteralStrings,
 {
 	BraceFormat = state;
 
+	if (Cpp.lang == LANG_IGNORE)
+	{
+		langType t;
+
+		t = getNamedLanguage ("CPreProcessor", 0);
+		initializeParser (t);
+	}
+
 	Cpp.ungetch         = '\0';
 	Cpp.ungetch2        = '\0';
 	Cpp.resolveRequired = false;
 	Cpp.hasAtLiteralStrings = hasAtLiteralStrings;
 	Cpp.hasCxxRawLiteralStrings = hasCxxRawLiteralStrings;
 	Cpp.hasSingleQuoteLiteralNumbers = hasSingleQuoteLiteralNumbers;
-	Cpp.defineMacroKind  = defineMacroKind;
-	Cpp.macroUndefRoleIndex = macroUndefRoleIndex;
-	Cpp.headerKind  = headerKind;
-	Cpp.headerSystemRoleIndex = headerSystemRoleIndex;
-	Cpp.headerLocalRoleIndex = headerLocalRoleIndex;
+	Cpp.defineMacroKind
+		= defineMacroKind? defineMacroKind: CPreProKinds + CPREPRO_MACRO;
+	Cpp.macroUndefRoleIndex
+		= defineMacroKind? macroUndefRoleIndex: CPREPRO_MACRO_KIND_UNDEF_ROLE;
+	Cpp.headerKind
+		= headerKind? headerKind: CPreProKinds + CPREPRO_HEADER;
+	Cpp.headerSystemRoleIndex
+		= headerKind? headerSystemRoleIndex: CPREPRO_HEADER_KIND_SYSTEM_ROLE;
+	Cpp.headerLocalRoleIndex
+		= headerKind? headerLocalRoleIndex: CPREPRO_HEADER_KIND_LOCAL_ROLE;
 
 	Cpp.directive.state     = DRCTV_NONE;
 	Cpp.directive.accept    = true;
@@ -353,6 +400,10 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 		 Cpp.defineMacroKind->roles [ Cpp.macroUndefRoleIndex ].enabled))
 	{
 		tagEntryInfo e;
+		int r;
+
+		if (Cpp.defineMacroKind == CPreProKinds + CPREPRO_MACRO)
+			pushLanguage (Cpp.lang);
 
 		if (undef)
 			initRefTagEntry (&e, name, Cpp.defineMacroKind,
@@ -365,9 +416,20 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 			markTagExtraBit (&e, XTAG_FILE_SCOPE);
 		e.truncateLine = true;
 		e.extensionFields.signature = signature;
-		return makeTagEntry (&e);
+
+		r = makeTagEntry (&e);
+
+		if (Cpp.defineMacroKind == CPreProKinds + CPREPRO_MACRO)
+			popLanguage ();
+
+		return r;
 	}
 	return CORK_NIL;
+}
+
+static bool doesCPreProRunAsStandaloneParser (void)
+{
+	return (Cpp.headerKind == CPreProKinds + CPREPRO_HEADER);
 }
 
 static void makeIncludeTag (const  char *const name, bool systemHeader)
@@ -382,11 +444,17 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 	    && isXtagEnabled (XTAG_REFERENCE_TAGS)
 	    && Cpp.headerKind->roles [ role_index ].enabled)
 	{
+		if (doesCPreProRunAsStandaloneParser ())
+			pushLanguage (Cpp.lang);
+
 		initRefTagEntry (&e, name, Cpp.headerKind, role_index);
 		e.lineNumberEntry = (bool) (Option.locate == EX_LINENUM);
 		e.isFileScope  = false;
 		e.truncateLine = true;
 		makeTagEntry (&e);
+
+		if (doesCPreProRunAsStandaloneParser ())
+			popLanguage ();
 	}
 }
 
@@ -984,4 +1052,29 @@ process:
 				debugPrintf (DEBUG_CPP, "%6ld: ", getInputLineNumber () + 1); )
 
 	return c;
+}
+
+static void findCppTags (void)
+{
+	cppInit (0, false, false, false,
+			 NULL, 0, NULL, 0, 0);
+
+	findRegexTagsMainloop (cppGetc);
+
+	cppTerminate ();
+}
+
+static void initializeCpp (const langType language)
+{
+	Cpp.lang = language;
+}
+
+extern parserDefinition* CPreProParser (void)
+{
+	parserDefinition* const def = parserNew ("CPreProcessor");
+	def->kinds      = CPreProKinds;
+	def->kindCount  = ARRAY_SIZE (CPreProKinds);
+	def->initialize = initializeCpp;
+	def->parser     = findCppTags;
+	return def;
 }

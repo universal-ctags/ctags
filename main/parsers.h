@@ -49,6 +49,7 @@
 	CoffeeScriptParser, \
 	CParser, \
 	CppParser, \
+	CPreProParser, \
 	CssParser, \
 	CsharpParser, \
 	CtagsParser, \

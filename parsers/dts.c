@@ -16,37 +16,6 @@
 #include "parse.h"
 #include "routines.h"
 
-typedef enum {
-	DTS_MACRO_KIND_UNDEF_ROLE,
-} dtsMacroRole;
-
-static roleDesc DTSMacroRoles [] = {
-	RoleTemplateUndef,
-};
-
-
-typedef enum {
-	DTS_HEADER_KIND_SYSTEM_ROLE,
-	DTS_HEADER_KIND_LOCAL_ROLE,
-} dtsHeaderRole;
-
-static roleDesc DTSHeaderRoles [] = {
-	RoleTemplateSystem,
-	RoleTemplateLocal,
-};
-
-
-typedef enum {
-	DTS_MACRO, DTS_HEADER,
-} dtsKind;
-
-static kindOption DTSKinds [] = {
-	{ true,  'd', "macro",      "macro definitions",
-	  .referenceOnly = false, ATTACH_ROLES(DTSMacroRoles)},
-	{ true, 'h', "header",     "included header files",
-	  .referenceOnly = true, ATTACH_ROLES(DTSHeaderRoles)},
-};
-
 static tagRegexTable dtsTagRegexTable [] = {
 	/* phandle = <0x00> */
 	{"^[ \t]*phandle[ \t]+=[ \t]+<(0x[a-fA-F0-9]+)>", "\\1",
@@ -68,9 +37,8 @@ static tagRegexTable dtsTagRegexTable [] = {
 */
 static void runCppGetc (void)
 {
-	cppInit (0, false, false, false,
-		 DTSKinds + DTS_MACRO, DTS_MACRO_KIND_UNDEF_ROLE,
-		 DTSKinds + DTS_HEADER, DTS_HEADER_KIND_SYSTEM_ROLE, DTS_HEADER_KIND_LOCAL_ROLE);
+	cppInit (false, false, false, false,
+			 NULL, 0, NULL, 0, 0);
 
 	findRegexTagsMainloop (cppGetc);
 
@@ -81,8 +49,6 @@ extern parserDefinition* DTSParser (void)
 {
 	static const char *const extensions [] = { "dts", "dtsi", NULL };
 	parserDefinition* const def = parserNew ("DTS");
-	def->kinds      = DTSKinds;
-	def->kindCount  = ARRAY_SIZE (DTSKinds);
 	def->extensions = extensions;
 	def->parser     = runCppGetc;
 	def->tagRegexTable = dtsTagRegexTable;
