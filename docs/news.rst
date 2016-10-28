@@ -868,7 +868,7 @@ field of the tag identifies the owner.
 Parser own parameter
 ---------------------------------------------------------------------
 
-.. TODO: Review...
+.. NOT REVIEWED YET
 
 To control the detail of a parser, ``--param-<LANG>`` option.
 ``--kinds-<LANG>``, ``--fields-<LANG>``, ``--extra-<LANG>`` (not implemented yet)
