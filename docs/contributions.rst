@@ -123,7 +123,46 @@ functional changes with style fixes makes reviewing harder.
 If possible, don't use file static variables. Find an alternative way
 that uses parameters.
 
-For indentation I'm using the linux style in cc-mode of GNU Emacs.
+
+.. NOT REVIEWED YET
+
+Notes for GNU emacs users
+.........................................................................
+
+If you use GNU emacs, utilize the `.editorconfig` configuration based
+on non-GNU C style. Here non-GNU C style means
+"align a keyword for control flow and `{` of the block start".
+
+GNU style:
+.. code-block:: C
+
+	if (...)
+	    {
+		...
+
+non-GNU style:
+.. code-block:: C
+
+	if (...)
+	{
+		...
+
+For combining the style and `.editorconfig` configuration, put
+following code snippet to your .emacs:
+
+.. code-block:: emacs
+
+	(add-hook 'hack-local-variables-hook
+		(lambda () (editorconfig-apply)))
+
+`.dir-locals.el` in ctags source tree applies "linux" style of `cc-mode`.
+Above code snippet applies the `.editorconfig` configuration AFTER
+installing the "linux" style to the current buffer.
+
+I like GNU style, but for keeping consistency in existing code of
+Exuberant-ctags, the origin of Universal-ctags, I introduced the style
+and configuration to my .emacs.  Please, do the same.
+
 
 Command line options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
