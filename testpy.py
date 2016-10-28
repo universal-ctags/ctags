@@ -256,12 +256,17 @@ def main():
     set_output_encoding(outenc)
 
     # set warning function
-    def warn_func(str):
-        print("warning: " + str.decode(encoding))
+    if (onig_encoding != onigmo.ONIG_ENCODING_UTF16_LE and
+            onig_encoding != onigmo.ONIG_ENCODING_UTF16_BE and
+            onig_encoding != onigmo.ONIG_ENCODING_UTF32_LE and
+            onig_encoding != onigmo.ONIG_ENCODING_UTF32_BE):
+        # only work with ASCII compatible encodings
+        def warn_func(str):
+            print("warning: " + str.decode(encoding))
 
-    warn_func_ptr = onigmo.OnigWarnFunc(warn_func)
-    onigmo.onig_set_warn_func(warn_func_ptr)
-    onigmo.onig_set_verb_warn_func(warn_func_ptr)
+        warn_func_ptr = onigmo.OnigWarnFunc(warn_func)
+        onigmo.onig_set_warn_func(warn_func_ptr)
+        onigmo.onig_set_verb_warn_func(warn_func_ptr)
 
 
     # Copied from onig-5.9.2/testc.c
