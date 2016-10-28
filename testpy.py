@@ -1202,7 +1202,7 @@ def main():
     x2("((?<v>)a)|b(?0)b", "bbabb", 0, 5, syn=onigmo.ONIG_SYNTAX_PERL)
     x2("((?<v>)a|b(?1)b)", "bbabb", 0, 5, syn=onigmo.ONIG_SYNTAX_PERL)
     x2("((?<v>a|b(?&v)b))", "bbabb", 0, 5, syn=onigmo.ONIG_SYNTAX_PERL)
-    n("(?<", "", err=onigmo.ONIGERR_EMPTY_GROUP_NAME)
+    n("(?<", "", err=onigmo.ONIGERR_END_PATTERN_WITH_UNMATCHED_PARENTHESIS)
     n("(?<>)", "", err=onigmo.ONIGERR_EMPTY_GROUP_NAME)
     n("(?<.>)", "", err=onigmo.ONIGERR_INVALID_CHAR_IN_GROUP_NAME)
 
@@ -1295,6 +1295,7 @@ def main():
     x2("(?P<name_2>ab)(?P>name_2)", "abab", 0, 4, syn=onigmo.ONIG_SYNTAX_PERL);
     x2("(?P<n>|\\((?P>n)\\))+$", "()(())", 0, 6, syn=onigmo.ONIG_SYNTAX_PERL);
     x2("((?P<name1>\\d)|(?P<name2>\\w))((?P=name1)|(?P=name2))", "ff", 0, 2, syn=onigmo.ONIG_SYNTAX_PERL);
+    n("(?P", "", syn=onigmo.ONIG_SYNTAX_PERL, err=onigmo.ONIGERR_UNDEFINED_GROUP_OPTION)
 
     # Fullwidth Alphabet
     n("ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ", "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ");
