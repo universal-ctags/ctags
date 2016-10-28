@@ -31,7 +31,7 @@ extern void setTagWriter (writerType wtype)
 	writer->type = wtype;
 }
 
-extern bool outpuFormatUsedStdoutByDefault (void)
+extern bool outputFormatUsedStdoutByDefault (void)
 {
 	return writer->useStdoutByDefault;
 }

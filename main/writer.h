@@ -52,7 +52,7 @@ int writerWritePtag (MIO * mio,
 					 const char *const pattern,
 					 const char *const parserName);
 
-extern bool outpuFormatUsedStdoutByDefault (void);
+extern bool outputFormatUsedStdoutByDefault (void);
 
 extern int makePatternStringCommon (const tagEntryInfo *const tag,
 				    int putc_func (char , void *),

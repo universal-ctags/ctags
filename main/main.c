@@ -109,7 +109,7 @@ extern bool isDestinationStdout (void)
 {
 	bool toStdout = false;
 
-	if (outpuFormatUsedStdoutByDefault() ||  Option.filter  ||
+	if (outputFormatUsedStdoutByDefault() ||  Option.filter  ||
 		(Option.tagFileName != NULL  &&  (strcmp (Option.tagFileName, "-") == 0
 						  || strcmp (Option.tagFileName, "/dev/stdout") == 0
 		)))
