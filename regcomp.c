@@ -5612,6 +5612,7 @@ onig_free(regex_t* reg)
   }
 }
 
+#ifdef RUBY
 size_t
 onig_memsize(const regex_t *reg)
 {
@@ -5635,6 +5636,7 @@ onig_region_memsize(const OnigRegion *regs)
     size += regs->allocated * (sizeof(*regs->beg) + sizeof(*regs->end));
     return size;
 }
+#endif
 
 #define REGEX_TRANSFER(to,from) do {\
   (to)->state = ONIG_STATE_MODIFY;\
