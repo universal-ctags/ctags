@@ -544,8 +544,16 @@ onig_copy_syntax = libonig.onig_copy_syntax
 # onig_copy_encoding
 # onig_get_default_case_fold_flag
 # onig_set_default_case_fold_flag
+
 # onig_get_match_stack_limit_size
+libonig.onig_get_match_stack_limit_size.argtypes = []
+libonig.onig_get_match_stack_limit_size.restype = ctypes.c_int
+onig_get_match_stack_limit_size = libonig.onig_get_match_stack_limit_size
+
 # onig_set_match_stack_limit_size
+libonig.onig_set_match_stack_limit_size.argtypes = [ctypes.c_int]
+libonig.onig_set_match_stack_limit_size.restype = ctypes.c_int
+onig_set_match_stack_limit_size = libonig.onig_set_match_stack_limit_size
 
 # onig_end
 libonig.onig_end.argtypes = []
