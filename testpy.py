@@ -1126,6 +1126,10 @@ def main():
     x2("foo|foobar", "foobar", 0, 6, opt=onigmo.ONIG_OPTION_FIND_LONGEST)
     x2("a*", "aa aaa aaaa aaaaa ", 12, 17, opt=onigmo.ONIG_OPTION_FIND_LONGEST)
 
+    # ONIG_OPTION_FIND_NOT_EMPTY option
+    x2("\w*", " a", 0, 0)
+    x2("\w*", " a", 1, 2, opt=onigmo.ONIG_OPTION_FIND_NOT_EMPTY)
+
     # character classes (tests for character class optimization)
     x2("[@][a]", "@a", 0, 2);
     x2(".*[a][b][c][d][e]", "abcde", 0, 5);
@@ -1401,6 +1405,13 @@ def main():
     x2("あいう", "あいうあいう", 3, 6, searchtype=SearchType.BACKWARD)
     x2("(?i)abc", "ABCABC", 3, 6, searchtype=SearchType.BACKWARD)
     x2("(?i)ａｂｃ", "ＡＢＣＡＢＣ", 3, 6, searchtype=SearchType.BACKWARD)
+    x2("[a-z]{3}$", "abcabc", 3, 6, searchtype=SearchType.BACKWARD)
+    x2("[あ-ん]{3}$", "あいうあいう", 3, 6, searchtype=SearchType.BACKWARD)
+
+    # These match differently. Is it okay?
+    x2(".*[a-z]bc", "abcabc", 0, 6, searchtype=SearchType.BACKWARD)
+    x2(".+[a-z]bc", "abcabc", 0, 6, searchtype=SearchType.BACKWARD)
+    x2(".{1,3}[a-z]bc", "abcabc", 2, 6, searchtype=SearchType.BACKWARD)
 
     # onig_match()
     x2("abc", "abcabc", 0, 3, searchtype=SearchType.MATCH)
