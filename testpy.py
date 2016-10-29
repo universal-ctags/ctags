@@ -75,7 +75,7 @@ class SearchType:
 def xx(pattern, target, s_from, s_to, mem, not_match,
         searchtype=SearchType.FORWARD,
         syn=syntax_default, opt=onigmo.ONIG_OPTION_DEFAULT,
-        err=onigmo.ONIG_NORMAL):
+        err=onigmo.ONIG_NORMAL, execerr=onigmo.ONIG_NORMAL):
     global nerror
     global nsucc
     global nfail
@@ -103,10 +103,12 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
     if len(pattern) > limit:
         pattern = pattern[:limit] + "..."
 
+    # Compile
     r = onigmo.onig_new(ctypes.byref(reg),
             patternp.getptr(), patternp.getptr(-1),
             opt, onig_encoding, syn, ctypes.byref(einfo));
     if r != 0:
+        # Error
         onigmo.onig_error_code_to_str(msg, r, ctypes.byref(einfo))
         if r == err:
             nsucc += 1
@@ -124,6 +126,7 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
         onigmo.onig_free(reg)
         return
 
+    # Execute
     region = onigmo.onig_region_new()
     if searchtype == SearchType.FORWARD:
         r = onigmo.onig_search(reg, targetp.getptr(), targetp.getptr(-1),
@@ -145,8 +148,9 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
         return
 
     if r < onigmo.ONIG_MISMATCH:
+        # Error
         onigmo.onig_error_code_to_str(msg, r)
-        if r == err:
+        if r == execerr:
             nsucc += 1
             print_result("OK(E)", "%s (/%s/ '%s')" % \
                     (msg.value.decode(), pattern, target))
@@ -159,6 +163,7 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
         return
 
     if r == onigmo.ONIG_MISMATCH:
+        # Not matched
         if not_match:
             nsucc += 1
             print_result("OK(N)", "/%s/ '%s'" % (pattern, target))
@@ -166,6 +171,7 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
             nfail += 1
             print_result("FAIL", "/%s/ '%s'" % (pattern, target))
     else:
+        # Matched
         if not_match:
             nfail += 1
             print_result("FAIL(N)", "/%s/ '%s'" % (pattern, target))
@@ -1416,6 +1422,16 @@ def main():
     # onig_match()
     x2("abc", "abcabc", 0, 3, searchtype=SearchType.MATCH)
     n("abc", " abcabc", searchtype=SearchType.MATCH)
+
+    # stack size
+    stack_size = onigmo.onig_get_match_stack_limit_size()
+    print("Default stack size: %d", stack_size)
+    onigmo.onig_set_match_stack_limit_size(1000)
+    print("New stack size: %d", onigmo.onig_get_match_stack_limit_size())
+    # These patterns need deep stack.
+    n("^a*$", "a" * 200 + "b")
+    n("^a*$", "a" * 2000 + "b", execerr=onigmo.ONIGERR_MATCH_STACK_LIMIT_OVER)
+    onigmo.onig_set_match_stack_limit_size(0)
 
     print("\nEncoding:", encoding)
     print("RESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
