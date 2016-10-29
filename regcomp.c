@@ -1884,17 +1884,8 @@ noname_disable_map(Node** plink, GroupNumRemap* map, int* counter)
     break;
 
   case NT_ANCHOR:
-    {
-      AnchorNode* an = NANCHOR(node);
-      switch (an->type) {
-      case ANCHOR_PREC_READ:
-      case ANCHOR_PREC_READ_NOT:
-      case ANCHOR_LOOK_BEHIND:
-      case ANCHOR_LOOK_BEHIND_NOT:
-	r = noname_disable_map(&(an->target), map, counter);
-	break;
-      }
-    }
+    if (NANCHOR(node)->target)
+      r = noname_disable_map(&(NANCHOR(node)->target), map, counter);
     break;
 
   default:
@@ -1961,17 +1952,8 @@ renumber_by_map(Node* node, GroupNumRemap* map)
     break;
 
   case NT_ANCHOR:
-    {
-      AnchorNode* an = NANCHOR(node);
-      switch (an->type) {
-      case ANCHOR_PREC_READ:
-      case ANCHOR_PREC_READ_NOT:
-      case ANCHOR_LOOK_BEHIND:
-      case ANCHOR_LOOK_BEHIND_NOT:
-	r = renumber_by_map(an->target, map);
-	break;
-      }
-    }
+    if (NANCHOR(node)->target)
+      r = renumber_by_map(NANCHOR(node)->target, map);
     break;
 
   default:
@@ -2003,6 +1985,11 @@ numbered_ref_check(Node* node)
   case NT_BREF:
     if (! IS_BACKREF_NAME_REF(NBREF(node)))
       return ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED;
+    break;
+
+  case NT_ANCHOR:
+    if (NANCHOR(node)->target)
+      r = numbered_ref_check(NANCHOR(node)->target);
     break;
 
   default:

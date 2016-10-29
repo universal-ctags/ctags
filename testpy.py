@@ -1116,6 +1116,8 @@ def main():
     x2("\\u0026", "\u0026", 0, 1)
     x2("[\\u0024-\\u0027]", "\u0026", 0, 1)
     n("\\u026x", "", err=onigmo.ONIGERR_TOO_SHORT_DIGITS)
+    n("()(?\\!(?'a')\\1)", "", err=onigmo.ONIGERR_UNDEFINED_GROUP_OPTION)
+    x2("\\i", "i", 0, 1)    # unknown escape warning
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
