@@ -269,6 +269,8 @@ def main():
         onigmo.onig_set_verb_warn_func(warn_func_ptr)
 
 
+    print(onigmo.onig_copyright())
+
     # Copied from onig-5.9.2/testc.c
     #   '?\?' which is used to avoid trigraph is replaced by '??'.
     #   Match positions are specified by unit of character instead of byte.
