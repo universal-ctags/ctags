@@ -66,6 +66,12 @@ def print_result(result, pattern, file=None):
     except UnicodeEncodeError as e:
         print('(' + str(e) + ')')
 
+def decode_errmsg(msg):
+    enc = encoding
+    if enc in ('UTF-16LE', 'UTF-16BE', 'UTF-32LE', 'UTF-32BE'):
+        enc = 'ASCII'
+    return msg.value.decode(enc, 'replace')
+
 
 class SearchType:
     FORWARD = 0
@@ -116,11 +122,11 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
         if r == err:
             nsucc += 1
             print_result("OK(E)", "%s (/%s/ '%s')" % \
-                    (msg.value.decode(), pattern, target))
+                    (decode_errmsg(msg), pattern, target))
         else:
             nerror += 1
             print_result("ERROR", "%s (/%s/ '%s')" % \
-                    (msg.value.decode(), pattern, target), file=sys.stderr)
+                    (decode_errmsg(msg), pattern, target), file=sys.stderr)
         return
 
     if err != onigmo.ONIG_NORMAL:
@@ -156,11 +162,11 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
         if r == execerr:
             nsucc += 1
             print_result("OK(E)", "%s (/%s/ '%s')" % \
-                    (msg.value.decode(), pattern, target))
+                    (decode_errmsg(msg), pattern, target))
         else:
             nerror += 1
             print_result("ERROR", "%s (/%s/ '%s')" % \
-                    (msg.value.decode(), pattern, target), file=sys.stderr)
+                    (decode_errmsg(msg), pattern, target), file=sys.stderr)
         onigmo.onig_free(reg)
         onigmo.onig_region_free(region, 1)
         return
@@ -265,10 +271,10 @@ def main():
     set_output_encoding(outenc)
 
     # set warning function
-    if (onig_encoding != onigmo.ONIG_ENCODING_UTF16_LE and
-            onig_encoding != onigmo.ONIG_ENCODING_UTF16_BE and
-            onig_encoding != onigmo.ONIG_ENCODING_UTF32_LE and
-            onig_encoding != onigmo.ONIG_ENCODING_UTF32_BE):
+    if onig_encoding not in (onigmo.ONIG_ENCODING_UTF16_LE,
+            onigmo.ONIG_ENCODING_UTF16_BE,
+            onigmo.ONIG_ENCODING_UTF32_LE,
+            onigmo.ONIG_ENCODING_UTF32_BE):
         # only work with ASCII compatible encodings
         def warn_func(str):
             print("warning: " + str.decode(encoding, 'replace'))
