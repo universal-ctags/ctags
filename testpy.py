@@ -1145,6 +1145,7 @@ def main():
         n(b"\\\xff0", "")
     if (onig_encoding == onigmo.ONIG_ENCODING_UTF8):
         n(b"[0-0-\xe2  ", "", err=onigmo.ONIGERR_PREMATURE_END_OF_CHAR_CLASS)
+    n("\\p{あ}", "", err=onigmo.ONIGERR_INVALID_CHAR_PROPERTY_NAME)
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
