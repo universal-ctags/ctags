@@ -271,17 +271,18 @@ def main():
     set_output_encoding(outenc)
 
     # set warning function
-    if onig_encoding not in (onigmo.ONIG_ENCODING_UTF16_LE,
+    warning_enc = encoding
+    if onig_encoding in (onigmo.ONIG_ENCODING_UTF16_LE,
             onigmo.ONIG_ENCODING_UTF16_BE,
             onigmo.ONIG_ENCODING_UTF32_LE,
             onigmo.ONIG_ENCODING_UTF32_BE):
-        # only work with ASCII compatible encodings
-        def warn_func(str):
-            print("warning: " + str.decode(encoding, 'replace'))
+        warning_enc = 'ascii'
+    def warn_func(str):
+        print("warning: " + str.decode(warning_enc, 'replace'))
 
-        warn_func_ptr = onigmo.OnigWarnFunc(warn_func)
-        onigmo.onig_set_warn_func(warn_func_ptr)
-        onigmo.onig_set_verb_warn_func(warn_func_ptr)
+    warn_func_ptr = onigmo.OnigWarnFunc(warn_func)
+    onigmo.onig_set_warn_func(warn_func_ptr)
+    onigmo.onig_set_verb_warn_func(warn_func_ptr)
 
 
     print(onigmo.onig_copyright())
@@ -1143,15 +1144,17 @@ def main():
     n("\\((", "", err=onigmo.ONIGERR_END_PATTERN_WITH_UNMATCHED_PARENTHESIS)
     n("(|", "", err=onigmo.ONIGERR_END_PATTERN_WITH_UNMATCHED_PARENTHESIS)
     x2("%{(.*?)}", "%{HOSTNAME}", 0, 11)
-    if (onig_encoding != onigmo.ONIG_ENCODING_UTF16_LE and
-            onig_encoding != onigmo.ONIG_ENCODING_UTF16_BE and
-            onig_encoding != onigmo.ONIG_ENCODING_UTF32_LE and
-            onig_encoding != onigmo.ONIG_ENCODING_UTF32_BE):
+    if onig_encoding not in (onigmo.ONIG_ENCODING_UTF16_LE,
+            onigmo.ONIG_ENCODING_UTF16_BE,
+            onigmo.ONIG_ENCODING_UTF32_LE,
+            onigmo.ONIG_ENCODING_UTF32_BE):
         n(b"'/g\\\xff\xff\xff\xff&))", "", err=onigmo.ONIGERR_UNMATCHED_CLOSE_PARENTHESIS)
         n(b"\\\xff0", "")
-    if (onig_encoding == onigmo.ONIG_ENCODING_UTF8):
+    if onig_encoding == onigmo.ONIG_ENCODING_UTF8:
         n(b"[0-0-\xe2  ", "", err=onigmo.ONIGERR_PREMATURE_END_OF_CHAR_CLASS)
     n("\\p{あ}", "", err=onigmo.ONIGERR_INVALID_CHAR_PROPERTY_NAME)
+    if is_unicode_encoding(onig_encoding):
+        n("\\p{\U00025771}", "", err=onigmo.ONIGERR_INVALID_CHAR_PROPERTY_NAME)
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
