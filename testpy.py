@@ -223,7 +223,7 @@ def set_encoding(enc):
                 "UTF-16BE": onigmo.ONIG_ENCODING_UTF16_BE,
                 "UTF-32LE": onigmo.ONIG_ENCODING_UTF32_LE,
                 "UTF-32BE": onigmo.ONIG_ENCODING_UTF32_BE}
-        onig_encoding = encs[enc]
+        onig_encoding = encs[enc.upper()]
     encoding = onig_encoding[0].name.decode()
 
 
@@ -271,7 +271,7 @@ def main():
             onig_encoding != onigmo.ONIG_ENCODING_UTF32_BE):
         # only work with ASCII compatible encodings
         def warn_func(str):
-            print("warning: " + str.decode(encoding))
+            print("warning: " + str.decode(encoding, 'replace'))
 
         warn_func_ptr = onigmo.OnigWarnFunc(warn_func)
         onigmo.onig_set_warn_func(warn_func_ptr)
@@ -1444,9 +1444,9 @@ def main():
 
     # stack size
     stack_size = onigmo.onig_get_match_stack_limit_size()
-    print("Default stack size: %d", stack_size)
+    print("Default stack size:", stack_size)
     onigmo.onig_set_match_stack_limit_size(1000)
-    print("New stack size: %d", onigmo.onig_get_match_stack_limit_size())
+    print("New stack size:", onigmo.onig_get_match_stack_limit_size())
     # These patterns need deep stack.
     n("^a*$", "a" * 200 + "b")
     n("^a*$", "a" * 2000 + "b", execerr=onigmo.ONIGERR_MATCH_STACK_LIMIT_OVER)
