@@ -96,12 +96,15 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
         target2 = target.encode(encoding)
     targetp = strptr(target2)
 
-    # cut very long outputs
+    # cut very long outputs (used for showing message)
+    if sys.version_info[0] < 3:
+        pattern = pattern2.decode(encoding, 'replace')
+        target = target2.decode(encoding, 'replace')
     limit = 100
-    if len(target) > limit:
-        target = target[:limit] + "..."
     if len(pattern) > limit:
         pattern = pattern[:limit] + "..."
+    if len(target) > limit:
+        target = target[:limit] + "..."
 
     # Compile
     r = onigmo.onig_new(ctypes.byref(reg),
@@ -1066,6 +1069,9 @@ def main():
         x2("\\x{25771}", "\U00025771", 0, 1)
     x2("[0-9-a]+", " 0123456789-a ", 1, 13)     # same as [0-9\-a]
     x2("[0-9-\\s]+", " 0123456789-a ", 0, 12)   # same as [0-9\-\s]
+    n("[0-9-a]", "", syn=onigmo.ONIG_SYNTAX_GREP, err=onigmo.ONIGERR_UNMATCHED_RANGE_SPECIFIER_IN_CHAR_CLASS)
+    x2("[a-b-]+", "ab-", 0, 3)
+    x2("[a-b-&&-]+", "ab-", 2, 3)
     x2("(?i:a) B", "a B", 0, 3);
     x2("(?i:a )B", "a B", 0, 3);
     x2("B (?i:a)", "B a", 0, 3);
@@ -1128,6 +1134,17 @@ def main():
     n("\\u026x", "", err=onigmo.ONIGERR_TOO_SHORT_DIGITS)
     n("()(?\\!(?'a')\\1)", "", err=onigmo.ONIGERR_UNDEFINED_GROUP_OPTION)
     x2("\\i", "i", 0, 1)    # unknown escape warning
+    n("\\((", "", err=onigmo.ONIGERR_END_PATTERN_WITH_UNMATCHED_PARENTHESIS)
+    n("(|", "", err=onigmo.ONIGERR_END_PATTERN_WITH_UNMATCHED_PARENTHESIS)
+    x2("%{(.*?)}", "%{HOSTNAME}", 0, 11)
+    if (onig_encoding != onigmo.ONIG_ENCODING_UTF16_LE and
+            onig_encoding != onigmo.ONIG_ENCODING_UTF16_BE and
+            onig_encoding != onigmo.ONIG_ENCODING_UTF32_LE and
+            onig_encoding != onigmo.ONIG_ENCODING_UTF32_BE):
+        n(b"'/g\\\xff\xff\xff\xff&))", "", err=onigmo.ONIGERR_UNMATCHED_CLOSE_PARENTHESIS)
+        n(b"\\\xff0", "")
+    if (onig_encoding == onigmo.ONIG_ENCODING_UTF8):
+        n(b"[0-0-\xe2  ", "", err=onigmo.ONIGERR_PREMATURE_END_OF_CHAR_CLASS)
 
     # ONIG_OPTION_FIND_LONGEST option
     x2("foo|foobar", "foobar", 0, 3)
