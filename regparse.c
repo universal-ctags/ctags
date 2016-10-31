@@ -2217,8 +2217,8 @@ or_cclass(CClassNode* dest, CClassNode* cc, ScanEnv* env)
 
 static void UNKNOWN_ESC_WARN(ScanEnv *env, int c);
 
-static int
-conv_backslash_value(int c, ScanEnv* env)
+static OnigCodePoint
+conv_backslash_value(OnigCodePoint c, ScanEnv* env)
 {
   if (IS_SYNTAX_OP(env->syntax, ONIG_SYN_OP_ESC_CONTROL_CHARS)) {
     switch (c) {
@@ -2542,7 +2542,7 @@ fetch_range_quantifier(UChar** src, UChar* end, OnigToken* tok, ScanEnv* env)
 
 /* \M-, \C-, \c, or \... */
 static int
-fetch_escaped_value(UChar** src, UChar* end, ScanEnv* env)
+fetch_escaped_value(UChar** src, UChar* end, ScanEnv* env, OnigCodePoint* val)
 {
   int v;
   OnigCodePoint c;
@@ -2561,9 +2561,8 @@ fetch_escaped_value(UChar** src, UChar* end, ScanEnv* env)
       if (PEND) return ONIGERR_END_PATTERN_AT_META;
       PFETCH_S(c);
       if (c == MC_ESC(env->syntax)) {
-	v = fetch_escaped_value(&p, end, env);
+	v = fetch_escaped_value(&p, end, env, &c);
 	if (v < 0) return v;
-	c = (OnigCodePoint )v;
       }
       c = ((c & 0xff) | 0x80);
     }
@@ -2591,9 +2590,8 @@ fetch_escaped_value(UChar** src, UChar* end, ScanEnv* env)
       }
       else {
 	if (c == MC_ESC(env->syntax)) {
-	  v = fetch_escaped_value(&p, end, env);
+	  v = fetch_escaped_value(&p, end, env, &c);
 	  if (v < 0) return v;
-	  c = (OnigCodePoint )v;
 	}
 	c &= 0x9f;
       }
@@ -2610,7 +2608,8 @@ fetch_escaped_value(UChar** src, UChar* end, ScanEnv* env)
   }
 
   *src = p;
-  return c;
+  *val = c;
+  return 0;
 }
 
 static int fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env);
@@ -3301,10 +3300,10 @@ fetch_token_in_cc(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
 
     default:
       PUNFETCH;
-      num = fetch_escaped_value(&p, end, env);
+      num = fetch_escaped_value(&p, end, env, &c2);
       if (num < 0) return num;
-      if (tok->u.c != num) {
-	tok->u.code = (OnigCodePoint )num;
+      if (tok->u.c != c2) {
+	tok->u.code = (OnigCodePoint )c2;
 	tok->type   = TK_CODE_POINT;
       }
       break;
@@ -3900,16 +3899,20 @@ fetch_token(OnigToken* tok, UChar** src, UChar* end, ScanEnv* env)
       break;
 
     default:
-      PUNFETCH;
-      num = fetch_escaped_value(&p, end, env);
-      if (num < 0) return num;
-      /* set_raw: */
-      if (tok->u.c != num) {
-	tok->type = TK_CODE_POINT;
-	tok->u.code = (OnigCodePoint )num;
-      }
-      else { /* string */
-	p = tok->backp + enclen(enc, tok->backp, end);
+      {
+	OnigCodePoint c2;
+
+	PUNFETCH;
+	num = fetch_escaped_value(&p, end, env, &c2);
+	if (num < 0) return num;
+	/* set_raw: */
+	if (tok->u.c != c2) {
+	  tok->type = TK_CODE_POINT;
+	  tok->u.code = (OnigCodePoint )c2;
+	}
+	else { /* string */
+	  p = tok->backp + enclen(enc, tok->backp, end);
+	}
       }
       break;
     }
