@@ -18,6 +18,7 @@ addons:
   apt:
     packages:
       - lcov
+      - python3
 
 before_install:
   - gem install lcoveralls
