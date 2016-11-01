@@ -1126,6 +1126,7 @@ def main():
     x2("[0-9-a]+", " 0123456789-a ", 1, 13)     # same as [0-9\-a]
     x2("[0-9-\\s]+", " 0123456789-a ", 0, 12)   # same as [0-9\-\s]
     n("[0-9-a]", "", syn=onigmo.ONIG_SYNTAX_GREP, err=onigmo.ONIGERR_UNMATCHED_RANGE_SPECIFIER_IN_CHAR_CLASS)
+    x2("[0-9-あ\\\\/\u0001]+", " 0123456789-あ\\/\u0001 ", 1, 16)
     x2("[a-b-]+", "ab-", 0, 3)
     x2("[a-b-&&-]+", "ab-", 2, 3)
     x2("(?i:a) B", "a B", 0, 3);

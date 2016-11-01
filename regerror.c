@@ -342,21 +342,12 @@ onig_vsnprintf_with_pattern(UChar buf[], int bufsize, OnigEncoding enc,
 
     p = pat;
     while (p < pat_end) {
-      if (*p == '\\') {
-	*s++ = *p++;
-	len = enclen(enc, p, pat_end);
-	while (len-- > 0) *s++ = *p++;
-      }
-      else if (*p == '/') {
-	*s++ = (unsigned char )'\\';
-	*s++ = *p++;
-      }
-      else if (ONIGENC_IS_MBC_HEAD(enc, p, pat_end)) {
+      if (ONIGENC_IS_MBC_HEAD(enc, p, pat_end)) {
         len = enclen(enc, p, pat_end);
         if (ONIGENC_MBC_MINLEN(enc) == 1) {
           while (len-- > 0) *s++ = *p++;
         }
-        else { /* for UTF16 */
+        else { /* for UTF16/32 */
           int blen;
 
           while (len-- > 0) {
@@ -366,6 +357,15 @@ onig_vsnprintf_with_pattern(UChar buf[], int bufsize, OnigEncoding enc,
             while (blen-- > 0) *s++ = *bp++;
           }
         }
+      }
+      else if (*p == '\\') {
+	*s++ = *p++;
+	len = enclen(enc, p, pat_end);
+	while (len-- > 0) *s++ = *p++;
+      }
+      else if (*p == '/') {
+	*s++ = (unsigned char )'\\';
+	*s++ = *p++;
       }
       else if (!ONIGENC_IS_CODE_PRINT(enc, *p) &&
 	       !ONIGENC_IS_CODE_SPACE(enc, *p)) {
