@@ -68,8 +68,8 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-crnl_SOURCES = crnl.c
-crnl_OBJECTS = crnl.$(OBJEXT)
+am_crnl_OBJECTS = crnl.$(OBJEXT)
+crnl_OBJECTS = $(am_crnl_OBJECTS)
 crnl_LDADD = $(LDADD)
 crnl_DEPENDENCIES = $(libname)
 am_encode_OBJECTS = encode.$(OBJEXT)
@@ -113,10 +113,10 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = crnl.c $(encode_SOURCES) $(listcap_SOURCES) $(names_SOURCES) \
-	$(posix_SOURCES) $(simple_SOURCES) $(sql_SOURCES) \
-	$(syntax_SOURCES)
-DIST_SOURCES = crnl.c $(encode_SOURCES) $(listcap_SOURCES) \
+SOURCES = $(crnl_SOURCES) $(encode_SOURCES) $(listcap_SOURCES) \
+	$(names_SOURCES) $(posix_SOURCES) $(simple_SOURCES) \
+	$(sql_SOURCES) $(syntax_SOURCES)
+DIST_SOURCES = $(crnl_SOURCES) $(encode_SOURCES) $(listcap_SOURCES) \
 	$(names_SOURCES) $(posix_SOURCES) $(simple_SOURCES) \
 	$(sql_SOURCES) $(syntax_SOURCES)
 am__can_run_installinfo = \
@@ -255,6 +255,7 @@ posix_SOURCES = posix.c
 simple_SOURCES = simple.c
 sql_SOURCES = sql.c
 syntax_SOURCES = syntax.c
+crnl_SOURCES = crnl.c
 sampledir = $(top_builddir)/sample
 all: all-am
 
@@ -569,7 +570,7 @@ uninstall-am:
 	pdf pdf-am ps ps-am tags uninstall uninstall-am
 
 
-test: encode listcap names posix simple sql syntax
+test: encode listcap names posix simple sql syntax crnl
 	$(sampledir)/encode
 	$(sampledir)/listcap
 	$(sampledir)/names
@@ -577,6 +578,7 @@ test: encode listcap names posix simple sql syntax
 	$(sampledir)/simple
 	$(sampledir)/sql
 	$(sampledir)/syntax
+	$(sampledir)/crnl
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

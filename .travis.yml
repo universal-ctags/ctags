@@ -28,7 +28,6 @@ before_script:
 script:
         - make pytest
         - make atest
-        - ./sample/crnl
         - make -C sample test
 
 after_success:
