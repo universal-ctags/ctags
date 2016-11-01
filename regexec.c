@@ -36,7 +36,12 @@
 # define USE_MATCH_RANGE_MUST_BE_INSIDE_OF_SPECIFIED_RANGE
 #endif
 
-#ifndef USE_DIRECT_THREADED_VM
+#ifdef USE_DIRECT_THREADED_VM
+# if (USE_DIRECT_THREADED_VM != 1) && (USE_DIRECT_THREADED_VM != 0)
+#  undef USE_DIRECT_THREADED_VM
+#  define USE_DIRECT_THREADED_VM 1
+# endif
+#else
 # ifdef __GNUC__
 #  define USE_DIRECT_THREADED_VM 1
 # else
@@ -1617,11 +1622,11 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
 
 #ifdef ONIG_DEBUG_MATCH
-# define OPCODE_EXEC_HOOK                                                \
+# define OPCODE_EXEC_HOOK                                               \
     if (s) {                                                            \
       UChar *op, *q, *bp, buf[50];                                      \
       int len;                                                          \
-      op = p - 1;                                                       \
+      op = p - USE_DIRECT_THREADED_VM;                                  \
       fprintf(stderr, "%4"PRIdPTR"> \"", (*op == OP_FINISH) ? (ptrdiff_t )-1 : s - str); \
       bp = buf;                                                         \
       q = s;                                                            \
