@@ -151,7 +151,7 @@ ONIG_EXTERN OnigCaseFoldType OnigDefaultCaseFoldFlag;
 #define ONIGENC_CASE_UPCASE                     (1<<13) /* has/needs uppercase mapping */
 #define ONIGENC_CASE_DOWNCASE                   (1<<14) /* has/needs lowercase mapping */
 #define ONIGENC_CASE_TITLECASE                  (1<<15) /* has/needs (special) titlecase mapping */
-#define ONIGENC_CASE_SPECIAL_OFFSET             3       /* offset in bytes from ONIGENC_CASE to ONIGENC_CASE_SPECIAL */
+#define ONIGENC_CASE_SPECIAL_OFFSET             3       /* offset in bits from ONIGENC_CASE to ONIGENC_CASE_SPECIAL */
 #define ONIGENC_CASE_UP_SPECIAL                 (1<<16) /* has special upcase mapping */
 #define ONIGENC_CASE_DOWN_SPECIAL               (1<<17) /* has special downcase mapping */
 #define ONIGENC_CASE_MODIFIED                   (1<<18) /* data has been modified */

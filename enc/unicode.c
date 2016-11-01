@@ -684,7 +684,7 @@ onigenc_unicode_case_map(OnigCaseFoldType* flagP,
 	  if (flags & ONIGENC_CASE_FOLD_TURKISH_AZERI && code == 'i')
 	    code = I_WITH_DOT_ABOVE;
 	  else
-	    code += 'A'-'a';
+	    code += 'A' - 'a';
 	}
       }
       else if (code >= 'A' && code <= 'Z') {
@@ -693,7 +693,7 @@ onigenc_unicode_case_map(OnigCaseFoldType* flagP,
 	  if (flags & ONIGENC_CASE_FOLD_TURKISH_AZERI && code == 'I')
 	    code = DOTLESS_i;
 	  else
-	    code += 'a'-'A';
+	    code += 'a' - 'A';
 	}
       }
     }
@@ -788,7 +788,7 @@ SpecialsCopy:
     to += ONIGENC_CODE_TO_MBC(enc, code, to);
     /* switch from titlecase to lowercase for capitalize */
     if (flags & ONIGENC_CASE_TITLECASE)
-      flags ^= (ONIGENC_CASE_UPCASE | ONIGENC_CASE_DOWNCASE | ONIGENC_CASE_TITLECASE|
+      flags ^= (ONIGENC_CASE_UPCASE | ONIGENC_CASE_DOWNCASE | ONIGENC_CASE_TITLECASE |
 	  ONIGENC_CASE_UP_SPECIAL | ONIGENC_CASE_DOWN_SPECIAL);
   }
   *flagP = flags;
