@@ -1,35 +1,35 @@
 language: c
 
 branches:
-        except:
-                - ruby-2.x
+  except:
+    - ruby-2.x
 
 compiler:
-        - gcc
-        - clang
+  - gcc
+  - clang
 
 env:
-        - CFLAGS=--coverage CONFOPT=
-        - CFLAGS=--coverage CONFOPT=--enable-multithread
+  - CFLAGS=--coverage CONFOPT=
+  - CFLAGS=--coverage CONFOPT=--enable-multithread
 
 sudo: false
 
 addons:
-        apt:
-                packages:
-                        - lcov
+  apt:
+    packages:
+      - lcov
 
 before_install:
-        - gem install lcoveralls
+  - gem install lcoveralls
 
 before_script:
-        - ./configure $CONFOPT && make
+  - ./configure $CONFOPT && make
 
 script:
-        - make pytest
-        - make atest
-        - make -C sample test
+  - make pytest
+  - make atest
+  - make -C sample test
 
 after_success:
-        - lcov -c -d .libs -o coverage.info
-        - lcoveralls --retry-count 5 coverage.info
+  - lcov -c -d .libs -o coverage.info
+  - lcoveralls --retry-count 5 coverage.info
