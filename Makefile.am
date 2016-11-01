@@ -3,6 +3,8 @@ encdir    = $(top_srcdir)/enc
 sampledir = $(top_srcdir)/sample
 libname = libonigmo.la
 
+PYTHON = python3
+
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = -Wall
 AM_CPPFLAGS = -I$(top_srcdir) -I$(includedir) -I$(encdir)/unicode
@@ -122,12 +124,12 @@ win32/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
 
 # Python TEST
 pytest:
-	LD_LIBRARY_PATH=.libs python $(srcdir)/testpy.py EUC-JP
-	LD_LIBRARY_PATH=.libs python $(srcdir)/testpy.py SJIS
-	LD_LIBRARY_PATH=.libs python $(srcdir)/testpy.py UTF-8
-	LD_LIBRARY_PATH=.libs python $(srcdir)/testpy.py UTF-16LE
-	LD_LIBRARY_PATH=.libs python $(srcdir)/testpy.py UTF-16BE
-	LD_LIBRARY_PATH=.libs python $(srcdir)/testpy.py UTF-32LE
-	LD_LIBRARY_PATH=.libs python $(srcdir)/testpy.py UTF-32BE
+	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py EUC-JP
+	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py SJIS
+	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py UTF-8
+	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py UTF-16LE
+	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py UTF-16BE
+	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py UTF-32LE
+	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py UTF-32BE
 
 ## END OF FILE
