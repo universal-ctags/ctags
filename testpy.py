@@ -14,13 +14,46 @@ nfail = 0
 
 # default encoding
 onig_encoding = onigmo.ONIG_ENCODING_EUC_JP
-encoding = onig_encoding[0].name.decode()
 
 # special syntactic settings
 _syntax_default = onigmo.OnigSyntaxType()
 onigmo.onig_copy_syntax(ctypes.byref(_syntax_default), onigmo.ONIG_SYNTAX_DEFAULT)
 _syntax_default.options &= ~onigmo.ONIG_OPTION_ASCII_RANGE
 syntax_default = ctypes.byref(_syntax_default)
+
+
+def get_encoding_name(onigenc):
+    """Return the name of specified onigmo.OnigEncoding.
+
+    arguments:
+      enc -- an instance of onigmo.OnigEncoding
+    """
+    return onigenc[0].name.decode()
+
+def is_unicode_encoding(enc):
+    """Check if the encoding is Unicode encoding.
+
+    arguments:
+      enc -- encoding name or an instance of onigmo.OnigEncoding
+    """
+    return enc in (onigmo.ONIG_ENCODING_UTF32_LE,
+                   onigmo.ONIG_ENCODING_UTF32_BE,
+                   onigmo.ONIG_ENCODING_UTF16_LE,
+                   onigmo.ONIG_ENCODING_UTF16_BE,
+                   onigmo.ONIG_ENCODING_UTF8,
+                   'UTF-16LE', 'UTF-16BE', 'UTF-32LE', 'UTF-32BE', 'UTF-8')
+
+def is_ascii_incompatible_encoding(enc):
+    """Check if the encoding is ASCII-incompatible encoding.
+
+    arguments:
+      enc -- encoding name or an instance of onigmo.OnigEncoding
+    """
+    return enc in (onigmo.ONIG_ENCODING_UTF32_LE,
+                   onigmo.ONIG_ENCODING_UTF32_BE,
+                   onigmo.ONIG_ENCODING_UTF16_LE,
+                   onigmo.ONIG_ENCODING_UTF16_BE,
+                   'UTF-16LE', 'UTF-16BE', 'UTF-32LE', 'UTF-32BE')
 
 
 class strptr:
@@ -67,10 +100,10 @@ def print_result(result, pattern, file=None):
         print('(' + str(e) + ')')
 
 def decode_errmsg(msg):
-    enc = encoding
-    if enc in ('UTF-16LE', 'UTF-16BE', 'UTF-32LE', 'UTF-32BE'):
-        enc = 'ASCII'
-    return msg.value.decode(enc, 'replace')
+    encoding = get_encoding_name(onig_encoding)
+    if is_ascii_incompatible_encoding(encoding):
+        encoding = 'ASCII'
+    return msg.value.decode(encoding, 'replace')
 
 
 class SearchType:
@@ -85,6 +118,8 @@ def xx(pattern, target, s_from, s_to, mem, not_match,
     global nerror
     global nsucc
     global nfail
+
+    encoding = get_encoding_name(onig_encoding)
 
     reg = onigmo.OnigRegex()
     einfo = onigmo.OnigErrorInfo()
@@ -207,33 +242,38 @@ def n(pattern, target, **kwargs):
     xx(pattern, target, 0, 0, 0, True, **kwargs)
 
 
-def is_unicode_encoding(enc):
-    return enc in (onigmo.ONIG_ENCODING_UTF32_LE,
-                   onigmo.ONIG_ENCODING_UTF32_BE,
-                   onigmo.ONIG_ENCODING_UTF16_LE,
-                   onigmo.ONIG_ENCODING_UTF16_BE,
-                   onigmo.ONIG_ENCODING_UTF8)
-
-
 def set_encoding(enc):
+    """Set the encoding used for testing.
+
+    arguments:
+      enc -- encoding name or an instance of onigmo.OnigEncoding
+    """
     global onig_encoding
-    global encoding
 
     if isinstance(enc, onigmo.OnigEncoding):
         onig_encoding = enc
     else:
         encs = {"EUC-JP": onigmo.ONIG_ENCODING_EUC_JP,
                 "SJIS": onigmo.ONIG_ENCODING_SJIS,
+                "CP932": onigmo.ONIG_ENCODING_CP932,
                 "UTF-8": onigmo.ONIG_ENCODING_UTF8,
                 "UTF-16LE": onigmo.ONIG_ENCODING_UTF16_LE,
                 "UTF-16BE": onigmo.ONIG_ENCODING_UTF16_BE,
                 "UTF-32LE": onigmo.ONIG_ENCODING_UTF32_LE,
                 "UTF-32BE": onigmo.ONIG_ENCODING_UTF32_BE}
         onig_encoding = encs[enc.upper()]
-    encoding = onig_encoding[0].name.decode()
 
+def get_encoding():
+    """Get the encoding used for testing."""
+    return onig_encoding
 
 def set_output_encoding(enc=None):
+    """Set the encoding used for showing the results.
+
+    arguments:
+      enc -- Encoding name or an instance of onigmo.OnigEncoding.
+             If omitted, locale.getpreferredencoding() is used.
+    """
     if enc is None:
         enc = locale.getpreferredencoding()
 
@@ -241,13 +281,25 @@ def set_output_encoding(enc=None):
         kw = dict(kwargs)
         kw.setdefault('errors', 'backslashreplace') # use \uXXXX style
         kw.setdefault('closefd', False)
-        writer = io.open(fo.fileno(), mode='w', **kw)
 
-        # work around for Python 2.x
-        write = writer.write    # save the original write() function
-        enc = locale.getpreferredencoding()
-        writer.write = lambda s: write(s.decode(enc)) \
-                if isinstance(s, bytes) else write(s)  # convert to unistr
+        if sys.version_info[0] < 3:
+            # Work around for Python 2.x
+            # New line conversion isn't needed here. Done in somewhere else.
+            writer = io.open(fo.fileno(), mode='w', newline='', **kw)
+            write = writer.write    # save the original write() function
+            enc = locale.getpreferredencoding()
+            def convwrite(s):
+                if isinstance(s, bytes):
+                    write(s.decode(enc))    # convert to unistr
+                else:
+                    write(s)
+                try:
+                    writer.flush()  # needed on Windows
+                except IOError:
+                    pass
+            writer.write = convwrite
+        else:
+            writer = io.open(fo.fileno(), mode='w', **kw)
         return writer
 
     sys.stdout = get_text_writer(sys.stdout, encoding=enc)
@@ -271,11 +323,8 @@ def main():
     set_output_encoding(outenc)
 
     # set warning function
-    warning_enc = encoding
-    if onig_encoding in (onigmo.ONIG_ENCODING_UTF16_LE,
-            onigmo.ONIG_ENCODING_UTF16_BE,
-            onigmo.ONIG_ENCODING_UTF32_LE,
-            onigmo.ONIG_ENCODING_UTF32_BE):
+    warning_enc = get_encoding_name(onig_encoding)
+    if is_ascii_incompatible_encoding(warning_enc):
         warning_enc = 'ascii'
     def warn_func(str):
         print("warning: " + str.decode(warning_enc, 'replace'))
@@ -1144,10 +1193,7 @@ def main():
     n("\\((", "", err=onigmo.ONIGERR_END_PATTERN_WITH_UNMATCHED_PARENTHESIS)
     n("(|", "", err=onigmo.ONIGERR_END_PATTERN_WITH_UNMATCHED_PARENTHESIS)
     x2("%{(.*?)}", "%{HOSTNAME}", 0, 11)
-    if onig_encoding not in (onigmo.ONIG_ENCODING_UTF16_LE,
-            onigmo.ONIG_ENCODING_UTF16_BE,
-            onigmo.ONIG_ENCODING_UTF32_LE,
-            onigmo.ONIG_ENCODING_UTF32_BE):
+    if not is_ascii_incompatible_encoding(onig_encoding):
         n(b"'/g\\\xff\xff\xff\xff&))", "", err=onigmo.ONIGERR_UNMATCHED_CLOSE_PARENTHESIS)
         n(b"\\\xff0", "")
     if onig_encoding == onigmo.ONIG_ENCODING_UTF8:
@@ -1462,7 +1508,7 @@ def main():
     n("^a*$", "a" * 2000 + "b", execerr=onigmo.ONIGERR_MATCH_STACK_LIMIT_OVER)
     onigmo.onig_set_match_stack_limit_size(0)
 
-    print("\nEncoding:", encoding)
+    print("\nEncoding:", get_encoding_name(onig_encoding))
     print("RESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
           nsucc, nfail, nerror, onigmo.onig_version()))
 
