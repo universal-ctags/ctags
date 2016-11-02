@@ -1178,7 +1178,7 @@ def main():
     x2("\\p{WoRd}", "a", 0, 1)  # property name is not case sensitive
     n("[[:WoRd:]]", "a", err=onigmo.ONIGERR_INVALID_POSIX_BRACKET_TYPE)   # POSIX bracket name is case sensitive
     n("(\\2)(\\1)", "")     # Issue #65
-    n("(0?0|(?(5)||)|(?(5)||))?", "", err=onigmo.ONIGERR_INVALID_CONDITION_PATTERN) # Ruby Bug#12418
+    n("(0?0|(?(1)||)|(?(1)||))?", "", err=onigmo.ONIGERR_INVALID_CONDITION_PATTERN) # Ruby Bug#12418
     n("[\\40000000000", "", err=onigmo.ONIGERR_TOO_BIG_NUMBER)  # Ruby Bug#12420
     n("[\\600000000000\n", "", err=onigmo.ONIGERR_TOO_BIG_NUMBER)   # Ruby Bug#12423
     n("[]", "", err=onigmo.ONIGERR_EMPTY_CHAR_CLASS)
