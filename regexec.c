@@ -1266,27 +1266,37 @@ static int backref_match_at_nested_level(regex_t* reg
 
 #ifdef ONIG_DEBUG_STATISTICS
 
-# define USE_TIMEOFDAY
+# ifdef _WIN32
+#  include <windows.h>
+static LARGE_INTEGER ts, te, freq;
+#  define GETTIME(t)	  QueryPerformanceCounter(&(t))
+#  define TIMEDIFF(te,ts) (unsigned long )(((te).QuadPart - (ts).QuadPart) \
+			    * 1000000 / freq.QuadPart)
+# else /* _WIN32 */
 
-# ifdef USE_TIMEOFDAY
-#  ifdef HAVE_SYS_TIME_H
-#   include <sys/time.h>
-#  endif
-#  ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#  endif
+#  define USE_TIMEOFDAY
+
+#  ifdef USE_TIMEOFDAY
+#   ifdef HAVE_SYS_TIME_H
+#    include <sys/time.h>
+#   endif
+#   ifdef HAVE_UNISTD_H
+#    include <unistd.h>
+#   endif
 static struct timeval ts, te;
-#  define GETTIME(t)      gettimeofday(&(t), (struct timezone* )0)
-#  define TIMEDIFF(te,ts) (((te).tv_usec - (ts).tv_usec) + \
-                           (((te).tv_sec - (ts).tv_sec)*1000000))
-# else /* USE_TIMEOFDAY */
-#  ifdef HAVE_SYS_TIMES_H
-#   include <sys/times.h>
-#  endif
+#   define GETTIME(t)      gettimeofday(&(t), (struct timezone* )0)
+#   define TIMEDIFF(te,ts) (((te).tv_usec - (ts).tv_usec) + \
+                            (((te).tv_sec - (ts).tv_sec)*1000000))
+#  else /* USE_TIMEOFDAY */
+#   ifdef HAVE_SYS_TIMES_H
+#    include <sys/times.h>
+#   endif
 static struct tms ts, te;
-#  define GETTIME(t)       times(&(t))
-#  define TIMEDIFF(te,ts)  ((te).tms_utime - (ts).tms_utime)
-# endif /* USE_TIMEOFDAY */
+#   define GETTIME(t)       times(&(t))
+#   define TIMEDIFF(te,ts)  ((te).tms_utime - (ts).tms_utime)
+#  endif /* USE_TIMEOFDAY */
+
+# endif /* _WIN32 */
 
 static int OpCounter[256];
 static int OpPrevCounter[256];
@@ -1315,6 +1325,9 @@ onig_statistics_init(void)
     OpCounter[i] = OpPrevCounter[i] = 0; OpTime[i] = 0;
   }
   MaxStackDepth = 0;
+# ifdef _WIN32
+  QueryPerformanceFrequency(&freq);
+# endif
 }
 
 extern void
