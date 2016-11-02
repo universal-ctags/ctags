@@ -1445,6 +1445,8 @@ def main():
     n("((?<x>x)|(?<y>y))(?(<x>)y|x)", "yy")
     n("(a)?(?<n>b)?(?(1)a)(?(<n>)b)", "aa", err=onigmo.ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED)
     x2("(a)?(?<n>b)?(?(1)a)(?(<n>)b)", "aa", 0, 2, syn=onigmo.ONIG_SYNTAX_PERL)
+    n("()(?(2))", "", err=onigmo.ONIGERR_INVALID_BACKREF)       # Issue #65
+    n("(?(700000))", "", err=onigmo.ONIGERR_INVALID_BACKREF)
 
     # Implicit-anchor optimization
     x2("(?m:.*abc)", "dddabdd\nddabc", 0, 13)   # optimized /(?m:.*abc)/ ==> /\A(?m:.*abc)/

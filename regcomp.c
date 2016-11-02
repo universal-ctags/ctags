@@ -4083,6 +4083,8 @@ restart:
 	  return ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED;
 	}
 #endif
+	if (NENCLOSE(node)->regnum > env->num_mem)
+	  return ONIGERR_INVALID_BACKREF;
 	r = setup_tree(NENCLOSE(node)->target, reg, state, env);
 	break;
       }
