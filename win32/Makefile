@@ -43,7 +43,13 @@ PYTHON = py -3.4-32
 PYTHON = py -3
 !endif
 
-WORKDIR = build_$(ARCH)
+!ifdef DEBUG
+DBGFLG = d
+!else
+DBGFLG =
+!endif
+
+WORKDIR = build_$(ARCH)$(DBGFLG)
 
 # Get the version of cl.exe.
 #  1. Write the version to a work file (mscver$(_NMAKE_VER).~).
@@ -64,6 +70,13 @@ CFLAGS = $(CFLAGS) -GL
 ARLIB_FLAGS = $(ARLIB_FLAGS) -LTCG
 ARDLL_FLAGS = $(ARDLL_FLAGS) -LTCG
 !endif
+!endif
+
+!ifdef DEBUG
+# Enable debug information.
+CFLAGS = $(CFLAGS) -Zi -DDEBUG=1 -D_DEBUG=1
+# Debug flags. (see regint.h)
+#CFLAGS = $(CFLAGS) -DONIG_DEBUG_PARSE_TREE -DONIG_DEBUG_COMPILE -DONIG_DEBUG_SEARCH -DONIG_DEBUG_MATCH -DONIG_DONT_OPTIMIZE
 !endif
 
 !ifdef DEFFILE
