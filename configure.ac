@@ -48,6 +48,8 @@ AC_SUBST(LTVERSION)
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 
+AC_CHECK_PROGS(python_prog, python3 python python2)
+
 dnl Checks for libraries.
 
 dnl Checks for header files.

@@ -3,7 +3,7 @@ encdir    = $(top_srcdir)/enc
 sampledir = $(top_srcdir)/sample
 libname = libonigmo.la
 
-PYTHON = python3
+PYTHON = @python_prog@
 
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = -Wall
