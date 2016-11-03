@@ -132,4 +132,18 @@ pytest:
 	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py UTF-32LE
 	LD_LIBRARY_PATH=.libs $(PYTHON) $(srcdir)/testpy.py UTF-32BE
 
+
+# lcov
+
+# Collect coverage data and write to coverage.info, then create HTML output
+# in the coverage directory.
+lcov:
+	if [ ! -f $(builddir)/enc/jis/props.kwd ]; then mkdir -p enc/jis; cp $(srcdir)/enc/jis/props.kwd $(builddir)/enc/jis/props.kwd; fi
+	lcov -c -d .libs -o coverage.info
+	genhtml -o coverage coverage.info
+
+# Clear coverage data.
+lcov-clear:
+	lcov -d . -z
+
 ## END OF FILE
