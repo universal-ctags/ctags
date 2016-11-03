@@ -113,9 +113,7 @@
 # include "config.h"
 #endif /* RUBY */
 
-#ifdef HAVE_STDARG_PROTOTYPES
-# include <stdarg.h>
-#endif
+#include <stdarg.h>
 
 /* */
 /* escape other system UChar definition */
@@ -950,27 +948,27 @@ typedef struct {
 extern OnigOpInfoType OnigOpInfo[];
 
 
-extern void onig_print_compiled_byte_code P_((FILE* f, UChar* bp, UChar* bpend, UChar** nextp, OnigEncoding enc));
+extern void onig_print_compiled_byte_code(FILE* f, UChar* bp, UChar* bpend, UChar** nextp, OnigEncoding enc);
 
 # ifdef ONIG_DEBUG_STATISTICS
-extern void onig_statistics_init P_((void));
-extern void onig_print_statistics P_((FILE* f));
+extern void onig_statistics_init(void);
+extern void onig_print_statistics(FILE* f);
 # endif
 #endif
 
-extern UChar* onig_error_code_to_format P_((OnigPosition code));
-extern void onig_vsnprintf_with_pattern P_((UChar buf[], int bufsize, OnigEncoding enc, UChar* pat, UChar* pat_end, const UChar *fmt, va_list args));
-extern void onig_snprintf_with_pattern PV_((UChar buf[], int bufsize, OnigEncoding enc, UChar* pat, UChar* pat_end, const UChar *fmt, ...));
-extern int  onig_bbuf_init P_((BBuf* buf, OnigDistance size));
-extern int  onig_compile P_((regex_t* reg, const UChar* pattern, const UChar* pattern_end, OnigErrorInfo* einfo));
+extern UChar* onig_error_code_to_format(OnigPosition code);
+extern void onig_vsnprintf_with_pattern(UChar buf[], int bufsize, OnigEncoding enc, UChar* pat, UChar* pat_end, const UChar *fmt, va_list args);
+extern void onig_snprintf_with_pattern(UChar buf[], int bufsize, OnigEncoding enc, UChar* pat, UChar* pat_end, const UChar *fmt, ...);
+extern int  onig_bbuf_init(BBuf* buf, OnigDistance size);
+extern int  onig_compile(regex_t* reg, const UChar* pattern, const UChar* pattern_end, OnigErrorInfo* einfo);
 #ifdef RUBY
-extern int  onig_compile_ruby P_((regex_t* reg, const UChar* pattern, const UChar* pattern_end, OnigErrorInfo* einfo, const char *sourcefile, int sourceline));
+extern int  onig_compile_ruby(regex_t* reg, const UChar* pattern, const UChar* pattern_end, OnigErrorInfo* einfo, const char *sourcefile, int sourceline);
 #endif
-extern void onig_chain_reduce P_((regex_t* reg));
-extern void onig_chain_link_add P_((regex_t* to, regex_t* add));
-extern void onig_transfer P_((regex_t* to, regex_t* from));
-extern int  onig_is_code_in_cc P_((OnigEncoding enc, OnigCodePoint code, CClassNode* cc));
-extern int  onig_is_code_in_cc_len P_((int enclen, OnigCodePoint code, CClassNode* cc));
+extern void onig_chain_reduce(regex_t* reg);
+extern void onig_chain_link_add(regex_t* to, regex_t* add);
+extern void onig_transfer(regex_t* to, regex_t* from);
+extern int  onig_is_code_in_cc(OnigEncoding enc, OnigCodePoint code, CClassNode* cc);
+extern int  onig_is_code_in_cc_len(int enclen, OnigCodePoint code, CClassNode* cc);
 
 /* strend hash */
 typedef void hash_table_type;
@@ -981,9 +979,9 @@ typedef void hash_table_type;
 #endif
 typedef st_data_t hash_data_type;
 
-extern hash_table_type* onig_st_init_strend_table_with_size P_((st_index_t size));
-extern int onig_st_lookup_strend P_((hash_table_type* table, const UChar* str_key, const UChar* end_key, hash_data_type *value));
-extern int onig_st_insert_strend P_((hash_table_type* table, const UChar* str_key, const UChar* end_key, hash_data_type value));
+extern hash_table_type* onig_st_init_strend_table_with_size(st_index_t size);
+extern int onig_st_lookup_strend(hash_table_type* table, const UChar* str_key, const UChar* end_key, hash_data_type *value);
+extern int onig_st_insert_strend(hash_table_type* table, const UChar* str_key, const UChar* end_key, hash_data_type value);
 
 /* encoding property management */
 #define PROPERTY_LIST_ADD_PROP(Name, CR) \
@@ -998,15 +996,15 @@ extern int onig_st_insert_strend P_((hash_table_type* table, const UChar* str_ke
     if (r != 0) return r;\
   }
 
-extern int onigenc_property_list_add_property P_((UChar* name, const OnigCodePoint* prop, hash_table_type **table, const OnigCodePoint*** plist, int *pnum, int *psize));
+extern int onigenc_property_list_add_property(UChar* name, const OnigCodePoint* prop, hash_table_type **table, const OnigCodePoint*** plist, int *pnum, int *psize);
 
 typedef int (*ONIGENC_INIT_PROPERTY_LIST_FUNC_TYPE)(void);
 
-extern int onigenc_property_list_init P_((ONIGENC_INIT_PROPERTY_LIST_FUNC_TYPE));
+extern int onigenc_property_list_init(ONIGENC_INIT_PROPERTY_LIST_FUNC_TYPE);
 
 #ifdef RUBY
-extern size_t onig_memsize P_((const regex_t *reg));
-extern size_t onig_region_memsize P_((const struct re_registers *regs));
+extern size_t onig_memsize(const regex_t *reg);
+extern size_t onig_region_memsize(const struct re_registers *regs);
 #endif
 
 RUBY_SYMBOL_EXPORT_END

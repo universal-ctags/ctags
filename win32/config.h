@@ -19,9 +19,7 @@
 #endif
 #define SIZEOF_FLOAT 4
 #define SIZEOF_DOUBLE 8
-#define HAVE_PROTOTYPES 1
 #define TOKEN_PASTE(x,y) x##y
-#define HAVE_STDARG_PROTOTYPES 1
 #ifndef NORETURN
 # if _MSC_VER > 1100
 #  define NORETURN(x) __declspec(noreturn) x

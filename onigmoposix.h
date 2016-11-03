@@ -87,26 +87,18 @@ typedef struct {
 } regex_t;
 
 
-#ifndef P_
-#if defined(__STDC__) || defined(_WIN32)
-# define P_(args) args
-#else
-# define P_(args) ()
-#endif
+#ifndef ONIG_EXTERN
+# if defined(_WIN32) && !defined(__GNUC__)
+#  if defined(EXPORT)
+#   define ONIG_EXTERN   extern __declspec(dllexport)
+#  else
+#   define ONIG_EXTERN   extern __declspec(dllimport)
+#  endif
+# endif
 #endif
 
 #ifndef ONIG_EXTERN
-#if defined(_WIN32) && !defined(__GNUC__)
-#if defined(EXPORT)
-#define ONIG_EXTERN   extern __declspec(dllexport)
-#else
-#define ONIG_EXTERN   extern __declspec(dllimport)
-#endif
-#endif
-#endif
-
-#ifndef ONIG_EXTERN
-#define ONIG_EXTERN   extern
+# define ONIG_EXTERN   extern
 #endif
 
 #ifndef ONIGMO_H
@@ -143,24 +135,24 @@ ONIG_EXTERN const OnigSyntaxType OnigSyntaxRuby;
 
 ONIG_EXTERN const OnigSyntaxType*  OnigDefaultSyntax;
 
-ONIG_EXTERN int  onig_set_default_syntax P_((const OnigSyntaxType* syntax));
-ONIG_EXTERN void onig_copy_syntax P_((OnigSyntaxType* to, const OnigSyntaxType* from));
-ONIG_EXTERN const char* onig_version P_((void));
-ONIG_EXTERN const char* onig_copyright P_((void));
+ONIG_EXTERN int  onig_set_default_syntax(const OnigSyntaxType* syntax);
+ONIG_EXTERN void onig_copy_syntax(OnigSyntaxType* to, const OnigSyntaxType* from);
+ONIG_EXTERN const char* onig_version(void);
+ONIG_EXTERN const char* onig_copyright(void);
 
 #endif /* ONIGMO_H */
 
 
-ONIG_EXTERN int    regcomp P_((regex_t* reg, const char* pat, int options));
-ONIG_EXTERN int    regexec P_((regex_t* reg, const char* str, size_t nmatch, regmatch_t* matches, int options));
-ONIG_EXTERN void   regfree P_((regex_t* reg));
-ONIG_EXTERN size_t regerror P_((int code, const regex_t* reg, char* buf, size_t size));
+ONIG_EXTERN int    regcomp(regex_t* reg, const char* pat, int options);
+ONIG_EXTERN int    regexec(regex_t* reg, const char* str, size_t nmatch, regmatch_t* matches, int options);
+ONIG_EXTERN void   regfree(regex_t* reg);
+ONIG_EXTERN size_t regerror(int code, const regex_t* reg, char* buf, size_t size);
 
 /* extended API */
-ONIG_EXTERN void reg_set_encoding P_((int enc));
-ONIG_EXTERN int  reg_name_to_group_numbers P_((regex_t* reg, const unsigned char* name, const unsigned char* name_end, int** nums));
-ONIG_EXTERN int  reg_foreach_name P_((regex_t* reg, int (*func)(const unsigned char*, const unsigned char*,int,int*,regex_t*,void*), void* arg));
-ONIG_EXTERN int  reg_number_of_names P_((regex_t* reg));
+ONIG_EXTERN void reg_set_encoding(int enc);
+ONIG_EXTERN int  reg_name_to_group_numbers(regex_t* reg, const unsigned char* name, const unsigned char* name_end, int** nums);
+ONIG_EXTERN int  reg_foreach_name(regex_t* reg, int (*func)(const unsigned char*, const unsigned char*,int,int*,regex_t*,void*), void* arg);
+ONIG_EXTERN int  reg_number_of_names(regex_t* reg);
 
 #ifdef __cplusplus
 }
