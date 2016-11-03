@@ -3,15 +3,15 @@
 /* static	char	sccsid[] = "@(#) st.c 5.1 89/12/14 Crucible"; */
 
 #ifdef RUBY
-#include "ruby/ruby.h"
+# include "ruby/ruby.h"
 #else
-#include "regint.h"
-#include "st.h"
+# include "regint.h"
+# include "st.h"
 #endif
 
 #include <stdio.h>
 #ifdef HAVE_STDLIB_H
-#include <stdlib.h>
+# include <stdlib.h>
 #endif
 #include <string.h>
 
@@ -51,6 +51,7 @@ STATIC_ASSERT(st_packed_bins, sizeof(st_packed_entry[MAX_PACKED_HASH]) <= sizeof
      *
      */
 
+#if 0 /* unused for now */
 #define type_numhash st_hashtype_num
 const struct st_hash_type st_hashtype_num = {
     st_numcmp,
@@ -69,6 +70,7 @@ static const struct st_hash_type type_strcasehash = {
     st_locale_insensitive_strcasecmp,
     strcasehash,
 };
+#endif
 
 static void rehash(st_table *);
 
@@ -138,6 +140,7 @@ remove_packed_entry(st_table *table, st_index_t i)
     }
 }
 
+#if 0 /* unused for now */
 static inline void
 remove_safe_packed_entry(st_table *table, st_index_t i, st_data_t never)
 {
@@ -146,6 +149,7 @@ remove_safe_packed_entry(st_table *table, st_index_t i, st_data_t never)
     PVAL_SET(table, i, never);
     PHASH_SET(table, i, 0);
 }
+#endif
 
 static st_index_t
 new_size(st_index_t size)
@@ -219,6 +223,7 @@ st_init_table_with_size(const struct st_hash_type *type, st_index_t size)
     return tbl;
 }
 
+#if 0 /* unused for now */
 st_table*
 st_init_table(const struct st_hash_type *type)
 {
@@ -260,6 +265,7 @@ st_init_strcasetable_with_size(st_index_t size)
 {
     return st_init_table_with_size(&type_strcasehash, size);
 }
+#endif
 
 void
 st_clear(st_table *table)
@@ -295,6 +301,7 @@ st_free_table(st_table *table)
     st_dealloc_table(table);
 }
 
+#if 0 /* unused for now */
 size_t
 st_memsize(const st_table *table)
 {
@@ -305,6 +312,7 @@ st_memsize(const st_table *table)
 	return table->num_entries * sizeof(struct st_table_entry) + table->num_bins * sizeof (void *) + sizeof(st_table);
     }
 }
+#endif
 
 #define PTR_NOT_EQUAL(table, ptr, hash_val, key) \
 ((ptr) != 0 && ((ptr)->hash != (hash_val) || !EQUAL((table), (key), (ptr)->key)))
@@ -395,6 +403,7 @@ st_lookup(st_table *table, register st_data_t key, st_data_t *value)
     }
 }
 
+#if 0 /* unused for now */
 int
 st_get_key(st_table *table, register st_data_t key, st_data_t *result)
 {
@@ -422,6 +431,7 @@ st_get_key(st_table *table, register st_data_t key, st_data_t *result)
 	return 1;
     }
 }
+#endif
 
 #undef collision_check
 #define collision_check 1
@@ -548,6 +558,7 @@ st_insert(register st_table *table, register st_data_t key, st_data_t value)
     }
 }
 
+#if 0 /* unused for now */
 int
 st_insert2(register st_table *table, register st_data_t key, st_data_t value,
 	   st_data_t (*func)(st_data_t))
@@ -581,6 +592,7 @@ st_insert2(register st_table *table, register st_data_t key, st_data_t value,
 	return 1;
     }
 }
+#endif
 
 void
 st_add_direct(st_table *table, st_data_t key, st_data_t value)
@@ -616,6 +628,7 @@ rehash(register st_table *table)
     }
 }
 
+#if 0 /* unused for now */
 st_table*
 st_copy(st_table *old_table)
 {
@@ -664,6 +677,7 @@ st_copy(st_table *old_table)
 
     return new_table;
 }
+#endif
 
 static inline void
 remove_entry(st_table *table, st_table_entry *ptr)
@@ -682,6 +696,7 @@ remove_entry(st_table *table, st_table_entry *ptr)
     table->num_entries--;
 }
 
+#if 0 /* unused for now */
 int
 st_delete(register st_table *table, register st_data_t *key, st_data_t *value)
 {
@@ -993,6 +1008,7 @@ st_foreach_check(st_table *table, int (*func)(ANYARGS), st_data_t arg, st_data_t
     }
     return 0;
 }
+#endif
 
 int
 st_foreach(st_table *table, int (*func)(ANYARGS), st_data_t arg)
@@ -1062,6 +1078,7 @@ st_foreach(st_table *table, int (*func)(ANYARGS), st_data_t arg)
     return 0;
 }
 
+#if 0 /* unused for now */
 static st_index_t
 get_keys(st_table *table, st_data_t *keys, st_index_t size, int check, st_data_t never)
 {
@@ -1143,6 +1160,7 @@ st_values_check(st_table *table, st_data_t *values, st_index_t size, st_data_t n
 {
     return get_values(table, values, size, 1, never);
 }
+#endif
 
 #if 0  /* unused right now */
 int
@@ -1225,6 +1243,7 @@ st_reverse_foreach(st_table *table, int (*func)(ANYARGS), st_data_t arg)
 }
 #endif
 
+#if 0 /* unused for now */
 /*
  * hash_32 - 32 bit Fowler/Noll/Vo FNV-1a hash code
  *
@@ -1670,3 +1689,4 @@ st_numhash(st_data_t n)
      */
     return (st_index_t)((n>>(RUBY_SPECIAL_SHIFT+3)|(n<<3)) ^ (n>>3));
 }
+#endif
