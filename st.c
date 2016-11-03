@@ -10,9 +10,7 @@
 #endif
 
 #include <stdio.h>
-#ifdef HAVE_STDLIB_H
-# include <stdlib.h>
-#endif
+#include <stdlib.h>
 #include <string.h>
 
 typedef struct st_table_entry st_table_entry;

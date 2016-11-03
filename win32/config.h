@@ -48,8 +48,6 @@
 #define HAVE_MEMCMP 1
 #define HAVE_MEMMOVE 1
 #define HAVE_MKDIR 1
-#define HAVE_STRCASECMP 1
-#define HAVE_STRNCASECMP 1
 #define HAVE_STRERROR 1
 #define HAVE_STRFTIME 1
 #define HAVE_STRCHR 1

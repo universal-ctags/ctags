@@ -273,19 +273,13 @@ extern pthread_mutex_t gOnigMutex;
 # define ONIG_STATE_DEC_THREAD(reg)  /* Nothing */
 #endif /* USE_RECOMPILE_API && USE_MULTI_THREAD_SYSTEM */
 
-#ifdef HAVE_STDLIB_H
-# include <stdlib.h>
-#endif
+#include <stdlib.h>
 
 #if defined(HAVE_ALLOCA_H) && (defined(_AIX) || !defined(__GNUC__))
 # include <alloca.h>
 #endif
 
-#ifdef HAVE_STRING_H
-# include <string.h>
-#else
-# include <strings.h>
-#endif
+#include <string.h>
 
 #include <ctype.h>
 #ifdef HAVE_SYS_TYPES_H
@@ -300,9 +294,7 @@ extern pthread_mutex_t gOnigMutex;
 # include <inttypes.h>
 #endif
 
-#ifdef STDC_HEADERS
-# include <stddef.h>
-#endif
+#include <stddef.h>
 
 #ifdef _WIN32
 # include <malloc.h>	/* for alloca() */
