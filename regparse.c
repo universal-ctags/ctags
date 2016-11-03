@@ -5523,7 +5523,7 @@ set_quantifier(Node* qnode, Node* target, int group, ScanEnv* env)
       int targetq_num = popular_quantifier_num(qnt);
 
 #ifdef USE_WARNING_REDUNDANT_NESTED_REPEAT_OPERATOR
-      if (!IS_QUANTIFIER_BY_NUMBER(qn) && !IS_QUANTIFIER_BY_NUMBER(qnt) &&
+      if (nestq_num >= 0 && targetq_num >= 0 &&
 	  IS_SYNTAX_BV(env->syntax, ONIG_SYN_WARN_REDUNDANT_NESTED_REPEAT)) {
 	switch (ReduceTypeTable[targetq_num][nestq_num]) {
 	case RQ_ASIS:
