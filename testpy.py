@@ -28,7 +28,10 @@ def get_encoding_name(onigenc):
     arguments:
       enc -- an instance of onigmo.OnigEncoding
     """
-    return onigenc[0].name.decode()
+    name = onigenc[0].name.decode()
+    if name == "Windows-31J":
+        name = "CP932"
+    return name
 
 def is_unicode_encoding(enc):
     """Check if the encoding is Unicode encoding.
