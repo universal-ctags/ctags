@@ -5696,7 +5696,7 @@ i_apply_case_fold(OnigCodePoint from, OnigCodePoint to[],
   CClassNode* cc;
   CClassNode* asc_cc;
   BitSetRef bs;
-  int add_flag;
+  int add_flag, r;
 
   iarg = (IApplyCaseFoldArg* )arg;
   env = iarg->env;
@@ -5723,7 +5723,8 @@ i_apply_case_fold(OnigCodePoint from, OnigCodePoint to[],
 	(is_in == 0 &&  IS_NCCLASS_NOT(cc))) {
       if (add_flag) {
 	if (ONIGENC_MBC_MINLEN(env->enc) > 1 || *to >= SINGLE_BYTE_SIZE) {
-	  add_code_range0(&(cc->mbuf), env, *to, *to, 0);
+	  r = add_code_range0(&(cc->mbuf), env, *to, *to, 0);
+	  if (r < 0) return r;
 	}
 	else {
 	  BITSET_SET_BIT(bs, *to);
@@ -5735,7 +5736,8 @@ i_apply_case_fold(OnigCodePoint from, OnigCodePoint to[],
       if (add_flag) {
 	if (ONIGENC_MBC_MINLEN(env->enc) > 1 || *to >= SINGLE_BYTE_SIZE) {
 	  if (IS_NCCLASS_NOT(cc)) clear_not_flag_cclass(cc, env->enc);
-	  add_code_range0(&(cc->mbuf), env, *to, *to, 0);
+	  r = add_code_range0(&(cc->mbuf), env, *to, *to, 0);
+	  if (r < 0) return r;
 	}
 	else {
 	  if (IS_NCCLASS_NOT(cc)) {
