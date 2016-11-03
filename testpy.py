@@ -253,6 +253,8 @@ def set_encoding(enc):
     """
     global onig_encoding
 
+    if enc == None:
+        return
     if isinstance(enc, onigmo.OnigEncoding):
         onig_encoding = enc
     else:
@@ -311,6 +313,7 @@ def set_output_encoding(enc=None):
 
 def set_default_warning_function():
     global _warn_func_ptr
+
     warning_enc = get_encoding_name(onig_encoding)
     if is_ascii_incompatible_encoding(warning_enc):
         warning_enc = 'ascii'
@@ -322,25 +325,36 @@ def set_default_warning_function():
     onigmo.onig_set_verb_warn_func(_warn_func_ptr)
 
 
-def main():
-    # set encoding of the test target
-    if len(sys.argv) > 1:
-        try:
-            set_encoding(sys.argv[1])
-        except KeyError:
-            print("test target encoding error")
-            print("Usage: python testpy.py [test target encoding] [output encoding]")
-            sys.exit()
+def init(enc, outenc=None):
+    """Setup test target encoding, output encoding and warning function.
 
-    # set encoding of stdout/stderr
+    arguments:
+      enc    -- Encoding used for testing.
+      outenc -- Encoding used for showing messages.
+    """
+    set_encoding(enc)
+    set_output_encoding(outenc)
+    set_default_warning_function()
+
+
+def main():
+    # encoding of the test target
+    enc = None
+    if len(sys.argv) > 1:
+        enc = sys.argv[1]
+
+    # encoding of stdout/stderr
     outenc = None
     if len(sys.argv) > 2:
         outenc = sys.argv[2]
-    set_output_encoding(outenc)
 
-    # set warning function
-    set_default_warning_function()
-
+    # Initialization
+    try:
+        init(enc, outenc)
+    except KeyError:
+        print("test target encoding error")
+        print("Usage: python testpy.py [test target encoding] [output encoding]")
+        sys.exit()
 
     print(onigmo.onig_copyright())
 
