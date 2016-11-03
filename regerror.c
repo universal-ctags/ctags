@@ -384,6 +384,7 @@ onig_vsnprintf_with_pattern(UChar buf[], int bufsize, OnigEncoding enc,
   }
 }
 
+#if 0 /* unused */
 void
 #ifdef HAVE_STDARG_PROTOTYPES
 onig_snprintf_with_pattern(UChar buf[], int bufsize, OnigEncoding enc,
@@ -405,4 +406,4 @@ onig_snprintf_with_pattern(buf, bufsize, enc, pat, pat_end, fmt, va_alist)
 	  pat, pat_end, fmt, args);
   va_end(args);
 }
-
+#endif
