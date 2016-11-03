@@ -306,6 +306,19 @@ def set_output_encoding(enc=None):
     sys.stderr = get_text_writer(sys.stderr, encoding=enc)
 
 
+def set_default_warning_function():
+    global _warn_func_ptr
+    warning_enc = get_encoding_name(onig_encoding)
+    if is_ascii_incompatible_encoding(warning_enc):
+        warning_enc = 'ascii'
+    def warn_func(str):
+        print("warning: " + str.decode(warning_enc, 'replace'))
+
+    _warn_func_ptr = onigmo.OnigWarnFunc(warn_func)
+    onigmo.onig_set_warn_func(_warn_func_ptr)
+    onigmo.onig_set_verb_warn_func(_warn_func_ptr)
+
+
 def main():
     # set encoding of the test target
     if len(sys.argv) > 1:
@@ -323,15 +336,7 @@ def main():
     set_output_encoding(outenc)
 
     # set warning function
-    warning_enc = get_encoding_name(onig_encoding)
-    if is_ascii_incompatible_encoding(warning_enc):
-        warning_enc = 'ascii'
-    def warn_func(str):
-        print("warning: " + str.decode(warning_enc, 'replace'))
-
-    warn_func_ptr = onigmo.OnigWarnFunc(warn_func)
-    onigmo.onig_set_warn_func(warn_func_ptr)
-    onigmo.onig_set_verb_warn_func(warn_func_ptr)
+    set_default_warning_function()
 
 
     print(onigmo.onig_copyright())
