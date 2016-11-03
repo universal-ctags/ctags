@@ -5406,9 +5406,12 @@ parse_enclose(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
 	  else if (c == ':') {
 	    OnigOptionType prev = env->option;
 
-	    env->option     = option;
+	    env->option = option;
 	    r = fetch_token(tok, &p, end, env);
-	    if (r < 0) return r;
+	    if (r < 0) {
+	      env->option = prev;
+	      return r;
+	    }
 	    r = parse_subexp(&target, tok, term, &p, end, env);
 	    env->option = prev;
 	    if (r < 0) return r;
@@ -6049,7 +6052,10 @@ parse_exp(Node** np, OnigToken* tok, int term,
 
       env->option = NENCLOSE(*np)->option;
       r = fetch_token(tok, src, end, env);
-      if (r < 0) return r;
+      if (r < 0) {
+	env->option = prev;
+	return r;
+      }
       r = parse_subexp(&target, tok, term, src, end, env);
       env->option = prev;
       if (r < 0) {
