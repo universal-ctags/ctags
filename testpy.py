@@ -16,10 +16,11 @@ nfail = 0
 onig_encoding = onigmo.ONIG_ENCODING_EUC_JP
 
 # special syntactic settings
-_syntax_default = onigmo.OnigSyntaxType()
-onigmo.onig_copy_syntax(ctypes.byref(_syntax_default), onigmo.ONIG_SYNTAX_DEFAULT)
-_syntax_default.options &= ~onigmo.ONIG_OPTION_ASCII_RANGE
-syntax_default = ctypes.byref(_syntax_default)
+syntax_default = ctypes.byref(onigmo.OnigSyntaxType())
+onigmo.onig_copy_syntax(syntax_default, onigmo.ONIG_SYNTAX_DEFAULT)
+onigmo.onig_set_syntax_options(syntax_default,
+        onigmo.onig_get_syntax_options(syntax_default)
+            & ~onigmo.ONIG_OPTION_ASCII_RANGE)
 
 
 def get_encoding_name(onigenc):
@@ -1532,6 +1533,16 @@ def main():
     n("^a*$", "a" * 200 + "b")
     n("^a*$", "a" * 2000 + "b", execerr=onigmo.ONIGERR_MATCH_STACK_LIMIT_OVER)
     onigmo.onig_set_match_stack_limit_size(0)
+
+    # syntax functions
+    onigmo.onig_set_syntax_op(syntax_default,
+        onigmo.onig_get_syntax_op(onigmo.ONIG_SYNTAX_DEFAULT))
+    onigmo.onig_set_syntax_op2(syntax_default,
+        onigmo.onig_get_syntax_op2(onigmo.ONIG_SYNTAX_DEFAULT))
+    onigmo.onig_set_syntax_behavior(syntax_default,
+        onigmo.onig_get_syntax_behavior(onigmo.ONIG_SYNTAX_DEFAULT))
+    onigmo.onig_set_default_syntax(None)
+
 
     print("\nEncoding:", get_encoding_name(onig_encoding))
     print("RESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Onigmo %s)" % (
