@@ -748,22 +748,12 @@ extern void onig_null_warn(const char* s);
 
 #define ONIG_CHAR_TABLE_SIZE   256
 
-/* regex_t state */
-#define ONIG_STATE_NORMAL              0
-#define ONIG_STATE_SEARCHING           1
-#define ONIG_STATE_COMPILING          -1
-#define ONIG_STATE_MODIFY             -2
-
-#define ONIG_STATE(reg) \
-  ((reg)->state > 0 ? ONIG_STATE_SEARCHING : (reg)->state)
-
 typedef struct re_pattern_buffer {
   /* common members of BBuf(bytes-buffer) */
   unsigned char* p;         /* compiled pattern */
   unsigned int used;        /* used space for p */
   unsigned int alloc;       /* allocated space for p */
 
-  int state;                     /* normal, searching, compiling */
   int num_mem;                   /* used memory(...) num counted from 1 */
   int num_repeat;                /* OP_REPEAT/OP_REPEAT_NG id-counter */
   int num_null_check;            /* OP_NULL_CHECK_START/END id counter */
@@ -840,10 +830,6 @@ ONIG_EXTERN
 void onig_free(OnigRegex);
 ONIG_EXTERN
 void onig_free_body(OnigRegex);
-ONIG_EXTERN
-int onig_recompile(OnigRegex, const OnigUChar* pattern, const OnigUChar* pattern_end, OnigOptionType option, OnigEncoding enc, OnigSyntaxType* syntax, OnigErrorInfo* einfo);
-ONIG_EXTERN
-int onig_recompile_deluxe(OnigRegex reg, const OnigUChar* pattern, const OnigUChar* pattern_end, OnigCompileInfo* ci, OnigErrorInfo* einfo);
 ONIG_EXTERN
 OnigPosition onig_search(OnigRegex, const OnigUChar* str, const OnigUChar* end, const OnigUChar* start, const OnigUChar* range, OnigRegion* region, OnigOptionType option);
 ONIG_EXTERN

@@ -201,23 +201,3 @@ onig_new_deluxe(regex_t** reg, const UChar* pattern, const UChar* pattern_end,
 
   return r;
 }
-
-#ifdef USE_RECOMPILE_API
-extern int
-onig_recompile_deluxe(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
-                      OnigCompileInfo* ci, OnigErrorInfo* einfo)
-{
-  int r;
-  regex_t *new_reg;
-
-  r = onig_new_deluxe(&new_reg, pattern, pattern_end, ci, einfo);
-  if (r) return r;
-  if (ONIG_STATE(reg) == ONIG_STATE_NORMAL) {
-    onig_transfer(reg, new_reg);
-  }
-  else {
-    onig_chain_link_add(reg, new_reg);
-  }
-  return 0;
-}
-#endif

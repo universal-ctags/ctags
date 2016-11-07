@@ -95,29 +95,6 @@ re_compile_pattern(const char* pattern, int size, regex_t* reg, char* ebuf)
   return r;
 }
 
-#ifdef USE_RECOMPILE_API
-extern int
-re_recompile_pattern(const char* pattern, int size, regex_t* reg, char* ebuf)
-{
-  int r;
-  OnigErrorInfo einfo;
-  OnigEncoding enc;
-
-  /* I think encoding and options should be arguments of this function.
-     But this is adapted to present re.c. (2002/11/29)
-   */
-  enc = OnigEncDefaultCharEncoding;
-
-  r = onig_recompile(reg, (UChar* )pattern, (UChar* )(pattern + size),
-		     reg->options, enc, OnigDefaultSyntax, &einfo);
-  if (r != ONIG_NORMAL) {
-    if (IS_NOT_NULL(ebuf))
-      (void )onig_error_code_to_str((UChar* )ebuf, r, &einfo);
-  }
-  return r;
-}
-#endif
-
 extern void
 re_free_pattern(regex_t* reg)
 {

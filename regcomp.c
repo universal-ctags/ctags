@@ -5637,7 +5637,6 @@ onig_region_memsize(const OnigRegion *regs)
 #endif
 
 #define REGEX_TRANSFER(to,from) do {\
-  (to)->state = ONIG_STATE_MODIFY;\
   onig_free_body(to);\
   xmemcpy(to, from, sizeof(regex_t));\
   xfree(from);\
@@ -5674,7 +5673,6 @@ onig_chain_reduce(regex_t* reg)
   prev = reg;
   head = prev->chain;
   if (IS_NOT_NULL(head)) {
-    reg->state = ONIG_STATE_MODIFY;
     while (IS_NOT_NULL(head->chain)) {
       prev = head;
       head = head->chain;
@@ -5726,7 +5724,6 @@ onig_compile(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
   scan_env.sourcefile = sourcefile;
   scan_env.sourceline = sourceline;
 #endif
-  reg->state = ONIG_STATE_COMPILING;
 
 #ifdef ONIG_DEBUG
   print_enc_string(stderr, reg->enc, pattern, pattern_end);
@@ -5882,7 +5879,6 @@ onig_compile(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
 #endif
 
  end:
-  reg->state = ONIG_STATE_NORMAL;
   return r;
 
  err_unset:
@@ -5906,27 +5902,6 @@ onig_compile(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
   return r;
 }
 
-#ifdef USE_RECOMPILE_API
-extern int
-onig_recompile(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
-	    OnigOptionType option, OnigEncoding enc, OnigSyntaxType* syntax,
-	    OnigErrorInfo* einfo)
-{
-  int r;
-  regex_t *new_reg;
-
-  r = onig_new(&new_reg, pattern, pattern_end, option, enc, syntax, einfo);
-  if (r) return r;
-  if (ONIG_STATE(reg) == ONIG_STATE_NORMAL) {
-    onig_transfer(reg, new_reg);
-  }
-  else {
-    onig_chain_link_add(reg, new_reg);
-  }
-  return 0;
-}
-#endif
-
 static int onig_inited = 0;
 
 extern int
@@ -5947,8 +5922,6 @@ onig_reg_init(regex_t* reg, OnigOptionType option,
       == (ONIG_OPTION_DONT_CAPTURE_GROUP|ONIG_OPTION_CAPTURE_GROUP)) {
     return ONIGERR_INVALID_COMBINATION_OF_OPTIONS;
   }
-
-  (reg)->state = ONIG_STATE_MODIFY;
 
   if ((option & ONIG_OPTION_NEGATE_SINGLELINE) != 0) {
     option |= syntax->options;

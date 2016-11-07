@@ -3781,31 +3781,6 @@ onig_match(regex_t* reg, const UChar* str, const UChar* end, const UChar* at, On
   UChar *prev;
   OnigMatchArg msa;
 
-#if defined(USE_RECOMPILE_API) && defined(USE_MULTI_THREAD_SYSTEM)
- start:
-  THREAD_ATOMIC_START;
-  if (ONIG_STATE(reg) >= ONIG_STATE_NORMAL) {
-    ONIG_STATE_INC(reg);
-    if (IS_NOT_NULL(reg->chain) && ONIG_STATE(reg) == ONIG_STATE_NORMAL) {
-      onig_chain_reduce(reg);
-      ONIG_STATE_INC(reg);
-    }
-  }
-  else {
-    int n;
-
-    THREAD_ATOMIC_END;
-    n = 0;
-    while (ONIG_STATE(reg) < ONIG_STATE_NORMAL) {
-      if (++n > THREAD_PASS_LIMIT_COUNT)
-	return ONIGERR_OVER_THREAD_PASS_LIMIT_COUNT;
-      THREAD_PASS;
-    }
-    goto start;
-  }
-  THREAD_ATOMIC_END;
-#endif /* USE_RECOMPILE_API && USE_MULTI_THREAD_SYSTEM */
-
   MATCH_ARG_INIT(msa, option, region, at, at);
 #ifdef USE_COMBINATION_EXPLOSION_CHECK
   {
@@ -3834,7 +3809,6 @@ onig_match(regex_t* reg, const UChar* str, const UChar* end, const UChar* at, On
   }
 
   MATCH_ARG_FREE(msa);
-  ONIG_STATE_DEC_THREAD(reg);
   return r;
 }
 
@@ -4092,31 +4066,6 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
   const UChar *orig_start = start;
   const UChar *orig_range = range;
 #endif
-
-#if defined(USE_RECOMPILE_API) && defined(USE_MULTI_THREAD_SYSTEM)
- start:
-  THREAD_ATOMIC_START;
-  if (ONIG_STATE(reg) >= ONIG_STATE_NORMAL) {
-    ONIG_STATE_INC(reg);
-    if (IS_NOT_NULL(reg->chain) && ONIG_STATE(reg) == ONIG_STATE_NORMAL) {
-      onig_chain_reduce(reg);
-      ONIG_STATE_INC(reg);
-    }
-  }
-  else {
-    int n;
-
-    THREAD_ATOMIC_END;
-    n = 0;
-    while (ONIG_STATE(reg) < ONIG_STATE_NORMAL) {
-      if (++n > THREAD_PASS_LIMIT_COUNT)
-	return ONIGERR_OVER_THREAD_PASS_LIMIT_COUNT;
-      THREAD_PASS;
-    }
-    goto start;
-  }
-  THREAD_ATOMIC_END;
-#endif /* USE_RECOMPILE_API && USE_MULTI_THREAD_SYSTEM */
 
 #ifdef ONIG_DEBUG_SEARCH
   fprintf(stderr,
@@ -4449,7 +4398,6 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
 
  finish:
   MATCH_ARG_FREE(msa);
-  ONIG_STATE_DEC_THREAD(reg);
 
   /* If result is mismatch and no FIND_NOT_EMPTY option,
      then the region is not set in match_at(). */
@@ -4470,7 +4418,6 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
  mismatch_no_msa:
   r = ONIG_MISMATCH;
  finish_no_msa:
-  ONIG_STATE_DEC_THREAD(reg);
 #ifdef ONIG_DEBUG
   if (r != ONIG_MISMATCH)
     fprintf(stderr, "onig_search: error %"PRIdPTRDIFF"\n", r);
@@ -4478,7 +4425,6 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
   return r;
 
  match:
-  ONIG_STATE_DEC_THREAD(reg);
   MATCH_ARG_FREE(msa);
   return s - str;
 }

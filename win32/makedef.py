@@ -17,9 +17,6 @@ exclude_symbols = [
 ]
 
 features = {
-    "USE_RECOMPILE_API": ("onig_recompile",
-                "onig_recompile_deluxe",
-                "re_recompile_pattern"),
     "USE_VARIABLE_META_CHARS": ("onig_set_meta_char",),
     "USE_CAPTURE_HISTORY": ("onig_get_capture_tree",)
 }

@@ -478,8 +478,6 @@ libonig.onig_free.argtypes = [OnigRegex]
 onig_free = libonig.onig_free
 
 # onig_free_body
-# onig_recompile
-# onig_recompile_deluxe
 
 # onig_search
 libonig.onig_search.argtypes = [OnigRegex,

@@ -73,7 +73,6 @@
 #define USE_MONOMANIAC_CHECK_CAPTURES_IN_ENDLESS_REPEAT  /* /(?:()|())*\2/ */
 #define USE_NEWLINE_AT_END_OF_STRING_HAS_EMPTY_LINE     /* /\n$/ =~ "\n" */
 #define USE_WARNING_REDUNDANT_NESTED_REPEAT_OPERATOR
-/* #define USE_RECOMPILE_API */
 /* !!! moved to regenc.h. */ /* #define USE_CRNL_AS_LINE_TERMINATOR */
 #define USE_NO_INVALID_QUANTIFIER
 
@@ -251,27 +250,6 @@ extern pthread_mutex_t gOnigMutex;
 # define xvsnprintf  vsnprintf
 #endif
 
-
-#if defined(USE_RECOMPILE_API) && defined(USE_MULTI_THREAD_SYSTEM)
-# define ONIG_STATE_INC(reg) (reg)->state++
-# define ONIG_STATE_DEC(reg) (reg)->state--
-
-# define ONIG_STATE_INC_THREAD(reg) do {\
-  THREAD_ATOMIC_START;\
-  (reg)->state++;\
-  THREAD_ATOMIC_END;\
-} while(0)
-# define ONIG_STATE_DEC_THREAD(reg) do {\
-  THREAD_ATOMIC_START;\
-  (reg)->state--;\
-  THREAD_ATOMIC_END;\
-} while(0)
-#else
-# define ONIG_STATE_INC(reg)         /* Nothing */
-# define ONIG_STATE_DEC(reg)         /* Nothing */
-# define ONIG_STATE_INC_THREAD(reg)  /* Nothing */
-# define ONIG_STATE_DEC_THREAD(reg)  /* Nothing */
-#endif /* USE_RECOMPILE_API && USE_MULTI_THREAD_SYSTEM */
 
 #include <stdlib.h>
 
