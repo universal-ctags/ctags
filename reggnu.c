@@ -116,7 +116,7 @@ re_alloc_pattern(regex_t** reg)
 extern void
 re_set_casetable(const char* table)
 {
-  onigenc_set_default_caseconv_table((UChar* )table);
+  /* onigenc_set_default_caseconv_table((UChar* )table); */
 }
 
 extern void

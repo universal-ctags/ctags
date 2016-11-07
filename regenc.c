@@ -364,12 +364,14 @@ const UChar OnigEncISO_8859_1_ToUpperCaseTable[256] = {
 };
 #endif
 
+#if 0
 extern void
 onigenc_set_default_caseconv_table(const UChar* table ARG_UNUSED)
 {
   /* nothing */
   /* obsoleted. */
 }
+#endif
 
 extern UChar*
 onigenc_get_left_adjust_char_head(OnigEncoding enc, const UChar* start, const UChar* s, const UChar* end)

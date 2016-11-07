@@ -415,8 +415,6 @@ int onigenc_set_default_encoding(OnigEncoding enc);
 ONIG_EXTERN
 OnigEncoding onigenc_get_default_encoding(void);
 ONIG_EXTERN
-void onigenc_set_default_caseconv_table(const OnigUChar* table);
-ONIG_EXTERN
 OnigUChar* onigenc_get_right_adjust_char_head_with_prev(OnigEncoding enc, const OnigUChar* start, const OnigUChar* s, const OnigUChar* end, const OnigUChar** prev);
 ONIG_EXTERN
 OnigUChar* onigenc_get_prev_char_head(OnigEncoding enc, const OnigUChar* start, const OnigUChar* s, const OnigUChar* end);
