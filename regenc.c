@@ -896,6 +896,7 @@ onigenc_with_ascii_strnicmp(OnigEncoding enc, const UChar* p, const UChar* end,
   return 0;
 }
 
+#if 0
 /* Property management */
 static int
 resize_property_list(int new_size, const OnigCodePoint*** plist, int* psize)
@@ -948,6 +949,7 @@ onigenc_property_list_add_property(UChar* name, const OnigCodePoint* prop,
 			(hash_data_type )(*pnum + ONIGENC_MAX_STD_CTYPE));
   return 0;
 }
+#endif
 
 extern int
 onigenc_ascii_only_case_map(OnigCaseFoldType* flagP, const OnigUChar** pp, const OnigUChar* end,
