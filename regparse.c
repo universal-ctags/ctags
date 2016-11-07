@@ -4637,7 +4637,8 @@ parse_char_class(Node** np, Node** asc_np, OnigToken* tok, UChar** src, UChar* e
 	else if (i > len) { /* fetch back */
 	  p = psave;
 	  for (i = 1; i < len; i++) {
-	    r = fetch_token_in_cc(tok, &p, end, env);
+	    (void)fetch_token_in_cc(tok, &p, end, env);
+	    /* no need to check the retun value (already checked above) */
 	  }
 	  fetched = 0;
 	}
