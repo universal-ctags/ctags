@@ -932,8 +932,6 @@ extern int  onig_compile(regex_t* reg, const UChar* pattern, const UChar* patter
 #ifdef RUBY
 extern int  onig_compile_ruby(regex_t* reg, const UChar* pattern, const UChar* pattern_end, OnigErrorInfo* einfo, const char *sourcefile, int sourceline);
 #endif
-extern void onig_chain_reduce(regex_t* reg);
-extern void onig_chain_link_add(regex_t* to, regex_t* add);
 extern void onig_transfer(regex_t* to, regex_t* from);
 extern int  onig_is_code_in_cc(OnigEncoding enc, OnigCodePoint code, CClassNode* cc);
 extern int  onig_is_code_in_cc_len(int enclen, OnigCodePoint code, CClassNode* cc);

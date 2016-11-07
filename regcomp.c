@@ -5650,38 +5650,6 @@ onig_transfer(regex_t* to, regex_t* from)
   THREAD_ATOMIC_END;
 }
 
-#define REGEX_CHAIN_HEAD(reg) do {\
-  while (IS_NOT_NULL((reg)->chain)) {\
-    (reg) = (reg)->chain;\
-  }\
-} while (0)
-
-extern void
-onig_chain_link_add(regex_t* to, regex_t* add)
-{
-  THREAD_ATOMIC_START;
-  REGEX_CHAIN_HEAD(to);
-  to->chain = add;
-  THREAD_ATOMIC_END;
-}
-
-extern void
-onig_chain_reduce(regex_t* reg)
-{
-  regex_t *head, *prev;
-
-  prev = reg;
-  head = prev->chain;
-  if (IS_NOT_NULL(head)) {
-    while (IS_NOT_NULL(head->chain)) {
-      prev = head;
-      head = head->chain;
-    }
-    prev->chain = (regex_t* )NULL;
-    REGEX_TRANSFER(reg, head);
-  }
-}
-
 #ifdef ONIG_DEBUG_COMPILE
 static void print_compiled_byte_code_list P_((FILE* f, regex_t* reg));
 #endif
