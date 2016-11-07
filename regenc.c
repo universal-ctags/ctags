@@ -948,19 +948,6 @@ onigenc_property_list_add_property(UChar* name, const OnigCodePoint* prop,
 }
 
 extern int
-onigenc_property_list_init(int (*f)(void))
-{
-  int r;
-
-  THREAD_ATOMIC_START;
-
-  r = f();
-
-  THREAD_ATOMIC_END;
-  return r;
-}
-
-extern int
 onigenc_ascii_only_case_map(OnigCaseFoldType* flagP, const OnigUChar** pp, const OnigUChar* end,
 			    OnigUChar* to, OnigUChar* to_end, const struct OnigEncodingTypeST* enc)
 {

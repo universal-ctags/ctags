@@ -173,8 +173,6 @@ onig_error_code_to_format(OnigPosition code)
     p = "not supported encoding combination"; break;
   case ONIGERR_INVALID_COMBINATION_OF_OPTIONS:
     p = "invalid combination of options"; break;
-  case ONIGERR_OVER_THREAD_PASS_LIMIT_COUNT:
-    p = "over thread pass limit count"; break;
 
   default:
     p = "undefined error code"; break;

@@ -436,7 +436,7 @@ ONIGERR_NOT_SUPPORTED_ENCODING_COMBINATION              =  -402
 ONIGERR_INVALID_COMBINATION_OF_OPTIONS                  =  -403
 
 # errors related to thread
-ONIGERR_OVER_THREAD_PASS_LIMIT_COUNT                    = -1001
+#ONIGERR_OVER_THREAD_PASS_LIMIT_COUNT                    = -1001
 
 
 OnigWarnFunc = ctypes.CFUNCTYPE(None, ctypes.c_char_p)

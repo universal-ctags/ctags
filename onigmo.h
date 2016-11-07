@@ -693,7 +693,7 @@ ONIG_EXTERN const OnigSyntaxType*   OnigDefaultSyntax;
 #define ONIGERR_INVALID_COMBINATION_OF_OPTIONS               -403
 
 /* errors related to thread */
-#define ONIGERR_OVER_THREAD_PASS_LIMIT_COUNT                -1001
+/* #define ONIGERR_OVER_THREAD_PASS_LIMIT_COUNT                -1001 */
 
 
 /* must be smaller than BIT_STATUS_BITS_NUM (unsigned int * 8) */

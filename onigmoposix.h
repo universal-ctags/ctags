@@ -61,7 +61,7 @@ extern "C" {
 #define REG_EONIG_INTERNAL  14
 #define REG_EONIG_BADWC     15
 #define REG_EONIG_BADARG    16
-#define REG_EONIG_THREAD    17
+/* #define REG_EONIG_THREAD    17 */
 
 /* character encodings (for reg_set_encoding()) */
 #define REG_POSIX_ENCODING_ASCII     0

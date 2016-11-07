@@ -30,15 +30,6 @@
 
 #include "regparse.h"
 
-#if defined(USE_MULTI_THREAD_SYSTEM) \
-  && defined(USE_DEFAULT_MULTI_THREAD_SYSTEM)
-# ifdef _WIN32
-CRITICAL_SECTION gOnigMutex;
-# else
-pthread_mutex_t gOnigMutex;
-# endif
-#endif
-
 OnigCaseFoldType OnigDefaultCaseFoldFlag = ONIGENC_CASE_FOLD_MIN;
 
 extern OnigCaseFoldType
@@ -5645,9 +5636,7 @@ onig_region_memsize(const OnigRegion *regs)
 extern void
 onig_transfer(regex_t* to, regex_t* from)
 {
-  THREAD_ATOMIC_START;
   REGEX_TRANSFER(to, from);
-  THREAD_ATOMIC_END;
 }
 
 #ifdef ONIG_DEBUG_COMPILE
@@ -5959,9 +5948,6 @@ onig_init(void)
   if (onig_inited != 0)
     return 0;
 
-  THREAD_SYSTEM_INIT;
-  THREAD_ATOMIC_START;
-
   onig_inited = 1;
 
   onigenc_init();
@@ -5971,7 +5957,6 @@ onig_init(void)
   onig_statistics_init();
 #endif
 
-  THREAD_ATOMIC_END;
   return 0;
 }
 
@@ -6010,8 +5995,6 @@ exec_end_call_list(void)
 extern int
 onig_end(void)
 {
-  THREAD_ATOMIC_START;
-
   exec_end_call_list();
 
 #ifdef ONIG_DEBUG_STATISTICS
@@ -6020,8 +6003,6 @@ onig_end(void)
 
   onig_inited = 0;
 
-  THREAD_ATOMIC_END;
-  THREAD_SYSTEM_END;
   return 0;
 }
 

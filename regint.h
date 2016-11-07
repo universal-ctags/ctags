@@ -129,52 +129,6 @@
 #define USE_FIND_LONGEST_SEARCH_ALL_OF_RANGE
 /* #define USE_COMBINATION_EXPLOSION_CHECK */     /* (X*)* */
 
-/* multithread config */
-/* #define USE_MULTI_THREAD_SYSTEM */
-/* #define USE_DEFAULT_MULTI_THREAD_SYSTEM */
-
-#if defined(USE_MULTI_THREAD_SYSTEM) \
-  && defined(USE_DEFAULT_MULTI_THREAD_SYSTEM)
-
-# ifdef _WIN32
-#  define WIN32_LEAN_AND_MEAN
-#  include <windows.h>
-extern CRITICAL_SECTION gOnigMutex;
-#  define THREAD_SYSTEM_INIT      InitializeCriticalSection(&gOnigMutex)
-#  define THREAD_SYSTEM_END       DeleteCriticalSection(&gOnigMutex)
-#  define THREAD_ATOMIC_START     EnterCriticalSection(&gOnigMutex)
-#  define THREAD_ATOMIC_END       LeaveCriticalSection(&gOnigMutex)
-#  define THREAD_PASS             Sleep(0)
-# else /* _WIN32 */
-#  include <pthread.h>
-#  include <sched.h>
-extern pthread_mutex_t gOnigMutex;
-#  define THREAD_SYSTEM_INIT      pthread_mutex_init(&gOnigMutex, NULL)
-#  define THREAD_SYSTEM_END       pthread_mutex_destroy(&gOnigMutex)
-#  define THREAD_ATOMIC_START     pthread_mutex_lock(&gOnigMutex)
-#  define THREAD_ATOMIC_END       pthread_mutex_unlock(&gOnigMutex)
-#  define THREAD_PASS             sched_yield()
-# endif /* _WIN32 */
-
-#else /* USE_DEFAULT_MULTI_THREAD_SYSTEM */
-
-# ifndef THREAD_SYSTEM_INIT
-#  define THREAD_SYSTEM_INIT      /* depend on thread system */
-# endif
-# ifndef THREAD_SYSTEM_END
-#  define THREAD_SYSTEM_END       /* depend on thread system */
-# endif
-# ifndef THREAD_ATOMIC_START
-#  define THREAD_ATOMIC_START     /* depend on thread system */
-# endif
-# ifndef THREAD_ATOMIC_END
-#  define THREAD_ATOMIC_END       /* depend on thread system */
-# endif
-# ifndef THREAD_PASS
-#  define THREAD_PASS             /* depend on thread system */
-# endif
-
-#endif /* USE_DEFAULT_MULTI_THREAD_SYSTEM */
 
 #ifndef xmalloc
 # define xmalloc     malloc
@@ -235,7 +189,6 @@ extern pthread_mutex_t gOnigMutex;
 #define STATE_CHECK_STRING_THRESHOLD_LEN             7
 #define STATE_CHECK_BUFF_MAX_SIZE               0x4000
 
-#define THREAD_PASS_LIMIT_COUNT     8
 #define xmemset     memset
 #define xmemcpy     memcpy
 #define xmemmove    memmove
@@ -948,25 +901,6 @@ typedef st_data_t hash_data_type;
 extern hash_table_type* onig_st_init_strend_table_with_size(st_index_t size);
 extern int onig_st_lookup_strend(hash_table_type* table, const UChar* str_key, const UChar* end_key, hash_data_type *value);
 extern int onig_st_insert_strend(hash_table_type* table, const UChar* str_key, const UChar* end_key, hash_data_type value);
-
-/* encoding property management */
-#define PROPERTY_LIST_ADD_PROP(Name, CR) \
-  r = onigenc_property_list_add_property((UChar* )Name, CR,\
-	      &PropertyNameTable, &PropertyList, &PropertyListNum,\
-	      &PropertyListSize);\
-  if (r != 0) goto end
-
-#define PROPERTY_LIST_INIT_CHECK \
-  if (PropertyInited == 0) {\
-    int r = onigenc_property_list_init(init_property_list);\
-    if (r != 0) return r;\
-  }
-
-extern int onigenc_property_list_add_property(UChar* name, const OnigCodePoint* prop, hash_table_type **table, const OnigCodePoint*** plist, int *pnum, int *psize);
-
-typedef int (*ONIGENC_INIT_PROPERTY_LIST_FUNC_TYPE)(void);
-
-extern int onigenc_property_list_init(ONIGENC_INIT_PROPERTY_LIST_FUNC_TYPE);
 
 #ifdef RUBY
 extern size_t onig_memsize(const regex_t *reg);
