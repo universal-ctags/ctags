@@ -590,7 +590,6 @@ st_insert2(register st_table *table, register st_data_t key, st_data_t value,
 	return 1;
     }
 }
-#endif
 
 void
 st_add_direct(st_table *table, st_data_t key, st_data_t value)
@@ -605,6 +604,7 @@ st_add_direct(st_table *table, st_data_t key, st_data_t value)
 
     add_direct(table, key, value, hash_val, hash_pos(hash_val, table->num_bins));
 }
+#endif
 
 static void
 rehash(register st_table *table)
