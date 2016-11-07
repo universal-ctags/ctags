@@ -142,7 +142,7 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
 
   if (r) {
     char s[ONIG_MAX_ERROR_MESSAGE_LEN];
-    onig_error_code_to_str(s, r, &einfo);
+    onig_error_code_to_str((UChar* )s, r, &einfo);
     fprintf(err_file, "ERROR: %s\n", s);
     nerror++;
     return ;
@@ -153,7 +153,7 @@ static void xx(char* pattern, char* str, int from, int to, int mem, int not)
 		  region, ONIG_OPTION_NONE);
   if (r < ONIG_MISMATCH) {
     char s[ONIG_MAX_ERROR_MESSAGE_LEN];
-    onig_error_code_to_str(s, r);
+    onig_error_code_to_str((UChar* )s, r);
     fprintf(err_file, "ERROR: %s\n", s);
     nerror++;
     return ;
