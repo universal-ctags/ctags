@@ -1587,8 +1587,15 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 
 
 #ifdef USE_SUBEXP_CALL
-  /* Stack #0 is used to store the pattern itself and used for (?R), \g<0>, etc. */
-  n = reg->num_repeat + (reg->num_mem + 1) * 2;
+/* Stack #0 is used to store the pattern itself and used for (?R), \g<0>,
+   etc. Additional space is required. */
+# define ADD_NUMMEM 1
+#else
+/* Stack #0 not is used. */
+# define ADD_NUMMEM 0
+#endif
+
+  n = reg->num_repeat + (reg->num_mem + ADD_NUMMEM) * 2;
 
   STACK_INIT(alloca_base, xmalloc_base, n, INIT_MATCH_STACK_SIZE);
   pop_level = reg->stack_pop_level;
@@ -1596,30 +1603,20 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
   repeat_stk = (OnigStackIndex* )alloca_base;
 
   mem_start_stk = (OnigStackIndex* )(repeat_stk + reg->num_repeat);
-  mem_end_stk   = mem_start_stk + (num_mem + 1);
-#else /* USE_SUBEXP_CALL */
-  /* Stack #0 not is used. */
-  n = reg->num_repeat + reg->num_mem * 2;
-
-  STACK_INIT(alloca_base, xmalloc_base, n, INIT_MATCH_STACK_SIZE);
-  pop_level = reg->stack_pop_level;
-  num_mem = reg->num_mem;
-  repeat_stk = (OnigStackIndex* )alloca_base;
-
-  mem_start_stk = (OnigStackIndex* )(repeat_stk + reg->num_repeat);
-  mem_end_stk   = mem_start_stk + num_mem;
-  mem_start_stk--; /* for index start from 1,
-		      mem_start_stk[1]..mem_start_stk[num_mem] */
-  mem_end_stk--;   /* for index start from 1,
-		      mem_end_stk[1]..mem_end_stk[num_mem] */
-#endif /* USE_SUBEXP_CALL */
+  mem_end_stk   = mem_start_stk + (num_mem + ADD_NUMMEM);
   {
     OnigStackIndex *pp = mem_start_stk;
-    for (; pp < (repeat_stk + n); pp+=2) {
+    for (; pp < repeat_stk + n; pp += 2) {
       pp[0] = INVALID_STACK_INDEX;
       pp[1] = INVALID_STACK_INDEX;
     }
   }
+#ifndef USE_SUBEXP_CALL
+  mem_start_stk--; /* for index start from 1,
+		      mem_start_stk[1]..mem_start_stk[num_mem] */
+  mem_end_stk--;   /* for index start from 1,
+		      mem_end_stk[1]..mem_end_stk[num_mem] */
+#endif
 
 #ifdef ONIG_DEBUG_MATCH
   fprintf(stderr, "match_at: str: %"PRIdPTR" (%p), end: %"PRIdPTR" (%p), start: %"PRIdPTR" (%p), sprev: %"PRIdPTR" (%p)\n",
