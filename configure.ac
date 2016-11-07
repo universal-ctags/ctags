@@ -68,26 +68,5 @@ dnl Checks for library functions.
 AC_FUNC_ALLOCA
 AC_FUNC_MEMCMP
 
-dnl check for multithread
-AC_ARG_ENABLE(multithread,
-	[  --enable-multithread    enable multithread support],
-	[multithread=$enableval])
-if test "${multithread}" = yes; then
-  case $host_os in
-  mingw*)
-    AC_DEFINE(USE_MULTI_THREAD_SYSTEM,1,[Define if enbale multithread support])
-    AC_DEFINE(USE_DEFAULT_MULTI_THREAD_SYSTEM,1,[Define if enable the default multithread system])
-    ;;
-  *)
-    dnl This check must be after AC_PROG_CC.
-    AC_CHECK_HEADERS(pthread.h,
-	  [AC_DEFINE(USE_MULTI_THREAD_SYSTEM,1,[Define if enbale multithread support])
-	   AC_DEFINE(USE_DEFAULT_MULTI_THREAD_SYSTEM,1,[Define if enable the default multithread system])
-    ])
-    AC_CHECK_LIB(pthread, pthread_mutex_init)
-    ;;
-  esac
-fi
-
 
 AC_OUTPUT([Makefile onigmo-config sample/Makefile], [chmod +x onigmo-config])

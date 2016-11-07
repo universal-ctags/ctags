@@ -10,7 +10,6 @@ compiler:
 
 env:
   - CFLAGS=--coverage CONFOPT=
-  - CFLAGS=--coverage CONFOPT=--enable-multithread
 
 sudo: false
 
