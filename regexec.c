@@ -36,12 +36,7 @@
 # define USE_MATCH_RANGE_MUST_BE_INSIDE_OF_SPECIFIED_RANGE
 #endif
 
-#ifdef USE_DIRECT_THREADED_VM
-# if (USE_DIRECT_THREADED_VM != 1) && (USE_DIRECT_THREADED_VM != 0)
-#  undef USE_DIRECT_THREADED_VM
-#  define USE_DIRECT_THREADED_VM 1
-# endif
-#else
+#ifndef USE_DIRECT_THREADED_VM
 # ifdef __GNUC__
 #  define USE_DIRECT_THREADED_VM 1
 # else
@@ -1401,6 +1396,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 #endif
 
 #if USE_DIRECT_THREADED_VM
+# define OP_OFFSET  1
 # define VM_LOOP JUMP;
 # define VM_LOOP_END
 # define CASE(x) L_##x: sbegin = s; OPCODE_EXEC_HOOK;
@@ -1571,8 +1567,9 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     &&L_DEFAULT
 # endif
   };
-#else
+#else /* USE_DIRECT_THREADED_VM */
 
+# define OP_OFFSET  0
 # define VM_LOOP                                \
   while (1) {                                   \
   OPCODE_EXEC_HOOK;                             \
@@ -1583,7 +1580,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 # define DEFAULT default:
 # define NEXT break
 # define JUMP continue; break
-#endif
+#endif /* USE_DIRECT_THREADED_VM */
 
 
 #ifdef USE_SUBEXP_CALL
@@ -1636,7 +1633,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     if (s) {                                                            \
       UChar *op, *q, *bp, buf[50];                                      \
       int len;                                                          \
-      op = p - USE_DIRECT_THREADED_VM;                                  \
+      op = p - OP_OFFSET;                                               \
       fprintf(stderr, "%4"PRIdPTR"> \"", (*op == OP_FINISH) ? (ptrdiff_t )-1 : s - str); \
       bp = buf;                                                         \
       q = s;                                                            \
