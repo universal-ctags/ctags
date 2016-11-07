@@ -3694,6 +3694,7 @@ bm_search_ic(regex_t* reg, const UChar* target, const UChar* target_end,
 }
 #endif /* USE_SUNDAY_QUICK_SEARCH */
 
+#ifdef USE_INT_MAP_BACKWARD
 static int
 set_bm_backward_skip(UChar* s, UChar* end, OnigEncoding enc ARG_UNUSED,
 		     int** skip)
@@ -3743,6 +3744,7 @@ bm_search_backward(regex_t* reg, const UChar* target, const UChar* target_end,
 
   return (UChar* )NULL;
 }
+#endif
 
 static UChar*
 map_search(OnigEncoding enc, UChar map[],
@@ -3949,7 +3951,6 @@ backward_search_range(regex_t* reg, const UChar* str, const UChar* end,
 		      UChar* s, const UChar* range, UChar* adjrange,
 		      UChar** low, UChar** high)
 {
-  int r;
   UChar *p;
 
   range += reg->dmin;
@@ -3973,7 +3974,9 @@ backward_search_range(regex_t* reg, const UChar* str, const UChar* end,
 
   case ONIG_OPTIMIZE_EXACT_BM:
   case ONIG_OPTIMIZE_EXACT_BM_NOT_REV:
+#ifdef USE_INT_MAP_BACKWARD
     if (IS_NULL(reg->int_map_backward)) {
+      int r;
       if (s - range < BM_BACKWARD_SEARCH_LENGTH_THRESHOLD)
 	goto exact_method;
 
@@ -3983,6 +3986,9 @@ backward_search_range(regex_t* reg, const UChar* str, const UChar* end,
     }
     p = bm_search_backward(reg, reg->exact, reg->exact_end, range, adjrange,
 			   end, p);
+#else
+    goto exact_method;
+#endif
     break;
 
   case ONIG_OPTIMIZE_MAP:
