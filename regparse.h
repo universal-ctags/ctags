@@ -353,7 +353,6 @@ extern Node*  onig_node_new_list(Node* left, Node* right);
 extern Node*  onig_node_list_add(Node* list, Node* x);
 extern Node*  onig_node_new_alt(Node* left, Node* right);
 extern void   onig_node_str_clear(Node* node);
-extern int    onig_free_node_list(void);
 extern int    onig_names_free(regex_t* reg);
 extern int    onig_parse_make_tree(Node** root, const UChar* pattern, const UChar* end, regex_t* reg, ScanEnv* env);
 extern int    onig_free_shared_cclass_table(void);
