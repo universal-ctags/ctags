@@ -40,8 +40,8 @@ libonigmo_la_SOURCES = regint.h regparse.h regenc.h st.h \
 
 libonigmo_la_LDFLAGS = -version-info $(LTVERSION) -no-undefined
 
-EXTRA_DIST = .gitignore onigmo.pc.in HISTORY README.ja index.html \
-	index_ja.html doc/API doc/API.ja doc/RE doc/RE.ja doc/FAQ doc/FAQ.ja \
+EXTRA_DIST = .gitignore onigmo.pc.in HISTORY README.ja README.md \
+	doc/API doc/API.ja doc/RE doc/RE.ja doc/FAQ doc/FAQ.ja \
 	doc/UnicodeProps.txt \
 	tool/.gitignore tool/Makefile tool/case-folding.rb \
 	tool/convert-name2ctype.sh tool/convert-jis-props.sh \
