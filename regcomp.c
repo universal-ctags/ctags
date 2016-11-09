@@ -6249,7 +6249,7 @@ onig_print_compiled_byte_code(FILE* f, UChar* bp, UChar* bpend, UChar** nextp,
       break;
     case ARG_RELADDR:
       GET_RELADDR_INC(addr, bp);
-      fprintf(f, ":(+%d)", addr);
+      fprintf(f, ":(%s%d)", (addr >= 0) ? "+" : "", addr);
       break;
     case ARG_ABSADDR:
       GET_ABSADDR_INC(addr, bp);
@@ -6438,7 +6438,7 @@ onig_print_compiled_byte_code(FILE* f, UChar* bp, UChar* bpend, UChar** nextp,
     case OP_PUSH_IF_PEEK_NEXT:
       addr = *((RelAddrType* )bp);
       bp += SIZE_RELADDR;
-      fprintf(f, ":(%d)", addr);
+      fprintf(f, ":(%s%d)", (addr >= 0) ? "+" : "", addr);
       p_string(f, 1, bp);
       bp += 1;
       break;
@@ -6451,7 +6451,7 @@ onig_print_compiled_byte_code(FILE* f, UChar* bp, UChar* bpend, UChar** nextp,
     case OP_PUSH_LOOK_BEHIND_NOT:
       GET_RELADDR_INC(addr, bp);
       GET_LENGTH_INC(len, bp);
-      fprintf(f, ":%d:(%d)", len, addr);
+      fprintf(f, ":%d:(%s%d)", len, (addr >= 0) ? "+" : "", addr);
       break;
 
     case OP_STATE_CHECK_PUSH:
@@ -6460,13 +6460,13 @@ onig_print_compiled_byte_code(FILE* f, UChar* bp, UChar* bpend, UChar** nextp,
       bp += SIZE_STATE_CHECK_NUM;
       addr = *((RelAddrType* )bp);
       bp += SIZE_RELADDR;
-      fprintf(f, ":%d:(%d)", scn, addr);
+      fprintf(f, ":%d:(%s%d)", scn, (addr >= 0) ? "+" : "", addr);
       break;
 
     case OP_CONDITION:
       GET_MEMNUM_INC(mem, bp);
       GET_RELADDR_INC(addr, bp);
-      fprintf(f, ":%d:(%d)", mem, addr);
+      fprintf(f, ":%d:(%s%d)", mem, (addr >= 0) ? "+" : "", addr);
       break;
 
     default:
