@@ -1430,7 +1430,6 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     &&L_OP_CCLASS_NOT,
     &&L_OP_CCLASS_MB_NOT,
     &&L_OP_CCLASS_MIX_NOT,
-    &&L_OP_CCLASS_NODE,          /* pointer to CClassNode node */
 
     &&L_OP_ANYCHAR,                 /* "."  */
     &&L_OP_ANYCHAR_ML,              /* "."  multi-line */
@@ -2091,25 +2090,6 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
 	GET_LENGTH_INC(tlen, p);
 	p += tlen;
 	s++;
-      }
-      MOP_OUT;
-      NEXT;
-
-    CASE(OP_CCLASS_NODE)  MOP_IN(OP_CCLASS_NODE);
-      {
-	OnigCodePoint code;
-	void *node;
-	int mb_len;
-	UChar *ss;
-
-	DATA_ENSURE(1);
-	GET_POINTER_INC(node, p);
-	mb_len = enclen(encode, s, end);
-	ss = s;
-	s += mb_len;
-	DATA_ENSURE(0);
-	code = ONIGENC_MBC_TO_CODE(encode, ss, s);
-	if (onig_is_code_in_cc_len(mb_len, code, node) == 0) goto fail;
       }
       MOP_OUT;
       NEXT;

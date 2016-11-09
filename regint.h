@@ -551,7 +551,6 @@ enum OpCode {
   OP_CCLASS_NOT,
   OP_CCLASS_MB_NOT,
   OP_CCLASS_MIX_NOT,
-  OP_CCLASS_NODE,       /* pointer to CClassNode node */
 
   OP_ANYCHAR,                 /* "."  */
   OP_ANYCHAR_ML,              /* "."  multi-line */
@@ -765,13 +764,10 @@ typedef void* PointerType;
 
 /* cclass node */
 #define FLAG_NCCLASS_NOT           (1<<0)
-#define FLAG_NCCLASS_SHARE         (1<<1)
 
 #define NCCLASS_SET_NOT(nd)     NCCLASS_FLAG_SET(nd, FLAG_NCCLASS_NOT)
-#define NCCLASS_SET_SHARE(nd)   NCCLASS_FLAG_SET(nd, FLAG_NCCLASS_SHARE)
 #define NCCLASS_CLEAR_NOT(nd)   NCCLASS_FLAG_CLEAR(nd, FLAG_NCCLASS_NOT)
 #define IS_NCCLASS_NOT(nd)      IS_NCCLASS_FLAG_ON(nd, FLAG_NCCLASS_NOT)
-#define IS_NCCLASS_SHARE(nd)    IS_NCCLASS_FLAG_ON(nd, FLAG_NCCLASS_SHARE)
 
 typedef struct {
   int type;

@@ -254,6 +254,7 @@ add_mem_num(regex_t* reg, int num)
   return 0;
 }
 
+#if 0
 static int
 add_pointer(regex_t* reg, void* addr)
 {
@@ -262,6 +263,7 @@ add_pointer(regex_t* reg, void* addr)
   BBUF_ADD(reg, &ptr, SIZE_POINTER);
   return 0;
 }
+#endif
 
 static int
 add_option(regex_t* reg, OnigOptionType option)
@@ -582,11 +584,6 @@ compile_length_cclass_node(CClassNode* cc, regex_t* reg)
 {
   int len;
 
-  if (IS_NCCLASS_SHARE(cc)) {
-    len = SIZE_OPCODE + SIZE_POINTER;
-    return len;
-  }
-
   if (IS_NULL(cc->mbuf)) {
     len = SIZE_OPCODE + SIZE_BITSET;
   }
@@ -611,12 +608,6 @@ static int
 compile_cclass_node(CClassNode* cc, regex_t* reg)
 {
   int r;
-
-  if (IS_NCCLASS_SHARE(cc)) {
-    add_opcode(reg, OP_CCLASS_NODE);
-    r = add_pointer(reg, cc);
-    return r;
-  }
 
   if (IS_NULL(cc->mbuf)) {
     if (IS_NCCLASS_NOT(cc))
@@ -6100,7 +6091,6 @@ OnigOpInfoType OnigOpInfo[] = {
   { OP_CCLASS_NOT,        "cclass-not",      ARG_SPECIAL },
   { OP_CCLASS_MB_NOT,     "cclass-mb-not",   ARG_SPECIAL },
   { OP_CCLASS_MIX_NOT,    "cclass-mix-not",  ARG_SPECIAL },
-  { OP_CCLASS_NODE,       "cclass-node",     ARG_SPECIAL },
   { OP_ANYCHAR,           "anychar",         ARG_NON },
   { OP_ANYCHAR_ML,        "anychar-ml",      ARG_NON },
   { OP_ANYCHAR_STAR,      "anychar*",        ARG_NON },
@@ -6374,16 +6364,6 @@ onig_print_compiled_byte_code(FILE* f, UChar* bp, UChar* bpend, UChar** nextp,
       GET_CODE_POINT(code, q);
       bp += len;
       fprintf(f, ":%d:%d:%d", n, (int )code, len);
-      break;
-
-    case OP_CCLASS_NODE:
-      {
-	CClassNode *cc;
-
-	GET_POINTER_INC(cc, bp);
-	n = bitset_on_num(cc->bs);
-	fprintf(f, ":%"PRIuPTR":%d", (uintptr_t )cc, n);
-      }
       break;
 
     case OP_BACKREFN_IC:
