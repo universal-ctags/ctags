@@ -5640,16 +5640,16 @@ onig_transfer(regex_t* to, regex_t* from)
 }
 
 #ifdef ONIG_DEBUG_COMPILE
-static void print_compiled_byte_code_list P_((FILE* f, regex_t* reg));
+static void print_compiled_byte_code_list(FILE* f, regex_t* reg);
 #endif
 #ifdef ONIG_DEBUG_PARSE_TREE
-static void print_tree P_((FILE* f, Node* node));
+static void print_tree(FILE* f, Node* node);
 #endif
 
 #ifdef RUBY
 extern int
 onig_compile(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
-	      OnigErrorInfo* einfo)
+	     OnigErrorInfo* einfo)
 {
   return onig_compile_ruby(reg, pattern, pattern_end, einfo, NULL, 0);
 }
@@ -5662,7 +5662,7 @@ onig_compile_ruby(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
 #else
 extern int
 onig_compile(regex_t* reg, const UChar* pattern, const UChar* pattern_end,
-	      OnigErrorInfo* einfo)
+	     OnigErrorInfo* einfo)
 #endif
 {
 #define COMPILE_INIT_SIZE  20
