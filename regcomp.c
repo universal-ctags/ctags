@@ -5646,11 +5646,13 @@ onig_region_memsize(const OnigRegion *regs)
   xfree(from);\
 } while (0)
 
+#if 0
 extern void
 onig_transfer(regex_t* to, regex_t* from)
 {
   REGEX_TRANSFER(to, from);
 }
+#endif
 
 #ifdef ONIG_DEBUG_COMPILE
 static void print_compiled_byte_code_list(FILE* f, regex_t* reg);
