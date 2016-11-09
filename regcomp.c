@@ -992,9 +992,12 @@ compile_length_quantifier_node(QtfrNode* qn, regex_t* reg)
     }
 
     if (qn->greedy) {
+#ifdef USE_OP_PUSH_OR_JUMP_EXACT
       if (IS_NOT_NULL(qn->head_exact))
 	len += SIZE_OP_PUSH_OR_JUMP_EXACT1 + mod_tlen + SIZE_OP_JUMP;
-      else if (IS_NOT_NULL(qn->next_head_exact))
+      else
+#endif
+      if (IS_NOT_NULL(qn->next_head_exact))
 	len += SIZE_OP_PUSH_IF_PEEK_NEXT + mod_tlen + SIZE_OP_JUMP;
       else
 	len += SIZE_OP_PUSH + mod_tlen + SIZE_OP_JUMP;
@@ -1060,9 +1063,12 @@ compile_quantifier_node(QtfrNode* qn, regex_t* reg)
       (qn->lower <= 1 || tlen * qn->lower <= QUANTIFIER_EXPAND_LIMIT_SIZE)) {
     if (qn->lower == 1 && tlen > QUANTIFIER_EXPAND_LIMIT_SIZE) {
       if (qn->greedy) {
+#ifdef USE_OP_PUSH_OR_JUMP_EXACT
 	if (IS_NOT_NULL(qn->head_exact))
 	  r = add_opcode_rel_addr(reg, OP_JUMP, SIZE_OP_PUSH_OR_JUMP_EXACT1);
-	else if (IS_NOT_NULL(qn->next_head_exact))
+	else
+#endif
+	if (IS_NOT_NULL(qn->next_head_exact))
 	  r = add_opcode_rel_addr(reg, OP_JUMP, SIZE_OP_PUSH_IF_PEEK_NEXT);
 	else
 	  r = add_opcode_rel_addr(reg, OP_JUMP, SIZE_OP_PUSH);
@@ -1078,6 +1084,7 @@ compile_quantifier_node(QtfrNode* qn, regex_t* reg)
     }
 
     if (qn->greedy) {
+#ifdef USE_OP_PUSH_OR_JUMP_EXACT
       if (IS_NOT_NULL(qn->head_exact)) {
 	r = add_opcode_rel_addr(reg, OP_PUSH_OR_JUMP_EXACT1,
 			     mod_tlen + SIZE_OP_JUMP);
@@ -1088,7 +1095,9 @@ compile_quantifier_node(QtfrNode* qn, regex_t* reg)
 	r = add_opcode_rel_addr(reg, OP_JUMP,
 	-(mod_tlen + (int )SIZE_OP_JUMP + (int )SIZE_OP_PUSH_OR_JUMP_EXACT1));
       }
-      else if (IS_NOT_NULL(qn->next_head_exact)) {
+      else
+#endif
+      if (IS_NOT_NULL(qn->next_head_exact)) {
 	r = add_opcode_rel_addr(reg, OP_PUSH_IF_PEEK_NEXT,
 				mod_tlen + SIZE_OP_JUMP);
 	if (r) return r;
@@ -2739,9 +2748,11 @@ get_head_value_node(Node* node, int exact, regex_t* reg)
     {
       QtfrNode* qn = NQTFR(node);
       if (qn->lower > 0) {
+#ifdef USE_OP_PUSH_OR_JUMP_EXACT
 	if (IS_NOT_NULL(qn->head_exact))
 	  n = qn->head_exact;
 	else
+#endif
 	  n = get_head_value_node(qn->target, exact, reg);
       }
     }

@@ -1501,7 +1501,11 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
     &&L_OP_JUMP,
     &&L_OP_PUSH,
     &&L_OP_POP,
+# ifdef USE_OP_PUSH_OR_JUMP_EXACT
     &&L_OP_PUSH_OR_JUMP_EXACT1,  /* if match exact then push, else jump. */
+# else
+    &&L_DEFAULT,
+# endif
     &&L_OP_PUSH_IF_PEEK_NEXT,    /* if match exact then push, else none. */
     &&L_OP_REPEAT,               /* {n,m} */
     &&L_OP_REPEAT_NG,            /* {n,m}? (non greedy) */
@@ -2847,6 +2851,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       MOP_OUT;
       JUMP;
 
+#ifdef USE_OP_PUSH_OR_JUMP_EXACT
     CASE(OP_PUSH_OR_JUMP_EXACT1)  MOP_IN(OP_PUSH_OR_JUMP_EXACT1);
       GET_RELADDR_INC(addr, p);
       if (*p == *s && DATA_ENSURE_CHECK1) {
@@ -2858,6 +2863,7 @@ match_at(regex_t* reg, const UChar* str, const UChar* end,
       p += (addr + 1);
       MOP_OUT;
       JUMP;
+#endif
 
     CASE(OP_PUSH_IF_PEEK_NEXT)  MOP_IN(OP_PUSH_IF_PEEK_NEXT);
       GET_RELADDR_INC(addr, p);
