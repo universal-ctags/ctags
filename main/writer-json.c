@@ -42,7 +42,7 @@ tagWriter jsonWriter = {
 
 static json_t* escapeFieldValue (const tagEntryInfo * tag, fieldType ftype)
 {
-	const char *str = renderFieldEscaped (ftype, tag, NO_PARSER_FIELD);
+	const char *str = renderFieldEscaped (jsonWriter.type, ftype, tag, NO_PARSER_FIELD);
 	if (str)
 		return json_string (str);
 	else

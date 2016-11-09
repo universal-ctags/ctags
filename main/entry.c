@@ -1042,8 +1042,9 @@ static unsigned int queueTagEntry(const tagEntryInfo *const tag)
 
 static void buildFqTagCache (const tagEntryInfo *const tag)
 {
-	renderFieldEscaped (FIELD_SCOPE_KIND_LONG, tag, NO_PARSER_FIELD);
-	renderFieldEscaped (FIELD_SCOPE, tag, NO_PARSER_FIELD);
+	/* TODO: WRITER_DEFAULT should not be used here.*/
+	renderFieldEscaped (WRITER_DEFAULT, FIELD_SCOPE_KIND_LONG, tag, NO_PARSER_FIELD);
+	renderFieldEscaped (WRITER_DEFAULT, FIELD_SCOPE, tag, NO_PARSER_FIELD);
 }
 
 extern void setupWriter (void)

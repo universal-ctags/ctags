@@ -19,7 +19,8 @@
    preWriteEntry, postWriteEntry should free it. */
 
 typedef enum eWriterType {
-	WRITER_CTAGS,
+	WRITER_DEFAULT,
+	WRITER_CTAGS = WRITER_DEFAULT,
 	WRITER_ETAGS,
 	WRITER_XREF,
 	WRITER_JSON,
