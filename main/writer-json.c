@@ -181,6 +181,14 @@ extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNU
 
 #else /* HAVE_JANSSON */
 
+tagWriter jsonWriter = {
+	.writeEntry = NULL,
+	.writePtagEntry = NULL,
+	.preWriteEntry = NULL,
+	.postWriteEntry = NULL,
+	.useStdoutByDefault = true,
+};
+
 extern bool ptagMakeJsonOutputVersion (ptagDesc *desc, void *data CTAGS_ATTR_UNUSED)
 {
 	return false;
