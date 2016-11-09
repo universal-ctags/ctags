@@ -3296,6 +3296,7 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
     }
   }
   else {
+# if OPT_EXACT_MAXLEN >= ONIG_CHAR_TABLE_SIZE
     while (s < end) {
       p = se = s + tlen1;
       t = tail;
@@ -3309,6 +3310,7 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
 	s += enclen(reg->enc, s, end);
       } while ((s - t) < skip && s < end);
     }
+# endif
   }
 
   return (UChar* )NULL;
@@ -3349,6 +3351,7 @@ bm_search(regex_t* reg, const UChar* target, const UChar* target_end,
     }
   }
   else { /* see int_map[] */
+# if OPT_EXACT_MAXLEN >= ONIG_CHAR_TABLE_SIZE
     while (s < end) {
       p = s;
       t = tail;
@@ -3358,6 +3361,7 @@ bm_search(regex_t* reg, const UChar* target, const UChar* target_end,
       }
       s += reg->int_map[*s];
     }
+# endif
   }
   return (UChar* )NULL;
 }
@@ -3401,6 +3405,7 @@ bm_search_notrev_ic(regex_t* reg, const UChar* target, const UChar* target_end,
     }
   }
   else {
+# if OPT_EXACT_MAXLEN >= ONIG_CHAR_TABLE_SIZE
     while (s < end) {
       se = s + tlen1;
       if (str_lower_case_match(enc, case_fold_flag, target, target_end,
@@ -3412,6 +3417,7 @@ bm_search_notrev_ic(regex_t* reg, const UChar* target, const UChar* target_end,
 	s += enclen(reg->enc, s, end);
       } while ((s - t) < skip && s < end);
     }
+# endif
   }
 
   return (UChar* )NULL;
@@ -3448,6 +3454,7 @@ bm_search_ic(regex_t* reg, const UChar* target, const UChar* target_end,
     }
   }
   else { /* see int_map[] */
+# if OPT_EXACT_MAXLEN >= ONIG_CHAR_TABLE_SIZE
     while (s < end) {
       p = s - (target_end - target) + 1;
       if (str_lower_case_match(enc, case_fold_flag, target, target_end,
@@ -3455,6 +3462,7 @@ bm_search_ic(regex_t* reg, const UChar* target, const UChar* target_end,
 	return (UChar* )p;
       s += reg->int_map[*s];
     }
+# endif
   }
   return (UChar* )NULL;
 }
@@ -3502,6 +3510,7 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
     }
   }
   else {
+# if OPT_EXACT_MAXLEN >= ONIG_CHAR_TABLE_SIZE
     while (s < end) {
       p = se = s + tlen1;
       t = tail;
@@ -3516,6 +3525,7 @@ bm_search_notrev(regex_t* reg, const UChar* target, const UChar* target_end,
 	s += enclen(enc, s, end);
       } while ((s - t) < skip && s < end);
     }
+# endif
   }
 
   return (UChar* )NULL;
@@ -3550,6 +3560,7 @@ bm_search(regex_t* reg, const UChar* target, const UChar* target_end,
     }
   }
   else { /* see int_map[] */
+# if OPT_EXACT_MAXLEN >= ONIG_CHAR_TABLE_SIZE
     while (s < end) {
       p = s;
       t = tail;
@@ -3560,6 +3571,7 @@ bm_search(regex_t* reg, const UChar* target, const UChar* target_end,
       if (s + 1 >= end) break;
       s += reg->int_map[s[1]];
     }
+# endif
   }
   return (UChar* )NULL;
 }
@@ -3604,6 +3616,7 @@ bm_search_notrev_ic(regex_t* reg, const UChar* target, const UChar* target_end,
     }
   }
   else {
+# if OPT_EXACT_MAXLEN >= ONIG_CHAR_TABLE_SIZE
     while (s < end) {
       se = s + tlen1;
       if (str_lower_case_match(enc, case_fold_flag, target, target_end,
@@ -3616,6 +3629,7 @@ bm_search_notrev_ic(regex_t* reg, const UChar* target, const UChar* target_end,
 	s += enclen(enc, s, end);
       } while ((s - t) < skip && s < end);
     }
+# endif
   }
 
   return (UChar* )NULL;
@@ -3655,6 +3669,7 @@ bm_search_ic(regex_t* reg, const UChar* target, const UChar* target_end,
     }
   }
   else { /* see int_map[] */
+# if OPT_EXACT_MAXLEN >= ONIG_CHAR_TABLE_SIZE
     while (s < end) {
       p = s - tlen1;
       if (str_lower_case_match(enc, case_fold_flag, target, target_end,
@@ -3663,6 +3678,7 @@ bm_search_ic(regex_t* reg, const UChar* target, const UChar* target_end,
       if (s + 1 >= end) break;
       s += reg->int_map[s[1]];
     }
+# endif
   }
   return (UChar* )NULL;
 }

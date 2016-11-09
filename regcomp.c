@@ -4180,6 +4180,10 @@ set_bm_skip(UChar* s, UChar* end, regex_t* reg,
     }
   }
   else {
+# if OPT_EXACT_MAXLEN < ONIG_CHAR_TABLE_SIZE
+    /* This should not happen. */
+    return ONIGERR_TYPE_BUG;
+# else
     if (IS_NULL(*int_skip)) {
       *int_skip = (int* )xmalloc(sizeof(int) * ONIG_CHAR_TABLE_SIZE);
       if (IS_NULL(*int_skip)) return ONIGERR_MEMORY;
@@ -4208,6 +4212,7 @@ set_bm_skip(UChar* s, UChar* end, regex_t* reg,
 	}
       }
     }
+# endif
   }
   return 0;
 }
@@ -4253,6 +4258,10 @@ set_bm_skip(UChar* s, UChar* end, regex_t* reg,
     }
   }
   else {
+# if OPT_EXACT_MAXLEN < ONIG_CHAR_TABLE_SIZE
+    /* This should not happen. */
+    return ONIGERR_TYPE_BUG;
+# else
     if (IS_NULL(*int_skip)) {
       *int_skip = (int* )xmalloc(sizeof(int) * ONIG_CHAR_TABLE_SIZE);
       if (IS_NULL(*int_skip)) return ONIGERR_MEMORY;
@@ -4281,12 +4290,11 @@ set_bm_skip(UChar* s, UChar* end, regex_t* reg,
 	}
       }
     }
+# endif
   }
   return 0;
 }
 #endif /* USE_SUNDAY_QUICK_SEARCH */
-
-#define OPT_EXACT_MAXLEN   24
 
 typedef struct {
   OnigDistance min;  /* min byte length */
@@ -5286,10 +5294,13 @@ set_optimize_exact_info(regex_t* reg, OptExactInfo* e)
     if (e->len >= 3 || (e->len >= 2 && allow_reverse)) {
       r = set_bm_skip(reg->exact, reg->exact_end, reg,
 		      reg->map, &(reg->int_map), 0);
-      if (r) return r;
-
-      reg->optimize = (allow_reverse != 0
+      if (r == 0) {
+	reg->optimize = (allow_reverse != 0
 		       ? ONIG_OPTIMIZE_EXACT_BM : ONIG_OPTIMIZE_EXACT_BM_NOT_REV);
+      }
+      else {
+	reg->optimize = ONIG_OPTIMIZE_EXACT;
+      }
     }
     else {
       reg->optimize = ONIG_OPTIMIZE_EXACT;
