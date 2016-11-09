@@ -16,10 +16,10 @@ extern tagWriter xrefWriter;
 extern tagWriter jsonWriter;
 
 static tagWriter *writerTable [WRITER_COUNT] = {
-	&ctagsWriter,
-	&etagsWriter,
-	&xrefWriter,
-	&jsonWriter,
+	[WRITER_CTAGS] = &ctagsWriter,
+	[WRITER_ETAGS] = &etagsWriter,
+	[WRITER_XREF]  = &xrefWriter,
+	[WRITER_JSON]  = &jsonWriter,
 };
 
 static void *writerData;
