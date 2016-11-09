@@ -77,7 +77,7 @@
 #define USE_NO_INVALID_QUANTIFIER
 
 /* internal config */
-#define USE_OP_PUSH_OR_JUMP_EXACT
+/* #define USE_OP_PUSH_OR_JUMP_EXACT */
 #define USE_QTFR_PEEK_NEXT
 #define USE_ST_LIBRARY
 #define USE_SUNDAY_QUICK_SEARCH
