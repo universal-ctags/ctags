@@ -180,12 +180,12 @@ extern int main(int argc, char* argv[])
   r |= exec(ONIG_ENCODING_ISO_8859_16, ONIG_OPTION_IGNORECASE,
 	   (char* )pattern, (char* )str);
 
-  r |= exec(ONIG_ENCODING_KOI8_R, ONIG_OPTION_NONE, "a+", "bbbaaaccc");
-  r |= exec(ONIG_ENCODING_KOI8_U, ONIG_OPTION_NONE, "a+", "bbbaaaccc");
-  r |= exec(ONIG_ENCODING_EUC_TW, ONIG_OPTION_NONE, "b*a+?c+", "bbbaaaccc");
-  r |= exec(ONIG_ENCODING_EUC_KR, ONIG_OPTION_NONE, "a+", "bbbaaaccc");
-  r |= exec(ONIG_ENCODING_EUC_CN, ONIG_OPTION_NONE, "c+", "bbbaaaccc");
-  r |= exec(ONIG_ENCODING_BIG5,   ONIG_OPTION_NONE, "a+", "bbbaaaccc");
+  r |= exec(ONIG_ENCODING_KOI8_R, ONIG_OPTION_IGNORECASE, "a+", "bbbaaaccc");
+  r |= exec(ONIG_ENCODING_KOI8_U, ONIG_OPTION_IGNORECASE, "a+", "bbbaaaccc");
+  r |= exec(ONIG_ENCODING_EUC_TW, ONIG_OPTION_IGNORECASE, "b*a+?c+", "bbbaaaccc");
+  r |= exec(ONIG_ENCODING_EUC_KR, ONIG_OPTION_IGNORECASE, "a+", "bbbaaaccc");
+  r |= exec(ONIG_ENCODING_EUC_CN, ONIG_OPTION_IGNORECASE, "c+", "bbbaaaccc");
+  r |= exec(ONIG_ENCODING_BIG5,   ONIG_OPTION_IGNORECASE, "a+", "bbbaaaccc");
 
   r |= exec(ONIG_ENCODING_ISO_8859_1, ONIG_OPTION_IGNORECASE,
            "\337", "SS");
