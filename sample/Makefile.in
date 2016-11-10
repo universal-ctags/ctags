@@ -571,7 +571,7 @@ uninstall-am:
 	pdf pdf-am ps ps-am tags uninstall uninstall-am
 
 
-test: encode listcap names posix simple sql syntax crnl
+test: encode$(EXEEXT) listcap$(EXEEXT) names$(EXEEXT) posix$(EXEEXT) simple$(EXEEXT) sql$(EXEEXT) syntax$(EXEEXT) crnl$(EXEEXT)
 	$(sampledir)/encode
 	$(sampledir)/listcap
 	$(sampledir)/names

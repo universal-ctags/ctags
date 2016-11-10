@@ -11,12 +11,12 @@ posix_SOURCES   = posix.c
 simple_SOURCES  = simple.c
 sql_SOURCES     = sql.c
 syntax_SOURCES  = syntax.c
-crnl_SOURCES  = crnl.c
+crnl_SOURCES    = crnl.c
 
 
 sampledir = $(top_builddir)/sample
 
-test: encode listcap names posix simple sql syntax crnl
+test: encode$(EXEEXT) listcap$(EXEEXT) names$(EXEEXT) posix$(EXEEXT) simple$(EXEEXT) sql$(EXEEXT) syntax$(EXEEXT) crnl$(EXEEXT)
 	$(sampledir)/encode
 	$(sampledir)/listcap
 	$(sampledir)/names
