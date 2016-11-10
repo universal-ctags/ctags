@@ -1151,7 +1151,7 @@ check_keyword:
 					{
 						CXX_DEBUG_PRINT(
 								"The token has replacement %s: applying",
-								szReplacement
+								pIgnore->replacement
 							);
 						vStringClear(t->pszWord);
 						vStringCatS(t->pszWord,pIgnore->replacement);
