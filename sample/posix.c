@@ -88,6 +88,14 @@ extern int main(int argc, char* argv[])
   }
   x(&reg, pattern, (UChar* )"a\nb\n");
 
+  /* Error test */
+  pattern = (UChar* )" [";
+  r = regcomp(&reg, (char* )pattern, REG_EXTENDED);
+  if (r) {
+    regerror(r, &reg, buf, sizeof(buf));
+    fprintf(stderr, "OK(E): %s\n", buf);
+  }
+
   regfree(&reg);
   return 0;
 }
