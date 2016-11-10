@@ -2168,6 +2168,7 @@ enum ReduceType {
 };
 
 static enum ReduceType const ReduceTypeTable[6][6] = {
+/* '?',     '*',     '+',    '??',    '*?',    '+?'      p / c   */
   {RQ_DEL,  RQ_A,    RQ_A,   RQ_QQ,   RQ_AQ,   RQ_ASIS}, /* '?'  */
   {RQ_DEL,  RQ_DEL,  RQ_DEL, RQ_P_QQ, RQ_P_QQ, RQ_DEL},  /* '*'  */
   {RQ_A,    RQ_A,    RQ_DEL, RQ_ASIS, RQ_P_QQ, RQ_DEL},  /* '+'  */
