@@ -1,4 +1,4 @@
-Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
+Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/11/11
 
 #include <onigmo.h>
 
@@ -298,6 +298,27 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/10/10
     ONIG_OPTION_NOTBOS       string head(str) isn't considered as begin of string (\A)
     ONIG_OPTION_NOTEOS       string end (end) isn't considered as end of string (\z)
     ONIG_OPTION_POSIX_REGION region argument is regmatch_t[] type of POSIX API.
+
+
+# int onig_scan(regex_t* reg, const UChar* str, const UChar* end,
+                OnigRegion* region, OnigOptionType option,
+                int (*scan_callback)(int, int, OnigRegion*, void*),
+                void* callback_arg)
+
+  Scan string and callback with matching region.
+
+  normal return: number of matching times
+  error:         error code
+  interruption:  return value of callback function (!= 0)
+
+  arguments
+  1 reg:    regex object
+  2 str:    target string
+  3 end:    terminate address of target string
+  4 region: address for return group match range info (NULL is allowed)
+  5 option: search time option
+  6 scan_callback: callback function (defined by user)
+  7 callback_arg:  optional argument passed to callback
 
 
 # OnigRegion* onig_region_new(void)

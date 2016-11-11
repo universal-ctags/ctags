@@ -4431,6 +4431,46 @@ onig_search_gpos(regex_t* reg, const UChar* str, const UChar* end,
   return s - str;
 }
 
+extern int
+onig_scan(regex_t* reg, const UChar* str, const UChar* end,
+	  OnigRegion* region, OnigOptionType option,
+	  int (*scan_callback)(int, int, OnigRegion*, void*),
+	  void* callback_arg)
+{
+  int r;
+  int n;
+  int rs;
+  const UChar* start;
+
+  n = 0;
+  start = str;
+  while (1) {
+    r = onig_search(reg, str, end, start, end, region, option);
+    if (r >= 0) {
+      rs = scan_callback(n, r, region, callback_arg);
+      n++;
+      if (rs != 0)
+	return rs;
+
+      if (region->end[0] == start - str)
+	start++;
+      else
+	start = str + region->end[0];
+
+      if (start > end)
+	break;
+    }
+    else if (r == ONIG_MISMATCH) {
+      break;
+    }
+    else { /* error */
+      return r;
+    }
+  }
+
+  return n;
+}
+
 extern OnigEncoding
 onig_get_encoding(const regex_t* reg)
 {
