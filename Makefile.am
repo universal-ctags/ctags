@@ -72,15 +72,6 @@ pkgconfigdir   = $(libdir)/pkgconfig
 pkgconfig_DATA = onigmo.pc
 CLEANFILES = onigmo.pc
 
-dll:
-	$(CXX) -shared -Wl,--output-def,libonigmo.def -o libonigmo.dll *.o \
-	$(LIBS)
-	strip libonigmo.dll
-
-# Ruby TEST
-rtest:
-	$(RUBYDIR)/ruby -w -Ke $(srcdir)/test.rb
-
 # character-types-table source generator
 mktable: $(encdir)/mktable.c $(srcdir)/regenc.h
 	$(CC) -I$(top_srcdir) -o mktable $(encdir)/mktable.c

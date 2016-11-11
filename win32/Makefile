@@ -35,7 +35,6 @@ RMDIR   = rd /s/q
 CC = cl
 RC = rc
 DEFS = -DHAVE_CONFIG_H -DEXPORT
-RUBYDIR = ..
 
 !if "$(ARCH)"=="x86"
 PYTHON = py -3.4-32
@@ -135,7 +134,6 @@ onigsources  = regerror.c regparse.c regext.c regcomp.c regexec.c regenc.c \
 	       regsyntax.c regtrav.c regversion.c reggnu.c st.c
 posixsources = regposix.c regposerr.c
 libsources   = $(posixsources) $(onigsources)
-rubysources  = $(onigsources)
 
 encdir       = enc
 distfiles    = README COPYING HISTORY \
@@ -240,10 +238,6 @@ $(WORKDIR)\onigmo.res: win32\onigmo.rc onigmo.h
 
 # Tests
 test: all ctest utest ptest pytest
-
-# Ruby test
-rtest:
-	$(RUBYDIR)\win32\ruby -w -Ke test.rb
 
 # C library test
 ctest: $(WORKDIR)\$(testc).exe

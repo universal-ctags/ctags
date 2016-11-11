@@ -1513,15 +1513,6 @@ onigmo-config: onigmo-config.in
 onigmo.pc: $(srcdir)/onigmo.pc.in Makefile
 	$(do_subst) < $(srcdir)/onigmo.pc.in > $(@)
 
-dll:
-	$(CXX) -shared -Wl,--output-def,libonigmo.def -o libonigmo.dll *.o \
-	$(LIBS)
-	strip libonigmo.dll
-
-# Ruby TEST
-rtest:
-	$(RUBYDIR)/ruby -w -Ke $(srcdir)/test.rb
-
 # character-types-table source generator
 mktable: $(encdir)/mktable.c $(srcdir)/regenc.h
 	$(CC) -I$(top_srcdir) -o mktable $(encdir)/mktable.c
