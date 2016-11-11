@@ -350,7 +350,6 @@ process_token:
 							cxxParserNewStatement();
 						}
 					break;
-					break;
 					case CXXKeywordCASE:
 						// ignore
 						if(!cxxParserParseUpToOneOf(
