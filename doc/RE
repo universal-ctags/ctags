@@ -303,6 +303,10 @@ syntax: ONIG_SYNTAX_RUBY (default)
                         Checks if a group with the given name has matched
                         something.
 
+                        BUG: If the name is defined more than once, the
+                        left-most group is checked, but it should be the
+                        same as \k<name>.
+
 
 8. Backreferences
 
@@ -322,6 +326,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
     ONIG_OPTION_CAPTURE_GROUP is not set.
 
   * ONIG_SYNTAX_PERL: \g{n}, \g{-n} and \g{name} can also be used.
+    BUG: If a name is defined more than once in Perl syntax, only the left-
+    most group should be checked.
 
 
   backreference with recursion level
@@ -389,7 +395,8 @@ syntax: ONIG_SYNTAX_RUBY (default)
 
   * ONIG_SYNTAX_PERL:
     Use (?&name), (?n), (?-n), (?+n), (?R) or (?0) instead of \g<>.
-    Calls with a name that is assigned to more than one groups are allowed.
+    Calls with a name that is assigned to more than one groups are allowed,
+    and the left-most subexp is used.
 
 
 10. Captured group
