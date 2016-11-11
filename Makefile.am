@@ -49,9 +49,6 @@ EXTRA_DIST = .gitignore onigmo.pc.in HISTORY README.ja README.md \
 	win32/Makefile win32/Makefile.mingw win32/config.h win32/testc.c \
 	win32/makedef.py win32/onigmo.rc \
 	$(encdir)/mktable.c \
-	$(sampledir)/encode.c $(sampledir)/listcap.c $(sampledir)/names.c \
-	$(sampledir)/posix.c $(sampledir)/simple.c $(sampledir)/sql.c \
-	$(sampledir)/syntax.c $(sampledir)/scan.c $(sampledir)/crnl.c \
 	test.rb testconv.rb testconvu.rb \
 	onigmo.py testpy.py .editorconfig
 
@@ -113,14 +110,14 @@ testcu_SOURCES = testu.c
 testcu_LDADD = libonigmo.la
 
 
-testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
+$(srcdir)/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
 	ruby -Ke $(srcdir)/testconv.rb < $(srcdir)/test.rb > $@
 
-testu.c: $(srcdir)/test.rb $(srcdir)/testconvu.rb
+$(srcdir)/testu.c: $(srcdir)/test.rb $(srcdir)/testconvu.rb
 	ruby -Ke $(srcdir)/testconvu.rb $(srcdir)/test.rb > $@
 
-win32/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
-	ruby -Ke $(srcdir)/testconv.rb -win < $(srcdir)/test.rb | nkf -cs > $@
+$(srcdir)/win32/testc.c: $(srcdir)/test.rb $(srcdir)/testconv.rb
+	ruby -Ke $(srcdir)/testconv.rb -win < $(srcdir)/test.rb | iconv -f euc-jp -t cp932 | sed -e "s/$$/\r/" > $@
 
 # Python TEST
 pytest:
