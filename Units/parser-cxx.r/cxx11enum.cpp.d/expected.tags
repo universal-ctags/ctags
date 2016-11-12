@@ -1,33 +1,49 @@
-A	input.cpp	/^enum A:int {A_a, A_b, A_c};$/;"	g	file:
-A_a	input.cpp	/^enum A:int {A_a, A_b, A_c};$/;"	e	enum:A	file:
-A_b	input.cpp	/^enum A:int {A_a, A_b, A_c};$/;"	e	enum:A	file:
-A_c	input.cpp	/^enum A:int {A_a, A_b, A_c};$/;"	e	enum:A	file:
-B	input.cpp	/^enum B:long {B_a, B_b, B_c};$/;"	g	file:
-B_a	input.cpp	/^enum B:long {B_a, B_b, B_c};$/;"	e	enum:B	file:
-B_b	input.cpp	/^enum B:long {B_a, B_b, B_c};$/;"	e	enum:B	file:
-B_c	input.cpp	/^enum B:long {B_a, B_b, B_c};$/;"	e	enum:B	file:
-C	input.cpp	/^enum C:unsigned int {C_a, C_b, C_c};$/;"	g	file:
-C_a	input.cpp	/^enum C:unsigned int {C_a, C_b, C_c};$/;"	e	enum:C	file:
-C_b	input.cpp	/^enum C:unsigned int {C_a, C_b, C_c};$/;"	e	enum:C	file:
-C_c	input.cpp	/^enum C:unsigned int {C_a, C_b, C_c};$/;"	e	enum:C	file:
-D	input.cpp	/^  enum D:int {a, b, c};$/;"	g	class:Foo	file:
-EC1	input.cpp	/^enum class EC1:short {EC1_a, EC1_b, EC1_c};$/;"	g	file:
-EC1_a	input.cpp	/^enum class EC1:short {EC1_a, EC1_b, EC1_c};$/;"	e	enum:EC1	file:
-EC1_b	input.cpp	/^enum class EC1:short {EC1_a, EC1_b, EC1_c};$/;"	e	enum:EC1	file:
-EC1_c	input.cpp	/^enum class EC1:short {EC1_a, EC1_b, EC1_c};$/;"	e	enum:EC1	file:
-EC2	input.cpp	/^  enum class EC2:unsigned {EC2_a, EC2_b, EC2_c};$/;"	g	class:Foo	file:
-EC2_a	input.cpp	/^  enum class EC2:unsigned {EC2_a, EC2_b, EC2_c};$/;"	e	enum:Foo::EC2	file:
-EC2_b	input.cpp	/^  enum class EC2:unsigned {EC2_a, EC2_b, EC2_c};$/;"	e	enum:Foo::EC2	file:
-EC2_c	input.cpp	/^  enum class EC2:unsigned {EC2_a, EC2_b, EC2_c};$/;"	e	enum:Foo::EC2	file:
-ES1	input.cpp	/^enum struct ES1:unsigned {ES1_a, ES1_b, ES1_c};$/;"	g	file:
-ES1_a	input.cpp	/^enum struct ES1:unsigned {ES1_a, ES1_b, ES1_c};$/;"	e	enum:ES1	file:
-ES1_b	input.cpp	/^enum struct ES1:unsigned {ES1_a, ES1_b, ES1_c};$/;"	e	enum:ES1	file:
-ES1_c	input.cpp	/^enum struct ES1:unsigned {ES1_a, ES1_b, ES1_c};$/;"	e	enum:ES1	file:
-ES2	input.cpp	/^  enum struct ES2:int {ES2_a, ES2_b, ES2_c};$/;"	g	class:Foo	file:
-ES2_a	input.cpp	/^  enum struct ES2:int {ES2_a, ES2_b, ES2_c};$/;"	e	enum:Foo::ES2	file:
-ES2_b	input.cpp	/^  enum struct ES2:int {ES2_a, ES2_b, ES2_c};$/;"	e	enum:Foo::ES2	file:
-ES2_c	input.cpp	/^  enum struct ES2:int {ES2_a, ES2_b, ES2_c};$/;"	e	enum:Foo::ES2	file:
-Foo	input.cpp	/^class Foo {$/;"	c	file:
-a	input.cpp	/^  enum D:int {a, b, c};$/;"	e	enum:Foo::D	file:
-b	input.cpp	/^  enum D:int {a, b, c};$/;"	e	enum:Foo::D	file:
-c	input.cpp	/^  enum D:int {a, b, c};$/;"	e	enum:Foo::D	file:
+SOME_MACRO	input.cpp	/^#define SOME_MACRO(/;"	d	file:	end:2
+whatever_t	input.cpp	/^typedef int whatever_t;$/;"	t	typeref:typename:int	file:
+uint8_t	input.cpp	/^typedef unsigned char uint8_t;$/;"	t	typeref:typename:unsigned char	file:
+E1	input.cpp	/^enum E1 : int { E1_member1, E1_member2 };$/;"	g	typeref:typename:int	file:	end:7
+E1_member1	input.cpp	/^enum E1 : int { E1_member1, E1_member2 };$/;"	e	enum:E1	file:
+E1_member2	input.cpp	/^enum E1 : int { E1_member1, E1_member2 };$/;"	e	enum:E1	file:
+E2	input.cpp	/^enum E2 : long { E2_member1 };$/;"	g	typeref:typename:long	file:	end:8
+E2_member1	input.cpp	/^enum E2 : long { E2_member1 };$/;"	e	enum:E2	file:
+E3	input.cpp	/^enum E3 : unsigned int { E3_member1 };$/;"	g	typeref:typename:unsigned int	file:	end:9
+E3_member1	input.cpp	/^enum E3 : unsigned int { E3_member1 };$/;"	e	enum:E3	file:
+E4	input.cpp	/^enum E4 : unsigned long long int { } E4_var1, E4_var2;$/;"	g	typeref:typename:unsigned long long int	file:	end:10
+E4_var1	input.cpp	/^enum E4 : unsigned long long int { } E4_var1, E4_var2;$/;"	v	typeref:enum:E4
+E4_var2	input.cpp	/^enum E4 : unsigned long long int { } E4_var1, E4_var2;$/;"	v	typeref:enum:E4
+E5	input.cpp	/^enum E5 : whatever_t { E5_member1 } E5_var1;$/;"	g	typeref:typename:whatever_t	file:	end:11
+E5_member1	input.cpp	/^enum E5 : whatever_t { E5_member1 } E5_var1;$/;"	e	enum:E5	file:
+E5_var1	input.cpp	/^enum E5 : whatever_t { E5_member1 } E5_var1;$/;"	v	typeref:enum:E5
+EC1	input.cpp	/^enum class EC1 { };$/;"	g	file:	end:13	properties:scopedenum
+EC2	input.cpp	/^enum class EC2 : short { EC2_member1, EC2_member2 };$/;"	g	typeref:typename:short	file:	end:14	properties:scopedenum
+EC2_member1	input.cpp	/^enum class EC2 : short { EC2_member1, EC2_member2 };$/;"	e	enum:EC2	file:
+EC2_member2	input.cpp	/^enum class EC2 : short { EC2_member1, EC2_member2 };$/;"	e	enum:EC2	file:
+ES1	input.cpp	/^enum struct ES1 { };$/;"	g	file:	end:16	properties:scopedenum
+ES2	input.cpp	/^enum struct ES2 : unsigned { ES2_member1, ES2_member2 };$/;"	g	typeref:typename:unsigned	file:	end:17	properties:scopedenum
+ES2_member1	input.cpp	/^enum struct ES2 : unsigned { ES2_member1, ES2_member2 };$/;"	e	enum:ES2	file:
+ES2_member2	input.cpp	/^enum struct ES2 : unsigned { ES2_member1, ES2_member2 };$/;"	e	enum:ES2	file:
+ES3	input.cpp	/^enum struct ES3 : uint8_t { ES3_member1 = SOME_MACRO(1,whatever appears here), ES3_member2 };$/;"	g	typeref:typename:uint8_t	file:	end:18	properties:scopedenum
+ES3_member1	input.cpp	/^enum struct ES3 : uint8_t { ES3_member1 = SOME_MACRO(1,whatever appears here), ES3_member2 };$/;"	e	enum:ES3	file:
+ES3_member2	input.cpp	/^enum struct ES3 : uint8_t { ES3_member1 = SOME_MACRO(1,whatever appears here), ES3_member2 };$/;"	e	enum:ES3	file:
+ES4	input.cpp	/^enum struct ES4 : unsigned long long int { ES4_member1 = (1234 * 10) << 1 };$/;"	g	typeref:typename:unsigned long long int	file:	end:19	properties:scopedenum
+ES4_member1	input.cpp	/^enum struct ES4 : unsigned long long int { ES4_member1 = (1234 * 10) << 1 };$/;"	e	enum:ES4	file:
+ES5	input.cpp	/^enum struct ES5 : signed whatever_t { } ES4_var1[10];$/;"	g	typeref:typename:signed whatever_t	file:	end:20	properties:scopedenum
+ES4_var1	input.cpp	/^enum struct ES5 : signed whatever_t { } ES4_var1[10];$/;"	v	typeref:enum:ES5[10]
+__anon5f0fdc1d0103	input.cpp	/^enum { Anon1_member1, Anon1_member2 };$/;"	g	file:	end:22
+Anon1_member1	input.cpp	/^enum { Anon1_member1, Anon1_member2 };$/;"	e	enum:__anon5f0fdc1d0103	file:
+Anon1_member2	input.cpp	/^enum { Anon1_member1, Anon1_member2 };$/;"	e	enum:__anon5f0fdc1d0103	file:
+__anon5f0fdc1d0203	input.cpp	/^enum : unsigned int { Anon2_member1 };$/;"	g	typeref:typename:unsigned int	file:	end:23
+Anon2_member1	input.cpp	/^enum : unsigned int { Anon2_member1 };$/;"	e	enum:__anon5f0fdc1d0203	file:
+__anon5f0fdc1d0303	input.cpp	/^enum : whatever_t { Anon3_member1 };$/;"	g	typeref:typename:whatever_t	file:	end:24
+Anon3_member1	input.cpp	/^enum : whatever_t { Anon3_member1 };$/;"	e	enum:__anon5f0fdc1d0303	file:
+Class	input.cpp	/^class Class$/;"	c	file:	end:32
+CE1	input.cpp	/^	enum CE1 : int { CE1_member1 = 10, CE1_member2 = (CE1_member1 << 10) };$/;"	g	class:Class	typeref:typename:int	file:	end:28
+CE1_member1	input.cpp	/^	enum CE1 : int { CE1_member1 = 10, CE1_member2 = (CE1_member1 << 10) };$/;"	e	enum:Class::CE1	file:
+CE1_member2	input.cpp	/^	enum CE1 : int { CE1_member1 = 10, CE1_member2 = (CE1_member1 << 10) };$/;"	e	enum:Class::CE1	file:
+CEC1	input.cpp	/^	enum class CEC1 : unsigned long int { CEC1_member1 };$/;"	g	class:Class	typeref:typename:unsigned long int	file:	end:29	properties:scopedenum
+CEC1_member1	input.cpp	/^	enum class CEC1 : unsigned long int { CEC1_member1 };$/;"	e	enum:Class::CEC1	file:
+CES1	input.cpp	/^	enum struct CES1 : int { CES1_member1 };$/;"	g	class:Class	typeref:typename:int	file:	end:30	properties:scopedenum
+CES1_member1	input.cpp	/^	enum struct CES1 : int { CES1_member1 };$/;"	e	enum:Class::CES1	file:
+Function1	input.cpp	/^	virtual enum CEC1 Function1(enum CE1 parameter);$/;"	p	class:Class	typeref:enum:CEC1	file:	properties:virtual
+E1_var1	input.cpp	/^enum E1 E1_var1;$/;"	v	typeref:enum:E1
+EC1_var1	input.cpp	/^enum EC1 EC1_var1[10][10];$/;"	v	typeref:enum:EC1[10][10]
