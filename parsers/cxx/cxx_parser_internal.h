@@ -32,6 +32,7 @@ bool cxxParserHandleLambda(CXXToken * pParenthesis);
 
 // cxx_parser_block.c
 bool cxxParserParseBlock(bool bExpectClosingBracket);
+bool cxxParserParseBlockHandleOpeningBracket(void);
 
 enum CXXExtractVariableDeclarationsFlags
 {

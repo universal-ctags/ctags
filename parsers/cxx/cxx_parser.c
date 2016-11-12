@@ -399,7 +399,7 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 	MIOPos oFilePosition = getInputFilePosition();
 	int iFileLine = getInputLineNumber();
 
-	if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon))
+	if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to EOF/semicolon");
 		return false;
@@ -411,7 +411,7 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 		CXX_DEBUG_LEAVE_TEXT("Got EOF after enum/class/struct/union block");
 		return true;
 	}
-
+	
 	if(g_cxx.pTokenChain->iCount < 2)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Nothing interesting after enum/class/struct block");
@@ -446,6 +446,18 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 				g_cxx.pTokenChain,
 				cxxTokenCreateKeyword(iFileLine,oFilePosition,CXXKeywordVOLATILE)
 			);
+	}
+
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
+	{
+		CXX_DEBUG_PRINT("Found opening bracket: possibly a function declaration?");
+		if(!cxxParserParseBlockHandleOpeningBracket())
+		{
+			CXX_DEBUG_LEAVE_TEXT("Failed to handle the opening bracket");
+			return false;
+		}
+		CXX_DEBUG_LEAVE_TEXT("Opening bracket handled");
+		return true;
 	}
 
 	if(uKeywordState & CXXParserKeywordStateSeenTypedef)
