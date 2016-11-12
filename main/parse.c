@@ -2184,6 +2184,17 @@ extern bool runParserInNarrowedInputStream (const langType language,
 					       unsigned long sourceLineOffset)
 {
 	bool tagFileResized;
+
+	verbose ("runParserInNarrowedInputStream: %s; "
+			 "file: %s, "
+			 "start(line: %lu, offset: %u, srcline: %lu)"
+			 " - "
+			 "end(line: %lu, offset: %u)\n",
+			 getLanguageName (language),
+			 getInputFileName (),
+			 startLine, startCharOffset, sourceLineOffset,
+			 endLine, endCharOffset);
+
 	pushNarrowedInputStream (language,
 				 startLine, startCharOffset,
 				 endLine, endCharOffset,
