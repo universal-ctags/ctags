@@ -7,6 +7,7 @@ public:
 class Derived : public Base
 {
 	virtual void foo() override;
+	virtual void foo() const override;
 	virtual void override();
 };
 

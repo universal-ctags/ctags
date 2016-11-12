@@ -66,7 +66,9 @@ static bool cxxParserParseBlockHandleOpeningBracket(void)
 									// FIXME: This check could be made stricter?
 									CXXTokenTypeSingleColon | CXXTokenTypeComma
 							))
-						)
+						) &&
+						// "override" is handled as identifier since it's a keyword only after function signatures
+						(strcmp(vStringValue(g_cxx.pToken->pPrev->pszWord),"override") != 0)
 					) || (
 						// type var[][][]..[] { ... }
 						// (but not '[] { ... }' which is a parameterelss lambda)
