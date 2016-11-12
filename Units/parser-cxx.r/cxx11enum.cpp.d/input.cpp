@@ -1,13 +1,46 @@
 
-enum A:int {A_a, A_b, A_c};
-enum B:long {B_a, B_b, B_c};
-enum C:unsigned int {C_a, C_b, C_c};
-enum class EC1:short {EC1_a, EC1_b, EC1_c};
-enum struct ES1:unsigned {ES1_a, ES1_b, ES1_c};
+#define SOME_MACRO(a,b) 1
 
-class Foo {
-  enum D:int {a, b, c};
-  enum class EC2:unsigned {EC2_a, EC2_b, EC2_c};
-  enum struct ES2:int {ES2_a, ES2_b, ES2_c};
-  virtual void foo(enum D a);
+typedef int whatever_t;
+typedef unsigned char uint8_t;
+
+enum E1 : int { E1_member1, E1_member2 };
+enum E2 : long { E2_member1 };
+enum E3 : unsigned int { E3_member1 };
+enum E4 : unsigned long long int { } E4_var1, E4_var2;
+enum E5 : whatever_t { E5_member1 } E5_var1;
+
+enum class EC1 { };
+enum class EC2 : short { EC2_member1, EC2_member2 };
+
+enum struct ES1 { };
+enum struct ES2 : unsigned { ES2_member1, ES2_member2 };
+enum struct ES3 : uint8_t { ES3_member1 = SOME_MACRO(1,whatever appears here), ES3_member2 };
+enum struct ES4 : unsigned long long int { ES4_member1 = (1234 * 10) << 1 };
+enum struct ES5 : signed whatever_t { } ES4_var1[10];
+
+enum { Anon1_member1, Anon1_member2 };
+enum : unsigned int { Anon2_member1 };
+enum : whatever_t { Anon3_member1 };
+
+class Class
+{
+	enum CE1 : int { CE1_member1 = 10, CE1_member2 = (CE1_member1 << 10) };
+	enum class CEC1 : unsigned long int { CEC1_member1 };
+	enum struct CES1 : int { CES1_member1 };
+	virtual enum CEC1 Function1(enum CE1 parameter);
 };
+
+// Forward declarations: we ignore them.
+enum F1 : whatever_t;
+enum class F2;
+enum class F3 : whatever_t;
+enum struct F4 : unsigned int;
+
+// variable declarations
+enum E1 E1_var1;
+enum EC1 EC1_var1[10][10];
+//enum class EC2 EC2_var1; <-- this is NOT valid C++11
+
+
+

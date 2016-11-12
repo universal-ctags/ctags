@@ -399,7 +399,7 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 	MIOPos oFilePosition = getInputFilePosition();
 	int iFileLine = getInputLineNumber();
 
-	if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon))
+	if(!cxxParserParseUpToOneOf(CXXTokenTypeEOF | CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Failed to parse up to EOF/semicolon");
 		return false;
@@ -411,7 +411,7 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 		CXX_DEBUG_LEAVE_TEXT("Got EOF after enum/class/struct/union block");
 		return true;
 	}
-
+	
 	if(g_cxx.pTokenChain->iCount < 2)
 	{
 		CXX_DEBUG_LEAVE_TEXT("Nothing interesting after enum/class/struct block");
@@ -448,6 +448,18 @@ static bool cxxParserParseEnumStructClassOrUnionFullDeclarationTrailer(
 			);
 	}
 
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeOpeningBracket))
+	{
+		CXX_DEBUG_PRINT("Found opening bracket: possibly a function declaration?");
+		if(!cxxParserParseBlockHandleOpeningBracket())
+		{
+			CXX_DEBUG_LEAVE_TEXT("Failed to handle the opening bracket");
+			return false;
+		}
+		CXX_DEBUG_LEAVE_TEXT("Opening bracket handled");
+		return true;
+	}
+
 	if(uKeywordState & CXXParserKeywordStateSeenTypedef)
 		cxxParserExtractTypedef(g_cxx.pTokenChain,true);
 	else
@@ -472,16 +484,64 @@ bool cxxParserParseEnum(void)
 				{ enumerator-list(optional) }	(1)
 			enum-key attr(optional) identifier enum-base(optional) ;
 				(2)	(since C++11)
+
+			enum-key	-	one of enum, enum class(since C++11), or enum struct(since C++11)
+			attr(C++11)	-	optional sequence of any number of attributes
+			identifier	-	the name of the enumeration that's being declared.
+				If present, and if this declaration is a re-declaration, it may be preceded by
+				nested-name-specifier(since C++11): sequence of names and scope-resolution
+				operators ::, ending with scope-resolution operator. The name can be omitted
+				only in unscoped enumeration declarations
+
+			enum-base(C++11)	-	colon (:), followed by a type-specifier-seq that names an
+				integral type (if it is cv-qualified, qualifications are ignored)
+			enumerator-list	-	comma-separated list of enumerator definitions, each of which is
+				either simply an identifier, which becomes the name of the enumerator, or an
+				identifier with an initializer: identifier = constexpr. In either case, the
+				identifier can be directly followed by an optional attribute specifier
+				sequence. (since C++17)
 	*/
 
 	// Skip attr and class-head-name
 	if(!cxxParserParseUpToOneOf(
-			CXXTokenTypeEOF | CXXTokenTypeSemicolon |
-				CXXTokenTypeParenthesisChain | CXXTokenTypeOpeningBracket
+			CXXTokenTypeEOF | CXXTokenTypeSemicolon | CXXTokenTypeKeyword |
+				CXXTokenTypeSingleColon | CXXTokenTypeParenthesisChain |
+				CXXTokenTypeOpeningBracket
 		))
 	{
 		CXX_DEBUG_LEAVE_TEXT("Could not parse enum name");
 		return false;
+	}
+
+	bool bIsScopedEnum = false; // c++11 scoped enum (enum class | enum struct)
+
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeKeyword))
+	{
+		// enum class | enum struct ?
+		if(
+			(g_cxx.pToken->eKeyword == CXXKeywordSTRUCT) ||
+			(g_cxx.pToken->eKeyword == CXXKeywordCLASS)
+		)
+		{
+			bIsScopedEnum = true;
+		}
+
+		if(!cxxParserParseUpToOneOf(
+				CXXTokenTypeEOF | CXXTokenTypeSemicolon | CXXTokenTypeSingleColon |
+					CXXTokenTypeParenthesisChain | CXXTokenTypeOpeningBracket
+			))
+		{
+			CXX_DEBUG_LEAVE_TEXT("Could not parse enum name");
+			return false;
+		}
+	}
+
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
+	{
+		// tolerate EOF, treat as forward declaration
+		cxxParserNewStatement();
+		CXX_DEBUG_LEAVE_TEXT("EOF before enum block: treating as forward declaration");
+		return true;
 	}
 
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeParenthesisChain))
@@ -493,12 +553,14 @@ bool cxxParserParseEnum(void)
 		return true;
 	}
 
-	// FIXME: This block is duplicated in struct/union/class
 	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSemicolon))
 	{
-		if(g_cxx.pTokenChain->iCount > 3)
+		CXX_DEBUG_PRINT("Found semicolon, maybe typedef or variable declaration");
+
+		// scoped enums can't be used to declare variables.
+		if((!bIsScopedEnum) && (g_cxx.pTokenChain->iCount > 3))
 		{
-			 // [typedef] struct X Y; <-- typedef has been removed!
+			 // [typedef] enum X Y; <-- typedef has been removed!
 			if(g_cxx.uKeywordState & CXXParserKeywordStateSeenTypedef)
 				cxxParserExtractTypedef(g_cxx.pTokenChain,true);
 			else
@@ -510,21 +572,53 @@ bool cxxParserParseEnum(void)
 		return true;
 	}
 
-	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeEOF))
-	{
-		// tolerate EOF, treat as forward declaration
-		cxxParserNewStatement();
-		CXX_DEBUG_LEAVE_TEXT("EOF before enum block: treating as forward declaration");
-		return true;
-	}
+	// colon or opening bracket
+	CXX_DEBUG_ASSERT(
+			cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeSingleColon | CXXTokenTypeOpeningBracket),
+			"We should be pointing to a : or a {"
+		);
 
-	// semicolon or opening bracket
-
-	// check if we can extract a class name identifier
+	// check if we can extract a class name identifier now
 	CXXToken * pEnumName = cxxTokenChainLastTokenOfType(
 			g_cxx.pTokenChain,
 			CXXTokenTypeIdentifier
 		);
+
+	CXXToken * pTypeBegin; // no need to NULLify, only pTypeEnd matters.
+	CXXToken * pTypeEnd = NULL;
+
+	if(cxxTokenTypeIs(g_cxx.pToken,CXXTokenTypeSingleColon))
+	{
+		// skip type
+		CXX_DEBUG_PRINT("Single colon, trying to skip type");
+		
+		pTypeBegin = g_cxx.pToken;
+
+		if(!cxxParserParseUpToOneOf(
+				CXXTokenTypeEOF | CXXTokenTypeSemicolon | CXXTokenTypeOpeningBracket
+			))
+		{
+			CXX_DEBUG_LEAVE_TEXT("Could not parse enum type");
+			return false;
+		}
+
+		if(cxxTokenTypeIsOneOf(g_cxx.pToken,CXXTokenTypeEOF | CXXTokenTypeSemicolon))
+		{
+			// tolerate EOF, treat as forward declaration
+			cxxParserNewStatement();
+			CXX_DEBUG_LEAVE_TEXT("EOF or semicolon before enum block: can't decode this");
+			return true;
+		}
+
+		// certainly opening bracket now.
+		if(g_cxx.pToken->pPrev != pTypeBegin)
+		{
+			// there were tokens between the semicolon and the type begin
+			pTypeBegin = pTypeBegin->pNext;
+			pTypeEnd = g_cxx.pToken->pPrev;
+		}
+	}
+
 
 	int iPushedScopes = 0;
 
@@ -570,6 +664,7 @@ bool cxxParserParseEnum(void)
 			);
 	}
 
+
 	tagEntryInfo * tag = cxxTagBegin(CXXTagKindENUM,pEnumName);
 
 	int iCorkQueueIndex = CORK_NIL;
@@ -579,7 +674,21 @@ bool cxxParserParseEnum(void)
 		// FIXME: this is debatable
 		tag->isFileScope = !isInputHeaderFile();
 
+		CXXToken * pTypeName = NULL;
+
+		if(pTypeEnd)
+		{
+			CXX_DEBUG_ASSERT(pTypeBegin,"Type begin should be also set here");
+			pTypeName = cxxTagCheckAndSetTypeField(pTypeBegin,pTypeEnd);
+		}
+
+		if(bIsScopedEnum)
+			cxxTagSetProperties(CXXTagPropertyScopedEnum);
+
 		iCorkQueueIndex = cxxTagCommit();
+		
+		if(pTypeName)
+			cxxTokenDestroy(pTypeName);
 	}
 
 	cxxScopePush(pEnumName,CXXScopeTypeEnum,CXXScopeAccessPublic);
