@@ -280,6 +280,8 @@ vString * cxxTagSetProperties(unsigned int uProperties)
 		ADD_PROPERTY("volatile");
 	if(uProperties & CXXTagPropertyDeprecated)
 		ADD_PROPERTY("deprecated");
+	if(uProperties & CXXTagPropertyScopedEnum)
+		ADD_PROPERTY("scopedenum");
 
 	cxxTagSetField(CXXTagFieldProperties,vStringValue(pszProperties));
 

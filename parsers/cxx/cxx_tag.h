@@ -137,6 +137,8 @@ typedef enum _CXXTagProperty
 	CXXTagPropertyScopeTemplateSpecialization = (1 << 14),
 	// __attribute__((deprecated)) has been seen
 	CXXTagPropertyDeprecated = (1 << 15),
+	// scoped enum (C++11)
+	CXXTagPropertyScopedEnum = (1 << 16)
 } CXXTagProperty;
 
 // Set the modifiers field of the tag.
