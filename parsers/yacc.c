@@ -21,6 +21,7 @@
 
 
 static bool not_in_grammar_rules = true;
+static bool in_union;
 static tagRegexTable yaccTagRegexTable [] = {
 	{"^([A-Za-z][A-Za-z_0-9]+)[ \t]*:", "\\1",
 	 "l,label,labels", NULL, &not_in_grammar_rules },
@@ -95,6 +96,7 @@ static void enter_union (const char *line CTAGS_ATTR_UNUSED,
 
 	if (not_in_grammar_rules)
 	{
+		in_union = true;
 		cstart->input = getInputLineNumber ();
 		cstart->source = getInputLineNumber ();
 	}
@@ -107,7 +109,7 @@ static void leave_union (const char *line CTAGS_ATTR_UNUSED,
 {
 	struct cStart *cstart = data;
 
-	if (not_in_grammar_rules && cstart->input && cstart->source)
+	if (not_in_grammar_rules && in_union && cstart->input && cstart->source)
 	{
 		unsigned long c_end;
 
@@ -118,6 +120,7 @@ static void leave_union (const char *line CTAGS_ATTR_UNUSED,
 			     cstart->source);
 
 		memset (cstart, 0, sizeof (*cstart));
+		in_union = false;
 	}
 }
 
@@ -141,11 +144,18 @@ static void initializeYaccParser (langType language)
 	addCallbackRegex (language, "^%\\{", "{exclusive}", enter_c_prologue, NULL, &cStart);
 	addCallbackRegex (language, "^%\\}", "{exclusive}", leave_c_prologue, NULL, &cStart);
 
-	not_in_grammar_rules = true;
 	addCallbackRegex (language, "^%%", "{exclusive}", change_section, NULL, NULL);
 
 	addCallbackRegex (language, "^%union", "{exclusive}", enter_union, NULL, &cStart);
 	addCallbackRegex (language, "^}",      "{exclusive}", leave_union, NULL, &cStart);
+}
+
+static void runYaccParser (void)
+{
+	in_union = false;
+	not_in_grammar_rules = true;
+
+	findRegexTags ();
 }
 
 extern parserDefinition* YaccParser (void)
@@ -154,7 +164,8 @@ extern parserDefinition* YaccParser (void)
 	parserDefinition* const def = parserNew ("YACC");
 	def->extensions = extensions;
 	def->initialize = initializeYaccParser;
-	def->method     = METHOD_NOT_CRAFTED|METHOD_REGEX;
+	def->method     = METHOD_REGEX;
+	def->parser     = runYaccParser;
 	def->tagRegexTable = yaccTagRegexTable;
 	def->tagRegexCount = ARRAY_SIZE (yaccTagRegexTable);
 	return def;
