@@ -17,7 +17,7 @@
 
 #include "parse.h"
 #include "vstring.h"
-#include "lcpp.h"
+#include "../meta-cpreprocessor.h"
 #include "debug.h"
 #include "keyword.h"
 #include "read.h"

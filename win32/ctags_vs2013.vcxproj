@@ -132,7 +132,7 @@
     <ClCompile Include="..\parsers\json.c" />
     <ClCompile Include="..\main\keyword.c" />
     <ClCompile Include="..\main\kind.c" />
-    <ClCompile Include="..\main\lcpp.c" />
+    <ClCompile Include="..\parsers\cpreprocessor.c" />
     <ClCompile Include="..\parsers\lisp.c" />
     <ClCompile Include="..\parsers\iniconf.c" />
     <ClCompile Include="..\main\lregex.c" />
@@ -154,6 +154,7 @@
     <ClCompile Include="..\main\output-etags.c" />
     <ClCompile Include="..\main\output-xref.c" />
     <ClCompile Include="..\main\output-json.c" />
+    <ClCompile Include="..\main\param.c" />
     <ClCompile Include="..\main\parse.c" />
     <ClCompile Include="..\parsers\pascal.c" />
     <ClCompile Include="..\parsers\perl.c" />
@@ -236,11 +237,12 @@
     <ClInclude Include="..\main\htable.h" />
     <ClInclude Include="..\main\keyword.h" />
     <ClInclude Include="..\main\kind.h" />
-    <ClInclude Include="..\main\lcpp.h" />
+    <ClInclude Include="..\parsers\meta-cpreprocessor.h" />
     <ClInclude Include="..\main\main.h" />
     <ClInclude Include="..\main\nestlevel.h" />
     <ClInclude Include="..\main\options.h" />
     <ClInclude Include="..\main\output.h" />
+    <ClInclude Include="..\main\param.h" />
     <ClInclude Include="..\main\parse.h" />
     <ClInclude Include="..\main\parsers.h" />
     <ClInclude Include="..\main\ptag.h" />

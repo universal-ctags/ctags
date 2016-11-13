@@ -75,4 +75,10 @@ extern void cppUngetc (const int c);
 extern int cppGetc (void);
 extern int cppSkipOverCComment (void);
 
+typedef struct sCppIgnoredTokenInfo {
+	bool ignoreFollowingParenthesis; /* -I SOMETHING+ */
+	char * replacement;              /* -I SOMETHING=REPLACEMENT */
+} cppIgnoredTokenInfo;
+extern const cppIgnoredTokenInfo * cppIsIgnoreToken (const char *const name);
+
 #endif  /* CTAGS_MAIN_GET_H */

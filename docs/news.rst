@@ -865,6 +865,43 @@ introducing parser own fields; `<fieldname>`:`<value>` is used as
 before and the name of field owner is never prefixed. The `language:`
 field of the tag identifies the owner.
 
+Parser own parameter
+---------------------------------------------------------------------
+
+.. NOT REVIEWED YET
+
+To control the detail of a parser, ``--param-<LANG>`` option.
+``--kinds-<LANG>``, ``--fields-<LANG>``, ``--extra-<LANG>`` (not implemented yet)
+can be used for customizing the behavior of a parser specified with ``<LANG>``.
+
+``--param-<LANG>`` should be used other aspects of the parser other
+than the options(kinds, fields, etras).
+
+A parser defines a set of parameters. Each parameter has name and
+takes an argument. A user can set a parameter with following notation
+::
+
+   --param-<LANG>:name=arg
+
+An example of specifying a parameter
+::
+
+   --param-CPreProcessor:if0=true
+
+Here `if0` is a name of parameter of CPreProcessor parser and
+`true` is the value of it.
+
+All available parameters can be listed with ``--list-params`` option.
+
+.. code-block:: console
+
+    $ ./ctags --list-params
+    #PARSER         NAME     DESCRIPTION
+    CPreProcessor   if0      examine code within "#if 0" branch (true or [false])
+    CPreProcessor   ignore   a token to be specially handled
+
+(At this time only CPreProcessor parser has parameters.)
+
 
 .. _xformat:
 

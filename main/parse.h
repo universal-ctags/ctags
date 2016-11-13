@@ -18,6 +18,7 @@
 #include "dependency.h"
 #include "field.h"
 #include "kind.h"
+#include "param.h"
 #include "parsers.h"  /* contains list of parsers */
 #include "strlist.h"
 
@@ -153,6 +154,10 @@ struct sParserDefinition {
 
 	parserDependency * dependencies;
 	unsigned int dependencyCount;
+
+	parameterHandlerTable  *parameterHandlerTable;
+	unsigned int parameterHandlerCount;
+
 	/* used internally */
 	langType id;		    /* id assigned to language */
 	unsigned int enabled:1;	       /* currently enabled? */
@@ -245,6 +250,7 @@ extern void printLanguageKinds (const langType language, bool allKindFields);
 extern void printLanguageRoles (const langType language, const char* letters);
 extern void printLanguageAliases (const langType language);
 extern void printLanguageList (void);
+extern void printLanguageParameters (const langType language);
 extern bool doesParserRequireMemoryStream (const langType language);
 extern bool parseFile (const char *const fileName);
 extern bool runParserInNarrowedInputStream (const langType language,

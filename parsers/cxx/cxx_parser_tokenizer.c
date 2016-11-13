@@ -16,7 +16,7 @@
 
 #include "parse.h"
 #include "vstring.h"
-#include "lcpp.h"
+#include "../meta-cpreprocessor.h"
 #include "debug.h"
 #include "keyword.h"
 #include "read.h"
@@ -1103,7 +1103,7 @@ bool cxxParserParseNextToken(void)
 		}
 
 		int iCXXKeyword;
-		const ignoredTokenInfo * pIgnore = NULL;
+		const cppIgnoredTokenInfo * pIgnore = NULL;
 
 check_keyword:
 
@@ -1141,8 +1141,8 @@ check_keyword:
 
 			if(!pIgnore)
 			{
-				pIgnore = isIgnoreToken(vStringValue(t->pszWord));
-			
+				pIgnore = cppIsIgnoreToken(vStringValue(t->pszWord));
+
 				if(pIgnore)
 				{
 					CXX_DEBUG_PRINT("Ignore token %s",vStringValue(t->pszWord));

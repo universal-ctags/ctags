@@ -27,7 +27,6 @@
 #include "fmt.h"
 #include "parse.h"
 #include "strlist.h"
-#include "htable.h"
 #include "vstring.h"
 
 /*
@@ -60,15 +59,9 @@ typedef enum sortType {
 	SO_FOLDSORTED
 } sortType;
 
-typedef struct sIgnoredTokenInfo {
-	bool ignoreFollowingParenthesis; /* -I SOMETHING+ */
-	char * replacement;              /* -I SOMETHING=REPLACEMENT */
-} ignoredTokenInfo;
-
 /*  This stores the command line options.
  */
 typedef struct sOptionValues {
-	hashTable * ignore;  /* -I  name of file containing tokens to ignore */
 	bool append;         /* -a  append to "tags" file */
 	bool backward;       /* -B  regexp patterns search backwards */
 	bool etags;          /* -e  output Emacs style tags file */
@@ -88,7 +81,6 @@ typedef struct sOptionValues {
 	char *inputEncoding;	/* --input-encoding	convert text into --output-encoding */
 	char *outputEncoding;	/* --output-encoding	write tags file as this encoding */
 #endif
-	bool if0;            /* --if0  examine code within "#if 0" branch */
 	langType language;      /* --lang specified language override */
 	bool followLinks;    /* --link  follow symbolic links? */
 	bool filter;         /* --filter  behave as filter: files in, tags out */
@@ -157,7 +149,6 @@ extern void cArgForth (cookedArgs* const current);
 
 extern bool isExcludedFile (const char* const name);
 extern bool isIncludeFile (const char *const fileName);
-extern const ignoredTokenInfo * isIgnoreToken (const char *const name);
 extern void parseCmdlineOptions (cookedArgs* const cargs);
 extern void previewFirstOption (cookedArgs* const cargs);
 extern void readOptionConfiguration (void);

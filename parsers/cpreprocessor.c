@@ -17,7 +17,8 @@
 
 #include "debug.h"
 #include "entry.h"
-#include "lcpp.h"
+#include "htable.h"
+#include "meta-cpreprocessor.h"
 #include "kind.h"
 #include "options.h"
 #include "read.h"
@@ -120,6 +121,9 @@ static kindOption CPreProKinds [] = {
 /*
 *   DATA DEFINITIONS
 */
+
+static bool doesExaminCodeWithInIf0Branch;
+
 
 /*  Use brace formatting to detect end of block.
  */
@@ -365,7 +369,7 @@ static bool pushConditional (const bool firstBranchChosen)
 		ifdef->branchChosen      = firstBranchChosen;
 		ifdef->ignoring = (bool) (ignoreAllBranches || (
 				! firstBranchChosen  &&  ! BraceFormat  &&
-				(ifdef->singleBranch || !Option.if0)));
+				(ifdef->singleBranch || !doesExaminCodeWithInIf0Branch)));
 		ignoreBranch = ifdef->ignoring;
 	}
 	return ignoreBranch;
@@ -410,7 +414,6 @@ static int makeDefineTag (const char *const name, const char* const signature, b
 					 Cpp.macroUndefRoleIndex);
 		else
 			initTagEntry (&e, name, Cpp.defineMacroKind);
-		e.lineNumberEntry = (bool) (Option.locate == EX_LINENUM);
 		e.isFileScope  = isFileScope;
 		if (isFileScope)
 			markTagExtraBit (&e, XTAG_FILE_SCOPE);
@@ -448,7 +451,6 @@ static void makeIncludeTag (const  char *const name, bool systemHeader)
 			pushLanguage (Cpp.lang);
 
 		initRefTagEntry (&e, name, Cpp.headerKind, role_index);
-		e.lineNumberEntry = (bool) (Option.locate == EX_LINENUM);
 		e.isFileScope  = false;
 		e.truncateLine = true;
 		makeTagEntry (&e);
@@ -1064,10 +1066,133 @@ static void findCppTags (void)
 	cppTerminate ();
 }
 
+
+/*
+ *  Token ignore processing
+ */
+
+static hashTable * ignoreTokenTable;
+
+/*  Determines whether or not "name" should be ignored, per the ignore list.
+ */
+extern const cppIgnoredTokenInfo * cppIsIgnoreToken(const char * name)
+{
+	if(!ignoreTokenTable)
+		return NULL;
+
+	return (const cppIgnoredTokenInfo *)hashTableGetItem(ignoreTokenTable,(char *)name);
+}
+
+static void saveIgnoreToken(const char * ignoreToken)
+{
+	if(!ignoreToken)
+		return;
+
+	Assert (ignoreTokenTable);
+
+	const char * c = ignoreToken;
+	char cc = *c;
+
+	const char * tokenBegin = c;
+	const char * tokenEnd = NULL;
+	const char * replacement = NULL;
+	bool ignoreFollowingParenthesis = false;
+
+	while(cc)
+	{
+		if(cc == '=')
+		{
+			if(!tokenEnd)
+				tokenEnd = c;
+			c++;
+			if(*c)
+				replacement = c;
+			break;
+		}
+
+		if(cc == '+')
+		{
+			if(!tokenEnd)
+				tokenEnd = c;
+			ignoreFollowingParenthesis = true;
+		}
+
+		c++;
+		cc = *c;
+	}
+
+	if(!tokenEnd)
+		tokenEnd = c;
+
+	if(tokenEnd <= tokenBegin)
+		return;
+
+
+	cppIgnoredTokenInfo * info = (cppIgnoredTokenInfo *)eMalloc(sizeof(cppIgnoredTokenInfo));
+
+	info->ignoreFollowingParenthesis = ignoreFollowingParenthesis;
+	info->replacement = replacement ? eStrdup(replacement) : NULL;
+
+	hashTablePutItem(ignoreTokenTable,eStrndup(tokenBegin,tokenEnd - tokenBegin),info);
+
+	verbose ("    ignore token: %s\n", ignoreToken);
+}
+
+static void freeIgnoredTokenInfo(cppIgnoredTokenInfo * info)
+{
+	if(!info)
+		return;
+	if(info->replacement)
+		eFree(info->replacement);
+	eFree(info);
+}
+
+static hashTable *makeIgnoreTokenTable (void)
+{
+	return hashTableNew(
+		1024,
+		hashCstrhash,
+		hashCstreq,
+		free,
+		(void (*)(void *))freeIgnoredTokenInfo
+		);
+}
+
 static void initializeCpp (const langType language)
 {
 	Cpp.lang = language;
+
+	ignoreTokenTable = makeIgnoreTokenTable ();
 }
+
+static void CpreProInstallIgnoreToken (const langType language, const char *name, const char *arg)
+{
+	if (arg == NULL || arg[0] == '\0')
+	{
+		hashTableDelete(ignoreTokenTable);
+		ignoreTokenTable = makeIgnoreTokenTable ();
+		verbose ("    clearing list\n");
+	}
+	else
+		saveIgnoreToken (arg);
+}
+
+static void CpreProSetIf0 (const langType language, const char *name, const char *arg)
+{
+	if (strcmp (arg, "true") == 0)
+		doesExaminCodeWithInIf0Branch = true;
+}
+
+static parameterHandlerTable CpreProParameterHandlerTable [] = {
+	{ .name = "if0",
+	  .desc = "examine code within \"#if 0\" branch (true or [false])",
+	  .handleParameter = CpreProSetIf0,
+	},
+	{ .name = "ignore",
+	  .desc = "a token to be specially handled",
+	  .handleParameter = CpreProInstallIgnoreToken,
+	},
+};
 
 extern parserDefinition* CPreProParser (void)
 {
@@ -1076,5 +1201,9 @@ extern parserDefinition* CPreProParser (void)
 	def->kindCount  = ARRAY_SIZE (CPreProKinds);
 	def->initialize = initializeCpp;
 	def->parser     = findCppTags;
+
+	def->parameterHandlerTable = CpreProParameterHandlerTable;
+	def->parameterHandlerCount = ARRAY_SIZE(CpreProParameterHandlerTable);
+
 	return def;
 }
