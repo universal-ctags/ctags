@@ -1,6 +1,17 @@
-Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/11/11
+Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/11/14
 
 #include <onigmo.h>
+
+
+# int onig_initialize(OnigEncoding use_encodings[], int num_encodings)
+
+  Initialize library.
+  This is added for compatibility to Oniguruma 6.0.
+  Currently this is same as onig_init().
+
+  arguments
+  1 use_encodings:         array of encodings used in application.
+  2 num_encodings:         number of encodings.
 
 
 # int onig_init(void)
@@ -9,6 +20,7 @@ Onigmo (Oniguruma-mod) API  Version 6.0.0  2016/11/11
 
   Single thread program:
     You don't have to call it explicitly, because it is called in onig_new().
+    However calling it is preferred.
 
   Multi thread program:
     You have to call it explicitly from a specific thread (normally the main

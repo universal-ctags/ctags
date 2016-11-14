@@ -809,6 +809,8 @@ typedef struct {
 
 /* Oniguruma Native API */
 ONIG_EXTERN
+int onig_initialize(OnigEncoding encodings[], int n);
+ONIG_EXTERN
 int onig_init(void);
 ONIG_EXTERN
 int onig_error_code_to_str(OnigUChar* s, OnigPosition err_code, ...);

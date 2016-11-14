@@ -1,6 +1,17 @@
-Onigmo インターフェース Version 6.0.0   2016/11/11
+Onigmo インターフェース Version 6.0.0   2016/11/14
 
 #include <onigmo.h>
+
+
+# int onig_initialize(OnigEncoding use_encodings[], int num_encodings)
+
+  ライブラリの初期化
+  鬼車6.0との互換性のために追加された。
+  現時点ではonig_init()と同じである。
+
+  引数
+  1 use_encodings:         使用する文字エンコーディングの配列
+  2 num_encodings:         文字エンコーディングの数
 
 
 # int onig_init(void)
@@ -9,6 +20,7 @@ Onigmo インターフェース Version 6.0.0   2016/11/11
 
   シングルスレッドプログラム:
     onig_new()の中で呼び出されるので、この関数を明示的に呼び出さなくてもよい。
+    しかし呼び出す方が望ましい。
 
   マルチスレッドプログラム:
     この関数はスレッドセーフではないため、onig_new()を呼ぶ前にある特定の

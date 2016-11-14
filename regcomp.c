@@ -5956,6 +5956,11 @@ onig_new(regex_t** reg, const UChar* pattern, const UChar* pattern_end,
   return r;
 }
 
+extern int
+onig_initialize(OnigEncoding encodings[] ARG_UNUSED, int n ARG_UNUSED)
+{
+  return onig_init();
+}
 
 extern int
 onig_init(void)
